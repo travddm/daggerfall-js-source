@@ -206,6 +206,7 @@ import { TITLES, GLYPHS, GLYPHS_MAX, AURAS, ICONS, titleClaimed, seatTitleClaimO
 import { nameAllowed, maskText, textCaught } from './nameFilter.js';   // NAME-F2: the filter runs INSIDE sanitizeName, so the relay carries it; TEXT-F1: and a player's words are starred inside sanitizeChat and wordsLine, the same way - nameFilter.js imports nothing, same as mat4.js above, so the worker's graph stays flat
 import { validRollSpec, validRoll, rollDice, ROLL_DICE_MAX, ROLL_SIDES_MAX, ROLL_MOD_MAX } from './dice.js';   // DICE1: the dice's law - one home for both ends (dice.js imports nothing, so the worker's graph stays flat)
 import { ribbonClaimOk } from './heraldryLaw.js';   // SEASON1 part two: a Season's banner ribbon - heraldryLaw.js imports nothing, so the worker's graph stays flat
+import { HEALTH_SHARE_WHOLE } from './siege/refereeHealthShare.js';   // SHARED-HEALTH: a report's share is in its parts - refereeHealthShare.js imports nothing, so the worker's graph stays flat
 import { GUILD_TAG_RE } from './guild/guildLaw.js';   // GUILD1c: a guild's tag is badged beside the name - guildLaw.js imports nothing, so the worker's graph stays flat
 import { homeMapIdOk, homeBuildingKeyOk, HOME_ORDER_KEYS_MAX } from './homeLaw.js';   // QUEST-HOME: a home word's town and buildings, the homes' own shapes - homeLaw.js imports nothing, so the worker's graph stays flat
 import { RAID_KEY_RE, RAID_SIG_RE, RAID_TARGET_MIN, RAID_TARGET_MAX, RAID_TYPES, RAID_WORD_KILLS_MAX, RAID_ACCOUNTS_MAX, RAID_TOP_MAX, RAID_TOWNS_SHA_RE, RAID_TOWNS_CHUNK, RAID_TOWNS_CHUNKS_MAX } from './raid/raidLaw.js';   // RAID3: a town raid's law - raidLaw.js imports nothing, so the worker's graph stays flat
@@ -1679,7 +1680,8 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  is deployed by CI and the relay by hand, so a skew between them is the ordinary state of a release day, and until
  *  now nothing on either end could see it. */
 // Integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world275';   // world275: SD-PARTY (2026-10-28, the owner: "we need to make this a party instance ... to stop griefin on the bosses"; bible/11-Multiplayer/Super-Dungeons.md SD-PARTY; NOT YET DEPLOYED; world274 on its branch, renumbered past LADDER-CUT's world274 at the merge): each party its own Shattered Hour, `sd:<s>.<owner>` (net/superDungeon/sdLaw.js sdRoomKey), its door the owner, staff and the owner's party (server/src/sdCopy.js, which joins the bundle); one life and one win a Hollow across the copies, the hub's `sdac:` and its receipts; a party's win closes its own Hour, the Hollow stands until it fades. SD-BACK, SD-SOLO, SD-WON (the same day, on the branch): a death keeps its own copy open to it and every other shut; a player in no party shares an Hour of eight, `sd:<s>.p<n>`, found by the Worker's `/sd/open`; a won copy takes nobody back past its collapse.
+export const RELAY_VERSION = 'world276';   // world276: SHARED-HEALTH (2026-10-26, world270 on its branch, renumbered past CHAT-POST, MASTER-THREE, RPT1026, APPEARANCES, LADDER-CUT and SD-PARTY at the merges; bible/06-Systems/Integrity-Arc.md section 5, "Decisions (2026-10-26, SHARED-HEALTH)"; NOT YET DEPLOYED): the open zone, a duel and a siege referee the player's own health as a share of the referee's count - the `vit` frame (validVitIn, validVitOut, VIT_RELAY_MIN) carries a client's health report in and the referee's count and ask out; net/siege/refereeHealthShare.js joins the bundle (siegeRef.js logs every change to a count); the zone's 30 s refill is gone. Deploy the relay first, then the site.
+// world275: SD-PARTY (2026-10-28, the owner: "we need to make this a party instance ... to stop griefin on the bosses"; bible/11-Multiplayer/Super-Dungeons.md SD-PARTY; NOT YET DEPLOYED; world274 on its branch, renumbered past LADDER-CUT's world274 at the merge): each party its own Shattered Hour, `sd:<s>.<owner>` (net/superDungeon/sdLaw.js sdRoomKey), its door the owner, staff and the owner's party (server/src/sdCopy.js, which joins the bundle); one life and one win a Hollow across the copies, the hub's `sdac:` and its receipts; a party's win closes its own Hour, the Hollow stands until it fades. SD-BACK, SD-SOLO, SD-WON (the same day, on the branch): a death keeps its own copy open to it and every other shut; a player in no party shares an Hour of eight, `sd:<s>.p<n>`, found by the Worker's `/sd/open`; a won copy takes nobody back past its collapse.
 // world274: LADDER-CUT (2026-10-28: "1.5 2 4"; NOT YET DEPLOYED): systems/skillSoftcap.js's cost ladder past 100 is 1.5 / 2 / 4 (was 4 / 8 / 16) - a file the bundle reaches; the wire unchanged. world273: APPEARANCES and HUNTERS-MARK, one release (2026-10-27; bible/04-Characters/Wardrobe.md section 6, bible/06-Systems/Bounty-Boards.md section 12; NOT YET DEPLOYED - world270, world271, then world272, on the branch, renumbered past main's CHAT-POST world270, MASTER-THREE world271 and FIELD BUGS 2026-10-26r world272 at the merges): a look item may carry `ap` - [t, m, v], the look a worn piece wears - kept only when it is a look there is and of the same kind as the piece (validLookItem, through net/appearanceLaw.js validWireAppearance); appearanceLaw.js and systems/armorMaterials.js join the bundle. Either side may deploy first: a relay before it drops `ap`, and the piece is seen in its own look; and net/identityToken.js's TITLES gains the hunt's four, the ten Marks of Mastery and the sea's two, last - the relay reads a token's title as every badge; the bundle's files unchanged; and APPEARANCES-II's sworn revenant's kit carries its look (validFoeRecord's `la`, each of its piece's kind - an older relay drops it and the piece is drawn in its own); and AUDIT HORIZONTAL B7's LOOT-DOOR: a loot room's hello (a world room or a cell - lootRoom) says the loot its build reads (`ll`, LOOT_HELLO_LAW), and while the setting `lootDoor` is on (net/relayCfg.js - off unset, and off until the site serves this build, since the relay deploys first) a hello there that says less or none is refused (LOOT_OLD_REASON, GROUND-GATE's words)
 // world272: FIELD BUGS 2026-10-26r (RPT1026, the private reports of 10-18 to 10-26; world270, then world271, on its branch, renumbered past CHAT-POST's world270 and MASTER-THREE's world271 at the merges; bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md; NOT YET DEPLOYED): RETIRED-BLOW (a blow from a fighter whose share was retired brings the share back at the boss's fraction first - the Remnant, its Echoes and Hearts, the gate's Warden, the Tonal Warden and its forks - and a Hour or Ketch blow from a pose past SD_POSE_FRESH_MS is dropped), BLOCK STAMP (the trade and page frames carry the sender's account, `sub`, through Room _directedFrame), ORRERY-HANDS (a stone's last turner named, the wrong turner held for the Hollow), and PROGRESS's masterSkills.js in the bundle; the trade and page frames the relay routes gain the sender's `sub`, which an older client ignores (AUDIT RPT1026 M7); and AUDIT RPT1026 I1 (sdBrain.js orreryWaited): a turner refused behind turners all over the Orrery's limit has the snap free it; and AUDIT RPT1026 F1 (masterSkills.js): the switch off notes the tough-foe practice it gives back on
 // world271: MASTER-THREE (FIELD BUGS 2026-10-26d, world269, then world270, on its branch, renumbered past BOW-TOPS' world269 and CHAT-POST's world270 at the merges; Discord #feature-feedback "Let us master all three primary skills"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md; NOT YET DEPLOYED) - systems/masterSkills.js, which the bundle reaches, holds MASTERY_SLOTS 3/2/1 (it was 2/2/1) and its boxes' words say 3; no relay code reads the slots, so nothing the relay does moved, but the bytes it ships did.
@@ -2316,7 +2318,7 @@ export function inRangeOf(roomKey, from) {
   return (to) => !!to && Math.max(Math.abs(fx - Math.floor(to.x / PIXEL_UNITS)), Math.abs(fy - Math.floor(to.z / PIXEL_UNITS))) <= RANGE_PIXELS;
 }
 
-/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'kt'|'eg'|'wild'|'wdun'|'holdem'|'iliac'|'gambit'|'lease', ...}
+/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'kt'|'eg'|'wild'|'vit'|'wdun'|'holdem'|'iliac'|'gambit'|'lease', ...}
  *  or {error} - the caller closes on an error. INSPECT1: every arm below, named - this line had fallen seven behind
  *  (test/net/auditworld2.test.js derives the list from the arms now, so it cannot fall behind again - the merge with
  *  main's HCC-PARK was its first catch: the park arm, unnamed). */
@@ -2375,6 +2377,12 @@ export function parseClient(text, { hasHello = false } = {}) {
     if (text.length > DUEL_FRAME_MAX) return { error: 'frame too large' };
     const data = validDuelData(m.data);
     return data ? { t: 'duel', data } : { error: 'bad duel' };
+  }
+  if (m.t === 'vit') {   // SHARED-HEALTH: my health's share, for the referee that holds a fight of mine (net/siege/refereeHealthShare.js)
+    if (!hasHello) return { error: 'vit before hello' };
+    if (text.length > VIT_FRAME_MAX) return { error: 'frame too large' };
+    const report = validVitIn(m);
+    return report ? { t: 'vit', ...report } : { error: 'bad vit' };
   }
   if (m.t === 'wed') {   // LEGACY7 part three: a proposal, its answer, its end or the union's word - one directed frame, projected by validWedData; the relay reads none of it
     if (!hasHello) return { error: 'wed before hello' };
@@ -4984,6 +4992,53 @@ function validWildDown(/** @type {any} */ m) {
   const p = wildPoint(m.p);
   return p ? { k: 'down', ms: m.ms, r, p } : null;
 }
+// ─── SHARED-HEALTH (2026-10-26, net/siege/refereeHealthShare.js): ONE HEALTH POOL UNDER THE REFEREE ───
+// A client's report of its health (`{t:'vit', n, s, seen}`) to the referee that holds a fight of its - the open zone's, a
+// duel's or a siege's, in the room its socket stands in - and the referee's words back: its count for that client's
+// pool (`k: 'h'`), or an ask for a report (`k: 'ask'`) where a pool waits for one.
+
+/** The relay that takes the `vit` frame and says its words; a client sends none to an older one. */
+export const VIT_RELAY_MIN = 276;
+/** Whether the relay that welcomed a socket takes `vit` (an older one closes the socket on it). */
+export const relaySupportsVit = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= VIT_RELAY_MIN; };
+/** A report's bound: the fewest bytes a well-made one fits in, many times over. */
+export const VIT_FRAME_MAX = 512;
+/** Reports a second a socket may send (the client's mirror sends at most four - refereeHealthMirror.js HEALTH_REPORT_MS). */
+export const VIT_HZ_MAX = 8;
+export const vitGate = (bucket, nowMs) => tokenGate(bucket, nowMs, VIT_HZ_MAX);
+/** How many pools' last words a report may name. */
+export const VIT_SEEN_MAX = 4;
+const WORD_MAX = 0x7fffffff;
+const epochOk = (v) => Number.isSafeInteger(v) && v >= 0;
+
+/**
+ * A client's report, PROJECTED: `{ report, share, seen }` (refereeHealthShare.js HealthReport), or null.
+ * @param {any} m
+ */
+export function validVitIn(m) {
+  if (!m || typeof m !== 'object' || !intIn(m.n, 1, WORD_MAX) || !intIn(m.s, 0, HEALTH_SHARE_WHOLE)) return null;
+  if (!Array.isArray(m.seen) || m.seen.length > VIT_SEEN_MAX) return null;
+  /** @type {Array<[number, number]>} */
+  const seen = [];
+  for (const pair of m.seen) {
+    if (!Array.isArray(pair) || pair.length !== 2 || !epochOk(pair[0]) || !intIn(pair[1], 0, WORD_MAX)) return null;
+    seen.push([pair[0], pair[1]]);
+  }
+  return { report: m.n, share: m.s, seen };
+}
+
+/**
+ * The referee's word to a client, PROJECTED: `{ k: 'h', health, max, epoch, word, report }` (refereeHealthShare.js
+ * PoolWord) or `{ k: 'ask' }`, or null.
+ * @param {any} m
+ */
+export function validVitOut(m) {
+  if (!m || typeof m !== 'object' || m.t !== 'vit') return null;
+  if (m.k === 'ask') return { k: 'ask' };
+  if (m.k !== 'h' || !intIn(m.m, 1, CARD_VITAL_MAX) || !intIn(m.h, 0, m.m) || !epochOk(m.e) || !intIn(m.w, 0, WORD_MAX) || !intIn(m.n, 0, WORD_MAX)) return null;
+  return { k: 'h', health: m.h, max: m.m, epoch: m.e, word: m.w, report: m.n };
+}
+
 /** Is this projected frame one the relay routes to a socket (true), or the room's own (false)? */
 export const wildDirected = (d) => !!d && WILD_DIRECTED.includes(d.k);
 /**
