@@ -326,18 +326,20 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
  * @param {object} mapsFile @param {object} blocksFile @param {object|null} [as]
  * @returns {(dfLocation: object) => {xMin: number, xMax: number, yMin: number, yMax: number}}
  */
+let keptGroundTiles = (_walk, _index, read) => read();   // FIRST-VISIT: `(walk, index, read) => groundTiles`, installed by groundTilesKept.js so no worker reaches the store
+export function setGroundTilesKeeper(fn) { keptGroundTiles = typeof fn === 'function' ? fn : (_walk, _index, read) => read(); }
 export function locationRectReader(mapsFile, blocksFile, as = null) {
   /** @type {Map<number, object|null>} block index -> its ground tiles, as getBlock serves them */
   const ground = new Map();
+  const walk = as ? JSON.stringify(as) : '';   // FIRST-VISIT: the walk's name in the kept record
   const shared = {
     checkName: (name) => blocksFile.checkName(name),
     getBlockIndex: (name) => blocksFile.getBlockIndex(name),
     getBlock: (index) => {
       let b = ground.get(index);
       if (b === undefined) {
-        const block = blocksFile.getBlock(index);
-        const groundTiles = block?.rmbBlock?.fldHeader?.groundData?.groundTiles;
-        b = groundTiles ? { rmbBlock: { fldHeader: { groundData: { groundTiles } } } } : block;   // a block with none fails SetLocationTiles as it did
+        const groundTiles = keptGroundTiles(walk, blocksFile.getBlockName?.(index) ?? index, () => blocksFile.getBlock(index)?.rmbBlock?.fldHeader?.groundData?.groundTiles);   // FIRST-VISIT: kept by block NAME, not index (a pack's added block takes its index in meeting order)
+        b = groundTiles ? { rmbBlock: { fldHeader: { groundData: { groundTiles } } } } : blocksFile.getBlock(index);   // a block with none fails SetLocationTiles as it did
         ground.set(index, b);
       }
       return b;
