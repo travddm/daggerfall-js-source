@@ -1,0 +1,72 @@
+[
+  {
+    "name": "PLACE-PINS-pin-not-read-before-roll",
+    "file": "src/world/tamrielCountry.js",
+    "old": "const pinned = pinnedCountryPick(templates, px, py);",
+    "new": "const pinned = null;",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-may-stand-ignores-pin",
+    "file": "src/world/tamrielCountry.js",
+    "old": "if (pinnedCountryAt(px, py)) return true;",
+    "new": "if (false) return true;",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-pixel-key-swapped",
+    "file": "src/world/tamrielCountry.js",
+    "old": "if (pixel) byPixel.set(`${pixel.x},${pixel.y}`, pin);",
+    "new": "if (pixel) byPixel.set(`${pixel.y},${pixel.x}`, pin);",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-gone-template-gives-null",
+    "file": "src/world/tamrielCountry.js",
+    "old": "if (pick.template !== null) return pick;",
+    "new": "if (pick) return pick;",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-template-not-by-map-id",
+    "file": "src/world/placeEpochs/pinnedPlaces.js",
+    "old": "(row?.mapTableData?.mapId ?? -1) >>> 0 === pin.template >>> 0",
+    "new": "(row?.mapTableData?.mapId ?? -1) >>> 0 !== pin.template >>> 0",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-version-still",
+    "file": "src/world/placeEpochs/pinnedPlaces.js",
+    "old": "  pinsVersion += 1;",
+    "new": "  pinsVersion += 0;",
+    "tests": ["test/world/placeEpochs/pinnedPlaces.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-identity-kind-change-passed",
+    "file": "src/world/placeEpochs/placeIdentity.js",
+    "old": "else if (now.kind !== was.kind)",
+    "new": "else if (false)",
+    "tests": ["test/world/placeEpochs/placeIdentity.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-identity-gone-passed",
+    "file": "src/world/placeEpochs/placeIdentity.js",
+    "old": "if (now === null) breaks.push",
+    "new": "if (false) breaks.push",
+    "tests": ["test/world/placeEpochs/placeIdentity.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-identity-capital-centre-only",
+    "file": "src/world/placeEpochs/placeIdentity.js",
+    "old": "for (let slice = 0; slice < slices; slice++)",
+    "new": "for (let slice = 0; slice < 1; slice++)",
+    "tests": ["test/world/placeEpochs/placeIdentity.test.js"]
+  },
+  {
+    "name": "PLACE-PINS-identity-pins-misnumbered",
+    "file": "src/world/placeEpochs/placeIdentity.js",
+    "old": "const id = pin.id >>> 0;",
+    "new": "const id = 0;",
+    "tests": ["test/world/placeEpochs/placeIdentity.test.js"]
+  }
+]

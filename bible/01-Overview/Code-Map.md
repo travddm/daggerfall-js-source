@@ -426,6 +426,7 @@ wiring in `src/scenes/`. A feature with one or two modules in a layer keeps them
 | `src/world/lands/` | The lands' landmarks past the Bay (`03-World/Tamriel-Lands.md`): the meshes made (`landPropMesh.js` - parasols, spires, the Hist, reeds, vines, groves) and where they stand, what they look like and their bodies (`landProps.js`). |
 | `src/world/merchantYards/` | A town's Stable and Wagon Yard (`03-World/Merchant-Yards.md`) - its models and assembly. |
 | `src/world/peaks/` | The mountains' high ground (`03-World/Peaks.md`): PEAKS1's snow caps and bare faces (`snowcap.js`), and PEAKS2's massif - its spurs, crests, summits and saddles (`massif.js`, built and pinned, not yet wired). |
+| `src/world/placeEpochs/` | A change to the map past the Bay that loses no player's data (`03-World/Place-Epochs.md`): the pinned country places (`pinnedPlaces.js`, its generated list), every place's id and kind (`placeIdentity.js`). |
 | `src/world/road/` | Roads: the network, its painter, verges and clearance - its models and assembly. |
 | `src/world/ships/` | The port's own ships: the galleon, the carrack, the large boat - its models and assembly. |
 | `src/world/starfall/` | The Starfall in the world: the star's art, its crater and stone, and Starfall Glass's picture. |

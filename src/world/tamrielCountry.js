@@ -37,6 +37,7 @@ import { unwalledLocation } from './townShape.js';   // TS7: a Bay city cloned a
 import { BAY_W, BAY_H, tamrielFit } from './tamriel/tamrielFrame.js';
 import { tamrielLandVersion } from './tamriel/tamrielLand.js';   // AUDIT-TESA A7-1: the ground's reads kept a land
 import { CAPITAL_LANE } from './tamrielCapitals.js';   // TESA10: the capitals' lane, after the lairs'
+import { pinnedPick, pinnedPlaces, pinnedPlacesVersion } from './placeEpochs/pinnedPlaces.js';   // a place holding player data stands whatever the roll says
 
 /** The pixel hash's salt. Changing it moves every place of the countryside. */
 export const COUNTRY_SALT = 0xc0c7;
@@ -188,6 +189,8 @@ export function countryPick(rates, templates, climate, px, py) {
  *   heightAt: (x: number, y: number) => number, ground: (x: number, y: number) => boolean }} at @param {number} px @param {number} py
  */
 export function countryStandsAt({ rates, templates, climateAt, heightAt, ground }, px, py) {
+  const pinned = pinnedCountryPick(templates, px, py);
+  if (pinned) return pinned;
   const pick = countryPick(rates, templates, climateAt(px, py), px, py);
   return pick && heightAt(px, py) > WATER_BYTE && ground(px, py) ? pick : null;
 }
@@ -196,7 +199,42 @@ export function countryStandsAt({ rates, templates, climateAt, heightAt, ground 
  *  test (scenes/zoneHallsHost.js: a hall never beside a place) asks this, so a hall's ground costs no farm's plateau.
  *  @param {{ rates: any, templates: any, climateAt: (x: number, y: number) => number, heightAt: (x: number, y: number) => number }} roll */
 export function countryMayStandAt({ rates, templates, climateAt, heightAt }, px, py) {
+  if (pinnedCountryAt(px, py)) return true;
   return !!countryPick(rates, templates, climateAt(px, py), px, py) && heightAt(px, py) > WATER_BYTE;
+}
+
+/** The pinned places by their pixel, rebuilt when the pins change. @type {{ version: number, byPixel: Map<string, import('./placeEpochs/pinnedPlaces.js').PinnedPlace> } | null} */
+let pinnedByPixel = null;
+
+/** The pinned place standing on (px, py), or null. A pinned place stands on the pixel its map id names. */
+export function pinnedCountryAt(px, py) {
+  if (pinnedByPixel === null || pinnedByPixel.version !== pinnedPlacesVersion()) {
+    const byPixel = new Map();
+    for (const pin of pinnedPlaces()) {
+      const pixel = countryPixelOfId(pin.id);
+      if (pixel) byPixel.set(`${pixel.x},${pixel.y}`, pin);
+    }
+    pinnedByPixel = { version: pinnedPlacesVersion(), byPixel };
+  }
+  if (pinnedByPixel.byPixel.size === 0) return null;
+  return pinnedByPixel.byPixel.get(`${px},${py}`) ?? null;
+}
+
+/**
+ * What a pinned place stands with on (px, py), or null where none is pinned. It ignores the roll, the climate and the
+ * ground: those may have changed under it since it was pinned, and its buildings must not. Should its template be gone
+ * from the kind's list, it takes the one the roll would hash to for that kind, as the countryside would have.
+ * @param {Map<number, any[]>} templates @param {number} px @param {number} py
+ * @returns {?{ type: number, template: any }}
+ */
+function pinnedCountryPick(templates, px, py) {
+  const pin = pinnedCountryAt(px, py);
+  if (!pin) return null;
+  const pick = pinnedPick(pin, templates);
+  if (pick.template !== null) return pick;
+  const list = templates?.get(pin.type);
+  if (!list?.length || list[0] === null) return pick;   // the roads worker's placeholder lists: the type is all it reads
+  return { type: pin.type, template: list[hash32(COUNTRY_SALT, px, py, 2) % list.length] };
 }
 
 /** A temple's epithet and its god - one of the Eight. */
