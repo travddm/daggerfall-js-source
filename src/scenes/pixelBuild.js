@@ -38,7 +38,7 @@ import { FOREST_HIDDEN_LOCATION_TYPES, populatesWanderingNpcs, tamrielLandsOn } 
 import { landGroundSet } from '../world/tamriel/tamrielLands.js';   // TESA-LANDS: a zone's dress of its ground
 import { standLandProps, landFeetOff } from '../world/lands/landProps.js';   // TESA-LANDS: and its landmarks stood, its flats off their feet
 import { climateNeighbourIn } from '../world/tamriel/tamrielGround.js';
-import { getLocationTerrainTileOrigin, setLocationTiles, WORLD_MAP_TILE_DIM } from '../world/terrain/terrainTiles.js';
+import { getLocationTerrainTileOrigin, setLocationTiles, stampedTiles, WORLD_MAP_TILE_DIM } from '../world/terrain/terrainTiles.js';
 import { townWalkShut } from '../world/townWalls.js';   // TS6: a town's walkers on its own ground, never through its wall; TS7: and its yards
 import { townGateRoads } from '../world/townGates.js';   // GATE-ROADS: a walled town's gates for their roads
 import { townFabricFor, fabricWalkShut } from '../world/urban/townFabricStand.js';   // URBANIZER U3: a town past the Bay's streets, yards and dead ends
@@ -277,6 +277,7 @@ export function createPixelBuild(host) {
     if (capitalViewOf(dfLocation)) for (const name of dfLocation.exterior.exteriorData.blockNames) { blocks.getBlockByName(name); await breather.breathe(); }
     if (groundLocation) locationRect = setLocationTiles(groundLocation, maps, blocks, seedTilemap);
     if (locationRect) locationRect.gateRoads = townGateRoads(groundLocation, maps, blocks);   // GATE-ROADS: its gates for the kernel to lay their roads (world/townGates.js)
+    const stamped = locationRect && capitalViewOf(groundLocation) ? stampedTiles(seedTilemap) : null;   // SNOW-STAMP: the snow's authored mask, before the kernel fills the rest (world/terrain/terrainTiles.js stampedTiles), published on the entry
     // WOD2: LocationLoader.AddLocation's DECISION (LocationLoader.cs:101-172),
     // taken here because it reads only the map data and the kernel needs
     // its rects. The region under the player is announced first
@@ -1484,6 +1485,7 @@ export function createPixelBuild(host) {
       // what Travel Options' SetLocationRects reads off the BUILT terrain
       // (TravelOptionsMod.cs:541-551). Null for a pixel with no location.
       locationRect,
+      stampedTiles: stamped,
       _seasonsGen: seasonsGen,   // SIB1: the install this pixel's flats were built under (AUDIT 61: captured at the lookups)
       homeTown, homeKeys: pixelHomeKeys, buildingKeys: pixelBuildingKeys,   // HOME-LOOK: the homes drawn on their own, and every building's key
       _lookV: homeLookRead,   // HOME-LOOK (AUDIT)

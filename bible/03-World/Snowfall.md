@@ -269,6 +269,19 @@ to the Bay's; the curves' classes and the host's handing of them; the join; with
 PIN MOVED: `test/render/snowfall1_runtime.test.js`'s roads line. Mutants: `tools/mutants/bayleftground.json`'s D3 (14),
 all dead; `snowfall1.json`'s carved-sea record retargeted by the move.
 
+## SNOW-STAMP - the Imperial City's authored ground from its build (2026-10-29)
+
+The snow's authored scan (`scenes/snowfallHost.js authoredTiles`) read the 64 blocks of every streamed Imperial City
+slice. Those blocks are generated (IC-GRAND), not read from BLOCKS.BSA, so each call made all 64 on the page. A far
+slice made its near view's too. At Land View 5 (121 slices) the scan took 25 s of a 49 s profile at the city's centre.
+Now a family capital's build keeps the tiles `setLocationTiles` stamped (`world/terrain/terrainTiles.js stampedTiles`,
+read off the seed TileMap), and the snow reads that mask. A capital has no TOWN-SHAPES outline and no wall carrier, so
+the mask is the scan's for the same blocks. Other places scan as before.
+
+DEPARTURE (SNOW-STAMP): a far slice's mask is its far view's stamp, the ground it draws, where the scan
+read the near view's blocks. Pins: `test/scenes/snowstamp.test.js` (2: the mask equals the scan's; the host reads no
+block for a stamped slice). Hand mutants (the 0xFF stamp missed, the stamp unread, the scan dropped) all failed it.
+
 ## Pins
 
 `test/systems/environs_texturePacks.test.js` (4); `tools/mutants/alikr1.json` (7, all

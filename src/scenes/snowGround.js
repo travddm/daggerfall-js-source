@@ -68,7 +68,9 @@ export function createSnowGround(host) {
       const net = !inBay(p.px, p.py) ? snowfallNetworkBeyond(p.px, p.py, p.paths) : raw?.source === 'basic-roads' ? snowfallNetwork(raw, p.px, p.py) : null;
       if (!net) return null;
       const loc = p.locationRect ? locationIndex.get(`${p.px},${p.py}`) : null;
-      const authored = loc?.exterior?.exteriorData && (net.kindAt || (net.roads | net.roadCorners | net.paths | net.pathCorners) !== 0) ? authoredTiles(loc, maps, blocks) : new Uint8Array(16384);
+      const scan = loc?.exterior?.exteriorData && (net.kindAt || (net.roads | net.roadCorners | net.paths | net.pathCorners) !== 0);
+      // SNOW-STAMP: a family capital's slice reads the tiles its build stamped (world/terrain/terrainTiles.js stampedTiles)
+      const authored = !scan ? new Uint8Array(16384) : p.stampedTiles ?? authoredTiles(loc, maps, blocks);
       return { ...net, authored, rect: p.locationRect ?? { xMin: 0, xMax: 0, yMin: 0, yMax: 0 } };
     },
     toGlobal(x, z) {

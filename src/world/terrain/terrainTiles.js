@@ -338,6 +338,16 @@ export function setLocationTiles(dfLocation, mapsFile, blocksFile, tilemapData) 
   };
 }
 
+/** SNOW-STAMP (departure from BasicRoadsTerrain.TryCreate's authored scan): the tiles setLocationTiles stamped, 1 each,
+ *  read off the seed TileMap before the kernel fills the rest. For a family capital's slice (no TOWN-SHAPES outline, no
+ *  wall carrier) it is the snow's authored mask (scenes/snowfallHost.js authoredTiles) from the blocks the build laid:
+ *  that scan generated all 64 of an Imperial City slice's blocks on the page, the near view's even for a far slice. */
+export function stampedTiles(seedTilemap) {
+  const out = new Uint8Array(WORLD_MAP_TILE_DIM * WORLD_MAP_TILE_DIM);
+  for (let i = 0; i < out.length; i++) if (seedTilemap[i] !== 0) out[i] = 1;
+  return out;
+}
+
 /** TOWN-SHAPES: the tiles about a town's grid its outline may reach into - its whole margin and wander, and one more. */
 const SHAPE_PAD = Math.ceil(TOWN_SHAPE.margin + TOWN_SHAPE.wander) + 1;
 /**
