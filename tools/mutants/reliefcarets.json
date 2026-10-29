@@ -65,8 +65,44 @@
   {
     "name": "RELIEF-CARETS-8-a-block-read-again",
     "file": "src/ui/ink/pastBayCarets.js",
-    "old": "          blocks.set(key, block);",
-    "new": "          void key;",
+    "old": "      blocks.set(key, block);",
+    "new": "      void key;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-9-warm-ignores-its-budget",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "      if (now() >= until) break;",
+    "new": "      if (false) break;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-10-a-trace-starts-no-warm",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "onTamrielTrace((trace) => { if (trace) startCaretWarm(); });",
+    "new": "onTamrielTrace((trace) => { if (false) startCaretWarm(); });",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-11-the-far-step-left-cold",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "export const WARM_STEPS = Object.freeze([CARET_STEP.continent, CARET_STEP.far]);",
+    "new": "export const WARM_STEPS = Object.freeze([CARET_STEP.continent]);",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-12-the-ink-reads-a-cold-store",
+    "file": "src/ui/tamrielInk.js",
+    "old": "  const carets = liveCarets();",
+    "new": "  const carets = createPastBayCarets({ heightByte: () => 0, climateAt: () => 0, frame, inBay });",
     "tests": [
       "test/ui/ink/pastBayCarets.test.js"
     ]

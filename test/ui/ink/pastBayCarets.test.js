@@ -2,7 +2,8 @@
 // pixel at or over the treeline, on the Bay's grid and steps, in the Bay's pen and shape - off the ground's heights.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blockCarets, createPastBayCarets, paintPastBayCarets, caretStep, CARET_BLOCK } from '../../../src/ui/ink/pastBayCarets.js';
+import { blockCarets, createPastBayCarets, paintPastBayCarets, caretStep, CARET_BLOCK, liveCarets, startCaretWarm, setCaretScheduler } from '../../../src/ui/ink/pastBayCarets.js';
+import { setTamrielTrace } from '../../../src/world/tamriel/tamrielLand.js';
 import { buildInkModel, paintInk, CARET_STEP, PEN } from '../../../src/ui/ink/inkMap.js';
 import { TREELINE_BYTE, SNOWLINE_BYTE } from '../../../src/ui/overworldModel.js';
 import { CLIMATES } from '../../../src/formats/mapsFile.js';
@@ -122,4 +123,51 @@ test('RELIEF-CARETS on the continent\'s own ground: every caret stands on a byte
     }
   }
   assert.ok(high > 0, 'the sample met high ground');
+});
+
+test('RELIEF-CARETS warm: a step\'s blocks read ahead of any view, in row order, a budget at a time, then none read again', () => {
+  const frame = { x0: -200, y0: -150, w: 1500, h: 900 };
+  const { ground, reads } = groundOf(() => 90, { frame });
+  const store = createPastBayCarets(ground);
+  let clock = 0;
+  const tick = () => clock++;
+  let calls = 0;
+  while (!store.warm(12, clock + 3, tick)) calls++;
+  assert.ok(calls > 1, 'more than one budget');
+  const blocks = store.blockCount();
+  const columns = Math.floor((frame.x0 + frame.w) / CARET_BLOCK) - Math.floor(frame.x0 / CARET_BLOCK) + 1;
+  const rows = Math.floor((frame.y0 + frame.h) / CARET_BLOCK) - Math.floor(frame.y0 / CARET_BLOCK) + 1;
+  assert.equal(blocks, columns * rows, 'every block of the frame');
+  const after = reads.height;
+  store.inRect(frame.x0, frame.y0, frame.x0 + frame.w, frame.y0 + frame.h, 12);
+  assert.equal(reads.height, after, 'a view over the warmed frame reads nothing');
+  assert.equal(store.warm(12, clock + 3, tick), true, 'done stays done');
+});
+
+test('RELIEF-CARETS the idle job: nothing with no scheduler, nothing with no trace; on a trace both steps read, and the store is the ink\'s', () => {
+  setCaretScheduler(null);
+  assert.deepEqual(startCaretWarm(), { slices: 0, done: false });
+  const queue = [];
+  setCaretScheduler((run) => queue.push(run));
+  try {
+    setTamrielTrace(null);
+    const idle = startCaretWarm();
+    queue.shift()();
+    assert.equal(idle.slices, 0, 'no trace: the job stops');
+    const W = 16;
+    setTamrielTrace({ w: W, h: W, land: new Uint8Array(W * W), province: new Uint8Array(W * W) });
+    assert.ok(queue.length > 0, 'a trace landing starts the job');
+    queue.length = 0;
+    let clock = 0;
+    const job = startCaretWarm(() => (clock += 1));
+    for (let n = 0; queue.length && n < 100000; n++) queue.shift()();
+    assert.equal(job.done, true);
+    assert.ok(job.slices > 1, 'a slice of idle time at a time');
+    const store = liveCarets();
+    for (const step of [CARET_STEP.continent, CARET_STEP.far]) assert.equal(store.warm(step, 0), true, `step ${step} read whole`);
+    assert.equal(buildTamrielInk().carets, store, 'the map reads the warmed store');
+  } finally {
+    setCaretScheduler(null);
+    setTamrielTrace(null);
+  }
 });

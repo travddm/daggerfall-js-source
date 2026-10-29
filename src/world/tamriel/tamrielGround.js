@@ -126,12 +126,18 @@ export function tamrielHeightByte(x, y) {
   const k = cacheKey(x, y);
   const hit = _bytes.get(k);
   if (hit !== undefined) return hit;
+  const byte = tamrielHeightByteRead(x, y);
+  if (_bytes.size >= GROUND_CACHE_MAX) _bytes.clear();
+  _bytes.set(k, byte);
+  return byte;
+}
+/** RELIEF-CARETS: the same byte, read and not kept - for the map's sweep of the continent, which would otherwise clear
+ *  the cache the streamed ground reads (GROUND_CACHE_MAX). */
+export function tamrielHeightByteRead(x, y) {
   const [px, py] = bayToPicture(x + 0.5, y + 0.5);
   let byte = rumareMouthPixel(x, y) ? 0 : authoredHeightByte(px, py, (groundHash(x, y) - 0.5) * 4);   // RUMARE-WATER: the mouth's pixels the sea's
   const basin = byte > SHORE_BYTE ? rumareBasin(x, y) : 0;
   if (basin > 0) byte = Math.round(byte - (byte - SHORE_BYTE) * basin);
-  if (_bytes.size >= GROUND_CACHE_MAX) _bytes.clear();
-  _bytes.set(k, byte);
   return byte;
 }
 

@@ -8,6 +8,9 @@
 
 import { TREELINE_BYTE, SNOWLINE_BYTE, isWaterPixel } from '../overworldModel.js';
 import { PEN, CARET_STEP, CONTINENT_BAND, toPaper } from './inkMap.js';
+import { tamrielHeightByteRead, tamrielClimateAt } from '../../world/tamriel/tamrielGround.js';
+import { tamrielFrameInBay, tamrielFit, inBay } from '../../world/tamriel/tamrielFrame.js';
+import { tamrielLandVersion, tamrielTrace, onTamrielTrace } from '../../world/tamriel/tamrielLand.js';
 
 /** One caret: a Bay pixel and whether it is over the snowline. @typedef {{ x: number, y: number, peak: boolean }} Caret */
 /**
@@ -47,33 +50,109 @@ export function blockCarets(ground, step, blockX, blockY) {
 }
 
 /**
- * The store of the carets past the Bay, read a block at a time and kept. Build one per ink (it belongs to the land and
- * heights the ink was built on).
+ * The store of the carets past the Bay, read a block at a time and kept. One per land and fit (liveCarets).
  * @param {CaretGround} ground
  */
 export function createPastBayCarets(ground) {
   /** @type {Map<string, Caret[]>} */
   const blocks = new Map();
+  /** @type {Map<number, number>} the next block, in the frame's row order, that `warm` reads at a step */
+  const warmed = new Map();
+
+  function blockAt(step, blockX, blockY) {
+    const key = `${step}|${blockX}|${blockY}`;
+    let block = blocks.get(key);
+    if (!block) {
+      block = blockCarets(ground, step, blockX, blockY);
+      blocks.set(key, block);
+    }
+    return block;
+  }
 
   /** The carets of a step within a rectangle of Bay pixels, a whole block at a time (the caller culls). */
   function inRect(x0, y0, x1, y1, step) {
     const carets = [];
     for (let blockY = Math.floor(y0 / CARET_BLOCK); blockY <= Math.floor(y1 / CARET_BLOCK); blockY++) {
       for (let blockX = Math.floor(x0 / CARET_BLOCK); blockX <= Math.floor(x1 / CARET_BLOCK); blockX++) {
-        const key = `${step}|${blockX}|${blockY}`;
-        let block = blocks.get(key);
-        if (!block) {
-          block = blockCarets(ground, step, blockX, blockY);
-          blocks.set(key, block);
-        }
-        for (const caret of block) carets.push(caret);
+        for (const caret of blockAt(step, blockX, blockY)) carets.push(caret);
       }
     }
     return carets;
   }
 
-  return { inRect, blockCount: () => blocks.size };
+  /**
+   * Read the frame's blocks at a step ahead of any view, in row order, until `now()` reaches `until` (at least one
+   * block a call). Answers whether every block of the step is read.
+   */
+  function warm(step, until, now = () => performance.now()) {
+    const { x0, y0, w, h } = ground.frame;
+    const firstX = Math.floor(x0 / CARET_BLOCK);
+    const firstY = Math.floor(y0 / CARET_BLOCK);
+    const columns = Math.floor((x0 + w) / CARET_BLOCK) - firstX + 1;
+    const total = columns * (Math.floor((y0 + h) / CARET_BLOCK) - firstY + 1);
+    let next = warmed.get(step) ?? 0;
+    while (next < total) {
+      blockAt(step, firstX + (next % columns), firstY + Math.floor(next / columns));
+      next++;
+      if (now() >= until) break;
+    }
+    warmed.set(step, next);
+    return next >= total;
+  }
+
+  return { inRect, warm, blockCount: () => blocks.size };
 }
+
+/** The live ground's store, kept while the land and the fit stand (a new trace, relief or fit is a new ground). */
+let _live = { key: '', store: /** @type {ReturnType<typeof createPastBayCarets>|null} */ (null) };
+export function liveCarets() {
+  const fit = tamrielFit();
+  const key = `${tamrielLandVersion()}|${fit.ox}|${fit.oy}|${fit.ppu}`;
+  if (_live.key !== key || !_live.store) {
+    const ground = { heightByte: tamrielHeightByteRead, climateAt: tamrielClimateAt, frame: tamrielFrameInBay(), inBay };
+    _live = { key, store: createPastBayCarets(ground) };
+  }
+  return _live.store;
+}
+
+/** The steps read in idle time once a trace lands: the continent's and the far band's, the views a map opens out to. */
+export const WARM_STEPS = Object.freeze([CARET_STEP.continent, CARET_STEP.far]);
+/** A slice of the page's idle time, ms - well under a frame. */
+export const WARM_SLICE_MS = 6;
+let _schedule = /** @type {((run: () => void) => void)|null} */ (typeof globalThis.requestIdleCallback === 'function' ? (run) => globalThis.requestIdleCallback(() => run()) : null);
+/** The idle job's scheduler: `requestIdleCallback` on a page, none in node (a test sets its own; null stops it). */
+export function setCaretScheduler(fn) { _schedule = fn; }
+
+/**
+ * The map's first look past the Bay read 107,000 bytes at the continent's step (about 0.8 s on its first open). This
+ * reads them, then the far step's, a slice of idle time at a time from the trace's landing, so the map opens on them read.
+ * A new ground (liveCarets) starts the steps again. Returns the job's state for its pins.
+ */
+export function startCaretWarm(now = () => performance.now()) {
+  const job = { slices: 0, done: false };
+  if (!_schedule) return job;
+  let store = null;
+  let stepIndex = 0;
+  const slice = () => {
+    if (!tamrielTrace()) return;
+    const live = liveCarets();
+    if (live !== store) {
+      store = live;
+      stepIndex = 0;
+    }
+    job.slices++;
+    const until = now() + WARM_SLICE_MS;
+    while (stepIndex < WARM_STEPS.length && live.warm(WARM_STEPS[stepIndex], until, now)) stepIndex++;
+    if (stepIndex >= WARM_STEPS.length) {
+      job.done = true;
+      return;
+    }
+    _schedule?.(slice);
+  };
+  _schedule(slice);
+  return job;
+}
+onTamrielTrace((trace) => { if (trace) startCaretWarm(); });
 
 /** The step a view thins the carets to: the Bay's, so the two lattices are one at the join. */
 export const caretStep = (band, continent) => CARET_STEP[continent ? CONTINENT_BAND : band] ?? CARET_STEP.mid;

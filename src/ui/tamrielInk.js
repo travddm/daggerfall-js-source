@@ -57,8 +57,7 @@ import { cyrodiilMask, zoneLineSteps } from '../systems/wild/cyrodiilZone.js';  
 import { watersInk, watersInkVersion } from '../world/tamriel/watersInk.js';   // MAP-WATERS: stream G's rivers and lakes past the Bay (the worker's copy), inked
 import { bridgesOf, inkBridgeLaw } from '../world/road/roadBridges.js';   // ROAD-LOOK: the bridges where the roads cross those rivers, marked
 import { lawLines, linkSteps, segKey, drain } from '../world/tamriel/tamrielLines.js';   // SMOOTH-LAND: the land's own lines
-import { tamrielHeightByte, tamrielClimateAt } from '../world/tamriel/tamrielGround.js';   // RELIEF-CARETS: the ground's heights past the Bay
-import { createPastBayCarets, paintPastBayCarets } from './ink/pastBayCarets.js';   // RELIEF-CARETS: its high ground, the Bay's law
+import { liveCarets, paintPastBayCarets } from './ink/pastBayCarets.js';   // RELIEF-CARETS: the high ground past the Bay, the Bay's law
 
 /** @typedef {{ x: number, y: number }} Pt */
 /** TESA13: the host's atlas's answer (world/tamrielAtlas.js placesIn) - the places on a rectangle's pixels. */
@@ -833,8 +832,8 @@ export function buildTamrielInk({ bayCoast = [] } = {}) {
   })
     .filter((c) => c && !inBay(c.x, c.y));
   const frame = tamrielFrameInBay();
-  // RELIEF-CARETS: the high ground off the ground's own heights, read as a view needs it (ui/ink/pastBayCarets.js)
-  const carets = createPastBayCarets({ heightByte: tamrielHeightByte, climateAt: tamrielClimateAt, frame, inBay });
+  // RELIEF-CARETS: the high ground off the ground's own heights, read in idle time and as a view needs it
+  const carets = liveCarets();
   // TESA15: the roads past the Bay are no part of it - they are inked a tile at a time as they land (arenaRoadInkAt)
   return { coast, borders, rivers, carets, provinces, seas, cities, frame, joined: stitched.joined, bayEnds: ends.length, traced: !!traced, arena: !!arena, version: tamrielLandVersion(), arenaVersion: arenaPlacesVersion(), capitalsVersion: capitalsVersion() };
 }

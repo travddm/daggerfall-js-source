@@ -1276,19 +1276,23 @@ apart, and read no height.
   the Bay's water law (`overworldModel.js` isWaterPixel) and at or over TREELINE_BYTE; a peak over SNOWLINE_BYTE. The
   lattice and steps are the Bay's (`caretStep`: CARET_STEP of the band, `continent` out on the continent), so a range
   runs across the join with no change of spacing. Drawn in the Bay's pen, size and shape (`paintPastBayCarets`).
-- **Read as a view needs it.** The continent is too large to read whole at the near step. A view reads the 96-pixel
-  blocks it shows at its step and keeps them; the store belongs to the ink (`buildTamrielInk`), which is built again
-  when the land, the places or the capitals move, so a new coast or new heights move the carets with no work of their own.
+- **Read ahead in idle time.** A view reads the 96-pixel blocks it shows at its step and keeps them. Read on the first
+  look at the continent, its 107,000 bytes cost 0.8 s (1,072 ms to complete against 287 ms). So `startCaretWarm` reads
+  the continent's and the far band's blocks a slice of idle time at a time from the trace's landing, as R4-7 makes the
+  lines. The store (`liveCarets`) is one per land version and fit, so a new coast or new heights start it again.
+- **Not through the ground's cache.** The sweep reads `tamrielGround.js` tamrielHeightByteRead, the same byte
+  tamrielHeightByte keeps: 500,000 reads would clear the cache the streamed ground reads (GROUND_CACHE_MAX).
 - **Gone:** `rangeCarets` and CARET_LATTICE. MOUNTAIN_RANGES still lifts the authored ground where no relief stands
   (`tamrielGround.js` rangeLift), so the carets follow it there too.
 
 ### Pins
 
-- **`test/ui/ink/pastBayCarets.test.js` (6):** a caret on every high pixel of each step's lattice and on no other, a
+- **`test/ui/ink/pastBayCarets.test.js` (8):** a caret on every high pixel of each step's lattice and on no other, a
   peak over the snowline; none on the Bay, at sea or past the frame, and the Bay's lattice kept where the frame cuts it;
   the steps the Bay's; a block read once a step; the same path as the Bay's painter draws for the same ground; and on
-  the continent's own ground every caret on high ground and the high ground in a view marked whole.
+  the continent's own ground every caret on high ground and the high ground in a view marked whole; a step's blocks
+  read ahead a budget at a time, then none again; the idle job started by a trace, both steps read, the ink's store.
 - **PIN MOVED (RELIEF-CARETS):** `test/ui/tamriel.test.js` (no caret on the Bay) and `test/world/tamriel3.test.js` (a
   caret only on the picture's land) read the carets through the store.
-- **Mutants:** `tools/mutants/reliefcarets.json` (8, all dead). `tamriel3.json`'s TAMRIEL3-a-caret-in-the-sea went with
+- **Mutants:** `tools/mutants/reliefcarets.json` (12, all dead). `tamriel3.json`'s TAMRIEL3-a-caret-in-the-sea went with
   `rangeCarets`; the water record here holds its law.
