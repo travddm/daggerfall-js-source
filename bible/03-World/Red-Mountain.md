@@ -199,7 +199,8 @@ about 130 m off the far views' smooth ground there. By day it keeps 30% of its n
 - Ghostgate is the gate alone: no Temple compound, no garrison, no road to it (nothing within the fence is a road's).
 - ASHFALL1's ashfall (`07-Rendering/Weather-Arc.md` E) falls on Red Mountain's zone half its hours, the Ashlands' 30%.
   It is the zone's weather: not born in the crater, as the lore's storms are, and the plume does not feed it.
-- Not yet: Dagoth Ur's citadel in the crater, the held map's caret for the cone (its bytes are the relief's).
+- Not yet: Dagoth Ur's citadel in the crater. The held map marks the high ground there by the relief's bytes, as
+  it marks any other (`Tamriel.md` RELIEF-CARETS); the cone's own lift is not in those bytes.
 
 ## Pins
 

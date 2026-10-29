@@ -1258,3 +1258,37 @@ band aids or half assed work"*.
 
 Section A, RELIEF-PEAKS (OURS: DFU stops at the Bay's edge; the large map's law is read off DFU's own WOODS.WLD, and
 the ranges and Red Mountain are the port's own).
+
+## RELIEF-CARETS - the high ground past the Bay marked by the Bay's own law (2026-10-29)
+
+The owner, on the held map: the Iliac Bay map's small marks "stop abruptly" past the Bay. The marks are the carets of
+the high ground. On the Bay a caret stands on every land pixel of WOODS.WLD at or over the treeline (byte 64), larger
+over the snowline (104), thinned to the band's grid (`ui/ink/inkMap.js` highGround, CARET_STEP). Past the Bay they stood
+on a lattice across the twelve ranges TAMRIEL1 drew by hand (`tamrielGeography.js` MOUNTAIN_RANGES), one picture unit
+apart, and read no height.
+
+- **Measured before** (the freeware's trace and relief, the frame sampled every 4 pixels): 93,080 land samples past the
+  Bay stood at or over the treeline, and 17,135 of them (18%) lay in a band. 42% of the bands' land stood under it. A
+  band stopped dead at its line's end, the Bay's carets stopped at its edge, and the lattice was 2.5 to 8 times
+  sparser than the Bay's.
+- **The law** (`ui/ink/pastBayCarets.js`): a caret on every pixel of the band's lattice past the Bay whose ground
+  (`tamrielGround.js` tamrielHeightByte, the relief where it stands, the authored lift where it does not) is land by
+  the Bay's water law (`overworldModel.js` isWaterPixel) and at or over TREELINE_BYTE; a peak over SNOWLINE_BYTE. The
+  lattice and steps are the Bay's (`caretStep`: CARET_STEP of the band, `continent` out on the continent), so a range
+  runs across the join with no change of spacing. Drawn in the Bay's pen, size and shape (`paintPastBayCarets`).
+- **Read as a view needs it.** The continent is too large to read whole at the near step. A view reads the 96-pixel
+  blocks it shows at its step and keeps them; the store belongs to the ink (`buildTamrielInk`), which is built again
+  when the land, the places or the capitals move, so a new coast or new heights move the carets with no work of their own.
+- **Gone:** `rangeCarets` and CARET_LATTICE. MOUNTAIN_RANGES still lifts the authored ground where no relief stands
+  (`tamrielGround.js` rangeLift), so the carets follow it there too.
+
+### Pins
+
+- **`test/ui/ink/pastBayCarets.test.js` (6):** a caret on every high pixel of each step's lattice and on no other, a
+  peak over the snowline; none on the Bay, at sea or past the frame, and the Bay's lattice kept where the frame cuts it;
+  the steps the Bay's; a block read once a step; the same path as the Bay's painter draws for the same ground; and on
+  the continent's own ground every caret on high ground and the high ground in a view marked whole.
+- **PIN MOVED (RELIEF-CARETS):** `test/ui/tamriel.test.js` (no caret on the Bay) and `test/world/tamriel3.test.js` (a
+  caret only on the picture's land) read the carets through the store.
+- **Mutants:** `tools/mutants/reliefcarets.json` (8, all dead). `tamriel3.json`'s TAMRIEL3-a-caret-in-the-sea went with
+  `rangeCarets`; the water record here holds its law.

@@ -261,10 +261,9 @@ test('TAMRIEL1 ink: the built model has no coast point on the Bay\'s own ground,
   let total = 0;
   for (const c of ink.coast) for (const p of c) { total++; assert.ok(!(p.x > 0 && p.x < BAY_W && p.y > 0 && p.y < BAY_H), 'no coast point inside the Bay'); }
   for (const c of ink.borders) for (const p of c) assert.ok(!(p.x > 0 && p.x < BAY_W && p.y > 0 && p.y < BAY_H), 'no border point inside the Bay');
-  for (const h of ink.carets) assert.ok(!inBay(h.x, h.y), 'no caret inside the Bay');
+  for (const h of ink.carets.inRect(-200, -200, BAY_W + 200, BAY_H + 200, 6)) assert.ok(!inBay(h.x + 0.5, h.y + 0.5), 'no caret inside the Bay');
   for (const c of ink.cities) assert.ok(!inBay(c.x, c.y));
   assert.ok(total < 4000, `the coast is ${total} points - a budget, not a bay`);
-  assert.ok(ink.carets.length < 3000, `${ink.carets.length} carets`);
   const onEdge = (p) => near(p.x, 0, 1e-6) || near(p.x, BAY_W, 1e-6) || near(p.y, 0, 1e-6) || near(p.y, BAY_H, 1e-6);
   const cut = ink.coast.flatMap((c) => [c[0], c[c.length - 1]]).filter(onEdge);
   assert.equal(cut.length, 2, 'the mainland\'s coast is cut twice by the Bay: once going in, once coming out');

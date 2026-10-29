@@ -1,0 +1,74 @@
+[
+  {
+    "name": "RELIEF-CARETS-1-low-ground-takes-a-caret",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "      if (byte < TREELINE_BYTE) continue;",
+    "new": "      if (byte < 0) continue;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-2-water-takes-a-caret",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "      if (isWaterPixel(ground.climateAt(x, y), byte)) continue;",
+    "new": "      if (false) continue;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-3-the-bay-is-marked-twice",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "      if (ground.inBay(x + 0.5, y + 0.5)) continue;",
+    "new": "      if (false) continue;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-4-a-lattice-off-the-bays",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "  const firstX = Math.ceil(left / step) * step;",
+    "new": "  const firstX = left;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-5-no-peaks",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "      carets.push({ x, y, peak: byte >= SNOWLINE_BYTE });",
+    "new": "      carets.push({ x, y, peak: false });",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-6-the-continent-takes-the-bands-step",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "export const caretStep = (band, continent) => CARET_STEP[continent ? CONTINENT_BAND : band] ?? CARET_STEP.mid;",
+    "new": "export const caretStep = (band, continent) => CARET_STEP[band] ?? CARET_STEP.mid;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-7-a-caret-off-the-bays-shape",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "    const half = caret.peak ? size * 1.3 : size;",
+    "new": "    const half = size;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  },
+  {
+    "name": "RELIEF-CARETS-8-a-block-read-again",
+    "file": "src/ui/ink/pastBayCarets.js",
+    "old": "          blocks.set(key, block);",
+    "new": "          void key;",
+    "tests": [
+      "test/ui/ink/pastBayCarets.test.js"
+    ]
+  }
+]

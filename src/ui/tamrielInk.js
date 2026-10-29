@@ -28,7 +28,7 @@
 // handed in by the window.
 // ═══════════════════════════════════════════════════════════════════
 import {
-  PROVINCES, MOUNTAIN_RANGES, RIVERS, SEAS, CITIES, COAST, ISLANDS, BORDERS, closedRing, pts, seaAt, provinceByKey,
+  PROVINCES, RIVERS, SEAS, CITIES, COAST, ISLANDS, BORDERS, closedRing, pts, seaAt, provinceByKey,
 } from '../world/tamriel/tamrielGeography.js';
 import { pictureToBay, bayToPicture, inBay, BAY_W, BAY_H, tamrielFit, tamrielFrameInBay } from '../world/tamriel/tamrielFrame.js';
 // TAMRIEL3: the picture's own land where the world host traced it (world/tamriel/tamrielLand.js) - the coast, the borders and
@@ -57,6 +57,8 @@ import { cyrodiilMask, zoneLineSteps } from '../systems/wild/cyrodiilZone.js';  
 import { watersInk, watersInkVersion } from '../world/tamriel/watersInk.js';   // MAP-WATERS: stream G's rivers and lakes past the Bay (the worker's copy), inked
 import { bridgesOf, inkBridgeLaw } from '../world/road/roadBridges.js';   // ROAD-LOOK: the bridges where the roads cross those rivers, marked
 import { lawLines, linkSteps, segKey, drain } from '../world/tamriel/tamrielLines.js';   // SMOOTH-LAND: the land's own lines
+import { tamrielHeightByte, tamrielClimateAt } from '../world/tamriel/tamrielGround.js';   // RELIEF-CARETS: the ground's heights past the Bay
+import { createPastBayCarets, paintPastBayCarets } from './ink/pastBayCarets.js';   // RELIEF-CARETS: its high ground, the Bay's law
 
 /** @typedef {{ x: number, y: number }} Pt */
 /** TESA13: the host's atlas's answer (world/tamrielAtlas.js placesIn) - the places on a rectangle's pixels. */
@@ -74,8 +76,6 @@ export const FRET_STEP = 1;
 export const FRET_AMP = 0.7;
 export const FRET_CALM = 3;
 export const FRET_SEED = 0x7a3e1;
-/** The high ground's carets: one lattice point every CARET_LATTICE picture units across a range's band. */
-export const CARET_LATTICE = 1;
 /** The sheet is on the continent when it is zoomed out past this fraction of the Bay's own fit. */
 export const CONTINENT_BELOW = 0.85;
 /** A city beyond the Bay answers a hover within this many paper pixels. */
@@ -273,34 +273,6 @@ export function stitchToBay(chains, ends, reach = STITCH_REACH) {
     return r;
   });
   return { chains: out, joined };
-}
-
-/** A range's carets: lattice points across its band, each with its lattice index for thinning by zoom. */
-function rangeCarets(range, noise) {
-  const out = [];
-  const seen = new Set();
-  const P = range.pts.map(([x, y]) => ({ x, y }));
-  for (let i = 0; i < P.length - 1; i++) {
-    const a = P[i], b = P[i + 1];
-    const len = Math.hypot(b.x - a.x, b.y - a.y);
-    const nx = -(b.y - a.y) / (len || 1), ny = (b.x - a.x) / (len || 1);
-    const n = Math.max(1, Math.round(len / CARET_LATTICE));
-    const rows = Math.round(range.w / CARET_LATTICE);
-    for (let k = 0; k <= n; k++) {
-      const p = lerpPt(a, b, k / n);
-      for (let r = -rows; r <= rows; r++) {
-        const taper = 1 - Math.abs(r) / (rows + 1);   // the band thins toward its edge
-        if (noise(p.x * 3 + r, p.y * 3 - r) > taper + 0.1) continue;
-        const x = p.x + nx * r * CARET_LATTICE, y = p.y + ny * r * CARET_LATTICE;
-        const ix = Math.round(x / CARET_LATTICE), iy = Math.round(y / CARET_LATTICE);
-        const key = `${ix},${iy}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        out.push({ x, y, ix, iy, peak: Math.abs(r) <= rows / 3 && range.gain >= 0.9 });
-      }
-    }
-  }
-  return out;
 }
 
 /** How far (picture pixels) an authored city is moved to stand on its own province's traced land. Past it the city
@@ -847,9 +819,6 @@ export function buildTamrielInk({ bayCoast = [] } = {}) {
   // water, inked as its coast. The lore map's six (TAMRIEL1) were drawn from memory as straight runs, and on the
   // picture half of them ran out across the sea; they stand on the authored shape alone.
   if (!traced) for (const rv of RIVERS) for (const c of clipOutsideRect(chainToBay(rv.pts.map(([x, y]) => ({ x, y }))), rect)) rivers.push(roundCorners(c, 12));
-  const carets = [];
-  // the ranges are authored; on the trace a caret stands only where the picture has land
-  for (const rg of MOUNTAIN_RANGES) for (const c of rangeCarets(rg, noise)) { if (traced && !provinceKeyAt(c.x, c.y)) continue; const q = toBay(c); if (!inBay(q.x, q.y)) carets.push({ ...c, x: q.x, y: q.y }); }
   const provinces = traced
     ? traced.labels.map((l) => { const p = provinceByKey(l.key); const [x, y] = pictureToBay(l.px, l.py); return { key: l.key, name: p?.name ?? l.key, x, y }; })
     : PROVINCES.map((p) => { const [x, y] = pictureToBay(p.label[0], p.label[1]); return { key: p.key, name: p.name, x, y }; });
@@ -864,6 +833,8 @@ export function buildTamrielInk({ bayCoast = [] } = {}) {
   })
     .filter((c) => c && !inBay(c.x, c.y));
   const frame = tamrielFrameInBay();
+  // RELIEF-CARETS: the high ground off the ground's own heights, read as a view needs it (ui/ink/pastBayCarets.js)
+  const carets = createPastBayCarets({ heightByte: tamrielHeightByte, climateAt: tamrielClimateAt, frame, inBay });
   // TESA15: the roads past the Bay are no part of it - they are inked a tile at a time as they land (arenaRoadInkAt)
   return { coast, borders, rivers, carets, provinces, seas, cities, frame, joined: stitched.joined, bayEnds: ends.length, traced: !!traced, arena: !!arena, version: tamrielLandVersion(), arenaVersion: arenaPlacesVersion(), capitalsVersion: capitalsVersion() };
 }
@@ -1209,20 +1180,8 @@ export function paintTamrielInk(ctx, view, ink, opts) {
     // the shore, in the Bay's own hand
     stroke(ink.coast, Math.max(3, s * 1.6), PEN.wash);
     stroke(ink.coast, 1.3, PEN.line);
-    // the high ground: the lattice thinned so a caret never lands under its neighbour
-    const unit = s * tamrielFit().ppu * CARET_LATTICE;   // paper px between lattice points
-    const k = Math.max(1, Math.ceil(5 / Math.max(unit, 1e-6)));
-    const caret = Math.max(2.5, Math.min(7, s * 0.9));
-    ctx.strokeStyle = PEN.relief;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (const h of ink.carets) {
-      if (h.ix % k !== 0 || h.iy % k !== 0 || !visible(h.x, h.y)) continue;
-      const [x, y] = toPaper(view, h.x, h.y);
-      const c = h.peak ? caret * 1.3 : caret;
-      ctx.moveTo(x - c, y + c * 0.6); ctx.lineTo(x, y - c * 0.6); ctx.lineTo(x + c, y + c * 0.6);
-    }
-    ctx.stroke();
+    // the high ground, on the Bay's own grid and steps (RELIEF-CARETS)
+    paintPastBayCarets(ctx, view, ink.carets, { paperW, paperH, band, continent });
     // the rivers (REGION-LINES: the provinces' borders are drawn over the roads' web, below)
     stroke(ink.rivers, 1, PEN.soft);
   }

@@ -320,15 +320,6 @@
     ]
   },
   {
-    "name": "TAMRIEL3-a-caret-in-the-sea",
-    "file": "src/ui/tamrielInk.js",
-    "old": "if (traced && !provinceKeyAt(c.x, c.y)) continue;",
-    "new": "if (false) continue;",
-    "tests": [
-      "test/world/tamriel3.test.js"
-    ]
-  },
-  {
     "name": "TAMRIEL3-a-sea-name-on-the-land",
     "file": "src/ui/tamrielInk.js",
     "old": ".filter((s) => !traced || !provinceKeyAt(...bayToPicture(s.x, s.y)));",

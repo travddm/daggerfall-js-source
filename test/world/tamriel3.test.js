@@ -372,7 +372,8 @@ test('TAMRIEL3 ink: the built model on a trace is the traced coast and borders (
   assert.ok(ink.borders.length >= 1);
   for (const c of ink.cities) { assert.ok(c.province, 'placed'); assert.ok(!(c.x >= 0 && c.y >= 0 && c.x < BAY_W && c.y < BAY_H)); }
   for (const s of ink.seas) assert.equal(provinceKeyAt(...bayToPicture(s.x, s.y)), null, `${s.name} named at sea`);
-  for (const c of ink.carets) assert.ok(provinceKeyAt(...bayToPicture(c.x, c.y)), 'a caret only on the picture\'s land');
+  const { x0, y0, w, h } = ink.frame;
+  for (const c of ink.carets.inRect(x0, y0, x0 + w, y0 + h, 12)) assert.ok(provinceKeyAt(...bayToPicture(c.x + 0.5, c.y + 0.5)), 'a caret only on the picture\'s land');
   const model = { coast: [] };
   const a = tamrielInkFor(model);
   assert.equal(tamrielInkFor(model), a, 'one model a trace');

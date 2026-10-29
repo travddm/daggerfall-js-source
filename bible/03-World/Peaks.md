@@ -26,8 +26,8 @@ own release: its module is built and pinned, and not wired.
 - **The authored spines are wrong in places.** `world/tamriel/tamrielGeography.js` MOUNTAIN_RANGES were drawn from
   memory on the lore map. The Velothi's spine runs over 0-336 m ground, Red Mountain's lies in the sea, and the
   Throat's lies on Skyrim's north shore. `tamrielRelief.js` `namedSummit` corrects the zones' hearts
-  (`tamrielBiomes.js`). The other two readers do not use it: the held map's carets (`ui/tamrielInk.js`) and the
-  authored law without a relief (`tamrielGround.js` `rangeLift`). That fix belongs to PEAKS2.
+  (`tamrielBiomes.js`). The authored law without a relief (`tamrielGround.js` `rangeLift`) does not use it. That fix
+  belongs to PEAKS2. The held map's carets read the ground's own heights (`Tamriel.md` RELIEF-CARETS), not the spines.
 - **World of Daggerfall's Mountains layouts** (`world/worldOfDaggerfall/worldOfDaggerfall.js` WOD-PEAKS) were already
   off by default: faceted ARCH3D spires stood as prefabs (FB1001-WODROCK).
 
@@ -131,8 +131,8 @@ deliberately, each re-derived and said why.
   keyed on the ground moves its version (GROUND_ROLL_VERSION, TAMRIEL_ROADS_VERSION, BAKE_GENERATOR_VERSION, the far
   bakes).
 - **Placed by the relief.** The named ranges' spines in `tamrielGeography.js` MOUNTAIN_RANGES are to be re-derived from
-  the relief's own ridgelines (`namedSummit`'s reach). The zones' hearts already read `namedSummit`, but the held map's
-  carets (`ui/tamrielInk.js`) and the authored law (`tamrielGround.js` `rangeLift`) do not.
+  the relief's own ridgelines (`namedSummit`'s reach). The zones' hearts already read `namedSummit`, but the authored law
+  (`tamrielGround.js` `rangeLift`) does not. The held map's carets follow the ground (`Tamriel.md` RELIEF-CARETS).
 - **World of Daggerfall's Mountains layouts** are retired as the mountain look then. Their Rocks layouts and the routes'
   `mountainPixels` stay.
 - **RELIEF-PEAKS (2026-10-27, `Tamriel.md`) stands the ranges past the Bay already.** KPbICA saw no mountains past the
