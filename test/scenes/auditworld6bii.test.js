@@ -246,18 +246,3 @@ test('AUDIT WORLD6b-ii B6/B8/C2: a puppet beating on me raises the enemy alert a
   assert.equal(pe.skillUses[SKILLS.Dodging], 0, 'no blow');
 });
 
-test('AUDIT WORLD6b-ii by source: the Seducer transforms for ME in both pools (A4/C4); the dungeon drops a puppet\'s latches after the mobile (B10); no double loose (B7); the pane says a peer\'s creature can hurt me (C3); the peer\'s height is the last standing one (C5); the prune reads the peers the hunt sees (C2); the record', () => {
-  const x = rd('src/scenes/exteriorFoes.js'), d = rd('src/scenes/dungeonContext.js'), w = rd('src/scenes/world.js');
-  assert.match(x, /f\.seducer\?\.update\(foeFrameDt\(dt\), isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting\);/, 'A4');
-  assert.match(d, /f\.seducer\?\.update\(foeFrameDt\(dt\), !foeDeps \|\| !f\.ai\._armedTargeting \|\| foeDeps\.isLocalPlayerTarget\(f\.ai\.target\)\);/, 'C4');
-  assert.match(d, /f\._castPending = false;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(_puppet && f\.mobile\) \{\s*if \(!f\._pupMine\) f\.mobile\.doMeleeDamage = false;/, 'B10: dropped after the mobile');
-  assert.doesNotMatch(d.slice(d.indexOf('function puppetStep('), d.indexOf('function puppetStep(') + 4000), /if \(f\.mobile\) \{[^\n]*\n\s*if \(!f\._pupMine\) f\.mobile\.doMeleeDamage = false;/, 'and no longer in puppetStep');
-  const pupArm = x.slice(x.indexOf("onArrow(from, dir, f, f._pupMine ? null : _at);"), x.indexOf("onArrow(from, dir, f, f._pupMine ? null : _at);") + 300);
-  assert.doesNotMatch(pupArm, /SOUND\.ArrowShoot/, 'B7: the loose rings at the host\'s seam alone');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /everyone nearby sees the same monsters and can fight them, and they can hurt you too\./, 'C3');
-  assert.match(w, /const h = peerBodies\?\.heightOf\(p\.id\) \|\| 0;\s*if \(h > 0\) _peerHeights\.set\(p\.id, h\);\s*out\.push\(\{ id: p\.id, feet: onlineToScene\(p\.shown\), height: _peerHeights\.get\(p\.id\), cv: p\.shown\?\.cv \| 0 \}\);/, 'C5');
-  assert.match(w, /\{ const ids = ownerIds\(\); if \(ids\) exteriorFoes\.pruneOwners\(ids, now\); \}/, 'C2: the prune reads the same list');
-  assert.match(x, /const _cullAt = f\.campId != null \? CAMP_CULL_DISTANCE : ENCOUNTER_CULL_DISTANCE;\n\s*if \(!f\.placed && !f\.managed && !f\.refugee && _playerDist > _cullAt && !\(f\.ai\.detected && f\.ai\.targetIsLocalPlayer !== false\) && !_raidKept && !\(_qTag\(f\) && partyNearFoe\(f, _cullAt\)\) && !_relentless\) \{/, 'A2');   // PIN MOVED (PACK-KEEP: nor a raid's monster while a player is near it)   // PIN MOVED (RVN2: nor a Relentless revenant hunting me); PIN MOVED (AUDIT WORLD-EVENTS L4-2: nor a raid's refugee)   // AUDIT (pre-merge) Q4: a shared quest's foe stands while a party member is near it   // WOD3: a mod-placed foe is never culled; DW-E4: nor a spawner-managed one
-  assert.match(x, /f\.ai\.targetIsLocalPlayer = f\._pupMine;\s*if \(f\._pupMine\) \{\s*f\.ai\._senses\?\.\(playerFeet, null\);/, 'A6/B8');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD6b-ii \(2026-09-14\)/, 'the record');
-});

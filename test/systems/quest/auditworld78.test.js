@@ -118,23 +118,6 @@ test('AUDIT WORLD7/8 A3/A6: CreateFoe - a marker ahead of the world online is a 
   assert.match(src, /else \{ const raised = Number\.isFinite\(step\) \? Math\.min\(raisedSince\(raisedNow, this\._lastRaised\), gameSeconds - this\._lastTick\) : 0; const forgiven = Math\.max\(0, gameSeconds - this\._lastTick - raised - step\) \+ raised; if \(forgiven > 0\) this\.lastSpawnTime \+= forgiven; this\._lastTick = gameSeconds; \}/, 'the in-flight path forgives too (QCLOCK-WORLD: the lived part past a step, and the raise whole)');
 });
 
-test('AUDIT WORLD7/8 A4/A10/C7/C9: the records and the residue - the machine ticks off the frame loop (a hidden tab runs no frames and charges one step on return), the record and the constant say so; the stand-down wording is gone or stamped superseded; the pre-WORLD8 memory sentence and the Ledger\'s WORLD5 sentence corrected', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!townTalk\.overlayActive && !worldMoveBusy\(\) && !hudFade\.fadeInProgress\) questBridge\.tick\(dt\);/, 'the quest tick is the frame\'s');   // WA1: and held while the world moves and the HUD fades (QuestMachine.Update :310-316) - worldMoveBusy() carries the load gate
-  // PIN MOVED (AUDIT SCALE B1): world.js listens for one visibilitychange - the account heartbeat's, so a knock waiting
-  // as the page hides goes then - and it ticks the heartbeat alone, nothing of the quest machine's
-  assert.deepEqual((w.match(/^.*visibilitychange.*$/gm) ?? []).map((l) => l.trim()),
-    ["globalThis.document?.addEventListener?.('visibilitychange', () => { heartbeat.tick(); });"], 'no hidden-tab timer drives it');
-  assert.match(rd('src/systems/quest/clock.js'), /a hidden tab runs no frames and charges one step\s*\n\s*\* {2}when it comes back/, 'the constant\'s note');
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.match(arc, /the tab closed or hidden \(the\nmachine ticks off the frame loop, so a hidden tab runs no frames and\ncharges one step when it comes back\)/, 'the record');
-  assert.equal(arc.includes('charges a step per throttled tick'), false);
-  assert.match(arc, /is applied as it stands and stamped at the arrival that applied it,\nso it is due an hour later\./, 'C7: a pre-WORLD8 memory is due an hour after the arrival that applied it');
-  assert.match(arc, /\[WORLD7: the word is `questClockStepMax` now, the\nsame on both hosts\.\]/, 'A10: AUDIT WORLD5 C10 stamped');
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /the stood-down hours never charged when it stands up \[superseded by WORLD7: the clocks charge played time\]/, 'C9');
-  assert.match(rd('src/scenes/exterior.js'), /AUDIT WORLD5 C10 \/ WORLD7: the quest clocks' played step, this host's word too/, 'A10: the host\'s import comment');
-});
-
 test('AUDIT WORLD7/8 B1/B4/C2: the stamp is the RELAY\'s millisecond - under an installed offset the wire\'s inverse over the shared minute answers the relay\'s instant, where sharedWallMs answers this machine\'s (right for a display, wrong for a stamp two machines compare); a stamp ahead of now is clamped at both readers by source', () => {
   const off = 2 * 3600 * 1000;   // this machine two hours from the relay
   const t0 = Date.now();

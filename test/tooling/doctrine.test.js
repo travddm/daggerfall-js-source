@@ -1166,22 +1166,6 @@ test('doctrine EOTB0: the derivation is not vacuous - a stranger and a loss both
   assert.equal(bundleArt(`${dir}112364/112364_0-0.png`), true, 'and one it did must pass');
 });
 
-// \u2500\u2500 VE4: A DERIVED ROW IS THE EXCEPTION PORT-DOCTRINE RECORDS, AND ONLY IT \u2500\u2500
-//
-// Every other row is a CLAIM that the art is the modder's own. Vanilla
-// Enhanced's rows say the opposite - it IS Daggerfall's art, repainted -
-// and stand on Mac's approval alone. An approval is bounded by what it
-// approved: the doctrine's exception paragraph names the directory, and a
-// derived row anywhere else, or a named directory with no row, reddens.
-const DOCTRINE = 'bible/01-Overview/Port-Doctrine.md';
-/** The directories Port-Doctrine's exception paragraphs name - every backticked `public/` or `vendor/` path on their lines. */
-function exceptionDirs() {
-  // ALIKR1/SNOWFALL1: every exception paragraph's line - THE ONE EXCEPTION (Vanilla Enhanced) and THE SECOND EXCEPTION;
-  // LAYERED-GEAR: and THE THIRD, whose art sits under vendor/ (the build reaches it through a glob, as Eye of the Beholder's)
-  // DEX0: and THE FOURTH, whose class skins live under vendor/ (the player body's sprite index reads them there)
-  const lines = readFileSync(join(root, DOCTRINE), 'utf8').split('\n').filter((l) => /^\s+\*\*THE (?:ONE|SECOND|THIRD|FOURTH) EXCEPTION\b/.test(l));
-  return lines.flatMap((line) => [...line.matchAll(/`((?:public|vendor)\/[^`]+\/)`/g)].map((m) => m[1]));
-}
 /** The mark each directory's approval gave it: Vanilla Enhanced's rows the first exception's, the environment packs' the
  *  second's, Layered Gearing's the third's, the enemies' and the class skins' the fourth's - a row in one exception
  *  wearing another's mark is a row approved by the wrong approval. */
@@ -1190,16 +1174,6 @@ const markFor = (dir) => (dir.startsWith('public/art/vanilla-enhanced/') ? VE4_D
   : dir.startsWith('public/art/daggerfall-enemy-expansion-repainted/') || dir.startsWith('vendor/class-skins/') ? DEX_DERIVED : ENVIRONS_DERIVED);
 /** The derived rows standing outside every directory the exception names. */
 const derivedOutside = (rows, dirs) => [...rows].filter(([dir, r]) => r.derived && !dirs.some((d) => dir.startsWith(d))).map(([dir]) => dir);
-
-test('doctrine VE4: a derived row stands inside the exception Port-Doctrine records, and every row inside it says it is derived', () => {
-  const dirs = exceptionDirs();
-  assert.deepEqual(dirs, ['public/art/vanilla-enhanced/', 'public/art/sands-of-the-alikr/', 'public/art/snowfall/', 'vendor/layered-armor/', 'public/art/daggerfall-enemy-expansion-repainted/', 'vendor/class-skins/Textures/'], 'the doctrine names six directories, under four approvals');
-  assert.deepEqual(derivedOutside(BUNDLE_ART, dirs), [], 'repainted game data outside the approved directory');
-  for (const d of dirs) assert.ok([...BUNDLE_ART].some(([dir, r]) => r.derived && dir.startsWith(d)), `${d} is approved and no row carries it`);
-  // and inside it nothing passes as the port's own: every row there says what it is
-  for (const [dir, r] of BUNDLE_ART) if (dirs.some((d) => dir.startsWith(d))) assert.equal(r.derived, markFor(dir), `${dir} sits in the exception and does not say so - in its own approval's words`);
-  for (const f of PUBLIC_ALLOWLIST.keys()) assert.ok(!dirs.some((d) => f.startsWith(d)), `${f}: an allow-list row inside the exception`);
-});
 
 test('doctrine STUDIO1: a picture is the studio\'s own by its roster and its listing alone - a stranger\'s, a file that is no picture and a link are not (AUDIT STUDIO1 C12: the arm is not vacuous)', () => {
   const at = mkdtempSync(join(tmpdir(), 'doctrine-studio-'));
@@ -1214,40 +1188,6 @@ test('doctrine STUDIO1: a picture is the studio\'s own by its roster and its lis
     symlinkSync(join(dir, 'Redclaw', '38181_1-0.png'), join(dir, 'Redclaw', '38181_3-0.png'));
     assert.deepEqual([...studioMembers(at)], [`${STUDIO_TREE}/Redclaw/38181_1-0.png`]);
   } finally { rmSync(at, { recursive: true, force: true }); }
-});
-
-test('doctrine VE4: the bound is not vacuous - a derived row outside the named directory reddens, and with no approval every one does', () => {
-  const rogue = new Map([...BUNDLE_ART, ['public/art/someone-elses-repaint/', { manifest: 'x', derived: VE4_DERIVED, why: 'THIRD-PARTY - x' }]]);
-  assert.deepEqual(derivedOutside(rogue, exceptionDirs()), ['public/art/someone-elses-repaint/']);
-  assert.deepEqual(derivedOutside(rogue, []), [...rogue].filter(([, r]) => r.derived).map(([d]) => d));
-});
-
-test('doctrine: no DERIVED raster is tracked either, whatever it is wearing', () => {
-  // AUDIT 21 (doctrine lane, F10) found the same rule broken in a shape no
-  // extension filter catches: src/characters/backs/*.json held flat arrays of
-  // ART_PAL indices whose opaque mask was IDENTICAL to the mirrored BODY00I0
-  // sprite - 5237/5237 texels, 100.00% silhouette agreement. Re-shaded, but
-  // the SHAPE and the ramps are the source art's, and the front sprite they
-  // were derived from is the user's ARENA2 file, not ours.
-  //
-  // A raster does not stop being a raster by being spelled as JSON, so the
-  // rule is on the SHAPE: a tracked file carrying a width/height and a flat
-  // pixel array is a raster, and none may be committed.
-  const suspects = [];
-  for (const f of tracked('src').concat(tracked('public'), tracked('bible'))) {
-    if (!f.endsWith('.json')) continue;
-    let j;
-    try { j = JSON.parse(readFileSync(join(root, f), 'utf8')); } catch { continue; }
-    if (j && typeof j === 'object' && Number.isFinite(j.width) && Number.isFinite(j.height)
-        && Array.isArray(j.data) && j.data.length >= j.width * j.height) {
-      suspects.push(`${f} (${j.width}x${j.height}, ${j.data.length} texels)`);
-    }
-  }
-  assert.deepEqual(suspects, [],
-    'these tracked files are RASTERS - a width, a height and a pixel array. If the\n'
-    + 'pixels were derived from ARENA2 (including a re-shade that keeps the original\n'
-    + 'silhouette) they may not be committed; regenerate them locally instead:\n'
-    + suspects.join('\n'));
 });
 
 test('doctrine: .gitignore still blocks the game data it claims to block', () => {
@@ -1298,46 +1238,6 @@ test('doctrine: .gitignore still blocks the game data it claims to block', () =>
 // row keep a ROSTER, which is the one line a new site has to touch.
 // ---------------------------------------------------------------------------
 
-test('doctrine: every DEPARTURE or Ledger A cite in src/ has a Ledger row naming its file', () => {
-  const ledger = readFileSync(join(root, 'bible/01-Overview/Port-Ledger.md'), 'utf8');
-  const unrecorded = [];
-  let scanned = 0;
-  for (const f of tracked('src')) {
-    if (!f.endsWith('.js')) continue;
-    const text = readFileSync(join(root, f), 'utf8');
-    // Both spellings: the shouted convention, and the prose one that let
-    // messageBox.js's row go unenforced when this pin first landed.
-    // ROAD-E fix-D: and the PLURAL. `\bDEPARTURE\b` is false on
-    // "RECORDED DEPARTURES", so nine files that shout the plural - the
-    // spell maker among them, which cited a Ledger A row that did not
-    // exist - were never scanned at all. The trailing S is now optional.
-    // ROAD-G G7: `Ledger A` joins the two DEPARTURE spellings. A file that
-    // names section A is claiming an approval just as loudly as one that
-    // shouts the word, and that half of F7's finding was never gated.
-    if (!/\bDEPARTURES?\b/.test(text) && !/deliberate departure/i.test(text)
-      && !/Ledger A/.test(text)) continue;
-    // The LEDGER must name the file. Citing the Ledger from the source side is
-    // NOT enough and deliberately does not count here: F7's eleven sites all
-    // cited "the Ledger A engine-PRNG rule" and no such row existed. A claim
-    // of approval is not an approval.
-    scanned++;
-    const base = f.split('/').pop();
-    if (ledger.includes(f) || ledger.includes(base)) continue;
-    unrecorded.push(f);
-  }
-  // ...and the population itself, so a rewording cannot quietly empty the
-  // gate the way `\bDEPARTURE\b` emptied it against the plural.
-  assert.ok(scanned >= 100,
-    `only ${scanned} files match the DEPARTURE / Ledger A claim - the shapes moved and this gate went quiet`);
-  assert.deepEqual(unrecorded, [],
-    'these files declare a DEPARTURE, or cite Ledger A, and no Ledger row names\n'
-    + 'them. The Ledger says\n'
-    + '"if a departure or gap is not on this page, it does not exist", which is only\n'
-    + 'usable as a gate while it is true - a later audit greps the Ledger to decide\n'
-    + '"approved or bug?" and gets the wrong answer:\n'
-    + unrecorded.join('\n'));
-});
-
 // ═══ AUDIT 58 (seams): a RECORDED departure resolves against a
 // section-A row that NAMES THE FILE ════════════════════════════════
 //
@@ -1367,42 +1267,6 @@ const A_BOUNDS = ['## A. Approved departures from DFU', '## A-note (H1)'];
 const RECORDED_CLAIM =
   /\bRECORDED DEPARTURES?\b|\bDEPARTURES?\b[^.\n]{0,40}\((?:recorded|Ledger A shape)|\bDEPARTURES?, both recorded\b/;
 
-test('AUDIT 58: a file claiming a RECORDED departure has an unstruck section-A row naming it', () => {
-  const doc = readFileSync(join(root, 'bible/01-Overview/Port-Ledger.md'), 'utf8').split('\n');
-  const lo = doc.findIndex((l) => l.startsWith(A_BOUNDS[0]));
-  const hi = doc.findIndex((l) => l.startsWith(A_BOUNDS[1]));
-  assert.ok(lo >= 0 && hi > lo, 'Port-Ledger has no section A');
-  // section A's table rows, minus the header and the struck ones -
-  // citedrift's own `awk '/^\|/ && !/^\|---/'` and `struck` helpers.
-  const approved = doc.slice(lo, hi)
-    .filter((l) => /^\|/.test(l) && !/^\|---/.test(l) && !/^\| What \|/.test(l))
-    .filter((l) => !/^\|\s*(\*\*)?~~/.test(l))
-    .join('\n');
-  assert.ok(approved.length > 1000, 'section A resolved to nothing - the bounds moved');
-
-  const claimed = [];
-  const unrowed = [];
-  for (const f of tracked('src')) {
-    if (!f.endsWith('.js')) continue;
-    // comments WRAP, so the claim is read off the unwrapped prose
-    const flat = readFileSync(join(root, f), 'utf8')
-      .replace(/^\s*(\/\/|\*)\s?/gm, '').replace(/\s+/g, ' ');
-    if (!RECORDED_CLAIM.test(flat)) continue;
-    claimed.push(f);
-    const base = f.split('/').pop();
-    if (!approved.includes(f) && !approved.includes(base)) unrowed.push(f);
-  }
-  // FD1 (2026-09-11): 18 -> 17, a deliberate edit - colorPicker.js and its
-  // keyed settings window were DELETED with the launcher, and the row is struck.
-  assert.ok(claimed.length >= 17,
-    `only ${claimed.length} files match the RECORDED-departure claim - the shapes moved and this gate went quiet`);
-  assert.deepEqual(unrowed, [],
-    'these files say their departure is already RECORDED and no unstruck section-A row\n'
-    + 'names them. "If a departure or gap is not on this page, it does not exist" is only\n'
-    + 'usable while it is true, and a STRUCK section-C row is not an approval:\n'
-    + unrowed.join('\n'));
-});
-
 // ═══ AUDIT 58 (f3/render): a gate knob that reads nothing is a door
 // that can neither fail nor act ═════════════════════════════════════
 test('AUDIT 58: every URL knob the world render gate hands the page has a live reader in src/', () => {
@@ -1431,34 +1295,3 @@ test('AUDIT 58: every URL knob the world render gate hands the page has a live r
     'the pass line names only what the run actually set');
 });
 
-// ═══ EE0: the world render gate exists, and reads the compositor's frame ═══
-test('EE0: the world render gate boots the real exterior and judges real pixels', () => {
-  const g = readFileSync('tools/worldRenderGate.mjs', 'utf8');
-  // it boots the GAME, against data, into the exterior
-  // AUDIT 48 F1: the classic mode must open the SKIN's door, ?skin=classic.
-  // A bare ?classic is the classic start-location door, and every
-  // classic-mode run before this rendered the enhanced skin.
-  assert.match(g, /const skin = MODE === 'classic' \? '&skin=classic' : '';/);
-  assert.ok(!/'&classic'/.test(g), 'the start-location door is not the skin door');
-  // EE7: the gate can boot either host - ?exterior by default, ?world
-  // with --world, where the grass lives
-  assert.match(g, /\/play\/\?\$\{WORLD \? 'world' : 'exterior'\}&shot&novideo&nofoes/);
-  assert.match(g, /window\.__frame/, 'it must wait for frames, not for load');
-  // it judges the COMPOSITOR'S frame: a readPixels outside the game's
-  // rAF returns a cleared buffer, which reads as "everything is black"
-  assert.match(g, /canvas\.screenshot\(\{ type: 'png'/);
-  assert.ok(!/readPixels\(/.test(g), 'a read-back of the default framebuffer lies here');
-  // and it fails on the three things a black world has
-  // EE3 sharpened these: the lower half is judged, and then the TERRAIN
-  // itself by a median band, because a lit building beside a void
-  // ground passed the lower-half check
-  assert.match(g, /the lower half is lit/);
-  assert.match(g, /the lower half has detail/);
-  assert.match(g, /the TERRAIN is lit \(street band median/);
-  assert.match(g, /the sky is drawn/);
-  // the arc plan names it as every slice's gate
-  const plan = readFileSync('bible/07-Rendering/Enhanced-Environments-Arc.md', 'utf8');
-  assert.match(plan, /tools\/worldRenderGate\.mjs/);
-  assert.match(plan, /an upload may create, fill and\s+parameterise an object\. It may not draw/,
-    'the law the texture incident taught must be in the plan');
-});

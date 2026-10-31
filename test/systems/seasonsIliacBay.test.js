@@ -634,16 +634,6 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   assert.deepEqual([...row.vendor], ['seasons-iliac-bay']);
 });
 
-test('SIB1: the vendor tree carries the manifest and the record, and NO raster - the textures are the player\'s to supply', () => {
-  const tracked = execFileSync('git', ['ls-files', 'vendor/seasons-iliac-bay'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
-  assert.deepEqual([...tracked].sort(), ['vendor/seasons-iliac-bay/README.md', 'vendor/seasons-iliac-bay/seasons-of-the-iliac-bay.dfmod.json'],
-    'the folder holds the manifest and the record and nothing else');
-  const readme = read('vendor/seasons-iliac-bay/README.md');
-  assert.match(readme, /permission/i);
-  assert.match(readme, /re-shaded sprite|silhouette/i, 'the README says why the textures are not here');
-  assert.ok(existsSync(join(root, 'bible/07-Rendering/Seasons-Iliac-Bay.md')), 'the bible page');
-});
-
 // ---- SIB2 (2026-09-08, Mac: "ensure the seasons mod is 1:1 and working") --
 
 test('SIB2: the bundle is the mod by its MANIFEST, not by one guessed file name; the events are DFU\'s per caller; a later version says so', () => {

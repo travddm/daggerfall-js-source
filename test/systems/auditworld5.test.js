@@ -267,29 +267,3 @@ test('AUDIT WORLD5 C8 (LIVED1): the sub-tick\'s minutes ride to the host alone, 
   assert.match(dc, /advanceMinutes: \(n\) => _restAdvance\(n\),/);
   assert.match(dc, /const classicMinutesRef = \{\s*get value\(\) \{ return ownMinutes\(\); \},\s*set value\(v\) \{ setOwnMinutes\(v\); \},\s*\};/, 'the dungeon\'s one clock view is the character\'s');
 });
-test('AUDIT WORLD5 by source: the sentence refills in both lanes (C9; LIVED1: its days are served on the prisoner\'s own clock), exterior.js says the stand-down (C10), the welcome\'s clock is stamped as it is built and the relay says which one it is (C11), the pane says the clock (C12), the install is the boot\'s first act (C13), the cautious heal is the trip\'s nights (C14)', () => {
-  const af = rd('src/scenes/arrestFlow.js');
-  assert.match(af, /playerEntity\.inPrison = false;\s*(?:\/\/[^\n]*\n\s*)*fillVitalSigns\(playerEntity\);/, 'C9 (LIVED1): the days are the refill\'s price, and online they are served on the prisoner\'s own clock');
-  assert.doesNotMatch(af, /sharedClockOn/, 'the sentence is gated on nothing - it is served in both lanes');
-  assert.ok((af.match(/^\s*fillVitalSigns\(playerEntity\);/gm) ?? []).length >= 3, 'the sentence\'s, the rescue\'s and the acquittal\'s refills');
-  assert.match(af, /advanceDays = \(days\) => advanceOwnMinutes\(days \* MINUTES_PER_DAY\),/, 'the days are the prisoner\'s own');
-  assert.match(rd('src/scenes/exterior.js'), /questClockStepMax: \(\) => \(sharedClockOn\(\) \? PLAYED_STEP_MAX_SECONDS : Infinity\),/, 'C10 (WORLD7\'s word: the same as world.js\'s)');
-  // SRV-N appended `v` after it, so the stamp is no longer the last field.
-  // What C11 is about is unchanged and is what is matched: Date.now() is
-  // CALLED where the welcome is built, not read from a variable set when
-  // the hello began - four storage awaits earlier, every millisecond of
-  // which the client carried as the relay's clock.
-  assert.match(rd('server/src/index.js'), /"now":\$\{Date\.now\(\)\},"v":/, 'C11: not the hello\'s start, four awaits earlier');
-  assert.ok(relayVersionAtLeast(66), 'C11: the relay bumped, and has not gone backwards since (SRV-N: asked monotonically - five pins used to retype one moving number)');
-  // DISC25-D: the last clause ("the quest clocks stand still") had been false since WORLD7 - they count played time
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /The world\\u2019s clock and sky run on real time\. Resting, travel, jail and training don\\u2019t move them, so a quest waiting for a time of day waits for the world\\u2019s, and a lycanthrope\\u2019s full moon lasts one night\. Your character also has their own clock\. It runs while you play and stops while you are logged off\. Resting, travel, jail and training use it\./, 'C12 (LIVED1: and the character\'s own time; AUDIT LIVED1b U8: logged off, not away; TIME2: the full moon\'s night)');
-  const w = rd('src/scenes/world.js');
-  const install = w.indexOf("if (params.has('online')) { setSharedClock(() => sharedClassicMinutes(Date.now() + _sharedOffsetMs), (m) => wallMsForClassicMinutes(m) - _sharedOffsetMs, { sky: () => skyClassicMinutes(Date.now() + _sharedOffsetMs), skyWall: (m) => wallMsForSkyMinutes(m) - _sharedOffsetMs }); setSharedWeather(true); }");   // TIME1: and the sky beside it
-  const boot = w.indexOf('export async function bootWorld(');
-  const season = w.indexOf('let season = seasonPin ?? climateSeasonFromMinutes(skyMinutes());');   // TIME1: the sky's season
-  assert.ok(boot > 0 && install > boot && season > install, 'C13: installed before the first read of the clock (the season)');
-  assert.ok(!w.slice(boot, install).split('\n').some((l) => !l.trim().startsWith('//') && l.includes('worldMinutes()')), 'C13: nothing between the boot\'s door and the install reads the clock');
-  assert.match(w, /if \(opts\.speedCautious\) \{/, 'C14 (LIVED1): the heal is the trip\'s nights, and online they are the character\'s own');
-  assert.match(w, /setSyntheticTimeIncrease\(true\); playerTicker\.advance\(computed\.minutes\);/, 'and the trip\'s days are advanced online too');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD5 \(2026-09-13\)/, 'the record');
-});

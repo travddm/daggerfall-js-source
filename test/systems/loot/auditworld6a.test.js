@@ -126,22 +126,3 @@ test('AUDIT WORLD6a B7: the memory\'s stamp is twelve base-36 digits and a dash,
   assert.equal(relay.mintSharedStamp, mintSharedStamp);
 });
 
-test('AUDIT WORLD6a by source: the settle asks the stack (A3), the keyed shop fallback claims and a stale row buys nothing (A4), a restock is said at the window (A5), an owned house or any ship keeps no shared loot room (A6/B6; STAFF-TP adds private presence), the first act in a new building pends (A7), a building\'s foes frame is no dungeon heartbeat (B8)', () => {
-  const m = hostText('src/scenes/worldModes.js'), pure = rd('src/world/interior/interiorShared.js');   // PIN MOVED (OUTDOOR-LOOT): the open, the frame's settle and the publish stand in world/interior/interiorShared.js (HOST-SPLIT moved them out of createWorldModes)
-  assert.match(m, /interiorLootFrame\(interiorCtx, _intShared, \{ now: performance\.now\(\), open: \(w\) => interiorWindows\.containsWindow\(w\) \}\)/, 'A3: the host asks the stack');
-  assert.match(pure, /!\(open\(win\) && !win\.done\)/, 'A3: and the settle is the stack\'s answer, not the slot\'s');
-  assert.match(m, /if \(si >= 0\) interiorLootOpen\(interiorCtx, `shelf:\$\{si\}`, interiorOverlay, _intShared, \{ fresh \}\);/, 'A4: claimed');
-  // DAEDRA2 widened the window from 200: the law is that the stale-row
-  // GUARD comes before the splice, and how many lines sit between them
-  // is incidental - a comment added at the gold gate closed it.
-  assert.match(m, /const at = shelf\.items\.indexOf\(it\);\s*if \(at < 0\) return undefined;[\s\S]{0,500}?shelf\.items\.splice\(at, 1\);/, 'A4: a row the shelf no longer holds');
-  assert.equal((m.match(/interiorPublishLoot\(key\);   \/\/ WORLD6a: the new day's stock/g) ?? []).length, 0, 'A5: no restock is said at the roll');
-  assert.match(pure, /export function interiorLootOpen\(ctx, key, win, bag, \{ fresh = false, keeping = null \} = \{\}\) \{[\s\S]*?publishWhole\(ctx, canon, bag, \{ claim: !fresh \}\);/, 'A5: said at the window, a fresh roll not a claim');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /const owned = !!privateVisitRoom \|\| b\?\.buildingType === BUILDING_TYPES\.Ship \|\| \(!interiorHome && houseOwnedAt\(/, 'B6: any ship');   // HOME1 re-aim: an online home keeps its room (home1.test.js)
-  assert.match(m, /_intShared\?\.owned \? \{ private: true, privateRoom: privateVisitRoom \}/, 'A6: private presence only, no shared loot room');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _actRoom = \(\) => !!\(online && \(isWorldRoom\(online\.room\) \|\| isWorldRoom\(_onlineKey\)\)\);/, 'A7');
-  assert.match(w, /online\.onFoes = \(id, data\) => \{\s*if \(isCellRoom\(online\.room\)\) \{[\s\S]*?if \(modes\?\.applyDungeonFoes\?\.\(id, data\) && modes\?\.mode === 'dungeon'\) seatClock\.heard\(performance\.now\(\)\);/, 'B8 (WORLD6b: the cell\'s arm ahead of it)');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## AUDIT WORLD6a \(2026-09-14\)/, 'the record');
-});

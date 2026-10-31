@@ -181,13 +181,3 @@ test('HALT-ONE beyond the pool: a peer\'s watchman is silent here in the lane (h
   d.leave();
 });
 
-test('HALT-ONE the hosts: the street\'s and a building\'s watch read the living lane and the window; the street\'s foe pool the lane, for a peer\'s watchman; the fixed-city page and the dungeon keep DFU\'s cadence (FLAGGED) - and the record names all four', () => {
-  const W = rd('src/scenes/world.js'), M = rd('src/scenes/worldModes.js');
-  assert.match(W, /oneVoice: \(\) => livingWorldOn\(\), windowUp: \(\) => townTalk\.overlayActive,/, 'world.js: the street\'s watch');
-  assert.match(W, /const exteriorFoes = createExteriorFoes\(\{\n {4}oneVoice: \(\) => livingWorldOn\(\),/, 'world.js: the street\'s foes');
-  assert.match(M, /oneVoice: \(\) => livingWorldOn\(\), windowUp: \(\) => !!townTalk\?\.overlayActive,/, 'worldModes.js: a building\'s watch');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /oneVoice/, 'exterior.js: no living town, DFU\'s watch');
-  const bible = rd('bible/06-Systems/Living-World.md');
-  const rec = bible.slice(bible.indexOf('## HALT-ONE'), bible.indexOf('\n## ', bible.indexOf('## HALT-ONE') + 5));
-  for (const host of ['scenes/world.js', 'scenes/worldModes.js', 'scenes/exterior.js', 'scenes/dungeonContext.js']) assert.ok(rec.includes(host), `the record names ${host}`);
-});

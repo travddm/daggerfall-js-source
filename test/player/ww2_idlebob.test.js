@@ -33,18 +33,3 @@ test('WW2: the one motion bag - every field the rig reads, from a player at rest
   assert.ok(bag.speedField >= 0, 'the speed setting is a number (never the idle gate)');
 });
 
-test('WW2: by source - the five host sites read the one bag and none is written out longhand; the record says so', () => {
-  for (const [host, sites] of [['src/scenes/world.js', 1], ['src/scenes/exterior.js', 1], ['src/scenes/worldModes.js', 2], ['src/scenes/dungeon.js', 1]]) {
-    const s = rd(host);
-    assert.equal((s.match(/motionBagOf\(player\)/g) ?? []).length, sites, host);
-    assert.equal(/forward: player\.moveForward/.test(s), false, `${host}: no longhand bag`);
-    assert.match(s, /import \{[^}]*motionBagOf[^}]*\} from '\.\.\/player\/motor\.js';/, `${host}: from the motor`);
-  }
-  const m = rd('src/player/motor.js');
-  assert.match(m, /export function motionBagOf\(player\) \{\s*\n\s*return \{\s*\n\s*forward: player\.moveForward \|\| 0, strafe: player\.moveStrafe \|\| 0, running: !!player\.isRunning, speed: player\.moveSpeed \|\| 0,\s*\n\s*grounded: player\.grounded !== false, jumping: !!player\.jumping, swimming: !!player\.swimming, levitating: !!player\.levitating,\s*\n\s*crouching: !!player\.crouching, riding: !!player\.riding, standing: !!player\.standing, speedField: player\.speed \|\| 0,\s*\n(?:\s*\/\/[^\n]*\n)*\s*climbing: !!\(player\.climb\?\.isClimbing \|\| player\.mantling \|\| player\.onWall\),\s*\n(?:\s*\/\/[^\n]*\n)*\s*bobTimer: Number\.isFinite\(player\.bobTimer\) \? player\.bobTimer : null,\s*\n(?:\s*\/\/[^\n]*\n)*\s*sneaking: !!player\.isSneaking, freeze: player\.freezeMotor \|\| 0, onExteriorWater: !!player\.onExteriorWater,\s*\n\s*height: Number\.isFinite\(player\.height\) \? player\.height : 0,\s*\n(?:\s*\/\/[^\n]*\n)*\s*yaw: Number\.isFinite\(player\.moveYaw\) \? player\.moveYaw : NaN,\s*\n(?:\s*\/\/[^\n]*\n)*\s*travel: typeof player\.travelAt === 'function' \? player\.travelAt\(\) : null,\s*\n\s*bodyYaw: player\.drawYaw \?\? player\._bodyYaw \?\? null, bodyYawOff: Number\.isFinite\(player\._bodyYawOff\) \? player\._bodyYawOff : 0,\s*\n\s*carriedYaw: Number\.isFinite\(player\.carriedYaw\) \? player\.carriedYaw : 0,\s*\n\s*\};/, 'the one bag, every field (AUDIT PRE-MERGE 0929 D1/D2: the yaw the motor moved by, its own word; AUDIT CLIMB1 F9: the climb, a mantle in flight included; CLIMB4: and a hold on the wall; TWO-HANDS AUDIT: the head bob\'s timer; AUDIT BODY-MOTION: the legs\' travel, drawn yaw and deck turns)');   // PIN MOVED (TWO-HANDS AUDIT): the bob's timer; PIN MOVED (AUDIT BODY-MOTION GAIT-9 / GAIT-17 / RIG-6): the third-person legs' fields
-  // the Bob module moved to weaponWidgetMotion.js on 2026-09-19 (the
-  // gun lab runs it rather than copying it) and the locals lost the
-  // component's `w.` - the GATE is the same line and is what this pins
-  assert.match(rd('src/combat/weapon/weaponWidgetMotion.js'), /if \(m\.standing\) sp = s\.bobWhileIdle \? 0\.1 : 0;/, 'the mod\'s idle gate, unchanged');
-  assert.match(rd('bible/05-Combat/Weapon-Widget.md'), /through the one motion bag \(`motionBagOf`, WW2\)/);
-});

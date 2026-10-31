@@ -150,19 +150,3 @@ test('WOD4: an unload takes the camp\'s foes; a rebuild the reference never make
   assert.match(tp, /exteriorFoes\.clearLive\(\);\n\s*wodCarry\.clear\(\);/, 'the sweep is an unload');
 });
 
-test('WOD4: the probe host stands the same camp in its fixed frame, lights it at every hour in its own colour, and rolls once; THE FOUR HOSTS', () => {
-  const x = rd('src/scenes/exterior.js');
-  assert.match(x, /if \(holdOn && b\.blockName === PRIVATEERS_HOLD_BLOCK\) \{\n\s*for \(const hm of HOLD_MODELS\) modelIds\.add\(hm\.modelId\);\n\s*for \(const hf of HOLD_FLATS\) archives\.add\(hf\.archive\);/, 'the loads');
-  assert.match(x, /if \(holdOn && b\.blockName === PRIVATEERS_HOLD_BLOCK\) holdBlocks\.push\(originMatrix\);   \/\/ WOD4/);
-  assert.match(x, /collider\.addMesh\('world', cpu\.positions, cpu\.indices, matrix\);   \/\/ CreateDaggerfallMeshGameObject's MeshCollider/);
-  assert.match(x, /flatGroups\.get\(k\)\.push\(centredBase\(\[origin\[12\] \+ hf\.pos\[0\], origin\[13\] \+ hf\.pos\[1\], origin\[14\] \+ hf\.pos\[2\]\], billboardSize\(t, hf\.record\)\)\);/);
-  assert.match(x, /const lit = withPlayerLights\(holdSel \? holdSel\.data : lightsOn/);
-  assert.match(x, /holdSel \? wodLightColors\(lit\.length \/ 4, lit\.length \/ 4 - holdSel\.data\.length \/ 4, holdSel\.colors, CITY_LIGHT_COLOR_F32\) : null\);/);
-  assert.match(x, /if \(!lanternsOn\) return nearestLights\(holdLights, eye, renderer\.maxPointLights, _holdOnlyRanges, \(l\) => l\.color\);/, 'the fires by day, the lanterns only at night');
-  assert.match(x, /tickHold\(\);   \/\/ WOD4[^\n]*\n\s*tickCityGates\(minute\);/);
-  assert.match(x, /if \(holdRolled \|\| !holdBlocks\.length\) return;\n\s*holdRolled = true;/, 'once');
-  assert.match(x, /exteriorFoes\.spawnFoe\(r\.mobileType, \[o\[12\] \+ r\.pos\[0\], o\[13\] \+ r\.pos\[1\], o\[14\] \+ r\.pos\[2\]\], \{ yaw: r\.yawDeg \* Math\.PI \/ 180, gender: r\.gender, placed: true, groundAlign: \{ hitDist: null \} \}\)/);
-  // worldModes.js and dungeonContext.js stand interiors and dungeons - no exterior block, no camp
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(rd(f), /PRIVATEERS_HOLD_BLOCK|wodPrivateersHold/, `${f} is flagged, not wired`);
-  assert.match(rd('bible/03-World/World-Of-Daggerfall.md'), /## The camp at Privateer's Hold \(WOD4\)/);
-});

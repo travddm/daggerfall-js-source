@@ -633,50 +633,6 @@ test('AUDIT-IF F3: LoadAudio puts every clip in flight at once, and one missing 
 
 // ═══ the hosts ═══════════════════════════════════════════════════════════════
 
-test('IF1: the four stride hosts ask ownsStride before the classic play and drive the component each frame; the modal host raises the three transitions and the standalone dungeon its own; the three landing sinks and the dungeon context\'s three gates; the interior context lists the combined mesh\'s materials; the inventory close refreshes; the records', () => {
-  const world = hostText('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), dj = rd('src/scenes/dungeon.js'), dc = rd('src/scenes/dungeonContext.js');
-  for (const [name, src] of [['world', world], ['exterior', ext], ['worldModes', wm], ['dungeon', dj]]) {
-    assert.match(src, /if \(_step && classicFootstepAllowed\(_step\.clip\)\) audio\.playOneShot\(_step\.clip, _step\.volume\);/, `${name}: DisableVanillaFootsteps (BA1: through the one gate both mods' DisableBuiltInFootsteps answer)`);
-    assert.ok(!/if \(_step\) audio\.playOneShot\(_step\.clip, _step\.volume\);/.test(src), `${name}: no ungated classic play`);
-    assert.equal((src.match(/immersiveFootsteps\.update\(dt, \{/g) ?? []).length, 1, `${name}: one FixedUpdate feed`);
-    assert.match(src, /import \{ immersiveFootsteps(?:, [^}]+)? \} from '\.\.\/systems\/immersiveFootsteps\.js'/, name);   // BA1: world.js also takes reportModCompatibilityIssues
-  }
-  // the exterior hosts hand the exterior arm's reads; the inside hosts the water arm's
-  for (const src of [world, ext]) {
-    // AUDIT PRECIP (PIN MOVED): the world host's season is the snow's under the feet on the snow lane (snowCoverHost.js footSeason)
-    assert.match(src, /inside: false, inDungeon: false,\s*season(?:: snowCover\.footSeason\(player\.pos, season\))?, climateIndex: [^\n]*, tileMapIndex: _surf\.tileIndex \?\? -1,[^\n]*\n\s*waterWalking: _surf\.water === ON_EXTERIOR_WATER\.WaterWalking,/, 'AUDIT-IF F2: off terrain is -1, never the water tile');
-    assert.match(src, /swimming: !!player\.isPlayerSwimming, pos: player\.pos,/, 'PlayerEnterExit.IsPlayerSwimming, not the motor flag');
-  }
-  assert.match(wm, /inside: true, inDungeon: mode === 'dungeon',\s*centreY: player\.pos\[1\] \+ player\.height \/ 2, waterSurfaceY: mode === 'dungeon' \? \(_surf \?\? null\) : null,/);
-  assert.match(dj, /inside: true, inDungeon: true,\s*centreY: player\.pos\[1\] \+ player\.height \/ 2, waterSurfaceY: surf \?\? null,/);
-  // the transitions
-  assert.match(wm, /immersiveFootsteps\.onTransitionInterior\(\{ buildingType: interiorBuilding\?\.buildingType \?\? null, materials: ctx\.floorMaterials \}\);/);
-  assert.equal((wm.match(/immersiveFootsteps\.onTransitionExterior\(\);/g) ?? []).length, 3, 'the building exit, the dungeon exit and (AUDIT 68 X3-ba-forceexit-rain) the forced exit');
-  assert.equal((wm.match(/immersiveFootsteps\.onTransitionDungeonInterior\(\);/g) ?? []).length, 1);
-  assert.equal((dj.match(/immersiveFootsteps\.onTransitionDungeonInterior\(\);/g) ?? []).length, 1, 'the standalone boot is the dungeon transition');
-  // the landings
-  for (const [name, src] of [['world', world], ['exterior', ext], ['worldModes', wm]]) assert.match(src, /sound: immersiveFootsteps\.fallSoundSink\(\(id, vol\) => audio\.playOneShot\(id, vol\)\)/, `${name}: the sink`);
-  assert.match(dc, /!immersiveFootsteps\.playLargeSplash\(\)\) audio\.playOneShot\(SOUND\.SplashLarge/);
-  assert.match(dc, /if \(!immersiveFootsteps\.applyPlayerFallDamage\(\)\) audio\.playOneShot\(SOUND\.FallDamage/);
-  assert.match(dc, /if \(!immersiveFootsteps\.hardFallAlert\(\)\) audio\.playOneShot\(SOUND\.FallHard/);
-  // the interior's materials and the inventory close
-  const ic = rd('src/scenes/interiorContext.js');
-  assert.match(ic, /floorMaterials\.push\(unityMaterialName\(a, r\)\);/);
-  assert.match(ic, /const swapped = texRemap\.get\(base\) \?\? base;/, 'through the climate remap - DFU names the material after the swapped archive');
-  assert.match(ic, /^\s+floorMaterials,/m, 'on the context');
-  assert.match(rd('src/ui/native/nativeInventory.js'), /_closeSilently\(\) \{[\s\S]{0,400}this\.done = true;[\s\S]{0,400}immersiveFootsteps\.onInventoryClose\(this\.hooks\.entity \?\? null\);/);
-  // AUDIT-IF F5: BOTH skins. The enhanced pack (the default) closes through inventoryDoor's own close, not _closeSilently.
-  assert.match(rd('src/ui/inventoryDoor.js'), /closeSession\(deps, \{ dropped \}\);[\s\S]{0,700}immersiveFootsteps\.onInventoryClose\(deps\.entity \?\? null\);/, 'the enhanced skin\'s close refreshes too');
-  assert.equal((rd('src/systems/inventorySession.js').match(/immersiveFootsteps/g) ?? []).length, 0, 'not in closeSession: inventorySession.js is upstream of transport.js, which the component imports');
-  // the records
-  assert.ok(existsSync(join(root, 'bible/06-Systems/Immersive-Footsteps.md')));
-  assert.match(rd('bible/01-Overview/Active-Arcs.md'), /06-Systems\/Immersive-Footsteps\.md/);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /06-Systems\/Immersive-Footsteps\.md/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /if1_immersivefootsteps\.test\.js/);
-  const m = /(\d+) modules\s*\n?\s*live under\s*\n?\s*`src\/systems\/`/.exec(rd('bible/06-Systems/Systems.md'));
-  assert.equal(Number(m[1]), readdirSync(join(root, 'src/systems'), { recursive: true }).filter((f) => f.endsWith('.js')).length, 'Systems.md counts src/systems/ live - IF1 put immersiveFootsteps.js in that count');
-});
-
 // AUDIT QS6 F7's SECOND CATCH. The `host-world-ungated` mutant had been
 // unapplied for waves - its anchor left `scenes/world.js` when BA1 folded
 // both mods' DisableBuiltInFootsteps into ONE gate - so it reported

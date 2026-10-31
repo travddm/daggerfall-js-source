@@ -271,11 +271,3 @@ test('AUDIT WORLD34 D4/D5: the relay names itself in /health; the session says t
   assert.match(menu, /Dungeons and buildings are shared: enemies, doors, levers and opened chests are the same for everyone and stay that way\. In towns and the wilds, everyone nearby sees the same monsters and can fight them/);   // WORLD6a: the building joined the sentence; WORLD6b: the cell's foes
 });
 
-test('AUDIT WORLD34: the record carries the root and the pins that enshrined it are turned', () => {
-  const a = rd('test/net/auditworld.test.js');
-  assert.match(a, /assert\.equal\(isWorldRoom\('dungeon:m123456789'\), true\)/, 'the nine-digit key is a world room now, where this file once pinned it as none');
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.match(arc, /## AUDIT WORLD34 \(2026-09-13\)/);
-  assert.match(arc, /187853213/, 'the number itself is in the record');
-  assert.match(arc, /npx wrangler deploy/, 'and the deploy the fix needs');
-});

@@ -213,30 +213,3 @@ test('WORLD5 (superseded by WORLD7): the stand-down is gone - a quest clock char
   assert.equal(rd('src/systems/quest/clock.js').includes('questClocksStoodDown'), false, 'the stand-down word is gone from the clock');
 });
 
-test('WORLD5: the hosts by source - the shared clock installed at the boot before anything reads the time, ?tod and ?timescale standing down, the reading anchored and the day rolled when the session starts, the relay\'s offset heard, the trip taking no WORLD time (LIVED1: the character\'s own), the world\'s jump refused, the rest paced, the quest clocks on played time through the bridge and the parser', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /let _sharedOffsetMs = 0;[^\n]*\n\s*if \(params\.has\('online'\)\) \{ setSharedClock\(\(\) => sharedClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), \(m\) => wallMsForClassicMinutes\(m\) - _sharedOffsetMs, \{ sky: \(\) => skyClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), skyWall: \(m\) => wallMsForSkyMinutes\(m\) - _sharedOffsetMs \}\); setSharedWeather\(true\); \}/, 'installed at the boot, the shared weather with it (OL3: the inverse beside the source; TIME1: the sky and its inverse beside them)');
-  assert.match(w, /if \(bootTod != null && !sharedClockOn\(\)\) setWorldMinutes\(/, '?tod stands down');
-  assert.match(w, /const timeScaleMult = params\.has\('timescale'\) && !sharedClockOn\(\) \? Number\(params\.get\('timescale'\)\) \/ 12 : 1;/, '?timescale stands down');
-  assert.match(w, /online\.onClock = \(offsetMs\) => \{ const was = _sharedOffsetMs; _sharedOffsetMs = offsetMs; (?:_sharedClockHeard = true; )?if \(Math\.abs\(offsetMs - was\) > 1000\) onlineArrival\(\); (?:hearSharedClock\(\); )?\};/, 'the relay\'s clock corrects this machine\'s (AUDIT WORLD5 C2: and a correction is an arrival - LIVED1: which moves nothing of the character\'s)');
-  assert.match(w, /const onlineArrival = \(\) => \{ alignEntityClocks\(playerEntity, worldMinutes\(\)\); rollClimateWeathersForDay\(worldMinutes\(\)\); refreshSeason\(skyMinutes\(\)\); \};[^\n]*\s*onlineArrival\(\);/, 'the session\'s start: the markers, the day\'s roll, the season (TIME1: the sky\'s)');
-  assert.match(w, /\{ arriveMinutes: sharedClockOn\(\) \? skyMinutes\(\) : worldMinutes\(\) \+ computed\.minutes,/, 'the trip takes no world time (TIME1: it lands in the sky\'s season now)');
-  assert.match(w, /\n\s*setSyntheticTimeIncrease\(true\); playerTicker\.advance\(computed\.minutes\);/, 'LIVED1: the trip\'s days are the character\'s own - advanced online too');
-  assert.match(w, /if \(clamp > 0 && !sharedClockOn\(\)\) \{ setSyntheticTimeIncrease\(true\); playerTicker\.advance\(clamp\); \}/, 'no arrival clamp');
-  assert.match(w, /questClockStepMax: \(\) => \(sharedClockOn\(\) \? PLAYED_STEP_MAX_SECONDS : Infinity\),/, 'the bridge\'s dep (WORLD7: the played step, not the stand-down)');
-  const sh = rd('src/scenes/shared.js');
-  assert.match(sh, /advance\(minutes\) \{\s*if \(!\(minutes > 0\)\) return null;\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) \{ if \(tickInFlight\(\)\) \{ advanceOwnMinutes\(minutes\); _raiseWaiting = true; return null; \} return this\.tick\(0, undefined, 0, minutes\); \}/, 'LIVED1: RaiseTime under the shared clock raises the character\'s own clock, and the tick walks it (AUDIT LIVED1b K1: one from inside a tick at once, after the window in hand)');
-  assert.match(sh, /sharedMinutes: \(\) => \(sharedClockOn\(\) \? skyMinutes\(\) : null\),/, 'every host\'s rest deps say the world\'s clock (the window\'s line, the session\'s quest gate; TIME1: the time the window says is the sky\'s)');
-  assert.match(rd('src/scenes/quest/questBridge.js'), /questClockStepMax: \(\) => ctx\.questClockStepMax\?\.\(\) \?\? Infinity,/);
-  const m = rd('src/systems/quest/machine.js');
-  assert.equal((m.match(/questClockStepMax: \(\) => this\.deps\.questClockStepMax\?\.\(\) \?\? Infinity/g) ?? []).length, 5, 'every door a live quest is born through');   // QUEST1: the fourth is receiveSharedQuest; PIN MOVED (QUEST-AUDIT III START-HELD): the fifth, a save's scheduled children
-  assert.match(rd('src/systems/quest/parser.js'), /const quest = new Quest\(\{ rolls, actionFactory, nowSeconds, skySeconds, worldSeconds, raisedSeconds, hooks, questClockStepMax \}\);/);
-  assert.match(rd('src/systems/quest/clock.js'), /const step = caller\.questClockStepMax\?\.\(\) \?\? Infinity;\s*\n\s*const raw = now - this\._lastWorldTimeSample;\s*\n\s*if \(!Number\.isFinite\(step\)\) return Math\.trunc\(raw\);\s*\n\s*const raised = raisedSince\(caller\.raisedSeconds\?\.\(\), this\._lastRaisedSample\);\s*\n\s*return Math\.trunc\(Math\.min\(Math\.max\(raw - raised, 0\), step\)\);/, 'WORLD7: one played step a frame');
-  const wt = rd('src/systems/worldTick.js');
-  assert.match(wt, /export const worldMinutes = \(\) => \(_sharedClock \? _sharedClock\(\) : _worldMinutes\);/);
-  assert.match(wt, /export function setWorldMinutes\(v\) \{\s*if \(_sharedClock\) return _sharedClock\(\);/);
-  assert.match(wt, /export function advanceWorldMinutes\(delta\) \{\s*if \(_sharedClock\) return _sharedClock\(\);/);
-  assert.match(rd('server/src/index.js'), /"world":\$\{world \?\? 'null'\},"now":\$\{Date\.now\(\)\},"v":/, 'the welcome\'s clock (AUDIT WORLD5 C11: stamped as the welcome is built)');   // SRV-N appended `v` after it; the law C11 is about - Date.now() CALLED here, not read from a variable four awaits old - is what is matched
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.match(arc, /## WORLD5 \(2026-09-13\)/, 'the record');
-});

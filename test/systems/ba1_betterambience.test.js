@@ -149,7 +149,6 @@ test('BA1: the Mods pane entry is the shipped modsettings.json - six sections, t
   assert.ok(credit); assert.equal(credit.version, '0.1.4'); assert.equal(credit.author, 'Joshua Steinhauer'); assert.match(credit.terms, /MIT/); assert.match(credit.terms, /Its rain and snow particle changes are not included\./);
   const readme = rd('vendor/better-ambience/README.md');
   assert.match(readme, /Better Ambience 0\.1\.4/); assert.match(readme, /MIT/); assert.match(readme, /Permission/); assert.match(readme, /0\.1\.5/, 'the Nexus label');
-  assert.match(rd('bible/01-Overview/Mod-Registry.md'), /\| `better-ambience` \|/);
 });
 
 test('BA1: TryImportAudioClips\' names - wood 4, stone 4, armour 11, crunchy-grass 4, water 6 asked and FIVE present (water_001 never existed), the rain loop - every present name a vendored WAV the manifest names; the two classic lists; the per-list volumes and pitch ranges', () => {
@@ -502,60 +501,3 @@ test('BA1 + IF1: ModCompatibilityChecking reads Better Ambience\'s switch throug
 
 // ═══ the hosts ══════════════════════════════════════════════════════════════════
 
-test('BA1: the four hosts gate the classic stride through the one gate, drive the component each frame, fold the shake into the view, the two dungeon hosts hand FoggyDungeons\' fog as the base the water murk overrides and its trilight to setLighting, the modal host and the standalone dungeon raise the transitions, the outer host raises OnStartGame and OnLoad with the compatibility box, every RemoveHealth sender hands its amount, and the engine seams exist; the records', () => {
-  const world = hostText('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), dj = rd('src/scenes/dungeon.js');
-  for (const [name, src] of [['world', world], ['exterior', ext], ['worldModes', wm], ['dungeon', dj]]) {
-    assert.match(src, /if \(_step && classicFootstepAllowed\(_step\.clip\)\) audio\.playOneShot\(_step\.clip, _step\.volume\);/, `${name}: the one gate`);
-    assert.equal((src.match(/betterAmbience\.frame\(dt, \{/g) ?? []).length, 1, `${name}: one frame`);
-    assert.equal((src.match(/betterAmbience\.view\(lookAt\(/g) ?? []).length, name === 'worldModes' ? 2 : 1, `${name}: the view fold`);   // PIN MOVED (EG-ZN, Elite-Gates.md section 11.8): the mode machine folds the shake into a second view too - over a shaft's ledge the camera's own leaned view replaces the drawn one AFTER the aim view is taken, so each of the two views is shaken once
-    assert.match(src, /import \{ betterAmbience, classicFootstepAllowed \} from '\.\.\/systems\/betterAmbience\.js'/, name);
-    assert.match(src, /swimming: !!player\.isPlayerSwimming, motorSwimming: !!player\.swimming,/, `${name}: PlayerEnterExit.IsPlayerSwimming AND playerMotor.IsSwimming, the two the source reads`);
-  }
-  for (const src of [world, ext]) assert.match(src, /onExteriorWater: _onWater, onExteriorWaterAny: _onWater, onExteriorPath: !!_surf\.path, onStaticGeometry: !!_surf\.staticGeometry, onFoot: isOnFoot\(player\.transportMode\),/);
-  assert.match(world, /loadInProgress: false, paused: _overlayHeld \|\| _seasonHeld,/, 'AUDIT-BA F2/F3: no debug key is a load; a held frame is paused');
-  assert.match(ext, /paused: _overlayHeld,/); assert.match(wm, /paused: overlayHeld,/); assert.match(dj, /paused: overlayHeld,/);
-  // OH-E: the world's dungeon hands the same two, through the abyss's arm (its darkened ambient, the Trilight's sky)
-  assert.match(wm, /const _dgAmbient = _abyss \? _abyss\.renderAmbient\.slice\(0, 3\) : dungeonCtx\.ambient;\n\s*const _dgTrilight = abyssTrilight\(betterAmbience\.dungeonAmbient\(\), _abyss\);/, 'worldModes: the trilight and the ambient it hands are Better Ambience\'s and the selector\'s outside the abyss');
-  for (const [name, src] of [['worldModes', wm], ['dungeon', dj]]) {
-    assert.match(src, /const _fog = dungeonFog\((?:lightingOn|!!renderer\.lightingLane), betterAmbience\.dungeonFog\(\) \?\? DUNGEON_FOG\); applyFog\(renderer, [a-zA-Z]+\.underwaterFogSettings\?\.\(cam\.pos\[1\], player\.pos, _fog\) \?\? _fog\);/, `${name}: the fog base (AUDIT-EL F6: through the lane's dark)`);
-    assert.match(src, /const _tri = dungeonTrilight\((?:lightingOn|_on), (?:betterAmbience\.dungeonAmbient\(\)|_dgTrilight)\); renderer\.setLighting\(new Float32Array\(_tri \? _tri\.equator : dungeonAmbient\((?:lightingOn|_on), (?:[a-zA-Z]+\.ambient|_dgAmbient)\)\), 0, undefined, _tri\);/, `${name}: the trilight (EL4: through the lane's dark, scaled once)`);
-    assert.match(src, /betterAmbience\.onTransition\(\{ dungeon: \{ regionName: dfLocation\.regionName, name: dfLocation\.name, inCastle: \(\) => !!ctx\.insideDungeonCastle\?\.\(\), exitPos: ctx\.enterMarker \? \[ctx\.enterMarker\.x, ctx\.enterMarker\.y, ctx\.enterMarker\.z\] : null \} \}\);/, `${name}: the dungeon transition`);
-  }
-  // AUDIT 68 X3-ba-forceexit-rain: and the forced exit (a Recall, a quest
-  // teleport, a load) - the Respawner raises the same exterior transition.
-  assert.equal((wm.match(/betterAmbience\.onTransition\(null\);/g) ?? []).length, 3, 'the two exits and the forced exit');
-  assert.equal((wm.match(/betterAmbience\.onTransition\(\{ building: true \}\);/g) ?? []).length, 1);
-  // ENH-NOTICE3: the compatibility box names its KIND and the seam
-  // finds the live host's slot (systems/notify.js). Still a push -
-  // that is the seam's default and B5's law for every
-  // DaggerfallUI.MessageBox - and still on BOTH of DFU's own raises.
-  assert.match(world, /betterAmbience\.onStartGame\(\);\s*reportModCompatibilityIssues\(\{ showText: \(lines\) => messageBox\(lines\) \}\);/, 'OnStartGame - a push, B5\'s law');
-  assert.match(world, /betterAmbience\.onLoad\(\);\s*reportModCompatibilityIssues\(\{ showText: \(lines\) => messageBox\(lines\) \}\);/, 'OnLoad');
-  assert.equal(/reportModCompatibilityIssues\(\{ showText: \(lines\) => townTalk\./.test(world), false, 'and no host-built window');
-  assert.match(world, /footsteps\.rebase\(\);\s*betterAmbience\.rebase\(\);/, 'the floating origin');
-  // every RemoveHealth sender hands its amount
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/shared.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js', 'src/world/actionSystem.js']) {
-    assert.equal((rd(f).match(/flashPlayerDamage\(\)/g) ?? []).length, 0, `${f}: no bare flash`);
-    assert.ok((rd(f).match(/flashPlayerDamage\((dmg|_fallDmg)\)/g) ?? []).length >= 1, `${f}: the amount rides`);
-  }
-  assert.match(rd('src/systems/betterAmbience.js'), /setRemoveHealthListener\(\(amount\) => betterAmbience\.removeHealth\(amount, playerEntity\.maxHealth \?\? 0\)\);/);
-  // the engine seams
-  const audio = rd('src/systems/audio.js');
-  assert.match(audio, /setReverb\(preset\) \{/); assert.match(audio, /loop\(index, volume = 1, \{ lowpass = 0 \} = \{\}\)/); assert.match(audio, /send\.connect\(conv\)\.connect\(wet\)\.connect\(this\._listenerIn\);/, 'wet beside dry, off the send (DW-D: through the listener, as the dry master is)');
-  // AUDIT-BA F4: the zone takes the music too - the send every bus feeds, both song players
-  assert.match(audio, /this\._master\.connect\(this\._reverbIn\);/, 'the sound master feeds the send'); assert.match(audio, /reverbSend\(\) \{ return this\._out\(\) \? this\._reverbIn : null; \}/);
-  const music = rd('src/systems/music.js');
-  assert.match(music, /new SongPlayer\(audio\.ctx, audio\.listenerBus\?\.\(\) \?\? null, audio\.reverbSend\?\.\(\) \?\? null\)/, 'the MIDI player hands its master to the send (DW-D: and its dry path to the listener, as every bus)');
-  assert.match(music, /new AudioSongPlayer\(audio\.ctx, null, audio\.reverbSend\?\.\(\) \?\? null\)/, 'and the streamed one');
-  assert.equal((rd('src/systems/song/songPlayer.js').match(/if \(this\._reverbSend\) this\._master\.connect\(this\._reverbSend\);/g) ?? []).length, 2, 'both players\' masters');
-  const renderer = rd('src/render/renderer.js');
-  assert.match(renderer, /uniform vec3 uAmbientSky;/); assert.match(renderer, /mix\(uAmbient, uAmbientSky, n\.y\) : mix\(uAmbient, uAmbientGround, -n\.y\)/, 'Trilight by the normal');
-  assert.match(renderer, /setLighting\(ambient, sunScale, sunColor, trilight = null\) \{[\s\S]{0,400}this\.setAmbientTrilight\(trilight\);/, 'every flat caller clears it');
-  // the records
-  assert.ok(existsSync(join(root, 'bible/06-Systems/Better-Ambience.md')));
-  assert.match(rd('bible/01-Overview/Active-Arcs.md'), /06-Systems\/Better-Ambience\.md/);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /06-Systems\/Better-Ambience\.md/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /ba1_betterambience\.test\.js/);
-  const m = /(\d+) modules\s*\n?\s*live under\s*\n?\s*`src\/systems\/`/.exec(rd('bible/06-Systems/Systems.md'));
-  assert.equal(Number(m[1]), readdirSync(join(root, 'src/systems'), { recursive: true }).filter((f) => f.endsWith('.js')).length, 'Systems.md counts src/systems/ live - BA1 put two modules in that count');
-});

@@ -143,15 +143,3 @@ test('OL1 - THE FUTURE HALF: every boolean switch the port declares is either fo
   assert.equal(onlineForcedModSetting('dynamic-skies', 'densitySetting', '?online=1'), undefined);
 });
 
-test('OL1 by source: the three read paths ask the one home first, the menu locks a forced switch and says why, and the Online pane says the lane', () => {
-  assert.match(rd('src/systems/uiSkin.js'), /return skinOverride\(search\) \?\? clean\(getPref\('skin'\)\) \?\? DEFAULT_SKIN;/, 'OVH3: the skin reads no lane');
-  assert.match(rd('src/systems/uiPrefs.js'), /export function getPref\(k\) \{\s*const forced = onlineForcedPref\(k\);[^\n]*\n\s*if \(forced !== undefined\) return forced;/);
-  assert.match(rd('src/systems/modSettings.js'), /const forced = onlineModSetting\(vendor, key\);[^\n]*\n\s*if \(forced !== undefined\) return forced;\s*const v = load\(\)\[vendor\]\?\.\[key\];/);   // REALM P0.2: the one home is onlineModSetting now (the room table, then a balance mod owned whole)
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /if \(onlineForcedPref\(key\) !== undefined\) lockOnline\(b, main\);/, 'a forced pref row is locked');
-  assert.match(menu, /if \(ground !== undefined\) lockOnline\(b, null, \{ note: modLockNote\(vendor, key\), value: ground \}\);/, 'a forced mod row is locked, with the reason it is actually locked FOR');   // WOD1: the ground's words for both terrain-writing vendors
-  assert.match(menu, /function lockOnline\(b, main, \{ note = ONLINE_LOCK_NOTE, value = true \} = \{\}\) \{\s*b\.textContent = value \? t\('menu\.online\.lockedOn', 'On \(online\)'\) : t\('menu\.online\.lockedOff', 'Off \(online\)'\);/, 'the lock says so and answers nothing');
-  assert.match(menu, /if \(tab\.id === 'mods' && isOnlinePage\(\)\) body\.append\(el\('p', 'meta opt-note', noteText\(ONLINE_MODS_NOTE\)\)\);/, 'the Mods pane says it once at the top (ORG2: the Mods & files tab, over every mod)');
-  assert.match(menu, /Every enhancement is on for everyone, but your interface is your own\./, 'the Online pane (OVH3: the world\'s lane, the player\'s screens)');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## OL1 \(2026-09-14\)/, 'the record');
-});

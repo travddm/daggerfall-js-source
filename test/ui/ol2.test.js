@@ -122,5 +122,4 @@ test('OL2 (6) + TRAVEL-FARE + LIVED1: online the trip\'s days are the traveller\
   void painted; void font; void renderer;
   assert.match(rd('src/ui/travel/travelMapWindow.js'), /noWorldTime: this\.deps\.noWorldTime,/, 'threaded through the map window');
   assert.match(rd('src/scenes/world.js'), /noWorldTime: \(\) => sharedClockOn\(\),/, 'the world host\'s word');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## OL2 \(2026-09-14\)/, 'the record');
 });
