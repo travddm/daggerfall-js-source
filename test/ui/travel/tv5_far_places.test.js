@@ -502,13 +502,6 @@ test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play 
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ ...wolf, kind: 'party' }] });
     const [c, , , w] = draws.at(-1);
     assert.equal(c.width, 2 * w, 'the image at the new dpr');
-    // WIKIMAID: a glyph's details may be a list - each drawn over it in its own colour, in their order (the ears' blush,
-    // the lace's white, the band and the face's plum)
-    fills.length = 0;
-    hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [{ key: 'peer:bun', x: 500, y: 300, front: true, label: 'SylviaBun', kind: 'traveller', badge: { title: 'wikimaid', glyphs: ['wikimaid'], lv: 12, gt: 'BUN' } }] });
-    const at = GLYPH_DETAIL.wikimaid.map((d) => fills.findIndex(([f, p]) => f === cssRgba(d.rgba) && p === d.path));
-    assert.ok(at.length === 3 && at.every((i) => i >= 0) && at[0] < at[1] && at[1] < at[2], `the WikiMaid's three details, each in its colour, in order (${at})`);
-    assert.ok(fills.some(([f, d]) => f === cssRgba(GLYPH_RGBA.wikimaid) && d === GLYPH_PATH.wikimaid), 'under them the rabbit, filled in its lilac');
   } finally {
     hud.disposeTravelViewHud();
     if (had) globalThis.Path2D = had; else delete globalThis.Path2D;

@@ -66,7 +66,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   apostle: () => t('account.glyph.apostle', 'Apostle'),
   hierophant: () => t('account.glyph.hierophant', 'Hierophant'),
   shadowfang: () => t('account.glyph.shadowfang', 'Shadow Fang'),   // SHADOW-FANG: the wolf's head beside SirMcMobdon's name
-  penitent: () => t('account.glyph.penitent', 'Penitent'),   // PENITENT: the sword in its lozenge beside Diggleborf's name
   herald: () => t('account.glyph.herald', 'Herald'),   // HERALD: the herald's trumpet and its banner
   tower: () => t('account.glyph.tower', 'A seat\'s Charter'),   // SEAT1c: the tower of a guild holding a palace seat
   crownDF: () => t('account.glyph.crownDF', 'The Crown of Daggerfall'),   // SEAT1c: a crown seat's crown, its kingdom's
@@ -80,11 +79,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   crownBM: () => t('account.glyph.crownBM', 'The Crown of Black Marsh'),
   crownCY: () => t('account.glyph.crownCY', 'The Crown of Cyrodiil'),
   laurel: () => t('account.glyph.laurel', 'Arena Champion'),   // ARENA4: the laurel, while its wearer is the season's #1
-  aegis: () => t('account.glyph.aegis', 'Aegis of Oblivion'),   // AEGIS: the pillars through the ring over the void, beside Sureme's name
-  primarch: () => t('account.glyph.primarch', 'Primarch'),   // PRIMARCH: the three-barred cross, beside GA00250's name
-  crystalfist: () => t('account.glyph.crystalfist', 'Crystal Fist'),   // CRYSTAL-FIST: the three slashes, beside Flylighter's name
-  wikimaid: () => t('account.glyph.wikimaid', 'WikiMaid'),   // WIKIMAID: the rabbit in its maid's headdress, beside SylviaBun's name
-  nirnrootsage: () => t('account.glyph.nirnrootsage', 'Nirnroot Sage'),   // NIRNROOT-SAGE: the nirnroot sprig, beside Blob-Marley's name
 });
 
 /** ACC4: THE TWO FACTS MAC ASKED FOR, as words. Pure, so node pins

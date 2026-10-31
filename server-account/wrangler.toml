@@ -345,14 +345,6 @@ SEASON_ZERO_WEEK = "2"
 # Turning (2026-11-01 18:00 UTC) wipes every Charter, so the law opens on an empty board and folds nothing. Any later
 # week folds at the Turning before it (seatTurning.js); empty keeps the seat law. Never move it back once it rules.
 DOMAINS_WEEK = "6"
-# PENITENT (2026-09-29, Mac: "This new custom title/glyph is for the user
-# Diggleborf", whose ask it is: "Looking to do a Trinimac themed one, so
-# maybe "Penitent" for the title starting gold and ending a sky blue", with
-# a sketch for the glyph): Penitent - the gold-to-sky title and the sword in
-# its lozenge beside the name, one player's. The same law as the tiers: a
-# handle here grants the title and the glyph, and taking it off takes both
-# on the next token.
-PENITENT_HANDLES = "Diggleborf"
 # HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need
 # to develop the herald title/glyph"): Herald - the azure title and the
 # herald's trumpet with its banner beside the name, the Patreon tier
@@ -360,52 +352,6 @@ PENITENT_HANDLES = "Diggleborf"
 # (PATREON_TIERS below); a handle here grants the title and the glyph by
 # name, as every list above does. Empty: nobody by name yet.
 HERALD_HANDLES = ""
-# AEGIS (2026-10-03, the owner: "For the account named Sureme ... a title,
-# glyph and new custom aura for this user. Title: Aegis of Oblivion. Theme:
-# Purple"): Aegis of Oblivion - the violet title, the aegis glyph (three
-# pillars through a ring over the void's tendrils) and the Oblivion Ward,
-# a full ring of violet runes at the feet. The first list that grants an
-# AURA as well as a title and a glyph (titles.js TIER_AURA); taking the
-# handle off takes all three on the next token.
-AEGIS_HANDLES = "Sureme"
-# PRIMARCH (2026-10-04, GA00250, relayed by the owner: "the title will be
-# Primarch, the color will be that light gold color that you guys use in
-# some places in the game menu"; "can the aura be a golden light around the
-# character? like i've seen some rare mobs with it"): Primarch - the title
-# in the menu's own light gold, the primarch glyph (GA00250's own
-# three-barred cross, in the same gold) and the Golden Radiance, a column of
-# golden light about the body. The second list that grants an aura (titles.js TIER_AURA);
-# taking the handle off takes all three on the next token.
-PRIMARCH_HANDLES = "GA00250"
-# CRYSTAL-FIST (2026-10-05, the owner, for Flylighter: "Title: Crystal Fist",
-# the glyph "referenced above" - three purple slashes - and the aura "also
-# purple, would be a circle of tiny purple squares going up and down out of
-# the ground", after Octavia's in Warframe, "the color 'gradient' would be
-# unnecessary"): Crystal Fist - the title in the reference's purple, the
-# crystalfist glyph (the three slashes) and the Crystal Resonance, a ring of
-# purple squares rising and falling about the feet. A list that grants an
-# aura (titles.js TIER_AURA); taking the handle off takes all three on the
-# next token. Flylighter stays a Disciple (DISCIPLE_HANDLES) - a second title
-# held, one worn.
-CRYSTAL_FIST_HANDLES = "Flylighter"
-# WIKIMAID (2026-10-17, for SylviaBun: "Honestly as dumb as this is gonna
-# sound the WikiMaid title and a purple aura with bunnies would be dope as
-# hell" - "Lets go all out for this"): WikiMaid - the title in an amethyst
-# into lilac into a bunny's blush, the wikimaid glyph (a rabbit's head, its
-# ears up, in a maid's frilled headband) and the Lilac Warren, rabbits
-# hopping round the feet on a ring of lilac light, their prints fading
-# behind them. A list that grants an aura (titles.js TIER_AURA); taking the
-# handle off takes all three on the next token.
-WIKIMAID_HANDLES = "SylviaBun"
-# NIRNROOT-SAGE (2026-10-26, for Blob-Marley, an Immortal backer - his final
-# idea: "billowing smoke, circling nirn roots around midsection, small glowing
-# green runes encircling feet"): Nirnroot Sage - the title in a nirnroot's
-# deep green into its glow into the pale of its smoke, the nirnrootsage glyph
-# (a nirnroot sprig, its leaves and its glowing bud) and Sage's Smoke, smoke
-# billowing up about the body, nirnroots circling the waist and green runes
-# glowing in a ring round the feet. A list that grants an aura (titles.js
-# TIER_AURA); taking the handle off takes all three on the next token.
-NIRNROOT_SAGE_HANDLES = "Blob-Marley"
 # PATREON-LINK (2026-10-01, Mac: "With patron and having to manually hand
 # out titles. Im running into a workflow where its really hard to keep up
 # with it"; asked, "Patreon auto-link"): A PATRON'S TITLE FOLLOWS THEIR

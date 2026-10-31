@@ -449,11 +449,6 @@
   "tr": "da5b58aa695d",
   "by": "claude-in-session"
  },
- "account.glyph.aegis": {
-  "en": "a9ca2af21ef6",
-  "tr": "ae64d4beb817",
-  "by": "claude-in-session"
- },
  "account.glyph.apostle": {
   "en": "b1f70fe78d55",
   "tr": "fd605e3a4049",
@@ -509,11 +504,6 @@
   "tr": "8639c3235e82",
   "by": "claude-in-session"
  },
- "account.glyph.crystalfist": {
-  "en": "e2e54bdbf75c",
-  "tr": "031fff4285f5",
-  "by": "claude-in-session"
- },
  "account.glyph.dev": {
   "en": "7e08ebec5e6f",
   "tr": "c7e79216c1eb",
@@ -549,21 +539,6 @@
   "tr": "2d2d6666db5d",
   "by": "claude-in-session"
  },
- "account.glyph.nirnrootsage": {
-  "en": "84174edc6e42",
-  "tr": "84174edc6e42",
-  "by": "claude-in-session"
- },
- "account.glyph.penitent": {
-  "en": "e96df7568799",
-  "tr": "b837ee93f661",
-  "by": "claude-in-session"
- },
- "account.glyph.primarch": {
-  "en": "842ed3763313",
-  "tr": "aa5085661c79",
-  "by": "claude-in-session"
- },
  "account.glyph.shadowfang": {
   "en": "ffecc7381117",
   "tr": "3aeea5d5aa5d",
@@ -577,11 +552,6 @@
  "account.glyph.tower": {
   "en": "6c0bc2242483",
   "tr": "bfa40975c8c1",
-  "by": "claude-in-session"
- },
- "account.glyph.wikimaid": {
-  "en": "28aa6cf63e1f",
-  "tr": "28aa6cf63e1f",
   "by": "claude-in-session"
  },
  "account.local.codeEmpty": {
@@ -5444,34 +5414,9 @@
   "tr": "6d87e05f4813",
   "by": "claude-in-session"
  },
- "coll.look.lilacwarren": {
-  "en": "f173914a62f6",
-  "tr": "dcac1655ab2e",
-  "by": "claude-in-session"
- },
  "coll.look.maelstrom": {
   "en": "36f5e003124b",
   "tr": "65059966a03b",
-  "by": "claude-in-session"
- },
- "coll.look.oblivionward": {
-  "en": "e4e4f727e8f4",
-  "tr": "f82c087084d7",
-  "by": "claude-in-session"
- },
- "coll.look.radiance": {
-  "en": "ba85180f5d77",
-  "tr": "e3ab3ddc0565",
-  "by": "claude-in-session"
- },
- "coll.look.resonance": {
-  "en": "4f617addf148",
-  "tr": "1fe8c9f737b3",
-  "by": "claude-in-session"
- },
- "coll.look.sagesmoke": {
-  "en": "d110d0fa1d62",
-  "tr": "f9525b8e1bd6",
   "by": "claude-in-session"
  },
  "coll.look.seraphwings": {

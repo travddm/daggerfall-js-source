@@ -26,9 +26,9 @@ test('SHADOW-FANG-MOD THE GRANT: Shadow Fang is a title that moderates; SirMcMob
   assert.equal(canModerate({ handle: 'SirMcMobdon', created_at: 0 }, {}), false, 'off the list, off the rights');
   assert.equal(canModerate({ handle: null, guest_name: 'SirMcMobdon' }, env), false, 'a guest is no title holder');
   for (const h of ['SirMcMobdon_', 'SirMcMob', 'Mobdon']) assert.equal(canModerate({ handle: h }, env), false, `${h}: another account`);
-  // the other made-for-one titles do not moderate
-  const others = { PENITENT_HANDLES: 'Diggleborf', AEGIS_HANDLES: 'Sureme', PRIMARCH_HANDLES: 'GA00250', CRYSTAL_FIST_HANDLES: 'Flylighter', WIKIMAID_HANDLES: 'SylviaBun' };
-  for (const h of ['Diggleborf', 'Sureme', 'GA00250', 'Flylighter', 'SylviaBun']) assert.equal(canModerate({ handle: h }, others), false, `${h}: no moderating`);
+  // the other list titles do not moderate
+  const others = { HERALD_HANDLES: 'Crier', DISCIPLE_HANDLES: 'Flylighter' };
+  for (const h of ['Crier', 'Flylighter']) assert.equal(canModerate({ handle: h }, others), false, `${h}: no moderating`);
 });
 
 test('SHADOW-FANG-MOD THE SERVICE: a Shadow Fang holder mutes, bans, looks and unbans through the real Worker; a moderator cannot ban them; taken off the list, the same holder is refused (mutant: canModerate not reading MOD_TIERS)', async () => {

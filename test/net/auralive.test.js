@@ -115,7 +115,7 @@ test('AURA-LIVE: a run of changes inside the gap costs ONE hello, and it is the 
   quiet(() => b.s.join(ROOM, at(1, 1))); await until(() => b.s.peers.has('aaaa-0001'), 'b');
   a.aura = 'shadowcloak'; a.s.rehello();
   await until(() => b.s.auraOf('aaaa-0001') === 'shadowcloak', 'first');
-  for (const k of ['oblivionward', 'emberfall', 'seraphwings']) { a.aura = k; a.s.rehello(); a.s.tick(); }
+  for (const k of ['turninghour', 'emberfall', 'seraphwings']) { a.aura = k; a.s.rehello(); a.s.tick(); }
   await settle();
   assert.equal(a.sockets.length, 2, 'held');
   clock.t += REHELLO_GAP_MS; a.s.tick(); a.s.tick();

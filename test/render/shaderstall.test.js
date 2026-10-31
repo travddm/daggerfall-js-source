@@ -258,7 +258,7 @@ test('AURA-SPLIT the auras\' looks: one program a look - the whole source with `
     assert.ok(!vs.includes('uniform int uAura;') && !fs.includes('uniform int uAura;'), `look ${k}: no uniform for it`);
   }
   const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-  const two = [{ at: [1, 0, 1] }, { at: [5, 0, 5], aura: 'oblivionward' }];
+  const two = [{ at: [1, 0, 1] }, { at: [5, 0, 5], aura: 'maelstrom' }];
   const f = fakeGl();
   assert.equal(startPlayPrograms(f.gl), true);
   const started = f.count('createProgram');
@@ -284,15 +284,15 @@ test('AURA-SPLIT the auras\' looks: one program a look - the whole source with `
   assert.equal(rg.drawn, 2, 'no extension: each look built at its first draw');
   assert.equal(g.count('createProgram'), 2, 'the looks drawn alone');
   // a look that will not build: told once, its wearers stand without it, and the other looks are drawn
-  const bad = fakeGl({ parallel: false, fails: [auraPrograms(1)[0][1]] });
+  const bad = fakeGl({ parallel: false, fails: [auraPrograms(8)[0][1]] });
   const rb = new AuraRingRenderer(bad.gl), warns = [], warn = console.warn;
   console.warn = (...a) => warns.push(a.join(' '));
   try {
-    rb.draw([{ at: [1, 0, 1] }, { at: [5, 0, 5], aura: 'oblivionward' }, { at: [9, 0, 9], aura: 'radiance' }], I, I, [0, 0, 0], 1);
-    assert.equal(rb.drawn, 2, 'the fire and the radiance drawn, the ward not');
-    rb.draw([{ at: [5, 0, 5], aura: 'oblivionward' }], I, I, [0, 0, 0], 1);
+    rb.draw([{ at: [1, 0, 1] }, { at: [5, 0, 5], aura: 'maelstrom' }, { at: [9, 0, 9], aura: 'witchfire' }], I, I, [0, 0, 0], 1);
+    assert.equal(rb.drawn, 2, 'the fire and the witchfire drawn, the maelstrom not');
+    rb.draw([{ at: [5, 0, 5], aura: 'maelstrom' }], I, I, [0, 0, 0], 1);
     assert.equal(rb.drawn, 0);
   } finally { console.warn = warn; }
   assert.equal(warns.length, 1, 'told once');
-  assert.match(warns[0], /\[aura\] look 1 would not build/);
+  assert.match(warns[0], /\[aura\] look 8 would not build/);
 });

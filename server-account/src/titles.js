@@ -28,23 +28,8 @@
 //             account you linked is an active patron entitled to that
 //             tier now (patreon.js) - Patreon's word, stored as WB9g's
 //             sale is, and read against the config at every ask.
-//   SHADOW FANG (SHADOW-FANG, 2026-09-26) the same, one player's own -
-//             and since SHADOW-CLOAK (2026-10-04) an aura beside it: the
-//             Holo Shadow Cloak, granted with the title as the Oblivion
-//             Ward is.
-//   PENITENT (PENITENT, 2026-09-29) the same, Diggleborf's own.
+//   SHADOW FANG  the same, one player's own; an aura beside it: the Holo Shadow Cloak, granted with the title.
 //   HERALD (HERALD, 2026-10-01) the same, and the Patreon tier's.
-//   AEGIS OF OBLIVION (AEGIS, 2026-10-03) the same, Sureme's own - and
-//             the list grants an AURA beside the title and its glyph
-//             (TIER_AURA): the Oblivion Ward, held while the handle is
-//             listed, as the glyph is. The first aura not bought.
-//   PRIMARCH (PRIMARCH, 2026-10-04) the same, GA00250's own - the title,
-//             its glyph and an aura: the Golden Radiance, a light about
-//             the body, granted with them as the Oblivion Ward is.
-//   CRYSTAL FIST (CRYSTAL-FIST, 2026-10-05) the same, Flylighter's own -
-//             the title, its glyph and an aura: the Crystal Resonance, a
-//             ring of purple squares rising and falling about the feet,
-//             granted with them as the Oblivion Ward is.
 //   GRAND CHAMPION, ARENA CHAMPION and THE LAUREL (ARENA4, 2026-10-02)
 //             the arena's rows (server-account/src/arena.js): a Grand
 //             Champion row the relay signed; the season's #1 of the
@@ -229,44 +214,19 @@ export const TIER_LISTS = Object.freeze({
   disciple: 'DISCIPLE_HANDLES',
   apostle: 'APOSTLE_HANDLES',
   hierophant: 'HIEROPHANT_HANDLES',
-  // SHADOW-FANG (2026-09-26, Mac): "SirMcMobdon gets a brand new title/glyph. Remove them from Apostle" - a title
-  // made for one player, granted the tiers' way: a list in the config, the title and its glyph together. SHADOW-CLOAK
-  // (2026-10-04): and the third list to grant an aura with it (TIER_AURA, below).
+  // A title made for one player, granted the tiers' way: a list in the config, the title and its glyph together, and
+  // an aura beside them (TIER_AURA, below). It also opens the staff's commands (MOD_TIERS, STAFF_GLYPHS).
   shadowfang: 'SHADOW_FANG_HANDLES',
-  // PENITENT (2026-09-29, Mac): "This new custom title/glyph is for the user Diggleborf" - a second title made for one
-  // player, granted the same way.
-  penitent: 'PENITENT_HANDLES',
-  // HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need to develop the herald title/glyph"): the
-  // Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and by
-  // this list for a Herald Mac names.
+  // The Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and
+  // by this list for a handle the owners name.
   herald: 'HERALD_HANDLES',
-  // AEGIS (2026-10-03, the owner: "For the account named Sureme ... a title, glyph and new custom aura for this user.
-  // Title: Aegis of Oblivion. Theme: Purple"): a third title made for one player, granted the same way - and the first
-  // list to grant an aura with it (TIER_AURA, below).
-  aegis: 'AEGIS_HANDLES',
-  // PRIMARCH (2026-10-04, GA00250, relayed by the owner: "the title will be Primarch, the color will be that light gold
-  // color that you guys use in some places in the game menu"; "can the aura be a golden light around the character?"):
-  // a fourth title made for one player, and the second list to grant an aura with it (TIER_AURA, below).
-  primarch: 'PRIMARCH_HANDLES',
-  // CRYSTAL-FIST (2026-10-05, the owner, for Flylighter: "Title: Crystal Fist", a glyph of three purple slashes, and an
-  // aura "also purple, would be a circle of tiny purple squares going up and down out of the ground"): a fifth title made
-  // for one player, and a list that grants an aura with it (TIER_AURA, below).
-  crystalfist: 'CRYSTAL_FIST_HANDLES',
-  // WIKIMAID (2026-10-17, for SylviaBun: "the WikiMaid title and a purple aura with bunnies would be dope as hell" - "Lets
-  // go all out for this"): a sixth title made for one player, and a list that grants an aura with it (TIER_AURA, below).
-  wikimaid: 'WIKIMAID_HANDLES',
-  // NIRNROOT-SAGE (2026-10-26, for Blob-Marley, an Immortal backer: "a cloud of billowing smoke with nirnroots circling
-  // around me" - his final idea, "billowing smoke, circling nirn roots around midsection, small glowing green runes
-  // encircling feet"; the owner named the title Nirnroot Sage and its glyph a nirnroot sprig): a seventh title made for
-  // one player, and a list that grants an aura with it (TIER_AURA, below).
-  nirnrootsage: 'NIRNROOT_SAGE_HANDLES',
 });
 /** The glyph each of those titles carries, in the vocabulary's words. */
-export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', shadowfang: 'shadowfang', penitent: 'penitent', herald: 'herald', aegis: 'aegis', primarch: 'primarch', crystalfist: 'crystalfist', wikimaid: 'wikimaid', nirnrootsage: 'nirnrootsage' });
+export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', shadowfang: 'shadowfang', herald: 'herald' });
 /** AEGIS: THE AURA A LIST'S TITLE CARRIES, where it carries one - held while the handle is listed, exactly as its glyph
  *  is, and gone on the next token once it is not. A grant like the glyph and unlike the Broker's: derived from the
  *  config at every ask, never a sale recorded on the row. */
-export const TIER_AURA = Object.freeze({ aegis: 'oblivionward', primarch: 'radiance', shadowfang: 'shadowcloak', crystalfist: 'resonance', wikimaid: 'lilacwarren', nirnrootsage: 'sagesmoke' });   // NIRNROOT-SAGE: Sage's Smoke; WIKIMAID: the Lilac Warren; CRYSTAL-FIST: the Crystal Resonance; PRIMARCH: the Golden Radiance; SHADOW-CLOAK (2026-10-04, the owner, for SirMcMobdon: "I want to build a new unique AURA specifically for his account. A holo shadow cloak with red accents. Extremely detailed"): the Holo Shadow Cloak
+export const TIER_AURA = Object.freeze({ shadowfang: 'shadowcloak' });
 
 /** STAFF-PANEL2-FIX (design doc, Weak spots: "Cutting off a staff member misses most doors" - "A stored suspended flag is
  *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, migration 0156, staff.js

@@ -463,7 +463,7 @@ test('QL12 THE VOCABULARY: the five join TITLES last, in QL_TITLES\' order; a re
   // PIN MOVED (STAR8): the five and the Starwarden of the Thirteenth of Frostfall, its bit the sixth (63 every one)
   // PIN MOVED (Elite Gates removed): the Weirwalker left - the four and the Starwarden, its bit the fifth (31 every one),
   // and the Spire's thirteen left the titles before them
-  assert.deepEqual([...TITLES.slice(-24, -19) /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */] /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): Witchwarden and Hearthkeeper joined the list last */, [...QL_TITLES]);
+  assert.deepEqual([...TITLES.slice(TITLES.indexOf(QL_TITLES[0]), TITLES.indexOf(QL_TITLES[0]) + QL_TITLES.length)], [...QL_TITLES]);
   assert.deepEqual([...QL_TITLES], ['doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden']);
   for (const t of QL_TITLES) {
     assert.deepEqual(titlesHeld({ handle: 'Mac', ql_titles: qlTitleBit(t) }, {}), [t], `${t} by its bit alone`);
