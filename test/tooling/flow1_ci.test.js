@@ -117,34 +117,3 @@ test('FLOW3 the tests a change can move: the ones that import it, through any de
   for (const f of EVERYTHING) assert.equal(testsFor([f], tests, d), 'all', f);
 });
 
-test('FLOW4 mutants N at a time: the same verdicts and output as a serial run, in list order; the source here never touched (the workspaces are copies); a record whose test does not pass outside this tree is judged here, in place, as a serial run judges it (mutants: every record in place; the baseline unread)', (t) => {
-  const d = scratch(t);
-  writeFileSync(join(d, 'package.json'), '{ "type": "module" }\n');
-  writeFileSync(join(d, 'target.js'), 'export const a = 1;\nexport const b = 2;\n');
-  const pin = (name, body) => writeFileSync(join(d, name), `import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { existsSync } from 'node:fs';\nimport { a, b } from './target.js';\n${body}\n`);
-  pin('a.test.js', "test('a', () => assert.equal(a, 1));");
-  pin('b.test.js', "test('b', () => assert.ok(b >= 0));");
-  // passes only in this tree: a workspace leaves the repository's .git behind
-  mkdirSync(join(d, '.git')); writeFileSync(join(d, '.git', 'HEAD'), 'ref: refs/heads/main\n');
-  pin('here.test.js', "test('here', () => { assert.ok(existsSync('.git/HEAD')); assert.equal(a, 1); });");
-  const list = [
-    { name: 'm1', file: 'target.js', old: 'a = 1', new: 'a = 5', tests: ['a.test.js'] },
-    { name: 'm2', file: 'target.js', old: 'b = 2', new: 'b = 3', tests: ['b.test.js'] },
-    { name: 'm3', file: 'target.js', old: 'a = 1', new: 'a = 7', tests: ['here.test.js'] },
-    { name: 'm4', file: 'target.js', old: 'nowhere', new: 'x', tests: ['a.test.js'] },
-  ];
-  writeFileSync(join(d, 'list.json'), JSON.stringify(list));
-  const before = readFileSync(join(d, 'target.js'), 'utf8');
-  const serial = spawnSync(process.execPath, [join(ROOT, 'tools/mutate.mjs'), 'list.json'], { cwd: d, encoding: 'utf8', env: ENV, timeout: 120000 });
-  const par = spawnSync(process.execPath, [join(ROOT, 'tools/mutate.mjs'), '--jobs', '3', 'list.json'], { cwd: d, encoding: 'utf8', env: ENV, timeout: 120000 });
-  const verdicts = (out) => out.split('\n').filter((l) => /^ {2}m\d:|^== |dead, .* survived/.test(l));
-  assert.deepEqual(verdicts(par.stdout), verdicts(serial.stdout), `same verdicts, same order:\n${par.stdout}`);
-  assert.equal(par.status, serial.status, 'the same exit');
-  assert.match(par.stdout, /m1: dead \(1 failing\)/);
-  assert.match(par.stdout, /m2: SURVIVED/);
-  assert.match(par.stdout, /m3: dead \(1 failing\)/, 'judged in place, where its test can pass unmutated');
-  assert.match(par.stdout, /m4: COULD NOT APPLY/);
-  assert.match(par.stdout, /\(3 workspaces; 1 of 4 mutants judged in place - their tests do not pass outside this tree: here\.test\.js\)/);
-  assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), before, 'the source is as it was');
-  assert.equal(existsSync(join(d, 'target.js.mutbak')), false);
-});

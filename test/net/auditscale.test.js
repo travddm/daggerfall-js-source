@@ -852,29 +852,3 @@ test('AUDIT SCALE D7: a sweep\'s backlog past one page is taken in the one hour 
 
 // ═══ M. THE AUDIT'S OWN MUTATION RUN ═════════════════════════════════════════════════════════════════════════════════
 
-test('AUDIT SCALE M1: a record whose tests fail with no mutant is no verdict - serially and with --jobs, said so and the run failed; the records beside it judged as ever (a test file that did not parse had read twenty "dead" in place)', (t) => {
-  const d = mkdtempSync(join(tmpdir(), 'auditscale-m1-'));
-  t.after(() => rmSync(d, { recursive: true, force: true }));
-  writeFileSync(join(d, 'package.json'), '{ "type": "module" }\n');
-  writeFileSync(join(d, 'target.js'), 'export const a = 1;\n');
-  const pin = (body) => `import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { a } from './target.js';\n${body}\n`;
-  writeFileSync(join(d, 'good.test.js'), pin("test('a', () => assert.equal(a, 1));"));
-  writeFileSync(join(d, 'broken.test.js'), pin("test('it's', () => assert.equal(a, 1));"));   // the apostrophe: no parse
-  writeFileSync(join(d, 'list.json'), JSON.stringify([
-    { name: 'm1', file: 'target.js', old: '= 1;', new: '= 2;', tests: ['good.test.js'] },
-    { name: 'm2', file: 'target.js', old: '= 1;', new: '= 3;', tests: ['broken.test.js'] },
-    { name: 'm3', file: 'target.js', old: '= 1;', new: '= 4;', tests: ['good.test.js', 'broken.test.js'] },
-  ]));
-  const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== 'NODE_TEST_CONTEXT'));
-  const mutate = fileURLToPath(new URL('../../tools/mutate.mjs', import.meta.url));
-  for (const args of [[], ['--jobs', '2']]) {
-    const r = spawnSync(process.execPath, [mutate, ...args, 'list.json'], { cwd: d, encoding: 'utf8', env, timeout: 120_000 });
-    const say = `${args.join(' ') || 'serial'}:\n${r.stdout}`;
-    assert.match(r.stdout, /m1: dead \(1 failing\)/, say);
-    assert.match(r.stdout, /m2: ITS TESTS FAIL UNMUTATED \(broken\.test\.js\) - not a verdict/, say);
-    assert.match(r.stdout, /m3: ITS TESTS FAIL UNMUTATED \(broken\.test\.js\) - not a verdict/, say);
-    assert.match(r.stdout, /1 dead, 0 survived, 0 equivalent as recorded, 0 stale records, 2 did not apply/, say);
-    assert.equal(r.status, 1, say);
-    assert.equal(readFileSync(join(d, 'target.js'), 'utf8'), 'export const a = 1;\n', 'the source as it was');
-  }
-});

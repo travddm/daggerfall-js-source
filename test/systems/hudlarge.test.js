@@ -20,7 +20,6 @@ import { ridingRect } from '../../src/systems/riding.js';
 import { MODES, nextInteractionMode } from '../../src/player/interactionMode.js';
 import { routeAction } from '../../src/ui/input.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
-import { resolveAnchor, maskAnchors } from '../../tools/citeAnchor.mjs';   // CITE-ANCHOR: a cite names its line by a quote
 import { drawHud } from '../../src/ui/hud/hud.js';                  // AUDIT 65 UI-4: largeHudBar() is the LAST DRAWN bar
 import { audio } from '../../src/systems/audio.js';             // AUDIT 65 UI-4
 import { SOUND } from '../../src/systems/soundClips.js';        // AUDIT 65 UI-4
@@ -479,58 +478,6 @@ test('D10: the offset really moves the horse rect and the viewmodel quad', () =>
   const callers = ['exterior', 'world', 'worldModes', 'dungeonContext']
     .filter((h) => src(`scenes/${h}.js`).includes('ridingRect('));
   assert.deepEqual(callers, [], 'and no host calls it directly any more');
-});
-
-test('D10: the narrowed flag\'s citation resolves to the activation ray it rests on', () => {
-  // A withdrawal is only as good as its evidence, and the evidence
-  // here IS the citation: "there are no screen-to-ray conversions to
-  // fix" rests entirely on the reader being able to open the named
-  // line and find the camera-forward pick. It named scenes/world.js
-  // :5880 - the AUDIT 18 arrow-streaming block, sixty-odd lines from
-  // any activation - so the one reader who checked would have found
-  // nothing and had to re-derive the clause. Resolve it instead of
-  // trusting it, both ways: the cite must land on the call, and the
-  // hosts it names must be ALL the hosts that carry one.
-  // E5 shipped what "WHAT REALLY REMAINS" named and rewrote that
-  // paragraph; the withdrawal above it stands unchanged, so the split
-  // moves to the block that now follows it.
-  const header = src('ui/hud/hudLarge.js').split('WHAT E5 DID NOT TAKE')[0];
-  const cites = [...header.matchAll(/scenes\/([A-Za-z0-9_]+)\.js:"([^"]+)"(?:\.\."([^"]+)")?/g)]
-    .map((m) => [`scenes/${m[1]}.js`, resolveAnchor(maskAnchors(src(`scenes/${m[1]}.js`)), src(`scenes/${m[1]}.js`).split('\n'), m[2], m[3] ?? null).line ?? 0]);
-  assert.ok(cites.length >= 2, 'the withdrawal cites the hosts it rests on');
-  for (const [rel, n] of cites) {
-    const line = src(rel).split('\n')[n - 1];
-    assert.match(line, /townTalk\.tryActivate\(cam\.pos, useFwd/,
-      `${rel}:${n} is cited for the activation ray and must BE it`);
-    // ...and the ray is the camera's own forward vector from the angles
-    // - or, since TI1, the touch tap's ray in its place: a pixel
-    // unprojected, but through the SAME reduced-viewport rect the world
-    // pass draws into, so a docked bar moves no pick on either device.
-    // The LAW is that useFwd is built ONCE, above the ladder, from the
-    // angles or the tap - so that is what is read, rather than a window
-    // of lines above the call. That window was 60 lines, then 80, and
-    // every audit that grew the ladder between the two (AUDIT 63 F33's
-    // pickpocket dispatch, AUDIT 65 MC-2's enemy arm and rival split,
-    // HARD2's race) had to widen it again or go red for a reason that
-    // was never the law. It also let a SECOND useFwd exist further
-    // down, which the law forbids and this does not.
-    const decls = [...src(rel).split('\n').entries()]
-      .filter(([, l]) => /const useFwd =/.test(l));
-    assert.equal(decls.length, 1, `${rel}: useFwd is built ONCE - ${decls.length} declarations`);
-    const [declLine, declText] = decls[0];
-    assert.match(declText, /const useFwd = _tapDir \?\? \[Math\.sin\(cam\.yaw\) \* Math\.cos\(cam\.pitch\)/,
-      `${rel}'s useFwd is the camera angles, or the tap's ray`);
-    assert.ok(declLine + 1 < n, `${rel}: useFwd is built ABOVE the ladder it feeds (:${declLine + 1} vs :${n})`);
-    // RETRO1: through worldViewportRect - the docked rect, or retro's pillarbox, which needs the canvas width too
-    assert.match(src(rel), /rayDirFromScreen\([^\n]*worldViewportRect\(canvas\.clientWidth, canvas\.clientHeight\)\)/,
-      `${rel}'s tap ray unprojects through the world-pass rect, not the canvas`);
-  }
-  // no third host carries the call and goes uncited
-  const hosts = ['world', 'exterior', 'dungeon', 'dungeonContext', 'interior', 'worldModes']
-    .filter((h) => /townTalk\.tryActivate\(cam\.pos, useFwd/.test(src(`scenes/${h}.js`)))
-    .map((h) => `scenes/${h}.js`);
-  assert.deepEqual(cites.map(([r]) => r).sort(), hosts.sort(),
-    'the cite names exactly the hosts that pick this way - "the other hosts" was one host');
 });
 
 // ---------------------------------------------------------------

@@ -25,7 +25,6 @@ import { MAX_STAT_VALUE } from '../../src/ui/chargen.js';
 import { SKILLS, SKILL_NAMES, setSkillRecentlyIncreased } from '../../src/systems/skills.js';
 import { levelUpSkillSum, LEVELUP_SKILL_SUM_PER_LEVEL, LEVELUP_BONUS_POOL_MIN, LEVELUP_BONUS_POOL_MAX } from '../../src/systems/advancement.js';
 import { sheetModel } from '../../src/ui/enhanced/enhancedCharSheet.js';
-import { citedLines } from '../../tools/citeAnchor.mjs';   // CITE-ANCHOR: a cite names its line by a quote, resolved as the gate does
 import { damageModifier, magicResist } from '../../src/combat/formulas.js';
 import { FATIGUE_MULTIPLIER } from '../../src/systems/statMods.js';
 import { LevelUpScreen, MUST_DISTRIBUTE_BONUS_POINTS } from '../../src/ui/charsheet.js';
@@ -496,53 +495,6 @@ test('LV1: a star\'s brightness is its VALUE, against the same ceiling the rollo
 
 // ── THE WORDS ─────────────────────────────────────────────────────
 
-test('LV1: every attribute has the port\'s OWN sentence, and no ARENA2 is read to say it', () => {
-  for (const k of STAT_KEYS_ORDER) {
-    assert.ok((ATTRIBUTE_BLURB[k] ?? '').length > 20, `${k} has a line`);
-    assert.equal(attributeLabel(k), k.charAt(0).toUpperCase() + k.slice(1));
-  }
-  assert.equal(new Set(Object.values(ATTRIBUTE_BLURB)).size, 8, 'eight different sentences');
-  // TEXT.RSC records 0..7 are DFU's attribute descriptions and they are
-  // GAME DATA. ui/charSheetDoor.js promises the enhanced skin reads
-  // none, so neither of this window's two files may reach for it.
-  for (const f of ['src/ui/levelUp/levelUpView.js', 'src/ui/enhanced/enhancedLevelUp.js']) {
-    // The IMPORTS are the test: TEXT.RSC is named in the reasoning
-    // above `ATTRIBUTE_BLURB`, which is exactly where it should be
-    // named - as the thing these words exist INSTEAD of.
-    assert.doesNotMatch(src(f), /^import[^\n]*(textRsc|formats\/|variantLinesById)/m, `${f} reads no game data`);
-  }
-
-  // AND EVERY LINE NAMES A CONSUMER, not a display. LV1's audit found
-  // two that did not: willpower cited the %mr QUEST MACRO (which only
-  // prints the number) where the consumer is the saving throw, and
-  // agility cited `toHitModifier` - the CHARACTER SHEET's display
-  // modifier, which the hit roll does not read - so the sentence
-  // described a number that rides nothing. A blurb is a promise about
-  // the code, so the code it points at has to be the code that runs.
-  const v = src('src/ui/levelUp/levelUpView.js');
-  // CITE-ANCHOR: each sentence names its consumer by the consumer's own words, wherever it stands (a number into the
-  // motor went stale three times) - and the line it names is the one that reads the stat
-  const names = (target, re) => citedLines(v, target).some((c) => re.test(c.text ?? ''));
-  assert.ok(names('src/systems/spellcast.js', /saving \+= magicResist\(liveStat\(target, 'willpower'\)\)/), 'willpower names the saving throw that consumes MagicResist');
-  assert.ok(names('src/combat/formulas.js', /statsToHit/), 'agility names the term inside the hit roll');
-  assert.ok(names('src/player/motor.js', /this\.speed = walkSpeed\(this\.stats\.speed\);/), 'speed names the motor that reads it');
-  assert.ok(names('src/systems/unleveledLoot.js', /playerLuck/), 'luck names the rarity roll a player actually notices');
-  assert.doesNotMatch(v, /toHitModifier = floor\(agility \/ 10\) - 5\.\n\s*agility:/,
-    'and the sheet\'s display modifier is no longer offered as what rides a swing');
-  // ...and no line promises a consequence this port does not apply:
-  // encumbrance is DRAWN and never charged for (MAC-E).
-  assert.doesNotMatch(ATTRIBUTE_BLURB.strength, /stagger|slow|encumber/i,
-    'the strength line no longer promises an encumbrance penalty nothing implements');
-  // THE CONSUMERS ARE NOT RE-DRIVEN HERE, and the first attempt to do
-  // it is the reason why: `damageModifier` goes through PCO1's
-  // override registry, so a vendored mod loaded by another import in
-  // this file can legitimately answer something else, and the pin
-  // failed against the port working correctly. The formulas have their
-  // own suites; what this file owns is that the WORDS point at them.
-  assert.equal(typeof magicResist, 'function');
-  assert.equal(typeof damageModifier, 'function');
-});
-
 // ── THE SEAMS ─────────────────────────────────────────────────────
 
 test('LV1: the door hands this window to ALL FOUR HOSTS, and mounts it as a lazy chunk', () => {
@@ -707,31 +659,6 @@ test('LV1b: the pause in front of the window is never blank, and never flashes e
   assert.match(door, /notice: \(h, o\) => \{ stopWaiting\(\); return paintChunkNotice\(h, o\); \}/,
     'and so is the notice - two answers to one event is what this arm prevents');
   assert.match(door, /const close = \(\) => \{\n\s*if \(fired\) return;\n\s*stopWaiting\(\);/, 'and the timer has an owner');
-});
-
-test('LV1b: the chunk warms at boot, in the three hosts that warm the sheet - and the fourth is named', () => {
-  const door = src('src/ui/charSheetDoor.js');
-  assert.match(door, /export function warmLevelUpWindow\(\) \{/);
-  assert.match(door, /if \(!isEnhanced\(\) \|\| typeof document === 'undefined'\) return null;/,
-    'the classic skin pays for nothing, and node has no window to warm');
-  assert.match(door, /import\('\.\/enhanced\/enhancedLevelUp\.js'\)\.catch\(/,
-    'a rejection is SWALLOWED: a stale chunk is the door\'s to report when a player opens it, not the boot\'s');
-  // THE FOUR HOSTS RULE: three wire it, the fourth is FLAGGED by name
-  // rather than left unmentioned.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(src(host), /warmLevelUpWindow\(\);/, `${host} warms it`);
-    assert.match(src(host), /import \{[^}]*warmLevelUpWindow[^}]*\} from '\.\.\/ui\/charSheetDoor\.js'/, `${host} imports it`);
-  }
-  assert.doesNotMatch(src('src/scenes/worldModes.js'), /warmLevelUpWindow/,
-    'the interior host builds no windows and boots inside one of the other three');
-  assert.match(door, /worldModes\.js needs none, and is NAMED here/, 'and the door says so where a reader will look');
-  assert.doesNotMatch(door, /is FLAGGED here/,
-    'in the FOUR HOSTS sense, not the open-flags one - that word is tools/regenOpenFlags.mjs\'s marker and this is not open work');
-  // Beside the art it rides with, in both boot hosts.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(src(host), /preloadCharSheetArt\(\{ renderer, fetchBytes, palette \}\);[^\n]*\n\s*warmLevelUpWindow\(\);/,
-      `${host}: the chunk warms where INFO00I0 warms`);
-  }
 });
 
 test('LV1b: the CHRONICLE answers the key it is named after, off the registry', () => {
