@@ -1,0 +1,18 @@
+[
+  {
+    "name": "RC-cap-at-four",
+    "file": "src/world/tamrielRoadsClient.js",
+    "old": "export const ROADS_WORKER_MAX = 2;",
+    "new": "export const ROADS_WORKER_MAX = 4;",
+    "tests": ["test/world/roadscap.test.js"],
+    "note": "The roads' pool back at four workers: the boot at Daggerfall peaks at 7.9-8.0 GB again."
+  },
+  {
+    "name": "RC-cap-unread",
+    "file": "src/world/tamrielRoadsClient.js",
+    "old": "Math.max(1, Math.min(ROADS_WORKER_MAX, cores - 2));",
+    "new": "Math.max(1, cores - 2);",
+    "tests": ["test/world/roadscap.test.js"],
+    "note": "The cap never read: a machine's every spare core builds roads, fourteen workers on sixteen cores."
+  }
+]

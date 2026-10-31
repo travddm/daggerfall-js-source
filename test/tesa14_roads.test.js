@@ -324,9 +324,9 @@ function memStore(seed = new Map()) {
 const settle = async () => { for (let k = 0; k < 20; k++) await new Promise((r) => setTimeout(r, 0)); };
 
 test('TESA14 the client: every region asked of the cache first - a hit lands without a build, a miss goes to a free worker (its inputs posted first) and into the cache; a new start drops the last one\'s answers (mutant: the cache, the init, the run\'s check)', async () => {
-  assert.equal(roadsWorkerCount(8), 4);
+  assert.equal(roadsWorkerCount(8), 2);   // PIN MOVED (ROADS-CAP): 4 -> 2, ROADS_WORKER_MAX
   assert.equal(roadsWorkerCount(2), 1);
-  assert.equal(roadsWorkerCount(5), 3);
+  assert.equal(roadsWorkerCount(5), 2);   // PIN MOVED (ROADS-CAP): 3 -> 2
   const lattice = regionLattice({ x0: 0, y0: -1000, w: 2400, h: 300 });
   const nodes = [{ x: 300, y: -900, type: T.TownCity }, { x: 360, y: -880, type: T.TownCity }, { x: 1100, y: -900, type: T.TownCity }, { x: 1160, y: -880, type: T.TownCity }];
   const inputs = { woodsBytes: syntheticWoods(1000, 500), trace: landTrace(), fit: null, spec: EMPTY_SPEC, nodes, obstacles: [], gates: [], lattice };

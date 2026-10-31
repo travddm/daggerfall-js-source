@@ -1033,8 +1033,8 @@ the countryside's 226,068 places or the lairs.
   countryside's rates and template counts, the lairs' rates, each lair template's dungeon type and plan size, each pool's
   sizes - and answers every pixel as the host does (`world/tamrielCountry.js` countryStandsAt, then
   `world/tamrielDungeons.js` lairStandsAt with lairPlanned: the host's own laws, lifted out of `scenes/world.js` to one home).
-- **Where it is built** (`world/tamrielRoadsWorker.js`): one to four workers of its own (roadsWorkerCount: the cores less
-  two, one at the least), off the terrain worker whose jobs stream the ground, each composing the continent's ground as every host does
+- **Where it is built** (`world/tamrielRoadsWorker.js`): one or two workers of its own (roadsWorkerCount: the cores less
+  two, one to ROADS_WORKER_MAX), off the terrain worker whose jobs stream the ground, each composing the continent's ground as every host does
   (groundWoods over WOODS.WLD's bytes, the trace and the fit) and rolling its places through a TESA13 atlas.
   `world/tamrielRoadsClient.js` keeps them busy a region each, the nearest first; asks the roads' cache first
   (`world/roadsCache.js` idbStore, regionKey: the region, the law's version, the builder's, GROUND_ROLL_VERSION and the
@@ -2917,6 +2917,24 @@ the cells' own models, the stones and the triangles, the ground shut, the base, 
 flights, the sweep's findings held, every building's door kept); the moved pins in `test/world/icbld_buildings.test.js`
 and `test/world/icgrand_fabric.test.js` (PIN MOVED (IC-STAIRS)). Mutants: `tools/mutants/icstairs.json` (32);
 `icbld.json` re-aimed by content.
+
+## ROADS-CAP - the roads past the Bay on two workers at most (2026-10-31)
+
+Each roads worker cost the renderer about 0.8 GB while it built, most of it heap not yet collected: in node a worker
+keeps about 80 MB after 48 regions. Four workers took the boot at Daggerfall to 7.9-8.0 GB, near the 8.2-8.7 GB where
+the renderer died. One run died there with no jump at all, and a jump to the Imperial City during the build died too.
+
+`ROADS_WORKER_MAX` is 2 (`world/tamrielRoadsClient.js` roadsWorkerCount: the cores less two, one to two; a 2-core
+machine builds on one, as before). Measured in headless Edge, two runs each, a fresh profile with no roads cache:
+
+| | four workers | two workers |
+| --- | --- | --- |
+| renderer peak at Daggerfall | 7.9-8.0 GB | 6.2-6.3 GB |
+| the 48 regions built | 193-206 s after boot | 251-264 s |
+| the city's 121 slices after the jump | 68-79 s | 69 s |
+
+Ending and remaking each worker every 3 or 6 regions did not lower the peak (7.85-8.0 GB): four workers' heaps stood
+at once all the same. Pins: `test/world/roadscap.test.js`, mutants `tools/mutants/roadscap.json`.
 
 ## Pins
 

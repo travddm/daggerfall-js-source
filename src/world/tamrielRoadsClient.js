@@ -26,8 +26,12 @@ import { unpackPastBayPlaces } from './pastBayPlaces.js';
 import { regionKey, regionPrefix, LEGACY_REGION_KEYS } from './tamrielRoads.js';
 import { createRoadsWorkerState } from './tamrielRoadsWorker.js';
 
-/** How many workers build at once - the cores the page can spare less two, one to four. */
-export const roadsWorkerCount = (cores = globalThis.navigator?.hardwareConcurrency ?? 4) => Math.max(1, Math.min(4, cores - 2));
+/** ROADS-CAP: the most roads workers at once. Each one costs the renderer about 0.8 GB while it builds. With four, the
+ *  boot at Daggerfall peaked at 7.9-8.0 GB, near where the renderer dies; with two, at 6.2-6.3 GB, the roads done about
+ *  55 s later (measured 2026-10-31, bible/03-World/Arena-Provinces.md ROADS-CAP). */
+export const ROADS_WORKER_MAX = 2;
+/** How many workers build at once - the cores the page can spare less two, one to ROADS_WORKER_MAX (a 2-core machine: one). */
+export const roadsWorkerCount = (cores = globalThis.navigator?.hardwareConcurrency ?? 4) => Math.max(1, Math.min(ROADS_WORKER_MAX, cores - 2));
 /** AUDIT TESA II R3/R8: the page's milliseconds a task spends landing the cache's regions, or building one with no worker
  *  - at least one landing, or one step, a task (TILE_BUDGET_MS's, ui/tamrielTiles.js). */
 export const LAND_BUDGET_MS = 8;
