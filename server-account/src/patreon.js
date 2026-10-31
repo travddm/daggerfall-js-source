@@ -78,7 +78,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { timingSafeEqual } from './password.js';
-import { sealWith, openWith } from './sealed.js';   // SHOP: the sealing lifted out, one copy for both doors
+import { sealWith, openWith } from './sealed.js';
 
 /** The titles a Patreon tier may grant - TITLE-N's three and HERALD's, lowest first. A mapping in PATREON_TIERS to
  *  anything else (the Dungeon Master, a one-player title) is not read: those are granted by name, never by a pledge. */
@@ -413,16 +413,14 @@ export const PATREON_TITLE_TEXT = Object.freeze({ disciple: 'Disciple', apostle:
 const titlesText = (/** @type {string[]} */ ts) => ts.map((t) => /** @type {any} */ (PATREON_TITLE_TEXT)[t] ?? t).join(', ');
 
 /**
- * One page. `lines` are sentences; `form`, when there is one, is the yes - a POST of the ticket to its `action`
- * (/v1/patreon/confirm unless it says another of this service's: SHOP's checkout).
- * @param {{ heading: string, lines?: string[], form?: { ticket: string, label: string, action?: string } | null }} page
+ * One page. `lines` are sentences; `form`, when there is one, is the yes - a POST of the ticket to /v1/patreon/confirm.
+ * @param {{ heading: string, lines?: string[], form?: { ticket: string, label: string } | null }} page
  */
 export function patreonPage({ heading, lines = [], form = null }) {
-  const action = form?.action && /^\/v1\/[a-z/]+$/.test(form.action) ? form.action : '/v1/patreon/confirm';
   const body = [
     `<h1>${esc(heading)}</h1>`,
     ...lines.map((l) => `<p>${esc(l)}</p>`),
-    form ? `<form method="post" action="${action}"><input type="hidden" name="ticket" value="${esc(form.ticket)}"><button type="submit">${esc(form.label)}</button></form>` : '',
+    form ? `<form method="post" action="/v1/patreon/confirm"><input type="hidden" name="ticket" value="${esc(form.ticket)}"><button type="submit">${esc(form.label)}</button></form>` : '',
   ].join('');
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">'
     + '<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
@@ -435,16 +433,14 @@ export function patreonPage({ heading, lines = [], form = null }) {
     + `</style></head><body><main>${body}</main></body></html>`;
 }
 
-/** A page as a Response: HTML, never cached, never framed, sending no Referer, its one form posting only here - SHOP:
- *  and on to `formTo` (Stripe's checkout), where the form's answer sends the browser, which form-action also governs. */
-export function patreonHtml(/** @type {string} */ html, status = 200, formTo = '') {
-  const to = /^https:\/\/[a-z0-9.-]+$/.test(formTo) ? ` ${formTo}` : '';
+/** A page as a Response: HTML, never cached, never framed, sending no Referer, its one form posting only here. */
+export function patreonHtml(/** @type {string} */ html, status = 200) {
   return new Response(html, {
     status,
     headers: {
       'content-type': 'text/html; charset=utf-8',
       'cache-control': 'no-store',
-      'content-security-policy': `default-src 'none'; style-src 'unsafe-inline'; form-action 'self'${to}; frame-ancestors 'none'; base-uri 'none'`,
+      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
       'x-frame-options': 'DENY',
       'referrer-policy': 'no-referrer',
     },

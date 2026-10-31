@@ -182,7 +182,6 @@ Repository secrets (Settings > Secrets and variables > Actions):
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
 | `DISCORD_BOT_TOKEN` | `account-deploy.yml` -> Worker secret and command registration | The Discord bot is off. |
 | `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | The shop is closed (the shop is being removed). |
 
 Worker secrets the workflow mints and never stores in the repository: `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`,
 `GATE_PUBLIC_KEY` (account service) and `GATE_SIGNING_KEY` (relay). Rotate the identity pair only on purpose: delete

@@ -58,7 +58,7 @@ const TAU = 2 * Math.PI;
 // ── THE VOCABULARY, THE GRANT, THE WIRE ─────────────────────────────
 
 test('SHADOW-CLOAK vocabulary: the cloak joins AURAS after the radiance (SERAPH-WINGS\' wings after it), "Holo Shadow Cloak" in words, its button in the Shadow Fang\'s paint; a look of its own - the fourth kind, its own mesh, and it SHADES; its colours the title\'s own black and crimson (mutants: the word, the paint, the kind, the colour)', () => {
-  assert.deepEqual([...AURAS], ['dagonfire', 'oblivionward', 'radiance', 'shadowcloak', 'seraphwings', 'resonance', 'turninghour', 'firsthour', 'maelstrom', 'beaconlight', 'burningstair', 'firstlight', 'lilacwarren', 'witchfire', 'sagesmoke', 'eternal'] /* PIN MOVED (SHOP): Eternal joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): Sage's Smoke joined the list last */ /* PIN MOVED (WITCH1): Witchfire joined the list last */, 'the Broker\'s fire, the ward, the radiance, then the cloak - SERAPH-WINGS\' wings after it, CRYSTAL-FIST\'s resonance after them (PIN MOVED) (PIN MOVED: SD9c\'s Turning Hour last) (PIN MOVED: EG-E2\'s three, the Spire\'s, after it)');   // PIN MOVED (WIKIMAID): the Lilac Warren joined the list last
+  assert.deepEqual([...AURAS], ['dagonfire', 'oblivionward', 'radiance', 'shadowcloak', 'seraphwings', 'resonance', 'turninghour', 'firsthour', 'maelstrom', 'beaconlight', 'burningstair', 'firstlight', 'lilacwarren', 'witchfire', 'sagesmoke'] /* PIN MOVED (NIRNROOT-SAGE): Sage's Smoke joined the list last */ /* PIN MOVED (WITCH1): Witchfire joined the list last */, 'the Broker\'s fire, the ward, the radiance, then the cloak - SERAPH-WINGS\' wings after it, CRYSTAL-FIST\'s resonance after them (PIN MOVED) (PIN MOVED: SD9c\'s Turning Hour last) (PIN MOVED: EG-E2\'s three, the Spire\'s, after it)');   // PIN MOVED (WIKIMAID): the Lilac Warren joined the list last
   assert.equal(AURA_TEXT.shadowcloak, 'Holo Shadow Cloak', 'the owner\'s words: "A holo shadow cloak"');
   assert.equal(AURA_PAINT.shadowcloak, 'shadowfang', 'its button in the Shadow Fang\'s black and crimson');
   assert.ok(TITLES.includes(AURA_PAINT.shadowcloak));
@@ -242,7 +242,7 @@ test('SHADOW-CLOAK the law: a CAPE clasped at the throat, its hood up round the 
   assert.ok(cloakRatesWhole(), 'every cloak rate whole over the clock');
   for (const r of [...Object.values(CLOAK_HZ), ...Object.values(CLOAK_FLOW), ...Object.values(CLOAK_SHRED_HZ)]) assert.ok(Number.isInteger(Math.round(r * AURA_CLOCK_PERIOD * 1e6) / 1e6), `whole: ${r}`);
   for (const l of CLOAK_EMBLEM_LIFE) assert.equal(AURA_CLOCK_PERIOD % l, 0, `an emblem's life divides the clock: ${l}`);
-  assert.equal(AURA_CARDS, Math.max(WARD_GLYPHS, CLOAK_EMBLEMS + CLOAK_SHREDS, AURA_LOOK.seraphwings.glyphs, AURA_LOOK.eternal.glyphs), 'the third draw has cards enough for the most any look floats (SERAPH-WINGS: its sparks and backlight - PIN MOVED; SHOP: the wisps and embers of Eternal - PIN MOVED)');
+  assert.equal(AURA_CARDS, Math.max(WARD_GLYPHS, CLOAK_EMBLEMS + CLOAK_SHREDS, AURA_LOOK.seraphwings.glyphs), 'the third draw has cards enough for the most any look floats (SERAPH-WINGS: its sparks and backlight - PIN MOVED)');
   for (const gone of ['cloakHex', 'cloakRain', 'cloakGlitch', 'cloakWisp', 'flicker']) assert.ok(!AURA_VS.includes(gone) && !AURA_FS.includes(gone), `"less digital": no ${gone}`);
 });
 
