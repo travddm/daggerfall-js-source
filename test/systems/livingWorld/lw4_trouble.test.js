@@ -18,7 +18,7 @@ import {
 import { mintResident, travellerRoster } from '../../../src/systems/livingWorld/census.js';
 import { createRelations, TURN_KINDS, TURNS_MAX } from '../../../src/systems/livingWorld/relations.js';
 import { ROAD_NEWS, NEWS_SHARE, newsScript, foeWord, fillLine } from '../../../src/systems/livingWorld/lines.js';
-import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { lwRoll, lwRng, lwSeed } from '../../../src/systems/livingWorld/seed.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';

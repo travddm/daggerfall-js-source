@@ -14,7 +14,7 @@ import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { createRelations } from '../../../src/systems/livingWorld/relations.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
-import { dealCircles, circleLine, ROUND_S, GATHER_BEAT_S, lineMinutes } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { dealCircles, circleLine, ROUND_S, GATHER_BEAT_S, lineMinutes } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import {
   ROOM_TALKS, roomKindOf, pickScript, fillLine, TOKEN_FALLBACK, LIVING_GREETINGS, HEARD_GREETINGS, firstNameOf,   // LW16: a stranger's word of a deed heard
   TOWN_TALKS, JOB_TALKS, WEATHER_TALKS, EVENING_TALKS, NIGHT_TALKS, ROAD_TALKS, CAMP_TALKS, MORNING_TALKS, DAY_TALKS,

@@ -30,7 +30,7 @@ import { retinue, revenantsWithYou, revenantsAway, callRevenant, callRefusal, se
 import { companionsWithYou, companionRoster, COMPANION_SLOTS } from '../systems/companionSlots.js';
 import { revenantPortrait, revenantRankNumeral } from '../systems/revenant/revenant.js';
 import { PERSONALITIES } from '../systems/revenant/revenantPersonality.js';
-import { loyaltyLabel } from '../systems/revenant/revenantFeud.js';     // RVN11 (22.4): its loyalty's word
+import { loyaltyLabel } from '../systems/revenant/revenantFeud.js';   // RVN11 (22.4): its loyalty's word
 import { ownMinutes, sharedClockOn } from '../systems/worldTick.js';
 import { requestFittedIcon, fittedImg } from './textureCanvas.js';
 import { giftablePieces, giveSwornGear, takeSwornGear, sendOnErrand, recallFromErrand, errandRefusal, abroadWords } from '../systems/revenant/revenantCompanions.js';   // RVN-GEAR, RVN-ERRAND

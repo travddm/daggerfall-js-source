@@ -35,7 +35,7 @@ import { smallerDungeonsStateNow } from '../../world/smallerDungeons.js';   // A
 import { askAgain } from './noAsksAgain.js';   // NO-ASKS-AGAIN (FIELD BUGS 2026-10-13e): a No that leads nowhere asks again
 import { isInstanceEpoch } from '../../net/instanceRoom.js';   // INSTANCES: a quest's instance epoch, its one spelling
 import { QUEST_SUCCESS_REP, QUEST_FAILURE_REP } from './questRepute.js';   // WAY-BACK: Quest.cs:36-37's one home, a leaf the guild hall reads
-import { readState, writeState } from '../questlines/qlState.js';     // QL1: a stamped quest's state - the layer's, kept by the quest (2.4)
+import { readState, writeState } from '../questlines/qlState.js';   // QL1: a stamped quest's state - the layer's, kept by the quest (2.4)
 
 /** ShowMessagePopup's chunker (Quest.cs:777, 793-819): a message
  *  longer than 22 LINES becomes several click-through boxes. A line

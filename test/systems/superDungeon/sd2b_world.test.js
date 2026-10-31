@@ -2,7 +2,7 @@
 // names found over this client's own map files and stood at its pixel while its phase stands, the find said at its door
 // until the hub's word moves it, and the chat's lines for the moves everyone online hears. bible/11-Multiplayer/
 // Super-Dungeons.md sections 2-4.
-import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';     // SD19 (
+import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';   // SD19 (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

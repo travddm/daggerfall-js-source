@@ -7,7 +7,7 @@
 
 import { stepAsideLoading, syncLoading } from '../ui/loadingScreen.js';   // LOAD1: a full-screen film's hold takes the loading screen aside; a claimed loop lets its hold go
 import { DFPalette } from '../formats/dfPalette.js';
-import '../systems/item/itemLaw.js';     // INT1: the item law, installed on the wire's door (systems/loot/loot.js setItemLaw) in every host
+import '../systems/item/itemLaw.js';   // INT1: the item law, installed on the wire's door (systems/loot/loot.js setItemLaw) in every host
 import { NetRandom } from '../formats/netRuntime.js';   // HAZE1: System.Random's one port (the stars' generator)
 import { swingHeld } from '../ui/input.js';   // FIX-F: the swing button through the registry
 import { ImgFile } from '../formats/imgFile.js';

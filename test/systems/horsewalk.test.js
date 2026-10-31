@@ -8,7 +8,7 @@
 // Features row, the Horses tutorial and the four hosts.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';     // HORSE-TIERS (
+import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { PlayerMotor } from '../../src/player/motor.js';

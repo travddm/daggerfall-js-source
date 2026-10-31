@@ -19,7 +19,7 @@ import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
 import { partiesNear, CALENDAR_MPM } from '../../../src/systems/livingWorld/trips.js';
 import { createLivingIndoors, soundRoom, INDOOR_CLEAR_M, INDOOR_DOOR_M } from '../../../src/scenes/livingWorld/livingIndoors.js';
 import { createLivingRoads, ROAD_GREET_REST_MIN, ROAD_GREET_S } from '../../../src/scenes/livingWorld/livingRoads.js';
-import { ROUND_S, GATHER_BEAT_S, lineMinutes, dealCircles, circleSlots, exchangeAt, circleLine } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { ROUND_S, GATHER_BEAT_S, lineMinutes, dealCircles, circleSlots, exchangeAt, circleLine } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { ROAD_GREETINGS } from '../../../src/systems/livingWorld/lines.js';
 

@@ -14,7 +14,7 @@
 import { loadQuestTables } from '../../systems/quest/tables.js';
 import { applyForageFix } from '../../systems/foraging/foragingLaw.js';   // FORAGE-FIX: Foraging's quest and list patches, applied as they are read
 import { applyQuestPatches, QUEST_PATCHES } from '../../systems/quest/questPatches.js';   // SHAM-TRAIL: the port's patches over DFU's own quests, applied as they are read
-import { questlineLines } from '../../systems/questlines/qlPatches.js';     // QL4: a flagship quest's branch, patched in while the questlines' switch is on (2.3)
+import { questlineLines } from '../../systems/questlines/qlPatches.js';   // QL4: a flagship quest's branch, patched in while the questlines' switch is on (2.3)
 
 const tableFiles = import.meta.glob('../../../vendor/dfu-quests/Tables/*.txt', { query: '?raw', import: 'default' });
 const questFiles = import.meta.glob('../../../vendor/dfu-quests/Quests/*.txt', { query: '?raw', import: 'default' });

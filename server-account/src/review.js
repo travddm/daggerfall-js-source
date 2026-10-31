@@ -63,7 +63,7 @@ import { repairOf, applyRepair, purseMendOf, applyPurseMend, bankSetOf, applyBan
 import { lawSigOf } from './verdict.js';   // PURSE-MEND: the signature the purse's finding stands under
 import { isHandleShaped } from '../../src/net/handleShape.js';   // SUMMON-REPAIR: an account named by its handle
 import { wealthOf, goldOf } from './judge.js';   // STAFF-SET-BANK: and a bank's gold as the judge counts it
-import { grantsMeasure } from './grants.js';     // GRANT2: the spawn grants' measure
+import { grantsMeasure } from './grants.js';   // GRANT2: the spawn grants' measure
 import { progressConfig, progressConfigOf, forgetProgressConfig, PROGRESS_LINE, PROGRESS_STREAMS } from './progress.js';   // INT17: the progression claims' line
 import { REALM_LETTER_TEMPLATE } from '../../src/net/realm/realmGoldLaw.js';   // HACKED-GOLD: a trade's letters, at their worth
 

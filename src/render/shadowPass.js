@@ -73,7 +73,7 @@ export const SHADOW_SUN_SIZE = 2048;
 /** A caster's face size (six layers of the point depth array per caster). */
 export const SHADOW_POINT_SIZE = 512;
 /** EL5: how many lanterns cast at once - the nearest to the eye. */
-export const SHADOW_POINT_CASTERS = 12;     // FLICKER-FIX: twelve, not eight - a lamp past the eight read the lo map (static casters only), so the player's and the townsfolk's shadows vanished for it and came back when it swapped in (+48 MB of depth layers). EL6: six; HQ1: eight - SC1's cache made a still caster nearly free.
+export const SHADOW_POINT_CASTERS = 12;   // FLICKER-FIX: twelve, not eight - a lamp past the eight read the lo map (static casters only), so the player's and the townsfolk's shadows vanished for it and came back when it swapped in (+48 MB of depth layers). EL6: six; HQ1: eight - SC1's cache made a still caster nearly free.
 /** EL8: the caster-slot table's size - one int per light slot the lane can
  *  hold (enhancedLighting.js EL_MAX_LIGHTS, pinned equal): a light's slot in
  *  one lookup, not a search over the casters per light per fragment. */

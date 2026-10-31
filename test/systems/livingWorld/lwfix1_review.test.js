@@ -15,7 +15,7 @@ import { createRelations } from '../../../src/systems/livingWorld/relations.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
 import { mintKeepsake } from '../../../src/systems/livingWorld/keepsake.js';
 import { createLivingIndoors, INDOOR_STIR_S, INDOOR_SEEN_M } from '../../../src/scenes/livingWorld/livingIndoors.js';
-import { ROUND_S, GATHER_BEAT_S, SLOT_LINES, lineMinutes, dealCircles, circleSlots, slotSpoken, exchangeScript, circleLine } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { ROUND_S, GATHER_BEAT_S, SLOT_LINES, lineMinutes, dealCircles, circleSlots, slotSpoken, exchangeScript, circleLine } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');

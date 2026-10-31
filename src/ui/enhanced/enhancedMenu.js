@@ -91,7 +91,7 @@
 
 import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
 import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
-import { dressStanding } from '../../systems/clothingStanding.js';     // DRESS1: the Standing page's Dress line
+import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
 import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
 import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
 import { lineStepOf } from '../../systems/questlines/qlLines.js';   // QL-OFFERED: a questline's step drawn under its line, never as a side quest
@@ -239,7 +239,7 @@ import '../../systems/featureLanes.js';   // FT18: the wind, the quick slots and
 import { AccountFlow } from '../accountFlow.js';
 import { accountCard } from './enhancedAccount.js';
 import { skinCard } from '../skinCard.js';   // DISC23-B2: the skin, on the profile
-import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js';     // TILE1, and ACC2c's card-shaped save
+import { saveTile, cloudStateOf, saveFromCard, newerBackup } from '../saveTile.js';   // TILE1, and ACC2c's card-shaped save
 import { loadFace } from '../facePortrait.js';
 import { timersMark, timersWindow, anchorBeside } from './enhancedTimers.js';   // TIMERS1: the hourglass beside the profile mark, and its window
 import { postMark, postWindow, watchPostMark, anchorPost } from './enhancedPost.js';   // SERVER-POST: the mailbox beside the hourglass, and its window

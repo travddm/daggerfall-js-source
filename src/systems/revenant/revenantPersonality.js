@@ -442,7 +442,7 @@ export const personalityLabel = (id) => (isPersonality(id) ? PERSONALITIES[id].l
  *  companion it felled. A line naming one its caller did not hand is passed over: none is said with a `{` left in it. */
 export const VOICE_PLACEHOLDERS = Object.freeze(['p', 'how', 'item', 'move', 'ally']);
 const PLACEHOLDER = /\{(p|how|item|move|ally)\}/g;
-const fill = (s, vars) => s.replace(PLACEHOLDER, (_, k) => String(vars[k]));     // AUDIT: a `$` in a typed name is a letter, never a pattern
+const fill = (s, vars) => s.replace(PLACEHOLDER, (_, k) => String(vars[k]));   // AUDIT: a `$` in a typed name is a letter, never a pattern
 const sayable = (s, vars) => [...s.matchAll(PLACEHOLDER)].every((m) => vars[m[1]] != null && vars[m[1]] !== '');
 /** A name's possessive, one rule for every title ("Varis' Rod", "Grushnak's Shadow"). */
 export const possessive = (name) => `${name}${/s$/i.test(name) ? "'" : "'s"}`;

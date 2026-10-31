@@ -25,8 +25,8 @@ import { retinueHasRoom, swornPlace, REVENANT_RETINUE_MAX, setRetinuePlayer, hol
 import { companionsWithYou, COMPANION_SLOTS } from '../companionSlots.js';
 import { enemyDisplayName } from '../../characters/enemy/enemyBasics.js';
 import { DISSOLVE_EMBER, DISSOLVE_ARCANE } from '../dissolve.js';
-import { clearPlayerHarm } from '../harmMark.js';     // AUDIT: a beaten one's harm is no one's death
-import { willMatters, willBroken, LAST_STAND_RANK, LAST_STAND_ROAR, PHASE_TWO, lastStandHealth, phaseTwo } from './revenantFeud.js';     // RVN3: the will (14.2); RVN4: the last stand (15)
+import { clearPlayerHarm } from '../harmMark.js';   // AUDIT: a beaten one's harm is no one's death
+import { willMatters, willBroken, LAST_STAND_RANK, LAST_STAND_ROAR, PHASE_TWO, lastStandHealth, phaseTwo } from './revenantFeud.js';   // RVN3: the will (14.2); RVN4: the last stand (15)
 import { endCraft, DREAD, dreadStandHealth } from './revenantUnquiet.js';   // UNQUIET (Revenants.md section 46): a flight's craft put down; the Dread's two stands
 import { t } from '../textManager.js';   // AUDIT UNQUIET: the slip's words through the text core
 import { noteAct } from '../questlines/qlActs.js';   // QL11: the features' acts, heard by the running quests

@@ -17,8 +17,8 @@ import {
 } from '../../../src/systems/livingWorld/census.js';
 import { townPlaces, streetNet, exitToward, exitNearest, SOCIAL_OUT, MARKET_OUT } from '../../../src/systems/livingWorld/places.js';
 import { findTownPath, pathLine, pointOnLine, stepCost, createPathBook } from '../../../src/systems/livingWorld/townPaths.js';
-import { dayPlan, entryAt, isOutdoor, walkMinutes, schedule, watchDuty, patrolBeat, WATCH_SHIFTS, favourites, DAY_START_MIN, DAY_MIN, MIN_STAY, GEAR_MIN, HOME_GAP, WALK_DETOUR, WALK_EXTRA_M } from '../../../src/systems/livingWorld/dayPlan.js';     // WATCH-DAY:
-import { spotCircles, spotRound, circleLine, circleSlots, slotSpoken, exchangeScript, circleStands, aloneStand, lineMinutes, ROUND_S, CIRCLE_APART } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { dayPlan, entryAt, isOutdoor, walkMinutes, schedule, watchDuty, patrolBeat, WATCH_SHIFTS, favourites, DAY_START_MIN, DAY_MIN, MIN_STAY, GEAR_MIN, HOME_GAP, WALK_DETOUR, WALK_EXTRA_M } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY:
+import { spotCircles, spotRound, circleLine, circleSlots, slotSpoken, exchangeScript, circleStands, aloneStand, lineMinutes, ROUND_S, CIRCLE_APART } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { fillLine, firstNameOf, pickScript, TOWN_TALKS, JOB_TALKS, LIVING_GREETINGS, TOKEN_FALLBACK } from '../../../src/systems/livingWorld/lines.js';
 import { createRelations, regardStanding, EVENTS, FRIEND_AT, ENEMY_AT, HOSTILE_AT, EASE_PER_DAY, RELATIONS_MAX, LIVING_WORLD_VENDOR } from '../../../src/systems/livingWorld/relations.js';
 import { CREW_LINE_S } from '../../../src/systems/naval/crewLife.js';

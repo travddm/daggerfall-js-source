@@ -15,7 +15,7 @@ import { createRelations, EVENTS, HOSTILE_AT, HAND_KINDS, HAND_NAME_MAX, TURNS_M
 import { placeAt, handDeath, roadHits, fateHits, deathCounted, turnKey, HAZARD } from '../../../src/systems/livingWorld/lives.js';
 import { handsOn, membersAt, newsOf, remainsNear, awayOf, partyAt, placeCycle, CALENDAR_MPM, NEWS_DAYS } from '../../../src/systems/livingWorld/trips.js';
 import { newsScript, SLAIN_NEWS, DIED_NEWS, HELPED_NEWS, ROAD_NEWS, fillLine } from '../../../src/systems/livingWorld/lines.js';
-import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
+import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { createLivingRoads } from '../../../src/scenes/livingWorld/livingRoads.js';
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';

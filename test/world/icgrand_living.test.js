@@ -88,7 +88,7 @@ test('AUDIT RELEASE R2-9 A CAPITAL\'S DEED IS ITS SLICE\'S - a deed bought in on
 // of several (a district wall whose gate stands in the next slice). Each near slice's fabric hands the town homes, shops
 // and taverns (world/imperialHomes.js fabricHomesIn), and a capital's slice is a town of quarters (places.js): each
 // quarter's people live, work and walk in it.
-const SPLIT = 112;     // a slice a district wall splits: its fabric's homes on two street nets (78 and 75)
+const SPLIT = 112;   // a slice a district wall splits: its fabric's homes on two street nets (78 and 75)
 // was a far ring's court laid over another neighbourhood's streets, found at the stairs' sweep and gone)
 /** A slice's walkers' grid of its own blocks (Daggerfall's cells left shut - the fabric's streets alone). */
 async function sliceNav(s) {

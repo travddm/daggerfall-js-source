@@ -3,7 +3,7 @@
 // over its pixel seen from SD_OMEN_PX round and a word in the taverns of its city; once found, its ring on the held map,
 // its mark on the compass inside SD_COMPASS_M, its row in the Timers window and its note under the red seal, until it
 // is gone.
-import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';     // SD18c (
+import { sdMarksOf, sdEndingOf } from '../../../src/net/superDungeon/sdMarks.js';   // SD18c (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

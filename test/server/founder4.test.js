@@ -16,7 +16,7 @@ import { verifyToken, importPublicKeyB64 } from '../../src/net/identityToken.js'
 import { ACCEPTED } from '../../src/net/legalLaw.js';
 
 const DAY = 24 * 60 * 60;
-const CUT = Date.UTC(2026, 8, 25, 12) / 1000;     // FOUNDER5 (
+const CUT = Date.UTC(2026, 8, 25, 12) / 1000;   // FOUNDER5 (
 const FILE = '0078_founder_links.sql';
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 const sql = (f) => readFileSync(new URL(`../../server-account/migrations/${f}`, import.meta.url), 'utf8');

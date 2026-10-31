@@ -254,7 +254,7 @@ export function paintWildCrows(ctx, view, halls, { t = 0, paperW = Infinity, pap
 // shaded down its right side, deep sockets with an ember in each, the nasal hollow and a row of teeth - with a soft drop
 // shadow under it and no halo. A giant that stands in my own world now has its embers burning bright and breathing.
 // Paper pixels, whole ones (crisp at any zoom): one per sprite pixel on the world map, two once the map is close.
-const SKULL = [     // GIANT-SKULL2: eleven by ten
+const SKULL = [   // GIANT-SKULL2: eleven by ten
   '...OOOOO...',
   '.OOWWWBBOO.',
   'OWWWBBBBBSO',

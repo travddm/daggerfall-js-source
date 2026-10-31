@@ -18,7 +18,7 @@ import { survivalInfoTokens, itemInfoRows } from '../../../src/systems/item/item
 import { TavernWindow } from '../../../src/ui/tavernWindow.js';
 import { NOT_ENOUGH_GOLD_ID } from '../../../src/systems/tavern.js';
 import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
-import { CLIMATES } from '../../../src/formats/mapsFile.js';     // MENU-CLIMATE (FIELD BUGS 2026-09-30
+import { CLIMATES } from '../../../src/formats/mapsFile.js';   // MENU-CLIMATE (FIELD BUGS 2026-09-30
 
 // ═══ SURV5: WHAT THE PLAYER IS TOLD, AND THE TAVERN ═══
 //
