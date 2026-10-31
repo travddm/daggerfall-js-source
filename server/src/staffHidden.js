@@ -27,7 +27,7 @@
 //   past them closes the silent ones past HELLO_WAIT_MS first (index.js `_unseatSilent`). A hidden seat said hello with a
 //   visible token is closed (`hiddenHello`): a hidden seat is the spectator's alone.
 //   ADMITTED AS STAFF, WRITING NOTHING. A private home (privateInteriorAdmits' staff right), a seat-limited instance
-//   (instanceAdmits' staff right), an Elite Breach and a Super dungeon's realm let a hidden socket in without its
+//   (instanceAdmits' staff right) and a Super dungeon's realm let a hidden socket in without its
 //   admission's membership or seat written. Entering a private home is reported to the account service's audit log
 //   (`hiddenEntered`, net/hiddenSeen.js) - the subject and the room, signed with the relay's receipt key - and a relay
 //   that cannot report one lets no hidden socket into a home (STAFF-PANEL5-HIDDEN-FIX, `hiddenSeenOn`).

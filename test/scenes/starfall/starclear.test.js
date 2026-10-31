@@ -12,7 +12,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   gateClearFor, gateClearSet, gateClearMemo, boxNearGate, pointNearGate, wodSiteOffGate, gateSiteTest, createGateClearSweep,
-  STAR_ROCK_M, EG_ARCH_ROCK_M, GATE_CLEAR_M,
+  STAR_ROCK_M, GATE_CLEAR_M,
 } from '../../../src/world/gate/gateClearance.js';
 import { createStarfallHost } from '../../../src/scenes/starfall/starfallHost.js';
 import { starNightAt, starTimes, starSpotLocal, starInWindow, STAR_HOUR_MS, STAR_PER_NIGHT } from '../../../src/net/starfall/starfallLaw.js';
@@ -38,36 +38,36 @@ const N = starNightAt(FESTIVAL.fromMs) + 30;
 const SKIP = HAS_ARENA2 ? false : 'no ARENA2 (sh tools/fetch-data.sh, then ARENA2_PATH)';
 const star = (s, px, py, x, z) => ({ s, px, py, x, z });
 
-test('STAR-CLEAR THE CLEARING: a star keeps STAR_ROCK_M about its heart - its crater\'s earth, the ring its coven stands on and room past it - in the gate\'s own set, keyed by its night and star after the gate\'s and the arches\'; a star alone is a set; a malformed or repeated one is none (mutants: the stars left out of the set; a star\'s reach the arch\'s)', () => {
+test('STAR-CLEAR THE CLEARING: a star keeps STAR_ROCK_M about its heart - its crater\'s earth, the ring its coven stands on and room past it - in the gate\'s own set, keyed by its night and star after the gate\'s; a star alone is a set; a malformed or repeated one is none (mutants: the stars left out of the set; a star\'s reach the arch\'s)', () => {
   assert.equal(STAR_ROCK_M, 28);
   assert.ok(STAR_ROCK_M >= STAR_STAND_R[1] + 8 && STAR_STAND_R[1] > STAR_BARE_R, 'the crater, the stand ring\'s far edge and a foe\'s room past it');
-  assert.ok(STAR_ROCK_M > GATE_CLEAR_M && STAR_ROCK_M > EG_ARCH_ROCK_M, 'a coven stands round a star, further out than the gate\'s or an arch\'s own');
+  assert.ok(STAR_ROCK_M > GATE_CLEAR_M, 'a coven stands round a star, further out than the gate\'s own');
   const gate = gateClearFor({ day: 700, px: 10, py: 10, spot: [400, 400] });
-  const set = gateClearSet(gate, [{ b: 'aaaaaaaaaaaaaaaa', px: 30, py: 30, x: 50, z: 60 }], [star(`${N}.2`, 40, 41, 300, 500), star(`${N}.0`, 50, 51, 410, 420)]);
-  assert.equal(set.key, `${gate.key}|eg:aaaaaaaaaaaaaaaa|star:${N}.0|star:${N}.2`, 'the gate, the arches, then the stars by night and star');
-  assert.deepEqual({ ...set.list[2] }, { key: `star:${N}.0`, px: 50, py: 51, x: 410, z: 420, r: STAR_ROCK_M });
-  assert.ok(Object.isFrozen(set.list[2]));
+  const set = gateClearSet(gate, [star(`${N}.2`, 40, 41, 300, 500), star(`${N}.0`, 50, 51, 410, 420)]);
+  assert.equal(set.key, `${gate.key}|star:${N}.0|star:${N}.2`, 'the gate, then the stars by night and star');
+  assert.deepEqual({ ...set.list[1] }, { key: `star:${N}.0`, px: 50, py: 51, x: 410, z: 420, r: STAR_ROCK_M });
+  assert.ok(Object.isFrozen(set.list[1]));
   assert.equal(boxNearGate(set, 50, 51, 410 + STAR_ROCK_M - 0.5, 420, 410 + STAR_ROCK_M - 0.5, 420), true, 'inside a star\'s reach');
   assert.equal(boxNearGate(set, 50, 51, 410 + STAR_ROCK_M + 0.5, 420, 410 + STAR_ROCK_M + 0.5, 420), false, 'just past it');
   assert.equal(pointNearGate(set, 51, 51, 410 + STAR_ROCK_M - 819.2 - 1, 420), true, 'from the pixel east of it, its own frame');
-  assert.equal(gateClearSet(null, [], [star(`${N}.1`, 5, 6, 1, 2)]).key, `star:${N}.1`, 'a star with no gate');
-  assert.equal(gateClearSet(gate, [], []), gate, 'the gate alone is still the gate\'s own clearing');
-  assert.equal(gateClearSet(null, [], [null, star(7, 1, 1, 1, 1), star('x', 1.5, 1, 1, 1), star('y', 1, 1, NaN, 1)]), null, 'none malformed');
-  assert.equal(gateClearSet(null, [], [star('z', 1, 1, 1, 1), star('z', 2, 2, 2, 2)]).list.length, 1, 'a star once');
+  assert.equal(gateClearSet(null, [star(`${N}.1`, 5, 6, 1, 2)]).key, `star:${N}.1`, 'a star with no gate');
+  assert.equal(gateClearSet(gate, []), gate, 'the gate alone is still the gate\'s own clearing');
+  assert.equal(gateClearSet(null, [null, star(7, 1, 1, 1, 1), star('x', 1.5, 1, 1, 1), star('y', 1, 1, NaN, 1)]), null, 'none malformed');
+  assert.equal(gateClearSet(null, [star('z', 1, 1, 1, 1), star('z', 2, 2, 2, 2)]).list.length, 1, 'a star once');
 });
 
-test('STAR-CLEAR THE MEMO: the world host\'s set is made again only when the gate, the arches or the stars move - the same object while each is the same (mutants: the stars never remake it)', () => {
+test('STAR-CLEAR THE MEMO: the world host\'s set is made again only when the gate or the stars move - the same object while each is the same (mutants: the stars never remake it)', () => {
   const memo = gateClearMemo();
   const gate = gateClearFor({ day: 700, px: 10, py: 10, spot: [400, 400] });
-  const arches = Object.freeze([]), stars = Object.freeze([star(`${N}.0`, 50, 51, 410, 420)]);
-  const a = memo(gate, arches, stars);
-  assert.equal(memo(gate, arches, stars), a, 'nothing moved: the same set');
+  const stars = Object.freeze([star(`${N}.0`, 50, 51, 410, 420)]);
+  const a = memo(gate, stars);
+  assert.equal(memo(gate, stars), a, 'nothing moved: the same set');
   assert.equal(a.key, `${gate.key}|star:${N}.0`);
-  const b = memo(gate, arches, Object.freeze([...stars, star(`${N}.1`, 60, 61, 1, 2)]));
+  const b = memo(gate, Object.freeze([...stars, star(`${N}.1`, 60, 61, 1, 2)]));
   assert.notEqual(b, a);
   assert.equal(b.key, `${gate.key}|star:${N}.0|star:${N}.1`, 'a star come');
-  assert.equal(memo(gate, null, null), gate, 'none: the gate\'s own');
-  assert.equal(memo(null, null, null), null);
+  assert.equal(memo(gate, null), gate, 'none: the gate\'s own');
+  assert.equal(memo(null, null), null);
 });
 
 /** Each coven's region 400 pixels in a block of its own, each pixel its own town's (STAR2's scan, star5_host's). */
@@ -150,7 +150,7 @@ test('STAR-CLEAR THE SWEEP: a star come builds again the pixel whose rock reache
   const far = { px: 50, py: 52, gateClearKey: gate.key, gateRefused: false, wodReach: [5, 5, 5, 5, 0] };
   const built = new Map([['n', near], ['f', far]]);
   assert.deepEqual(sweep.step(gate, built), [], 'the gate alone, as built');
-  const withStar = gateClearSet(gate, [], [star(`${N}.0`, 50, 51, 410, 420)]);
+  const withStar = gateClearSet(gate, [star(`${N}.0`, 50, 51, 410, 420)]);
   assert.deepEqual(sweep.step(withStar, built), [near], 'the star come: the pixel whose boulder reaches its heart is built again');
   assert.equal(far.gateClearKey, withStar.key, 'the far pixel marked current');
   near.gateClearKey = withStar.key; near.gateRefused = true; near.wodReach = [5, 5, 5, 5, 0];
@@ -181,7 +181,7 @@ test('STAR-CLEAR over the shipped lists: a star\'s spot DOES land in the mod\'s 
   for (let n = N; n < N + 1500; n++) for (let k = 0; k < STAR_PER_NIGHT; k++) {
     const [x, y] = pixels[((n * 3 + k) * 7919) % pixels.length];
     const [sx, sz] = starSpotLocal(n, k);
-    const clear = gateClearSet(null, [], [star(`${n}.${k}`, x, y, sx, sz)]);
+    const clear = gateClearSet(null, [star(`${n}.${k}`, x, y, sx, sz)]);
     spots++;
     let within = 0;
     for (const p of pickLocations(tile(x, y), session, getPrefab, paths, null)) for (const o of p.prefab.obj) if (Math.abs(o.pos.y) <= 1000 && pointNearGate(clear, x, y, p.rect.x * 6.4 + o.pos.x, p.rect.y * 6.4 + o.pos.z)) within++;
@@ -246,7 +246,7 @@ test('STAR-CLEAR on the player\'s map: of the festival\'s real stars, the mod\'s
     for (const s of findStarSites(n, scan, { gateSiteOf: (d) => findGateSite(d, scan) })) {
       if (!starInWindow(s.n, s.k)) continue;
       stars++;
-      const clear = gateClearSet(null, [], [star(`${s.n}.${s.k}`, s.px, s.py, s.spot[0], s.spot[1])]);
+      const clear = gateClearSet(null, [star(`${s.n}.${s.k}`, s.px, s.py, s.spot[0], s.spot[1])]);
       if (reaches(s, clear, false)) rocked++;
       if (reaches(s, clear, true)) wholeLeft++;
     }

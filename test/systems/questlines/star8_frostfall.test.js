@@ -70,7 +70,7 @@ test('STAR8 THE LINE: the Festival\'s, tier 3 - from level 6, online, a register
   assert.ok(QL_WITNESS_KINDS.includes('star') && QL_WITNESS_KINDS.includes('stars3'));
   assert.deepEqual([0, 1, 2, 3].map((s) => qlStepClaimed('thirteenthFrostfall', s)), [true, false, true, false], 'the spindle and its fate are the client\'s');
   assert.equal(ACT_KINDS['star-held'], 'endgame', 'a receipt the service holds');
-  assert.deepEqual([QL_TITLES.at(-1), TITLES.at(-20) /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): the festival's two after it */, qlTitleBit('starwarden'), TITLE_TEXT.starwarden], ['starwarden', 'starwarden', 32, 'Starwarden']);
+  assert.deepEqual([QL_TITLES.at(-1), TITLES.at(-20) /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): the festival's two after it */, qlTitleBit('starwarden'), TITLE_TEXT.starwarden], ['starwarden', 'starwarden', 16, 'Starwarden']);   // PIN MOVED (Elite Gates removed): the Weir Road's title left QL_TITLES, so the Starwarden's bit is 16
 });
 
 test('STAR8 THE SEASON: the line begins only on the Festival\'s days - the festival\'s own calendar, read off the runner\'s clock; out of season the window draws it not at all, in season locked with what it waits on, and it begins (mutants: the opener unread; the calendar unread)', () => {

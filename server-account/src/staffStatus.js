@@ -15,8 +15,7 @@
 //
 // WHERE EACH NUMBER COMES FROM - what the game already records; nothing new is written for this screen:
 //   - players: registered accounts at play (a play beat inside PLAY_GRACE_S - players.played_at, by its index), the tabs
-//     at play (heartbeats carrying a beat in the last five minutes, from Analytics Engine), the Elite Breaches live (the
-//     relay's own public /v1/eg/live, which the relay deploy reads too), and each room kind's sockets over the last five
+//     at play (heartbeats carrying a beat in the last five minutes, from Analytics Engine), and each room kind's sockets over the last five
 //     minutes (the relay's own Analytics Engine points, relayScale.js RoomMetrics: an estimate from below, sockets not
 //     accounts - `chat` counts a player about four times). Per hub shard, per layer and distinct accounts per room kind
 //     are NOT MEASURED: the relay has no door that says them (see `UNMEASURED`).
@@ -29,7 +28,7 @@
 //
 // CHEAP BY CONSTRUCTION (design doc, Server load; weak spot "The panel goes blank when the database is slow"): each part
 // is kept in the isolate for its own time - STATUS_FAST_S for the database's health reads and the relay's /health,
-// STATUS_SLOW_S for Analytics Engine and the relay's breach list, STATUS_ACTIVITY_S for the hour's activity (the heavy
+// STATUS_SLOW_S for Analytics Engine, STATUS_ACTIVITY_S for the hour's activity (the heavy
 // reads) - so a poll every ten seconds costs the session's read and, at most, the fast part's one batch. Only a part's
 // answer is kept, never a pending one: a Worker cannot hand one request's I/O to another.
 //
@@ -57,7 +56,7 @@ import { modAiOn } from './modAi.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { PLAY_GRACE_S } from '../../src/net/playClock.js';
 
-/** How long each part is kept in the isolate, seconds: the health reads, Analytics Engine and the relay's breach list, and
+/** How long each part is kept in the isolate, seconds: the health reads, Analytics Engine, and
  *  the hour's activity (the design's "cache 5-10 minutes" for a heavy read). */
 export const STATUS_FAST_S = 10;
 export const STATUS_SLOW_S = 60;
@@ -68,9 +67,6 @@ export const STATUS_WINDOW_S = 5 * 60;
 export const STATUS_SLOW_MS = 1000;
 /** How long one ask of the relay or of Analytics Engine may take, ms. */
 export const STATUS_ASK_MS = 3000;
-/** The relay's public breach list - its EG_LIVE_PATH (src/net/eliteGates/egDurable.js), spelled here because importing
- *  that module would bundle the relay's graph into this Worker; the status pin holds the two together. */
-export const EG_LIVE_PATH = '/v1/eg/live';
 /** The Analytics Engine datasets (server-account/wrangler.toml, server/wrangler.toml). */
 const ACCOUNT_DATASET = 'daggerfall_accounts';
 const RELAY_DATASET = 'daggerfall_relay';
@@ -85,7 +81,6 @@ export const STATUS_ROUTES = Object.freeze(['/v1/staff/status', '/v1/staff/home'
 export const STATUS_METRICS = Object.freeze({
   'players.registered': 'registered accounts at play (a play beat inside the play clock\'s grace)',
   'players.tabs': 'tabs at play (heartbeats with a beat, last 5 minutes)',
-  'players.breaches': 'Elite Breaches live',
   'load.rps': 'requests a second (last 5 minutes)',
   'load.slow': `requests a minute taking ${STATUS_SLOW_MS} ms or more`,
   'load.refused': '429 and 503 answers a minute',
@@ -148,7 +143,7 @@ async function aeAsk(env, sql) {
 }
 
 /**
- * ONE PUBLIC READ OF THE RELAY - its /health, its live breaches - through the `RELAY` service binding where the Worker
+ * ONE PUBLIC READ OF THE RELAY - its /health - through the `RELAY` service binding where the Worker
  * has it (sanctions.js pushLaw's reason: one Worker fetching another's workers.dev address may be refused), at the host
  * RELAY_LAW_URL names.
  * @param {any} env @param {string} path @returns {Promise<{ state: 'ok', body: any }|{ state: 'missing'|'not-configured' }>}
@@ -174,7 +169,11 @@ const LIMITS_SQL = 'SELECT l.metric, l.amber, l.red, l.set_by, l.set_at, p.handl
 const limitsFrom = (rows) => {
   /** @type {Record<string, Limit & { by: string|null, byName: string|null, at: number }>} */
   const out = {};
-  for (const l of rows ?? []) out[l.metric] = { amber: l.amber ?? null, red: l.red ?? null, by: l.set_by ?? null, byName: l.handle ?? null, at: l.set_at };
+  for (const l of rows ?? []) {
+    // A row of a metric the screen no longer shows (one set before it was removed) is skipped, never answered
+    if (!Object.hasOwn(STATUS_METRICS, l.metric)) continue;
+    out[l.metric] = { amber: l.amber ?? null, red: l.red ?? null, by: l.set_by ?? null, byName: l.handle ?? null, at: l.set_at };
+  }
   return out;
 };
 /** THE LIMITS, by metric. @param {any} db */
@@ -199,10 +198,10 @@ async function fastPart(/** @type {any} */ ctx, /** @type {any} */ env) {
   return { at: nowS, db: health ? 'ok' : 'missing', health, limits, relay: await relayAsk(env, '/health') };
 }
 
-/** The slow part (STATUS_SLOW_S): Analytics Engine's three questions and the relay's breach list. */
+/** The slow part (STATUS_SLOW_S): Analytics Engine's three questions. */
 async function slowPart(/** @type {any} */ ctx, /** @type {any} */ env) {
   const w = `timestamp > NOW() - INTERVAL '${STATUS_WINDOW_S / 60}' MINUTE`;
-  const [load, cron, rooms, breaches] = await Promise.all([
+  const [load, cron, rooms] = await Promise.all([
     aeAsk(env, `SELECT SUM(_sample_interval) AS requests, SUM(IF(double1 >= ${STATUS_SLOW_MS}, 1, 0) * _sample_interval) AS slow,
       SUM(IF(blob3 = '429', 1, 0) * _sample_interval) AS r429, SUM(IF(blob3 = '503', 1, 0) * _sample_interval) AS r503,
       SUM(IF(startsWith(blob3, '5'), 1, 0) * _sample_interval) AS r5xx, SUM(double5 * _sample_interval) AS d1_wait_ms,
@@ -212,9 +211,8 @@ async function slowPart(/** @type {any} */ ctx, /** @type {any} */ env) {
     aeAsk(env, `SELECT blob1 AS job, SUM(IF(blob3 = '200', 0, 1) * _sample_interval) AS failed FROM ${ACCOUNT_DATASET}
       WHERE timestamp > NOW() - INTERVAL '1' HOUR AND blob2 = 'CRON' GROUP BY job ORDER BY failed DESC LIMIT 60`),
     aeAsk(env, `SELECT blob1 AS kind, SUM(double2 * _sample_interval) AS sockets FROM ${RELAY_DATASET} WHERE ${w} GROUP BY kind ORDER BY sockets DESC LIMIT 40`),
-    relayAsk(env, EG_LIVE_PATH),
   ]);
-  return { at: ctx.nowS, load, cron, rooms, breaches };
+  return { at: ctx.nowS, load, cron, rooms };
 }
 
 /** The activity part (STATUS_ACTIVITY_S): the last hour's, in one statement. Sales and Marks are read through their
@@ -281,10 +279,9 @@ export async function statusNow(ctx, env) {
   const players = tile('players', 'Players', {
     registered: h ? num(h.registered) : null,
     tabs: L ? num(L.beats) : null,
-    breaches: ok(slow.breaches) && Number.isSafeInteger(slow.breaches.body.live) ? slow.breaches.body.live : null,
-  }, limits, { registered: fast.db, tabs: slow.load.state, breaches: slow.breaches.state, rooms: slow.rooms.state }, Math.min(fast.at, slow.at), {
+  }, limits, { registered: fast.db, tabs: slow.load.state, rooms: slow.rooms.state }, Math.min(fast.at, slow.at), {
     // each room kind's sockets over the window - an estimate from below, sockets not accounts (relayLoad.mjs says why)
-    rooms: ok(slow.rooms) ? { basis: `${mins}-minute sockets`, kinds, dungeons: kinds.dungeon ?? 0, arenas: kinds.arena ?? 0, breaches: kinds.eg ?? 0 } : null,
+    rooms: ok(slow.rooms) ? { basis: `${mins}-minute sockets`, kinds, dungeons: kinds.dungeon ?? 0, arenas: kinds.arena ?? 0 } : null,
     unmeasured: UNMEASURED,
   });
   const load = tile('load', 'Service load', {

@@ -1,7 +1,7 @@
 // @ts-check
 // LOCKPICK (2026-10-26; bible/06-Systems/Lockpicking.md): THE LOCKPICK'S OWN PICTURE - a hook pick with a leather-wrapped
 // grip laid across an L-shaped tension wrench, painted here in code under a pseudo-archive of its own
-// (world/eliteGates/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): steel lit from the
+// (world/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): steel lit from the
 // top-left through the ordered dither, the grip's wraps banded, a dark outline, its ground clear. Nothing ships and nothing
 // is read from the player's data (Port-Doctrine: A RENDER OF GAME DATA IS GAME DATA): the same pixels every boot.
 //
@@ -12,7 +12,7 @@
 // Pure but for its registration. Not a DFU member. Ledger A (LOCKPICK).
 import { image, putTexel, ramp, paletteOf, quantize } from '../../world/superDungeon/sdPixelKit.js';
 
-/** The lockpick's pseudo-archive (registered in world/eliteGates/pseudoArchives.js), its one record. */
+/** The lockpick's pseudo-archive (registered in world/pseudoArchives.js), its one record. */
 export const LOCKPICK_ARCHIVE = 38321;
 export const LOCKPICK_ART = Object.freeze({ archive: LOCKPICK_ARCHIVE, record: 0 });
 /** Its size in texels: inside an item cell (ui/item/itemScroller.js CELL_W x SLOT_H, never enlarged). */

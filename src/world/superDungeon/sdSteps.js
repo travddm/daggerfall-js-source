@@ -24,15 +24,15 @@
 //
 // EG-H3 (2026-10-12, the Elite Gates arc; bible/11-Multiplayer/Elite-Gates.md sections 10.1 and 29, EG4): THE COURSE AS
 // DATA - the course is no longer frozen by a function of this module's: it is SD_COURSE_SPEC, laid by the one course law
-// (net/eliteGates/egSpanLaw.js courseOf), byte for byte the course it was (test/net/eliteGates/egseam_law.test.js), and every reader takes a course
-// (the Hour's own by default). THE PLATFORM CLOCK lives in net/eliteGates/egSpanLaw.js, the Spire's pieces' own, and is said here
+// (net/superDungeon/egSpanLaw.js courseOf), byte for byte the course it was (test/net/egseam_law.test.js), and every reader takes a course
+// (the Hour's own by default). THE PLATFORM CLOCK lives in net/superDungeon/egSpanLaw.js, the Spire's pieces' own, and is said here
 // as it always was (stepAt, beatStands, beatBlinks, beatWarned, the Beat's and the Crumble's numbers).
 //
 // Not a DFU member. Ledger A (SUPER-DUNGEONS).
 import { SD_ARENA } from '../../net/superDungeon/sdBrain.js';
 import { SD_FIRST_STEP } from './sdHall.js';
-import { courseOf, EG_BEAT_CYCLE_S, EG_BEAT_SOLID_S, EG_BEAT_BLINK_S, EG_CRUMBLE_DELAY_S } from '../../net/eliteGates/egSpanLaw.js';
-export { stepAt, beatStands, beatBlinks, beatWarned } from '../../net/eliteGates/egSpanLaw.js';
+import { courseOf, EG_BEAT_CYCLE_S, EG_BEAT_SOLID_S, EG_BEAT_BLINK_S, EG_CRUMBLE_DELAY_S } from '../../net/superDungeon/egSpanLaw.js';
+export { stepAt, beatStands, beatBlinks, beatWarned } from '../../net/superDungeon/egSpanLaw.js';
 
 /** Below this (the realm's y) the Hour casts a body back; and how much of its health it costs. */
 export const SD_VOID_Y = -30;
@@ -74,7 +74,7 @@ const CRUMBLE_TO_ARENA = 2.4;
 const CHECK_R = 3;
 
 /**
- * EG-H3 (EG4): THE HOUR'S COURSE AS DATA - its spec, laid along +z from the first step's far edge (net/eliteGates/egSpanLaw.js
+ * EG-H3 (EG4): THE HOUR'S COURSE AS DATA - its spec, laid along +z from the first step's far edge (net/superDungeon/egSpanLaw.js
  * courseOf): the Drift's eight (span 0) and B; the Beat's seven and its two risers (span 1), alternate Beats half a beat
  * apart and the course a riser higher after each, and C; the Crumble's eight (span 2), each a step down to the arena's
  * floor; the arena. AUDIT SD II (L2 F9): every step ONE shape, its unused fields nought - the page's frame reads them for
@@ -125,7 +125,7 @@ export function spanAt(z, course = SD_COURSE) {
   return -1;
 }
 
-// THE PLATFORM CLOCK - stepAt, beatStands, beatBlinks and beatWarned - is net/eliteGates/egSpanLaw.js's since EG-H3, said above.
+// THE PLATFORM CLOCK - stepAt, beatStands, beatBlinks and beatWarned - is net/superDungeon/egSpanLaw.js's since EG-H3, said above.
 /**
  * A Crumble step `since` seconds after a foot first touched it (null: untouched): `{ drop, whole, shaking }` - how far it
  * has fallen, whether it stands whole (untouched, still shaking, or back), and whether it shakes (its warning). AUDIT SD

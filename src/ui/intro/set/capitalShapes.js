@@ -12,7 +12,7 @@
 // Solitude's), in metres, y up, on the port's MeshBuilder (world/detStandIns.js). No game data.
 import { DOOR_TYPE } from '../../../world/meshReader.js';   // WW7-4: a castle's door
 // The pictures' pseudo-archive is the game's (world/capitalModels.js registers the pictures the film paints with), never a
-// number of the set's own: the registry (world/eliteGates/pseudoArchives.js) holds one owner to a number.
+// number of the set's own: the registry (world/pseudoArchives.js) holds one owner to a number.
 import { CAPITAL_ARCHIVE } from '../../../world/capitalShapes.js';
 /** The pictures, by record (world/capitalModels.js capitalArt paints them). */
 const CAPITAL_ART = Object.freeze({

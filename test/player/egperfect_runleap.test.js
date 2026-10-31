@@ -4,7 +4,7 @@
 // online (systems/features.js `enhanced-climbing`, scenes/shared.js parkourSwitchOn), and a running Jump with the floor ending
 // within PARKOUR_RUNLEAP_EDGE became CLIMB3's running leap (player/motor.js _pkRunLeapSpeeds) - at Jumping 100 it flew over
 // the platform the solver proved the plain jump lands on. The made level's law (systems/madeLevel.js `runLeap`) refuses it
-// on the Spire and in the Hour, through the four hosts' one parkour deps (scenes/shared.js parkourDeps `leap`), at the motor's
+// in the Hour, through the four hosts' one parkour deps (scenes/shared.js parkourDeps `leap`), at the motor's
 // one door (_pkMayLeap - the leap at the edge and its late press); the wall run stays. Fixtures from the producers: a
 // character from chargen, the deps the hosts hand the motor.
 import '../modsOff.js';
@@ -13,11 +13,11 @@ import assert from 'node:assert/strict';
 import { SKILLS } from '../../src/systems/skills.js';
 import { createCharacter } from '../../src/systems/chargen.js';
 import { buildCustomCareer } from '../../src/systems/customClass.js';
-import { PlayerMotor, registerJumpForgiveness } from '../../src/player/motor.js';
+import { PlayerMotor } from '../../src/player/motor.js';
 import { Collider } from '../../src/player/collider.js';
 import { parkourDeps } from '../../src/scenes/shared.js';
 import { playerEntity } from '../../src/characters/playerEntity.js';
-import { registerMadeLevelHere, madeRuleHere, madeLevelRule } from '../../src/systems/madeLevel.js';
+import { registerMadeLevelHere, madeLevelRule } from '../../src/systems/madeLevel.js';
 
 const STATS = { strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 };
 const career = buildCustomCareer({
@@ -70,13 +70,12 @@ function pair(p, { pressAt = 0, late = -1 } = {}) {
   return { on: null, flew: maxZ };
 }
 
-test('EG-PERFECT THE RUNNING LEAP REFUSED (section 10.5; systems/madeLevel.js `runLeap`): on the Spire and in the Hour a running Jump at a span\'s edge - pressed at the edge or 0.6 m short of it - is THE SPAN BUILD\'s plain jump and lands on the platform the solver proved, at Jumping 0 and at Jumping 100; with no made level (or the court) the enhanced climb\'s running leap flies on as CLIMB3 made it - at Jumping 100 clean over the platform; the deps every host hands the motor carry the law\'s word (mutants: the rule dropped from either row; the motor deaf to `leap`; the deps\' word inverted)', () => {
-  assert.equal(madeLevelRule('spire', 'runLeap'), 'refused');
+test('EG-PERFECT THE RUNNING LEAP REFUSED (section 10.5; systems/madeLevel.js `runLeap`): in the Hour a running Jump at a span\'s edge - pressed at the edge or 0.6 m short of it - is THE SPAN BUILD\'s plain jump and lands on the platform the solver proved, at Jumping 0 and at Jumping 100; with no made level (or the court) the enhanced climb\'s running leap flies on as CLIMB3 made it - at Jumping 100 clean over the platform; the deps every host hands the motor carry the law\'s word (mutants: the rule dropped from the Hour\'s row; the motor deaf to `leap`; the deps\' word inverted)', () => {
   assert.equal(madeLevelRule('hour', 'runLeap'), 'refused');
   assert.equal(madeLevelRule('court', 'runLeap'), null, 'the court has no course: the leap as the game has it');
   const fast = leaper(100), slow = leaper(0);
   try {
-    for (const lv of ['spire', 'hour']) {
+    for (const lv of ['hour']) {
       here(lv);
       assert.equal(parkourDeps(fast).leap(), false, `${lv}: the deps say no leap`);
       for (const [p, name] of [[fast, 'Jumping 100'], [slow, 'Jumping 0']]) for (const pressAt of [0, 0.6]) {
@@ -98,25 +97,10 @@ test('EG-PERFECT THE RUNNING LEAP REFUSED (section 10.5; systems/madeLevel.js `r
   } finally { registerMadeLevelHere(null); }
 });
 
-test('EG-PERFECT THE LATE PRESS REFUSED WITH IT (section 10.8): a Jump a beat after running off a span\'s edge was CLIMB3\'s late press - the leap again; on the Spire it is no leap, and with the Spire\'s own forgiveness wired as the world host wires it (registerJumpForgiveness, the made level\'s `latePress`) it is the plain jump, and lands on the platform; with no made level the late press still leaps (mutants: the late press left to the leap; the forgiveness unread)', () => {
-  const fast = leaper(100);
-  try {
-    registerJumpForgiveness(() => madeRuleHere('jumpBuffer'), () => madeRuleHere('latePress'));
-    here('spire');
-    const r = pair(fast, { late: 3 });
-    assert.equal(r.on, 'landing', `the Spire: the late press is the forgiven plain jump (flew to ${r.flew.toFixed(2)})`);
-    assert.ok(r.flew < 3.5, `a plain jump's flight from just past the edge (${r.flew.toFixed(2)} m)`);
-    here(null);
-    const w = pair(fast, { late: 3 });
-    assert.equal(w.on, null, 'no made level: the late press leaps as CLIMB3 made it');
-    assert.ok(w.flew > 8);
-  } finally { registerJumpForgiveness(null, null); registerMadeLevelHere(null); }
-});
-
-test('EG-PERFECT THE WALL RUN KEPT (Elite-Gates-Ascent.md section 4, "Climbing is never asked" no longer): with the leap refused on the Spire a running Jump at a Riser\'s 2.3 m face still runs up it and stands on its top at Climbing 0 - the refusal touches the leap alone (mutant: the whole parkour lane refused)', () => {
+test('EG-PERFECT THE WALL RUN KEPT (Elite-Gates-Ascent.md section 4, "Climbing is never asked" no longer): with the leap refused in the Hour a running Jump at a Riser\'s 2.3 m face still runs up it and stands on its top at Climbing 0 - the refusal touches the leap alone (mutant: the whole parkour lane refused)', () => {
   const p = leaper(0);
   try {
-    here('spire');
+    here('hour');
     const col = new Collider(() => -Infinity);
     box(col, 'runup', -1.5, -0.5, -12, 1.5, 0, 0);
     box(col, 'riser', -1.5, -0.5, 0, 1.5, 2.3, 2.6);

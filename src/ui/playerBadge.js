@@ -107,27 +107,11 @@ export const TITLE_TEXT = Object.freeze({
   seasonmaster: 'Season Master',  // CHAP6e: a Season's Master's, kept for good
   ilovelamp: 'I Love Lamp',       // LAMP-KEEPER II (2026-10-14, Mac: "the 'I Love Lamp' title"): a lamp keeper spoken to
   coilbreaker: 'Coilbreaker',     // SERPENT5 (2026-10-15, Sea-Serpent.md section 17): one dealing ship's serpent kill in twenty grants it
-  // EG-E2 (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 19, THE HONOURS): the Spire's thirteen, in the table's
-  // order - earned in the Elite Breach (server-account/src/egHonours.js), never bought
-  spirewalker: 'Spirewalker',
-  beaconlighter: 'Beacon-Lighter',
-  kynbane: 'Kynbane',
-  unfallen: 'The Unfallen',
-  lonebeacon: 'The Lone Beacon',
-  battlemage: 'Battlemage of the Spire',
-  wellheadwalker: 'Wellhead-Walker',
-  mastergallery: 'Master of the Galleries',
-  mastercairn: 'Master of the Cairn',
-  mastershade: 'Master of the Shade',
-  masterwellhead: 'Master of the Wellhead',
-  spirechampion: 'Spire Champion',
-  spirefirst: 'First of the Spire',
   wikimaid: 'WikiMaid',           // WIKIMAID (2026-10-17, for SylviaBun: "the WikiMaid title"): SylviaBun's own, spelled as she spelled it
-  // QL12 (2026-10-19, bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' FIVE, a title a line, in the lines'
+  // QL12 (2026-10-19, bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' FOUR, a title a line, in the lines'
   // order (net/questlineClaims.js QL_TITLES) - paid by the account service on the line's last witnessed step, held for good
   doorwarden: 'Doorwarden',                // the Burning Doors
   covenbane: 'Covenbane',                  // the Covens' Hoard
-  weirwalker: 'Weirwalker',                // the Weir Road
   hourwitness: 'Witness of the Hour',      // the Hour That Was Not
   satakalwitness: "Satakal's Witness",     // the Old Coil
   starwarden: 'Starwarden',                // STAR8: the Thirteenth of Frostfall
@@ -168,9 +152,6 @@ export const AURA_TEXT = Object.freeze({
   turninghour: 'The Turning Hour',   // SD9c: the Brass Remnant's wheel of brass gears and gold light, one kill in eight
   firsthour: 'The First Hour',   // HOURS-FIRST: The Turning Hour in the first dawn's light, Hour's First's own, granted with the title
   maelstrom: 'The Maelstrom',   // SERPENT5: the Old Coil's whirlpool of tide and foam, one dealing ship's serpent kill in fifty
-  beaconlight: 'Beaconlight',   // EG-E2: Kynbane's gold-white motes, granted with the title
-  burningstair: 'The Burning Stair',   // EG-E2: Wellhead-Walker's falling embers, granted with the title
-  firstlight: 'Firstlight',   // EG-E2: First of the Spire's dawn-white ring, granted with the title by name
   lilacwarren: 'Lilac Warren',   // WIKIMAID: the WikiMaid's rabbits hopping round the feet on a ring of lilac light, granted with the title
   witchfire: 'Witchfire',   // WITCH1: a coven's green fire round the feet, tallow candles in its ring, bought from a Wyrd Sister
   sagesmoke: "Sage's Smoke",   // NIRNROOT-SAGE: smoke billowing about the Nirnroot Sage, nirnroots circling the waist, green runes round the feet, granted with the title
@@ -258,19 +239,6 @@ export const HOUR_SUN = Object.freeze([1, 0.969, 0.918, 1]);         // #fff7ea
 export const COIL_SEA = Object.freeze([0.165, 0.561, 0.651, 1]);    // #2a8fa6
 export const COIL_TIDE = Object.freeze([0.122, 0.682, 0.549, 1]);   // #1fae8c
 export const COIL_FOAM = Object.freeze([0.847, 0.976, 0.937, 1]);   // #d8f9ef
-/** EG-E2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 19, THE HONOURS): THE
- *  SPIRE'S COLOURS, named once - the three titles whose auras are drawn in them read them here, as the auras do
- *  (render/auraRing.js SPIRE_RGB): the beacon's flame and its white heart (Beacon-Lighter; Kynbane's Beaconlight, its
- *  motes), the Kyn's blood (Kynbane), the Wellhead's ember and its coal (Wellhead-Walker; The Burning Stair), and the
- *  dawn and its gold (First of the Spire; Firstlight, its ring) - and, SPIRE-FIRST, its rose (Firstlight's spires and rays). */
-export const SPIRE_BEACON = Object.freeze([1, 0.902, 0.62, 1]);        // #ffe69e - paler and whiter than the Crowned's gold
-export const SPIRE_BEACON_WHITE = Object.freeze([1, 0.976, 0.902, 1]); // #fff9e6
-export const SPIRE_KYN = Object.freeze([0.69, 0.157, 0.118, 1]);       // #b0281e - darker and bloodier than the Developer's red
-export const SPIRE_EMBER = Object.freeze([0.941, 0.416, 0.208, 1]);    // #f06a35 - redder than the Gatebreaker's fire
-export const SPIRE_COAL = Object.freeze([0.62, 0.122, 0.039, 1]);      // #9e1f0a
-export const SPIRE_DAWN = Object.freeze([0.992, 0.886, 0.816, 1]);     // #fde2d0 - a blush of dawn, paler than Hour's First's rose gold
-export const SPIRE_DAWN_GOLD = Object.freeze([1, 0.792, 0.522, 1]);    // #ffca85
-export const SPIRE_DAWN_ROSE = Object.freeze([1, 0.624, 0.502, 1]);    // #ff9f80 - SPIRE-FIRST: the sky low at sunrise, Firstlight's spires' feet and its rays' tips
 /** WIKIMAID (2026-10-17, for SylviaBun: "Honestly as dumb as this is gonna sound the WikiMaid title and a purple aura with
  *  bunnies would be dope as hell" - "Lets go all out for this"). No colour was named for the title; the aura was asked
  *  purple, and the title and its glyph are drawn in the same family so the three read as one grant: an AMETHYST, the
@@ -372,32 +340,12 @@ export const TITLE_RGBA = Object.freeze({
   // Founder's gold and the Hour's, lighter than the Dungeon Master's orange
   ilovelamp: Object.freeze([1, 0.698, 0.376, 1]),           // #ffb260
   coilbreaker: COIL_TIDE,                                   // SERPENT5: the tide's green, #1fae8c
-  // EG-E2: THE SPIRE'S THIRTEEN, none another title's - the Spire's dusk for its first step, the beacon's flame, the Kyn's
-  // blood, an unbroken ivory, a lone cold star, the Imperial Battlemages' blue, the Wellhead's ember; each band's Master
-  // its own ground's (the Galleries' old gilt, the Cairn's soul-gems, the Shade's night, the Wellhead's forge); the
-  // Champion's jade, and the first dawn for the first company
-  spirewalker: Object.freeze([0.62, 0.659, 0.8, 1]),        // #9ea8cc
-  beaconlighter: SPIRE_BEACON,
-  kynbane: SPIRE_KYN,
-  unfallen: Object.freeze([0.902, 0.882, 0.812, 1]),        // #e6e1cf
-  lonebeacon: Object.freeze([0.788, 0.894, 1, 1]),          // #c9e4ff
-  battlemage: Object.freeze([0.31, 0.4, 0.769, 1]),         // #4f66c4
-  wellheadwalker: SPIRE_EMBER,
-  mastergallery: Object.freeze([0.788, 0.647, 0.353, 1]),   // #c9a55a
-  mastercairn: Object.freeze([0.541, 0.859, 0.89, 1]),      // #8adbe3
-  mastershade: Object.freeze([0.424, 0.373, 0.682, 1]),     // #6c5fae
-  masterwellhead: Object.freeze([0.831, 0.333, 0.165, 1]),  // #d4552a
-  spirechampion: Object.freeze([0.275, 0.839, 0.549, 1]),   // #46d68c
-  spirefirst: SPIRE_DAWN,
   wikimaid: WARREN_LILAC,   // WIKIMAID: the rabbits' lilac - the colour a face that cannot draw a gradient uses, and the glyph's
-  // QL12 (no colour named): THE QUESTLINES' FIVE, each its line's place and each more than 40 from every title's - the
-  // Burning Doors' EMBER, redder than the Gatebreaker's fire and brighter than the Wellhead's Master's forge; the covens'
-  // hoarded GOLD, deeper than the Founder's and the Hour's; the Spire's own BLUE, bluer and deeper than the Herald's azure
-  // and brighter than the Battlemages'; Akatosh's BRASS, greener than the Warden's bronze; and the SEA's teal, bluer than
-  // the Coilbreaker's tide
+  // QL12 (no colour named): THE QUESTLINES' FOUR, each its line's place and each more than 40 from every title's - the
+  // Burning Doors' EMBER, redder than the Gatebreaker's fire; the covens' hoarded GOLD, deeper than the Founder's and the
+  // Hour's; Akatosh's BRASS, greener than the Warden's bronze; and the SEA's teal, bluer than the Coilbreaker's tide
   doorwarden: Object.freeze([0.910, 0.251, 0.047, 1]),       // #e8400c
   covenbane: Object.freeze([0.816, 0.667, 0.063, 1]),        // #d0aa10
-  weirwalker: Object.freeze([0.122, 0.373, 1, 1]),           // #1f5fff
   hourwitness: Object.freeze([0.678, 0.647, 0.188, 1]),      // #ada530
   satakalwitness: Object.freeze([0.071, 0.722, 0.722, 1]),   // #12b8b8
   // STAR8: the STARWARDEN - a falling star's streak at its deepest violet (render/starfall/starfallPass.js's fall), redder
@@ -790,7 +738,7 @@ export const badgeClass = (kind, key) => `${kind}-${key}`;
  *  the Gatebreaker's, the Oblivion Ward the Aegis of Oblivion's, the Golden Radiance the Primarch's (PRIMARCH), the Holo
  *  Shadow Cloak the Shadow Fang's black and crimson (SHADOW-CLOAK), the Seraph Wings the Founder's gold - the wings' own, where
  *  the developer's paint is a red (SERAPH-WINGS), the Crystal Resonance the Crystal Fist's purple (CRYSTAL-FIST). A pin walks AURA_TEXT and requires an entry. */
-export const AURA_PAINT = Object.freeze({ dagonfire: 'gatebreaker', oblivionward: 'aegis', radiance: 'primarch', shadowcloak: 'shadowfang', seraphwings: 'founder', resonance: 'crystalfist', turninghour: 'hourbreaker', firsthour: 'hoursfirst', maelstrom: 'coilbreaker', beaconlight: 'kynbane', burningstair: 'wellheadwalker', firstlight: 'spirefirst', lilacwarren: 'wikimaid', witchfire: 'witchwarden', sagesmoke: 'nirnrootsage' });   // NIRNROOT-SAGE: Sage's Smoke in the Nirnroot Sage's leaf into glow into haze   // WITCH1: Witchfire in the Witchwarden's green   // WIKIMAID: the Lilac Warren in the WikiMaid's amethyst into blush; HOURS-FIRST: The First Hour in Hour's First's rose gold; SERPENT5: The Maelstrom in the Coilbreaker's sea; EG-E2: the Spire's three each in its title's paint
+export const AURA_PAINT = Object.freeze({ dagonfire: 'gatebreaker', oblivionward: 'aegis', radiance: 'primarch', shadowcloak: 'shadowfang', seraphwings: 'founder', resonance: 'crystalfist', turninghour: 'hourbreaker', firsthour: 'hoursfirst', maelstrom: 'coilbreaker', lilacwarren: 'wikimaid', witchfire: 'witchwarden', sagesmoke: 'nirnrootsage' });   // NIRNROOT-SAGE: Sage's Smoke in the Nirnroot Sage's leaf into glow into haze   // WITCH1: Witchfire in the Witchwarden's green   // WIKIMAID: the Lilac Warren in the WikiMaid's amethyst into blush; HOURS-FIRST: The First Hour in Hour's First's rose gold; SERPENT5: The Maelstrom in the Coilbreaker's sea
 /** SHADOW-FANG: `titlePaint`'s properties as CSS declarations, the colour
  *  left to the button (its border is drawn in it) - so a gradient title's
  *  word on the card is the SAME paint as over a head, not a second one. */

@@ -24,12 +24,11 @@ export const SEASON_TICK_MS = 1000;
 /** A row's door (systems/seasonBook.js `door`) -> its button's words. */
 const SEASON_DOOR_TEXT = Object.freeze({
   arena: () => t('season.book.door.arena', 'Arena'),
-  spire: () => t('season.book.door.spire', 'Boards'),
 });
 
 /**
  * WHAT THE WINDOW READS, off the pause face's hooks: the hourglass's source (hooks.timers - the relay's clock, the seats'
- * word, the Spire's boards' door) under the laurel's own reads (hooks.season - the boards), and the Arena's door once a
+ * word) under the laurel's own reads (hooks.season - the boards), and the Arena's door once a
  * banner is worn. Null where there is no clock: offline, or before the relay's has been heard. `opening` - the window's
  * first read, the one that may ask the service (AUDIT SEASON-BOOK R1).
  * @param {any} hooks
@@ -39,7 +38,7 @@ export function seasonSource(hooks, { opening = false } = {}) {
   if (!clock) return null;
   const reads = hooks.season?.({ opening, now: clock.now }) ?? null;
   const arena = hooks.arenaJoined?.() && typeof hooks.openArena === 'function' ? () => hooks.openArena() : null;
-  return { ...reads, now: clock.now, seatsOpen: clock.seatsOpen, zero: clock.zero, doors: { arena, spire: clock.doors?.board ?? null } };
+  return { ...reads, now: clock.now, seatsOpen: clock.seatsOpen, zero: clock.zero, doors: { arena } };
 }
 
 /** THE TIME LEFT, as the hourglass counts it (eventTimers.js timerText) with its days' letters in the player's language

@@ -97,7 +97,7 @@ test('WITCH1 AN ACT, A QUEST AND A BOUNTY ask by their group: a fish caught is `
   await new Promise((r) => setTimeout(r, 0));
   noteAct('elite-foe-slain');   // its kill already asked its own
   await new Promise((r) => setTimeout(r, 0));
-  noteAct('redoubt-taken');   // a later deed: its own find
+  noteAct('hour-broken');   // a later deed: its own find
   await askFind('world');
   assert.deepEqual(asked.filter(([n]) => n === 'find').map(([, s]) => s), ['endgame', 'endgame', 'world']);
   assert.equal(FESTIVAL_FIND, 'festival-find');

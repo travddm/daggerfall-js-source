@@ -552,15 +552,6 @@ export const ROUTES = new Set([
   '/v1/serpent/claim',   // SERPENT1: a sea serpent's receipt
   '/v1/star/claim',   // STAR7: a fallen star's receipt
   '/v1/sd/claim',   // SD9b: a Brass Remnant's receipt - an Hour broken, and its grants on the first write
-  '/v1/eg/keys',   // EG-PLAY: the Weir Keys held, the live breach, the day's Rehearsal
-  '/v1/eg/open',   // EG-PLAY: a key staked and the open order signed
-  '/v1/eg/admit',   // EG-PLAY: a member's admission order
-  '/v1/eg/claim',   // EG-PLAY: an Elite Breach's receipt - a Redoubt taken, a member's end, a void
-  '/v1/eg/board',   // EG-E2: the Elite Breach's three boards - the Descent, the Depths, the Deepest Redoubts
-  '/v1/eg/sink',   // EG-E1: the Broker's Panoply piece, once an account a week, for 20 embers
-  '/v1/eg/find',   // EG-E3: a dungeon elite's find - the service's die at the tier's odds, capped a day and a week
-  '/v1/eg/starts',   // EG-F: the start window's preflight - which starts each member of the opener's party may make
-  '/v1/eg/first',   // EG-ZF: the first-time lines a client showed, kept once an account
   '/v1/lamp/claim',   // LAMP-KEEPER II: a lamp keeper spoken to - I Love Lamp laid on the row once (AUDIT FIVE-ASKS A1: it was never listed, so every claim was a 404)
   '/v1/ql/claim',   // QL12: a questline's step claimed - opened, then witnessed by its endgame receipt; a line's title, the Covens' Hoard's key (questlines.js)
   // MARKS1: Marks (marks.js) - an account's balance, the Bank's exchange (Marks for gold, never the other way), a

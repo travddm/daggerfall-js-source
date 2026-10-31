@@ -132,8 +132,8 @@ export function buildProgram(gl, vsSrc, fsSrc, label = '') {
     fault ??= `${label ? `${label} link: ` : ''}${gl.getProgramInfoLog(prog)}`;
   }
   // AUDIT EG V (lane 6's shader objects; EVERY ALLOCATION HAS AN OWNER): the two stages flagged for deletion once the link
-  // is read - attached, they live as long as the program and go with its deleteProgram. Kept, every pass rebuilt (the
-  // Spire's look each breach, the spans' ghosts each circle) left its two behind. A build that throws frees its program too.
+  // is read - attached, they live as long as the program and go with its deleteProgram. Kept, every pass rebuilt left its
+  // two behind. A build that throws frees its program too.
   gl.deleteShader(vs); gl.deleteShader(fs);
   if (fault != null) { gl.deleteProgram(prog); throw new Error(fault); }
   return prog;

@@ -29,7 +29,6 @@ import { GEM_GRADE_ROWS } from '../../src/systems/gems.js';   // GEM2: the sixte
 import { GOODS_ROWS } from '../../src/systems/naval/tradeGoods.js';   // CAPT-TRADE: the seventeenth registrar
 import { CHART_ROW } from '../../src/systems/naval/treasureCharts.js';   // CAPT-CHARTS: the eighteenth
 import { UPKEEP_ITEM_ROWS } from '../../src/systems/upkeep/upkeepItemRows.js';   // STEED1/WAGONS4: the nineteenth registrar
-import { WEIR_KEY_ROW } from '../../src/systems/eliteGates/weirKey.js';   // EG-PLAY: the twentieth - the Weir Key, bound
 import { SOUL_CAKE_ROW, HEARTH_OFFERING_ROW } from '../../src/systems/festival/soulCake.js';   // WITCH1: the twenty-first - the Soul Cake and the Hearth Offering, bound
 import { STARGLASS_ROW } from '../../src/systems/starfall/starglass.js';   // STAR7: the twenty-second - Starglass, not bound
 import { LOCKPICK_ROW } from '../../src/systems/lockpick/lockpickItem.js';   // LOCKPICK: the Lockpick, not bound
@@ -169,7 +168,6 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
     ...GEM_GRADE_ROWS,   // GEM2: the 32 graded gems - none bound: a gem changes hands, as DFU's do
     ...GOODS_ROWS, CHART_ROW,   // CAPT-TRADE, CAPT-CHARTS (PIN MOVED): the exchange's goods and the treasure chart - none bound: cargo and charts change hands
     ...UPKEEP_ITEM_ROWS,   // STEED1/WAGONS4: the Sack of Oats and the Wagon Repair Kit - neither bound: they change hands
-    WEIR_KEY_ROW,   // EG-PLAY: the Weir Key - bound: the account's balance, never traded
     SOUL_CAKE_ROW, HEARTH_OFFERING_ROW,   // WITCH1: the Soul Cake and the Hearth Offering - bound: the cakes are the account's
     STARGLASS_ROW,   // STAR7: Starglass - not bound: a fallen star's glass changes hands, as a gem does
     LOCKPICK_ROW,   // LOCKPICK: the Lockpick - not bound: a pick changes hands, sold on every General Store's counter
@@ -191,7 +189,7 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
   };
   walk('src');
   // PIN MOVED (guns removed): systems/thunderlock.js and systems/pistolet.js left the registrars with the guns
-  assert.deepEqual(registrars.sort(), ['src/systems/ayleidStones.js', 'src/systems/comeSailAway/comeSailAwayItems.js', 'src/systems/deepWater/deepWatersFishItems.js', 'src/systems/eliteGates/weirKey.js', 'src/systems/festival/soulCake.js', 'src/systems/foraging/foragingInstall.js', 'src/systems/gate/gateSpoils.js', 'src/systems/gems.js', 'src/systems/legacy/heirloom.js', 'src/systems/livingWorld/keepsake.js', 'src/systems/lockpick/lockpickItem.js', 'src/systems/naval/navalStores.js', 'src/systems/naval/tradeGoods.js', 'src/systems/naval/treasureCharts.js', 'src/systems/professions/profTemplates.js', 'src/systems/rest/restItems.js', 'src/systems/roleplayRealismItems/rriInstall.js', 'src/systems/starfall/starglass.js', 'src/systems/survival/items.js', 'src/systems/upkeep/upkeepItemRows.js', 'src/systems/walletItem.js']);   // SEA-REPAIR: the ninth, the carpenter's stores; REST6: the tenth, the rest supplies; LW6c: the eleventh, the keepsake; LEGACY4: the twelfth, an ancestor's remains; LOOT21: the fourteenth, the Ayleid stones
+  assert.deepEqual(registrars.sort(), ['src/systems/ayleidStones.js', 'src/systems/comeSailAway/comeSailAwayItems.js', 'src/systems/deepWater/deepWatersFishItems.js', 'src/systems/festival/soulCake.js', 'src/systems/foraging/foragingInstall.js', 'src/systems/gate/gateSpoils.js', 'src/systems/gems.js', 'src/systems/legacy/heirloom.js', 'src/systems/livingWorld/keepsake.js', 'src/systems/lockpick/lockpickItem.js', 'src/systems/naval/navalStores.js', 'src/systems/naval/tradeGoods.js', 'src/systems/naval/treasureCharts.js', 'src/systems/professions/profTemplates.js', 'src/systems/rest/restItems.js', 'src/systems/roleplayRealismItems/rriInstall.js', 'src/systems/starfall/starglass.js', 'src/systems/survival/items.js', 'src/systems/upkeep/upkeepItemRows.js', 'src/systems/walletItem.js']);   // SEA-REPAIR: the ninth, the carpenter's stores; REST6: the tenth, the rest supplies; LW6c: the eleventh, the keepsake; LEGACY4: the twelfth, an ancestor's remains; LOOT21: the fourteenth, the Ayleid stones
   // and the honest client never offers one: the window's pack refuses it before a half is ever written
   const holder = { items: [{ ...sigilStone(), stackCount: 2 }], goldPieces: 0 };
   assert.equal(createTradePack(holder).offerable(holder.items[0]), tradeRefusal(holder.items[0]));

@@ -19,7 +19,6 @@ import {
 import { gateScoreSongs, midiNote, SCORE_TPQ } from '../../../src/systems/gate/gateScore.js';
 import { sdScoreSongs } from '../../../src/systems/superDungeon/sdScore.js';
 import { arenaScoreSongs } from '../../../src/systems/arena/arenaScore.js';
-import { SPIRE_SONGS } from '../../../src/systems/eliteGates/egScore.js';
 import { SONG_FILES, songFileToRecordName } from '../../../src/systems/song/songFiles.js';
 import { songVoices, songKit, songLevel } from '../../../src/systems/song/songPlayer.js';
 
@@ -40,7 +39,7 @@ test('SEA-SCORE THE SONGS: six, by their own names - eight and three, beside eve
   const taken = new Set([
     ...SONG_FILES.map((n) => songFileToRecordName(n)),
     ...Object.values(gateScoreSongs()).map((s) => s.name), ...Object.values(sdScoreSongs()).map((s) => s.name),
-    ...Object.values(arenaScoreSongs()).map((s) => s.name), ...Object.values(SPIRE_SONGS),
+    ...Object.values(arenaScoreSongs()).map((s) => s.name),
   ]);
   assert.deepEqual({ ...SEA_SHAPE }, {
     calm: { bpm: 84, bars: 64, beats: 3 }, open: { bpm: 100, bars: 48, beats: 4 }, storm: { bpm: 126, bars: 48, beats: 4 },

@@ -44,7 +44,6 @@ const DECLARED = Object.freeze({
   'src/characters/enemy/enemyAnchor.js': 'a size for a foe\'s anchor - it draws nothing',
   'src/world/rmbFlats.js': 'mobileBillboardSize\'s own home - it draws nothing',
   'src/characters/residentWalker.js': 'the walker itself - its hosts draw it (world.js, travellerSprites.js)',
-  'src/scenes/eliteGates/egFight.js': 'EG-PLAY\'s champion and Court lord - the Warden\'s sprite at 2.5, as the gate\'s court drew him before MWNPC10a; its legion stands in bodies through scenes/gate/gateHost.js, and the Spire\'s own lords are EG13\'s (bible/11-Multiplayer/Elite-Gates.md section 31, EG-PLAY)',
   'src/scenes/gate/gateCaptive.js': 'WB14f\'s captive knight of the Covenant - Daggerfall\'s Knight kneeling bowed in his chains, his hurt frame held, a pose no body lane stands (they walk, swing, flinch and fall), then standing free a minute in the ward\'s gold and gone; nobody strikes him',
   'src/scenes/wagon/wagonWardenShow.js': 'WARDEN1\'s thrower - a guard of the watch in the city guards\' picture with a wagon riding over its head (Mac: "lift the wagon/horse on top of their sprite"); a body has no lift to stand it in, and the watch\'s own guards stand in bodies (cityGuards.js)',
 });

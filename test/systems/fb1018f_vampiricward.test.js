@@ -2,8 +2,7 @@
 // you have a vampiric weapon to heal yourself during the breach run"). Vampiric Effect when strikes heals the wearer every
 // point a blow DEALS (systems/enchantments.js - VampiricEffect.cs; bible/05-Combat/Balance-Arc.md BAL7). A blow on a body a
 // referee holds is resolved against its stand-in, and a ward the referee keeps turns it whole - the stand-in says so
-// (`warded`: the Warden's ward and the Brass Remnant shut, scenes/dungeonContext.js gateBossBody; the Spire's turned blows,
-// scenes/eliteGates/egFight.js TURNED-BLOW). Every other heal and power of a landed blow already refused one (the leech since
+// (`warded`: the Warden's ward and the Brass Remnant shut, scenes/dungeonContext.js gateBossBody). Every other heal and power of a landed blow already refused one (the leech since
 // AUDIT WORLD-REWARDS B3); the payload alone healed the whole claim. Driven through the real payload dispatcher and the real
 // formula, on the real Legendary that carries it (Gortwog's Cleaver, systems/loot/lootRarity.js) against the Warden's own
 // stand-in (world/gate/gateBoss.js bossStandIn). On the code before the fix the warded blows heal their whole damage.
@@ -33,8 +32,7 @@ import { setPlayerDoor } from '../../src/systems/playerDoor.js';
 import { coilStacksAt, _resetSetPowersForTests, _setSetPowersClockForTests } from '../../src/systems/sigil/sigilSetPowers.js';
 import { setSigilOnline, setSigilRenown, _resetSigilForTests } from '../../src/systems/sigil/sigil.js';
 import { _resetSigilSetsForTests } from '../../src/systems/sigil/sigilSets.js';
-import { PANOPLY_SET_PIECES, SERPENT_SET_PIECES, mintAetheric } from '../../src/systems/aetheric.js';
-import { tellPlayerCast } from '../../src/systems/playerCasts.js';
+import { SERPENT_SET_PIECES, mintAetheric } from '../../src/systems/aetheric.js';
 import { equipItem } from '../../src/systems/equip.js';
 import { WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 
@@ -132,7 +130,7 @@ test('VAMPIRIC-WARD CAST WHEN STRIKES INTO A WARD (AUDIT FB1018f L3-2; CastWhenS
   assert.equal(b2.currentCondition, 100 - DURABILITY_LOSS_ON_STRIKE, 'and pays its 10');
 });
 
-test('VAMPIRIC-WARD THE SETS\' STRIKE INTO A WARD (AUDIT FB1018f L3-3; systems/sigil/sigilSetPowers.js setStrike, setBlow\'s own AUDIT SETS L4): through the real formula on the Warden\'s stand-in, warded - the Battlemage\'s Panoply returns no magicka of its armed cast and Sethrakul\'s Coilscale lays no Constrict on him; unwarded, both as they did (mutants: the sets\' strike blind to the ward)', () => {
+test('VAMPIRIC-WARD THE SETS\' STRIKE INTO A WARD (AUDIT FB1018f L3-3; systems/sigil/sigilSetPowers.js setStrike, setBlow\'s own AUDIT SETS L4): through the real formula on the Warden\'s stand-in, warded - Sethrakul\'s Coilscale lays no Constrict on him; unwarded, as it did (mutants: the sets\' strike blind to the ward)', () => {
   const stats = () => ({ strength: 75, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 });
   const player = () => ({ isPlayer: true, items: [], stats: stats(), skills: new Array(35).fill(60), skillUses: new Array(35).fill(0), level: 30, career: {}, activeEffects: [], health: 100, maxHealth: 100, magicka: 0, maxMagicka: 1000, armorValues: new Array(7).fill(100) });
   const wear = (pieces) => { const e = player(); for (const r of pieces.slice(0, 4)) { const it = mintAetheric(r); e.items.push(it); equipItem(e, it); } return e; };
@@ -146,13 +144,6 @@ test('VAMPIRIC-WARD THE SETS\' STRIKE INTO A WARD (AUDIT FB1018f L3-3; systems/s
       _resetSetPowersForTests(); _setSetPowersClockForTests(() => T0);
       const warden = bossStandIn(bossLookOf('warden'), 'The Warden');
       warden.warded = warded;
-      const e = wear(PANOPLY_SET_PIECES);
-      setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => e });
-      tellPlayerCast(e, { name: 'Fireball', element: 0 }, 400);
-      blows(e, warden, 10);
-      if (warded) assert.equal(e.magicka, 0, 'the Discipline: no magicka back off his ward');
-      else assert.ok(e.magicka > 0, `the Discipline returns ${e.magicka} off blows that land`);
-      _resetSetPowersForTests(); _setSetPowersClockForTests(() => T0);
       const c = wear(SERPENT_SET_PIECES);
       setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => c });
       blows(c, warden, 5);

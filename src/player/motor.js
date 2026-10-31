@@ -58,8 +58,8 @@ export const SYSTEM_TIMER_UPDATES_DIVISOR = 0.0549254;
 // on landing (CheckFallingDamage: damage past 5, a hard-fall alert
 // past 2.5 - the HOST applies HP/sounds; PlayerHealth does in DFU).
 export const GROUNDED_JUMP_GATE_S = 0.1;
-// EG-H2 (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 10.8, THE FORGIVENESS - a departure from DFU, Ledger A):
-// in an Elite Breach's halls a jump pressed up to the buffer before landing fires ON landing (the 0.1 s gate above
+// THE FORGIVENESS (a departure from DFU, Ledger A): where the made level asks for it, a jump pressed up to the buffer
+// before landing fires ON landing (the 0.1 s gate above
 // swallowed it, and chained Beats and Crumbles ate presses), and a plain jump pressed up to the late press after walking
 // off an edge still leaps (the parkour's PARKOUR_COYOTE_S covers only the running leap). Seconds, asked of the world
 // host every step (the made level's law - systems/madeLevel.js `jumpBuffer`, `latePress`): none registered, or 0, is
@@ -72,18 +72,6 @@ export function registerJumpForgiveness(buffer, late) {
 }
 /** A word read as seconds in [0, 0.5] - one that throws, or is no number, forgives nothing. */
 const jumpForgiven = (fn) => { if (!fn) return 0; try { const v = Number(fn()); return Number.isFinite(v) ? Math.max(0, Math.min(0.5, v)) : 0; } catch { return 0; } };
-// EG-ZR (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 15 - Fleetfoot: "run speed +4 / 7 / 10%", the holder's
-// client's; a departure from DFU, Ledger A): THE RUN'S SPEED MODIFIERS - a named registry beside the walk's one (DW-D's
-// swim scale): `fn() -> multiplier` on the run on foot (a mount's canter is the horse's pace - STEED1's - never its
-// rider's run), read every step. None registered, or each answering 1 (or no number), is DFU's run exactly.
-const _runMods = new Map();
-export function registerRunSpeedMod(name, fn) { if (typeof fn === 'function') _runMods.set(name, fn); else _runMods.delete(name); }
-/** The run's multiplier now - the product of every modifier's positive number (one that throws is none). */
-export function runSpeedMult() {
-  let k = 1;
-  for (const fn of _runMods.values()) { try { const v = Number(fn()); if (Number.isFinite(v) && v > 0) k *= v; } catch { /* a Vestige is not the step's problem */ } }
-  return k;
-}
 // HOTFIX 2026-08-17 (live mobile report: "jumping has me go in the
 // air but instantly snaps me to the ground"): the motor integrated
 // with RAW RENDER dt - DFU's physics runs in Unity's FixedUpdate at
@@ -590,9 +578,9 @@ export class PlayerMotor {
     this.velY = 0;
     this.grounded = false;
     this.groundedTime = 0;         // PlayerMotor.GroundedTime (the 0.1 s jump gate reads it)
-    this._jfBuf = Infinity;        // EG-H2 (THE FORGIVENESS): seconds since a fresh Jump pressed in the air (Infinity: none waiting)
-    this._jfAir = Infinity;        // EG-H2: seconds since the feet last stood (Infinity: they have not yet)
-    this._jfWas = false;           // EG-H2: the Jump key's last step, for the press's edge (its own - the parkour lane keeps one too)
+    this._jfBuf = Infinity;        // THE FORGIVENESS: seconds since a fresh Jump pressed in the air (Infinity: none waiting)
+    this._jfAir = Infinity;        // THE FORGIVENESS: seconds since the feet last stood (Infinity: they have not yet)
+    this._jfWas = false;           // THE FORGIVENESS: the Jump key's last step, for the press's edge (its own - the parkour lane keeps one too)
     this.jumping = false;          // AcrobatMotor.Jumping: set at jump, cleared on the next grounded frame
     this.falling = false;          // AcrobatMotor.Falling (CheckInitFall / CheckFallingDamage)
     // PlayerMotor.CancelMovement: raised by the swim/levitate edges
@@ -2490,8 +2478,8 @@ export class PlayerMotor {
 
   /** AUDIT CLIMB-ARC L8: a leap where the plain jump would go - never under slowfall (HandleJumpInput's cancel, which
    *  the leaps had bypassed: a jump on the spot billed, a late press 117 m out) nor wading outdoor water (its other).
-   *  EG-PERFECT (2026-10-18; bible/11-Multiplayer/Elite-Gates.md section 10.5): nor where the parkour's deps say no leap
-   *  (`leap` - scenes/shared.js parkourDeps, the made level's `runLeap`): the Spire's spans and the Hour's Steps are proven
+   *  Nor where the parkour's deps say no leap
+   *  (`leap` - scenes/shared.js parkourDeps, the made level's `runLeap`): the Hour's Steps are proven
    *  gap by gap with the plain running jump, and the leap (~3.9 m at Jumping 0, ~8.4 m at Jumping 100) flew past the
    *  platform it lands on. Refused, the press is the plain jump (the late press the made level's own forgiveness); the wall
    *  run, the mantle, the vault and the climb are untouched. Deps with no word leap as before. */
@@ -3265,7 +3253,6 @@ export class PlayerMotor {
     if (this.isRunning) {
       speed = runSpeed(this.stats.speed, this.stats.running, this.crouching, rideBase);
       if (rideBase != null) speed *= this._rideScale();   // STEED1: a gallop at the horse's own pace
-      else if (_runMods.size) speed *= runSpeedMult();   // EG-ZR: the run's modifiers - Fleetfoot's, in an Elite Breach
     } else {
       // ApplyInputSpeedAdjustment (:127-133): the SNEAK arm subtracts
       // from whatever GetBaseSpeed returned - including the RIDE base.
@@ -3410,9 +3397,9 @@ export class PlayerMotor {
     // JUMP-SLOW (FIELD BUGS 2026-10-11b, Mac: "Give the jump back"; a departure, Port-Ledger A): DFU's IsSlowFalling
     // clause of this cancel (AcrobatMotor.cs:68) is dropped - the rise is the jump's, and the spell's 2.1 m/s takes the
     // descent from the apex (ApplyGravity below). Still ground-gated (0.1 s): no jump from the air, so no climbing on air.
-    // EG-H2 (THE FORGIVENESS, above): the buffer - a fresh press in the air, landed within it, fires on the landing; the
+    // THE FORGIVENESS (above): the buffer - a fresh press in the air, landed within it, fires on the landing; the
     // late press - a fresh press within it of walking off an edge (no jump of its own) leaps as from the edge. Both 0
-    // outside an Elite Breach, and the gate below is DFU's verbatim.
+    // where the made level names none, and the gate below is DFU's verbatim.
     const fBuf = jumpForgiven(_jfBufferOf), fLate = jumpForgiven(_jfLateOf);
     const jFresh = !!input.jump && !this._jfWas;
     this._jfWas = !!input.jump;
@@ -3437,7 +3424,7 @@ export class PlayerMotor {
       this.groundedTime = 0;
       this.jumping = true;
       this.jumped = true;   // P11: the fatigue/tally consumer reads this frame flag
-      this._jfBuf = Infinity;   // EG-H2: the press spent (a jump's own fall owes no late press: `jLate` asks it is no jump's)
+      this._jfBuf = Infinity;   // THE FORGIVENESS: the press spent (a jump's own fall owes no late press: `jLate` asks it is no jump's)
     }
     this._airVelX = vx;
     this._airVelZ = vz;

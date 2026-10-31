@@ -23,9 +23,6 @@ import { createSdClaims } from '../../../src/net/superDungeon/sdClaims.js';
 import { mintSdReceipt } from '../../../src/net/superDungeon/sdReceipt.js';
 import { createSerpentClaims } from '../../../src/net/serpent/serpentClaims.js';
 import { mintSerpentReceipt } from '../../../src/net/serpent/serpentReceipt.js';
-import { createEgClient } from '../../../src/scenes/eliteGates/egClient.js';
-import { mintEgReceipt } from '../../../src/net/eliteGates/egReceipt.js';
-import { validEgOut, SOCIAL_ROOM } from '../../../src/net/wire.js';
 import { createProfBook, PROF_KEPT_KEY } from '../../../src/net/profBook.js';
 import { recipeById } from '../../../src/net/recipeLaw.js';
 import { createArenaBouts } from '../../../src/scenes/arena/arenaBouts.js';
@@ -138,10 +135,9 @@ test('QL11 the kinds: ACT_IDS is the leaf\'s keys, frozen; each kind lower-case 
   assert.ok(Object.isFrozen(ACT_KINDS) && Object.isFrozen(ACT_IDS));
   for (const k of ACT_IDS) assert.match(k, /^[a-z]+(-[a-z]+)*$/, k);
   for (const k of ACT_IDS) assert.ok(typeof ACT_KINDS[k] === 'string' && ACT_KINDS[k].length > 0, `${k} has its family`);
-  assert.equal(ACT_IDS.length, 24);   // PIN MOVED (STAR8): and star-held, a fallen star held; PIN MOVED (AUDIT STAR8 T1): and wyrd-met, a Wyrd Sister's window; PIN MOVED (T-A): and heart-star-held, the Heart-Star held
+  assert.equal(ACT_IDS.length, 22);   // PIN MOVED (Elite Gates removed): redoubt-taken and valkynaz-felled gone; PIN MOVED (STAR8): and star-held, a fallen star held; PIN MOVED (AUDIT STAR8 T1): and wyrd-met, a Wyrd Sister's window; PIN MOVED (T-A): and heart-star-held, the Heart-Star held
   assert.equal(ACT_KINDS['heart-star-held'], ACT_KINDS['star-held'], 'T-A: the Heart-Star\'s act the endgame\'s, as its star\'s - one family, so the festival\'s finds hear the two as one deed');
   assert.ok(!Object.hasOwn(ACT_KINDS, 'wagon-hauled'), 'no feature sells a wagon\'s load (qlActs.js says why)');
-  assert.ok(Object.hasOwn(ACT_KINDS, 'valkynaz-felled'), 'the Weir Road\'s third step waits on it');
 });
 
 // ── THE LEAF'S LAW ─────────────────────────────────────────────
@@ -410,38 +406,6 @@ test('QL11 serpent-slain (net/serpent/serpentClaims.js): said off a serpent rece
     assert.deepEqual(await added(before), [], 'counted before: no act');
     guest = true;
     assert.deepEqual(await added(await serpent(903)), [], 'a guest\'s: kept, not counted');
-  } finally { done(); }
-});
-
-test('QL11 redoubt-taken and valkynaz-felled (scenes/eliteGates/egClient.js redoubtActs, off this screen\'s claim loop): a Redoubt receipt the service counted (`recorded`) - every fifth Court\'s a Valkynaz\'s besides; a Rehearsal\'s, one answered `again` (counted before), none (mutants: ACTS M1 a Valkynaz\'s on every Redoubt; the Rehearsal counted; a re-claim counted)', async (t) => {
-  let clock = T0S * 1000;
-  t.mock.method(Date, 'now', () => clock);
-  const B = '0123456789abcdef', ME = 'acct-mac';
-  const answers = [];
-  const mem = new Map();
-  const store = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => { mem.set(k, String(v)); }, removeItem: (k) => mem.delete(k) };
-  const modes = { mode: 'exterior', stepping: false, egHallBreach: () => null, egHallCircle: () => null, stepThroughFire: async () => true, enterEgHall: () => true };
-  const account = { me: () => ME, guest: () => false, keys: async () => ({ ok: false }), claim: async () => answers.shift() ?? { ok: false, error: 'offline' } };
-  // the rig of test/net/eliteGates/egaudit4_net_client.test.js: this screen's client on open ground, every door a stand-in
-  const client = createEgClient({ modes: () => modes, online: () => ({ sendEg: () => true }), hub: () => ({ egOk: true, sendEg: () => true }), account, now: () => clock,
-    entity: { level: 20, health: 100, maxHealth: 100, items: [] }, player: { pos: [0, 0, 0] }, cam: { pos: [0, 0, 0], yaw: 0 }, say: () => {}, site: () => ({}),
-    wire: () => ({ px: 300, py: 200, x: 1000, y: 0, z: 2000, yaw: 0 }), landAt: () => true, hurt: () => {}, store, paid: () => {},
-    callPortal: { open: () => ({ at: [0, 0, 0] }), clear: () => {}, tick: () => {}, standing: () => false }, feet: () => [0, 0, 0] });
-  const redoubt = (w, o = {}) => mintEgReceipt({ q: 'w', b: B, s: ME, z: 'z'.repeat(20), c: 7, w, h: 5 * w, t: 600, n: 1, ew: 0, l: 20, ...o }, null, { subtle: SUBTLE, nowS: T0S });
-  const claimed = async (r, data) => {
-    heard.length = 0;
-    answers.push({ ok: true, data: { q: 'w', b: B, keys: 0, paid: true, ...data } });
-    client.word(validEgOut({ k: 'rcpt', r }), SOCIAL_ROOM);
-    await settled();
-    assert.equal(answers.length, 0, 'claimed');
-    return kinds();
-  };
-  listen();
-  try {
-    assert.deepEqual(await claimed(await redoubt(4), { recorded: true, w: 4 }), ['redoubt-taken']);
-    assert.deepEqual(await claimed(await redoubt(5), { recorded: true, w: 5 }), ['redoubt-taken', 'valkynaz-felled'], 'the fifth Court: a Valkynaz\'s');
-    assert.deepEqual(await claimed(await redoubt(10, { rh: 1 }), { recorded: true, w: 10 }), [], 'a Rehearsal\'s is practice');
-    assert.deepEqual(await claimed(await redoubt(15), { recorded: false, again: true, w: 15 }), [], 'answered `again`: counted before');
   } finally { done(); }
 });
 

@@ -10,24 +10,20 @@
 // place, and the list is rebuilt only when a row starts, ends or arrives (a live window, the world running under it).
 //
 // TIMERS2 (2026-10-22, the owner: "organize the timer system in the pause menu"): THE WINDOW IN GROUPS. The rows stand
-// under what they are - World events, the Battlespire, Town raids, Seats and battles, Resets (eventTimers.js
+// under what they are - World events, Town raids, Seats and battles, Resets (eventTimers.js
 // TIMER_GROUPS) - each group's head saying how many of its rows are under way, and a row under way wears its own "Now"
-// above its countdown. A bar of buttons over the list shows every group or one alone (All, World, Spire, Raids, Seats,
+// above its countdown. A bar of buttons over the list shows every group or one alone (All, World, Raids, Seats,
 // Resets - a group with no row has no button), kept while the game runs; a group that empties hands the list back to All,
 // and All is the choice then. The window stands at one height and its list scrolls under the bar (AUDIT TIMERS2 H1, M6).
 import { eventTimerRows, timerText, localWhenText, timerGroups } from '../../systems/eventTimers.js';
 import { t } from '../../systems/textManager.js';   // TIMERS2: the groups' words in the player's language
 
-/** EG-ZM: a row's door (systems/eventTimers.js `door`) -> its button's words. */
-export const TIMER_DOOR_TEXT = Object.freeze({ board: 'Boards' });
-
 /** A row's kind -> its marker class (colour in the sheet). */
-export const TIMER_KINDS = Object.freeze(['gate', 'serpent', 'super', 'star', 'elite', 'raid', 'battle', 'seat', 'reset']);   // SERPENT-TIMERS: the sea serpent's; SD2c: the Super dungeon's, once found; STAR6: a fallen star's; TIMERS2: the Elite Breach's, in its arch's gold (it drew in no colour)
+export const TIMER_KINDS = Object.freeze(['gate', 'serpent', 'super', 'star', 'raid', 'battle', 'seat', 'reset']);   // SERPENT-TIMERS: the sea serpent's; SD2c: the Super dungeon's, once found; STAR6: a fallen star's
 
 /** TIMERS2: a group's head (its title) and its button in the bar (a short word), in the player's language. */
 export const timerGroupTitle = (id) => ({
   world: () => t('timers.group.world', 'World events'),
-  spire: () => t('timers.group.spire', 'The Battlespire'),
   raids: () => t('timers.group.raids', 'Town raids'),
   seats: () => t('timers.group.seats', 'Seats and battles'),
   resets: () => t('timers.group.resets', 'Resets'),
@@ -35,7 +31,6 @@ export const timerGroupTitle = (id) => ({
 export const timerGroupChip = (id) => ({
   all: () => t('timers.chip.all', 'All'),
   world: () => t('timers.chip.world', 'World'),
-  spire: () => t('timers.chip.spire', 'Spire'),
   raids: () => t('timers.chip.raids', 'Raids'),
   seats: () => t('timers.chip.seats', 'Seats'),
   resets: () => t('timers.chip.resets', 'Resets'),
@@ -91,14 +86,12 @@ export function anchorBeside(mark, profile, host, gap = 10) {
 /**
  * The window. `read()` answers the host's live source for eventTimerRows - { now, gate, seats, zero, raids } with
  * `now` the relay's clock - or null when there is none (offline). Returns { root, stop }: the caller stops the tick
- * when the window goes (a render, an unmount). EG-ZM: a row with a door (`door` - the boards' on an Elite row) carries
- * its button, which hands the source's own door (`doors[door]`, read at the press) to `door(fn)` - the caller's way of
- * opening it (the pause face hands its place on first). TIMERS2: `group` the group it opens on ('all', or a
+ * when the window goes (a render, an unmount). TIMERS2: `group` the group it opens on ('all', or a
  * TIMER_GROUPS id) - the one last shown when unsaid.
  * @param {Document} doc
- * @param {{ read: () => any, onClose: () => void, every?: number, door?: (fn: () => any) => any, group?: string, focus?: boolean }} o
+ * @param {{ read: () => any, onClose: () => void, every?: number, group?: string, focus?: boolean }} o
  */
-export function timersWindow(doc, { read, onClose, every = 1000, door = (fn) => fn(), group = shownGroup, focus = true }) {
+export function timersWindow(doc, { read, onClose, every = 1000, group = shownGroup, focus = true }) {
   const el = (tag, cls, text) => {
     const n = doc.createElement(tag);
     if (cls) n.className = cls;
@@ -188,7 +181,7 @@ export function timersWindow(doc, { read, onClose, every = 1000, door = (fn) => 
     for (const { id, n, live } of counts) { const c = chips.get(id); if (c) chipSay(c, id, n, live); }
     const shown = showing === 'all' ? groups : groups.filter((g) => g.id === showing);
     // A cleared raid can change only the detail count while the displayed raid stays the same.
-    const nextShape = JSON.stringify([showing, shown.map((g) => [g.id, g.live, g.rows.map((r) => [r.id, r.live, r.title, r.where, r.detail, r.door ?? null])])]);
+    const nextShape = JSON.stringify([showing, shown.map((g) => [g.id, g.live, g.rows.map((r) => [r.id, r.live, r.title, r.where, r.detail])])]);
     if (nextShape !== shape) {
       shape = nextShape;
       cells = new Map();
@@ -215,15 +208,6 @@ export function timersWindow(doc, { read, onClose, every = 1000, door = (fn) => 
           if (r.live) clock.append(el('span', 'tm-badge', t('timers.now', 'Now')));
           clock.append(count, when);
           row.append(text, clock);
-          // EG-ZM (Elite-Gates.md section 20): the row's door - a button as the window's Close is, so a press, a tap and the
-          // pad's walk reach it alike; the source's door is read at the press, never kept from the draw
-          if (TIMER_DOOR_TEXT[r.door]) {
-            const go = el('button', 'act tm-door', TIMER_DOOR_TEXT[r.door]);
-            /** @type {any} */ (go).type = 'button';
-            const which = r.door;
-            go.addEventListener('click', () => { const fn = read()?.doors?.[which]; if (typeof fn === 'function') door(fn); });
-            row.append(go);
-          }
           list.append(row);
           cells.set(r.id, { count, when });
         }

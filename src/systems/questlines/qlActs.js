@@ -43,8 +43,6 @@ export const ACT_KINDS = Object.freeze({
   'rite-broken': 'endgame',   // Dagon's Faithful's rite broken before the breach opened
   'breach-closed': 'endgame',   // a Dagon's Breach closed
   'elite-foe-slain': 'endgame',   // an elite foe slain in an Elite Dungeon
-  'redoubt-taken': 'endgame',   // a Redoubt taken in an Elite Breach
-  'valkynaz-felled': 'endgame',   // a Valkynaz's Redoubt taken in an Elite Breach
   'hour-broken': 'endgame',   // the Brass Remnant broken in the Shattered Hour
   'serpent-slain': 'endgame',   // the Sea Serpent slain
   'star-held': 'endgame',   // a fallen star held through its master's fall (the Starfall - STAR8)

@@ -60,7 +60,7 @@ export const SERPENT_GILDED_CHANCE = 1 / 250;
 /** GILDED2: DRAGONFIRE - the Dragonfire Oath's power (systems/loot/lootPowers.js, kind 'dragonfire'). A landed blow on a foe of
  *  `group` burns it again for `share`% of the blow, and every OTHER foe of it within `metres` for as much - Akatosh's fire,
  *  which no Daedra resists (no element's share is taken of it). AUDIT WORLD-REWARDS B1: the struck one's burn is what
- *  reaches a body the relay runs (the gate's Warden and his host, an Elite Gate's legion) - owed to its blow's own claim,
+ *  reaches a body the relay runs (the gate's Warden and his host) - owed to its blow's own claim,
  *  as Open Hand's second blow is (playerDoor.js oweFoe); the burst on the others reaches only the foes the world runs.
  *  Read once at import, frozen. */
 export const DRAGONFIRE = Object.freeze({

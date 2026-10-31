@@ -5,8 +5,7 @@
 // bible/11-Multiplayer/Starfall.md section 8. Its reading is the law's (systems/starfall/starfallClient.js
 // starTrackerModel); this is the node.
 //
-// MADE ONCE AND UPDATED, never rebuilt: each part written only when what it says changes (the Elite Breach's tracker's
-// law, ui/eliteGates/egHud.js). DRESSED IN EVERY SKIN, as the gate's bar is - a fight is read whatever skin is worn: under
+// MADE ONCE AND UPDATED, never rebuilt: each part written only when what it says changes. DRESSED IN EVERY SKIN, as the gate's bar is - a fight is read whatever skin is worn: under
 // Enhanced Plus the kit's panel (ui/enhanced/enhancedFrame.js FRAME_ROLES, `body .star-hud`), on the classic skin the
 // kit's own rules cut to it (scopeRules).
 //

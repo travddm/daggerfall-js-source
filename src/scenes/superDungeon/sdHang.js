@@ -31,7 +31,7 @@ export const SD_FAR_TURNS = -1;
 /**
  * THE HANG'S SET: `renderer` makes and frees its meshes; `clock()` the realm's anchored seconds (the dungeon host's
  * sdEndClock - every screen's chains and gears tick together); `lite` the phones' tier; EG-H3 (EG4): `course` the course
- * whose checkpoints hang as the steps' islands (net/eliteGates/egSpanLaw.js courseOf's record - the Hour's by default).
+ * whose checkpoints hang as the steps' islands (net/superDungeon/egSpanLaw.js courseOf's record - the Hour's by default).
  * @param {{ renderer?: any, clock?: () => number, lite?: boolean, course?: any }} deps
  */
 export function createSdHang({ renderer = null, clock = () => performance.now() / 1000, lite = isTouchDevice(), course = SD_COURSE } = {}) {

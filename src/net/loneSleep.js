@@ -149,8 +149,8 @@ function poseAhead(s, ws, send) {
   if (!pose || s._dead) return;
   const mine = ws === s._ws, last = mine ? s._lastSent : s._haloPosed.get(ws);
   if (last && last.x === pose.x && last.z === pose.z && (last.mv | 0) === (pose.mv | 0)) return;
-  const pl = s.poseRide?.() ?? null, ab = s.poseAboard?.() ?? null, now = s._now();
-  const out = { ...pose, ...(pl ? { pl } : {}), ...(ab ? { ab } : {}), ts: s._stampTs() };
+  const ab = s.poseAboard?.() ?? null, now = s._now();
+  const out = { ...pose, ...(ab ? { ab } : {}), ts: s._stampTs() };
   try { send(JSON.stringify({ t: 'pose', p: out })); } catch { return; }
   s.stats.sent++;
   if (mine) { s._lastSent = { ...pose }; s._lastSentAt = now; s.stats.poses++; } else s._haloPosed.set(ws, { x: out.x, z: out.z, mv: out.mv | 0, at: now });

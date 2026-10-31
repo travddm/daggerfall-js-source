@@ -112,7 +112,7 @@ export const SD_HAND_FLASH_OUT = 1.2;
  * (null out of the Hour), `shake(k)` the camera's door, `arrived()` (SD-LOOK S6) told as my feet first stand on the
  * Threshold - the way back's ring turns once - and `ready()` whether the arrival can be seen yet (AUDIT SD V S5: the veil
  * opened - the exhale was spent under it). EG-H3 (EG4): `course` the course whose checkpoints the rewind reads (the Hour's
- * by default - net/eliteGates/egSpanLaw.js courseOf's record).
+ * by default - net/superDungeon/egSpanLaw.js courseOf's record).
  * @param {{ link: any, feet?: () => (number[] | null), shake?: (k: number) => void, arrived?: () => void, ready?: () => boolean, course?: any }} deps
  */
 export function createSdFx({ link, feet = () => null, shake = () => {}, arrived = () => {}, ready = () => true, course = SD_COURSE }) {

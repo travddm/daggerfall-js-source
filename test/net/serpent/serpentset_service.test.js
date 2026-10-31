@@ -42,7 +42,7 @@ async function stand(extra = {}) {
 test('SERPENT-SET the law: a serpent strikes 40 silver, a ship that stood half; it is a combat faucet, under the day\'s 150 with the gates and the raids - the ceiling unmoved; its line a mint (mutants: the amount; the stood share; the cap\'s kinds)', () => {
   assert.deepEqual(MARKS_FAUCETS.serpent, { amount: 40, stood: 0.5 });
   assert.deepEqual([serpentStrikeOf('dealt'), serpentStrikeOf('stood'), serpentStrikeOf(undefined)], [40, 20, 40]);
-  assert.deepEqual(MARKS_COMBAT, { kinds: ['gate', 'raid', 'serpent', 'eg', 'star'], perDay: 150 });   // PIN MOVED (STAR7): a fallen star held strikes under the same cap; PIN MOVED (EG-E1): the Spire's Redoubts under the same cap, the ceiling unmoved
+  assert.deepEqual(MARKS_COMBAT, { kinds: ['gate', 'raid', 'serpent', 'star'], perDay: 150 });   // PIN MOVED (STAR7): a fallen star held strikes under the same cap
   assert.equal(SERPENT_EMBERS, 1);
 });
 

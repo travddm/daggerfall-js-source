@@ -71,7 +71,7 @@ export function weaponClimb(entity, skill, { online = isOnlinePage() } = {}) {
 
 /** The struck foe's share of its health - null where this machine cannot know it: a body the relay runs, its health here
  *  a placeholder nothing empties (world/gate/gateBoss.js bossStandIn `relayHealth` - the Warden, his crystals and host,
- *  the Remnant, the Elite Gates' court, the sea serpent), with no word of its own heard. AUDIT MARTIAL L3 F2: read as
+ *  the Remnant, the sea serpent), with no word of its own heard. AUDIT MARTIAL L3 F2: read as
  *  full, the hammer took its x1.8 on every blow of a boss fight and the axe never its own. FIELD BUGS 2026-10-18f
  *  RELAY-SHARE: the one law (combat/healthShare.js) - such a body now reads the relay's own word of its health (its
  *  stand-in's owner's reader), so each half pays its own there too, and the mean only where no word is heard. */

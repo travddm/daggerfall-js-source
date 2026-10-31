@@ -15,12 +15,9 @@ import { EVENT_GROUND_M, setEventGround, eventGroundAt, groundNear } from '../..
 import { createGatePool } from '../../src/scenes/gate/gatePool.js';
 import { gateTimes, GATE_RISE_MS } from '../../src/net/gate/gateLaw.js';
 import { createPortalGates } from '../../src/scenes/portalGates.js';
-import { createEgCallPortal } from '../../src/scenes/eliteGates/egCall.js';
 import { portalPlace, portalStonePlace, PORTAL_TEXT } from '../../src/systems/portalStone.js';
 import { createHorseCartPool } from '../../src/scenes/horseCartPool.js';
 import { HCC_WIRE_KIND } from '../../src/systems/horse/horseCartWire.js';
-import { createEgArchPool } from '../../src/scenes/eliteGates/egArch.js';
-import { signEgCall } from '../../src/net/eliteGates/egCallSig.js';
 import { createStarfallHost } from '../../src/scenes/starfall/starfallHost.js';
 import { starNightAt, starTimes, STAR_LIFE_MS } from '../../src/net/starfall/starfallLaw.js';
 import { STAR_COVENS, starCovenOf } from '../../src/systems/starfall/starfallCovens.js';
@@ -75,7 +72,7 @@ test('RPT1026-EVENTS GATE-WAY THE GATE\'S GROUND: the real gate pool says its ga
   } finally { setEventGround('gate', null); }
 });
 
-test('RPT1026-EVENTS GATE-WAY THE PICK: a Portal Stone\'s portal is refused before a standing gate - `event`, nothing spent, its line said - and stands where it stood before past the ground; an Elite Breach\'s call opens its own as ever (mutants: the stone\'s pick unasked)', () => {
+test('RPT1026-EVENTS GATE-WAY THE PICK: a Portal Stone\'s portal is refused before a standing gate - `event`, nothing spent, its line said - and stands where it stood before past the ground (mutants: the stone\'s pick unasked)', () => {
   const W = gateWorld('sealed');
   try {
     const ground = () => 1, probes = { ground };
@@ -83,11 +80,11 @@ test('RPT1026-EVENTS GATE-WAY THE PICK: a Portal Stone\'s portal is refused befo
     assert.deepEqual(near, { refused: 'event' }, 'two metres on from ten off the gate: on its ground');
     assert.ok(PORTAL_TEXT.event.length > 0 && PORTAL_TEXT[near.refused] === PORTAL_TEXT.event, 'the line the host says (world.js standPortal: PORTAL_TEXT[place.refused])');
     assert.ok(portalStonePlace(off(W.foot, 60, 1), 0, probes).at, 'past the ground: placed');
-    assert.ok(portalPlace(off(W.foot, 10, 1), 0, probes).at, 'the place law itself unchanged - the call\'s portal is the way in');
+    assert.ok(portalPlace(off(W.foot, 10, 1), 0, probes).at, 'the place law itself unchanged');
   } finally { setEventGround('gate', null); }
 });
 
-test('RPT1026-EVENTS GATE-WAY A PEER\'S PORTAL: a word of one on a standing gate\'s ground is not believed; one already standing when the gate rises beside it closes and takes nobody stepping in; past the ground a peer\'s stands; the Elite call\'s pool keeps its own there (mutants: the peer\'s word believed; the standing one left open)', () => {
+test('RPT1026-EVENTS GATE-WAY A PEER\'S PORTAL: a word of one on a standing gate\'s ground is not believed; one already standing when the gate rises beside it closes and takes nobody stepping in; past the ground a peer\'s stands (mutants: the peer\'s word believed; the standing one left open)', () => {
   const W = gateWorld(null);
   let now = 1000;
   const entered = [];
@@ -111,11 +108,6 @@ test('RPT1026-EVENTS GATE-WAY A PEER\'S PORTAL: a word of one on a standing gate
     const opener3 = createPortalGates({ now: () => now });
     opener3.open(off(W.foot, 70, 0), { pixel: { x: 40, y: 40 }, name: 'Wayrest' });
     assert.equal(gates.applyOwner('p3', opener3.wireRecord(off(W.foot, 69, 0)), off(W.foot, 69, 0)), true, 'past it: believed');
-    // the Elite call's own portal, opened on the ground, stands - it is the way into an event
-    const call = createEgCallPortal({ now: () => now });
-    assert.ok(call.open(off(W.foot, 5, 0), 0, { ground: () => 1 }).at, 'opened');
-    call.tick(off(W.foot, 30, 0));
-    assert.equal(call.standing(), true, 'and kept');
   } finally { setEventGround('gate', null); }
 });
 
@@ -143,29 +135,6 @@ test('RPT1026-EVENTS GATE-WAY A CARAVAN IN THE GATE: another player\'s wagon par
     assert.equal(pool.teamOf('griefer').length, 0, 'no team stood for it');
     assert.equal(pool.peers.get('griefer').offGround, true);
   } finally { setEventGround('gate', null); }
-});
-
-test('RPT1026-EVENTS GATE-WAY AN ELITE BREACH\'S ARCH: the real arch pool says the foot of every arch it stands - the company\'s, from the hub\'s signed call - and nothing once there is none (mutants: the arches never said)', async () => {
-  const { subtle } = globalThis.crypto;
-  const T0 = 1_800_000_000_000, B = '0123456789abcdef', ME = 'acct-mac', SITE = { px: 300, py: 200, x: 409.6, y: 0, z: 380, yaw: 0 };
-  const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
-  let clock = T0;
-  const pool = createEgArchPool({
-    renderer: { createMesh: (m) => ({ m }), uploadTexture() {}, uploadEmissionTexture() {}, drawMesh() {} },
-    collider: () => ({ addMesh() {}, removeBucket() {} }),
-    pixelTranslation: () => [0, 0, 0], heightAt: () => 0, now: () => clock, feet: () => [409.6, 0, 360], me: () => ME,
-    say: () => {}, onStep: () => {}, verifyKey: async () => kp.publicKey,
-  });
-  try {
-    assert.equal(eventGroundAt([409.6, 0, 380]), null, 'no arch: no ground');
-    pool.call({ b: B, o: 'Mac', os: ME, op: T0, ew: 0, site: SITE, co: [[ME, 'Mac', 1]], sg: await signEgCall({ b: B, o: 'Mac', os: ME, op: T0, ew: 0, site: SITE }, kp.privateKey, { subtle }) });
-    clock = T0 + 30_000;
-    pool.frame(0.016);
-    assert.deepEqual(pool.arches.get(B).place.origin, [409.6, 0, 380]);
-    assert.equal(eventGroundAt([409.6 + EVENT_GROUND_M - 1, 0, 380]), 'arch', 'its ground');
-    assert.equal(eventGroundAt([409.6 + EVENT_GROUND_M + 1, 0, 380]), null, 'past it');
-    assert.deepEqual(createPortalGates({ now: () => clock }).applyOwner('p1', (() => { const o = createPortalGates({ now: () => clock }); o.open([420, 0, 380], { pixel: { x: 40, y: 40 }, name: 'Wayrest' }); return o.wireRecord([420, 0, 380]); })(), [420, 0, 380]), false, 'a stranger\'s portal before the arch refused');
-  } finally { setEventGround('arch', null); }
 });
 
 /** Each coven's region 400 pixels in a block of its own, each pixel its own town's (test/scenes/starfall/star5_host.test.js's scan). */

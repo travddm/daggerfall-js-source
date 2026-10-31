@@ -9,7 +9,7 @@
 // THE SERVICE DECIDES WHAT IS HELD (server-account/src/titles.js titlesHeld, aurasHeld, iconsHeld, glyphsOf); this is the
 // same law said to a player. Where a number of the law is the client's too, it is read here (the Broker's and the Wyrd
 // Sister's prices, the Hearth Offerings' counts, the festival's dates, a questline's giver and level); where it is the
-// service's alone (a roll's odds, the Redoubts an honour asks), it is written here and test/ui/collections2.test.js
+// service's alone (a roll's odds), it is written here and test/ui/collections2.test.js
 // holds it to the service's own table, so the two cannot drift apart unnoticed.
 //
 // Pure but for the text core: no DOM. Not a DFU member - Daggerfall Unity has no accounts. Ledger A (COLLECTIONS-II).
@@ -35,7 +35,6 @@ const VOCABULARY = Object.freeze({ title: TITLES, aura: AURAS, icon: ICONS, glyp
 export const wordPair = (/** @type {string} */ id, /** @type {() => string} */ words) => /** @type {readonly [string, () => string]} */ (Object.freeze([id, words]));
 /** WHERE A THING COMES FROM, in the order the page lists them: what play earns first, what no play can earn last. */
 export const WARDROBE_SOURCES = Object.freeze([
-  wordPair('spire', () => t('coll.src.spire', 'The Elite Breach')),
   wordPair('abyss', () => t('coll.src.abyss', 'The Abyss Dungeons')),
   wordPair('serpent', () => t('coll.src.serpent', 'The Sea Serpent')),
   wordPair('broker', () => t('coll.src.broker', 'The Sigil Broker')),
@@ -108,10 +107,6 @@ export const AVAIL_LINE = Object.freeze({
 export const REMNANT_ODDS = Object.freeze({ hourbreaker: 4, turninghour: 8 });
 /** The Sea Serpent's (server-account/src/serpents.js SERPENT_TITLE_CHANCE, SERPENT_AURA_CHANCE): one in twenty, fifty. */
 export const SERPENT_ODDS = Object.freeze({ coilbreaker: 20, maelstrom: 50 });
-/** The Redoubt an Elite Breach honour asks (server-account/src/egHonours.js EG_REDOUBT_HONOURS, EG_UNFALLEN_REDOUBT). */
-export const REDOUBT_OF = Object.freeze({ spirewalker: 2, beaconlighter: 5, kynbane: 10, unfallen: 10, battlemage: 15, wellheadwalker: 20, beaconlight: 10, burningstair: 20 });
-/** A Descent bracket's companies that hold Spire Champion (egHonours.js EG_CHAMPIONS_TOP). */
-export const SPIRE_CHAMPIONS_TOP = 10;
 
 // ── the words of how ──────────────────────────────────────────────────────────────────────────────────────────────────
 const bestowed = () => t('coll.how.bestowed', 'Made for one player and granted to them by name.');
@@ -120,13 +115,11 @@ const patron = (/** @type {string} */ tier) => () => t('coll.how.patron', 'Suppo
 const apostle = () => t('coll.how.apostle', 'A Patreon reward with no tier to pledge yet - for now it is granted by name.');
 const developer = () => t('coll.how.developer', 'The game’s developers.');
 const dungeonMaster = () => t('coll.how.dungeonmaster', 'The game’s Dungeon Master, who may speak to chat in orange with /dm.');
-const broker = (/** @type {string} */ id) => () => t('coll.how.broker', 'Buy it from the Sigil Broker for {price} Deadlands Embers - won closing Dagon’s Breaches, slaying Sea Serpents and taking Elite Breach Redoubts.', { price: insigniaById(id)?.price ?? 0 });   // AUDIT COLLECTIONS-II (lane 1): every ember the purse counts (accounts.js EMBERS_EARNED_SQL)
+const broker = (/** @type {string} */ id) => () => t('coll.how.broker', 'Buy it from the Sigil Broker for {price} Deadlands Embers - won closing Dagon’s Breaches and slaying Sea Serpents.', { price: insigniaById(id)?.price ?? 0 });   // AUDIT COLLECTIONS-II (lane 1): every ember the purse counts (accounts.js EMBERS_EARNED_SQL)
 const wyrd = (/** @type {string} */ id) => () => t('coll.how.wyrdSister', 'Buy it from a Wyrd Sister for {price} Soul Cakes during the Witches’ Festival.', { price: wareById(id)?.price ?? 0 });
 const remnant = (/** @type {keyof typeof REMNANT_ODDS} */ k) => () => t('coll.how.remnant', 'A chance of one in {n} each time you help break the Brass Remnant in an Abyss Dungeon.', { n: REMNANT_ODDS[k] });
 const serpent = (/** @type {keyof typeof SERPENT_ODDS} */ k) => () => t('coll.how.serpent', 'A chance of one in {n} each time a Sea Serpent you fought is slain, if your own fire dealt a real share of your ship’s.', { n: SERPENT_ODDS[k] });   // AUDIT COLLECTIONS-II (lane 1): rolled a player, on a dealing claim alone (serpents.js)
-const redoubt = (/** @type {keyof typeof REDOUBT_OF} */ k) => () => t('coll.how.redoubt', 'Take Redoubt {n} or a deeper one in the Elite Breach (a Rehearsal does not count).', { n: REDOUBT_OF[k] });
 const hoursFirst = () => t('coll.how.hoursfirst', 'Granted by name to the first company to break an Abyss Dungeon.');
-const spireFirst = () => t('coll.how.spirefirst', 'Granted by name to the first company to take Redoubt 10.');
 const arenaTop = () => t('coll.how.arenachampion', 'Stand first on the Arena’s ranked board this season, with at least {bouts} rated bouts against {foes} different opponents.', { bouts: ARENA_CHAMPION_MIN_BOUTS, foes: ARENA_CHAMPION_MIN_FOES });
 /** AUDIT COLLECTIONS-II (lane 4): the crown's own row names its kingdom (the glyph's word, in the player's language) - a
  *  kingdom's English name inside a translated sentence was the one word the player's language could not have. */
@@ -160,7 +153,7 @@ const questline = (/** @type {string} */ title) => () => {
 /** @typedef {{ src: string, avail: string, how: () => string, look?: () => string, note?: () => string, with?: ReadonlyArray<string>, via?: string, scope?: string }} WardrobeEntry */
 /** One entry: `with` what comes beside it (`kind:key`, all of them each way); `via` the title whose holding it follows (High
  *  Master, only ever signed in a Chapter Master's place - never held, never worn, never counted on its own); `note` its
- *  own availability sentence where the kind's would mislead (Spire Champion); `scope: 'character'` a thing the
+ *  own availability sentence where the kind's would mislead; `scope: 'character'` a thing the
  *  character shows and the account never keeps (a seat's glyph) - its holding unknown to the page, never counted. */
 const E = (/** @type {string} */ src, /** @type {string} */ avail, /** @type {() => string} */ how, extra = {}) => Object.freeze({ src, avail, how, ...extra, ...(extra.with ? { with: Object.freeze([...extra.with]) } : {}) });
 
@@ -202,27 +195,9 @@ export const WARDROBE = Object.freeze({
     seasonmaster: E('chapters', 'dormant', () => t('coll.how.seasonmaster', 'Hold a chapter’s Master seat for a whole Season. Kept for good.')),
     ilovelamp: E('world', 'open', () => t('coll.how.ilovelamp', 'Speak with a shopkeeper who is a lamp.')),
     coilbreaker: E('serpent', 'chance', serpent('coilbreaker')),
-    spirewalker: E('spire', 'open', redoubt('spirewalker')),
-    beaconlighter: E('spire', 'open', redoubt('beaconlighter')),
-    kynbane: E('spire', 'open', redoubt('kynbane'), { with: ['aura:beaconlight'] }),
-    // AUDIT COLLECTIONS-II (lane 1): the fall is the member's own (egBrain.js, the `w` receipt's `fl` a member's falls), so
-    // the Unfallen is a player who never fell - never a company with no fall, as Elite-Gates.md section 19 had it
-    unfallen: E('spire', 'open', () => t('coll.how.unfallen', 'Take Redoubt {n} of the Elite Breach without falling yourself, in a breach begun at Hall 1 (a Rehearsal does not count).', { n: REDOUBT_OF.unfallen })),
-    lonebeacon: E('spire', 'open', () => t('coll.how.lonebeacon', 'Fell a Court alone while in a company of four or more in the Elite Breach (a Rehearsal does not count).')),
-    battlemage: E('spire', 'open', redoubt('battlemage')),
-    wellheadwalker: E('spire', 'open', redoubt('wellheadwalker'), { with: ['aura:burningstair'] }),
-    mastergallery: E('spire', 'open', () => t('coll.how.mastergallery', 'Win every feat against the lords of the Galleries in the Elite Breach (a Rehearsal does not count).')),
-    mastercairn: E('spire', 'open', () => t('coll.how.mastercairn', 'Win every feat against the lords of the Cairn in the Elite Breach (a Rehearsal does not count).')),
-    mastershade: E('spire', 'open', () => t('coll.how.mastershade', 'Win every feat against the lords of the Shade in the Elite Breach (a Rehearsal does not count).')),
-    masterwellhead: E('spire', 'open', () => t('coll.how.masterwellhead', 'Win every feat against the lords of the Wellhead in the Elite Breach (a Rehearsal does not count).')),
-    // AUDIT COLLECTIONS-II (lane 1): the last season's Descent's top tens, read whole and held through the season after
-    // (egHonours.js DESCENT_SQL: no Rehearsal, begun at Hall 1, no Wager) - nobody takes it mid-season
-    spirechampion: E('spire', 'ranked', () => t('coll.how.spirechampion', 'End a season in the top {n} companies of a Descent bracket on the Elite Breach’s boards - an unwagered breach begun at Hall 1, never a Rehearsal.', { n: SPIRE_CHAMPIONS_TOP }), { note: () => t('coll.availLine.spirechampion', 'Held through the whole season after the one you earned it in.') }),
-    spirefirst: E('spire', 'retired', spireFirst, { with: ['aura:firstlight'] }),
     wikimaid: E('bestowed', 'bestowed', bestowed, { with: ['aura:lilacwarren', 'glyph:wikimaid'] }),
     doorwarden: E('questlines', 'open', questline('doorwarden')),
     covenbane: E('questlines', 'open', questline('covenbane')),
-    weirwalker: E('questlines', 'open', questline('weirwalker')),
     hourwitness: E('questlines', 'open', questline('hourwitness')),
     satakalwitness: E('questlines', 'open', questline('satakalwitness')),
     starwarden: E('questlines', 'seasonal', questline('starwarden')),
@@ -247,9 +222,6 @@ export const WARDROBE = Object.freeze({
     turninghour: E('abyss', 'chance', remnant('turninghour'), { look: () => t('coll.look.turninghour', 'A turning wheel of brass gears and gold light.') }),
     firsthour: E('abyss', 'retired', hoursFirst, { with: ['title:hoursfirst'], look: () => t('coll.look.firsthour', 'The Turning Hour’s wheel in the light of the first dawn.') }),
     maelstrom: E('serpent', 'chance', serpent('maelstrom'), { look: () => t('coll.look.maelstrom', 'A whirlpool of tide and foam about your feet.') }),
-    beaconlight: E('spire', 'open', redoubt('beaconlight'), { with: ['title:kynbane'], look: () => t('coll.look.beaconlight', 'Gold-white motes rising like a beacon’s sparks.') }),
-    burningstair: E('spire', 'open', redoubt('burningstair'), { with: ['title:wellheadwalker'], look: () => t('coll.look.burningstair', 'Embers falling about you as if down a burning stair.') }),
-    firstlight: E('spire', 'retired', spireFirst, { with: ['title:spirefirst'], look: () => t('coll.look.firstlight', 'A dawn-white ring of light.') }),
     lilacwarren: E('bestowed', 'bestowed', bestowed, { with: ['title:wikimaid', 'glyph:wikimaid'], look: () => t('coll.look.lilacwarren', 'Rabbits hopping round your feet on a ring of lilac light.') }),
     witchfire: E('festival', 'seasonal', wyrd('aura:witchfire'), { look: () => t('coll.look.witchfire', 'A coven’s green fire round your feet, tallow candles burning in its ring.') }),
     sagesmoke: E('bestowed', 'bestowed', bestowed, { with: ['title:nirnrootsage', 'glyph:nirnrootsage'], look: () => t('coll.look.sagesmoke', 'Smoke billowing about you, nirnroots circling your waist and small green runes glowing round your feet.') }),

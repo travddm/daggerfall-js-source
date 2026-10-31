@@ -2191,7 +2191,7 @@ export class Collider {
     // a PH1 floor where it cannot stand, its height not clear over it (_resolveSphere's floorAbove: a fence's rail met
     // from behind; the vertical pass set a wagon's driver sliding along one on its rail where the sideways pass had
     // refused it). A falling body's catch of a lip is the arm's as it was (a running jump's reach,
-    // net/eliteGates/egSpanLaw.js egJumpReach, is measured on it).
+    // net/superDungeon/egSpanLaw.js egJumpReach, is measured on it).
     this._walk = dy === 0 || this._onGround ? height : 0;
     this._resolveCapsule(feet, hOut, height, Infinity, true);   // WW-LID: a body moving sideways straddles a floor only below its head's centre
     // WW-LID: and a sideways pass the resolve refused is not taken - the refusal reverts to the resolve's entry, which is

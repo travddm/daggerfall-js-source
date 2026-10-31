@@ -53,11 +53,15 @@ import { bodySayer } from '../../net/bossBody.js';   // INT15: my body, said to 
 import { wordShare } from '../../combat/healthShare.js';   // FIELD BUGS 2026-10-18f RELAY-SHARE: his health's share, the relay's word
 import { createGateHost } from './gateHost.js';   // WB11c: the Legion-Lord's host - its bodies, blows, words and sounds
 import { createSpriteWarm } from './gateSpriteWarm.js';   // GATE-MIX: the night's bodies' sprites made ready as I come in
-import { EG_MIX, egDbGain } from '../../systems/eliteGates/egMix.js';   // GATE-MIX: the Spire's level for the peers' sounds, the court's too
 import { setPeerSoundScope, peerSoundScope } from '../../net/peer/peerFx.js';   // GATE-MIX: the peers' sounds' one scope
 import { createPopulationLane } from '../../characters/npcBodies.js'; import { creatureLook } from '../../characters/creatureBodies.js'; import { rosterActor } from '../../characters/rosterBodies.js';   // MWNPC10: the court's creatures in their Morrowind bodies
 import { ENEMY_BASICS } from '../../characters/enemy/enemyBasics.js';
 import { mobileBillboardSize, billboardSize } from '../../world/rmbFlats.js';
+
+/** GATE-MIX: how far every other player's sound sits under itself while I stand in the court (decibels). */
+export const COURT_PEER_DB = -4;
+/** COURT_PEER_DB as the audio engine's gain. */
+export const courtPeerGain = () => 10 ** (COURT_PEER_DB / 20);
 
 /** The words a strike says that the hurt itself does not; and the fall's, to a player the receipt never came for.
  *  WB13b: the event and stop - "Frost Nova resisted." */
@@ -336,7 +340,7 @@ export function createGateCourt({
   // SHADER-STALL (render/glProgram.js compiledPass): each of the court's passes is built the first frame it is wanted AND
   // its programs are done - started where it was built (the telegraph's with the court; the portal's as it rises; his
   // blows' and the crystals' at their first), never a frame frozen on a compile.
-  const telegraphPass = compiledPass(gl, telegraphPrograms(false), () => new GateTelegraphRenderer(gl), (e) => console.warn('[gate] the telegraph would not build', e?.message ?? e));
+  const telegraphPass = compiledPass(gl, telegraphPrograms(), () => new GateTelegraphRenderer(gl), (e) => console.warn('[gate] the telegraph would not build', e?.message ?? e));
   telegraphPass();   // started with the court, as it was built with it
   /** WB11c: HIS HOST (scenes/gate/gateHost.js) - its blows land on me through the door his own do (`land`), each its share,
    *  its base and its element through my saving throw; a Ward-Bearer's Pulse flares the rim in his element's colour */
@@ -556,10 +560,10 @@ export function createGateCourt({
     spin = (spin + gateSpinRate(1) * Math.max(0, dt)) % 1;
   }
   /** GATE-MIX: THE PEERS DOWN IN THE COURT - every other player's sound (net/peer/peerFx.js peerHeard: their blows, steps,
-   *  swings and cries) EG_MIX.peerDb under itself while I stand here, as THE SPIRE MIX has it (systems/eliteGates/egMix.js
-   *  `peers`), so a crowd's blows sit under his cues rather than summing with them. The scope is handed in only when
-   *  no place holds it, and taken back only while it is still this one: the Spire's is never touched. */
-  const peersDown = (run) => (typeof audio?.scaled === 'function' ? audio.scaled(egDbGain(EG_MIX.peerDb), run) : run());
+   *  swings and cries) COURT_PEER_DB under itself while I stand here, so a crowd's blows sit under his cues rather than
+   *  summing with them. The scope is handed in only when no place holds it, and taken back only while it is still this
+   *  one: another place's scope is never touched. */
+  const peersDown = (run) => (typeof audio?.scaled === 'function' ? audio.scaled(courtPeerGain(), run) : run());
   function peersHeard(inCourt) {
     const held = peerSoundScope();
     if (inCourt && held === null) setPeerSoundScope(peersDown);

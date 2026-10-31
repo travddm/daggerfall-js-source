@@ -6,8 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validStaffDestination, validStaffTeleportIn, validStaffTeleportOut, notePlace } from '../../src/net/staffTeleport.js';
-import { parseClient, egSite, validEgIn, WORLD_PIXEL_BOUND, validOwIn, validOwOut, SOCIAL_ROOM, RELAY_VERSION, worldRoom, relaySupportsWorldWide } from '../../src/net/wire.js';
-import { validEgArchWord, egArchSite } from '../../src/scenes/eliteGates/egArch.js';
+import { parseClient, WORLD_PIXEL_BOUND, validOwIn, validOwOut, SOCIAL_ROOM, RELAY_VERSION, worldRoom, relaySupportsWorldWide } from '../../src/net/wire.js';
 import { CITIES } from '../../src/world/tamriel/tamrielGeography.js';
 import { pictureToBay, setTamrielFit, inBay } from '../../src/world/tamriel/tamrielFrame.js';
 import { setTamrielTrace } from '../../src/world/tamriel/tamrielLand.js';
@@ -52,20 +51,6 @@ test('R2-1 staff /tp reaches a player past the Bay: a destination there is lossl
   for (const pixel of [{ x: WORLD_PIXEL_BOUND, y: 0 }, { x: 0, y: -WORLD_PIXEL_BOUND }]) assert.equal(validStaffDestination({ ...ext, pixel }), null, 'past the wire\'s grid');
 });
 
-test('R2-2 an Elite Breach\'s arch past the Bay: its site is a site, so the open leaves the client (validEgIn), the relay keeps it (parseClient) and every member stands it (validEgArchWord) - the key is no longer staked for a word that is never sent (mutants: the Bay\'s bounds on the site, either axis)', () => {
-  for (const p of [SOLITUDE, IMPERIAL, ALINOR]) {
-    const site = egArchSite([p.x * 819.2 + 409.6, 12, 380.25], 1.5, p.x, p.y, [p.x * 819.2, 0, 0]);
-    assert.deepEqual(site, { px: p.x, py: p.y, x: 409.6, y: 12, z: 380.25, yaw: 1.5 });
-    assert.deepEqual(egSite(site), site, `${p.x},${p.y}`);
-    assert.deepEqual(validEgIn({ k: 'open', z: 'v1.abc.def', site }), { k: 'open', z: 'v1.abc.def', site });
-    assert.deepEqual(parseClient(JSON.stringify({ t: 'eg', k: 'open', z: 'v1.abc.def', site }), { hasHello: true }), { t: 'eg', k: 'open', z: 'v1.abc.def', site });
-    const word = { b: '0123456789abcdef', o: 'Mac', os: 'acct-mac', op: 1_800_000_000_000, ew: 0, site, sg: 'a'.repeat(86) };
-    assert.deepEqual(validEgArchWord(word), word);
-  }
-  const site = { px: 0, py: 0, x: 1, y: 2, z: 3, yaw: 0 };
-  for (const [px, py] of [[WORLD_PIXEL_BOUND, 0], [0, -WORLD_PIXEL_BOUND], [1.5, 0], ['1', 0]]) assert.equal(egSite({ ...site, px, py }), null, `${px},${py}`);
-});
-
 test('R2-3 a headstone past the Bay is owed to its cell and locked for the party: its place `g<px>,<py>` reads back to the world\'s pixel, the word leaves the client (validOwIn), the cell folds it into its ledger (owFoldGraves) and says it back (validOwOut) - GRAVE-PARTY\'s own field bug, past the Bay (mutants: the Bay\'s three digits in the place; the Bay\'s bounds on the row)', () => {
   const M = 1_000_000;
   for (const p of [SOLITUDE, IMPERIAL, ALINOR]) {
@@ -90,9 +75,8 @@ test('R2 THE OLDER RELAY: a word naming a pixel past the Bay goes only to a rela
   assert.deepEqual([bayMapPixel(0, 0), bayMapPixel(999, 499), bayMapPixel(1000, 0), bayMapPixel(0, -1), bayMapPixel(1.5, 0)], [true, true, false, false, false]);
   const BAY = { x: 207, y: 213 };
   const extAt = (pixel) => ({ kind: 'exterior', pixel, pos: [1, 2, 3], yaw: 0, pitch: 0 });
-  const siteAt = (p) => ({ px: p.x, py: p.y, x: 409.6, y: 12, z: 380.25, yaw: 1.5 });
   for (const [v, world] of [['world259', false], [RELAY_VERSION, true]]) {
-    // the hub: the staff answer and the arch
+    // the hub: the staff answer
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Bran', id: 'peer-bran', secret: 'secret-bran', WebSocketImpl: FakeWS, presence: false });
     s.join(SOCIAL_ROOM); const ws = sockets[0]; ws.open();
@@ -103,12 +87,6 @@ test('R2 THE OLDER RELAY: a word naming a pixel past the Bay goes only to a rela
     assert.deepEqual(sent().at(-1), { t: 'stp', k: 'answer', ticket: 'tk-bay', dest: extAt(BAY) }, 'a Bay destination to every relay');
     assert.equal(s.sendStaffTeleport({ k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) }), true);
     assert.deepEqual(sent().at(-1), world ? { t: 'stp', k: 'answer', ticket: 'tk-far', dest: extAt(SOLITUDE) } : { t: 'stp', k: 'answer', ticket: 'tk-far', error: 'unavailable' }, `${v}: past the Bay`);
-    assert.equal(s.egSiteOk(siteAt(BAY)), true);
-    assert.equal(s.egSiteOk(siteAt(IMPERIAL)), world, `${v}: an arch past the Bay`);
-    assert.equal(s.egSiteOk(null), false);
-    const before = ws.sent.length;
-    assert.equal(s.sendEg('open', { z: 'v1.abc.def', site: siteAt(IMPERIAL) }), world, `${v}: the open past the Bay`);
-    assert.equal(ws.sent.length - before, world ? 1 : 0);
     s.leave();
     // the cell past the Bay: a headstone's row
     const c = fakeSocketClass();

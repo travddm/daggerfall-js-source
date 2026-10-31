@@ -17,9 +17,7 @@
 // roll reads the player's mods and prefs as well as the seed). What the
 // service can say is that a fall it was shown happened, to this account,
 // and paid: the receipt the relay signed made the kill's row here
-// (accounts.js claimGate, sds.js claimSd, egEconomy.js egRedoubtPay - a
-// Redoubt paid, never one taken twice in a week, which pays its gold
-// alone), and a send names that kill. No row, no pieces (`lost-no-kill`
+// (accounts.js claimGate, sds.js claimSd), and a send names that kill. No row, no pieces (`lost-no-kill`
 // - the client asks again: the receipt's own claim may still be on its
 // way). A row older than LOST_WINDOW_S takes none (`lost-spent`).
 //
@@ -47,22 +45,22 @@ const words = (/** @type {string} */ subject, /** @type {string} */ where) => Ob
 export const LOST_WORDS = Object.freeze({
   gate: words('Left in the Burning Court', 'the floor of the Burning Court'),
   sd: words('Left at the Last Moment', 'the arena floor of the Last Moment'),
-  eg: words('Left at a Redoubt', 'beside a Redoubt\'s beacon in the Battlespire'),
 });
 
-/** AUDIT SHIP C1: WHAT A DOOR CAN HAVE LEFT - the one Gilded its spoils roll (gateSpoils.js the Oath; the Last Moment and
- *  a Redoubt none). */
-export const LOST_GILDED = Object.freeze({ gate: DRAGONFIRE_OATH.id, sd: null, eg: null });
+/** AUDIT SHIP C1: WHAT A DOOR CAN HAVE LEFT - the one Gilded its spoils roll (gateSpoils.js the Oath; the Last Moment
+ *  none). */
+export const LOST_GILDED = Object.freeze({ gate: DRAGONFIRE_OATH.id, sd: null });
 export const lostLeftBy = (/** @type {{ kind: string }} */ kill, /** @type {any} */ item) => (item?.gilded == null && item?.rarity !== GILDED)
   || item?.gilded === LOST_GILDED[kill.kind];
 
-/** The kill's row for this account, as the service recorded it: its `at`, or null. A Redoubt's only where it paid. */
+/** The kill's row for this account, as the service recorded it: its `at`, or null. Null too for a kind no door here
+ *  records (an old client's), so its send is refused as `lost-no-kill`. */
 async function killAt(db, account, kill) {
   const row = kill.kind === 'gate'
     ? await db.prepare('SELECT at FROM gate_kills WHERE day = ?1 AND account = ?2').bind(kill.day, account).first()
     : kill.kind === 'sd'
       ? await db.prepare('SELECT at FROM sd_kills WHERE slot = ?1 AND account = ?2').bind(kill.slot, account).first()
-      : await db.prepare('SELECT at FROM eg_redoubts WHERE b = ?1 AND account = ?2 AND w = ?3 AND paid = 1').bind(kill.b, account, kill.w).first();
+      : null;
   return Number.isSafeInteger(row?.at) ? row.at : null;
 }
 

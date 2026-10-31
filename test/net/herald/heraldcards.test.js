@@ -1,8 +1,8 @@
 // HERALD-CARDS (2026-10-22, the owner: "I want to overhaul our discord world event notification system to be more
 // organized"): THE HERALDS' ONE CARD. The law (net/herald/heraldCard.js: the card's shape, its bounds, the families'
 // colours, the door's thread), every herald's every post read as a card of its family, and the hub routing each family
-// to its own thread (server/src/index.js `_heraldOf`, `_heraldSend`; the relay settings gateThread, serpentThread,
-// sdThread and egThread - net/relayCfg.js).
+// to its own thread (server/src/index.js `_heraldOf`, `_heraldSend`; the relay settings gateThread, serpentThread
+// and sdThread - net/relayCfg.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,15 +14,12 @@ import {
 import * as gateHerald from '../../../src/net/gate/gateHerald.js';
 import { serpentOmenPost, serpentFellPost } from '../../../src/net/serpent/serpentHerald.js';
 import { sdHeraldPost } from '../../../src/net/superDungeon/sdHerald.js';
-import { egHeraldPost } from '../../../src/net/eliteGates/egHerald.js';
 import { SERPENT_RING_MAP_CSS } from '../../../src/ui/serpentMapMark.js';
 import { SD_RING_MAP_CSS } from '../../../src/ui/superDungeon/sdMapMark.js';
-import { EG_ARCH_RING_CSS } from '../../../src/ui/eliteGates/egArchMapMark.js';
 import { GATE_PLACE_MAX, SOCIAL_ROOM, SD_KEY } from '../../../src/net/wire.js';
 import { gateTimes } from '../../../src/net/gate/gateLaw.js';
 import { serpentTimes } from '../../../src/net/serpent/serpentLaw.js';
 import { SD_LIFETIME_MS, SD_COOLDOWN_MS } from '../../../src/net/superDungeon/sdLaw.js';
-import { EG_HERALD_KEY } from '../../../src/net/eliteGates/egHerald.js';
 import { RELAY_VERSION } from '../../../src/net/wire.js';
 import { relayCfgSupported, RELAY_CFG_KEY_MIN } from '../../../src/net/relayCfg.js';
 import { OnlineSession } from '../../../src/net/online.js';
@@ -32,7 +29,7 @@ import { cardOf, cardWords } from '../../heraldCards.mjs';
 
 const ROLE = '112233445566778899';
 const HOOK = 'https://discord.com/api/webhooks/123456789012345678/abc_DEF-123';
-const T_GATE = '200000000000000001', T_SEA = '200000000000000002', T_EG = '200000000000000004';
+const T_GATE = '200000000000000001', T_SEA = '200000000000000002';
 const LOUD_NAME = '**@everyone** <@&1> https://evil.io/x [a](b) `c` ~d~ |e|';
 
 // ═══ THE CARD ════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -54,19 +51,19 @@ test('HERALD-CARDS the card: one embed - its family\'s name and colour, the titl
   const bare = heraldCard({ family: 'abyss', moment: 'M', title: 'T' }).embeds[0];
   assert.ok(!('description' in bare) && !('fields' in bare), 'no text, no fields: neither key');
   assert.equal(heraldCard({ family: 'nonesuch', moment: 'M', title: 'T' }).embeds[0].author.name, 'Dagon\'s Breach', 'a family the table lacks: the gate\'s, never a throw on the hub\'s alarm');
-  assert.deepEqual(Object.keys(HERALD_FAMILIES), ['gate', 'serpent', 'abyss', 'spire']);
-  assert.deepEqual(Object.values(HERALD_FAMILIES).map((f) => f.name), ['Dagon\'s Breach', 'The Sea Serpent', 'The Abyss Dungeon', 'The Battlespire']);
+  assert.deepEqual(Object.keys(HERALD_FAMILIES), ['gate', 'serpent', 'abyss']);
+  assert.deepEqual(Object.values(HERALD_FAMILIES).map((f) => f.name), ['Dagon\'s Breach', 'The Sea Serpent', 'The Abyss Dungeon']);
 });
 
 test('HERALD-CARDS the bounds: every part of a card is cut to Discord\'s own bound, never refused - a body past one would be refused whole and let go (mutants: a bound lifted; the cut without its ellipsis)', () => {
-  const long = heraldCard({ family: 'spire', moment: 'm'.repeat(3000), title: 't'.repeat(300), text: 'x'.repeat(5000), role: ROLE, ping: 'p'.repeat(3000) });
+  const long = heraldCard({ family: 'abyss', moment: 'm'.repeat(3000), title: 't'.repeat(300), text: 'x'.repeat(5000), role: ROLE, ping: 'p'.repeat(3000) });
   const e = long.embeds[0];
   // AUDIT HERALD-CARDS L1: each part to its own bound, and the whole to 6000 (its own pin) - so each part measured alone
   assert.deepEqual([e.title.length, e.footer.text.length, long.content.length], [HERALD_TITLE_MAX, HERALD_FOOTER_MAX, HERALD_CONTENT_MAX]);
-  assert.equal(heraldCard({ family: 'spire', moment: 'm', title: 't', text: 'x'.repeat(5000) }).embeds[0].description.length, HERALD_TEXT_MAX);
-  const many = heraldCard({ family: 'spire', moment: 'm', title: 't', fields: Array.from({ length: 30 }, (_, i) => [`f${i}`, 'v']) }).embeds[0].fields;
+  assert.equal(heraldCard({ family: 'abyss', moment: 'm', title: 't', text: 'x'.repeat(5000) }).embeds[0].description.length, HERALD_TEXT_MAX);
+  const many = heraldCard({ family: 'abyss', moment: 'm', title: 't', fields: Array.from({ length: 30 }, (_, i) => [`f${i}`, 'v']) }).embeds[0].fields;
   assert.equal(many.length, HERALD_FIELDS_MAX);
-  const wide = heraldCard({ family: 'spire', moment: 'm', title: 't', fields: [['f', 'v'.repeat(2000)]] }).embeds[0].fields[0].value;
+  const wide = heraldCard({ family: 'abyss', moment: 'm', title: 't', fields: [['f', 'v'.repeat(2000)]] }).embeds[0].fields[0].value;
   assert.ok(wide.length === HERALD_FIELD_VALUE_MAX && wide.endsWith('\u2026'));
   assert.ok(e.title.endsWith('\u2026') && e.description.endsWith('\u2026'));
   assert.deepEqual([HERALD_TITLE_MAX, HERALD_TEXT_MAX, HERALD_FIELDS_MAX, HERALD_FIELD_VALUE_MAX, HERALD_FOOTER_MAX, HERALD_CONTENT_MAX, HERALD_EMBED_MAX], [256, 4096, 25, 1024, 2048, 2000, 6000], 'Discord\'s own');
@@ -88,17 +85,12 @@ function everyPost() {
     out.push(['abyss', 'Risen', true, sdHeraldPost('rise', r, ROLE)], ['abyss', 'Found', true, sdHeraldPost('found', r, ROLE)]);
     out.push(['abyss', 'Hour broken', false, sdHeraldPost('fell', r, ROLE)], ['abyss', 'Faded', false, sdHeraldPost('fade', r, ROLE)]);
   }
-  for (const p of [{ kind: 'rd', o: LOUD_NAME, n: 1, w: 19_990, h: 99_950, t: 7 * 86_400, ew: 19_000 }, { kind: 'rd', o: LOUD_NAME, n: 8, w: 20, h: 100, t: 1 },
-    { kind: 'first', o: LOUD_NAME, n: 8, by: many, w: 10, h: 50, t: 7 * 86_400, ew: 9 }, { kind: 'lb', n: LOUD_NAME, lk: 'ilthys', c: 8 },
-    { kind: 'top', br: 2, by: many, o: LOUD_NAME, h: 99_999, td: 7 * 86_400 }, { kind: 'seal', band: 3, o: LOUD_NAME, n: 1 }]) {
-    out.push(['spire', { rd: 'Redoubt', first: 'First of the Spire', lb: 'The Lone Beacon', top: 'Descent record', seal: 'Seal lifted' }[p.kind], false, egHeraldPost(p)]);
-  }
   return out;
 }
 
-test('HERALD-CARDS every herald\'s every post is a card of its family: the gate\'s omen, kill and rite; the serpent\'s bells and kill; the Abyss Dungeon\'s rise, find, fall and fade; the Spire\'s Redoubt, First of the Spire, Lone Beacon, Descent and seal - each its family\'s name and colour and its moment\'s footer, a title, within Discord\'s bounds at its widest, pinging the role where it pings and nobody elsewhere, and no player\'s name carrying a mention, a link or markdown (mutants: a post left as text; a family miscoloured; a ping on a quiet post; a name taken raw)', () => {
+test('HERALD-CARDS every herald\'s every post is a card of its family: the gate\'s omen, kill and rite; the serpent\'s bells and kill; the Abyss Dungeon\'s rise, find, fall and fade - each its family\'s name and colour and its moment\'s footer, a title, within Discord\'s bounds at its widest, pinging the role where it pings and nobody elsewhere, and no player\'s name carrying a mention, a link or markdown (mutants: a post left as text; a family miscoloured; a ping on a quiet post; a name taken raw)', () => {
   const posts = everyPost();
-  assert.equal(posts.length, 30);
+  assert.equal(posts.length, 24);   // PIN MOVED (EG removal): the Battlespire's six posts left
   const moments = new Set();
   for (const [family, moment, pings, p] of posts) {
     const c = cardOf(p), F = HERALD_FAMILIES[family];
@@ -119,14 +111,13 @@ test('HERALD-CARDS every herald\'s every post is a card of its family: the gate\
     assert.ok(!/[@<>*`~|[\]]|https?:/.test(words), `${why}: ${words}`);
     moments.add(`${family}/${moment}`);
   }
-  assert.equal(moments.size, 14, 'fourteen moments, each its own footer');
+  assert.equal(moments.size, 9, 'nine moments, each its own footer');   // PIN MOVED (EG removal): the Battlespire's five moments left
 });
 
 test('HERALD-CARDS the colours: each family\'s is its marker in the Timers - the gate\'s red the timers sheet reads from this table, the others their rings on the map (mutants: a colour drifted from its ring)', () => {
   assert.equal(heraldCss('gate'), '#e2554c');
   assert.equal(heraldCss('serpent'), SERPENT_RING_MAP_CSS);
   assert.equal(heraldCss('abyss'), SD_RING_MAP_CSS);
-  assert.equal(heraldCss('spire'), EG_ARCH_RING_CSS);
 });
 
 test('HERALD-CARDS the door and the words: a thread is a Discord id or nothing; a card goes to the webhook, into the thread when one is named; who did it is the first names through heraldName and the rest counted; a moment in the reader\'s clock and how soon; the gate\'s herald says the card\'s own door and words again, the same functions (mutants: a thread taken raw; the thread dropped from the URL; the others miscounted)', () => {
@@ -161,25 +152,23 @@ async function withHub(fn, env) {
   try { await quiet(() => fn({ r, posts, tick: (ms) => { clock += ms; }, set: (t) => { clock = t; } })); } finally { Date.now = realNow; globalThis.fetch = realFetch; }
 }
 
-test('HERALD-CARDS relay: each family posts to its own thread when the operator names one, else the gate\'s, else the channel itself - the gate\'s omen, the serpent\'s bells, the Abyss Dungeon\'s rise and the Spire\'s Redoubt each to theirs (mutants: every family to the gate\'s thread; a family\'s own thread ignored; the gate\'s not the fallback)', async () => {
+test('HERALD-CARDS relay: each family posts to its own thread when the operator names one, else the gate\'s, else the channel itself - the gate\'s omen, the serpent\'s bells and the Abyss Dungeon\'s rise each to theirs (mutants: every family to the gate\'s thread; a family\'s own thread ignored; the gate\'s not the fallback)', async () => {
   await withHub(async ({ r, posts }) => {
-    assert.deepEqual(r.room._heraldOf().threads, { gate: null, serpent: null, abyss: null, spire: null }, 'none named: the channel itself');
+    assert.deepEqual(r.room._heraldOf().threads, { gate: null, serpent: null, abyss: null }, 'none named: the channel itself');
     await r.room._heraldSend(gateHerald.omenPost({ day: 538 }), 'gate');
     assert.equal(posts.at(-1).url, HOOK, 'as before');
   }, {});
   await withHub(async ({ r, posts }) => {
-    assert.deepEqual(r.room._heraldOf().threads, { gate: T_GATE, serpent: T_SEA, abyss: T_GATE, spire: T_EG });
+    assert.deepEqual(r.room._heraldOf().threads, { gate: T_GATE, serpent: T_SEA, abyss: T_GATE });
     await r.room._heraldSend(gateHerald.omenPost({ day: 538 }), 'gate');
     await r.room._heraldSend(serpentOmenPost({ day: 5 }), 'serpent');
     await r.room._heraldSend(sdHeraldPost('rise', { s: 3, r: 17, until: 1.8e12, next: 1.8e12 }), 'abyss');
-    await r.room._heraldSend(egHeraldPost({ kind: 'rd', o: 'Mac', w: 10, h: 50, t: 1 }), 'spire');
     assert.deepEqual(posts.map((p) => [p.url, cardOf(p.body).author]), [
       [`${HOOK}?thread_id=${T_GATE}`, 'Dagon\'s Breach'],
       [`${HOOK}?thread_id=${T_SEA}`, 'The Sea Serpent'],
       [`${HOOK}?thread_id=${T_GATE}`, 'The Abyss Dungeon'],
-      [`${HOOK}?thread_id=${T_EG}`, 'The Battlespire'],
     ]);
-  }, { GATE_DISCORD_THREAD: T_GATE, SERPENT_DISCORD_THREAD: T_SEA, SD_DISCORD_THREAD: 'not-an-id', EG_DISCORD_THREAD: T_EG });
+  }, { GATE_DISCORD_THREAD: T_GATE, SERPENT_DISCORD_THREAD: T_SEA, SD_DISCORD_THREAD: 'not-an-id' });
 });
 
 test('HERALD-CARDS relay: a thread is a setting a developer changes at run time - an id taken and in force at once, a link or a name refused in words /relay shows and nothing kept, `-` handing it back to the var (mutants: a thread kept unchecked; the herald\'s threads read once for ever)', async () => {
@@ -187,7 +176,7 @@ test('HERALD-CARDS relay: a thread is a setting a developer changes at run time 
     const dev = r.connect(); tick(300); await r.hello(dev, 'dev-0001', null, { glyphs: ['dev'] });
     // the hub hears a developer's setting at most so often - each said a while after the last, as auditscale2_relay.test.js says them
     const say = async (k, v) => { tick(5000); await r.raw(dev, JSON.stringify({ t: 'cfg', k, v })); return dev.sent.filter((f) => f.t === 'cfg').at(-1); };
-    for (const k of ['gateThread', 'serpentThread', 'sdThread', 'egThread']) {
+    for (const k of ['gateThread', 'serpentThread', 'sdThread']) {
       for (const bad of [`<#${T_SEA}>`, `https://discord.com/channels/1/${T_SEA}`, 'world-events']) {
         const a = await say(k, bad);
         assert.match(a.error, /Discord thread's id/, `${k} ${bad}`);
@@ -202,9 +191,9 @@ test('HERALD-CARDS relay: a thread is a setting a developer changes at run time 
 });
 
 test('HERALD-CARDS the client says a thread setting only to a relay that knows it - an older one finds no such name and closes the hub link on the frame; the roles and every older setting as before (mutants: a thread said to world242; the floor read for every setting)', async () => {
-  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, egThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });   // PIN MOVED (SD-PARTY, world275): sdCollapse; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor, world272's - re-hashed in place); PIN MOVED (THE FOLD: world260, one release; COST-2 part two, world262): cellSeed
+  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });   // PIN MOVED (SD-PARTY, world275): sdCollapse; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor, world272's - re-hashed in place); PIN MOVED (THE FOLD: world260, one release; COST-2 part two, world262): cellSeed
   assert.ok(relayCfgSupported(RELAY_VERSION, 'gateThread'), 'this relay knows them');
-  assert.deepEqual([relayCfgSupported('world242'), relayCfgSupported('world242', 'gateThread'), relayCfgSupported('world250', 'egThread'), relayCfgSupported('world242', 'gateRole'), relayCfgSupported('world191', 'gateRole')], [true, false, true, true, false]);
+  assert.deepEqual([relayCfgSupported('world242'), relayCfgSupported('world242', 'gateThread'), relayCfgSupported('world250', 'sdThread'), relayCfgSupported('world242', 'gateRole'), relayCfgSupported('world191', 'gateRole')], [true, false, true, true, false]);
   await quiet(() => {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000, rand: () => 0, presence: false });
@@ -224,8 +213,8 @@ test('HERALD-CARDS the client says a thread setting only to a relay that knows i
 const T_ABYSS = '200000000000000003';
 const FAMILY_OF = Object.fromEntries(Object.entries(HERALD_FAMILIES).map(([f, F]) => [F.name, f]));
 
-test('AUDIT HERALD-CARDS M1: every beat posts its cards to its own family\'s thread - the gate\'s omen, the serpent\'s bells, the Abyss Dungeon\'s rise and the Spire\'s Redoubt, each beat driven with all four threads set; the route is read off the card\'s own family (mutants: a beat\'s family dropped, every post to the gate\'s thread)', async () => {
-  const threads = { gate: T_GATE, serpent: T_SEA, abyss: T_ABYSS, spire: T_EG };
+test('AUDIT HERALD-CARDS M1: every beat posts its cards to its own family\'s thread - the gate\'s omen, the serpent\'s bells, the Abyss Dungeon\'s rise, each beat driven with all three threads set; the route is read off the card\'s own family (mutants: a beat\'s family dropped, every post to the gate\'s thread)', async () => {
+  const threads = { gate: T_GATE, serpent: T_SEA, abyss: T_ABYSS };
   await withHub(async ({ r, posts, set }) => {
     const omen = gateTimes(538).omenAt;
     set(omen); await r.room._heraldBeat(omen);
@@ -235,12 +224,9 @@ test('AUDIT HERALD-CARDS M1: every beat posts its cards to its own family\'s thr
     r.store.set(SD_KEY, { s: 2, ph: 'risen', r: 17, at: T0, until: T0 + SD_LIFETIME_MS, next: T0 + SD_LIFETIME_MS + SD_COOLDOWN_MS });
     r.room._sdRec = undefined;
     set(T0 + 1000); await r.room._sdHeraldBeat(T0 + 1000);
-    const now = T0 + 2000;
-    r.store.set(EG_HERALD_KEY, { q: [{ i: 1, at: now, kind: 'rd', o: 'Mac', n: 3, w: 10, h: 50, t: 100, ew: 0 }], n: 1 });
-    set(now); await r.room._egHeraldBeat(now);
-    assert.deepEqual(posts.map((p) => FAMILY_OF[cardOf(p.body).author]), ['gate', 'serpent', 'abyss', 'spire'], 'one post a beat, each its own family');
+    assert.deepEqual(posts.map((p) => FAMILY_OF[cardOf(p.body).author]), ['gate', 'serpent', 'abyss'], 'one post a beat, each its own family');
     for (const p of posts) assert.equal(p.url, `${HOOK}?thread_id=${threads[FAMILY_OF[cardOf(p.body).author]]}`, cardOf(p.body).author);
-  }, { GATE_DISCORD_THREAD: T_GATE, SERPENT_DISCORD_THREAD: T_SEA, SD_DISCORD_THREAD: T_ABYSS, EG_DISCORD_THREAD: T_EG, GATE_DISCORD_ROLE: ROLE });
+  }, { GATE_DISCORD_THREAD: T_GATE, SERPENT_DISCORD_THREAD: T_SEA, SD_DISCORD_THREAD: T_ABYSS, GATE_DISCORD_ROLE: ROLE });
 });
 
 test('AUDIT HERALD-CARDS H1: a thread Discord refuses (no thread of the channel, deleted, locked) never loses the post - it goes to the channel itself, once, and the refusal is said; let go only when the channel refuses it too; a post with no thread is not posted twice (mutants: the thread\'s refusal taken as the post\'s; the channel tried on a retryable answer)', async () => {
@@ -273,7 +259,7 @@ test('AUDIT HERALD-CARDS L1/L2: a card is held to Discord\'s 6000 whole - the te
   assert.equal(heraldEmbedSize(big), HERALD_EMBED_MAX);
   assert.equal(big.embeds[0].fields.length, 3, 'the facts kept, the text cut');
   assert.ok(big.embeds[0].description.endsWith('\u2026'));
-  const huge = heraldCard({ family: 'spire', moment: 'm'.repeat(3000), title: 't'.repeat(300), text: 'x'.repeat(5000), fields: Array.from({ length: 30 }, (_, i) => [`f${i}`, 'v'.repeat(2000)]) });
+  const huge = heraldCard({ family: 'abyss', moment: 'm'.repeat(3000), title: 't'.repeat(300), text: 'x'.repeat(5000), fields: Array.from({ length: 30 }, (_, i) => [`f${i}`, 'v'.repeat(2000)]) });
   assert.ok(heraldEmbedSize(huge) <= HERALD_EMBED_MAX, `${heraldEmbedSize(huge)}`);
   assert.deepEqual(heraldCard({ family: 'gate', moment: 'M', title: 'T', fields: [['A', ' '], [' ', 'v'], ['', 'v'], ['B', 'b']] }).embeds[0].fields, [{ name: 'B', value: 'b', inline: true }]);
   assert.deepEqual(['- Ann', '--Bo', ' - Cy', 'Jo-Ann', '-'].map(heraldName), ['Ann', 'Bo', 'Cy', 'Jo-Ann', '']);

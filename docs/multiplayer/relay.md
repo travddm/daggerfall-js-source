@@ -18,7 +18,7 @@ to deploy and test it. Scaling, the chat hub and cost are in [relay-scaling-and-
 | `server/src/sdCopy.js` | Super Dungeon copy rooms and per-account Super Dungeon state on the hub |
 | `server/src/staff*.js` | Staff features on the relay; see [staff-tools.md](staff-tools.md) |
 
-The relay imports a large part of `src/net/` (wire rules, receipts, boss brains, arena and Elite Gate law). Wrangler
+The relay imports a large part of `src/net/` (wire rules, receipts, boss brains, arena law). Wrangler
 bundles those relative imports. A change to any file in that import graph is a relay change; see
 [wire-protocol.md](wire-protocol.md).
 
@@ -30,7 +30,6 @@ bundles those relative imports. A change to any file in that import graph is a r
 | --- | --- |
 | `/health` | JSON `{ ok, service: 'daggerfall-online', version: RELAY_VERSION, t }` |
 | `SD_OPEN_PATH` | `sdOpenDoor` (Super Dungeon open check) |
-| `/v1/eg/live` (`EG_LIVE_PATH`) | `egLiveAsk`: live Elite Breach rooms, read by the deploy workflow |
 | `/v1/law` (`SAFE_LAW_PATH`) | `lawDoor`: signed orders from the account service (bans, mutes, staff orders) |
 | `/room/<key>` | A WebSocket to the Room named `<key>` |
 
@@ -61,7 +60,6 @@ Clients build keys; the Worker only validates them. Key builders live in `src/ne
 | Siege / royal | `siege:<seat>:<week>`, `royal:<seat>:<week>` | `src/net/siege/siegeRef.js` |
 | Arena | `arena:hall`, `arena:b<16hex>`, `arena:p<code>`, `arena:x<hour>` | `src/net/arena/arenaLaw.js` |
 | Super Dungeon | `sd:<slot>.<owner>` | `src/net/superDungeon/sdLaw.js` |
-| Elite Breach | `eg:<16hex>` | `src/net/eliteGates/egLaw.js` |
 | Park registry | `parkreg:<owner>` | `parkRegistryRoom` in `wire.js` |
 
 `chat:world` is also the **hub**: the object that holds cross-room state (parties, guild outboxes, relay settings,
@@ -153,9 +151,7 @@ leases, feeds) and `GATE_DISCORD_WEBHOOK`.
    differ (or on dispatch with `redeploy`, for a `wrangler.toml`-only change).
 2. Job `verify` runs `verify.yml`.
 3. Job `deploy` checks that `IDENTITY_PUBLIC_KEY` matches the account service's `/v1/pubkey`, waits for live sieges
-   (`/v1/seats/sieges/live`) and for Elite Breaches under a retired law (`/v1/eg/live` against `EG_LAWS`), then runs
-   `wrangler deploy` from `server/`. Dispatch with `force` skips the waits and voids open breaches
-   (`EG_VOID_BEFORE`).
+   (`/v1/seats/sieges/live`), then runs `wrangler deploy` from `server/`. Dispatch with `force` skips the wait.
 4. It polls `/health` until the new version answers; a miss fails the run.
 
 **A deploy restarts every Durable Object and closes every socket.** All players drop and reconnect.

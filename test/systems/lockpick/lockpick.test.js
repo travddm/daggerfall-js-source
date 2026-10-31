@@ -30,7 +30,7 @@ import { ENEMY_BASICS } from '../../../src/characters/enemy/enemyBasics.js';
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { SKILLS } from '../../../src/systems/skills.js';
 import { SOUND } from '../../../src/systems/soundClips.js';
-import { PSEUDO_ARCHIVES } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES } from '../../../src/world/pseudoArchives.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');

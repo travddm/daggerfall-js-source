@@ -67,17 +67,15 @@ import { BANDAGE_TEMPLATE } from '../roleplayRealismItems/rriRealism.js';
 import { FORAGING_TEMPLATES } from '../foraging/foragingLaw.js';
 import { REST_ITEM_ROWS } from '../rest/restItemRows.js';
 import { DEEP_WATERS_FISH_TEMPLATES } from '../deepWater/deepWatersFishRows.js';
-import { WEIR_KEY_LAW_ROW } from '../eliteGates/weirKeyRow.js';   // KEY-LAW: the Weir Key's home pulls the Spire's law and its picture in
 import { SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW } from '../festival/festivalRows.js';   // WITCH1: the festival's home pulls its pictures and the texture door in
-import { STARGLASS_LAW_ROW } from '../starfall/starglassRow.js';   // STAR7: Starglass's home pulls its picture in - the Weir Key's way
-import { LOCKPICK_LAW_ROW } from '../lockpick/lockpickRow.js';   // LOCKPICK: the Lockpick's home pulls its picture and the loot law in - the Weir Key's way
+import { STARGLASS_LAW_ROW } from '../starfall/starglassRow.js';   // STAR7: Starglass's home pulls its picture in
+import { LOCKPICK_LAW_ROW } from '../lockpick/lockpickRow.js';   // LOCKPICK: the Lockpick's home pulls its picture and the loot law in
 import { DEX_ENEMY_IDS } from '../enemyExpansion/dexIds.js';   // SOUL-LAW: the mod's fifty, whose souls a gem holds - read from its tables, no install
 // THE PORT'S OWN TEMPLATES register as their homes load (itemTemplates.js registerCustomTemplates). A headless reader -
 // the account service - loads none of the game, so the homes that register at import are imported here for exactly
 // that; the four whose homes pull the UI in (foraging, rest, Deep Waters' fish, Roleplay & Realism: Items) hand the law
 // their rows from leaves instead, read beside the registry (lawTemplate) and never put into it - so a client with the
-// mod switched off does not start knowing its items. The Weir Key's (KEY-LAW, FIELD BUGS 2026-10-17) is read beside
-// it too: its home (systems/eliteGates/weirKey.js) pulls the Spire's law and its picture in - and Starglass's (STAR7), whose
+// mod switched off does not start knowing its items. Starglass's (STAR7) is read beside it too: its
 // home (systems/starfall/starglass.js) pulls its picture in, and the Lockpick's (LOCKPICK), whose home
 // (systems/lockpick/lockpickItem.js) pulls its picture, the loot law and the foes' table in.
 import '../professions/profTemplates.js';
@@ -129,7 +127,7 @@ export const ITEM_LAW_VERSION = 14;
 const T = ENCHANTMENT_TYPES;
 const TYPE_KEY = Object.freeze(Object.fromEntries(Object.entries(T).map(([k, v]) => [v, k])));
 /** The templates whose homes cannot load headless, by index - their rows, as the homes register them. */
-const LAW_ONLY = new Map(/** @type {any[]} */ ([...RRI_TEMPLATES, ...FORAGING_TEMPLATES, ...REST_ITEM_ROWS, ...DEEP_WATERS_FISH_TEMPLATES, WEIR_KEY_LAW_ROW, SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW, STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]).map((t) => [t.index, t]));
+const LAW_ONLY = new Map(/** @type {any[]} */ ([...RRI_TEMPLATES, ...FORAGING_TEMPLATES, ...REST_ITEM_ROWS, ...DEEP_WATERS_FISH_TEMPLATES, SOUL_CAKE_LAW_ROW, HEARTH_OFFERING_LAW_ROW, STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]).map((t) => [t.index, t]));
 /** A template the port knows: the live registry's row, or a law-only row. */
 export const lawTemplate = (/** @type {unknown} */ i) => (Number.isInteger(i) ? templateByIndex(i) ?? LAW_ONLY.get(/** @type {number} */ (i)) ?? null : null);
 

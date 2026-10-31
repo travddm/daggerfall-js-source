@@ -145,7 +145,7 @@ export function createMwMagicFx({
       for (const v of [...plan.cast, plan.bolt, ...plan.hit, ...plan.area]) if (v) load(cat, v);
     },
     /** The cast's start: its casting visuals at the caster's feet, one per model; the player's hands glow too. EG-ZG:
-     *  `alpha` its share of itself (another player's during a Spire trial - THE QUIET COMPANY, ui/eliteGates/egAccess.js egAllyLook). */
+     *  `alpha` its share of itself. */
     cast(sp, feet, { player = false, body = null, alpha = 1 } = {}) {
       const cat = catalogNow();
       const plan = cat ? planOf(cat, sp) : null;

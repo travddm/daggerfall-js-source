@@ -7,7 +7,7 @@
 //
 // THREE CLOCKS, KEPT APART - each says which it is:
 //   - THE SEASON (net/arena/arenaLaw.js arenaSeasonOf - eight weeks from Monday 28 September 2026, 00:00 UTC): the boards
-//     that start fresh with it - the Arena, the Spire's Descent and the season's captains.
+//     that start fresh with it - the Arena and the season's captains.
 //     "Season {n}", as every one of those boards names it (AUDIT SEASON-BOOK W7).
 //   - THE SEATS' SEASON (net/townSeatLaw.js seasonOf - its own weeks off the service's Season 0, ending at a Sunday
 //     Turning): the guilds' war for the towns, its titles, its ribbon, its reset; Season 0 the beta, wiped at its end.
@@ -23,7 +23,7 @@ import { t } from './textManager.js';
 /** The realm's season in days (eight weeks). */
 export const SEASON_BOOK_DAYS = ARENA_SEASON_S / 86_400;
 /** A champion's title asks this much of the board's leader - the Arena's law (ARENA_CHAMPION_MIN_BOUTS and its FOES -
- *  test/ui/enhanced/seasonbook.test.js holds it to these). Spire Champion is not one of them (AUDIT SEASON-BOOK L1). */
+ *  test/ui/enhanced/seasonbook.test.js holds it to these). */
 export const SEASON_TITLE_GAMES = 10;
 export const SEASON_TITLE_FOES = 5;
 
@@ -79,12 +79,6 @@ export function arenaStanding(/** @type {any} */ board) {
   const banner = me.banner === 'red' ? t('season.book.arena.red', 'Red Banner') : me.banner === 'blue' ? t('season.book.arena.blue', 'Blue Banner') : null;
   return banner ? t('season.book.arena.withBanner', '{line} - {points, plural, one {# point} other {# points}} for the {banner}', { line, banner, points: Number(me.points) || 0 }) : line;
 }
-/** THE SPIRE'S LINE: the best Descent of the player's company this season (the board's `best` - the Spire's own window
- *  says it "Your best"; AUDIT SEASON-BOOK L3: a Descent, from Hall 1 - never the player's own deepest hall). */
-export function spireStanding(/** @type {any} */ data) {
-  const h = Number(data?.best?.h);
-  return Number.isSafeInteger(h) && h > 0 ? t('season.book.spire.best', 'Your best Descent: Hall {hall}', { hall: h }) : t('season.book.spire.none', 'No Descent yet this season');
-}
 /** THE SEA'S LINE: the captain's ledger's season figures (captainLedger.js `season`) - this season's alone. */
 export function seaStanding(/** @type {any} */ figures, /** @type {number} */ n) {
   if (!figures || figures.n !== n || (!(figures.deepest > 0) && !(figures.legends > 0))) return t('season.book.sea.none', 'No voyage counted yet this season');
@@ -95,10 +89,10 @@ export function seaStanding(/** @type {any} */ figures, /** @type {number} */ n)
  * THE WINDOW'S MODEL. `src`:
  *   now        the relay's clock, ms
  *   seatsOpen  the seats open to the account; zero - Season 0's seat week (the hourglass's source carries both)
- *   boards     { arena, spire } - each `{ state, data }` or null (scenes/seasonBookHost.js); absent: no reads
+ *   boards     { arena } - each `{ state, data }` or null (scenes/seasonBookHost.js); absent: no reads
  *   signedIn   false - no one signed in; guest - a guest's session (both: ranked by nothing here)
  *   sea        the ledger's season figures, or null
- *   doors      { arena, spire } - whether each row's door stands
+ *   doors      { arena } - whether each row's door stands
  * Answers `{ sections: [{ id, title, sub, at, atLabel, lead, rows: [{ id, name, about, standing, door }], foot }] }` -
  * `at` the moment its countdown counts to (ms), `door` a door's id or null.
  */
@@ -117,14 +111,11 @@ export function seasonBookModel(/** @type {any} */ src) {
       { id: 'arena', name: t('season.book.arena.name', 'The Arena'),
         about: t('season.book.arena.about', 'Rated bouts set your season rating. The leader wears Arena Champion, and the banner with more points wears the laurel next season.'),
         standing: boardLine(src, b.arena, arenaStanding), door: src?.doors?.arena && !src?.guest ? 'arena' : null },
-      { id: 'spire', name: t('season.book.spire.name', 'The Spire'),
-        about: t('season.book.spire.about', 'Each bracket ranks companies by their deepest Descent from Hall 1. The top ten are Spire Champions next season. A new season lets you start from half your deepest Redoubt.'),
-        standing: boardLine(src, b.spire, spireStanding), door: src?.doors?.spire ? 'spire' : null },
       { id: 'sea', name: t('season.book.sea.name', 'The season\'s captains'),
         about: t('season.book.sea.about', 'The deepest voyage past the Veil and the most legends sunk or taken, on the board at any freeport\'s harbormaster.'),
         standing: src?.boards ? seaStanding(src.sea, realm.n) : null, door: null },
     ],
-    // AUDIT SEASON-BOOK L1/W4: the title the rule is for, by name - Spire Champion is the top ten's, above
+    // AUDIT SEASON-BOOK L1/W4: the title the rule is for, by name
     foot: t('season.book.realm.foot', 'Arena Champion is worn by the leader, once they have {games} rated bouts against {foes} different opponents.', { games: SEASON_TITLE_GAMES, foes: SEASON_TITLE_FOES }),
   });
   const seat = seatSeasonAt(now, src?.zero ?? null, !!src?.seatsOpen);

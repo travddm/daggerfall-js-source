@@ -23,8 +23,7 @@ import { QUEST_FILES, packMachine, parsedQuest } from '../../qlSources.mjs';
 
 /** The act a witness's receipt is, and how many of it the step asks (the script's `ql act <kind> <n>`). */
 const WITNESS_ACT = Object.freeze({
-  rite: ['rite-broken', 1], breach: ['breach-closed', 1], redoubt: ['redoubt-taken', 1], redoubts3: ['redoubt-taken', 3],
-  valkynaz: ['valkynaz-felled', 1], hour: ['hour-broken', 1], serpent: ['serpent-slain', 1],
+  rite: ['rite-broken', 1], breach: ['breach-closed', 1], hour: ['hour-broken', 1], serpent: ['serpent-slain', 1],
   star: ['star-held', 1], stars3: ['star-held', 3],   // PIN MOVED (STAR8): the fallen stars
 });
 
@@ -93,14 +92,13 @@ test('QL11/QL12 every act a line\'s script waits on is one the features say; a w
   assert.deepEqual(problems, []);
 });
 
-test('QL13 the Covens\' Hoard\'s key: kept by the outcome the service reads, and only behind the Burning Doors witnessed whole', () => {
+test('QL13 the Covens\' Hoard\'s end: the key sold or sealed, the claim\'s two words; and the line only behind the Burning Doors witnessed whole', () => {
   const svc = QL_SERVICE_LINES.covensHoard;
-  const step = lineById('covensHoard').steps[svc.key.at];
+  const step = lineById('covensHoard').steps[2];
   const sheet = sheetFor(step.quest);
   assert.ok(sheet, `${step.quest}: its sheet`);
   const ids = (sheet?.outcomes ?? []).filter((o) => !o.failure).map((o) => o.id);
-  assert.ok(ids.includes(svc.key.choice), `the outcome "${svc.key.choice}" keeps the key`);
-  assert.ok(ids.some((id) => id !== svc.key.choice), 'and another gives it up');
+  assert.deepEqual(ids, ['keep', 'seal'], 'the key sold to the Guild (`keep`), or sealed by the Order');
   assert.equal(svc.after, 'burningDoors', 'the Burning Doors witnessed whole (AUDIT QUESTLINES SERVICE-4: its title held, never its breach alone)');
   assert.equal(QL_SERVICE_LINES.burningDoors.title, 'doorwarden');
   assert.deepEqual(QL_SERVICE_LINES.burningDoors.witness, { 2: 'rite', 3: 'breach' });
@@ -135,24 +133,23 @@ async function stepOnBridge(name, { inTown = true } = {}) {
   return { bridge, quest, st, tick, words };
 }
 
-test('AUDIT QUESTLINES LINES-4: the Covens\' Hoard kept pays the Guild\'s fee in gold, as the seal does - the Weir Key is the account\'s, once, so the keep is never paid by the key alone - and Ysolde says so before the choice and after it, never handing over a key the script cannot promise (mutants: `ql paid` back on the keep path; 1030 without the house\'s once; 1040\'s "slides the key across")', async () => {
+test('AUDIT QUESTLINES LINES-4: the Covens\' Hoard\'s key sold pays the Guild\'s fee in gold, as the seal does, and the key\'s worth besides - and Ysolde asks before the choice and counts it out after, never handing over a key (mutants: `ql paid` back on the keep path; the worth unpaid; 1040\'s "slides the key across")', async () => {
   const { quest, st, tick, words } = await stepOnBridge('QLCH03');
   tick(2);
   for (const r of quest.resources.values()) if (r.isPerson && r.symbol?.name === 'ysolde') r.setPlayerClicked();
   tick(2);
   assert.equal(st.asked.length, 1, 'asked once');
   assert.equal(st.asked[0].message.id, 1030);
-  assert.match(words(1030), /gives a Spire key to a house once/, 'the house\'s once, said before the choice');
-  st.asked[0].respond(0);   // keep
+  assert.match(words(1030), /Sell it to the Guild/, 'the sale, said before the choice');
+  st.asked[0].respond(0);   // keep: the sale
   tick(6);
   assert.ok(quest.questComplete && quest.questSuccess);
-  assert.equal(quest.ql.outcome, QL_SERVICE_LINES.covensHoard.key.choice, 'the outcome the service pays the key on');
-  assert.equal(st.rewards.length, 1, 'the Guild\'s fee, in gold - whatever the service answers of the key');
+  assert.equal(quest.ql.outcome, 'keep', 'the claim\'s word for the sale');
+  assert.equal(st.rewards.length, 2, 'the Guild\'s fee, in gold, and the key\'s worth');
   assert.equal(st.offers.length, 1, 'and the choice of gear');
   assert.doesNotMatch(words(1040), /slides the key/);
-  assert.match(words(1040), /A house has it once/);
-  // PIN MOVED (AUDIT QUESTLINES VOICE-QL): the house's once said as a sentence of its own, no dash aside (Voice.md rule 5)
-  assert.match(sheetFor('QLCH03').outcomes.find((o) => o.id === 'keep').text, /A house is given that key only once/);
+  assert.match(words(1040), /Sold, then/);
+  assert.match(sheetFor('QLCH03').outcomes.find((o) => o.id === 'keep').text, /sold the Weir Key to the Guild/);
 });
 
 test('AUDIT QUESTLINES LINES-8, ACTS-7: the watch\'s letter waits for a town by day, as a courier\'s does, and the purse and the end wait for the letter - a revenant that kneels in the wild ends nothing there; the sheet\'s word is heard when they are (mutants: the purse and the end in the letter\'s own tick; the word bound to `_heard_`)', async () => {
@@ -197,17 +194,13 @@ const messagesOf = (text) => {
 };
 const personsOf = (text) => new Set([...qbnOf(text).matchAll(/^\s*Person (_[a-zA-Z0-9]+_)/gm)].map((m) => m[1]));
 
-test('AUDIT QUESTLINES LINES-9, -10, -23, -24, -27, ACTS-7: the lines\' words hold to the world they run in - no year named but the Spire\'s fall (the online calendar runs a year a month), no years counted on the Weir Road, Corvane never "always" at a tavern a step moves, no giver asks for "tomorrow" (the next step is an hour off), a later introduction\'s giver new, the Covenant never the Order\'s, a revenant brought to its knees, every purse its tier\'s band (mutants: QLWR04\'s "3E 406"; QLWR02\'s "eight years"; QLWR01\'s "I am always here"; QLIG01\'s "Ask me about it tomorrow"; QLIP02\'s "_crafter_, the court crafter"; QLBD05\'s "keepers of the Covenant"; QLIW02\'s "Beat a revenant"; QLBD01\'s 150 to 250)', () => {
+test('AUDIT QUESTLINES LINES-9, -10, -23, -24, -27, ACTS-7: the lines\' words hold to the world they run in - no year named but the Spire\'s fall (the online calendar runs a year a month), no giver asks for "tomorrow" (the next step is an hour off), a later introduction\'s giver new, the Covenant never the Order\'s, a revenant brought to its knees, every purse its tier\'s band (mutants: QLIG01\'s "Ask me about it tomorrow"; QLIP02\'s "_crafter_, the court crafter"; QLBD05\'s "keepers of the Covenant"; QLIW02\'s "Beat a revenant"; QLBD01\'s 150 to 250)', () => {
   const problems = [];
   for (const l of QL_LINES) l.steps.forEach((s, i) => {
     if (!QUEST_FILES.has(s.quest)) return;   // the script pin names it
     const text = scriptText(s.quest);
     const flat = `${qrcWords(text)}\n${sheetWords(s.quest)}`.replace(/\s+/g, ' ');
     for (const m of flat.matchAll(/3E (\d+)/g)) if (m[1] !== '398') problems.push(`${s.quest}: names 3E ${m[1]} - the world's year runs on`);
-    if (l.id === 'weirRoad') {
-      for (const m of flat.matchAll(/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+) years\b/gi)) problems.push(`${s.quest}: counts "${m[0]}" since the Spire fell`);
-      if (/\balways (?:here|there)\b/i.test(flat)) problems.push(`${s.quest}: Corvane "always" at a tavern each step moves`);
-    }
     if (/\b(?:ask|see|find|come to) me\b[^."]*\btomorrow\b/i.test(flat)) problems.push(`${s.quest}: a giver asks for tomorrow - the next step is an hour off`);
     if (/keepers? of the Covenant|kept the Covenant/i.test(flat)) problems.push(`${s.quest}: the Order of the Hour as the Covenant's keeper - it is the Emperors' blood's`);
     if (/\bbeat (?:a|one|your) revenant/i.test(flat)) problems.push(`${s.quest}: a revenant "beaten" by the player - it kneels whoever struck it`);
@@ -411,7 +404,7 @@ test('QL12 the service: every step of a paid line opened at its start, a witness
   clock.s += STEP_GAP_S; step(); await settle();
   runner.ended(machine.end('QLBD04'), { id: 'done', failure: false });
   step(); await settle();
-  assert.deepEqual(honours, [{ line: 'burningDoors', title: 'doorwarden', key: false, keys: null, keyHeld: false }]);
+  assert.deepEqual(honours, [{ line: 'burningDoors', title: 'doorwarden' }]);
 });
 
 test('QL12 the runner offline: an endgame line begun waits where it stood, and says why', () => {
@@ -632,8 +625,7 @@ test('AUDIT QUESTLINES UI-7, UI-14: the rows say a failed step is offered again 
   assert.deepEqual([coil?.state, coil?.opens], ['waiting', 'Continues online.'], 'a line begun online, seen offline');
 });
 
-test('AUDIT QUESTLINES DOC-18, DOC-6, DOC-34: the Cycle is one story in order - the Covens\' Hoard after the Burning Doors, the Weir Road after the Hoard; and every step\'s sheet pays at its line\'s tier - the line\'s `tier` is the sheets\' (mutants: an `after` dropped; a sheet\'s tier drifted)', () => {
+test('AUDIT QUESTLINES DOC-18, DOC-6, DOC-34: the Cycle is one story in order - the Covens\' Hoard after the Burning Doors; and every step\'s sheet pays at its line\'s tier - the line\'s `tier` is the sheets\' (mutants: an `after` dropped; a sheet\'s tier drifted)', () => {
   assert.equal(lineById('covensHoard').opens.after, 'burningDoors');
-  assert.equal(lineById('weirRoad').opens.after, 'covensHoard');
   for (const l of QL_LINES) for (const s of l.steps) assert.equal(sheetFor(s.quest)?.tier, l.tier, `${s.quest}: its sheet's tier is ${l.id}'s`);
 });

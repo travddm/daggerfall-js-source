@@ -88,9 +88,7 @@ export const FRAME_ROLES = {
     'body .aw-win',   // ARENA3: the Arena window - the Notice Board's carved frame
     'body .lgs-win',   // LEGACY3: the Succession - who carries the line on
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its bar, its panels, its presses
-    'body .fmt-bar', 'body .fmt-side', 'body .fmt-confirmbox',
-    // EG-PLUS: the Elite Breach's windows (ui/eliteGates/egKit.js) - the breach's panel, the boards and the start window
-    'body .eg-win'],
+    'body .fmt-bar', 'body .fmt-side', 'body .fmt-confirmbox'],
   // the talk panel is a .px-win whose own ground rule outweighs .px-win's
   windowGround: ['.talk-shell .talk-panel'],
   // REVENANT-PAGE / COMPANION-ROSTER: a row is a card, never a press (the 2026-10-02 audit: the tile's hover and its sink);
@@ -130,8 +128,6 @@ export const FRAME_ROLES = {
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its card, its word, its hint (under the Grimoire the card
     // and the word are scrolls of its own)
     'body .fmt-tip', 'body .fmt-say', 'body .fmt-hint',
-    // EG-PLUS: the call's tracker, a plate over the world, and a section inside a breach window
-    'body .eg-hud', 'body .eg-k-sec',
     // STAR6: the fallen star's tracker, a plate over the world (ui/starfall/starTracker.js)
     'body .star-hud',
     // EVENTS1: the event board, a plate over the world (ui/eventBoard.js) - its news inside it
@@ -190,15 +186,12 @@ export const FRAME_ROLES = {
     // named beside them was `.px-menu.px-compact`, which nothing builds - that list is the rail's rows, the qrow role)
     '.px-menu .doorbtn',
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its bar, its panels, its presses
-    'body .fmt-btn',
-    // EG-PLUS: a breach window's presses and its close; the Spire HUD's decrees press and its touch buttons
-    'body .eg-k-btn', 'body .eg-k-x', 'body .eg-spire.enhanced .eg-fold', 'body .eg-spire.enhanced .eg-touch button'],
+    'body .fmt-btn'],
   primary: ['.lv-ok', '.hmroot .act:not(.hmtool)', 'body .dfdecor-place', 'body .bounty-shell .act.primary', 'body .lgs-shell .act.primary', 'body .notice-shell .act.primary',
     'body .aw-shell .act.primary',   // ARENA3: Fight and the wager placed - what the window is for   // BOUNTY1: Take bounty and Take the reward in brass   // PLUS-MAP: the map's tools are plain stone   // PLUS-DRESS: Place is what the decorator is for
     'body .dfnaval-take',   // NAV-F: Take all (and a raid's Sail on) - what the plunder window is for
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its bar, its panels, its presses
-    'body .fmt-btn.fmt-go',
-    'body .eg-k-btn[data-kind="primary"]'],   // EG-PLUS: Open the breach, Close a recap - what the window is for
+    'body .fmt-btn.fmt-go'],
   // PLUS-DRESS: a press that COSTS something - leave or disband a guild, remove a member, challenge a player - the
   // button in blood rather than brass (the low-health frame's red). Each is a button above as well; this is its edge.
   warn: ['body .lk-acts .lk-auto',   /* AUDIT LOCKPICK C6: the Auto attempt - a failed roll snaps a pick */ 'body .dfsocial-btn.warn', 'body .dfprofile-duel',
@@ -222,8 +215,7 @@ export const FRAME_ROLES = {
     'body .dfnaval-choice',   // NAV-F: the captor's three choices - the one taken brass
     '.px-sys .cmp-vent',   // RVN-ERRAND: the errand's venture - the one chosen brass
     '.px-sys .coll-part',
-    '.px-sys .coll-filter', '.px-sys .coll-with', '.px-sys .coll-retry',   // COLLECTIONS-II: the wardrobe's filters, and a "comes with" press - AUDIT COLLECTIONS-II: and a failed read's Try again
-    'body .eg-k-tile'],   // EG-PLUS: a Vestige offered, a start, a decree for the Wager - the one taken brass   // COLLECTIONS (CARDS-PLUS): the parts' switch
+    '.px-sys .coll-filter', '.px-sys .coll-with', '.px-sys .coll-retry'],   // COLLECTIONS-II: the wardrobe's filters, and a "comes with" press - AUDIT COLLECTIONS-II: and a failed read's Try again   // COLLECTIONS (CARDS-PLUS): the parts' switch
   // HOLDINGS: where a holding is (`.hld-state`)
   chip: ['body .lk-meta > span',   /* AUDIT LOCKPICK C1: the picks, the pins set, the skill - read, never pressed */ 'body .rvncard-rank', '.px-sys .rvn-rank', '.px-sys .hld-state', '.px-sys .fam-chip',   // LEGACY3: a person's state
      'body .rvncard-mood', '.px-sys .rvn-mood', '.pack-shell .fate-mood', '.px-sys .cmp-rank', '.px-sys .cmp-mood', '.hud-qspell', '.hud-temp', '.pack-shell .sf-tile', '.pack-shell .sf-pill', '.hud-qstag', '.hud-readied', '.lv-note-key',   // (UI3: the effect and need chips are the status widget's tiles now)
@@ -234,8 +226,7 @@ export const FRAME_ROLES = {
     // FIRM1: the Firmament's window (ui/firmamentWindow.js) - its bar, its panels, its presses
     'body .fmt-purse',
     '.px-sys .cmp-odds',
-    '.px-sys .coll-tag',   // COLLECTIONS-II: a row's readouts - whose it is, whether it can be had
-    'body .eg-k-chip', 'body .eg-spire.enhanced .eg-chip'],   // EG-PLUS: a breach window's readouts, and the Spire HUD's chips   // RVN-ERRAND: an errand's odds - a readout
+    '.px-sys .coll-tag'],   // COLLECTIONS-II: a row's readouts - whose it is, whether it can be had   // RVN-ERRAND: an errand's odds - a readout
   // HOLDINGS: a holding's picture, a name's field (`.hld-art`, `.hld-field`)
   well: ['body .lk-canvas',   /* AUDIT LOCKPICK C1: the lock itself, sunk in the window */ 'body .rvncard-face', '.px-sys .rvn-face', '.px-sys .hld-art', '.px-sys .hld-field', '.px-sys .fam-view', '.px-sys .fam-card .fam-face', 'body .lgs-face',   // LEGACY3: the tree's ground, the card's portrait
      '.pack-shell .fate-face', '.px-sys .cmp-face', '.px-sys .cmp-slot', '.px-sys .cmp-gslot', '.trade-shell .packcol', '.pack-shell .sf-sec', '.shell .opt-search', '.shell .ft-tile-drawer',   // FT18: the Features search and a tile's opened drawer
@@ -268,21 +259,17 @@ export const FRAME_ROLES = {
     // PLUS4: the shelf's own "On the shelf / N items" band - the same header a loot window's
     // remotehead already wears, just never scoped for the trade counter's own copy of that markup
     '.trade-shell .remotehead',
-    'body .dfsocial-head', 'body .dfchat-tabs', 'body .dfsocial-tabs',
-    'body .eg-k-head'],   // EG-PLUS: the band that names a breach window
+    'body .dfsocial-head', 'body .dfchat-tabs', 'body .dfsocial-tabs'],
   headerRule: ['body .rvncard-name', '.shell .ft-drawer-label', '.pack-shell .sf-sec h4', '.pack-shell .card h3', '.hmcard h3', '.hmcard h2', '.lv-crown', '.talk-modes', '.talk-cats',
     'body .dfsocial-sec', 'body .dfpeer-name', 'body .dfdecor-head',   // PLUS-DRESS: the Social panel's section heads (the Guild tab's), the F-menu's name
-    'body .dfnaval-sechead',   // NAV-F: the plunder window's three heads
-    'body .eg-k-sechead'],   // EG-PLUS: a breach window's section head
-  footer: ['.port-host .port-foot', '.dlg-shell .dlg-acts', '.trade-shell .trade-footer', '.pack-shell .pack-dock', '.pack-shell .packbar', '.talk-say',
-    'body .eg-k-dock'],   // EG-PLUS: the band a breach window's presses stand on
+    'body .dfnaval-sechead'],   // NAV-F: the plunder window's three heads
+  footer: ['.port-host .port-foot', '.dlg-shell .dlg-acts', '.trade-shell .trade-footer', '.pack-shell .pack-dock', '.pack-shell .packbar', '.talk-say'],
   footerRule: ['.lv-foot', '.wizard .actionbar'],
   rule: ['.port-host .port-stat', '.pack-shell .sf-row', '.pack-shell .sf-th', '.px-stat', '.px-sys .row', '.shell .row', '.px-setwrap .row', '.hmresult', '.hmpair', '.cr-shell .cr-head',
     'body .dfprofile-head', 'body .dfsocial-letterhead',
     'body .dfsocial-row'],   // PLUS-DRESS: a friend's, a party seat's, a guild member's row - an engraved line under each
   // rules that sit ABOVE their content
-  ruleTop: ['.px-qarch', '.wplaque-list', 'body .dfchat-form',
-    'body .eg-k-foot'],   // EG-PLUS: a breach window's foot, its keys
+  ruleTop: ['.px-qarch', '.wplaque-list', 'body .dfchat-form'],
   // a list whose rows are lines, not boxes: the loot window's rows
   // (they are .pack-shell .itemrow too, so this outweighs the tile role)
   listRow: ['.pack-shell .loot-win .itemrow', '.trade-shell .itemrow',   // PLUS6: the shop's shelf and basket rows too
@@ -293,14 +280,13 @@ export const FRAME_ROLES = {
     'body .bounty-post',   // BOUNTY1: the board's notices
     'body .aw-tier',   // ARENA3: the ladder's ten tiers, a line each
     '.px-sys .codex-line',   // COLLECTIONS (CARDS-PLUS): the codex's Legendaries, a line each - the one opened brass
-    '.px-sys .coll-row',   // COLLECTIONS-II: a title, an aura, an icon or a glyph, a line each - the one opened brass
-    'body .eg-k-row'],   // EG-PLUS: a board's line, a recap's member - the reader's own brass
+    '.px-sys .coll-row'],   // COLLECTIONS-II: a title, an aura, an icon or a glyph, a line each - the one opened brass
   // the fading wing rules and dividers of the quest page
   wing: ['.px-qwing'],
   wingFlip: ['.px-qwing.px-flip'],
   railRight: ['.px-qrail', '.shell .side', '.shell .subrail'],
   railLeft: ['.talk-topics', '.shell .detail', 'body .dfchat-who'],
-  tabs: ['.px-tabs button', '.talk-mode', 'body .dfsocial-tab', 'body .dfchat-tab', 'body .eg-k-tab'],   // EG-PLUS: the boards' tabs
+  tabs: ['.px-tabs button', '.talk-mode', 'body .dfsocial-tab', 'body .dfchat-tab'],
   // the CHOSEN option of a row of several (Cloud quality: Default / Low / High, and
   // every tier row like it) - filled green, the colour of a switch that is on.
   // On/off switches already carry their own green and red (.ft-seg-switch).

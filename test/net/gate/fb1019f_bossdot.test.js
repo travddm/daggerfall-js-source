@@ -5,7 +5,7 @@
 // level-20 Burn dealt its first round and the rest of its rounds went nowhere. Its rounds are carried now: kept a body,
 // renewed by a recast (STACK-CAP), ticked on the shared world's round (COURT_ROUND_MS, the court's soul trap's clock) by
 // effects.js tickActiveEffects, each round's sum out through the door a spell's claim takes. Driven on the real producers:
-// the spell maker's Continuous Damage, the stand-in factories, the court and its host driver, an Elite Breach's real fight,
+// the spell maker's Continuous Damage, the stand-in factories, the court and its host driver,
 // the serpent's door, and the wire's validator.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 import { bossStandIn, hostStandIn, crystalStandIn, bossLookOf, hostLookOf } from '../../../src/world/gate/gateBoss.js';
 import { HIT_KINDS, HOST } from '../../../src/net/gate/gateBrain.js';
 import { GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
-import { validGateIn, validEgOut } from '../../../src/net/wire.js';
+import { validGateIn } from '../../../src/net/wire.js';
 import { createStandInSpell, createStandInRounds, createSerpentSpell, countOnStandIn, carriedOnStandIn } from '../../../src/scenes/gate/standInSpell.js';
 import { createGateCourt, COURT_ROUND_MS } from '../../../src/scenes/gate/gateCourt.js';
 import { courtToDungeon } from '../../../src/world/gate/gateArena.js';
@@ -28,15 +28,6 @@ import { SERPENT_HIT_CAP_X, SERPENT_HAND_REF } from '../../../src/net/serpent/se
 import { destroyGateBossBar } from '../../../src/ui/gate/gateBossBar.js';
 import { destroyGateMarksCard } from '../../../src/ui/gate/gateMarksView.js';
 import { destroyGateGround } from '../../../src/ui/gate/gateGroundView.js';
-import { egHallOf, EG_SEALED_MS } from '../../../src/net/eliteGates/egLaw.js';
-import { egBreachNew, egEnter, egStep, egStateOf } from '../../../src/net/eliteGates/egBrain.js';
-import { foldEg, EG_STATE_EMPTY } from '../../../src/net/eliteGates/egLink.js';
-import { EG_ROLE, egBodiesOf } from '../../../src/net/eliteGates/egBodies.js';
-import { EG_KIND } from '../../../src/net/eliteGates/egLegion.js';
-import { egFightView, egGroundAt } from '../../../src/net/eliteGates/egWalkGraph.js';
-import { EG_ECHO_Q, EG_MOMENTUM_STEP } from '../../../src/net/eliteGates/egVestige.js';
-import { createEgFight } from '../../../src/scenes/eliteGates/egFight.js';
-import { egHallCentre } from '../../../src/world/eliteGates/egHall.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const NOOP = () => {};
@@ -274,81 +265,3 @@ test('BOSS-DOT THE SERPENT (createSerpentSpell, out of bootWorld): a hand\'s Bur
     } finally { registerSpellLandedListener('fb1019f-dot', null); }
   });
 });
-
-/** AN ELITE BREACH'S REAL FIGHT: a span woken on the relay's own brain, my Vestiges Momentum III and Arcane Echo III, the
- *  screen's echo roll always on - and me on an island of the fight ground, where its Harriers are struck whole. */
-async function spanFight() {
-  const ME = 'acct-0', T0 = 1_800_000_000_000, seed = 12345;
-  let h = 0;
-  for (let k = 1; k <= 15 && !h; k++) if (egHallOf(seed, k, 0).kind === 'span') h = k;
-  const spec = egHallOf(seed, h, 0);
-  let s = seed;
-  const rng = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return s / 4294967296; };
-  const co = [[ME, 'M0', 30], ['acct-1', 'M1', 30]];
-  let now = T0;
-  const B = egBreachNew({ b: '0123456789abcdef', ez: 'z'.repeat(20), s: ME, o: 'M0', ew: 0, rh: 0, seed, op: now - EG_SEALED_MS - 1000, co, site: { px: 1, py: 1, x: 0, y: 0, z: 0, yaw: 0 }, wg: [] });
-  for (const [sub] of co) egEnter(B, sub, `ord${sub}`.padEnd(20, 'x'), 40, now);
-  B.h = h; B.sg = 'arrive'; B.wk = now; B.cnt = { left: 1_800_000, at: now }; B.pulledAt = now; B.su = now + 30_000;
-  B.mem[ME].vs = [[6, 3], [19, 3]];
-  const arrive = { x: spec.arrive.x, z: spec.arrive.z, y: spec.arrive.y ?? 0 };
-  const pos = { [ME]: { sx: spec.x0 + arrive.x, z: arrive.z, y: arrive.y }, 'acct-1': { sx: spec.x0 + arrive.x + 0.5, z: arrive.z, y: arrive.y } };
-  let E = { ...EG_STATE_EMPTY, b: B.b, seed: B.seed, geo: 0 };
-  const tell = (w) => { if (!w || (w.to && w.to !== ME)) return; const v = validEgOut(JSON.parse(JSON.stringify(w))); if (v) E = foldEg(E, v, now); };
-  const centre = egHallCentre(spec), feet = [centre[0] + arrive.x, centre[1] + arrive.y, centre[2] + arrive.z], sent = [];
-  const tex = (archive) => ({ archive, recordCount: 30, getFrameCount: () => 5, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ width: 0, height: 0 }) });
-  const fight = createEgFight({ renderer: { textures: { has: () => true }, createBillboardBatch: (archive, record, size) => ({ archive, record, size, origin: [0, 0, 0], bounds: [0, 0, 0, 1] }), destroyBillboardBatch: NOOP },
-    link: { state: () => E }, now: () => now, feet: () => feet, cam: () => [feet[0], feet[1] + 1.6, feet[2] - 6], player: () => ({ health: 100, maxHealth: 100 }), me: () => ME,
-    getTexture: async (a) => tex(a), uploadRecordFrame: NOOP, strike: NOOP, save: () => 0, sendHit: (x) => { sent.push(x); return true; }, rand: () => 0 });
-  const at = (x, z, y = 0) => { pos[ME] = { sx: spec.x0 + x, z, y }; feet[0] = centre[0] + x; feet[1] = centre[1] + y; feet[2] = centre[2] + z; };
-  const step = async () => { now += 250; for (const w of egStep(B, now, co.map(([sub]) => ({ sub, ...pos[sub], dead: false, at: now })), rng)) tell(w); fight.frame(); await new Promise((r) => setImmediate(r)); fight.frame(); };
-  for (let k = 0; k < 60 && B.sg !== 'trial'; k++) await step();
-  assert.equal(B.sg, 'trial', 'the span woke');
-  const isle = spec.islands.find((i) => egGroundAt(egFightView(spec), i.x, i.y ?? 0, i.z, 0));
-  at(isle.x, isle.z, isle.y ?? 0);
-  for (let k = 0; k < 40; k++) await step();
-  E = { ...E, ms: egStateOf(B, now).ms };   // my run as the room's state word says it - my Vestiges
-  fight.frame();
-  const by = egBodiesOf(B.F, EG_ROLE.add).filter((b) => b.k === EG_KIND.harrier).sort((p, r) => Math.hypot(p.x - isle.x, p.z - isle.z) - Math.hypot(r.x - isle.x, r.z - isle.z))[0];
-  return { fight, sent, i: by.i, target: () => fight.hostTargets().find((q) => q.i === by.i), at, isle };
-}
-
-test('BOSS-DOT AN ELITE BREACH: a round of my lasting harm on a Spire body is no blow - sent as a spell\'s claim, it takes no Momentum, builds none and rolls no Arcane Echo, where a cast\'s claim does all three (mutants: a round takes the stacks; a round builds them; a round echoes)', async () => {
-  const S = await spanFight();
-  assert.equal(S.target()?.entity.warded, false, 'on the fight ground: whole');
-  const n = () => S.sent.length;
-  assert.equal(S.fight.hostHit({ i: S.i, d: 100, r: HIT_KINDS.Spell }), true);
-  assert.deepEqual(S.sent.slice(-2).map((x) => [x.d, x.q >= EG_ECHO_Q]), [[100, false], [100, true]], 'a cast: its claim, and its Echo');
-  const k = n();
-  assert.equal(S.fight.hostHit({ i: S.i, d: 100, r: HIT_KINDS.Spell, tick: true }), true);
-  assert.deepEqual(S.sent.slice(k).map((x) => [x.d, x.q >= EG_ECHO_Q]), [[100, false]], 'a round: its claim alone, no Momentum taken, no Echo');
-  const j = n();
-  S.fight.hostHit({ i: S.i, d: 100, r: HIT_KINDS.Spell });
-  assert.equal(S.sent[j].d, Math.round(100 * (1 + EG_MOMENTUM_STEP)), 'the next cast takes the one stack the cast built - the round built none');
-});
-
-test('BOSS-DOT A TURNED RECAST ON A SPIRE BODY (AUDIT FB1019f C4): an Elite Breach body\'s ward rides on its stand-in alone (egFight.js turnStandIn - the host record the dungeon context hands the doors carries none) - a Burn on a Harrier struck from the fight ground lays its rounds; recast from no footing, it renews none and answers so, and its rounds run out as first laid (mutant: the ward read off the record alone)', async () => {
-  const S = await spanFight();
-  let t = 900 * COURT_ROUND_MS, rounds = 0;
-  // the host seam as dungeonContext.js gateHostBodies hands it: `{ host, entity, ... }`, no ward of the record's own
-  const doors = createStandInSpell({
-    player: playerEntity, say: NOOP, rolls: HALF, now: () => t,
-    boss: () => null, crystals: () => [], rival: () => null, host: () => S.fight.hostTargets().map((q) => ({ host: q.i, entity: q.entity })),
-    landOnBoss: () => false, landOnCrystal: () => false, landOnRival: () => false,
-    landOnHost: (hb, d, r, tick = false) => { const went = S.fight.hostHit({ i: hb.host, d, r, tick }); if (went && tick) rounds++; return went; },
-    nextArenaQ: NOOP, trapNow: () => null, onTrap: () => false,
-  });
-  const stand = (dx, dz) => { S.at(S.isle.x + dx, S.isle.z + dz, S.isle.y ?? 0); S.fight.frame(); };
-  atLevel(20, () => {
-    assert.equal(S.target()?.entity.warded, false, 'on the fight ground: whole');
-    assert.equal(doors.spellOnHost(BURN, S.i), true, 'struck whole: its rounds laid');
-    for (let k = 0; k < 3; k++) { t += COURT_ROUND_MS; doors.standInRound(); }
-    assert.equal(rounds, 3, 'three rounds landed');
-    stand(1e4, 1e4);
-    assert.deepEqual([S.target()?.entity.warded, doors.spellOnHost(BURN, S.i)], [true, false], 'from no footing: its stand-in turned, and a recast renews nothing');
-    stand(0, 0);
-    assert.equal(S.target()?.entity.warded, false, 'back on the fight ground: whole');
-    for (let k = 0; k < 40; k++) { t += COURT_ROUND_MS; doors.standInRound(); }
-    assert.equal(rounds, ROUNDS - 1, 'its 24 ran as first laid - never renewed by the turned recast');
-  });
-});
-

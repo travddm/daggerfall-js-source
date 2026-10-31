@@ -139,8 +139,7 @@ export class DeathScreen {
     // at the purse, whatever the purse did while the player lay dead (AUDIT 28 B5: a mate's bounty clear pays the
     // dead too, and the respawn took its share of the bigger purse). A death with no respawn (the run ends) takes none.
     const respawns = this.online || this.rises;
-    // EG-H2 (bible/11-Multiplayer/Elite-Gates.md section 24): a made level whose law exempts DEATH-PENALTY (the Spire's -
-    // systems/madeLevel.js) hands `penalty: false`: the respawn takes nothing, so the screen states nothing
+    // A made level whose law exempts DEATH-PENALTY (systems/madeLevel.js) hands `penalty: false`: the respawn takes nothing, so the screen states nothing
     this.goldLoss = respawns && penalty !== false ? deathGoldLoss(goldPiecesOf(entity)) : 0;
     if (respawns) stateDeathLoss(this.goldLoss);
     this.goldLossLine = deathPenaltyLine(this.goldLoss);   // drawn ONCE: the enhanced face redraws every frame and the words must not change under the player

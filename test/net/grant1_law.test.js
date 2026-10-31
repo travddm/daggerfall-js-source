@@ -17,7 +17,6 @@ import { ROAD_PARTY_MAX } from '../../src/systems/roadEncounters.js';
 import { CAMP_SIZE } from '../../src/systems/campEncounters.js';
 import { PARTY_SCALE_EXTRA_MAX } from '../../src/systems/party/partyScale.js';
 import { chooseRandomEnemy } from '../../src/systems/encounters.js';
-import { signEgCall } from '../../src/net/eliteGates/egCallSig.js';
 import { STAR_WAVE_MAX } from '../../src/net/starfall/starfallLaw.js';
 import { RELAY_VERSION } from '../../src/net/wire.js';
 
@@ -99,9 +98,6 @@ test('GRANT1 THE RELAY\'S SIGNATURE: every field signed in one fixed order behin
   assert.equal(await verifyGrant({ ...G, sg }, null, { subtle }), false, 'no key to verify with');
   assert.equal(await verifyGrant({ ...G, k: 'raid', sg }, kp.publicKey, { subtle }), false, 'a grant not read whole is never verified');
   assert.equal(await signGrant(G, null, { subtle }), '', 'a relay with no key signs nothing');
-  // ONE KEY, NEVER CONFUSED: an arch call signed with the same key is no grant
-  const call = await signEgCall({ b: '0123456789abcdef', os: 'acct-mac', o: 'Mac', op: T0, ew: 0, site: { px: 300, py: 200, x: 1, y: 2, z: 3, yaw: 0 } }, kp.privateKey, { subtle });
-  assert.equal(await verifyGrant({ ...G, sg: call }, kp.publicKey, { subtle }), false);
 });
 
 test('GRANT1 THE MARKS: rolled from the seed alone - the same seed, the same marks; three draws a member, so a member\'s marks are its own whatever the count; an elite only for an owner of Renown 5 or more, its draw made either way; an elite never a champion; near the street\'s rates over many seeds (mutants: the Renown\'s gate dropped; a draw skipped for an elite; the champion\'s rate moved)', () => {

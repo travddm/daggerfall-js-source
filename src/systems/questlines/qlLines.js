@@ -7,12 +7,12 @@
 //
 // A LINE IS DATA: its steps' quests, the words the window shows of it, when it opens, and where it is offered (`post` -
 // QL-OFFERED: a line is taken, never sent). What it pays beyond its
-// quests' own rewards is the service's (net/questlineClaims.js QL_SERVICE_LINES - the witnessed steps, the title, the
-// Covens' Hoard's key), read by id here, never restated. The runner (qlLineRunner.js) begins a line the player takes and
+// quests' own rewards is the service's (net/questlineClaims.js QL_SERVICE_LINES - the witnessed steps, the title), read
+// by id here, never restated. The runner (qlLineRunner.js) begins a line the player takes and
 // starts its next step; the window (ui/questlines/qlJournal.js) draws the line.
 //
-//   THE DAGON CYCLE (4.1) - three lines, one story: the Burning Doors (Dagon's Breach), the Covens' Hoard (the Elite
-//     Dungeons' gold-lit champions), the Weir Road (the Elite Breach). Online: every witness is a relay's receipt.
+//   THE DAGON CYCLE (4.1) - two lines, one story: the Burning Doors (Dagon's Breach), the Covens' Hoard (the Elite
+//     Dungeons' gold-lit champions). Online: every witness is a relay's receipt.
 //   THE HOUR THAT WAS NOT (4.2) - the Abyss Dungeon, from the Order of the Hour. Online.
 //   THE OLD COIL (4.3) - the Sea Serpent, from Sentinel's sailors. Online.
 //   THE INTRODUCTIONS (4.5) - a short line for each Tutorials group with a feature to go to: the crafts, the gear's own
@@ -84,19 +84,6 @@ export const QL_LINES = Object.freeze([
       { quest: 'QLCH01', title: () => t('ql.step.QLCH01', 'Gold-Lit') },
       { quest: 'QLCH02', title: () => t('ql.step.QLCH02', 'The Lieutenant') },
       { quest: 'QLCH03', title: () => t('ql.step.QLCH03', 'What the Key Opens') },
-    ],
-  }),
-  line({
-    id: 'weirRoad', group: 'cycle', tier: 4, post: 'tavern',
-    title: () => t('ql.line.weirRoad', 'The Weir Road'),
-    lead: () => t('ql.line.weirRoad.lead', 'The Battlespire fell in 3E 398. One of its last class of Battlemages has never stopped living that year.'),
-    giver: () => t('ql.line.weirRoad.giver', 'Corvane Tull, Battlemage of the Spire’s last class'),
-    opens: { after: 'covensHoard', online: true, account: true },
-    steps: [
-      { quest: 'QLWR01', title: () => t('ql.step.QLWR01', 'The Weir Gate') },
-      { quest: 'QLWR02', title: () => t('ql.step.QLWR02', 'The Torn Halls') },
-      { quest: 'QLWR03', title: () => t('ql.step.QLWR03', 'A Warrior Duke') },
-      { quest: 'QLWR04', title: () => t('ql.step.QLWR04', 'The Battlemage’s Account') },
     ],
   }),
   line({

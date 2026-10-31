@@ -182,8 +182,6 @@ export const CATEGORIES = Object.freeze([
       "Effects/VignetteRounded"]),
     sec("reading", "Readability", [
       "GUI/SwapHealthAndFatigueColors", "GUI/DimAlphaStrength", "GUI/SDFFontRendering"]),
-    sec("danger", "Danger shapes", [
-      "port:dangerPalette", "port:telegraphFill"]),
     sec("largehud", "Large status bar", [
       "GUI/LargeHUD", "GUI/LargeHUDDocked", "GUI/LargeHUDUndockedScale", "GUI/LargeHUDUndockedAlignment", "GUI/LargeHUDUndockedOffsetWeapon",
       "GUI/LargeHUDOffsetHorse"]),

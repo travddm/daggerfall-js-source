@@ -24,7 +24,7 @@ import {
   _setSetPowersClockForTests, _resetSetPowersForTests,
 } from '../../../src/systems/sigil/sigilSetPowers.js';
 import { setSigilOnline, setSigilRenown, _resetSigilForTests } from '../../../src/systems/sigil/sigil.js';
-import { setById, ROUND_SECONDS, _resetSigilSetsForTests } from '../../../src/systems/sigil/sigilSets.js';
+import { ROUND_SECONDS, _resetSigilSetsForTests } from '../../../src/systems/sigil/sigilSets.js';
 import { statusTiles } from '../../../src/ui/hud/hudStatus.js';
 import { setTileTier } from '../../../src/ui/enhanced/enhancedHud.js';
 import { _resetPlayerHealForTests } from '../../../src/systems/playerHeal.js';
@@ -152,7 +152,6 @@ test('AUDIT STAR W6/S2/S3: the Veil says its effect and how long, its spell and 
   assert.equal(setTileTier({ ...tiles[0], name: 'Schleier' })?.i, 2, 'nor does a name in the player\'s language matter');
   assert.equal(setTileTier({ ...tiles[0], tier: null }), null, 'no tier, no line');
   assert.equal(setTileTier({ set: 'technique', tier: 2 }), null, 'a tile of no set');
-  assert.equal('Reprieve'.startsWith(setById('panoply').tiers[2].name), false, 'the Reprieve\'s chip was another the name could not find');
   try {
     patchLocaleTable('xx', 'Port_Strings', [['starfall.set.veilChip', 'Schleier'], ['starfall.set.veil', 'Schleier! {s} s.'], ['starfall.set.veilSpell', 'Mephalas Schleier']]);
     setLocale('xx');

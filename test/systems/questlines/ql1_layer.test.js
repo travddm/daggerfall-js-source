@@ -467,17 +467,17 @@ test('AUDIT QUESTLINES LAW-6: M0B00Y06 whose time runs out inside its hand-in\'s
   assert.equal(rec.offers.length, 1);
 });
 
-test('AUDIT QUESTLINES LAW-6: QLWR04\'s courier letter (`give pc _letter_ notify`) pays nothing - the quest stays unpaid and its mercy\'s gold is scaled x1.25; a second gold reward is never scaled again (mutants: reward\'s letter rule deleted; reward\'s paid guard on the gold deleted)', () => {
+test('AUDIT QUESTLINES LAW-6: QLCH03\'s courier letter (`give pc _letter_ notify`) pays nothing - the quest stays unpaid and its seal\'s gold is scaled x1.25; a second gold reward is never scaled again (mutants: reward\'s letter rule deleted; reward\'s paid guard on the gold deleted)', () => {
   const { rec, start, tick } = packBridge({ playerEntity: { name: 'Hero', level: 20, gender: 'male', career: { weaponArmorShieldsBitfield: 0, forbiddenMaterialsFlags: 0 }, skills: new Array(35).fill(30) } });
-  const q = start('QLWR04');
+  const q = start('QLCH03');
   for (const t of q.tasks.values()) for (const a of t.actions) if (a.typeName === 'PlaceNpc') a.isComplete = true;
   for (const a of q.getTask({ name: 'courier' }).actions) if (a.typeName === 'GivePc') a.offerImmediatelyNow();
   q.getTask({ name: 'courier' }).start(); tick(3);   // the courier's letter arrives
   assert.equal(q.ql.paid, false, 'a letter is the quest\'s mail, never its pay');
   const gold = q.getItem({ name: 'gold' }).daggerfallUnityItem;
   const minted = gold.stackCount;
-  q.getTask({ name: 'tomercy' }).start(); tick(6);
-  assert.equal(q.ql.outcome, 'mercy');
+  q.getTask({ name: 'toseal' }).start(); tick(6);
+  assert.equal(q.ql.outcome, 'seal');
   assert.equal(gold.stackCount, Math.round(minted * 1.25), 'greater: x1.25 at GivePc');
   assert.ok(rec.rewards.includes(gold), 'the scaled purse is the one offered');
   const second = goldStack(200);

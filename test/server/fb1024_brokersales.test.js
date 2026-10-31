@@ -10,13 +10,10 @@ import { readFileSync } from 'node:fs';
 import { standService } from '../accountDb.mjs';
 import { ROUTES } from '../../server-account/src/service.js';
 import { brokerRidOk } from '../../server-account/src/brokerSales.js';
-import { EG_PANOPLY_IDS, EG_SINK_EMBERS } from '../../src/net/eliteGates/egPay.js';
 import { INSIGNIA, BROKER_RID_RE, mintBrokerRid } from '../../src/net/insignia.js';
-import { arenaWeekOf } from '../../src/net/arena/arenaLaw.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const AURA = INSIGNIA.find((o) => o.kind === 'aura');
-const P = EG_PANOPLY_IDS[1];
 
 async function stood(embers = 200) {
   const S = await standService({});
@@ -37,31 +34,12 @@ test('BROKER-RID the request id: `b` and fifteen to thirty-one of base 36, minte
   assert.equal(String(BROKER_RID_RE), String(/^b[a-z0-9]{15,31}$/));
 });
 
-test('BROKER-RID THE PANOPLY: a press with an id writes it beside its sale; asked again, its sale again (nothing spent twice); a bad id refused; a press without one sells as it did (mutants: the id unwritten; asked again sold again; the id never checked)', async () => {
-  const W = await stood();
-  const rid = mintBrokerRid();
-  const sold = await W.call('/v1/eg/sink', { piece: P, rid });
-  assert.deepEqual([sold.status, sold.body.ok, sold.body.piece], [200, true, P]);
-  assert.deepEqual(W.rows(), [{ rid, kind: 'panoply', item: P, settled: 0, asked_by: null }]);
-  const again = await W.call('/v1/eg/sink', { piece: P, rid });
-  assert.deepEqual([again.status, again.body.ok, again.body.piece, again.body.again, again.body.week], [200, true, P, true, sold.body.week]);
-  assert.equal(W.spent(), EG_SINK_EMBERS, 'spent once');
-  assert.deepEqual([(await W.call('/v1/eg/sink', { piece: P, rid: 'nope' })).status, (await W.call('/v1/eg/sink', { piece: P, rid: 'nope' })).body.error], [400, 'rid']);
-  // another press, another id, the same week: the week's piece is bought - no row written for it
-  const twice = await W.call('/v1/eg/sink', { piece: EG_PANOPLY_IDS[2], rid: mintBrokerRid() });
-  assert.deepEqual([twice.status, twice.body.error, W.rows().length], [409, 'bought', 1]);
-  // a client before the id: sells as it always did, and writes no row
-  const W2 = await stood();
-  const old = await W2.call('/v1/eg/sink', { piece: P });
-  assert.deepEqual([old.status, old.body.ok, W2.rows()], [200, true, []]);
-});
-
-test('BROKER-RID THE SETTLE: the sale an id wrote answers `held`, its kind, its item and its FIRST ask\'s nonce, every time it is asked; an id with no row is fenced - a press of it landing late writes nothing, the Panoply\'s or the insignia\'s; a guest and a bad id or nonce refused (mutants: no fence; the latest ask as `by`; a fence answered held)', async () => {
+test('BROKER-RID THE SETTLE: the sale an id wrote answers `held`, its kind, its item and its FIRST ask\'s nonce, every time it is asked; an id with no row is fenced - a press of it landing late writes nothing; a guest and a bad id or nonce refused (mutants: no fence; the latest ask as `by`; a fence answered held)', async () => {
   const W = await stood();
   const rid = mintBrokerRid(), n1 = mintBrokerRid(), n2 = mintBrokerRid();
-  await W.call('/v1/eg/sink', { piece: P, rid });
+  await W.call('/v1/account/insignia', { item: AURA.id, rid });
   const first = await W.call('/v1/broker/settle', { rid, nonce: n1 });
-  assert.deepEqual([first.status, first.body], [200, { held: true, kind: 'panoply', item: P, by: n1, week: arenaWeekOf(Math.floor(Date.now() / 1000)) }]);
+  assert.deepEqual([first.status, first.body.held, first.body.kind, first.body.item, first.body.by], [200, true, 'insignia', AURA.id, n1]);
   assert.equal((await W.call('/v1/broker/settle', { rid, nonce: n2 })).body.by, n1, 'the first ask, whoever asks');
   // an id the service never wrote: fenced - and its press, landing late, writes nothing and spends nothing
   const ghost = mintBrokerRid(), ghost2 = mintBrokerRid();
@@ -69,8 +47,6 @@ test('BROKER-RID THE SETTLE: the sale an id wrote answers `held`, its kind, its 
   assert.deepEqual((await W.call('/v1/broker/settle', { rid: ghost, nonce: n2 })).body, { held: false }, 'a fence stays a fence');
   const W2 = await stood();
   assert.deepEqual((await W2.call('/v1/broker/settle', { rid: ghost, nonce: n1 })).body, { held: false });
-  const late = await W2.call('/v1/eg/sink', { piece: P, rid: ghost });
-  assert.deepEqual([late.status, late.body.error, W2.spent(), W2.raw.prepare('SELECT COUNT(*) AS n FROM eg_sink').get().n], [409, 'fenced', 0, 0]);
   assert.deepEqual((await W2.call('/v1/broker/settle', { rid: ghost2, nonce: n1 })).body, { held: false });
   const lateIns = await W2.call('/v1/account/insignia', { item: AURA.id, rid: ghost2 });
   assert.deepEqual([lateIns.status, lateIns.body.error, W2.spent()], [409, 'fenced', 0]);

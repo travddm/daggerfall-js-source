@@ -1065,7 +1065,7 @@ export const FEATURES = Object.freeze([
     // `gear`, which qlJournal.js qlObjectivesBlock reads) - "each one finished offers" was no longer true. Still two
     // sentences and no longer than it was (FT15's note budget)
     get note() { return t('features.questlines.note', 'Every quest shows its objectives, some let you choose how they end, some offer a piece of gear '
-      + 'fitted to you when done, and questlines lead to the Breaches, the Battlespire and the Abyss. Off is the classic journal '
+      + 'fitted to you when done, and questlines lead to the Breaches and the Abyss. Off is the classic journal '
       + 'and its rewards, and online it is always on.'); },
     get effect() { return t('features.questlines.effect', 'Takes effect on the next quest you take; quests you already have keep the rules they began with.'); },
     kinds: Object.freeze(['enhanced']),

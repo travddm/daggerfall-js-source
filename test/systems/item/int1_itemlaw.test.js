@@ -23,9 +23,6 @@ import { POISON_START_VALUE, POISONS } from '../../../src/systems/poisons.js';
 import { enchantmentSettings } from '../../../src/systems/enchantmentCatalogue.js';
 import { DFU_MAGIC_ITEMS } from '../../dfuMagicItems.mjs';
 import { execFileSync } from 'node:child_process';   // KEY-LAW: the law as the account service loads it
-import { WEIR_KEY_ROW } from '../../../src/systems/eliteGates/weirKey.js';
-import { WEIR_KEY_LAW_ROW } from '../../../src/systems/eliteGates/weirKeyRow.js';
-import { EG_TEXT } from '../../../src/net/eliteGates/egLaw.js';
 
 const SWEEP = honestItems({ seeds: 4 });
 /** A row as the item maker lays it (enchanting.js applyEnchantments): the catalogue's settings, its type the classic number. */
@@ -51,7 +48,7 @@ test('INT1: every item every honest producer mints carries no finding - in the s
   assert.deepEqual(honestItemsSkipped, [], 'every producer ran headless');
   const sources = new Set(SWEEP.map((s) => s.source));
   // PIN MOVED (its audit): the producers counted exactly - a producer dropped from the sweep is a hole, never a pass
-  assert.equal(sources.size, 89, `the sweep's producers: ${sources.size}`);   // PIN MOVED (AUDIT MAKER-RARE A1): + the temple's lift after the maker; PIN MOVED (MAKER-RARE): + the item maker over an identified Rare; PIN MOVED (STAFF-EVENT THE REWARD): + staffEventSpoils.staffSpoilsList; PIN MOVED (AUDIT QUESTLINES REWARD-9): + qlRewards.rollRewardChoice; PIN MOVED (guns removed): - the Thunderlock's producer; PIN MOVED (KEY-LAW): + the Weir Key; PIN MOVED (TECH1): + lootRarity.addTechniqueLine and what may follow it; PIN MOVED (AUDIT CAPTAIN'S SEA B12): + the exchange's goods and the treasure chart
+  assert.equal(sources.size, 88, `the sweep's producers: ${sources.size}`);   // PIN MOVED (Elite Gates removed): - the Weir Key's producer; PIN MOVED (AUDIT MAKER-RARE A1): + the temple's lift after the maker; PIN MOVED (MAKER-RARE): + the item maker over an identified Rare; PIN MOVED (STAFF-EVENT THE REWARD): + staffEventSpoils.staffSpoilsList; PIN MOVED (AUDIT QUESTLINES REWARD-9): + qlRewards.rollRewardChoice; PIN MOVED (guns removed): - the Thunderlock's producer; PIN MOVED (KEY-LAW): + the Weir Key; PIN MOVED (TECH1): + lootRarity.addTechniqueLine and what may follow it; PIN MOVED (AUDIT CAPTAIN'S SEA B12): + the exchange's goods and the treasure chart
   assert.ok(SWEEP.length >= 30_000, `the sweep's items: ${SWEEP.length}`);
   // AUDIT MAKER-RARE C3: the item maker's Rare run is held to what it is for - every group a Rare rolls on, found and
   // crafted, and every cursed Rare the doors minted, each lifted at the temple after (A1: a bound soul's forced row of the
@@ -160,17 +157,11 @@ test('INT1: the templates the law knows - every custom index a producer mints in
   // row the service never registers: the Weir Key's (575) was known here and a 'template' finding there, and every realm
   // character that held a key had its trading frozen, with a strike, the hour the Breach went live
   const custom = [...new Set(SWEEP.map(({ item }) => item.templateIndex).filter((i) => i >= 288))].sort((a, b) => a - b);
-  assert.ok(custom.includes(WEIR_KEY_LAW_ROW.index), 'the sweep mints the Weir Key');
   const judge = new URL('../../../server-account/src/judge.js', import.meta.url).href;
   const law = new URL('../../../src/systems/item/itemLaw.js', import.meta.url).href;
   const headless = `await import(${JSON.stringify(judge)}); const { lawTemplate } = await import(${JSON.stringify(law)});`
     + ` process.stdout.write(JSON.stringify(${JSON.stringify(custom)}.filter((i) => !lawTemplate(i))));`;
   assert.deepEqual(JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', headless], { encoding: 'utf8' })), [], 'every custom template the sweep mints, known to the service\'s law');
-  // the leaf is the row the game registers, but its name and its picture
-  const { name, worldTextureArchive, worldTextureRecord, ...keyRow } = WEIR_KEY_ROW;
-  assert.deepEqual(keyRow, { ...WEIR_KEY_LAW_ROW });
-  assert.equal(name, EG_TEXT.keyName);
-  assert.ok(Number.isInteger(worldTextureArchive) && Number.isInteger(worldTextureRecord));
   assert.deepEqual(Object.keys(CUSTOM_TEMPLATE_GROUPS), ['Weapons', 'Armor', 'Gems', 'Jewellery', 'Furniture']);
   const dagger = honest((it) => it.group === 'Weapons' && it.templateIndex === 113 && !it.rarity && !it.magic, 'a dagger');
   assert.equal(itemWorth(dagger), dagger.value, 'an honest price counts whole');

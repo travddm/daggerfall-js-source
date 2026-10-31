@@ -52,7 +52,6 @@ import { registerModSaveData } from '../modSaveData.js';
 import { isLocked } from '../item/itemLock.js';
 import { addItem } from '../inventory.js';
 import { isEquipped } from '../equip.js';   // SS5: a worn ware is taken off before it is dismantled
-import { EG_SINK_EMBERS, EG_PANOPLY_IDS } from '../../net/eliteGates/egPay.js';   // EG-E1: the Panoply sink's price and its pieces
 import { BROKER_RID_RE, mintBrokerRid, insigniaById } from '../../net/insignia.js';   // AUDIT FB1024 (BROKER-RID): a press's request id, an owed insignia's price
 import { t } from '../textManager.js';   // BROKER-RID: the owed sale's word, in the player's language
 
@@ -287,45 +286,6 @@ export async function insigniaSale(offer, { items, buy, settle, save, account, r
   return { ok: true, data: r.data };
 }
 
-/**
- * EG-E1 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 19, THE SINK): THE
- * BROKER'S PANOPLY PIECE, BOTH HALVES - one piece of the buyer's choosing (`piece`, one of EG_PANOPLY_IDS), once an account
- * an arena week, for EG_SINK_EMBERS - the insignia's sale's own order (insigniaSale): the piece minted first (`mint` - the
- * host's, off the Panoply's records: a piece it cannot make is never paid for), the embers taken from the pack, then the
- * account service's sale (`buy(piece, rid)` - server-account/src/egEconomy.js egSink); one it refused gives the embers
- * back; one whose answer was lost is asked after by its request id, as the insignia's is (AUDIT FB1024, BROKER-RID): held
- * and this ask the first, the piece; fenced, the embers back; not heard, owed. A sale held adds the piece and is `save`d at
- * once. The piece carries no `stonesPaid`: it is not the day's stock, and no dismantle pays its embers back (itemLaw.js's
- * Broker price check). Answers `{ ok: true, data, item }` or `{ ok: false, error }` ('piece': not a piece the host can
- * mint; 'stones': the pack short; 'unheard': owed, or the owed list full).
- * @param {string} piece
- * @param {{ items: any[], buy: (piece: string, rid: string) => Promise<any>, settle: (body: any) => Promise<any>, mint: (piece: string) => any, save: () => void, account: string|null, rid?: string }} io
- */
-export async function panoplySale(piece, { items, buy, settle, mint, save, account, rid = mintBrokerRid() }) {
-  if (!EG_PANOPLY_IDS.includes(piece)) return { ok: false, error: 'piece' };
-  if (_owed.length >= OWED_MAX) return { ok: false, error: 'unheard' };   // what is owed settles first - nothing taken
-  let item = null;
-  try { item = mint(piece); } catch { item = null; }
-  if (!item) return { ok: false, error: 'piece' };
-  if (!spendStones(items, EG_SINK_EMBERS)) return { ok: false, error: 'stones' };
-  let r;
-  try { r = await buy(piece, rid); } catch { r = { ok: false, error: 'offline' }; }
-  if (insigniaUnheard(r)) {
-    const s = await askAfter(settle, rid);
-    if (!s) return oweSale({ kind: 'panoply', id: piece, embers: EG_SINK_EMBERS, rid, account }, items, save);
-    if (s.held && !s.mine) return { ok: false, error: 'unheard' };   // another ask took the piece first: never twice
-    if (s.held) r = { ok: true, data: { ok: true, piece, week: s.week } };
-  }
-  if (!r?.ok) {
-    addItem(items, Object.assign(sigilStone(), { stackCount: EG_SINK_EMBERS }));   // the embers back: the service holds no sale
-    return { ok: false, error: typeof r?.error === 'string' ? r.error : 'offline' };
-  }
-  delete item.stonesPaid;
-  addItem(items, item);
-  save();
-  return { ok: true, data: r.data, item };
-}
-
 /** The stones out of the pack (`items`, the list itself), as `take` names them (`{ item, count }` each): a stack the
  *  count empties gone, one it draws on at what it keeps (SS1). The sale's and the insignia's one hand. */
 function takeFromPack(items, take) {
@@ -347,8 +307,7 @@ function takeFromPack(items, take) {
 // press carries a request id (src/net/insignia.js BROKER_RID_RE) and is asked after by it alone: the service answers the
 // sale that id wrote, or fences the id so the press can never land after (server-account/src/brokerSales.js). An owed
 // sale is `{ kind, id, embers, rid, account }`, rides the save (`SigilBrokerOwed`), and is settled by the Broker's next
-// open under the account that made it: held, the piece - if this page's ask was the FIRST (`by`), so a save loaded again
-// is told it was handed out; an insignia's is the account's already; fenced, the embers back. At most OWED_MAX; past it a
+// open under the account that made it: held, the account's already; fenced, the embers back. At most OWED_MAX; past it a
 // press is refused before anything is taken.
 export const OWED_MAX = 8;
 export const BROKER_OWED_VENDOR = 'SigilBrokerOwed';
@@ -360,10 +319,10 @@ let _owed = [];
 const _asking = new Set();
 /** This page's asks whose answers were lost, by request id - each its nonce: the first ask may have been one of them. */
 const _lost = new Map();
-const owedPrice = (kind, id) => (kind === 'panoply' ? (EG_PANOPLY_IDS.includes(id) ? EG_SINK_EMBERS : 0) : (insigniaById(id)?.price ?? 0));
+const owedPrice = (id) => insigniaById(id)?.price ?? 0;
 const owedRow = (o) => ({ kind: o.kind, id: o.id, embers: o.embers, rid: o.rid, account: o.account });
-const validOwedRow = (o) => !!o && typeof o === 'object' && (o.kind === 'insignia' || o.kind === 'panoply') && typeof o.id === 'string'
-  && o.embers > 0 && o.embers === owedPrice(o.kind, o.id) && typeof o.rid === 'string' && BROKER_RID_RE.test(o.rid)
+const validOwedRow = (o) => !!o && typeof o === 'object' && o.kind === 'insignia' && typeof o.id === 'string'
+  && o.embers > 0 && o.embers === owedPrice(o.id) && typeof o.rid === 'string' && BROKER_RID_RE.test(o.rid)
   && typeof o.account === 'string' && o.account.length > 0 && o.account.length <= 64;
 /** A save's owed list, or none: each row whole, priced as its sale is, one a request id, at most OWED_MAX. */
 export function validOwed(r) {
@@ -404,11 +363,10 @@ async function askAfter(settle, rid) {
 /**
  * THE BROKER'S NEXT OPEN - every owed sale of the signed-in account (`account()`) asked after by its request id, one ask a
  * sale at once: fenced, the embers back into the pack as it stands NOW (`items()` - a save loaded while it was asked is
- * the pack that is owed); a Panoply sale held and first asked here, the piece (`mint`); held and handed out to an ask
- * elsewhere (a save loaded again), nothing more; an insignia held, the account's. Each settled one is struck and saved.
- * @param {{ settle: (body: any) => Promise<any>, account: () => string|null, items: () => any[], save: () => void, mint: (piece: string) => any }} io
+ * the pack that is owed); held, the account's. Each settled one is struck and saved.
+ * @param {{ settle: (body: any) => Promise<any>, account: () => string|null, items: () => any[], save: () => void }} io
  */
-export async function settleOwedSales({ settle, account, items, save, mint }) {
+export async function settleOwedSales({ settle, account, items, save }) {
   const me = account();
   for (const row of _owed.filter((o) => o.account === me && !_asking.has(o.rid))) {
     _asking.add(row.rid);
@@ -416,13 +374,7 @@ export async function settleOwedSales({ settle, account, items, save, mint }) {
       const s = await askAfter(settle, row.rid);
       if (!s) continue;
       const live = _owed.find((o) => o.rid === row.rid);
-      if (s.held && s.kind === 'panoply' && s.mine) {
-        let it = null;
-        try { it = live ? mint(live.id) : null; } catch { it = null; }
-        if (!it) { lostAsk(row.rid, s.by); continue; }   // the piece still owed to this page's first ask
-        delete it.stonesPaid;
-        addItem(items(), it);
-      } else if (!s.held && live) addItem(items(), Object.assign(sigilStone(), { stackCount: live.embers }));
+      if (!s.held && live) addItem(items(), Object.assign(sigilStone(), { stackCount: live.embers }));
       if (!live) continue;
       _owed = _owed.filter((o) => o.rid !== row.rid);
       _lost.delete(row.rid);
@@ -431,21 +383,20 @@ export async function settleOwedSales({ settle, account, items, save, mint }) {
   }
 }
 /**
- * The host's one door to the Broker's two sales and the owed ones (HOST-SPLIT: one statement there): `insignia(offer,
- * buy)` and `panoply(piece, buy)` each a sale with this pack, the save, the settle door (`settleDoor(ioOf(), body)`) and
+ * The host's one door to the Broker's insignia sale and the owed ones (HOST-SPLIT: one statement there): `insignia(offer,
+ * buy)` a sale with this pack, the save, the settle door (`settleDoor(ioOf(), body)`) and
  * the account `ioOf()` names; `settled(ask)` settles what is owed, then answers `ask()` for the window's own use.
- * @param {{ items?: any[] }} entity @param {{ changed: () => void }} saver @param {(piece: string) => any} mint
+ * @param {{ items?: any[] }} entity @param {{ changed: () => void }} saver
  * @param {() => ({ account?: string|null } | null)} ioOf @param {(io: any, body: any) => Promise<any>} settleDoor
  */
-export function brokerOwedDoor(entity, saver, mint, ioOf, settleDoor) {
+export function brokerOwedDoor(entity, saver, ioOf, settleDoor) {
   const items = () => (entity.items ??= []);
   const save = () => saver.changed();
   const settle = (body) => settleDoor(ioOf(), body);
   const account = () => ioOf()?.account ?? null;
   return {
     insignia: (offer, buy) => insigniaSale(offer, { items: items(), buy, settle, save, account: account() }),
-    panoply: (piece, buy) => panoplySale(piece, { items: items(), buy, settle, mint, save, account: account() }),
-    settled: async (ask) => { await settleOwedSales({ settle, account, items, save, mint }); return ask(); },
+    settled: async (ask) => { await settleOwedSales({ settle, account, items, save }); return ask(); },
   };
 }
 /** Tests: the owed list and this page's asks cleared. */

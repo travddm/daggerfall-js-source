@@ -104,7 +104,7 @@ test('STAFF-PANEL5-FEEDS: a manual run can redeploy at the live version, and a p
     assert.match(step(name), /if: steps\.live\.outputs\.version != steps\.ver\.outputs\.version \|\| github\.event\.inputs\.redeploy == 'true'$/, name);
   }
   // a redeploy drops every player like any deploy, so it waits like one
-  for (const name of ['Wait out any live siege', 'The Spire\'s drain and hold']) {
+  for (const name of ['Wait out any live siege']) {
     assert.match(step(name), /if: \(steps\.live\.outputs\.version != steps\.ver\.outputs\.version \|\| github\.event\.inputs\.redeploy == 'true'\) && github\.event\.inputs\.force != 'true'$/, name);
   }
   assert.match(step('Nothing to do'), /if: steps\.live\.outputs\.version == steps\.ver\.outputs\.version && github\.event\.inputs\.redeploy != 'true'$/);

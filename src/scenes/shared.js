@@ -96,7 +96,7 @@ import { installSmithing } from '../systems/smithItems.js';   // PROF3: the Repa
 import { installCooking, dishStaminaFactor } from '../systems/cookItems.js';   // PROF9: a dish eaten, and the Tart's stamina
 import { installHealingSupply } from '../systems/healingSupply.js';   // POTION-COMMON: Potions of Healing in the loot
 import { installRaidingParties } from '../systems/raidingParties.js';   // RAID1: World Events - Raiding Parties' save slot
-import '../systems/gate/gateSpoils.js'; import '../systems/portalStone.js'; import '../systems/gems.js'; import '../systems/eliteGates/weirKey.js'; import '../systems/festival/soulCake.js';   // WITCH1: and the Witches' Festival's two (2000, 2001); EG-PLAY: and the Weir Key's (575) - its Use the world host's opener, every other host's 'cold'
+import '../systems/gate/gateSpoils.js'; import '../systems/portalStone.js'; import '../systems/gems.js'; import '../systems/festival/soulCake.js';   // WITCH1: and the Witches' Festival's two (2000, 2001)
    // WB5: the Sigil Stone's own template (570) registers in every host, so a save carrying one loads it in any of the four; PORTAL1: and the Portal Stone's Use (572)
 import '../systems/sigil/sigilBroker.js';   // SET7: the Broker's record (what this character bought today) registers its save slot in every host, so a save made anywhere carries it
 import { installImmersiveTravel } from '../systems/immersiveTravel.js';   // IT1: Immersive Travel's Init - the drivers' and sailors' factions, their Fast Travel services
@@ -1002,7 +1002,7 @@ export const FOREST_HIDDEN_LOCATION_TYPES = Object.freeze(new Set([4, 7, 9, 10, 
  *  (the world host's: a profession's node under the look, or an act playing - player/motor.js _freeStart). */
 /** EG-PERFECT (2026-10-18; bible/11-Multiplayer/Elite-Gates.md section 10.5): `leap` - whether the running leap may fly here
  *  (player/motor.js _pkMayLeap, the leap at an edge and its late press): the made level's law (systems/madeLevel.js `runLeap`)
- *  refuses it on the Spire's spans and the Hour's Steps, whose every gap is proven with the plain jump. One home for the four
+ *  refuses it on the Hour's Steps, whose every gap is proven with the plain jump. One home for the four
  *  hosts' motors (THE ONE CONSTRUCTION SEAM): the world host's made level answers, every other host's none. */
 export function parkourDeps(entity, say = null, { hold = null } = {}) {
   return {

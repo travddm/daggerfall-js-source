@@ -167,7 +167,7 @@ const hide = (d) => { if (d && !d.hidden) { d.object.matrix.fill(0); d.hidden = 
  * @param {{ renderer?: any, audio?: any, ending?: string | null, lite?: boolean, course?: any }} deps - SD-LOOK S9: `ending` the Hollow's Ending
  *   (net/superDungeon/sdMarks.js SD_ENDINGS' id), its sign on the vane's fin; `lite` the phone's tier (ui/touch/touchDevice.js isTouchDevice -
  *   its own by default): two chunks a Crumble step, not four, and the pendulums' gears without teeth; EG-H3 (EG4):
- *   `course` the course it rides (net/eliteGates/egSpanLaw.js courseOf's record - the Hour's by default), its ghosts at most
+ *   `course` the course it rides (net/superDungeon/egSpanLaw.js courseOf's record - the Hour's by default), its ghosts at most
  *   SD_GHOSTS_MAX
  */
 export function createSdSteps({ renderer = null, audio = null, ending = null, lite = isTouchDevice(), course = SD_COURSE } = {}) {

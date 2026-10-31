@@ -143,12 +143,14 @@ test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in ev
   const STRONGEST = {
     // PIN MOVED (guns removed): cadence 3 -> 5, the Hourlock's toll (every third shot) gone; 5 is today's
     // most frequent (lower is stronger)
+    // PIN MOVED (Elite Gates removed): `magicka` and `shield` gone - the Battlemage's Panoply's powers held their only numbers
     above: 75, below: 33, blow: 140, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
-    gold: 5, guard: 30, heal: 30, hitCap: 25, magicka: 30, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
-    rounds: 4, seconds: 8, shield: 40, ship: 30, spell: 25, splash: 60, stacks: 5, thorns: 30, ward: 40,
+    gold: 5, guard: 30, heal: 30, hitCap: 25, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
+    rounds: 4, seconds: 8, ship: 30, spell: 25, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
   // PIN MOVED (guns removed): the floor 145 -> 141, the Hourlock's and The Last Lock's power numbers gone
-  holdRoles(powerNumbers(), 141, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
+  // PIN MOVED (Elite Gates removed): the floor 141 -> 135, the Battlemage's Panoply's set powers gone
+  holdRoles(powerNumbers(), 135, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
 });
 /** THE ROLES HELD: every number has a role; a line's under its kind's Legendary top; every other at or under today's
  *  strongest of its role (`strongest`, as written down - a lower one is lowered there and in the page). */

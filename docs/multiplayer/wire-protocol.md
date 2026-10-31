@@ -12,7 +12,7 @@ same checks.
 
 Other shared protocol modules in `src/net/` are bundled into the relay the same way: `identityToken.js`,
 `hubShards.js`, `cellTree.js`, `instanceRoom.js`, `roomLease.js`, and the per-mode `*Law.js`, `*Receipt.js` and
-`*Brain.js` files (gates, arena, Super Dungeons, Elite Gates, wild, duel, raid, serpent).
+`*Brain.js` files (gates, arena, Super Dungeons, wild, duel, raid, serpent).
 
 ## Frames
 

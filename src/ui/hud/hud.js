@@ -519,7 +519,6 @@ export function hideHudTextSurfaces(hudText = null) {
 
 export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   { font = null, cursorActive = false, reticleHidden = false, windowCoversHud = null, hudHidden = false, detected = null, playerXZ = null, gate = null, quest = null, wayOut = null, party = null, ships = null, nodes = null, boats = null, largeHud = null, hover = null,
-    arch = null,   // EG-F: my company's Elite arch, scene XZ, while it stands - the compass's mark (scenes/eliteGates/egArch.js compass)
     // STAR6: the compass's event marks the host has long handed and this door never took - the sea serpent's (SERPENT1,
     // scenes/world.js serpentCompassMark) and a found Hollow's (SD2c, sdCompassMark), each drawn by the enhanced HUD and
     // dropped here, so neither showed - and a fallen star's (starfall.compassMark), scene XZ each, or null
@@ -717,7 +716,6 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
       detected: detected ?? null,
       playerXZ: playerXZ ?? null,
       gate: gate ?? null,   // WB1: the Oblivion Gate's scene XZ while the player stands in its ring - the compass's own mark
-      arch: arch ?? null,   // EG-F: my company's Elite arch, scene XZ, while it stands (scenes/eliteGates/egArch.js compass)
       serpent: serpent ?? null, sd: sd ?? null, star: star ?? null,   // STAR6: forwarded at last (SERPENT1's, SD2c's) - and the star's
       quest: quest ?? null,   // GUIDE5: the tracker's quest's place, scene XZ, on the street - the compass's quest mark
       wayOut: wayOut ?? null,   // WAYOUT1: underground, the way out along the walked trail, scene XZ (systems/wayOut.js)

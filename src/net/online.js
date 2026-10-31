@@ -112,9 +112,6 @@ import { dungeonRoomTag } from './wire.js';   // SD-ONLINE: a dungeon's room car
 import { nativePoseRoom } from './wire.js';   // SLIM-FRAME: the frame a room's poses are in - one home, the relay's slim pose rounds by it
 import { validSdIn, validSdOut, sdGate, sdPzGate, relaySupportsSd, sdFightGate, SD_BRAIN_V } from './wire.js';
 import { relaySupportsWw5, STAR_STARS_MAX as STAR_PER_NIGHT_WIRE, SD_LANE_KIND, sdLaneWire } from './wire.js';   // WW5: a relay that keeps the stars and the Hollows past the Bay; a star past the Bay's three is a province's
-import { validEgIn, validEgOut, egGate, relaySupportsEg, relaySupportsEgLand, EG_BRAIN_V } from './wire.js';   // EG-PLAY: an Elite Breach's frame - the open to the hub, a member's words to its room; the call, the breach and its fights in
-import { egHubGate, EG_HUB_KINDS } from './wire.js';   // AUDIT EG IV (lane3 #5): the hub's breach words on their own bucket
-import { isEgRoom } from './eliteGates/egLaw.js';   // SD3: the Super dungeon's frame - a find out, the hub's record in; SD6b: a turn out, the realm's Orrery in
 import { isSdRoom } from './superDungeon/sdLaw.js';   // SD6b: the realm's room, where the Orrery's turns go
 import { owGate, validOwIn, validOwOut, relaySupportsOverworld, OW_WORD_IDS_MAX, OW_WORD_ROWS_MAX, relaySupportsOwGraves, owGraveGate, relaySupportsOwWorld } from './wire.js';   // GRAVE-PARTY: and the graves' word's relay - AUDIT GRAVE-PARTY G3: and its own bucket
 import { validSerpentIn, validSerpentOut, serpentGate, relaySupportsSerpent, relaySupportsSerpentSite } from './wire.js';   // SERPENT1: the sea serpent's frame, both ways   // OW6L: the overworld ledger's frame, both ways
@@ -401,7 +398,6 @@ export function lerpPose(from, to, t) {
     ...(to.cl ? { cl: to.cl, ...(Number.isFinite(to.cw) ? { cw: to.cw } : {}), ...(to.ck ? { ck: to.ck, ...(Number.isFinite(to.cy) ? { cy: to.cy } : {}), ...(to.cd ? { cd: to.cd } : {}) } : {}) } : {}),   // CLIMB6: the move's kind, lip and time, whole   // CLIMB5: the climb and its facing - whole (the body eases its own yaw), omitted off the wall as the wire omits it
     ...(to.ga ? { ga: to.ga, ...(to.gm ? { gm: to.gm } : {}) } : {}), ...(to.gb ? { gb: to.gb } : {}),   // PEER-ACTS: the gathering act and the net's throw, and the beats on their own - discrete, omitted at none as the wire omits them
     ...(to.ab ? { ab: aboardAlong(from.ab, to.ab, k) } : {}),   // DECK-POSE: the place aboard, eased along its deck as the feet are - omitted ashore as the wire omits it
-    ...(to.pl ? { pl: rideAlong(from.pl, to.pl, k) } : {}),   // EG-H1 (RIDE-PLAY): the ride on a breach's moving piece, eased on one piece as the feet are - dropped here, no ridden peer ever reached rideAt
   };
 }
 /** DECK-POSE (net/wire.js validAboard): a place aboard drawn between two poses' - on one deck, the feet in her frame eased
@@ -410,14 +406,6 @@ export function lerpPose(from, to, t) {
 export function aboardAlong(from, to, k) {
   if (!Array.isArray(from) || from[0] !== to[0] || from[1] !== to[1]) return [...to];
   return [to[0], to[1], from[2] + (to[2] - from[2]) * k, from[3] + (to[3] - from[3]) * k, from[4] + (to[4] - from[4]) * k];
-}
-/** EG-H1 RIDE-PLAY (FIELD BUGS 2026-10-23, net/wire.js riddenOf): a ridden pose's `pl` - [piece, dx, dy, dz] - drawn
- *  between two poses' - on one piece its offset eased as the feet are; onto a piece, or onto another, the newer whole. The
- *  play-out carried no `pl` at all, so the session's drawn pose never had one and `rideAt` stood no peer on its piece: a
- *  rider on a swinging Drift was drawn in world space, 160-550 ms behind it (Elite-Gates.md section 10.8). Pure. */
-export function rideAlong(from, to, k) {
-  if (!Array.isArray(from) || from[0] !== to[0]) return [...to];
-  return [to[0], from[1] + (to[1] - from[1]) * k, from[2] + (to[2] - from[2]) * k, from[3] + (to[3] - from[3]) * k];
 }
 
 /** The distance between two poses on the ground. */
@@ -857,14 +845,6 @@ export class OnlineSession {
     this.onRite = null;           // WB12d: (word, room) => void - the hub's word of a broken rite, projected by the wire's validRiteOut
     this.onSd = null;             // SD3: (word, room) => void - the hub's word of the Super dungeon (its record), projected by the wire's validSdOut
     this.onSdHall = null;         // SD6b: (word, room) => void - the realm's word of its Orrery (the stones, the fray, the dial, the Concord), from my own realm alone
-    this.onEg = null;             // EG-PLAY: (word, room) => void - an Elite Breach's word (net/wire.js validEgOut): the hub's call, my own breach room's state, fights and receipts
-    /** EG-H1 (bible/11-Multiplayer/Elite-Gates.md section 10.8 - RIDDEN POSES): () => [i, dx, dy, dz] | null - my pose's ride on
-     *  a breach's moving piece, laid on each pose I say (scenes/eliteGates/egClient.js ridePl); and (pose) => void - a peer's drawn place
-     *  moved onto its ride at my shared clock (rideDraw), EG-ZL: and a peer on no ride told, never moved (its ghost slab on a
-     *  Crumble I have seen fall - section 10.8). Null outside the Spire. */
-    this.poseRide = null;
-    this.poseDown = null;   // AUDIT WORLD-EVENTS L1-4: () => [x, y, z] | null - where my body lies down (scenes/eliteGates/egClient.js)
-    this.rideAt = null;
     /** DECK-POSE: () => [owner, slot, x, y, z] | null - my place aboard a boat (scenes/comeSailAway/comeSailAwayAboard.js
      *  word, or helmWord at my own helm), laid on each pose I say (net/wire.js validAboard). Null ashore, or no Come Sail Away. */
     this.poseAboard = null;
@@ -1066,7 +1046,6 @@ export class OnlineSession {
       // AUDIT WB12d (C6): each socket's own relay's word goes with it - the cell crossed into keeps the raid and the rite
       // its welcome said it keeps, and the one stepped down keeps its own (sendRaid/sendRite read the socket's word)
       const old = { ws: this._ws, status: this.status === 'open' ? 'open' : 'connecting', retryAt: null, backoff: BACKOFF_MIN_MS, since: this._now(), raidOk: this.raidOk, riteOk: this.riteOk, serpentOk: this.serpentOk, sdOk: this.sdOk, ww5Ok: this.ww5Ok, foeInventoryOk: this.foeInventoryOk, wildOk: this.wildOk, wildCollectOk: this.wildCollectOk, bossOk: this.bossOk };   // SERPENT1: and the serpent's; INT9 (AUDIT): and the zone's; AUDIT INT15: and the count's
-      old.egOk = this.egOk;   // EG-PLAY: and the breach's
       old.starOk = this.starOk;   // STAR3: and the star's
       old.sevOk = this.sevOk;   // STAFF-EVENT: and the staff events'
       old.raidWorldOk = this.raidWorldOk;   // WW6: and the raids past the Bay
@@ -1075,7 +1054,7 @@ export class OnlineSession {
       this._halo.set(this.room, old);
       old.ly = this.layer; this.layer = h.ly ?? 0; this._layerRoom = room;   // SCALE5d: each socket's layer goes with it
       this._ws = h.ws; this.status = h.status; this.error = null; this._retryAt = h.retryAt; this._backoff = h.backoff; this._dropAt = h.dropAt ?? null; this._tokenRetry = !!h.tokenRetry;   // DOOR-TOKEN: its wait on a token too
-      this.raidOk = !!h.raidOk; this.riteOk = !!h.riteOk; this.serpentOk = !!h.serpentOk; this.sdOk = !!h.sdOk; this.egOk = !!h.egOk; this.ww5Ok = !!h.ww5Ok;   // SD3: and the find's; EG-PLAY: and the breach's; WW5: and the stars' and Hollows' past the Bay
+      this.raidOk = !!h.raidOk; this.riteOk = !!h.riteOk; this.serpentOk = !!h.serpentOk; this.sdOk = !!h.sdOk; this.ww5Ok = !!h.ww5Ok;   // SD3: and the find's; WW5: and the stars' and Hollows' past the Bay
       this.starOk = !!h.starOk;   // STAR3: and the star's
       this.sevOk = !!h.sevOk;   // STAFF-EVENT
       this.raidWorldOk = !!h.raidWorldOk;   // WW6
@@ -2144,30 +2123,6 @@ export class OnlineSession {
    *  damage `d`, its kind `r` (net/gate/gateBrain.js HIT_KINDS). TRUE MEANS THE WORD LEFT THE SOCKET. */
   sendSdBlow(k, fields) { return this._sdFightSend(validSdIn({ ...fields, k })); }
 
-  /** AUDIT RELEASE R2-2: may an Elite arch stand at `site` on this relay - the Bay's map on any relay that opens breaches,
-   *  a pixel past the Bay on the world-wide relay alone (worldPixelsOk). The key's refusal asks it before the key is staked
-   *  (scenes/eliteGates/egClient.js openRefusal), and the open asks it again. @param {any} site */
-  egSiteOk(site) {
-    return !!site && (this.worldPixelsOk || bayMapPixel(site.px, site.py));
-  }
-  /** EG-PLAY: AN ELITE BREACH'S WORD down my own socket (net/wire.js validEgIn): the open (`k` 'open', `z` the service's
-   *  signed order, `site` where my company answers from) to the hub alone; my admission (`in`), a step through a door
-   *  (`down`), the way home (`home`) and my blows (`hit`, `ahit`, `xhit`) to my own breach's room alone - at a relay that
-   *  keeps breaches, after its welcome, on the breach's own bucket. TRUE MEANS THE WORD LEFT THE SOCKET. */
-  sendEg(k, fields = {}) {
-    const w = validEgIn({ ...fields, k, ...(k === 'in' ? { bv: EG_BRAIN_V } : {}) });
-    if (!w || !this.egOk || this.status !== 'open' || !this._ws || !this._welcomed.has(this._ws)) return false;
-    if (w.k === 'open' && !this.egSiteOk(w.site)) return false;   // AUDIT RELEASE R2-2: an arch past the Bay, to a relay that reads the Bay's map alone, is never said
-    if (k === 'open' || k === 'void' || k === 'claimed' ? !isSocialRoom(this.room) : !isEgRoom(this.room)) return false;   // EG-ZA: a stake's void and a counted receipt's word, the hub's as the open is
-    // AUDIT EG IV (lane3 #5): the hub's own words on the hub's bucket for them (net/wire.js egHubGate) - a word it would refuse
-    // is never sent
-    const body = k === 'vt', hubWord = EG_HUB_KINDS.includes(k), gate = body ? bodyWordGate(this._egBodyBucket, this._now()) : hubWord ? egHubGate(this._egHubBucket, this._now()) : egGate(this._egBucket, this._now());   // EG-H1: my body's word on a bucket of its own (AUDIT INT15's law)
-    if (!gate.pass) return false;
-    try { this._ws.send(JSON.stringify({ t: 'eg', ...w })); } catch { return false; }
-    if (body) this._egBodyBucket = gate.bucket; else if (hubWord) this._egHubBucket = gate.bucket; else this._egBucket = gate.bucket;
-    this.stats.sent++;
-    return true;
-  }
   /** RAID-ROLL: the towns table to the hub that asked for it by its pinned hash (`raid` `tw`), in pieces the wire's own
    *  projection takes (net/raid/raidLaw.js RAID_TOWNS_CHUNK) - down this hub socket alone. Answers whether it all went. */
   /** STAFF-EVENT: my word on the staff event I stand in (net/staffEvent/staffEventLaw.js validStaffEventIn) - down the
@@ -2639,10 +2594,8 @@ export class OnlineSession {
     // is due (HALO-THIN, haloPoseDue); AUDIT WORLD6b-iii(b) A5: through every OPEN socket, my own cell's down or not (the
     // halos rode out nothing while the fan sat behind the primary's send), and then whole
     if (!(this._ws && this.status === 'open') && ![...this._halo.values()].some((h) => h.status === 'open' && h.ws)) return false;   // nowhere to say it: nothing stamped
-    const pl = this.poseRide?.() ?? null;   // EG-H1: RIDDEN POSES - my ride on a breach's moving piece, when I stand on one
     const ab = this.poseAboard?.() ?? null;   // DECK-POSE: and my place on a boat's deck, when I stand aboard one
-    const dn = this.poseDown?.() ?? null;   // AUDIT WORLD-EVENTS L1-4: my body lying down where it fell (a made level keeps me for a raise) - its place, still, dying
-    const out = { ...pose, ...(dn ? { x: dn[0], y: dn[1], z: dn[2], mv: 0, dd: 1 } : {}), ...(pl && !dn ? { pl } : {}), ...(ab ? { ab } : {}), ts: this._stampTs() };   // SCALE2b: one send time for every room's copy - that is what lets a listener order them
+    const out = { ...pose, ...(ab ? { ab } : {}), ts: this._stampTs() };   // SCALE2b: one send time for every room's copy - that is what lets a listener order them
     // RPT1026-SECNET: a stalled line is handed no burst to deliver (LINE_STALL_MS) - the pose waits, the latest goes
     let went = this._poseHeld(this._ws, now) ? false : this._send({ t: 'pose', p: out });
     if (went) this._earOf(this._ws).posed = now;
@@ -3540,8 +3493,6 @@ export class OnlineSession {
       else { const h = this._halo.get(room); if (h) h.riteOk = relaySupportsRite(relayV); }
       if (primary) { this.starOk = relaySupportsStar(relayV); this.ww5Ok = relaySupportsWw5(relayV); }   // STAR3: the cell keeps a fallen star - an older relay closes the socket on `star`; WW5: and a province's
       else { const h = this._halo.get(room); if (h) { h.starOk = relaySupportsStar(relayV); h.ww5Ok = relaySupportsWw5(relayV); } }   // WW5: a halo says for itself (AUDIT RAID R8b's law)
-      if (primary) this.egOk = relaySupportsEg(relayV);   // EG-PLAY: a relay that opens Elite Breaches - an older one closes the socket on `eg`
-      if (primary) this.egLandOk = relaySupportsEgLand(relayV);   // FIELD BUGS 2026-10-20f LANDED-WORD: a relay that says what my blows on a breach's bodies land
       if (primary) this.sdOk = relaySupportsSd(relayV);   // SD3: the cell hears a Hollow found - an older relay closes the socket on `sd`
       else { const h = this._halo.get(room); if (h) h.sdOk = relaySupportsSd(relayV); }
       if (primary) this.serpentSiteOk = relaySupportsSerpentSite(relayV);   // SERPENT2: the hub's serpent herald
@@ -3780,10 +3731,6 @@ export class OnlineSession {
       else if (r?.k === 'rcpt') { if ((room === this.room && isSdRoom(room)) || isSocialRoom(room)) this._deliver('sd', () => this.onSdReceipt?.(r.r, room)); }   // SD9a: my receipt - my own realm's, or the hub's
       else if (r && r.k !== 'ev' && r.k !== SD_LANE_KIND) { if (room === this.room && isSdRoom(room)) this._deliver('sd', () => this.onSdFight?.(r, room)); }   // SD8b: the realm's fight, from my own realm alone; WW5: a province lane's record is the hub's, as the Bay's
       else if (r && isSocialRoom(room)) this._deliver('sd', () => this.onSd?.(r, room));
-    } else if (m.t === 'eg') {
-      // EG-PLAY: an Elite Breach's word - the call from the hub, everything else from the breach room I stand in alone
-      const r = validEgOut(m);
-      if (r && (isSocialRoom(room) ? r.k === 'call' || r.k === 'no' || r.k === 'rcpt' : room === this.room && isEgRoom(room))) this._deliver('eg', () => this.onEg?.(r, room));   // EG-ZA: and a receipt the hub holds for me (a void it asked, my breach's receipts at my hello)
     } else if (m.t === 'watch') {
       // SEAT1b (Seats-Arc 4.2): THE WATCH'S TICK - my own cell's alone (the relay ticks the socket that stands there, never a
       // halo's), a well-formed `k1` receipt or nothing; what it is worth is the account service's to say
@@ -4437,8 +4384,6 @@ export class OnlineSession {
       if (!was || s.x !== was.x || s.y !== was.y || s.z !== was.z) p.drawnAt = now;
       else if (s.mv && now - p.drawnAt >= SHOWN_MOVE_HOLD_MS) s.mv = 0;   // AUDIT 637 C3: the sender's own edge (world.js: moving while now < moved + the hold)
       p.shown = p.drawn = s;
-      if (s.pl && this.rideAt) { const r = { ...s }; this.rideAt(r); p.shown = r; }   // EG-H1: a ridden peer drawn on its piece at my clock (its walk's place left as it was)
-      else if (this.rideAt) this.rideAt(s);   // EG-ZL (Elite-Gates.md section 10.8): a peer on no ride told too, never moved - on a Crumble I have seen fall it stands on a ghost slab
     }
   }
 

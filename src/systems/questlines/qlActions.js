@@ -15,7 +15,7 @@
 //                                                                   DFU quest's (unstamped) says nothing.
 //   ql act <kind> <n>                                               a trigger (QL11): true once the player has done <n>
 //                                                                   acts of <kind> since the task was armed - a fish
-//                                                                   caught, a breach closed, a Redoubt taken. The acts
+//                                                                   caught, a breach closed. The acts
 //                                                                   are the layer's (qlLayer.js act), heard from the
 //                                                                   features; a quest that is not stamped hears none.
 //   ql paid                                                         the quest paid, quietly: its success and its

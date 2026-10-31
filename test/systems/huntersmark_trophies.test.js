@@ -22,8 +22,7 @@ import { composeTrophy, loadTrophyArt, TROPHY_W, TROPHY_H, TROPHY_M, TROPHY_WOOD
 import { huntKind, trophyLine } from '../../src/scenes/huntHost.js';
 import { fishKind, speciesOfHaul } from '../../src/scenes/fishHost.js';
 import { PASSIVE_FISH_SPECIES } from '../../src/world/passiveFish.js';
-import { EG_ANNALS, EG_ANNALS_FOUND } from '../../src/net/eliteGates/egAnnals.js';
-import { GATHERED_PARTS, gatheredCount, drawGatheredPart, annalsHeldOf } from '../../src/ui/collections/gatheredPart.js';
+import { GATHERED_PARTS, gatheredCount, drawGatheredPart } from '../../src/ui/collections/gatheredPart.js';
 import { partCount } from '../../src/ui/collectionsPage.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import '../../src/systems/professions/profTemplates.js';   // the Mounted Trophy's row, as the game registers it
@@ -150,7 +149,7 @@ test('HUNTERS-MARK THE TROPHY HUNTER on the real Worker: a clean pelt of a grade
   assert.equal(giveTrophySaved(null, MOB.Harpy, () => { saves++; }), false, 'no one to give it to');
 });
 
-test('HUNTERS-MARK THE GATHERED LOG AND THE COLLECTIONS PAGE\'S PARTS: a fish logged once a haul on its key\'s day, a trophy as minted, the save\'s record read defensively; the Trophies and Fish parts list the whole set, held or not; the Annals part the pages the account keeps, or asks a sign-in (mutants: a haul logged twice; the first day overwritten; a bad row kept; the annals\' bits read wrong; the part\'s count)', () => {
+test('HUNTERS-MARK THE GATHERED LOG AND THE COLLECTIONS PAGE\'S PARTS: a fish logged once a haul on its key\'s day, a trophy as minted, the save\'s record read defensively; the Trophies and Fish parts list the whole set, held or not (mutants: a haul logged twice; the first day overwritten; a bad row kept; the part\'s count)', () => {
   assert.ok(registeredModSaveVendors().includes(GATHERED_VENDOR));
   _resetGatheredForTests();
   assert.deepEqual(readGathered({ fish: { 9002: { n: 2, day: 20000 }, x: { n: 1, day: 1 }, 9003: { n: 0, day: 1 } }, trophies: [] }), { fish: { 9002: { n: 2, day: 20000 } }, trophies: {} });
@@ -167,12 +166,9 @@ test('HUNTERS-MARK THE GATHERED LOG AND THE COLLECTIONS PAGE\'S PARTS: a fish lo
   const species = speciesOfHaul(node, 231);
   assert.deepEqual(gatheredOf('fish')[species.templateIndex], { n: 1, day: 20724 }, 'once, on the haul key\'s day');
   // the parts
-  assert.deepEqual(GATHERED_PARTS.map(([id]) => id), ['trophies', 'fish', 'annals']);
+  assert.deepEqual(GATHERED_PARTS.map(([id]) => id), ['trophies', 'fish']);
   assert.deepEqual(gatheredCount('trophies', null), { held: 1, total: TROPHY_BEASTS.length });
   assert.deepEqual(partCount('fish', null), { held: 1, total: PASSIVE_FISH_SPECIES.length }, 'the page\'s tile reads the part');
-  assert.deepEqual(gatheredCount('annals', null), { held: null, total: EG_ANNALS.length }, 'the account not read');
-  assert.deepEqual(annalsHeldOf({ annals: 0b101 | (1 << 17) }), [0, 2, 17]);
-  assert.equal(annalsHeldOf({ annals: -1 }), null);
   const draw = (id, w) => { const d = el('div'); drawGatheredPart(d, kit, id, w); return d; };
   const t = draw('trophies', null);
   assert.equal(byClass(t, 'codex-line').length, TROPHY_BEASTS.length);
@@ -182,10 +178,5 @@ test('HUNTERS-MARK THE GATHERED LOG AND THE COLLECTIONS PAGE\'S PARTS: a fish lo
   const f = draw('fish', null);
   assert.equal(byClass(f, 'codex-line').length, PASSIVE_FISH_SPECIES.length);
   assert.match(byClass(f, 'found')[0].textContent, new RegExp(`^${species.itemName}1 hauls · first on `));
-  const a = draw('annals', { annals: 0b11 });
-  assert.equal(byClass(a, 'found').length, 2);
-  assert.match(byClass(a, 'found')[0].textContent, new RegExp(`^${EG_ANNALS[0][0].replace(/[.*+?^${}()|[\]\\']/g, '.')}`));
-  assert.match(byClass(a, 'codex-line')[EG_ANNALS_FOUND].textContent, /Given at a lord's first fall/);
-  assert.match(draw('annals', null).textContent, /Sign in to your account/);
 });
 

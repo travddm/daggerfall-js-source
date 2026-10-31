@@ -1,48 +1,38 @@
 // @ts-check
 // EG-H2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 24, slice EG7): THE
-// MADE LEVEL'S RULES - one law for the three made levels the world host stands a player in: the Burning Court (an
-// Oblivion Gate's arena, world/gate/gateArena.js), the Shattered Hour (world/superDungeon/sdRealm.js) and an Elite Breach's circle - the
-// Spire (world/eliteGates/egHall.js). Each rule's door asked the level itself (`gateArenaDay`, `sdRealmSlot`, `egHallBreach`,
-// `isGateArena`, `_sdRealm`, `_egHall`), so a third made level grew a third copy of every check and one was forgotten
-// (THE FOUR HOSTS RULE's own failure: the pause's Save never learnt the Spire). Now a door asks THIS law what the level
-// under the player turns off, and test/systems/eliteGates/egmade_law.test.js sweeps the hosts so no door asks a level again (THE ONE
-// CONSTRUCTION SEAM).
+// MADE LEVEL'S RULES - one law for the made levels the world host stands a player in: the Burning Court (an Oblivion
+// Gate's arena, world/gate/gateArena.js) and the Shattered Hour (world/superDungeon/sdRealm.js). Each rule's door asked
+// the level itself (`gateArenaDay`, `sdRealmSlot`, `isGateArena`, `_sdRealm`), so a new made level grew a new copy of
+// every check and one was forgotten. Now a door asks THIS law what the level under the player turns off, and
+// test/systems/egmade_law.test.js sweeps the hosts so no door asks a level again (THE ONE CONSTRUCTION SEAM).
 //
-//   madeLevelOf(loc)      'court' | 'hour' | 'spire' | null - the location's own predicates, read in one place
+//   madeLevelOf(loc)      'court' | 'hour' | null - the location's own predicates, read in one place
 //   MADE_LEVEL_RULES      what each level turns off, as data (null: as the game does it today)
-//   MADE_LEVEL_TEXT       how each level refuses, in its own words (the court's, the Hour's, the Spire's - unchanged)
+//   MADE_LEVEL_TEXT       how each level refuses, in its own words (the court's, the Hour's - unchanged)
 //   madeLevelRule(lv, r)  a rule of a level; madeLevelSays(lv, r) its refusal's words
-//   registerMadeLevelHere the world host's word on where the player stands (and whether on the Spire's traversal
-//                         ground), so a door with no host in reach (an item's use, a technique) asks the same law
+//   registerMadeLevelHere the world host's word on where the player stands, so a door with no host in reach (an item's
+//                         use, a technique) asks the same law
 //
 // The Burning Court and the Hour were re-plugged unchanged (EG7) - every value for them what their doors did before this
 // law, pinned by their own tests and by the law's - and EVENT-RULES moved two rows since (AUDIT WORLD-EVENTS L5-14): their
-// regeneration held, not off, and no level refusing a party member's Resurrect. The Spire's column is section 24's, with
-// THE POTION LAW, THE FORGIVENESS (section 10.8), the flight bans (section 10.7), AvoidDeath refused and DEATH-PENALTY none.
+// regeneration held, not off, and no level refusing a party member's Resurrect. The rules no level sets now (the
+// slow-fall ban, THE FORGIVENESS, AvoidDeath, the death penalty) keep their keys
+// and their doors, so a level that wants one names it in its row.
 //
 // Not a DFU member. Ledger A (ELITE-GATES).
 import { isGateArena, COURT_TEXT } from '../world/gate/gateArena.js';
 import { isSdRealm, SD_REALM_TEXT } from '../world/superDungeon/sdRealm.js';
-import { isEgHall } from '../world/eliteGates/egHall.js';
-import { EG_TEXT } from '../net/eliteGates/egLaw.js';
 
 /** The made levels, by the law's names. */
-export const MADE_LEVELS = Object.freeze(['court', 'hour', 'spire']);
+export const MADE_LEVELS = Object.freeze(['court', 'hour']);
 
 /**
- * Which made level a location is: the Burning Court, the Shattered Hour, the Spire, or none. The three predicates are
- * their own homes' (each asks its made record's location id), mutually exclusive.
+ * Which made level a location is: the Burning Court, the Shattered Hour, or none. The two predicates are their own
+ * homes' (each asks its made record's location id), mutually exclusive.
  * @param {any} loc a dungeon location (worldModes' `dungeonLoc`, dungeonContext's `dfLocation`)
- * @returns {'court'|'hour'|'spire'|null}
+ * @returns {'court'|'hour'|null}
  */
-export const madeLevelOf = (loc) => (isGateArena(loc) ? 'court' : isSdRealm(loc) ? 'hour' : isEgHall(loc) ? 'spire' : null);
-
-/** THE FORGIVENESS (section 10.8): a jump pressed up to this long before landing fires on landing; a plain jump pressed
- *  up to this long after walking off an edge still leaps (s). The Spire's alone - the motor is DFU's elsewhere. */
-export const EG_JUMP_BUFFER_S = 0.12;
-export const EG_LATE_PRESS_S = 0.12;
-/** The technique flight's refusal on the Spire's traversal ground (section 10.7: on a span a leap would be a bridge). */
-export const EG_NO_FLIGHT_TEXT = 'The Spire\'s spans are walked, not flown.';
+export const madeLevelOf = (loc) => (isGateArena(loc) ? 'court' : isSdRealm(loc) ? 'hour' : null);
 
 /**
  * Every rule the law knows, and what its value means (null in a level's row: the game's own, as today):
@@ -55,11 +45,8 @@ export const EG_NO_FLIGHT_TEXT = 'The Spire\'s spans are walked, not flown.';
  *   companions    'out'      - GATE-ALONE, SD-ALONE: lifted at the door, stood again outside
  *   regen         'held'     - the court's law (systems/courtRules.js): natural regeneration at half, and none for 5 s
  *                              after a hurt (EVENT-RULES - it was 'off', WBX6's)
- *   potions       'counted'  - THE POTION LAW: two restoring potions a hall (systems/eliteGates/spireKit.js, the count the breach's
- *                              client keeps - ui/eliteGates/egHud.js EG_POTIONS_PER_HALL)
  *   levitate      'banned'   - the Levitate ward (characters/playerEntity.js registerLevitateWard)
  *   slowfall      'banned'   - the motor's slow fall written false (the effect still runs)
- *   techFlight    'refused'  - a weapon technique's leap or dash, on traversal ground
  *   jumpBuffer    seconds    - THE FORGIVENESS's buffer (0: DFU's motor, none)
  *   latePress     seconds    - THE FORGIVENESS's late press (0: none)
  *   runLeap       'refused'  - EG-PERFECT: the enhanced climb's RUNNING LEAP (player/motor.js _pkMayLeap - CLIMB3's leap at an
@@ -73,8 +60,8 @@ export const EG_NO_FLIGHT_TEXT = 'The Spire\'s spans are walked, not flown.';
  *   unstuck       'refused' | 'wayHome' - /unstuck refused, or the level's own way out
  *   says          'mid' | 'hour' - the voice a level's refusal is said in (the mid-screen line, the Hour's own voice)
  */
-export const MADE_LEVEL_RULE_KEYS = Object.freeze(['save', 'rest', 'automap', 'mark', 'recall', 'portalStone', 'companions', 'regen', 'potions', 'levitate', 'slowfall',
-  'techFlight', 'jumpBuffer', 'latePress', 'runLeap', 'resurrect', 'avoidDeath', 'death', 'deathPenalty', 'unstuck', 'says']);
+export const MADE_LEVEL_RULE_KEYS = Object.freeze(['save', 'rest', 'automap', 'mark', 'recall', 'portalStone', 'companions', 'regen', 'levitate', 'slowfall',
+  'jumpBuffer', 'latePress', 'runLeap', 'resurrect', 'avoidDeath', 'death', 'deathPenalty', 'unstuck', 'says']);
 const NONE_IS_ZERO = new Set(['jumpBuffer', 'latePress']);
 /** A level's row: every rule named, null (or 0 for a duration) where the level leaves the game as it is. */
 const row = (o) => Object.freeze(Object.fromEntries(MADE_LEVEL_RULE_KEYS.map((k) => [k, o[k] ?? (NONE_IS_ZERO.has(k) ? 0 : null)])));
@@ -98,16 +85,11 @@ export const MADE_LEVEL_RULES = Object.freeze({
   court: row({ save: 'refused', rest: 'refused', automap: 'off', mark: 'refused', portalStone: 'refused', companions: 'out', regen: 'held', death: 'castOut', unstuck: 'refused', says: 'mid' }),
   hour: row({ save: 'refused', rest: 'refused', automap: 'off', mark: 'refused', recall: 'refused', portalStone: 'refused', companions: 'out', regen: 'held', levitate: 'banned',
     runLeap: 'refused', death: 'final', unstuck: 'wayHome', says: 'hour' }),
-  spire: row({ save: 'refused', rest: 'refused', automap: 'off', mark: 'refused', recall: 'refused', portalStone: 'refused', companions: 'out', regen: 'held', potions: 'counted',
-    levitate: 'banned', slowfall: 'banned', techFlight: 'refused', jumpBuffer: EG_JUMP_BUFFER_S, latePress: EG_LATE_PRESS_S, runLeap: 'refused', avoidDeath: 'refused', death: 'fall',
-    deathPenalty: 'none', unstuck: 'refused', says: 'mid' }),
 });
-/** HOW EACH REFUSES, in its own words - the three homes' own lines, unchanged (the Spire's Mark is its Recall's). */
+/** HOW EACH REFUSES, in its own words - the homes' own lines, unchanged. */
 export const MADE_LEVEL_TEXT = Object.freeze({
   court: Object.freeze({ save: COURT_TEXT.noSave, rest: COURT_TEXT.noRest, automap: COURT_TEXT.noMap, mark: COURT_TEXT.noMark, unstuck: COURT_TEXT.noUnstuck }),
   hour: Object.freeze({ save: SD_REALM_TEXT.noSave, rest: SD_REALM_TEXT.noRest, automap: SD_REALM_TEXT.noMap, mark: SD_REALM_TEXT.noMark, recall: SD_REALM_TEXT.noRecall }),
-  spire: Object.freeze({ save: EG_TEXT.noSave, rest: EG_TEXT.noRest, automap: EG_TEXT.noMap, mark: EG_TEXT.noRecall, recall: EG_TEXT.noRecall,
-    unstuck: `${EG_TEXT.noRecall} The way home stands at a Redoubt.`, techFlight: EG_NO_FLIGHT_TEXT }),
 });
 
 /**
@@ -115,7 +97,7 @@ export const MADE_LEVEL_TEXT = Object.freeze({
  * @param {string|null|undefined} level @param {string} rule
  */
 export function madeLevelRule(level, rule) {
-  const r = level ? MADE_LEVEL_RULES[/** @type {'court'|'hour'|'spire'} */ (level)] : null;
+  const r = level ? MADE_LEVEL_RULES[/** @type {'court'|'hour'} */ (level)] : null;
   if (r && Object.hasOwn(r, rule)) return r[rule];
   return NONE_IS_ZERO.has(rule) ? 0 : null;
 }
@@ -124,35 +106,27 @@ export function madeLevelRule(level, rule) {
  * @param {string|null|undefined} level @param {string} rule
  */
 export function madeLevelSays(level, rule) {
-  const t = level ? MADE_LEVEL_TEXT[/** @type {'court'|'hour'|'spire'} */ (level)] : null;
+  const t = level ? MADE_LEVEL_TEXT[/** @type {'court'|'hour'} */ (level)] : null;
   return (t && Object.hasOwn(t, rule) ? t[rule] : '') ?? '';
 }
 
 // ── where the player stands: the world host's word ───────────────────────────────────────────────────────
 /** @type {(() => any) | null} */
 let _here = null;
-/** @type {(() => any) | null} */
-let _traverse = null;
 /**
- * The world host's word on the made level under the player (scenes/world.js - its mode machine's `madeLevel`), and
- * whether its feet stand on the Spire's traversal ground (off the hall's fight floor - scenes/eliteGates/egClient.js onTraverse).
- * A door with no host in reach reads them: an item's use (systems/eliteGates/spireKit.js), a technique (combat/techniques.js), the
- * motor's forgiveness. Null removes either. A word that throws is no made level.
- * @param {(() => any) | null} here @param {(() => any) | null} [traverse]
+ * The world host's word on the made level under the player (scenes/world.js - its mode machine's `madeLevel`). A door
+ * with no host in reach reads it: an item's use, a technique, the motor's forgiveness. Null removes it. A word that
+ * throws is no made level.
+ * @param {(() => any) | null} here
  */
-export function registerMadeLevelHere(here, traverse = null) {
+export function registerMadeLevelHere(here) {
   _here = typeof here === 'function' ? here : null;
-  _traverse = typeof traverse === 'function' ? traverse : null;
 }
 /** The made level under the player now, or null. */
 export function madeLevelHere() {
-  try { const v = _here?.() ?? null; return MADE_LEVELS.includes(v) ? /** @type {'court'|'hour'|'spire'} */ (v) : null; } catch { return null; }
+  try { const v = _here?.() ?? null; return MADE_LEVELS.includes(v) ? /** @type {'court'|'hour'} */ (v) : null; } catch { return null; }
 }
 /** A rule of the made level under the player now. */
 export const madeRuleHere = (/** @type {string} */ rule) => madeLevelRule(madeLevelHere(), rule);
 /** Its refusal's words. */
 export const madeSaysHere = (/** @type {string} */ rule) => madeLevelSays(madeLevelHere(), rule);
-/** Whether the player's feet stand on traversal ground (the Spire's spans, off every fight floor). */
-export function madeOnTraverse() {
-  try { return !!_traverse?.(); } catch { return false; }
-}

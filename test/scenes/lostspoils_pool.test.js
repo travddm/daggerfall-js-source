@@ -3,14 +3,13 @@
 // still on it is owed to the mailbox in ONE write of the spew's crash record (its `pieces` the pack's part, the rest its
 // `mail`), sent, asked again while the answer is not a yes, and given to the pack on a refusal that will never be one or
 // after LOST_OWED_MAX_MS; the gold goes to the purse as ever. And a new burst over a floor not yet left gathers it first.
-// Every floor here is the game's own roll (spoilsList, sdSpoilsList, egSpoilsList).
+// Every floor here is the game's own roll (spoilsList, sdSpoilsList).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createSpoilsPool, spoilsList, recoverSpoils, mailOf, SPOILS_STORE_KEY, SPOILS_TEXT, LOST_TEXT, LOST_RETRY_MS, LOST_RETRY_MAX_MS, LOST_FIRST_MS } from '../../src/scenes/spoilsPool.js';
 import { LOST_OWED_MAX_MS, LOST_INDEX_MAX, LOST_ITEM_BYTES, LOST_BODY_MAX } from '../../src/net/lostLaw.js';
 import { sdSpoilsList, sdSpoilsDay } from '../../src/systems/superDungeon/sdSpoils.js';
-import { egSpoilsList, egSpoilsDay } from '../../src/systems/eliteGates/egSpoils.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const WALL = 1_700_000_000_000;
@@ -193,7 +192,7 @@ test('LOST-SPOILS ONE WRITE: the device restarted with a send out hands the pack
   assert.deepEqual(recs.map((r) => r.day), [700, 702, 703], 'the oldest without mail went; the one still owing stayed, and took no crash record\'s place');
 });
 
-test('LOST-SPOILS A NEW BURST OVER A FLOOR NOT YET LEFT GATHERS IT FIRST - a breach\'s next Redoubt had thrown its spoils over the last one\'s, whose leftovers were on no floor and in no pack until the next boot handed back the whole of them, pressed pieces too; with a door, the old floor\'s items go to the mailbox (mutants: the old floor dropped under the new)', async () => {
+test('LOST-SPOILS A NEW BURST OVER A FLOOR NOT YET LEFT GATHERS IT FIRST - a boss\'s next burst had thrown its spoils over the last one\'s, whose leftovers were on no floor and in no pack until the next boot handed back the whole of them, pressed pieces too; with a door, the old floor\'s items go to the mailbox (mutants: the old floor dropped under the new)', async () => {
   const one = spoilsList(99, 8), two = spoilsList(7, 8);
   const h = harness({ mail: false });
   burst(h, 700, 99); settle(h); h.p.pick('spoil:0');
@@ -210,7 +209,7 @@ test('LOST-SPOILS A NEW BURST OVER A FLOOR NOT YET LEFT GATHERS IT FIRST - a bre
   assert.deepEqual(m.sends.map((s) => [s.day, s.pieces.map((p) => p.i)]), [[700, itemsLeft(one, [0]).map((x) => x.i)]], 'the first floor\'s items to the mailbox');
 });
 
-test('LOST-SPOILS the sizes the law names hold the game\'s own spoils: the gate\'s (a portent night, the rite broken), the Brass Remnant\'s and a Valkynaz\'s Redoubt - every list under LOST_INDEX_MAX places, every item under LOST_ITEM_BYTES, every send under LOST_BODY_MAX (mutants: a bound under the spoils)', () => {
+test('LOST-SPOILS the sizes the law names hold the game\'s own spoils: the gate\'s (a portent night, the rite broken), and the Brass Remnant\'s - every list under LOST_INDEX_MAX places, every item under LOST_ITEM_BYTES, every send under LOST_BODY_MAX (mutants: a bound under the spoils)', () => {
   let send = 0, item = 0, places = 0;
   const measure = (day, list) => {
     places = Math.max(places, list.length);
@@ -222,11 +221,10 @@ test('LOST-SPOILS the sizes the law names hold the game\'s own spoils: the gate\
     for (const lv of [1, 30, 60]) {
       measure(20380, spoilsList(s * 7919, lv, { p: 3, r: 1 }));
       measure(sdSpoilsDay(123456789), sdSpoilsList(s * 104729, lv));
-      measure(egSpoilsDay('f'.repeat(16), 10), egSpoilsList(s * 1299709, lv, 10, { lord: 'x', pity: [1, 1], goldOnly: false, embers: 3 }));
     }
   }
   assert.ok(places < LOST_INDEX_MAX, `${places} places`);
   assert.ok(item < LOST_ITEM_BYTES, `${item} bytes an item`);
-  assert.ok(send > 4096 && send < LOST_BODY_MAX, `${send} bytes a send - past the service's 4 KiB, under the route's own`);
+  assert.ok(send < LOST_BODY_MAX, `${send} bytes a send - under the route's own`);
 });
 

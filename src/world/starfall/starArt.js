@@ -1,7 +1,7 @@
 // @ts-check
 // STAR4 (2026-10-20): THE FALLEN STAR'S ART - every picture its crater and its stone wear, painted in code on the
 // Super dungeon's pixel kit (world/superDungeon/sdPixelKit.js: seeded noise, ramps through the ordered dither, a palette
-// held), under a pseudo-archive of its own (world/eliteGates/pseudoArchives.js). No ARENA2 pixel is in it. Design:
+// held), under a pseudo-archive of its own (world/pseudoArchives.js). No ARENA2 pixel is in it. Design:
 // bible/11-Multiplayer/Starfall.md section 3.
 //
 // Each record is `{ albedo, emission }`: what the surface is, and what of it glows of itself (black: nothing) - the
@@ -12,7 +12,7 @@
 // Pure. Not a DFU member. Ledger A (STARFALL).
 import { image, putTexel, noiseField, ramp, paletteOf, quantize } from '../superDungeon/sdPixelKit.js';
 
-/** The star's pseudo-archive (registered in world/eliteGates/pseudoArchives.js). */
+/** The star's pseudo-archive (registered in world/pseudoArchives.js). */
 export const STAR_ARCHIVE = 38301;
 /** Its records: the crater's burned earth, its rim, the stone's glass, the thread, the glass held and the glass lost. */
 export const STAR_EARTH_RECORD = 0;

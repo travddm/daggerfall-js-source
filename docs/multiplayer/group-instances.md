@@ -1,7 +1,7 @@
 # Group content on the relay
 
-This page summarises how group content runs as rooms on the relay: private instances, Elite Gates (Elite Breaches),
-Super Dungeons (the Abyss), the arena, and the wild PvP zone. It covers the shared mechanism and the files for each
+This page summarises how group content runs as rooms on the relay: private instances, Super Dungeons (the Abyss),
+the arena, and the wild PvP zone. It covers the shared mechanism and the files for each
 mode, not their content or tuning.
 
 ## The shared mechanism
@@ -37,9 +37,9 @@ Rewards are not taken on the client's word.
 
 1. When a fight ends, the relay (or the hub) issues a **receipt** signed with `GATE_SIGNING_KEY`
    (`importReceiptKey`). Receipt formats: `src/net/gate/gateReceipt.js`, `superDungeon/sdReceipt.js`,
-   `eliteGates/egReceipt.js`, `arena/arenaReceipt.js`, `wild/wildReceipt.js`, `duel/duelReceipt.js`. Pending receipts
+   `arena/arenaReceipt.js`, `wild/wildReceipt.js`, `duel/duelReceipt.js`. Pending receipts
    are kept in hub storage under per-mode prefixes and swept by `_sweepHub`.
-2. The client posts it to the account service (`/v1/gate/claim`, `/v1/sd/claim`, `/v1/eg/claim`,
+2. The client posts it to the account service (`/v1/gate/claim`, `/v1/sd/claim`,
    `/v1/arena/claim`, `/v1/wild/*`, `/v1/duel/claim`). The service verifies it with `GATE_PUBLIC_KEY`
    (`server-account/src/signing.js`).
 3. The service inserts the kill or result with `INSERT OR IGNORE` on a key that includes the receipt's nonce, so a
@@ -51,7 +51,7 @@ Unclaimed rewards of a player who left go to their mail as "Lost and Found" (`se
 ### Gating entry
 
 The Worker refuses a key with 404 before an object exists when the mode says the room is not open (`gateHolds`,
-`sdLiveAsk`, `isEgRoom`, `exhibitionAdmits`). Inside, the room checks party membership through the hub
+`sdLiveAsk`, `exhibitionAdmits`). Inside, the room checks party membership through the hub
 (`partyHoldsOwner`, `_instanceKinOf`).
 
 ## Private instances
@@ -59,20 +59,6 @@ The Worker refuses a key with 404 before an object exists when the mode says the
 `src/net/instanceRoom.js`. Key `dungeon:m<mapId>.i<owner16hex>.<epoch8hex>` (or the `interior:` form). The owner
 part is a digest of the owner's account (`instanceOwnerOf`; guild castles use `instanceGuildOwnerOf`). The epoch
 makes a fresh copy. Only the owner's party is admitted. Entry from the world goes through `src/scenes/instanceDoor.js`.
-
-## Elite Gates (Elite Breach)
-
-- Room `eg:<16hex>` (`EG_ROOM`, `egRoomKey`, `src/net/eliteGates/egLaw.js`). Client: `src/scenes/eliteGates/egClient.js`.
-- A breach runs under a numbered **law** (`EG_LAWS`, `src/net/eliteGates/egDurable.js`) that fixes its layout and
-  rules. The room keeps its run in durable storage (`KEPT` keys: phase, end time, holds, receipts, seed). The relay
-  deploy waits for breaches under a law the new build no longer has, and `force` voids them (`EG_VOID_BEFORE`).
-- A player who drops can rejoin within `EG_REJOIN_MS`. Route proof (`egRouteProof.js`, `egWalkGraph.js`,
-  `egSpanLaw.js`) checks that a reported walk through the breach was possible.
-- Account side: `server-account/src/eg.js`, tables `eg_runs`, `eg_stakes`, `eg_feats`, `eg_champions`, routes
-  `/v1/eg/*` (open, admit, claim, board, keys).
-- `.github/workflows/eg-sweep.yml` (reusable) runs the real player motor across every breach course with
-  `tools/egSpanSolve.mjs`, to prove each course can be walked. It runs on pull requests, nightly and before relay
-  deploys.
 
 ## Super Dungeons (the Abyss)
 

@@ -341,7 +341,7 @@ export class GateFxRenderer {
   }
 
   /** AUDIT EG-FALL (L1-6; bible/Home.md, EVERY ALLOCATION HAS AN OWNER): its programs, arrays and buffers freed - once, then
-   *  nothing (render/gate/gateTelegraph.js destroy's shape). The Elite Breach's fight frees its own with the breach. */
+   *  nothing (render/gate/gateTelegraph.js destroy's shape). */
   destroy() {
     const gl = this.gl;
     if (!gl) return;

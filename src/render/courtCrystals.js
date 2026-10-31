@@ -335,9 +335,8 @@ export class CourtCrystalRenderer {
     gl.depthMask(true); gl.disable(gl.BLEND); gl.enable(gl.CULL_FACE);
   }
 
-  /** AUDIT EG V (L6-5; Elite-Gates.md section 29, EVERY ALLOCATION HAS AN OWNER): its two programs, two vertex arrays and four
-   *  buffers let go - once; a destroyed pass draws nothing. The breach's fight frees its own at every way out of the Spire
-   *  (scenes/eliteGates/egFight.js leave); the Burning Court's is a screen's, kept. */
+  /** AUDIT EG V (L6-5, EVERY ALLOCATION HAS AN OWNER): its two programs, two vertex arrays and four buffers let go -
+   *  once; a destroyed pass draws nothing. The Burning Court's is a screen's, kept. */
   destroy() {
     const gl = this.gl;
     if (!gl) return;

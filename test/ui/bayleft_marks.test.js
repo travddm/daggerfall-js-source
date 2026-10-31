@@ -1,8 +1,8 @@
 // BAY-LEFT-MAPS (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
 // exceptions."; bible/10-UI/Held-Map-Arc.md BAY-LEFT-MAPS) - THE HELD MAP'S MARKS AND THE MAP'S FLAGS PAST THE BAY.
 //
-// C1: the held map read its party, its travellers, the trader's coin, the serpent's ring (and the Super dungeon's, the
-// arch's), the Motherlodes, the POIs, the raids and the stars against the Bay's 1000 x 500 (`this._size`,
+// C1: the held map read its party, its travellers, the trader's coin, the serpent's ring (and the Super dungeon's),
+// the Motherlodes, the POIs, the raids and the stars against the Bay's 1000 x 500 (`this._size`,
 // which no host hands), where the gates past the Bay, the bounties and the quests were read over the sheet's own box -
 // so a member in Solitude was no mark. Every reader reads that box now (heldMap.js _marksBox), the Bay's own box the
 // Bay's old bound to the pixel.
@@ -56,7 +56,6 @@ const marksDeps = () => ({
   vendor: () => ({ ...SOLITUDE, label: 'Trader', town: 'Solitude' }),
   serpent: () => ({ cx: SOLITUDE.px, cy: SOLITUDE.py, r: 12, label: 'Sea Serpent' }),
   sd: () => ({ cx: WHITERUN.px, cy: WHITERUN.py, r: 3, label: 'Super dungeon' }),
-  arch: () => ({ cx: WHITERUN.px, cy: WHITERUN.py, r: 2, label: 'Arch' }),
   lodes: () => [{ cx: WHITERUN.px + 0.5, cy: WHITERUN.py + 0.5, r: 4, label: 'Motherlode' }],
   pois: () => [{ cx: WHITERUN.px + 0.5, cy: WHITERUN.py + 0.5, r: 2, label: 'POI' }],
   raids: () => [{ px: WHITERUN.px, py: WHITERUN.py, label: 'Raid' }],
@@ -77,7 +76,7 @@ const mkWin = (extra = {}) => new HeldMapWindow({
 const kept = (win) => ({
   party: win._party.map((m) => m.name), trav: win._trav.map((m) => m.name), vendor: win._vendor?.town ?? null,
   // PIN MOVED (AUDIT BAY-LEFT, its packages merged): WW5's Hollows are a list (`_sds`), read over the sheet's box
-  serpent: win._serpent?.label ?? null, sd: win._sds?.[0]?.label ?? null, arch: win._arch?.label ?? null,
+  serpent: win._serpent?.label ?? null, sd: win._sds?.[0]?.label ?? null,
   lodes: win._lodes.length, pois: win._pois.length, raids: win._raids.length, stars: win._stars.length,
   gates: win._gates.length, bounties: win._bounties.length, lairs: win._revenants.length, quests: win._quests.length,
 });
@@ -116,7 +115,7 @@ test('BAY-LEFT-MAPS C1 THE BOX READERS: over the Bay\'s own box each reads exact
   assert.deepEqual(readRaidMarksIn(raids, f).map((m) => m.key), ['0,0', '999,499', '1000,0', '-1,0', 'w']);
 });
 
-test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, the travellers, the trader\'s coin, the serpent\'s ring, a Super dungeon\'s, an arch\'s, the Motherlodes, the POIs, the raids and the stars past the Bay are all kept; with it off the sheet is the Bay\'s and they drop, the Bay\'s own kept (mutants: the party read over the Bay; the travellers over the Bay; the vendor over the Bay; the serpent over the Bay; the lodes over the Bay; the POIs over the Bay; the box the continent\'s with the continent off)', () => {
+test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, the travellers, the trader\'s coin, the serpent\'s ring, a Super dungeon\'s, the Motherlodes, the POIs, the raids and the stars past the Bay are all kept; with it off the sheet is the Bay\'s and they drop, the Bay\'s own kept (mutants: the party read over the Bay; the travellers over the Bay; the vendor over the Bay; the serpent over the Bay; the lodes over the Bay; the POIs over the Bay; the box the continent\'s with the continent off)', () => {
   _resetForTests();
   setTamrielFit(null);
   withDocument(() => {
@@ -126,7 +125,7 @@ test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, t
     on._refreshParty();
     assert.deepEqual(kept(on), {
       party: ['In Solitude', 'In the Bay'], trav: ['Rider past the Bay', 'Rider on the Bay'], vendor: 'Solitude',
-      serpent: 'Sea Serpent', sd: 'Super dungeon', arch: 'Arch', lodes: 1, pois: 1, raids: 1, stars: 1,
+      serpent: 'Sea Serpent', sd: 'Super dungeon', lodes: 1, pois: 1, raids: 1, stars: 1,
       gates: 1, bounties: 1, lairs: 1, quests: 1,
     });
     on.dispose();
@@ -135,7 +134,7 @@ test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, t
     assert.deepEqual(off._marksBox(), BAY_BOX, 'the continent put away: the Bay\'s own sheet');
     off._refreshParty();
     assert.deepEqual(kept(off), {
-      party: ['In the Bay'], trav: ['Rider on the Bay'], vendor: 'Bayton', serpent: null, sd: null, arch: null, lodes: 0, pois: 0, raids: 0, stars: 0,
+      party: ['In the Bay'], trav: ['Rider on the Bay'], vendor: 'Bayton', serpent: null, sd: null, lodes: 0, pois: 0, raids: 0, stars: 0,
       gates: 0, bounties: 0, lairs: 0, quests: 0,
     });
     off.dispose();
@@ -250,7 +249,7 @@ test('BAY-LEFT-MAPS C1 on the player\'s data: over the freeware\'s trace and fit
     win._refreshParty();
     assert.deepEqual(kept(win), {
       party: ['In Solitude', 'In the Bay'], trav: ['Rider past the Bay', 'Rider on the Bay'], vendor: 'Solitude',
-      serpent: 'Sea Serpent', sd: 'Super dungeon', arch: 'Arch', lodes: 1, pois: 1, raids: 1, stars: 1,
+      serpent: 'Sea Serpent', sd: 'Super dungeon', lodes: 1, pois: 1, raids: 1, stars: 1,
       gates: 1, bounties: 1, lairs: 1, quests: 1,
     });
     win.dispose();

@@ -1,6 +1,6 @@
 // @ts-check
 // STAR7 (2026-10-20): STARGLASS'S OWN PICTURE - a sliver of the fallen star's glass, painted here in code under a
-// pseudo-archive of its own (world/eliteGates/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): the
+// pseudo-archive of its own (world/pseudoArchives.js) on the Hour's paint box (world/superDungeon/sdPixelKit.js): the
 // stone's own glass ramp and its violet vein (world/starfall/starArt.js STAR_RAMPS), lit from the top-left through the
 // ordered dither, a dark violet outline, its ground clear. Nothing ships and nothing is read from the player's data
 // (Port-Doctrine: A RENDER OF GAME DATA IS GAME DATA): the same pixels every boot.
@@ -13,7 +13,7 @@
 import { image, putTexel, ramp, paletteOf, quantize } from '../superDungeon/sdPixelKit.js';
 import { STAR_RAMPS } from './starArt.js';
 
-/** Starglass's pseudo-archive (registered in world/eliteGates/pseudoArchives.js), its one record. */
+/** Starglass's pseudo-archive (registered in world/pseudoArchives.js), its one record. */
 export const STARGLASS_ARCHIVE = 38302;
 export const STARGLASS_ART = Object.freeze({ archive: STARGLASS_ARCHIVE, record: 0 });
 /** Its size in texels: an upright sliver inside an item cell (ui/item/itemScroller.js CELL_W x SLOT_H, never enlarged). */

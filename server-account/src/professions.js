@@ -1213,8 +1213,8 @@ export async function depositStores(ctx, player, env, { character, material: key
  *
  * DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53; PROF0 4.1): THE DAEDRIC INGOT - an Ebony Ingot, a Daedra's
  * Heart and a Deadlands Ember a unit (professionLaw SMELT_RECIPES, DAEDRIC_EMBERS). The ember is spent out of the ACCOUNT'S
- * PURSE, as the Sigil Broker spends it (accounts.js buyInsignia, insigniaPurse; egEconomy.js egSink): the decision asks
- * that the account's gates, serpents and Redoubts earned the embers its insignia, the Panoply and the forge have not yet
+ * PURSE, as the Sigil Broker spends it (accounts.js buyInsignia, insigniaPurse): the decision asks
+ * that the account's gates and serpents earned the embers its insignia and the forge have not yet
  * taken, and the same batch adds them to `insignia_spent` - so two smelts pressed at once never spend one ember twice;
  * refused `prof-embers` where the inputs are held and the purse is short (the answer of a smelt made says the purse
  * left, `purse`; a refusal is its word alone, as every route's - index.js). The heart is a CATALYST:
@@ -1288,7 +1288,7 @@ export async function smeltAtForge(ctx, player, env, { character, recipe: id, co
   const most = (list) => (list.length > 1 ? `MAX(${list.join(', ')})` : list[0]);
   const bought = most(boughtOf), loose = most(looseOf);   // `bought` the products loose or bought, `loose` the loose ones
   // DAEDRIC-SMELT: the embers the work spends, and the purse that must hold them - the Broker's own reading (accounts.js
-  // buyInsignia: what the account's kills earned less what its insignia, the Panoply and the forge already took)
+  // buyInsignia: what the account's kills earned less what its insignia and the forge already took)
   const embers = workEmbers(r, count);
   if (embers > 0) {
     binds.push(embers);

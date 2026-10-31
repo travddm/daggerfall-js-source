@@ -15,7 +15,6 @@
 import { displayName } from './accounts.js';
 import { titleWorn, glyphsOf } from './titles.js';
 import { withArenaHonoursAll } from './arena.js';
-import { withEgHonoursAll } from './egHonours.js';   // EG-E2: and the Spire Champions
 import { withMasteryMarksAll } from './hunts.js';   // MARKS-OF-MASTERY
 
 /**
@@ -32,7 +31,6 @@ export async function boardNamesOf(ctx, ids, env, nowS, own) {
     const part = want.slice(i, i + 50);
     let rows = (await ctx.db.prepare(`SELECT * FROM players WHERE id IN (${part.map((_, k) => `?${k + 1}`).join(', ')})`).bind(...part).all()).results ?? [];
     if (!own.arena) rows = await withArenaHonoursAll(ctx, rows, nowS);
-    rows = await withEgHonoursAll(ctx, rows, nowS);   // EG-E2: and the last season's Spire Champions, the Worker's kept word on every board
     rows = await withMasteryMarksAll(ctx, rows);   // MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles, read off their rows
     for (const row of rows) {
       const withH = { ...row, ...(own.arena ? { arena: own.arena(row) } : {}) };

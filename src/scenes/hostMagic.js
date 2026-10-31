@@ -84,8 +84,6 @@ import { noteFeudHarm, elementFeudClass } from '../systems/feudLedger.js';   // 
 import { noteSkillChallenge } from '../systems/skillSoftcap.js';   // BAL9: a spell answers its foe, as a blow does
 import { sandSpellRefusal } from '../systems/arena/arenaKit.js';   // AUDIT ARENA-LADDER: the sand's kit law
 import { createMwMagicFx } from './mwMagicFx.js';   // MW-SPELLFX1: Morrowind's spell effects, drawn by every host through this engine
-import { egAllyLook } from '../ui/eliteGates/egAccess.js';   // EG-ZG (Elite-Gates.md section 25.4): THE QUIET COMPANY - another player's spell effects in a Spire trial
-import { CONCEAL_MODE } from '../systems/combatVisuals.js';   // EG-ZG: an ally's flat drawn translucent, as a revealed foe's is (alpha alone)
 import { fpsSpellCasting } from '../combat/fpsSpellCasting.js';   // CAST-SPEED: the ONE pair of hands, whose motion gates the click
 import { spellHandUp, spellHandBusy, tellCastPending, CAST_PRESS } from '../combat/twoHands/spellHand.js';   // SPELL-HAND: a spell in the free hand beside a weapon - the swing is the weapon's
 export { CAST_PRESS };   // SPELL-HAND: the cast's own press, handed on - the hosts ask the magic door for it, never a two-hands module (TWO-HANDS, THE FOUR HOSTS)
@@ -726,9 +724,6 @@ export function createPlayerMagic({
    *  `elementType != None && targetType != ByTouch` (rangeType 1). */
   function showImpactFlash(m, pos) {
     if (!m.spell || m.spell.element == null || m.spell.rangeType === 1) return;
-    // EG-ZG (Elite-Gates.md section 25.4 - THE QUIET COMPANY): an ally's missile in a Spire trial lands as its classic flash
-    // alone, at the quiet share - no bloom, no chunks, no burst in light of its own, no kick
-    if (m.quiet) { impacts.showImpactFlash(missileArchive(m.spell.element), pos, 1, allyConceal(m.quiet)); return; }
     impacts.showImpactFlash(missileArchive(m.spell.element), pos);
     // IMPACTFEEL: the impact reads heavier - a larger, slower bloom behind the classic flash, a few chunks of the
     // element's own art, and (IMPACTFX) the burst in light: the element's spray thrown back off what it struck and down
@@ -1380,13 +1375,9 @@ export function createPlayerMagic({
     return true;
   }
 
-  /** EG-ZG (Elite-Gates.md section 25.4 - THE QUIET COMPANY): an ally's flat at the quiet share (`q` ui/eliteGates/egAccess.js
-   *  egAllyLook's), translucent in the billboards' blended phase (CONCEAL_MODE.reveal - alpha alone, no ripple, no shade). */
-  const allyConceal = (q) => (q ? { mode: CONCEAL_MODE.reveal, alpha: q.alpha, t: 0, phase: 0 } : null);
-  /** MW-SPELLFX1: a missile's Morrowind bolt (scenes/mwMagicFx.js) - placed now, moved with the flight, ended with it. EG-ZG:
-   *  an ally's (`m.quiet`) at the quiet share. */
+  /** MW-SPELLFX1: a missile's Morrowind bolt (scenes/mwMagicFx.js) - placed now, moved with the flight, ended with it. */
   function withBolt(m) {
-    m.mwBolt = mwFx.bolt(m.spell, m.quiet ? { alpha: m.quiet.alpha } : undefined);
+    m.mwBolt = mwFx.bolt(m.spell);
     m.mwBolt.at(m.pos, m.dir);
     return m;
   }
@@ -1409,7 +1400,6 @@ export function createPlayerMagic({
     const size = billboardSize(t, 0);
     m.firePos = [...m.pos];
     m.batch = renderer.createBillboardBatch(archive, 0, size, [centredBase(m.firePos, size)]);   // FIELD-GUN20: a missile is CENTRED on its position (DaggerfallMissile.cs:601-602, no AlignToBase) - the base is half a height under it
-    if (m.quiet) m.batch.conceal = allyConceal(m.quiet);   // EG-ZG: an ally's missile at the quiet share
     // FA1 slice 2: the missile flat ANIMATES while it flies -
     // DaggerfallMissile.cs:605 sets BillboardFramesPerSecond (5) on the
     // billboard it makes at :601. Frozen on frame 0, a fireball was a
@@ -1735,7 +1725,6 @@ export function createPlayerMagic({
     /** PEERLIGHT2: the others' Light spells this frame - `list` [{ id, feet, height, forward }] (scene frame), one
      *  mount each, the rest put out. Answers their point lights (the hosts' shape). An empty list puts them all out. */
     peerCandles(list, dt) {
-      if (egAllyLook()?.glow === 0) list = null;   // EG-ZG (Elite-Gates.md section 25.4 - THE QUIET COMPANY): in a Spire trial another player's light is put out
       const want = new Set();
       _peerCandleLights.length = 0;
       for (const c of list ?? []) {
@@ -1861,19 +1850,16 @@ export function createPlayerMagic({
       const look = { element: el, rangeType };
       const q = casterId != null ? (peerBodies?.() ?? []).find((b) => b && b.id === casterId && Array.isArray(b.feet)) : null;
       const feet = q ? q.feet : [from[0], from[1] - CAPSULE_HEIGHT * 0.9, from[2]];
-      // EG-ZG (Elite-Gates.md section 25.4 - THE QUIET COMPANY): during a Spire trial another player's effects draw at 60% with
-      // no light of their own (ui/eliteGates/egAccess.js egAllyLook - the Spire's client says when); everywhere else, as they always were
-      const quiet = egAllyLook();
-      mwFx.cast(look, feet, quiet ? { alpha: quiet.alpha } : undefined);
+      mwFx.cast(look, feet);
       if (rangeType === 2 || rangeType === 4) {
         if (!Array.isArray(dir) || dir.length !== 3 || !dir.every(Number.isFinite)) return false;
-        missiles.push(withBolt({ spell: look, pos: [...from], dir: [...dir], age: 0, batch: null, fromPlayer: null, visual: true, casterId, quiet }));   // MW-SPELLFX1: its bolt; EG-ZG: and its quiet share
+        missiles.push(withBolt({ spell: look, pos: [...from], dir: [...dir], age: 0, batch: null, fromPlayer: null, visual: true, casterId }));   // MW-SPELLFX1: its bolt
         return true;
       }
       // a touch goes off at arm's length along the aim; a self or area cast on the caster's own body
       const at = rangeType === 1 && Array.isArray(dir) ? [from[0] + dir[0] * 1.5, from[1] + dir[1] * 1.5, from[2] + dir[2] * 1.5] : [from[0], from[1] - 0.6, from[2]];
-      impacts.showImpactFlash(missileArchive(el), at, 1, allyConceal(quiet));
-      if (rangeType === 1 && !quiet) landFx(elementFxKind(el), at, { scale: 0.75, power: 0.6, heard: 24 });   // IMPACTFX: a peer's touch, its small spray (EG-ZG: none of its light in a trial)
+      impacts.showImpactFlash(missileArchive(el), at);
+      if (rangeType === 1) landFx(elementFxKind(el), at, { scale: 0.75, power: 0.6, heard: 24 });   // IMPACTFX: a peer's touch, its small spray
       return true;
     },
     /** X3-slice: an enemy spell missile joins the engine's pool -

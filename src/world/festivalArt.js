@@ -5,7 +5,7 @@
 // outline, every texel forced into the picture's own ramps at the end. Daggerfall has no gourd, no straw man and no cake;
 // the festival brings them, painted to stand beside its own candles and skulls.
 //
-// ONE ARCHIVE, FESTIVAL_ARCHIVE (world/eliteGates/pseudoArchives.js registers it), a record each picture
+// ONE ARCHIVE, FESTIVAL_ARCHIVE (world/pseudoArchives.js registers it), a record each picture
 // (FESTIVAL_ART): the Soul Cake's and the Hearth Offering's item pictures, the offering as it stands at a door, and the
 // towns' turnip lantern, straw effigy and ward-staff (world/witchesDecor.js stands them). Each reaches every door a picture
 // does as a STAND-IN of its archive (systems/textureReplacement.js addVendorTextures - `standIn`, `build`), so an item list

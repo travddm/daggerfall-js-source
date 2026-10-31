@@ -3,8 +3,7 @@
 // lost"; bible/07-Rendering/Performance-Priority.md SHADER-STALL, the audit): THE PASSES PLAY MEETS, STARTED AT THE
 // BOOT'S IDLE. SHADER-STALL built a pass in play once the driver said its compile was done - no frame frozen on it -
 // and a pass first wanted inside its compile was simply late: a gate's fire, the court's way in, the node's ring by
-// the compile's time, and the Elite Breach's telegraphs and crystals for the first seconds of a fight (seconds, on
-// D3D11), where before the screen had frozen and every drawn frame showed them. The audit's law: a pass the game is
+// the compile's time, where before the screen had frozen and every drawn frame showed them. The audit's law: a pass the game is
 // played by is never skipped for a compile (render/glProgram.js compiledPass `get(true)` builds it the frame it is
 // needed), and none of them should have to wait - so where the driver compiles beside the frames
 // (KHR_parallel_shader_compile) every one of them is started here, at the boot's idle, minutes before a player meets
@@ -25,11 +24,11 @@ import { AURA_PROGRAMS } from './auraRing.js';
 import { FIRE_PROGRAMS } from './redMountainFire.js';
 import { GLOW_PROGRAMS } from './ghostfenceGlow.js';
 
-/** The programs started early: a gate's fire (the world's gates, the Elite arches, the court's way in and way home),
- *  the court's and the Spire's telegraphs, his blows' sparks, the crystals, the nodes' glint (NODE-GLINT's, the outline's
+/** The programs started early: a gate's fire (the world's gates, the court's way in and way home),
+ *  the court's telegraph, his blows' sparks, the crystals, the nodes' glint (NODE-GLINT's, the outline's
  *  before it), and the auras' - one program a look (AURA-SPLIT), the first wearer in range having waited 8.5-11 s on
  *  D3D11 for the one program they had been (AURA-STALL); the volcano's fire and the fence's glow (AUDIT RED-MOUNTAIN F5). */
-export const playPrograms = () => [...GATE_PASS_PROGRAMS, ...telegraphPrograms(false), ...telegraphPrograms(true), ...GATE_FX_PROGRAMS, ...CRYSTAL_PROGRAMS, ...NODE_GLINT_PROGRAMS, ...AURA_PROGRAMS, ...FIRE_PROGRAMS, ...GLOW_PROGRAMS];
+export const playPrograms = () => [...GATE_PASS_PROGRAMS, ...telegraphPrograms(), ...GATE_FX_PROGRAMS, ...CRYSTAL_PROGRAMS, ...NODE_GLINT_PROGRAMS, ...AURA_PROGRAMS, ...FIRE_PROGRAMS, ...GLOW_PROGRAMS];
 
 /** Start them on `gl` where its driver compiles beside the frames; answers whether it did. */
 export function startPlayPrograms(gl) {

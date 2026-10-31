@@ -331,7 +331,7 @@ test('AUDIT SAFE RELAY-13c: THE STAMP\'S AND THE FEED\'S TAGS ARE WORDS OF THEIR
   const tags = [];
   const files = ['src/net/wild/wildReceipt.js', 'src/net/gate/gateReceipt.js', 'src/net/identityToken.js', 'src/net/raid/raidReceipt.js', 'src/net/duel/duelReceipt.js',
     'src/net/arena/arenaReceipt.js', 'src/net/siege/siegeReceipt.js', 'src/net/serpent/serpentReceipt.js', 'src/net/superDungeon/sdReceipt.js',
-    'src/net/eliteGates/egReceipt.js', 'src/net/eliteGates/egCallSig.js', 'src/net/watchReceipt.js', 'src/net/productRecord.js', 'src/net/safety/chatStamp.js', 'src/net/safety/chatFeed.js'];
+    'src/net/watchReceipt.js', 'src/net/productRecord.js', 'src/net/safety/chatStamp.js', 'src/net/safety/chatFeed.js'];
   for (const f of files) for (const m of rd(f).matchAll(/export const [A-Z_]+_V = '([^']+)'/g)) tags.push(m[1]);
   assert.ok(tags.includes('f1'), 'the receipts\' tags were read');
   assert.equal(tags.filter((t) => t === STAMP_V).length, 1, 'the stamp\'s tag is its own');

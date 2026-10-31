@@ -2265,8 +2265,8 @@
   "by": "claude-in-session"
  },
  "account.refusal.profEmbers": {
-  "en": "d2777e4fd91c",
-  "tr": "d90051cb766a",
+  "en": "929bc38deba8",
+  "tr": "8bf3ed1ff063",
   "by": "claude-in-session"
  },
  "account.refusal.profFishCap": {
@@ -3144,11 +3144,6 @@
   "tr": "4f727c806651",
   "by": "claude-in-session"
  },
- "coll.availLine.spirechampion": {
-  "en": "ebb9822c8847",
-  "tr": "41bad19273ef",
-  "by": "claude-in-session"
- },
  "coll.availLine.staff": {
   "en": "f76117f6d839",
   "tr": "c263e68ec63f",
@@ -3240,8 +3235,8 @@
   "by": "claude-in-session"
  },
  "coll.how.broker": {
-  "en": "410ed6aff3d4",
-  "tr": "81d3e19c17f3",
+  "en": "94e0f8dc75cd",
+  "tr": "7879d6e415cb",
   "by": "claude-in-session"
  },
  "coll.how.champion": {
@@ -3319,31 +3314,6 @@
   "tr": "3c641fa7ba6d",
   "by": "claude-in-session"
  },
- "coll.how.lonebeacon": {
-  "en": "5b94fef27ec4",
-  "tr": "6645e4d7d2e0",
-  "by": "claude-in-session"
- },
- "coll.how.mastercairn": {
-  "en": "606c1f8bb7f8",
-  "tr": "cbb4e1874f0e",
-  "by": "claude-in-session"
- },
- "coll.how.mastergallery": {
-  "en": "e465b6b125b4",
-  "tr": "f4adbec2feb7",
-  "by": "claude-in-session"
- },
- "coll.how.mastershade": {
-  "en": "728b30e001fc",
-  "tr": "a77bb2dcb519",
-  "by": "claude-in-session"
- },
- "coll.how.masterwellhead": {
-  "en": "b9cdf6a25b20",
-  "tr": "548823d92b0c",
-  "by": "claude-in-session"
- },
  "coll.how.moderator": {
   "en": "39cebd8d1fa7",
   "tr": "f79501715117",
@@ -3369,11 +3339,6 @@
   "tr": "7046864fd87f",
   "by": "claude-in-session"
  },
- "coll.how.redoubt": {
-  "en": "f72c89dd8bf4",
-  "tr": "8e811f10762f",
-  "by": "claude-in-session"
- },
  "coll.how.remnant": {
   "en": "46addfbd4c6d",
   "tr": "d6bdf94d2683",
@@ -3394,16 +3359,6 @@
   "tr": "ef97d1d8efe4",
   "by": "claude-in-session"
  },
- "coll.how.spirechampion": {
-  "en": "1a09c341cb0e",
-  "tr": "29549a80125e",
-  "by": "claude-in-session"
- },
- "coll.how.spirefirst": {
-  "en": "2ee44bf5ab83",
-  "tr": "80eec9735352",
-  "by": "claude-in-session"
- },
  "coll.how.sprout": {
   "en": "0e71901bafee",
   "tr": "3bd956452f10",
@@ -3412,11 +3367,6 @@
  "coll.how.tower": {
   "en": "e2f075844842",
   "tr": "a1de67c30b9b",
-  "by": "claude-in-session"
- },
- "coll.how.unfallen": {
-  "en": "ca08d48d0279",
-  "tr": "861f3f1bd555",
   "by": "claude-in-session"
  },
  "coll.how.warden": {
@@ -3449,16 +3399,6 @@
   "tr": "6d1b6f2e6268",
   "by": "claude-in-session"
  },
- "coll.look.beaconlight": {
-  "en": "9585e0629cd0",
-  "tr": "b173ad3ef12c",
-  "by": "claude-in-session"
- },
- "coll.look.burningstair": {
-  "en": "7d8ccf63a48f",
-  "tr": "78db06e67f2c",
-  "by": "claude-in-session"
- },
  "coll.look.dagonfire": {
   "en": "be02d35d3918",
   "tr": "b8a2033fdb6a",
@@ -3467,11 +3407,6 @@
  "coll.look.firsthour": {
   "en": "5b58e0a124e1",
   "tr": "42ea3fa4eadd",
-  "by": "claude-in-session"
- },
- "coll.look.firstlight": {
-  "en": "def7efcade7e",
-  "tr": "73e3530e72d4",
   "by": "claude-in-session"
  },
  "coll.look.lilacwarren": {
@@ -3612,11 +3547,6 @@
  "coll.src.serpent": {
   "en": "4b379442d4aa",
   "tr": "781848d91836",
-  "by": "claude-in-session"
- },
- "coll.src.spire": {
-  "en": "3360a4ab6a3a",
-  "tr": "11de9e89cdcf",
   "by": "claude-in-session"
  },
  "coll.src.staff": {
@@ -4542,16 +4472,6 @@
  "dex.enemy.wolf": {
   "en": "5b7c6cb41497",
   "tr": "fbcfec670bf5",
-  "by": "claude-in-session"
- },
- "eg.say.duelOpen": {
-  "en": "24025fba490a",
-  "tr": "ac2daf87f673",
-  "by": "claude-in-session"
- },
- "eg.say.duelUnmet": {
-  "en": "4aa70c44cca8",
-  "tr": "b526e8b70968",
   "by": "claude-in-session"
  },
  "faction.province.court": {
@@ -12615,8 +12535,8 @@
   "by": "claude-in-session"
  },
  "prof.page.forge.daedric": {
-  "en": "403a1fe356fa",
-  "tr": "90d7adef67fa",
+  "en": "74a123233fa7",
+  "tr": "cbdb10b98dc4",
   "by": "claude-in-session"
  },
  "prof.page.forge.home": {

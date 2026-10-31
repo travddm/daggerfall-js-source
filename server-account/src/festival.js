@@ -9,7 +9,7 @@
 //
 // No relay sees an ordinary kill, so a find is the account's word that it killed (or fished, or won) - and that word is
 // BOUNDED here, never believed: the service's own die decides each ask at its source's odds, and a UTC day takes at most
-// FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cakes (a Weir Key's find's law, eg.js findEg). A forged client finds no
+// FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cakes. A forged client finds no
 // more than an honest one who played the whole day. Everything the cakes buy is the service's to sell: a sale is one
 // guarded UPDATE that takes the price only while the count covers it.
 //

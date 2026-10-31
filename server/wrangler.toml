@@ -119,7 +119,7 @@ SD_DISCORD_ROLE = ""
 # ═══ HERALD-CARDS: THE THREAD EACH EVENT POSTS TO ═══════════════════
 #
 # Every herald post is a card (src/net/herald/heraldCard.js) - Dagon's
-# Breach, the Sea Serpent, the Abyss Dungeon and the Battlespire each in
+# Breach, the Sea Serpent and the Abyss Dungeon each in
 # its own colour. Name a thread of the gate's channel for a family and
 # its cards go there: a forum channel with one post a family (every
 # gate's cards in the gate's post), or a text channel's threads -
@@ -132,13 +132,12 @@ SD_DISCORD_ROLE = ""
 # forum post with no thread, and a refused post is let go.
 # Each is also a setting a developer changes at run time, with no
 # deploy: `/relay gateThread <id>`, `/relay serpentThread <id>`,
-# `/relay sdThread <id>`, `/relay egThread <id>`
+# `/relay sdThread <id>`
 # (src/net/relayCfg.js).
 # EMPTY IS A LEGAL STATE: one channel, as before.
 GATE_DISCORD_THREAD = ""
 SERPENT_DISCORD_THREAD = ""
 SD_DISCORD_THREAD = ""
-EG_DISCORD_THREAD = ""
 # ═══ SAFE5: THE REVIEWER'S FEED ═════════════════════════════════════
 #
 # Where the public channels' lines are posted for the account service's

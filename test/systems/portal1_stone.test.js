@@ -599,7 +599,7 @@ test('PORTAL1 the door, the pick and the arrival, as world.js runs them (PIN MOV
     Object.assign(scope, keep);
   };
   door({ _modeNow: 'interior', busy: true }, PS.PORTAL_TEXT.notHere);
-  door({ made: 'spire', busy: true }, PS.PORTAL_TEXT.notHere);   // EG-H2: never in a made level, whatever the mode says
+  door({ made: 'hour', busy: true }, PS.PORTAL_TEXT.notHere);   // EG-H2: never in a made level, whatever the mode says (PIN MOVED, Elite Gates removed: the Hour's, the Spire's gone)
   door({ busy: true, duel: true }, PS.PORTAL_HOLD_TEXT.busy);
   door({ _teleporting: true }, PS.PORTAL_HOLD_TEXT.busy);
   door({ duel: true, siege: true }, PS.PORTAL_HOLD_TEXT.duel);

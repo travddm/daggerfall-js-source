@@ -39,7 +39,6 @@ import { repairUnmintedConditions, repoolWeaponConditions } from '../conditionRe
 import { restackStones, nameEmbers, PORTAL_GIFT, givePortalGift } from '../gate/gateSpoils.js';   // SS1: Sigil Stones saved before they stacked, folded into one stack; WB12a: and named Deadlands Embers
 import { WALLET_GIFT, giveWalletGift } from '../walletItem.js';   // WALLET1: a character from before the wallet is given one, once
 import { LOCKPICK_GIFT, giveLockpickGift } from '../lockpick/lockpickItem.js';   // LOCKPICK: a picking class from before the lockpick is given its picks, once
-import { foldStrayWeirKeys } from '../eliteGates/weirKey.js';   // KEY-FACE: a Weir Key's face anywhere but the pack, folded away
 import { foldStrayFaces } from '../festival/soulCake.js';   // WITCH1: and the Witches' Festival's, the same law
 import '../professions/profTemplates.js';   // PROF2: the ores, ingots and stone a pack may hold, known to every scene a save loads in
 import '../rest/restItems.js';   // REST6: the seven rest supplies (1700-1706), known to every scene a save loads in
@@ -813,6 +812,44 @@ export function dropRetiredGunItems(/** @type {any} */ entity, /** @type {any[]}
   return dropped;
 }
 
+/** The Weir Key's template (575), removed with the Elite Gates. The game no longer registers it, so a save's record of
+ *  one is an item nothing can use or price. */
+const RETIRED_WEIR_KEY_TEMPLATE = 575;
+/** The Battlemage's Panoply, removed with the Elite Gates: its pieces' Aetheric record ids begin so, and their sigil
+ *  names the set. Neither is a record or a set the game knows any more. */
+const RETIRED_PANOPLY_ID_PREFIX = 'panoply-';
+const RETIRED_PANOPLY_SET = 'panoply';
+/** Whether `item` is a Weir Key or a Panoply piece. */
+function isRetiredEgItem(/** @type {any} */ item) {
+  if (item?.templateIndex === RETIRED_WEIR_KEY_TEMPLATE) return true;
+  if (typeof item?.aetheric === 'string' && item.aetheric.startsWith(RETIRED_PANOPLY_ID_PREFIX)) return true;
+  return item?.sigil?.set === RETIRED_PANOPLY_SET;
+}
+/** Every Weir Key and Panoply piece taken out of `lists` and out of the rooms' placed things `rooms` (each an id-keyed
+ *  record), in place - unequipped first, so no slot keeps a piece the pack no longer holds; how many went. */
+export function dropRetiredEgItems(/** @type {any} */ entity, /** @type {any[][]} */ lists, /** @type {any[]} */ rooms = []) {
+  let dropped = 0;
+  for (const list of lists) {
+    if (!Array.isArray(list)) continue;
+    for (let i = list.length - 1; i >= 0; i--) {
+      const item = list[i];
+      if (!isRetiredEgItem(item)) continue;
+      if (entity && isEquipped(item)) unequipSlot(entity, item.equipSlot);
+      list.splice(i, 1);
+      dropped++;
+    }
+  }
+  for (const room of rooms) {
+    if (!room || typeof room !== 'object') continue;
+    for (const [id, item] of Object.entries(room)) {
+      if (!isRetiredEgItem(item)) continue;
+      delete room[id];
+      dropped++;
+    }
+  }
+  return dropped;
+}
+
 /** PORTAL1 (AUDIT PORTAL1 U9): how many saves this page has restored - every load, whichever host runs it, passes the one
  *  door below, so a host that must end something at EVERY load (scenes/world.js: the portals standing) asks this count
  *  rather than each branch of each load. */
@@ -920,14 +957,14 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   // ITEM-WALK: and every other list the save holds (savedItemLists), by the one runner (repairItemLists)
   const repairLists = savedItemLists(snap, entity);   // BAG1: and the bag's
   repairItemLists(repairLists);
-  // FIELD BUGS 2026-10-19f KEY-FACE: A WEIR KEY'S FACE IS THE PACK'S ALONE (systems/eliteGates/weirKey.js foldStrayWeirKeys) -
-  // one in any other list the save holds (the wagon, a storage piece, a ship's hold, a companion's pack, a body) or set
-  // out in a room (`decorOwn`) was stowed before its row was pack-only, or thrown on a body and never taken up: folded
-  // away here, in the same place and for the same hosts as the repairs above. The pack keeps its own; the account's
-  // balance restacks it.
+  // FIELD BUGS 2026-10-19f KEY-FACE: a festival face in any list the save holds but the pack (the wagon, a storage piece,
+  // a ship's hold, a companion's pack, a body) or set out in a room (`decorOwn`) is folded away here, in the same place
+  // and for the same hosts as the repairs above
   const strayLists = repairLists.filter((l) => l !== entity.items), strayRooms = arrayOf(snap.sceneCache?.scenes).map((s) => s?.decorOwn);
-  const strayKeys = foldStrayWeirKeys(strayLists, strayRooms);
-  if (strayKeys) console.info(`[save] KEY-FACE: ${strayKeys} Weir Key face(s) outside the pack folded away - the account holds the keys`);
+  // A Weir Key or a Battlemage's Panoply piece kept from before the Elite Gates were removed leaves those lists and rooms
+  // here, before the scene cache is restored from them; the pack's go below its relinks
+  const strayEgItems = dropRetiredEgItems(entity, strayLists, strayRooms);
+  if (strayEgItems) console.info(`[save] ${strayEgItems} Elite Gates item(s) from the removed Elite Gates dropped`);
   const strayFaces = foldStrayFaces(strayLists, strayRooms);   // WITCH1: and the festival's Soul Cakes and Hearth Offerings, the same law
   if (strayFaces) console.info(`[save] KEY-FACE: ${strayFaces} festival face(s) outside the pack folded away - the account holds them`);
   entity.rentedRooms = (snap.rentedRooms ?? []).map((r) => ({ ...r }));   // U39: the rented rooms (pre-U39 saves restore empty)
@@ -1025,6 +1062,9 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
     const n = dropRetiredGunItems(entity, list);
     if (n) console.info(`[save] ${n} gun item(s) from the removed guns dropped`);
   }
+  // And a Weir Key or a Battlemage's Panoply piece kept from before the Elite Gates were removed
+  const retiredEgItems = dropRetiredEgItems(entity, savedItemLists(snap, entity));
+  if (retiredEgItems) console.info(`[save] ${retiredEgItems} Elite Gates item(s) from the removed Elite Gates dropped`);
   giveLockpickGift(entity);   // LOCKPICK: and a picking class from before the lockpick, its picks - at the pack's end too
   entity.activeEffects = (snap.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).filter((a) => effectKindLoaded(a.kind)).map(copyEffectEntry);   // E2: a stale pin in an old snapshot cannot re-link - drop it (DFU :2312); AUDIT DUEL1 B4: nor a duel's spell a save from before the filter kept; AUDIT PRE-MERGE 0928 S3: nor an effect of a mod not loaded (Come Sail Away's water walk)
   // DISC10-D/E V11: THE DREAM'S PUSH IS NOT SAVED. CustomSaveData_v1 keeps

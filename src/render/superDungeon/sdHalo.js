@@ -112,8 +112,7 @@ export class SdHaloRenderer {
     this.drawn = n;
     return true;
   }
-  /** EG-LOOK (Elite-Gates-Look.md section 29 - EVERY ALLOCATION HAS AN OWNER): every GL object it made, freed once (the
-   *  Spire's look releases its halos at the breach's end - scenes/eliteGates/egLookDraw.js). */
+  /** EVERY ALLOCATION HAS AN OWNER: every GL object it made, freed once. */
   destroy() {
     const gl = this.gl;
     if (!this.prog) return;

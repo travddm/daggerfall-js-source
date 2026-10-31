@@ -27,7 +27,7 @@ new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintTo
   default is `DEFAULT_SERVER` in `online.js`. `onlineStart` takes `?server=<url>`, then the `onlineServer`
   preference, then the default.
 - **Sessions per page.** One presence session (the player's body in the world) and separate chat channel sessions
-  (`presence: false`, `wire2: true`, sharing `pageWave`). Instance, Elite Gate, staff and caravan links create their
+  (`presence: false`, `wire2: true`, sharing `pageWave`). Instance, staff and caravan links create their
   own sessions.
 - **Rooms.** `roomKeyFor({ host, mode, mapId, regionIndex, locationName, buildingKey, mapPixel, instance, ... })` builds
   the room key. `join(room, pose)` and `leave()` change room; a key change closes the old socket and opens a new one.
@@ -90,7 +90,7 @@ call(io, path, body)   // io = { fetch, base, secret }
   `accountRefusalText` turns refusals into player text.
 - Main calls: `openGuest`, `register`, `login`, `recover`, `logout`, `readAccount`, `changePassword`, `mintIdentity`,
   `beatPlay`, the equip calls (title, aura, icon, glyph, name), safety and moderation calls, and groups for homes,
-  realm, professions, market, guilds, arena, Elite Gates, wild zone, reward claims, staff chat and duels.
+  realm, professions, market, guilds, arena, wild zone, reward claims, staff chat and duels.
 
 ## Cloud saves
 

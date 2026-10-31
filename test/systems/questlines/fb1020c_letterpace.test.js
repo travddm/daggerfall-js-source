@@ -53,7 +53,7 @@ const startUp = (quest) => {
   for (const a of task?.actions ?? []) if (a.typeName === 'StartStopTimer') a.update(task);
 };
 /** The later steps whose courier brings a letter (QL-OFFERED: the only couriers a line has). */
-const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLWR03', 'QLWR04', 'QLHR02', 'QLOC03',
+const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLHR02', 'QLOC03',
   'QLTF02', 'QLTF03', 'QLTF04', 'QLIS02', 'QLIS03', 'QLIW02'];
 
 test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent - its start-up puts its letter in hand (`start task`, `get item`), so nothing of it is ever on its way; a later step\'s courier hands its letter over as `give pc <Item ... letter> notify`, on its way while held, not once given or set aside (mutants: textId, isComplete, the item\'s kind, the shelf)', () => {
@@ -61,7 +61,7 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent
   // The Thirteenth of Frostfall opens IN PERSON - a Wyrd Sister hands her letter as she is met (QLTF01 `get item
   // _letter_`), or Morwen's raven its note once a star is held: neither at the start-up, neither by courier
   const IN_PERSON = new Set(['thirteenthFrostfall']);
-  assert.equal(QL_LINES.length, 13);
+  assert.equal(QL_LINES.length, 12);   // PIN MOVED (Elite Gates removed): the Weir Road gone
   const couriers = [];
   for (const l of QL_LINES) {
     const { quest } = parsedQuest(l.steps[0].quest, machine);

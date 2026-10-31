@@ -56,7 +56,7 @@ import { registerSpellCostMod } from '../spellcost.js';
 import { registerCastSpeedMod } from '../castSpeed.js';   // CAST-SPEED: the castSpeed lines' door onto a cast's rate
 import { registerSpellPowerMod, registerSpellPierceMod } from '../spell/spellPower.js';   // BAL9c: potency and the arcane three's doors onto a damage spell
 import { hasSpecialAbility, SPECIAL_ABILITY, restIgnoresNoRegen } from '../rest/rest.js';   // BAL9c: a career that cannot regenerate magicka, rest's own gate
-import { registerPlayerBlowLanded, pendingPlayerBlow, REACH_RISE_M, registerSpireRedoubt, spireRoomNow } from '../sigil/sigilSetPowers.js';   // EG-ZH: the Spire's recovery - the breach the player stands in, and the Redoubt's door
+import { registerPlayerBlowLanded, pendingPlayerBlow, REACH_RISE_M } from '../sigil/sigilSetPowers.js';
 import { registerRollerLevel } from './lootLevelGate.js';   // LOOT-GATE
 import { lootGateLevel } from '../mentorMode.js';   // LOOT-GATE, MENTOR2: the real level - a mentor is no young character
 import { playerDoor, paidBack, oweFoe } from '../playerDoor.js';   // BAL5: a blow paid back never kills; OPEN-HAND: a follow-up owed to a relay's body
@@ -154,7 +154,6 @@ const freshState = () => ({
   bedrock: 0, bedrockUntil: 0,           // Bedrock
   charges: 0,                            // Dawnward
   vigilReady: 0, graceReady: 0, hasteReady: 0, graceHeal: 0,
-  spireHeld: new Map(),                  // EG-ZH: a death save spent in an Elite Breach, `key -> the breach`, held to its next Redoubt
   recovering: new Set(),                 // the recoveries whose "ready again" is still to be said
 });
 let _s = freshState();
@@ -297,7 +296,7 @@ function again(target, damage, word) {
   const door = playerDoor();
   const f = recordOf(door, target);
   const n = Math.max(1, Math.round(damage));
-  if (!f?.dead) showFollowUp(n, word, target);   // FIELD BUGS 2026-10-15e ROSE-SEEN: the HUD showed the first blow alone; FIELD BUGS 2026-10-20f LANDED-WORD: never a claim on a body whose room says what lands
+  if (!f?.dead) showFollowUp(n, word);   // FIELD BUGS 2026-10-15e ROSE-SEEN: the HUD showed the first blow alone
   if (f) { if (!f.dead) door.hurtFoe(f, n); return; }
   oweFoe(target, n);   // FIELD BUGS 2026-10-12g OPEN-HAND: a body the relay runs (the gate's Warden) - its host's claim carries it
 }
@@ -322,7 +321,7 @@ function arc(target, amount, metres, word) {
  *  element's share of it: Akatosh's fire, which no Daedra resists. AUDIT WORLD-REWARDS B1: the struck one's burn goes as
  *  Many Endings' echo does (again - through its record, or OWED to the claim a body the relay runs sends, the relay's caps
  *  deciding); the burst is Earthshaker's reach (near) over one kind of foe, and reaches only the foes the world runs - a
- *  body the relay runs has no record, and no other is in reach of it (the gate's court, an Elite Gate's legion). */
+ *  body the relay runs has no record, and no other is in reach of it (the gate's court). */
 function dragonfire(target, amount, metres, group, word) {
   if (!(amount > 0)) return;
   again(target, amount, word);   // FIELD BUGS 2026-10-19f CHAIN-SEEN: its number tagged with its name, as Many Endings' is
@@ -391,35 +390,16 @@ export function lootDamageMod(entity, dmg) {
   if (titan && entity.maxHealth > 0) d = Math.min(d, Math.max(1, Math.ceil((entity.maxHealth * titan.most) / 100)));
   return Math.max(dmg > 0 && d > 0 ? 1 : 0, Math.round(d));
 }
-// ── EG-ZH: THE SPIRE'S RECOVERY ────────────────────────────────────
-// Elite-Gates.md section 15, "Death saves": Divine Grace and the Ghost-King's Vigil are no timers in an Elite Breach - as
-// timers they would hand out a fresh life every few minutes. Each spent in an `eg:` room is HELD to the next Redoubt taken
-// (the sets' law, systems/sigil/sigilSetPowers.js spireHold - the same host word, `spireRoomNow`), its chip reading "Redoubt";
-// the Redoubt recovers both, held or still on a timer. The hold is that breach's: out of it, or in another, the power's
-// own timer governs again.
-/** The two powers the Spire holds, by their READY field. */
-export const LOOT_SPIRE_SAVES = Object.freeze({ grace: 'graceReady', vigil: 'vigilReady' });
-/** A death save just spent: held to the next Redoubt when it was spent in a breach. */
-function lootSpireHold(k) { const room = spireRoomNow(); if (room != null) _s.spireHeld.set(k, room); else _s.spireHeld.delete(k); }
-/** Is this power held to a Redoubt now - spent in the breach the player still stands in? */
-export function lootSpireHeld(k) { const room = _s.spireHeld.get(k); return room !== undefined && room === spireRoomNow(); }
-/** The Redoubt taken (systems/sigil/sigilSetPowers.js spireRedoubtTaken's door): both recover at once, and the next round says so. */
-function lootRedoubtTaken() {
-  for (const field of Object.values(LOOT_SPIRE_SAVES)) _s[field] = 0;
-  _s.spireHeld.clear();
-}
-
 /** DIVINE GRACE: damage that would kill me leaves me standing (the door sets me at 1), healed a share once the hurt is
- *  told; then it must recover - in the Spire, at its next Redoubt (EG-ZH). */
+ *  told; then it must recover. */
 export function lootDeathSave(entity) {
   const p = powerKind(entity, 'grace');
   if (!p) return false;
   const now = _now();
-  if (now < _s.graceReady || lootSpireHeld('grace')) return false;   // EG-ZH: and in the Spire, not before its next Redoubt
+  if (now < _s.graceReady) return false;
   _s.graceReady = now + p.recover;
   _s.graceHeal = p.heal;
   _s.recovering.add('grace');
-  lootSpireHold('grace');
   say('Divine Grace! The Nine will not let you fall.');
   return true;
 }
@@ -437,10 +417,9 @@ export function lootHurt(entity, { before, after, saved = false }) {
   const line = (max * v.below) / 100;
   if (!(before >= line && after < line)) return;
   const now = _now();
-  if (now < _s.vigilReady || lootSpireHeld('vigil')) return;   // EG-ZH: and in the Spire, not before its next Redoubt
+  if (now < _s.vigilReady) return;
   _s.vigilReady = now + v.recover;
   _s.recovering.add('vigil');
-  lootSpireHold('vigil');
   healMine(entity, (max * v.heal) / 100);
   say("The Ghost-King's Vigil. You are not alone on the field.");
 }
@@ -552,7 +531,7 @@ export function lootRound(entity) {
   const now = _now();
   for (const k of [..._s.recovering]) {
     const r = READY[k];
-    if (now < r.at() || lootSpireHeld(k)) continue;   // EG-ZH: a death save the Spire holds is said at its Redoubt
+    if (now < r.at()) continue;
     _s.recovering.delete(k);
     if (r.line && powerKind(entity, r.kind)) say(r.line);
   }
@@ -605,7 +584,6 @@ registerMagicRoundHook(LOOT_POWERS, lootRound);
 registerLegendaryFind(LOOT_POWERS, lootFind);
 registerRollerLevel(() => { const me = playerDoor()?.player?.(); return me ? lootGateLevel(me) : null; });   // LOOT-GATE: the live player's level holds the top tiers back - none before a host publish; MENTOR2: the real one while mentoringes its door, so a bare roll (a test, a tool) rolls at its source alone
 registerEntityFold(LOOT_POWERS, wardrobeFold);   // LOOT15
-registerSpireRedoubt(LOOT_POWERS, lootRedoubtTaken);   // EG-ZH: Divine Grace and the Vigil recover at a Redoubt in a breach
 
 /** LOOT5: THE HUD'S CHIPS for the powers now, beside the sets' (scenes/world.js hands both to the HUD) - each
  *  `{ key, set: 'legendary', name, text, state }`: Flow's and Bedrock's stacks and seconds, Dawnward's charges, a
@@ -616,14 +594,13 @@ export function lootHudChips(entity, now = _now()) {
   const has = (k) => powers.some((p) => p.power.kind === k);
   const left = (t) => Math.max(0, Math.ceil(t - now));
   const time = (n) => (n >= 60 ? `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}` : `${n}s`);
-  // EG-ZH: a death save the Spire holds reads "Redoubt", however its timer stands (Elite-Gates.md section 15)
-  const wait = (k, field) => (lootSpireHeld(k) ? 'Redoubt' : left(_s[field]) ? time(left(_s[field])) : '');
+  const wait = (field) => (left(_s[field]) ? time(left(_s[field])) : '');
   const out = [];
   if (has('flow') && flowStacks(now)) out.push({ key: 'flow', set: 'legendary', name: `Flow ${flowStacks(now)}`, text: time(left(_s.flowUntil)), state: 'active' });
   if (has('bedrock') && bedrockStacks(now)) out.push({ key: 'bedrock', set: 'legendary', name: `Bedrock ${bedrockStacks(now)}`, text: time(left(_s.bedrockUntil)), state: 'active' });
   if (has('dawnward') && _s.charges) out.push({ key: 'dawnward', set: 'legendary', name: 'Dawnward', text: `${_s.charges}/${powerKind(entity, 'dawnward').charges}`, state: 'active' });
-  if (has('vigil') && wait('vigil', 'vigilReady')) out.push({ key: 'vigil', set: 'legendary', name: 'Vigil', text: wait('vigil', 'vigilReady'), state: 'recovering' });
-  if (has('grace') && wait('grace', 'graceReady')) out.push({ key: 'grace', set: 'legendary', name: 'Divine Grace', text: wait('grace', 'graceReady'), state: 'recovering' });
+  if (has('vigil') && wait('vigilReady')) out.push({ key: 'vigil', set: 'legendary', name: 'Vigil', text: wait('vigilReady'), state: 'recovering' });
+  if (has('grace') && wait('graceReady')) out.push({ key: 'grace', set: 'legendary', name: 'Divine Grace', text: wait('graceReady'), state: 'recovering' });
   if (has('haste') && left(_s.hasteReady)) out.push({ key: 'haste', set: 'legendary', name: 'Haste', text: time(left(_s.hasteReady)), state: 'recovering' });
   return out;
 }
