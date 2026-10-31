@@ -644,3 +644,80 @@ was block 1287, about 450 m from B.
   showed, B asked that cell at once and showed the piece after 0.6 s.
 - Not driven here: a window over the world, which reads the same gate as the hidden tab and was driven in YC1's
   checks, and the hub's shards (above). The relay was renumbered world272 to world278, and the account acct199 to acct208, after this run; the renumbers move no code.
+
+## 12. YC4 - building (2026-10-29): the town's homes answer by cell and by version
+
+**Status: DECIDED 2026-10-29 (section 12.6). Not built yet.**
+
+Section 6 decided that the homes answer goes by cell and by version, as the yards did. `HOME_TOWN_MAX` is already
+2,048 (YC1), so no town is cut today. YC4 is about the answer's cost: HOMES-SHED measured `/v1/homes/town` as the
+busiest route of the 2026-10-13 overload (88,079 asks in the hour), and `Scale-Arc.md` puts its cost in its rate, not
+its read (0.6 ms a read). A page asks the whole town's homes at its gate and at a home's door, at most once in 60 s
+(`onlineHomes.js` HOME_TOWN_TTL_MS), and almost every answer is the one it had.
+
+### 12.1 The answer has two parts
+
+The yards' answer was the same for every caller. The homes answer is not (`homes.js` homesInTown):
+
+- **Shared**, the same for every caller: `buildingKey`, `owner`, `entry`, `rent` (`vacant`, `from`), `score`, `look`
+  (none for a shunned home), `deed`, and a hall's `hall` (name, tag, heraldry).
+- **The caller's own**: `mine`, `character`, `crossed`, `refund`, `rentDue`, `tenant`, `guildmate`, `offer`,
+  `giving`, `member`, `keeper`, `hallEntry`, `hallSell`, `insider`, `vote`, a shunned home's `look` for its insiders,
+  the KNIGHT-HOUSE deed filter, and the town's `openGates`.
+
+Only the shared part goes by cell and version. The caller's own part is one read of the caller's own rows.
+
+### 12.2 The shared part: cells and versions, as the yards
+
+- **Schema.** `home_cell_ver (map_id, cell, ver, built, stale_at)` and `home_cells (map_id, cell, built, shape, rows)`,
+  the shapes of 0190's two tables, with a backfill of every cell that holds a home.
+- **Triggers move a cell's version** on a write of `homes` (insert, delete, and an update: both cells when a home
+  moves, as arenaMoveHome does), of `home_rooms`, and of `guilds` (name, tag, heraldry: every cell that holds one of
+  its halls).
+- **Time moves vacancy too.** A room whose tenancy ends is vacant without a write. A cell's built row keeps the
+  earliest `until` of its let rooms as `stale_at`. The minute's clock moves the version of every cell past its
+  `stale_at`, so a page that holds the cell hears it changed, and builds it again.
+- **The route.** `POST /v1/homes/cells`, `{ mapId, cells: [[cell, ver], ...] }`, under the session pass as
+  `/v1/homes/town` is: owners' handles are account data, where the yards' pieces were not.
+  It answers only the cells whose version moved, under a byte budget with `more`, kept per cell in the isolate, and
+  read on a replica with "a version never goes back". It is section 3.4's route for homes.
+
+### 12.3 The caller's own part
+
+`POST /v1/homes/own`, `{ mapId, character }`: the homes in the town that the caller owns, is a member of, rents, voted
+on, has an open offer on, or may enter as a guildmate, each with its own fields, plus `openGates`. It reads by the
+caller's rows, not the whole town, so its cost follows what the caller holds. It stays on the primary: its rows are
+the caller's own writes.
+
+### 12.4 The push: the HOME CELL ORDER
+
+A home write that moved a cell answers a signed order, `{o:'hcell', s, m, c, v, i, e}`, as a decor write answers its
+YARD ORDER (section 3.6). The acting client carries it to the hub, which checks it and fans `{t:'hcell', l:[[m, c, v],
+...]}` to every page at most once a second, each cell's highest version kept. The hub's welcome says `hc: 1`, and a
+client carries an order only to a hub that said it. A page acts on a word only by asking that cell. A write that moves
+many cells at once (a guild's heraldry, which redraws all its halls) answers no order: the poll finds those.
+
+### 12.5 The client
+
+`onlineHomes.js` keeps one registry, and `homeAt` reads it as today. It merges the shared rows by cell with the
+caller's own rows by building key. It asks a town's cells with the versions it holds when it asks the town today (at
+its gate and at a home's door, at most once in 60 s), and at once on a home word. A word missed while the hub link was
+down is read at the next such ask. It asks its own part when it first asks a town, after each of its own writes, on a
+home word for a cell where it holds an own row, and once 5 minutes have passed. Only those make the own part change, so it is asked far less than the
+town is today. QUEST-HOME's home words (`hearHome`) still make it ask at once.
+
+The registry knows a town by its map id, not where the player stands, so it asks every cell a town can hold (65) in
+one request, not nearest first (`homeCellSync.js` HOME_TOWN_CELLS). A service that answers the two routes with a 404,
+400 or 403 is older than acct209: the page reads `/v1/homes/town` from then on.
+
+### 12.6 Decided (2026-10-29)
+
+1. **The full split**, not a single town version.
+2. **Old builds keep the old answer for one release.** `/v1/homes/town` answers as it does today, so a page that has
+   not reloaded sees every home. A later release removes it.
+3. **The push is a signed order now**, with this release, so the poll can stay cheap and a door moves at once.
+
+### 12.7 Release
+
+One release: the account service (the migration, the two routes, the order) and the relay (the hub's arm, a new
+RELAY_VERSION) before the site.

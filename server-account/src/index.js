@@ -239,7 +239,7 @@ import {
   nameAsOf, wornNameOf, chooseNameAs,   // NAME-AS: the name the room reads - the account's or the character's
   ACCOUNT_MAX, ACCOUNT_WINDOW_S,
 } from './accounts.js';
-import { mintToken, mintRenownOrder, mintGuildOrder, mintGuildOutOrder, mintHomeOrder, mintYardOrder, MAX_TTL_S, TOKEN_V, ID_RE, SEAT_TITLES, CHAPTER_TITLES, TOKEN_MAX_CHARS, TOKEN_BODY_MAX, tokenBodyOf } from '../../src/net/identityToken.js';
+import { mintToken, mintRenownOrder, mintGuildOrder, mintGuildOutOrder, mintHomeOrder, mintYardOrder, mintHomeCellOrder, MAX_TTL_S, TOKEN_V, ID_RE, SEAT_TITLES, CHAPTER_TITLES, TOKEN_MAX_CHARS, TOKEN_BODY_MAX, tokenBodyOf } from '../../src/net/identityToken.js';
 import { ACCOUNT_VERSION, MAX_BODY_BYTES, ROUTES, OPEN_ROUTES, PATREON_OPEN_ROUTES, SAFE_OPEN_ROUTES, STAFF_ROUTES, savePathOf, realmPathOf, poiPathOf, SAVE_MAX_BYTES, SHOT_MAX_BYTES, maintaining, routeDb, d1BookmarkOf, D1_BOOKMARK_RE, d1Overloaded, noteOverload, shedding } from './service.js';   // SCALE4d: the routes a read replica may serve, and the session they are served on
 import { poiRolesOf, putPoiAsset, getPoiAsset, savePoiDraft, submitPoi, withdrawPoi, requestRetire, reviewPoi, rollbackPoi, listPoi, poiHistory, poiQueue, poiLiveFeed, poiHeldVersion, poiFeedTag, listShelf, shelfEntry, shelve, unshelve, POI_ASSET_MAX, POI_DRAFT_BODY_MAX, POI_LIVE_ASSET_MAX_AGE_S } from './poi.js';   // POI-1: the POI store - builders draft, an approver decides, the feed is what is live; POI-4b: the library's shelf
 import { listSaves, putCard, putBlob, getBlob, deleteSave, saveCardOf } from './saves.js';
@@ -289,7 +289,7 @@ import { claimLamp } from './lamp.js';
 import { festivalOf, findFestival, buyFestival, festivalTown, setOffering, fillOffering, takeInOffering, takeFromOffering, FEST_STATUS } from './festival.js';   // WITCH1: the Witches' Festival   // LAMP-KEEPER II: I Love Lamp, laid on the row
 import { claimQl, QL_STATUS } from './questlines.js';   // QL12: a questline's step claimed - what the service witnessed, paid
 import { voteHome } from './homeVotes.js';   // HOME-VOTE: a town's word on a player's house
-import { claimHome, releaseHome, setHomeEntry, homesInTown, homesOf, setHomeLook, homeLayoutsKept, arenaMoveHome, arenaMovesOf, arenaMoveSeen, holdDeed, inheritHome } from './homes.js';   // HOME1: the online homes' routes; HOME-LOOK: its outside; WD3: the towns' layouts; ARENA4b: the homes the arena displaced, moved; FIELD BUGS 2026-10-04d KNIGHT-HOUSE: a deed held
+import { claimHome, releaseHome, setHomeEntry, homesInTown, homesOwn, homesOf, setHomeLook, homeLayoutsKept, arenaMoveHome, arenaMovesOf, arenaMoveSeen, holdDeed, inheritHome } from './homes.js';   // HOME1: the online homes' routes; HOME-LOOK: its outside; WD3: the towns' layouts; ARENA4b: the homes the arena displaced, moved; FIELD BUGS 2026-10-04d KNIGHT-HOUSE: a deed held
 import { homeTransfer } from './homeTransfer.js';   // a house offered to one account, accepted as one write
 import { roomsOf, offerRoom, withdrawRoom, rentRoom, collectRent } from './rent.js';   // HOME-RENT: a home's rooms, rented
 import {
@@ -326,6 +326,7 @@ const withChapterTitles = async (/** @type {any} */ ctx, /** @type {any} */ play
   ? { ...player, chapterTitles: [...new Set((await chapterTitlesOfAccount(ctx.db, player.id, ctx.nowS, seasonZeroOf(env.SEASON_ZERO_WEEK))).map((t) => t.title))] } : player);
 import { huntState, huntClear, withMasteryMarks, HUNT_STATUS } from './hunts.js';   // HUNTERS-MARK: the hunt's ledger; MARKS-OF-MASTERY: the titles read off it
 import { decorOf, placeDecor, moveDecor, removeDecor, hideDecorBase } from './decor.js';
+import { homeCellsKept, settleHomeCellsAfter, forgetHomeTown } from './homeCells.js';   // YC4: a town's homes kept and read a block at a time
 import { yardCellsKept, forgetYardCell, forgetYardTown, settleYardCell } from './yardCells.js';   // YARD-CELL: a town's yards kept and read a block at a time   // DECOR1: an online home's decor; BASE-HIDE: what its owner took out
 import { commitDecorBatch } from './decorBatch.js';   // DECOR-BATCH: one Confirm for a home's draft
 import { decorUse } from './decorAccess.js';   // DECOR-ACCESS: who may use a container or a station
@@ -713,6 +714,30 @@ async function yardOrderOf(r, settled, mapId, s, env, subtle, nowS) {
   if (!key) return r;
   const yardOrder = await mintYardOrder({ s, m: mapId, c: settled.cell, v: settled.ver }, key, { subtle, nowS });
   return { ...r, yardVer: settled.ver, yardOrder };
+}
+
+/** YC4 (bible/11-Multiplayer/Yard-Cells.md section 12.4): a home write's answer with the cells it moved built again
+ *  (homeCells.js settleHomeCellsAfter) and a signed HOME CELL ORDER for each (`homeCellOrders`), which the acting client
+ *  carries to the hub. None if no cell moved or the service has no key: the pages' poll finds the cell. */
+async function withHomeCells(r, db, path, body, s, env, subtle, nowS) {
+  const moved = await settleHomeCellsAfter(db, path, body, nowS).catch((e) => { console.warn('[homes] the cell not built', e?.message ?? e); return []; });
+  if (!moved.length) return r;
+  const key = await signingKey(env, subtle);
+  if (!key) return r;
+  const homeCellOrders = [];
+  for (const { mapId, cell, ver } of moved) {
+    homeCellOrders.push(await mintHomeCellOrder({ s, m: mapId, c: cell, v: ver }, key, { subtle, nowS }));
+  }
+  return { ...r, homeCellOrders };
+}
+
+/** YC4: a hall bought or sold moved its home's cell as any home write does (withHomeCells) - the building its answer
+ *  names (`moved`), since the Guild tab's sale names none in its body. Any other guild act answers no home cell order. */
+async function hallCellsOf(r, db, path, s, env, subtle, nowS) {
+  if (path !== '/v1/guilds/hall/buy' && path !== '/v1/guilds/hall/sell') return r;
+  const [move] = Array.isArray(r?.moved) ? r.moved : [];
+  const buildingKey = move?.on?.[0] ?? move?.off?.[0];
+  return withHomeCells(r, db, path, { mapId: move?.mapId, buildingKey }, s, env, subtle, nowS);
 }
 
 async function homeOrdersOf(r, s, env, subtle, nowS) {
@@ -1799,6 +1824,14 @@ const service = {
           const r = await homesInTown(ctx, who.player, body, { seats: seatsOpenFor(who.player, env) });   // SEAT1d: Open Gates
           return 'error' in r ? no(r.error, 400, origin) : json(r, 200, origin);
         }
+        if (path === '/v1/homes/cells') {   // YC4: the town's homes every caller reads alike, by cell and version
+          const r = await homeCellsKept(ctx, body, nowS);
+          return 'error' in r ? no(r.error, 400, origin) : json(r, 200, origin);
+        }
+        if (path === '/v1/homes/own') {   // YC4: the caller's own part of a town
+          const r = await homesOwn(ctx, who.player, body, { seats: seatsOpenFor(who.player, env) });
+          return 'error' in r ? no(r.error, r.error === 'dead' ? 410 : 400, origin) : json(r, 200, origin);
+        }
         if (path === '/v1/homes/mine') return json(await homesOf(ctx, who.player), 200, origin);
         if ((path === '/v1/homes/decor' || path.startsWith('/v1/homes/decor/')) && body?.seat === true && !seatsOpenFor(who.player, env)) return no('seats-closed', 403, origin);   // SEAT-HALL: a palace's Charter Room while the seats are open
         if (path === '/v1/homes/layouts') return json(await homeLayoutsKept(ctx), 200, origin);   // WD3: every town holding a home, and the layout it keeps; STORM-SHED 2: read again only once a town's homes moved
@@ -1813,6 +1846,7 @@ const service = {
         if (accountKind(who.player) !== 'linked') return no('homes-need-account', 403, origin);
         // REALM P2.2b: a realm character's record is in R2, and moves with the act; a sequence refused says the service's own
         const hctx = { ...ctx, bucket: env.SAVES };
+        const cellsMoved = (r) => withHomeCells(r, ctx.db, path, body, who.player.id, env, subtle, nowS);   // YC4: a home write's cells built again, and signed
         const realmNo = (r) => (r.error === 'seq' ? json({ error: 'seq', seq: r.seq }, 409, origin) : r.error === 'lease' || r.error === 'realm-gold' ? no(r.error, 409, origin) : null);
         if (path.startsWith('/v1/homes/decor/')) {
           // DECOR1: a piece placed, moved or removed - the owner's character's alone (decor.js)
@@ -1842,7 +1876,7 @@ const service = {
             : path === '/v1/homes/rooms/withdraw' ? await withdrawRoom(hctx, who.player, body)
               : path === '/v1/homes/rooms/rent' ? await rentRoom(hctx, who.player, body)
                 : await collectRent(hctx, who.player, body);
-          if (!('error' in r)) return json(r, 200, origin);
+          if (!('error' in r)) return json(path === '/v1/homes/rooms/collect' ? r : await cellsMoved(r), 200, origin);
           const said = realmNo(r);
           if (said) return said;
           if (r.error === 'rent-price') return json({ error: 'rent-price', price: r.price }, 409, origin);   // the price that stands, for the door to show
@@ -1851,19 +1885,19 @@ const service = {
         }
         if (path === '/v1/homes/vote') {   // HOME-VOTE: a registered account's word on a home it is no insider of
           const r = await voteHome(ctx, who.player, body);
-          if (!('error' in r)) return json(r, 200, origin);
+          if (!('error' in r)) return json(await cellsMoved(r), 200, origin);
           return no(r.error, r.error === 'no-home' ? 404 : r.error === 'vote-rate' ? 429 : r.error === 'vote-own' || r.error === 'vote-young' ? 403 : 400, origin);
         }
         if (path === '/v1/homes/look') {   // HOME-LOOK: how a home looks outside - its owner's character's (GUILD-YARD: a hall's, its keepers')
           const r = await setHomeLook(hctx, who.player, body);
-          if (!('error' in r)) return json(r, 200, origin);
+          if (!('error' in r)) return json(await cellsMoved(r), 200, origin);
           return no(r.error, r.error === 'no-home' ? 404 : r.error === 'decor-rate' ? 429 : 400, origin);
         }
         if (path === '/v1/homes/arena-move') {
           // ARENA4b: A HOME THE ARENA DISPLACED, MOVED to the house its owner's client picked (homes.js arenaMoveHome) - the
           // pieces' refund onto the owner's record in the move's own batch, a realm act's
           const r = await arenaMoveHome(hctx, who.player, body);
-          if (!('error' in r)) return json(await homeOrdersOf(r, who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME
+          if (!('error' in r)) return json(await homeOrdersOf(await cellsMoved(r), who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME
           const said = realmNo(r);
           if (said) return said;
           const status = r.error === 'home-taken' || r.error === 'home-changed' || r.error === 'guild-treasury-full' ? 409 : r.error === 'no-home' ? 404 : 400;
@@ -1881,7 +1915,7 @@ const service = {
           // FIELD BUGS 2026-10-04d KNIGHT-HOUSE: A DEED THE REALM GAVE, HELD - the building a realm character's record holds
           // Daggerfall's deed to (a Knightly Order's house) kept from anyone else's claim (homes.js holdDeed)
           const r = await holdDeed(hctx, who.player, body);
-          if (!('error' in r)) return json(await homeOrdersOf(r, who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME
+          if (!('error' in r)) return json(await homeOrdersOf(await cellsMoved(r), who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME
           if (r.error === 'home-layout') return json({ error: 'home-layout', layout: r.layout ?? null }, 409, origin);   // as /v1/homes/claim answers it
           const status = r.error === 'home-taken' || r.error === 'home-arena' ? 409 : r.error === 'home-rate' ? 429 : r.error === 'no-deed' || r.error === 'no-realm-character' ? 404 : 400;
           return no(r.error, status, origin);
@@ -1890,12 +1924,12 @@ const service = {
           // PERMADEATH-HOUSES: a fallen member's home taken up by a living realm character of their line (homes.js
           // inheritHome) - the tombstone gate above has already refused a `character` that is dead
           const r = await inheritHome(hctx, who.player, body);
-          if (!('error' in r)) return json(r, 200, origin);
+          if (!('error' in r)) return json(await cellsMoved(r), 200, origin);
           return no(r.error, r.error === 'not-heir' ? 403 : r.error === 'no-home' ? 404 : r.error === 'homes-need-account' ? 403 : 400, origin);
         }
         if (path === '/v1/homes/claim') {
           const r = await claimHome(hctx, who.player, body);
-          if (!('error' in r)) return json(await homeOrdersOf(r, who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a home now, said to every page online
+          if (!('error' in r)) return json(await homeOrdersOf(await cellsMoved(r), who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a home now, said to every page online
           const said = realmNo(r);
           if (said) return said;
           if (r.error === 'home-layout') return json({ error: 'home-layout', layout: r.layout ?? null }, 409, origin);   // WD3 (AUDIT WD3 O1): the layout the town keeps, for the client to hear
@@ -1904,7 +1938,7 @@ const service = {
         }
         if (path === '/v1/homes/transfer') {
           const r = await homeTransfer(hctx, who.player, body);
-          if (!('error' in r)) return json(r, 200, origin);
+          if (!('error' in r)) return json(await cellsMoved(r), 200, origin);
           const said = realmNo(r);
           if (said) return said;
           const conflict = r.error === 'home-cap' || r.error === 'home-tenants' || r.error === 'home-vendor-stocked' || r.error === 'home-holds' || r.error === 'offer-open' || r.error === 'offer-closed' || r.error === 'offer-stale' || r.error === 'home-deed';
@@ -1912,7 +1946,7 @@ const service = {
         }
         const r = path === '/v1/homes/release' ? await releaseHome(hctx, who.player, body) : await setHomeEntry(hctx, who.player, body, env);   // AUDIT LW-II-2 S4: a door leaving public reckons its patrons, by the service's secret
         if ('error' in r) return realmNo(r) ?? no(r.error, r.error === 'bad-entry' || r.error === 'realm-needed' ? 400 : r.error === 'home-crossed' || r.error === 'home-tenants' || r.error === 'home-vendor-stocked' || r.error === 'home-holds' ? 409 : 404, origin);   // HOME-CROSSED; HOME-RENT: a sale waits for its tenants; HOME-VENDOR: and its stocked trader; a shared chest still holding goods
-        return json(await homeOrdersOf(r, who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a sale - a house again to every page online
+        return json(await homeOrdersOf(await cellsMoved(r), who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a sale - a house again to every page online
       }
 
       // ═══ GUILD1: THE GUILDS ═════════════════════════════════════
@@ -1949,7 +1983,10 @@ const service = {
         }[path];
         if (!act) return no('not-found', 404, origin);
         const r = await act({ ...ctx, env, bucket: env.SAVES }, who.player, body);   // REALM P2.2: a realm character's record is in R2; AUDIT 28 M5: the switch says whether the Marks show
-        if (!('error' in r)) return json(await homeOrdersOf(await guildOrdersOf(r, who.player.id, env, subtle, nowS), who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a hall bought or sold
+        if (!('error' in r)) {
+          const signed = await hallCellsOf(await guildOrdersOf(r, who.player.id, env, subtle, nowS), ctx.db, path, who.player.id, env, subtle, nowS);   // YC4: a hall's cell, as a home's
+          return json(await homeOrdersOf(signed, who.player.id, env, subtle, nowS), 200, origin);   // QUEST-HOME: a hall bought or sold
+        }
         if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);   // REALM P2.2: the service's own, as a checkpoint's
         if (r.error === 'home-layout') return json({ error: 'home-layout', layout: r.layout ?? null }, 409, origin);   // AUDIT PRE-MERGE 1003 WD1: the town's layout, as /v1/homes/claim answers it
         // AUDIT2 GUILD2 S2/S7: the word the filter caught (`why`, the door's own field for a refusal's reason), and when the
@@ -2760,7 +2797,10 @@ const service = {
         // /v1/realm/delete - HOUSE-LOSS: which undoes one too, for a door that asks a delete. ACCOUNT-HOMES: the homes it
         // bought go with it (QUEST-HOME's `moved`), and their towns' kept yard cells are let go as a decor write lets one go
         const deleted = await deleteRealm(rctx, me, body.id);
-        for (const { mapId } of deleted?.moved ?? []) forgetYardTown(mapId);
+        for (const { mapId } of deleted?.moved ?? []) {
+          forgetYardTown(mapId);
+          forgetHomeTown(mapId);   // YC4: and its homes' cells
+        }
         return answer(await homeOrdersOf(deleted, me, env, subtle, nowS));   // QUEST-HOME: its homes a house again to every page online
       }
 

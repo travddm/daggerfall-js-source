@@ -133,7 +133,7 @@ test('HOME-VOTE the service: an account a week old votes and the score is its vo
   const bob = aged(await svc.registered('Bob'));
   const cid = aged(await svc.registered('Cid'));
   const g = await svc.guest();
-  assert.deepEqual((await vote(bob, -1)).body, { ok: true, mapId: 7, buildingKey: 300, vote: -1, score: -1 });
+  assert.deepEqual({ ...(await vote(bob, -1)).body, homeCellOrders: undefined }, { ok: true, mapId: 7, buildingKey: 300, vote: -1, score: -1, homeCellOrders: undefined });   // PIN MOVED (YC4): and the cell it moved (home_cells.test.js)
   assert.equal((await vote(bob, -1)).body.score, -1, 'the same vote again: still one');
   assert.equal((await vote(cid, 1)).body.score, 0);
   assert.equal((await vote(bob, 1)).body.score, 2, 'a change of mind');
@@ -219,7 +219,7 @@ test('HOME-VOTE the registry over the real door (AUDIT D3, D8): the town read th
   const bob = aged(await svc.registered('Bob'));
   const told = [];
   let asks = 0;
-  const door = accountHomes({ fetch: (u, i) => { if (String(u).endsWith('/v1/homes/town')) asks++; return svc.fetch(u, i); }, storage: sessionStorageOf(SESSION_KEY, bob) });
+  const door = accountHomes({ fetch: (u, i) => { if (String(u).endsWith('/v1/homes/cells')) asks++; return svc.fetch(u, i); }, storage: sessionStorageOf(SESSION_KEY, bob) });   // YC4: each read of the town asks its cells once
   const homes = createOnlineHomes({ api: door, character: () => 'r-bob', onWrote: (...a) => told.push(a) });
   await homes.ensure(7);
   assert.equal(homes.homeAt(7, 300).score, 0);

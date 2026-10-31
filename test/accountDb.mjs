@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import worker from '../server-account/src/index.js';
 import { _resetKeyForTests } from '../server-account/src/signing.js';
 import { _resetPassKeyForTests } from '../server-account/src/sessionPass.js';
+import { _resetHomeCellsKept } from '../server-account/src/homeCells.js';   // YC4: nor any home cell
 import { _resetYardCellsKept } from '../server-account/src/yardCells.js';   // YARD-SHED, YARD-CELL: a stood service is a fresh isolate - no yard cell kept
 import { _resetBusyShed } from '../server-account/src/service.js';   // BUSY-GATE: and nothing shed
 import { _resetWeeksKept } from '../server-account/src/weekKept.js';   // PRIMARY-FOLD: nor any week read settled
@@ -28,6 +29,39 @@ const MIGRATIONS = readdirSync(new URL('../server-account/migrations', import.me
 /** SEAT-CAP: D1's bound on one statement's parameters (Cloudflare's D1 limits) - node:sqlite's is 32,766, so a list bound
  *  whole passed every test here and threw on the live database once it grew past 100 (the seats' Turning, 2026-10-11). */
 export const D1_MAX_BOUND = 100;
+
+/** D1's bound on one compound SELECT's terms (SQLITE_LIMIT_COMPOUND_SELECT) - node:sqlite's is 500, so YC4's six-term
+ *  UNION passed here and answered every /v1/homes/own with a 500 on D1 (2026-10-29). Counted, not set: Node 22 (CI) has
+ *  no `limits` option. Not held by `d1()`: the market's History read is six terms on main. */
+export const D1_MAX_COMPOUND = 5;
+
+/** `db` refusing, as D1 does, a statement with a compound SELECT past D1_MAX_COMPOUND terms. */
+export function d1CompoundBound(db) {
+  return new Proxy(db, {
+    get(target, field) {
+      if (field !== 'prepare') return typeof target[field] === 'function' ? target[field].bind(target) : target[field];
+      return (sql) => {
+        const terms = compoundTermsOf(sql);
+        if (terms > D1_MAX_COMPOUND) throw new Error(`D1_ERROR: too many terms in compound SELECT (${terms}, D1 takes ${D1_MAX_COMPOUND})`);
+        return target.prepare(sql);
+      };
+    },
+  });
+}
+
+/** The most terms of any one compound SELECT in `sql`: its UNION, INTERSECT and EXCEPT at one parenthesis depth, quoted
+ *  text and line comments left out, plus one. */
+export function compoundTermsOf(sql) {
+  const open = [0];
+  let most = 0;
+  const text = sql.replace(/'(?:[^']|'')*'|--[^\n]*/g, "''");
+  for (const [token] of text.matchAll(/[()]|\b(?:UNION|INTERSECT|EXCEPT)\b/gi)) {
+    if (token === '(') open.push(0);
+    else if (token === ')') most = Math.max(most, open.pop() ?? 0);
+    else open[open.length - 1] += 1;
+  }
+  return Math.max(most, ...open) + 1;
+}
 
 /** A fresh database, every migration applied. */
 export function d1() {
@@ -96,6 +130,7 @@ export async function standService(extra = {}) {
   _resetKeyForTests();
   _resetPassKeyForTests();   // SESSION-SIGN: the pass key drawn from this service's own key
   _resetYardCellsKept();
+  _resetHomeCellsKept();
   _resetBusyShed();
   forgetChapters();
   _resetWeeksKept();
