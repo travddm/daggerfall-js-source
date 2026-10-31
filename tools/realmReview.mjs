@@ -1,11 +1,11 @@
-// INT6 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE REVIEW, BY HAND. The account service's
+// INT6: THE REVIEW, BY HAND. The account service's
 // routes do the work and hold the law (server-account/src/review.js); this names the act and says the answer.
 //
 //   node tools/realmReview.mjs holds                         the characters held or flagged, each with its last finding
 //   node tools/realmReview.mjs findings <id>                 one character's findings and its wealth by the hour, and the
 //                                                            purse its record holds (`character.purse` - PURSE-MEND's `was`)
 //   node tools/realmReview.mjs clear <id> [note]             lift its hold (its strikes and timed holds with it) and its flag -
-//                                                            an override: AUTO-HOLD (2026-10-16), no hold waits on it to lift -
+//                                                            an override: AUTO-HOLD, no hold waits on it to lift -
 //                                                            and EXCUSE the law's finding standing, as it stands now: the
 //                                                            same pieces, purse, bank, level, attributes and skills hold
 //                                                            nothing again, and any other state holds again (RPT1026-
@@ -42,15 +42,15 @@
 //                                                            law's hold lifted when the purse was all it held on; its tab
 //                                                            loses the seat, as the repair's does (net/repairLaw.js)
 //
-// THE MEASURE FIRST (Mac, 2026-10-09: "Measure 7 days, then enforce"): read `budget 7` after a week, set each band's
+// THE MEASURE FIRST: read `budget 7` after a week, set each band's
 // `rate` past its 0.999 quantile with room, and `budget-set` with `enforce: true`.
-// INT17 (the owner, 2026-10-17: "Measure first"): read `progress 7` after a week, set each stream's `rate` past its 0.999
+// INT17: read `progress 7` after a week, set each stream's `rate` past its 0.999
 // quantile with room (and its `cap` a few hours' worth), and `progress-set` with `enforce: true` and every stream named.
-// GRANT2 (bible/11-Multiplayer/Spawn-Grants.md section 12; the owner: seven days): read `grants 7` after a week, set each
+// GRANT2 (; the owner: seven days): read `grants 7` after a week, set each
 // kind's bucket in net/grantLaw.js GRANT_KINDS past its 0.999 quantile with room and GRANT_CELL_CEILING past the cells'
 // most live - GRANT5: each kind's `rate.suggested` and the cells' `suggested` say both, half again past the measure - then
 // GRANT6: `/relay grantMode enforce` (Spawn-Grants section 15).
-// INT14 (Mac, 2026-10-10: "Measure, then enforce"): read `bodies 7` after a week; the boss fights' line is the RELAY'S - set
+// INT14: read `bodies 7` after a week; the boss fights' line is the RELAY'S - set
 // its BOSS_BODY var (server/wrangler.toml, net/bossBody.js bodyConfig) to `{"enforce": true, "body": {"depth", "perS"},
 // "hull": {"depth", "perS"}}`, `perS` past the 0.999 quantile's rate (a minute's, in thousandths: / 60000) with room.
 //

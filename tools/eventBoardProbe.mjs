@@ -1,4 +1,4 @@
-// EVENTS1 (2026-10-23), MEASURED: the event board and its news (ui/eventBoard.js) drawn in Chromium over the real HUD -
+// EVENTS1, MEASURED: the event board and its news (ui/eventBoard.js) drawn in Chromium over the real HUD -
 // the enhanced HUD through its own entry (drawEnhancedHud: the vitals, the hotbar, the quick slots and six buffs in the
 // status widget), a live chat panel (createChatPanel over a ChatLog) - its peek full, widened by the player, or open -
 // the quest card and the party list in their sheets' classes - on Enhanced Plus and the classic skin, at a desk's sizes,

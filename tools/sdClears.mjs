@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// SD-CLEARS (2026-10-08, Mac: "The first group clear of the new abyss dungeon is done. Can you pull up all of their
-// names?") - WHO BROKE AN ABYSS DUNGEON, READ BY THE OPERATOR. The hub's record keeps only the top fighter's name and how
-// many fought (`top`, `n` - bible/11-Multiplayer/Super-Dungeons.md section 2); the names are the account service's, one
+// SD-CLEARS - WHO BROKE AN ABYSS DUNGEON, READ BY THE OPERATOR. The hub's record keeps only the top fighter's name and how
+// many fought (`top`, `n`); the names are the account service's, one
 // `sd_kills` row a (slot, account) the kill's receipt was claimed for (migration 0090, server-account/src/sds.js). No
 // route reads them back by slot, so they are read here, by hand, through .github/workflows/sd-clears.yml. It writes
 // nothing.

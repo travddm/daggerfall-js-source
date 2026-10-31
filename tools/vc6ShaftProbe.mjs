@@ -1,7 +1,6 @@
-// VC6c (2026-09-18): THE SHAFTS, ON A REAL GPU.
+// VC6c: THE SHAFTS, ON A REAL GPU.
 //
-// Mac: "when the sun is covered by clouds, there shouldnt be sky rays or
-// sky rays coming through trees/flora". The fix reads the cloud shadow
+// . The fix reads the cloud shadow
 // map at the player's feet and squares it - and no pin can see it,
 // because the pins run on a fake GL that compiles anything and draws
 // nothing, and the sky lab has no air pass at all. So: the real renderer

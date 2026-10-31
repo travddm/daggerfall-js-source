@@ -1,4 +1,4 @@
-// PAD-DOOR (2026-09-27): THE FRONT DOOR DRIVEN BY A CONTROLLER, IN A REAL PAGE.
+// PAD-DOOR: THE FRONT DOOR DRIVEN BY A CONTROLLER, IN A REAL PAGE.
 //
 // Discord, an AYN Thor (a handheld with the controller built in): "unable to select online, load game anything".
 // No pad reached the door before a scene attached one. This probe stands a fake standard-mapped pad behind

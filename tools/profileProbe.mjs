@@ -1,5 +1,4 @@
-// INSPECT1, MEASURED (2026-09-23, kurkku: "a profile page that you can bring up when you're near them"; Mac: "a new
-// enhanced UI element for the player inspect interaction. Showing their glyph, name, title, stats and worn gear").
+// INSPECT1, MEASURED.
 //
 // test/ui/inspect1.test.js holds the law on a fake document; this stands the REAL card (ui/profileWindow.js) over the real
 // sheet in Chromium and reads back what a fake cannot. At a desktop's width, a narrow window's and a phone's, the WIDEST
@@ -10,7 +9,7 @@
 // row wider than its column, the Close a thumb can press and on screen. A card taller than the screen scrolls inside
 // itself, with its Close reachable. The waiting card and the silent one are photographed too. Photographs to
 // tools/shots/ (or SHOT_DIR).
-// PROFILE-UI (2026-10-07, Mac: "Lets only organize and polish the player profile. Its a mess"): every glyph a player can
+// PROFILE-UI: every glyph a player can
 // show - the identity token's whole vocabulary, eighteen now where three were - stands on a row of its own under the
 // name, which keeps one line; the record's four plaques wrap inside the card; what they wear stands in its parts, a pair
 // one row under the plural. The front door's film is taken down before each photograph (it mounts on its own clock).

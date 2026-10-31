@@ -1,5 +1,4 @@
-// THE GATHERING'S SOUNDS, SYNTHESISED AND BAKED (GATHER-FEEL, 2026-10-13, Mac: "I want to improve gathering, add
-// gathering sounds and overall make the experience more palatable" - bible/06-Systems/Professions-Arc.md section 44).
+// THE GATHERING'S SOUNDS, SYNTHESISED AND BAKED (GATHER-FEEL, 2026-10-13, ).
 //
 // OURS, the climb's way (tools/climbSfx.mjs): built here from noise and sine with the shared kit (tools/sfxSynth.mjs)
 // and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit mono - so an axe in

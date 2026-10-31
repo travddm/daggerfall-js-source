@@ -1,5 +1,5 @@
-// PERF-NEXT (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
-// THE FRAME PROBE - what a frame of the REAL game costs, by where the time goes. bible/07-Rendering/Performance-Next.md.
+// PERF-NEXT:
+// THE FRAME PROBE - what a frame of the REAL game costs, by where the time goes..
 // `npm run perf` (tools/perfProbe.mjs) reads the FPS counter's own numbers; this reads the frame from the inside, for
 // the A/B of a change (AUDIT 637 D13: the pass's figures came from probes in a session's scratch, and nothing in the
 // tree could make them again). Per scene: boot, settle (the stream, the grass), then
@@ -7,7 +7,7 @@
 //  - a CPU PROFILE over FRAMES frames with the census off, attributed BY SAMPLE COUNT x the median interval (V8's
 //    interval weights are not a time on SwiftShader's starved main thread);
 //  - a sampled HEAP profile over FRAMES frames, the collected objects included (what a frame allocates).
-// Every wait is FRAME-SYNCED on the shot-mode `__frame` counter, never a sleep (bible/Home.md: SwiftShader renders the
+// Every wait is FRAME-SYNCED on the shot-mode `__frame` counter, never a sleep (: SwiftShader renders the
 // streaming scene at seconds a frame). Two probe-only transforms, the tree untouched: the stream's build slice served at
 // 250 ms and the grass field filled at once, so a scene settles in minutes rather than hours. INSTR=shadow also times
 // the shadow pass's own methods (its replays by kind, the dynamic scan, the signatures, the blits, the sun's and the
@@ -51,7 +51,7 @@ export const SCENES = {
   dungeon: '/play/?world&classic&class=1&novideo&shot&play&fps',
 };
 
-/** PERF-ON4: the probe-only edits, by file - each [needle, replacement] asserted where it is made (bible/Home.md's
+/** PERF-ON4: the probe-only edits, by file - each [needle, replacement] asserted where it is made ('s
  *  Process rule), and held to the tree by test/tooling/perfon4_probes.test.js, so a needle a change moves fails the suite and
  *  not the next probe run. The stream's build slice served at 250 ms; the grass field filled at once. */
 export const FRAME_PROBE_EDITS = Object.freeze([

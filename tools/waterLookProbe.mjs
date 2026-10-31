@@ -1,4 +1,4 @@
-// WATER-NEXT (2026-10-07): THE REAL WORLD'S WATER, PHOTOGRAPHED - THE REVERT's lesson (bible/07-Rendering/Water-Arc.md:
+// WATER-NEXT: THE REAL WORLD'S WATER, PHOTOGRAPHED - THE REVERT's lesson (:
 // "a look change wants a shot from the real game before it lands, not a probe number"). Boots the streaming world
 // (`?world`) headless on SwiftShader at a one-square view radius, as tools/grassLookProbe.mjs does, waits for the shot
 // flag and the stream, then takes one photograph per SHOTS entry from the one boot - each an expression run in the

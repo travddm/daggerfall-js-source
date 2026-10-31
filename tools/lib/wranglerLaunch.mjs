@@ -1,4 +1,4 @@
-// HARNESS-WIN (2026-10-25): HOW A TOOL STARTS WRANGLER AND STOPS WHAT IT STARTED, on Linux, macOS and Windows - the one
+// HARNESS-WIN: HOW A TOOL STARTS WRANGLER AND STOPS WHAT IT STARTED, on Linux, macOS and Windows - the one
 // place the platforms differ, for tools/loadHarness.mjs and tools/accountProbe.mjs.
 //
 // Off Windows (Linux, macOS) the tools run as they always have: the wrangler named, or `npx --yes wrangler@4`, spawned

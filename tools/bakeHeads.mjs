@@ -3,8 +3,7 @@
 //     node tools/bakeHeads.mjs
 //         re-make the shipped NIFs and DDSs from the committed exports and their paintings
 //
-// MW-HEADS1 (2026-10-13, the owner: "Everything we are doing is for the morrowwind model. This batch is for breton",
-// with daggerwind.fbx and six paintings; asked, every Breton man wears them - bible/04-Characters/Own-Heads.md). The
+// MW-HEADS1. The
 // first batch of the port's own heads: three Breton men's heads and three hairs, in place of the Breton men's heads
 // Morrowind's own data carries (characters/ownModels/ownHeadModels.js, formats/morrowind/mwFirstPerson.js facePools).
 //
@@ -20,7 +19,7 @@
 //   (x +-4.78) and the same back, though one is a different mesh with a sculpted beard - so the frame is the source
 //   head's (`b_n_breton_m_head_05`, the names say), and each part is baked in it: the object's scene placement taken
 //   back off (`partFrame` - a translation, the scene turning nothing), never re-centred, never scaled.
-//   MW-HEADS2 (2026-10-15, the owner: "some of the ingame heads are backwards on the body"): AND TURNED ROUND. How the
+//   MW-HEADS2: AND TURNED ROUND. How the
 //   game's Head node turns that frame is the one link the tree cannot read - no retail skeleton's part nodes are
 //   vendored - and the first bake took the scene's +Y for the face's, as the scene's body faced: seen in game, the face
 //   hung backwards on the body. So the head's frame faces -Y - the scene turned half round about its crown
@@ -33,9 +32,7 @@
 //   material's picture (tx_b_n_breton_m_h04.png and so on), so each part is read by its material AND held to that name
 //   (`objectMaterials`), and each painting was matched to its name by what it is drawn for - the red band on the
 //   headband's own island, the eyepatch on a full-face layout that is not mirrored, the hairline along its hair's
-//   island (bible/04-Characters/Own-Heads.md). MW-HEADS3 (2026-10-15, the export's author, through the owner: "the
-//   eyepatch head was assigned the wrong hair / it gave me the rambo hair / ... its using the eyepatch on the wrong
-//   head"): the eyepatch is h0411's - object .002's face, its hair the 01 - and the plain brown beard h0423's; the two
+//   island. MW-HEADS3: the eyepatch is h0411's - object .002's face, its hair the 01 - and the plain brown beard h0423's; the two
 //   share one layout, so the paintings could not tell them apart and the first match guessed the headband's object.
 //
 //   NOTHING OF A SKELETON. A rigid part needs no bind and no weights: each NIF is the part's mesh and its painting, the
@@ -52,7 +49,7 @@ import { objectTree, BOX_SLACK } from './bakeSteelPlate.mjs';
 
 /** The owner's exports, as committed - one per batch, as it came. */
 export const SOURCES = Object.freeze({
-  breton: 'src/assets/mw/source/Breton_Heads.fbx',   // daggerwind.fbx (2026-10-13)
+  breton: 'src/assets/mw/source/Breton_Heads.fbx',     // daggerwind.fbx
 });
 
 /** The paintings, as committed - each under its part's id, beside the name the export gives it. */

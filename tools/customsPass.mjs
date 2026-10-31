@@ -1,5 +1,4 @@
-// CUSTOMS-PASS (2026-09-29, the field - Mac, asked what becomes of a character a build from before the realm stranded:
-// "Staff customs pass"): A DEVELOPER GRANTS ONE ACCOUNT ONE CHARACTER THROUGH CUSTOMS. The account service's route does
+// CUSTOMS-PASS: A DEVELOPER GRANTS ONE ACCOUNT ONE CHARACTER THROUGH CUSTOMS. The account service's route does
 // the work and holds the law (server-account/src/realm.js grantCustomsPass and customsRealm); this names the account and
 // says the answer.
 //

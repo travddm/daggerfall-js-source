@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27): A UNITY AUDIO CLIP'S FSB5 VORBIS, BACK TO AN OGG FILE -
+// CSA-A: A UNITY AUDIO CLIP'S FSB5 VORBIS, BACK TO AN OGG FILE -
 // the packets untouched, only the container rebuilt.
 //
 // Unity imports an .ogg or .wav as Vorbis and stores it as an FMOD sound bank

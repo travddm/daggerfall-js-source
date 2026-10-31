@@ -65,7 +65,7 @@ export function assertedIn(line, prefix) {
   return m ? Number(m[1]) : null;
 }
 
-/** The branch's own clause of a pin's history - the text after `PIN MOVED: <v>, ` up to the next `; PIN MOVED: ` (or the
+/** The branch's own clause of a pin's history - the text after `
  *  string's or the comment's end). */
 export function ownClause(line, prefix, v) {
   const at = line.indexOf(`PIN MOVED: ${prefix}${v}, `);

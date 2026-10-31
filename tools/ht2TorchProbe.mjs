@@ -1,7 +1,6 @@
 // HT2 - THE PACK'S ACT ON A LIGHT SOURCE, in a real browser.
 //
-// Mac: "So you cant equip the torch in your offhand, you can only drop
-// it on the ground". The enhanced pack's primary act was Wear, no light
+// . The enhanced pack's primary act was Wear, no light
 // source has an equip slot, and the card answered "torch cannot be
 // worn." - so the only act on it that named the torch honestly was
 // Drop. The law is headless and pinned there

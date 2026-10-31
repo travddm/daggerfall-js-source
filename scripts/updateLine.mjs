@@ -1,4 +1,4 @@
-// REL8 (2026-10-09, Mac: "Let's officially start numbering updates beginning with 0.0.1") - THE UPDATE LINE.
+// REL8 - THE UPDATE LINE.
 //
 // A player's update is numbered MAJOR.MINOR.PATCH: MAJOR.MINOR is the line below, written by hand; PATCH is DERIVED
 // (scripts/updateNumber.mjs) - the merge to main that last changed the line is the line's update 1, and every

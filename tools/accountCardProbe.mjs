@@ -39,7 +39,7 @@ const check = (name, ok, detail = '') => {
 // enumeration of it. Every file under src/ is served at its own path
 // instead, and the browser resolves the relative imports itself - the
 // same thing the bundler does, with nothing to keep in step.
-// NAME-AS (2026-10-12): AND vendor/ BESIDE IT. The card's graph left src/ -
+// NAME-AS: AND vendor/ BESIDE IT. The card's graph left src/ -
 // accountClient.js -> marketLaw.js -> ... -> player/classSkins.js imports
 // vendor/class-skins/skins.json - and the probe aborted that one request,
 // so the card's first import failed and the probe had stopped running at

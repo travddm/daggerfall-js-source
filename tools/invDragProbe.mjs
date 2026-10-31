@@ -1,6 +1,5 @@
 // INV3 - THE HOLD, MEASURED UNDER A REAL FINGER.
 //
-// Mac: "Hold to drag functionality in inventory sometimes doesnt work."
 // SOMETIMES is the whole report, and node cannot see it. The suite
 // drives this drag through test/invdrag.mjs, a document just real
 // enough to carry the gesture - but that document has no compositor,

@@ -1,4 +1,4 @@
-// TESA15 (bible/03-World/Arena-Provinces.md TESA15) - THE MAP PAST THE BAY AT THE WORLD'S FIDELITY, in the real game: the
+// TESA15 (TESA15) - THE MAP PAST THE BAY AT THE WORLD'S FIDELITY, in the real game: the
 // world host boots in Daggerfall, the roads' regions land (from the roads' cache, after a first run), the places they laid
 // are read (window.__tesaPlaces), the paint past the Bay is timed through its kept tiles against the same paint with none,
 // and the travel map (V) is opened and photographed out on the continent, at far, at mid and near over Skyrim. Grown from

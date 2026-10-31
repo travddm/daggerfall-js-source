@@ -1,7 +1,7 @@
-// AUDIT BANTHA1 (RISK, bible/01-Overview/audits/Audit-Bantha.md): WHERE THE JUNGLE STANDS ON THE MAP - read off the
+// AUDIT BANTHA1 (RISK): WHERE THE JUNGLE STANDS ON THE MAP - read off the
 // owner's own ARENA2, which this repository does not hold. BANTHA1 stood the jungle on a political region and found region
 // 10 (Bantha) holds no pixel and no place - Daggerfall names it and never paints it - so it stood on Glenpoint. BANTHA2
-// (2026-10-19, the owner: "The area is red in bantha and should be the jungle biome"): the jungle is the area the owner
+// the jungle is the area the owner
 // painted (world/jungle/banthaArea.js). This says how many map pixels it holds, its box, the regions and climates it
 // covers (the jungle lays the rainforest's law over whatever they are) and its towns and cities (the names
 // `SCENES=jungle LOC=<town> npm run perf` takes, with the town's region), beside Daggerfall's region for scale.

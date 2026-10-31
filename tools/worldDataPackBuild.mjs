@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// WD3 (2026-10-01): A MOD'S WHOLE WORLD DATA AS ONE PACK - the author's edits over the player's own MAPS.BSA and
+// WD3: A MOD'S WHOLE WORLD DATA AS ONE PACK - the author's edits over the player's own MAPS.BSA and
 // BLOCKS.BSA, every shared piece once (formats/worldData/worldDataPack.js says what a pack is and why).
 //
 //   node tools/worldDataPackBuild.mjs <arena2> <bundle.dfmod> <vendor> <out.json> [--title T] [--author A] [--version V]

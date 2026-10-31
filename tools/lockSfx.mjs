@@ -1,5 +1,4 @@
-// THE LOCK'S SOUNDS, SYNTHESISED AND BAKED (LOCKPICK, 2026-10-26, the owner: "I want to build a detailed lock picking
-// minigame and introduce a lockpick item" - bible/06-Systems/Lockpicking.md).
+// THE LOCK'S SOUNDS, SYNTHESISED AND BAKED (LOCKPICK, 2026-10-26, ).
 //
 // OURS, the gathering's way (tools/gatherSfx.mjs): built here from noise and sine with the shared kit (tools/sfxSynth.mjs)
 // and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit mono. DAGGER.SND has

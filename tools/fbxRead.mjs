@@ -1,7 +1,6 @@
 // THE BINARY FBX READER, and nothing else.
 //
-// FIELD-GUN-MW1 (2026-09-20, Mac: "texturing and rigging this for the
-// morrowind model"): the Dwarven Thunderlock is THE PORT'S OWN WEAPON
+// FIELD-GUN-MW1: the Dwarven Thunderlock is THE PORT'S OWN WEAPON
 // (systems/thunderlock.js) and Morrowind has no firearm, so the MW
 // first-person lane - which resolves every mesh out of the PLAYER'S
 // install by search token - can never find a model for it. The model

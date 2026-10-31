@@ -1,4 +1,4 @@
-// TV1 - THE TRAVEL VIEW, IN A REAL BROWSER (bible/06-Systems/Travel-View.md).
+// TV1 - THE TRAVEL VIEW, IN A REAL BROWSER.
 //
 // The node pins drive the camera's law and the host's machine against fakes. What only a real GL and a real DOM can
 // say, this says - on a SYNTHETIC valley (CI has no ARENA2 and never will), through the real renderer:

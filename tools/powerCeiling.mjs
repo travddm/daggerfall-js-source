@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// POWER-CEILING (2026-10-27, bible/05-Combat/Power-Ceiling.md): THE CEILINGS, MEASURED. A blow's powers and a hurt's
+// POWER-CEILING: THE CEILINGS, MEASURED. A blow's powers and a hurt's
 // guards each come from a few registries; this reads every registry's own most from the records and laws the code reads,
 // so the two composite ceilings in src/systems/powerCeiling.js are a product of today's tops, not a guess.
 // test/combat/powerceiling.test.js runs the same functions: a record that raises a registry's top fails it.

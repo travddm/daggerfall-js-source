@@ -1,9 +1,6 @@
 // THE CHAT LIST HOLDS ITS ROWS, MEASURED.
 //
-// CHAT2 (2026-09-15, Mac relaying a player): "The chat UI when
-// accumulating messages scrunched together and makes history
-// unreadable and after some time, chat history disappears
-// altogether."
+// CHAT2 (2026-09-15,
 //
 // Both halves were one bug and it is a LAYOUT bug, which is why no
 // pin in `test/net/chat1.test.js` could see it: node has no layout engine,

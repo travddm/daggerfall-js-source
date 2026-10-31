@@ -1,6 +1,4 @@
-// RENOWN-BAR (2026-09-26, Mac: "with the new renown xp bar, I want to remove the xp amount on the lefthand side and
-// integrate it into the bar itself, then center the bar properly"; then "Actually lets just keep the other bar and
-// remove the xp. Just have it visible in the player profile") - THE HUD'S RENOWN ROW, DRAWN AND MEASURED.
+// RENOWN-BAR - THE HUD'S RENOWN ROW, DRAWN AND MEASURED.
 //
 // Whether a bar is centred is a thing about pixels: a pin can say the row's rule reads `grid` with two equal outer
 // columns, and only a layout engine can say the bar's middle IS the vitals' middle. So the REAL HUD is drawn here
@@ -8,7 +6,7 @@
 // the page hands it through ui/hud/hudRenown.js's own seam, at a desktop, a laptop and a phone both ways up, and for each
 // Renown state - a level part-way (with XP earned and not yet answered), a level's start, a level's last XP, the cap,
 // and a level with no total yet (the box alone) - it reads:
-//   - UI3 (2026-09-27, Mac: "more space for the XP bar and being able to fit the XP amounts inside"): THE NUMBERS IN
+//   - UI3: THE NUMBERS IN
 //     THE BAR - the level's credit over its span ("Highest" at the cap), inside the track and on one line, never
 //     beside it; none with no total;
 //   - THE BAR IS CENTRED: the track's middle within 1px of the vitals row's middle (the health bar's - the screen's);

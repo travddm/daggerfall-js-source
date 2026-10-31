@@ -1,6 +1,4 @@
-// BUG-G1 (2026-09-21, SquidKam on Discord: "Guards kill the framerate too /
-// I think thats a sound issue right? cause the guards have some null
-// sounds"). WHAT A WATCHMAN COSTS PER FRAME, measured rather than guessed.
+// BUG-G1. WHAT A WATCHMAN COSTS PER FRAME, measured rather than guessed.
 //
 // The sound path was read first and is cheap by construction: a missing
 // DAGGER.SND record is cached as null once (audio.js _buffer) and the attract

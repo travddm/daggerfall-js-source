@@ -1,5 +1,4 @@
-// THE CLIMB'S SOUNDS, SYNTHESISED AND BAKED (CLIMB4, 2026-10-01, Mac: "I reallty want go to go all in with the detai.
-// Liike proer feel to climbing" - the Enhanced Climbing arc, bible/03-World/Parkour-Arc.md).
+// THE CLIMB'S SOUNDS, SYNTHESISED AND BAKED (CLIMB4, 2026-10-01, - the Enhanced Climbing arc).
 //
 // OURS, the naval arc's way (tools/navalSfx.mjs): built here from noise and sine with the shared kit (tools/sfxSynth.mjs)
 // and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit mono - so a hand on

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FLOW3 (2026-09-26, Mac: "is there a way to really ensure we have a faster workflow with the same standards?"): THE
+// FLOW3: THE
 // TESTS A CHANGE CAN MOVE, AND NO OTHERS - the loop while working. The whole suite is ~6 minutes; a change to one module
 // is pinned by a few dozen files (a change to spoilsPool.js: ten, two seconds). A test file is chosen when
 //   - it changed itself,

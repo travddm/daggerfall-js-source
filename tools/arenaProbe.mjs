@@ -1,5 +1,4 @@
-// ARENA2, SEEN (2026-10-02, Mac: "extremely detailed and authentic ... AAA grade. All UI elements and text must be
-// enhanced UI plus"): the arena's bouts played through on the world host in a real browser - the city's exhibition on
+// ARENA2, SEEN: the arena's bouts played through on the world host in a real browser - the city's exhibition on
 // the hour (the fighters, the crowd in the tiers, the HUD), the Herald's choice at the gate, the floor's instance and
 // a ladder bout fought to its verdict, the ladder's step and the way out. test/arena2_*.test.js hold the laws headless;
 // this stands them over the real game and photographs what a fake cannot.

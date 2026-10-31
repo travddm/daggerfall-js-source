@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DS1 (2026-09-25): DETAILED SHIPS 1.0.0 (Cliffworms) - EVERY VENDORED
+// DS1: DETAILED SHIPS 1.0.0 (Cliffworms) - EVERY VENDORED
 // FILE, OUT OF THE SHIPPED BUNDLE AND THE PLAYER'S OWN BLOCKS.BSA.
 //
 //   node tools/detailedShipsAssets.mjs <arena2> "<path-to>/detailed ships.dfmod" [outDir]

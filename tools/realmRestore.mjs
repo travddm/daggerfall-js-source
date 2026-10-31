@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════════
-// RESTORE (2026-09-29, Mac: "I want people to get their stuff back") - THE HOUSES A DELETED CUSTOMS CHARACTER TOOK WITH IT,
+// RESTORE - THE HOUSES A DELETED CUSTOMS CHARACTER TOOK WITH IT,
 // PLANNED BACK FROM THE DATABASE'S OWN HISTORY.
 //
-// From CUSTOMS-CARRY's arrival on main (2026-09-29 03:09:50 UTC) until HOUSE-LOSS, customs carried an offline
+// From CUSTOMS-CARRY's arrival on main until HOUSE-LOSS, customs carried an offline
 // character's online home, guild place and Renown track to its realm id before the first save was sent, and the door's
 // Delete on a character whose first save never landed took them with it - the home's pieces and hidden furniture by the
-// tables' cascade - and left the census spent (bible/01-Overview/bugs/Field-Bugs-2026-09-29.md, HOUSE-LOSS). Those rows are
+// tables' cascade - and left the census spent (, HOUSE-LOSS). Those rows are
 // gone from the database; D1 Time Travel still holds them. The operator's workflow (.github/workflows/realm-restore.yml)
 // reads a snapshot from before the loss (THEN) and the database as it stands (NOW), and this plans what comes back.
 //

@@ -1,4 +1,4 @@
-// DA13 (2026-10-14, Mac: "B only: per-file channel"): THE GAME'S FILES ON THIS COPY'S DISK - which version is played,
+// DA13: THE GAME'S FILES ON THIS COPY'S DISK - which version is played,
 // and how a new one comes to be played without a byte of the old one moving until it has proved itself.
 //
 // The bundled copy inside the install is the SEED: app.asar's dist/, indexed at build time (app/game-seed.json). A

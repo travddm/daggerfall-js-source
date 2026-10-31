@@ -1,4 +1,4 @@
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md, "The growth") - THE FOREST FIELD MEASURED: the quantiles a zone's `woods`
+// TESA-LANDS (, "The growth") - THE FOREST FIELD MEASURED: the quantiles a zone's `woods`
 // is read on (world/tamriel/tamrielLands.js FOREST_QUANTILES), off the field itself (world/terrain/terrainNature.js
 // forestCover) at world tiles drawn evenly over the continent's frame (world/tamriel/tamrielFrame.js tamrielFrameInBay,
 // the Bay's coordinates: a pixel 128 world tiles, north up). Pure node: no game data, no browser.

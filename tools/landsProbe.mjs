@@ -1,4 +1,4 @@
-// TESA-LANDS (bible/03-World/Tamriel-Lands.md) - THE LANDS PAST THE BAY, PHOTOGRAPHED in the real game. Boots the streaming
+// TESA-LANDS - THE LANDS PAST THE BAY, PHOTOGRAPHED in the real game. Boots the streaming
 // world headless on SwiftShader at a ONE-square land view (TerrainDistance 1: the 3x3 - SwiftShader never finishes the
 // default 121), and for each zone asked jumps past the Bay to a pixel deep in it (`__tesaJump`, as a fast travel lands) and
 // photographs it standing level, looking down at the ground at its feet, and from 330 m over it. Every wait is on the

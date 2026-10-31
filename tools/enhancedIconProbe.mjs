@@ -211,7 +211,7 @@ check('the address came from inventoryItemImage',
 // A cold icon used to repaint the screen when it landed, which is what
 // made the letters give way to the picture; since VIRT the waiting tile
 // takes its picture in place and the screen is not repainted at all
-// (bible/10-UI/UI-Arc.md VIRT). AUDIT VIRT: so the count that pins it is
+// (VIRT). AUDIT VIRT: so the count that pins it is
 // the landings' own (`__pack`'s `landings`, the passes that put pictures
 // into tiles, and `painted`, the tiles they put them into). A landing
 // that set off another - a cache that forgot an in-flight record asked

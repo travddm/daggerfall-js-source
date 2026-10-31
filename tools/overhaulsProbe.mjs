@@ -3,7 +3,7 @@
 // look worn from its button reads back as the card's look in use; a mix made on Features reads "Custom"; GrimoireUI's
 // card shows the pack's own art (the file served, the picture decoded); and wearing GrimoireUI reloads onto the
 // classic skin with the pack on the shelf, the card saying so. VE4 / AUDIT VE: the Texture card reads Vanilla Enhanced
-// in use on a fresh game (Mac: "Ensure this is on by default"); its add-ons stand on the card and switch there; a shipped
+// in use on a fresh game; its add-ons stand on the card and switch there; a shipped
 // picture is served under /play/ and decoded by the pack's own WORKER (AUDIT VE P1); Classic puts it away, keeping the
 // add-ons, and Vanilla Enhanced worn again brings them back. A phone takes the add-on rows without spilling.
 //

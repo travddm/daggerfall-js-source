@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// FLOW1 (2026-09-26): THE SHARDS' WEIGHTS - each test file's own wall time (a fresh `node --test <file>`: its start, its
+// FLOW1: THE SHARDS' WEIGHTS - each test file's own wall time (a fresh `node --test <file>`: its start, its
 // imports and its tests), taken `--jobs` at a time and written to tools/testTimes.json for tools/testShards.mjs. Only
 // the balance reads them: a stale or missing time never leaves a file out of a shard, it only places it less well. Run
 // it again when the suite's shape moves (a new slow file, a slow file made fast).
 //
 //
-// CI-TIMES (2026-10-19, Mac: "Do it"): the times are RECORDED BY CI now - every shard adds each of its files' wall time
+// CI-TIMES: the times are RECORDED BY CI now - every shard adds each of its files' wall time
 // to a record (tools/fileTimes.mjs), and after a green run test-times.yml merges the eight onto the times that run was
 // split by (`--merge`) and keeps them in the Actions cache, where the next run's shards read them (verify.yml). This
 // tool's re-take stays for a machine of one's own.

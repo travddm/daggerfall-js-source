@@ -315,7 +315,7 @@ try {
   await page.mouse.move(mid.x, mid.y);
   await page.mouse.wheel(0, -600);
   await page.mouse.wheel(0, -600);   // past the ceiling: the clamp must not move the point under the cursor
-  // AUDIT MAP-FIELD (2026-09-19): MEASURE THE DRIFT ON THE SCREEN.
+  // AUDIT MAP-FIELD: MEASURE THE DRIFT ON THE SCREEN.
   //
   // The tolerance was 0.05 MAP pixels, and a map pixel shrinks as the
   // scale grows - so the same drift in the only units a player has,

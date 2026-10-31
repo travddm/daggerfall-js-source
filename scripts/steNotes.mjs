@@ -1,5 +1,4 @@
-// STE-NOTES (2026-10-26, the owner: "The law for patch notes is now
-// ASD-STE100 Simplified Technical English (STE)"): THE NOTES ARE WRITTEN
+// STE-NOTES: THE NOTES ARE WRITTEN
 // IN STE. A pull request's `## Patch notes` (REL6) are what the release
 // prints and the launcher shows, so they are read by players in every
 // language the game speaks, many of them not in their first one - STE is
@@ -28,7 +27,7 @@
 // The rest of STE - the approved words in their approved meanings, an
 // article before a noun, no noun cluster past three words, the active
 // voice - is the writer's and the reviewer's
-// (bible/01-Overview/Desktop-App.md, STE-NOTES). A clean run is not proof
+// (, STE-NOTES). A clean run is not proof
 // the notes are STE.
 //
 // The pull request's `ste-notes` check (.github/workflows/ste-notes.yml)

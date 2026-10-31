@@ -2,7 +2,7 @@
 //
 // HellRay (Discord, "Performance issues with boss AoE attacks circles and player sprites"): "massive FPS drops when the
 // boss performs AoE attacks and circles appear on the ground ... Player sprites also cause severe performance drops,
-// especially when more than 10 players are gathered in one area." The record: bible/07-Rendering/Performance-Rig.md
+// especially when more than 10 players are gathered in one area." The record:
 // AOE-PERF.
 //
 // This runs the real renderer in Chromium (SwiftShader - software GL, whose time grows with the fragments and vertices

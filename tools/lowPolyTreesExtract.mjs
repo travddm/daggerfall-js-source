@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// LPT1 (2026-10-05): LOW POLY TREES 5 (SquidKamer - Kamer) - THE TREES AS DATA, OUT OF THE SHIPPED BUNDLE.
+// LPT1: LOW POLY TREES 5 (SquidKamer - Kamer) - THE TREES AS DATA, OUT OF THE SHIPPED BUNDLE.
 //
 //   node tools/lowPolyTreesExtract.mjs "<path-to>/lowpolytrees.dfmod" --arena2 <ARENA2> [outDir]
 //
 // Default outDir is vendor/low-poly-trees. The bundle is read with tools/lib/unityScene.mjs (Come Sail Away's reader);
-// bible/07-Rendering/Low-Poly-Trees.md is the record. What the port carries:
+// is the record. What the port carries:
 //
 // - `lowpolytrees.dfmod.json` - the mod's manifest, the bundle's own TextAsset byte for byte.
 // - `Trees/trees.json` + `Trees/trees.bin` - Kamer's own geometry: every mesh's positions, normals and uv0 (f32,

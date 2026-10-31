@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE FIT PROBE: the authored continent laid over the player's own
+// TAMRIEL1 - THE FIT PROBE: the authored continent laid over the player's own
 // picture of it, and the Bay's edge measured against the data. LOCAL ONLY: it reads ARENA2 and writes a render of it,
 // which never ships (Port-Doctrine, A RENDER OF GAME DATA IS GAME DATA) - the output directory is gitignored.
 //

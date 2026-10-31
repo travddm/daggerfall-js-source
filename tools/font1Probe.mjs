@@ -1,6 +1,4 @@
-// FONT1 (2026-09-16, Mac: "Enhanced mode UI. Especially the new online
-// interfaces font use our enhanced font. Ambient Text mod also doesnt
-// use it. Any enhanced UI or text must be our enhanced version"):
+// FONT1:
 // THE ENHANCED FACE, MEASURED.
 //
 // A font swap is a LAYOUT change, and node has no layout engine - the
@@ -23,7 +21,7 @@
 //      moved them.
 //   4. THE HUD'S TEXT SURFACES - the mid-screen label stands at DFU's
 //      146-of-200 line, under the reticle and over the bars (AUDIT FONT
-//      F11); and, since ENH-NOTICE3 (2026-09-21) moved PopupText's rows
+//      F11); and, since ENH-NOTICE3 moved PopupText's rows
 //      off the top-centre column and into the right-edge notice stack
 //      as TOASTS (ui/enhanced/enhancedNotice.js), the toasts: at the right edge,
 //      two models' rows stacking rather than overlapping (AUDIT FONT F1's

@@ -7,10 +7,7 @@
 // the repo's own; the file records the FBX it baked (`source`, its path in the
 // repo when it lies there).
 //
-// GALLEON (2026-10-01, Mac: "So this model is to replace the current ingame
-// gallon model. The doors/hatches should open and close and we will need to
-// give this a proper texture, along with a wheel at the helm, the sails and
-// ropes, and ensuring cannon fire shoots from the cannon holes properly").
+// GALLEON.
 //
 // Mac sent three exports - New_Ship.fbx, New_Ship_Access_Hatch.fbx and
 // New_Ship_Window_Shutters.fbx - and they are ONE SCENE three times: every
@@ -18,7 +15,7 @@
 // (measured, node for node). So one is committed, and the hatch and the
 // shutter are read out of it by their own objects (`ROLES` below).
 //
-// GALLEON-2 (2026-10-02, Mac: "Replace it with this updated model"):
+// GALLEON-2:
 // New_Ship_Even_EVEN_newer.fbx, committed over New_Ship.fbx. Read against
 // the first, part for part: the ship stands 36.25 m along the scene's Y
 // (FRAME.centreline - she was on Y 0). Her hull is reshaped (95 faces where
@@ -48,7 +45,7 @@
 //    +Y. Come Sail Away's hulls - and so the port's boats - stand in Unity's
 //    frame: +x starboard, +y up, +z the bow, the root on the waterline
 //    (systems/naval/navalShips.js's header). So a scene point (X, Y, Z) is
-//    the boat's ( CENTRELINE - Y, Z - WATERLINE, X - MIDSHIP ) times SCALE
+//    the boat's (CENTRELINE - Y, Z - WATERLINE, X - MIDSHIP ) times SCALE
 //    (CENTRELINE her keel line's Y - her hull object's own): a mirror,
 //    which is why every polygon's corners are REVERSED on the way through -
 //    Blender's front is counter-clockwise in a right-handed frame and the
@@ -121,7 +118,7 @@
 // (test/world/ships/galleon_model.test.js): the source is committed beside it, so the
 // file is a DERIVATION, never a blob.
 //
-// SHIPS-2 (2026-10-07): the reading, the cut and the refusals are every ship's now - tools/shipBake.mjs, the bake for
+// SHIPS-2: the reading, the cut and the refusals are every ship's now - tools/shipBake.mjs, the bake for
 // a scene of parts, moved out of this file word for word; this is the galleon's spec over it (her frame, roles,
 // skips and rudder) and her command line, and it answers every name it always answered.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';

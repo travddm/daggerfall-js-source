@@ -6,8 +6,7 @@
 //                            [--keep-rotation] [--no-normalise]
 //                            [--placement=object|scene] [--material=N]
 //
-// FIELD-GUN-MW1 (2026-09-20, Mac: "texturing and rigging this for the
-// morrowind model"). The reader's header says why an FBX is a source
+// FIELD-GUN-MW1. The reader's header says why an FBX is a source
 // asset and not a runtime format; this file is the bake.
 //
 // ═══ WHAT IT BAKES INTO ═══════════════════════════════════════════
@@ -30,7 +29,7 @@
 //    polygons a modelling package emits and WRONG for a concave one -
 //    which is why a concave n-gon is never fanned.
 //
-//    MW-BRIG1 (2026-09-29, Mac's steel brigandine): IT IS EAR-CLIPPED
+//    MW-BRIG1: IT IS EAR-CLIPPED
 //    INSTEAD. The first cut REFUSED a concave n-gon ("triangulate it in
 //    Blender"), and the brigandine carries six - three mirrored pairs
 //    round its front clasps, a quad and a pentagon each, real notches
@@ -241,7 +240,7 @@ export function isConvexPolygon(pts) {
 }
 
 /**
- * MW-EBONY1 (2026-10-09): A FACE THAT NAMES ONE CORNER TWICE. Mac's ebony breastplate carries eight 16-gons each with
+ * MW-EBONY1: A FACE THAT NAMES ONE CORNER TWICE. Mac's ebony breastplate carries eight 16-gons each with
  * two corners standing on the very spot as the corner before them - two vertices, one place, a zero-length edge - and
  * earClip finds no ear in them (a corner of no turn is neither an ear nor a reflex). Dropping each corner that repeats
  * the one before it leaves the face's own outline, which clips; the dropped corner's triangles would have had no area.

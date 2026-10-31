@@ -1,4 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md): THE STUDIO'S LISTING, MADE WHERE IT IS SERVED.
+// STUDIO1: THE STUDIO'S LISTING, MADE WHERE IT IS SERVED.
 //
 // The studio (src/systems/studioArt/studioArt.js) is a folder the game's artists drop pictures into. What the game
 // wears is what the folder holds: the dev server answers `art/studio/index.json` by reading the folder as it is asked,

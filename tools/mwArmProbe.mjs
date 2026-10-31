@@ -609,8 +609,7 @@ await boot(FIX.bsa);   // back to the armed-with-nothing baseline for L6/L7
 // (L5b leaves the rig in THIRD person, where draw() correctly no-ops -
 // the fresh boot below is the first-person baseline L5c measures.)
 // ── L5c: THE LOOK FOLLOWS - PITCH THROUGH THE REAL PASS ─────────────
-// IG1 (Mac: "the first person view should follow the camera when up or
-// down, which it currently doesn't"). Rule 54's composition: the neck
+// IG1. Rule 54's composition: the neck
 // takes neckRotateFactor (0.75) of the look, the lens takes all of it,
 // so the arms SLIDE by only the remaining quarter and stay in frame.
 // Measured, not trusted: drive the camera dep's pitch and read the
@@ -697,8 +696,7 @@ ok(bobUp.cy < bobRest.cy - 0.005,
   `a bob UP shows the arms LOWER - the offset hits the lens twice and the neck once (cy ${bobRest.cy.toFixed(3)} -> ${bobUp.cy.toFixed(3)})`);
 
 // ── L5e: FIXED TO THE SCREEN - THE SHIPPED DEFAULT, MEASURED ────────
-// IG6 (Mac's final call: "just make it where it follows the screen.
-// Just like classic daggerfall"). With the flag back ON, the neck
+// IG6. With the flag back ON, the neck
 // takes the WHOLE look (neckAim 1), the offset is zero at both
 // applications, and the lens takes the whole look too - a rigid
 // ensemble seen by a lens that rotates with it, so the picture must

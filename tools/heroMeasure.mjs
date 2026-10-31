@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// BAL11 (2026-10-17, bible/05-Combat/Balance-Arc.md section 17; the Discord's field report: "the game gets too easy ...
-// starting around character level 10/renown 15ish"): THE HERO'S THREAT, MEASURED - what one kill costs a stated player of
+// BAL11: THE HERO'S THREAT, MEASURED - what one kill costs a stated player of
 // each level and Renown, against DFU's own encounter band at that level (systems/encounters.js chooseRandomEnemy's band, as
 // weights over each table's twenty slots), through the real overhaul blow both ways (combat/pcaao.js pcaaoAttackDamage,
 // PCAAO and Meaner Monsters on as they ship), seeded, so every figure the record quotes is a command away.

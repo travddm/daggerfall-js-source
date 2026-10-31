@@ -2,7 +2,7 @@
 //
 //     node tools/fbxStrip.mjs <in.fbx> <out.fbx> --drop=<Model>[,<Model>...]
 //
-// MW-STEEL1 (2026-10-06, Mac: "These 2 files are for the armor replacement of the morrowind steel armor"). Mac's
+// MW-STEEL1. Mac's
 // steel-plate scenes carry, beside the armour, the body it was fitted on: two objects of a Breton man out of a
 // "Morrowind_TPose_Models" pack - his head (`Breton_Male.003`) and his neck (`Breton_Male.006`), textured with
 // Morrowind's own tx_b_n_breton_m_* pictures. They are Bethesda's meshes. The port never ships Morrowind data (it reads
@@ -33,7 +33,7 @@
 //
 //     node tools/fbxStrip.mjs <in.fbx> <out.fbx> --cut=<Model>:<material>[,...]
 //
-// MW-FOLK1 (2026-10-13, the owner's townsfolk outfits). An outfit can carry, joined into its own object, a piece of the
+// MW-FOLK1. An outfit can carry, joined into its own object, a piece of the
 // body it was made on: the 385 outfit (`Breton_Male.018`) holds 61 polygons of a Morrowind groin under its tunic, worn
 // in material slot 6 - Morrowind's own tx_b_n_generic_m_g00 - and dropping the object would drop the outfit. A cut
 // takes out the polygons that wear that slot, with every vertex, normal and UV only they used, and rewrites the

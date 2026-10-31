@@ -1,4 +1,4 @@
-// SCALE5c (2026-10-10; bible/11-Multiplayer/Scale-Arc.md SCALE5c): WHAT THE HUB'S SHARDS COST AND SAVE, MEASURED ON THE
+// SCALE5c: WHAT THE HUB'S SHARDS COST AND SAVE, MEASURED ON THE
 // REAL ROOM over the pins' fake object (test/fakeRoom.mjs) - every hello a signed token through the relay's own door.
 //
 //   ONE HUB  N players on `chat:world` alone, as every build before SCALE5c: the time and the sends of each hello (its
