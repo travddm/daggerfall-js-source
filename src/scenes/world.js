@@ -294,7 +294,8 @@ import { preloadTamrielTrace } from '../ui/tamrielTrace.js';   // TAMRIEL3: Dagg
 import { fitBayToPicture, tamrielLandVersion } from '../world/tamriel/tamrielLand.js';   // TAMRIEL3: where the Bay stands on it; WW2: which picture a theatre's gate scan read
 import { arenaPlaces, arenaPixels, setArenaStanding, pastBayLakeAt } from '../world/arenaPlaces.js';   // TESA1: the places on it (TESA12: the port's own); TESA2: the pixels they stand on
 import { arenaRoadsLayer, setArenaRoads } from '../world/arenaRoads.js';   // TESA4: the roads past the Bay's layer
-import { arenaTemplates, ARENA_LOAD_WAIT_MS } from '../world/arenaLocations.js';   // TESA2: the places stood, each a Daggerfall town or dungeon cloned
+import { arenaTemplates } from '../world/arenaLocations.js';   // TESA2: the places stood, each a Daggerfall town or dungeon cloned
+import { waitForTamrielTrace } from '../world/tamriel/tamrielTraceWait.js';   // a save past the Bay waits for the trace as a start there does, its cap counted in steps
 import { countryTemplates, countryCounts } from '../world/tamrielCountry.js';   // TESA7: the countryside past the Bay
 import { countrysideOn } from './shared.js';   // TESA7: its kill door
 import { capitalsOn } from './shared.js';   // TESA10: the capitals' kill door
@@ -29245,10 +29246,11 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // new game, so it takes the classic start's place rather than
   // running after it.
   // TESA2: a save made in a town past the Bay loads into it - the places stand once the trace has landed, so a load waits
-  // for it, ARENA_LOAD_WAIT_MS at most (a trace that never lands costs that and no more)
+  // for it, world/tamriel/tamrielTraceWait.js's cap at most (counted in steps, so a slow device is given longer; a trace
+  // that never lands costs that and no more)
   // AUDIT-TESA A7-1: every place past the Bay moves with the trace - a town, a capital, the countryside's, a lair - so
   // with any of them standing a load waits for it
-  if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has('load')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);
+  if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has('load')) await waitForTamrielTrace(arenaTraced);
   let _loadedGame = false;   // EOTB-IL: which of StartGameBehaviour's two events this boot is
   if (params.has('classicload') && peekPendingClassicSave()) {
     // SAV3: the classic import takes the load's place in the boot walk

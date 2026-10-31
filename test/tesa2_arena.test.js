@@ -17,7 +17,7 @@ import {
 } from '../src/world/arenaPlaces.js';
 import {
   arenaPlaceId, isArenaPlaceId, arenaLocationIndex, arenaTemplates, arenaTemplateOf, synthesizeArenaLocation,
-  ARENA_PLACE_SALT, ARENA_PLACE_BASE, ARENA_INDEX_BASE, ARENA_TEMPLATE_KINDS, ARENA_LOAD_WAIT_MS,
+  ARENA_PLACE_SALT, ARENA_PLACE_BASE, ARENA_INDEX_BASE, ARENA_TEMPLATE_KINDS,
 } from '../src/world/arenaLocations.js';
 import { etherPlaceId, etherLocationIndex } from '../src/world/etherPlaces.js';
 import { CELLS_W, CELLS_H } from '../src/world/ethericSea.js';
@@ -100,7 +100,7 @@ test('TESA2 the installed pixels: made once a trace and a fit, made again when e
 });
 
 test('TESA2 the id: a lane of its own in the high 12 bits and a number past every Bay pixel id below, so no Arena place is a spawn\'s, an isle\'s or a Bay place\'s; the index its own negative past the isles\'; all 432 slots apart (mutant: the salt, the base, the ordinal)', () => {
-  assert.deepEqual([ARENA_PLACE_SALT, ARENA_PLACE_BASE, ARENA_INDEX_BASE, ARENA_LOAD_WAIT_MS], [0xa7, 500000, 1000000, 8000]);
+  assert.deepEqual([ARENA_PLACE_SALT, ARENA_PLACE_BASE, ARENA_INDEX_BASE], [0xa7, 500000, 1000000]);
   const p = { provinceIndex: 2, id: 2 };
   assert.equal(arenaPlaceId(p), ((0xa7 << 20) | (500000 + 2 * 48 + 2)) >>> 0);
   assert.equal(arenaLocationIndex(p), -(1000000 + 98));
@@ -230,7 +230,7 @@ test('TESA2 the host: offline on the land beyond the Bay it stands the places - 
   assert.match(sweep, /if \(\(place \? `\$\{place\.provinceIndex\}\|\$\{place\.id\}\|\$\{!!place\.port\}` : null\) !== \(p\.arenaSlot \? `\$\{p\.arenaSlot\.provinceIndex\}\|\$\{p\.arenaSlot\.id\}\|\$\{!!p\.arenaSlot\.port\}` : null\)\) again\.push/, 'PIN MOVED (TESA6): and its port');
   assert.match(sweep, /if \(!again\.length\) return;\n\s+swap\.rebuild\(again\);/);   // PIN MOVED (IC-SWAP-BEHIND): built again behind its view, or torn down and queued nearest first (scenes/swapBehind.js rebuild)
   assert.match(w, /if \(_arenaTemplates && !building\) sweepArenaPixels\(\);/);
-  const WAIT = "if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has('load')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);";
+  const WAIT = "if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has('load')) await waitForTamrielTrace(arenaTraced);";   // PIN MOVED (the trace's cap counted in steps: world/tamriel/tamrielTraceWait.js)
   assert.ok(w.includes(WAIT), 'PIN MOVED (TESA12: the trace alone - no data to wait for; AUDIT-TESA A7-1: one wait for everything past the Bay) a load waits for the trace');
   assert.ok(w.indexOf(WAIT) < w.indexOf('  let _loadedGame = false;'), 'before the boot decides its start');
   assert.match(w, /\.finally\(\(\) => arenaTraceLanded\(\)\);/, 'landed, or never will');

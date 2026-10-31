@@ -10,7 +10,7 @@
 // stand in the location index as they build) threw "location not found" and the page never booted, a reload neither.
 // Such a start is booted the way a save made in a town past the Bay loads (TESA2): the world stands first on the Bay -
 // the nearest Bay town to the place where its pixel is known before the trace, else the boot's own default - and once
-// the land past the Bay has its trace (world.js arenaTraced, ARENA_LOAD_WAIT_MS at most, the load's own wait) and the
+// the land past the Bay has its trace (world.js arenaTraced, world/tamriel/tamrielTraceWait.js's cap, the load's own wait) and the
 // boot's world stands, the player is moved to the place by its kept map id (`seat`, LEGACY-HOME's: the registry's row, a
 // country place's id read back to its pixel, an isle's to its centre) or by its region's name and its own (the
 // registry's first listed place of that name past the Bay). `farStart` settles when the move is made (or none could
@@ -22,7 +22,7 @@ import { inBay } from '../world/tamriel/tamrielFrame.js';
 import { BAY_THEATRE } from '../world/worldWide/worldGrid.js';
 import { countryPixelOfId } from '../world/tamrielCountry.js';
 import { etherPlacePixelOfId } from '../world/etherPlaces.js';
-import { ARENA_LOAD_WAIT_MS } from '../world/arenaLocations.js';
+import { waitForTamrielTrace } from '../world/tamriel/tamrielTraceWait.js';
 import { nearestSafePlace } from '../systems/deathRespawn.js';
 import { REPOSITION } from '../systems/ship.js';
 import { START_READY_MS, START_READY_TRIES, STARTS_TEXT } from './startsHost.js';
@@ -73,8 +73,12 @@ function bayGuardOf(far, { worldPlaces, locationIndex, maps }) {
 
 const wait = (/** @type {number} */ ms) => new Promise((r) => { setTimeout(r, ms); });
 
-/** @param {any} host */
-export function createBootStart(host) {
+/**
+ * @param {any} host
+ * @param {{ traceWait?: import('../world/tamriel/tamrielTraceWait.js').TraceWaitBudget }} [options] the trace wait's
+ *   budget: its own default in the game; a test passes a short one
+ */
+export function createBootStart(host, { traceWait } = {}) {
   const { locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady } = host;
   // U31 / THE CLASSIC START. StartGameBehaviour (:371-401) does not
   // resolve the start by NAME - it reads a map pixel out of settings
@@ -111,7 +115,7 @@ export function createBootStart(host) {
    *  past the Bay loads (world.js: the load's wait on arenaTraced, then its teleport). Answers the pixel reached, or null. */
   async function reach(/** @type {{ id: ?number, region: string, loc: string }} */ to) {
     for (let i = 0; !_worldReady() && i < START_READY_TRIES; i++) await wait(START_READY_MS);
-    const landed = _worldReady() && await Promise.race([Promise.resolve(host.arenaTraced).then(() => true, () => true), wait(ARENA_LOAD_WAIT_MS).then(() => false)]);
+    const landed = _worldReady() && await waitForTamrielTrace(host.arenaTraced, traceWait);
     const at = landed ? farPixelOf(to, worldPlaces) : null;
     if (!at) {
       console.warn(`[world] no way to ${to.region}/${to.loc} past the Bay (seat ${to.id ?? '-'}): the world stands at ${startLoc.name}`);

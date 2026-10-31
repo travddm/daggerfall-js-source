@@ -237,7 +237,7 @@ test('AUDIT-TESA A6-2: where a capital\'s models stand - a wall over a garden or
 
 test('AUDIT-TESA A7-1/A5-F1/A2-6: a load waits for the trace whenever a place past the Bay stands - a capital or the countryside, Arena or none; the land moving rolls the countryside\'s and the lairs\' pixels again; their ground\'s reads kept a fit and a land', () => {
   // PIN MOVED (TESA12): one wait - the town past the Bay's beside the capitals' and the countryside's
-  const i = W.indexOf('if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has(\'load\')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);');
+  const i = W.indexOf('if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has(\'load\')) await waitForTamrielTrace(arenaTraced);');   // PIN MOVED (the trace's cap counted in steps: world/tamriel/tamrielTraceWait.js)
   assert.ok(i > 0, 'the wait');
   assert.match(W, /const rolled = moved && !!\(host\._countryTemplates \|\| host\._lairTemplates\) && !cap && !had\?\.capital && !had\?\.arena;\n\s+if \(rolled \|\| cap !== !!had\?\.capital\) again\.push/, 'the sweep');
   assert.match(read('src/world/tamrielCountry.js'), /if \(fit !== tamrielFit\(\) \|\| land !== tamrielLandVersion\(\)\) \{ dry\.clear\(\); fit = tamrielFit\(\); land = tamrielLandVersion\(\); \}/, 'the ground');

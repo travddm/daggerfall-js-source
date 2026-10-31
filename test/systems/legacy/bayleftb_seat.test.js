@@ -39,7 +39,7 @@ async function world() {
   return _world;
 }
 /** The boot's start over the world, as world.js constructs it - its teleport, its word and its readiness recorded. */
-async function boot(search, { ready = () => true } = {}) {
+async function boot(search, { ready = () => true, arenaTraced = Promise.resolve(), traceWait = undefined } = {}) {
   const w = await world();
   const params = new URLSearchParams(search);
   const moves = [], said = [];
@@ -48,8 +48,8 @@ async function boot(search, { ready = () => true } = {}) {
     params, locationIndex: w.index, maps: w.maps, worldPlaces: w.worldPlaces,
     regionName: params.get('region') || 'Daggerfall', locationName: params.get('loc') || 'Daggerfall',
     _teleportToPixel: async (x, y, local, opts) => { moves.push([x, y, local, opts, asked]); },
-    _worldReady: () => ready(++asked), arenaTraced: Promise.resolve(), townTalk: { say: (line) => said.push(line) },
-  });
+    _worldReady: () => ready(++asked), arenaTraced, townTalk: { say: (line) => said.push(line) },
+  }, { traceWait });
   return { ...start, at: await start.farStart, moves: moves.map((m) => m.slice(0, 4)), askedAtMove: moves.map((m) => m[4]), said };
 }
 
@@ -91,6 +91,25 @@ test('BAY-LEFT-B B1: the Bay\'s starts are as they were - a Bay town stands with
   const late = await boot(`?world=1&legacyborn=4&region=Skyrim&loc=Solitude&seat=${SOLITUDE.id}`, { ready: (n) => n >= 3 });
   assert.equal(late.moves.length, 1);
   assert.ok(late.askedAtMove[0] >= 3, `moved once the world stood (asked ${late.askedAtMove[0]} times)`);
+});
+
+test('a seat past the Bay waits for a trace that lands late - after the world stands, on a slow device - and is still reached (mutant: the trace\'s cap read as one step)', { skip: NO_DATA }, async () => {
+  // Seen 2026-10-31 at a 6x CPU throttle: the trace landed 18.8 s after the world stood, past the 8 s the wait once
+  // gave it, and the heir was born at the Bay's guard town. Here the trace lands after several of a short budget's steps.
+  const slowTrace = new Promise((resolve) => { setTimeout(resolve, 60); });
+  const b = await boot(`?world=1&legacyborn=4&region=Skyrim&loc=Solitude&seat=${SOLITUDE.id}`, { arenaTraced: slowTrace, traceWait: { steps: 40, stepMs: 5 } });
+  assert.deepEqual(b.at, { x: SOLITUDE.x, y: SOLITUDE.y });
+  assert.equal(b.moves.length, 1);
+  assert.deepEqual(b.said, []);
+});
+
+test('a seat past the Bay whose trace never lands falls back once the trace wait\'s steps are spent - the world stays at the Bay\'s town, and it is said', { skip: NO_DATA }, async () => {
+  const neverLands = new Promise(() => {});
+  const b = await boot(`?world=1&legacyborn=4&region=Skyrim&loc=Solitude&seat=${SOLITUDE.id}`, { arenaTraced: neverLands, traceWait: { steps: 4, stepMs: 5 } });
+  assert.equal(b.at, null);
+  assert.deepEqual(b.moves, []);
+  assert.deepEqual(b.said, [STARTS_TEXT.noSite]);
+  assert.equal(b.startLoc.name, 'Charencester Garden', 'the Bay\'s town nearest the seat');
 });
 
 test('BAY-LEFT-B B1: farStartOf - a start past the Bay is a kept map id or a province\'s region; farPixelOf reads an id as the registry, the countryside or an isle stands it (mutants: the seat\'s parse; the province test; the country arm\'s check)', () => {

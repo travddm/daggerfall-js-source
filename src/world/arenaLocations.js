@@ -30,9 +30,6 @@ export const ARENA_PLACE_SALT = 0xa7;
 export const ARENA_PLACE_BASE = 500000;
 /** The places' location indices count down from here. */
 export const ARENA_INDEX_BASE = 1000000;
-/** How long, at most, a boot's load waits for the places past the Bay to stand (the trace landing) - a save made in a
- *  town past the Bay loads into it; a trace that never lands costs this and no more. */
-export const ARENA_LOAD_WAIT_MS = 8000;
 
 /** A place's kind's template: the location type it clones (never one with a dungeon - TESA12: the kinds that had one
  *  went with Arena's staff dungeons). */

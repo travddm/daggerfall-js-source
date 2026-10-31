@@ -183,7 +183,10 @@ into, a dungeon to go down - and the held map takes the player there.
   the data landing after a pixel built, the Arena card's Attach or Remove), every built pixel past the Bay whose
   Arena slot is not the place standing on it now is built again.
 - **A save made in an Arena town** loads into it: with the player's Arena attached, the boot's load waits for the data and
-  the trace (`arenaTraced`), ARENA_LOAD_WAIT_MS (8 s) at most.
+  the trace (`arenaTraced`), at most `world/tamriel/tamrielTraceWait.js:"export const TRACE_WAIT_STEPS = 240;"` steps
+  of 250 ms. The cap is counted in steps, not as one timer: the trace loads on the main thread beside the boot, so a
+  slow device is given longer. An 8 s timer once raced it, and at a 6x CPU throttle the trace landed 18.8 s after the
+  world stood (2026-10-31).
 - **The journey** (`ui/heldMap.js` `_pickAt`, `ui/tamrielInk.js` tamrielCityAt): where a host stands the places
   (`setArenaStanding`, the world host's word at its mount) each inked place carries the pixel it stands on, and a press
   on one ON THE TELEPORT MAP (the Portal Stone's, the guild's) picks that pixel for the portal; the cursor points at a

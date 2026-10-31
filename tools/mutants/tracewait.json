@@ -1,0 +1,51 @@
+[
+  {
+    "name": "TRACE-WAIT-one-step",
+    "file": "src/world/tamriel/tamrielTraceWait.js",
+    "old": "for (let step = 0; !settled && step < steps; step++) await sleep(stepMs);",
+    "new": "for (let step = 0; !settled && step < 1; step++) await sleep(stepMs);",
+    "tests": ["test/world/tamrieltracewait.test.js", "test/systems/legacy/bayleftb_seat.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-failure-unseen",
+    "file": "src/world/tamriel/tamrielTraceWait.js",
+    "old": "Promise.resolve(traced).then(markSettled, markSettled);",
+    "new": "Promise.resolve(traced).then(markSettled, () => {});",
+    "tests": ["test/world/tamrieltracewait.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-cap-unsaid",
+    "file": "src/world/tamriel/tamrielTraceWait.js",
+    "old": "  return settled;\n",
+    "new": "  return true;\n",
+    "tests": ["test/world/tamrieltracewait.test.js", "test/systems/legacy/bayleftb_seat.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-settled-first",
+    "file": "src/world/tamriel/tamrielTraceWait.js",
+    "old": "  await Promise.resolve();\n",
+    "new": "",
+    "tests": ["test/world/tamrieltracewait.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-seat-waits",
+    "file": "src/scenes/bootStartHost.js",
+    "old": "const landed = _worldReady() && await waitForTamrielTrace(host.arenaTraced, traceWait);",
+    "new": "const landed = _worldReady();",
+    "tests": ["test/systems/legacy/bayleftb_seat.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-seat-budget",
+    "file": "src/scenes/bootStartHost.js",
+    "old": "    const landed = _worldReady() && await waitForTamrielTrace(host.arenaTraced, traceWait);",
+    "new": "    const landed = _worldReady() && await waitForTamrielTrace(host.arenaTraced, { steps: 1, stepMs: 5 });",
+    "tests": ["test/systems/legacy/bayleftb_seat.test.js"]
+  },
+  {
+    "name": "TRACE-WAIT-load-waits",
+    "file": "src/scenes/world.js",
+    "old": "params.has('load')) await waitForTamrielTrace(arenaTraced);",
+    "new": "params.has('load')) await arenaTraced;",
+    "tests": ["test/tesa2_arena.test.js", "test/audit_tesa.test.js"]
+  }
+]
