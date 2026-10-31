@@ -614,13 +614,14 @@ not driven: no test stands a sharded hub for the yard word.
   hub's welcome; `parseClient` knows `{t:'yard', order}`. The law both ends read is `net/yardWordLaw.js`.
 - Client: `net/yardPush.js` (the carrier, the welcome and close, the frames' gate, the ears); three hooks in
   `net/online.js` and one in `net/accountClient.js`; `scenes/yardCellSync.js` hears words, polls slowly while the push
-  is healthy and doubles over quiet polls; `scenes/homeYards.js` subscribes and hands each write's `yardVer` on.
+  is healthy and doubles over quiet polls; `scenes/homeYards.js` subscribes.
   `bootWorld` is not touched.
 
 **Departures from sections 3.6 and 3.7:**
 
-- **The order's own version, not the cell's.** The owner's write answers `yardVer`, which marks the held cell's
-  `ownVer`. The owner's own word is dropped by it. The cell's `ver` stays the last answer's: raising it to `yardVer`
+- **The owner's own word is asked.** Its version can hold a neighbour's write in the same cell, and the hub says only a
+  cell's highest version in a second, so dropping it lost that write until the slow poll (review, 2026-10-31). It costs
+  one cells request on the writer's page a write. The cell's `ver` stays the last answer's: raising it to `yardVer`
   would let a later poll answer "no change" and leave the owner's yard stale once its 60 s hold ended.
 - **No extra poll on leaving a skip.** Words heard while the yards are not drawn are kept and asked the moment they are
   drawn again, and a poll that came due meanwhile goes then (YC1's rule). An extra poll on every edge would add nothing

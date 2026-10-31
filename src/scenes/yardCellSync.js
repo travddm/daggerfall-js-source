@@ -36,7 +36,7 @@ export const YARD_ASK_M = YARD_DRAW_M + 200;
 export const YARD_KEEP_MARGIN_M = 100;
 
 /** @typedef {{ mapId: number, cell: number, distance: number }} CellWish  a cell the host wants, `distance` in metres */
-/** @typedef {{ ver: number, byKey: Map<number, any[]>, askedTurn: number, ownVer?: number }} HeldCell  `ver` 0 before an answer; `byKey` by building key; `askedTurn` the write turn its answer was asked at; `ownVer` the highest version the owner's own writes answered */
+/** @typedef {{ ver: number, byKey: Map<number, any[]>, askedTurn: number }} HeldCell  `ver` 0 before an answer; `byKey` by building key; `askedTurn` the write turn its answer was asked at */
 /** @typedef {{ v: number, at: number, tries: number }} PushedCell  a hub word not yet asked: its version, when to ask (ms), the asks made */
 /** @typedef {{ cells: Map<number, HeldCell>, polledAt: number, asking: boolean, failedAt: number, failures: number, more: number[], interval: number, epoch: number, pushed: Map<number, PushedCell> }} HeldTown  `failures` in a row; `more` the cells left for the next request; `interval` the slow poll's wait (ms); `epoch` the hub link's welcome count at the last poll */
 /** @typedef {{ turn: number, at: number, list: any[] }} OwnWrite  the owner's own write to one yard (FB1001 YARD-STALE): its turn, when (ms), the yard it left */
@@ -61,14 +61,14 @@ export function createYardCellSync({ api, now = () => Date.now(), polling = () =
 
   /** A cell's answer as the page holds it: each home's pieces the yard's law allows (YARD-SWEEP: never a tower's piece
    *  from before YARD-HEIGHT). The owner's own writes are laid over it when it is read (piecesOf), not written into it. */
-  function heldOf(/** @type {any} */ answer, /** @type {number} */ askedTurn, /** @type {HeldCell | undefined} */ was) {
+  function heldOf(/** @type {any} */ answer, /** @type {number} */ askedTurn) {
     /** @type {Map<number, any[]>} */
     const byKey = new Map();
     for (const yard of answer.yards ?? []) {
       if (!Number.isSafeInteger(yard?.buildingKey) || !Array.isArray(yard.pieces)) continue;
       byKey.set(yard.buildingKey, yard.pieces.map(decorYardPieceOf).filter((piece) => piece && decorYardHighOk(piece)));
     }
-    return { ver: Number(answer.ver) || 0, byKey, askedTurn, ...(was?.ownVer ? { ownVer: was.ownVer } : {}) };
+    return { ver: Number(answer.ver) || 0, byKey, askedTurn };
   }
   /** Whether the owner's write stands over the cell's answer: written after that answer was asked, or within
    *  YARD_WRITE_HOLD_MS of now (the service keeps a cell 30 s and reads it off a replica). */
@@ -106,7 +106,7 @@ export function createYardCellSync({ api, now = () => Date.now(), polling = () =
         if (!Number.isSafeInteger(cellAnswer?.cell)) continue;
         const held = town.cells.get(cellAnswer.cell);
         if (held && Number(cellAnswer.ver) < held.ver) continue;   // a version older than the one held never takes a cell back
-        town.cells.set(cellAnswer.cell, heldOf(cellAnswer, askedTurn, held));
+        town.cells.set(cellAnswer.cell, heldOf(cellAnswer, askedTurn));
       }
       const answered = new Set(data.cells.map((cellAnswer) => cellAnswer?.cell));
       for (const [cell] of cells) {
@@ -184,24 +184,20 @@ export function createYardCellSync({ api, now = () => Date.now(), polling = () =
 
   return {
     update,
-    /** YC2: the hub's words `[mapId, cell, version]`. A word for a cell this page holds, past the version it holds and
-     *  past the owner's own write's, is asked after a random wait; any other is dropped, and the same word twice is one
-     *  ask at most. */
+    /** YC2: the hub's words `[mapId, cell, version]`. A word for a cell this page holds, past the version it holds, is
+     *  asked after a random wait; any other is dropped, and the same word twice is one ask at most. The owner's own word
+     *  is asked too: its write's version can hold another home's write in the same cell, which the hub folds into the
+     *  owner's word when both land in one second. */
     hear(/** @type {number[][]} */ words) {
       for (const [mapId, cell, v] of words) {
         const town = towns.get(mapId);
         const held = town?.cells.get(cell);
         if (!town || !held) continue;
-        if (v <= Math.max(held.ver, held.ownVer ?? 0)) continue;
+        if (v <= held.ver) continue;
         if ((town.pushed.get(cell)?.v ?? 0) >= v) continue;
         town.pushed.set(cell, { v, at: now() + rand() * YARD_PUSH_WAIT_MS, tries: 0 });
         town.interval = YARD_SLOW_POLL_MS;
       }
-    },
-    /** YC2: the version the owner's own write to a yard answered - its own word, when it comes, is dropped. */
-    wrote(/** @type {number} */ mapId, /** @type {number} */ buildingKey, /** @type {number} */ ver) {
-      const held = towns.get(mapId)?.cells.get(yardCellOf(buildingKey));
-      if (held && Number.isSafeInteger(ver)) held.ownVer = Math.max(held.ownVer ?? 0, ver);
     },
     /** A home's yard pieces as held now - the owner's own write where it stands, else the service's answer - or null
      *  while its cell is not answered. */

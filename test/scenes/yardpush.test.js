@@ -1,7 +1,7 @@
 // YARD-CELL YC2 (bible/11-Multiplayer/Yard-Cells.md sections 3.6 and 3.7) - THE PAGE'S END OF THE YARD PUSH.
 // Over the real cell sync (scenes/yardCellSync.js) and the real push (net/yardPush.js): a hub word past the version a
 // page holds asks that cell once, after a random wait; a word at or below it, or for a cell the page does not hold, is
-// dropped, and the owner's own word too; the poll slows while the push is healthy and doubles over quiet polls, back on
+// dropped - the owner's own word is asked, for a neighbour's write it can hold; the poll slows while the push is healthy and doubles over quiet polls, back on
 // a change; a break in the hub link polls at its welcome. An order goes only down a link whose welcome said it hears
 // yard words, spaced; the hub's frames are checked and gated before an ear hears them.
 import { test } from 'node:test';
@@ -17,14 +17,15 @@ const A = makeBuildingKey(1, 1, 1);
 const CELL = yardCellOf(A);
 const TOWN = 7;
 const wish = [{ mapId: TOWN, cell: CELL, distance: 10 }];
+const piece = (id) => ({ id, model: 41000, flat: null, pos: [8, 0, 2], rot: [0, 0, 0], scale: 1, light: null, storage: false, paid: 0 });
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
 /** A fake cell route over one cell whose version the test moves, recording each request. */
 function route() {
-  const state = { ver: 1, asked: /** @type {number[][][]} */ ([]) };
+  const state = { ver: 1, yards: /** @type {any[]} */ ([]), asked: /** @type {number[][][]} */ ([]) };
   const yardCells = async (/** @type {number} */ mapId, /** @type {number[][]} */ cells) => {
     state.asked.push(cells.map((pair) => [...pair]));
-    const out = cells.filter(([cell, have]) => cell === CELL && state.ver > have).map(([cell]) => ({ cell, ver: state.ver, yards: [] }));
+    const out = cells.filter(([cell, have]) => cell === CELL && state.ver > have).map(([cell]) => ({ cell, ver: state.ver, yards: state.yards }));
     return { ok: true, data: { mapId, cells: out, more: [] } };
   };
   return { state, api: { yardCells } };
@@ -41,7 +42,7 @@ async function stood({ healthy = true, rand = () => 0.5 } = {}) {
   return { clock, link, state, sync, step: async (ms) => { clock.t += ms; sync.update(wish); await flush(); } };
 }
 
-test('YARD-CELL YC2 a word past the version held asks that cell once, after the random wait; one at or below it, for a cell not held, or the owner\'s own, is dropped (mutants: the version rule, the wait, the own mark)', async () => {
+test('YARD-CELL YC2 a word past the version held asks that cell once, after the random wait; one at or below it, or for a cell not held, is dropped (mutants: the version rule, the wait)', async () => {
   const { clock, state, sync, step } = await stood();
   assert.equal(state.asked.length, 1, 'the cell coming into reach');
   sync.hear([[TOWN, CELL, 1], [TOWN, CELL + 1, 9], [TOWN + 1, CELL, 9]]);
@@ -56,13 +57,22 @@ test('YARD-CELL YC2 a word past the version held asks that cell once, after the 
   assert.deepEqual(state.asked.slice(1), [[[CELL, 1]]], 'that cell, with the version held - the same word twice is one ask');
   await step(YARD_PUSH_WAIT_MS);
   assert.equal(state.asked.length, 2, 'answered at the word\'s version: nothing left to ask');
-  // the owner's own write answered version 3: its word, when the hub says it, is dropped
-  state.ver = 3;
-  sync.wrote(TOWN, A, 3);
-  sync.hear([[TOWN, CELL, 3]]);
-  await step(YARD_PUSH_WAIT_MS);
-  assert.equal(state.asked.length, 2, 'the owner\'s own word');
   assert.ok(clock.t < YARD_SLOW_POLL_MS, 'no poll came due in this test');
+});
+
+test('YARD-CELL YC2 two homes of one cell written in the same second: the hub says only the higher version, the owner\'s, and the owner\'s page asks it - the neighbour\'s piece stands (mutant: the owner\'s own word dropped)', async () => {
+  const { state, sync, step } = await stood({ rand: () => 0 });
+  const B = makeBuildingKey(1, 1, 2);
+  assert.equal(yardCellOf(B), CELL, 'a neighbour in the same cell');
+  // the neighbour's write moved the cell to 2, then this page's owner wrote A's yard at 3, inside one hub second
+  sync.hold(TOWN, A, [piece('mine')]);
+  state.ver = 3;
+  state.yards = [{ buildingKey: A, pieces: [piece('mine')] }, { buildingKey: B, pieces: [piece('theirs')] }];
+  sync.hear([[TOWN, CELL, 3]]);
+  await step(0);
+  assert.deepEqual(state.asked.slice(1), [[[CELL, 1]]], 'the owner\'s own word asked, with the version held');
+  assert.deepEqual(sync.piecesOf(TOWN, B)?.map((p) => p.id), ['theirs'], 'the neighbour\'s piece stands');
+  assert.deepEqual(sync.piecesOf(TOWN, A)?.map((p) => p.id), ['mine'], 'and the owner\'s own');
 });
 
 test('YARD-CELL YC2 a pushed cell answered at an older version (another isolate\'s kept answer) is asked again after YARD_PUSH_RETRY_MS, YARD_PUSH_TRIES asks in all', async () => {

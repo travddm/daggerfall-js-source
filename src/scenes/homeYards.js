@@ -744,20 +744,15 @@ export function createHomeYards(deps) {
     cells.hold(y.mapId, y.bk, list);   // FB1001 YARD-STALE: and over the answers that follow it
     y.sig = JSON.stringify(list);
   }
-  /** YC2: a yard write's answer - the version it moved its cell to, so the owner's own word is dropped when it comes. */
-  const wrote = (a, answer) => {
-    if (answer?.ok && Number.isSafeInteger(answer.data?.yardVer)) cells.wrote(a?.mapId, a?.buildingKey, answer.data.yardVer);
-    return answer;
-  };
   const homeDecor = deps.api ? {
-    place: async (a) => wrote(a, await deps.api.place({ ...a, yard: true })),
-    move: async (a) => wrote(a, await deps.api.move(a)),
-    remove: async (a) => wrote(a, await deps.api.remove(a)),
+    place: (a) => deps.api.place({ ...a, yard: true }),
+    move: (a) => deps.api.move(a),
+    remove: (a) => deps.api.remove(a),
     hidden: async () => ({ ok: false, error: 'bad-decor' }),
     // HOME-YARD: the street's Confirm is the room's draft, over the yard's pieces and the same revision
     ...(typeof deps.api.list === 'function' && typeof deps.api.batch === 'function' ? {
       list: (mapId, buildingKey) => deps.api.list(mapId, buildingKey, false, true),
-      batch: async (a) => wrote(a, await deps.api.batch({ ...a, yard: true })),
+      batch: (a) => deps.api.batch({ ...a, yard: true }),
     } : {}),
   } : null;
   const collider = {
