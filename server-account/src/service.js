@@ -166,7 +166,7 @@ export function noteD1Wait(/** @type {number} */ ms, /** @type {number} */ trips
  *  performance for more people"): THE ROUTES WHOSE READS A D1 READ REPLICA MAY SERVE. The token's mint is a dozen
  *  reads, and a relay deploy asks it of every player in the same minute: the wave that overloaded the one primary on
  *  2026-10-06 (STORM-SHED). Its writes are the primary's - a stale session's touch, and a region's chapters, written
- *  only over the version they read (npcHalls.js) - and its one read-then-write, the arena's and Iliac Hand's #1 counted
+ *  only over the version they read (npcHalls.js) - and its one read-then-write, the arena's #1 counted
  *  again and stored, runs on the binding (index.js, AUDIT SCALE4d A1). Every other route stays on the binding. */
 export const REPLICA_ROUTES = new Map([
   ['/v1/auth/token', 'POST'],
@@ -174,7 +174,7 @@ export const REPLICA_ROUTES = new Map([
   // READS A PLAYER'S TAB KEEPS ASKING, each on the session of the bookmark it carries (d1BookmarkOf) - the heartbeat (the
   // board, the box, the post; its beat a single UPDATE, which a session sends to the primary), the account view, the
   // realm's list, the professions' state and the day's motherlodes (their pick an INSERT OR IGNORE of a pure roll). Their
-  // one read-then-store - the arena's and Iliac Hand's #1, counted again where it is stale - runs on the binding wherever
+  // one read-then-store - the arena's #1, counted again where it is stale - runs on the binding wherever
   // it is asked (index.js `honoursCtx`, board.js through `ctx.primary`), as AUDIT SCALE4d A1 put the mint's there.
   ['/v1/heartbeat', 'POST'],
   ['/v1/account', 'GET'],
@@ -657,11 +657,6 @@ export const ROUTES = new Set([
   '/v1/sea/season/board',   // SEA-SEASON: the sea's season boards
   '/v1/crew/hall', '/v1/crew/sign', '/v1/crew/release',   // CREW-SIGNED: a crew hall's recruit signed once online (crewSigns.js)
   '/v1/sea/wreck', '/v1/sea/prize/collect', '/v1/sea/prize/reclaim',   // SHIP-PVP: a wreck at sea, and its prize
-  '/v1/cards/stake',   // CARDS6: a card table's stake held against the realm record
-  '/v1/cards/cashout',   // CARDS6: the relay's cash-out receipt paid back into it
-  '/v1/cards/deck',   // CARDS10: a ranked seat's deck vouched for (iliac.js deckOrderOf)
-  '/v1/iliac/claim', '/v1/iliac/board',   // CARDS10: Iliac Hand's season board
-  '/v1/gambit/claim', '/v1/gambit/board',   // KG6: The King's Gambit's season board
   // HOME-VENDOR: a home's trader's stock, and the region's traders
   '/v1/market/vendor', '/v1/market/vendors', '/v1/market/myvendors',
   // RPT1026-MARKET ARRIVE: the road alone - the account's market settled and what is on its way read (market.js marketRoad)

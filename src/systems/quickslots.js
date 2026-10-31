@@ -155,8 +155,7 @@ function computeKey(item) {
     item.legendary ?? '', ench, custom, affixes, item.aetheric ?? ''].join('|')   // SET6: an Aetheric piece's record, as a Legendary's
     + (item.gilded ? `|g${item.gilded}` : '')   // GILDED1: a Gilded piece's record - only when set, so a save's keys still resolve
     + (item.potent ? `|p${item.potent}` : '')   // AUDIT PROF12 A2: a Potent potion's share (set at the mint - the cache holds), so a slot and its count keep Potent and plain apart; AUDIT PROF-541 Q1: only when set, so a save's plain keys still resolve
-    + (typeof item.card === 'string' ? `|c${item.card}` : '')
-    + (item.templateIndex === BOOK_TEMPLATE && item.message != null ? `|m${item.message}` : '');   // AUDIT CARDS-5 C3: a book's own text (books.js `message = id`) - two titles are two books on the bar   // AUDIT CARDS-5 C3: a card's own card - a Rat and a Lamia are two kinds (only when set, so every other key stands)
+    + (item.templateIndex === BOOK_TEMPLATE && item.message != null ? `|m${item.message}` : '');   // AUDIT CARDS-5 C3: a book's own text (books.js `message = id`) - two titles are two books on the bar
 }
 
 /** What a consumable slot takes: a potion or a drug - the two arms of

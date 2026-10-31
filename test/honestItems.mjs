@@ -66,8 +66,6 @@ const SCENE_CACHE = await load('../src/systems/sceneCache.js');
 const START = await load('../src/systems/startingGear.js');
 const RRI_KITS = await load('../src/systems/roleplayRealismItems/rriKits.js');
 const RRI_INSTALL = await load('../src/systems/roleplayRealismItems/rriInstall.js');
-const ILIAC = await load('../src/systems/iliac/iliacItems.js');
-const CARDS = await load('../src/net/iliac/iliacCards.js');
 const RECIPES = await load('../src/net/recipeLaw.js');
 const SMITH = await load('../src/systems/smithItems.js');
 const COOK = await load('../src/systems/cookItems.js');
@@ -715,7 +713,6 @@ function runChargen(run, seedsOf) {
     for (let classIndex = 0; classIndex < 18; classIndex++) for (const isCustom of [false, true]) for (const gender of ['male', 'female']) for (const race of (isCustom ? races.slice(0, 1) : races).filter((_, r) => isCustom || (r + classIndex) % 3 === 0 || r === 0)) {
       const e = { ...newPlayer({ level: 1, gender, gold: 0 }), race };
       START.assignStartingGear(e, { classIndex, isCustom, rolls: seeded(hashOf(`${classIndex}${gender}${race}${isCustom}`)), torchesFromItems: classIndex % 2 === 0 });
-      ILIAC?.giveBinderAtChargen?.(e);
       all(e.items);
     }
   });
@@ -1079,14 +1076,6 @@ function runHomes(run, seedsOf, S, minted) {
   run('walletItem.mintWallet / giveWallet', (one) => {
     one(WALLET.mintWallet());
     const e = newPlayer(); WALLET.giveWallet(e); for (const it of e.items) one(it);
-  });
-  run('iliacItems (every card, binders with decks)', (one) => {
-    const ids = CARDS.ILIAC_CARDS.map((c) => c.id);
-    for (const [i, id] of ids.entries()) one(ILIAC.mintIliacCard(id, 1 + (i % 4)));
-    const decks = range(ILIAC.BINDER_DECKS_MAX).map((d) => ({ name: `Deck ${d}`, cards: ids.slice(d, d + 20) }));
-    for (const n of [0, 1, 5, ILIAC.BINDER_DECKS_MAX]) one(ILIAC.mintBinder(decks.slice(0, n)));
-    one(ILIAC.mintBinder([{ name: 'Starter', cards: [...CARDS.STARTER_DECK] }]));
-    const e = newPlayer(); ILIAC.giveBinderAtChargen(e); for (const it of e.items) one(it);
   });
   run('livingWorld/keepsake.mintKeepsake', (one) => {
     for (const s of seedsOf()) one(KEEPSAKE.mintKeepsake({ id: `L${s % 900}.t${s % 7}~${s % 3}`, name: `Resident ${s % 97}`, town: s % 5000, home: s % 3 ? s % 40 : null }));

@@ -26,7 +26,6 @@ import { isPlate, plateMetal } from './armorMaterials.js';   // AUDIT CLAWS B2: 
 import { ammoTemplateFor } from '../characters/thunderlockIds.js';   // what a ranged weapon spends - a leaf, so no cycle (see the file)
 import { isRriStackable } from './roleplayRealismItems/rriRealism.js';   // RRI2: the IsItemStackable override - an added yes (FormulaHelper.cs:2100-2102)
 import { noteShot } from './shotTally.js';   // ARENA-ARROWS: the shots a bout loosed - a leaf, so no cycle
-import { cardWorth } from '../net/card/cardWorthLaw.js';   // AUDIT CARDS-6 A6: a card split off is worth its card (the law imports nothing of systems/)
 import { PATRON_COUNTER_MARK, COUNTER_PAID_MARK, COUNTER_VALUE_MARK } from '../net/patronLaw.js';   // AUDIT LW-II-2 S1: a stack keeps the counter's mark (the law imports nothing)
 import { isStolen, markStolen } from './stolenGoods.js';   // STOLEN-GOODS: a stolen piece stacks with stolen kin alone, and a split keeps the mark (a leaf)
 import { sameFoundMark, carryFoundMark } from './item/foundMark.js';   // AUDIT MEND-THIRD: a found stack keeps its mark
@@ -252,8 +251,6 @@ export function stacksWith(a, b) {
     // AUDIT MERGE-PLUS C4 (LOCK1 - the port's own field, Ledger A): a locked stack merges only with a locked one. Thirty
     // locked arrows stowed in a wagon holding five came out as thirty-five unlocked, and dropped.
     (a.locked === true) === (b.locked === true) &&
-    // CARDS8 (the port's own field, Ledger A): a card stacks only with its own card - two Rats, never a Rat and a Lich
-    (a.card ?? null) === (b.card ?? null) &&
     // STOLEN-GOODS (FIELD BUGS 2026-10-16b; the port's own field, Ledger A): a stolen piece stacks only with stolen kin -
     // three arrows off a shut shop's shelf merged into the pack's twenty were twenty-three honest arrows (or twenty-three
     // stolen ones), and the court took the wrong count
@@ -406,13 +403,6 @@ export function splitStack(list, stack, numberToPick, { rolls = Math.random } = 
   if (priced && stack.worldTextureRecord != null) picked.worldTextureRecord = stack.worldTextureRecord;
   if (stack.timeForItemToDisappear) picked.timeForItemToDisappear = stack.timeForItemToDisappear;
   if (stack.locked === true) picked.locked = true;   // AUDIT MERGE-PLUS C4: the part split off keeps the stack's lock
-  if (typeof stack.card === 'string') {   // CARDS8: the card split off is the card it was
-    picked.card = stack.card;
-    // AUDIT CARDS-6 A6: and worth its card's worth (net/card/cardWorthLaw.js CARD_WORTH, the mint's) - it took the template's
-    // coin, so a Lich split off its stack read 1 on its item card while the stack read 75
-    const w = cardWorth(stack.card);
-    if (w > 0) picked.value = w;
-  }
   if (stack.bound === true) picked.bound = true;   // AUDIT SS: and its binding (systems/item/itemBound.js) - never the Broker's price, which a dismantle pays out of
   if (stack[PATRON_COUNTER_MARK] === true) picked[PATRON_COUNTER_MARK] = true;   // AUDIT LW-II-2 S1: and the counter's mark (net/patronLaw.js) - a split is no way out of it
   if (Number.isInteger(stack[COUNTER_PAID_MARK])) picked[COUNTER_PAID_MARK] = stack[COUNTER_PAID_MARK];   // LAW-3: and what the counter was paid a piece

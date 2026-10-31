@@ -59,10 +59,8 @@ import { itemEnchantmentPower, craftedJewelRecipe, MAX_ENCHANTMENTS } from '../e
 import { isStackable, ARROW_TEMPLATE, GOLD_TEMPLATE, GLASS_BOTTLE_TEMPLATE, LETTER_OF_CREDIT_TEMPLATE } from '../inventory.js';   // HACKED-GOLD: a letter's worth is gold (GOLD-INT)
 import { setItemLaw, LOOT_STACK_MAX, ITEM_GROUP_NAME_BY_CLASS } from '../loot/loot.js';
 import { CREATE_ITEM_ROWS, MENS_PLAIN_ROBES, WOMENS_PLAIN_ROBES } from '../createItemRows.js';
-import { cardById } from '../../net/iliac/iliacCards.js';
 import { PROVENANCE_RE, REPAIR_KIT_TEMPLATE, MASTERWORK } from '../../net/recipeLaw.js';
 import { isMasterWork, MASTER_LINES, MASTER_PROCS_MAX } from '../../net/masterLaw.js';   // MASTER-ART: a Master's work's shape
-import { ILIAC_CARD_TEMPLATE, CARD_BINDER_TEMPLATE, BINDER_DECKS_MAX } from '../iliac/iliacItems.js';
 import { POTENT } from '../../net/alchemyLaw.js';
 import { RRI_TEMPLATES } from '../roleplayRealismItems/rriItems.js';
 import { BANDAGE_TEMPLATE } from '../roleplayRealismItems/rriRealism.js';
@@ -281,9 +279,6 @@ export function itemFindings(v, opts = {}) {
   if ((has(item, 'kitMetal') || item.fieldKit === true) && item.templateIndex !== REPAIR_KIT_TEMPLATE) out.add('crafted');
   if (has(item, 'hand') && !(item.group === 'Jewellery' && has(item, 'provenance'))) out.add('crafted');
   if (has(item, 'potent') && !(item.templateIndex === GLASS_BOTTLE_TEMPLATE && POTENT_SHARES.includes(item.potent))) out.add('crafted');
-  if (has(item, 'card') && !(item.templateIndex === ILIAC_CARD_TEMPLATE && cardById(item.card))) out.add('card');
-  if (has(item, 'decks') && !(item.templateIndex === CARD_BINDER_TEMPLATE && Array.isArray(item.decks) && item.decks.length <= BINDER_DECKS_MAX
-    && item.decks.every((/** @type {any} */ d) => Array.isArray(d?.cards) && d.cards.every((/** @type {string} */ c) => cardById(c))))) out.add('card');
   // ── a wagon's mark: on DFU's Small Cart alone, and a marked kind at its own price (WAGONS2 AUDIT: a row marked a
   //    Caravan at the cart's 150 sold as a Caravan at the cart's price) - its floor, the price it was first shelved at
   //    (WAGON-PRICE: one bought before the price rose stays lawful) ──

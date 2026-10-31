@@ -70,7 +70,6 @@ Mods (the folder README has the version, credits and permission):
 | `pixelify-glyphs`, `silkscreen-five` | Single glyphs for the enhanced skin's fonts |
 | `roads-hazelnut` | Basic Roads' road, track, river and stream bitmaps |
 | `vorbis-fsb-setups` | Vorbis setup headers for turning Unity audio clips into Ogg (`tools/lib/fsb5Vorbis.mjs`) |
-| `kings-gambit` | Belongs to a feature being removed |
 
 ## A mod's switches (`src/systems/modSettings.js`)
 

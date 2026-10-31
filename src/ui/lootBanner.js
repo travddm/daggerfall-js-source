@@ -5,22 +5,21 @@
 // RIGHT EDGE FOR EVERY RARE-OR-BETTER THING THAT ARRIVES IN THE PLAYER'S KEEPING.
 //
 // Mac's four answers: Rare and up (Common and Magic keep the small pickup feed under the crosshair); every way a piece
-// can arrive (loot, spoils, a quest's reward, a craft, the Broker, a shop, a trade, the market, a card); at the right
+// can arrive (loot, spoils, a quest's reward, a craft, the Broker, a shop, a trade, the market); at the right
 // edge by the notices; and the three top tiers - Aetheric, Artifact, Gilded - a bigger banner with a fanfare.
 //
 // WHAT ARRIVED is the watcher's (systems/acquireWatch.js - the pack, the wagon and the Materials Bag read once a frame,
 // a piece marked the first frame it stands there). This module is the FACE: the law of what stands and for how long
 // (`createBannerQueue`, pure), and the stack the law is drawn into.
 //
-// A BANNER: the piece's picture in a well framed in its tier (a card's own face, painted - render/iliacCardFaces.js),
-// a kicker in the tier's light (its label - "Exalted Legendary", "Perfect Rare", "Rare Card" - and its pips), the name in
-// the tier's colour with a count where more than one came ("x3"), what it is under it ("Longsword", "Unit card"), and -
+// A BANNER: the piece's picture in a well framed in its tier, a kicker in the tier's light (its label - "Exalted
+// Legendary", "Perfect Rare" - and its pips), the name in the tier's colour with a count where more than one came
+// ("x3"), what it is under it ("Longsword"), and -
 // the codex's first find of a Legendary record - "New to your codex". The tier's edge runs down its right side; a light
 // sweeps it once as it lands. A BIG one stands taller, its picture larger, glowing, and holds longer.
 //
 // THE LAW: three standing at most, the newest on top; each holds LOOT_BANNER_HOLD_MS (a big one LOOT_BANNER_BIG_HOLD_MS)
-// and slides out; what arrives while three stand waits, the best tier first, at most LOOT_BANNER_PENDING_MAX. A second
-// card of a kind whose banner stands or waits adds to its count. Its clock is the frame's and takes the HUD's hide gate
+// and slides out; what arrives while three stand waits, the best tier first, at most LOOT_BANNER_PENDING_MAX. Its clock is the frame's and takes the HUD's hide gate
 // (ui/hud/hud.js drawHud, beside the revenant's cards and the herald): under a window - the loot window, a shop's counter,
 // the Broker's - it stands hidden and nothing ages, so a piece bought or taken there is announced when the window goes.
 // A piece no longer held when its turn comes (a zone remains the room gave to another) never stands.
@@ -41,11 +40,8 @@
 import { isEnhanced } from '../systems/uiSkin.js';
 import { createAcquireWatch, setCodexFindPresenter, tierIsBig, tierRank, isAcquired, announces } from '../systems/acquireWatch.js';
 import { tierLabel, RARITIES } from '../systems/loot/lootRarity.js';
-import { isIliacCard } from '../systems/iliac/iliacItems.js';
-import { cardById } from '../net/iliac/iliacCards.js';
 import { itemLongName } from '../systems/item/itemInfo.js';
 import { inventoryItemImage, templateByIndex } from '../systems/item/itemTemplates.js';
-import { paintIliacCard, ILIAC_CARD_ASPECT } from '../render/iliacCardFaces.js';
 import { requestFittedIcon, fittedImg } from './textureCanvas.js';
 import { screenDpr } from './iconFit.js';
 import { PIXEL_STACK, PIXEL_FONT_CSS, PIXELIFY_FIVE_FACE, PIXEL_TEXT_SHADOW } from './pixelifyFive.js';
@@ -85,36 +81,32 @@ const _ids = new WeakMap();
 const idOf = (item) => { let id = _ids.get(item); if (id == null) { id = ++_uid; _ids.set(item, id); } return id; };
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
 
-/** The kicker's words: a card's tier and "Card"; any other piece the pack's own tier label (lootRarity.js tierLabel). */
+/** The kicker's words: the pack's own tier label (lootRarity.js tierLabel). */
 export function bannerKicker(item, tier) {
-  if (isIliacCard(item)) return `${RARITIES[tier]?.label ?? cap(tier)} Card`;
   try { return tierLabel(item); } catch { return RARITIES[tier]?.label ?? cap(tier); }
 }
-/** What it is, under the name: a card's kind ("Unit card"), any other piece its template's name ("Longsword"). */
+/** What it is, under the name: its template's name ("Longsword"). */
 export function bannerSub(item) {
-  if (isIliacCard(item)) { const c = cardById(item.card); return c ? `${cap(c.kind)} card` : 'Card'; }
   return templateByIndex(item?.templateIndex)?.name ?? '';
 }
 
 /**
  * ONE ARRIVAL AS A BANNER'S DATA - snapshotted when it arrives (systems/acquireWatch.js `{ item, count, tier }`), so the
- * banner says what came even after the piece changes. Its KEY makes two arrivals one banner: a card is its card (a
- * second Wereboar adds to the first's count), any other piece itself.
+ * banner says what came even after the piece changes. Its KEY makes two arrivals one banner: the piece itself.
  */
 export function bannerEntry(arrival, identity = undefined) {
   const item = arrival?.item;
   const tier = arrival?.tier;
   if (!item || !RARITIES[tier]) return null;
   const count = Math.max(1, Math.trunc(Number(arrival.count) || 1));
-  const card = isIliacCard(item) ? cardById(item.card) : null;
   let name = '';
-  try { name = card ? card.name : itemLongName(item); } catch { name = ''; }
+  try { name = itemLongName(item); } catch { name = ''; }
   return {
-    key: card ? `card\u0002${item.card}` : `item\u0002${idOf(item)}`,
-    item, card: card ? item.card : null,
+    key: `item\u0002${idOf(item)}`,
+    item,
     tier, name: name || item.name || 'Item', kicker: bannerKicker(item, tier), sub: bannerSub(item),
     exalted: tier === 'legendary' && item.exalted === true, big: tierIsBig(tier),
-    count, codex: false, image: card ? null : imageOf(item, identity),
+    count, codex: false, image: imageOf(item, identity),
   };
 }
 function imageOf(item, identity) {
@@ -140,7 +132,7 @@ export function honourEntry({ kind, key } = /** @type {any} */ ({})) {
   const badge = titleBadge({ title: aura ? AURA_PAINT[key] : key });
   const rgba = badge?.gradient?.length > 1 ? gradientAt(badge.gradient, 0.5) : badge?.rgba ?? null;
   return {
-    key: `honour\u0002${kind}\u0002${key}`, item: null, card: null, honour: { kind, key, badge, rgba },
+    key: `honour\u0002${kind}\u0002${key}`, item: null, honour: { kind, key, badge, rgba },
     tier: 'gilded', name, kicker: honourKicker(kind), sub: honourSub(), exalted: false, big: true, count: 1, codex: false, image: null,
   };
 }
@@ -210,13 +202,12 @@ export function createBannerQueue({ max = LOOT_BANNERS_MAX, hold = LOOT_BANNER_H
   };
 }
 
-/** Whether `entity` still holds what an entry stands for - the record itself, or (a card) any record of its card. */
+/** Whether `entity` still holds what an entry stands for - the record itself. */
 export function bannerStillHeld(entity, entry) {
   for (const list of [entity?.items, entity?.wagonItems, entity?.bagItems]) {
     if (!Array.isArray(list)) continue;
     for (const it of list) {
       if (it === entry.item) return true;
-      if (entry.card && isIliacCard(it) && it.card === entry.card) return true;
     }
   }
   return false;
@@ -405,23 +396,11 @@ function build(d, e) {
   return { el: node, num, codex, bumps: 0, count: e.count };
 }
 
-/** The picture: a card's own face, painted; any other piece the pack's fitted icon now, or once it lands (a banner gone
+/** The picture: the pack's fitted icon now, or once it lands (a banner gone
  *  by then takes nothing). A piece with no picture stands on its words in an empty well. */
 function setPicture(icon, e) {
   const box = e.big ? LOOT_BANNER_BIG_ICON_BOX : LOOT_BANNER_ICON_BOX;
   if (e.honour) { const d = icon.ownerDocument ?? docOf(); if (d) icon.append(honourMark(d, e.honour.kind, box)); return; }   // HONOUR-BANNER: its own mark
-  if (e.card) {
-    try {
-      const c = icon.ownerDocument?.createElement?.('canvas');
-      const ctx = c?.getContext?.('2d');
-      if (!ctx) return;
-      const h = box * 2, w = Math.round(h * ILIAC_CARD_ASPECT);
-      c.width = w; c.height = h;
-      paintIliacCard(ctx, cardById(e.card), w, h);
-      icon.append(c);
-    } catch { /* the words stand */ }
-    return;
-  }
   if (!e.image || e.image.archive == null) return;
   const put = (pic) => {
     if (!pic?.src) return false;
@@ -571,7 +550,7 @@ export function bannerCodexFind(item) {
   const e = queue.find(item);
   if (e) { e.codex = true; const c = drawn.get(e.id); if (c) c.codex.hidden = false; return true; }
   // only a piece the watcher will read next frame: in the keeping of the player it last read, and not read yet
-  if (isAcquired(item) || !_entity || !bannerStillHeld(_entity, { item, card: null })) return false;
+  if (isAcquired(item) || !_entity || !bannerStillHeld(_entity, { item })) return false;
   _codexNew.add(item);
   return true;
 }
@@ -606,7 +585,7 @@ export function buildLootBannerPreview(doc) {
   ensureStyle(doc);
   const stack = doc.createElement('div');
   stack.className = 'lootbanner-stack';
-  const { el: node } = build(doc, { tier: 'legendary', big: false, exalted: true, kicker: 'Exalted Legendary', name: 'Loot banners (preview)', sub: 'Longsword', count: 1, codex: false, image: null, card: null });
+  const { el: node } = build(doc, { tier: 'legendary', big: false, exalted: true, kicker: 'Exalted Legendary', name: 'Loot banners (preview)', sub: 'Longsword', count: 1, codex: false, image: null });
   node.classList.add('lb-in');
   stack.append(node);
   return stack;

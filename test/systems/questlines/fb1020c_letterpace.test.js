@@ -21,13 +21,12 @@ import { createLineRunner, letterOnItsWay, STEP_GAP_S } from '../../../src/syste
 import { QL_LINES, lineStepOf } from '../../../src/systems/questlines/qlLines.js';
 import { QUESTLINES_PREF, questlinesOn } from '../../../src/systems/questlines/qlLaw.js';
 import { LOOT_RARITY_KEY } from '../../../src/systems/loot/lootRarity.js';
-import { KINGS_GAMBIT_KEY } from '../../../src/systems/features.js';
 import { setPref } from '../../../src/systems/uiPrefs.js';
 import { questSource, loadTables, packMachine, parsedQuest } from '../../qlSources.mjs';
 import { starfallRuns } from '../../../src/net/starfall/starfallLaw.js';   // the run's wall clock held out of the festival
 
 loadTables();
-for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, KINGS_GAMBIT_KEY, 'naval']) setPref(k, true);
+for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, 'naval']) setPref(k, true);
 
 /** The letter a step's quest hands over by courier: its `give pc <letter> notify` actions. */
 const letterGives = (quest) => [...quest.tasks.values()].flatMap((t) => t.actions)
@@ -62,7 +61,7 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent
   // The Thirteenth of Frostfall opens IN PERSON - a Wyrd Sister hands her letter as she is met (QLTF01 `get item
   // _letter_`), or Morwen's raven its note once a star is held: neither at the start-up, neither by courier
   const IN_PERSON = new Set(['thirteenthFrostfall']);
-  assert.equal(QL_LINES.length, 14);
+  assert.equal(QL_LINES.length, 13);
   const couriers = [];
   for (const l of QL_LINES) {
     const { quest } = parsedQuest(l.steps[0].quest, machine);
@@ -185,16 +184,16 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED), the runner: the take is a let
 
 test('FB1020c LETTER-PACE, the runner: the save keeps when the last letter came - a load inside its hour starts no later step, an hour on it starts; an older save without it loads as no letter yet (mutants: restore drops `lettered`)', () => {
   const { runner, clock, step, named } = runnerOf();
-  runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1, lettered: clock.s - 60 } });
-  assert.equal(runner.lineState('introTables').lettered, clock.s - 60, 'restored');
-  assert.equal(runner.snapshot().introTables.lettered, clock.s - 60, 'and saved again');
+  runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1, lettered: clock.s - 60 } });
+  assert.equal(runner.lineState('introGear').lettered, clock.s - 60, 'restored');
+  assert.equal(runner.snapshot().introGear.lettered, clock.s - 60, 'and saved again');
   step();
-  assert.equal(named('QLIT02'), null, 'inside the letter\'s hour: nothing starts');
+  assert.equal(named('QLIG02'), null, 'inside the letter\'s hour: nothing starts');
   clock.s += STEP_GAP_S;
   step();
-  assert.ok(named('QLIT02'), 'an hour on');
-  runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1 } });
-  assert.equal(runner.lineState('introTables').lettered, 0, 'a save from before LETTER-PACE');
+  assert.ok(named('QLIG02'), 'an hour on');
+  runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1 } });
+  assert.equal(runner.lineState('introGear').lettered, 0, 'a save from before LETTER-PACE');
 });
 
 /** The real bridge as the game ticks it, online: a registered account (every line's gate), the short wait

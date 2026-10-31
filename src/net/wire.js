@@ -215,17 +215,11 @@ import { privateInteriorOf } from './privateInterior.js';   // SLIM-FRAME: an ow
 import { validSdMarks, SD_ELEMENTS } from './superDungeon/sdMarks.js';   // SD18a: a Hollow's marks and its blows' elements - sdMarks.js imports nothing, so the worker's graph stays
 import { validArenaIn, validArenaOut } from './arena/arenaLaw.js';   // ARENA4: the arena's words both ways - arenaLaw.js imports nothing, so the worker's graph stays flat
 import { readHouse } from './houseLaw.js';   // LEGACY7 part two: a house rides a row - houseLaw.js imports nothing, so the worker's graph stays flat
-import { validHoldemIn, validHoldemOut } from './holdemTable.js';   // CARDS5: the relay's card table's words both ways - holdemTable.js imports only cardLaw.js, which imports only dice.js (already the bundle's)
-import { validIliacIn, validIliacOut } from './iliac/iliacTable.js';   // CARDS10: the relay's Iliac table's words both ways - iliacTable.js imports the rules (iliacHand.js, iliacCards.js) and Hold'em's bounds
-import { validGambitIn, validGambitOut } from './gambit/gambitTable.js';   // KG5: the relay's King's Gambit table's words both ways - gambitTable.js imports the law (kingsGambit.js, which brings enemyBasics.js and mathf.js) and Hold'em's bounds
 import { GATE_COURTS_MAX } from './gate/gateCourts.js';   // GATE-COURTS: a court's number on the wire - gateCourts.js imports nothing, so the worker's graph stays flat
 import { validGateMods, GATE_FEEDS_MAX, validGatePortents } from './gate/gateMods.js';   // WB8b: the Warden's marks on a gate's state - gateMods.js imports nothing, so the worker's graph stays flat
 import { egStampOk } from './eliteGates/egShape.js';   // EG-FULL: a Spire blow's FULL shape stamp, checked as the wire carries it - egShape.js imports nothing, so the worker's graph stays flat
 import { validWireAppearance } from './appearanceLaw.js';   // APPEARANCES: a worn piece's look on a look's item - appearanceLaw.js imports systems/armorMaterials.js alone, a leaf, so the worker's graph stays flat
 export { validRollSpec, validRoll, rollDice, ROLL_DICE_MAX, ROLL_SIDES_MAX, ROLL_MOD_MAX };
-export { validHoldemIn, validHoldemOut };
-export { validIliacIn, validIliacOut };
-export { validGambitIn, validGambitOut };
 
 /** WORLD5: the instant the online world stood at the classic game start - 2026-09-14T00:00:00Z. */
 export const ONLINE_EPOCH_MS = Date.UTC(2026, 8, 14, 0, 0, 0);
@@ -2347,7 +2341,7 @@ export function inRangeOf(roomKey, from) {
   return (to) => !!to && Math.max(Math.abs(fx - Math.floor(to.x / PIXEL_UNITS)), Math.abs(fy - Math.floor(to.z / PIXEL_UNITS))) <= RANGE_PIXELS;
 }
 
-/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'eg'|'wild'|'wdun'|'holdem'|'iliac'|'gambit'|'lease', ...}
+/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'eg'|'wild'|'wdun'|'lease', ...}
  *  or {error} - the caller closes on an error. INSPECT1: every arm below, named - this line had fallen seven behind
  *  (test/net/auditworld2.test.js derives the list from the arms now, so it cannot fall behind again - the merge with
  *  main's HCC-PARK was its first catch: the park arm, unnamed). */
@@ -2618,34 +2612,6 @@ export function parseClient(text, { hasHello = false } = {}) {
     if (m.ch === undefined) return { t: 'chat', text, ...me, ...linked };
     return CHAT_LINE_CHANNELS.includes(m.ch) ? { t: 'chat', text, ch: m.ch, ...me, ...linked } : { error: 'bad chat' };
   }
-  if (m.t === 'holdem') {
-    // CARDS5: A WORD TO THE ROOM'S CARD TABLE - sit in a chair, stand, act, or look (net/holdemTable.js, both ends). The
-    // relay deals and runs the table; nothing on this frame is a card.
-    if (!hasHello) return { error: 'holdem before hello' };
-    if (text.length > HOLDEM_FRAME_MAX) return { error: 'frame too large' };
-    const h = validHoldemIn(m);
-    if (!h) return { error: 'bad holdem' };
-    return { t: 'holdem', ...h };
-  }
-  if (m.t === 'iliac') {
-    // CARDS10: A WORD TO THE ROOM'S ILIAC TABLE - sit with a deck (and, ranked, the service's order on it), stand, commit
-    // a turn's plays, or look (net/iliac/iliacTable.js, both ends). The relay deals and runs the game.
-    if (!hasHello) return { error: 'iliac before hello' };
-    if (text.length > ILIAC_FRAME_MAX) return { error: 'frame too large' };
-    const w = validIliacIn(m);
-    if (!w) return { error: 'bad iliac' };
-    return { t: 'iliac', ...w };
-  }
-  if (m.t === 'gambit') {
-    // KG5: A WORD TO THE ROOM'S KING'S GAMBIT TABLE - sit with a crown, ready with an army, act (the law's command in the
-    // game the panel showed), forfeit, stand, or look (net/gambit/gambitTable.js, both ends). The relay builds the board, rolls
-    // every die and runs the clock.
-    if (!hasHello) return { error: 'gambit before hello' };
-    if (text.length > GAMBIT_FRAME_MAX) return { error: 'frame too large' };
-    const w = validGambitIn(m);
-    if (!w) return { error: 'bad gambit' };
-    return { t: 'gambit', ...w };
-  }
   if (m.t === 'roll') {
     // DICE1: A ROLL ASKED OF THE RELAY - how many dice, how many sides, what to add, inside the dice's own bounds
     // (net/dice.js). The relay rolls them; nothing on this frame is a result. A channel is the chat line's law.
@@ -2841,23 +2807,6 @@ export const eventGate = (bucket, nowMs) => tokenGate(bucket, nowMs, EVENT_HZ_MA
  *  roll ten times a second until the number suits is a table nobody trusts (every roll is SAID, so the table sees each
  *  try; the gate keeps the tries readable). */
 export const ROLL_HZ_MAX = 1;
-/** CARDS5: a player's words to the card table, a second - a seat acts once a turn, and sits or looks rarely. */
-export const HOLDEM_HZ_MAX = 4;
-export const HOLDEM_FRAME_MAX = 1600;   // CARDS6: a sit carries the service's stake order (net/holdemTable.js HOLDEM_STAKE_MAX)
-export const holdemGate = (bucket, nowMs) => tokenGate(bucket, nowMs, HOLDEM_HZ_MAX);
-/** CARDS10: an Iliac sit carries thirty card ids and the service's deck order (net/iliac/iliacTable.js ILIAC_ORDER_MAX); its
- *  words a second are Hold'em's (holdemGate, a bucket of their own). */
-export const ILIAC_FRAME_MAX = 2400;
-/** KG5: a King's Gambit word's longest is a Ready - twelve roster ids and a crown, and (KG6) at the gold table the
- *  service's stake order (net/holdemTable.js HOLDEM_STAKE_MAX, Hold'em's sit's own cap); its words a second are Hold'em's
- *  (holdemGate, a bucket of their own), and its sits spend the room's one sit budget (holdemSitRoomGate). */
-export const GAMBIT_FRAME_MAX = 1600;
-/** AUDIT CARDS-3 A4: the room's sits a second, every socket together - a sit fans the whole table to every socket in the
- *  room and writes the room's tables, and a socket's own gate let ten sockets toggling sit and stand push a megabyte
- *  a second into a room of sixty. A sit past it is refused 'busy'; acts and looks are the seat's own (one a turn, and
- *  a look answers its asker alone). */
-export const HOLDEM_SIT_ROOM_HZ_MAX = 4;
-export const holdemSitRoomGate = (bucket, nowMs) => tokenGate(bucket, nowMs, HOLDEM_SIT_ROOM_HZ_MAX);
 export const rollGate = (bucket, nowMs) => tokenGate(bucket, nowMs, ROLL_HZ_MAX);
 /** MOD1: the mute order's own bucket - see MUTE_HZ_MAX. */
 export const muteGate = (bucket, nowMs) => tokenGate(bucket, nowMs, MUTE_HZ_MAX);
@@ -3799,17 +3748,6 @@ export const EMOTE_RELAY_MIN = 102;   // MERGE: world102, as ROLL_RELAY_MIN
 export const DM_RELAY_MIN = 104;
 export const relaySupportsDm = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= DM_RELAY_MIN; };
 export const relaySupportsEmote = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= EMOTE_RELAY_MIN; };
-/** CARDS5: the relay's card table - TAVERN CARDS' world178 (world176 on its branch). A relay before it closes on the
- *  frame. AUDIT CARDS-6 E20: it still read 176 after the merge renumbered TAVERN CARDS past main's SUPER-DUNGEONS world176
- *  and THE WROTHGARIAN ZONE world177 - two relays that deal nothing, which it called able to. */
-export const HOLDEM_RELAY_MIN = 178;
-/** CARDS10: the relay that first deals Iliac Hand (an older one CLOSES the socket on an iliac frame). */
-export const ILIAC_RELAY_MIN = 182;   // world179 on its branch - renumbered at the merges past main's HOURS-FIRST world179, TAVERN-TABLES world180 and TV-BEYOND world181, none of which deals Iliac Hand (an `iliac` frame to them closes the socket)
-export const relaySupportsIliac = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= ILIAC_RELAY_MIN; };
-/** KG5: the relay that first runs The King's Gambit (an older one CLOSES the socket on a gambit frame). */
-export const GAMBIT_RELAY_MIN = 204;   // world203 on its branch - renumbered past main's FIVE-ASKS world202 at the merge, which runs no King's Gambit
-export const relaySupportsGambit = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= GAMBIT_RELAY_MIN; };
-export const relaySupportsHoldem = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= HOLDEM_RELAY_MIN; };
 export const relaySupportsRoll = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= ROLL_RELAY_MIN; };
 /** CHAT-CHAN: the relay that first routes a party's line and opens the region channels. An older one would take a
  *  `ch` it does not know as... nothing: its parse projects `{t:'chat', text}` and the party's line would be fanned to

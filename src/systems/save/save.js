@@ -23,9 +23,6 @@ import { restartHeldEnchantments } from '../enchantments.js';   // E2: the held 
 import { snapshotWeather, restoreWeather, rollClimateWeathersForDay } from '../weather/weatherSim.js';   // W1: playerPosition.weather (SerializablePlayer.cs:225) - one value, every host; AUDIT WORLD5 C4: the shared day's sky over a loaded one
 import { snapshotRegionConditions, restoreRegionConditions } from '../region/regionConditions.js';
 import { arenaLadderSnapshot, arenaLadderRestore } from '../arena/arenaLadder.js';
-import { regularsBookRestore } from '../card/cardTableSession.js';   // AUDIT CARDS-2 H2: the tavern regulars' purses, by the day   // ARENA2: the arena's ladder, offline
-import { forfeitsBookRestore } from '../iliac/iliacTableSession.js';   // CARDS10: the regulars' forfeits
-import { gambitPursesRestore, gambitCrownRestore } from '../gambit/gambitTableSession.js';   // KG3: The King's Gambit's regulars' nights and the player's crown
 import { arenaLeagueSnapshot, arenaLeagueRestore } from '../arena/arenaLeague.js';   // ARENA3: the banners, the season, the Records page, the book
 import { arenaReplaysSnapshot, arenaReplaysRestore } from '../arena/arenaReplay.js';   // ARENA5: your ladder replays
 import { snapshotStanding, restoreStanding } from '../standing.js';   // REP: the standing book   // S42: the CONDITION half of RegionDataRecord
@@ -42,7 +39,6 @@ import { repairUnmintedConditions, repoolWeaponConditions } from '../conditionRe
 import { restackStones, nameEmbers, PORTAL_GIFT, givePortalGift } from '../gate/gateSpoils.js';   // SS1: Sigil Stones saved before they stacked, folded into one stack; WB12a: and named Deadlands Embers
 import { WALLET_GIFT, giveWalletGift } from '../walletItem.js';   // WALLET1: a character from before the wallet is given one, once
 import { LOCKPICK_GIFT, giveLockpickGift } from '../lockpick/lockpickItem.js';   // LOCKPICK: a picking class from before the lockpick is given its picks, once
-import { BINDER_GIFT, giveBinderGift, cleanBinders } from '../iliac/iliacItems.js';   // CARDS8: and a Card Binder with the starter deck, once
 import { foldStrayWeirKeys } from '../eliteGates/weirKey.js';   // KEY-FACE: a Weir Key's face anywhere but the pack, folded away
 import { foldStrayFaces } from '../festival/soulCake.js';   // WITCH1: and the Witches' Festival's, the same law
 import '../professions/profTemplates.js';   // PROF2: the ores, ingots and stone a pack may hold, known to every scene a save loads in
@@ -427,7 +423,6 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   snap.boatCabinLink = readBankCabinLink(entity.boatCabinLink);
   if (entity.shipCrossed === true) snap.shipCrossed = true;   // RESTORE: a ship that came through customs, which the realm's bank never buys back (banking.js)
   snap.loanAmnesty = Number.isSafeInteger(entity.loanAmnesty) ? entity.loanAmnesty : LOAN_AMNESTY;
-  snap.binderGift = Number.isSafeInteger(entity.binderGift) ? entity.binderGift : BINDER_GIFT;   // CARDS8: whether this character has been given its binder - the Wallet's law: one never restored from an older save is born with it (chargen's)
   snap.walletGift = Number.isSafeInteger(entity.walletGift) ? entity.walletGift : WALLET_GIFT;   // WALLET1: whether this character has been given its wallet - one never restored from an older save is born with it (its kit's)
   snap.lockpickGift = Number.isSafeInteger(entity.lockpickGift) ? entity.lockpickGift : LOCKPICK_GIFT;   // LOCKPICK: the Wallet's law - one never restored from an older save is born with its picks (its kit's)
   snap.portalGift = Number.isSafeInteger(entity.portalGift) ? entity.portalGift : PORTAL_GIFT;   // PORTAL-GIFT: which gift this character has had - one never restored from an older save is born after it   // LOAN-AMNESTY: which amnesty this character has had - a character never restored from an older save is born after the last
@@ -494,12 +489,6 @@ export function snapshotPlayer(entity, { position = null, pose = null, classicMi
   // ARENA2: THE LADDER (systems/arena/arenaLadder.js) - the tier, the bouts won in it, the champions beaten, the Grand
   // Champion and the record, versioned inside its own shape (`v`); additive, so SAVE_VERSION does not move
   snap.arena = arenaLadderSnapshot(entity.arenaLadder ?? null);
-  // AUDIT CARDS-2 H2: THE TAVERN REGULARS' BOOK (systems/card/cardTableSession.js) - each card table's regulars' purses and
-  // tempers for the game day, so a load puts them back as it puts the purse back; additive (an older save keeps none)
-  snap.cardRegulars = regularsBookRestore(entity.cardRegulars);
-  snap.iliacForfeits = forfeitsBookRestore(entity.iliacForfeits);   // CARDS10: the regulars who paid a card tonight
-  snap.gambitPurses = gambitPursesRestore(entity.gambitPurses);   // KG3: what The King's Gambit's regulars paid out tonight (Kings-Gambit.md 10.7)
-  snap.gambitCrown = gambitCrownRestore(entity.gambitCrown);   // KG3: the player's crown, kept on the character (10.4)
   // ARENA5: YOUR LADDER REPLAYS (systems/arena/arenaReplay.js) - the last three ladder bouts, each its own versioned record,
   // on the arena record beside the ladder (an older save reads back with none; the ladder's own read ignores the field)
   snap.arena.replays = arenaReplaysSnapshot(entity.arenaReplays ?? []);
@@ -781,15 +770,27 @@ export function repairItemLists(repairLists) {
   // HELD-BASE (FIELD BUGS 2026-10-18f) mends the mint alone: AUDIT FB1018f L1-1 - a load that moved a saved piece's base
   // rewrote the print the realm ledger follows it by (server-account/src/judge.js ledgerPrintOf, templateIndex:material),
   // and the next checkpoint read an honest piece as forged and held its player. A piece a save kept stays as it was.
-  // AUDIT CARDS-6 A6: every card worth its tier's worth (iliacItems.js cleanBinders - a card minted before CARDS9 carried
-  // a coin's) in every list, not the pack's alone: one in the wagon, the bag or a house chest kept its coin after a load
-  for (const list of repairLists) cleanBinders(list);
   // PARTS-WEIGHT (FIELD BUGS 2026-10-18e): a boat's parts weigh her timbers alone now - parts her hold had made too heavy
   // to lift, in a chest or anywhere, given her hull's packed weight (comeSailAwayItems.js repairPartsWeights)
   for (const list of repairLists) {
     const n = repairPartsWeights(list);
     if (n) console.info(`[save] PARTS-WEIGHT: ${n} boat parts item(s) weighed as their hull alone`);
   }
+}
+
+/** The templates of the removed card games' items: the card (581), the Card Binder (582) and the card pack (583). A save
+ *  from before their removal keeps them under their stored names, so the orphan pass (removeOrphanedItems) would read
+ *  them as known items; the load drops them instead. */
+const RETIRED_CARD_TEMPLATES = Object.freeze(new Set([581, 582, 583]));
+/** Every record of RETIRED_CARD_TEMPLATES taken out of `list`, in place; how many went. */
+export function dropRetiredCardItems(/** @type {any[]} */ list) {
+  let dropped = 0;
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (!RETIRED_CARD_TEMPLATES.has(list[i]?.templateIndex)) continue;
+    list.splice(i, 1);
+    dropped++;
+  }
+  return dropped;
 }
 
 /** PORTAL1 (AUDIT PORTAL1 U9): how many saves this page has restored - every load, whichever host runs it, passes the one
@@ -923,7 +924,6 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   entity.portalGift = Number.isSafeInteger(snap.portalGift) ? snap.portalGift : 0;   // PORTAL-GIFT: a save from before the gift has had none
   entity.walletGift = Number.isSafeInteger(snap.walletGift) ? snap.walletGift : 0;   // WALLET1: a save from before the wallet has had none
   entity.lockpickGift = Number.isSafeInteger(snap.lockpickGift) ? snap.lockpickGift : 0;   // LOCKPICK: a save from before the lockpick has had none
-  entity.binderGift = Number.isSafeInteger(snap.binderGift) ? snap.binderGift : 0;   // CARDS8
   entity.boardShipPosition = snap.boardShipPosition ?? null;   // TR4 (:425)
   entity.anchorPosition = snap.anchorPosition ? { ...snap.anchorPosition } : null;   // TP-slice
   // A4: the three stragglers' restore arms (see the snapshot side).
@@ -994,8 +994,12 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   }
   givePortalGift(entity);   // PORTAL-GIFT: a character from before the gift is given its stones once - below the relinks and the fold, onto the pack's stack
   giveWalletGift(entity);   // WALLET1: and a character from before the wallet, one - at the pack's end, below the relinks (no index above it moves)
-  cleanBinders(entity.items);   // AUDIT CARDS-5 C1: a binder's decks from an old, foreign or edited save made sound (the load copies a record whole)
-  giveBinderGift(entity);   // CARDS8: and the Card Binder and its starter deck, once - at the pack's end too
+  // A card, a Card Binder or a card pack kept from the removed card games leaves every list - below the relinks, as the
+  // gold migration's removals are, so no index-keyed relink slides
+  for (const list of savedItemLists(snap, entity)) {
+    const n = dropRetiredCardItems(list);
+    if (n) console.info(`[save] ${n} card game item(s) from the removed card games dropped`);
+  }
   giveLockpickGift(entity);   // LOCKPICK: and a picking class from before the lockpick, its picks - at the pack's end too
   entity.activeEffects = (snap.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).filter((a) => effectKindLoaded(a.kind)).map(copyEffectEntry);   // E2: a stale pin in an old snapshot cannot re-link - drop it (DFU :2312); AUDIT DUEL1 B4: nor a duel's spell a save from before the filter kept; AUDIT PRE-MERGE 0928 S3: nor an effect of a mod not loaded (Come Sail Away's water walk)
   // DISC10-D/E V11: THE DREAM'S PUSH IS NOT SAVED. CustomSaveData_v1 keeps
@@ -1092,10 +1096,6 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   entity.legalRep = snap.legalRep ? { ...snap.legalRep } : {};
   restoreStanding(entity, snap.standing);   // REP: a pre-REP save restores an empty book
   entity.arenaLadder = arenaLadderRestore(snap.arena);   // ARENA2: a save from before the ladder climbs from tier 1
-  entity.cardRegulars = regularsBookRestore(snap.cardRegulars);   // AUDIT CARDS-2 H2: a save from before the book seats fresh regulars
-  entity.iliacForfeits = forfeitsBookRestore(snap.iliacForfeits);   // CARDS10: a save from before the book owes no regular's card
-  entity.gambitPurses = gambitPursesRestore(snap.gambitPurses);   // KG3: a save from before the book owes no regular's night
-  entity.gambitCrown = gambitCrownRestore(snap.gambitCrown);   // KG3: one of the four crowns, else Daggerfall
   entity.arenaReplays = arenaReplaysRestore(snap.arena?.replays);   // ARENA5: a save from before the replays keeps none
   entity.arenaLeague = arenaLeagueRestore(snap.arenaLeague);   // ARENA3: a save from before the banners wears none
   // AUDIT 23 (C4/guilds-4): DFU clamps every region's LegalRep right

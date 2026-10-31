@@ -29,16 +29,12 @@ import { ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES } from '../../src/net
 import { seasonTitles } from '../../src/net/townSeatLaw.js';
 import { codexRows, codexSets, noteFind, _resetCodexForTests } from '../../src/systems/loot/lootCodex.js';
 import { GILDED_RECORDS, DRAGONFIRE_OATH, mintGilded } from '../../src/systems/gilded.js';
-import { STARTER_DECK, ILIAC_CARDS } from '../../src/net/iliac/iliacCards.js';
 import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, FOUNDER_UNTIL, wardrobeOf } from '../../server-account/src/titles.js';
 import { PATREON_TITLES } from '../../server-account/src/patreon.js';
 import { SD_TITLE_CHANCE, SD_AURA_CHANCE } from '../../server-account/src/sds.js';
 import { SERPENT_TITLE_CHANCE, SERPENT_AURA_CHANCE } from '../../server-account/src/serpents.js';
 import { EG_HONOUR_TITLES, EG_HONOUR_AURA, EG_REDOUBT_HONOURS, EG_UNFALLEN_REDOUBT, EG_CHAMPION_TITLE, EG_FIRST_TITLE, EG_FIRST_AURA, EG_CHAMPIONS_TOP, egHonourBitsOf, egHonourTitlesOf } from '../../server-account/src/egHonours.js';
-import { ILIAC_CHAMPION_MIN_GAMES, ILIAC_CHAMPION_MIN_FOES } from '../../server-account/src/iliac.js';
-import { GAMBIT_CHAMPION_MIN_GAMES, GAMBIT_CHAMPION_MIN_FOES } from '../../server-account/src/gambit.js';
 import { EMBERS_EARNED_SQL } from '../../server-account/src/accounts.js';
-import { giveBinder } from '../../src/systems/iliac/iliacItems.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const WRANGLER = read('server-account/wrangler.toml');
@@ -117,7 +113,7 @@ const CATALOGUE = {
   'title:hearthkeeper': 'festival seasonal', 'title:warden': 'seats open', 'title:protector': 'seats open', 'title:crowned': 'seats open',
   'title:keeper': 'seats open', 'title:champion': 'seats open', 'title:chaptermaster': 'chapters dormant', 'title:chapterofficer': 'chapters dormant',
   'title:formermaster': 'chapters dormant', 'title:highmaster': 'chapters dormant', 'title:seasonmaster': 'chapters dormant', 'title:grandchampion': 'ranked open',
-  'title:arenachampion': 'ranked ranked', 'title:iliacchampion': 'ranked ranked', 'title:grandmaster': 'ranked ranked', 'title:ilovelamp': 'world open',
+  'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
   'title:founder': 'account closed', 'title:disciple': 'patrons patron', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons patron',
   'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff', 'title:shadowfang': 'bestowed bestowed',
   'title:penitent': 'bestowed bestowed', 'title:aegis': 'bestowed bestowed', 'title:primarch': 'bestowed bestowed', 'title:crystalfist': 'bestowed bestowed',
@@ -210,8 +206,6 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   // the boards' floors
   assert.match(how('title', 'arenachampion'), new RegExp(`at least ${ARENA_CHAMPION_MIN_BOUTS} rated bouts against ${ARENA_CHAMPION_MIN_FOES} different`));
   assert.equal(how('glyph', 'laurel'), how('title', 'arenachampion'));
-  assert.deepEqual(W.TABLE_CHAMPION_FLOOR, { iliacchampion: { games: ILIAC_CHAMPION_MIN_GAMES, foes: ILIAC_CHAMPION_MIN_FOES }, grandmaster: { games: GAMBIT_CHAMPION_MIN_GAMES, foes: GAMBIT_CHAMPION_MIN_FOES } });
-  for (const t of ['iliacchampion', 'grandmaster']) assert.match(how('title', t), new RegExp(`at least ${W.TABLE_CHAMPION_FLOOR[t].games} ranked games against ${W.TABLE_CHAMPION_FLOOR[t].foes} different`));
   assert.equal(W.availLine(entry('title', 'arenachampion')), 'Held only while you stay on top.', 'never "passes to whoever takes your place" - a #1 short of the floor holds nothing');
   // the questlines, each its own line's words - the line found by the service's own table, never by the catalogue's
   // reading of it (AUDIT COLLECTIONS-II lane 5: a reader that found another line said that line's words and the pin agreed)
@@ -302,17 +296,16 @@ test('COLLECTIONS-II THE SEASONS AND THE FILTERS: a festival\'s piece seasonal w
 
 // ── THE PAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('COLLECTIONS-II THE PAGE: six tiles, each its part\'s name over its count and the kit\'s meter of it (a dash, and an empty meter, where the account is not read); the codex\'s and the cards\' counts their producers\' own; the account\'s line for every state of the read - a guest told it keeps none, a refusal that signed out said (mutants: the meter never drawn, or backwards; the codex count short of the Gilded; the cards off by one; the count without the account; the auth sentence swallowed)', async () => {
+test('COLLECTIONS-II THE PAGE: six tiles, each its part\'s name over its count and the kit\'s meter of it (a dash, and an empty meter, where the account is not read); the codex\'s count its producers\' own; the account\'s line for every state of the read - a guest told it keeps none, a refusal that signed out said (mutants: the meter never drawn, or backwards; the codex count short of the Gilded; the cards off by one; the count without the account; the auth sentence swallowed)', async () => {
   globalThis.document = undefined;
   _resetForTests(); setPref('lootRarity', true); _resetCodexForTests();
   resetCollectionsPage();
   const me = { items: [] };
-  giveBinder(me);
   const flow = fakeFlow(mintedWardrobe());
   const p = page({ flow, player: me });
   await settle();
   const tiles = cls(p.root, 'coll-part');
-  assert.deepEqual(tiles.map((b) => b.attrs['data-focus']), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'codex', 'cards', 'trophies', 'fish', 'annals'].map((id) => `coll-part-${id}`));   // PIN MOVED (HUNTERS-MARK): the gathered parts after them, always shown; PIN MOVED (APPEARANCES): the looks' part, first of the character's
+  assert.deepEqual(tiles.map((b) => b.attrs['data-focus']), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'codex', 'trophies', 'fish', 'annals'].map((id) => `coll-part-${id}`));   // PIN MOVED (HUNTERS-MARK): the gathered parts after them, always shown; PIN MOVED (APPEARANCES): the looks' part, first of the character's
   assert.equal(tiles[0].children[1].textContent, `3 / ${TITLES.length - 1}`);
   assert.equal(cls(tiles[0], 'px-meter')[0].textContent, `3/${TITLES.length - 1}`, 'the meter, held of all');
   assert.equal(tiles[0].attrs['aria-pressed'], 'true');
@@ -321,8 +314,6 @@ test('COLLECTIONS-II THE PAGE: six tiles, each its part\'s name over its count a
   assert.deepEqual(partCount('codex', null), { held: 0, total });
   noteFind(mintGilded(DRAGONFIRE_OATH), { quiet: true });
   assert.deepEqual(partCount('codex', null), { held: 1, total }, 'a Gilded found counts');
-  // the cards: the catalog's, the starter deck's distinct cards held
-  assert.deepEqual(partCount('cards', null, me), { held: new Set(STARTER_DECK).size, total: ILIAC_CARDS.length });
   assert.deepEqual(partCount('titles', null), { held: null, total: TITLES.length - 1 });
   // the account's line, every state
   const line = (f) => { resetCollectionsPage(); return cls(page({ flow: f }).root, 'coll-acct')[0]?.textContent ?? null; };

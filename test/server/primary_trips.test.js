@@ -19,8 +19,6 @@ import { forgetBudgetConfig, budgetKept } from '../../server-account/src/budget.
 import { _resetArenaCache, arenaHonoursOf } from '../../server-account/src/arena.js';
 import { withHonours } from '../../server-account/src/honours.js';
 import { ARENA_SEASON_EPOCH_S, ARENA_SEASON_S } from '../../src/net/arena/arenaLaw.js';
-import { _resetIliacCache, iliacHonoursOf } from '../../server-account/src/iliac.js';
-import { _resetGambitCache, gambitHonoursOf } from '../../server-account/src/gambit.js';
 
 const quiet = async (fn) => { const keep = { warn: console.warn }; console.warn = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 
@@ -102,21 +100,21 @@ test('PRIMARY-TRIPS SAVE-BATCH: a checkpoint reads its record\'s row, the ledger
   assert.equal(R.at().seq, 3, 'both landed');
 });
 
-test('PRIMARY-TRIPS SIGN-BATCH: the doors that read a badge ask the arena\'s, Iliac Hand\'s and The King\'s Gambit\'s honours in ONE batch on the binding - never a session\'s - and leave out a #1 this Worker kept (mutants: a game\'s reads asked apart; the kept #1 asked again)', async () => {
+test('PRIMARY-TRIPS SIGN-BATCH: the doors that read a badge ask the arena\'s honours in ONE batch on the binding - never a session\'s - and leave out a #1 this Worker kept (mutants: a game\'s reads asked apart; the kept #1 asked again)', async () => {
   const { S, db, who, R, ask } = await counted();
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  _resetArenaCache();
   db._sessions.length = 0;
   const cold = await ask(() => S.call('/v1/auth/token', { character: R.id }, who.secret));
   assert.equal(cold.r.status, 200);
   const honours = cold.trips.filter((t) => has(t, /FROM arena_pve WHERE player = \?1/));
   assert.equal(honours.length, 1, 'one batch');
-  for (const re of [/FROM arena_champions WHERE season/, /FROM iliac_champions WHERE season/, /FROM iliac_games WHERE season/, /FROM gambit_champions WHERE season/, /FROM gambit_games WHERE season/]) assert.ok(has(honours[0], re), `${re} in it`);
-  assert.ok(!cold.trips.some((t) => t.sql && /arena_pve WHERE player|FROM (arena|iliac|gambit)_champions WHERE season|FROM (iliac|gambit)_games WHERE season/.test(t.sql)), 'none asked apart (a #1 found stale is counted and stored after, as before)');
+  assert.ok(has(honours[0], /FROM arena_champions WHERE season/), 'the season\'s #1 in it');
+  assert.ok(!cold.trips.some((t) => t.sql && /arena_pve WHERE player|FROM arena_champions WHERE season/.test(t.sql)), 'none asked apart (a #1 found stale is counted and stored after, as before)');
   assert.ok(!db._sessions.some((s) => s.statements.some((x) => /arena_pve WHERE player/.test(x))), 'on the binding, never the mint\'s session (AUDIT SCALE4d A1)');
   const warm = await ask(() => S.call('/v1/auth/token', { character: R.id }, who.secret));
   const again = warm.trips.filter((t) => has(t, /FROM arena_pve WHERE player = \?1/));
   assert.equal(again.length, 1);
-  assert.deepEqual(again[0].batch?.length, 1, 'the three #1s this Worker kept are not asked again - the Grand Champion\'s row alone');
+  assert.deepEqual(again[0].batch?.length, 1, 'the #1 this Worker kept is not asked again - the Grand Champion\'s row alone');
 });
 
 test('PRIMARY-TRIPS BEAT-LAST: a heartbeat asks its reads - the box, the board, the post - before its beat, so a session sends none of them after the write to the primary; every part answered as before (mutant: the beat first)', async () => {
@@ -201,20 +199,20 @@ test('PRIMARY-TRIPS audit: a checkpoint keeps the budget\'s config the moment it
 });
 
 test('PRIMARY-TRIPS audit: a badge\'s kept #1 is the one the plan saw - another request counting a new season while the batch is out never stands in its place (mutant: the kept #1 read after the batch)', async () => {
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  _resetArenaCache();
   const boundary = ARENA_SEASON_EPOCH_S + 3 * ARENA_SEASON_S;
   const dbFor = (champ, nowS, hold = null) => {
     const st = (sql) => ({ sql, bind() { return this; }, async first() { return /_champions/.test(sql) ? { player: champ, at: nowS } : null; }, async all() { return { results: [] }; }, async run() { return {}; } });
     return { prepare: st, async batch(list) { await hold; return list.map((x) => ({ results: /_champions/.test(x.sql) ? [{ player: champ, at: nowS }] : [] })); } };
   };
   const A = { id: 'A', handle: 'a' };
-  for (const of of [arenaHonoursOf, iliacHonoursOf, gambitHonoursOf]) assert.equal((await of({ db: dbFor('A', boundary - 1) }, A, boundary - 1)).champion, true, 'each game\'s #1, kept');
+  assert.equal((await arenaHonoursOf({ db: dbFor('A', boundary - 1) }, A, boundary - 1)).champion, true, 'the arena\'s #1, kept');
   let release = () => {};
   const hold = new Promise((r) => { release = r; });
   const signing = withHonours({ db: dbFor('A', boundary - 1, hold) }, A, boundary - 1);
-  for (const of of [arenaHonoursOf, iliacHonoursOf, gambitHonoursOf]) await of({ db: dbFor(null, boundary) }, { id: 'X', handle: 'x' }, boundary);   // a second on: each game's next season counted
+  await arenaHonoursOf({ db: dbFor(null, boundary) }, { id: 'X', handle: 'x' }, boundary);   // a second on: the next season counted
   release();
   const signed = await signing;
-  assert.deepEqual([signed.arena.champion, signed.iliac.champion, signed.gambit.champion], [true, true, true], 'the #1 each plan saw');
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  assert.equal(signed.arena.champion, true, 'the #1 the plan saw');
+  _resetArenaCache();
 });

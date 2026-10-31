@@ -128,8 +128,6 @@ Feature areas have a var with `off`, `dev` (developers only) or `on`: `MARKS_OPE
   `wild-escrow`, `sea`, `crew-signs`, `patrons`, `eg-stakes`, `safety-sweep`, and the staff sweeps (audit, evidence,
   census, messages, events, feeds, reactions, staff chat).
 
-Card-game champion jobs (`iliac-champion`, `gambit-champion`) belong to features being removed.
-
 Each job is bounded (`SWEEP_ROWS`, `ROUNDS_MAX`, `FIRING_STATEMENTS_MAX`). A minute job that runs long competes with
 player requests for D1.
 

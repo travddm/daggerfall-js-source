@@ -62,7 +62,6 @@ export const FIND_SOURCES = Object.freeze({
   gather: Object.freeze({ p: 0.2, n: 1 }),
   make: Object.freeze({ p: 0.3, n: 1 }),
   loot: Object.freeze({ p: 0.3, n: 1 }),
-  tavern: Object.freeze({ p: 1, n: 2 }),
   sea: Object.freeze({ p: 0.5, n: 2 }),
   world: Object.freeze({ p: 1, n: 2 }),
   endgame: Object.freeze({ p: 1, n: 4 }),
@@ -96,13 +95,11 @@ export const QL_STARWARDEN_CAKES = 30;
 export const WYRD_PIECE_IDS = Object.freeze([
   'wyrd-hood', 'wyrd-right-mantle', 'wyrd-left-mantle', 'wyrd-robe', 'wyrd-gloves', 'wyrd-greaves', 'wyrd-boots', 'wyrd-hearthward', 'wyrd-athame',
 ]);
-/** The festival's Iliac Hand cards (net/iliac/iliacCards.js FESTIVAL_CARD_IDS: kept out of every pack and every drop). */
-export const FESTIVAL_CARD_IDS = Object.freeze(['warlock', 'thaumaturge', 'glenmoril-witch', 'demonologist', 'tales-and-tallows', 'spectre-of-lysandus']);
 /** THE PROFILE ICONS the festival brings (net/identityToken.js ICONS): three sold, the Soul Cake's earned. */
 export const FESTIVAL_ICONS = Object.freeze(['tallowskull', 'twinmoons', 'wyrdcauldron', 'soulcake']);
 const ware = (/** @type {string} */ kind, /** @type {string} */ key, /** @type {number} */ price) => Object.freeze({ id: `${kind}:${key}`, kind, key, price });
 /** EVERY WARE, in the window's order: `{ id, kind, key, price }`. The account's - a title, an aura, an icon - are bought
- *  once and kept; the pack's - a set piece, a card - are minted on the client once the service has taken the cakes; the
+ *  once and kept; the pack's - a set piece - are minted on the client once the service has taken the cakes; the
  *  Hearth Offering is counted on the account as its cakes are (`fest_bowls`), the pack's bowls its face. */
 export const FESTIVAL_WARES = Object.freeze([
   ware('title', 'witchwarden', 60),
@@ -112,7 +109,6 @@ export const FESTIVAL_WARES = Object.freeze([
   ware('icon', 'wyrdcauldron', 40),
   ware('item', 'offering', 5),
   ...WYRD_PIECE_IDS.map((id) => ware('piece', id, id === 'wyrd-athame' ? 60 : id === 'wyrd-robe' ? 50 : 40)),
-  ...FESTIVAL_CARD_IDS.map((id) => ware('card', id, id === 'spectre-of-lysandus' ? 45 : 20)),
 ]);
 export const wareById = (/** @type {unknown} */ id) => (typeof id === 'string' ? FESTIVAL_WARES.find((w) => w.id === id) ?? null : null);
 /** Whether a ware is the Hearth Offering - a bowl the account's count holds (bowlWare), never a piece minted. */

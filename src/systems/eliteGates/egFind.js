@@ -7,7 +7,7 @@
 // real day and a week (server-account/src/eg.js findEg). A forged ask is bounded there, never believed here.
 //
 // WHO ASKS (section 5, step 1): the foe's OWNER kills it - a joiner's blow is applied by the owner, so the death and its
-// handlers (scenes/corpseMarker.js raiseEnemyDeath, the seam CARDS9's card uses - systems/card/cardSources.js dropFoeCard) run
+// handlers (scenes/corpseMarker.js raiseEnemyDeath) run
 // there, and the owner names the striking joiner on the foes stream (`_killedBy`, the record's `v`, for KILLED_BY_MS -
 // scenes/dungeonContext.js). So:
 //   - on the owner, the death handler asks when its own blow killed (`by` null - the record's `v` null - or its own id),

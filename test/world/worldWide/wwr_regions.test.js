@@ -141,7 +141,7 @@ test('WW-R the account service: a node\'s region any of the world\'s (a province
   assert.deepEqual([regionOk(0), regionOk(61), regionOk(64), regionOk(70), regionOk(71), regionOk(-1)], [true, true, true, true, false, false]);
   assert.deepEqual([bayRegionOk(0), bayRegionOk(61), bayRegionOk(62), bayRegionOk(70)], [true, true, false, false]);
   // PIN MOVED (WW7-5, World-Wide.md WW7-5): the town books every region's - the world's towns past the Bay stand (ww7_books.test.js)
-  for (const f of ['market', 'writs', 'contracts', 'cards', 'npcReceipts', 'npcHalls', 'npcChapters', 'seaBounty']) {
+  for (const f of ['market', 'writs', 'contracts', 'npcReceipts', 'npcHalls', 'npcChapters', 'seaBounty']) {
     const s = src(`server-account/src/${f}.js`);
     assert.match(s, /regionOk\b[^\n]*\} from '\.\.\/\.\.\/src\/net\/nodeLaw\.js'/, `${f}: the world's regions`);
     assert.doesNotMatch(s, /bayRegionOk/, `${f}: no town book the Bay's alone`);

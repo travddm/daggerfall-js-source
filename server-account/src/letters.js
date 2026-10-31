@@ -41,8 +41,6 @@
 import { mintId, accountKind, displayName, isMuted, overRate } from './accounts.js';
 import { ID_RE } from '../../src/net/identityToken.js';   // NAME-AS: a friend's letter, addressed by account
 import { titleWorn, glyphsShown } from './titles.js';
-import { withIliacHonours, withIliacHonoursAll } from './iliac.js';   // CARDS10: and Iliac Hand's season #1's title
-import { withGambitHonours, withGambitHonoursAll } from './gambit.js';   // KG6: and The King's Gambit's GRANDMASTER
 import { withArenaHonours, withArenaHonoursAll } from './arena.js';   // AUDIT PRE-MERGE 1003 S8: the arena's honours on a sender's badge
 import { withEgHonours, withEgHonoursAll } from './egHonours.js';   // EG-E2: and the Spire Champions
 import { withMasteryMarks, withMasteryMarksAll } from './hunts.js';   // AUDIT HORIZONTAL F5: and the Marks of Mastery
@@ -119,9 +117,8 @@ export async function inboxOf({ db, nowS, primary = db }, reader, env) {   // SC
       .bind(...senders).all();
     // SCALE4g: ON THE BINDING - a #1 found stale is counted again and STORED (arena.js championNow), never off a replica
     // (AUDIT SCALE4d A1's law, where the heartbeat's session reads the rest)
-    for (const p of await withIliacHonoursAll({ db: primary }, await withArenaHonoursAll({ db: primary }, found, nowS), nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
+    for (const p of await withArenaHonoursAll({ db: primary }, found, nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
     for (const p of await withEgHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // EG-E2: and Spire Champion (egHonours.js)
-    for (const p of await withGambitHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // KG6: and The King's Gambit's GRANDMASTER
     for (const p of await withMasteryMarksAll({ db }, [...rows.values()])) rows.set(p.id, p);   // AUDIT HORIZONTAL F5: a worn Mark of Mastery (reads alone)
   }
   const letters = results.map((l) => ({
@@ -142,10 +139,10 @@ export async function readLetter({ db, nowS }, reader, env, id) {
     .bind(id, reader.id).first();
   if (!l) return { error: 'no-letter' };
   if (l.read_at == null) await db.prepare('UPDATE letters SET read_at = ? WHERE id = ? AND to_id = ? AND read_at IS NULL').bind(nowS, id, reader.id).run();
-  const row = await withIliacHonours({ db }, await withArenaHonours({ db }, await db.prepare('SELECT * FROM players WHERE id = ?').bind(l.from_id).first(), nowS), nowS);   // AUDIT PRE-MERGE 1003 S8; CARDS10: and Iliac Hand's
+  const row = await withArenaHonours({ db }, await db.prepare('SELECT * FROM players WHERE id = ?').bind(l.from_id).first(), nowS);   // AUDIT PRE-MERGE 1003 S8
   return {
     letter: {
-      id: l.id, from: l.from_name, ...badgeOf(await withMasteryMarks({ db }, await withGambitHonours({ db }, await withEgHonours({ db }, row, nowS), nowS)), env, nowS), subject: l.subject, body: l.body,   // EG-E2: and Spire Champion; KG6: the GRANDMASTER's too; AUDIT HORIZONTAL F5: and a Mark of Mastery
+      id: l.id, from: l.from_name, ...badgeOf(await withMasteryMarks({ db }, await withEgHonours({ db }, row, nowS)), env, nowS), subject: l.subject, body: l.body,   // EG-E2: and Spire Champion; AUDIT HORIZONTAL F5: and a Mark of Mastery
       sentAt: l.sent_at, readAt: l.read_at ?? nowS,
     },
   };

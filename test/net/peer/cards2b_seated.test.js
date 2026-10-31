@@ -21,7 +21,6 @@ import { validPose, poseChanged, POSE_SEAT_TOP_MAX } from '../../../src/net/wire
 import { lerpPose } from '../../../src/net/online.js';
 import { peerCamera, seatFor } from '../../../src/net/peer/peerBodies.js';
 import { peerMoving } from '../../../src/net/peer/peerClimb.js';
-import { cardTableSeats } from '../../../src/world/card/cardTables.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const r3 = (v) => Math.round(v * 1000) / 1000;
@@ -88,28 +87,6 @@ test('CARDS2b the seat in the rig\'s space: forward +Y, right +X, up +Z, in its 
     climbRequestToRig(s.req, { feet: s.origin, yaw: 0, unitsPerMetre: U, weight: 0.9, height: 1.1 }), 'the world request at the race, through the climb rig\'s own mapping');
   assert.equal(seatRequestFor(null, { unitsPerMetre: U }), null);
   assert.equal(seatRequestFor({}, { unitsPerMetre: U }), null);
-});
-
-test('CARDS2b solved on retail\'s biped at EVERY seat of a real table: hips level with the knees, shins standing, feet on their marks, both hands on the top', () => {
-  const rest = skeletonSpaceMatrices(biped(), poseSkeleton(biped(), null, null, 0), GRAPH_ROOT), b = climbBones(biped());
-  assert.deepEqual([rest.get(b.root).t[2], rest.get(b.L.calf).t[2], rest.get(b.head).t[2]].map((v) => Math.round(v / U * 100) / 100), [1.09, 0.63, 1.7], 'the biped the numbers were measured on');
-  // AUDIT CARDS E3: the shape the producer mints - cardTableSeats' own seats round a 2 x 1 table at 0.8, at (3, 0, 7).
-  const aabb = { min: [3, 0, 7], max: [5, 0.8, 8] };
-  const seats = cardTableSeats({ aabb }, () => true);
-  assert.equal(seats.length, 6);
-  for (const seat of seats) {
-    const p = solveSeat(seat);
-    const tag = `${seat.side} seat at ${pt([seat.x, seat.z])}`;
-    assert.ok(p.out.reach.L < 0.01 && p.out.reach.R < 0.01, `${tag}: the hands reach their marks`);
-    for (const w of p.wrists) {
-      assert.ok(w[0] > aabb.min[0] + 0.05 && w[0] < aabb.max[0] - 0.05 && w[2] > aabb.min[2] + 0.05 && w[2] < aabb.max[2] - 0.05, `${tag}: a wrist over the top, inside its edge: ${pt(w)}`);
-      assert.ok(Math.abs(w[1] - 0.84) < 0.01, `${tag}: a forearm's thickness over the top: ${w[1]}`);
-    }
-    assert.ok(Math.abs(p.hip[1] - 0.61) < 0.01, `${tag}: the hips on the chair: ${p.hip[1]}`);
-    for (const k of p.knees) assert.ok(Math.abs(k[1] - p.hip[1]) < 0.03, `${tag}: the thighs level`);
-    for (const [i, k] of p.knees.entries()) assert.ok(Math.hypot(k[0] - p.feet[i][0], k[2] - p.feet[i][2]) < 0.06, `${tag}: the shins standing`);
-    assert.ok(Math.abs(p.head[1] - SEATED_EYE_HEIGHT) < 0.03, `${tag}: the head where the seated eye looks from: ${p.head[1]}`);
-  }
 });
 
 test('CARDS2b the race on the biped: the legs sit true at every build and height; a short body reaches the top, a tall one comes as near as its arms go (AUDIT CARDS D2)', () => {

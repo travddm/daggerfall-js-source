@@ -25,9 +25,6 @@ export const ACT_KINDS = Object.freeze({
   // the loot's own laws
   'gem-socketed': 'loot',   // a gem set in a socket
   'piece-reforged': 'loot',   // a piece reforged
-  // the tavern's tables
-  'gambit-won': 'tavern',   // a game of the King's Gambit won
-  'cards-won': 'tavern',   // a hand of cards won
   // the sea and the road
   'port-reached': 'sea',   // a port reached under sail
   'cargo-delivered': 'sea',   // a cargo delivered

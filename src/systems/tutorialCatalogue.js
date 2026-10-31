@@ -339,27 +339,6 @@ export const TUTORIALS = Object.freeze([
     ],
   }),
   page({
-    id: 'tavern-cards', group: 'towns', title: 'Card Games', trigger: 'When you first sit at a card table.',
-    body: [
-      'Play Texas Hold\'em, Iliac Hand or The King\'s Gambit against the locals, and the first two against other players too. Online, one table plays for real gold.',
-      'Cards you collect go into your Card Binder, kept under Menu > Holdings > Collections.',
-    ],
-  }),
-  // KG3 (bible/11-Multiplayer/Kings-Gambit.md section 14.5): the third game at the card table - its words through the
-  // text core, read when the page is shown; no number (the panel's guide carries them) and no crown (a page names no
-  // old game, and the game's own crown is its capital's)
-  page({
-    id: 'kings-gambit', group: 'towns',
-    get title() { return t('tutorials.kingsGambit.title', 'The King\'s Gambit'); },
-    get trigger() { return t('tutorials.kingsGambit.trigger', 'When you first sit down to The King\'s Gambit.'); },
-    get body() {
-      return [
-        t('tutorials.kingsGambit.body1', 'A game of armies and kings, played on a board laid across a tavern\'s card table. Choose a regular to play, set down your stake and raise your army.'),
-        t('tutorials.kingsGambit.body2', 'Each turn, move your pieces, strike and drink potions. Bring down the enemy king to win, and guard your own.'),
-      ];
-    },
-  }),
-  page({
     id: 'holdings', group: 'towns', title: 'Houses', trigger: 'When you first look at buying or renting a house.',
     body: [
       'Offline, banks sell houses. Online, you may buy up to three empty houses at their front doors and choose who may enter.',

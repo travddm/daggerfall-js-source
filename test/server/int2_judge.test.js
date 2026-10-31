@@ -202,7 +202,7 @@ test('INT3: EVERY ROUTE THAT HANDS A REALM CHARACTER\'S VALUE ON SAYS SO - no pr
   }
   // PIN MOVED (SEA-BOUNTY, 2026-10-22): a bounty's post - its gold paid to whichever hand ends the captain at sea
   // DECOR-ACCESS: a house's price paid by its buyer to its seller (homeTransfer.js)
-  assert.deepEqual(found, { 'alchemy.js': 1, 'cards.js': 1, 'guildVault.js': 1, 'guilds.js': 1, 'homeTransfer.js': 1, 'market.js': 2, 'rent.js': 1, 'seaBounty.js': 1 });
+  assert.deepEqual(found, { 'alchemy.js': 1, 'guildVault.js': 1, 'guilds.js': 1, 'homeTransfer.js': 1, 'market.js': 2, 'rent.js': 1, 'seaBounty.js': 1 });
   const trade = readFileSync(new URL('realmTrade.js', dir), 'utf8');
   // PIN MOVED (its audit): the hold's own word - 'record-unjudged' was told 'trade-held'
   // PIN MOVED (FIELD BUGS 2026-10-11g HELD-SIDE): and the side it held kept with the word

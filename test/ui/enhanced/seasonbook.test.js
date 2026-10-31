@@ -5,14 +5,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { realmSeasonAt, seatSeasonAt, seatSeasonTitle, seasonBookModel, arenaStanding, spireStanding, ladderStanding, seaStanding,
+import { realmSeasonAt, seatSeasonAt, seatSeasonTitle, seasonBookModel, arenaStanding, spireStanding, seaStanding,
   SEASON_BOOK_DAYS, SEASON_TITLE_GAMES, SEASON_TITLE_FOES } from '../../../src/systems/seasonBook.js';
 import { createSeasonBook, SEASON_BOARD_FRESH_MS, SEASON_BOARDS, boardSeasonOf } from '../../../src/scenes/seasonBookHost.js';
 import { seasonMark, seasonWindow, seasonSource, anchorSeason, seasonLeftText, seasonWhenText, SEASON_TICK_MS } from '../../../src/ui/enhanced/enhancedSeason.js';
 import { pauseCommandOf, pauseCommandRefusal, HOST_COMMANDS, HELP_LINES, parseChatLine } from '../../../src/net/chatCommands.js';
 import { ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES, ARENA_SEASON_S, ARENA_SEASON_EPOCH_S } from '../../../src/net/arena/arenaLaw.js';
-import { ILIAC_CHAMPION_MIN_GAMES, ILIAC_CHAMPION_MIN_FOES } from '../../../server-account/src/iliac.js';
-import { GAMBIT_CHAMPION_MIN_GAMES, GAMBIT_CHAMPION_MIN_FOES } from '../../../server-account/src/gambit.js';
 import { SEASON_ZERO_WEEKS, SEASON_WEEKS } from '../../../src/net/townSeatLaw.js';
 import { FESTIVALS } from '../../../src/net/festivalLaw.js';
 import { ENHANCED_CSS } from '../../../src/ui/enhanced/enhancedStyle.js';
@@ -51,13 +49,13 @@ test('AUDIT SEASON-BOOK W1/U8: the seats\' Season named in the player\'s languag
   assert.deepEqual([s13.n, s13.month, s13.numeral, seatSeasonTitle(s13)], [13, 0, 'II', 'Season of Morning Star II']);
 });
 
-test('SEASON-BOOK the model: three sections, each its clock; the season\'s five boards, the seats\' Season (Season 0 as the beta it is; a counted Season its own lead), the festival open or coming - every section\'s title, sub-line, lead, countdown word and foot (mutants: the trial crowning; the beta\'s lead on every Season; the seats\' end said as an opening; the festival\'s end for its opening; a shut seat shown)', () => {
+test('SEASON-BOOK the model: three sections, each its clock; the season\'s three boards, the seats\' Season (Season 0 as the beta it is; a counted Season its own lead), the festival open or coming - every section\'s title, sub-line, lead, countdown word and foot (mutants: the trial crowning; the beta\'s lead on every Season; the seats\' end said as an opening; the festival\'s end for its opening; a shut seat shown)', () => {
   const m = seasonBookModel({ now: NOW, seatsOpen: true, zero: 2, boards: {} });
   assert.deepEqual(m.sections.map((s) => s.id), ['realm', 'seats', 'festival']);
   const realm = sec(m, 'realm');
   assert.deepEqual([realm.title, realm.sub, realm.at, realm.atLabel, realm.lead], ['Season 1', 'Day 25 of 56', Date.UTC(2026, 10, 23), 'ends', 'Every board here starts fresh each season.']);
-  assert.deepEqual(realm.rows.map((r) => r.id), ['arena', 'spire', 'iliac', 'gambit', 'sea']);
-  assert.deepEqual(realm.rows.map((r) => r.name), ['The Arena', 'The Spire', 'Iliac Hand', 'The King\'s Gambit', 'The season\'s captains']);
+  assert.deepEqual(realm.rows.map((r) => r.id), ['arena', 'spire', 'sea']);
+  assert.deepEqual(realm.rows.map((r) => r.name), ['The Arena', 'The Spire', 'The season\'s captains']);
   const seats = sec(m, 'seats');
   assert.deepEqual([seats.title, seats.sub, seats.at, seats.atLabel], ['The Seats: Season 0', 'Week 3 of 4', Date.UTC(2026, 10, 1, 18), 'ends']);
   assert.equal(seats.lead, 'Season 0 is the beta. When it ends, the seats\' war is wiped and no one is crowned. Silver, the Stores and your professions stay.');
@@ -79,15 +77,13 @@ test('SEASON-BOOK the model: three sections, each its clock; the season\'s five 
   assert.equal(sec(seasonBookModel({ now: Date.UTC(2026, 10, 9) }), 'festival'), undefined, 'none to come: no section');
 });
 
-test('AUDIT SEASON-BOOK L1/L5/L6/L7/L12/W4-W8: every line says what the game does, in the game\'s own words - the champions\' rule names its three titles (never the Spire\'s); the Tides\' five lands and Calm; the cakes found on any foe; the eve\'s UTC day; Keeper the guildmaster\'s; silver, the beta, "Season n", the season\'s captains, the harbormaster, rated, opponents, registered accounts (mutants: each sentence as it stood)', () => {
+test('AUDIT SEASON-BOOK L1/L5/L6/L7/L12/W4-W8: every line says what the game does, in the game\'s own words - the champions\' rule names its title (never the Spire\'s); the Tides\' five lands and Calm; the cakes found on any foe; the eve\'s UTC day; Keeper the guildmaster\'s; silver, the beta, "Season n", the season\'s captains, the harbormaster, rated, opponents, registered accounts (mutants: each sentence as it stood)', () => {
   const m = seasonBookModel({ now: Date.UTC(2026, 10, 10), seatsOpen: true, zero: 2, boards: {} });
   const realm = sec(m, 'realm'), seats = sec(m, 'seats');
-  assert.equal(realm.foot, 'Arena Champion, Iliac Champion and Grandmaster are worn by the leader, once they have 10 rated bouts or games against 5 different opponents.');
+  assert.equal(realm.foot, 'Arena Champion is worn by the leader, once they have 10 rated bouts against 5 different opponents.');
   assert.doesNotMatch(realm.foot, /Spire/, 'L1: Spire Champion is the top ten\'s, through the next season');
   assert.equal(row(realm, 'spire').about, 'Each bracket ranks companies by their deepest Descent from Hall 1. The top ten are Spire Champions next season. A new season lets you start from half your deepest Redoubt.');
   assert.equal(row(realm, 'arena').about, 'Rated bouts set your season rating. The leader wears Arena Champion, and the banner with more points wears the laurel next season.');
-  assert.equal(row(realm, 'iliac').about, 'Rated games at the card table. The leader wears Iliac Champion.');
-  assert.equal(row(realm, 'gambit').about, 'Rated games between registered accounts. The leader wears Grandmaster.');
   assert.equal(row(realm, 'sea').about, 'The deepest voyage past the Veil and the most legends sunk or taken, on the board at any freeport\'s harbormaster.');
   assert.equal(row(seats, 'tides').about, 'Each week every kingdom, the Marches and the Free Lands draw a Tide - a harvest, a plague, raiders - or stay Calm.');
   assert.equal(row(seats, 'crowns').about, 'Each crown\'s guildmaster earns Crowned in Season 1. The guildmaster of a guild that holds a seat all Season earns Keeper of its town.');
@@ -97,10 +93,8 @@ test('AUDIT SEASON-BOOK L1/L5/L6/L7/L12/W4-W8: every line says what the game doe
   assert.equal(row(fest, 'starfall').about, 'Every in-game night, about once a real hour, one coven pulls three stars down near its region\'s towns. Hold the crater against the waves.');
   const words = JSON.stringify(seasonBookModel({ now: NOW, seatsOpen: true, zero: 2, boards: {} }));
   for (const gone of [/\bMarks\b/, /profession tracks/, /Ranked Season/, /harbourmaster/, /\brivals?\b/, /ranked bouts/i, /real-world calendar/]) assert.doesNotMatch(words, gone, `W6-W8: ${gone}`);
-  // P16/L13: the foot's numbers are all three boards' - the service's own constants held to the book's
+  // P16/L13: the foot's numbers are the arena's - the service's own constants held to the book's
   assert.deepEqual([SEASON_TITLE_GAMES, SEASON_TITLE_FOES], [ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES]);
-  assert.deepEqual([SEASON_TITLE_GAMES, SEASON_TITLE_FOES], [ILIAC_CHAMPION_MIN_GAMES, ILIAC_CHAMPION_MIN_FOES]);
-  assert.deepEqual([SEASON_TITLE_GAMES, SEASON_TITLE_FOES], [GAMBIT_CHAMPION_MIN_GAMES, GAMBIT_CHAMPION_MIN_FOES]);
 });
 
 test('SEASON-BOOK the standings: each line as the board says it - AUDIT L2/W3 the points the player\'s own for their banner; L3 the company\'s best Descent; W2/L8 every number ungrouped, as the boards print it; P11 a bout is a win, a loss or a draw, a rank of 0 no rank, legends alone a voyage (mutants: the banner\'s total; "deepest"; a grouped rating; a term of the bouts dropped)', () => {
@@ -117,10 +111,6 @@ test('SEASON-BOOK the standings: each line as the board says it - AUDIT L2/W3 th
   assert.equal(spireStanding({ best: { h: 14, t: 3000 } }), 'Your best Descent: Hall 14');
   assert.equal(spireStanding({ best: { h: 0 } }), 'No Descent yet this season');
   assert.equal(spireStanding({ best: null }), 'No Descent yet this season');
-  assert.equal(ladderStanding({ me: { rating: 1100, games: 1 }, rows: [{ rank: 1 }], pinned: { you: true, rank: 23 } }), '#23 - rating 1100 - 1 game');
-  assert.equal(ladderStanding({ me: { rating: 1100, games: 3 } }), 'Rating 1100 - 3 games', 'no rows at all');
-  assert.equal(ladderStanding({ me: { rating: 1000, games: 0 } }), 'No rated games yet');
-  assert.equal(ladderStanding({ me: null }), null);
   assert.equal(seaStanding({ n: 1, deepest: 212.7, legends: 1 }, 1), 'Deepest: 212 leagues past the Veil - 1 legend ended');
   assert.equal(seaStanding({ n: 1, deepest: 0, legends: 2 }, 1), 'Deepest: 0 leagues past the Veil - 2 legends ended', 'legends alone are a season counted');
   assert.equal(seaStanding({ n: 0, deepest: 400, legends: 3 }, 1), 'No voyage counted yet this season', 'last season\'s figures are not this one\'s');
@@ -129,57 +119,57 @@ test('SEASON-BOOK the standings: each line as the board says it - AUDIT L2/W3 th
 
 test('SEASON-BOOK the rows\' standing by its read: asking, unread, the player\'s own; AUDIT R4/L4 a guest told to add a username and no one signed in to sign in (the festival too); R7 an arena not live says nothing; a host that hands no reads shows none; the doors only where the host hands one (mutants: a guest ranked; an unread board as asking; a door without its host)', () => {
   const arena = { me: { pvp: { rating: 1240, wins: 7, losses: 2, draws: 1 }, rank: 4, banner: 'red', points: 1 } };
-  const m = seasonBookModel({ now: NOW, signedIn: true, boards: { arena: ok(arena), spire: { state: 'asking', data: null }, iliac: { state: 'failed', data: null }, gambit: ok({ me: null }) }, sea: { n: 1, deepest: 9, legends: 0 }, doors: { arena: () => true, spire: null } });
+  const m = seasonBookModel({ now: NOW, signedIn: true, boards: { arena: ok(arena), spire: { state: 'asking', data: null } }, sea: { n: 1, deepest: 9, legends: 0 }, doors: { arena: () => true, spire: null } });
   const realm = sec(m, 'realm');
-  assert.deepEqual(realm.rows.map((r) => r.standing), ['#4 - rating 1240 - 1 point for the Red Banner', 'Reading the board...', 'The board can\'t be read right now.', 'Sign in to be ranked.', 'Deepest: 9 leagues past the Veil - 0 legends ended']);
-  assert.deepEqual(realm.rows.map((r) => r.door), ['arena', null, null, null, null], 'the Arena\'s door handed, the Spire\'s not');
+  assert.deepEqual(realm.rows.map((r) => r.standing), ['#4 - rating 1240 - 1 point for the Red Banner', 'Reading the board...', 'Deepest: 9 leagues past the Veil - 0 legends ended']);
+  assert.deepEqual(realm.rows.map((r) => r.door), ['arena', null, null], 'the Arena\'s door handed, the Spire\'s not');
+  const unread = sec(seasonBookModel({ now: NOW, signedIn: true, boards: { arena: ok({ me: null }), spire: { state: 'failed', data: null } } }), 'realm');
+  assert.deepEqual(unread.rows.slice(0, 2).map((r) => r.standing), ['Sign in to be ranked.', 'The board can\'t be read right now.']);
   assert.equal(row(sec(seasonBookModel({ now: NOW, signedIn: true, boards: { arena: null } }), 'realm'), 'arena').standing, null, 'R7: an arena not live reads nothing');
   const guest = seasonBookModel({ now: NOW, guest: true, signedIn: true, boards: {}, doors: { arena: () => true, spire: () => true } });
-  assert.deepEqual(sec(guest, 'realm').rows.slice(0, 4).map((r) => r.standing), Array(4).fill('Add a username to be ranked.'), 'R4: a guest is never told a rank will follow');
+  assert.deepEqual(sec(guest, 'realm').rows.slice(0, 2).map((r) => r.standing), Array(2).fill('Add a username to be ranked.'), 'R4: a guest is never told a rank will follow');
   assert.equal(row(sec(guest, 'realm'), 'arena').door, null, 'no Arena door for a guest');
   assert.equal(sec(guest, 'festival').foot, 'Add a username to join the festival.', 'L4: the festival shut to a guest, said');
   const out = seasonBookModel({ now: NOW, signedIn: false, boards: {} });
-  assert.deepEqual(sec(out, 'realm').rows.slice(0, 4).map((r) => r.standing), Array(4).fill('Sign in to be ranked.'));
+  assert.deepEqual(sec(out, 'realm').rows.slice(0, 2).map((r) => r.standing), Array(2).fill('Sign in to be ranked.'));
   assert.equal(sec(out, 'festival').foot, 'Sign in to join the festival.');
   assert.ok(sec(seasonBookModel({ now: NOW }), 'realm').rows.every((r) => r.standing === null), 'a host that hands no reads: no line at all, never "reading" for ever');
 });
 
 // ── the host's reads ──
 function world({ answer = () => ({ ok: true, data: { season: { n: 1 }, me: { rating: 1, games: 1 } } }), me = 'acct-a', guest = false } = {}) {
-  const asks = { eg: 0, iliac: 0, gambit: 0 };
+  const asks = { eg: 0 };
   const w = { asks, me, guest,
     eg: { board: () => { asks.eg++; return Promise.resolve(answer('eg')); }, me: () => w.me, guest: () => w.guest },
-    iliac: { board: () => { asks.iliac++; return Promise.resolve(answer('iliac')); } },
-    gambit: { board: () => { asks.gambit++; return Promise.resolve(answer('gambit')); } },
     ledger: { season: () => ({ n: 1, deepest: 3, legends: 0 }) } };
   return w;
 }
-const total = (w) => w.asks.eg + w.asks.iliac + w.asks.gambit;
+const total = (w) => w.asks.eg;
 
 test('AUDIT SEASON-BOOK R1: a board is asked when the window OPENS, once a minute at most however often it opens, never while it stays open; never on a hidden page or while the service says it is overloaded; the arena refreshed then too, never a tick (mutants: asked every tick; the minute a second; the `out` flag ignored; hidden asked; busy asked)', async () => {
   assert.equal(SEASON_BOARD_FRESH_MS, 60_000);
-  assert.deepEqual(Object.keys(SEASON_BOARDS), ['spire', 'iliac', 'gambit']);
+  assert.deepEqual(Object.keys(SEASON_BOARDS), ['spire']);
   let clock = 0, hid = false, bz = false;
   const w = world();
   const book = createSeasonBook(() => w, { now: () => clock, hidden: () => hid, busy: () => bz });
   book.source({ opening: true, now: NOW });
-  assert.deepEqual(w.asks, { eg: 1, iliac: 1, gambit: 1 }, 'the opening asks each board through its door');
+  assert.deepEqual(w.asks, { eg: 1 }, 'the opening asks the board through its door');
   await tick();
   for (let s = 1; s <= 600; s++) { clock += 1000; book.source({ now: NOW }); }
-  assert.equal(total(w), 3, 'ten minutes open: nothing more asked');
+  assert.equal(total(w), 1, 'ten minutes open: nothing more asked');
   book.source({ opening: true, now: NOW });
-  assert.equal(total(w), 6, 'opened again, past the minute: asked again');
+  assert.equal(total(w), 2, 'opened again, past the minute: asked again');
   await tick();
   clock += SEASON_BOARD_FRESH_MS - 1;
   book.source({ opening: true, now: NOW });
-  assert.equal(total(w), 6, 'opened again inside the minute: nothing');
+  assert.equal(total(w), 2, 'opened again inside the minute: nothing');
   clock += 1;
   hid = true; book.source({ opening: true, now: NOW });
-  assert.equal(total(w), 6, 'a hidden page asks nothing');
+  assert.equal(total(w), 2, 'a hidden page asks nothing');
   hid = false; bz = true; book.source({ opening: true, now: NOW });
-  assert.equal(total(w), 6, 'an overloaded service is let be');
+  assert.equal(total(w), 2, 'an overloaded service is let be');
   bz = false; book.source({ opening: true, now: NOW });
-  assert.equal(total(w), 9);
+  assert.equal(total(w), 3);
   // an ask still out is never asked twice
   let release;
   const slow = world({ answer: () => new Promise((r) => { release = r; }) });
@@ -188,7 +178,7 @@ test('AUDIT SEASON-BOOK R1: a board is asked when the window OPENS, once a minut
   b2.source({ opening: true, now: NOW });
   c2 += 10 * SEASON_BOARD_FRESH_MS;
   b2.source({ opening: true, now: NOW });
-  assert.equal(total(slow), 3, 'the `out` flag holds while an answer is coming');
+  assert.equal(total(slow), 1, 'the `out` flag holds while an answer is coming');
   release({ ok: true, data: { me: null } }); await tick();
   // the default clock is the page's own monotonic one
   const was = performance.now;
@@ -199,10 +189,10 @@ test('AUDIT SEASON-BOOK R1: a board is asked when the window OPENS, once a minut
     const b3 = createSeasonBook(() => w3);
     b3.source({ opening: true, now: NOW }); await tick();
     b3.source({ opening: true, now: NOW });
-    assert.equal(total(w3), 3);
+    assert.equal(total(w3), 1);
     fake += SEASON_BOARD_FRESH_MS;
     b3.source({ opening: true, now: NOW });
-    assert.equal(total(w3), 6, 'performance.now is the default clock');
+    assert.equal(total(w3), 2, 'performance.now is the default clock');
   } finally { performance.now = was; }
 });
 
@@ -211,23 +201,23 @@ test('AUDIT SEASON-BOOK R2/R4: the reads are the signed-in account\'s - another 
   const w = world({ answer: (k) => ({ ok: true, data: { season: { n: 1 }, me: { rating: w.me === 'acct-a' ? 1820 : 1000, games: 3 }, rows: [] } }) });
   const book = createSeasonBook(() => w, { now: () => clock });
   book.source({ opening: true, now: NOW }); await tick();
-  assert.equal(book.source({ now: NOW }).boards.iliac.data.me.rating, 1820);
+  assert.equal(book.source({ now: NOW }).boards.spire.data.me.rating, 1820);
   w.me = 'acct-b';
   const b = book.source({ now: NOW });
-  assert.equal(b.boards.iliac.state, 'asking', 'A\'s line is gone the moment B is signed in');
-  assert.equal(total(w), 6, 'and B\'s asked at once');
+  assert.equal(b.boards.spire.state, 'asking', 'A\'s line is gone the moment B is signed in');
+  assert.equal(total(w), 2, 'and B\'s asked at once');
   await tick();
-  assert.equal(book.source({ now: NOW }).boards.iliac.data.me.rating, 1000);
+  assert.equal(book.source({ now: NOW }).boards.spire.data.me.rating, 1000);
   // signed out: nothing asked, nothing kept
   w.me = null;
   const out = book.source({ opening: true, now: NOW });
   assert.deepEqual([out.signedIn, out.guest, out.boards], [false, false, {}]);
-  assert.equal(total(w), 6);
+  assert.equal(total(w), 2);
   // a guest: nothing asked
   w.me = 'guest-1'; w.guest = true;
   const g = book.source({ opening: true, now: NOW });
   assert.deepEqual([g.signedIn, g.guest, g.boards], [true, true, {}], 'a guest is signed in - as a guest, ranked by nothing');
-  assert.equal(total(w), 6);
+  assert.equal(total(w), 2);
   // a no-session answer drops what was kept
   const w2 = world();
   let n = 0;
@@ -238,10 +228,14 @@ test('AUDIT SEASON-BOOK R2/R4: the reads are the signed-in account\'s - another 
   n += SEASON_BOARD_FRESH_MS;
   b2.source({ opening: true, now: NOW }); await tick();
   assert.deepEqual(b2.source({ now: NOW }).boards.spire, { state: 'failed', data: null }, 'no session: never a standing kept');
-  w2.iliac.board = () => Promise.resolve({ ok: false, error: 'server' });
+  w2.eg.board = () => Promise.resolve({ ok: true, data: { season: { n: 1 }, me: { rating: 1, games: 1 } } });
   n += SEASON_BOARD_FRESH_MS;
   b2.source({ opening: true, now: NOW }); await tick();
-  assert.equal(b2.source({ now: NOW }).boards.iliac.state, 'ok', 'a failure of the service keeps the last good answer');
+  assert.equal(b2.source({ now: NOW }).boards.spire.state, 'ok');
+  w2.eg.board = () => Promise.resolve({ ok: false, error: 'server' });
+  n += SEASON_BOARD_FRESH_MS;
+  b2.source({ opening: true, now: NOW }); await tick();
+  assert.equal(b2.source({ now: NOW }).boards.spire.state, 'ok', 'a failure of the service keeps the last good answer');
 });
 
 test('AUDIT SEASON-BOOK R3/L9: an answer of another season is no standing, and the season turning asks again at once, open or not (mutants: last season\'s lines under the new season)', async () => {
@@ -254,7 +248,7 @@ test('AUDIT SEASON-BOOK R3/L9: an answer of another season is no standing, and t
   assert.equal(book.source({ now: S2 - 60_000 }).boards.spire.state, 'ok');
   const turned = book.source({ now: S2 });
   assert.equal(turned.boards.spire.state, 'asking', 'season 1\'s answer under season 2: asked again, never shown');
-  assert.equal(total(w), 6, 'asked the moment the season turned, inside the minute and with no opening');
+  assert.equal(total(w), 2, 'asked the moment the season turned, inside the minute and with no opening');
   await tick();
   assert.equal(book.source({ now: S2 }).boards.spire.state, 'failed', 'the service still on season 1: unread, never last season\'s line');
   season = 2;
@@ -296,7 +290,8 @@ test('AUDIT SEASON-BOOK R5/S1/R7: the arena\'s board is a read like the others -
 test('AUDIT SEASON-BOOK P12: never a throw out of the source - a board door that throws, a ledger that throws, an arena that throws, a getter not declared yet (AUDIT TIMERS1 D6\'s law); an ok answer without data keeps what was kept (mutants: each try dropped)', async () => {
   let clock = 0;
   const w = world();
-  w.gambit.board = () => { throw new Error('sync'); };
+  const answers = w.eg.board;
+  w.eg.board = () => { throw new Error('sync'); };
   w.ledger.season = () => { throw new Error('ledger'); };
   w.arena = { live: () => { throw new Error('arena'); } };
   const book = createSeasonBook(() => w, { now: () => clock });
@@ -304,11 +299,15 @@ test('AUDIT SEASON-BOOK P12: never a throw out of the source - a board door that
   assert.equal(s.sea, null);
   assert.equal(s.boards.arena, null);
   await tick();
-  assert.equal(book.source({ now: NOW }).boards.gambit.state, 'failed', 'a throwing door is a failed read');
-  w.iliac.board = () => Promise.resolve({ ok: true });
+  assert.equal(book.source({ now: NOW }).boards.spire.state, 'failed', 'a throwing door is a failed read');
+  w.eg.board = answers;
   clock += SEASON_BOARD_FRESH_MS;
   book.source({ opening: true, now: NOW }); await tick();
-  assert.equal(book.source({ now: NOW }).boards.iliac.state, 'ok', 'an answer with no data never wipes the kept one');
+  assert.equal(book.source({ now: NOW }).boards.spire.state, 'ok');
+  w.eg.board = () => Promise.resolve({ ok: true });
+  clock += SEASON_BOARD_FRESH_MS;
+  book.source({ opening: true, now: NOW }); await tick();
+  assert.equal(book.source({ now: NOW }).boards.spire.state, 'ok', 'an answer with no data never wipes the kept one');
   const early = createSeasonBook(() => { throw new ReferenceError('Cannot access before initialization'); });
   assert.deepEqual(early.source({ opening: true, now: NOW }), { signedIn: false, guest: false, boards: {}, sea: null });
 });
@@ -400,22 +399,22 @@ test('AUDIT SEASON-BOOK P8/W1: the time left as the hourglass counts it, its day
 });
 
 test('AUDIT SEASON-BOOK S2/U2: every line rewritten in place - a board\'s answer, the day turning - and the list rebuilt only when its rows or doors change; a door with the focus keeps it across that rebuild; P2 a door hands the source\'s own door read at the press (the Arena\'s, the Spire\'s), and a door gone does nothing (mutants: rebuilt every tick; the sub frozen; the focus dropped; the door read from the draw or the wrong one; the guard gone)', () => counted(() => {
-  let now = NOW, iliac = { state: 'asking', data: null }, joined = false;
+  let now = NOW, spire = { state: 'asking', data: null }, joined = false;
   const opened = [];
   const doors = { spire: () => { opened.push('spire'); return true; }, arena: () => { opened.push('arena'); return true; } };
-  const src = () => ({ now, seatsOpen: true, zero: 2, signedIn: true, boards: { spire: ok({ best: { h: 3 } }), iliac }, doors: { spire: doors.spire, arena: joined ? doors.arena : null } });
+  const src = () => ({ now, seatsOpen: true, zero: 2, signedIn: true, boards: { spire }, doors: { spire: doors.spire, arena: joined ? doors.arena : null } });
   const handed = [];
   const doc = fakeDoc();
   const view = seasonWindow(doc, { read: src, onClose() {}, focus: false, door: (fn) => { handed.push(fn); return fn(); } });
   const root = view.root;
-  const realm = one(root, 'sb-realm'), standing = one(one(root, 'sb-iliac'), 'sb-standing');
+  const realm = one(root, 'sb-realm'), standing = one(one(root, 'sb-spire'), 'sb-standing');
   assert.equal(standing.textContent, 'Reading the board...');
-  iliac = ok({ me: { rating: 1200, games: 2 }, rows: [{ you: true, rank: 2 }] });
+  spire = ok({ best: { h: 3 } });
   now += 86_400_000;   // the day turns too
   view.draw();
   assert.equal(one(root, 'sb-realm'), realm, 'the same section - nothing rebuilt');
-  assert.equal(one(one(root, 'sb-iliac'), 'sb-standing'), standing, 'the same line, its words new');
-  assert.equal(standing.textContent, '#2 - rating 1200 - 2 games');
+  assert.equal(one(one(root, 'sb-spire'), 'sb-standing'), standing, 'the same line, its words new');
+  assert.equal(standing.textContent, 'Your best Descent: Hall 3');
   assert.equal(one(realm, 'sb-ssub').textContent, 'Day 26 of 56', 'the day turned in place');
   assert.equal(one(realm, 'sb-count').textContent, seasonLeftText(Date.UTC(2026, 10, 23) - now), 'the countdown the relay\'s, to the second');
   assert.equal(one(realm, 'sb-count').textContent, '30d 12h');

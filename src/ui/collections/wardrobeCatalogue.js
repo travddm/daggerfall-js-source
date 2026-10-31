@@ -46,7 +46,7 @@ export const WARDROBE_SOURCES = Object.freeze([
   wordPair('festival', () => t('coll.src.festival', 'The Witches’ Festival')),
   wordPair('seats', () => t('coll.src.seats', 'The Seats')),
   wordPair('chapters', () => t('coll.src.chapters', 'The Guild Chapters')),
-  wordPair('ranked', () => t('coll.src.ranked', 'The Arena and the Card Tables')),
+  wordPair('ranked', () => t('coll.src.ranked', 'The Arena')),
   wordPair('world', () => t('coll.src.world', 'Around the Bay')),
   wordPair('account', () => t('coll.src.account', 'Your Account')),
   wordPair('shop', () => t('coll.src.shop', 'The Shop')),   // SHOP: the pause face's shop, its pre-alpha wares
@@ -116,9 +116,6 @@ export const SERPENT_ODDS = Object.freeze({ coilbreaker: 20, maelstrom: 50 });
 export const REDOUBT_OF = Object.freeze({ spirewalker: 2, beaconlighter: 5, kynbane: 10, unfallen: 10, battlemage: 15, wellheadwalker: 20, beaconlight: 10, burningstair: 20 });
 /** A Descent bracket's companies that hold Spire Champion (egHonours.js EG_CHAMPIONS_TOP). */
 export const SPIRE_CHAMPIONS_TOP = 10;
-/** AUDIT COLLECTIONS-II (lane 1): the games and the different foes a card table's season #1 must have played to hold its
- *  title (server-account/src/iliac.js ILIAC_CHAMPION_MIN_GAMES, ILIAC_CHAMPION_MIN_FOES; gambit.js GAMBIT_CHAMPION_*). */
-export const TABLE_CHAMPION_FLOOR = Object.freeze({ iliacchampion: Object.freeze({ games: 10, foes: 5 }), grandmaster: Object.freeze({ games: 10, foes: 5 }) });
 
 // ── the words of how ──────────────────────────────────────────────────────────────────────────────────────────────────
 /** SHOP: a ware's words of how - the gem on the pause face, its price the shop's own (net/shopLaw.js SHOP_WARES). */
@@ -202,7 +199,6 @@ export const WARDROBE = Object.freeze({
     crystalfist: E('bestowed', 'bestowed', bestowed, { with: ['aura:resonance', 'glyph:crystalfist'] }),
     hourbreaker: E('abyss', 'chance', remnant('hourbreaker')),
     hoursfirst: E('abyss', 'retired', hoursFirst, { with: ['aura:firsthour'] }),
-    iliacchampion: E('ranked', 'ranked', () => t('coll.how.iliacchampion', 'Stand first on Iliac Hand’s ranked board this season, with at least {games} ranked games against {foes} different opponents.', TABLE_CHAMPION_FLOOR.iliacchampion)),
     // CHAP4c's titles: minted only while the service's CHAPTER_TITLES is on (server-account/wrangler.toml - off; the pin
     // reads the switch, so turning it on fails until these say so)
     chaptermaster: E('chapters', 'dormant', () => t('coll.how.chaptermaster', 'Hold the Master’s seat of a guild chapter.')),
@@ -211,7 +207,6 @@ export const WARDROBE = Object.freeze({
     highmaster: E('chapters', 'dormant', () => t('coll.how.highmaster', 'Shown in place of Chapter Master while your chapter stands Ascendant.'), { via: 'chaptermaster' }),
     seasonmaster: E('chapters', 'dormant', () => t('coll.how.seasonmaster', 'Hold a chapter’s Master seat for a whole Season. Kept for good.')),
     ilovelamp: E('world', 'open', () => t('coll.how.ilovelamp', 'Speak with a shopkeeper who is a lamp.')),
-    grandmaster: E('ranked', 'ranked', () => t('coll.how.grandmaster', 'Stand first on The King’s Gambit’s ranked board this season, with at least {games} ranked games against {foes} different opponents.', TABLE_CHAMPION_FLOOR.grandmaster)),
     coilbreaker: E('serpent', 'chance', serpent('coilbreaker')),
     spirewalker: E('spire', 'open', redoubt('spirewalker')),
     beaconlighter: E('spire', 'open', redoubt('beaconlighter')),

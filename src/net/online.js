@@ -107,7 +107,6 @@ import { caravanKeyOf } from './privateInterior.js';   // WAGONS2-VISIT: a carav
 import { relaySupportsCaravan, validCaravanData } from './wire.js';   // WAGONS2-VISIT: what a caravan's owner placed, said to its room
 import { isArenaRoom, validArenaIn } from './arena/arenaLaw.js';   // ARENA4: the arena's hall and its bouts
 import { poseChanged, POSE_TS_MOD, poseTsDiff, SOCKETS_MAX, WORLD_CELL, RANGE_PIXELS, PIXEL_UNITS, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, CLOSE_SAME_ROOM, CLOSE_REPARTITION, CELL_HELLO_LAW, HALO_OF_PARAM, HALO_OF_MAX, WORLD_FRAME_MAX, worldFrameMaxFor, isCellRoom, hitOwnerOf, validPose, validLook, sanitizeName, readBadge, readAura, readIcon, readRibbon, sanitizeChat, validChatItem, validChatItems, chatGate, redGate, dmGate, relaySupportsDm, muteGate, subOf, mutedUntilOf, worldRoom, inRange, relayUrl, isWorldRoom, streamsFoes, isChatRoom, foesGate, FOES_FRAME_MAX, MAX_FRAME_BYTES, hitGate, actGate, actFrameFits, whoGate, WHO_RETRY_MS, HEARTBEAT_MS, PING_MS, FOES_FULL_MS, FOES_STALE_MS, relayVersionOf, chatInGate, CHAT_ROOM_HZ_MAX, socialGate, partyGate, validPartyPose, validSocialFrame, validPartyFrame, PARTY_SEND_MS, validSocialAct, socialInGate, noteInGate, partyInGate, SOCIAL_IN_HZ_MAX, NOTE_IN_HZ_MAX, INBOUND_FRAME_MAX, questInGate, validQuestFrame, QUEST_SEND_MS, QUEST_HUB_MIN_MS, PARTY_MAX, tokenGate, validTradeData, tradeGate, tradeInGate, validCastData, castGate, castInGate, CAST_FRAME_MAX, CAST_IN_HZ_MAX, relaySupportsCast, TRADE_IN_HZ_MAX, relaySupportsTrade, TRADE_FRAME_MAX, parkGate, relaySupportsPark, PARK_CELL_MAX, PARK_KEY_RE, PARK_TTL_MS, relaySupportsChannels, relaySupportsLang, relaySupportsTradeChan, CHAT_LINE_CHANNELS, partyChatInGate, PARTY_CHAT_ROOM_HZ_MAX, relaySupportsRoll, rollGate, validRollSpec, validRoll, relaySupportsEmote, validCardData, cardGate, cardInGate, CARD_FRAME_MAX, CARD_IN_HZ_MAX, relaySupportsCard, validPageData, pageGate, pageInGate, PAGE_FRAME_MAX, PAGE_IN_HZ_MAX, relaySupportsPage, validDuelData, duelGate, duelInGate, DUEL_FRAME_MAX, DUEL_IN_HZ_MAX, relaySupportsBossRef, bodyWordGate, relaySupportsDuelRef, validDuelRefOut, validWedData, wedGate, wedInGate, WED_FRAME_MAX, WED_IN_HZ_MAX, relaySupportsWed, readRenown, renownGate, relaySupportsRenown, RENOWN_ORDER_KEEP_MS, RENOWN_RESEND_MS, lookGate, relaySupportsLook, relaySupportsPartyTravel, relaySupportsRestOpt, relaySupportsEvent, relayKnowsLiveEvent, eventGate, validLiveEvent, LIVE_EVENTS, isSocialRoom, validGateIn, validGateOut, gateGate, relaySupportsGate, relaySupportsOwn, relaySupportsGateSpent, relaySupportsGateSite, relaySupportsGateHeal, relaySupportsCourtWatch, relaySupportsPortents, gatePlaceWire, readGuildTag, readHouse, relaySupportsGuild, GUILD_ORDER_KEEP_MS, guildChatInGate, GUILD_CHAT_ROOM_HZ_MAX, validRaidIn, validRaidOut, raidGate, relaySupportsRaid, validRaidTownsIn, isRegionRoom, validTravellerMark, validTravellerFrame, validTravWords, relaySupportsTravellers, travInGate, TRAV_SEND_MIN_MS, TRAV_WELCOME_MAX, TRAV_STALE_MS, relaySupportsPartyWalk, relaySupportsPartyLead, relaySupportsPartyMap, validAmapFrame, amapBody, AMAP_SEND_MS, AMAP_HUB_MIN_MS, validSiegeIn, validSiegeOut, siegeGate, relayFightsBattles, relayRunsRoyal, validRiteIn, validRiteOut, riteGate, relaySupportsRite, validStarIn, validStarOut, starGate, relaySupportsStar, arenaGate, relaySupportsArena, readArenaOut, validWildData, validWildOut, wildDirected, wildGate, wildInGate, WILD_IN_HZ_MAX, WILD_FRAME_MAX, relaySupportsWildRef, validWildRefOut, relaySupportsWdun, relaySupportsWdunGiants, relaySupportsWdunSea, seaVaultCell, validWdunIn, validWdunOut, BUSY_TOKEN_UNREAD, WIRE2_BATCH_MAX, GROUND_LAW, groundRoom, GRANT_HELLO_LAW, LOOT_HELLO_LAW, lootRoom, validParkYeet, relaySupportsWildCollect, relaySupportsHome, HOME_ORDER_KEEP_MS, validHomeFrame, homeInGate, relaySupportsSeaPvp, SEA_PVP_KINDS, relaySupportsRaidWorld, relaySupportsProvinceRegions, relaySupportsGateLanes, gateLaneWire, relaySupportsWdunWorld } from './wire.js';   // SCALE5a: a busy close's word that the token went unread   // SOC2: the hub's law, at home; AUDIT SOC B3/B11/B20: the act's projection, the inbound gates, the inbound bound
-import { relaySupportsHoldem, holdemGate, validHoldemIn, validHoldemOut, relaySupportsIliac, validIliacIn, validIliacOut, relaySupportsGambit, validGambitIn, validGambitOut } from './wire.js';   // CARDS5: the relay's card table, both ways
 import { RAID_TOWNS_CHUNK, raidLaneOfKey } from './raid/raidLaw.js';   // RAID-ROLL: the towns table's pieces; WW6: a raid's lane
 import { dungeonRoomTag } from './wire.js';   // SD-ONLINE: a dungeon's room carries the size it was built at
 import { nativePoseRoom } from './wire.js';   // SLIM-FRAME: the frame a room's poses are in - one home, the relay's slim pose rounds by it
@@ -764,18 +763,8 @@ export class OnlineSession {
     this.tradeChanOk = false;     // CHAT-TRADE: and the Trade and LFG channels (relaySupportsTradeChan)
     this.rollOk = false;          // DICE1: ...and rolls dice (relaySupportsRoll) - an older one CLOSES the socket on a roll frame
     this.emoteOk = false;         // EMOTE1: ...and carries an action line (relaySupportsEmote) - an older one would say it as plain words
-    this.onHoldem = null;         // CARDS5: (frame) => void - the relay's card table: the room's events and the table, my hole cards, my turn
     this.onRoll = null;           // DICE1: ({id, name, at, mine, sub, ch, roll}) => void - a roll the RELAY made, checked by the dice's law
     this._rollBucket = null;      // DICE1: my own rolls out, rollGate's law
-    this.holdemOk = false;        // CARDS5: ...and deals cards (relaySupportsHoldem) - an older one CLOSES the socket on a holdem frame
-    this.holdemWelcomes = 0;      // AUDIT CARDS-3 B1: my primary socket's welcomes - the seat a dropped socket held is sat again on the next
-    this._holdemBucket = null;    // CARDS5: my words to the card table, holdemGate's law
-    this.onIliac = null;          // CARDS10: (frame) => void - the relay's Iliac table: the room's events and the table, my own view, a ranked game's receipt
-    this.iliacOk = false;         // CARDS10: ...and deals Iliac Hand (relaySupportsIliac) - an older one CLOSES the socket on an iliac frame
-    this._iliacBucket = null;     // CARDS10: my words to the Iliac table, holdemGate's law in a bucket of their own
-    this.onGambit = null;         // KG5: (frame) => void - the relay's King's Gambit table: the room's events and the table
-    this.gambitOk = false;        // KG5: ...and runs The King's Gambit (relaySupportsGambit) - an older one CLOSES the socket on a gambit frame
-    this._gambitBucket = null;    // KG5: my words to the King's Gambit table, holdemGate's law in a bucket of their own
     this.castOk = false;          // AUDIT ALLY-CAST B1: the relay that welcomed this socket routes cast frames (relaySupportsCast) - an older one CLOSES the socket on one
     this.onTrade = null;          // TRADE1: (id, data) => void - a trade frame from a peer, projected by the wire's validTradeData, addressed to ME
     this.onPeerDeath = null;      // PCORPSE1: (peer {id, look, name}, pose, room, how) => void - another player's LAST pose: they fell there; `how` { intro: true } when an introduction said it (AUDIT ONLINE 3 F5)
@@ -2748,42 +2737,6 @@ export class OnlineSession {
     return true;
   }
 
-  /** CARDS5: a word to the room's card table (sit, stand, act, look - net/holdemTable.js validHoldemIn), to a relay that
-   *  deals; false when it is not one, the word is bad or the gate is shut. */
-  sendHoldem(word) {
-    const w = validHoldemIn(word);
-    if (!w || !this.holdemOk) return false;
-    const gate = holdemGate(this._holdemBucket, this._now());
-    if (!gate.pass) return false;
-    if (!this._send({ t: 'holdem', ...w })) return false;
-    this._holdemBucket = gate.bucket;
-    return true;
-  }
-
-  /** CARDS10: a word to the room's Iliac table (sit, stand, commit, look - net/iliac/iliacTable.js validIliacIn), to a relay
-   *  that deals it; false when it is not one, the word is bad or the gate is shut. */
-  sendIliac(word) {
-    const w = validIliacIn(word);
-    if (!w || !this.iliacOk) return false;
-    const gate = holdemGate(this._iliacBucket, this._now());
-    if (!gate.pass) return false;
-    if (!this._send({ t: 'iliac', ...w })) return false;
-    this._iliacBucket = gate.bucket;
-    return true;
-  }
-
-  /** KG5: a word to the room's King's Gambit table (sit, ready, unready, act, forfeit, stand, look - net/gambit/gambitTable.js
-   *  validGambitIn), to a relay that runs it; false when it is not one, the word is bad or the gate is shut. */
-  sendGambit(word) {
-    const w = validGambitIn(word);
-    if (!w || !this.gambitOk) return false;
-    const gate = holdemGate(this._gambitBucket, this._now());
-    if (!gate.pass) return false;
-    if (!this._send({ t: 'gambit', ...w })) return false;
-    this._gambitBucket = gate.bucket;
-    return true;
-  }
-
   /** DICE1: a roll ASKED of the relay (net/dice.js's spec) on the channel this socket's room is, or a party's (`ch`,
    *  the hub link, CHAT-CHAN's law). The relay rolls and says the result to the channel, this socket included - the
    *  receipt is the roll itself. False when nothing went: a spec the dice refuse, a relay that does not roll, the
@@ -3546,9 +3499,6 @@ export class OnlineSession {
       if (primary) this.langOk = relaySupportsLang(relayV);   // CHAT-LANG
       if (primary) this.tradeChanOk = relaySupportsTradeChan(relayV);   // CHAT-TRADE
       if (primary) this.rollOk = relaySupportsRoll(relayV);   // DICE1
-      if (primary) { this.holdemOk = relaySupportsHoldem(relayV); this.holdemWelcomes++; }   // CARDS5; AUDIT CARDS-3 B1: a new welcome is a new socket - the relay stood the old one up
-      if (primary) this.gambitOk = relaySupportsGambit(relayV);   // KG5: and runs the third
-      if (primary) this.iliacOk = relaySupportsIliac(relayV);   // CARDS10: and deals the second game   // CARDS5; AUDIT CARDS-3 B1: a new welcome is a new socket - the relay stood the old one up
       if (primary) this.emoteOk = relaySupportsEmote(relayV);   // EMOTE1
       if (primary) this.grantStatsOk = relaySupportsGrantStats(relayV);   // FOE-BOUNDS: a tally's `stats` to a relay that knows it
       if (primary) this.starGrantOk = relaySupportsStarGrant(relayV);   // AUDIT STAR-TUNE F1: a star's stands ask `star` of a relay that mints it
@@ -4027,22 +3977,6 @@ export class OnlineSession {
       const list = Array.isArray(m.items) && m.items.length ? m.items : (m.item && typeof m.item === 'object' && !Array.isArray(m.item) ? [m.item] : null);
       const linked = list ? { items: list, item: list[0] } : {};
       this._deliver('chat', () => this.onChat?.({ id: m.id, name: sanitizeName(m.name), text, at: Number.isFinite(m.at) ? m.at : now, mine: m.id === this.id, sub: subOf(m), ch, ...(m.me === true ? { me: true } : {}), ...linked, ...(typeof m.sg === 'string' && STAMP_RE.test(m.sg) ? { sg: m.sg, ...(m.text.length <= CHAT_MAX ? { raw: m.text } : {}) } : {}) }));
-    } else if (m.t === 'holdem') {
-      // CARDS5: THE RELAY'S CARD TABLE - the room's events and the table as it stands, my own hole cards, or my turn;
-      // checked by the table's own law, from the room the player stands in only
-      if (!validHoldemOut(m) || (!primary && m.cashout === undefined)) return;   // CARDS6: a cash-out from the room just left too - it is gold
-      this._deliver('holdem', () => this.onHoldem?.({ ...m, at: now }));
-    } else if (m.t === 'iliac') {
-      // CARDS10: THE RELAY'S ILIAC TABLE - the room's events and the table, my own view of the game, or a ranked game's
-      // receipt (from the room just left too - it is a result on the board); checked by the table's own law
-      if (!validIliacOut(m) || (!primary && m.receipt === undefined)) return;
-      this._deliver('iliac', () => this.onIliac?.({ ...m, at: now }));
-    } else if (m.t === 'gambit') {
-      // KG5: THE RELAY'S KING'S GAMBIT TABLE - the room's events and the table (the whole board: nothing of a dealt game
-      // is hidden), or a refusal; checked by the table's own law, from the room the player stands in only - KG6: and a
-      // rated game's receipt from the room just left too (it is a result on the board)
-      if (!validGambitOut(m) || (!primary && m.receipt === undefined)) return;
-      this._deliver('gambit', () => this.onGambit?.({ ...m, at: now }));
     } else if (m.t === 'roll') {
       // DICE1: A ROLL THE RELAY MADE - checked by the dice's own law (n dice, each 1..m, the total their sum plus k):
       // an honest relay rolled it, and a dishonest one's numbers that do not add up are no roll. Gated in on the

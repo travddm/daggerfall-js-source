@@ -1,9 +1,9 @@
 // LOOT-BANNER + ACQUIRE1 (2026-10-09, Mac: "a popup for when you obtain something of rarity including weapons, armor, the
 // new cards, etc - something akin to a destiny loot popup notification"; bible/10-UI/Loot-Banner.md). The laws pinned here:
 //   - THE WATCHER (systems/acquireWatch.js): what arrived in the player's keeping - the pack, the wagon, the Materials Bag -
-//     read once a frame; a piece marked the first frame it stands there; a card by its count; a new baseline for a new
+//     read once a frame; a piece marked the first frame it stands there; a new baseline for a new
 //     entity, a load, and the creation; only Rare and up announces; the mark is the receiver's (stripped off the wire).
-//   - THE LAW (ui/lootBanner.js createBannerQueue): three standing, the best waiting first, a card's count added, a hold
+//   - THE LAW (ui/lootBanner.js createBannerQueue): three standing, the best waiting first, a count added, a hold
 //     and a big one's, a piece no longer held never standing.
 //   - THE FACE: Enhanced Plus only, at the right edge under the notices; the big tiers' banner and fanfare; hidden under the
 //     HUD's gate with its clock still; the codex's first find said on the banner.
@@ -21,9 +21,6 @@ import * as CX from '../../src/systems/loot/lootCodex.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '../../src/systems/aetheric.js';
 import { mintHourlock } from '../../src/systems/gilded.js';
-import { mintIliacCard, giveBinderAtChargen } from '../../src/systems/iliac/iliacItems.js';
-import { ILIAC_CARDS } from '../../src/net/iliac/iliacCards.js';
-import { addItem, splitStack } from '../../src/systems/inventory.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
 import { wildRecord } from '../../src/systems/wild/wildDeath.js';
 import { ITEM_FIELDS } from '../../src/systems/item/itemFields.js';
@@ -38,7 +35,6 @@ const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; r
 const known = (it) => Object.assign(it, { isIdentified: true });
 const tiered = (tier, seed = 2) => known(LR.applyRarity(createWeapon(113, 1), tier, lcg(seed)));
 const legend = (id = 'wyrmbane') => { const rec = LR.legendaryById(id); return known(LR.applyRarity(createWeapon(rec.templates?.[0] ?? 113, 1), 'legendary', lcg(1), [rec])); };
-const cardOf = (tier) => ILIAC_CARDS.find((c) => c.tier === tier).id;
 const on = () => { _resetForTests(); setPref('lootRarity', true); };
 const hero = (over = {}) => ({ isPlayer: true, chargenDone: true, items: [], wagonItems: [], bagItems: [], ...over });
 const names = (arr) => arr.map((a) => [a.item.name, a.tier, a.count]);
@@ -67,40 +63,6 @@ test('ACQUIRE1 THE WATCHER: the first frame is a baseline; a new Rare piece arri
   assert.equal(W.markable(potion), false); assert.equal(W.markable({ group: 'Weapons', templateIndex: 131 }), false, 'an arrow never');
 });
 
-test('ACQUIRE1 THE CARDS: a card arrives by its count - a new record, a card merged into a stack held, a stack of the player\'s own back from a chest saying nothing; a split into the wagon says nothing; its tier its catalog\'s, with loot rarity off too (mutants: the merge missed; the split an arrival; my own stack an arrival; a card\'s tier the loot ladder\'s)', () => {
-  on();
-  const watch = W.createAcquireWatch();
-  const rareId = cardOf('rare'), commonId = cardOf('common');
-  const me = hero();
-  watch.observe(me);
-  addItem(me.items, mintIliacCard(rareId, 1));
-  addItem(me.items, mintIliacCard(commonId, 3));
-  const a = watch.observe(me);
-  assert.equal(a.length, 1, 'the Rare card; a Common card says nothing');
-  assert.deepEqual([a[0].item.card, a[0].tier, a[0].count], [rareId, 'rare', 1]);
-  addItem(me.items, mintIliacCard(rareId, 2));
-  assert.equal(me.items.filter((it) => it.card === rareId).length, 1, 'merged into the stack held');
-  assert.deepEqual(watch.observe(me).map((x) => [x.item.card, x.count]), [[rareId, 2]], 'its count rose by two');
-  const stack = me.items.find((it) => it.card === rareId);
-  const half = splitStack(me.items, stack, 1);
-  me.items.splice(me.items.indexOf(half), 1);
-  addItem(me.wagonItems, half);
-  assert.deepEqual(watch.observe(me), [], 'a split into the wagon');
-  me.wagonItems.splice(me.wagonItems.indexOf(half), 1);
-  addItem(me.items, half);
-  assert.equal(me.items.filter((it) => it.card === rareId).length, 1, 'merged back into the pack\'s stack');
-  assert.deepEqual(watch.observe(me), [], 'and back out of the wagon: the three lists\' count did not rise');
-  me.items.splice(me.items.indexOf(stack), 1);
-  assert.deepEqual(watch.observe(me), [], 'into a chest');
-  me.items.push(stack);
-  assert.deepEqual(watch.observe(me), [], 'and back: my own stack, marked');
-  setPref('lootRarity', false);
-  addItem(me.items, mintIliacCard(cardOf('legendary'), 1));
-  assert.deepEqual(watch.observe(me).map((x) => x.tier), ['legendary'], 'the tier printed on the card, whatever the ladder\'s switch');
-  me.items.push(tiered('legendary', 9));
-  assert.deepEqual(watch.observe(me), [], 'a piece of the ladder, the ladder off: no tier');
-});
-
 test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it ends, and a new entity announce nothing; the mark is the receiver\'s - stripped by the wire\'s clamp and the zone\'s record, so a piece another player hands over arrives (mutants: no baseline at a load; the starter deck announced; the wire keeping the mark)', () => {
   on();
   const watch = W.createAcquireWatch();
@@ -108,10 +70,9 @@ test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it 
   watch.observe(me);
   me.items.push(tiered('legendary'));
   assert.deepEqual(watch.observe(me), [], 'the creation');
-  giveBinderAtChargen(me);   // the kit's tail and the flag in the same gap between two frames (chargenSession.js)
-  me.items.push(mintAetheric(AETHERIC_RECORDS[0]));
+  me.items.push(mintAetheric(AETHERIC_RECORDS[0]));   // the kit's tail and the flag in the same gap between two frames (chargenSession.js)
   me.chargenDone = true;
-  assert.deepEqual(watch.observe(me), [], 'the frame it ends: its starter deck and kit announce nothing');
+  assert.deepEqual(watch.observe(me), [], 'the frame it ends: its kit announces nothing');
   assert.deepEqual(watch.observe(me), [], 'nor the next');
   me.items = [...me.items, legend('graveward')];   // a save from before the mark: nothing in it carries one
   assert.deepEqual(watch.observe(me), [], 'a load replaces the pack: a baseline');
@@ -126,7 +87,7 @@ test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it 
   assert.deepEqual(watch.observe(me2).map((x) => x.tier), ['rare'], 'handed over: new to its taker');
 });
 
-test('LOOT-BANNER THE LAW: three stand, the newest first; what waits goes in by tier, the best first; a card\'s count adds to its banner standing or waiting; a hold, a big one\'s longer, then the slide; a piece no longer held is dropped at its turn; past the waiting cap the lowest go (mutants: no cap; waiting in arrival order; a second card a second banner; one hold for all; the held check skipped)', () => {
+test('LOOT-BANNER THE LAW: three stand, the newest first; what waits goes in by tier, the best first; a count adds to its banner standing or waiting; a hold, a big one\'s longer, then the slide; a piece no longer held is dropped at its turn; past the waiting cap the lowest go (mutants: no cap; waiting in arrival order; a second card a second banner; one hold for all; the held check skipped)', () => {
   const q = B.createBannerQueue({ max: 3, hold: 100, bigHold: 300, slide: 10, pendingMax: 5 });
   const e = (key, tier, big = false) => ({ key, tier, big, count: 1, name: key });
   q.push([e('a', 'rare'), e('b', 'legendary'), e('c', 'rare'), e('d', 'gilded', true), e('x', 'rare')]);
@@ -243,7 +204,7 @@ test('LOOT-BANNER THE FACE: on Enhanced Plus a new Exalted Legendary stands at t
   }, { skin: 'classic' });
 }));
 
-test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece stand big and play the fanfare once a frame, with the port\'s sounds on; a Rare plays nothing; a card stands as its tier\'s card with its count; a piece gone before its turn never stands (mutants: no big banner; no fanfare; the fanfare past the sounds switch; a card uncounted)', () => withPage((doc, sounds) => {
+test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece stand big and play the fanfare once a frame, with the port\'s sounds on; a Rare plays nothing; a piece gone before its turn never stands (mutants: no big banner; no fanfare; the fanfare past the sounds switch; a card uncounted)', () => withPage((doc, sounds) => {
   on();
   setPref('soundEnhancements', true);
   const me = hero();
@@ -266,15 +227,6 @@ test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece sta
   me.items.push(Object.assign(tiered('rare', 10), { artifact: true }));
   frame(me);
   assert.deepEqual(sounds, [], 'the port\'s sounds off: no fanfare');
-  B._resetLootBannersForTests();
-  frame(me);
-  const id = cardOf('legendary');
-  addItem(me.items, mintIliacCard(id, 2));
-  frame(me);
-  const c = byClass(doc.body, 'lootbanner')[0];
-  assert.equal(textIn(c, 'lb-kicker'), 'Legendary Card');
-  assert.equal(byClass(c, 'lb-count')[0].textContent, '×2');
-  assert.equal(textIn(c, 'lb-sub'), `${ILIAC_CARDS.find((x) => x.id === id).kind.replace(/^./, (s) => s.toUpperCase())} card`);
   B._resetLootBannersForTests();
   frame(me);
   const fleeting = tiered('legendary', 11);

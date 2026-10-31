@@ -136,8 +136,9 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaab' }, ON), { repeat: true, ware: 'title:witchwarden', cakes: 40, bowls: 0, wares: ['title:witchwarden'] }, 'asked again: answered, nothing moved');
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaac' }, ON), { error: 'owned' });
   // a pack's ware is bought as often as the cakes go round
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaad' }, ON)).cakes, 20);
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
+  cakes(alice, 80);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaad' }, ON)).cakes, 40);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
   assert.equal(row(alice.id).fest_wares, 'title:witchwarden');
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM fest_sales WHERE account = ?').get(alice.id).n, 3);
   // a Hearth Offering is the account's count, as the cakes are - asked twice, one bowl
@@ -146,8 +147,8 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.equal((await buyFestival(ctx(), player(alice), { ware: 'item:offering', rid: 'aaaaaaaaaab0' }, ON)).bowls, 1, 'a repeat counts no second bowl');
   assert.equal(row(alice.id).fest_bowls, 1);
   // the days over: a new sale is closed, a sale asked before it is still answered
-  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
-  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
+  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
+  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
 });
 
 test('WITCH1 THE HEARTH OFFERING: set out only at a home the character owns (never a hall), filled from the owner\'s cakes, taken from once a day by others, taken in with its cakes', async () => {

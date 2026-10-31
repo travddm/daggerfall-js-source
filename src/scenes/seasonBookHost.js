@@ -17,7 +17,6 @@
 //   arena   the arena online (scenes/arena/arenaOnline.js) or null - its own board, its `fetchBoard` and `refresh`
 //   eg      the Elite Breach's account door (net/accountClient.js accountEg) - the Spire's boards; its `me()` and
 //           `guest()` are the session's (every door reads the one stored session)
-//   iliac   Iliac Hand's (accountIliac), gambit The King's Gambit's (accountGambit) - each `board()` `call`'s `{ ok, data }`
 //   ledger  the captain's ledger (systems/naval/captainLedger.js) - `season()` its season's figures
 // The getter is called under a try: the pause door stands before the world host's last declarations (AUDIT TIMERS1 D6),
 // and one not declared yet is none.
@@ -27,7 +26,7 @@ import { arenaSeasonOf } from '../net/arena/arenaLaw.js';
 /** A board asked no oftener than this, ms - and only at a window's opening. */
 export const SEASON_BOARD_FRESH_MS = 60_000;
 /** The boards the window asks of the service, by the window's row - and the `world()` door each is asked through. */
-export const SEASON_BOARDS = Object.freeze({ spire: 'eg', iliac: 'iliac', gambit: 'gambit' });
+export const SEASON_BOARDS = Object.freeze({ spire: 'eg' });
 /** An answer that says no one is signed in: its read is dropped, never kept as a standing. */
 const SIGNED_OUT = new Set(['no-session', 'auth']);
 

@@ -614,19 +614,9 @@
   "tr": "811f13fbda96",
   "by": "claude-in-session"
  },
- "account.refusal.badBuyIn": {
-  "en": "65d7432f4410",
-  "tr": "85ba9dd9aa4f",
-  "by": "claude-in-session"
- },
  "account.refusal.badCode": {
   "en": "cca3778d98a6",
   "tr": "bf95a46adb54",
-  "by": "claude-in-session"
- },
- "account.refusal.badDeck": {
-  "en": "7e70078f928c",
-  "tr": "af442e683ba9",
   "by": "claude-in-session"
  },
  "account.refusal.badDecor": {
@@ -819,16 +809,6 @@
   "tr": "35a02b775fe1",
   "by": "claude-in-session"
  },
- "account.refusal.badStakes": {
-  "en": "f7811ab9b484",
-  "tr": "a6c02a4bb215",
-  "by": "claude-in-session"
- },
- "account.refusal.badTable": {
-  "en": "da1d76383b8c",
-  "tr": "2bc46bce4132",
-  "by": "claude-in-session"
- },
  "account.refusal.badText": {
   "en": "003919932dc4",
   "tr": "dda5c53af075",
@@ -944,56 +924,6 @@
   "tr": "f0440f6404de",
   "by": "claude-in-session"
  },
- "account.refusal.cardsCashoutFailed": {
-  "en": "75da0b07a45c",
-  "tr": "2acdf7e7f427",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsClosed": {
-  "en": "c61e7fdf39f7",
-  "tr": "03097e047355",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsHeld": {
-  "en": "40082089f829",
-  "tr": "b47ffab32e73",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsNoStake": {
-  "en": "8df11154b6a3",
-  "tr": "03b99268cd49",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsNotYours": {
-  "en": "e9b8a768e2bb",
-  "tr": "5acfaad5aadb",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsOtherCharacter": {
-  "en": "edcce67b3c3e",
-  "tr": "c29f63ca9d80",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsRealm": {
-  "en": "b5f21c074a82",
-  "tr": "1d002825354c",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsReceipt": {
-  "en": "c4f0616b2e8b",
-  "tr": "8dbc1b0d48c7",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsStakeFailed": {
-  "en": "f1036895079d",
-  "tr": "372c03a7bc8e",
-  "by": "claude-in-session"
- },
- "account.refusal.cardsStakePaid": {
-  "en": "7fa6a5aa0f95",
-  "tr": "a0625f433436",
-  "by": "claude-in-session"
- },
  "account.refusal.carriedFull": {
   "en": "2c0623124246",
   "tr": "0cfb29d02827",
@@ -1099,11 +1029,6 @@
   "tr": "cfdb8c0d1875",
   "by": "claude-in-session"
  },
- "account.refusal.customsCards": {
-  "en": "9c323c1c7c13",
-  "tr": "651acf56c979",
-  "by": "claude-in-session"
- },
  "account.refusal.customsNeverOnline": {
   "en": "3b52be195adb",
   "tr": "7255042fcc8a",
@@ -1117,11 +1042,6 @@
  "account.refusal.dead": {
   "en": "11f518f200c6",
   "tr": "49fa5d3f0a4e",
-  "by": "claude-in-session"
- },
- "account.refusal.deckShort": {
-  "en": "2de05aa68736",
-  "tr": "d22d7d995677",
   "by": "claude-in-session"
  },
  "account.refusal.decorCap": {
@@ -2509,11 +2429,6 @@
   "tr": "aa2bd244be8e",
   "by": "claude-in-session"
  },
- "account.refusal.rankedNeedsAccount": {
-  "en": "19e3e5579204",
-  "tr": "18884efb5c73",
-  "by": "claude-in-session"
- },
  "account.refusal.rate": {
   "en": "525a23ec88e0",
   "tr": "47002cf010b0",
@@ -3054,11 +2969,6 @@
   "tr": "0d954b557b61",
   "by": "claude-in-session"
  },
- "cards.cashout.banked": {
-  "en": "dbeb3e2bdded",
-  "tr": "a9171bdb567e",
-  "by": "claude-in-session"
- },
  "chair.bench": {
   "en": "931fa888a4a9",
   "tr": "9e89988cc3fb",
@@ -3394,11 +3304,6 @@
   "tr": "22f23667273d",
   "by": "claude-in-session"
  },
- "coll.how.grandmaster": {
-  "en": "3573e80976e9",
-  "tr": "c059f3f9704e",
-  "by": "claude-in-session"
- },
  "coll.how.hearthkeeper": {
   "en": "9aaba1a1fcbb",
   "tr": "d787432c9164",
@@ -3412,11 +3317,6 @@
  "coll.how.hoursfirst": {
   "en": "95f2d9728c51",
   "tr": "3b8f76c52236",
-  "by": "claude-in-session"
- },
- "coll.how.iliacchampion": {
-  "en": "f1cc281162fe",
-  "tr": "3401b6c50826",
   "by": "claude-in-session"
  },
  "coll.how.ilovelamp": {
@@ -3644,11 +3544,6 @@
   "tr": "058b3994590f",
   "by": "claude-in-session"
  },
- "coll.part.cards": {
-  "en": "0f830bc25e52",
-  "tr": "7d2b4fb4f592",
-  "by": "claude-in-session"
- },
  "coll.part.codex": {
   "en": "2c5d5b88672d",
   "tr": "2c5d5b88672d",
@@ -3715,8 +3610,8 @@
   "by": "claude-in-session"
  },
  "coll.src.ranked": {
-  "en": "d8e0013d70f6",
-  "tr": "e1a29605c3d7",
+  "en": "f718846620df",
+  "tr": "cd0c5e482550",
   "by": "claude-in-session"
  },
  "coll.src.seats": {

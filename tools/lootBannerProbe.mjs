@@ -8,7 +8,7 @@
 // player entity (what drawHud hands it), `drawEnhancedHud`, `drawEnhancedToasts` - the pieces minted by the game's own
 // producers, and the probe measures the rectangles as well as photographing them.
 //
-// THE ICONS ARE STAND-INS (tools/pickupFeedProbe.mjs's reason: no ARENA2 here). A card's picture is the real painted face.
+// THE ICONS ARE STAND-INS (tools/pickupFeedProbe.mjs's reason: no ARENA2 here).
 //
 // IT RUNS ON VITE'S OWN DEV SERVER (the pickup feed probe's pattern).
 //
@@ -41,8 +41,6 @@ import * as LR from '/src/systems/loot/lootRarity.js';
 import { createWeapon } from '/src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '/src/systems/aetheric.js';
 import { mintHourlock } from '/src/systems/gilded.js';
-import { mintIliacCard } from '/src/systems/iliac/iliacItems.js';
-import { ILIAC_CARDS } from '/src/net/iliac/iliacCards.js';
 import { addItem } from '/src/systems/inventory.js';
 
 setPref('lootRarity', true);
@@ -51,7 +49,6 @@ const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; r
 const known = (it) => Object.assign(it, { isIdentified: true });
 const tiered = (tier, tpl = 113, seed = 2) => known(LR.applyRarity(createWeapon(tpl, 1), tier, lcg(seed)));
 const legend = (id) => { const rec = LR.legendaryById(id); return known(LR.applyRarity(createWeapon(rec.templates?.[0] ?? 113, 1), 'legendary', lcg(1), [rec])); };
-const cardOf = (tier) => ILIAC_CARDS.find((c) => c.tier === tier).id;
 let e = null;
 let notice = false;
 const fresh = () => ({ name: 'Aelwyn', isPlayer: true, chargenDone: true, career: { name: 'Spellsword' }, stats: { strength: 50, endurance: 48, willpower: 50, intelligence: 50 },
@@ -81,11 +78,11 @@ _setLootBannerForTests({ icon: (image, box) => ({ src: swordPic, w: box, h: box,
 
 const SCENES = {
   // three tiers at once, beside two notices: the stack steps under them
-  mixed: () => { notice = true; return [tiered('rare', 113, 3), Object.assign(legend('wyrmbane'), { exalted: true }), ...[mintIliacCard(cardOf('legendary'), 2)]]; },
+  mixed: () => { notice = true; return [tiered('rare', 113, 3), Object.assign(legend('wyrmbane'), { exalted: true }), tiered('legendary', 121, 4)]; },
   // the top tiers: big banners
   big: () => { notice = false; return [mintAetheric(AETHERIC_RECORDS[0]), mintHourlock(), Object.assign(tiered('rare', 120, 5), { artifact: true, name: 'Mace of Molag Bal' })]; },
   // a burst: three stand, the best first, the rest wait
-  burst: () => { notice = false; return [tiered('rare', 113, 7), tiered('rare', 120, 8), legend('graveward'), mintIliacCard(cardOf('rare'), 1), mintIliacCard(cardOf('aetheric'), 1), tiered('legendary', 121, 9)]; },
+  burst: () => { notice = false; return [tiered('rare', 113, 7), tiered('rare', 120, 8), legend('graveward'), tiered('rare', 121, 10), mintAetheric(AETHERIC_RECORDS[0]), tiered('legendary', 121, 9)]; },
 };
 globalThis.__scene = async (name) => {
   clearLootBanners();

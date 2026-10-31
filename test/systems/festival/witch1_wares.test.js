@@ -1,13 +1,12 @@
 // WITCH1 (2026-10-20, the owner: "A new armor set, a new weapon, a new title and aura, a brand new item (profile icon),
 // new cards"; bible/06-Systems/Witches-Festival.md): THE WYRD SISTER'S WARES - the Wyrd's Raiment and its three tiers
-// driven through the real set seam, the Witchmoon Athame, the six festival cards kept out of every pack and patron, the
-// Witchfire aura's look, the profile icons drawn in code, the festival's painted pictures, and the window's rows and
+// driven through the real set seam, the Witchmoon Athame, the Witchfire aura's look, the profile icons drawn in code, the festival's painted pictures, and the window's rows and
 // presses (src/ui/wyrdWindow.js).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { WYRD_SET_PIECES, wyrdPieceById, AETHERIC_RECORDS } from '../../../src/systems/aetheric.js';
-import { WYRD_PIECE_IDS, FESTIVAL_CARD_IDS, FESTIVAL_WARES } from '../../../src/net/festivalLaw.js';
+import { WYRD_PIECE_IDS } from '../../../src/net/festivalLaw.js';
 import { SIGIL_SETS, tierValues, SET_STAGE_MAX, _resetSigilSetsForTests } from '../../../src/systems/sigil/sigilSets.js';
 import { SIGIL_SET_IDS, setSigilOnline, setSigilRenown, _resetSigilForTests } from '../../../src/systems/sigil/sigil.js';
 import { setBlow, setSetPowersVoice, setPowerStates, setRound, _setSetPowersClockForTests, _resetSetPowersForTests } from '../../../src/systems/sigil/sigilSetPowers.js';
@@ -18,9 +17,6 @@ import { entityStatMod } from '../../../src/systems/entityMods.js';
 import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { hallowedFoe, foeFindSource } from '../../../src/systems/festival/festivalFoes.js';
-import { ILIAC_CARDS, CARD_EMBLEMS, cardById } from '../../../src/net/iliac/iliacCards.js';
-import { PACK_POOL } from '../../../src/systems/card/cardSources.js';
-import { cardRules, cardFlavor } from '../../../src/systems/iliac/iliacCardWords.js';
 import { AURA_LOOK, AURA_FS, witchfireRatesWhole } from '../../../src/render/auraRing.js';
 import { profileIconNode, ICON_ART, ICON_TEXT } from '../../../src/ui/profileIcons.js';
 import { ICONS } from '../../../src/net/identityToken.js';
@@ -108,22 +104,6 @@ test('WITCH1 WHAT A FOE IS TO THE FESTIVAL: the dead and the summoned hallowed; 
   assert.equal(foeFindSource(null), 'foe');
 });
 
-test('WITCH1 THE FESTIVAL\'S CARDS: six, in the catalogue, their rules the effects\' own words, never in a pack or a patron\'s hand; the witch and the candle emblems', () => {
-  assert.deepEqual(ILIAC_CARDS.slice(-6).map((c) => c.id), FESTIVAL_CARD_IDS);
-  assert.deepEqual(CARD_EMBLEMS.slice(-2), ['witch', 'candle']);
-  assert.deepEqual(FESTIVAL_CARD_IDS.map((id) => { const c = cardById(id); return `${c.name}|${c.kind}|${c.cost}|${c.power}|${c.tier}`; }), [
-    'Warlock|unit|2|2|magic', 'Thaumaturge|unit|3|3|magic', 'Glenmoril Witch|unit|4|4|rare', 'Demonologist|unit|4|3|rare',
-    'Tales and Tallows|spell|3|0|magic', "King Lysandus' Spectre|unit|6|7|legendary",
-  ]);
-  assert.deepEqual(FESTIVAL_CARD_IDS.map((id) => cardRules(cardById(id))), [
-    'Reveal: gain +1 magicka next turn.', 'Ongoing: your mage units here have +1 power.', 'Reveal: turn the weakest enemy unit here into a Rat.',
-    'Reveal: summon two Imps here.', 'Summon a Ghost here.', 'Reveal: enemy units lose 1 power.',
-  ]);
-  assert.ok(FESTIVAL_CARD_IDS.every((id) => cardFlavor(cardById(id)).length > 10));
-  for (const pool of Object.values(PACK_POOL)) for (const id of FESTIVAL_CARD_IDS) assert.ok(!pool.includes(id), `${id} in no pack`);
-  assert.deepEqual(FESTIVAL_WARES.filter((w) => w.kind === 'card').map((w) => w.key), FESTIVAL_CARD_IDS, 'sold by the Wyrd Sister alone');
-});
-
 test('WITCH1 THE WITCHFIRE AURA: its look and its own branch of the shader; its clocks whole on the aura\'s period', () => {
   assert.equal(AURA_LOOK.witchfire.kind, 13);
   assert.ok(Object.values(AURA_LOOK).filter((l) => l.kind === 13).length === 1, 'a kind of its own');
@@ -176,7 +156,7 @@ test('WITCH1 THE WINDOW\'S ROWS AND PRESSES: the wares in their parts, the two t
   assert.deepEqual(rows.filter((r) => r.part === 'insignia').map((r) => r.id), [
     'title:witchwarden', 'aura:witchfire', 'icon:tallowskull', 'icon:twinmoons', 'icon:wyrdcauldron', 'earned:hearthkeeper', 'earned:starwarden', 'earned:soulcake',
   ]);   // PIN MOVED (AUDIT STAR8 T3): the Starwarden beside Hearthkeeper
-  assert.deepEqual([...new Set(rows.map((r) => r.part))], ['insignia', 'offering', 'raiment', 'cards']);
+  assert.deepEqual([...new Set(rows.map((r) => r.part))], ['insignia', 'offering', 'raiment']);
   const by = (id) => rows.find((r) => r.id === id);
   assert.deepEqual([by('title:witchwarden').owned, by('title:witchwarden').worn], [true, true]);
   assert.deepEqual([by('icon:twinmoons').owned, by('icon:twinmoons').worn], [true, false]);
@@ -191,9 +171,9 @@ test('WITCH1 THE WINDOW\'S ROWS AND PRESSES: the wares in their parts, the two t
   assert.equal(wyrdPress(by('earned:soulcake'), live).label, '3/10');
   assert.equal(wyrdPress(by('earned:soulcake'), live).why, "Earned by taking Soul Cakes from others' offerings.");
   assert.deepEqual(wyrdPress(by('aura:witchfire'), live), { label: '100 more', why: 'You need more Soul Cakes.' });
-  assert.deepEqual(wyrdPress(by('card:warlock'), live), { label: 'Buy', why: null });
-  assert.deepEqual(wyrdPress(by('card:warlock'), { ...live, shut: 'offline' }), { label: 'Buy', why: 'The Wyrd cannot hear you right now.' });
-  assert.deepEqual(wyrdPress(by('card:warlock'), { ...live, shut: 'guest' }), { label: 'Buy', why: 'Link an account to keep Soul Cakes.' }, 'a guest is told why (AUDIT WITCH1 F-M1)');
+  assert.deepEqual(wyrdPress(by('piece:wyrd-hood'), live), { label: 'Buy', why: null });
+  assert.deepEqual(wyrdPress(by('piece:wyrd-hood'), { ...live, shut: 'offline' }), { label: 'Buy', why: 'The Wyrd cannot hear you right now.' });
+  assert.deepEqual(wyrdPress(by('piece:wyrd-hood'), { ...live, shut: 'guest' }), { label: 'Buy', why: 'Link an account to keep Soul Cakes.' }, 'a guest is told why (AUDIT WITCH1 F-M1)');
   // the account unheard: its progress unknown, never a known nought (AUDIT WITCH1 G2)
   const unheard = wyrdRows({ wares: [], given: null, taken: null }, null, () => null, (it) => it?.name ?? '?');
   const of = (id) => unheard.find((r) => r.id === id);
@@ -248,7 +228,7 @@ test('WITCH1 THE WINDOW MOUNTED: the reason a press cannot be said (a guest\'s, 
       liveView.unmount();
       assert.equal(price('earned:hearthkeeper').textContent, '', 'its progress the press\'s word alone');
       assert.notEqual(kidsOf(row('item:offering'), 'broker-set')[0].textContent, kidsOf(row('item:offering'), 'broker-name')[0].textContent, 'the bowl\'s kind line is its own');
-      btn('card:warlock').onclick?.({ stopPropagation() {} });
+      btn('piece:wyrd-hood').onclick?.({ stopPropagation() {} });
       assert.ok(WYRD_CSS.includes('.wyrd-shell .broker-card { position: sticky; top: 0; }'));
       assert.ok(WYRD_CSS.includes('text-overflow: ellipsis'));
       // the relay comes back, no answer says so: the window looks again

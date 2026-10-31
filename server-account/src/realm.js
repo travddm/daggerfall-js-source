@@ -49,7 +49,6 @@ import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
 import { liquidWealthOf, customsAllowance, REALM_BIRTH_LEVEL, REALM_BIRTH_WEALTH_MAX } from '../../src/net/realm/realmGoldLaw.js';
-import { cardWorthOf, cardPacksOf, customsCardAllowance, STARTER_DECK_WORTH } from '../../src/net/card/cardWorthLaw.js';   // CARDS9: the cards' customs - the client's law   // AUDIT REALM2 S1: the first save, measured as customs measures it
 import { ID_RE, armsIssuable } from '../../src/net/identityToken.js';   // CUSTOMS-PASS: an account named by its id; INT7: the arms' claim
 import { isGuestShaped, isHandleShaped } from '../../src/net/handleShape.js';   // CUSTOMS-PASS: a handle and a guest's name, told apart by their shape alone
 import { isDeveloper } from './titles.js';   // CUSTOMS-PASS: a developer grants one
@@ -475,16 +474,11 @@ export function firstSaveRefusal(text, row) {
   try { save = JSON.parse(text); } catch { save = null; }
   const shaped = !!save && typeof save === 'object' && !Array.isArray(save);
   if (!row.origin_id) {
-    // CARDS9: and no more cards than the binder's gift - the starter deck's worth (net/card/cardWorthLaw.js). AUDIT CARDS-6 A1:
-    // and no sealed pack - chargen hands none, and the first save lands before the world is played
-    return shaped && save.level === REALM_BIRTH_LEVEL && liquidWealthOf(save) <= REALM_BIRTH_WEALTH_MAX && cardWorthOf(save) <= STARTER_DECK_WORTH && cardPacksOf(save) === 0 ? null : { error: 'realm-birth' };
+    return shaped && save.level === REALM_BIRTH_LEVEL && liquidWealthOf(save) <= REALM_BIRTH_WEALTH_MAX ? null : { error: 'realm-birth' };
   }
   let level = null;
   try { level = JSON.parse(row.summary ?? 'null')?.level ?? null; } catch { level = null; }
-  if (!(shaped && liquidWealthOf(save) <= customsAllowance(level))) return { error: 'customs-allowance' };
-  // CARDS9 (Tavern-Cards section 32): A CUSTOMS CHARACTER'S CARDS, at their worth, within the level's card allowance -
-  // customs' own bound (systems/realmCustoms.js cardCustoms takes the dearest past it on the client's copy)
-  return cardWorthOf(save) <= customsCardAllowance(level) ? null : { error: 'customs-cards' };
+  return shaped && liquidWealthOf(save) <= customsAllowance(level) ? null : { error: 'customs-allowance' };
 }
 
 /** INT2-INT6: the judge's columns on a character's row (migration 0096; AUTO-HOLD's timed hold, 0120; RPT1026-LEDGERLAW's
@@ -903,8 +897,6 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   // online"), and any character of the account may stock a trader in one now - so goods another of them has standing at
   // one wait, as a sale waits for them (homes.js releaseHome): the delete would leave them for sale at a trader gone
   if (Number((await db.prepare(HOME_VENDOR_STOCK_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
-  // AUDIT CARDS-4 A3: a card table's stake still held comes home to this character first (cards.js cashoutCards)
-  if (await db.prepare(`SELECT 1 FROM card_stakes WHERE player = ? AND char_id = ? AND status = 'held' LIMIT 1`).bind(playerId, id).first()) return { error: 'cards-held' };
   // AUDIT SEA VENTURES B4: gold owed it at sea, a wreck's goods held for it, and its own hold's goods due back come home
   // to it first (seaBounty.js, seaWreck.js) - deleted, they stood owed to no character for good
   if (await db.prepare(`SELECT 1 FROM sea_bounty_owed WHERE killer = ?1 AND killer_char = ?2 AND paid_at IS NULL

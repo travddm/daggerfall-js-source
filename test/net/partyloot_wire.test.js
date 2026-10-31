@@ -72,7 +72,6 @@ import * as RL from '../../src/systems/roomLoot.js';
 const { ROOM_PUT_RESAY_MS } = RL;
 import { egFindStruck, egFindKill } from '../../src/systems/eliteGates/egFind.js';   // the dungeon's find asks (a room's body's kill goes here, unregistered: false)
 import { fakeRoom } from '../fakeRoom.mjs';
-import '../../src/systems/card/cardSources.js';   // CARDS9's death handler registers at import, as the hosts load it
 import '../../src/scenes/physicalItemsLayer.js';   // PI1's
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
 import { appliedOwnerTm } from '../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount

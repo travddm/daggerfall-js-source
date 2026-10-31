@@ -106,3 +106,21 @@ export function chairSeatOf(aabb, matrix, probe, from) {
     eye: [cx, feetY + SEATED_EYE_HEIGHT, cz], pitch: 0, seatY,
   };
 }
+
+/** A seat with another player's seated feet within this of it, on the ground, is theirs. */
+export const SEAT_TAKEN_RADIUS = 0.3;
+
+/**
+ * The seats other players already sit in: the indices of `seats` with one of `feet` (their seated feet, in the same
+ * space) within SEAT_TAKEN_RADIUS on the ground.
+ * @param {{x: number, z: number}[]} seats
+ * @param {number[][]} feet
+ */
+export const takenSeats = (seats, feet) => seats.flatMap((s, i) => (feet.some((f) => Math.hypot(f[0] - s.x, f[2] - s.z) <= SEAT_TAKEN_RADIUS) ? [i] : []));
+
+/** The stick's throw that stands a seated player up, as a step would. */
+export const SEAT_STICK_LEAVE = 0.3;
+/** Does this frame's movement stand a seated player up: a move key, a jump (or any other press the host hands in - the
+ *  autorun latch, a swing key), or the stick thrown. */
+export const leavesSeat = (mv, jump) => !!(mv?.forwards || mv?.backwards || mv?.left || mv?.right || jump
+  || (mv?.analog && Math.hypot(Number(mv.analog.x) || 0, Number(mv.analog.y) || 0) > SEAT_STICK_LEAVE));

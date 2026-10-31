@@ -109,13 +109,9 @@ export const PSEUDO_ARCHIVES = Object.freeze([
 
 /** EVERY STRING PSEUDO-ARCHIVE. @type {ReadonlyArray<PseudoArchiveKey>} */
 export const PSEUDO_ARCHIVE_KEYS = Object.freeze([
-  K('cards', 'render/cardTableDraw.js', 'CARD_ARCHIVE', "the tavern's cards"),
-  K('cardtable', 'world/card/cardTableProp.js', 'CARD_TABLE_ARCHIVE', "the card table's cloth"),
   K('fxportal', 'scenes/portalFx.js', 'PORTAL_ARCHIVE', "the Portal Stone's vortex"),
   K('hcc', 'scenes/horseCartPool.js', 'HORSE_ARCHIVE', "Horses, Carts and Coaches"),
   K('htwaist-lantern', 'player/eyeOfTheBeholder/eotbLantern.js', 'LANTERN_ART_KEY', 'the waist lantern'),
-  K('iliac-cards', 'render/iliacTableDraw.js', 'ILIAC_ARCHIVE', "Iliac Hand's cards"),
-  K('kings-gambit', 'render/gambitTableDraw.js', 'GAMBIT_ARCHIVE', "The King's Gambit's board and pieces - render/gambitTableDraw.js (the merge of main)"),
   K('model-icon', 'ui/item/itemScroller.js', 'MODEL_ICON_ARCHIVE', "a model's icon in the item lists"),
   K('mw-stand', 'scenes/decor/decorRoom.js', 'MW_STAND_ARCHIVE', "a placed Morrowind stand's picture"),
 ]);

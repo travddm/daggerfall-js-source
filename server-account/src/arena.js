@@ -45,7 +45,7 @@ import {
   ARENA_TIERS, ARENA_TIER_BOUTS, ARENA_PAIR_DAY_MAX, ARENA_CHAMPION_MIN_BOUTS, arenaRatingOk, ARENA_ELO_MIN, ARENA_ELO_MAX,
   ARENA_CHAMPION_MIN_FOES, ARENA_PAIR_SEASON_MAX, ARENA_TICKET_RE, arenaNextOf, ARENA_BOUT_ID_RE, ARENA_ATTEMPT_LIFE_S,   // AUDIT ARENA-LADDER
 } from '../../src/net/arena/arenaLaw.js';
-import { boardNamesOf } from './boardNames.js';   // AUDIT CARDS-6 D3: a board's names wear every honour, Iliac Hand's too
+import { boardNamesOf } from './boardNames.js';   // AUDIT CARDS-6 D3: a board's names wear every honour
 import { renownQuestXp } from '../../src/net/renown.js';   // ARENA4b: a bout's Renown, sized as quests are
 import { reportRenownXp, renownTrackOf, renownCharacterOk } from './renownTracks.js';   // ARENA4b: credited through the renown law's own door
 import { shapeOf, keptFits } from './keptBoard.js';   // AUDIT LEAN-READS B1/B10: a kept board's shape, and its bound in bytes

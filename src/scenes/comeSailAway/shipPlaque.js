@@ -10,7 +10,7 @@
 // in from her side, and the board is a grid of those hits stood just proud of her (PLAQUE_STANDOFF) - so it follows a
 // flaring bow, any hull's, the mod's own fallbacks too. Her stern would not serve: a port ship's is a rounded V (a flat
 // board would stand 0.6 m off it at its ends) and the Large Boat's rudder stands in its middle. A name is read on each
-// side as a captain reads it from alongside - the world is drawn left-handed (render/cardTableDraw.js's note), so seen
+// side as a captain reads it from alongside - the world is drawn left-handed, so seen
 // from her starboard her bow is to the right and the starboard board runs aft to bow; the port board bow to aft.
 //
 //   HER PLANKING  the mesh most rays into her lower bows meet (`plankingOf`) - never a gunport's lid, a cathead or a

@@ -248,13 +248,10 @@ import { GRANT_MEASURE_SIG_HEADER, GRANT_MEASURE_MAX_BYTES } from '../../src/net
 import { takeNetFeed, NET_FEED_PATH } from './staffNet.js';   // STAFF-PANEL5-FEEDS: the relay's net feed, its door in
 import { takeReactionFeed, REACTION_FEED_PATH } from './staffReactions.js';   // STAFF-PANEL5-FEEDS: the bot check's episodes, their door in
 import { STAFF_FEED_SIG_HEADER, STAFF_FEED_MAX_BYTES } from '../../server/src/staffFeedLaw.js';
-import { stakeCards, cashoutCards } from './cards.js';   // CARDS6: a card table's stakes, escrowed
 import { seaBountyBoard, seaBountyPost, seaBountyCollect } from './seaBounty.js';   // SEA-BOUNTY: a freeport's bounty board on the open sea's killers
 import { crewHall, crewSign, crewRelease, CREW_STATUS } from './crewSigns.js';   // CREW-SIGNED: a crew hall's recruit signed once online
 import { seaSeasonBoard } from './seaSeason.js';   // SEA-SEASON: the sea's season boards
 import { seaWreck, seaPrizeCollect, seaPrizeReclaim } from './seaWreck.js';   // SHIP-PVP: a wreck at sea, and its prize
-import { deckOrderOf, claimIliac, iliacBoardOf } from './iliac.js';
-import { claimGambit, gambitBoardOf } from './gambit.js';   // KG6: The King's Gambit's season board and its GRANDMASTER   // CARDS10: a ranked seat's deck vouched for, Iliac Hand's season board and its title
 import { titleWorn, glyphsOf, glyphsHidden, auraWorn, iconWorn } from './titles.js';
 import { withHonours } from './honours.js';   // SIGN-BATCH: the three games' honours on a badge's row, in one batch
 import { claimArena, arenaAttempt, arenaBoardOf, arenaTeam, arenaRatingOf, ARENA_HONOUR_PATHS, ARENA_RENOWN_REGION } from './arena.js';   // ARENA4: the arena's records, its board, its banners, and the honours the mint reads
@@ -450,9 +447,6 @@ const RENT_STATUS = Object.freeze({
   'rent-taken': 409, 'rent-held': 409, 'rent-rooms': 409, 'rent-none': 409, 'rent-own': 403, 'realm-only': 403,
   'rent-rate': 429, 'no-rent-room': 404, 'no-home': 404,
 });
-/** AUDIT CARDS-6 D8: a card table's and a ranked deck's refusals that are not a bad request (400, the default): the service
- *  with no key to sign with, a guest asking for a ranked seat. */
-const CARDS_STATUS = Object.freeze({ 'cards-closed': 503, 'ranked-needs-account': 403 });
 /** PRIVATE-REPORT: a report's refusals that are not a bad request (400, the default). */
 const REPORT_STATUS = Object.freeze({ 'report-rate': 429, 'report-full': 409, 'no-report': 404, 'not-report-reader': 403 });
 /** SERVER-POST: the post's own refusals; a claim's realm words are REALM_STATUS's. */
@@ -1176,11 +1170,10 @@ const service = {
       // season's #1 (server-account/src/arena.js arenaHonoursOf) - so titles.js derives `grandchampion`, `arenachampion`
       // and the laurel from the arena's rows as it derives the founder from a date. Only on the doors that read a badge.
       // AUDIT SCALE4d A1: ON THE BINDING, never the mint's replica session - a #1 found stale is COUNTED AGAIN AND WRITTEN
-      // (arena.js championNow -> storeArenaChampion, iliac.js the same): counted off a replica as new as the session lookup,
+      // (arena.js championNow -> storeArenaChampion): counted off a replica as new as the session lookup,
       // the write put back a #1 a rated bout had just moved past, and the clock only re-stamps a kept #1
       const honoursCtx = { ...ctx, db: env.DB };
-      // CARDS10: and Iliac Hand's season #1 (iliac.js), on the same doors; KG6: and The King's Gambit's (gambit.js);
-      // SIGN-BATCH: the three games' reads in ONE batch (honours.js withHonours), each answered as its with*Honours answers; EG-E2: and
+      // SIGN-BATCH: the games' reads in ONE batch (honours.js withHonours), each answered as its with*Honours answers; EG-E2: and
       // the Spire Champions - the last season's Descent's top tens (egHonours.js), read beside them
       if (ARENA_HONOUR_PATHS.has(path)) who.player = await withEgHonours(honoursCtx, await withHonours(honoursCtx, who.player, nowS), nowS);
 
@@ -1651,34 +1644,6 @@ const service = {
         // season's ratings and its #1, the climb, the fastest Grand Champions, the banners and the Hall of Champions - and
         // the caller's own (`me`).
         return json(await arenaBoardOf(ctx, who.player, env), 200, origin);
-      }
-
-      if (path === '/v1/iliac/claim' && request.method === 'POST') {
-        // CARDS10: A RANKED GAME'S RECEIPT, CARRIED HERE BY AN ACCOUNT IT NAMES - the arena players' bout's law for Iliac
-        // Hand (iliac.js claimIliac): the signature, the account, one row a game, both ratings. A refusal says its rung.
-        const r = await claimIliac(ctx, who.player, body.receipt, await gatePublicKey(env, subtle));
-        if (r.error) return json({ error: r.error, ...(r.why ? { why: r.why } : {}) }, r.error === 'no-gate-key' || r.error === 'busy' ? 503 : r.error === 'not-yours' ? 403 : 400, origin);
-        return json(r, 200, origin);
-      }
-
-      if (path === '/v1/iliac/board' && request.method === 'POST') {
-        // CARDS10: ILIAC HAND'S SEASON BOARD (Tavern-Cards section 6.4: "a season board, the Arena's way, with a title for
-        // the top of it"), counted from the rows, and the caller's own.
-        return json(await iliacBoardOf(ctx, who.player, env), 200, origin);
-      }
-
-      if (path === '/v1/gambit/claim' && request.method === 'POST') {
-        // KG6: A RATED KING'S GAMBIT'S RECEIPT, CARRIED HERE BY AN ACCOUNT IT NAMES - Iliac Hand's law (gambit.js
-        // claimGambit): the signature, the account, one row a game, both ratings. A refusal says its rung.
-        const r = await claimGambit(ctx, who.player, body.receipt, await gatePublicKey(env, subtle));
-        if (r.error) return json({ error: r.error, ...(r.why ? { why: r.why } : {}) }, r.error === 'no-gate-key' || r.error === 'busy' ? 503 : r.error === 'not-yours' ? 403 : 400, origin);
-        return json(r, 200, origin);
-      }
-
-      if (path === '/v1/gambit/board' && request.method === 'POST') {
-        // KG6: THE KING'S GAMBIT'S SEASON BOARD (Kings-Gambit.md 10.7: "a season board the Arena's way ... whose #1 over 10
-        // games against 5 foes wears GRANDMASTER"), counted from the rows, and the caller's own.
-        return json(await gambitBoardOf(ctx, who.player, env), 200, origin);
       }
 
       if (path === '/v1/arena/team' && request.method === 'POST') {
@@ -2170,29 +2135,6 @@ const service = {
       if (path === '/v1/sea/season/board') {
         if (request.method !== 'POST') return no('method', 405, origin);
         return json(await seaSeasonBoard(ctx, who.player, body), 200, origin);
-      }
-
-      // ═══ CARDS6: A CARD TABLE'S STAKES ══════════════════════════════════
-      //
-      // Tavern-Cards section 23: a realm character's buy-in held here against the service's order, and the relay's cash-out
-      // receipt paid back into the record - each act its own batch, the gold and the row together (cards.js).
-      if (path.startsWith('/v1/cards/')) {
-        if (request.method !== 'POST') return no('method', 405, origin);
-        const cctx = { ...ctx, bucket: env.SAVES };
-        const act = {
-          '/v1/cards/stake': async () => stakeCards(cctx, who.player, env, body, await signingKey(env, subtle)),
-          '/v1/cards/cashout': async () => cashoutCards(cctx, who.player, env, body, await gatePublicKey(env, subtle)),
-          '/v1/cards/deck': async () => deckOrderOf(cctx, who.player, env, body, await signingKey(env, subtle)),   // CARDS10: a ranked seat's deck, vouched for
-        }[path];
-        if (!act) return no('not-found', 404, origin);
-        const r = await act();
-        if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);   // the record moved under the act, as a checkpoint's
-        // AUDIT CARDS-4 A4: and why a receipt was refused - the device keeps one refused on its signature or clock
-        // AUDIT CARDS-6 D7: and the card a short deck lacks (iliac.js deckOrderOf) - said nowhere, the vouch's "(card)" never
-        // could be; D8: the service without its key is the service's 503 (the token's own no-signing-key), and a guest's
-        // ranked seat the account's 403 (the arena's ladder-needs-account) - neither a bad request
-        if ('error' in r) return json({ error: r.error, ...(r.why ? { why: r.why } : {}), ...(typeof r.card === 'string' ? { card: r.card } : {}) }, CARDS_STATUS[r.error] ?? JUDGE_STATUS[r.error] ?? 400, origin);   // INT3: a held stake's own
-        return json(r, 200, origin);
       }
 
       // ═══ PROF5: THE MARKET ══════════════════════════════════════════

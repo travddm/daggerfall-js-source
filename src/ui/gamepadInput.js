@@ -338,9 +338,6 @@ export function attachGamepad(canvas, hooks = {}, { getPads = null, dispatch = s
     const helmUp = !overlay && !lb && !rb && !lootUp && !!hooks.helm?.up?.();
     if (P.helmUp && !helmUp) helmLetGo();
     P.helmUp = helmUp;
-    // AUDIT KG II C4: AT THE KING'S GAMBIT'S BOARD, THE D-PAD IS ITS CURSOR (Kings-Gambit.md 14.3) - the bare d-pad keeps its
-    // own codes, which the board reads; none reaches its world actions (map, log, rest, swap hands) mid-battle
-    const boardUp = !overlay && !lb && !rb && !lootUp && !helmUp && !!hooks.board?.up?.();
     const set = !xbOn ? null : lb && rb ? P.setOrder : lb ? 0 : rb ? 1 : null;
     const downNow = new Set();
     for (const code of CROSSBAR_CODES) if (padDown(code)) downNow.add(code);
@@ -352,7 +349,7 @@ export function attachGamepad(canvas, hooks = {}, { getPads = null, dispatch = s
         if (P.xbHeld.has(code)) { swallowed.add(code); wanted.delete(code); continue; }
         // PADPLUS3: the bare d-pad never reaches a slot - it is its own actions, one press each
         const bare = dpad[code];
-        if (bare && !lootUp && !helmUp && !boardUp) {
+        if (bare && !lootUp && !helmUp) {
           wanted.delete(code); swallowed.add(code);
           // PADPLUS10: a direction with a HOLD fires its tap on the release (below); one without fires on the press
           if (bare.hold) continue;
@@ -366,8 +363,8 @@ export function attachGamepad(canvas, hooks = {}, { getPads = null, dispatch = s
         const st = P.dh[code] ??= { t: -1, fired: false };
         if (!act.hold) { st.t = -1; continue; }
         const now = downNow.has(code);
-        if (now && !P.xbPrev.has(code)) { st.t = set === null && !lootUp && !helmUp && !boardUp ? 0 : -1; st.fired = false; }
-        if (st.t >= 0 && (set !== null || lootUp || helmUp || boardUp)) st.t = -1;   // a bumper, a loot plaque, the helm or the board took the press
+        if (now && !P.xbPrev.has(code)) { st.t = set === null && !lootUp && !helmUp ? 0 : -1; st.fired = false; }
+        if (st.t >= 0 && (set !== null || lootUp || helmUp)) st.t = -1;   // a bumper, a loot plaque or the helm took the press
         if (st.t < 0) continue;
         if (now) {
           st.t += dt;

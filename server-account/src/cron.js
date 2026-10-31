@@ -64,8 +64,6 @@ import { sweepCraftWrits } from './craftWrits.js';   // CRAFT-WRITS: an unfilled
 import { retryFreezePushes, sweepStaffChat } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: a freeze's push again, the staff chat's sweep
 import { SESSION_IDLE_S } from './accounts.js';
 import { storeArenaChampion, ARENA_CHAMPION_CLOCK_S } from './arena.js';
-import { iliacChampionClock } from './iliac.js';   // CARDS10: Iliac Hand's season #1, counted the arena's way
-import { gambitChampionClock } from './gambit.js';   // KG6: The King's Gambit's season #1, the same way
 import { countedDb } from './metrics.js';
 import { maintaining } from './service.js';
 import { WRIT_SETTLE_MAX } from '../../src/net/writLaw.js';
@@ -173,10 +171,6 @@ export const MINUTE_JOBS = Object.freeze([
     await storeArenaChampion(ctx, season, ctx.nowS);
     return 1;
   }],
-  // CARDS10: Iliac Hand's season #1, the arena's law (iliac.js iliacChampionClock) - counted only after a rated game
-  ['iliac-champion', async (ctx) => iliacChampionClock(ctx)],
-  // KG6: The King's Gambit's season #1 - its GRANDMASTER (gambit.js gambitChampionClock), Iliac Hand's law
-  ['gambit-champion', async (ctx) => gambitChampionClock(ctx)],
   // REZ-BLOODLINE AUDIT R1 (legacy.js settleHolds): a fall the death door held for a party's Resurrect whose window closed
   // with no tab to close it - a page killed under its death screen - takes what a tombstone takes with it (its union, its
   // guild seat, its pieces). The window is the realm's own (REZ_HOLD_S), so the minute is the read that catches it

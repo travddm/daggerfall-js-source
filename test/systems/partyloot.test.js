@@ -52,7 +52,6 @@ import * as RL from '../../src/systems/roomLoot.js';
 import { ITEM_TEMPLATES } from '../../src/characters/paperdoll/paperdoll.js';
 import { planTake, applyTransfer } from '../../src/systems/item/itemTransfer.js';
 import { runBulk, bulkVerdict } from '../../src/ui/storeBulk.js';
-import '../../src/systems/card/cardSources.js';   // CARDS9's death handler registers at import, as the hosts load it
 import '../../src/scenes/physicalItemsLayer.js';   // PI1's
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS, eliteTraits };   // AUDIT WORLD-EVENTS; and the elite's trait off its pick's seed (BOSS-TRAITS - applyEliteScaling, which CHAMP-BASE's harness mounts)
@@ -507,9 +506,11 @@ test('PARTY-LOOT, HOST ARBITRATES: a host that LEAVES mid-claim neither dupes no
   setPref('quickLoot', true);
   const r = room3();
   fall(r);
-  const key = KEYS.find((k) => baseRows(shown(r.B, k)).length >= 3);
+  // three pieces each its own row: two piles of gold share one key, and a pile left behind would read as one not taken
+  const ownRows = (list) => list.filter((it) => !RL.isPersonalLoot(it) && list.filter((o) => pieceKey(o) === pieceKey(it)).length === 1);
+  const key = KEYS.find((k) => ownRows(shown(r.B, k)).length >= 3);
   assert.ok(key, 'a container with three pieces of the room\'s');
-  const [x, y, z] = shown(r.B, key).filter((it) => !RL.isPersonalLoot(it));
+  const [x, y, z] = ownRows(shown(r.B, key));
   const n = (it) => RL.pieceCount(it);
   const b0 = { x: holding(r.B, x), y: holding(r.B, y), z: holding(r.B, z) }, c0 = { x: holding(r.C, x), y: holding(r.C, y) };
   // X: B's claim, answered by the host before it goes - granted, and said to everyone

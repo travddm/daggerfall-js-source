@@ -10,8 +10,8 @@
 // magicOrBetter at a boss's source; A PANOPLY PIECE when the Panoply's own draw says so (net/eliteGates/egPay.js egPanoplyHit - its
 // own stream, so the account service reads a miss for its pity without the ladder) or the service's pity forces it,
 // the piece's choice ONE draw, always taken; THE LORD'S NAMED LEGENDARY 1 in EG_LORD_ARM_IN (systems/eliteGates/egLordArms.js);
-// the ladder's last pass; THE LORD'S CARD (systems/bossCards.js bossCardRoll by its key); then the sockets, the gem and
-// the technique pass, the gate's.
+// the ladder's last pass; one spare draw on a lord's pass (rollPass says why); then the sockets, the gem and the
+// technique pass, the gate's.
 //
 // A VALKYNAZ'S REDOUBT ROLLS TWICE, two seeds from the receipt's (net/eliteGates/egPay.js egPassSeed). THE WEEK: a Redoubt's number
 // pays once an account an arena week - the account service answers whether this claim paid (server-account/src/eg.js),
@@ -20,7 +20,7 @@
 // AUDIT EG III (lane2 #1; section 16.3): THE RELIQUARIES' ROLLS - each Reliquary a good end opens (the end receipt's `rl` as
 // the account service answers it: the circles that pay this week) is one more pass at its Redoubt's depth, rolled on its own
 // seed off the END receipt's (egReliquarySeed), its Panoply at twice the Redoubt's chance (EG_RELIQUARY_PANOPLY_X, its own
-// stream - no pity: the service never sees a Reliquary's roll), no lord's arm nor card (a Reliquary is no lord's).
+// stream - no pity: the service never sees a Reliquary's roll), no lord's arm (a Reliquary is no lord's).
 //
 // AUDIT EG V (2026-10-15; sections 16.1, 16.3 and 19): THE SEED IS THE CLAIM'S - a receipt's spoils and an end's Reliquaries
 // roll on the seed the account service answers its claim with (`seed` - net/eliteGates/egPay.js egSpoilsSeed: the receipt's `c` mixed
@@ -33,7 +33,6 @@ import { seededRng } from '../wind/wind.js';
 import { spoilsBase, magicOrBetter, sigilStone, SPOILS_SOURCE } from '../gate/gateSpoils.js';
 import { applyRarity, lastPass, socketPass, weaponSocketPass, techniquePass } from '../loot/lootRarity.js';
 import { bossGems } from '../gems.js';
-import { bossCardRoll } from '../bossCards.js';
 import { mintPanoplyPiece } from '../aetheric.js';   // EG15: THE BATTLEMAGE'S PANOPLY's nine records - which piece, one draw
 import { egLordArm } from './egLordArms.js';
 import { RANDOM_TREASURE_ICONS } from '../loot/loot.js';
@@ -77,7 +76,7 @@ function graded(item, tier, rolls) {
 export const egSpoilsGold = (lv, w) => EG_SPOILS_GOLD_PER_LEVEL * Math.max(1, lv) * Math.min(EG_SPOILS_GOLD_MAX, 1 + EG_SPOILS_GOLD_STEP * (Math.max(1, w | 0) - 1));
 
 /**
- * ONE PASS of a Redoubt's spoils: `{ gold, pieces: [{ item, tier }], card, gems }`. `o.panoply` whether its Panoply piece
+ * ONE PASS of a Redoubt's spoils: `{ gold, pieces: [{ item, tier }], gems }`. `o.panoply` whether its Panoply piece
  * comes (its choice one draw either way).
  * @param {number} seed the pass's seed @param {number} lv @param {number} w the Redoubt
  * @param {{ lord?: string, panoply: boolean }} o
@@ -96,12 +95,14 @@ function rollPass(seed, lv, w, o) {
   const named = rolls() * EG_LORD_ARM_IN < 1 && o.lord ? egLordArm(o.lord, lv, rolls) : null;
   if (named) pieces.push({ item: named, tier: named.rarity });
   lastPass(pieces.map((p) => p.item), rolls);
-  const card = o.lord ? bossCardRoll(o.lord, rolls) : null;
+  // The lord's card was drawn here before the card games were removed: its draw is still taken, so the sockets, the
+  // gem and the technique pass roll for a seed as they did.
+  if (o.lord) rolls();
   socketPass(pieces.map((p) => p.item), rolls);
   weaponSocketPass(pieces.map((p) => p.item), rolls);
   const gems = bossGems('gate', rolls);
   techniquePass(pieces.map((p) => p.item), rolls);
-  return { gold, pieces, card, gems };
+  return { gold, pieces, gems };
 }
 
 /**
@@ -115,13 +116,13 @@ export function rollEgSpoils(seed, level, w, { lord = '', pity = [], goldOnly = 
   const lv = Math.max(1, Math.floor(Number(level) || 1));
   const passes = [];
   for (let p = 0; p < egSpoilsPasses(w); p++) {
-    if (goldOnly) { const r = seededRng(egPassSeed(seed, p)); passes.push({ gold: Math.round(egSpoilsGold(lv, w) * (0.8 + 0.4 * r())), pieces: [], card: null, gems: [] }); continue; }
+    if (goldOnly) { const r = seededRng(egPassSeed(seed, p)); passes.push({ gold: Math.round(egSpoilsGold(lv, w) * (0.8 + 0.4 * r())), pieces: [], gems: [] }); continue; }
     passes.push(rollPass(egPassSeed(seed, p), lv, w, { lord, panoply: pity.includes(p) || egPanoplyHit(seed >>> 0, w, p) }));
   }
   return passes;
 }
 
-/** The spoils as the pool throws them (scenes/spoilsPool.js's pieces): each pass's items, its card, its gems, then its
+/** The spoils as the pool throws them (scenes/spoilsPool.js's pieces): each pass's items, its gems, then its
  *  gold - the Hour's order - each dressed in the treasure flat the seed chooses. AUDIT EG V (lane8 L8-2): `o.embers` the
  *  Deadlands Embers the claim paid, one stack thrown last (egEmberStack), its flat drawn after every other. Pure.
  * @param {number} seed @param {number} level @param {number} w @param {{ lord?: string, pity?: number[], goldOnly?: boolean, embers?: number }} [o] */
@@ -149,7 +150,6 @@ function dressed(seed, passes, embers = null) {
   for (const s of passes) {
     for (const p of s.pieces) out.push({ kind: 'item', item: p.item, tier: p.tier, record: flat() });
     const gold = { kind: 'gold', gold: s.gold, tier: 'common', record: flat() };
-    if (s.card) out.push({ kind: 'item', item: s.card, tier: 'aetheric', record: flat() });
     for (const g of s.gems) out.push({ kind: 'item', item: g, tier: 'common', record: flat() });
     out.push(gold);
   }

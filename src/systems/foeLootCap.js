@@ -44,11 +44,7 @@ import { wildFoeLoot } from './wild/wildZone.js';   // WILD1: a foe of the open 
 import { isPotion } from './useItem.js';   // CAP-SUPPLIES: a potion IS the glass bottle - DFU's IsPotion, its one export (AUDIT 625 L7)
 import { ENEMY_BASICS } from '../characters/enemy/enemyBasics.js';   // KIT-ROLL: the row every host hands its spawn
 import { renownLootQuarters, lootEased } from './renownLoot.js';
-import { isCardRecord } from '../net/card/cardWorthLaw.js';   // CARDS9: a foe's card   // RENOWN-LOOT: the plain ladder by the roller's Renown
 
-/** CARDS9 (Tavern-Cards section 32): A FOE'S CARD IS KEPT AS A MAGIC PIECE - its one rare draw is never thrown away for a
- *  common blade (rank 2: past a supply's 1 and a Common piece's 0, level with a Magic piece's). */
-export const CARD_CAP_RANK = 2;
 /** The most a plain foe's body carries, gold included. */
 export const PLAIN_FOE_LOOT_CAP = 3;
 /** ...and a plain foe's in an Elite Dungeon. */
@@ -123,7 +119,7 @@ const GARMENT_UNDER_SUPPLY = 0.5;
 // AUDIT LOOT II A9: with the ladder on - off, a garment ranks as it always did (a DFU magic shirt, Magic by its
 // enchantment, over a potion: law 6)
 const garmentRank = (it) => (lootRarityOn() && isGarment(it) && rarityRank(it) > 0 && rarityRank(it) < RARITIES.legendary.rank ? GARMENT_UNDER_SUPPLY : null);
-const capRank = (it) => { if (isCardRecord(it)) return CARD_CAP_RANK; const r = rarityRank(it); const g = garmentRank(it); if (g != null) return g; return r > 0 ? 1 + r : (isLootSupply(it) ? 1 : 0); };
+const capRank = (it) => { const r = rarityRank(it); const g = garmentRank(it); if (g != null) return g; return r > 0 ? 1 + r : (isLootSupply(it) ? 1 : 0); };
 
 /** STUCK-ARROWS (bible/05-Combat/Arrow-Supply.md, Mac: "Allow arrows to sometimes be retrieved from enemies"): AN ARROW
  *  IS NO FIND. The shafts the player put into a body (combat/arrowFlight.js playerArrowHitFoe) and an archer's own quiver

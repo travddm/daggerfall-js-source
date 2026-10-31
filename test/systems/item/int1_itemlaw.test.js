@@ -51,7 +51,7 @@ test('INT1: every item every honest producer mints carries no finding - in the s
   assert.deepEqual(honestItemsSkipped, [], 'every producer ran headless');
   const sources = new Set(SWEEP.map((s) => s.source));
   // PIN MOVED (its audit): the producers counted exactly - a producer dropped from the sweep is a hole, never a pass
-  assert.equal(sources.size, 91, `the sweep's producers: ${sources.size}`);   // PIN MOVED (AUDIT MAKER-RARE A1): + the temple's lift after the maker; PIN MOVED (MAKER-RARE): + the item maker over an identified Rare; PIN MOVED (STAFF-EVENT THE REWARD): + staffEventSpoils.staffSpoilsList; PIN MOVED (AUDIT QUESTLINES REWARD-9): + qlRewards.rollRewardChoice; PIN MOVED (KEY-LAW): + the Weir Key; PIN MOVED (TECH1): + lootRarity.addTechniqueLine and what may follow it; PIN MOVED (AUDIT CAPTAIN'S SEA B12): + the exchange's goods and the treasure chart
+  assert.equal(sources.size, 90, `the sweep's producers: ${sources.size}`);   // PIN MOVED (AUDIT MAKER-RARE A1): + the temple's lift after the maker; PIN MOVED (MAKER-RARE): + the item maker over an identified Rare; PIN MOVED (STAFF-EVENT THE REWARD): + staffEventSpoils.staffSpoilsList; PIN MOVED (AUDIT QUESTLINES REWARD-9): + qlRewards.rollRewardChoice; PIN MOVED (KEY-LAW): + the Weir Key; PIN MOVED (TECH1): + lootRarity.addTechniqueLine and what may follow it; PIN MOVED (AUDIT CAPTAIN'S SEA B12): + the exchange's goods and the treasure chart
   assert.ok(SWEEP.length >= 30_000, `the sweep's items: ${SWEEP.length}`);
   // AUDIT MAKER-RARE C3: the item maker's Rare run is held to what it is for - every group a Rare rolls on, found and
   // crafted, and every cursed Rare the doors minted, each lifted at the temple after (A1: a bound soul's forced row of the
@@ -129,7 +129,6 @@ test('INT1: the forgeries the old wire validator took, each from an honest piece
     ['the skeleton key\'s picture on a dagger', { ...common, worldTextureArchive: 432, worldTextureRecord: 20 }, 'artifact'],
     ['a sword that vanishes', { ...honest((it) => it.group === 'Weapons' && it.templateIndex === 121 && !it.rarity, 'a claymore'), timeForItemToDisappear: 10 }, 'summoned'],
     ['a classic flag on a port dagger', { ...common, flags: 0x10 }, 'flags'],
-    ['a card no catalog prints', { ...honest((it) => typeof it.card === 'string', 'a card'), card: 'no-such-card' }, 'card'],
     ['a potion at 30% potent', { ...honest((it) => it.templateIndex === 83, 'a potion'), potent: 30 }, 'crafted'],
     ['a quality with no craft', { ...common, quality: 4 }, 'crafted'],
     ['an id that is no id', { ...magicSword, uid: 'x' }, 'uid'],
@@ -227,7 +226,6 @@ test('INT1 (its audit): the honest shapes the law refused - a curse the temple L
   for (const soul of [43, 127, 147]) assert.ok(itemFindings({ ...gem, trappedSoulType: soul }).includes('soul'), `soul ${soul}`);
   const common = honest((it) => it.group === 'Weapons' && it.templateIndex === 113 && !it.rarity && !it.magic && !(it.enchantments ?? []).length, 'a common dagger');
   assert.ok(itemFindings({ ...common, enchantments: [null] }).includes('enchantments'));
-  assert.ok(itemFindings({ ...honest((it) => it.templateIndex === 582, 'a Card Binder'), decks: [null] }).includes('card'));
   // a foe's blade carries one of the eight weapon poisons (DFU's EnemyEntity: Nux Vomica to Thyrwort) - the four after
   // them are drugs, drunk and never on a blade
   assert.deepEqual(itemFindings({ ...common, poisonType: POISON_START_VALUE }), [], 'the first poison');

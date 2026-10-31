@@ -33,9 +33,9 @@ import { REVENANT_MIN_RENOWN } from '../revenant/revenant.js';   // AUDIT QUESTL
  * @typedef {{ quest: string, title: () => string, needs?: ReadonlyArray<LineNeed> }} LineStep
  *   `needs` what the step's deed cannot be done without (AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6): the step waits,
  *   saying so, until each holds - never started to fail every day
- * @typedef {'lootRarity'|'kingsGambit'|'naval'|'renown'|'starfall'} LineNeed
- *   `lootRarity` Loot rarity on (a socket, a reforge); `kingsGambit` The King's Gambit on (its table); `naval` Naval
- *   Combat on (the sea's own deeds); `renown` the Renown a revenant comes at (revenant.js REVENANT_MIN_RENOWN, online);
+ * @typedef {'lootRarity'|'naval'|'renown'|'starfall'} LineNeed
+ *   `lootRarity` Loot rarity on (a socket, a reforge); `naval` Naval Combat on (the sea's own deeds); `renown` the
+ *   Renown a revenant comes at (revenant.js REVENANT_MIN_RENOWN, online);
  *   `starfall` (STAR8) the Starfall running - the Witches' Festival's days (net/festivalLaw.js, through
  *   net/starfall/starfallLaw.js starfallRuns), when stars fall to be held
  * @typedef {{ level?: number, after?: string, online?: boolean, account?: boolean, event?: LineNeed }} LineOpens
@@ -184,17 +184,6 @@ export const QL_LINES = Object.freeze([
     ],
   }),
   line({
-    id: 'introTables', group: 'intro', tier: 1, post: 'board',
-    title: () => t('ql.line.introTables', 'A Seat at the Table'),
-    lead: () => t('ql.line.introTables.lead', 'A tavern regular is looking for someone new to lose to. Or, better, to beat.'),
-    giver: () => t('ql.line.introTables.giver', 'a tavern regular'),
-    opens: { level: 2 },
-    steps: [
-      { quest: 'QLIT01', title: () => t('ql.step.QLIT01', 'A Hand of Cards') },
-      { quest: 'QLIT02', title: () => t('ql.step.QLIT02', 'The King’s Gambit'), needs: ['kingsGambit'] },
-    ],
-  }),
-  line({
     id: 'introArena', group: 'intro', tier: 2, post: 'board',
     title: () => t('ql.line.introArena', 'The Herald’s Call'),
     lead: () => t('ql.line.introArena.lead', 'The Arena’s Herald is calling for new blood, and pays the first purse in advance of glory.'),
@@ -275,7 +264,6 @@ export const eventHolds = (l, probe) => !l.opens.event || (probe.need?.(l.opens.
 /** A step's need, in words - the window's "Opens with ..." (the Features rows' own names). */
 const NEED_WORDS = Object.freeze({
   lootRarity: () => t('ql.line.needs.lootRarity', 'with Loot rarity on'),
-  kingsGambit: () => t('ql.line.needs.kingsGambit', 'with The King\u2019s Gambit on'),
   naval: () => t('ql.line.needs.naval', 'with Naval Combat on'),
   renown: () => t('ql.line.needs.renown', 'at Renown {n}', { n: REVENANT_MIN_RENOWN }),
   starfall: () => t('ql.line.needs.starfall', 'during the Witches’ Festival'),   // STAR8

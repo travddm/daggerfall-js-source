@@ -134,11 +134,6 @@
   "tr": "10feca3dca49",
   "by": "claude-in-session"
  },
- "cards.cashout.banked": {
-  "en": "dbeb3e2bdded",
-  "tr": "ff759a9a75b7",
-  "by": "claude-in-session"
- },
  "chair.bench": {
   "en": "931fa888a4a9",
   "tr": "aa91a5219116",
@@ -474,11 +469,6 @@
   "tr": "925871fca06f",
   "by": "claude-in-session"
  },
- "coll.how.grandmaster": {
-  "en": "3573e80976e9",
-  "tr": "1653f3d3a255",
-  "by": "claude-in-session"
- },
  "coll.how.hearthkeeper": {
   "en": "9aaba1a1fcbb",
   "tr": "03dc4ba3058c",
@@ -492,11 +482,6 @@
  "coll.how.hoursfirst": {
   "en": "95f2d9728c51",
   "tr": "2b02d1db3950",
-  "by": "claude-in-session"
- },
- "coll.how.iliacchampion": {
-  "en": "f1cc281162fe",
-  "tr": "33e8b3339339",
   "by": "claude-in-session"
  },
  "coll.how.ilovelamp": {
@@ -724,11 +709,6 @@
   "tr": "68452e6cb9c1",
   "by": "claude-in-session"
  },
- "coll.part.cards": {
-  "en": "0f830bc25e52",
-  "tr": "91b7735c3069",
-  "by": "claude-in-session"
- },
  "coll.part.codex": {
   "en": "2c5d5b88672d",
   "tr": "cdec333f6960",
@@ -795,8 +775,8 @@
   "by": "claude-in-session"
  },
  "coll.src.ranked": {
-  "en": "d8e0013d70f6",
-  "tr": "5ed7f43f0389",
+  "en": "f718846620df",
+  "tr": "0401ee67fa3f",
   "by": "claude-in-session"
  },
  "coll.src.seats": {

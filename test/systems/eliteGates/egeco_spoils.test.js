@@ -1,11 +1,8 @@
 // EG-E (2026-10-12, the Elite Gates arc; bible/11-Multiplayer/Elite-Gates.md section 19, REWARDS AND THE ECONOMY): A
-// REDOUBT'S SPOILS - the lords' named Legendaries (systems/eliteGates/egLordArms.js) and the lords' own cards (net/iliac/iliacCards.js,
-// systems/bossCards.js BOSS_CARDS by lord key).
+// REDOUBT'S SPOILS - the lords' named Legendaries (systems/eliteGates/egLordArms.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EG_LORD_ARMS, egLordArm } from '../../../src/systems/eliteGates/egLordArms.js';
-import { BOSS_CARDS, BOSS_CARD_PER_MILLE, bossCardRoll } from '../../../src/systems/bossCards.js';
-import { cardById } from '../../../src/net/iliac/iliacCards.js';
 import { EG_LORDS } from '../../../src/net/eliteGates/egLaw.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 import { validLootItem } from '../../../src/systems/loot/loot.js';
@@ -38,26 +35,6 @@ test('EG-E THE LORDS\' NAMED LEGENDARIES (section 19): each of the thirteen lord
   assert.equal(egLordArm('kynreeve', 20, seededRng(1)), null, 'a champion drops none');
 });
 
-test('EG-E THE LORDS\' CARDS (section 19): each lord its own aetheric unit card by its key in BOSS_CARDS, at the gate\'s rate (200 per mille), one draw whatever it answers; a champion\'s key draws once and finds none (mutants: a lord\'s rate; a card past the tier)', () => {
-  for (const k of LORDS) {
-    const id = BOSS_CARDS[k];
-    assert.ok(id, `${k}: its card`);
-    const c = cardById(id);
-    assert.equal(c.tier, 'aetheric', id);
-    assert.equal(c.kind, 'unit', id);
-    assert.equal(BOSS_CARD_PER_MILLE[k], 200, `${k}: the gate's rate`);
-    let n = 0;
-    const yes = () => { n++; return 0.1999; };
-    assert.equal(bossCardRoll(k, yes)?.card, id);
-    assert.equal(bossCardRoll(k, () => { n++; return 0.2; }), null);
-    assert.equal(n, 2, 'one draw each');
-  }
-  assert.equal(new Set(LORDS.map((k) => BOSS_CARDS[k])).size, LORDS.length, 'thirteen cards, no two the same');
-  let n = 0;
-  assert.equal(bossCardRoll('kynreeve', () => { n++; return 0; }), null);
-  assert.equal(n, 1);
-});
-
 test('EG-E A REDOUBT\'S SPOILS (section 19): gold that grows a tenth a Redoubt to three times; one Rare or Legendary piece (the Legendary 20% at Redoubt 1 to 65%); one to three magicOrBetter; the same seed the same spoils; a Valkynaz\'s twice on two seeds; a Redoubt taken again this week its gold alone (mutants: the second pass on the first\'s seed; the gold-only roll still throwing pieces; a fourth magicOrBetter)', () => {
   const at = (w, o) => rollEgSpoils(0x9e3779b9, 20, w, o);
   assert.equal(at(1).length, 1); assert.equal(at(5).length, 2, 'a Valkynaz\'s Redoubt rolls twice');
@@ -77,24 +54,21 @@ test('EG-E A REDOUBT\'S SPOILS (section 19): gold that grows a tenth a Redoubt t
   assert.ok(legendary / n > 0.1 && legendary / n < 0.32, `about a fifth Legendary at Redoubt 1 (${legendary / n})`);
   const gold = rollEgSpoils(77, 20, 5, { lord: 'ilthys', goldOnly: true });
   assert.equal(gold.length, 2);
-  assert.ok(gold.every((p) => p.pieces.length === 0 && p.card === null && p.gems.length === 0 && p.gold > 0), 'its gold alone');
+  assert.ok(gold.every((p) => p.pieces.length === 0 && p.gems.length === 0 && p.gold > 0), 'its gold alone');
   assert.deepEqual(egSpoilsList(77, 20, 5, { goldOnly: true }).map((x) => x.kind), ['gold', 'gold']);
 });
 
-test('EG-E THE LORD\'S ARM AND CARD IN THE SPOILS (section 19): the named Legendary about 1 in 8 at its lord\'s Redoubt, the card about 1 in 5, each thrown after the pieces; a list\'s card after its pass\'s items and before its gold (mutants: the arm every time; the card before the pieces)', () => {
-  let arms = 0, cards = 0;
+test('EG-E THE LORD\'S ARM IN THE SPOILS (section 19): the named Legendary about 1 in 8 at its lord\'s Redoubt, thrown with the pieces; a list\'s gold last (mutants: the arm every time)', () => {
+  let arms = 0;
   const N = 800;
   for (let s = 1; s <= N; s++) {
     const [p] = rollEgSpoils((s * 2246822519) >>> 0, 20, 2, { lord: 'twins' });
     if (p.pieces.some((x) => x.item.name === EG_LORD_ARMS.twins.name)) arms++;
-    if (p.card) { cards++; assert.equal(p.card.card, BOSS_CARDS.twins); }
   }
   assert.ok(Math.abs(arms / N - 1 / 8) < 0.04, `about 1 in 8 (${arms / N})`);
-  assert.ok(Math.abs(cards / N - 0.2) < 0.05, `about 1 in 5 (${cards / N})`);
   for (let s = 1; s <= 60; s++) {
-    const seed = (s * 97) >>> 0, list = egSpoilsList(seed, 20, 2, { lord: 'twins' }), [p] = rollEgSpoils(seed, 20, 2, { lord: 'twins' });
+    const seed = (s * 97) >>> 0, list = egSpoilsList(seed, 20, 2, { lord: 'twins' });
     assert.equal(list.at(-1).kind, 'gold', 'its gold last');
-    if (p.card) assert.equal(list[p.pieces.length].item.card, BOSS_CARDS.twins, 'the card right after the pieces');
     for (const x of list) if (x.kind === 'item') assert.ok(validLootItem(JSON.parse(JSON.stringify(x.item))), 'the crash record\'s door takes each');
   }
   assert.deepEqual(egSpoilsOf(egSpoilsDay('0123456789abcdef', 12)), { b: '0123456789abcdef', w: 12 });

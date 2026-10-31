@@ -16,7 +16,6 @@ import { createQuestBridge } from '../../../src/scenes/quest/questBridge.js';
 import { createLineRunner, STEP_GAP_S, RETRY_GAP_S } from '../../../src/systems/questlines/qlLineRunner.js';
 import { QUESTLINES_PREF, questlinesOn } from '../../../src/systems/questlines/qlLaw.js';
 import { LOOT_RARITY_KEY } from '../../../src/systems/loot/lootRarity.js';
-import { KINGS_GAMBIT_KEY } from '../../../src/systems/features.js';
 import { setPref } from '../../../src/systems/uiPrefs.js';
 import { GUILD_GROUPS } from '../../../src/formats/factionFile.js';
 import { questSource, loadTables } from '../../qlSources.mjs';
@@ -27,7 +26,7 @@ import { TRACKER_PREF, _resetQuestTrackerForTests } from '../../../src/ui/quest/
 import { lineBoard } from '../../../src/scenes/quest/questlineOffers.js';
 
 loadTables();
-for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, KINGS_GAMBIT_KEY, 'naval']) setPref(k, true);
+for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, 'naval']) setPref(k, true);
 // NO LIVE TIMER RUNS HERE (GUIDE2's law): the pause tab's intervals are recorded, never run
 globalThis.setInterval = () => 0;
 globalThis.clearInterval = () => {};
@@ -80,7 +79,7 @@ test('QL-OFFERED THE LAW: a line whose gate holds is offered and never scheduled
   const runner = createLineRunner({ machine, ctx: { level: () => 30, online: () => false, nowSeconds: () => clock.s } });
   for (let i = 0; i < 24; i++) { runner.look(); machine.tick(); clock.s += STEP_GAP_S; }
   assert.deepEqual(machine.scheduled, [], 'a day in town: nothing sent');
-  assert.deepEqual(runner.rows().map((r) => [r.id, r.state, r.post]), [['introGear', 'offered', null], ['introSea', 'offered', null], ['introRoad', 'offered', null], ['introTables', 'offered', null]],
+  assert.deepEqual(runner.rows().map((r) => [r.id, r.state, r.post]), [['introGear', 'offered', null], ['introSea', 'offered', null], ['introRoad', 'offered', null]],
     'on offer, and only what may be taken - no locked line drawn; offline a town\'s board is DFU\'s rumour box, so none is posted there');
   assert.equal(runner.takeLine('burningDoors').reason, 'closed', 'an endgame line offline: not on offer');
   assert.equal(runner.takeLine('noSuchLine').reason, 'unknown');
@@ -100,76 +99,76 @@ test('QL-OFFERED THE LAW: a line whose gate holds is offered and never scheduled
 });
 
 test('QL-OFFERED THE TAKE, on the real bridge: nothing begins unasked; taken from the Quests tab, the first step\'s letter is in hand at once and in silence - no courier, no box - its journal entry written and its own clock counting, and the take said in the HUD (mutants: the start-up\'s letter on a courier again; the take unsaid)', () => {
-  const S = bridgeAt({ level: 2 });
+  const S = bridgeAt({ level: 4 });
   S.tick(6);
-  assert.equal(S.named('QLIT01'), null, 'nothing begun unasked');
-  assert.equal(S.row('introTables').state, 'offered');
-  const r = S.bridge.journalClean.takeLine('introTables');
+  assert.equal(S.named('QLIG01'), null, 'nothing begun unasked');
+  assert.equal(S.row('introGear').state, 'offered');
+  const r = S.bridge.journalClean.takeLine('introGear');
   assert.equal(r.ok, true);
-  assert.equal(r.text, 'You took up A Seat at the Table. It is on the Quests tab of the pause menu.');
+  assert.equal(r.text, 'You took up The Smith’s Secrets. It is on the Quests tab of the pause menu.');
   assert.ok(S.st.hud.includes(r.text), 'said in the HUD');
   S.tick(3);
-  const q = S.named('QLIT01');
+  const q = S.named('QLIG01');
   assert.ok(q, 'its first step running');
-  assert.ok(S.st.pack.includes(q.getItem({ name: 'card' }).daggerfallUnityItem), 'the card in the pack');
+  assert.ok(S.st.pack.includes(q.getItem({ name: 'note' }).daggerfallUnityItem), 'the note in the pack');
   assert.deepEqual(S.st.popups, [], 'taken, never sent: no courier\'s box');
   assert.deepEqual(q.getLogMessages().map((m) => m.messageID), [1010], 'its journal entry');
   assert.equal(q.getClock({ name: 'wait' }).clockEnabled, true, 'its thirty days counting from the take');
-  assert.equal(S.row('introTables').state, 'running');
-  assert.equal(S.bridge.journalClean.takeLine('introTables').text, 'That questline is not on offer now.', 'taken once');
+  assert.equal(S.row('introGear').state, 'running');
+  assert.equal(S.bridge.journalClean.takeLine('introGear').text, 'That questline is not on offer now.', 'taken once');
 });
 
 test('QL-OFFERED A FIRST STEP THAT LAPSES IS OFFERED AGAIN, NEVER SENT AGAIN, on the real bridge: its thirty days run out (QuestFail), the line is back on offer with no record; days on, no copy of it has begun; taken again, it begins (mutants: the end\'s re-offer and the look\'s)', () => {
-  const S = bridgeAt({ level: 2 });
-  S.bridge.journalClean.takeLine('introTables');
+  const S = bridgeAt({ level: 4 });
+  S.bridge.journalClean.takeLine('introGear');
   S.tick(3);
-  S.named('QLIT01').getTask({ name: 'wait' }).start();   // its _wait_ clock's own task: "... found another" - `end quest`
+  S.named('QLIG01').getTask({ name: 'wait' }).start();   // its _wait_ clock's own task: "... found another" - `end quest`
   S.tick(6);
-  assert.equal(S.named('QLIT01'), null, 'ended');
-  assert.equal(S.bridge.questlines.runner.lineState('introTables'), null, 'its record let go');
-  assert.equal(S.row('introTables').state, 'offered', 'on offer again');
+  assert.equal(S.named('QLIG01'), null, 'ended');
+  assert.equal(S.bridge.questlines.runner.lineState('introGear'), null, 'its record let go');
+  assert.equal(S.row('introGear').state, 'offered', 'on offer again');
   S.st.s += 3 * 86400;
   S.tick(10);
-  assert.equal(S.named('QLIT01'), null, 'three days on: never sent again');
-  assert.equal(S.bridge.journalClean.takeLine('introTables').ok, true, 'taken again');
+  assert.equal(S.named('QLIG01'), null, 'three days on: never sent again');
+  assert.equal(S.bridge.journalClean.takeLine('introGear').ok, true, 'taken again');
   S.tick(3);
-  assert.ok(S.named('QLIT01'));
+  assert.ok(S.named('QLIG01'));
 });
 
-test('QL-OFFERED A TAKEN LINE\'S LATER STEPS STILL COME, on the real bridge: the first step finished (a hand won, its regular told), the second begins an hour on with no take of its own (mutants: a later step left to a take)', () => {
-  const S = bridgeAt({ level: 2 });
-  S.bridge.journalClean.takeLine('introTables');
+test('QL-OFFERED A TAKEN LINE\'S LATER STEPS STILL COME, on the real bridge: the first step finished (a gem set, its armorer told), the second begins an hour on with no take of its own (mutants: a later step left to a take)', () => {
+  const S = bridgeAt({ level: 4 });
+  S.bridge.journalClean.takeLine('introGear');
   S.tick(3);
-  const q = S.named('QLIT01');
-  S.bridge.questlines.act('cards-won', 1);
+  const q = S.named('QLIG01');
+  S.bridge.questlines.act('gem-socketed', 1);
   S.tick(3);
-  for (const r of q.resources.values()) if (r.isPerson && r.symbol?.name === 'regular') r.setPlayerClicked();
+  for (const r of q.resources.values()) if (r.isPerson && r.symbol?.name === 'smith') r.setPlayerClicked();
   S.tick(6);
   assert.ok(q.questComplete && q.questSuccess, 'the first step done');
-  assert.equal(S.bridge.questlines.runner.lineState('introTables').step, 1);
-  assert.equal(S.named('QLIT02'), null, 'not in the same breath');
+  assert.equal(S.bridge.questlines.runner.lineState('introGear').step, 1);
+  assert.equal(S.named('QLIG02'), null, 'not in the same breath');
   S.st.s += STEP_GAP_S;
   S.tick(3);
-  assert.ok(S.named('QLIT02'), 'an hour on, the next step - the line the player\'s');
+  assert.ok(S.named('QLIG02'), 'an hour on, the next step - the line the player\'s');
 });
 
 test('QL-OFFERED OLD SAVES KEEP THEIR PROGRESS: a save from before (QL0\'s records, no `taken`) loads every line it had begun where it stood - a first step whose letter came (its journal entry written) stays the player\'s, a later step stands; a first step SENT and never delivered (scheduled, no entry) is let go and its line is on offer; a first step with no quest goes back on offer; a line the player TOOK is never let go, its letter come or not (mutants: the migration unread; `taken` unread; the journal unread)', () => {
   const A = bridgeAt({ level: 30 });
-  A.bridge.machine.startQuestByName('QLIT01'); A.tick(2);   // QL0's runner began it, and its letter came
+  A.bridge.machine.startQuestByName('QLIS01'); A.tick(2);   // QL0's runner began it, and its letter came
   A.bridge.machine.startQuestByName('QLIG02'); A.tick(2);   // the Smith's Secrets at its second step
   A.bridge.machine.scheduleQuestByName('QLIR01');   // sent, its letter not come - saved before the next tick
   const snap = A.bridge.snapshot();
   const ql0 = (step) => ({ step, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1, lettered: 0 });
-  snap.questlines.lines = { introTables: ql0(0), introGear: ql0(1), introRoad: ql0(0), introSea: ql0(0) };
+  snap.questlines.lines = { introSea: ql0(0), introGear: ql0(1), introRoad: ql0(0) };
   const B = bridgeAt({ level: 30 });
   B.bridge.restore(structuredClone(snap));
   const runner = B.bridge.questlines.runner;
-  assert.equal(runner.lineState('introTables')?.step, 0, 'its letter came: the player\'s');
+  assert.equal(runner.lineState('introSea')?.step, 0, 'its letter came: the player\'s');
   assert.equal(runner.lineState('introGear')?.step, 1, 'a later step: where it stood');
   assert.equal(runner.lineState('introRoad'), null, 'sent and never delivered: let go');
   assert.ok(![...B.bridge.machine.questsToInvoke, ...B.bridge.machine.quests.values()].some((q) => q.questName === 'QLIR01' && !q.questTombstoned), 'its quest gone with it');
   B.tick(2);
-  assert.deepEqual(['introTables', 'introGear', 'introRoad', 'introSea'].map((id) => B.row(id)?.state), ['running', 'running', 'offered', 'offered']);
+  assert.deepEqual(['introSea', 'introGear', 'introRoad'].map((id) => B.row(id)?.state), ['running', 'running', 'offered']);
   // a line the player TOOK, its letter still to come: never let go
   const C = bridgeAt({ level: 30 });
   const snap2 = structuredClone(snap);
@@ -182,25 +181,25 @@ test('QL-OFFERED OLD SAVES KEEP THEIR PROGRESS: a save from before (QL0\'s recor
 
 test('QL-OFFERED THE NOTICE BOARD\'S WORK WANTED: online, the introductions on offer hang on the Notices tab, each its giver\'s letter under the town\'s seal; read large, a card\'s Take begins its line with the very quest its letter was read from, says so and comes down; a line begun is no card; every board the door opens posts them (mutants: the section dropped; the Take unwired; the card left up; the take a new draw; the door\'s source; the bridge unregistered)', async () => {
   const S = bridgeAt({ level: 20, online: true });
-  assert.ok(lineBoard()?.cards.some((c) => c.id === 'introTables'), 'the bridge posts its board on the page');
+  assert.ok(lineBoard()?.cards.some((c) => c.id === 'introGear'), 'the bridge posts its board on the page');
   const host = globalThis.document.createElement('div');
   mountNoticeBoard(host, { town: { name: 'Daggerfall', mapId: 5 }, book: quietBook(), questlines: () => S.bridge.lineOffers.board() });
   await settle();
   const head = byClass(host, 'notice-section').map((n) => n.textContent).find((h) => h.startsWith('Help wanted'));
   assert.ok(head, 'its section');
-  const cards = () => byClass(host, 'notice-card').filter((c) => /seal-town/.test(c.className) && c.textContent.includes('A Seat at the Table'));
-  assert.equal(cards().length, 1, 'A Seat at the Table hangs there');
-  assert.match(cards()[0].textContent, /a tavern regular/, 'its giver named');
+  const cards = () => byClass(host, 'notice-card').filter((c) => /seal-town/.test(c.className) && c.textContent.includes('The Smith’s Secrets'));
+  assert.equal(cards().length, 1, 'The Smith’s Secrets hangs there');
+  assert.match(cards()[0].textContent, /an armorer/, 'its giver named');
   cards()[0].click();
   const read = byClass(host, 'notice-read')[0];
-  assert.match(read.textContent, /every coin I own, and I have taken every coin they own/, 'its letter, its lines joined as one');
+  assert.match(read.textContent, /Every weapon worth carrying has room in it for a stone/, 'its letter, its lines joined as one');
   const take = byClass(host, 'notice-take')[0];
   assert.ok(take, 'its Take');
   take.click();
-  assert.equal(byClass(host, 'notice-word')[0].textContent, 'You took up A Seat at the Table. It is on the Quests tab of the pause menu.');
+  assert.equal(byClass(host, 'notice-word')[0].textContent, 'You took up The Smith’s Secrets. It is on the Quests tab of the pause menu.');
   assert.equal(cards().length, 0, 'its card down');
-  assert.equal(S.named('QLIT01'), S.read.get('introTables'), 'the letter read is the quest begun');
-  assert.equal(S.bridge.questlines.runner.lineState('introTables')?.taken, true);
+  assert.equal(S.named('QLIG01'), S.read.get('introGear'), 'the letter read is the quest begun');
+  assert.equal(S.bridge.questlines.runner.lineState('introGear')?.taken, true);
   // the next board: a line begun is no card - and the door posts the bridge's own, no host handing it
   const ov = createNoticeOverlay({ town: { name: 'Daggerfall', mapId: 5 }, book: quietBook(), onClose() {} });
   await settle(8);
@@ -208,7 +207,7 @@ test('QL-OFFERED THE NOTICE BOARD\'S WORK WANTED: online, the introductions on o
   try {
     const titles = byClass(door, 'notice-card').map((c) => c.textContent);
     assert.ok(titles.some((t) => t.includes('Written in the Stars')), 'the door\'s board posts them');
-    assert.ok(!titles.some((t) => t.includes('A Seat at the Table')), 'a line begun: no card');
+    assert.ok(!titles.some((t) => t.includes('The Smith’s Secrets')), 'a line begun: no card');
   } finally { ov.dispose(); }
 });
 
@@ -270,10 +269,10 @@ test('QL-OFFERED THE QUESTS TAB: a questline\'s running step is drawn under its 
   const quest = (id, name, questName) => ({ id, name, questName, clockSeconds: null, clocks: [], messages: [message(`${name}.`)], steps: [{ stepID: 0, messageID: 1, time: 1 }], ql: null });
   const step = (q, title, state) => ({ quest: q, title, state, witnessed: false, outcome: null });
   const log = () => ({
-    active: [quest('4', 'Rat Problem', 'M0B00Y01'), quest('9', 'The First Hand', 'QLIT01')],
+    active: [quest('4', 'Rat Problem', 'M0B00Y01'), quest('9', 'A Stone in the Setting', 'QLIG01')],
     unlogged: [], shelved: [], hidden: [], finished: [], ladders: [],
     lines: [
-      { id: 'introTables', group: 'intro', title: 'A Seat at the Table', lead: 'A card player.', giver: 'a tavern regular', state: 'running', opens: null, outcome: null, honour: null, post: null, steps: [step('QLIT01', 'The First Hand', 'current'), step('QLIT02', 'The Long Game', 'next')] },
+      { id: 'introGear', group: 'intro', title: 'The Smith’s Secrets', lead: 'A gem to set.', giver: 'an armorer', state: 'running', opens: null, outcome: null, honour: null, post: null, steps: [step('QLIG01', 'A Stone in the Setting', 'current'), step('QLIG02', 'The Long Game', 'next')] },
       { id: 'introRoad', group: 'intro', title: 'The Merchant’s Road', lead: 'A load to haul.', giver: 'a stable master', state: 'offered', opens: null, outcome: null, honour: null, post: 'board', steps: [step('QLIR01', 'A Load for the Yard', 'next'), step('QLIR02', 'The Long Haul', 'next')] },
     ],
   });
@@ -281,12 +280,12 @@ test('QL-OFFERED THE QUESTS TAB: a questline\'s running step is drawn under its 
   const clean = { offers: () => [], takeLine: (id) => { taken.push(id); return { ok: true, text: 'You took up The Merchant’s Road. It is on the Quests tab of the pause menu.' }; } };
   await withTab(log(), clean, async (host) => {
     const order = rowsOf(host);
-    assert.deepEqual(order.slice(order.indexOf('Side Quests'), order.indexOf('Archived')), ['Side Quests', 'Rat Problem', 'Questlines', 'A Seat at the Table', 'The First Hand', 'The Merchant’s Road'],
+    assert.deepEqual(order.slice(order.indexOf('Side Quests'), order.indexOf('Archived')), ['Side Quests', 'Rat Problem', 'Questlines', 'The Smith’s Secrets', 'A Stone in the Setting', 'The Merchant’s Road'],
       'the step under its line, once; the line on offer after the one under way');
-    const stepRow = all(host).find((n) => n.tagName === 'BUTTON' && n.textContent.includes('The First Hand'));
+    const stepRow = all(host).find((n) => n.tagName === 'BUTTON' && n.textContent.includes('A Stone in the Setting'));
     assert.match(String(stepRow.className), /px-qstep/);
     stepRow.click();
-    assert.match(host.querySelectorAll('.px-qdetail')[0].textContent, /The First Hand\./, 'its own quest\'s page');
+    assert.match(host.querySelectorAll('.px-qdetail')[0].textContent, /A Stone in the Setting\./, 'its own quest\'s page');
     const road = all(host).find((n) => n.tagName === 'BUTTON' && String(n.className).includes('px-qlinerow') && n.textContent.includes('Merchant'));
     road.click();
     const detail = () => host.querySelectorAll('.px-qdetail')[0];
@@ -304,6 +303,6 @@ test('QL-OFFERED THE QUESTS TAB: a questline\'s running step is drawn under its 
   const off = { ...log(), lines: [] };
   await withTab(off, clean, async (host) => {
     const order = rowsOf(host);
-    assert.deepEqual(order.slice(order.indexOf('Side Quests'), order.indexOf('Archived')), ['Side Quests', 'Rat Problem', 'The First Hand']);
+    assert.deepEqual(order.slice(order.indexOf('Side Quests'), order.indexOf('Archived')), ['Side Quests', 'Rat Problem', 'A Stone in the Setting']);
   });
 });
