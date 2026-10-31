@@ -107,7 +107,7 @@ test('STAFF-VIEW1 the gate: no layer, no ask and no element for a player\'s glyp
     assert.equal(follow.asks, 0, 'and nothing asked of the panel');
     assert.equal(r.host.marks(null), null);
   }
-  for (const glyphs of [['mod'], ['shadowfang'], ['dev', 'dm']]) {
+  for (const glyphs of [['mod'], ['dev'], ['dev', 'dm']]) {
     const doc = fakeDocument();
     const follow = fakeFollow({ room: [peer('p1', 0, -20)] });
     const r = rig({ glyphs, follow, doc });

@@ -472,7 +472,7 @@ test('AUDIT NAMES N1-6 readout: a titled player held at the top near a corner an
 
 test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play face paints it - the gradient title over an edge of its own colour and black with no blurred shadow, each glyph in its colour at the name face\'s stroke, the wolf\'s red eye (WIKIMAID: and each of a list of details, in order), the Renown under the row\'s shadow, the name in the pixel face; a badge redrawn for my party and for a new dpr', async () => {
   const hud = await import('../../../src/ui/travel/travelViewHud.js');
-  const { TITLE_RGBA, GLYPH_RGBA, GLYPH_PATH, GLYPH_DETAIL, GLYPH_EDGE_W, cssRgba } = await import('../../../src/ui/playerBadge.js');
+  const { TITLE_RGBA, GLYPH_RGBA, GLYPH_PATH, cssRgba } = await import('../../../src/ui/playerBadge.js');
   const { PIXEL_STACK } = await import('../../../src/ui/pixelifyFive.js');
   const had = globalThis.Path2D;
   globalThis.Path2D = class { constructor(d) { this.d = d; } };
@@ -480,14 +480,12 @@ test('AUDIT NAMES N1-2/N1-3/N1-4/N1-9 readout: the badge painted as the in-play 
   hud.showTravelViewHud({}, doc);
   const N = hud.TRAVEL_VIEW_NAME_COLORS;
   try {
-    const wolf = { key: 'peer:wolf', x: 500, y: 300, front: true, label: 'SirMcMobdon', kind: 'traveller', badge: { title: 'shadowfang', glyphs: ['shadowfang', 'dev'], lv: 50, gt: 'WOLF' } };
+    const wolf = { key: 'peer:wolf', x: 500, y: 300, front: true, label: 'SirMcMobdon', kind: 'traveller', badge: { title: 'hourbreaker', glyphs: ['dev'], lv: 50, gt: 'WOLF' } };
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [wolf] });
-    const title = texts.filter(([t]) => t === 'Shadow Fang');
-    const edge = cssRgba(TITLE_RGBA.shadowfang);
+    const title = texts.filter(([t]) => t === 'Hourbreaker');
+    const edge = cssRgba(TITLE_RGBA.hourbreaker);
     assert.deepEqual(title.map(([, f]) => (f?.gradient ? 'gradient' : f)), ['#000', edge, edge, 'gradient'], 'black under, its colour right and below, the gradient over');
     assert.ok(title.every(([, , , blur]) => blur === 0), 'no blurred shadow drowning the black half (AUDIT A4/A5)');
-    assert.ok(fills.some(([f, d]) => f === cssRgba(GLYPH_DETAIL.shadowfang.rgba) && d === GLYPH_DETAIL.shadowfang.path), 'the wolf\'s red eye');
-    assert.ok(strokes.some(([c, w, j, d]) => c === cssRgba(GLYPH_RGBA.shadowfang) && w === GLYPH_EDGE_W && j === 'round' && d === GLYPH_PATH.shadowfang), 'the gradient glyph\'s edge, round');
     assert.ok(strokes.some(([c, w, j, d]) => c === cssRgba(GLYPH_RGBA.dev) && w === 1.6 && j === 'round' && d === GLYPH_PATH.dev), 'a stroked glyph in its own colour at the name face\'s 1.6');
     assert.equal(texts.find(([t]) => t === '50')?.[3], 3, 'the Renown under the row\'s shadow');
     const name = texts.find(([t]) => t === 'SirMcMobdon');

@@ -26,7 +26,7 @@ test('OWN1: the wire - an own frame is an object from a hello\'d socket, capped 
   const smuggled = `{"t":"world","data":{"pad":"${'p'.repeat(FOES_FRAME_MAX)}"},"t":"own"}`;
   assert.ok(smuggled.length < WORLD_FRAME_MAX);
   assert.equal(parseClient(smuggled, { hasHello: true }).error, 'frame too large', 'a world frame\'s prefix that parses as own keeps the own frame\'s cap (AUDIT WORLD A2)');
-  assert.equal(relaySupportsOwn('world113'), false); assert.equal(relaySupportsOwn('world117'), false, 'main\'s last relay before the merge (SHADOW-FANG) knows no own frame'); assert.equal(relaySupportsOwn(`world${OWN_RELAY_MIN}`), true); assert.equal(relaySupportsOwn('whatever'), false);
+  assert.equal(relaySupportsOwn('world113'), false); assert.equal(relaySupportsOwn('world117'), false, 'main\'s last relay before the merge knows no own frame'); assert.equal(relaySupportsOwn(`world${OWN_RELAY_MIN}`), true); assert.equal(relaySupportsOwn('whatever'), false);
   assert.equal(relaySupportsOwn(RELAY_VERSION), true, 'this relay carries it - world121 since ONE-SEAT\'s merge (the Sigil Sets branch\'s AUDIT SET at world119, then PARTY-BUFFS, REST-OPT and the batch\'s audit at world120)');
   assert.equal(OWN_RELAY_MIN, 118, 'AUDIT (cross-cutting F7): the own lane\'s first relay stays world118 - the re-aim to relaySupportsOwn(RELAY_VERSION) alone let it drift to any later number');
 });

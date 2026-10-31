@@ -52,7 +52,7 @@ import {
 import { handleLooksLikeEmail } from '../net/handleShape.js';   // HANDLE-EMAIL: a new username is never an address
 import { ACCEPTED, TERMS_URL, PRIVACY_URL } from '../net/legalLaw.js';   // TERMS1: the documents a new account agrees to
 import { t, localizedTable } from '../systems/textManager.js';   // L10N4: the card's words in the player's language, read when they are drawn
-import { AURA_TEXT, TITLE_TEXT } from './playerBadge.js';   // SHADOW-CLOAK (AUDIT): an aura's name in the card's note - COLLECTIONS-II: and a title's
+import { AURA_TEXT, TITLE_TEXT } from './playerBadge.js';   // an aura's name in the card's note - COLLECTIONS-II: and a title's
 import { ICON_TEXT } from './profileIcons.js';   // WITCH1: an icon's name in the card's note
 
 /** Every stage this card can be on. Exported because a pin that
@@ -300,7 +300,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     // top-right button reads the stored session. This is the next answer
     // that states the name after a registration (acknowledging the code
     // lands here), and it is the service's own word, so it is adopted.
-    adoptIdentity(storage, { name: r.data.account?.name, kind: r.data.account?.kind, glyphs: r.data.wardrobe?.glyphs, glyphsOff: r.data.wardrobe?.glyphsOff, aura: auraStated(r.data.wardrobe), icon: iconStated(r.data.wardrobe), secret: asked });   // SHADOW-FANG: and what is true of the account; AUDIT B4: into the session that asked; WB9g: and the aura worn
+    adoptIdentity(storage, { name: r.data.account?.name, kind: r.data.account?.kind, glyphs: r.data.wardrobe?.glyphs, glyphsOff: r.data.wardrobe?.glyphsOff, aura: auraStated(r.data.wardrobe), icon: iconStated(r.data.wardrobe), secret: asked });   // and what is true of the account; AUDIT B4: into the session that asked; WB9g: and the aura worn
     // ACC3c: THE WARDROBE IS ITS OWN FIELD, exactly as the service
     // answers it - what this account HOLDS, what it WEARS, and what is
     // true of it. Held beside `account` rather than folded into it,
@@ -470,7 +470,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
       if (!r.ok) return refuse(accountRefusalText(r.error));
       self.wardrobe = { ...(self.wardrobe ?? {}), titles: r.data.titles, title: r.data.title, glyphs: r.data.glyphs, ...glyphHalf(r.data), ...auraHalf(r.data) };
       self.busy = false;
-      self.note = want ? t('account.flow.wearing', 'Wearing {what}.', { what: AURA_TEXT[want] ?? want }) : t('account.flow.auraRemoved', 'Aura removed.');   // SHADOW-CLOAK (AUDIT): the aura's name, never its key
+      self.note = want ? t('account.flow.wearing', 'Wearing {what}.', { what: AURA_TEXT[want] ?? want }) : t('account.flow.auraRemoved', 'Aura removed.');   // the aura's name, never its key
       adoptIdentity(storage, { glyphs: r.data.glyphs, glyphsOff: r.data.glyphsOff, aura: auraStated(r.data), icon: iconStated(r.data), secret: asked });
       changed();
       return true;

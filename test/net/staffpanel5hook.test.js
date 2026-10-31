@@ -713,7 +713,7 @@ test('STAFF-PANEL5-FOLLOW TP law: where a note puts staff, the line a TP says, a
   assert.match(staffTpLine({ name: 'Bran', fb: 'mismatch' }), /did not match \(the player can see this\)/);
   assert.equal(staffTpLine({ name: 'Bran' }), 'Teleported to Bran\'s exact position (the player can see this).');
   assert.deepEqual(STAFF_TP_FALLBACKS, ['missing', 'mismatch']);
-  for (const [g, ok] of [[['dev'], true], [['shadowfang'], true], [['dm'], false], [['mod'], false], [[], false], [null, false], ['dev', false]]) assert.equal(quietTeleportAllowed(g), ok, JSON.stringify(g));
+  for (const [g, ok] of [[['dev'], true], [['dm'], false], [['mod'], false], [[], false], [null, false], ['dev', false]]) assert.equal(quietTeleportAllowed(g), ok, JSON.stringify(g));
 });
 
 test('STAFF-PANEL5-FOLLOW TP: a note\'s answer is loaded and, with feet, placed; a place with no spot is loaded alone; a note this build cannot place asks their game, every ask after it too', async () => {

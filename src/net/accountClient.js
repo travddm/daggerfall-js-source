@@ -1340,7 +1340,7 @@ export function storedSession(storage) {
  *  write down. */
 export function keepSession(storage, { id, name, kind, sessionId, secret, glyphs, aura, icon, nameAsAt }) {
   try {
-    storage?.setItem?.(SESSION_KEY, JSON.stringify({ id, name, kind, sessionId, secret, glyphs, aura, icon, nameAsAt }));   // SHADOW-FANG: `glyphs` when the service has stated them (adoptIdentity) - JSON leaves it out otherwise; WB9g: `aura` likewise; WITCH1: `icon` likewise; NAME-AS: `nameAsAt` likewise
+    storage?.setItem?.(SESSION_KEY, JSON.stringify({ id, name, kind, sessionId, secret, glyphs, aura, icon, nameAsAt }));   // `glyphs` when the service has stated them (adoptIdentity) - JSON leaves it out otherwise; WB9g: `aura` likewise; WITCH1: `icon` likewise; NAME-AS: `nameAsAt` likewise
     return true;
   } catch { return false; }
 }
@@ -1370,24 +1370,22 @@ export function keepSession(storage, { id, name, kind, sessionId, secret, glyphs
  * it corrects the name and kind of a session that already exists, so
  * an answer arriving after a sign-out cannot resurrect one.
  *
- * SHADOW-FANG (2026-09-26): AND THE GLYPHS, when the answer states them - what is TRUE of this account (a token's
- * `glyphs`, a wardrobe's). The relay reads a player's glyphs off the signature for everybody else; this device keeps
- * the service's last word for its own player, so what dresses them on their own screen (their werewolf's skin,
- * characters/werewolfSkin.js) is there offline too. Strings only, a bounded list; a list that did not change is not
+ * AND THE GLYPHS, when the answer states them - what is TRUE of this account (a token's `glyphs`, a wardrobe's). The
+ * relay reads a player's glyphs off the signature for everybody else; this device keeps the service's last word for
+ * its own player (systems/ownGlyphs.js), so it is there offline too. Strings only, a bounded list; a list that did not change is not
  * written.
  *
  * AUDIT B4 (2026-09-26): AND ONLY INTO THE SESSION THAT ASKED. `secret` is
  * the credential the answer was asked with; a session signed out and
  * another signed in while it was in flight is not the one it describes -
- * adopted, one account's name and glyphs landed on another's device (and
- * dressed its werewolf in a skin it does not hold).
+ * adopted, one account's name and glyphs landed on another's device.
  *
  * WB9g (2026-09-30): AND THE AURA WORN (`aura`, null for none), when the answer states it - a token's, a wardrobe's
  * after any wear (the account card's, the Broker's) - so this device's own player sees the fire at their feet the moment
  * any door changes it (systems/ownGlyphs.js ownAura). The room sees it from their next hello, off the signature.
  *
  * GLYPH-WEAR (2026-10-02): LESS THE GLYPHS TAKEN OFF (`glyphsOff`), when the answer states them - what dresses my own
- * player on my own screen is what the room is shown, so a Shadow Fang hidden is a wolf in no skin here as it is there.
+ * player on my own screen is what the room is shown.
  *
  * NAME-AS (2026-10-12): `name` HERE IS THE ACCOUNT'S. The stored session is the account's picture (the profile mark reads
  * its name as the account's), and since NAME-AS the room may read a character's name instead - so the minter hands this

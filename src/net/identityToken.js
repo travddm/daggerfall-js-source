@@ -194,13 +194,13 @@ export const ACCOUNT_KINDS = Object.freeze(['guest', 'linked']);
 /** The titles that exist. A title is WORN one at a time, so a token
  *  carries at most one. Grants are the service's business (who HOLDS
  *  one); this list is the vocabulary both ends share. */
-export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
+export const TITLES = Object.freeze(['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane']);
 
 /** SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE SEATS' TITLES - five GENERIC ids, because a town's
  *  or a Season's name cannot be a closed list's word: "Warden of <Town>" (a palace seat's guildmaster), "Protector of
  *  <Kingdom>" (a crown's), "Crowned in Season N", "Keeper of <Town>, Season N" (kept for good, SEASON1) and the Royal
  *  Tourney's champion (CROWN1). Each rides with a bounded claim beside it - `ts`: [the seat key, the Season] - from
- *  which the client words it. Reaching the relay once, here, before the service mints any (the SHADOW-FANG order). */
+ *  which the client words it. Reaching the relay once, here, before the service mints any - a relay that does not know a title refuses the token that carries it. */
 export const SEAT_TITLES = Object.freeze(['warden', 'protector', 'crowned', 'keeper', 'champion']);
 /** SEAT1c: whether `ts` is a seat title's claim - [seat key (a map id, unsigned 32), Season (0-9999)]. */
 export const seatTitleClaimOk = (ts) => Array.isArray(ts) && ts.length === 2 && Number.isSafeInteger(ts[0]) && ts[0] >= 0 && ts[0] <= 0xffffffff
@@ -221,16 +221,16 @@ export const titleClaimed = (t) => SEAT_TITLES.includes(t) || CHAPTER_TITLES.inc
  *  your character stands. These items should be expensive and sought after"): THE AURAS THAT EXIST. An aura is WORN,
  *  one at a time, as a title is - so a token carries at most one (`au`) - and it is signed for the same reason a title
  *  is: a fire at a player's feet that a client could assert is a fire every client has. Holding one is the service's
- *  business (the Broker's insignia, bought - net/insignia.js; or granted by name beside a title - server-account/src/titles.js
- *  TIER_AURA: the Holo Shadow Cloak; or the developers' Seraph Wings - titles.js DEVELOPER_AURA); this list is the
+ *  business (the Broker's insignia, bought - net/insignia.js; or the developers' Seraph Wings -
+ *  server-account/src/titles.js DEVELOPER_AURA); this list is the
  *  vocabulary both ends share. */
-export const AURAS = Object.freeze(['dagonfire', 'shadowcloak', 'seraphwings', 'turninghour', 'firsthour', 'maelstrom', 'witchfire']);
+export const AURAS = Object.freeze(['dagonfire', 'seraphwings', 'turninghour', 'firsthour', 'maelstrom', 'witchfire']);
 
 /** The glyphs that exist. A glyph is not worn, it is TRUE of a player -
  *  sprout is "this account is new", dev is "this is a developer", mod is
  *  "this is a moderator" (MOD1, Mac: "a moderator glyph") - so a token
  *  may carry several and a player chooses none of them. */
-export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY']);
+export const GLYPHS = Object.freeze(['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY']);
 
 /** The bound on `g`, and it is the vocabulary's own size rather than a
  *  number somebody picked: a token carrying more glyph slots than there

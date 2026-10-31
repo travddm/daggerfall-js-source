@@ -49,7 +49,7 @@ export const RELAY_CFG_KEY_MIN = Object.freeze({ gateThread: 250, serpentThread:
 /** Does the relay at version `v` take a setting - any (`k` unsaid), or that one? */
 export const relayCfgSupported = (v, k = null) => Number(/^world(\d+)$/.exec(String(v ?? ''))?.[1]) >= Math.max(RELAY_CFG_RELAY_MIN, RELAY_CFG_KEY_MIN[k] ?? 0);
 /** May a player whose verified glyphs are `glyphs` set the relay's settings? The Developer's alone - a Dungeon Master's
- *  and Shadow Fang's staff commands move only themselves (net/staffCommands.js). */
+ *  staff commands move only themselves (net/staffCommands.js). */
 export const mayRelayCfg = (glyphs) => Array.isArray(glyphs) && glyphs.includes('dev');
 
 /**

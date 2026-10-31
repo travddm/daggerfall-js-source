@@ -86,8 +86,8 @@ let ghostSerial = 0;   // AUDIT A2: each afterimage's own suffix for the ids it 
 /** The attributes that reference an element by `url(#id)` (an svg's paint servers, clips, masks, filters, markers). */
 const URL_ATTRS = ['fill', 'stroke', 'clip-path', 'mask', 'filter', 'marker-start', 'marker-mid', 'marker-end', 'style'];
 
-/** SHADOW-FANG (AUDIT A2): A GHOST'S IDS ARE RENAMED, NOT DROPPED. An svg inside a window paints through one - a
- *  gradient glyph's `fill: url(#dfglyph-grad-N)` - and with the id stripped the ghost's wolf folded away hollow. Each
+/** AUDIT A2: A GHOST'S IDS ARE RENAMED, NOT DROPPED. An svg inside a window may paint through one - a gradient's
+ *  `fill: url(#id)` - and with the id stripped the ghost's drawing folds away hollow. Each
  *  id takes `tag`, and every `url(#id)` and `href="#id"` inside the same ghost moves with it; the real window keeps
  *  its own names. @returns {Map<string, string>} old id -> the ghost's */
 export function renameGhostIds(els, tag) {

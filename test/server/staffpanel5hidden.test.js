@@ -85,7 +85,7 @@ test('STAFF-PANEL5-HIDDEN: the door is listed among the staff panel\'s and opens
   assert.deepEqual([...HIDDEN_ROUTES], ['/v1/staff/hide']);
   for (const r of HIDDEN_ROUTES) assert.ok(STAFF_ROUTES.has(r), r);
   assert.equal(HIDDEN_NAME, 'Staff member');
-  assert.deepEqual([...HIDDEN_GLYPHS], ['dev', 'mod', 'dm', 'shadowfang']);
+  assert.deepEqual([...HIDDEN_GLYPHS], ['dev', 'mod', 'dm']);
   assert.ok(ORDER_KINDS.includes('hide'));
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const t = nowS();

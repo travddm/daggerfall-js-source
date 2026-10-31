@@ -360,7 +360,7 @@ test('WEREWOLF1 a peer: the pose\'s `wb` 1 builds the wolf (holding nothing), ke
     rigs.push(r); return r;
   };
   const pb = new PeerBodies({ renderer: {}, createRig, now: () => now });
-  const peer = (wb) => ({ id: 'wolf', name: 'SirMcMobdon', look: LOOK, shown: pose(wb ? { wb, wd: 1, lh: 0, sr: 1, hl: 1 } : {}), glyphs: ['shadowfang'] });
+  const peer = (wb) => ({ id: 'wolf', name: 'SirMcMobdon', look: LOOK, shown: pose(wb ? { wb, wd: 1, lh: 0, sr: 1, hl: 1 } : {}) });
   pb.sync([peer(0)], (p) => [p.x, p.y, p.z], 0.016, [0, 0, 0]);
   await settle();
   assert.equal(built.at(-1).werewolf, undefined, 'the person first');

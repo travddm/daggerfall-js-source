@@ -30,7 +30,6 @@ import { racialFpsWeapon } from '../../systems/lycanthropy.js';   // V4: the tra
 import { EQUIP_SLOTS, equipTableOf, fillEquipTable } from '../../systems/equip.js';   // AUDIT 17e F17; MW-D32 the worn read; MW-EARLY: a save's worn set
 import { setItemFields } from '../../systems/item/itemTemplates.js';   // MW-EARLY: a save's items as the restore reads them
 import { dfWornEquipment } from '../../formats/morrowind/mwItemMap.js';   // MW-D32
-import { ownWerewolfSkin } from '../../systems/ownGlyphs.js';   // SHADOW-FANG: the skin my own werewolf wears
 import { ARMOR_ENUM } from '../enemyEquipment.js';   // MW-D32
 import { loadFpsWeaponArt, drawFpsWeapon, fpsWeaponQuad, weaponTypeForItem, WEAPON_TYPES, fpLightingOn, WEAPON_FILE, plainWeaponType } from '../fpsWeapon.js';
 import { spriteGlow, meshGlow } from '../../systems/weaponGlow.js';   // WEAPON-GLOW1: the held weapon's element, as each hand shows it
@@ -127,7 +126,6 @@ export function armBuildOptsOf(entity) {
   const worn = entity.equip?.slots?.[EQUIP_SLOTS.RightHand] ?? null;
   return {
     werewolf: isMwWerewolf(entity),   // WEREWOLF1: a save loaded mid-transformation builds the wolf at the door
-    skin: isMwWerewolf(entity) ? ownWerewolfSkin() : null,   // SHADOW-FANG: and in its skin
     vampire: !!liveVampirism(entity),   // PORTRAIT3D (the owner: "Do this"): a vampire wears the race's vampire head (getVampireHead, MWNPC14), the body as its portrait
     race: mwRaceId(entity.race),
     female: entity.gender === 'female',
@@ -653,7 +651,7 @@ export function createWeaponRig({ renderer, canvas, fetchBytes, palette, audio, 
     fpArm.attach(renderer, camera);
     _armRenderer = renderer ?? null;   // APPEARANCES-II: the preview body's
     // BEAST-SELF: the Morrowind arm and body stand aside while they are not the form the curse holds (combat/fpArm.js
-    // setStandIn). SHADOW-FANG (the merge): Bloodmoon's wolf IS a Morrowind beast (WEREWOLF1), so a werewolf whose wolf
+    // setStandIn). Bloodmoon's wolf IS a Morrowind beast (WEREWOLF1), so a werewolf whose wolf
     // stands keeps them; a wolf refused or still building, a wereboar (Morrowind has none), and the wolf still standing
     // while the person rebuilds after the turn back stand aside - never the person on a beast, nor the beast on a person
     const beast = !!entity && isTransformedLycanthrope(entity), wolf = !!fpArm.wolfStanding?.();
@@ -803,7 +801,6 @@ export function createWeaponRig({ renderer, canvas, fetchBytes, palette, audio, 
   const heldGlowNow = () => { if (playerWeapon.weapon !== heldFor) askHeld(); return heldGlow; };
   const heldType = (item) => (glowOf(item) ? plainWeaponType(weaponTypeForItem(item)) : weaponTypeForItem(item));
   let _dx = 0, _dy = 0, _held = false;
-  let wolfForm = false, wolfSkin = null;   // WEREWOLF1 / SHADOW-FANG (AUDIT D5): the form handed to the rig last, and the skin read at its change
 
   function artFor(held) {
     const plain = !!glowOf(held);   // WEAPON-GLOW1: an element shown swings the plain sheet
@@ -1402,12 +1399,10 @@ export function createWeaponRig({ renderer, canvas, fetchBytes, palette, audio, 
       // under the gate the turn back was never asked: the player stood in the classic sprite until the next load.
       // setWerewolf needs only the last build's opts, which a refusal keeps, and asks nothing of a rig never built.
       // Ahead of the hand, the worn table and the spell too, so their queue waits on the form's build rather than
-      // swapping on the body it replaces (AUDIT D3). SHADOW-FANG (AUDIT D5): the skin is read at the CHANGE - a
-      // storage read a frame is a file read in the desktop shell.
+      // swapping on the body it replaces (AUDIT D3).
       if (entity && !paralyzed) {
         const wolf = isMwWerewolf(entity);
-        if (wolf !== wolfForm) { wolfForm = wolf; wolfSkin = wolf ? ownWerewolfSkin() : null; }
-        fpArm.setWerewolf(wolf, { skin: wolfSkin });
+        fpArm.setWerewolf(wolf);
         fpArm.setVampire?.(!!liveVampirism(entity));   // PORTRAIT3D: and the vampire's head the moment the curse takes, the face at the cure
       }
       // Paralysis freezes the arm as it freezes the swing - a clip that

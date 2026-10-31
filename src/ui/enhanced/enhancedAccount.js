@@ -65,7 +65,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   disciple: () => t('account.glyph.disciple', 'Disciple'),   // TITLE-N: the Patreon tiers' marks, each its title's word
   apostle: () => t('account.glyph.apostle', 'Apostle'),
   hierophant: () => t('account.glyph.hierophant', 'Hierophant'),
-  shadowfang: () => t('account.glyph.shadowfang', 'Shadow Fang'),   // SHADOW-FANG: the wolf's head beside SirMcMobdon's name
   herald: () => t('account.glyph.herald', 'Herald'),   // HERALD: the herald's trumpet and its banner
   tower: () => t('account.glyph.tower', 'A seat\'s Charter'),   // SEAT1c: the tower of a guild holding a palace seat
   crownDF: () => t('account.glyph.crownDF', 'The Crown of Daggerfall'),   // SEAT1c: a crown seat's crown, its kingdom's
@@ -346,7 +345,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     const held = Array.isArray(w?.titles) ? w.titles : [];
     const glyphs = glyphBadges(w);
     const icons = Array.isArray(w?.icons) ? w.icons : [];   // WITCH1: the profile icons held
-    const auras = Array.isArray(w?.auras) ? w.auras : [];   // WB9g: the Broker's auras this account owns; AEGIS: and a listed title's (PRIMARCH: the Golden Radiance; SHADOW-CLOAK: the Holo Shadow Cloak; SERAPH-WINGS: a developer's Seraph Wings)
+    const auras = Array.isArray(w?.auras) ? w.auras : [];   // WB9g: the Broker's auras this account owns; AEGIS: and a listed title's (SERAPH-WINGS: a developer's Seraph Wings)
     if (!held.length && !glyphs.length && !auras.length && !icons.length) return;
 
     const box = el('div', 'acctwear');
@@ -363,7 +362,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
         // table, so the gold here and the gold over a head are one
         // fact - and this card goes on bringing no design language of
         // its own, which is the rule ACC1e was built under.
-        // SHADOW-FANG: the word in a span of its own, so a gradient title's paint clips to the letters and leaves
+        // the word in a span of its own, so a gradient title's paint clips to the letters and leaves
         // the button's border in its plain colour (ui/playerBadge.js badgeCss)
         const b = keyedAs(el('button', `acttitle ${badgeClass('tl', key)}${worn ? ' worn' : ''}`), `title:${key}`);
         const word = el('span', 'acttitleword', TITLE_TEXT[key] ?? key);
@@ -428,8 +427,8 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
         chip.setAttribute('aria-pressed', shown ? 'true' : 'false');
         chip.title = shown ? t('account.wear.glyphShown', 'Shown. Press to hide it') : t('account.wear.glyphHidden', 'Hidden. Press to show it');
         chip.onclick = () => flow.toggleGlyph(g.key);
-        // SHADOW-FANG: the one drawing's colourless half (ui/playerBadge.js glyphArtNode) - its shapes are
-        // currentColor, which this chip's class colours; a gradient glyph brings its own fill and eye
+        // the one drawing's colourless half (ui/playerBadge.js glyphArtNode) - its shapes are
+        // currentColor, which this chip's class colours
         const svg = glyphArtNode(doc, g, 'acctglyphart', 1.6);
         if (svg) chip.append(svg);
         chip.append(el('span', null, GLYPH_LABEL[g.key] ?? g.key));

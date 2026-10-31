@@ -28,7 +28,6 @@
 //             account you linked is an active patron entitled to that
 //             tier now (patreon.js) - Patreon's word, stored as WB9g's
 //             sale is, and read against the config at every ask.
-//   SHADOW FANG  the same, one player's own; an aura beside it: the Holo Shadow Cloak, granted with the title.
 //   HERALD (HERALD, 2026-10-01) the same, and the Patreon tier's.
 //   GRAND CHAMPION, ARENA CHAMPION and THE LAUREL (ARENA4, 2026-10-02)
 //             the arena's rows (server-account/src/arena.js): a Grand
@@ -214,19 +213,16 @@ export const TIER_LISTS = Object.freeze({
   disciple: 'DISCIPLE_HANDLES',
   apostle: 'APOSTLE_HANDLES',
   hierophant: 'HIEROPHANT_HANDLES',
-  // A title made for one player, granted the tiers' way: a list in the config, the title and its glyph together, and
-  // an aura beside them (TIER_AURA, below). It also opens the staff's commands (MOD_TIERS, STAFF_GLYPHS).
-  shadowfang: 'SHADOW_FANG_HANDLES',
   // The Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and
   // by this list for a handle the owners name.
   herald: 'HERALD_HANDLES',
 });
 /** The glyph each of those titles carries, in the vocabulary's words. */
-export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', shadowfang: 'shadowfang', herald: 'herald' });
+export const TIER_GLYPH = Object.freeze({ dungeonmaster: 'dm', disciple: 'disciple', apostle: 'apostle', hierophant: 'hierophant', herald: 'herald' });
 /** AEGIS: THE AURA A LIST'S TITLE CARRIES, where it carries one - held while the handle is listed, exactly as its glyph
  *  is, and gone on the next token once it is not. A grant like the glyph and unlike the Broker's: derived from the
  *  config at every ask, never a sale recorded on the row. */
-export const TIER_AURA = Object.freeze({ shadowfang: 'shadowcloak' });
+export const TIER_AURA = Object.freeze({});
 
 /** STAFF-PANEL2-FIX (design doc, Weak spots: "Cutting off a staff member misses most doors" - "A stored suspended flag is
  *  checked in every role path"): a staff member an owner cut off (`players.staff_suspended`, migration 0156, staff.js
@@ -258,19 +254,11 @@ export const isModerator = (player, env) =>
   typeof player?.handle === 'string' && !!player.handle && !staffSuspended(player)
   && (moderatorHandles(env).has(player.handle.toLowerCase()) || player.staff_mod === 1);
 
-/** SHADOW-FANG-MOD (2026-10-19, Mac: "Give the shadow fang title mod perms including ban"): THE TITLES THAT MODERATE -
- *  their holders may do everything canModerate opens (mute, ban, unban, strikes, the reports' queue, a case's buttons),
- *  and are protected as a moderator is. Held by the title's own list (TIER_LISTS), so taking the handle off takes the
- *  rights with the title on the next call. The GLYPH stays the title's own: no shield, as for a developer. */
-export const MOD_TIERS = Object.freeze(['shadowfang']);
-
 /** MOD1: MAY THIS PLAYER MODERATE? A moderator may, and so may a
  *  developer - the people who can already speak as the server are not
  *  made to add themselves to a second list to mute somebody. The GLYPH
- *  stays the moderator list's alone: the dev mark already says more.
- *  SHADOW-FANG-MOD: and so may a holder of a MOD_TIERS title. */
-export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env)
-  || MOD_TIERS.some((t) => holdsTier(t, player, env));
+ *  stays the moderator list's alone: the dev mark already says more. */
+export const canModerate = (player, env) => isModerator(player, env) || isDeveloper(player, env);
 
 /** FOUNDER3: WHEN THIS ACCOUNT FIRST PLAYED. Founder was read off
  *  `registered_at`, and registering is only the moment a player chose a

@@ -1,7 +1,6 @@
 // @ts-check
-// STAFF1 (2026-09-28, Mac: "So for developer, dungeon master and the shadow fang titles I want to add teleport, debug,
-// and other admin commands"; Mac chose the groups: TELEPORT (self) and DEBUG, no time or weather, nothing that acts on
-// another player): THE STAFF'S CHAT COMMANDS - one grammar, pure, DOM-free (net/chatCommands.js's way).
+// STAFF1: THE STAFF'S CHAT COMMANDS, for the Developer and the Dungeon Master - teleport (self) and debug, no time or
+// weather, nothing that acts on another player - one grammar, pure, DOM-free (net/chatCommands.js's way).
 //
 //   /tp <place>          to a town, dungeon or other named place, anywhere in the Iliac Bay (its best match)
 //   /tp <x> <y>          to a map pixel (x 0-999, y 0-499 - the travel map's own grid)
@@ -13,8 +12,8 @@
 //   /staff               this list
 //   /relay <setting> <v> a relay setting, at run time - the Developer's alone (SCALE5b, net/relayCfg.js)
 //
-// WHO MAY: a player whose OWN glyphs say `dev`, `dm` or `shadowfang` - the Developer's, the Dungeon Master's and Shadow
-// Fang's (identityToken.js TITLES/GLYPHS). Commands move/change only the typer.
+// WHO MAY: a player whose OWN glyphs say `dev` or `dm` - the Developer's and the Dungeon Master's (identityToken.js
+// TITLES/GLYPHS). Commands move/change only the typer.
 // The exact-player lookup additionally requires the relay's verified staff claim.
 // Anyone else gets `unknown` - the chat's own refusal - so the commands are not advertised to them.
 //
@@ -24,7 +23,7 @@
 import { parseRelayCfgCommand } from './relayCfg.js';   // SCALE5b: /relay's words
 
 /** The glyphs that open the staff's commands. */
-export const STAFF_GLYPHS = Object.freeze(['dev', 'dm', 'shadowfang']);
+export const STAFF_GLYPHS = Object.freeze(['dev', 'dm']);
 /** Whether a player wearing `glyphs` is staff. */
 export const isStaff = (glyphs) => Array.isArray(glyphs) && glyphs.some((g) => STAFF_GLYPHS.includes(g));
 

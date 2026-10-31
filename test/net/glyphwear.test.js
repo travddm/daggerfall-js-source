@@ -73,12 +73,12 @@ test('GLYPH-WEAR token and relay: `gx` must be a non-empty list of `g`\'s own; `
   assert.deepEqual(readBadge(row).glyphs, ['mod']);
 });
 
-test('GLYPH-WEAR own screen: the stored session keeps the glyphs shown, so a hidden Shadow Fang is no skin here as it is none there (mutants: glyphsOff ignored)', () => {
+test('GLYPH-WEAR own screen: the stored session keeps the glyphs shown, so a glyph hidden there is hidden here (mutants: glyphsOff ignored)', () => {
   const s = memStore();
   keepSession(s, { id: 'abcd1234', name: 'Mob', kind: 'linked', sessionId: 'x', secret: 'sec' });
-  adoptIdentity(s, { glyphs: ['shadowfang', 'disciple'], glyphsOff: ['shadowfang'], secret: 'sec' });
+  adoptIdentity(s, { glyphs: ['herald', 'disciple'], glyphsOff: ['herald'], secret: 'sec' });
   assert.deepEqual(storedSession(s).glyphs, ['disciple']);
-  adoptIdentity(s, { glyphs: ['shadowfang', 'disciple'], glyphsOff: [], secret: 'sec' });
-  assert.deepEqual(storedSession(s).glyphs, ['shadowfang', 'disciple']);
+  adoptIdentity(s, { glyphs: ['herald', 'disciple'], glyphsOff: [], secret: 'sec' });
+  assert.deepEqual(storedSession(s).glyphs, ['herald', 'disciple']);
   assert.ok(s.getItem(SESSION_KEY));
 });
