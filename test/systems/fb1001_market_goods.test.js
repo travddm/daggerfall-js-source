@@ -477,13 +477,13 @@ test('MARKET-ANY tab: Goods after the Auctions - each piece its name, condition,
   // a crafted piece: Eve's own alone, the other named
   kindPress('piece').onclick();
   assert.deepEqual(tiles().map((b) => b.getAttribute('data-focus')), [`list-piece|piece|${own.provenance}`]);
-  assert.match(text(), /1 crafted piece you hold is made by another player, and only the maker can sell it as crafted\. List it from your pack for gold instead\./);     // AUDIT 657 D7: BOARD-UI (
+  assert.match(text(), /1 crafted piece you hold is made by another player, and only the maker can sell it as crafted\. List it from your pack for gold instead\./);   // AUDIT 657 D7: BOARD-UI (
   // a piece from the pack: the looted pieces and Mac's make; the stone and Eve's own make said, each on its own tile
   kindPress('item').onclick();
   assert.deepEqual(tiles().map((b) => named(b, 'packpick-name')), [eve.goods.goodName(weapon), eve.goods.goodName(armour), eve.goods.goodName(theirs)]);
   assert.deepEqual([...root.querySelectorAll('.packpick-refused')[0].querySelectorAll('.packpick-tile')].map((n) => [named(n, 'packpick-name'), named(n, 'packpick-why')]),
     [['Deadlands Ember', 'bound to you'], [eve.goods.goodName(own), 'made by you. List it as a crafted piece']]);
-  assert.match(text(), /No fee to list\. Up for 72 hours on every board\. If it sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\. It leaves your pack now and comes back if it does not sell\./);     // AUDIT 657 B9 (
+  assert.match(text(), /No fee to list\. Up for 72 hours on every board\. If it sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\. It leaves your pack now and comes back if it does not sell\./);   // AUDIT 657 B9 (
   assert.equal(selects().some((x) => x.getAttribute('aria-label') === 'Currency'), false, 'no Drakes to choose');
   // PACK-PICK: none chosen until a tile is pressed - a sale takes it out of the pack - and the one pressed looked at
   assert.equal(buttons().find((b) => b.textContent === 'List').disabled, true, 'nothing chosen yet');

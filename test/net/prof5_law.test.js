@@ -89,7 +89,7 @@ test('PROF5 law: the catalogue - every registered material, the four foods and e
   assert.ok(cat.every((c) => material(c.key)), 'every one a Stores material');
   assert.equal(new Set(cat.map((c) => c.key)).size, cat.length);
   assert.ok(cat.some((c) => c.family === 'herbs') && cat.some((c) => c.key === 'food:apple') && cat.some((c) => c.key === 'ore:mithril') && cat.some((c) => c.key === 'cloth:wool'));
-  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'siege']);     // SEAT2b part two (
+  assert.deepEqual([...new Set(cat.map((c) => c.family))], ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'siege']);   // SEAT2b part two (
   assert.deepEqual({ key: WOOL.key, tier: WOOL.tier, templateIndex: WOOL.templateIndex, name: WOOL.name }, { key: 'cloth:wool', tier: 2, templateIndex: 669, name: 'Wool Bolt' });
   assert.equal(minedMaterial('cloth:wool').family, 'hides');
   assert.deepEqual(WEAVERS_STOCK.map((w) => [w.key, w.marks, w.counter]), [['cloth:linen', 2, 'weavers'], ['cloth:wool', 3, 'weavers']], '4.5\'s own prices');

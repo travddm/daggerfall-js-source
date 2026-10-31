@@ -83,7 +83,7 @@ test('SD18b UNDER ITS BAR AND ON ITS WAKE: the row of its marks and the omens\' 
   assert.deepEqual([bar.title, bar.epithet], ['The Walking Hour', ''], 'its phase over the row');
   const plain = newRemnantFight(4, 1, T0); joinRemnant(plain, 'a', 'A', 30, T0);
   const P = createSdFightLink({ now: () => T0 + 20_000 }); P.word(validSdOut({ ...remnantStateOf(plain), me: 1 }));
-  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);     // AUDIT SD III (T17
+  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);   // AUDIT SD III (T17
   // the wake
   assert.deepEqual(sdWakeText(MK), { ...SD_BEAT_TEXT.wake, sub: 'The Turning Tide - the Ending of Wayrest' });
   assert.equal(sdWakeText(null), SD_BEAT_TEXT.wake);
@@ -145,7 +145,7 @@ test('SD18b A STRIKE IN ITS ELEMENT: softened by my resistance (the save door - 
 test('SD18b THE HALL: the Ending\'s own stone lit in its light, breathing on the hall\'s clock - in the Hour\'s light channel; the fray\'s arc round once by the Hollow\'s own snap (the Fraying\'s thirty-six)', () => {
   const slot = 5, E = sdEndingOf(sdMarksOf(slot)), k = SD_STONES.findIndex((s) => s.key === E.id);
   const L0 = sdEndingStoneLight(slot, 0), L1 = sdEndingStoneLight(slot, 1);
-  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);     // AUDIT SD III (V3
+  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);   // AUDIT SD III (V3
   assert.deepEqual([L0.x, L0.y, L0.z, L0.range, L0.stone], [d[0], d[1], d[2], SD_STONE_LIGHT.range, k]);
   assert.ok(L0.color.every((v, i) => near(v, E.light[i] * SD_STONE_LIGHT.gain * (1 - SD_STONE_LIGHT.breathe))));
   assert.ok(L1.color[0] !== L0.color[0], 'breathing');

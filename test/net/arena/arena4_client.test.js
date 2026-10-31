@@ -142,7 +142,7 @@ test('ARENA4 the window online: the Bouts page carries the bouts on the sand (Wa
   assert.equal(players.live[0].watching, ARENA_TEXT.online.watching(4));
   assert.deepEqual(players.live[0].acts.map((a) => a.act), ['spectate']);
   const ch = (mm) => mm.bouts.cards.find((c) => c.kind === 'challenge');
-  assert.deepEqual(ch(m).acts.map((a) => [a.act, a.why]), [['queue', null], ['casual', null]]);     // ARENA4b (
+  assert.deepEqual(ch(m).acts.map((a) => [a.act, a.why]), [['queue', null], ['casual', null]]);   // ARENA4b (
   assert.deepEqual(ch(at({ status: 'open', queue: 'queued', band: 300, n: 4, live: [] })).acts.map((a) => a.act), ['unqueue']);
   const off = ch(at({ status: 'open', queue: 'offer', offer: { o: O, vs: { n: 'Brann', r: 1040 }, until: 18_000 }, live: [] }));
   assert.deepEqual(off.acts.map((a) => a.act), ['accept', 'decline']);

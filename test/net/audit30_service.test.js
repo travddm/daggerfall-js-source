@@ -109,7 +109,7 @@ test('AUDIT 30 S3: an id whose row the market\'s prune took (SCALE4b: the hour\'
   const l = await s.call('/v1/market/list', list(mac, { units: 100, price: 50, rid: RL }), mac.secret);
   assert.equal((await s.call('/v1/market/buy', { character: ann.character, region: DF, listing: l.body.listing.id, units: 100, max: 5000, hubs: HUBS, rid: RB }, ann.secret)).status, 200);
   clock(_now + (MARKET_KEEP_DAYS + 1) * DAY);
-  await runCron(s.env, { cron: CRON_HOUR, nowS: _now });     // the prune
+  await runCron(s.env, { cron: CRON_HOUR, nowS: _now });   // the prune
   assert.equal(Number(s.raw.prepare('SELECT COUNT(*) AS n FROM market_orders').get().n), 0, 'the rows are gone, the ledger\'s lines are not');
   s.fund(mac, 1_000_000);
   const o2 = await s.call('/v1/market/order', { character: mac.character, region: DF, material: 'ore:mithril', units: 1000, price: 1000, hubs: HUBS, rid: RO }, mac.secret);
@@ -220,7 +220,7 @@ test('AUDIT 30 S9 + L7 + L8: a listing binds only its kind\'s fields; an order f
   s.piece(mac, '0123456789abcdef');
   const p = await s.call('/v1/market/list', { character: mac.character, region: DF, kind: 'piece', provenance: '0123456789abcdef', wear: 900, price: 5, material: 'ore:mithril', hubs: HUBS, rid: rid() }, mac.secret);
   assert.equal(p.status, 200, JSON.stringify(p.body));
-  for (const m of ['part:daedra-heart']) {     // PROF7 moved it: the Bear Hide is Hunting's now
+  for (const m of ['part:daedra-heart']) {   // PROF7 moved it: the Bear Hide is Hunting's now
     const o = await s.call('/v1/market/order', { character: mac.character, region: DF, material: m, units: 1, price: 10, hubs: HUBS, rid: rid() }, mac.secret);
     assert.equal(o.body.error, 'bad-material', `${m}: an escrow held a week for goods nobody can bring`);
   }

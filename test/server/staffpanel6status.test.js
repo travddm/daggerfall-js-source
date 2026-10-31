@@ -380,7 +380,7 @@ test('STAFF-PANEL6-STATUS: HOME - the top n of each watch the caller may see, wo
   assert.deepEqual(admin.watches.find((x) => x.id === 'boom'), { id: 'boom', label: 'boom', items: [], high: 0, total: 0, more: 0, failed: true });
   const mod = await homeOf({}, {}, { player: {}, role: 'moderator' }, 10, list);
   assert.ok(!mod.watches.some((x) => x.id === 'admins'), 'an Admin\'s watch is not a Moderator\'s');
-  assert.deepEqual(HOME_WATCHES.map((x) => [x.id, x.role]), [['reports', 'moderator'], ['economy', 'admin'], ['gains', 'admin'], ['contested', 'admin'], ['bursts', 'admin'], ['monsters', 'admin'], ['freeze', 'admin'], ['watchlist', 'moderator'], ['status', 'admin']]);     // every staff module's watch, the design's Home order (
+  assert.deepEqual(HOME_WATCHES.map((x) => [x.id, x.role]), [['reports', 'moderator'], ['economy', 'admin'], ['gains', 'admin'], ['contested', 'admin'], ['bursts', 'admin'], ['monsters', 'admin'], ['freeze', 'admin'], ['watchlist', 'moderator'], ['status', 'admin']]);   // every staff module's watch, the design's Home order (
   assert.equal(HOME_WATCHES[0], REPORTS_WATCH);
 });
 

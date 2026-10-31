@@ -646,7 +646,7 @@ test('AUDIT NAV1 B1 the host lets a prize go: a boarding won clears her boarded 
   assert.equal(e.ship.boarded, false, 'the fight is over');
   // out of sight: she goes
   view.feet = [DESPAWN_BEYOND + 500, 0, 0];
-  run(2 + SHIP_FADE_S);     // SHIP-FADE
+  run(2 + SHIP_FADE_S);   // SHIP-FADE
   assert.equal(host._sea.has(id), false, 'let go past DESPAWN_BEYOND');
 });
 
@@ -688,7 +688,7 @@ test('AUDIT NAV1 M8 the sea keeps the world\'s time: a long frame (Come Sail Awa
 test('AUDIT NAV1 NAV-R a raider coming alongside to board is chasing me - the Overworld\'s map says so, and losing me spends her (mutants: the board mode unread)', async () => {
   const { host, run, log } = await sea({ hull: 2, settings: { ShipsAtSea: 'off', Boarders: true } });
   host.raiders([{ id: 'r1', seed: 0x51f00d, pos: [300, 0, 0], yaw: Math.PI / 2, ahead: [600, 0, 0] }], { sight: 1000, spent: new Set() });
-  run(GRAPPLE_STILL_S + 3);     // SEA-EASE (
+  run(GRAPPLE_STILL_S + 3);   // SEA-EASE (
   const e = [...host._sea.values()].find((x) => x.raider);
   assert.equal(e.ship.mode, 'board', 'my boat lies still: she comes to board');
   assert.equal(host.raiderShipOf(0x51f00d).chase, true);

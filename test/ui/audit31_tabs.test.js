@@ -223,7 +223,7 @@ test('AUDIT 31 U4, U11, H6, U13: Yours declines a commission naming you and says
   const held = Object.assign([], { blocked: 1 });
   const h = workRig({ data: boardData(), pieces: held });
   await openWork(h.host);
-  assert.match(byClass(h.host, 'seal-commission')[0].textContent, /Your piece for it is equipped, locked or bound\. Free it first\./);     // BOARD-UI (
+  assert.match(byClass(h.host, 'seal-commission')[0].textContent, /Your piece for it is equipped, locked or bound\. Free it first\./);   // BOARD-UI (
   h.v.unmount();
 });
 
@@ -274,7 +274,7 @@ test('AUDIT 31 L6, U14: a next bid past any balance is said, never a Bid greyed 
   redraw();
   byClass(root, 'market-row')[0].click();
   redraw();
-  assert.match(root.textContent, /The next bid \(10,000,001 silver\) is more than an account can hold\./);     // BOARD-UI (
+  assert.match(root.textContent, /The next bid \(10,000,001 silver\) is more than an account can hold\./);   // BOARD-UI (
   assert.equal(byClass(root, 'market-bid').length, 0);
   data = { rows: [] };
   tab.state.family = 'weapons';

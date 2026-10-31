@@ -32,7 +32,7 @@ test('DISC17-A: half the wisps, each twice as dark - 120 at a gale and 10 in a c
   assert.equal(WISP_MAX, 120);
   assert.deepEqual([wispCount(1), wispCount(0)], [120, 10], 'a gale and a dead calm (the floor is the same share)');
   assert.equal(WISP_FLOOR, 0.08);
-  assert.deepEqual([...WISP_LOOK.alpha], [0.09, 0.11]);     // SWAY-SOFT: under half DISC17-A's 0.20, 0.24
+  assert.deepEqual([...WISP_LOOK.alpha], [0.09, 0.11]);   // SWAY-SOFT: under half DISC17-A's 0.20, 0.24
   // WISPS-RETURN: a wisp is a streak again, and its darkest is the look's own alpha at the strength - read
   // off a frame the renderer draws, through both shaders' main()s, at the height of a wisp's life, over its length and
   // across its width

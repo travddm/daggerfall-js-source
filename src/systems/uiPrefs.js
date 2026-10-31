@@ -83,7 +83,7 @@ export const PREF_DEFAULTS = Object.freeze({
   // full screens stand on ('desk' | 'map'), and the vitals' vials upright in the corner or lying in a row ('upright' |
   // 'row'). While the dress is worn `plusTheme` stays the player's, unworn.
   plusDress: 'none', grimoirePages: 'cream', grimoireBackdrop: 'desk', grimoireVitals: 'upright', grimoireSpellbook: 'book',
-  grimoireDial: 'classic',     // DIAL-PACK: the Tab dial's doors - Daggerfall's own art ('classic') or the pack's paintings ('pack')
+  grimoireDial: 'classic',   // DIAL-PACK: the Tab dial's doors - Daggerfall's own art ('classic') or the pack's paintings ('pack')
   // TEXT-FONT: the face the enhanced skin's words are written in ('game' | 'sans' | 'mono' | 'dyslexic' |
   // 'system', ui/textFont.js) and the installed font 'system' names.
   textFont: 'game', textFontSystem: '',

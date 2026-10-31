@@ -391,7 +391,7 @@ test('SHIP-CLAIM a harbour\'s ship claimed is not stood at her berth again today
   assert.equal(mine.hull, e.ship.hull, 'mine now');
   mine.GameObject.position = [mine.GameObject.position[0] + 3000, 0, mine.GameObject.position[2] - 3000];
   h.view.feet = [0, 0, 300 + HARBOUR_LEAVE + 800];
-  h.run(1 + SHIP_FADE_S);     // SHIP-FADE
+  h.run(1 + SHIP_FADE_S);   // SHIP-FADE
   h.view.feet = [0, 0, 300];
   h.run(1);
   assert.ok(moored().length >= 1, 'the harbour stood again');

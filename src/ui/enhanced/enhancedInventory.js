@@ -96,7 +96,7 @@ import {
 } from '../paperDoll.js';
 import {
   equipItem, unequipSlot, equipTableOf, isEquipped,
-  isForbiddenEquip, isBrokenItem, getEquipSlot, bodyPartForSlot,     // getEquipSlot - Mac: Wear only where a slot would take it; bodyPartForSlot - AC-COMPARE: GetBodyPartForEquipSlot, the part a worn panel stands for}
+  isForbiddenEquip, isBrokenItem, getEquipSlot, bodyPartForSlot,   // getEquipSlot - Mac: Wear only where a slot would take it; bodyPartForSlot - AC-COMPARE: GetBodyPartForEquipSlot, the part a worn panel stands for}
   swapHands, canSwapHands,   // SWAP-HANDS
 } from '../../systems/equip.js';
 import { armourBadge, armourPlaque, compareBlock, lineCompareBlock, wearComparison } from '../armourCard.js';   // AC-COMPARE: the doll's numbers on the map, the overall figure, the card's comparison
@@ -3706,7 +3706,7 @@ export function itemInfoBoxes(item, d = deps) {
   const rows = d?.rows;
   if (!rows) return [[{ text: 'No item description available.', center: true }]];
   const boxes = [itemInfoRows(item, rows, { name: questLetterName(item, d.getQuest ?? null) })];
-  { const look = lookLine(item); if (look) boxes.push([{ text: look, center: true }]); }     // APPEARANCES: a look worn over it said - the pack's picture is the piece's own
+  { const look = lookLine(item); if (look) boxes.push([{ text: look, center: true }]); }   // APPEARANCES: a look worn over it said - the pack's picture is the piece's own
   if (isPotionRecipe(item)) {
     const names = potionRecipeIngredientNames(item) ?? [];
     if (names.length) boxes.push(names.map((text) => ({ text, center: true })));

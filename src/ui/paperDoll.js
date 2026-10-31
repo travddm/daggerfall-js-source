@@ -134,7 +134,7 @@ export { clampArmorVariant };
 /** GetItemImage(forPaperDoll) resolution: {archive, record, dye,
  *  target} or null for groups with no paperdoll layer. */
 export function paperdollItemImage(worn, { gender = 'male', race = 'Breton' } = {}) {
-  const item = drawnPiece(worn);     // APPEARANCES: a piece wearing a look is drawn as the look - the player's doll and every peer's
+  const item = drawnPiece(worn);   // APPEARANCES: a piece wearing a look is drawn as the look - the player's doll and every peer's
   const morph = raceByKey(race)?.morphologyIndex ?? HUMAN_MORPHOLOGY;
   const t = getTemplate(item.templateIndex);
   if (!t) return null;

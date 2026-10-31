@@ -62,7 +62,7 @@ test('LW2 the body: a ResidentWalker is a MobilePerson (every seam that takes a 
   assert.equal(p.frame, 0);
   const g = new ResidentWalker({}, { archive: 399, guard: true, frameCount: () => 1, groundY: () => 0 });
   g.pos = [0, 0, 0];
-  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);     // LW-TALK:
+  assert.equal(g.update(0.1, eye, true).record, PERSON_GUARD_IDLE_RECORD);   // LW-TALK:
   assert.doesNotThrow(() => p.release(), 'nothing on the grid to release');
 });
 
@@ -152,7 +152,7 @@ test('LW2 coming onto the street: on ARRIVAL (the first frame, a jump of the clo
   run(t, 4);
   const seen = new Set(t.town.pool.filter((r) => r.visible && r.res).map((r) => r.res.id));
   let checked = 0, waited = 0;
-  for (let f = 0; f < 30 * 160; f++) {     // LW-TALK:
+  for (let f = 0; f < 30 * 160; f++) {   // LW-TALK:
     t.clock.t += RATE / 30;
     const seats = t.town.update(1 / 30, SQUARE, 0, SQUARE, true);
     const now = new Set();

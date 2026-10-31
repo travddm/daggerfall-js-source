@@ -257,7 +257,7 @@ test('WB3b the seams, by source: the dungeon host enters the court through its o
   assert.match(w, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);
   assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onGate = \(g\) => gateLink\?\.word\(g\);/);
   // WB9b: the three courts' floor, as far as the walkways are laid - one arena, its crossings and clock refilled each frame
-  assert.match(w, /if \(!player\.arena && modes\?\.gateArenaDay\?\.\(\) != null\) player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/, 'the floor in the online frame');     // WB14b: the night's plan
+  assert.match(w, /if \(!player\.arena && modes\?\.gateArenaDay\?\.\(\) != null\) player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/, 'the floor in the online frame');   // WB14b: the night's plan
   assert.match(w, /if \(!onlineOn && modes\?\.gateArenaDay\?\.\(\) != null\) \{ ejectFromCourt\(COURT_TEXT\.collapse\); gateCourt\?\.leave\(\);/, 'offline, no court - and (AUDIT SS) its floor gathered on the way out');
   // AUDIT WBX F10: the court's own frame once first - a screen asleep through midnight lands the Wrath, then is carried out
   assert.match(w, /if \(courtDay != null && Date\.now\(\) \+ _sharedOffsetMs >= gateTimes\(courtDay\)\.wrathAt \+ GATE_COLLAPSE_MS\) \{[\s\S]{0,400}?try \{ gateCourt\?\.frame\(\); \} catch[^\n]*\n\s*ejectFromCourt\(COURT_TEXT\.collapse\);/);

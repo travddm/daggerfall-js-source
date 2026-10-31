@@ -180,7 +180,7 @@ test('NT1 / AUDIT-WH R6: the world plaque has ONE owner per host, and every one 
   const destroy = plaque.slice(plaque.indexOf('export function destroyWorldPlaque() {'));
   for (const slot of ['node = null;', 'shownSig = null;', 'lastX = null;', 'lastTop = null;',
     '_faults = 0;', '_faultSaid = false;', '_gateMark = null;', '_gateOn = false;',
-    '_winKey = null;', '_winFrom = 0;']) {     // FIELD BUGS 2026-10-11g LOOT-SCROLL (
+    '_winKey = null;', '_winFrom = 0;']) {   // FIELD BUGS 2026-10-11g LOOT-SCROLL (
     assert.ok(destroy.includes(slot), `destroyWorldPlaque leaves ${slot.split(' ')[0]} behind`);
   }
   // THE SIX DOORS. Five of them were unpinned before AUDIT-WH R6, and

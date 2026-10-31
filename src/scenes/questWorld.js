@@ -89,7 +89,7 @@ export function createQuestWorld(host) {
       // MAPS.BSA record of its own (readClassicLocation: the town mods took nothing there)
       getRegion: { value: (r) => (provinces && isProvinceRegion(r) ? provinces.getRegion(r) : maps.getRegion(r)) },
       readClassicLocation: { value: (r, l) => (isProvinceRegion(r) ? null : maps.readClassicLocation(r, l)) },
-      getLocation: { value: (r, l) => questSized(provinces && isProvinceRegion(r) ? provinces.getLocation(r, l) : maps.getLocation(r, l)) },     // INSTANCES: online a quest's markers are chosen on the dungeon whole - its instance's layout // AUDIT WORLD34 B2: online, the room's one layout (SD-ONLINE: the world's size for it)
+      getLocation: { value: (r, l) => questSized(provinces && isProvinceRegion(r) ? provinces.getLocation(r, l) : maps.getLocation(r, l)) },   // INSTANCES: online a quest's markers are chosen on the dungeon whole - its instance's layout // AUDIT WORLD34 B2: online, the room's one layout (SD-ONLINE: the world's size for it)
       getLocationByName: { value: (rn, ln) => questSized(placeByName(rn, ln)) },   // AUDIT-TESA A2-1: the clock's travel time to a site past the Bay
     }),
     getBlock: (name) => blocks.getBlockByName(name),

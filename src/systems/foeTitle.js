@@ -31,7 +31,7 @@ export function foeTitle(entity, base, { traits = true } = {}) {
   if (entity?.wildGiant) base = 'Greater Giant';   // GREATER-GIANT: the zone's own giants (systems/wild/wildZone.js GREATER_GIANT_NAME)
   const revenant = entity?.revenant?.name;
   if (typeof revenant === 'string' && revenant) return revenant;
-  const band = entity?.bandName;     // RVN6 (17): a revenant's follower, by its band - "Orc of Grushnak's Warband"
+  const band = entity?.bandName;   // RVN6 (17): a revenant's follower, by its band - "Orc of Grushnak's Warband"
   if (typeof band === 'string' && band) return `${base} of ${band}`;
   const c = entity?.champion;
   const named = typeof c === 'string' && c ? `${c.charAt(0).toUpperCase()}${c.slice(1)} ${base}` : base;

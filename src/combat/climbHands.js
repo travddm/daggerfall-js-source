@@ -68,7 +68,7 @@ export const HANDS = Object.freeze({
                            // FACE_BACK less WRIST_OUT ahead) through DFU's own lens on this surface (- at 52 the two fists' boxes met in the middle)
   GRIP_AT: 0.35,           // the grip: the point of a fist held on the wall, its share of the drawn height down from the top
   BOTTOM_SLACK: 34,        // the sleeve under the screen's bottom edge at rest: no lift may exceed it
-  REACH_W: 190,              // the reaching arm's drawn width, anchored at its own side of the screen (Mac: "it needs to sit on the
+  REACH_W: 190,            // the reaching arm's drawn width, anchored at its own side of the screen (Mac: "it needs to sit on the
                            // left/right side of the screen respectively"; then "they need to be the originasl size" - 150 shrank it)
   REACH_X_IN: 4,           // the reaching arm's box in from its edge
   REACH_SLACK: 16,         // the reaching arm's sleeve under the bottom edge

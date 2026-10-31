@@ -53,7 +53,7 @@ test('LW14 the timeline: each stop its minutes (a foe\'s DEEP_FOE_MIN by its see
   assert.deepEqual([...DEEP_FOE_MIN], [25, 40]);
   assert.deepEqual([DEEP_TREASURE_MIN, DEEP_DETOUR, DEEP_WALK_M], [10, 1.6, 30]);
   const stops = stopsOf(dungeon(), SIDE, ENTRY);
-  const trip = { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1000 + 400 } };     // a fated trouble: no deep fight of its own   //
+  const trip = { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1000 + 400 } };   // a fated trouble: no deep fight of its own   //
   const r = routeOf(stops, ENTRY, trip);
   assert.ok(r.legs.length >= 2);
   let t = 1000, at = ENTRY;

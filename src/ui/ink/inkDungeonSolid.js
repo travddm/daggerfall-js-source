@@ -61,7 +61,7 @@ export const SOLID = Object.freeze({
   trailRise: 1.5,    // ...and a trail point marks the floor within this height of its feet
   cutRise: 0.75,     // EM3-3D fix: a wall standing between the eye and the floor behind it is cut down to this - low
                      // enough to see the room over, high enough that a doorway still reads as a gap in a wall
-  wallThick: 0.35,     // EM3-3D fix: a wall is drawn this thick, against its floor
+  wallThick: 0.35,   // EM3-3D fix: a wall is drawn this thick, against its floor
   cutFacing: 0.15,   // ...when that floor lies this far (0..1, of a step straight away from the eye) behind it
 });
 

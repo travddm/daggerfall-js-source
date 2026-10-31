@@ -82,7 +82,7 @@ export function standLooseFoe({ collider, feet, yawRad, fovDegrees, foes, spawn 
   let spot = null;
   for (let i = 0; i < attempts && !spot; i++) {
     spot = placeFoeFreely(env, { minDistance, maxDistance, lineOfSightCheck });
-    if (spot && open && !raidSpotOpen(collider, spot)) spot = null;     // PACK-OPEN: a spot in a building is another attempt
+    if (spot && open && !raidSpotOpen(collider, spot)) spot = null;   // PACK-OPEN: a spot in a building is another attempt
   }
   if (!spot) return null;
   // FinalizeFoe (FoeSpawner.cs:210-226): a FLYING foe lifts 1.5 from

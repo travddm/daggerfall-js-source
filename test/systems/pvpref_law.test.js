@@ -63,8 +63,8 @@ test('PVP-REF THE ROOM AND VITALITY: `siege:<seat>:<week>`; 300 + 2 x Renown, th
   assert.equal(siegeOfRoom('nope'), null);
   assert.ok(SIEGE_ROOM.test('siege:0:0'));
   assert.deepEqual([siegeVitality(1), siegeVitality(50), siegeVitality(99), siegeVitality(0), siegeVitality(undefined), siegeVitality(12.9), siegeVitality(-5)], [302, 400, 400, 302, 302, 324, 302]);
-  assert.deepEqual([...SIEGE_KINDS], ['in', 'blow', 'cast', 'ask', 'yes']);     // CROWN1 part two: a Royal Tourney's challenge and accept (
-  assert.deepEqual([...SIEGE_OUT_KINDS], ['st', 'hp', 'fell', 'up', 'back', 'no', 'f', 'end', 'ask', 'bout', 'bend', 'lad', 'won']);     // SEAT2a: the battle's field and its end (
+  assert.deepEqual([...SIEGE_KINDS], ['in', 'blow', 'cast', 'ask', 'yes']);   // CROWN1 part two: a Royal Tourney's challenge and accept (
+  assert.deepEqual([...SIEGE_OUT_KINDS], ['st', 'hp', 'fell', 'up', 'back', 'no', 'f', 'end', 'ask', 'bout', 'bend', 'lad', 'won']);   // SEAT2a: the battle's field and its end (
   assert.deepEqual(validSiegeIn({ k: 'in', junk: 1 }), { k: 'in' });
   assert.deepEqual(validSiegeIn({ k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 40, r: 0, x: 1 }), { k: 'blow', to: 'peer-0002', w: 123, m: 9, d: 40, r: 0 });
   assert.deepEqual(validSiegeIn({ k: 'blow', to: 'peer-0002', w: -1, m: 0, d: 4, r: 1 }), { k: 'blow', to: 'peer-0002', w: -1, m: 0, d: 4, r: 1 });

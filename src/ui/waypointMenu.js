@@ -70,7 +70,7 @@ export const waypointMenuOpen = () => !!open;
 export function closeWaypointMenu(owner = null) {
   const o = open;
   if (!o || (owner != null && o.owner !== owner)) return;
-  open = null;     // the slot emptied before the occupant is told
+  open = null;   // the slot emptied before the occupant is told
   o.win?.removeEventListener?.('keydown', o.key, true);
   o.win?.removeEventListener?.('pointerdown', o.away, true);
   o.el.remove?.();

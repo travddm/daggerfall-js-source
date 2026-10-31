@@ -241,7 +241,7 @@ test('SD20c NO REVERSED SMOOTHSTEP IN ANY SHADER (V14): GLSL leaves smoothstep(a
   assert.ok(read1 > 150, `${read1} read`);
   for (const [name, glsl] of [['the beam', SD_BEAM_VS + SD_BEAM_FS], ['the sky', SD_SKY_VS + SD_SKY_FS + SD_SKY_PAINT_FS]]   /* SD-LOOK (PIN MOVED): its paint holds its horizon and its face */) {
     const edges = smoothEdges(glsl), told = edges.filter(([a, b]) => a !== null && b !== null);
-    assert.ok(told.length >= 5, `${name}: ${told.length} of ${edges.length} read`);     // SD-LOOK (
+    assert.ok(told.length >= 5, `${name}: ${told.length} of ${edges.length} read`);   // SD-LOOK (
     for (const [a, b, src] of told) assert.ok(a < b, `${name}: smoothstep(${src}, ...)`);
   }
 });

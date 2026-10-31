@@ -26,7 +26,7 @@ function rig({ aboard = 'peer-capt', ready = true } = {}) {
   const w = { now: 0, here: { x: 150, y: 300 }, capt: { x: 150, y: 300 }, aboard, ready, said: [], trips: [], went: true };
   let social = picture(w.capt);
   const vp = createVeilParty({
-    social: () => social, aboard: () => (w.aboard ? { owner: w.aboard } : null), here: () => w.here,     // `across` left out: the module's own Veil law (world/ethericSea.js inEther)
+    social: () => social, aboard: () => (w.aboard ? { owner: w.aboard } : null), here: () => w.here,   // `across` left out: the module's own Veil law (world/ethericSea.js inEther)
     ready: () => w.ready, now: () => w.now, say: (l) => w.said.push(l),   // `now` the page's wall clock: AUDIT HORIZONTAL C5, the window never reads it
     travel: (pick, opts, computed) => { w.trips.push({ pick, opts, computed }); return Promise.resolve(w.went); },
   });

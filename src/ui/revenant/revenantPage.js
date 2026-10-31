@@ -361,7 +361,7 @@ export function drawRevenantsPage(detail, rerender, { el, divider, player = null
       ? t('rvn.unq.page.howHeld', 'From Renown {renown}, an elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you.', { renown: REVENANT_MIN_RENOWN })
       : t('rvn.unq.page.how', 'An elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you.');
     detail.append(el('p', 'px-note', revenantOn()
-      ? `${lead} ${how}`     // AUDIT: the sworn and the fallen below are revenants too; RENOWN-GATE: and when they begin
+      ? `${lead} ${how}`   // AUDIT: the sworn and the fallen below are revenants too; RENOWN-GATE: and when they begin
       : 'Revenants need Loot rarity, which is off.'));
   } else {
     const list = el('div', 'rvn-list');

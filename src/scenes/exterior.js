@@ -1818,7 +1818,7 @@ export async function bootExterior(canvas, renderer, params, status) {
   });
   /** The clock passed by an act of upkeep (a kit's hour), as a camp meal's: the ticker, then the encounters it owes. */
   const upkeepPass = (n) => { playerTicker.advance(n); runEncounterTick(walkMode ? player.pos : cam.pos, true); };
-  setRideWalk((mode, runAsked) => upkeep.rideWalks(mode, runAsked));     // HORSE-WALK: horse care's horse walks unless it gallops - the fixed city stands no Overworld and runs no journey, so no road keeps the ride's pace here (world.js rideOnTheRoad)
+  setRideWalk((mode, runAsked) => upkeep.rideWalks(mode, runAsked));   // HORSE-WALK: horse care's horse walks unless it gallops - the fixed city stands no Overworld and runs no journey, so no road keeps the ride's pace here (world.js rideOnTheRoad)
   setGallopGate((mode, mods) => upkeep.gallopGate(mode, mods));
   registerUpkeepUses(upkeep, {
     reach: () => upkeepReach(hccRuntimeOn(), !!hccRuntimeOn()), horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,
@@ -6124,7 +6124,7 @@ export async function bootExterior(canvas, renderer, params, status) {
       _visBatches.push(b);
     }
     renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), walkMode ? player.pos : cam.pos));   // TACT4: a foe's wind-up on the ground
-    renderer.drawFoeTelegraphs?.(techniqueMarksNow());     // TECH1: and the player's own marks, after the foes'
+    renderer.drawFoeTelegraphs?.(techniqueMarksNow());   // TECH1: and the player's own marks, after the foes'
     for (const b of arenaBouts.batches()) _visBatches.push(b);   // ARENA-FIX 12: the crowd in the colosseum's tiers, and what it throws
     bloodMarks.draw(camRight, UP_Y);   // BLOOD1a: the marks go down BEFORE the billboards, so a body standing in its own blood is over it and not under it. ABOVE setFlatWind for the reason its own neighbour gives: WIND3 pins the wind and the draw as ADJACENT.
     if (lowPolyTrees && lptSets.length) { if (cullOn) spherePlanes(_pv, _lptPlanes); lowPolyTrees.frame(lptSets, cam.pos[0], cam.pos[1], cam.pos[2], lptOpts); }   // LPT1: the near 3D trees, for the flats' call below - culled to the frame's view (AUDIT LPT B4)

@@ -249,7 +249,7 @@ test('SD11c THE END JUDGED WHERE I STAND (L1 F3): a step under the veil - into t
 /** world.js's Rift memory over `storage` (SD-ONELIFE ( */
 function enteredOf(storage) {
   assert.match(W, /\n  const _sdEntered = sdSlotsKept\(SD_ENTERED_KEY, \(\) => _accountSds\.me\(\)\);\n/);
-  return sdSlotsKept(SD_ENTERED_KEY, () => null, () => storage);     // AUDIT SD III (H1
+  return sdSlotsKept(SD_ENTERED_KEY, () => null, () => storage);   // AUDIT SD III (H1
 }
 const memStorage = () => { const m = new Map(); return { m, getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
 
@@ -263,11 +263,11 @@ function riftHost({ rec, hollow, storage = memStorage(), entered = true } = {}) 
     forceExitToExterior: () => log.push('out'), enterSdRealm: async () => { log.push('realm'); return entered; },
   };
   const env = {
-    sdHost: { record: () => h.rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 },     // SD-THROUGH (
-    INTERIOR_SEASON: 3, SD_REALM_TEXT, setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), _sdEntered: enteredOf(storage), _sdFallen: new Set(),     // SD-ONELIFE (
+    sdHost: { record: () => h.rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 },   // SD-THROUGH (
+    INTERIOR_SEASON: 3, SD_REALM_TEXT, setMidScreenText: (t) => log.push(['said', t]), sdSay: (t) => log.push(['said', t]), _sdEntered: enteredOf(storage), _sdFallen: new Set(),   // SD-ONELIFE (
     _teleportToPixel: async () => { log.push('pixel'); if (h.onWalk) h.rec = h.onWalk; },
     sdVeilCentre: () => null, standBeforeHollowDoor: () => true,   // SD-LOOK S5: the veil's centre; AUDIT SD IV (F40): before its door
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },     // SD-PARTY (
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (
   };
   const body = `${constOf('sdRiftOf')}\n${fnOf('sdEnterRealm')}\nreturn { sdRiftOf, sdEnterRealm };`;
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -572,17 +572,17 @@ function fightHost() {
     _sdReceipts: new Map(), sdReceiptsLeft: () => log.push('receipts'),
     sdSpoilsBurst: { leave: () => log.push('floor.leave'), frame: () => log.push('floor.frame') }, saveSoon: { changed: () => log.push('save') },
     sdBlows: { leave: () => log.push('blows.leave'), frame: () => log.push('blows.frame') },
-    sdRemVoice: { leave: () => log.push('voice.leave'), frame: () => log.push('voice.frame') },     // SD14a (
-    sdFx: { leave: () => log.push('fx.leave'), frame: () => log.push('fx.frame'), away() {} },     // SD16 (
+    sdRemVoice: { leave: () => log.push('voice.leave'), frame: () => log.push('voice.frame') },   // SD14a (
+    sdFx: { leave: () => log.push('fx.leave'), frame: () => log.push('fx.frame'), away() {} },   // SD16 (
     sdDungeonToRealm: () => [0, 0, 0], player: { pos: [0, 0, 0] }, sdBarNear: () => false, remnantBarModel: () => null,
     drawGateBossBar: () => log.push('bar'), gamePaused: () => false, townTalk: {},
     // SD15 (
     playerEntity: { health: 10 }, SD_ARENA: { x: 0, z: 0 }, cam: { yaw: 0 }, sdPerilAt: () => null, sdGroundModel: () => null,
     sdBeats: { frame: () => null, leave: () => {} }, titleCardModel: () => null, drawGateGround: () => log.push('ground'), drawSdTitleCard: () => log.push('card'),
-    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard: () => log.push('marks'), performance: { now: () => 0 },     // SD18b (
-    gateVeil: null,     // AUDIT SD III (T18
+    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard: () => log.push('marks'), performance: { now: () => 0 },   // SD18b (
+    gateVeil: null,   // AUDIT SD III (T18
   };
-  const body = `let _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${fnOf('sdFightHeard')}\n${constOf('sdFightFrame')}\nreturn { sdFightHeard, sdFightFrame, held: () => _sdFightHeld };`;     // AUDIT SD III (V13
+  const body = `let _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${fnOf('sdFightHeard')}\n${constOf('sdFightFrame')}\nreturn { sdFightHeard, sdFightFrame, held: () => _sdFightHeld };`;   // AUDIT SD III (V13
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
   return { ...api, log, at: (s) => { slot = s; }, receipts: env._sdReceipts };
 }
@@ -599,12 +599,12 @@ test('SD11c THE WORLD HOST\'S FIGHT, RUN FROM ITS OWN TEXT (L8 G3, L5 F5): in th
   assert.equal(h.held(), true);
   h.log.length = 0;
   h.sdFightFrame(); h.sdFightFrame();
-  assert.deepEqual(h.log, ['blows.frame', 'voice.frame', 'fx.frame', 'floor.frame', 'blows.frame', 'voice.frame', 'fx.frame', 'floor.frame'], 'in the Hour: each frame');     // SD14a (
+  assert.deepEqual(h.log, ['blows.frame', 'voice.frame', 'fx.frame', 'floor.frame', 'blows.frame', 'voice.frame', 'fx.frame', 'floor.frame'], 'in the Hour: each frame');   // SD14a (
   h.log.length = 0;
   h.receipts.set(4, 'r');
   h.at(null);
   h.sdFightFrame();
-  assert.deepEqual(h.log, ['receipts', 'floor.leave', 'save', 'link.leave', 'blows.leave', 'voice.leave', 'fx.leave'], 'out: the receipts, the floor gathered, a checkpoint asked, the fight left');     // SD14a (
+  assert.deepEqual(h.log, ['receipts', 'floor.leave', 'save', 'link.leave', 'blows.leave', 'voice.leave', 'fx.leave'], 'out: the receipts, the floor gathered, a checkpoint asked, the fight left');   // SD14a (
   h.log.length = 0;
   h.receipts.clear();
   h.sdFightFrame(); h.sdFightFrame();
@@ -627,7 +627,7 @@ test('SD11c A DEATH IN THE HOUR IS THE HOUR\'S, AND THE FLOOR\'S LAST WORDS GO T
   // the Hour's pool's voice, from its own text
   const from = W.indexOf('const sdSpoilsPool = createSpoilsPool({');
   const line = W.slice(from, W.indexOf('\n  });', from)).split('\n').find((l) => l.includes('say: (text) =>'));
-  const sayText = /say: (\(text\) => \(text === SD_SPOILS_TEXT\.gathered \? chatNotice\(text\) : sdSay\(text, SD_VOICE_RANK\.note\)\))/.exec(line)?.[1];     // (SD11d
+  const sayText = /say: (\(text\) => \(text === SD_SPOILS_TEXT\.gathered \? chatNotice\(text\) : sdSay\(text, SD_VOICE_RANK\.note\)\))/.exec(line)?.[1];   // (SD11d
   assert.ok(sayText, 'its say');
   const log = [];
   const say = evalIn(sayText, { SD_SPOILS_TEXT, SD_VOICE_RANK: { note: 1 }, chatNotice: (t) => log.push(['chat', t]), sdSay: (t) => log.push(['screen', t]) });

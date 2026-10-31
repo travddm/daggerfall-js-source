@@ -991,7 +991,7 @@ export function computeEnchantmentMods(entity, ctx = null, { clampMagicka = true
 export function enchantmentMagicRound(entity, round, { nowMinutes = 0, ctx = null } = {}) {
   ctx = mergeCtx(ctx);
   if (entity.isPlayer) (entity.reactionMods ??= new Array(SOCIAL_GROUP_COUNT).fill(0)).fill(0);   // ClearReactionMods (PlayerEntity.cs:1567-1570 - Array.Clear over all socialGroupCount = 11 entries)
-  applyDressStanding(entity);     // DRESS1: worn clothing refills the just-cleared mods - BEFORE the early return, so plain clothes count with nothing enchanted worn
+  applyDressStanding(entity);   // DRESS1: worn clothing refills the just-cleared mods - BEFORE the early return, so plain clothes count with nothing enchanted worn
   const items = equippedEnchantedItems(entity);
   if (!items.length) { entity._enchantMods = null; return; }
   computeEnchantmentMods(entity, ctx);

@@ -107,7 +107,7 @@ const mine = (e) => !!e?.isPlayer && !e.peer;
 /** A piece's valid lines of one kind - none with the switch off (off is DFU exactly). */
 export function linesOf(item, id) {
   if (!lootRarityOn() || !Array.isArray(item?.affixes)) return [];
-  return readLines(item).filter((a) => a?.id === id && validAffix(a));     // GEM1: a piece's gems as law 6 holds them
+  return readLines(item).filter((a) => a?.id === id && validAffix(a));   // GEM1: a piece's gems as law 6 holds them
 }
 /** What MY entity wears - the equip table's pieces. */
 export const wornPieces = (entity) => (entity ? equipTableOf(entity).filter(Boolean) : []);

@@ -127,7 +127,7 @@ test('LW-FIX6 two who come to an empty table never begin mid-script - LW-TALK: P
   r.layer.frame(0.016, DOOR, 0, [0, 1.6, -4.6]);   // in: nobody at any table
   r.st.clock = T + 5;
   r.st.inside = [RES(1), RES(2)];
-  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);     // the player looks away: the pair stood - AUDIT LW-ROOMS:
+  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);   // the player looks away: the pair stood - AUDIT LW-ROOMS:
   // behind the door's row (the room's walk lays its first table in that row now, square to the player's look out of the
   // door, where the eye's own rounding saw it)
   const [a, b] = r.layer.stood();

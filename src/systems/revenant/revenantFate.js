@@ -196,7 +196,7 @@ export function finishExecution(player, f) {
   swornWitness(f.mobileType ?? f.entity?.mobileType);   // RVN11 (Feud-Arc.md 22.1): one of its own kind executed in a sworn one's sight, -15
   const items = [...(Array.isArray(f.entity?.items) ? f.entity.items : []), ...(f.trophy ? [f.trophy] : [])];
   f.trophy = null;
-  if (f.entity) f.entity.items = [];     // AUDIT: handed to the pile - never a save's dead record's to carry twice
+  if (f.entity) f.entity.items = [];   // AUDIT: handed to the pile - never a save's dead record's to carry twice
   return items;
 }
 /** AUDIT: HELD BY ITS FATE - kneeling, burning, gathering into its portal, or a companion stepping out
@@ -219,7 +219,7 @@ export function beginSpare(player, f, { now = Date.now(), rolls = Math.random } 
   const back = revenantHandBack(player, r, f.entity);   // RVN8 (Feud-Arc.md 19): what it took of mine, handed back at the oath
   f.yielded = null;
   f.sparing = { at: now };
-  if (state === 'with') holdSworn(r.id, SPARING_MS);     // AUDIT: its companion steps out once the kneeling one is through
+  if (state === 'with') holdSworn(r.id, SPARING_MS);   // AUDIT: its companion steps out once the kneeling one is through
   const body = (state === 'with'
     ? `Sworn to you. ${r.given} walks at your side now.`
     : `Sworn to you. Your companions are full, so ${r.given} waits until you call it.`)

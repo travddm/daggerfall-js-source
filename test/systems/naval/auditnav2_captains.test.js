@@ -279,7 +279,7 @@ test('AUDIT NAV2 F23 two ships struck to each other are let go: a ship that stri
     assert.ok(s.host._sea.has(g.id) && s.host._sea.has(b.id) && !g.retiring && !b.retiring, 'in sight: kept');   // AUDIT BAY A15: never fading
     s.view.feet = [0, 0, -(DESPAWN_BEYOND + 3000)];
     s.host.frame(0.1);
-    assert.ok(s.host._sea.get(g.id)?.retiring && s.host._sea.get(b.id)?.retiring, 'both let go on the next director step (SHIP-FADE: fading)');     // SHIP-FADE
+    assert.ok(s.host._sea.get(g.id)?.retiring && s.host._sea.get(b.id)?.retiring, 'both let go on the next director step (SHIP-FADE: fading)');   // SHIP-FADE
     for (let t = 0; t < SHIP_FADE_S + 0.5; t += 0.1) s.host.frame(0.1);
     assert.ok(!s.host._sea.has(g.id) && !s.host._sea.has(b.id), 'and gone once faded');
   }

@@ -116,7 +116,7 @@ test('SD2d the world host: the cast-out is the dungeon\'s own way out (the mode 
   // AUDIT SD II (L1 F2, F9
   // Hour under its veil - (SD11d
   assert.match(w, /castOut: \(\) => \{\n {6}if \(!\(playerEntity\.health > 0\) \|\| modes\?\.deathUp\?\.\(\)\) return false;\n {6}const hour = modes\?\.sdRealmSlot\?\.\(\) != null;\n {6}if \(!modes\?\.unstuck\?\.\(\)\) return false;\n {6}if \(hour\) gateVeil\?\.flash\('hourCast'\);[^\n]*\n {6}sdSay\(SD_CAST_OUT_LINE\);\n {6}return true;\n {4}\},/);
-  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');     // AUDIT SD III (T15
+  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');   // AUDIT SD III (T15
   const online = w.indexOf('  const onlineFrame = (now, dt) => {');
   const frameAt = w.indexOf('    sdFrame();   // SD2b');
   const serpent = w.indexOf('    serpentFrame();   // SERPENT1');

@@ -311,7 +311,7 @@ test('SEAT1b THE ACCOUNT\'S CAP AND THE STANDINGS\' SHAPE: 2,000 an account a se
   }
   const s = await standings(gm);
   assert.equal(s.standings[0].influence, ACCOUNT_SEAT_WEEK_CAP, 'one account, 2,000 a seat a week');
-  assert.deepEqual(Object.keys(s).sort(), ['battle', 'chronicle', 'defence', 'fight', 'holder', 'mine', 'phase', 'reckoningAt', 'royal', 'season', 'seat', 'standings', 'tides', 'turningAt', 'week']);     // SEAT1c: the holder, its defence, the week's battle, the Chronicle; SEAT2a (
+  assert.deepEqual(Object.keys(s).sort(), ['battle', 'chronicle', 'defence', 'fight', 'holder', 'mine', 'phase', 'reckoningAt', 'royal', 'season', 'seat', 'standings', 'tides', 'turningAt', 'week']);   // SEAT1c: the holder, its defence, the week's battle, the Chronicle; SEAT2a (
   assert.deepEqual([s.phase, s.week, s.seat.key], ['muster', week, ANTICLERE.key]);
   assert.deepEqual(s.standings[0].guild, { id: gid, name: 'Silver Hand', tag: 'SH', heraldry: null });
   // CROWN2 (

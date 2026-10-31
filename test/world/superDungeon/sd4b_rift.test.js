@@ -77,7 +77,7 @@ test('SD4b the Rift\'s size: 7 m at most, the hall\'s own less its air, never un
   assert.equal(sdRiftFit(1, 1), SD_RIFT_MIN_M, 'never under the least');
   assert.equal(sdRiftFit(undefined, Infinity), SD_RIFT_SIZE_M, 'an unmeasured side asks nothing');
   // a great hall: the end itself, the whole ring
-  assert.deepEqual(sdRiftPlace([20, 0, 20], hall({ x1: 40, z1: 40, h: 12 })), { at: [20, 0, 20], size: 7, face: [Math.cos(Math.PI / 4), 0, Math.sin(Math.PI / 4)] });     // SD-LOOK (
+  assert.deepEqual(sdRiftPlace([20, 0, 20], hall({ x1: 40, z1: 40, h: 12 })), { at: [20, 0, 20], size: 7, face: [Math.cos(Math.PI / 4), 0, Math.sin(Math.PI / 4)] });   // SD-LOOK (
   // a corner: the diagonal three metres out, where its walls stand furthest
   const r = sdRiftPlace([1, 0, 1], hall());
   const s = 1 + 3 * Math.SQRT1_2;
@@ -160,7 +160,7 @@ test('SD4b the art - SD-LOOK (PIN MOVED: the billboard frames retired for the as
 function fakes({ archive = true } = {}) {
   const r = { made: [], freed: [] };
   r.uploadTexture = () => {}; r.uploadEmissionTexture = () => {};
-  r.createMesh = (m) => { const g = { m }; r.made.push(g); return g; };     // SD-LOOK (
+  r.createMesh = (m) => { const g = { m }; r.made.push(g); return g; };   // SD-LOOK (
   r.destroyMesh = (g) => r.freed.push(g);
   const bell = new Float32Array(6000).map((_, i) => Math.sin(i / 2.3) * Math.exp(-i / 2500));
   const a = {
@@ -299,7 +299,7 @@ test('SD4b the host\'s steps, run from its own text: into the Rift its word firs
   const body = `${fn('sdRiftStep')}\n${fn('sdReturnStep')}\nreturn { sdRiftStep, sdReturnStep };`;
   const make = (host) => {
     const said = [], tp = [];
-    const f = new Function('sdEndWord', 'setMidScreenText', 'SD_NO_RIFT', 'api', 'actions', 'opts', body)(     // AUDIT SD II (SD11d
+    const f = new Function('sdEndWord', 'setMidScreenText', 'SD_NO_RIFT', 'api', 'actions', 'opts', body)(   // AUDIT SD II (SD11d
       () => host, (t) => said.push(t), SD_NO_RIFT,
       { startSpawn: (o) => (o?.preferEnterMarker === false ? [1, 2, 3] : [9, 9, 9]) }, { onTeleport: ({ pos }) => tp.push(pos) }, {});
     return { ...f, said, tp };

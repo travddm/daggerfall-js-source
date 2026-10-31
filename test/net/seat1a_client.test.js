@@ -235,7 +235,7 @@ test('SEAT1a the banners: the palace door\'s two, a gate\'s on its town side bes
   assert.deepEqual(b.top, [0.5, 2 + BOARD_PENNANT_RISE_M, 0.1]);
   const frames = new Map([[makeBuildingKey(1, 2, 1), { at: [0, 0, 0], box: [-5, 0, -5, 5, 8, 5], door: { a: [-1, 0, 5], b: [1, 0, 5] } }]]);
   const boards = [{ local: I, box: [0, 0, 0, 1, 2, 0.2] }, { local: I, box: [3, 0, 0, 4, 2, 0.2] }];
-  const all = seatBannerAnchors({ frames, palaceKeys: [makeBuildingKey(1, 2, 1)], gates: [gate], boards, bounty: new Set([1]), centre: [0, 20] });     // ONE-BOARD REVERTED (
+  const all = seatBannerAnchors({ frames, palaceKeys: [makeBuildingKey(1, 2, 1)], gates: [gate], boards, bounty: new Set([1]), centre: [0, 20] });   // ONE-BOARD REVERTED (
   assert.equal(all.length, 4, 'the door\'s two, the gate\'s one, the rumour board\'s one - never the bounty board\'s');
   assert.deepEqual(all[3], boardPennantAnchor(boards[0]), 'the pennant over the rumour board itself');
   assert.equal(seatBannerAnchors({ boards, centre: [0, 20] }).length, 2, 'no bounty board: a pennant over each');

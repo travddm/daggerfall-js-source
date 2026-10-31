@@ -300,7 +300,7 @@ test('WB5 a crash loses nothing: at boot the record\'s pieces AS KEPT (not a re-
   // a piece the validator refuses is not handed over; the rest are
   const bad = JSON.parse(JSON.stringify(spoilsList(42, 6)));
   bad[0].item.templateIndex = 99999;
-  bad[bad.length - 1].gold = -5;     // GEM2 (
+  bad[bad.length - 1].gold = -5;   // GEM2 (
   st.set(SPOILS_STORE_KEY, { day: 701, at: WALL, who: 'char-1', pieces: bad });
   const got2 = [];
   assert.equal(bad.at(-1).kind, 'gold');

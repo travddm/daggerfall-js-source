@@ -40,7 +40,7 @@ function rig({ inside = [], stays = false, wall = null, clock = 100 * DAY_MIN + 
   };
   const town = {
     insideAt: () => st.inside.map((res) => ({ res, e: stays ? { kind: 'tavern', t0: 0, t1: 1e12 } : { kind: 'tavern' } })),
-    dayOf: (t) => Math.floor((t - 240) / DAY_MIN), talkBeat: () => (stays ? BEAT : null),     // LW-TALK:
+    dayOf: (t) => Math.floor((t - 240) / DAY_MIN), talkBeat: () => (stays ? BEAT : null),   // LW-TALK:
     lineCtx: () => ({ weather: null, hour: 20, news: null }), typeOf: () => BUILDING_TYPES.Tavern, greetingFor: () => null,
     o: { relations: () => createRelations() },
   };
@@ -91,7 +91,7 @@ test('LW8c the room astir: one in no circle stays put a while (INDOOR_STIR_S, th
   while (!two.layer.stood()[0].walking && steps++ < 400) run(two, 0.5);
   const claimed = two.layer.stood()[0].at;
   two.st.inside = [RES(1), RES(2), RES(3), RES(4), RES(5), RES(6), RES(7), RES(8)];
-  two.layer.frame(1, [0, 0, -4.65], Math.PI, [0, 1.6, -4.65]);     // AUDIT LW-ROOMS:
+  two.layer.frame(1, [0, 0, -4.65], Math.PI, [0, 1.6, -4.65]);   // AUDIT LW-ROOMS:
   // looking out of it (the room's walk deals a place of that row first now, square to the look, where the eye's own
   // rounding saw it and none came in)
   const others = two.layer.stood().filter((s) => s.id !== 'L9.1');

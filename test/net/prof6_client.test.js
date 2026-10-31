@@ -269,7 +269,7 @@ test('PROF6 the Work tab: this region\'s guild writs under the guild blue (Deliv
   r2.v.unmount();
   const r3 = workRig({ data: boardData(), pieces: [] });
   await ticks(); byClass(r3.host, 'notice-tab')[1].click(); await ticks();
-  assert.match(byClass(r3.host, 'notice-writ')[2].textContent, /You carry no unworn piece you made for it\./);     // BOARD-UI (
+  assert.match(byClass(r3.host, 'notice-writ')[2].textContent, /You carry no unworn piece you made for it\./);   // BOARD-UI (
   r3.v.unmount();
 });
 
@@ -305,7 +305,7 @@ test('PROF6 the Work tab\'s forms: an Officer\'s guild writ - the escrow, the pa
   assert.equal(byClass(form(), 'work-post')[0].disabled, true, 'no crafter, no commission');
   who.value = 'Silverthorn'; who.oninput();
   field('comm|pay').value = '900'; field('comm|pay').oninput();
-  assert.match(form().textContent, /The crafter gets it, less 45 silver tax, for an unworn piece they made\./);     // BOARD-UI (
+  assert.match(form().textContent, /The crafter gets it, less 45 silver tax, for an unworn piece they made\./);   // BOARD-UI (
   byClass(form(), 'work-post')[0].click();
   await ticks();
   assert.deepEqual(calls.at(-1), ['commission', { region: DF, crafter: 'Silverthorn', recipe: 'dagger:iron', quality: 2, pay: 900 }]);
@@ -369,7 +369,7 @@ test('PROF6 the Guild tab: the guild Stores read once, each material\'s count an
   const doc = { ...document, createElement: (t) => Object.assign(document.createElement(t), { dataset: {} }) };
   doc.head.dataset ??= {}; doc.body.dataset ??= {};
   const panel = createSocialPanel({ social: new SocialState({ acct: 'acct-a' }), guild: book, doc, win: { addEventListener() {}, removeEventListener() {} }, overlay: () => false, touch: false });
-  panel.openGuild('stores');     // GUILD2 (
+  panel.openGuild('stores');   // GUILD2 (
   await ticks(6); panel.render(); await ticks(6); panel.render();
   const t = panel.root.textContent;
   assert.match(t, /Guild Stores/);
@@ -378,14 +378,14 @@ test('PROF6 the Guild tab: the guild Stores read once, each material\'s count an
   assert.match(t, /Writ budget/);
   assert.equal(calls.filter((c) => c[0] === 'read').length, 1, 'read once');
   const fields = byClass(panel.root, 'dfsocial-field');
-  const units = fields.find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');     // GUILD-UX (
+  const units = fields.find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (
   units.value = '15'; units.dispatch('input', {});
   const btn = (label) => byClass(panel.root, 'dfsocial-btn').find((b) => b.textContent.startsWith(label));
   btn('Put in').click();
   await ticks();
   assert.deepEqual(calls.at(-1), ['deposit', OAK, 15]);
   panel.render();
-  const units2 = byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');     // GUILD-UX (
+  const units2 = byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (
   units2.value = '10'; units2.dispatch('input', {});
   btn('Take out').click();
   await ticks();

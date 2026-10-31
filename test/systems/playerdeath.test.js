@@ -191,7 +191,7 @@ test('DC1: the standalone dungeon sinks OUTSIDE the overlay-held walk branch, th
   assert.match(ctxSrc, /const _ms = opts\.motorState\?\.\(\) \?\? null;\n\s+activeOverlay = new DeathScreen\(\{ eyeHeight: _ms\?\.eyeLevel, capsuleHeight: _ms\?\.capsule, onReset:/,
     'the presenter takes the live heights through opts.motorState');
   assert.match(scene, /motorState: \(\) => \(_motorRef \? \{ eyeLevel: _motorRef\.eye\[1\] - _motorRef\.pos\[1\], capsule: _motorRef\.height, fallFrom: _motorRef\.falling \? _motorRef\.fallStart : null \} : null\)/,
-    'the scene passes the seam, late-bound like the F222 pose');     // AUDIT SD III (D1
+    'the scene passes the seam, late-bound like the F222 pose');   // AUDIT SD III (D1
   assert.match(scene, /_motorRef = player;/, 'the slot binds once the motor exists');
 });
 

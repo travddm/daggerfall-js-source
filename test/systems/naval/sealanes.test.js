@@ -449,7 +449,7 @@ test('SEA-LANES THE WORLD\'S FEED: before the frame poses the sea\'s ships, ever
   assert.match(hostText('src/scenes/world.js'), /add\(\{ id: summary \? summary\.id : portIdOf\(beyond\), loc, x: p\.x \+ dx, y: p\.y \+ dy, name: summary \? maps\.getRegion\(summary\.regionIndex\)\?\.mapNames\?\.\[summary\.mapIndex\] \?\? null : beyond\.name \}\);/, 'the harbour\'s town by its name');   // PIN MOVED (PORT-SHIPS): scenes/harbourHost.js, the host read whole   // PIN MOVED (RPT1026-WORLD FAR-QUAY): every port town near, each once
   f.laneShips();
   assert.equal(f.calls.liners.length, 1);
-  const { list } = f.calls.liners[0];     // AUDIT BAY A6
+  const { list } = f.calls.liners[0];   // AUDIT BAY A6
   const want = packetsAt(lane, way, clock);
   assert.ok(want[0].phase === 'dwell' && want[0].port.id === lane.a.id, 'her first packet at home');
   assert.deepEqual(list.map((l) => l.id), want.map((p) => p.id), 'every packet of the lane');

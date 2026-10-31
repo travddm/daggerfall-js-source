@@ -63,7 +63,7 @@ test('seams 1: alphaIndex -1 keeps palette index 0 opaque; 0 cuts it (MaterialRe
 
 test('seams 1: the pipeline uploads MESH materials opaque and flats as cutouts, through the one door', () => {
   const p = src('src/scenes/dataPipeline.js');
-  assert.match(p, /const uploadRecord = \(archive, record, \{ opaque = false, mips, removeMask = false, dye = null, dyeTarget = null, cutout = false \} = \{\}\) =>/);     // REVIEW 2026-09-05: + the icon door's mips opt-out; DYE-ICON: + the swatch the dye changes
+  assert.match(p, /const uploadRecord = \(archive, record, \{ opaque = false, mips, removeMask = false, dye = null, dyeTarget = null, cutout = false \} = \{\}\) =>/);   // REVIEW 2026-09-05: + the icon door's mips opt-out; DYE-ICON: + the swatch the dye changes
   assert.match(p, /const masked = swap \? null : removeMask \? changeMask\(bitmap\) : bitmap;/);
   assert.match(p, /const color32 = swap \?\? t\.getColor32\(dyed \? changeDyeBitmap\(masked, dye, dyeTarget\) : masked, opaque \? -1 : 0\);/);   // DYE-ICON: the opaque/cutout choice is untouched
   assert.match(p, /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/);

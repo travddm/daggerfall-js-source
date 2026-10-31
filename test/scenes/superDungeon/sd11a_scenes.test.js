@@ -317,7 +317,7 @@ test('AUDIT SD II L2 F7: THE AURORAE WHOLE ROUND - their curtain\'s noise read r
 test('AUDIT SD II L2 F12: NO POW OF A NEGATIVE in the arc\'s shaders - Wayrest\'s arches squared (pow(2.0 * cell - 1.0, 2.0) was negative over half of every span: undefined in GLSL ES, NaN on D3D), and the Turning Hour\'s gleam on a base kept off the negative (a cos a hair under -1): the sky\'s skylines run with D3D\'s pow are numbers everywhere (mutants: the arch a pow; the gleam unguarded)', () => {
   assert.doesNotMatch(SD_SKY_PAINT_FS, /\bpow\(/, 'the sky takes no pow at all');
   const f = skyRun();
-  for (let u = -1; u <= 1; u += 0.01) for (let v = -0.05; v < 1; v += 0.05) for (let k = 0; k < SD_SKY_SHARDS.length; k++) assert.ok(Number.isFinite(f[`skyline${k}`](u, v)), `skyline${k}(${u.toFixed(2)}, ${v.toFixed(2)})`);     // SD-LOOK (
+  for (let u = -1; u <= 1; u += 0.01) for (let v = -0.05; v < 1; v += 0.05) for (let k = 0; k < SD_SKY_SHARDS.length; k++) assert.ok(Number.isFinite(f[`skyline${k}`](u, v)), `skyline${k}(${u.toFixed(2)}, ${v.toFixed(2)})`);   // SD-LOOK (
   const turning = AURA_FS.slice(AURA_FS.indexOf('vec3 turningGround('), AURA_FS.indexOf('vec3 turningWall('));
   const bases = [...turning.matchAll(/\bpow\(/g)].map((m) => turning.slice(m.index + 4, m.index + 8));
   assert.ok(bases.length >= 1 && bases.every((b) => b === 'max('), `every pow of the Turning Hour's ground on a base kept off the negative (${bases})`);
@@ -603,11 +603,11 @@ test('AUDIT SD II L2 F17: THE HALL\'S WORD FORGOTTEN OUT OF THE REALM, run from 
     // SD14a, SD15 (
     sdRemVoice: { leave() {}, frame() {} }, cam: { yaw: 0 }, SD_ARENA: { x: 0, z: 0 }, sdPerilAt: () => null, sdGroundModel: () => null,
     sdBeats: { frame: () => null, leave() {} }, titleCardModel: () => null, drawGateGround() {}, drawSdTitleCard() {},
-    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard() {}, performance: { now: () => 0 },     // SD18b (
-    gateVeil: null,     // AUDIT SD III (T18
-    sdFx: null,     // AUDIT SD V (L5
+    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard() {}, performance: { now: () => 0 },   // SD18b (
+    gateVeil: null,   // AUDIT SD III (T18
+    sdFx: null,   // AUDIT SD V (L5
   };
-  const h = new Function(...Object.keys(env), `let _sdHall = null, _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${text}\nreturn { sdHallHeard, sdFightFrame, sdHallWord, sdConcordHere };`)(...Object.values(env));     // AUDIT SD III (V13
+  const h = new Function(...Object.keys(env), `let _sdHall = null, _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${text}\nreturn { sdHallHeard, sdFightFrame, sdHallWord, sdConcordHere };`)(...Object.values(env));   // AUDIT SD III (V13
   const word = { k: 'pz', s: 3, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 6, ok: true };
   h.sdHallHeard(word);
   h.sdFightFrame();

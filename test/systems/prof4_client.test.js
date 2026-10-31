@@ -299,7 +299,7 @@ test('PROF4 host: the tree targeted, E starts the Wood-Axe\'s ring (DFU\'s War A
     assert.deepEqual([asked[0].node, asked[0].kind, asked[0].act.clean, asked[0].act.cuts, asked[0].act.chops], [n.key, 'logs', true, 3, 3], 'three Clean Cuts: a clean ring');
     assert.equal(axe.currentCondition, 49, 'the Wood-Axe worn by one');
     assert.ok(said.includes('+3 Oak Logs and Resin to your Stores'), 'the Resin said with the logs (GATHER-SAID: one line)');
-    host.tick(CHOP_ACT.swingS);     // GATHER-FEEL (
+    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
     for (let i = 0; i < 4; i++) { host.tick(0.016); await tick(); }
     const fall = made.find((b) => b.tip);
     assert.ok(fall, 'the tree falls');

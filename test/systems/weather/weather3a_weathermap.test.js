@@ -404,7 +404,7 @@ test('WEATHER3a: the land under a birth - off the map is its edge\'s climate, an
   weatherAt(-500000, -500000, YEAR, (px, py) => { seaCalls.push([px, py]); return sea(px, py); });
   assert.ok(seaCalls.length > 0 && seaCalls.every(([px, py]) => !inMap(px, py)), 'the sea answered off the map: its edge never asked');
   // WEATHER3g: past the edge is the edge's own climate - a system born there is the land's weather, not the sea's
-  const edge = (px, py) => (!inMap(px, py) ? -1 : px === 0 || py === 0 ? CLIMATES.Mountain : CLIMATES.Swamp);     // a map with nothing past its edge (
+  const edge = (px, py) => (!inMap(px, py) ? -1 : px === 0 || py === 0 ? CLIMATES.Mountain : CLIMATES.Swamp);   // a map with nothing past its edge (
   let snowed = 0;
   for (let i = 0; i < 200; i++) if (weatherAt(-200000 - i * 3001, -150000, YEAR + 20 * 1440 + i * 13, edge).word === 'snow') snowed++;
   assert.ok(snowed > 30, `past the mountains' edge it snows as the mountains do (${snowed} of 200)`);

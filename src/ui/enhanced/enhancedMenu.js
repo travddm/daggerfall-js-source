@@ -1225,7 +1225,7 @@ function accountWindow() {
   for (const c of ['tl', 'tr', 'bl', 'br']) win.append(el('span', `px-gem px-corner px-${c}`));
   const body = el('div', 'px-body');
   body.append(accountBody());
-  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root);     // DISC23-B2: who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
+  body.append(skinCard(document, { gender: () => playerEntity?.gender }).root);   // DISC23-B2: who you are drawn as, beside who you are; LAYERED-GEAR: the character's own body, the one Layered Gearing first wears
   win.append(body);
   return win;
 }

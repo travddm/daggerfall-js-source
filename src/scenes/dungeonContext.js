@@ -138,7 +138,7 @@ import {
   applyDamageToNonPlayer,          // MT-iv: EnemyAttack.ApplyDamageToNonPlayer (:303-392)
   makeEnemiesHostile,              // ROAD-B: GameManager.cs:790-806
   spawnEnemyLoot,                  // RF2: SetEnemyCareer's whole loot chain, one seam
-  windupDoor,                        // TELL1: the poise door
+  windupDoor,                      // TELL1: the poise door
   tellCues,                        // TELL2: a telegraphed blow's three cues
   takeAimedShot, aimedDirection, aimedArrowMeta, aimedBlowInfo,   // TELL6d: the aimed shot's loose and its weight
   landBlowEffect,                  // TELL6e: what a landing does to the player
@@ -2090,7 +2090,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (!f?.yielded || f.dead) return false;
     const at = [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]];
     if (id === 'kill') {
-      renownFoeStruck(f);     // AUDIT: the execution is my blow - a kneel past RENOWN_ASSIST_MS paid nothing
+      renownFoeStruck(f);   // AUDIT: the execution is my blow - a kneel past RENOWN_ASSIST_MS paid nothing
       const ev = beginExecution(playerEntity, f, { now: Date.now() });
       audio.play3d(SOUND.SwingLowPitch, at, 1, { maxDistance: 16 });
       opts.shakeCamera?.(1.4);
@@ -2130,7 +2130,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         opts.shakeCamera?.(3);
         f._hfAt = performance.now() / 1000;   // the red flash, on foeHitFlash's own clock (the frame's write reads it)
       } else if (st === 'done') {
-        const feet = floorLanding(collider, [f.ai.feet[0], f.ai.feet[1] + 0.1, f.ai.feet[2]]);     // AUDIT: its pile on the floor, never in the air
+        const feet = floorLanding(collider, [f.ai.feet[0], f.ai.feet[1] + 0.1, f.ai.feet[2]]);   // AUDIT: its pile on the floor, never in the air
         // AUDIT: ITS SOUL - the kill door's X5 trap and V3 Star, which the yield ran ahead of (the open world's law)
         const trap = attemptSoulTrap(f.entity, f.mobileType, playerEntity.items, Math.random());
         if (trap.alert && trap.alert !== 'trapNoneEmpty' && SOUL_TRAP_TEXT[trap.alert]) hudText.add(SOUL_TRAP_TEXT[trap.alert]);
@@ -3475,7 +3475,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
 
   const magic = createPlayerMagic({
     isPuppet: (f) => isPuppetFoe(f),   // AUDIT FEUD 2: a room's foe another client runs - no rout of mine
-    lairHere: () => {     // RVN7 (18.1): a deed underground - this dungeon is its lair
+    lairHere: () => {   // RVN7 (18.1): a deed underground - this dungeon is its lair
       const mt = dfLocation.mapTableData;
       if (!mt || !dfLocation.name || !lairable()) return null;
       const p = longitudeLatitudeToMapPixel(mt.longitude, mt.latitude);
@@ -4527,7 +4527,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     for (const cr of gateCrystalBodies()) { cr._backFacing = false; live.push(cr); }   // WB9c: the Reckoning's crystals, bodies the swing meets as it meets him
     for (const hb of gateHostBodies()) { hb._backFacing = false; live.push(hb); }   // WB11c: his host, bodies the swing meets (its facing is the relay's walk, not a body's - no backstab)
     const rival = arenaRivalBody();   // ARENA4: my opponent on a relay's sand - a body the swing meets, by its surface
-    if (rival) { rival._backFacing = false; live.push(rival); }     // BAL8: no backstab at a player - the stand-in faces nowhere (world.js hands `yaw: 0`, so every blow from its -z side was one, x3), and the duel's, the siege's and the zone's referees roll none (AUDIT WB11 W2's law)
+    if (rival) { rival._backFacing = false; live.push(rival); }   // BAL8: no backstab at a player - the stand-in faces nowhere (world.js hands `yaw: 0`, so every blow from its -z side was one, x3), and the duel's, the siege's and the zone's referees roll none (AUDIT WB11 W2's law)
     // (the module-level playerEntity import IS foeDeps.playerEntity -
     // the old shadowing destructure was the null read that crashed)
     let hitEnemy = false;

@@ -128,7 +128,7 @@ export function armBuildOptsOf(entity) {
   return {
     werewolf: isMwWerewolf(entity),   // WEREWOLF1: a save loaded mid-transformation builds the wolf at the door
     skin: isMwWerewolf(entity) ? ownWerewolfSkin() : null,   // SHADOW-FANG: and in its skin
-    vampire: !!liveVampirism(entity),     // PORTRAIT3D: a vampire wears the race's vampire head (getVampireHead, MWNPC14), the body as its portrait
+    vampire: !!liveVampirism(entity),   // PORTRAIT3D: a vampire wears the race's vampire head (getVampireHead, MWNPC14), the body as its portrait
     race: mwRaceId(entity.race),
     female: entity.gender === 'female',
     faceIndex: entity.faceIndex | 0,
@@ -807,7 +807,7 @@ export function createWeaponRig({ renderer, canvas, fetchBytes, palette, audio, 
     const plain = !!glowOf(held);   // WEAPON-GLOW1: an element shown swings the plain sheet
     const type = heldType(held);
     if (type === WEAPON_TYPES.None) return null;
-    const item = drawnPiece(held);     // APPEARANCES: the sheet of the look the weapon wears - its kind's, so the type and the swing are the weapon's own
+    const item = drawnPiece(held);   // APPEARANCES: the sheet of the look the weapon wears - its kind's, so the type and the swing are the weapon's own
     if (!palette) return null;
     // DW1: the key carries the name the atlas is ASKED by. Under Diverse
     // Weapons a longsword and a broadsword are the same WEAPON_TYPE with

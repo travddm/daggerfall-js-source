@@ -87,7 +87,7 @@ test('AUDIT REST-PARTY C5: a brazier by the door counts toward N - N - 1 placed 
   assert.ok(withB.every((p) => (p[0] - 8) ** 2 + (p[2] - 8) ** 2 >= DFIRE.spacingM ** 2), 'none by the brazier');
   const elite = placeDungeonFires({ ...base, elite: true });
   assert.equal(elite.length, 2);
-  assert.deepEqual(elite[0], [5 + DFIRE.ringM, 0, 5], 'an elite\'s first is the entrance\'s');     // AUDIT REST II F3 (
+  assert.deepEqual(elite[0], [5 + DFIRE.ringM, 0, 5], 'an elite\'s first is the entrance\'s');   // AUDIT REST II F3 (
   const eliteB = placeDungeonFires({ ...base, elite: true, existing: brazier });
   assert.deepEqual(eliteB, [elite[1]], 'the brazier is the entrance\'s, the deep fire the other');
   // an elite of one with a brazier at its door: the brazier is the one
@@ -96,7 +96,7 @@ test('AUDIT REST-PARTY C5: a brazier by the door counts toward N - N - 1 placed 
   assert.deepEqual(placeDungeonFires({ blocks: small, probe: open, seed: 5, elite: true, existing: brazier }), []);
   // a brazier far from the door is not the entrance's: the full count, the entrance fire by the start
   const far = placeDungeonFires({ ...base, existing: [[RDB_SIDE * 6, 0, 30]] });
-  assert.deepEqual(far[0], [5 + DFIRE.ringM, 0, 5]);     // AUDIT REST II F3 (
+  assert.deepEqual(far[0], [5 + DFIRE.ringM, 0, 5]);   // AUDIT REST II F3 (
 });
 
 test('AUDIT REST-PARTY C3: a stair\'s tread and a ramp are no floor - the floor sampled half a metre round on eight bearings, level to 5 cm, flat past 0.99', () => {
@@ -180,7 +180,7 @@ test('AUDIT REST-PARTY C6: tools/dungeonFireProbe.mjs stands what the game stand
   const r = probeFires(col, blocks, { seed: 3, sizeOf });
   assert.equal(r.braziers, 1);
   assert.equal(r.valid, 1, 'the start marker kept beside a door face that is not an exit; the lift\'s marker refused');
-  assert.deepEqual(r.fires, [[5 + DFIRE.ringM, 0, 5]]);     // AUDIT REST II F3 (
+  assert.deepEqual(r.fires, [[5 + DFIRE.ringM, 0, 5]]);   // AUDIT REST II F3 (
   // the game's own call over the same inputs, read the game's way, stands the same fires
   const { doors, existing } = fireLayoutInputs(blocks, layoutHearths(blocks, sizeOf));
   assert.deepEqual(placeDungeonFires({ blocks, probe: colliderFireProbe(col), doors, existing, seed: 3 }), r.fires);

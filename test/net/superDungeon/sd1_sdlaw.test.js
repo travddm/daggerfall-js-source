@@ -204,11 +204,11 @@ test('SD1: the name, the room and the words', () => {
   assert.equal(sdOwnerOfRoom(`sd:42.${O}`), O);
   assert.equal(sdOwnerOfRoom('sd:42'), null);
   // the words
-  assert.equal(sdFoundLine({ who: 'Mara', near: 'Daggerfall' }), 'Mara has found an Abyss Dungeon near Daggerfall!');     // ABYSS-NAME (
-  assert.equal(sdFellLine({ top: 'Mara', n: 1, name: 'The Brass Hollow' }), 'Mara broke the Hour in the Brass Hollow. It collapses.');     // AUDIT SD II (L6 F20
+  assert.equal(sdFoundLine({ who: 'Mara', near: 'Daggerfall' }), 'Mara has found an Abyss Dungeon near Daggerfall!');   // ABYSS-NAME (
+  assert.equal(sdFellLine({ top: 'Mara', n: 1, name: 'The Brass Hollow' }), 'Mara broke the Hour in the Brass Hollow. It collapses.');   // AUDIT SD II (L6 F20
   assert.equal(sdFellLine({ top: 'Mara', n: 2, name: 'The Brass Hollow' }), 'Mara and 1 other broke the Hour in the Brass Hollow. It collapses.');
   assert.equal(sdFellLine({ top: 'Mara', n: 5, name: 'The Brass Hollow' }), 'Mara and 4 others broke the Hour in the Brass Hollow. It collapses.');
   assert.equal(sdFadeLine({ name: 'The Stopped Bell' }), 'The Hour closes over the Stopped Bell, unbroken.');
-  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');     // AUDIT SD III (T15
+  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');   // AUDIT SD III (T15
 });
 

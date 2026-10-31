@@ -184,7 +184,7 @@ test('SEAT2a A HEADLESS 10v10 SIEGE, THE ATTACKERS\' ENDING: two banners raised 
     assert.deepEqual(f.n, [10, 9, 1], 'who is in');
     assert.deepEqual([f.s, f.e], [T, T + SIEGE_LENGTH_MS.palace]);
     assert.ok(sieges(eye, 'f').length >= 300, 'a frame a second while it is in');
-    await walk(h, att.map((ws) => [ws, at(0, -40)]));     // the Throne, from either banner   //
+    await walk(h, att.map((ws) => [ws, at(0, -40)]));   // the Throne, from either banner   //
     await until(T + 60_000);
     assert.equal(sieges(eye, 'f').at(-1).th, 60 - 24, 'the Throne\'s seconds: held from the beat after the attackers reached it');   // PIN MOVED (AUDIT-SEATS): R2 - walked, the Market's five are within its 8 m from T + 24 s
     await until(T + 200_000);

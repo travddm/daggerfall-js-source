@@ -708,7 +708,7 @@ export function raidFrame(dt = 0) {
     expire(now, home);
     for (const r of state.raids) routRaid(r);
     state.lastSelectedDay = day;
-    state.raids = raidsForDay(day, regions).filter((r) => !isWildRegion(r.regionIndex));     // PVPDUNGEONS: every client drops the zone's towns from the day's roll alike
+    state.raids = raidsForDay(day, regions).filter((r) => !isWildRegion(r.regionIndex));   // PVPDUNGEONS: every client drops the zone's towns from the day's roll alike
     cancelPending();
     scheduleNextSpawn(-1);
     scheduleNextDefender();

@@ -170,7 +170,7 @@ test('LR2: the affix kinds - six, each banded per tier, each with a word for the
   // TECH1: a weapon's technique is a kind after every kind, and in no pool - never
   // drawn by the numbers' pass, the proc line, the Exalted, a curse or the Reforge (its door's own pass)
   assert.deepEqual(Object.keys(LR.AFFIX_KINDS).filter((id) => !LR.AFFIX_IDS.includes(id)), ['technique']);
-  assert.deepEqual(LR.AFFIX_IDS.filter((id) => LR.AFFIX_KINDS[id].proc), ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring']);     // CAST-SPEED: after every kind before it
+  assert.deepEqual(LR.AFFIX_IDS.filter((id) => LR.AFFIX_KINDS[id].proc), ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring']);   // CAST-SPEED: after every kind before it
   for (const id of LR.AFFIX_IDS) {
     const k = LR.AFFIX_KINDS[id];
     assert.ok(['prefix', 'suffix'].includes(k.slot));
@@ -489,7 +489,7 @@ test('LR3: the Test Room\'s loot ladder - one door, thirty items (a Magic and a 
   assert.deepEqual(added.filter((i) => i.rarity === 'gilded').map((i) => i.gilded), ['the-dragonfire-oath', 'the-sunken-sovereign'], 'GILDED2: the world\'s two, whole (GILDED1\'s Hourlock went with the guns)');
   assert.deepEqual(added.filter((i) => i.rarity === 'aetheric').map((i) => i.aetheric), AETHERIC_RECORDS.map((r) => r.id), 'SET6: the nine Regalia pieces, once each; RAID4b: then the raids\' twenty-seven');
   assert.equal(added.filter((i) => i.rarity === 'magic').length, 12);   // LOOT14: and the wardrobe's two
-  assert.equal(added.filter((i) => i.rarity === 'rare').length, 16 + TECHNIQUE_IDS.length);     // LOOT16: and the cursed one; LOOT20: and the socketed one; GEM1: and the three-socket bow
+  assert.equal(added.filter((i) => i.rarity === 'rare').length, 16 + TECHNIQUE_IDS.length);   // LOOT16: and the cursed one; LOOT20: and the socketed one; GEM1: and the three-socket bow
   const legs = added.filter((i) => i.rarity === 'legendary' && i.isIdentified && !i.exalted && !i.cursed);   // LOOT2: the Exalted is the room's one extra; LOOT16: and the cursed one
   assert.deepEqual(legs.map((i) => i.legendary).sort(), [...LR.LEGENDARIES, ...LR.WARDROBE_LEGENDARIES, ...LR.ARCANE_LEGENDARIES].map((l) => l.id).sort(), 'every record once - LOOT15: the wardrobe\'s six too; BAL9c: and the arcane three');   // PIN MOVED (BAL9c)
   for (const it of legs) { const rec = LR.legendaryById(it.legendary); assert.ok(!rec.templates || rec.templates.includes(it.templateIndex), `${rec.id} on a fitting base`); }

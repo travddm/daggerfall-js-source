@@ -700,7 +700,7 @@ export async function harvestNode(ctx, player, env, body = {}) {
     if (kind === 'herbs') {
       tier = patch.tier;
       if (!tierOpen(rank, tier)) return { error: 'prof-rank' };
-      xpTier = herbXpTier(rank);     // HERB-XP: picked at the rank's own tier, as a haul is worked
+      xpTier = herbXpTier(rank);   // HERB-XP: picked at the rank's own tier, as a haul is worked
       key2 = herbKey(patch.herb, region);
       const common = tier === 1;
       // the steady hand's report, bounded: an uncommon or rare herb unbruised is the clean act; a bruised one yields one

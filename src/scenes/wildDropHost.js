@@ -37,7 +37,7 @@ export function createWildDropHost(host) {
       session: realmSession,
       checkpoint: () => wildDeathCheckpoint(),
       needsAnswer: true,
-      call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),     // MAC: my killer's piece into escrow where its room signs the collect; COMPANION-DROP (AUDIT FB1019f B2) and LETTERS-TENTH: the words my game applies (systems/wild/wildDeath.js wildFallWords - STORE-KEEPS retired CART-AWAY's wagon word)
+      call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),   // MAC: my killer's piece into escrow where its room signs the collect; COMPANION-DROP (AUDIT FB1019f B2) and LETTERS-TENTH: the words my game applies (systems/wild/wildDeath.js wildFallWords - STORE-KEEPS retired CART-AWAY's wagon word)
       apply: (a) => wildDropTaken(a?.data ?? null, body, lay),
     }).catch((e) => console.warn('[wild] the drop failed', e?.message ?? e));
   };

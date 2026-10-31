@@ -113,7 +113,7 @@ test('HT-WAIST-NET end to end: my lantern lit at the waist leaves my session THE
   const r = fakeRoom(ROOM);
   const relayMine = r.connect(), relayTheirs = r.connect();
   await r.hello(relayMine, 'lamp-0001', P); await r.hello(relayTheirs, 'seer-0001', P);
-  for (const f of relayMine.sent) mine.receive(f);     // SD-HELLO (
+  for (const f of relayMine.sent) mine.receive(f);   // SD-HELLO (
   let heard = 0;
   const hear = () => { for (; heard < relayTheirs.sent.length; heard++) theirs.receive(relayTheirs.sent[heard]); };
   const relayLast = async () => {

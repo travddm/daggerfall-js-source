@@ -456,12 +456,12 @@ test('TOOL-USE: the world host hands Foraging the professions, the keys, and the
 });
 
 test('TOOL-USE: the Professions page says a tool\'s Use at the node is the key\'s and from the pack only points the way; the empty Stores say where their goods come from', () => {
-  assert.match(GATHER_HOW.herbalism, /patch of herbs/);     // VOICE1 (
-  assert.match(GATHER_HOW.mining, /vein of ore or a boulder/);     // VOICE1 (
+  assert.match(GATHER_HOW.herbalism, /patch of herbs/);   // VOICE1 (
+  assert.match(GATHER_HOW.mining, /vein of ore or a boulder/);   // VOICE1 (
   assert.match(GATHER_HOW.logging, /tree/);
-  assert.match(GATHER_HOW.herbalism, /The Sickle and the Basket can be used from your hotbar or quick slots as well\. Used from your pack, a tool only tells you where it can be used\.$/);     // VOICE1 (
-  assert.match(GATHER_HOW.mining, /The pick can also be used from your hotbar or quick slots\. Used from your pack, a tool only tells you where it can be used\.$/);     // VOICE1 (
-  assert.match(GATHER_HOW.logging, /The axe can also be used from your hotbar or quick slots\. Used from your pack, a tool only tells you where it can be used\.$/);     // VOICE1 (
+  assert.match(GATHER_HOW.herbalism, /The Sickle and the Basket can be used from your hotbar or quick slots as well\. Used from your pack, a tool only tells you where it can be used\.$/);   // VOICE1 (
+  assert.match(GATHER_HOW.mining, /The pick can also be used from your hotbar or quick slots\. Used from your pack, a tool only tells you where it can be used\.$/);   // VOICE1 (
+  assert.match(GATHER_HOW.logging, /The axe can also be used from your hotbar or quick slots\. Used from your pack, a tool only tells you where it can be used\.$/);   // VOICE1 (
   for (const k of ['herbalism', 'mining', 'logging']) assert.doesNotMatch(GATHER_HOW[k], /Foraging|earns no XP/);
   assert.match(STORES_EMPTY_LINE, /You can also use the matching tool from your hotbar or a quick slot\. Tools used from your pack gather nothing\.$/);
   const src = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
@@ -474,7 +474,7 @@ test('TOOL-USE: the Professions page says a tool\'s Use at the node is the key\'
   assert.doesNotMatch(GATHER_HOW.herbalism, /act choice key/);
   assert.match(GATHER_HOW.herbalism, /the patch's list also lets you search it for food/);
   assert.doesNotMatch(src, /act choice key searches/);
-  assert.match(src, /The carcass\\'s list also lets you search it\.'\)\)\);/);     // VOICE1 (
+  assert.match(src, /The carcass\\'s list also lets you search it\.'\)\)\);/);   // VOICE1 (
   assert.match(STORES_EMPTY_CARRY_LINE, /goes into your Materials Bag or pack\. Put it in here in any town\.$/);
   assert.match(src, /all\.size \? t\('prof\.page\.stores\.noMatch', 'Nothing in the Stores matches\.'\) : storesEmptyCarryLine\(\)\)\);/);
   assert.match(src, /const storesEmptyCarryLine = \(\) => t\('prof\.page\.stores\.emptyCarry', STORES_EMPTY_CARRY_LINE\);/);

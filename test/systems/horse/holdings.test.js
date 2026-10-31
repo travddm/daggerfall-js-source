@@ -121,7 +121,7 @@ test('HOLDINGS stableView: the pair as the page reads it - owned, its modes, a p
   walk(30, 90);
   const v = rt.stableView();
   assert.deepEqual({ ...v, wagonAt: undefined }, { persistence: true, transport: TRANSPORT.Foot, hasHorse: true, hasCart: true, horseName: '', wagonMode: WAGON_MODE.Deployed, horseMode: HORSE_MODE.HitchedToWagon,
-    wagonStabled: false, horseStabled: false,     // WAGON-STABLED (
+    wagonStabled: false, horseStabled: false,   // WAGON-STABLED (
     wagonAt: undefined, horseAt: null, out: true, inside: false, onShip: false, kg: 120, limit: 750 });
   assert.ok(v.wagonAt >= 32 && v.wagonAt <= 33, `the wagon 2.5 m behind where it was summoned, 30 m walked: ${v.wagonAt}`);
 });
@@ -158,7 +158,7 @@ test('HOLDINGS the Stable page over the real runtime through the hosts\' one sea
   let re = 0;
   const draw = () => { const d = el('div', 'px-qdetail'); drawStablePage(d, () => { re++; }, kit); return d; };
   let d = draw();
-  assert.match(d.textContent, /Your horse.*With you/);     // WAGON-STABLED (
+  assert.match(d.textContent, /Your horse.*With you/);   // WAGON-STABLED (
   assert.match(d.textContent, /Your wagon.*With you/);
   assert.match(d.textContent, /0\/750/, 'the load against the wagon\'s limit');
   assert.equal(buttons(d, 'Send away').length, 0, 'nothing out to send');

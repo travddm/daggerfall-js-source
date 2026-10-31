@@ -588,7 +588,7 @@ test('RAID3 client: standing in a raided town at a relay that keeps raids, I say
   assert.equal(log.words.at(-1).w.n, 2, 'a word the session refused is said again');
   const n = log.words.length;
   at.town = null;
-  at.pixel = { x: 201, y: 100 };     // FIELD BUGS 2026-10-11g RAID-WORD (
+  at.pixel = { x: 201, y: 100 };   // FIELD BUGS 2026-10-11g RAID-WORD (
   frame(1);
   assert.equal(log.words.length, n, 'out of the town: nothing');
   at.town = { regionIndex: 3, locationIndex: 7 };

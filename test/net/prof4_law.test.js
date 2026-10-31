@@ -98,9 +98,9 @@ test('PROF4 law: the forge burns a log to a Charcoal (a Charcoal Burner two) and
   assert.deepEqual([WORKBENCH_FEE, FORGE_FEE], [50, 50]);
   assert.deepEqual(FURNISHER_STOCK.map((x) => [x.key, x.marks, x.counter]), [['cloth:linen', 2, 'furnisher']]);
   assert.ok(SMITH_STOCK.every((x) => x.counter === 'smith'));
-  assert.deepEqual(STOCKS.map((x) => x.key).slice(0, 7), ['leather:cured', 'plank:oak', 'plank:pine', 'wood:charcoal', 'cloth:linen', 'cloth:linen', 'cloth:wool']);     // PROF5: the Weavers' counter's two after them
+  assert.deepEqual(STOCKS.map((x) => x.key).slice(0, 7), ['leather:cured', 'plank:oak', 'plank:pine', 'wood:charcoal', 'cloth:linen', 'cloth:linen', 'cloth:wool']);   // PROF5: the Weavers' counter's two after them
   assert.equal(stockOf('cloth:linen').counter, 'furnisher');
-  assert.deepEqual([...NO_PACK_FORM], ['work:ram', 'essence:arcane']);     // AUDIT PROF12 E1 (
+  assert.deepEqual([...NO_PACK_FORM], ['work:ram', 'essence:arcane']);   // AUDIT PROF12 E1 (
   assert.deepEqual(['leather:cured', 'cloth:linen', 'hide:bear', 'plank:oak', 'log:teak', 'wood:charcoal', 'ingot:iron'].map(withdrawable), [true, true, true, true, true, true, true]);
 });
 
@@ -119,7 +119,7 @@ test('PROF4 law: Carpentry\'s recipes (9.3) - staves 3 planks, short bows 3 and 
     [[217, '8 plank:pine + 2 cloth:linen'], [219, '8 plank:oak + 2 cloth:linen'], [218, '8 plank:cherry + 2 cloth:linen'], [220, '8 plank:teak + 2 cloth:linen']]);
   assert.deepEqual([recipeById('basket:pine').templateIndex, ins('basket:pine'), recipeById('basket:pine').kind], [1607, '2 plank:pine', 'tool']);
   const ram = recipeById('ramkit:oak');
-  assert.deepEqual([ram.templateIndex, ram.rank, RAM_KIT_RANK, ins('ramkit:oak'), ram.later], [690, 60, 60, '40 plank:oak + 20 ingot:iron + 4 hide:bear', undefined]);     // SEAT2b part two (
+  assert.deepEqual([ram.templateIndex, ram.rank, RAM_KIT_RANK, ins('ramkit:oak'), ram.later], [690, 60, 60, '40 plank:oak + 20 ingot:iron + 4 hide:bear', undefined]);   // SEAT2b part two (
   assert.equal(recipeOpen(ram, 100), true, 'made since SEAT2b part two (PIN MOVED: named, never made until the sieges)');
   assert.equal(recipeOpen(ram, 59), false, 'at Carpentry 60');
   assert.equal(recipeOpen(recipeById('chair:oak'), 10), true);

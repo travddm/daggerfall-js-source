@@ -419,7 +419,7 @@ test('SERAPH-WINGS on the back of an Eye of the Beholder sprite: its bones read 
   // WINGS-FIT: facing nowhere yet (Vector3.zero) the sprite shows the eye its FRONT (orientation 0) - so it faces the eye,
   // and the wings hang behind it; it answered null, and the camera's yaw hung them over the sprite's face
   assert.equal(b.state().orientation, 0, 'facing nowhere: its front to the eye');
-  const fy = b.facing().yaw;     // SPRITE-FACE (
+  const fy = b.facing().yaw;   // SPRITE-FACE (
   assert.ok(Math.abs(Math.atan2(Math.sin(fy - Math.PI), Math.cos(fy - Math.PI))) < 1e-9, `facing nowhere yet: facing the eye (${fy})`);
   // AUDIT 3: WALKING BACK, THE SPRITE FACES THE CAMERA - and so do the cloak and the wings (they were the camera's way: the cape over its face)
   const yaw = 0.3, cp = [-Math.sin(yaw) * 2, 3.5, -Math.cos(yaw) * 2];
@@ -444,10 +444,10 @@ test('SERAPH-WINGS on the back of an Eye of the Beholder sprite: its bones read 
   assert.equal(b.figure(), null, 'but no figure');
   // the plumbing: the door hands the figure, the view keeps it, a peer's walker or beast gives its own
   const src = (f) => readFileSync(new URL('../../' + f, import.meta.url), 'utf8');
-  assert.match(src('src/player/eyeOfTheBeholder/eotbBody.js'), /setEotbDrawBody\(\(canvas, f\) => this\.draw\(canvas, f\), \(\) => this\.figure\(\), \(\) => this\.facing\(\)\);/);     // SPRITE-FACE (
+  assert.match(src('src/player/eyeOfTheBeholder/eotbBody.js'), /setEotbDrawBody\(\(canvas, f\) => this\.draw\(canvas, f\), \(\) => this\.figure\(\), \(\) => this\.facing\(\)\);/);   // SPRITE-FACE (
   assert.match(src('src/player/eyeOfTheBeholder/eotbBody.js'), /figure = last\.riding \|\| FP \? null : \{ base: c\[1\] - cam\.feet\[1\], mpp: batchPx > 0 \? batchSize\.h \* grow \/ batchPx : 0, beast: !!last\.transformed \};/, 'none in the saddle - a rider\'s frame is the horse\'s too - nor in first person (SPRITE-FACE, PIN MOVED: its facing is facing()\'s)');
   const mv = src('src/player/mwView.js');
-  assert.match(mv, /const drawn = drawEotbBody\([^;]*\); spriteFigure = drawn \? eotbFigure\(\) : null; spriteFacing = drawn \? eotbFacing\(\) : null; return drawn;/);     // SPRITE-FACE (
+  assert.match(mv, /const drawn = drawEotbBody\([^;]*\); spriteFigure = drawn \? eotbFigure\(\) : null; spriteFacing = drawn \? eotbFacing\(\) : null; return drawn;/);   // SPRITE-FACE (
   assert.match(mv, /export function mwViewSpriteFigure\(\) \{ return eotbLane\(\) \? spriteFigure : null; \}/);
   const pr = src('src/net/peer/peerRiders.js');
   assert.match(pr, /figureOf: layer\.figureOf,   \/\/ SERAPH-WINGS/);

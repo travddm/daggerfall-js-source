@@ -19,7 +19,7 @@ export function createWildSeizeHost(host) {
       _wildSeize.delete(r);
       if (host.wildRemains.has(r)) continue;   // their tab took it: its remains stand (or stood)
       const p = s.p ?? campToWire(player.feetAt());   // AUDIT INT9: where the body fell, in its room's frame
-      wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then((a) => {     // MAC: my piece in escrow where the room signs my collect
+      wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then((a) => {   // MAC: my piece in escrow where the room signs my collect
         const d = a?.ok ? a.data : null;
         if (d?.order && Array.isArray(d.items) && d.items.length) { wildDeposit({ r: d.r, items: d.items, o: d.order, p, room: s.room, mine: null }); return; }
         // AUDIT INT9: a word that says nothing of the fall (offline, the service's own error, the rate, a record that moved

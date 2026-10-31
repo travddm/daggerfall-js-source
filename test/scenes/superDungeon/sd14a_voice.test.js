@@ -41,7 +41,7 @@ test('SD14a ITS VOICE IS THE IRON ATRONACH\'S, for a colossus: Daggerfall\'s own
   assert.deepEqual([iron.moveSound, iron.barkSound, iron.attackSound], [SD_IRON.move, SD_IRON.bark, SD_IRON.attack]);
   const C = SD_VOICE_CUES;
   const flat = Object.values(C).flatMap((c) => (Array.isArray(c) ? c : c.clip !== undefined ? [c] : Object.values(c)));
-  assert.equal(flat.length, 32);     // AUDIT SD III (A2
+  assert.equal(flat.length, 32);   // AUDIT SD III (A2
   assert.ok(SD_VOICE_CUES.knell.clip === SD_VOICE_CUES.release.end.clip && SD_VOICE_CUES.knell.volume < SD_VOICE_CUES.release.end.volume / 2, 'the End struck again: its own toll, softer');
   assert.ok(flat.every((c) => Number.isInteger(c.clip) && c.pitch > 0 && c.pitch < 3 && c.volume > 0 && c.reach > 0));
   assert.ok(C.step.pitch < C.echoStep[0].pitch && C.echoStep[0].pitch < C.echoStep[1].pitch, 'the Remnant under gold under silver');
@@ -144,7 +144,7 @@ test('SD14a ITS STRIDES AND ITS GROWL: a step heard for each SD_STRIDE_M it walk
   // a growl due as a blow begins: held for the blow
   const d = rig();
   d.v.frame();
-  for (let ms = 0; ms < SD_GROWL_MS - 20; ms += 100) d.step(Math.min(100, SD_GROWL_MS - 20 - ms));     // AUDIT SD III (A6
+  for (let ms = 0; ms < SD_GROWL_MS - 20; ms += 100) d.step(Math.min(100, SD_GROWL_MS - 20 - ms));   // AUDIT SD III (A6
   assert.equal(count(d.heard, SD_VOICE_CUES.growl), 0);
   d.s.rem.atk = { i: 50, a: SD_BLOWS.hand.id, at: d.at() + 1600, x: 0, z: 0, yw: 0, tg: [] };
   d.step(40);
@@ -221,6 +221,6 @@ test('SD14a FORGOTTEN AS THE HOUR IS LEFT, and the world host\'s: made beside th
   r.step(300);
   assert.equal(count(r.heard, SD_VOICE_CUES.wake), 0, 'left: the next fight seen is taken as it stands');
   assert.match(W, /const sdRemVoice = sdFightLink \? createSdRemnantVoice\(\{ audio, link: sdFightLink, feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\) \}\) : null;/);
-  assert.match(W, /if \(inRealm && playerEntity\.health > 0\) \{ try \{ sdRemVoice\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] voice', e\?\.message \?\? e\); \} \}/);     // AUDIT SD III (A5
-  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);     // SD16 (
+  assert.match(W, /if \(inRealm && playerEntity\.health > 0\) \{ try \{ sdRemVoice\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] voice', e\?\.message \?\? e\); \} \}/);   // AUDIT SD III (A5
+  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // SD16 (
 });

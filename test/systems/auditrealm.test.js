@@ -166,7 +166,7 @@ test('AUDIT REALM F1: BOUND_TEMPLATES is every row the game registers with `boun
     WALLET_ROW,   // WALLET1: the wallet - bound (and pack-only): it never changes hands
     ...AYLEID_STONE_TEMPLATES,   // LOOT21: the Welkynd and Varla Stones - neither bound: a stone changes hands
     ...GEM_GRADE_ROWS,   // GEM2: the 32 graded gems - none bound: a gem changes hands, as DFU's do
-    ...GOODS_ROWS, CHART_ROW,     // CAPT-TRADE, CAPT-CHARTS (
+    ...GOODS_ROWS, CHART_ROW,   // CAPT-TRADE, CAPT-CHARTS (
     ...UPKEEP_ITEM_ROWS,   // STEED1/WAGONS4: the Sack of Oats and the Wagon Repair Kit - neither bound: they change hands
     SOUL_CAKE_ROW, HEARTH_OFFERING_ROW,   // WITCH1: the Soul Cake and the Hearth Offering - bound: the cakes are the account's
     STARGLASS_ROW,   // STAR7: Starglass - not bound: a fallen star's glass changes hands, as a gem does
@@ -278,7 +278,7 @@ test('AUDIT REALM L1-F4 / L2-F1: a settle landing between the first side\'s read
   let armed = true;
   r.env.DB.prepare = (sql) => {
     const st = realPrepare(sql);
-    if (!/^SELECT seq, lease, bytes, obj, prev[a-z_, ]* FROM realm_characters/.test(sql)) return st;     // INT3 (
+    if (!/^SELECT seq, lease, bytes, obj, prev[a-z_, ]* FROM realm_characters/.test(sql)) return st;   // INT3 (
     let args = [];
     const wrap = { ...st, bind(...a) { args = a; st.bind(...a); return wrap; }, async first() {
       const row = await st.first();
@@ -447,7 +447,7 @@ test('AUDIT REALM L1-F3: the purse takes only what the service paid the record -
     pay: (n) => { purse.gold -= n; }, refund: (n) => { purse.gold += n; }, realm: { act },
   });
   assert.equal((await buy()).ok, true);
-  assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN);     // HOME-PRICE (
+  assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN);   // HOME-PRICE (
   // pressed again once the first had answered: the service says `repeat` and moves nothing - nor does the purse
   assert.equal((await buy()).ok, true);
   assert.equal(purse.gold, 50_000 - HOME_PRICE_MIN, 'paid once');
@@ -460,7 +460,7 @@ test('AUDIT REALM L1-F3: the purse takes only what the service paid the record -
 test('AUDIT REALM L1-F3: a placed piece pays back half of what records paid for it - placed by the record, half; shrunk, half of the part records paid; one from before the realm, nothing', { timeout: 60_000 }, async () => {
   const s = await registered();
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [] });
-  const bought = await A.homes.claim({ mapId: 55, buildingKey: 3, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });     // HOME-PRICE (
+  const bought = await A.homes.claim({ mapId: 55, buildingKey: 3, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (
   let seq = bought.data.realm.seq;
   const where = () => ({ id: A.char, lease: A.lease, seq });
   const piece = { id: 'd1', model: 41000, pos: [0, 0, 0], rot: [0, 0, 0], scale: 1, paid: 400 };
@@ -481,7 +481,7 @@ test('AUDIT REALM L1-F3: a placed piece pays back half of what records paid for 
 test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild place and its Renown with it - and a guildmaster with members hands the guild over first', { timeout: 60_000 }, async () => {
   const s = await registered();
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [] });
-  const claimed = await A.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });     // HOME-PRICE (
+  const claimed = await A.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (
   const founded = await A.guilds.found({ character: A.char, name: 'The Iron Oath', tag: 'IRON', realm: { id: A.char, lease: A.lease, seq: claimed.data.realm.seq } });
   assert.equal(founded.ok, true);
   const guildId = s.env.DB._raw.prepare('SELECT id FROM guilds').get().id;

@@ -97,7 +97,7 @@ async function stand({ nowS, specs = { 50: null, 100: null }, slowTexture = fals
       host.tick(0.001);
     }
     input.v = { held: false, attack: false, choice: false };
-    host.tick(CHOP_ACT.swingS);     // GATHER-FEEL (
+    host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
     await tick(); await tick(); await tick();
   }
   return { host, book, door, entry, forest, made, destroyed, moved, said, clock, day, fell, feet, view, built, texGate, input };
@@ -175,7 +175,7 @@ test('AUDIT 30 A5: an answer landing on a pixel stood again under the ask falls 
   }
   assert.equal(w.host.acting(), false, 'the act played to its end on the pixel stood again');
   w.input.v = { held: false, attack: false, choice: false };
-  w.host.tick(CHOP_ACT.swingS);     // GATHER-FEEL (
+  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   process.off('unhandledRejection', onRej);
   assert.equal(w.book.taken(n.key, 'logs'), true);
@@ -202,7 +202,7 @@ test('AUDIT 30 A5: an answer landing on a pixel stood again under the ask falls 
     v.host.tick(0.001);
   }
   v.input.v = { held: false, attack: false, choice: false };
-  v.host.tick(CHOP_ACT.swingS);     // GATHER-FEEL (
+  v.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   const fallen = v.made.filter((b) => b.tip);
   assert.equal(fallen.length, 1, 'the node fell');
@@ -267,7 +267,7 @@ test('AUDIT 30 A5: the fall is the node\'s as its pixel stands NOW - a wood re-l
     if (before && !w.host.acting()) { w.host.onDestroyed(w.entry); w.built.set('400,150', entry2); w.host.onBuilt(entry2); }
   }
   w.input.v = { held: false, attack: false, choice: false };
-  w.host.tick(CHOP_ACT.swingS);     // GATHER-FEEL (
+  w.host.tick(CHOP_ACT.swingS);   // GATHER-FEEL (
   for (let i = 0; i < 8; i++) await tick();
   const falls = w.made.filter((b) => b.tip);
   assert.equal(falls.length, 1);

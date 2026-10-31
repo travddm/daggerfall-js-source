@@ -255,7 +255,7 @@ test('H1: the four consumers are wired, and each goes through the law', () => {
   // four are host code with no node coverage.
   const modes = code('scenes/worldModes.js');
   assert.match(modes, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\);/, 'the one reading of the law');
-  assert.match(modes, /houseOwned: !interiorHome && houseOwnedAt\(b, b\?\.buildingKey \?\? 0\), homeBed: homeBedIsMine\(interiorHome, /, 'CanRest sleeps in a house you own (V5 left this false)');     // HOME1 re-aim: online, in my online home too; HOME-RENT re-aim: and a room I rent in one
+  assert.match(modes, /houseOwned: !interiorHome && houseOwnedAt\(b, b\?\.buildingKey \?\? 0\), homeBed: homeBedIsMine\(interiorHome, /, 'CanRest sleeps in a house you own (V5 left this false)');   // HOME1 re-aim: online, in my online home too; HOME-RENT re-aim: and a room I rent in one
   assert.match(modes, /isHouseOwned: \(key\) => houseOwnedAt\(bd, key\),/, 'the lock ladder knows your own front door');
   assert.match(modes, /ownsHouse: \(\) => ownsHouse\(/, 'the bank window asks the registry');
   // AUDIT 68 S22: ...and ONLY there - place.js reads `world.isHouseOwned`; the bridge's ctx forward reached a

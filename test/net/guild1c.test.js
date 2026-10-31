@@ -535,7 +535,7 @@ test('GUILD1c the book: the look hands the membership it reads to the host when 
 test('GUILD1c the chat: a Guild tab beside the Party tab - off the bar until the character is in a guild, its lines peeking over the world - `/guild` and `/gu` say a line on it (`/g` stays the World\'s), and its list is the hub\'s peers wearing my tag, with my own row (mutants: the tab shown to everyone; /g taken from the World; a member of another guild listed)', () => {
   const tab = CHAT_TABS.find((t) => t.id === 'guild');
   assert.deepEqual({ ...tab }, { id: 'guild', label: 'Guild', room: null, link: false, hint: 'Only your guild', hidden: true, peekAll: true });
-  assert.deepEqual(CHAT_TABS.map((t) => t.id), ['world', 'region', 'lang', 'trade', 'lfg', 'party', 'guild', 'local']);     // CHAT-LANG: the Language tab after the Region's; CHAT-TRADE: the Trade and LFG tabs after it (
+  assert.deepEqual(CHAT_TABS.map((t) => t.id), ['world', 'region', 'lang', 'trade', 'lfg', 'party', 'guild', 'local']);   // CHAT-LANG: the Language tab after the Region's; CHAT-TRADE: the Trade and LFG tabs after it (
   const cmd = CHANNEL_COMMANDS.find((c) => c.tab === 'guild');
   assert.deepEqual([...cmd.names], ['guild', 'gu']);
   assert.equal(CHANNEL_COMMANDS.find((c) => c.names.includes('g')).tab, 'world');

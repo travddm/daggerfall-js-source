@@ -341,7 +341,7 @@ async function tabs({ escrowB = true } = {}) {
   const A = await r.player(), B = await r.player();
   const entA = { name: 'Arthago', items: [dagger(), arrows(3)], goldPieces: 50, stats: { strength: 60 } };
   const entB = { name: 'Brisienna', items: [arrows(10)], goldPieces: 5, stats: { strength: 60 } };
-  const snap = (e) => JSON.stringify({ name: e.name, level: 1, items: e.items, goldPieces: e.goldPieces });     // INT2 (
+  const snap = (e) => JSON.stringify({ name: e.name, level: 1, items: e.items, goldPieces: e.goldPieces });   // INT2 (
   A.char = await character(A, 'Arthago', JSON.parse(snap(entA)));
   B.char = await character(B, 'Brisienna', JSON.parse(snap(entB)));
   const q = [], said = { A: [], B: [] };

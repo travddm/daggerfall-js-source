@@ -63,7 +63,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   const f = sdFind(r, T0 + H, 'Mara');
   const m = sdMapMark(f, HOLLOW, T0 + H + 1000);
   assert.deepEqual({ ...m, tip: null }, { day: 1, cx: 303.5, cy: 202.5, r: SD_RING_R, label: 'The Stopped Bell - fades in 1d 22h', phase: 'found', tip: null });
-  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });     // SD18c (
+  assert.deepEqual(m.tip, { title: 'The Stopped Bell, an Abyss Dungeon', lines: ['Near Copperham', `It keeps the Ending of ${sdEndingOf(sdMarksOf(1)).stone}`, 'Found by Mara', 'Fades in 1d 22h'] });   // SD18c (
   assert.equal(sdStateWords(f, T0 + H + 1000), 'fades in 1d 22h');
   const k = sdFell(f, T0 + 3 * H, { top: 'Mara', n: 2 });
   assert.equal(sdMapMark(k, HOLLOW, T0 + 3 * H + 1000).label, 'The Stopped Bell - collapsing');
@@ -76,7 +76,7 @@ test('SD2c the ring: none while it has only risen (a find), its own pixel\'s onc
   assert.deepEqual(read.tip.lines, m.tip.lines);
   assert.notEqual(gateMarkKey(read), gateMarkKey(readGateMark(() => sdMapMark(f, HOLLOW, T0 + 3 * H), { width: 1000, height: 500 })), 'its words tick: a new key, a repaint');
   assert.equal(SD_RING_MAP_CSS, SD_MAP_INK.ring);
-  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');     // ABYSS-NAME (
+  assert.equal(SD_LEGEND_TEXT, 'Abyss Dungeon');   // ABYSS-NAME (
 });
 
 test('SD2c the note under the red seal: the ring\'s own words - its name, its city, its state; none without a ring; the board hangs it after the gate\'s (mutants: the state dropped; hung without a ring)', () => {

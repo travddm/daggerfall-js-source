@@ -258,7 +258,7 @@ test('AUDIT 30 U13: what must fail is not offered - a listing past the board\'s 
   buttons(t.root).find((b) => b.textContent === 'My listings').onclick();
   await tick();
   assert.equal(buttons(t.root).find((b) => b.textContent === 'List').disabled, true);
-  assert.match(t.root.textContent, /You have 30 listings up, the most allowed here\./);     // BOARD-UI (
+  assert.match(t.root.textContent, /You have 30 listings up, the most allowed here\./);   // BOARD-UI (
   buttons(t.root).find((b) => b.textContent === 'Orders').onclick();
   await tick();
   assert.equal(buttons(t.root).find((b) => b.textContent === 'Post the order').disabled, true);

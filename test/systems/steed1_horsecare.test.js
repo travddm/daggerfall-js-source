@@ -362,7 +362,7 @@ test('STEED1 THE STABLE\'S ACTS: oats and an apple fed by hand - beside the hors
   // the reach off the mod's runtime
   const rt = (o) => ({ stableView: () => ({ persistence: true, hasHorse: true, transport: TRANSPORT.Foot, horseMode: HORSE_MODE.LooseStationary, wagonMode: WAGON_MODE.WithPlayer, horseName: 'Ash', ...o.view }), canMountHorseFromTransportWindow: () => o.mount, canAccessWagonInventory: () => ({ allowed: o.wagon }) });
   assert.deepEqual(upkeepReach(rt({ mount: true, wagon: false }), true), { near: true, stabled: false, wagonNear: false, who: 'Ash' });
-  assert.deepEqual(upkeepReach(rt({ mount: false, wagon: true, view: { horseMode: HORSE_MODE.WithPlayer, horseStabled: true } }), true), { near: false, stabled: true, wagonNear: true, who: 'Ash' });     // WAGON-STABLED (
+  assert.deepEqual(upkeepReach(rt({ mount: false, wagon: true, view: { horseMode: HORSE_MODE.WithPlayer, horseStabled: true } }), true), { near: false, stabled: true, wagonNear: true, who: 'Ash' });   // WAGON-STABLED (
   assert.deepEqual(upkeepReach(rt({ mount: false, wagon: false }), false), { near: true, stabled: false, wagonNear: true, who: 'Your horse' }, 'the mod off: always beside');
 });
 

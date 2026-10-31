@@ -81,7 +81,7 @@ test('U31: startInDungeon routes through tryEnterDungeon, which is what makes th
   // the entrance-door candidates tryExitDungeon computes its landing
   // from. A copied body that skipped that would enter fine and strand
   // the player exactly as before.
-  const body = modes.slice(modes.indexOf('async function startInDungeon({ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined } = {})'));     // CASTLE1: the load names its dungeon; MAP-KEEP: and says it is one
+  const body = modes.slice(modes.indexOf('async function startInDungeon({ locationKey = null, fromLoad = false, holdOpen = false, recorded = undefined } = {})'));   // CASTLE1: the load names its dungeon; MAP-KEEP: and says it is one
   const fnEnd = body.indexOf('\n  }');
   // DE1 re-anchored this from the exact argument list onto the call.
   // startInDungeon now passes { preferEnterMarker: true } - it is
@@ -90,7 +90,7 @@ test('U31: startInDungeon routes through tryEnterDungeon, which is what makes th
   // holds: REUSE the door path so dungeonReturn is recorded.
   assert.match(body.slice(0, fnEnd), /return tryEnterDungeon\(hit, entries[,)]/,
     'starting inside must go through the same door path that records dungeonReturn');
-  assert.match(body.slice(0, fnEnd), /\{ preferEnterMarker: true, fromLoad, holdOpen, recorded \}/,     // MAP-KEEP: the load's arm rides beside it
+  assert.match(body.slice(0, fnEnd), /\{ preferEnterMarker: true, fromLoad, holdOpen, recorded \}/,   // MAP-KEEP: the load's arm rides beside it
     'and it is the StartDungeonInterior member: the enter marker wins, the facing is north');
   assert.match(modes, /dungeonReturn = \{/, 'the exit landing still depends on dungeonReturn being recorded');
   // and it is on the API the host calls

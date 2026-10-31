@@ -51,7 +51,7 @@ test('FT18: ten rows are four, and nothing they offered is lost - every key, def
     assert.equal(row(gone), undefined, `${gone} is condensed`);
   }
   assert.equal(FEATURES.length, 116);
-  const want = { grassDensity: 1, grassStyle: 'meadow', floraSway: true, windWisps: true, quickbarStyle: 'hotbar', quickslots: true,     // HB-LYCFREE: the hotbar by default (
+  const want = { grassDensity: 1, grassStyle: 'meadow', floraSway: true, windWisps: true, quickbarStyle: 'hotbar', quickslots: true,   // HB-LYCFREE: the hotbar by default (
     'blood-gore': 'normal', 'blood-marks': true, 'blood-overkill': true, 'blood-screen': true };
   for (const [k, v] of Object.entries(want)) assert.equal(FEATURE_PREF_DEFAULTS[k], v, `${k} keeps its default`);
   assert.deepEqual(row('grass').control.parts.map((p) => p.key), ['grassStyle']);
@@ -189,7 +189,7 @@ test('FT18: All off - every switch to Off, a row with no Off to Daggerfall\'s ow
       if (to >= 0) assert.equal(st.at, to, `${f.id} is off`);
     }
     assert.equal(label('cloud-quality'), 'High', 'a choice keeps what it was');
-    assert.equal(getPref('grassStyle'), 'meadow', 'and so does a choice in a drawer');     // MEADOW1: the meadow by default (
+    assert.equal(getPref('grassStyle'), 'meadow', 'and so does a choice in a drawer');   // MEADOW1: the meadow by default (
     assert.equal(label('dungeon-wall-style'), 'Classic');
     assert.deepEqual([label('render-scale'), getPref('renderScale'), renderScaleSetting()], ['100%', 1, 1], 'the world drawn at the window\'s own size again - the renderer reads 100%');
     assert.equal(label('enhanced-environments'), 'Off', 'the outdoors bar says Off now, so All off can find it');

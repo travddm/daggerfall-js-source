@@ -169,7 +169,7 @@ test('NAV-R a raider is SPENT for its life - said once to the world host - when 
   assert.deepEqual(log.spent, [RAIDER.id], 'said once');
   // the world host marks her spent; the next refresh never stands her again, and lets her go out of sight
   host.raiders([RAIDER], { sight: RAIDER_SIGHT_M, spent: new Set([RAIDER.id]) });
-  run(host, SHIP_FADE_S + 0.5);     // SHIP-FADE
+  run(host, SHIP_FADE_S + 0.5);   // SHIP-FADE
   assert.equal(raiderShips(host).length, 0, 'out of sight, gone - and not stood again');
   // another: sunk
   const other = { ...RAIDER, id: 'r17.16.100', seed: 0x51f00e, pos: [-6000 + 600, 0, 0], ahead: [-6000 + 600, 0, 200] };
@@ -190,7 +190,7 @@ test('NAV-R the director stands a raider outside its despawns (the raider\'s own
   run(host, 3);
   assert.equal(raiderShips(host).length, 1, 'the director never takes her');
   host.raiders([{ ...RAIDER, pos: raiderShips(host)[0].ship.pos }], { sight: RAIDER_SIGHT_NIGHT_M, spent: new Set() });
-  assert.equal(raiderShips(host)[0]?.retiring, true, 'her own plan lets her go past RAIDER_DROP_M (SHIP-FADE: fading)');     // SHIP-FADE
+  assert.equal(raiderShips(host)[0]?.retiring, true, 'her own plan lets her go past RAIDER_DROP_M (SHIP-FADE: fading)');   // SHIP-FADE
   run(host, SHIP_FADE_S + 0.5);
   assert.equal(raiderShips(host).length, 0, 'and gone');
   // online: a peer with the lower id already stands her seed

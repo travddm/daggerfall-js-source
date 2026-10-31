@@ -30,7 +30,7 @@ test('OW6 law: AN ENEMY\'S REACH ALONG THE WAY - dead ahead, the distance to its
 });
 
 test('OW6 law: THE CAP - the highest rate that leaves THREAT_WARN_S of real time to the nearest reach, stepped down the spinner\'s own ladder, never under walking pace; a chaser from any side at its own pace too; nothing near, no cap (mutants: the warning, the ladder, the chaser\'s pace dropped, the worst threat not the one kept)', () => {
-  assert.equal(THREAT_WARN_S, 0.6);     // OW6-LATE: was 5 - the player: it slowed "waaaay to early"; OW6-NEAR (29g): 2 -> 1.2, "reduce ... by like 40%"; OW6-HALF: 1.2 -> 0.6
+  assert.equal(THREAT_WARN_S, 0.6);   // OW6-LATE: was 5 - the player: it slowed "waaaay to early"; OW6-NEAR (29g): 2 -> 1.2, "reduce ... by like 40%"; OW6-HALF: 1.2 -> 0.6
   assert.deepEqual([0.2, 1.7, 3.9, 4.99, 5, 9.9, 10, 47, 100].map(threatStep), [1, 1, 3, 4, 5, 5, 10, 45, 100]);
   assert.deepEqual(threatCap({ threats: [], heading: NORTH, speedMps: 16 }), { cap: Infinity, threat: null, metres: Infinity, held: false });
   const band = { dx: 0, dz: 2000, reach: 320 };

@@ -100,7 +100,7 @@ test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their source
     const r = applyCustoms(snap);
     assert.equal(r.restKept, 2);
     assert.deepEqual(snap.items, [sword], 'the copy carries none of them');
-    assert.ok(customsLines(r).some((l) => /rest supplies stayed with your offline character/.test(l)));     // AUDIT REST II H13 (
+    assert.ok(customsLines(r).some((l) => /rest supplies stayed with your offline character/.test(l)));   // AUDIT REST II H13 (
     assert.ok(customsLines(r, { before: true }).some((l) => /will stay/.test(l)));
     const tonic = createRestItem(REST_ITEM.Tonic);
     globalThis.location = { search: '?online' };

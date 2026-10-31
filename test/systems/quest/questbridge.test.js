@@ -578,7 +578,7 @@ test('MAC-K2: the bridge’s questLog is the ONE walk - and it is the arithmetic
   assert.equal(dead.active[0].clockSeconds, 600, 'clock_b counts for nothing: clock_a\'s ten minutes are the deadline');
 
   // a host whose notebook has not been built yet is not a crash
-  assert.deepEqual(questLog({ quests: new Map() }, null, undefined, ...layerOff), { active: [], finished: [], ended: [], hidden: [], shelved: [], unlogged: [], lines: [], ladders: [] });     // QUEST-SHELF (
+  assert.deepEqual(questLog({ quests: new Map() }, null, undefined, ...layerOff), { active: [], finished: [], ended: [], hidden: [], shelved: [], unlogged: [], lines: [], ladders: [] });   // QUEST-SHELF (
 
   // AND NO HOST WALKS IT ITSELF ANY MORE. Derived: the clock field is
   // the walk's own vocabulary, so a host that spells it has grown a

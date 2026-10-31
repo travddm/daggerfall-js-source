@@ -296,7 +296,7 @@ export function staffEventEarned(led) {
   const fell = led.fellAt ?? led.first;
   const half = Math.max(0, fell - led.first) / 2;
   const rows = Object.entries(led.a)
-    .filter(([acct, r]) => !acct.startsWith('id:') && (r.h ?? 0) >= STAFF_EVENT_EARN_KILLS)     // REWARD-KILLS (; card "Kills only (3+)"): a stand alone earns nothing
+    .filter(([acct, r]) => !acct.startsWith('id:') && (r.h ?? 0) >= STAFF_EVENT_EARN_KILLS)   // REWARD-KILLS (; card "Kills only (3+)"): a stand alone earns nothing
     .sort(([a, x], [b, y]) => (y.h ?? 0) - (x.h ?? 0) || Number(b === led.kb) - Number(a === led.kb) || (y.t ?? 0) - (x.t ?? 0) || (a < b ? -1 : 1));
   return rows.map(([acct, rec], i) => ({ acct, rec, rank: i < STAFF_EVENT_BOARD_MAX ? i + 1 : 0 }));
 }

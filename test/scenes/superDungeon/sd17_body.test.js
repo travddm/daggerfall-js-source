@@ -67,7 +67,7 @@ test('SD17 EIGHTEEN STATES TO THE WARDEN\'S TEN - at rest the parts stand where 
   const r = restRig();
   r.legs[0] = 0.8; r.legs[1] = -0.6; r.trunk[LEAN] = 0.4; r.trunk[TWIST] = -1.1; r.trunk[NOD] = 0.5; r.arms[0][0] = 2.2; r.arms[0][1] = 0.7; r.arms[1][0] = -0.5; r.arms[1][1] = 1.1;
   const P = rigMatrices(base, r), at = (m, p) => apply4(m, p);
-  assert.ok(nearV(at(P[0], [B.legX, SD_RIG_JOINTS.hip, 0]), at(base, [B.legX, SD_RIG_JOINTS.hip, 0]), 1e-5), 'its right hip');     // AUDIT SD III (V11
+  assert.ok(nearV(at(P[0], [B.legX, SD_RIG_JOINTS.hip, 0]), at(base, [B.legX, SD_RIG_JOINTS.hip, 0]), 1e-5), 'its right hip');   // AUDIT SD III (V11
   assert.ok(nearV(at(P[1], [-B.legX, SD_RIG_JOINTS.hip, 0]), at(base, [-B.legX, SD_RIG_JOINTS.hip, 0]), 1e-5), 'its left hip');
   assert.ok(nearV(at(P[2], [0, SD_RIG_JOINTS.waist, 0]), at(base, [0, SD_RIG_JOINTS.waist, 0]), 1e-5), 'the waist');
   assert.ok(nearV(at(P[3], [0, SD_RIG_JOINTS.neck, 0]), at(P[2], [0, SD_RIG_JOINTS.neck, 0]), 1e-5), 'the neck on the torso');
@@ -75,10 +75,10 @@ test('SD17 EIGHTEEN STATES TO THE WARDEN\'S TEN - at rest the parts stand where 
   assert.ok(nearV(at(P[5], [-B.armX, SD_RIG_JOINTS.shoulder, 0]), at(P[2], [-B.armX, SD_RIG_JOINTS.shoulder, 0]), 1e-5), 'its left shoulder on the torso');
   // the turns' senses: a leg's forward swing puts its foot forward; a lean forward its chest; an arm's raise forward its hand; a nod its face down
   const one = (f) => { const q = restRig(); f(q); return rigMatrices(arenaBase(0, 0, 0), q); };
-  assert.ok(apply4(one((q) => { q.legs[0] = 0.5; })[0], [B.legX, 0, 0])[2] > 1, 'the foot forward');     // AUDIT SD III (V11
+  assert.ok(apply4(one((q) => { q.legs[0] = 0.5; })[0], [B.legX, 0, 0])[2] > 1, 'the foot forward');   // AUDIT SD III (V11
   assert.ok(apply4(one((q) => { q.trunk[LEAN] = 0.3; })[2], [0, SD_RIG_JOINTS.neck, 0])[2] > 0.5, 'the chest forward');
   assert.ok(apply4(one((q) => { q.arms[0][0] = Math.PI / 2; })[4], SD_REM_HAND[0])[2] > 2.5, 'the hand forward');
-  assert.ok(apply4(one((q) => { q.arms[0][1] = 0.8; })[4], SD_REM_HAND[0])[0] > B.armX + 1.5, 'its right arm out to its right');     // AUDIT SD III (V11
+  assert.ok(apply4(one((q) => { q.arms[0][1] = 0.8; })[4], SD_REM_HAND[0])[0] > B.armX + 1.5, 'its right arm out to its right');   // AUDIT SD III (V11
   assert.ok(apply4(one((q) => { q.trunk[NOD] = 0.5; })[3], [0, SD_RIG_JOINTS.neck + 0.5, B.headD / 2])[1] < SD_RIG_JOINTS.neck + 0.5, 'its face down');
   assert.ok(apply4(one((q) => { q.trunk[TWIST] = Math.PI / 2; })[2], [0, SD_RIG_JOINTS.neck, 1])[0] > 0.9, 'turned as a facing turns: +z toward +x');
 });
@@ -149,7 +149,7 @@ test('SD17 EVERY BLOW MOVED: the Stomp\'s leg raised over the floor and slammed 
   // the Hand: the right hand along the bearing - at a quarter of the sweep, and at three quarters, turned the other way
   for (const [sw, k] of [[1, 0.25], [1, 0.75], [-1, 0.25]]) {
     const A = SD_BLOWS.hand, hs = s(A, T0, { sw }), t = T0 + A.active * k, P = partsAt(hs, -1, t);
-    const shoulder = apply4(P[4], [B.armX, SD_RIG_JOINTS.shoulder, 0]), hand = apply4(P[4], SD_REM_HAND[0]);     // AUDIT SD III (V11
+    const shoulder = apply4(P[4], [B.armX, SD_RIG_JOINTS.shoulder, 0]), hand = apply4(P[4], SD_REM_HAND[0]);   // AUDIT SD III (V11
     const bearing = 0.4 + sw * (A.arc * k - A.arc / 2);
     assert.ok(near(Math.atan2(hand[0] - shoulder[0], hand[2] - shoulder[2]), bearing, 1e-6), `the hand down the bearing (sw ${sw}, ${k})`);
     assert.ok(Math.abs(hand[1] - shoulder[1]) < 0.6, 'held out, about level (its lean dips it)');

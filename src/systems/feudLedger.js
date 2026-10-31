@@ -72,7 +72,7 @@ export function noteFeudHarm(entity, cls, n, { silver = false, metal = null } = 
   const l = feudOf(entity);
   if (!l) return;
   l.dmg[FEUD_CLASSES.includes(cls) ? cls : 'other'] += n;
-  l.last = FEUD_CLASSES.includes(cls) ? cls : 'other';     // UNQUIET: the blow that broke it
+  l.last = FEUD_CLASSES.includes(cls) ? cls : 'other';   // UNQUIET: the blow that broke it
   if (silver) l.silver += n;
   if (feudWeakBlow(entity, { cls, metal })) {
     l.weak++;

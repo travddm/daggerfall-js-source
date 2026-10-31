@@ -223,8 +223,8 @@ test('TAMRIEL-RELIEF the wiring, by source: the data its own chunk (no static im
   assert.match(client, /\.\.\.\(t\.relief \? \[t\.relief\.buffer\] : \[\]\)/);
   assert.match(read('src/scenes/tamrielRoadsHost.js'), /const trace = tamrielTrace\(\), fit = tamrielFit\(\);/, 'the roads worker takes the installed trace whole');
   assert.match(read('src/world/tamrielRoads.js'), /if \(trace\?\.relief\) for \(let i = 0; i < trace\.relief\.length; i\+\+\) mix\(trace\.relief\[i\] \+ 256\);/);
-  assert.match(read('src/world/tamriel/tamrielGround.js'), /if \(reliefStands\(\)\) \{\n\s+const ease = Math\.min\(1, Math\.max\(0, \/\*\* @type \{number\} \*\/ \(coastDepthAt\(px, py\)\)\) \/ RELIEF_COAST_REACH\);/);     // AUDIT TESA II G4 (
-  assert.match(read('src/world/tamriel/tamrielBiomes.js'), /export const BIOMES_VERSION = 5;/);     // IC-RING moved it on; AUDIT TESA II (
+  assert.match(read('src/world/tamriel/tamrielGround.js'), /if \(reliefStands\(\)\) \{\n\s+const ease = Math\.min\(1, Math\.max\(0, \/\*\* @type \{number\} \*\/ \(coastDepthAt\(px, py\)\)\) \/ RELIEF_COAST_REACH\);/);   // AUDIT TESA II G4 (
+  assert.match(read('src/world/tamriel/tamrielBiomes.js'), /export const BIOMES_VERSION = 5;/);   // IC-RING moved it on; AUDIT TESA II (
   assert.ok(existsSync(join(ROOT, SOURCE)), 'the owner\'s heightmap is committed as the bake\'s source');
 });
 

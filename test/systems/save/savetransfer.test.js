@@ -58,7 +58,7 @@ test('SP1: the layout is the app’s own - the three spellings, the two files, t
   assert.deepEqual(slotPathOf('Roaming/DFO Online/Saves/SAVE0/SaveInfo.txt'), { n: 0, file: 'SaveInfo.txt' }, 'a whole userData folder can be picked, however deep the save sits in it');
   assert.equal(slotPathOf('Saves/SAVE03/SaveData.txt'), null, 'a hand-spelt slot number is not a slot (the app’s own law)');
   assert.equal(slotPathOf('Saves/README.txt'), null);
-  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');     // BR4
+  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');   // BR4
 });
 
 test('SP1: the round trip - export a store, read the zip back, import into an empty store, every slot where it was', async () => {

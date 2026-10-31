@@ -140,7 +140,7 @@ function homeHost() {
   const said = [];
   const env = {
     sdFightLink: { state: () => state, now: () => now }, SD_REM_SINK_MS, clearOfPillars, sdRealmToDungeon: realmToDungeon, SD_ARENA,
-    sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT,     // AUDIT SD II (SD11f, L6 F16
+    sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT,   // AUDIT SD II (SD11f, L6 F16
   };
   const body = `let _sdHome = null;\n${constOf('sdHomeAt')}\n${constOf('sdHomeAge')}\nreturn { sdHomeAt, sdHomeAge };`;
   const { sdHomeAt, sdHomeAge } = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -175,10 +175,10 @@ function riftHost({ rec = null, entered = true, s = 7 } = {}) {
   };
   const env = {
     sdHost: { record: () => rec, hollow: () => hollow }, _sharedOffsetMs: 0, sdRiftWord, sdReturnStands, sdThroughStands, sdRiftCount, riftLook, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, isSdRealm,
-    SD_REALM_TEXT: { lost: 'lost' }, setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async () => log.push('pixel'), _sdEntered: new Set(), _sdFallen: new Set(),     // SD-ONELIFE (
-    sdSay: (t) => log.push(['said', t]),     // AUDIT SD II (SD11d
+    SD_REALM_TEXT: { lost: 'lost' }, setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async () => log.push('pixel'), _sdEntered: new Set(), _sdFallen: new Set(),   // SD-ONELIFE (
+    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d
     sdVeilCentre: () => null, standBeforeHollowDoor: () => true,   // SD-LOOK S5: the veil's centre; AUDIT SD IV (F40): before its door
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },     // SD-PARTY (
+    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (
   };
   const body = `${constOf('sdRiftOf')}\n${fnOf('sdEnterRealm')}\nreturn { sdRiftOf, sdEnterRealm };`;
   const api = new Function(...Object.keys(env), body)(...Object.values(env));
@@ -226,7 +226,7 @@ function receiptHost() {
 test('AUDIT SD MY HOUR RECEIPT, WHEREVER IT COMES: the hub\'s hand of it (at the kill, when I stood outside the realm; at my hello) is heard by the hub\'s own link - the chat tab\'s, the one in chat:world - to the account service and the spoils, as the realm\'s is; one my realm handed me, kept for a burst that never came (I left before it - the way back, a death, the Hour\'s end), is its spoils straight into the pack as I am out of the realm, once (mutants: the hub\'s hand unheard; the kept receipt left for a week; granted every frame)', async () => {
   const w = strip(W);
   assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\); sdSpoilsReceipt\(r, room\); \};/);
-  assert.match(w, /if \(!inRealm && _sdReceipts\.size\) sdReceiptsLeft\(\);\s*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}/, 'before the floor is gathered and the fight forgotten');     // AUDIT SD II (L5 F5
+  assert.match(w, /if \(!inRealm && _sdReceipts\.size\) sdReceiptsLeft\(\);\s*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}/, 'before the floor is gathered and the fight forgotten');   // AUDIT SD II (L5 F5
   const h = receiptHost();
   h.at(7);
   const r = await receiptFor(7);
@@ -496,7 +496,7 @@ async function withRealm(fn, { concord = true } = {}) {
   const realNow = Date.now;
   let clock = T0;
   Date.now = () => clock;
-  const world = fakeRooms({ now: () => clock, vars: { SD_COLLAPSE: 'on' } });     // SD-PARTY (
+  const world = fakeRooms({ now: () => clock, vars: { SD_COLLAPSE: 'on' } });   // SD-PARTY (
   const hub = world.room(SOCIAL_ROOM);
   try {
     await quiet(async () => {

@@ -46,7 +46,7 @@ import { PEN, HALO_PEN, NAME_FACE } from '../ink/inkMap.js';
 export const STRIP = Object.freeze({
   refPaper: 520,   // the paper width these numbers were chosen at
   scaleMin: 0.72,
-  scaleMax: 1.45,    // PLUS-MAP: the sheet's name reads as its title
+  scaleMax: 1.45,  // PLUS-MAP: the sheet's name reads as its title
   font: 19,        // the hand face's size
   padX: 12,        // from the paper's left edge
   padY: 8,         // from the paper's top edge

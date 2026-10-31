@@ -244,7 +244,7 @@ test('SD8c MY PLACE IN THE FIGHT: my `in` is due standing in the arena until the
   L3.word(validSdOut({ k: 'ec', e: [[4, 9, T0 + 9, 0], [9, 9, T0, 0]], r: 0, at: T0 + 2 }));
   L3.word(validSdOut({ k: 'ph', n: 3, at: T0 + 3, up: T0 + 4 }));
   L3.word(validSdOut({ k: 'stun', until: T0 + 9, at: T0 + 5 }));
-  assert.deepEqual(words, [SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), SD_FIGHT_TEXT.echoFell('Ann', 0), SD_FIGHT_TEXT.echoRose(0), SD_FIGHT_TEXT.lastMoment, SD_FIGHT_TEXT.stunned]);     // AUDIT SD III (T14
+  assert.deepEqual(words, [SD_FIGHT_TEXT.dragonBreak(SD_ECHO_PAIR_MS), SD_FIGHT_TEXT.echoFell('Ann', 0), SD_FIGHT_TEXT.echoRose(0), SD_FIGHT_TEXT.lastMoment, SD_FIGHT_TEXT.stunned]);   // AUDIT SD III (T14
 });
 
 // ── the realm's `me` ──────────────────────────────────────────────────
@@ -275,7 +275,7 @@ async function withRealm(fn) {
       const mara = cell.connect(); await cell.hello(mara, 'peer-mara', doorPose(10), { name: 'Mara' });
       await cell.raw(mara, JSON.stringify({ t: 'sd', k: 'found', s: rec.s, px: PX, py: PY }));
       const realm = world.room(sdTestKey(rec.s));
-      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }     // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (
+      { const h = await realm.room._sdHallOf(rec.s); h.ok = true; await realm.room.state.storage.put('sdorrery', h); }   // AUDIT SD: past the Orrery, kept as a realm keeps it - the fight's door asks its Concord (
       const beat = async (ms) => { const end = clock + ms; while (realm.alarm.at != null && realm.alarm.at <= end) { clock = Math.max(clock, realm.alarm.at); await realm.fire(); } clock = end; };
       await fn({ realm, rec, beat });
     });
@@ -597,7 +597,7 @@ test('SD8c THE BODIES MADE: the Remnant its own height from its feet, its body w
   assert.ok(det > 0, 'a proper turn - never a mirror');
   assert.ok(near(Math.atan2(fwd[0] - 5, fwd[2] + 3), Math.PI / 2), 'the law\'s bearing: atan2(dx, dz)');
   // the metals
-  assert.deepEqual(remnantArt().map(([rec]) => rec), [SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, 25, 26, 27, 28, 29, 30]);     // SD18c (
+  assert.deepEqual(remnantArt().map(([rec]) => rec), [SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD, 25, 26, 27, 28, 29, 30]);   // SD18c (
   const others = [SD_STEPS_CRACKED_RECORD, SD_STEPS_BEAT_RECORD, ...Object.values(SD_HALL_GLOW_RECORD), SD_REALM_BRASS_RECORD, SD_REALM_ROOT_RECORD];
   assert.ok([SD_REMNANT_GOLD_RECORD, SD_REMNANT_SILVER_RECORD].every((r) => !others.includes(r)), 'records of their own');
   const g = echoMetalArt('gold'), s = echoMetalArt('silver');
@@ -617,7 +617,7 @@ test('SD8c THE PILLARS STAND: the arena\'s four pillars on the collider, their s
   const p = realmPillarTris();
   assert.equal(p.length, 4 * 5 * 2 * 9, 'four pillars, four sides and a top each, two triangles a face');
   const all = realmColliderTris(), floors = realmFloorTris(), lamps = realmLampTris();
-  assert.equal(all.length, floors.length + p.length + lamps.length);     // AUDIT SD II (L2 F14
+  assert.equal(all.length, floors.length + p.length + lamps.length);   // AUDIT SD II (L2 F14
   assert.deepEqual([...all.slice(floors.length, floors.length + p.length)], [...p]);
   for (let i = 0; i < p.length; i += 3) {
     const [x, y, z] = dungeonToRealm(p[i], p[i + 1], p[i + 2]);

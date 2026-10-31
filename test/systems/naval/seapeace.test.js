@@ -244,7 +244,7 @@ test('SEA-PEACE the stern chase: a quarry running from her - her way away over C
 
 test('SEA-PEACE a prize taken: a navy that beats a pirate comes alongside her, grapples, lies lashed PRIZE_TAKE_S, then fires her - she founders - her own crew thinned by PRIZE_COST, and sails on; the news reaches my HUD within NEWS_RANGE (mutants: the prize never boarded, never fired, the crew uncharged, the news unbounded)', async () => {
   const s = await sea({ hull: null });
-  const p = s.host._sea.get(s.host.spawnShip('pirateSloop', { range: 400, bearing: 0 }));     // the cutter's win here, and men to spare (
+  const p = s.host._sea.get(s.host.spawnShip('pirateSloop', { range: 400, bearing: 0 }));   // the cutter's win here, and men to spare (
   const n = s.host._sea.get(s.host.spawnShip('navyCutter', { range: 700, bearing: 299 * DEG }));
   let lashedAt = null, crewAt = null, prizeCrew = null;
   for (let t = 0; t < 600 && s.host._sea.has(p.id); t += 1) {
@@ -296,7 +296,7 @@ test('SEA-PEACE a prize her taker comes for is in a fight: though every player i
 
 test('SEA-PEACE a victor struck casts off her prize to fight, and the prize is anyone\'s again; a prize I board is never hers (mutants: the lash kept under fire)', async () => {
   const s = await sea({ hull: null });
-  const p = s.host._sea.get(s.host.spawnShip('pirateSloop', { range: 400, bearing: 0 }));     // the cutter's win here, and men to spare (
+  const p = s.host._sea.get(s.host.spawnShip('pirateSloop', { range: 400, bearing: 0 }));   // the cutter's win here, and men to spare (
   const n = s.host._sea.get(s.host.spawnShip('navyCutter', { range: 700, bearing: 299 * DEG }));
   for (let t = 0; t < 600 && !n.ship.lashed; t++) s.run(1);
   assert.ok(n.ship.lashed, 'lashed');

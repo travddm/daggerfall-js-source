@@ -807,7 +807,7 @@ test('BANTHA1 the jungle\'s door: Low Poly Trees\' own over the owner\'s files -
     decode: async (bytes) => { const p = PNG.sync.read(Buffer.from(bytes)); return { width: p.width, height: p.height, data: new Uint8Array(p.data) }; },
   });
   await Promise.all([door.load(), door.load()]);
-  assert.equal(fetched, 21, 'every file once');     // JUNGLE-ROADSIDE (
+  assert.equal(fetched, 21, 'every file once');   // JUNGLE-ROADSIDE (
   assert.equal(door.loaded, true);
   // AUDIT BANTHA1 TREE-6: a load that failed is asked again on BUILD-RETRY's clock, never latched for the session
   let t = 0, drop = true, asked = 0;

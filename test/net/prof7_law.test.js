@@ -67,7 +67,7 @@ test('PROF7 law: the leathers (665 Cured tier 2, 666 Hardened tier 5) and the cl
   assert.deepEqual(CLOTHS.map((m) => [m.key, m.templateIndex, m.tier]), [['cloth:linen', 668, 1], ['cloth:wool', 669, 2], ['cloth:silk', 670, 4], ['cloth:standard', 671, 5]]);
   assert.deepEqual([LINEN, WOOL, SILK, STANDARD_SILK], CLOTHS);
   assert.deepEqual(HIDE_TEMPLATES.map((m) => m.templateIndex), [655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 681, 682, 683, 665, 666, 668, 669, 670, 671]);
-  assert.deepEqual([...NO_PACK_FORM], ['work:ram', 'essence:arcane']);     // AUDIT PROF12 E1 (
+  assert.deepEqual([...NO_PACK_FORM], ['work:ram', 'essence:arcane']);   // AUDIT PROF12 E1 (
   for (const m of [...HIDE_TEMPLATES, ...PARTS]) {
     assert.equal(minedMaterial(m.key)?.templateIndex, m.templateIndex, m.key);
     assert.equal(withdrawable(m.key), true, m.key);

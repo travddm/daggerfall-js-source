@@ -52,7 +52,7 @@ export function timersMark(doc, { onOpen, open = false }) {
   const glass = doc.createElement('span');
   glass.className = 'px-hourglass';
   glass.setAttribute('aria-hidden', 'true');
-  b.append(glass);     // HOURGLASS-ALONE: the glass alone - its name is the label's and the title's
+  b.append(glass);   // HOURGLASS-ALONE: the glass alone - its name is the label's and the title's
   b.addEventListener('click', () => onOpen());
   return b;
 }

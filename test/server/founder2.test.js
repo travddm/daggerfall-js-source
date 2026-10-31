@@ -16,7 +16,7 @@ test('FOUNDER2: every account registered by the end of 2026-09-24 holds Founder,
   assert.deepEqual(titlesHeld(since, {}), ['founder'], 'registered after TITLE-R closed it: granted now');
   assert.equal(equipRefusal('founder', since, {}), null, 'and it may be worn');
   assert.equal(titleWorn({ ...since, title: 'founder' }, {}), 'founder');
-  const lastSecond = { handle: 'Late', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 };     // FOUNDER5 (
+  const lastSecond = { handle: 'Late', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 };   // FOUNDER5 (
   assert.deepEqual(titlesHeld(lastSecond, {}), ['founder'], 'the cutoff second is inside');
   assert.deepEqual(titlesHeld({ handle: 'After', registered_at: Date.UTC(2026, 8, 25, 12) / 1000 + 1 }, {}), [], 'a second past: closed again');
   assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000);

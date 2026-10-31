@@ -780,7 +780,7 @@ export function remainsOrderValid(c) {
   if (!Number.isSafeInteger(c.wn) || c.wn < 0 || c.wn > REMAINS_RECORDS_MAX) return false;
   if (typeof c.wm !== 'string' || c.wm.length > 64 || !streamsFoes(c.wm)) return false;
   if (c.wg !== undefined && !(typeof c.wg === 'string' && GUILD_ID_RE.test(c.wg))) return false;
-  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;     // MAC: an escrow is the killer's piece's
+  if (c.wk === undefined && c.wi === undefined) return c.we === undefined;   // MAC: an escrow is the killer's piece's
   if (c.we !== undefined && c.we !== 1) return false;
   return typeof c.wk === 'string' && ID_RE.test(c.wk) && c.wk !== c.s && Number.isSafeInteger(c.wi) && c.wi >= 0 && c.wi < c.wn;
 }

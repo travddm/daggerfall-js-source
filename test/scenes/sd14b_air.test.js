@@ -42,7 +42,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   assert.equal(air.on, true);
   assert.deepEqual([...e.loops.keys()].sort(), [SD_AIR_VOID.loop, SD_AIR_WORKS.loop].sort());
   assert.deepEqual([...e.loops3d.keys()].sort(), [SD_AIR_GEARS.loop, SD_AIR_HUM.loop].sort());
-  assert.equal(e.loops.get(SD_AIR_VOID.loop).clip, SD_AIR_VOID.clip, 'the void made');     // AUDIT SD III (A3
+  assert.equal(e.loops.get(SD_AIR_VOID.loop).clip, SD_AIR_VOID.clip, 'the void made');   // AUDIT SD III (A3
   assert.equal(SD_AIR_VOID.voice, SOUND.AmbientWindMoanDeep, 'of the deep moan');
   assert.ok(SD_AIR_VOID.pitch < 0.74, 'lower than the Deadlands\' own moan');
   assert.deepEqual(e.loops3d.get(SD_AIR_HUM.loop).pos, SD_AIR_HUM_AT);
@@ -51,7 +51,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   const [gx, , gz] = dungeonToRealm(...SD_AIR_GEARS_AT);
   assert.ok(Math.hypot(gx - SD_ARENA.x, gz - SD_ARENA.z) < 0.01, 'under the arena');
   assert.ok(SD_AIR_HUM.maxDistance < SD_ARENA.z - SD_ORRERY.z, 'the hum never reaches the arena');
-  assert.deepEqual(e.reg.map((r) => r[0]).sort(), [SD_AIR_GEARS.clip, SD_AIR_HUM.clip, SD_AIR_VOID.clip, SD_AIR_WORKS.clip].sort());     // AUDIT SD III (A3
+  assert.deepEqual(e.reg.map((r) => r[0]).sort(), [SD_AIR_GEARS.clip, SD_AIR_HUM.clip, SD_AIR_VOID.clip, SD_AIR_WORKS.clip].sort());   // AUDIT SD III (A3
   air.frame(10.1, [0, 1, 0]); air.frame(10.2, [0, 1, 0]);
   assert.equal(e.reg.length, 4, 'made once');
   air.stop();
@@ -61,7 +61,7 @@ test('SD14b THE BEDS: the void\'s wind (the deep moan, lower) breathing on the H
   const n = engine({ archive: false });
   const a2 = createSdAir(n);
   a2.frame(5, [0, 0, 0]);
-  assert.equal(n.loops.size + n.loops3d.size, 0);     // AUDIT SD III (A3
+  assert.equal(n.loops.size + n.loops3d.size, 0);   // AUDIT SD III (A3
   assert.equal(n.reg.length, 0);
   // a later engine's air silences the old one's
   const e3 = engine(), old = createSdAir(e3);

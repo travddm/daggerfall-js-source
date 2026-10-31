@@ -79,7 +79,7 @@ test('AUDIT NAV1 (online #2) THE SEA HANDED ON: a stander gone from the cell too
   qa.present = false;
   q.run(OWNER_SWEEP_S + 0.6);
   assert.ok(loneC.orphan != null && loneC.owner === 'a', 'c holds her for the heir');
-  q.run(ORPHAN_S + SHIP_FADE_S + 0.5);     // SHIP-FADE
+  q.run(ORPHAN_S + SHIP_FADE_S + 0.5);   // SHIP-FADE
   assert.ok(bySeed(qc, lone.ship.seed) === null, 'no word claimed her: let go');
   assert.ok(bySeed(qb, lone.ship.seed)?.owner === null, 'the heir has her, all the same');
 });
