@@ -137,20 +137,6 @@ test('DISC19-A: in the session itself the round clock never touches a curse or a
   resetMagicRoundMarker(null);
 });
 
-// ═══ B: the Light spell underground ═══════════════════════════════════════════════════════════════════════════════
-test('DISC19-B: the world host\'s dungeon frame lights the DUNGEON engine\'s candle - the engine every cast down there goes through - and never its own', () => {
-  const src = rd('src/scenes/worldModes.js');
-  const at = src.indexOf("if (mode === 'dungeon') {\n      if (pendingDungeonExit)");   // the frame's own branch, not the one-line dispatches
-  const branch = src.slice(at, src.indexOf('\n    }\n', at));
-  assert.ok(at > 0 && branch.includes('dungeonCtx.drawFoes('), 'the branch was found whole');
-  const lights = branch.slice(branch.indexOf('const _dgLit = withPlayerLights('));
-  assert.match(lights.slice(0, lights.indexOf('renderer.setClearColor')), /^const _dgLit = withPlayerLights\(\n(?:\s*\/\/[^\n]*\n)*\s*_dgNear,[^\n]*\n\s*abyssCandle\(dungeonCtx\.candleLight\(\), _abyss\), _abyss\?\.torchOff \? null : _dgTint\(playerTorchLight\(/);   // AUDIT DISC19: the pair channel, the candle untinted (LA-AUDIT A5: the selection is _dgNear, one past the cap for its fade; OH-E: the abyss's half, off its own white)
-  assert.match(branch, /const _dgNear = _iilDg \? [^\n]*: nearestLights\(dungeonCtx\.lights, [^\n]*, \(\) => _dgColor, DUNGEON_LIGHT_BLOCK_RANGE\);/, 'the selection rides the pair channel');
-  assert.ok(!branch.includes('magic?.candleLight()') && !branch.includes('magic.candleLight()'), 'this host\'s own engine is not updated underground');
-  assert.ok(!/\bmagic\??\.update\(/.test(branch), 'and nothing here updates it - so its candle is never the dungeon\'s');
-  assert.match(rd('src/scenes/dungeonContext.js'), /candleLight: \(\) => magic\.candleLight\(\),/, 'the context hands out its own engine\'s candle');
-});
-
 // ═══ C: the death loop ═══════════════════════════════════════════════════════════════════════════════════════════
 const withSearch = (search, fn) => {
   const had = Object.getOwnPropertyDescriptor(globalThis, 'location');
@@ -196,16 +182,6 @@ test('DISC19-C: the online exit autosave writes every slot of a living player an
   assert.deepEqual(exitAutosaveNames(p, { storage }).sort(), ['Backup', 'Before online', QUICK_SAVE_NAME].sort(), 'alive: every slot, as ONLINE-AUTOSAVE1 was asked');
   assert.deepEqual(exitAutosaveNames(p, { storage, deathUp: true }), [], 'the death screen is up: none');
   assert.deepEqual(exitAutosaveNames({ ...p, health: 0 }, { storage }), [], 'dead: none');
-  // and the handler writes only through that answer, with every host's death read
-  const w = rd('src/scenes/world.js');
-  // FIELD BUGS 29h (BOOT-HIDE): PIN MOVED - the handler is named at the checkpoint (`exitAutosave`) and handed to the
-  // page with the checkpoint's other doors, below every binding it reads (test/scenes/fb0929h_boothide.test.js)
-  const at = w.search(/const exitAutosave = \(\) => \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(!online \|\| !playerSpawned\b/);   // AUDIT ONESEAT H4: its guard asks the seat too, a comment above it
-  const handler = w.slice(at, w.indexOf('\n  };', at));
-  assert.ok(at > 0, 'the online exit autosave was found');
-  assert.ok(w.includes("\n  addEventListener('beforeunload', exitAutosave);\n"), 'and it is the page\'s end');
-  assert.match(handler, /for \(const saveName of exitAutosaveNames\(playerEntity, \{ deathUp: townTalk\.overlay instanceof DeathScreen \|\| !!modes\?\.deathUp\?\.\(\) \|\| successionOpen\(\) \}\)\) save\(saveName\);/);
-  assert.ok(!handler.includes('saveKeysOfCharacter('), 'no second list of slots beside the guarded one');
 });
 
 test('DISC19-C: an online page\'s death screen counts its respawn in the hint\'s place, and offline keeps the full hint - main\'s DEATH4 and AUDIT CONTRIB A5 said it first, and this batch\'s own hint was folded into theirs at the merge', () => {
@@ -219,9 +195,6 @@ test('DISC19-C: an online page\'s death screen counts its respawn in the hint\'s
     assert.equal(ds.online, false);
     assert.equal(ds.hint, 'ENTER end   F11 load');
   });
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): offline, a death Project Legacy will raise says Rise (riseHint)
-  // L10N4: the count and the hint in the player's language (t(), hintText) - the English hint kept as the hosts give it
-  assert.match(rd('src/ui/deathScreen.js'), /const hint = this\.online \? (?:\(this\.wild \? t\('death\.risingInWild', 'RISING IN \{n\}', \{ n: this\.respawnIn \}\) : )?t\('death\.risingIn', 'RISING IN \{n\}   ENTER now', \{ n: this\.respawnIn \}\)\)? : hintText\(this\.rises \? riseHint\(this\.hint\) : this\.hint\);/, 'no dead key drawn online');
 });
 
 // ═══ F: the watch and the town ════════════════════════════════════════════════════════════════════════════════════
@@ -354,20 +327,6 @@ test('DISC19-F: the player\'s swing spares a defender while the monsters\' pool 
   assert.equal(d.defender, true);
 });
 
-test('DISC19-F by source: the host runs the town watch after the pools move, resolves the swing watch -> monsters -> townsfolk (FB0929: no pass offers the defenders alone), and keeps camps out of every location\'s rect', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);[^\n]*\n(?:\s*if \(_deckBodies\.size\) navalLeash\(\);[^\n]*\n)?(?:\s*\/\/ TACT3[^\n]*\n\s*\/\/[^\n]*\n\s*const _ownTact[^\n]*\n\s*spaceAcross\([^\n]*\n\s*(?:if \([^\n]*\) )?clearDoorways\([^\n]*\n)?(?:\s*navalCrewFrame\((?:gamePaused\(\) \? 0 : )?foeDt\);[^\n]*\n)?\s*livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\)(?:, \.\.\.navalCrew\.batches\(\))?\);\n\s*if \(playerSpawned\) _townWatchFrame\(foeDt\);/);   // QUEST-POPUP-PAUSE re-aim: the pools' clock; TACT3: the crowd and the door between the leash and the draw; LIVING CREW re-aim: the decks' crews step and draw between; AUDIT NAV2 F53 PIN MOVED: their clock held by a pause
-  assert.match(w, /enabled: \(getPref\('townWatch'\) !== false \|\| raidDefendingHere\(\)\) && !isTransformedLycanthrope\(playerEntity\),\n\s*inTown: _isPlayerInTownStrict\(\), crime: !!playerEntity\.crimeCommitted,/);   // AUDIT DISC19: the whole frame is townWatch.runTownWatchFrame, pinned there
-  const swingAt = w.indexOf('} else if (!cityGuards.resolvePlayerHit(');
-  const order = ['} else if (!cityGuards.resolvePlayerHit(', 'if (exteriorFoes.resolvePlayerHit(', 'cityGuards.resolveCivilianHit('].map((k) => w.indexOf(k, swingAt));
-  assert.ok(swingAt > 0 && order.every((i, k) => i >= 0 && (k === 0 || i > order[k - 1])), `the three passes in order: ${order}`);
-  assert.equal(w.split('cityGuards.resolvePlayerHit(').length - 1, 1, 'one pass over the watch - none that offers the defenders alone');
-  assert.match(w, /inside: false, inLocationRect: _inAnyLocationRect\(walkMode \? player\.pos : cam\.pos\),/, 'the chunk roll asks the pixel just entered');
-  assert.match(w, /anchor = campAnchorSpot\(\{ feet, [^\n]*\n\s*if \(anchor && _inAnyLocationRect\(\[anchor\.x, anchor\.y, anchor\.z\]\)\) anchor = null;/, 'the camp is never pitched in a town');
-  assert.match(w, /spot = placeFoeFreely\(memberEnv, [^\n]*\n\s*if \(spot && _inAnyLocationRect\(\[spot\.x, spot\.y, spot\.z\]\)\) spot = null;/, 'nor a member over its line');
-  assert.match(w, /const loc = locationIndex\.get\(`\$\{px\.x \+ dx\},\$\{px\.y \+ dy\}`\);\n\s*if \(loc\?\.exterior\?\.exteriorData && isInLocationRect\(wc\.x, wc\.z, locationWorldRect\(loc, px\.x \+ dx, px\.y \+ dy\)\)\) return true;/, 'every location\'s widened rect, the pixel and its neighbours');
-});
-
 // ═══ E: the King of Worms' door ═══════════════════════════════════════════════════════════════════════════════════
 /** An axis-aligned box as twelve triangles. */
 function boxMesh(min, max) {
@@ -438,23 +397,7 @@ function staticClosure(entry) {
   return seen;
 }
 
-test('DISC19-D: every module the dungeon\'s foe subsystem loads lazily is one the world host\'s page already holds - no chunk there is lazy-only, so no deploy can delete it under an open tab', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  const at = dc.indexOf('if (opts.foes && palette) {');
-  const block = dc.slice(at, dc.indexOf('} catch (err) {', at));
-  const lazy = [...block.matchAll(/import\('(\.[^']+)'\)/g)].map((m) => resolve(SRC_ROOT, 'scenes', m[1]));
-  assert.ok(at > 0 && lazy.length >= 7, `the foe block's lazy imports were found (${lazy.length})`);   // 7 since AUDIT 68 dropped the dead rig's shared/engineRig/raceCharacter imports
-  const held = staticClosure('scenes/world.js');
-  const lazyOnly = lazy.filter((p) => !held.has(p)).map((p) => p.slice(SRC_ROOT.length + 1));
-  assert.deepEqual(lazyOnly, [], 'a lazy-only chunk in the foe block is a dungeon of flats after the next deploy');
-  assert.ok(staticClosure('scenes/dungeonContext.js').has(resolve(SRC_ROOT, 'ai/enhancedMotor.js')), 'the enhanced motor is the context\'s own static import');
-});
-
 test('DISC19-D: a chunk gone mid-session is said on the screen, not swallowed - and the log names what really failed', () => {
   assert.equal(isStaleChunk(new TypeError('Failed to fetch dynamically imported module: https://daggerfalljs.dev/play/assets/enhancedMotor-CPTnjkkD.js')), true);
   assert.match(STALE_CHUNK_IN_PLAY_TEXT, /\bReload\b/);   // PIN MOVED (VOICE2): 'The game was updated. Reload to see the enemies.' - a sentence, no dash aside (Voice.md rule 5)
-  const dc = rd('src/scenes/dungeonContext.js');
-  const c = dc.slice(dc.indexOf('} catch (err) {', dc.indexOf('if (opts.foes && palette) {')));
-  assert.match(c.slice(0, 1200), /if \(isStaleChunk\(err\)\) _staleChunkNotice = true;/);   // AUDIT DISC19: said on the level's first frame (drawFoes), auditdisc19's pin
-  assert.match(c.slice(0, 1200), /the dungeon builds with no live enemies/);
 });

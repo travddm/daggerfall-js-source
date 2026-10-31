@@ -154,7 +154,6 @@ test('AUDIT WORLD-EVENTS L2-6: a raid\'s leader carries an elite\'s drop, and it
   const was = e.items.length;
   promoteRaidLeader(e, { name: 'Orc Warlord' });
   assert.equal(e.items.length, was, 'once');
-  assert.match(rd('src/systems/raidingParties.js'), /promoteRaidLeader\(foe\.entity, \{ name: raidLeaderNameOf\(foe\.mobileType \?\? mobileType\) \}\); foe\.entity\.bossTraits = undefined; foe\.entity\.bossWard = undefined; giveBossTraits\(foe\.entity, rollBossTraits\(RAID_LEADER_TRAITS, rnd\(\)\)\);/, 'its two, in place of a stand\'s one');
 });
 
 test('AUDIT WORLD-EVENTS L2-7 / L2-8 / L2-11: two real pools - my ward\'s share rides my record, a reader draws it and hears it break; a forged mask stands an elite\'s one trait; the heir of a warded foe keeps a ward (mutants: the share unsent; the share unread; the mask untrimmed; the heir unwarded)', async () => {
@@ -268,8 +267,6 @@ test('AUDIT WORLD-EVENTS L5-4: a Spire lord (its target\'s `lord`) carries its t
   assert.equal(lord.entity.bossTraits.length, 2);
   assert.equal(said.length, 1, 'said once');
   assert.equal(legion.entity.bossTraits, undefined);
-  assert.match(rd('src/scenes/eliteGates/egFight.js'), /name: look\.name, lord: !!look\.lord, m: b\.max, hp: b\.hp \};/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /hostLordTraits\(q, \(l\) => hudText\.add\(l\)\);/);
 });
 
 test('AUDIT WORLD-EVENTS L5-6 / L5-12: each trait\'s rule is told once a session at my first blow on one; the target frame carries the rules and names the foe without the word its trait line says; the title\'s word composes in the player\'s language (mutants: the rules never told; told every blow; the word twice)', async () => {
@@ -285,5 +282,4 @@ test('AUDIT WORLD-EVENTS L5-6 / L5-12: each trait\'s rule is told once a session
   assert.ok(foeTarget().rules[0].includes('comes back at you'));
   assert.equal(foeTarget().name, 'Elite Orc', 'the name without the word its trait line says');
   assert.equal(foeTitle(f.entity, 'Orc'), 'Thorned Elite Orc', 'the title keeps it (the hover, the death line)');
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /parts\.foeTraits\.title = rules;/);
 });

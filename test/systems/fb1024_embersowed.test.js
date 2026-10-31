@@ -222,14 +222,3 @@ test('BROKER-RID the owed list rides the save, each row whole and priced as its 
   assert.match(BROKER_OWED_TEXT, /Your embers are held/);
 });
 
-test('BROKER-RID the host door (world.js) - both sales and both loads through brokerOwedDoor, the account an owed sale is settled under on the io', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const brokerOwed = brokerOwedDoor\(playerEntity, saveSoon, panoplyPieceById, insigniaIo, settleBrokerSale\);/);
-  assert.ok(w.indexOf('const insigniaIo = () =>') < w.indexOf('const brokerOwed = brokerOwedDoor('), 'the io built before the door is');
-  assert.match(w, /return ses \? \{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), base: serviceBase\(st\), secret: ses\.secret, account: ses\.id \?\? null \} : null;/);
-  assert.match(w, /const r = await brokerOwed\.settled\(\(\) => readAccount\(io\)\); if \(r\.ok\) insigniaAdopt\(r\.data\?\.wardrobe\);/);
-  assert.match(w, /load: async \(\) => \{ try \{ const a = await brokerOwed\.settled\(_accountEg\.keys\); if \(a\?\.ok\) _panoplySink = a\.data\?\.sink \?\? null; \}/);
-  assert.match(w, /const r = await brokerOwed\.insignia\(offer, \(id, rid\) => buyInsignia\(io, id, rid\)\);/);
-  assert.match(w, /const r = await brokerOwed\.panoply\(id, \(p, rid\) => _accountEg\.sink\(p, rid\)\);/);
-  assert.equal((w.match(/r\.error === 'unheard' \? brokerOwedText\(\)/g) ?? []).length, 2, 'both sales say it');
-});

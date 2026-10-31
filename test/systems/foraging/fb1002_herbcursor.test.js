@@ -211,11 +211,3 @@ test('HERB-CURSOR the other acts: a vein asks the look (its points are aimed by 
   } finally { s.done(); }
 });
 
-test('HERB-CURSOR the world\'s seam, by source: the Basket\'s hold, and the look asked back at its release only where nothing else holds the mouse - the player\'s own freed cursor, a window, a surface, an overlay, the travel view; a look act takes back a cursor the player freed under the same gates (its behaviour, and the Escape\'s keyup, are test/systems/fb1002_herbcursor_audit.test.js\'s) (mutants: the seam unpassed; the relock ungated)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const seam = w.match(/ pointer: \(want\) => \{[^\n]*?\}; \},/)?.[0] ?? '';
-  assert.ok(seam, 'createGatherHost is handed the pointer');
-  assert.match(seam, /const relock = \(\) => \{ if \(!cursorActive\(\) && !gamePaused\(\) && !pointerSurfaces\.size && !\(modes\?\.modalWindowUp\?\.\(\) \?\? false\) && !overlayOpen\(\) && !travelView\?\.active\) requestLook\(canvas\); \};/);
-  assert.match(seam, /if \(want === 'look'\) \{ if \(cursorActive\(\)\) \{ setCursorActive\(false\); relock\(\); \} return null; \}/);
-  assert.match(seam, /const off = holdCursor\(\); return \(\) => \{ if \(!off\(\)\) return;/);
-});

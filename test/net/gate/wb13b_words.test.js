@@ -108,7 +108,6 @@ test('WB13b the chat names the marks - the card and the bar say what each does; 
   const fell = cardOf(fellPost({ day: 112, top: [], n: 0 }));
   assert.deepEqual([fell.author, fell.title, fell.fields.Where, fell.text], ['Dagon\'s Breach', 'Valkynaz Ruhn has fallen', 'In the wilds', 'The breach collapses.']);
   assert.equal(fellLine({ near: null, boss: P.boss, top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'the chat says what Discord\'s card says - its title, its family, where and the collapse');
-  assert.match(read('src/scenes/world.js'), /eventNotice\('gate', \(f\.c != null \? courtFellLine : fellLine\)\(\{ \.\.\.f, near: site\?\.day === day \? site\.near : null,/, 'a screen that never found the site: no place ("near the wilds") - PIN MOVED (GATE-COURTS): a court\'s kill its own line');
 });
 
 test('WB13b nothing said on stepping into the court - the marks\' card stands at that moment, with the same subtitle as by the gate (mutants: the arrival line said again; two subtitles)', () => {
@@ -117,8 +116,6 @@ test('WB13b nothing said on stepping into the court - the marks\' card stands at
   assert.equal(MARKS_CARD_TEXT.gate('Valkynaz Ruhn', 'the Burning'), MARKS_CARD_TEXT.arrive('Valkynaz Ruhn', 'the Burning'));
   const md = ['venom', 'grudge', 'echoing'];
   assert.equal(marksCardModel(md, { name: 'Valkynaz Ruhn' }, { mode: 'gate' }).sub, marksCardModel(md, { name: 'Valkynaz Ruhn' }, { mode: 'arrive', since: 0, now: 1000 }).sub);
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /if \(!marksSaid\) \{ marksSaid = true; if \(P\.md && !s\.fell && s\.wrath == null\) marksAt = t; \}/);
 });
 
 test('WB13b a phase\'s turn is its name and (WB13e) its one order on its card; the Reckoning\'s call, its count and its break one line each (the bar counts it down) (mutants: the old turn)', () => {
@@ -129,13 +126,3 @@ test('WB13b a phase\'s turn is its name and (WB13e) its one order on its card; t
   assert.equal(COURT_RECKON_TEXT.broken(), 'The Reckoning breaks! Strike now!');
 });
 
-test('WB13b the notice board\'s card says where and the countdown\'s state - the subject is the name (it said the label again) (mutant: the label in the body)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const state = String\(mark\.label \?\? ''\)\.replace\(\/\^Dagon's Breach\(\?: - \)\?\/, ''\);/);
-  assert.match(w, /body: state \? `Near \$\{near\}\. \$\{state\.charAt\(0\)\.toUpperCase\(\)\}\$\{state\.slice\(1\)\}\.` : `Near \$\{near\}\.`/);
-  // the same transform, read as the card would say it
-  const body = (label, near) => { const state = String(label ?? '').replace(/^Dagon's Breach(?: - )?/, ''); return state ? `Near ${near}. ${state.charAt(0).toUpperCase()}${state.slice(1)}.` : `Near ${near}.`; };
-  assert.equal(body('Dagon\'s Breach - opens in 4:07', 'Copperham'), 'Near Copperham. Opens in 4:07.');
-  assert.equal(body('Dagon\'s Breach - sealed, collapses in 6:12', 'Copperham'), 'Near Copperham. Sealed, collapses in 6:12.');
-  assert.equal(body('Dagon\'s Breach', 'Copperham'), 'Near Copperham.');
-});

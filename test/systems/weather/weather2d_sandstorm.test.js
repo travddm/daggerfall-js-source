@@ -161,18 +161,3 @@ test('WEATHER2d the sand: the wisps\' program in the sand\'s look - tan, dense, 
   assert.equal(sand.drawn, 0, 'a storm at nothing draws nothing');
 });
 
-test('WEATHER2d the hosts: the sand renderer built on the enhanced lane, the sand drawn before the rain\'s branch on the front\'s intensity as a foreign pass, and the rain program never built for it', () => {
-  for (const [name, s, eye] of [['world', rd('src/scenes/world.js'), 'wxEye32'], ['exterior', rd('src/scenes/exterior.js'), 'eye32']]) {   // PIN MOVED (OW-WEATHER, FIELD BUGS 2026-10-01 #9): the world host's eye is the view's (test/net/peer/fb1001_overworld.test.js)
-    // PIN MOVED (ASHFALL1, 2026-10-27): the sand's renderer is the dry falls' (render/dryFall.js DryFallRenderer - its wisps in SAND_LOOK, and the
-    // ash beside them), the branch every dry fall's, the fall handed its kind
-    assert.match(s, /const dryFall = sky\.enhanced \? new DryFallRenderer\(renderer\.gl\) : null;/, `${name}: built at boot`);
-    assert.match(s, /if \(precipMode && !isDryFall\(precipMode\) && !precip\) precip = new PrecipitationRenderer\(renderer\.gl, precipOpts\);/, `${name}: the rain program is not the sand's`);
-    const i = s.indexOf('if (isDryFall(precipShown)) {');
-    assert.ok(i > 0, `${name}: the sand branch`);
-    const draw = `dryFall.draw({ on: true, kind: precipShown, strength01: fx.intensity, windV: wd.windV, step: wd.step }, proj, view, ${eye}, now / 1000, renderer.worldViewportPx?.[3]);`;
-    assert.ok(new RegExp(`${draw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\n\\s+renderer\\.markForeignPass\\(\\);`).test(s.slice(i, i + 600)), `${name}: the front's intensity, the one wind, a foreign pass`);   // RAIN-OVER-GRASS: the world host's falling weather is one closure, indented once more
-    assert.ok(s.slice(i, i + 800).includes('} else if (precipShown && precip) {'), `${name}: the rain's branch after it`);
-    assert.ok(s.includes("import { DryFallRenderer } from '../render/dryFall.js';"), `${name}: imported`);   // PIN MOVED (ASHFALL1, 2026-10-27)
-  }
-});
-

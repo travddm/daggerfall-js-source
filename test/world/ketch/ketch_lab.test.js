@@ -87,12 +87,6 @@ test('KETCH-LOOK KL0 THE LAB\'S KNOBS: ?grey, ?lite (or the touch door), ?bill a
   assert.deepEqual({ ...k }, { grey: true, lite: true, bill: true, sky: false, weather: 'rain', hour: 18.5, eye: 20, arena2: true, gauges: true });
   assert.equal(ketchLabKnobs('?eye=0.2').eye, 1, 'the eye never slower than the game\'s');
   assert.equal(ketchLabKnobs('?touch=on').lite, true, 'the touch door is the phone\'s tier');
-  const src = readFileSync(new URL('../../../src/tools/ketchLab.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(knobs\.grey\) canvas\.style\.filter = 'grayscale\(1\)';/);
-  assert.match(src, /createSdSteps\(\{ renderer, course: KT_COURSE, lite: knobs\.lite \}\)/);
-  assert.match(src, /const sky = knobs\.sky \? new EnhancedSkyRenderer\(gl\) : null;/);
-  assert.match(src, /window\.__lab\.bill = \(\) =>/);
-  assert.ok(src.indexOf('renderer.drawMesh(d.gpu') < src.indexOf('sky.draw(') && src.indexOf('sky.draw(') < src.indexOf('renderer.drawBillboards('), 'the sky after the opaque level, before the billboards - the dungeon arm\'s order');
 });
 
 test('KETCH-LOOK KL3 THE LAB\'S FAKE LINK: every fight and every knob a whole state the room could say - through the wire\'s own projection and the page\'s fold - and the one law reads what each knob wrote: the cradles, the engine, the loose cells, the carried, the wave, the stun, the Discord, the song and its forks, the ring\'s sections, the turn west, the fall; KL0\'s ?sec&secAt and ?forks still stand their fights (mutants: a knob unread; a section\'s moment turned)', async () => {
@@ -136,8 +130,6 @@ test('KETCH-LOOK KL3 THE BILL\'S CEILINGS: a ceiling for each zone\'s view (the 
   assert.deepEqual(Object.keys(KT_LAB_BILL), ['waist', 'gallery', 'hold', 'bridge', 'cabin']);
   for (const [v, n] of Object.entries(KT_LAB_BILL)) { assert.ok(KT_LAB_VIEWS[v], `${v} a view`); assert.ok(Number.isInteger(n) && n > 0, `${v} measured`); }
   assert.ok(KT_LAB_BILL.waist < KT_LAB_BILL.bridge && KT_LAB_BILL.hold < KT_LAB_BILL.bridge);
-  const probe = readFileSync(new URL('../../../tools/ketchLabProbe.mjs', import.meta.url), 'utf8');
-  assert.match(probe, /b\.gl <= KT_LAB_BILL\[view\]/);
 });
 
 test('KETCH-LOOK KL3 THE LAB\'S BLOWS ARE THE BRAIN\'S: a keel, a lash and a ring (its Tonal Wave with it) begun by the lab from where the Warden stands are byte for byte the blows the relay\'s own beat begins there, at the same moment, at the same fighter (mutants: a blow\'s wind-up unfloored; the wave left off)', async () => {

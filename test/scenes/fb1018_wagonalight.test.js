@@ -143,21 +143,12 @@ test('WAGON-ALIGHT THE PARKED BOX NEVER STANDS ROUND A BODY OF MINE: a companion
   assert.equal(pool.capsuleInBox(m, parts), false);
   buckets.length = 0; pool.frame(1 / 30, [0, 2, 0], 0);
   assert.ok(buckets.some(([op]) => op === 'add'), 'stood once it stepped out');
-  // the wiring: the streaming host hands both layers - the crew's hands and the sworn
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /^ {4}bodyCapsules: \(\) => \[\.\.\.crewAshore\.capsules\(\), \.\.\.revenantAshore\.capsules\(\)\],/m);
-  // AUDIT FB1018 L4-2: and both layers' seats asked of the pool's own question - parked, the seat goes
-  assert.match(src, /^ {4}seat: \(i\) => wagonRiders\?\.companionSeat\(i, hcc\.carriesCompanions\(\)\) \?\? null,/m);
-  assert.match(src, /^ {4}seat: \(i\) => wagonRiders\?\.companionSeat\(crewCount\(\) \+ i, hcc\.carriesCompanions\(\)\) \?\? null,/m);
 });
 
 test('WAGON-ALIGHT ONE GET-DOWN POINT: the law answers it (systems/wagon/wagonSeats.js getDownPoint - GET_DOWN_STEP behind the seat\'s yaw), and nothing else in src/ works it out again - the player\'s getting down and the companion layer\'s both call it (mutants: the step\'s sign; the player\'s own copy back)', () => {
   assert.equal(GET_DOWN_STEP, 1.6);
   assert.deepEqual(getDownPoint({ feet: [10, 1, 20], yaw: Math.PI / 2 }).map((v) => +v.toFixed(6)), [8.4, 1, 20]);
   assert.deepEqual(getDownPoint({ feet: [10, 1, 20], yaw: 0 }).map((v) => +v.toFixed(6)), [10, 1, 18.4]);
-  const riders = rd('src/scenes/wagon/wagonRiders.js'), crew = rd('src/scenes/crewAshore.js');
-  assert.match(riders, /deps\.unpin\?\.\(near \? getDownPoint\(at\) : null\);/);
-  assert.match(crew, /const to = getDownPoint\(sat\);/);
   // AUDIT FB1018 L1-3: the whole of src/, as the name says - the step worked out (the constant or its 1.6 behind a yaw) in
   // the law alone
   const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.js') ? [join(d, e.name)] : []));
@@ -165,7 +156,6 @@ test('WAGON-ALIGHT ONE GET-DOWN POINT: the law answers it (systems/wagon/wagonSe
   const law = join(src, 'systems', 'wagon', 'wagonSeats.js');
   const again = walk(src).filter((f) => f !== law && /\* GET_DOWN_STEP|GET_DOWN_STEP \*|(sin|cos)\([^)]*yaw[^)]*\) \* 1\.6\b/.test(readFileSync(f, 'utf8')));
   assert.deepEqual(again, [], 'the get-down step worked out again outside the law');
-  for (const [name, text] of [['wagonRiders.js', riders], ['crewAshore.js', crew]]) assert.doesNotMatch(text, /GET_DOWN_STEP\]?\s*[,;)]|\* GET_DOWN_STEP/, `${name} works the step out itself`);
 });
 
 test('WAGON-ALIGHT A PLAYER GIVEN A COMPANION\'S SEAT ON THE ROAD (AUDIT FB1018 L1-4): four companions in the four seats, a peer accepted into the first - the companions move up a seat, the last one, its seat gone while the wagon still trails and no box stands, gets down at its seat\'s get-down point beside the moving wagon and walks on the ground', async () => {

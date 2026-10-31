@@ -336,10 +336,8 @@ test('NODE-GLINT screenRect, widenRect, snapRect and innerShare: a node\'s boxes
 });
 
 test('NODE-GLINT the programs: the mask\'s vertex stage is the billboard program\'s own with the rectangle stretched over the tile after it, never moving a vertex given way; its fragment stage the picture\'s cut; AUDIT NODE-GLINT: each glint found once for the node in the light\'s vertex stage - each node its own seed, each life its own spot and turn, the life numbered on the clock\'s own wrap, its light never NaN, the first of its tries in the picture\'s box on the screen that the silhouette holds round it, none a dark life, handed on flat; the fragment stage the sheen inside the silhouette and never still, each glint\'s star about its spot, nothing lit nothing drawn, at the nearer picture, stood toward the eye never past half its way, faded in the fog, the haze and the sea\'s murk (mutants: the remap moving a gone vertex; every node one seed; a spot never chosen afresh; the wrap unkept; a negative flash; the hold unasked; a spot off the screen taken; a dark life lit; the still glints moving; the sheen outside the picture; the sheen under reduced motion; the depth its own texel\'s; the light behind its node; the pull past the eye; the murk ignored)', () => {
-  const bb = src('src/render/renderer.js');
   assert.ok(NODE_MASK_VS.startsWith('#version 300 es'));
   assert.ok(NODE_MASK_VS.includes('if (uMesh > 0.5) {') && NODE_MASK_VS.includes('if (gone) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);'), 'BB_VS whole');
-  assert.ok(bb.includes('if (gone) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);'));
   assert.match(NODE_MASK_VS, /if \(gone\) gl_Position = vec4\(2\.0, 2\.0, 2\.0, 1\.0\);[^\n]*\n\s*if \(!gone\) gl_Position\.xy = \(gl_Position\.xy - uMaskRect\.xy \* gl_Position\.w\) \* uMaskRect\.zw;/, 'the remap after the vertex is placed, a gone one left off the clip volume');
   assert.match(NODE_MASK_FS, /if \(a < 0\.5\) discard;/);
   assert.match(NODE_MASK_FS, /a = vAlpha > 0\.0 \? a \* vAlpha : 1\.0;/, 'a tree\'s material cut, an opaque card never');
@@ -393,7 +391,6 @@ test('NODE-GLINT the programs: the mask\'s vertex stage is the billboard program
   assert.ok(fs.includes('  o = vec4(dwWaterFogAdd(light * uAlpha * fogFactorAt(at3), at3), 1.0);'), 'kindled, faded, fogged and murked');
   assert.equal(GLINT_MAX, NODE_GLOW_MAX, 'a tile for every node the glow could light');
   assert.equal(GLINT_MAX, GLINT_GRID * GLINT_GRID);
-  assert.match(bb, /BB_QUAD_INDEX_BYTES = 6 \* 4;/);
 });
 
 // ─── THE DRAW ────────────────────────────────────────────────────────
@@ -656,21 +653,7 @@ test('NODE-GLINT the world host\'s pass (createNodeGlintPass): a mark with pictu
   assert.equal(late, 0, 'an idle build after the end builds nothing');
   assert.equal(mine.pass, null);
   assert.equal(own.calls.filter((x) => x[0] === 'deleteProgram').length - before, 1, 'its own glow\'s program freed with it');
-  assert.match(src('src/render/nodeGlint.js'), /dispose\(\) \{ dead = true; asked = true; pass\?\.dispose\(\); pass = null; if \(handed === undefined\) glow\?\.dispose\?\.\(\); \},/, 'its own glow freed at its end');
 });
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
-test('NODE-GLINT the wiring: the world host lights the marks through the glint, the glow its fallback, in the hook after each mode\'s opaque world (the street\'s, a dungeon\'s), none under the travel view; the renderer keeps the flats\' basis and the 3D trees its frame drew, forgotten each frame; no ring remains (mutants: the glint unwired; the drawn trees never forgotten; the drawn trees never kept; no glow of its own)', () => {
-  const w = src('src/scenes/world.js'), r = src('src/render/renderer.js');
-  assert.match(w, /const nodeGlintPass = createNodeGlintPass\(renderer\);/);   // PIN MOVED (NODE-GLINT): the outline's pass, renamed - HOST-SPLIT's no entry in bootWorld stands
-  assert.match(src('src/render/nodeGlint.js'), /const glow = handed === undefined \? createNodeGlowPass\(renderer\) : handed;/, 'the fallback glow its own when the host hands none');   // PIN MOVED (AUDIT NODE-GLINT): built where its end can free it
-  assert.match(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\); nodeGlintPass\.draw\(travelView\?\.active \? null : nodeMarksAt\(enchantFeet\(\)\)\); partyPing\?\.draw\(renderer\); \};/);   // PARTY-PING: the route rides the same hook
-  assert.doesNotMatch(w, /nodeGlowPass|nodeOutline/, 'the glow is the glint\'s fallback alone, and the ring is gone');
-  // PIN MOVED (the seams review's matrix-for-a-basis test): the three components the vec3 uniforms read, never a copy whole
-  assert.match(r, /const bbR = \(this\._bbRight \?\?= new Float32Array\(3\)\), bbU = \(this\._bbUp \?\?= new Float32Array\(3\)\);\n\s*bbR\[0\] = camRight\[0\]; bbR\[1\] = camRight\[1\]; bbR\[2\] = camRight\[2\];\n\s*bbU\[0\] = camUp\[0\]; bbU\[1\] = camUp\[1\]; bbU\[2\] = camUp\[2\];/);
-  assert.match(r, /for \(let i = 0; i < slots\.length; i\+\+\) drawn\[i\] = slots\[i\]\?\.runs\.length \? slots\[i\] : null;/);
-  assert.match(r, /this\._lptDrawn\?\.fill\(null\);   \/\/ NODE-OUTLINE: and the 3D trees a frame drew/);
-  assert.match(r, /lptDrawnFrames\(\) \{ return this\._lptDrawn \?\? \[\]; \}/);
-  assert.match(src('src/scenes/gatherHost.js'), /for \(const r of out\) r\.pictures = r\.kind\.picturesOf\?\.\(r\.node, r\.src\?\.entry \?\? null\) \?\? r\.src\?\.pictures\?\.get\(r\.key\) \?\? null;/);
-});

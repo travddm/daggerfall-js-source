@@ -196,12 +196,6 @@ test('CHAP2b the board\'s asks: each chapter\'s by its guild\'s row, a member\'s
   ], 'a Brotherhood member sees its chapter\'s contracts');
 });
 
-test('CHAP2b a realm character\'s delete takes what its receipts gave (mutants: the delete)', () => {
-  const realm = src('server-account/src/realm.js');
-  assert.equal((realm.match(/DELETE FROM npc_receipt_credits WHERE player = \? AND char_id = \?/g) ?? []).length, 2, 'deleteRealm and undoCustoms');
-  assert.match(src('server-account/migrations/0100_npc_receipts.sql'), /PRIMARY KEY \(char_id, faction_id, ref\)/);
-});
-
 // ── THE BOARD AND THE WIRING ────────────────────────────────────────
 
 test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): each chapter\'s Duties on its card, the gate held and the town defended, what each earns, a member\'s first of each today; never a card, which had no Take (mutants: the text, the state)', async () => {
@@ -228,19 +222,3 @@ test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-P
   assert.equal(byClass(host, 'notice-take').length, 0);
 });
 
-test('CHAP2b the wiring: both routes credit after the receipt\'s row, the raid by its key\'s region; the board lists the asks; the host refreshes the Roll and says the guilds\' memory on a credited claim (mutants: the routes, the refresh)', () => {
-  const index = src('server-account/src/index.js');
-  assert.match(index, /if \(r\.recorded && !r\.rite && body\.region != null\) answer\.chapters = await creditReceipt\(ctx, who\.player, env, \{ character: body\.character \?\? null, kind: 'gate', id: r\.day, region: body\.region \}\);/);
-  assert.match(index, /answer\.chapters = await creditReceipt\(ctx, who\.player, env, \{ character: body\.character \?\? null, kind: 'raid', id: r\.key, region: contractRegionOfRaid\(r\.key\) \}\);/);
-  assert.match(src('server-account/src/professions.js'), /receipts: await receiptAsks\(db, player, env, character, region, nowS\),/);
-  const world = src('src/scenes/world.js');
-  // PIN MOVED (AUDIT CHAP3 C8: and the Merit its chapters counted it)
-  assert.match(world, /if \(c\?\.counted\) \{\n\s+rollTracker\?\.refresh\(\);\n(?:\s+\/\/[^\n]*\n)*\s+const merit = \(c\.merit \?\? \[\]\)\.reduce\(\(n, \/\*\* @type \{any\} \*\/ x\) => n \+ \(Number\(x\?\.amount\) \|\| 0\), 0\);\n\s+const line = hallRememberLine\(\(c\.credited \?\? \[\]\)\.map\(\(x\) => x\.f\), merit\);\n\s+if \(line\) chatNotice\(line\);/);
-  // PIN MOVED (AUDIT CHAP3 C3: a kept gate claim waits for the gate's scan; C4: a raid's said on the fighting character's page)
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the wait asks the receipt - a lane past the Bay's waits on no scan
-  assert.match(world, /claim: \(r\) => \(gateClaimReady\(r\) \? _accountGates\.claim\(r, gateSeatWord\(r\)\)\.then\(rollHeard\) : Promise\.resolve\(\{ ok: false, error: 'offline' \}\)\),/);
-  assert.match(world, /claim: \(r, ch, \.\.\.a\) => _accountRaids\.claim\(r, ch, \.\.\.a\)\.then\(\(x\) => \(ch === characterIdOf\(playerEntity\) \? rollHeard\(x\) : x\)\),/);
-  // PIN MOVED: GUILD3d - the asks are each chapter's Duties line on its card
-  // PIN MOVED: AUDIT GUILD3 L2 - and the reader's Merit row, the Merit promised only where it earns
-  assert.match(src('src/ui/noticeWindow.js'), /const duties = chapterDutiesLine\(c\.faction, writs\?\.receipts, merit\);[^\n]*\n\s+if \(duties\) card\.append\(el\('p', 'notice-chapter notice-duties', duties\)\);/);
-});

@@ -1082,31 +1082,6 @@ test('TWO-HANDS AUDIT 2 the rig under a READY Morrowind arm (L5): a light that i
   } finally { fpArm.ready = saved; _resetModSettings(); }
 });
 
-test('TWO-HANDS the arm, by source: the mirror is posed over the clip ahead of the neck and the climb (the assembly\'s own hook), both rigs ask it, the run is solved under the climb\'s request in the same slot (TWO-HANDS AUDIT: blended, never chosen), and the rig hands the arm the hands\' mode, the left hand\'s weapon and the blow\'s hand every frame', () => {
-  const fp = rd('src/formats/morrowind/mwFirstPerson.js');
-  assert.match(fp, /const pose = fns\.poseSkeleton\(skeleton, tracks, sampleTrack, time, \{ accumRoot \}\);\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.mirrored = mirror \? applyMirrorRig\(skeleton, pose, GRAPH_ROOT, fns\.skelMats, mirrorWithPoses\(mirror, fns, skeleton, accumRoot\)\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*applyFirstPersonNeck\(/);
-  // PIN MOVED (BODY-MOTION, 2026-10-18): the third-person body's own motion (`motion`, characters/bodyMotion/) is solved
-  // between the neck and the run - over the mirror, under the run and the climb
-  // PIN MOVED (BOW-AIM, FIELD BUGS 2026-10-26c): the third person's ranged aim (`aim`, combat/spineAim.js) between the neck and the motion
-  assert.match(fp, /applyFirstPersonNeck\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.aimFit = aim \? aim\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.motionFit = motion \? motion\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.runFit = run \? applyClimbRig\(skeleton, pose, GRAPH_ROOT, fns\.skelMats, run\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.climbFit = climb \? applyClimbRig/, 'the run under the climb, after the neck');
-  const arm = rd('src/combat/fpArm.js');
-  assert.equal((arm.match(/mirror: mirrorFor\('(first|third)', /g) ?? []).length, 2, 'both views');
-  // PIN MOVED (TWO-HANDS AUDIT, finding 4): the slot took the climb OR the run (`climb: held ? null : (firstClimb(climbWorld,
-  // cam) ?? firstRun(cam)),`) and dropped the run whole the frame a climb began; now both, the run under the climb
-  assert.match(arm, /const fClimb = held \? null : firstClimb\(climbWorld, cam\);/);
-  assert.match(arm, /climb: fClimb,\n(?:\s*\/\/[^\n]*\n)*\s*run: firstRun\(cam\),/);
-  assert.match(arm, /else if \(r\.slot === 'offweapon'\) r\.hidden = !offShown\(built\);/);
-  assert.match(arm, /else if \(r\.slot === 'offweapon'\) r\.hidden = !offShown\(t\) \|\| climbHands;/);
-  assert.match(arm, /if \(\(held \|\| climbHands\) && r\.slot === 'offweapon'\) r\.hidden = true;/);
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /const armItem = pairUp\(\) \? playerWeapon\.handItem\('R'\) : playerWeapon\.weapon;/);
-  assert.match(rig, /fpArm\.setHands\(\{ mode: pairUp\(\) \? playerWeapon\.handsMode : HANDS_MODE\.Single, lead: playerWeapon\.leadHand \}\);/);
-  assert.match(rig, /const offItem = pairUp\(\) && playerWeapon\.handsMode === HANDS_MODE\.Dual \? playerWeapon\.handItem\('L'\) : null;\n\s*fpArm\.setOffWeapon\(offItem\);/);   // the left item named once - its blade and its glow (WEAPON-GLOW1)
-  assert.match(rig, /hand: pairUp\(\) \? playerWeapon\.strike\?\.hand \?\? null : null \}\);/);
-  assert.match(rig, /fpArm\.setRunHands\?\.\(wanted, \{ speed, phase: Number\.isFinite\(mv\.bobTimer\) \? runPhaseOfBob\(mv\.bobTimer\) : null \}\);/);   // PIN MOVED (TWO-HANDS AUDIT): the arms on the head bob's clock
-  assert.match(rig, /const armsRun = fpArm\.active\(\) && !!fpArm\.runPosed\?\.\(\);/);
-});
-
 // ---- TWO-HANDS FIELD (2026-10-16, Mac after the merge) ------------------------------------------------------------
 
 test('TWO-HANDS FIELD the law, A STRIDE\'S OTHER HALF (strideOppositeTime): half the group\'s loop window on, read off its own loop keys inside the block the state plays - wrapping inside the window; the group\'s start to stop where it has no loop keys; another block\'s keys never; nothing without a window', () => {

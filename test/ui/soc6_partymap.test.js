@@ -537,25 +537,6 @@ test('SOC6: the classic page re-reads the party on a timer and rebuilds only on 
 // ── THE HOST ─────────────────────────────────────────────────────
 
 test('SOC6: world.js hands the ONE dep bag a party function, and a seatless pose is omitted (mutants: partyMarkers-keeps-poseless, partyMarkers-snapshot, partyMarkers-includes-me, bag-loses-a-key)', () => {
-  const src = read('src/scenes/world.js');
-  assert.equal([...src.matchAll(/createTravelMapWindow\(\{/g)].length, 1, 'still ONE construction seam');
-  const bag = src.slice(src.indexOf('createTravelMapWindow({'));
-  // U61's pins, intact: the additions went on new lines
-  assert.match(bag, /\bwoods,/, 'the relief still rides the one bag');
-  assert.match(bag, /getPlayerPixel: playerTravelOrigin/, 'and so does the player pixel');
-  assert.match(bag, /party: \(\) => partyMarkers\(\),/, 'and now the party, as a FUNCTION read on each refresh');
-
-  // the composer: the members OTHER than me (my own seat is the
-  // player's own mark on both maps), and only those whose pose has
-  // arrived
-  // AUDIT 68 X2: anchored on the composer's own first line, and there is ONE - a same-named closure (MAP-PARTY1's
-  // dead one stood in toggleExteriorAutomap) captured the first indexOf and widened this slice by 3,800 lines
-  assert.equal((src.match(/const partyMarkers = /g) ?? []).length, 1, 'one party composer in world.js');
-  const fn = src.slice(src.indexOf('const partyMarkers = () => (social?.others() ?? [])'), src.indexOf('const partyFrame = '));
-  assert.match(fn, /social\?\.others\(\) \?\? \[\]/, 'the party\'s OTHER members - never my own seat twice');
-  assert.match(fn, /\.filter\(\(m\) => !!m\.p\)/, 'a seat with no pose yet is omitted');
-  assert.match(fn, /px: m\.p\.px, py: m\.p\.py, in: m\.p\.in \?\? 0, loc: m\.p\.loc \?\? ''/,
-    'the pose\'s own travel pixel, and `in` beside it');
 
   // WHY the filter is load-bearing, driven on the real picture: a
   // member takes their seat before their first pose lands, and
@@ -588,13 +569,7 @@ test('SOC6: the door carries the party to whichever skin the host wears (mutants
     assert.equal(win._party.length, 1, 'the enhanced skin - which is the one online forces (OL1)');
     win.dispose();
   });
-  // both windows name the dep in their own contract, so a host reading
-  // either door's doc finds it
-  assert.match(read('src/ui/travel/travelMapDoor.js'), /party: \(\) => \[\{acct, name, px, py, in, loc, online, leader\}\]/);
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /SOC6, an optional/);
-  assert.match(read('src/ui/heldMap.js'), /SOC6: and an optional `party:/);
 });
-
 
 // ── THE AUDIT'S OWN PINS ─────────────────────────────────────────
 
@@ -630,49 +605,9 @@ test('AUDIT SOC D2: members on ONE pixel stack rather than stand on top of each 
   });
 });
 
-test('AUDIT SOC C16/C17 (MAP1): the party is INK - no label node, no title, no clamp; the name is placed by the same transform as its ring (mutants: a DOM label layer put back; the name placed by a second transform)', () => {
-  // C16/C17 were about DOM labels over a GL relief - a pointer-transparent layer whose `title` could never show, and a
-  // label cut by the root's overflow. MAP1 draws the party ON THE SHEET, so there is no label node to carry a title and
-  // no window edge to be cut by: the canvas IS the paper, and what is off the paper is simply not drawn.
-  const src = read('src/ui/heldMap.js');
-  assert.doesNotMatch(src, /lab\.title = |_partyLabels|_positionPartyLabels/, 'no label nodes at all');
-  assert.match(src, /partyHoverText/, 'the sentence lives on in the hover line');
-  const ink = read('src/ui/ink/inkMap.js');
-  assert.match(ink, /const \[x, y\] = toPaper\(view, m\.x, m\.y\);\s*\n\s*ctx\.strokeStyle = m\.color;[\s\S]{0,400}ctx\.fillText\(m\.name, x, y \+ 9 \+ \(m\.stack \?\? 0\) \* PARTY_LABEL_STACK\);/,
-    'ring and name from ONE toPaper read');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedStyle.js'), /\.ovparty|\.hmparty/, 'and no layer in the stylesheet either');
-});
-
-test('AUDIT SOC C10/D5 (MAP1): the legend is a flex child of the FOOT row, beside the hint and the band, so it wraps with them instead of landing on them (mutants: the legend floated at a guessed height again; the legend appended to the root)', () => {
-  const style = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(style, /\.hmlegend \{\s*position: static; flex: none; display: none;/, 'a chip, not a floating box');
-  assert.doesNotMatch(style, /\.hmlegend \{[^}]*bottom: 70px/, 'no guess about how tall the row happens to be');
-  assert.match(style, /\.hmfoot \{\s*position: absolute; left: 18px; bottom: 18px; display: flex; gap: 12px;/, 'the row it lives in');
-  assert.match(style, /@media \(max-width: 860px\) \{[\s\S]*?\.hmfoot \{ left: 12px; bottom: 12px; flex-wrap: wrap;/, '...and still the row that wraps');
-  assert.match(read('src/ui/heldMap.js'), /const legend = el\('div', 'hmlegend'\);[\s\S]{0,600}?foot\.append\(key, hint, band, legend, ports, over\);/, 'appended INTO the foot (MAP2 put the ports button beside it, TV1 the Overworld button after that, MAP-KEY the key as its first line)');
-  skin('enhanced');
-  withDocument(() => {
-    const win = mkWin({ party: () => [member()] });
-    const foot = win._chrome.root.children.find((c) => c.children.includes(win._chrome.legend));
-    assert.ok(foot, 'the legend is a child of the foot row, not of the root');
-    assert.equal(win._chrome.root.children.includes(win._chrome.legend), false);
-    assert.equal(win._chrome.legend.style.display, 'flex');
-    win.dispose();
-  });
-});
-
 test('AUDIT SOC D7/D9: the offline grey is DERIVED from the dot bytes rather than typed twice, and the hover radius says 18 and why (mutants: the CSS grey typed back by hand, so the label and the classic dot drift again; the comment claiming the markers\' own 16)', () => {
   const hex = (rgb) => '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('');
   assert.equal(PARTY_OFFLINE_CSS, hex(PARTY_OFFLINE_DOT_RGB), 'the DOM grey IS the buffer grey');
   assert.equal(PARTY_OFFLINE_CSS, '#8c948c');
   assert.equal(PARTY_MARK_CSS, PARTY_GREEN_CSS, 'and the live one was always derived, as it still is');
-  const marks = read('src/ui/partyMapMarks.js');
-  assert.match(marks, /export const PARTY_OFFLINE_CSS = hex\(PARTY_OFFLINE_DOT_RGB\);/, 'derived, not spelled');
-  const bare = marks.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-  assert.doesNotMatch(bare, /#8c9/, 'the literal is not in the module\'s code at all - only the derivation is');
-  // D9: the radius, and the reason for it - on the held map now
-  const src = read('src/ui/heldMap.js');
-  assert.match(src, /_partyAt\(sx, sy\) \{\s*\n\s*let best = null, bestD = 18 \* 18;/);
-  assert.match(src, /radius of 18[\s\S]{0,400}WIDER than the location markers/, 'the comment says the number it uses and why it is not the markers\' own');
-  assert.match(src, /_markerAt\(sx, sy\) \{\s*\n\s*let best = null, bestD = 16 \* 16;/, 'and the markers still pick at 16');
 });

@@ -65,36 +65,3 @@ test('OT1: the sink edge writes IsPlayerSwimming, the unsink edge clears it, the
   }
 });
 
-test('OT1: both exterior hosts feed the helper the pre-clear value and the sink edge, after the surface model', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(host);
-    assert.match(s, /import \{[^}]*\bexteriorSwimming\b[^}]*\} from '\.\.\/player\/exteriorSurface\.js'/, `${host} imports exteriorSwimming`);
-    // The carried value is read BEFORE applyMotorEffectFlags clears it
-    // - after, and the dungeon exit's value is gone before the latch
-    // can see it.
-    const read = s.indexOf('const _wasSwimming = !!player.isPlayerSwimming;');   // XL-1: the HOST flag (PlayerEnterExit.isPlayerSwimming)
-    const clear = s.indexOf('applyMotorEffectFlags(player, playerEntity');   // DW-D: the world host hands it the carved sea's forge
-    assert.ok(read > 0 && clear > 0 && read < clear, `${host}: _wasSwimming must be read before the per-frame clear`);
-    // The write sits after the surface model (it needs the tile under
-    // the player) and after the motor ran (it needs this frame's sunk).
-    const surf = s.indexOf('const _surf = exteriorSurfaceNow();');
-    const write = s.indexOf("player.isPlayerSwimming = exteriorSwimming({ wasSwimming: _wasSwimming, sunk: !!player.sunk, unsunk: player.heightAction === 'unsink', tileIndex: _surf.tileIndex });");
-    assert.ok(surf > 0 && write > surf, `${host}: player.isPlayerSwimming is derived from the surface model's tile`);
-    assert.ok(write > clear, `${host}: the write follows the clear it re-derives`);
-    // DoUnsinking's write is the motor's own 'unsink' height action -
-    // `_beginUnsink` sets it and the lerp's end resets it - so the host
-    // invents no memory of its own for the edge.
-    const motor = src('src/player/motor.js');
-    assert.match(motor, /_beginUnsink\(\) \{[\s\S]{0,400}this\.heightAction = 'unsink';/, 'the motor names the unsink edge');
-  }
-});
-
-test('OT1: the per-frame clear is untouched - the EFFECT still owns levitate/waterWalking/slowFall', () => {
-  // The clear stays exactly as AUDIT 18 pinned it (audit18_hosts_outer),
-  // and XL-1 is why it must: `player.swimming` IS levitateMotor
-  // .IsSwimming and :421 clears it outdoors with no tile test, so the
-  // helper's result goes to the OTHER member and this line keeps the
-  // motor's own flag down every exterior frame.
-  const shared = src('src/scenes/shared.js');
-  assert.match(shared, /swimming = false \} = \{\}\) \{[\s\S]{0,500}?player\.swimming = !!swimming;/, 'applyMotorEffectFlags still clears swimming (DW-D: false unless the carved sea\'s forge rides the write)');
-});

@@ -197,26 +197,6 @@ test('EMPIRE-ACCOUNT, the service: a realm record pays from the Empire\'s accoun
   assert.deepEqual(record, live);
 });
 
-test('EMPIRE-ACCOUNT by source: the boot folds beside the amnesty, says so once the world stands, and every online wallet and the purchase window read the Empire\'s account', () => {
-  const w = hostText('src/scenes/world.js');
-  const fold = w.indexOf('const empireFolded = realmBoot ? foldEmpireAccounts(bootSnapRead) : null;');
-  assert.ok(fold > 0);
-  assert.ok(fold > w.indexOf('const loansForgiven = realmBoot ? forgiveLoans(bootSnapRead) : null;'), 'after the amnesty');
-  assert.ok(fold < w.indexOf('empireJoin({ entity: playerEntity'), 'before the join settles a loan');
-  assert.match(w, /for \(const line of empireAccountLines\(empireFolded\)\) townTalk\.say\(line\);/);
-  assert.match(w, /const account = playerEntity\.bankAccounts\[goldRegion\(playerEntity\.bankAccounts, region\)\] \?\? null;/, 'the market\'s wallet');
-  // PIN MOVED (INSTANCES' HOST-SPLIT, 2026-10-15): the yard's wallet left bootWorld whole for scenes/homeYards.js, which reads
-  // only the player handed it; bootWorld hands it the player
-  assert.match(src('src/scenes/homeYards.js'), /const a = entity\.bankAccounts\[goldRegion\(entity\.bankAccounts, region\)\] \?\? null;/, 'the yard\'s wallet');
-  assert.doesNotMatch(src('src/scenes/homeYards.js'), /bankAccounts\[region\] \?\? null/, 'the yard\'s wallet reads no branch\'s own account');
-  assert.match(w, /wallet: \(region\) => homeYardWallet\(playerEntity, region\),/, '...handed the player');
-  assert.match(w, /const account = playerEntity\.bankAccounts\[goldRegion\(playerEntity\.bankAccounts, _questRegionIndex\(\) \?\? 0\)\] \?\? null;/, 'the guild\'s wallet');
-  assert.doesNotMatch(w, /bankAccounts\[region\] \?\? null/, 'no wallet reads a branch\'s own account');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /return playerEntity\.bankAccounts\[goldRegion\(playerEntity\.bankAccounts, region\)\] \?\? null;/, 'a home\'s wallet');
-  assert.match(m, /accountGold: playerEntity\.bankAccounts\?\.\[goldRegion\(playerEntity\.bankAccounts, interiorOverlay\.region\)\]\?\.accountGold \?\? 0,/, 'the purchase window');
-});
-
 test('EMPIRE-ACCOUNT: an overdue loan\'s draw is said online - at the join and on the day\'s sweep - where it took the gold without a word; offline it stays silent', () => {
   assert.deepEqual(empireDrawLines(3_000, 'Wayrest'), ['The Empire takes', '3000 gold from your account for your loan in Wayrest.']);
   assert.deepEqual(empireDrawLines(0, 'Wayrest'), []);

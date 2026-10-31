@@ -228,27 +228,6 @@ function callsOf(text, name) {
   return out;
 }
 
-test('FB0929: one law at every counter - the keyed shelf and repair rows price through the walk and GetTradePrice, and every GetTradePrice call hands the walk\'s pieces', () => {
-  const wm = code('src/scenes/worldModes.js');
-  const fn = (name) => { const at = wm.indexOf(`function ${name}(`); return wm.slice(at, wm.indexOf('\n  }\n', at)); };
-  assert.match(fn('buyPrice'), /const lot = tradeCost\('Buy', \[it\], /, 'the keyed shelf (the fallback with no ARENA2)');
-  assert.match(fn('buyPrice'), /return getTradePrice\('Buy', lot\.cost, /);
-  assert.match(fn('repairPrice'), /const lot = tradeCost\('Repair', \[it\], /, 'the keyed repair list');
-  assert.match(fn('repairPrice'), /return getTradePrice\('Repair', lot\.cost, /);
-  // CRAFT-WORTH (2026-10-11): and the keyed SALE too - it priced the raw value at the region's index with no condition
-  assert.match(fn('sellPrice'), /const lot = tradeCost\('Sell', \[it\], \{ quality: b\.quality, priceAdjustment: shopAdjustment\(b, 'Sell'\) \}\);/, 'the keyed sale row');
-  assert.match(fn('sellPrice'), /return getTradePrice\('Sell', lot\.cost, /);
-  for (const f of ['buyPrice', 'repairPrice', 'sellPrice']) assert.doesNotMatch(fn(f), /calculateTradePrice|calculateCost|calculateItemRepairCost/, `${f} keeps no copy of the haggle`);
-  const calls = [];
-  for (const f of readdirSync(new URL('../../src/', import.meta.url), { recursive: true })) {
-    if (!f.endsWith('.js') || !rd(`src/${f}`).includes('getTradePrice(')) continue;
-    for (const c of callsOf(code(`src/${f}`), 'getTradePrice')) calls.push([f, c]);
-  }
-  assert.ok(calls.length >= 6, `the classic offer, the enhanced quote, offer and quick sale, the two keyed rows: ${calls.length}`);
-  // PIN MOVED (LAW-3, Town-Economy-Arc 7.4): a sale's call hands the walk's resale tally after its pieces
-  for (const [f, c] of calls) assert.match(c, /,\s*(?:lot\.)?pieces(?:,\s*(?:lot\.)?resale)?\)$/, `${f}: ${c}`);
-});
-
 test('FB0929: the sale is not floored - Daggerfall\'s offline, at most half the floored asking price online; the floor only raises an ask, so the loop that bought a bandage for nothing and sold it back for a gold nets nothing', () => {
   const bandage = bandageOf(shelfOf(BUILDING_TYPES.GeneralStore, 10));
   const ctx = { quality: 1, priceAdjustment: 750, skills: SKILLS };

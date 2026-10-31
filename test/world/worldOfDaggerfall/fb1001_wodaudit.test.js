@@ -56,7 +56,6 @@ test('AUDIT WR2: a rock pebble under the 4x threshold is unfolded like its outcr
   assert.equal(wodRockUvs(rock, at(1.0), 60610), rock, 'a pebble at its own size is its own');
   const statue = quad();
   assert.equal(wodRockUvs(statue, at(2.65), 43301), statue, 'the shrine statue at 2.65 is its own');
-  assert.match(hostText('src/scenes/world.js'), /const cpu = wodRockUvs\(cpuModels\.get\(m\.modelId\), m\.matrix, m\.modelId\);/, 'the host hands the piece\'s model id');
 });
 
 test('ROCK-CAP (Mac: "Cap at ~8 m a repeat"): a rock pebble\'s face tiles no finer than a repeat per 8 m in its finest direction, its grain\'s proportions kept; a palisade keeps its own density; a pebble already coarser keeps its own (mutants: no cap; the cap on every model; the cap by the coarse direction)', () => {

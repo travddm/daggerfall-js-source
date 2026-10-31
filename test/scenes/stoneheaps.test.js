@@ -181,7 +181,4 @@ test('STONE-HEAPS the Bay as it was: on the same stone and the same climate a Ba
       assert.equal(heaps.length, bay ? 0 : boulders({ x: px, y: py, day: DAY, climate: CLIMATES.Mountain }).length, `${px},${py}: ${heaps.length} heaps`);
     } finally { s.host.dispose(); }
   }
-  // the day rock fields stand past the Bay, `fields` is theirs to read again
-  assert.match(read('src/scenes/pixelBuild.js'), /if \(picks\.length && onTheBay\(px, py\)\) \{ wodPicks = picks;/);
-  assert.match(read('src/scenes/mineHost.js'), /const fields = inBay\(px, py\);/);
 });

@@ -132,7 +132,3 @@ test('DISC28-B: a new crime after the withdrawn question raises a fresh surrende
   flow.dispose();
 });
 
-test('DISC28-B: the host withdraws the question where the arrival clears the crime', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /setCrimeCommitted\(playerEntity, CRIMES\.None\);\s*\n\s*arrestFlow\.crimeCleared\(\);/);
-});

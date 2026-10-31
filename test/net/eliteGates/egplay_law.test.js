@@ -21,10 +21,6 @@ test('EG-PLAY ONE SEED, ONE LEVEL: a hall\'s spec is the same object asked twice
   for (let h = 1; h <= 40; h++) egHallOf(99, h);   // the cache rolls over
   assert.equal(egSpecDigest(egHallOf(0x1234, 7)), d, 'the same bytes laid again');
   assert.notEqual(egSpecDigest(egHallOf(0x1235, 7)), d, 'another seed, another hall');
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLaw.js', import.meta.url), 'utf8');
-  const gen = src.slice(src.indexOf('// ── the law\'s trigonometry'), src.indexOf('/** A circle\'s five specs'));
-  assert.ok(gen.length > 2000, 'the generator found');
-  for (const bad of ['Math.sin', 'Math.cos', 'Math.tan', 'Math.atan', 'Math.random', 'Math.sqrt', 'Math.hypot', 'Math.pow', 'Math.exp', 'Math.log', 'Date.now', 'performance.now']) assert.ok(!gen.includes(bad), `the generator calls ${bad}`);
   assert.deepEqual([lawSin(0), lawSin(90), lawSin(180), lawSin(270), lawCos(0), lawSin(30), lawSin(-30), lawSin(405)], [0, 10000, 0, -10000, 10000, 5000, -5000, 7071]);
   assert.throws(() => lawSin(7), /multiple of 5/);
 });

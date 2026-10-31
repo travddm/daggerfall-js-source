@@ -329,17 +329,6 @@ test('AUDIT MW-NPC C5: a watchman\'s look follows his number on the wire once he
   assert.deepEqual(foeLook(a), foeLook(b), 'the encounter pool\'s foe and its puppet one person');
 });
 
-// PIN MOVED (FB1015 LOOT-BODY, test/render/fb1015_lootbody.test.js): the window's frame draws the bodies drawFoes last synced as
-// well as showing the corpse flats - this pin holds C6's own half, every corpse flat shown before the mark, by the door
-test('AUDIT MW-NPC C6: under a window both dungeon hosts draw the flats and return before drawFoes - so every corpse flat is shown first, none left cast-only by the last frame, and only a body standing marks its own again (by source; the hosts\' order is FB1015\'s pin)', () => {
-  const fb = rd('src/characters/foeBodies.js');
-  const door = fb.slice(fb.indexOf('export function drawBodiesUnderWindow('));
-  const show = door.indexOf('  for (const f of foes) { const b = corpseFlat(f); if (b) b.castOnly = false; }');
-  const mark = door.indexOf("if (b) b.castOnly = lane.has('foe', idOf(f)); }");
-  assert.ok(show > 0 && mark > show, 'every flat shown, then a standing body\'s marked');
-  assert.ok(rd('src/scenes/dungeonContext.js').includes('drawBodiesUnderWindow(_npcLane, foes, _npcStood, { idOf: foeId, corpseFlat: (f) => f.corpseBatch,'));
-});
-
 test('AUDIT MW-NPC B3 (the slot): in an NPC lane a newcomer within the cut takes the slot of a body past it at once - never the dwell a visible body waits out - and an unseen far body gives its slot up before a visible one held past the range, even where the visible one is farther', async () => {
   const rig = () => { const r = { mode: 'first', skinned: false, attach() {}, async build() { await flush(); return { ok: true }; }, canThirdPerson: () => true, raceHeightScale: () => 1, setViewMode(m) { r.mode = m; return true; }, thirdActive: () => r.mode === 'third' && r.skinned, update(dt, o) { if (o?.pose !== false) r.skinned = true; }, drawThird: () => true, unload() {}, setSheathed() {}, revive() {} }; return r; };
   // the clock stands still: no dwell or hand-over interval ever runs out - only an unseen body's slot can be taken

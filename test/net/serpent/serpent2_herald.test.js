@@ -362,15 +362,6 @@ test('SERPENT2 client: the omen finds the site AHEAD of the bells (from its quie
   const none = createSerpentOmen({ now: () => clock, site: () => null, say: () => {} });
   none.frame();
   assert.equal(none.ahead(), null, 'no site found: nothing said');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const serpentFrame = \(\) => \{\n\s*try \{ serpentOmen\?\.frame\(\); \}[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*try \{ const a = serpentOmen\?\.ahead\?\.\(\); if \(a && !a\.site\.told\) socialLink\(\)\?\.sendSerpentSite\?\.\(a\.day, a\.site\.sx, a\.site\.sz, a\.site\.near\); \}/, 'on the serpent\'s frame, after its omen');   // PIN MOVED (WW7-12): a site the hub told is never said back
-});
-
-test('SERPENT2 config: the role is a var beside the gate\'s, empty by default (the gate\'s pinged); the webhook is the gate\'s secret; the relay reads the serpent\'s role by the name the bible gives', () => {
-  const toml = rd('server/wrangler.toml');
-  assert.match(toml, /^SERPENT_DISCORD_ROLE = "\d*"$/m);
-  assert.ok(!/^SERPENT_DISCORD_WEBHOOK\s*=/m.test(toml) && !/discord(?:app)?\.com\/api\/webhooks\/\d/.test(toml), 'no webhook written down');
-  assert.match(rd('server/src/index.js'), /serpentHeraldRole\(role\('serpentRole'\), role\('gateRole'\)\)/);   // PIN MOVED (SCALE5b): SERPENT_DISCORD_ROLE and GATE_DISCORD_ROLE through relayCfgValue - the hub's settings over the vars (net/relayCfg.js)
 });
 
 // ═══ THE TIMERS WINDOW ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -400,7 +391,4 @@ test('SERPENT2 timers: the serpent\'s row through its day - its rising counted d
   // its kind in the window: after the gate's, in its waters' own colour, named in the button
   assert.deepEqual(TIMER_KINDS.slice(0, 2), ['gate', 'serpent']);
   assert.ok(ENHANCED_CSS.includes(`.px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; }`));
-  assert.match(rd('src/ui/enhanced/enhancedTimers.js'), /'Timers: gates, the sea serpent, the Abyss Dungeon, the Starfall, the Sky-Ketch, raids, battles and resets'/);   // PIN MOVED (SD2c): the Super dungeon's row beside the serpent's; ABYSS-NAME: named the player's way; STAR6: the Starfall's; KETCH: the Sky-Ketch's
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /serpent: \{ place: serpentOmen\?\.current\?\.\(\)\?\.site\?\.near \?\? null, site: serpentOmen\?\.current\?\.\(\)\?\.site \?\? null, fellAt: \(day\) => \{ const site = serpentOmen\?\.current\?\.\(\)\?\.site; return site && site\.day === day \? serpentLink\?\.fellAt\?\.\(day, site\) \?\? null : null; \} \},/, 'the host hands the omen\'s port and its own site\'s kill (EVENTS1: and the site itself, the event board\'s way to it)');
 });

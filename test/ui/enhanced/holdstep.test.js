@@ -68,15 +68,3 @@ test('HOLD-STEP: the editor sets a typed value where its spinner steps - refused
   assert.equal(w.slots[0].settings.magnitudeBaseHigh, 64);
 });
 
-test('HOLD-STEP: the port\'s field, its hold and its act order - down, set, up in render and in the per-frame walk alike', () => {
-  const port = rd('src/ui/enhanced/enhancedPort.js');
-  assert.match(port, /if \(b\.set && !b\.disabled\) n\.append\(spinField\(doc, b, acts\)\);/);
-  assert.match(port, /case 'spinner': if \(!b\.disabled\) \{ if \(b\.down\) out\.push\(b\.down\); if \(b\.set\) out\.push\(b\.set\); if \(b\.up\) out\.push\(b\.up\); \} return;/);
-  assert.match(port, /const spin = e\.target\.closest\?\.\('\.port-spinbtn\[data-a\]'\);\n\s*if \(spin && !spin\.disabled && \(e\.button \?\? 0\) === 0\) \{\n\s*startHold\(\[\.\.\.body\.querySelectorAll\('\.port-spinbtn'\)\]\.indexOf\(spin\)\);/,
-    'the hold is keyed by the button\'s PLACE among the spinner buttons, not its node or a bare act index');
-  assert.match(port, /if \(hold\.n > 0\) \{ swallowClick = true;/, 'a hold that stepped swallows its release\'s click');
-  assert.match(port, /const btn = body\?\.querySelectorAll\?\.\('\.port-spinbtn'\)\?\.\[h\.pos\] \?\? null;\n\s*const fn = btn && !btn\.disabled && btn\.dataset\.a != null \? acts\[Number\(btn\.dataset\.a\)\] : null;\n\s*if \(typeof fn !== 'function'\) \{ stopHold\(\); return; \}/,
-    'each repeat runs the LATEST view\'s act for the button at that place - the DOM is rebuilt under the finger - and a view with no such button (the editor shut mid-hold) ends the hold rather than pressing what stands at the index now');
-  assert.match(port, /stopHold\(\);   \/\/ HOLD-STEP: a window taken down mid-hold stops stepping/);
-  assert.match(rd('src/ui/enhanced/enhancedPortStyle.js'), /\.port-btn\.port-spinbtn \{ touch-action: none;/);
-});

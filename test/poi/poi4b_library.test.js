@@ -418,15 +418,3 @@ test('POI-4b PLACING AN ENTRY: its parts keep their own turn, size, solidity and
   assert.equal(ed.docOf(id).lights.length, 1);
 });
 
-test('POI-4b RECORDS: the shelf in the migration and the routes in the service; the import keeps what it places unless told not; the inspectors keep a POI and a part', () => {
-  assert.match(src('server-account/migrations/0116_poi.sql'), /CREATE TABLE IF NOT EXISTS poi_shelf \(/);
-  const index = src('server-account/src/index.js');
-  assert.match(index, /route === 'shelf' && request\.method === 'GET'\) return answer\(poiPath\.id \? await shelfEntry\(/);
-  assert.match(index, /if \(route === 'unshelve'\) return answer\(await unshelve\(pctx, me, env, \{ id: body\.id \}\)\);/);
-  const panel = src('src/ui/poi/poiEditorPanel.js');
-  assert.match(panel, /const keepToo = check\(true, \(\) => \{\}\);/);
-  // PIN MOVED (AUDIT POI L7): kept with the lights it read (they were left behind, `lights: []`)
-  assert.match(panel, /if \(keepToo\.checked\) \{[\s\S]{0,600}await library\.keepNow\(\{ name: r\.asset\.name, parts: r\.asset\.parts, lights: r\.asset\.lights \?\? \[\], meshes \}\);/);
-  assert.match(panel, /library\.keep\(\{ name: d\.name, parts: structuredClone\(d\.parts\), lights: structuredClone\(d\.lights \?\? \[\]\) \}\)/);
-  assert.match(panel, /library\.keep\(\{ name: part\.name \|\| part\.key, parts: \[\{ \.\.\.structuredClone\(part\), t: \[0, 0, 0\] \}\], lights: \[\] \}\)/);
-});

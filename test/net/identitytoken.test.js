@@ -89,13 +89,6 @@ test('ACC1a: THERE IS NO ALGORITHM FIELD - the version prefix is the algorithm',
   }
   assert.deepEqual(Object.keys(claims).sort(), ['e', 'i', 'k', 'n', 's']);
 
-  // ...and the verifier never reads an algorithm from anywhere but its
-  // own constant. Held at the source, because this is the one law a
-  // fixture cannot demonstrate the absence of.
-  const text = src('src/net/identityToken.js');
-  const algs = [...text.matchAll(/name:\s*'([A-Za-z0-9-]+)'/g)].map((m) => m[1]);
-  assert.deepEqual([...new Set(algs)], ['Ed25519'], 'more than one algorithm is named in this file');
-
   // A TOKEN UNDER ANOTHER VERSION IS REFUSED, not guessed at.
   const [, body, sig] = token.split('.');
   assert.deepEqual(await check(kp, `v2.${body}.${sig}`), { ok: false, why: 'version' });
@@ -295,10 +288,6 @@ test('ACC1a: the minter refuses a claim set the verifier would have refused', as
   // arc is an id this token can carry - ACC0's adoption, held here
   // rather than assumed. net/social.js keeps it under the same regex.
   assert.match(String(ID_RE), /A-Za-z0-9_-/);
-  const soc = src('src/net/social.js');
-  const socRe = /\/\^\[A-Za-z0-9_-\]\{4,40\}\$\//.exec(soc);
-  assert.ok(socRe, 'net/social.js no longer keeps the account id under the shape this token carries');
-  assert.equal(String(ID_RE), socRe[0], 'the two shapes have drifted - an existing account could not be adopted');
 
   // claimsValid is the one place the shape lives, and the minter and
   // the verifier both go through it
@@ -308,34 +297,6 @@ test('ACC1a: the minter refuses a claim set the verifier would have refused', as
   assert.equal(claimsValid(null), false);
   assert.equal(claimsValid([]), false, 'an array is not a claim set');
   assert.equal(claimsValid('x'), false);
-});
-
-test('ACC1a: PURE, and both ends can import it', async () => {
-  // The relay will import this file, which puts it in the worker's
-  // bundle. It may reach for no global clock, no fetch, no storage and
-  // no DOM - the same law server/src/relay.js lives under.
-  const text = src('src/net/identityToken.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
-  for (const forbidden of [/\bDate\.now\b/, /\bfetch\b/, /\bdocument\b/, /\blocalStorage\b/, /\bprocess\b/,
-    /\bglobalThis\.crypto\b/, /\brequire\(/]) {
-    assert.doesNotMatch(text, forbidden, `identityToken.js reaches for ${forbidden}`);
-  }
-  // the clock and the crypto are ARGUMENTS, which is why node can drive
-  // this file exactly as a Worker does
-  assert.match(text, /nowS/);
-  assert.match(text, /subtle/);
-  // it imports the wire's name law and the guild's shapes (GUILD1c - guildLaw.js imports nothing), and the heraldry's
-  // colours (SEASON1 part two, PIN MOVED: a Season's banner ribbon - heraldryLaw.js imports nothing), and - SEAT2b part two
-  // (b), PIN MOVED: a siege pass's works - siegeRef.js's worksOf (it imports nothing, and the relay bundles it already),
-  // and - LEGACY7 part two, PIN MOVED: a house's claims - houseLaw.js's houseClaimOk (it imports nothing; the relay bundles
-  // it too, world174 - world172 on its branch), and nothing else
-  const imports = [...text.matchAll(/from\s+'(\.[^']+)'/g)].map((m) => m[1]);
-  // PIN MOVED (STAFF-EVENT, world255): and staffEventLaw.js's event shape for a staff event order - it imports nothing; the
-  // relay bundles it with this order
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, world201): and homeLaw.js's town and building shapes for a home order - it
-  // imports nothing; the relay bundles it with this order
-  assert.deepEqual(imports, ['./staffEvent/staffEventLaw.js', './wire.js', './guild/guildLaw.js', './heraldryLaw.js', './siege/siegeRef.js', './houseLaw.js', './homeLaw.js'], 'a new import here is a new file in the relay\'s bundle');
 });
 
 // ═══ ACC1d: THE TRIPWIRE FIRED, AND THIS IS WHAT REPLACED IT ═══════

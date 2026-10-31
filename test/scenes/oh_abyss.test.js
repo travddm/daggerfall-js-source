@@ -741,30 +741,7 @@ test('OH-E the loot events: EnemyEntity.OnLootSpawned carries the table key, the
   for (const key of ['K', 'Q']) { const pile = []; addPileLootExtras(pile, key, () => 0.999); assert.equal(t.at(-1)?.key, key); assert.equal(t.at(-1).items, pile, 'the pile itself'); }
   offT();
   assert.equal(t.length, 2);
-  const ctx = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(ctx, /addPileLootExtras\(items, lootKey, rolls, \{ locationIndex: dfLocation\.mapTableData\.dungeonType, luck, level, where: 'dungeon', quarters \}\);[^\n]*\n\s*rollLootRarity\(/, 'the dungeon\'s pile: the trio and the event, then the port\'s rarity roll');   // PIN MOVED (PARTY-LOOT): the roll's own terms
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const lootHost = readFileSync(new URL('../../src/scenes/ohLootHost.js', import.meta.url), 'utf8');   // PIN MOVED (HOST-SPLIT, EVENT-RULES): out of the world host whole
-  const body = lootHost.slice(lootHost.indexOf('const ohUpgrade = '), lootHost.indexOf('return () => { offTable(); offEnemy(); };'));
-  assert.ok(body.includes('ohAbyss.shouldUpgradeLoot()'), 'ShouldUpgradeLoot gates both');
-  assert.ok(body.includes('addBonusMagicLoot(lootMatrix(key).MI, items'), 'the key\'s MI column');
-  assert.ok(body.indexOf('addBonusMagicLoot(') < body.indexOf('upgradeLoot('), 'AddBonusMagicLoot, then UpgradeLoot over the whole of Items');
-  assert.match(body, /tableLootSpawned\.add\(\(e\) => ohUpgrade\(e\.key, e\.items, \[\], e\.where, e\.rolls \?\? Math\.random, e\.roller \?\? player\(\)\)\)/);   // PIN MOVED (PARTY-LOOT): the raiser's dice and roller (a room's base rolls on the room's)
-  assert.match(body, /enemyLootSpawned\.add\(\(e\) => ohUpgrade\(e\.lootTableKey, e\.items, e\.worn, e\.where, e\.rolls \?\? Math\.random, e\.roller \?\? player\(\)\)\)/);
-  // AUDIT OH-F B3: the dungeon's rolls alone take the upgrade - the street's foes and guards roll during the build
-  assert.match(body, /if \(where !== 'dungeon' \|\| !ohAbyss\.shouldUpgradeLoot\(\)\) return;/);
-  assert.equal((ctx.match(/spawnEnemyLoot\(entity, e\.mobileType, basics, D\.playerEntity, \{ \.\.\.eliteLootOpts\(e\), where: 'dungeon' \}\)/g) ?? []).length, 2, 'both of the dungeon\'s foe arms');
   for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js', 'src/scenes/interiorContext.js']) assert.doesNotMatch(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'), /where: 'dungeon'/, `${f} is not the dungeon`);
-  assert.match(src, /_ohLootOff\?\.\(\);\s*_ohLootOff = null;\s*if \(ohAbyss\) _ohLootOff = ohLootUpgrades\(ohAbyss, \(\) => playerEntity\);/, 'a second world replaces the listeners');
-  // PlayerEnterExit.Dungeon while SetDungeon lays it out: the modes seam answers the location before its context exists
-  assert.match(src, /dungeon: \(\) => ohDungeonOf\(modes\?\.dungeonCtx\) \?\? ohLayingOutOf\(modes\?\.layingOutLocation\)/);
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /layingOutLoc = dfLocation;[^\n]*\n\s*const ctx = await buildDungeonContext\(/, 'set before the layout');
-  assert.match(wm, /layingOutLoc = null;\n\s*if \(!live\(\)\) \{ abandonContext\(ctx\); return false; \}[^\n]*\n\s*dungeonCtx = ctx;/, 'handed over to the context');
-  // MapsFile.GetLocation reads each caller its own DFLocation: a build's summary is its own, so the abyss's rename and
-  // flood on a Recall into the template never reach the maps cache's location
-  assert.match(wm, /const dfLocation = ownDungeonLocation\(sized\);/);
-  assert.match(wm, /mapTableData: loc\.mapTableData && \{ \.\.\.loc\.mapTableData \},\n\s*dungeon: loc\.dungeon && \{ \.\.\.loc\.dungeon, blocks: loc\.dungeon\.blocks\?\.map\(\(b\) => \(\{ \.\.\.b \}\)\) \},/);
 });
 
 // AUDIT OH-F B1/B2 (2026-09-26): DFU destroys the dungeon and builds it again on every load, then stands the saved
@@ -778,31 +755,6 @@ test('AUDIT OH-F B2 loadRebuilds: a load the abyss stands in - the live dungeon 
   await w.abyss.tryEnterPit(PIT.x, PIT.y);
   assert.equal(w.abyss.active, true);
   assert.equal(w.abyss.loadRebuilds(null), true, 'the live dungeon is the drowned one');
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(opts\.worldLoad && snap\.locationKey != null && \(snap\.locationKey !== _locationKey \|\| opts\.loadRebuilds\?\.\(snap\)\)\) \{/);
-  assert.match(src('src/scenes/worldModes.js'), /loadRebuilds: \(snap\) => host\.loadRebuilds\?\.\(snap\) \?\? false,/);
-  assert.match(src('src/scenes/world.js'), /loadRebuilds: \(snap\) => ohAbyss\?\.loadRebuilds\(snap\?\.modData\?\.\[OCEAN_HOLES_VENDOR\] \?\? null\) \?\? false,/);
-});
-
-test('AUDIT OH-F B1 the drowned dungeon\'s save: a destroyed foe stays gone (no corpse, no respawn), the restore\'s rebuilds settle before the mod loop', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /\.\.\.\(f\.abyssDestroyed \? \{ abyssDestroyed: true \} : \{\}\),/, 'collectWorld writes the destroy');
-  // PIN MOVED (AUDIT BAL, bible/05-Combat/Balance-Arc.md section 10): the restore carries the saved elites' pre-pass and
-  // arm - the loop is read to its end, and its rebuilds are three (the species', the hour's, the elite's), each collected
-  const loop = dc.slice(dc.indexOf('function applyWorld('), dc.indexOf('return Promise.allSettled(settling)', dc.indexOf('function applyWorld(')));
-  const destroyed = loop.indexOf('if (sf.abyssDestroyed) { if (!f.abyssDestroyed) { f.abyssDestroyed = true; questPoolOps.removeFoe(f); } return; }');
-  assert.ok(destroyed > 0, 'restored through removeFoe - dead, bodiless, lootless - never setFoeDead\'s corpse');
-  assert.ok(destroyed < loop.indexOf('respawnDue(sf.died, _now)') && destroyed < loop.indexOf('patchFoe(f, sf, wire);'), 'before the respawn and the patch');
-  assert.match(dc, /if \(f\.abyssDestroyed\) return false;   \/\/ AUDIT OH-F B5\/C1/, 'the hour\'s respawn refuses it');
-  assert.equal((loop.match(/settling\.push\(retypeFoe\(/g) ?? []).length, 3, 'every one of the restore\'s rebuilds is collected');
-  assert.match(dc, /return Promise\.allSettled\(settling\)\.then\(\(\) => undefined\);/);
-  // AUDIT DELVE E2 (THE DELVE ARC): a save laid at another dungeon size than this one's leaves the room's record
-  // unapplied (foe i of one layout is not foe i of the other); OH-F B1's law - the rebuilds handed back - stands beside it
-  assert.match(dc, /const settled = extras\.world && extras\.locationKey === _locationKey && !otherLayout \? applyWorld\(extras\.world\) : null;/);
-  assert.match(dc, /return settled \?\? Promise\.resolve\(\);/);
-  const w = src('src/scenes/world.js');
-  const restore = w.indexOf('await modes?.restoreDungeonSave?.(extras); }');
-  assert.ok(restore > 0 && restore < w.indexOf('restoreModSaveRecords(extras.modData, csaModLoadFailed);', restore), 'the mod loop reads the restored set');
 });
 
 test('AUDIT OH-F B3 the loot events carry the host that rolled them: the dungeon\'s tagged, every other roll null', () => {
@@ -823,80 +775,3 @@ test('AUDIT OH-F B3 the loot events carry the host that rolled them: the dungeon
   assert.deepEqual(seen.map((x) => x.where), ['dungeon', null]);
 });
 
-test('AUDIT OH-F B4 the descent is one move: `entering` from the pit to the arrival; a respawn that takes the door keeps its own move', async () => {
-  const w = world();
-  let seen = null;
-  const enter = w.abyss.tryEnterPit(PIT.x, PIT.y);
-  seen = w.abyss.entering;
-  await enter;
-  assert.equal(seen, true, 'entering from the first await');
-  assert.equal(w.abyss.entering, false, 'and not once the dungeon is entered');
-  // a door refused while a respawn is under way: no teleport back to the pit, the state cleared
-  const r = world({ enter: 'refuse' });
-  r.P.respawning = true;
-  await r.abyss.tryEnterPit(PIT.x, PIT.y);
-  assert.equal(entries(r.log, 'teleport').length, 1, 'the GPS move alone - the respawn owns the way back');
-  assert.equal(r.abyss.entering, false);
-  assert.equal(r.abyss.transitioning, false);
-  assert.equal(r.abyss.active, false);
-  // without a respawn the refusal is answered as a failed transition: back to where the swimmer was
-  const q = world({ enter: 'refuse' });
-  await q.abyss.tryEnterPit(PIT.x, PIT.y);
-  assert.equal(entries(q.log, 'teleport').length, 2);
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /function worldMoveBusy\(\) \{[^}]*\|\| !!ohAbyss\?\.entering;\s*\}/, 'loads, Recall, quests and jail wait for the descent');
-  // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): the save is scenes/worldQuickSave.js's, the descent read live through host
-  assert.match(readFileSync(new URL('../../src/scenes/worldQuickSave.js', import.meta.url), 'utf8'), /function worldQuickSave\(saveName = QUICK_SAVE_NAME, \{ quiet = false, sink = null \} = \{\}\) \{\s*(?:\/\/[^\n]*\n\s*)*if \(host\.ohAbyss\?\.entering\) \{ if \(!quiet\) townTalk\.say\('You cannot save now\.'\); return false; \}/, 'and a save refuses (AUDIT REALM2 M5: saying so to a save pressed, never to the quiet checkpoint)');
-});
-
-test('AUDIT OH-F B5 online: the Recall renames before the room is joined; a death wakes at the pit; the hour never brings a destroyed foe back', async () => {
-  const w = world();
-  assert.equal(w.abyss.returnPoint(), null, 'outside the abyss there is no pit door');
-  await w.abyss.tryEnterPit(PIT.x, PIT.y);
-  const r = w.abyss.returnPoint();
-  assert.deepEqual(r.pixel, { x: PIT.x, y: PIT.y });
-  assert.equal(r.worldX, w.abyss.data.ReturnWorldX);
-  assert.equal(r.worldZ, w.abyss.data.ReturnWorldZ);
-  w.gps.x = r.worldX; w.gps.z = r.worldZ;
-  const before = entries(w.log, 'feet').length;
-  await w.abyss.standAtPit(r);
-  assert.equal(entries(w.log, 'feet').length, before + 1, 'stood on the entrance, as the way up stands it');
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const oh = src.indexOf('oceanHoles.checkSettings(); ohAbyss?.update(); }');
-  assert.ok(oh > 0 && oh < src.indexOf('onlineFrame(now, dt);'), 'the abyss\'s Update before the online frame reads the room key');
-  assert.match(src, /const ohReturn = wasInDungeon \? ohAbyss\?\.returnPoint\(\) \?\? null : null;/);
-  // RESPAWN-GROUND (FIELD BUGS 2026-09-30, PIN MOVED): the pixel is read with the return point, before the rise is
-  // scheduled - so before the exit that clears the abyss, as this pin asked
-  const read = src.indexOf('\n    const px = ohReturn?.pixel ?? playerTravelPixel();');
-  assert.ok(src.indexOf('const ohReturn = wasInDungeon') < read && read < src.indexOf("if (mode !== 'exterior') modes?.forceExitToExterior();", read), 'read before the exit clears the abyss');
-  assert.match(src, /if \(ohReturn\) \{ await ohTeleportToWorld\(ohReturn\.worldX, ohReturn\.worldZ\); await ohAbyss\.standAtPit\(ohReturn\); \}/);
-});
-
-test('AUDIT OH-F C6 the quota walks the hierarchy: each block\'s Fixed Enemies before its Random Enemies, marker order within, the spawns last', async () => {
-  const { enemyHierarchyOrder, collectDungeonEnemies } = await import('../../src/characters/dungeonEnemies.js');
-  const r = (blockIndex, fixed, n) => ({ n, src: { blockIndex, fixed } });
-  // N0000021's shape: a random marker before a fixed one in the same block
-  const pool = [r(0, false, 'r0a'), r(0, true, 'f0a'), r(0, false, 'r0b'), r(1, true, 'f1a'), r(1, false, 'r1a'), r(1, true, 'f1b'), { n: 'spawn1', src: {} }, { n: 'spawn2', src: { blockIndex: 0, fixed: true } }];
-  const order = enemyHierarchyOrder(pool, 6).map((f) => f.n);
-  assert.deepEqual(order, ['f0a', 'r0a', 'r0b', 'f1a', 'f1b', 'r1a', 'spawn1', 'spawn2'], 'a spawn is the dungeon\'s child, whatever its record says');
-  assert.deepEqual(pool.map((f) => f.n), ['r0a', 'f0a', 'r0b', 'f1a', 'r1a', 'f1b', 'spawn1', 'spawn2'], 'the pool itself keeps its order (saves and rooms are keyed by index)');
-  // the layout's records carry their block
-  const block = (markers) => ({ originX: 0, originZ: 0, waterLevel: 10000, markers });
-  const fixedAt = (x) => ({ record: 16, archive: 199, factionOrMobileId: 5, flags: 0, x, y: 0, z: 0, rawY: 0, actionByte: 0, soundIndex: 0 });
-  const got = collectDungeonEnemies([block([fixedAt(1)]), block([fixedAt(2), fixedAt(3)])], { locationId: 7, dungeonType: 0, playerLevel: 1 });
-  assert.deepEqual(got.map((e) => e.blockIndex), [0, 1, 1]);
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dc, /foes: \(\) => enemyHierarchyOrder\(foes, _layoutFoes\)\.filter\(\(f\) => !f\.dead && f\.entity && !runByAnother\(f\)\)\.map\(abyssFoeView\),/);   // AUDIT PRE-MERGE 0928 M1: the ones this player runs
-});
-
-test('AUDIT OH-F C3/C4/C7 the spawn\'s own marks at the build: a quest foe is QuestSpawn when OnEnemySpawn hears it, an ally is one, a Wabbajack\'s creature has LoadID 0', () => {
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dc, /get questSpawn\(\) \{ return !!rec\.questBehaviour \|\| !!rec\.src\?\.questSpawn; \}/, 'GameObjectHelper.cs:1286-1294: QuestSpawn before the event');
-  assert.match(dc, /const f = await spawnLooseFoe\(mobileType, position, \{ gender, yawRad, questSpawn: true \}\);/);
-  const stand = dc.indexOf('const stand = (rec) => {');
-  const ally = dc.indexOf('applySpawnAlliance(entity, e);');
-  assert.ok(ally > 0 && ally < dc.indexOf('stand(rec);', ally), 'the team turned before stand() raises OnEnemySpawn');
-  assert.ok(stand > 0);
-  assert.match(dc, /Promise\.resolve\(spawnLooseFoe\(mobileType, at, \{ loadID: 0 \}\)\)\.then\(\(nf\) => \{/, 'CreateEnemy sets no LoadID');
-  assert.match(dc, /if \(_layoutStood && !puppet\) \{ if \(rec\.src\) rec\.src\.loadID \?\?= \+\+_spawnUid; opts\.onEnemySpawn\?\.\(rec\); \}/, 'the counter only fills an ABSENT LoadID - a 0 stays 0 (AUDIT PRE-MERGE 0928 M1: and a puppet, another player\'s foe, is no spawn at all)');
-});

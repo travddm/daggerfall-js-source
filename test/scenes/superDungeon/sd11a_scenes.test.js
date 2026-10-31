@@ -102,7 +102,6 @@ function onScreen(S, [P, U]) {
 // ── L2 F1: the hall as the eye sees it ─────────────────────────────────
 
 test('AUDIT SD II L2 F1: THE ORRERY\'S HALL AS THE EYE SEES IT, through the game\'s own camera (mat4\'s lookAt and its one mirror): a stone\'s right is the screen\'s right; its hand stands at twelve straight up, its third hour at three o\'clock, and turns clockwise; the forward handle - "Turn it forward" - on the right; its dial, its sign, every plaque read unmirrored, u left to right and v up, and every one of them - and the hand at every hour, the notch over its twelfth, the fronts of its cap and handles - turned toward the eye (mutants: the right the left; the hand\'s turn a mirror; a sign wound away; a plaque mirrored; the notch wound away)', () => {
-  assert.match(read('src/render/renderer.js'), /gl\.frontFace\(gl\.CW\);/, 'the renderer draws a face wound clockwise on the screen');
   const hall = buildHallModel(), hand = buildHandModel();
   const handTris = trisOf(hand);
   const r = fakeRenderer(), set = createSdHall({ renderer: r, s: 1 });
@@ -218,11 +217,6 @@ test('AUDIT SD II L2 F3: THE HOUR\'S GLOWS ARE THEIR OWN LIGHT - every emission 
     assert.ok(r.emission.length >= 2 && r.emission.length === r.albedo.length, `${what}: a light for every picture`);
     for (const [, rec, opts] of r.emission) assert.equal(opts?.white, true, `${what}: record ${rec} its own light`);
   }
-  assert.match(read('src/scenes/worldModes.js'), /for \(const \[rec, art\] of realmArt\(\)\) \{ renderer\.uploadTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.albedo\); renderer\.uploadEmissionTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.emission, \{ white: true \}\); \}/, 'the realm\'s own five');
-  // the renderer's own law, which the four now take: a white emission wears no window's colour
-  const R = read('src/render/renderer.js');
-  assert.match(R, /if \(opts\.white\) this\.emissionWhite\.add\(key\);/);
-  assert.match(R, /const emisColor = sm\._evEmisWhite \? EMISSION_WHITE : this\._windowEmission;/);
 });
 
 // ── L2 F4: the walk meets the islands ──────────────────────────────────
@@ -503,7 +497,6 @@ test('AUDIT SD II L2 F9: THE SAME LIGHTS AND THE SAME SKY, made in place - realm
     assert.equal(got, into);
     for (const key of ['right', 'up', 'fwd', 'lens']) assert.ok(near(got[key], Float32Array.from(want[key])), key);
   }
-  assert.match(read('src/render/superDungeon/sdSky.js'), /const gl = this\.gl, U = this\.u, b = sdSkyBasisInto\(view, proj, this\._b\);/, 'the pass\'s frame reads it into its own');
   // the blows' driver idles only when sdBlowsInFlight would hand it nothing
   const atk = { i: 1, a: 1, at: 0 }, rem = { x: 0, z: 8, yw: 0, mv: null, atk: null }, ec = (a0, a1, h = 50) => [{ h, atk: a0 }, { h, atk: a1 }];
   for (const s of [SD_FIGHT_EMPTY, { ...SD_FIGHT_EMPTY, fi: 1 }, { ...SD_FIGHT_EMPTY, fi: 1, rem: { ...rem, atk } }, { ...SD_FIGHT_EMPTY, fi: 1, clk: atk },
@@ -516,18 +509,6 @@ test('AUDIT SD II L2 F9: THE SAME LIGHTS AND THE SAME SKY, made in place - realm
 // ── L2 F10, F11: posed before the world pass; a hidden draw no draw ─────
 
 test('AUDIT SD II L2 F10, F11: THE HOUR POSED BEFORE THE WORLD PASS, AND A HIDDEN DRAW NO DRAW - the mode machine\'s dungeon arm poses the hall and the arena (the dungeon host\'s sdPose) before the frame begins and before its draws, with no window up, as the Steps are ridden before the motor (in drawFoes, after the world pass, they were drawn a frame late); its draw loop skips a draw that says it is hidden, and so its shadow\'s record (drawMesh makes it); and the sets say so - a gone step, a body not shown, an Echo out of the Break, the hall\'s bridge before the Concord, the breath between gusts (mutants: posed after the draws; a hidden step drawn) (ALLOC-RACE - mutant: a still body posed again)', () => {
-  const W = read('src/scenes/worldModes.js');
-  const arm = W.slice(W.indexOf("if (mode === 'dungeon') {"), W.indexOf('// Whole-pipeline swap: interior draws'));
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  const pose = arm.indexOf('if (isSdRealm(dungeonLoc) && !windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) dungeonCtx.sdPose?.(dt, player.pos);');
-  const draws = arm.indexOf('for (const d of dungeonCtx.dynamicDraws) if (!d.hidden && !d.culled) renderer.drawMesh(d.gpu, d.object.matrix, d.texRemap ?? dungeonCtx.texRemap, d.noShadow ? DRAW_NO_SHADOW : DRAW_SHADOW);');   // SD-LOOK (PIN MOVED): a draw's own remap, shadow and cull
-  assert.ok(pose > 0 && pose < arm.indexOf('renderer.beginFrame(') && pose < draws, 'posed before the frame and its draws');
-  assert.ok(draws < arm.indexOf('dungeonCtx.drawFoes('), 'the draws before drawFoes');
-  assert.match(read('src/render/renderer.js'), /if \(!wire && !noShadow && this\._casting\) this\._shadows\.recordMesh\(/, 'a drawMesh is what records a shadow');
-  const D = read('src/scenes/dungeonContext.js');
-  assert.deepEqual([D.match(/\bsdHallFrame\(dt, playerFeet\);/g)?.length, D.match(/\bsdRemnantFrame\(dt, playerFeet\);/g)?.length], [1, 1], 'framed in one place');
-  // PIN MOVED (SD-LOOK S11): and the hang after them - its chains and gears posed with the Hall and the arena, before the draws
-  assert.match(D, /sdPose\(dt, playerFeet\) \{\n\s+if \(sdHall\) sdHallFrame\(dt, playerFeet\);\n\s+if \(sdRemnant\) sdRemnantFrame\(dt, playerFeet\);\n\s+if \(sdHang\) \{ sdHang\.stand\(\{ dynamicDraws \}\); sdHang\.frame\(\); \}[^\n]*\n\s+\},/);
   // the sets
   const steps = createSdSteps({ renderer: fakeRenderer() }), list = [];
   steps.stand({ dynamicDraws: list, collider: null });

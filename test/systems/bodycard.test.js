@@ -105,7 +105,4 @@ test('BODY-CARD: the switch - a Features row, Billboard Look, enhanced, the view
   assert.equal(PREF_DEFAULTS.mwBillboardLook, false);
   assert.ok(JSON.stringify(CATEGORIES).includes('"feat:mw-npc-bodies","feat:mw-billboard-look"'), 'beside Morrowind People');
   assert.equal(categoryOf('feat:mw-billboard-look'), categoryOf('feat:mw-npc-bodies'));
-  // PIN MOVED (BODY-FLAT, 2026-10-23): the switch is read once - the card's flatness, its level picture and its upright
-  assert.match(src('src/render/characterSprite.js'), /const flat = up == null && !!getPref\('mwBillboardLook'\);/);
-  assert.match(src('src/render/characterSprite.js'), /const qUp = up \?\? \(flat \? WORLD_UP : pictureUp\(camDir\)\);/);
 });

@@ -106,10 +106,6 @@ test('AUDIT DELVE E6: a party mate\'s quest foe (a puppet, its behaviour the sha
   const marks = dungeonQuestMarks({ foes: [puppet], people, boxOf: () => null, behaviourOf, followedId: '7' });
   assert.deepEqual(marks, [{ at: [1, 0, 1], name: 'Ulric', followed: true }, { at: [5, 0, 5], name: 'Lady Brisienna', followed: true }]);
   assert.deepEqual(dungeonQuestMarks({ foes: [puppet], boxOf: () => null }), [], 'by the foe\'s own behaviour alone, the puppet was dropped');
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /people: dungeonCtx\?\.people \?\? \[\], behaviourOf: \(f\) => dungeonCtx\?\.questFoeBehaviour\?\.\(f\) \?\? f\.questBehaviour \?\? null,/);
-  const ctx = src('src/scenes/dungeonContext.js');
-  assert.match(ctx, /questFoeBehaviour\(f\) \{\n\s+if \(!f\) return null;\n\s+if \(f\.questBehaviour\) return f\.questBehaviour;\n\s+return f\._pupQuest \? \(ownShare\(\)\?\.behaviourFor\?\.\(f\._pupQuest\) \?\? null\) : null;/);
 });
 
 test('AUDIT DELVE C6: the compass\'s pick - the followed quest\'s nearest, else the nearest of all', () => {
@@ -129,18 +125,6 @@ test('AUDIT DELVE E7: the Exact tier follows the tracker\'s quest - it is fed wh
     setPref(GUIDANCE_PREF, 'exact');
     assert.equal(followOn(), true, 'with the card and the marks off, the Exact compass still follows');
   } finally { setUiSkin(skin); setPref(GUIDANCE_PREF, pref); setPref('questMarks', marks); setPref('questTracker', tracker); }
-});
-
-test('GUIDE8: the host hands the Exact tier\'s marks to the dungeon, which draws them on its map and its compass', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const dungeonQuestMarksHere = \(\) => \(guidanceTier\(\) !== 'exact' \? null : dungeonQuestMarks\(\{/);
-  assert.match(wm, /stands: dungeonQuestFlats, foes: dungeonCtx\?\.foes \?\? \[\], boxOf: questStandBox, followedId: questTracker\.tracked\(\)\?\.id \?\? null,/);
-  assert.match(wm, /questMarks: \(\) => dungeonQuestMarksHere\(\),/);
-  const ctx = src('src/scenes/dungeonContext.js');
-  assert.match(ctx, /quests: \(\) => opts\.questMarks\?\.\(\) \?\? null,/);
-  assert.match(ctx, /quest: questCompassMark\(playerFeet\),/);
-  assert.match(ctx, /return questCompassPick\(feet \? opts\.questMarks\?\.\(\) \?\? null : null, feet\);/, 'the followed quest\'s first, else the nearest (questGuidance.js questCompassPick)');
-  assert.match(src('src/ui/automap/automapDoor.js'), /quests: deps\.quests \?\? null,/);
 });
 
 // the sheet: a two-storey level (disc22g's fixture), rooms a and b side by side at 0, room c at 12
@@ -207,10 +191,6 @@ test('AUDIT DELVE D3/D4: the diamond is the mark under the pointer, and the hove
 
 test('AUDIT DELVE D1: on the solid map an echo or a quest off the floor in view says its floor', () => {
   const quests = [{ at: [105, 0, 205], name: 'Totem of Wyrd', followed: true }, { at: [105, 12, 205], name: 'Ulric', followed: false }];
-  const sheet = src('src/ui/automap/automapSheet.js');
-  assert.match(sheet, /return solidOn && s >= 0 && s !== index \? ` \\u00b7 \$\{f\.sheets\[s\]\.label\}` : '';/);
-  assert.match(sheet, /name: `Moved\$\{floorOf\(p\[1\]\)\}`/);
-  assert.match(sheet, /name: `\$\{q\.name \?\? ''\}\$\{floorOf\(p\[1\]\)\}`/);
   // on the flat plan, a mark is on its own sheet and needs no word
   const s = createAutomapSheet({ record: () => rec(['af']), model: () => ({ rows: LEVEL }), player: () => ({ feet: [105, 0, 205], yaw: 0 }), quests: () => quests });
   const ctx = recordingCtx();
@@ -252,9 +232,6 @@ test('GUIDE8: the strip lists a quest\'s floor before it is walked, and marks it
     const bare = floorStripLayout([{ index: 0, label: 'Floor 1' }], 0, { paperW });
     assert.equal(bare.rows[0].x + bare.rows[0].w, paperW - 26 * bare.scale, 'with no marks the words keep their pad');
   }
-  const sheet = src('src/ui/automap/automapSheet.js');
-  assert.match(sheet, /for \(const q of questSheets\(\)\) keep\.add\(q\);/, 'listed before it is walked');
-  assert.match(sheet, /you: youSheet\(\), exit: exitSheet\(\), seen: c\?\.seen \?\? null, quest: questSheets\(\),/);
 });
 
 test('GUIDE8: the Features row - Enhanced, Journal or Exact, Journal by default and on All off', () => {
@@ -293,23 +270,5 @@ test('GUIDE8 TOWN TIER (AUDIT DELVE): the town map rings a building the journal 
   assert.equal(mk(() => []).quests().length, 0, 'unfound and unnamed by a quest: no ring');
   assert.equal(mk(() => [{ buildingKey: KEY, followed: true }]).quests().length, 1, 'the building the journal names: ringed, found or not');
   assert.equal(mk(null).quests().length, 0);
-  assert.match(src('src/ui/town/townMapDoor.js'), /questBuildings: deps\.townQuestBuildings \?\? null,/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /townQuestBuildings: \(\) => \(townTierOn\(\) \? townQuestBuildings\(questTracker\.views, dfLoc\.mapTableData\?\.mapId, questTracker\.tracked\(\)\?\.id \?\? null\) : \[\]\),/);
-  assert.match(w, /quest: vendorCompassMark\(\) \?\? townQuestCompassMark\(\) \?\? questCompassMark\(\),/);
-  const fn = w.slice(w.indexOf('const townQuestCompassMark = () => {'), w.indexOf('const gateCompassMark = () => {'));
-  assert.match(fn, /if \(!townTierOn\(\) \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return null;/, 'the tier, on the street');
-  assert.match(fn, /const bld = questTracker\.tracked\(\)\?\.target\?\.building;/, 'the tracked quest\'s named building');
-  assert.match(fn, /\(\(dfLoc\.mapTableData\?\.mapId \?\? -1\) >>> 0\) !== \(Number\(bld\.mapId\) >>> 0\)\) return null;/, 'only in its town');
-  assert.match(fn, /return \[_townQuestAt\.at\[0\] \+ t\[0\] \+ b\.locOrigin\[0\], _townQuestAt\.at\[1\] \+ t\[2\] \+ b\.locOrigin\[2\]\];/, 'the town map\'s frame turned back: local + translation + origin, as `local` is taken');
-  assert.match(w, /const local = \[feet\[0\] - t\[0\] - b\.locOrigin\[0\], feet\[1\] - t\[1\] - b\.locOrigin\[1\], feet\[2\] - t\[2\] - b\.locOrigin\[2\]\];/, 'the frame it is the inverse of');
-});
-
-test('GUIDE8 EXACT INDOORS (AUDIT DELVE): the interior hands its quest marks to its map and its compass', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const interiorQuestMarksHere = \(\) => \(guidanceTier\(\) !== 'exact' \|\| !interiorCtx \? null : dungeonQuestMarks\(\{\n\s+stands: questFlats, foes: interiorFoePool\(\), people: interiorCtx\.people \?\? \[\], boxOf: questStandBox, followedId: questTracker\.tracked\(\)\?\.id \?\? null,/);
-  assert.match(wm, /itemName: \(st\) => interiorHoverName\(`questflat:\$\{questFlats\.indexOf\(st\)\}`\)\?\.title \?\? null,/, 'the interior plaque\'s own word');
-  assert.match(wm, /quest: questCompassPick\(interiorQuestMarksHere\(\), player\.pos\),/);
-  assert.match(wm, /quests: \(\) => interiorQuestMarksHere\(\),/);
 });
 

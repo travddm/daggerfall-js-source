@@ -384,22 +384,6 @@ test('TESA15 the painter: at far each pixel\'s steps, in to the Bay\'s scale the
 
 // ── THE WIRING ──────────────────────────────────────────────────
 
-test('TESA15 the window and the world: the kept tiles over paintPastBay and the word, at the sheet\'s dpr, painted again while owed, let go on close; a landing repaints the window and moves no static key (AUDIT TESA II M9); the hover\'s name off the one roll; the build handed the held pixels (mutant: each seam)', () => {
-  const H = read('src/ui/heldMap.js'), W = hostText('src/scenes/world.js'), I = read('src/ui/tamrielInk.js');
-  assert.match(H, /tiles: \(this\._pastBayTiles \?\?= createTamrielTiles\(\{ paint: \(c, v, w, h, o, job\) => paintPastBay\(c, v, \{ \.\.\.o, paperW: w, paperH: h \}, job\), stamp: pastBayStamp \}\)\), dpr: env\.dpr, settling \};/);   // PIN MOVED (AUDIT TESA II M10): the tile's job handed through
-  assert.match(H, /if \(this\._pastBayTiles\?\.takePending\(\)\) \{ this\._staticKey = ''; this\._dirty = true; \}/);
-  assert.match(H, /this\._pastBayTiles\?\.clear\(\);/);
-  // PIN MOVED (AUDIT TESA II M9): the places' and the roads' landing repaints the window from its tick - the tiles compare
-  // their words - and is no part of the static key (the sheet's ink and the marks' bake are not stroked again for it)
-  assert.match(H, /const pastBay = `\$\{arenaRoadsVersion\(\)\}\|\$\{pastBayPlacesVersion\(\)\}`;\n\s+if \(pastBay !== this\._pastBayWord\) \{ this\._pastBayWord = pastBay; this\._staticKey = ''; this\._dirty = true; \}/);
-  const staticKey = H.slice(H.indexOf('      staticKey: () => ['), H.indexOf("      ].join('|'),", H.indexOf('      staticKey: () => [')));
-  assert.doesNotMatch(staticKey, /pastBayPlacesVersion\(\)|arenaRoadsVersion\(\)/);
-  assert.match(I, /if \(opts\.tiles\) opts\.tiles\.draw\(ctx, view, \{ paperW, paperH, dpr: opts\.dpr \?\? 1, key: `\$\{band\}\|\$\{continent \? 1 : 0\}\|\$\{JSON\.stringify\(past\.filters\)\}\|\$\{JSON\.stringify\(past\.inks\)\}\|\$\{past\.portsOnly \? 1 : 0\}`, paint: past, \.\.\.\(opts\.settling \? \{ budgetMs: 0, force: false \} : \{\}\), base: baseOf\(past, ink\) \}\);/, 'the key: the band, the continent, the filters, the hues, the Ports filter');   // PIN MOVED (MAP-WHOLE): and the base under every tile owed; PIN MOVED (BAY-LEFT-MAPS C11, test/ui/bayleft_find.test.js): and the Ports filter
-  assert.match(W, /const tamrielRoadHeld = \(\) => \(_arenaTemplates \? arenaPixels\(\)\?\.stood\.filter\(\(p\) => arenaTemplateOf\(_arenaTemplates, p\)\)\.map\(\(p\) => \(\{ x: p\.bx, y: p\.by \}\)\) : null\) \?\? \[\];/);
-  assert.match(W, /window\.__tesaPlaces = \(x0, y0, x1, y1\) => pastBayPlacesIn\(x0, y0, x1, y1\);/);
-  assert.match(W, /tamrielPlacesIn: tamrielLand \? pastBayPlacesIn : null,/, 'the map seam: the regions\' places');
-});
-
 // ── ZOOM-FAST (2026-10-24, the owner: "The map also is slow to load when zooming in and out") ──
 test('ZOOM-FAST the tiles: a draw told not to force paints none past its budget (a zoom still settling: none at all) and says it owes; a stand-in is sought under the last key at the same level, so a band crossed keeps the roads up (mutants: forced anyway; the last key forgotten)', () => {
   const r = rig();

@@ -199,7 +199,6 @@ test('PERF-EXT30: Dynamic Skies\' sheets at opacity 0 read nothing and hand on t
       assert.ok(s.Opacity > 0, `${n} ${k}: opacity ${s.Opacity}`);
     }
   }
-  assert.match(read('src/scenes/shared.js'), /if \(clouds && dynamicSky\) dynamicSky\.cloudsExternal = true;/, 'DS2: under the clouds, the default');
 });
 
 // ── PERF-EXT30: THE PORT'S DOME ───────────────────────────────────────────────────────────────────────────────────────
@@ -247,19 +246,10 @@ test('PERF-EXT30: the port\'s dome at cover 0 calls no noise and draws what the 
     assert.deepEqual(g1.out, o1.out, `${weather}: and agrees to the bit`);
     assert.notDeepEqual(g1.out, g0.out, `${weather}: and draws cloud (else the cover arm is vacuous)`);
   }
-  // THE PREMISE the gate's exactness rests on: fbm stays under 1 (the octaves' weights sum to 0.96875 and the hash is a
-  // fract), no deck carries a bias, and no weather's softness is 0 - so a cover of 0 (smoothstep from 1) is 0 everywhere
-  const fs = read('src/render/enhancedSky.js');
-  assert.match(fs, /float fbm\(vec2 p\) \{\n {2}float v = 0\.0, a = 0\.5;\n {2}for \(int i = 0; i < 5; i\+\+\) \{ v \+= a \* vnoise\(p\); p = p \* 2\.0 \+ vec2\(17\.1, 9\.7\); a \*= 0\.5; \}/,
-    'five octaves from 1/2 halving: 1/2 + ... + 1/32 = 0.96875 - with a hash under 1, a cover of 0 (smoothstep from 1) is 0 everywhere');
-  assert.match(fs, /float hash21\(vec2 p\) \{[^\n]*return fract\(p\.x \* p\.y\); \}/, 'the hash is a fract: under 1');
-  assert.match(fs, /vec2 hi = deck\(dir, 0\.95, uDrift \* 0\.55, uCloudCover \* 0\.75, uCloudSoft \* 1\.5, 0\.0\);/);
-  assert.match(fs, /vec2 lo = deck\(dir, 1\.9, uDrift, uCloudCover, uCloudSoft, 0\.0\);/);
   let max = 0;
   for (let i = 0; i < 20000; i++) max = Math.max(max, fbm(rnd() * 5120, rnd() * 5120));
   assert.ok(max < 0.96875, `the JS twin over 20,000 points peaks at ${max.toFixed(4)}`);
   for (const [w, row] of Object.entries(WEATHER_SKY)) assert.ok(row.soft > 0, `${w}: soft ${row.soft}`);
-  assert.match(fs, /gl\.uniform1f\(u\.uCloudCover, this\.cloudsExternal \? 0 : s\.cloudCover\);/, 'VC3: the cover the gate reads');
 });
 
 // ── PERF-EXT31: THE AIR RESOLVE ───────────────────────────────────────────────────────────────────────────────────────

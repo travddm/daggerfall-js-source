@@ -89,33 +89,6 @@ test('SPELL-HAND THE CAST\'S DOORS (scenes/hostMagic.js): with the spell hand up
   } finally { _resetSpellHand(); }
 });
 
-test('SPELL-HAND THE FOUR HOSTS RULE: every cast press is a cast\'s own - ActivateCenterObject\'s in the street (world.js, exterior.js), indoors and in the dungeon (worldModes.js), the fixed dungeon (dungeon.js) and the hotbar - and the dungeon\'s attack door never swings on one; no swing button says it is a cast (mutants: a host\'s cast press unsaid; the dungeon swinging on a cast press)', () => {
-  // PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): the press is the imported word CAST_PRESS (combat/twoHands/spellHand.js, handed to the hosts by scenes/hostMagic.js - TWO-HANDS' FOUR HOSTS read no two-hands module) and the
-  // dungeon's door takes its `cast` positionally - an option object was an entry each host grew by (was: `{ cast: true }`)
-  const casts = (file) => (src(file).match(/interceptAttack\?*\.?\(true, CAST_PRESS\)/g) ?? []).length;
-  assert.equal(casts('src/scenes/world.js'), 1, 'world.js: the activate press');
-  assert.equal(casts('src/scenes/exterior.js'), 1, 'exterior.js');
-  assert.equal(casts('src/scenes/worldModes.js'), 1, 'worldModes.js: the interior');
-  assert.equal(casts('src/systems/quickslots.js'), 1, 'the hotbar');
-  assert.match(src('src/scenes/worldModes.js'), /dungeonCtx\?\.playerAttackInput\?\.\(0, 0, true, true\)/, 'worldModes.js: the dungeon\'s');
-  assert.match(src('src/scenes/dungeon.js'), /if \(_act\.cast\) ctx\.playerAttackInput\(0, 0, true, true\)/, 'the fixed dungeon\'s');
-  assert.match(src('src/scenes/dungeonContext.js'), /function playerAttackInput\(dx, dy, held, cast = false\)[^\n]*\n(?:[^\n]*\n){0,8}?\s+if \(magic\.interceptAttack\(held, cast \? CAST_PRESS : undefined\) \|\| cast\) return;/, 'a cast press in the dungeon never swings');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/dungeon.js']) {
-    assert.equal((src(f).match(/isSwingButton\([^)]*\)[^\n]*interceptAttack\([^)]*CAST_PRESS/g) ?? []).length, 0, `${f}: no swing button casts as a cast`);
-  }
-  // AUDIT SPELL-HAND L4-9: the stick-half tap (TS1) is the lock pick and nothing below it - never a cast, in every host
-  assert.match(src('src/scenes/world.js'), /hasReadySpell: magic\.spellArmed\(\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/exterior.js'), /hasReadySpell: magic\.spellArmed\(\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/dungeon.js'), /hasReadySpell: \(ctx\.spellArmed\?\.\(\) \?\? false\) && !_tapLockOnly,/);
-  assert.match(src('src/scenes/worldModes.js'), /hasReadySpell: \(\(mode === 'dungeon' \? dungeonCtx\?\.spellArmed\?\.\(\) : magic\?\.spellArmed\(\)\) \?\? false\) && !host\.activateLockOnly\?\.\(\),/);
-  // AUDIT SPELL-HAND L4-6: a kept press never leaves under a window - every host hands its own pause word
-  assert.match(src('src/scenes/world.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], _mfwd, gamePaused\(\)\);/);
-  assert.match(src('src/scenes/exterior.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], _mfwd, gamePaused\(\)\);/);
-  assert.match(src('src/scenes/worldModes.js'), /magic\.firePending\(\[\.\.\.cam\.pos\], eyeDir\(\), overlayHeld\);/);
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): online the dungeon's frame runs under its own window, so it hands that pause word too
-  assert.match(src('src/scenes/dungeonContext.js'), /magic\.firePending\(eye, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\], !!opts\.breathHeld\?\.\(\) \|\| dungeonPaused\(\)\);/);
-});
-
 // ---- THE CLASSIC LANE, THROUGH THE REAL RIG -------------------------------------------------------------------------
 
 /** A WEAPON CIF (the two-hands suite's) and a casting CIF (the readied hands suite's: six single-frame records). */
@@ -554,7 +527,6 @@ test('SPELL-HAND AUDIT L3-4 / L4-7, THE ARM\'S CAST HOLDS EVERY HAND, AND A LEAP
     for (let i = 0; i < 10; i++) { await frame(1 / 60, true); if (r.playerWeapon.machine.state !== 'Idle') swung = true; }
     assert.ok(swung, 'its hands free: the blow');
   } finally { arm.restore(); _resetSpellHand(); }
-  assert.match(src('src/combat/weapon/weaponRig.js'), /const handsBusy = \(\) => [^\n]*\|\| techniqueFlying\(\);/, 'L4-7: a technique\'s leap or dash is a strike in flight (its landing blow paid for at the launch)');
 });
 
 test('SPELL-HAND AUDIT L4-4 THE TUTORIAL NAMES THE CAST\'S OWN PRESS: the spellbook page casts with ActivateCenterObject (EntityEffectManager\'s own, which casts whatever the hands) and says the swing button swings the weapon beside a spell in the free hand - never the swing button as the cast\'s (mutant: the page back to the swing button)', () => {

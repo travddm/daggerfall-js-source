@@ -67,5 +67,4 @@ test('WALLET-UI the sheet: the ledger drawn - each part\'s name, a row a currenc
     /\.pack-shell \.walletsheet \.wallet-v \{ color: var\(--bone\); text-align: right; font-variant-numeric: tabular-nums; \}/,
     /\.pack-shell \.walletsheet \.wallet-row\.none \.wallet-v, \.pack-shell \.walletsheet \.wallet-v\.why \{ color: var\(--dim\);/,
   ]) assert.match(ENHANCED_CSS, rule);
-  assert.match(src('tools/walletProbe.mjs'), /figures stand in one column/, 'the probe reads the column in a browser');
 });

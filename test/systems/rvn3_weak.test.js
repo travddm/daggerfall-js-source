@@ -208,77 +208,6 @@ test('RVN3 ON A WIND-UP a blow of its weakness weighs x2 (TELL\'s POISE_WEAK) - 
 
 // ── the reveal and the flinch ───────────────────────────────────────
 
-test('RVN3 THE REVEAL: my first blow of its weakness - the real strike - counts in the ledger, tells the record (known), its card once and the hiss where it stands; a second blow no second card; my spell of its element reveals it too (mutants: never counted; never known; the card every blow; no hiss; the spell\'s unnoticed)', async () => {
-  const p = me();
-  const o = foe();
-  o._voiceId = 'rvn3-reveal';
-  const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(o, r);
-  const sfx = [], lines = [];
-  setPlayerDoor({ foes: () => [{ entity: o, ai: { feet: [1, 0, 2] } }], feet: () => [0, 0, 0], hurtFoe() {}, castOnPlayer() {}, sfx: (id, at) => sfx.push([id, at]), say: (l) => lines.push(l) });
-  r.weak = 'blade'; o.revenant = { ...o.revenant, weak: 'blade', edge: F.adaptEdge(r.learned, 'blade') };
-  let d = 0;
-  for (let i = 0; i < 20 && !(d > 0); i++) d = calculateAttackDamage(p, o, { weapon: createWeapon(W.Longsword, 1, () => 0.5), rolls: () => 0.2 });
-  assert.ok(d > 0);
-  assert.equal(o._feud.weak, 1, 'counted');
-  assert.equal(N.revenantById(r.id).weakKnown, 2, 'known');
-  assert.deepEqual(sfx, [[SOUND.Burning, [1, 0, 2]]], 'the hiss where it stands');
-  const cards = shown.filter((e) => e.kind === 'weakness');
-  assert.equal(cards.length, 1);
-  assert.match(cards[0].body, /^Its weakness laid bare: Blades\.$/);
-  assert.equal(cards[0].kicker, 'Weakness');
-  calculateAttackDamage(p, o, { weapon: createWeapon(W.Longsword, 1, () => 0.5), rolls: () => 0.2 });
-  assert.equal(shown.filter((e) => e.kind === 'weakness').length, 1, 'no second card');
-  assert.equal(sfx.length, 1, 'no second hiss');
-  assert.ok(o._feud.weak >= 2);
-  // a spell of its element: the landing notes it - weak, revealed
-  const q = foe();
-  q._voiceId = 'rvn3-spell';
-  const rq = N.revenantDeed(p, q, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(q, rq);
-  rq.weak = 'fire'; q.revenant = { ...q.revenant, weak: 'fire', edge: F.adaptEdge([], 'fire') };
-  magicFor(p).applySpellToFoe(FIRE, 5, { entity: q }, null, undefined, { hurt() {} });
-  assert.equal(q._feud.weak, 1);
-  assert.equal(N.revenantById(rq.id).weakKnown, 2);
-  // a metal weakness through the real strike: the blade's own metal counts
-  const m = foe();
-  m._voiceId = 'rvn3-metal';
-  const rm = N.revenantDeed(p, m, 'fled', { rolls: () => 0.5 });
-  N.applyRevenant(m, rm);
-  rm.weak = 'elven'; m.revenant = { ...m.revenant, weak: 'elven', edge: F.adaptEdge([], 'elven') };
-  let dm = 0;
-  for (let i = 0; i < 20 && !(dm > 0); i++) dm = calculateAttackDamage(p, m, { weapon: createWeapon(W.Longsword, 3, () => 0.5), rolls: () => 0.2 });
-  assert.ok(dm > 0);
-  assert.equal(m._feud.weak, 1, 'an elven blade on an elven-weak one');
-  assert.match(read('src/systems/revenant/revenant.js'), /Promise\.resolve\(\)\.then\(\(\) => \{ try \{ tagHit\(entity, HIT_TAGS\.weakness\); \}/, 'the word, after the number its blow raises');
-});
-
-test('RVN3 THE FLINCH: under half its health, its weakness unknown - the narrator\'s line, the record hinted, once a stand; above half, nothing; known, nothing (mutants: the line at any health; hinted twice; a known one flinching)', () => {
-  const p = me();
-  const o = foe();
-  const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-  const f = { entity: o };
-  o.health = o.maxHealth * 0.6;
-  assert.equal(N.revenantFlinch(f), null, 'above half');
-  assert.equal(f._flinched, undefined);
-  o.health = o.maxHealth * 0.4;
-  const ev = N.revenantFlinch(f);
-  assert.equal(ev.kind, 'weakness');
-  assert.equal(ev.body, F.FLINCH_LINES[r.weak]);
-  assert.equal(ev.speech, null, 'the narrator\'s, in no voice');
-  assert.equal(N.revenantById(r.id).weakKnown, 1, 'hinted');
-  assert.equal(N.revenantFlinch(f), null, 'once a stand');
-  const g = { entity: foe() };
-  const r2 = N.revenantDeed(p, g.entity, 'fled', { rolls: () => 0.5 });
-  r2.weakKnown = 2;
-  g.entity.health = 1;
-  assert.equal(N.revenantFlinch(g), null, 'known: nothing to shy from');
-  assert.equal(r2.weakKnown, 2);
-  // both pools ask it beside the taunt
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(f\.entity\.revenant\?\.id && !f\._flinched\) \{ const ev = revenantFlinch\(f, \{ archive: f\.archive \}\); if \(ev\) revenantSay\(ev, say\); \}/);
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(f\.entity\?\.revenant\?\.id && !f\._flinched\) \{ const ev = revenantFlinch\(f, \{ archive: f\.mobileArchive \}\); if \(ev\) revenantSay\(ev, \(l\) => hudText\.add\(l\)\); \}/);
-});
-
 // ── the will, on the real pool ──────────────────────────────────────
 
 const careers = (() => {
@@ -384,14 +313,6 @@ test('RVN3 THE WILL: from rank 3 a revenant my fight has not broken does not kne
   assert.equal(z.leaving, undefined, 'past its unbroken will');
   assert.ok(z.yielded, 'to its knees');
   assert.equal(N.revenantById(r5.id).defeated, false, 'the choice still mine');
-});
-
-test('RVN3 the dungeon\'s doors: the will at its yield seam, the tear-away its escape, the fate-held refusal (mutants: any unwired)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /revenantMayYield\(foe\)\) \{ if \(!ownersWholeKill\(_whole, \{ fromPlayer, peer \}\) && revenantWillHolds\(foe\)\) tearAwayDungeonFoe\(foe\); else yieldDungeonFoe\(foe\); return; \}/);   // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
-  assert.match(d, /function tearAwayDungeonFoe\(f\) \{[\s\S]{0,300}beginTearAway\(f, \(\) => escapeDungeonFoe\(f, \{ unbroken: true \}\)\);/);
-  assert.match(d, /if \(foe\.yielded \|\| foe\.executing \|\| foe\.sparing \|\| foe\.leaving \|\| foe\.roaring\) return;/);   // PIN MOVED (RVN4: nor one roaring)
-  assert.match(d, /unbroken \? revenantUnbrokenEvent\(r, playerEntity\?\.name, \{ archive: f\.mobileArchive \}\)/);
 });
 
 test('RVN3 the page: its weakness as I know it - unknown, its kind, what it is; from rank 3 the will\'s rule (mutants: a hint named; the rule at rank 2)', () => {

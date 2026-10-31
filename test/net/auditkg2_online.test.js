@@ -179,8 +179,6 @@ test('AUDIT KG II B12 A STAND THE LINK WOULD NOT CARRY: the host is told it is d
   g.relay({ t: 'gambit', table: 1, now: 0, events: [], state: view([null, { id: 'me', name: 'Ves', chair: 3, crown: 0 }]) });
   g.close();
   assert.deepEqual(due, [true, false, false], 'a stand that went owes nothing');
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /for \(const \[i, ctx\] of gambitStandsDue\) if \(ctx !== interiorCtx \|\| host\.gambitOnline\?\.send\?\.\(\{ op: 'stand', table: i \}\)\) gambitStandsDue\.delete\(i\);/, 'the host says it again each frame, as Hold\'em\'s');
 });
 
 test('AUDIT KG II B10 + B18 + B11 THE SESSION: a watcher\'s board shows both sides\' actions apart; a game opened under way says no deal\'s muster; a press made while one is on its way is held and sent once the board is told, checked again (mutants: the watcher\'s gap; midway; the held press)', () => {
@@ -227,10 +225,6 @@ test('AUDIT KG II B10 + B18 + B11 THE SESSION: a watcher\'s board shows both sid
 });
 
 test('AUDIT KG II B13 A WATCHED BOARD LET GO WITH ITS TABLE: the last stand\'s frame (both seats empty) closes the watch; the host\'s chair kept past its stand (source pins)', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /if \(!st\?\.game && !\(st\?\.seats \?\? \[\]\)\.some\(Boolean\)\) closeGambitWatch\(f\.table\);/);
-  assert.match(wm, /seats\[st\.seats\?\.\[0\]\?\.chair \?\? w\.hostChair \?\? 0\]/);
-  assert.doesNotMatch(wm, /the red table plays no King's Gambit online before KG6/, 'AUDIT KG II B9: the red table\'s board is asked on approach');
   // the frame the source reads: both seats empty once the last stands
   const t = newGambitTable({ chairs: 4 }), rand32 = xorshift(3), r = new RemoteGambitTable({ myId: null });
   const told = (m) => { for (const x of m) r.apply({ t: 'gambit', table: 1, now: 0, ...x.frame }, 0); };

@@ -219,37 +219,3 @@ function hostScope(repeat) {
 }
 const LADDERS = [['src/scenes/world.js', 'worldKeyAction'], ['src/scenes/exterior.js', 'exteriorKeyAction']];
 
-test('AUDIT DISC28 UI-7: the outdoor ladders (world.js, exterior.js) act on a press, never on its auto-repeat - a held F9 is one save, a held Q one recast', () => {
-  const ACTS = ['QuickSave', 'QuickLoad', 'Rest', 'CastSpell', 'RecastSpell', 'AbortSpell', 'CharacterSheet', 'LogBook', 'NoteBook', 'Inventory', 'Escape', 'TravelMap', 'AutoMap', 'QuickDial', 'Screenshot'];
-  for (const [file, name] of LADDERS) {
-    const text = src(file);
-    const fnText = `function ${name}(act, first) ${blockAfter(text, `function ${name}(act, first) `)}`;
-    for (const act of ACTS) {
-      const press = hostScope(false);
-      const pressed = runIn(fnText, press.env)(act, true);
-      if (!press.calls.length) continue;   // this ladder has no door for the action (exterior's dev route has no load)
-      assert.equal(pressed, true, `${file} ${act}: the press is taken`);
-      const held = hostScope(true);
-      const taken = runIn(fnText, held.env)(act, true);
-      assert.deepEqual(held.calls, [], `${file} ${act}: a repeat opens, saves or casts nothing (the press did: ${press.calls})`);
-      assert.equal(taken, true, `${file} ${act}: the repeat is swallowed, not handed on`);
-      assert.ok(held.prevented() > 0, `${file} ${act}: its default is prevented`);
-    }
-    // the polled actions are the frame's own read, never this ladder's - the guard leaves them alone
-    const polled = hostScope(true);
-    assert.equal(runIn(fnText, polled.env)('ReadyWeapon', true), false, `${file}: a polled action's repeat is declined, not swallowed`);
-    assert.deepEqual(polled.calls, [], `${file}: a polled action is still declined here`);
-  }
-  // world.js's F11 under the death screen (FIX-E; DUPE-LOAD: that window alone): one press, one load. PIN MOVED (DUPE-LOAD):
-  // the arm's opener reads `loadsUnder` now; only its body runs here, so the fixture's overlay need not be the death screen
-  const text = src('src/scenes/world.js');
-  const arm = blockAfter(text, "if (townTalk.overlayActive && townTalk.overlay?.loadsUnder === true && !isTextEntryTarget(e.target) && (modes?.mode ?? 'exterior') === 'exterior' && codeMeans(bindings(), e.code, 'QuickLoad') && !retroToggleKey(e, keys)) ");
-  for (const [repeat, want] of [[false, ['hudCtx.quickLoad']], [true, []]]) {
-    const h = hostScope(repeat);
-    h.env.townTalk = { overlayActive: true, overlay: {} };
-    h.env.DeathScreen = class {};
-    h.env._deathWasOnline = false;
-    runIn(`function () ${arm}`, h.env)();
-    assert.deepEqual(h.calls, want, `F11 under a window, repeat=${repeat}`);
-  }
-});

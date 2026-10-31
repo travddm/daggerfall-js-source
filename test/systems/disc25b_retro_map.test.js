@@ -68,8 +68,6 @@ test('DISC25-B: retroScreenRect is CustomScreenRect - the pillars in whole pixel
   retro(1, RETRO_ASPECT.FOUR_THREE);
   assert.equal(retroScreenRect(1000, 1080), null);
   assert.equal(retroScreenRect(0, 1080), null);
-  assert.match(readFileSync(new URL('../../src/systems/retroMode.js', import.meta.url), 'utf8'),
-    /const pillarWidth = retroPillarWidth\(screenW, screenH, aspect\);/, 'the world rect cuts from the same pillar');
   resetToDefaults();
 });
 

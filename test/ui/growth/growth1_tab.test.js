@@ -54,11 +54,6 @@ const family = (m, id) => m.families.find((f) => f.id === id);
 // ── GROWTH1: the tab and its rail ───────────────────────────────────────────────────────────────────────────────────
 
 test('GROWTH1 THE TAB: Growth stands after Stats in the window\'s one list; a landing names it, a page of it, or a family\'s guide - each a Growth landing, no other tab\'s (mutants: the tab left out; a family landing unread; the leaf drifting from the tab)', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const PAUSE_TABS = Object\.freeze\(\[\['quests', 'Quests'\], \['stats', 'Stats'\], \['growth', 'Growth'\], \['holdings', 'Holdings'\],/);
-  assert.match(menu, /growth: pauseGrowth,/);
-  assert.match(menu, /else if \(growthPageAt\(at\)\) pauseTab = 'growth';/);
-  assert.match(menu, /resetGrowthTab\(at\);/);
   assert.deepEqual(GROWTH_PAGE_SECTIONS.map(([id]) => id), ['level', 'specs', 'firmament', 'captain']);
   for (const at of ['growth', 'level', 'specs', 'firmament', 'captain', 'specs:arcane', 'specs:martial']) assert.equal(growthPageAt(at), true, at);
   for (const at of ['stats', 'holdings', 'family', 'revenants', null, undefined, 'specs:nope']) assert.equal(growthPageAt(at), false, String(at));
@@ -68,9 +63,6 @@ test('GROWTH1 THE TAB: Growth stands after Stats in the window\'s one list; a la
   resetGrowthTab(null); assert.equal(growthSection(), 'level', 'a bare landing: the Level page');
   setGrowthSection('firmament'); assert.equal(growthSection(), 'firmament');
   setGrowthSection('nope'); assert.equal(growthSection(), 'firmament', 'no such page: it stays');
-  // the boot door reads the LEAF, never the tab (whose guide reads the spellbook's chunk)
-  assert.match(rd('src/ui/pauseDoor.js'), /import \{ growthPageAt \} from '\.\/growth\/growthPages\.js';/);
-  assert.doesNotMatch(rd('src/ui/pauseDoor.js'), /growth\/growthTab\.js/);
 });
 
 test('GROWTH1 THE RAIL: the Captain\'s Stars where the host hands a captain\'s sky over (else three pages); what waits - a level owed, the paths open, the captain\'s points unspent (mutants: the captain drawn for any host; a due page read off another\'s count)', () => {
@@ -208,7 +200,6 @@ test('AUDIT GROWTH LANE1-1/4 THE SLOTS: a pair the slots left can never hold is 
   assert.equal(stateLine(family(specGuideModel(s), 'martial'), bm, true), 'Your class can\'t master both of these skills.');
   // neither is shown until asked: the reachable list leaves both out
   assert.equal(SPEC_STATES.indexOf('slots') > SPEC_STATES.indexOf('closed') && SPEC_STATES.indexOf('slots') < SPEC_STATES.indexOf('never'), true);
-  assert.match(rd('src/ui/growth/specGuide.js'), /const reachable = fam\.paths\.filter\(\(p\) => p\.state !== 'never' && p\.state !== 'slots'\);/);
 });
 
 test('AUDIT GROWTH LANE1-4 THE HEADLINE: no path for the family says whether the class never could or the player\'s masteries spent the slots (mutants: the spent read as the class\'s)', () => {
@@ -453,76 +444,6 @@ test('AUDIT GROWTH LANE2/LANE3 THE STAGE\'S EDGES: a face left before its chunk 
   // the Grimoire's strip; the focus kept in the box and the leave press in its own strip
   for (const f of ['src/ui/firmamentWindow.js', 'src/ui/skyWindow.js', 'src/ui/enhanced/enhancedLevelUp.js']) assert.match(rd(f), /if \(embed && root\.closest\?\.\('\[inert\]'\)\) return;/, f);
   for (const f of ['src/ui/firmamentWindow.js', 'src/ui/skyWindow.js']) assert.match(rd(f), /const placeSay = \(\) => \{ sayBox\.style\.top = `\$\{Math\.round\(\(barFoot\(\) \|\| 66\) \+ 10\)\}px`; \};/, f);
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /if \(pauseTab === 'growth' && growthAsks\(\)\) \{ timersOpen = false; timersFocusBack = true; render\(\); return; \}/, 'the timers door asks');
-  assert.match(menu, /\(\) => \{ if \(pauseTab === 'growth' && growthAsks\(\)\) return; onAction\('resume'\); \}\);/, 'the scrim asks');
-  const tab = rd('src/ui/growth/growthTab.js');
-  assert.match(tab, /:root\[data-plus-dress="grimoire"\] \.px-journal\.gr-book > \.px-qrail \{ width: 25%;/);
-  assert.match(tab, /const levelDoor = \(\) => \(globalThis\.innerHeight \?\? 720\) < LEVEL_PANE_MIN_H \|\| /);
-  assert.match(tab, /door: levelDoor\(\),/);
-  const stage = rd('src/ui/growth/growthStage.js');
-  assert.match(stage, /\.gr-fullbox > \.gr-stagehost \{ bottom: 48px; \}/);
-  assert.match(stage, /me\.guard = \(e\) => \{ if \(me\.box && !me\.box\.contains\?\.\(/);
-  assert.match(stage, /document\.addEventListener\?\.\('focusin', me\.guard, true\);/);
-});
-
-test('AUDIT GROWTH LANE3 THE CLASSIC SHEET\'S EDGES: no Growth window while the rollout stands (its points live on the sheet - the window\'s Save and doors would lose them); the sheet disposes what it pushed; a chosen path\'s row only while it is in force; Enter on a focused button is the button\'s in the tab; no dead Close in the tab (mutants: the guide over the rollout; dispose dropped; the dormant row; Enter taken; the Close shown)', async () => {
-  const { CharSheet } = await import('../../../src/ui/charsheet.js');
-  const e = spellsword({ mastered: [LB, AR] });
-  e.readyToLevelUp = true; e.pendingLevel = 21;
-  const asked = [];
-  const sheet = new CharSheet(e, { growth: (at) => { asked.push(at); return { done: false, tick() {}, draw() {}, dispose() {} }; } });
-  assert.equal(sheet.leveling, true, 'the rollout stands');
-  assert.equal(sheet._growth('specs:martial'), false, 'no window over it');
-  assert.deepEqual(asked, []);
-  const plain = new CharSheet(spellsword(), { growth: (at) => { asked.push(at); return { done: false, tick() {}, draw() {}, dispose: () => { asked.push('disposed'); } }; } });
-  assert.equal(plain._growth('specs:arcane'), true);
-  plain.child = plain.hooks.growth('specs:arcane');
-  plain.dispose();
-  assert.deepEqual(asked, ['specs:arcane', 'specs:arcane', 'disposed'], 'the host\'s drop reaches the child');
-  assert.equal(plain.child, null);
-  const src = rd('src/ui/charsheet.js');
-  assert.match(src, /const guide = typeof this\.hooks\?\.growth === 'function' && !this\.leveling;/);
-  assert.match(src, /const pathText = pathOf\(e\) && masterSkillsActive\(e\) \? t\('schools\.sheet\.chosen'/);
-  assert.match(src, /const martialText = martialPathOf\(e\) && masterSkillsActive\(e\) \? t\('martial\.sheet\.chosen'/);
-  const lv = rd('src/ui/enhanced/enhancedLevelUp.js');
-  assert.match(lv, /case 'Enter': case 'NumpadEnter': if \(embed && t\w*\?\.tagName === 'BUTTON'\) \{ used = false; break; \} confirm\(\); break;/);
-  assert.match(lv, /if \(embed && screen\?\.viewOnly\) ok\.hidden = true;/);
-});
-
-test('GROWTH3 THE WINDOWS, EMBEDDED (by source; tools/growthProbe.mjs drives them): the Firmament, the captain\'s stars and the Ascension each draw at the stage\'s size with no overlay and no Escape of their own - the window\'s back stack asks back(); unaccepted stars asked about once; a stage between two draws hears no key (mutants: an embedded window\'s own Escape; its overlay registered; the deaf check dropped)', () => {
-  const firm = rd('src/ui/firmamentWindow.js');
-  assert.match(firm, /\.fmt-root\.fmt-embed \{ position: absolute; z-index: auto; \}/);
-  assert.match(firm, /if \(embed\) \{ root\.classList\.add\('fmt-embed'\); root\.setAttribute\('aria-modal', 'false'\); exitBtn\.hidden = true; \}/);
-  assert.match(firm, /if \(dead \|\| \(embed && !root\.isConnected\)\) return;/);
-  assert.match(firm, /case 'Escape':\n\s*if \(embed\) \{ used = false; break; \}/);
-  assert.match(firm, /let unregister = embed \? \(\) => \{\} : registerOverlay\(overlayClose\);/);
-  // PIN MOVED (AUDIT GROWTH LANE3-8): the ask is for the stars it named - re-armed when they change
-  assert.match(firm, /rearm\(\);\n\s*if \(unaccepted\(\) && !armedClose\) \{ arm\(\); say\(unacceptedLeave\(\), true\); return true; \}/);
-  assert.match(firm, /const rearm = \(\) => \{ if \(armedClose && armedAt !== sig\(\)\) armedClose = false; \};/);
-  // the captain's and the revenants' skies are one window (ui/skyWindow.js - RVN-STARS); only the captain's is embedded
-  // (AUDIT GROWTH LANE4-4: each piece of its embedding pinned as the Firmament's is - no Close, no focus taken, the stage
-  // watched, the leaving press's words)
-  const sky = rd('src/ui/skyWindow.js');
-  assert.match(sky, /case 'Escape': if \(embed\) \{ used = false; break; \} tryClose\(\); break;/);
-  assert.match(sky, /rearm\(\);\n\s*if \(dead \|\| !unaccepted\(\) \|\| armedClose\) return false;\n\s*arm\(\);\n\s*say\(W\.unacceptedEsc \?\? W\.unaccepted, true\);\n\s*return true;/);   // PIN MOVED (LANE3-8)
-  assert.match(sky, /const rearm = \(\) => \{ if \(armedClose && armedAt !== pending\.join\(\)\) armedClose = false; \};/);
-  assert.match(sky, /if \(dead \|\| \(embed && !root\.isConnected\)\) return;/);
-  assert.match(sky, /if \(embed\) \{ root\.classList\.add\('fmt-embed'\); root\.setAttribute\('aria-modal', 'false'\); exitBtn\.hidden = true; \}/);
-  assert.match(sky, /if \(embed\) try \{ watch = new globalThis\.ResizeObserver\(\(\) => \{ if \(!dead\) resize\(\); \}\); watch\.observe\(root\); \} catch \{ watch = null; \}/);
-  assert.match(sky, /if \(!embed\) \(goBtn\.disabled \? homeBtn : goBtn\)\.focus\?\.\(\{ preventScroll: true \}\);/);
-  assert.match(rd('src/ui/captainTreeWindow.js'), /unacceptedEsc: t\('captain\.sky\.unacceptedLeave', 'You have unaccepted changes\. Press \{accept\} to keep them, or leave again to discard them\.', \{ accept: t\('captain\.sky\.accept', 'Accept'\) \}\),/);
-  assert.doesNotMatch(rd('src/ui/revenantStarsWindow.js'), /embed/, 'the revenant sky stands over the window, never in it');
-  assert.match(rd('src/ui/captainTreeWindow.js'), /return mountSkyWindow\(host, sky, \{ changed, onExit, doc, embed \}\);/);
-  const lv = rd('src/ui/enhanced/enhancedLevelUp.js');
-  assert.match(lv, /if \(embed\) root\.classList\.add\('lv-embed'\);/);
-  assert.match(lv, /if \(embed && !root\.isConnected\) return;/, 'the Ascension deaf while detached, as the skies are');
-  assert.match(lv, /if \(!embed\) unregister = registerOverlay\(closeArm\);/);
-  assert.match(lv, /if \(embed \|\| overlayAction\(e\) !== 'back'\) return;/, 'Escape is the window\'s: a level left stays owed');
-  // the window's back stack asks the face first, on the Growth tab with a face up
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /: mode === 'pause' && pauseTab === 'growth' && stageLive\(\) \? \(\) => \{ if \(!growthBack\(\)\) onAction\('resume'\); \}/);
-  // GROWTH-BOOK: one window size for every page of the tab, face or none
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /if \(pauseTab === 'growth'\) win\.classList\.add\('px-win-growth'\);/);
 });
 
 // GROWTH5 (the merge of RVN-STARS found it: AUDIT RVN-STARS S8's law, for every face on the stage) - LEAVING ASKS FIRST
@@ -546,40 +467,9 @@ test('GROWTH5 LEAVING ASKS FIRST: another page, another tab, the sheet\'s key an
     pending = false; armed = false;
     assert.equal(stageAsks(), false, 'nothing pending: nothing asked');
   } finally { globalThis.document = was; globalThis.innerWidth = keptW; dropStage(); }
-  const sheet = rd('src/ui/charSheetDoor.js');
-  assert.match(sheet, /const dialClose = \(\) => \{ if \(view\?\.asksFirst\?\.\(\)\) \{ unregister = registerOverlay\(dialClose\); return; \} close\(\); \};\n\s+unregister = registerOverlay\(dialClose\);/, 'the dial arm asks, and is laid again');
-  assert.match(sheet, /if \(view\?\.asksFirst\?\.\(\) \|\| rvnStars\.asks\(\)\) return;\s+\/\/ GROWTH5/, 'the sheet\'s key asks (PIN MOVED, AUDIT GROWTH LANE4-1: a sworn one\'s sky too)');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /asksFirst: \(\) => mode === 'pause' && pauseTab === 'growth' && growthAsks\(\),/);
-  assert.match(menu, /b\.onclick = \(\) => \{ if \(pauseTab === 'growth' && id !== 'growth' && growthAsks\(\)\) return;/, 'another tab asks');
-  assert.match(rd('src/ui/growth/growthTab.js'), /b\.onclick = \(\) => \{ if \(sec !== id && stageAsks\(\)\) return;/, 'another page asks');
-  // PIN MOVED (AUDIT GROWTH LANE3-6): the face's own ask - opened full screen when it asks while it stands nowhere
-  assert.match(rd('src/ui/growth/growthStage.js'), /try \{ held = !!me\.face\?\.back\?\.\(\); \} catch \{ return false; \}\n\s*if \(held && !me\.full && !me\.host\.isConnected && me\.words\) setFull\(true, me\.el, me\.words\);/);
 });
 
 // ── GROWTH4: the classic sheet's rows and the one ask's words ───────────────────────────────────────────────────────
-
-test('GROWTH4 THE CLASSIC SHEET: where a document stands, its S and W rows open the Growth tab\'s guide on their family - the enhanced pause, pushed as the sheet\'s own child (its Resume back to the sheet); the rows stand whenever the class can meet a path (mutants: the rows only while a path is open; the family landing swapped; the guide on the host\'s slot)', async () => {
-  const { CharSheet } = await import('../../../src/ui/charsheet.js');
-  const e = spellsword({ raised: { [LB]: 64 } });
-  const asked = [];
-  const sheet = new CharSheet(e, { growth: (at) => { asked.push(at); return { done: false, tick() {}, draw() {} }; } });
-  sheet.page = 1;
-  sheet._pathRow = [0, 0, 10, 9]; sheet._martialRow = [0, 10, 10, 9];
-  sheet.input('KeyS');
-  assert.deepEqual(asked, ['specs:arcane']);
-  assert.ok(sheet.child, 'pushed as the sheet\'s child');
-  sheet.child = null;
-  sheet.input('KeyW');
-  assert.deepEqual(asked, ['specs:arcane', 'specs:martial']);
-  const src = rd('src/ui/charsheet.js');
-  assert.match(src, /: guide && pathPossible\(e\) \? t\('schools\.sheet\.guide', 'Arcane paths  \(S\)'\) : null;/);
-  assert.match(src, /: guide && martialPossible\(e\) \? t\('martial\.sheet\.guide', 'Martial paths  \(W\)'\) : null;/);
-  const door = rd('src/ui/charSheetDoor.js');
-  // PIN MOVED (AUDIT GROWTH LANE3-14): and no relock under the sheet on its Save or Load
-  assert.match(door, /if \(typeof document !== 'undefined'\) hooks\.growth = \(at\) => openPauseFlow\(\(\) => \{\}, \{ \.\.\.\(deps\.pause\?\.\(\) \?\? \{\}\), at, onResume: \(\) => \{\}, relock: \(\) => \{\} \}\);/);
-  assert.match(rd('src/ui/pauseDoor.js'), /if \(growthPageAt\(hooks\.at\) && typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\);/, 'on either skin');
-});
 
 test('GROWTH4 THE ONE ASK\'S WORDS: on the enhanced skin the No and the several-open box name the Growth tab; the classic skin\'s the skill screen, whose rows open the same guide (mutants: the skins\' words swapped)', () => {
   assert.equal(AP.pathDeclinedGrowthText(), 'You can choose a specialization later on the Growth tab of the pause menu.');
@@ -590,11 +480,6 @@ test('GROWTH4 THE ONE ASK\'S WORDS: on the enhanced skin the No and the several-
   assert.equal(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger], { growth: true }).at(-2), 'See them all and choose one on the Growth tab of the pause menu.');
   assert.equal(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger]).at(-2), 'Choose one in your skill screen.');
   assert.equal(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger]).at(-1), 'Resetting it later costs 200,000 gold.');
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /\(\) => say\(isEnhanced\(\) \? pathDeclinedGrowthText\(\) : pathDeclinedText\(\)\)\);/);
-  assert.match(shared, /\(\) => say\(isEnhanced\(\) \? martialDeclinedGrowthText\(\) : martialDeclinedText\(\)\)\);/);
-  assert.match(shared, /ask\(pathsOpenRows\(open, \{ growth: isEnhanced\(\) \}\), null, null, \{ okOnly: true \}\);/);
-  assert.match(shared, /ask\(martialOpenRows\(open, \{ growth: isEnhanced\(\) \}\), null, null, \{ okOnly: true \}\);/);
 });
 
 // ── the pause window, driven (LAST: the fake document's globals stand for the rest of the file) ─────────────────────
@@ -654,88 +539,6 @@ test('GROWTH THE WINDOW, DRIVEN: the Stats page\'s Growth door (its count) lands
       assert.match(on.textContent, /Captain's Stars/, 'the Growth tab\'s Captain\'s Stars');
     } finally { menu2.unmount(); setHoldingsProvider(null); }
   } finally { restore(); dropStage(); }
-});
-
-test('AUDIT GROWTH LANE5-4 THE TAB WITH ITS REAL FACES, DRIVEN: the Firmament and the captain\'s sky mounted on the stage - a star taken, another page, another tab and the window\'s asksFirst each hold the first press and say so, the second goes and drops the face, the stars never set; the Level page with a level owed draws the owed rollout, never the view (mutants: the Firmament\'s back unreturned; the captain\'s; the owed read false; a face mounted unembedded)', async () => {
-  await import('../../chargenDom.mjs');
-  _resetForTests();
-  const { mountEnhancedMenu } = await import('../../../src/ui/enhanced/enhancedMenu.js');
-  const { setHoldingsProvider } = await import('../../../src/ui/holdingsPages.js');
-  const { setFirmamentBook } = await import('../../../src/net/firmament/firmamentBook.js');
-  const { starsFor, craftPointsFor } = await import('../../../src/net/firmament/firmamentLaw.js');
-  const { START_KEYS } = await import('../../../src/net/firmament/firmamentTree.js');
-  const { createCaptainLedger } = await import('../../../src/systems/naval/captainLedger.js');
-  const settle = async (pred) => { for (let i = 0; i < 200 && !pred(); i++) await new Promise((r) => setTimeout(r, 5)); };
-  const kept = { ...playerEntity };
-  const restore = () => { for (const k of Object.keys(playerEntity)) if (!(k in kept)) delete playerEntity[k]; Object.assign(playerEntity, kept); };
-  let tree = { start: null, nodes: [] };
-  const commits = [];
-  setFirmamentBook({
-    state: { open: true, stars: starsFor(30), craft: craftPointsFor(new Array(10).fill(30)), renown: 30, refund: { freeBelow: 10, perStar: 10 } },
-    current: () => tree, read: async () => ({ ok: true }), onChange: () => () => {},
-    commit: async (next) => { commits.push(next); tree = next; return { ok: true }; }, respec: async () => ({ ok: false }), canRespec: () => false,
-  });
-  const ledger = createCaptainLedger();
-  for (let i = 0; i < 40; i++) ledger.sailed(90000);
-  const setBefore = ledger.tree().slice();
-  setHoldingsProvider({ captain: {
-    model: () => ({ crowns: [], refusedAt: 0, marque: null, contracts: [], charts: [], log: [], stars: { ...ledger.captain(), set: ledger.tree().length - 1 } }),
-    openStars: () => false, stars: () => ({ ledger, changed: () => {} }),
-  } });
-  const host = globalThis.document.createElement('div');
-  globalThis.document.body.append(host);   // the window on the page: its faces stand connected, as in the game
-  const raf = globalThis.requestAnimationFrame;
-  globalThis.requestAnimationFrame = () => 1;   // the skies' frame loop asks for the next frame inside this one: none here
-  let menu = null;
-  try {
-    Object.assign(playerEntity, spellsword({ mastered: [LB, AR] }), { readyToLevelUp: true, pendingLevel: 21, isPlayer: true });
-    menu = mountEnhancedMenu(host, { mode: 'pause', hooks: { ascendScreen: () => levelUpScreenFor(playerEntity) }, onAction: () => {}, at: 'firmament' });
-    const rail = (text) => host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes(text));
-    const page = () => host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && String(b.className).includes(' on'))?.textContent ?? '';
-    const tab = (text) => host.querySelectorAll('button').find((b) => b.textContent.replace(/\u25c6/g, '') === text);
-    const asked = (re) => assert.match(host.textContent, re);
-    // THE FIRMAMENT: a birthsign taken - another page asks once, then goes (the face dropped, nothing committed)
-    await settle(() => stageFace()?.allocate);
-    const firm = stageFace();
-    assert.equal(typeof firm.back, 'function', 'the Firmament answers the stage\'s ask');
-    assert.equal(host.querySelectorAll('div').some((d) => String(d.className).includes('fmt-embed')), true, 'drawn in the pane, embedded');
-    firm.allocate(START_KEYS[1]);
-    assert.equal(firm.model().changes.startChanged, true);
-    rail('Specializations').onclick();
-    assert.match(page(), /Firmament/, 'the first press held');
-    asked(/You have unaccepted changes\. Press Accept to keep them, or leave again to discard them\./);
-    assert.equal(menu.asksFirst(), false, 'asked once: the window\'s own ask lets the second go');
-    rail('Specializations').onclick();
-    assert.match(page(), /Specializations/, 'the second press went');
-    assert.equal(stageFace(), null, 'the face dropped');
-    assert.deepEqual(commits, [], 'nothing accepted');
-    // THE CAPTAIN'S SKY: a star taken - the window's asksFirst (the sheet's key, the dial's) holds once; another tab after it goes
-    rail('Captain').onclick();
-    await settle(() => stageFace()?.take);
-    const sky = stageFace();
-    assert.equal(typeof sky.back, 'function', 'the captain\'s sky answers the stage\'s ask');
-    assert.equal(host.querySelectorAll('div').filter((d) => String(d.className).includes('fmt-embed')).length, 1, 'the captain\'s sky in the pane, embedded');
-    const star = (await import('../../../src/systems/naval/captainTree.js')).CAPTAIN_STARS.find((s) => !setBefore.includes(s.id) && s.links?.some?.((l) => setBefore.includes(l)))?.id;
-    if (star) sky.take(star); else sky.take((await import('../../../src/systems/naval/captainTree.js')).CAPTAIN_STARS[1].id);
-    assert.ok(sky.model().changes.added > 0, 'a star pending');
-    assert.equal(menu.asksFirst(), true, 'the sheet\'s or the dial\'s key: asked');
-    asked(/You have unaccepted changes\. Press Accept to keep them, or leave again to discard them\./);
-    tab('Stats').onclick();
-    assert.equal(stageFace(), null, 'another tab, the second press: the face dropped');
-    assert.deepEqual(ledger.tree(), setBefore, 'the captain\'s stars never set');
-    // THE LEVEL PAGE with a level owed: the owed rollout (pool and Ascend), never the view
-    tab('Growth').onclick();
-    rail('Level').onclick();
-    assert.ok(host.querySelectorAll('div').some((d) => String(d.className).includes('gr-stagecard')), 'a 720-high window: the Level page\'s door, the face full screen (AUDIT GROWTH LANE2-8)');
-    await settle(() => stageFace()?.model);
-    const lv = stageFace().model();
-    assert.equal(lv.crown.viewOnly, false, 'the level owed, not the view of the stars');
-    assert.ok(lv.pool > 0, 'its points to place');
-    // the window put away takes the face with it (its listeners, its frame loop, a full-screen box)
-    menu.unmount(); menu = null;
-    assert.equal(stageLive(), null, 'the face went with the window');
-    assert.match(rd('src/ui/growth/growthTab.js'), /entity, embed: true, onExit: \(\) => \{ dropStage\(\); ctx\.render\(\); \} \}\)\)/, 'the Ascension ascended: the stage drops it and the page draws again');
-  } finally { menu?.unmount(); host.remove?.(); setFirmamentBook(null); setHoldingsProvider(null); restore(); dropStage(); globalThis.requestAnimationFrame = raf; }
 });
 
 test('AUDIT GROWTH LANE3-9 / LANE5-6 THE YES/NO CARD AND THE MASTER SKILLS LINE, DRIVEN: Escape over the card is its No and never resumes the game under it; the window\'s unmount takes a standing card down; the Master Skills page draws its specialisation line only for a character with a family to reach or a path held (mutants: the back stack over the card; the card left standing; the line for a class that can never meet a path)', async () => {

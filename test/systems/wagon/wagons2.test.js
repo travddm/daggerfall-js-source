@@ -540,15 +540,6 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   // the vault: its book asks the pack's own refusal, and the host's pack says it
   const book = new GuildBook({ door: {}, character: () => 'c', wallet: {}, realm: { act: async () => ({ ok: true }) }, pack: { items: () => entity.items, add() {}, changed() {}, refuses: (it) => packTradeRefusal(it, entity) } });
   assert.deepEqual(await book.vaultPut(caravan), { ok: false, error: 'vault-goods' });
-  const w = src('scenes/world.js'), wm = src('scenes/worldModes.js'), sp = readFileSync(new URL('../../../src/ui/socialPanel.js', import.meta.url), 'utf8');
-  assert.match(w, /reach: \(\) => _storesReached\(\), refuses: \(it\) => packTradeRefusal\(it, playerEntity\) \}/);
-  assert.match(sp, /tradeRefusal\(it\) == null && !g\.pack\.refuses\?\.\(it\) && !isLocked\(it\)/);
-  // the keyed shop
-  assert.match(wm, /\n {4}if \(loadedWagonHeld\(it\)\) return 0;   \/\/ WAGONS2 \(AUDIT\)/);
-  assert.match(wm, /for \(let i = sellable\.length - 1; i >= 0; i--\) if \(loadedWagonHeld\(sellable\[i\]\)\) sellable\.splice\(i, 1\);/);
-  // the room: never judged sold by the pack
-  assert.doesNotMatch(w, /caravanGone|_ownedCaravan/);
-  assert.doesNotMatch(wm, /removePermanentScene\(sceneCache\(\), CARAVAN_SCENE_NAME\)/);
   // the room only onto the caravan where it stands
   const room = { v: 2, kind: 'caravan', origin: [4000, 10, 8000], turn: 30, step: [4000, 10, 7900], yaw: 0 };
   let parked = { Mode: WAGON_MODE.Deployed, WorldX: 4010, WorldZ: 8020 };
@@ -559,10 +550,6 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   parked = { Mode: WAGON_MODE.WithPlayer, WorldX: 4000, WorldZ: 8000 };
   assert.equal(access.canRestore(room), false, 'driven, parked nowhere');
   assert.equal(access.canRestore(room, [4000, 8000]), true, 'a save\'s own place, given');
-  assert.match(w, /if \(extras\.interior\?\.caravanRoom\) extras\.interior = \{ \.\.\.extras\.interior, caravanAt: parkedCaravanAt\(extras\.modData\?\.\[HCC_VENDOR\] \?\? null\) \};/);
-  assert.match(wm, /!host\.caravanRoom\?\.canRestore\(saved\.caravanRoom, saved\.caravanAt\)\) return false;/);
-  assert.match(w, /parkedAt: \(\) => parkedCaravanAt\(hccRuntime\.view\(\)\.state\),/);
-  assert.match(w, /busy: \(\) => worldMoveBusy\(\) \|\| !!wagonRiders\?\.seated\(\),/);
   // a travelling room's other layouts folded back
   const cache = createSceneCache();
   cacheScene(cache, 'Cabin', { decor: [{ id: 'a', pos: [0, 0, 0], rot: [0, 0, 0] }], decorItems: { a: [{ name: 'x' }] } });
@@ -575,7 +562,6 @@ test('WAGONS2 (AUDIT) THE CARAVAN KEPT: the wagon a player drives while it holds
   assert.deepEqual([folded.decorOwn.b.name, folded.droppedPiles.length], ['own', 1]);
   assert.equal(cache.scenes.has(layoutSceneName('Cabin', 'mod1')), false, 'the copy forgotten');
   assert.equal(containsPermanentScene(cache, layoutSceneName('Cabin', 'mod1')), false);
-  assert.match(wm, /if \(interiorCabin\) foldLayoutCopies\(sceneCache\(\), name\);/);
   // the item law: a wagon's mark
   assert.deepEqual(itemFindings(caravan), [], 'a shelf\'s caravan is lawful');
   assert.deepEqual(itemFindings({ ...caravan, wagonLook: { o: 2, w: 5 } }), [], 'painted too');

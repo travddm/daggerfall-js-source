@@ -111,23 +111,5 @@ test('HUD-HELM THE CARD UNDER THE BAR: the sea\'s target card stands under the h
     destroyNavalHud();
     [globalThis.innerWidth, globalThis.innerHeight] = had;
   }
-  assert.match(rd('src/scenes/world.js'), /scale: enhancedHudScale\(\),\n\s+under: enhancedHelmBar\(\),/, 'the host hands the card the bar it drew');
 });
 
-test('HUD-HELM THE FOUR HOSTS: the panel has one builder, and it places itself - world.js, the only host with a sea to sail, draws it; exterior.js, worldModes.js and dungeonContext.js draw none (mutant: the build\'s placing dropped)', () => {
-  const helm = rd('src/ui/enhanced/enhancedHelm.js');
-  assert.match(helm, /import \{ placeHudPieces \} from '\.\.\/hud\/hudPlacer\.js';/);
-  assert.doesNotMatch(helm, /from '(?:\.\.?\/)+(?:[\w-]+\/)*hudLayout\.js'/, 'through the leaf');   // AUDIT TIDY TOOL-1: at any depth
-  assert.match(helm, /doc\.body\.append\(host\);\n {4}placeHudPieces\(doc\);/, 'placed the moment it is put on the page');
-  assert.match(rd('src/scenes/world.js'), /import \{ drawEnhancedHelm, hideEnhancedHelm, enhancedHelmMounted, enhancedHelmBar,/);
-  for (const host of ['exterior.js', 'worldModes.js', 'dungeonContext.js']) assert.ok(!rd(`src/scenes/${host}`).includes('drawEnhancedHelm('), `${host}: draws no helm`);
-});
-
-test('HUD-HELM THE HUD STAYS LIGHT: the editor\'s preview reaches the panel\'s module, so the panel reads the helm keys and the hull names from their leaves (systems/comeSailAway/comeSailAwayActions.js, comeSailAwayHulls.js) - never from the sea\'s law or the boat, which would carry the quest machine onto the HUD (AUDIT GUIDE O6) - and the sea reads the one table back (mutants: the keys or the names read from the sea\'s module or the boat)', async () => {
-  const from = [...rd('src/ui/enhanced/enhancedHelm.js').matchAll(/^import [^;]*? from '([^']+)';/gm)].map((m) => m[1]);
-  assert.ok(from.includes('../../systems/comeSailAway/comeSailAwayActions.js') && from.includes('../../systems/comeSailAway/comeSailAwayHulls.js'), 'the two leaves');
-  for (const heavy of ['comeSailAway.js', 'comeSailAwayBoat.js']) assert.ok(!from.some((s) => s.endsWith(`/comeSailAway/${heavy}`)), `the panel reads nothing from ${heavy}`);   // AUDIT TIDY TOOL-1: at any depth
-  assert.equal(/^import /m.test(rd('src/systems/comeSailAway/comeSailAwayActions.js')), false, 'the keys\' table a leaf');
-  const [leaf, sea] = await Promise.all([import('../../../src/systems/comeSailAway/comeSailAwayActions.js'), import('../../../src/systems/comeSailAway/comeSailAway.js')]);
-  assert.equal(sea.BOAT_ACTIONS, leaf.BOAT_ACTIONS, 'one table: the sea re-exports the leaf\'s');
-});

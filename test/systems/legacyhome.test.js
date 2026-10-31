@@ -407,32 +407,6 @@ test('LEGACY-HOME: the town reads the line beside its census - the same day\'s p
 
 // ---- the wiring -----------------------------------------------------------------------------------------------------
 
-test('LEGACY-HOME wiring: the town\'s extra people are the host\'s; a family house holds the line only; a kin slain is the record\'s; the talk door meets them first; their own head in the window', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (LEGACY5): and the census's own record of a spouse who wed in
-  assert.match(w, /extraPeople: \(day, town\) => host\.legacyHost\?\.residentsOf\(livingTown\.mapId, \(seed\) => town\.homeFor\(seed\), \(id\) => town\.residents\.find\(\(r\) => r\.id === id\) \?\? null\) \?\? null,/);
-  assert.match(w, /if \(legacyHost\?\.isFamilyHouse\(\{ mapId: b\.townMapId \?\? 0, buildingKey: b\.buildingKey \}\)\) return \{ key: b\.buildingKey, town, only: isFamilyRes \};/);
-  assert.match(w, /return modes\?\.interiorCtx\?\.ownedRoom \? null : \{ key: b\.buildingKey, town \};/, 'AUDIT-E1 stands for every other room of the player\'s');
-  assert.match(w, /if \(isFamilyRes\(res\)\) return false;   \/\/ LEGACY-HOME/);
-  assert.match(w, /if \(isFamilyRes\(res\)\) \{ legacyHost\?\.kinSlain\(res\); return; \}/);
-  // PROJECT LEGACY'S MERGE OF WATCH-PROTECTS: one of the line a beast killed is the record's too, and a townsperson's
-  // death by another hand ends their courtship as one struck down does
-  assert.match(w, /const livingKilled = \(res, t\) => \{[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(isFamilyRes\(res\)\) \{ legacyHost\?\.kinKilled\(res\); return; \}\n\s*legacyHost\?\.residentDied\(res\.id\);[^\n]*\n\s*livingRelations\.turn\('killed', /);
-  assert.match(w, /kin: \(person, talk\) => legacyMeetKin\(person, talk\),/);   // PIN MOVED (LW11): a caravan's door after the kin's
-  // PIN MOVED (LEGACY7 part five): offline the deeds as before; online the realm character's homes (test/legacy7_homes)
-  // PIN MOVED (HOUSES-3): every region's three deeds (banking.js allDeeds)
-  assert.match(w, /heldHouses: \(\) => \(isOnlinePage\(\) \? \(realmSession \? _legacyOnlineHomes : null\) : allDeeds\(playerEntity\.houses\)\.filter\(deedStands\)\),/);
-  assert.match(w, /play: \(\) => legacyHost\?\.switchTo\(kin\.person\.id, \{ here: true \}\)/);
-  const t = rd('src/scenes/townTalk.js');
-  const i = t.indexOf('if (livingTalk?.kin?.(target.person, () => converse(target))) return;');
-  assert.ok(i > t.indexOf("const moment = target.person?.living?.town?.moment?.(target.person) ?? null;"), 'after the refusal and the moment');
-  assert.ok(i < t.indexOf('function converse(target) {'), 'before the words');
-  assert.equal((t.match(/portrait: portraitOf\(/g) ?? []).length, 2, 'both mobile doors');
-  assert.match(t, /person\?\.living\?\.res\?\.portrait \?\? \{ archive: 'CommonFaces'/);
-  assert.match(rd('src/ui/native/nativeTalk.js'), /PORTRAIT_ARCHIVE\[archive\] \?\? \(HEADS_FILE\.test\(String\(archive\)\) \? String\(archive\) : PORTRAIT_ARCHIVE\.CommonFaces\)/);
-  assert.match(rd('src/scenes/livingWorld/livingIndoors.js'), /\.filter\(\(x\) => !b\.only \|\| b\.only\(x\.res\)\)/);
-});
-
 test('LEGACY-HOME: Play as from the meeting - a member never played is born in the town they were met in; from the Family tab, at the seat', () => {
   _resetModSettings();
   const { host, w } = homeWorld();

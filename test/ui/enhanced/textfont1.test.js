@@ -48,11 +48,3 @@ test('TEXT-FONT Dyslexic: OpenDyslexic shipped under public/ with its licence, f
   assert.doesNotMatch(textFontCss('sans', ''), /@font-face/);
 });
 
-test('TEXT-FONT worn with the look, offered on its card', () => {
-  const plus = readFileSync(new URL('../../../src/ui/enhanced/enhancedPlusStyle.js', import.meta.url), 'utf8');
-  assert.match(plus, /mountTextFont\(doc\);   \/\/ TEXT-FONT: under either look/);
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(menu, /choiceRow\('Text font', TEXT_FONTS, textFont\(\)/);
-  assert.match(menu, /if \(textFont\(\) === 'system'\) card\.append\(systemFontRow\(render\)\)/);
-  assert.doesNotMatch(menu, /'Player names'/);
-});

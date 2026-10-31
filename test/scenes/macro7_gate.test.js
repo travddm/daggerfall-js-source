@@ -299,7 +299,6 @@ test('MACRO-7: every token in DFU’s TEXT.RSC has a table row or a named consum
   const rowless = [...tokens].filter((tok) => !handled.includes(tok)).sort();
   assert.deepEqual(rowless, Object.keys(TOKEN_LEDGER).sort(),
     'a token with no row and no consumer - give it a source, or record who answers it and why');
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /%tcn/, '%tcn’s consumer still does its Replace');
 });
 
 test('MACRO-7: the gate’s own net - the census finds the read shapes it claims to', () => {

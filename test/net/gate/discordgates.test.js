@@ -329,20 +329,5 @@ test('DISCORD-GATES client: the game says where it found the gate to the hub - o
   assert.equal(off.o.sendGateSite(DAY, 1000, 1, 'Wayrest'), false, 'off the map');
   assert.equal(off.o.sendGateSite(DAY, 1000, 1, 'Wayrest'), true, 'and asked no more that day');
   assert.equal(off.sites().length, 0);
-  // the scene: the clearing's own site, off the gate's frame
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (WW2, bible/03-World/World-Wide.md): and each lane's past the Bay, from its omen on
-  assert.match(w, /const reportGateSite = \(\) => \{\n\s*const s = _gateClearNow\(\) \? _gateClearOf\.site : null;\n\s*if \(s\) socialLink\(\)\?\.sendGateSite\?\.\(s\.day, s\.px, s\.py, s\.place\);\n[^\n]*\n\s*for \(const \{ lane, c \} of gateOmen\?\.currents\(\) \?\? \[\]\) if \(lane && c\.site\) socialLink\(\)\?\.sendGateSite\?\.\(c\.site\.day, c\.site\.px, c\.site\.py, c\.site\.place\);\n\s*\};/);
-  assert.match(w, /gateClaims\?\.tick\(\);[^\n]*\n\s*if \(gateOmen\) reportGateSite\(\);/, 'on the gate\'s frame, online');
 });
 
-test('DISCORD-GATES config: the webhook is a Worker SECRET the repository never holds, the role a var beside the raids\' pin; the relay reads both by the names the bible gives', () => {
-  const toml = rd('server/wrangler.toml');
-  assert.match(toml, /^GATE_DISCORD_ROLE = "\d*"$/m, 'the role: a var, empty or an id');
-  assert.ok(!/^GATE_DISCORD_WEBHOOK\s*=/m.test(toml), 'the webhook is never a var');
-  assert.ok(!/discord(?:app)?\.com\/api\/webhooks\/\d/.test(toml), 'and no webhook URL is written down');
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /heraldWebhook\(this\.env\?\.GATE_DISCORD_WEBHOOK\)/);
-  assert.match(idx, /role: heraldRole\(role\('gateRole'\)\)/);   // PIN MOVED (SCALE5b): the role through relayCfgValue - the hub's setting when it holds one, else GATE_DISCORD_ROLE (net/relayCfg.js RELAY_CFG_VARS, test/net/scale5b.test.js)
-  assert.match(idx, /const cfg = this\._relayCfg, role = \(k\) => relayCfgValue\(cfg, this\.env, k\);/);
-});

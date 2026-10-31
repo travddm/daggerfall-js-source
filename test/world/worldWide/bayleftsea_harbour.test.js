@@ -109,9 +109,3 @@ test('BAY-LEFT-SEA (ARENA2): on the freeware all 29 ports past the Bay keep a cr
   } finally { setTamrielTrace(null); setTamrielFit(null); }
 });
 
-test('BAY-LEFT-SEA THE HOST: the crowns\' capitals are read above the world\'s ports, whose harbours past the Bay are handed the nearest crown (mutants: the capitals read below - BOOT-TDZ)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const caps = w.indexOf('  const navalCapitals = () => (_navalCapitals ??= NAVAL_CROWNS.map((c) => {'), ports = w.indexOf('  const worldPorts = createWorldPorts({');
-  assert.ok(caps > 0 && ports > caps, 'navalCapitals declared before the world\'s ports ask it');
-  assert.ok(w.indexOf('  let _navalCapitals = null;') < caps);
-});

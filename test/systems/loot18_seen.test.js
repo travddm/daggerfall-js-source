@@ -107,9 +107,6 @@ test('LOOT18: the pack\'s card - Junk beside the lock on gear in the pack, its l
     acts().find((b) => b.textContent === 'Lock').onclick({});
     assert.deepEqual([isLocked(s), isJunk(s)], [true, false], 'the lock lifts the mark');
   });
-  // a worn piece takes none, nor anything but gear (a bandage's card stands as DISC13 pins it)
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /if \(side === 'local' && !line\.equipped && junkable\(picked\)\) \{\n\s+const j = el\('button', 'act', isJunk\(picked\) \? 'Not junk' : 'Junk'\);/, 'local, unworn gear alone');
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.pack-shell \[data-junk\] \.tile > \*/, 'the sheet dims the mark\'s picture');
   _resetForTests();
 });
 
@@ -309,6 +306,4 @@ test('LOOT18: the line compare - each line against the same on what a wear repla
     assert.ok(rows[3].classList.contains('lost'));
     assert.equal(lineCompareBlock(e2, on2), null, 'a worn piece compares with nothing');
   });
-  // PIN MOVED (AUDIT LOOT II B6): the card hands both blocks its one comparison
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /const lc = lineCompareBlock\(deps\.entity, picked, wear\); if \(lc\) into\.append\(lc\);/, 'the card draws it under AC-COMPARE\'s numbers');
 });

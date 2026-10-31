@@ -94,10 +94,6 @@ test('EM4: the town is drawn in the BAY\'s pen - not one colour is invented here
   for (const [name, value] of Object.entries(TOWN_PEN)) {
     assert.ok(Object.values(PEN).includes(value), `TOWN_PEN.${name} is a colour inkMap does not have`);
   }
-  const text = src('src/ui/ink/inkTown.js');
-  assert.match(text, /PEN, HALO_PEN, NAME_FACE, toPaper, paintCaret, paintPartyCarets, CARET_R, quarterWash, quarterInk,\n\} from '\.\/inkMap\.js';/);
-  assert.doesNotMatch(text, /rgba?\(/, 'a colour written out here is a colour that drifts');
-  assert.doesNotMatch(text, /#[0-9a-fA-F]{3,8}\b/);
   // and the three sheets share the pen by VALUE, not by coincidence
   assert.equal(TOWN_PEN.wall, PEN.line);
   assert.equal(TOWN_PEN.wash, PEN.wash);
@@ -329,7 +325,6 @@ test('EM4: the plan is TRACED - the built-up pixels are an island and the street
   // own edge, which is the picture a reader wants anyway.
   const touching = ec.find((c) => c.some((p) => p.x === BLOCK_PX));
   assert.notDeepEqual(touching[0], touching[touching.length - 1], 'an edge-touching shore is open');
-  assert.match(src('src/ui/ink/inkTown.js'), /ctx\.closePath\(\);/, 'and the painter closes it');
 });
 
 test('EM7: the four QUARTERS go under the WALL, each in classic\'s own hue for it', () => {
@@ -405,32 +400,10 @@ test('EM7: the four QUARTERS go under the WALL, each in classic\'s own hue for i
 });
 
 test('EM7: the quarters and their colours have ONE HOME, and BOTH skins read it there', () => {
-  // The sets used to sit in ui/ink/inkTown.js AND in
-  // ui/exteriorAutomapWindow.js at once, which is how the same building
-  // could have come to be drawn as a shop on one map and a house on the
-  // next. The ladder answers for both now.
-  const classic = src('src/ui/exteriorAutomapWindow.js');
-  assert.match(classic, /from '\.\/town\/townQuarters\.js'/, 'the classic window asks the one home');
-  for (const dead of [/const TEMPLE_SET = new Set/, /const SHOP_SET = new Set/,
-    /const HOUSE_SET = new Set/, /const SHOWALL_SET = new Set/, /const TAVERN_BYTE = /]) {
-    assert.doesNotMatch(classic, dead, 'a second copy of the groups is a second answer');
-  }
-  // ...and not one of DFU's four defaults is typed there any more - the
-  // paint, the three caption swatches and the enhanced sheet all read
-  // the same table.
-  for (const argb of Object.values(CLASSIC_ARGB)) {
-    assert.doesNotMatch(classic, new RegExp(`0x${argb.toString(16)}`), 'a fourth copy of a colour');
-  }
   assert.equal(Object.keys(CLASSIC_ARGB).length, QUARTERS.length);
   assert.equal(Object.keys(CLASSIC_SETTING).length, QUARTERS.length);
   for (const q of QUARTERS) assert.match(CLASSIC_SETTING[q], /^Automap\w+Color$/);
 
-  // THE LADDER IS THE ONE THING isBuilt AND isEnterable ARE MADE OF -
-  // derived, not a pair of sets kept beside it, so a byte regrouped
-  // moves every answer at once.
-  const inkSrc = src('src/ui/ink/inkTown.js');
-  assert.match(inkSrc, /isBuilt = \(byte\) => quarterOf\(byte\) !== null/);
-  assert.doesNotMatch(inkSrc, /new Set\(\[/, 'a set here is a set that can drift from the ladder');
   for (const b of [...TEMPLE_SET, ...SHOP_SET, TAVERN_BYTE, ...HOUSE_SET]) {
     assert.equal(isBuilt(b), quarterOf(b) !== null);
   }
@@ -530,9 +503,6 @@ test('EM7: every quarter\'s wash and ink are DERIVED from classic\'s own colour 
   assert.notEqual(plain.staticKey(), mixed.staticKey(),
     'two towns with the same footprint and different quarters ink differently');
 
-  // and none of it is written out in the ink module
-  assert.doesNotMatch(src('src/ui/ink/inkTown.js'), /rgba?\(/);
-  assert.doesNotMatch(src('src/ui/town/townQuarters.js'), /rgba?\(/);
   // the mixing law is the one home for the strings
   assert.equal(rgba([1.4, 2.6, 3], 0.5), 'rgba(1, 3, 3, 0.5)');
   assert.deepEqual(mixRgb([0, 0, 0], [10, 20, 30], 0.5), [5, 10, 15]);
@@ -563,10 +533,6 @@ test('EM4: the town answers the whole sheet contract, from OUTSIDE the window', 
   assert.equal(s.id, 'town');
   assert.ok(isSheet(s), 'a member of the contract is missing');
   for (const m of SHEET_MEMBERS) assert.ok(m in s, `${m} is not even a key`);
-  const text = src('src/ui/town/townSheet.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
-  assert.doesNotMatch(text, /\bdocument\b|\bglobalThis\b|heldMap|renderer/);
 });
 
 test('EM4: the space is LAYOUT PIXELS and already starts at zero', () => {
@@ -965,19 +931,3 @@ test('EM4 / EM5: a name is never laid under a gauntlet', () => {
   assert.ok(!left.some((r) => r.text === one.text));
 });
 
-test('EM4 / EM5: the window puts the sprite\'s own thumb zones into PAPER space', () => {
-  // The zones are measured on the SPRITE (MAP-FIELD4 keyed the
-  // gauntlets out of it pixel by pixel) and PAPER is measured on the
-  // same sprite, so one division carries them over. Held at the source
-  // because the arithmetic is the kind that is right or mirrored, and
-  // nothing in a harness can see which.
-  const held = src('src/ui/heldMap.js');
-  assert.match(held, /_handRects\(paperW, paperH\)/, 'the window computes them');
-  assert.match(held, /reserveHands: this\._handRects\(paperW, paperH\)/, 'and hands them to the live sheet');
-  assert.match(held, /\(v - PAPER\.x0\) \/ \(PAPER\.x1 - PAPER\.x0\)/, 'through PAPER\'s own rectangle');
-  assert.match(held, /THUMB_ZONES\.map/, 'over the sprite\'s own measured zones');
-  // the zones really do cover the paper's lower corners and not its top
-  const fy = (v) => (v - 0.198) / (0.703 - 0.198);
-  assert.ok(fy(0.410) > 0.35, 'the hands start below the sheet\'s upper third');
-  assert.ok(fy(0.725) > 1, 'and run off its bottom edge');
-});

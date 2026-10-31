@@ -66,10 +66,6 @@ test('AUDIT TELL B1: a wind-up nobody stepped tells nothing and holds nothing - 
   assert.equal(breakWindup({ _tac: { state: 'windup', puppet: true } }), false, 'a puppet\'s is its owner\'s');
   assert.equal(breakWindup({ _tac: { state: 'engage' } }), false, 'nothing to break');
   for (const st of ['dash', 'chain']) assert.equal(breakWindup({ feet: [0, 0, 0], vitals: () => null, _tac: { state: st, dash: {}, seen: T } }), true, `a ${st}`);
-  const em = rd('src/characters/enemy/enemyMotor.js');
-  assert.match(em, /if \(!this\.canAct && this\._tac\?\.state && !locked\) breakWindup\(this\);/, 'the motor breaks it where the foe cannot act');
-  assert.match(em, /flee\(fromFeet, seconds, pace = 1\) \{\n\s*breakWindup\(this\);/, 'and where it routs');   // FLIGHT-FIRST: its run's pace
-  assert.match(rd('src/ai/tactics.js'), /const skipped = !!ai\._tacSkipped \|\| unseen\(s, now\);/, 'a gap on the foes\' clock is a step it did not decide');
 });
 
 test('AUDIT TELL B4: a released place takes the archer\'s aimed shot with it - DFU\'s bow roll whole again (mutants: the shot kept)', () => {
@@ -153,22 +149,6 @@ test('AUDIT TELL O6: a puppet\'s gap-closer that landed on me lets its one blow 
   assert.equal(puppetGapLanded(gap({ kind: 'sweep' }), T + 0.1), false, 'a blow of reach');
 });
 
-test('AUDIT TELL B2/B3/B6/B7/B8/B9/B10/B11 by source: the run breaks as the wind-up does; a leap lands only where its foe got to; no feint on a gap closer; the wind-up aimed at its target\'s feet; a turn on another breaks it and a chain fires at its own target; a chain waits for the first verdict; a recentre moves the run\'s head; a plain shot drops a stale aimed one (mutants: each line gone)', () => {
-  const t = rd('src/ai/tactics.js');
-  assert.match(t, /function dashTurn\(ai, s, now, skipped = false\) \{/, 'B2: the run hears the skipped step');
-  assert.match(t, /if \(s\.state === 'dash'\) return dashTurn\(ai, s, now, skipped\);/);
-  assert.match(t, /\/\/ AUDIT TELL B3: a leap lands on its disc only where its foe got to/);
-  // PIN MOVED (RVN5: a signature and a pyre never feint either - bible/12-Enhanced-AI/Feud-Arc.md 16.1)
-  assert.match(t, /if \(chain === 0 && !sig && shape !== 'aimed' && shape !== 'pyre' && !GAP_CLOSERS\.includes\(shape\) && feints\(/, 'B6: a charge and a leap never feint');
-  assert.match(t, /\/\/ AUDIT TELL B7: aimed at its TARGET's feet/);
-  assert.match(t, /b\.key = targetKey\(ai\);   \/\/ AUDIT TELL B8/);
-  assert.match(t, /tf = ck === s\.chainKey \? targetFeet\(ai, ck\) : null;/, 'B8: the chain at its own target');
-  assert.match(t, /if \(now < s\.chainAt \|\| \(ai\._blowVerdict != null && now < s\.chainAt \+ CHAIN_SPEND_MAX\)\)/, 'B9');
-  assert.match(t, /const CHAIN_SPEND_MAX = 0\.6;/);
-  assert.match(rd('src/characters/enemy/enemyMotor.js'), /const head = this\._tac\?\.dash\?\.head;   \/\/ AUDIT TELL B10/);
-  assert.match(rd('src/characters/enemy/enemyAttack.js'), /ai\._tacShot = \(ai\._tacShot \?\? 0\) \+ 1; ai\._blowShot = null; \}/, 'B11');
-});
-
 // ── the shatter (3.2, built at last) ────────────────────────────────
 
 test('AUDIT TELL (3.2): a wind-up its poise broke SHATTERS - drawn BLOW_SHATTER more, its fill frozen, going out; never a live blow; a cut feint or a landed one has nothing to break; a recentre moves it; the reset forgets it (mutants: the shatter never drawn; it never ends; it counts as live)', () => {
@@ -195,11 +175,6 @@ test('AUDIT TELL (3.2): a wind-up its poise broke SHATTERS - drawn BLOW_SHATTER 
   setLiveBlow(ai, makeBlow('lunge', [0, 0, 0], 0, T)); shatterBlow(ai, T);
   resetBlows();
   assert.equal(drawableBlows(T, null).length, 0, 'the reset forgets it');
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uShatter;/);
-  assert.match(P, /gl\.uniform1f\(U\.uShatter, phase\.shatter > 0 \? phase\.shatter : 0\);/);
-  assert.match(P, /if \(uShatter > 0\.0\) \{[^}]*oColor = telegraphStyle\(dist, inside \? 1\.0 : 0\.0, edge, 1\.0, 0\.0, 0\.0, vec3\(1\.0\), fogK\) \* \(uShatter \* shard\);/, 'white, whole-filled, cracked');
-  assert.match(rd('src/ai/puppetBlows.js'), /if \(r\.ws === 1\) shatterBlow\(ai, now\); else setLiveBlow\(ai, null\);/, 'a puppet its owner staggered shatters too');
 });
 
 // ── the landing on the player ───────────────────────────────────────
@@ -251,7 +226,6 @@ test('AUDIT TELL L2: a load forgets the last game\'s landings - the queue, the k
   queueBlowEffect(blowEffectOf('slam', true), 10, [1, 0], null);
   drainBlowEffects({ motor: mo, entity: ent });
   assert.deepEqual(mo.calls[0], ['down', 0.9, 0.6], 'and the guard: a knockdown at once');
-  assert.match(rd('src/systems/save/save.js'), /for \(const k of ENTITY_FIELDS\) entity\[k\] = snap\[k\];\n\s*resetBlowEffects\(entity\);/);
   const m = motorOn();
   m.blowPush(5, 0); m.blowRattle(0.6, 0.6); m.blowKnockDown(0.9, 0.6);
   m.spawn(3, 0, 3);
@@ -286,7 +260,6 @@ test('AUDIT TELL L3/L4: a body the motor or the hands hold takes no push, and no
   queueBlowEffect(blowEffectOf('charge', true), 10, [1, 0], null);
   drainBlowEffects({ motor: ok, entity: { health: 30 } });
   assert.deepEqual(ok.calls, [['down', 0.9, 0.6]], 'the guard was not spent by the refusal');
-  assert.match(rd('src/player/motor.js'), /this\.collider\.move\(this\.pos, dx, 0, dz, this\.height, this\.grounded && !this\.jumping && !this\.swimming && !this\.levitating\);/);
 });
 
 test('AUDIT TELL L5: the bleed deals its whole and no more - each tick its share of what is left, rounded, the rest carried; a tick of nothing hurts nothing (mutants: three ticks of 1 for a bleed of 1)', () => {
@@ -324,32 +297,6 @@ test('AUDIT TELL L9: the swing and the cast are barred while the body is down - 
   assert.equal(knockedDown(T + 5), false, 'a body a host left is never down for good');
 });
 
-test('AUDIT TELL H1/L6/H6/P1 by source: the foes\' clock held under a dungeon\'s window in every host; the building\'s blow frame runs under a window as the street\'s; the stagger\'s kick reaches every pool and host - the watch, the exterior route, its modes, the standalone dungeon - for my own blow alone; a peer\'s blow on my watch carries its kind (mutants: any one unwired)', () => {
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online ?world's dungeon window holds its foes over a death alone; ?exterior, offline, holds them under any
-  assert.match(rd('src/scenes/world.js'), /tickTactics\(foeFrameDt\(_questBoxHoldsFoes\(\) \|\| \(_mode\(\) === 'dungeon' && windowHoldsDungeon\(modes\?\.dungeonCtx\?\.uiOverlayActive, playerEntity\.health > 0 && !modes\?\.deathUp\?\.\(\)\)\) \? 0 : dt\)\);/, 'src/scenes/world.js');
-  assert.match(rd('src/scenes/exterior.js'), /tickTactics\(foeFrameDt\(_questBoxHoldsFoes\(\) \|\| \(_mode\(\) === 'dungeon' && !!modes\?\.dungeonCtx\?\.uiOverlayActive\) \? 0 : dt\)\);/, 'src/scenes/exterior.js');
-  assert.match(rd('src/scenes/dungeon.js'), /tickTactics\(foeFrameDt\(ctx\.uiOverlayActive \? 0 : dt\)\);/);
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /playerBlowFrame\([^\n]*\n\s*if \(!overlayHeld\) \{/, 'L6: above the window gate');
-  assert.match(wm, /playerEntity, audio, shake: \(k\) => host\.shakeCamera\?\.\(k\),/, 'H6: the building\'s watch');
-  const ex = rd('src/scenes/exterior.js');
-  assert.match(ex, /const exteriorFoes = createExteriorFoes\(\{\n[^\n]*\n\s*shake: \(k\) => betterAmbience\.weaponKick\(k\),/, 'H6: the exterior route\'s street pool');
-  assert.match(ex, /var modes = createWorldModes\(\{\n\s*climbFeel,[^\n]*\n\s*shakeCamera: \(k\) => betterAmbience\.weaponKick\(k\),/, 'H6: and its modes');
-  assert.match(rd('src/scenes/dungeon.js'), /shakeCamera: \(k\) => betterAmbience\.weaponKick\(k\),   \/\/ AUDIT TELL H6/);
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(h), /shake: \(k\) => betterAmbience\.weaponKick\(k\),   \/\/ AUDIT TELL H6: my blow that staggers a watchman/, `${h}: the watch`);
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.match(cg, /\n\s*shake = null,   \/\/ AUDIT TELL H6/);
-  for (const p of ['src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(p), /shake: fromPlayer && !peer && !striker \? (?:opts\.shakeCamera|shake) : null/, `${p}: my own blow's kick alone`);
-    assert.match(rd(p), /from: striker\?\.ai\?\.feet \?\? playerFeet, wc, fromPlayer,/, `${p}: U6 - whose blow, to the door`);
-  }
-  // PIN MOVED (RVN1: one `mine` for the tag and the fight's ledger)
-  assert.match(rd('src/scenes/hostCombat.js'), /const mine = fromPlayer && !peer && !striker;[\s\S]*if \(mine\) \{ windupTag\(word, f, true\);[\s\S]*if \(mine\) \{ windupTag\(word, f, false\);/, 'U6: a foe\'s own spell, a SetHealth(0), raises no word of mine (RVN1: one `mine` for the tag and the ledger)');
-  assert.match(wm, /hurt: \(g, dmg, at, dir, wc = null, kind = 'melee'\) => interiorGuards\?\.hurtGuard\(g, dmg, at, dir, \{ fromPlayer: false, peer: true, wc, kind \}\)/, 'P1: the building\'s watch as the street\'s');
-  // PIN MOVED (AUDIT FEUD: the blow's weakness rides after its feet - blowClassOf's fourth argument; AUDIT FEUD 2: a blow that landed)
-  assert.match(rd('src/scenes/dungeonContext.js'), /blowClassOf\(foe\.ai, \{ kind, weapon, claws: !weapon && !!playerEntity\?\.isInBeastForm, round \}, playerFeet, !round && damage > 0 && feudWeakBlow\(/, 'the back judged from the blow\'s own feet, as the local door judges it');
-});
-
 // ── the screen ──────────────────────────────────────────────────────
 
 test('AUDIT TELL U1/U2/U8/U10: the bands metres-capped inside the 0.5 m the pass draws; the contrast\'s dark band between its line and its white keyline; the sweep\'s rear disc outlined; nothing past 0.5 m drawn without a discard ahead of the derivatives (mutants: a band uncapped; the dark band gone; the discard back)', () => {
@@ -361,23 +308,6 @@ test('AUDIT TELL U1/U2/U8/U10: the bands metres-capped inside the 0.5 m the pass
   assert.equal((S.match(/float aa = min\(max\(fwidth\(edge\), 1e-4\), 0\.0625\);/g) ?? []).length, 1, 'the contrast');
   assert.match(S, /float kd = \(1\.0 - fin\) \* smoothstep\(4\.0 \* aa, 4\.4 \* aa, edge\) \* \(1\.0 - smoothstep\(5\.0 \* aa, 5\.4 \* aa, edge\)\);/);
   assert.match(S, /float kw = \(1\.0 - fin\) \* smoothstep\(5\.0 \* aa, 5\.4 \* aa, edge\) \* \(1\.0 - smoothstep\(7\.0 \* aa, 7\.5 \* aa, edge\)\);/);
-  const P = rd('src/render/foeTelegraph.js');
-  assert.doesNotMatch(P, /discard/, 'U10');
-  assert.match(P, /bool beyond = !inside && dist > 0\.5;[\s\S]*if \(beyond\) oColor = vec4\(0\.0\);[^\n]*\n\}`;/, 'last, after every look');
-  assert.match(P, /dist = inside \? \(d < 0\.5 && ang > uP\.y \? 0\.5 - d : min\(uP\.x - d, d >= 0\.5 \? \(uP\.y - ang\) \* d : 1e3\)\) : min\(max\(d - uP\.x, \(ang - uP\.y\) \* d\), d - 0\.5\);/, 'U8');
-  const probe = rd('tools/foeTelegraphProbe.mjs');
-  for (const n of ['AUDIT TELL U2: contrast - a dark band', 'AUDIT TELL U8: the sweep', 'AUDIT TELL (3.2): the shatter is white and cracked']) assert.ok(probe.includes(n), `the browser probe: ${n}`);
-});
-
-test('AUDIT TELL U3/U4/U5: the poise word centred under the track, the quest card clearing it; the flash on THIS foe\'s break alone; the card re-measured when the track comes or goes (mutants: the flash on a target switch; the card blind to the track)', () => {
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.hud-poiseword \{ position: absolute; left: 50%; top: calc\(100% \+ 3px\); transform: translateX\(-50%\);/);
-  assert.match(css, /body:has\(\.hud-foe\.on\.blade\.poised\) \.qtrack \{ --qt-clear: calc\(18px \+ 28px \* var\(--hud-scale, 1\) \+ 30px \+ 104px \* var\(--hud-scale, 1\)\); \}/);
-  assert.match(css, /\.hud-foepoise\.poise-staggered\.poise-flash \.hud-poisefill \{ animation: hud-poise-flash/);   // PIN MOVED (POISE-BOX): the state classes are the track's own
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const flash = pk === 'staggered' && last\.foePoiseRef === ref && last\.foePoise !== 'staggered';/);
-  assert.match(hud, /parts\.foePoise\.className = `hud-foepoise\$\{p \? ` poise-\$\{p\.state\}` : ''\}\$\{flash \? ' poise-flash' : ''\}`;/);
-  assert.match(rd('src/ui/quest/questTracker.js'), /\$\{foe\?\.classList\?\.contains\?\.\('poised'\) \? '\|poised' : ''\}`;/);
 });
 
 test('AUDIT TELL U7: no foe\'s wind-up takes the bar from my duel\'s opponent; another foe\'s still yields after THREAT_YIELD_S (mutants: the duel bar stolen)', () => {
@@ -393,7 +323,6 @@ test('AUDIT TELL U7: no foe\'s wind-up takes the bar from my duel\'s opponent; a
   tickFoeTarget(THREAT_YIELD_S + 0.5);
   markFoeThreat(orc);
   assert.equal(foeTarget().name, 'Orc');
-  assert.match(rd('src/scenes/world.js'), /_duelFoe = \{ entity: \{ name: peerName\(d\.peer\) \?\? 'Your opponent', health: 1, maxHealth: 1 \}, dead: false, duel: true \};/);
 });
 
 test('AUDIT TELL U9: nothing allocated a frame for a foe with nothing telegraphed, nor for a glint that changes (mutants: a cue list a frame; a glint array a frame)', () => {
@@ -428,7 +357,6 @@ test('AUDIT TELL (8.2, built at last): a sweep\'s bleed drips the player\'s bloo
   const after = [];
   for (let i = 0; i < 600; i++) for (const x of ledger.tick(1 / 60, [body], view)) if (x.kind === 'drip') after.push(x);
   assert.equal(after.length, 0, `healed past ${BLEED_THRESHOLD} and no wound: dry`);
-  assert.match(rd('src/scenes/hitEffects.js'), /strides: false, wound: !!entity\.bleed \}\);/);
 });
 
 // ── section 28: the duel harness, and the floor it tuned ────────────

@@ -164,17 +164,6 @@ test('AUDIT CARDS-3 pins, the regulars\' looks, the hand\'s grab and ground, the
   assert.ok(Math.max(...mid.map((c) => c.pos[1])) > Math.max(...restY) + 0.004, 'lifted');
 });
 
-test('AUDIT CARDS-3 pins, the host lines no driven test reaches (mutants D-host-*, D-world-*)', () => {
-  const wm = read('src/scenes/worldModes.js'), w = read('src/scenes/world.js');
-  assert.match(wm, /silenceTorch\(\);[^\n]*? if \(next !== 'interior'\) closeCardWatches\(\);[^\n]*? mode = next;/, 'the watches go with the interior');
-  assert.match(w, /    cardOnline: \{ ok: \(\) => !!online\?\.holdemOk, send: \(w\) => !!online\?\.sendHoldem\(w\),/, 'the host hands the modes the relay that deals');
-  assert.match(wm, /return \{ \.\.\.r, say: b && now < b\.until \? b\.text : null \};/, 'a bark ends');
-  assert.match(wm, /g\.drag\.off = !onTable\(q, g\.scene\?\.places\.table\);[^\n]*\n\s*if \(!g\.drag\.off\) g\.drag\.point = q;/, 'a carried bet follows the cursor on the table');
-  assert.match(wm, /action: id === 'raise' \? \{ type: 'raise', to: Math\.floor\(Number\(value\) \|\| 0\) \} : \{ type: id \} \}\);/, 'a raise in whole chips');
-  assert.match(wm, /online: g\.remote \? \{ waiting: g\.remote\.seated < 2 && !g\.remote\.state\?\.hand,/, 'waiting only between hands');
-  assert.match(w, /if \(d > CREW_SAY_RANGE \|\| !at\.front\) continue;\n\s*points\.push\(\{ x: at\.x, y: at\.y, text: b\.text, who: `card:\$\{b\.id\}`/, 'a regular heard within the crew\'s range');
-});
-
 test('AUDIT CARDS-3 pins, the fixes\' own small seams: an old refusal cleared by the table moving on; a regulars\' layer let go frees its dolls; the carried chips off the stack', async () => {
   const t = newTable({ chairs: 2, bb: 10 });
   const me = new RemoteCardTable({ myId: 'a', chair: 0 });

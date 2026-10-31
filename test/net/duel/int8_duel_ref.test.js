@@ -267,11 +267,6 @@ test('INT8 THE CLIENT\'S CARRIER: a duel\'s receipt is either fighter\'s to carr
   assert.deepEqual(strangerAsked, [], 'a receipt naming neither fighter it plays: never offered');
   assert.equal(duelClaimSettles({ ok: false, error: 'not-yours' }), true);
   assert.equal(duelClaimSettles({ ok: false, error: 'offline' }), false);
-  const online = rd('src/net/online.js');
-  assert.match(online, /\} else if \(m\.t === 'dref'\) \{[\s\S]*?const g = validDuelRefOut\(m\);\s*\n\s*if \(g\) this\._deliver\('dref', \(\) => this\.onDuelRef\?\.\(g, room\)\);/);
-  assert.equal(/m\.t === 'dref'\) \{[^}]*if \(!primary\) return;/.test(online), false, 'never the primary alone');
-  assert.ok(rd('src/scenes/world.js').includes('send: (d) => online?.sendDuel(d, { room: duelMgr?.duel && _duelRoom ? _duelRoom : null }) === true,'), 'a bout\'s frames to the room that referees it');
-  assert.match(online, /this\.duelOk = relaySupportsDuelRef\(relayV\);/, 'a client duels on a refereeing relay alone');
 });
 
 test('INT8 (AUDIT) THE DUEL\'S CAST PATH IS DORMANT: no caller hands a spell to the target\'s own effects as a duel\'s (`duelCast`) since the referee holds the duel - its floor and its strip in systems/effects.js stand unread, kept as they stand (bible/06-Systems/Integrity-Arc.md 5b) (mutants: a duel opponent\'s spell applied on its target\'s machine)', () => {

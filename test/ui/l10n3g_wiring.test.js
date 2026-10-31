@@ -405,8 +405,6 @@ test('L10N3g the start: the new character\'s game (finishChargen) and the world 
   assert.equal(say(), 'il', 'the entity itself, not the wizard\'s constant');
   // THE WORLD HOST'S BOOT: every start, a load included - the first thing bootWorld does, before anything awaits
   assert.equal(sessionHeroGender, handHeroGenderToGrammar, 'the hosts hand it through the session\'s door, one law');
-  assert.ok(/\nexport async function bootWorld\(canvas, renderer, params, status\) \{ handHeroGenderToGrammar\(playerEntity\);/
-    .test(readFileSync(join(ROOT, 'src/scenes/world.js'), 'utf8')), 'bootWorld no longer opens by handing the grammar the live hero');
   const was = playerEntity.gender;
   try {
     sessionHeroGender(playerEntity);

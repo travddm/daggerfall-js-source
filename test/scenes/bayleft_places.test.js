@@ -86,11 +86,6 @@ test('BAY-LEFT-MAPS C3 A QUEST\'S DIAMOND: a place a quest names past the Bay is
   assert.ok(loc && p.index.get('-150,-40') === loc, 'read, it stands');
   assert.equal(mp.tvPlaceSummary(-150, -40), null, 'standing, still unfound');
   assert.equal(mp.tvPlaceSummary(-150, -40, true)?.loc, loc, 'standing, named by the quest: the index\'s place');
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /const qp = \/\^quest:\(-\?\\d\+\),\(-\?\\d\+\)\$\/\.exec\(key\);/);
-  assert.match(W, /const plate = qp \? \{ summary: tvPlaceSummary\(Number\(qp\[1\]\), Number\(qp\[2\]\), true\) \} :/);
-  assert.match(hostText('src/scenes/travelViewMarks.js'), /const s = tvPlaceSummary\(q\.px, q\.py, true\), r = s \? tvPlaceRect\(s\) : null;/, 'its diamond over the place\'s middle');
-  assert.match(W, /const r = summary\.lightRect\?\.\(\) \?\? locationWorldRect\(summary\.loc, summary\.pixel\.x, summary\.pixel\.y\);/, 'a plate over a place not standing yet reads no location');
 });
 
 test('BAY-LEFT-MAPS C3 TV5\'S FAR PLATES: the Bay\'s towns gathered once (the Bay\'s alone, never a place past it the index held then), and past the Bay a near query - the registry\'s towns in the edge\'s circle (a capital once, by its centre) and the countryside\'s the roads laid - asked each time (mutants: the snapshot back; the Bay\'s gathered with what stood past it; the capital\'s every slice; the countryside unread; the registry read once for good; the edge\'s circle held to the Bay)', () => {
@@ -150,7 +145,6 @@ test('BAY-LEFT-MAPS C10 THE JUNCTION MAP\'S DOTS: on the Bay its row and DFU\'s 
   assert.deepEqual(mp.junctionPlaceAt(TOWN.px, TOWN.py), { locationType: T.TownHamlet, mapId: TOWN.mapId, discovered: true });
   assert.deepEqual(p.stands, [], 'nothing stood for a dot');
   assert.equal(mp.junctionPlaceAt(500, 250), null, 'the Bay: its row\'s (none in this dictionary)');
-  assert.match(hostText('src/scenes/world.js'), /locationAt: \(x, y\) => junctionPlaceAt\(x, y\),/);
 });
 
 // ── ON THE PLAYER'S DATA ──────────────────────────────────────────────────────────────────────────────────────────

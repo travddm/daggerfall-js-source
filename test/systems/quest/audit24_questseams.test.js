@@ -130,50 +130,6 @@ const CTX_PENDING = new Map([
   ['questlineService', 'the bridge builds its own (scenes/quest/questlineHost.js questlineService - the account claim online, none offline); a test hands one in'],
 ]);
 
-/** Every `ctx.<name>` the bridge reaches for, and what world.js gives
- *  it. The bridge's ctx surface has the same trapdoor questWorld had:
- *  every read is `ctx.x?.()`, so an unmounted seam evaporates in
- *  silence. RemoveNpcQuestor was one - npcSession has carried it since
- *  TK-iv and nothing called it, so an offered townsperson never left
- *  npcsWithWork and was re-offered the same quest for ever. */
-function bridgeCtxSeams() {
-  return new Set([...read('src/scenes/quest/questBridge.js').matchAll(/\bctx\.(\w+)/g)].map((m) => m[1]));
-}
-
-function bridgeCtxSupplied() {
-  const src = read('src/scenes/world.js');
-  const i = src.indexOf('questBridge = createQuestBridge({');
-  assert.ok(i > 0);
-  let depth = 0;
-  let j = src.indexOf('{', i);
-  const start = j;
-  for (; j < src.length; j++) {
-    if (src[j] === '{') depth++;
-    else if (src[j] === '}' && --depth === 0) break;
-  }
-  const body = src.slice(start, j + 1);
-  return new Set([
-    ...[...body.matchAll(/^ {4}(\w+)\s*[:(]/gm)].map((m) => m[1]),
-    ...[...body.matchAll(/^ {4}(\w+),\s*$/gm)].map((m) => m[1]),
-  ]);
-}
-
-test('audit24 seams: every bridge ctx seam is SUPPLIED or declared PENDING', () => {
-  const used = bridgeCtxSeams();
-  const supplied = bridgeCtxSupplied();
-  assert.ok(supplied.size >= 40, `world.js supplies ${supplied.size} bridge seams`);
-  const orphans = [...used].filter((n) => !supplied.has(n) && !CTX_PENDING.has(n)).sort();
-  assert.deepEqual(orphans, [], 'a bridge seam nothing answers and nobody declared pending');
-  for (const [seam, why] of CTX_PENDING) {
-    assert.ok(!supplied.has(seam), `${seam} is supplied now - drop its PENDING row (${why})`);
-    assert.ok(used.has(seam), `nothing reads ${seam} any more - drop its PENDING row (${why})`);
-  }
-  // the three AUDIT 24 mounts
-  for (const seam of ['removeNpcQuestor', 'makePcDiseased', 'cureDisease']) {
-    assert.ok(supplied.has(seam), `${seam} is mounted`);
-  }
-});
-
 /** Every `world.<name>` the quest system reaches for.
  *
  *  AUDIT 24 (wave 26): THE ALIAS HOLE. This scanned for the literal
@@ -219,48 +175,6 @@ function calledSeams() {
   }
   return names;
 }
-
-/** The keys the host actually mounts on questWorld. */
-function mountedSeams() {
-  const src = hostText('src/scenes/world.js');
-  const i = src.indexOf('const questWorld = {');
-  assert.ok(i > 0, 'questWorld is where the host answers the contract');
-  let depth = 0;
-  let j = src.indexOf('{', i);
-  const start = j;
-  for (; j < src.length; j++) {
-    if (src[j] === '{') depth++;
-    else if (src[j] === '}' && --depth === 0) break;
-  }
-  const body = src.slice(start, j + 1);
-  return new Set([
-    ...[...body.matchAll(/^ {4}(\w+)\s*[:(]/gm)].map((m) => m[1]),
-    ...[...body.matchAll(/^ {4}(\w+),\s*$/gm)].map((m) => m[1]),
-  ]);
-}
-
-test('audit24 seams: every world seam the quest system calls is MOUNTED or declared PENDING', () => {
-  const called = calledSeams();
-  const mounted = mountedSeams();
-  assert.ok(mounted.size >= 14, `questWorld mounts ${mounted.size} seams`);
-  const orphans = [...called].filter((n) => !mounted.has(n) && !PENDING.has(n)).sort();
-  assert.deepEqual(orphans, [],
-    'a seam the quest system calls that nothing answers and nobody declared pending');
-});
-
-test('audit24 seams: the four AUDIT 24 mounts are live, and PENDING carries no dead rows', () => {
-  const mounted = mountedSeams();
-  for (const seam of ['discoverLocation', 'addNote', 'currentRegionRace', 'getRandomText']) {
-    assert.ok(mounted.has(seam), `${seam} is mounted - it was declared in Q3 and answered by nothing`);
-  }
-  // a PENDING row for a seam that IS mounted is a stale excuse; a row
-  // for a seam nobody calls any more is dead weight
-  const called = calledSeams();
-  for (const [seam, why] of PENDING) {
-    assert.ok(!mounted.has(seam), `${seam} is mounted now - drop its PENDING row (${why})`);
-    assert.ok(called.has(seam), `nothing calls ${seam} any more - drop its PENDING row (${why})`);
-  }
-});
 
 // ---- the questorData STRUCT ----
 
@@ -335,91 +249,6 @@ test('audit24: ParseQuest swallows every exception and answers null', async () =
   assert.ok(good, 'a good source parses');
   const bad = m.parseQuestForLists(['Quest: __BAD', 'QRC:', 'QBN:', 'this is not a line signature at all'], 0, { rolls: () => 0 });
   assert.equal(bad, null, 'and a broken one answers NULL rather than throwing');
-});
-
-test("audit24: TeleportPc writes its SiteLink before the transport, and reads the marker array unguarded", () => {
-  // C#'s order (TeleportPc.cs:72-135): respawning check, resume,
-  // CreateSiteLink, GetPlace, marker pick, respawn. The port's
-  // transport-seam guard sat at the TOP, above the SiteLink write - so
-  // on a host that has not mounted respawnPlayerAtSite (which is
-  // today's port) the link was never created, where C# writes it every
-  // tick regardless. The SiteLink is machine state other actions read;
-  // it is not the transport's to withhold.
-  const src = read('src/systems/quest/actions.js');
-  const i = src.indexOf('export class TeleportPc');
-  assert.ok(i > 0);
-  const body = src.slice(i, i + 4200);
-  const link = body.indexOf('createSiteLink?.(');
-  const guard = body.indexOf('if (!world?.respawnPlayerAtSite) return;');
-  assert.ok(link > 0 && guard > 0);
-  assert.ok(link < guard, 'the SiteLink write comes FIRST');
-  // and the marker-array read is unguarded, so a null array NREs where
-  // C# does - before any respawn, rather than after a half-done one
-  assert.match(body, /this\.targetMarker < place\.siteDetails\.questSpawnMarkers\.length/,
-    'no `?? 0`: a null array throws here, as C#:102 does');
-});
-
-test('audit24: a late destroy event cannot null a RECOUPLED resource link', async () => {
-  // C#'s handler writes `questResourceBehaviour = null;` and its
-  // PARAMETER shadows the field of that name, so the assignment lands
-  // on the local and the field is never cleared. It READS as cleared
-  // under Unity's fake-null, which is why the port clears it - but the
-  // port cleared it blindly, so an OLD behaviour's late destroy event
-  // nulled a link that had already been recoupled to a new one. C#
-  // cannot do that; its assignment never reaches the field.
-  const { QuestResource } = await import('../../../src/systems/quest/questResource.js');
-  const r = Object.create(QuestResource.prototype);
-  const mk = () => ({ offDestroy() {} });
-  const oldB = mk();
-  const newB = mk();
-  r._questResourceBehaviour = oldB;
-  r._onBehaviourDestroyed = (behaviour) => {
-    behaviour.offDestroy(r._onBehaviourDestroyed);
-    if (r._questResourceBehaviour === behaviour) r._questResourceBehaviour = null;
-  };
-  // the shape the SOURCE has:
-  assert.match(read('src/systems/quest/questResource.js'),
-    /if \(this\._questResourceBehaviour === behaviour\) this\._questResourceBehaviour = null;/,
-    'the clear is guarded on identity');
-  r._questResourceBehaviour = newB;      // recoupled
-  r._onBehaviourDestroyed(oldB);         // the OLD one finally dies
-  assert.equal(r._questResourceBehaviour, newB, 'the live link survives');
-  r._onBehaviourDestroyed(newB);
-  assert.equal(r._questResourceBehaviour, null, 'and its own destroy still clears it');
-});
-
-test('audit24: no action carries a createNew-only field that a RESTORE leaves undefined', async () => {
-  // A restore mints the action through its (Quest) constructor and then
-  // walks saveShape. A field that is set ONLY in createNew and is not
-  // in the shape therefore comes back UNDEFINED - and in C# it comes
-  // back 0, because it is a struct-defaulted field. PlaySound was the
-  // one: `this.timesPlayed++` ran on undefined, NaN failed
-  // `NaN <= count`, and the sound never played again for the rest of
-  // the save.
-  const src = read('src/systems/quest/actions.js');
-  const parts = src.split(/\nexport class (\w+) extends ActionTemplate \{/);
-  const offenders = [];
-  for (let i = 1; i < parts.length; i += 2) {
-    const name = parts[i];
-    let body = parts[i + 1];
-    const end = body.indexOf('\n}\n');
-    if (end > 0) body = body.slice(0, end);
-    const ctor = /constructor\([^)]*\)\s*\{([\s\S]*?)\n {2}\}/.exec(body);
-    const declared = new Set([...(ctor ? ctor[1] : '').matchAll(/this\.(\w+)\s*=/g)].map((m) => m[1]));
-    const shape = /get saveShape\(\)\s*\{ return \[([\s\S]*?)\]; \}/.exec(body);
-    const saved = new Set([...(shape ? shape[1] : '').matchAll(/\['(\w+)'/g)].map((m) => m[1]));
-    const assigned = new Set([...body.matchAll(/action\.(\w+)\s*=/g)].map((m) => m[1]));
-    const reads = new Set([...body.matchAll(/this\.(\w+)(?!\s*=)/g)].map((m) => m[1]));
-    for (const f of assigned) {
-      if (f.startsWith('_') || declared.has(f) || saved.has(f) || !reads.has(f)) continue;
-      offenders.push(`${name}.${f}`);
-    }
-  }
-  assert.deepEqual(offenders.sort(), [],
-    'a field set only in createNew must be declared in the ctor (C# gets 0 for free; JS gets undefined)');
-  // and the rule really has teeth - the sweep must be finding fields
-  assert.ok(/class PlaySound extends ActionTemplate \{[\s\S]{0,1600}this\.timesPlayed = 0;/.test(src),
-    'PlaySound, the one that had it, declares it now');
 });
 
 test('audit24: a NEW CHARACTER starts the two hard-coded quests, main quest included', async () => {

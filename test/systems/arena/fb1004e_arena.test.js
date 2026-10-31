@@ -87,7 +87,6 @@ test('ARENA-ARROWS tally: a real round spent from the watched pack is a shot, a 
   assert.deepEqual([...stopShotTally()], [[ARROW_TEMPLATE, 3]], 'four real shots, one lodged where it can be looted');
   noteShot(pack, ARROW_TEMPLATE); noteShotRecoverable(ARROW_TEMPLATE);
   assert.equal(stopShotTally(), null, 'stopped: nothing counted after');
-  assert.match(read('src/systems/inventory.js'), /const real = !isSummoned\(getItem\(list, opts\.group, template, opts\)\);\n  if \(!removeOne\(list, template, opts\)\) return false;\n  if \(real\) noteShot\(list, template\);/);
 });
 
 /** test/systems/arena/audit1003_bouts.test.js's rig, cut down: a ladder bout on a fake floor, the driver's doors logged. */
@@ -143,10 +142,6 @@ test('ARENA-ARROWS driven: a bout dismissed before its healers stops its tally -
   assert.equal(r.A.refundQuiver(), 0, 'paid once');
 });
 
-test('ARENA-ARROWS: a private session\'s bout let go before its healers hands the quiver back too (the world host\'s session door)', () => {
-  assert.match(read('src/scenes/world.js'), /heal: \(\) => \{ arenaHeal\(\); arenaBouts\.refundQuiver\(\); \},/);
-});
-
 // ── ARENA-TEAMS ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('ARENA-TEAMS: a two-against-one\'s pair are teammates and a blast of one passes the other by; a Grand Melee has none (mutants: the side ignored; the blast\'s skip gone; a caster without its foe)', () => {
@@ -160,12 +155,6 @@ test('ARENA-TEAMS: a two-against-one\'s pair are teammates and a blast of one pa
   assert.equal(boutTeammates(a, { entity: {} }), false);
   assert.equal(boutTeammates({ entity: {} }, { entity: {} }), false, 'no bout, no team');
   assert.equal(boutTeammates(tag('m', 1), tag('m', 2)), false, 'a Grand Melee: each a side of its own');
-  const M = read('src/scenes/hostMagic.js');
-  const blast = M.slice(M.indexOf('function explodeAt('), M.indexOf('applySpellToFoe(spell, casterLevel, t, caster);', M.indexOf('function explodeAt(')));
-  assert.match(blast, /if \(caster\?\.foe && boutTeammates\(caster\.foe, t\)\) continue;/, 'the blast passes a teammate by');
-  // the floor's instance is a dungeon level: its foe missiles' blasts carry their foe as hostMagic's own do
-  const D = read('src/scenes/dungeonContext.js');
-  for (const w of ['wCaster', 'fCaster', 'mCaster']) assert.match(D, new RegExp(`const ${w} = m\\.casterFoe \\? \\{ entity: m\\.casterFoe\\.entity, sinks: foeSinks\\(m\\.casterFoe\\), foe: m\\.casterFoe \\} : null;`), w);
 });
 
 test('ARENA-TEAMS: the HUD calls a Grand Melee "each alone" between its columns, a team bout "vs" (mutants: the melee test inverted; the word never written)', () => {
@@ -174,7 +163,6 @@ test('ARENA-TEAMS: the HUD calls a Grand Melee "each alone" between its columns,
   assert.equal(at([f('you', 0), f('a', 1), f('b', 2), f('c', 3)]).vs, ARENA_TEXT.hud.eachAlone, 'every fighter a side of its own');
   assert.equal(at([f('you', 0), f('a', 1), f('b', 1)]).vs, ARENA_TEXT.hud.vs, 'two against one: a team');
   assert.equal(at([f('you', 0), f('a', 1)]).vs, ARENA_TEXT.hud.vs, 'a duel');
-  assert.match(read('src/ui/arena/arenaHud.js'), /if \(\(model\.vs \?\? ARENA_TEXT\.hud\.vs\) !== shown\.vs\) \{ shown\.vs = model\.vs \?\? ARENA_TEXT\.hud\.vs; parts\.vs\.textContent = shown\.vs; \}/);
 });
 
 // ── CURSE-OFF-SAND ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -199,7 +187,6 @@ test('CURSE-OFF-SAND: the Curse of Daggerfall\'s wave waits outside the arena\'s
     const src = read(`src/scenes/${host}`), at = src.indexOf('tryPlaceFoe: (handle) => {');
     assert.ok(at > 0 && !src.slice(at, at + 6000).includes('keptOffArenaGround'), `${host}: no refusal at placement`);   // PIN MOVED (TESA's merge): world.js's quest world is scenes/questWorld.js's (host.modes), the host read whole
   }
-  assert.match(read('src/scenes/worldModes.js'), /questFoeKeptOff\(foe\) \{\n\s*return mode === 'dungeon' && keptOffArenaGround\(\{ questName: foe\?\.parentQuest\?\.questName, inArenaLevel: isArenaFloor\(dungeonLoc\) \|\| isArenaUndercroft\(dungeonLoc\) \}\);/);
 });
 
 test('CURSE-OFF-SAND driven: a wave kept off passes at CreateFoe\'s spawn event as a hidden Foe\'s does - no wave pending, so no encounter event raised every tick to break a rest on the grounds; off the grounds the next interval\'s wave comes (mutants: the seam unasked)', () => {

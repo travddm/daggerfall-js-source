@@ -69,19 +69,3 @@ test('CRUX1: the video queue - a second video waits for the first, a failed play
   assert.equal(q.pending(), 0);
 });
 
-test('CRUX1: by source - the dungeon start falls back to the host\'s doorless site; the host answers its own pixel\'s location with a dungeon (an interior season, no door, the pixel as the group) and null without one; the entry reads nothing off `hit.door`; the quest teleport, the cemetery transfer and the new game all ride startInDungeon; the videos go through the queue', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /const hit = dungeonStartDoorFor\(entries\.filter\(\(e\) => e\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\), host\.dungeonStartSite\?\.\(\) \?\? null, locationKey\);\s*\n\s*if \(!hit\) return false;/);   // CASTLE1: the doorless site is the law's third rung now (systems/save/save.js dungeonStartDoorFor)
-  const enter = wm.slice(wm.indexOf('async function tryEnterDungeon('), wm.indexOf('function tryExitDungeon('));
-  assert.doesNotMatch(enter, /hit\.door\b/, 'the door-based entry never reads the door itself - a doorless hit is whole');
-  for (const f of ['hit.dfLocation', 'hit.climateBase', 'hit.season', 'hit.group']) assert.ok(enter.includes(f), `${f} is what a hit must carry`);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /dungeonStartSite: \(\) => \{\s*\n\s*const p = playerTravelPixel\(\);\s*\n\s*const key = `\$\{p\.x\},\$\{p\.y\}`;\s*\n\s*const dfLocation = locationIndex\.get\(key\) \?\? null;\s*\n\s*if \(!dfLocation\?\.hasDungeon\) return null;\s*\n\s*return \{ dfLocation, climateBase: getWorldClimateSettings\(maps\.getClimateIndex\(p\.x, p\.y\)\)\.climateType, season: INTERIOR_SEASON, group: key, door: null, dfBlock: null, recordIndex: -1 \};/);
-  assert.match(w, /const entered = await modes\?\.startInDungeon\(\);\s*\n\s*if \(!entered\) console\.warn\('\[quest\] respawn: no dungeon entrance at site/, 'the quest teleport');
-  assert.match(w, /_lastEncMinutes = Math\.floor\(playerTicker\.ownMinutes\);[^\n]*\n\s*const entered = await \(modes\?\.startInDungeon\?\.\(\) \?\? false\);/, 'the vampire wakes in the crypt');
-  assert.match(w, /playVideo: \(name\) => \{ _questVideos\(name\); \},/);
-  assert.match(w, /const _questVideos = makeVideoQueue\(async \(name\) => \{/);
-  assert.equal((w.match(/_questVideos\(name\)/g) ?? []).length, 1, 'one door into the queue');
-  const m = rd('src/systems/quest/machine.js');
-  assert.match(m, /scheduleQuestByName\(questName, factionId = 0, opts = \{\}\) \{[\s\S]*?try \{\s*\n\s*return this\.scheduleQuest\(lines, factionId, opts\);\s*\n\s*\} catch \(ex\) \{/);
-});

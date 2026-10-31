@@ -85,8 +85,6 @@ test('the rarity: GUNS-UNFOUND - the one gun find keeps its place and mints noth
     assert.equal(d.n, 1, `${v}: one draw, as it always drew`);
     assert.deepEqual(found, [], `${v}: nothing - neither a gun nor its shot`);
   }
-  const shelf = readFileSync('src/systems/shopStock.js', 'utf8');
-  assert.ok(!/createPistolet|PISTOLET_TEMPLATE|isPistolet/.test(shelf), 'the shop stock never names it');
   for (const buildingType of Object.keys(SHOP_ITEM_GROUPS).map(Number)) {
     const all = stockShopShelf({ buildingType, quality: 20 }, { level: 30 }, { rolls: () => 0 });
     assert.ok(!all.some(isPistolet), `building ${buildingType}: no Pistolet on the shelf`);

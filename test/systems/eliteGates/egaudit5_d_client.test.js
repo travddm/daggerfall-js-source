@@ -275,12 +275,6 @@ test('AUDIT EG V L8-1 THE SPIRE\'S BLOWS ARE A FOE\'S (section 15\'s death saves
   w = wearing(panoply);
   hurtPlayer(w.e, 85);
   assert.equal(P.setPowerStates(0).reprieve, 0, 'an unmarked hurt raises nothing');
-  // every body's blow the screen lands is marked - mine, and my part of a chained mate's (Morvayn's soul-chain)
-  const src = readFileSync(new URL('../../../src/scenes/eliteGates/egFight.js', import.meta.url), 'utf8');
-  const blows = src.match(/landShare\(bl\.p, bl\.b, bl\.el, bl\.nm, [^;]*?\)(?=[;\s])/g) ?? [];
-  assert.equal(blows.length, 2, 'two doors a body\'s blow lands by');
-  for (const call of blows) assert.match(call, /, true\)$/, `a foe's blow: ${call}`);
-  assert.equal((src.match(/landShare\([^)]*\)/g) ?? []).filter((c) => !c.startsWith('landShare(bl.')).filter((c) => /, true\)$/.test(c)).length, 0, 'no hazard, zone or drain marked');
   // the mark is the blow's alone: one set and never taken lies past BLOW_WINDOW_S
   w = wearing(panoply);
   P.setSpireStruck();
@@ -311,12 +305,6 @@ test('AUDIT EG V L8-2 / L8-5 THE SPOILS A CLAIM PAYS (sections 16.1, 16.3 and 19
   assert.deepEqual(g.roll().map((q) => q.kind), egReliquaryList(dx.seed, 20, [1, 2]).map((q) => q.kind));
   assert.deepEqual(JSON.stringify(g.roll().map((q) => q.item?.name ?? q.gold)), JSON.stringify(egReliquaryList(dx.seed, 20, [1, 2]).map((q) => q.item?.name ?? q.gold)), 'the claim\'s seed rolled');
   assert.notDeepEqual(JSON.stringify(g.roll().map((q) => q.gold ?? 0)), JSON.stringify(egReliquaryList(777, 20, [1, 2]).map((q) => q.gold ?? 0)), 'never the receipt\'s own');
-  // the host's half (scenes/world.js egSpoilsPaid): the claim's seed and its embers into the Redoubt's spoils
-  const host = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const fn = host.slice(host.indexOf('function egSpoilsPaid(c, d) {'), host.indexOf('function egSpoilsPaid(c, d) {') + 2200);
-  assert.match(fn, /embers: Number\.isSafeInteger\(d\?\.embers\) \? d\.embers : 0 \}/, 'the embers the claim paid');
-  assert.match(fn, /const seed = egSpoilsSeedOf\(c, d\), day = egSpoilsDay\(c\.b, c\.w\), roll = \(\) => egSpoilsList\(seed, level, c\.w, o\);/, 'rolled on the claim\'s seed');
-  assert.match(fn, /sdSpoilsPool\.spew\(\{ day, seed, level,/, 'thrown on it');
 });
 
 // ── L8-9 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────

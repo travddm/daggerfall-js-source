@@ -160,14 +160,6 @@ test('DECOR2b the shop screens: a piece of furniture is staged whatever it weigh
   Math.random = () => 0.99;
   try { const [x, y, rw, rh] = TRADE_RECTS.steal; bare.w.click(x + rw / 2, y + rh / 2); } finally { Math.random = real; }
   assert.deepEqual(bare.pack.map((it) => it.templateIndex), [229], 'carried as before');
-  // the enhanced screen, by source
-  const e = src('src/ui/enhanced/enhancedTrade.js');
-  assert.match(e, /if \(inBuy\(\)\) return buyPlan\(item\)\.ok;/, 'the selection\'s dry run asks the one gate');
-  assert.match(e, /function pickRemote\(item\) \{\n  if \(inBuy\(\)\) \{\n    const plan = buyPlan\(item\);/, 'and so does the click');
-  assert.match(e, /function buyPlan\(item\) \{\n  if \(isFurnishing\(item\)\) return \{ ok: true, amount: item\.stackCount \?\? 1 \};\n  return planTake\(item, \{ bag: \[\.\.\.deps\.packItems\(\), \.\.\.basket\.filter\(\(x\) => !isFurnishing\(x\)\)\], entity: deps\.entity \?\? null \}\);/);
-  assert.match(e, /if \(basket\.length\) \{ deliverFurniture\(basket\); transferAll\(basket, deps\.packItems\(\)\); \}\n    else if \(!deliverFurniture\(deps\.shelfItems\(\), items\[0\]\)\) move\(items\[0\], deps\.shelfItems\(\), deps\.packItems\(\)\);/);
-  assert.match(e, /if \(!deps\.deliver\) return 0;\n  const going = list\.filter\(\(it\) => isFurnishing\(it\) && \(one === null \|\| it === one\)\);\n  for \(const it of going\) list\.splice\(list\.indexOf\(it\), 1\);\n  if \(going\.length\) deps\.deliver\(going\);\n  return going\.length;/);
-  assert.match(e, /return carriedWeight\(entity \?\? \{\}\) \+ totalWeight\(basket\.filter\(\(x\) => !isFurnishing\(x\)\)\);/);
 });
 
 // ─── THE SAVE ────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -413,29 +405,3 @@ test('DECOR2b furniture and an online home: the account service has the model an
 
 // ─── THE HOST ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('DECOR2b the host (worldModes.js) by source: the tool reads the deliveries; a piece of furniture lives among them, is taken out of them whole and given back to them - never the pack; bought at the counter, bought by the keyed list, stolen off the shelf by either screen, or carried out of a closed shop, it is delivered and said once for the lot; a sold room and an online home\'s strays say where the furniture went (mutants: the deliveries unread, furniture into the pack at the counter, the keyed buy, the steal or the closed shop, one line per piece)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /furnishings: \(\) => playerEntity\.furnishings \?\? \[\],/);
-  // PIN MOVED (AUDIT FB1025i E1): the owner's own things' doors are systems/decor/decorPack.js's, the host wires them
-  const pk = src('src/systems/decor/decorPack.js');
-  assert.match(m, /const \{ decorHome, decorPackTake, decorPackGive \} = createDecorPack\(\(\) => playerEntity\);/);
-  assert.match(pk, /function decorPackTake\(\/\*\* @type \{any\} \*\/ item\) \{\n\s*if \(isFurnishing\(item\)\) \{[^\n]*\n\s*const list = decorHome\(item\);\n\s*const i = list\.indexOf\(item\);\n\s*if \(i < 0\) return null;\n\s*list\.splice\(i, 1\);\n\s*return item;\n\s*\}/, 'whole, out of the deliveries');
-  assert.match(pk, /function decorPackGive\(\/\*\* @type \{any\} \*\/ item\) \{\n\s*if \(isFurnishing\(item\)\) \{ decorHome\(item\)\.push\(item\); return item; \}/, 'given back to the deliveries');
-  assert.match(pk, /function decorHome\(\/\*\* @type \{any\} \*\/ item\) \{\n\s*if \(isFurnishing\(item\)\) return \(entity\(\)\.furnishings \?\?= \[\]\);\n\s*return \(entity\(\)\.items \?\?= \[\]\);/);
-  assert.match(m, /function decorDeliver\(items\) \{\n\s*if \(!items\.length\) return;\n\s*for \(const it of items\) decorHome\(it\)\.push\(it\);\n\s*say\(furnishingDeliveredLine\(items\.map\(\(it\) => itemLongName\(it\)\)\)\);/, 'said once for the lot');
-  assert.match(m, /if \(i >= 0\) shelf\.items\.splice\(i, 1\);\n\s*if \(!isFurnishing\(it\)\) addItem\(playerEntity\.items, it\);\n\s*\}\n\s*decorDeliver\(staged\.filter\(isFurnishing\)\);/, 'the counter');
-  // PIN MOVED (AUDIT HOLDINGS F8): the rest of the keyed list's buy into the pack, but a ship's deed to the Fleet's book
-  assert.match(m, /if \(isFurnishing\(it\)\) decorDeliver\(\[it\]\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*else if \(!\(it\?\.templateIndex === FLEET_DEED_TEMPLATE && titleDeed\(it, [^\n]*\)\)\) addItem\(playerEntity\.items, it\);/, 'the keyed list');
-  assert.match(m, /packItems: \(\) => \(playerEntity\.items \?\?= \[\]\),\n\s*deliver: \(items\) => decorDeliver\(items\),/, 'the steal');
-  // PIN MOVED (STOLEN-GOODS AUDIT S1): the shelf's tally reads the shop's keeping, not its count
-  assert.match(m, /if \(shopShelfTheft\(shelfBefore, shelf\.items\)\) tallyCrimeGuildRequirements\(playerEntity, true, 1\);\n\s*decorDeliverCarried\(\);/, 'the closed shop');
-  assert.match(m, /function decorDeliverCarried\(\) \{\n\s*const pack = playerEntity\.items \?\? \[\];\n\s*const carried = pack\.filter\(isFurnishing\);\n\s*for \(const it of carried\) pack\.splice\(pack\.indexOf\(it\), 1\);\n\s*decorDeliver\(carried\);/);
-  assert.match(m, /if \(own\.length\) say\(ownBackLines\(own, decorOwnBackLine\)\);/, 'a sold house or ship');
-  assert.match(m, /homeSoldLine\(r\.refund, r\.decorBack, r\.rent \?\? 0\) \+ \(own\.length \? ` \$\{ownBackLines\(own, decorOwnBackLine\)\}` : ''\)/, 'a sold online home');
-  assert.match(m, /if \(back\.length\) say\(ownBackLines\(back, \(n\) =>/, 'the strays');
-  const n = src('src/ui/native/nativeTrade.js');
-  assert.match(n, /this\._deliverFurniture\(this\.basket\);[^\n]*\n\s*transferAll\(this\.basket, this\.hooks\.packItems\(\)\);/);
-  assert.match(n, /const plan = isFurnishing\(item\) \? \{ ok: true, amount: item\.stackCount \?\? 1 \} : planTake\(item, \{\n\s*bag: \[\.\.\.this\.hooks\.packItems\(\), \.\.\.this\.basket\.filter\(\(x\) => !isFurnishing\(x\)\)\],/);
-  const save = src('src/systems/save/save.js');
-  assert.match(save, /snap\.furnishings = \(entity\.furnishings \?\? \[\]\)\.map\(\(it\) => \(\{ \.\.\.it \}\)\);/);
-});

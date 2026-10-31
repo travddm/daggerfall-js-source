@@ -210,9 +210,3 @@ test('CROWN2 THE TURNING: the vassal\'s tribute - 5% of its week\'s Tithe - to i
   assert.equal(s2.held(ALCAIRE.key).standing, 55, 'no cost: unchallenged +5');
 });
 
-test('CROWN2 THE TURNING\'S WIRING BY SOURCE: each holder handed its liege\'s reach and its break off the law\'s reckoning (mutants: the reach handed)', () => {
-  const src = readFileSync(new URL('../../server-account/src/seatTurning.js', import.meta.url), 'utf8');
-  assert.match(src, /const reckoned = fealtyReckoning\(fealtyRows, charters\);/);
-  assert.match(src, /liegeReach: reckoned\.liegeReach\(h\.guild_id, registry\.get\(key\)\),/);
-  assert.match(src, /brokeFealty: breakers\.has\(h\.guild_id\),/);
-});

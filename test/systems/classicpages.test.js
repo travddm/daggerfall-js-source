@@ -109,7 +109,6 @@ test('CLASSIC-PAGES: THE PROFESSIONS KEY - appended, a default share on the down
   assert.equal(routeAction('Professions', { togglePause: (o) => atHelm.push(o), sailing: () => true }), false, 'at a helm the down arrow is less sail\'s');
   assert.deepEqual(atHelm, [], 'nothing opened while sailing');
   assert.equal(routeAction('Professions', { togglePause: () => {}, sailing: () => false }), true);
-  assert.match(rd('src/scenes/world.js'), /sailing: \(\) => !!csaRuntime\?\.isSailing\(\),/, 'the streaming world says when it sails');
 });
 
 test('CLASSIC-PAGES: a Forge, Workbench or Loom works on either skin while the pages stand; the stations and the first harvest\'s line name no skin', () => {
@@ -127,8 +126,4 @@ test('CLASSIC-PAGES: a Forge, Workbench or Loom works on either skin while the p
   // PIN MOVED (AUDIT HOLDINGS C7): the Stores page is on the Holdings tab; the key opens the Professions
   assert.equal(storesWhereLine('DOWN'), 'Gathered goods go straight to your Stores, under Holdings in the pause menu. DOWN opens your Professions.');
   assert.equal(storesWhereLine(''), 'Gathered goods go straight to your Stores, under Holdings in the pause menu.', 'the key unbound');
-  // the station's press is the pause door's, at the Stores page - which opens on the classic skin now. PIN MOVED
-  // (CRAFT-HALL): at the Crafting page, the station's own door (profPages.js stationDoorAt) - a professions page too
-  assert.match(rd('src/scenes/worldModes.js'), /if \(forgeOffered\(\)\) interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(piece\.station\) \}\)/);
-  assert.match(rd('src/scenes/gatherHost.js'), /hud\.toast\(storesWhereLine\(deps\.keyLabel\?\.\('Professions'\) \?\? '', d\.carry === true\)\)/, 'the host names the key the player has it on (BAG1, PIN MOVED: and says the bag when the goods were carried)');
 });

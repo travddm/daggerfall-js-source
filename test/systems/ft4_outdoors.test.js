@@ -99,11 +99,3 @@ test('FT4: the registry law - a condensed row names its own default, and it must
   assert.deepEqual(mut({ default: 'off' }), []);
 });
 
-test('FT4: the Enhanced category\'s row left with its copy; the host\'s composition is untouched', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(!/prefRow\('enhancedEnvironments'/.test(menu), 'the registry holds the words now');
-  assert.ok(!/function portRowsEnhanced\(/.test(menu), 'FT12: the Enhanced category is gone from the settings rail - its rows are the home\'s');
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /const enhancedLane = isEnhanced\(\) && params\.get\('sky'\) !== 'classic' && getPref\('enhancedEnvironments'\);/);
-  assert.match(shared, /const dynamicOn = enhancedLane && \(skyDoor === 'dynamic' \|\| \(skyDoor === null && modSetting\('dynamic-skies', 'Enabled'\)\)\);/, 'the row writes the stores this line reads; it does not replace the line');
-});

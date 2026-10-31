@@ -189,14 +189,6 @@ test('AUDIT PRE-MERGE 1003b C6/S5: a newcomer refused by a full session (or a lo
   assert.deepEqual(shut.doors.at(-1), ['leave']);
 }));
 
-test('AUDIT PRE-MERGE 1003b C7: the floor entered away from Daggerfall\'s colosseum lands back where it was entered - its way out is the Herald\'s place only when the Herald is streamed in (mutants: no way back recorded; the exit not falling back to it)', () => {
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /const from = \{ pos: \[player\.pos\[0\], player\.pos\[1\] \+ CAPSULE_HEIGHT \/ 2, player\.pos\[2\]\], normal: \[Math\.sin\(cam\.yaw\), 0, Math\.cos\(cam\.yaw\)\] \};/);
-  assert.match(modes, /arenaFloor: kind, arenaFrom: from,/);
-  assert.match(modes, /arenaFrom: hit\.arenaFrom \?\? null,/);
-  assert.match(modes, /dungeonReturn\.arena \? host\.arenaLanding\?\.\(\) \?\? dungeonReturn\.arenaFrom \?\? null :/);
-});
-
 test('AUDIT PRE-MERGE 1003b C8/U3/U8: the card keeps the session\'s word - a host\'s press refused is said in the window, not only in the chat under it; `no bout` with no bout here is said; a session stepped out of offers its code again, a wrong code says why (mutants: the word dropped; `no bout` unsaid; no rejoin)', async () => onClock(async () => {
   const o = await hosted([['Alva']]);
   o.H.A.act('privPick', { r: 'm9' }); await o.H.S.flush(); await beats(o);

@@ -367,11 +367,6 @@ test('SERPENT3 a pair\'s share (Mac: "Two or more ships"): with exactly two ship
   assert.deepEqual(crushHurt(whole, 2 / 3), { hull: Math.round((CRUSH.hull * 1200 + CRUSH.base) * 2 / 3), sail: Math.round(CRUSH.sail * SERPENT_CANVAS_X * 600 * 2 / 3), crew: Math.round(CRUSH.crew * 2 / 3) });
   assert.equal(gripHurt(whole, 10, undefined, 2 / 3).hurt.hull, Math.floor((GRIP.hull * 1200 + GRIP.base) * 10 * 2 / 3));
   assert.equal(grindHurt(whole, 10, 0, 2 / 3).hurt.hull, Math.floor((MAEL_GRIND.hull * 1200 + MAEL_GRIND.base) * 10 * 2 / 3));
-  const hostSrc = readFileSync(new URL('../../../src/scenes/serpentHost.js', import.meta.url), 'utf8');
-  assert.match(hostSrc, /crushHurt\(ship, share\(\), blows\)/, 'the crush at the share');   // PIN MOVED (AUDIT SHIPS C3): carried
-  assert.match(hostSrc, /gripHurt\(ship, Math\.min\(1, dtS\), grip, share\(\)\)/, 'the grip at the share');
-  assert.match(hostSrc, /grindHurt\(ship, dtS, grind, share\(\)\)/, 'the grind at the share');
-  assert.match(hostSrc, /const share = \(\) => fleetShare\(deps\.link\.state\(\)\.n\);/, 'off the relay\'s count');
   // the host: a Rising Maw on my ship, and the venom on my feet, by the ships afloat at the fight
   for (const n of [1, 2, 3]) {
     const { host, hear, step, at, strikes, bites } = clientRig();

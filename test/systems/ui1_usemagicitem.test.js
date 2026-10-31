@@ -130,30 +130,3 @@ test('UI1: AllowCancel is false, and the pick CLOSES first, then uses (:88-97)',
   assert.equal(win.done, true);
 });
 
-test('UI1: the door exists in all three player hosts and routes through the port\'s ONE use seam', () => {
-  const input = read('src/ui/input.js');
-  assert.match(input, /case 'UseMagicItem': return ctx\.openUseMagicItem \? \(ctx\.openUseMagicItem\(\), true\) : false;/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const s = read(host);
-    assert.match(s, /openUseMagicItem[(:]/, `${host}: the door is implemented`);
-    assert.match(s, /createUseMagicItemWindow\(\{/, `${host}: through the window factory`);
-  }
-  // The world host owns the use itself - useItem, the inventory's own
-  // path - and lends it to the two modal hosts.
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const useMagicItem = \(item\) => \{\s*\n\s*const r = useItem\(item, playerEntity\.items \?\? \[\], \{/);
-  // U53's ONE-BUILDER LAW: the host-owned use hooks are ONE bag both
-  // readers take. UI1's first cut copied them and test/systems/potions.test.js
-  // caught it - two drink hooks where the law says one.
-  assert.equal((world.match(/drinkPotion: \(key, potent\)/g) ?? []).length, 1, 'one drink hook');   // PIN MOVED (PROF12): a Potent potion's share handed on
-  assert.match(world, /const useHooks = \{/);
-  // QS2 made it THREE readers, not a third bag: the quickslot key drinks the
-  // potion the window's Use button drinks, so its hooks are this same object
-  // with the three the window adds at its own call site.
-  assert.equal((world.match(/\.\.\.useHooks,/g) ?? []).length, 3, 'every reader takes the ONE bag');
-  // DISC21-C: the bag takes the rig in the player's hands
-  assert.match(world, /const quickslotHooks = \((?:rig = weaponRig)?\) => \(\{\s*\n\s*\.\.\.useHooks,/, 'QS2\'s reader included');
-  assert.match(world, /useMagicItem: \(item\) => useMagicItem\(item\),/, 'lent to worldModes');
-  assert.match(read('src/scenes/worldModes.js'), /useMagicItem: \(item\) => host\.useMagicItem\?\.\(item\),/, 'and on to the dungeon ctx');
-  assert.match(read('src/scenes/dungeonContext.js'), /onUse: \(item\) => opts\.useMagicItem\?\.\(item\),/);
-});

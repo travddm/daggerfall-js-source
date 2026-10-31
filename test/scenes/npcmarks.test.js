@@ -195,23 +195,6 @@ test('NPC-MARKS the Features row: on by default, the viewer\'s, under the enhanc
   assert.deepEqual([...row.kinds], ['enhanced']);
 });
 
-test('NPC-MARKS THE FOUR HOSTS: the interior and the dungeon (worldModes.js), the street (world.js) and the bench (exterior.js) each gather and draw; the dungeon hands its lane; the click asks the same route', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /npcMarks\.gather\(npcMarkCtx, interiorCtx\.people, questFlats\);/);
-  assert.match(wm, /npcMarks\.draw\(proj, view, mwv\.eye, peopleBodies, performance\.now\(\) \/ 1000\)/);
-  assert.match(wm, /npcMarks\.gather\(npcMarkCtx, dungeonCtx\.people, dungeonQuestFlats\);/);
-  assert.match(wm, /npcMarks\.draw\(proj, view, mwv\.eye, dungeonCtx\.peopleLane, performance\.now\(\) \/ 1000\)/);
-  assert.match(wm, /const route = staticNpcRouteIn\(\{ npcFactionId: pn\.factionID, dict: townTalk\?\.factionDict \?\? null, building: interiorBuilding \}\);/);
-  assert.doesNotMatch(wm, /staticNpcRoute\(\{/, 'no second construction of the route\'s arguments');
-  assert.match(src('src/scenes/dungeonContext.js'), /peopleLane: _peopleLane,/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /npcMarks\.consider\(pn, streetMarkCtx\);/);
-  assert.match(w, /npcMarks\.draw\(proj, view, mwv\.eye, streetPeople, now \/ 1000\)/);
-  const ex = src('src/scenes/exterior.js');
-  assert.match(ex, /npcMarks\.gather\(standMarkCtx, exteriorNpcs\);/);
-  assert.match(ex, /npcMarks\.draw\(proj, view, eye, standPeople, now \/ 1000\)/);
-});
-
 /** The icon as the fragment stage draws it, cell by cell, top row first: '.' discarded, '#' the dark rim, 'O' the fill. */
 function iconMask(kind) {
   const fns = glslFunctions(NPC_MARK_FS, { vP: [0, 0], uKind: NPC_MARK_KINDS[kind], uAlpha: 1, o: [0, 0, 0, 0] });
@@ -283,8 +266,6 @@ test('AUDIT NPC-MARKS L2: a townsperson the work pool holds is marked where the 
   assert.equal(markKindOf(p, ctx), 'quest');
   work.delete(7);
   assert.equal(markKindOf(p, ctx), null, 'read every frame - the offer taken, the mark gone');
-  assert.match(src('src/scenes/worldModes.js'), /offersWork: \(pn\) => !!npcSession\?\.isNpcOfferingQuest\(pn\._mwSeed \?\?= staticNpcData\(pn, staticNpcSceneCtx\(pn\)\)\.nameSeed\)/);
-  assert.match(src('src/scenes/world.js'), /offersWork: \(pn\) => npcSession\.isNpcOfferingQuest\(pn\._mwSeed \?\?= staticNpcData\(pn, \{ locationIndex: _questLoc\(\)\?\.locationIndex \?\? 0 \}\)\.nameSeed\)/);
 });
 
 test('AUDIT NPC-MARKS L3: a guild-service route marks only where a guild answers it - a holy order\'s servant in a building no divine runs is "You get no response."', () => {

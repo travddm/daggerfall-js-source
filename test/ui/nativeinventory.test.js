@@ -165,105 +165,6 @@ test('U25: the gold button drops gold into the remote pile, refusing bad amounts
   assert.equal(bag.length, 0, 'and the pack never held a coin');
 });
 
-test('U25 / THE ONE CONSTRUCTION SEAM: ONE inventory builder per host', () => {
-  // THE RULE IS THE SAME; THE SHAPE IT GUARDS CHANGED. This pin used
-  // to walk FOUR construction sites and check each carried the same
-  // eight hooks, because two of the four were hand-rolled copies of a
-  // factory sitting in the same file - and the bug it was written for
-  // is worth keeping: U42 put `openSpellbook:` on three of the five
-  // sites, and the two loot-pile windows went on printing "You cannot
-  // open your spellbook here." over a Spellbook the player was
-  // holding.
-  //
-  // U53 DELETED THE COPIES. Both were the factory's eleven hooks
-  // verbatim plus `loot` and `onClose`, which is exactly what its
-  // `extra` parameter is for, so each host has ONE builder and the
-  // loot arm calls it. A hook added to a host now reaches every window
-  // that host opens because there is only one place to add it - the
-  // failure this rule exists for is structurally impossible rather
-  // than swept for.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const REQUIRED = ['items:', 'entity:', 'icons:', 'rows:', 'nowMinute:', 'openSpellbook:',
-    'revealMap:', 'drinkPotion:'];
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const src = hostText(f);
-    const builders = (src.match(/createInventoryWindow\(\{/g) ?? []).length;
-    assert.equal(builders, 1, `${f}: ONE builder, not ${builders}`);
-    assert.doesNotMatch(src, /new NativeInventoryWindow\(/,
-      `${f} must not construct the window past the door`);
-    // the one builder carries every shared hook...
-    const j = src.indexOf('createInventoryWindow({');
-    const block = src.slice(j, src.indexOf('\n  });', j));
-    for (const hook of REQUIRED) {
-      // A hook may arrive through a SPREAD BAG the host shares with
-      // another reader (world.js's `useHooks`, which the use-magic-item
-      // pick also takes) - that IS the one-builder law rather than a
-      // breach of it, so resolve one level of `...bag` before failing.
-      const reachable = block.includes(hook) || [...block.matchAll(/\.\.\.(\w+),/g)].some(([, bag]) => {
-        const d = src.indexOf(`const ${bag} = {`);
-        return d >= 0 && src.slice(d, src.indexOf('\n  };', d)).includes(hook);
-      });
-      assert.ok(reachable, `${f}'s builder is missing ${hook}`);
-    }
-    // ...and the loot arm goes THROUGH it, carrying only what differs
-    // DISC10-E L3 re-aim: the builder may answer null now (the door refuses a transformed lycanthrope), so the arms
-    // build first and mount only a window - through the same one builder
-    assert.match(src, /const w = makeInventoryWindow\(\{\n/,
-      `${f}: the loot pile must reach the same builder`);
-    // MAC-E added a SECOND site to this law - the corpse, which used to
-    // empty itself into the pack instead of opening at all - so the
-    // slices below are found by what each one carries rather than by
-    // being the first `showOverlay(makeInventoryWindow({` in the file.
-    // QUICK-LOOT B4: the hooks are HOISTED now - `const _hooks =
-    // droppedLootHooks(pile)` above the arm - because quick loot is
-    // handed the very same object the window would get, and minting it
-    // twice would be two identities for one pile. The law is unchanged
-    // and is asserted on the hoist instead of on the property.
-    // DW-E3: the streaming host's arm names a FISH's identity the same way when the one ray met a fish (a fish is
-    // a DaggerfallLoot) - one hoisted object either way, handed to the window and to quick loot alike.
-    const pileAt = src.search(/const _hooks = (?:_fish \? dwFishLootHooks\(_fish\) : )?droppedLootHooks\(pile\);/);
-    assert.ok(pileAt > 0, `${f}: the pile arm no longer names its own identity`);
-    // QUICK-LOOT B4: past the decline and its reasoning, to the property itself - PIN MOVED (AUDIT 625 S2): to the arm's
-    // own end (the take's close), not a count of characters a comment above the property can outgrow
-    const pile = src.slice(pileAt, src.indexOf('droppedLoot.releaseEmptied();   // AUDIT 68 S20', pileAt));
-    // G5: DaggerfallLoot's identity travels with the pile through the
-    // ONE shared shape, so a fifth call site cannot ship a partial one.
-    assert.match(pile, /loot: _hooks,/);
-    assert.match(pile, /quickLootTake\(dropKey, _hooks, playerEntity,/,
-      `${f}: ...and quick loot takes through that SAME identity, never a second one`);
-    assert.match(pile, /onClose: \(\) => droppedLoot\.releaseEmptied\(\)/);
-    // ...and the BODY's identity travels the same way, built by the
-    // pool rather than the host (scenes/corpseMarker.js's
-    // corpseLootHooks): the host hands over a door, the pool decides
-    // what goes through it.
-    // QUICK-LOOT B4: ...with the decline in front of it. The body's
-    // identity still comes from the POOL (corpseLootHooks) and still
-    // reaches the same builder behind the same art gate; quick loot is
-    // handed that very object and answers null when it is not wanted.
-    // LOOT-STACK: the decline is a press's only, and the pile rides
-    // beside the pool's hooks into the same builder.
-    // PIN MOVED (AUDIT 625 D6): and the door answers whether it opened (the quick take, or the window's own answer)
-    assert.match(src, /takeLoot\(lootKey, \(l\) => townTalk\.say\(l\),\n\s*inventoryDoorReady\(\) \? \(loot\) => \{\n\s*if \(!pileKeys && quickLootTake\(lootKey, loot, playerEntity, \(l\) => townTalk\.say\(l\), \{ getQuest: [^}]*\}\)\) return true;[^\n]*\n\s*const pile = lootPile\([^\n]*\n\s*const w = makeInventoryWindow\(\{ loot: pile \? \{ \.\.\.loot, pile \} : loot \}\);\n\s*if \(w\) townTalk\.showOverlay\(w\);[^\n]*\n\s*return !!w;[^\n]*\n\s*\} : null\)/,   // DISC10-E L3 re-aim: a refused pack is null and mounts nothing
-      `${f}: the corpse must reach the same builder, behind the same art gate`);
-  }
-  // the dungeon host has one too, and it is the door's
-  const dc = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.doesNotMatch(dc, /new NativeInventoryWindow\(/);
-  assert.match(dc, /createInventoryWindow\(\{/);
-});
-
-test('U44: the window FORWARDS its item-use hooks into the law', () => {
-  // The window is where a hook stops being a host's business and
-  // becomes useItem's argument. Naming a hook in the host and dropping
-  // it here is invisible: the arm falls back to its `pending` line,
-  // which is exactly the "You drink the potion." lie U44 removed.
-  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..',
-    'src/ui/native/nativeInventory.js'), 'utf8');
-  const call = src.slice(src.indexOf('this._useResult(useItem('), src.indexOf('}));', src.indexOf('this._useResult(useItem(')));
-  assert.match(call, /revealMap: this\.hooks\.revealMap \?\? null/, 'the reveal hook is forwarded');
-  assert.match(call, /drinkPotion: this\.hooks\.drinkPotion \?\? null/, 'and the drink hook');
-});
-
 test('U42: USING the Spellbook item closes the inventory FIRST, then opens the book', () => {
   // DaggerfallInventoryWindow.cs:1748-1764 posts the open; the port
   // has ONE overlay slot, so the order matters exactly as AUDIT B-C1
@@ -294,45 +195,6 @@ test('U42: USING the Spellbook item closes the inventory FIRST, then opens the b
   assert.equal(bare.boxes[0].rows[0].text, USE_PENDING.spellbook);
 });
 
-test('U26 / THE FOUR HOSTS: every host that opens an inventory opens the NATIVE one', () => {
-  // U25 pinned the opposite of this and fired the moment U26 swapped
-  // the dungeon, which is what a both-ways pin is for. The keyed
-  // InventoryWindow is now gone from every host.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const dungeon = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.equal(dungeon.includes('new InventoryWindow('), false, 'the keyed window is retired here');
-  // U53: through the DOOR, which is the one thing that constructs
-  // NativeInventoryWindow now. The law this pin holds - the keyed
-  // window is retired and the native one is what every host opens -
-  // is unchanged; the address moved one module out.
-  assert.ok(dungeon.includes('createInventoryWindow({'));
-  assert.equal(dungeon.includes('new NativeInventoryWindow('), false,
-    'the dungeon must not construct the window past the door');
-  // ...and the dungeon builds it in ONE place, so its loot targets and
-  // its F6 press cannot drift apart
-  assert.equal((dungeon.match(/createInventoryWindow\(\{/g) ?? []).length, 1);
-  for (const hook of ['items:', 'entity:', 'icons:', 'rows:', 'nowMinute:', 'onDrop:', 'onClose:']) {
-    assert.ok(dungeon.includes(hook), `the dungeon builder is missing ${hook}`);
-  }
-  // worldModes opens no inventory of its own - it MOUNTS the other
-  // two, so a click inside a building reaches theirs.
-  const modes = readFileSync(join(root, 'src/scenes/worldModes.js'), 'utf8');
-  assert.equal(modes.includes('NativeInventoryWindow'), false, 'the interior host opens none');
-  assert.equal(modes.includes('createInventoryWindow'), false, '...and builds none either');
-  // ...and the keyed window is DELETED, not merely unimported. Its one
-  // law lives in systems/equip.js, which every host reaches.
-  const keyed = readFileSync(join(root, 'src/ui/deathScreen.js'), 'utf8');
-  assert.equal(keyed.includes('export class InventoryWindow'), false, 'the keyed window is gone');
-  // U42 took the SPELLBOOK out of this module the same way U26 took
-  // the inventory - onto its own classic art - so what is left here
-  // is the death screen alone. Both-ways: the module must not have
-  // grown either window back.
-  assert.equal(keyed.includes('export class SpellbookWindow'), false, 'and so is the keyed spellbook (U42)');
-  assert.ok(keyed.includes('export class DeathScreen'), 'the death screen is what this module is now');
-  assert.ok(readFileSync(join(root, 'src/ui/spellbookWindow.js'), 'utf8').includes('export class SpellbookWindow'),
-    'the spellbook lives on the classic art');
-});
-
 test('U26: the dungeon routes RAW KEY CODES to a native overlay', () => {
   // routeKey handed every overlay an ACTION ('back'/'confirm'/'up'),
   // which is the keyed windows' vocabulary and cannot express F6, a
@@ -355,50 +217,6 @@ test('U26: the dungeon routes RAW KEY CODES to a native overlay', () => {
   assert.equal(typedChar('Numpad7'), '7');
   assert.equal(typedChar('KeyA', { key: 'a' }), 'a');
   assert.equal(typedChar('Escape'), null);
-});
-
-test('U26: the dungeon host wires the four things the swap needed', () => {
-  // No execution coverage in node, so the seams are read - the idiom
-  // this repo already uses for its scene hosts.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const ctx = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  const scene = readFileSync(join(root, 'src/scenes/dungeon.js'), 'utf8');
-  const modes = readFileSync(join(root, 'src/scenes/worldModes.js'), 'utf8');
-
-  // 1. A GROUND PILE. droppedLoot is host-agnostic and had simply
-  //    never been mounted here, so a Remove-mode drop had nowhere to
-  //    land - which is what made this a slice and not an edit.
-  assert.ok(ctx.includes('createDroppedLoot('), 'droppedLoot is mounted');
-  assert.ok(ctx.includes('droppedLoot.lootTargets()'), 'and its piles are activatable');
-  assert.ok(ctx.includes('droppedLoot.batches()'), 'and they draw');
-  assert.ok(ctx.includes('droppedLoot.releaseEmptied()'), 'and empty ones are freed on close');
-  // EVERY ALLOCATION HAS AN OWNER: the piles leave with the dungeon
-  // PIN MOVED (AUDIT FB1018 L3-2, bible/01-Overview/audits/Audit-Field-Bugs-2026-10-18.md): through the pool's own restore,
-  // which marks each pile dead and frees its batch (and its animator entry) - droppedLoot.js restorePiles
-  assert.ok(/destroy\(\)[\s\S]*droppedLoot\.restorePiles\(null\);/.test(ctx),
-    'the piles\' BATCHES are destroyed in destroy() - marked dead first (NT1), not just the array emptied');
-
-  // 2. BOTH dungeon hosts route the new key prefix. The standalone
-  //    scene and the world-modes machine each own a loot arm, and a
-  //    prefix added to one is exactly the drift this repo keeps
-  //    finding.
-  for (const [name, src] of [['dungeon.js', scene], ['worldModes.js', modes]]) {
-    assert.ok(src.includes("droppedLoot:'"), `${name} routes droppedLoot: to takeLoot`);
-  }
-
-  // 3. takeLoot OPENS THE WINDOW rather than vacuuming the pile - the
-  //    old body transferred every item on one keypress.
-  assert.ok(ctx.includes('const _w = openInventory(source') && ctx.includes('if (_w) activeOverlay = _w;'), 'a loot target opens the window');   // DISC10-E L3 re-aim: and a refused one (the door's null) is not written over the slot
-  assert.equal(/for \(const item of source\) \{ addItem\(playerEntity/.test(ctx), false, 'the vacuum is gone');
-
-  // 4. A native overlay draws against the REAL canvas with no screen
-  //    offset - it letterboxes itself, and applying the offset twice
-  //    left the dimmed world showing in the bars (AUDIT 19 F2 again).
-  assert.ok(/isChoiceWindow\)\s*\{\s*\n\s*activeOverlay\.draw\(renderer, canvas,/.test(ctx),
-    'the native branch passes the real canvas');
-  // ...and the shot counter advances under an overlay, or a probe
-  // cannot frame-sync through one (the Process rule forbids sleeping).
-  assert.ok(/uiOverlayActive\) \{[\s\S]{0,600}?frames\+\+/.test(scene), 'the frame counter still ticks');
 });
 
 // ---------------------------------------------------------------

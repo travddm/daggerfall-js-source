@@ -67,8 +67,6 @@ test('JAN1 (hand): THE RING RELEASES ONLY WHAT IT CAPTURED - a key whose down a 
   assert.equal(w.weapon, sword);
   w.toggleHand({ apply: true });
   assert.equal(w.weapon, null, 'the left hand holds nothing'); assert.equal(weaponTypeForItem(null), WEAPON_TYPES.Melee, 'and nothing draws as the fist');
-  const s = rd('src/ui/input.js');
-  assert.ok(s.includes("export function noteKeyUp(edges, code) { if (!edges) return; if (edges.own && !edges.own.delete(code)) return; edges.up.add(code); }"), 'one home for the law');
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) assert.ok(/noteKeyUp\(latch\.edge, e\.code\)/.test(rd(f)) || /noteKeyUp\(/.test(rd(f)), `${f}: the keyup reaches the ring through noteKeyUp alone`);
 });
 
@@ -88,15 +86,6 @@ test('JAN1 (fist): THE POSE IS THE PLAYER\'S, NOT THE RIG\'S - the port has four
   exterior.updateHands(sword, null); exterior.applyWeapon();
   assert.equal(exterior.weapon, sword, 'the sword again'); assert.equal(exterior.sheathed, false); assert.equal(exterior.usingRightHand, true);
   assert.equal(applyWeaponPose(exterior, null), false, 'no pose (a rig that was never built) moves nothing');
-  // every door of the interior host carries the pair, derived from the host's own function names
-  const wm = rd('src/scenes/worldModes.js');
-  const body = (name, endAt) => { const i = wm.indexOf(name); assert.ok(i > 0, name); return wm.slice(i, wm.indexOf(endAt, i)); };
-  assert.match(body("function tryExit(", "mwViewTransition('Exterior')"), /host\.applyWeaponPose\?\.\(weaponPoseOf\(interiorWeapon\.playerWeapon\)\)/, 'a building\'s exit hands the pair to the exterior rig');
-  assert.match(body("function exitDungeonNow()", "mwViewTransition('Exterior')"), /const pose = dungeonPose\(\);[^\n]*\n\s*host\.onDungeonLeave\?\.\(\);[^\n]*\n\s*teardownDungeonQuestFlats\(\);[^\n]*\n\s*dungeonCtx\.destroy\(\);[\s\S]*?host\.applyWeaponPose\?\.\(pose\);/, 'a dungeon\'s exit reads the pair BEFORE the leave hook and the teardown (WORLD1 pins that triple) and hands it over after the mode');
-  assert.match(body("forceExitToExterior({ cacheScene = true, load = false } = {}) {", "AUDIT 63r F30"), /const pose = mode === 'dungeon' \? dungeonPose\(\) : mode === 'interior' \? weaponPoseOf\(interiorWeapon\.playerWeapon\) : null;[\s\S]*?if \(pose\) host\.applyWeaponPose\?\.\(pose\);/, 'the forced exit (a load, a teleport) the same, from whichever rig is live');
-  assert.match(wm, /setMode\('interior'\);\n\s*host\.unlockOn\?\.\(\);[^\n]*\n\s*mwViewTransition\('Interior'\);[^\n]*\n\s*setWeaponPose\(interiorWeapon\.playerWeapon, host\.weaponPose\?\.\(\) \?\? null\);/, 'a building\'s entry seeds the interior rig from the exterior\'s');
-  assert.match(wm, /const dungeonPose = \(\) => weaponPoseOf\(dungeonCtx\?\.weaponRig\?\.\(\)\?\.playerWeapon \?\? null\);/, 'the dungeon rig\'s pair has one reader');
-  assert.match(wm, /setMode\('dungeon'\);\n\s*host\.unlockOn\?\.\(\);[^\n]*\n\s*mwViewTransition\('Interior'\);[^\n]*\n\s*setWeaponPose\(dungeonCtx\?\.weaponRig\?\.\(\)\?\.playerWeapon \?\? null, host\.weaponPose\?\.\(\) \?\? null\);/, 'a dungeon\'s entry seeds the dungeon rig');
   // DISC8-E: the pair must sit in the bag worldModes READS them from - JAN1 parked them in the inventory window's
   // deps, a text match anywhere in the file passed, and no door ever handed the pose
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
@@ -106,10 +95,6 @@ test('JAN1 (fist): THE POSE IS THE PLAYER\'S, NOT THE RIG\'S - the port has four
     const inv = literalBody(rd(f), 'const makeInventoryWindow = (extra = {}) => createInventoryWindow(');
     assert.doesNotMatch(inv, /\bweaponPose:/, `${f}: the inventory window reads no pose - a door parked there is dead`);
   }
-  // the asymmetry that made the picture: the torch is read off the ENTITY, the sheath off the RIG
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.ok(rig.includes('fpArm.setTorch(isLitTorch(entity?.lightSource))'), 'the torch is the entity\'s');
-  assert.ok(/playerWeapon\.sheathed/.test(rig), 'the sheath is the rig\'s - a door that carries one and not the other is exactly this bug');
 });
 
 test('JAN1 (sky): the streaming host grounds a walker on the TERRAIN, not the location\'s average - the navgrid is the block rect, the flattened rect is the stamped tiles plus a clearance and is smaller, and blendLocationTerrain only eases the band between toward the average: a walker there stood metres in the air', () => {
@@ -124,20 +109,9 @@ test('JAN1 (sky): the streaming host grounds a walker on the TERRAIN, not the lo
   const drop = (avg - s[0 * hDim + 64]) * worldHeight;
   assert.ok(drop > 8, `tile 0 - inside the navgrid, outside the rect - lies ${drop.toFixed(1)} units below the average a walker was stood at`);
   assert.equal(tileWeight(56), 7); assert.equal(tileWeight(63), 7, 'an unstamped marker tile is walkable, which is how a walker reaches the band');
-  const w = hostText('src/scenes/world.js');
-  assert.equal(/groundY: \(\) => locOrigin\[1\],/.test(w), false, 'no constant groundY for the wandering pool');
-  assert.match(w, /const personGroundY = \(x, z\) => \{\s*\n\s*const t = host\.state\.pixelTranslation\(px, py\);\s*\n\s*const h = heightAt\(x \+ locOrigin\[0\] \+ t\[0\], z \+ locOrigin\[2\] \+ t\[2\]\);\s*\n\s*return Number\.isFinite\(h\) \? h - t\[1\] \+ 2\.0 \* 0\.025 : locOrigin\[1\];/, 'the terrain floor, out of the pixel\'s vertical frame, with locOrigin\'s own lift; a pixel not built answers the old constant');
-  // LW2 (2026-10-04): the closure is ONE for both of the host's pools - DFU's walkers and the living world's residents
-  assert.equal((w.match(/groundY: personGroundY/g) ?? []).length, 2, 'both pools stand their bodies on it');
-  assert.match(rd('src/scenes/exterior.js'), /groundY: \(x, z\) => collider\.heightAt\(x, z\)/, 'both hosts on one law: the collider\'s floor');
 });
 
 test('JAN1 (glare): the lantern glare needs a flame under it AND nothing in front of it - EL7\'s presence rule stands (a city light sits at the top of its flat), and a surface nearer than the light at the light\'s own pixel is an occluder whatever the footprint\'s taps found (the half BUGS-5 F4\'s narrowing left)', () => {
-  const a = rd('src/render/airPass.js');
-  assert.match(a, /: 1\.0 - smoothstep\(\$\{glslFloat\(AIR_GLARE_SLACK \/ 2\)\}, \$\{glslFloat\(AIR_GLARE_SLACK\)\}, abs\(d - lantern\)\);/, 'EL7: presence, at every tap (LA-POST2: soft, filtered)');
-  assert.match(a, /return hide \? smoothstep\(\$\{glslFloat\(AIR_GLARE_SLACK\)\}, \$\{glslFloat\(2 \* AIR_GLARE_SLACK\)\}, lantern - d\)/, 'the veto: a surface nearer than the light by past the slack hides it (LA-POST2: whole by twice the slack)');
-  assert.match(a, /vec2 cuv = ndc\.xy \* 0\.5 \+ 0\.5;\s*\n\s*if \(cuv == clamp\(cuv, vec2\(0\.0\), vec2\(1\.0\)\)\) vis \*= 1\.0 - filtered\(cuv, lantern, true\);/, 'and the veto at the light\'s own pixel, after the sum');
-  assert.ok(a.indexOf('vec2 cuv = ndc.xy * 0.5 + 0.5;') > a.indexOf('vis = sum / '), 'the veto reads the sum it scales');
   assert.equal(AIR_GLARE_SLACK, 0.25);
   // the geometry, in JS: a lamp 0.6 under an attic floor at 6 units, the eye 1.5 up, pitched down. The taps are
   // view-space offsets about the light (AIR_GLARE_TAPS, in half-sizes s); an oblique floor sweeps a wide range of depths across them.

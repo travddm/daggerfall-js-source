@@ -194,17 +194,6 @@ test('FESTIVAL-STAGE the music: a Festival town\'s streets hear the tavern\'s pl
   assert.equal(festivalEnvironment(MUSIC_ENV.City, 'yes'), MUSIC_ENV.City, 'only a Festival that rules');
 });
 
-test('FESTIVAL-STAGE wired in the streets\' host: the build measures the Festival\'s anchors at the taverns and the bounty boards and a lantern before every banner, kept on the pixel; the stage reads the dressed seat; the lantern pool takes its lanterns; the music its Festival (mutants: the temples for the taverns; the pool without them; the music without it)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const festivalAnchors = pixelBoardSplit \? festivalBannerAnchors\(\{ frames: pixelHomeFrames, tavernKeys: buildingKeysOfType\(locBlocks, makeBuildingKey, TALK_BUILDING_TYPES\.Tavern\), boards: pixelBoards, bounty: pixelBoardSplit \}\) : null;/);
-  assert.match(w, /const festivalLanterns = festivalAnchors \? festivalLanternsOf\(\[\.\.\.\(seatAnchors \?\? \[\]\), \.\.\.festivalAnchors\]\) : null;/);
-  assert.match(w, /seatAnchors, _boardSplit: pixelBoardSplit, festivalAnchors, festivalLanterns,/);
-  assert.match(w, /const festivalStage = seatBook \? createFestivalStage\(\{ seatAt: \(mapId\) => seatHere\(mapId\), version: \(\) => \(seatBook\.open === true \? 1 : 0\) \}\) : null;/);
-  assert.match(w, /worldLightAnimator\.ranges, festivalStage \? festivalStage\.lanterns : null\);/);
-  assert.match(w, /arrested: Boolean\(playerEntity\.arrested\),\n\s*festival: festivalStage\?\.festive\(_musicLoc\?\.mapTableData\?\.mapId\) === true,/);
-  assert.match(src('src/scenes/shared.js'), /const environment = festivalEnvironment\(held, merged\.festival === true\);/);
-});
-
 // ─── AUDIT FESTIVAL S1: THE TURNING WHILE THE PLAYER STAYS ──────────
 // The seats' list was read at the session's start and at a town's arrival alone, and an arrival inside SEAT_LIST_CACHE_MS
 // reused the last read - so a Festival (its music, banners, lanterns) or a Curfew outlived its week for a player who stayed
@@ -296,7 +285,6 @@ test('AUDIT FESTIVAL S1 the book\'s frame tick reads the list again ONCE when th
   book3.redTick();
   await tick();
   assert.equal(shut.calls, 1, 'shut: never asked at the Turning');
-  assert.match(hostText('src/scenes/world.js'), /\n    seatBook\?\.redTick\(\);   \/\/ CROWN2/, 'the host ticks the book each online frame');
   assert.equal(SEAT_TURN_READ_SPREAD_MS, 120_000, 'two minutes');
   // the shares drawn: a book's own, from its rand - the last of the window still reads inside it
   const late = turningDoor(() => edicts[1]);

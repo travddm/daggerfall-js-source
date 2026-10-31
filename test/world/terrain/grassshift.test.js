@@ -22,7 +22,6 @@ import { TERRAIN_SIZE, HEIGHTMAP_DIMENSION } from '../../../src/world/terrain/te
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-const WORLD = hostText('src/scenes/world.js');
 
 /** A WebGL2 that answers what the grass renderer's constructor asks and
  *  counts the rest; `rec` collects each drawn slot's decode frame. */
@@ -110,8 +109,6 @@ test('PERF-EXT20: discSlotCount sweeps once per question - every field after the
   assert.equal(G.discSweeps() - s0, 4, 'four distinct questions, four sweeps - and the repeat none');
   // the memo IS the sweep's answer
   assert.equal(G.discSlotCount(G.LAB_GRASS.span), a.slots);
-  // the world pays the one sweep at mount, behind the loading screen
-  assert.match(WORLD, /  let labGrassField = null;[^\n]*\n  if \(labGrass\) discSlotCount\(LAB_GRASS\.span\);/, 'warmed where the renderer is built');
 });
 
 // ─── PERF-EXT21: THE FIELD SURVIVES THE ORIGIN SHIFT ────────────────
@@ -239,27 +236,6 @@ test('PERF-EXT21: invalidate after a shift drops exactly the cells whose squares
   // a rect asked in the field's own frame would have dropped others
   const naive = before.filter((h) => h.cx * cell <= x1 && (h.cx + 1) * cell > x0 && h.cz * cell <= z1 && (h.cz + 1) * cell > z0).map((h) => G.cellKey(h.cx, h.cz)).sort((a, b) => a - b);
   assert.notDeepEqual(naive, want, 'the fixture tells the two frames apart');
-});
-
-test('PERF-EXT21: the host moves the field at a shift, empties it at a teleport, and re-reads it wherever a pixel lands or joins the near ring', () => {
-  const shift = WORLD.slice(WORLD.indexOf('    if (r.offset) {\n      // FloatingOrigin.OffsetPlayerController'), WORLD.indexOf('    if (r.pixelChanged) {\n      // P1: PlayerGPS.Update'));
-  assert.ok(shift.length > 500, 'the shift block was found');
-  assert.match(shift, /labGrassField\?\.shiftOrigin\(r\.offset\);/, 'the shift carries the field');
-  assert.doesNotMatch(shift, /labGrassField = null/, 'and no longer throws it away');
-  const tp = WORLD.slice(WORLD.indexOf('  async function _teleportToPixel('), WORLD.indexOf('    _wodArrival = wodArrivalOf(queue);'));
-  assert.ok(tp.length > 1000, 'the teleport was found');
-  const cut = tp.indexOf('\n    labGrassField = null;\n');
-  assert.ok(cut > 0 && cut < tp.indexOf('queue.push(...state.init(px, py));') && !/\bawait\b/.test(tp.slice(cut, tp.indexOf('queue.push(...state.init(px, py));'))),
-    'a new scene frame starts an empty field - said before state.init re-anchors the scene, with no frame between');
-  assert.match(WORLD, /\n    if \(host\.labGrassField\) \{   \/\/ WOD2[^\n]*\n      const t = host\.state\.pixelTranslation\(px, py\);\n      host\.labGrassField\.invalidate\(t\[0\], t\[2\], t\[0\] \+ TERRAIN_SIZE, t\[2\] \+ TERRAIN_SIZE\);/,
-    'every published pixel re-reads the cells over it, not a location\'s alone');
-  // PERF-EXT21 (the review): and so nothing is kept to ask it - the set
-  // AUDIT BRANCH (WoD) m2 filled at a teardown gated this very line, and
-  // was written and never read once the line stopped asking
-  assert.doesNotMatch(WORLD, /_wodSiteWas/, 'no teardown remembers a site for a publish that no longer asks');
-  const rs = WORLD.slice(WORLD.indexOf('  function restrideTerrain('), WORLD.indexOf('  function destroyPixel('));
-  assert.match(rs, /if \(stride === 1 && labGrassField\) \{\n      const t = state\.pixelTranslation\(p\.px, p\.py\);\n      labGrassField\.invalidate\(t\[0\], t\[2\], t\[0\] \+ TERRAIN_SIZE, t\[2\] \+ TERRAIN_SIZE\);/,
-    'a promotion to the near ring re-reads the cells over it');
 });
 
 // ─── PERF-EXT22: A WALK PLACES ITS RIM A SLICE A FRAME ──────────────

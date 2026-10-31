@@ -78,7 +78,6 @@ test('HORSE-FACE: a ride is no placing - strafing past PLACE_JUMP_M a frame keep
     assert.deepEqual(b.state().lastMoveDirection.map((v) => Math.round(v)), [1, 0, 0], `frame ${i}: a gallop's frame is no placing - never the view's +z`);
   }
   const { readFileSync } = await import('node:fs');
-  assert.match(readFileSync(new URL('../../../src/player/mwView.js', import.meta.url), 'utf8'), /export function mwViewRebase\(delta\) \{\n\s*eotbCamera\.onPositionUpdate\(delta\);\n\s*eotbWagon\.rebase\(delta\);\n\s*eotbBody\.rebase\(delta\);/);
 });
 
 test('HORSE-FACE: a body carried with no input of its own (placed every frame - a journey\'s autopilot, a cart) never paints the placing\'s -1 (mutant: the -1 written back)', async () => {

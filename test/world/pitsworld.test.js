@@ -113,16 +113,6 @@ test('PITS-WORLD the open zone\'s ask (scenes/oceanHolesHost.js openZoneAtNow): 
   } finally { globalThis.location = was; }
 });
 
-test('PITS-WORLD by source: the dungeon host knows the abyss by its own law - a lair\'s home and the tutorial\'s page - and the abyss renames its dungeon by its pit\'s id', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /\|\| isAbyssMapId\(dfLocation\?\.mapTableData\?\.mapId\)\); \}/);
-  assert.match(d, /: isAbyssMapId\(dfLocation\?\.mapTableData\?\.mapId\) \? 'ocean-holes'/);
-  assert.doesNotMatch(d, />= 0x60000000/, 'no reader takes a range for the abyss');
-  assert.match(rd('src/scenes/oceanHolesAbyss.js'), /const abyssMapId = \(\) => getAbyssMapId\(data\.PitMapX, data\.PitMapY\);/);
-  assert.match(rd('src/scenes/oceanHolesHost.js'), /if \(openZoneAt\(st\.mapX, st\.mapY\)\) \{ markTerrainProcessed\(st, v, 'rejected:open-zone'\); return; \}/);
-  assert.doesNotMatch(hostText('src/scenes/world.js'), /openZoneAt/, 'the host hands nothing: the module asks the zone itself');
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD'].every((n) => existsSync(join(ARENA2, n)));
 test('PITS-WORLD with ARENA2: over the player\'s own picture and the continent\'s carved sea (TAMRIEL-DEEP\'s bake), the pits past the Bay stand where the bake verifies the deep - the Topal Bay\'s open water; online the zone\'s water (Lake Rumare, the Niben) stands none', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

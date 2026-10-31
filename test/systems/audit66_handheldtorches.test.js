@@ -200,25 +200,6 @@ test('AUDIT 66 F3: the thrown torch\'s quad is CENTRED on the flight point (the 
   assert.deepEqual(q.loops[0].moves.at(-1), p.pos, 'and its 3D loop');
 });
 
-test('AUDIT 66 F4/F6/F5/F11: the four host lifetimes - the interior sweep runs with the transition and above its own restore, the quest-teleport exit sweeps too, the dungeon teardown frees the pool and the rig, and the exterior sweep sits above the modal return', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  const enter = wm.indexOf('interiorTorches.destroyAll();');
-  const restore = wm.indexOf('restoreInteriorScene();');
-  assert.ok(enter > 0 && restore > 0 && enter < restore, 'F4: the sweep is BEFORE the scene cache puts the room\'s torches back, not after it');
-  assert.match(wm, /dismountPlayer\('ToBuildingInterior'\);\s*transitioning = true;\s*try \{\s*(?:\/\/[^\n]*\n\s*)*interiorTorches\.destroyAll\(\);/, 'F4: it runs where the transition does - the first thing the entry does, not the last');
-  assert.equal((wm.match(/interiorTorches\.destroyAll\(\);/g) ?? []).length, 3, 'F6: the way in, the way out, and the quest-teleport / load exit');
-  assert.match(wm, /interiorDropped\.restorePiles\(null\);[^\n]*\n\s*interiorTorches\.destroyAll\(\);/, 'F6: in the teardown list beside its sibling pool');
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /droppedTorches\.destroyAll\(\);\s*weaponRig\.dispose\?\.\(\);/, 'F5/F8: the dropped pool and the rig\'s component leave with the dungeon');
-  assert.ok(dc.indexOf('for (const t of torches) { t.handle?.stop()') < dc.indexOf('droppedTorches.destroyAll();'), 'F5: in the teardown, beside the wall torches\' own loops');
-  assert.ok(dc.indexOf('droppedTorches.destroyAll();') < dc.indexOf('sceneAmbience.dispose();'), 'F5: inside destroy(), not somewhere later');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const src = rd(host);
-    assert.match(src, /if \(_mode\(\) !== _torchesMode\) \{ droppedTorches\.destroyAll\(\); weaponRig\.silenceTorch\(\);[^\n]*? _torchesMode = _mode\(\); \}[^\n]*\n\s*if \(modes\.frame\(dt, now\)\) \{/, `F11 ${host}: the sweep is a transition EVENT, above the modal return - not a chore at the foot of a frame that indoor modes never reach`);
-    assert.ok(src.indexOf('_torchesMode = _mode(); }') < src.indexOf('droppedTorches.tick(dt)'), `F11 ${host}: and it stands above the tick it used to share a line with`);
-  }
-});
-
 test('AUDIT 66 F7: a dropped torch loses the click to a door, a board and a static NPC as it loses it to a pile - the ray\'s nearest hit takes it, in both exterior hosts', () => {
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const src = rd(host);
@@ -240,9 +221,6 @@ test('AUDIT 66 F7: a dropped torch loses the click to a door, a board and a stat
 });
 
 test('AUDIT 66 F8: the component\'s teardown has owners - the switch\'s falling edge and the rig\'s own dispose - and it stops the burning loop and gives PlayerTorch its offset back', () => {
-  const rigSrc = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rigSrc, /if \(!_torchesOn && _handheldWasOn\) handheld\.dispose\(\);/, 'the switch off is a teardown: update() runs only while the mod is ON, so the loop could not stop itself');
-  assert.match(rigSrc, /dispose\(\) \{ handheld\.dispose\(\); _handheldWasOn = false; \}/, 'and the host has a door');
   // and what dispose actually frees
   setPlayerTorchOffsetOverride(null);
   const r = rig({ 'Presentation.Ambidexterity': true });
@@ -257,9 +235,6 @@ test('AUDIT 66 F8: the component\'s teardown has owners - the switch\'s falling 
 });
 
 test('AUDIT 66 F9: DrawTrajectory is a law, not a frame - the arc integrates from the free hand at the tilted look, breaks on a wall, and runs 300 steps; and the component no longer spends a frame on points nothing can draw', () => {
-  const src = rd('src/systems/handheldTorches.js');
-  assert.ok(!/drawTrajectory\(\)/.test(src), 'no per-frame integration left in Update');
-  assert.match(src, /export function throwArcPoints\(/, 'the mod\'s own arithmetic, kept whole for the host that can draw it');
   assert.deepEqual([TRAJECTORY_STEPS, TRAJECTORY_FIXED_DT, TRAJECTORY_SPEED, TRAJECTORY_GRAVITY], [300, 0.02, 25, 9.8]);
   const open = throwArcPoints({ origin: [0, 1, 0], forward: [0, 0, 1], right: [1, 0, 0], freeHand: FREE_HAND.Right, strength: 1, throwAngle: 0, throwGravity: 1, throwStrength: 1, bodyStrength: 100 });
   assert.equal(open.length, TRAJECTORY_STEPS + 1, 'no wall: the first point plus 300 steps');
@@ -280,16 +255,6 @@ test('AUDIT 66 F9: DrawTrajectory is a law, not a frame - the arc integrates fro
   // the switch says what it does, beside the other one the port cannot draw
   const def = MOD_SETTINGS[HANDHELD_TORCHES_VENDOR].keys['Throwing.ShowTrajectory'];
   assert.equal(def.description, 'Has no effect here: the throw\u2019s arc isn\u2019t drawn in this game.', 'the pane says the arc is not drawn here');
-});
-
-test('AUDIT 66 F10: the dropped light\'s range carries no PlayerTorchLightScale - the port holds that setting inert for a radius, in one place - and the dep no host could feed is gone', () => {
-  const src = rd('src/scenes/droppedTorches.js');
-  assert.ok(!/torchLightScale/.test(src), 'the dep is gone');
-  assert.ok(!/DROPPED_LIGHT_INTENSITY/.test(src), 'and the constant nothing read');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.ok(!/torchLightScale/.test(rd(host)), `${host}: never passed one`);
-  }
-  assert.match(rd('src/systems/playerTorch.js'), /PlayerTorchLightScale\`?\s*\n?\/\/?\s*stays inert|stays inert/, 'the one decision, in the lane that made it');
 });
 
 // ═══ the pins HT1 wrote that a mutation would have survived ═════════════

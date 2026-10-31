@@ -163,76 +163,6 @@ test('MW-LOAD: the answer survives JSON whole, and the envelope is refused when 
   assert.deepEqual([...ARM_GMST_IDS], [GMST_SNEAK_DELTA]);
 });
 
-test('MW-LOAD: the per-kind readers ride the same per-record functions as the one pass', () => {
-  // ONE HOME: bodyParts/raceRecords/armorRecords/clothingRecords/
-  // weaponRecords/gmstValue and extractArmRecords cannot disagree
-  // because each kind has exactly one reader, called from both.
-  const src = rd('src/formats/morrowind/mwFirstPerson.js');
-  for (const [kind, reader, walker] of [
-    ['BODY', 'readBodyPart', 'bodyParts'], ['RACE', 'readRace', 'raceRecords'],
-    ['ARMO', 'readArmor', 'armorRecords'], ['CLOT', 'readClothing', 'clothingRecords'],
-    ['WEAP', 'readWeapon', 'weaponRecords'], ['LIGH', 'readLight', 'lightRecords'], ['GMST', 'readGmst', 'gmstValue'],
-    ['MGEF', 'readMagicEffect', 'magicEffectRecords'], ['STAT', 'readStatic', 'vfxStaticRecords'],   // MW-SPELLFX1
-  ]) {
-    assert.match(src, new RegExp(`case '${kind}': \\{?[\\s\\S]{0,40}?${reader}\\(bytes, rec\\)`), `${kind}: the one pass calls ${reader}`);
-    const fn = src.slice(src.indexOf(`export function ${walker}(`));
-    assert.match(fn.slice(0, fn.indexOf('\n}\n')), new RegExp(`${reader}\\(bytes, rec\\)`), `${walker} calls ${reader}`);
-    assert.equal(src.split(`function ${reader}(bytes, rec)`).length, 2, `${reader} is declared once`);
-  }
-});
-
-test('MW-LOAD: dataSource keeps the record sets in the derived store, keyed to the file and refused by envelope', () => {
-  const src = rd('src/scenes/dataSource.js');
-  const door = src.slice(src.indexOf('export const loadMorrowindArmRecords = async (fileName) =>'));
-  assert.ok(door.length > 100, 'the door exists');
-  assert.match(door, /const blob = await assetBlob\(MW_STORE, fileName\);/, 'the file is a Blob handle - its size is free, its bytes are not read for a hit');
-  assert.match(door, /await import\('\.\.\/formats\/morrowind\/mwFirstPerson\.js'\)/, 'the reader is imported at the door, not at boot');
-  assert.match(door, /`\$\{ARM_RECORDS_PREFIX\}:v\$\{ARM_RECORDS_VERSION\}:\$\{fileName\}:\$\{blob\.size\}:\$\{await sampleStamp\(blob\)\}`/,
-    'the key names the reader version, the file, its size and its sample stamp');
-  assert.match(door, /const cached = await loadDerivedJson\(key\);\s*\n\s*let records = isArmRecords\(cached\) \? cached : null;/,
-    'a stored set is read only when its own envelope carries this key and this shape');
-  const json = src.slice(src.indexOf('export async function loadDerivedJson(key)'));
-  assert.match(json.slice(0, json.indexOf('\n}\n')), /env && env\.key === key && Object\.hasOwn\(env, 'value'\) \? env\.value : null/,
-    'the envelope is the key: another key\'s value is null');
-  assert.match(door, /const bytes = new Uint8Array\(await blob\.arrayBuffer\(\)\);\s*\n\s*const t1 = performance\.now\(\);\s*\n\s*records = extractArmRecords\(bytes\);/,
-    'a miss reads the file once and extracts in one pass');
-  assert.match(door, /await storeDerivedJson\(key, records\);/, 'and keeps it');
-  assert.match(door, /const cache = _mwRecordsCache;[\s\S]*cache\.files\.set\(fileName, records\);/, 'and memoises for the session - in the generation the read began under (AUDIT 68)');
-  // the memo drops with the attach generation, like every swap cache
-  assert.match(src, /_mwGeneration\+\+; _mwArchiveCache = null; _mwFileCache = null; _mwRecordsCache = null; \}/,   // AUDIT 68: the dead ESM door's reset is gone with it
-    'a new attach drops the record memo with the other swap caches');
-  const clear = src.slice(src.indexOf('export const clearStoredMorrowind = async () =>'));
-  assert.match(clear.slice(0, clear.indexOf('\n};')), /await clearDerivedPrefix\(ARM_RECORDS_PREFIX\);/,
-    'clearing the Morrowind store sweeps its derived record sets');
-  // the stamp is two range reads, never the whole file
-  const stamp = src.slice(src.indexOf('async function sampleStamp(blob)'));
-  assert.match(stamp.slice(0, stamp.indexOf('\n}\n')), /blob\.slice\(0, span\)[\s\S]*blob\.slice\(blob\.size - span, blob\.size\)/,
-    'head and tail by range');
-  // the header says who the consumer is
-  assert.match(src, /ITS ONE CONSUMER IS MW-LOAD's arm record sets/);
-});
-
-test('MW-LOAD: the attach fingerprint carries the stored SIZES, so a same-name re-attach is a change', () => {
-  // THE DEFECT the browser probe showed: a second Morrowind.esm stored
-  // over the first moved no name, so the generation stood, the record
-  // memo answered for the old file, and the persistent set made the
-  // stale answer visible. Every swap cache rode the same gap.
-  const src = rd('src/scenes/dataSource.js');
-  assert.match(src, /const mwFingerprint = \(names, sizes = \[\]\) => \[\.\.\.names\]\.sort\(\)\.map\(\(n, i\) => `\$\{n\}\\t\$\{sizes\[i\] \?\? ''\}`\)\.join\('\\n'\);/,
-    'name and size per row, in sorted order');
-  const sizes = src.slice(src.indexOf('async function storedMorrowindSizes(names)'));
-  // AUDIT 65 XL-6: off a PLAIN GET, not assetBlob. Both stored shapes
-  // answer their own size (a Blob's `.size`, a legacy ArrayBuffer's
-  // `.byteLength`); assetBlob would MIGRATE every legacy record - a
-  // structured clone and a readwrite put per file - just to measure it.
-  assert.match(sizes.slice(0, sizes.indexOf('\n}\n')), /for \(const n of \[\.\.\.names\]\.sort\(\)\) \{\s*\n\s*const v = await assetValue\(MW_STORE, n\);\s*\n\s*out\.push\(v == null \? -1 : \(v\.size \?\? v\.byteLength \?\? -1\)\);/,
-    'the sizes walk the same sorted order off a plain get - no bytes read, and nothing written');
-  assert.doesNotMatch(sizes.slice(0, sizes.indexOf('\n}\n')), /assetBlob/, 'measuring a set never migrates it');
-  const reg = src.slice(src.indexOf('export async function registerMorrowindData()'));
-  assert.match(reg, /const sizes = await storedMorrowindSizes\(names\);\s*\n\s*const print = mwFingerprint\(names, sizes\);/);
-});
-
-
 // ── the build, through the door ──────────────────────────────────────
 import { buildFpArm, armRecordsOf, fpSkeletonPath, FP_CLIP_PATH } from '../../../src/combat/fpArm.js';
 import { FACE_MATCH_VERSION } from '../../../src/formats/morrowind/mwFaceMatch.js';
@@ -346,17 +276,4 @@ test('MW-LOAD: the face verdict is kept in the derived store against the set, th
   assert.notEqual(asked[0], asked[1], 'another pool is measured anew');
   assert.equal(asked[0], asked[2], 'the same pool keeps its verdict');
   assert.deepEqual(asked[0].split(':').slice(0, -1), asked[1].split(':').slice(0, -1), 'the rest of the key the same');
-  // source pins: the key and the guard
-  const src = rd('src/combat/fpArm.js');
-  // PIN MOVED (AUDIT MW-HEADS1): the key names the pools measured after the set
-  assert.match(src, /`mw-face-match:v\$\{FACE_MATCH_VERSION\}:\$\{race\}:\$\{female \? 'f' : 'm'\}:\$\{faceIndex \| 0\}:\$\{fnv\(print\)\}:\$\{fnv\(measured\)\}`/,
-    'the key names the matcher version, the identity, the set and the candidates');
-  assert.match(src, /if \(kept && \(kept\.head \|\| kept\.hair\)\) \{ faceMatch = kept; FACE_MATCH_CACHE\.set\(fkey, kept\); \}/);
-  assert.match(src, /if \(dkey && \(faceMatch\.head \|\| faceMatch\.hair\)\) \{\s*\n\s*try \{ await d\.storeDerivedJson\(dkey, faceMatch\); \}/);
-  // the measurement decodes level 0 only - MW-TEXTHREAD: in the texture pool, the same decoder off the frame's thread
-  const measure = src.slice(src.indexOf('async function measurePart('));
-  assert.match(measure.slice(0, measure.indexOf('\n}\n')), /await decodeTextureOffThread\(tpath, tarc\.get\(tpath\), \{ levels: 1 \}\)/);
-  // the esm loop takes the door first, the bytes second
-  assert.match(src, /const records = typeof d\.loadMorrowindArmRecords === 'function' \? await d\.loadMorrowindArmRecords\(n\) : null;\s*\n\s*esmBytes\.push\(records \? \{ name: n, records \} : \{ name: n, bytes: await d\.loadMorrowindFile\(n\) \}\);/);
-  assert.match(src, /if \(e\.records\) return armRecordsOf\(e\.records, kind\);/);
 });

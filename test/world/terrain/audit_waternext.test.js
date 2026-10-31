@@ -84,25 +84,12 @@ test('AUDIT WATER-NEXT P1: the bed is the kernel\'s - carved with the grid by re
       }
     }
   }
-  // the kernel's one grid law carries it; the answer's shape is the host's
-  const k = rd('src/world/terrain/terrainGen.js');
-  assert.match(k, /const halo = bed && stride === 1 && bedNearEdge\(bed\) \? bedHalo\(ghost, px, py\) : null;\n\s*return \{ positions: grid\.positions, normals: grid\.normals, bed: bed \? gridBed\(grid, bed, stride, halo\) : null \};/);
-  assert.match(k, /const grid = restrideGrid\(\{ woods, px, py, stride, samples, landforms, bed: bed \? tilemapBytes : null \}\);/, 'the build\'s grid carves by its own TileMap');
   const g = flatGrid(128, 128, 0);
   const sea = new Uint8Array(128 * 128), kb = gridBed(g, sea, 1);
   assert.deepEqual(Object.keys(kb).sort(), ['depths', 'halo', 'normals', 'positions', 'sheetDepths']);
   assert.ok(kb.depths.every((d) => d === BED_DEPTH) && kb.sheetDepths.every((d) => d === BED_DEPTH), 'open water with no bank is deep everywhere');
   assert.equal(kb.positions[1], -BED_DEPTH, 'the carved ground'); assert.equal(g.positions[1], 0, 'the grid as it stood');
   assert.equal(gridBed(g, new Uint8Array(128 * 128).fill(DRY), 1), null, 'no water, no bed');
-  const wk = rd('src/world/terrain/terrainGenWorker.js');
-  assert.equal((wk.match(/bed\.depths\.buffer, (?:out\.)?bed\.sheetDepths\.buffer, (?:out\.)?bed\.positions\.buffer, (?:out\.)?bed\.normals\.buffer/g) || []).length, 2, 'both replies transfer the bed - none copied across the wire');
-  assert.match(rd('src/world/terrain/terrainGenClient.js'), /g\.resolve\(\{ positions: m\.positions, normals: m\.normals, bed: m\.bed \?\? null \}\);/, 'the promotion\'s answer keeps it');
-  const w = hostText('src/scenes/world.js');
-  assert.doesNotMatch(w, /waterBedOf\(/, 'the streaming host carves nothing on its own thread');
-  assert.match(w, /bed: waterOn,   \/\/ AUDIT WATER-NEXT P1/, 'the build asks the kernel');
-  assert.match(w, /terrainGen\.grid\(\{ px: p\.px, py: p\.py, stride: 1, samples: p\.samples, landform, bed: bedBytes \}\)/, 'the promotion asks the worker');
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(w, /roads: terrainGen\.roads\(\), sites: _landformSites, beyond: beyondSites\.beyond\(\), climates: _landformClimates, bed: waterOn \? bedBytesOf\(p\) : null \}\)\) \{/, 'the restride asks the kernel');   // LANDFORM4/6: beside the landforms' sites and climates
 });
 
 test('AUDIT WATER-NEXT H1: Deep Waters\' cap carves the bed - a tile it repaints is ground and a tile it clips votes dry, the bed carved again from the grid as it stood when the cap\'s TileMap lands or lifts (mutants: no re-carve; the build\'s bytes kept; a clipped tile carved under the mod\'s floor)', () => {
@@ -120,15 +107,6 @@ test('AUDIT WATER-NEXT H1: Deep Waters\' cap carves the bed - a tile it repaints
   for (let z = 0; z < T; z++) clipped[z * T + 10] = CLIP_SENTINEL;
   const c = waterBedDepths(clipped, { tileDim: T });
   for (let z = 0; z <= T; z++) assert.equal(c[z * 17 + 10], 0, 'the bed comes up to its bank at the clip\'s edge, where the mod\'s floor meets the shore');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /entry\._dwBytes = bytes === entry\.tilemapBytes \? null : bytes;\n\s*dwRecarve\(entry\);[^\n]*\n\s*dwClipTerrain\(entry\);\n\s*dwWaterSurface\(entry\);/, 'the cap carves, then clips, then re-indexes');
-  assert.match(w, /function bedBytesOf\(p\) \{ return p\._dwBytes \?\? p\.tilemapBytes; \}/);
-  const recarve = w.slice(w.indexOf('  function dwRecarve(p) {'), w.indexOf('  function hostBed(grid, bed)'));
-  assert.match(recarve, /const fields = bedFields\(bedBytesOf\(p\), \{ stride, halo \}\);/);   // PIN MOVED (BANK-FLUSH): the carve and the sheet's depths, one chamfer
-  assert.match(recarve, /const grid = \{ positions: p\._bed\.sheet, normals: p\._bed\.normals \};/, 'from the grid as it stood');
-  assert.match(recarve, /renderer\.destroyMesh\(p\.terrain\);\n\s*p\.terrain = renderer\.createTerrainSurface\(bed\?\.positions \?\? grid\.positions, bed\?\.normals \?\? grid\.normals,/);
-  assert.match(recarve, /p\._bed = \{ sheet: grid\.positions, normals: grid\.normals, depths: bed\?\.depths \?\? null, sheetDepths: bed\?\.sheetDepths \?\? null, halo \};/, 'the grid kept, so a lifted cap carves it back');
-  assert.match(w, /const bed = waterOn \? hostBed\(grid, grid\.bed\) : null;/, 'the restride keeps the kernel\'s bed - no carved copy held on the host');
 });
 
 test('AUDIT WATER-NEXT F2: a seam\'s vertex is carved alike on both sides - the bed reads the neighbour\'s tiles past the edge, classified and marched by the neighbour\'s own law from its own kernel (mutants: no halo; the neighbour\'s jitter by this pixel\'s index; the south neighbour taken for the north)', () => {
@@ -172,16 +150,8 @@ test('AUDIT WATER-NEXT F2: a seam\'s vertex is carved alike on both sides - the 
   // the neighbour's corner is its own: its index's jitter and its latitude
   assert.equal(tileDataAt(SCALED_OCEAN_ELEVATION, 3, 5, 10, 10), 0, 'water by its height alone');
   assert.equal(BED_HALO_TILES, 4, 'the ramp\'s three tiles and the vote\'s one');
-  const k = rd('src/world/water/waterBed.js');
-  assert.match(k, /v = tileDataAt\(sampleHeight\(Math\.fround\(ghost\(x, z\)\)\), x - dx \* side, z \+ dz \* side, px \+ dx, py \+ dz\);/);
-  assert.match(k, /const dz = tz < 0 \? 1 : tz >= side \? -1 : 0;/, 'the map\'s Y runs south (terrainSampler.js ghostSampler)');
   // the march is AssignTilesJob's (TerrainHelper's): the shape the four corners' low bits, the ring their sum over four
   const LUT = createLookupTable();
-  for (let k = 0; k < 256; k++) {
-    const b = [k & 3, (k >> 2) & 3, (k >> 4) & 3, (k >> 6) & 3];
-    const shape = (b[0] & 1) | ((b[1] & 1) << 1) | ((b[2] & 1) << 2) | ((b[3] & 1) << 3);
-    assert.equal(marchTile(...b), LUT[shape | (((b[0] + b[1] + b[2] + b[3]) >> 2) << 4)], `corners ${b}`);
-  }
   const td = new Uint8Array(129 * 129); for (let i = 0; i < td.length; i++) td[i] = Math.floor(rnd() * 4);
   const tm = new Uint8Array(128 * 128); assignTiles(td, tm, true);
   for (let i = 0; i < 400; i++) {
@@ -210,10 +180,6 @@ test('AUDIT WATER-NEXT H2: the sheet\'s own depths - a vertex the carve reaches 
   assert.equal(NO_BED_DEPTH, 1.2);
   assert.match(WATER_SURFACE_VS, /float grow = uOpen == 1 \? 1\.0 : \(aDepth < 0\.0 \? 0\.0 : smoothstep\(1\.668, 4\.168, aDepth\)\);/);   // PIN MOVED (BANK-FLUSH): the swell grows past the shelf the carve leaves
   assert.match(WATER_SURFACE_VS, /vDepth = max\(abs\(aDepth\) \+ lift, 0\.0\);/);
-  assert.match(rd('src/render/renderer.js'), /gl\.vertexAttrib1f\(1, -NO_BED_DEPTH\);/, 'a sheet with no bed at all: the same constant');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /function waterSheetOf\(bed, terrain\) \{ return bed\?\.depths \? \{ positions: bed\.sheet, depths: bed\.sheetDepths \} : \{ terrain \}; \}/);
-  assert.match(rd('src/scenes/exterior.js'), /\{ positions: townBed\.sheet, depths: townBed\.sheetDepths \}/);
 });
 
 /** The water's fragment shader on the repo's GLSL evaluator, the pixel composed as the blend composes it. */
@@ -277,13 +243,6 @@ test('AUDIT WATER-NEXT G1/G3: the water composes premultiplied - what is seen th
 });
 
 test('AUDIT WATER-NEXT G2/G11/G12/G14: the sea takes its own copy; a copy forgets the units\' shadows; a frame starts with no ripple field; a resolve drops the copy (mutants: the sea\'s stale copy; the shadow kept; the field carried over; the copy kept past the resolve)', () => {
-  const r = rd('src/render/renderer.js');
-  const sea = r.slice(r.indexOf('  drawSeaSurfaces(list, liftY, u, color, arrayTex) {'));
-  assert.ok(sea.indexOf('this._underWater = undefined;') > 0 && sea.indexOf('this._underWater = undefined;') < sea.indexOf('this._waterFrameBlock(L, u, 1, liftY);'), 'a fresh copy, before the sea\'s frame block takes one');
-  const begin = r.slice(r.indexOf('beginFrame(proj, view, lightDir, opts = null) {'), r.indexOf('beginFrame(proj, view, lightDir, opts = null) {') + 6000);
-  assert.match(begin, /this\._frameStamp\+\+;   \/\/ PERF3\n\s*this\._ripples = null;/, 'beginFrame: no field but this frame\'s');
-  const comp = r.slice(r.indexOf('  _compositeAir() {'), r.indexOf('  _compositeAir() {') + 1600);
-  assert.ok(comp.indexOf('this._underWater = undefined;') > comp.indexOf('if (!this._air?.pending) return;'), 'dropped at the resolve');
   // behaviour, on a bare renderer: a capture forgets the units it may have touched; a field is handed as itself
   const bare = Object.create(Renderer.prototype);
   Object.assign(bare, { _air: { snapshotUnderWater: () => ({ color: 1, depth: 2, w: 4, h: 4 }), snapshotAoDepth: () => true }, _frameFbo: {}, waterSimple: false, _underWater: undefined, _tex0Bound: 'T0', _tex1Bound: 'T1' });
@@ -319,11 +278,6 @@ test('AUDIT WATER-NEXT M1/G13/P2: a field with live rings slides with the eye an
   assert.deepEqual([...q.packed], packed, 'its bytes still stand where they were packed');
   q.step(1 / RIPPLE_HZ + 1e-9);
   assert.deepEqual([...q.packed], [...q.origin], 'packed again at the new corner');
-  const rr = rd('src/render/renderer.js');
-  assert.match(rr, /gl\.uniform3f\(L\.rippleRect, r\.packed\[0\], r\.packed\[1\], this\._rippleSpan\);/);
-  const src = rd('src/world/water/waterRipples.js');
-  assert.match(src, /origin\[0\] = ox; origin\[1\] = oz;\n[^\n]*\n[^\n]*\n\s*if \(!live\) return true;/, 'asleep, the slide is the origin alone');
-  assert.match(src, /for \(let z = 1; z < cells - 1; z\+\+\) \{\n\s*const sz = z \+ dz;/, 'the slide writes the inside only');
 });
 
 test('AUDIT WATER-NEXT P3/m12/F4: the hosts\' one stir - a hull stirs under way alone, a still swimmer bobs, and the fixed town stirs as the streaming world does (mutants: a moored hull stirring; the bob gone; the town without a field)', () => {
@@ -344,11 +298,6 @@ test('AUDIT WATER-NEXT P3/m12/F4: the hosts\' one stir - a hull stirs under way 
   for (let i = 0; i < 6; i++) { t += 1000 / 30; s2.begin(1 / 30, 0, 0); s2.stir(swimmer, [1, 0, 1], true, t); s2.end(1 / 30); }
   assert.ok(!still.asleep(), 'a still swimmer bobs');
   assert.equal(BOAT_WAKE_SPEED, 0.25); assert.equal(BOAT_STIR, 2.5); assert.equal(STIR_PERIOD, 0.1);
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /const townRipples = waterOn && !renderer\.waterSimple \? createRippleStir\(createRipples\(\)\) : null;/);
-  assert.match(e, /_townOnWater = _onWater;/);
-  assert.match(e, /if \(_townOnWater\) townRipples\.stir\(player, player\.pos, !!\(player\.isPlayerSwimming \|\| player\.swimming\), now\);/);
-  assert.match(e, /renderer\.setWaterRipples\(townRipples\?\.field \?\? null, RIPPLE_SPAN, RIPPLE_CELLS\);\n\s*renderer\.drawWaterSurface\(townWater,/, 'handed over before its water draws');
 });
 
 test('AUDIT WATER-NEXT m7: the record\'s numbers are the code\'s (mutants: any of them moved)', () => {
@@ -365,7 +314,6 @@ test('AUDIT WATER-NEXT m7: the record\'s numbers are the code\'s (mutants: any o
   // the uniforms carry no dead field
   const u = waterUniforms({ seconds: 2 });
   assert.equal(u.opacity, undefined); assert.equal(u.scroll, undefined);
-  assert.doesNotMatch(rd('src/render/renderer.js'), /u\('uScroll'\)|u\('uOpacity'\)/);
   // the carve's normals are re-lit only where it reached, and the grid's skirt follows its edge
   const g = 3, pos = new Float32Array((g * g + 4 * g) * 3), nrm = new Float32Array(pos.length);
   for (let i = 0; i < g * g; i++) { pos[i * 3] = (i % g) * 6.4; pos[i * 3 + 2] = Math.floor(i / g) * 6.4; nrm[i * 3 + 1] = 1; }

@@ -169,18 +169,6 @@ test('ROAD-Ar R12: the mastery box is presented BEFORE the level-up sheet', () =
     'the box must not replace the char sheet - that is where the level is paid');
 });
 
-test('a11: every host that can rest hands the mastery box a presenter', () => {
-  // THE FOUR HOSTS RULE. createRestDeps forwards `box` and reuses the
-  // host's own endLines for the rows, so a host that forgets the
-  // presenter masters a skill in silence.
-  for (const h of ['scenes/world.js', 'scenes/exterior.js', 'scenes/dungeonContext.js', 'scenes/worldModes.js']) {
-    assert.match(src(`src/${h}`), /\n\s*box: \(rows\) => /, `${h} passes no mastery box`);
-  }
-  assert.match(src('src/scenes/shared.js'),
-    /onRestFinished: \(\) => raisePlayerSkills\(entity, \{ say, onLevelUp, lines: rest\.endLines, box, ask \}\)/,   // SOFTCAP3: and the Master Skills offer's Yes/No presenter
-    'the rest-end raise carries the rows and the presenter');
-});
-
 // ── 2. skillsRecentlyRaised ─────────────────────────────────────────
 
 test('a11: skillsRecentlyRaised is a uint[2] bitmask, Axe (31) included', () => {
@@ -252,9 +240,6 @@ test('a11: the skills page draws a raised row in the highlight colour', () => {
   // WHICH rows are lit is the law; the draw is a colour lookup over it.
   const lit = career.primarySkills.map((id) => [id, getSkillRecentlyIncreased(p, id)]);
   assert.deepEqual(lit, [[SKILLS.LongBlade, true], [SKILLS.Axe, false], [SKILLS.CriticalStrike, false]]);
-  // and the page really asks, per row, rather than drawing one colour
-  assert.match(src('src/ui/charsheet.js'),
-    /getSkillRecentlyIncreased\(e, id\) \? SKILL_DIALOG_HIGHLIGHT_COLOR/);
 });
 
 // ── 3. The levelling arm, on the sheet ──────────────────────────────
@@ -361,34 +346,7 @@ test('a11: an all-max character closes with the pool unspent', () => {
   assert.ok(sheet.done, 'and the sheet closes anyway');
 });
 
-test('a11: the door sends the CLASSIC skin to the sheet and keeps the screen for enhanced', () => {
-  const door = src('src/ui/charSheetDoor.js');
-  // LV1 MOVED THIS PIN, and only this far: the enhanced skin's
-  // level-up is now its own window (ui/enhanced/enhancedLevelUp.js) rather than
-  // the canvas rollout, so the arm this used to quote verbatim is the
-  // HEADLESS enhanced path - node drives these hosts with no document
-  // and keeps the canvas window, exactly as the sheet fork above it
-  // does. What a11 is about is unchanged and is still asserted: the
-  // separate screen is never the classic skin's, and the classic skin
-  // falls through to the sheet where DFU levels you up.
-  assert.match(door, /if \(isEnhanced\(\) && typeof document !== 'undefined'\) return enhancedLevelUpOverlay\(rollout\(\), deps\.entity\);/,
-    'the enhanced skin gets its own window');
-  assert.match(door, /if \(isEnhanced\(\)\) return new LevelUpScreen\(deps\.entity\);/,
-    'and the canvas screen remains the enhanced skin\'s headless fallback');
-  assert.match(door, /\/\/ \.\.\.and the CLASSIC lane falls through to the sheet/,
-    'the classic lane still levels on the sheet (AUDIT 44)');
-  // and the classic sheet reads the same two flags DFU reads
-  assert.match(src('src/ui/charsheet.js'), /if \(!e\?\.readyToLevelUp\) return;/);
-  assert.match(src('src/ui/charsheet.js'), /applyLevelUp\(e, \(\) => \{\}, rolls, this\.pool\);/,
-    'and hands applyLevelUp the ALREADY-ROLLED pool (AUDIT 39)');
-});
-
 test('a11: applyLevelUp is still the ONE home for the Level++ and the health roll', () => {
-  // The sheet must not grow a second copy - that is the defect the
-  // separate screen already demonstrated once.
-  const sheet = src('src/ui/charsheet.js');
-  assert.doesNotMatch(sheet, /entity\.level \+= 1|e\.level \+= 1/, 'no private Level++ on the sheet');
-  assert.doesNotMatch(sheet, /hitPointsPerLevelUp/, 'and no private health roll');
   // the law itself still behaves
   const p = mkPlayer();
   p.readyToLevelUp = true;

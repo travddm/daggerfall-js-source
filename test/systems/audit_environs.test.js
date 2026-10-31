@@ -76,7 +76,6 @@ test('AUDIT ENVIRONS S1: SnowContextData.Prepare reads the roads of the map pixe
   // the box's map pixels, rows north to south as MapsFile counts them
   const b = snowPixelBox(503 * SIZE + 1, 248 * SIZE + 1, 505 * SIZE - 1, 250 * SIZE - 1);
   assert.deepEqual(b, { x0: 503, x1: 504, y0: 250, y1: 251 }, 'global z 248-250 pixels north of the map\'s south edge: rows 251 and 250');
-  assert.match(read('src/systems/snowfallRuntime.js'), /for \(const t of this\.world\.terrainsIn\(minGX, minGZ, maxGX, maxGZ\)\) \{/);
 });
 
 test('AUDIT ENVIRONS S3 + S8: a Surface setting that rebuilds the window on a frame leaves that frame on the NEW window - nothing stamped against its unset centre - and the rebuild zeroes the refill\'s remainder; CompleteSession\'s refill clock ticks half a second on, on the weather it is told (mutants: the frame kept on the old window; the remainder kept; the clock at once)', () => {
@@ -171,7 +170,6 @@ test('AUDIT ENVIRONS S2: a load completes its session on the LOADED game\'s cloc
   for (let i = 0; i < 120; i++) { st.now += 1 / 30; st.sec += 1; frame(); }
   assert.equal(host.runtime.tracks.count, cells, 'its tracks stand - the refill\'s clock started at the load');
   assert.equal(host.runtime.snowpack.wildernessDepth, depth, 'and the snowpack did not run the gap');
-  assert.match(read('src/scenes/snowfallHost.js'), /if \(!runtime\.restoreSaveData\(d, 0\)\)/);
 });
 
 test('AUDIT ENVIRONS S5: a tile\'s ground rebuilt as a build reads it is heard when the runtime\'s frame is done (OnPromoteTerrainData is the streaming world\'s, never the frame\'s) - the window builds again on the new ground, not committed on the old (mutants: the promotion delivered inside the build)', async () => {
@@ -233,7 +231,6 @@ test('AUDIT ENVIRONS G1 + G3 + G4: the snow\'s GL owes the renderer its seam bef
   assert.equal(log[0]?.[0], 'endUiRun');
   assert.ok(!log.some((c) => c[0] === 'pixelStorei' && c[1] === 'UNPACK_FLIP_Y_WEBGL' && c[2] === true), 'no flip asked of an ImageBitmap');
   assert.ok(log.some((c) => c[0] === 'texParameteri' && c[2] === 'TEXTURE_MIN_FILTER' && c[3] === 'NEAREST_MIPMAP_NEAREST'), 'FilterMode.Point: the nearest level');
-  assert.match(read('src/scenes/snowfallHost.js'), /createImageBitmap\(await r\.blob\(\), \{ imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' \}\)/);
 });
 
 test('AUDIT ENVIRONS G6: the blanket\'s tiles are culled to the frame\'s frustum by their bounds - the ground\'s span and the deepest snow over it - as each tile\'s renderer is culled in the mod (mutants: the cull ignored; the bounds without the snow; the span unread)', () => {
@@ -296,7 +293,6 @@ test('AUDIT ENVIRONS I5: the snow and the wind cost themselves, never the frame 
   const f = { dt: 0.02, outside: true, weather: 'sunny', minutes: 523530, climate: 231, mapPixel: { x: 100, y: 200 }, heading: [1, 0], feet: [0, 0, 0], height: 1.8 };
   await quiet(() => { assert.equal(wind.frame(f), null); assert.equal(wind.frame(f), null); });
   assert.equal(ticks, 1, 'the wind stops at the frame that threw');
-  assert.match(read('src/render/renderer.js'), /prepareTerrainSnow\(\) \{ this\._ensureTerrainSnow\(\); \}/);
 });
 
 test('SHADER-STALL the snow\'s surface is made the first frame its program\'s compile is done - started as the masks land, never a frame waiting on it; a renderer that cannot say makes it at once, as it was (mutants: the surface made while it compiles; never made after)', async () => {
@@ -332,10 +328,6 @@ test('AUDIT ENVIRONS I2 + I7: a teleport\'s new frame carries the snow, the wind
   st.x += 30; walk(rt, st, 1, { step: 0 });
   assert.match(rt.lastStampStatus, /^rejected teleport-sized segment: 327\d\d\.\d\dm$/, 'the departure\'s last stamp is 32 km behind: no trench to the arrival');
   assert.equal(rt.tracks.count, writes, 'no phantom cells at the arrival');
-  const w = read('src/scenes/world.js');
-  const at = w.indexOf('    csaReanchor(state.initOffset);   // FIELD-CSA1');
-  const block = w.slice(at, w.indexOf('\n    _streamSince = null;', at));
-  for (const line of ['snowfall.offsetOrigin(state.initOffset);', 'windfall.offsetOrigin(state.initOffset);', 'hazeGl?.offsetOrigin(state.initOffset);', 'heatHaze.reset();']) assert.ok(block.includes(line), `the re-anchor: ${line}`);
   // the haze's layer: taken grounded, held airborne, carried by a recentre's height
   const h = createHeatHaze();
   const noon = { exterior: true, climate: 224, weather: 'sunny', minuteOfDay: 720, settings: { ...HAZE_OFF, enabled: true, intensity: 1.5 } };

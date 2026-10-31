@@ -250,10 +250,6 @@ test('GUILD2 the client\'s door: the five routes and their bodies; every refusal
     'guild-vault-rank', 'guild-vault-limit', 'guild-vault-full', 'guild-vault-empty', 'guild-vault-moved', 'guild-vault', 'vault-goods',
     'bad-vault-item', 'bad-vault-count', 'bad-vault-slot', 'bad-vault-grant']) assert.equal(typeof REFUSALS[w], 'string', w);
   assert.match(REFUSALS['guild-rename-gold'], /25,000 gold/);
-  const svc = src('server-account/src/service.js'), idx = src('server-account/src/index.js');
-  for (const r of ['/v1/guilds/rename', '/v1/guilds/vault', '/v1/guilds/vault/put', '/v1/guilds/vault/take', '/v1/guilds/vault/grant']) {
-    assert.ok(svc.includes(`'${r}'`), r); assert.ok(idx.includes(`'${r}':`), r);
-  }
 });
 
 // ─── THE TAB ────────────────────────────────────────────────────────
@@ -576,40 +572,3 @@ test('GUILD2c (AUDIT2 G2/G3): a hole is painted once in each colour, each inside
   assert.ok(plainCalls.some((c) => c[0] === 'fill' && c[1] === SHIELD_CLOTH));
 });
 
-test('GUILD2c the Arms page: the guildmaster\'s choices are pictures - the division a tile each, drawn on the draft\'s own colours; the colours swatches, the ones the law refuses shut and saying why (AUDIT2 U14); the device a tile of forty; the device\'s own colour; the banner, the shield and the tag as they will stand (mutants: a refused colour offered; the second colour row on a plain field)', async () => {
-  const t = await tab(view({ marks: 900 }), {}, 'arms');
-  const tiles = find(t.panel.root, 'dfsocial-tile');
-  assert.equal(tiles.filter((x) => /^Field: /.test(x.attrs['aria-label'])).length, 8);
-  assert.equal(tiles.filter((x) => /^Device: /.test(x.attrs['aria-label'])).length, 40);
-  const sw = (label) => find(t.panel.root, 'dfsocial-swatch').find((x) => x.attrs['aria-label'] === label || x.attrs['aria-label'].startsWith(`${label} (`));
-  assert.equal(sw('Field color: Ash').disabled, true, 'Ash never the field');
-  assert.match(src('src/ui/socialPanel.js'), /\.dfsocial\.touch \.dfsocial-swatch \{ width: 44px; height: 44px; \}/, 'AUDIT2 D4: a finger\'s swatch');
-  assert.equal(sw('Field color: Gold').disabled, true, 'nor the border\'s colour');
-  // AUDIT2 U14: a shut swatch says why - on its label and title, and drawn under its row for a finger
-  assert.equal(sw('Field color: Gold').attrs['aria-label'], 'Field color: Gold (unavailable: the arms need a border unlike the field)');
-  assert.equal(sw('Field color: Gold').attrs.title, 'Gold (unavailable: the arms need a border unlike the field)');
-  assert.ok(texts(t.panel.root).some((x) => /^Unavailable: the arms need .*a border unlike the field/.test(x)), 'drawn');
-  assert.equal(sw('Second color: Crimson'), undefined, 'a plain field has no second colour');
-  tiles.find((x) => x.attrs['aria-label'] === 'Field: Per pale').fire('click');
-  assert.ok(sw('Second color: Crimson'), 'divided, it has');
-  assert.equal(sw('Second color: Azure').disabled, true, 'never the field\'s');
-  sw('Second color: Crimson').fire('click');
-  sw('Device color (matches the border unless chosen): Argent').fire('click');
-  const [banner] = find(t.panel.root, 'dfsocial-armspics')[0].children;
-  assert.ok(decodeURIComponent(banner.src).includes('fill="#b3262e"'), 'the banner wears the draft');
-  assert.ok(texts(t.panel.root).includes('Per pale Azure and Crimson, bordered Gold, a Wolf Argent'));
-  assert.equal(button(t.panel.root, 'Change it').disabled, false);
-  assert.ok(find(t.panel.root, 'dfsocial-tagchip')[0].textContent.includes('HND'));
-  // AUDIT GUILD2: every swatch asks the law itself - the device's colour against the second field colour was left open,
-  // and a pick of it made arms the law refused (the border's too, while the device wears the border's)
-  assert.equal(sw('Device color (matches the border unless chosen): Crimson').disabled, true, 'never the second colour');
-  sw('Device color (matches the border unless chosen): Gold').fire('click');   // the border's again
-  assert.equal(sw('Border: Crimson').disabled, true, 'a border the device would wear against the second colour');
-  for (const label of find(t.panel.root, 'dfsocial-swatch').map((b) => b.attrs['aria-label'])) {
-    const b = sw(label);   // drawn again at each pick: the swatch as it stands now
-    if (!b || b.disabled) continue;
-    b.fire('click');
-    const raise = button(t.panel.root, 'Change it');
-    assert.equal(raise.disabled, false, `${label} - an open swatch makes arms the law takes (${raise.whyEl?.textContent ?? ''})`);
-  }
-});

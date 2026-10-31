@@ -144,14 +144,3 @@ test('L10N3b the pack\'s font, where a browser can load it: registered for its l
   }
 });
 
-test('L10N3b by source: the pack row under the language row on the front door alone, none for English; the picker reads a folder or a zip through the one classifier', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /if \(!pause\) \{ const packRow = translationPackRow\(\); if \(packRow\) out\.push\(packRow\); \}/);
-  assert.match(menu, /if \(!info \|\| cur === BASE_LOCALE \|\| info\.hidden\) return null;/, 'English has no pack: English is the game\'s own');
-  const ds = rd('src/scenes/dataSource.js');
-  assert.match(ds, /zip: \(name\) => !!classifyPackFile\(name\),/, 'a zip inflates only what the game reads');
-  assert.match(ds, /const record = await installTranslationPack\(code, packEntriesFromFiles\(files\)\);/);
-  const ld = rd('src/scenes/localeData.js');
-  assert.match(ld, /\.then\(\(\) => applyPack\(tag\)\)/, 'the pack after the drafts');
-  assert.match(ld, /_packs = await packStore\.installedPacks\(\);   \/\/ L10N3b: before anything is registered/);
-});

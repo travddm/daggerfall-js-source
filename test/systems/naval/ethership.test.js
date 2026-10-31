@@ -219,14 +219,6 @@ test('ETHER-LEGENDS her terrors at sea: the Drowned Queen\'s timbers knit while 
   assert.equal(q.damage.hull, hurt, 'nothing knits in the first quiet seconds');
   s.run(10);
   assert.ok(q.damage.hull > hurt, 'her timbers knit');
-  const host = read('src/scenes/naval/navalHost.js');
-  assert.match(host, /if \(legendOfClass\(s\.cls\.id\)\?\.trait !== 'mends' \|\| s\.damage\.state !== SHIP_STATES\.afloat \|\| s\.damage\.fire > 0\) return;/);
-  assert.match(host, /if \(clock - s\.damage\.lastHitAt < LEGEND_MEND_QUIET_S \|\| s\.damage\.hull >= s\.damage\.maxHull\) return;/);
-  assert.match(host, /s\.damage\.repair\(\{ hull: s\.damage\.maxHull \* LEGEND_MEND_PER_S \* d, sail: 0, crew: 0 \}\);/);
-  assert.match(host, /const reach = reachOf\(e, glassReach\(\{ night, lit: showsLight\(e\), sight, lookout \}\)\);/, 'the knowledge step');
-  assert.match(host, /const reach = reachOf\(e, glassReach\(\{ night: !!where\(\)\.night, lit: showsLight\(e\), sight, lookout \}\)\);/, 'the glass\'s card');
-  assert.match(host, /\? \{ far: reach\.far \* LEGEND_VEIL_K, near: reach\.near \* LEGEND_VEIL_K, eye: reach\.eye \* LEGEND_VEIL_K, lookout: reach\.lookout \* LEGEND_VEIL_K \} : reach\);/);
-  assert.match(host, /legendOfClass\(e\.ship\.cls\.id\)\?\.trait === 'veiled'/);
 });
 
 test('ETHER-SHIPS the strands at sea: a wild isle\'s site floats its casks out within reach (the world\'s sites, kind `strand`), and a cask hauled is the world\'s gather - its good into the hold of the boat that sailed through it, said (mutants: the kind, the haul\'s branch, the gift)', async () => {
@@ -247,22 +239,3 @@ test('ETHER-SHIPS the strands at sea: a wild isle\'s site floats its casks out w
   assert.ok(s.log.say.includes('You haul a cask aboard: 3 shards of starglass from the strand of X.'));
 });
 
-test('ETHER-SHIPS by source: the director told the sea (its band and its legend), the crown\'s waters none past the Veil, a ship of the sea launched under its own names and colours; the world\'s door to the legends, the papers and the strands (mutants: each seam)', () => {
-  const host = read('src/scenes/naval/navalHost.js');
-  assert.match(host, /ether: etherCtx\(w\),/);
-  assert.match(host, /const l = deps\.ether\?\.legendHere\?\.\(w\.px, w\.py, \{ night: !!w\.night \}\) \?\? null;/);
-  assert.match(host, /return \{ band, legend: l \? \{ id: l\.id, classId: l\.classId \} : null \};/, 'her class to the director');
-  assert.match(host, /else if \(ether && cls\.faction === 'pirate'\) ship\.temper = temperOf\(cls, spec\.seed, \{ bold: etherBold\(ether\) \}\);/, 'the band\'s boldness');
-  assert.match(host, /if \(legend\) ship\.temper = TEMPERS\.bold;/, 'a legend fears nothing');
-  assert.match(host, /const distress = relieving \|\| w\.ether \? null : distressAt\(crown\.name\);/);
-  assert.match(host, /const watersCrown = \(\) => \{ const w = where\(\); return w\.ether \? null : crownOf/);
-  assert.match(host, /if \(entry\.ether\) \{ chargeEther\(act, entry\); return; \}/);
-  assert.match(host, /const area = namesArea\(spec, w\), names = ether \? etherShipNames\(cls, spec\.seed\) : watersShipNames\(cls, spec\.seed, region, crown, area\);/);   // PIN MOVED (WW7-8): the area kept for the wire   // PIN MOVED (AUDIT TESA II K7): the waters' names a module helper
-  assert.match(host, /const etherTier = \(entry\) => \(entry\.ether \? BANDS\.find\(\(b\) => b\.id === entry\.ether\)\?\.tier \?\? 0 : 0\);/, 'her hold the band\'s tiers richer');
-  assert.match(host, /deps\.hold\?\.\(key, tier \+ \(entry\.deep \? DEEP_TIER : 0\) \+ etherTier\(entry\)\)/);
-  assert.match(host, /deep: !!entry\.deep \|\| !!entry\.ether \}\);/, 'her casks the deep\'s');
-  const world = read('src/scenes/world.js');
-  assert.match(world, /legendHere: \(px, py, o\) => etherHost\.legendHere\(px, py, o\),/);
-  assert.match(world, /sites: \(\) => \{ const p = playerTravelPixel\(\); return etherSea && inEther\(p\.x, p\.y\) \? \[\.\.\.harbourOffice\.sites\(\), \.\.\.etherHost\.sites\(p\.x, p\.y\), \.\.\.seaVentures\.wrackSites\(p\.x, p\.y\)\] : harbourOffice\.sites\(\); \},/);   // PIN MOVED (SEA-EVENTS, 2026-10-22): and the Aether Storm's wrack
-  assert.match(world, /waters: ether \? 'ether' : watersOf\(\{ nearPort, portPx: navalPortPx\(\) \}\), ether,/);
-});

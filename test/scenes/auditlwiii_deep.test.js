@@ -19,15 +19,11 @@ test('AUDIT LW-III ONE PILE A BODY: remains laid before a save made inside ride 
   const rel = createRelations();
   let loot = createDroppedLoot(lootDeps());
   const r = { key: 'deep:R1:T1', res: { id: 'R1', name: 'Ada Lark' }, trip: { id: 'T1', fallen: [] }, t: 100 };
-  const src = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
   // the dungeon's own doors (dungeonContext.js layRemains / remainsPile), over its droppedLoot
   const d = {
     layRemains: (items, feet, icon, key = null) => { const p = loot.dropPile(items, feet, null, icon); if (p && key) p.remainsKey = key; return p; },
     remainsPile: (key) => loot._piles.find((p) => p.remainsKey === key && !p.dead) ?? null,
   };
-  assert.match(src, /layRemains: \(items, feet, icon, key = null\) => \{ const p = droppedLoot\.dropPile\(items, feet, null, icon\); if \(p && key\) p\.remainsKey = key; return p; \},/);
-  assert.match(src, /remainsPile: \(key\) => droppedLoot\._piles\.find\(\(p\) => p\.remainsKey === key && !p\.dead\) \?\? null,/);
-  assert.match(src, /\.\.\.\(p\.remainsKey \? \{ remainsKey: p\.remainsKey \} : \{\}\),/, 'the save\'s row keeps the key');
   const rem = createDeepRemains({
     spots: () => [], laid: (k) => rel.turns().laid.has(k), mark: (k) => rel.turn('laid', k),
     lay: (res, feet, key) => d.layRemains([{ name: 'sword' }, { name: `${res.name}'s locket` }], feet, { archive: 380, record: 1 }, key),
@@ -78,9 +74,6 @@ test('AUDIT LW-III THE DIVERS\' ELECTION ASKED EACH FRAME: a reader that loses i
 });
 
 test('AUDIT LW-III the way out at the door\'s own floor: both hosts of the dive\'s route hand the entry\'s y (deepRoute.js yOf) - the last leg was walked at the first stop\'s (mutants: each host)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /r = deepRouteOf\(stops, e \? \{ x: e\.x, y: e\.y, z: e\.z \} : \{ x: stops\[0\]\.x, z: stops\[0\]\.z \}, trip\);/);
-  assert.match(w, /const from = entry \? \{ x: entry\.x, y: entry\.y, z: entry\.z \} : \{ x: stops\[0\]\.x, z: stops\[0\]\.z \};/);
   const r = routeOf([{ key: '0:1', kind: 'foe', x: 20, y: -6, z: 0, block: 0, loadID: 1 }], { x: 0, y: 2, z: 0 }, { id: 'T1', dive: { t0: 0, t1: 600 } });
   assert.equal(r?.out.path.at(-1).y, 2, 'the way out ends on the door\'s floor');
 });

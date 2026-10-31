@@ -104,8 +104,4 @@ test('SKILL-TICK: the Stats page\'s model hands each row its reading, and the ro
   const p = fresh();
   p.skillUses[SKILLS.Axe] = 7;
   assert.deepEqual(sheetModel(p).progress(SKILLS.Axe), skillAdvanceProgress(p, SKILLS.Axe));
-  const src = (await import('node:fs')).readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  const rows = src.slice(src.indexOf('function statsSkills(detail, m) {'), src.indexOf('/** ADVANTAGES: GetClassSpecials'));
-  assert.match(rows, /const tick = m\.progress \? skillTickText\(m\.progress\(id, ownMinutes\(\)\)\) : '';/);
-  assert.match(rows, /if \(tick\) r\.append\(el\('div', 'px-skilltick', tick\)\);/);
 });

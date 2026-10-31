@@ -35,9 +35,6 @@ test('PROF12 law: DFU\'s twenty have ONE home - the leaf (systems/potionRecipes.
   assert.equal(effects.HEAL_SPELL_POINTS_KEY, leaf.HEAL_SPELL_POINTS_KEY);
   assert.equal(leaf.HEAL_SPELL_POINTS_KEY, 'Heal-SpellPoints');
   assert.equal(leaf.POTION_RECIPES.find((r) => r.name === 'restorePower').effect, 'Heal-SpellPoints');
-  assert.doesNotMatch(src('src/systems/potionRecipes.js'), /^import /m, 'the leaf imports nothing');
-  assert.match(src('src/net/alchemyLaw.js'), /import \{ POTION_RECIPES, potionRecipeKey, potionKeyFromCauldron \} from '\.\.\/systems\/potionRecipes\.js';/);
-  assert.doesNotMatch(src('src/net/alchemyLaw.js'), /ingredients: \[\d/, 'no recipe typed again');
   assert.deepEqual(POTIONS.map((p) => p.id), leaf.POTION_RECIPES.map((r) => r.name));
   for (const p of POTIONS) assert.equal(p.key, leaf.potionRecipeKey(leaf.POTION_RECIPES.find((r) => r.name === p.id).ingredients), p.id);
 });

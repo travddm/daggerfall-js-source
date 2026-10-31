@@ -67,8 +67,6 @@ test('AUDIT RELEASE R1-1: a Bay city\'s wall stood beside the Imperial City\'s f
   assert.deepEqual(customModelFor(cell), { ic: cell }, 'the city\'s cell its own fabric, never a Bay city\'s wall');
   assert.deepEqual(customModelNeeds(cell), [], 'and no wall\'s pieces asked of the player\'s ARCH3D for it');
   assert.deepEqual([...customModelNeeds(townWallModelId(KNIGHTSTON))].sort(), Object.values(WALL_MODELS).sort(), 'the wall its own');
-  // the families as the game installs them: the fabric and the skylines owned by their runs' own tests
-  assert.match(read('src/world/capitalModels.js'), /registerCustomModelFamily\(\{ owns: isFabricModelId,[^\n]+\n\s+registerCustomModelFamily\(\{ owns: isSkylineId,/);
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

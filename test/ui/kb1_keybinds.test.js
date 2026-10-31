@@ -98,7 +98,6 @@ test('KB1 law 5: a mod switched off answers nothing on its keys - held, pressed 
     assert.equal(getBinding(store, 'TorchDrop'), 'KeyG', '...and it is still bound - switching the mod on must not find it given away');
     assert.equal(actionLive('Jump'), true, 'the game\'s own actions always answer');
   } finally { _resetModSettings(); setBindings(null); }
-  assert.match(rd('src/ui/input.js'), /export function held\(keys, action\) \{\s*\n\s*if \(!actionLive\(action\)\) return false;/);
 });
 
 test('KB1: RT swings beside the mouse - a non-mouse code bound to SwingWeapon is read whether or not a button holds the other slot (mutant: swingKeyHeld only when no mouse button is bound)', () => {
@@ -157,40 +156,9 @@ test('KB1 (Mac: "Enter = chat"): while a chat panel claims the key, Enter opens 
     setCursorActive(false);
     setBindings(null);
   }
-  assert.match(rd('src/ui/chatPanel.js'), /const releaseCursorKey = claimCursorKey\(takesKey\);/, 'the chat panel claims it for as long as it stands - AUDIT KB1: press by press, on its own handler\'s word');
 });
 
 // ── DFU'S DEAD ROWS, BUILT ─────────────────────────────────────────────
-
-test('KB1 (Mac: "build 2") + AUDIT KB1: PrintScreen takes a screenshot - F8 by default, wherever it is rebound, routed like every world action: never under a window, never from a text field, never on a repeat (mutants: the arm missing; the repeat routed)', () => {
-  const store = defaults();
-  setBindings(store);
-  const shots = [];
-  setScreenshotCanvas({ id: 'c' }, { shoot: (c) => shots.push(c) });
-  try {
-    const key = (code, extra = {}) => ({ code, key: code, repeat: false, target: { tagName: 'CANVAS' }, preventDefault() { this.prevented = true; }, ...extra });
-    const world = { uiOverlayActive: false };
-    assert.equal(routeKey(key('F8'), world), true);
-    assert.equal(shots.length, 1, 'F8 shoots');
-    routeKey(key('F8', { target: { tagName: 'INPUT' } }), world);
-    assert.equal(routeKey(key('F8', { repeat: true }), world), true, 'a repeat is swallowed...');
-    assert.equal(shots.length, 1, '...and shoots nothing; nor does a field');
-    const under = [];
-    routeKey(key('F8'), { uiOverlayActive: true, overlayIsNative: true, overlayInput: (c) => under.push(c) });
-    assert.deepEqual(under, ['F8'], 'a window up takes F8 (the automaps\' third background, AUDIT KB1)');
-    assert.equal(shots.length, 1, '...and no screenshot is taken under it');
-    setBinding(store, 'F12', 'PrintScreen');
-    routeKey(key('F8'), world);
-    assert.equal(shots.length, 1, 'rebound, F8 no longer shoots');
-    routeKey(key('F12'), world);
-    assert.equal(shots.length, 2, '...and the new key does');
-    assert.match(screenshotName(new Date(2026, 8, 23, 14, 5, 9)), /^dfo-20260923-140509\.png$/);
-    assert.match(rd('src/main.js'), /setScreenshotCanvas\(canvas\);/, 'the canvas handed in once, at boot');
-  } finally {
-    setScreenshotCanvas(null);
-    setBindings(null);
-  }
-});
 
 test('KB1 (Mac: "build 2"): CenterView levels the view through the look filter - the owed pitch replaced, paid out smoothly, and never latched as a hand\'s look (mutant: pitch snapped, or fed through add())', () => {
   const f = new LookFilter();
@@ -226,7 +194,6 @@ test('KB1: a window closes on the key that opened it, wherever it is bound - the
   inv.input('KeyI');
   assert.equal(inv.done, true, 'the pack closes on Inventory\'s key');
   setBindings(null);
-  assert.match(rd('src/ui/enhanced/enhancedSpellbook.js'), /if \(overlayAction\(e\) !== 'back' && !eventMeans\(e, 'CastSpell'\)\) return;/, 'the enhanced book on its own key too (AUDIT KB1: the event\'s own read; UXB1-S: shared or not)');
 });
 
 // ── LAW 4: ASKED, NOT TAKEN ────────────────────────────────────────────

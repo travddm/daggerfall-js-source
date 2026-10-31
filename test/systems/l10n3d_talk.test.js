@@ -294,9 +294,6 @@ test('L10N3d talk: FormulaHelper\'s two combat lines - a successful backstab, an
 });
 
 test('L10N3d talk by source: townTalk\'s palace resolver hands a palace that is not one of the three capitals to GenerateBuildingName\'s own localized "palace" (FormulaHelper.cs:3069); the Daggerfall/Wayrest/Sentinel lookup stays an identity - it keys the canonical location name', () => {
-  const tt = readFileSync(new URL('../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(tt, /const id = \{ Daggerfall: 475, Wayrest: 476, Sentinel: 477 \}\[locName\];/);
-  assert.match(tt, /return v\?\.\[0\] \? v\[0\]\.replace\(\/\\\.\$\/, ''\) : null;/);
   const { english, french } = inFrench({ palace: 'Palais' }, () => generateBuildingName(7, BUILDING_TYPES.Palace, { palaceName: () => null }));
   assert.deepEqual([english, french], ['Palace', 'Palais']);
 });

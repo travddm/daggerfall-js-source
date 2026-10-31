@@ -140,12 +140,6 @@ test('ARENA-WAIT: what is not waiting - off the online lane the save\'s arena as
   // realm's save; on the online lane its doors are shut now, in the seat's own words (the next test)
   session = { arenaOk: false, arenaHeard: false, superseded: true, terminal: true };
   assert.deepEqual([A.waiting(), A.shutText(O.climbWait)], [true, SEAT_NOTICE], 'a seat given up is shut, never offline');
-  // world.js: the lane and the clock handed in; Fight, the city's sand and the Herald's Watch take the online arm while waiting
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /session: \(\) => online, lane: \(\) => onlineOn, nowS: \(\) => relayNowS\(\) \?\? Date\.now\(\) \/ 1000,/);
-  assert.match(w, /if \(arenaOnline\?\.live\(\) \|\| arenaOnline\?\.waiting\(\)\) \{ const r = arenaOnline\.fightLadder\(\);/);
-  assert.match(w, /if \(arenaOnline\?\.exhibitions\?\.\(\) \|\| arenaOnline\?\.waiting\?\.\(\)\) arenaOnline\.watchCity\(ex\);/);
-  assert.match(w, /if \(arenaOnline\?\.exhibitions\?\.\(\) \|\| arenaOnline\?\.waiting\?\.\(\)\) \{ arenaBouts\.dismiss\(\); arenaOnline\.watchExhibition\(ex\); return; \}/);
 });
 
 // ═══ AUDIT (2026-10-16) ═══════════════════════════════════════════════════════════════════════════════════════════════

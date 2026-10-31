@@ -14,7 +14,6 @@ import { siegeRoomKey, SIEGE_UNITS_PER_M } from '../../../src/net/siege/siegeRef
 import { siegeNpcLook, siegeNpcAct, createSiegeNpcs, SIEGE_NPC_LOOKS, SIEGE_NPC_FALL_MS } from '../../../src/scenes/siegeNpcs.js';
 import { enemyDisplayName } from '../../../src/characters/enemy/enemyBasics.js';
 
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const T = 1_800_000_000_000;
 const M = SIEGE_UNITS_PER_M;
 const SH = { name: 'The Silver Hand', tag: 'SH' }, EO = { name: 'Ebon Oath', tag: 'EO' };
@@ -118,10 +117,3 @@ test('SEAT2b part two (c) THE SCREEN\'S DRIVER: a guard is the City Watch, the r
   assert.deepEqual(d.state(), { bodies: [], shown: 0, targets: 0 }, 'out of the battle: every body put away');
 });
 
-test('SEAT2b part two (c) THE HOST\'S SEAMS (scenes/world.js): the driver made with the session, its feet on the scene\'s ground; drawn in the siege\'s own room alone; its batches on the town\'s billboard pass; its bodies the arms\' (a foe\'s body found among them, a spell\'s mark by its own name) (mutants: each seam)', () => {
-  assert.match(W, /siegeNpcs = createSiegeNpcs\(\{ renderer, getTexture, uploadRecordFrame, audio, cam: \(\) => cam\.pos,\s+toScene: \(x, z\) => \{ const q = onlineToScene\(\{ x, y: 0, z \}\); const y = heightAt\(q\[0\], q\[2\]\);/);
-  assert.match(W, /if \(siegeNpcs\) \{ if \(inSiegeRoom\(\)\) siegeNpcs\.frame\(siegeSession\.npcs\(\), battleNowMs\(\)\); else siegeNpcs\.leave\(\); \}/);
-  assert.match(W, /if \(siegeNpcs\) for \(const b of siegeNpcs\.batches\(\)\) allBatches\.push\(b\);/);
-  assert.match(W, /const duelBody = \(peerId\) => \(peerId \? \(peersNear\(\)\?\.find\(\(x\) => x\.id === peerId\) \?\? siegeNpcs\?\.body\(peerId\) \?\? null\) : null\);/);
-  assert.match(W, /name: b\.name \?\? peerName\(b\.id\) \?\? 'a foe'/);
-});

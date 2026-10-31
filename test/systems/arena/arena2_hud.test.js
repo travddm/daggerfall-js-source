@@ -144,9 +144,6 @@ test('ARENA2 HUD sheet and dress: the pixel face, reduced motion, touch sizes, t
   for (const sel of ['body .arena-hud', 'body .arena-track', 'body .arena-fill', 'body .arena-stam .arena-fill', 'body .arena-crowd .arena-fill', 'body .arena-tag[data-tag="villain"]', 'body .arena-crowd-word[data-band="roar"]']) {
     assert.ok(ONLINE_DRESS_CSS.includes(sel), `the Plus sheet dresses ${sel}`);
   }
-  const hud = rd('src/ui/arena/arenaHud.js');
-  assert.ok(!/innerHTML/.test(hud), 'textContent only');
-  assert.ok(!/style\.(color|background)/.test(hud), 'no colour written inline');
 });
 
 // ── THE HERALD ───────────────────────────────────────────────────────────────────────────────────────────

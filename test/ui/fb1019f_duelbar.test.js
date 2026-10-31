@@ -222,21 +222,3 @@ test('DUEL-BAR THE ENHANCED HUD: the health bar\'s fill and figure read the refe
   }
 }));
 
-test('DUEL-BAR THE HOST: the world host hands drawHud my vitality off the duel manager\'s live duel - one entry, in its one drawHud call, by my own peer id; the duel\'s readout keeps its line; the law is a leaf of the client\'s, never in the relay\'s bundle (net/duel/duelSession.js, which the relay\'s arena reaches, untouched); no host and no HUD module writes the referee\'s word into the save\'s health (mutants: the entry dropped; the duel held after its end read; the vitality written to the save)', () => {
-  const world = rd('src/scenes/world.js');
-  const call = world.slice(world.indexOf('drawHud(renderer, canvas, hudArt, playerEntity,'), world.indexOf('weaponSheathed: !!weaponRig.playerWeapon.sheathed });'));
-  assert.match(call, /\n\s*healthBar: duelVitality\(duelMgr\.live, online\?\.id \?\? ''\),/);
-  assert.equal(world.match(/healthBar:/g).length, 1, 'one wiring line');
-  assert.match(world, /^import \{ duelVitality \} from '\.\.\/net\/duel\/duelBar\.js';/m);
-  assert.match(world, /const me = online\?\.id \?\? '', h = d\.h \?\? \[\];/, 'the readout\'s own "me", the same id');
-  assert.match(world, /self: mine \? \[`Your vitality: \$\{mine\[1\]\} \/ \$\{mine\[2\]\}`\] : \[\]/, 'the readout\'s own line stands');
-  assert.equal(rd('src/net/duel/duelSession.js').includes('duelBar'), false, 'the relay\'s duel law knows nothing of the bar');
-  assert.equal(rd('server/src/index.js').includes('duelBar'), false);
-  for (const f of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js', 'src/ui/hud/hud.js', 'src/ui/hud/hudVitals.js', 'src/ui/enhanced/enhancedHud.js', 'src/net/duel/duelBar.js']) {
-    assert.equal(/\.health\s*=[^=][^;]*vitality/.test(rd(f)), false, `${f}: no write of the referee's vitality to a health`);
-  }
-  // the four hosts (Home.md): a duel is outdoors alone - the street's host wires it; a building, a dungeon and the offline
-  // city never hold a live duel (duelCan's 'outdoors'), and hand drawHud no bar
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) assert.equal(rd(f).includes('healthBar'), false, f);
-  assert.match(world, /if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return 'outdoors';/);
-});

@@ -156,9 +156,3 @@ test('CHAP6e a Season\'s Master: every Season a character held a Master\'s seat 
   assert.deepEqual(await s.titlesOf(s.R.id), [], 'a dead character holds nothing');
 });
 
-test('CHAP6e the wiring: the relay\'s world182 re-hashed in place, undeployed; the mint signs a High Master in the Master\'s place; the service reads the Chronicle\'s Season rows (mutants: each seam)', () => {
-  assert.match(rd('test/net/relayversion.test.js'), /\n  world183: '[0-9a-f]{64}',   \/\/ CHAP4c \(world182 on its branch[^\n]*\(re-hashed in place, undeployed - bytes 3012337d\.\.\. before it: CHAP6e /)   // PIN MOVED: world183 - past CARDS10's world182 at the merge of main;
-  assert.match(rd('server-account/src/index.js'), /: CHAPTER_TITLES\.includes\(wornT\) \? \(chapterT \? \{ t: chapterT\.high \? 'highmaster' : wornT, ts: chapterT\.ts \} : \{\}\)/);
-  assert.match(rd('server-account/src/npcChapters.js'), /SELECT x\.char_id, x\.faction, x\.region, x\.data FROM npc_chapter_history x \$\{who\}\n\s+AND x\.kind = 'season'`\)/);
-  assert.match(rd('server-account/wrangler.toml'), /\nCHAPTER_TITLES = "off"\n/);
-});

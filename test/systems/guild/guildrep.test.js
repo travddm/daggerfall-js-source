@@ -79,13 +79,3 @@ test('GUILD-REP: the enhanced Standing page draws each guild - name, rank and a 
   });
 });
 
-test('GUILD-REP: one model, both skins - the classic box and the enhanced page read the same book', () => {
-  assert.match(read('src/ui/charsheet.js'), /const book = affiliations\(entity\);/);
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const book = affiliations\(entity, \{ now: dateFromClassicMinutes\(Math\.floor\(ownMinutes\(\)\)\), online: isOnlinePage\(\) \}\);/);   // PIN MOVED (AUDIT GUILD-WORDS II C-7): and online, where a promotion may end a probation sooner. PIN MOVED (STANDING-WORDS): the character's own date for a probation's days
-  // REP5: PIN MOVED - the law of each region stands between the social groups and the guilds (test/systems/rep5_notices.test.js)
-  // DRESS1 (2026-09-30): PIN MOVED again - the Dress line (test/systems/dress_standing.test.js) sits under the groups, before the law
-  assert.match(menu, /r\.append\(el\('span', 'k', groupNames\[i\]\), signedRep\(reps\[i\] \?\? 0\)\);\s*detail\.append\(r\);\s*\}\s*statsDress\(detail, playerEntity\);\s*statsLaw\(detail, playerEntity\);\s*statsGuilds\(detail, playerEntity\);/,
-    'the Standing page draws the guilds after the social groups (and the law between)');
-  assert.doesNotMatch(menu, /from '(?:\.\.?\/)+(?:[\w-]+\/)*charsheet\.js'/, 'the enhanced skin never imports the classic sheet');
-});

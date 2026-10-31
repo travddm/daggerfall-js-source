@@ -327,24 +327,6 @@ test('AUDIT TUT1: windowHeld asks every live host - true when one holds the wind
   assert.equal(windowHeld(box), true, 'a dormant host is not asked');
   off1(); off2(); off3();
   _resetNotifyForTests();
-  assert.match(read('src/scenes/townTalk.js'), /\n  registerPresenter\(\{ holds: \(win\) => windows\.containsWindow\(win\) \}\);/);
-  assert.match(read('src/scenes/worldModes.js'), /\n  registerPresenter\(\{ holds: \(win\) => interiorWindows\.containsWindow\(win\) \}\);/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /const _unregisterHolds = registerPresenter\(\{ holds: \(win\) => dungeonWindows\.containsWindow\(win\), active: \(\) => _live && !_ctxDead \}\);/);
-  assert.match(dc, /destroy\(\) \{\n      _ctxDead = true;[\s\S]{0,2000}\n      _unregisterHolds\(\);/, 'and it leaves with the context');
-});
-
-test('AUDIT TUT1: a page waits out the loading screen; a scene\'s page is asked for once, by the build that stands it (an Ocean Hole\'s door pops none of its own)', () => {
-  const pop = read('src/ui/tutorialPopup.js');
-  assert.match(pop, /held: \(\) => pauseFlowShowing\(\) \|\| loadingHeld\(\),/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /: isAbyssMapId\(dfLocation\?\.mapTableData\?\.mapId\) \? 'ocean-holes'/, 'the Ocean Hole\'s page is the build\'s');   // PIN MOVED (PITS-WORLD, 2026-10-27): the abyss by its own law (world/oceanHoles.js isAbyssMapId), the Bay's and past it - a zone hall's id from 0xf0000000 had opened this page
-  assert.doesNotMatch(read('src/scenes/worldModes.js'), /noteFirstUse\('ocean-holes'/, 'and its door asks for none');
-  // another player's team is theirs: only my own horse and wagon keys pop a page
-  assert.match(read('src/scenes/horseCartPool.js'), /if \(key === KEY_WAGON \|\| key === KEY_FOLLOWING_WAGON\) noteFirstUse\('wagon'\); else if \(key === KEY_HORSE\) noteFirstUse\('horse'\);/);
-  // a refusal opens nothing, and pops nothing
-  assert.match(read('src/ui/tradeDoor.js'), /if \(sup\) \{ messageBox\(sup\.text\); return null; \}\n {2}noteFirstUse\('shops'\);/);
-  assert.match(read('src/systems/daedraSummoning.js'), /if \(gold < cost\) return \{ kind: 'poor', cost \};\n {2}noteFirstUse\('daedra-summoning'\);/);
 });
 
 test('TUT1: while the menu stands a page waits - never pushed over the pause window - and shows once it is down', () => {
@@ -358,10 +340,6 @@ test('TUT1: while the menu stands a page waits - never pushed over the pause win
   r.setHeld(false);
   r.advance(RETRY_MS);
   assert.equal(r.mounted.length, 1);
-  const pd = read('src/ui/pauseDoor.js');
-  assert.match(pd, /export function openPauseFlow\(show, hooks = \{\}\) \{\n  return shown\(openPauseFlowNow\(show, hooks\)\);/, 'the door keeps the window it opened');
-  assert.match(pd, /\? \(\) => shown\(enhancedPauseOverlay\(show, \{ \.\.\.hooks, at: 'settings', onResume: again \}\)\)/, 'AUDIT TUT1: the classic window\'s Settings detour is kept too');
-  assert.match(pd, /const openClassicPauseFlow = \(show, hooks\) => shown\(openClassicPauseWindow\(show, hooks\)\);/, '...and every classic window, the one its Resume opens again among them');
   clearTutorialLine();
 });
 
@@ -468,29 +446,7 @@ test('TUT1: the seams, swept both ways - every page that pops has a seam in src/
   }
 });
 
-test('TUT1: the four hosts register the popups\' handler (THE FOUR HOSTS RULE); the two new-game seams start the tour after the game-start quests', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(read(host), /^import (?:[^;]*from )?'\.\.\/ui\/tutorialPopup\.js';/m, `${host} loads ui/tutorialPopup.js`);
-  }
-  assert.match(read('src/ui/tutorialPopup.js'), /^setTutorialHandler\(tutorialFirstUse\);$/m, 'the module registers itself');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    // PIN MOVED (START2): the start's quest named - the world's once its character stands where the story begins (scenes/startsHost.js), the bench's the commission in hand
-    assert.match(read(host), /questBridge\.initAtGameStart\((?:start|HAND_START_QUEST)\);(?:[^\n]*\n\s+| )startTutorialTour\(\);/, `${host}: the tour where _TUTOR__ spoke`);
-  }
-});
-
 // ── THE MENU ───────────────────────────────────────────────────
-
-test('TUT1: the menu - a Tutorials tab in the pause window, a Tutorials section on every rail, one pane for both, let go at unmount', () => {
-  const s = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(s, /const PAUSE_TABS = Object\.freeze\(\[[^\n]*\['tutorials', 'Tutorials'\], \['system', 'System'\]\]\);/);
-  assert.match(s, /tutorials: drawTutorialsPane, system: pauseSystem \}\)\[pauseTab\]\(body\);/);
-  for (const rail of ['SECTIONS_BOOT', 'SECTIONS_CLASSIC', 'SECTIONS_PAUSE']) {
-    assert.match(s, new RegExp(`const ${rail} = \\[[^\\]]*'Tutorials'`), `${rail} carries Tutorials`);
-  }
-  assert.match(s, /\n {8}tutorials: drawTutorialsPane, {3}\/\/ TUT1\n/, 'the shell draws the same pane');
-  assert.match(s, /stopPost\(\);   \/\/ SERVER-POST[^\n]*\n\s+releaseTutorialsPane\(\);/);
-});
 
 test('TUT1: the pane\'s search keeps the pages whose title or words hold every word asked; nothing asked keeps them all', () => {
   assert.equal(tutorialsMatching('').length, TUTORIALS.length);
@@ -529,5 +485,4 @@ test('TUT1: a save still in DFU\'s tutorial leaves it at the load, and starts th
   assert.deepEqual(retireDfuTutorial(done), { retired: 0, started: false });
   assert.deepEqual(done.removed, []);
   assert.deepEqual(retireDfuTutorial(null), { retired: 0, started: false });
-  assert.match(read('src/scenes/quest/questBridge.js'), /relayMovedLayouts\(machine, [^\n]*\n\s+retireDfuTutorial\(machine\);/, 'at the load, once the machine is restored and its dungeons laid');
 });

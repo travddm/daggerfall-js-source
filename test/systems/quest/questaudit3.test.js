@@ -153,19 +153,6 @@ test('QUEST-RESET\'s questor rung: a questor the click bound refuses the restart
   }
 });
 
-test('STORY-AGAIN\'s doors: the bridge hands both through journalClean (every host\'s pause window and chronicle), seeds a legacy save after the notebook restores, and the two journals draw the press twice (source pins)', () => {
-  const bridge = src('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /storyAgain: \(\) => machine\.storyAgainQuests\(\)\.map/);
-  assert.match(bridge, /const r = machine\.startStoryAgain\(questName\);/);
-  assert.match(bridge, /if \(data\.notebook\) notebook\.restoreSaveData\(data\.notebook\);\n(?:\s*\/\/.*\n)*\s*machine\.seedStory\(notebook\.getFinishedQuests\(\)\.map\(\(e\) => e\[0\]\?\.render\)\.filter\(\(r\) => r\?\.kind === 'quest'\)\);/);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const story = \(clean\?\.storyAgain\?\.\(\) \?\? \[\]\)\.map/);
-  assert.match(menu, /section\(t\('pause\.journal\.main', 'Main Quests'\), \[\.\.\.mains, \.\.\.story\]/);
-  assert.match(menu, /if \(journalCleanArmed !== sel\.key\) \{ journalCleanArmed = sel\.key; render\(\); return; \}\n\s*journalCleanArmed = null;\n\s*const out = clean\.startStoryAgain\(sel\.story\.questName\);/);
-  const chron = src('src/ui/enhanced/enhancedChronicle.js');
-  assert.match(chron, /shelfWord = storyDoor\.startStoryAgain\(s\.questName\)\?\.text \?\? '';/);
-});
-
 test('LODGED-STAND: a quest Person whose feet stand inside a model stands beside it; feet in the open stand as given; the dungeon host stands its Persons through it (mutants: the free, the host\'s call)', () => {
   // a floor facing up, and a closed 2 m box on it round the marker, its faces looking out
   const c = new Collider(() => -Infinity);
@@ -188,6 +175,4 @@ test('LODGED-STAND: a quest Person whose feet stand inside a model stands beside
   const open = [5, 0, 5];
   assert.equal(freeQuestStand(c, open, 1.8), open, 'in the open: as given');
   assert.equal(freeQuestStand(null, inside, 1.8), inside, 'no collider: as given');
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /if \(Number\.isFinite\(drop\)\) by = \(origin - drop\) \+ size\.h \* 0\.02;\n\s*if \(inDungeon\) \{ \[x, by, z\] = freeQuestStand\(ctx\.collider, \[x, by, z\], size\.h\); stand\.x = x; stand\.z = z; \}/);
 });

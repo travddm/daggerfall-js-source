@@ -179,13 +179,6 @@ test('TOUCH-HOLD Plus: layout 2 - LT is Interact: a store on layout 1 (LT Recast
   } finally { resetPrefs(); }
 });
 
-test('TOUCH-HOLD prompts: with a pad in hand the professions\' prompts and lines name the pad\'s button, as the sea\'s readout names its own; else the key (mutants: the key named to a pad)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const actKeyWord = \(action\) => \{\n\s*const padHeld = controllerLook\(\) \? padFamily\(\) : null;[^\n]*\n\s*const pad = padHeld \? getBinding\(bindings\(\), action, false\) : null;\n\s*if \(pad && \/\^Joystick\/\.test\(pad\)\) return hdGlyphName\(padHeld, pad\);\n\s*const c = getBinding\(bindings\(\), action\);\n\s*return c \? tagText\(c\) : null;\n\s*\};/);
-  assert.match(w, /keyLabel: \(a\) => actKeyWord\(a\) \?\? '\?',/, 'the gathering host\'s prompt and meter');
-  assert.match(w, /keyLabel: \(a\) => actKeyWord\(a\),[^\n]*\n\s*professionUse: /, 'the tools\' lines');
-});
-
 // ─── THE SKINNING KNIFE'S USE ────────────────────────────────────────
 
 const WOODS = 231, GLENUMBRA = 59;

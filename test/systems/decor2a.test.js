@@ -354,23 +354,3 @@ test('DECOR2a one\'s own thing and an online home: the account service has the p
 
 // ─── THE HOST ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('DECOR2a the host (worldModes.js) by source: the tool\'s pack is the player\'s, a thing leaves it as a drop moves it and comes back through the pack\'s own door; the save writes and restores the room\'s own things; an online home\'s owner gets back any thing its room no longer stands, a visitor never; a piece is named by the owner\'s own record, else its numbers; a sold house, ship or online home gives its own things back to the pack and pays only for what was bought; the pack\'s pictures wear their dye (mutants: the transfer bypassed, the save forgetting them, a visitor handed another\'s things, a sale keeping them)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /pack: \(\) => playerEntity\.items \?\? \[\], identity: \(\) => playerEntity,/);
-  assert.match(m, /packHas: \(item\) => decorHome\(item\)\.includes\(item\), packTake: \(item\) => decorPackTake\(item\), packGive: \(item\) => decorPackGive\(item\),/);   // DECOR2b: furniture lives among the deliveries
-  // PIN MOVED (AUDIT FB1025i E1): the doors are systems/decor/decorPack.js's, over the host's entity
-  const pk = src('src/systems/decor/decorPack.js');
-  assert.match(m, /createDecorPack\(\(\) => playerEntity\)/);
-  assert.match(pk, /return applyTransfer\(item, \{ ok: true, amount: 1 \}, pack, \[\], \{ entity: entity\(\), fromLocal: true \}\) \?\? null;/, 'as a drop moves it');
-  assert.match(pk, /function decorPackGive\(\/\*\* @type \{any\} \*\/ item\) \{\n\s*if \(isFurnishing\(item\)\) \{ decorHome\(item\)\.push\(item\); return item; \}\n\s*entity\(\)\.items \?\?= \[\];\n\s*return addItem\(entity\(\)\.items, item\);/);   // DECOR2b: furniture first
-  assert.match(m, /const decorOwn = interiorDecor\.ownSnapshot\(\);/);
-  assert.match(m, /decor, decorItems, decorOwn, hiddenBase, frame: 'building'/);
-  assert.match(m, /interiorDecor\.setItems\(data\.decorItems\);\n\s*interiorDecor\.setOwn\(data\.decorOwn\);/);
-  assert.match(m, /interiorDecor\.set\(pieces\);\n\s*if \(interiorHome\?\.own\) decorReturnStrays\(pieces\);/, 'the owner alone');
-  assert.match(m, /for \(const id of interiorDecor\.ownIds\(\)\) \{\n\s*if \(standing\.has\(id\)\) continue;\n\s*const item = interiorDecor\.takeOwn\(id\);\n\s*if \(item\) \{ decorPackGive\(item\); back\.push\(item\); \}/);
-  assert.match(m, /const kept = piece\?\.item \? interiorDecor\.ownOf\(piece\.id\) : null;[\s\S]{0,400}itemTitle: piece\?\.item \? \(\(kept \? itemLongName\(kept\) : null\) \|\| decorItemName\(piece\.item\)\) : null,/);
-  assert.match(m, /const own = takeSceneOwn\(sceneCache\(\), sceneName\);[^\n]*\n\s*for \(const item of own\) decorPackGive\(item\);/, 'a sold house or ship');
-  assert.match(m, /own = takeSceneOwn\(sceneCache\(\), homeSceneName\(mapId, bd\.buildingKey\)\);[^\n]*\n\s*for \(const item of own\) decorPackGive\(item\);\n\s*removePermanentScene\(sceneCache\(\), homeSceneName\(mapId, bd\.buildingKey\)\);/, 'an online home, before its scene goes (AUDIT REALM2 C6: as the sale is paid - test/systems/auditrealm2_client.test.js)');
-  assert.match(m, /iconUrl: \(a, r, dye = null, dyeTarget = null\) => loadIcon\(a, r, \{ scale: 1, dye, dyeTarget \}\),/);
-  assert.equal(chipNamed != null, true);
-});

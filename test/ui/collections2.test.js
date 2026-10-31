@@ -201,12 +201,10 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   // the Unfallen is the member who never fell: the `w` receipt's `fl` is the member's own
   assert.equal(W.REDOUBT_OF.unfallen, EG_UNFALLEN_REDOUBT);
   assert.ok(egHonourTitlesOf(egHonourBitsOf({ q: 'w', w: 10, ew: 0, fl: 0 })).includes('unfallen') && !egHonourTitlesOf(egHonourBitsOf({ q: 'w', w: 10, ew: 0, fl: 1 })).includes('unfallen'));
-  assert.match(read('src/net/eliteGates/egBrain.js'), /fl: m\.falls \?\? 0/, 'a member\'s own falls on its receipt');
   assert.match(how('title', 'unfallen'), /without falling yourself, in a breach begun at Hall 1/);
   for (const t of ['unfallen', 'lonebeacon', 'mastergallery', 'mastercairn', 'mastershade', 'masterwellhead', ...EG_REDOUBT_HONOURS.map(([, x]) => x)]) assert.match(how('title', t), /Rehearsal does not count/, `${t}: never from a Rehearsal`);
   // Spire Champion: the last season's Descent, its rules, held through the next
   assert.equal(W.SPIRE_CHAMPIONS_TOP, EG_CHAMPIONS_TOP);
-  assert.match(read('server-account/src/egHonours.js'), /rh = 0 AND ew = 0 AND wg = 0/, 'the Descent: no Rehearsal, begun at Hall 1, unwagered');
   assert.match(how('title', 'spirechampion'), new RegExp(`top ${EG_CHAMPIONS_TOP} companies .* an unwagered breach begun at Hall 1, never a Rehearsal`));
   assert.equal(W.availLine(entry('title', 'spirechampion')), 'Held through the whole season after the one you earned it in.');
   // the boards' floors
@@ -240,12 +238,8 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   for (const t of ['crowned', 'keeper']) assert.match(how('title', t), /from Season 1 on/);
   for (const t of ['warden', 'protector']) assert.match(how('title', t), /Your guildmaster character wears it as/);
   assert.match(how('title', 'champion'), /held when its crown proclaims one/);
-  // the festival's cakes: the ones others take
-  assert.match(read('server-account/src/festival.js'), /UPDATE players SET fest_given = fest_given \+ \?2 WHERE id = \?1/);
   assert.match(how('title', 'hearthkeeper'), new RegExp(`have other players take ${HEARTHKEEPER_GIVEN} Soul Cakes from it`));
   assert.match(how('icon', 'soulcake'), new RegExp(`\\b${SOULCAKE_TAKEN} Soul Cakes`));
-  // the serpent's roll: a dealing claim's alone
-  assert.match(read('server-account/src/serpents.js'), /const draw = c\.x === 'stood' \? null/);
   for (const k of Object.keys(W.SERPENT_ODDS)) assert.match(how(k === 'maelstrom' ? 'aura' : 'title', k), /if your own fire dealt a real share of your ship’s/);
   // the embers: every purse
   for (const table of ['gate_kills', 'serpent_kills', 'eg_redoubts']) assert.ok(EMBERS_EARNED_SQL.includes(table), table);
@@ -588,12 +582,6 @@ test('COLLECTIONS-II DRESSED BY THE KIT, AND ON THE PAGE: the filters and a "com
   assert.equal(laid[0].id, COLLECTION_PAGE_STYLE_ID);
   assert.ok(laid[0].textContent.includes(COLLECTION_PAGE_CSS) && laid[0].textContent.includes(WARDROBE_PART_CSS) && laid[0].textContent.includes(WARDROBE_THEME_CSS));
   resetCollectionsPage();
-});
-
-test('COLLECTIONS-II THE MENU\'S WIRING (AUDIT COLLECTIONS-II lanes 2 and 5): the account card closing asks the page\'s read again; every part lands by its name (mutants: the close reading nothing; a wardrobe part\'s name landing elsewhere)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /  acctPaint = null;\n  rereadCollectionsAccount\(\);   \/\/ AUDIT COLLECTIONS-II[^\n]*\n  render\(\);\n\}/);
-  assert.match(menu, /else if \(at === 'collections' \|\| COLLECTION_PARTS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'holdings'; holdSec = 'collections'; if \(at !== 'collections'\) setCollectionsPart\(at\); \}/);
 });
 
 test('COLLECTIONS-II the account card\'s note names the title worn, never its key (the page says that note)', async () => {

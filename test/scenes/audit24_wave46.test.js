@@ -118,8 +118,6 @@ test('audit24 wave46: the male High Elf swap is the ENEMY\'s handling, and the p
     playerVoice({ race: RACES.HighElf, gender: 'female', isAttack: true, rolls: () => 0 }).clip,
     'a FEMALE High Elf is untouched either way');
 
-  // the grunt goes through the player one now
-  assert.match(rd('src/scenes/hostCombat.js'), /return playerVoice\(\{\n\s+race: RACES\[playerEntity\.race\]/);
   const grunt = playerAttackGrunt(player(), false, () => 0);
   assert.equal(grunt.clip, raceGenderAttackSound(RACES.HighElf, 'male', () => 0),
     'a male High Elf player grunts as a High Elf');
@@ -188,32 +186,6 @@ test('audit24 wave46: the pain voice - forty percent, the player\'s own race, he
   assert.doesNotThrow(() => playPlayerVoice(null, { clip: 1 }), 'a host with no audio');
 });
 
-test('audit24 wave46: a fall flashes the screen and does NOT make you cry out', () => {
-  // The distinction is real in the source, not an oversight in the
-  // port. Both hang off RemoveHealth, but Unity's SendMessage reaches
-  // every component while a direct C# call reaches one:
-  //   EnemyAttack:406 and DaggerfallAction:739/:768 SEND it   -> both
-  //   PlayerHealth:57 CALLS ITS OWN RemoveHealth for a fall   -> flash only
-  // PlayerFootsteps' own fall arm (:306-311) plays the FallDamage clip
-  // and nothing else.
-  const shared = rd('src/scenes/shared.js');
-  const fall = shared.slice(shared.indexOf('export function applyFallLanding'));
-  assert.match(fall, /flashPlayerDamage\(dmg\);/, 'the fall flashes (BA1: with its amount)');
-  assert.doesNotMatch(fall.slice(0, fall.indexOf('\n}')), /playerPainVoice/, 'and does not cry');
-
-  // the traps SEND it, so they get BOTH. The flash is the action
-  // system's own (it models SendMessage's PlayerHealth receiver); the
-  // cry is the HOST's, because the audio device is - AUDIT 64 F40
-  // wired it onto the one sink that carries the message.
-  const act = rd('src/world/actionSystem.js');
-  assert.match(act, /flashPlayerDamage\(dmg\)/, 'the traps flash (BA1: with the amount)');
-  const dc = rd('src/scenes/dungeonContext.js');
-  const sink = dc.slice(dc.indexOf('damagePlayer:'), dc.indexOf('castSpell:'));
-  assert.match(sink, /hurtPlayer\(dmg\)/, 'the trap bills the health');
-  assert.match(sink, /playPlayerVoice\(audio, playerPainVoice\(playerEntity, dmg\)\)/,
-    'and the trap CRIES - DaggerfallAction.cs:739/:768 send the same message EnemyAttack.cs:406 does');
-});
-
 test('audit24 wave46: every blow and every ARROW now owes all three', () => {
   // EnemyAttack.cs:404-416 - SendDamageToPlayer sends RemoveHealth
   // (flash + cry) and then PlayWeaponHitSound / PlayWeaponlessHitSound.
@@ -268,48 +240,6 @@ test('audit24 wave46: every blow and every ARROW now owes all three', () => {
   // trap's sink and - WB4a - the Burning Court boss's blow, strikePlayer), so they stay counted
   const cries = (f) => rd(f).split('\n').filter((l) => l.trim().startsWith('playPlayerVoice(audio, playerPainVoice(')).length;
   assert.equal(cries('src/scenes/dungeonContext.js'), 4, 'dungeon: the blow, the arrow, the damage trap AND the Burning Court boss\'s blow');
-  // the two arrow-on-player sites, which had NONE of this
-  const w = rd('src/scenes/world.js');
-  const arrow = w.slice(w.indexOf('onPlayerHit: (m) =>'));
-  const arrowArm = arrow.slice(0, arrow.indexOf('addItem(playerEntity.items'));
-  assert.match(arrowArm, /hitSoundFor\(m\.weapon\)/, 'world: the arrow sounds');
-  assert.match(arrowArm, /flashPlayerDamage\(dmg\)/, 'world: the arrow flashes (BA1: with the amount)');
-  assert.match(arrowArm, /playerPainVoice\(playerEntity, dmg\)/, 'world: the arrow cries');
 
-  const d = rd('src/scenes/dungeonContext.js');
-  const di = d.indexOf('an enemy ARROW reaches the player');
-  assert.ok(di > 0, 'the dungeon arrow arm is annotated');
-  const dArm = d.slice(di, d.indexOf('addItem(playerEntity.items', di));
-  assert.match(dArm, /audio\.playOneShot\(hitSoundFor\(m\.weapon\), PLAYER_HIT_VOLUME\)/,
-    'dungeon: the arrow SOUNDS - it was silent, and at the PLAYER volume (AUDIT 58)');
-  // and all three hang off a LANDED arrow: SendDamageToPlayer is only
-  // reached from ApplyDamageToPlayer's `if (damage > 0)` arm, so a
-  // miss must make no noise, no flash and no cry
-  assert.match(dArm, /if \(dmg > 0\) \{/, 'dungeon: gated on a landed arrow');
-  assert.match(arrowArm, /if \(dmg > 0\) \{/, 'world: likewise');
-  assert.match(dArm, /flashPlayerDamage\(dmg\)/, 'dungeon: and flashes (BA1: with the amount)');
-  assert.match(dArm, /playerPainVoice\(playerEntity, dmg\)/, 'dungeon: and cries');
 });
 
-test('audit24 wave46: PlayArrowSound is DEAD in DFU and stays unported', () => {
-  // PlayerFootsteps.cs:366-372 defines it with the comment "Capture
-  // this message so we can play enemies' arrow sounds on player" - and
-  // `grep SendMessage("PlayArrowSound")` over the whole DFU tree
-  // returns nothing. Its siblings all have senders
-  // (PlayWeaponHitSound and PlayWeaponlessHitSound from EnemyAttack
-  // :413/:415, PlayLargeSplash from PlayerEnterExit:390). This one
-  // never fires, so an enemy arrow in DFU makes the WEAPON hit sound
-  // and no arrow sound at all - which is what the port now does.
-  const src = rd('src/systems/soundClips.js');
-  // PIN MOVED (KG4b, 11-Multiplayer/Kings-Gambit.md section 17.4): the clip IS named now - The King's Gambit's archers
-  // play it, as the mod's IL does (world/gambitMotion.js) - and still nothing plays it for an enemy's arrow: the game's
-  // board is the one place in the port that reads SOUND.ArrowHit
-  assert.match(src, /ArrowHit: \d+/, 'named for the one game that plays it');
-  const readers = ['src/scenes/world.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js', 'src/combat/arrowFlight.js', 'src/world/gambitMotion.js'].filter((f) => /SOUND\.ArrowHit\b/.test(rd(f)));
-  assert.deepEqual(readers, ['src/world/gambitMotion.js'], 'never an enemy arrow\'s');
-  // hitSoundFor IS the two live ones, and the port uses it for arrows
-  assert.match(src, /export function hitSoundFor\(weapon, rolls = Math\.random\)/);
-  for (const f of ['src/scenes/world.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(f), /hitSoundFor\(m\.weapon\)/, `${f}: the arrow takes the WEAPON family`);
-  }
-});

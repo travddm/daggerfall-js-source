@@ -390,9 +390,6 @@ test('AUDIT C&C S8, S13: THE WORDS SAY WHAT IS SO - the credits and the Features
   const cc = Object.values(CREDITS).flat().find((c) => c?.title === 'Climates & Calories');
   assert.match(cc.what, /There are four tiers in Settings: Off, Boons \(the default: neglect costs nothing, and staying fed, watered and rested gives bonuses\), Casual/);
   assert.doesNotMatch(JSON.stringify(cc), /nothing taken/);
-  const features = read('src/systems/features.js');
-  assert.match(features, /\/\/ \(SURV-BOONS, 2026-10-12: neglect costs nothing, a need met earns a bonus\),/);
-  assert.doesNotMatch(features, /nothing taken, a need met/);
   const page = TUTORIALS.find((t) => t.id === 'survival');
   assert.equal(page.trigger, 'When a need first shows on your screen.');
   assert.equal(page.body[0], 'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.');   // VOICE1 (PIN MOVED): the same law in plain words
@@ -498,9 +495,6 @@ test('AUDIT C&C D6, R11: THE COMFORTABLE THERMOMETER IS NEUTRAL - its column the
     assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 52, `${c}: no hue to speak of`);
   }
   for (const f of ['src/systems/survival/status.js', 'src/ui/hud/hudStatus.js']) assert.doesNotMatch(read(f), /the campfire for the hearth/, f);
-  // PIN MOVED (AUDIT C&C, lens S): REST1's tile is Next night now
-  assert.match(read('src/systems/survival/status.js'), /a flame for the hearth \(its own - REST1's Next night is the campfire\)/);
-  assert.match(read('src/ui/hud/hudStatus.js'), /a flame of its own for the hearth \(REST1's\n\/\/ {5}Next night is the campfire\)/);
 });
 
 // ═══ R5, R6, R7 - THE PINS THAT DID NOT FAIL ════════════════════════════

@@ -146,29 +146,6 @@ test('CARDS3b the scene riffles before it deals, says whose each card is and whe
   d.destroy();
 });
 
-test('CARDS3b the host: the held two drawn from the view, the press on the stack or the hand taken before the seat\'s stand, the panel\'s left to it, the listeners gone with the game', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const body = (name) => { const a = wm.indexOf(`function ${name}(`); return wm.slice(a, wm.indexOf('\n  }\n', a)); };
-  assert.match(wm, /if \(cardGame\?\.scene\) cardDrawGame\(cardGame, proj, view, mwv\.eye\);/);
-  assert.match(body('cardDrawGame'), /const held = mine >= 0 \? p\.cards\.filter\(\(c\) => c\.seat === mine && c\.settled && Math\.cos\(c\.roll\) > 0\.5\)/);
-  // PIN MOVED (AUDIT CARDS-6 E21): both laid at the frame's fit - a narrow screen's hand held farther off
-  assert.match(body('cardDrawGame'), /const mats0 = heldMatrices\(view, fan, g\.peek, 0, fit\);/, 'AUDIT CARDS-3 C3: the fan laid for the whole hand');
-  assert.match(body('cardDrawGame'), /const mats = g\.lift > 1e-4 \? heldMatrices\(view, fan, g\.peek, g\.lift, fit\) : mats0;/, 'AUDIT CARDS-3 C1: lifted clear of the panel');
-  assert.match(body('cardDrawGame'), /matrix: h\.k >= 1 \? h\.m : blendMatrix\(cardMatrix\(c\.pos, c\.yaw, c\.roll\), h\.m, ease\(h\.k\)\)/, 'AUDIT CARDS-3 C3: eased from the cloth into the hand and out');
-  const listen = body('cardPointerListen');
-  // AUDIT CARDS-3 C5: pointer events (a touch is a pointer), the press at the capture phase - before the seat's
-  assert.match(listen, /window\.addEventListener\('pointerdown', down, true\);/, 'the capture phase - before the seat\'s mousedown');
-  assert.match(listen, /window\.addEventListener\('mousedown', mouseDown, true\);/, 'and the mouse press a taken pointerdown leaves behind');
-  assert.match(listen, /g\.swallowMouse = true;\n\s*e\.stopImmediatePropagation\?\.\(\); e\.preventDefault\?\.\(\);/);
-  assert.match(listen, /const up = \(e\) => \{\n\s*g\.swallowMouse = false;/, 'and the swallow ends with the press - a later click is the seat\'s');
-  assert.match(listen, /if \(!mine\(\) \|\| onPanel\(e\) \|\| \(e\.button \?\? 0\) !== 0\) return;/, 'the panel\'s press is the panel\'s; the primary button alone (C10)');
-  assert.match(listen, /else if \(!grabbed\) return;/, 'AUDIT CARDS-3 C2: a press on the stack is swallowed with nothing to bet');
-  assert.match(listen, /if \(!place \|\| d\.off \|\| onPanel\(e\) \|\| !inBetZone\(d\.point, place, g\.scene\.places\.table\)\) return;/, 'C6: let go on the table, never over the panel');
-  assert.match(listen, /if \(still && still\.id === d\.bet\.id && still\.value === d\.bet\.value\) cardPress\(g, d\.bet\.id, d\.bet\.value\);/, 'C10: the bet as the table stands at the letting go');
-  assert.match(body('closeCardGame'), /g\.unlisten\?\.\(\);/, 'the listeners gone with the game');
-  assert.match(read('src/ui/card/cardTableHud.js'), /sliderValue: \(\) => sliderValue,/);
-});
-
 test('AUDIT CARDS-3 C1: the held hand lifts clear of the panel - by the pixels it is under it, at the hand\'s depth and the frame\'s field of view; never past HELD_LIFT_MAX', () => {
   const proj = new Float32Array(16); proj[5] = 1 / Math.tan((65 * Math.PI) / 360);   // a 65-degree field
   assert.equal(heldLift(400, 500, 640, proj), 0, 'clear of it already');

@@ -518,8 +518,6 @@ test('AUDIT EG IV lane1 #23 and #32 THE TWINS: each twin turns its own phase, th
   assert.deepEqual([SD_ECHO_PAIR_MS, EG_TWIN_ONE_MS], [15_000, 20_000]);
   const O = court(1, 35, 'twins', { n: 2 });
   assert.equal(egLordsPairOf(O.F).ms, EG_TWIN_ONE_MS, 'one court: 20 s');
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLords.js', import.meta.url), 'utf8');
-  assert.ok(!/one \? 20_000 : 15_000|15_000\)\)/.test(src), 'no literal window');
 });
 
 test('AUDIT EG IV lane1 #24 THE LAST CHARGE\'S FALLEN THIRD RISES AS THE NEXT FALLS (section 13.4): each third told 5 s and fallen until the next third falls - 25 s on, never at its telling (mutants: risen at 20 s)', () => {

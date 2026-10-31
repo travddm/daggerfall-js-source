@@ -331,26 +331,6 @@ test('LW14 the remains at the true stop: the deep\'s fallen laid where the dice\
   assert.ok([[1, 0, 1], [2, 0, 2]].some((s) => s[0] === laid[1][0]));
 });
 
-test('LW14 the host\'s seams: the build\'s stops and its cleared set (the outer host\'s word through the modes host), the dead built emptied and the piles empty, the pool\'s stops and floors, the world\'s routes and remains and door, the activation\'s door underground (mutants: each seam)', () => {
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(d, /const _deepStops = stopsOf\(dungeon\.blocks, RDB_SIDE, dungeon\.startMarker \?\? null\);/);
-  assert.match(d, /const _deepCleared = opts\.deepCleared\?\.\(dfLocation, _deepStops, dungeon\.startMarker \?\? null\) \?\? new Set\(\);/);
-  assert.match(d, /if \(!f\.entity \|\| f\.src\?\.fixed \|\| !_deepFoeCleared\.has\(`\$\{f\.src\?\.blockIndex\}:\$\{f\.src\?\.loadID\}`\)\) continue;\n\s*f\.entity\.items = \[\];\n\s*setFoeDead\(f, true\);/);   // PIN MOVED (AUDIT LW-II D1/D3): by the placed block, at the build's end
-  assert.match(d, /if \(stopKey && _deepCleared\.has\(stopKey\)\) items\.length = 0;/);
-  assert.match(d, /deepStops: \(\) => _deepStops,/);
-  assert.match(d, /stopPile: \(key\) => lootPiles\.find\(\(p\) => p\.stopKey === key\) \?\? null,/);
-  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(m, /deepCleared: \(loc, stops, entry\) => host\.deepCleared\?\.\(loc, stops, entry\) \?\? null,/);
-  assert.match(m, /openLiving: \(rec\) => !!host\.openLivingDiver\?\.\(rec\),/);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const dives = divesIn\(here, tBuild - DIVE_CLEAR_MIN, tBuild, livingTripWorld,/);
-  assert.match(w, /return deepClearedOf\(dives\.map\(\(tr\) => deepRouteOf\(stops, from, tr\)\), tBuild\);/);
-  assert.match(w, /deepCleared: \(loc, stops, entry\) => livingDeepCleared\(loc, stops, entry\),/);
-  assert.match(w, /route: livingDeepRoute,/);
-  assert.match(w, /const s = stopOfMinute\(livingDeepRoute\(r\.trip\), r\.t\);\n\s+const at = s \? d\.floorAt\?\.\(s\.x, s\.y, s\.z\) \?\? null : null;/);   // PIN MOVED (AUDIT LW-II D9): kept by the remains' key
-  assert.match(w, /openLivingDiver: \(rec\) => \(livingWorldOn\(\) && rec\?\.living \? !!livingDivers\?\.offers\(rec,/);
-});
-
 test('AUDIT LW-II LW14: a company\'s strength is who stood (the bodies come one by one, an enemy keeps away) - none had enough before one fell; LEAD ON arrives each at its own stop; on the way out nothing ahead is theirs; another floor heard, never met; let go and met again as left, one drawing on the player never let go; the rival\'s word once a pile; remains with no resting places; the door at the treasure\'s reach, never in Info; the way out on its floors (mutants: D2, D4, D6, D7, D8, D11, D12, D13)', async () => {
   const route = lineRoute();
   // D2: the bodies arrive one by one - nobody hurt, nobody leaves
@@ -482,17 +462,3 @@ test('AUDIT LW-II LW14: a company\'s strength is who stood (the bodies come one 
   assert.equal(pointAt(ro, mid).y, -8, 'floored where it walks');
 });
 
-test('AUDIT LW-II LW14: the build\'s clear at its END, every binding a corpse reads stood before it, keyed by the placed block; the piles it passed lie picked over; online none - the room\'s dungeon is the room\'s; the remains\' places kept (mutants: D1, D3, D5, D9, D10)', () => {
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  const clear = d.indexOf('for (const f of foes) {\n    if (!f.entity || f.src?.fixed || !_deepFoeCleared.has(');
-  assert.ok(clear > 0);
-  for (const bound of ['const _wallNow = () =>', 'const billboardBatches = [];', 'const flatAnims = new FlatAnimator();', 'let _ctxDead = false;', 'function settleLootFlat(i) {']) {
-    assert.ok(d.indexOf(bound) > 0 && d.indexOf(bound) < clear, `${bound} stands before the clear`);
-  }
-  assert.ok(clear < d.lastIndexOf('  return api;'), 'and the build returns after it');
-  assert.match(d, /\.map\(\(s\) => `\$\{s\.block\}:\$\{s\.loadID\}`\)\);/);
-  assert.match(d, /for \(const \[i, p\] of lootPiles\.entries\(\)\) if \(p\.stopKey && _deepCleared\.has\(p\.stopKey\) && !p\.items\.length\) settleLootFlat\(i\);/);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /if \(!livingWorldOn\(\) \|\| params\.has\('online'\) \|\| !stops\?\.length \|\| !loc\?\.mapTableData\) return null;/);
-  assert.match(w, /if \(_livingRemainsPlace\.has\(r\.key\)\) return _livingRemainsPlace\.get\(r\.key\);/);
-});

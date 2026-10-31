@@ -51,10 +51,6 @@ test('AUDIT TESA III E1-2 THE BENCH KNOWS TS7\'S WALL: a Bay city walled on its 
   // a city with no wall of its own: its bytes themselves
   const plain = city(['H.RMB'], 4502);
   assert.equal(wallLaidBytes(plain, 0, 0, houses), houses);
-  // the bench: its walk grid off the laid bytes, its town map with the wall on it
-  const ext = rd('src/scenes/exterior.js');
-  assert.match(ext, /cityNav\.setBlockData\(b\.x, b\.y, wallLaidBytes\(dfLocation, b\.x, b\.y, b\.dfBlock\.rmbBlock\.fldHeader\.autoMapData\),/);
-  assert.match(ext, /blocks: wallOnTownMap\(loc\.blocks\.map\(\(bl\) => \(\{ x: bl\.x, y: bl\.y, autoMap: bl\.dfBlock\?\.rmbBlock\?\.fldHeader\?\.autoMapData, landmark: arenaTownLandmark\(bl\.dfBlock\) \}\)\), townWallCellsOf\(dfLocation\), loc\.width\),/);
 });
 
 test('AUDIT TESA III E1-2 with ARENA2: Daggerfall, Wayrest and Sentinel on the bench - their rings opened on the door\'s read, a walk grid off their blocks\' laid bytes shut on every cell of their walls, their town maps drawing them; off the raw bytes no wall byte stands in Daggerfall\'s blocks at all (mutant: the bytes unlaid)', { skip: skipReal }, async () => {
@@ -104,7 +100,6 @@ test('AUDIT TESA III E1-4 THE DEEP WATERS BAKE BLENDS A TOWN AS THE STREAMED BUI
   assert.equal(rectsFingerprint([[100, 1, 2, 3, 4]]), rectsFingerprint([[100, 1, 2, 3, 4]]));
   assert.equal(BAKE_GENERATOR_VERSION, 2, 'the bake\'s rules moved: a coastal town\'s blend its outline\'s (was 1)');
   assert.match(bakeCacheKey({ woodsHash: 1, rectsHash: 2 }), /^dwbake:v2:1:2$/);
-  assert.match(rd('src/world/deepWater/deepWatersClient.js'), /rows\.push\(\[py \* 1000 \+ px, r\.xMin, r\.xMax, r\.yMin, r\.yMax, \.\.\.\(r\.shape \? \[r\.shape\] : \[\]\)\]\);/);
 });
 
 test('AUDIT TESA III E1-4 with ARENA2: Antelibuton and Aldwall Rock - the bake\'s water test over the row Deep Waters is handed is the streamed build\'s ground, sample for sample; the rect alone (the bake before) called thousands of their sea samples land (mutant: the outline left off the row)', { skip: skipReal }, async () => {

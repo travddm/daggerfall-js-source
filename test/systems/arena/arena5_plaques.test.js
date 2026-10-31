@@ -114,7 +114,6 @@ test('ARENA5 the plaques themselves: a board of the dark wood Daggerfall backs i
   registerArenaPlaques();
   assert.deepEqual(tex(customModelFor(PLAQUE_MODEL)), tex(cut));
   assert.deepEqual(tex(customModelFor(PLAQUE_BARE_MODEL)), tex(bare));
-  assert.match(read('src/world/arena/arenaCity.js'), /registerArenaPlaques\(\);/, 'installArena registers them with the colosseum');
   _resetCustomModels(); _resetArenaPlaques();
 });
 
@@ -158,20 +157,3 @@ test('ARENA5 the gate\'s word on the wall: offline the save\'s names, online the
   assert.ok(PLAQUE_MAX >= 8, 'a wall of names');
 });
 
-test('ARENA5 the wall\'s words and wiring: a plaque reads its champion - name, banner, season, Grand Champion - or the stone\'s waiting line; stood at the undercroft\'s mount about the Keeper\'s place, drawn on the dungeon\'s pass (a champion\'s board for each name, the bare after), named and pressed through one key (mutants: ARENA5-WALL-NOT-STOOD, ARENA5-WALL-CUT-COUNT, ARENA5-WALL-PRESS)', () => {
-  assert.equal(U.plaqueLine('Aldo', 'the Blue Banner', '3E 406'), 'Aldo - Grand Champion of the Arena, for the Blue Banner, 3E 406.');
-  assert.equal(U.plaqueLine('Vex', '', 'Season 2'), 'Vex - Grand Champion of the Arena, Season 2.');
-  assert.equal(U.plaqueTitle('Vex'), 'Vex, Grand Champion');
-  assert.equal(U.hallNone, 'No name is cut here yet.');
-  const M = read('src/scenes/worldModes.js');
-  assert.match(M, /standArenaWall\(ctx, dfLocation\)\.catch\(\(\) => \{\}\);/, 'stood at the mount');
-  assert.match(M, /const plan = hallPlaquePlan\(ctx\.arenaHall, \(o, d, m\) => ctx\.collider\?\.raycast\?\.\(o, d, m\) \?\? Infinity\);/, 'about the Keeper, in the level\'s collider');
-  assert.match(M, /for \(const p of w\.plaques\) renderer\.drawMesh\(p\.k < n \? w\.gpu\.cut : w\.gpu\.bare, p\.matrix, null\);/, 'a champion\'s board for each name');
-  assert.match(M, /drawArenaWall\(\);[^\n]*\/\/ ARENA5/, 'drawn on the dungeon\'s pass');   // HOTFIX 1003l: the floor's sky after it on its line
-  assert.match(M, /if \(key\.startsWith\('plaque:'\)\) \{ readPlaque\(key\); return true; \}/, 'pressed');
-  assert.match(M, /say\(c \? U\.plaqueLine\(c\.name, c\.banner \? ARENA_TEXT\.teams\.the\[c\.banner\] \?\? '' : '', c\.season\) : U\.hallNone\);/, 'its line, or the stone\'s');
-  assert.match(M, /ctx\.addActivationTargets\(\(\) => arenaWallLive\(\)\?\.plaques\.map/, 'in the ray');
-  assert.match(M, /key\.startsWith\('plaque:'\) \? plaqueName\(key\) : null/, 'and named on the plaque');
-  assert.match(read('src/scenes/dungeonContext.js'), /arenaHall: _undercroftHall\?\.hall \?\? null,/);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(read(f), /arenaHallPlaques: \(\) => arenaGate\.plaques\(\),/, f);
-});

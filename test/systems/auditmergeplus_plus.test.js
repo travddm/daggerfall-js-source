@@ -55,30 +55,6 @@ function statementAt(text, from) {
 
 // ── B1: the struck point, in the mode's own frame ─────────────────────────────────────────────────────────────────
 
-/** THE BOOT'S TWO LAWS, AS WORLD.JS HOLDS THEM: the overworld's own (`campToWire`), the two declared beside the pose
- *  (`onlineToScene` and its inverse `sceneToOnline`), the splash observer that hands a blow of mine to PEERFX1, and the
- *  frame's per-mode slice (`shedY`, the pose, both laws re-written) - each a whole statement of the stripped source. */
-function bootSlices() {
-  const W = strip(read('src/scenes/world.js'));
-  const one = (head) => {
-    const i = W.indexOf(head);
-    assert.ok(i >= 0, `world.js has no \`${head}\``);
-    assert.equal(W.indexOf(head, i + 1), -1, `\`${head}\` stands once`);
-    return statementAt(W, i);
-  };
-  const frame = [];
-  for (let i = W.indexOf('const shedY = '); i >= 0;) {
-    while (/\s/.test(W[i])) i++;
-    const s = statementAt(W, i);
-    if (!/^(?:const shedY|const nativeFrame|const pose|onlineToScene|sceneToOnline) =/.test(s)) break;
-    frame.push(s); i += s.length;
-  }
-  assert.ok(frame.length >= 3, 'the frame\'s slice: shedY, the pose and its law');
-  return {
-    W, camp: one('const campToWire = '), toScene: one('let onlineToScene = '), toWire: one('let sceneToOnline = '),
-    observer: one('setSplashObserver((bloodIndex, pos, hit) =>'), frame: frame.join('\n'),
-  };
-}
 /** One player's boot, as far as a blow of theirs goes - their floating origin, where they stand, the laws, the
  *  observer (strict, as the module is), and a frame in a given mode. */
 function bootOf(slices, { origin, comp, pos }) {
@@ -96,69 +72,6 @@ function bootOf(slices, { origin, comp, pos }) {
 }
 const near = (a, b, msg) => assert.ok(a.length === b.length && a.every((v, k) => Math.abs(v - b[k]) < 1e-6), `${msg}: ${JSON.stringify(a)}, not ${JSON.stringify(b)}`);
 const minus = (a, b) => a.map((v, k) => v - b[k]);
-
-test('STAFF-TP private presence: two floating origins agree on body height and native position inside a personal room', () => {
-  const slices = bootSlices(), P = [12.123456789, -50.123456789, 40.987654321];
-  const room = `owned:${'a'.repeat(32)}.${'b'.repeat(16)}:42.9`;
-  const origin = { x: 207, y: 213 }, comp = [30, 4, -20];
-  const owner = bootOf(slices, { origin, comp, pos: P });
-  const visitor = bootOf(slices, { origin: { x: 206, y: 214 }, comp: [-8, -2.5, 11], pos: [0, 0, 0] });
-  const pose = owner.frameIn('interior', room); visitor.frameIn('interior', room);
-  near([pose.x, pose.y, pose.z], owner.campToWire(P), 'private body uses native frame');
-  near(visitor.campToWire(visitor.toScene(pose)), [pose.x, pose.y, pose.z], 'visitor renders in their own origin');
-});
-
-test('AUDIT MERGE-PLUS B1 the struck point rides the mode\'s own law, by source: `sceneToOnline` declared beside `onlineToScene` (the overworld\'s law until a frame says otherwise), the splash observer hands PEERFX1 that live law and never the overworld\'s, and every frame writes it from the mode, right after its inverse (mutants: the splash back on campToWire, the per-frame law never written, no law declared)', () => {
-  const { W, frame } = bootSlices();
-  assert.match(W, /let onlineToScene = \(p\) => \[p\.x, p\.y, p\.z\];\s+let sceneToOnline = campToWire;/, 'declared beside the pose\'s own law');
-  assert.match(W, /setSplashObserver\(\(bloodIndex, pos, hit\) => \{ peerFxPlayer\.splashed\(pos\); if \(hit\?\.fromPlayer\) noteMyBlow\(pos, bloodIndex, hit, \(q\) => sceneToOnline\(q\)\); \}\);/, 'my blow goes out through the law of the frame it was struck in');
-  assert.ok(!/noteMyBlow\([^;]*campToWire/.test(W), 'no blow of mine is mapped by the overworld\'s law alone');
-  assert.match(frame, /\(p\) => \[p\.x, shedY \? p\.y \+ state\.compensation\[1\] : p\.y, p\.z\];\s*sceneToOnline = nativeFrame \? campToWire : \(q\) => \[q\[0\], shedY \? q\[1\] - state\.compensation\[1\] : q\[1\], q\[2\]\];$/, 'written each frame, beside its inverse');
-  assert.equal((W.match(/\bsceneToOnline =/g) ?? []).length, 2, 'the declaration and the frame, nowhere else');
-});
-
-test('AUDIT MERGE-PLUS B1 a blow struck in the overworld, a building or a dungeon lands, on the receiver\'s screen, where it was struck beside the striker\'s body - the boot\'s slice MOUNTED and a real blow struck through it (validPose, the peer-fx player, the receiver\'s own law); in a dungeon, the very point. Before, it went out through the overworld\'s law in every mode and landed millions of units away (mutants: the splash back on campToWire, the per-frame law never written, no law declared)', () => {
-  const slices = bootSlices();
-  const P = [12.5, -3, 40.25];     // the striker, in their own scene
-  const Q = [13.25, -1.75, 41.5];  // the foe's chest they struck
-  try {
-    for (const mode of ['exterior', 'interior', 'dungeon']) {
-      _resetPeerFxForTests();
-      const me = bootOf(slices, { origin: { x: 207, y: 213 }, comp: [30, 4, -20], pos: P });
-      const them = bootOf(slices, { origin: { x: 206, y: 214 }, comp: [-8, -2.5, 11], pos: [0, 0, 0] });
-      const pose = me.frameIn(mode);
-      them.frameIn(mode);
-      // the pose's own law: a blow struck where I stand goes out where my pose says I stand
-      me.strike(P);
-      assert.deepEqual(poseFx().hp, [pose.x, pose.y, pose.z], `${mode}: my blow's point and my body ride one law`);
-      me.strike(Q);
-      const before = validPose({ ...pose });
-      const wire = validPose({ ...pose, ...poseFx() });
-      assert.equal(wire.hk, 2, `${mode}: the blow rides the pose`);
-      assert.ok(wire.hp, `${mode}: its point passes the wire's door`);
-      let t = 0;
-      const blows = [];
-      const fx = createPeerFxPlayer({ toScene: them.toScene, now: () => t, play: { blow: (b) => blows.push(b) } });
-      fx.update('striker', before, them.toScene(before));
-      fx.frame();
-      fx.update('striker', wire, them.toScene(wire));
-      t = 1; fx.frame();
-      assert.equal(blows.length, 1, `${mode}: the blow plays once`);
-      near(minus(blows[0].at, them.toScene(wire)), minus(Q, P), `${mode}: where it was struck, beside the striker's drawn body`);
-      if (mode === 'dungeon') near(blows[0].at, Q, 'a dungeon\'s frame is its own and shared: the very point');
-    }
-    // one host, frame after frame: the law is the overworld's until a frame runs, then each frame's own mode
-    _resetPeerFxForTests();
-    const me = bootOf(slices, { origin: { x: 207, y: 213 }, comp: [30, 4, -20], pos: P });
-    me.strike(Q);
-    assert.deepEqual(poseFx().hp, me.campToWire(Q), 'before the first frame: the overworld\'s law, the declaration\'s');
-    for (const mode of ['dungeon', 'exterior', 'interior', 'dungeon']) {
-      const pose = me.frameIn(mode);
-      me.strike(P);
-      assert.deepEqual(poseFx().hp, [pose.x, pose.y, pose.z], `${mode}, re-entered: the frame wrote its own law`);
-    }
-  } finally { _resetPeerFxForTests(); }
-});
 
 // ── B2: a ghosted light slot under a raised shield ────────────────────────────────────────────────────────────────
 

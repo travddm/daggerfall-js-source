@@ -39,17 +39,6 @@ test('DISC25-D: a guild quest refused to a non-member names the guild - a temple
   assert.equal(shareRefusalText({ reason: 'active' }), SHARE_REFUSAL_TEXT.active);
   assert.equal(shareRefusalText({ reason: 'guild' }), SHARE_REFUSAL_TEXT.guild);
   assert.equal(shareRefusalText({ reason: 'nonsense' }), null);
-  // and the receiver's line is built from it
-  assert.match(hostText('src/scenes/world.js'), /setMidScreenText\(shareRefusedLine\(result, who, label, quest\.data\?\.build \?\? null\)\);/);   // SHARE-MEND: and the sender's build, for a skew; PIN MOVED (QUEST-AUDIT III SHARE-WORDS): the line is questShare.js shareRefusedLine's
-  assert.doesNotMatch(hostText('src/scenes/world.js'), /const why = SHARE_REFUSAL_TEXT\[result\.reason\];/);
   assert.equal(shareRefusedLine(r, 'Ana', 'Guard the Guild'), 'Ana tried to share "Guard the Guild", but you are not a member of the Mages Guild, which this quest requires.', 'the line names the guild');
 });
 
-test('DISC25-D: the Online pane says what the shared clock does to a quest - and no longer that the quest clocks stand still', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.doesNotMatch(menu, /the quest clocks stand still/, 'false since WORLD7: quest clocks count played time');
-  assert.match(menu, /a quest waiting for a time of day waits for the world\\u2019s[^.]*\. Your character also has their own clock\. It runs while you play and stops while you are logged off\. Resting, travel, jail and training use it\. Your wounds[^.]*loans and repairs run on it\. Quest timers run on the world\\u2019s clock while you play\. Resting, waiting and traveling don\\u2019t use up a quest\\u2019s days, and time logged off never counts\./);   // LIVED1: the character's own time, said between; TIME3: and the quest timers on it; PIN MOVED (VOICE2): American spelling (Voice.md rule 8)
-  // the law the sentence says: online a quest clock charges the time lived one played step at most (WORLD7) and the
-  // time raised whole (TIME3), and a rest moves no world time
-  assert.match(rd('src/systems/quest/clock.js'), /export const PLAYED_STEP_MAX_SECONDS = 30 \* 60;/);
-});

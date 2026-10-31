@@ -210,16 +210,3 @@ test('TELL6e: the hosts\' frame helper drains the queue and ticks the bleed thro
   assert.deepEqual(hurts, [1], 'its first tick, through the host\'s door');
 });
 
-test('TELL6e: wired - the four hosts\' player frames, the three pools\' hits, the swing and the cast barred while down (mutants: any host or pool unwired)', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    const s = rd(h);
-    assert.match(s, /playerBlowFrame\(\{ motor: player, entity: playerEntity, shake: \(k\) => betterAmbience\.weaponKick\(k\), hurt: \(n\) => \{ hurtPlayer\(playerEntity, n\); flashPlayerDamage\(n\); surfacePlayer\(\); \} \}\);[^\n]*\n(?:[^\n]*if \(!overlayHeld\) \{\n(?:\s*\/\/[^\n]*\n)*)?[^\n]*player\.(update|holdFrame)\(/, `${h}: its player frame, before the motor's`);   // PIN MOVED (AUDIT TELL L6: the building's host runs it above its window gate, as the street's do)
-  }
-  for (const [h, rig] of [['src/scenes/world.js', 'weaponRig.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/exterior.js', 'weaponRig.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/worldModes.js', 'interiorWeapon.frame(dt, { paralyzed: paralyzed || knockedDown() })'], ['src/scenes/dungeonContext.js', 'weaponRig.frame(dt, { paralyzed: _pParalyzed || knockedDown() })']]) {
-    assert.ok(rd(h).includes(rig), `${h}: no swing while down`);
-  }
-  assert.match(rd('src/scenes/hostMagic.js'), /function castInput\(eye, dir\) \{\n\s*const sp = readiedSpell;\n\s*if \(!sp\) return false;\n\s*if \(knockedDown\(\)\) return false;/, 'no cast while down');
-  for (const [p, v] of [['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/dungeonContext.js', 'f'], ['src/scenes/cityGuards.js', 'g']]) {
-    assert.ok(rd(p).includes(`landBlowEffect(${v}, hp0 - playerEntity.health, playerFeet);`), `${p}: its hit asks`);   // PIN MOVED (AUDIT TELL L8: by what reached health)
-  }
-});

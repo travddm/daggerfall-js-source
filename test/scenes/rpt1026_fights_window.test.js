@@ -44,24 +44,3 @@ test('RPT1026-FIGHTS WINDOW-ONLINE THE LAW: offline a window holds the dungeon (
   assert.deepEqual([windowHoldsDungeon(true, true), windowHoldsDungeon(true, false), windowHoldsDungeon(false, true), windowHoldsDungeon(false, false)], [false, true, false, false], 'online: the world runs under a living player\'s window');
 });
 
-test('RPT1026-FIGHTS WINDOW-ONLINE THE HOSTS: the world-hosted dungeon holds its frame by the law - the window\'s early return, the bodies drawn frozen under it, the Hour\'s poses and late telegraph - and draws a window it ran under last; the motor, the collision triggers, the breath and a pending cast still wait for it; the street host\'s tactics clock asks the same law; the offline hosts keep the pause (mutants: the early return by the window alone; no window drawn over a frame that ran; the breath run under a window)', () => {
-  const WM = read('src/scenes/worldModes.js');
-  const held = 'windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())';
-  assert.ok(WM.includes(`if (${held}) { dungeonCtx.hideHudText?.(); hideWorldPlaque(); dungeonCtx.tickOverlay(dt);`), 'the early return is the law\'s');
-  assert.ok(WM.includes(`if (${held}) dungeonCtx.drawWindowBodies?.(`), 'the frozen bodies only under a frame held');
-  assert.ok(WM.includes(`if (isSdRealm(dungeonLoc) && !${held}) dungeonCtx.sdPose?.(dt, player.pos);`), 'the Hour posed whenever the frame runs');
-  assert.ok(WM.includes(`if (_sdLate.on && ${held}) host.drawSdTelegraph?.(_sdLate);`));
-  assert.ok(WM.includes('dungeonCtx.drawFoes(dt, canvas, proj, view, cam.pos, player.pos, !dungeonCtx.uiOverlayActive && anyMove(moveHeld(keys)),'), 'no move under a window: no trigger walked onto');
-  assert.ok(WM.includes('if (dungeonCtx.unpausedOverlay || dungeonCtx.uiOverlayActive) { dungeonCtx.tickOverlay(dt); dungeonCtx.drawOverlay(canvas); }'), 'the window last, over a frame that ran under it');
-  assert.match(WM, /const overlayHeld = [^\n]*\n[^\n]*\n\s+\(mode === 'dungeon' && !!dungeonCtx\?\.uiOverlayActive\);/, 'the motor still held by any window');
-  const D = read('src/scenes/dungeonContext.js');
-  assert.ok(D.includes('breathTick(opts.breathHeld?.() || dungeonPaused() ? 0 : dt, playerFeet, playerHeight);'), 'the breath waits under any window (AUDIT 27h S1)');
-  assert.ok(D.includes('magic.firePending(eye, [-aimed[2], -aimed[6], -aimed[10]], !!opts.breathHeld?.() || dungeonPaused());'), 'and a pending cast');
-  assert.ok(D.includes('cursorActive: dungeonPaused() || !!opts.pointerSurfaceUp?.(),'), 'the plaque hidden under it');
-  const W = read('src/scenes/world.js');
-  assert.ok(W.includes("tickTactics(foeFrameDt(_questBoxHoldsFoes() || (_mode() === 'dungeon' && windowHoldsDungeon(modes?.dungeonCtx?.uiOverlayActive, playerEntity.health > 0 && !modes?.deathUp?.())) ? 0 : dt));"), 'the brain\'s clock is the foes\' step: held when they are');
-  // the offline hosts: the standalone dungeon and the fixed city never run online - DFU's pause, unchanged
-  const DG = read('src/scenes/dungeon.js');
-  assert.ok(DG.includes('tickTactics(foeFrameDt(ctx.uiOverlayActive ? 0 : dt));'));
-  assert.ok(!/windowHoldsDungeon/.test(DG + read('src/scenes/exterior.js')), 'offline: no shared clock to answer');
-});

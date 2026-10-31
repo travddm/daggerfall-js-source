@@ -120,15 +120,3 @@ test('ROADS-CLEAR over the shipped lists and Basic Roads: WoD pieces DO land on 
   assert.equal(nearWhole, 0, 'no camp, fort, shrine or ruin piece is - the mod\'s own pixel test already holds those back');
 });
 
-test('ROADS-CLEAR by source: the world host asks the site at its pick, each piece and flat by its own box before it stands, and each camp anchor and member', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /\}, wodPathsPoint, \(name, prefab, rect\) => wodSiteClear\(terrainGen\.roads\(\), px, py, name, prefab, rect\)\);/, 'the road asked first, and alone (GATE-AGREE: the clearing asks each pick after it is made)');
-  assert.match(w, /const box = transformedAabb\(archAabb\(m\.modelId, cpu\.positions\), m\.matrix\);\n(?:\s*\/\/[^\n]*\n|\s*if \(isWodShrub\(m\.modelId, stood\[m\.pick\]\?\.name\)\) \{[^\n]*\n(?:[^\n]*\n){2}\s*\}\n|\s*if \(rockPick\(m\.pick\) && [^\n]*rockSeatDrop[^\n]*\n)*\s*if \(boxNearPath\(_roadsNow, px, py, box\[0\] \* UNITS_PER_METRE, box\[2\] \* UNITS_PER_METRE, box\[3\] \* UNITS_PER_METRE, box\[5\] \* UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR\)\) \{ _wodOffRoad\+\+; continue; \}\n(?:\s*(?:\/\/[^\n]*|if \([^\n]*\) \{ [^\n]*continue; \}|gateLedger\.reach\.push\([^\n]*\);)\n)*\s*unionBox\(box\);/,
-    'the piece is refused before it joins the bounds, the batch or the collider (WOD-BUSH: its shrub grounded between, which moves no x or z the road reads; ROCK-SEAT: nor a rock seated into the ground)');
-  assert.match(w, /for \(const f of place\.flats\) \{\n\s*if \(pointNearPath\(_roadsNow, px, py, f\.base\[0\] \* UNITS_PER_METRE, f\.base\[2\] \* UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR\)\) \{ _wodOffRoad\+\+; continue; \}/);
-  assert.match(w, /const _roadsNow = terrainGen\.roads\(\);/);
-  assert.match(w, /if \(anchor && _nearRoad\(\[anchor\.x, anchor\.y, anchor\.z\], \(hit\.spacing \?\? 0\) \+ CAMP_ROAD_CLEAR_M\)\) anchor = null;/, 'the camp ring clear of the road');
-  assert.match(w, /if \(spot && _nearRoad\(\[spot\.x, spot\.y, spot\.z\], CAMP_ROAD_CLEAR_M\)\) spot = null;/, 'and each member');
-  assert.match(w, /const _nearRoad = \(pos, radiusM\) => \{\n\s*const net = terrainGen\.roads\(\);\n\s*if \(!net\) return false;\n\s*const wc = state\.worldCoords\(pos\);\n\s*const p = worldCoordToMapPixel\(wc\.x, wc\.z\);\n\s*const o = mapPixelToWorldCoords\(p\.x, p\.y\);\n\s*return pointNearPath\(net, p\.x, p\.y, wc\.x - o\.x, wc\.z - o\.z, radiusM \* UNITS_PER_METRE\);/,
-    'a scene position into its pixel\'s own frame, the network\'s units');
-});

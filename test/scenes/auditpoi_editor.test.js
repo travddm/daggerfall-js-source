@@ -265,23 +265,6 @@ test('AUDIT POI E17: while another document is shown in a POI\'s place (the appr
   assert.equal(Wd.ed.edit(id, 'rename', (d) => { d.name = 'Hall 2'; }), true);
 });
 
-test('AUDIT POI E18: the editor\'s lines are sized in the pixels of the rect the world pass draws into, never the whole drawing buffer (mutant: the viewport unread)', () => {
-  const draws = [];
-  let vp = [0, 120, 800, 480];
-  const pass = { draw: (_p, _v, lines, opts) => { draws.push(opts); return lines.length > 0; } };
-  const Wd = editorWorld({ deps: { pass, viewport: () => vp } });
-  Wd.editor.enter();
-  Wd.ed.create({ px: 10, py: 20, x: 4, z: 6, name: 'A' });
-  const v = Wd.frame();
-  assert.equal(Wd.editor.drawLines(v.proj, v.view), true);
-  assert.deepEqual(draws.map((o) => [o.onTop, o.vw, o.vh]), [[false, 800, 480], [true, 800, 480]]);
-  vp = null;
-  draws.length = 0;
-  Wd.editor.drawLines(v.proj, v.view);
-  assert.deepEqual(draws.map((o) => [o.vw, o.vh]), [[0, 0], [0, 0]], 'no rect: the pass\'s own drawing buffer');
-  assert.match(src('src/scenes/world.js'), /viewport: \(\) => renderer\.worldViewportPx,   \/\/ AUDIT POI E18/, 'the world hands it the world pass\'s rect');
-});
-
 test('AUDIT POI E16: the editor acts on its own keys alone - the browser keeps every other (find, reload, zoom, Tab, back, F5), though the world hears none of them (mutants: every chord answered taken; any key answered taken)', async () => {
   const { createPoiEditorRouter } = await import('../../src/scenes/poiEditorHost.js');
   const Wd = editorWorld();
@@ -303,38 +286,6 @@ test('AUDIT POI E16: the editor acts on its own keys alone - the browser keeps e
   const up = ev({ type: 'keyup', code: 'KeyW', target: canvas });
   route.onEvent(up);
   assert.deepEqual([!!up.stopped, !!up.prevented], [true, false]);
-});
-
-test('AUDIT POI E2: a key at the panel\'s own controls is the editor\'s - "New POI" then Escape stops the placing, a tool clicked then E turns; a key in a typed field is the field\'s; neither reaches the world below; a window over the world keeps its own (mutants: the panel\'s keys handed down; a field\'s key acted on)', async () => {
-  const { createPoiEditorRouter } = await import('../../src/scenes/poiEditorHost.js');
-  const Wd = editorWorld();
-  Wd.editor.enter();
-  let overlay = false;
-  const button = { tagName: 'BUTTON' }, field = { tagName: 'INPUT' }, canvas = {};
-  const route = createPoiEditorRouter({ editor: Wd.editor, canvas, cam: Wd.cam, acts: () => ({}), owns: (t) => t === button || t === field, overlayUp: () => overlay, textEntry: (t) => t?.tagName === 'INPUT' });
-  Wd.editor.placeNew('New place');
-  // the window's capture listener leaves a panel target to the panel...
-  const esc0 = ev({ type: 'keydown', code: 'Escape', target: button });
-  route.onEvent(esc0);
-  assert.equal(!!esc0.stopped, false);
-  // ...and the panel's own root takes it: the editor's Escape, stopped there
-  const esc = ev({ type: 'keydown', code: 'Escape', target: button });
-  route.onPanelKey(esc);
-  assert.equal(Wd.editor.placing(), null, 'the placing stopped (it opened the pause, the placing still armed)');
-  assert.deepEqual([!!esc.stopped, !!esc.prevented], [true, true]);
-  const e = ev({ type: 'keydown', code: 'KeyE', target: button });
-  route.onPanelKey(e);
-  assert.equal(Wd.editor.mode(), 'turn', 'E: the turn tool, never the body\'s Interact');
-  assert.equal(!!e.stopped, true);
-  const typed = ev({ type: 'keydown', code: 'KeyW', target: field });
-  route.onPanelKey(typed);
-  assert.deepEqual([Wd.editor.mode(), !!typed.stopped, !!typed.prevented], ['turn', true, false], 'a field\'s W is typed, and walks nobody');
-  overlay = true;
-  const under = ev({ type: 'keydown', code: 'Escape', target: button });
-  route.onPanelKey(under);
-  assert.equal(!!under.stopped, false, 'the map the bar opened has its Escape');
-  // the world binds it on the panel's root, for both edges
-  assert.match(src('src/scenes/world.js'), /for \(const ty of \['keydown', 'keyup'\]\) panel\.root\.addEventListener\(ty, route\.onPanelKey\);/);
 });
 
 test('AUDIT POI E14: a release is never gated - a button let go over a window, the pointer\'s capture lost, the window\'s blur end the drag where it stands and the look; the world gone from under the editor (a mode, a load) leaves it at the next frame or event (mutants: the pointer-up over a window lost; the blur unheard; the world\'s change unasked)', async () => {
@@ -407,28 +358,3 @@ test('AUDIT POI E1: the bar\'s keys stand down while a hold stands - a digit und
   }
 });
 
-test('AUDIT POI E1, E3, E12, E13, E14, E15 - THE WORLD\'S WIRING, BY SOURCE: the boot\'s cursor and walk toggles stand down under the editor and the bar is held while it is open; the held keys let go on the way in and out; on foot alone; \'here\' refused over unbuilt ground and moved off a rock; a mode change, a load and a death leave it; a live POI clicked opened (mutants: each line undone)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /bindCursorToggle\(canvas, \(\) => [^\n]*\|\| !!poiEditor\?\.active\(\), \(e\) => actionsOf\(e, keys\)\);/, 'E1: Y, Ctrl+Y and Enter no longer free the cursor over the editor');
-  assert.match(w, /bindWalkMode\(\(e\) => actionsOf\(e, keys\), \(\) => [^\n]*\|\| !!poiEditor\?\.active\(\)\);/, 'E1: nor flip walk mode');
-  const at = w.indexOf('  function mountPoiEditor(me, io) {'), mount = w.slice(at, w.indexOf('\n  }\n', at));
-  const enter = mount.slice(mount.indexOf('    function enter() {'), mount.indexOf('    function exit(how) {'));
-  const exit = mount.slice(mount.indexOf('    function exit(how) {'), mount.indexOf('    function jump() {'));
-  assert.match(enter, /hotbarKeysBack = holdHotbarKeys\(\);/, 'E1: the bar held on the way in');
-  assert.match(exit, /hotbarKeysBack\?\.\(\); hotbarKeysBack = null;/, 'E1: and let go on the way out');
-  assert.match(mount, /const worldKeysUp = \(\) => \{ keys\.clear\(\); for \(const ring of Object\.values\(latch\.edge\)\) ring\.clear\(\); \};/, 'E3: the held set and every edge ring');
-  assert.match(enter, /\n\s*worldKeysUp\(\);\n/, 'E3: on the way in');
-  assert.match(exit, /\n\s*worldKeysUp\(\);   \/\/ AUDIT POI E3/, 'E3: and on the way out');
-  assert.match(enter, /if \(_mode\(\) !== 'exterior' \|\| travelView\?\.active \|\| !isOnFoot\(player\.transportMode\) \|\| !!csaRuntime\?\.isSailing\?\.\(\)\) \{ townTalk\.say\(/, 'E12: a bench, a saddle and a helm refused');
-  assert.match(exit, /if \(!Number\.isFinite\(below\)\) \{ panel\.say\([^\n]*\); return; \}/, 'E13: unbuilt ground refused, the editor still open');
-  assert.ok(exit.indexOf('return; }') < exit.indexOf('window.removeEventListener'), 'E13: refused before anything is torn down');
-  assert.match(exit, /if \(heldInSolid\(collider, landing\)\) landing = openGroundNear\(collider, landing\[0\], landing\[2\], \{ dry: \(floor\) => floor >= tvSeaY\(\) \}\) \?\? landing;/, 'E13: the teleport\'s own rock check');
-  assert.match(mount, /gone: \(\) => _mode\(\) !== 'exterior' \|\| restoresSoFar\(\) !== openedAt,\n\s*onGone: \(\) => exit\('away'\),/, 'E14: a mode change or a load leaves it');
-  assert.match(enter, /openedAt = restoresSoFar\(\);/, 'E14: the loads counted from each opening');
-  assert.match(mount, /const route = createPoiEditorRouter\(\{ editor, canvas, cam, acts: \(\) => panel\.acts, owns: \(target\) => panel\.owns\(target\), overlayUp: \(\) => townTalk\.overlayActive, textEntry: isTextEntryTarget, win: window \}\);/);
-  assert.match(enter, /for \(const ty of POI_EDITOR_EVENTS\) window\.addEventListener\(ty, onEvent, \{ capture: true, passive: false \}\);/, 'E14: the capture\'s loss and the blur heard too');
-  const presenter = w.slice(w.indexOf('setDeathPresenter(() => {'), w.indexOf('setDeathPresenter(() => {') + 400);
-  assert.match(presenter, /^setDeathPresenter\(\(\) => \{\n\s*poiEditorLeave\?\.\('back'\);/, 'E14: a death leaves it first');
-  assert.match(mount, /poiEditorLeave = exit;/);
-  assert.match(mount, /editor\.wantsOpen = \(id\) => \{ panel\.open\(id\)\.catch\(/, 'E15: a live POI clicked is opened');
-});

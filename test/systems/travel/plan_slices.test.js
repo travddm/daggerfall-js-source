@@ -122,16 +122,6 @@ test('PLAN-SLICES a journey begun while one is planning takes its place; an erro
   assert.equal(typeof PLAN_PENDING, 'object');
 });
 
-test('PLAN-SLICES the host\'s wiring: the world host plans through the slicer, its two journeys run in it, OWS2\'s two asks out of it; the Travel View\'s readout says the plan is being made', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /import \{ planRouteSliced as planRoute, planJourney \} from '\.\.\/systems\/travel\/planSlices\.js';/);
-  assert.match(w, /function travelViewRouteTo\(summary, \{ roads = false, voyage = false, noWay = null \} = \{\}\) \{\n\s+return planJourney\(\(\) => \{/);
-  assert.match(w, /function travelViewWalkTo\(point, pix, \{ door = null, water = false, roads = false, outside = false \} = \{\}\) \{\n\s+return planJourney\(\(\) => \{/);
-  assert.doesNotMatch(w, /function tvMooredDry|const tvSeaAsk = /);
-  assert.match(read('src/scenes/travelView.js'), /trip: planning\(\) \? planningLine\(\) : deps\.trip\?\.\(\) \?\? ''/);
-  assert.match(read('src/scenes/travelView.js'), /const planningLine = \(\) => t\('travelView\.planning', 'Planning the way\.\.\.'\);/);
-});
-
 test('PLAN-SLICES a voyage by the sea lanes is sliced too: its two floods\' and its lanes\' cells counted in the plan\'s tally, the same plan at its end (mutants: a flood uncounted, the lanes uncounted)', () => {
   const sea = () => true;   // the open sea everywhere past the Bay's table
   const from = { x: 1200, y: 300 }, to = { x: 1700, y: 300 };

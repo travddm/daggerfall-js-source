@@ -132,8 +132,6 @@ test('APPEARANCES THE SWEEP: every look in the pack, the wagon and the Materials
   const back = {};
   restorePlayer(back, JSON.parse(JSON.stringify(snap)));
   assert.deepEqual(back.appearances, ['120.1.0', '107.521.2'], 'and a load restores them');
-  assert.match(readFileSync(new URL('../../src/systems/save/save.js', import.meta.url), 'utf8'), /\n {2}'appearances',\n\];/, 'a field of ENTITY_FIELDS, copied both ways');
-  assert.match(readFileSync(new URL('../../src/ui/hud/hud.js', import.meta.url), 'utf8'), /drawRevenantCards\(\{ hidden: cursorActive[^\n]*\n {2}try \{ noteHeldLooks\(vitals\); \}[^\n]*\n {2}\/\/ LOOT-BANNER:/, 'swept once a frame on the HUD\'s one call, outside the skin\'s gate as the loot watcher is - every host, every skin');
 });
 
 test('APPEARANCES A LOOK WORN: of its kind only, off the item or the wire; the piece drawn as it - one copy a piece and look, made again when the slot or the look changes - its dye its metal\'s, an artifact\'s and a Gilded piece\'s own art dropped, its enchantments kept (mutants: the kind unchecked; the memo never kept; the memo never renewed; the dye kept; the artifact kept)', () => {

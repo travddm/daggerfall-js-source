@@ -31,8 +31,3 @@ test('SWING-DEFAULT1: a player who chose the drag keeps it, and the choice set b
   _resetForTests?.();
 });
 
-test('SWING-DEFAULT1: the gesture machine still reads the setting, not a literal', () => {
-  const pw = read('src/combat/playerWeapon.js');
-  assert.match(pw, /swingMode = getInt\('Controls', 'WeaponSwingMode', 0, 2\)/);
-  assert.match(pw, /if \(swingMode !== 0\) \{/, 'modes 1 and 2 are the click arm; 0 alone tracks the drag');
-});

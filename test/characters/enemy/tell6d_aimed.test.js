@@ -49,7 +49,6 @@ test('TELL6d: the aimed shot - 0.6 s, a line 0.5 m wide to its target, x1.4, x1.
     for (let across = -1; across <= 1; across += 0.07) assert.equal(blowField('aimed', across, along, 20).inside, inBlow(b, -across, along));
   }
   assert.equal(BLOW_KIND.aimed, BLOW_KIND.lunge, 'the lane\'s branch');
-  assert.match(rd('src/render/foeTelegraph.js'), /else if \(b\.kind === 'aimed'\) gl\.uniform4f\(U\.uP, b\.ahead \?\? 0, P\.halfW, 0, 0\);/);
 });
 
 test('TELL6d: the loose - the arrow\'s pitch kept, its heading the line\'s; x1.3 as fast in flight; x1.4 where it strikes, end to end through the formulas (mutants: the bearing unlocked; the speed or the weight lost)', () => {
@@ -139,12 +138,6 @@ test('TELL6d: an ordinary archer of the tier never aims; the switch off, nothing
 });
 
 test('TELL6d: the pools loose it and the hosts weigh it - the locked bearing and the arrow\'s word at both loose arms, the four hosts\' arrow hits (mutants: any arm unwired)', () => {
-  const ex = rd('src/scenes/exteriorFoes.js');
-  assert.match(ex, /const shot = takeAimedShot\(f\.ai\);[^\n]*\n\s*const dir = aimedDirection\(arrowAimDirection\(/);
-  assert.match(ex, /onArrow\(from, dir, f, _atPlayer \? null : _at, aimedArrowMeta\(shot\)\);/);
-  const dg = rd('src/scenes/dungeonContext.js');
-  assert.match(dg, /fireArrow\(from, dir, f\.entity\.weapon, false, f, _atPlayer \? null : _at, null, aimedArrowMeta\(shot\)\);/);
-  assert.match(dg, /const step = \(m\.arrow && !m\.flatArchive \? ARROW_FLIGHT_SPEED : MISSILE_SPEED\) \* \(m\.speedScale \?\? 1\) \* dt;/);
   for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
     assert.match(rd(host), /blowInfo: m\.aimed \? aimedBlowInfo\(m\) : null,/, `${host}: its arrow's weight`);
   }

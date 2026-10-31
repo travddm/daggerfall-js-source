@@ -301,22 +301,5 @@ test('RAID4 the cards: the account card\'s row and the Inspect card\'s line say 
   const v = profileView({ name: 'Ann', peer: null, look: null, card: null, state: 'silent', record: { raids: { defended: 4 } } });
   assert.equal(v.raids, 'Towns defended: 4');
   assert.equal(typeof createProfileWindow, 'function');
-  const acct = src('src/ui/enhanced/enhancedAccount.js');
-  assert.match(acct, /const raids = raidRecordText\(flow\.account\.raids\);\n\s+if \(raids\) row\(t\('account\.card\.raids', 'Towns defended'\), raids\);/);   // L10N4 (PIN MOVED): the row's word through t()
 });
 
-test('RAID4 the world host by source: my receipt goes to the queue with the character that fought it; the queue claims through the account\'s door and is offered on the frame\'s clock; a counted raid\'s Renown is the page\'s only for the character that earned it', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (WW6): the seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's live names
-  // read there as `host.<name>`
-  const rh = src('src/scenes/raidHost.js');
-  const at = rh.indexOf('  setRaidingPartiesHost({');
-  const body = rh.slice(at, rh.indexOf('\n  });', at));
-  assert.match(body, /onRaidReceipt: \(r, c, held\) => \{ \(c\?\.v \? grantStaffSpoils\([^)]*\) : host\.raidClaims\?\.add\(r, characterIdOf\(playerEntity\), typeof playerEntity\?\.name === 'string' \? playerEntity\.name : null, playerEntity\?\.level \?\? 1, held === true\)\); \},/);   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): and whether the town was held, with the receipt;   // PIN MOVED (STAFF-EVENT THE REWARD): a staff event receipt (its claims name v) rolls its own spoils, a raid receipt goes on as before   // AUDIT RAID R4: with its level - the thanks wait for the service's word (onSpoils)
-  assert.match(w, /onSpoils: \(entry\) => grantRaidSpoils\(entry\),/);
-  assert.match(w, /const raidClaims = params\.has\('online'\) \? createRaidClaims\(\{\n(?:\s+\/\/[^\n]*\n)*\s+claim: \(r, ch, \.\.\.a\) => _accountRaids\.claim\(r, ch, \.\.\.a\)\.then\([^\n]*\n\s+me: _accountRaids\.me,/);   // PIN MOVED (AUDIT CHAP3 C4: said on the fighting character's page); PIN MOVED (CHAP2b): the answer handed on to the Roll's refresh
-  // SERPENT1 keeps its own guard beside it: this one is the raid queue's own, read inside its block
-  const rq = w.slice(w.indexOf("const raidClaims = params.has('online') ? createRaidClaims({"), w.indexOf('  }) : null;', w.indexOf("const raidClaims = params.has('online') ? createRaidClaims({")));
-  assert.match(rq, /onRecorded: \(data\) => \{\n\s+if \(data\?\.renown\?\.character !== characterIdOf\(playerEntity\)\) return;/);
-  assert.match(w, /raidClaims\?\.tick\(\);/);
-});

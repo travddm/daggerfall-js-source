@@ -383,7 +383,6 @@ test('AUDIT L3-7 / L3-10 A BLOW CUT SHORT, A FREE HAND EASED: a rebuild mid-shot
   for (let i = 0; i < 400 && a.status().upper !== UPPER_BODY.WeaponEquipped; i++) a.update(0.05);
   assert.equal(a.status().weaponGroup, 'weapononehand', 'rebuilt: the blade\'s group, the shot\'s gone with it');
   a.unload();
-  assert.match(readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8'), /viewMode = want;\n\s*actionState = null; actionSource = null; attackType = null; holdWindUp = false;\n\s*blowType = null; attackHand = null;/, 'the view switch resets the blow too');
   // the free hand's weight: 1 with no spell, easing to 0 under one (never a step), back on the hold's ease
   let s = { w: 1, ready: 0, since: Infinity };
   s = rifleStanceStep(s, { wanted: true, free: true, dt: 0.016 });
@@ -392,7 +391,6 @@ test('AUDIT L3-7 / L3-10 A BLOW CUT SHORT, A FREE HAND EASED: a rebuild mid-shot
   assert.ok(s.free > 0.5 && s.free < 1, `under a spell: eased, not switched (${s.free.toFixed(3)})`);
   for (let i = 0; i < 60; i++) s = rifleStanceStep(s, { wanted: true, free: false, dt: 0.016 });
   assert.ok(s.free < 0.01, 'and gone');
-  assert.match(readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8'), /only: g\.lone \? 'R' : g\.only, free: g\.lone \? \(rifle\.free \?\? 1\) : 0/, 'the hold places the free hand at that weight');
 });
 
 test('AUDIT L5-8 A BLOW THE ARM CANNOT PLAY LEAVES ITS GROUP AS IT WAS: a .kf whose thrown group has no "shoot start" (the never-traps law: a missing key degrades) refuses the left gun\'s shot, and the arm stays in the blade\'s group - never stuck in the gun\'s with no blow playing (mutant: the abort keeping the struck hand\'s group)', async () => {

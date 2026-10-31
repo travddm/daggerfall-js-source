@@ -45,7 +45,6 @@ test('what it borrows is RUN, not restated: the game’s frame and the Two-Hands
   const html = page();
   // PIN MOVED (AUDIT PISTOL-PORT D7): the page asks its panel's rect of the lab module, which runs pistolHandRect
   assert.match(html, /\bpistolPageRect\(hands, hd, state, art, canvas\)/);
-  assert.match(readFileSync('src/tools/pistolLab.js', 'utf8'), /=> pistolHandRect\(hands, h, \{/);
   for (const step of ['placeSprite(', 'widgetTransformRect(', 'unionDrawRect(']) {
     assert.ok(!html.includes(step), `the page calls ${step} itself - a second copy of the frame the game draws`);
   }

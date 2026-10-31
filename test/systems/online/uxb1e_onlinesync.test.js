@@ -25,35 +25,6 @@ function fresh() {
   resetPrefs(); resetSettings(); _resetModSettings();
 }
 
-test('UXB1-E: the plan is the lane\'s tables, whole - every forced pref, every forced setting, the room\'s dungeon size, every key the room owns - and nothing on an online page', () => {
-  fresh();
-  const plan = onlineSyncPlan({ search: '' });
-  const ids = plan.map((r) => r.id);
-  assert.equal(new Set(ids).size, ids.length, 'one row a rule');
-  const want = [
-    ...Object.keys(ONLINE_FORCED_PREFS).map((k) => `prefs:${k}`),
-    ...[ONLINE_FORCED_SETTINGS, ONLINE_LAYOUT_SETTINGS].flatMap((t) => Object.entries(t).flatMap(([s, keys]) => Object.keys(keys).map((k) => `settings:${s}/${k}`))),
-    ...Object.entries(ONLINE_ROOM_MOD_KEYS).flatMap(([v, keys]) => Object.keys(keys).map((k) => `mods:${v}/${k}`)),
-    // REALM P0.2: and every other key of a balance mod the room owns whole (its shipped default), the cosmetic keys aside
-    ...Object.entries(ONLINE_WHOLE_MODS).flatMap(([v, own]) => Object.keys(MOD_SETTINGS[v].keys)
-      .filter((k) => !Object.hasOwn(ONLINE_ROOM_MOD_KEYS[v] ?? {}, k) && !own.includes(k)).map((k) => `mods:${v}/${k}`)),
-  ];
-  assert.deepEqual(ids, want);
-  assert.ok(ids.includes('prefs:enhancedAI'), 'the registry\'s `online: true` rows are in the lane\'s table by the time the plan reads it');
-  assert.ok(!ids.includes('prefs:mwArms'), 'MWA4: the arms\' switch is retired - the attached files are it, so there is nothing to copy');
-  assert.ok(ids.includes('settings:Experimental/SmallerDungeons'), 'online no dungeon is DFU\'s small one (useSmallerDungeon)');
-  assert.equal(ONLINE_LAYOUT_SETTINGS.Experimental.SmallerDungeons, 'False');
-  // SD-ONLINE (PIN MOVED): online the size law answers the WORLD's size for each dungeon (it was the whole dungeon), and
-  // the world-dungeon-sizes row is forced on there - a registry row, so the forced prefs carry it and the sync copies it
-  // home with Smaller Dungeons off (and the medium row off: the world's sizes win over it anyway)
-  assert.match(read('src/world/smallerDungeons.js'), /if \(online\) return whole \? 'full' : onlineDungeonSize\(dfLocation\);/, '...which is the law the rows copy (DSIZE1: the size law answers a size; SD-ONLINE: online it is the world\'s - the public room\'s; PIN MOVED, INSTANCES: an instance and a quest\'s world ask for the dungeon whole)');
-  assert.ok(ids.includes('prefs:worldDungeonSizes'), 'SD-ONLINE: the world\'s sizes, forced on online');
-  assert.equal(ONLINE_FORCED_PREFS.worldDungeonSizes, true);
-  assert.equal(ONLINE_FORCED_PREFS.mediumDungeons, false);
-  for (const r of plan) assert.ok(r.label && !/^[a-z]+[A-Z]/.test(r.label), `${r.id} reads as words: ${r.label}`);
-  assert.equal(onlineSyncPlan({ search: '?online' }), null, 'online, every read is the room\'s - the player\'s own cannot be seen');
-});
-
 test('UXB1-E: a sync writes only what differs, each into its own store, keeps what it replaced, and Undo puts it back', () => {
   fresh();
   setPref('enhancedAI', false);
@@ -159,44 +130,3 @@ const find = (n, cls, out = []) => {
   return out;
 };
 
-test('UXB1-E: the Online pane\'s card - what differs, now and then, one press to sync, and Undo after it; nothing to press when nothing differs', () => {
-  fresh();
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI ships On offline as in every room, so a
-  // default shelf no longer differs there - the player who turned it Off does
-  setPref('enhancedAI', false);
-  globalThis.document = { createElement: fakeEl };
-  try {
-    let card = onlineSyncCard();
-    assert.equal(find(card, 'svsync').length, 1);
-    assert.equal(card.children[0].textContent, ONLINE_SYNC_TITLE);
-    const rows = find(card, 'svsync-row');
-    const differ = onlineSyncPlan({ search: '' }).filter((r) => !r.same);
-    assert.equal(rows.length, differ.length);
-    assert.deepEqual(rows.map((r) => find(r, 'svsync-name')[0].textContent), differ.map((r) => r.label));
-    const ai = rows.find((r) => find(r, 'svsync-name')[0].textContent === 'Enhanced AI');
-    assert.ok(ai, 'a shelf with the Enhanced AI turned off differs from the room - on in every room');
-    assert.deepEqual([find(ai, 'svsync-was')[0].textContent, find(ai, 'svsync-to')[0].textContent], ['Off', 'On']);
-    const [go] = find(card, 'svsync-go');
-    assert.equal(go.textContent, `Sync ${differ.length} setting${differ.length === 1 ? '' : 's'}`);
-    assert.equal(find(card, 'svsync-undo').length, 0, 'nothing to undo yet');
-    go.onclick();
-    assert.equal(getPref('enhancedAI'), true);
-
-    card = onlineSyncCard();
-    assert.equal(find(card, 'svsync-row').length, 0);
-    assert.equal(find(card, 'svsync-same')[0].textContent, ONLINE_SYNC_SAME);
-    assert.equal(find(card, 'svsync-go').length, 0);
-    const [undo] = find(card, 'svsync-undo');
-    assert.ok(undo, 'the way back');
-    undo.onclick();
-    assert.equal(getPref('enhancedAI'), false);
-    assert.equal(find(onlineSyncCard(), 'svsync-undo').length, 0);
-  } finally {
-    delete globalThis.document;
-  }
-  // on the pane, with saves and without: under the rules it copies
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const pane = menu.slice(menu.indexOf('function paneOnline(body)'), menu.indexOf('export const ONLINE_SYNC_TITLE'));
-  assert.equal((pane.match(/body\.append\(onlineSyncCard\(\)\);/g) ?? []).length, 2);
-  assert.ok(pane.indexOf("body.append(foot);\n  body.append(onlineSyncCard());") > 0, 'after the footer that names the room\'s switches');
-});

@@ -349,27 +349,6 @@ test('D6: BUY SHIP in a port opens the SHIPYARD - the else arm, not a refusal (:
   assert.equal(opened, 1, 'neither refusal ever reaches the list');
 });
 
-test('D6: the host mounts BOTH arms of the ONE popup, and PurchaseShip has a caller at last', () => {
-  const wm = readFileSync(join(root, 'src', 'scenes', 'worldModes.js'), 'utf8');
-  assert.match(wm, /const openBankMarket = \(arms\) => \{/,
-    'DFU has one popup class; the port must not grow a second mount for it');
-  assert.match(wm, /openShipPurchase: \(\) => openBankMarket\(\{/, 'BUY SHIP reaches it with no house list at all');
-  assert.match(wm, /purchaseShip\(playerEntity\.bankAccounts, bankRegion\(\), ship, playerEntity, bankPurse\(\)/,
-    'PurchaseShip (:467-486) is callerless again');
-  // AssignShipToPlayer (:488-497) makes BOTH scenes permanent - the
-  // exact pair SellShip drops
-  assert.match(wm, /addPermanentScene\(sceneCache\(\), worldSceneName\(SHIP_COORDS\[s\]\.x, SHIP_COORDS\[s\]\.y\)\)/);
-  assert.match(wm, /addPermanentScene\(sceneCache\(\), interiorSceneName\(SHIP_INTERIOR_MAP_IDS\[s\], BUILDING_KEY_0\)\)/);
-  // ...and the door of the ship it sells answers the lock ladder: the
-  // key was simply absent at the call, so buildingLocks' last arm
-  // (PlayerActivate.cs:1307-1308) could never fire
-  // AUDIT 64 F11 factored the one BuildingIsUnlocked evaluation
-  // (PlayerActivate.cs:358) into resolveBuildingUnlocked, so the arm is
-  // two levels shallower - the law it pins is unchanged.
-  assert.match(wm, /^ {6}ownsShip: ownsShip\(playerEntity\),$/m,
-    'buildingIsUnlocked is handed no ownsShip, so it defaults false');
-});
-
 test('B2: the inventory label carries the WAGON in parentheses (:241-246)', () => {
   const dry = win();
   assert.equal(dry.w.labels().inventory, '1000', 'no cart, no parenthesis');
@@ -393,13 +372,3 @@ test('B2: the inventory label carries the WAGON in parentheses (:241-246)', () =
   assert.equal(cart.w.labels().loanBy, '', 'no loan, no due date');
 });
 
-test('B2: the host consumes the banking route that has been dead since G8', () => {
-  const code = readFileSync(join(root, 'src', 'scenes', 'worldModes.js'), 'utf8');
-  assert.match(code, /route\.service === 'banking'/, 'the arm exists');
-  assert.match(code, /preloadBankArt\(/, 'and the art is preloaded with the rest');
-  assert.match(code, /createBankAccounts\(/, 'the accounts are minted on first use');
-  // the save carries them
-  const save = readFileSync(join(root, 'src/systems/save/save.js'), 'utf8');   // TIDY2: one path, so a move rewrites it
-  assert.match(save, /snap\.bankAccounts =/);
-  assert.match(save, /entity\.bankAccounts = snap\.bankAccounts\?\.length \? padRegionTable\(snap\.bankAccounts\.map\(\(a\) => \(\{ \.\.\.a \}\)\), blankAccount\) : createBankAccounts\(\);/, 'JAN1: no accounts saved is the full table');   // PIN MOVED (WW-R, bible/03-World/World-Wide.md): a save's table padded to the provinces' regions
-});

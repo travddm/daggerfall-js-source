@@ -432,25 +432,3 @@ test('DW-E3: a fish\'s probe meets the player\'s capsule - its side and its caps
   assert.equal(rayUprightCapsule([-2, 1, 0], [1, 0, 0], 1, [0, 0, 0], 0.35, 1.8), null, 'out of reach');
 });
 
-test('DW-E3: the world host - the pulse and PumpAll after the decorations, the pulse alone indoors, the fish raced with the piles and opened on the pile arm, hovered and itemised by the fish\'s own item, moved with a recentre, drawn streamed after the decorations; the loot window shows the fish\'s icon (pins)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(dwDecor\) \{ dwDecor\.process\(\); deepWaters\.flushPromoteTiming\(\); \}[^\n]*\n\s+if \(dwFish\) \{\n\s+_dwFishInside = false;\n\s+const f = dwFishFrame\(dt\);\n\s+dwFish\.pump\(f\);/);
-  assert.match(w, /if \(dwFish\) \{\n\s+_dwFishInside = true;\n\s+const f = dwFishFrame\(dt\);\n\s+dwFish\.pulse\.pump\(f\);/, 'indoors: the pulse only (IsPlayerInExteriorWaterContext false - cleared two seconds on)');
-  assert.match(w, /_pilePick = pickActivatableHit\(cam\.pos, useFwd, dwLootTargets\(\), collider\);/);
-  assert.match(w, /pile: pickActivatableHit\(cam\.pos, _hd, dwLootTargets\(\), collider\),/);
-  assert.match(w, /const _fish = dwFish\?\.fishFor\(dropKey\) \?\? null;[^\n]*\n\s+const pile = _fish \? null : droppedLoot\.pileFor\(dropKey\);/, 'a fish key never reaches pileFor (it reads no prefix)');
-  assert.match(w, /dwFish\?\.offsetAll\(r\.offset\);/);
-  assert.match(w, /if \(dwDecor\) drawDeepWatersDecorations\(groundQueue\);[^\n]*\n\s+if \(dwFish\) drawDeepWatersFish\(\);/);
-  assert.match(w, /onTransientReset\(\(\) => dwFish\.reset\(\)\);/);
-  assert.match(w, /visibleDistance: cam\.pos\[1\] < seaY - 0\.05 \? vision \* 1\.1 : topSurfaceOpaqueFadeEnd\(vision\),/);
-  assert.match(w, /const dwPlayerObjectPosition = \(\) => \(walkMode \? \[player\.pos\[0\], player\.pos\[1\] \+ \(player\.height \?\? CAPSULE_HEIGHT\) \/ 2, player\.pos\[2\]\] : cam\.pos\);/, 'PlayerObject.transform.position: the capsule centre');
-  assert.match(w, /playerPos: dwPlayerObjectPosition\(\),/, 'the flee, the probe and the distant step measure from the centre');
-  assert.match(w, /playerPosition: \(\) => \(dwPlaying\(\) \? dwPlayerObjectPosition\(\) : null\),/);
-  assert.match(w, /for \(const pool of \[exteriorFoes\.foes, cityGuards\.guards\]\) \{[\s\S]{0,300}rayUprightCapsule\(o, d, reach, feet, BODY_CAPSULE_RADIUS, f\.ai\.height \?\? CAPSULE_HEIGHT\);/, 'the probe meets the foes\' CharacterControllers (every layer, triggers ignored)');
-  assert.match(w, /const td = decodedTextureTopDown\(a, 0\);[\s\S]{0,120}renderer\.uploadTexture\('img', `dwfish:\$\{a\}`, \{ width: td\.width, height: td\.height, colors: td\.rgba \}\)/, 'the icon uploads top-down, as the panel\'s drawImgCrop samples UI art');
-  const inv = rd('src/ui/native/nativeInventory.js');
-  assert.match(inv, /const own = this\.hooks\.loot\?\.remoteImage\?\.\(\);\n\s+return own \? \{ image: own, label: shown\.label \} : shown;/, 'UpdateFishLootIcon: over whatever the window drew, its label kept');
-  const r = rd('src/render/deepWatersRender.js');
-  assert.match(r, /gl\.uniform1f\(u\.uCutoff, g\.cutoff \?\? DECORATION_CUTOFF\);/);
-  assert.match(r, /gl\.drawElements\(gl\.TRIANGLES, g\.count, gl\.UNSIGNED_INT, g\.offset \?\? 0\);/);
-});

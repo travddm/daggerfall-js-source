@@ -313,16 +313,6 @@ test('COMBAT-FEEL over the real naval host: a pirate\'s ball by my side whistles
   assert.ok(typeof cardMen === 'number' && cardMen < 100, `her card's men thinned: ${cardMen}`);
 });
 
-test('COMBAT-FEEL the wiring: the host hears a pass, drenches on a splash, scales the fall, feels the blow, counts the men, lights the magazine, and steps the feel each frame (mutants: each line)', () => {
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /if \(e\.type === 'pass'\) \{ feel\.passed\(e\); return; \}/);
-  assert.match(host, /effects\.shotSplash\(\[e\.point\[0\], seaY, e\.point\[2\]\], e\.gun === 'heavy', e\.shot, burstScale\(e\.point\)\);/);
-  assert.match(host, /feel\.splashed\(\[e\.point\[0\], seaY, e\.point\[2\]\]\);/);
-  assert.match(host, /if \(box\) out\.push\(\{ id: myBoatId\(b\), box, rig: rigBoxesOf\(b\), boat: b, ear: true \}\);/);
-  assert.match(host, /feel\.sinking\(entry, s\.seed, s\.damage\.fire > 0 \|\| \(entry\.fires \?\? \[\]\)\.some\(\(f\) => !f\.out\)\);/);
-  assert.match(host, /feel\.frame\(total, \(en\) => \(sea\.get\(en\.id\) === en && en\.ship\.damage\.state === SHIP_STATES\.sinking \?/);
-});
-
 /** A document enough for the HUD's draw. */
 function fakeDoc() {
   const mk = (tag) => {

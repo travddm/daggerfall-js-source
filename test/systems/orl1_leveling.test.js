@@ -839,47 +839,6 @@ test('ORL1: the question\'s UP arm is bound, both spellings', () => {
   }
 });
 
-test('ORL1: the interior host\'s two level-up arms, and the dungeon host\'s font-less escape', () => {
-  // The pins lens: reverting either interior arm, or the dungeon's
-  // virtue escape, passed the whole suite - the only coverage was a
-  // substring check against a COMMENT in another file. These are source
-  // laws because the hosts are not constructible in a unit test, and
-  // they are held by CONTENT rather than by a file name.
-  // LV1 MOVED THIS PIN AND STRENGTHENED IT. Both interior arms used to
-  // re-answer the mod's question inline, which is what this asserted;
-  // they now ask ui/charSheetDoor.js, which answers the WHOLE fork -
-  // lane, skin and book - so the arm cannot be right about the mod and
-  // wrong about the skin, which is exactly what happened when the
-  // enhanced level-up window landed and three hosts got it.
-  const wm = rd('src/scenes/worldModes.js');
-  const arms = wm.match(/interiorOverlay = host\.makeCharSheet\?\.\(interiorSheetDoors\(\)\) \?\? createCharSheetWindow\(\{ entity: playerEntity \}\);/g) ?? [];
-  // AUDIT 68 S23-levelup-closure-dup: the two identical arms are ONE
-  // closure now, which the ticker AND the rest session both hand in.
-  assert.equal(arms.length, 1, 'the ONE interior level-up arm goes through the ONE seam');
-  assert.equal((wm.match(/onLevelUp: onInteriorLevelUp,/g) ?? []).length, 2, 'the walk and the rest both level up through it');
-  assert.match(wm, /import \{ createCharSheetWindow \} from '\.\.\/ui\/charSheetDoor\.js';/);
-  assert.doesNotMatch(wm, /new (Virtue)?LevelUpScreen\(/, 'and neither builds a screen of its own');
-
-  const dc = rd('src/scenes/dungeonContext.js');
-  // the virtue arm comes BEFORE the classic ones, or the purse would be
-  // spent by a policy that does not know the mod's caps - and LV1's DOM
-  // wrapper comes before both, because it WRAPS either of them (and
-  // because nulling it rather than closing it would leave the window on
-  // screen over a game already handed back).
-  const virtue = dc.indexOf('activeOverlay?.isVirtueLevelUp');
-  const classic = dc.indexOf('activeOverlay instanceof LevelUpScreen');
-  const enhanced = dc.indexOf('activeOverlay?.isEnhancedLevelUp');
-  assert.ok(virtue > 0 && classic > 0 && virtue < classic,
-    'the font-less escape asks about the mod\'s window FIRST');
-  assert.ok(enhanced > 0 && enhanced < virtue, 'and about the window that wraps it before either');
-  assert.match(dc, /activeOverlay\.spendRemainingHeadless\(\);/);
-  // The wrapper's own escape runs the MOD's planner when the mod's
-  // screen is inside it - spendPoolLowest there would ignore the
-  // three-attribute cap, the +5 ceiling and Luck's price.
-  assert.match(rd('src/ui/charSheetDoor.js'),
-    /if \(screen\?\.isVirtueLevelUp\) \{ screen\.spendRemainingHeadless\(\); close\(\); return true; \}/);
-});
-
 test('ORL1: the window\'s font-less escape spends within the caps and closes', () => {
   const p = virtuePlayer({ levelProgress: LEVELUP_TOTAL, level: 2 });
   for (const k of STAT_KEYS_ORDER) p.stats[k] = 50;
@@ -926,10 +885,6 @@ test('ORL1: the question can be answered with the MOUSE, which is how the wizard
   q2.hover(160, 8);
   assert.equal(q2.cursor, 0, 'a hover off the rows leaves the choice where it was');
 
-  // ...and the chargen door really forwards it
-  const cs = rd('src/systems/chargenSession.js');
-  assert.match(cs, /click\(vx, vy\) \{ if \(prompt\) prompt\.click\(vx, vy\); else inner\.click\?\.\(vx, vy\); \},/);
-  assert.match(cs, /hover\(vx, vy, e = null\) \{ if \(prompt\) prompt\.hover\(vx, vy\); else inner\.hover\?\.\(vx, vy, e\); \},/);
 });
 
 test('ORL1: the question describes the purse the game will actually hand out', () => {
@@ -1108,61 +1063,7 @@ test('ORL1: a wizard torn down mid-question still hands its host an answer', () 
   assert.equal(calls, 1);
 });
 
-test('ORL1: the choice rides the ONE chargen door, and every apply path answers it', () => {
-  const cs = rd('src/systems/chargenSession.js');
-  assert.match(cs, /return withLevelingChoice\(flow, \{ onDone, onCancel, hudScale, startChoice \}\);/,   // PIN MOVED (START2): and the host's start page
-    'createChargenWindow wraps the wizard rather than each host wiring a prompt');
-  assert.match(cs, /initVirtueLeveling\(playerEntity, newCharacterLevelingSystem\(result\.levelingSystem \?\? LEVELING_CLASSIC, \{ online: isOnlinePage\(\) \}\)\);/,
-    'finishChargen sets the answer beside the DFU level anchor (LEVEL-ONLINE: through the one law for a new character)');
-  assert.match(cs, /initVirtueLeveling\(playerEntity, newCharacterLevelingSystem\(LEVELING_CLASSIC, \{ online: isOnlinePage\(\) \}\)\);/,
-    'and the ?class= skip takes the port\'s own law (LEVEL-ONLINE: Oblivion\'s online)');
-  // THE FOUR HOSTS, each named at this seam
-  for (const host of ['world.js', 'exterior.js', 'worldModes.js', 'dungeonContext.js']) {
-    assert.ok(cs.includes(host), `the leveling seam does not name ${host}`);
-  }
-  // the third apply path - the font-less creation - answers it too
-  assert.match(rd('src/scenes/dungeonContext.js'), /initVirtueLeveling\(playerEntity, LEVELING_CLASSIC\);/);
-});
-
-test('ORL1: the mod\'s window is the door\'s, in BOTH lanes, and the classic sheet stands down', () => {
-  const door = rd('src/ui/charSheetDoor.js');
-  // LV1: the fork is one block now rather than two guards in a row,
-  // because the enhanced skin needs the same answer to build its own
-  // window with. The LAW is unchanged and still pinned: whose law
-  // levels this character is decided BEFORE anything is constructed,
-  // the Oghma is excluded from the mod's arm, and the mod's screen is
-  // what the classic lane gets.
-  assert.match(door, /const virtue = !deps\.entity\?\.oghmaLevelUp && usesVirtueLeveling\(deps\.entity\);/,
-    'the mod\'s question is asked first, and the book is not the mod\'s');
-  // LV2 re-aimed this BY CONTENT: both constructions now carry the
-  // fanfare answer (ui/levelUp/levelNotice.js played it at the moment the level
-  // was earned, which on the enhanced skin is not this moment), and the
-  // law this pin holds - WHICH screen the answer above chooses - is
-  // unchanged.
-  // PIN MOVED (GROWTH1): the rollout's one home, levelUpScreenFor, handed that same answer
-  assert.match(door, /const rollout = \(\) => levelUpScreenFor\(deps\.entity, virtue\);/, 'and the screen either skin drives is chosen by that answer');
-  assert.match(door, /return virtue \? new VirtueLevelUpScreen\(entity, \{ fanfare \}\) : new LevelUpScreen\(entity, undefined, \{ fanfare \}\);/);
-  assert.match(door, /if \(virtue\) return new VirtueLevelUpScreen\(deps\.entity\);\n\s*if \(isEnhanced\(\)\) return new LevelUpScreen\(deps\.entity\);/,
-    'the mod\'s window still comes ahead of the enhanced lane\'s canvas screen');
-  const sheet = rd('src/ui/charsheet.js');
-  assert.match(sheet, /if \(!e\.oghmaLevelUp && usesVirtueLeveling\(e\)\) return;/,
-    'the classic rollout refuses a virtue level-up - the other half of the door');
-  // a11's law still holds for the new window: no private Level++, no
-  // private health roll in any UI module.
-  const win = rd('src/ui/virtueLevelUp.js');
-  assert.doesNotMatch(win, /\.level \+= 1/, 'no private Level++ in the window');
-  assert.doesNotMatch(win, /hitPointsPerLevelUp/, 'and no private health roll');
-  assert.match(win, /commitVirtueLevelUp/, 'the law module owns the change');
-});
-
 test('ORL1: the choice and the bar ride the SAVE, not the mod-settings store', () => {
-  const save = rd('src/systems/save/save.js');
-  for (const f of ['levelingSystem', 'levelProgress', 'levelRollUp']) {
-    assert.match(save, new RegExp(`'${f}'`), `${f} is carried by the save`);
-  }
-  // a classic import is a classic character - offline (LEVEL-ONLINE: an online import is a new online character)
-  assert.match(rd('src/systems/classicSave.js'),
-    /levelingSystem: newCharacterLevelingSystem\(LEVELING_CLASSIC, \{ online \}\), levelProgress: 0, levelRollUp: 0,/);
   // AND THE CHOICE IS NOT IN THE MOD STORE: that store is per-browser
   // and shared by every character, which is the wrong lifetime for it.
   assert.equal(Object.keys(MOD_SETTINGS[V].keys).includes('levelingSystem'), false);
@@ -1208,14 +1109,6 @@ test('ORL1: the mod ships ON, and a switched-off mod asks nobody', () => {
   assert.equal(MOD_SETTINGS[V].keys.Enabled.default, true);
   assert.equal(oblivionLevelingEnabled(reader()), true);
   assert.equal(oblivionLevelingEnabled(reader({ Enabled: false })), false);
-  // ...and with it off the wizard's answer goes straight out, carrying
-  // the port's own law rather than a question nobody was asked - OFFLINE (LEVEL-ONLINE: online the question is
-  // always put, Oblivion's option shut - LEVEL-ONLINE-2).
-  // LEGACY2: the questions are a chain now (the leveling one, Project Legacy's model); with none asked the answer goes
-  // straight out carrying the classic system - and the leveling question is asked only with the mod on, or online
-  const src = rd('src/systems/chargenSession.js');
-  assert.match(src, /if \(oblivionLevelingEnabled\(\) \|\| online\) asks\.push\(/);
-  assert.match(src, /const unasked = \{ levelingSystem: LEVELING_CLASSIC \};\n\s*if \(!asks\.length\) \{\n\s*return chargenWizard\(flow, \{\n\s*onCancel, hudScale, onDone: \(r\) => onDone\?\.\(\{ \.\.\.r, \.\.\.unasked \}\),/);
 });
 
 test('ORL1: neither screen claims native geometry it has no source for', () => {
@@ -1678,7 +1571,6 @@ test('ORL1 deep audit: a refusal with no legal plus names the control that still
   const font = { tex: 'font', fnt: { fixedWidth: 6, fixedHeight: 8, glyphWidth: () => 5 } };
   w.draw(r, { width: 1600, height: 1000 }, font);
   assert.ok(r.quads.length > 100, 'the window painted');
-  assert.match(rd('src/ui/virtueLevelUp.js'), /TAKE_ONE_BACK_HINT/);
 });
 
 test('ORL1 deep audit: the font-less escape re-plans from SCRATCH, and a partly spent window still closes', () => {

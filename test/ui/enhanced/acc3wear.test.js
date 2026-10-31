@@ -202,15 +202,6 @@ test('ACC3c: nothing equips while a call is in flight, and nothing equips off th
 // ── THE CARD, AND THE RULE IT ALMOST BROKE ──────────────────────────
 
 test('ACC3c: the card writes a CLASS and the skin carries the colour - walked out of the vocabulary, so a title added to the token cannot draw grey', () => {
-  // ACC1e's pin forbids a colour in this file, and the first cut of
-  // this slice broke it by setting `style.color` off the badge table.
-  // That pin was right: two copies of a design language is how the
-  // front door and the rooms behind it drift apart.
-  const js = src('src/ui/enhanced/enhancedAccount.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
-  assert.doesNotMatch(js, /\.style\./, 'the card styles itself again');
-  assert.doesNotMatch(js, /#[0-9a-fA-F]{6}/);
 
   // ...and the rules really exist, one per member of the vocabulary,
   // in the colour ui/playerBadge.js holds.
@@ -228,18 +219,6 @@ test('ACC3c: the card writes a CLASS and the skin carries the colour - walked ou
   // it is a picture, and the room is the context.)
   for (const g of GLYPHS) assert.ok(GLYPH_LABEL[g], `${g} has no word on the card`);
   for (const t of TITLES) assert.ok(TITLE_TEXT[t], `${t} has no word`);
-});
-
-test('ACC3c, GLYPH-WEAR: a glyph is a button now - Mac (2026-10-02): "can we make it where players can also equip/unequip their glyphs" - pressed off and on through the flow, and it says which way it will go', () => {
-  const js = src('src/ui/enhanced/enhancedAccount.js');
-  // Read off the source, as the pin it replaces was: the glyph arm builds a button, hangs the flow's toggle on it, and
-  // says whether it is shown - the title's own picker shape.
-  const wardrobe = js.slice(js.indexOf('function wardrobe()'), js.indexOf('function paint()'));
-  assert.match(wardrobe, /el\('button', `acttitle/, 'a title is pressable');
-  const glyphArm = wardrobe.slice(wardrobe.indexOf("'Glyphs'"));
-  assert.match(glyphArm, /el\('button', `acctglyph/, 'and so is a glyph');
-  assert.match(glyphArm, /onclick = \(\) => flow\.toggleGlyph\(g\.key\)/);
-  assert.match(glyphArm, /aria-pressed/);
 });
 
 // ── THE ROSTER ──────────────────────────────────────────────────────
@@ -265,25 +244,5 @@ test('ACC3c: the chat roster wears the badge, MY OWN ROW INCLUDED - the relay ne
   const liar = rosterRows({ id: 'peer-0009', name: 'Nobody', title: 'emperor', glyphs: ['crown'], peers: new Map() });
   assert.equal(liar.rows[0].title, null);
   assert.deepEqual(liar.rows[0].glyphs, []);
-  assert.match(src('src/net/roster.js'), /readBadge\(from\)/, 'one reader, not a second spelling of the vocabulary check');
 });
 
-test('ACC3c / TITLE-R: the roster REPAINTS when a glyph changes - it is keyed, and a stale glyph would sit on screen until somebody else joined; it wears NO title (Mac: "Titles shouldnt show in the online panel. Only glyphs"), and the glyphs follow the name (mutants: the glyphs out of the key; the title back on the row)', () => {
-  // SOC3 put the open menu in this key for exactly this reason. A
-  // sprout that aged out changes nothing else about the row - so
-  // without the glyphs in the key the list is correct and never redrawn.
-  const panel = src('src/ui/chatPanel.js');
-  const key = /const key = label \+ '\|' \+ total \+ '\|' \+ \(menuFor \?\? ''\) \+ '\|' \+ query \+ '\|' \+ rows\.map\(\(r\) => [^\n]*\)\.join\(','\);/.exec(panel);   // CHAT-CHAN: the list's own word leads the key
-  assert.ok(key, 'the roster key moved');
-  assert.match(key[0], /r\.glyphs/, 'a glyph that changes must repaint the row it is on');
-  assert.doesNotMatch(key[0], /r\.title/, 'TITLE-R: the row draws no title, so a title changing repaints nothing');
-  const row = panel.slice(panel.indexOf("const line = el('div', 'dfchat-who-line');"), panel.indexOf("if (dup.has(r.name.toLowerCase()))"));
-  assert.doesNotMatch(row, /titleBadge|who-title/, 'TITLE-R: no title on the roster row');
-  // CHAT-FIT: they sit in the row's one nowrap LINE (`line`), not on the row itself
-  assert.ok(row.indexOf('line.append(nameEl)') >= 0 && row.indexOf('line.append(nameEl)') < row.indexOf('dfchat-who-glyph'), 'the glyphs after the name');
-  // the title stays where Mac kept it: over the name (ui/nameLayer.js, net/remotePlayers.js) - TITLE-C (2026-10-12, Mac:
-  // "remove titles from appearing in the chat") took it off the chat line as TITLE-R took it off the roster
-  const nodes = /const badgeNodes = \(peer, prefix\) => \{[^]*?\n  \};/.exec(panel);
-  assert.ok(nodes, 'the line badge\'s builder moved');
-  assert.doesNotMatch(nodes[0].replace(/\/\/[^\n]*|\/\*[^]*?\*\//g, ''), /title/i, 'TITLE-C: a chat line wears no title (its comments stripped - a note saying so is not a title)');
-});

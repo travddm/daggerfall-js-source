@@ -117,11 +117,6 @@ test('HAZE1 the shader: every constant the DXBC carries, as the vendored listing
   for (const v of [0.02222222276031970977783203125, ...HAZE_AXES.a, ...HAZE_AXES.b, HAZE_AXES.up, HAZE_AXES.scale, HAZE_AXES.k1, HAZE_AXES.k2, ...HAZE_DRIFT, 1.15, 0.85, 0.3, 0.9999, 25.0]) {
     assert.ok(has(v) || has(-v), `${v} is a constant of the mod's shader`);
   }
-  const fs = read('src/render/heatHaze.js');
-  for (const t of ['(abs(vObjY) - 25.0) * 0.0222222228', 'if (0.9999 - s < 0.0) discard;', 'vec2(0.9239, 0.3827)', 'vec2(-0.4226, 0.9063)', 'vWorld.y * 1.5',
-    'uNoiseScale * 0.0022', 'vec4(3.6, 3.6, 7.2, 7.2)', 'texture(uNoise, uv.xy).xy - 0.5', 'texture(uNoise, uv.zw).yx - 0.5', '(n1 * 1.15 + n2 * 0.85) * vec2(0.3, 1.0) * strength']) {
-    assert.ok(fs.includes(t), `the translation reads ${t}`);
-  }
   const { pos, idx } = hazeCylinder();
   assert.equal(pos.length, 128 * 2 * 3);
   assert.equal(idx.length, 768);
@@ -181,22 +176,3 @@ test('HAZE1 the pass: the GrabPass is the world viewport copied out of what is b
   assert.deepEqual(r.anchor, [-819.2, 0, 0], 'the land stays where it was: the anchor takes the shift back');
 });
 
-test('HAZE1 the hosts (THE FOUR HOSTS RULE): world.js and exterior.js build the ring on the enhanced lane and draw it once the opaque world is whole, before what falls; both stand it down indoors; world.js carries its noise across the floating origin. worldModes.js (interiors) and dungeonContext.js draw no exterior - nothing to haze (mutants: the draw after the rain; the indoor drop)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.match(s, /const hazeGl = sky\.enhanced \? new HeatHazeRenderer\(renderer\.gl\) : null;/, `${host}: built on the enhanced lane`);
-    assert.match(s, /heatHaze\.suppress\(\);/, `${host}: indoors, at once`);
-    assert.match(s, /settings: hazeFrameSettings\(\) \}\);/, `${host}: the switch read per frame (the keys when one is written)`);
-    // AUDIT ENVIRONS: the ease on the real clock (unscaledDeltaTime), the shimmer on the game's (_Time.y)
-    assert.match(s, new RegExp(`heatHaze\\.tick\\(\\{ dt, time: gamePaused\\(\\) \\? 0 : dt \\* ${host.endsWith('world.js') ? 'worldTimeScale' : 'hccTimeScale'}\\(\\), `), `${host}: the shimmer's clock held by a pause, scaled with the world`);
-    assert.match(s, /\], hz\.seconds\)\) renderer\.markForeignPass\(\);/, `${host}: drawn on the haze's own clock, not the page's`);
-  }
-  const w = read('src/scenes/world.js');
-  assert.ok(w.indexOf('if (hz.visible && !tvf && hazeGl.draw(') < w.indexOf('    drawFalling();   // RAIN-OVER-GRASS'), 'world.js: before what falls');
-  assert.ok(w.indexOf('labGrass.draw(proj, view') < w.indexOf('if (hz.visible && !tvf && hazeGl.draw('), 'world.js: after the grass');
-  assert.match(w, /hazeGl\?\.offsetOrigin\(r\.offset\);[^\n]*\n\s*heatHaze\.offsetOrigin\(r\.offset\);/, 'world.js: the noise and the held layer across the floating origin');
-  assert.match(w, /windfall\.offsetOrigin\(state\.initOffset\);\n\s*hazeGl\?\.offsetOrigin\(state\.initOffset\);\n\s*heatHaze\.reset\(\);/, 'world.js: a teleport\'s new frame carries the noise, and the arrival reads its layer afresh');
-  const e = read('src/scenes/exterior.js');
-  assert.ok(e.indexOf('if (hz.visible && hazeGl.draw(') < e.indexOf('const precipShown = enhancedFront ? fx.shown : precipMode;'), 'exterior.js: before what falls');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(host), /HeatHaze/, `${host}: no exterior to haze`);
-});

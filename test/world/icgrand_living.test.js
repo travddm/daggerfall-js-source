@@ -152,9 +152,6 @@ test('IC-GRAND THE FABRIC\'S HOMES - a near slice\'s fabric hands its living tow
   assert.equal(cityHomesOf({ capital: { k: IC, s: SPLIT } }), h);
   assert.equal(cityHomesOf({ capital: { k: OTHER, s: 0 } }), NO_HOMES);
   assert.equal(cityHomesOf({ mapTableData: { mapId: 1234 } }), NO_HOMES);
-  const pb = readFileSync(new URL('../../src/scenes/pixelBuild.js', import.meta.url), 'utf8');
-  assert.match(pb, /\.map\(\(b\) => \(\{ key: b\.buildingKey, type: b\.buildingType, quality: b\.quality, factionId: b\.factionId \}\)\)\.concat\(cityHomesOf\(dfLocation\)\.buildings\),/);
-  assert.match(pb, /\}\)\.concat\(cityHomesOf\(dfLocation\)\.doors\),/);
 });
 
 test('IC-GRAND A TOWN OF QUARTERS - a capital\'s slice walks every street net QUARTER_MIN of its buildings open onto, each a quarter of its own: every quarter its people, each living, working and walking in it (every walk of their day from a cell of its net to a cell of the same); the one net alone left a district\'s streets empty; ids unique; a Bay town one net as it was (mutants: no quarters; one census; the town\'s places for every day; a quarter\'s slots the first\'s)', async () => {

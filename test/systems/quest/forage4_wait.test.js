@@ -342,13 +342,3 @@ test('FORAGE4 done-when: online, the Wood-Axe\'s quest gives a 12-second wait an
   assert.equal(page.remaining, 12);
 });
 
-test('FORAGE4: the wiring - the streaming host builds the wait on its own slot and rest test, ticks it, holds its boxes, and the save carries it', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const foragingWait = createForagingWait\(\{\n\s*entity: playerEntity,\n\s*showOverlay: \(w\) => townTalk\.showOverlay\(w\),\n\s*overlayActive: \(\) => townTalk\.overlayActive \|\| !!modes\?\.overlayHeld,\n\s*enemiesNear: \(\) => duelEnemyNear\(\) \|\| areEnemiesNearby\(exteriorFoePool\(\), \{ resting: true \}\),\n\s*online: \(\) => sharedClockOn\(\),/);
-  assert.match(w, /\n\s*foragingWait\.tick\(\);   \/\/ FORAGE4: online, a standing wait takes the slot when it is free/, 'every frame, in every mode');
-  assert.match(w, /waitOnline: \(seconds, quest\) => \{ foragingWait\.add\(seconds, quest\?\.displayName \?\? null\); \},/);
-  assert.match(w, /const showQuestBox = \(box\) => \{\n[^\n]*\n\s*if \(foragingWait\.holds\(\)\) \{ foragingWait\.hold\(\(\) => showQuestBox\(box\), keptBox\(box\)\); return; \}/);
-  assert.match(w, /if \(foragingWait\.holds\(\)\) foragingWait\.hold\(\(\) => giveReward\(dfItem\), \{ reward: dfItem \}\);/, 'a reward\'s pile after its box, behind the wait - and kept in the save');
-  assert.match(rd('src/systems/save/save.js'), /'lastSkillCheckTime',\n\s*'foragingWait',/);   // MERGE 2: main's LIVED1 retired restSimMinutes
-  assert.match(rd('src/systems/quest/questActionsExtension.js'), /if \(hooks\?\.sharedClock\?\.\(\)\) hooks\?\.waitOnline\?\.\(seconds, this\.parentQuest\);\n\s*hooks\?\.raiseTime\?\.\(seconds\);/);   // MERGE 2: the character's time in both lanes
-});

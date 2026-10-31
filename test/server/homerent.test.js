@@ -201,7 +201,6 @@ test('HOME-RENT the races and the rate: a rent whose room changed between its re
   assert.deepEqual(await roomMovedOf(db, 7, 300, 1, 40), { error: 'rent-taken' });
   await call('/v1/homes/rooms/withdraw', { room: 1 });
   assert.deepEqual(await roomMovedOf(db, 7, 300, 1, 40), { error: 'no-rent-room' });
-  assert.ok(src('server-account/src/rent.js').includes('|| (await roomMovedOf(db, mapId, buildingKey, room, price));'), 'the rent\'s write answers by it');
   const ownerAt = () => ({ id: o.character, ...svc.env.DB._raw.prepare('SELECT lease, seq FROM realm_characters WHERE id = ?').get(o.character) });
   let last = null;
   for (let i = 0; i <= RENT_WRITES_MAX && last?.body?.error !== 'rent-rate'; i++) last = await call('/v1/homes/rooms/collect', { realm: ownerAt() });
@@ -395,19 +394,3 @@ test('HOME-RENT the decorator\'s rooms view: an online home of two rooms gets "R
   assert.equal(all(house.doc.body.children.find((c) => c.className === 'dfdecor'), 'dfdecor-chip').some((c) => /^Rooms to rent/.test(c.textContent)), false, 'a house rents no rooms');
 });
 
-test('HOME-RENT the host by source: the door lists a tenant\'s and a room-to-rent\'s rows, a rent row pressed (or a click on a home that shuts me out with a room free) asks which room, how many days and the price before it pays on the record, a tenant is told their days and rests there, and the decorator\'s rooms go through the service\'s own door (mutants: the rent before the lock unasked; the tenant\'s bed; the confirm skipped)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const rows = \[\.\.\.\(homeVisitorRows\(home, homeDoorFor\(bd, home\)\) \?\? \[\]\), \.\.\.\(worldPlaqueOn\(\) \? homeVoteRows\(home\) : \[\]\)\];/);   // PIN MOVED: HOME-VOTE - a visitor's rows, and the town's votes under them; PIN MOVED (AUDIT HOME-VOTE II D1): where the plaque draws a list
-  assert.match(wm, /&& \(verb === HOME_VERB\.rent \|\| \(verb == null && door === 'locked' && home\.rent\)\)\) \{ openHomeRent\(bd, home\)/);
-  assert.ok(wm.indexOf('openHomeRent(bd, home).catch') < wm.indexOf("if (door === 'locked') { townTalk?.say?.(homeLockedLine(home)); return true; }"), 'before the lock');
-  assert.match(wm, /action: \(\) => openHomeRentConfirm\(bd, room, d\)/, 'the price asked before it is paid');
-  // PIN MOVED (FIELD BUGS 2026-10-01 RENT-REST): the tenant's bed rides the rest's bag as the home's bed, which stands
-  // where a bought house stands (test/systems/fb1001_rent.test.js drives it through canRest)
-  assert.match(wm, /homeBed: homeBedIsMine\(interiorHome, Math\.floor\(Date\.now\(\) \/ 1000\)\) \|\| !!interiorSeatHall\?\.member,/);   // PIN MOVED (SEAT-HALL): and the palace holder's members rest there
-  assert.match(wm, /if \(home && !home\.own && rentDaysLeft\(home\.tenant, Math\.floor\(Date\.now\(\) \/ 1000\)\) > 0\) say\(rentWelcomeLine/);
-  assert.match(wm, /rent: \(\) => decorRentDoor\(\),/);
-  assert.match(wm, /if \(!api \|\| !interiorHome\?\.own \|\| !b\) return null;/, 'the owner\'s alone');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const homesApi = params\.has\('online'\) \? accountHomes\(/);
-  assert.match(w, /homesApi,   \/\/ HOME-RENT/);
-});

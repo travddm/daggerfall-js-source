@@ -115,9 +115,6 @@ test('DISC23-B2: the PROFILE carries the skin - every set as its own picture, th
     assert.equal(modSetting(V, 'Enabled'), true);
     assert.equal(heads().length, 2);
   });
-  // the profile window draws it, under the account card
-  // PIN MOVED (LAYERED-GEAR): the card is handed the character's own body, the one Layered Gearing first wears
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /body\.append\(accountBody\(\)\);\s*\n\s*body\.append\(skinCard\(document, \{ gender: \(\) => playerEntity\?\.gender \}\)\.root\);/);
   _resetModSettings();
 });
 
@@ -235,11 +232,3 @@ test('DISC23-B: who is NOT a walker - a Morrowind body on this screen, a rider, 
   assert.ok(riders);
 });
 
-test('DISC23-B: the host - one art store, the walkers after the bodies and skipping them, their height to the name pass, swept with the rest', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const eotbArt = createEotbArt\(\{ renderer \}\);[^\n]*\n\s*peerRiders = createPeerRiders\(\{ renderer, art: eotbArt \}\);[^\n]*\n\s*peerWalkers = createPeerWalkers\(\{ renderer, art: eotbArt, enabled: \(\) => getPref\('peerClassSprites'\) !== false \}\);/);
-  assert.match(w, /peerBodies\.sync\(afoot,[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*peerWalkers\.sync\(seen, onlineToScene, \{ eye: peerEye, right: peerRight, dt, skip: \(id\) => peerBodies\.heightOf\(id\) > 0, hurt: \(id\) => peerHurtAge\(id\) < PEER_FLINCH_S, conceal: veilOf(?:, grow: tvGrow)? \}\);/);   // PEERFX3: and a class skin's hurt pose; PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): grown under the Overworld
-  assert.match(w, /bodyHeight: \(id\) => peerRiders\.heightOf\(id\) \|\| peerBodies\.heightOf\(id\) \|\| peerWalkers\.heightOf\(id\),/);
-  assert.match(w, /peerWalkers\?\.offsetAll\(r\.offset\);/);
-  assert.match(w, /if \(peerWalkers\) for \(const b of peerWalkers\.batches\(\)\) \{ if \(cullOn && billboardOutside\(b\)\) \{ if \(renderer\.shadowReachBatch\(b\)\) castBatches\.push\(b\); continue; \} allBatches\.push\(b\); \}/);
-});

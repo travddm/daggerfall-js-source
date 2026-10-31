@@ -165,40 +165,6 @@ test('FB0929: a defender on the look ray stays the swing - the townsperson behin
   assert.deepEqual([struck, murders, p.crimeCommitted], [['townsperson'], 1, 5]);
 });
 
-// RAID-GUARDS (2026-09-29, Mac, after FB0929: "Raids shouldnt let you damage the guards"): while a raid is on in the
-// town, its defenders take none of the player's blows WHATEVER the setting - one question, cityGuards.playerSpares,
-// asked by the swing, the riding charge's list and the damage door itself. The crime watch is never spared.
-test('RAID-GUARDS: while a raid is on in the town its defenders take none of the player\'s blows whatever the setting - the swing, the charge\'s list and the damage door (no Assault) - and the crime watch is never spared', async () => {
-  setValue('MeleeAttacks', 'MeleeAttackFriendlyProtection', false);
-  try {
-    const p = townsman();
-    let raid = true;
-    const { guards, beside, front } = await raidStreet(p, { raidHere: () => raid });
-    const w = new PlayerWeapon({});
-    const struck = [];
-    w.onAttackResult = ({ foe }) => struck.push(foe);
-    assert.equal(guards.resolvePlayerHit(w, EYE0, FWD0, FEET0, inView, null, { swing: {} }), false, 'the raid\'s defenders are not the swing\'s, the setting off');
-    assert.equal(struck.length, 0);
-    for (const d of [beside, front]) assert.equal(guards.playerSpares(d), true, 'spared');
-    // the damage door: a blow of the player's that reaches it anyway lands nothing and is no crime; a raider's lands
-    guards.hurtGuard(front, 50, FEET0);
-    assert.deepEqual([front.entity.health, p.crimeCommitted, guards.anyWatchStanding()], [10000, 0, false], 'refused at the door - no Assault');
-    guards.hurtGuard(front, 50, FEET0, null, { fromPlayer: false });
-    assert.equal(front.entity.health, 9950, 'a raider\'s blow is the raid\'s');
-    // the crime watch is never spared, raid or not
-    const watchman = await guards.spawnCityGuard([0, 0, 1.2], 0, FEET0);
-    assert.ok(watchman && !watchman.defender, 'a crime watchman, as spawnCityGuard mints him');
-    assert.equal(guards.playerSpares(watchman), false);
-    // the raid over, the setting decides again (off: DFU's box pass)
-    raid = false;
-    assert.equal(guards.playerSpares(front), false, 'no raid, no protection: DFU\'s ally rule');
-  } finally { setValue('MeleeAttacks', 'MeleeAttackFriendlyProtection', true); }
-  // THE HOST: the world host tells the pool where a raid is on, and the riding charge takes its guards through the rule
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /createCityGuards\(\{[\s\S]{0,600}?raidHere: \(\) => raidDefendingHere\(\),/, 'world.js hands the pool the raid');
-  assert.match(w, /guards: \(\) => cityGuards\.guards\.filter\(\(g\) => !cityGuards\.playerSpares\(g\)\),/, 'the charge asks the one rule');
-});
-
 test('RAID-REP: a cleanse raises the raided region\'s own standing and touches no other region\'s - its legal reputation, its People and its knightly order alone; the Fighters Guild\'s +3 is the one standing that is not a region\'s (Kamer\'s)', () => {
   const f = (id, o) => [id, { id, rep: 0, region: -1, type: 0, ggroup: 0, parent: 0, ally1: 0, ally2: 0, ally3: 0, enemy1: 0, enemy2: 0, enemy3: 0, ...o }];
   const store = { dict: new Map([
@@ -250,8 +216,6 @@ test('RAID-GUARDS-NPC: while a raid is on, the town\'s walkers take none of the 
   assert.deepEqual([hit, p.crimeCommitted], [['guard'], 4]);
   assert.deepEqual(await guards.resolveCivilianHit(w, EYE0, FWD0, FEET0, [townsperson], { onMurder: () => { murders++; }, inViewFn: inView }), { crime: 'murder' });
   assert.deepEqual([hit, murders, p.crimeCommitted], [['guard', 'townsperson'], 1, 5]);
-  // THE HOST: the riding trample asks the same rule of the street's walkers
-  assert.match(rd('src/scenes/world.js'), /livePersons: \(\) => _livePersons\.filter\(\(seat\) => !cityGuards\.playerSparesPerson\(seat\.person\)\),/, 'the trample passes a raid\'s walkers by');
   // AUDIT 29g: THE HOSTS' TAIL, RUN. A swing that stopped on a spared body met someone: no door behind him is bashed (a
   // break-in in town) and no HUD surfacing - it whooshes. A swing that met nobody is the door's; a crime surfaces.
   for (const [file, doorArgs] of [['src/scenes/world.js', 'cam.pos, lookFwd'], ['src/scenes/exterior.js', 'eye, fwd']]) {

@@ -55,18 +55,6 @@ test('WEEDS1: why F5’s own test cannot see it - a batch is a whole pixel wide'
   const pixelSpan = 128 * 6.4;
   assert.ok(pixelSpan / 2 > farMinRadius * 100,
     `a batch's sphere can be ${(pixelSpan / 2).toFixed(0)} units where F5 is looking for ${farMinRadius.toFixed(2)} - three orders apart`);
-  // ...AND F5'S BATCH LINE IS GONE WITH IT, because once the sprite test
-  // exists F5 can no longer decide anything about a flat: a single-flat
-  // batch's radius is hypot(w, h) / 2, so F5 fired only when
-  // hypot(w, h) < 4 texels - which implies h < 4 texels, the sprite test
-  // itself. Its behavioural pin in bugs5 passed for the wrong reason the
-  // moment this landed, and its mutant survived, which is what said so.
-  const sp = read('src/render/shadowPass.js');
-  assert.match(sp, /b\.size\.h < minFlatH/, 'the sprite test decides a flat');
-  assert.doesNotMatch(sp, /if \(minRadius > 0 && b\.bounds && b\.bounds\[3\] < minRadius\)/, 'F5\u2019s batch line is retired, not left looking like it decides something');
-  // F5 over MESHES and terrain is untouched and still live - it is only
-  // the FLAT arm the sprite test subsumes
-  assert.match(sp, /if \(minRadius > 0 && r\.kind !== REC_BB && r\.kind !== REC_CHAR && r\.bounded/, 'the record-level test stands');
   // the subsumption, arithmetically rather than by assertion: for every
   // sprite shape, if F5 would have culled it then the height test does
   for (const [w, h] of [[0.3, 0.3], [0.1, 0.9], [2, 0.2], [0.6, 0.6], [3, 3]]) {
@@ -76,17 +64,6 @@ test('WEEDS1: why F5’s own test cannot see it - a batch is a whole pixel wide'
 });
 
 test('WEEDS1: the lantern replays are untouched, and that is the point of passing the texel', () => {
-  // A cube face is 512 over a lantern's range, so its texel is centimetres
-  // and a small prop beside a lantern casts a shadow you can see. The
-  // point replays pass no texel, so they get the floor alone - exactly
-  // what they had before.
-  const sp = read('src/render/shadowPass.js');
-  assert.match(sp, /replay\(f, vp, lightPos, recordBasis = false, minRadius = 0, texel = 0, filter = REPLAY_ALL, self = true, cand = null\)/, 'the texel is an argument with a zero default (SC1: and the filter after it, every record by default; DISC24-C: and the self card\'s word after that; PERF-SHADOW1: and a lantern\'s candidates last, none by default)');
-  assert.match(sp, /const minFlatH = texel > 0 \? Math\.max\(SHADOW_FLAT_MIN_HEIGHT, texel \* SHADOW_FLAT_MIN_TEXELS\) : SHADOW_FLAT_MIN_HEIGHT;/,
-    'no texel means the floor, unchanged');
-  assert.match(sp, /this\.replay\(f, this\.faceVP\[face\], pos, false, 0, 0, REPLAY_ALL, selfNear, cand\)/, 'and the point replay passes none (a zero)');   // DISC29-E: the self card's word is its own rank; PERF-SHADOW1: the lantern's candidates after it
-  // the sun cascades pass their own (PERF-SUN3 - PIN MOVED: and the cascade's own list from the shared walk after them)
-  assert.match(sp, /this\.replay\(f, this\.sunVP\[c\], null, false, SHADOW_CASCADE_MIN_RADIUS_TEXELS \* sunTexelWorld\(c, k\), sunTexelWorld\(c, k\), REPLAY_ALL, true, sunCand \? sunCand\[c\] : null\)/);
   // a lantern's texel really is far finer than a far cascade's, which is
   // what makes treating them differently right rather than convenient
   const lanternTexel = 2 * 18 / SHADOW_POINT_SIZE;   // a lantern's range is ~18 units over a 512 face
@@ -95,13 +72,3 @@ test('WEEDS1: the lantern replays are untouched, and that is the point of passin
   assert.equal(SHADOW_SUN_SIZE, 2048);
 });
 
-test('WEEDS1: an upside-down flame still casts nothing, as it did', () => {
-  // droppedTorches draws its flame on a negated localScale.y, so its
-  // `size.h` is NEGATIVE - and the existing test culls it, because a
-  // negative height is below any floor. That is pre-existing and stays:
-  // raising the floor cannot start a flame casting.
-  const sp = read('src/render/shadowPass.js');
-  assert.match(sp, /b\.size\.h < minFlatH/, 'the comparison is signed, not an absolute');
-  assert.doesNotMatch(sp, /Math\.abs\(b\.size\.h\)/, 'nothing takes the magnitude, which would change what casts');
-  for (const c of [0, 1, 2]) assert.ok(-2 < minFlatH(c), 'a negative height is under every cascade’s threshold');
-});

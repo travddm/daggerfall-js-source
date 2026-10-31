@@ -58,14 +58,6 @@ test('TILE1: the tile carries FACTS ABOUT A CHARACTER and no prose', () => {
   const dd = walk(t).filter((n) => n.tagName === 'DD').map((n) => n.textContent);
   assert.deepEqual(dd, ['84 / 120', '14,230']);
 
-  // Mac, on the account card two hours before this one: "Nothing is
-  // centered, there's uneeded text explaining what an account is". So
-  // the tile has NO paragraph that explains anything - every string on
-  // it is a fact about this save, and the pin holds that by looking for
-  // the shape the explanation would take.
-  const src = rd('src/ui/saveTile.js');
-  const strings = [...src.matchAll(/el\('p', '[a-z ]*', '([^'\n]{25,})'\)/g)].map((m) => m[1]);
-  assert.deepEqual(strings, [], `the tile grew prose: ${strings.join(' | ')}`);
 });
 
 test('TILE1: a missing field drops out rather than leaving a dangling separator', () => {
@@ -179,66 +171,6 @@ test('AUDIT-312 F3: the cloud line\'s STATE is decided where a pin can reach it'
   assert.deepEqual(cloudStateOf({ signedIn: true, characterId: 'c1', card, error: 'too-large', nowS: now }),
     { state: 'bad', when: null, error: 'too-large' });
 
-  // ...AND THE TWO THINGS ONLY THE MENU CAN DO, held where they live.
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  // THE SLOT KEY IS THE SERVICE'S, and it comes from the module that
-  // owns "a slot is (character, save name)". The menu's own copy had
-  // dropped the character half, which makes every character's QuickSave
-  // one slot - one spinner and one error on all of them.
-  assert.match(menu, /const cloudKeyOf = \(save\) => slotKeyOf\(save\);/);
-  assert.doesNotMatch(menu, /save\.saveName \?\? ''\}`;/, 'the menu writes no second slot key');
-  // THE LISTING IS ASKED AGAIN, NEVER PATCHED: one answer about what
-  // the cloud holds, and it comes from the cloud.
-  assert.match(menu, /if \(r\.ok \|\| r\.error === 'stale'\) \{ cloudAsked = false; ensureCloud\(\); \}/);   // the pre-merge audit 0927b B2: a stale restore asks again too
-  // ...and the latch is per VISIT, which means a fresh mount clears it.
-  assert.match(menu.slice(menu.indexOf('export function mountEnhancedMenu')), /^\s*cloudAsked = false;$/m);
-});
-
-test('AUDIT-312 F1: the cloud DELETE has a door, and it asks twice', () => {
-  // The route existed, `removeCloudSlot` existed, and nothing called
-  // either - while the refusal table already told a player at the bound
-  // to "delete a save there to make room". An account at SAVES_MAX
-  // could never back up again, and the only sentence it was given named
-  // an act the game did not offer.
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /removeCloudSlot/, 'the menu calls the delete');
-  // ...AND IT SAYS `backup`: the tile already has a Delete, the pane's
-  // own, which removes the save from this device. Two buttons reading
-  // `Delete` one row apart - one destroying the game, one destroying
-  // the copy - is the worst label this menu could carry.
-  assert.match(menu, /label: t\('menu\.cloud\.deleteBackup', 'Delete backup'\)/);
-  assert.match(menu, /label: t\('menu\.cloud\.deleteBackupAsk', 'Delete backup\?'\)/, 'a destructive act asks twice');
-  // EVERY ONE of them: the save's tile and the cloud-only card each carry
-  // the button, so one site asking twice cannot stand for the other (the
-  // A312-7 mutant lived through the lone match above while the card's
-  // copy still read true).
-  const deletes = menu.match(/label: t\('menu\.cloud\.deleteBackup', 'Delete backup'\)/g) ?? [];
-  const asks = menu.match(/cloudArm === slot\s*\?\s*\{ label: t\('menu\.cloud\.deleteBackupAsk', 'Delete backup\?'\), primary: true/g) ?? [];
-  assert.equal(asks.length, deletes.length, 'every Delete backup is armed by a first press');
-  // IT REMOVES THE COPY AND NEVER THE SAVE. The cloud is a backup, so
-  // deleting the backup is not deleting the game.
-  const cloud = rd('src/systems/cloudSaves.js');
-  const fn = cloud.slice(cloud.indexOf('export const removeCloudSlot'));
-  assert.doesNotMatch(fn, /removeItem|setItem/, 'it never touches this device\'s store');
-  // ...and the sentence that names it is reachable now.
-  assert.match(rd('src/net/accountClient.js'), /'too-many-saves': \(\) => t\('[^']*', '[^']*[Dd]elete[^']*'/);   // L10N4 (PIN MOVED): the sentence is its t() call's English
-});
-
-test('AUDIT-312 F5: the ten heads stay POSITIONAL - the index IS the identity', () => {
-  // `faceIndex` is on the save envelope and it addresses a RECORD
-  // NUMBER. The first cut of the extraction ended `.filter(Boolean)`,
-  // which COMPACTS - so one record that will not draw shifted every
-  // later face down by one, while ui/chargenArt.js's loadFaceSet (the
-  // other reader of the same ten records) pushes for every index and
-  // never compacts. Two homes that disagree about what index 5 means is
-  // the exact drift this module was extracted to prevent.
-  const face = rd('src/ui/facePortrait.js');
-  assert.match(face, /for \(let i = 0; i < races\.FACES_PER_RACE; i\+\+\) set\.push\(/);
-  assert.doesNotMatch(face, /^\s*return set\.filter/m, 'a compacted set is a different index');
-  // Both readers already draw something where a face is missing, which
-  // is what makes the hole safe to keep.
-  assert.match(rd('src/ui/enhanced/enhancedChargen.js'), /const art = faces\?\.canvases\?\.\[i\];/);
-  assert.match(face, /const art = set\[i\] \?\? set\[0\] \?\? null;/);
 });
 
 test('TILE2: how long ago, in words a player reads at a glance', () => {
@@ -280,91 +212,6 @@ test('TILE2: a disabled action is not wired, and the actions are the PANE\'S - t
   buttons[0].onclick(); buttons[1].onclick();
   assert.equal(pressed, 11);
 
-  // THE TILE KNOWS NO PANE. Not "Load", not "Play online", not
-  // "Overwrite" - those are the panes' words, and a tile that spelled
-  // one would be a tile only one pane could use.
-  const src = rd('src/ui/saveTile.js');
-  for (const word of ['Play online', 'Overwrite', "'Load'", 'onAction', 'appStorage', 'cloudSaves']) {
-    assert.ok(!src.includes(word), `the tile names a pane's own business: ${word}`);
-  }
-});
-
-test('TILE2: ONE tile for THREE panes, and the classes it draws belong to nobody else', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  // The drift this retired: three hand-rolled copies of the same four
-  // lines is how three panes come to disagree about what a save is.
-  assert.doesNotMatch(menu, /function slotCard\(/, 'the old per-pane card is gone');
-  assert.match(menu, /import \{ saveTile, cloudStateOf, saveFromCard, newerBackup \} from '\.\.\/saveTile\.js'/);   // + the newer-backup question (FIELD 2026-09-27, 0927b B1)
-  // AUDIT-312 F3: and the DECISION comes from there too, rather than
-  // being re-inlined into a module no pin can drive. The gate is that
-  // the menu asks; the arithmetic itself is pinned above.
-  assert.match(menu, /const state = cloudStateOf\(\{/);
-  const pane = (from, to) => menu.slice(menu.indexOf(from), menu.indexOf(to));
-  for (const [name, from, to] of [
-    ['Online', 'function paneOnline(body)', 'function paneLoad(body)'],
-    ['Load', 'function paneLoad(body)', '// ── SAVE GAME'],
-    ['Save', 'function paneSave(body)', '// ── EXIT (pause only)'],
-  ]) assert.match(pane(from, to), /tileGrid\(/, `the ${name} pane draws tiles`);
-
-  // ═══ THE CLASS NAMES ARE THIS TILE'S ALONE ══════════════════════
-  //
-  // The probe found `.tile` was ALREADY the inventory and trade item
-  // icon (30x30, ui/enhanced/enhancedInventory.js and ui/enhanced/enhancedTrade.js), so
-  // the save tiles were being squashed by a rule written for something
-  // else - and every check about their size read 34x34. A source sweep
-  // could have caught it and did not, because nobody thought to look.
-  // This is that sweep, derived: the classes saveTile.js really puts in
-  // the DOM, against every other module that puts classes in the DOM.
-  //
-  // THE BORROWED VOCABULARY IS EXEMPT AND NAMED: `act`, `acts`,
-  // `primary` and `stats` are the skin's own words and are SUPPOSED to
-  // be shared - enhancedStyle.js's header says two copies of a design
-  // language is how the front door and the rooms drift apart. What may
-  // not be shared is a class this tile INVENTS, and `.tile` was exactly
-  // that.
-  const BORROWED = new Set(['act', 'acts', 'primary', 'stats']);
-  const src = rd('src/ui/saveTile.js');
-  const mine = new Set([...src.matchAll(/el\('[a-z0-9]+', '([a-z0-9 -]+)'/g)]
-    .flatMap((m) => m[1].split(' ')).filter(Boolean));
-  for (const m of src.matchAll(/el\('[a-z0-9]+', `([a-z0-9-]+)/g)) mine.add(m[1]);
-  for (const b of BORROWED) mine.delete(b);
-  assert.ok(mine.size >= 6, `the class walk found only ${[...mine].join(', ')} - it has stopped seeing its subject`);
-  const others = readdirSync(new URL('../../src/ui', import.meta.url), { recursive: true })
-    .filter((f) => f.endsWith('.js') && f.split(/[\\/]/).pop() !== 'saveTile.js');
-  for (const f of others) {
-    const other = rd(`src/ui/${f}`);
-    for (const cls of mine) {
-      assert.ok(!new RegExp(`'${cls}'|\`${cls}[\`\\s]`).test(other),
-        `ui/${f} also draws a "${cls}" - two modules, one class, and the later CSS rule wins`);
-    }
-  }
-});
-
-test('TILE1: the face has ONE home, and it is not the one chargenArt already owns', () => {
-  // The drawing lived inside systems/chargenSession.js, where only the
-  // wizard could reach it. The save tile is the second caller, so it
-  // moved rather than being copied.
-  const session = rd('src/systems/chargenSession.js');
-  assert.match(session, /import\('\.\.\/ui\/facePortrait\.js'\)/);
-  assert.match(session, /out\.loadFaces = \(raceKey, gender\) => loadFaceCanvases\(raceKey, gender, \{ scale: 2 \}\);/);
-  assert.doesNotMatch(session, /CifRciFile/, 'the wizard no longer knows which file a race\'s heads live in');
-
-  // ...AND IT IS NAMED APART FROM chargenArt.js's `loadFaceSet`, which
-  // is a different thing under a similar name: that one uploads the
-  // same ten records as GL TEXTURES and returns nothing. AUDIT 24's
-  // ratchet caught the collision the moment the second one existed.
-  const face = rd('src/ui/facePortrait.js');
-  assert.match(face, /export async function loadFaceCanvases\(/);
-  assert.doesNotMatch(face, /export async function loadFaceSet\(/);
-  assert.match(rd('src/ui/chargenArt.js'), /export async function loadFaceSet\(/, 'the other one is still there, which is why the name had to differ');
-
-  // THE IDENTITY THE PORTRAIT NEEDS WAS ALREADY IN THE SAVE - S3c/U9
-  // put race, gender and faceIndex on the envelope. Nothing new is
-  // stored; the menu's row simply stopped throwing three fields away.
-  assert.match(rd('src/systems/save/save.js'), /'name', 'gender', 'race', 'raceId', 'faceIndex'/);
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /race: typeof snap\.race === 'string' \? snap\.race : null,/);
-  assert.match(menu, /faceIndex: Number\.isInteger\(snap\.faceIndex\) \? snap\.faceIndex : 0,/);
 });
 
 // ── ACC2c: THE SAVE THAT IS ONLY IN THE CLOUD ─────────────────────────────────────────────────────

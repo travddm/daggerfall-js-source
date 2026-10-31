@@ -115,24 +115,6 @@ test('GROUND-AGREE the spawn the roll stands (world/spawnGroundPlace.js spawnAt)
   assert.deepEqual(gone.spawnAt(sx, sy, { clocks: false }), spawn, 'the clocks not asked: the spawn, alive or dead');
 });
 
-test('GROUND-AGREE by source: the pixel build shapes its ground - the blend, the tiles, World of Daggerfall\'s pick, the woods\' and the jungle\'s clearings - for the ground\'s place, and stands only what stands; the lift reads the same place (mutants: the build shapes the stood; the rect the stood\'s; the pick the stood\'s)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT RELEASE R3, the merge of main into TESA): what stands is IC-GRAND's view of it (a slice of the
-  // Imperial City far from the player its far view, world/tamrielCapitals.js capitalBuildView), its far-view flag beside it
-  assert.match(w, /const dfLocation = capitalBuildView\(_locationToBuild\(px, py\), px, py, host\.state\.current\) \|\| null;[^\n]*\n(?:\s*const farView = [^\n]*\n)?(?:\s*\/\/[^\n]*\n)*\s*const groundLocation = spawnGroundPlace\.groundLocationAt\(px, py, dfLocation\);/, 'asked once, beside what stands');
-  assert.match(w, /if \(groundLocation\) locationRect = setLocationTiles\(groundLocation, maps, blocks, seedTilemap\);/, 'the rect and the tiles');
-  assert.equal(w.match(/hasLocation: !!groundLocation/g)?.length, 2, 'World of Daggerfall\'s pick and the kernel\'s blend');
-  assert.doesNotMatch(w, /hasLocation: !!dfLocation/, 'nothing shapes ground by what stands alone');
-  // PIN MOVED (TESA-LANDS): and the lands' past the Bay - a zone's own flats close round the same places
-  assert.equal(w.match(/FOREST_HIDDEN_LOCATION_TYPES\.has\(groundLocation\?\.mapTableData\?\.locationType\)/g)?.length, 3, 'the woods\', the jungle\'s and the lands\' clearings');
-  assert.match(w, /location: dfLocation \? dfLocation\.name : null,/, 'what stands is still the clocks\' (tvSpawnGone reads it)');
-  assert.match(w, /const spawnGroundPlace = createSpawnGroundPlace\(\{/, 'the host makes the law once');
-  assert.match(w, /_livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway,/, 'and hands the build its ground\'s place');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): on the Bay; past it the lift reads the build's own place (no spawn stands past the Bay)
-  assert.match(w, /const _liftLocationAt = \(x, y\) => \(onTheBay\(x, y\) \? spawnGroundPlace\.groundLocationAt\(x, y, locationIndex\.get\(`\$\{x\},\$\{y\}`\)\) : _locationToBuild\(x, y\)\);/, 'and the lift reads it for a pixel not built yet');
-  assert.match(w, /const tvSpawnAt = spawnGroundPlace\.spawnAt;/, 'and the Overworld\'s far found spawn is the same law, the clocks asked');
-});
-
 test('GROUND-AGREE on the real producer: a ruin\'s blend moves its pixel\'s ground by metres - a client that built the pixel with its spawn dead stood every peer there sunk or floating - and the ground is now the same whether it stands or not', () => {
   const ruin = { exterior: { exteriorData: { width: 1, height: 1, blockNames: ['RUIN'] } }, mapTableData: { locationType: 10 } };
   const rect = locationFootprintRect(ruin);

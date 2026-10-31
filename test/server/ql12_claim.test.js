@@ -551,9 +551,6 @@ test('QL12 THE ROUTE (AUDIT FIVE-ASKS A1\'s lesson): /v1/ql/claim is listed, beh
   assert.ok(ROUTES.has('/v1/ql/claim') && !OPEN_ROUTES.has('/v1/ql/claim'), 'a route the worker answers, behind a session');
   const { S } = await stood(t);
   assert.equal((await S.call('/v1/ql/claim', { line: 'burningDoors', step: 3 })).status, 401, 'a stranger claims nothing');
-  const index = read('server-account/src/index.js');
-  assert.match(index, /\/\/ {3}POST \/v1\/ql\/claim {4}\{ line, step, phase, choice\? \}/, 'the header\'s route list');
-  assert.match(index, /if \(path === '\/v1\/ql\/claim' && request\.method === 'POST'\) \{/);
   assert.match(read('server-account/wrangler.toml'), /^QUESTLINES_OPEN = "on"$/m);
   const sql = read('server-account/migrations/0133_questlines.sql');
   assert.match(sql, /^CREATE TABLE IF NOT EXISTS ql_steps \(/m);

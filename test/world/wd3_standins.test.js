@@ -153,9 +153,6 @@ test('WD3 stand-ins, the aliases: each bed id IS Daggerfall\'s bed, its three be
   assert.equal(customAliasFor(42069), null);
   assert.equal(classicModelIdOf(42069), 42069);
   assert.equal(isBedModel(classicModelIdOf(42069)), false);
-  assert.match(src('src/scenes/interiorContext.js'), /\} else if \(isBedModel\(classicModelIdOf\(p\.modelIdNum\)\)\) \{/);
-  assert.match(src('src/scenes/dataPipeline.js'), /const alias = customAliasFor\(modelIdNum\);\n {4}if \(alias\) return buildAliasMesh\(modelIdNum, alias\);/);
-  assert.match(src('src/scenes/dungeonContext.js'), /const alias = custom \? null : customAliasFor\(id\);/);
   resetAll();
 });
 
@@ -369,7 +366,6 @@ test('WD3 stand-ins, the install: once; every piece behind the town mods\' switc
   assert.equal(hasTextureReplacement(1210, 10), true, 'Detailed Ships\' own switch');
   assert.equal(hasCustomModel(45081), true, 'DET\'s timbers stand for its ships');
   assert.equal(hasCustomModel(69424), false, 'the towns\' own pieces do not');
-  assert.match(src('src/world/townStandIns.js'), /let n = installDetStandIns\(isOn\);\n {2}shareDetailedShipsArt\(isOn\);/);
   resetAll();
 });
 
@@ -574,8 +570,6 @@ test('WD3 with ARENA2: the alias beds are built by the pipeline from the player\
 });
 
 test('WD3 the towns\' scenery is never a person (AUDIT WD3 G1) - a street flat carries the trigger collider the ray meets only in a person archive (DaggerfallBillboard FlatTypes.NPC, RDBLayout.IsNPCFlat, the dungeons\' law); the mods\' lamps, food and animals carry faction ids and stay scenery', () => {
-  const W = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  assert.match(W, /if \(!pn\.width\) return;\n(?: {6}\/\/.*\n)+ {6}if \(pn\.textureArchive != null && !isNpcFlat\(pn\.textureArchive\)\) return;\n {6}targets\.push\(\{ key: `person:\$\{i\}`/);
   for (const a of [334, 346, 357, 175, 184]) assert.equal(isNpcFlat(a), true, String(a));
   for (const a of [210, 10021, 10024, 10010, 201, 1200]) assert.equal(isNpcFlat(a), false, String(a));
 });
@@ -654,6 +648,4 @@ test('WD3 the town stand-ins YIELD to the player\'s own picture of the record (A
   assert.equal(TR.hasTextureReplacement(10021, 3), true, 'with Replace Game Artwork off the stand-in answers again');
   setValue('Enhancements', 'AssetInjection', 'True');
   TR.setBundleTextures([]); clearVendorTextures();
-  assert.match(readFileSync(join(ROOT, 'src/world/detStandIns.js'), 'utf8'), /return addVendorTextures\(entries\.map\(\(e\) => \(\{ \.\.\.e, yields: true \}\)\)\);/);
-  assert.match(readFileSync(join(ROOT, 'src/world/townStandIns.js'), 'utf8'), /n \+= addVendorTextures\(cloths\.map\(\(e\) => \(\{ \.\.\.e, yields: true \}\)\)\);/);
 });

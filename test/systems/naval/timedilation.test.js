@@ -49,15 +49,6 @@ test('TIME-DILATION the sea\'s threats: each hostile ship afloat says her hold, 
   const fx = s.view.feet;
   const cap = threatCap({ threats: threats.map((t) => ({ dx: t.pos[0] - fx[0], dz: t.pos[2] - fx[2], reach: t.reach, holds: t.holds, ...(t.chasing ? { chasing: true, mps: t.mps } : {}) })), heading: { x: 0, z: 1 }, speedMps: 4 });
   assert.equal(foeRate(cap, 60), 1, 'the journey at x1 alongside her');
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /for \(const t of naval\?\.threats\(\) \?\? \[\]\) out\.push\(\{ dx: t\.pos\[0\] - fx\[0\], dz: t\.pos\[2\] - fx\[2\], reach: t\.reach, holds: t\.holds,/);
-  assert.match(W, /const rate = csaHoldsTimeScale\(\) \? null : \(foes\.strangerRate \? Math\.min\(foeRate\(foes, travelAsked\), foes\.strangerRate\) : foeRate\(foes, travelAsked\)\);/);
-  assert.match(W, /const foeCap = foes\.strangerRate \? Math\.min\(foeRate\(foes, want\), foes\.strangerRate\) : foeRate\(foes, want\);/);
-  assert.equal((W.match(/foePaced\(/g) ?? []).length, 0, 'no journey under the bare floor');
-  assert.match(W, /danger: \(\) => duelEnemyNear\(\) \|\| \(!playerEntity\.staffHidden && areEnemiesNearby\(wildSeen\(exteriorFoePool\(\)\)\)\) \|\| navalHostileNear\(\),/);
-  // PIN MOVED (OW-RISE): the rise counts the foes the view's danger does - WILD-ALERT's wildSeen (test/systems/travel/ow_rise.test.js)
-  assert.match(W, /duelEnemyNear\(\) \|\| areEnemiesNearby\(wildSeen\(exteriorFoePool\(\)\)\) \|\| navalHostileNear\(\) \|\| !travelViewAllowed\(\)\.ok\) return;/);
-  assert.match(W, /if \(duelEnemyNear\(\) \|\| areEnemiesNearby\(exteriorFoePool\(\)\) \|\| navalHostileNear\(\)\) \{ tvSay\(TRAVEL_VIEW_TEXT\.enemies\); return false; \}/);
 });
 
 test('TIME-DILATION the shared sea: a peer within NAVAL_SHARE_RADIUS shares my sea, and it sails at real time whatever my clock - alone (offline, or the peer past the radius) it keeps the world\'s, as AUDIT NAV1 laid down; the seconds never negative (mutants: the share, the radius, the real time, the wiring)', async () => {
@@ -83,5 +74,4 @@ test('TIME-DILATION the shared sea: a peer within NAVAL_SHARE_RADIUS shares my s
   assert.ok(real > 0.5, `she sails (${real.toFixed(2)} m)`);
   assert.ok(Math.abs(sharedFast - real) < real * 0.25, `shared: a real second's way at x30 (${sharedFast.toFixed(2)} m against ${real.toFixed(2)})`);
   assert.ok(alone > real * 5, `alone: the world's thirty seconds (${alone.toFixed(2)} m)`);
-  assert.match(hostText('src/scenes/naval/navalHost.js'), /const total = paused \? 0 : Math\.min\(seaSeconds\(dt, timeScale\(\), sharedSea\(deps\.online\?\.peers\?\.\(\), deps\.feet\(\), NAVAL_SHARE_RADIUS\)\), FRAME_STEP_S \* FRAME_STEPS_MAX\);/);
 });

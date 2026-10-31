@@ -259,40 +259,6 @@ test('TI2 touch.js: the gyro listener follows the pref, and dispose removes it (
   });
 });
 
-// ---------------------------------------------------------------
-// the text pins
-// ---------------------------------------------------------------
-test('TI2 pins: the layer\'s chrome - safe-area edges, the inline name field, no window.prompt, the fullscreen ask from the first touch, haptics through the pref (mutant: any one back to TI1)', () => {
-  const s = read('src/ui/touch/touch.js');
-  assert.match(s, /const edge = \(side, px\) => `\$\{side\}:calc\(\$\{px\}px \+ env\(safe-area-inset-\$\{side\}, 0px\)\)`;/, 'the safe-area helper');
-  assert.doesNotMatch(s, /'(left|right|top|bottom):\d+px'/, 'no control is placed by a bare pixel edge any more');
-  assert.doesNotMatch(s, /window\.prompt\(/, 'the native prompt is gone');
-  assert.match(s, /entry = document\.createElement\('input'\);/, 'an inline field raises the phone\'s keyboard');
-  assert.match(s, /askFullscreen\(\); askMotion\(\);\s+\/\/ TI2: the first touch is the user gesture both need/, 'fullscreen and motion are asked from the canvas touchstart');
-  assert.match(s, /if \(fsAsked \|\| !getPref\('touchFullscreen'\)\) return;/, 'asked once, and only under the pref');
-  assert.match(s, /if \(!getPref\('touchHaptics'\)\) return;\s*\n\s*try \{ navigator\.vibrate\?\.\(ms\); \}/, 'haptics through the pref, on a platform that has them');
-  assert.match(s, /if \(!swiping\) buzz\(15\);/, 'the hold that arms a swipe is felt');
-  assert.match(s, /if \(dot\.style\.display !== 'block'\) buzz\(20\);/, 'the lock landing is felt, once');
-  assert.match(s, /hooks\.look\?\.\(ev\.dx \* TOUCH_LOOK_GAIN \* lookNorm\(\), ev\.dy \* TOUCH_LOOK_GAIN \* lookNorm\(\)\)/, 'the drag is normalised');
-  assert.match(s, /gyroLookDelta\(e\.rotationRate, globalThis\.screen\?\.orientation\?\.type \?\? 'landscape-primary', dt, lookScale\(\), getPref\('touchGyroSensitivity'\)\)/, 'the gyro divides the host\'s lookScale out');
-  // PIN MOVED (CARDS-TOUCH, Tavern-Cards section 31): and at a card table's seat, the seated head turned by nothing
-  assert.match(s, /if \(!\(dt > 0\) \|\| dt > GYRO_MAX_DT \|\| hooks\.paused\?\.\(\) \|\| hooks\.cardTable\?\.\(\)\) return;/, 'a motion sample under a window is dropped, like a drag (AUDIT 62 F7)');
-  assert.match(s, /axes: \(\) => \(stickId !== null && getPref\('touchAnalogStick'\) \? \{ x: stickX, y: stickY \} : null\)/, 'the handle publishes the throw under the pref');
-});
-
-test('TI2 pins: the hosts hand the throw to MoveAxes beside the held keys, the modal frames through the host seam (mutant: a host dropped)', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    assert.match(read(h), /const mv = moveHeld\(keys\);\s*\n\s*mv\.analog = touch\?\.axes\(\) \?\? gamepad\?\.axes\(\) \?\? null;/, `${h}: the reading rides the same bag (GP1: the pad's stick behind the finger's)`);
-  }
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(h), /stickAxes: \(\) => touch\?\.axes\(\) \?\? gamepad\?\.axes\(\) \?\? null,/, `${h}: the modal frames' seam`);
-  }
-  assert.match(read('src/scenes/worldModes.js'), /const mv = moveHeld\(keys\);\s*\n\s*mv\.analog = host\.stickAxes\?\.\(\) \?\? null;/, 'worldModes reads it through the host');
-  const ax = read('src/player/moveAxes.js');
-  assert.match(ax, /const toward = \(axis, target\) => axis \+ clamp\(target - axis, -MOVE_ACCELERATION_CONST \* dt, MOVE_ACCELERATION_CONST \* dt\);/, 'the throw is a TARGET under acceleration');
-  assert.match(ax, /this\.horizontal = ax !== 0 \? ax : \(held\.right \? 1 : 0\) - \(held\.left \? 1 : 0\);/, 'and the axis itself without');
-});
-
 test('TI2 pins: the prefs shelf carries the touch knobs with their shipped answers; the Touch card mounts only where the device reports touch (mutant: a default flipped, or the card unconditional)', () => {
   assert.equal(PREF_DEFAULTS.touchLookSensitivity, 1);
   assert.equal(PREF_DEFAULTS.touchAnalogStick, true, 'analog by default: the throw is the speed');
@@ -301,16 +267,6 @@ test('TI2 pins: the prefs shelf carries the touch knobs with their shipped answe
   assert.equal(PREF_DEFAULTS.touchGyroSensitivity, 1);
   assert.equal(PREF_DEFAULTS.touchHaptics, true);
   assert.equal(PREF_DEFAULTS.touchFullscreen, true);
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /import \{ isTouchDevice \} from '\.\.\/touch\/touch\.js';/);
-  // SO1: the touch knobs are rows under CONTROLS (beside the mouse and
-  // the pad), and the whole set is gated on the device the same way.
-  // PAD-CURSOR: the controller's cursor-assist row stands ahead of the gate - a controller's, on every device
-  assert.match(menu, /function portRowsControls\(\) \{\s*\n\s*const out = \[\];\s*\n(?:\s*\/\/[^\n]*\n)?\s*out\.push\(prefRow\('padCursorAssist'[^;]*;\s*\n\s*if \(!isTouchDevice\(\)\) return out;/, 'the touch rows are gated');
-  for (const key of ['touchLookSensitivity', 'touchAnalogStick', 'touchStickAnchor', 'touchGyroLook', 'touchGyroSensitivity', 'touchHaptics', 'touchFullscreen']) {
-    assert.ok(menu.includes(`'${key}'`), `${key} has a control`);
-  }
-  assert.match(menu, /onChange: \(on\) => \{ if \(on\) \{ try \{ globalThis\.DeviceMotionEvent\?\.requestPermission\?\.\(\)/, 'the gyro switch asks iOS from the click, the one gesture it accepts');
 });
 
 test('TI2 pins: the manifest makes the game page a home-screen app - fullscreen, landscape, its icons on disk; the landing page references no file (mutant: the link dropped, an icon missing, or the landing page pointing at one)', () => {

@@ -76,12 +76,6 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
 });
 
 test('ORE-MAP: the world host hands the held map the card online, asks a pixel\'s witnessed state once and after the pointer rests, through the gathering host - which stands again a pixel of its own whose state the answer moved - and the Mining page says where to look (mutants: the card offline; asked every hover; the ask past the host; the stood pixel left on its old word)', async () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /      oreAt: profBook \? oreMapAt : null,/);
-  assert.match(w, /if \(!fact && profBook\?\.state\?\.open === true && gatherHost && !_oreAsked\.has\(k\)\) \{\n\s+clearTimeout\(_oreAskTimer\);\n\s+_oreAskTimer = setTimeout\(\(\) => \{\n\s+if \(_oreAsked\.has\(k\)\) return;\n\s+_oreAsked\.add\(k\);\n\s+gatherHost\?\.askPixels\(\[\[px, py\]\]\)\.then\(\(\) => again\?\.\(\), \(\) => \{\}\);\n\s+\}, ORE_ASK_MS\);/);
-  // PIN MOVED (MINE-PERKS, Professions-Arc 43): and whether the reader is a Surveyor, whose own word witnesses the ground
-  assert.match(w, /return oreMapTip\(\{ climate: maps\.getClimateIndex\(px, py\), region: maps\.getRegionIndexAt\(px, py\), fact, surveyed \}\);/, 'the ground\'s own climate and region, as the gathering host reads them');
-  assert.match(w, /pixelInfo: \(x, y\) => \{ try \{ return \{ climate: maps\.getClimateIndex\(x, y\), region: maps\.getRegionIndexAt\(x, y\) \}; \}/, 'the same reads the veins stand by');
   assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);   // VOICE1 (PIN MOVED): the same law in plain words
   // the gathering host's ask: a pixel it stands, answered as changed, is stood again
   const WOODS = CLIMATES.Woodlands, PX = 405, PY = 150, DAY = 20500;

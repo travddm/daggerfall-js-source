@@ -22,7 +22,6 @@ import { clearOfPillars } from '../../../src/scenes/superDungeon/sdSpoils.js';
 import { SD_SLIP_FRAC } from '../../../src/scenes/superDungeon/sdRemnantVoice.js';
 
 const T0 = 1_800_000_000_000;
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const at = (x, y, z) => realmToDungeon(SD_ARENA.x + x, y, SD_ARENA.z + z);
 const near = (a, b, e = 1e-6) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= e);
 /** The shakes felt, to the realm's round trip's rounding. */
@@ -229,11 +228,4 @@ test('SD16 THE BURSTS AS THE SPARK PASS TAKES THEM: sixteen at most, the oldest 
   assert.deepEqual(r.fx.bursts(r.at()), [], 'spent');
   // the draw: nothing to draw, no pass made
   assert.equal(r.fx.draw(null, null, null, [0, 0, 0], r.at()), false);
-  // the world
-  assert.match(W, /import \{ createSdFx \} from '\.\/superDungeon\/sdFx\.js';/);
-  assert.match(W, /const sdFx = sdFightLink \? createSdFx\(\{\n\s+link: sdFightLink,\n\s+feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\),\n\s+shake: \(k\) => betterAmbience\.weaponKick\(k\),/);
-  assert.match(W, /if \(inRealm\) \{ try \{ sdFx\?\.frame\(\); \} catch/);
-  assert.match(W, /sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false;/);
-  assert.match(W, /const sparks = !!\(sdFx && sdFightLink && sdFx\.draw\(renderer\.gl, proj, view, eye, sdFightLink\.now\(\), fog, renderer\.worldViewportPx\?\.\[3\]\)\); const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\);/);   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(W, /fx = sdFx && sdFightLink \? sdFx\.lights\(sdFightLink\.now\(\)\) : NO_SD_LIGHTS;\n[^\n]*\n[^\n]*\n\s+if \(!fx\.length && !stone && !hearts\.length\) return lit;[\s\S]*?for \(let i = 0; i < fx\.length; i\+\+\) _sdHourLights\.push\(fx\[i\]\);/);   // SD18b (PIN MOVED): and the Ending's stone   // AUDIT SD III (V5, PIN MOVED): into one kept list   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
 });

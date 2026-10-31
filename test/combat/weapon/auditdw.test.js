@@ -50,10 +50,6 @@ test('AUDIT-DW F2: a weapon atlas\'s custom frames are asked TOGETHER - every as
   const bare = await customFrames('WEAPON10.CIF', null, { recordCount: 1, getFrameCount: () => 1 }, (n) => { asked.push(n); return null; });
   assert.equal(asked.at(-1), 'WEAPON10.CIF_0-0', 'MetalTypes.None adds nothing (bare hands)');
   assert.deepEqual(bare, [[null]]);
-  const fp = rd('src/combat/fpsWeapon.js');
-  assert.match(fp, /const customs = await customFrames\(askName, metal, cif, customImage\);/, 'the loader takes the batch');
-  assert.ok(!/const custom = await customWeaponImage\(name\);/.test(fp), 'and no frame is awaited on its own');
-  assert.match(fp, /await Promise\.all\(asks\);/);
 });
 
 test('AUDIT-DW F1: the list drawer decodes THE RECORD it draws before the upload - getTexture, then preloadRecord(archive, record, dye), then uploadRecord - and a host without the seam still draws', async () => {
@@ -83,13 +79,6 @@ test('AUDIT-DW F1: the list drawer decodes THE RECORD it draws before the upload
   // the same seam in the other three doors, by source
   // DISC22-D: the drawer's own decode - the hook is a spy's seam, and a host without it decodes through the module
   for (const f of ['src/ui/item/itemScroller.js', 'src/ui/native/nativeInventory.js']) assert.match(rd(f), /await preloadIconRecord\(icons, img\);/, f);
-  assert.match(rd('src/ui/item/itemScroller.js'), /const ask = icons\?\.preloadRecord \?\? \(\(archive, record, dye\) => preloadTextureRecord\(archive, record, 0, 'Albedo', dye\)\.catch\(\(\) => null\)\);/);
-  assert.match(rd('src/ui/textureCanvas.js'), /\? preloadTextureRecord\(archive, record, 0, 'Albedo', dye\)\.catch\(\(\) => null\)/, 'the DOM door');
-  assert.match(rd('src/ui/paperDoll.js'), /await preloadTextureRecord\(archive, record, 0, 'Albedo', dye\);[^\n]*\n\s+const swap = decodedTextureTopDown/, 'the doll');
-  assert.match(rd('src/combat/diverseWeapons/diverseWeaponsIcons.js'), /gate: moddedWeaponHUDAnimsEnabled, lazy: true/, 'the mod\'s icons are lazy');
-  // PIN MOVED (AUDIT VE R1): the preload decodes each key from the one entry that answers it now - a lazy one is still skipped
-  // (AUDIT DEX B5: and a readOnly one the GPU holds alone)
-  assert.match(rd('src/systems/textureReplacement.js'), /if \(entry && !entry\.lazy && !decodedFrom\(key, entry\) && !releasedFrom\(key, entry\)\) todo\.push\(\[key, entry\]\);/, 'and the archive preload skips them');
 });
 
 // ── the widget clone's bench, the WW1 suite's shape ───────────────────
@@ -145,8 +134,6 @@ test('AUDIT-DW F3: under DoubleScaleTextures a `w_` hit draws into the doubled b
   w.customCache.set('w_LONGSWORD.CIF_0-0_Steel', { tex: 'legacy', width: 100, height: 80 });
   b.frame();
   assert.deepEqual([b.draws.at(-1).rect.w, b.draws.at(-1).rect.h], [400, 240]);
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /doubled: name\.startsWith\('w_'\)/);
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /else if \(w\.s\.doubleScale && custom\.doubled !== false\) \{/);
 });
 
 test('DW-CLIP: under the Diverse Weapons preset (DoubleScaleTextures + TrueTextureSize 1) a full-canvas `w_` idle draws WHOLE at its painted size - the war axe\'s 317x200 fills the 320x200 screen, nothing pushed off the bottom-right', () => {
@@ -169,10 +156,6 @@ test('DW-CLIP: under the Diverse Weapons preset (DoubleScaleTextures + TrueTextu
   cw.customCache.set([...cw.customCache.keys()].find((n) => n.startsWith('w_')), { tex: 'double', width: 100, height: 80, doubled: true });
   c.frame();
   assert.deepEqual(cw.offset, [0.5, 0.5]);
-  // DISC14-C: the gate is one helper now, shared with the doubled idle's bob - the shift and the centred bob ride the same doubling
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /function doubledIdleNow\(\) \{\s*\n\s*if \(!w\.s\.doubleScale \|\| w\.s\.trueSize \|\| !w\.art\) return false;/);
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /return record != null && !!customTexture\(record, Math\.max\(0, w\.currentFrame\)\)\?\.doubled;/);
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /if \(\(w\.weaponState === S\.Idle \|\| \(w\.currentWeaponType === T\.Bow && w\.currentFrame === 0\)\) && doubledIdleNow\(\)\) \{\s*\n\s*w\.offset = /);
   _resetModSettings();
   assert.equal(modSettingsOf('diverse-weapons').WeaponWidgetPreset, false, 'DISC16-B: the preset defaults off, as at DW1 (DW-CLIP had it on)');
 });

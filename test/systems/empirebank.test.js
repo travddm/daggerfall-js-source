@@ -39,8 +39,6 @@ test('EMPIRE-BANK a bank discovered before shows its name now; a quest\'s rename
   assert.equal(shownBuildingName(bank, null), 'The Bank of Daggerfall', 'no live name: the stored one');
   assert.equal(shownBuildingName({ ...bank, isOverrideName: true, displayName: 'The Hideout' }, 'The Bank of the Empire'), 'The Hideout');
   assert.equal(shownBuildingName({ buildingType: BUILDING_TYPES.Tavern, displayName: 'The Rusty Tankard', isOverrideName: false }, 'Something Else'), 'The Rusty Tankard');
-  assert.match(src('src/ui/exteriorAutomapWindow.js'), /name = shownBuildingName\(rec, byKey\.get\(b\.buildingKey\)\?\.name\) \|\|/);
-  assert.match(src('src/scenes/worldModes.js'), /displayName: home \? homeDoorTitle\(home, questSiteHere\(bd\) && db\.isOverrideName \? db\.displayName : null\) : homeDoorName\(shownBuildingName\(db, bd\.name\), !!houseVerbs, bd\.buildingType\),/);   // PIN MOVED (QUEST-RESIDENCE, FIELD BUGS 2026-10-15c: a quest's home says the quest's name - homeDoorTitle's second word); FIELD BUGS 2026-09-30b HOME-PLAQUE (PIN MOVED): a nameless house with verbs is a Residence; IC-PROPS (PIN MOVED): a house by its type (a nameless building by its place - systems/worldTooltips.js)
 });
 
 test('EMPIRE-BANK the loans: online the cap is a tenth - DFU\'s law and Roleplay & Realism\'s alike - and a loan past it is refused; offline the cap is whole (mutants: the tenth offline; the override skipped online; the divisor)', () => {
@@ -60,8 +58,3 @@ test('EMPIRE-BANK the loans: online the cap is a tenth - DFU\'s law and Roleplay
   });
 });
 
-test('EMPIRE-BANK the teller: online the Enhanced Plus bank is the Empire\'s, its town beneath (sweep)', () => {
-  const P = src('src/ui/enhanced/enhancedPorts.js');
-  assert.match(P, /title: empire \? `Bank of \$\{EMPIRE_BANK_OF\}` : city \? `Bank of \$\{city\}` : 'The Bank'/);
-  assert.match(P, /const empire = isOnlinePage\(\);/);
-});

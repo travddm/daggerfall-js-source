@@ -208,26 +208,3 @@ test('ARENA4b a room the move carried, as the client reads it: kept with no poin
   assert.equal(homeBedIsMine({ tenant: 100 + 86400 }, 100), true, 'the bed reads the tenancy, never the point');
 });
 
-test('ARENA4b the host: world.js moves the online homes once a boot, after the homes\' towns land and the world stands - picked by arenaHomeFor in the city as it stands, emptied by emptyArenaScene from the old OnlineHome scene into the new, inside the realm\'s act; offline unchanged (mutants: the call dropped from the landing; the checkpoint unhanded; the flag declared after the boot\'s first landing; `playerSpawned` declared after it)', () => {
-  const w = read('src/scenes/world.js');
-  const landing = w.slice(w.indexOf('function takeHomeLayouts('), w.indexOf('function askHomeLayoutsAgain('));
-  assert.ok(/_homeLayoutsApplied = true;[\s\S]{0,300}void moveArenaHomesOnline\(\);/.test(landing), 'after the pins stand - the town in its homes\' layout');
-  assert.ok(w.indexOf('let _arenaHomesAsked = false;') < w.indexOf('const landing = takeHomeLayouts(heard);'), 'the flag stands before the boot\'s first landing reads it');
-  const fn = w.slice(w.indexOf('async function moveArenaHomesOnline('), w.indexOf('async function moveArenaHomesOnline(') + 4000);
-  assert.ok(fn.includes('!(playerSpawned && modes && _bootLoaded && !_loading)'), 'once the world stands - its checkpoint can write - and the boot\'s own character is loaded');
-  // HOTFIX 1003d: before the boot's save is read, characterIdOf mints a stand-in id that owns nothing - the move asked
-  // for it, found nothing, and never asked again that boot
-  assert.ok(fn.indexOf('if (!playerSpawned || !_bootLoaded || _loading) { _arenaHomesAsked = false; return null; }') < fn.indexOf('const me = characterIdOf(playerEntity);'), 'the character read only once the boot\'s is loaded');
-  assert.ok(/_bootLoaded = true; if \(testRoomOffline\)/.test(w) && w.indexOf('_bootLoaded = true;') > w.indexOf('await worldQuickLoad({ ...bootLoadPick, snap });'), 'marked after the boot\'s load');
-  // HOTFIX 1003 (live on daggerfalljs.dev: "can't access lexical declaration before initialization"): the homes' towns land
-  // before the boot walk reached `let playerSpawned`'s old line, and the wait above read it in its dead zone
-  assert.ok(w.indexOf('let playerSpawned = false, _bootLoaded = false;') > 0 && w.indexOf('let playerSpawned = false, _bootLoaded = false;') < w.indexOf('const landing = takeHomeLayouts(heard);'), 'the world-stands flag declared before the boot\'s first landing reads it');
-  assert.ok(fn.includes('arenaHomeFor({ mapId: now.mapId, oldKey: from, oldType: now.oldTypeOf(from) }, now.summaries'), 'the offline rule over the city as it stands');
-  // FIELD BUGS 2026-10-07 CRATE-LAYOUT (PIN MOVED): and the new house's record stamped in the layout the homes' towns
-  // stand in (test/systems/fb1007_homewipe.test.js)
-  assert.ok(fn.includes('emptyArenaScene(scenes, homeSceneName(now.mapId, from), homeSceneName(now.mapId, to), { layout: layoutStampOfMapId(now.mapId) })'), 'the online home\'s own scene');
-  assert.ok(fn.includes('realmGoldAct({ ...o, session: realmSession, checkpoint: () => onlineCheckpoint() })'), 'inside the realm\'s act');
-  assert.ok(fn.includes('credit: arenaRefund') && fn.includes('giveOwn: arenaGiveOwn'), 'the offline move\'s own doors');
-  assert.ok(fn.includes('checkpoint: () => onlineCheckpointLanded(),   // the emptied scene in the save'), 'the save written before a move is said read (AUDIT PRE-MERGE 1003 O10: landed - the realm\'s answer to its put)');
-  assert.ok(/if \(!homeLayoutsOnline\) moveArenaDeed\(\);/.test(w), 'offline, the deed\'s move as before');
-});

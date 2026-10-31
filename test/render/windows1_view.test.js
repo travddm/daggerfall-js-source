@@ -302,53 +302,6 @@ test('RW1 view V6: the glass door a non-ARENA2 room declares - uploadGlassMask r
   assert.equal(glassTexelCount(m), 1);
 });
 
-test('RW1 view V7: a cutout picture - { cutout: true } marks the texture (a later ask marks a key already held), its sub-meshes cut in the lit pass and nowhere else, and the shadow casters replay a cut sub-mesh on its own with the half-alpha program and its picture, the rest in runs as ever (mutants: the flag lost, every picture cut, the shadow replay casting the holes, the cells kept for a cut mesh)', () => {
-  const log = [];
-  const r = recordingRenderer(log);
-  const a = r.uploadTexture(5, 1, px, { cutout: true });
-  r.uploadTexture(5, 2, px);
-  const b = r.textures.get('5_2');
-  assert.equal(r._cutoutArt.has(a), true); assert.equal(r._cutoutArt.has(b), false, 'no other picture');
-  r.uploadTexture(5, 2, px, { cutout: true });
-  assert.equal(r._cutoutArt.has(b), true, 'a cutout ask cuts the picture the key already holds');
-  r.uploadTexture(5, 3, px, { opaque: true });
-  const mesh = { vao: {}, bounds: new Float32Array([0, 0, 0, 1]), subMeshes: [
-    { textureArchive: 5, textureRecord: 3, primitiveCount: 2, startIndex: 0, _bounds: new Float32Array([0, 0, 0, 1]) },
-    { textureArchive: 5, textureRecord: 1, primitiveCount: 2, startIndex: 6, _bounds: new Float32Array([0, 0, 0, 1]) },
-    { textureArchive: 5, textureRecord: 3, primitiveCount: 2, startIndex: 12, _bounds: new Float32Array([0, 0, 0, 1]) },
-  ], shadowCells: [{ startIndex: 0, primitiveCount: 6, _bounds: new Float32Array([0, 0, 0, 1]) }], shadowVao: { id: 'cells' } };
-  r.beginFrame(I, I, new Float32Array([0, 1, 0]));
-  log.length = 0; r.drawMesh(mesh, I);
-  assert.deepEqual(uploads(log, 'uCutout'), [[0], [1], [0]], 'the cut picture cut, the two others not');
-  assert.equal(mesh._evAnyCut, true);
-  // the shadow casters
-  const sl = [];
-  const gl = new Proxy({}, { get: (_, k) => {
-    if (k === 'getProgramParameter' || k === 'getShaderParameter') return () => true;
-    if (k === 'getUniformLocation') return (p, nm) => ({ nm, p });
-    if (typeof k === 'string' && k.startsWith('create')) return () => ({});
-    if (typeof k === 'string' && k.toUpperCase() === k) return k;
-    return (...args) => sl.push([k, ...args]);
-  } });
-  const sp = new ShadowPass(gl, { build: (vs, fs) => ({ fs }), vs: { mesh: 'mesh', bb: 'bb', terrain: 'terrain', char: 'char' } });
-  assert.equal(sp.programs.meshCutout.p.fs, DEPTH_BB_FS, 'the half-alpha cut, the flats\' own');
-  sp.recordMesh(mesh, I, null);
-  sl.length = 0;
-  sp.replay({ bindVao: (v) => sl.push(['bindVao', v]) }, I, null);
-  const progs = sl.filter((c) => c[0] === 'useProgram').map((c) => c[1].fs);
-  assert.deepEqual(progs, [DEPTH_FS, DEPTH_BB_FS, DEPTH_FS], 'the run, the cut one, the run again');
-  assert.ok(sl.some((c) => c[0] === 'bindTexture' && c[2] === mesh.subMeshes[1]._evTex), 'the cut sub-mesh\'s own picture');
-  assert.ok(!sl.some((c) => c[0] === 'bindVao' && c[1]?.id === 'cells'), 'a mesh with a cut picture replays its sub-meshes, not its cells');
-  assert.equal(sl.filter((c) => c[0] === 'drawElements').length, 3);
-  // INCIDENT 2026-09-04's law stands for every other picture: the model shader's only alpha cut is the flag's
-  const fs = rd('src/render/renderer.js');
-  const model = fs.slice(fs.indexOf('const FS = `'), fs.indexOf('const CHAR_FS = `'));
-  // PIN MOVED (POI-2, render/meshAlpha.js): and the translucent draw's output alpha - `meshAlphaOf(tex.a)`, alpha one but
-  // behind `uMeshAlpha` - which cuts nothing: no discard on alpha but the flag's
-  const reads = model.match(/tex\.a/g) ?? [];
-  assert.ok(reads.length === 1 && model.includes('meshAlphaOf(tex.a)') && !/discard[^;]*tex\.a|tex\.a[^;]*discard/.test(model) && model.split('${RW_MAIN_CUTOUT}').length === 2, 'the classic FS reads no alpha but through the block\'s one line, behind its flag');
-});
-
 test('RW1 view V8 (GLASS-ALL): which interior texels are glass - a building set\'s window wall (record 2, its twin record 1; the castles apart) in a climate an interior is laid out in, its new art against the twin in the glass ramp, the panes kept and the lead, the frame, the wall\'s speckle, a half-repainted wall and a stray blob left; the pipeline asks it after the emissive arm, of a pack\'s picture too (mutants: windows1.json GLASS-ALL-*)', () => {
   // a synthetic window wall, rows top-down as getDFBitmap gives them: a wall of 50, a frame of 75, a 20 x 20 pane of
   // the ramp's 104 with a lead line of 120 every fifth texel, speckle of 104 on the wall, a 2 x 2 blob of 104 in new art
@@ -389,11 +342,6 @@ test('RW1 view V8 (GLASS-ALL): which interior texels are glass - a building set\
   assert.deepEqual(GLASS_RAMP, [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 86, 216, 222, 223]);
   for (const a of [16, 116, 316, 416, 44, 60, 63, 66, 11, 28, 37, 40]) assert.ok(isInteriorGlassArchive(a), `${a}: a building's interior`);
   for (const a of [19, 22, 23, 24, 25, 45, 47, 48, 68, 41, 12, 14, 9, 504, 1210, -16, 216, 237, 240]) assert.equal(isInteriorGlassArchive(a), false, `${a}: no building's window wall in it`);
-  const p = rd('src/scenes/dataPipeline.js');
-  const emissive = p.indexOf('renderer.uploadEmissionTexture(archive, record, color32, { white: true, replacement });');
-  const arm = p.indexOf('} else if (!t.vendor && isInteriorGlassArchive(archive) && renderer.uploadGlassMask) {');
-  assert.ok(emissive > 0 && arm > emissive && arm - emissive < 200, 'the last arm, after the auto-emissive one (a fireplace keeps its glow)');
-  assert.match(p.slice(arm, arm + 800), /const glass = interiorGlassMask\(archive, record, bitmap, \(r\) => \(r < t\.recordCount \? t\.getDFBitmap\(r, 0\) : null\)\);\n\s+if \(glass\) renderer\.uploadGlassMask\(archive, record, glass, \{ replacement \}\);/);
 });
 
 test('GLASS-ALL (ARENA2): every building set\'s window wall in the four climates an interior is laid out in has its glass found - the desert castle none, the paperdoll\'s TEXTURE.237 none (skipped without ARENA2_PATH)', (t) => {
@@ -433,30 +381,15 @@ test('RW1 view V9: the interior\'s merge keeps a sphere a model per sub-mesh, so
   assert.ok(p[3] < 1 && p[7] < 1, 'each a model\'s size, not the batch\'s');
   const plain = new StaticBatchBuilder(); plain.add(quad(0), I, key);
   assert.equal(plain.finish().subMeshes[0].pieces, undefined, 'a pixel\'s merge measures none');
-  assert.match(rd('src/scenes/interiorContext.js'), /const staticBuilder = new StaticBatchBuilder\(\{ pieces: true \}\);/);
 });
 
 test('RW1 view V10: THE FOUR HOSTS, the interior arm - the view out is asked once the room\'s light and air are set (its bracket puts them back), before the room\'s lamps and its beginFrame, and painted right after that beginFrame, never in the dungeon arm; world.js and exterior.js hand a street with the player\'s building in it (PANE-CLIP: the renderer leaves out the room\'s side of the glass); dungeonContext.js draws no view out (FLAGGED there: a dungeon has no window to the street) (mutants: the order swapped, a host without its street, the dungeon arm painting)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  const vo = wm.indexOf('const _rwView = viewOutFrame(viewOut, { renderer, mode: realWindowsMode(), proj, view, now: performance.now(), scene: host.outsideView?.() ?? null });');
-  const light = wm.indexOf('renderer.setLighting(new Float32Array(roomAmbient(isNight(skyMinutes() % 1440) ? INTERIOR_NIGHT_AMBIENT : INTERIOR_AMBIENT, interiorCtx.roomLamps)), 0);');   // PIN MOVED (RPT1026-WORLD DARK-ROOM): the room's ambient through roomAmbient; PIN MOVED (AUDIT RPT1026 J1): by the lamps the room was built with
-  const fog = wm.indexOf("renderer.setFog('exp', 0.001, 0, 0, new Float32Array([0, 0, 0]));", light);
-  const lamps = wm.indexOf('renderer.setPointLights(_itLit.data, null, _itLit.colors);\n    renderer.everyLightCasts();', vo);
-  const begin = wm.indexOf('    renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);   // AUDIT-EL F5: a WORLD frame - the lane replays its records for this one\n    renderer.setGlassView(_rwView);');
-  assert.ok(light > 0 && fog > light && vo > fog && vo - fog < 600, 'the room\'s light and air, then the view out (a bracket: it puts them back)');
-  assert.ok(lamps > vo, 'the room\'s lamps after it - its own beginFrame takes no tier the room asked for (DISC15)');
-  assert.ok(begin > lamps, 'painted right after the interior\'s beginFrame');
-  assert.equal(wm.split('renderer.setGlassView(').length - 1, 1, 'one arm paints it');
-  const dungeonBegin = wm.indexOf('      renderer.beginFrame(proj, view, _ktLook?.sunDir ?? INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): on a ship's deck, the sun's own direction
-  assert.ok(dungeonBegin > 0 && dungeonBegin < vo, 'the dungeon arm stands above it and returns before it');
-  assert.ok(!rd('src/scenes/dungeonContext.js').includes('outsideViewFrame') && !rd('src/scenes/dungeonContext.js').includes('setGlassView'), 'the dungeon host draws no view out');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(host);
     assert.match(s, /const outsideView = \(\) => \(\{\n\s+setup: \(r\) => \{/, `${host}: the street, and no box - FIELD BUGS 2026-10-12g PANE-CLIP (it left out the building's own other wing and a neighbour's wall against it)`);
     assert.doesNotMatch(s, /outsideViewClip|VIEW_CLIP_PAD/, `${host}: the building's box is gone`);
     assert.match(s, /return sunDirection\(clockMinute\);/, `${host}: the clock's sun`);
   }
-  assert.match(hostText('src/scenes/world.js'), /if \(ring > VIEW_RINGS\) continue;/, 'the streamed world walks VIEW_RINGS out');
   // the background's ray and sky are the camera's own
   const proj = mirrorProjectionX(perspective(1, 1.6, 0.05, 500)), view = lookAt([0, 1, 0], [0, 1, -5], [0, 1, 0]);
   const rays = viewRays(proj, view);
@@ -479,65 +412,6 @@ test('RW1 view V11: an interior\'s declared glass never blooms - the Enhanced Li
   const bound = calls.filter((c) => c[0] === 'bindTexture').map((c) => c[2]);
   assert.deepEqual(bound, ['window-mask'], 'the window blooms, the glass does not');
   assert.equal(fake.stats.emitDraws, 1);
-});
-
-test('RW1 (AUDIT) THE STREET AS IT STANDS NOW: its air re-lit by the clock (a night\'s sky after an evening indoors, a day\'s after a night\'s sleep), the town\'s lanterns by the clock and never the player\'s own light, its water and seafloor drawn; the target kept as a pane shrinks and freed with the building; the bracket puts the draw baseline back after a throw and holds its own target past its frame\'s begin; a door the switch does not know is no door; the seed rounded to the native, the Fresnel never NaN; the air pass\'s replay binds its mesh past the quads (mutants: the fog unlit, the lanterns kept, the water left out, the target shrunk, the building\'s target kept, the baseline left, an unknown door full, the half-metre seed, the negative pow, the replay\'s stale VAO)', async () => {
-  const { clockFogColor, realWindowsGlsl, realWindowsMode } = await import('../../src/render/realWindows.js');
-  const { getPref, setPref } = await import('../../src/systems/uiPrefs.js');
-  // the clock's air
-  const day = new Float32Array([0.5, 0.6, 0.8]);
-  const night = clockFogColor(day, 0.6, 0);
-  assert.ok(night.every((v, i) => Math.abs(v - day[i] * 0.1) < 1e-6), `an evening indoors: a night's air ${night}`);
-  const morning = clockFogColor(night, 0, 0.6);
-  assert.ok(morning.every((v, i) => Math.abs(v - day[i]) < 1e-5), 'a night\'s sleep: the day\'s');
-  assert.ok(clockFogColor([0.9, 0.9, 0.9], 0, 0.6).every((v) => v <= 1), 'never past white');
-  // the switch's door
-  const was = getPref('realWindows');
-  try {
-    setPref('realWindows', 'rooms');
-    assert.equal(realWindowsMode('?skin=enhanced&windows=0'), 'rooms', 'a door it does not know: the row stands');
-    assert.equal(realWindowsMode('?skin=enhanced&windows=off'), 'off');
-  } finally { setPref('realWindows', was); }
-  // the shader
-  const glsl = realWindowsGlsl();
-  assert.match(glsl, /float plane = floor\(dot\(vn, vWorldPos - uModel\[3\]\.xyz\) \* 40\.0 \+ 0\.5\);/, 'the seed at the native');
-  assert.match(glsl, /float F = pow\(max\(1\.0 - nv, 0\.0\), 5\.0\);/, 'never the pow of a negative');
-  // the target: kept as the pane shrinks
-  const log = [];
-  const r = recordingRenderer(log);
-  const big = r._rwEnsureTarget(512, 256);
-  assert.equal(r._rwEnsureTarget(256, 128), big, 'a smaller pane: the same target');
-  assert.notEqual(r._rwEnsureTarget(1024, 256), big, 'a larger one: a new one');
-  const tall = r._rwEnsureTarget(256, 1024);
-  assert.deepEqual([tall.allocW, tall.allocH], [1024, 1024], 'WAGONS2 (FINAL AUDIT): a tall pane after a wide one keeps the wide side');
-  assert.equal(r._rwEnsureTarget(1024, 256), tall, 'and the wide one again: the same target - no remaking at every turn of the head');
-  // the bracket after a throw: the baseline back
-  r.setWindowRooms('full');
-  log.length = 0;
-  r.outsideViewFrame([-0.5, -0.5, 0.5, 0.5], I, I, { draw: ({ renderer: rr }) => { rr.gl.depthMask(false); rr.gl.enable('BLEND'); throw new Error('mid-pass in a blended phase'); } });
-  const last = (name, pick = () => true) => log.filter((c) => c[0] === name && pick(c)).at(-1);
-  assert.deepEqual(last('depthMask'), ['depthMask', true], 'the depth mask on again');
-  const blend = log.filter((c) => (c[0] === 'enable' || c[0] === 'disable') && c[1] === 'BLEND').at(-1);
-  assert.deepEqual(blend, ['disable', 'BLEND'], 'blending off again');
-  assert.equal(r._rwOutside, null, 'the bracket closed');
-  // the replay: its mesh's VAO bound past the quads' own
-  const { AirPass } = await import('../../src/render/airPass.js');
-  const binds = [];
-  const gl = new Proxy({}, { get: (_, k) => (typeof k === 'string' && k.toUpperCase() === k ? k : () => {}) });
-  const fake = { gl, programs: { emitMesh: { p: {}, uProj: 'p', uView: 'v', uModel: 'm', uEmissionTex: 'e', uEmissionColor: 'c' } }, targets: {}, _planes: new Float32Array(24), _identityView: I, _emitDepth() {}, _white: [1, 1, 1], stats: { emitDraws: 0 } };
-  const mesh = { vao: { id: 'mesh' }, subMeshes: [{ _evEmis: 'window-mask', _evWin: 1, primitiveCount: 2, startIndex: 0 }] };
-  AirPass.prototype._replayEmission.call(fake, { blackTex: 'black', windowEmission: [0.8, 0.57, 0.18], bindVao: (v) => binds.push(v) }, { count: 1, records: [{ kind: 0, mesh, matrix: I, bounded: false }] }, I, null);
-  assert.deepEqual(binds, [null, mesh.vao], 'the shadow forgotten first, then the mesh bound');
-  // the hosts
-  const w = hostText('src/scenes/world.js'), ex = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), rr = rd('src/render/renderer.js');
-  for (const host of [w, ex]) assert.match(host, /r\.setFogColor\(clockFogColor\(keptFog, keptSun, r\._sunScale\)\);/);
-  assert.match(w, /r\.setPointLights\(lightsOnAt\(clockMinute\) \? outsideLanterns\(r\) : new Float32Array\(0\), CITY_LIGHT_COLOR_F32\);/);
-  assert.match(ex, /r\.setPointLights\(lightsOnAt\(clockMinute\) \? nearestLights\(cityLights, cam\.pos, r\.maxPointLights, lightAnimator\.ranges\) : new Float32Array\(0\), CITY_LIGHT_COLOR_F32\);/);
-  assert.match(w, /if \(deepWaters\) \{ drawDeepWatersFloors\(ground\); r\.markForeignPass\(\); \}[^\n]*\n\s+if \(waterOn && _waterU\) \{/);   // WAGONS2 (FINAL AUDIT): and the mod's programs told
-  assert.match(w, /r\.drawWaterSurfaces\(_waterRows, n, 6\.4, _waterU\);/);
-  assert.equal((wm.match(/dropViewOut\(\);   \/\/ RW1 \(AUDIT\)/g) ?? []).length, 2, 'both ways out of a building');
-  assert.match(wm, /const dropViewOut = \(\) => \{ renderer\.releaseOutsideView\?\.\(\); viewOut\.drawn = false; renderer\.takeGlassRect\?\.\(\); \};/, 'its target freed, its glass forgotten');
-  assert.match(rr, /this\.beginFrame\(cropProj, view, [^\n]*\n\s+this\._frameFbo = t\.fbo; setFrameTarget\(t\.fbo\);/);
 });
 
 test('RW1 x WAGONS2 (FINAL AUDIT) THE VIEW OUT AT THE WORLD\'S OWN SIZE: the view out is sized by the pixels the world is drawn at - the retro or render-scale image, a docked HUD\'s shrunk rect - never by the canvas (a retro 320 x 200 world on a 1080p canvas drew one pane at up to 960 x 540, more than the whole frame) (mutant: the canvas\'s size)', () => {

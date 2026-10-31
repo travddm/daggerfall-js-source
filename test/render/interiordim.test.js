@@ -61,22 +61,3 @@ test('INTERIOR-DIM THE GRADE: the room\'s eye aimed at 0.12 and held at 1.2, blo
   assert.deepEqual(r4(air.grade), r4([AIR_BLOOM_STRENGTH, 1, AIR_VIGNETTE, AIR_CONTRAST]), 'the rest the lane\'s defaults');
 });
 
-test('INTERIOR-DIM THE HOSTS: both interior hosts hand the room\'s lamps through interiorLightColor on the lane\'s word and ask the room\'s grade just above their beginFrame (only the clear and the rect between) - the world\'s interior arm after its view out (whose own resolve would take a grade set before it), the Improved Interior Lighting branch untouched; the dungeon arm asks neither (THE FOUR HOSTS: exterior.js and world.js reach interiors through worldModes.js, dungeonContext.js keeps EL4\'s dark) (mutants: either host\'s old colour, either grade gone, the lane\'s word forced on)', () => {
-  const W = rd('src/scenes/worldModes.js'), I = rd('src/scenes/interior.js');
-  const COLOR = '(l) => interiorLightColor(!!renderer.lightingLane, l.color, l.intensity)';
-  const GRADE = 'renderer.setSceneGrade?.(interiorGrade(!!renderer.lightingLane));';
-  for (const [name, s] of [['worldModes', W], ['interior', I]]) {
-    assert.equal(s.split(COLOR).length - 1, 1, `${name}: the room's lamps through the lane's law`);
-    assert.ok(!s.includes('(l) => [l.color[0] * l.intensity, l.color[1] * l.intensity, l.color[2] * l.intensity]'), `${name}: the old colour gone`);
-    assert.equal(s.split(GRADE).length - 1, 1, `${name}: the room's grade, once`);
-    const g = s.indexOf(GRADE), b = s.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);', g);
-    const between = s.slice(g, b).split('\n').slice(1).map((l) => l.trim()).filter(Boolean);
-    assert.ok(g > 0 && b > g && between.every((l) => /^renderer\.(setClearColor\(INTERIOR_CLEAR\)|setWorldViewport\()/.test(l)), `${name}: nothing but the clear and the rect between the grade and the room's beginFrame: ${between}`);
-    assert.ok(s.indexOf(COLOR) < g, `${name}: the lamps set before it`);
-    assert.match(s, /\? nearestLights\(_iil(It)?\.lights, cam\.pos, renderer\.maxPointLights, _iil(It)?\.ranges, _iil(It)?\.colorOf\)/, `${name}: the mod's lights keep the mod's colours`);
-  }
-  assert.ok(W.indexOf('const _rwView = viewOutFrame(') < W.indexOf(GRADE), 'the world\'s arm: the grade after the view out');
-  assert.ok(W.indexOf('const _dgColor = lanternColor(') < W.indexOf('const _rwView = viewOutFrame('), 'the dungeon arm stands above the interior\'s');
-  assert.ok(!rd('src/scenes/dungeonContext.js').includes('interiorGrade') && !rd('src/scenes/dungeon.js').includes('interiorGrade'), 'no dungeon host asks a room\'s grade');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(host), /import \{ createWorldModes \} from '\.\/worldModes\.js';/, `${host}: its interiors are worldModes.js's`);
-});

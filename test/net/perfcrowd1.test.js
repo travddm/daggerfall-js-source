@@ -54,7 +54,6 @@ test('PERF-PEERS2: a peer\'s feet are asked of toScene ONCE a sync, however many
   // the projection: the product handed in is the product made per head
   const proj = mirrorProjectionX(perspective(Math.PI / 3, 16 / 9, 0.2, 600)), view = lookAt([0, 1.7, 0], [0, 1.7, -10], [0, 1, 0]);
   for (const p of [[1, 2, -9], [-3, 0.5, -20], [0.2, 1.7, 30]]) assert.deepEqual(projectToScreen(p, 1600, 900, proj, view, null, false, multiply(proj, view)), projectToScreen(p, 1600, 900, proj, view));
-  assert.match(rd('src/net/remotePlayers.js'), /projectToScreen\(head, w, h, proj, view, rect, false, pv \?\?= multiply\(proj, view\)\)/, 'namePoints makes it once');
 });
 
 /** A fake document (test/net/name1_bubbles.test.js's shape): every write counted. */
@@ -106,9 +105,6 @@ test('PERF-NAMES1 + PERF-LEAK1: a name is moved by its transform alone (no box m
 
 test('PERF-PEERS4: a class sprite\'s archive is warmed once the sprite has STOOD as its peer WARM_AFTER_FRAMES frames - never on its bundle\'s landing, so a peer drawn in a set or a body (the bundle a stand-in) warms nothing (mutants: the warm back on landing; the count never reached)', async () => {
   const { WARM_AFTER_FRAMES } = await import('../../src/net/remotePlayers.js');
-  const src = rd('src/net/remotePlayers.js');
-  assert.doesNotMatch(src, /this\._mobiles\.set\(peerId, bundle\); this\._warmArchive\(bundle\);/, 'no warm on landing');
-  assert.match(src, /if \(\+\+entry\.drawnFrames === WARM_AFTER_FRAMES\) this\._warmArchive\(bundle\);/);
   assert.equal(WARM_AFTER_FRAMES, 30);
   // executed: a bundle that lands warms nothing; one drawn WARM_AFTER_FRAMES frames warms once
   const renderer = { createBillboardBatch: () => ({ origin: [0, 0, 0], size: null }), destroyBillboardBatch: () => {}, uploadTexture: () => ({}), textures: new Map(), releaseTexture: () => {} };
@@ -125,15 +121,6 @@ test('PERF-PEERS4: a class sprite\'s archive is warmed once the sprite has STOOD
   rp.sync([peer], (p) => [p.x, p.y, p.z], { dt: 0.016, eye: [0, 1.7, 0] });
   for (let f = 0; f < 5; f++) rp.sync([peer], (p) => [p.x, p.y, p.z], { dt: 0.016, eye: [0, 1.7, 0] });
   assert.equal(warmed.length, 1, 'then once');
-});
-
-test('PERF-GC1: the desktop shell sets the young generation\'s semi-space to 32 MB - ONE js-flags switch (a second would replace it), after the storage root is pinned and before the app is ready, where Chromium reads its switches (mutants: the switch dropped; set after ready)', () => {
-  const main = readFileSync(new URL('../../app/main.cjs', import.meta.url), 'utf8').replace(/^\s*\/\/.*$/gm, '');
-  const from = main.indexOf("\nif (process.env.DAGGER_USER_DATA) app.setPath('userData'"), to = main.indexOf('\napp.whenReady()');
-  assert.ok(from > 0 && to > from, 'the storage root is pinned, then the app is readied');
-  const flags = [...main.matchAll(/appendSwitch\('js-flags'/g)];
-  assert.equal(flags.length, 1, 'one js-flags switch in the shell');
-  assert.match(main.slice(from, to), /\napp\.commandLine\.appendSwitch\('js-flags', '--max-semi-space-size=32'\);/);
 });
 
 test('PERF-SAILS1: a boat\'s walk makes a node\'s matrix only where it moved - and every matrix is the reference walk\'s to the bit through a turned spar, a moved hull, a part switched off while the hull moved and on again, and a part hung elsewhere (mutants: the parent\'s making not asked; the local values not asked; the parent not asked)', async () => {

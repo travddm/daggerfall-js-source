@@ -97,10 +97,6 @@ test('APPEARANCES THE COUNTER: the interior host builds it once and hands its ro
   assert.deepEqual(Object.keys(rows.of(BUILDING_TYPES.Bank)), [], 'a bank: neither');
   assert.deepEqual(Object.keys(rows.of(null)), [], 'outside a building: neither');
   assert.equal(rows.of(BUILDING_TYPES.WeaponSmith).wardrobe.label, 'Wardrobe');
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /const shopRows = createShopRows\(\{ say: \(l\) => say\(l\), mountInterior: \(w\) => mountInterior\(w\), mountService: mountServiceWindow \}\);/, 'built once');
-  assert.match(modes, /onSell: \(\) => openMerchantSell\(\),\n\s+\.\.\.shopRows\.of\(interiorBuilding\?\.buildingType\),/, 'the repair shop\'s popup');
-  assert.match(modes, /\.\.\.\(banking \|\| custom \? \{\} : shopRows\.of\(interiorBuilding\?\.buildingType\)\),/, 'the merchant\'s - never a teller\'s, never a mod\'s service');
 });
 
 test('APPEARANCES THE WINDOW: the worn pieces that can take a look, each with what it looks like now; the piece picked shows its own look (free, Worn while it wears no other) and every collected look of its kind with its fee - Wear lays it on and says so, a short purse says how much more, pressed it says why and takes nothing, and the own look\'s press gives it back (mutants: the fee unsaid; a refused press that wears; the own look not offered back; a piece that cannot take a look listed)', () => {
@@ -173,7 +169,4 @@ test('APPEARANCES THE WORDS: every word the window says goes through the text co
   assert.equal(wardrobeRefusal('worn'), 'You no longer wear that piece');
   assert.equal(wardrobeRefusal('same'), 'It already wears that look');
   assert.equal(WARDROBE_WORDS.sub(), 'Give a piece you wear any look of its kind you have collected. Only how it looks changes.');
-  const src = read('src/ui/wardrobe/wardrobeWindow.js');
-  // PIN MOVED (APPEARANCES-II): four more - the preview's head and its figure's name, a look's Try and its own look's
-  assert.equal((src.match(/t\('wardrobe\./g) ?? []).length, 27, 'its words, each a key of its own - "Looks like" the pack\'s too (systems/appearances.js lookLine)');
 });

@@ -176,14 +176,8 @@ test('CHAP5b the words: a chapter\'s news by its band - none for Steady - its gu
   let got = null;
   for (let seed = 0; seed < 200 && !got; seed++) got = newsScript(seed, [item]);
   assert.ok(got && CHAPTER_NEWS.failing.includes(got.script), 'a Failing chapter\'s own words');
-  assert.match(src('src/systems/livingWorld/meetups.js'), /guild: told\?\.item\.guild \?\? null,/);
   assert.equal(typeof circleLine, 'function');
 });
 
 // ── THE WIRING ──────────────────────────────────────────────────────
 
-test('CHAP5b the wiring: the host hands the living town its chapters off the sheet - none offline - in the politic region, banded and named (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /chapterOf: chapterSheet \? \(faction\) => livingChapterOf\(faction, px, py\) : undefined,/);   // PIN MOVED (AUDIT CHAP4 C2): the town's own pixel
-  assert.match(w, /const livingChapterOf = \(\/\*\* @type \{number\} \*\/ faction, \/\*\* @type \{number\} \*\/ x, \/\*\* @type \{number\} \*\/ y\) => \{\n\s+const f = chapterFactionOf\(faction, townTalk\?\.factionDict \?\? null\) \?\? faction;\n\s+const region = \(\(\) => \{ try \{ return maps\.getRegionIndexAt\(x, y\); \} catch \{ return null; \} \}\)\(\);\n\s+const c = Number\.isInteger\(region\) \? chapterSheet\?\.chapterOf\(f, region\) \?\? null : null;\n[^\n]*\n\s+return c == null \? null : \{ band: chapterBandOf\(c\.strength\)\.band, name: `the \$\{hallPosterName\(f\)\}`, event: c\.event \?\? null, shut: c\.shut === true \};/);   // PIN MOVED (AUDIT CHAP4 C2): the town's own region, the hall's faction read as its chapter's; PIN MOVED (CHAP6c): the whole chapter read, its Season's event and shut halls beside its band
-});

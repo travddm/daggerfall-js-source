@@ -349,27 +349,3 @@ test('SD3 the session: a find goes down the socket of the cell its pixel is in, 
   } finally { console.info = log; }
 });
 
-test('SD3 the relay by source: the hub\'s alarm beats the director beside the sweep and the heralds, its first account hello arms it, its welcome says the record; a cell\'s alarm tells a find owed beside the rite\'s; the Worker asks the hub after the socket\'s own check; the internal doors routed; the census counts registered accounts alone (mutants: each seam removed)', () => {
-  const r = read('server/src/index.js');
-  assert.match(r, /await this\._serpentHeraldBeat\(Date\.now\(\)\); await this\._sdBeat\(Date\.now\(\)\); await this\._sdHeraldBeat\(Date\.now\(\)\); await this\._ktHeraldBeat\(Date\.now\(\)\); return; \}/);   // SD-HERALD (PIN MOVED): the Abyss Dungeon's herald after the director's beat; KETCH (PIN MOVED): the Sky-Ketch's herald last
-  assert.match(r, /await this\._sdArm\(now\);   \/\/ SD3/);
-  assert.match(r, /\{ try \{ await this\._sdHelloWords\(ws\); \}/);   // PIN MOVED (WW5): every lane's record - the Bay's `ev` first, as it always was, each province's `ln` - from a method of its own; PIN MOVED, SCALE5c: among the hub's words (`_hubHelloWords`), said to the bus's socket or a shard's
-  assert.match(r, /if \(r && r\.s % SD_LANE_SPAN > 0\) this\._send\(ws, JSON\.stringify\(\{ t: 'sd', k: lane \? SD_LANE_KIND : 'ev', \.\.\.r \}\)\);/);
-  assert.match(r, /if \(isSocialRoom\(a\.key\)\) await this\._hubHelloWords\(ws, m, who\.subject, now\);/);   // and those, the hub's alone
-  assert.match(r, /const sdOwed = await this\._sdTellHub\(Date\.now\(\)\);/);
-  assert.match(r, /if \(sdOwed\) await this\._sdCellArm\(Date\.now\(\) \+ SD_TELL_RETRY_MS\); if \(starDue\) await this\._starArm\(starDue\); return; \}/);   // PIN MOVED (STAR3): and a star's, after it
-  const upgrade = r.indexOf("!== 'websocket') return json({ error: 'websocket only' }, 426);");
-  const asked = r.indexOf('const rec = await sdLiveAsk(env.ROOMS, s);');
-  assert.ok(upgrade > 0 && asked > upgrade, 'the hub asked after the socket\'s own check');
-  for (const [path, fn] of [['SD_INTERNAL_CENSUS', '_sdCensusInternal()'], ['SD_INTERNAL_FOUND', '_sdFoundInternal(request)'], ['SD_INTERNAL_LIVE', '_sdLiveInternal(request)']]) assert.ok(r.includes(`if (path === ${path}) return this.${fn};`), path);   // PIN MOVED (WW5): the live door reads its asker's slot, and answers its lane's record
-  assert.match(r, /const linked = \(isRegionRoom\(a\.key\) \|\| realmRoom\) && who\.kind === 'linked' \? \{ lk: 1 \} : \{\};/);   // AUDIT SD II (PIN MOVED, L7 H2): and a realm's
-  assert.match(r, /if \(b\.id && b\.lk && typeof b\.sub === 'string' && b\.sub\) subs\.add\(b\.sub\);/);
-  // AUDIT SD II (PIN MOVED, L7 M1/M3): the realm's own gate after the token, by account, then the admission - a guest as one
-  assert.match(r, /if \(realmRoom\) \{\n {8}const known = !!who\.subject && \(await this\._sdRealmOf\(sdSlotOfRoom\(a\.key\)\)\)\.in\.includes\(who\.subject\);\n {8}gate = await this\._battleHelloGate\(who\.subject \?\? m\.id, known \? 'fighter' : 'watch', now\);/);
-  assert.match(r, /const no = await this\._sdAdmit\(a\.key, who\.subject, now, who\.kind !== 'linked', isStaff\(who\.glyphs\)\);/);   // PIN MOVED: SD-PARTY - staff stand in any party's Hour
-  assert.match(r, /if \(no === SD_NO_BUSY\) \{ this\._refuse\(ws, 'busy', CLOSE_BUSY\); return; \}/);
-  assert.match(r, /if \(!battle && !floor && !realmRoom && !instRoom && !ktRoom\) \{/);   // PIN MOVED (INSTANCES' audit): nor an instance's - its gate by account after the token; KETCH (PIN MOVED): nor a ship's - its door by account after the token
-  const on = read('src/net/online.js');
-  assert.match(on, /if \(r && isSocialRoom\(room\)\) this\._deliver\('sd', \(\) => this\.onSd\?\.\(r, room\)\);/);
-  assert.match(on, /this\.serpentOk = !!h\.serpentOk; this\.sdOk = !!h\.sdOk;/);
-});

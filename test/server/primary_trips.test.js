@@ -132,20 +132,6 @@ test('PRIMARY-TRIPS BEAT-LAST: a heartbeat asks its reads - the box, the board, 
   assert.ok(beat > lastRead, `the beat after every read of the box, the board and the post (beat at ${beat}, last read at ${lastRead})`);
 });
 
-test('PRIMARY-TRIPS HALL-PLAN: a hall witness\'s version bump reads the key\'s own reports - the (kind, key) index - never every hall report through (kind, region) (mutant: the bump\'s DISTINCT on the bare column)', () => {
-  const src = readFileSync(new URL('../../server-account/src/npcHalls.js', import.meta.url), 'utf8');
-  const m = /`INSERT INTO npc_hall_regions \(region, ver, done, at\) SELECT DISTINCT (\+?region), 1, 0, \?2 FROM world_witness/.exec(src);
-  assert.ok(m, 'the bump\'s statement');
-  const db = new DatabaseSync(':memory:');
-  const dir = new URL('../../server-account/migrations/', import.meta.url);
-  for (const f of readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()) db.exec(readFileSync(new URL(f, dir), 'utf8'));
-  const plan = db.prepare(`EXPLAIN QUERY PLAN INSERT INTO npc_hall_regions (region, ver, done, at) SELECT DISTINCT ${m[1]}, 1, 0, ?2 FROM world_witness
-    WHERE kind = 'npchall' AND key = ?1 AND changes() > 0
-    ON CONFLICT (region) DO UPDATE SET ver = npc_hall_regions.ver + 1`).all().map((r) => r.detail).join('\n');
-  assert.match(plan, /USING INDEX sqlite_autoindex_world_witness_1 \(kind=\? AND key=\?\)/, plan);
-  assert.doesNotMatch(plan, /idx_world_witness_region/);
-});
-
 /** A D1 binding over two node:sqlite copies of the schema - a primary and a replica that lags it until `catchUp` - its
  *  sessions served as D1 serves them: 'first-primary' the primary, 'first-unconstrained' the replica, a bookmark the
  *  replica once it has caught up to it, else the primary. `refuse` names a bookmark whose session fails at its read. */

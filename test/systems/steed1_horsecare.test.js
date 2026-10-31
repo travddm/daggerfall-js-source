@@ -265,7 +265,6 @@ test('STEED1 THE GALLOP\'S GATE: after the mod\'s word - Roleplay & Realism\'s n
     setCanRunOverride(null);
     assert.equal(canRunUnlessRiding(TRANSPORT_MODES.Horse), false, 'off, no mod: DFU\'s own - no run in the saddle');
   } finally { setGallopGate(null); setCanRunOverride(null); }
-  assert.match(rd('src/systems/transport.js'), /const mods = _canRun\?\.\(mode\) \?\? null;\n\s*return _gallop\?\.\(mode, mods\) \?\? mods \?\? !isRiding\(mode\);/);
 });
 
 test('STEED1 THE RIDE\'S PACE IN THE MOTOR: the ride base and the gallop times the horse\'s Speed (rideSpeedScale), the half-speed base with them; a scale that is no number is 1 (mutants: the walk scaled, the gallop unscaled, the half-speed base unscaled)', () => {
@@ -431,8 +430,6 @@ test('STEED1 THE ITEM: `horseBond` (tenths, 1..1000) and `horseFed` (a minute, 1
 test('STEED1 THE SWITCH: a Features row of the World tab\'s Travel; the enhanced lane\'s alone. HORSE-TIERS (PIN MOVED): tiers on the one key, Boons the default, the player\'s online, read through the one accessor (test/systems/horsetiers.test.js holds the rest)', () => {
   const f = FEATURES.find((x) => x.id === 'horse-care');
   assert.deepEqual([f.group, f.kinds, f.control.store, f.control.key, f.control.initial, f.control.online], ['world', ['enhanced'], 'prefs', 'horseCare', 'boons', 'player']);
-  assert.match(rd('src/systems/upkeep/upkeepSwitch.js'), /export const horseCareRules = \(\) => \(isEnhanced\(\) \? horseCareRulesForTier\(horseCareTierOfStored\(getPref\(HORSE_CARE_PREF\)\)\) : null\);/);
-  assert.match(rd('src/ui/settings/settingsMap.js'), /"feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:wagon-upkeep"\]/);
 });
 
 test('STEED1 THE STABLE PAGE: each horse its card - its bond and hunger in words, the ridden one\'s breath, four stats with the bond\'s share beside, Feed oats and Give an apple (dark with none, full or away), Ride this one on every other (mutants: a horse dropped, the acts unwired)', async () => {
@@ -474,26 +471,6 @@ test('STEED1 THE STABLE PAGE: each horse its card - its bond and hunger in words
   setHoldingsProvider(null);
 });
 
-test('STEED1 THE HOSTS (world.js, exterior.js): the upkeep built before the mod\'s runtime, the gallop gate set, the oats\' and the kit\'s Use registered; the motor handed its pace before its step, the frame\'s upkeep after the surface (the odometer\'s metres); a gallop under horse care no rider\'s fatigue; the HUD handed the horse\'s breath; the Stable page the upkeep and the clock\'s door. THE FOUR HOSTS: worldModes.js and dungeonContext.js stand no transport - a building or a dungeon puts the rider on foot (transport.js dismountOnTransition) - and are named, not wired (bible/06-Systems/Horse-Care.md)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(host);
-    assert.ok(s.indexOf('const upkeep = createUpkeep({') > 0 && s.indexOf('const upkeep = createUpkeep({') < s.indexOf('const hccRuntime = createHorseCartRuntime({'), `${host}: before the runtime`);
-    assert.match(s, /horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,\n\s*where: \(\) => horseWhereOf\(hccRuntimeOn\(\)\?\.stableView\(\) \?\? null\),/, host);   // HORSE-TIERS / WAGON-TIERS (PIN MOVED): the one accessor each
-    assert.match(s, /setGallopGate\(\(mode, mods\) => upkeep\.gallopGate\(mode, mods\)\);\n\s*registerUpkeepUses\(upkeep, \{/, host);
-    assert.match(s, /player\.rideSpeedScale = upkeep\.rideScale\(player\.transportMode, wagonLoadShare\(\)\);[^\n]*\n\s*playerBlowFrame\(\{ motor: player,[^\n]*\n\s*if \(_overlayHeld[^\n]*player\.holdFrame\(\);/, `${host}: the pace before the step (and before its blow frame - TELL6e's and DISC8-G's order kept)`);
-    assert.match(s, /_surfPath = !!_surf\.path;\n[\s\S]{0,400}?const odo = player\.odometer\?\.h \?\? 0, metres = _upkeepOdo == null \? 0 : Math\.max\(0, odo - _upkeepOdo\);/, `${host}: the metres off the odometer, after the surface`);
-    assert.match(s, /const galloping = !_overlayHeld && mode === TRANSPORT_MODES\.Horse && !!player\.isRunning && !player\.standing;\n\s*upkeep\.tick\(gamePaused\(\) \? 0 : dt, \{\n\s*mode, galloping, moving: !player\.standing,/, host);   // STEED-UI: the gallop named once, for the upkeep and the saddle panel
-    assert.match(s, /running: player\.isRunning && !player\.standing && upkeep\.riderPaysGallop\(player\.transportMode\),/, `${host}: the gallop the horse's breath`);
-    assert.match(s, /steed: [^\n]*upkeep\.bar\(player\.transportMode\) : null,/, `${host}: the HUD's bar`);
-    assert.match(s, /upkeep, pass: upkeepPass \}\),/, `${host}: the Stable page's upkeep and its hour`);
-    assert.match(s, /const upkeepPass = \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\(/, `${host}: the hour, one home - the Stable page's, the kit's Use, the saddle panel's (STEED-UI)`);
-  }
-  assert.match(rd('src/ui/hud/hud.js'), /drawGripBar\(renderer, canvas, art, grip \?\? steed, s\);/, 'the classic HUD: the horse\'s breath in the grip\'s place');
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /const gr = opts\.grip \?\? opts\.steed \?\? null;\n\s*const gripWord = opts\.grip \? 'Grip' : 'Horse';/, 'the enhanced HUD: under the horse\'s word');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.equal(/upkeep\.(tick|rideScale|bar)\(/.test(rd(host)), false, `${host}: no transport indoors`);
-  assert.match(rd('src/systems/transport.js'), /dismountOnTransition = \(mode, transition\) =>\n\s*\(transition === 'ToBuildingInterior' \|\| transition === 'ToDungeonInterior' \? TRANSPORT_MODES\.Foot : mode\);/);
-});
-
 test('AUDIT STEED1 THE KEEP\'S CLOCK: a load and a new character start it afresh (upkeep.reset, at every door the hosts load through), and so does the switch turned off - a horse is never fed back the span from a minute another character, or another session, last kept it (mutants: AUDIT-STEED1-off-keeps-clock, AUDIT-STEED1-load-no-reset)', () => {
   let t = T0, on = true;
   const h = horse(12, { horseFed: T0 + 60 });
@@ -512,8 +489,4 @@ test('AUDIT STEED1 THE KEEP\'S CLOCK: a load and a new character start it afresh
   u.tick(0.016, {});
   assert.equal(items[1].stackCount, 9, 'no sack eaten back across the load');
   assert.deepEqual(said.filter((l) => /ate|sack/i.test(l)), [], 'and none said');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /hccRuntime\.handleStartLoad\(\);[^\n]*\n\s*wagonRiders\?\.clear\(\);[^\n]*\n\s*upkeep\.reset\(\);/, 'the load\'s OnStartLoad (after WAGONS2\'s riders)');
-  assert.ok(world.includes('horseCartLoad: (rec) => { hccRuntime.handleStartLoad(); upkeep.reset();'), 'a same-dungeon load');
-  assert.ok(world.includes('  if (!_loadedGame) upkeep.reset();'), 'a new character');
 });

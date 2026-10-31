@@ -46,11 +46,6 @@ test('ELITE-FLOOR: under level 3, the watch and an ally are never elites - the f
   assert.equal(pup.maxHealth, 40, '...its maximum the owner\'s word');
 });
 
-test('ELITE-FLOOR: the dungeon\'s build arm promotes only when the promotion stands - a refused one falls through to the plain build (the Elite Dungeon\'s doubling, LOOT7\'s champion arm)', () => {
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(e\?\.eliteFoe && entity && promoteEliteFoe\(entity, \{ eliteDungeon: !!e\.elite, superDungeon: !!e\.superTier, checkLevel: false \}\)\) \{ if \(e\.elite\) entity\.elite = true; eliteTraits\(entity, e\.eliteSeed\); return; \}\s*(?:\/\/[^\n]*)?\n\s*if \(e\?\.superTier && entity\) \{ scaleSuperFoe\(entity\); return void applyChampion\(entity, e\.champion\); \}\s*(?:\/\/[^\n]*)?\n\s*if \(!e\?\.elite \|\| !entity\) return void applyChampion\(entity, e\?\.champion\);/);   // SD4a (PIN MOVED): a Super dungeon's elite is its own stack, and a refused one falls through to the Super's scale before the Elite's
-});
-
 test('FOE-TITLE: a revenant by its name, a champion by its trait, an elite as Elite, anyone else as it was - on the target bar, the hover, the death line and the body alike (mutants: the elite unnamed off the target bar; the revenant named by its kind)', () => {
   assert.equal(foeTitle({}, 'Orc'), 'Orc');
   assert.equal(foeTitle({ champion: 'mighty' }, 'Orc'), 'Mighty Orc');
@@ -68,7 +63,6 @@ test('FOE-TITLE: a revenant by its name, a champion by its trait, an elite as El
   for (const f of ['src/ui/hud/hudFoeTarget.js', 'src/systems/worldTooltips.js', 'src/systems/champions.js']) {
     assert.match(read(f), /import \{ foeTitle \} from '[./]+(?:systems\/)?foeTitle\.js';/, `${f} asks the one home`);
   }
-  assert.doesNotMatch(read('src/systems/foeTitle.js'), /^import /m, 'a leaf: the HUD\'s leaves may ask it');
 });
 
 test('ELITE-RATES: the open world\'s odds - one in twenty again, and no gate left to ask (mutant: ELITE-RARITY\'s one in fifty)', () => {

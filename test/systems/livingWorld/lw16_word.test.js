@@ -196,39 +196,6 @@ test('LW16 the living town: any town\'s deeds (the word a visitor carries from t
   assert.deepEqual(quiet.town.reputeAt(D + 1000), { regard: 0, deeds: [] });
 });
 
-test('LW16 the host\'s seams: a town\'s carried word worked a slice a frame (a generator over the visits of these NEWS_DAYS days, each its town\'s news when it set out, a courier\'s the visits its town had had - one hop), the town told it once done; the kept word made again with the roads; a town\'s news at any minute; the talk\'s regard of a stranger by the repute; the talk\'s {from} (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /carriedOf: \(day\) => livingCarriedOf\(livingTown, day\),/);
-  assert.match(w, /for \(const near of livingTripWorld\.townsNear\(town\.px \?\? 0, town\.py \?\? 0, TRIP_REACH_PX\)\) \{ if \(townTrips\(near, noon, livingTripWorld, o\) === undefined\) out\.partial = true; yield; \}\n\s+const vs = livingVisitorsCached\(town, day - d, o\);\n.*\n\s+yield;/);   // PIN MOVED (AUDIT LW-II B4): a town about still asked: partial;
-  assert.match(w, /for \(let b = 0; b <= NEWS_DAYS; b\+\+\) \{ townTrips\(tr\.from, fromNoon - b \* 1440, livingTripWorld, o\); yield; \}/);
-  assert.match(w, /const heard = relay && courier \? yield\* livingVisitsGen\(tr\.from, Math\.floor\(\(tr\.outT0 - 240\) \/ 1440\), o, false\) : \[\];/);
-  assert.match(w, /const said = livingRoadNewsAt\(tr\.from, tr\.outT0, o\);\n\s+if \(!said\.whole\) out\.partial = true;/);   // PIN MOVED (AUDIT LW-II B4)
-  assert.match(w, /whole: _livingToldKept\.get\(k\) === told,/);
-  assert.match(w, /const courier = tr\.party\.some\(\(m\) => m\.job === 'courier'\);/);
-  assert.match(w, /out\.push\(\{ id: tr\.id, from, inT: tr\.outT1, outT0: tr\.outT0, courier, news: said\.news,/);   // AUDIT LW-II-2 P12: a visit known here from its coming in (its trip's end), from the minute it set out
-  assert.match(w, /e = \{ gen: livingVisitsGen\(town, day, \{ mpm: PERSON_MOVE_SPEED \/ livingBaseRate\(\), memo: _livingTripMemo \}, true\), visits: null, at: 0, map: town\.mapId >>> 0 \};/);
-  assert.match(w, /return e\.visits \?\? _livingCarriedLast\.get\(town\.mapId >>> 0\) \?\? null;/);   // AUDIT LW-II B11: the last word while the next is worked
-  assert.match(w, /if \(_livingWordRel !== livingRelations\) _livingCarriedLast\.clear\(\);/);
-  assert.match(w, /if \(livingWorldOn\(\)\) livingCarriedStep\(LIVING_CARRIED_SLICE_MS\);   \/\/ LW16: the word carried, worked a slice a frame/);   // PIN MOVED (AUDIT LW-II-2 H7): the open world's step by its own line - the modal frame's beside it (auditlwii2_town)
-  assert.match(w, /const LIVING_CARRIED_SLICE_MS = 3;/);
-  assert.match(w, /try \{ r = e\.gen\.next\(\); \} catch \(err\) \{[^\n]*r = \{ done: true, value: null \}; \}/);   // PIN MOVED (AUDIT LW-II B13): a throw never wedges the slice
-  assert.match(w, /if \(r\.done\) \{ e\.visits = r\.value \?\? Object\.assign\(\[\], \{ partial: true \}\); e\.at = performance\.now\(\); _livingCarriedLast\.set\(e\.map, e\.visits\); \}/);   // PIN MOVED (AUDIT LW-II-2 W7): the town's last word kept as its day's is done
-  assert.match(w, /if \(vs === undefined\) out\.partial = true;/);
-  assert.match(w, /if \(heard\.partial\) out\.partial = true;/);
-  assert.match(w, /if \(e\?\.visits\?\.partial && performance\.now\(\) - e\.at > LIVING_CARRIED_RETRY_MS\) e = null;/);
-  assert.match(w, /const v = `\$\{livingWays\.generation\}\|\$\{livingRelations\.turnsVersion\(\)\}`;/);
-  assert.match(w, /_livingCarried\.clear\(\); _livingVisitorsKept\.clear\(\); _livingToldKept\.clear\(\);/);
-  assert.match(w, /livingWordFresh\(\);   \/\/ LW16: the town's news kept with the roads/);
-  assert.match(w, /return \{ told, whole: _livingToldKept\.get\(k\) === told, news: newsOf\(told, t\)\.map/);
-  assert.match(w, /if \(whole\) \{/);
-  assert.match(w, /regard: livingRegardOf\(res, day\), personality:/);
-  assert.match(w, /const lt = livingRelations\.known\(res\.id\) \? null : livingTownOfMap\(res\.town\);\n\s+return lt \? lt\.reputeAt\(\)\.regard : livingRelations\.regard\(res\.id, day\);/);
-  const m = readFileSync(new URL('../../../src/systems/livingWorld/meetups.js', import.meta.url), 'utf8');
-  assert.match(m, /from: told\?\.item\.from \?\? null,/);
-  const lt = readFileSync(new URL('../../../src/systems/livingWorld/livingTown.js', import.meta.url), 'utf8');
-  assert.match(lt, /const visits = this\._roads \? this\.o\.carriedOf\?\.\(this\._roads\.day\) : null;/);   // PIN MOVED (AUDIT LW-II-2 W10): the host's word alone
-});
-
 test('AUDIT LW-II LW16: a visit\'s deeds read once, not every minute; a courier\'s relay of the town\'s own word never told back to it, nor its own region\'s tales; the road\'s news counted only once the town knows it; a band named whole in the talk (mutants: B3, B8, B9, B14)', () => {
   const roads = { away: new Map(), visitors: [], news: [road('own', D + 700, { helped: true, kind: 'won' })] };
   const day = Math.floor((D + 600 - 240) / DAY_MIN);

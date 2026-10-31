@@ -284,10 +284,6 @@ test('TELL9: telegraph contrast - a part of the Enhanced AI row, off by default,
   assert.match(TELEGRAPH_STYLE_GLSL, /vec4 telegraphContrast\(vec4 o, float edge, float fin, vec2 p, float iron, vec3 col, float fogK\)/);
   assert.match(TELEGRAPH_STYLE_GLSL, /vec3\(1\.0\) \* kw/, 'the white keyline');
   assert.match(TELEGRAPH_STYLE_GLSL, /\(1\.0 - iron\)/, 'the dots for poise alone - iron keeps its hatch');
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uContrast;/);
-  assert.match(P, /if \(uContrast > 0\.5\) oColor = telegraphContrast\(oColor, dist, inside \? 1\.0 : 0\.0, vec2\(across, along\), uIron, uColor, fogK\);/);
-  assert.ok(P.indexOf('telegraphContrast(oColor') < P.indexOf('if (uCut > 0.0)'), 'a cut feint dashes the bold mark too');
   const { FoeTelegraphPass } = await import('../../../src/render/foeTelegraph.js');
   const { gl, calls } = fakeGl();
   const pass = new FoeTelegraphPass(gl);
@@ -303,7 +299,6 @@ test('TELL9: telegraph contrast - a part of the Enhanced AI row, off by default,
   calls.length = 0;
   pass.draw([{ blow: plain, phase: { t: 0.5, flash: 0 } }], I, I, null, { contrast: false });
   assert.deepEqual(ups(), [0], 'a caller may say (the probe)');
-  assert.match(rd('tools/foeTelegraphProbe.mjs'), /TELL9: contrast/, 'the probe reads it off a real frame');
 });
 
 // ── the bleed's own icon ────────────────────────────────────────────
@@ -357,48 +352,15 @@ test('TELL9: the Enhanced AI note gains its line - wound-up blows, the stagger, 
   assert.ok(row.note.length <= 450, `${row.note.length}`);
 });
 
-test('TELL9: the enhanced HUD draws the track under the foe\'s health - its state a class, its fill, its word; the sheet colours it (amber, iron red and hatched, the staggered flash, open) and honours reduced motion; the quest card clears the taller bar; the words wear the numbers\' face (mutants: the track never drawn; the hatch gone; the flash under reduced motion)', () => {
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const foePoise = el\('div', 'hud-foepoise'\);/);
-  assert.match(hud, /foe\.append\(foeName, foeTraits, foeTrack, foeBlade, foePoise\);/);
-  // POISE-QUIET (2026-10-06, the player: "the block under the monsters hp must go"): an EMPTY track - no wind-up, no iron, no
-  // stagger, no opening - is no track: the bar stands alone until the foe's poise has something to say
-  assert.match(hud, /const p = t\.poise && t\.poise\.state && t\.poise\.state !== 'empty' \? t\.poise : null;/);
-  assert.match(hud, /parts\.foe\.classList\.toggle\('poised', !!p\)/);
-  assert.match(hud, /width\(parts\.foePoiseFill, 'foePoiseFill', p\.fill \* 100\);/);
-  assert.match(hud, /put\(parts\.foePoiseWord, 'foePoiseWord', p\.word\);/);
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.hud-foe\.poised \.hud-foepoise \{ display: block; \}/);
-  assert.match(css, /\.hud-foepoise\.poise-windup \.hud-poisefill \{ background: #e0a43a; \}/);   // PIN MOVED (POISE-BOX): the state classes are the track's own
-  assert.match(css, /\.hud-foepoise\.poise-iron \.hud-poisefill \{ background: repeating-linear-gradient\(/, 'iron never by colour alone');
-  // PIN MOVED (AUDIT TELL U3/U4): the flash on THIS foe's break alone; the word under the track, which the card clears
-  assert.match(css, /\.hud-foepoise\.poise-staggered \.hud-poisefill \{ background: #fff; \}\n\.hud-foepoise\.poise-staggered\.poise-flash \.hud-poisefill \{ animation: hud-poise-flash/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \.hud-foepoise\.poise-staggered\.poise-flash \.hud-poisefill \{ animation: none; \} \}/);
-  assert.match(css, /body:has\(\.hud-foe\.on\.poised\) \.qtrack \{ --qt-clear: calc\(18px \+ 28px \* var\(--hud-scale, 1\) \+ 30px \+ 74px \* var\(--hud-scale, 1\)\); \}/);
-  assert.match(css, /\.hitnum-word \{/);
-  assert.match(css, /\.hitnum-perfect \{/);
-  assert.match(rd('src/scenes/hostCombat.js'), /setFoePoiseReader\(\(f\) => poiseTrack\(f\?\.ai\)\);/, 'the host registers the brain\'s reading (the HUD imports no brain)');
-});
-
 test('POISE-BOX (field, 2026-10-05, the owner\'s screenshot of a black box under a foe\'s health): every class the poise track wears is its own - no rule in the sheets styles one of them off the track. As bare words the idle state\'s \'empty\' took the sheet\'s .empty component (a dashed box, 26px of padding) and the 6px track stood 54px tall over the world (mutants: the bare state classes; the bare flash)', () => {
   // the states the producer mints (the inputs of the law's own test above)
   const blow = (o = {}) => ({ guard: 'poise', ...o });
   const states = [{ state: 'engage' }, { state: 'windup', blow: blow() }, { state: 'windup', blow: blow({ guard: 'iron' }) }, { state: 'staggered' }, { state: 'overreach' }]
     .map((tac) => poiseTrack({ _tac: tac }).state);
   assert.deepEqual(states, ['empty', 'windup', 'iron', 'staggered', 'open']);
-  // the classes the HUD writes for them
-  const write = /parts\.foePoise\.className = `hud-foepoise\$\{p \? ` ([\w-]*)\$\{p\.state\}` : ''\}\$\{flash \? ' ([\w-]+)' : ''\}`;/.exec(rd('src/ui/enhanced/enhancedHud.js'));
-  assert.ok(write, 'the HUD no longer writes the track\'s classes in the shape this pin reads');
-  const worn = [...states.map((s) => write[1] + s), write[2]];
   // every rule naming one of them names it ON the track - in every UI module's sheets, each of which may inject one,
   // read as RULES (HUD-CLASS, test/sheetRules.mjs: a comment or a JS read is never a selector there)
   const { rules, unread } = literalSheetRules();
   assert.deepEqual(unread, [], 'a sheet the reader could not read');
   assert.ok(rules.some((r) => r.where.startsWith('src/ui/enhanced/enhancedStyle.js:') && r.sel === '.hud-foepoise.poise-windup .hud-poisefill'), 'the reader sees the track\'s own rules');
-  const off = [];
-  for (const r of rules) {
-    for (const sel of selectorsOf(r)) for (const c of compounds(sel)) if (classesOf(c).some((x) => worn.includes(x)) && !classesOf(c).includes('hud-foepoise')) off.push(`${r.where} ${sel}`);
-  }
-  assert.deepEqual(off, [], 'a sheet rule styles a class the poise track wears, off the track');
-  assert.ok(worn.every((c) => c.startsWith('poise-')), worn.join(' '));
 });

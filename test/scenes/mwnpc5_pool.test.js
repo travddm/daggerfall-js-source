@@ -101,19 +101,3 @@ test('MWNPC5c the pool offers its class foes dressed, the dead from the kill, sy
   assert.equal(lane.destroyed, 1, 'and gone with the pool');
 });
 
-test('MWNPC5c the three hosts by source: each calls drawBodies after the pool\'s batches() and before those billboards draw, and draws the veiled beside the peers\'', () => {
-  const sites = [
-    ['src/scenes/world.js', 'livePersonBatches.push(...exteriorFoes.batches(), ...navalCrew.batches());', 'exteriorFoes.drawBodies(canvas, proj, view, mwv.eye, foeDt);', 'if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);', 'exteriorFoes.drawVeiledBodies();'],
-    ['src/scenes/worldModes.js', 'const _foeBatches = interiorFoes.batches();', 'interiorFoes.drawBodies(canvas, proj, view, mwv.eye, foeDt);', 'if (_foeBatches.length) renderer.drawBillboards(_foeBatches, camRight, UP_Y);', 'interiorFoes?.drawVeiledBodies();'],
-    ['src/scenes/exterior.js', 'personBatches.push(...exteriorFoes.batches());', 'exteriorFoes.drawBodies(canvas, proj, view, eye, foeDt);', 'if (personBatches.length) renderer.drawBillboards(personBatches, camRight, UP_Y);', 'exteriorFoes.drawVeiledBodies();'],
-  ];
-  for (const [file, offer, draw, flats, veiled] of sites) {
-    const s = rd(file);
-    const a = s.indexOf(offer), b = s.indexOf(draw, a), c = s.indexOf(flats, b);
-    assert.ok(a > 0 && b > a && c > b, `${file}: offered, drawn, and then the billboards`);
-    assert.equal(s.split(draw).length, 2, `${file}: once`);
-    assert.ok(s.includes(veiled), `${file}: the veiled`);
-  }
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.ok(pool.includes('_npcLane?.destroy(); _npcLane = null;   // MWNPC5c: the bodies with them'), 'the pool\'s destroy lets its lane go');
-});

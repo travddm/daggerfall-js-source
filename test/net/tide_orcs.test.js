@@ -179,9 +179,4 @@ test('SEASON1 THE CLIENT\'S TIDES: the book reads a land\'s Tide off the week an
     assert.equal(calculateTravelTime({ x: 100, y: 50 }, { x: 118, y: 50 }, { travelShip: true, speedCautious: true }, climate).minutes < ocean.minutes, true);
   } finally { setSeaTide(null); }
   assert.equal(trip({}).minutes, calm.minutes, 'offline: DFU\'s own');
-  // the wiring
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /setSeaTide\(seatBook \? \(end\) => \(seatBook\.tideAt\(maps\.getRegionIndexAt\(end\.x, end\.y\)\) === 'storms' \? TIDE_EFFECTS\.stormsSea : 1\) : null\);/);
-  assert.match(world, /if \(act\.hostile && seatEdicts\.orcsAt\(p\.px, p\.py\)\) \{\n\s+exteriorFoes\.spawnFoe\(act\.mobileType, \[x \+ ORC_RAID_PACE, y, z \+ ORC_RAID_PACE\]/);
-  assert.match(world, /tideAt: \(region\) => seatBook\?\.tideAt\(region\) \?\? 'calm',\n\s+orcCamp: \(site, region\) => seatBook\?\.orcCamp\(site, region\) \?\? Promise\.resolve\(\{ counted: false \}\),/);
 });

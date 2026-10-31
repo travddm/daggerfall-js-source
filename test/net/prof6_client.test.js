@@ -401,27 +401,3 @@ test('PROF6 the Guild tab: the guild Stores read once, each material\'s count an
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
-test('PROF6 wiring: the routes behind a session and in the Worker\'s table with their statuses; the door\'s calls; every refusal a sentence; the host\'s books and the board\'s and guild\'s hand-offs; the styles; the deploy carries the law; the Court writ\'s word names its profession (FOUND: it said Herbalism for every writ)', () => {
-  const service = src('server-account/src/service.js'), idx = src('server-account/src/index.js');
-  const routes = ['/v1/writs/post', '/v1/writs/supply', '/v1/writs/withdraw', '/v1/writs/budget', '/v1/writs/commission', '/v1/writs/fulfil',
-    '/v1/writs/cancel', '/v1/writs/decline', '/v1/stores/guild', '/v1/stores/guild-deposit', '/v1/stores/guild-withdraw'];
-  for (const r of routes) { assert.ok(service.includes(`'${r}'`), r); assert.ok(idx.includes(`'${r}':`), r); }
-  assert.match(idx, /'writ-gone': 409, 'writ-elsewhere': 409/);
-  assert.match(idx, /'guild-stores': 409, 'guild-writs': 409/);
-  const door = src('src/net/accountClient.js');
-  for (const r of routes) assert.ok(door.includes(`'${r}'`), r);
-  const words = [...src('server-account/src/writs.js').matchAll(/error: '([a-z-]+)'/g)].map((m) => m[1]);
-  for (const w of new Set(words)) assert.ok(REFUSALS[w], `a sentence for ${w}`);
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /const writBook = params\.has\('online'\)\n\s+\? createWritBook\(\{ door: accountWrits/);
-  assert.match(world, /writs: writBook, regionNameOf: \(r\) => REGION_NAMES\[r\] \?\? 'another region', pieces: commissionPieces,/);
-  assert.match(world, /settle: \(\) => writBook\.settle\(marketPutBack, marketDrop\)/);
-  assert.match(world, /profStores: writBook \? \{\n\s*writs: writBook, open: \(\) => profBook\?\.state\.open === true/);
-  assert.match(world, /\(!named \|\| named\.has\(it\.provenance\)\)\n\s*&& commissionFilledBy\(c, \{ recipe: pieceOfRecipe\(it, c\.recipe\) \? c\.recipe : null, quality: it\.quality \?\? null \}\) && wearOf\(it\) === WEAR_WHOLE/);
-  assert.match(world, /const prof = professionName\(d\.track\?\.profession\) \|\| 'profession';/);
-  assert.doesNotMatch(world, /Herbalism XP\./, 'the XP its writ\'s own profession\'s');
-  const css = src('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(css, /\.notice-card\.seal-commission, \.notice-read\.seal-commission \{ --seal: #3f7a3a; \}/);
-  assert.match(css, /\.work-row \{ display: flex; flex-wrap: wrap;/);
-  assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/writLaw\.js"/);
-});

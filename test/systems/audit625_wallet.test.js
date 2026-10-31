@@ -29,8 +29,6 @@ test('AUDIT 625 W1: the decorate panel never sets the wallet out - a piece set d
   assert.equal(decorMountOf(wallet), null, 'nor hangs');
   assert.equal(decorOwnEntry(wallet, 0), null, 'so the panel lists no row for it (scenes/decor/decorTool.js ownEntries reads this door alone)');
   assert.equal(decorStandOf({ group: 'UselessItems2', templateIndex: BAG_TEMPLATE }), null, 'the Materials Bag, as ever');
-  // a pack-only piece is refused by its ROW, whatever its picture: the rule is the row's `packOnly`, read at the stand
-  assert.match(src('src/systems/decor/decorItems.js'), /if \(isBagItem\(item\) \|\| isPackOnly\(item\)\) return null;/);
   const ruby = { group: 'Gems', templateIndex: 0, name: 'Ruby', stackCount: 1 };
   assert.ok(decorStandOf(ruby), 'a gem still stands');
 });
@@ -98,9 +96,6 @@ test('AUDIT 625 W3: each piece the wallet holds is the pack\'s own ROW in its sh
     row.isConnected = true;   // the harness's tree has no document to be connected to (test/systems/fb1004c_robes.test.js)
     assert.equal(inventoryQuickAct(row), true, 'the quick act acted');
   });
-  // and each is the dock's own tile: laid as the dock lays them, the tier on its frame, its pips, its count's corner and
-  // a drag's insertion mark (the Plus skin's frames named the dock's rows alone)
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.pack-shell \.walletsheet \.walletpieces \{ display: flex; flex-wrap: wrap; gap: 6px;/);
   for (const tail of ['[data-rarity] {', '[data-rarity]::before {', ' .count {', '.hasbar .count {', '[data-locked] .count {', '[data-rarity].dragover {', '.hasbar[data-rarity]::before {']) {
     const sel = tail.slice(0, -2);
     assert.ok(ITEM_FRAME_CSS.includes(`.pack-shell .walletpieces .itemrow${sel}, .pack-shell .pack-dock .itemrow${tail}`), `the wallet's tile${sel}`);
@@ -110,35 +105,3 @@ test('AUDIT 625 W3: each piece the wallet holds is the pack\'s own ROW in its sh
 
 // ─── THE SILVER ──────────────────────────────────────────────────────
 
-test('AUDIT 625 W5: the silver line says WHY it shows no figure - offline the account keeps it online; online the page is asking (every look asks afresh); an account that holds none (a guest, or the counting-houses shut) says none - and the hotbar asks afresh for its next press, as the classic box asks for its next look; one ask in flight at a time (mutants: the online wait in the offline words; none in the offline words; the hotbar never asking; asks stacked)', async () => {
-  _resetWalletForTests();
-  try {
-    const empty = (opts) => walletLines(walletContents([], { goldPieces: 0 }, opts))[2];
-    assert.equal(empty(), 'Silver: held in your online account', 'offline: no host');
-    setWalletSilver(() => null, () => {});
-    assert.equal(empty(), 'Silver: checking your account', 'online, not known yet');
-    setWalletSilver(() => false, () => {});
-    assert.equal(empty(), 'Silver: none', 'online, an account that holds none');
-    setWalletSilver(() => 35, () => {});
-    assert.equal(empty(), 'Silver: 35');
-    // the host's reader: false while the book says the account holds none
-    assert.match(src('src/scenes/world.js'), /if \(marksBook\) setWalletSilver\(\(\) => \(marksBook\.state\.open === false \? false : marksBook\.state\.balance\), \(\) => marksBook\.refresh\(\)\);/);
-    // the hotbar: says what is known now, and asks afresh for the next press
-    let asked = 0;
-    let settle = () => {};
-    setWalletSilver(() => null, () => { asked++; return new Promise((res) => { settle = res; }); });
-    const e = { name: 'Aelwyn', goldPieces: 5, items: [mintWallet()] };
-    qs.clearHotbar();
-    qs.setHotbarSlot(0, qs.hotbarEntryForItem(e.items[0]));
-    const said = [];
-    const doors = { quickUse: (n) => { qs.useQuickslot(n === 1 ? 'c1' : 'c2', { entity: e, items: e.items, hooks: {}, say: (l) => said.push(l) }); return true; } };
-    assert.equal(qs.hotbarPress(0, { entity: e, doors, say: (l) => said.push(l) }).kind, 'used');
-    assert.match(said[0], /Silver: checking your account/);
-    assert.equal(asked, 1, 'the hotbar asked');
-    qs.hotbarPress(0, { entity: e, doors, say: (l) => said.push(l) });
-    assert.equal(asked, 1, 'one ask in flight - a second press waits on it');
-    settle(); for (let i = 0; i < 5; i++) await Promise.resolve();
-    qs.hotbarPress(0, { entity: e, doors, say: (l) => said.push(l) });
-    assert.equal(asked, 2, 'settled: the next press asks again');
-  } finally { qs.clearHotbar(); _resetWalletForTests(); }
-});

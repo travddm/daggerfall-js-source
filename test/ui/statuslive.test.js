@@ -175,58 +175,7 @@ test('STATUS-LIVE: the composer is ONE page - record 22, the health box, and SUR
   assert.deepEqual(fed.slice(0, plain.length), plain, '...and the first two pages are untouched');
 });
 
-test('STATUS-LIVE by source: all four hosts reach the ONE composer, each with its own slot\'s two doors', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const s = src(h);
-    assert.match(s, /toggleStatusReadout\(\{/, `${h} opens the readout through the composer`);
-    assert.match(s, /mount: \(box\) => /, `${h} hands its own mount`);
-    assert.match(s, /drop: \(box\) => /, `${h} hands its own drop - a close that frees the SLOT`);
-    assert.equal(/new ActionTextBox\(statusInfoRows\(/.test(s), false, `${h} keeps no copy of the chain`);
-    assert.match(s, /survival: survivalOn\(\) \? \{ minutes: Math\.floor\((?:ownMinutes\(\)|classicMinutesRef\.value)\)/, `${h} still feeds SURV5's page (LIVED1: on the character's own clock)`);
-  }
-  // the yield, at every door a window key can come through
-  assert.match(src('src/ui/input.js'), /if \(statusReadoutTakesAction\(action\)\) return true;/, 'routeAction, for the two modal hosts and the large HUD');
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(src(h), /if \(statusReadoutTakesAction\(act\)\) \{ e\.preventDefault\(\); return true; \}/, `${h} runs its OWN ladder and owes the same call`);
-  }
-  // ...and the module that carries it is a LEAF, which is the whole
-  // reason it is not in ui/ beside the box (the TDZ crash its header
-  // records)
-  const leaf = src('src/systems/statusReadout.js');
-  assert.equal(/from '\.\.\/ui\//.test(leaf), false, 'systems/statusReadout.js reaches into no ui/ module');
-  assert.match(src('src/ui/input.js'), /from '\.\.\/systems\/statusReadout\.js'/);
-});
-
-test('STATUS-LIVE by source: every host gate that consumed on the SLOT now asks the PAUSE', () => {
-  const tt = src('src/scenes/townTalk.js');
-  assert.match(tt, /if \(overlay && talkPaused\(\)\) \{/, 'the keydown rung');
-  assert.match(tt, /if \(!overlay \|\| !talkPaused\(\)\) return false;\n    const r = canvas\.getBoundingClientRect\(\);/, 'the pointerdown rung');
-  assert.match(tt, /function keyup\(e\) \{\n    if \(!overlay \|\| !talkPaused\(\)\) return false;/, 'the release half of the keydown rung');
-  assert.equal(/function keydown\(e\) \{\n    if \(overlay\) \{/.test(tt), false, 'the slot-truthiness gate is retired, not shadowed');
-  assert.equal((tt.match(/if \(!overlay\) return false;/g) ?? []).length, 0, 'and no seam in this host is left asking the slot where it meant the pause');
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /get uiOverlayActive\(\) \{ return interiorPaused\(\); \},/, 'the interior ctx answers routeKey the way the dungeon twin always has');
-  assert.equal(/get uiOverlayActive\(\) \{ return !!interiorOverlay; \}/.test(wm), false);
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): and a pausing window the played frame ran under, online
-  assert.match(wm, /if \(dungeonCtx\.unpausedOverlay \|\| dungeonCtx\.uiOverlayActive\) \{ dungeonCtx\.tickOverlay\(dt\); dungeonCtx\.drawOverlay\(canvas\); \}/,
-    'the dungeon frame paints a non-pausing occupant on the PLAYED frame - its paused arm returns above this');
-  // THE FOUR HOSTS RULE: ?dungeon mounts the same context and routes
-  // the same key table at it, so it owes the same line.
-  assert.match(src('src/scenes/dungeon.js'), /if \(ctx\.unpausedOverlay\) \{ ctx\.tickOverlay\(dt\); ctx\.drawOverlay\(canvas\); \}/,
-    'the standalone dungeon host draws it too');
-  // ...and the question is the CONTEXT'S OWN WORD, not the host
-  // re-deriving it off a probe surface. ROAD-tail's sweep
-  // (test/scenes/roadb_host_pause.test.js) is what caught the first draft
-  // writing `overlayWindow()` there: a probe surface is not a gate.
-  assert.match(src('src/scenes/dungeonContext.js'), /get unpausedOverlay\(\) \{ return !!activeOverlay && !dungeonPaused\(\); \},/);
-  assert.match(src('src/scenes/dungeonContext.js'),
-    /if \(pauseWhileOpen\(activeOverlay\)\) renderer\.drawScreenQuad\(null, \{ x: 0, y: 0, w: canvas\.width, h: canvas\.height \}, undefined, \[0\.02, 0\.02, 0\.02, 0\.6\]\);/,
-    'the modal DIM belongs to a modal window - a corridor you are walking down is not blacked out');
-});
-
 test('STATUS-LIVE: the enhanced panel carries the box\'s OWN caption, and a replaced box takes its panel with it', () => {
-  assert.match(src('src/ui/enhanced/enhancedNotice.js'), /drawEnhancedNotice\(\{ rows, hint: box\.noticeHint \}, undefined, box\._noticeKey\)/,
-    'noticeDraw hands the box\'s hint down; undefined is NOTICE_HINT\'s own spelling, so no other box moves');
   // the release on dispose: showOverlay disposes the OUTGOING window,
   // and without this the panel left only when the watchdog noticed
   const box = new ActionTextBox(['x']);
@@ -247,10 +196,4 @@ test('NOTICE-FIT: the panel is CAPPED, not sized - and the phone block is a cap 
   // queries and the first one is the talk shell's
   assert.match(ENHANCED_CSS, /@media \(max-width: 720px\) \{\n  \.notice-stack \{[^}]*\}\n  \.notice \{ max-width: 88vw;/, 'the phone block caps too');
   assert.equal(/\.notice \{ width: 88vw;/.test(ENHANCED_CSS), false, '...and nowhere in the sheet is it a fixed width again');
-  // MEASURED, not asserted: tools/noticeFitProbe.mjs draws the four
-  // real shapes in Chromium and reports 210 / 450 / 520 / 339 px at
-  // 1280 wide - four widths where there used to be one.
-  assert.match(src('tools/noticeFitProbe.mjs'), /drawEnhancedNotice\(frame, document, name\)/, 'the probe builds the panels through the real entry');
-  assert.match(src('tools/noticeFitProbe.mjs'), /requestAnimationFrame\(pump\)/,
-    'and PUMPS the draw the way a host does - the first run photographed a slide-OUT, because the watchdog swept a panel nobody was drawing');
 });

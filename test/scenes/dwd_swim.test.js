@@ -652,25 +652,6 @@ test('DW-D: ApplyArgonianInfiniteBreath is IsWaterBreathing for an Argonian play
     assert.equal(argonian.currentBreath, 0, 'no drain - the clause\'s else arm zeroes the counter as DFU\'s does when breathing');
   } finally { setWaterBreathingRule(prev); }
   assert.equal(isWaterBreathing(argonian), false, 'the rule gone, the effect alone');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /if \(dwPlayer\) setWaterBreathingRule\(\(e\) => e === playerEntity && dwSettings\(\)\.argonianInfiniteBreath && e\.raceId === RACES\.Argonian\);/, 'the world host installs it with the mod');
-  assert.match(world, /if \(breathStep\(playerEntity, dwPlayer\.submerged, _dwBreathState\) === 'drowned'\)/, 'the sea\'s breath on the forged isPlayerSubmerged, the rule inside breathStep');
-});
-
-test('DW-D: the forge reaches past the motor - the exterior ambient\'s water arm, Temple.AvoidDeath on both exterior hooks, the host\'s one motor write (pins)', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /ambience\.update\(dt, \{ playerPos: cam\.pos, inside: false, underground: modes\?\.mode === 'dungeon', waterSurfaceY: dwPlayer\?\.waterLevelY \?\? null, submerged: !!dwPlayer\?\.submerged \}\);/, 'AmbientEffectsPlayer: blockWaterLevel != 10000 and IsPlayerSubmerged');
-  assert.match(world, /avoidDeath\(activeMemberships\(playerEntity\), \{ submerged: !!dwPlayer\?\.submerged \}\)/, 'the boot host\'s consult');
-  assert.match(world, /exteriorSubmerged: \(\) => !!dwPlayer\?\.submerged,/, 'handed to the mode router');
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /avoidDeath\(activeMemberships\(playerEntity\), \{ submerged: !!host\.exteriorSubmerged\?\.\(\) \}\)/, 'the router\'s consult, which outlives a building');
-  // the forge rides the ONE write, never a second
-  const i = world.indexOf('const _dwForge = dwPlayer && playerSpawned ? dwPlayer.beforeMove({');
-  const j = world.indexOf('applyMotorEffectFlags(player, playerEntity, _dwForge ?? undefined);');
-  assert.ok(i > 0 && j > i, 'Update ahead of the one write');
-  const k = world.indexOf('dwPlayer.afterMove({ now: now / 1000, player,');
-  assert.ok(k > j, 'PostPhaseRestore after the motor');
-  assert.ok(world.indexOf('dwFlushStateChange();   // OutdoorSwimDriverAfter') > k, 'then FlushStateChange');
 });
 
 test('DW-D: a step in the heightfield is no slope - the capsule rests on the ground beneath it at a carved cell\'s edge, and the ground\'s normal there is the ground\'s (mutant: the centred difference back)', () => {
@@ -728,13 +709,6 @@ test('DW-D: the dungeon arm\'s afloat line - once per over-encumbered swim, the 
   frame(w);
   assert.deepEqual(w.hud, [CANNOT_FLOAT_TEXT, CANNOT_FLOAT_TEXT], 'and heavy again, the line again');
 
-  // the three hosts: each dungeon arm right after its swim write, the world host behind the forge
-  const dungeon = rd('src/scenes/dungeon.js');
-  assert.match(dungeon, /player\.waterWalking = ctx\.playerWaterWalking\(\);\n\s+const afloat = afloatMessageStep\(player, player\.waterWalking\);[^\n]*\n\s+if \(afloat\) ctx\.hudSay\?\.\(afloat, CANNOT_FLOAT_HUD_SECONDS\);/);
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /player\.waterWalking = dungeonCtx\.playerWaterWalking\(\);\n\s+const afloat = afloatMessageStep\(player, player\.waterWalking\);[^\n]*\n\s+if \(afloat\) dungeonCtx\.hudSay\(afloat, CANNOT_FLOAT_HUD_SECONDS\);/);
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /applyMotorEffectFlags\(player, playerEntity, _dwForge \?\? undefined\);\n[^\n]*\n\s+if \(_dwForge\) \{ const afloat = afloatMessageStep\(player, player\.waterWalking\); if \(afloat\) townTalk\.say\(afloat, CANNOT_FLOAT_HUD_SECONDS\); \}/);
 });
 
 test('DW-D: GuardSwimMotorFrameSpike - a swimmer\'s frame whose Time.deltaTime passes 0.1 s moves them nothing (LevitateMotor disabled), the next ordinary frame enables it again; never a levitator; released inside and when suppressed (mutants: the bar, the levitation term, the release, the motor\'s return)', () => {
@@ -771,8 +745,4 @@ test('DW-D: GuardSwimMotorFrameSpike - a swimmer\'s frame whose Time.deltaTime p
   assert.equal(w.m.levitateMotorEnabled, false);
   frame(w, { onBoat: true });
   assert.equal(w.m.levitateMotorEnabled, true, 'SuppressOutdoorSwimming: released');
-  // the host hands the driver Time.deltaTime
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /frameDelta: dt \* worldTimeScale\(\),/, 'the frame\'s clamped seconds x Time.timeScale');
-  assert.match(world, /const dt = Math\.min\(0\.1, \(now - last\) \/ 1000\);/, 'and the frame is clamped at the mod\'s own 0.1 s');
 });

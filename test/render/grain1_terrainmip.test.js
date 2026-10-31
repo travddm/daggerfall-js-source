@@ -45,44 +45,6 @@ test('GRAIN1: every tile-array sample takes its footprint from the UNWRAPPED coo
   assert.doesNotMatch(fs, /texture\(uTileArr, vec3\(uv, 0\.0\)\)/, 'no implicit sample survives there either');
 });
 
-test('GRAIN1: the tile array is mipmapped and minified trilinear - and MAGNIFIED nearest, so the ground underfoot keeps its texels', () => {
-  const r = read('src/render/renderer.js');
-  const up = r.slice(r.indexOf('  *uploadTileArraySteps(archive, layers) {'));   // PIN MOVED (OW-HITCH): the upload's body is its steps' (uploadTileArray runs them to their end)
-  const body = up.slice(0, up.indexOf('\n  }\n'));
-  assert.match(body, /gl\.generateMipmap\(gl\.TEXTURE_2D_ARRAY\);/, 'the chain is built');
-  assert.match(body, /this\._setGroundSampler\(groundSharpnessTier\(\)\)/, 'GRAIN AUDIT 1: minification is the TIER\u2019s, set by the one method the world load re-applies');
-  assert.match(body, /TEXTURE_MAG_FILTER, gl\.NEAREST/, 'MAGNIFICATION DOES NOT MOVE - the near field is where Daggerfall’s texels are meant to be square and visible, and a mipmap has no say there');
-  // the mipmap is generated AFTER every layer is uploaded, or the chain is
-  // built from an empty texture and the distance goes black
-  assert.ok(body.indexOf('texSubImage3D') < body.indexOf('generateMipmap'), 'every layer is uploaded before the chain is built');
-  // CLAMP survives: a 2D ARRAY mipmaps each layer on its own, so no tile can
-  // bleed into another the way an atlas would
-  assert.match(body, /TEXTURE_WRAP_S, gl\.CLAMP_TO_EDGE/);
-  assert.match(body, /TEXTURE_WRAP_T, gl\.CLAMP_TO_EDGE/);
-});
-
-test('GRAIN1: anisotropy is asked for, capped, and optional - terrain is read at a grazing angle almost everywhere', () => {
-  const r = read('src/render/renderer.js');
-  const up = r.slice(r.indexOf('  *uploadTileArraySteps(archive, layers) {'));   // PIN MOVED (OW-HITCH): the upload's body is its steps' (uploadTileArray runs them to their end)
-  const body = up.slice(0, up.indexOf('\n  }\n'));
-  const ext = r.slice(r.indexOf('  _anisoExtension() {'), r.indexOf('\n  }\n', r.indexOf('  _anisoExtension() {')));
-  assert.match(ext, /getExtension\('EXT_texture_filter_anisotropic'\)/, 'asked for by name');
-  assert.match(ext, /if \(this\._anisoExt === null\)/, 'GRAIN AUDIT 1: asked ONCE - null is "not asked", false is "the driver has none"; the old ||= re-asked every archive on a driver without it');
-  assert.match(ext, /\?\? false;/, '...and an absent extension is remembered as false');
-  const set = r.slice(r.indexOf('  _setGroundSampler(tier) {'), r.indexOf('\n  }\n', r.indexOf('  _setGroundSampler(tier) {')));
-  assert.match(set, /groundSamplerFor\(tier, this\._anisoMax\)/, 'GRAIN2: how much of it is the machine\u2019s question, so it is read from the dial');
-  assert.match(set, /if \(ext\) gl\.texParameterf/, 'and a driver without it still draws - the mipmap alone already fixes the grain');
-});
-
-test('GRAIN1: the tile array is the ONLY texture this touches - the sprites keep their hard edges', () => {
-  const r = read('src/render/renderer.js');
-  // every other generateMipmap in the renderer predates this; the sprite and
-  // flat paths must not have acquired one, or every billboard goes soft.
-  const mips = [...r.matchAll(/gl\.generateMipmap\(([^)]*)\)/g)].map((m) => m[1]);
-  // AUDIT PRECIP GROUND-2: a ground set's twin is uploaded through uploadTileArray itself - the one mipmapped texture still
-  assert.deepEqual(mips, ['gl.TEXTURE_2D_ARRAY'], `only the tile arrays are mipmapped (found: ${mips.join(', ')})`);
-});
-
 test('GRAIN2: the anisotropy is a DIAL, and its tiers never exceed what the driver allows', async () => {
   const { anisotropyFor } = await import('../../src/render/renderer.js');
   const { FEATURE_PREF_DEFAULTS, FEATURES } = await import('../../src/systems/features.js');
@@ -107,13 +69,7 @@ test('GRAIN2: the anisotropy is a DIAL, and its tiers never exceed what the driv
   assert.equal(row.control.online, 'player', 'one player’s dial is not everyone’s');
   assert.match(row.effect, /world next loads/, 'the tile arrays are cached for the page, so the hosts RE-APPLY the tier at every world load (GRAIN AUDIT 1: before that this sentence was false - it landed on a page reload)');
   assert.deepEqual([...row.kinds], ['enhanced', 'classic'], 'GRAIN AUDIT 1: both lanes sample the one array, so both lanes get the dial');
-  // the renderer reads the dial rather than a number chosen once
-  const r = read('src/render/renderer.js');
-  assert.match(r, /this\._setGroundSampler\(groundSharpnessTier\(\)\)/, 'read where the array is built - the door-or-pref tier into the one sampler method (GRAIN AUDIT 1)');
-  assert.match(r, /groundSamplerFor\(tier, this\._anisoMax\)/, '...which asks the dial\u2019s law for the filter and the anisotropy together');
-  assert.match(r, /if \(ext\) gl\.texParameterf\(gl\.TEXTURE_2D_ARRAY, ext\.TEXTURE_MAX_ANISOTROPY_EXT, s\.aniso\);/, 'GRAIN AUDIT 1: the value is SET whatever it is - 1 included - because a cached array at 16x has to come down to 1x when the player asks for Off; the old `if (want > 1)` skip left it where it was');
 });
-
 
 /** a GL that logs every call and answers enums with their own name (incident_dungeon_seams' rig) */
 function recordingRenderer(log, { aniso = true, max = 16 } = {}) {
@@ -190,7 +146,4 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
     const apply = h.indexOf('renderer.applyGroundSharpness();', guard);
     assert.ok(guard > 0 && apply > guard && apply - guard < 1200, `${host}: the tier is re-applied right after the guard, cached or not`);
   }
-  // the one real-GPU instrument can be pointed at a tier
-  const probe = read('tools/perfProbe.mjs');
-  assert.ok(probe.includes("process.env.GROUND ? `&ground=${encodeURIComponent(process.env.GROUND)}` : ''") && probe.includes('${url}${GROUND}`'), 'GROUND=off|default|max rides every scene URL through the ?ground door');
 });

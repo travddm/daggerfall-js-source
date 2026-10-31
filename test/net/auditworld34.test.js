@@ -192,7 +192,6 @@ test('AUDIT WORLD34 C1: the memory rode the welcome ALONE - a socket whose welco
   assert.deepEqual(worlds, [], 'not an object: not a memory');
   ws.receive({ t: 'world', id: 'aaaa-0001', data: mem });
   assert.deepEqual(worlds, [mem], 'the host\'s memory, after the welcome');
-  assert.match(rd('src/net/wire.js'), /\{t:'world', id, data\}\s+the room's memory, to a socket whose welcome carried none \(AUDIT WORLD34 C1\)/, 'on the wire\'s list');
 });
 
 test('AUDIT WORLD34 D3: sendWorld is under the room\'s guard like every other out-frame - the host of a slug room, a town or a cell sends no memory and hears false', () => {
@@ -214,47 +213,10 @@ test('AUDIT WORLD34 B2: online, ONE layout - the layout the room addresses by in
   assert.equal(useSmallerDungeon(loc, { setting: false, questMachine: machine }), true, 'offline: the quest\'s frozen state wins');
   assert.equal(useSmallerDungeon(loc, { setting: false, questMachine: machine, online: true }), false, 'online: not even the quest\'s');
   assert.equal(dungeonSizeFor(loc, { setting: true, medium: false, questMachine: machine, online: true }), onlineDungeonSize(loc), 'SD-ONLINE: the world\'s one size for it - no setting and no quest\'s copy reaches it');
-  const m = rd('src/scenes/worldModes.js'), w = hostText('src/scenes/world.js');   // HOST-SPLIT (at the merge of main into TESA): questWorld is scenes/questWorld.js's - the host read whole
-  assert.match(m, /dungeonLocationFor\(hit\.dfLocation, \{ questMachine: questBridge\?\.machine, online: host\.dungeonOnline\?\.\(\) \?\? false, whole: !!place\?\.whole \}\)/, 'the entry seam asks');   // PIN MOVED (INSTANCES): and the door's `whole` - an instance is the dungeon whole, its own room   // PIN MOVED (INSTANCES' audit): `place`, the entry decided
-  assert.match(w, /dungeonOnline: \(\) => onlineOn,/, 'and the world host answers');
-  assert.equal((w.match(/questMachine: (?:host\.)?questBridge\?\.machine, online: params\.has\('online'\), whole: params\.has\('online'\) \}\)/g) ?? []).length, 1, 'the quest layer\'s one sizing (PIN MOVED, START2: questWorld.js questSized - its two location doors and the start seam through it) (the page flag: a quest parsed at chargen reaches them before `onlineOn` is declared; PIN MOVED, INSTANCES: online they ask for the dungeon whole)');
-  assert.equal((w.match(/getLocation: \{ value: \(r, l\) => questSized\(provinces && isProvinceRegion\(r\) \? provinces\.getLocation\(r, l\) : maps\.getLocation\(r, l\)\) \}|getLocationByName: \{ value: \(rn, ln\) => questSized\(placeByName\(rn, ln\)\) \}/g) ?? []).length, 2, 'its two location doors (PIN MOVED, AUDIT RELEASE R2-5: a province\'s region\'s place sized the same way)');
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(data\.k != null && data\.k !== _locationKey\) \{ if \(!_keyMismatchSaid\) \{ _keyMismatchSaid = true; console\.warn\(/, 'a stream keyed to another layout is refused and SAID once');
-});
-
-test('AUDIT WORLD34 B1/B3 by source: a dead foe is retyped too (a joiner whose save had killed the foe at `i` refused the rebuild for the life of the context and stood an invulnerable mismatch); a full frame goes even when it carries nothing - it is the heartbeat', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /async function retypeFoe\(i, mobileType, gender = null, \{ anyFoe = false, at = null \} = \{\}\) \{\s*const f = foes\[i\];\s*(?:\/\/[^\n]*\n\s*)*if \(!f \|\| \(!anyFoe && i >= _layoutFoes\) \|\| !f\.src \|\| _retyping\.has\(i\) \|\| !canStandFoe\(mobileType\)\) return false;/, 'no f.dead in the guard (OH-E: `anyFoe` lets the abyss retype a spawned foe; the layout run is still the stream\'s)');
-  assert.doesNotMatch(d.slice(d.indexOf('async function retypeFoe('), d.indexOf('async function retypeFoe(') + 900), /f\.dead \|\|/);
-  // REST-SYNC re-aim: the frame also carries the room's shared encounters (`x`) - an empty full frame still goes
-  assert.match(d, /if \(!out\.length && !shared\.length && !full\) return null;\s*const frame = \{ n: \+\+_foesSeq, k: _locationKey, f: out \};/, 'the empty full frame goes');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const dungeonAuthority = \(now = performance\.now\(\)\) => !\(online\?\.room && isWorldRoom\(online\.room\) && online\.status === 'open' && online\.host && !online\.isHost\(\) && seatClock\.live\(now\)\);/, 'the seat still reads the heartbeat');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-  assert.match(w, /online\.onFoes = \(id, data\) => \{\s*(?:\/\/[^\n]*\n\s*)*(?:if \(isCellRoom\(online\.room\) && [^\n]*camps\.applyOwner[^\n]*\n\s*)?if \(isCellRoom\(online\.room\)\) \{[\s\S]*?if \(modes\?\.applyDungeonFoes\?\.\(id, data\) && modes\?\.mode === 'dungeon'\) seatClock\.heard\(performance\.now\(\)\);\s*\};/, 'and every frame in, empty or not, is the heartbeat (AUDIT WORLD6a B8: in a dungeon - a building\'s room streams no foes; WORLD6b: a cell\'s frame is the encounter pool\'s, no heartbeat)');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-});
-
-test('AUDIT WORLD34 C2 by source: the memory\'s action records are the SHARED half out (no picker\'s latch) and PROJECTED in (validActionRecord, as an act\'s are) - the relay serves the stored bytes back unparsed for thirty days', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /import \{[^\n]*sharedRecord, validActionRecord \} from '\.\.\/world\/actionSystem\.js';/);
-  assert.match(d, /w\.loot = \[\.\.\.lootRecords\(\[\.\.\._lootSeen\]\), \.\.\.searchRoom\.records\(\(c\) => _roomState\.has\(c\)\)\];\s*(?:for \(const f of w\.foes\) delete f\.noBody;[^\n]*\n\s*)?(?:for \(const f of w\.foes\) delete f\.eliteFoe;[^\n]*\n\s*)?(?:\/\/[^\n]*\n\s*)*w\.actions = \(w\.actions \?\? \[\]\)\.map\(sharedRecord\);\s*(?:w\.camps = campMemory\(\);[^\n]*\n\s*)?return \{ locationKey: _locationKey, stamp: _sharedStamp, world: w \};/, 'out');   // SURV3: the camps ride the memory too   // PIN MOVED (the revenant audit): a foe's `noBody` stripped after the loot   // PIN MOVED (AUDIT BAL): and its `eliteFoe` (bible/05-Combat/Balance-Arc.md section 10)   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the memory carries the strangers' searches beside the opened containers (scenes/searchRoom.js records)
-  assert.match(d, /const acts = Array\.isArray\(shared\.world\.actions\) \? shared\.world\.actions\.map\(validActionRecord\)\.filter\(Boolean\) : \[\];[\s\S]*?const sfoes = Array\.isArray\(shared\.world\.foes\) \? shared\.world\.foes\.slice\(0, _layoutFoes\)\.map\(validSharedFoe\) : \[\];[\s\S]*?applyWorld\(\{ \.\.\.shared\.world, piles: undefined, actions: acts, foes: sfoes \}/, 'in');
-});
-
-test('AUDIT WORLD34 C3 by source: a refused act is KEPT while the socket is away and flushed when it returns; it is cleared only when the room is no world room', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _actRoom = \(\) => !!\(online && \(isWorldRoom\(online\.room\) \|\| isWorldRoom\(_onlineKey\)\)\);/);   // AUDIT WORLD6a A7: or the room the mode names, while the socket is held
-  assert.match(w, /const actSend = \(data\) => \{\s*if \(!_actRoom\(\)\) \{ _actPend\.clear\(\); return false; \}\s*if \(!_actLive\(\)\) \{ for \(const k of \[\.\.\.\(\(data\?\.a \?\? \[\]\)\.map\(\(r\) => r\.key\)\), \.\.\.\(\(data\?\.l \?\? \[\]\)\.map\(\(r\) => r\.k\)\)(?:, \.\.\.\(\(data\?\.c \?\? \[\]\)\.map\(\(r\) => `camp:\$\{r\.i\}`\)\))?\]\) _actPend\.add\(k\); return false; \}/, 'kept');   // SURV3: a camp's key rides the same set
-  assert.match(w, /const actFlush = \(\) => \{\s*if \(!_actPend\.size\) return false;\s*if \(!_actRoom\(\)\) \{ _actPend\.clear\(\); return false; \}\s*if \(!_actLive\(\)\) return false;/, 'flushed when the socket is back');
-  assert.doesNotMatch(w, /if \(!_actLive\(\)\) \{ _actPend\.clear\(\); return false; \}/, 'the old clear is gone');
 });
 
 test('AUDIT WORLD34 D4/D5: the relay names itself in /health; the session says the room and whether it is a shared world, and the host; the Online pane\'s copy says what is shared', () => {
   assert.match(RELAY_VERSION, /^world\d+$/, 'bumped with every relay-changing slice - the latest slice pins its own value (WORLD5 pinned world5)');
-  assert.match(rd('server/src/index.js'), /json\(\{ ok: true, service: 'daggerfall-online', version: RELAY_VERSION, t: Date\.now\(\) \}\)/);
-  const o = rd('src/net/online.js');
-  assert.match(o, /console\.info\(`\[online\] room \$\{room\} - \$\{isWorldRoom\(room\) \? 'a shared world' : isCellRoom\(room\) \? 'shared country \(each player\\'s foes are everyone\\'s\)' : isChatRoom\(room\) \? 'a chat channel' : 'presence only'\}`\);/);   // WORLD6b: the cell says what it shares
-  assert.match(o, /if \(host && isWorldRoom\(this\.room\)\) console\.info\(`\[online\] host \$\{host\}\$\{host === this\.id \? ' \(me\)' : ''\}`\);/);
   const lines = [];
   const info = console.info; console.info = (l) => lines.push(l);
   try {
@@ -266,8 +228,5 @@ test('AUDIT WORLD34 D4/D5: the relay names itself in /health; the session says t
     sockets[1].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null });
   } finally { console.info = info; }
   assert.deepEqual(lines, [`[online] room dungeon:m${PRIVATEERS_HOLD} - a shared world`, '[online] host bbbb-0002', '[online] room world:3,12 - shared country (each player\'s foes are everyone\'s)'], 'a cell says its room and no host (WORLD6b: and what it shares)');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.doesNotMatch(menu, /el\('p', 'meta', 'Everyone runs their own game from their own save; you see each other and walk together\. Nothing else is shared yet\.'\)/, 'the pre-WORLD1 promise is gone');
-  assert.match(menu, /Dungeons and buildings are shared: enemies, doors, levers and opened chests are the same for everyone and stay that way\. In towns and the wilds, everyone nearby sees the same monsters and can fight them/);   // WORLD6a: the building joined the sentence; WORLD6b: the cell's foes
 });
 

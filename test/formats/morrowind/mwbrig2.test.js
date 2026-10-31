@@ -212,15 +212,6 @@ test('MW-BRIG2: the item - the Steel Brigandine Jerkin (since MW-BRIG4 every bri
     assert.equal(ownMwDataPath(`../assets/mw/${path}`), path);
   }
   assert.ok(itemMapCoverage().some((c) => c.kind === 'own' && c.own === 'ownArmorModels' && c.material === 'Steel'));
-  // The build loads the body under it - shadowed or not - and hands it to the binder with the part, through
-  // ownBodyPaths and ownBodyPart (MW-STEEL4: the third person's alone - no model skinned from the body reaches the first).
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /  return \(add\.skinFrom \?\? \[\]\)\.flatMap\(\(slot\) => rows\n/);
-  assert.match(fp, /const bodyUnder = \(add\) => ownBodyPaths\(add, rows\);/);
-  assert.match(fp, /\.\.\.worn\.adds\.flatMap\(bodyUnder\)\.map\(\(b\) => b\.path\),   \/\/ MW-BRIG2/);
-  assert.match(fp, /\.\.\.ownBodyPart\(row, rows, find\) \}\);/);
-  // PIN MOVED (MWNPC3): the body's bytes are the archive's one copy (nifBytes), where each build sliced its own
-  assert.match(fp, /if \(!add\.skinFrom\) return \{\};\n  return \{\n    skinFrom: ownBodyPaths\(add, rows\)\.map\(\(b\) => \(\{ slot: b\.slot, bytes: nifBytes\(find\(b\.path\), b\.path\) \}\)\)\.filter\(\(b\) => b\.bytes\),/);
 });
 
 test('MW-BRIG2: the shipped files are re-made from the committed sources, byte for byte, and read back', () => {

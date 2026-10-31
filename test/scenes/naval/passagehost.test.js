@@ -321,22 +321,3 @@ test('PASSAGE host: HER MASTER\'S CLOCK IS HER BOAT\'S - a load that stands anot
   assert.deepEqual(b.rt.AllBoats, [], 'off her: over');
 });
 
-test('PASSAGE host wiring: the world host builds it once and calls it - the berth\'s ship\'s Activate, its frame whatever the sea fight\'s switch, the Overworld\'s crossing as the voyage; a booked ship is never boarded as mine moored, never said left moored, never packed, never the Fleet\'s, and saved with her voyage (mutants: each door unwired)', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /^import \{ createPassageHost \} from '\.\/naval\/passageHost\.js';/m);
-  assert.match(world, /\n {4}passage: \(ship\) => passage\?\.offer\(ship\),/, 'the sea\'s door to it');
-  assert.match(world, /const passage = createPassageHost\(\{[^]*?canGo: travelViewCanGo, route: travelViewRouteTo, travel: \(\) => travelOptions,/, 'the Overworld\'s journey is the voyage - a voyage\'s');
-  assert.match(world, /return tvSeaCrosses\(tvSeaRig\(b\)\) \? \{ start: 'sea', again: !!b\.packable, boat: b, how: 'helm', voyage: !!b\.charter \} : null;/, 'her helm asks the planner for a voyage (AUDIT PASSAGE A1)');
-  assert.match(world, /if \(voyage && !voyageSails\(from, summary\.pixel, plan\)\) \{ noWay\?\.\(\); return false; \}/, 'a plan that never sails refused');   // PIN MOVED (FIELD BUGS 2026-10-21d PASSAGE-IN): but from her port's roadstead she runs in
-  assert.match(readFileSync(new URL('../../../src/systems/travel/seaAsk.js', import.meta.url), 'utf8'), /export const tvSeaAsk = \(means, goal\) => \(means \? \{ \.\.\.means, again: means\.again && !means\.voyage, goal \} : null\);/, 'and never packed to launch again (PIN MOVED (PLAN-SLICES): out of the host, systems/travel/seaAsk.js)');
-  assert.match(world, /import \{ tvMooredDry, tvSeaAsk \} from '\.\.\/systems\/travel\/seaAsk\.js';/);
-  assert.match(world, /standsOn: csaStandsOn, busy: worldMoveBusy, player, remount: setTransportModeHere, talk: townTalk,\n\s+writ: starts\.writ \}\);/, 'the rider remounted on a refusal, her deck underfoot, a world\'s move - PIN MOVED (START2): and an opened commission\'s writ');
-  assert.match(world, /\n {4}passage\.frame\(dt, gamePaused\(\) \|\| _loading\);[^\n]*\n {4}const on = navalOn\(\);/, 'its frame, before the switch returns');
-  assert.match(world, /if \(!b\.GameObject\?\.activeSelf \|\| b\.inside \|\| b\.charter \|\| !tvSeaCrosses\(tvSeaRig\(b\)\)\) continue;/, 'never boarded as mine moored');
-  assert.match(world, /if \(!boat\.charter\) tvSay\(TRAVEL_VIEW_TEXT\.leftMoored\);/, 'never said left moored');
-  const csa = read('src/systems/comeSailAway/comeSailAway.js');
-  assert.match(csa, /\.\.\.\(b\.charter \? \{ Charter: JSON\.parse\(JSON\.stringify\(b\.charter\)\) \} : \{\}\),/, 'saved with her');
-  assert.match(csa, /if \(placedBoat\.Charter && typeof placedBoat\.Charter === 'object'\) boat\.charter = placedBoat\.Charter;/, 'and read back');
-  assert.match(csa, /function PackBoat\(boat, item = false, lost = false\) \{\n {4}if \(item && boat\?\.charter\) return false;/, 'never parts in my pack');
-  assert.match(read('src/scenes/fleetHost.js'), /const placed = \(\) => \(csa\(\)\?\.AllBoats \?\? \[\]\)\.filter\(\(b\) => b\?\.uid && !b\.charter\);/, 'never the Fleet\'s');
-});

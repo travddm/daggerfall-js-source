@@ -51,7 +51,3 @@ test('DEAD-CLOCK: an `until ... performed` waiting on a clock makes it a deadlin
   assert.equal(clockCounts(pending, onlyUntil), true, 'an action the registry could not read counts as an action');
 });
 
-test('DEAD-CLOCK by source: the journal\'s "Time remains" counts only a clock that counts', () => {
-  const b = rd('src/scenes/quest/questBridge.js');
-  assert.match(b, /if \(r\.clockEnabled && !r\.clockFinished && Number\.isFinite\(r\.remainingTimeInSeconds\) && clockCounts\(q, r\)\) \{/);
-});

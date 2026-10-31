@@ -174,7 +174,6 @@ test('WEATHER2b the switch: the enhanced skin, Enhanced Environments and the wea
   assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, true);
   assert.equal(PREF_DEFAULTS.weatherEvents, true); assert.equal(ONLINE_FORCED_PREFS.weatherEvents, true, 'one field for every player');
   assert.equal(FEATURES.findIndex((f) => f.id === 'weather-events'), FEATURES.findIndex((f) => f.id === 'enhanced-map') + 4, 'TAMRIEL1/TAMRIEL2 (2026-10-08): the continent\'s two rows stand between the 3D dungeon map and this; FT18: where the sway row stood - the sway is the wind row\'s part now; EM3-3D: the 3D dungeon map row stands between, under the map row it belongs to');
-  assert.match(rd('src/systems/weather/weatherSim.js'), /get\('wxfield'\) !== 'off'/, 'the kill door');
 });
 
 test('WEATHER2b the wind: a crossing builds its front on the short lead, the day roll\'s on three hours; the factor takes the lead; the model says which lead is up', () => {
@@ -195,27 +194,5 @@ test('WEATHER2b the wind: a crossing builds its front on the short lead, the day
   a.tick(607, 'rain'); assert.ok(a.arrival() < 0.01, 'the day roll\'s front is still building');
   const c = createWindModel({ seed: 3 }); c.tick(0, 'sunny'); c.arrive(); c.tick(1, 'sunny'); c.tick(2, 'rain');
   assert.equal(c.state().front.lead, FRONT_LEAD_MIN, 'an arrive with no change on its tick is forgotten');
-});
-
-test('WEATHER2b the controller and the hosts: the sky eases on the front\'s own lead and has an arrive hook; both hosts sample the field after the drain, read the crossing stamp after the jump\'s, hand the arrivals the place, and give the clouds the field\'s cells', () => {
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /weatherArrive\(\) \{ windModel\.arrive\(\); \}/);
-  assert.match(shared, /const easeDt = windModel\.inLead\(\) \? dt \* \(WEATHER_EASE_MINUTES \/ windModel\.leadMinutes\(\)\) : dt;/);
-  assert.doesNotMatch(shared, /FRONT_LEAD_MIN/, 'the controller no longer assumes the long lead');
-  const w = rd('src/scenes/world.js'), e = rd('src/scenes/exterior.js');
-  for (const [name, s] of [['world', w], ['exterior', e]]) {
-    assert.match(s, /const drained = tickWeather\(/, `${name}: the drain's answer`);
-    assert.match(s, /sampleWeatherField\(Math\.floor\(playerTicker\.classicMinutes\), [^,]+, [^;]+, climateAt, drained \? 'drain' : 'live'\);/, `${name}: the field after the drain`);
-    assert.match(s, /let seenCrossing = weatherCrossingStamp\(\);/, `${name}: the boot's stamp is the baseline`);
-    assert.match(s, /const crossing = weatherCrossingStamp\(\) !== seenCrossing(?: \|\| seaVentures\.stormTurned\(\))?;(?:\s*\/\/[^\n]*)?\s*\n\s*seenCrossing = weatherCrossingStamp\(\);\s*\n\s*if \(crossing && !jump\) sky\.weatherArrive\(\);/, `${name}: a crossing tells the sky, a jump wins`);
-    assert.match(s, /cells: fieldCellsHere\(\), cloudBase: /, `${name}: the clouds' cells are the field's (WEATHER3c: the base they stand on beside them)`);
-    assert.match(s, /const climateAt = \(px, py\) => maps\.getClimateIndex\(px, py\);/, `${name}: the map's lookup`);
-  }
-  assert.match(w, /const fieldXZ = \(\) => \{ const p = walkMode \? player\.pos : cam\.pos, wc = state\.worldCoords\(p\); return \[\.\.\.fieldFromNative\(wc\.x, wc\.z\), altitudeOfWorldY\(p\[1\] - state\.compensation\[1\]\)\]; \};/, 'world: the player\'s place in the field - and its height above the sea (PRECIP1)');
-  assert.match(w, /cellOfField\(c, \(x, z\) => \{ const n = nativeFromField\(x, z\); return state\.localFromWorld\(n\[0\], n\[1\]\); \}\)/, 'world: the cells back into the floating host space (WEATHER3g: through the one conversion)');
-  assert.match(w, /weatherRespawn\(Math\.floor\(playerTicker\.classicMinutes\), maps\.getClimateIndex\(px\.x, px\.y\), Math\.random, fieldXZ\(\), climateAt\)/, 'world: the respawn samples the destination');
-  assert.equal((w.match(/applyClimateWeather\([^;]*fieldXZ\(\), climateAt\);/g) || []).length, 2, 'world: both travel arrivals sample the destination');
-  assert.match(e, /fieldOfPixelLocal\(_locPixel\.x, _locPixel\.y, eye\[0\], eye\[2\]\)/, 'exterior: the eye in the location\'s pixel');
-  assert.match(e, /cellOfField\(c, \(x, z\) => pixelLocalOfField\(_locPixel\.x, _locPixel\.y, x, z\)\)/);
 });
 

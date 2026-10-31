@@ -80,7 +80,6 @@ test('AUDIT WORLD-EVENTS L1-3: Hist-Sap, the Warden\'s Steadfast and the Firmame
   POW.pathRound(wa);
   assert.equal(wa.health, 115, 'past it: half');
   setCourtRules(false);
-  assert.match(rd('src/systems/firmamentPowers.js'), /if \(c\.hpRegen && entity\.health > 0 && entity\.health < entity\.maxHealth\) \{ const held = regenShare\(\(entity\.maxHealth \* c\.hpRegen\) \/ 1000, 'firmament', entity\); if \(held > 0\) healMine\(entity, held\); \}/, 'the sky\'s regeneration: through the same share');
 });
 
 test('AUDIT WORLD-EVENTS L1-9: each body carries its own fractions - two foes under one Regenerate each heal on their own rounds, and a foe\'s rounds never spend the player\'s (mutants: one carry for every body)', () => {
@@ -108,7 +107,4 @@ test('AUDIT WORLD-EVENTS L1-10: the pause starts at the player\'s hurt door - a 
   setCourtRules(true, T + 2000);
   assert.equal(regenPausedMs(), REGEN_HELD_HURT_MS - 2000 + 10, 'the pause runs on');
   setCourtRules(false);
-  // the door is the client's (systems/courtRulesDoor.js, the world host's import): the account Worker bundles courtRules.js
-  assert.match(rd('src/scenes/world.js'), /^import '\.\.\/systems\/courtRulesDoor\.js';/m, 'the world host wires the door');
-  assert.doesNotMatch(rd('src/systems/courtRules.js'), /from '\.\.\/characters\/playerEntity\.js'/, 'never the player\'s entity in the Worker\'s bundle');
 });

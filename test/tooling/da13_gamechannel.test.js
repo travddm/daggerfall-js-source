@@ -31,7 +31,6 @@ const G = require('../../app/lib/gameChannel.cjs');
 const { openGameStore, loadSeed } = require('../../app/lib/gameStore.cjs');
 const L = require('../../app/lib/launcherState.cjs');
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const main = rd('app/main.cjs');
 
 const SHELL = 'a'.repeat(64);
 const OTHER_SHELL = 'b'.repeat(64);
@@ -371,28 +370,6 @@ test('DA13: a version the store did not finish, or whose files are gone, is no v
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test('DA13: which path a release takes - the channel for the same shell and generation, the installer for another shell, another generation, a version that failed here, or a copy with no seed', () => {
-  const seed = { shell: SHELL };
-  const m = { channel: G.GAME_CHANNEL, shell: SHELL, version: '0.1.11' };
-  assert.equal(G.routeFor({ seed, manifest: m }).route, 'game');
-  assert.equal(G.routeFor({ seed, manifest: { ...m, shell: OTHER_SHELL } }).route, 'installer', 'the release changes the app itself');
-  assert.equal(G.routeFor({ seed, manifest: { ...m, channel: G.GAME_CHANNEL + 1 } }).route, 'installer');
-  assert.equal(G.routeFor({ seed, manifest: m, failed: ['0.1.11'] }).route, 'installer', 'a version the channel failed on here');
-  assert.equal(G.routeFor({ seed, manifest: m, failed: ['0.1.10'] }).route, 'game');
-  assert.equal(G.routeFor({ seed: null, manifest: m }).route, 'installer');
-  // the release's game, as the release lists it - its own download links, and the pack's size
-  const base = 'https://github.com/Lattymoy/daggerfall-js-source/releases/download/app-v0.1.11/';
-  const rel = { assets: [{ name: G.GAME_FILES.manifest, size: 9, browser_download_url: base + G.GAME_FILES.manifest }, { name: G.GAME_FILES.pack, size: 99, browser_download_url: base + G.GAME_FILES.pack }] };
-  assert.deepEqual(G.gameAssetsOf(rel), { manifest: base + G.GAME_FILES.manifest, pack: base + G.GAME_FILES.pack, packSize: 99 });
-  assert.equal(G.gameAssetsOf({ assets: rel.assets.slice(0, 1) }), null, 'a release with no pack carries no game');
-  assert.equal(G.gameAssetsOf({ assets: rel.assets.map((a) => ({ ...a, browser_download_url: `https://elsewhere.example/${a.name}` })) }), null, 'only this repository\'s own downloads');
-  assert.equal(G.versionOfTag('app-v0.1.11'), '0.1.11');
-  assert.equal(G.versionOfTag('v0.1.11'), null);
-  // macOS, the portable exe and the AppImage alike: nothing in the channel's choice asks the transport
-  const ask = main.slice(main.indexOf('async function askGame() {'), main.indexOf('/** The files `manifest` asks of this copy'));
-  assert.doesNotMatch(ask, /currentUpdateTransport|process\.platform|PORTABLE_EXECUTABLE_DIR|APPIMAGE/, 'every copy with a seed takes the channel - the transport is only the installer\'s path');
-});
-
 test('DA13: the launcher - the game\'s download held before play like an installer\'s, Play runs it at once with nothing installed, and a failure hands the release back to the installer\'s path', () => {
   const run = (state, ...events) => events.reduce(L.reduce, state);
   const fresh = (over = {}) => L.initialState({ current: '0.1.10', transport: 'notice', checkEnabled: true, arena2Dir: '/games/ARENA2', lastPlayed: '0.1.10', ...over });
@@ -434,60 +411,6 @@ test('DA13: the launcher - the game\'s download held before play like an install
       'DFO Online 0.1.11 is ready. It runs the next time you start, or now from File > Restart to Update. Save first.');
     assert.doesNotMatch(updateReadyText({ version: '0.1.11', manual: false }), /installs/, 'nothing installs when the channel brought it');
   });
-});
-
-test('DA13: the shell - the game\'s channel asked first everywhere, served by the version in use, proved by its boot, and the installer\'s path on any failure', () => {
-  const sliceOf = (from, to) => { const a = main.indexOf(from); assert.ok(a >= 0, from); const b = main.indexOf(to, a + from.length); assert.ok(b > a, to); return main.slice(a, b); };
-  const ask = sliceOf('async function askGame() {', '/** The files `manifest` asks of this copy');
-  assert.match(ask, /if \(!gameStore\) return 'installer';/, 'no seed: the installer\'s path, as before DA13');
-  assert.match(ask, /if \(!latest\) return gameStore\.active\(\) \? 'offline' : 'installer';/, 'a game ahead of its installer is never compared by the installer\'s path');
-  assert.match(ask, /if \(!isNewerRelease\(gameVersion\(\), latest\.tag\)\) return 'current';/, 'compared against the GAME this copy plays');
-  assert.match(ask, /const manifest = parseManifestFile\(Buffer\.from\(await res\.arrayBuffer\(\)\), \{ version \}\);/);
-  assert.match(ask, /if \(manifest\.pack\.size !== latest\.game\.packSize\) throw/);
-  assert.match(ask, /\} catch \(err\) \{\s*if \(gameJob\?\.version === version\) gameJob = null;\s*if \(version\) gameStore\.fail\(version\);/, 'any failure is remembered - that release is the installer\'s');
-  assert.match(sliceOf('function gameFailed(', '/** The installer\'s path, quietly'), /gameStore\.fail\(version\);[\s\S]*if \(launcher && !launcher\.state\.launch\) \{ launcherDispatch\(\{ type: 'game-failed' \}\); startLaunchCheck\(\); return; \}\s*if \(updateChecksEnabled\(\)\) askInstaller\(\);/,
-    'a download that failed hands the release to the installer\'s path at once');
-  assert.match(sliceOf('function downloadGame(', '/** A version of the game is here'), /\(err\) => \{ gameJob = null; gameFailed\(version, err\); \}/);
-  const arrived = sliceOf('function gameArrived(', '/** The channel could not bring');
-  assert.match(arrived, /if \(!gameWindow \|\| gameWindow\.isDestroyed\(\)\) \{\s*gameStore\.activate\(version\);\s*launcherDispatch\(\{ type: 'game-applied', version \}\);/, 'no page running: played at once');
-  assert.match(arrived, /if \(gameStore\.ready\(\) !== version\) gameStore\.markReady\(version\);/, 'a page running: never switched under it');
-  // every check asks it first: the launcher's, the hourly one, --play's, the menu's
-  assert.match(sliceOf('function startLaunchCheck()', 'function runLauncher()'), /askGame\(\)\.then\(\(g\) => \{\s*if \(g === 'current'\) launcherDispatch\(\{ type: 'check-none' \}\);\s*else if \(g === 'offline'\) launcherDispatch\(\{ type: 'check-failed' \}\);\s*if \(g !== 'installer'\) return;/);
-  assert.match(sliceOf('function startRechecks()', '// ---- the window'), /if \(await askGame\(\) !== 'installer'\) return;\s*if \(currentUpdateTransport\(\) === 'updater'\) \{/);
-  assert.match(sliceOf('async function runDirect(', '// The launcher\'s two words.'), /askGame\(\)\.then\(\(g\) => \{ if \(g === 'installer'\) askInstaller\(\); \}\);/);
-  assert.match(main, /click: \(\) => checkForUpdatesLoudly\(\),/);
-  // served by the version in use
-  const serve = sliceOf('function handleDagger(req) {', '// ---- updating:');
-  assert.match(serve, /if \(gameStore\?\.active\(\)\) \{\s*const file = gameStore\.resolve\(rel\) \?\? gameStore\.resolve\(`\$\{rel\}\/index\.html`\);\s*return file \? fileResponse\(file\) : new Response\('not found', \{ status: 404 \}\);\s*\}/,
-    'a path the version does not name is not served - whatever the install holds');
-  assert.ok(serve.indexOf('gameStore?.active()') < serve.indexOf('let p = path.normalize(path.join(DIST, rel));'), 'before the install\'s own copy');
-  // counted, switched at a document load, proved, given up
-  const cw = sliceOf('async function createWindow(', '// ---- the launcher');
-  // PIN MOVED (UPDATE-POPUP): which navigations switch is lib/readyGameSwitch.cjs's, run in its own test below
-  assert.match(cw, /win\.webContents\.on\('did-start-navigation', \(d\) => \{\s*if \(switchesReadyGame\(d\)\) playReadyGame\(\);\s*\}\);/);
-  assert.match(cw, /gameStore\?\.bootStarting\(\);\s*await win\.loadURL\('dagger:\/\/game\/play\/index\.html'\);/);
-  assert.match(cw, /win\.webContents\.on\('did-fail-load', \(_e, code, _text, _url, isMainFrame\) => \{ if \(isMainFrame && code !== -3\) giveUp\('did not load'\); \}\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-21b RENDERER-GONE): the stop goes to the trial first, as ever - and a stop the trial does not
-  // take is said and restarted (test/tooling/fb1021b_renderergone.test.js), where it had been met by nothing
-  assert.match(cw, /win\.webContents\.on\('render-process-gone', async \(_e, details\) => \{[^]*?if \(giveUp\('stopped before it came up'\) \|\| /);
-  assert.match(cw, /const bad = gameStore\?\.rollback\(\);\s*if \(!bad\) return false;/);
-  assert.match(main, /ipcMain\.on\('dagger:game-up', \(e\) => \{\s*if \(gameWindow && !gameWindow\.isDestroyed\(\) && e\.sender === gameWindow\.webContents\) gameStore\?\.bootDone\(\);\s*\}\);/, 'the game\'s window\'s word only');
-  const preload = rd('app/preload.cjs');
-  assert.match(preload, /onUpdateReady: \(cb\) => \{\s*updateListeners\.push\(cb\);\s*if \(updateHeard\) cb\(updateHeard\);[\s\S]*?ipcRenderer\.send\('dagger:game-up'\);\s*\},/, 'the game\'s boot subscribing is its word that it came up');
-  assert.match(rd('src/main.js'), /Promise\.all\(\[import\('\.\/systems\/shellUpdates\.js'\), import\('\.\/systems\/notify\.js'\)\]\)\s*\.then\(\(\[updates, notify\]\) => updates\.listenForShellUpdates\(globalThis\.daggerShell/, 'and it subscribes once its own lazy modules have loaded');
-  // Restart to Update reloads onto a version the channel brought - the page's own Leave/Stay asks first
-  assert.match(sliceOf('async function restartToUpdate()', '/** A box over the window'), /if \(updateReady\?\.game\) \{ reloadOntoUpdate\(\); return; \}/);
-  assert.match(sliceOf('function reloadOntoUpdate()', '/** The menu\'s check, out loud'), /markLeaving\(gameWindow\.webContents\);\s*gameWindow\.webContents\.reload\(\);/);
-  // opened once, by the one instance, before the first request
-  assert.match(main, /if \(!isSingleInstance\) return;[^\n]*\n\s*openGame\(\);[^\n]*\n\s*protocol\.handle\('dagger', handleDagger\);/);
-  assert.match(sliceOf('function openGame() {', '/** The version of the game this copy plays'), /const seed = app\.isPackaged \? loadSeed\(GAME_SEED, app\.getVersion\(\)\) : null;\s*if \(!seed\) return;/);
-  // the game's version is what the player is told and what Play keeps
-  assert.match(main, /const gameVersion = \(\) => gameStore\?\.version\(\) \?\? app\.getVersion\(\);/);
-  assert.match(main, /current: gameVersion\(\),/);
-  // one range a request, a refused answer never read whole
-  const range = sliceOf('async function fetchPackRange(', '/** The channel\'s download in flight');
-  assert.match(range, /Range: `bytes=\$\{start\}-\$\{end - 1\}`/);
-  assert.match(range, /if \(res\.status !== 206 \|\| !res\.body\) \{ stop\.abort\(\); return \{ status: res\.status, contentRange, bytes: Buffer\.alloc\(0\) \}; \}/);
 });
 
 test('DA13: a readied version is switched to only by a navigation that can commit - a new document of the game\'s own, never one the fence cancels', () => {

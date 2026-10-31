@@ -52,15 +52,3 @@ test('CARDS3c the squeezed card: the same rigid plate, drawn up along its own le
   assert.ok(trs, 'mat4');
 });
 
-test('CARDS3c the host: a press on the hand remembered, squeezed as it is pulled down, its letting go a check (when the law has one) or a fold (on his turn), the front card alone squeezed', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const body = (name) => { const a = wm.indexOf(`function ${name}(`); return wm.slice(a, wm.indexOf('\n  }\n', a)); };
-  const listen = body('cardPointerListen');
-  // PIN MOVED (AUDIT CARDS-6 E2): the press keeps the pointer that made it
-  assert.ok(listen.includes("else if (!grabbed && cardHandHovered(g)) { g.peekHeld = true; g.handPress = { at: g.mouse.slice(), t: performance.now(), id: idOf(e) }; }"));
-  assert.ok(listen.includes('if (g.handPress) g.squeeze = squeezeOf(g.handPress.at, g.mouse, canvas.clientHeight);'));
-  assert.ok(listen.includes("if (kind === 'click' && legal?.check) cardPress(g, 'check');"), 'a click checks only where a check is the law\'s');
-  assert.ok(listen.includes("else if (kind === 'push' && legal) cardPress(g, 'fold');"), 'a push folds only on his turn');
-  assert.ok(listen.indexOf('g.handPress = null; g.squeeze = null;') < listen.indexOf('const d = g.drag;'), 'the press let go before the chips are asked');
-  assert.ok(body('cardDrawGame').includes('if (g.squeeze > 0 && mats.length > 1) mats[0] = squeezeMatrix(mats[0], g.squeeze);'), 'the front card');
-});

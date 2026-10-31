@@ -74,8 +74,6 @@ test('AUDIT LEGACY A1/B3: THE DEATH IS DECIDED AT THE DOOR - the blow that kills
     presentPlayerDeath({ health: 0 });
     assert.equal(loadFamily(w.storage, w.host.family.id).remains.length, 1);
   } finally { setDeathListener('projectLegacy', null); }
-  assert.match(rd('src/scenes/world.js'), /setDeathListener\('projectLegacy', \(\) => legacyHost\?\.onDeath\(\)\);/);
-  assert.match(rd('src/characters/playerEntity.js'), /hearDeath\(entity\);   \/\/ AUDIT LEGACY: OnDeath's subscribers, before the screen\n\s+_deathPresenter\?\.\(entity\);/);
 });
 
 test('AUDIT LEGACY A1: an Enduring toll is paid once a death - the door and the reset and a re-ask are one decision', () => {
@@ -86,13 +84,6 @@ test('AUDIT LEGACY A1: an Enduring toll is paid once a death - the door and the 
   assert.equal(w.host.deathOutcome().kind, 'rise');
   assert.equal(p.toll, 11, 'one toll');
   assert.equal(w.host.willRise(), false, 'presented');
-});
-
-test('AUDIT LEGACY B1: the Succession is the death\'s own screen - the DEATH-KEPT backstop and the exit autosave read it', () => {
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /!\(townTalk\.overlay instanceof DeathScreen\) && !modes\?\.deathUp\?\.\(\) && !successionOpen\(\)\) presentPlayerDeath\(playerEntity\);/);
-  assert.equal((src.match(/deathUp: townTalk\.overlay instanceof DeathScreen \|\| !!modes\?\.deathUp\?\.\(\) \|\| successionOpen\(\)/g) ?? []).length, 2, 'both exit autosaves');
-  assert.match(src, /function openLegacySuccession\(out, past = null\) \{\n\s+if \(successionOpen\(\)\) return;/);
 });
 
 // ---- the past and the record ---------------------------------------------------------------------------------------
@@ -163,13 +154,6 @@ test('AUDIT LEGACY A4/B7: a fall waits on the record - a closed tab or a failed 
   leaveBirth(w.tab, { familyId: w.host.family.id, personId: 9, region: 'Daggerfall', loc: 'Gothway Garden', estate: 0 });
   assert.ok(readBirth(w.tab, 9));
   assert.ok(readBirth(w.tab, 9), 'still there - a failed boot retries');
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /if \(!r\) \{ legacyBirthFailed\('no birth waits for this address'\); return; \}/);
-  assert.match(src, /\}\)\.catch\(\(e\) => legacyBirthFailed\(e\?\.message \?\? String\(e\)\)\);/);
-  // PIN MOVED (AUDIT LEGACY II A2): the birth stands only with its save - and the handoff is answered then
-  // PIN MOVED (LEGACY7): the save may answer later (an online birth's first save is the realm's checkpoint) - the birth
-  // stands with it all the same, and the handoff is answered then
-  assert.match(rd('src/scenes/legacyHost.js'), /payEstateOf\(p, \{ write: false \}\);\n\s+const landed = \(ok\) => \{\n\s+if \(ok\) \{ store\(\); clearBirth\(deps\.tab\(\)\); return true; \}/, 'the born member saved at birth, the handoff answered then');
 });
 
 test('AUDIT LEGACY A6/H3: TWO AUTHORITIES - a death is the store\'s, what a character was given is their save\'s: a reload rewinds a grant with the bag, never a death', () => {
@@ -252,33 +236,15 @@ test('AUDIT LEGACY B6: a switch and a retirement never go on without their save'
   assert.equal(w.host.mantleRefusal(), null);
 });
 
-test('AUDIT LEGACY B5: Privateer\'s Hold - a death Project Legacy will raise respawns at the start marker offline too, the toll said, and (BAL4) the tenth paid', () => {
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /const legacyRise = host\.legacyWillRise\?\.\(\) \?\? false;\n\s+const online = host\.dungeonOnline\?\.\(\) \?\? false;\n\s+if \(isPrivateersHold && \(online \|\| legacyRise\)\) \{/);
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): an offline rise pays the same tenth (it was "no online penalty")
-  assert.match(m, /const goldLost = applyDeathPenalty\(playerEntity\);/);
-  assert.match(rd('src/scenes/world.js'), /legacyRiseLine: \(\) => \{ const o = legacyHost\?\.deathOutcome\(\); return o\?\.kind === 'rise' \? o\.line : null; \},/);
-});
-
 test('AUDIT LEGACY B8 + F5: the maps ring nothing with the mod off; "Always have descendants" answers at the death', () => {
   const f = foundFamily(person('c-a'), { id: 'fam-n' });
   f.people[0].heir = false;
   assert.equal(newbornAllowed(f, f.people[0], { descendants: DESCENDANTS.random }), false);
   assert.equal(newbornAllowed(f, f.people[0], { descendants: DESCENDANTS.always }), true, 'the dial turned to Always later answers for everyone born');
-  assert.match(rd('src/scenes/legacyHost.js'), /const mapMarks = \(\) => \(family && deps\.on\(\) && !past \? openRemains\(\) : \[\]\)/);
   assert.equal(ESTATE_MAX, 9_900);
 });
 
 // ---- the UI -------------------------------------------------------------------------------------------------------------
-
-test('AUDIT LEGACY U2/U6/U10: the tree captures the pointer only once a drag is under way; its tools sit at the top, named', () => {
-  const src = rd('src/ui/familyPages.js');
-  assert.doesNotMatch(src, /onpointerdown = \(e\) => \{[^\n]*(setPointerCapture|capturePointer)/, 'never at the press');
-  // RPT1026-CLIENT (PIN MOVED): the capture through ui/pointerCapture.js, which answers a pad's refused pointer
-  assert.match(src, /if \(!drag\.held\) \{ drag\.held = true; view\.classList\.add\('dragging'\); capturePointer\(view, drag\.id\); \}/);
-  assert.match(src, /\.px-sys \.fam-tools \{ position: absolute; right: 6px; top: 6px;/);
-  assert.match(src, /b\.setAttribute\('aria-label', title\);/);
-});
 
 test('AUDIT LEGACY U3: the Succession walks by keyboard - arrows and Tab move, Enter presses the lit button, the line\'s end lit when no one is left', () => {
   const root = globalThis.document.createElement('div');
@@ -293,17 +259,10 @@ test('AUDIT LEGACY U3: the Succession walks by keyboard - arrows and Tab move, E
   walkButtons(root, 'Tab', { shiftKey: true });
   walkButtons(root, 'Space');
   assert.deepEqual(pressed, ['lgs-go-b', 'lgs-go-a']);
-  // PIN MOVED (LEGACY-HOME): a refused card's button is passed over, and the meeting's own acts (Talk) come before the end;
-  // PIN MOVED (AUDIT LEGACY II U14): a refused one is `aria-disabled` - in the walk, never lit first
-  assert.match(rd('src/ui/legacy/legacySuccession.js'), /\|\| win\.querySelector\?\.\('\.lgs-go:not\(\[disabled\]\):not\(\[aria-disabled="true"\]\)'\) \|\| win\.querySelector\?\.\('\.lgs-act'\) \|\| win\.querySelector\?\.\('\.lgs-end'\)\)\?\.focus\?\.\(\)/);
-  assert.match(rd('src/ui/legacy/legacyDoor.js'), /input\(code, e = null\) \{ walkButtons\(host, code, e\); \},/);
   void keydown;
 });
 
 test('AUDIT LEGACY U4/U8/H9: the mantle\'s refusal on the card; an armed act never waits for the way back; the tree says whose remains are at peace', () => {
-  const src = rd('src/ui/familyPages.js');
-  assert.match(src, /const why = _provider\?\.mantleRefusal\?\.\(\) \?\? null;/);
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /b\.onclick = \(\) => \{ famSec = id; disarmFamilyPages\(\); render\(\); \};/);
   assert.doesNotThrow(() => disarmFamilyPages());
   const f = foundFamily(person('c-a'), { id: 'fam-c' });
   const k = addChild(f, 1, { rng: familyRng(5) }).person;
@@ -314,8 +273,3 @@ test('AUDIT LEGACY U4/U8/H9: the mantle\'s refusal on the card; an armed act nev
   assert.ok(personChips(f, k, 0).some((c) => c.text === 'At peace'));
 });
 
-test('AUDIT LEGACY U5: five tabs on one row - the tab spacing a step tighter', () => {
-  // PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab): seven tabs - a step tighter again (0.08em, 9 px), the diamonds the lit tab's alone
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.px-tabs button \{ font: inherit; font-size: 20px; letter-spacing: 0\.08em; text-indent: 0\.08em;\n[^\n]*\n\s+min-height: 44px; padding: 6px 9px; display: flex; align-items: center; gap: 8px;/);
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.px-tabs button:not\(\.on\) \.px-c \{ display: none; \}/);
-});

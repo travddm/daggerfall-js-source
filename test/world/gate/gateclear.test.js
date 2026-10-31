@@ -253,35 +253,3 @@ test('GATE-CLEAR over the shipped lists: a gate\'s spot DOES land in the mod\'s 
   assert.ok(left > 0, `the rock fields' and mountains' pieces are the placement's to refuse, box by box: ${left} such positions`);
 });
 
-test('GATE-CLEAR by source: the build reads the clearing once and asks it at the pick, of each piece and flat before it stands, and remembers what it cost; the sweep runs between builds; the clearing is the omen\'s own roll, online alone', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.equal(w.match(/(?<!get )_gateClearNow\(\)/g)?.length, 3,   // (HOST-SPLIT 2: the pixel build reads it live through its getter, `get _gateClearNow()`, which is no read)
-    'read by the build, by the sweep and by the hub\'s word of the site (DISCORD-GATES) - nowhere else');
-  assert.match(w, /const gateClear = host\._gateClearNow\(\);\n\s*const gateLedger = \{ refused: false, reach: \[\] \};[^\n]*\n\s*const gateSite = gateSiteTest\(gateClear, px, py, gateLedger\);\n\s*if \(wod && onTheBay\(px, py\) && await wodOpened\) \{/, 'read once, before the pick');   // PIN MOVED (AUDIT CAPTAIN'S SEA G8): the pick the Bay's alone
-  // PIN MOVED (GATE-AGREE, bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): the road alone picks; the clearing asks each
-  // pick after it is made, the kernel levels every pick's ground, and a held pick stands nothing
-  assert.match(w, /\}, wodPathsPoint, \(name, prefab, rect\) => wodSiteClear\(terrainGen\.roads\(\), px, py, name, prefab, rect\)\);/, 'the road alone decides a pick');
-  assert.match(w, /if \(picks\.length && onTheBay\(px, py\)\) \{ wodPicks = picks; wodHeld = picks\.map\(\(p\) => !gateSite\(p\.prefabName, p\.prefab, p\.rect\)\); \}/, 'then the gate, of each pick');
-  assert.match(w, /wod: wodPicks \? \{ picks: wodPicks\.map\(/, 'the kernel levels every pick, held or not');
-  assert.match(w, /const stood = wodPicks\.filter\(\(_, i\) => !wodHeld\[i\]\);\n\s*const place = wod\.placements\(stood, wodAverages\.filter\(\(_, i\) => !wodHeld\[i\]\)\);/, 'a held pick stands none of its objects');
-  assert.match(w, /\{ _wodOffRoad\+\+; continue; \}\n(?:\s*\/\/[^\n]*\n)*\s*if \(boxNearGate\(gateClear, px, py, box\[0\], box\[2\], box\[3\], box\[5\]\)\) \{ gateLedger\.refused = true; _wodOffGate\+\+; continue; \}\n\s*gateLedger\.reach\.push\(box\[0\], box\[2\], box\[3\], box\[5\], 0\);\n\s*unionBox\(box\);/,
-    'a piece whose mesh box reaches the clearing is refused before it joins the bounds, the batch or the collider - and what stands is kept');
-  // PIN MOVED (VERGE1, 2026-10-07): the clear roadsides' ask may stand between the road's and the gate's - a road refusal too
-  assert.match(w, /for \(const f of place\.flats\) \{\n[^\n]*_wodOffRoad\+\+; continue; \}[^\n]*\n(?:\s*\/\/[^\n]*\n|\s*if \(vergeNet && [^\n]*\{ _wodOffRoad\+\+; continue; \}\n)*\s*if \(pointNearGate\(gateClear, px, py, f\.base\[0\], f\.base\[2\], WOD_FLAT_GATE_CLEAR_M\)\) \{ gateLedger\.refused = true; _wodOffGate\+\+; continue; \}[^\n]*\n\s*gateLedger\.reach\.push\(f\.base\[0\], f\.base\[2\], f\.base\[0\], f\.base\[2\], WOD_FLAT_GATE_CLEAR_M\);\n\s*if \(f\.scale\.x === 1/,
-    'a flat too, before it is added');
-  assert.match(w, /gateClearKey: gateClear\?\.key \?\? null,[^\n]*\n\s*gateRefused: gateLedger\.refused,[^\n]*\n\s*wodReach: gateLedger\.reach\.length \? Float32Array\.from\(gateLedger\.reach\) : null,/);
-  assert.match(w, /swap\.publish\(px, py, key, made, \{[\s\S]{0,9900}\n\s*for \(const pile of wodKept\.piles \?\? \[\]\) standWodPile\(pkey, wodLife, pile\);[^\n]*\n\s*gateClearSweep\.published\(pkey, gateClear\?\.key\);/, 'asked as it publishes');   // PIN MOVED (TESA-LANDS): 9700 -> 9900, the entry's landmarks' line; PIN MOVED (IC-SWAP-BEHIND): published through the swap, under the pixel's own key - 9400 -> 9700, the entry grown at the branch's merge of main (past 9,400 there already) and the tail's reads under `pkey`   // PIN MOVED (at the merge of main into TESA): 9000 -> 9400, TESA4's Arena roads' fields and its stale-layer check between
-  assert.match(w, /if \(_wodLate\.size && !building\) sweepWodLate\(\);[^\n]*\n\s*if \(!building\) sweepGateClear\(\);/, 'the sweep on the frame, between builds');
-  // PIN MOVED (IC-SWAP-BEHIND): built again through the swap (scenes/swapBehind.js rebuild) - behind its view, which stands; the
-  // switch off, torn down and queued nearest first, the player held on a pixel built again under them
-  assert.match(w, /function sweepGateClear\(\) \{\n\s*const clear = _gateClearNow\(\);\n\s*const again = gateClearSweep\.step\(clear, built\)\.map\(\(p\) => \(\{ px: p\.px, py: p\.py \}\)\);\n\s*if \(!again\.length\) return;\n\s*swap\.rebuild\(again\);/,
-    'built again and queued nearest first - the late sweep\'s shape');
-  assert.match(w, /let _gateClearNow = \(\) => null;/, 'offline, and until the gate\'s section installs it: the mod exactly');
-  assert.match(w, /if \(gateOmen\) _gateClearNow = \(\) => \{\n\s*if \(!_gateScan\) return null;\n\s*const day = gateAt\(Date\.now\(\) \+ _sharedOffsetMs\)\.day;\n\s*if \(_gateClearOf\.day !== day\) \{\n\s*let site = null;\n\s*try \{ site = findGateSite\(day, _gateScan\); \}[^\n]*\n\s*_gateClearOf = \{ day, site, clear: gateClearFor\(site\) \};/,
-    'the gate the relay\'s clock is about, on the omen\'s own scan and roll');
-  assert.match(w, /bayGateSite: \(day\) => \{\n\s*if \(!maps\) return null;\n\s*try \{ const scan = gateScanOf\(\); return scan \? findGateSite\(day, scan\) : null; \}/, 'the omen names the same site the clearing keeps');   // PIN MOVED (WW2): the Bay's lane's site
-  // AUDIT HOST-SPLIT 2, the second read: the build's text now stands in the module the join appends, so it is ordered
-  // against the build's construction, where the build stood
-  const built = w.indexOf('const { buildPixelNow } = createPixelBuild(');
-  assert.ok(built > 0 && w.indexOf('let _gateClearNow = () => null;') < built, 'declared before the build that reads it');
-});

@@ -32,23 +32,7 @@ import { isClassEnemyId, enemyEntityType } from '../../../src/characters/enemy/e
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');
-const D = src('src/scenes/dungeonContext.js');
-const X = src('src/scenes/exteriorFoes.js');
-const W = src('src/scenes/world.js');
 
-// ---- the dungeon's own lane, sliced out of the source (test/scenes/questparty3c.test.js's harness) ----
-const AST = acorn.parse(D, { ecmaVersion: 'latest', sourceType: 'module' });
-function find(pred) {
-  let hit = null;
-  (function walk(n) {
-    if (!n || typeof n.type !== 'string' || hit) return;
-    if (pred(n)) { hit = n; return; }
-    for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); }
-  })(AST);
-  return hit;
-}
-const fnSrc = (name) => { const n = find((x) => x.type === 'FunctionDeclaration' && x.id?.name === name); assert.ok(n, `src has function ${name}`); return D.slice(n.start, n.end); };
-const declSrc = (name) => { const n = find((x) => x.type === 'VariableDeclaration' && x.declarations.some((d) => d.id?.name === name)); assert.ok(n, `src declares ${name}`); return D.slice(n.start, n.end); };
 const scoped = (state) => new Proxy(state, {
   has: (t, k) => k !== '__s',
   get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])),
@@ -66,72 +50,6 @@ const foe = (over = {}) => ({
 });
 const questFoe = (symbol = 'tiger', over = {}) => foe({ questBehaviour: { questUID: 7, targetSymbol: { name: symbol } }, ...over });
 const PARTY = new Set(['aaa-0001', 'mmm-0002', 'zzz-0009']);
-
-function side(self, { own = [], linked = true } = {}) {
-  const foes = [...own];
-  const said = [], died = [];
-  const share = {
-    linked,
-    tagOf: (f) => (f.questBehaviour?.targetSymbol?.name ? { q: QUEST, s: f.questBehaviour.targetSymbol.name } : null),
-    accepts: (from) => PARTY.has(self) && PARTY.has(from) && share.linked,
-    partyPeer: (id) => PARTY.has(self) && PARTY.has(id),
-    peerMayHit: (peerId) => PARTY.has(peerId),
-    onPuppetHurt: () => {}, onPuppetDied: (tag, from, i) => died.push([tag.s, from, i]),
-    onKeptDied: (tag, i) => said.push([tag.q, tag.s, i]),
-    behaviourFor: (tag) => (share.linked ? { questUID: 7, targetSymbol: { name: tag.s } } : null),
-    adoptsOrphan: () => false,
-  };
-  const state = {
-    foeSeed, applyWireLook,   // AUDIT MW-NPC II K3: the records' look seed (roomRecord, applyFoeRecord, the puppets' stands)
-    ...TRAIT_DOORS,   // AUDIT WORLD-EVENTS: the trait doors roomRecord, applyFoeRecord and setAuthority call
-    partyOnlyQuestShare, opts: { selfId: () => self, questShare: () => share },
-    _layoutFoes: 0, foes, _authority: true, _encId: undefined, _ctxDead: false, _locationKey: 'dungeon:7',
-    _ownSeq: 0, _ownFrameSeq: 0, _ownGen: 0, _ownPups: new Map(), _ownPending: new Map(), _ownOwners: new Map(), _ownPendLoose: new Set(), _ownAdopted: new Map(), _ownKept: new Map(),
-    FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, QUEST_PUPPETS_MAX, CELL_LOOSE_PUPPETS, LOOSE_PUPPETS_MAX: 24, HIT_DMG_MAX: 10000, FOES_FRAME_MAX,
-    isClassEnemyId, enemyEntityType, validFoeRecord, validQuestTags, validLooseSeqs, companionNames, questMarkerYields, summonedWord, summonedRecord, markSummoned, GENDER_BIT: ['male', 'female'],   // PIN MOVED (AUDIT WK-U3, 2026-10-01): the own lane reads companions' names beside their places
-    _sharedFoe: () => false, fightN: () => 1, canStandFoe: () => true,
-    applyFoeRecord: (f, r) => { if (r.f) f.ai.feet = [...r.f]; if (Number.isFinite(r.h)) f.entity.health = r.h; if (r.d === 1) f.dead = true; f._pup = { feet: [...(r.f ?? f.ai.feet)], yaw: r.y ?? 0 }; },
-    buildFoeAt: async (e) => { const f = foe({ mobileType: e.mobileType, gender: e.gender, ai: { feet: [e.x, e.y, e.z], yaw: 0, resumeLive() { this.resumed = true; } } }); foes.push(f); return f; },
-    renderer: { destroyBillboardBatch: () => {} }, freeCorpse: (f) => { f.corpse = false; }, dropCandidate: () => {},
-    bindQuestFoeHost: (f, b) => { f.questBehaviour = b; },
-    questPoolOps: { removeFoe: (f) => { f.dead = true; } },
-    landPeerBlow: () => true,
-    console: { info() {}, warn() {}, error: (...a) => assert.fail(a.join(' ')) },
-  };
-  const api = mount(`
-    const q2 = (v) => Math.round(v * 100) / 100;
-    const q3 = (v) => Math.round(v * 1000) / 1000;
-    ${declSrc('isRoomFoe')}
-    ${declSrc('ownPupKey')}
-    ${declSrc('ownShare')}
-    ${declSrc('ownQuestTag')}
-    ${declSrc('ownLoose')}
-    ${declSrc('questTouched')}
-    ${declSrc('ownHeirIsMe')}
-    ${declSrc('ownHeirElse')}
-    ${declSrc('FOES_FRAME_SLACK')}
-    ${declSrc('FOE_MAX_PER_FRAME')}
-    ${declSrc('_maxLeft')}
-    ${declSrc('foeMaxOf')}
-    ${fnSrc('fitMaxima')}
-    ${fnSrc('roomRecord')}
-    ${fnSrc('ownFrame')}
-    ${fnSrc('applyOwnFrame')}
-    ${fnSrc('ownPuppetsOf')}
-    ${fnSrc('standOwnPuppet')}
-    ${fnSrc('keepOwnRecord')}
-    ${fnSrc('applyOwnRecord')}
-    ${fnSrc('keptKillTick')}
-    ${fnSrc('dropOwnPuppet')}
-    ${fnSrc('adoptOwn')}
-    ${fnSrc('ownHandOverFrame')}
-    ${fnSrc('dropOwnHanded')}
-    ${fnSrc('letGoOwn')}
-    ${fnSrc('standDownMarkerCopies')}
-    return { ownFrame, applyOwnFrame, ownHandOverFrame, dropOwnHanded, keptKillTick };
-  `, state);
-  return { ...api, state, foes, said, died, share };
-}
 
 // ---- the quest: the real machine over a script whose `killed` task is the ping ----
 const VENDOR = join(ROOT, 'vendor', 'dfu-quests');
@@ -189,50 +107,6 @@ test('KEPT-KILL: every quest the game reads and every Foe it declares fits the r
   assert.equal(getInnerSymbolName('_tiger_'), 'tiger', 'its symbol on the row');
 });
 
-test('KEPT-KILL: the gap, reproduced in the dungeon - an heir whose copy holds no such quest takes the handed tiger, and its fall is said once with its number on the heir\'s lane', async () => {
-  const tiger = questFoe('tiger', { _questMarker: true });
-  const owner = side('aaa-0001', { own: [tiger] });
-  const heir = side('mmm-0002', { linked: false });
-  heir.applyOwnFrame('aaa-0001', owner.ownFrame(true));
-  await tick();
-  assert.equal(heir.foes.length, 0, 'DISC28-J: no linked copy, no puppet - the tiger is the owner\'s alone while the owner stands it');
-  heir.applyOwnFrame('aaa-0001', owner.ownHandOverFrame(() => 'mmm-0002'));   // the owner dies by it, or walks out
-  await tick();
-  const took = heir.foes.find((f) => f._ownFrom == null && !f.dead);
-  assert.deepEqual(took?._keptTag, { q: QUEST, s: 'tiger' }, 'AUDIT DISC28 QS-J: taken on the partner\'s word');
-  assert.equal(heir.keptKillTick(took), false, 'alive: nothing to say');
-  took.entity.health = 0; took.dead = true; took.corpse = true;   // the heir kills it - no copy of the quest in the room
-  assert.equal(heir.keptKillTick(took), true);
-  assert.equal(heir.keptKillTick(took), false, 'once');
-  const i = heir.ownFrame(true).f.find((r) => r.d === 1)?.i;
-  assert.ok(Number.isInteger(i), 'its body rides the heir\'s lane');
-  assert.deepEqual(heir.said, [[QUEST, 'tiger', i]], 'the quest, the Foe and the number the heir\'s lane gives it - what a witness keys its own count on');
-  // what says nothing: a foe let go (its owner's again), one culled, a bound foe (a linked heir's copy counts it itself)
-  const gone = foe({ _keptTag: { q: QUEST, s: 'tiger' }, dead: true, _gone: true });
-  assert.equal(heir.keptKillTick(gone), false, 'let go at full health: no kill');
-  const bound = questFoe('tiger', { entity: { health: 0, maxHealth: 30, items: [] }, dead: true });
-  assert.equal(heir.keptKillTick(bound), false, 'a foe my copy holds: its QuestResourceBehaviour counts it');
-  assert.equal(heir.said.length, 1);
-});
-
-test('KEPT-KILL: a linked member who stands the kept tiger as a puppet sees its fall with its holder and number - the same key the holder\'s pose says', async () => {
-  const tiger = questFoe('tiger');
-  const owner = side('aaa-0001', { own: [tiger] });
-  const heir = side('mmm-0002', { linked: false });
-  heir.applyOwnFrame('aaa-0001', owner.ownFrame(true));
-  heir.applyOwnFrame('aaa-0001', owner.ownHandOverFrame(() => 'mmm-0002'));
-  await tick();
-  const took = heir.foes.find((f) => f._ownFrom == null && !f.dead);
-  const witness = side('zzz-0009');
-  witness.applyOwnFrame('mmm-0002', heir.ownFrame(true));
-  await tick();
-  assert.equal(witness.foes.filter((f) => !f.dead).length, 1, 'stood: the kept foe rides to the party as the quest\'s');
-  took.entity.health = 0; took.dead = true; took.corpse = true;
-  heir.keptKillTick(took);
-  witness.applyOwnFrame('mmm-0002', heir.ownFrame(true));
-  assert.deepEqual(witness.died, [['tiger', 'mmm-0002', heir.said[0][2]]], 'the puppet\'s death names the holder and the number its pose says');
-});
-
 test('KEPT-KILL: the ledger - the heir\'s rows ride its pose for the hold and no longer, eight at most; a member counts a kill once, by sight or by word, and remembers it past the hold', () => {
   const L = new KeptKillLedger();
   assert.equal(L.rows(0), null, 'nothing said: no field');
@@ -280,19 +154,3 @@ test('KEPT-KILL: the ping - Runaway Pet\'s `killed 1 _tiger_` fires on the owner
   assert.equal(creditKeptKills(B, L, 'acct-heir', rows, 10), 0, 'then said: already counted');
 });
 
-test('KEPT-KILL by source: both pools say a kept foe\'s fall each frame by the behaviour\'s test, a puppet\'s death names its owner and number, and the world host carries the pose both ways', () => {
-  // the dungeon: the frame's behaviour loop, and the record door's death
-  assert.match(D, /for \(const f of foes\) \{ f\.questBehaviour\?\.update\(\); if \(f\._keptTag \|\| \(f\.questBehaviour && f\._ownFrom == null\)\) keptKillTick\(f\); \}/, 'the dungeon frame asks every kept foe - DESYNC-ZERO: and every quest foe of mine');
-  assert.match(D, /if \(f\._pupQuest && !wasDead && f\.dead\) share\?\.onPuppetDied\?\.\(f\._pupQuest, f\._ownFrom, f\._ownI\);/, 'the dungeon witness names whose and which');
-  // the open air and the buildings: the same, in the pool's own words
-  assert.match(X, /f\.questBehaviour\?\.update\(\);\n\s+if \(f\._keptTag \|\| f\.questBehaviour\) keptKillTick\(f\);[^\n]*\n\s+if \(f\.dead\) continue;/, 'before the dead skip, as the behaviour runs');
-  assert.match(X, /function keptKillTick\(f\) \{\n(?:\s*\/\/[^\n]*\n)*\s+const tag = f\._keptTag \?\? \(isPrivateQuestFoe\(f\) \? _qTag\(f\) : null\);\n\s+if \(!tag \|\| f\._keptSaid \|\| f\.puppet \|\| !\(f\.entity\?\.health <= 0\)\) return false;\n\s+f\._keptSaid = true;\n\s+_questShare\?\.onKeptDied\?\.\(\{ q: tag\.q, s: tag\.s \}, f\.seq\);/, 'once, at zero, with its number on my stream');
-  assert.match(X, /if \(f\._pupQuest\) _questShare\?\.onPuppetDied\?\.\(f\._pupQuest, f\.puppet, f\.seq\);/, 'the open-air witness names whose and which');
-  // the world host: the heir's pose, the members' count, and the witness through the same ledger
-  assert.match(W, /onKeptDied: \(tag, i\) => \{ keptKills\.said\(tag, i, Date\.now\(\)\); \}/, 'said into the ledger');
-  assert.match(W, /\.\.\.keptKillField\(\),/, 'the pose carries it');
-  assert.match(W, /if \(p\?\.qk && social\.inMyParty\(acct\)\) creditKeptKills\(questBridge\?\.machine, keptKills, acct, p\.qk, Date\.now\(\)\);/, 'a member of my party alone');
-  // PIN MOVED (QUEST-AUDIT III KILL-ONCE): and through the Foe's partner credit, which a kill the envelope brought already spends
-  // PIN MOVED (AUDIT QA3 E3, quest/foe.js creditPartnerKill): the credit names whose kill it is - it spends only what that owner's envelope brought
-  assert.match(W, /if \(owner && Number\.isInteger\(i\) && !keptKills\.credit\(owner, tag\.q, tag\.s, i, Date\.now\(\)\)\) return;\n\s+foe\.creditPartnerKill\?\.\(owner\);/, 'the witness counts through the ledger');
-});

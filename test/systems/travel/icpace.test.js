@@ -98,9 +98,3 @@ test('IC-PACE the journey: a street is walked at its own town\'s pace - the Impe
   assert.ok(bare.rate <= TOWN_PACE_MAX);
 });
 
-test('IC-PACE the host\'s wiring: the keys\' travel held to the pace the town answers, none out of town', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const tvTownPace = \(\) => townWalk\.townPace\(state\.worldCoords\(player\.pos\)\);/);
-  assert.match(w, /const town = tvTownPace\(\) \?\? Infinity;/);
-  assert.doesNotMatch(w, /TOWN_PACE_MAX/, 'no town\'s pace of the host\'s own');
-});

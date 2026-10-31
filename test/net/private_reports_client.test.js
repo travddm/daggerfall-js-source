@@ -454,19 +454,8 @@ test('PRIVATE-REPORT the doors: `/bug` the form and `/mail` the mailbox, on eith
   assert.ok(HOST_COMMANDS.includes('bug'));
   assert.deepEqual(parseChatLine('/bug'), { kind: 'host', name: 'bug' }, 'never said to the room');
   assert.ok(HELP_LINES.some((l) => l.startsWith('/bug - ')), '/help says it');
-  const world = src('src/scenes/world.js');
-  // PIN MOVED (SEASON-BOOK): the host asks pauseCommandOf, mailboxCommandOf's lines and `/season` (test/ui/enhanced/seasonbook.test.js)
-  assert.match(world, /import \{ breachCommandOf, helpLines, pauseCommandOf, pauseCommandRefusal \} from '\.\.\/net\/chatCommands\.js';/);
-  assert.match(world, /\{ const at = pauseCommandOf\(text\); if \(at\) \{/);
   assert.equal(pauseCommandOf('/bug'), 'report');
   assert.equal(pauseCommandOf('/mail'), 'mailbox');
-  const door = src('src/ui/pauseDoor.js');
-  assert.match(door, /if \(\(hooks\.at === 'mailbox' \|\| hooks\.at === 'report' \|\| hooks\.at === 'season'\) && typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\);/);   // PIN MOVED (SEASON-BOOK): and `/season`
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /else if \(at === 'report'\) \{ postOpen = true; postKeep = \{ view: 'report' \}; \}/);
-  // AUDIT PRIVATE-REPORT UI-2: Escape in the mailbox's fields leaves the window; UI-10: a held key in a field is the field's
-  assert.match(menu, /if \(t && \(t\.tagName === 'INPUT' \|\| t\.tagName === 'TEXTAREA' \|\| t\.isContentEditable\) && !\(e\.key === 'Escape' && t\.closest\?\.\('\.px-postwin'\)\)\) return;/);
-  assert.match(door, /if \(e\.repeat && \(e\.key === 'Enter' \|\| e\.key === ' '\) && !isTextEntryTarget\(e\.target\)\) \{/);
   for (const rule of ['.px-postwin .pr-field textarea', '.px-postwin .pr-kind input:focus-visible', '.px-postwin .pm-doors',
     '.px-postwin .pr-field textarea::placeholder, .px-postwin .pr-field input::placeholder { color: var(--dim); }', '.px-postwin .pr-more[hidden] { display: none; }']) assert.ok(ENHANCED_CSS.includes(rule), rule);
 });

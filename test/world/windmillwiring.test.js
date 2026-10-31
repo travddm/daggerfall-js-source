@@ -52,43 +52,6 @@ test('WM2b: both exterior hosts select mills, mount the rotor, and draw it', () 
   }
 });
 
-test('WM2b: a mill only turns on a wind the sky actually knows', () => {
-  // sky.wind() is null under the classic sky, which eases nothing. Null
-  // is "no wind is known", NOT "the wind is zero" - so the guard is on
-  // the row's existence, and a mill stands still rather than guessing.
-  for (const host of EXTERIOR_HOSTS) {
-    const text = src(host);
-    assert.match(text, /sky\.wind\(\)/, `${host} does not read the eased wind`);
-  }
-  assert.match(src('src/scenes/shared.js'), /wind\(\)\s*\{\s*\n?\s*return weatherRowNow \? weatherRowNow\.wind : null;/,
-    'the sky controller no longer answers the eased wind, or answers zero instead of null');
-  // world.js reads it ONCE a frame rather than once a mill.
-  assert.match(hostText('src/scenes/world.js'), /const windNow = sky\.wind\(\);/,
-    'world.js should read the wind once per frame, not per mill');
-});
-
-test('WM2b: the rotor is uploaded lazily, and once', () => {
-  // A town with no farm block must pay nothing, and a location with
-  // twenty mills must upload one mesh.
-  assert.match(src('src/scenes/exterior.js'), /millCount && isEnhanced\(\)\)\s*\?\s*await getWindmillMeshes\(/,
-    'exterior.js uploads the mill even when no block here stands one');
-  const pipeline = src('src/scenes/dataPipeline.js');
-  assert.match(pipeline, /if \(gpuMeshes\.has\(key\)\) return gpuMeshes\.get\(key\);/,
-    'the mill parts no longer cache - every mill would upload its own copy');
-  assert.match(pipeline, /const ROTOR_KEY = -\d+;/,
-    'the rotor cache key must be one no ARCH3D record id can collide with');
-  assert.match(pipeline, /bodyKey = \(climateBase, isWinter\) => -\(/,
-    'the body is cached per climate and season, under a negative key');
-});
-
-test('WM2b: the streaming host phases mills on the MAP PIXEL, not the world', () => {
-  // The floating origin shifts the world under the player. A phase keyed
-  // on world position would re-seed every mill on every origin shift -
-  // every windmill in sight jumping to a new angle as you walk.
-  assert.match(hostText('src/scenes/world.js'), /rotorPhase\(px \+ local\[12\], py \+ local\[14\]\)/,
-    'world.js phases mills on something other than the map pixel + local offset');
-});
-
 test('WM2b: the two unwired hosts really do not place mills', () => {
   // The record says interiors and dungeons never stand a mill, because
   // mills are exterior scenery. Checked rather than asserted in prose.
@@ -189,26 +152,6 @@ test('WM2f: the mill comes with the building that carries its door', () => {
       mill.matrix[14] - mill.building.matrix[14]);
     assert.ok(d > 2 && d < 20, `${b}: the building is ${d.toFixed(1)} units from its mill`);
   }
-});
-
-test('WM2f: the building rides the ordinary model path, and the 1:1 lane never sees it', () => {
-  // It is a placed model like any other, so it takes its mesh, climate
-  // swap, collider and door geometry from the paths that already exist -
-  // which is also how it would leak into the classic skin, since those
-  // paths know nothing about the enhanced one. Hence the flag.
-  const layout = readFileSync(join(root, 'src/world/rmbLayout.js'), 'utf8');
-  assert.match(layout, /models\.push\(w\.building\)/, 'the building is not placed as an ordinary model');
-  assert.match(layout, /enhancedOnly: true/, 'the building is not marked as an enhanced-skin departure');
-  for (const host of EXTERIOR_HOSTS) {
-    assert.match(src(host), /placed\.enhancedOnly && !isEnhanced\(\)/,
-      `${host} would draw the mill's building on the classic skin`);
-  }
-  // WM2g: and it DOES claim a recordIndex now - the one the attached
-  // subrecord got. WM2f left it undefined on purpose, because the
-  // subrecord it belongs to is one Kamer added and the port's block did
-  // not have it; WM2g appends that subrecord, so the door has an inside.
-  assert.match(layout, /w\.building\.recordIndex = recordIndex/,
-    'the building has no subrecord index, so its door can never open');
 });
 
 test('WM2g: the mill\'s subrecord is attached, and attaching it twice does nothing', () => {

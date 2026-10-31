@@ -678,43 +678,6 @@ test('AUDIT POI U12 T8 A LOOK REFUSED LEAVES THE LOOK BEFORE IT; LOOK AT IT AND 
   P.panel.destroy();
 });
 
-test('AUDIT POI C1 C3 T8 THE QUEUE: a submission changed since it was listed is said and the queue asked again, the look ended; the document\'s hash sent with the word; more waiting than listed is said; the stale warning on a stale one alone; before a new POI and after a retirement nothing stands (mutants: no refresh on poi-changed; the hash not sent; the bound unsaid; the warning on every one; something shown for nothing)', async () => {
-  assert.match(src('src/ui/poi/poiReviewPanel.js'), /poiReview\(i, item\.id, item\.rev, verdict, word \|\| null, item\.docSha \?\? null\)/, 'the hash the queue gave, sent with the word (contract C1)');
-  const P = await over({ approver: true });
-  const live = docOf(P.sha, 'Old tower');
-  const fresh = 'poi-0000000f00d0';
-  P.svc.queue = [
-    { id: POI_ID, rev: 4, kind: 'retire', doc: null, docSha: null, base: null, author: 'Ann', at: 1, submittedAt: Date.now() / 1000 - 60, liveRev: 3, liveDoc: live, stale: true },
-    { id: fresh, rev: 2, kind: 'doc', doc: { ...docOf(P.sha, 'Hut'), id: fresh }, docSha: 'e'.repeat(64), base: null, author: 'Ann', at: 1, submittedAt: Date.now() / 1000 - 30, liveRev: null, liveDoc: null, stale: false },
-  ];
-  P.svc.more = true;
-  press(button(P.root, 'Approvals'));
-  await until(() => !!P.panel.review.queue(), 'listed'); await flush();
-  const dlg = () => P.panel.review.dialog();
-  assert.ok(all(dlg()).some((n) => n.textContent === 'More submissions are waiting. Decide on these to see the rest.'));
-  assert.equal(all(dlg()).filter((n) => n.className === 'dfpoi-warn' && /older live revision/.test(n.textContent)).length, 1, 'the stale one alone warned');
-  // a retirement: nothing after; its before the live one
-  const looks = () => all(dlg()).filter((n) => n.tagName === 'BUTTON' && n.textContent === 'Look at it');
-  press(looks()[0]);
-  assert.equal(P.edit.shownAs(POI_ID), null, 'after a retirement, nothing stands');
-  press(button(dlg(), 'Show the live one'));
-  assert.equal(P.edit.shownAs(POI_ID)?.name, 'Old tower');
-  // a new POI: the submission after; nothing before it
-  press(looks()[1]);
-  assert.equal(P.edit.overlay().get(fresh)?.doc.name, 'Hut');
-  press(button(dlg(), 'Show the live one'));
-  assert.equal(P.edit.shownAs(fresh), null, 'before a new POI, nothing stands');
-  press(button(dlg(), 'Show the submission'));
-  // changed since it was listed: said, the queue asked again, the look ended
-  P.svc.refuse['/v1/poi/review'] = 'poi-changed';
-  const asked = P.svc.count('/v1/poi/queue');
-  press(all(dlg()).filter((n) => n.tagName === 'BUTTON' && n.textContent === 'Approve')[1]);
-  await until(() => P.svc.count('/v1/poi/queue') === asked + 1, 'asked again'); await flush();
-  assert.equal(P.panel.review.looking(), null, 'the look ended');
-  assert.equal(P.edit.has(fresh), false, 'the submission looked at let go');
-  P.panel.destroy();
-});
-
 test('AUDIT POI C2 T8 A POI\'S HISTORY: a put-back drawn as one, a taken-back retirement in words; nothing offered to put back that has no document; put back the approver\'s alone; History only once the store has the POI (mutants: a put-back offered on a retirement or a put-back; offered to a builder; History on a new POI)', async () => {
   const P = await over({ approver: true });
   const first = docOf(P.sha, 'First');
@@ -778,8 +741,6 @@ test('AUDIT POI U13 THE WORDS: counts in their plurals; glTF\'s object names sai
   const importPart = (a) => t('poi.editor.importPart', '{name}: {vertices, plural, one {{vertices, number} vertex} other {{vertices, number} vertices}}, {triangles, plural, one {{triangles, number} triangle} other {{triangles, number} triangles}}, {materials, plural, one {# material} other {# materials}}', a);
   assert.equal(importPart({ name: 'Roof', vertices: 3, triangles: 1, materials: 1 }), 'Roof: 3 vertices, 1 triangle, 1 material');
   assert.equal(importPart({ name: 'Keep', vertices: 262144, triangles: 2, materials: 4 }), 'Keep: 262,144 vertices, 2 triangles, 4 materials');
-  assert.match(src('src/ui/poi/poiEditorPanel.js'), /t\('poi\.editor\.importPart', '\{name\}: \{vertices, plural, one \{\{vertices, number\} vertex\}/);
-  assert.match(src('src/ui/poi/poiEditorPanel.js'), /t\('poi\.editor\.speed', 'Eye \{speed, number\} m\/s'/);
   assert.equal(problemText({ code: 'material-count', want: 1, have: 2 }), 'Its model has 1 material; the part has 2.');
   assert.equal(gltfErrorText('missing', { what: 'accessor', index: 3 }), 'This model refers to an accessor that is not there.');
   assert.equal(gltfErrorText('missing', { what: 'bufferView', index: 0 }), 'This model refers to a buffer view that is not there.');

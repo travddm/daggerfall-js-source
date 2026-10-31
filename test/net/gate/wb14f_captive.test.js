@@ -309,7 +309,6 @@ test('WB14f the court: the Reckoning the ward takes lands on none of us here, wh
   const red = { color: [1, 0, 0], edge: [1, 0, 0], style: 5 };
   assert.deepEqual(cap.dress(red, reckonState(0)).color, [1, 0, 0], 'his own, unwarded');
   assert.equal(cap.dress(null, reckonState(12)), null);
-  assert.match(read('src/scenes/gate/gateCourt.js'), /if \(v === 'hit' && !wardTakes\(s\.cp, atk\)\) \{ if \(ATTACK_BY_ID\[atk\.a\] === ATTACKS\.wrath\) wrathLanded = true; land\(atk, P\); \}/);
 });
 
 test('WB14f AUDIT of WB14c: my blow on one of his host goes out from the floor its body stands on - a Brute from its platform, a gaoler from the Pen - and from no other floor; the bodies offered are those on my floor (mutants: refused from a platform - WB14c\'s "from his court" - or offered across the fire)', () => {

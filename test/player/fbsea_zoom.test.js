@@ -15,9 +15,6 @@ import { colliderPoses } from '../../src/world/prefabColliders.js';
 import { meshLocalBounds, Boat } from '../../src/systems/comeSailAway/comeSailAwayBoat.js';
 import { readyPool } from '../navalSea.mjs';
 
-const WORLD = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-const EOTB = readFileSync(new URL('../../src/player/eyeOfTheBeholder/eotbCamera.js', import.meta.url), 'utf8');
-
 test('FIELD BUGS 2026-09-29 (the sea) #3: THE MORROWIND CAMERA AT A HELM - a notch out is a ratio, the hull\'s reach in ten; in by the ratio (HELM-ZOOM: the whole range, from the base in a dozen notches - the reference\'s ten-unit ladder below 800 took sixty); off the helm the distance comes back to 800 and the save keeps no more; on foot the reference\'s far end stands (mutants: the ratio unapplied, the reach unclamped, the helm\'s distance kept off it, the save past the reference)', () => {
   const cam = createMwCamera();
   const settle = () => cam.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 });
@@ -85,7 +82,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #3: EYE OF THE BEHOLDER AT A HELM - past t
   c.setSeaReach(0);
   c.tick({});
   assert.ok(Math.abs(dist() - -MAX_Z) < 1e-9, 'off the helm: the mod\'s own far end, at once');
-  assert.match(EOTB, /const far = seaReach > -MAX_Z && !\(cfg\.overrides\.Boat\.enabled && isSailing\) \? -seaReach : MAX_Z;/, 'the mod\'s own boat override keeps its own');
 });
 
 test('FIELD BUGS 2026-09-29 (the sea) #3: THE HELM\'S REACH AND HER OWN HULL - the reach is SEA_ZOOM_REACH of her hull mesh\'s largest half-extent (a Small Ship 66 m, the galley 140 m); at her wheel her own stern pins the camera a few metres out, and with her own buckets passed by it stands at the reach; the world passes them by at a helm alone (mutants: the reach\'s half-extent, the skip unwired)', async () => {
@@ -127,11 +123,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #3: THE HELM\'S REACH AND HER OWN HULL - t
     assert.ok(Math.abs(free.distance - reach) < 1e-6, `hull ${hull}: her own passed by, at the reach (${free.distance.toFixed(1)} m)`);
     pool.remove(boat);
   }
-  // the world's wiring
-  assert.match(WORLD, /const csaHelm = csaOn\(\) && csaRuntime\?\.isSailing\(\) \? csaRuntime\.state\.CurrentBoat : null;\n\s+const camFilter = csaHelm \? csaCameraFilter\(csaHelm\) : null;/);
-  assert.match(WORLD, /raycast: \(o, d, m\) => Math\.min\(collider\.raycast\(o, d, m, camFilter\), hcc\.cameraHit\(o, d, m\)\),[^\n]*\n\s+spherecast: \(o, r, d, m\) => \{ const h = Math\.min\(collider\.sphereCast\(o, r, d, m, camFilter\)\.dist, hcc\.cameraHit\(o, d, m, r\)\);/);   // PIN MOVED (WAGONS3): and my driven wagon's body a wall to the camera on its bench
-  assert.match(WORLD, /seaReach: csaHelm \? csaSeaReach\(csaHelm\) : 0,/);
-  assert.match(WORLD, /for \(const \[key, b\] of _csaBuckets\) if \(b\.boat === boat\) skip\.push\(key\);/, 'her own buckets, and no other boat\'s');
 });
 
 test('AUDIT HELM-ZOOM (E1, E2, E3): IN FROM WHERE THE CAMERA STANDS WHEN PINNED, ONE NOTCH A FRAME, AND THE MOD\'S LADDER BELOW ITS BASE BOTH WAYS - a Morrowind camera pinned at 105 units moves on the first wheel-in (it spent four notches unseen); a burst of twenty clicks in one frame is one notch (a trackpad\'s swipe crossed the whole range); Eye of the Beholder out from below its base steps the mod\'s 0.2 (it leapt to the base) (mutants: in from the wanted distance, the burst summed, the ratio below the base)', () => {

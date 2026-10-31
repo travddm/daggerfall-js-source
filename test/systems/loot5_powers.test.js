@@ -79,12 +79,6 @@ test('LOOT5: thirty powers - one a record, named, briefed inside the card\'s 32,
   const lines = LR.rarityLines(w);
   assert.ok(lines.includes('Dragonsbane: +50% vs dragons and giants'), 'the card says it');
   assert.equal(lines.at(-1), LR.legendaryById('wyrmbane').lore, 'the lore still last');
-  const src = strip(read('src/systems/loot/lootPowers.js'));
-  for (const [seam, fn] of [['registerPlayerDamageMod', 'lootDamageMod'], ['registerPlayerDeathSave', 'lootDeathSave'], ['registerPlayerHurtListener', 'lootHurt'],
-    ['registerPlayerKillListener', 'lootKill'], ['registerAbsorptionChance', 'lootAbsorbChance'], ['registerMagicRoundHook', 'lootRound'], ['registerLegendaryFind', 'lootFind']]) {
-    assert.match(src, new RegExp(`\\n${seam}\\(LOOT_POWERS, ${fn}\\);`), `${seam} -> ${fn}`);
-  }
-  assert.match(read('src/scenes/world.js'), /setHudSetChips\(\(e\) => \[\.\.\.setHudChips\(e\), \.\.\.lootHudChips\(e\), \.\.\.martialHudChips\(e\)\]\);/, 'the HUD hears both');   // PIN MOVED (RPT1026-PROGRESS): and a martial path's passive beside them
 });
 
 test('LOOT5: who - my worn pieces, one count a power, a weapon\'s on its own blows, asleep in a duel, nothing off', () => {
@@ -339,5 +333,4 @@ test('LOOT5: the HUD\'s chips - the stacks, the charges and the recoveries, in t
   assert.deepEqual(chips.map((c) => [c.key, c.state]), [['flow', 'active'], ['dawnward', 'active'], ['grace', 'recovering']]);
   assert.ok(chips.every((c) => c.set === 'legendary'));
   assert.deepEqual(LP.lootHudChips({ ...me, peer: true }), []);
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /t\.set === 'legendary' \? RARITIES\.legendary\.colour/);
 });

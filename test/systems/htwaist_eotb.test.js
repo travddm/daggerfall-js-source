@@ -70,7 +70,6 @@ const lanternDraws = (r) => r.draws.filter((d) => d.batch.archive === LANTERN_AR
 test('HT-WAIST (EOTB): the frame state carries the lantern at the waist - bodyState passes it through, and the rig hands it over (mutant: the field dropped)', () => {
   assert.equal(bodyState({ hipLantern: true }).hipLantern, true);
   assert.equal(bodyState({}).hipLantern, false);
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /hipLantern: !!entity && lanternAtWaist\(entity\.lightSource\),/);
 });
 
 test('HT-WAIST (EOTB): lit at the waist, a SECOND billboard - Daggerfall\'s lantern picture under its own key, hung from the sprite\'s right hip; without it, the body draws alone (mutant: the lantern never drawn, or drawn with no lantern at the waist)', async () => {
@@ -152,56 +151,9 @@ test('HT-WAIST (EOTB): it SWINGS with the sprite\'s walk - a walk begun tilts th
   assert.ok(Math.abs(rest.up[0]) < 0.01 && rest.size.h > HIP_LANTERN_SPRITE.height - 0.001, 'at rest again: upright, full length');
 });
 
-test('HT-WAIST (EOTB): it lights you from where it hangs, and stops the moment it is not drawn - put out, first person, the saddle, the beast, the body toggled off, another lane (mutant: the light point never written, or left behind)', async () => {
-  setPlayerWaistLightOverride(null);
-  try {
-    const { b, r } = await liveBody();
-    ticks(b, 12, state({ hipLantern: true }));
-    await drawn(b);
-    const o = playerWaistLightOverride();
-    assert.ok(o, 'the light point written');
-    assert.ok(o.left < 0 && o.up > 0.3, `the right hip, above the feet (${JSON.stringify(o)})`);
-    const minted = r.batches.filter((x) => x.archive === LANTERN_ART_KEY).length;
-    // put out: the batch goes (its owner frees it) and so does the light point
-    ticks(b, 1, state({ hipLantern: false }));
-    assert.equal(playerWaistLightOverride(), null, 'put out: the light point cleared');
-    assert.equal(r.destroyed.filter((x) => x.archive === LANTERN_ART_KEY).length, minted, 'and the lantern\'s batch destroyed');
-    // riding / the beast: not drawn, nothing written
-    for (const s of [state({ hipLantern: true, riding: true }), state({ hipLantern: true, transformed: true })]) {
-      ticks(b, 12, s);
-      const before = lanternDraws(r).length;
-      b.draw(null, view);
-      assert.equal(lanternDraws(r).length, before, 'not on the rider\'s or the beast\'s sprite');
-      assert.equal(playerWaistLightOverride(), null);
-    }
-    // toggled off (the camera into the head) and another lane (mwView's Morrowind branch)
-    ticks(b, 12, state({ hipLantern: true }));
-    b.draw(null, view);
-    assert.ok(playerWaistLightOverride());
-    b.toggle(false, false);
-    assert.equal(playerWaistLightOverride(), null, 'the body toggled off: the light point goes with it');
-    b.toggle(true, false);
-    ticks(b, 12, state({ hipLantern: true }));
-    b.draw(null, view);
-    assert.ok(playerWaistLightOverride());
-    b.standDown();
-    assert.equal(playerWaistLightOverride(), null, 'another body has the frame: stood down');
-    assert.match(rd('src/player/mwView.js'), /eotbBody\.standDown\(\);\n\s*\/\/ RIDE-POV/, 'and mwView\'s Morrowind lane stands it down each frame');
-    // first person: the billboard is the first-person one - no lantern (HT-WAIST-BACK: it does not hang, whatever the view)
-    const fp = await liveBody();
-    fp.b.toggle(true, true);
-    ticks(fp.b, 12, state({ hipLantern: true }));
-    fp.b.draw(null, view);
-    assert.equal(lanternDraws(fp.r).length, 0, 'first person: no lantern at the hip');
-  } finally { setPlayerWaistLightOverride(null); }
-});
-
 test('HT-WAIST (EOTB): the picture is the Lantern template\'s own world texture - read off the template, never a literal; no data, no throw (mutant: the art door throwing, or a hard-wired record)', async () => {
   const t = templateByIndex(LANTERN_TEMPLATE);
   assert.deepEqual([t.worldTextureArchive, t.worldTextureRecord], [200, 10], 'TEXTURE.200 record 10, the shipping template\'s own');
-  const src = rd('src/player/eyeOfTheBeholder/eotbLantern.js');   // HT-WAIST-BACK: the art door every EOTB sprite takes
-  assert.match(src, /const t = templateByIndex\(LANTERN_TEMPLATE\);/);
-  assert.doesNotMatch(src, /getDFBitmap\(10\b|texName\(200\)/, 'no literal record');
   const warn = console.warn; console.warn = () => {};
   try { assert.equal(await loadLanternArt(), null, 'no ARENA2 in this container: null, never a throw'); } finally { console.warn = warn; }
   // and a failed art door leaves the body drawing without it

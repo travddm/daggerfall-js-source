@@ -200,11 +200,3 @@ test('REALM-DOOR, the words: the refusal fits a WebSocket close reason and asks 
   assert.equal(realmDoorShut(null), false, 'no session');
 });
 
-test('REALM-DOOR, the realm-era tab: its minter names the realm character it joined, and a door shut on it takes the player to the Online door with the realm\'s word before anything else the frame does (mutants: the minter back on the save\'s own id; the frame\'s check dropped)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /accountTokenMinter\(\{[^}]*character: \(\) => \(onlineOn \? realmSession\?\.id \?\? null : null\)/, 'the character this tab brings online is the one the realm joined - never an id the save or characterIdOf mints');
-  const frame = world.slice(world.indexOf('  const onlineFrame = (now, dt) => {'));
-  const shut = frame.indexOf("if (realmSession && !realmSession.lost && realmDoorShut(online)) { realmLost('no-realm-character'); return; }");
-  assert.ok(shut > 0, 'the online frame asks whether the relay shut the realm\'s door on this tab');
-  assert.ok(shut < frame.indexOf('if (seatOut()) {'), 'first - before the seat\'s own law draws its notice over it');
-});

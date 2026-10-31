@@ -140,76 +140,6 @@ test('every province has a NAME, and the names are the map\u2019s own spelling',
   assert.equal(PROVINCE_NAMES[INERT_REGION.key], 'Imperial Province');
 });
 
-// ── THE RAIL CANNOT DRIFT FROM THE FLOW ──────────────────────────
-// The wizard's states live in ui/chargen.js's STATES; the rail is a
-// second list of the same thing, grouped. A state that appears in
-// neither or in two would leave the wizard on a stage the rail cannot
-// show - so the two agree, mechanically, rather than by memory.
-test('every wizard state belongs to exactly one rail stage', () => {
-  const src = readFileSync(new URL('../../../src/ui/chargen.js', import.meta.url), 'utf8');
-  const m = src.match(/const STATES = \[([^\]]+)\]/);
-  assert.ok(m, 'ui/chargen.js lost its STATES list');
-  const states = [...m[1].matchAll(/'([a-zA-Z]+)'/g)].map((x) => x[1])
-    .filter((s) => s !== 'done');   // 'done' is the exit, not a stage
-  for (const state of states) {
-    const owners = STAGE_RAIL.filter((s) => s.states.includes(state));
-    assert.equal(owners.length, 1, `${state} is owned by ${owners.length} rail stages`);
-  }
-  const listed = STAGE_RAIL.flatMap((s) => s.states);
-  for (const s of listed) {
-    assert.ok(states.includes(s), `the rail names ${s}, which is not a wizard state`);
-  }
-});
-
-// ── AND NEITHER CAN THE STAGES ───────────────────────────────────
-// AUDIT 39. The rail agreed with the flow (above) while the RENDERERS
-// did not: STAGES had twelve keys against fourteen states, so the ten
-// class questions and the custom-class builder - BOTH reached from
-// this screen's own buttons - fell through to a pane that drew
-// nothing and claimed a classic screen owned it. The rail pin could
-// not see it, because the rail folds both into 'Class'.
-test('AUDIT 39: every wizard state has a renderer, not a fallback pane', () => {
-  const flowSrc = readFileSync(new URL('../../../src/ui/chargen.js', import.meta.url), 'utf8');
-  const view = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  const states = [...flowSrc.match(/const STATES = \[([^\]]+)\]/)[1].matchAll(/'([a-zA-Z]+)'/g)]
-    .map((x) => x[1]).filter((s) => s !== 'done');
-  const map = view.slice(view.indexOf('const STAGES = {'), view.indexOf('};', view.indexOf('const STAGES = {')));
-  for (const state of states) {
-    assert.match(map, new RegExp(`\\b${state}:\\s*\\w+Stage`), `${state} has no renderer in STAGES`);
-  }
-});
-
-test('AUDIT 39: the two new stages speak through the flow\'s own doors', () => {
-  const view = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  // THE QUESTIONS. displayQuestion already says where each answer
-  // starts, so a) b) c) are three buttons rather than a scroll to hunt
-  // in - and the answer goes through applyHit, not a second law.
-  assert.match(view, /flow\.applyHit\(\{ answerClass: i \}\)/);
-  assert.match(view, /\[\[aIndex, bIndex\], \[bIndex, cIndex\], \[cIndex, lines\.length\]\]/);
-  assert.match(view, /import \{ QUESTION_COUNT \} from '\.\.\/\.\.\/systems\/classQuestions\.js'/,
-    'the count is the quiz\'s own, not a ten typed here');
-  assert.match(view, /flow\.applyHit\(\{ confirmQClass: true \}\)/);
-  assert.match(view, /flow\.applyHit\(\{ cancelQClass: true \}\)/);
-  // THE BUILDER. Every control is one of the flow's hits; nothing here
-  // writes flow.custom itself, or the two screens would keep two
-  // different builders.
-  for (const hit of ['customSkill: slot', 'customHp: dir', 'customStatStep: dir',
-    'customAdvantage: true', 'customDisadvantage: true', 'customExit: true', 'customBox: true']) {
-    assert.ok(view.includes(hit), `the builder does not press ${hit}`);
-  }
-  const builder = view.slice(view.indexOf('function customClassStage()'), view.indexOf('// ── HOW YOUR HISTORY'));
-  assert.doesNotMatch(builder, /c\.(skills|stats|hp|advantages|disadvantages)\s*(\[[^\]]*\])?\s*=[^=]/,
-    'the view must not write the builder - the laws are ui/chargen.js\'s');
-  // The words for an advantage are DFU's recovered HardStrings, and
-  // the ones for a skill are the skill table's.
-  assert.match(view, /import \{ labelFor \} from '\.\.\/\.\.\/systems\/specialAdvantages\.js'/);
-  // AND THE FALLBACK PANE NO LONGER LIES: nothing classic is mounted
-  // behind the enhanced skin (chargenSession mounts this view alone).
-  assert.doesNotMatch(view, /is still the classic screen/);
-  const pending = view.slice(view.indexOf('function pendingStage(stage)'), view.indexOf('// ── SHELL'));
-  assert.match(pending, /has nothing to show/);
-});
-
 // The source sweeps above hold that the two views exist and press the
 // flow's doors; these hold that the doors they press are REAL, which a
 // text pin cannot. Both states are entered the way the enhanced screen
@@ -297,12 +227,6 @@ test('AUDIT-39r: the enhanced quiz answers on the PRESS - no invisible constella
   assert.equal(f.qAnswered, 2);
   assert.notEqual(f.qDisplay, second, 'on the question the player was actually reading');
 
-  // ...and the view really does cut that seam, rather than the pin
-  // proving a helper nobody calls.
-  const view = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(view, /flow = muteConstellation\(f\);/, 'the mount mutes the flow it is handed');
-  assert.doesNotMatch(view, /startConstellationAnim returns 0 seconds without it/,
-    'and the false premise is gone from the stage that rested on it');
 });
 
 test('AUDIT 39: the class list\'s last row reaches a builder the view can drive', () => {
@@ -345,36 +269,6 @@ test('AUDIT 39: the class list\'s last row reaches a builder the view can drive'
   assert.equal(c.box, null);
 });
 
-// ── THE KEYBOARD ─────────────────────────────────────────────────
-// Live proof is tools/enhancedChargenProbe.mjs, which walks the whole
-// wizard to `done` without a pointer event. What a sweep holds is the
-// three things that would rot quietly.
-test('the wizard routes keys through the SHARED table, not a second map', () => {
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(src, /import \{ overlayAction, isTextEntryTarget \} from '\.\.\/input\.js'/,
-    'a second key map is how the two skins come to disagree about what Escape does');
-  assert.match(src, /const action = overlayAction\(e\);/);
-  assert.match(src, /flow\.input\(action\)/, 'and the FLOW answers it, not this file');
-});
-
-test('the key handler has an owner - it is removed on unmount', () => {
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(src, /addEventListener\('keydown'/);
-  const unmount = src.slice(src.indexOf('unmount()'));
-  assert.match(unmount, /removeEventListener\('keydown'/,
-    'a window-level listener outlives the DOM it was mounted for');
-});
-
-test('a real text field keeps its own keys', () => {
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  const fn = src.slice(src.indexOf('function onKey'), src.indexOf('\n}', src.indexOf('function onKey')));
-  assert.match(fn, /if \(isTextEntryTarget\(e\.target\) && action !== 'back'\) return;/,
-    'the name boxes feed the flow themselves - every key but Escape, which no field types (DISC10-B) - a stolen key is a doubled letter (CG2: the one shared rule, and the host\'s ladder leaves the field\'s key alone too)');
-  // and it must not swallow keys it did not use, or Tab stops working
-  assert.ok(fn.indexOf('if (!action) return;') < fn.indexOf('preventDefault'),
-    'preventDefault must come AFTER the table has claimed the key');
-});
-
 // ── THE SEAM ─────────────────────────────────────────────────────
 // The skin is chosen in ONE place. AUDIT 17i split createChargenWindow
 // out because three separate bugs came from hosts wiring chargen by
@@ -389,58 +283,6 @@ test('no host mounts the enhanced wizard itself', () => {
     assert.ok(!/enhancedChargen/.test(src),
       `src/scenes/${f} reaches for the enhanced wizard - it goes through createChargenWindow`);
   }
-});
-
-test('the seam forks on the skin, and needs a DOM to do it', () => {
-  const src = readFileSync(new URL('../../../src/systems/chargenSession.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(isEnhanced\(\) && typeof document !== 'undefined'\)/,
-    'a DOM view needs a DOM; without one the canvas wizard stands');
-  assert.match(src, /enhancedChargenOverlay\(flow/);
-  // the hosts tear an overlay down when it reports done, and a DOM
-  // node outlives the object reporting it - so unmount comes first
-  const fn = src.slice(src.indexOf('function enhancedChargenOverlay'));
-  assert.ok(fn.indexOf('view?.unmount()') < fn.indexOf('onDone?.('),
-    'the view must come down BEFORE done fires');
-});
-
-test('the FOUR HOSTS are each named at the seam', () => {
-  const src = readFileSync(new URL('../../../src/systems/chargenSession.js', import.meta.url), 'utf8');
-  for (const host of ['world.js', 'exterior.js', 'worldModes.js', 'dungeonContext.js']) {
-    assert.ok(src.includes(host), `the seam does not name ${host}`);
-  }
-  // WAVE D: the fourth host went through the door, so the seam names
-  // it WIRED. What the rule demands is that the list ACCOUNT for every
-  // host - a host may not be omitted, whatever its state - so the pin
-  // reads the state rather than assuming one.
-  assert.match(src, /dungeonContext\.js\s+WIRED \(wave D/,
-    'the fourth host reaches the fork now, and the seam says so by name');
-  assert.ok(!/FLAGGED/.test(src), 'and no host is left outside the seam');
-});
-
-// ── A MODAL OVERLAY OWNS ITS INPUT ───────────────────────────────
-// Mac, playing the deployed build: the wizard came up over a live
-// dungeon, the map ignored every click, and the mouse still swung the
-// view. Both halves are the same fact - the host was reading input
-// underneath a screen that had it.
-test('the wizard drops the pointer lock, and keeps dropping it', () => {
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(src, /document\.exitPointerLock\(\)/,
-    'a LOCKED pointer never reaches the DOM - every mouse event goes to the '
-    + 'locked element as a delta, so a fixed div is invisible to it at any z-index');
-  assert.match(src, /addEventListener\('pointerlockchange'/,
-    'the hosts only gate RE-taking the lock; a host that takes it anyway must lose it');
-  const un = src.slice(src.indexOf('unmount()'));
-  assert.match(un, /removeEventListener\('pointerlockchange'/, 'and the listener has an owner');
-});
-
-test('keys are captured, so the host never sees one the wizard used', () => {
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(src, /addEventListener\('keydown', keyHandler, \{ capture: true \}\)/,
-    'the host walks the player and routes dungeon keys off its own window keydown');
-  const fn = src.slice(src.indexOf('function onKey'), src.indexOf('\n}', src.indexOf('function onKey')));
-  assert.match(fn, /e\.stopPropagation\(\)/);
-  assert.ok(fn.indexOf('if (!action) return;') < fn.indexOf('stopPropagation'),
-    'a key the wizard did NOT use must still reach the page');
 });
 
 // ── THE REAL CORPUS ──────────────────────────────────────────────

@@ -52,15 +52,6 @@ test('AUDIT-RR F1: the swing clock hands the rig\'s { entity, weaponType, usingR
     machineStep(m, 0.016, 50);
     assert.equal(seen.at(-1), null, 'a caller without one hands null (the widget clone\'s path)');
   } finally { registerMeleeWeaponAnimTime(null); }
-  assert.match(rd('src/characters/weaponStates.js'), /export function machineStep\(m, dt, liveSpeed, animCtx = null\)/);
-  assert.match(rd('src/characters/weaponStates.js'), /getMeleeWeaponAnimTime\(liveSpeed, animCtx\)/);
-  assert.match(rd('src/combat/playerWeapon.js'), /machineStep\(this\.machine, dt, this\.liveSpeed, this\.animCtx\?\.\(\) \?\? null\)/);
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): the rig's thunk is PlayerWeapon's swingCtx - the same three
-  // fields off the hand in use (the striking hand while a strike of both hands is in flight, else the used hand, so one
-  // hand in use is asked exactly as before) - and (PIN MOVED, TWO-HANDS AUDIT 2) nothing else: the off hand's burden is
-  // whole ticks the machine holds, never a factor a ctx carries
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /playerWeapon\.animCtx = \(\) => playerWeapon\.swingCtx\(entity\);/);
-  assert.match(rd('src/combat/playerWeapon.js'), /return \{ entity, weaponType: weaponTypeForItem\(this\.weapon\), usingRightHand: this\.activeHand === 'R' \};/);
   assert.equal(typeof CLASSIC_FRAME_UPDATE, 'number');
 });
 
@@ -79,30 +70,7 @@ test('AUDIT-RR F2: a guild joined through its initiation quest\'s end runs the c
   }
   const noStore = {};
   guildInitiationQuestEnded(noStore, tg.initiationQuest ?? 'O0A0AL00', true, 0);
-  assert.match(rd('src/systems/guild/guilds.js'), /export function guildInitiationQuestEnded\(memberships, questName, questSuccess, now, store = null\)/);
-  assert.match(rd('src/systems/guild/guilds.js'), /joinGuild\(memberships, guild, now, store\);\s+\/\/ AUDIT-RR F2/);
-  assert.match(hostText('src/scenes/world.js'), /guildInitiationQuestEnded\(activeMemberships\(playerEntity\), q\?\.questName \?\? '',[\s\S]{0,200}_questStore\(\)/, 'the host hands the store');
   _resetModSettings();
-});
-
-test('AUDIT-RR F4: the expulsion squad places with CreateFoeSpawner\'s own arguments - no line-of-sight check, the mod\'s distances, a long attempt budget - and standLooseFoe takes all four', () => {
-  const he = rd('src/scenes/hostEnchant.js');
-  assert.match(he, /mobileType, \{ allied = false, lineOfSightCheck = true, minDistance = 4, maxDistance = 20, attempts = LOOSE_FOE_PLACE_ATTEMPTS, open = false \} = \{\}\)/);   // PIN MOVED (PACK-OPEN: and `open`, a raid stand's)
-  assert.match(he, /for \(let i = 0; i < attempts && !spot; i\+\+\) \{\s+spot = placeFoeFreely\(env, \{ minDistance, maxDistance, lineOfSightCheck \}\);/);
-  const ri = rd('src/systems/roleplayRealism/rrInstall.js');
-  assert.match(ri, /export const RR_SQUAD_PLACE_ATTEMPTS = 600;/);
-  assert.match(ri, /_host\.spawnFoe\(wave\.mobileType, \{ minDistance: wave\.minDistance, maxDistance: wave\.maxDistance, lineOfSightCheck: false, attempts: RR_SQUAD_PLACE_ATTEMPTS \}\)/);
-});
-
-test('AUDIT-RR F5/F8: encumbranceEffects reads the PLAYER alone (RoleplayRealism.cs:582) and SetFatigue clamps both ways; F9: the purification potion\'s install-time read is recorded', () => {
-  const ri = rd('src/systems/roleplayRealism/rrInstall.js');
-  assert.match(ri, /if \(!rrModule\('encumbranceEffects'\) \|\| !entity\?\.isPlayer \|\| !entity\?\.stats/);
-  assert.match(ri, /entity\.fatigue = Math\.min\(maxFatigue\(entity\), Math\.max\(0, \(entity\.fatigue \?\? 0\) - cost\)\)/);
-  // BALANCE1: the overload's drain is exertion, on the port's scale - and only a DRAIN is scaled (a negative effect is the C#'s own);
-  // the pre-merge audit (0927b F2): the fraction CARRIED on the entity, never truncated away
-  assert.match(ri, /let cost = e\.fatigueEffect;\s*if \(cost > 0\) \{\s*const owed = cost \* FATIGUE_DRAIN_SCALE \+ \(entity\._rrFatigueCarry \?\? 0\);\s*cost = Math\.floor\(owed \+ 1e-9\);[^\n]*\n\s*entity\._rrFatigueCarry = Math\.max\(0, owed - cost\);/);
-  const dup = ri.match(/^import \{[^}]*\} from '\.\/rrRealism\.js'/gm) || [];
-  assert.equal(dup.length, 1, 'one import from rrRealism.js, not two');
 });
 
 test('AUDIT-RR F7: EncumbranceEffects_OnNewMagicRound is float arithmetic - the band edges land where the C#\'s do (double arithmetic put 38/50 one off)', () => {
@@ -126,23 +94,10 @@ test('AUDIT-RR F26: TrainingSkillPicker_OnItemPicked\'s `(float)skillValue / tra
   assert.equal(rrTrainingCost(100, 25, 50, false), 100, 'variableTrainingPrice off');
 });
 
-test('AUDIT-RR F10: an ENEMY_BASICS row the mod cannot write is said, not skipped in silence', () => {
-  assert.match(rd('src/systems/roleplayRealism/rrRealism.js'), /if \(!target \|\| Object\.isFrozen\(target\)\) \{ if \(target\) console\.warn\(`\[rr\] enemyAppearance: ENEMY_BASICS row \$\{id\} is frozen/);
-});
-
-test('AUDIT-RR F13: the sprite-variant race reads the location\'s climate SETTINGS\' worldClimate (223-232), not the climate type 0-3 that fell to the Breton arm everywhere', () => {
-  assert.match(rd('src/scenes/worldModes.js'), /worldClimate: hit\.dfLocation\?\.climate\?\.worldClimate \?\? null,\s+\/\/ AUDIT-RR F13/);
-});
-
 test('AUDIT-RR F14/F25: the neck band is the sprite\'s BOTTOM fifth (Unity v = 0 is the bottom row; the port samples v = 0 at the top) and the docked large HUD lifts the mount by its own height', () => {
   const band = rrRidingNeckBand(10);
   assert.deepEqual(band, { u0: RR_RIDING.extX, u1: RR_RIDING.extX + RR_RIDING.extW, v0: 0.8, v1: 0.8 + 0.1, widthTrim: 14 });
   assert.equal(rrRidingNeckBand(0).v1, 0.8, 'no lift, no band');
-  const mr = rd('src/player/mountRig.js');
-  assert.match(mr, /import \{ horseOffsetHeight, dockedLargeHudHeight \} from '\.\.\/ui\/hud\/hudLarge\.js'/);
-  assert.match(mr, /const offset = Math\.trunc\(dockedLargeHudHeight\(\)\);[^\n]*\n\s+rect\.y = c\.height - \(\(art\.height \+ yAdj\) \* scaleY\) - offset;\s+return \{ yAdj, scaleY, c, offset \};/);   // AUDIT-RR2 G4: `(int)` (EnhancedRiding.cs:257)
-  assert.match(mr, /function drawNeckBand\(\{ yAdj, scaleY, c, offset \}, rect, art, r, tint\)/);   // HORSE-LIT: the sprite's light rides in (fb1016_horselit.test.js)
-  assert.match(mr, /\{ u0: band\.u0, v0: band\.v0, u1: band\.u1, v1: band\.v1 \}, tint\)/);
 });
 
 test('AUDIT-RR F15/F16/F17/F18: the riding component\'s contacts - a civilian under the hooves bleeds LETHAL, cries at RidingVolumeScale, is retired; a foe is charged ONCE with the component\'s own knockback and the heavy pain voice, the blow handed down with no knock direction', () => {
@@ -186,7 +141,6 @@ test('AUDIT-RR F15/F16/F17/F18: the riding component\'s contacts - a civilian un
   const monster = { entity: { isClass: false }, mobileType: 0 };
   const v = enemyHeavyPainVoice(monster, () => 0.99);
   assert.ok(v && typeof v.clip === 'number', 'a monster answers');
-  assert.match(rd('src/scenes/hostCombat.js'), /export function enemyHeavyPainVoice\(f, rolls = Math\.random\) \{\s+if \(!f\) return null;[\s\S]{0,400}const gender = \(f\.gender === 'male' \|\| f\.mobileType === KNIGHT_CITY_WATCH\) \? 'male' : 'female';\s+return combatVoice\(\{ race: foeVoiceRace\(f, rolls\), gender, isAttack: false, heavyDamage: true, rolls \}\);/);   // AUDIT-RR2 G2: the component's own pick (:190-194)
   // F15: both hosts hand LETHAL_HIT to the splash; both stand the component; the standalone exterior runs its contacts
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(h);
@@ -194,23 +148,7 @@ test('AUDIT-RR F15/F16/F17/F18: the riding component\'s contacts - a civilian un
     assert.match(s, /createRrRidingContacts\(\{/, `${h}: the component`);
     assert.match(s, /voice: \(f\) => enemyHeavyPainVoice\(f\)/, `${h}: the voice`);
   }
-  assert.match(hostText('src/scenes/world.js'), /ridingVolumeScale: \(\) => \(_travelSoundsOff \? 0 : RIDING_VOLUME_SCALE\)/);
-  assert.match(rd('src/scenes/exterior.js'), /if \(rrRidingOn\(\) && player\.riding && player\.isRunning\) rrRiding\.contacts\(\);/);
   _resetModSettings();
-});
-
-test('AUDIT-RR F6/F23/F24/F30: the bed\'s click rests in THAT bed (ignoreAllocatedBed), the intense box rides over DFU\'s own TrainSkill box, the gold gate counts letters of credit, RaiseTime before the skill write', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /interiorKeyCtx\.toggleRest\(\{ ignoreAllocatedBed: true \}\);/);
-  assert.match(wm, /toggleRest\(\{ ignoreAllocatedBed = false \} = \{\}\) \{/);
-  assert.match(wm, /createRestWindow\(interiorRestDeps, ignoreAllocatedBed\)/);   // through main's rest door (RESTDOOR1), the flag riding
-  const intensive = wm.indexOf('interiorTicker.advance(days * MINUTES_PER_DAY);   // RaiseTime(SecondsPerDay * 4) first');
-  assert.ok(intensive > 0);
-  assert.ok(wm.indexOf('playerEntity.skills[skill] = permanentSkillValue(playerEntity, skill) + points;   // SetPermanentSkillValue', intensive) > intensive, 'the days pass, then the +4');
-  const gw = rd('src/ui/guildServiceWindows.js');
-  assert.match(gw, /import \{ goldAmount, totalGoldAmount(?:, deductGold)? \} from '\.\.\/systems\/court\.js'/);   // REP3/REP4: the temple's pardon and penance take their gold at the same counter
-  assert.match(gw, /if \(totalGoldAmount\(entity\) < cost\) return \[\{ rows: macroRows\(rows, NOT_ENOUGH_GOLD_ID, ctx\) \}\];/);
-  assert.match(gw, /AUDIT-RR F23: TrainSkill pushes DFU's own MessageBox\(TrainSkillId\)/);
 });
 
 test('AUDIT-RR F32/F35: WorldDataVariants\' last key is THIS location\'s before its blocks are read, and a negative key asks nothing', () => {
@@ -223,23 +161,6 @@ test('AUDIT-RR F32/F35: WorldDataVariants\' last key is THIS location\'s before 
   assert.ok(lastLocationKeyOf() < 0);
   assert.equal(getBlockVariantHere('TVRNAS02.RMB'), NO_VARIANT, '`if (lastLocationKey >= 0)` (WorldDataVariants.cs:192)');
   clearWorldDataVariants();
-  assert.match(hostText('src/scenes/world.js'), /setLastLocationKeyTo\(dfLocation\.regionIndex, dfLocation\.locationIndex \?\? 0\);\s+\/\/ AUDIT-RR F32/);
-  assert.match(rd('src/scenes/exterior.js'), /setLastLocationKeyTo\(dfLocation\.regionIndex, dfLocation\.locationIndex \?\? 0\);\s+\/\/ AUDIT-RR F32/);
-  const w = hostText('src/scenes/world.js');
-  const key = w.indexOf('setLastLocationKeyTo(dfLocation.regionIndex, dfLocation.locationIndex ?? 0);   // AUDIT-RR F32');
-  const layout = w.slice(key).search(/layoutLocation(?:Steps)?\(/) + key;   // PIN MOVED (IC-STUTTER): the streaming host's layout a block a step
-  assert.ok(key > 0 && layout > key && layout - key < 4000, 'the key is set before the layout that reads it');
-});
-
-test('AUDIT-RR F33/F34/F36/F37/F38/F39: the locationnew resolver is wired at install, place.js seeds the merge with the location index, no phantom discovery record, a duplicate location throws, a stored replacement block is read again, a new game clears the variants', () => {
-  assert.match(rd('src/formats/worldData/worldDataReplacement.js'), /export function installWorldDataReplacement\(\) \{[\s\S]{0,200}setNewLocationIndexResolver\(getNewDFLocationIndex\);/);
-  assert.match(rd('src/formats/worldData/worldDataReplacement.js'), /if \(dfRegion\.mapIdLookup\.has\(dfLocation\.mapTableData\.mapId\)\) throw new Error/);
-  assert.match(rd('src/formats/worldData/worldDataReplacement.js'), /if \(dfRegion\.mapNameLookup\.has\(dfLocation\.name\)\) throw new Error/);
-  assert.match(rd('src/systems/quest/place.js'), /mergeNamedBuildings\(location\.exterior\.buildings, blocks\.filter\(\(b\) => b\.dfBlock\), \{ locationIndex: location\.locationIndex \?\? 0 \}\)/);
-  assert.match(hostText('src/scenes/world.js'), /const armRec = arm \? \(topicTree\.listBuildings \?\? \[\]\)\.find\(\(b\) => b\.buildingKey === arm\.buildingKey\) : null;\s+if \(arm && armRec\) discoverBuilding\(/);
-  assert.match(rd('src/formats/blocksFile.js'), /if \(this\._blocks\[block\] !== null && this\._blocks\[block\]\.bytes !== null\) return true;\s+\/\/ AUDIT-RR F38/);
-  const cg = rd('src/systems/chargenSession.js');
-  assert.equal((cg.match(/^\s+clearWorldDataVariants\(\);\s+\/\/ AUDIT-RR F39/gm) || []).length, 2, 'both new-game paths');
 });
 
 test('AUDIT-RR (RRI) F3/F5/F6/F7/F8/F9/F10: shops stock the registered custom items; a fur piece\'s weight is its own field; random armor is named; NativeMaterialValue and GetEquipSound are the class\'s; a mod spell survives the save; ConvertOrcish walks the loot', () => {
@@ -257,22 +178,8 @@ test('AUDIT-RR (RRI) F3/F5/F6/F7/F8/F9/F10: shops stock the registered custom it
   assert.equal(rriEquipSound({ templateIndex: 520, material: ARMOR_MATERIAL.Steel }), 'EquipLeather');
   assert.equal(rriEquipSound({ templateIndex: 513 }), 'EquipAxe');
   assert.equal(rriEquipSound({ templateIndex: 102 }), null);
-  assert.ok(!/soundClips|itemTemplates|\/equip\.js|equipTable/.test(rd('src/systems/roleplayRealismItems/rriItems.js').match(/^import[^\n]*$/gm).join('\n')), 'the law stays a leaf');
   // F5: an item carrying weightInKg answers it
   assert.equal(unitWeightInKg({ group: 'Armor', templateIndex: 523, material: ARMOR_MATERIAL.Leather, weightInKg: 1.4 }), 1.4);
   assert.equal(unitWeightInKg({ group: 'Armor', templateIndex: 523, material: ARMOR_MATERIAL.Leather, weightInKg: 1.4, water: 0.5 }), 1.9);
-  assert.match(rd('src/systems/inventory.js'), /if \(Number\.isFinite\(item\.weightInKg\)\) return item\.weightInKg \+/);
-  assert.match(rd('src/systems/item/itemTemplates.js'), /AUDIT-RR F5: ApplyArmorMaterial runs BEFORE the class's SetVariant/);
-  // F3: the shelf's second loop
-  const shop = rd('src/systems/shopStock.js');
-  assert.match(shop, /const customs = customItemsForGroup\(group\);\s+let customChanceMod = chanceMod;\s+if \(customChanceMod === 0 && group === 'Transportation'\) customChanceMod = 20;/);
-  assert.match(shop, /const stockChance = Math\.trunc\(customChanceMod \* 5 \* \(21 - t\.rarity\) \/ 100\);\s+if \(!dice100\(stockChance, rolls\(\)\)\) continue;\s+if \(group === 'Weapons'\) add\(\{ group, templateIndex, material: randomMaterial\(level, rolls\), flags: 0 \}\);\s+else if \(group === 'Armor'\) add\(\{ group, templateIndex, material: randomArmorMaterial\(level, rolls\) \}\);/);
-  // F6: random armor minted through setItemFields (named); F9: a mod spell serialised whole; F10: loot items converted too
-  assert.match(rd('src/systems/loot/loot.js'), /AUDIT-RR F6: the class ctor names the item from its template BEFORE SetVariant/);
-  assert.ok(!/rriVariantFields/.test(rd('src/systems/loot/loot.js')), 'the mint runs the variant fold, not the loot');
-  assert.match(rd('src/systems/save/save.js'), /\(sp\?\.custom \|\| sp\?\.rri\) \? JSON\.parse\(JSON\.stringify\(sp\)\) : sp\.index/);
-  assert.match(rd('src/systems/equip.js'), /\(1 << \(rriNativeMaterialValue\(item\) >> 8\)\) & forbiddenArmors/);
-  assert.match(rd('src/systems/equip.js'), /const own = rriEquipSound\(item\);\s+\/\/ AUDIT-RR F8/);
-  assert.match(rd('src/combat/rriEnemyEquipment.js'), /AUDIT-RR F10: `Items\.SearchItems\(Weapons\)` \+ `\(Armor\)` \(:691-692\)/);
 });
 

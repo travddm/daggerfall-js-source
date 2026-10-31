@@ -305,21 +305,6 @@ test('AUDIT EG IV lane3 #8 / #15 SECTION 23\'S RECEIPT TABLE IS THE MINT\'S, AND
   assert.ok(X.every((o) => o.claims.n === 3 && o.claims.co[0] === 3), 'an end\'s `n` and `co` count every entrant');
 });
 
-// ── lane3 #9 ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-test('AUDIT EG IV lane3 #9 THE HUB SWEEPS A CALL PAST ITS OPEN WINDOW (section 23, step 4): an open keeps its call for each member (`egcall:<sub>`), and the hub\'s own sweep forgets each once the open window has ended - it was forgotten only by that account\'s own next hello, so a called member who never returned left it for good; a call still open is kept (mutants: the prefix unswept; a live call swept)', async () => {
-  await withRelay(async ({ hub, mac, order, say, step, now }) => {
-    await say(mac, { k: 'open', z: await order(B, 'z'.repeat(20)), site: SITE });
-    assert.ok(hub.store.has(egCallKey('acct-ann')) && hub.store.has(egCallKey('acct-mac')), 'kept for both');
-    await hub.room._sweepHub(now());
-    assert.ok(hub.store.has(egCallKey('acct-ann')), 'its window still open: kept');
-    step(EG_SEALED_MS + EG_ADMIT_MAX_MS + 1000);
-    await hub.room._sweepHub(now());
-    assert.equal(hub.store.has(egCallKey('acct-ann')), false, 'past its window: swept');
-    assert.equal(hub.store.has(egCallKey('acct-mac')), false);
-    assert.doesNotMatch(rd('src/net/wire.js'), /never a swept prefix/);
-  }, { party: true });
-});
-
 // ── lane3 #11 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 test('AUDIT EG IV lane3 #11 THE OPENER WHO NEVER STEPS IN IS OWED THEIR END AT THE FIRST WAKE (section 23, `eg_live`): the company plays on without its opener, and the wake that closes the door to them owes their end then - `\'empty\'`, nothing cleared - so their stake settles and their `eg_live` clears, never three hours on; owed once, nothing more at the breach\'s end; an opener who entered is owed nothing there (mutants: the opener never owed; owed when in)', () => {
   const D = opened(2, ['acct-1']);

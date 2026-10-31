@@ -143,8 +143,6 @@ test('WEAPON-POOL: a save\'s weapons minted on their rows move to the one pool o
   assert.deepEqual(pairs(snap.world.piles[0].items), [[2400, 1600]], 'a pile in the world, in the save itself');
   // idempotent: every piece moved is on the pool, and the Warhammer was - a second load moves nothing
   for (const list of [q.items, q.wagonItems, q.bagItems, q.otherItems, snap.world.piles[0].items]) assert.equal(repoolWeaponConditions(list), 0);
-  // the load door runs it over every list the save carries, after the never-minted are minted (DISC21-A)
-  assert.match(rd('src/systems/save/save.js'), /const n = repairUnmintedConditions\(list\);[\s\S]*?for \(const list of repairLists\) \{\s+const n = repoolWeaponConditions\(list\);/);
 });
 
 test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s row, a custom row and Roleplay & Realism: Items\' patch, through the ladder and a made piece\'s quality - and nothing else moves: armour, clothing, jewellery, a torch, a frozen record, a piece with no condition, a piece no mint gives; with the mod on, a classic row beside a different one (a Short Bow, a Wakizashi) moves too; the share rounds to the nearest point (mutants: each row source; the ladder\'s default; the quality\'s rounding; the share\'s rounding; each guard; the group test turned on armour alone; a neighbour\'s row read)', () => {

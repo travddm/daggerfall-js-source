@@ -77,10 +77,6 @@ test('QUARRY-WORLD the words (bountyBoard.js): the board names every monster the
   assert.deepEqual([0, 3, 6, 4, 5, 7, 8, 12, 13, 19, 15, 17, 16, 20, 21, 22, 23, 24, 27].map(bountyFoesWord), ['Rats', 'Giant Bats', 'Spiders', 'Grizzly Bears', 'Sabretooth Tigers', 'Orcs',
     'Centaurs', 'Orc Sergeants', 'Harpies', 'Mummies', 'Skeletal Warriors', 'Zombies', 'Giants', 'Giant Scorpions', 'Orc Shamans', 'Gargoyles', 'Wraiths', 'Orc Warlords', 'Daedroths'], 'the ladder\'s words as they were');
   assert.equal(bountyFoesWord(283), 'Will-o\'-wisps');
-  const src = rd('src/systems/bounty/bountyBoard.js');
-  const table = src.slice(src.indexOf('const FOES = Object.freeze({'), src.indexOf('});', src.indexOf('const FOES = Object.freeze({')));
-  const rows = table.split('\n').filter((l) => /^\s+\d+: \[/.test(l));
-  assert.ok(rows.length >= 56 && rows.every((l) => /\(\) => t\('bounty\.foes\.\w+', '[^']*(?:\\'[^']*)*'\)\],/.test(l)), 'every word a text-core call');
   const en = readFileSync(new URL('../../locales/en/Port_Strings.csv', import.meta.url), 'utf8');
   assert.match(en, /^bounty\.foes\.mudcrabs,"Mudcrabs"$/m, 'in the catalog');
   for (const lang of ['bg', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'ko', 'nb', 'pt-BR', 'ro', 'ru']) {
@@ -141,10 +137,6 @@ test('QUARRY-WORLD the host (scenes/bountyHost.js): a board posts the land\'s be
 });
 
 test('QUARRY-WORLD by source: the world host hands the board the land\'s wild over its maps', () => {
-  assert.match(hostText('src/scenes/world.js'), /wildAt: bountyLandWild\(maps\),/);
-  const host = rd('src/scenes/bountyHost.js');
-  assert.match(host, /dungeons: dungeonsFor\(b\.px, b\.py\), wild: wildFor\(b\.px, b\.py\) \}\);/);
-  assert.match(host, /dungeons: dungeonsFor\(town\.px, town\.py\), wild: wildFor\(town\.px, town\.py\) \}\);/);
   let asked = 0;
   const at = bountyLandWild({ getClimateIndex: () => { asked++; return CLIMATES.Desert; } });
   assert.deepEqual(at(5, 5), at(5, 5));

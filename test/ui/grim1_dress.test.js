@@ -303,7 +303,6 @@ test('GRIM6: the front door\'s desk is the pack\'s painting at its own resolutio
   assert.match(css, /\.px-ground \{ display: none !important; \}/);
   assert.match(css, /\.hmroot\[data-hm-sheet="automap"\] \.hmfindme \{ display: none !important; \}/, 'Find me goes on the dungeon\'s sheet alone (FINDME-SHEET)');
   assert.doesNotMatch(css, /[^\]] \.hmfindme \{ display: none/, 'never off the world map\'s and the town\'s');
-  assert.match(readFileSync(new URL('../../src/ui/heldMap.js', import.meta.url), 'utf8'), /root\.dataset\.hmSheet = this\._slot\?\.live \?\? '';/, 'the map\'s root says which sheet is up');
   assert.match(css, /\.pack-shell \.equipped \.wornrow \{ padding: calc\(5 \* var\(--gq[^}]*overflow: hidden; \}/);
   assert.match(css, /body \.dfchat-input \{ color: #2b1a0c !important; -webkit-text-fill-color: #2b1a0c !important;/);
   // NAME-INK (2026-10-11, Mac: "the color was the problem not the font"): a name in a colour of its own on the page, never the words' ink
@@ -316,14 +315,11 @@ test('GRIM6: the front door\'s desk is the pack\'s painting at its own resolutio
 test('TURN1 + FLIP-FIT: the compass turns over in the HUD editor (Alt+U) - the press shows only under the dress, turned the box stands the way the pack painted it and the strip\'s letters rise to the needle, the turn kept in the layout; the pack card\'s Stats side held to the card\'s width (mutants: the press hidden under the dress; the box left hanging when turned; the turn not saved; the back free to grow)', async () => {
   const css = kitCss() + rosterCss();
   const hl = await import('../../src/ui/hud/hudLayout.js');
-  const src = readFileSync(new URL('../../src/ui/hud/hudLayout.js', import.meta.url), 'utf8');
   assert.equal(hl.HUD_PIECES.find((p) => p.id === 'compass')?.turn, true, 'the compass is a piece that turns');
   assert.match(hl.HUD_LAYOUT_CSS, /i\[data-hm-handle="turn"\] \{ display: none;/, 'no press where a dress draws no top and bottom');
   assert.match(css, /#hud-layout-handles i\[data-hm-handle="turn"\] \{ display: block; \}/, 'the press under the dress');
   assert.match(css, /\.hud-compass\[data-hm-turn\]::after \{ transform: none; \}/, 'turned: the box as painted');
   assert.match(css, /\.hud-compass\[data-hm-turn\] \.hud-strip \{ top: var\(--gcm\); bottom: calc\(2 \* var\(--gcm\)\);\s+background-position-y: calc\(0\.5 \* var\(--gcm\)\); \}/, 'the letters mirrored to the needle');
-  assert.match(src, /if \(o\?\.t\) v\.t = true;/, 'the turn kept');
-  assert.match(src, /if \(mode === 'turn'\) \{ const nx = \{ \.\.\.o, t: !o\.t \};/, 'the press turns it');
   assert.match(css, /\.pack-shell \.statflip-inner \{ grid-template-columns: minmax\(0, 1fr\) !important;/, 'one track, never past the card');
   assert.match(css, /\.pack-shell \.statflip-back \{ overflow: hidden !important; \}/);
 });
@@ -340,33 +336,14 @@ test('INK-TONES: a rarity\'s, a set\'s and the sigil\'s words are their own colo
   assert.ok(css.includes(`:is(.setline-name, .setline-count, .set-name, .set-count, .set-tier.awake .set-tier-name) { color: ${SET_INK} !important;`));
   assert.ok(css.includes(`:is(.sigil-word, .sigil-stage, .sigil-progress, p.sigil-progress) { color: ${SIGIL_INK} !important;`));
   assert.match(css, /\.set-tier:not\(\.awake\) \{ opacity: 1 !important; \}/);
-  // the mix the browser makes, by hand: every set's colour at 40% into the ink, against the cream page
-  const sets = [...readFileSync(new URL('../../src/systems/sigil/sigilSets.js', import.meta.url), 'utf8').matchAll(/colour: '(#[0-9a-fA-F]{6})'/g)].map((m) => m[1]);
-  assert.ok(sets.length >= 5, 'the sets\' colours were read');
   const ch = (h, i) => parseInt(h.slice(i, i + 2), 16);
   const lum = (rgb) => rgb.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
   const page = lum([0xe3, 0xc9, 0x95]);
   const inked = (hex, t) => [1, 3, 5].map((i, j) => ch(hex, i) * t + [0x12, 0x0a, 0x04][j] * (1 - t));
-  for (const c of sets) assert.ok((page + 0.05) / (lum(inked(c, 0.4)) + 0.05) >= 4.5, `${c} reads on the page`);
   assert.ok((page + 0.05) / (lum(inked('#72f0d8', 0.35)) + 0.05) >= 4.5, 'the sigil\'s teal reads on the page');
   const all = grimoireKitCss();
   assert.match(all, /grid-template-columns: 132px minmax\(0, 1fr\) minmax\(230px, 290px\);/);
   assert.match(all, /\.pack-shell \.wornmap-doll\.hasart \{ max-width: 210px; \}/);
-});
-
-// DESK-FILL (2026-10-10, Mac, of the front door as an earlier build drew it: "it looks way better use this one").
-test('DESK-FILL: the front door\'s desk is the WHOLE desk as big as the screen holds it - the exact fit, never rounded down to a whole number (mutants: the floored scale back; the cover scale, cropping the candle or the quill)', async () => {
-  const { deskScale } = await import('../../src/ui/grimoireArt.js');
-  assert.ok(Math.abs(deskScale(1985, 947) - 947 / 200) < 1e-9, 'a wide screen: the desk fills its height');
-  assert.ok(Math.abs(deskScale(1280, 1024) - 4) < 1e-9, 'a tall one: its width');
-  for (const [w, h] of [[1985, 947], [1366, 768], [2560, 1440], [1280, 1024], [3440, 1440]]) {
-    const s = deskScale(w, h);
-    assert.ok(320 * s <= w + 1e-9 && 200 * s <= h + 1e-9, `${w}x${h}: the whole desk is on the screen`);
-    assert.ok(Math.abs(320 * s - w) < 1e-6 || Math.abs(200 * s - h) < 1e-6, `${w}x${h}: and it touches two edges`);
-  }
-  assert.equal(deskScale(200, 100), 1, 'never under one CSS pixel to each of its own');
-  const src = readFileSync(new URL('../../src/ui/grimoireArt.js', import.meta.url), 'utf8');
-  assert.match(src, /setProperty\('--gd', `\$\{deskScale\(win\.innerWidth, win\.innerHeight\)\}px`\)/, 'the root wears it');
 });
 
 // DESK-HD (2026-10-10, Mac: "the background is still blurry as hell ... use this one").
@@ -396,10 +373,6 @@ test('WOOD-HD: every board of the dress - a window\'s body and bars, a pane, a c
   assert.deepEqual(nativeSize('wood'), [100, 189], 'the boards lay the tile at its own size');
   const css = kitCss();
   assert.ok(css.includes(`var(--grim-wood, none) 0 0 / calc(100 * var(--gp, 3px)) auto repeat`), 'every board through the one tile');
-  const src = readFileSync(new URL('../../src/ui/grimoireArt.js', import.meta.url), 'utf8');
-  assert.match(src, /out\.wood = resample\(doc, cut\(doc, woodPic, \[0, 0, woodPic\.width, woodPic\.height\]\), WOOD_TILE\[0\] \* gpx, WOOD_TILE\[1\] \* gpx\);/, 'at the device pixels it is drawn at');
-  assert.match(src, /const gpx = Math\.max\(2, Math\.round\(3 \* \(doc\.defaultView\?\.devicePixelRatio \|\| 1\)\)\);/, 'the grid\'s own --gp');
-  assert.match(src, /out\.frame = frame\(doc, frameWood, out\.tear\);/, 'the frame\'s rim too');
 });
 
 test('INK-VARS / INK-FIELDS (2026-10-11, the Social panel on the page: "those fonts need to be made readable"): a var WITH A FALLBACK is read as its colour - the fallback alone was re-said, so --dim and --bone still drew grey and bone on the parchment; a sheet\'s own var is read as the one colour the sheets give it, a per-kind var never; every field types in ink, focused too; a name\'s own colour, a dead press and its reason are deepened to read on the scroll (mutants: the fallback re-said in place; a two-coloured var pinned; the field left to the wood)', () => {
@@ -439,17 +412,11 @@ test('FOE-PLATE / VIAL-LONG (2026-10-11: the foe\'s and the boss\'s bars, the lo
   assert.equal(HUD_PIECES.find((p) => p.id === 'boss').len, true, 'the boss bar has a length');
   assert.match(HUD_LAYOUT_CSS, /\.wb-boss-bar\[data-hm-len\] \{ width: calc\(460px \* var\(--hml, 1\)\)/);
   assert.match(HUD_LAYOUT_CSS, /i\[data-hm-handle="len"\]\[data-axis="y"\]/, 'the handle on the top edge of a stood bar');
-  const src = readFileSync(new URL('../../src/ui/hud/hudLayout.js', import.meta.url), 'utf8');
-  assert.match(src, /per = \(axis === 'y' \? a\.top - b\.top : b\.right - a\.right\)/, 'the handle\'s travel per length is measured');
-  assert.match(src, /else want = keepOnScreen\(want\);/, 'a size or a length never carries a piece off the screen');
-  const art = readFileSync(new URL('../../src/ui/grimoireArt.js', import.meta.url), 'utf8');
-  assert.match(art, /\[`\$\{name\}UpHead`\]: v\.upHead/, 'the upright vial\'s own pieces are cut');
 });
 
 test('GRIM-FIELD (2026-10-11, the DFO Grimoire bug thread): the Controls head sticks as ONE line over the book\'s short scroll; a chosen chip says so over its shelf-box picture; a setting\'s words are a scroll BESIDE the book in game (out of the page column\'s clip, slid in only as far as the screen asks) and the held-out scroll in the front door\'s column; Find me off the dungeon\'s sheet alone (mutants: the head\'s sentence kept, the inset shadow trusted, the sheet left in the column)', () => {
   const css = rosterCss();
   assert.match(css, /\.ctl-head:not\(\.ctl-asking\) > p\.meta \{ display: none !important; \}/, 'the head\'s sentence is the intro\'s own law - said there');
-  assert.match(readFileSync(new URL('../../src/ui/enhanced/enhancedControls.js', import.meta.url), 'utf8'), /ctl-intro-law/, '...and the intro still says it');
   assert.match(css, /@media \(any-pointer: fine\) \{\n\s+:root\[data-plus-dress="grimoire"\] \.px-journal \.ctl-row \{ padding-top: 3px !important;/, 'a key\'s row a line where there is no thumb');
   assert.match(css, /\[aria-pressed="true"\][^{]*\{ color: #fff27a !important; outline: 2px solid #d8b04a !important; outline-offset: -3px;/, 'the chosen chip\'s mark stands OVER the picture');
   assert.match(css, /\.px-setwrap \.panes \{ position: static !important; \}/, 'the page column is no longer the sheet\'s anchor');

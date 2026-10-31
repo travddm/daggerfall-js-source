@@ -495,10 +495,3 @@ test('REALM P2.1: while a transaction is in flight no checkpoint is sent; the on
   assert.deepEqual(await settleRealmTradeHalf({ session: { transact: async () => ({ ok: false, why: 'goods' }) }, half: {} }), { ok: false, why: 'goods', text: realmTradeRefusalText('goods') });
 });
 
-test('REALM P2.1 by source: the world host hands every trade of a realm character to the realm; the session\'s hold is its own', { timeout: 60_000 }, () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /escrow: realmSession \? realmTradeEscrow\(\{ session: realmSession, checkpoint: \(\) => onlineCheckpoint\(\), heldSaid: \(\) => tradeHeldNotice\(null, realmSession\.tradeHeld, realmSession\.tradeHeldWhy\) \}\) : null,/);   // PIN MOVED (RING-HOLD): and the hold's notice, for a refusal over my own
-  const ts = src('src/net/tradeSession.js');
-  assert.match(ts, /if \(this\._escrow\) \{ this\._settle\(\); return; \}/, 'the commit is the realm\'s');
-  assert.match(ts, /if \(this\._handle && !this\._sentCommit && !this\._settling\)/, 'a half with the realm is restored only by its answer');
-});

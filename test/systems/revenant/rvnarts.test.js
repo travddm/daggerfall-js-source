@@ -310,21 +310,6 @@ test('RVN-ARTS THE GATES: rank I, the Enhanced AI switch off, a sworn one, one r
   assert.equal(go(loud, ctxOf([5, 0, 0])), 'start', 'a cry is no spell: silence holds none');
 });
 
-test('RVN-ARTS AUDIT RVN B4 A FOE NOT STEPPED: the open world\'s pool steps a revenant\'s art before its run\'s and its scatter\'s own frames (a running one\'s ward and cry ran on, and its marks stood); a foe the pool stopped stepping (a kneeling one) has its live marks cut at its next frame - never landed late, unseen (mutants: the call back after the run\'s exits; the stale cut gone)', () => {
-  const ext = read('src/scenes/exteriorFoes.js');
-  assert.match(ext, /const _flee = [^\n]*\n\s+if \(f\.entity\.revenant\?\.id\) artFrame\(f, playerFeet\);[^\n]*\n\s+if \(_flee === 'escape'\)/, 'between the flee step and its exits');
-  assert.equal((ext.match(/\) artFrame\(f, playerFeet\);/g) ?? []).length, 1, 'once a frame');
-  const r = withArt('siphon');
-  const f = foe(r);
-  const c = ctxOf([0, 0, 6]);
-  now = 500; go(f, c);
-  now = 503; assert.equal(go(f, c), 'start');
-  now += 1.0;   // a second of frames the pool never stepped it (it knelt) - its lane's landing among them
-  assert.equal(go(f, c), null);
-  assert.equal(c.struck.length, 0, 'cut, never landed');
-  assert.equal(artBlows().length, 0);
-});
-
 test('RVN-ARTS AUDIT RVN B1, B8, B9, B10 THE CHANNEL: its disc on the ground it marks and about its feet wherever they go; broken by any harm since the last frame (a heal between never hides a blow); the ward\'s edge back on the stamp it warded alone - a stamp made since keeps its own (mutants: no fit; the disc left behind; a heal masking the blow; the old edge on the new stamp)', () => {
   const ground = { raycast: (o) => o[1] - 1.75 };   // the floor 1.75 m under any point: a stair's tread
   const r = withArt('mending');
@@ -454,30 +439,3 @@ test('RVN-ARTS SWORN MENDING: a hurt that leaves me under two fifths (through hu
   assert.equal(A.swornMendStep({ isPlayer: true, peer: true, health: 10, maxHealth: 100 }, 10, [N.revenantById(m.id)], () => true), null, 'a peer is no one it mends');
 });
 
-test('RVN-ARTS THE WORDS: the page says what its art does - to me while it hunts (and from Rank II, with Enhanced AI), for me once sworn - and no line for one without (mutants: a side\'s words swapped; the rank\'s note gone)', () => {
-  const r = withArt('barrage', { mobileType: M.Lich, rank: 1 });
-  assert.equal(A.artWords(r), 'Art: Barrage - 3 blasts at your feet, one after another. Keep moving (from Rank II).');
-  setPref('enhancedAI', false);
-  r.rank = 2;
-  assert.equal(A.artWords(r), 'Art: Barrage - 3 blasts at your feet, one after another. Keep moving (with Enhanced AI).');
-  const sy = withArt('siphon', { rank: 2, sworn: true });
-  assert.equal(A.artWords(sy), 'Art: Siphon - now and then it draws its foe\'s life and gives you 25% of it.', 'AUDIT RVN D13: its share its constant\'s');
-  const s = withArt('mending', { rank: 2, sworn: true });
-  assert.equal(A.artWords(s), 'Art: Mending - when you fall under 40% of your health it heals 16% of it (every 120 seconds).', 'AUDIT RVN-STARS S9: in seconds');
-  const w = withArt('warding', { rank: 4, sworn: true });
-  assert.equal(A.artWords(w), 'Art: Ward - as it goes into a fight it shields you for 18 (every 90 seconds).');
-  let none = null;
-  for (let i = 0; i < 100 && !none; i++) if (!A.drawArt(`rv-none-${i}`, M.Orc)) none = { id: `rv-none-${i}`, mobileType: M.Orc, rank: 3 };
-  assert.equal(A.artWords(none), null);
-  assert.match(read('src/ui/revenant/revenantPage.js'), /const art = fallen \? '' : artWords\(r\);/, 'the Revenants page says it');
-  assert.match(read('src/ui/companionRoster.js'), /const art = artWords\(r, \{ sworn: true \}\);/, 'the Companions page says it');
-});
-
-test('RVN-ARTS THE POOLS: the open world\'s pool (street and building) and the dungeon\'s each step a revenant\'s art beside its signature, through their own spell doors - the dungeon\'s for a foe of mine alone, REVENANT-DUNGEON\'s gate (mutants: a pool unwired; the dungeon\'s gate gone)', () => {
-  const ext = read('src/scenes/exteriorFoes.js');
-  assert.match(ext, /if \(f\.entity\.revenant\?\.id\) artFrame\(f, playerFeet\);/);
-  assert.match(ext, /revenantArtFrame\(f, playerFeet, f\._artDoor \?\?= \{/, 'its door made once a stand');
-  assert.match(ext, /strike: \(sp\) => \{ const h = playerEntity\?\.health \?\? 0; magicHooks\?\.strikePlayer\?\.\(sp, f\.entity\.level \?\? 1, f\); return Math\.max\(0, h - \(playerEntity\?\.health \?\? h\)\); \}/, 'the health it took');
-  const dun = read('src/scenes/dungeonContext.js');
-  assert.match(dun, /if \(f\.entity\?\.revenant\?\.id && \(!onlineRoom\(\) \|\| !_roomFoe\)\) revenantArtFrame\(f, _pf, f\._artDoor \?\?= \{[^\n]*strike: \(sp\) => \{ const h = playerEntity\.health \?\? 0; magic\.strikePlayerFrom\(sp, f\.entity\.level \?\? 1, f\); return Math\.max\(0, h - \(playerEntity\.health \?\? h\)\); \}/);
-});

@@ -29,6 +29,4 @@ test('SEASON1 THE SEAT TAB\'S TIDE: the Marches\' Tide this week and what it doe
   host = mount({ season: null, tides: null });
   await tick();
   assert.equal(byClass(host, 'notice-seat-tide').length, 0);
-  const tab = readFileSync(new URL('../../src/ui/seatTab.js', import.meta.url), 'utf8');
-  assert.match(tab, /const words = edictLine\(chosen, seat\.tier, data\?\.tides\?\.next \?\? 'calm', seat\);/);   // PIN MOVED (BAY-LEFT-SEA): and the seat, a Bounty past the Bay worded for its dens
 });

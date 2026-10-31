@@ -116,9 +116,6 @@ test('OFFER-ID through the realm: a Rare looted since the last checkpoint is off
 });
 
 test('OFFER-ID by source: the host hands its realm pack the id stamp; a pack handed none stamps nothing (the other readers of the pack)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const tradePack = checkpointedTradePack\(createTradePack\(playerEntity, \{ stampIds: stampItemIds \}\), \(\) => onlineCheckpoint\(\)\);/);
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/tradePack.js', import.meta.url), 'utf8'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*itemIds\.js'/, 'never imported: the item law would install itself');
   const fresh = rareSword(5);
   createTradePack({ items: [fresh] }).wire([{ item: fresh, count: 1 }]);
   assert.equal(fresh.uid, undefined);

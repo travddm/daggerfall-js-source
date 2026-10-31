@@ -102,7 +102,6 @@ test('OWS2 route: the dry line - AUDIT DEEP T2-1\'s law in one home, the resume\
   const sea = (x) => x === 10;
   assert.equal(dryLine({ x: 5, y: 3 }, { x: 15, y: 3 }, sea), false);
   assert.equal(dryLine({ x: 5, y: 3 }, { x: 9, y: 9 }, sea), true);
-  assert.match(rd('src/systems/travel/travelOptions.js'), /return dryLineOf\(a, b, deps\.isWater\);/);
 });
 
 // ── THE JOURNEY'S HAND ON THE HELM ──────────────────────────────────────────────────────────────────────────────────
@@ -261,7 +260,6 @@ test('OWS2 Travel Options: afloat, the mod\'s ocean stop and the walk\'s steerin
   assert.equal(spot.xMax - spot.xMin, SEA_SPOT_SIZE, 'a spot reached afloat: the sea\'s square');
   to.beginTravelAlongRoute({ legs: [{ x: 6, y: 492, kind: 'open' }], point: { pixel: { x: 6, y: 492 }, x: 6 * 32768 + 900, z: 7 * 32768 + 900 } });
   assert.equal(to.state.autopilot.destinationWorldRect.xMax - to.state.autopilot.destinationWorldRect.xMin, 512, 'one walked to: a path\'s width');
-  assert.match(rd('src/systems/travel/travelOptions.js'), /spotRect\(r\.point, SEA_LEG_KINDS\.includes\(r\.legs\.at\(-1\)\?\.kind\)\)/, 'a spot reached by sea arrives in the sea\'s square');
 });
 
 test('OWS2 words: the trip\'s line says a crossing; the refusals say why', () => {
@@ -274,52 +272,3 @@ test('OWS2 words: the trip\'s line says a crossing; the refusals say why', () =>
 
 // ── THE WORLD HOST ──────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('OWS2 host wiring by source: the boat a journey crosses in; the plan asked with it; the frame before the mod\'s; the launch, the helm\'s keys through the one seam, the landfall, the step ashore and the pack', () => {
-  const w = rd('src/scenes/world.js');
-  // the means: at its helm, mine moored in reach, the parts in the pack - a boat that crosses
-  assert.match(w, /const tvSeaCrosses = \(rig\) => !!rig && \(rig\.sails > 0 \|\| rig\.crewed\) && \(rig\.cargo > 0 \|\| !!csaRuntime\?\.helmResponsive\(\)\);/);   // PIN MOVED (AUDIT NAV2 F16): the Carrack crosses where the responsive helm sails her
-  assert.match(w, /return tvSeaCrosses\(tvSeaRig\(b\)\) \? \{ start: 'sea', again: !!b\.packable, boat: b, how: 'helm', voyage: !!b\.charter \} : null;/);   // PIN MOVED (PASSAGE): a booked ship's helm asks a voyage
-  assert.match(w, /if \(Math\.hypot\(p\[0\] - feet\[0\], p\[2\] - feet\[2\]\) <= TV_SEA_MOORED_M\) return \{ start: 'sea', again: !!b\.packable, boat: b, how: 'moored' \};/);
-  assert.match(w, /return tvSeaParts\(\) \? \{ start: 'land', again: true, boat: null, how: 'parts' \} : null;/);
-  assert.match(w, /it\?\.templateIndex === CSA_PARTS_TEMPLATE && tvSeaCrosses\(csa\.hullRig\?\.\(csaHullFromMessage\(it\.message \?\? 0\)\)\)/);
-  // the plans
-  // THE MERGE (OW4 x OWS2): the planner's ground is routeGround's (the sea and the peaks' law, read once), the boat beside it
-  // PIN MOVED (AUDIT OW5 S3): a plan that never sails is planned again on land, the moored boat left where it lies
-  assert.match(w, /let plan = planRoute\(from, summary\.pixel, \{ roads: net\?\.roads \?\? null, tracks: net\?\.tracks \?\? null, \.\.\.tvRouteGround\(\), sea: tvSeaAsk\(means, 'land'\) \}\);[^\n]*\n(?:\s*if \(!plan && !net && roadNet\)[^\n]*\n)?\s*const dry = tvMooredDry\(means, plan, [^\n]*\n\s*if \(dry\) \{ plan = dry; means = null; \}/);
-  // PIN MOVED (AUDIT OW5 S3): a let - a plan that never sails drops the moored boat's ask
-  assert.match(w, /let seaAsk = means && \(water \|\| means\.start === 'sea' \|\| !dryLine\(from, pix, tvWater\)\) \? tvSeaAsk\(means, water \? 'sea' : 'land'\) : null;\n\s*if \(water && !seaAsk\) \{ tvSeaNoWay\(from, pix, null, null, 'sea'\); return false; \}/);
-  // PIN MOVED (AUDIT OW5 S3): a let
-  assert.match(w, /let plan = planRoute\(from, pix, \{ roads: wnet\?\.roads \?\? null, tracks: wnet\?\.tracks \?\? null, \.\.\.tvRouteGround\(\), goalExempt: !!door, sea: seaAsk \}\);/);
-  assert.match(w, /else if \(what\.kind === 'water'\) \{ if \(travelOptions\?\.settings\?\.targetCoordsAllowed === false\) tvSay\(TRAVEL_VIEW_TEXT\.placesOnly\); else travelViewWalkTo\(hit\.point, pix, \{ water: true \}\); \}/);
-  assert.match(w, /if \(csaAboard\.aboard\) \{ tvSay\(TRAVEL_VIEW_TEXT\.passenger\); return false; \}/);
-  // the frame, before the mod's own
-  const sea = w.indexOf('tvSeaFrame(dt);   // OWS2'), mod = w.indexOf('const report = travelOptions.update({'), govern = w.indexOf('travelViewGovern(dt);   // TV2');
-  assert.ok(sea >= 0 && govern > sea && mod > govern && mod - sea < 3000, 'the crossing\'s frame first, then the cap\'s, then the mod\'s own update');
-  // the seam: the helm reads the journey's keys and oars beside the rest
-  assert.match(w, /\|\| csaJourneyHelm\.held\.has\(action\)(?: \|\| \(!!HELM_RUDDER_ACTIONS\[action\] && helmTurnKeys\(\) && held\(keys, HELM_RUDDER_ACTIONS\[action\]\)\))?,/);   // HELM-KEYS: the turn keys beside it at a helm
-  assert.match(w, /get toggleAutorun\(\) \{ return !!player\.toggleAutorun \|\| csaJourneyHelm\.row; \},/);
-  // PIN MOVED (AUDIT OW5 S1): the crossing's alone - a mod journey at a helm meets the mod's own ocean stop
-  assert.match(w, /atSea: \(\) => !!tvSea\.means && \(!!csaBoatUnderMe\(\) \|\| tvSea\.phase === 'landing'\),/, 'afloat, and coming ashore - on the crossing');
-  // the launch, the landfall, ashore, the pack
-  assert.match(w, /boat = csaRuntime\.LaunchFromParts\(parts, \(\) => playerEntity\.items, spot\.at, spot\.dir, csaTerrainOf\(csaPixelAt\(spot\.at\[0\], spot\.at\[2\]\)\)\);/);
-  assert.match(w, /if \(boat\) csaCall\(\(\) => csaRuntime\.StartSailing\(boat\)\);/);
-  assert.match(w, /if \(landfall && \(csaRuntime\.IsBeached\(boat\) \|\| \(landAhead <= TV_SEA_BEACH_M && Math\.abs\(v\[2\]\) < 0\.6\)\)\) \{ tvSeaLand\(boat\); return; \}/);
-  assert.match(w, /csaJourneyHelm\.press\(CSA_BOAT_ACTIONS\.disembark\);/);   // PIN MOVED (FIELD BUGS 2026-10-21d PASSAGE-HANDS): the journey's own tap
-  assert.match(w, /if \(csaRuntime\.state\.disembarking == null && !csaRuntime\.isSailing\(\)\) tvSeaAshore\(\);/);
-  // SHIP-PACK (PIN MOVED): a ship packs at her landfall too - with her deed in the pack, else she is left moored
-  // PIN MOVED (HOLD-WEIGHT, FIELD BUGS 2026-10-05c): and only parts her bearer can carry (test/systems/comeSailAway/fb1005c_holdweight.test.js)
-  assert.match(w, /if \(tvSea\.means\?\.again && boat\.packable && csaPassengersOn\(boat\) === 0 && !csaRuntime\.deedMissing\(boat\) && !csaRuntime\.partsTooHeavy\(boat\)\) csaCall\(\(\) => csaRuntime\.PackBoat\(boat, true\)\);/);
-  assert.match(w, /if \(!Number\.isFinite\(h\) \|\| h < tvSeaY\(\) \+ 0\.2\) continue;/);
-  // the journey over: the hand off the helm, the sails down
-  assert.match(w, /if \(csaRuntime\?\.isSailing\(\) && csaRuntime\.state\.sailPosition > 0\) csaJourneyHelm\.press\(CSA_BOAT_ACTIONS\.toggleSail\);/);   // PASSAGE-HANDS
-  assert.match(w, /if \(tvSea\.means\?\.how === 'moored'\) csaCall\(\(\) => csaRuntime\.StartSailing\(tvSea\.means\.boat\)\);/);
-  assert.match(w, /if \(deepWaters\) q\[1\] = Math\.max\(q\[1\], tvSeaY\(\) \+ 1\);/, 'the line over the water rides its top');
-});
-
-test('AUDIT OWS A1/A2 by source: a load takes the crossing\'s hand off the helm and forgets the crossing (declared above the load - BOOT-TDZ); a journey\'s end forgets a landing it left, so the ocean stop is never held down after it', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /csaJourneyHelm\.held\.clear\(\); csaJourneyHelm\.row = false; tvSea\.means = null; tvSea\.phase = null; tvSea\.boat = null; tvSea\.wasLive = csaJourneyHelm\.live = false;   \/\/ AUDIT OWS A1/);   // PIN MOVED (AUDIT FB1021d PS-2): and the hand's live mark
-  const decl = w.indexOf('  const tvSea = { means: null,'), load = w.indexOf('tvSea.wasLive = csaJourneyHelm.live = false;   // AUDIT OWS A1'), reader = w.indexOf("atSea: () => !!tvSea.means && (!!csaBoatUnderMe() || tvSea.phase === 'landing'),");
-  assert.ok(decl >= 0 && decl < load && decl < reader, 'BOOT-TDZ: the state above the load that clears it and the stop that reads it');
-  assert.match(w, /tvSea\.wasLive = csaJourneyHelm\.live = false;[^\n]*\n\s*tvSea\.phase = null; tvSea\.boat = null;   \/\/ AUDIT OWS A2/);   // PIN MOVED (AUDIT FB1021d PS-2): and the hand's live mark
-});

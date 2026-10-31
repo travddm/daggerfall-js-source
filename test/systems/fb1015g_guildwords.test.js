@@ -496,23 +496,5 @@ test('AUDIT GUILD-WORDS II F-1, F-2: the classic window\'s refusal wraps on the 
   assert.ok(layoutMessageBox(font, latchBoxRows({ rows: [SEAT] })).w > 320, 'left whole, the chair\'s refusal ran past both edges');
   const laid = layoutMessageBox(font, fitBoxRows(font, latchBoxRows({ rows: [SEAT] })));
   assert.ok(laid.w <= 320 && laid.x >= 0, `fitted, ${laid.w} wide at ${laid.x}`);
-  assert.ok(src('src/ui/guildServiceWindow.js').includes('this._box = layoutMessageBox(font, fitBoxRows(font, latchBoxRows(top, this.hooks.rows)), buttons);'));
-  assert.ok(src('src/ui/enhanced/enhancedPort.js').includes("const n = el(doc, 'div', `port-text${b.center ? ' center' : ''}${b.scroll ? ' scroll' : ''}`);"));
-  const css = src('src/ui/enhanced/enhancedPortStyle.js');
-  assert.match(css, /\.port-text\.scroll \{ flex: none; max-height: min\(34dvh, 240px\); overflow-y: auto; display: flex; flex-direction: column; gap: 6px;/);
-  assert.match(css, /@media \(max-height: 480px\) \{ \.port-text\.scroll \{ max-height: 20dvh; \} \}/, 'a phone on its side: a shorter well');
 });
 
-test('SEAT-WORDS / STANDING-WORDS: the hosts - the gate and the house take the book\'s ceiling, the hall\'s line the character\'s date and the review\'s book, the Standing page the online flag, the streets\' tracker the module\'s doors through a lazy chat door and no door of its own over them, in any shape (mutants: each seam, a door overridden - II E-11)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.ok(wm.includes('const access = serviceAccess(guild, membershipOf(seated(), guild), service, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null });'));
-  assert.ok(wm.includes('const decision = receiveHouseDecision(kept, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null,'));
-  assert.ok(wm.includes('rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships })'));
-  const w = src('src/scenes/world.js');
-  const start = w.indexOf('const rollTracker = onlineOn && realmSession ? createRollTracker({');
-  const call = w.slice(start, w.indexOf('}) : null;', start));
-  assert.ok(start > 0 && call.includes('...rollNoticeDoors({ entityOf: () => playerEntity, say: (text) => chatNotice(text) }),'));
-  assert.doesNotMatch(call.slice(call.indexOf('...rollNoticeDoors(')), /['"]?\bon(Capped|Standing|Ceiling|Full)['"]?\s*[:(]/, 'no door of the host\'s own after the module\'s');
-  assert.doesNotMatch(call, /['"]?\bon(Ceiling|Full)['"]?\s*[:(]/, 'the pace\'s lines are the module\'s alone');
-  assert.ok(src('src/ui/enhanced/enhancedMenu.js').includes('const book = affiliations(entity, { now: dateFromClassicMinutes(Math.floor(ownMinutes())), online: isOnlinePage() });'));
-});

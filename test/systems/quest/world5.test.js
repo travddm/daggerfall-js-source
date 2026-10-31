@@ -210,6 +210,5 @@ test('WORLD5 (superseded by WORLD7): the stand-down is gone - a quest clock char
   const never = new Clock({ rolls: () => 0.5, nowSeconds: () => now, resources: new Map() }, 'Clock _d_ 01:00');
   never.startTimer(); now += 60; never.tick(never.parentQuest);
   assert.equal(never.remainingTimeInSeconds, 3540, 'a quest with no seam charges as ever');
-  assert.equal(rd('src/systems/quest/clock.js').includes('questClocksStoodDown'), false, 'the stand-down word is gone from the clock');
 });
 

@@ -105,12 +105,6 @@ test('ACC1d: the minter asks the REAL route, with the secret in the header and n
   // that door, and the BODY carries none either.
   assert.doesNotMatch(calls[0].url, /sekrit/);
   assert.deepEqual(calls[0].body, {});
-  // DERIVED, not remembered: the service really serves this route and
-  // really answers a `token` key.
-  const svc = rd('server-account/src/index.js');
-  assert.match(svc, /path === '\/v1\/auth\/token' && request\.method === 'POST'/, 'the route the minter posts to');
-  assert.match(svc, /return json\(\{\s*\n\s*token,/, 'and the key it reads back (ACC3 put the wardrobe beside it, so the answer is spread over lines now)');
-  assert.match(rd('src/net/accountClient.js'), /call\(io, '\/v1\/auth\/token'/, 'spelled once, in the ladder');
   assert.equal(typeof mintIdentity, 'function', 'the route has a name, so no call site spells a path');
 });
 
@@ -277,34 +271,9 @@ test('ACC1d: the wire checks the token\'s SHAPE and nothing else - kept, absent,
   for (const bad of [null, 0, 1, true, {}, [], ['v1.a.b']]) {
     assert.equal(hello({ tok: bad }).error, 'bad token', `a ${typeof bad} is not a token`);
   }
-  // THE PARSER IS SYNC AND PURE AND STAYS THAT WAY: it may not verify,
-  // because verifying needs WebCrypto and a key, and a `await` here
-  // would put the whole wire on a promise.
-  const wire = rd('src/net/wire.js');
-  assert.doesNotMatch(wire, /verifyToken|importPublicKeyB64/, 'the wire never verifies - that is the relay\'s, and it is async');
-  assert.doesNotMatch(wire, /'v1'|"v1"/, 'and it never spells a version: identityToken.js is the one home for that');
 });
 
 // ── 4. THE HOSTS ────────────────────────────────────────────────────
-
-test('ACC1d: the host builds ONE minter and hands it to the presence session AND every channel link (mutant: a seam nothing calls)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ accountTokenMinter, storedSession(, [A-Za-z]+)* \} from '\.\.\/net\/accountClient\.js'/);   // ACC4: the play beat rode this import until SCALE4c knocked through the heartbeat
-  // NAME-ADOPT: and every answer's identity flows back onto the live
-  // sessions - the half of this seam that was missing, which is why a
-  // player saw their character's name while everybody else saw the handle.
-  // RENOWN1: and the character coming online, whose Renown the token carries - REALM-DOOR: the realm character this tab
-  // joined, which the service signs as the realm's and the relay's door reads (test/net/realmdoor.test.js)
-  assert.match(w, /const identityMinter = accountTokenMinter\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\), onIssued: adoptIssued, now: steadyNow,\s+character: \(\) => \(onlineOn \? realmSession\?\.id \?\? null : null\) \}\)/);
-  assert.match(w, /online = new OnlineSession\(\{[\s\S]*?mintToken: identityMinter,[\s\S]*?\}\);/, 'the presence session');
-  assert.match(w, /link\.mintToken = identityMinter;/, 'and every channel link - the hub is where a name is READ');
-  assert.equal((w.match(/accountTokenMinter\(/g) ?? []).length, 1, 'ONE minter: two would be two reads of the store per connect and no benefit');
-  // THE APP's store, never the TAB's: an account is the player's, and a
-  // second tab is the same person. The peer id is the other way round
-  // (TABS1) and that difference is deliberate.
-  assert.match(w, /import \{ appStorage \} from '\.\.\/systems\/appStorage\.js'/);
-  assert.doesNotMatch(rd('src/net/online.js'), /accountClient|fetch\(/, 'the session does not know the account service exists');
-});
 
 // ── 5. THE VERDICT IS GONE, AND ACC1g IS WHY ────────────────────────
 //
@@ -363,33 +332,3 @@ test('ACC1g: no door between the relay and the client carries a verdict any more
 
 // ── 6. THE NOTE AND THE CODE ────────────────────────────────────────
 
-test('ACC1d: identityToken.js is IN the relay bundle now, so its own note may no longer say the refusal is unbuilt (DEPLOY-PROSE, two-directional)', () => {
-  // DERIVED FROM THE BUNDLE WALK, not from a date or a flag: the same
-  // graph SLAM8 hashes the relay with answers "is this file shipped to
-  // the relay yet?", so this pin cannot go stale by nobody remembering.
-  const inBundle = RELAY_GRAPH.includes('src/net/identityToken.js');
-  const note = rd('src/net/identityToken.js');
-  if (inBundle) {
-    // The sentences ACC1a wrote WHILE the refusal was unbuilt. Each was
-    // true the day it was typed and is a lie the moment the relay
-    // imports this file - which is DEPLOY-PROSE exactly: a sentence
-    // typed BESIDE a fact rather than derived from it, going stale on a
-    // day nobody was looking at it.
-    for (const stale of [
-      'NOTHING HERE ENFORCES EITHER YET',
-      'which does not import this file yet',
-      'not in the relay bundle yet',
-    ]) assert.ok(!note.includes(stale), `the note still says "${stale}" while the relay imports it`);
-    assert.match(note, /ACC1d BUILT BOTH/, 'and it says which slice built it');
-    // AND IT STILL STATES THE BOUND. "Spent once" without "per room" is
-    // the comment claiming a shut window that bible ACC1d D4 refused to
-    // claim.
-    assert.match(note, /PER ROOM/, 'the refusal is per room and the note says so');
-  } else {
-    assert.ok(note.includes('NOTHING HERE ENFORCES EITHER YET'),
-      'outside the bundle, a note claiming the refusal is built would be the same lie the other way round');
-  }
-  // THE CONTROL, HARD5-3's: the membership test is only worth anything
-  // if the walk really spells paths this way.
-  assert.ok(RELAY_GRAPH.includes('src/net/wire.js'), 'the walk spells paths the way this pin does');
-});

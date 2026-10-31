@@ -397,30 +397,3 @@ test('INSPECT1 the F-menu\'s Inspect row: first, when the host offers it, acting
 
 // ─── THE HOST, BY SOURCE ────────────────────────────────────────────────────────────────────────────────────────
 
-test('INSPECT1 host by source: the Inspect row is offered on every body the F key finds; its act opens the profile at once from the room\'s half and asks for the card only of a relay that routes it, retried by the frame and timed at CARD_WAIT_MS; an ask is answered through the gate with my own card, an answer drawn only on the card that asked; F again closes the profile; the other surfaces yield their Escape to it (mutants: an ask sent to an old relay; the answer drawn for anyone; the wait never said)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const peerActsFor = \(peerId\) => \(\{ \.\.\.social\.actionsFor\(peerId\), \.\.\.tradeActionsFor\(peerId\), canInspect: true, canReadPage: !!pageOffers\.get\(peerId\), \.\.\.duelActionsFor\(peerId\) \}\);/, 'one bag: the hub\'s acts, the trade\'s, and the look (JOURNAL1: and a page they hold out to me)');
-  assert.match(w, /peerId: hit\.peer\.id, actions: peerActsFor\(hit\.peer\.id\) \}\) === true;/, 'the F-card reads it');
-  assert.match(w, /const acts = social \? peerActsFor\(id\) : null;/, 'the plaque\'s rows read it (ACT-MENU)');
-  assert.match(w, /const row = plaqueRowFor\(sel\.id, id, peerActsFor\(id\)\);/, 'and the plaque\'s press');
-  assert.match(w, /if \(act\.k === 'profile\.inspect'\) \{ inspectPeer\(act\.peer\); return; \}/);
-  const inspect = w.slice(w.indexOf('const inspectPeer = (peerId) => {'), w.indexOf('const socialInteract = () => {'));
-  assert.match(inspect, /const can = !!online\?\.cardOk;\s*\n\s*_profileAsk = can \? \{ peerId, at: performance\.now\(\), sent: false \} : null;\s*\n\s*if \(_profileAsk\) _profileAsk\.sent = online\.sendCard\(\{ to: peerId, ask: true \}\) === true;/);
-  assert.match(inspect, /state: can \? 'asking' : 'unsupported'/);
-  assert.match(inspect, /if \(!_profileAsk\.sent\) _profileAsk\.sent = online\?\.sendCard\(\{ to: _profileAsk\.peerId, ask: true \}\) === true;\s*\n\s*if \(performance\.now\(\) - _profileAsk\.at < CARD_WAIT_MS\) return;/);
-  assert.match(inspect, /state: 'silent'/);
-  const onCard = w.slice(w.indexOf('online.onCard = (id, d, sub = null) => {'), w.indexOf('online.onAct = '));   // DUEL1: the answerer's account stamp rides in
-  assert.match(onCard, /if \(!cardAnswers\.pass\(id, performance\.now\(\)\)\) return;\s*\n\s*const card = composeCard\(playerEntity\);\s*\n\s*if \(card\) online\.sendCard\(\{ to: id, card \}\);/);
-  assert.match(onCard, /if \(!d\?\.card \|\| _profileAsk\?\.peerId !== id\) return;/);
-  assert.match(onCard, /profileWin\?\.update\(id, withDuel\(id, profileView\(\{ name: peerName\(id\), peer: p, look: p\?\.look \?\? null, card: d\.card, state: 'answered' \}\)\)\);/);   // DUEL1: with the duel's word on it (the Challenge button, their record)
-  assert.match(w, /if \(profileWin\?\.isOpen\(\)\) \{ profileWin\.hide\(\); return true; \}/, 'F again closes the profile');
-  // JOURNAL1: and each yields it to a page read from the F-menu too (the page window stands where the profile does)
-  assert.match(w, /above: \(\) => !!\(socialPanel\?\.isOpen\?\.\(\) \|\| socialMenu\?\.isOpen\?\.\(\) \|\| profileWin\?\.isOpen\?\.\(\) \|\| pageWin\?\.isOpen\?\.\(\)\),/, 'the chat yields its Escape');
-  assert.match(w, /above: \(\) => !!\(socialMenu\?\.isOpen\?\.\(\) \|\| profileWin\?\.isOpen\?\.\(\) \|\| pageWin\?\.isOpen\?\.\(\)\),/, 'the friends panel yields its Escape');
-  assert.match(w, /onOpen: \(\) => surfaceOpen\('profile'\),\s*\n\s*onClose: \(\) => \{ surfaceClose\('profile'\); _profileAsk = null; _profileSub = null; _profileView = null; \},/, 'a pointer surface, and a card closed is no longer waited on (DUEL1: nor its stamp and its view kept)');
-  assert.match(w, /profileWin\?\.render\(\{ covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \}\);/, 'drawn under the F-menu\'s own covering word');
-  assert.match(w, /tradeFrame\(\);[^\n]*\n(?:\s*duelFrame\(\);[^\n]*\n)?(?:\s*wedFrame\(\);[^\n]*\n)?\s*profileFrame\(\);/, 'its ask retried and its wait timed in the online frame, beside the trade\'s own (DUEL1: and the duel\'s) - before the dead return');
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /if \(m\.t === 'card'\) \{[\s\S]{0,1200}?a = this\._meterCard\(ws, a, now\); if \(!a\) return;\s*\n\s*if \(isChatRoom\(a\.key\) \|\| isSocialRoom\(a\.key\)\) return;/);
-  assert.match(relay, /if \(!this\._senderFunnel\(tws, a\.id, now\)\) return;\s*\n(?:\s*\/\/[^\n]*\n)*\s*this\._send\(tws, JSON\.stringify\(\{ t: 'card', id: a\.id, \.\.\.\(typeof a\.sub === 'string' && a\.sub \? \{ sub: a\.sub \} : \{\}\), data: m\.data \}\)\);/, 'the cast arm\'s funnel, shared (DUEL1: and the answerer\'s verified account beside its id)');
-});

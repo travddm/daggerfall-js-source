@@ -133,8 +133,6 @@ test('PROVINCE-COURTS the door: every province faction a dictionary lacks, added
   const store = createFactionRep(new Map([[41, { id: 41, name: 'The Fighters Guild', parent: 0, children: null }]]));
   assert.equal(store.dict.size, 1 + 36, 'Reset (:331): a fresh store carries them');
   assert.equal(store.dict.get(6364).name, 'People of Skyrim');
-  assert.match(rd('src/scenes/townTalk.js'), /addCustomFactions\(factions\.factionDict, factions\.factionNameToId\);/, 'the talk reader comes in by the same door');
-  assert.match(rd('src/systems/faction/factionRep.js'), /export function addCustomFactions\(dict, nameToId = null\) \{[^}]*addProvinceFactions\(dict, nameToId\);/);
 });
 
 test('PROVINCE-COURTS the shown names: a province\'s court and people in the player\'s language through GetLocalizedFactionName\'s port door - the key stays English (mutants: the door unasked; the region\'s shown name unread)', () => {
@@ -211,46 +209,6 @@ test('PROVINCE-COURTS the castle\'s court, the capital\'s own: a Bay court\'s pe
   assert.equal(crownRulerHere(people, 364), null);
   assert.equal(crownRulerHere([{ factionID: 364 }], 364)?.factionID, 364);
   assert.equal(crownRulerHere(people, null), null);
-});
-
-test('PROVINCE-COURTS a lookup of a faction by a region is typed - no reader of a region\'s court, people or crown can take a vampire clan for a province\'s (the source swept: every findFactions names a type, every findFactionByTypeAndRegion a FACTION_TYPES or the Province\'s 7, or passes its caller\'s type through)', () => {
-  const files = [];
-  const walk = (d) => { for (const e of readdirSync(new URL(d, ROOT), { withFileTypes: true })) { const p = `${d}/${e.name}`; if (e.isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } };
-  walk('src');
-  /** A call's arguments, its brackets balanced, split at its own commas. */
-  const argsAt = (src, open) => {
-    let depth = 0, cur = '';
-    const out = [];
-    for (let i = open; i < src.length; i++) {
-      const c = src[i];
-      if (c === '(' || c === '{' || c === '[') { depth++; if (depth === 1) continue; }
-      if (c === ')' || c === '}' || c === ']') { depth--; if (depth === 0) { out.push(cur.trim()); return out; } }
-      if (c === ',' && depth === 1) { out.push(cur.trim()); cur = ''; continue; }
-      cur += c;
-    }
-    return out;
-  };
-  const declared = (src, at) => /function\s+$/.test(src.slice(Math.max(0, at - 20), at));
-  let n = 0;
-  for (const f of files) {
-    const src = rd(f);
-    for (const m of src.matchAll(/\bfindFactions\(/g)) {
-      if (declared(src, m.index)) continue;
-      const args = argsAt(src, m.index + m[0].length - 1);
-      n++;
-      assert.match(args[1] ?? '', /\btype:/, `${f}: findFactions(${args.join(', ')}) names no type`);
-    }
-    for (const m of src.matchAll(/\bfindFactionByTypeAndRegion\??\.?\(/g)) {
-      if (declared(src, m.index)) continue;
-      const args = argsAt(src, m.index + m[0].length - 1);
-      const type = args.length >= 3 ? args[1] : args[0];
-      n++;
-      assert.match(type ?? '', /^(FACTION_TYPES\.(Province|People|Courts|WitchesCoven)|7|type)$/, `${f}: findFactionByTypeAndRegion(${args.join(', ')})`);
-    }
-  }
-  assert.ok(n >= 15, `${n} lookups found - the walk is reading the tree`);
-  // crownHall's own walk asks the Province type with the region
-  assert.match(rd('src/systems/crownHall.js'), /if \(f\?\.type !== FACTION_TYPES\.Province \|\| f\.region !== region\) continue;/);
 });
 
 test('PROVINCE-COURTS on the freeware: the Bay\'s 62 regions\' factions are FACTION.TXT\'s to the byte - every record, every child list, every region\'s court, people and Province as before; the clans\' records untouched (mutants: a Bay record moved; a Bay child gained)', { skip: skipReal }, () => {

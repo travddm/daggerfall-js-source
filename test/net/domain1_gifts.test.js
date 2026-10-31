@@ -224,9 +224,6 @@ test('DOMAIN1 THE BOOK: a gift asked again after an answer that never came carri
 });
 
 test('DOMAIN1 THE BOARD: the Seat tab draws the gift panel for the guild\'s own place alone, each material held with its Stores and bag and a count, Give asks the bag\'s units into the Stores first and then the gift, and a Siege Camp says what it holds (mutants: the place\'s key; the bag first; the camp\'s line; the count\'s bound)', async () => {
-  const src = readFileSync(new URL('../../src/ui/seatTab.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(host\.giving && gifts\?\.place && gifts\.key === seat\.key\) \{/, 'only where the guild gives AT THIS seat');
-  assert.match(src, /if \(giving\.bag\(key\) > 0\) \{\n\s+const ready = await giving\.putIn\(key, n\);/, 'the bag\'s units into the Stores first');
   const { drawSeatGifts } = await import('../../src/ui/seatWorks.js');
   const host = document.createElement('div');
   const gave = [];

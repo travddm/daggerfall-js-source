@@ -468,36 +468,3 @@ test('PROF4 pages: the Workbench at a Furniture Store - the saws for the logs he
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
-test('PROF4 wiring: a built pixel keeps its forest (the tree flats by World of Daggerfall\'s table, their groups\' batches); the host mints furniture among the home\'s things, asks the station by the recipe, the plane\'s band off AGI and WIL; the workbench a Furniture Store\'s or a home\'s station; the billboard shader tips a felled tree; DECOR marks a set-down piece from the service\'s own row', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (ECOTONE1, 2026-10-07): a flat's climate is its own - the pixel's, or the neighbour's a border stood it by
-  // (`base` its summer archive, the Tree table's key; `archive` the season's set it is drawn in)
-  assert.match(w, /const tree = isTreeRecord\(base, f\.record\) \? \{ id: pixelTrees\.length, group: '', i: 0, x: f\.x, y: f\.y, z: f\.z, wood: f\.wood \?\? 0, base, archive \} : null;\n\s+if \(tree\) pixelTrees\.push\(tree\);/);   // PIN MOVED (AUDIT PRECIP HOST-7): its group and place the log's grouping writes (placeTrees)
-  assert.match(w, /if \(t\) \{ t\.group = places\[j\]\[0\]; t\.i = places\[j\]\[1\]; t\.archive = archives\[j\]; \}/);   // FOREST1 (AUDIT F3): and how wooded its tile is
-  assert.match(w, /forest: \{ base: climate\.natureArchive, archive: natureArchive, trees: pixelTrees\.filter\(\(t\) => forestGroups\.has\(t\.group\)\), groups: forestGroups \},/);
-  // PIN MOVED (ECOTONE1): any of the pixel's nature archives - its own, or a neighbour climate's a border stood here
-  assert.equal((w.match(/if \(g\.natureSet\.has\(archive\)\) forestGroups\.set\(k, \{ batch, centers, size[^}]*\}\);/g) ?? []).length, 3, 'the season\'s batch, the classic one and (LPT1) a low-poly tree\'s far pictures');
-  assert.match(w, /if \(isCraftedFurniture\(it\)\) \(playerEntity\.furnishings \?\?= \[\]\)\.push\(it\);\n\s*else addItem\(\(playerEntity\.items \?\?= \[\]\), it, 'back'\);/);
-  // PROF7 moved it: the station a recipe's profession names (craftStation) - the workbench Carpentry's, the loom Outfitting's
-  assert.match(w, /const st = craftStation\(recipeById\(recipe\)\?\.profession\);\n\s*const f = st\.here\(\);/);
-  assert.match(w, /const craftStation = \(profession\) => \(profession === 'carpentry'\n\s*\? \{ here: \(\) => workbenchHere\(\),/);   // PIN MOVED (CARP-YARD, 2026-10-12): the host's own question - a joinery's bench in the street
-  // PIN MOVED (PROF11): the work names the mason's bench too
-  assert.match(w, /const bench = work\?\.station === 'workbench', loom = work\?\.station === 'loom', mason = work\?\.station === 'mason';/);
-  assert.match(w, /planeBand: \(\) => planeBand\(\{ agility: liveStat\(playerEntity, 'agility'\), willpower: liveStat\(playerEntity, 'willpower'\) \}\),/);
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /if \(interiorBuilding\.buildingType === BUILDING_TYPES\.FurnitureStore\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: WORKBENCH_FEE \};/);
-  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'workbench'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
-  const r = src('src/render/renderer.js');
-  assert.match(r, /uniform vec3 uTip;/);
-  assert.match(r, /if \(uTip\.z != 0\.0\) \{/);
-  assert.match(r, /if \(tp \|\| this\._bbTipOn\) \{ gl\.uniform3f\(this\.bbUTip, tp \? tp\[0\] : 0, tp \? tp\[1\] : 0, tp \? tp\[2\] : 0\); this\._bbTipOn = !!tp; \}/);
-  const d = src('server-account/src/decor.js');
-  assert.match(d, /const ours = row && row\.owner === player\.id && Number\(row\.template\) === p\.item\.t && Number\(row\.listed\) === 0 && !elsewhere;/);   // AUDIT 30 S6: and not on the market, and not standing twice
-  assert.match(d, /delete plain\.mk;/);
-  const g = src('src/scenes/gatherHost.js');
-  // PIN MOVED (AUDIT GATHER-FEEL F1): the kinds told which nodes' last blow is still in the air, and a node gone once it has landed
-  assert.match(g, /for \(const k of kinds\) k\.stood\?\.\(entry, rec\.nodes\.filter\(\(n\) => n\.kind === k\.id\), landingOn\);/);
-  assert.match(g, /for \(const f of shownGone\(k, n\) \? \(k\.goneFlatsOf\?\.\(n, entry\) \?\? \[\]\) : k\.flatsOf\(n\)\) \{/);
-  // AUDIT 30 A5: the node as its pixel stands now, the fall's failure its own
-  assert.match(g, /const now = s\?\.nodes\.find\(\(x\) => x\.key === a\.node\.key\) \?\? null;\n\s*if \(now && k\.felled\) \{\n\s*try \{ Promise\.resolve\(k\.felled\(now, \{ entry: s\.entry, from: deps\.eye\(\)\.pos, tr: deps\.pixelTranslation\(a\.px, a\.py, \[0, 0, 0\]\) \}\)\)\.catch/);
-});

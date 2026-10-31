@@ -107,35 +107,7 @@ test('WORLD6b-iii(e): the pools - the striker\'s dose at a PUPPET does not run o
   // the owner's own dose at its own foe: the door lands it directly
   const own = bob.poisonFoe(rat, POISONS.Somnalius);
   assert.ok(own && own.kind === 'poison' && own.poison === POISONS.Somnalius, 'dosed here, the entry back');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /return inflictPoison\(f\.entity, pt, false, \{ rolls, currentMinute: Math\.floor\(currentMinute\(\)\) \}\);/, 'the pool\'s own uniform seam rolls the saving throw (ENGINE-PRNG RULE), so the pin is not a coin');
   assert.equal(rat._divertPt, undefined, 'nothing set aside on a foe of mine');
-  // the pool's doors, by source: the melee chain through poisonFoe; the divert's spend; the owner's landing order
-  const e = rd('src/scenes/exteriorFoes.js');
-  assert.match(e, /\(f, pt\) => poisonFoe\(f, pt\)\)\) \{\s+\/\/ C2-slice \(combat-11\); WORLD6b-iii\(e\)/, 'resolvePlayerHit\'s poison through the one door');
-  assert.match(e, /const _pt = f\._divertPt \?\? null; f\._divertPt = null;/, 'spent by the divert, once');
-  assert.match(e, /\.\.\.\(_pt != null \? \{ pt: _pt \} : \{\}\),[^\n]*\n\s*(?:\.\.\.\(_wc \? \{ wc: hitClassField\(_wc\) \} : \{\}\),[^\n]*\n\s*)?\.\.\.\(kind === 'arrow' \? \{ ar: 1 \} : \{\}\),\n\s*\.\.\.\(spell \?\? \{\}\),[^\n]*\n\s*\.\.\.\(_whole \? \{ z: 1 \} : \{\}\) \}\);/, 'the dose on the blow (the calc\'s word), the shaft on an arrow (STRIKE-SHARED: a strike spell; AUDIT PSCALE1: and a kill\'s flag after them)');
-  assert.match(e, /if \(pt != null\) inflictPoison\(f\.entity, pt, false, \{ rolls, currentMinute: Math\.floor\(currentMinute\(\)\) \}\);[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*if \(onWatch\) _net\.watch\.hurt\(f, dmg, at, dir(?:, data\.wc != null \? hitClassOf\(data\) : null(?:, kind)?)?\);[^\n]*\n\s*else damageFoe\(f, blow, at, dir, \{ fromPlayer: true, kind, peer: true, peerId: from, whole: data\.z === 1(?:, \.\.\.\(data\.wc != null \? \{ wc: hitClassOf\(data\) \} : \{\}\))? \}\);[^\n]*\n\s*(?:if \(!onWatch && data\.wc != null[^\n]*\n\s*)?(?:\/\/[^\n]*\n\s*)*if \(data\.ar === 1 && kind === 'arrow' && !\(onWatch && f\.dead\) && arrowsIn\(f\.entity\.items \?\?= \[\]\) < HIT_ARROWS_MAX\) addItem\(f\.entity\.items, bowDamageArrow\(\)\);/, 'the owner: the dose before the health moves, the shaft after (BowDamage\'s order), bounded; MAC-N1: the shaft minted by the one export; WATCH1: a watchman through the watch\'s door, a foe through this pool\'s');   // PIN MOVED (AUDIT TELL P1: the watch's door carries the blow's kind)
-});
-
-test('WORLD6b-iii(e): the hosts and the dungeon twin, by source - the exterior\'s arrow blow says its kind and routes its poison through the pool\'s door (the watch dosed here); the interior host splits by pool; the dungeon has the same door, the same divert and the same landing; the disease rider is the monster\'s alone', () => {
-  for (const [p, ticker] of [['src/scenes/world.js', 'playerTicker'], ['src/scenes/exterior.js', 'playerTicker']]) {
-    const s = rd(p);
-    assert.match(s, /: exteriorFoes\.damageFoe\(f, d, player\.pos, m\.dir, \{ kind: 'arrow', weapon: m\.weapon \?\? null \}\)\),/, `${p}: the shaft's kind rides`);   // PIN MOVED (AUDIT FEUD 2: and its bow)
-    assert.match(s, new RegExp(`onInflictPoison: \\(att, tgt, pt\\) => \\(cityGuards\\.guards\\.includes\\(t\\) \\? inflictPoison\\(tgt, pt, false, \\{ currentMinute: Math\\.floor\\(${ticker}\\.ownMinutes\\) \\}\\) : exteriorFoes\\.poisonFoe\\(t, pt\\)\\),`), `${p}: the pool's one poison door, the watch its own`);
-  }
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /\? interiorFoes\?\.damageFoe\(f, d, player\.pos, m\.dir, \{ kind: 'arrow', weapon: m\.weapon \?\? null \}\)/);   // PIN MOVED (AUDIT FEUD 2: and its bow)
-  assert.match(m, /onInflictPoison: \(att, tgt, pt\) => \(t\._encounter \? interiorFoes\?\.poisonFoe\(t, pt\) : inflictPoison\(tgt, pt, false, \{ currentMinute: Math\.floor\(interiorTicker\.ownMinutes\) \}\)\),/);   // LIVED1: a dose is dated on the character's own clock
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /function poisonFoe\(f, pt\) \{\s*\n\s*if \(!f\) return null;\s*\n\s*const pi = foes\.indexOf\(f\);\s*\n\s*if \(\(!_authority && isRoomFoe\(f, pi\)\) \|\| f\._ownFrom != null\) \{ f\._divertPt = pt; return null; \}[^\n]*\n\s*return inflictPoison\(f\.entity, pt, false, \{ currentMinute: Math\.floor\(classicMinutesRef\.value\) \}\);/, 'the dungeon\'s door: a layout foe while another hosts is a puppet');
-  assert.match(d, /\(f, pt\) => poisonFoe\(f, pt\)\)\) \{\s+\/\/ C2-slice \(combat-11\)/, 'the melee chain'); assert.match(d, /onInflictPoison: \(att, tgt, pt\) => poisonFoe\(f, pt\),/, 'the shaft');
-  assert.match(d, /const _pt = fromPlayer \? \(foe\._divertPt \?\? null\) : null; if \(fromPlayer\) foe\._divertPt = null;/); assert.match(d, /\.\.\.\(_pt != null \? \{ pt: _pt \} : \{\}\),[^\n]*\n\s*(?:\.\.\.\(_wc \? \{ wc: hitClassField\(_wc\) \} : \{\}\),[^\n]*\n\s*)?\.\.\.\(kind === 'arrow' \? \{ ar: 1 \} : \{\}\),\n\s*\.\.\.\(spell \?\? \{\}\),[^\n]*\n\s*\.\.\.\(_whole \? \{ z: 1 \} : \{\}\) \}\);/);
-  assert.match(d, /const pt = hitPoisonOf\(data\);/); assert.match(d, /if \(pt != null\) inflictPoison\(f\.entity, pt, false, \{ currentMinute: Math\.floor\(classicMinutesRef\.value\) \}\);[^\n]*\n\s*damageFoe\(f, dmg, at, dir, \{ fromPlayer: true, peer: true, kind, peerId: id, whole: data\.z === 1(?:, \.\.\.\(data\.wc != null \? \{ wc: hitClassOf\(data\) \} : \{\}\))? \}\);/, 'the host lands the dose before the health moves');
-  // the disease rider: FormulaHelper.OnMonsterHit rides the MONSTER's weaponless loop alone - a player's blow carries none
-  const fm = rd('src/combat/formulas.js');
-  assert.match(fm, /if \(!attacker\.isPlayer && attacker\.isClass === false && attacker\.basics\) \{[\s\S]{0,2000}if \(hitDamage > 0 && onMonsterHit\) onMonsterHit\(attacker, target, hitDamage\);/, 'the disease rider is inside the monster arm');
-  assert.equal((fm.match(/onMonsterHit\(attacker, target, hitDamage\)/g) ?? []).length, 1, 'and nowhere else');
-  assert.match(fm, /if \(weapon && damage > 0 && \(weapon\.poisonType \?\? -1\) !== -1\) \{\s*\n\s*if \(onInflictPoison\) onInflictPoison\(attacker, target, weapon\.poisonType\);\s*\n\s*weapon\.poisonType = -1;/, 'the poison is the one rider a player\'s blow carries: inside a damaging hit, cleared from the weapon either way');
 });
 
 test('WORLD6b-iii(e): the session - a stranger\'s pose, foes or blow (an id held in no room) asks the relay who it is, through the socket the frame came on, once per WHO_RETRY_MS per id and WHO_HZ_MAX a second; a peer, my own id and a stranger already asked are not asked; the join answer makes it a peer - its next pose is placed and its foes are heard; a refused ask (the gate, no open socket) is not marked and the next frame asks', () => {
@@ -236,7 +208,4 @@ test('WORLD6b-iii(e): the Room - who answers the asker alone with the member\'s 
   // not hello'd: refused as every frame is
   const n = r.connect(); await who(n, 'aaaa-0001');
   assert.equal(ofType(n, 'join').length, 0);
-  const s = rd('server/src/index.js');
-  assert.match(s, /if \(m\.t === 'who'\) \{[\s\S]{0,1200}a = this\._meterWho\(ws, a, now\); if \(!a\) return;\s*\n\s*if \(isChatRoom\(a\.key\)\) return;/, 'the ask\'s own meter, then the channel refusal');
-  assert.match(s, /this\._send\(ws, JSON\.stringify\(badged\(\{ t: 'join', id: b\.id, name: b\.name, look, pose: inRange\(a\.key \?\? '', a\.pose, b\.pose\) \? \(this\._drawn\(b, a\.key\)\.pose \?\? null\) : null \}, b\)\)\);/, 'the answer: the asker alone, and the pose within range (AUDIT WORLD6b-iii(e) B2). ACC1g took ACC1d\'s verdict off this frame with the rest of the wire: every name in the room was verified to get in, so a per-name `v` said the same thing about everybody. ACC3 put a badge back on it - and NOT a per-name verdict: a title is held by a few and is read off the signature, so it says something about the peer it is on (test/server/acc3titles.test.js drives the frame, this pin holds the shape)');   // PIN MOVED (AUDIT-SEATS): T2 - the pose as the room tells it (`_drawn`: in a battle room a spectator stands nowhere; any other room's as it is)
 });

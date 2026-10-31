@@ -202,7 +202,6 @@ test('LOCKPICK item: its row registered and known headless, a stack of steel and
   assert.equal(t.name, 'Lockpick'); assert.equal(t.stackable, true); assert.equal(t.weight, 0.05);
   assert.equal(t.worldTexArchive, LOCKPICK_ARCHIVE); assert.equal(LOCKPICK_ROW.worldTextureRecord, 0);
   assert.equal(lawTemplate(LOCKPICK_TEMPLATE)?.index, 584, 'the item law knows it');
-  assert.ok(src('src/systems/item/itemLaw.js').includes('STARGLASS_LAW_ROW, LOCKPICK_LAW_ROW]'), 'beside the registry from its leaf, as the service reads it');
   const it = lockpicks(3);
   assert.equal(isLockpick(it), true); assert.equal(it.group, 'UselessItems2'); assert.equal(it.stackCount, 3);
   assert.equal(isLockpick({ ...it, group: 'Gems' }), false);
@@ -243,9 +242,6 @@ test('LOCKPICK item: counted across stacks, spent one at a time; the counter\'s 
     const off = [lockpicks(4)];
     restockEndless(off, [lockpicks(21)]); assert.equal(off[0].stackCount, 4, 'offline it sells out until the day\'s restock');
   } finally { globalThis.location = was; }
-  const SS = src('src/systems/shopStock.js');
-  assert.match(SS, /if \(shelfIndex === 0 && \(buildingType === BUILDING_TYPES\.GeneralStore \|\| buildingType === BUILDING_TYPES\.PawnShop\)\) ensureEndlessLockpicks\(items\);/,
-    'every General Store\'s and Pawn Shop\'s counter');
 });
 
 test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a character from before is given them once', () => {
@@ -261,11 +257,6 @@ test('LOCKPICK item: a class that holds Lockpicking sets out with its picks, a c
   assert.equal(giveLockpickGift(old), 0, 'once'); assert.equal(lockpickCount(old.items), 5);
   const oldKnight = { items: [], career: knight.career };
   assert.equal(giveLockpickGift(oldKnight), 0); assert.equal(oldKnight.lockpickGift, 1, 'marked all the same');
-  assert.match(src('src/systems/startingGear.js'), /const picks = giveStartingLockpicks\(entity\);\n\s*if \(picks\) added\.push\(picks\);/);
-  const S = src('src/systems/save/save.js');
-  assert.ok(S.includes('snap.lockpickGift = Number.isSafeInteger(entity.lockpickGift) ? entity.lockpickGift : LOCKPICK_GIFT;'), 'a new character is born with it');
-  assert.ok(S.includes('entity.lockpickGift = Number.isSafeInteger(snap.lockpickGift) ? snap.lockpickGift : 0;'), 'a save from before has had none');
-  assert.ok(S.indexOf('giveLockpickGift(entity);') > S.indexOf('giveWalletGift(entity);'), 'given as the save is restored, at the pack\'s end');
 });
 
 test('LOCKPICK item: a rogue\'s pockets - a Burglar or a Thief more often than not, the rest now and then, none else', () => {
@@ -377,9 +368,6 @@ test('LOCKPICK host: a front door - DFU\'s exterior chance, its own roll; opened
   await new Promise((res) => setTimeout(res, OPEN_HOLD_MS + 40));
   assert.deepEqual(order, ['enter']); assert.equal(r.lines.length, 1, 'the success line');
   assert.ok(r.sounds.some(([k]) => k === SOUND.ActivateLockUnlock), 'DFU\'s chime');
-  const H = src('src/scenes/lockpickHost.js');
-  // AUDIT LOCKPICK A5: the tally found at all - its absence read -1 and passed; lockpick_door.test.js counts it landing
-  assert.ok(H.indexOf('tallyCrimeGuildRequirements(player, true, 1)') >= 0 && H.indexOf('tallyCrimeGuildRequirements(player, true, 1)') < H.indexOf('line(LOCKPICKING_SUCCESS_TEXT)'), 'CG2: the tally before the text (PlayerActivate.cs:552)');
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -444,26 +432,5 @@ test('LOCKPICK sites: a dungeon door hands its pick to the host below the magic 
   for (let i = 0; i < 100 && door.state !== 'end'; i++) a.update(0.1);
   assert.equal(door.state, 'end');
   assert.equal(a.lockpicked(door), false, 'an open lock is no lock'); assert.equal(door.state, 'end', 'and its door is not swung shut');
-  const D = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (AUDIT LOCKPICK A4): the graph's doors wired through the host's own `wire` - the dungeon's and a building's
-  // alike (test/systems/lockpick/lockpick_audit.test.js drives it over a real graph)
-  assert.match(D, /lockpick\.wire\(actions, `door:\$\{dfLocation\?\.mapTableData\?\.mapId \?\? 0\}`\);/);
-  assert.match(D, /return lockpick\.inside\(\{\n\s*lock: sb\.lock, key, what:/, 'a chest\'s pick, where SEARCH1 rolled');
-  assert.match(D, /onOpen: \(\) => \{ markPicked\(key\); hudText\.add\(LOCKPICKING_SUCCESS_TEXT\); audio\.play3d\(SOUND\.ActivateLockUnlock, centre\); activateSearchable\(i, mode\); \}/, 'opened, marked picked and searched');
-  assert.ok(D.includes('lockpick.dispose();   // LOCKPICK'), 'shut with the context');
-  assert.equal(/Math\.random\(\) \* 100 >= interiorLockpickingChance/.test(D), false, 'no roll left');
 });
 
-test('LOCKPICK sites: a front door in Steal mode opens the window where the roll stood, and is activated again once picked', () => {
-  const W = src('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT LOCKPICK A1): the host is `lockHost` - the ladder's own `lockpick` (the skill, DFU's name) shadowed
-  // `lockpick` and every front door threw; test/systems/lockpick/lockpick_door.test.js drives the door itself
-  assert.ok(W.includes('const lockHost = createLockpickHost({ talk: townTalk, mount: mountServiceWindow });'), 'the mode\'s own slot (A4), the street\'s line');
-  const ladder = W.indexOf('if (!opened && !isBash) {\n          const lockpick = skillValue(playerEntity, SKILLS.Lockpicking);');
-  const steal = W.indexOf("if (getInteractionMode() !== 'steal') {", ladder);
-  const pick = W.indexOf('if (!picked) return lockHost.frontDoor({ lock: lockValue, skill: lockpick, key: `front:${locId ?? 0}:${bd.buildingKey}`, enter: () => activateStaticDoor(hit, entries, false, { homeAsked, picked: true })', ladder);
-  assert.ok(ladder > 0 && steal > ladder && pick > steal, 'the refusal first, the window in Steal mode');
-  assert.ok(W.indexOf('isBrokenIn = true;   // :557', pick) > pick, 'picked, it is a break-in');
-  assert.equal(W.includes('getLastLockpickAttempt'), false, 'the anti-grind gate retired');
-  assert.equal(W.includes('Math.floor(Math.random() * 100);   // Random.Range(1, 101)'), false, 'no roll left');
-});

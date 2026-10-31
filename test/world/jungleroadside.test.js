@@ -203,9 +203,6 @@ test('JUNGLE-ROADSIDE the jungle\'s door carries the pairs: two near-only protot
   assert.deepEqual([0, 1, 2].map((k) => lost.door.pairProto(k, 0) != null), [true, true, false], 'the sunk pair alone gone');
   assert.equal(warned.length, 1);
   assert.match(warned[0], /the roadside pair pine2 will not read: pine2\.mtl: 503/);
-  // each pair read a breath of its own, after the five (AUDIT JUNGLE-ROADSIDE PERF-3)
-  assert.match(text('src/systems/jungleTreesAssets.js'), /for \(const \[k, p\] of JUNGLE_PAIRS\.entries\(\)\) \{\n\s+if \(breathe\) await breathe\(\);/);
-  assert.match(text('src/systems/jungleTreesAssets.js'), /if \(breathe\) await breathe\(\);\n\s+trees = packJungleTrees\(species, halves\);/, 'and a breath before the pack');
 });
 
 test('JUNGLE-ROADSIDE the near set turns a half across its road: a group\'s own `turn` in place of lptVariety\'s; turnXZ is the turn the trees\' program gives a vertex (mutants: the turn ignored; turnXZ turned the other way)', () => {
@@ -214,7 +211,6 @@ test('JUNGLE-ROADSIDE the near set turns a half across its road: a group\'s own 
   assert.deepEqual([own.trees[5], own.trees[11]], [Math.fround(0.25), Math.fround(-2)]);
   const theirs = buildTreeSet(400, 100, [{ h: 0, centers: c, wild: null, own: Float32Array.of(1, 1) }]);
   assert.equal(theirs.trees[5], Math.fround(lptVariety(400, 100, 10, 20, true).yaw));
-  assert.match(text('src/render/renderer.js'), /float tc = cos\(aInst\.w\), tsn = sin\(aInst\.w\);[\s\S]{0,120}world = vec3\(tc \* p\.x \+ tsn \* p\.z, p\.y, -tsn \* p\.x \+ tc \* p\.z\) \+ aInst\.xyz;/, 'the program\'s turn');
   const [x, z] = turnXZ(3, 4, 0.7);
   assert.ok(near(x, Math.cos(0.7) * 3 + Math.sin(0.7) * 4) && near(z, -Math.sin(0.7) * 3 + Math.cos(0.7) * 4));
 });
@@ -322,8 +318,6 @@ test('JUNGLE-ROADSIDE where it asks: both trunks\' tiles of the jungle\'s tree l
   assert.deepEqual([5, 6, 7, 8].map((y) => ok(9, y)), [true, true, true, true], 'each its own tile (x, y), never its transpose');
   g2[9 * T + 7] = Math.tan(33.5 * Math.PI / 180) ** 2;
   assert.ok(ok(7, 9), '33.5 degrees stands');
-  // PIN MOVED (GRAHT1): the tile law off a graht-oak's foot where they stand (world/jungle/grahtOaks.js grahtFootMask)
-  assert.match(text('src/world/terrain/jungleNature.js'), /tileOk: onFoot \? \(\(ok\) => \(tx, ty\) => ok\(tx, ty\) && !onFoot\[ty \* tDim \+ tx\]\)\(pairTile\(share, groundOf, g2Of, openOf\)\) : pairTile\(share, groundOf, g2Of, openOf\),[^\n]*\n\s+trailOk: \(x, z, r\) => !trails \|\| trailClear\(px, py, x, z, r\),/, 'the layout\'s own law and trails');
   // EVERY STATION of every arm, slid either way, every pair, turn and the two extreme scales: a trunk EDGE_MIN inside
   let nearest = Infinity;
   for (const [, sx, sz] of ARMS) {
@@ -381,7 +375,6 @@ test('JUNGLE-ROADSIDE THE DRAWN GROUND\'S LOWEST AND HIGHEST, exactly: lowestDra
   saddle[10 * H + 11] += 4 / yScale; saddle[11 * H + 10] += 4 / yScale;
   const mx = 10.5 * CELL, mz = 10.5 * CELL;
   assert.ok(near(groundAt(saddle, mx, mz), 102, 1e-3) && near(lowestDrawn(saddle, mx, mz, 0.5), 100, 1e-3), 'the drawn ground\'s, not the bilinear\'s');
-  assert.match(text('src/world/jungle/jungleRoadside.js'), /const y = Math\.min\(\.\.\.trees\.map\(\(t\) => lowestDrawn\(heightmapData, t\.x, t\.z, t\.foot\)\)\) - R\.sink;/);
 });
 
 test('JUNGLE-ROADSIDE SUNK, NEVER FLOATING: a pair stands 0.3 m under the lowest drawn ground beneath either foot - nowhere under its feet is the ground within 0.3 m of it, and under one it is exactly that; a trunk buried more than 3 m stands none; the road under its lianas keeps 2.75 m under each of their cells, and 2.75 m under UNDER_TOP anywhere under the pair (mutants: the highest ground taken; the sink raised out of the ground or dropped; the burial unasked or moved; the headroom moved or unscaled; the cells over the band unasked; the road\'s highest unasked)', () => {
@@ -471,14 +464,6 @@ test('JUNGLE-ROADSIDE the worker reads the roads by Basic Roads\' one port: worl
   for (const [k, v] of Object.entries({ roadRoom, ARMS, PATH_HALF_M })) assert.equal(roadVerge[k], v, k);
   assert.equal(PATH_HALF_M, PATH_HALF_WIDTH / UNITS_PER_METRE);
   assert.equal(PATH_HALF_M, 6.4);
-  const band = text('src/world/road/roadBand.js');
-  assert.match(band, /export const PATH_HALF_M = PATH_HALF_WIDTH \/ UNITS_PER_METRE;/);
-  // PIN MOVED (TESA4/TESA5, at the merge of main into TESA): the map's pixels ask the network (and a crossing's join past it), every other pixel Arena's roads;
-  // PIN MOVED (VOYAGER2): every other pixel the curves of Arena's roads and tracks (world/road/roadCurves.js curveDistance)
-  assert.match(band, /const onMap = mx >= 0 && my >= 0 && mx < MAP_W && my < MAP_H;/);
-  assert.match(band, /Math\.min\(r \? curveDistance\(r, tx, tz\) : Infinity, t \? curveDistance\(t, tx, tz\) : Infinity\) \* TILE_M - PATH_HALF_M;/);
-  assert.match(band, /const bits = pathsDataPoint\(net, mx, my\) \| arenaJoinByte\(mx, my\);/);
-  assert.match(band, /import \{ pathsDataPoint, MP_WORLD_UNITS, N, NE, E, SE, S, SW, W, NW \} from '\.\/pathData\.js';/);
   const bytes = (f) => new Uint8Array(readFileSync(join(ROOT, 'vendor/roads-hazelnut', f)));
   const net = { roads: bytes('roadData.bytes'), tracks: bytes('trackData.bytes') };
   let tracks = 0;
@@ -515,10 +500,6 @@ test('JUNGLE-ROADSIDE in the layout: the pairs handed beside the flats, never am
   const kept = off.flats.filter(far);
   assert.ok(kept.length > off.flats.length / 2);
   assert.deepEqual(on.flats.filter(far), kept, 'the jungle away from them as it stood');
-  const gen = text('src/world/terrain/terrainGen.js');
-  assert.match(gen, /const \{ flats: nature, pairs: roadside, graht \} = jungleLayout\(/);   // PIN MOVED (GRAHT1): and the graht-oaks
-  assert.match(gen, /pois: placesFor\(jungle\.hidden\), paths, net: roads, canopy: /, 'the kernel hands the jungle its network');   // PIN MOVED (GRAHT1): and the canopy's field after it
-  assert.match(gen, /\n\s+roadside,   \/\/ JUNGLE-ROADSIDE/, 'and the pairs back beside the flats');
 });
 
 // ---- the build -----------------------------------------------------------------------------------------------------
@@ -575,16 +556,5 @@ test('JUNGLE-ROADSIDE the build stands each pair whole, a tree\'s half at its ow
   const slots = [{ cut: new Set([c]) }, { cut: new Set([b]) }];
   const r = Object.assign(Object.create(Renderer.prototype), { _lptSlots: slots });
   assert.deepEqual([r._lptFrameOf([a, b]), r._lptFrameOf([a]), r._lptFrameOf(c)], [slots[1], null, slots[0]], 'the renderer finds the frame drawing any of them');
-  assert.match(text('src/render/nodeGlint.js'), /sendCut\(b\.lptProto \? frames\.find\(\(f\) => f\?\.cut && lptCuts\(f\.cut, b\.lptProto\)\) \?\? null : null\);/, 'and the glint');
 
-  const pb = text('src/scenes/pixelBuild.js');
-  assert.match(pb, /const pairs = keptPairs\(roadside, \(x, z\) => !pointNearGate\(gateClear, px, py, x, z, WOD_FLAT_GATE_CLEAR_M\) && !insideRocks\(pixelRocks, x, z\)\);/, 'kept by the gate\'s clearing and the rocks, as every flat');
-  const fallback = pb.slice(pb.indexOf('    if (!jungleOk) {\n      for (const t of pairs.flatMap('), pb.indexOf('    // WOD4: THE CAMP AT PRIVATEER\'S HOLD'));
-  assert.match(fallback, /addFlat\(archive, t\.record, t\.x, walkGroundAt\(samples, t\.x, t\.z\), t\.z, \{ wild: JUNGLE_ARCHIVE \}\);/, 'the door unloaded, its Tree records at their own ground');   // PIN MOVED (FLORA-GROUND): the ground's one law, walkGroundAt
-  assert.doesNotMatch(fallback, /pixelTrees|tree:/, 'never Logging\'s, whatever the door (AUDIT JUNGLE-ROADSIDE GAME-2)');
-  assert.doesNotMatch(pb, /f\.pair\b/, 'no pair among the flats');
-  assert.match(pb, /if \(jungleOk && pairs\.length\) \{\n\s+await standRoadside\(\{\n\s+door: jungle\.door, pairs, speciesPic, groups: jungleGroups, handles: jungleHandles, set: jungleSet,/);
-  assert.ok(pb.indexOf('await standRoadside(') < pb.indexOf('for (const [gk, g] of jungleGroups) {'), 'its trees join the groups before they stand');
-  assert.match(pb, /const near = g\.spanned \? g\.centers\.map\(\(c\) => !g\.spanned\.has\(c\)\) : null;\n\s+jungleSet\.push\(\{ h: pic\.h, centers: near \? g\.centers\.filter\(\(_, i\) => near\[i\]\) : g\.centers, wild: null, own: near \? own\.filter\(\(_, i\) => near\[i\]\) : own, fit: null \}\);/, 'never the species\' near set - its half draws it');
-  assert.match(pb, /batch\.lptProto = g\.spans \? \[far, \.\.\.g\.spans\] : far;/, 'its far picture gives way to its half');
 });

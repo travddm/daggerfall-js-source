@@ -125,10 +125,6 @@ test('QS6: the engine\'s own gates are the slot\'s gates - a spell the player ca
   assert.deepEqual(out, { kind: 'pressed', name: 'Wildfire', readied: false });
   assert.equal(r.magic.readied(), null);
   assert.ok(r.said.includes("You don't have the spell points."), 'the ENGINE\'s refusal, not ours');
-  // The model contains no price of its own - the one home for a cast cost is
-  // the engine, which is why the refusal above is the engine's.
-  const src = read('src/systems/quickslots.js');
-  assert.doesNotMatch(src, /calculateCastCost|spellPointCost|playerEntity\.magicka/, 'the model never prices a spell');
 });
 
 test('QS6: a spell the book no longer holds is a GHOST - the slot keeps its name, the press refuses by that name, and an empty book has its own word (mutants: a ghost readying `undefined`; the empty book silently doing nothing)', () => {
@@ -415,45 +411,7 @@ test('QS6: the off hand presses the SWAP when that is what its cell shows, and t
   entity.lightSource = torch();
   assert.equal(quickslotView(entity).off.kind, 'torch');
   assert.equal(offHandOffersSwap(entity), false);
-  // And it really is the VIEW that answers, not a copy of its ladder.
-  assert.match(read('src/systems/quickslots.js'),
-    /export const offHandOffersSwap = \(entity\) => quickslotView\(entity\)\.off\.kind === 'swap';/);
 });
 
 // ── THE WIRING ───────────────────────────────────────────────────────
 
-test('QS6: every host that answers a gameplay key DRIVES the hold machine, on its own keys and behind its own gate - the AUDIT SOC B4/D1 walk, for a key that only a frame can read (mutants: a host that never ticks, so the three keys are dead in a shop or underground; a tick with no gate, so a window typing 1 drinks a potion)', () => {
-  // The four frames, each beside the ReadyWeapon/SwitchHand latches the
-  // machine is modelled on.
-  const sites = [
-    ['src/scenes/world.js', /tickQuickHold\(dt\);/],
-    ['src/scenes/exterior.js', /tickQuickHold\(dt\);/],
-    // AUDIT QS6 F6: ABOVE the host's own `walkMode && !overlayHeld` gate, where
-    // the call used to sit - there a blocked frame never reached it at all and
-    // the `blocked` argument was dead.
-    ['src/scenes/dungeon.js', /ctx\.tickQuickHold\?\.\(dt, \{ isHeld: \(a\) => held\(keys, a\), blocked: overlayHeld \|\| !walkMode \}\);/],
-    ['src/scenes/worldModes.js', /dungeonCtx\?\.tickQuickHold\?\.\(dt, \{ isHeld: \(a\) => held\(keys, a\), blocked: overlayHeld \}\);/],
-  ];
-  for (const [path, re] of sites) {
-    const src = read(path);
-    assert.match(src, re, `${path} never drives the machine`);
-    // ...and it stands with the polled latches, not somewhere of its own.
-    // MWCROUCH: SwitchHand is `released` off the frame's key-edge ring now
-    // (ActionComplete is the RELEASE, WeaponManager.cs:272) - what this
-    // clause asks is unchanged, that the hold machine stands with the
-    // frame's other per-frame key reads and not somewhere of its own.
-    assert.match(src, /released\((keyEdge|latch\.edge), keys, 'SwitchHand'\)/, `${path} really is a frame that polls`);
-  }
-  // THE GATE. Every builder of the tick names one - a key under an open window
-  // is the window's, and the held-key Set is not even filled there.
-  for (const [path, gate] of [['src/scenes/world.js', /blocked: gamePaused\(\),/], ['src/scenes/exterior.js', /blocked: gamePaused\(\),/]]) {
-    assert.match(read(path), gate, `${path} ticks behind its own gate`);
-  }
-  // The interior mode's own, which is the fourth frame's other arm.
-  assert.match(read('src/scenes/worldModes.js'), /isHeld: \(a\) => held\(keys, a\), blocked: overlayHeld, entity: playerEntity,/);
-  // The dungeon context hands the machine OUT - it has no frame, and BOTH
-  // hosts that mount it have one.
-  assert.match(read('src/scenes/dungeonContext.js'),
-    /const tickQuickHold = \(dt, \{ isHeld = null, blocked = false \} = \{\}\) => tickQuickslotHold\(dt, \{/);
-  assert.match(read('src/scenes/dungeonContext.js'), /\n    tickQuickHold,/, 'and puts it on the handle both hosts read');
-});

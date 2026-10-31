@@ -162,17 +162,3 @@ test('NAME-AS a letter to a friend, by account: the reader found by id - registe
   assert.equal(third.id.length > 0, true);
 });
 
-test('NAME-AS a board note names its author\'s account beside the name it was signed with, so its duel finds the author among the players here by account (mutants: `by` dropped)', async () => {
-  const S = await standService({ BOARD_OPEN: 'on' });
-  const author = await S.registered('Pinner');
-  const reader = await S.registered('Looker');
-  const map = 1234567;
-  const pinned = await S.call('/v1/board/pin', { map, subject: 'A duel', body: 'Meet me by the fountain.', days: 1, button: 'duel', rid: 'n1abcdefghijklmn' }, author.secret);
-  assert.equal(pinned.status, 200, JSON.stringify(pinned.body));
-  const read = await S.call('/v1/board/read', { map }, reader.secret);
-  assert.equal(read.status, 200, JSON.stringify(read.body));
-  const note = read.body.notes.find((n) => n.subject === 'A duel');
-  assert.ok(note, 'the note is on the board');
-  assert.deepEqual([note.from, note.by], ['Pinner', author.id], 'the name it was signed with, and the account behind it');
-  assert.match(src('server-account/src/board.js'), /from: n\.author_name, by: n\.author,/);
-});

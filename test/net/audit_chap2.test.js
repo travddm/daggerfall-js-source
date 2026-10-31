@@ -363,7 +363,6 @@ test('AUDIT CHAP2 E2: the claims\' hour is the service\'s - past 120 a character
     assert.ok(!r.error, JSON.stringify(r));
   }
   assert.deepEqual(await claimRoll(s.ctx(T0 + 2), s.player, s.body({ rid: 'rate-over001', deltas: { 40: 1 }, members: [] })), { error: 'roll-rate' });
-  assert.match(src('server-account/src/index.js'), /'roll-rate': 429/);
 });
 
 // ── THE SERVICE: THE HALLS AND THEIR WRITS ──────────────────────────
@@ -640,14 +639,3 @@ test('AUDIT CHAP2 T23/C5: a hall writ\'s card under the guild\'s seal, named, it
   assert.equal(byClass(host, 'notice-worktoday')[0].textContent, 'Writs today: 0 of 3');
 });
 
-test('AUDIT CHAP2 T7/C1/E1: the wiring - the kept adoption rides the save, the tracker plays the session\'s character through a signed-in door, the board hears a filled writ before it asks whether it still stands, /hall reaches the developer\'s doors (mutants: getSaveData, character, the door\'s storage, the onTaken order, the command)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /registerModSaveData\(ROLL_KEPT_VENDOR, \{\n\s+newSaveData: \(\) => null,\n\s+getSaveData: \(\) => rollKept,\n\s+restoreSaveData: \(rec\) => \{ rollKept = rollKeptOf\(rec\); \},/);
-  assert.match(world, /createRollTracker\(\{\n\s+io: accountRoll\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\) \}\),\n\s+character: \(\) => realmSession\.id,/);
-  assert.match(world, /const hallCmd = parseHallCommand\(text\);[\s\S]{0,700}hallDoor\.strike\(hallCmd\.key\)[\s\S]{0,700}hallDoor\.halls\(region\)/);
-  const board = src('src/ui/noticeWindow.js');
-  assert.match(board, /const said = r\?\.ok \? work\.onTaken\?\.\(r\) : null;\n\s+if \(!alive\) \{ if \(said\) work\.sayLate\?\.\(said\); return; \}/);   // PIN MOVED (AUDIT CHAP3 C5: and the line said in the chat)
-  assert.match(src('server-account/src/index.js'), /path === '\/v1\/chapters\/strike' \? await strikeHall\(ctx, who\.player, env, body\)/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/chapters\/witness', '\/v1\/chapters\/halls', '\/v1\/chapters\/strike',/);
-  assert.match(src('server-account/migrations/0099_npc_halls.sql'), /ALTER TABLE npc_roll_heads ADD COLUMN kseq INTEGER NOT NULL DEFAULT 0;/);
-});

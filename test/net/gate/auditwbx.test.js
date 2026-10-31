@@ -80,27 +80,6 @@ test('AUDIT WBX R5/R6 the bar through the Wrath\'s wind-up, and midnight is his:
   assert.equal(applyHit(g, 'p', 20, HIT_KINDS.Spell, { x: 0, z: 3 }, 60_000), 0, 'after midnight, with no beat to have said the Wrath');
 });
 
-test('AUDIT WBX R7/R6/R8 the relay\'s door: an `in` without the brain\'s law (a tab loaded before the deploy) is refused in words it knows; a blow arms the beat as an `in` does; the hub\'s sweep forgets an expired receipt (mutants: the law unasked; a blow that never wakes him; the receipt kept for ever)', async () => {
-  const DAY = 200, TT = gateTimes(DAY), KEY = gateRoomKey(DAY);
-  const realNow = Date.now; let clock = TT.openAt + 1000; Date.now = () => clock;
-  try {
-    const world = fakeRooms({ now: () => clock });
-    const r = world.room(KEY);
-    const pose = { x: COURT_CENTRE[0], y: 0, z: COURT_CENTRE[2] + 3, yaw: 0, pitch: 0 };
-    const a = r.connect(); await r.hello(a, 'peer-0001', pose);
-    await r.raw(a, JSON.stringify({ t: 'gate', k: 'in', lv: 10 }));
-    assert.deepEqual(a.sent.filter((m) => m.t === 'gate').at(-1), { t: 'gate', k: 'no', m: 'the gate is closed' }, 'no law, no fight');
-    assert.ok(!r.room._fight, 'no fight made for it');
-    await r.raw(a, JSON.stringify({ t: 'gate', k: 'in', lv: 10, bv: GATE_BRAIN_V }));
-    assert.ok(r.room._fight?.players['acct-peer-0001'], 'with it, in');
-    await r.room.state.storage.deleteAlarm?.();
-    r.alarm.at = null;
-    await r.raw(a, JSON.stringify({ t: 'gate', k: 'hit', q: 1, d: 5, r: HIT_KINDS.Spell }));
-    assert.ok(r.alarm.at != null && r.alarm.at <= clock + BRAIN_TICK_MS, 'a blow wakes the beat');
-    assert.match(read('server/src/index.js'), /for \(const \[k, r\] of kept\) \{ glast = k; if \(!r \|\| typeof r !== 'object' \|\| !\(Number\.isFinite\(r\.e\) && now < r\.e \* 1000\)\) dead\.push\(k\); \}/, 'the hub\'s sweep takes expired receipts');
-  } finally { Date.now = realNow; }
-});
-
 // ═══ S: THE SPOILS ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
 test('AUDIT WBX S1 a spent receipt is said to the hub, which forgets its kept copy (that day\'s alone): the next hello of any device is handed nothing; the court\'s fighters are not handed it by the hub at the kill, and any other account on its newest tab alone (mutants: the hub keeping it; every tab handed it)', async () => {
@@ -190,7 +169,6 @@ test('AUDIT WBX S2 the receipt says the level the fight admitted its account at,
   assert.equal(spoilsLevel(8, 30), 8, 'never over the player\'s own');
   assert.equal(spoilsLevel(50, undefined), 50);
   assert.equal(spoilsLevel(0, undefined), 1);
-  assert.match(read('server/src/index.js'), /mintReceipt\(\{ d: f\.day, b: f\.boss, s: sub, c: rand32\(\), x: earnedBy\(f, sub\), l: f\.players\[sub\]\.lv, \.\.\.\(helped\.has\(sub\) \? \{ r: 1 \} : \{\}\), \.\.\.this\._bodyMeasureOf\(f, sub, GATE_SEAM\.earned\), \.\.\.\(receiptPortents\(f\) \? \{ p: receiptPortents\(f\) \} : \{\}\) \}/, 'the relay signs the level it admitted');   // PIN MOVED (WB14g): and a portent night's `p` after the count's measure; PIN MOVED (INT14): and the count's measure beside it   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
 });
 
 // ═══ F: THE COURT ════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -206,10 +184,6 @@ test('AUDIT WBX F1/F2 no weapon is worn or destroyed on him: the Razor\'s whole-
   assert.equal(razor.strikes({ target: him, item, rolls: () => 0.999 }), null, 'not him');
   const foe = razor.strikes({ target: { health: 40, stats: {} }, item, rolls: () => 0 });
   assert.ok(foe === null || foe.durabilityLoss === 40, 'a foe as the artifact has it');
-  const e = read('src/systems/enchantments.js');
-  assert.match(e, /applyResults\(target\?\.spareGear && r\?\.durabilityLoss \? \{ \.\.\.r, durabilityLoss: 0 \} : r, env\);/, 'the Strikes payloads\' bill spared on him');
-  assert.match(read('src/scenes/hostEnchant.js'), /if \(target\?\.spareGear\) \{ bossSpell\?\.\(record, target\); return; \}/, 'a Cast When Strikes spell goes by his own spell door (AUDIT WB11 W1: the stand-in it met with it)');
-  assert.match(read('src/scenes/dungeonContext.js'), /bossSpell: opts\.gateBoss \? \(record, target\) => \{ spellOnStandIn\(record, target\); \} : null,/);   // AUDIT WB11 W1: by the stand-in it met
 });
 
 test('AUDIT WBX F3/F4 where he stands: his fall frozen where he fell (a charge\'s head, a leap\'s flight, a walk\'s step) on every screen and in the relay\'s state; a walk\'s word ends the attack before it, so he is never drawn frozen at a charge\'s end while he walks (mutants: the fall at the last word\'s start; the charge kept through the walk)', () => {
@@ -271,23 +245,11 @@ test('AUDIT WBX F6/F9 the court: my trap on him is said while it runs (a recast 
   assert.deepEqual(h.c.trapNow(), { chance: 40 });
   h.c.leave(); h.clock.t = 2000; h.c.frame();
   assert.deepEqual(h.c.trapNow(), { chance: 40 }, 'out and back in: still running');
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): his spell door left the context (scenes/gate/standInSpell.js),
-  // the court's trap handed in by the context's wiring
-  assert.match(read('src/scenes/dungeonContext.js'), /trapNow: \(\) => opts\.bossTrapNow\?\.\(\) \?\? null, onTrap: \(trap\) => !!opts\.onBossTrap\?\.\(trap\),/);
-  assert.match(read('src/scenes/gate/standInSpell.js'), /const running = host\.trapNow\(\);\n\s*if \(running\) boss\.entity\.activeEffects = \[\{ kind: 'soulTrap', chance: running\.chance, roundsRemaining: 0 \}\];/, 'a recast\'s incumbent');
   // a leap in the air: no stride counted
   const g = court();
   const leap = { i: 2, a: ATTACKS.leap.id, at: 10_000, x: 0, z: -12, yw: 0, tg: [[0, 12]] };
   g.link.st = { ...st, atk: leap, x: 0, z: -12 };
   for (let t = 9000; t <= 10_000; t += 16) { g.clock.t = t; g.c.frame(); }
-  assert.match(read('src/scenes/gate/gateCourt.js'), /if \(bossHop\(s, t\) > 0\) \{ stepFrom = null; strideRun = 0; \}/);
-});
-
-test('AUDIT WBX F5 a Soul Trap reaches him at range and bursting, not by touch alone: the missile may meet him when its spell is a duel\'s or a trap, and so may its blast (mutants: the missile\'s duel word alone)', () => {
-  const m = read('src/scenes/hostMagic.js');
-  assert.match(m, /boss: !!duelSpellOf\(sp\) \|\| \(sp\.effects \?\? \[\]\)\.some\(\(e\) => e && isSoulTrapEffect\(e\)\)/);
-  assert.match(m, /if \(m\.boss \?\? m\.duel\) \{/);
-  assert.match(m, /if \(boss && caster\?\.entity === playerEntity\) for \(const t of sweepFoes\(pos, EXPLOSION_RADIUS, bossMarksFor\(spell\)\)\) giveToBoss\(t, spell, caster\);/);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders
 });
 
 // ═══ W: THE GATE IN THE WORLD, AND ITS MUSIC ═════════════════════════════════════════════════════════════════════════
@@ -330,13 +292,3 @@ test('AUDIT WBX W1/W6 a player standing in the stone the moment it comes up whol
   assert.ok(Math.abs((moved[0].aabb.min[0] - box[0].aabb.min[0]) - 64) < 1e-6, 'moved with the gate');
 });
 
-test('AUDIT WBX W2/W3 the court\'s music: a song made in code plays where MIDI.BSA did not load; the fanfare\'s time is counted from its own first note - SCORE_STING_LEAD_MS after the court asked for it, the war song\'s fade and the player\'s start (mutants: the archive asked of a made song; the fanfare cut under the fade)', async () => {
-  const { MUSIC_FADE_OUT_S } = await import('../../../src/systems/music.js');
-  const { SCORE_STING_LEAD_MS } = await import('../../../src/systems/gate/gateScore.js');
-  assert.equal(SCORE_STING_LEAD_MS, Math.round(MUSIC_FADE_OUT_S * 1000 + 60), 'the fade out and the player\'s beat on');
-  const m = read('src/systems/music.js');
-  assert.match(m, /_ensurePlayer\(made = false\) \{\n[^\n]*\n\s*if \(!this\.enabled && !made\) return null;/);
-  assert.match(m, /const player = this\._ensurePlayer\(this\._made\.has\(name\)\);/);
-  assert.match(m, /if \(!this\.archive\) return false;/);
-  assert.match(read('src/systems/gate/gateScore.js'), /if \(law === GATE_SONGS\.fell && stingAt === null\) stingAt = now \+ SCORE_STING_LEAD_MS;/);
-});

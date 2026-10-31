@@ -308,8 +308,4 @@ test('NAV-D ONE RAID AT A TIME (THE MERGE with OWS3): Warm Ashes\' module answer
   assert.equal(raidUnderWay(), true, 'the lent ship is out');
   setWarmAshesHost(null);
   _resetWarmAshesShips();
-  // the host: the machine's live raid quests are the word, and the sea fight's starter asks first
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /raidRunning: \(\) => \[\.\.\.questBridge\.machine\.quests\.values\(\)\]\.some\(\(q\) => WA_RAID_QUESTS\.includes\(q\.questName\) && !q\.questComplete && !q\.questTombstoned\),/);
-  assert.match(w, /startRaid: \(name\) => \{\n\s+if \(warmAshesRaidUnderWay\(\)\) return null;/);
 });

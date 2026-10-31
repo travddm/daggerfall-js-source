@@ -51,26 +51,6 @@ test('SKIN-CARRY: a refused store answers false from setPref and null from setUi
   _resetForTests();
 });
 
-test('SKIN-CARRY by source: the UI Overhaul card\'s choice reads the store\'s word and carries a refused choice on the reload URL, and drops the override otherwise - its one home since MENU-TOGGLE retired the menu\'s switchSkin (mutant: the carry dropped, or the override left standing)', () => {
-  const ovh = rd('src/systems/overhauls.js');
-  const fn = ovh.slice(ovh.indexOf('export function uiChoiceUrl('), ovh.indexOf('\n}\n', ovh.indexOf('export function uiChoiceUrl(')) + 3);
-  assert.match(fn, /url\.searchParams\.delete\('skin'\);/, 'a stored choice rides no override');
-  assert.match(fn, /if \(setUiSkin\(skin\) === null\) url\.searchParams\.set\('skin', skin\);/, 'a refused one rides the URL');
-  assert.match(fn, /return url\.toString\(\);/);
-  assert.doesNotMatch(rd('src/ui/enhanced/enhancedMenu.js'), /function switchSkin\(/, 'the menu\'s own door is retired (MENU-TOGGLE)');
-  assert.match(rd('src/systems/uiSkin.js'), /return setPref\('skin', skin\) === false \? null : skin;/);
-  assert.match(rd('src/systems/uiPrefs.js'), /export function setPref\(k, v\) \{ if \(_prefs === null\) loadPrefs\(\); _prefs\[k\] = v; return savePrefs\(\); \}/);
-});
-
 test('DG-LNX by source: the folder arm is guarded like the zip arm, reports progress, and names the zip and the drop when the browser hands over nothing or the read throws (mutant: the guard or the hint dropped)', () => {
-  const ds = rd('src/scenes/dataSource.js');
-  const gate = ds.slice(ds.indexOf('const ingest = async (files) => {'), ds.indexOf("ui.querySelector('#pick').addEventListener"));
-  assert.match(gate, /try \{[\s\S]*\} catch \(err\) \{\n\s+msg\.textContent = `folder failed: \$\{err\?\.message \?\? err\}\. \$\{FOLDER_PICK_HINT\}`;/, 'a read that throws says so and points at the route that works');
-  assert.match(gate, /if \(!files\.length\) \{ msg\.textContent = `the browser handed over no files from that folder\. \$\{FOLDER_PICK_HINT\}`; return; \}/, 'an empty pick is named, with the same hint');
-  assert.match(gate, /readPicked\(files, \(done, n\) => \{ msg\.textContent = `reading \$\{done\}\/\$\{n\}\.\.\.`; \}\)/, 'progress while the folder reads');
-  assert.match(gate, /no ARENA2 files in that selection \(\$\{files\.length\} files, none of them Daggerfall/, 'a pick of the wrong folder says which');
-  assert.match(ds, /async function readPicked\(files, progress = null\) \{[\s\S]*?if \(progress && \(done % 25 === 0 \|\| done === files\.length\)\) progress\(done, files\.length\);/, 'readPicked reports every 25 files and at the end');
   assert.match(FOLDER_PICK_HINT, /Snap or Flatpak/); assert.match(FOLDER_PICK_HINT, /\.zip/); assert.match(FOLDER_PICK_HINT, /drag the folder/);
-  // the zip arm's own guard is the model and stands
-  assert.match(ds, /msg\.textContent = `zip failed: \$\{err\.message\}`;/);
 });

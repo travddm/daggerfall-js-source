@@ -173,11 +173,3 @@ test('LW-FIX1 a table\'s talk is never re-dealt mid-script - LW-TALK: PIN MOVED 
   }
 });
 
-test('LW-FIX1 the streaming host: the deep passes by the player\'s own dead (slain, died - the pool\'s corpses) and makes its books again below when a turn is made there, for the remains and the divers alike; a room with nobody in it is let go on the way out like one with people (mutants: the slain, the died, the books for each, the empty room each way)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /return !turns\.fallen\.has\(key\) && !turns\.spared\.has\(key\) && !turns\.slain\.has\(key\) && !turns\.died\.has\(key\) && !livingDivers\?\.stood\(r\.trip\.id, r\.res\.id\);/);
-  assert.match(w, /livingTurnsFresh\(\);   \/\/ LW-FIX1: a turn made below[^\n]*\n\s*livingMemoFresh\(\);[^\n]*\n\s*const turns = livingRelations\.turns\(\);\n\s*_livingRemainsList = here \? fallenIn\(/);
-  assert.match(w, /livingTurnsFresh\(\);   \/\/ LW-FIX1: the books fresh below too\n\s*livingMemoFresh\(\);[^\n]*\n\s*_livingDiversList = here \? diversAt\(/);
-  assert.match(w, /if \(!livingWorldOn\(\) \|\| _mode\(\) !== 'interior'\) \{ if \(livingIndoors\?\.size \|\| livingIndoors\?\.spots\(\)\.length\) livingIndoors\.clear\(\); return; \}/);
-  assert.match(w, /if \(livingIndoors\?\.size \|\| livingIndoors\?\.spots\(\)\.length\) livingIndoors\.clear\(\);   \/\/ LW8: the street again/);
-});

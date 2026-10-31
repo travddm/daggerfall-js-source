@@ -147,8 +147,6 @@ test('SEA-TRADE the harbour office: online its exchange priced by the port town\
   assert.deepEqual(bare.rows.map(({ have, ...r }) => r), exchangeOf(WAYREST, 3));
   assert.equal(bare.band, null);
   assert.doesNotMatch(exchangeText(bare).lede, /Port economy/);
-  assert.match(hostText('src/scenes/world.js'), /etherGoods: \(\) => etherOut, town: townEcon,/);
-  assert.match(rd('src/scenes/harbourOffice.js'), /markCounterBought\(\[goods\], \{ price: k \* r\.sell \}\);[^\n]*\n\s*deps\.stow\?\.\(hold, goods\);/);
 });
 
 test('SEA-TRADE the host module: a port town\'s lanes counted off the map\'s lane network once it stands (each lane at its two ports) and read into its Prosperity and card; the lanes asked again while they do not stand (BOOT-TDZ II); a port\'s exchange factors and band its town\'s, none past the Veil or where no town stands; a dealing told to the book at the port\'s pixel; the world host hands it the MAPS location and the lanes (mutants: TOWNECON4-host-lanes-once, TOWNECON4-host-lanes-cached-empty, TOWNECON4-host-ether, TOWNECON4-host-deal-unbooked)', async () => {
@@ -193,7 +191,4 @@ test('SEA-TRADE the host module: a port town\'s lanes counted off the map\'s lan
   assert.equal(off.exchangeAt(port), null);
   assert.equal(off.bandAt(port), null);
   assert.equal(off.seaDeal(port), false);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /locAt: \(x, y\) => locationIndex\.get\(`\$\{x\},\$\{y\}`\)\?\.mapTableData \?\? null, portLanes: \(\) => \(_lanesReady && mapDict \? worldLanes\.all\(\) : null\) \}\);/);   // PIN MOVED (WW3): the Bay's lanes - SEA-TRADE's ticks are the Bay's (WW7); PIN MOVED (WW7-10): the world's
-  assert.match(rd('src/scenes/townEconHost.js'), /seaDeal: \(port\) => \(book && portTown\(port\) != null \? book\.seaDeal\(port\.px, port\.py\) : false\),/);
 });

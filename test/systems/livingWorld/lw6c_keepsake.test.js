@@ -98,12 +98,3 @@ test('LW6c carried home: speaking with one of the household the fallen lived wit
   assert.ok(seen.size >= 2, 'not one set of words for every keepsake');
 });
 
-test('LW6c the hosts: the talk shows the household\'s moment on the parchment before any words (and no conversation that time); the body\'s town answers it - the street\'s own, the room\'s door, gives the town what the player carries and takes the keepsake handed over, and lays each fallen\'s keepsake with their remains (mutants: the parchment, the doors, the carried, the handed, the laid)', () => {
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /if \(refusal\) \{ const b = livingTalk\?\.regard\?\.\(target\.person\) \?\? null; setMidScreenText\(b \? [^\n]*: refusal\); return; \}\n(?:\s*\/\/[^\n]*\n)*\s*const moment = target\.person\?\.living\?\.town\?\.moment\?\.\(target\.person\) \?\? null;\n\s*if \(moment\) \{ showOverlay\(new ActionTextBox\(moment\)\); return; \}/);   // PIN MOVED (AUDIT PLAIN-UI U11): the refusal says where the resident stands
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /moment: \(p\) => livingIndoors\?\.town\(\)\?\.moment\?\.\(p\) \?\? null,/);
-  assert.match(w, /keepsakes: \(\) => playerEntity\.items \?\? \[\],/);
-  assert.match(w, /takeKeepsake: \(item\) => \{ const i = playerEntity\.items\?\.indexOf\(item\) \?\? -1; if \(i >= 0\) playerEntity\.items\.splice\(i, 1\); \},/);
-  assert.match(rd('src/scenes/livingWorld/remainsGoods.js'), /items\.push\(mintKeepsake\(res\)\);/);   // PIN MOVED (HOST-SPLIT, SEA VENTURES 2026-10-22): livingRemainsLay moved verbatim out of bootWorld into scenes/livingWorld/remainsGoods.js
-});

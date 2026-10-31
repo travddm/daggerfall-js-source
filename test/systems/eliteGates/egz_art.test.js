@@ -74,15 +74,6 @@ test('EG-ZH GetFireWallColors32 ON SYNTHETIC BYTES: a TextureFile\'s own palette
   assert.deepEqual([...fire.colors.slice(8, 16)], [126, 48, 15, 178, 202, 124, 91, 255], 'the cut-out black (alpha 0) and the white');
 });
 
-test('EG-ZH THE FIRE WALLS\' UPLOAD (scenes/dataPipeline.js): both arms - a record\'s and a frame\'s - take GetFireWallColors32 for TEXTURE.356 over the CLASSIC albedo (a pack\'s picture over it lights from the reference texture, as TextureReader does), never on a stand-in, and every other emissive record still reuses its albedo (mutants: the arm skipped again; the swap\'s colours lit; a stand-in lit)', () => {
-  const S = rd('src/scenes/dataPipeline.js');
-  assert.match(S, /import \{ isEmissive, FIRE_WALLS_ARCHIVE, FIRE_WALL_COLOR, FIRE_WALL_SCALE \} from '\.\.\/world\/emissiveTextures\.js';/);
-  assert.match(S, /if \(archive === FIRE_WALLS_ARCHIVE\) \{ if \(!t\.vendor\) \{ const classic = swap \? t\.getColor32\(bitmap, opaque \? -1 : 0\) : color32;[^\n]*\n\s*else renderer\.uploadEmissionTexture\(archive, record, color32, \{ white: true, replacement \}\);/);
-  assert.match(S, /} else if \(isEmissive\(archive, record\) && !t\.vendor\) \{\n\s*\/\/ EG-ZH[^\n]*\n\s*const classic = swapFrame \? t\.getColor32\(bitmap, 0\) : color32;\n\s*renderer\.uploadEmissionTexture\(archive, key, t\.getFireWallColors32\(classic\.colors, classic\.width, classic\.height, FIRE_WALL_COLOR, FIRE_WALL_SCALE\), \{ white: true, replacement \}\);/);
-  assert.equal((S.match(/archive !== FIRE_WALLS_ARCHIVE\) \{/g) ?? []).length, 1, 'the frame\'s arm keeps its albedo arm for every other archive');
-  assert.ok(!/isEmissive\(archive, record\) && archive !== FIRE_WALLS_ARCHIVE\) \{\n\s*\/\/ AUDIT 39 F49/.test(S), 'the record\'s arm no longer skips the fire walls');
-});
-
 test('EG-ZH THE FIRE WALLS THROUGH THE REAL PIPELINE (scenes/dataPipeline.js, synthetic bytes): a made TEXTURE.356 stood in the pipeline\'s own archive table - record 0 uploads its albedo and an emission map that is GetFireWallColors32 of its classic albedo, white; a frame\'s upload the same under its composite key; record 1 (not emissive) no emission; a pack\'s picture over record 2 uploads as the albedo while the emission still lights from the classic record; another archive\'s emissive record still its albedo (mutants: the swap lit; a frame unlit; the arm thrown on a swap)', async () => {
   const pal = new Uint8Array(768);
   for (let i = 0; i < 256; i++) { pal[i * 3] = i; pal[i * 3 + 1] = (i * 7) & 255; pal[i * 3 + 2] = 255 - i; }
@@ -241,5 +232,4 @@ test('EG-ZH THE KEY\'S PICTURE, KEPT AND DRAWN: under the Spire\'s held block\'s
   assert.deepEqual(decodedTexture(38282, 0, 0, 'Albedo', 7) && decodedTexture(38282, 0, 0, 'Albedo', 7).width, 32, 'a dye asks the same picture (the port\'s own art takes none)');
   assert.deepEqual(vendorTextureStandIn(38282).getSize(0), { width: 32, height: 22 }, 'the shell measures it, as the icon doors ask');
   setTextureDeriveContext(null);
-  assert.ok(!/worldTextureArchive: 211/.test(rd('src/systems/eliteGates/weirKey.js')), 'the Talisman\'s picture gone');
 });

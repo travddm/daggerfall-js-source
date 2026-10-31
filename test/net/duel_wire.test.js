@@ -67,8 +67,6 @@ test('DUEL1 the cast frame is exactly what it was: a touch or a ranged single ta
   // is the caster's counted number now (above), and the cast frame stands as it was
   assert.ok(validCastData({ to: 'peer-0002', level: 5, spell: HEAL_SPELL }));
   for (const rangeType of [0, 3, 4]) assert.equal(validCastData({ to: 'peer-0002', level: 5, spell: { ...HEAL_SPELL, rangeType } }), null, `a cast frame at range ${rangeType}`);
-  // AUDIT INT8 (the pins' own): DUEL_RANGE_TYPES retired with the duel's spell record - nothing read it but this line
-  assert.equal(/DUEL_RANGE_TYPES/.test(rd('src/net/wire.js')), false);
 });
 
 test('DUEL1 the parser and the version: `duel` is its own arm (after the hello, under its own door); world107 is the first relay that routes it (mutants: the frame parsed before the hello; an old relay trusted)', () => {

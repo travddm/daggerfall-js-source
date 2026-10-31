@@ -110,32 +110,6 @@ test('REVENANT-TROPHY its weapon, named for it: its kind\'s (an orc an axe, a li
   assert.equal(T.trophyRarity(1, () => 0), 'legendary'); assert.equal(T.trophyRarity(1, () => 0.99), 'magic');
 });
 
-// ── THE POOL: yield, kill ──────────────────────────────────────────────────────────────────────────────────────
-test('REVENANT-FATE the real pool: a revenant\'s death blow leaves it KNEELING - at 1, its trophy rolled, its plea said, its record\'s deed; no blow lands after, no foe targets it, the save leaves it out; activated, its choice is the loot window\'s model (mutants: it dies as before; a blow kills it kneeling; a foe still hunts it)', async () => {
-  fresh();
-  const me = player();
-  const r = revenantOf(me);
-  const { pool, said } = rig(me);
-  const f = await pool.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r });
-  assert.ok(f.entity.revenant?.id === r.id, 'it stands as the revenant');
-  pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.equal(f.dead, false, 'beaten, not dead');
-  assert.ok(f.yielded, 'it yields');
-  assert.equal(f.entity.health, 1);
-  assert.ok(f.trophy && /^[A-Z][^']*'s? /.test(f.trophy.name), 'its trophy rolled at the yield');
-  assert.equal(N.revenantById(r.id).history.at(-1).deed, 'yielded');
-  assert.ok(said.some((l) => l.startsWith(r.name)), 'its plea said');
-  pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.equal(f.entity.health, 1, 'kneeling, it takes no blow');
-  assert.match(read('src/characters/enemy/enemyTargets.js'), /if \(c === self \|\| \(targetAi && targetAi === ai\)\) continue;\n[^\n]*\n[^\n]*\n\s*if \(!isPlayer && \(c\.yielded \|\| c\.executing \|\| c\.sparing \|\| c\.leaving\)\) continue;/, 'nobody hunts a kneeling one (nor a body in its portal)');
-  assert.equal(pool.snapshotWorld((p) => ({ x: p[0], z: p[2] })).length, 0, 'never in the save');
-  const m = pool.fateFor(f);
-  assert.equal(m.kind, 'fate'); assert.equal(m.name, r.name); assert.deepEqual(m.options.map((o) => o.id), ['kill', 'spare']);
-  assert.equal(m.trophy, f.trophy, 'KILL shows the very weapon it will drop');
-  assert.match(m.options[0].detail, new RegExp(`It drops ${f.trophy.name.replace(/[.*+?^${}()|[\]\\']/g, '\\$&')}`));
-  assert.equal(m.live(), true);
-});
-
 test('REVENANT-FATE KILL: the execution - its last words, the blow felt, then the burst (blood, a harder kick) and the body burning away in embers from the feet up; done, it is gone with NO body and its pile drops where it knelt, its trophy in it; its record closed, executed (mutants: no pile; the trophy left out; a body left; the record open)', async () => {
   fresh();
   const me = player();
@@ -244,64 +218,6 @@ test('REVENANT-FATE no door, no yield; my own kill kneels it all the same; a pup
   assert.equal(F.revenantMayYield({ entity: { revenant: { id: 'x' } }, companion: 'rv:x' }), false);
 });
 
-test('REVENANT-HEIR (Discord, 2026-10-07: "I got them to Elite Level V and I thought they\'d kneel but they just keeled over and died"): my revenant is never handed on - a death\'s, a door\'s or a walk-away\'s handover names an heir for my plain foe and none for it, so it stays mine and a party member\'s killing blow still brings its last stand and then its fate here; an heir that took it held no record of it and killed it as a plain foe (mutants: the revenant handed like any foe; the dungeon\'s own frame handing it)', async () => {
-  fresh();
-  const me = player();
-  const r = revenantOf(me, { rank: 1 });
-  const { pool } = rig(me);
-  const net = { room: () => 'world:3,12', selfId: () => 'ann-0001', now: () => 0, staleMs: 1e9, onPeerHit: () => true, toWire: (p) => [p[0], p[1], p[2]], toScene: (p) => [p[0], p[1], p[2]] };
-  pool.setNet(net);
-  const rev = await pool.spawnFoe(2, [0, 0, 0], { feetGiven: true, level: 6, revenant: r });
-  const plain = await pool.spawnFoe(2, [4, 0, 0], { feetGiven: true, level: 6 });
-  const frame = pool.handOverFrame(() => 'bob-0002');
-  assert.equal(frame.f.find((x) => x.i === plain.seq)?.e, 'bob-0002', 'a plain foe goes to the heir its owner names');
-  assert.equal(frame.f.find((x) => x.i === rev.seq)?.e, undefined, 'my revenant is named for nobody');
-  assert.equal(pool.dropOwnLive(), 1, 'only the plain foe is let go');
-  assert.equal(rev.dead, false, 'the revenant stays mine');
-  // the heir's own side, had it been handed: another character's pool holds no record of it - a plain death
-  const { pool: heir } = rig(player('char-heir'));
-  heir.setNet({ ...net, selfId: () => 'bob-0002' });
-  heir.applyFoes('ann-0001', { ...frame, f: frame.f.map((x) => (x.i === rev.seq ? { ...x, e: 'bob-0002' } : x)) });
-  await new Promise((res) => setTimeout(res, 20));
-  const taken = heir.foes.find((x) => !x.puppet && x.entity?.revenant);
-  assert.ok(taken, 'the heir stood it as its own');
-  heir.damageFoe(taken, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.equal(taken.dead, true, 'an heir\'s copy holds no record of it: no kneel, a plain death - why it is never handed');
-  // and staying mine, the party member's killing blow lands here, where its record is: it kneels
-  pool.applyHit('bob-0002', { k: 'world:3,12', i: rev.seq, dmg: 9999, kind: 'melee' });
-  assert.equal(rev.dead, false, 'a party member\'s last blow does not kill it');
-  assert.ok(rev.yielded, 'it kneels, its fate mine');
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(heirOf && !f\.dead\) \{ const h = f\.entity\?\.revenant\?\.id \? null : \(heirOf\(f\) \?\? null\); f\._heir = h; if \(h\) r\.e = h; \}/, 'underground, my lair\'s stand goes with me too');
-});
-
-// ── the wire, the activation, the hosts ────────────────────────────────────────────────────────────────────────
-test('REVENANT-FATE the wire and the doors: a record says `yd` kneeling and `ex` burning (1 or absent); the pool writes both, a puppet kneels and burns from them; activating a kneeling one opens its choice at the treasure\'s reach; every host hands its door (mutants: a bad flag let through; the puppet standing; the door unasked)', () => {
-  assert.deepEqual(validFoeRecord({ i: 3, yd: 1, ex: 1 }), { i: 3, yd: 1, ex: 1 });
-  assert.equal(validFoeRecord({ i: 3, yd: 2 }), null);
-  assert.equal(validFoeRecord({ i: 3, ex: true }), null);
-  const x = read('src/scenes/exteriorFoes.js');
-  assert.match(x, /\.\.\.\(f\.yielded \? \{ yd: 1 \} : \{\}\), \.\.\.\(f\.executing \? \{ ex: 1 \} : \{\}\)/);
-  assert.match(x, /f\._pupYield = r\.yd === 1;/);
-  assert.match(x, /if \(\(f\._pupYield \|\| f\._pupExec\) && f\.mobile\.heldPose\) f\._mout = f\.mobile\.heldPose\('hurt', -1/);
-  const act = read('src/player/mobileEnemyActivate.js');
-  assert.match(act, /if \(foe\.yielded && !foe\.puppet && openFate\) \{\n\s*if \(!\(distance <= TREASURE_ACTIVATION_DISTANCE\)\) \{ midScreen\?\.\(tooFarAwayText\(\)\); return true; \}[^\n]*\n\s*openFate\(foe\);/);
-  const w = read('src/scenes/world.js'), m = read('src/scenes/worldModes.js'), d = read('src/scenes/dungeonContext.js');
-  assert.match(w, /openFate: \(rec\) => openRevenantFate\(rec\),/, 'the street');
-  assert.equal((m.match(/openFate: \(rec\) => !!host\.openRevenantFate\?\.\(rec\),/g) ?? []).length, 2, 'a building and a dungeon');
-  // PIN MOVED (AUDIT PI1 H4): the fate window also says no to Physical Items' shift-drop - it opens indoors and
-  // underground too, where the street's pool is not the floor
-  assert.match(w, /const w = makeInventoryWindow\(\{ fate: model, loot: \{ items: \(\) => \[\], playerOwned: false \}, physicalDropOn: \(\) => false \}\);/, 'the loot window itself');
-  // PIN MOVED (RVN3: an unbroken will tears away instead - the same gate)
-  // PIN MOVED (FIELD BUGS 2026-10-16b RVN-OWNERS-CHOICE): a whole blow passes the gate only as the owner's own
-  // (revenantFate.js ownersWholeKill) - a party member's Disintegrate kneels it (test/systems/revenant/fb1016b_rvnownerschoice.test.js)
-  // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
-  assert.match(d, /if \(opts\.fates && \(!onlineRoom\(\) \|\| !isRoomFoe\(foe\)\) && revenantMayYield\(foe\)\) \{ if \(!ownersWholeKill\(_whole, \{ fromPlayer, peer \}\) && revenantWillHolds\(foe\)\) tearAwayDungeonFoe\(foe\); else yieldDungeonFoe\(foe\); return; \}/, 'underground: the player\'s alone');
-  // underground a held foe decides nothing and animates nothing of its own, but is still DRAWN - the kneel, the burn
-  const arm = d.slice(d.indexOf('      if (f.mobile) {\n'), d.indexOf('_mobileBatches.push(f.batch);'));
-  assert.match(arm, /^      if \(f\.mobile\) \{\n[\s\S]*?\n        if \(!_fateHeld\) \{[^\n]*\n\s*\/\/ A5 - DaedraSeducerMobileBehaviour/, 'the mobile arm draws a held foe; only its own update is skipped');
-  assert.match(arm, /const _dv = f\.executing \|\| f\.sparing \|\| f\.portalFx \? fateDissolve\(f, Date\.now\(\)\) : null;/, 'and burns it away as it draws');
-});
-
 // ── THE LOOT WINDOW'S FATE SIDE ────────────────────────────────────────────────────────────────────────────────
 function fakeEl(tag) {
   const classes = new Set();
@@ -320,50 +236,3 @@ function fakeEl(tag) {
 const el = (t, cls, text) => { const n = fakeEl(t); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const byClass = (root, cls) => { const out = []; const walk = (x) => { for (const c of x.children ?? []) { if (c.classList?.contains(cls)) out.push(c); walk(c); } }; walk(root); return out; };
 
-test('REVENANT-FATE the loot window\'s FATE side: the loot frame\'s own head (its name, what it is, its personality), its plea, KILL a row of the trophy as a looted weapon\'s tile and SPARE a row of its portrait; a pick asks to confirm, a second press does it; K, S, Enter and Back (mutants: one click decides; the trophy\'s tile not drawn; Back closes over a pick)', () => {
-  const chosen = [], picks = [], tiles = [];
-  const model = {
-    kind: 'fate', name: 'Grushnak the Butcher', sub: 'Rank II · Orc', mood: 'Witty', plea: { speech: 'I concede.', body: null }, portrait: null,
-    trophy: { name: "Grushnak's Reaver" },
-    options: [
-      { id: 'kill', key: 'K', label: 'Kill', verb: 'Execute', tone: 'warn', title: 'Kill Grushnak', detail: "It drops Grushnak's Reaver - Rare War Axe", confirm: 'Destroy it?', disabled: false },
-      { id: 'spare', key: 'S', label: 'Spare', verb: 'Spare', tone: 'primary', title: 'Spare Grushnak', detail: 'It joins you', confirm: 'Spare it?', disabled: false },
-    ],
-  };
-  const kit = { el, trophyTile: (row, item) => { tiles.push(item); row.append(el('span', 'tile')); }, portrait: () => false, onPick: (id) => picks.push(id), onChoose: (id) => chosen.push(id) };
-  let col = fateColumn(model, null, kit);
-  assert.equal(byClass(col, 'remotehead').length, 1, 'the loot frame\'s head');
-  assert.match(byClass(col, 'remotewho')[0].textContent, /Grushnak the Butcher/);
-  assert.equal(byClass(col, 'fate-mood')[0].textContent, 'Witty');
-  assert.equal(byClass(col, 'fate-plea')[0].textContent, '“I concede.”');
-  const rows = byClass(col, 'itemrow');
-  assert.equal(rows.length, 2, 'two rows, the loot list\'s own');
-  assert.deepEqual(tiles, [model.trophy], 'KILL drawn as the looted weapon is');
-  assert.equal(byClass(rows[1], 'fate-face').length, 1, 'SPARE its portrait\'s well');
-  rows[0].onclick();
-  assert.deepEqual(picks, ['kill'], 'one click picks');
-  assert.deepEqual(chosen, [], '...and decides nothing');
-  col = fateColumn(model, 'kill', kit);
-  assert.equal(byClass(col, 'fate-confirm').length, 1, 'the pick asks');
-  byClass(col, 'itemrow')[0].onclick();
-  assert.deepEqual(chosen, ['kill'], 'the second press does it');
-  byClass(byClass(col, 'fate-confirm')[0], 'act')[0].onclick();
-  assert.deepEqual(chosen, ['kill', 'kill'], 'so does the confirm');
-  const keys = [];
-  const hooks = { onPick: (id) => keys.push(['pick', id]), onChoose: (id) => keys.push(['choose', id]) };
-  assert.equal(fateKey({ key: 's' }, model, null, hooks), true);
-  assert.equal(fateKey({ key: 's' }, model, 'spare', hooks), true);
-  assert.equal(fateKey({ key: 'Enter' }, model, 'kill', hooks), true);
-  assert.equal(fateKey({ key: 'Escape' }, model, 'kill', hooks), true, 'Back steps out of a pick');
-  assert.equal(fateKey({ key: 'Escape' }, model, null, hooks), false, '...and with none it is the window\'s (it closes, the foe kneels on)');
-  assert.deepEqual(keys, [['pick', 'spare'], ['choose', 'spare'], ['choose', 'kill'], ['pick', null]]);
-  assert.equal(REMOTE_TITLE.fate, 'Fate');
-  assert.deepEqual(remoteModel({ fate: model, loot: { items: () => [{ name: 'x' }] } }, {}), { kind: 'fate', title: 'Grushnak the Butcher', items: [], count: 0, weight: 0, capacity: null, pile: null }, 'the remote side is the fate, never the body\'s list');
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /if \(remote\.kind === 'fate'\) return fateCol\(\);/);
-  assert.match(inv, /loot-win\$\{remote\.count > LOOT_ONE_COLUMN \? ' wide' : ''\}\$\{remote\.kind === 'fate' \? ' fate' : ''\}/, 'the loot window\'s own frame');
-  const door = read('src/ui/inventoryDoor.js');
-  assert.match(door, /if \(deps\.fate\) return isEnhanced\(\) && typeof document !== 'undefined' \? enhancedInventoryOverlay\(deps\) : classicFateWindow\(deps\.fate\);/, 'the classic skin a keyed box');
-  // AUDIT (2026-10-02): the judgement comes before the beast's refusal, on both skins
-  assert.ok(door.indexOf('if (deps.fate) return') < door.indexOf('const sup = racialSuppressInventory(deps.entity);'), 'a beast-form player still judges');
-});

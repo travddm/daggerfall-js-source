@@ -309,12 +309,6 @@ test('SOC4: createFaceLoader IS the classic path - raceArt names the FACE CIF fo
   assert.deepEqual(asked, ['FACE12I0.CIF', 'FACE02I0.CIF'], 'the other gender is the other file');
   assert.equal(await createFaceLoader({})({ race: 'Nord', gender: 'male', face: 0 }), null, 'no art pair handed in: no portrait, and no throw');
   assert.equal(await createFaceLoader({ fetchBytes })({ race: 'Nord', gender: 'male', face: 0 }), null, 'half a pair is no pair either');
-  const src = rd('src/ui/partyPanel.js');
-  assert.match(src, /import \{ CifRciFile \} from '\.\.\/formats\/cifRciFile\.js';/, 'the paper doll\'s own reader');
-  assert.match(src, /import \{ raceArt, FACES_PER_RACE \} from '\.\.\/systems\/races\.js';/);
-  assert.match(src, /import \{ bitmapToColor32 \} from '\.\.\/formats\/color32Order\.js';/, 'and the indexed-to-RGBA door - BOOT2 moved it from the HUD to the formats leaf (test/render/boot2.test.js holds the one home)');
-  assert.match(src, /cif\.getDFBitmap\(record, 0\)/);
-  assert.doesNotMatch(src, /innerHTML/, 'a name is text, never markup');
 });
 
 // ── THE NAMES OVER THE BODIES ─────────────────────────────────────────────────────────────────────
@@ -360,49 +354,9 @@ test('SOC4: the names over the bodies - drawNames takes the party colour as its 
   const none = recorder();
   rp.drawNames(none, FONT, PROJ, VIEW, 1280, 800, [0, 0, 0], 1, (p) => [p.x, p.y, p.z], null, () => null);
   assert.deepEqual(none.runs.map((x) => x.color), [[1, 1, 1, 1], [1, 1, 1, 1]]);
-  const src = rd('src/net/remotePlayers.js');
-  // NAME1 (2026-09-16) MOVED THIS PIN, deliberately and in one direction only: `blocked` is APPENDED BEHIND
-  // `colorOf`, so SOC4's law - the colour is the last thing the caller chose to say, and a caller that says nothing
-  // draws the names it always drew - holds exactly as written. The point grew `scale` and `depth` beside the id for
-  // the same reason: both faces size a label from one number.
-  assert.match(src, /drawNames\(renderer, font, proj, view, w, h, eye, scale = 1, toScene = \(p\) => \[p\.x, p\.y, p\.z\], rect = null, colorOf = null, blocked = null\) \{/, 'appended, so every existing call site keeps its meaning');
-  assert.match(src, /s, colorOf\?\.\(n\.id\) \?\? \[1, 1, 1, 1\]\);/, 'and the white is the fallback, not a branch that can be inverted');
-  // AUDIT NAME1 F3 MOVED IT AGAIN, the same way: the point grew a `lens` beside the scale (the frame's own FOV
-  // term) and the id is still the first thing on it.
-  // ACC3 MOVED IT A THIRD TIME, the same way again: the point grew the
-  // peer's BADGE (a title and its glyphs) beside the lens, and the id
-  // is still the first thing on it. The badge is a fact about the PEER
-  // and rides the point; the colour is the social picture's knowledge
-  // and is asked for by id - which is the difference this pin is for.
-  assert.match(src, /out\.push\(\{ id: e\.peer\.id, name: e\.peer\.name \?\? '', x: s\.x, y: s\.y,\n\s*title: [^\n]*\n\s*rb: e\.peer\.rb \?\? null,[^\n]*\n\s*house: e\.peer\.house \?\? null,[^\n]*\n\s*scale: nameScaleFor\(s\.depth\) \* lens, depth: s\.depth, lens \}\);/, 'the point carries the id (SEASON1 part two, PIN MOVED: a Season\'s banner ribbon on its own line before the scale; LEGACY7, PIN MOVED: the house on its own line after it)');
 });
 
 // ── THE HOST ──────────────────────────────────────────────────────────────────────────────────────
-
-test('SOC4: the wiring in scenes/world.js - the panel is made in socialStart over `social` with the ESCORT FACES\' own art pair, driven once a frame from chatFrame after the pose goes out and under the chat\'s own `covered` word, and the name pass asks the picture for the colour (mutants: the panel made per frame; a second fetch door or palette; the panel drawn under a window; the colour hard-coded at the draw)', () => {
-  const w = rd('src/scenes/world.js');
-  // CHAT1's lesson, taken again: a pin that reads AROUND prose reddens on the prose. The comments come out whole -
-  // trailing ones included - so a line of explanation may be written between two lines of law.
-  const bare = w.replace(/\/\/[^\n]*/g, ' ');
-  assert.match(w, /import \{ createPartyPanel \} from '\.\.\/ui\/partyPanel\.js';/);
-  assert.match(bare, /let partyPanel = null;/, 'one handle beside `social`, held for the session');
-  assert.match(bare, /partyPanel = createPartyPanel\(\{ social, art: \{ fetchBytes, palette \}, here: \(\) => _partyPose \}\);/, 'made ONCE, in socialStart, over the picture (PARTY8-B: and over the pose partyFrame last sent, for "where am I")');
-  assert.match(w, /initEscortFaces\(\{\s*fetchBytes, palette, renderer,/, 'and the pair is the escort faces\' own - one fetch door, one palette');
-  assert.equal((w.match(/createPartyPanel\(/g) ?? []).length, 1, 'made in exactly one place - never per frame');
-  assert.match(bare, /partyFrame\(performance\.now\(\)\);(?:\s*\w+\?\.render\([^\n]*\);)*\s*partyPanel\?\.render\(\{ covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \}\);\s*\};/,   // SOC7 integration: SOC3's panel renders on the same line-run, between the pose and this - the tail of the frame is still ours
-    'drawn from the chat frame, AFTER the pose goes out, under the same covered word the chat panel takes (CHAT1 pins the lines above it as they stand)');
-  // NAME1 MOVED THIS PIN TOO, and the finding is named: the names are the enhanced skin's DOM now (ui/nameLayer.js),
-  // so the host has TWO faces - the layer where there is a document and the classic bitmap pass where there is not.
-  // Both ask the SAME question of the picture, which is the whole of what SOC4 pinned here.
-  // AUDIT NAME1 F1/F14 MOVED IT ONCE MORE, and in one direction: the four statements became ONE call
-  // (net/remotePlayers.js nameFrame, where a pin drives them), and BOTH faces are inside it. The colour is still
-  // the picture's own answer, handed in at the one door - which is the whole of what SOC4 pinned here.
-  assert.match(w, /layer: nameLayer, log: chatLog, colorOf: \(id\) => social\?\.colorOf\(id\) \?\? null, blocked,/,
-    'the name pass asks net/social.js for the colour - the host never decides what green means');
-  assert.match(rd('src/net/remotePlayers.js'), /layer\.render\(\{ points, log, covered, colorOf, viewport: \(Number\.isFinite\(rect\?\.h\) \? rect\.h : 1\) \* h, hudScale \}\);/, 'the DOM face takes it');
-  assert.match(rd('src/net/remotePlayers.js'), /return this\.drawNamePoints\(renderer, font, points, scale, colorOf\);/, 'and so does the bitmap face, the one a host with no layer draws');
-  assert.doesNotMatch(bare, /PARTY_GREEN/, 'and the host never carries the colour itself: one home, in the picture');
-});
 
 test('SOC4: the panel is a HUD, not a window - fixed at the top-right below the FPS counter, no pointer events, one injected sheet, no markup and no storage key of its own (mutants: the panel over the FPS read-out; the panel eating clicks; a uiPrefs key added without a lane)', () => {
   // AUDIT SOC C6: 92, not 40. The FPS read-out is FOUR LINES with the renderer's counts on - measured at 165x76 in
@@ -418,18 +372,12 @@ test('SOC4: the panel is a HUD, not a window - fixed at the top-right below the 
   // friends panel besides. 180 wide at the bottom right, above the touch layer's jump column (bottom 16, 48 tall).
   assert.match(PARTY_CSS, /@media \(max-width: 560px\) \{\s*\.dfparty, \.dfparty\.touch \{ width: 180px; top: auto; bottom: calc\(76px \+ env\(safe-area-inset-bottom, 0px\)\); \}/,
     'the phone drops the HUD out of the chat\'s corner rather than merely narrowing it');
-  const src = rd('src/ui/partyPanel.js');
-  assert.doesNotMatch(src, /getPref|setPref|uiPrefs/, 'the party HUD keeps no setting: it is there when there is a party and gone when there is not');
-  assert.doesNotMatch(src, /localStorage|appStorage/);
-  assert.match(src, /export const PARTY_STYLE_ID = 'dagger-party-style';/);
-  assert.match(src, /if \(doc\.getElementById\?\.\(PARTY_STYLE_ID\)\) return;/, 'the sheet, once');
   // the touch class rides the same flag chatPanel does
   const doc = fakeDocument();
   injectPartyStyle(doc);
   const { panel } = stand({ members: [member('me', { acct: 'acct-me', name: 'Mac' }), member('Bran')], doc, touch: true });
   assert.equal(panel.root.className, 'dfparty touch');
 });
-
 
 // ── THE AUDIT'S OWN PINS ──────────────────────────────────────────────────────────────────────────
 

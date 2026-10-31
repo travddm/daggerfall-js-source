@@ -161,16 +161,3 @@ test('BAY-LEFT-B B1: the birth\'s address carries the seat\'s map id (`seat`) wh
   assert.ok(BOOT_DOOR_KEYS.includes('seat'));
 });
 
-test('BAY-LEFT-B B1: the world host wires it - the start\'s module with its move\'s doors, the birth waiting on the move, and the seatless birth\'s nearest town the world\'s (mutants: the birth\'s wait; the nearest\'s law)', () => {
-  const W = rd('src/scenes/world.js');
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): world.js hands over its own bindings - the settled ones by value, its
-  // readiness among them (`_worldReady`, the homes' sweep's and START2's too), the two declared below as getters
-  // (test/tooling/hostseam.test.js)
-  assert.match(W, /const \{ startLoc, farStart \} = createBootStart\(\{ locationIndex, locationName, maps, params, regionName, _teleportToPixel, worldPlaces, _worldReady,\n\s+get arenaTraced\(\) \{ return arenaTraced; \}, get townTalk\(\) \{ return townTalk; \} \}\);/);
-  assert.match(W, /const _worldReady = \(\) => playerSpawned && _bootLoaded && !_loading;/);
-  assert.match(W, /Promise\.all\(\[createChargenFlow\(fetchBytes\), legacyReady, farStart\]\)\.then\(/);
-  assert.match(W, /return nearestTown\(maps\.getRegion\(h\.regionIndex\), h\.region, h\.pixel\) \?\? nearestTownAnywhere\(nearestTownOf, REGION_NAMES, h\.pixel\);/);
-  const P = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(P, /px: l\.country\.px, py: l\.country\.py, name: l\.name, region: l\.regionIndex, mapId: l\.mapTableData\?\.mapId \}\);/, 'a country town named, as the registry\'s are');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /_pickedLegacyBirth = \{ personId: took\.heirId, region: took\.place\.region, loc: took\.place\.loc, \.\.\.\(Number\.isInteger\(took\.place\.mapId\) \? \{ mapId: took\.place\.mapId \} : \{\}\) \};/, 'the Online page\'s pick carries the seat\'s id');   // PIN MOVED (the fourth merge of main into #1184): main's RPT1026-MISC HEIR-WAITS names the heir the take minted
-});

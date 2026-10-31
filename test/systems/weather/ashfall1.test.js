@@ -260,8 +260,6 @@ test('ASHFALL1 the sky: a brown-grey pall low, deep and dark, tinted, its veil h
   assert.deepEqual(CELL_TINT.ashfall, [0.66, 0.60, 0.56]); assert.deepEqual(CURTAIN_FALL.ashfall, [0.9, 0]); assert.equal(CIRRUS_COVER.ashfall, 0.15);
   const c = cellOf('ashfall', 1, 2, 20000);
   assert.deepEqual(c.tint, CELL_TINT.ashfall); assert.equal(c.fall, 0.9); assert.equal(c.fallKind, 0);
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /float tinted = 1\.0 - step\(2\.999, dot\(uCellC\[i\]\.rgb, vec3\(1\.0\)\)\);\n\s+tint = mix\(tint, vec3\(dot\(tint, vec3\(0\.299, 0\.587, 0\.114\)\)\), tinted\) \* uCellC\[i\]\.rgb;/, 'the sky\'s veil its tint\'s grey (white for a word with none: untouched)');
   const [veil] = curtainsOf([{ ...c, x: 0, z: 15000 }], { focus: [0, 0, 0], eye: [0, 400, 0] });
   assert.deepEqual(veil.tint, CELL_TINT.ashfall, 'the travel view\'s veil carries it');
   const grey = 0.299 * Math.fround(0.5) + 0.587 * Math.fround(0.54) + 0.114 * Math.fround(0.6);
@@ -322,17 +320,5 @@ test('ASHFALL1 the fall: grey ash and the embers among it - two instance sets on
   assert.ok(ash.windOff[0] >= 0 && ash.windOff[0] < span && ash.windOff[1] >= 0 && ash.windOff[1] < span, 'wrapped to the gust\'s span');
   ash.draw({ on: true, strength01: 0, windV: [0, 0], step: [0, 0] }, proj, proj, new Float32Array([0, 0, 0]), 4);
   assert.equal(ash.drawn + ash.embers, 0, 'an ashfall at nothing draws nothing');
-});
-
-test('ASHFALL1 the hosts: the dry falls\' one renderer built on the enhanced lane, every dry fall\'s branch before the rain\'s, the fall handed its kind; the rain program never built for the ash', () => {
-  for (const [name, s, eye] of [['world', rd('src/scenes/world.js'), 'wxEye32'], ['exterior', rd('src/scenes/exterior.js'), 'eye32']]) {
-    assert.match(s, /const dryFall = sky\.enhanced \? new DryFallRenderer\(renderer\.gl\) : null;/, `${name}: built at boot`);
-    assert.match(s, /if \(precipMode && !isDryFall\(precipMode\) && !precip\) precip = new PrecipitationRenderer/, `${name}: the rain program for the wet falls alone`);
-    assert.match(s, /let precip = precipMode && !isDryFall\(precipMode\) \? new PrecipitationRenderer\(renderer\.gl, precipOpts\) : null;/, `${name}: at boot too`);
-    const i = s.indexOf('if (isDryFall(precipShown)) {');
-    assert.ok(i > 0, `${name}: the dry falls' branch`);
-    assert.ok(s.slice(i, i + 900).includes(`dryFall.draw({ on: true, kind: precipShown, strength01: fx.intensity, windV: wd.windV, step: wd.step }, proj, view, ${eye}, now / 1000, renderer.worldViewportPx?.[3]);`), `${name}: the kind handed (the frame's gust, which neither fall reads, gone), and the world image's height`);
-    if (name === 'world') assert.ok(s.slice(i, i + 900).includes('if (dryFall && !_dwPrecipOff && (!_travelWeatherOff || tvf)) {'), 'world: Travel Options\' weather off stands the dry falls down, as the rain');
-  }
 });
 

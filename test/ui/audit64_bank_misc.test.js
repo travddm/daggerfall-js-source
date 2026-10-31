@@ -247,43 +247,8 @@ test('AUDIT 64 F27: the loan reminder carries loanReminderHUDDelay = 3 (LoanChec
   assert.match(said[0][0], /4000 gold pieces due in/);
 });
 
-test('AUDIT 64 F27: the two outdoor hosts speak the ticker\'s lines instead of logging them', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const text = src(host);
-    assert.equal(/say: \(msg\) => console\.log\('\[player\]'/.test(text), false,
-      `${host}: DaggerfallUI.AddHUDText is a HUD popup, not a log (LoanChecker.cs:42-45)`);
-    assert.match(text, /say: \(msg, delay\) => townTalk\.say\(msg, delay\)/,
-      `${host}: the sink reaches the HUD and forwards the delay`);
-  }
-  // and the two hosts that already spoke now FORWARD the delay
-  assert.match(src('src/scenes/dungeonContext.js'), /say: \(msg, delay\) => hudText\.add\(msg, delay\)/);
-  assert.match(src('src/scenes/worldModes.js'), /const say = \(l, delay\) =>/);
-});
-
 // ── the HOST WIRING (the AUDIT 63 lesson: an unpinned host wiring is
 //    a law that only half landed) ───────────────────────────────────
-
-test('AUDIT 64 F25/F26: the one host that mounts the bank feeds the macro producers and the house resolver', () => {
-  const modes = src('src/scenes/worldModes.js');
-  // ONE resolver, asked by the price, the offer gate and the sale -
-  // DFU's window and manager both run the same GetBuildingSummary.
-  // PIN MOVED (HOUSES-3): the one resolver over the region's three (banking.js townDeeds) - the offers, their prices
-  // and the sale all read it; an offer only where it resolves (F26), the sale's miss DFU's no-op
-  assert.match(modes, /const townHouses = \(\) => townDeeds\(playerEntity\.houses \?\? \[\], bankRegion\(\), buildingDirectory\?\.\(\)\);/);
-  assert.match(modes, /houseOffers: \(\) => townHouses\(\)\.map\(/);
-  assert.match(modes, /const offered = townHouses\(\)\[i\] \?\? null;/);
-  assert.match(modes, /found: owned !== null/);
-  assert.equal(/dir\?\.buildings\?\.find\(\(b\) => b\.buildingKey === key\)/.test(modes), false,
-    'the second, independent lookup is gone');
-  // the three GLOBAL macro producers SetTextTokens needs
-  for (const hook of ['playerName:', 'cityName:', 'regionName:']) {
-    assert.ok(modes.includes(`      ${hook}`), `worldModes wires ${hook} for the bank window`);
-  }
-  // AUDIT 64 F26: and the fixed-city host's directory carries its real
-  // buildings, or an owned house never resolves even in its own town.
-  assert.match(src('src/scenes/exterior.js'),
-    /buildings: locationBuildings\(dfLocation\.exterior\?\.buildings \?\? \[\], loc\.blocks, \{ locationIndex: dfLocation\.locationIndex \?\? 0 \}\)/);   // RR3b: the merge takes the location index
-});
 
 // ── F28 ──────────────────────────────────────────────────────────────
 

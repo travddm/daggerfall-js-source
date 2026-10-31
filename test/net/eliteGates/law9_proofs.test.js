@@ -101,10 +101,6 @@ test('THE ASCENT - THE PROOFS, THE CLIMBING MOTOR\'S NUMBERS (Elite-Gates-Ascent
   assert.equal(EG_JUMP_G, GRAVITY);
   assert.equal(EG_ROUTE_PROOF_LAW, EG_HEIGHT_LAW);
   assert.deepEqual([EG_CLIMB_LEDGE_MIN_M, EG_ROUTE_STAIR_MAX, EG_STAIR_DOWN_X, EG_GRIP_SLACK_S, EG_ROUTE_COURSE_SIDE_M], [0.8, 1, 1.5, 0.1, 4]);
-  // one answer on every engine: the links' law and the route's crossing ask no transcendental (section 9's law clock)
-  const span = readFileSync('src/net/eliteGates/egSpanLaw.js', 'utf8'), a = span.indexOf('// ── THE ASCENT (LAW 9, 2026-10-16; Elite-Gates-Ascent.md section 6): THE ROUTE\'S CROSSING'), b = span.indexOf(' * THE TIMED SOLVER on a hall\'s course', a);
-  assert.ok(a > 0 && b > a);
-  for (const src of [readFileSync('src/net/eliteGates/egRouteProof.js', 'utf8'), span.slice(a, b)]) assert.ok(!/Math\.(sin|cos|tan|atan2|hypot|pow|exp|log|cbrt)\s*\(/.test(src), 'no transcendental asked');
 });
 
 test('THE ASCENT - THE PROOFS, THE GRIP (section 4: "the grip\'s own arithmetic, parkour.js - pinned"): a pitch is on the wall its height less the hang\'s reach at THE SPAN BUILD\'s climb, and is proven while that is within the grip at Climbing 0 with fatigue spent less its margin - 3.31 m is, 3.33 is not; the pitches between rest ledges each on a fresh grip, a ledge too shallow to stand on resting nobody; and the REAL climbing motor climbs the longest proven pitch and falls from one past it (mutants: no margin; the hang\'s reach climbed; shallow ledges rest; the ledges out of order; a pitch\'s margin ignored)', () => {

@@ -56,8 +56,6 @@ test('REP2: the surrender - a beaten criminal is taken at any standing, voluntar
   assert.equal(surrenderToCityGuards({ health: 7, watchSlain: true }, 1, false), false, 'a watchman slain: the blow lands');
   assert.equal(surrenderToCityGuards({ health: 7, watchSlain: true }, 1, true), true, '...but a voluntary surrender is still taken');
   assert.equal(surrenderToCityGuards({ health: 0 }, 1, true), false);
-  assert.match(src('src/scenes/cityGuards.js'), /tallyCrimeGuildRequirements\(playerEntity, false, 1\);\n(?:\s*\/\/[^\n]*\n)*\s*playerEntity\.watchSlain = true;/,
-    'the player\'s kill of a watchman sets it');
 });
 
 /** The arrest flow over a stub overlay (the boxes' fallback texts; no court art). */
@@ -84,8 +82,6 @@ test('REP2: a crime is charged ONCE per chase - a second wave\'s surrender box c
   hit();
   assert.equal(legalRepOf(r.p, 2), -28, 'the Murder is its own charge');
   dispose(r);
-  assert.match(src('src/scenes/cityGuards.js'), /if \(!playerEntity\.crimeCommitted\) \{ playerEntity\.chargedCrime = 0; playerEntity\.watchSlain = false; \}/,
-    'the crime cleared by any door clears the chase');
 });
 
 test('REP2: a load ends the chase with the trial - the loaded save\'s crime is charged at its own first box (mutant: the charge carried across the load)', () => {

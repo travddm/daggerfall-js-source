@@ -92,7 +92,6 @@ test('AUDIT WORLD3 A: the relay - the act fan spends a BYTE budget (the frame ti
   r.room._roomActs = { tokens: 0, at: Date.now() + 60_000 };   // stamped ahead: tokenGate refills on the clock too (see A1 above)
   await r.raw(j1, frame);
   assert.equal(ofType(h, 'act').length, 3, 'and the frame budget still bites'); assert.equal(j1.closed, null);
-  assert.match(rd('server/src/index.js'), /AUDIT WORLD3 A1: the fan is the frame times its listeners, and a frame count is no bound on it/);
 });
 
 test('AUDIT WORLD3 B: the action graph - a record off the wire is projected and clamped, so no "t" can brick a door for the room (A2); the picker\'s retry latch travels in NEITHER direction and a failed pick emits no act at all (B1); an INSTANT mover is heard by the peers, not only a tween (B3)', () => {

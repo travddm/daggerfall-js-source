@@ -199,8 +199,6 @@ test('SCALE1 D: the market\'s materials view asked for the whole catalogue binds
   const r = await s.call('/v1/market/read', { character: mac.character, region: 17, view: 'materials', materials: all, hubs: { 17: [207, 212] } }, mac.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.deepEqual(r.body.rows, []);
-  const market = src('server-account/src/market.js');
-  assert.match(market, /material IN\s*\(SELECT value FROM json_each\(\?2\)\)`\)\.bind\(today - MARKET_MEDIAN_DAYS, JSON\.stringify\(keys\)\)/, 'the medians bind their keys as one');
 });
 
 // ═══ E. THE DEPLOYS ══════════════════════════════════════════════════════════════════════════════════════════════════

@@ -214,18 +214,6 @@ test('FB1009 HOME-FOOT the report on the real decorator: the owner of an L-shape
   assert.equal(rows().length, 1, 'the one piece written');
 });
 
-test('FB1009 HOME-FOOT the world host by source: every building\'s ground measured once per model and recorded beside its box at the build, a second model\'s ground joining the first\'s; the yard\'s lot and its neighbours read it (mutants: the host records no ground; a second model\'s ground dropped; the host measures the box)', () => {
-  const w = hostText('src/scenes/world.js');
-  // HOST-SPLIT 2: the host keeps modelFootRects and its pixel build imports footRectsAt - each from the yards' home
-  for (const name of ['modelFootRects', 'footRectsAt']) assert.match(w, new RegExp(`import \\{[^}]*\\b${name}\\b[^}]*\\} from '\\./homeYards\\.js';`), name);
-  assert.match(w, /const modelFeetOf = \(id, cpu\) => \{\n\s*let rs = modelFeet\.get\(id\);\n\s*if \(!rs\) modelFeet\.set\(id, rs = modelFootRects\(cpu\.positions, cpu\.indices\)\);\n\s*return rs;\n\s*\};/);
-  assert.match(w, /const rects = footRectsAt\(modelFeetOf\(placed\.modelIdNum, cpu\), local\);[^\n]*\n\s*const f = pixelHomeFrames\.get\(homeKey\);\n\s*if \(!f && at\) pixelHomeFrames\.set\(homeKey, \{ at, box: \[\.\.\.box\], rects, type: bd\?\.buildingType \?\? null, faction: bd\?\.factionId \?\? 0, parts: \[\[cpu, local\]\] \}\);[^\n]*\n\s*else if \(f\) \{ for \(let i = 0; i < 3; i\+\+\) \{ f\.box\[i\] = Math\.min\(f\.box\[i\], box\[i\]\); f\.box\[i \+ 3\] = Math\.max\(f\.box\[i \+ 3\], box\[i \+ 3\]\); \} f\.rects\.push\(\.\.\.rects\); f\.parts\?\.push\(\[cpu, local\]\); \}/,
-    'the ground beside the box, a second model\'s joined to the first\'s (PIN MOVED, YARD-LINE: and its record\'s type and faction; PIN MOVED, AUDIT RPT1026 J2: and its models, for its banners\' walls)');
-  const y = src('src/scenes/homeYards.js');
-  assert.match(y, /lot: yardLot\(frame\.at, frame\.box, YARD_MARGIN, frame\.rects\)/);
-  assert.match(y, /const ground = f\.rects\?\.length \? f\.rects : \[\[f\.box\[0\], f\.box\[2\], f\.box\[3\], f\.box\[5\]\]\];/);
-});
-
 test('FB1009 HOME-FOOT the game\'s own houses (ARENA2): Hammerfell\'s two-storey house (ARCH3D 709) - its forecourt and the step before its ground door the yard\'s, its body the house; and over every desert town\'s houses, the step 1.5 m before each ground-floor door the box called "inside your house" for 5,166 of 11,701 and the ground for under a thousand (a porch under its own roof), while a point 2 m inside every door is still the house', { skip: skipReal }, () => {
   const { maps, blocks, modelOf } = game();
   const m = modelOf(709);

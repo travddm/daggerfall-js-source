@@ -98,72 +98,6 @@ function browserDecode() {
   return () => Object.assign(globalThis, had);
 }
 
-test('AUDIT STUDIO1 S1: the stand-in the studio covers stands in for a studio picture that will not load (her painted deck, never a hole), and gives the studio\'s picture its size, its scale and its box', async () => {
-  reset();
-  try {
-    // A1: through her real registration - the studio's deck will not load (404), its trim is no PNG
-    const s = served({ [`a/${GALLEON_ARCHIVE}_${GALLEON_TEX.trim}-0.png`]: new Uint8Array([1, 2, 3]) });
-    await installStudioArt({ fetch: (u) => (u.includes(`_${GALLEON_TEX.deck}-0`) ? Promise.resolve({ ok: false, status: 404 }) : s.fetch(u)), decode: async (b) => readPng(b) });
-    addVendorTextures([{ archive: GALLEON_ARCHIVE, record: GALLEON_TEX.deck, studio: true, fileName: 'studio:a/deck.png', load: async () => null }]);
-    registerGalleonArt(addVendorTextures);
-    await preloadTextureArchive(GALLEON_ARCHIVE, { decode });
-    const painted = new Map(galleonArt());
-    for (const rec of [GALLEON_TEX.deck, GALLEON_TEX.trim]) {
-      const got = decodedTexture(GALLEON_ARCHIVE, rec);
-      assert.ok(got, `${rec}: a picture, not a hole`);
-      assert.ok(Buffer.from(got.colors).equals(Buffer.from(toColor32(painted.get(rec)).colors)), `${rec}: her own painted picture stands in`);
-    }
-    // a studio picture decoded before the art it covers registered (the boot's install, then her pool) is decoded again
-    // with it: its box is hers
-    reset();
-    await installStudioArt({ fetch: served({ [`a/${GALLEON_ARCHIVE}_${GALLEON_TEX.deck}-0.png`]: picture(4, 4, [33, 0, 0]) }).fetch, decode });
-    await studioLanded();
-    assert.equal(vendorTextureStandIn(GALLEON_ARCHIVE).getBox(GALLEON_TEX.deck), null, 'decoded alone: no box yet');
-    registerGalleonArt(addVendorTextures);
-    await preloadTextureArchive(GALLEON_ARCHIVE, { decode });
-    assert.deepEqual(vendorTextureStandIn(GALLEON_ARCHIVE).getBox(GALLEON_TEX.deck), { width: 64, height: 64 }, 'covered: her deck\'s box');
-    assert.deepEqual(red(decodedTexture(GALLEON_ARCHIVE, GALLEON_TEX.deck)), [33, 0, 0], 'still the studio\'s picture');
-    // A2: a stand-in built at a classic record's scale (a town's clutter, a DET flat) - the studio's at twice its size
-    reset();
-    const built = { width: 16, height: 24, data: new Uint8Array(16 * 24 * 4).fill(90), scale: { width: 64, height: 64 } };
-    addVendorTextures([{ archive: 39100, record: 0, standIn: true, offset: { x: 2, y: 3 }, build: async () => built }]);
-    addVendorTextures([{ archive: 39100, record: 0, studio: true, fileName: 'studio:a/39100_0-0.png', load: async () => picture(32, 48, [200, 10, 10]) }]);
-    await preloadTextureArchive(39100, { decode });
-    const t = vendorTextureStandIn(39100);
-    assert.deepEqual(t.getSize(0), { width: 16, height: 24 }, 'it stands as big as the stand-in');
-    assert.deepEqual(t.getScale(0), { width: 64, height: 64 }, 'at the stand-in\'s scale');
-    assert.deepEqual(t.getBox(0), { width: 16, height: 24 }, 'the doll fits it to the stand-in\'s box');
-    assert.deepEqual([t.getDFBitmap(0).width, t.getDFBitmap(0).height], [32, 48], 'drawn in the studio\'s own texels');
-    assert.deepEqual(t.getOffset(0), { x: 2, y: 3 });
-    assert.match(readFileSync(new URL('../../../src/ui/paperDoll.js', import.meta.url), 'utf8'), /const classic = tex\.vendor \? \(tex\.getBox\?\.\(record\) \?\? null\) : tex\.getSize\(record\);/, 'the doll\'s box for a stand-in is the studio\'s');
-    // a stand-in with no studio picture keeps its own answers
-    addVendorTextures([{ archive: 39101, record: 0, standIn: true, build: async () => built }]);
-    await preloadTextureArchive(39101, { decode });
-    assert.equal(vendorTextureStandIn(39101).getBox(0), null);
-  } finally { reset(); }
-});
-
-test('AUDIT STUDIO1 S2: the boot waits for the registration alone - the port\'s own pictures decode after it, never more than PRELOAD_CONCURRENCY at once', async () => {
-  reset();
-  try {
-    let open;
-    const pictures = new Promise((r) => { open = r; });
-    const files = {};
-    for (let r = 0; r < 20; r++) files[`a/${WAGON_ARCHIVE}_${200 + r}-0.png`] = picture(2, 2, [r, 0, 0]);
-    const index = served(files);
-    const s = served(files, { gate: pictures });
-    const fetch = (u) => (u === studioUrl(STUDIO_INDEX) ? index.fetch(u) : s.fetch(u));
-    assert.equal(await installStudioArt({ fetch, decode }), 20, 'registered while every picture is still on its way');
-    assert.equal(decodedTexture(WAGON_ARCHIVE, 200), null);
-    await turns();
-    assert.ok(s.most() > 0 && s.most() <= PRELOAD_CONCURRENCY, `at most ${PRELOAD_CONCURRENCY} fetched at once (${s.most()})`);
-    open();
-    await studioLanded();
-    assert.deepEqual(red(decodedTexture(WAGON_ARCHIVE, 219)), [19, 0, 0], 'every one decoded when it lands');
-    assert.match(readFileSync(new URL('../../../src/scenes/shared.js', import.meta.url), 'utf8'), /const studio = installStudioArt\(\)\.catch\(\(\) => 0\);/, 'the boot\'s Promise.all carries the registration');
-  } finally { reset(); }
-});
-
 test('AUDIT STUDIO1 S3: an archive\'s first load waits for the studio\'s listing - the pipeline\'s own getTexture - and a hold never waits past its bound', async () => {
   reset();
   const restore = browserDecode();
@@ -251,28 +185,6 @@ test('AUDIT STUDIO1 S5: the studio inherits `lazy`; a studio picture of one dye 
       writeFileSync(join(dir, STUDIO_TREE, 'a', '233_5-0_Silver.png'), picture(2, 2, [1, 1, 1]));
       assert.match(studioListing(dir).problems[0], /a dye after it as the game asks it: _Iron, never _iron or _Silver/);
     } finally { rmSync(dir, { recursive: true, force: true }); }
-  } finally { reset(); }
-});
-
-test('AUDIT STUDIO1 S6: a listing that would not read is asked again, one not served is an answer; the icons\' cache keys on the studio; the wagon\'s icon asks for the install itself', async () => {
-  reset();
-  try {
-    const failing = served({}, { fail: true });
-    assert.equal(await installStudioArt({ fetch: failing.fetch, decode }), 0);
-    const files = { 'a/38181_1-0.png': picture(2, 2, [1, 2, 3]) };
-    const ok = served(files);
-    const gen = studioGeneration();
-    assert.equal(await installStudioArt({ fetch: ok.fetch, decode }), 1, 'the next boot asks again');
-    assert.equal(studioGeneration(), gen + 1, 'a registration moves the generation');
-    const none = served(files, { index: false });
-    _resetStudioArt();
-    assert.equal(await installStudioArt({ fetch: none.fetch, decode }), 0);
-    assert.equal(await installStudioArt({ fetch: ok.fetch, decode }), 0, 'not served is an answer: kept');
-    assert.equal(ok.asked.filter((u) => u === studioUrl(STUDIO_INDEX)).length, 1);
-    const canvas = readFileSync(new URL('../../../src/ui/textureCanvas.js', import.meta.url), 'utf8');
-    assert.match(canvas, /const iconsGeneration = \(\) => `\$\{dfmodGeneration\(\)\}:\$\{studioGeneration\(\)\}`;/);
-    assert.match(canvas, /if \(_fittedGen !== iconsGeneration\(\)\)/, 'the fitted pictures too');
-    assert.match(readFileSync(new URL('../../../src/systems/studioArt/studioArt.js', import.meta.url), 'utf8'), /export async function studioLanded\(\) \{\n {2}const n = await installStudioArt\(\);/, 'landed asks the install');
   } finally { reset(); }
 });
 

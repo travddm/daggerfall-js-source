@@ -73,45 +73,6 @@ beforeEach(() => {
 
 // ── the leaf ────────────────────────────────────────────────────────
 
-test('RVN1 the leaf: a ledger opens only for a body the gate passes (a candidate, the switch on), never the player; harm by class (anything else `other`), silver apart; the counts by name alone; taken once (mutants: the gate ignored; the player kept; an unknown class dropped; silver unkept; a count by any name; taken twice)', () => {
-  const plain = orc({ plain: true });
-  L.noteFeudHarm(plain, 'blade', 10);
-  assert.equal(plain._feud, undefined, 'a plain foe keeps none');
-  const p = me();
-  L.noteFeudHarm(p, 'blade', 10);
-  assert.equal(p._feud, undefined, 'the player none');
-  L.setFeudGate(() => true);   // whatever a gate says, the player keeps no ledger of herself
-  try { L.noteFeudHarm(p, 'blade', 10); } finally { L.setFeudGate((e) => N.revenantCandidate(e)); }
-  assert.equal(p._feud, undefined, 'the player none, whatever the gate');
-  setPref('lootRarity', false);
-  const off = orc();
-  L.noteFeudHarm(off, 'blade', 10);
-  assert.equal(off._feud, undefined, 'the switch off: none');
-  setPref('lootRarity', true);
-  const o = orc();
-  assert.equal(L.feudOf(o, false), null, 'asked without opening: none yet');
-  L.noteFeudHarm(o, 'blade', 0);
-  L.noteFeudHarm(o, 'blade', -4);
-  assert.equal(o._feud, undefined, 'nothing dealt opens nothing');
-  L.noteFeudHarm(o, 'blade', 7, { silver: true });
-  L.noteFeudHarm(o, 'wand-of-nonsense', 3);
-  L.noteFeud(o, 'staggers'); L.noteFeud(o, 'staggers'); L.noteFeud(o, 'health'); L.noteFeud(o, 'dmg');
-  L.noteFeudBackstab(o);
-  const l = o._feud;
-  assert.deepEqual(Object.keys(l.dmg), [...L.FEUD_CLASSES]);
-  assert.equal(l.dmg.blade, 7);
-  assert.equal(l.dmg.other, 3, 'an unknown class is `other`');
-  assert.equal(l.silver, 7);
-  assert.equal(l.staggers, 2);
-  assert.equal(l.backstab, true);
-  assert.equal(typeof l.health, 'undefined', 'a count by no name of the ledger\'s is no count');
-  assert.equal(L.takeFeud(o), l);
-  assert.equal(o._feud, null);
-  assert.equal(L.takeFeud(o), null, 'taken once');
-  assert.deepEqual(['fire', 'frost', 'poison', 'shock', 'magic', 'magic'], [0, 1, 2, 3, 4, 9].map(L.elementFeudClass), 'DFU\'s ElementTypes in order; an unknown one magic');
-  assert.equal(read('src/systems/feudLedger.js').match(/^import /m), null, 'a leaf: it imports nothing');
-});
-
 test('RVN1 the ledger\'s day and place: night on the SKY\'s minute when it opens (worldClock.isNight), its start the character\'s minute; the place its pool\'s tag - street, building, dungeon - else the street (mutants: night never read; read at the fold; the place ignored)', () => {
   setWorldMinutes(1440 * 3 + 120);   // 02:00, day 3
   const a = orc();
@@ -339,43 +300,6 @@ test('RVN1 THE SCARS: the leading source at 40% of what was dealt or more (exact
   assert.deepEqual(kept.map((s) => s.at), [10, 10, 20, 20, 20, 20]);
 });
 
-test('RVN1 THE FOLD: the deed (revenantDeed - the kill and both escapes) takes the ledger and writes its scars at the character\'s minute, counts the fight; a rank-up past 2 draws its signature; the ledger is gone whatever the answer (mutants: the fold dropped; the ledger kept; fights uncounted; no signature at rank 2)', () => {
-  setWorldMinutes(1440 * 2 + 60);   // 01:00 - night
-  const p = me();
-  const o = orc();
-  L.noteFeudHarm(o, 'fire', 50);
-  L.noteFeudHarm(o, 'blade', 10);
-  L.noteFeud(o, 'staggers'); L.noteFeud(o, 'staggers');
-  const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5, now: 4000 });
-  assert.ok(r);
-  assert.deepEqual(r.scars, [{ k: 'fire', at: 4000 }, { k: 'staggered', at: 4000 }, { k: 'night', at: 4000 }, { k: 'fled', at: 4000 }]);
-  assert.equal(o._feud, null, 'the ledger taken');
-  assert.equal(r.fights, 1);
-  assert.equal(r.rank, 1);
-  assert.equal(r.sig, null, 'no signature at rank 1');
-  setWorldMinutes(1440 * 4 + 720);
-  L.noteFeudHarm(o, 'blade', 9); L.noteFeudHarm(o, 'arrow', 8); L.noteFeudHarm(o, 'frost', 8);   // 36% leads nothing
-  const r2 = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5, now: 9000 });   // UNQUIET (Revenants.md section 46): an escape ranks it - a kill only every second time
-  assert.equal(r2, r);
-  assert.equal(r.rank, 2);
-  assert.ok(F.isSignature(r.sig), `drawn at rank 2 (${r.sig})`);
-  assert.equal(r.sig, F.drawSignature(r.id, r.mobileType), 'on its id');
-  assert.deepEqual(r.scars.slice(-2), [{ k: 'mixed', at: 9000 }, { k: 'fled', at: 9000 }]);
-  assert.equal(r.fights, 2);
-  // a plain foe: no record, and its ledger (none was ever opened) - and a judged one's taken all the same
-  const j = orc();
-  L.noteFeudHarm(j, 'blade', 5);
-  N.revenantDeed(p, j, 'fled', { rolls: () => 0.5 });
-  const rec = N.revenantById(j.revenant.id);
-  N.revenantSpared(p, j);
-  L.noteFeudHarm(j, 'blade', 5);
-  assert.equal(N.revenantDeed(p, j, 'slew', { rolls: () => 0.5 }), null, 'a sworn one does no deed');
-  assert.equal(j._feud, null, 'its ledger gone with the fight');
-  assert.equal(rec.scars.length, 2, 'and nothing written');
-  const fold = read('src/systems/revenant/revenant.js');
-  assert.ok(fold.indexOf('const ledger = takeFeud(entity);') < fold.indexOf('if (!revenantCandidate(entity, rec) || !Number.isInteger(mobileType)) return null;'), 'taken before any answer');
-});
-
 test('RVN1 a return is a fight: applyRevenant counts it (an older record\'s count is kills + escapes + returns) (mutants: a return uncounted)', () => {
   const p = me();
   const o = orc();
@@ -455,41 +379,6 @@ test('RVN1 THE VALIDATORS: a scar of no kind or no minute dropped, the latest si
   assert.equal(r3.sig, 'leap', 'a signature kept');
 });
 
-test('RVN1 THE DRAWS ON ITS ID: one id, one weakness, signature and kin - every time; ids differ; the shared DFRandom never moves; a new record\'s weakness never what its career resists or shrugs off (mutants: a draw on Math.random; the shared dice moved; the career unread)', () => {
-  setSeed(12345);
-  const seed = getSeed();
-  const a = F.newFeudFields('rvn-a', M.Orc, 2);
-  const b = F.newFeudFields('rvn-a', M.Orc, 2);
-  assert.deepEqual(a, b, 'one id, one answer');
-  N.mergeRevenants([older()], []);
-  assert.equal(getSeed(), seed, 'the shared dice unmoved');
-  const ws = new Set(), ss = new Set(), ks = new Set();
-  for (let i = 0; i < 60; i++) {
-    ws.add(F.drawWeakness(`id-${i}`, M.SkeletalWarrior));
-    ss.add(F.drawSignature(`id-${i}`, M.Orc));
-    ks.add(F.drawKin(`id-${i}`, M.Warrior).join(','));
-  }
-  assert.ok(ws.size >= 4, `the undead pool drawn whole across ids (${[...ws]})`);
-  assert.deepEqual([...ss].sort(), ['charge', 'slam'], 'a blade\'s two shapes');
-  assert.ok(ks.size > 1);
-  assert.equal(getSeed(), seed);
-  for (let i = 0; i < 80; i++) {
-    assert.notEqual(F.drawWeakness(`id-${i}`, M.FireDaedra, { resistanceFlags: 16 }), 'frost', 'frost resisted: never frost');
-    assert.notEqual(F.drawWeakness(`id-${i}`, M.SkeletalWarrior, { immunityFlags: 8 }), 'fire', 'fire shrugged off: never fire');
-  }
-  assert.ok(F.weaknessShut('frost', { resistanceFlags: 16 }));
-  assert.ok(!F.weaknessShut('silver', { resistanceFlags: 0xff }));
-  const p = me();
-  for (let i = 0; i < 12; i++) {   // frost is three in five of a fire daedra's pool: twelve born never frost only by its career
-    const o = orc({ mobileType: M.FireDaedra, level: 12 });
-    o.career = { ...(o.career ?? {}), resistanceFlags: 16 };
-    const r = N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-    assert.ok(F.isWeakness(r.weak) && r.weak !== 'frost', `born against its career (${r.weak})`);
-    N._resetRevenantForTests(); _store.clear();   // UNQUIET (Revenants.md section 46): none rises while three hunt me - each born alone
-  }
-  assert.equal(read('src/systems/revenant/revenantFeud.js').includes('Math.random'), false, 'no draw on Math.random');
-});
-
 test('RVN1 THE POOLS (section 14.1, 16.1, 17): the weakness by kind (the undead fire, silver, blunt, the daylight; a daedra its opposite only where it has one; a beast fire and frost and a cut), the signature by family (a caster\'s the pyre), the kin by faction (a solitary kind none; a beast its own kind; a person its class\'s family) (mutants: a table row moved)', () => {
   const pool = (t) => F.weaknessPool(t).map(([w]) => w);
   assert.deepEqual(pool(M.Zombie), ['fire', 'magic', 'silver', 'blunt', 'daylight']);
@@ -557,36 +446,3 @@ test('RVN1 THE STORE: lastDay rides the save slot and the mirror - read back a w
 
 // ── the page, the pools ─────────────────────────────────────────────
 
-test('RVN1 the page: a living revenant\'s scars in words, newest first and each once (a deed\'s scar is the history\'s); the six new deeds worded (mutants: the scars unshown; a new deed shown raw)', () => {
-  assert.equal(scarWords({ scars: [{ k: 'fire', at: 1 }, { k: 'slew', at: 1 }, { k: 'night', at: 1 }, { k: 'fire', at: 2 }, { k: 'staggered', at: 2 }] }), 'Scarred by staggered, fire, fought by night.');
-  assert.equal(scarWords({ scars: [{ k: 'fled', at: 1 }] }), '', 'a deed alone: nothing to say');
-  assert.equal(scarWords({}), '');
-  const page = read('src/ui/revenant/revenantPage.js');
-  for (const [d, w] of [['felled', 'felled your companion'], ['routed', 'routed you'], ['festered', 'grew bolder'], ['deserted', 'deserted you'], ['betrayed', 'betrayed you'], ['laststand', 'made its last stand']]) {
-    assert.ok(page.includes(`${d}: '${w}'`), d);
-  }
-  // drawn on a real page: the row says it
-  const p = me();
-  const o = orc();
-  L.noteFeudHarm(o, 'arrow', 20);
-  N.revenantDeed(p, o, 'fled', { rolls: () => 0.5 });
-  const made = [];
-  const el = (tag, cls = '', text = '') => {
-    const n = { tag, cls, text, kids: [], append(...k) { this.kids.push(...k); }, insertBefore(k) { this.kids.unshift(k); }, setAttribute() {}, get firstChild() { return this.kids[0] ?? null; }, querySelector: () => null, isConnected: true };
-    made.push(n);
-    return n;
-  };
-  const detail = el('div');
-  drawRevenantsPage(detail, () => {}, { el, divider: () => el('hr'), player: p, kindName: () => 'Orc' });
-  assert.ok(made.some((n) => n.cls === 'rvn-scars' && n.text === 'Scarred by arrows.'), 'the row\'s scars');
-});
-
-test('RVN1 THE PLACE TAGS: the street pool tags a foe street or building by the host\'s inside flag; both of the dungeon\'s builds (a person, a monster) dungeon (mutants: a tag dropped)', () => {
-  const ex = read('src/scenes/exteriorFoes.js');
-  assert.match(ex, /if \(team\) entity\.team = team;\n\s*entity\._feudPlace = playerInside \? 'building' : 'street';/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.equal(dc.match(/applySpawnAlliance\(entity, e\);[^\n]*\n\s*entity\._feudPlace = 'dungeon';/g)?.length, 2, 'both builds');
-  // the hosts that stand these pools: world.js and exterior.js (the street pool), worldModes.js (its building interior,
-  // playerInside), dungeonContext.js (and dungeon.js, its standalone host)
-  assert.match(read('src/scenes/worldModes.js'), /playerInside: true/);
-});

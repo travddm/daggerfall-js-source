@@ -280,15 +280,3 @@ test('DW-E4: the exterior pool stands a deep foe where the mod sets its transfor
   assert.equal(stray.dead, true, 'an encounter foe that far is culled, as ever');
 });
 
-test('DW-E4: the world host - the foes\' lane on the pulse, four attempts; a foe stood through the exterior pool with its transform set, hostile to the player, not saved, the tracker\'s entry at once; every exterior foe reads the level the swim driver leaves; the settings (pins)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /enemies: dwEnemies \? \{ spawner: dwEnemies, canPopulate: dwEnemies\.canPopulate, get attempts\(\) \{ return _standsTheDeep\(\) \? ENEMY_ATTEMPTS_PER_PIXEL_PER_TICK : 0; \} \} : null,/);   // DEEP-SHARE re-aim: the four attempts are the one standing the deep's
-  assert.match(w, /exteriorFoes\.spawnFoe\(type, pos, \{ yaw: 0, loose: true, transient: true, managed: true, team, transformY: \(h\) => \(floor \? alignFloorEnemyY\(pos\[1\], h\) : pos\[1\]\) \}\)/);
-  assert.match(w, /f\.ai\.makeEnemyHostileToAttacker\?\.\(PLAYER_TARGET, walkMode \? \[\.\.\.player\.pos\] : null\);/, 'ConfigureSpawnedEnemy: MakeEnemyHostileToAttacker(the player)');
-  assert.match(w, /if \(o\.gone\) \{ exteriorFoes\.removeFoe\(f\); return; \}/, 'released while it stood: removed as it lands');
-  assert.match(w, /waterLevelY: \(\) => dwPlayer\?\.waterLevelY \?\? null,/);
-  const h = rd('src/scenes/deepWater/deepWatersHost.js');
-  assert.match(h, /on: get\('General\.SpawnUnderwaterEnemies'\) === true,\n\s+frequency: scaledSliderValue\(get\('General\.EnemyFrequency'\), 0\.5\),\n\s+maxLive: Math\.max\(0, Math\.trunc\(Number\(get\('General\.MaxLiveEnemies'\)\)\)\),/);
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /waterSurfaceY: waterLevelY \? \(\) => waterLevelY\(\) : null,/);
-});

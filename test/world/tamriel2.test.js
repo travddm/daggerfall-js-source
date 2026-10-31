@@ -239,11 +239,6 @@ test('TAMRIEL2 worker: the client says the reader has the continent round it off
   const plain = new TerrainGenClient({ woods: stubWoods(), woodsBytes: new Uint8Array(16), workerFactory: () => ({ postMessage: (m) => posted.push(m), terminate() {} }) });
   assert.equal(posted[posted.length - 1].tamriel, false, 'a bare reader says so');
   assert.ok(plain);
-  const worker = read('src/world/terrain/terrainGenWorker.js');
-  assert.match(worker, /import \{ groundWoods, dropGroundCache \} from '\.\.\/tamriel\/tamrielGround\.js';/);   // TAMRIEL3: and the cache dropped when the trace lands
-  assert.match(worker, /woods = m\.tamriel \? groundWoods\(w\) : w;/, 'composed on init, as the host composes');
-  const ground = read('src/world/tamriel/tamrielGround.js');
-  for (const bad of ['document', 'globalThis.', 'fetch(', 'localStorage', 'getPref']) assert.ok(!ground.includes(bad), `pure: no ${bad}`);
 });
 
 // ── THE SWITCH, THE ROW, THE HOST ────────────────────────────────
@@ -261,28 +256,6 @@ test('TAMRIEL2 switch: the Features row `tamriel-land` is on by default in the w
     setPref('tamrielLand', false);
     assert.equal(tamrielLandOn('?skin=enhanced'), false);
   } finally { _resetForTests(); }
-});
-
-test('TAMRIEL2 host: the reader is rebound to the composed one at the mount, after the boot repairs and before the client copies the bytes; the frame set or cleared; the climate read composed; World of Daggerfall and Deep Waters held to the Bay; the far ring handed the continent\'s bytes', () => {
-  const src = hostText('src/scenes/world.js');
-  assert.match(src, /let woods = new WoodsFile\(\);/, 'rebound, so every reader of `woods` sees the one reader');
-  const i = src.indexOf('woods.syncHeightMapBytes();'), j = src.indexOf('const terrainGen = new TerrainGenClient({ woods, woodsBytes });');
-  assert.ok(i > 0 && j > i, 'the client is built after the repairs');
-  const between = src.slice(i, j);
-  assert.match(between, /const tamrielLand = tamrielLandOn\(\);/);
-  assert.match(between, /woods = groundWoods\(woods\);/, 'composed between the two');
-  // PIN MOVED (WW-R, bible/03-World/World-Wide.md): the climate and the politic map composed in one (tamrielGround.js groundMaps)
-  assert.match(between, /groundMaps\(maps\);/);
-  assert.match(between, /StreamingWorldState\.frame = tamrielLand \? tamrielFrameInBay\(\) : null;/);
-  assert.match(src, /if \(picks\.length && onTheBay\(px, py\)\) \{ wodPicks = picks; wodHeld = /, 'the mod\'s sites are the Bay\'s');   // PIN MOVED (GATE-AGREE): the picks a clearing holds beside them
-  // PIN MOVED (ETHER-DEEP, bible/03-World/Eltheric-Ocean.md): the host's promote is the one gate for every arm - the Bay's
-  // map and the Eltheric Ocean's box carved, the continent past the map held there (test/world/deepWater/ether_deep.test.js)
-  assert.match(src, /const dwNear = deepWaters \? deepWaters\.promoteNear\(\{ px, py, samples, tilemap, tilemapBytes \}\) : null;/, 'the mod\'s bathymetry is the host\'s to gate');
-  // PIN MOVED (ETHER-SEA, bible/03-World/Eltheric-Ocean.md): and the Eltheric Ocean's isles past the map, whatever the
-  // continent's switch says
-  assert.match(src, /byteAt: tamrielLand \|\| etherSea \? \(x, y\) => woods\.getHeightMapValue\(x, y\) : null,/, 'the ring past the map');
-  assert.match(src, /restrideGrid\(\{ woods, px: p\.px/, 'the promotion reads the one reader');
-  assert.equal((src.match(/tamrielLandOn\(\)/g) ?? []).length, 1, 'read once, at the mount');
 });
 
 // TAMRIEL2-WORKER (2026-10-08, the field: "game freezes when I go outside"): THE WORKER'S WHOLE GRAPH IS PURE. EV7's

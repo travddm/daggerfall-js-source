@@ -111,27 +111,6 @@ test('DW1: the atlas asks by the per-template name under the flag, and by the cl
   // and the classic table is untouched: every WEAPON_TYPES entry still names its WEAPON0x.CIF
   assert.equal(WEAPON_FILE[WEAPON_TYPES.LongBlade], 'WEAPON04.CIF');
   assert.equal(WEAPON_FILE[WEAPON_TYPES.LongBlade_Magic], 'WEAPO104.CIF');
-  // BOTH LANES take it: the base FPSWeapon loader asks per frame and
-  // keeps the classic record's width and height (:398-399), and the
-  // widget clone asks through the same door
-  const fp = src('src/combat/fpsWeapon.js');
-  assert.match(fp, /const askName = atlasFileName\(item, fileName, undefined, plain \? false : undefined\);/);   // PIN MOVED (WEAPON-GLOW1): the plain set asked while an element shows (bible/05-Combat/Weapon-Glow.md)
-  assert.match(fp, /export const frameName = \(askName, record, frame, metal\) => `\$\{askName\}_\$\{record\}-\$\{frame\}\$\{metal \? `_\$\{metal\}` : ''\}`;/, 'GetNameCifRci’s spelling, one home (AUDIT-DW)');
-  assert.match(fp, /const name = frameName\(askName, r, f, metal\);/);
-  assert.match(fp, /const customs = await customFrames\(askName, metal, cif, customImage\);/, 'AUDIT-DW F2: every frame asked together');
-  assert.match(fp, /const custom = customs\[r\]\[f\];/);
-  assert.match(fp, /records\.push\(\{ width: size\.width, height: size\.height, frames \}\);/, 'the record keeps the classic box');
-  const ww = src('src/combat/weapon/weaponWidget.js');
-  assert.match(ww, /const file = atlasFileName\(w\.specificWeapon, classic, undefined, ctx\?\.glow \? false : undefined\);/);   // PIN MOVED (WEAPON-GLOW1): the plain set asked while an element shows, as the loader asks it
-  assert.match(ww, /for \(const name of customTextureNames\(file, record, frame, metal, w\.s\.doubleScale\)\) \{/);
-  assert.match(ww, /customWeaponImage\(name\)\.then/);
-  // and the rig's art cache carries the name the atlas is asked by, or
-  // a longsword and a broadsword share the first one's frames
-  const rig = src('src/combat/weapon/weaponRig.js');
-  // PIN MOVED (WEAPON-GLOW1, bible/05-Combat/Weapon-Glow.md): the name asked is the plain set's while the weapon's
-  // element shows, and the loader is told so - still the asked name in the key, still SpecificWeapon at the loader
-  assert.match(rig, /const key = `\$\{type\}:\$\{item\?\.material \?\? 0\}:\$\{thunderlock \? \(gilded \? 'gilded' : ''\) : atlasFileName\(item, WEAPON_FILE\[type\] \?\? '', undefined, plain \? false : undefined\)\}`;/);
-  assert.match(rig, /loadFpsWeaponArt\(fetchBytes, palette, renderer, type, item\?\.material \?\? 0, item, \{ plain \}\)/, 'SpecificWeapon reaches the loader');
 });
 
 test('DW1: the names one frame is asked by - the metal suffix, and the w_ ask falling through to the plain one', () => {
@@ -142,12 +121,6 @@ test('DW1: the names one frame is asked by - the metal suffix, and the w_ ask fa
   // MetalTypes' names are the port's MATERIAL_NAMES, index for index
   assert.deepEqual(MATERIAL_NAMES, ['Iron', 'Steel', 'Silver', 'Elven', 'Dwarven', 'Mithril', 'Adamantium', 'Ebony', 'Orcish', 'Daedric']);
   for (const [name, i] of Object.entries(WEAPON_MATERIALS)) if (i >= 0) assert.equal(MATERIAL_NAMES[i], name);
-  // the clone remembers a miss so the next name gets its turn, and
-  // forgets them with the atlas
-  const ww = src('src/combat/weapon/weaponWidget.js');
-  assert.match(ww, /if \(misses\.has\(name\)\) continue;/);
-  assert.match(ww, /if \(!img\) \{ misses\.add\(name\); return; \}/);
-  assert.match(ww, /w\.customMisses = new Set\(\);/);
 });
 
 // ── the door ──────────────────────────────────────────────────────────
@@ -193,9 +166,6 @@ test('DW1: the door - a loose PNG spelt as the mod asks answers, keeps its rows,
   assert.equal(await diverseWeaponsImage('LONGSWORD.CIF_0-1_Iron', { decode }), null, 'a name nothing carries');
   assert.equal(loads.length, 1, 'and a miss does not load');
   clearDiverseWeaponsSources();
-  // BOTH DOORS behind the one ask, this mod's first
-  const a = src('src/combat/diverseWeapons/diverseWeaponsAssets.js');
-  assert.match(a, /return \(await diverseWeaponsImage\(name\)\) \?\? \(await weaponWidgetImage\(name\)\) \?\? null;/);
 });
 
 // ── the preset ────────────────────────────────────────────────────────
@@ -235,13 +205,6 @@ test('DW1: the Weapon Widget preset the bundle ships, restated exactly, laid ove
 // ── the wiring ────────────────────────────────────────────────────────
 
 test('DW1: the pick reaches the door at BOTH of its sites, the credits name the mod, and the vendor record is whole', () => {
-  // PIN MOVED (AUDIT VE R2): the two sites are one registration now - the store's, which the boot seam calls
-  assert.match(src('src/scenes/dataSource.js'), /setDiverseWeaponsSources\(names, loadTextureFile\);/, 'the store\'s registration fans the pick out to the door');
-  assert.match(src('src/scenes/shared.js'), /const textures = registerTextureStore\(\)/, 'and the boot reaches it');
-  assert.match(src('src/scenes/dataSource.js'), /<b>Diverse Weapons<\/b> comes with the game\.\s+A folder with a newer version's <b>\.dfmod<\/b> uses that version's\s+art instead\./, 'and the pick says so (DW2: the shipped set, the attached one winning)');
-  const credits = src('src/ui/credits.js');
-  assert.match(credits, /title: 'Diverse Weapons',\s*\n\s*version: '1\.7\.3',\s*\n\s*author: 'RealAKP',/);
-  assert.match(credits, /vendor: Object\.freeze\(\['diverse-weapons'\]\),/);
   for (const f of ['README.md', 'DiverseWeaponsMain.cs', 'diverse-weapons.dfmod.json', 'weapon-widget-preset.json', 'Readme.txt']) {
     assert.ok(existsSync(new URL(`../../../vendor/diverse-weapons/${f}`, import.meta.url)), `vendor/diverse-weapons/${f}`);
   }

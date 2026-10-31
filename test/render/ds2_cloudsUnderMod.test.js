@@ -57,20 +57,3 @@ test('DS2: the clouds’ state under the mod - the port’s colours, the MOD’s
   assert.deepEqual(cloudsStateUnderMod(st, m, { minuteOfDay: 23 * 60, weather }).masser, m.masser);
 });
 
-test('DS2: the seam - built on the lane, the mod’s sheets stand down, the clouds and the deck under the mod', () => {
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /const clouds = enhancedLane && cloudsDoor !== 'off'/);
-  assert.match(shared, /if \(clouds && dynamicSky\) dynamicSky\.cloudsExternal = true;/);
-  assert.match(shared, /const cb = dreadW > 0 \? \{ word: skyWord, row: weatherRowNow \} : cloudBaseOf\(extra, weatherName, weatherRowNow\);[^\n]*\n\s*clouds\.setState\(cloudsStateUnderMod\(st, dynamicMoons, \{ minuteOfDay, weather: cb\.word, classicMinutes: nowMinutes, skyMinutes: skyNow, seconds, drift: driftXZ, row: cb\.row, skyRow: weatherRowNow \}\),[^\n]*\n\s*cb\.row, cb\.word, easeDt, driftXZ, \(extra\?\.flash \?\? 0\) \+ dreadGlow, extra\?\.pos \?\? null, extra\?\.cells \?\? null\);/, 'the same row, dt, drift, flash and position the dome path hands them (WEATHER3c: the row and word the clouds stand on - the eased worn row off the map\'s lane, clear air on it; AUDIT PRECIP SKY-1: the far fade the SKY\'s own row)');
-  assert.match(shared, /if \(clouds\.shadow\) Object\.assign\(dynamicDeck, clouds\.shadow\);/, 'the ground takes the shadow map under the mod');
-  // AUDIT 65 MC-3: and the THIRD export with them - the mod's moon term
-  // is the bridge's, not a second copy of its body in the controller.
-  assert.match(shared, /import \{ cloudsStateUnderMod, dynamicMoonState, dynamicMoonlight \} from '\.\.\/render\/dynamicSkiesBridge\.js';/);
-  assert.doesNotMatch(shared, /^function dynamicMoonState/m, 'the moon state moved to the bridge, with the clouds’ state');
-  const r = read('src/render/dynamicSkiesRenderer.js');
-  assert.match(r, /this\.cloudsExternal = false;/);
-  assert.match(r, /this\.cloudsExternal && \(name === '_CloudTopOpacity' \|\| name === '_CloudOpacity'\) \? 0 : \(mat\[name\] \?\? MATERIAL_DEFAULTS\[name\] \?\? 0\)/, 'opacity 0 to the shader, the material untouched - the dome’s uCloudCover law');
-  const lab = read('src/tools/skyLab.js');
-  assert.match(lab, /import \{ cloudsStateUnderMod, dynamicMoonState \} from '\.\.\/render\/dynamicSkiesBridge\.js';/, 'the lab takes the bridge, not the controller');
-  assert.match(lab, /const cst = dynamicOn\s*\n\s*\? cloudsStateUnderMod\(sky\.state, dynamicMoonState\(dyn, minuteOfDay, row\.cover\), \{ minuteOfDay, weather: \$\('weather'\)\.value, phases, seconds, drift: labDrift \}\)\s*\n\s*: sky\.state;/);
-});

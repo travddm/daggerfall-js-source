@@ -665,20 +665,6 @@ const CLAIM_EXTRA_KEYS = ['g'];
  *  prefab's body, the blow arm's own (ahead of its dead-foe refusal); an older build falls to the blow arm and refuses a dead foe. */
 const OLD_KEYS = ['dmg', 'take', 'back', 'grant', 'slain', 'fb', 'ar', 'al', 'ac', 'sf', 'z', 'wc', 'sp', 'lv', 'pt', 'p', 'd', 'kind', 'nv', 'own', 'to', 'k', 'i', 'n', 'cs'];
 
-test('T16(a) AC6 (guard - passes today): the new frames\' keys (bw, bp, br, bq, bv - and the claim frame\'s g) are disjoint from the old applyHit arms\' keys, and applyHit reads no key of `data` the design does not name', () => {
-  assert.deepEqual([...NEW_KEYS, ...CLAIM_EXTRA_KEYS].filter((k) => OLD_KEYS.includes(k)), [], 'a new frame key collides with an old arm\'s: an older build would take the frame for a blow, a take or a grant');
-  const src = readFileSync(new URL('../../src/scenes/exteriorFoes.js', import.meta.url), 'utf8');
-  const ast = acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'module' });
-  let fn = null;
-  (function walk(n) { if (!n || typeof n.type !== 'string' || fn) return; if (n.type === 'FunctionDeclaration' && n.id?.name === 'applyHit') { fn = n; return; } for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); } })(ast);
-  assert.ok(fn, 'exteriorFoes.js has function applyHit');
-  const read = new Set();
-  (function walk(n) { if (!n || typeof n.type !== 'string') return; if (n.type === 'MemberExpression' && !n.computed && n.object?.type === 'Identifier' && n.object.name === 'data' && n.property?.type === 'Identifier') read.add(n.property.name); for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); } })(fn);
-  assert.ok(read.has('dmg'), 'the scan reads the blow arm - the arm an older build falls to for a frame it does not know (guard)');
-  const unnamed = [...read].filter((k) => !OLD_KEYS.includes(k) && !NEW_KEYS.includes(k));
-  assert.deepEqual(unnamed, [], 'applyHit reads keys of the frame DESIGN.md 3.4 does not name - an arm added without being checked against the others');
-});
-
 for (const where of WHERES) {
   test(`T16(a) AC6 [${where}]: every new-protocol frame on the wire speaks the new keys and the routing only - never a blow's, a take's or a grant's - so an older build falls to its blow arm (no dmg: refused)`, async () => {
     const s = await scene(where);

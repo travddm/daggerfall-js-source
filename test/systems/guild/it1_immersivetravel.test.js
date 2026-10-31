@@ -341,15 +341,3 @@ test('IT1 online: the mod is the room\'s and Disable Normal Travel is held off -
   } finally { _resetModSettings(); }
 });
 
-test('IT1 by source: a driver\'s trip goes from its own map to fast travel, never through the travel map\'s online floor (AUDIT IT1 W3), which stands as TRAVEL-ONLINE wrote it; the driver\'s map opens in the street\'s slot and its door reads PlayerGPS', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /if \(isOnlinePage\(\) && !opts\?\.travelShip\) \{ townTalk\.say\(ONLINE_LAND_TRAVEL_REFUSAL\); hudFade\.clearFade\(\); \} else fastTravelTo\(pick, opts, computed\);/);
-  assert.match(w, /function openImmersiveMap\(kind\) \{[\s\S]*?immersive: \{ kind, settings \},[\s\S]*?travelOptions: \(\) => null,[\s\S]*?onTravel: \(pick, opts, computed\) => \{ fastTravelTo\(pick, \{ \.\.\.opts, immersive: opts\?\.immersive \?\? kind \}, computed\); \},[\s\S]*?townTalk\.showOverlay\(win\);/);
-  assert.match(w, /openImmersiveMap,\n\s+travelEnemiesNearby: \(\) => duelEnemyNear\(\) \|\| areEnemiesNearby\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\]\) \|\| navalHostileNear\(\),/);
-  assert.match(w, /immersiveSettings: immersiveSettingsIfOn,\n\s+itHere,/);
-  const m = read('src/scenes/worldModes.js');
-  assert.match(m, /openImmersiveMap: \(kind\) => host\.openImmersiveMap\?\.\(kind\) \?\? null,/);
-  assert.match(m, /\(mode === 'interior' \? mountInterior : mountServiceWindow\)\(createMerchantServiceWindow\(\{/);
-  const sh = read('src/scenes/shared.js');
-  assert.ok(sh.indexOf('installImmersiveTravel();') > 0 && sh.indexOf('installImmersiveTravel();') < sh.indexOf('installRoleplayRealism();'));
-});

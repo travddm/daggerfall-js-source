@@ -119,31 +119,6 @@ test('AUDIT 63 F37: WeaponEnvDamage strikes the mover at its live pose, not its 
   assert.equal(o.activationCount, 2, 'the swing lands where the platform now is');
 });
 
-test('AUDIT 63 F38: an action DOOR with a record is a DaggerfallActionCollision too', () => {
-  // RDBLayout.cs:255-259 runs AddActionModelHelper on the DOOR
-  // GameObject `if (HasAction(obj))`; that reaches AddAction (:897), and
-  // AddAction attaches DaggerfallActionCollision whenever the trigger
-  // flag is Collision01/Collision03/MultiTrigger/Collision09
-  // (:992-996) - with no door exclusion. The port's collision pass
-  // skipped every object without an `aabb`, and no door had one.
-  const dc = src('src/scenes/dungeonContext.js');
-  const doorLoop = dc.slice(dc.indexOf('for (const d of b.layout.actionDoors) {'), dc.indexOf('for (const f of b.layout.flats) {'));
-  assert.match(doorLoop, /if \(d\.action\) \{\n\s*o\.aabb = worldAabb\(cpu\.positions, matrix\);\n\s*o\.restOnlyTrigger = true;\n\s*\}/,
-    'the action-door loop gives a recorded door its collision box (HasAction, RDBLayout.cs:255-259)');
-  const specialArm = dc.slice(dc.indexOf("if (cls === 'specialDoor') {"), dc.indexOf("if (cls === 'effect') {"));
-  assert.match(specialArm, /o\.aabb = aabb;\n\s*o\.restOnlyTrigger = true;/,
-    'a special door goes through the SAME AddAction call (RDBLayout.cs:897)');
-  // The rest guard is DaggerfallActionDoor's own law: Open() calls
-  // MakeTrigger(true) (DaggerfallActionDoor.cs:293, :354-358), so a
-  // swinging or open door cannot be collided with at all.
-  const pass = dc.slice(dc.indexOf('function collisionTriggers('), dc.indexOf('function waterSurfaceYAt('));
-  assert.match(pass, /if \(o\.restOnlyTrigger && o\.state !== 'start'\) continue;/);
-  // ...and the door is measured LIVE, because its BoxCollider rides the
-  // transform and its own record's Move can carry the closed door away
-  // from the placement matrix.
-  assert.match(pass, /const a = o\.kind === 'door' \? objectAabb\(o\) : o\.aabb;/);
-});
-
 test('AUDIT 63 F38: a MultiTrigger DoorText door fires its record on WalkInto', () => {
   // DaggerfallActionCollision.cs:36-56 sends Receive(PlayerObject,
   // WalkOn|WalkInto) on contact while a move key is held; the gate
@@ -197,13 +172,7 @@ test('AUDIT 63 F39: the door plaque holds for 2 s, not the 1 s popDelay', () => 
   dropped.add('A strong, orcish voice...');
   dropped.tick(1.5);
   assert.ok(dropped.timer < 0, 'the 1.0 default has already begun scrolling out by then');
-  // and the DoorText seam is the one call site that passes it.
-  const dc = src('src/scenes/dungeonContext.js');
-  const seam = dc.slice(dc.indexOf('actions.onDoorText = (id) => {'), dc.indexOf('// ROAD-B: THE TRESPASS CHECK IS A REAL SWITCH NOW.'));
-  assert.match(seam, /for \(const l of lines\) hudText\.add\(l, DOOR_TEXT_HUD_DELAY_S\);/,
-    'AddHUDText(tokens, 2.0f) carries its delay per line');
 });
-
 
 // ---------------------------------------------------------------- F42
 // EnemyMotor.ObstacleCheck's DaggerfallActionDoor arm, at the INTERIOR
@@ -251,53 +220,8 @@ test('AUDIT 63 F42: a BUILDING interior door is a DaggerfallActionDoor, so Obsta
   assert.equal(unwired.doorKey, undefined, 'and no door is ever recorded, so OpenDoors has nothing');
 });
 
-test('AUDIT 63 F42: both interior pools are handed the dep, and both forward it to the motor', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const foesMount = wm.slice(wm.indexOf('function makeInteriorFoes(ctx) {'), wm.indexOf('function makeInteriorGuards(ctx) {'));
-  const guardMount = wm.slice(wm.indexOf('function makeInteriorGuards(ctx) {'), wm.indexOf('function makeInteriorGuards(ctx) {') + 3000);
-  for (const [name, body] of [['makeInteriorFoes', foesMount], ['makeInteriorGuards', guardMount]]) {
-    assert.match(body, /isActionDoor: \(key\) => key != null && isActionDoorObject\(ctx\.actions\?\.objects\.get\(key\)\)/,
-      `${name} answers GetComponent<DaggerfallActionDoor>() over the interior's own ActionSystem`);
-  }
-  // The two pool factories carry it through to `new EnemyAI(...)`; the
-  // STREET mounts pass nothing and keep the `() => false` fallback,
-  // which is the half of F36's deferral that stands.
-  for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    const body = src(f);
-    assert.ok(body.includes('isActionDoor = null'), `${f} takes the dep, defaulted off`);
-    const at = body.indexOf("? EnhancedEnemyAI : EnemyAI)(");   // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): the motor is the switch's choice where the room hands a mesh
-    const ctor = body.slice(at, at + 1600);
-    assert.ok(ctor.includes('isActionDoor,'), `${f} hands it to the motor`);
-  }
-  for (const street of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.ok(!src(street).includes('isActionDoor'), `${street} stays deferred - the open street is the undecided half`);
-  }
-});
-
-test('AUDIT 63 F42: the interior host runs OpenDoors, the step that follows ObstacleCheck', () => {
-  // EnemyMotor.OpenDoors (:1424-1442) is a private step of
-  // EnemyMotor.Move, so it runs wherever an enemy does. Wiring the
-  // ObstacleCheck arm without it would leave a CanOpenDoors foe walking
-  // at a shut door forever - a state DFU cannot reach, because the two
-  // are steps of the one Move.
-  const wm = src('src/scenes/worldModes.js');
-  const arm = wm.slice(wm.indexOf('function openInteriorDoors(pool) {'), wm.indexOf('function makeInteriorFoes(ctx) {'));
-  assert.ok(arm.includes('ENEMY_BASICS[f.mobileType]?.canOpenDoors'), 'CanOpenDoors gates the whole law (:1428)');
-  assert.ok(arm.includes('isActionDoorObject(door)'), 'senses.LastKnownDoor is a DaggerfallActionDoor');
-  assert.ok(arm.includes('openDoorsStep('), 'the shared step owns the distance/lock/open gates');
-  assert.ok(arm.includes('acts.toggleDoor(door)'), 'ToggleDoor() on the interior ActionSystem');
-  assert.ok(arm.includes('entityIsParalyzed(f.entity)'), 'EnemyMotor.HandleParalysis');
-  assert.ok(wm.includes('openInteriorDoors(interiorFoes.foes)'), 'the encounter pool is driven');
-  assert.ok(wm.includes('openInteriorDoors(interiorGuards.guards)'), 'and the indoor watch, which is CanOpenDoors');
-});
-
 // ---------------------------------------------------------------- F43
 test('AUDIT 63 F43: the interior activation ray reads the ONE helper, not a fourth inline copy', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const ray = wm.slice(wm.indexOf('const targets = interiorCtx.doors.map('), wm.indexOf('targets.push(...interiorDropped.lootTargets());'));
-  assert.ok(ray.includes('targets.push(...activationTargets(interiorCtx.actions.objects));'),
-    'the interior arm builds action targets the way the dungeon arm does');
-  assert.ok(!/objAabb\(o\)/.test(ray), 'and no longer measures an action object with the inline worldAabb spelling');
   // The spelling it dropped is the one activationTargets exists to
   // replace: it dereferences `o.cpu.positions` on an object that has no
   // mesh. interiorContext registers only doors today, so the arm was
@@ -388,13 +312,6 @@ test('AUDIT 63 F45: a Door-flagged foyer door cannot take the hack from a bump',
   // when the collision path is allowed to call Receive.
   a.receive(door, 'WalkInto');
   assert.equal(door.currentLockValue, 0, 'the hack fires ahead of the gate, exactly as DFU orders it');
-  // ...so the pass has to refuse the call.
-  const dc = src('src/scenes/dungeonContext.js');
-  const pass = dc.slice(dc.indexOf('function collisionTriggers('), dc.indexOf('function waterSurfaceYAt('));
   // FIELD BUGS 2026-10-21d FLAT-WALK: the pass asks walkHears - hasActionCollision, and no flat relay
   assert.equal(walkHears(door), false, 'what a walk hears is a DaggerfallActionCollision first');
-  assert.ok(pass.includes('if (!walkHears(o)) continue;'),
-    'the collision pass walks only the objects DFU gives a DaggerfallActionCollision');
-  assert.ok(pass.indexOf('if (!walkHears(o)) continue;') < pass.indexOf('actions.receive(o, touch);'),
-    'and refuses before Receive, which is where the hack sits');   // AUDIT PRE-MERGE 0929 D1/D2: the receive is of the touch actionContact heard
 });

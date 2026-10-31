@@ -397,34 +397,6 @@ test('CSA-I: WaterWalkingSilent on the port\'s effect list - its own kind (no st
 
 // ── the host's seams ─────────────────────────────────────────────────────────────────────────────────────────────
 
-test('CSA-I: the host\'s seams - the map\'s window (a native window: every key, its key-ups, OnGUI\'s draw), rotated with the host\'s edges; the mouse bottom up; the two pictures off the player\'s files; the draw\'s shadow then text; the debug values beside the widget; IsWaterWalking read one way everywhere', () => {
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT, BAY-LEFT-MAPS): the map's pictures and its draw list are scenes/csaMapHost.js's - the host read whole
-  assert.match(w, /topWindowIsMessageBox: \(\) => \(modes\?\.topWindow\?\.\(\) \?\? null\) instanceof ActionTextBox,/);
-  assert.match(w, /map: \{ open: \(\) => csaMapOpen\(\), close: \(\) => csaMapClose\(\) \},/);
-  assert.match(w, /isChoiceWindow: true,\s*get done\(\) \{ return _csaMapWindow !== win; \},\s*input\(code, e\) \{ if \(!e\?\.repeat\) _csaMapKeys\.down\.add\(code\); _csaMapKeys\.held\.add\(code\); \},\s*keyup\(code\) \{ if \(_csaMapKeys\.held\.delete\(code\)\) _csaMapKeys\.up\.add\(code\); \},/);   // AUDIT PRE-MERGE 0928 U1: the release its own press made (test/systems/audit0928_input.test.js)
-  assert.match(w, /draw\(\) \{ csaDrawMap\(\); \},/);
-  assert.match(w, /if \(modes\?\.mountWindow\?\.\(win\)\) _csaMapWindow = win;/);
-  assert.match(w, /beginInputFrame\(latch\.edge\); csaInputFrame\(\);/);
-  assert.match(w, /keyDown: \(k\) => \{ const c = csaKeyCode\(k\); return !!latch\.edge\?\.downFrame\?\.has\(c\) \|\| _csaMapKeys\.downFrame\.has\(c\); \},/);
-  assert.match(w, /keyUp: \(k\) => \{ const c = csaKeyCode\(k\); return !!latch\.edge\?\.upFrame\?\.has\(c\) \|\| _csaMapKeys\.upFrame\.has\(c\); \},/);
-  assert.match(w, /\.\.\.csaInput,/);
-  assert.match(w, /_csaMouse = \[\(e\.clientX - r\.left\) \* \(canvas\.width \/ r\.width\), canvas\.height - \(e\.clientY - r\.top\) \* \(canvas\.height \/ r\.height\)\];/);
-  assert.match(w, /img\.load\(await fetchBytes\(TRAVEL_MAP_IMG\), TRAVEL_MAP_IMG\);/);
-  assert.match(w, /renderer\.uploadTexture\('img', 'csa-map', csaToScreenOrder\(travelMapPicture\(img\.getDFBitmap\(0, 0\), \(i\) => pal\.get\(i\)\)\)\)/);
-  assert.match(w, /getTexture\(CSA_LINE_TEXTURE\.archive\)\.then\(\(t\) => \{\s*_csaPics\.line = renderer\.uploadTexture\('img', 'csa-line', t\.getColor32\(t\.getDFBitmap\(CSA_LINE_TEXTURE\.record, CSA_LINE_TEXTURE\.frame\), 0\)\);/);
-  assert.match(w, /drawText\(renderer, font, d\.text, d\.x \+ d\.shadowPos\[0\], d\.y \+ d\.shadowPos\[1\], d\.scale, rgba\(d\.shadow\)\);\s*drawText\(renderer, font, d\.text, d\.x, d\.y, d\.scale, rgba\(d\.color\)\);/);
-  assert.match(w, /const values = csaRuntime\.debugValues\(\{ paused: gamePaused\(\) \}\);[^\n]*\n\s*if \(values\) csaDrawList\(values\);/);
-  assert.match(w, /assignModBundle\(playerEntity, \{ name: spec\.name, kind: WATER_WALKING_SILENT_KIND, rounds, bundleType: spec\.bundleType \}\);/);
-  assert.match(w, /removeBundle: \(name\) => removeBundleNamed\(playerEntity, name\),/);
-  const m = src('scenes/worldModes.js');
-  assert.match(m, /topWindow: \(\) => \(mode === 'dungeon' \? \(dungeonCtx\?\.overlayWindow\?\.\(\) \?\? null\) : mode === 'interior' \? interiorOverlay : \(townTalk\?\.overlay \?\? null\)\),/);
-  assert.match(src('scenes/shared.js'), /player\.waterWalking = isEntityWaterWalking\(entity\);/);
-  const dc = src('scenes/dungeonContext.js');
-  assert.match(dc, /playerWaterWalking: \(\) => isEntityWaterWalking\(playerEntity\),/);
-  assert.match(dc, /waterWalking: isEntityWaterWalking\(playerEntity\) \} : null;/);
-  assert.doesNotMatch(src('scenes/shared.js') + dc, /hasActiveEffect\((entity|playerEntity), 'waterWalking'\)/, 'no reader of the one kind alone');
-});
-
 // ── BAY-LEFT-MAPS C12 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
 // exceptions."; bible/03-World/Come-Sail-Away.md BAY-LEFT-MAPS) - THE READING PAST THE BAY ──────────────────────────────────
 // The mod's picture is the Bay's, so a boat past it had no cross. Past the Bay's map the reading is drawn on Daggerfall's

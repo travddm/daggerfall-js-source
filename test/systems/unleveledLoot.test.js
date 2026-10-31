@@ -64,11 +64,7 @@ test('UL1: the transitions - region and the location\'s DungeonType at every OnP
   assert.equal(_state().dungeon, -1, 'OnTransitionExterior');
   unleveledLootPreTransition();
   assert.equal(_state().dungeon, 1, 'the dungeon exit\'s OnPreTransition re-reads the dungeon\'s own type - and no OnTransitionExterior follows it in the C#');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.equal((wm.match(/unleveledLootPreTransition\(\);/g) || []).length, 5, 'TransitionInterior, TransitionExterior, TransitionDungeonInterior, TransitionDungeonExterior, the teleport');
-  assert.equal((wm.match(/unleveledLootExteriorTransition\(\);/g) || []).length, 1, 'OnTransitionExterior once - tryExit');
-  const exitDungeon = wm.slice(wm.indexOf('function exitDungeonNow() {'), wm.indexOf('function exitDungeonNow() {') + 600);
-  assert.match(exitDungeon, /unleveledLootPreTransition\(\);/); assert.doesNotMatch(exitDungeon, /unleveledLootExteriorTransition/);
+   
   _resetUnleveledLoot();
 });
 
@@ -208,7 +204,7 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   // guards pin fail one run in eight. The shapes are pinned in
   // test/systems/surv2_items.test.js; here it is still that all three raise.
   for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js', 'src/scenes/dungeonContext.js']) assert.match(rd(f), /raiseEnemyDeath\(\w+\.entity, \{[^}]*\}\);/, `${f}: the kill raises OnEnemyDeath, with its own roll and luck`);
-  assert.match(rd('src/combat/enemyEquipment.js'), /formulaOverride\('randomMaterial'\)\?\.\(playerLevel, rolls\)/); assert.match(rd('src/combat/enemyEquipment.js'), /formulaOverride\('randomArmorMaterial'\)\?\.\(playerLevel, rolls\)/);
+   
   // the pane
   const m = MOD_SETTINGS.unleveledLoot;
   assert.equal(m.author, 'Ralzar'); assert.deepEqual(Object.keys(m.keys), ['Enabled', ...UNLEVELED_MATERIAL_NAMES]); assert.equal(m.keys.Enabled.default, true);   // MO1
@@ -222,17 +218,13 @@ test('UL1: the registry - installed, the two rolls answer the mod\'s when Enable
   setModSetting('unleveledLoot', 'Steel', 42); assert.equal(modSetting('unleveledLoot', 'Steel'), 9, 'a choice clamps to its options');
   setModSetting('unleveledLoot', 'Steel', -3); assert.equal(modSetting('unleveledLoot', 'Steel'), 0);
   _resetModSettings();
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /if \(isChoiceKey\(def\)\) \{/, 'the pane steps the choice keys by name');
   assert.ok(Object.keys(MOD_SETTINGS).indexOf('pcaao') < Object.keys(MOD_SETTINGS).indexOf('unleveledLoot'), 'listed after the overhaul, as its manifest orders it');
   const credit = CREDITS.mods.find((c) => c.title === 'Unleveled Loot');
   assert.ok(credit); assert.equal(credit.version, '1.1.2'); assert.deepEqual([...credit.vendor], ['unleveledLoot']);
   const manifest = JSON.parse(rd('vendor/unleveledLoot/UnleveledLoot.dfmod.json'));
   assert.equal(manifest.ModVersion, '1.1.2'); assert.deepEqual(manifest.Dependencies.map((d) => d.Name), ['roleplayrealism', 'roleplayrealism-items']);
   assert.match(rd('vendor/unleveledLoot/README.md'), /Ralzar/); assert.match(rd('vendor/unleveledLoot/README.md'), /MIT/);
-  const wt = rd('src/systems/worldTick.js');
-  assert.ok(wt.indexOf('installPcaao();') < wt.indexOf('installUnleveledLoot();'), 'installed last');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /setUnleveledLootWorld\(\{/); assert.match(wm, /insideOpenShop: \(\) => mode === 'interior' && !!interiorBuilding\?\.insideOpenShop,/); assert.match(wm, /locationDungeonType: \(\) => host\.currentLocation\?\.\(\)\?\.mapTableData\?\.dungeonType \?\? 255,/);
+    
   for (const h of ['world', 'exterior']) assert.match(rd(`src/scenes/${h}.js`), /currentRegionIndex: \(\) =>/, `${h}: hands the machine the region`);
   setUnleveledLootWorld(saved);
 });

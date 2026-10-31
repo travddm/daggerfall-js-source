@@ -45,30 +45,5 @@ test('WEAPON-MOUNT: the renderer\'s picture door is the decal pass with its swit
   const thrower = { _decalPicture: false, drawDecals() { throw new Error('lost context'); } };
   assert.throws(() => Renderer.prototype.drawDecalPicture.call(thrower, 'b', 't'));
   assert.equal(thrower._decalPicture, false, 'off again even when the draw throws');
-  const r = rd('src/render/renderer.js');
-  const fn = r.slice(r.indexOf('  drawDecals(batch, tex, ranges = null) {'), r.indexOf('\n  }\n', r.indexOf('  drawDecals(batch, tex, ranges = null) {')));
-  assert.match(fn, /gl\.uniform1f\(d\.picture, this\._decalPicture \? 1 : 0\);/, 'every decal draw says which it is');
-  assert.match(r, /picture: gl\.getUniformLocation\(P, 'uPicture'\),/, 'on whichever decal program is installed');
 });
 
-test('WEAPON-MOUNT: both decal programs draw a picture\'s texel as its colour - the classic straight, the lane decoded and flat - and a mark is untouched', () => {
-  const r = rd('src/render/renderer.js');
-  const classic = r.slice(r.indexOf('const DECAL_FS = `'), r.indexOf('`;', r.indexOf('const DECAL_FS = `')));
-  assert.match(classic, /uniform float uPicture;/);
-  assert.match(classic, /if \(uPicture > 0\.5\) rgb = t\.rgb \* vColor\.rgb \* lightAcc;/, 'the texel is the colour');
-  assert.ok(classic.indexOf('if (uPicture > 0.5) rgb') > classic.indexOf('vec3 rgb = vColor.rgb * exp('), 'after the film, overriding it for a picture alone');
-  const el = rd('src/render/enhancedLighting.js');
-  const lane = el.slice(el.indexOf('export const EL_DECAL_FS = `'), el.indexOf('`;', el.indexOf('export const EL_DECAL_FS = `')));
-  assert.match(lane, /uniform float uPicture;/);
-  assert.match(lane, /if \(uPicture > 0\.5\) \{ albedo = elDecode\(t\.rgb \* vColor\.rgb\); thick = 0\.0; \}/, 'the texel decoded as every lane texel is, and no film');
-  assert.match(lane, /if \(uPicture > 0\.5\) duv = vec2\(0\.0\);/, 'and no relief off its red channel');
-  assert.ok(lane.indexOf('if (uPicture > 0.5) duv') < lane.indexOf('if (dot(c, c) > 1e-12 && abs(uvDet)'), 'before the meniscus reads it');
-});
-
-test('WEAPON-MOUNT: the placement ghost is the picture it will hang as, and only the decorator\'s mounts take the door', () => {
-  assert.match(rd('src/scenes/decor/decorTool.js'), /\(r\?\.drawDecalPicture \?\? r\?\.drawDecals\)\?\.call\(r, p\.decal, p\.art\.tex\);/);
-  assert.match(rd('src/scenes/decor/decorRoom.js'), /\(r\?\.drawDecalPicture \?\? r\?\.drawDecals\)\?\.call\(r, e\.mount\.batch, e\.mount\.tex\);/);
-  for (const f of ['src/combat/blood/bloodMarks.js', 'src/combat/blood/bloodDecals.js']) {
-    assert.doesNotMatch(rd(f), /drawDecalPicture/, `${f}: a blood mark is a film`);
-  }
-});

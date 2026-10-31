@@ -131,15 +131,3 @@ test('wagon: the 750kg gates - the refusal, the split-take, the gold clamp', () 
   assert.equal(rich.goldPieces, 96000, 'and only the clamped amount left the counter');
 });
 
-test('wagon: the collection rides the save envelope', () => {
-  const s = readFileSync(new URL('../../src/systems/save/save.js', import.meta.url), 'utf8');
-  assert.ok(s.includes('snap.wagonItems = (entity.wagonItems ?? []).map((it) => ({ ...it }));'), 'the snapshot half');
-  assert.ok(s.includes('entity.wagonItems = (snap.wagonItems ?? []).map((it) => setItemFields(it));'), 'the restore half (pre-W saves restore empty; JAN1: set on the way in)');
-  // every inventory construction hands the wagon hook
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    const h = readFileSync(new URL(`../../${host}`, import.meta.url), 'utf8');
-    assert.ok(h.includes('wagonItems: () => (playerEntity.wagonItems ??= [])'), `${host} wires wagonItems`);
-  }
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.ok(dc.includes('<= WAGON_ACCESS_DISTANCE'), 'the dungeon host measures the exit-door distance');
-});

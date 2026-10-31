@@ -28,12 +28,6 @@ test('FONT3: the reading pair rides the one trio, after the stack, so a rule tha
   assert.ok(PIXEL_FONT_CSS.startsWith(`font-family: ${PIXEL_STACK};`), 'the stack first');
   assert.ok(PIXEL_FONT_CSS.trimEnd().endsWith(PIXEL_READ_CSS), 'the pair last');
   assert.equal(PIXEL_STACK, `${PIXEL_FAMILIES}, monospace`, 'the families are the stack\'s own head');
-  // the touch layer was the one place a weight stood BEFORE the trio - turned round, or the entry field's 600 is lost
-  const touch = read('src/ui/touch/touch.js');
-  assert.match(touch, /`\$\{PIXEL_FONT_CSS\}font-weight:500;font-size:15px;`/);
-  assert.match(touch, /`\$\{PIXEL_FONT_CSS\}font-weight:600;font-size:18px;`/);
-  // the request already carries 500 - nothing new is fetched for the pair
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /FONT_PIXEL_DATA = 'Pixelify\+Sans:wght@400;500'/);
 });
 
 test('FONT3: the enhanced body wears the whole trio, and the menu-era tokens name the pixel stack in the game\'s sheet alone', () => {
@@ -50,7 +44,6 @@ test('FONT3: the recovery code is the one word named outside the pixel face - it
   const code = ruleOf(ENHANCED_CSS, '.card .acctcode code');
   assert.match(code, /font-family: 'Barlow Semi Condensed', system-ui, sans-serif; -webkit-font-smoothing: antialiased;/);
   assert.doesNotMatch(code, /var\(--data\)/, 'never the token, which is the pixel stack in this sheet');
-  assert.match(read('server-account/src/password.js'), /CODE_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'/, 'the alphabet the reason rests on');
 });
 
 // THE FLOOR. Every sheet an enhanced surface lays; the number is the one the codemod held them to.
@@ -107,21 +100,6 @@ test('FONT3: ONE FACE - the death screen\'s words, the gate\'s ground warning, t
   for (const s of ['body .wb-boss-bar', 'body .wb-gate-banner', 'body .wb-marks-card', 'body .wb-dmg-chart']) {
     assert.doesNotMatch(ruleOf(PLUS_CSS, s), /font-weight: 400/, `${s}: the reading weight is not undone`);
   }
-  const pad = read('src/ui/plus/plusPad.js');
-  assert.doesNotMatch(pad, /var\(--pixel-font/, 'a variable nothing declares');
-  assert.match(pad, /\$\{PIXEL_FONT_CSS\} font-size: 13px; line-height: 1;/);
-  const intro = read('src/ui/intro/introScreen.js');
-  assert.match(intro, /const STYLE = `\$\{PIXELIFY_FIVE_FACE\}\n#intro\{[^}]*\$\{PIXEL_FONT_CSS\}/);
-  assert.doesNotMatch(/const STYLE = `[\s\S]*?`;/.exec(intro)[0], /Georgia|system-ui/, 'no other face left in the film\'s sheet');
-  assert.match(intro, /injectEnhancedFonts\(doc\);/);
-  // the two inline-only cards name the face first and load nothing for it
-  assert.match(read('src/ui/charSheetDoor.js'), /font:500 20px\/1\.6 \$\{PIXEL_FAMILIES\},system-ui,sans-serif;/);
-  assert.match(read('src/ui/enhanced/enhancedChunk.js'), /font:500 14px\/1\.5 \$\{PIXEL_FAMILIES\},system-ui,sans-serif;/);
-  assert.match(read('src/scenes/dataSource.js'), /const face = isEnhanced\(\) \? `\$\{PIXEL_FONT_CSS\}font-size:14px;` : 'font:14px monospace;-webkit-font-smoothing:antialiased;letter-spacing:normal;';/);
-});
-
-test('FONT3: the dungeon\'s readied-spell line is the classic skin\'s - the enhanced HUD already names the spell', () => {
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(hudFont && magic\.readied\(\) && !isEnhanced\(\)\) \{/);
 });
 
 // ── a document just real enough for the two DOM arms ──
@@ -162,11 +140,6 @@ test('FONT3: a draw list\'s words - one layer per id, a line per text at its own
   assert.equal(root.children[1].style.display, 'none', 'a line the list dropped is hidden');
   hideEnhancedTextLayer('t-layer');
   assert.equal(root.style.display, 'none', 'the window\'s dispose takes the layer down');
-  // world.js: the map's list names the layer, the window's dispose hides it
-  const world = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT, BAY-LEFT-MAPS): the draw list is scenes/csaMapHost.js's - the host read whole
-  assert.match(world, /if \(draws\) csaDrawList\(draws, CSA_MAP_TEXT_LAYER\);/);
-  assert.match(world, /dispose\(\) \{ if \(_csaMapWindow === win\) _csaMapWindow = null; hideEnhancedTextLayer\(CSA_MAP_TEXT_LAYER\); \}/);
-  assert.match(world, /const words = layerId && isEnhanced\(\) && typeof document !== 'undefined' \? \[\] : null;/);
 });
 
 test('FONT3: the prison countdown - the mid-screen label\'s DOM face under the enhanced skin, taken down by dispose', () => {

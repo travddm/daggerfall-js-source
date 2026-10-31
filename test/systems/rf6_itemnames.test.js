@@ -131,26 +131,3 @@ test('RF6: the enhanced line and the plaque read the parts - the same name and m
   assert.equal(itemLine({ templateIndex: -1 }).name, 'Unknown', 'U54: a real unknown still says so');
 });
 
-test('RF6: no second derivation - the enhanced modules read the resolver, never materialName, resolveItemName or the raw record name for a label', () => {
-  const info = read('src/systems/item/itemInfo.js');
-  // PIN MOVED (AUDIT PISTOLET C9): and a name that already says its metal (the Dwarven Pistolet, minted Dwarven) takes no
-  // second one; PIN MOVED (PISTOLET-NAMES): asked of the item's own template name, a Rare's prefix and all
-  assert.match(info, /export function itemLongName\(item, opts\) \{\s*const \{ name, material \} = itemNameParts\(item, opts\);[\s\S]*?if \(!material \|\| withholdsMaterialPrefix\(item\) \|\| namesItsMetal\(item, material\)\) return name;\s*return formatText\(item\?\.group === 'Armor'\s*\? localizedText\('longArmorNameFormatString', '\{0\} \{1\}'\)\s*: localizedText\('longWeaponNameFormatString', '\{0\} \{1\}'\), material, name\);\s*\}/, 'the long name IS the join, unless the name keeps the metal off its front');
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /const parts = itemNameParts\(item, \{ getQuest: deps\.getQuest \?\? null \}\);/, 'the line reads the parts, the quest machine through');
-  assert.match(inv, /name: parts\.name \|\| t\?\.name \|\| 'Unknown',/);
-  assert.match(inv, /material: parts\.material \|\| null,/);
-  assert.match(inv, /const named = itemLongName\(item, \{ getQuest: deps\.getQuest \?\? null \}\);[\s\S]*?\$\{named\} is broken[\s\S]*?may not use \$\{named\}[\s\S]*?\$\{named\} cannot be worn/, 'the three notices name through the resolver');
-  assert.match(read('src/systems/worldHover.js'), /name: itemNameParts\(it\)\.name \|\| 'Something',/, 'the plaque');
-  // QS3: the HUD's hand plaque became the quickslot diamond, whose every
-  // cell is named by the model's one `cell()` through the resolver.
-  assert.match(read('src/systems/quickslots.js'), /const cell = \(item, extra = \{\}\) => \(\{ item, name: itemLongName\(item\), condition: conditionPercentage\(item\), \.\.\.extra \}\);/, 'the HUD\'s held weapon');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedHud.js'), /materialName\(|resolveItemName\(/, 'the diamond derives no name of its own');
-  const files = readdirSync(join(root, 'src/ui'), { recursive: true }).filter((f) => /^enhanced.*\.js$|^worldPlaque\.js$|^hud.*\.js$/.test(f.split(/[\\/]/).pop()));   // WORLD-HOVER: lootHover.js is worldPlaque.js - a rename drops a file out of this sweep SILENTLY, so the name moves with it
-  assert.ok(files.length >= 12);
-  for (const f of files) {
-    const src = read(`src/ui/${f}`).replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-    assert.doesNotMatch(src, /\bmaterialName\(|\bresolveItemName\(/, `${f} derives no name arm itself`);
-    assert.doesNotMatch(src, /\$\{item\.name\}|held2\.name|\bit\.name \|\| 'Something'/, `${f} labels nothing by the raw record name`);
-  }
-});

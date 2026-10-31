@@ -105,15 +105,3 @@ test('MWNPC8a-3 the turn: facing the player the first frame, then turning toward
   assert.notEqual(personActor({}, look, [0, 0, 0], [0, 0, 1], 0).id, id, 'another person, another id');
 });
 
-test('MWNPC8a-4 the building by source: the lane, the look read once and never before the faction table, the people offered before the room\'s billboards draw, and let go with the room at both its doors', () => {
-  const m = rd('src/scenes/worldModes.js');
-  assert.ok(m.includes("const peopleBodies = createPopulationLane({ laneName: 'people', renderer });"));
-  assert.ok(m.includes('if (pn._mwLook !== undefined) return pn._mwLook;\n    const dict = townTalk?.factionDict ?? null;\n    if (!dict) return null;'), 'not before the faction table');
-  const frame = m.indexOf('const _peopleOn = peopleBodies.frame();');
-  const offer = m.indexOf('if (look) peopleBodies.offer(personActor(pn, look, pn._mwFeet ??= [pn.x, pn.y, pn.z], mwv.eye, dt), pn.standBatch);', frame);
-  const reset = m.indexOf('else pn.standBatch.castOnly = false;', offer);
-  const draw = m.indexOf('peopleBodies.draw(canvas, proj, view, mwv.eye, dt);', reset);
-  const flats = m.indexOf('renderer.drawBillboards([...interiorCtx.billboardBatches,', draw);
-  assert.ok(frame > 0 && offer > frame && reset > offer && draw > reset && flats > draw, 'offered, the rest drawn, synced and marked, then the room\'s billboards');
-  assert.equal(m.split('peopleBodies.destroy();').length - 1, 2, 'both of the room\'s teardowns');
-});

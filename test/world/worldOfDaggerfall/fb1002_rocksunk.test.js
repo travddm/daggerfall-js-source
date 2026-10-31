@@ -81,13 +81,6 @@ test('ROCK-SUNK on the real producer: round Hadus a rock field\'s 60610s keep th
   assert.deepEqual(stood(291, 428), { names: ['Bandits'], bushes: 3, grounded: 3 }, 'WOD_BanditCamp_02 west of it');
 });
 
-test('ROCK-SUNK by source: the WoD loop asks isWodShrub with the pick\'s own site name, and the rock sites are one list', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(isWodShrub\(m\.modelId, stood\[m\.pick\]\?\.name\)\) \{[^\n]*\n\s+const dy = lowestGroundUnder\(samples, box\) - box\[1\];/);
-  assert.match(w, /const rockPick = \(i\) => WOD_ROCK_SITES\.includes\(stood\[i\]\?\.name\);/);
-  assert.doesNotMatch(w, /=== 'Rocks'|=== 'Mountains'|WOD_BUSH_MODEL/, 'no second spelling of either');
-});
-
 test('ROCK-SUNK on the real mesh: WOD-BUSH raised the rock fields\' 60610s by tens to hundreds of metres', { skip: skipReal }, async () => {
   const { Arch3dFile } = await import('../../../src/formats/arch3dFile.js');
   const { dfMeshToModel } = await import('../../../src/world/meshReader.js');

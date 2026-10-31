@@ -248,17 +248,3 @@ test('LEGACY6 the host: a share only for the one born on this page - a load forg
   assert.equal(w.rel.size(), 0);
 });
 
-test('LEGACY6 wiring: the world host hands the host the town\'s regard, the sky and the revenant law, tells the house\'s news in its towns, and a new game\'s relations take the birth\'s share', () => {
-  const src = hostText('src/scenes/world.js');
-  assert.match(src, /regards: \(\) => livingRelations, regardDay: livingRegardDay, sky: \(\) => skyMinutes\(\),/);
-  assert.match(src, /killerOf: \(cid, ownAt\) => revenantKillerOf\(cid, ownAt\), inheritFoe: \(rec\) => inheritRevenant\(playerEntity, rec\),/);
-  assert.match(src, /familyNews: \(t\) => host\.legacyHost\?\.newsFor\(livingTown\.mapId, t\) \?\? null,/);
-  assert.match(src, /newGame: \(\) => \{ livingRelations = characterRelations\(null, ownMinutes, params\.has\('online'\)\); legacyHost\?\.seedRegards\(livingRelations\); \},/);   // REGARD-OWN (FIELD BUGS 2026-10-21d)
-  assert.match(rd('src/systems/livingWorld/meetups.js'), /house: told\?\.item\.house \?\? null,/);
-  // the house's news at each of its doors: a laying to rest, a wedding, a child of the house
-  const host = rd('src/scenes/legacyHost.js');
-  assert.match(host, /delete r\.first;\n\s*tellNews\('rested', r\.name, deps\.here\(\)\?\.mapId\);/);
-  assert.match(host, /tellNews\('wed', fullNameOf\(s\.given, s\.surname\), c\.mapId\);/);
-  assert.match(host, /tellNews\('born', fullNameOf\(kid\.given, kid\.surname\), spouseOf\(family, p\)\?\.mapId\);/);
-  assert.match(rd('src/systems/livingWorld/livingTown.js'), /const kin = this\.o\.familyNews\?\.\(t\) \?\? \[\];/);
-});

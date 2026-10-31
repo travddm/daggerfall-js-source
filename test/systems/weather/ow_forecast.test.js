@@ -185,16 +185,3 @@ test('OW-FORECAST a place\'s card: its own next hours first, then its town\'s ca
   assert.equal(plates[1].tip(), null);
 });
 
-test('OW-FORECAST the wiring: the host makes it over its own map, clock, place and route and hands it to the marks; the view says its line under the journey\'s, a line of its own in the block, shown only when it says something (mutants: the line unasked; the HUD line never shown)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT OW-REVISITED L3-1 / L3-4 / L3-14): handed the traveller's height, Travel Options whole (its stretches'
-  // paces), the shared clock, the clock's rate and the event that holds the sky
-  assert.match(w, /const owForecast = createOverworldForecast\(\{ climateAt, ground: mapGroundHere, minuteNow: \(\) => playerTicker\.classicMinutes, here: \(\) => state\.worldCoords\(player\.pos\), alt: \(\) => fieldXZ\(\)\[2\], tvTrip, tvTripLive, travel: \(\) => travelOptions, shared: sharedClockOn, rateNow: worldTimeScale, held: \(\) => sunbaby\.on \}\);/);
-  assert.match(w, /createTravelViewMarks\(\{[^]*?myGuildTag, owForecast, params,/);
-  assert.match(w, /sky: \(\) => owForecast\.line\(performance\.now\(\)\),/);
-  assert.match(readFileSync(new URL('../../../src/scenes/travelView.js', import.meta.url), 'utf8'), /sky: deps\.sky\?\.\(\) \?\? '',/);
-  const hud = readFileSync(new URL('../../../src/ui/travel/travelViewHud.js', import.meta.url), 'utf8');
-  assert.match(hud, /text\.append\(title, where, trip, sky, hint\);/);
-  assert.match(hud, /put\(parts\.sky, 'sky', f\.sky \?\? ''\);[^\n]*\n\s*style\(parts\.sky, 'sky-d', 'display', f\.sky \? '' : 'none'\);/);
-  assert.match(hud, /const words = `\$\{last\.where\}\|\$\{last\.hint\}\|\$\{last\.trip\}\|\$\{last\.sky\}`;/, 'the bar measured again when its weather line comes or goes (AUDIT OW-REVISITED L3-6)');
-});

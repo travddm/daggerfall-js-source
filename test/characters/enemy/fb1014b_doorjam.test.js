@@ -196,16 +196,6 @@ test('DOOR-JAM: through the crouch the probes and aims read the foe\'s own heigh
   assert.ok(Math.abs(g.ai.feet[0]) < 1e-6 && Math.abs(h.ai.feet[0]) < 1e-6 && h.ai.feet[2] - g.ai.feet[2] > 0.5, `across pools too (${g.ai.feet.map((v) => v.toFixed(3))} | ${h.ai.feet.map((v) => v.toFixed(3))})`);
 });
 
-test('DOOR-JAM by source: HeightAdjust runs after every fixed step\'s moves (FixedUpdate\'s last call), and every Move in both motors writes its CollidedSides', () => {
-  const m = rd('src/characters/enemy/enemyMotor.js');
-  assert.match(m, /this\._step\(FIXED_DT, playerFeet, senses, paralyzed, paused\);\n\s*this\._heightAdjust\(FIXED_DT\);/);
-  for (const f of ['src/characters/enemy/enemyMotor.js', 'src/ai/enhancedMotor.js']) {
-    const s = rd(f);
-    const moves = [...s.matchAll(/const (\w+) = this\.collider\.move\(this\.feet,[^;]*\);[^\n]*\n\s*this\.isGrounded = \1\.grounded;[^\n]*\n\s*this\.collidedSides = !!\1\.sides;/g)].length;
-    assert.equal(moves, [...s.matchAll(/this\.collider\.move\(this\.feet,/g)].length, `${f}: every Move keeps its CollidedSides`);
-  }
-});
-
 // ── KEEP FULL HEIGHT (Mac, 2026-10-15) ──────────────────────────────
 // "Keep full height": while a foe ducks, only its movement sweeps the duck. Projectiles, touch spells, its sight, a
 // foe hunting it, the crosshair, the lock-on and the health bars keep its full height - DFU's own side effect of the

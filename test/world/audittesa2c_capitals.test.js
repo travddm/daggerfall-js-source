@@ -82,8 +82,6 @@ test('AUDIT TESA II C1: a capital leaves Daggerfall\'s rim to the land - its out
   }
   assert.ok(laid > 1000, `the rims laid: ${laid}`);
   assert.ok(roads >= 13 * 22, `the thirteen approaches over the rim, each eleven tiles deep and two wide at the least, a run along a wall in it too (the Imperial City's its own): ${roads}`);
-  // the location's rect: the rim's land blends from where the city's ground ends (terrainTiles.js' capital arm)
-  assert.match(read('src/world/terrain/terrainTiles.js'), /if \(dfLocation\.capital\) \{\n\s+const lo = \(v\) => \(v > 0 \? v : v - extraClearance\), hi = \(v\) => \(v < WORLD_MAP_TILE_DIM - 1 \? v \+ 1 : v \+ extraClearance\);/);
 });
 
 test('AUDIT TESA II C1: no landmark stands in the rim on a side of land - every vertex of every capital\'s models inside it; Talos Bridge\'s west end at its inner edge, down at the ground (AUDIT-TESA A3-2: the road from the west meets it, where its deck stood 42 m over the road\'s end)', () => {

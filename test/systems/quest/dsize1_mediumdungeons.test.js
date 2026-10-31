@@ -182,9 +182,6 @@ test('DSIZE1 E5: the machine\'s Start takes a linked dungeon\'s size where the m
   const elsewhere = quest(2, M, 999);
   adoptLinkedDungeonSize(elsewhere, machineOf(S.Disabled));
   assert.equal(elsewhere.smallerDungeonsState, M, 'a link on another dungeon is not this one\'s');
-  // wired at the machine's Start, after the stamp
-  const m = src('src/systems/quest/machine.js');
-  assert.match(m, /startQuestImmediate\(quest\) \{\n    quest\.start\(\);\n    adoptLinkedDungeonSize\(quest, this\);/);
 });
 
 test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another size, loaded online, has its dungeon markers enumerated again on the dungeon whole (its quest\'s world asks for it whole - the layout its instance builds), its placements put back there, and its stamp set to DFU\'s Disabled', () => {
@@ -239,11 +236,6 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   dun.siteDetails = { ...dun.siteDetails, locationName: 'Nowhere' };
   assert.equal(relayOnlineDungeons(m), 0);
   assert.equal(q.smallerDungeonsState, MEDIUM_DUNGEONS_STATE, 'unread: the stamp stands');
-  // wired at the bridge's load, online only, before anything mounts
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const restore = bridge.slice(bridge.indexOf('restore(data) {'));
-  assert.match(restore, /machine\.restoreSaveData\(data\.machine \?\? \{ siteLinks: \[\], quests: \[\] \}\);\n(?:\s*\/\/[^\n]*\n)+\s*if \(isOnlinePage\(\)\) relayOnlineDungeons\(machine, /);
-  assert.doesNotMatch(src('src/systems/quest/questRepair.js'), /function relayWholeDungeons/, 'the whole-dungeon re-lay is gone, not beside it');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
@@ -311,14 +303,4 @@ test('DETECT-FINDS: a searched object\'s find is in the one loot walk, at its bo
   // and the Detect scan finds it, as it finds a pile
   const scan = updateNearbyObjects([0, 0, 0], { loot });
   assert.equal(getNearbyObjects(scan, NEARBY.Treasure).length, 1);
-  assert.match(src('src/scenes/dungeonContext.js'), /loot: \(\) => nearbyLootRecords\(\{ piles: \[\.\.\.lootPiles, \.\.\.droppedLoot\._piles\], foes, searched: searchables \}\),/);
-  // AUDIT DELVE (the open item closed): the street's searched headstones need no walk of their own - a grave's find is
-  // minted as a dropped pile on the ground (searchPartyHost.js activateGrave), and the street's Detect walk carries every pile
-  // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): activateGrave left bootWorld for scenes/searchPartyHost.js
-  const w = src('src/scenes/world.js');
-  const sp = src('src/scenes/searchPartyHost.js');
-  const grave = sp.slice(sp.indexOf('function activateGrave(g, mode = \'grab\') {'), sp.indexOf('  return { activateGrave'));
-  assert.ok(grave.length > 0, 'the stone\'s search, in its module');
-  assert.match(grave, /const pile = droppedLoot\.dropPile\(items, dropFeet\(\), /, 'the grave\'s find is a pile');
-  assert.match(w, /loot: \(\) => nearbyLootRecords\(\{ piles: droppedLoot\._piles, foes: exteriorFoePool\(\) \}\),/, 'and the street walks the piles');
 });

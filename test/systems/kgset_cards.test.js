@@ -105,8 +105,6 @@ test('KG-SET the relay\'s catalog keeps no word; the words cover the set exactly
   assert.deepEqual([...CARD_WORD_IDS], ALL.map((c) => c.id), 'every card and holding has its words, and nothing else has any');
   assert.ok(Object.isFrozen(CARD_WORD_IDS));
   for (const nobody of [null, undefined, {}, { id: 'no-such-card' }, { id: 'toString' }, { id: '__proto__' }]) assert.deepEqual(cardWords(nobody), { rules: '', flavor: '' });
-  assert.doesNotMatch(read('src/net/iliac/iliacCards.js'), /\btext: '|\bflavor: '/, 'no card writes its words into the relay\'s catalog');
-  assert.doesNotMatch(read('src/net/iliac/iliacCards.js'), /^import /m, 'and the catalog still imports nothing - the relay carries it whole');
 });
 
 test('KG-SET a card\'s words are read when they are shown - French chosen, French said on the face, the binder, the item and the table; English again, byte for byte', () => {

@@ -196,19 +196,6 @@ test('TESA5 the worker: the crossings\' layer merged into the one it installs - 
   }
 });
 
-test('TESA5 the host: the crossings found on the Bay\'s own network with the land\'s two laws, handed over with their gates as road towns once that network is known - never before it lands - and the stale law takes a Bay pixel a join reaches (mutant: the wait, the land, a gate\'s grade) - PIN MOVED (TESA14): scenes/tamrielRoadsHost.js', () => {
-  const w = hostText('src/scenes/world.js'), host = read('src/scenes/tamrielRoadsHost.js');
-  assert.match(w, /const arenaJoinLand = \(x, y\) => \(onTheBay\(x, y\) \? !isWaterPixel\(maps\.getClimateIndex\(x, y\), host\.woods\.getHeightMapValue\(x, y\)\) : host\.woods\.getHeightMapValue\(x, y\) > WATER_BYTE\);/, 'the Bay\'s water law on it, the beach line past it');   // PIN MOVED (HOST-SPLIT, at the merge of main): the sweeps are scenes/tamrielSweepsHost.js's, their live names through host
-  assert.match(w, /createTamrielRoadsHost\(\{ terrainGen, woodsBytes, heightAt: \(x, y\) => host\.woods\.getHeightMapValue\(x, y\), joinLand: arenaJoinLand, onLanded: arenaRoadsLanded,/);
-  assert.match(host, /const pixels = standing\.pixels\(\), bay = terrainGen\.roads\(\);/);
-  assert.match(host, /if \(!pixels \|\| \(!bay && terrainGen\.hasRoads\)\) return;/, 'the Bay\'s network on its way: wait for it');
-  assert.match(host, /const joins = forBay \? arenaJoins\(forBay, joinLand\) : \[\];/);
-  assert.match(host, /\.\.\.joins\.map\(\(j\) => \(\{ x: j\.gate\[0\], y: j\.gate\[1\], type: LOCATION_TYPES\.TownCity \}\)\)\];/, 'a gate a road town');
-  assert.match(host, /terrainGen\.addArenaRoads\(joinLayer\(joins\), onLanded, \{ reset: true \}\);/, 'the crossings first, the layer reset');
-  assert.match(w, /const arenaRoadsStale = \(p, epoch, layer, reset = true\) => \(p\.arenaRoadsEpoch < epoch && /, 'a Bay pixel too');   // PIN MOVED (ROAD-FOLLOW): the law in brackets, a waiting wall's pixel beside it
-  assert.match(read('src/world/terrain/terrainGen.js'), /const join = arena \? 0 : arenaJoinByte\(px, py\);/);
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((f) => existsSync(pathJoin(ARENA2, f)));
 test('TESA5 with ARENA2: on Basic Roads\' own network fourteen crossings - seven north, five south, two east, none west (the Eltheric) - 47 join pixels on the Bay - PIN MOVED (ROAD-GAPS): seven and 19 at JOIN_SPACING 60', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

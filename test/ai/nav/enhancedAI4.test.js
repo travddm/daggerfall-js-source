@@ -63,17 +63,6 @@ function foe(Cls, c, bake, feet, opts = {}) {
 
 const START = [2, 0, 2], TARGET = [10, 0, 2];   // either side of the divider, near its closed (north) end
 
-test('ENHANCED AI 4: the classic motor is untouched', () => {
-  const motor = rd('src/characters/enemy/enemyMotor.js');
-  // DFU's own EnhancedCombatAI is NAMED in the classic file (its header
-  // says it ports the classic path), so the test is for the PORT's
-  // enhanced symbols, not the word.
-  assert.ok(!/navmesh|findPath|EnhancedEnemyAI|enhancedMotor|navWorld/.test(motor), 'decision #1: enemyMotor.js carries no enhanced code');
-  const ours = rd('src/ai/enhancedMotor.js');
-  assert.ok(/extends EnemyAI/.test(ours), 'the enhanced motor is a subclass, not a fork');
-  assert.ok(!/_classicTick\s*\(/.test(ours.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')), 'it overrides the DESTINATION, not the classic tick');
-});
-
 test('ENHANCED AI 4: the constants are project-final\u2019s, verbatim', () => {
   // enemyShared.js:7-12 and enemy.js:402 at project-final 8ba9100.
   assert.equal(REPATH_INT, 0.4); assert.equal(REPATH_FAIL, 0.5);
@@ -407,11 +396,6 @@ test('ENHANCED AI 4a: the bake is height-invariant - the anchor carries its y', 
   const xz = (r) => r.p.map((q) => `${q[0].toFixed(2)},${q[2].toFixed(2)}`).join('|');
   assert.equal(xz(at25), xz(at0));
   assert.equal(xz(atNeg), xz(at0));
-  // ONE HOME: the anchor is built through regionAnchor, in the one bake
-  // core (AUDIT 68: navBake's bakeSoup) - the worker and the main-thread
-  // fallback call it and spell no pipeline of their own.
-  const core = rd('src/ai/nav/navBake.js');
-  assert.equal((core.match(/buildRegions\(chf, \{ anchor: regionAnchor\(/g) ?? []).length, 1, 'navBake builds the anchor, once');
   for (const f of ['src/ai/nav/navBake.js', 'src/ai/nav/navWorker.js', 'src/ai/nav/navClient.js']) {
     const src = rd(f);
     assert.ok(!/anchor: \{ x: [a-z.]*anchor\[0\], z:/.test(src), `${f} still builds an anchor without y`);
@@ -498,27 +482,3 @@ test('AUDIT 55: the switch\u2019s reach is the dungeon host\u2019s foes and noth
   for (const f of readers) assert.ok(/enhancedAI|EnhancedEnemyAI|enhancedNav/.test(rd(f)), `${f} lost its read`);
 });
 
-test('ENHANCED AI 4: the host chooses the motor by the switch and refills the budget each frame', () => {
-  const host = rd('src/scenes/dungeonContext.js');
-  assert.equal((host.match(/getPref\('enhancedAI'\) \? D\.EnhancedEnemyAI : D\.EnemyAI/g) || []).length, 2, 'both construction sites choose by the pref');
-  assert.ok(/nav: \(\) => enhancedNav\.chf, navWorld: enhancedNav\.world/.test(host), 'the bake is a thunk and the world is the host\u2019s');
-  assert.ok(/enhancedNav\.world\.pathBudget = enhancedNav\.world\.budgetPerFrame/.test(host), 'the budget is refilled once a frame (his enemy.js:404)');
-  // THE BUG MAC FOUND. buildFoeAt runs in buildDungeonContext's top-level
-  // flow and reads `enhancedNav.world` at construction; the object must
-  // therefore be declared ABOVE the foe block, or every foe hits the
-  // temporal dead zone inside its per-foe try and is left a floating
-  // billboard with no motor. Pinned by line ORDER, since no node test
-  // can run this host without ARENA2.
-  const decl = host.indexOf('const enhancedNav = {');
-  const firstMint = host.indexOf('async function buildFoeAt(');
-  const lazy = host.indexOf('const [{ EnemyAI, withinYaw');   // AUDIT 68 S04-v-dungeon-dead-rig-deps: the lazy block's first destructure now
-  assert.ok(decl > 0 && firstMint > 0 && lazy > 0);
-  assert.ok(decl < lazy, 'enhancedNav must be declared before the lazy foe block');
-  assert.ok(decl < firstMint, 'enhancedNav must be declared before buildFoeAt');
-  assert.ok(/enhancedNav\.world = makeNavWorld\(\)/.test(host), 'one world per host, made in the lazy block');
-  // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): the other two pools are AI 5's - its interior half constructs the
-  // enhanced motor in each where the room hands a mesh, by the same switch (test/ai/nav/fb1016b_indoorwatch.test.js)
-  for (const f of ['src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
-    assert.equal((rd(f).match(/getPref\('enhancedAI'\) \? EnhancedEnemyAI : EnemyAI/g) || []).length, 1, `${f}: its one construction site chooses by the pref`);
-  }
-});

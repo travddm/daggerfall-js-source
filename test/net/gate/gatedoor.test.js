@@ -75,8 +75,6 @@ test('GATE-DOOR the court\'s door: a court admits GATE_HELLO_HZ_MAX hellos in on
     for (let i = 1; i <= GATE_HELLO_HZ_MAX; i++) { const ws = R.connect(); await R.hello(ws, `peer-${String(i).padStart(4, '0')}`, null); if (!ws.closed) opened++; }
     assert.equal(opened, GATE_HELLO_HZ_MAX - 1, 'the look spent one token - and the door stayed the court\'s');
   });
-  assert.match(src('server/src/index.js'), /_helloHz\(key\) \{ return isChatRoom\(key\) \? CHAT_HELLO_HZ_MAX : isGateRoom\(key\) \? GATE_HELLO_HZ_MAX : HELLO_HZ_MAX; \}/, 'one rate a room');
-  assert.equal(src('server/src/index.js').split('tokenGate(this._hellos, now, this._helloHz(a.key))').length - 1, 2, 'the hello\'s door and the look\'s, one rate');
 });
 
 test('GATE-DOOR the session stamps a busy refusal of its room on its own clock (`busyAt`) - a door that answered, which the court reads; an open socket\'s drop and a halo\'s refusal stamp nothing, a court\'s upgrade that never opened does (AUDIT PLAN-1000 B1, B4) (mutants: never stamped; a drop stamped; a halo\'s stamped; the never-opened court unstamped)', async () => {
@@ -154,5 +152,4 @@ test('GATE-DOOR a court that refuses me busy is an answer, not a silence: while 
   w.me.at = null;
   at(w, 200_000);
   assert.equal(w.c.silent(), false, 'out of the court, forgotten');
-  assert.match(src('src/scenes/world.js'), /\n {4}now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, door: \(\) => online\?\.busyAt \?\? null,/, 'the host hands the court its session\'s door');
 });

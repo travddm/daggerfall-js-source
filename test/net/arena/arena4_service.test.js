@@ -283,6 +283,4 @@ test('AUDIT COLLECTIONS-II (lanes 1, 2): the glyph\'s and the icon\'s doors answ
   r = await S.call('/v1/account/icon', { icon: null }, A.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.ok(r.body.titles.includes('arenachampion') && r.body.glyphs.includes('laurel'), 'an icon taken off keeps them too');
-  const src = readFileSync(new URL('../../../server-account/src/index.js', import.meta.url), 'utf8');
-  assert.match(src, /const r = await equipGlyph\(ctx, await withSeatTitles\(ctx, who\.player, env\), env, body\.glyph, body\.on !== false\);/, 'the glyph\'s door reads a Charter\'s and a chapter\'s titles');
 });

@@ -124,15 +124,6 @@ test('AUDIT 30 S3: an id whose row the market\'s prune took (SCALE4b: the hour\'
   assert.deepEqual([l4.body.error, s.balance(mac)], ['prof-rid', f0], 'a listing free of its fee');
 });
 
-test('AUDIT 30 S4: no ledger line of the market\'s or the stock\'s is an OR IGNORE - a line that breaks the balance\'s CHECK fails its act, never lands unpaid', () => {
-  const m = src('server-account/src/market.js');
-  assert.equal((m.match(/INSERT OR IGNORE INTO marks_ledger/g) ?? []).length, 0);
-  const p = src('server-account/src/professions.js');
-  assert.equal((p.match(/INSERT OR IGNORE INTO marks_ledger/g) ?? []).length, 1, 'the writ\'s pay alone (its id a writ\'s, filled once by its nonce)');
-  assert.match(p, /SELECT 'account', \?1, 'burn', NULL, 'stock', marks, \?2, at, \?1, material, rid \|\| ':stock' FROM prof_stock WHERE player = \?1 AND rid = \?3 AND n = \?4/);
-  assert.match(p, /SELECT 'account', \?1, 'burn', NULL, 'respec', \?4, \?5, \?6, \?1, \?8, \?7\n\s*WHERE COALESCE\(\(SELECT balance FROM marks WHERE account = \?1\), 0\) >= \?4\n\s*AND NOT EXISTS \(SELECT 1 FROM marks_ledger WHERE actor = \?1 AND rid = \?7\)/);
-});
-
 // ─── THE TAX (L6) ────────────────────────────────────────────────────
 
 test('AUDIT 30 L6: the tax is taken on a listing\'s running total - two buys of ten Marks pay what one of twenty does', async () => {

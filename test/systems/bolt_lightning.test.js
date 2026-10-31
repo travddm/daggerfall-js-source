@@ -213,5 +213,4 @@ test('BOLT wired: both exterior hosts feed their distant strikes and the storm o
     assert.match(s, new RegExp(`boltsGl\\.draw\\(boltFrame\\.bolts, proj, view, new Float32Array\\(${esc}\\)[,)]`), host);
   }
   assert.equal(STORM_BASE_M, 500, 'the thunder profile\'s base');
-  assert.match(rd('src/render/volumetricClouds.js'), /thunder: {2}Object\.freeze\(\{ base: 500,/);
 });

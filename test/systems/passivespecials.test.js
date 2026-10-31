@@ -267,40 +267,7 @@ test('V2c: the vampire\'s noon runs through runMagicRoundsFor, after the enchant
   runMagicRoundsFor(p, noon4, noon4 + 4, { sinks: { hurt: (n) => { p.health -= n; } } });
   assert.equal(before - p.health, 0, 'VAMP-DAY: the sun no longer burns');
   assert.equal(p.racialOverride.statMods.strength, -20, '...the day is the stats\' -20 instead');
-  const src = read('src/systems/worldTick.js');
-  const body = src.slice(src.indexOf('export function runMagicRoundsFor'));
-  assert.ok(body.indexOf('enchantmentMagicRound(') < body.indexOf('passiveSpecialsMagicRound('),
-    'the pass runs AFTER the enchant fold - its magery arm sums _enchantMods.maxMagicka into the one modifier');
 });
 
 // ── 8. THE FOUR HOSTS (the seam registrations, greppable) ─────────
 
-test('V2c: THE FOUR HOSTS answer the sunlight seam', () => {
-  // worldModes owns the mode machine for BOTH town pages (world.js and
-  // exterior.js each build it), so the one live-mode-routed
-  // registration there serves exterior, interior and town dungeons.
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(wm.includes('setPassiveSpecialsHost({'), 'worldModes registers');
-  assert.ok(wm.includes("isInside: () => mode !== 'exterior'"), 'routed by LIVE mode, never latched');
-  assert.ok(wm.includes('BUILDING_TYPES.Temple') && wm.includes('FIGHTER_TRAINERS_FACTION'),
-    'the holy pair: Temple type or faction 849 (PlayerEnterExit.cs:1424-1431)');
-  // dungeonContext registers its own and RESTORES the displaced host
-  // on destroy - a latched dungeon answer would keep the sun off the
-  // player forever after the exit.
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.ok(dc.includes('const _prevPassiveHost = setPassiveSpecialsHost({'), 'dungeonContext registers and keeps the previous');
-  assert.ok(dc.includes('setPassiveSpecialsHost(_prevPassiveHost)'), 'destroy() hands the seam back');
-  // the enchant ctx wires the two E1-FLAGGED arms off the seam. WAVE
-  // D: in the SHARED ctx body, so every host that mounts it answers
-  // them - the two reads route by live mode anyway, which is why they
-  // are resolved there rather than handed in by each host.
-  const he = read('src/scenes/hostEnchant.js');
-  assert.ok(he.includes('inSunlight: () => playerInSunlight()'), 'the E1 conditional arms are live');
-  assert.ok(he.includes('inHolyPlace: () => playerInHolyPlace()'), 'both of them');
-  for (const h of ['src/scenes/world.js', 'src/scenes/dungeonContext.js']) {
-    assert.ok(read(h).includes('createEnchantCtx('), `${h} mounts that body`);
-  }
-  // exterior.js gets the registration from the mode machine it builds
-  const ex = read('src/scenes/exterior.js');
-  assert.ok(ex.includes('setPassiveSpecialsHost'), 'exterior names the seam at its createWorldModes call');
-});

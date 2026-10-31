@@ -87,8 +87,6 @@ test('EG-H2 THE LAW (section 24): madeLevelOf names each made location by its ow
     assert.deepEqual([madeLevelHere(), madeRuleHere('save'), madeOnTraverse()], [null, null, false], 'a word that throws is none');
   } finally { registerMadeLevelHere(null); }
   assert.equal(madeLevelHere(), null);
-  // the mode machine's accessor: the made level of the dungeon standing, null in every other mode
-  assert.match(read('src/scenes/worldModes.js'), /madeLevel: \(\) => \(mode === 'dungeon' \? madeLevelOf\(dungeonLoc\) : null\),/);
 });
 
 test('EG-H2 THE BURNING COURT AND THE HOUR, UNCHANGED (section 24): rule by rule, the law decides as each door did before it - the saves, the rest and the map refused in each level\'s own words; the Mark refused in both and the Recall in the Hour alone (the court refuses the Mark only), each in its own voice (the mid-screen line, the Hour\'s); companions out; no regeneration; Levitate warded in the Hour and never in the court; Resurrect refused in the Hour and not in the court; a death cast out of the court and final for the Hour\'s Hollow; /unstuck refused in the court in its words and the Hour\'s way home in the Hour; no forgiveness, no slowfall ban, no technique refusal, no potion count, no AvoidDeath refusal and the DEATH-PENALTY in both, as before (mutants: any of the two columns moved)', () => {

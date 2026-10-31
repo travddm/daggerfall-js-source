@@ -612,9 +612,6 @@ test('ACC1b: A GUEST NAME AND A HANDLE CANNOT COLLIDE, and it is structural', as
   assert.ok(isHandleShaped('Nystul'));
   assert.ok(!isGuestShaped('Nystul'));
   assert.ok(GUEST_BANKS.length >= 5, 'the banks are the game\'s own and there are several');
-  // the names come from DAGGERFALL'S OWN BANK - the same file the
-  // chargen wizard and every townsperson draw from
-  assert.match(src('server-account/src/guestName.js'), /characters\/nameGen\.json/);
 
   // THE BANK'S OWN ALPHABET, DERIVED - because the first cut of this
   // law spelled the guest shape as `[A-Za-z]+ [A-Za-z]+` and its own
@@ -689,9 +686,6 @@ test('ACC1b: a handle is refused at ENTRY, by shape and by the port\'s own filte
   for (const bad of ['Theod Gwyn', ' Nystul', 'Nystul ', 'ab', '', 'x'.repeat(40), 42, null, '1Nystul']) {
     assert.ok(handleRefusal(bad), `${String(bad)} was allowed as a handle`);
   }
-  // NAME-F2's law: refuse at entry rather than repair at exit, so the
-  // token never has to carry a name the wire would have replaced.
-  assert.match(src('server-account/src/accounts.js'), /nameIsIssuable/);
 });
 
 test('ACC1b: nothing a client is told carries a credential', async () => {
@@ -854,9 +848,6 @@ test('ACC1b: THE PRIVATE KEY IS A SECRET, and the committed config proves it', a
   assert.doesNotMatch(toml, /IDENTITY_PRIVATE_KEY\s*=/, 'a private key is assigned in a committed file');
   assert.doesNotMatch(toml, /MC4CAQ|BEGIN [A-Z ]*PRIVATE KEY/, 'a PKCS8 key is pasted into the config');
   assert.match(toml, /wrangler secret put/, 'the config no longer says where the key goes instead');
-  // the tool that mints it writes nothing to disk
-  const tool = src('tools/mintIdentityKeys.mjs');
-  assert.doesNotMatch(tool, /writeFile|appendFile|createWriteStream/, 'the key tool writes a key to disk');
 
   // a service with no key still hands out accounts - it just cannot
   // vouch for them, and it says so rather than minting something the

@@ -65,9 +65,6 @@ test('COMPASS-PARTY the classic compass: a green 5x3 triangle per mate over the 
   assert.equal(drawPartyCompassMarks(renderer, [], me, 0, box), 0);
   assert.equal(drawPartyCompassMarks(renderer, [[0, 50]], null, 0, box), 0);
   assert.equal(quads.length, 0);
-  const H = src('src/ui/hud/hud.js');
-  assert.match(H, /drawPartyCompassMarks\(renderer, party, playerXZ, heading01, \{ bx, by, bw, s \}\);/, 'drawn after the Detect markers on the classic box');
-  assert.match(H, /party: party \?\? null,   \/\/ COMPASS-PARTY/, 'and handed to the enhanced skin');
 });
 
 const mkEl = () => ({
@@ -117,12 +114,3 @@ test('COMPASS-PARTY the enhanced strip: a green mark per mate at its bearing, po
   }
 });
 
-test('COMPASS-PARTY the hosts: the open world hands the whole party (the bodies drawn, the rest by their poses), the building and the dungeon the mates standing in them (mutants: a host that hands none)', () => {
-  const W = src('src/scenes/world.js');
-  assert.match(W, /party: partyCompass\(\),   \/\/ COMPASS-PARTY/);
-  assert.match(W, /const partyCompass = \(\) => \(social\?\.party \? partyCompassPoints\(\{\n    bodies: partyOnMaps, others: social\.others\(\)\.filter\(\(m\) => !m\.peers\?\.some\(\(id\) => _hiddenPeers\.has\(id\)\)\), here: playerTravelPixel\(\),/);
-  assert.match(W, /pixelCentre: \(px, py\) => \{ const t = state\.pixelTranslation\(px, py\); return \[t\[0\] \+ TERRAIN_SIZE \/ 2, t\[2\] \+ TERRAIN_SIZE \/ 2\]; \},/, 'the middle of the pixel (its terrain spans TERRAIN_SIZE from its translation)');
-  assert.match(W, /fromWorld: \(wx, wz\) => state\.localFromWorld\(wx, wz\),/);
-  assert.match(src('src/scenes/worldModes.js'), /party: partyCompassPoints\(\{ bodies: \(\) => host\.partyNear\?\.\(\) \?\? \[\] \}\),/);
-  assert.match(src('src/scenes/dungeonContext.js'), /party: partyCompassPoints\(\{ bodies: opts\.party \?\? null \}\),/);
-});

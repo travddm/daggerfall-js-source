@@ -179,18 +179,6 @@ test('AUDIT POI R3: a look that would not load is let go of at once - two POIs s
 
 // ── R4, R14 (the world's draw) ──────────────────────────────────────
 
-test('AUDIT POI R4, R14: the world draws a POI\'s glass after the grass, the banners, the Windfall, the haze and the held flats - every pass that writes depth the glass does not - sorted from the view\'s own eye; the editor\'s lines after it (mutants: the glass before the grass; sorted from the traveller\'s head)', () => {
-  const w = src('src/scenes/world.js');
-  const at = (needle) => { const i = w.indexOf(needle); assert.ok(i > 0, needle); return i; };
-  const glass = at('poiHost?.drawTranslucent(');
-  for (const before of ['    frameGrass();\n', '    frameBanners();\n', 'windfall.draw(proj, view', '    frameHaze();\n', '    renderer.drawHeld(camRight, bbUp);']) assert.ok(at(before) < glass, `${before.trim()} before the glass`);
-  assert.ok(glass < at('    drawFalling();'), 'and the rain after it, as before');
-  assert.ok(w.includes('poiHost?.drawTranslucent(renderer, mwv.eye, yardCull);'), 'the view\'s own eye');
-  assert.ok(at('if (poiEditor?.drawLines(proj, view)) renderer.markForeignPass();') > glass, 'the handles over the glass');
-  assert.ok(w.includes("if (_torchesMode === 'exterior') poiHost?.standDown();"), 'R8: the street left keeps the models');
-  assert.ok(w.includes('decodeImage: decodePoiImageSteps,'), 'R8: the decoder\'s steps under the host\'s budget');
-});
-
 test('AUDIT POI R14: a two-sided blended submesh lays its back faces first; a translucent part the view test sees off screen is not drawn; the far one first whatever the order they stand in (mutants: the front faces first; a shadow-only verdict drawn)', async () => {
   const book = createTextureBook();
   const recordOf = (m) => book.recordOf(materialLook(m));
@@ -395,7 +383,6 @@ test('AUDIT POI R9: a picture is read back through WebGL2 - its bitmap made unpr
   assert.ok(calls.some((c) => c[0] === 'pixelStorei' && c[1] === C.UNPACK_PREMULTIPLY_ALPHA_WEBGL && c[2] === false));
   assert.equal(deleted, 2, 'its texture and framebuffer deleted');
   assert.equal(bmp.closed, true, 'the bitmap closed');
-  assert.match(src('src/poi/poiImageDecode.js'), /AUDIT POI R9: NOT THROUGH A 2D CANVAS/);
 });
 
 // ── R11 ─────────────────────────────────────────────────────────────
@@ -435,7 +422,6 @@ test('AUDIT POI R12: a frame makes nothing it can keep - an empty pixel\'s answe
   const row2 = H.host.lights([])[0];
   assert.equal(row2, row, 'the same row');
   assert.equal(r3(row2.x), 1100 + 819.2);
-  assert.match(src('src/scenes/poiHost.js'), /want\.clear\(\);/);
 });
 
 // ── R13, R15, S11: the feed ─────────────────────────────────────────

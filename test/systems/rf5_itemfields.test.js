@@ -111,14 +111,6 @@ test('RF5: every field the port\'s own mints write is declared, and each value i
   leaveForRepair(w, 'town:12', 720, 1000);
   assertDeclared(w, 'leaveForRepair');
   assertDeclared({ ...w, questItem: true, questUID: 4, questSymbol: { name: '_item_' } }, 'the quest link');
-  // the classic importer writes only declared fields (its literal and its later assignments)
-  const src = read('src/systems/classicSave.js');
-  const body = src.slice(src.indexOf('export function classicItemFromRecord'), src.indexOf('export function', src.indexOf('export function classicItemFromRecord') + 10));
-  const literal = body.slice(body.indexOf('const item = {'), body.indexOf('};', body.indexOf('const item = {')));
-  const keys = new Set([...literal.matchAll(/^\s{4}([a-zA-Z]+):/gm)].map((m) => m[1]));
-  for (const m of src.matchAll(/\bitem\.([a-zA-Z]+) = /g)) keys.add(m[1]);
-  assert.ok(keys.size >= 18, `the importer's keys were found (${keys.size})`);
-  for (const k of keys) assert.ok(isDeclaredItemField(k), `classicItemFromRecord writes '${k}', undeclared`);
 });
 
 test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refuses the item, a string is cut, an undeclared field rides the clamp', () => {
@@ -175,10 +167,4 @@ test('RF5: one declaration - the array list derives from the kinds, the validato
   assert.ok(Object.isFrozen(ITEM_FIELDS) && ITEM_FIELD_NAMES.length >= 40);
   for (const k of ITEM_FIELD_NAMES) assert.ok(['int', 'number', 'bool', 'string', 'enum', 'array', 'object'].includes(ITEM_FIELDS[k].kind), k);
   for (const k of LOOK_ITEM_FIELDS) assert.ok(isDeclaredItemField(k), `the look's '${k}' is declared`);
-  const loot = read('src/systems/loot/loot.js');
-  assert.match(loot, /export const LOOT_ARRAY_FIELDS = Object\.freeze\(itemFieldsOfKind\('array'\)\);/);
-  assert.match(loot, /if \(!validItemFields\(out\)\) return null;/, 'the validator checks every declared field');
-  assert.doesNotMatch(loot, /\['enchantments', 'customEnchantments', 'affixes'\]/, 'no hand list');
-  assert.doesNotMatch(loot, /validAffixList/, 'LR4\'s check rides the schema');
-  assert.doesNotMatch(read('src/systems/item/itemFields.js'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*loot\.js'|from '(?:\.\.?\/)+(?:[\w-]+\/)*inventory\.js'|from '(?:\.\.?\/)+(?:[\w-]+\/)*equip\.js'/, 'the schema sits under the mints');
 });

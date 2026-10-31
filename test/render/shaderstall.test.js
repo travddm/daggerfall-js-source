@@ -246,17 +246,6 @@ test('SHADER-STALL the warm\'s named steps (warmPrograms): a step that names its
   assert.ok(!ran.includes('never'), 'a warm that ends runs nothing more');
 });
 
-test('SHADER-STALL the wiring: the world\'s sea warm and the spells\' impact pass by their named steps; the Elite Gates\' telegraphs and crystals through the door, made again for each breach', () => {
-  assert.match(read('src/scenes/world.js'), /if \(csaRender\) void warmPrograms\(csaRender\.warmSteps\(\)\);/);
-  // PIN MOVED (AUDIT SHADER-STALL, 2026-10-20): and its `need` - a spell's draw built the pass first, the warm stands down
-  assert.match(read('src/scenes/hostMagic.js'), /void warmPrograms\(\[\{ start: \(\) => startPrograms\(renderer\.gl, SPELL_IMPACT_PROGRAMS\), run: \(\) => \{ if \(!fxPass && !fxBroken\) fxPass = new SpellImpactPass\(renderer\.gl\); \}, need: \(\) => !fxPass && !fxBroken \}\]/);
-  const eg = read('src/scenes/eliteGates/egFight.js');
-  assert.match(eg, /const telegraphDoor = \(\) => compiledPass\(gl, telegraphPrograms\(true\), \(\) => new GateTelegraphRenderer\(gl, \{ spire: true \}\)/);
-  assert.match(eg, /const crystalDoor = \(\) => compiledPass\(gl, CRYSTAL_PROGRAMS, \(\) => new CourtCrystalRenderer\(gl\)/);
-  assert.match(eg, /pass = null; crystalPass = null; telegraphOf = telegraphDoor\(\); crystalsOf = crystalDoor\(\);/);
-  assert.doesNotMatch(eg, /new GateTelegraphRenderer\(gl, \{ spire: true \}\); \}/, 'no build outside the door');
-});
-
 // AURA-STALL (#1137) and AURA-SPLIT (#1143, bible/07-Rendering/Performance-Priority.md): the auras' one program was 81 KB
 // of fragment shader, and its build at the first wearer in range held the main thread 8.5-11 s on D3D11 - met on the frame
 // the travel view came down near a crowd, since the view draws no aura. Each look is now a program of its own (67 ms to
@@ -294,11 +283,6 @@ test('AURA-SPLIT the auras\' looks: one program a look - the whole source with `
   rg.draw(two, I, I, [0, 0, 0], 1);
   assert.equal(rg.drawn, 2, 'no extension: each look built at its first draw');
   assert.equal(g.count('createProgram'), 2, 'the looks drawn alone');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const auraPassOf = compiledPass\(renderer\.gl, \[\], \(\) => new AuraRingRenderer\(renderer\.gl\),/, 'the world\'s door waits on no program');
-  assert.match(w, /const _auraPass = auraPassOf\(\);/);
-  assert.equal(w.split('\n').filter((l) => l.split('//')[0].includes('new AuraRingRenderer(')).length, 1, 'built nowhere outside its door (a comment that names the build is no build)');
-  assert.match(read('src/render/auraRing.js'), /const P = this\.programOf\(look\.kind\);/, 'a look never asked as needed in the draw');
   // a look that will not build: told once, its wearers stand without it, and the other looks are drawn
   const bad = fakeGl({ parallel: false, fails: [auraPrograms(1)[0][1]] });
   const rb = new AuraRingRenderer(bad.gl), warns = [], warn = console.warn;

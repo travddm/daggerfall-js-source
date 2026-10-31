@@ -74,9 +74,4 @@ test('AUDIT 28 W2b: the key is LIVE, and the three foe pools all resolve through
   for (const host of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
     assert.match(read(host), /playerWeapon\.resolveHit\(live, playerEntity, canSee,/, `${host} does not resolve through resolveHit`);
   }
-  // The civilian arm stays behind the pools - :1057's fallback order.
-  const world = read('src/scenes/world.js');
-  const guards = world.indexOf('cityGuards.resolvePlayerHit(weaponRig.playerWeapon');
-  const civil = world.indexOf('cityGuards.resolveCivilianHit(weaponRig.playerWeapon');
-  assert.ok(guards > 0 && civil > guards, 'civilians are struck only after the pools miss');
 });

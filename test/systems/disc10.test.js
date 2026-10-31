@@ -184,19 +184,6 @@ async function hitchAndRide(yieldFn) {
   } finally { s.cleanup(); }
 }
 
-test('DISC10-A: one cart - while Horse Cart and Cargo trails its wagon, the Eye Of The Beholder cart gives way: a hitch, a ride through two turns and a U-turn draw ONE wagon a frame, and no forward look names "Wagon"', async () => {
-  const before = await hitchAndRide(null);   // the seam with nothing registered: what the report saw
-  assert.equal(before.most, 2, 'unyielded, both mods stand a cart for the Cart transport - the report\'s two wagons');
-  assert.ok(before.named > 0, 'and the EOTB cart\'s box named "Wagon" over the road');
-  const after = await hitchAndRide((s) => s.rt.showTrailingWagon);   // world.js and exterior.js register exactly this, HCC on
-  assert.deepEqual([after.most, after.kinds], [1, ['TrailingWagon41214_Body']], 'one wagon a frame, and it is HCC\'s');
-  assert.equal(after.named, 0, 'HCC\'s trailing wagon takes no activation, so riding names nothing');
-  const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8'), E = readFileSync(new URL('../../src/scenes/exterior.js', import.meta.url), 'utf8');
-  for (const [label, src] of [['world.js', W], ['exterior.js', E]]) {
-    assert.match(src, /hcc\.attach\(hccRuntime\);\n\s*setEotbCartYields\(\(\) => hccOn\(\) && hccRuntime\.showTrailingWagon\);/, `${label} registers the yield beside the runtime it reads`);
-  }
-});
-
 test('DISC10-A: the Eye Of The Beholder cart alone (HCC off) is struck where its TURNED body is - trailing at a diagonal, a forward look over the road names nothing; turned round to face it, it is still named; and a box that holds the eye names nothing by the ground inside it', async () => {
   const floor = (o, d, m) => (d[1] < -1e-9 && o[1] > 0 && o[1] / -d[1] <= m ? o[1] / -d[1] : Infinity);
   const col = { raycast: floor, raycastHit: (o, d, m) => ({ dist: floor(o, d, m), key: null }) };

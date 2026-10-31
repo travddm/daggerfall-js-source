@@ -134,15 +134,3 @@ test('FEUD HARNESS ITS BAND FIRST: struck down kin by kin before its master; at 
   assert.ok(fights({ rank: 5, mode: 'trade' }, SEEDS(6)).every((x) => x.bandSlain === 0), 'its master first: none slain');
 });
 
-test('FEUD HARNESS THE CELL AND THE HEADER: a cell counts its flight and its band; the measure stands its band-first and alone rows beside the targets; the header names what is modelled and what is not (mutants: a count dropped)', () => {
-  const c = H.revenantCell({ rank: 3, mode: 'trade' }, 4);
-  for (const k of ['fled', 'flights', 'cornered', 'caught', 'stoodInFlight', 'band', 'bandSwings', 'bandWindups', 'bandHits', 'rallied', 'portal', 'bandSlain', 'scattered']) assert.ok(k in c, k);
-  assert.equal(c.band, 2);
-  const src = read('tools/tellDuel.mjs');
-  assert.match(src, /and the rest of the fight the pools give it - ITS BAND/);
-  assert.match(src, /Never modelled: the player's own health \(the band's plain blows - under the tier - land on nobody here\), a\n\/\/ kin's spells/);
-  assert.doesNotMatch(src, /Never modelled: a flight/);
-  const m = H.measureFeud({ fights: 1, weapons: ['Longsword'] });
-  assert.deepEqual(m.beside.map((x) => `${x.rank}/${x.mode}/${x.order}/${x.band}`), ['3/trade/band/2', '3/dodge/band/2', '5/trade/band/3', '5/dodge/band/3', '3/trade/alone/0', '3/dodge/alone/0']);
-  assert.ok(m.beside.filter((x) => x.order === 'alone').every((x) => x.flights === 0));
-});

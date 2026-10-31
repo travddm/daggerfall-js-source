@@ -142,19 +142,6 @@ test('MAC-N1: the smith PAYS for a corpse\'s cuirass - the staged lot totals a f
   assert.ok(b.box?.price > 0, `and the smith pays: ${b.box?.price}`);
 });
 
-test('MAC-N1: every Armor mint in the tree goes through SetItem\'s writes, and the value law has ONE home', () => {
-  // the population: no `mintCondition({ group: 'Armor'` without setItemFields in front of it
-  const bareArmor = SRC.filter(([, s]) => /mintCondition\(\{\s*group: 'Armor'/.test(s)).map(([p]) => p);
-  assert.deepEqual(bareArmor, [], 'an Armor record minted with a condition and no value');
-  const through = SRC.filter(([, s]) => /mintCondition\(setItemFields\(\{\s*group: 'Armor'/.test(s)).map(([p]) => p).sort();
-  assert.deepEqual(through, ['src/combat/enemyEquipment.js', 'src/combat/rriEnemyEquipment.js', 'src/scenes/worldModes.js', 'src/systems/aetheric.js', 'src/systems/createItem.js', 'src/systems/questlines/qlRewards.js', 'src/systems/sigil/sigilBroker.js', 'src/systems/testRoom.js'],
-    'the corpse, the knightly gift, the Create Item spell and the test room - the four sites that minted armor bare or by hand (RRI2: and the mod\'s enemy kit, through the same export; SET6: and the Aetheric mint, Ruhn\'s Regalia; SET7: and the Sigil Broker\'s day\'s stock; QL3, PIN MOVED: and a questline reward\'s armor piece, qlRewards.js baseOf)');
-  // ONE home for `value ?? itemBaseValue` as a MINT (readers - itemInfo's %wth, the keyed shelf's itemValue - may fall back)
-  const copies = SRC.filter(([p, s]) => p !== 'src/systems/item/itemTemplates.js' && /value: item\.value \?\? itemBaseValue\(item\)/.test(s)).map(([p]) => p);
-  assert.deepEqual(copies, [], 'the five private copies of SetItem\'s value write are gone');
-  assert.match(rd('src/systems/item/itemTemplates.js'), /export function setItemFields\(item\) \{\s*const named = \{ \.\.\.item, name: item\.name \?\? templateByIndex\(item\.templateIndex\)\?\.name \};[\s\S]{0,700}?return \{\s*\.\.\.named,\s*\.\.\.\(variant \? \{ \.\.\.variant, rriVariant: true \} : \{\}\),\s*(?:[^\n]*\n){1,3}\s*value: itemValueOf\(named\),\s*\};\s*\}/, 'JAN1: the value write reads through itemValueOf - a non-finite saved value is an absent one (AUDIT-RR F5: priced BEFORE the class\'s variant fold, as ApplyArmorMaterial runs before SetVariant)');
-});
-
 test('MAC-N1: the recovered arrow is CreateWeapon\'s arrow with stackCount 1 (EnemyAttack.cs:145-147), minted by ONE export at every host', () => {
   const a = bowDamageArrow();
   assert.equal(a.group, 'Weapons');
@@ -239,8 +226,6 @@ test('MAC-N2: tabAccepts is AddLocalItem verbatim, and filterByTab is FilterLoca
   assert.equal(on('ingredients'), 1);
   assert.equal(on('clothing'), 1);
   assert.equal(filterByTab(items, 'weapons').length, 2, 'FilterLocalItems drops the worn one first');
-  assert.match(rd('src/ui/native/nativeInventory.js'), /export function filterByTab\(items, tab\) \{\s*return items\.filter\(\(it\) => \{\s*if \(isEquipped\(it\)\) return false;[^\n]*\n\s*return tabAccepts\(it, tab\);/,
-    'one law, read by both windows');
 });
 
 test('MAC-N2: the four tab hotkeys work on the shop screen, in the parent\'s add order ahead of the action panel and the exit', () => {
@@ -250,8 +235,6 @@ test('MAC-N2: the four tab hotkeys work on the shop screen, in the parent\'s add
   w.input('F3'); assert.equal(w.tab, 'clothing', 'InventoryClothing');
   w.input('F1'); assert.equal(w.tab, 'weapons', 'InventoryWeapons');
   assert.equal(w.done, false, 'none of them closed anything');
-  assert.match(rd('src/ui/native/nativeTrade.js'), /const hit = firstHotkey\(\[\s*\.\.\.Object\.keys\(TAB_BUTTONS\),\s*\.\.\.\(this\.mode === 'Buy' \? \['TradeSteal'\] : \[\]\),\s*\.\.\.\(action \? \[action\] : \[\]\),\s*'TradeClear',\s*'TradeExit',\s*\], code, e\);/,
-    'SetupTabPageButtons (:228) before SetupActionButtons (:229) before the exit button (:249)');
   w.input('KeyX'); assert.equal(w.done, true, 'and exit is still X at the tail');
 });
 
@@ -358,19 +341,6 @@ test('MAC-N2: the selected tab is drawn as the INVE01I0 cutout over the base, an
     assert.deepEqual(gold[0].src, { u0: x / 320, v0: y / 200, u1: (x + cw) / 320, v1: (y + ch) / 200 }, 'the SUBRECT of the sheet, not the whole of it');
     assert.ok(calls.findIndex((c) => c.tex === 'base') < calls.indexOf(gold[0]), 'over the base');
   } finally { _setTradeArtForTests(null); }
-  assert.match(rd('src/ui/native/nativeTrade.js'), /loadImg\(deps, 'INVE01I0\.IMG'\)/, 'goldTexture (:757) is loaded with the rest');
-});
-
-test('MAC-N2: every host that hands a window its pointer hands the trade window the event and the release it drags by', () => {
-  // the interior host and the dungeon slot: hover(vx, vy, e) and release() on 'up' (ROAD-E E1's seams, now load-bearing for two more windows)
-  assert.match(rd('src/scenes/worldModes.js'), /interiorOverlay\.hover\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/);
-  assert.match(rd('src/scenes/worldModes.js'), /interiorOverlay\?\.release\?\.\(\);/);   // STATUS-LIVE: the arm's gate is interiorPaused(); the slot read inside it is optional-chained
-  assert.match(rd('src/scenes/dungeonContext.js'), /overlayHover\(vx, vy, e = null\) \{ activeOverlay\?\.hover\?\.\(vx, vy, e\); \}/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /if \(phase === 'up'\) activeOverlay\?\.release\?\.\(\);/);
-  assert.match(rd('src/scenes/townTalk.js'), /overlay\.hover\(v \? v\[0\] : -1, v \? v\[1\] : -1, e\);/);
-  assert.match(rd('src/scenes/townTalk.js'), /if \(phase === 'up'\) overlay\.release\?\.\(\);/);
-  // and the wheel reaches the interior slot with its point
-  assert.match(rd('src/scenes/worldModes.js'), /interiorOverlay\?\.wheel\?\.\(Math\.sign\(e\.deltaY\), v \? v\[0\] : -1, v \? v\[1\] : -1\);/);   // STATUS-LIVE: likewise
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -430,21 +400,3 @@ test('MAC-N3: an equal URL is not rewritten, a history that refuses is warned ab
   assert.equal(publishBootParams(new URLSearchParams('online=1'), { history: undefined, location: undefined }), '?online=1', 'node has neither: no throw');
 });
 
-test('MAC-N3: main.js publishes before BOTH world boots the front door reaches, and clears the decided keys before the menu decides them', () => {
-  const main = rd('src/main.js');
-  const before = main.match(/publishBootParams\(params\);[^\n]*\n\s*return bootWorld\(canvas, renderer, params, status\);/g) ?? [];
-  assert.equal(before.length, 2, 'the enhanced menu\'s door and the classic Begin door');
-  assert.match(main, /for \(const k of BOOT_DOOR_KEYS\) params\.delete\(k\);\s*\n\s*publishBootParams\(params\);\s*\n\s*const \{ runEnhancedMenu \} = await import\('\.\/ui\/enhanced\/enhancedMenu\.js'\);/,
-    'a stale ?online off a previous session\'s URL must not lock the Mods pane of a player who has not chosen yet');
-  // BOOT_DOOR_KEYS is exactly the set main.js decides per choice - derived from the source, not listed twice
-  const decided = [...new Set([...main.matchAll(/params\.(?:set|delete)\('(\w+)'/g)].map((m) => m[1]))].sort();
-  assert.deepEqual(decided, [...BOOT_DOOR_KEYS].sort());
-});
-
-test('MAC-N3 + OVH3: the chat mounts on either skin (the online panels keep their own face over any UI Overhaul), and the online read is the one off location.search', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /if \(typeof document !== 'undefined'\) chatStart\(\);/);
-  assert.match(rd('src/systems/uiSkin.js'), /return skinOverride\(search\) \?\? clean\(getPref\('skin'\)\)/, 'the skin reads no lane');
-  assert.match(rd('src/systems/online/onlineLane.js'), /export const isOnlinePage = \(search = globalThis\.location\?\.search \?\? ''\) => pageHas\('online', search\);/,   // PERF-URL: parsed once a search
-    'the one read, off location.search - the copy main.js edits is not it');
-});

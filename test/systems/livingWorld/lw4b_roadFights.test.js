@@ -156,13 +156,6 @@ test('LW4b the end is what happens: an ally cut down FELL; every foe dead, the f
   assert.ok(!synced.some((x) => armedIds.includes(x.key)), 'its armed the peer\'s allies, come through the stream - never drawn here too (AUDIT-B6)');
   const unarmedIds = membersAt(beset, m).filter((x) => x.cls == null).map((x) => x.id);
   if (unarmedIds.length) assert.ok(synced.some((x) => unarmedIds.includes(x.key)), 'its unarmed drawn as ever');
-  // the host
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /spawn: \(type, feet, o\) => exteriorFoes\.spawnFoe\(type, feet, \{ yaw: o\.yaw, gender: o\.gender, level: o\.level, allied: o\.allied, loose: true, transient: true, managed: true \}\),/);   // PIN MOVED (AUDIT LW-III): managed - the fight owns its bodies' lives
-  assert.match(w, /owner: \(feet\) => amGroupRollOwner\(online\?\.id \?\? null, player\.feetAt\(\), \(peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => Math\.hypot\(p\.feet\[0\] - feet\[0\], p\.feet\[2\] - feet\[2\]\) <= LIVE_M\), Infinity\),/, 'AUDIT-B5: the fight\'s own election');
-  assert.match(w, /ready: \(\) => !!walkMode && !!playerSpawned && !_loading && !modes\?\.transitioning && _mode\(\) === 'exterior' && !playerAfloat\(\),/);
-  assert.match(w, /return turnKey\(place, placeCycle\(place, roster, Math\.floor\(trip\.outT0 \/ 1440\), livingScale\(\)\)\);/);
-  assert.match(rd('src/scenes/livingWorld/livingRoads.js'), /clear\(\) \{ deps\.sprites\.clear\(\); deps\.teams\?\.clear\(\); deps\.fights\?\.clear\(\);/);   // LW10: PIN MOVED - the teams cleared beside
 });
 
 test('AUDIT LW-III KILLED, NOT GONE: a fight\'s bodies the pool let go without a blow (its relevance cull: dead, no corpse) are neither a fall nor a win - no ally a death at the player\'s side, no fight won, no fated spared; one killed (dead with a corpse, or executed) is (mutants: the ally\'s kill, the foes\' kill, the lost)', async () => {

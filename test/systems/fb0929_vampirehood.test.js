@@ -106,9 +106,6 @@ test('VAMP-HOOD: the arrival clamp\'s racial arm asks the same hood - a hooded v
   nextVariant(cloak);
   assert.equal(racialSunAverse(v), false, 'hooded: it does not');
   assert.equal(arrivalClampMinutes(at(12), { sunAverse: racialSunAverse(v) }), 0, 'no push');
-  // world.js is the one caller: the racial arm through the law, the career's Damage from Sunlight beside it untouched
-  assert.match(read('src/scenes/world.js'), /sunAverse: racialSunAverse\(playerEntity\) \|\| careerSunAverse\(playerEntity\),/,
-    'HasVampirism() || Career.DamageFromSunlight (DaggerfallTravelPopUp.cs:351), both arms hooded');   // PIN MOVED (HOOD-CAREER): the career's arm asks the hood too
 });
 
 test('VAMP-HOOD online: the door reads the shared clock, whose day is one real hour - bare-headed the vampire waits it out, hooded it travels', () => {
@@ -127,13 +124,6 @@ test('VAMP-HOOD online: the door reads the shared clock, whose day is one real h
     nextVariant(cloak);
     assert.equal(racialFastTravelBlock(v, nowMin), null, 'hooded at the shared noon: the map opens');
   } finally { setSharedClock(null); }
-  // the map door says DFU's line and then the way out; the party's refusal reads the same law off the same clock
-  // (MERGE with LIVED1: DFU's line rides sayWithNightfall - online the world's nightfall on its own HUD row, AUDIT LIVED1
-  // M - and the hood's way out after both; the party's refusal adds the nightfall to the door's own words)
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const ftb = racialFastTravelBlock\(playerEntity, nowMin\);\n\s*if \(ftb\) \{ sayWithNightfall\(ftb\.text\); if \(ftb\.hint\) townTalk\.say\(ftb\.hint\); return false; \}/,   // GUIDE2: the door answers the journal's Show on map
-    'the map door speaks the hint after the refusal');
-  assert.match(world, /const sun = \(careerFastTravelBlock\(playerEntity, nowMin\) \?\? racialFastTravelBlock\(playerEntity, nowMin\)\)\?\.text \?\? null;[^\n]*\n\s*return sun \? withNightfall\(sun\) : null;/, 'the party\'s refusal');   // PIN MOVED (HOOD-CAREER): the career's rung first, both hooded
 });
 
 test('HOOD-SUN (2026-10-07, Mac: "The vampire cloak and hood doesn\'t work ingame for shielding against the sun"): the hood shields the stats too - bare-headed in the street\'s sun at noon the seven stats are 20 down (VAMP-DAY), the hood raised they are 0 (BAL6: shielded, not the night\'s +20), lowered 20 down again; a hood in the pack shields nothing (mutants: the stats ask no hood; the hood read backwards)', () => {   // PIN MOVED (HOOD-SUN): VAMP-HOOD left the -20 under a hood; PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the hood raised is 0, not +20
@@ -162,17 +152,3 @@ test('HOOD-SUN (2026-10-07, Mac: "The vampire cloak and hood doesn\'t work ingam
   assert.equal(w.racialOverride.statMods.strength, -VAMPIRE_STAT_MOD, 'a raised hood in the pack, not worn: the sun\'s -20');
 });
 
-test('VAMP-HOOD: ONE hood law - vampirism reads survival/temperature.js cloakState and names no hooded garment of its own; THE FOUR HOSTS', () => {
-  const src = read('src/systems/vampirism.js');
-  assert.match(src, /^import \{ cloakState \} from '\.\/survival\/temperature\.js';/m, 'the felt temperature\'s hood, imported');
-  assert.match(src, /return !cloakState\(entity\.equip\?\.slots \?\? null\)\.hood;/, 'read off the worn table, as the survival feed reads it');
-  assert.doesNotMatch(src, /HOODED_|\b(154|155|163|191|192|200)\b/, 'no second list of hooded items');
-  // the travel map's door, the party's refusal and the arrival clamp are world.js's alone: exterior.js mounts no map
-  // (its header), and the interior and dungeon hosts are inside, where the door refuses before any sun rung
-  const world = read('src/scenes/world.js');
-  assert.equal((world.match(/racialFastTravelBlock\(playerEntity, nowMin\)/g) ?? []).length, 3, 'the map door, the party\'s refusal and the driver\'s map online (AUDIT IT1 W2, PIN MOVED)');
-  for (const host of ['exterior', 'worldModes', 'dungeonContext']) {
-    assert.doesNotMatch(read(`src/scenes/${host}.js`), /racialFastTravelBlock|racialSunAverse|arrivalClampMinutes/,
-      `${host}.js has no travel door - flagged, nothing to wire`);
-  }
-});

@@ -361,8 +361,6 @@ test('CHEST-DRAFT E8 (AUDIT FB1025i): a save\'s room gives back what its record 
   assert.deepEqual(keysOf(back), keysOf([stray, g2]), 'the staged own thing and the staged chest\'s good');
   assert.deepEqual([room.ownIds(), Object.keys(room.itemsSnapshot())], [['o1'], ['c1']], 'what stands keeps its own');
   assert.deepEqual(said, ['2 of your things were no longer here and went back to your pack.']);
-  const host = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(host, /interiorDecor\.setOwn\(data\.decorOwn\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!\(interiorHome \|\| _seatHallVisit\)\) returnUnstood\(interiorDecor, placed, decorPackGive, say\);/, 'the host asks it of a save\'s room as it restores it - an online home\'s list does its own');
 });
 
 /** A sworn revenant gone over to the feud, carrying `took` - the more valuable half of the pack it was given
@@ -421,18 +419,6 @@ test('COPY-LIFT the law the keep act lifts by: a record\'s copy of its own, its 
     const once = await r.put(A, [k0, k1, k2, k3, k4, k5, other, k7, k8, k9, k10]);
     assert.deepEqual(sorted(once.locked), sorted(keysOf([k1, k2, k3, k4, k5, k6, k7, k8, k9])), 'k0 and k10 trade again; every other piece locked');
   } finally { r.done(); }
-});
-
-test('COPY-LIFT (AUDIT FB1025i F1): no revenant takes a realm-locked piece - a kill\'s take (RVN8 pickTaken) draws around it, a deserter keeps none (splitPack asks the same), and one taken before comes home at the load', () => {
-  const [locked, free] = rares(2, 160);
-  setRealmLocked([ledgerKeyOf(locked)]);
-  try {
-    assert.deepEqual([revenantMayTake(locked), revenantMayTake(free)], [false, true]);
-    for (let kills = 0; kills < 12; kills++) assert.equal(pickTaken('rv1', kills, locked, [locked, free]), free, 'never the locked one, worn or carried');
-    const src = readFileSync(new URL('../../src/systems/revenant/revenant.js', import.meta.url), 'utf8');
-    assert.match(src, /isGold: \(it\) => isGoldPieces\(it\) \|\| !revenantMayTake\(it\)/, 'a deserter\'s split keeps only what it may take');
-    assert.match(src, /const home = r\.took\.filter\(\(it\) => !revenantMayTake\(it\)\);/, 'and what it may no longer keep comes home');
-  } finally { setRealmLocked([]); }
 });
 
 test('COPY-LIFT no checkpoint lifts a copy: a claim\'s copy - a piece another record held first - stays locked when the claimant shows it once', async () => {

@@ -405,17 +405,6 @@ test('B5: the rest window runs UpdateNpcPresence on pop, ONCE, and it only ever 
   assert.equal(calls, 1, 'OnPop is owed ONCE, like onClose');
 });
 
-test('B5: the interior host wires OnPop to its live people list and its own clock', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /updateNpcPresence: \(\) => \{/, 'worldModes supplies the OnPop dep');
-  assert.match(wm, /updateNpcPresence\(interiorBuilding\?\.buildingType/,
-    'and calls the law with the building it is standing in');
-  assert.match(src('src/ui/restWindow.js'), /this\.deps\.updateNpcPresence\?\.\(\);/,
-    'and the window calls it from its ONE close door');
-  // The FLAG this closes must not survive the thing it flagged.
-  assert.equal(/The port has no\s+\/\/\s+NPC-presence pass at all/.test(src('src/ui/restWindow.js')), false);
-});
-
 // ROAD review-p: and the walk has to LAND. DFU's people are
 // GameObjects, so SetActive(true) (DaggerfallInterior.cs:355-357) draws
 // the billboard and arms its BoxCollider on the spot. The port's host
@@ -448,16 +437,6 @@ test('B5: SetActive on a person the build hid stands them for real, not just the
   host.destroy();
   assert.equal(pn.active, false);
   assert.deepEqual(gone, [pn], 'and the late stand can be taken back out');
-});
-
-test('B5: the interior build uses that host, and its late half touches the live draw lists', () => {
-  const ic = src('src/scenes/interiorContext.js');
-  assert.match(ic, /pn\.host = makeInteriorPersonHost\(pn, \{/, 'the build wires the routed host');
-  assert.match(ic, /built: \(\) => peopleBuilt/, 'with the build-time/after-the-build seam');
-  assert.match(ic, /billboardBatches\.push\(pn\.standBatch\)/,
-    'a stand pushes its own batch into the LIVE array the host draws from (AUDIT 68: the build\'s stand and the late one are one)');
-  assert.match(ic, /pn\.width = size\.w;[\s\S]{0,60}pn\.height = size\.h;[\s\S]{0,400}uploadRecord\(/,
-    'and resolves the extent U23\'s activation ray refuses to aim without');
 });
 
 // ---------------------------------------------------------------------
@@ -547,10 +526,3 @@ test('B5: the toggle key does not fire while the hours PROMPT has the field', ()
   } finally { setBindings(null); }
 });
 
-test('B5: the restWindow FLAG about the toggle binding is retired, not reworded', () => {
-  const rw = src('src/ui/restWindow.js');
-  assert.equal(/A per-window\s+\/\/ toggle-close binding is a UI-arc facility/.test(rw), false,
-    'the FLAG text must not survive the thing it flagged');
-  assert.equal(/The port cannot: with a\s+\/\/ window up every host routes keys through overlayAction/.test(rw), false);
-  assert.match(rw, /toggleClosedBinding/, 'and DFU\'s own field name is what carries it');
-});

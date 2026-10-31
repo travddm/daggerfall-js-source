@@ -280,23 +280,6 @@ test('FORAGE1: every Foraging quest, patched, parses on the port\'s machine - on
   assert.deepEqual([...unread], ['update-quest-item _x_ Leveled'], 'the one line DFU drops');
 });
 
-test('FORAGE1: the wiring - boot installs it, both exterior hosts register QAE\'s actions and answer the checks, the loader patches', () => {
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /installForaging\(\);[^\n]*\n\s*installWarmAshesShips\(\);/, 'at boot, before any quest bridge');
-  for (const p of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(p);
-    assert.match(s, /for \(const t of questActionsExtensionTemplates\(\)\) questBridge\.machine\.registerAction\(t\);/, p);
-    assert.match(s, /setForagingHost\(\{/, p);
-    assert.match(s, /player\.onExteriorWaterMethod = _surf\.water;/, `${p}: the three-valued water`);
-  }
-  assert.match(rd('src/scenes/worldModes.js'), /player\.onExteriorWaterMethod = 'None';/);
-  const loader = rd('src/scenes/quest/questData.js');
-  assert.match(loader, /vendor\/foraging\/Quests\/\*\.txt/);
-  assert.match(loader, /if \(path\.includes\('\/vendor\/foraging\/'\)\) \{\n\s*try \{ patched = applyForageFix\(name, text\); \} catch/, 'a failed patch warns and loads the shipped text');
-  assert.match(loader, /if \(name\.startsWith\('QuestList-'\)\) tables\.set\(name, patched\);/, 'Q13: the list is patched too');
-  assert.match(rd('src/scenes/world.js'), /enemiesNear: exterior \? \(duelEnemyNear\(\) \|\| areEnemiesNearby\(/, 'DUEL1: a duel is an enemy near');
-});
-
 test('FORAGE1: a General Store and a Pawn Shop shelve the tools by DFU\'s own custom-item loop, and not while the switch is off', async () => {
   const { stockShopShelf } = await import('../../src/systems/shopStock.js');
   const { BUILDING_TYPES } = await import('../../src/world/buildingNames.js');

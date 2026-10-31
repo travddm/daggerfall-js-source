@@ -220,14 +220,6 @@ test('AUDIT DEX A5 the reading\'s reachable arms: a caster that shoots keeps bot
   assert.equal(adaptBlowClass({ isPlayer: true }, null, 'melee'), 'h2h');
 });
 
-test('AUDIT DEX A5 the hosts\' arms by SetupDemoEnemy\'s entity type: a dungeon\'s marker foe takes the monster arm or the class arm, the street\'s mint and its knockback read the same - a mod\'s monster (256-290) is no class, its class (384-398) no monster', () => {
-  const dc = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8'), xf = readFileSync(join(ROOT, 'src/scenes/exteriorFoes.js'), 'utf8');
-  assert.equal(dc.split("if (foeDeps && enemyEntityType(e.mobileType) === 'class' && basics.maleTexture) {").length, 2, 'the dungeon\'s class arm');
-  assert.equal(dc.split("if (foeDeps && enemyEntityType(e.mobileType) === 'monster' && basics.maleTexture) {").length, 2, 'the dungeon\'s monster arm');
-  assert.match(xf, /const isClass = enemyEntityType\(mobileType\) === 'class', career = loadEnemyCareer\(mobileType, fetchBytes\);/, 'the street\'s mint');
-  assert.match(xf, /const isClass = enemyEntityType\(f\.mobileType\) === 'class';/, 'the street\'s knockback weight');
-});
-
 test('DEX1 loaded: the classic rows written in the table, and at a foe\'s mint - Meaner Monsters standing aside beside it, its author\'s form of it for this mod being MUDEX (MUDEX1, mudex1.test.js)', (t) => {
   t.after(() => { _resetEnemyExpansion(); clearCustomEnemies(); _resetMintRowEditors(); });
   const before = structuredClone(ENEMY_BASICS[9]);

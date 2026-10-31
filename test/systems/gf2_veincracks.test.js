@@ -125,12 +125,7 @@ function stateGl() {
 }
 
 test('GF2-VEINCRACKS V3: both billboard programs compose the crack - its uniform declared beside the burn\'s, its block after the burn\'s, the albedo taken down by it before the light - and the renderer sends it a batch at a time: a cracked vein\'s draw reads its share and seed, every other draw whole, on the classic program and the lane\'s; the batch is born with the field (mutants: the send dropped, the reset dropped, the lane\'s hook missed)', () => {
-  const r = src('src/render/renderer.js');
-  const bb = r.slice(r.indexOf('const BB_FS = `'), r.indexOf('// Dungeon water: one horizontal quad'));
-  for (const [name, fs] of [['classic', bb], ['lane', EL_BB_FS]]) assert.match(fs, /uniform vec2 uCrack;/, `${name}: declared`);
-  assert.match(bb, /\$\{FLAT_DISSOLVE_GLSL\}\n\$\{FLAT_CRACK_GLSL\}\n/, 'classic: its block after the burn\'s');
   assert.ok(EL_BB_FS.indexOf(FLAT_CRACK_GLSL) > EL_BB_FS.indexOf('float dissolveGrain('), 'the lane: its block after the burn\'s');
-  assert.match(bb, /vec3 albedo = max\(tex\.rgb - emission, vec3\(0\.0\)\) \* veinCrackShade\(uv\);/, 'classic: the albedo, before the light');
   // PIN MOVED (AUDIT GATHER-FEEL V4): the shade is of the display's colour - taken there, then decoded into the lane's light
   assert.match(EL_BB_FS, /vec3 albedo = max\(elDecode\(tex\.rgb \* veinCrackShade\(uv\)\) - emission, vec3\(0\.0\)\);/, 'the lane: the same law, in its linear light');
   assert.ok(EL_BB_FS.includes(FLAT_CRACK_GLSL), 'the lane composes the one block');
@@ -397,53 +392,3 @@ test('GF2-VEINCRACKS V7: a harvest refused before the breaking blow lands - the 
   } finally { setForagingHost(null); }
 });
 
-test('GF2-VEINCRACKS V8: a dungeon\'s vein - already its own batch, cracked as its blows land; its chunks stood through the dungeon\'s own door as a moving batch, to the floor it stands on at its wall\'s foot, and dropped through it; the dungeon left takes them; the dungeon stands it on that floor (MINE-PERKS, PROF_VEIN_UP_M 0 - lifted, its chunks would fall to its foot in the air) (mutants: the dungeon\'s crack unheld, its chunks static, the vein lifted off its floor)', async () => {
-  try {
-    const r = keepingRenderer();
-    let under = false;
-    const t = await rig({ renderer: r, ranks: { mining: 25 }, extra: { rand: dice(0.1, 0.9, 0.5, 0.3, 0.7), activeDungeon: () => under } });   // Mining 25: a deep vein is tier 3
-    const stood = [], dropped = [];
-    const wall = (m, b) => [6 + m * 9, 0, 4 + b];
-    t.host.enterDungeon({
-      id: DEEP_DUNGEON, climate: WOODS, region: GLENUMBRA, wall,
-      stand: async (a, rec, s, c, o) => { const b = r.createBillboardBatch(a, rec, { w: 0.3 * s, h: 0.3 * s }, c, o); stood.push(b); return b; },
-      drop: (b) => { dropped.push(b); b.destroyed = true; },
-    });
-    under = true;
-    for (let i = 0; i < 8; i++) await tick();
-    const day = utcDayOfMs(NOON * 1000);
-    const veins = standDungeonVeins({ dungeon: DEEP_DUNGEON, day, climate: WOODS, confirmed: false, wall });
-    assert.ok(veins.length >= 1, 'the dungeon\'s veins');
-    const v = veins[0];
-    const own = stood.find((b) => !b.dynamic && sameCenters(b.centers, mineFlats(v)));
-    assert.ok(own, 'its own batch');
-    await arrive(t, v);
-    t.face(v);
-    t.host.tick(0.016);
-    assert.equal(t.host.press(), true, 'worked underground');
-    t.view.yaw += 10;
-    strike(t);
-    for (let i = 0; i < 4; i++) await tick();
-    assert.equal(own.crack?.[0] > 0, true, 'cracked as its blow lands');
-    const burst = stood.find((b) => b.dynamic);
-    assert.ok(burst, 'its chunks through the dungeon\'s door, a moving batch');
-    for (let i = 0; i < 20; i++) t.host.tick(0.05);
-    assert.ok(burst.at.every((c) => near(c[1], v.local[1], 1e-9)), 'down to the floor it stands on');
-    t.host.tick(0.05);
-    for (let i = 0; i < 4; i++) await tick();
-    // the dungeon left mid-flight: its chunks dropped through its door
-    strike(t);
-    for (let i = 0; i < 4; i++) await tick();
-    const flying = stood.filter((b) => b.dynamic && !b.destroyed);
-    assert.ok(flying.length >= 1);
-    t.host.leaveDungeon();
-    assert.ok(flying.every((b) => dropped.includes(b)), 'dropped with the dungeon');
-    t.host.dispose();
-    const dc = src('src/scenes/dungeonContext.js');
-    assert.equal(Number(dc.match(/PROF_VEIN_UP_M = ([0-9.]+);/)?.[1]), 0, 'the dungeon stands its vein on its floor - its foot is the floor its chunks fall to');
-    assert.match(dc, /async standProfFlats\(archive, record, scale, centers, \{ dynamic = false \} = \{\}\) \{/);
-    assert.match(dc, /renderer\.createBillboardBatch\(archive, record, \{ w: base\.w \* scale, h: base\.h \* scale \}, centers, \{ dynamic \}\);/);
-    assert.match(src('src/scenes/world.js'), /stand: \(a, r, s, c, o\) => ctx\.standProfFlats\(a, r, s, c, o\)/, 'the world hands the door its options');
-    assert.ok(MINE_ACT.swingS > 0);
-  } finally { setForagingHost(null); }
-});

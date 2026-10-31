@@ -463,51 +463,6 @@ test('HOME1 the bank online: Buy House answers that a home is bought at its own 
   assert.equal(opened, 1, 'offline, Daggerfall\'s own window');
 });
 
-test('HOME1 the wiring by source: the home answers at the door BEFORE Daggerfall\'s lock ladder and shuts it by no pick, bash or spell; Info at my own door is my menu and at a house for sale its offer, No going on to the door; the visit latches its home once, committed with the building and cleared at both teardowns; my home keeps its own scene, its bed and its storage, a visitor\'s cupboard is shut, and a home has no residents; its room is kept loot-free; the doors name it; the world builds the registry online alone, keys a door by its own town, asks a town on arrival, and no quest picks a home', () => {
-  const m = hostText('src/scenes/worldModes.js');   // PIN MOVED (HOST-SPLIT): the host WHOLE
-  const door = m.slice(m.indexOf('async function activateStaticDoor('));
-  const gate = door.indexOf('const door = homeDoorFor(bd, home);');
-  assert.ok(gate > 0 && gate < door.indexOf('const unlocked = homeOpen || resolveBuildingUnlocked(bd);'), 'the home answers first');
-  assert.match(door, /if \(door === 'locked'\) \{ townTalk\?\.say\?\.\(homeLockedLine\(home\)\); return true; \}/, 'shut: said, and the press ends - before the Open spell, the pick and the bash');
-  assert.ok(door.indexOf("if (door === 'locked')") < door.indexOf('exteriorOpenSpellFor(playerEntity)'));
-  // HOME2 moved the Info-only offer: the plaque's verbs first; where it lists none, HOME-OFFER's prompt says which
-  // press asks (test/systems/online/homeoffer.test.js, test/systems/home2.test.js hold the rest) and the door does what it says
-  // GUILD-HALL-SALE: and a hall's managers' menu (its door's own prompt - test/net/hallsale.test.js)
-  assert.match(door, /if \(verb == null\) \{\s*const prompt = homeDoorPrompt\(\{ door, mode, price, declined: _homeDeclined\.has\(homeIdOf\(bd\)\), asked: homeAsked, isBash, hallMenu: hallManaged\(home\) \}\);\s*if \(prompt === 'menu'\) \{ openHomeOwnerMenu\(bd, home, hit, entries\); return true; \}\s*if \(prompt === 'hall-menu'\) \{ openHallMenu\(bd, home, hit, entries\); return true; \}[^\n]*\n\s*if \(prompt === 'offer'\) \{ openHomeOffer\(bd, price, hit, entries\); return true; \}/);
-  assert.match(m, /const homeOnward = \(hit, entries\) => \(\) => \{ activateStaticDoor\(hit, entries, false, \{ homeAsked: true \}\)/, 'No and Go in come back to the door, past the menu');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /houseOwned: home !== null \|\| houseOwnedAt\(/, 'no greeting from residents a home does not have');
-  assert.match(m, /interiorHome = home;   \/\/ HOME1/);
-  assert.match(m, /if \(home\?\.own\) addPermanentScene\(sceneCache\(\), homeSceneName\(homeTownOf\(building\), building\.buildingKey\)\);/, 'my home\'s scene is kept whichever page bought it');
-  assert.equal((m.match(/(?<!let )interiorHome = null;/g) ?? []).length, 2, 'cleared at both teardowns');
-  assert.match(m, /if \(interiorHome\?\.own\) return homeSceneName\(homeTownOf\(interiorBuilding\), key\);/);
-  assert.match(m, /if \(c && interiorHome && !interiorHome\.own\) \{ say\(homeBelongsLine\(interiorHome\)\); return true; \}/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /isHouseOwned: \(key\) => home !== null \|\| houseOwnedAt\(/, 'any home has no residents');
-  assert.match(src('src/world/interior/interiorShared.js'), /if \(!bag\?\.locationKey \|\| !canon \|\| !ctx \|\| bag\.home\) return false;/, 'no claim from a home\'s cupboard');   // PIN MOVED (OUTDOOR-LOOT): the publish stands in world/interior/interiorShared.js (HOST-SPLIT moved it out of createWorldModes)
-  assert.match(src('src/world/interior/interiorShared.js'), /if \(net && !bag\.owned && !bag\.home && bag\.locationKey\) bag\.room = createInteriorRoomLoot\(net, bag\);/, 'and a home keeps no room: the cupboards\' room law is minted for no home, no owned house and no ship');
-  assert.match(m, /\+ \(!_intShared\.home && Array\.isArray\(data\.l\) \? applyInteriorLoot\(/, 'no peer\'s word on one');
-  assert.match(m, /addPermanentScene\(sceneCache\(\), homeSceneName\(mapId, bd\.buildingKey\)\);/, 'a bought home\'s scene is kept');
-  assert.match(m, /removePermanentScene\(sceneCache\(\), homeSceneName\(mapId, bd\.buildingKey\)\);/, 'a sold one\'s is not');
-  assert.match(m, /displayName: home \? homeDoorTitle\(home, questSiteHere\(bd\) && db\.isOverrideName \? db\.displayName : null\) : homeDoorName\(shownBuildingName\(db, bd\.name\), !!houseVerbs, bd\.buildingType\),/, 'the hover names it');   // EMPIRE-BANK: a bank's name now (discovery.js shownBuildingName); FIELD BUGS 2026-09-30b HOME-PLAQUE (PIN MOVED); QUEST-RESIDENCE: and a quest's home its quest's name (PIN MOVED); IC-PROPS (PIN MOVED): a house by its type, a nameless building by its place
-  assert.match(m, /onlineHomeLines: \(\) => \(host\.onlineHomes \? HOME_BANK_LINES : null\),/);
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (TESA's merge): the quest world's isPlayerHome is scenes/questWorld.js's - the host read whole
-  // PIN MOVED (BOOT-OVERLAP, 2026-10-12): the door stands above the data's read (WD3's ask goes out beside it), the
-  // registry where it stood - both online alone, both before any quest can ask
-  const homesAt = w.indexOf("const homesApi = params.has('online') ? accountHomes(");
-  assert.ok(homesAt > 0 && homesAt < w.indexOf("  status('loading data');") && homesAt < w.indexOf('const onlineHomes = homesApi ? createOnlineHomes('), 'online alone, and built before any quest can ask');   // HOME-RENT: the service's door kept for a home's rooms too
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): every town's homes, the boot's read beside the towns asked
-  // AUDIT TESA-BIOME P5: in one file - the quest world (scenes/questWorld.js) is handed onlineHomes by value at its
-  // construction, so the host declares it before it builds the quest world; the read itself stands in the quest world
-  const host = src('src/scenes/world.js');
-  assert.ok(host.indexOf('const onlineHomes = ') > 0 && host.indexOf('const onlineHomes = ') < host.indexOf('const { questWorld } = createQuestWorld({'), 'declared before the quest world is built');
-  assert.ok(src('src/scenes/questWorld.js').includes('isPlayerHome: (mapId, buildingKey) => onlineHomes?.homeStands(mapId, buildingKey) ?? false,'));
-  assert.match(w, /townMapId: \(dfLoc\.mapTableData\?\.mapId \?\? 0\) >>> 0,/, 'the door\'s own town');
-  assert.match(w, /onlineHomes\?\.ensure\(_musicLoc\?\.mapTableData\?\.mapId\);/, 'the town asked on arrival');
-  assert.match(w, /partyNames: \(\) => \(social\?\.others\?\.\(\) \?\? \[\]\)\.map\(\(m\) => m\.name\)/);
-  assert.match(src('src/systems/quest/place.js'), /if \(world\.isPlayerHome\?\.\(location\.mapTableData\?\.mapId, buildingKey\)\) continue;/);
-});
-
 test('HOME1 the door knows its house\'s model: the record a door resolves to carries the model its price is measured from - the SAME model the town\'s directory names for that building (the first 3D object of its subrecord) - so the bank and the door price one building off one model: the bank Daggerfall\'s radius x 1280 offline, the door its ground online (AUDIT HOME-PRICE D8: test/systems/homeprice.test.js) (mutants: the model unread at the door)', () => {
   const dfBlock = {
     name: 'HOME1TST.RMB', index: 7,

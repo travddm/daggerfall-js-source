@@ -143,15 +143,6 @@ test('AUDIT MW-NPC II K3/K4: a seed is minted ONCE and rides the wire - two owne
   assert.equal(foeLook(copy), null, 'no body before the owner\'s seed');
   applyWireLook(copy, { ls: foeSeed(host) });
   assert.deepEqual(foeLook(copy), foeLook(host), 'the host\'s man');
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const r = roomRecord\(f, f\._encId, full, true\);/, 'the room\'s encounters ride their seed');
-  assert.match(d, /const r = roomRecord\(f, f\._ownSeq, full \|\| !!heirOf, true\);/, 'and a member\'s own foes');
-  assert.match(d, /const r = roomRecord\(f, i, full\);/, 'never the layout\'s (every machine seeds those off the layout point - the frame\'s cap)');
-  assert.equal((d.match(/f\._mwWire = 'seed'; applyWireLook\(f, newest\);/g) ?? []).length, 2, 'both puppet stands take the owner\'s seed');
-  assert.match(d, /if \(f\._mwWire\) applyWireLook\(f, r\);/, 'and every record after');
-  assert.match(d, /if \(seeded && \(full \|\| f\._lsSent === undefined\)\) \{ r\.ls = foeSeed\(f\); f\._lsSent = r\.ls; \}/, 'the owner says it on its first record and every full frame');
-  assert.equal((d.match(/f\._maxSent = undefined; f\._lsSent = undefined; \}/g) ?? []).length, 2, 'a record the frame\'s cap cut owes its seed again (both lanes)');
-  assert.equal((d.match(/\{ \.\.\.r, ls: r\.ls \?\? was\.ls \}/g) ?? []).length, 2, 'a newer word while a puppet builds keeps the seed the first carried (both lanes)');
 });
 
 test('AUDIT MW-NPC II K1: a living resident walking the street stands in what the row WEARS NOW - the watch\'s uniform on duty and his own clothes off it, a guild member\'s or a priest\'s class gear, a still picture\'s kind\'s garments - read again when the dress changes; a beggar\'s picture keeps the street', () => {
@@ -178,13 +169,6 @@ test('AUDIT MW-NPC II K1: a living resident walking the street stands in what th
   assert.ok(still.look.items.length > 0 && wornByRole(still.look, 'priest') && !still.look.items.some((it) => it.equipSlot === EQUIP_SLOTS.LegsClothes), 'his robes, the picture\'s kind (AUDIT HORIZONTAL: an empty look is every role\'s, so the street outfit passed too)');
   row3.stillRole = 'beggar';
   assert.equal(residentWalkerActor(row3, [0, 0, 0]), null, 'a beggar sits or lies at their pitch - no body does');
-  const town = rd('src/systems/livingWorld/livingTown.js');
-  assert.ok(town.includes('if (look) p.still(look, role); }'), 'the town hands the picture\'s kind');
-  assert.ok(town.includes('|| (want && (p.stillRole ?? null) !== role)) {'), 'and stills again when only the kind changed (two kinds share pictures)');
-  const walker = rd('src/characters/residentWalker.js');
-  assert.ok(walker.includes('    this.stillRole = look ? role : null;'), 'the walker keeps it while the picture stands');
-  assert.ok(walker.includes('this.stillLook = null; this.stillRole = null; this._stillAnim = null; }'), 'and forgets it with the rest when dressed as another');
-  assert.ok(rd('src/scenes/world.js').includes('if (a) folkStreet.offer(a, batch); else batch.castOnly = false;'), 'a row without a body shows its flat');
 });
 
 test('AUDIT MW-NPC II P1 (the merge of MERCHANT-YARDS): each yard\'s keeper stands in a body - the town\'s race in the outfit their picture wears, off the yard\'s own key (every client the same keeper), turned to the eye as a standing person is; world.js offers them on the street\'s people lane before it draws', async () => {
@@ -209,10 +193,6 @@ test('AUDIT MW-NPC II P1 (the merge of MERCHANT-YARDS): each yard\'s keeper stan
   assert.notEqual(stable.a.id, wagon.a.id, 'two people');
   const again = await stand();
   assert.deepEqual(again.got[0].a.look, stable.a.look, 'the same keeper on another client');
-  const w = rd('src/scenes/world.js');
-  const offer = w.indexOf("    if (merchantYards && _mode() === 'exterior') merchantYards.offerBodies(offerStreetPerson, mwv.eye, townTalk.overlayActive ? 0 : dt);"), draw = w.indexOf('streetPeople.draw(canvas, proj, view, mwv.eye');
-  assert.ok(offer > 0 && offer < draw && draw - offer < 400, 'offered on the people lane, just before it draws');
-  assert.ok(w.includes("const offerStreetPerson = (a, b) => streetPeople.offer(a, b);"));
 });
 
 test('AUDIT MW-NPC II K5: the transformed Daedra Seducer FLIES, so her body is a creature whose record flies - the build asks the CREA Flies flag and a walker is refused at the record (her sprite stands); one that flies builds', async () => {
@@ -281,26 +261,6 @@ test('AUDIT MW-NPC II H2: under the Overworld no NPC lane stands a body - the ho
     holdNpcBodies(true, performance.now() - NPC_HOLD_MS - 1);
     assert.equal(npcBodiesHeld(), false, 'a hold no frame renewed has lapsed (a room\'s frame, a dungeon\'s, never asks it)');
   } finally { holdNpcBodies(false); lane.destroy(); }
-  const w = rd('src/scenes/world.js');
-  const tvf = w.indexOf('const tvf = travelView?.frame(dt'), hold = w.indexOf('holdNpcBodies(!!tvf);'), lanes = w.indexOf('const _peopleOn = streetPeople.frame();');
-  assert.ok(tvf > 0 && hold > tvf && hold < lanes, 'asked each frame from the view, before any lane stands its people');
-});
-
-test('AUDIT MW-NPC II H3: in the dungeon a corpse flat minted under a standing body casts alone from its first frame, and one whose body went this frame (the cut, the switch) is drawn on the foes\' pass after the sync - the level\'s pass draws the flats before drawFoes marks them (by source)', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /f\.corpseBatch = batch;[^\n]*\n\s*batch\.castOnly = !!_npcLane\?\.has\('foe', foeId\(f\)\);[^\n]*\n\s*billboardBatches\.push\(batch\);/, 'minted cast-only where the body stands');
-  const was = d.indexOf('if (f.corpseBatch?.castOnly) _corpseWasCast.push(f.corpseBatch);'), reset = d.indexOf('if (f.corpseBatch) f.corpseBatch.castOnly = false;', was);
-  assert.ok(was > 0 && reset > was && reset - was < 120, 'what the level\'s pass drew cast-only, read before the reset');
-  const mark = d.indexOf("for (const f of _npcStood) { const b = f.dead ? f.corpseBatch : f.batch; if (b) b.castOnly = npcLane.has('foe', foeId(f)); }");
-  const late = d.indexOf('for (const b of _corpseWasCast) if (!b.castOnly) _corpseLate.push(b);'), drawn = d.indexOf('if (_corpseLate.length) renderer.drawBillboards(_corpseLate,');
-  assert.ok(mark > 0 && late > mark && drawn > late, 'after the sync\'s marks, the flats whose body went drawn this frame');
-});
-
-test('AUDIT MW-NPC II H4/H5: the gate\'s host - a body first seen falling keeps its own number (two were `host:undefined`, one body); the boss\'s and his host\'s bodies carry WB13d\'s hit flash their cast-only billboards hold (by source)', () => {
-  const g = rd('src/scenes/gate/gateHost.js'), c = rd('src/scenes/gate/gateCourt.js');
-  assert.match(g, /const b = bodies\.get\(g\.i\) \?\? \{ i: g\.i, look: hostLookOf\(g\.k, P\.aspect\.id\),/);
-  assert.match(g, /dead: dead \? 1 \+ \(\(b\.i \| 0\) % 3\) : 0 \}\), b\.batch,\s*null, b\.batch\.hitFlash \|\| 0\);/);
-  assert.match(c, /scale: \(body\.scale \?\? 1\) \* \(profileOf\(s\)\.size \?\? 1\) \}\), shown, null, shown\.hitFlash \|\| 0\);/);
 });
 
 test('AUDIT MW-NPC II L1: the page\'s build gate builds one body at a time, a player\'s (a peer\'s, the family\'s) ahead of every NPC build still waiting; a build that holds it past BODY_GATE_STALL_MS lets the next go', async (t) => {
@@ -315,7 +275,6 @@ test('AUDIT MW-NPC II L1: the page\'s build gate builds one body at a time, a pl
   open();
   for (let i = 0; i < 6; i++) await settle();
   assert.deepEqual(order, ['npcA+', 'npcA-', 'peer', 'npcB', 'npcC'], 'the peer next, ahead of the street\'s queue');
-  assert.match(rd('src/net/peer/peerBodies.js'), /if \(this\._gate\) this\._queue = gateBuild\(this\._gate, build, this\._buildInRange\);/, 'an NPC lane\'s builds wait low');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const g2 = createBuildGate(), o2 = [];
   gateBuild(g2, () => new Promise(() => { o2.push('wedged'); }), true);

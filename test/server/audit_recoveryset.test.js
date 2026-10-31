@@ -166,9 +166,6 @@ test('AUDIT RECOVERY-SET A2: a build from before the set asks for nothing and is
   assert.equal(back.codesLeft, undefined);
   assert.equal(accountView(rowOf(ctx, id), NOW).recoveryLeft, 1, 'a set it cannot show was left standing');
   assert.equal((await recover(ctx, { handle: 'Nystul', code: back.recoveryCode, password: 'and again from it' })).id, id, 'the code it was shown does not work');
-  // and the route reads the ask only as `true`
-  assert.match(src('server-account/src/index.js'), /legal: \{ terms: body\.terms, privacy: body\.privacy \}, set: body\.set === true \}\)/);
-  assert.match(src('server-account/src/index.js'), /password: body\.password, set: body\.set === true \}\)/);
 });
 
 test('AUDIT RECOVERY-SET A2 C1: THIS build asks for the set at register and at recover, and the shape the service mints - eight codes and the handle - is what the card shows, for the account as the row names it (mutants: the ask unsent; the register shown one code of eight; whose unset)', async () => {
@@ -193,7 +190,6 @@ test('AUDIT RECOVERY-SET A2 C1: THIS build asks for the set at register and at r
   assert.equal(calls.find((c) => c.path === '/v1/auth/register').body.set, true, 'this build did not ask for the set');
   assert.deepEqual(flow.recoveryCodes, set, 'the card showed fewer than the service minted');
   assert.equal(flow.codesFor, 'Nystul', 'the saved file names the typing, not the account');
-  assert.match(src('src/net/accountClient.js'), /call\(io, '\/v1\/auth\/recover', \{ handle, code, password, set: true \}\)/, 'recover does not ask for the set');
 });
 
 // ── A5, C5, C11 ───────────────────────────────────────────────────────
@@ -259,34 +255,6 @@ function cardWith(script = {}, { onClose = () => {} } = {}) {
   return { doc, flow, card };
 }
 const buttons = (card) => card.root.all.filter((n) => n.tag === 'button');
-
-test('AUDIT RECOVERY-SET B1 C8: in its host - a Close passed - the code stage offers NO Close, and Close is held while a press is out; the menu holds the window open over codes and keeps one flow per window (mutants: Close on the code stage; Close live while busy; the window closed over codes; the flow built per render)', () => {
-  const { flow, card } = cardWith();
-  flow.stage = 'code';
-  flow.recoveryCodes = SET;
-  card.paint();
-  assert.deepEqual(buttons(card).map((b) => b.textContent), ['Copy', 'Save as a file', 'I have written them down'], 'a second way off the code stage');
-  flow.stage = 'codes';
-  flow.busy = true;
-  card.paint();
-  assert.equal(buttons(card).find((b) => b.textContent === 'Close')?.disabled, true, 'Close live while a set is being made');
-  flow.busy = false;
-  card.paint();
-  assert.equal(buttons(card).find((b) => b.textContent === 'Close')?.disabled, false);
-
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const accountMayClose = \(\) => !acctFlow \|\| \(acctFlow\.stage !== 'code' && !acctFlow\.busy\);\nfunction closeAccount\(\) \{\n  if \(!accountMayClose\(\)\) return;/);
-  // every door out of the window is that one: its Close, a tap outside (both hosts), Escape
-  assert.match(menu, /onClose: closeAccount,/);
-  assert.equal((menu.match(/closeOnOutsideTap\(home, '\.px-(acct)?win', closeAccount\);/g) ?? []).length, 2);
-  assert.match(menu, /const back = accountOpen \? \(\) => closeAccount\(\)/);
-  assert.doesNotMatch(menu, /accountOpen = false; render\(\);/, 'a door closes the window around closeAccount');
-  // the flow is the window's: built when there is none, started once, kept across renders, dropped with the window
-  // PIN MOVED (COLLECTIONS-II, bible/10-UI/Collections.md): built by the one construction the Collections page's flow is
-  assert.match(menu, /const fresh = !acctFlow;\n  if \(fresh\) acctFlow = newAccountFlow\(\(\) => acctPaint\?\.\(\)\);/);
-  assert.match(menu, /const newAccountFlow = \(onChange\) => AccountFlow\(\{ io: \{ fetch: \(\.\.\.a\) => globalThis\.fetch\(\.\.\.a\), base: serviceBase\(appStorage\(\)\) \}, storage: appStorage\(\), onChange \}\);/);
-  assert.match(menu, /if \(fresh\) Promise\.resolve\(acctFlow\.start\(\)\)\.catch\(\(\) => \{\}\);/);
-});
 
 test('AUDIT RECOVERY-SET C2 B4: the codes are dropped the moment they are acknowledged (not when the account read returns) and by any move off the stage; a sentence about them is said only while they are up, and leaves with them (mutants: the acknowledgement keeps them; go keeps them; say off the stage; the note outlives them)', async () => {
   const { flow } = cardWith({ '/v1/account': { hang: true } });

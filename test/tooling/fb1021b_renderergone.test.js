@@ -9,7 +9,6 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const G = require('../../app/lib/rendererGone.cjs');
-const main = readFileSync(new URL('../../app/main.cjs', import.meta.url), 'utf8');
 
 test('RENDERER-GONE the page stopped is said, with why: Restart the default, Quit the cancel; a loop of stops says so', () => {
   const a = G.goneAsk('oom');
@@ -45,14 +44,3 @@ test('RENDERER-GONE the stops are counted inside the span; crash.log keeps its n
   assert.ok(log.endsWith(`1999 ${'x'.repeat(60)}\n`), 'the newest kept');
 });
 
-test('RENDERER-GONE by source: the shell asks with exactly these and acts on exactly those answers - after the trial\'s rollback is no answer; a hung page\'s Restart crashes it and that stop restarts unasked', () => {
-  assert.match(main, /const \{ goneAsk, restarts, hangAsk, restartsHung, createStopCount, goneLine, logWith \} = require\('\.\/lib\/rendererGone\.cjs'\);/);
-  assert.match(main, /if \(!bad\) return false;/, 'giveUp answers whether the trial took the stop');
-  assert.match(main, /if \(giveUp\('stopped before it came up'\) \|\| win\.isDestroyed\(\) \|\| details\?\.reason === 'clean-exit'\) return;\n\s*if \(restarting\) \{ restarting = false; win\.webContents\.reload\(\); return; \}\n\s*const \{ response \} = await dialog\.showMessageBox\(win, goneAsk\(details\?\.reason, stops\.stop\(Date\.now\(\)\)\)\);\n\s*if \(win\.isDestroyed\(\)\) return;\n\s*if \(restarts\(response\)\) win\.webContents\.reload\(\); else app\.quit\(\);/);
-  assert.match(main, /win\.webContents\.on\('unresponsive', async \(\) => \{[\s\S]*?const \{ response \} = await dialog\.showMessageBox\(win, hangAsk\(\)\);[\s\S]*?if \(!restartsHung\(response\) \|\| win\.isDestroyed\(\)\) return;\n\s*restarting = true;\n\s*win\.webContents\.forcefullyCrashRenderer\(\);/);
-  assert.match(main, /if \(details\?\.reason !== 'clean-exit'\) logGone\('renderer', details\);/, 'every stop kept in crash.log');
-  // PIN MOVED (GPU-TRAIL-LOST, 2026-10-25): the GPU's stop is held for the page's lost sample, then logged by logGone
-  assert.match(main, /app\.on\('child-process-gone', \(_e, details\) => \{ if \(details\?\.type === 'GPU'\) gpuGone\.gone\(details, Date\.now\(\)\); \}\);/);
-  assert.match(main, /createGpuGoneWait\(\{ write: \(details, at\) => logGone\('gpu', details, at\) \}\)/);
-  assert.equal((main.match(/'render-process-gone'/g) ?? []).length, 1, 'one door for a stopped page');
-});

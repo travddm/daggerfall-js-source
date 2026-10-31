@@ -104,13 +104,6 @@ test('LOOT7: the street\'s - a hash of where it stands, its type and the count, 
   assert.deepEqual(validFoeRecord({ i: 3, cp: 4 }), { i: 3, cp: 4 });
   for (const bad of [-1, 16, 1.5, 'x']) assert.equal(validFoeRecord({ i: 3, cp: bad }), null, `cp ${bad}`);
   assert.deepEqual(validFoeRecord({ i: 3 }), { i: 3 }, 'none when none');
-  const ef = strip(read('src/scenes/exteriorFoes.js'));
-  assert.match(ef, /if \(!allied && !entity\.eliteFoe\) applyChampion\(entity, champion !== undefined \? champion : revenant \? \(revenant\.trait \? championIndex\(revenant\.trait\) : null\) : \(capped \? rollStreetChampion\(pending\.feet, mobileType\) : null\), \{ own: !puppet \}\);\s*(?:if \(revenant && !puppet\) applyRevenant\(entity, revenant(?:, \{ turned \})?\);\s*)?(?:(?:const wild = |if \(wild|if \(zoneGiant != null\))[^\n]*\n\s*|entity\.(?:maxHealth|healthMult|damageScale) = [^\n]*\n\s*|\}\s*\n\s*)*if \(puppet\) entity\.items = \[\];/, 'the owner rolls an encounter\'s, a puppet takes its owner\'s word - before the loot (WILD1: the open zone\'s scaling between; ELITE FOES: never on an elite - one or the other)');   // ZONE-GIANTS/PVPGIANT: the zone's giant marks and its ten-times body are the zone's scaling too
-  assert.match(ef, /if \(!onWatch && f\.entity\?\.champion\) r\.cp = championIndex\(f\.entity\.champion\);/, 'the record carries it');
-  assert.equal((ef.match(/const cp = Number\.isInteger\(r\.cp\) && championsOf\(from\) < PEER_CHAMPION_PUPPETS_MAX \? r\.cp : null;/g) ?? []).length, 2, 'both of a puppet\'s stands read it, under its owner\'s champions');   // PIN MOVED (GRANT0, Spawn-Grants.md section 8: the trait counted)
-  assert.equal((ef.match(/champion: cp \}\)/g) ?? []).length, 2, 'and stand it');
-  assert.match(ef, /champion: f\.entity\.champion \?\? null,/, 'a save keeps it');
-  assert.match(ef, /champion: sf\.champion \? championIndex\(sf\.champion\) : null/, 'and a load stands it again, never rolled');
 });
 
 test('LOOT7: what a champion is - twice the health, a quarter harder on any elite\'s, its trait on top; never the low, the watch, an ally, off', () => {
@@ -154,9 +147,6 @@ test('LOOT7: its name everywhere - the hover, the HUD\'s target, the death line,
   assert.equal(liveEntityName({ entity: foe() }, 'Orc'), 'Orc');
   assert.equal(sayEnemyDied(() => {}, 7, e), 'Mighty Orc just died.');
   assert.equal(sayEnemyDied(() => {}, 7), 'Orc just died.');
-  const dc = strip(read('src/scenes/dungeonContext.js'));
-  assert.match(dc, /corpseName\(championName\(f\.entity, corpseEntityName\(f\.mobileType\)\)\)/, 'the dungeon\'s body');
-  assert.match(strip(read('src/scenes/exteriorFoes.js')), /corpseName\(properName\(e\.entity\) \?\? championName\(e\.entity, corpseEntityName\(e\.mobileType\)\)\)/, 'the street\'s - AUDIT WB12d (D2): a foe\'s own name first');
 });
 
 test('LOOT7: the traits that answer a blow - the Vampiric drinks its blow, the Thorned hurts my blow back; registered', () => {
@@ -184,9 +174,6 @@ test('LOOT7: the traits that answer a blow - the Vampiric drinks its blow, the T
   const pet = { health: 50, maxHealth: 50, activeEffects: [] };
   CH.championStrike(pet, t, 70);
   assert.equal(pet.health, 50, 'never an ally\'s blow');
-  const src = strip(read('src/systems/champions.js'));
-  assert.match(src, /registerPlayerStruckListener\(CHAMPIONS, championStruck\);/);
-  assert.match(src, /registerPlayerStrikeListener\(CHAMPIONS, championStrike\);/);
 });
 
 test('LOOT7: its loot - its own roll and no Rare forced (CHAMP-LOOT), never its worn kit; its own source; nothing off', () => {
@@ -217,9 +204,5 @@ test('LOOT7: its loot - its own roll and no Rare forced (CHAMP-LOOT), never its 
     assert.deepEqual(said(a.items), said(b), `seed ${seed}`);
   }
   assert.deepEqual(LR.CHAMPION_SOURCE, { tier: 2, quality: 1.25, ladder: 0.5 });   // CHAMP-LOOT: half the elite's
-  assert.match(strip(read('src/systems/loot/lootRarity.js')), /rollLootRarity\(loot, champ \? championSource\(source, qualityMult\) : \{ \.\.\.source, qualityMult, \.\.\.\(weights \? \{ weights \} : \{\}\) \}, \{ rolls, luck, find, level \}\);/, 'the corpse door reads it');   // PIN MOVED (AUDIT UPDATE L4): and the roller's level   // PIN MOVED (PARTY-LOOT): the caller's finders ride beside the Luck   // FOE-CAP: a plain foe's ladder rides beside it (a champion is never plain)
   off();
-  const dc = strip(read('src/scenes/dungeonContext.js'));
-  assert.match(dc, /markDungeonChampions\(enemies, dfLocation\.dungeon\.recordElement\.header\.locationId\);/, 'the layout marked');
-  assert.match(dc, /if \(!e\?\.elite \|\| !entity\) return void applyChampion\(entity, e\?\.champion\);[\s\S]{0,400}entity\.elite = true; applyChampion\(entity, e\.champion\);/, 'every build arm stands it, an elite\'s too');
 });

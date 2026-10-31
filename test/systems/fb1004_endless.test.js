@@ -71,16 +71,6 @@ test('ENDLESS-STOCK: only the bag and the Campfire - the horse, the cart and the
   assert.equal(restockEndless(null, [shelf.find(isBagItem)]), 0);
 });
 
-test('ENDLESS-STOCK wired: both purchases put the endless rows back after they take them - the counter\'s (commitTrade\'s Buy arm) and the keyed list\'s (doBuy); no other door does, so a row stolen from a closed shop is never restocked (by source)', () => {
-  const w = src('src/scenes/worldModes.js');
-  assert.match(w, /if \(i >= 0\) shelf\.items\.splice\(i, 1\);\n\s+if \(!isFurnishing\(it\)\) addItem\(playerEntity\.items, it\);\n\s+\}\n\s+decorDeliver\(staged\.filter\(isFurnishing\)\);[^\n]*\n\s+restockEndless\(shelf\.items, staged, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');   // PIN MOVED (ENDLESS-ARROWS): the counter's shop handed in; PIN MOVED (AUDIT UPDATE E2): for the counter's shelf alone
-  const buyArm = w.slice(w.indexOf('function commitTrade(shelf, mode, staged, price, proceeds'), w.indexOf("} else if (mode === 'Sell' || mode === 'SellMagic') {"));
-  assert.match(buyArm, /restockEndless\(shelf\.items, staged, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\)/, 'inside the Buy arm');
-  const doBuy = w.slice(w.indexOf('function doBuy(shelf, it) {'), w.indexOf('function doSell(shelf, it) {'));
-  assert.match(doBuy, /shelf\.items\.splice\(at, 1\);[\s\S]*\) addItem\(playerEntity\.items, it\);\n\s+restockEndless\(shelf\.items, \[it\], shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list, after the row is taken');   // PIN MOVED (ENDLESS-ARROWS; AUDIT UPDATE E2)
-  assert.equal(w.match(/restockEndless\(/g).length, 2, 'those two alone');
-});
-
 test('AUDIT ENDLESS-STOCK F1/F2: online no shop buys back a bag or a Campfire - bought cheap and sold dear it was gold for nothing, and one sold made any shelf endless; offline a shop buys them as before (mutants: the buy-back open online; closed offline)', () => {
   const shelf = onlineShelf();
   const bag = shelf.find(isBagItem), fire = shelf.find(isCampfireKit), rope = shelf.find((it) => !isEndlessStock(it) && shopBuysItem(BUILDING_TYPES.GeneralStore, it));

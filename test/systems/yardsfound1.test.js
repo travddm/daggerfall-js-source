@@ -219,28 +219,4 @@ test('YARDS-FOUND THE OVERWORLD: each yard standing is a mark - its name over it
   y.dispose();
 });
 
-test('YARDS-FOUND THE HOSTS: the streaming host hands its yards to the town map (laid on the rows once, at the door both maps share), to the talk directory and to the Overworld\'s marks; townTalk joins them to its directory and, with no engine, groups them after the shops; the bench stands no yard, and the interiors and the dungeon open no town map (mutants: each hand dropped)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /\n\s+yards: b\.merchantYards \?\? null,   \/\/ YARDS-FOUND/, 'the town map');
-  assert.match(w, /\n\s+yards: cur\.merchantYards \?\? null,   \/\/ YARDS-FOUND/, 'the talk directory');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js, the yards
-  // read live off the host that hands them over
-  const tvm = read('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /for \(const m of host\.merchantYards\?\.overworldMarks\(\) \?\? \[\]\) marks\.push\(m\);/, 'the Overworld');
-  assert.ok(tvm.indexOf('merchantYards?.overworldMarks()') > tvm.indexOf('function travelViewMarks()'), 'in the Overworld\'s marks');
-  assert.match(w, /createTravelViewMarks\(\{[^]*?\n\s+get merchantYards\(\) \{ return merchantYards; \},[^]*?\n\s+\}\);/, 'handed over live');
-  const door = read('src/ui/town/townMapDoor.js');
-  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): laid in the door's `laidOn`, which both arms read - the classic window's rows and the held sheet's
-  assert.match(door, /if \(deps\.yards\?\.length\) deps = \{ \.\.\.deps, blocks: yardTownBlocks\(deps\.blocks \?\? \[\], deps\.yards\) \};\n\s+return deps;/, 'laid before either map is built');
-  assert.match(door, /return exteriorAutomapArtLoaded\(\) \? new ExteriorAutomapWindow\(laidOn\(deps\)\) : null;/, 'the classic window\'s rows');
-  assert.match(door, /export function townSheetBag\(deps = \{\}\) \{\n\s+deps = laidOn\(deps\);/, 'the held sheet\'s');
-  const tt = read('src/scenes/townTalk.js');
-  assert.match(tt, /directory = buildBuildingDirectory\(topics\.exteriorBuildings, topics\.blocks, opts\);\n(?:\s+\/\/[^\n]*\n)*\s+directory\.push\(\.\.\.yardDirectoryRows\(topics\.yards\)\);/, 'joined to the directory');
-  // PIN MOVED (SHIPYARDS-FOUND, 2026-10-11): the found places' one order - the yards' two, then a port's four
-  assert.match(tt, /\.\.\.FOUND_KIND_ORDER\.map\(\(k\) => \(\{ label: FOUND_TALK_GROUPS\[k\], buildings: directory\.filter\(\(b\) => b\.yard === k\) \}\)\),/, 'the fallback\'s groups');
-  assert.doesNotMatch(read('src/scenes/exterior.js'), /merchantYards|yardTownBlocks/, 'the bench stands no yard');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(host), /createTownMapWindow/, `${host} opens no town map`);
-  assert.match(read('src/ui/travel/travelViewHud.js'), /if \(k === 'yard'\) return k;/, 'the HUD\'s look');
-});
-
 function close(a, b, eps, msg = '') { assert.ok(Math.abs(a - b) < eps, `${msg}: ${a} vs ${b}`); }

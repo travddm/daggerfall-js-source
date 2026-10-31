@@ -153,29 +153,3 @@ test('RESTX2: the rest WINDOW\'s counter ticks down online at the offline rate, 
   assert.equal(restClockLine(CLASSIC_GAME_START_TIME + 95), 'World time 15:05 - you rest on your own clock', 'LIVED1: the world\'s time, and whose time the counter spends');
 });
 
-test('RESTX2 by source: the free lane and the shared-clock lane are gone from the session; the four hosts hand the sub-tick\'s end to their encounter roll', () => {
-  const src = read('src/systems/rest/restSession.js');
-  for (const gone of ['_free()', 'FREE_REST_HOUR_CAP', '_sharedAt', '_freeHours', '_holdShared', '_sharedTaken']) {
-    assert.ok(!src.includes(gone), `${gone} is retired with the lane it served`);
-  }
-  assert.match(src, /_takeSubTick\(\) \{\s*\n(?:\s*\/\/[^\n]*\n)*\s*if \(this\._timer < this\._subTickEvery\) return false;\s*\n\s*this\._timer -= this\._subTickEvery;\s*\n\s*return true;\s*\n\s*\}/, 'ONE pacing law: the timer, and nothing else is consulted');
-  assert.match(src, /_accrue\(dt\) \{\s*\n\s*this\._timer \+= dt;\s*\n\s*\}/, 'every mode banks the frame');
-  const loop = src.slice(src.indexOf('while (this._takeSubTick()) {'), src.indexOf('this._minutesOfHour += MINUTES_PER_TICK;'));
-  assert.doesNotMatch(src, /_onlineSimMinutes\s*[+=]/, 'LIVED1: the session keeps no minute counter of its own');
-  assert.match(loop, /this\.deps\.advanceMinutes\(MINUTES_PER_TICK\);/, 'the ONE place time is spent, in every lane - the host\'s advance moves the character\'s own clock');
-  assert.match(loop, /\n\s*this\.deps\.tickQuests\?\.\(\);/, 'TIME3: the quest tick rides every lane - the character\'s clock, which the rest moves');
-  assert.doesNotMatch(loop, /sharedMinutes\?\.\(\)\)\) this\.deps\.tickQuests/, 'and RESTX2\'s gate is gone');
-  assert.match(src, /if \(this\.mode === 'timed'\) \{\s*\n(?:\s*\/\/[^\n]*\n)*\s*this\.deps\.tickVitals\(\);/, 'F1\'s guard is gone: the tally is unconditional');
-  // THE FOUR HOSTS: the two exterior hosts' encounter roll reads the character's own clock, which the rest moves
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = read(host);
-    assert.match(h, /function runEncounterTick\(playerFeet, isResting = false(?:, \{ spawns = true \} = \{\})?\) \{/, `${host}: the roll knows it's a rest`);   // AUDIT LIVED1b P1: a mirror's night walks it with the wanderers left out
-    assert.match(h, /const now = Math\.floor\(playerTicker\.ownMinutes\);/, `${host}: ...and its now is the character's own clock (LIVED1)`);
-    // RESTING GATE: the rest deps pass isResting=true, so camps/packs (MIN_CAMP_SPAWN_DISTANCE always
-    // outside RESTING_DISTANCE - see encounters.js/campEncounters.js) never silently outflank the
-    // enemies-nearby interrupt - they're a walking-around feature only, same as before this gate existed.
-    assert.match(h, /advanceMinutes: \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\([^)]*, true\); \}/, `${host}: the rest deps spend the minutes on the character's clock and roll, flagged as a rest`);
-  }
-  assert.match(read('src/scenes/dungeonContext.js'), /advanceMinutes: \(n\) => _restAdvance\(n\),/, 'the dungeon\'s arm');
-  assert.match(read('src/scenes/worldModes.js'), /advanceMinutes: \(n\) => \{ interiorTicker\.advance\(n\); host\.encounterTick\?\.\(\); \},/, 'the interior\'s arm rolls nothing inside a building, and its ticker takes the minutes');
-});

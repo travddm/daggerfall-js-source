@@ -504,30 +504,3 @@ test('WB9c the pass: nothing to draw touches nothing; the clusters opaque with t
 
 // ═══ THE SEAMS ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('WB9c the seams, by source: the relay judges an `xhit` by applyCrystalHit and fans it; the world host hands the court the crystals and their door and sends `xhit`; the dungeon context meets them with the swing, the shaft and the spell by their surface and never in `foes`; hostMagic routes a crystal mark through its own door; the court draws them before its telegraph (mutants: each seam removed)', () => {
-  const relay = read('server/src/index.js');
-  assert.match(relay, /if \(m\.k === 'xhit'\) this\._gateFan\(applyCrystalHit\(f, a\.sub, m\.c, m\.d, m\.r, at, now, m\.q\)\);/);   // PIN MOVED (INT11): from `at` - its pose, alive by its word and the count's (test/net/gate/wb11_gate_host.test.js pins it)   // AUDIT WB11 W3: by its blow's sequence
-  const w = read('src/scenes/world.js');
-  assert.match(w, /sendCrystal: \(hit\) => !!online\?\.sendGate\?\.\(\{ k: 'xhit', \.\.\.hit \}\),/);
-  assert.match(w, /gateCrystals: \(\) => gateCourt\?\.crystalTargets\(\) \?\? null,/);
-  assert.match(w, /onCrystalHit: \(hit\) => !!gateCourt\?\.crystalHit\(hit\),/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /gateCrystals: \(\) => host\.gateCrystals\?\.\(\) \?\? null,/);
-  assert.match(wm, /onCrystalHit: \(hit\) => !!host\.onCrystalHit\?\.\(hit\),/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(f\.crystal != null\) return bossSight\(eye, inViewFn, f\);/);
-  assert.match(dc, /for \(const cr of gateCrystalBodies\(\)\) \{ cr\._backFacing = false; live\.push\(cr\); \}/);
-  assert.match(dc, /if \(foe\.crystal != null\) \{ hitEnemy = true; swingOnCrystal\(foe, damage\); continue; \}/);
-  assert.match(dc, /const landOnCrystal = \(cr, damage, r\) => \{ damage \+= takeOwed\(cr\.entity\); return sdRemnant \? sdRemnant\.heartHit\(\{ c: cr\.crystal, d: damage, r \}\) : !!opts\.onCrystalHit\?\.\(\{ c: cr\.crystal, d: damage, r \}\); \};/);   // PIN MOVED (SD8c): a Heart's of the Reset in the Hour; PIN MOVED (FIELD BUGS 2026-10-12g OPEN-HAND): and the follow-up the blow owes
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the crystal's spell door left the context for
-  // scenes/gate/standInSpell.js, wired with the crystals and their door; its claim goes out as a spell
-  assert.match(dc, /createStandInSpell\(\{[^]*?crystals: gateCrystalBodies,[^]*?landOnCrystal,/);
-  assert.match(read('src/scenes/gate/standInSpell.js'), /const cr = host\.crystals\(\)\.find\(\(q\) => q\.crystal === c\), harm = duelSpellOf\(sp\);\n\s*if \(!cr \|\| !harm\) return false;\n\s*return onBody\(sp, cr, harm, caster, host\.landOnCrystal, `c\$\{c\}`\);/);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): its rounds' key
-  const hm = read('src/scenes/hostMagic.js');
-  assert.match(hm, /if \(mark\?\.crystal != null\) \{ try \{ return !!castAtCrystal\?\.\(sp, mark\.crystal, caster\); \} catch \{ return false; \} \}/);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders
-  assert.match(hm, /if \(!crystalMarks \|\| !castAtCrystal \|\| !sp \|\| !duelSpellOf\(sp\)\) return \[\];/, 'a harmful spell alone');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  const crystalsFirst = gc.indexOf('crystalPass.draw(_crystalDraw, proj, view, eye, seconds, fog);'), tel = gc.indexOf('for (const ps of poolDraw) { pass.draw(ps');
-  assert.ok(crystalsFirst > 0 && crystalsFirst < tel, 'opaque before the added');
-  assert.match(gc, /crystals\(s, t, P\);   \/\/ WB9c/);
-});

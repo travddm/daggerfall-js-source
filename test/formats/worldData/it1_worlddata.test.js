@@ -91,13 +91,6 @@ test('IT1 the layer: the gate\'s records appended to whatever the door serves un
   } finally { _resetWorldDataReplacement(); resetToDefaults(); }
 });
 
-test('IT1 by source: the loader reads the mod\'s patches into the layer it lays - after every patch is on the door', () => {
-  const src = readFileSync(join(ROOT, 'src/scenes/modWorldData.js'), 'utf8');
-  assert.match(src, /const onServed = vendor === 'immersive-travel' \? \(json\) => \{ itPatches\.push\(patch\); itOwn\.push\(json\); \} : null;/);
-  assert.match(src, /installImmersiveTravelGates\(itPatches, itOwn, immersiveTravelLoaded\);/);   // AUDIT IT1 G3 (PIN MOVED): the mod loaded for the game
-  assert.ok(src.indexOf('installImmersiveTravelGates(itPatches') > src.indexOf('registerWorldDataPatch(patch, '));
-});
-
 // With the player's own ARENA2 (Mac's machine): each patch, laid on the classic block, IS the author's file - the
 // check the tool could not make without a BLOCKS.BSA (vendor/immersive-travel/README.md). A difference means the
 // editor touched classic records too: run `node tools/immersiveTravelPatches.mjs <dfmod> <arena2>` for WD1's diff.

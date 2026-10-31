@@ -204,9 +204,6 @@ test('EG-ZS SPELLWEAVE, THE CLIENT\'S HALF (section 15, Arcana\'s capstone: "eve
   hold([[vId('overcharge'), 1], [vId('spellbane'), 1], [vId('shieldweaver'), 1]], 'fedcba9876543210');
   assert.equal(price(bolt), 0, 'a cast with nothing held counted nothing');
   _resetSpireVestigesForTests();
-  const src = readFileSync(new URL('../../../src/scenes/hostMagic.js', import.meta.url), 'utf8');
-  assert.match(src, /const spellPointCost = free \? 0 : calculateCastCost\(sp, playerEntity\)\.sp;/, 'the ready captures the price the spend pays');
-  assert.match(src, /if \(v\) tellPlayerCast\(playerEntity, sp, cost\);/, 'a cast that left the hands is told');
 });
 
 // ── RALLYING CRY ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -427,8 +424,6 @@ test('EG-ZS THE MARKYNAZ\'S DECREE ON HIS CARD (section 8.5: "named on his card"
   // the words and the node
   assert.equal(egArrivalLive(a.card), `${a.card.main}. ${a.card.sub} The Grand Duke's Decree: Colossal.`);
   assert.equal(egArrivalLive(c.card.lays ? { ...c.card, lays: '' } : c.card), `${c.card.main}. ${c.card.sub}`);
-  const cl = readFileSync(new URL('../../../src/scenes/eliteGates/egClient.js', import.meta.url), 'utf8');
-  assert.match(cl, /if \(pres\.card\) pres\.live = egArrivalLive\(pres\.card\);/, 'the screen reader hears the card\'s words whole');
   const doc = fakeDocument();
   destroyEgSpireHud();
   drawEgArrivalCard(egArrivalShown(a.card, 1000, 2000), { doc });

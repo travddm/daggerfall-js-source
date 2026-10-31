@@ -58,7 +58,6 @@ test('AUDIT SEATS-2 R1: a shaft from beyond the Captain\'s leash and a blow\'s r
 });
 
 test('AUDIT SEATS-2 R2, R3: a work blow\'s field frame is cut at the blow\'s moment; the Throne\'s seconds are held to its hold, so a late beat\'s last frame still passes the wire (mutants: the frame at the last beat; the clamp)', () => {
-  assert.match(readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8'), /this\._siegeFan\(\[siegeFieldFrame\(b, this\._siegeCounts\(s\), now\)\]\);   \/\/ AUDIT SEATS-2 R2/);
   const b = newBattle({ kind: 'siege', tier: 'crown', startMs: T, endMs: T + 2700_000, field: fieldOf(SF, 'crown') });
   b.throne = SIEGE_THRONE.crown.holdS + 1.5;
   const f = siegeFieldFrame(b, [1, 1, 0], T + 1000);

@@ -541,9 +541,6 @@ test('AUDIT SHIPYARDS NO MARK THAT MARKS NOTHING (L7-5): asked where the crew ha
   assert.equal(answer('crewhall'), DIRECTION_TEXT_ID);
   assert.equal(answer('lighthouse'), MAP_REVEAL_TEXT_ID, 'a roll under 0.35 marks a lettered place');
   assert.equal(answer('shipyard'), MAP_REVEAL_TEXT_ID);
-  // the talk window's own hint asks the same law
-  const tt = readFileSync(new URL('../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(tt, /const h = buildingHint\(rolls, !lettersOnMap\(building\.buildingKey\)\);/);
 });
 
 // ── the piers ───────────────────────────────────────────────────────────────────────────────────────────────────────

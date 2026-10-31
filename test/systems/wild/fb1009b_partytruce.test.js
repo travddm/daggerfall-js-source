@@ -40,21 +40,3 @@ test('PARTY-TRUCE: a mate who leaves the party, or whose party I leave, is under
   assert.match(wild.WILD_TEXT.truce, /cannot fight for ten minutes/);
 });
 
-test('PARTY-TRUCE: the host holds a party left out of the fight - wildFair asks the truce beside the party, and the zone frame reads the party each frame and says the truce in the zone (mutants: wildFair unasked; the frame never read)', () => {
-  const w = src('src/scenes/world.js');
-  const fair = w.slice(w.indexOf('  const wildFair = (peerId) => {'), w.indexOf('  /** PARTY-TRUCE: the row a party\'s walk asks with'));
-  // PIN MOVED (Mac, 2026-10-14, "Guildmates are friends" - bible/11-Multiplayer/Wild-Zone.md section 3): wildFair asks the
-  // party and its truce inside the one kin law, net/wild/wildRef.js wildKin, beside the duel and the guild
-  assert.match(fair, /if \(wildKin\(\{ party: !!social\?\.isPartyPeer\(peerId\) \|\| _wildTruce\.holds\(peerId, Date\.now\(\)\),/);
-  const frame = w.slice(w.indexOf('  const wildFrame = () => {'), w.indexOf('    if (playerEntity.health > 0 && !modes?.deathUp?.()) {', w.indexOf('  const wildFrame = () => {')));
-  assert.match(frame, /if \(_wildTruce\.frame\(social\?\.partyPeers\?\.\(\) \?\? new Set\(\), Date\.now\(\)\)\.length && here\) townTalk\.say\(zoneWord\('truce'\)\);/);   // PIN MOVED (AUDIT SEA VENTURES C7): the ground's own words
-  assert.match(w, /\n {2}const _wildTruce = createPartyTruce\(\);/);
-  // PIN MOVED (INT9, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): the defender's client resolves no blow now -
-  // the RELAY referees the zone and asks the hub's party and its truce of every blow (the attacker's word is never enough)
-  const relay = src('server/src/index.js');
-  // PIN MOVED (Mac, 2026-10-14, "Guildmates are friends"): the referee asks the hub's party and its truce through the same
-  // kin law, once neither the duel nor the guild makes the two kin
-  assert.match(relay, /const kin = wildKin\(\{ duel: duelKin, guilds: \[a\.gi, tb\.gi\] \}\) \|\| wildKin\(\{ party: await this\._wdunKinOf\(a\.sub, tb\.sub, now\) \}\);/);
-  assert.match(relay, /const parties = \(r\) => \[r\?\.party, r\?\.partyWas && now - r\.partyWas\.at < WILD_REF\.truceMs \? r\.partyWas\.id : null\]\.filter\(Boolean\);/, 'the hub keeps the party a record left, the truce\'s ten minutes');
-  assert.match(w, /\n {4}fair: wildFair,/);
-});

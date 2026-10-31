@@ -98,9 +98,6 @@ test('GUARD-ONLINE: the table names the real quest\'s watch - N0B10Y03\'s _S.02_
 });
 
 test('GUARD-ONLINE: the shared clock reaches the quest - both bridge hosts say it, the bridge carries it, the machine hands it to the actions', () => {
-  assert.match(rd('src/scenes/quest/questBridge.js'), /sharedClock: \(\) => !!ctx\.sharedClock\?\.\(\),/);
-  assert.match(rd('src/scenes/quest/questBridge.js'), /'sharedClock'/, 'a contract seam - a host that forgets it is reported');
-  assert.match(rd('src/systems/quest/machine.js'), /sharedClock: \(\) => !!this\.deps\.sharedClock\?\.\(\),/);
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(rd(f), /sharedClock: \(\) => sharedClockOn\(\),/, `${f} wires it`);
   }

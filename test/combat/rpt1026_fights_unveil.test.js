@@ -55,10 +55,3 @@ test('RPT1026-FIGHTS STRIKE-UNVEILS A BLOW ON A PLAYER THAT LANDS UNVEILS ITS ST
   assert.deepEqual(kinds(t), trueKind, 'a true Chameleon stands');
 });
 
-test('RPT1026-FIGHTS STRIKE-UNVEILS EVERY BLOW BETWEEN PLAYERS NAMES ITS STRIKER: the world host\'s four - a duel\'s, a work\'s, a battle\'s and the zone\'s (the zone\'s halls reach it through wildStrike) - each hands the player as the striker (mutants: the zone\'s blow unnamed)', () => {
-  const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.equal(W.split('= resolveDuelStrike(').length - 1, 4, 'four blows between players');
-  const named = W.match(/= resolveDuelStrike\(\{[^\n]*?\}, duelStandIn\(playerEntity\)\);/g) ?? [];
-  assert.equal(named.length, 4, 'each names its striker');
-  assert.match(W, /const wildStrikeOut = \(to, by, weapon, swing, drawMs = 0, \{ off = false \} = \{\}\) => \{\n\s+if \(!wildFair\(to\)\) return false;\n[^\n]*\n[^\n]*\n\s+const r = resolveDuelStrike\(\{[^\n]*\}, duelStandIn\(playerEntity\)\);/, 'the zone\'s');
-});

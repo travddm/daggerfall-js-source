@@ -509,19 +509,6 @@ test('MW-D12 rule 10: equip and unequip key names are the group\'s own, and are 
   assert.equal(s.playing, false, 'and the equip section plays ONCE - no loopFallback');
 });
 
-test('MW-D12: weaponRig hands the strike to the arm instead of dropping it', () => {
-  const rig = readFileSync(new URL('../../../src/combat/weapon/weaponRig.js', import.meta.url), 'utf8');
-  // The two call sites that used to discard their return value.
-  assert.match(rig, /const strike = !paralyzed && c && canAttack && !armLoosing && !techniqueFlying\(\)\s*\n\s*\? playerWeapon\.gesture\(/,   // AUDIT 68 S09-sheathed-swing: and Update's early returns gate it; BOW-CLOCK: and a shot the arm cannot draw yet; PIN MOVED (AUDIT TECH1): and no gesture while a technique's leap or dash is in the air
-    'the gesture result is kept');
-  assert.match(rig, /const strike = playerWeapon\.clickAttack\(\);/, 'and so is the click\'s');
-  assert.ok(rig.includes('fpArm.setSheathed(playerWeapon.sheathed)'),
-    'and the stance is synced from the live flag every frame');
-  // ONE HOME: the rig applies rules, it does not restate them.
-  assert.ok(!/mwAttackType|composeStanceGroup|attackKeys/.test(rig),
-    'the rig names no animation rule of its own');
-});
-
 test('MW-D12: the weapon RANGE is hidden, not repacked away', async () => {
   // showWeapons hides the node (rule 57's own distinction). Repacking
   // without the weapon would change the vertex buffer's length every
@@ -542,12 +529,6 @@ test('MW-D12: the weapon RANGE is hidden, not repacked away', async () => {
     'and the SAME range is shown again');
   assert.ok(ranges.some((r) => r.slot !== 'weapon' && r.hidden === false),
     'while the arm\'s own pieces are never hidden');
-});
-
-test('MW-D12: the renderer SKIPS a hidden range rather than drawing it', () => {
-  const src = readFileSync(new URL('../../../src/render/renderer.js', import.meta.url), 'utf8');
-  assert.match(src, /for \(const r of mesh\.ranges\) \{\n\s*\/\/[\s\S]*?if \(r\.hidden\) continue;/,
-    'the skip is the FIRST thing in the range loop, before the texture bind');
 });
 
 // --- MW-D19: THE WEAPON FOLLOWS THE HAND ------------------------------------

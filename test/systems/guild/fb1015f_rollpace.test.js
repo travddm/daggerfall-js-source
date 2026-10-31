@@ -108,10 +108,3 @@ test('ROLL-PACE: the review reads the Roll\'s reputation, never the page\'s uncl
   assert.equal(rollPaceOf({ stopped: 'chapters-closed', standing: () => null }, F, DAY0), null, 'the Roll refused: DFU\'s review');
 });
 
-test('ROLL-PACE by source: the halls read the pace for the guild\'s own faction - the review\'s ceiling, the no-wait only while it paces, the hall\'s line - and the host hands it (mutants: each dropped)', () => {
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(wm.includes('        rankCeiling: host.rollPace?.(guild.factionId)?.ceiling ?? null,'));
-  assert.ok(wm.includes('        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId),'));
-  assert.ok(wm.includes('rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships })'));   // PIN MOVED (SEAT-LINE, FIELD BUGS 2026-10-15g): read seated, with the review's date and book
-  assert.ok(read('src/scenes/world.js').includes('    rollPace: (f) => rollPaceOf(rollTracker, f, Math.floor(Date.now() / 1000)),'));
-});

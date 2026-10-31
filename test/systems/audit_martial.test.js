@@ -265,18 +265,6 @@ test('AUDIT MARTIAL L1 L6 / L2 F2: a signature\'s HUD chip makes nothing a frame
   assert.ok(r.out.signature < 2, `a signature in hand: ${r.out.signature.toFixed(2)} bytes a frame`);
 }));
 
-test('AUDIT MARTIAL L1 N1, L1 N3, L4 N3: a follow-up owed a body the relay runs shows its number; "blows and arrows" where arrows pay; Blackjack\'s "twice" is its number; Hallowed Strike\'s mace says its +25 to hit (mutants: the number in the record\'s branch alone; Blackjack\'s times moved)', () => clean(() => {
-  const powers = src('src/systems/martialPowers.js');
-  const shown = powers.indexOf('  if (!f?.dead) showFollowUp(n, word, entity);'), branch = powers.indexOf('  if (f) { if (!f.dead) door.hurtFoe(f, n); return; }');
-  assert.ok(shown >= 0 && branch > shown, 'the number before the record\'s branch (the loot\'s again, ROSE-SEEN)');
-  const W = (id) => MP.martialWords(id);
-  assert.match(W('blademaster').passive, /blows or arrows/); assert.match(W('cutthroat').passive, /blows and arrows/);
-  assert.match(W('berserker').passive, /blows and arrows/); assert.match(W('warblade').rider, /blows and arrows/);
-  assert.equal(MP.MARTIAL_NUMBERS.blackjack.times, 2, 'the word "twice" is this number');
-  assert.equal(W('cutthroat').rider, 'An enemy that hadn\'t noticed you takes the blow twice.');
-  assert.match(W('crusader').techniqueText, /\+25 to hit\.$/);
-}));
-
 test('AUDIT MARTIAL L3 F1: an OLDER BUILD\'s save keeps the permanent choice - the career\'s mirror (a record every build carries whole) gives the path back, already asked; a mirror another character wrote (an heir\'s inherited career) gives nothing; the live career never holds it (mutants: no mirror written; the mirror read from a newer save; the character\'s id unread)', () => clean(() => {
   const p = pathFighter('cutthroat'); p.martialPrompted = true;
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(p)));

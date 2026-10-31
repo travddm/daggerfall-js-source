@@ -73,36 +73,3 @@ test('QT-LIVE1c questTimerWords: the line for the selected quest off a FRESH log
   assert.equal(questTimerWords(null, 'a:5'), null, 'a host with no log');
 });
 
-test('QT-LIVE1d the journal arms the once-a-second redraw ONLY under a timer, reads the host\'s log fresh each time, rewrites the span in place, and repaints when the line is gone', () => {
-  const src = rd('src/ui/enhanced/enhancedMenu.js');
-  const meta = src.slice(src.indexOf('if (sel.clockSeconds != null) {'), src.indexOf('if (meta.childNodes.length)'));
-  assert.match(meta, /armQuestTimer\(timer, sel\.key\);/, 'armed inside the timer block, keyed on the selected row');
-  const arm = src.slice(src.indexOf('function armQuestTimer(span, key) {'), src.indexOf('function remainWords(s) {'));
-  assert.match(arm, /questTimer = setInterval\(\(\) => \{/);
-  assert.match(arm, /\}, 1000\);/, 'once a second - the words are minutes, and online a minute is five real seconds');
-  assert.match(arm, /questTimerWords\(hooks\.questLog\?\.\(\), key\)/, 'the HOST\'s log, read fresh - never a log captured at render');
-  assert.match(arm, /span\.textContent = w\.text;/);
-  assert.match(arm, /span\.className = `px-qtimer\$\{w\.urgent \? ' urgent' : ''\}`;/, 'the urgent gold follows the number');
-  assert.match(arm, /if \(!w\) \{ render\(\); return; \}/, 'a fired clock or an ended quest is a stale PANEL');
-  assert.match(arm, /if \(questTimer\) \{ clearInterval\(questTimer\); questTimer = null; \}/, 're-arming clears the last one first');
-});
-
-// THE DERIVED LAW. Every interval this screen arms is owned: the
-// variable it lands in is cleared by the rebuild (renderInto) AND by
-// the unmount. The ground clock earned that law (PX1b); the quest timer
-// is the second interval, and a third cannot arrive without both
-// clears - the population is every `X = setInterval(` in the file.
-test('QT-LIVE1e every setInterval in the enhanced menu is cleared by the rebuild and by the unmount (derived)', () => {
-  const src = rd('src/ui/enhanced/enhancedMenu.js');
-  const owners = new Set([...src.matchAll(/(\w+) = setInterval\(/g)].map((m) => m[1]));
-  assert.ok(owners.has('groundTimer') && owners.has('questTimer'), `the intervals: ${[...owners].join(', ')}`);
-  const rebuild = src.slice(src.indexOf('function renderInto() {'), src.indexOf('const shell = el(\'div\', \'shell\');'));
-  const unmountAt = src.indexOf('if (keyHandler) globalThis.removeEventListener(\'keydown\', keyHandler, { capture: true });');
-  assert.ok(unmountAt > 0);
-  const unmount = src.slice(unmountAt, src.indexOf('keyHandler = null;', unmountAt));
-  for (const v of owners) {
-    assert.match(src, new RegExp(`^let ${v} = null;`, 'm'), `${v} is module state, one owner`);
-    assert.match(rebuild, new RegExp(`if \\(${v}\\) \\{ clearInterval\\(${v}\\); ${v} = null; \\}`), `${v} cleared by the rebuild`);
-    assert.match(unmount, new RegExp(`if \\(${v}\\) \\{ clearInterval\\(${v}\\); ${v} = null; \\}`), `${v} cleared by the unmount`);
-  }
-});

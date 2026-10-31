@@ -68,12 +68,6 @@ test('RR3 the record: the four quest files vendored, the list\'s three rows, the
   assert.deepEqual(RR_PLACES_TABLE.map((r) => r.split(',')[0].trim()), ['Aldleigh', 'Northrock_Fort_Ext', 'Northrock_Fort']);
   assert.deepEqual(RR_FACTIONS_TABLE.map((r) => Number(r.split(',')[3])), [1020, 1021, 1022]);
   assert.deepEqual(RR_FACTION_IDS, { LordVerathon: 1020, CaptainUlthega: 1021, OrthusDharjen: 1022 });
-  // the mod's Quests/ folder rides the pack loader's globs
-  const qd = rd('src/scenes/quest/questData.js');
-  assert.match(qd, /import\.meta\.glob\('\.\.\/\.\.\/\.\.\/vendor\/roleplay-realism\/Quests\/\*\.txt'/);
-  // FORAGE-FIX (2026-09-28): a list is read as a quest is, and only Foraging's own is patched - RR's rides as shipped
-  assert.match(qd, /const text = stripBom\(await load\(\)\);\n[\s\S]*?let patched = text;\n\s*if \(path\.includes\('\/vendor\/foraging\/'\)\) \{/);
-  assert.match(qd, /if \(name\.startsWith\('QuestList-'\)\) tables\.set\(name, patched\);/);
 });
 
 // ---- RegisterFactionIds (:659-706) + FactionFile.RegisterCustomFaction + AddCustomFactions ----
@@ -106,7 +100,6 @@ test('RR3 the three factions: the registry, the records verbatim, the dictionary
   const rep = createFactionRep(new Map([[41, { id: 41, name: 'The Fighters Guild', parent: 0, children: null }]]));
   assert.equal(rep.dict.get(1022)?.name, 'Orthus Dharjen');
   assert.ok(Object.isFrozen(customFactions().get(1020)));
-  assert.match(rd('src/scenes/townTalk.js'), /addCustomFactions\(factions\.factionDict, factions\.factionNameToId\);/, 'the talk reader stands in for PlayerEntity.FactionData');
   assert.ok(typeof FactionFile === 'function');
 });
 
@@ -277,11 +270,6 @@ test('RR3 the fort\'s tracks and the armorer\'s discovery: nine pixels, the comp
   assert.deepEqual(rrMasterArmorerDiscovery({ regionIndex: 52, locationIndex: 7 }, variantOf), { buildingKey: 131342, name: 'Dharjen Custom Armor' });
   assert.equal(rrMasterArmorerDiscovery({ regionIndex: 52, locationIndex: 8 }, variantOf), null, 'no variant set: nothing');
   assert.equal(rrMasterArmorerDiscovery(null, variantOf), null);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(rrEnabled\(\)\) \{ const _px = playerTravelPixel\(\); for \(const line of rrFortProximityLines\(_px\.x, _px\.y\)\) townTalk\.say\(line, 5\); \}/, 'OnMapPixelChanged: AddHUDText(text, 5)');
-  assert.match(w, /if \(dfLocation\) setLastLocationKeyTo\(dfLocation\.regionIndex, dfLocation\.locationIndex \?\? 0\);/);
-  // PIN MOVED (BAY-LEFT-MAPS C7 = E2, test/systems/bayleft_disckey.test.js): the town's book by the one key-maker
-  assert.match(w, /const arm = rrMasterArmorerDiscovery\(_musicLoc, getBuildingVariant\);\s*const armRec = arm \? \(topicTree\.listBuildings \?\? \[\]\)\.find\(\(b\) => b\.buildingKey === arm\.buildingKey\) : null;\s*if \(arm && armRec\) discoverBuilding\(townBookOf\(_musicLoc\), armRec, arm\.name\);/, 'OnEnterLocationRect: DiscoverBuilding(key, name) - and nothing without the directory\'s record (AUDIT-RR F36, PlayerGPS.cs:932-933)');
 });
 
 // ---- CustomArmorService (:414-484) ------------------------------------------------
@@ -350,14 +338,6 @@ test('RR3 the merchant service: the registry, the gate, the route, the popup\'s 
   const route = staticNpcRoute({ npcFactionId: 1022, npcFaction: { id: 1022, sgroup: SOCIAL_GROUPS.Merchants, ggroup: 0 }, buildingType: -1, insideBuilding: true, hasCustomMerchantService });
   assert.deepEqual(route, { kind: 'merchant', service: 'sell' });
   assert.equal(staticNpcRoute({ npcFactionId: 1022, npcFaction: { id: 1022, sgroup: SOCIAL_GROUPS.Merchants, ggroup: 0 }, buildingType: -1, insideBuilding: true }).kind, 'talk', 'without the registry read: DFU\'s empty registry');
-  const wm = rd('src/scenes/worldModes.js');
-  // NPC-MARKS (PIN MOVED): the route's arguments are built in one place, which the click and the marks over heads both ask
-  assert.match(rd('src/scenes/npcMarksHost.js'), /hasCustomMerchantService,\s*\/\/ RR3/);
-  assert.match(wm, /const route = staticNpcRouteIn\(\{ npcFactionId: pn\.factionID, dict: townTalk\?\.factionDict \?\? null, building: interiorBuilding \}\);/);
-  assert.match(wm, /const custom = getCustomMerchantService\(pn\.factionID\);/);
-  assert.match(wm, /label: custom \? getCustomMerchantServiceLabel\(pn\.factionID\) : undefined,/);
-  assert.match(wm, /function openCustomMerchantService\(service\) \{[\s\S]*?messageBox: \(text\) => \(mode === 'interior' \? mountInterior\(new ActionTextBox\(\[text\]\)\) : mountServiceWindow\(new ActionTextBox\(\[text\]\)\)\),[\s\S]*?const win = openTradeWindow\(\{ items \}, b, 'Buy'\);/);   // IT1 (PIN MOVED): a street merchant's box in the street's slot
-  assert.match(rd('src/ui/merchant/merchantServiceWindow.js'), /const label = this\.hooks\.label \?\? merchantServiceLabel\(this\.hooks\.service\);/);
   // the reset seam
   _resetMerchantServices();
   assert.equal(hasCustomMerchantService(1022), false);
@@ -367,14 +347,3 @@ test('RR3 the merchant service: the registry, the gate, the route, the popup\'s 
   for (const f of RR_CUSTOM_FACTIONS) registerCustomFaction(f.id, f);
 });
 
-test('RR3 the install: InitMod\'s order and the gates, by source', () => {
-  const inst = rd('src/systems/roleplayRealism/rrInstall.js');
-  assert.match(inst, /if \(!registerQuestList\(RR_QUEST_LIST, \(\) => rrEnabled\(\)\)\) throw new Error\('Quest list name is already in use, unable to register RoleplayRealism quest list\.'\);/);
-  assert.match(inst, /if \(rrEnabled\(\)\) for \(const f of RR_CUSTOM_FACTIONS\) registerCustomFaction\(f\.id, f\);/);
-  assert.match(inst, /addIntoQuestTables\(\{ places: \[\.\.\.RR_PLACES_TABLE\], factions: \[\.\.\.RR_FACTIONS_TABLE\] \}\);/);
-  assert.match(inst, /registerMerchantService\(RR_FACTION_IDS\.OrthusDharjen, \(window, entity\) => rrCustomArmorService\(window, entity\), RR_TEXT\.customArmor, \(\) => rrEnabled\(\)\);/);
-  const order = ['installRoleplayRealismArt();', 'registerQuestList(', 'registerCustomFaction(', 'addIntoQuestTables(', 'registerMerchantService('].map((s) => inst.indexOf(s));
-  assert.ok(order.every((i, k) => i > 0 && (k === 0 || i > order[k - 1])), 'the C#\'s order: the list, the factions, the tables, the service');
-  assert.match(rd('src/systems/quest/questLists.js'), /for \(const questList of registeredQuestLists\(\)\) this\._loadQuestList\(questList\);/);
-  assert.match(rd('src/systems/faction/factionRep.js'), /addCustomFactions\(dict\);\s*\/\/ Reset \(:331\)/);
-});

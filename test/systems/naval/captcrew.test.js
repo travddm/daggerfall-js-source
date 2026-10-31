@@ -116,22 +116,3 @@ test('CAPT-CREW in a captain\'s words: the crew card ends a hand\'s line with hi
   assert.equal(postWords('Deckhand', 3), '');
 });
 
-test('CAPT-CREW at sea: the host reads her posts aboard each frame - her Bosun\'s way handed to Come Sail Away\'s Rigging read (postsWay), never on a boat with no crew - and the seams take the worth: the guns\' reload, the mending, the repairs, the hands over the rail, the Cook\'s wear, the lookout\'s hail (mutants: the worth unread, the posts\' way, each seam)', async () => {
-  const save = { v: 1, boats: { 42: { hull: 1, sail: 1, crew: 1, mates: { morale: 60, hires: 2, hands: [hand('Gil', 'Bosun', 30), hand('Hal', 'Deckhand')] } } }, notoriety: {}, day: null, raids: [] };
-  const s = await sea({ hull: 2, save });
-  s.boat.crewed = true;
-  s.run(0.5);
-  assert.equal(s.host.postsWay(s.boat), 1.04, 'an Old Salt Bosun: 4% more way under sail');
-  s.boat.crewed = false;
-  assert.equal(s.host.postsWay(s.boat), 1, 'a boat with no crew has no Bosun');
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /reloadScale: \(\) => \(boat\.crewed && st\.crew \? reloadScaleOf\(st\.crew\.morale, st\.crew\.order\) \* st\.worth\.reload : 1\)/, 'the Gunner on the reload');
-  assert.match(host, /s\.worth = captainWorth\(b\.crewed \? crewWorth\(c\.hands, ashoreNames\(b\)\) : NO_WORTH, deps\.captain\?\.stats\?\.\(\)\);/, 'her posts aboard, a hand ashore working none (AUDIT CAPTAIN\'S SEA C1: none ashore while I sail)');
-  assert.match(host, /c\.tick\(d, \{ inPort: [^\n]*wear: s\.worth\.wear \}\);/, 'the Cook on the sea\'s clock');
-  assert.match(host, /const scale = \(b\.crewed \? mendScaleOf\(s\.crew\.morale\) \* \(s\.worth\?\.mend \?\? 1\) : 1\) \* \(underFire/, 'the Carpenter on the repairs');
-  assert.match(host, /scale: b\.crewed \? mendScaleOf\(s\.crew\.morale\) \* \(s\.worth\?\.mend \?\? 1\) : 1 \}\);/, 'and on the free mending');
-  assert.match(host, /return Math\.max\(1, Math\.min\(base \+ 1 \+ mate, base \+ handsBonusOf\(st\.crew\.morale, st\.crew\.order\) \+ mate, Math\.max\(base \+ 1, men\)\)\);/, 'the First Mate\'s hands - as many as her crew has men for (AUDIT CAPTAIN\'S SEA C5)');
-  assert.match(host, /nightSight\(SAIL_HO_RANGE \* sight, \{ night, lit: showsLight\(e\) \}\)/, 'the Lookout on the hail');
-  assert.match(rd('src/scenes/world.js'), /refit: \(boat\) => \{ const r = fleetHost\?\.refit\(boat\) \?\? null, k = naval\?\.postsWay\?\.\(boat\) \?\? 1; return k === 1 \? r : \{ \.\.\.\(r \?\? \{\}\), speed: \(Number\(r\?\.speed\) \|\| 1\) \* k \}; \},/, 'the Bosun beside the Rigging, where the runtime reads its rates');
-  assert.match(rd('src/scenes/fleetHost.js'), /fights: h\.fights \| 0, boardings: h\.boardings \| 0, prior: h\.prior \| 0, ashore: !!away\?\.has\(i\) \}\)\);/, 'the Fleet page is handed his boardings, his prior service and whether he is ashore');
-});

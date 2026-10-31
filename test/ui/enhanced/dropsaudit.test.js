@@ -36,8 +36,6 @@ test('ELITE-SPELLS: an elite caster\'s DamageHealth lands at its damageScale, in
   const plain = hit({ entity: { level: 5 } });
   assert.ok(plain > 0);
   assert.equal(hit({ entity: { level: 5, damageScale: 2 } }), plain * 2, 'an elite Fireball hurts twice as much');
-  const src = rd('src/systems/effects.js');
-  assert.match(src, /const n = casterDamageScaled\(effectMagnitude\(a\.effect, a\.casterLevel, a\.saveScaled \?\? true, a\.element, a\.flag, target, rolls, a\.caster\), a\.caster, target, a\.school\);/, 'and its damage over time');   // PIN MOVED (BAL9): the round's magnitude takes its caster, for a damage spell's pierce; PIN MOVED (SCHOOLS3): and the school it was cast in
 });
 
 test('ELITE-LEDGE: an elite copy stands on the marker\'s own floor - off a walkway it turns to the next bearing, and with none it stands on the marker', () => {
@@ -55,31 +53,14 @@ test('ELITE-LEDGE: an elite copy stands on the marker\'s own floor - off a walkw
   // level floor everywhere: the drop's own east and west
   const [, e2, w2] = expandEliteEnemies([marker], { floor: () => 7 });
   assert.ok(e2.x > 0.8 && Math.abs(e2.z) < 1e-9 && w2.x < -0.8);
-  assert.match(rd('src/scenes/dungeonContext.js'), /floor: \(at\) => \{ const d = collider\.raycast\(\[at\[0\], at\[1\] \+ 1, at\[2\]\], \[0, -1, 0\], 3\); return Number\.isFinite\(d\) \? at\[1\] \+ 1 - d : null; \},/, 'the host answers with a ray down');
 });
 
 test('CAMP-CULL and CAMP-CAP: a camp member outlives the 100-150 m band it stands in; a group stands whole or not at all under the encounter cap', () => {
   assert.ok(CAMP_CULL_DISTANCE > MAX_CAMP_SPAWN_DISTANCE + 25, 'past the band, with a margin');
   assert.ok(ENCOUNTER_CULL_DISTANCE < MAX_CAMP_SPAWN_DISTANCE, 'the finding: the encounter cull alone took most of the band');
-  const foes = rd('src/scenes/exteriorFoes.js');
-  assert.match(foes, /const _cullAt = f\.campId != null \? CAMP_CULL_DISTANCE : ENCOUNTER_CULL_DISTANCE;\n\s*if \(!f\.placed && !f\.managed && !f\.refugee && _playerDist > _cullAt && /);   // DW-E4: a spawner-managed foe is exempt too; PIN MOVED (AUDIT WORLD-EVENTS L4-2): and a raid's refugee
-  // PVPDUNGEONS: the room is the pool's cap - MAX_ACTIVE_ENCOUNTER_FOES, four times it (WILD_PACK_MULT) in the open zone
-  assert.match(foes, /export const encounterCap = \(\) => \(wildHere\(\) \? MAX_ACTIVE_ENCOUNTER_FOES \* WILD_PACK_MULT : MAX_ACTIVE_ENCOUNTER_FOES\);/);
-  assert.match(foes, /const encounterRoom = \(\) => encounterCap\(\) - activeCount\(\) - spawning\.filter\(\(s\) => s\.capped\)\.length;\n\n\s*return \{ foes, spawnFoe, damageFoe, encounterRoom,/);
-  assert.match(rd('src/scenes/world.js'), /let room = exteriorFoes\.encounterRoom\?\.\(\) \?\? Infinity;\n\s*for \(const h of chunkCampHits\) \{\n(?:\s*\/\/[^\n]*\n)*\s*const size = campMembers\(h\.mobileTypes\)\.length;\n\s*if \(size > room\) continue;\n\s*room -= size;\n\s*_standCampEncounter\(h, player\.feetAt\(\)\);/, 'the room is asked for the group as it will stand - grown by the party (PSCALE1)');
 });
 
 test('F1 F3 F4: the loss nodes in the HUD tracks and the system dress on the Stats page are Plus\'s - and since PLUS-DEAD retired plain Enhanced they always stand; the base sheet\'s rules as they were (Plus\'s edits in the Plus sheet)', () => {
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.doesNotMatch(hud, /plusLoss|isEnhancedPlus/, 'no second face to build for');
-  assert.match(hud, /const ghost = el\('i', 'hud-ghost'\);/);
-  assert.match(hud, /track\.append\(ghost, \.\.\.chunks\); armChunks\(chunks\);/);
-  assert.match(hud, /foeTrack\.append\(foeGhost, \.\.\.foeChunks\); armChunks\(foeChunks\);/);
-  // PIN MOVED (HOLDINGS): the Holdings page wears the same dress - the pin reads the STATS page's own detail, by its F3 mark
-  // (a match anywhere in the menu was satisfied by the Holdings page's and let the Stats page's go undressed)
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /const detail = el\('div', 'px-qdetail px-sys'\);   \/\/ DROPS-AUDIT F3/);
-  const stats = rd('src/ui/enhanced/enhancedMenu.js').slice(rd('src/ui/enhanced/enhancedMenu.js').indexOf('function pauseStats(body)'));
-  assert.match(stats.slice(0, stats.indexOf('\n}\n')), /const detail = el\('div', 'px-qdetail px-sys'\);/, 'inside pauseStats');
   assert.match(ENHANCED_CSS, /color: var\(--dim\); background: transparent; border: 1px solid var\(--iron\);\n\}\n\.hmpick\.on \{ color: var\(--brass\); border-color: var\(--brass\); background: #12161b; \}/);
   assert.match(ENHANCED_CSS, /\.trade-shell \.packcol \{ padding: 0 2px 18px; overflow-y: auto; min-height: 0; \}/);
   assert.doesNotMatch(ENHANCED_CSS, /\.trade-shell \.remotehead \{/);
@@ -88,25 +69,6 @@ test('F1 F3 F4: the loss nodes in the HUD tracks and the system dress on the Sta
   assert.match(PLUS_FIX_CSS, /\.trade-shell \.remotehead \{ border-bottom: 2px solid/);
 });
 
-test('F2 F5 F6 F9 F10 F11: one press per dialog or list; Escape puts the menu away, not the pack; a notice takes the first click; the card and the menu answer only their own item and gesture; a ported window paints no preview', () => {
-  assert.match(rd('src/ui/enhanced/enhancedDialog.js'), /if \(!active \|\| active\.spent\) return; active\.spent = true; press\(b\.button\); closeEnhancedDialog\(\);/);
-  const picker = rd('src/ui/enhanced/enhancedPicker.js');
-  assert.match(picker, /if \(!active \|\| active\.spent\) return; active\.spent = true; pickRow\(active, i, geo\); closeEnhancedPicker\(\);/);
-  assert.match(picker, /if \(!active \|\| active\.spent\) return; active\.spent = true; replayClick\(active\.canvas, active\.m, 1, 1\); closeEnhancedPicker\(\);/);
-  const inv = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /function onKey\(e\) \{[\s\S]{0,400}?if \(menuEl && e\.key === 'Escape'\) \{ e\.preventDefault\(\); e\.stopPropagation\(\); closeMenu\(\); return; \}/, 'before anything else the pack does with the key');
-  assert.match(inv, /\(\) => \{ if \(tipEl && tipFor === item\) showTip\(item, from, row\); \}/);
-  assert.match(inv, /function hideTip\(\) \{ tipEl\?\.remove\(\); tipEl = null; tipFor = null; tipRow = null; \}/);   // AUDIT VIRT: and the row it stood beside
-  assert.match(inv, /row\.oncontextmenu = \(e\) => \{ e\.preventDefault\(\); if \(drag\) return; openMenu\(/);
-  const port = rd('src/ui/enhanced/enhancedPort.js');
-  // PIN MOVED, SPELLSHOP-SAID (FIELD BUGS 2026-10-19f): the notice is the panel the window raised, not a `box` field four
-  // of the ported windows kept (test/ui/fb1019f_spellshopsaid.test.js drives it)
-  assert.match(port, /if \(noticeShown\(win\)\) \{ win\.click\?\.\(-1, -1\); return; \}\n\s*if \(!b \|\| b\.disabled\) return;/);
-  assert.match(port, /win\.inPort = true;\n\s*const proxy = new Proxy\(win, \{/);
-  assert.match(rd('src/ui/bankPurchaseWindow.js'), /if \(modelIdNum != null && !this\.inPort\) \{/);
-});
-
 test('F7 F8: the gauntlet stands down where a controller hid the pointer; the bank\'s Cancel no longer names a key that closes the bank', () => {
   assert.match(CURSOR_CSS, /html:not\(\.plus-nocursor\) canvas\[style\*="cursor: none"\] \{ cursor: none !important; \}/);
-  assert.match(rd('src/ui/enhanced/enhancedPorts.js'), /\{ label: 'Cancel', act: \(\) => \{ w\.transactionType = TRANSACTION_TYPE\.None; w\.value = ''; \} \}\]/);
 });

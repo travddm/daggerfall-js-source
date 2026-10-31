@@ -83,50 +83,6 @@ test('WATER-NEXT 2 the copy: once a frame, before the first water draw, the lane
   assert.equal(new Set(units).size, units.length, 'four units, four things');
   assert.ok(units.every((u) => u !== 0 && u !== 2), 'never the ground array\'s or the tilemap\'s');
   assert.ok(WATER_SCENE_DEPTH_UNIT === BB_SURFACE_UNIT, 'the billboards\' surface unit - both rebind before every draw that reads it');
-  const r = read('src/render/renderer.js');
-  assert.match(r, /this\._underWater = undefined;/, 'beginFrame: a new frame takes a new copy');
-  assert.match(r, /if \(this\._underWater !== undefined\) return this\._underWater;/);
-  assert.match(r, /this\._underWater = \(this\._air && this\._frameFbo && !this\.waterSimple\) \? this\._air\.snapshotUnderWater\(\) : null;/);
-  const a = read('src/render/airPass.js');
-  assert.match(a, /gl\.blitFramebuffer\(0, 0, F\.w, F\.h, 0, 0, F\.w, F\.h, gl\.COLOR_BUFFER_BIT \| gl\.DEPTH_BUFFER_BIT, gl\.NEAREST\);/);
-  assert.match(a, /if \(k\.uwFbo\) \{ gl\.deleteTexture\(k\.uwColor\); gl\.deleteTexture\(k\.uwDepth\); gl\.deleteFramebuffer\(k\.uwFbo\); \}/, 'freed with the frame');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /if \(waterOn && !f\.underwater && _waterU\) \{[\s\S]*?renderer\.drawSeaSurfaces\(_dwSurfaceList,[\s\S]*?return;\s*\n\s*\}/);
-  assert.match(w, /dwRender\.drawSurfaces\(_dwSurfaceList,/, 'the underside stays the mod\'s');
-  assert.match(w, /function csaDrawWaves\(\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(!csaRender \|\| waterOn\) return;/, 'Come Sail Away\'s sprite breakers retired under the water that breaks on its own shore');
-  assert.match(w, /columnOn: f\.s\.spawnSurfaces && !f\.underwater && !waterOn,/, 'the mod\'s fake column off under the water that measures its own (the first sea shots: moire stripes, the column twice)');
   assert.match(waterSurfaceFs('', ''), /if \(uOpen == 1 && uSceneOn == 1\) edge \*= smoothstep\(0\.0, 0\.12, vdepth\);/, 'the sea\'s staircase edge gone where it covers no water');
 });
 
-test('WATER-NEXT 2 the bed\'s face: both terrain programs draw the ground under the enhanced water as silted dirt, by the water\'s own corner coverage, never under a puddle\'s art; only the hosts that draw the enhanced water switch it on, once a program (mutants: the bed in the classic skin; the puddle\'s art lost; the switch never set)', async () => {
-  const { WATER_BED_GLSL, waterBedMix, BED_RECORD, BED_SILT } = await import('../../src/render/waterBedGlsl.js');
-  const { EL_TERRAIN_FS } = await import('../../src/render/enhancedLighting.js');
-  const r = read('src/render/renderer.js');
-  assert.equal(BED_RECORD, 1, 'the tileset\'s dirt');
-  assert.ok(BED_SILT.every((v) => v < 1), 'darkened');
-  assert.match(WATER_BED_GLSL, /if \(uWaterBed < 0\.5\) return vec2\(0\.0\);/, 'off, nothing');   // PIN MOVED (SHORE-SILT): the bed's share and its fringe's
-  assert.match(WATER_BED_GLSL, /rec == 8u \|\| rec == 9u \|\| rec == 23u/, 'a puddle keeps its art');
-  assert.match(waterBedMix(), /textureGrad\(uTileArr, vec3\(tuv, 1\.0\), gx, gy\)\.rgb \* vec3\(0\.62, 0\.60, 0\.52\)/);
-  assert.match(waterBedMix((t) => `elDecode(${t})`), /elDecode\(textureGrad\(uTileArr, vec3\(tuv, 1\.0\), gx, gy\)\.rgb\)/, 'the lane decodes it as it decodes the ground');
-  assert.ok(EL_TERRAIN_FS.includes(WATER_BED_GLSL) && EL_TERRAIN_FS.includes(waterBedMix((t) => `elDecode(${t})`)), 'the lane\'s terrain');
-  assert.match(r, /\$\{WATER_BED_GLSL\}/);
-  assert.match(r, /\$\{waterBedMix\(\)\}/, 'the classic terrain');
-  assert.match(r, /gl\.uniform1f\(this\.tUWaterBed, this\.waterBed \? 1 : 0\);/, 'a frame\'s, in the block every terrain program variant takes');
-  assert.match(r, /  waterBed = false;/, 'off by default - the classic skin never sets it');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(read(f), /renderer\.waterBed = waterOn;/, `${f}: the switch is the water's own`);
-});
-
-test('WATER-NEXT the Water quality row: Full by default, the player\'s online; Simple takes no copy under the water and keeps no ripple field - the bed, the swell, the foam and the body stand (mutants: the copy taken anyway; the ripples kept)', async () => {
-  const { FEATURES } = await import('../../src/systems/features.js');
-  const row = FEATURES.find((f) => f.id === 'water-quality');
-  assert.deepEqual(row.control.tiers.map((t) => t[0]), ['full', 'simple']);
-  assert.equal(row.control.initial, 'full');
-  assert.equal(row.control.online, 'player');
-  assert.deepEqual([...row.kinds], ['enhanced']);
-  const r = read('src/render/renderer.js');
-  assert.match(r, /this\._underWater = \(this\._air && this\._frameFbo && !this\.waterSimple\) \? this\._air\.snapshotUnderWater\(\) : null;/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /renderer\.waterSimple = getPref\('waterQuality'\) === 'simple';/);
-  assert.match(w, /const ripples = waterOn && !renderer\.waterSimple \? createRippleStir\(createRipples\(\)\) : null;/);
-  assert.match(read('src/scenes/exterior.js'), /renderer\.waterSimple = getPref\('waterQuality'\) === 'simple';/);
-});

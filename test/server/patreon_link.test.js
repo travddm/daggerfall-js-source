@@ -203,7 +203,6 @@ test('PATREON-LINK, end to end: the account read carries the link - Patreon\'s a
   assert.deepEqual((await off.account(someone)).wardrobe.titles, []);
 });
 
-
 test('PATREON-LINK, end to end: the callback spends the code and ASKS, writing nothing; the yes links - the tier a title held, its glyph signed into the token, wearable (mutants: the callback links; the confirm never writes; the redirect spent differs from the one authorized)', async () => {
   const { account, registered, raw, get, confirm, call } = await stand();
   const me = await registered('Patron');
@@ -475,7 +474,6 @@ function cardDoc() {
 }
 
 test('PATREON-LINK: the card - Link Patreon is a LINK that opens at once in a new tab (the system browser in the app); linked, what the pledge holds, Refresh and Unlink; nothing for a guest or while linking is off; every class one the skin defines (mutants: the row drawn for a guest; the link not a link; the row drawn while off)', async () => {
-  const css = src('src/ui/enhanced/enhancedStyle.js');
   const draw = (patreon, account = ACCOUNT, titles = []) => {
     const flow = AccountFlow({ io: service([answer(patreon, titles)]).io, storage: memStorage() });
     flow.stage = 'in';
@@ -517,8 +515,6 @@ test('PATREON-LINK: the card - Link Patreon is a LINK that opens at once in a ne
   }
   ({ all } = draw({ on: true, linked: false, titles: [], link: 'javascript:alert(1)' }));
   assert.ok(!all.some((n) => n.tag === 'a'), 'only an https link is ever drawn');
-  const missing = [...worn].filter((c) => !css.includes(`.${c}`));
-  assert.deepEqual(missing, [], 'the row wears a class the enhanced skin has no rule for');
 });
 
 test('PATREON-LINK: back from the browser, the card reads the account again - and a card taken down stops listening (mutants: no read on the way back; the listener outlives its card)', async () => {

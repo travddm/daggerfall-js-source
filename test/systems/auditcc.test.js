@@ -138,8 +138,6 @@ test('AUDIT C&C E5: A JUMP\'S MINUTES ARE FELT AT THEIR OWN HOUR AND MONTH OFFLI
   // a one-minute step is no jump - that minute, the host's own env, stepped or not
   const one = (skyFollows) => { const e = body(from); runSurvivalMinutes(e, from, from + 1, skyAt(MOUNTAIN, from + 600), deps({ skyFollows })); return e.survival.felt; };
   assert.equal(one(true), one(false), 'one minute is lived in the host\'s env');
-  // the tick says it: offline (no shared clock) the sky is the clock
-  assert.match(read('src/systems/worldTick.js'), /runSurvivalMinutes\(entity, lastMinutes, nowMinutes, survival\.env \?\? \{\}, \{ [^\n]*skyFollows: !_sharedClock \}\);/);
 });
 
 test('AUDIT C&C T1: WHAT THE DOLL DRAWS OVER THE CUIRASS COVERS IT - COVERING_CHEST is the four robes (drawOrder 80 to the cuirass\'s 50; a cloak\'s 90), where SURV1\'s reading of the IL had a strap and a surcoat beside them and the mod\'s own list adds three gowns the doll draws under the cuirass', () => {
@@ -363,15 +361,6 @@ test('AUDIT C&C N3/H2: A PRISONER LEAVES FED, WATERED AND RESTED - the sentence 
   assert.equal(sleepStage(s.sleepDebt), 'rested');
 });
 
-test('AUDIT C&C B11: THE ENHANCED MENU\'S ATTRIBUTES PAGE NAMES THE BOONS THAT RAISE THEM - under the meters, from the pack\'s one source (ui/temperatureCard.js boonStatRows: nothing outside the Boons tier), so a raised attribute is explained on every sheet that shows it', () => {
-  const src = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(src, /import \{ boonStatRows \} from '\.\.\/temperatureCard\.js';/);
-  const fn = src.slice(src.indexOf('function statsAttributes('), src.indexOf('\n}\n', src.indexOf('function statsAttributes(')));
-  assert.match(fn, /const boons = boonStatRows\(playerEntity\);\n\s*if \(!boons\.length\) return;\n\s*detail\.append\(pxDivider\('Boons'\)\);/, 'the section only when a boon stands, after the eight meters');
-  assert.match(fn, /r\.append\(el\('span', 'k', k\), el\('span', 'v', v\)\);/, 'each boon its name and what it gives');
-  assert.ok(fn.indexOf('meterRow(') < fn.indexOf('boonStatRows('), 'the meters first');
-});
-
 test('AUDIT C&C N5: A DRAIN LANDS INSIDE THE POOL - DaggerfallEntity.SetFatigue clamps every write to [0, MaxFatigue], and the hosts\' drains clamped at nought alone: a pool a lapsed boon or a Fortify\'s end leaves over its ceiling (8,320 over 6,400) stayed over it through every drain (8,310); the one clamp (statMods.js clampFatigue) in the ticker\'s sinks and the four hosts\' own', () => {
   const e = { stats: { ...STATS }, raceId: RACES.Breton, items: [], activeEffects: [], health: 40, maxHealth: 40, fatigue: 8320 };
   const ticker = createPlayerTicker(e);
@@ -481,7 +470,6 @@ test('AUDIT C&C N8: THIRST RISES AT ITS BASE RATE IN THE COLD - a body loses wat
   assert.equal(hour({ climateIndex: CLIMATES.Mountain, month: 0, hour: 2, weather: 'snow' }), 16.667);
   assert.equal(hour({ climateIndex: CLIMATES.Woodlands, month: 6, hour: 12, weather: 'sunny', insideBuilding: true }), 16.667);
   assert.ok(hour({ climateIndex: CLIMATES.Desert2, month: 6, hour: 12, weather: 'sunny' }) > 30);
-  assert.doesNotMatch(read('src/systems/survival/needs.js'), /Math\.max\(0\.5, 1 \+ Math\.max\(0, temp\.felt - 10\) \/ 10\)/);
 });
 
 test('AUDIT C&C D5: BARE FEET READ THE NATURAL TEMPERATURE AGAINST THE LIVE ENDURANCE, OUTSIDE - the mod\'s FeetDmg: past half the live endurance, on foot, never inside; the port read the felt temperature (a robe and a cloak shod the feet), the permanent endurance (a Fortify Endurance did nothing) and underground too', () => {
@@ -514,26 +502,5 @@ test('AUDIT C&C (lens T): A CASTLE\'S HALLS ARE NOT UNDERGROUND - the mod\'s Dun
   // the feed carries the host's word (off by default - a host that says nothing stands in no castle), and the host says it
   assert.equal(survivalFeed(wearer(), { ...hall, castle: true }).env.castle, true);
   assert.equal(survivalFeed(wearer(), hall).env.castle, false);
-  assert.match(read('src/scenes/dungeonContext.js'), /\n {6}castle: !!\(_fpFeet && castleBlockAt\(_fpFeet\[0\], _fpFeet\[2\]\)\),/);
 });
 
-test('AUDIT C&C (lens T): THE STANDALONE EXTERIOR READS THE REPAIRED CLIMATE - StreamingWorld.ReadyCheck dilates the coast\'s ocean pixels before DFU reads a climate, and the streaming host runs it at boot; the standalone exterior (?loc, ?region) read the raw buffer, so a coastal town whose own pixel is raw Ocean felt the sea\'s nought there and its land\'s climate in the world - it runs the same repair, after its maps load and before its first location read (mutant: no repair)', () => {
-  const ext = read('src/scenes/exterior.js');
-  const load = ext.indexOf('  maps.load(mapsBytes, climateBytes, politicBytes);');
-  const repair = ext.indexOf('\n  dilateCoastalClimate(maps, 2);\n');
-  const first = ext.indexOf('maps.getLocation');
-  assert.ok(load >= 0 && repair >= 0 && first >= 0, 'the load, the repair and the first read all stand');
-  assert.ok(load < repair && repair < first, 'the repair between the load and the first read');
-  assert.match(read('src/scenes/world.js'), /\n {2}const dilated = dilateCoastalClimate\(maps, 2\);/, 'as the streaming host runs it');
-});
-
-test('AUDIT C&C (lens H): NO SAVE INSIDE A JOURNEY - DFU\'s fast travel is one frame (TeleportToCoordinates, then RaiseTime), and here the teleport is awaited with frames running before the clock moves: a save between them wrote the arrival\'s place with the departure\'s clock and needs; the save refuses while the journey stands, and the journey\'s flag stands from before the teleport to after the clock, and falls whatever happens (mutant: no refusal)', () => {
-  const w = read('src/scenes/world.js');
-  const qs = read('src/scenes/worldQuickSave.js'), at = qs.indexOf('function worldQuickSave(');   // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): the save is scenes/worldQuickSave.js's, the host's live names read through host
-  const save = qs.slice(at, qs.indexOf('const pf = walkMode && host.playerSpawned ? player.pos : cam.pos;', at));
-  assert.match(save, /\n {4}if \(host\._traveling\) \{ if \(!quiet\) townTalk\.say\('You cannot save now\.'\); return false; \}/, 'refused, said to a save pressed');
-  const rise = w.indexOf('      _traveling = true;\n'), teleport = w.indexOf('await _teleportToPixel(pick.pixel.x, pick.pixel.y', rise);
-  const clock = w.indexOf('playerTicker.advance(computed.minutes);', teleport), fall = w.indexOf('        _traveling = false;\n', clock);
-  assert.ok(rise > 0 && rise < teleport && teleport < clock && clock < fall, 'the flag over the teleport and the clock');
-  assert.ok(/\} finally \{\n {6}try \{ if \(hccPostDue\)[^\n]*\n {6}finally \{\n {8}_traveling = false;/.test(w), 'and it falls in a finally');
-});

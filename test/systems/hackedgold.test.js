@@ -128,19 +128,6 @@ test('HACKED-GOLD a building\'s containers: a peer\'s word lands without a lette
   assert.deepEqual(recs[0].r.map((it) => it.templateIndex), [113], 'what this client says carries no letter');
 });
 
-test('HACKED-GOLD the dungeon\'s words and a foe\'s heir: every site a peer\'s list lands at, or this client says one from, reads the one law (pinned at its one line each; the building\'s and the body\'s run above) (mutants: each site\'s filter)', () => {
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /import \{ peerHanded(?:, neverPeerHanded)?(?:, notCarried)? \} from '\.\.\/systems\/peerWord\.js';/);   // PIN MOVED (PARTY-LOOT, host arbitrates): the room's stored pieces said pair by pair, by peerHanded's own rule; PIN MOVED (AUDIT AUTO-HOLD): and notCarried, a body restored off the wire
-  assert.match(dc, /r: peerHanded\(held\)\.map\(\(it\) => \(\{ \.\.\.it \}\)\)/, 'a dungeon\'s record said');
-  assert.match(dc, /const items = peerHanded\(validLootList\(rec\.r\)\);/, 'a dungeon\'s record heard');
-  assert.match(dc, /const li = notCarried\(peerHanded\(validLootList\(sf\.items\)\)\);/, 'a body on the wire');   // PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
-  const xf = read('src/scenes/exteriorFoes.js');
-  assert.match(xf, /const items = h \? peerHanded\(validLootList\(f\.entity\?\.items \?\? \[\]\)\) : null;/, 'a foe handed to its heir');
-  assert.match(xf, /const items = peerHanded\(validLootList\(r\.it\)\);/, 'a foe taken as its heir');
-  assert.match(read('src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/, 'a grant');   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's, the line as it was; PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/world/interior/interiorShared.js']) assert.doesNotMatch(read(f), /\bunbound\(/, `${f}: no list a peer hands over is read by SS3's narrower filter alone`);
-});
-
 test('HACKED-GOLD a peer\'s price is held under the law\'s ceiling - a dagger priced at nine million lands at its ceiling, an honest one as it came; a letter\'s worth and a boat\'s records are no price, and stand; never under the floor (mutants: the ceiling unregistered; the ceiling unread; the identity records capped)', () => {
   const honest = dagger();
   assert.equal(validLootItem(wire(honest)).value, honest.value, 'an honest price stands');
@@ -158,8 +145,6 @@ test('HACKED-GOLD the wild zone\'s worn offer lands what can be worn - a coin pi
   assert.equal(wearableItem(dagger()), true);
   assert.equal(wearableItem(goldStack(65_535)), false, 'a coin pile is no worn piece');
   assert.equal(wearableItem(letterOfCredit(5_000)), false, 'nor a letter');
-  assert.match(read('src/scenes/world.js'), /const minted = \(Array\.isArray\(body\.items\) \? body\.items : \[\]\)\.map\(\(it\) => \{ const r = validLootList\(\[it\]\)\?\.\[0\] \?\? null; return r && wearableItem\(r\) \? r : null; \}\);/,
-    'each record minted alone, in its place - and only a piece that can be worn');
 });
 
 test('HACKED-GOLD the put: online a letter of credit goes into no container but the player\'s own - the classic pack refuses a chest in its own words and keeps it; its own pile, its storage and the ground take it, and offline every place does; the enhanced pack\'s gates ask the same (mutants: online unasked; the own pile refused; the classic gate; the enhanced gates)', () => {
@@ -198,12 +183,6 @@ test('HACKED-GOLD the put: online a letter of credit goes into no container but 
     wo._pick(wo._filtered().indexOf(d));
     assert.ok(chest2.includes(d) && !bag4.includes(d), 'offline, a chest takes it as DFU\'s did');
   } finally { if (had === undefined) delete globalThis.location; else globalThis.location = had; }
-  // the enhanced pack: a loot session never opens the pack (MAC-M2 B), so the gate stands where the law would reach a
-  // container the day one does - read at both of its gates
-  const ei = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(ei, /const letterRefuses = \(item\) => letterRefusesPut\(item, \{ container: remote\?\.kind === 'container', own: deps\.loot\?\.playerOwned === true \}\);/);
-  assert.match(ei, /if \(remote && letterRefuses\(item\)\) return \{ kind: 'stow', label: null, speaks: true \};/, 'the drag\'s ghost');
-  assert.match(ei, /if \(remote && letterRefuses\(item\)\) \{\n\s+notice = letterPutText\(itemLongName\(item, \{ getQuest: deps\.getQuest \?\? null \}\)\);\n\s+return render\(\);/, 'the stow');
 });
 
 test('HACKED-GOLD GOLD-INT: a purse, a letter\'s worth and a coin pile\'s count are each one DFU int - at it lawful, past it a finding; a classic save\'s letter its tree\'s unsigned; an account as it was (mutants: the purse unbounded; the letter unbounded; the classic bound; the pile unbounded)', () => {

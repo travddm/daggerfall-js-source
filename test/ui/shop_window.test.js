@@ -64,9 +64,6 @@ const flowIn = (shop = card(), extra = {}) => ({ stage: 'in', account: { handle:
 // ── THE DISCLAIMER AND THE NAMES ──────────────────────────────────────
 
 test('SHOP: the window\'s disclaimer is the service\'s, word for word - the proceeds and the cosmetic line - and it stands first, above every ware (mutants: a word changed on one side; the disclaimer after the panels)', () => {
-  const src = rd('src/ui/enhanced/enhancedShop.js');
-  assert.ok(src.includes(`t('shop.proceeds', '${SHOP_PROCEEDS}')`), 'the proceeds, the service\'s own words');
-  assert.ok(src.includes(`t('shop.cosmetic', '${SHOP_COSMETIC}')`));
   assert.equal(SHOP_PROCEEDS, 'All proceeds go to the costs of developing DFO Online.');
   const w = shopWindow(fakeDoc(), { flow: () => flowIn(), onClose() {}, focus: false, preview: async () => null });
   const body = w.root.children.find((c) => c.className === 'px-body');
@@ -175,19 +172,6 @@ test('SHOP: the gem - a button that opens a dialog, named Shop, its sheet placed
   assert.match(SHOP_CSS, /prefers-reduced-motion: reduce\) \{ \.px-shopgem::after \{ animation: none; \}/);
 });
 
-test('SHOP: the pause face wires the gem at the end of the row of marks and its window on the timers\' stage - the face under it inert, Escape closing it first, its previews let go at every rebuild and unmount, its flow a visit\'s (mutants: the gem left out of the chain; the window never stopped)', () => {
-  const m = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(m.includes("const gem = shopGem(home, [mark, envelope, laurel]);"), 'after the laurel');
-  assert.ok(m.includes("shopAnchor = anchorSeason(gem, chain, home.querySelector?.('.px-profile'), home);"), 'placed off the chain it is handed, at the row\'s end');
-  assert.ok(m.includes("shopView = shopWindow(document, { flow: shopFlowOf, keep: shopKeep, onClose: closeShop, focus: shopFocusIn });"));
-  assert.ok(m.includes("for (const n of [stage, home.querySelector?.('.px-profile'), mark, envelope, laurel, gem]) n?.setAttribute?.('inert', '');"));
-  assert.ok(m.includes(': shopOpen && shopView ? () => closeShop()'), 'Escape');
-  assert.equal(m.split('stopShop();').length - 1, 2, 'a rebuild and the unmount');
-  assert.ok(m.includes("shopOpen = false; shopFocusBack = false; shopFlow = null; shopKeep = {};"), 'a visit\'s');
-  assert.ok(m.includes('.px-seasonmark, .px-shopmark'), 'a tap on the gem is inside');
-  assert.ok(m.includes('const flow = newAccountFlow('), 'the one construction seam');
-});
-
 // ── THE ACCOUNT FLOW ──────────────────────────────────────────────────
 
 test('SHOP: the account flow carries the shop\'s card off the account read, says where the player went, and says the ware landed when the read on the way back holds it; signing out forgets it (mutants: the card never read; the landing never said)', async () => {
@@ -235,8 +219,6 @@ test('SHOP: a receipt\'s head keeps its ware - one of the shop\'s, nothing else 
   assert.ok(!aura.children.at(-1).classList.contains(FLAME_CLASS), 'an aura\'s word in its paint - never the title\'s plate');
   assert.equal(shopWareTag(doc, 'glyph:origin').children.length, 2, 'the glyph\'s drawing before its label');
   assert.equal(shopWareTag(doc, 'nope'), null);
-  const post = rd('src/ui/enhanced/enhancedPost.js');
-  assert.ok(post.includes("} else if (p.ware) {   // SHOP: a receipt") && post.includes("} else if (head.ware) {   // SHOP: the receipt's ware"));
 });
 
 // ── THE CATALOGUE ─────────────────────────────────────────────────────

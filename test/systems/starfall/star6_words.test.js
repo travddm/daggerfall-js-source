@@ -180,7 +180,6 @@ test('STAR6 THE TIMERS WINDOW\'S ROWS: a fallen star still undecided counts down
   assert.ok(!rows.some((r) => r.id === 'y'), 'only the star\'s kind');
   assert.equal(rows.findIndex((r) => r.id === `star:${N}.0`) < rows.findIndex((r) => !r.live), true, 'live first');
   assert.ok(TIMER_KINDS.includes('star'));
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.px-timerswin \.tm-star \{ --tm-kind: \$\{STAR_VIOLET_CSS\}; \}/);
 });
 
 test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name and title (the Heart-Star\'s its own), its health, its circle\'s two calls as marks spent as it falls past them, warded and the circle counted while it stands, the defenders; fallen, it holds and fades (mutants: the marks, the ward, the fade)', () => {
@@ -199,7 +198,6 @@ test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name a
   assert.equal(m.warded, true);
   assert.deepEqual([m.wardedText, m.fallenText], ['Warded', 'Felled'], 'AUDIT STAR U3: its own words, through the text core - the gate\'s were English alone');
   assert.deepEqual([m.wardedText, m.fallenText], [STAR_CARD_TEXT.warded(), STAR_CARD_TEXT.felled()]);
-  assert.match(read('src/ui/gate/gateBossBar.js'), /model\.warded \? model\.wardedText \?\? BOSS_BAR_TEXT\.warded/, 'the bar says the model\'s ward');
   assert.equal(m.host, '3 of her circle stand');
   assert.equal(m.fightersLine, '4 defenders');
   const open = starBarModel({ ...b, circle: 0 }, 0);
@@ -210,7 +208,6 @@ test('STAR6 THE MASTER\'S BAR: the gate\'s bar in the star\'s theme - its name a
   assert.equal(starBarModel({ ...b, fellAt: 1000 }, 1000 + STAR_BAR_FELL_HOLD_MS + STAR_BAR_FELL_FADE_MS / 2).alpha, 0.5);
   assert.equal(starBarModel({ ...b, fellAt: 1000 }, 1000 + STAR_BAR_FELL_HOLD_MS + STAR_BAR_FELL_FADE_MS).alpha, 0);
   assert.equal(starBarModel({ ...b, max: 0 }, 0).frac, 1);
-  assert.match(read('src/ui/gate/gateBossBar.js'), /\.wb-boss-bar\.star/, 'the bar dressed in the star\'s theme');
 });
 
 /** A page the tracker writes into: its nodes, their text and style, and how often each was written. */

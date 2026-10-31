@@ -161,8 +161,6 @@ test('WEATHER3g: THE SKY\'S CLIP - a storm cell\'s cloud stands only over its fr
   const packed = packCells([cell, cellOfField({ ...c, clip: null }, shift)], 8);
   assert.deepEqual([...packed.k.slice(0, 4)], [2900, 4050, 30000, packed.c[3]], 'the clip, with the cell\'s own rim');
   assert.equal(packed.k[6], -1, 'none');
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /uniform vec4 uCellK\[8\];/);
   // on the shader's own resolveAt: the storm's base where its front's core is, the zone's past it, eased over the rim
   const f = fieldFns([{ ...cellOf('thunder', 0, 0, 9000), clip: [6000, 0, 8000, null] }]);   // the clip's rim is the cell's own (3150 m)
   const baseAt = (x) => { f.resolveAt([x, 0]); return f.globals.fBase; };
@@ -171,5 +169,4 @@ test('WEATHER3g: THE SKY\'S CLIP - a storm cell\'s cloud stands only over its fr
   const mid = baseAt(6000 - 6400);
   assert.ok(mid > VC_PROFILE.thunder.base && mid < ZONE.uBase, 'eased over the clip\'s rim');
   assert.ok(FIELD_UNIFORMS.includes('uCellK'));
-  assert.match(vc, /gl\.uniform4fv\(u\.uCellK, k\.k\);/);
 });

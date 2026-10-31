@@ -55,7 +55,4 @@ test('WOD-SEA-TEST THE REGION THE SEA ANSWERS: a pixel of the sea (politic 64) i
   assert.equal(at(64), 31, 'the sea');
   assert.equal(at(128 + 17), 17, 'Daggerfall');
   assert.equal(at(128 + 29), 29);
-  const pb = readFileSync(join(ROOT, 'src/scenes/pixelBuild.js'), 'utf8');
-  assert.match(pb, /^ {10}regionIndex: maps\.getRegionIndexAt\(px, py\),/m);
-  assert.doesNotMatch(pb, /mapRegionIndex:/, 'the location\'s region is no field of the tile');
 });

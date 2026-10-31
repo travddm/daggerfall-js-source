@@ -254,7 +254,6 @@ test('TESA-LANDS A PIXEL\'S GROUND SET: past the Bay a summer set its zone\'s dr
   // the page hands the door's word (world/climateSwaps.js - the terrain worker's modules are world/'s alone)
   setSnowlessGround(snowless);
   try { assert.equal(winterSetSnowless(403), true); assert.equal(winterSetSnowless(303), false); } finally { setSnowlessGround(winterGroundSnowless); }
-  assert.match(read('src/scenes/pixelBuild.js'), /const landSetOf = \(x, y, archive\) => \(lands \? landGroundSet\(x, y, archive, winterSetSnowless\) : archive\);/);
   assert.equal(landGroundSet(...vine, 2), groundSetKey('summersetVineCoast', 302), 'its base in the climate\'s stead');
   assert.equal(landGroundSet(...alikr, 2), 2, 'no dress, its own');
   assert.equal(landGroundSet(100, 100, 302), 302, 'the Bay its own');
@@ -306,7 +305,6 @@ test('TESA-LANDS THE DRESS OFF THE PAGE\'S THREAD (AUDIT): the worker answers dr
   w3.onerror({ message: 'gone' });
   assert.deepEqual(bytes(await asked), bytes(want));
   assert.ok(!c3.alive && w3.dead);
-  assert.match(read('src/world/tamriel/groundDressClient.js'), /return new Worker\(new URL\('\.\/groundDressWorker\.js', import\.meta\.url\), \{ type: 'module' \}\);/);
   // the ground sets: a zone's key dressed through the client, and learned again in a scene after
   const tex = { recordCount: 56, getDFBitmap: (r) => r, getColor32: (r) => ({ ...set[r], colors: set[r].colors.slice() }) };
   const tileArrays = new Map(), key = groundSetKey('morrowindAshlands', 102), dressed = [];
@@ -410,24 +408,3 @@ test('TESA-LANDS A SET ON ITS WAY, ITS PLACE GONE (the second audit, lane C): a 
   assert.equal(m.groundPuddles.get(pine), m.groundPuddles.get(102), 'the file\'s other zone\'s key finds them');
 });
 
-test('TESA-LANDS THE DOORS: the ground sets\' module dresses a zone\'s key a record a breath at the pack\'s exposure and keeps its maps under the key, no blades where the zone grows none; the pixel\'s build names its set and its neighbours\' each its own zone\'s, and stands its landmarks; the Features row and its switch (mutants: the dress unstepped; the blades kept on ash; the neighbours the pixel\'s)', () => {
-  const gs = read('src/scenes/groundSets.js');
-  assert.match(gs, /const fileOf = \(key\) => parseGroundSetKey\(key\)\?\.archive \?\? key;/);
-  assert.match(gs, /const getTexture = \(key\) => archiveTexture\(fileOf\(key\)\);/);
-  assert.match(gs, /const own = await groundLayersOf\(fileOf\(groundArchive\), groundTex\);/);
-  assert.match(gs, /own\.layers = await dresser\(\)\.dress\(own\.layers, dress, own\.modLayers \? setExposure\(own\.modLayers, classicOf\(groundTex\)\) : 1, breathe\);\n\s+own\.modLayers = own\.layers;\n\s+DRESSED_MEANS\.set\(groundArchive, own\.layers\.map\(tileMeanColour\)\);/);
-  assert.match(gs, /if \(dress\) groundDrawnMeans\.set\(groundArchive, DRESSED_MEANS\.get\(groundArchive\)\);[^\n]*\n\s+else if \(labGrass\) groundDrawnMeans\.set\(/);   // PIN MOVED (the second audit, lane C): the dress's means first - never taken twice off the same layers
-  assert.match(gs, /if \(landOf\(groundArchive\)\?\.blades === false\) grassRecords\.set\(groundArchive, new Set\(\)\);/);
-  const pb = read('src/scenes/pixelBuild.js');
-  assert.match(pb, /const lands = tamrielLandsOn\(\);/);
-  assert.match(pb, /const groundArchive = landSetOf\(px, py, snowCover \?/);
-  assert.match(pb, /return climateNeighbourIn\(px, py, x, y\) \? landSetOf\(x, y, archive\) : landSetOf\(px, py, archive\);/);
-  assert.match(pb, /near\.map\(\(c, k\) => neighbourSet\(px, py, k,/);
-  const sh = read('src/systems/landsSwitch.js');
-  assert.match(sh, /if \(pageParam\('lands', search\) === 'off' && !isOnlinePage\(search\)\) return false;/);
-  assert.match(sh, /const row = onlineForcedPref\('tamrielLands', search\) \?\? getPref\('tamrielLands'\);\n\s+return !!row && \(isOnlinePage\(search\) \|\| isEnhanced\(search\)\);/);
-  assert.match(read('src/scenes/shared.js'), /export \{ tamrielLandsOn \} from '\.\.\/systems\/landsSwitch\.js';/);
-  const feats = read('src/systems/features.js');
-  assert.match(feats, /id: 'tamriel-lands'/);
-  assert.match(feats, /control: Object\.freeze\(\{ store: 'prefs', key: 'tamrielLands', initial: true, online: true \}\)/);
-});

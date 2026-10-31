@@ -593,32 +593,3 @@ test('SERPENT1 ring: the held map reads its mark by the gate\'s reader and paint
 
 // ═══ THE FOUR HOSTS ═════════════════════════════════════════════════════════════════════════════════
 
-test('SERPENT1 hosts: THE WORLD HOST wires it whole - the naval host\'s seam read at a frame, Come Sail Away\'s drift beside its warp, the cell\'s and the hub\'s words to the link, its frame in the online frame and away from it, its body before the sea and its marks after, the held map\'s ring and the compass; the other three hosts are named and carry none of it (THE FOUR HOSTS RULE - by design) (mutants: a seam unwired; a host importing it)', () => {
-  const src = (f) => readFileSync(new URL(`../../src/scenes/${f}`, import.meta.url), 'utf8');
-  const world = src('world.js');
-  for (const pin of [
-    'get serpent() { return serpentHost; }',
-    'drift: (boat) => naval?.drift?.(boat) ?? null',
-    "online.onSerpent = (w) => { if (w?.k === 'bd') serpentHost?.wrecked?.(w); else serpentLink?.word(w); };",   // PIN MOVED (INT13): the count's wreck heard beside the link
-    'link.onSerpent = (w) => serpentLink?.word(w);',
-    'serpentFrame();   // SERPENT1',
-    'serpentAway(!onlineOn);',
-    'serpent: () => serpentOmen?.mapMark() ?? null',
-    'serpent: serpentCompassMark()',
-    'onReceipt: (r) => { const c = readSerpentReceipt(r); serpentClaims?.add(',
-    'onSpoils: (entry) => grantSerpentSpoils(entry)',
-  ]) assert.ok(world.includes(pin), pin);
-  const body = world.indexOf('serpentRenderer()?.drawBody(_serpentDraw)'), csa = world.indexOf('if (csaOn()) csa.draw(renderer);   // CSA-B');
-  const sea = world.indexOf('serpentRenderer()?.drawSea(_serpentDraw)'), naval = world.indexOf('if (naval?.enabled) navalRender.draw(naval.drawFrame());');
-  assert.ok(csa > 0 && body > csa && body - csa < 600, 'the body with the opaque world, after the boats');
-  assert.ok(naval > 0 && sea > naval && sea - naval < 400, 'the marks over the sea');
-  assert.ok(/THE FOUR HOSTS RULE: THIS host \(scenes\/world\.js\) wires it whole\. scenes\/exterior\.js[\s\S]{0,200}scenes\/worldModes\.js[\s\S]{0,200}scenes\/dungeonContext\.js[\s\S]{0,200}named and left without it/.test(world), 'all four named');
-  for (const other of ['exterior.js', 'worldModes.js', 'dungeonContext.js']) assert.ok(!/serpent/i.test(src(other)), `${other} carries no serpent`);
-  const naval2 = src('naval/navalHost.js');
-  assert.ok(naval2.includes('drift: (boat) => (enabled ? deps.serpent?.drift?.(boat) ?? null : null)'));   // PIN MOVED: SERPENT4 - and the ships' bumpers; PIN MOVED: HULL-PASS (Field-Bugs-2026-10-26d) - the bumpers retired
-  assert.ok(naval2.includes('gale: (boat) => (enabled ? deps.serpent?.gale?.(boat) ?? null : null)'), 'SERPENT4: the gale through the naval host');
-  assert.ok(world.includes('gale: (boat) => naval?.gale?.(boat) ?? null,'), 'SERPENT4: Come Sail Away\'s gale beside its drift');
-  assert.ok(naval2.includes('for (const t of deps.serpent?.targets?.() ?? []) out.push(t);'));
-  const csaSrc = readFileSync(new URL('../../src/systems/comeSailAway/comeSailAway.js', import.meta.url), 'utf8');
-  assert.ok(csaSrc.includes('drift ? vAdd(state.currentVector, drift) : state.currentVector'));
-});

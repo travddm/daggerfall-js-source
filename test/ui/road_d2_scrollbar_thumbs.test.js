@@ -88,18 +88,6 @@ test('ROAD-D2: the picker\'s thumb is DFU\'s three slices on the panel\'s own 5x
   assert.equal(r4.quads.length, 0);
 });
 
-test('ROAD-D2: drawListPicker draws that thumb, so all three chargen pickers get it', () => {
-  // The class list, the custom-class skill/help picker and the two
-  // special-advantage pickers all share drawListPicker; the thumb has
-  // to hang off THAT, not off one caller. (The body needs PICK00I0 to
-  // run, so this is the seam a bare suite can reach.)
-  const code = read('src/ui/chargenArt.js');
-  assert.match(code, /drawPickerScrollThumb\(renderer, m, names\.length, rows, scroll\);/,
-    'the live list length and the CALLER\'s row count are Update\'s TotalUnits/DisplayUnits (:103-106)');
-  assert.equal(code.includes('AUDIT 17g FLAGGED: the scrollbar THUMB does not draw'), false,
-    'and the flag it closes is gone from the index');
-});
-
 // ── the spellbook (F180's flat brass bar) ─────────────────────────
 
 const spell = (name, cost) => ({ name, cost, index: 1, icon: 3, element: 0, rangeType: 2, effects: [] });

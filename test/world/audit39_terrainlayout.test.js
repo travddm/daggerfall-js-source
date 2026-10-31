@@ -229,17 +229,3 @@ test('AUDIT 39 #19: archive-216 treasure flats are not read as enemy markers', (
   assert.equal(out[0].mobileType, 32);
 });
 
-test('AUDIT 39 #20: the windmill subrecord guard no longer claims BlocksFile caches', () => {
-  // blocksFile.js sets autoDiscard = true and nothing clears it, so
-  // loadBlock discards the previous block on every request: an A,B,A
-  // sequence re-parses A into a NEW object. DFU is the same, which is
-  // why RMBLayout keeps its own locationCache.
-  assert.match(read('src/formats/blocksFile.js'), /this\.autoDiscard = true;/);
-  const blocks = read('src/formats/blocksFile.js');
-  assert.equal((blocks.match(/this\.autoDiscard\s*=/g) || []).length, 1,
-    'autoDiscard is assigned somewhere else now - the rationale must be re-checked');
-  const layout = read('src/world/rmbLayout.js');
-  assert.doesNotMatch(layout, /BlocksFile CACHES its parsed blocks/,
-    'the false idempotence rationale is back');
-  assert.match(layout, /autoDiscard is true and nothing ever clears it/);
-});

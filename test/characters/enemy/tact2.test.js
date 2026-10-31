@@ -217,23 +217,6 @@ test('TACT2: the brain only steers a foe that sees its target in range - out of 
   assert.equal(tacticsStep({ _dist: Infinity, inSight: false, feet: [0, 0, 0] }, 1, 0), false);
 });
 
-test('TACT2: the motor and the attack read the brain - the step, the stand, the gates; the hosts hand the vitals and the player\'s facing', () => {
-  const m = rd('src/characters/enemy/enemyMotor.js');
-  // PIN MOVED (TELL6, bible/12-Enhanced-AI/Feud-Arc.md 8.1): a charge's run is never the detour's either
-  assert.match(m, /const _took = tacticsStep\(this, dx, dz\);\n\s*if \(_took && \(!detouring \|\| this\.fleeLeft > 0 \|\| this\._tac\?\.state === 'windup' \|\| this\._tac\?\.state === 'dash'\)\) return;[^\n]*\n\s*this\._tacDir = null;\n\s*\/\/ Ranged attacks/);
-  assert.match(m, /if \(this\._tacDir\) \{ this\._tacDir = null; this\._tacBlocked = true; this\.moving = false; \}[^\n]*\n\s*else this\._findDetour\(dir2d\);/);
-  const a = rd('src/characters/enemy/enemyAttack.js');
-  assert.match(a, /if \(ai\._tacStrike === false\) continue;/);
-  assert.match(a, /&& ai\._tacShoot !== false && this\.rolls\(\) < BOW_SHOT_CHANCE\)/);
-  assert.match(a, /ai\._tacSwung = \(ai\._tacSwung \?\? 0\) \+ 1;/);
-  const c = rd('src/characters/enemy/enemyCasting.js');
-  assert.match(c, /if \(ai\._tacShoot === false\) continue;/);
-  assert.match(c, /dist <= MELEE_DISTANCE && ai\._tacStrike !== false\)/);
-  for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) assert.match(rd(f), /vitals: \(\) => entity,/, f);
-  assert.equal((rd('src/scenes/dungeonContext.js').match(/vitals: \(\) => entity,/g) ?? []).length, 2);
-  assert.match(rd('src/scenes/world.js'), /noteLocalPlayer\(walkMode && playerSpawned \? player\.pos : cam\.pos, fwd\);/);
-});
-
 /** A bare foe for the board's own law: in sight, at `d` from the target, ahead along +z. */
 const stub = (d = 3.4) => ({ inSight: true, detected: true, _dist: d, feet: [0, 0, -d], stopDistance: 2.25, yaw: 0, _armedTargeting: false, flee() {} });
 

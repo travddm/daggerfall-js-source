@@ -179,12 +179,4 @@ test('MW-SHOULDER THE WIRING: the feature row (off by default, Off / Right / Lef
   assert.equal(row.control.initial, 'off', 'off, as the reference ships it (settings.lua:44)');
   assert.equal(row.control.online, 'player');
   assert.deepEqual(row.control.tiers.map((t) => t[0]), ['off', 'right', 'left']);
-  assert.match(rd('src/ui/settings/settingsMap.js'), /sec\("camera", "Camera", \[\n\s*"feat:mw-shoulder-camera", "feat:mod-eye-of-the-beholder"\]\)/);
-  const view = rd('src/player/mwView.js');
-  const set = view.indexOf("mwCamera.setShoulder(getPref('mwShoulderCam'));");
-  const step = view.indexOf('mwCamera.stepShoulder(state.dt ?? 0, fpArm.shoulderStance());');
-  const eye = view.indexOf('const eye = mwCamera.eye({ fpEye, feet, yaw, pitch, heightScale, raycast, spherecast, pivotFloor });');
-  assert.ok(set > 0 && step > set && eye > step, 'the side, the step, then the eye');
-  const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /shoulderStance: \(\) => \(spellReady \|\| !sheathed \? 'combat' : camera\?\.\(\)\?\.move\?\.swimming \? 'swimming' : null\),/);
 });

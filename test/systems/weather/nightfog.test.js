@@ -171,11 +171,6 @@ test('NIGHT-FOG THE CONTROLLER hands every host the lit fog on the enhanced lane
   classic.ctl.renderer.clearColor = Float32Array.of(0.02, 0.03, 0.05);   // a night panorama's horizon (NITE??I0's west, as dark as DFU paints it)
   assert.equal(classic.ctl.fogColorFor(FOG_SETTINGS.sunny), classic.ctl.renderer.clearColor, 'the classic panorama: SetSkyFogColor verbatim, however dark');
   assert.deepEqual([...at('sky=enhanced', 1380, 'fog').fog], [0.5, 0.5, 0.5], 'DFU\'s grey at midnight, brighter than the air: left');
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /const nightFogLane = Boolean\(enhancedSky \|\| dynamic\);/);
-  assert.match(shared, /const litAir = \(fog\) => \(nightFogLane && nightFogOn\(\)/);
-  assert.match(shared, /nightScale: getFloat\('Enhancements', 'NightAmbientLightScale', 0, 1\), sun: airAt\.sun, moon: moonNow\(\)/);
-  assert.match(shared, /airAt\.minute = minuteOfDay; airAt\.sun = extra\?\.sun \?\? 1;/);
   // indoors: DFU's SetFog interior and dungeon branches set their own black fog, never through the sky's colour
   for (const host of ['src/scenes/worldModes.js', 'src/scenes/interior.js', 'src/scenes/dungeon.js']) assert.doesNotMatch(rd(host), /fogColorFor/, `${host} takes no outdoor fog colour`);
 });

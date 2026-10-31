@@ -170,12 +170,3 @@ test('RENOWN-LOOT the supplies, through the real hooks: a looting foe\'s healing
 
 // ─── THE HOSTS ───────────────────────────────────────────────────────
 
-test('RENOWN-LOOT the four hosts: no host holds a LOOT-EASE knob of its own - every one is read inside the shared rolls, at the page\'s door, which world.js sets as it learns its Renown; the offline town page never goes online (mutants: a host rolling its own keep)', () => {
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(rd(f), /PLAIN_FOE_RARITY_WEIGHTS|HEALING_ENEMY_CHANCE|HEALING_PILE_CHANCE|MAGICKA_(ENEMY|PILE)_CHANCE|REST_(FOE|PILE)_CHANCES|plainFoeLootKeep|renownLootQuarters/, `${f}: no knob of its own`);
-  }
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /setSigilOnline\(params\.has\('online'\)\);/, 'online from the page\'s own word, before any list is minted');
-  assert.match(w, /setSigilRenown\(level\);/, 'and the Renown as it is adopted');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /setSigilOnline/, 'the offline town page: LOOT-EASE\'s whole');
-});

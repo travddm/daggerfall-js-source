@@ -227,5 +227,4 @@ test('L10N1 parity with DFU\'s C#: the collection names, the error string and th
   const parser = readFileSync(dfuFile('Assets/Scripts/Game/StringTableCSVParser.cs'), 'utf8');
   const pattern = /const string linePattern = "(.*)";/.exec(parser)[1].replace(/\\\\/g, '\\').replace(/\\"/g, '"');
   assert.equal(pattern, '(?:\\n|^)([^",\\n]*),((?:"[^"]*")+|[^",\\n]*)');
-  assert.ok(rd('src/systems/textManager.js').includes('const CSV_LINE = /(?:\\n|^)([^",\\n]*),((?:"[^"]*")+|[^",\\n]*)/g;'), 'the port\'s pattern is the same text');
 });

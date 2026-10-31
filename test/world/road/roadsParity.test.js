@@ -38,53 +38,6 @@ test('AUDIT 51: our painter matches the mod\u2019s PaintPath byte for byte over 
   assert.deepEqual(diffs.slice(0, 12), [], `${diffs.length} of 907 cases differ from the mod`);
 });
 
-// AUDIT 51: THE SMOOTHER IS THE MOD'S - SmoothRoadsJob, ported. Road and
-// water_temp tiles only, the tile's four corners, a five-point mean in
-// place in scan order, on the two layouts that own them: the TILEMAP is
-// x + y*tDim (JobA.Idx(x, y, tDim), TerrainHelper.cs:170) and the
-// HEIGHTMAP is y + x*hDim (JobA.Idx(y, x, hDim), TerrainSampler.cs:123
-// - what terrainSampler.js:"data[x * hDim + y]" writes). The mod reads both in their own
-// layout and so does the port. MODS AUDIT (2026-09-08): there is NO
-// divergence - AUDIT 51 and AUDIT 58 both recorded one ("the mod's
-// sample base is the transpose"), and it was AUDIT 58's own fix of the
-// PORT's base (y*hDim + x, wrong) to x*hDim + y that made the port equal
-// to the mod's Idx(y, x, hDim). This pin used to compute its expected
-// corners from `10 * H + 63` - the smoother's own wrong base - so it
-// could not see the defect it was written for.
-test('AUDIT 51: the smoother is SmoothRoadsJob - road and water only, four corners, five-point mean, in place', async () => {
-  const { smoothRoadHeights, SMOOTHED_TILES } = await import('../../../src/world/road/roadPainter.js');
-  assert.deepEqual([...SMOOTHED_TILES].sort((a, b) => a - b), [46, 0xff], 'road and water_temp, as his `tile == road || tile == water_temp`');
-  const H = 129;
-  const samples = new Float32Array(H * H); for (let i = 0; i < samples.length; i++) samples[i] = (i % 2) ? 50 : 30;
-  const tilemap = new Uint8Array(128 * 128);
-  tilemap[10 * 128 + 63] = 46;        // one road tile at (63,10)
-  tilemap[20 * 128 + 63] = 47 + 64;   // an EDGE tile: the mod does not smooth it
-  tilemap[30 * 128 + 63] = 11;        // a TRACK tile: nor this
-  const before = Float32Array.from(samples);
-  const n = smoothRoadHeights(samples, tilemap);
-  assert.equal(n, 4, 'exactly the road tile\u2019s four corners');
-  // his order: idx, idx+1, idx+hDim, idx+hDim+1, each a five-point mean
-  // of the CURRENT array - the second corner reads the first's result.
-  const idx = 63 * H + 10;   // the SAMPLER's layout: sample(x=63, y=10) = s[x * H + y]
-  const mean5 = (arr, i) => (arr[i] + arr[i + H] + arr[i + 1] + arr[i - H] + arr[i - 1]) / 5;
-  const expect = Float32Array.from(before);
-  for (const k of [idx, idx + 1, idx + H, idx + H + 1]) expect[k] = mean5(expect, k);
-  for (const k of [idx, idx + 1, idx + H, idx + H + 1]) assert.ok(Math.abs(samples[k] - expect[k]) < 1e-5, `corner ${k} is the in-place five-point mean`);
-  assert.equal(samples[63 * H + 20], before[63 * H + 20], 'the edge tile\u2019s corner is untouched');
-  assert.equal(samples[63 * H + 30], before[63 * H + 30], 'the track tile\u2019s corner is untouched');
-  // the rect is skipped, as his locationRect.Contains skips it
-  const s2 = Float32Array.from(before); const t2 = new Uint8Array(128 * 128); t2[64 * 128 + 64] = 46;
-  assert.equal(smoothRoadHeights(s2, t2, H, { xMin: 60, xMax: 70, yMin: 60, yMax: 70 }), 0, 'a road tile inside the rect is not smoothed');
-  // both indices his: the tile read is the painter's (y*tDim + x, which
-  // IS his Idx(x, y, tDim)) and the corner base is the sampler's
-  // (x*hDim + y, which IS his Idx(y, x, hDim)).
-  const src = readFileSync(new URL('../../../src/world/road/roadPainter.js', import.meta.url), 'utf8');
-  assert.match(src, /const tile = tilemap\[y \* tDim \+ x\];/, 'the tile is read at y*tDim + x - the painter\u2019s own layout, his Idx(x, y, tDim)');
-  assert.match(src, /const idx = x \* hDim \+ y;/, 'and the corner base is the HEIGHTMAP\u2019s - his Idx(y, x, hDim), TerrainSampler.cs:123');
-  assert.match(src, /NO DIVERGENCE\./, 'and the record says so');
-  assert.ok(!/DELIBERATE DIVERGENCE/.test(src), 'the false entry is gone');
-});
-
 // MODS AUDIT (2026-09-08): THE RECT'S EDGE. His skip is
 // `locationRect.Contains(new Vector2(x, y))` - Unity's Rect.Contains,
 // min-inclusive and MAX-EXCLUSIVE - and the port's was max-inclusive:

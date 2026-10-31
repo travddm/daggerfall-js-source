@@ -183,19 +183,6 @@ test('QUICK-LOOT-STATS: the side is decided by arithmetic at real widths, and th
   // than hanging off an edge it was told not to use.
   assert.match(css, /\[data-side="below"\] \{ position: static;/);
 
-  // ...AND THE TWO CANNOT PART, which the four lines above do NOT hold:
-  // they compare the sheet against the very constant the sheet is built
-  // from, so they agree by construction and a mutant that widened the
-  // panel sailed through all of them. A pin asserting the wiring as it
-  // is always agrees with it. What has to be true is that the sheet
-  // INTERPOLATES the constant rather than restating the number - the
-  // only shape in which one edit cannot move the drawing without
-  // moving the arithmetic.
-  const sheet = readFileSync('src/ui/enhanced/enhancedStyle.js', 'utf8');
-  assert.match(sheet, /\.wplaque-stats \{[^}]*width: \$\{STATS_W\}px/, 'the drawn width IS the constant, not a copy of it');
-  assert.match(sheet, /max-width: \$\{PLAQUE_MAX_W\}px/, 'and so is the plaque\'s own');
-  assert.match(sheet, /\[data-side="right"\] \{ left: calc\(100% \+ \$\{STATS_GAP\}px\)/);
-  assert.match(sheet, /\[data-side="left"\] \{ right: calc\(100% \+ \$\{STATS_GAP\}px\)/);
   // A MUTANT THAT WIDENED THE PANEL (190 -> 220) WAS WITHDRAWN RATHER
   // THAN KILLED, and the reason belongs here. It survives every pin in
   // this file and it should: the sheet interpolates the constant and

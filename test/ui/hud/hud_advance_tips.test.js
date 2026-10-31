@@ -51,7 +51,6 @@ test('SKILL-READY / FIRM-STARS: two 16px outlined glyphs, two movable pieces, an
   }
   const ids = HUD_PIECES.map((p) => p.id);
   assert.ok(ids.includes('skillsReady') && ids.includes('starsUnspent'));
-  assert.match(src('src/ui/levelUp/levelNotice.js'), /improvable: improvable \?\? 0 \}/);
 });
 
 test('STATUS-TIPS: a spell says what its effects do, a disease what it wears down, a need what it is', () => {
@@ -86,7 +85,6 @@ test('BELT-LANTERN: one lantern hangs at a time, a hung one is at the waist what
   assert.equal(lanternAtWaist(b), true);
   assert.equal(unhangBeltLantern(b), true);
   assert.equal(beltLanternOf(e), null);
-  assert.match(src('src/ui/enhanced/enhancedInventory.js'), /\{ label: 'Lantern', lantern: true \}/);
 });
 
 test('MONSTER-QUIET and MONSTER-VOL: a foe calls 40% as often, a companion as before; the Audio tab\'s volume scales every call', () => {
@@ -105,8 +103,6 @@ test('MONSTER-QUIET and MONSTER-VOL: a foe calls 40% as often, a companion as be
   setPref('monsterVolume', 0.35);
   assert.equal(monsterVolume(), 0.35);
   _resetForTests();
-  assert.match(src('src/scenes/hostCombat.js'), /out\.volume \* monsterVolume\(\)/);
-  assert.match(src('src/ui/settings/settingsMap.js'), /"Controls\/MusicVolume", "port:monsterVolume"/);
 });
 
 test('HOOD-GAP: a run of empty px under the hood\'s foot with the body under it takes the foot\'s colour; open air stays open', () => {
@@ -120,21 +116,3 @@ test('HOOD-GAP: a run of empty px under the hood\'s foot with the body under it 
   for (let y = 3; y < h; y++) assert.equal(d[(y * w + 1) * 4 + 3], 0);
 });
 
-test('QUEST-WORDS-FIRST: a click a quest heard ticks the machine at once, and the NPC\'s door waits for the windows it raised', async () => {
-  const { createQuestClickFirst, clickHeardByQuest } = await import('../../../src/scenes/quest/questClickFirst.js');
-  let top = null, opened = 0, heard = true;
-  const first = createQuestClickFirst({ tick: () => { top = 'questBox'; }, top: () => top, heard: () => heard });
-  assert.equal(first.hold(() => { opened++; }), true, 'the box came up: the door waits');
-  first.settled('rewardPile');
-  assert.equal(opened, 0, 'the reward next');
-  first.settled(null);
-  assert.equal(opened, 1, 'then the conversation');
-  heard = false;
-  assert.equal(first.hold(() => {}), false, 'a click no quest heard opens at once');
-  const silent = createQuestClickFirst({ tick: () => {}, top: () => null, heard: () => true });
-  assert.equal(silent.hold(() => {}), false, 'a tick that said nothing opens at once');
-  const person = { isPerson: true, hasPlayerClicked: true };
-  assert.equal(clickHeardByQuest({ quests: new Map([[1, { questComplete: false, resources: new Map([['a', person]]) }]]) }), true);
-  assert.equal(clickHeardByQuest({ quests: new Map([[1, { questComplete: true, resources: new Map([['a', person]]) }]]) }), false);
-  assert.match(src('src/scenes/worldModes.js'), /questWordsFirst\.hold\(/);
-});

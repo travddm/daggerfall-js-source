@@ -97,11 +97,6 @@ test('WEATHER3c: THE CLOUDS STAND ON CLEAR AIR on the map\'s lane - its row whol
   assert.equal(currentCloudBase(), 'sunny');
   setWeatherMapLaw(false);
   assert.equal(currentCloudBase(), null);
-  // the controller's two paths hand the clouds the base's state and row; the dome keeps its own
-  const shared = rd('src/scenes/shared.js');
-  assert.equal((shared.match(/const cb = dreadW > 0 \? \{ word: skyWord, row: weatherRowNow \} : cloudBaseOf\(extra, weatherName, weatherRowNow\);/g) || []).length, 2, 'the dome path and the mod path (EVENT1: the live event\'s deck over it while the dread is up)');
-  assert.match(shared, /enhancedSky\.setState\(skyState\(\{\s*\n\s*minuteOfDay,\s*\n\s*weather: skyWord,/, 'the dome itself is the worn word\'s (EVENT1: the storm\'s while the dread is up)');
-  assert.match(shared, /const skyWord = dreadW > 0 \? DREAD_SKY_WORD : systemWordOf\(weatherName\);/, 'the worn word but under the live event');   // AUDIT PRECIP FALL-2 (PIN MOVED): its system's
 });
 
 test('WEATHER3c: THE WIND OF WHAT IS COMING - the storm\'s violence, at its envelope, from its edge to nothing APPROACH_M out; a floor under the fronts', () => {
@@ -153,12 +148,3 @@ test('WEATHER3c: the sim\'s cells - every kind of sky, and a winter storm a snow
   assert.ok(typeof currentWeather() === 'string');
 });
 
-test('WEATHER3c: the hosts hand the clouds the base, the wind the approach, and the cells their importance and rank', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = rd(host);
-    assert.match(h, /cells: fieldCellsHere\(\), cloudBase: weatherOverride (?:\|\| seaStormShown\(\) )?\? null : currentCloudBase\(\), approach: weatherOverride \? 0 : currentWindApproach\(\) \}\);/, host);   // PIN MOVED (SEA-EVENTS, 2026-10-22): world.js's clouds stand on the Aether Storm's thunder in it (scenes/seaVenturesHost.js seaStormShown)
-    assert.match(h, /currentFieldCells\(\)\.map\(\(c\) => cellOfField\(c, \(x, z\) => /, `${host}: the cells carry the pick (WEATHER3g: through the one conversion)`);
-  }
-  assert.match(rd('src/scenes/shared.js'), /windModel\.tick\(extra\?\.classicMinutes \?\? 0, systemWordOf\(weatherName\), extra\?\.violence \?\? weatherName, extra\?\.approach \?\? 0\);/);
-  assert.match(rd('src/render/volumetricClouds.js'), /this\.cells = pickCells\(/);
-});

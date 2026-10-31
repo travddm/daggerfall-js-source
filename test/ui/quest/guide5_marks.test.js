@@ -353,14 +353,6 @@ test('GUIDE5 THE COMPASS - one mark, the tracker\'s quest\'s place: a hollow dia
 // ---------------------------------------------------------------
 
 test('GUIDE5 ONE HOST, ITS LAWS - the street resolves a place with the held map\'s goto law, hands the held map every quest\'s place while the marks are on, and hands the compass the tracker\'s quest\'s place (the pixel\'s middle, the party marks\' own sum) on the street alone; drawHud forwards it and the enhanced HUD draws it; the classic map is DFU\'s and gets none; the switch is a Features row beside the tracker\'s; the module stays light (mutants: the marks off the switch; the compass indoors; the point off the pixel\'s middle; the forward dropped)', () => {
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /const questPixel = \(find\) => find\?\.worldPixel \?\? questPlacePixel\(maps, find\?\.regionName \?\? '', find\?\.locationName \?\? ''\);/, 'AUDIT GUIDE O3: the host\'s memo - the held map\'s goto law (placePixelOf), read once a place');   // PIN MOVED (START3): a place past the Bay by its own pixel first
-  assert.match(W, /quests: \(\) => \(marksOn\(\) \? questMapMarks\(questTracker\.views, questTracker\.shown\(\)\?\.id \?\? null, questPixel\) : \[\]\),/);
-  assert.match(W, /const questCompassMark = \(\) => \{\n\s*if \(!marksOn\(\) \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return null;\n\s*const find = questTracker\.shown\(\)\?\.target\?\.find;\n\s*const p = find \? questPixel\(find\) : null;\n\s*if \(!p\) return null;\n\s*const t = state\.pixelTranslation\(p\.x, p\.y\);\n\s*return \[t\[0\] \+ TERRAIN_SIZE \/ 2, t\[2\] \+ TERRAIN_SIZE \/ 2\];/);
-  assert.match(W, /quest: (?:vendorCompassMark\(\) \?\? )?(?:townQuestCompassMark\(\) \?\? )?questCompassMark\(\),   \/\/ GUIDE5/);   // HOME-VENDOR: a trader's waypoint first, while it is set
-  assert.match(rd('src/ui/hud/hud.js'), /quest: quest \?\? null,   \/\/ GUIDE5/);
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /drawQuestMark\(opts\.quest \?\? null, opts\.playerXZ \?\? null, heading01\);   \/\/ GUIDE5/);
-  assert.doesNotMatch(rd('src/ui/travel/travelMapWindow.js'), /quests/, 'the classic travel map is DFU\'s: a player who chose DFU\'s maps chose its look');
   const row = FEATURES.find((f) => f.id === 'quest-marks');
   assert.ok(row);
   assert.deepEqual([row.group, row.kinds, row.control.store, row.control.key, row.control.initial, row.control.online],

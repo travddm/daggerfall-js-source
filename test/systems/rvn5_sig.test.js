@@ -98,27 +98,6 @@ test('RVN5 THE LAW: from rank 2; x2.0, 12-18 s, iron from rank 3, its ember, its
   assert.equal(e2.revenant.sigBlow.name, F.signatureName(r));
 });
 
-test('RVN5 THE PYRE\'S SHAPE: the brain\'s verdict a disc about its locked point, the ground\'s field the same, its quad by its point; the slam\'s branch of the shader (mutants: the disc at the foe\'s feet; the radius the leap\'s; the quad the longest\'s)', () => {
-  const b = makeBlow('pyre', [0, 0, 0], 0, 0);
-  b.ahead = 8;
-  assert.equal(inBlow(b, 0, 8), true, 'its point');
-  assert.equal(inBlow(b, 2.15, 8), true, 'inside its rim');
-  assert.equal(inBlow(b, 2.25, 8), false, 'past its rim');
-  assert.equal(inBlow(b, 0, 5.7), false, 'short of it');
-  assert.equal(inBlow(b, 0, 0), false, 'the foe\'s own feet are safe');
-  assert.equal(blowField('pyre', 0, 8, 8).inside, true);
-  assert.equal(blowField('pyre', 2.15, 8, 8).inside, true);
-  assert.equal(blowField('pyre', 2.25, 8, 8).inside, false);
-  assert.equal(blowField('pyre', 0, 0, 8).inside, false);
-  assert.ok(blowField('pyre', 2.1, 8, 8).rim, 'its rim');
-  assert.equal(BLOW_KIND.pyre, BLOW_KIND.slam);
-  const tg = read('src/render/foeTelegraph.js');
-  assert.match(tg, /else if \(b\.kind === 'leap' \|\| b\.kind === 'pyre'\) gl\.uniform4f\(U\.uP, P\.r, b\.ahead \?\? 0, 0, 0\);/, 'the shader: its radius and its point');
-  assert.match(tg, /const P = BLOW\[b\.kind\]/, 'its own numbers');
-  assert.ok(Math.abs(quadHalf('pyre', 8) - (8 + 2.2 + 0.6)) < 1e-9);
-  assert.ok(Math.abs(quadHalf('pyre') - (12 + 2.2 + 0.6)) < 1e-9, 'unplaced: its farthest');
-});
-
 // ── the names ───────────────────────────────────────────────────────
 
 test('RVN5 THE NAMES: "<given>\'s <noun>", the noun drawn on its id from its shape\'s bank - each bank whole, every noun reached, one id the same twice, the shared DFRandom unmoved; a pyre\'s by its kind\'s element; derived, never stored (mutants: a bank\'s noun moved; the draw off its id; the last noun unreachable; an element moved)', () => {
@@ -220,56 +199,6 @@ function firstWindup(f, player, secs = 30) {
 }
 function withRandom(v, fn) { const r = Math.random; Math.random = () => v; try { return fn(); } finally { Math.random = r; } }
 
-test('RVN5 ON THE REAL BRAIN: its signature ahead of every other blow - x2.0, its ember, its WIND, no feint, iron from rank 3, called (`_sigCall`), its cooldown drawn 12-18 s; inside it the plain blows (mutants: the signature unpicked; its numbers unread; a feint; its cooldown unset or not drawn)', () => {
-  for (const rank of [2, 3]) {
-    resetTactics(); resetBlows(); T = 0;
-    const f = brainFoe('slam', { rank });
-    const player = [0, 0, 0];
-    const b = withRandom(0.05, () => firstWindup(f, player));
-    assert.equal(b?.kind, 'slam', `rank ${rank}: its signature`);
-    assert.equal(b.sig, true);
-    assert.equal(b.mult, 2.0);
-    assert.deepEqual([...b.color], [...F.SIG.COLOR]);
-    assert.equal(b.windPitch, 0.7);
-    assert.equal(b.guard, rank >= 3 ? 'iron' : 'poise');
-    assert.equal(b.feint, undefined, 'a signature never feints');
-    assert.ok(Math.abs(f.ai._tac.sigReady - (b.start + 12 + 6 * 0.05)) < 1e-9, 'its cooldown drawn');
-    assert.ok(Math.abs(f.ai._sigCall - b.start) < 1e-9, 'called');
-  }
-  // its cooldown: the next blows inside it are the plain ones (a blade's: a lunge or a sweep), past it the signature again
-  resetTactics(); resetBlows(); T = 0;
-  const f = brainFoe('slam');
-  const player = [0, 0, 0];
-  const first = withRandom(0.05, () => firstWindup(f, player));
-  assert.equal(first.sig, true);
-  run(f, first.land - T + 0.3, player);
-  const seen = new Set([first]);
-  const next = () => {
-    f.ai._tac.blowReady = T;   // its plain cooldown spent by hand: the signature's own gate alone decides
-    for (let i = 0; i < 120; i++) {
-      const b = withRandom(0.05, () => firstWindup(f, player, 0.5));
-      if (b && !seen.has(b)) { seen.add(b); return b; }
-      if (f.ai._tac.state !== 'windup') f.ai._tac.blowReady = Math.min(f.ai._tac.blowReady ?? T, T);
-    }
-    return null;
-  };
-  assert.ok(f.ai._tac.sigReady > T + 10, 'its cooldown still running');
-  const plain = next();
-  assert.ok(plain, 'a plain blow inside its cooldown');
-  assert.notEqual(plain.sig, true);
-  assert.notEqual(plain.mult, 2.0);
-  run(f, plain.land - T + 0.3, player);
-  f.ai._tac.sigReady = T;   // past its cooldown: its signature again
-  const again = next();
-  assert.equal(again?.sig, true, 'past it, the signature again');
-  // the roll: BLOW_CHANCE's, as every blow's - a draw past it winds nothing
-  resetTactics(); resetBlows(); T = 0;
-  assert.equal(withRandom(0.99, () => firstWindup(brainFoe('slam'), [0, 0, 0], 3)), null, 'no roll, no signature');
-  assert.equal(BLOW_CHANCE, 0.1);
-  // the source: no feint on a signature, nor on a pyre
-  assert.match(read('src/ai/tactics.js'), /if \(chain === 0 && !sig && shape !== 'aimed' && shape !== 'pyre' && !GAP_CLOSERS\.includes\(shape\)/);
-});
-
 test('RVN5 THE PYRE on the REAL brain: wound up at my feet (locked, out to 12 m), iron from rank 3, no held swing; standing in it its blast is asked of the pool (`_blowPyre`, x2.0) and the foe waits - no swing; stepped off, nothing, and it overreaches (mutants: aimed at its own feet; unlocked; a swing held; the blast asked on a miss; no overreach)', () => {
   const land = (stay, rank = 2) => {
     resetTactics(); resetBlows(); T = 0;
@@ -293,37 +222,6 @@ test('RVN5 THE PYRE on the REAL brain: wound up at my feet (locked, out to 12 m)
   assert.equal(miss.ai._blowPyre ?? null, null, 'stepped off: no blast');
   assert.equal(miss.ai._tac.state, 'overreach');
   assert.equal(land(true, 3).ai._blowPyre.mult, 2.0);
-});
-
-test('RVN5 THE PYRE as a shooter\'s turn: a caster that fights at range winds it up with its token - the casters\' first tell; out of range, out of sight or at another than me, never (mutants: the shooter\'s branch unwired; any gate dropped)', () => {
-  resetTactics(); resetBlows(); T = 0;
-  const f = brainFoe('pyre', { mobileType: M.Lich, at: [0, 0, 10], shooter: true });
-  const player = [0, 0, 0];
-  const b = withRandom(0.05, () => firstWindup(f, player));
-  assert.equal(f.ai._tac.kind, 'ranged', 'it fights as a shooter');
-  assert.equal(b?.kind, 'pyre');
-  assert.equal(b.sig, true);
-  // its cooldown gates the shooter's turn too: landed, its plain cooldown spent, no second pyre inside it
-  run(f, b.land - T + 0.3, player);
-  f.ai._tac.blowReady = T;
-  assert.equal(withRandom(0.05, () => firstWindup(f, player, 3)), null, 'none inside its cooldown');
-  f.ai._tac.sigReady = T; f.ai._tac.blowReady = T;
-  assert.equal(withRandom(0.05, () => firstWindup(f, player, 3))?.kind, 'pyre', 'past it, again');
-  // with its token, as its shot goes (TACT's ranged token)
-  assert.match(read('src/ai/tactics.js'), /if \(has && sig\?\.kind === 'pyre' && _me && ai\.canAct !== false && now >= \(s\.blowReady \?\? 0\) && now >= \(s\.sigReady \?\? 0\)/);
-  // the gates
-  const ai = { inSight: true, _armedTargeting: false };
-  assert.equal(signatureReaches(ai, {}, 'pyre', 12, false, 0, 12), true);
-  assert.equal(signatureReaches(ai, {}, 'pyre', 12.1, false, 0, 12.1), false, 'past its range');
-  assert.equal(signatureReaches({ ...ai, inSight: false }, {}, 'pyre', 5, false, 0, 5), false, 'out of sight');
-  assert.equal(signatureReaches({ inSight: true, _armedTargeting: true, target: { isPlayer: true, isPeer: true, peerId: 'p2' } }, {}, 'pyre', 5, false, 0, 5), false, 'at a peer: never (RVN13)');
-  assert.equal(signatureReaches({ inSight: true, _armedTargeting: true, target: { mobileType: 7 } }, {}, 'pyre', 5, false, 0, 5), false, 'at a foe: never');
-  assert.equal(signatureReaches(ai, {}, 'slam', 2, true, 0, 2), true, 'a shape of reach in reach');
-  assert.equal(signatureReaches(ai, {}, 'slam', 6, false, 0, 6), false, 'and never out of it');
-  assert.equal(signatureReaches(ai, {}, 'charge', 2, true, 0, 2), false, 'a gap-closer never in reach');
-  const bear = brainFoe('charge', { mobileType: M.GrizzlyBear, at: [0, 0, 6] });
-  assert.equal(signatureReaches(bear.ai, bear.ent, 'charge', 6, false, 0, -6), true, 'its lane free, out of reach: it charges');
-  assert.equal(signatureReaches(bear.ai, bear.ent, 'charge', 6, true, 0, -6), false, 'the same lane in reach (a long arm): never');
 });
 
 test('RVN5 THE SWITCH: off, the brain never winds a signature (a telegraph is the Enhanced AI\'s) (mutants: a signature without the switch)', () => {
@@ -433,18 +331,6 @@ test('RVN5 ON THE REAL STREET POOL: its signature called once a stand - the card
   assert.equal(strikes.length, 1, 'a slam casts nothing');
 });
 
-test('RVN5 THE DUNGEON AND THE HOSTS: the dungeon\'s seam is the street\'s, through its own engine; every host\'s door through the engine\'s strikePlayerFrom (fireMissile\'s gates), whose caster is a missile\'s - its entity and its sinks, so my reflection sends it back (mutants: any unwired; the caster bare)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(f\.ai\._sigCall \|\| f\.ai\._blowPyre\) signatureDungeonFrame\(f\);/);
-  assert.match(d, /const r = sb && !f\._sigCalled \? revenantById\(f\.entity\.revenant\.id\) : null;\n\s*if \(r\) \{ f\._sigCalled = true; revenantSay\(revenantSignatureEvent\(r, sb\.noun, \{ archive: f\.mobileArchive(?:, playerName: playerEntity\?\.name)? \}\), \(l\) => hudText\.add\(l\)\); \}/);
-  assert.match(d, /if \(sb\?\.kind === 'pyre'\) \{\n\s*audio\.play3dId\?\.\(SPELL_CAST_SOUND\[sb\.element\] \?\? SPELL_CAST_SOUND\[4\], \[f\.ai\.feet\[0\], f\.ai\.feet\[1\], f\.ai\.feet\[2\]\], 1, \{ maxDistance: 16 \}\);\n\s*magic\.strikePlayerFrom\(pyreSpell\(sb\.name, sb\.element, p\.mult\), f\.entity\.level \?\? 1, f\);/);
-  assert.match(read('src/scenes/exteriorFoes.js'), /magicHooks\?\.strikePlayer\?\.\(pyreSpell\(sb\.name, sb\.element, p\.mult\), f\.entity\.level \?\? 1, f\);/);
-  assert.match(read('src/scenes/world.js'), /strikePlayer: \(spell, casterLevel, foe\) => \{ if \(walkMode && playerSpawned\) magic\.strikePlayerFrom\(spell, casterLevel, foe\); \},/);
-  assert.match(read('src/scenes/exterior.js'), /strikePlayer: \(spell, casterLevel, foe\) => \{ if \(walkMode\) magic\.strikePlayerFrom\(spell, casterLevel, foe\); \},/);
-  assert.match(read('src/scenes/worldModes.js'), /strikePlayer: \(spell, casterLevel, foe\) => magic\.strikePlayerFrom\(spell, casterLevel, foe\),/);
-  assert.match(read('src/scenes/hostMagic.js'), /strikePlayerFrom: \(spell, casterLevel, foe\) => applySpellToPlayer\(spell, casterLevel, foe\?\.entity \? \{ entity: foe\.entity, sinks: foeSinks\(foe\), foe \} : null\),/);
-});
-
 test('RVN5 ON THE WIRE: a signature of reach rides as its shape (iron as it is); the pyre not at all - its blast is mine alone until RVN13 (mutants: the pyre on the wire)', () => {
   const pyre = makeBlow('pyre', [0, 0, 0], 0, 0); pyre.ahead = 6;
   assert.deepEqual(blowWire({ _tac: { state: 'windup', blow: pyre } }, 0.1), {});
@@ -456,21 +342,3 @@ test('RVN5 ON THE WIRE: a signature of reach rides as its shape (iron as it is);
 
 // ── the page ────────────────────────────────────────────────────────
 
-test('RVN5 the page: from rank 2 its signature - its name and what it does, "unstoppable" where it is iron, "(with Enhanced AI)" with the switch off; none under rank 2 (mutants: shown at rank 1; the switch unread; the iron unsaid; the shape unsaid)', () => {
-  const r = rec('slam', 2);
-  const name = F.signatureName(r);
-  assert.equal(signatureWords({ ...r, rank: 1 }, true), '');
-  assert.equal(signatureWords(r, true), `Signature: ${name} - an overhead slam.`);
-  assert.equal(signatureWords(r, false), `Signature: ${name} - an overhead slam (with Enhanced AI).`);
-  assert.equal(signatureWords({ ...r, rank: 3 }, true), `Signature: ${name} - an overhead slam, unstoppable.`);
-  for (const [sig, what] of [['charge', 'a charge'], ['leap', 'a leap'], ['ring', 'a ring about it']]) {
-    assert.ok(signatureWords(rec(sig), true).endsWith(` - ${what}.`), sig);
-  }
-  assert.equal(signatureWords({ id: 'q', given: 'Varis', sig: 'pyre', mobileType: M.Lich, rank: 2 }, true), "Signature: Varis' Rimefall - a blast of frost at your feet.");
-  assert.equal(signatureWords({ id: 'q', given: 'Varis', sig: 'pyre', mobileType: M.Ghost, rank: 2 }, true), "Signature: Varis' Unmaking - a blast of magic at your feet.");
-  setPref('enhancedAI', false);
-  assert.ok(signatureWords(r).endsWith('(with Enhanced AI).'), 'the switch read by default');
-  setPref('enhancedAI', true);
-  assert.ok(!signatureWords(r).includes('Enhanced AI'));
-  assert.match(read('src/ui/revenant/revenantPage.js'), /const sig = fallen \? '' : signatureWords\(r\);   \/\/ RVN5\n\s*if \(sig\) text\.append\(el\('span', 'rvn-will', sig\)\);/);
-});

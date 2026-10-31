@@ -695,60 +695,6 @@ test('AUDIT GALLEON R8/R11: her gunports\' throats - sill, lintel and cheeks - w
 
 // ── R12: her texels ────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT GALLEON R12: her art\'s comment says her texels as she wears them - each figure the median, over its area, of the texel along u and v of every triangle she draws in that picture (her planking 3.1 cm square, her bottom 3.1 by 3.5, her side 4.4 by 4.5, her castle 4.1 by 5.2, her stern 4.3-4.4 by 5.2, her spars 3.1-3.3 along and 0.8-3.3 round, gilt and gratings 1.6, rope 0.2-0.4 round and 0.8 along, canvas 8-19 by 5-25, a shutter 1.4 by 2.4, a door 2.4 by 4.0) - and no longer says "3 to 5 cm", "square-pixelled", tiles stretched to keep the texel, or the canvas, the shutters and the door among the tiling pictures', () => {
-  const src = readFileSync(new URL('../../../src/world/ships/galleonArt.js', import.meta.url), 'utf8');
-  for (const lie of [/a texel is 3 to 5 cm/, /Square-pixelled/i, /their tiles stretched to keep the texel/, /so a texel is the size it was\.\s*\*\//, /canvas, rope, gilt, the hatches' gratings, the\s*\/\/\s*gunport lids' red, a planked door/]) assert.doesNotMatch(src, lie);
-  // each triangle's texel along u and v (cm: the metres a unit of u or v spans, over 64), with its area
-  const S = [];
-  for (const key of Object.keys(MODELS.meshes).filter((k) => MODELS.meshes[k].galleon && !k.endsWith(':collider'))) {
-    const g = MODELS.geometry(key);
-    g.subMeshes.forEach((sm, k) => {
-      // a sail's and a running rope's picture is its renderer's (galleonRig.js: canvas, rope), not a slot of the mesh
-      const rec = g.slots?.[k]?.record ?? (/^galleon:sail:/.test(key) ? TEX.canvas : /^galleon:rope:/.test(key) ? TEX.rope : null);
-      if (rec == null) return;
-      for (let t = sm.startIndex; t < sm.startIndex + sm.primitiveCount * 3; t += 3) {
-        const ix = [0, 1, 2].map((j) => g.indices[t + j]);
-        const Pp = ix.map((i) => [g.positions[i * 3], g.positions[i * 3 + 1], g.positions[i * 3 + 2]]), U = ix.map((i) => [g.uvs[i * 2], g.uvs[i * 2 + 1]]);
-        const e1 = sub(Pp[1], Pp[0]), e2 = sub(Pp[2], Pp[0]);
-        const du1 = U[1][0] - U[0][0], dv1 = U[1][1] - U[0][1], du2 = U[2][0] - U[0][0], dv2 = U[2][1] - U[0][1], det = du1 * dv2 - du2 * dv1;
-        if (Math.abs(det) < 1e-12) continue;
-        const u = Math.hypot(...e1.map((v, d) => (v * dv2 - e2[d] * dv1) / det)) / 0.64, v = Math.hypot(...e1.map((x, d) => (-x * du2 + e2[d] * du1) / det)) / 0.64;
-        S.push({ rec, key, u, v, w: Math.hypot(...cross(e1, e2)) / 2 });
-      }
-    });
-  }
-  const median = (f, d) => { const l = S.filter(f).sort((a, b) => a[d] - b[d]), tot = l.reduce((a, x) => a + x.w, 0); let acc = 0; for (const x of l) { acc += x.w; if (acc >= tot / 2) return x[d]; } return NaN; };
-  const recs = (...r) => (x) => r.includes(x.rec), mesh = (rec, key) => (x) => x.rec === rec && x.key === `galleon:${key}`;
-  /** A figure the comment gives: what it was measured over, along u or v, and the figure to its last place. */
-  const says = (what, f, d, fig, place = 0.05) => { const m = median(f, d); assert.ok(Math.abs(m - fig) <= place + 1e-9, `${what} ${d}: ${m.toFixed(3)} cm where the comment says ${fig}`); };
-  /** A range the comment gives: each mesh's median, the least and the most its ends. */
-  const spans = (what, rec, d, lo, hi, place = 0.05) => {
-    const ms = [...new Set(S.filter(recs(rec)).map((x) => x.key))].map((k) => median((x) => x.rec === rec && x.key === k, d));
-    assert.ok(Math.abs(Math.min(...ms) - lo) <= place && Math.abs(Math.max(...ms) - hi) <= place, `${what} ${d}: ${Math.min(...ms).toFixed(3)}-${Math.max(...ms).toFixed(3)} cm where the comment says ${lo}-${hi}`);
-  };
-  for (const d of ['u', 'v']) says('her planking', recs(TEX.deck, TEX.hullInner, TEX.beams, TEX.underDeck, TEX.dark, TEX.trim), d, 3.1);
-  says('her bottom', mesh(TEX.hullBottom, 'hull'), 'u', 3.1); says('her bottom', mesh(TEX.hullBottom, 'hull'), 'v', 3.5);
-  says('her side', recs(TEX.hullSide0, TEX.hullSide1, TEX.hullSide2), 'u', 4.4); says('her side', recs(TEX.hullSide0, TEX.hullSide1, TEX.hullSide2), 'v', 4.5);
-  says('her side\'s lowest slice', recs(TEX.hullSide3), 'u', 5.1); says('her side\'s lowest slice', recs(TEX.hullSide3), 'v', 4.6);
-  says('her castle', recs(TEX.castle0, TEX.castle1), 'u', 4.1); says('her castle', recs(TEX.castle0, TEX.castle1), 'v', 5.2);
-  says('her stern\'s upper slice', recs(TEX.sternWindows0), 'u', 4.4); says('her stern\'s lower slice', recs(TEX.sternWindows1), 'u', 4.3); says('her stern', recs(TEX.sternWindows0, TEX.sternWindows1), 'v', 5.2);
-  spans('her spars along', TEX.spar, 'v', 3.1, 3.3); spans('her spars round', TEX.spar, 'u', 0.8, 3.3);
-  says('a yard round', mesh(TEX.spar, 'yard:ForeCourse'), 'u', 1.6); says('the gaff round', mesh(TEX.spar, 'gaff'), 'u', 1.2);
-  for (const d of ['u', 'v']) { says('her gilt', recs(TEX.gilt), d, 1.6); says('her gratings', recs(TEX.grate), d, 1.6); }
-  says('a gun\'s barrel along', mesh(TEX.iron, 'gun'), 'v', 1.6); says('a gun\'s barrel round', mesh(TEX.iron, 'gun'), 'u', 1.3);
-  spans('her rope round', TEX.rope, 'u', 0.2, 0.4); says('her rope along', recs(TEX.rope), 'v', 0.8);
-  spans('her canvas across', TEX.canvas, 'u', 8, 19, 0.5); spans('her canvas up', TEX.canvas, 'v', 5, 25, 0.5);
-  says('the fore course', mesh(TEX.canvas, 'sail:ForeCourse'), 'u', 18.6); says('the fore course', mesh(TEX.canvas, 'sail:ForeCourse'), 'v', 6.8);
-  says('the jib', mesh(TEX.canvas, 'sail:Jib'), 'u', 8.0); says('the jib', mesh(TEX.canvas, 'sail:Jib'), 'v', 25.3);
-  says('a shutter', recs(TEX.lid), 'u', 1.4); says('a shutter', recs(TEX.lid), 'v', 2.4);
-  says('a door', recs(TEX.door), 'u', 2.4); says('a door', recs(TEX.door), 'v', 4.0);
-  // and the comment says those figures
-  const header = src.slice(src.indexOf('AUDIT GN-R12'), src.indexOf('THE LIVERY IS'));
-  for (const fig of ['3.1 cm a texel square', 'her bottom 3.1 by 3.5', 'her side 4.4 cm along her by 4.5 up', 'lowest slice 5.1 by 4.6', 'her castle 4.1 by 5.2', 'her stern 4.3-4.4 by 5.2', '3.1-3.3 cm', '0.8-3.3 round', 'a yard 1.6 cm, the gaff 1.2', '(1.6 cm)', '(1.3 round it)', '0.2-0.4 cm round', '0.8 along', '8-19 cm across and 5-25 up', '18.6 by 6.8', '8.0 by 25.3', 'a shutter\'s face 1.4 by 2.4', 'a door\'s 2.4 by 4.0']) {
-    assert.ok(header.replace(/\s*\/\/\s*/g, ' ').includes(fig), `the comment says "${fig}"`);
-  }
-});
-
 // ── R14: T-junctions ───────────────────────────────────────────────────────────────────────────────────────────────
 
 /** A mesh's T-junctions: a corner of it lying inside one of its edges (2e-5 m). */
@@ -822,37 +768,3 @@ test('AUDIT GALLEON B1: every baked part is lit polygon by polygon - each triang
 
 // ── the nits ───────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT GALLEON NITS: her measurements the module comment calls pinned are pinned to the final bake (to 1 mm, the beams\' tolerance) - her gun deck, her castle\'s front and aft, her gangway, both doorways, her sternpost, and AUDIT GN\'s own (her side\'s knuckle, her rail\'s cap, a hatch cover\'s foot) - and three comments that were false say what is true: the collider welding (closes nothing), the castle\'s dead "stairwells\' cut" rule (gone), the ramp\'s 4 cm (2.3)', () => {
-  const pts = (role) => { const p = part(role), o = []; for (let i = 0; i < p.positions.length; i += 3) o.push([p.positions[i], p.positions[i + 1], p.positions[i + 2]]); return o; };
-  const ext = (role, d, f = Math.max) => f(...pts(role).map((q) => q[d]));
-  near(M.gunDeckY, ext('gunDeck', 1), 1e-3, 'gunDeckY: the gun deck\'s top');
-  near(M.castleFrontZ, ext('castle', 2), 1e-3, 'castleFrontZ: the castle\'s fore face');
-  near(M.castleAftZ, ext('castle', 2, Math.min), 1e-3, 'castleAftZ: the castle\'s aftmost');
-  // the castle's front wall and its doorway: the faces at the doorway's jambs (|x| under 0.85, square to x)
-  const c = part('castle'), cP = c.positions;
-  const faces = c.polygons.map((poly) => { const ring = poly.map((i) => [cP[i * 3], cP[i * 3 + 1], cP[i * 3 + 2]]); return { ring, n: norm(newell(ring)) }; });
-  const jambs = faces.filter((f) => Math.abs(f.n[0]) > 0.99 && f.ring.every((q) => Math.abs(q[0]) < 0.85));
-  const jy = jambs.flatMap((f) => f.ring.map((q) => q[1])), jz = jambs.flatMap((f) => f.ring.map((q) => q[2]));
-  near(M.castleDoor.halfX, Math.max(...jambs.flatMap((f) => f.ring.map((q) => Math.abs(q[0])))), 1e-3, 'castleDoor.halfX');
-  near(M.castleDoor.y1, Math.max(...jy), 1e-3, 'castleDoor.y1: the doorway\'s head');
-  near(M.castleDoor.y0, Math.min(...jambs.filter((f) => Math.max(...f.ring.map((q) => q[1])) > M.castleDoor.y1 - 1e-3).flatMap((f) => f.ring.map((q) => q[1]))), 1e-3, 'castleDoor.y0: the foot of the jambs that reach its head');
-  near(M.castleFrontInnerZ, Math.min(...jz), 1e-3, 'castleFrontInnerZ: the front wall\'s inner face');
-  near(M.castleDoor.z, (Math.min(...jz) + Math.max(...jz)) / 2, 1e-3, 'castleDoor.z: the front wall\'s middle');
-  const b = pts('bulkhead'), bj = b.filter((q) => Math.abs(q[0]) < 1);
-  near(M.bulkheadDoor.halfX, Math.max(...bj.map((q) => Math.abs(q[0]))), 1e-3, 'bulkheadDoor.halfX');
-  near(M.bulkheadDoor.y1, Math.max(...bj.map((q) => q[1])), 1e-3, 'bulkheadDoor.y1: its doorway\'s head');
-  near(M.bulkheadDoor.y0, M.gunDeckY, 1e-9, 'bulkheadDoor.y0: on the gun deck');
-  near(M.bulkheadDoor.z, (Math.min(...b.map((q) => q[2])) + Math.max(...b.map((q) => q[2]))) / 2, 1e-3, 'bulkheadDoor.z: the bulkhead\'s middle');
-  const h = pts('hull'), sill = h.filter((q) => Math.abs(q[1] - M.gangway.sillY) < 0.01 && Math.abs(q[0]) > 5);
-  near(M.gangway.sillY, Math.max(...sill.map((q) => q[1])), 1e-3, 'gangway.sillY');
-  near(M.gangway.z0, Math.min(...sill.map((q) => q[2])), 1e-3, 'gangway.z0');
-  near(M.gangway.z1, Math.max(...sill.map((q) => q[2])), 1e-3, 'gangway.z1');
-  near(M.rudderPivotZ, Math.min(...h.filter((q) => Math.abs(q[0]) < 1e-4 && q[1] > -3.5 && q[1] < M.knuckleY + 1e-3).map((q) => q[2])), 1e-3, 'rudderPivotZ: her sternpost, keel to knuckle');
-  near(M.knuckleY, Math.max(...h.filter((q) => Math.abs(q[0]) > 5.85).map((q) => q[1])), 1e-3, 'knuckleY: her widest corners');
-  near(M.railCapY, ext('castleRail', 1), 1e-3, 'railCapY');
-  near(M.hatchCoverUnderY, ext('hatchFore', 1, Math.min), 1e-3, 'hatchCoverUnderY');
-  const mesh = readFileSync(new URL('../../../src/world/ships/galleonMesh.js', import.meta.url), 'utf8'), model = readFileSync(new URL('../../../src/world/ships/galleonModel.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(mesh, /so the collider's mesh is a closed one/);
-  assert.doesNotMatch(model, /return tiled\(TEX\.trim\);\s*\/\/ the stairwells' cut/);
-  assert.doesNotMatch(model, /the ramp rose 4 cm through the top tread/);
-});

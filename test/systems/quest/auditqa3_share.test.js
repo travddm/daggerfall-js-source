@@ -33,7 +33,6 @@ import { packMachine, questSource } from '../../qlSources.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(p, 'utf8').replace(/^﻿/, '');
-const W = read(join(ROOT, 'src/scenes/world.js'));   // the host's share wiring, read by source
 {
   const VENDOR = join(ROOT, 'vendor', 'dfu-quests', 'Tables');
   const sources = {};
@@ -171,7 +170,6 @@ test('QA3 E1: a received copy waits at its questline choice while its sharer is 
   }));
   const seen = bridge((acct) => acct === 'acct-a').machine.deps;
   assert.deepEqual([seen.partyHas?.('acct-a'), seen.partyHas?.('acct-z'), bridge(null).machine.deps.partyHas?.('acct-a')], [true, false, true]);
-  assert.match(W, /partyHas: \(acct\) => !!social\?\.inMyParty\(acct\),/, 'the world asks its party');
 });
 
 test('QA3 E1: sharing a received copy on does not make its holder a second chooser - it waits on the player who shared it while they are in the party, and their answer is the copy\'s (mutants: the share-on clears the receipt)', () => {
@@ -258,7 +256,6 @@ test('QA3 E3: a kill an envelope brought is spent only by its own sender\'s cred
   assert.equal(creditKeptKills(D, new KeptKillLedger(), 'acct-c', rowOf(1), 0), 1, 'C\'s word for a kill its envelope brought...');
   assert.equal(creditKeptKills(D, new KeptKillLedger(), 'acct-c', rowOf(2), 0), 1);
   assert.equal(tigerOf(qd).killCount, 3, '...spent: neither counted twice');
-  assert.match(W, /foe\.creditPartnerKill\?\.\(owner\);/, 'the world names whose fall it is');
 });
 
 // ---- E4 ----
@@ -279,7 +276,6 @@ test('QA3 E4: a copy new here answers "held" - merged by nobody, so the sharer\'
   assert.deepEqual([answer.held, r.ok, r.resync, r.held, r.quest === qa], [1, true, true, true, true], 'a held word: B holds it');
   assert.equal(qa._holdersHeard?.has('acct-b'), true, 'B named a holder');
   assert.equal(QS.syncBaselineAfter(qa, r, 'sig-before'), 'sig-before', 'nothing merged: the host\'s baseline is what it was');
-  assert.match(W, /_questSyncSeen\.set\(quest\.questName, syncBaselineAfter\(q, result, _questSyncSeen\.get\(quest\.questName\)\)\);/, 'the host hands it the baseline it had');
   // the copy changed (the sharer's sync), and changed back: no longer the copy as it came
   receive(B, '__H', { ...env(A, qa), sync: 1 }, { from: 'acct-a' }); run(B, 2);
   assert.equal(env(B, qb).held, undefined, 'changed since it came: its sync is a sync');

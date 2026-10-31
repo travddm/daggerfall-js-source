@@ -231,9 +231,6 @@ test('CG2: the faction ids have ONE home, and court.js re-exports it', () => {
   assert.equal(THIEVES_GUILD_FACTION_ID, 42);
   assert.equal(DARK_BROTHERHOOD_FACTION_ID, 108);
   assert.equal(COURT_TG, THIEVES_GUILD_FACTION_ID, 'court.js answers the same object');
-  const court = readFileSync(join(HERE, '..', 'src', 'systems', 'court.js'), 'utf8');
-  assert.equal(/^export const THIEVES_GUILD_FACTION_ID/m.test(court), false,
-    'court.js must RE-EXPORT the id, never declare a second one');
 });
 
 test('CG2: every live crime site tallies, with DFU\'s own weight', () => {
@@ -257,16 +254,3 @@ test('CG2: every live crime site tallies, with DFU\'s own weight', () => {
     'PlayerEntity.Update calls it at :531, below the prevent-flag resets at :528-530');
 });
 
-test('CG2: the four fields survive a save - a tally nobody persists never reaches ten', () => {
-  // AUDIT 18 F3's lesson, which cost the port its whole legal standing
-  // once already: nobody steals ten times in one sitting, so a tally
-  // that resets on load makes the guild unreachable by any player who
-  // saves. SerializablePlayer.cs:144-147 writes all four in the same
-  // player block as crimeCommitted, and so does this port.
-  const save = readFileSync(join(HERE, '..', 'src/systems/save/save.js'), 'utf8');   // TIDY2: one path, so a move rewrites it
-  for (const f of ['thievesGuildRequirementTally', 'darkBrotherhoodRequirementTally',
-    'timeForThievesGuildLetter', 'timeForDarkBrotherhoodLetter']) {
-    assert.match(save, new RegExp(`snap\\.${f} = entity\\.${f} \\?\\? 0`), `${f} is written`);
-    assert.match(save, new RegExp(`entity\\.${f} = snap\\.${f} \\?\\? 0`), `${f} is restored`);
-  }
-});

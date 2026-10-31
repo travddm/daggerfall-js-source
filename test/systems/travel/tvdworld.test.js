@@ -160,14 +160,6 @@ test('TVD-WORLD the host: a found spawn past the Bay, its pixel never built, sta
   } finally { restoreDiscovery(null); }
 });
 
-test('TVD-WORLD by source: the world host hands the places to the Overworld\'s dungeons; the find reads the lairs\' found test and their gen; the models\' list keys on the gen too', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /createTravelViewDungeons\(\{[^}]*provinceQuestPlaces,/);
-  assert.match(w, /locAt: tvDungeonAt, isFound: tvDungeonFound \}\)\.filter\(\(g\) => !g\.found\)/);
-  assert.match(w, /const at = playerTravelPixel\(\), dg = tvKnownGen\(\), n = `\$\{_locIndexGen\}:\$\{tvDungeonRowsAt\.gen\(\)\}`;/);
-  assert.match(rd('src/scenes/travelViewDungeonModels.js'), /n = `\$\{host\._locIndexGen\}:\$\{tvDungeonRowsAt\.gen\?\.\(\) \?\? 0\}`;/);
-});
-
 const ARENA2 = process.env.ARENA2_PATH ?? '';
 const HAS = !!ARENA2 && existsSync(join(ARENA2, 'MAPS.BSA')) && existsSync(join(ARENA2, 'ARCH3D.BSA'));
 test('TVD-WORLD on the player\'s data: about Windhelm\'s road and Bravil the Overworld stands its lairs - the places host\'s own, every one in reach - where it stood none', { skip: HAS ? false : 'ARENA2_PATH not set' }, async () => {

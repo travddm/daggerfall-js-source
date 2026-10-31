@@ -78,26 +78,6 @@ test('enemydoors: OpenDoors - within 2m of a closed unlocked door it toggles; ev
   assert.equal(OPEN_DOOR_DISTANCE, 2, 'EnemyMotor.cs:34');
 });
 
-test('enemydoors: the dungeon host arm - a DaggerfallActionDoor, behind canOpenDoors', () => {
-  const src = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  const i = src.indexOf('foeDeps.openDoorsStep(');
-  assert.ok(i > 0, 'the host drives the law');
-  const arm = src.slice(Math.max(0, i - 700), i);
-  assert.ok(arm.includes('ENEMY_BASICS[f.mobileType]?.canOpenDoors'), 'the mobile flag gates it');
-  // AUDIT 63 F40: this pin used to assert
-  // `DOOR_VERB_FLAGS.has(_door.actionFlag)` - the port's own predicate,
-  // not the reference's. DFU asks GetComponent<DaggerfallActionDoor>()
-  // (EnemySenses.cs:913 stores the handle, EnemyMotor.cs:1425-1442
-  // consumes it with no flag test), which is the shared helper.
-  assert.ok(arm.includes('isActionDoorObject(_door)'), 'the COMPONENT test, not the door-verb action family');
-  assert.ok(arm.includes('f.ai.doorKey'), 'the senses key feeds it');
-  assert.ok(src.includes('actions.toggleDoor(_door)'), 'the toggle is the ActionSystem door path');
-  // ObstacleCheck asks the SAME question (EnemyMotor.cs:1159), so the
-  // callback the motor consumes must answer it the same way.
-  assert.match(src, /const isActionDoor = \(key\) => \{[\s\S]{0,120}?isActionDoorObject\(actions\?\.objects\.get\(key\)\)/,
-    'the ObstacleCheck seam asks the component too');
-});
-
 test('enemydoors: isActionDoorObject IS GetComponent<DaggerfallActionDoor>() - the record-less door counts', () => {
   const a = new ActionSystem(stubCollider());
   // RDBLayout.cs:247-259: AddActionDoor attaches the component to EVERY

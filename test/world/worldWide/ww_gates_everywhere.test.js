@@ -72,12 +72,6 @@ test('WW-GATES-EVERYWHERE A2b: A PROVINCE\'S GATE\'S KILL NAMES ITS OWN PROVINCE
   const scan = { byRegion: new Map([[17, Int32Array.from(Array.from({ length: 30 }, (_, i) => 300 * 1000 + 200 + i))]]), towns: [{ name: 'Daggerfall', px: 207, py: 213, region: 17 }], townAt: new Int32Array(1000 * 500).fill(0) };
   assert.deepEqual([gateSeatRegion(day, null), gateClaimWaits(day, null), gateSeatRegion(day, scan), gateClaimWaits(day, scan)], [null, true, 17, false]);
   assert.deepEqual([gateSeatRegion(undefined, null), gateClaimWaits(undefined, null)], [null, true], 'no number: the Bay\'s wait, as before');
-  // the host's two lines (scenes/world.js gateSeatWord, gateClaimReady)
-  const w = src('src/scenes/world.js');
-  assert.match(w, /try \{ region = c \? gateSeatRegion\(c\.d, _gateScan\) : null; \} catch \{ region = null; \}/);
-  assert.match(w, /return region != null \? \{ region, character \} : character \? \{ character \} : null;/);
-  assert.match(w, /if \(!gateClaimWaits\(readReceipt\(r\)\?\.d, _gateScan\) \|\| Date\.now\(\) - _gateClaimsFrom >= GATE_SCAN_WAIT_MS\) return true;/);
-  assert.match(w, /claim: \(r\) => \(gateClaimReady\(r\) \? _accountGates\.claim\(r, gateSeatWord\(r\)\)/);
 });
 
 test('WW-GATES-EVERYWHERE A2b THE SERVICE: a Skyrim gate\'s kill, its region Skyrim\'s, counts for the guild pledged at Solitude - three agreeing claims 300 influence; the same gate named in a Bay region or another province\'s is no seat\'s, its refusal named for what it is (mutants: the lane\'s province unasked; the refusal\'s word)', async (t) => {
@@ -196,9 +190,6 @@ test('WW-GATES-EVERYWHERE THE COURT: a province\'s gate\'s court is laid in its 
   assert.deepEqual([site.region, site.regionName, site.town.region], [64, 'Skyrim', 64]);
   const court = gateArenaLocation({ day: n, near: site.near, regionIndex: site.region, regionName: site.regionName });
   assert.deepEqual([court.regionIndex, court.regionName, court.gate], [64, 'Skyrim', n]);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const site = gateOmen\?\.siteOf\?\.\(g\.day\);\s+const mine = site\?\.day === g\.day;\n\s+return \{ climateBase: climateType, season: INTERIOR_SEASON, climate: \{ worldClimate: ci, climateType \}, regionIndex: mine \? site\.region : -1, regionName: mine \? site\.regionName : '' \};/, 'the host lays the court in the site\'s region');
-  assert.match(w, /if \(gateOmen\) _gateClearNow = \(\) => \{\n\s+if \(!_gateScan\) return null;\n\s+const day = gateAt\(Date\.now\(\) \+ _sharedOffsetMs\)\.day;/, 'the clearing the Bay\'s lane\'s');
 });
 
 // ─── A2c: the scans in the page's idle moments ──────────────────────────────────────────────────

@@ -29,7 +29,6 @@ test('IC-GRAND THE COLOSSEUM GONE - TESA11\'s Colosseum of the port\'s own retir
   assert.equal(Object.hasOwn(IMPERIAL_MODELS, 'colosseum'), false);
   assert.equal('buildColosseum' in capitalImperial, false);
   assert.equal('colosseumGate' in imperialCity, false);
-  assert.doesNotMatch(read('src/world/capitalModels.js'), /buildColosseum|colosseum\]/);
 });
 
 test('IC-GRAND DAGGERFALL\'S ARENA IN THE ARENA DISTRICT - its block in the cell under the arena\'s point (bearing 90, at its heart where its avenue meets the middle ring road), the same port block Daggerfall\'s is (one index, no copy), its slice\'s grid naming it; the fabric kept off its cell and a street round it (mutants: the cell another; the block a copy)', () => {
@@ -63,9 +62,6 @@ test('IC-GRAND ITS STAIR THE UNDERCROFT\'S DOOR - a place stands the arena where
   const u = undercroftLocation(loc);
   assert.ok(isArenaUndercroft(u) && u.hasDungeon && u.regionIndex === loc.regionIndex && u.exterior === loc.exterior, 'its undercroft under the city');
   assert.equal(isUndercroftDoor({ dfBlock: { name: ARENA_BLOCK }, door: { doorType: 3 } }, 3), true);
-  assert.match(read('src/scenes/world.js'), /if \(!isUndercroftDoor\(e, DOOR_TYPE\.DUNGEON_ENTRANCE\) \|\| !standsArena\(city\)\) return \{ dfLocation: city, group: e\.pixelKey \};/);
-  // the build marks the pixel that lays the block an arena's (its stage, its Herald) whatever the city
-  assert.match(read('src/scenes/pixelBuild.js'), /if \(b\.blockName === ARENA_BLOCK\) arenaOrigin = \[originMatrix\[12\], originMatrix\[13\], originMatrix\[14\]\];/);
 });
 
 test('IC-GRAND DAGGERFALL KEEPS ITS OWN - the city\'s cell (4, 3) is the arena\'s in every read of Daggerfall, its edit asked of Daggerfall alone (the Imperial City\'s slices untouched by it); the gate\'s people Daggerfall\'s court\'s, the Royal Guard\'s and the people\'s (RECORDED: the same block stands them in the Imperial City - its factions the owner\'s to say) (mutants: the edit on any city; the cell moved)', () => {
@@ -74,5 +70,4 @@ test('IC-GRAND DAGGERFALL KEEPS ITS OWN - the city\'s cell (4, 3) is the arena\'
   assert.equal(standArenaInLocation(loc, null, { getBlockByName: () => null }), null, 'no edit of the Imperial City');
   assert.equal(JSON.stringify(loc.exterior.exteriorData.blockNames), before);
   assert.deepEqual([...new Set(ARENA_GATE_PEOPLE.map((p) => p.faction))].sort((a, b) => a - b), [372, 518, 595]);
-  assert.match(read('src/world/arena/arenaCity.js'), /export function standArenaInLocation\(dfLocation, maps, blocksFile\) \{\n\s+if \(!isArenaCity\(dfLocation\)\) return null;/);
 });

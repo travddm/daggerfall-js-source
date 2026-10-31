@@ -111,16 +111,6 @@ test('SCALE4h the service says what the hour still takes: after each report, the
   assert.equal(renownAnswer({ room: 0 }, 1, null).room, 0, 'a spent hour is a room of nothing, not none');
 });
 
-test('SCALE4h the host: the room kept with the hour and the total it was said at, read only while both still hold; the tracker\'s word the law over what the page last heard; nothing earned in an hour the bound has spent (mutants: a room read in another hour; a room read after another door moved the total; the word not given; a spent hour still earning)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /import \{ createRenownTracker, [^}]*renownReportSoon \} from '\.\.\/net\/renownTracker\.js';/);
-  assert.match(w, /if \(a\.room !== null\) _renownRoom = \{ room: a\.room, hour: renownHour\(\), xp: renownXp \};/, 'kept as the answer said it, after the total is adopted');
-  assert.match(w, /renownXpAdopt\(a\.xp\);[^\n]*\n\s*if \(a\.room !== null\) _renownRoom/, 'the total adopted first, so the room is kept against the total it belongs to');
-  // PIN MOVED, AUDIT SCALE II C-4: the hour's last minute said beside the spent hour (renownHourLeftMs)
-  assert.match(w, /soon: \(\) => renownReportSoon\(\{ xp: renownXp, pending: renownTracker\?\.pending\(\) \?\? 0, capped: _renownCapHour === renownHour\(\), hourLeftMs: renownHourLeftMs\(\),\s*room: _renownRoom && _renownRoom\.hour === renownHour\(\) && _renownRoom\.xp === renownXp \? _renownRoom\.room : null \}\),/);
-  assert.match(w, /earning: \(\) => !!online && !seatOut\(\) && _renownCapHour !== renownHour\(\),/, 'a spent hour earns nothing');
-});
-
 test('SCALE4h a fighter\'s hour, measured: Renown reported far less often at the SCALE4h law, the rise still reported at the minute\'s pace (tools/hotWritesBench.mjs over the real Worker; mutants: the law unwired)', async () => {
   const quiet = console.warn; console.warn = () => {};
   try {

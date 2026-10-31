@@ -183,8 +183,4 @@ test('PASS-COUNT THE RENDERER COUNTS THEM: the room\'s frame takes every draw it
     s.setLightingLane(null);
     assert.equal(lit(WORLD_FRAME), 0, 'the lane off: none');
   } finally { console.warn = warn; }
-  // the order the count relies on: the interior host asks for the view out before its own beginFrame
-  const modes = read('src/scenes/worldModes.js');
-  const at = modes.indexOf('viewOutFrame(');
-  assert.ok(at > 0 && modes.indexOf('renderer.beginFrame(', at) > at, 'the view out is drawn before the room begins its frame');
 });

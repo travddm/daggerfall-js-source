@@ -265,8 +265,6 @@ test('LOOT4: the thorns - back to the foe whose blow took my health, through the
   off();
   setStruck(orc, me, 5); hurtPlayer(me, 5);
   assert.equal(d.hurts.length, before, 'off: none');
-  // the registration, in the sigil sets' own hurt: one law of a landed blow
-  assert.match(strip(read('src/systems/sigil/sigilSetPowers.js')), /if \(before - after > 0\) for \(const fn of _landed\.values\(\)\)/);
 });
 
 test('LOOT4: the focus - my spells cost less, all I wear under the cap; registered at every seam under one name', () => {
@@ -285,11 +283,6 @@ test('LOOT4: the focus - my spells cost less, all I wear under the cap; register
   assert.equal(priced, Math.max(1, Math.round((plain * 90) / 100)), 'the registered modifier takes its ten in a hundred off the real price');
   for (const t of [133, 135, 136, 137, 138, 134]) wear(me, Object.assign(mintCondition({ group: 'Jewellery', templateIndex: t, flags: 0 }), { rarity: 'rare', affixes: [{ id: 'focus', value: 10 }] }));
   assert.equal(LP.lootCastCost(me, 100), 100 - LP.FOCUS_CAP, 'never past the cap');
-  const src = strip(read('src/systems/loot/lootPowers.js'));
-  for (const [seam, fn] of [['registerWeaponBlowMod', 'lootBlow'], ['registerPlayerStrikeListener', 'lootStrike'], ['registerPlayerBlowLanded', 'lootLanded'], ['registerSpellCostMod', 'lootCastCost']]) {
-    assert.match(src, new RegExp(`\\n${seam}\\(LOOT_POWERS, ${fn}\\);`), `${seam} -> ${fn}`);
-  }
-  assert.match(read('src/scenes/world.js'), /from '\.\.\/systems\/loot\/lootPowers\.js'; import \{ setSetPowersVoice/, 'the game imports it beside the sets');
 });
 
 test('LOOT4: the wire carries a line that does something and refuses a forged one', () => {

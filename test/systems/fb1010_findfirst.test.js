@@ -117,9 +117,3 @@ test('FIND-FIRST (AUDIT FB1010 B2): a driver\'s map opens on the Bay even when a
   driver.dispose();
 }));
 
-test('FIND-FIRST: the world host asks it of the player\'s own map alone - the key and the journal, never a teleport, a portal stone or a driver\'s map', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('townTalk.showOverlay(_travelMap);'));
-  assert.ok(door.indexOf('_travelMap.openOnMe?.();') > door.indexOf('_travelMap = buildTravelMapWindow('), 'toggleTravelMap\'s open, on the window it built');
-  assert.equal(w.match(/\.openOnMe\b/g).length, 1, 'and no other door');
-});

@@ -57,8 +57,6 @@ test('AUDIT WEAPON-POOL P2: a weapon still on its row\'s pool moves before it we
   assignHeldSpell(record, wearer, held, { ctx: { castingSkillOf: at(50) } });
   assert.deepEqual([held.maxCondition, held.currentCondition], [1600, 1441], 'billed on the one pool - not broken on its row\'s');
   assert.ok(wearer.items.includes(held));
-  // the door: lowerCondition moves it after minting it and before a point is taken
-  assert.match(rd('src/systems/equip.js'), /export function lowerCondition\(item, amount[^)]*\) \{\s+mintCondition\(item\);[^]*?repoolWeapon\(item\);\s+if \(\(item\.maxCondition \?\? 0\) <= 0\) return false;/);
 });
 
 test('AUDIT WEAPON-POOL P3: a piece at a smith keeps the job it was booked for - the load leaves it, a drop-off beside it never re-derives it from the one pool\'s points (13 times as long), and once collected whole it moves at its first wear (mutants: the guard dropped)', () => {

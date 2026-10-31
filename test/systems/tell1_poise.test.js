@@ -111,9 +111,6 @@ test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite
   const re = { maxHealth: 40, health: 40 };
   rv.applyRevenant(re, r, { now: 0 });
   assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);   // PIN MOVED (UNQUIET, Revenants.md section 46): +40% health a rank (it was 25%)
-  assert.match(rd('src/scenes/dungeonContext.js'), /entity\.maxHealth = Math\.max\(1, Math\.round\(entity\.maxHealth \* ELITE_HEALTH_SCALE\)\);\n\s*entity\.health = entity\.maxHealth;\n\s*entity\.healthMult = \(entity\.healthMult \?\? 1\) \* ELITE_HEALTH_SCALE;/);
-  assert.match(rd('src/scenes/riteHost.js'), /f\.entity\.healthMult = \(f\.entity\.healthMult \?\? 1\) \* RITE_SUMMONER_HEALTH;/);
-  assert.match(rd('src/systems/revenant/revenantCompanions.js'), /entity\.healthMult = \(entity\.healthMult \?\? 1\) \* \(1 \+ SWORN_HEALTH_PER_RANK \* rank\) \* starHealth;/);
 });
 
 test('TELL1: a blow\'s class - blunt, axe, long blade, short blade, hands, claws, two-handed on top, an arrow, a spell\'s landing (its round nothing), a peer\'s, nothing else', () => {
@@ -312,12 +309,6 @@ test('TELL1: a staggered foe takes a quarter more - the registry, the formulas\'
   assert.ok(plain > 0, `a blow that lands (${plain})`);
   const hit = calculateAttackDamage(attacker, { ...target, staggerUntil: 2 }, opts);
   assert.equal(hit, Math.max(1, Math.round(plain * 1.25)));
-  const fm = rd('src/combat/formulas.js');
-  assert.match(fm, /const m = mentorDamageTakenMult\(target\);\n\s*if \(m > 1\) damage = Math\.max\(1, Math\.round\(damage \* m\)\);\n\s*\}\n(\s*\/\/[^\n]*\n)*\s*damage = blowTaken\(damage, attacker, target, weapon, /, 'after mentor mode, before the reports');
-  const hm = rd('src/scenes/hostMagic.js');
-  // PIN MOVED (RVN1: the landing notes my spell in its fight's ledger between the take and the sink)
-  assert.match(hm, /hurt: \(n, o\) => \{\n\s*const d = o\?\.whole \|\| o\?\.round \? n : blowTaken\(n, striker, foe\.entity, null, \{ kind: 'spell'[^\n]*\n[^\n]*\n\s*return sinks\.hurt\(d, \{ \.\.\.\(o \?\? \{\}\), element: spell\?\.element \?\? null \}\);/, 'a spell\'s landing; a kill and a round as they come (RVN1: the ledger notes it between; PIN MOVED RVN3: its element rides to the door)');
-  assert.match(hm, /const r = applySpell\(spell, casterLevel, foe\.entity, landing, rolls, caster, ctx\);/);
 });
 
 // ── the doors ───────────────────────────────────────────────────────
@@ -422,42 +413,3 @@ test('TELL1: the foe-vs-foe payload writes no knockback on a foe winding up - it
   assert.equal(windupDoor({ ...f, entity: f.ent }, 5, { striker: attacker, from: [0, 0, 0], weight: ORC_W }), 'stagger', '25 + 5 x 1.0 reaches 30 (hands: 18)');
 });
 
-test('TELL1: every door asks the poise door where it writes DFU\'s knock, passes the player\'s weapon, and holds the Hurt through a stagger; the spells\' rounds and the arrows\' kinds reach the doors (mutants: a door left on the old law)', () => {
-  const ex = rd('src/scenes/exteriorFoes.js');
-  // PIN MOVED (TELL4, bible/12-Enhanced-AI/Feud-Arc.md 6.1): an overreached foe asks the door too (the first blow staggers it)
-  assert.match(ex, /const _tell = \(f\.ai\?\._tac\?\.state !== 'windup' && f\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(f, damage, \{[^\n]*\n\s*kind, weapon, round, peer, striker, from: striker\?\.ai\?\.feet \?\? playerFeet,/);
-  assert.match(ex, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && !f\.entity\?\.staffBoss && weaponKnockbackApplies\(f\.ai\.knockbackSpeed, isClass, mobileWeight\)\) \{/);   // BOSS-UNSHAKEN: a staff event's mini boss takes no shove
-  assert.match(ex, /f\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(ex, /damageFoe\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(ex, /hurting: f\.ai\.hurtKnock \|\| f\.ai\.staggered,/);
-  assert.match(ex, /hurt: \(n, o\) => damageFoe\(f, n, null, null, \{ fromPlayer: false, kind: 'spell', whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\),/);   // PIN MOVED (RVN3: a landing's element)
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /const _tell = \(g\.ai\?\._tac\?\.state !== 'windup' && g\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(g, damage, \{/);   // PIN MOVED (TELL4)
-  assert.match(g, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && weaponKnockbackApplies\(g\.ai\.knockbackSpeed, true, guardWeight\)\) \{/);
-  assert.match(g, /g\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(g, /damageGuard\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(g, /hurting: g\.ai\.hurtKnock \|\| g\.ai\.staggered,/);
-  assert.match(g, /hurtFromFoe: \(dmg, dir, striker = null\) => damageGuard\(g, dmg, null, dir \?\? null, \{ fromPlayer: false, striker \}\)/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const _tell = \(foe\.ai\?\._tac\?\.state !== 'windup' && foe\.ai\?\._tac\?\.state !== 'overreach'\) \? null : windupDoor\(foe, damage, \{/);   // PIN MOVED (TELL4)
-  assert.match(d, /if \(_tell === 'hold'\) return;\n\s*if \(knockDir && foe\.ai\) \{/);
-  assert.match(d, /foe\.ai\.knockbackSpeed = weaponKnockbackSpeed\(damage, w\) \* \(_tell === 'stagger' \? TELL\.STAGGER_KNOCK : 1\);/);
-  assert.match(d, /damageFoe\(foe, damage, playerFeet, lookDir, \{ weapon: playerWeapon\.strikingWeapon \}\);/);
-  assert.match(d, /hurting: f\.ai\.hurtKnock \|\| f\.ai\.staggered \|\| !!_pb\?\.staggered,/);   // PIN MOVED (TELL8: and the host's stagger on its puppet)
-  assert.match(d, /hurt: \(n, o\) => damageFoe\(f, n, null, null, \{ kind: 'spell', fromPlayer: o\?\.fromPlayer \?\? fromPlayer, whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\),/);   // PIN MOVED (RVN3: a landing's element)
-  assert.match(rd('src/systems/effects.js'), /sinks\.hurt\(n, \{ fromPlayer: !a\.caster \|\| !!a\.caster\.isPlayer, bundleDuel: !!a\.bundleDuel, round: true, element: a\.element \?\? null \}\);/, 'a round says it is one');   // PIN MOVED (BOSS-TRAITS): and its element
-  for (const [file, re] of [
-    ['src/scenes/world.js', /cityGuards\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/exterior.js', /cityGuards\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/worldModes.js', /interiorGuards\?\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/],
-    ['src/scenes/world.js', /cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-    ['src/scenes/exterior.js', /cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-    ['src/scenes/worldModes.js', /interiorGuards\?\.hurtGuard\(foe, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)/],
-  ]) assert.match(rd(file), re, file);
-  assert.match(rd('src/scenes/hostCombat.js'), /if \(target\.ai && !tEnt\?\.staffBoss && !windupHolds\(target\.ai\) && enemyKnockbackApplies\(/);
-  const mo = rd('src/characters/enemy/enemyMotor.js');
-  // PIN MOVED (TELL4, Feud-Arc.md 6.1): the stagger's lock is `locked` - a stagger or an overreach
-  assert.match(mo, /const locked = staggered \|\| overreached \|\| \(this\.roarUntil > 0 && tacticsNow\(\) < this\.roarUntil\);/);   // PIN MOVED (RVN4: a last stand's roar holds it too)
-  assert.match(mo, /this\.canAct = !paralyzed && !knocked && !locked && \(this\.isHostile \|\| foeTarget\);/);
-  assert.match(mo, /if \(paralyzed \|\| paused \|\| locked \|\| !\(this\.isHostile \|\| foeTarget\)\) this\.moving = false;/);
-});

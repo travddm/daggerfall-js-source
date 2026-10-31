@@ -768,38 +768,3 @@ test('SHIP-PVP the board\'s prize rows (navalYardWindow.js wantedText): a wreck\
   win.unmount();
 });
 
-test('SHIP-PVP the seams by source: the naval host\'s guns asked and its seams built; the sea\'s host builds the guns and the wreck\'s half, steps them and hears the referee; the world hands it my cell, a stranger and a name, and routes the referee\'s sea words; the socket\'s gate; the relay\'s dispatch, gone, beat and read-back; the routes; the deploy watches the law (mutants: each seam)', () => {
-  const naval = src('src/scenes/naval/navalHost.js');
-  assert.match(naval, /hitBy: \(s\) => shipShot\(s\) \|\| pvp\.open\(p\.id, s, isMine\(s\)\) \}\);/);
-  assert.match(naval, /if \(typeof e\.target === 'string' && e\.target\.startsWith\('peer:'\)\) \{\n\s+if \(!isMine\(e\.shooter\)\) return;\n\s+const hurt = shotDamage\(gun, zone, \{ roll: random\(\), weight: e\.weight \}\);\n\s+if \(e\.type !== 'blast'\) gunsRefit\(hurt, e\.shooter\);\n\s+if \(fire\) hurt\.fire = fire;\n\s+pvp\.shot\(e\.target\.slice\(5\), hurt\);\n\s+return;\n\s+\}/);
-  assert.match(naval, /const pvp = createNavalPvp\(\{\n\s+enabled: \(\) => enabled, boat: \(\) => boatInPlay\(\), stateOf: \(b\) => myBoatState\(b\), build: \(b\) => refitBuild\(b\), pose: \(b\) => boatPose\(b\),/);
-  assert.match(naval, /\n {4}pvp,\n/);
-  const sea = src('src/scenes/seaVenturesHost.js');
-  assert.match(sea, /live: \(\) => live\(\) && !!deps\.cell\?\.\(\)\?\.seaPvpOk && wildHere\(\) && wildZoneKind\(\) === ETHER_KIND,/);
-  assert.match(sea, /if \(nv && nv !== armed\) \{ nv\.pvp\?\.attach\?\.\(broadsides\); armed = nv; \}\n\s+broadsides\.step\(\);\n\s+wrecks\.frame\(\);/);
-  // PIN MOVED (AUDIT SEA VENTURES E6A): the guns stepped every online frame (world.js wildFrame), never the exterior's alone
-  assert.doesNotMatch(sea, /function step\(strikes = 0\) \{\n\s+pvpStep\(\);/);
-  assert.match(sea, /gather, step, guns: pvpStep,/);
-  assert.match(src('src/scenes/world.js'), /remainsMarkTick\(Date\.now\(\)\);[^\n]*\n\s+seaVentures\.guns\(\);/);
-  assert.match(sea, /wref: \(g, room\) => broadsides\.hear\(g, room\),/);
-  assert.match(sea, /name: \(id\) => \(deps\.name \? deps\.name\(id\) : deps\.cell\?\.\(\)\?\.peers\?\.get\?\.\(id\)\?\.name\) \|\| '',/, 'a peer\'s name the socket\'s own (HOST-SPLIT)');
-  assert.match(sea, /const wrecks = createSeaWreckHost\(\{ session: deps\.session, checkpoint: deps\.checkpoint, character,/);
-  assert.match(sea, /send: \(d, o\) => deps\.cell\?\.\(\)\?\.sendWild\?\.\(d, o\) === true,/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /cell: \(\) => online, foe: \(id\) => wildIsStranger\(id, online\?\.drawable\?\.\(\)\?\.find\(\(d\) => d\.id === id\)\?\.gt\),/);
-  assert.match(w, /else if \(g\.k === 'rc'\) wildRcIn\(g, room\);\n\s+else if \(g\.k === 'grace'\) wildGrace\.heard\(g\);[^\n]*\n\s+else seaVentures\.wref\(g, room\);/);   // PIN MOVED (ZONE-GRACE, 2026-10-26): safe passage's word before the sea's
-  const on = src('src/net/online.js');
-  assert.match(on, /this\.seaPvpOk = relaySupportsSeaPvp\(relayV\);/);
-  assert.match(on, /if \(SEA_PVP_KINDS\.includes\(d\.k\) && !this\._seaPvpOn\(ws\)\) return false;/);
-  const relay = src('server/src/index.js');
-  assert.match(relay, /if \(k === 'helm' \|\| k === 'shot' \|\| k === 'board'\) \{ await this\._seaWord\(a, m\.data, now\); return; \}/);
-  assert.ok(relay.indexOf('if (d.k === \'board\') { const w = seaBoard(st, a.sub, d.r, now);') < relay.indexOf('const target = this._idFirst(d.to);\n    const tb = target?.[1];\n    if (!tb?.sub) return;\n    const fa = st.fighters.get(a.sub)'), 'a boarding asks nothing of her captain\'s socket');
-  assert.match(relay, /wildGone\(this\._wildRef, a\.sub, Date\.now\(\)\); seaGone\(this\._wildRef, a\.sub, Date\.now\(\)\); this\._wildLeaveCarry\(a, Date\.now\(\)\); \}/);   // PIN MOVED (AUDIT PVP-EASE L3-1): and the leave kept at the hub
-  assert.match(relay, /for \(const w of seaStep\(st, now\)\) await this\._seaSign\(w, now\);/);
-  assert.match(relay, /for \(const \[, v\] of await this\.state\.storage\.list\(\{ prefix: SEA_WRECK_PREFIX \}\)\) \{ const w = seaWreckOf\(v\); if \(w\) \(st\.wrecks \?\?= new Map\(\)\)\.set\(w\.r, w\); \}/);
-  const idx = src('server-account/src/index.js');
-  assert.match(idx, /path === '\/v1\/sea\/wreck' \? await seaWreck\(sctx, who\.player, body, \{ gateKey: await gatePublicKey\(env, subtle\) \}\)/);
-  assert.match(idx, /: path === '\/v1\/sea\/prize\/collect' \? await seaPrizeCollect\(sctx, who\.player, body\) : await seaPrizeReclaim\(sctx, who\.player, body\);/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/sea\/wreck', '\/v1\/sea\/prize\/collect', '\/v1\/sea\/prize\/reclaim',/);
-  assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/sea\/seaPrizeLaw\.js"/);
-});

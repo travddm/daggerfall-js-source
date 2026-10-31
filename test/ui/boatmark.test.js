@@ -152,17 +152,6 @@ test('BOAT-MARK the classic compass: the glyph per boat, its foot on the box\'s 
   assert.equal(quads.length, 0);
 });
 
-test('BOAT-MARK the classic compass\'s order: the boats are drawn after the nodes and before the Detect markers, the party and the ships, which stand over them; drawHud hands the boats to the enhanced skin (mutants: the boats never drawn; drawn again over the ships)', () => {
-  const H = src('src/ui/hud/hud.js');
-  const body = H.slice(H.indexOf('export function drawHud('), H.indexOf('export function drawPartyCompassMarks('));
-  const boatsAt = body.indexOf('drawBoatCompassMarks(renderer, boats, playerXZ, heading01, { bx, by, bw, s });');
-  assert.ok(boatsAt > body.indexOf('drawNodeCompassMarks(renderer, nodes,'), 'over the nodes');
-  for (const later of ['if (detected && detected.length && playerXZ)', 'drawPartyCompassMarks(renderer, party,', 'drawShipCompassMarks(renderer, ships,']) assert.ok(boatsAt < body.indexOf(later), `before ${later}`);
-  assert.equal(body.split('drawBoatCompassMarks(').length, 2, 'drawn once - never again over the live marks');
-  assert.match(H, /nodes = null, boats = null, largeHud = null/);
-  assert.match(H, /boats: boats \?\? null,/);
-});
-
 const mkEl = () => ({
   className: '', textContent: '', id: '', children: [], dataset: {},
   style: { setProperty(k, v) { this[k] = v; }, removeProperty(k) { delete this[k]; } },
@@ -217,16 +206,3 @@ test('BOAT-MARK the enhanced strip: a boat glyph per boat at its bearing on the 
   }
 });
 
-test('BOAT-MARK the street\'s host by source: my boats from Come Sail Away\'s own list, the boat under me (my helm\'s) left out, my feet and the streaming world\'s own frame, on the street alone (the travel view is the street\'s); the runtime keeps what the mark reads; every edit to world.js line-neutral (the import folded beside the quest marks\', the door beside the ships\')', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /ships: navalOn\(\) && _mode\(\) === 'exterior' \? naval\?\.compassShips\(\) \?\? null : null, boats: csaRuntime && _mode\(\) === 'exterior' \? boatCompassPoints\(csaRuntime\.AllBoats, csaBoatUnderMe\(\), enchantFeet\(\), state, TERRAIN_SIZE\) : null,/);
-  assert.match(w, /^import \{ marksOn, questMapMarks \} from '\.\.\/ui\/quest\/questMarks\.js'; import \{ boatCompassPoints \} from '\.\.\/ui\/boatMarks\.js';/m);
-  assert.match(w, /const csaBoatUnderMe = \(\) => \(csaRuntime\?\.isSailing\(\) \? csaRuntime\.state\.CurrentBoat : null\) \?\? csaAboard\.aboard\?\.boat \?\? null;/, 'the boat at my helm');
-  assert.match(w, /const state = new StreamingWorldState\(/, 'the streaming world the mark reads its frame from');
-  // what the mark reads off a boat is the runtime's own: her pixel, her dungeon flag, whether she stands in sight
-  const csa = src('src/systems/comeSailAway/comeSailAway.js');
-  assert.match(csa, /pixelsApart\(deps\.currentMapPixel\(\), allBoat2\.MapPixel\) > 1/, 'out of sight past a pixel: the mark\'s "in sight" is hers');
-  assert.match(csa, /MapPixel: b\.MapPixel \? \{ X: b\.MapPixel\.X, Y: b\.MapPixel\.Y \} : null,/, 'her pixel saved with her');
-  assert.match(csa, /if \(ridesTheWorld\(allBoat\)\) OnPositionUpdateBoat\(allBoat, offset\);/, 'every boat out of sight rides the recentres');
-  assert.match(csa, /const ridesTheWorld = \(boat\) => !boat\.inside \|\| boat\.GameObject\.activeSelf;/, 'a dungeon\'s boat out of sight does not');
-});

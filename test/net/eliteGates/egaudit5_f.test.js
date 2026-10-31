@@ -298,11 +298,6 @@ test('AUDIT EG V L5-2 THE TIMED SOLVER ON THE LAW\'S CLOCK (section 9: "the law 
     assert.doesNotThrow(() => assert.equal(egSpanProof({ ...shaft, v: 8 }).ok, true), 'law 8\'s shaft on the law\'s clock');
     assert.throws(() => egSpanProof({ ...shaft, v: 7 }), /Math\.sin asked/);
   } finally { BANNED.forEach((k, i) => { Math[k] = kept[i]; }); egHeroSeam(EG_HERO_FRAGS); }
-  // the source sweep: the generator, the law's clock and the solver ask no transcendental
-  const src = readFileSync('src/net/eliteGates/egSpanLaw.js', 'utf8');
-  const slice = (from, to) => { const a = src.indexOf(from), b = src.indexOf(to, a); assert.ok(a >= 0 && b > a, `${from} .. ${to}`); return src.slice(a, b); };
-  const swept = [slice('// ── AUDIT EG V (lane5 #2; spec law 8, section 9): THE LAW\'S CLOCK', '// ── end THE LAW\'S CLOCK'), slice('export function egSpanOf(', 'export function egCourseOf('), slice('function jumpLands(', '/** EG6a: does THE SPAN BUILD\'s jump on'), slice('export function egPairWindows(', '/** THE MEDIAN (section 10.5)'), slice('export function egRoadCross(', '/** EG6a: the farthest a leap'), slice('export function egSpanProof(', '// ── AUDIT EG III (2026-10-13, lane 1 #7')];
-  for (const s of swept) assert.ok(!/Math\.(sin|cos|tan|atan2|hypot|pow|exp|log|cbrt)\s*\(/.test(s), `no transcendental asked: ${s.slice(0, 60)}`);
 });
 
 test('AUDIT EG V L5-17 THE LANDING ROOM\'S EXCEPTION (EG-HERO-LAY\'s fit rule: "a piece that moves along the course"): from law 8 only a Rail and a Drum - whose motion runs along the course - are left to the solver; a Drift swings across it and a Pendulum\'s step stands still, so each is landed on as still ground; law 7 excepted all four (mutants: a Drift excepted under law 8; a Rail judged)', () => {

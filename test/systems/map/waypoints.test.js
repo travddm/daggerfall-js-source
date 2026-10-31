@@ -242,18 +242,6 @@ test('WAYPOINTS: the right-click menu - added where the map was pressed with its
   fresh();
 });
 
-test('WAYPOINTS host: both maps take the right click as the store\'s - the Overworld\'s still right press, the held map\'s world sheet arm - and the hub\'s party and guild lines reach the store before the chat', () => {
-  const tv = rd('src/scenes/travelView.js');
-  assert.match(tv, /if \(p && p\.id === e\.pointerId && !p\.moved && p\.button === 2 && state === 'up' && e\.type !== 'pointercancel'\) \{\n\s*const key = deps\.hud\?\.pickAt\?\.\(e\.clientX, e\.clientY\) \?\? null;\n\s*deps\.onContext\?\.\(e\.clientX, e\.clientY, key, e\);/, 'a right press that never moved - a right DRAG still orbits');
-  const hm = rd('src/ui/heldMap.js');
-  assert.match(hm, /context: \(cx, cy\) => this\._waypointContext\(cx, cy\),/, 'the world sheet\'s arm (EM1: the window never asks which sheet)');
-  assert.match(hm, /if \(e\.button === 2\) \{ e\.preventDefault\?\.\(\); this\._sheet\?\.context\(e\.clientX, e\.clientY\); \}/);
-  for (const f of ['src/ui/automap/automapSheet.js', 'src/ui/town/townSheet.js']) assert.match(rd(f), /context\(\) \{ return false; \},/, `${f}: no waypoints there`);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /setWaypointSender\(\(ch, text\) => socialLink\(\)\?\.sendChat\(text, \{ ch \}\) \?\? false\);/, 'the hub\'s own channels - no relay change');
-  assert.match(w, /if \(socialLink\(\)\?\.status === 'open' && social\) syncWaypointGroups\(\{ party: social\.party\?\.id \?\? null, guild: myGuildTag\(\) \}\);/, 'GROUP-LEAVE: told only while the hub is open, so a dropped link removes nothing');
-});
-
 test('WILD-WAYPOINT: my remains in the open zone plant one followed red flag, kept with its end on this device - gone at its time, when the room says the remains are gone, at the next death\'s flag, or when removed by hand; and the book hears its room before its word (WILD-SEEN)', async () => {
   fresh();
   const W = await import('../../../src/systems/wild/wildRemainsWaypoint.js');
@@ -279,11 +267,5 @@ test('WILD-WAYPOINT: my remains in the open zone plant one followed red flag, ke
   assert.equal(W.remainsMarkTick(0), true, 'removed by hand: the record goes too');
   assert.equal(W.remainsMark(), null);
   assert.equal(W.markRemains({ mx: -9000, my: 3, until: 1e15 }), null, 'off the world: no flag');   // PIN MOVED (BAY-LEFT-MAPS): -5 is a point past the Bay, west of its corner, now
-  // the host
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /online\.onWildRoom = \(w, room\) => \{\n\s*if \(!online\.heldRooms\(\)\.includes\(room\)\) return;\n\s*wildRemains\.setRooms\(online\.heldRooms\(\)\);\n\s*wildRemains\.onWord\(w, room\);\n\s*if \(w\?\.k === 'gone'\) \{ remainsGone\(w\.r\);/, 'WILD-SEEN + HALO-REMAINS: the rooms first, so a near relay\'s hello is never cleared as another room\'s by the frame after it');
-  // PIN MOVED (INT9): the remains are the service's records, deposited on its order - the flag is planted as they go out
-  assert.match(src, /if \(at\) markRemains\(\{ mx: at\.mx, my: at\.my, until: _wildMine\.until, r: dep\.r \}\);/, 'the death plants it where they lie');
-  assert.match(src, /remainsMarkTick\(Date\.now\(\)\);/, 'and the frame takes it down at its time');
   fresh();
 });

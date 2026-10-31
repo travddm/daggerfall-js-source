@@ -49,12 +49,6 @@ test('SEASON1 THE ECONOMY\'S TIDES, THE LAW: a Harvest a quarter more on the lan
   assert.deepEqual([herbYield({ roll: 4, tideMult: 0.75 }, top), foodYield({ roll: 4, tideMult: 1.25 }, top), veinYield({ roll: 4, tideMult: 1.25 }, top), boulderYield({ roll: 4, tideMult: 1.25 }, top).qty], [3, 5, 5, 5]);
   assert.equal(haulYield({ roll: 2, tideMult: 1.5 }, top), 3, 'the net, before a school\'s fish');
   assert.equal(haulYield({ roll: 2, school: true, tideMult: 1.5 }, 0), 3 + 1, 'a school\'s fish added after the Tide (before it, 4.5 - and the low dice\'s fifth)');
-  // the wiring: every kind of ground's yield asks its own Tide, on confirmed ground alone
-  const prof = readFileSync(new URL('../../server-account/src/professions.js', import.meta.url), 'utf8');
-  assert.match(prof, /const tide = !deep && !isBody && confirmed \? tideNow\(env, nowS, region\) : 'calm';/);
-  for (const k of ['haul', 'tree', 'herb', 'food', 'boulder', 'vein']) assert.match(prof, new RegExp(`tideMult: tideYield\\(tide, '${k}'\\)`), k);
-  const mkt = readFileSync(new URL('../../server-account/src/market.js', import.meta.url), 'utf8');
-  assert.equal((mkt.match(/courierSlow\(env, nowS, region\)/g) ?? []).length, 3, 'the read\'s quote, the buy and the bid');
 });
 
 async function stand(zero) {

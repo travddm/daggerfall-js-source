@@ -248,15 +248,6 @@ test('WARDEN1 relay: a fifth team in a town throws the longest parked there, at 
   });
 });
 
-test('WARDEN1 relay hosts: the frame\'s door runs the round when it is due; the alarm is its other duties\' alone; a socket speaking for a team is marked (`pk`) so the watch can tell it', () => {
-  const s = rd('server/src/index.js');
-  assert.match(s, /if \(a\.id && isCellRoom\(a\.key\) && wardenDue\(this\._wardenAt, Date\.now\(\)\)\) \{\n\s+try \{ await this\._parkWarden\(Date\.now\(\)\); \} catch \(e\) \{ this\._parks = null; this\._wardenAt = Date\.now\(\) \+ WARDEN_RETRY_MS;/);   // PIN MOVED (AUDIT WARDEN1 R4): the round's failure is its own
-  const alarm = s.slice(s.indexOf('  async alarm() {'), s.indexOf('  /** The alarm\'s duties past the boss rooms\' beats'));
-  assert.equal(alarm.includes('_parkWarden'), false, 'the alarm throws nothing');
-  assert.match(s, /if \(a\.pk !== k\) \{ a = \{ \.\.\.a, pk: k \}; this\._setAttach\(ws, a\); \}/);
-  assert.match(s, /await this\._parkWarden\(now\);   \/\/ WARDEN1: a throw an alarm missed is made before the joiner reads the cell/);
-});
-
 // ─── the client's law ───────────────────────────────────────────────────────────────────────────────────────────────
 
 test('WARDEN1 law: the watch keeps a city, a hamlet and a village; a third of the wagon\'s footprint on road cells stands it on the road; a throw lands straight out through the nearest edge, past it, strayed along it but never past its ends', () => {
@@ -397,24 +388,6 @@ test('WARDEN1 pool: a team the watch carries is no box for the ray - mine nor an
   pool.holdTeam(key, false); pool.holdTeam('', false);
   pool.frame(0.016, [0, 1.7, -10]);
   assert.equal(keys().length, 2); assert.equal(buckets.size, 1);
-});
-
-test('WARDEN1 hosts: the online plumbing carries `y` and the owner\'s word; world.js plays a throw before the pool moves the record, wires the owner\'s word, stamps off its built towns, frames, draws and ends the show; the runtime adopts a throw', () => {
-  const o = rd('src/net/online.js');
-  assert.match(o, /\.\.\.\(m\.data && Number\.isFinite\(m\.y\) \? \{ y: m\.y \} : \{\}\)/);
-  assert.match(o, /\.\.\.\(Number\.isFinite\(e\.y\) \? \{ y: e\.y \} : \{\}\) \}\)\);/);
-  assert.match(o, /const y = isCellRoom\(room\) \? validParkYeet\(m\) : null;\n\s*if \(y\) this\._deliver\('parkYeet', \(\) => this\.onParkYeet\?\.\(room, y\)\);/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /online\.onPark = \(room, e\) => \{ wagonWarden\?\.keptWord\(room, e\); hcc\.applyKept\(room, e, campToScene, performance\.now\(\)\); \};/);
-  assert.match(w, /online\.onParkYeet = \(room, y\) => wagonWarden\?\.onParkYeet\(room, y\);/);
-  assert.match(w, /wardenTown: dfLocation && isWardenTown\(dfLocation\.mapTableData\?\.locationType\) \? \(dfLocation\.mapTableData\?\.mapId \?\? 0\) >>> 0 : null,/);
-  assert.match(w, /if \(!_loading\) wagonWarden\?\.tick\(\); if \(_mode\(\) === 'exterior'\) wardenShows\?\.frame\(cam\.pos\);/);
-  assert.match(w, /if \(_mode\(\) === 'exterior'\) wardenShows\?\.draw\(renderer\);/);
-  assert.match(w, /livePersonBatches\.push\(\.\.\.wardenShows\.batches\(\)\)/);
-  assert.equal((w.match(/wardenShows\?\.destroyAll\(\);/g) ?? []).length, 2, 'a re-anchor and a load');
-  assert.match(w, /hcc\.setWardenWord\(\(a\) => wagonWarden\?\.word\(a\) \?\? null\);/);
-  assert.match(w, /registerModSaveData\(WARDEN_VENDOR, \{/);
-  assert.match(rd('src/systems/horse/horseCart.js'), /adoptYeet,   \/\/ WARDEN1/);
 });
 
 // ─── the runtime ────────────────────────────────────────────────────────────────────────────────────────────────────

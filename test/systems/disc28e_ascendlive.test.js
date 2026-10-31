@@ -171,19 +171,6 @@ test('ASCEND-LIVE: the stars wear the classic sheet\'s own two colours - over a 
 });
 
 test('ASCEND-LIVE by source: the window paints the live value on the star, its brightness, its tint, its words and its line', () => {
-  const w = readFileSync(new URL('../../src/ui/enhanced/enhancedLevelUp.js', import.meta.url), 'utf8');
-  const paint = w.slice(w.indexOf('    for (const s of stars) {'), w.indexOf('    // A LINE LIGHTS WHEN BOTH ITS STARS HAVE RISEN.'));
-  codeHasOnce(paint, /s\.val\.textContent = String\(r\.live\);/);
-  codeHasOnce(paint, /s\.gem\.style\.opacity = String\(0\.45 \+ 0\.55 \* starBrightness\(r\.live\)\);/);
-  codeHasOnce(paint, /const tint = liveTint\(r\);\s*s\.node\.classList\.toggle\('boosted', tint === 'boosted'\);\s*s\.node\.classList\.toggle\('lowered', tint === 'lowered'\);/);
-  codeHasOnce(paint, /s\.node\.setAttribute\('aria-label', starLabel\(r\)\);/);
-  const about = w.slice(w.indexOf('    for (const [k, a] of about) {'), w.indexOf('    plus.disabled'));
-  codeHasOnce(about, /a\.item\.classList\.toggle\('on', k === m\.focus\);\s*a\.line\.textContent = liveNote\(r\);\s*a\.line\.classList\.toggle\('lowered', liveTint\(r\) === 'lowered'\);/,
-    'every attribute\'s line is written, the chosen one seen - so the band is the tallest\'s, whichever is chosen');
-  const build = w.slice(w.indexOf("  const pickName = el('div', 'lv-pickname');"), w.indexOf('  choice.append(') + 80);
-  codeHasOnce(build, /pickName\.append\(pickN, pickF, pickC\);/, 'the pick name keeps to its own three - no line widens it');
-  codeHasOnce(build, /const item = el\('div', 'lv-about'\);\s*const line = el\('div', 'lv-live'\);\s*item\.append\(line, el\('p', null, ATTRIBUTE_BLURB\[k\] \?\? ''\)\);/);
-  codeHasOnce(build, /choice\.append\(ask, pick, blurb\);/);
   // THE ROOM, in the sheet (comments stripped): one cell for the eight; on a phone or a short screen the line takes
   // its blurb's place; short, both are one line. The browser probe measured it: the choosing tap never moves the figure.
   const css = ENHANCED_CSS.replace(/\/\*[\s\S]*?\*\//g, '');

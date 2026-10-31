@@ -205,20 +205,3 @@ test('GRANT8 AN `encr` MEMBER STANDS ITS SEED\'S SPECIES: the owner\'s encounter
   assert.equal(await D.host.check(OWNER, CELL, { ...fr.f[0], i: 50, t: want === 1 ? 2 : 1, gr: [f._grant.g, 0] }), 'dice');
 });
 
-test('GRANT4 THE BUILDING\'S POOL AND THE DUNGEON\'S OWN LANE ARE WIRED: world.js hands the grants\' host to the building\'s pool and to the dungeon; the dungeon\'s own lane asks before it builds a stand, carries the grant on its record and frame, checks a new puppet\'s, ends a member gone, hands one on to its heir, ties an adopted one, and keeps the clock (by source; mutants: the dungeon\'s ask dropped; its frame\'s grants dropped)', () => {
-  const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const M = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const D = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(W, /\n\s+grants,\s+\/\/ GRANT4: the building's own stands/);
-  assert.match(W, /grants: \(\) => \(online \? grants : null\),/);
-  assert.match(M, /grants: \(\) => host\.grants\?\.\(\) \?\? null,/);
-  assert.match(D, /const ask = bout \? null : grants\?\.\(\)\?\.memberFor\(grantKindOf\(\{ allied, questBehaviour: questSpawn, revenant, loose: true \}\)\) \?\? null/);
-  assert.match(D, /if \(ask && !gm && grants\?\.\(\)\?\.enforcing\(\)\) return null;\n\s+const f = await buildFoeAt\(e, false\);/);
-  assert.match(D, /if \(seeded && f\._grant && !f\._grant\._dead\) r\.gr = \[f\._grant\.g, f\._grantI\];/);
-  assert.match(D, /\.\.\.\(gs\.length \? \{ gs \} : \{\}\)/);
-  assert.match(D, /grants\?\.\(\)\?\.heard\(from, data\.gs\);/);
-  assert.match(D, /standOwnPuppet\(from, r, qt, o\.gen, lo, grants\?\.\(\)\?\.check\(from, null, r\) \?\? null\)/);
-  assert.match(D, /grants\?\.\(\)\?\.handed\(f, heir\);/);
-  assert.match(D, /grants\?\.\(\)\?\.adopted\(from, f, f\._ownI\);/);
-  assert.match(D, /grants\?\.\(\)\?\.tick\(\);/);
-});

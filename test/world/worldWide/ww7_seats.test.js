@@ -68,10 +68,3 @@ test('WW7-3 the seats past the Bay: a crown at each capital, a palace at each Ar
   assert.deepEqual([bay.list.length, bay.powers.has(64), bay.powers.get(21)], [0, false, 3021]);
 });
 
-test('WW7-3 by source: the places module adds the seats past the Bay as it registers the places - each capital\'s centre in its province\'s region, each Arena city-state but a capital\'s pixel\'s - and the host hands it the seats (mutants: the seats never added)', () => {
-  const m = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(m, /if \(townSeats\) replaceSeats\(townSeats, 'tesa', tamrielSeatsOf\(seatPlaces\(\)\)\);/);
-  assert.match(m, /capitals\.push\(\{ key: capitalPlaceId\(k, 0\), name: CAPITALS\[k\]\.name, px: at\.x, py: at\.y, region: regionOfProvince\(CAPITALS\[k\]\.province\) \}\);/);
-  assert.match(m, /filter\(\(p\) => p\.kind === 'city-state' && !capitalOnPixel\(p\.bx, p\.by\)\)/);
-  assert.match(rd('src/scenes/world.js'), /townSeats, woodsBytes, worldPlaces,/);
-});

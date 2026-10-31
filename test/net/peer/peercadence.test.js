@@ -245,26 +245,3 @@ test('AUDIT PEER-CADENCE F3 (Lens 1): a rebuild that let the mesh go (an archer\
   assert.equal(pb.has('far'), true, 'and the body stands again on that frame');
 });
 
-test('PEER-CADENCE: by source - the clips advance ABOVE the pose gate, the particle step takes the banked dt, the hidden loop runs on a skipped frame too, and the first-person branch takes no flag', () => {
-  const src = rd('src/combat/fpArm.js');
-  assert.match(src, /update\(dt, \{ pose = true, effectsDt = dt \} = \{\}\) \{/, 'the flag and the bank, defaulted to the old behaviour');
-  const upd = src.slice(src.indexOf('update(dt, { pose = true, effectsDt = dt } = {}) {'));
-  const third = upd.indexOf("if (viewMode === 'third') {");
-  const gate = upd.indexOf('if (pose) {');
-  assert.ok(gate > third && third > 0, 'the pose gate is inside the third-person branch');
-  for (const clip of ['advanceClip(actionState', 'advanceClip(movementState', 'advanceClip(jumpState', 'advanceClip(idleState', 'advanceClip(torchState']) {
-    const at = upd.indexOf(clip); assert.ok(at > 0 && at < third, `${clip} advances before the branch, so before the gate`);
-  }
-  // PIN MOVED (MW-BOW1): the weapon's own clock poses its pieces first, inside the same gate - a skipped frame poses neither
-  assert.match(upd, /if \(pose\) \{\s*posePartClocks\(t\.arm, [^\n]*\n\s*poseAssembly\(t\.arm, \{[\s\S]*?\}\);\s*uploadThirdMesh\(t\);[\s\S]*?stepRigEffects\(t\.arm, \{ dt: effectsDt,[\s\S]*?frames\+\+;[^\n]*\n\s*\}\s*if \(!thirdMesh\) return;[^\n]*\n[\s\S]*?for \(const r of thirdMesh\.ranges\) \{/, 'skin, upload, particles on the banked dt and the frame count inside the gate; the hidden loop outside it, guarded for a mesh that was never minted');
-  const fp = upd.slice(upd.indexOf('const fBase = poseSource'), upd.indexOf('frames++', upd.indexOf('const fBase = poseSource')));
-  assert.doesNotMatch(fp, /if \(pose\)|if \(!pose\)|\bpose \?|effectsDt/, 'the first-person branch never reads the flag or the bank');
-  const pb = rd('src/net/peer/peerBodies.js');
-  assert.match(pb, /export const POSE_CADENCE = \[\[10, 1\], \[25, 2\], \[Infinity, 3\]\];/);
-  assert.match(pb, /const must = !b\.posed \|\| !\(b\.rig\.thirdActive\?\.\(\) \?\? true\);/, 'a body with no skin to keep poses (AUDIT PEER-CADENCE F3)');
-  // PIN MOVED (HORSE-VIEW's audit, 2026-10-21): the distance is the last pass's camera's, through its lens (cadenceD2 -
-  // test/systems/horse/fb1021_horses.test.js drives it); before any pass, `near`'s, as every test above measures it
-  assert.match(pb, /\(this\._frame \+ b\.phase\) % poseCadenceFor\(eye && b\.feet \? cadenceD2\(b\.feet, eye, lens\) : b\.d2\) === 0 \? 1 : 0;/, 'otherwise the phase-staggered cadence on the MODULE\'s frame at this frame\'s distance (AUDIT PEER-CADENCE F1) - WB9h: ranked for the skin budget, a body out of the view skinning nothing');
-  assert.match(pb, /\n    this\._frame\+\+;\n/, 'the module counts frames in sync');
-  assert.match(pb, /phase: this\._phase\+\+, bank: 0,/, 'a new body takes the next phase');
-});

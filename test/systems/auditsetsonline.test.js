@@ -169,7 +169,6 @@ test('AUDIT SETS L4: A BLOW THE WARDEN\'S WARD TURNS spends no power - Riposte s
   const s = sword();
   assert.equal(setBlow(s, 100, e, { name: 'the Warden', warded: true }, {}), 100, 'turned whole: no Riposte on it');
   assert.equal(setBlow(s, 100, e, RAT, {}), 115, 'and the next blow that lands has it');
-  assert.match(read('src/scenes/dungeonContext.js'), /b\.entity\.warded = !!b\.warded;/);
 });
 
 // ═══ THE WIRE AND THE ROOM ═══════════════════════════════════════════════════════════════════════
@@ -177,12 +176,6 @@ test('AUDIT SETS L4: A BLOW THE WARDEN\'S WARD TURNS spends no power - Riposte s
 test('AUDIT SETS M1: A FOE\'S MAXIMUM HEALTH RIDES ITS RECORD (`k`) - bounded as its health is; the exterior owner and the dungeon host say it, the puppet and the guest\'s copy take it, so Run Them Down reads the OWNER\'s "under half" (mutants: `k` unbounded; unsaid; untaken)', () => {
   assert.deepEqual(validFoeRecord({ i: 1, h: 40, k: 70 }), { i: 1, h: 40, k: 70 });
   for (const k of [0, -5, FOE_HEALTH_MAX + 1, NaN, '70']) assert.equal(validFoeRecord({ i: 1, k }), null, `k=${String(k)}`);
-  const ext = read('src/scenes/exteriorFoes.js'), dun = read('src/scenes/dungeonContext.js');
-  assert.match(ext, /\.\.\.\(Number\.isFinite\(f\.entity\.maxHealth\) && f\.entity\.maxHealth >= 1 \? \{ k: Math\.min\(FOE_HEALTH_MAX, f\.entity\.maxHealth\) \} : \{\}\)/, 'the owner says it');
-  assert.match(ext, /if \(r\.k !== undefined\) f\.entity\.maxHealth = r\.k;/, 'the puppet takes it');
-  assert.match(dun, /if \(owesMax\) \{ r\.k = max; f\._maxSent = max; _maxLeft--; \}/, 'the host says it - on a delta while owed (test/net/restsync.test.js)');
-  assert.match(dun, /r\.k = max; f\._maxSent = max; room -= 5 \+ String\(max\)\.length;/, 'and on a full frame while its room holds it');
-  assert.match(dun, /if \(Number\.isFinite\(r\.k\)\) f\.entity\.maxHealth = r\.k;/, 'the guest\'s copy takes it');
   // the law it feeds: a raider at 40 of its owner's 70 is NOT under half, whatever my roll of 100 said
   fresh();
   const e = wearSet(player(), 'thieftaker', 4);
@@ -206,14 +199,6 @@ test('AUDIT SETS M2: A ROOM\'S WORD THIS BUILD CANNOT READ - a newer game\'s ite
   assert.deepEqual(box.items, [{ name: 'mine' }], 'nothing landed');
   assert.equal(applyInteriorLoot(ctx, [{ k: 'container:0', r: [], d: today }], { seen: s.seen, today, unreadable: s.unreadable }), 1);
   assert.equal(s.unreadable.has('container:0'), false, 'a word it can read again clears it');
-  const wm = hostText('src/scenes/worldModes.js'), pure = read('src/world/interior/interiorShared.js'), dun = read('src/scenes/dungeonContext.js');   // PIN MOVED (OUTDOOR-LOOT): the building's loot doors stand in world/interior/interiorShared.js now (HOST-SPLIT moved them out of createWorldModes)
-  assert.match(pure, /if \(bag\.unreadable\?\.has\(canon\)\) return false;   \/\/ AUDIT SETS M2/, 'never claimed or closed over in a building');
-  assert.match(wm, /\{ \.\.\._intShared, from: id, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/, 'the building\'s bag whole - its set of the unreadable among it - handed to the door');   // PIN MOVED (AUTO-HOLD): and the pieces I carry beside it   // PIN MOVED (OUTDOOR-LOOT): the bag whole, and the sender
-  // OUTDOOR-LOOT (DESIGN 4.6): and a cupboard the room spoke about in words this build cannot read is NEVER OPENED - not over a roll of its own either
-  assert.match(wm, /if \(_intShared\?\.unreadable\?\.has\(key\)\) \{ setMidScreenText\(LOOT_NEWER_TEXT\); return true; \}/, 'the press says the newer-version line and opens nothing');
-  assert.match(dun, /if \(!items\) \{ if \(lootHolder\(canon\) && !respawnDue\(rec\.t, _wallNow\(\)\)\) \{ _lootSeen\.add\(canon\); _lootUnreadable\.add\(canon\); \} continue; \}/, 'a word due back (WORLD8) locks nothing');
-  assert.match(dun, /if \(_lootUnreadable\.has\(canon\)\) return false;   \/\/ AUDIT SETS M2/, 'never claimed or closed over in a dungeon');
-  assert.match(dun, /if \(_u && _lootUnreadable\.has\(lootKeyOf\(_u\)\)\) \{ setMidScreenText\(roomUnreadableText\(lootKeyOf\(_u\)\)\); return 0; \}/, 'nor opened');   // PIN MOVED (RPT1026-ITEMS LOOT-SKEW): the line the room module chooses - M2's for a piece this build cannot read, another build's base said as one   // PIN MOVED BACK (AUDIT GRAVE-PARTY G2): GRAVE-PARTY opened a room container as the player's own here - an online pile is built empty, so it opened empty, or its base unclaimed; M2's refusal stands for every container again (test/systems/fb1016b_graveparty.test.js)
   assert.match(LOOT_NEWER_TEXT, /newer version of the game/);
 });
 

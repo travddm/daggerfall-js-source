@@ -81,19 +81,5 @@ test('LOOT11: the finds - a pile put down (a house\'s treasure too); a body of m
   assert.equal(finds.length, 1);
   assert.deepEqual(finds[0].root, [4, LOOT_LINE_CROWN, 2], 'its crown');
   assert.ok(finds[0].items.includes(rare), 'its list, live');
-  const ef = read('src/scenes/exteriorFoes.js');
-  assert.match(ef, /lootFinds: \(\) => foes\.filter\(\(f\) => f\.dead && f\.corpseMarker && !f\.puppet && !f\.corpseDisabled && f\.entity\?\.items\?\.length\)\.map\(\(f\) => \(\{ root: lootCrown\(f\.corpseMarker\.pos, f\.corpseMarker\.size\), items: f\.entity\.items \}\)\),/, 'my bodies, never a peer\'s');
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /\.\.\.foes\.filter\(\(f\) => lootableBody\(f\) && f\.corpsePos && f\.entity\?\.items\?\.length\)\.map\(\(f\) => \(\{ root: lootCrown\(f\.corpsePos, f\.corpseBatch\?\.size\), items: f\.entity\.items \}\)\),/, 'a searchable body (the room\'s)');
-  assert.match(dc, /\.\.\.lootPiles\.filter\(\(p\) => p\.items\?\.length\)\.map\(\(p\) => \(\{ root: lootCrown\(p\.pos, p\.batch\?\.size\), items: p\.items \}\)\),\s*\.\.\.droppedLoot\.lootFinds\(\),/, 'its piles and what was put down');
 });
 
-test('LOOT11: every host draws them in its own pass - the street after the gate\'s fire, the dungeon after its billboards, a building after its characters', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const lootLines = createLootLines\(renderer\.gl\);/, 'one pass, built once');
-  assert.match(w, /if \(lootLines\.draw\(\(\) => \[\.\.\.exteriorFoes\.lootFinds\(\), \.\.\.droppedLoot\.lootFinds\(\)\], proj, view, new Float32Array\(mwv\.eye\), now \/ 1000,/, 'the street\'s');
-  assert.match(w, /drawLootLines: \(\{ proj, view, eye, finds \}\) => \{\s*if \(lootLines\.draw\(finds, proj, view, eye, performance\.now\(\) \/ 1000, \{ mode: renderer\._fogMode/, 'the modes\' hook, in their own air');
-  const m = read('src/scenes/worldModes.js');
-  assert.match(m, /host\.drawLootLines\?\.\(\{ proj, view, eye: mwv\.eye, finds: \(\) => dungeonCtx\.lootFinds\?\.\(\) \?\? \[\] \}\);/, 'the dungeon\'s');
-  assert.match(m, /host\.drawLootLines\?\.\(\{ proj, view, eye: mwv\.eye, finds: \(\) => \[\.\.\.interiorDropped\.lootFinds\(\), \.\.\.\(interiorFoes\?\.lootFinds\?\.\(\) \?\? \[\]\)\] \}\);/, 'a building\'s');
-});

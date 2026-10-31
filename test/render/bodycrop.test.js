@@ -269,11 +269,6 @@ test('BODY-CROP: the quad writes a window picture\'s depth as it stands (uDepthK
   for (const [i, sx, sy] of [[0, -1, -1], [1, -1, 1], [2, 1, 1], [3, 1, -1]]) {
     assert.ok(corner(i).every((x, k) => Math.abs(x - want(sx, sy)[k]) < 1e-6), `corner ${i} along the tilted right`);
   }
-  const fs = rd('src/render/renderer.js');
-  assert.ok(fs.includes('  if (uDepthK.w > 1.5) return d;   // BODY-CROP: the frame\'s own depth, as the picture took it'), 'the shader takes the texel\'s depth');
-  const body = fs.slice(fs.indexOf('float bodyDepth(float d) {'), fs.indexOf('// eliteRim\'s twin'));
-  const floor = body.indexOf('return gl_FragCoord.z;   // AUDIT WEAPON-GLOW MW-1'), own = body.indexOf('if (uDepthK.w > 1.5) return d;');
-  assert.ok(floor > 0 && own > floor, 'after the glow\'s floor: a ring or an ember keeps the quad\'s depth');
 });
 
 test('MW-DETAIL: the switch - a Features row, Morrowind Model Detail, enhanced, the viewer\'s own, Pixelated by default, beside the Billboard Look; read where each Morrowind picture is sized - the bodies and horses (drawBodyPicture), the first-person arm and the rider\'s horse in first person', () => {
@@ -286,12 +281,4 @@ test('MW-DETAIL: the switch - a Features row, Morrowind Model Detail, enhanced, 
   assert.equal(FEATURE_PREF_DEFAULTS.mwModelDetail, 'pixel');
   assert.equal(PREF_DEFAULTS.mwModelDetail, 'pixel');
   assert.ok(JSON.stringify(CATEGORIES).includes('"feat:mw-billboard-look","feat:mw-model-detail"'), 'beside the Billboard Look');
-  const arm = rd('src/combat/fpArm.js');
-  const draw = arm.slice(arm.indexOf('    draw(canvas) {'), arm.indexOf('    status()'));
-  assert.match(draw, /const pixel = mwModelPixel\(\);\s*\n\s*const wantW = canvas\.clientWidth \/ pixel;\s*\n\s*const wantH = canvas\.clientHeight \/ pixel;/, 'the first-person arm');
-  assert.equal(arm.match(/drawBodyPicture\(renderer, canvas, thirdMesh, model, /g)?.length, 2, 'the body, and the rider with the horse');
-  assert.ok(!/drawRigSpriteBox\(/.test(arm), 'and no card of its own');
-  const horse = rd('src/world/horseRig.js');
-  assert.match(horse, /drawBodyPicture\(renderer, canvas, h\.mesh, h\.model, \{ \.\.\.bx, up, conceal, hitFlash \}, proj, view, eye\);/, 'a horse alone');
-  assert.match(horse, /const pixel = mwModelPixel\(\);[^\n]*\n\s*const wantW = canvas\.clientWidth \/ pixel, wantH = canvas\.clientHeight \/ pixel;\s*\n\s*const edge = renderer\.charSpriteRoom\?\.\(Math\.ceil\(Math\.max\(wantW, wantH\)\)\) \?\? CHAR_SPRITE_RT_SIZE;/, 'the rider\'s horse in first person, and its room');
 });

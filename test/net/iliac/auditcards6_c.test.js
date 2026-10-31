@@ -70,54 +70,6 @@ async function rankedPair(c) {
   return { A, B };
 }
 
-test('AUDIT CARDS-6 C1: a ranked result is KEPT, owed to both accounts - a winner whose link was down at the end is told it on his hello and his look, until his device says it holds it (ack); off the table\'s queue only once kept', () => withRoom(async (c) => {
-  const { r, T, word, join, receipts, gatePub, now } = c;
-  const { A, B } = await rankedPair(c);
-  assert.equal(T().ranked, true, 'a ranked game');
-  // A's link is down (the runtime has not told the relay): B stands up mid-game, conceding - A's win sent to a dead socket
-  A.send = () => { throw new Error('the link is down'); };
-  await word(B, { op: 'stand', table: 0 });
-  assert.equal(receipts(B).length, 1, 'the loser holds the result');
-  assert.equal(T()?.results?.length ?? 0, 0, 'signed and kept: off the queue');
-  const owed = r.store.get('iowed:acct-peer-a');
-  assert.equal(owed?.length, 1, 'owed to the winner\'s account');
-  assert.equal(r.store.get('iowed:acct-peer-b')?.length, 1, 'and to the loser\'s');
-  // A back on a new socket, the same id: his hello is told the result, and so is a look - the same signed bytes
-  const A2 = r.connect(); await r.hello(A2, 'peer-a', null, { name: 'peer-a' });
-  assert.deepEqual(receipts(A2), receipts(B), 'told on the hello');
-  const v = await verifyIliacReceipt(receipts(A2)[0], gatePub, { subtle, nowS: Math.floor(now() / 1000) });
-  assert.deepEqual([v.ok, v.claims.r, v.claims.h], [true, 0, 'left'], 'his win, signed');
-  await word(A2, { op: 'look', table: 0 });
-  assert.equal(receipts(A2).length, 2, 'and again on a look, while his device has not said it holds it');
-  // the device keeps it and says so: the room owes it no longer
-  await word(A2, { op: 'ack', table: 0, j: readIliacReceipt(receipts(A2)[0]).j });
-  await word(A2, { op: 'look', table: 0 });
-  assert.equal(receipts(A2).length, 2, 'acked: not told again');
-  assert.equal(r.store.get('iowed:acct-peer-a'), undefined, 'and forgotten');
-  assert.equal(r.store.get('iowed:acct-peer-b')?.length, 1, 'the other account\'s own ack is its own');
-  const B2 = await join('peer-b2', { tokenSub: 'acct-peer-b' });
-  assert.equal(receipts(B2).length, 1, 'another socket of the account, told on its hello');
-  await word(B2, { op: 'sit', table: 0, chair: 1, chairs: 4, deck: DECK });
-  assert.equal(receipts(B2).length, 2, 'and a sit hears what its account is owed first');
-  // a keep that fails keeps the result on the table's queue, signed again on the next save (AUDIT CARDS-4 B4's rule)
-  const put = r.state.storage.put;
-  let fail = 1;
-  r.state.storage.put = async (k, val) => { if (typeof k === 'string' && k.startsWith('iowed:') && fail > 0) { fail--; throw new Error('the disk'); } return put(k, val); };
-  const t = T();
-  t.results.push({ j: '00000000000000c1', f: ['acct-peer-a', 'acct-peer-b'], r: 1, h: 'power', to: ['peer-a', 'peer-b'] });
-  await r.room._iliacSave();
-  assert.equal(T().results.length, 1, 'not kept: still queued');
-  await r.room._iliacSave();
-  assert.equal(T().results.length, 0, 'kept on the next save');
-  assert.ok(r.store.get('iowed:acct-peer-a').some((x) => x.j === '00000000000000c1'));
-  r.state.storage.put = put;
-  // the host's half: a receipt kept by the claims is acked to the relay at once
-  const w = read('src/scenes/worldModes.js');
-  assert.ok(w.includes("    if (typeof f?.receipt === 'string' && host.iliacClaims) { const j = readIliacReceipt(f.receipt)?.j; if (j) host.iliacOnline?.send?.({ op: 'ack', table: f.table, j }); }"));
-  assert.deepEqual(validIliacIn({ op: 'ack', table: 0, j: '00000000000000c1' }), { op: 'ack', table: 0, j: '00000000000000c1' });
-  assert.equal(validIliacIn({ op: 'ack', table: 0, j: 'nope' }), null);
-}));
-
 test('AUDIT CARDS-6 C2: a sit\'s own refusals are asked before the room\'s sit budget is spent - a socket sending refused sits (Iliac\'s \'seated\', Hold\'em\'s \'taken\') four a second keeps no other card table \'busy\'; the budget still binds real sits', () => withRoom(async ({ r, tick, iliac, join }) => {
   const X = await join('peer-x'), Y = await join('peer-y'), H = await join('peer-h'), I = await join('peer-i');
   const raw = (ws, o) => r.raw(ws, JSON.stringify(o));

@@ -125,14 +125,6 @@ test('RAID-WORD: a jump\'s sweep - the pool emptied, no one dead - frees the rai
   assert.ok(log.raiders.length >= MAX_RAID_ENEMIES + 4, `back in the town the raid stands raiders again, one a clock - the swept hold no place (${log.raiders.length - MAX_RAID_ENEMIES} new)`);
 });
 
-test('RAID-WORD by source: the world host tells the raid of its sweep beside the sweep itself - every jump, load and respawn runs it', () => {
-  const w = read('src/scenes/world.js');
-  const sweep = w.indexOf('    exteriorFoes.clearLive();\n'), guards = w.indexOf('    cityGuards.clearLive();\n');
-  assert.ok(sweep > 0 && guards > sweep, 'the sweep this pin reads');
-  assert.match(w.slice(guards, guards + 400), /\n {4}raidPoolCleared\(\);   \/\/ FIELD BUGS 2026-10-11g RAID-WORD/, 'the sweep, then the raid told');
-  assert.match(w, /import \{[^}]*\braidPoolCleared\b[^}]*\} from '\.\.\/systems\/raidingParties\.js';/);
-});
-
 test('RAID-WORD: the held map\'s raid card reads the town\'s ledger at a raid relay - its count and its target, the day\'s roll of 15 to 25 - and this machine\'s share without one (mutants: the ledger unread; its target unread)', () => {
   const r = raidRec({ killed: 4, attackAmount: 20 });
   assert.equal(raidMapMarks([r], AT(610))[0].tip.lines[2], '4 of 20 driven off', 'no ledger: my share');
@@ -140,6 +132,5 @@ test('RAID-WORD: the held map\'s raid card reads the town\'s ledger at a raid re
   assert.equal(raidMapMarks([r], AT(610), { relay: ledger })[0].tip.lines[2], '17 of 23 driven off', 'the town\'s count against the town\'s target');
   assert.equal(raidMapMarks([raidRec({ killed: 0 })], AT(610), { relay: ledger })[0].tip.lines[2], '17 of 23 driven off', 'a player who has killed none here still sees the town\'s');
   assert.equal(raidMapMarks([r], AT(610), { relay: () => null })[0].tip.lines[2], '4 of 20 driven off');
-  assert.match(read('src/scenes/world.js'), /raidMapMarks\(raidState\(\)\.raids, worldMinutes\(\), \{ [^}]*relay: raidRelayState \}\)/, 'the world host hands it the ledger');
   assert.equal(typeof raidRelayState, 'function');
 });

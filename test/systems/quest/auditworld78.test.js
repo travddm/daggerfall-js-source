@@ -59,9 +59,6 @@ test('AUDIT WORLD7/8 A1/A2/A11: the Clock - a backward sample online charges not
   assert.equal(nan._lastWorldTimeSample, now.t, 'the sample is now');
   now.t += 60; nan.tick(q);
   assert.equal(nan.remainingTimeInSeconds, 3540, 'and the remainder is a number');
-  const src = rd('src/systems/quest/clock.js');
-  assert.match(src, /const raw = now - this\._lastWorldTimeSample;\s*\n\s*if \(!Number\.isFinite\(step\)\) return Math\.trunc\(raw\);\s*\n\s*const raised = raisedSince\(caller\.raisedSeconds\?\.\(\), this\._lastRaisedSample\);\s*\n\s*return Math\.trunc\(Math\.min\(Math\.max\(raw - raised, 0\), step\)\);/);
-  assert.match(src, /this\._lastWorldTimeSample = Number\.isFinite\(dataIn\.lastWorldTimeSample\) \? dataIn\.lastWorldTimeSample : wholeSeconds\(this\.parentQuest\);/);
 });
 
 test('AUDIT WORLD7/8 A3/A6: CreateFoe - a marker ahead of the world online is a resume (the first wave waits a full interval from here, not the whole offset); a backward gap mid-session the same; an away while a wave is in flight is forgiven too (one wave after the interval, not two at once); offline the marker arithmetic is DFU\'s own', () => {
@@ -112,10 +109,6 @@ test('AUDIT WORLD7/8 A3/A6: CreateFoe - a marker ahead of the world online is a 
     m.tick(); assert.equal(act.lastSpawnTime, clock.t + 30 * 86400, 'offline the marker is DFU\'s own');
     clock.t += 3600; m.tick(); assert.equal(world.created.length, 0);
   }
-  const src = rd('src/systems/quest/actions.js');
-  assert.match(src, /else if \(this\._lastTick == null\) \{ if \(Number\.isFinite\(step\) && \(gameSeconds - this\.lastSpawnTime > step \|\| gameSeconds < this\.lastSpawnTime\)\) this\.lastSpawnTime = gameSeconds; this\._lastTick = gameSeconds; \}/);
-  assert.match(src, /else if \(Number\.isFinite\(step\) && gameSeconds < this\._lastTick\) \{ this\.lastSpawnTime = gameSeconds; this\._lastTick = gameSeconds; \}/);
-  assert.match(src, /else \{ const raised = Number\.isFinite\(step\) \? Math\.min\(raisedSince\(raisedNow, this\._lastRaised\), gameSeconds - this\._lastTick\) : 0; const forgiven = Math\.max\(0, gameSeconds - this\._lastTick - raised - step\) \+ raised; if \(forgiven > 0\) this\.lastSpawnTime \+= forgiven; this\._lastTick = gameSeconds; \}/, 'the in-flight path forgives too (QCLOCK-WORLD: the lived part past a step, and the raise whole)');
 });
 
 test('AUDIT WORLD7/8 B1/B4/C2: the stamp is the RELAY\'s millisecond - under an installed offset the wire\'s inverse over the shared minute answers the relay\'s instant, where sharedWallMs answers this machine\'s (right for a display, wrong for a stamp two machines compare); a stamp ahead of now is clamped at both readers by source', () => {
@@ -135,11 +128,4 @@ test('AUDIT WORLD7/8 B1/B4/C2: the stamp is the RELAY\'s millisecond - under an 
     assert.equal(respawnDue(stampAtKill, nowLater + 60_000), true);
   } finally { setSharedClock(null); }
   assert.ok(Date.now() - t0 < 5000);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const _wallNow = \(\) => \(sharedClockOn\(\) \? wallMsForClassicMinutes\(worldMinutes\(\)\) : null\);/, 'the dungeon reads the relay\'s');
-  assert.equal((d.match(/sharedWallMs\(/g) ?? []).length, 0, 'and never this machine\'s');
-  assert.match(d, /f\._diedAt = _n == null \? sf\.died : Math\.min\(sf\.died, _n\); \}/, 'B4: the memory\'s stamp never ahead of now');
-  assert.match(d, /const _t = Number\.isFinite\(rec\.t\) \? \(_now == null \? rec\.t : Math\.min\(rec\.t, _now\)\) : _now;/, 'C2: the loot record\'s stamp never ahead of now');
-  assert.match(d, /f\._diedAt \?\?= _wallNow\(\);   \/\/ AUDIT WORLD7\/8 B6/, 'B6: the quest pool\'s remove door stamps too');
-  assert.match(d, /const RESPAWN_BURST = 4;/, 'B9');
 });

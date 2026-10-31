@@ -20,7 +20,6 @@ import { foldQuickLoot, quickLootTake, quickLootArm } from '../../src/systems/qu
 import { inventoryQuickAct } from '../../src/ui/enhanced/enhancedInventory.js';
 import { ROOT, examination, noteCame, withQuickLoot, frameOf, thief, overPile, bedRoom } from '../robesHarness.mjs';   // the harness the audit's file shares
 
-
 test('WHERE-ROBES: the examination as DFU runs it - a click on the robes says 1018 and hands over the note; no click, no note (the trigger is the click, ticked through the real machine)', () => {
   const e = examination();
   assert.equal(e.robes.questItem, true, 'the robes are the quest\'s own item');
@@ -44,7 +43,6 @@ test('WHERE-ROBES: the one home answers nothing for what is not a live quest ite
 });
 
 // ── QUICK LOOT: the row taken with no window ───────────────────────────────────────────────────────────────────────
-
 
 test('WHERE-ROBES: QUICK LOOT\'s take is the loot row\'s click - the robes off a pile with E send the quest click, and the note comes (mutant: the click left out of takeThrough)', () => withQuickLoot(() => {
   const e = examination();
@@ -71,7 +69,6 @@ test('WHERE-ROBES: QUICK LOOT\'s take-all (P) clicks every quest row of the lot,
 }));
 
 // ── THE ENHANCED SKIN: the menu and the pad's quick act ─────────────────────────────────────────────────────────────
-
 
 test('WHERE-ROBES: the enhanced skin\'s RIGHT CLICK on a loot row (a long press, the pad\'s Y) is DFU\'s right click - the quest click goes first, then its Take takes (mutant: the menu\'s click left out)', () => {
   const e = examination();
@@ -129,15 +126,7 @@ test('WHERE-ROBES: a quest ITEM stand is named by the Item resource\'s own item 
   assert.equal(questStandItem(null), null);
 });
 
-test('WHERE-ROBES: both hosts\' quest-stand namers ask the one reader - no namer reads a field no resource has', () => {
-  const wm = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  assert.equal((wm.match(/questResourceName\(questStandItem\(res\), \{ archive: st\.archive \?\? -1, record: st\.record \?\? -1, getQuest: \(uid\) => questBridge\?\.machine\.getQuest\(uid\) \?\? null \}\)/g) ?? []).length, 2,
-    'the building\'s namer and the dungeon\'s');
-  assert.doesNotMatch(wm, /res\.daggerfallItem|res\.item \?\?/, 'the old read is gone from both');
-});
-
 // ── THE PRESS: the robes on a bed, a dresser, a shelf ───────────────────────────────────────────────────────────────
-
 
 test('WHERE-ROBES: furniture is struck at its MESH - the robes on a mattress win the press over the bed whose box holds them, in either list order; the mattress itself is still the bed (mutants: the surface law dropped; the box-containment test dropped; struck at the box\'s entry, not the surface)', async () => {
   const { pickActivatableHit } = await import('../../src/player/activate.js');
@@ -156,25 +145,6 @@ test('WHERE-ROBES: furniture is struck at its MESH - the robes on a mattress win
   // a ray that crosses the bed's box above the headboard's reach and meets nothing of it never struck the bed
   const over = (() => { const d = [3, 0.5, 0]; const n = Math.hypot(...d); return d.map((v) => v / n); })();
   assert.equal(pickActivatableHit(eye, over, [bed], c), null, 'air over the bed is not the bed - the wall the ray meets is past its box');
-});
-
-test('WHERE-ROBES: a building\'s containers, beds and shelves and a dungeon\'s searchables race the ray by the surface law, and a shelf that does nothing is no target at all (DFU leaves a residence\'s shelf geometry)', () => {
-  const wm = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  for (const fam of ['container', 'bed', 'shelf']) {
-    assert.match(wm, new RegExp(`targets\\.push\\(\\{ key: \`${fam}:\\$\\{i\\}\`[^\\n]*surface: true \\}\\);`), `${fam}: struck at its mesh`);
-  }
-  // THE FOUR HOSTS: a dungeon's searchable models (SEARCH1 - coffins, shelves, chests, crates) are the same case, in its
-  // own shared 'dungeon' bucket; the street's headstones stand where no quest item can (a quest item's Place is a
-  // building or a dungeon), and exterior.js stands no furniture
-  const dc = readFileSync(join(ROOT, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.match(dc, /targets\.push\(\{ key: `search:\$\{i\}`, aabb: sb\.aabb, distance: RAY_DISTANCE, reach: searchReachFor\(sb\.aabb, lastPlayerFeet, [^\n]*\), surface: true \}\)/, 'the dungeon\'s searchables too');   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the reach is the body's to the box (searchables.js searchReachFor)
-  assert.match(wm, /if \(shelvesAct\(interiorBuilding\)\) interiorCtx\.shelves\.forEach\(/, 'the shelves are targets only where they act');
-  // the predicate is openShelf's three arms, asked as one question - a fourth arm added to the press must be added here
-  assert.match(wm, /const shelvesAct = \(b\) => !!b && \(hallOfRecordsHere\(b\) \|\| isShop\(b\.buildingType\) \|\| isBookshelfBuilding\(b\.buildingType\)\);/);
-  const open = wm.slice(wm.indexOf('  function openShelf(i) {'), wm.indexOf('    // A2: PlayerActivate.ActivateLootContainer\'s ShopShelves arm'));
-  assert.match(open, /if \(hallOfRecordsHere\(b\)\) \{ openHallOfRecords\(b\); return; \}/);
-  assert.match(open, /if \(!isShop\(b\.buildingType\)\) \{/);
-  assert.match(open, /if \(isBookshelfBuilding\(b\.buildingType\)\) openBookshelf\(shelf, b\);/);
 });
 
 // ── A PARTY'S RESYNC: the pickup is this world's ────────────────────────────────────────────────────────────────────

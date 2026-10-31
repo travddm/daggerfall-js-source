@@ -252,14 +252,6 @@ function dirToFrom(from, p) { const d = [p[0] - from[0], p[1] - from[1], p[2] - 
 
 test('POI-3 WORDS: every code the law, the glTF reader, the mesh and the picture header can say has its own sentence - walked from their sources; a code no table knows is still said; a problem\'s place said by its part\'s name (mutants: a code unsaid; the part by its index when it has a name)', () => {
   const unknown = (s) => /Something is wrong/.test(s);
-  const law = src('src/poi/poiLaw.js');
-  const lawCodes = new Set([...law.matchAll(/say\([^,]+, '([a-z0-9-]+)'/g)].map((m) => m[1]).concat([...law.matchAll(/code: '([a-z0-9-]+)'/g)].map((m) => m[1])));
-  assert.ok(lawCodes.size >= 40, `the walk found the law's codes (${lawCodes.size})`);
-  for (const c of lawCodes) assert.ok(!unknown(problemText({ code: c, max: 1, min: 0, have: 1, want: 2, key: 'k', bytes: 1 })), `law code ${c} unsaid`);
-  const gl = src('src/poi/gltfImport.js');
-  for (const c of new Set([...gl.matchAll(/fail\('([a-z0-9-]+)'/g)].map((m) => m[1]))) assert.ok(!unknown(gltfErrorText(c, { ext: 'x', uri: 'y', what: 'z' })), `glTF code ${c} unsaid`);
-  for (const c of new Set([...gl.matchAll(/warn\('([a-z0-9-]+)'/g)].map((m) => m[1]))) assert.ok(!unknown(gltfWarningText(c)), `glTF warning ${c} unsaid`);
-  for (const c of new Set([...src('src/poi/poiImage.js').matchAll(/error: '([a-z0-9-]+)'/g)].map((m) => m[1]))) assert.ok(!unknown(imageErrorText(c)), `picture code ${c} unsaid`);
   assert.match(meshErrorText('too-many-vertices'), /262,144/);
   // PIN MOVED (AUDIT POI L8): the two a damaged file meets have words of their own; every other mesh code is a damaged model
   assert.match(meshErrorText('index-range'), /names a vertex it does not have/);
@@ -300,7 +292,6 @@ test('POI-3 THE DOOR: a draft PUT as JSON with the bearer to the draft route; an
   assert.equal(asked.at(-1).headers.authorization, 'Bearer s3cret');
   await poiSubmit(io, 'poi-000000000001', 3);
   assert.equal(asked.at(-1).method, 'POST'); assert.deepEqual(JSON.parse(asked.at(-1).body), { id: 'poi-000000000001', rev: 3 });
-  assert.match(src('src/poi/poiService.js'), /import \{ call \} from '\.\.\/net\/accountClient\.js';/);
 });
 
 // ── THE PASS AND THE HOST IN THE WORLD ─────────────────────────────

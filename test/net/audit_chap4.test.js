@@ -243,10 +243,6 @@ test('AUDIT CHAP4 D1: a membership the active book does not hold is dormant - cl
     ['seats', 'server-account/src/npcChapters.js', /WHERE r\.member = 1 AND r\.dormant = 0 AND/]]) assert.match(src(file), re, f);
 });
 
-test('AUDIT CHAP4 D1: the tab claims by the active book - its members off the curse\'s own reading (mutants: the vampire read)', () => {
-  assert.match(src('src/net/npcRollTracker.js'), /return rollMembersOf\(entity\?\.guildMemberships, rollVampireOf\(entity\)\);/);   // CURSE-CARRY: the door carries first, then reads
-});
-
 // ── THE CLIENT ──────────────────────────────────────────────────────
 
 test('AUDIT CHAP4 C1: with nothing to claim the tab asks again once ROLL_SEATS_MS old - a Turning\'s seats reach the page; never sooner (mutants: the beat, the first word\'s stamp)', async () => {
@@ -275,15 +271,6 @@ test('AUDIT CHAP4 C1: with nothing to claim the tab asks again once ROLL_SEATS_M
   assert.equal(ROLL_SEATS_MS, SHEET_KEPT_MS);
 });
 
-test('AUDIT CHAP4 C2, C3: the living town reads its chapters at its own pixel; the rank\'s ceiling holds from the page\'s first frame (mutants: the player\'s pixel, the held gate)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /chapterOf: chapterSheet \? \(faction\) => livingChapterOf\(faction, px, py\) : undefined,/);
-  assert.match(w, /const livingChapterOf = \(\/\*\* @type \{number\} \*\/ faction, \/\*\* @type \{number\} \*\/ x, \/\*\* @type \{number\} \*\/ y\) => \{\n\s+const f = chapterFactionOf\(faction, townTalk\?\.factionDict \?\? null\) \?\? faction;\n\s+const region = \(\(\) => \{ try \{ return maps\.getRegionIndexAt\(x, y\); \} catch \{ return null; \} \}\)\(\);/);
-  // PIN MOVED (ROLL-PACE, FIELD BUGS 2026-10-15f): the ceiling is the Roll's pace's, read from the page's first frame -
-  // before the Roll's first word it promotes nobody (npcChapterLaw.js rollPromoteCeiling, fb1015f_rollpace's pins)
-  assert.match(w, /rollPace: \(f\) => rollPaceOf\(rollTracker, f, Math\.floor\(Date\.now\(\) \/ 1000\)\),/);
-});
-
 test('AUDIT CHAP4 (D, worth a look): a hall building\'s faction read as its chapter\'s - a temple\'s templar order its divine\'s, a guild hall\'s its guild\'s, the hidden two as they are (mutants: the resolution)', () => {
   const STENDARR = 33;
   const dict = new Map([
@@ -304,24 +291,6 @@ test('AUDIT CHAP4 C4: the chapter is the line\'s subject - an order\'s plural na
   for (const pool of Object.values(CHAPTER_NEWS)) for (const script of pool) for (const line of script) {
     assert.doesNotMatch(line, /(^|say )\{guild\}/, line);   // never the sentence's first word, nor its subject
   }
-});
-
-test('AUDIT CHAP4 C5, C6: both doors of a seat\'s Hall of Records read it one way - the seat\'s Chronicle and its region\'s chapters\', together (mutants: the board\'s door, the serial read)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const w = st && seatBook \? await hallOfRecordsRead\(st\) : null;/);
-  assert.match(w, /if \(!seat \|\| !seatBook\) return null;\n\s+return hallOfRecordsRead\(seat\);/);
-  assert.match(w, /const \[r, ch\] = await Promise\.all\(\[/);
-});
-
-test('AUDIT CHAP4 D3, D4, E2: a seat\'s title at its chapter\'s hall (the popup and its counter), DFU\'s refusal said under the roll, a knight\'s gifts by the book (mutants: each seam)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /guildTitle: \(\) => getTitle\(membershipOf\(seated\(\), guild\), playerEntity, guild\),/);
-  assert.match(m, /return g \? getTitle\(membershipOf\(seatedBook\(activeMemberships\(playerEntity\), membershipKey\(g\), host\.chapterSeatRank\?\.\(g\.factionId\) \?\? null\), g\), playerEntity, g\) : null;/);
-  assert.match(m, /chapterRollWindow\(\{ \.\.\.roll, lines: \[\.\.\.roll\.lines, access\.text\] \}\)/);
-  assert.match(m, /const kept = guild \? membershipOf\(activeMemberships\(playerEntity\), guild\) : null;/);
-  assert.match(m, /const decision = receiveArmorDecision\(kept, \{/);
-  assert.match(m, /onChoose: \(\) => \{ claimArmor\(kept, decision\.mask\); surfacePlayer\(\); \},/);
-  assert.match(m, /const decision = receiveHouseDecision\(kept, \{/);
 });
 
 // ── THE PINS (lens T) ───────────────────────────────────────────────

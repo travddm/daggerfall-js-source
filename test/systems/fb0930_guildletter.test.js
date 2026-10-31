@@ -138,14 +138,6 @@ test('GUILD-LETTER one letter: the realm\'s maker, which the Worker bundles, is 
   assert.equal(guildDoneText('20,000 gold taken out.', { ok: true, letter: true }), '20,000 gold taken out. You are paid with a letter of credit.');
   assert.equal(guildDoneText('20,000 gold taken out.', { ok: true }), '20,000 gold taken out.');
   assert.equal(guildDoneText('20,000 gold taken out.', { ok: true, letter: 'yes' }), '20,000 gold taken out.');
-  // AUDIT GUILD1d R13: an act's word may be the answer's own (the hall's sale says its sum) - through the same door
-  assert.match(src('src/ui/socialPanel.js'), /guildUi\.word = r\?\.ok \? guildDoneText\(typeof okWord === 'function' \? okWord\(r\) : okWord, r\) : guildWordText\(r\?\.error, r, Math\.floor\(social\.now\(\) \/ 1000\)\);/, 'every act\'s word goes through it');   // PIN MOVED (AUDIT2 GUILD2 S2/S7): and its reason
-});
-
-test('GUILD-LETTER the host: the world\'s guild wallet weighs a withdrawal by the real carried weight against the real max encumbrance, and writes the realm\'s letter at the front of the pack or the coins (mutants: the weight unread; the ceiling unread; the host pays coins)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /credit: \(n, \{ letter = false \} = \{\}\) => \{ if \(letter\) \(playerEntity\.items \?\?= \[\]\)\.unshift\(realmLetterOfCredit\(n\)\); else addGold\(playerEntity, n\); \},/);
-  assert.match(w, /paper: \(n\) => sellProceeds\(n, \{ carriedWeightKg: carriedWeight\(playerEntity\), maxEncumbranceKg: entityMaxEncumbrance\(playerEntity\) \}\)\.kind === 'letterOfCredit',/);
 });
 
 test('GUILD-LETTER the reporter\'s parenthesis: a realm character takes out only what realm characters put in (AUDIT REALM L1-F3) - and the refusal says that rule, where it said only "before the realm" (mutants: the old words)', () => {

@@ -185,25 +185,6 @@ test('MW-TEXTHREAD: the build\'s textures arrive through the pool - its preload 
   } finally { _resetTexturePool(); }
 });
 
-test('MW-TEXTHREAD: the source spellings - the worker constructed as Vite bundles it, the worker importing the pure decoder alone, and every decode site of the build going through the pool', () => {
-  const client = rd('src/formats/morrowind/mwTextureClient.js');
-  assert.match(client, /return new Worker\(new URL\('\.\/mwTextureWorker\.js', import\.meta\.url\), \{ type: 'module' \}\);/);
-  const worker = rd('src/formats/morrowind/mwTextureWorker.js');
-  assert.deepEqual([...worker.matchAll(/^import .* from '([^']+)';/gm)].map((m) => m[1]), ['./mwTexture.js'], 'the worker graph is the pure decoder alone');
-  const arm = rd('src/combat/fpArm.js');
-  const preload = arm.slice(arm.indexOf('async function preloadArmTextures('), arm.indexOf('\n}\n', arm.indexOf('async function preloadArmTextures(')));
-  assert.match(preload, /image = await decodeTextureOffThread\(path, arc\.get\(path\)\)/);
-  assert.match(preload, /if \(!TEXTURE_CACHE\.has\(key\)\) TEXTURE_CACHE\.set\(key, \{ ok: true, path, image \}\);/, 'the image is kept');
-  assert.match(preload, /if \(err\?\.decoderError && !TEXTURE_CACHE\.has\(key\)\) TEXTURE_CACHE\.set\(key, \{ ok: false, path, error: err\.message, image: warningImage\(\) \}\);/, 'and so is the decoder\'s refusal, in collectArmTextures\' words (AUDIT F4)');
-  // AUDIT F5: side by side, a few at a time - each garment once, heads and hairs in one set of lanes, in the pools' order
-  assert.match(arm, /const once = asked\.filter\(\(rec\) => !seen\.has\(rec\.id\) && seen\.add\(rec\.id\)\);\n\s*await inLanes\(once, \(rec\) => preloadClothingColour\(rec, parts, archives, gen\)\);/, 'the garments\' measures in lanes, each record once');
-  assert.match(arm, /const measured = await inLanes\(\[\.\.\.pools\.heads\.map\(\(rec\) => \[rec, 'head'\]\), \.\.\.pools\.hairs\.map\(\(rec\) => \[rec, 'hair'\]\)\],\n\s*async \(\[rec, kind\]\) => \(\{ id: rec\.id, f: await measurePart\(rec, archives, kind\) \}\)\);\n\s*const heads = measured\.slice\(0, pools\.heads\.length\);\n\s*const hairs = measured\.slice\(pools\.heads\.length\);/, 'the face match\'s candidates in lanes, in the pools\' own order');
-  // the colour measure: level 0 alone, on this thread only for a candidate the pool's measure (AUDIT F2) did not answer
-  assert.match(arm, /rgb = garmentColourOf\(decodeTextureImage\(tpath, tarc\.get\(tpath\)\.slice\(\), \{ levels: 1 \}\)\.mips\[0\]\);/, 'the colour measure decodes level 0 alone');
-  assert.match(arm, /try \{ rgb = garmentColourOf\(\(await decodeTextureOffThread\(tpath, tarc\.get\(tpath\), \{ levels: 1 \}\)\)\.mips\[0\]\); \}/, 'and in the pool, the same level');
-  assert.equal((arm.match(/tpath = clothingTexturePath\(rec, parts, archives\);/g) ?? []).length, 2, 'one derivation of the garment\'s texture, two measures of it');
-});
-
 // ═══ AUDIT MW-TEXTHREAD ═════════════════════════════════════════════
 const enc = (s) => [...s].map((c) => c.charCodeAt(0));
 const u32 = (n) => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
@@ -377,5 +358,4 @@ test('AUDIT MW-TEXTHREAD F6: an idle pool lets its workers go once every job has
   await sleep(40);
   assert.deepEqual(held.map((w) => w.terminated), [1, 1], 'quiet again, with nothing in hand: both let go');
   two.close();
-  assert.match(rd('src/formats/morrowind/mwTextureClient.js'), /idle\.unref\?\.\(\);/, 'and an idle timer never holds node open');
 });

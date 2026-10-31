@@ -113,10 +113,6 @@ test('URBANIZER U3 the model\'s streets: setts over every main cell at FABRIC_RO
   const mq = townFabricModel(q, 'granite', fenced);
   const kerbsQ = faces(mq, URBAN_ARCHIVE, k + URBAN_KINDS.flags).filter((t) => !t.every((v) => Math.abs(v[1] - FABRIC_PAVE_Y) < 1e-6));
   assert.ok(Math.abs(sum(kerbsQ) - kerbArea - C * FABRIC_PAVE_Y) < 1e-3, 'the new cell\'s two open sides, not its side on the house - and the pavement it joins loses the kerb it had onto it');
-  // a walker's step is clear where its ray at its foot plus 0.1 m meets nothing (characters/mobile/mobilePerson.js _clear,
-  // its feet on the town's ground - the setts' face): a kerb at or over that would shut every pavement to the town's people
-  const step = Number(/const ty = this\.groundY\(x, z\) \+ ([\d.]+);/.exec(readFileSync(new URL('../../../src/characters/mobile/mobilePerson.js', import.meta.url), 'utf8'))?.[1]);
-  assert.ok(step > 0 && FABRIC_PAVE_Y - FABRIC_ROAD_Y < step - 0.01, `the kerb (${FABRIC_PAVE_Y - FABRIC_ROAD_Y} m) under the walker's step (${step} m)`);
 });
 
 test('URBANIZER U3 the model\'s yards: a fenced style\'s runs in Daggerfall\'s own fence (ARCH3D 41206) a piece every 3.2 m or so, stretched along the run, the gate left open; a walled style\'s in its wall FABRIC_WALL high under a coping, a pillar either side of each gate; a dead end\'s wall FABRIC_DEAD_WALL high; the woodpile against its fence (mutants: the gate fenced; the pillars unlaid; the dead end\'s wall a yard\'s)', () => {

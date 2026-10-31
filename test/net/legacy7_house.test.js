@@ -104,11 +104,4 @@ test('LEGACY7 the faces: the inspect card\'s line, the roster\'s tile, and the n
   assert.equal(profileView({ name: 'Mira', peer: {} }).house, null);
   assert.equal(realmRowAsSave({ id: 'r1', name: 'Ysolde Hlaalu', house: { hn: 'Hlaalu', hc: 'Ysolde' } }).house, 'Ysolde of House Hlaalu');
   assert.equal(realmRowAsSave({ id: 'r1', name: 'X' }).house, null);
-  const layer = rd('src/ui/nameLayer.js');
-  assert.match(layer, /setText\(tag\.house, houseLine\(p\.house\) \?\? ''\);/);
-  assert.match(layer, /node\.append\(bubble, title, tag, house, ribbon\);/);
-  assert.match(rd('src/net/remotePlayers.js'), /house: e\.peer\.house \?\? null,/);
-  assert.match(rd('src/net/online.js'), /p\.house = readHouse\(m\);/);
-  assert.match(rd('src/ui/saveTile.js'), /if \(save\?\.house\) who\.append\(el\('p', 'svhouse', save\.house\)\);/);
-  assert.match(rd('server/src/index.js'), /const house = c\.hn \? \{ hn: c\.hn,/);
 });

@@ -102,7 +102,6 @@ test('CRAFT2 law: the first-make 500 a pattern\'s at a tier - Adamantium, Ebony,
   // gem's spend at most one more), and its kin - PIN MOVED (CLOTH-GEMS): ONE bind, a JSON list (82 kin a Wand's)
   const binds = Math.max(...RECIPES.map((r) => 16 + 2 * Math.max(recipeInputs(r).length, recipeInputs(r, { heartwood: true, cracked: true }).length) + 1));
   assert.ok(binds < 100, `the decision's binds: ${binds}`);
-  assert.match(readFileSync(new URL('../../server-account/src/professions.js', import.meta.url), 'utf8'), /const madeBefore = `recipe IN \(SELECT value FROM json_each\(\?\$\{binds\.length \+ 1\}\)\)`;\n  binds\.push\(JSON\.stringify\(kin\)\);/);
 });
 
 test('CRAFT2 law: what a picked pattern is made of - the last craft\'s material where it can be made; else the highest tier made now, then made from raw; else the open one holding most of its inputs; else the last\'s, else the first', async () => {

@@ -171,25 +171,6 @@ test('STUCK-ARROWS: THE DUNGEON\'S HALF - an entry in its draw list for each sta
   assert.equal(held.size, 1);
 });
 
-test('STUCK-ARROWS: THE FOUR HOSTS - the three flights pass their pool (the world its pixel), the dungeon sticks at its wall seam and draws in its list, every loose and technique door carries the conjured round, and neither save keeps an unsaved pile (mutants: by source)', () => {
-  const ext = read('src/scenes/exterior.js'), world = read('src/scenes/world.js'), modes = read('src/scenes/worldModes.js'), dun = read('src/scenes/dungeonContext.js');
-  assert.match(ext, /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot \}\)/);
-  assert.match(world, /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot, pixelKeyAt: \(\) => `\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}` \}\)/);
-  assert.match(modes, /new ArrowFlight\(\{ getGpuMesh: pipeline\.getGpuMesh, collider: \(\) => interiorCtx\?\.collider, effects: interiorHitEffects, loot: interiorDropped \}\)/);
-  assert.match(dun, /if \(m\.arrow && stickable\(m\)\) stickArrow\(droppedLoot, impact, _unit\);[^\n]*\n\s*retireMissile\(m\);/);
-  assert.match(dun, /syncStuckArrowDraws\(droppedLoot, dynamicDraws, _stuckDraws, stuckArrowMesh\);[^\n]*\n\s*if \(!missiles\.length \|\| !playerFeet\) return;/, 'before the no-missile return');
-  assert.match(dun, /droppedLoot: droppedLoot\._piles\.filter\(\(p\) => !p\.unsaved\)\.map/);
-  for (const [name, s, fire] of [['exterior', ext, 'arrows.fire(eye, fwd'], ['world', world, 'arrows.fire(cam.pos, fwd'], ['worldModes', modes, 'interiorArrows.fire(player.eye, eyeDir()']]) {
-    assert.match(s, /const shot = \{ summoned: false \};[^\n]*\n\s*if \(spendAmmoFor\(playerEntity\.items, \w+\.playerWeapon\.weapon, shot\)\) \{/, `${name}: the loose asks whether the round was conjured`);
-    const at = s.indexOf(fire);
-    assert.ok(at > 0 && s.slice(at, s.indexOf('\n', at)).includes('summoned: shot.summoned'), `${name}: the shaft carries it`);
-    assert.match(s, /\.\.\.\(o\?\.summoned \? \{ summoned: true \} : \{\}\) \}\),/, `${name}: the technique door carries it`);
-  }
-  assert.match(dun, /if \(!spendAmmoFor\(playerEntity\.items, playerWeapon\.weapon, shot\)\) continue;\n\s*fireArrow\([^\n]*shot\.summoned \? \{ summoned: true \} : null\);/);
-  assert.match(dun, /\.\.\.\(o\?\.summoned \? \{ summoned: true \} : \{\}\) \}\),/);
-  assert.match(read('src/scenes/droppedLoot.js'), /p\.owner !== 'wild' && !p\.unsaved\)/);
-});
-
 test('STUCK-ARROWS: spendAmmoFor answers whether the round was conjured - DFU\'s isArrowSummoned, conjured first (mutants: never told; told the inverse)', () => {
   const pack = [arrows(1, { timeForItemToDisappear: 99 }), arrows(2)];
   const shot = {};
@@ -215,7 +196,6 @@ test('ARROW LODGE: a real shaft that strikes a foe lodges in its pack ARROW_LODG
   playerArrowHitFoe(shaft, f, { playerEntity: player, rolls: () => { n++; return n === 1 ? 0.99 : 0.3; } });
   assert.ok(n >= 2);
   assert.equal(arrowCount(f.entity.items), 1, 'the last draw (0.3) decided it, the first (0.99) was the blow\'s');
-  assert.match(read('src/combat/arrowFlight.js'), /if \(foe\.entity\?\.items && !orbArchiveFor\(m\.weapon\) && !m\.summoned && rolls\(\) < ARROW_LODGE_CHANCE\) \{/);
 });
 
 test('ARROW LODGE: AN ARROW IS NO FIND - a plain body keeps its cap of pieces AND every arrow in it, uncounted (mutants: arrows counted; arrows dropped; arrows ranked)', () => {

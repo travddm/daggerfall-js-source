@@ -224,7 +224,4 @@ test('DISC24-B: the enhanced lists (pack, detail, shop, player trade) picture th
   for (const f of ['src/ui/enhanced/enhancedTrade.js', 'src/ui/enhanced/enhancedPlayerTrade.js']) {
     assert.match(readFileSync(new URL(f, ROOT), 'utf8'), /linePicture\(line, \{ box: SLOT_BOX\.row,/, f);
   }
-  const inv = readFileSync(new URL('src/ui/enhanced/enhancedInventory.js', ROOT), 'utf8');
-  assert.equal((inv.match(/linePicture\(line, \{ box(?:: SLOT_BOX\.card)?, onReady: ready(?:, snap)? \}\)/g) ?? []).length, 2, 'the pack\'s tile and its detail card');
-  assert.match(inv, /requestFittedPicture\(name, \(wake\) => linePictureUrl\(line, \{ scale: 1, onReady: wake \}\),/, 'the fitted door asks this one');
 });

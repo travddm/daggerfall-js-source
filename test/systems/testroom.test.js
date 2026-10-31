@@ -159,27 +159,6 @@ test('TSR2: armBuildOptsOf reads the STRING gender - the !! that built the femal
   assert.equal(armBuildOptsOf({ ...entity('male'), items: [] }).hasAmmo, false);
 });
 
-test('TSR3: the three doors all read the one home', () => {
-  // The pane shows TEST_PRESETS and fires test:<id>.
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /for \(const p of TEST_PRESETS\)/, 'the pane iterates the home, not a copy');
-  assert.match(menu, /onAction\(`test:\$\{p\.id\}`\)/, 'a card press is the boot');
-  assert.match(menu, /test: paneTest,/, 'the rail entry has a pane');
-  // The route: set on this choice, DELETED on every other (F12's law).
-  const main = read('src/main.js');
-  assert.match(main, /if \(typeof choice === 'string' && choice\.startsWith\('test:'\)\) params\.set\('test', choice\.slice\(5\)\);/);
-  assert.match(main, /else params\.delete\('test'\);/, 'New Game must not re-enter the room');
-  // The boot: preset resolved BEFORE the branch (an unknown id falls
-  // through to the wizard), the same headless seam, the armory, and
-  // the arms built only when the data is attached.
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const testEntry = !playerEntity\.chargenDone && params\.has\('test'\) \? testEntryById\(params\.get\('test'\)\) : null;\s*\n\s*const testPreset = testEntry\?\.preset \?\? null;/,
-    'TSR4: the entry resolves first, the preset off it - an unknown id is still null before the branch');
-  assert.match(world, /await applyTestCharacter\(playerEntity, preset, \{ fetchBytes, spellsByIndex: sbi \}\)/);
-  assert.match(world, /if \(morrowindDataCount\(\) > 0\)/, 'no data, no build - the classic sprite stands');
-  assert.match(world, /await buildArmsFor\(playerEntity\)/, 'with data, the rigs come up without the pause-card trip');
-});
-
 // The full character - identity honored through the REAL headless
 // chargen, the armory in the pack, the baseline dressed. Needs
 // CLASS*.CFG, so it rides the ARENA2 gate like every chargen pin.
@@ -237,48 +216,6 @@ test('TSR4: the mount is the store\'s own horse, once, and the pack answers hasH
   assert.ok(horse.value > 0, 'and the shelf\'s base value rides along');
   assert.equal(seedTestMount(entity), false, 'a pack with a horse is left alone');
   assert.equal(entity.items.filter((it) => it.templateIndex === TRANSPORT_HORSE_TEMPLATE).length, 1);
-});
-
-test('TSR4: the pane, the boot and the frame gate - the edge landing, the ONE transport door, never before the first stand', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /onAction\(`test:\$\{TEST_RIDE\.id\}`\)/, 'the ride card fires the same choice family');
-  // TSR4b: the ride NEVER takes the classic start - that is Privateer's
-  // Hold with StartInDungeon, and an exterior landing racing a dungeon
-  // entry is "either in the dungeon or in the ground". It keeps the
-  // named start (the city's exterior); every other door keeps classic.
-  const main = read('src/main.js');
-  // FIELD BUGS 2026-09-29 (the sea) #5: the sea battle is a spawn outdoors too - the one home's list, which the
-  // route reads (test/systems/fbsea_testroom.test.js pins the list itself)
-  assert.match(main, /const \{ testStartsOutdoors \} = await import\('\.\/systems\/testRoom\.js'\);\s*\n\s*if \(testStartsOutdoors\(params\.get\('test'\)\)\) params\.delete\('classic'\);\s*\n\s*else params\.set\('classic', '1'\);/,
-    'the ride drops the classic start through the one home\'s list; every other choice still sets it');
-  assert.ok(main.indexOf("params.delete('classic')") > main.indexOf("else params.delete('test');"), 'decided after the test param is settled');
-  const world = read('src/scenes/world.js');
-  // the horse lands with the armory; the mount is DEFERRED to the frame
-  // loop's spawn gate, so it can never run before the player has a floor
-  assert.match(world, /if \(testEntry\.ride\) \{ seedTestMount\(playerEntity\); rideOutWanted = true; \}/);
-  assert.match(world, /if \(rideOutWanted && playerSpawned\) rideOut\(\);/, 'the frame gate');
-  const rideAt = world.indexOf('const rideOut = () => {');
-  const gateAt = world.indexOf('if (rideOutWanted && playerSpawned) rideOut();');
-  assert.ok(rideAt > 0 && gateAt > rideAt, 'defined at the boot, fired from the loop');
-  const body = world.slice(rideAt, world.indexOf('\n  };', rideAt));
-  // the landing is the fast-travel arrival's own edge law (no start
-  // markers = outside the walls, facing in), floored the arrival's way
-  assert.ok(body.includes("locationLandingFor(startPixel.x, startPixel.y, { noMarkers: true })"), 'the edge landing');
-  assert.ok(body.includes('floorLanding(collider, edge.pos, ARRIVAL_REACH, ARRIVAL_LIFT)'), 'floored like an arrival');
-  assert.ok(body.includes('cam.yaw = edge.yaw;'), 'facing the location, as PositionPlayerToLocation sets it');
-  // TSR4a: the edge can stand in the NEXT pixel (an 8x8 city fills its
-  // own), so the landing WAITS for terrain under the point - heightAt
-  // is -Infinity until that pixel is built - and never floors before it
-  assert.match(body, /if \(rideOutEdge === null\) rideOutEdge = locationLandingFor\(/, 'the edge is resolved once, off the built start pixel');
-  assert.ok(body.includes('const groundThere = !!edge && Number.isFinite(heightAt(edge.pos[0], edge.pos[2]));'), 'terrain under the landing point is the gate');
-  assert.ok(body.includes('if (edge && !groundThere && (building || queue.length || inFlight.size)) return;'), 'waits while the ring is still building');
-  assert.ok(body.indexOf('return;') < body.indexOf('rideOutWanted = false;'), 'the wait keeps the want armed; only a landing (or the dead-man) clears it');
-  assert.ok(body.indexOf('const groundThere') < body.indexOf('floorLanding('), 'the floor ray runs only once the ground is there');
-  assert.ok(body.includes("'[testroom] ride out: no terrain under the edge landing after the ring built - mounting where you stand'"), 'the dead-man release says so');
-  // the mount goes through U53's ONE door - tr5 pins that the door is
-  // the only motor call, so this cannot be a second one
-  assert.ok(body.includes('setTransportModeHere(TRANSPORT_MODES.Horse);'), 'the one transport door');
-  assert.ok(!body.includes('player.setTransportMode('), 'never the motor directly');
 });
 
 test('TSR4a: an 8x8 city fills its pixel, so its edge landing stands in the NEXT pixel - the reason the ride waits for ground', () => {

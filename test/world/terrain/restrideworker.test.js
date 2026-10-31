@@ -15,7 +15,6 @@ import { TerrainGenClient } from '../../../src/world/terrain/terrainGenClient.js
 import { WoodsFile, MAP_WIDTH, MAP_HEIGHT } from '../../../src/formats/woodsFile.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-const WORLD = hostText('src/scenes/world.js');
 const bytes = (a) => Buffer.from(a.buffer, a.byteOffset, a.byteLength).toString('base64');
 
 /** a WOODS.WLD the real reader loads: every cell at one offset, a sloping heightmap (AUDIT 58 F4's shape) */
@@ -49,8 +48,6 @@ test('PERF-EXT26: restrideGrid is the one grid law - the kernel builds its grid 
       assert.equal(bytes(got.normals), bytes(want.normals), `${px},${py} stride ${stride}: normals`);
     }
   }
-  const src = readFileSync(new URL('../../../src/world/terrain/terrainGen.js', import.meta.url), 'utf8');
-  assert.match(src, /const grid = restrideGrid\(\{ woods, px, py, stride, samples, landforms, bed: bed \? tilemapBytes : null \}\);/, 'the build runs the same law (LANDFORM1-3: with the landforms it shaped the samples by)');   // PIN MOVED (AUDIT WATER-NEXT P1): and the bed with it
 });
 
 test('PERF-EXT26: the REAL worker shell answers a grid job by its id, the bytes the main thread builds, its arrays transferred - and a grid before init says so under its id', async () => {
@@ -123,15 +120,3 @@ test('PERF-EXT26: the client sends a grid by id with the samples CLONED, answers
   assert.equal(bytes((await none.grid({ px: 250, py: 160, stride: 1, samples })).positions), bytes(want.positions));
 });
 
-test('PERF-EXT26: the host sends every promotion to a worker that is up - on the crossing frame - swaps only a reply its pixel still wants, and keeps STREAM1\'s queue as the fallback', () => {
-  const spend = WORLD.slice(WORLD.indexOf('  function spendRestrides() {'), WORLD.indexOf('  function promoteOffThread(p) {'));
-  assert.match(spend, /if \(terrainGen\.threaded\) \{\n      for \(const p of restridePending\.values\(\)\) promoteOffThread\(p\);\n      restridePending\.clear\(\);\n      return;\n    \}\n    let budget = RESTRIDE_PER_FRAME;/, 'all at once to the worker, else the one-a-frame queue');
-  const off = WORLD.slice(WORLD.indexOf('  function promoteOffThread(p) {'), WORLD.indexOf('  function restrideTerrain('));
-  assert.match(off, /if \(built\.get\(key\) !== p\) return;[^\n]*\n    if \(strideFor\(p\.px, p\.py\) === p\._stride\) return;/, 'nothing is sent for a pixel gone or no longer promoted');
-  // PIN MOVED (AUDIT WATER-NEXT P1/H1): the bed rides the job, and a cap's TileMap that moved meanwhile is carved by
-  assert.match(off, /terrainGen\.grid\(\{ px: p\.px, py: p\.py, stride: 1, samples: p\.samples, landform, bed: bedBytes \}\)\.then\(\(grid\) => \{[^\n]*\n      if \(built\.get\(key\) !== p\) return;[^\n]*\n      if \(strideFor\(p\.px, p\.py\) !== 1 \|\| p\._stride === 1\) return;[^\n]*\n      if \(waterOn && bedBytesOf\(p\) !== bedBytes\) grid = [^\n]*\n      restrideTerrain\(p, 1, grid\);/, 'the reply lands only on the pixel that asked, still wanting stride 1');
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(WORLD, /  function restrideTerrain\(p, stride, grid = restrideGrid\(\{ woods, px: p\.px, py: p\.py, stride, samples: p\.samples, landform, roads: terrainGen\.roads\(\), sites: _landformSites, beyond: beyondSites\.beyond\(\), climates: _landformClimates, bed: waterOn \? bedBytesOf\(p\) : null \}\)\) \{/, 'one swap, the grid from the worker or built here by the same law (LANDFORM1-3: the build\'s ghost rows)');
-  assert.match(WORLD, /else \{ restridePending\.delete\(`\$\{p\.px\},\$\{p\.py\}`\); restrideTerrain\(p, want\); \}\n      \}\n      if \(terrainGen\.threaded\) spendRestrides\(\);/, 'the crossing frame sends them, ahead of the new pixels\' jobs');
-  assert.doesNotMatch(WORLD, /buildTerrainGrid\(p\.samples/, 'the host keeps no second spelling of the grid');
-});

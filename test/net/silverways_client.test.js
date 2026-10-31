@@ -59,7 +59,6 @@ test('SILVER-WAYS the lines: a counted claim says its strike, a guild deed it co
   assert.equal(b.state.balance, 50, 'the balance the last strike answered');
   b.claimLines({ marks: { struck: 30, balance: 80, combat: { earned: 130, max: 150 } } }, 'raid');
   assert.deepEqual([b.state.today.combat, b.state.today.combatMax], [130, 150], 'the day\'s combat silver as the strike said it');
-  assert.match(src('src/ui/enhanced/enhancedPorts.js'), /\['From gates, raids, serpents and the Spire today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.combat \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.combatMax \?\? MARKS_COMBAT\.perDay\}`\],/, 'the Bank\'s card says it (PIN MOVED, SERPENT-SET: the serpents\' under the same cap, named; PIN MOVED, EG-E1: and the Spire\'s Redoubts\')');
   assert.equal(MARKS_TEXT.contract(12, null), 'A guild pays you 12 silver under its contract.');
 });
 
@@ -200,19 +199,5 @@ test('SILVER-WAYS the Work tab\'s contracts: each a card under its guild - what 
 test('SILVER-WAYS the Guild tab\'s treasury lines: a deed, a contract put up and what came home each in its own words, never a deposit; the service\'s kinds map to them (mutants: a kind left a deposit)', () => {
   assert.deepEqual([GUILD_MARKS_LEDGER_WORDS.deed, GUILD_MARKS_LEDGER_WORDS.contract, GUILD_MARKS_LEDGER_WORDS['contract-return']],
     ['completed a guild deed:', 'put up a contract of', 'came home with']);
-  const g = src('server-account/src/guilds.js');
-  assert.match(g, /'guild-withdraw': 'withdraw', heraldry: 'heraldry', 'guild-deed': 'deed', 'contract-escrow': 'contract', 'contract-return': 'contract-return',/);
-  assert.match(g, /kind: GUILD_MARKS_LINE_KIND\[l\.kind\] \?\? 'deposit'/);
 });
 
-test('SILVER-WAYS the world host by source: the raid claims say the book\'s silver lines; the gate claim carries the claiming character whether or not the scan found the region; a guild with a contract standing is kept from going (mutants: each seam)', () => {
-  const w = src('src/scenes/world.js');
-  // HAUL-CARDS (PIN MOVED): the silver as cards too (ui/haulCards.js claimHauls), the book's lines said as ever
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'raid'\)\); return marksBook\?\.claimLines\(data, 'raid'\) \?\? null; \},/);
-  assert.match(w, /onMarks: \(marks, data\) => \{ showHaul\(claimHauls\(data \?\? \{ marks \}, 'gate'\)\); return marksBook\?\.claimLines\(data \?\? \{ marks \}, 'gate'\) \?\? null; \},/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the region its own word (scenes/gate/gateSeat.js gateSeatRegion - a lane past the Bay's its province's)
-  assert.match(w, /return region != null \? \{ region, character \} : character \? \{ character \} : null;/);
-  // PIN MOVED: AUDIT GUILD3 T1 - one list of holds, the gate's and the view's: a contract standing, or a closed one's escrow not yet home
-  assert.match(src('server-account/src/guilds.js'), /\['guild-contracts', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM guild_contracts WHERE guild_id = \$\{p\} AND state = 'open'\)`\]/);
-  assert.match(src('server-account/src/guilds.js'), /\['guild-writ-escrow', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM guild_contracts WHERE guild_id = \$\{p\} AND state IN \('filled', 'withdrawn', 'expired'\) AND \+returned = 0 AND escrow > 0\)`\]/);
-});

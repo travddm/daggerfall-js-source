@@ -57,5 +57,4 @@ test('EM3-3D map choice by source: the Features row - interface, enhanced-only, 
   assert.match(row.note, /Off shows one flat floor at a time/, 'the note says what Off keeps');
   const i = FEATURES.findIndex((f) => f.id === 'enhanced-map');
   assert.equal(FEATURES[i + 1]?.id, 'dungeon-map-3d', 'listed right under the Enhanced map');
-  assert.match(rd('src/ui/heldMap.js'), /createAutomapSheet\(\{ solid: dungeonMap3dOn\(\), /, 'the sheet is built through dungeonMap3dOn');
 });

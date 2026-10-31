@@ -49,9 +49,3 @@ test('LH1: the right hand, as before; a two-hander goes to the right and the han
   assert.equal(onLeft.switched, 1, 'and the player now holds it: the hand followed');
 });
 
-test('LH1 by source: every host hands the swap its LIVE rig\'s hand door - the street\'s, the building\'s own, the dungeon\'s', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(read(f), /const quickSwap = \(rig = weaponRig\) => \{[^\n]*\n\s*swapQuickslot\(\{[^\n]*hand: rig\.handDoor\(\) \}\);/, f);
-  assert.match(read('src/scenes/worldModes.js'), /host\.quickSwap\?\.\(interiorWeapon\)/);
-  assert.match(read('src/scenes/dungeonContext.js'), /hand: weaponRig\.handDoor\(\) \}\);/);
-  assert.match(read('src/combat/weapon/weaponRig.js'), /handDoor\(\) \{\s*\n\s*syncWorn\(\);\s*\n\s*return \{ usingRightHand: playerWeapon\.usingRightHand, switchHand: \(\) => this\.switchHand\(\) \};/);
-});

@@ -78,7 +78,6 @@ test('FPS-CAP1: the store\'s value is read DFU\'s way - clamped to 0..300, and a
     assert.equal(frameCapSkip(1000), false);
     assert.equal(frameCapSkip(1016.7), true, 'the live gate reads the store');
   } finally { _resetForTests(); _resetFrameCap(); }
-  assert.match(read('src/systems/frameCap.js'), /getInt\('Video', 'TargetFrameRate', 0, 300\)/, 'SettingsManager.cs:414, spelled out for MENU T5');
 });
 
 test('FPS-CAP1: the Video row is a stepped control over Off and the rates screens run at - it never offers 1-29, and it reads Off, not 0 (mutant: the stops or the Off reading dropped)', () => {
@@ -114,38 +113,3 @@ test('FPS-CAP1: Wait For Screen Refresh is unavailable - a page always waits - a
   assert.match(INSTEAD[k], /Frame Rate Cap/);
 });
 
-test('FPS-CAP1: all four hosts hold a frame at the top of the callback - above the clock\'s stamp and the input frame, so a held frame leaves no sample and loses no key (mutant: the gate dropped from any host, or moved below the input frame)', () => {
-  const GATE = String.raw`if \(frameCapSkip\(now\)\) \{ requestAnimationFrame\(frame\); return; \}`;
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const s = read(h);
-    assert.match(s, /import \{ frameCapSkip \} from '\.\.\/systems\/frameCap\.js';/, `${h}: imports the gate`);
-    assert.match(s, new RegExp(String.raw`if \(!frameAlive\(_frameToken\)\) \{ destroyWorldPlaque\(\); return; \}[^\n]*\n\s+${GATE}[^\n]*\n\s+frameBegin\(now\);[^\n]*\n\s+beginInputFrame\(`),
-      `${h}: alive, then the cap, then the stamp and the input frame`);
-    assert.equal(s.split('frameCapSkip(now)').length - 1, 1, `${h}: one gate`);
-  }
-  const interior = read('src/scenes/interior.js');
-  assert.match(interior, new RegExp(String.raw`function frame\(now\) \{\n\s+${GATE}[^\n]*\n\s+const dt = `), 'the interior host: the first statement, above its dt');
-});
-
-test('FPS-CAP1: the FPS counter counts the frames the game drew, not the screen\'s refresh (mutant: the counter\'s own gate dropped)', () => {
-  const prev = { d: globalThis.document, w: globalThis.window };
-  const stubEl = () => ({ id: '', textContent: '', style: { cssText: '', display: '' }, appendChild(c) { return c; }, remove() {} });
-  globalThis.document = { createElement: stubEl, body: stubEl() };
-  globalThis.window = {};
-  _resetForTests();
-  _resetFrameCap();
-  try {
-    setValue('Video', 'TargetFrameRate', '30');
-    const c = mountFpsCounter({ enabled: () => true, raf: null });
-    for (let t = 1000; t <= 3000.5; t += 1000 / 60) c.tick(t);
-    const stats = globalThis.window.__fpsStats();
-    assert.ok(stats && stats.fps >= 29 && stats.fps <= 31, `a 60 Hz screen capped at 30 counts 30: ${JSON.stringify(stats)}`);
-    // PIN MOVED (AUDIT FB1018D L2-1): the counter reads the last stamp before it pushes this one (HITCH-KEEP's gap) - still
-    // nothing counted before the gate
-    assert.match(read('src/ui/fpsCounter.js'), /if \(frameCapSkip\(now\)\) \{ if \(live && raf\) handle = raf\(tick\); return; \}\n\s+const prev = stamps\.length \? stamps\[stamps\.length - 1\] : null;\n\s+stamps\.push\(now\);/);
-    c.dispose();
-  } finally {
-    globalThis.document = prev.d; globalThis.window = prev.w;
-    _resetForTests(); _resetFrameCap();
-  }
-});

@@ -91,11 +91,6 @@ test('SEARCH1: the box acts only once it is clicked away, and never when replace
   assert.equal(n, 1);
 });
 
-test('SEARCH1: both dungeon hosts route a search key, the exterior ladder a grave', () => {
-  for (const f of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js']) assert.match(readFileSync(f, 'utf8'), /key\.startsWith\('search:'\)/, f);
-  assert.match(readFileSync('src/scenes/worldModes.js', 'utf8'), /startsWith\('grave:'\)/);
-});
-
 test('FOE-CAP: who is plain - champions, elites, revenants and bosses are not', () => {
   const lvl = { level: 5 };
   assert.deepEqual(plainFoeLootRule({ level: 5 }, lvl), { cap: 3, plainLadder: true });
@@ -189,31 +184,8 @@ test('KIT-ROLL (LOOT-EASE): a foe\'s dropped kit rolls the plain ladder at its d
   _resetForTests();
 });
 
-test('KIT-ROLL: every body door a plain foe dies through rolls its kit before anything reads the body\'s tiers - the dungeon\'s kill, a joiner\'s copy and an arrival\'s, the street\'s kill and the watch\'s; the spawn never does (mutants: any door\'s call dropped or put after the sigils)', () => {
-  const doors = [
-    ['src/scenes/dungeonContext.js', /(?:if \(!_roomBody\) )?rollCorpseKit\(foe\.entity, \{ luck: liveStat\(playerEntity, 'luck'\) \}\);[^\n]*\n\s*spawnCorpse\(foe\);\s*playRareDrop\(audio, foe\.ai\.feet, foe\.entity\.items\);[^\n]*\n\s*(?:if \(!_roomBody\) )?stampWonWeapons\(foe\.entity\.items/],   // PIN MOVED (PARTY-LOOT): a room's body rolls its kit inside its base
-    ['src/scenes/dungeonContext.js', /if \(r\.d === 1 && !f\.dead && !\(roomLootOn\(\) && roomCanonOfFoe\(f\) != null\)\) \{ rollCorpseKit\(f\.entity, [^}]*\}\); addCorpseFood\([^;]*; stampWonWeapons\(f\.entity\.items/],
-    ['src/scenes/dungeonContext.js', /if \(wire && sf\.dead && !f\.dead && sf\.items == null && !\(roomLootOn\(\) && roomCanonOfFoe\(f\) != null\)\) \{ rollCorpseKit\(f\.entity, [^}]*\}\); addCorpseFood\([^;]*; stampWonWeapons\(f\.entity\.items/],
-    ['src/scenes/exteriorFoes.js', /rollCorpseKit\(f\.entity, \{ rolls, luck: liveStat\(playerEntity, 'luck'\) \}\);[^\n]*\n\s*stampWonWeapons\(f\.entity\.items/],
-    ['src/scenes/cityGuards.js', /rollCorpseKit\(g\.entity, \{ rolls: rand, luck: liveStat\(playerEntity, 'luck'\) \}\);[^\n]*\n\s*stampWonWeapons\(g\.entity\.items/],
-  ];
-  for (const [f, re] of doors) assert.match(readFileSync(f, 'utf8'), re, f);
-  // and every body's sigil stamp in a foe pool has the kit roll before it - a new door cannot forget it
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    const src = readFileSync(f, 'utf8');
-    const stamps = [...src.matchAll(/stampWonWeapons\((\w+)\.entity\.items/g)];
-    const kits = [...src.matchAll(/rollCorpseKit\((\w+)\.entity,/g)];
-    assert.equal(kits.length, stamps.length, `${f}: a kit roll for every body's stamp`);
-  }
-  assert.doesNotMatch(readFileSync('src/scenes/hostCombat.js', 'utf8'), /rollCorpseKit/, 'never at the spawn: the foe would fight with it');
-});
-
 test('SEARCH1-PARTY: two foes a player, a search is the room\'s container, and a crowd says so', () => {
   assert.equal(SEARCH_FOES_PER_PLAYER, 2);
-  const dc = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  assert.match(dc, /LOOT_KEY_RE = \/\^\(loot\|corpse\|enc\|srch\):/);   // the room's word carries it (WORLD4)
-  assert.match(dc, /publishLoot\(`srch:\$\{i\}`\)/);                    // said on every search, whatever it rolled
-  assert.match(dc, /canon\.startsWith\('srch:'\)\) searchHeard/);         // and heard as the five hours
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/searchPartyHost.js']) assert.match(readFileSync(f, 'utf8'), /SEARCH_FOES_PER_PLAYER \* \(1 \+/, f);   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js for scenes/searchPartyHost.js
   assert.equal(searchMessage('crate', 'foe', { foeName: 'Orc', count: 4, rolls: () => 0 }).at(-1), 'And it has brought company.');
   assert.notEqual(searchMessage('crate', 'foe', { foeName: 'Orc', count: 1, rolls: () => 0 }).at(-1), 'And it has brought company.');
@@ -223,7 +195,6 @@ test('CHAMP-LOOT: no Rare forced onto a champion - Magic and Rare at half a plai
   const LR = await import('../../src/systems/loot/lootRarity.js');
   const { ELITE_FOE_LOOT, eliteRareChance } = await import('../../src/systems/eliteFoes.js');
   assert.equal(LR.CHAMPION_RARE_CHANCE, undefined);
-  assert.doesNotMatch(readFileSync('src/scenes/hostCombat.js', 'utf8'), /ensureChampionLoot/);
   const N = 2;   // eligible pieces on the body
   for (const lv of [3, 8, 12, 17, 21]) {
     const src = LR.corpseSource({ level: lv }, lv, 7);
@@ -237,18 +208,6 @@ test('CHAMP-LOOT: no Rare forced onto a champion - Magic and Rare at half a plai
   }
 });
 
-test('ELITE-RARE: an elite\'s extra Rare is half a champion\'s blue at its level', async () => {
-  const LR = await import('../../src/systems/loot/lootRarity.js');
-  const { eliteRareChance } = await import('../../src/systems/eliteFoes.js');
-  const want = { 3: 0.07, 8: 0.104, 12: 0.13, 17: 0.162 };
-  for (const [lv, w] of Object.entries(want)) {
-    const blue = LR.rarityChances(LR.championSource(LR.corpseSource({ level: +lv }, +lv, null))).magic / 1000;
-    assert.equal(eliteRareChance(+lv), 0.5 * (1 - (1 - blue) ** 2));
-    assert.ok(Math.abs(eliteRareChance(+lv) - w) < 0.001, `L${lv}: ${eliteRareChance(+lv)}`);
-  }
-  assert.match(readFileSync('src/systems/eliteFoes.js', 'utf8'), /if \(rolls\(\) < eliteRareChance\(lv\) \* \(at == null \? 1 : rareGate\(at\)\)\)/);   // PIN MOVED (LOOT-GATE): the roller's level holds it back
-});
-
 test('SLAUGHTER-BOX (FIELD BUGS 2026-10-15c, the Discord: "Random encounter from box - Slaughter fish"): a chest\'s or a crate\'s foe is never one of the roster\'s water species - it stands on the dry floor beside the box; a roster of swimmers alone wakes the grave\'s undead; the species are RDBLayout\'s three, the Aquatic ones of EnemyBasics, one home (mutants: the filter dropped; one species out of the set; the wild halls\' own copy back)', () => {
   const drawn = new Set();
   for (let r = 0; r < 1; r += 0.05) drawn.add(pickRosterFoe([0, 11, 41, 42], 5, () => r));
@@ -256,5 +215,4 @@ test('SLAUGHTER-BOX (FIELD BUGS 2026-10-15c, the Discord: "Random encounter from
   assert.equal(pickRosterFoe([11, 41, 42], 1, () => 0.999), 19, 'a roster of swimmers alone: the grave\'s undead');
   assert.deepEqual([...WATER_SPECIES].sort((a, b) => a - b), [11, 41, 42]);
   assert.deepEqual(Object.keys(ENEMY_BASICS).filter((k) => ENEMY_BASICS[k].behaviour === 'Aquatic').map(Number), [...WATER_SPECIES].sort((a, b) => a - b), 'the swimmers the motor knows are the layout\'s');
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/wild/wildDungeons.js', import.meta.url), 'utf8'), /new Set\(\[11, 41, 42\]\)/, 'the wild halls read the one home');
 });

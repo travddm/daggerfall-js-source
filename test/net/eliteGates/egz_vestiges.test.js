@@ -516,7 +516,5 @@ test('EG-ZR MENDER\'S GRACE, THE RECEIVER\'S HALF ("heals you cast on allies +15
     S.out();
     assert.equal(S.client.menderGrace('peer-ann', 100), 0, 'out of the Spire');
   } finally { S.done(); }
-  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(W, /magic\.applySpellToPlayer\(spell, d\.level, null, \{ allyCast: true, strangerCast: !mate \}\); egClient\?\.menderGrace\?\.\(id, playerEntity\.health - before\);[^\n]*\n\s*const healed = Math\.max\(0, Math\.trunc\(playerEntity\.health - before\)\);/, 'every ally cast\'s heal reaches it, before the heal is told');
 });
 

@@ -52,8 +52,6 @@ test('REP3: a banishment\'s term is thirty days of the world\'s calendar - read 
   assert.equal(old.regionConditions[4].banishedUntil, 50 + BANISHMENT_MINUTES, 'given its thirty days');
   liftBanishment(old, 4);
   assert.equal(isBanished(old, 4, 60), false);
-  // AUDIT REP F2: PIN MOVED - on the world's TRUSTED clock (worldTick.js trustedWorldMinutes; test/systems/auditrep.test.js)
-  assert.match(src('src/scenes/arrestFlow.js'), /banish\(playerEntity, region\(\), trustedWorldMinutes\(\)\);/, 'the court\'s banishment stamps the term, on the world\'s clock');
 });
 
 test('REP3: the term rides the save - a banishment standing carries `b`, none does not; a pre-REP save restores none (mutant: the term dropped on save)', () => {

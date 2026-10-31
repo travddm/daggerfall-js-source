@@ -180,12 +180,6 @@ test('ROAD-FOLLOW the host\'s reader: on the Bay the network\'s bytes and a cros
   assert.deepEqual(r(1500, 300), { roads: DIR.W | DIR.NE, tracks: 0, curved: true });
 });
 
-test('ROAD-FOLLOW the wiring: the places host hands the walls its reader (the Bay\'s network, the roads host\'s regions; none where it paints no roads), a region landing builds again the pixel of a wall that waited, and a waiting walled town plans no streets (the source)', () => {
-  assert.match(rd('src/scenes/tamrielPlacesHost.js'), /setTownWallPaths\(terrainGen \? townWallPathsReader\(\{ bay: \(\) => terrainGen\.roads\(\), landedIn: _tamrielRoads \? \(x0, y0, x1, y1\) => _tamrielRoads\.landedIn\(x0, y0, x1, y1\) : null \}\) : null\);/);
-  assert.match(rd('src/scenes/tamrielSweepsHost.js'), /\|\| townWallReadyAt\(p\.px, p\.py\);/);
-  assert.match(rd('src/world/urban/townFabricStand.js'), /if \(dfLocation\.outline\?\.walled && townWallWaits\(dfLocation\)\) return null;/);
-});
-
 // ── THE CAPITALS: THE ROAD ON FROM THE SPAN'S EDGE TO THE GATE ──
 
 /** The arm's end of a capital's gate pixel - the middle of its side facing the span - in the plan's metres (x east, z south
@@ -211,10 +205,6 @@ test('ROAD-FOLLOW a capital\'s gates: each walled capital\'s plan names the midd
   assert.deepEqual(by['imperial-city'].W.map(Math.round), [-10040, 0]);
   assert.equal(by.falinesti, null);
   for (const c of CAPITALS) if (c.gateAt) assert.deepEqual(Object.keys(c.gateAt).sort(), [...c.gates].sort(), `${c.key}: a gate each road side`);
-  // the walls are cut at the same measures
-  assert.match(rd('src/world/capitalAlinor.js'), /brokenRun\(mb, ne, nw, W, \[\[W\.east - W\.northGate, W\.gate, W\.gateH\]\]\);/);
-  assert.match(rd('src/world/capitalTorval.js'), /gatedRun\(mb, SAND, ne, nw, W\.thick, W\.h, W\.east - W\.northGate, W\.gate, W\.gateH\);/);
-  assert.match(rd('src/world/capitalSolitude.js'), /gatedRun\(mb, NORD, sw, stepS, W\.thick, W\.h, W\.southGate - W\.west, W\.gate, W\.gateH\);/);   // PIN MOVED (SOLITUDE-RELIEF): its south run to the terraces' step tower
 });
 
 test('ROAD-FOLLOW a capital\'s approaches: the road on from the gate pixel\'s arm - its end the middle of the pixel\'s side - to the plan\'s gate, two tiles of the road\'s own surface: straight in to a gate on its line, in to APPROACH_SKIRT short of the wall, along it and in to a gate off it; every metre of the way on it, over gardens and open ground alone (mutants: the arrival\'s slice, the skirt, the gate\'s depth, the side\'s frame)', () => {
@@ -252,7 +242,6 @@ test('ROAD-FOLLOW a capital\'s approaches: the road on from the gate pixel\'s ar
   // the roads' gate pixel stood off it
   const wide = { anchor: [100, 100], gateAt: { N: [3000, -10240], W: [-10240, -4000] } }, D25 = { w: 25, h: 25, mx: 12, my: 12 };
   assert.deepEqual([capitalGateSlice(wide, D25, 'N'), capitalGateSlice(wide, D25, 'W'), capitalGateSlice(wide, D25, 'E')], [16, 7, 12]);
-  assert.match(rd('src/world/tamrielCapitals.js'), /const \[dx, dy\] = GATE_STEPS\[side\], sl = capitalGateSlice\(cap, D, side\);\n {4}const base = \[at\.px \+ \(dx > 0 \? D\.w - D\.mx : dx < 0 \? -D\.mx - 1 : sl - D\.mx\), at\.py \+ \(dy > 0 \? D\.h - D\.my : dy < 0 \? -D\.my - 1 : sl - D\.my\)\];/);
 });
 
 test('ROAD-FOLLOW a capital lays its approaches: in its gardens over its rim too (the rim\'s no ground beside it, no tree on the road), the open ground the Imperial City\'s crosses a block of its own (the shared open cell elsewhere), its index past every block before it (mutants: the rim over the road; a tree on it; the shared open cell kept; the open block unregistered)', () => {

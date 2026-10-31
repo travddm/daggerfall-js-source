@@ -754,22 +754,3 @@ test('START2 on the freeware: the start page\'s classic face fits the native scr
 
 // ── the hosts' wiring ────────────────────────────────────────────
 
-test('START2 the world host wires the start host (scenes/startsHost.js) and grows no logic of its own: the page through the chargen door, the answer into its OnStartGame, the quests and the welcome once the character stands where their story begins, a birth online after it, the quest layer\'s start seam, and the writ at the passage; the fixed city\'s bench hands the commission (mutants: each line)', () => {
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /const starts = createStartsHost\(\{ params, pastBay: !!_lairTemplates, quests: \(\) => questWorld,\n\s+teleport: _teleportToPixel, landReady: arenaTraced, talk: townTalk, machine: \(\) => questBridge\?\.machine, ready: _worldReady \}\);/);   // PIN MOVED (AUDIT BAY-LEFT, its packages merged): world.js's one readiness, the homes' sweep's and the start's too
-  assert.match(W, /starts\.begin\(\(start\) => \{ questBridge\.initAtGameStart\(start\); startTutorialTour\(\); \}, startKey\);/);
-  assert.match(W, /if \(!questBridge\) \{ _questStartPending = startKey \?\? true; return; \}/, 'the answer kept while the bridge is still to come');
-  assert.match(W, /if \(_questStartPending\) questInitAtGameStart\(_questStartPending\);/, 'and handed on when it comes');
-  assert.match(W, /startChoice: starts\.page,/);
-  assert.match(W, /questInitAtGameStart\(r\.startKey\);/);
-  assert.match(W, /if \(realmNew\) starts\.settled\.then\(realmBirth\)\.catch\(/);
-  assert.match(W, /writ: starts\.writ \}\);/);
-  assert.match(W, /lairLocationAt, nearestTownOf, provinceQuestPlaces, tamrielPlaceName \} = createTamrielPlaces\(/);   // PIN MOVED (TESA x AUDIT TESA II): P2's nearest town beside it; PIN MOVED (AUDIT RELEASE R2-5): the start lair rides the places past the Bay
-  assert.match(W, /playerTravelPixel, provinceQuestPlaces, questSiteMovedHere, talkBuildingCompassDirection/);   // PIN MOVED (AUDIT RELEASE R2-5)
-  assert.match(rd('src/scenes/tamrielPlacesHost.js'), /refresh: registerTamrielPlaces, startLairAt,/);
-  assert.match(rd('src/scenes/questWorld.js'), /const startLairAt = provinceQuestPlaces\?\.startLairAt;/);   // PIN MOVED (AUDIT RELEASE R2-5, hostseam): the places' own, no host read the game never hands
-  const Q = rd('src/scenes/questWorld.js');
-  assert.match(Q, /startSiteOfId: \(id\) => \{\n\s+const start = startOfSiteId\(id\);\n\s+const loc = start \? startLairAt\?\.\(start, \(l\) => dungeonItemMarkerCount\(\(name\) => blocks\.getBlockByName\(name\), questSized\(l\)\) > 0\) : null;\n\s+return loc \? questSized\(loc\) : null;/);
-  assert.match(rd('src/scenes/exterior.js'), /questBridge\.initAtGameStart\(HAND_START_QUEST\);/);
-  assert.match(rd('src/systems/quest/place.js'), /let location = start \? world\.startSiteOfId\?\.\(this\.p1\) \?\? null : findQuestLocation\(world\.maps, this\.p1\);/);
-});

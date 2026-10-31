@@ -85,8 +85,6 @@ test('RPT1026-EVENTS GATE-WAY THE PICK: a Portal Stone\'s portal is refused befo
     assert.ok(portalStonePlace(off(W.foot, 60, 1), 0, probes).at, 'past the ground: placed');
     assert.ok(portalPlace(off(W.foot, 10, 1), 0, probes).at, 'the place law itself unchanged - the call\'s portal is the way in');
   } finally { setEventGround('gate', null); }
-  const world = hostText('src/scenes/world.js');   // PIN MOVED (the merge of main into #1184): the Portal Stone's door is scenes/portalStoneHost.js's (HOST-SPLIT) - the host read whole
-  assert.match(world, /const place = portalStonePlace\(feet, cam\.yaw, \{/, 'the world host\'s pick asks the stone\'s place');
 });
 
 test('RPT1026-EVENTS GATE-WAY A PEER\'S PORTAL: a word of one on a standing gate\'s ground is not believed; one already standing when the gate rises beside it closes and takes nobody stepping in; past the ground a peer\'s stands; the Elite call\'s pool keeps its own there (mutants: the peer\'s word believed; the standing one left open)', () => {

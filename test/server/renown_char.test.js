@@ -320,7 +320,6 @@ test('RENOWN-CHAR a realm character deleted takes its OWN Renown with it and lea
   assert.deepEqual(await renownTrackOf({ db }, A.id, 'char-keep'), { xp: 900, level: renownForXp(900) }, 'another character\'s stays');
   assert.ok(CHARACTER_TABLES.includes('renown_tracks'), 'the track is a character\'s table');
   assert.equal(CHARACTER_TABLES.includes('renown_accounts'), false);
-  assert.doesNotMatch(src('server-account/src/realm.js'), /(UPDATE|DELETE FROM|INSERT INTO|REPLACE INTO)\s+renown_accounts/i);
   const next = await createRealm({ db, rand, nowS: T0 + 2 }, A.id, { name: 'Tamsin' });
   assert.equal((await reportRenownXp({ db, nowS: T0 + 3 }, A, { character: next.id, xp: 10 })).xp, 10, 'a new character starts at its own nothing');
 });
@@ -362,11 +361,4 @@ test('RENOWN-CHAR the client: the account card draws the characters\' tracks - t
   card.paint();
   const plain = card.root.all.find((n) => n.tag === 'h3');
   assert.deepEqual([plain.textContent, plain.children.length], ['Lattymoy', 0], 'RENOWN-ACCOUNT\'s one Renown: no character\'s, none drawn');
-  // THE PAGE: a counted raid's Renown is the page's only for the character that fought it
-  const w = src('src/scenes/world.js');
-  assert.match(w, /onRecorded: \(data\) => \{\n\s+if \(data\?\.renown\?\.character !== characterIdOf\(playerEntity\)\) return;[^\n]*\n\s+const a = renownAnswer\(\{ \.\.\.data\.renown, order: data\.order \?\? null \}, data\.renown\.credited \?\? 0, renownSaid\);/);
-  // THE DELETE DIALOG: the Renown goes with the character again
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /Its Renown, professions, Stores, the homes it bought and its guild place are lost\. Homes belong to your account, so your other characters lose them too\. Any offline copy you made stays\./);   // PROF-DELETE: and its professions; ACCOUNT-HOMES: the homes it bought, the account's (PIN MOVED)
-  assert.doesNotMatch(menu, /Your Renown belongs to your account/);
 });

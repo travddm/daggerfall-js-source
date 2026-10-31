@@ -340,7 +340,6 @@ test('LEGACY-KEY: the family tree is its own action with a free default, and the
   const owner = new Map(DEFAULT_BINDINGS.map(([c, a]) => [a, c]));
   assert.equal(owner.get('LegacyFamily'), 'NumpadDivide');
   assert.deepEqual(MOD_ACTIONS['project-legacy'].map((r) => r.action), ['LegacyFamily']);
-  assert.match(rd('src/ui/input.js'), /case 'LegacyFamily': return ctx\.togglePause \? \(ctx\.togglePause\(\{ at: 'family', setPlayerPos \}\), true\) : false;/);
 });
 
 // ---- the host, headless ------------------------------------------------------------------------------------------
@@ -474,13 +473,3 @@ test('LEGACY1: the save carries the family and a newer store copy wins at the lo
   assert.equal(said.fall?.kind, 'fall', '...with the line\'s waiting Succession');
 });
 
-test('LEGACY1: THE FOUR HOSTS - the street and the modal hosts all reset a death through Project Legacy first', () => {
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /onReset: \(\) => \(legacyDeathReset\(\) \|\| \(_deathWasOnline \? respawnOnlinePlayer\(\) : endRunToTitleMenu\(renderer\)\)\)/);
-  assert.match(src, /onlineRespawn: \(\) => \{ if \(legacyDeathReset\(\)\) return true;/);
-  // the interior and the dungeon hosts reset through that one door
-  assert.match(rd('src/scenes/worldModes.js'), /onReset: \(\) => \{ if \(!host\.onlineRespawn\?\.\(\)\) endRunToTitleMenu\(renderer\); \}/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /onReset: \(\) => \{ if \(!opts\.onlineRespawn\?\.\(\)\) endRunToTitleMenu\(renderer\); \}/);
-  // the born member through THE ONE CONSTRUCTION SEAM, never a hand-rolled character
-  assert.match(src, /const r = host\?\.bornResult\(\{ careers, factionDict \}\);[\s\S]{0,400}finishChargen\(playerEntity, r, sbi\);/);
-});

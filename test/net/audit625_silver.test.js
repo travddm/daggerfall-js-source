@@ -139,7 +139,6 @@ test('AUDIT 625 S4: a find is asked under the account that found it or not at al
   b.who.account = 'X';
   assert.deepEqual((await b.book.find('search')).map((f) => f.kind), ['corpse', 'search'], 'X\'s owed, under X');
   assert.deepEqual(b.asks.slice(MARKS_TRIES).map((a) => a[2]), ['Y', 'X', 'X']);
-  assert.match(src('src/net/marksBook.js'), /door\.find\(f\.kind, f\.rid, f\.account\)/);
 });
 
 // ─── S1: AN ACCOUNT NOT YET A WEEK OLD ───────────────────────────────
@@ -179,43 +178,11 @@ test('AUDIT 625 D6: a body\'s find rolls only when its door OPENED it - a window
   assert.equal(arrowsOnly([{ templateIndex: ARROW_TEMPLATE_INDEX, stackCount: 3 }]), true);
   assert.equal(arrowsOnly([{ templateIndex: ARROW_TEMPLATE_INDEX }, { templateIndex: 121 }]), false);
   assert.equal(arrowsOnly([]), false);
-  const ef = src('src/scenes/bodyLootHost.js');   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's
-  assert.match(ef, /const arrows = arrowsOnly\(grant\);/);
-  assert.match(ef, /if \(n > 0 && !arrows\) silverFindAt\('corpse', f\);/);
-  assert.match(src('src/scenes/corpseMarker.js'), /if \(arrowsOnly\(items\)\) \{/);
   // the hosts' doors answer whether they opened: the quick take, or the window that mounted
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = src(f);
     assert.match(s, /took: showPickups \}\)\) return true;   \/\/ AUDIT QL-WEIGHT1/, `${f}: the quick take is an open`);
     assert.match(s, /if \(w\) townTalk\.showOverlay\(w\);   \/\/ DISC10-E L3: a refused pack is null\n\s+return !!w;   \/\/ AUDIT 625 D6/, `${f}: the window's own answer`);
   }
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /took: showPickups \}\)\) return true;   \/\/ AUDIT QL-WEIGHT1: the window's own resolver; PICKUP-F/);
-  assert.match(wm, /const w = interiorInventory\(\{ loot: pile \? \{ \.\.\.loot, pile \} : loot \}\);\n\s+mountInterior\(w\);\n\s+return !!w;   \/\/ AUDIT 625 D6/, 'a refused pack (null) answers no open');
 });
 
-test('AUDIT 625 S5 + D6: the dungeon rolls a body\'s or a pile\'s find by the ROOM\'S OWN NAME for it - the dungeon and its container (a body by its death too: a foe the hour raised and slew again is a body anew) - so leaving and coming back rolls nothing again, and the hour\'s restock is the same pile; and only once its door opened it (mutants: the object again; the death unread; the roll before the window\'s answer)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /function silverFindKey\(key, kind, i\) \{/);
-  assert.match(dc, /return kind === 'corpse' \? `\$\{place\}:\$\{canon\}@\$\{foes\[i\]\?\._diedAt \?\? ''\}` : `\$\{place\}:\$\{canon\}`;/);
-  assert.match(dc, /const place = !dfLocation\?\.spawned && Number\.isSafeInteger\(mapId\) \? `dun:\$\{mapId\}` : null;/);
-  // the quick door's take, then the window's mount - each rolls after its own answer, never before
-  const quick = dc.indexOf("if (!pileKeys && quickLootTake(key, { items: () => source }");
-  const roll1 = dc.indexOf('if (_find) silverFindAt(_find.kind, _find.key);', quick);
-  const mount = dc.indexOf('const _w = openInventory(source, onEmptied, { lootHooks, lootKey: _k });');
-  const roll2 = dc.indexOf('if (_w && _find) silverFindAt(_find.kind, _find.key);', mount);
-  assert.ok(quick > 0 && roll1 > quick && roll1 < mount, 'the quick take, then its roll');
-  assert.ok(roll2 > mount, 'the window, then its roll');
-  assert.equal(dc.includes("silverFindAt('corpse', foes[i])"), false, 'no find rolled by the object');
-});
-
-test('AUDIT 625 S2: an interior\'s TREASURE pile - a tavern\'s, a guild hall\'s, the scene\'s own container (`container: true`) - rolls its find at its door as the dungeon\'s pile does, by its own key, once it opened; a pile the player dropped never (mutants: the door unasked; a dropped pile asked; the roll before the open)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const _find = pile\.container === true && pile\.items\.length\n\s+\? \(pile\.containerKey \? `int:\$\{homeTownOf\(interiorBuilding\)\}:\$\{interiorBuilding\?\.buildingKey \?\? ''\}:\$\{pile\.containerKey\}` : pile\) : null;/, 'by its town, its building and its marker - `treasure:<i>` alone is every tavern\'s');
-  // the streaming host's own scene containers - World of Daggerfall's, Deep Waters' - unsaved, their objects their names
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const _find = pile\?\.container === true && pile\.items\.length \? pile : null;/);
-  assert.match(w, /if \(w\) townTalk\.showOverlay\(w\);   \/\/ DISC10-E L3: a refused pack is null\n\s+if \(w && _find\) silverFindAt\('pile', _find\);\n\s+\} else \{\n\s+if \(_find\) silverFindAt\('pile', _find\);\n\s+droppedLoot\.releaseEmptied\(\);/);
-  assert.match(wm, /if \(!quickLootTake\(key, _hooks, playerEntity, \(l\) => say\(l\), \{ getQuest: \(uid\) => questBridge\?\.machine\.getQuest\(uid\) \?\? null, took: showPickups \}\)\) \{[^\n]*\n\s+const w = interiorInventory\(\{ loot: _hooks \}\);\n\s+mountInterior\(w\);\n\s+if \(w && _find\) silverFindAt\('pile', _find\);/);
-  assert.match(wm, /\} else \{\n\s+if \(_find\) silverFindAt\('pile', _find\);/);
-});

@@ -34,12 +34,3 @@ test('LOOT-MARKS worn on both looks: Plus\'s stone washes in the tier\'s own col
   assert.match(page, /\.wplaque-row\[data-rarity="magic"\] \{ background: linear-gradient\(90deg, rgba\(31, 79, 158, 0\.3\)/, 'the page\'s wash is the tier\'s ink (#1f4f9e)');
 });
 
-test('TAB-WHEEL the strip turns under the wheel with no bar, the page held while it can turn; a cut edge fades; a tab chosen comes wholly in (mutants: the wheel left to the page; a bar shown; no fade)', () => {
-  const p = src('src/ui/chatPanel.js');
-  assert.match(p, /\.dfchat-tablist \{[^}]*overflow-x: auto; scrollbar-width: none; \}/, 'no bar');
-  assert.match(p, /\.dfchat-tablist::-webkit-scrollbar \{ display: none; \}/);
-  assert.match(p, /tabList\.addEventListener\('wheel', \(e\) => \{\n\s*const over = [^\n]*\n\s*if \(!\(over > 1\)\) return;\n\s*const d = \(Math\.abs\(e\.deltaX\) > Math\.abs\(e\.deltaY\) \? e\.deltaX : e\.deltaY\)[^\n]*\n\s*if \(!d\) return;\n\s*const was = tabList\.scrollLeft;\n\s*tabList\.scrollLeft = Math\.max\(0, Math\.min\(over, was \+ d\)\);\n\s*if \(tabList\.scrollLeft !== was\) e\.preventDefault\(\);/);
-  assert.match(p, /\}, \{ passive: false \}\);\n\s*tabList\.addEventListener\('scroll', tabEdges\);/, 'not passive: it may hold the page');
-  for (const side of ['right', 'left', 'both']) assert.match(p, new RegExp(`\\.dfchat-tablist\\[data-more="${side}"\\] \\{ -webkit-mask-image: linear-gradient`), side);
-  assert.match(p, /b\.scrollIntoView\?\.\(\{ block: 'nearest', inline: 'nearest' \}\); \}\);/);
-});

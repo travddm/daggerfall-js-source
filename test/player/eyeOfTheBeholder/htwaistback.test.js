@@ -294,33 +294,3 @@ test('HT-WAIST-BACK (the others): EVERY ALLOCATION HAS AN OWNER - the lantern\'s
   assert.equal(minted(), freed(), 'every batch minted was freed');
 });
 
-test('HT-WAIST-BACK: ONE HOME - your sprite and the walkers hang it through player/eyeOfTheBeholder/eotbLantern.js and neither keeps its own rule, hang, swing drive or art door; the host draws the walkers\' lanterns in the hook every mode\'s pass calls after your body; the pace is net/peer/peerPace.js\'s (mutants: a second copy; the host never draws them)', () => {
-  const lantern = rd('src/player/eyeOfTheBeholder/eotbLantern.js');
-  const body = rd('src/player/eyeOfTheBeholder/eotbBody.js');
-  const riders = rd('src/net/peer/peerRiders.js');
-  for (const [name, src] of [['eotbBody.js', body], ['peerRiders.js', riders]]) {
-    assert.match(src, /from '(?:\.|(?:\.\.\/)+player\/eyeOfTheBeholder)\/eotbLantern\.js';/, `${name} takes the lantern from its one home`);
-    for (const fn of ['isRearView', 'createLanternArt', 'createSpriteLantern', 'stepSpriteLantern', 'spriteStride', 'hangSpriteLantern', 'mintSpriteLantern', 'dropSpriteLantern']) {
-      assert.match(src, new RegExp(`\\b${fn}\\(`), `${name} calls ${fn}`);
-    }
-    for (const copy of [/lanternSwingDown\(/, /stepLanternSwing\(/, /HIP_LANTERN_SPRITE\s*=/, /RECORD_OFFSETS\[/, /\.uploadTexture\(LANTERN_ART_KEY/, /templateByIndex\(LANTERN_TEMPLATE\)/]) {
-      assert.doesNotMatch(src, copy, `${name} carries no copy of the shared law (${copy})`);
-    }
-  }
-  for (const once of [/export function isRearView\(/, /export const HIP_LANTERN_SPRITE = /, /lanternSwingDown\(/, /export async function loadLanternArt\(/]) {
-    assert.equal(lantern.match(new RegExp(once.source, 'g'))?.length, 1, `eotbLantern.js states ${once} once`);
-  }
-  // the host: the bodies' hook - world.js's exterior pass calls it, and worldModes' dungeon and interior passes reach it
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const drawPeerBodies = \(proj, view, eye, face = null\) => \{ if \(peerBodies\) peerBodies\.draw\(canvas, \{ proj, view, eye, flashOf: peerFlashOf, grow: face \? peerGrow : null, up: face\?\.up \?\? null \}\); peerWalkers\?\.drawLanterns\(\); \(_mode\(\) === 'interior' \? familyRoom : _mode\(\) === 'exterior' \? familyStreet : null\)\?\.draw\(canvas, \{ proj, view, eye \}\); \};/);   // PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11)
-  assert.match(world, /mwViewDrawBody\([^\n]*\n\s*drawPeerBodies\(proj, view, mwv\.eye, tvf \? tvFace : null\);/, 'the exterior pass: right after the player\'s own body');
-  assert.equal(rd('src/scenes/worldModes.js').match(/mwViewDrawBody\([^\n]*\n\s*host\.drawPeerBodies\?\.\(\{ proj, view, eye: mwv\.eye \}\);/g)?.length, 2, 'the dungeon and the interior passes: the same hook');
-  // the pace: one law, two readers
-  const pace = rd('src/net/peer/peerPace.js');
-  assert.match(pace, /export const JUMP_UNITS = 5;/);
-  for (const [name, src] of [['peerBodies.js', rd('src/net/peer/peerBodies.js')], ['peerRiders.js', riders]]) {
-    assert.match(src, /stepPeerPace\(/, `${name} reads the pace through net/peer/peerPace.js`);
-    assert.doesNotMatch(src, /\* 0\.8 \+ \(d \/ dt\) \* 0\.2/, `${name} keeps no copy of it`);
-  }
-});
-

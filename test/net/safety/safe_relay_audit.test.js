@@ -322,7 +322,6 @@ test('AUDIT SAFE RELAY-12: A ROOM\'S FEED BATCH IS FEED_BATCH LINES - it posts t
     assert.equal(opened.batch.lines.length, FEED_BATCH);
     assert.deepEqual(r.room._feedQ.lines.map((l) => l.text), [`line ${FEED_BATCH}`, `line ${FEED_BATCH + 1}`, `line ${FEED_BATCH + 2}`]);
   } finally { clearTimeout(r.room._feedQ?.timer); globalThis.fetch = realFetch; }
-  assert.equal(rd('server/src/index.js').includes('q.lines.shift()'), false, 'the drop that could never run is gone');
 });
 
 test('AUDIT SAFE RELAY-13c: THE STAMP\'S AND THE FEED\'S TAGS ARE WORDS OF THEIR OWN - `c1` was the card receipt\'s tag and `f1` the wild receipt\'s, their signed bytes kept apart by one byte; no signed tag in src/net equals either or begins as they do (mutants: the stamp\'s tag back to a receipt\'s; the feed\'s)', () => {

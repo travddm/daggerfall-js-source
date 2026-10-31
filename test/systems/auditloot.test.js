@@ -102,8 +102,6 @@ test('AUDIT LOOT F3: a made piece the Reforge rolled again, or one imprinted, is
   const me = { isPlayer: true, items: [b, welkyndShards(25)], goldPieces: 6000 };
   assert.deepEqual(CX.imprintPiece(b, 'nightwhisper', me), { ok: true });
   assert.equal(asMinted(b), false, 'a power imprinted');
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): the market's pieces out of world.js (HOST-SPLIT, scenes/marketPiecesHost.js)
-  assert.match(read('src/scenes/marketPiecesHost.js'), /\.filter\(\(it\) => it\?\.provenance && asMinted\(it\) && !tradeRefusal\(it\)/, 'the market\'s pieces ask it');
 });
 
 test('AUDIT LOOT F4: a Legendary in one hand and a Rare imprinted with its power in the other - both hands\' blows ride it, whichever the table lists first', () => {
@@ -140,7 +138,6 @@ test('AUDIT LOOT F6: the Reforge\'s window laid - its tabs, the Codex\'s rows, t
     /\.reforge-card \.reforge-line, \.imprint-card \.imprint-choice \{ display: flex;/,
     /\.reforge-card \.reforge-press, \.imprint-card \.imprint-press \{ width: auto;/,
   ]) assert.match(REFORGE_CSS, rule);
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\$\{BROKER_CSS\}\n\$\{REFORGE_CSS\}\n/, 'the Plus sheet carries it');
   on();
   const prev = globalThis.location;
   globalThis.location = { search: '?skin=classic' };

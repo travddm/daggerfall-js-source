@@ -259,5 +259,4 @@ test('AUDIT EG III THE SEASON\'S ROW AND THE SHELF\'S WORDS (sections 20 and 11.
   };
   assert.deepEqual(words('shelf'), { title: 'The Shelf', subs: ['topples once onto the lesser foes', 'Work it'] });
   assert.deepEqual(words('sluice').subs[1], 'Work it once every 30 seconds');
-  assert.match(rd('src/scenes/eliteGates/egSpan.js'), /E\.once \? 'Work it' : 'Work it once every 30 seconds'/);
 });

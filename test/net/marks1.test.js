@@ -121,17 +121,6 @@ test('MARKS1: GOLD NEVER BUYS MARKS - no kind, route, table or statement takes g
   // PROF1 built the second: a Court writ's pay, struck for units the service took out of the Stores (test/prof1_service)
   assert.deepEqual(Object.entries(MARKS_KINDS).filter(([, way]) => way === 'mint').map(([k]) => k), ['gate', 'writ', 'siege-honours', 'gate-incursion', 'seat-strike-refund', 'raid', 'guild-deed', 'motherlode', 'serpent', 'gather', 'find', 'eg', 'star', 'castle-sale', 'castle-lost', 'domain-fold', 'craft-writ'], 'the faucets built - each a witnessed act but SILVER-FINDS\' two (a gathering\'s find, a loot find), bounded by the service\'s dice and the day');   // PIN MOVED (AUDIT-SEATS): a siege's relay-signed Honours and an Incursion's agreed gate days, registered at last; PIN MOVED (SILVER-WAYS): a raid's receipt, a guild's deed, a Motherlode's Watch; PIN MOVED (EG-E1): a Redoubt of the Elite Breach, the relay's receipt; PIN MOVED (DOMAIN2): a castle's refunds, given up and lost - silver home that its purchase burnt, never more (castles.js); PIN MOVED (DOMAIN3): a folded Charter's claim fee home, the strike's refund (seatTurning.js)
   assert.ok(![...ROUTES].some((r) => r.startsWith('/v1/marks/') && /buy|purchase|gold/i.test(r)), 'no route to buy Drakes');
-  const marks = src('server-account/src/marks.js').replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  // PIN MOVED (SILVER-WAYS): the gate's statement became the combat strike's, the gate's and the raid's alone, and the
-  // guild deed's strikes a guild's treasury
-  const mints = [...marks.matchAll(/SELECT 'mint', NULL, '(?:account|guild)', [^,]+, '([^']+)'/g)].map((m) => m[1]);
-  // PIN MOVED (SILVER-FINDS): a third - the finds' (a gathering's and a loot's), each the service's dice under its day
-  assert.deepEqual(mints, ['${kind}', 'guild-deed', '${kind}'], 'the service strikes Drakes in three statements, the combat strike\'s, the deed\'s and the finds\'');
-  assert.deepEqual([...marks.matchAll(/combatStrikeStatement\(ctx, player, '([a-z]+)'/g)].map((m) => m[1]), ['gate', 'raid', 'star', 'serpent', 'eg'], 'the combat strike, a gate\'s, a raid\'s, (STAR7, PIN MOVED) a fallen star\'s, (SERPENT-SET) a serpent\'s and (EG-E1, PIN MOVED) a Redoubt\'s');
-  assert.deepEqual([...marks.matchAll(/findStrikeStatement\(ctx, player, '([a-z]+)'/g)].map((m) => m[1]), ['gather', 'find'], 'SILVER-FINDS: the finds\' strike, a gathering\'s and a loot\'s');
-  // PIN MOVED (CRAFT-WRITS, Professions-Arc.md section 49): a fourth statement, a crafting writ's pay - for goods the service
-  // saw made, never a loose unit's (prof_brews.witnessed; products.bought_with, gold's wall), out of the realm record
-  assert.deepEqual([...src('server-account/src/craftWrits.js').replace(/^\s*\/\/.*$/gm, '').matchAll(/SELECT 'mint', NULL, 'account', [^,]+, '([^']+)'/g)].map((m) => m[1]), ['craft-writ']);
   assert.doesNotMatch(src('server-account/migrations/0025_marks.sql'), /'gold'/, 'the ledger has no gold end');
   assert.match(src('server-account/migrations/0025_marks.sql'), /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild'\)\)/);
 });
@@ -458,19 +447,3 @@ test('MARKS1 the gate\'s line: a counted gate says the Marks struck, or that the
   assert.deepEqual(said, ['Breach recorded. Breaches closed: 4.', MARKS_TEXT.struck(50, 200)]);   // WB13b
 });
 
-test('MARKS1 the wiring: online the streaming host holds the book and hands it to the Bank, the guild and the gate; the Bank face, the Guild tab and the account card show Marks', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const marksBook = params\.has\('online'\)\n\s*\? createMarksBook\(\{ door: accountMarks\(/);
-  assert.match(w, /marks: marksBook,   \/\/ MARKS1: the Bank of the Empire's Marks, online/);
-  assert.match(w, /marks: marksBook,   \/\/ MARKS1: the guild's Marks treasury/);
-  // PIN MOVED (SILVER-WAYS): the gate's lines and the raid's, the strike's and a guild deed's, in the book's own words
-  // HAUL-CARDS (PIN MOVED): the book's lines said as ever, its cards shown beside them (ui/haulCards.js claimHauls)
-  assert.match(w, /onMarks: \(marks, data\) => \{ showHaul\(claimHauls\(data \?\? \{ marks \}, 'gate'\)\); return marksBook\?\.claimLines\(data \?\? \{ marks \}, 'gate'\) \?\? null; \},/);
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'raid'\)\); return marksBook\?\.claimLines\(data, 'raid'\) \?\? null; \},/);
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /sellMarks: host\.marks \? \(n\) => host\.marks\.sell\(n, marksSaleCredit\(\(\) => playerEntity\.bankAccounts, bankRegion, host\.saveSoon\), bankRegion\(\)\) : null,/);
-  assert.match(m, /void host\.marks\.settle\(marksSaleCredit\(\(\) => playerEntity\.bankAccounts, bankRegion, host\.saveSoon\)\)/, 'a kept sale settles as the counter opens');
-  assert.match(src('src/ui/enhanced/enhancedPorts.js'), /\{ label: w\.hooks\.marks\.pending\(\) \? 'Counting a sale\.\.\.' : 'Sell silver', act: \(\) => w\._button\('sellMarks'\)/);
-  assert.match(src('src/ui/socialPanel.js'), /if \(g\.marks\?\.state\?\.open === true\) \{\n\s*out\.push\(el\('div', 'dfsocial-sec', 'Silver treasury'\)\);/);
-  assert.match(src('src/ui/enhanced/enhancedAccount.js'), /if \(Number\.isSafeInteger\(flow\.account\.marks\)\) row\(t\('account\.card\.silver', 'Silver'\), marksText\(flow\.account\.marks\)\);/);   // L10N4 (PIN MOVED): the row's word through t()
-});

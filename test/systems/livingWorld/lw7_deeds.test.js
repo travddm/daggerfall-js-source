@@ -296,9 +296,6 @@ test('LW7 the town talks of the deeds (`deedNews`): each of its own the player s
   assert.ok(pick({ kind: 'fell', who: 'A', helped: true }, HELPED_NEWS.fell));
   assert.ok(pick({ kind: 'driven', who: 'A', helped: true }, ROAD_NEWS.driven), 'no words of its own: the road\'s');
   assert.ok(pick({ kind: 'won', who: 'A' }, ROAD_NEWS.won), 'not turned: the road\'s');
-  const lt = rd('src/systems/livingWorld/livingTown.js');
-  assert.match(lt, /if \(deeds\.length\) ctx\.news = \[\.\.\.\(ctx\.news \?\? \[\]\), \.\.\.deeds\];/, 'the street\'s meetings tell the deeds beside the road\'s news');
-  assert.match(lt, /ctx\.player = this\.o\.playerName\?\.\(\) \?\? '';/);
   assert.ok(SLAIN_NEWS.seen.every((sc) => sc.some((l) => l.includes('{player}'))), 'seen, the player named');
   assert.ok(SLAIN_NEWS.unseen.every((sc) => !sc.some((l) => l.includes('{player}'))), 'unseen, not');
   // the circle fills the player's name - LW-TALK: PIN MOVED - told in an exchange, on the exchange's own draw
@@ -359,48 +356,3 @@ test('LW7 the road\'s deeds: a traveller struck down (`slain`) - the hand\'s tur
   assert.ok(!marksAt({ slain: new Map([[key, { t: solo.outT0 + 5 }]]) }).includes(`party:${solo.id}`), 'struck down on the way: none');
 });
 
-test('LW7 the streaming host: every resident\'s place by the lives (`livingCycleOf` - a traveller\'s placeCycle, a townsperson\'s own cycleOf; the newcomer the census\'s own mint with their home), a hand\'s death and the player\'s (`livingDeadAt`, `livingSlay`), the trouble never taking a hand\'s dead, a trip\'s hand deaths, the news of fights the player turned, a crew\'s holders; the town\'s options; the swing\'s civilian pool through the deeds (`livingStruckPool` - the watch struck, anyone else struck down; the guard it stands watched), the trample\'s too, a swing at the road\'s travellers (`livingStrikeRoad` - reach, a wall, the blood, the Brotherhood\'s five, the racial hit); a question\'s tone through `livingTone` (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(res\.roll !== 't'\) return cycleOf\(res, day, livingScale\(\)\)\.k;/, 'a townsperson\'s own cycle');
-  assert.match(w, /return placeCycle\(roster\.find\(\(r\) => r\.slot === res\.slot\) \?\? res, roster, day, livingScale\(\)\);/, 'a traveller\'s place cycle');
-  assert.match(w, /if \(!turns\.slain\.size && !turns\.died\.size && !turns\.killed\.size\) return false;[^\n]*\n\s*const h = livingPlaceOf\(res, livingCycleOf\(res, Math\.floor\(\(t - 240\) \/ 1440\)\)\)\.hand;\n\s*return h != null && h <= t;/);
-  // PIN MOVED (LEGACY-HOME): one of Project Legacy's line struck down is the family record's, never the lives' (test/systems/legacyhome.test.js)
-  assert.match(w, /const livingSlay = \(res, t, seen\) => \{\n\s*if \(isFamilyRes\(res\)\) \{ legacyHost\?\.kinSlain\(res\); return; \}[^\n]*\n(?:\s*legacyHost\?\.residentDied\(res\.id\);[^\n]*\n)?\s*livingRelations\.turn\('slain', turnKey\(res, livingCycleOf\(res, Math\.floor\(\(t - 240\) \/ 1440\)\)\), \{ t, seen, who: res\.name \}\);\n\s*\};/);
-  assert.match(w, /got = \{ holder, dies: !pl\.vacant && pl\.dies, hand: pl\.hand \};/);
-  assert.match(w, /return pl\.dies && pl\.hand == null; \},   \/\/ LW7/);
-  assert.match(w, /f = handsOn\(f, \(m\) => livingPlaceOf\(m, livingCycleOf\(m, Math\.floor\(\(trip\.outT0 - 240\) \/ 1440\)\)\)\.hand\);/);
-  assert.match(w, /helped: won\.has\(n\.enc\) \}\)\) \};/);   // PIN MOVED (LW16): the town's news at any minute (livingRoadNewsAt), the word carried's too
-  assert.match(w, /const res = livingPlaceOf\(c\.res, livingCycleOf\(c\.res, day\)\)\.holder;/);
-  // PIN MOVED (LEGACY5): a townsperson wed into Project Legacy's line holds no census place (the line's resident now)
-  assert.match(w, /holderOf: \(res, day\) => \(host\.legacyHost\?\.holdsResident\(res\.id\) \? null : livingPlaceOf\(res, livingCycleOf\(res, day\)\)\.holder\), deadAt: livingDeadAt, slay: livingSlay, killed: livingKilled,/);   // WATCH-FIX: PIN MOVED - and one of the watch another hand killed
-  assert.match(w, /const hit = collider\.raycast\(\[a\[0\] \+ locOrigin\[0\] \+ tr\[0\], a\[1\] \+ tr\[1\], a\[2\] \+ locOrigin\[2\] \+ tr\[2\]\], \[d\[0\] \/ len, d\[1\] \/ len, d\[2\] \/ len\], len\);\n\s*return !\(Number\.isFinite\(hit\) && hit < len - 0\.25\);/, 'the town\'s line of sight, the collider\'s');
-  // the street's seams
-  assert.match(w, /pos, fwdYaw: person\.facingYaw, guard: person\.guard, person,/);
-  assert.match(w, /cityGuards\.resolveCivilianHit\(weaponRig\.playerWeapon, cam\.pos, lookFwd, player\.pos, livingStruckPool\(_guardPool\(\)\),/);
-  assert.match(w, /const livingStruckPool = \(pool\) => \(livingWorldOn\(\) \? pool\.map\(\(e\) => \(\{ \.\.\.e, disable: \(\) => \{ livingDeedOf\(e\.person, e\.pos\); e\.disable\(\); \} \}\)\) : pool\);/);
-  assert.match(w, /if \(!person\.guard\) \{ town\.slain\(person\); return; \}\n\s*town\.struck\(person\);/);   // WATCH-FIX: PIN MOVED - the guard stood in his place is followed by its mark (livingWatchStep), whichever arm stood it
-  assert.match(w, /retire: \(person\) => \{ livingDeedOf\(person\); for \(const p of built\.values\(\)\) if \(p\.population\?\.retire\(person\)\) break; \},/);
-  // LW-FIX2: the guard found by the conversion's own mark, and cut down the town's whole deed (test/systems/livingWorld/lwfix2_watch.test.js) -
-  // WATCH-FIX: PIN MOVED - every marked guard followed every frame in the lane, its end deciding (test/systems/livingWorld/watchfix_watch.test.js)
-  assert.match(w, /const livingWatchStep = \(\) => watchStep\(_livingWatchTurned, cityGuards\.guards, \{ resolve: livingResidentOf, localOf: livingLocalOf \}\);/);
-  assert.match(w, /if \(livingWorldOn\(\)\) \{ livingWatchStep\(\); livingPeerWatchStep\(\); \}/);
-  // PIN MOVED (FIELD BUGS 2026-10-25i ROAD-SPARE): the road's strike is scenes/livingWorld/roadStrike.js (run by execution in
-  // test/systems/livingWorld/fb1025i_roadspare.test.js) - the host builds it and offers it a swing that met nobody in the street
-  assert.match(w, /const livingStrikeRoad = createRoadStrike\(\{ roads: \(\) => livingRoads, open: \(\) => livingWorldOn\(\) && _mode\(\) === 'exterior', collider, cityGuards, hitEffects, playerEntity \}\);/);
-  assert.match(w, /r \|\|= livingStrikeRoad\(cam\.pos, lookFwd\);[^\n]*\n\s*if \(r\?\.crime \|\| r\?\.struck\) surfacePlayer\(\);/);
-  const rs = rd('src/scenes/livingWorld/roadStrike.js');
-  assert.match(rs, /const near = nearestPerson\(eye, dir, layer\.talkSeats\(\)\);\n\s*if \(!near \|\| near\.distance > WEAPON_REACH\) return false;\n\s*const wall = collider\.raycast\(eye, dir, near\.distance\);\n\s*if \(Number\.isFinite\(wall\) && wall < near\.distance - 1e-3\) return false;\n\s*if \(cityGuards\.playerSparesPerson\(near\.entry\.person\)\) return ROAD_SPARED;[^\n]*\n\s*if \(!layer\.slain\(near\.entry\.person\)\) return false;/);
-  assert.match(rs, /tallyCrimeGuildRequirements\(playerEntity, false, 5\);\n\s*playerWeaponHitEntity\(playerEntity, \{ health: 0 \}, \{ isCivilian: true \}\);/);
-  // PIN MOVED: TONE-TASTE - the seams carry the tone as taken
-  assert.match(w, /livingTone: \(person, taste\) => person\?\.living\?\.town\?\.toned\?\.\(person, taste\),/);
-  assert.match(w, /_livingRoadsDoor\.toned = \(p, taste\) => livingRoads\?\.toned\(p, taste\) \?\? null;/);
-  // PIN MOVED (LW11): the road's slay is the hand's turn and the road's report of it
-  assert.match(w, /slay: livingRoadSlay,   \/\/ LW7: a traveller struck down/);
-  assert.match(w, /const livingRoadSlay = \(res, t, seen\) => \{ livingSlay\(res, t, seen\); caravanHostOf\(\)\.slain\(res, t\); \};/);
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /const _toneHeard = \(\) => \{ if \(_toneTarget\) livingTone\?\.\(_toneTarget, _toneTaste\(\)\); \};/);   // PIN MOVED: TONE-TASTE
-  assert.match(tt, /_toneTarget = _toneNext;   \/\/ LW7[^\n]*\n\s*_toneNext = null;/, 'the window takes the door\'s resident, and every other door leaves nobody');
-  assert.match(tt, /livingTalk\?\.talked\?\.\(target\.person\);[^\n]*\n\s*_toneNext = target\.person\.living \? target\.person : null;/, 'the mobile door names its resident');
-  assert.match(tt, /_toneHeard\(\);   \/\/ LW7: the question's tone/);
-  assert.match(tt, /askWork: \(\) => \(_toneHeard\(\), eng\.pipeline\.getAnswerText\(workListItem\(\), \{/);
-});

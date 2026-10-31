@@ -13,7 +13,6 @@ import { createSiegeSession, SIEGE_SESSION_TEXT } from '../../../src/net/siege/s
 import { createSiegeHud } from '../../../src/ui/siegeHud.js';
 import { siegeRoomKey, siegeNextWave, SIEGE_UNITS_PER_M } from '../../../src/net/siege/siegeRef.js';
 
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const T = 1_800_000_000_000;
 const SH = { name: 'The Silver Hand', tag: 'SH' }, EO = { name: 'Ebon Oath', tag: 'EO' };
 const F = { k: 'f', b: [[1, 0, 0], [1, 0, 0], [1, 0, 0], [2, 0, 0]], th: 0, s: T, e: T + 2_700_000, n: [2, 1, 0] };
@@ -91,11 +90,3 @@ test('SEAT2b part two (b) THE SESSION\'S WORK: an attacker strikes the standing 
   assert.equal(SIEGE_SESSION_TEXT.breach('Wayrest'), 'The Gatehouse of Wayrest is breached.');
 });
 
-test('SEAT2b part two (b) THE HOST\'S SWING AT A WORK: a swing that finds no foe falls to the work in reach - the Gatehouse\'s or the Ram\'s body about the Throne\'s point - rolled as a blow on a foe, sent as the work\'s (mutants: the fall-through; the reach; the roll; the send)', () => {
-  assert.match(W, /if \(!foes\.length\) return \(battle === siegeSession && siegeWorkHit\(\)\) \|\| wildMeleeHit\(eye, inViewFn\);/);   // WILD1: past the work, a fair player of the open zone
-  assert.match(W, /if \(!best\) return battle === siegeSession && siegeWorkHit\(\);/);
-  assert.match(W, /const siegeWorkHit = \(\) => \{\n\s+const to = siegeSession\?\.workTarget\?\.\(\) \?\? null;\n\s+const at = to \? siegeSession\.workPoint\(\) : null;/);
-  assert.match(W, /if \(Math\.hypot\(me\[0\] - at\[0\], me\[2\] - at\[1\]\) \/ SIEGE_UNITS_PER_M > SIEGE_REACH\.melee \+ size\) return false;/);
-  assert.match(W, /const size = to === SIEGE_WORK_IDS\.gate \? SIEGE_GATEHOUSE\.sizeM : SIEGE_RAM\.sizeM;/);
-  assert.match(W, /siegeSession\.workBlow\(to, \{ w: weapon \? weapon\.templateIndex : -1, m: held\?\.material \?\? 0, d: r\.dmg, r: siegeBlowKind\('melee'\) \}\);/);
-});

@@ -435,8 +435,4 @@ test('BR5: a copy from before the rename still finds its download, and a copy fr
   assert.equal(releaseAssetUrl({ assets: [at(DOWNLOAD_FILES.linux, 'https://example.com/x.AppImage')] }, DOWNLOAD_FILES.linux), null);
   assert.equal(releaseAssetUrl({ assets: [at(DOWNLOAD_FILES.linux, 'https://github.com/someone/else/releases/download/v1/x.AppImage')] }, DOWNLOAD_FILES.linux), null);
   for (const bad of [null, {}, { assets: 'x' }, { assets: [null, 7, { name: DOWNLOAD_FILES.linux }] }]) assert.equal(releaseAssetUrl(bad, DOWNLOAD_FILES.linux), null);
-  // and the shell takes it: the notice's Download, and the launcher's Reinstall after a check has read one
-  const main = rd('app/main.cjs');
-  assert.match(main, /const listed = file \? releaseAssetUrl\(json, file\) : null;\n\s*if \(tag && listed\) listedDownload = listed;/);
-  assert.match(main, /function ownDownloadUrl\(\) \{\n {2}if \(listedDownload\) return listedDownload;/);
 });

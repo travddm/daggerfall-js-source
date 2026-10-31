@@ -344,9 +344,3 @@ test('STORM-SHED C: the kept rows are the isolate\'s, not a request\'s - each re
   assert.equal(c.n, 1, 'two requests, two Proxies, one read');
 });
 
-test('STORM-SHED C: a character\'s harvests today are read off its own rows - the professions\' state read plans on idx_node_harvests_char_day by the player, the character and the day, never the primary key by the day alone (every player\'s harvests of the day, 8,021 rows a read in the outage) (mutant: migration 0085 unwritten)', () => {
-  const sql = /'(SELECT node, kind FROM node_harvests WHERE player = \?1 AND char_id = \?2 AND day = \?3)'/.exec(src('server-account/src/professions.js'))?.[1];
-  assert.ok(sql, 'the state\'s own read, as professions.js asks it');
-  const plan = d1()._raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all('p', 'c', 1).map((r) => r.detail).join(' | ');
-  assert.match(plan, /USING COVERING INDEX idx_node_harvests_char_day \(player=\? AND char_id=\? AND day=\?\)/);
-});

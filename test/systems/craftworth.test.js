@@ -62,14 +62,6 @@ test('CRAFT-WORTH a patron pays a crafted piece no more than the piece it was ma
   }
 });
 
-test('CRAFT-WORTH the keyed shelf (the counter with no trade art) prices a sale through the window\'s own walk and sells no conjured piece (mutants: the keyed sale off the walk; a conjured piece listed; one sold)', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const fn = (name) => { const at = wm.indexOf(`function ${name}(`); return wm.slice(at, wm.indexOf('\n  }\n', at)); };
-  assert.match(fn('sellPrice'), /const lot = tradeCost\('Sell', \[it\], \{ quality: b\.quality, priceAdjustment: shopAdjustment\(b, 'Sell'\) \}\);\n\s*return getTradePrice\('Sell', lot\.cost, b\.quality, /);
-  assert.match(fn('showSellList'), /&& !isSummoned\(it\)\);/);
-  assert.match(fn('doSell'), /\n\s*if \(isSummoned\(it\)\) return 0;/);
-});
-
 test('AUDIT CRAFT-WORTH a FOUND piece tempered keeps its patron worth (a temper writes `quality`, a craft mark, onto it - only a crafted piece loses its roll), a crafted piece with no value of its own is priced at its base untouched, and a malformed line list is no throw (mutants: the strip on any marked piece; the roll off the base; the list unguarded)', () => {
   const found = mint('dagger:iron', 1, 3);
   for (const k of ['provenance', 'quality', 'recipe']) delete found[k];

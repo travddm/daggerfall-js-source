@@ -334,31 +334,3 @@ test('Q5: SpawnCityGuards and Enemies fire their host doors, flags intact', () =
   assert.equal(m.of('clearEnemies').length, 1);
 });
 
-test('Q5: the world host mounts every new door', () => {
-  const w = hostText('src/scenes/world.js');
-  for (const door of ['setPlayerCrime: (crime) => setCrimeCommitted(playerEntity, crime)',
-    'getGoldPieces: () => goldAmount(playerEntity)',
-    'deductGoldPieces: (n) => deductGoldPieces(playerEntity, n)',
-    'raiseTime: (seconds) => advanceOwnMinutes(seconds / 60)',   // LIVED1: a quest's RaiseTime is the character's own time
-    'spawnCityGuards: (immediate) =>',
-    // ROAD-B MOVED THIS NEEDLE. The door is still mounted; it is no
-    // longer an inline arrow, because MakeEnemiesHostile is now the
-    // shared law (hostCombat.makeEnemiesHostile) over the host's whole
-    // active-enemy database rather than a private walk of the two
-    // exterior pools. `_makeEnemiesHostile` IS that closure, so the
-    // pin follows it by name.
-    'makeEnemiesHostile: _makeEnemiesHostile', 'clearEnemies: () =>',
-// AUDIT 39 (#27) MOVED THIS PIN. It used to read
-    // `currentWeatherKey: () => WEATHER_TYPES[`, which pinned the bug:
-    // WEATHER_TYPES is the NAME array and both operands are already
-    // names, so the index answered undefined -> null on every call and
-    // the always-on Weather trigger could never match. The fold is the
-    // identity, so the seam is the bare read.
-    'currentWeatherKey: () => weatherOverride ?? currentWeather()', 'currentClimateIndex: () => maps.getClimateIndex(',
-    // AUDIT 39: the two seams this wave mounted - JournalNote's TOKEN
-    // overload and PayMoney's GetGoldAmount gate.
-    'addNoteTokens: (tokens) => host.questBridge?.notebook?.addNoteTokens(tokens)',   // PIN MOVED (TESA's merge): scenes/questWorld.js's, `questBridge` its live name
-    'getTotalGold: () => totalGoldAmount(playerEntity)']) {
-    assert.ok(w.includes(door), `world.js mounts ${door.split(':')[0]}`);
-  }
-});

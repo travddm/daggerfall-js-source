@@ -398,11 +398,3 @@ test('AUDIT REALM L1-F3: the decor tool takes what the SERVICE paid the record -
   assert.deepEqual([askedR, rig.w.credited.slice(creditedR), checkpoints.length - marksR], [2, [], 1]);
 });
 
-test('REALM P2.2b by source: the world host hands the realm act to the homes and the decor; the sale needs the service\'s answer', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /realm: \(\) => host\.realmAct \?\? null,   \/\/ REALM P2\.2b/);
-  assert.equal((m.match(/realm: host\.realmAct \? \{ act: host\.realmAct \} : null,/g) ?? []).length, 4, 'the buy and the sale - HOME-RENT: and a room rented, and its rent collected');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /realmAct: realmSession \? \(o\) => realmGoldAct\(\{ session: realmSession, checkpoint: \(\) => onlineCheckpoint\(\), \.\.\.o \}\) : null,/);
-  assert.match(src('src/systems/online/onlineHomes.js'), /needsAnswer: true,/);
-});

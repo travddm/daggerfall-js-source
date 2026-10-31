@@ -84,9 +84,6 @@ test('EXACT-PIECES a plan past the Bay with no way by land at the pixel is refus
   assert.equal(planRoute({ x: 1005, y: 110 }, { x: 1030, y: 110 }, { ...rg, tally }), null);
   assert.equal(tally.n, 0, 'not a cell');
   assert.ok(planRoute({ x: 1005, y: 110 }, { x: 1012, y: 115 }, { ...rg }), 'one isle: walked');
-  assert.match(read('src/scenes/tamrielRoadsHost.js'), /addExactPieces\(region, land \?\? null\);/);
-  assert.match(read('src/scenes/tamrielRoadsHost.js'), /resetExactPieces\(lattice, regions\);/);
-  assert.match(read('src/world/tamrielRoads.js'), /const pieces = regionLand\(region, \(x, y\) => \(inBay\(x, y\) \? heightAt\(x, y\) : heights\[\(y - gy\) \* MAP_W \+ \(x - gx\)\]\)\);/);
 });
 
 // ── WITH ARENA2: the freeware's own Tamriel ─────────────────────

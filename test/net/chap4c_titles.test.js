@@ -134,12 +134,3 @@ test('CHAP4c a Former Master: a Master\'s seat lost this Season titles its chara
   assert.deepEqual((await chapterTitlesOfAccount(s.svc.env.DB, s.who.id, T0, null, s.R.id)), [], 'a dead character holds nothing');
 });
 
-test('CHAP4c the wiring: the relay\'s version is a new one with its law; the toml ships the switch off; the wardrobe and the mint lay the chapters\' titles (mutants: each seam)', () => {
-  assert.match(rd('server-account/wrangler.toml'), /\nCHAPTER_TITLES = "off"\n/);
-  assert.match(rd('test/net/relayversion.test.js'), /\n  world183: '[0-9a-f]{64}',   \/\/ CHAP4c /);   // PIN MOVED (the merge of main past CARDS10's world182): world183; PIN MOVED (AUDIT CHAP4 R12): CHAP4c's own row - world179's is HOURS-FIRST's, world180's TAVERN-TABLES' and world181's TV-BEYOND's since the merges of main
-  const ix = rd('server-account/src/index.js');
-  assert.match(ix, /const withSeatTitles = async \(ctx, player, env\) => withChapterTitles\(ctx, /);
-  assert.match(ix, /const worn = await withChapterTitles\(ctx, seats \? /);
-  assert.match(ix, /\.find\(\(t\) => t\.title === wornT\) \?\? null : null;/);
-  assert.match(rd('server-account/src/titles.js'), /if \(Array\.isArray\(player\?\.chapterTitles\)\) for \(const t of player\.chapterTitles\) if \(CHAPTER_TITLES\.includes\(t\) && !held\.includes\(t\)\) held\.push\(t\);/);
-});

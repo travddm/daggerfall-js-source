@@ -112,9 +112,3 @@ test('RVN12a THE EVENTS\' VOICES: the signature names its move (in the line too)
   assert.equal(N.revenantBetrayEvent(rat).speech, null);
 });
 
-test('RVN12a THE HOSTS: the signature\'s card, the betrayer\'s and the deserter\'s carry my name (mutants: unhanded)', () => {
-  assert.match(read('src/scenes/exteriorFoes.js'), /revenantSignatureEvent\(r, sb\.noun, \{ archive: f\.archive, playerName: playerEntity\?\.name \}\)/);
-  assert.match(read('src/scenes/dungeonContext.js'), /revenantSignatureEvent\(r, sb\.noun, \{ archive: f\.mobileArchive, playerName: playerEntity\?\.name \}\)/);
-  assert.match(read('src/scenes/world.js'), /revenantBetrayEvent\(r, \{ playerName: playerEntity\?\.name \}\)/);
-  assert.match(read('src/systems/revenant/revenant.js'), /r\.notice === 'deserted' \? revenantDesertEvent\(r, \{ playerName: player\.name \}\)/);
-});

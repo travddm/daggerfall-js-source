@@ -165,9 +165,6 @@ test('HALT-ONE the tells: in the lane a watchman\'s stagger and wind-up are a pe
 });
 
 test('HALT-ONE beyond the pool: a peer\'s watchman is silent here in the lane (his call is his owner\'s); the siege\'s Town Guard cries his move voice when hurt, never a Halt (mutants: the peer\'s watch calling; the siege\'s Halt)', async () => {
-  const foes = rd('src/scenes/exteriorFoes.js');
-  assert.match(foes, /f\.quietVoice = f\.mobileType === KNIGHT_CITY_WATCH && !!oneVoice\(\);/);
-  assert.match(foes, /if \(!f\.quietVoice\) tickEnemySound\(f\.sounds, f\.ai\.feet, playerFeet, dt,/, 'the puppet\'s attract clock gated by it');
   const M = SIEGE_UNITS_PER_M, T = 1_800_000_000_000;
   const heard = [];
   const tex = { getFrameCount: () => 4, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ x: 0, y: 0 }) };

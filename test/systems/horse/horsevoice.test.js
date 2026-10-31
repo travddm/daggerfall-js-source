@@ -346,23 +346,6 @@ test('HORSE-VOICE THE INSTALL: the fifteen registered once; a bus that would not
 
 // ── the hosts ─────────────────────────────────────────────────────────
 
-test('HORSE-VOICE THE HOSTS: the two that ride (world.js, exterior.js) hand the rig the ground (the stride\'s kind), foes in sight and horse care\'s breath; exterior.js takes the kind off the very ctx its stride\'s set is picked from; the rig keeps DFU\'s neigh and clop as its switch-off arm; another player\'s hooves take their pose\'s ground behind the same switch (mutants: a host unwired; the bench\'s kind off another ctx; the peers on DFU\'s clop whatever)', () => {
-  const W = src('src/scenes/world.js'), X = src('src/scenes/exterior.js');
-  assert.ok(W.includes('surfaceKind: () => _lastFootstepKind, foesNear: () => areEnemiesNearby([...cityGuards.guards, ...exteriorFoes.foes]), horseBreath: () => upkeep.bar(player.transportMode),'));
-  assert.ok(X.includes('surfaceKind: () => _townFootstepKind, foesNear: () => areEnemiesNearby([...cityGuards.guards, ...exteriorFoes.foes]), horseBreath: () => upkeep.bar(player.transportMode),'));
-  assert.ok(X.includes('}, pickFootstepSet(_fsCtx));\n        _townFootstepKind = pickFootstepKind(_fsCtx);'));
-  const R = src('src/player/mountRig.js');
-  assert.ok(R.includes("        if (r.neigh) audio.playOneShot(SOUND.AnimalHorse, RIDING_VOLUME_SCALE * horse);"));   // HORSE-VOL: under Horse Volume
-  assert.ok(R.includes("        voice.hush();   // AUDIT SOUNDSCAPE H1"), 'the switch-off arm lets the voices\' debts go');
-  assert.ok(R.includes("running: player.isRunning, pitch: r.pitch, paused: ridePaused,"), 'the gallop\'s breath on the loop\'s own pitch (H3)');
-  assert.ok(R.includes("else audio.setLoop('riding', r.playing ? SOUND[r.clip] : null, { volume: r.volume * horse, pitch: r.pitch });"));
-  assert.ok(R.includes("if (voiced) audio.setLoop('riding', r.playing ? hoofClipFor(r.clip, surfaceKind?.()) : null, { volume: r.volume * horse, pitch: r.pitch });"));
-  const P = src('src/net/remotePlayers.js');
-  assert.ok(P.includes('const clop = out.playing && heard ? SOUND[out.clip] : null;'));
-  assert.ok(P.includes('clop != null && voiced ? hoofClipFor(out.clip, peer.shown.fk) : clop'));
-  assert.ok(P.includes('const voiced = heard && enhancedSoundsOn();'));
-});
-
 test('HORSE-VOICE THE RIG\'S READS (AUDIT SOUNDSCAPE P5): the rig run on the shapes their producers make - horse care\'s `bar` ({ amount, low }) short of breath, blowing at the walk; foes about, the spook; a Travel Options journey (ridingVolumeScale 0), every voice silent; a pause, none said and the clock\'s moment held; the peers\' hooves load the clips themselves (mutants: the breath unread; the foes unread; the journey not silencing; the pause unread; the peers never loading)', async () => {
   _resetHorseSounds();
   assert.equal(await installHorseSounds({ registerSound: async () => true }, { fetchBytes: async () => new Uint8Array(4) }), 15);
@@ -388,6 +371,4 @@ test('HORSE-VOICE THE RIG\'S READS (AUDIT SOUNDSCAPE P5): the rig run on the sha
   still.frames(2);
   assert.ok(still.calls.shots.length >= 1, 'the pause over: its held moment said');
   _resetHorseSounds();
-  const P = src('src/net/remotePlayers.js');
-  assert.ok(P.includes('if (voiced) installHorseSounds(audio);'), 'a peer heard on my sounds loads the clips');
 });

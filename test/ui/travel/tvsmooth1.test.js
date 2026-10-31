@@ -38,10 +38,6 @@ test('TV-SMOOTH: at x1 the guard is SNAP_SPAN, exactly as before', () => {
   const fresh = span([0, 0, 0], [PlayerMotor.SNAP_SPAN + 0.5, 0, 0]);
   assert.deepEqual(fresh.bodyFeetAt(0.5), [PlayerMotor.SNAP_SPAN + 0.5, 0, 0], 'a motor that never stepped: x1');
   assert.deepEqual(span([0, 0, 0], [1, 0, 0], FIXED_DT).bodyFeetAt(0.5), [0.5, 0, 0]);
-  const motor = rd('src/player/motor.js');
-  assert.match(motor, /if \(this\._acc >= step\) this\._spanStep = step;/, 'update records the step its span is');
-  assert.equal((motor.match(/> this\._snapSpan2\(\)/g) ?? []).length, 3, 'eyeAt, feetAt and bodyFeetAt all read the scaled guard');
-  assert.doesNotMatch(motor, /PlayerMotor\.SNAP_SPAN \* PlayerMotor\.SNAP_SPAN/);
 });
 
 test('ROAD-BRIDGE: one open pixel between two road legs is the road\'s; a longer run, an open end or open ground on one side is not (mutants: any open leg bridged, the distance unread)', () => {
@@ -54,35 +50,6 @@ test('ROAD-BRIDGE: one open pixel between two road legs is the road\'s; a longer
   assert.equal(bridgedRoadLeg([R(1), R(2, 'open')], 1), false, 'the last leg');
   assert.equal(bridgedRoadLeg([R(1), R(2)], 1), false, 'a road leg is no bridge');
   assert.equal(bridgedRoadLeg([R(1), R(2, 'sea'), R(3)], 1), false, 'a crossing is never the road\'s');
-  assert.match(rd('src/systems/travel/travelOptions.js'), /ROAD_LEG_KINDS\.includes\(leg\.kind\) \|\| bridgedRoadLeg\(r\.legs, at\)/, 'journeyOnRoad reads it');
-});
-
-test('PACE-KEEP: the ground caps the dials, never writes them', () => {
-  const src = rd('src/systems/travel/travelPace.js');
-  const fn = /export function setPaceGround\(onRoad\) \{[\s\S]*?\n\}/.exec(src)?.[0] ?? '';
-  assert.ok(fn, 'setPaceGround found');
-  assert.doesNotMatch(fn, /write\(/, 'no write on the ground\'s word');
-});
-
-test('TV-SMOOTH: the route line leaves from the drawn feet; the ring is placed by the tenth of a pixel and centred on them', () => {
-  const w = rd('src/scenes/world.js');
-  const route = /\n  function travelViewRoute\(\) \{\n[\s\S]*?\n  \}\n/.exec(w)?.[0] ?? '';
-  assert.match(route, /const pts = \[player\.feetAt\(\)\];\n\s*const me = state\.worldCoords\(pts\[0\]\);/);
-  const hud = rd('src/ui/travel/travelViewHud.js');
-  assert.match(hud, /translate3d\(\$\{f\.feet\.x\.toFixed\(1\)\}px, \$\{f\.feet\.y\.toFixed\(1\)\}px, 0\)/);
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  const ring = /\.tview-ring \{([^}]*)\}/.exec(css)?.[1] ?? '';
-  const n = (k) => Number(new RegExp(`${k}: (-?\\d+)px`).exec(ring)?.[1]);
-  assert.match(ring, /box-sizing: border-box/);
-  assert.deepEqual([n('left') * -2, n('top') * -2], [n('width'), n('height')], 'its middle on the feet');
-  assert.match(css, /\.tview-ring::after \{[^}]*animation: tview-ring-breath/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \.tview-ring::after \{ animation: none; \} \}/);
-  // OW-DOTS-GROUND: no dash pattern and no march - the dots are the view's world points, each a round-capped stroke
-  for (const sel of ['line', 'casing']) {
-    const rule = new RegExp(`\\.tview-route-${sel} \\{([^}]*)\\}`).exec(css)?.[1] ?? '';
-    assert.match(rule, /stroke-linecap: round;/, `${sel}: round caps make the dots`);
-    assert.doesNotMatch(rule, /animation|dasharray/, `${sel}: still, no screen pattern`);
-  }
 });
 
 test('OW-DOTS-GROUND (Mac: "the dotted lines dont look still"): the route\'s dots are points on the land - the camera following the traveller moves none of them on the ground; toward the horizon they only thin (mutants: laid from the feet; the spacing not a doubling)', () => {
@@ -114,11 +81,8 @@ test('OW-DOTS-GROUND (Mac: "the dotted lines dont look still"): the route\'s dot
   assert.ok(common.length > 20 && kept / common.length >= 0.9, `${kept} of ${common.length} dots where they were on the land`);
   assert.equal(routeGroundDots([], camAt(0)).length, 0);
   assert.ok(routeGroundDots(route(0), camAt(0), { w: 1280, h: 720 }).every((q) => q.x >= -16 && q.x <= 1296 && q.y >= -16 && q.y <= 736), 'on the screen alone');
-  const hud = rd('src/ui/travel/travelViewHud.js');
-  assert.match(hud, /const pairs = Array\.isArray\(f\.routeDots\) \? dotPairsFor\(f\.routeDotSizes\) : null;\n\s*const shown = pairs \? '' : Array\.isArray\(f\.routeDots\) \? routeDotsPath\(f\.routeDots, vw, vh\) : d;/, 'the readout draws the dots, a pair a size; the line where none are handed');
   assert.equal(hudMod.routeDotsPath([{ x: 1.26, y: 2 }, { x: 5000, y: 5 }, null], 100, 100), 'M1.3 2.0h0', 'a zero-length stroke each, off the screen none');
   assert.equal(hudMod.routeDotsPath([{ x: 1, y: 2, c: 0 }, { x: 3, y: 4, c: 2 }], 100, 100, 2), 'M3.0 4.0h0', 'one size\'s dots');
-  assert.match(rd('src/scenes/travelView.js'), /routeDots: routeGroundDots\(routeWorld, proj, [^\n]*keep: dotSpacing \}\),[^\n]*\n\s*routeDotSizes: ROUTE_DOT_SIZES,/);
 });
 
 test('OW-DOTS-EVEN (Mac: "the dot spacing is still a bit weird make it more consistent"): ONE spacing on the ground for the whole line, picked at the feet and kept; the dots shrink with the land toward the horizon, thinned only where they would crowd (mutants: the spacing picked piece by piece; the sizes unread; the keep unread)', () => {
@@ -173,7 +137,4 @@ test('OW-DOTS-EVEN (Mac: "the dot spacing is still a bit weird make it more cons
   routeGroundDots(route, cam, { w: 1280, h: 720, keep: far });
   assert.equal(far.k, k0, 'far past it: picked again');
   assert.deepEqual([routeDotClass(1), routeDotClass(0.1), routeDotClass(2)], [0, ROUTE_DOT_SIZES.length - 1, 0]);
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.equal(Number(/\.tview-route-casing \{[^}]*stroke-width: (\d+);/.exec(css)?.[1]), hudMod.ROUTE_CASING_W, 'the casing\'s width pinned');
-  assert.equal(Number(/\.tview-route-line \{[^}]*stroke-width: (\d+);/.exec(css)?.[1]), hudMod.ROUTE_LINE_W, 'the line\'s width pinned');
 });

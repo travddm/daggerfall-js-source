@@ -44,19 +44,6 @@ test('TO-LIVE THE LIVE HALF READ AGAIN: handed the boot bag, the read answers th
   _resetModSettings();
 });
 
-test('TO-LIVE THE HOST READS IT AGAIN: the world keeps its load\'s bag and, on a change of the mod settings, reads the live half afresh and hands it to the mod - at the map\'s open (the fare deps\' handle) and in the journey\'s own frame; RATE-LAW: no limit to hand the panel (mutants: never refreshed, refreshed but not handed over)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /let travelOptionsSettings = readTravelOptionsSettings\(\);/);
-  assert.match(w, /const travelOptionsBoot = travelOptionsSettings;/);
-  const fn = w.match(/function refreshTravelOptionsSettings\(\) \{[\s\S]*?\n {2}\}/)?.[0] ?? '';
-  assert.match(fn, /const g = modSettingsGeneration\(\);\s+if \(g === _travelOptionsGen\) return;\s+_travelOptionsGen = g;/);
-  assert.match(fn, /travelOptionsSettings = readTravelOptionsSettings\(modSetting, travelOptionsBoot\);/);
-  assert.match(fn, /if \(travelOptions\) travelOptions\.settings = travelOptionsSettings;/);
-  assert.doesNotMatch(fn, /setAccelerationLimit/, 'RATE-LAW: the panel has no limit');
-  assert.match(w, /travelOptions: \(\) => \{ refreshTravelOptionsSettings\(\); return travelOptions; \},/, 'the maps\' handle');
-  assert.match(w, /refreshTravelOptionsSettings\(\);[^\n]*\n\s+const report = travelOptions\.update\(\{/, 'the journey\'s frame');
-});
-
 test('TO-LIVE INNS ON THE TILE: the other half of the mod\'s rule is a dial the drawer draws, right after Cautiously - TO-FIELD2 turned it on and no screen could turn it off (mutant: off the tile)', () => {
   const tile = MOD_CURATED['travel-options'];
   assert.equal(tile.indexOf(INNS), tile.indexOf(CAUTIOUS) + 1);

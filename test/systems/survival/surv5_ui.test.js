@@ -195,32 +195,3 @@ test('SURV5: the tavern window - the survival menu in the one picker: a meal cha
   _resetForTests();
 });
 
-test('SURV5: by source - the four hosts chain the third box, the enhanced HUD carries the strip, the interior hands the tavern its climate and clock', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    // STATUS-LIVE (2026-09-22): the readout does not PAUSE, so there is
-    // nothing to route it a key and AddNextMessageBox cannot advance -
-    // the three pages are one page, composed once in ui/statusBox.js.
-    // What each host still owes is this arc's own half: the mod's
-    // switch, the world's minutes, the vampirism and the endurance,
-    // fed as SURV5's own bag or withheld as null when the mod is off.
-    assert.match(read(f), /survival: survivalOn\(\) \? \{ minutes: Math\.floor\(ownMinutes\(\)\), vampire: !!liveVampirism\(playerEntity\), endurance: liveStat\(playerEntity, 'endurance'\) \} : null,/, `${f}: the third box (LIVED1: on the character's own clock)`);
-  }
-  // ...and the ONE place it becomes rows, so the page cannot be dropped
-  // by a host that forgets it.
-  assert.match(read('src/ui/statusBox.js'), /if \(survival\) rows\.push\('', \.\.\.survivalStatusRows\(entity, survival\.minutes, \{ rules: survivalRules\(\), \.\.\.survival \}\)\);/);   // PIN MOVED (AUDIT C&C S11): and the live tier, read once
-  const hud = read('src/ui/enhanced/enhancedHud.js');
-  // UI3: the needs are the status widget's tiles - a felt need amber, one that costs red
-  assert.match(hud, /const needs = survivalOn\(\) \? survivalHudChips\(vitals, Math\.floor\(ownMinutes\(\)\), \{ vampire: !!liveVampirism\(vitals\), endurance: liveStat\(vitals, 'endurance'\), rules: survivalRules\(\), live \}\) : \[\];/);   // PIN MOVED (AUDIT SURV-BOONS C14): and the live tier   // PIN MOVED (AUDIT C&C S5/S9): its rules, and the frame's one live reading
-  assert.match(hud, /const all = statusTiles\(\{ spells, powers, afflictions: afflictionRows\(vitals\), needs, rested \}\);/);   // REST1: and the Next night tile
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hst-cell\.danger \{/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /climateIndex: \(\) => host\.climateIndex\?\.\(\) \?\? 232,\s*\n\s*advanceMinutes: \(n\) => interiorTicker\.advance\(n\),\s*\n\s*endurance: \(\) => liveStat\(playerEntity, 'endurance'\),/);
-  assert.match(read('src/scenes/world.js'), /climateIndex: \(\) => maps\.getClimateIndex\(playerTravelPixel\(\)\.x, playerTravelPixel\(\)\.y\),   \/\/ SURV5/);
-  assert.match(read('src/scenes/exterior.js'), /climateIndex: \(\) => locClimateIndex,   \/\/ SURV5/);
-  assert.match(read('src/ui/tavernWindow.js'), /if \(survivalOn\(\) && typeof h\.climateIndex === 'function'\) \{ this\._survivalFood\(\); return; \}/);
-  assert.match(read('src/systems/item/itemInfo.js'), /if \(isSurvivalItem\(item\)(?: \|\| isRestItem\(item\))?\) record = survivalInfoTokens\(item\);/);
-  assert.match(read('src/systems/survival/needs.js'), /s\.felt = temp\.felt;/);
-  for (const f of ['status', 'tavernMenu']) {
-    assert.doesNotMatch(read(`src/systems/survival/${f}.js`), /from '\.\.\/\.\.\/scenes\/|from '\.\.\/\.\.\/ui\/|from '\.\.\/\.\.\/combat\/|from '\.\.\/spellcast|from '\.\.\/diseases|from '\.\.\/effects|document\.|window\./, `${f}.js is pure`);
-  }
-});

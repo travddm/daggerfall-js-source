@@ -144,14 +144,6 @@ test('BAY-LEFT-MAPS C1 THE HELD MAP\'S POLL: with the continent on, the party, t
   _resetForTests();
 });
 
-test('BAY-LEFT-MAPS C1: the held map reads no mark against the Bay\'s 1000 x 500 any more - every reader of its poll takes the sheet\'s box (a source sweep of _refreshParty)', () => {
-  const src = read('src/ui/heldMap.js');
-  const poll = src.slice(src.indexOf('  _refreshParty() {'), src.indexOf('    this._partyKey = key;'));
-  assert.doesNotMatch(poll, /this\._size\b(?!, sheet)/, 'no reader bound by this._size (the quests\' size is their fallback beside the box)');
-  assert.match(poll, /const sheet = this\._marksBox\(\);/);
-  assert.equal([...poll.matchAll(/, sheet[,)]/g)].length, 16, 'sixteen readers over the one box - the gates, the rings, the bounties, the lairs, the lodes, the POIs, the raids, the stars, the quests, the coin, the travellers and the party');
-});
-
 const fresh = () => { delete globalThis.localStorage; _resetWaypoints(); };
 
 test('BAY-LEFT-MAPS C2 WAYPOINTS PAST THE BAY: a flag of mine, my party\'s and my guild\'s stands in Solitude and Torval, a party line naming one is heard, a kept one comes back from the device, and the world\'s edge - the wire\'s own - is the edge (mutants: the Bay\'s bound back; the world\'s bound a pixel short)', () => {

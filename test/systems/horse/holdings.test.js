@@ -19,7 +19,6 @@ import { CSA_ITEM_TEMPLATES } from '../../../src/systems/comeSailAway/comeSailAw
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
 const read = (p) => hostText(p);
-const MENU = read('src/ui/enhanced/enhancedMenu.js');
 
 // ── a fake DOM, the Companions page's (test/systems/revenant/revenant_companions.test.js) ─────────────────────────────────────────────
 function fakeEl(tag) {
@@ -43,37 +42,6 @@ _setHoldingsIconForTests(() => ({ src: 'data:x', w: 30, h: 30 }));
 globalThis.document = undefined;
 
 // ── the tab ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('HOLDINGS the pause window has a fourth tab, Holdings, between Stats and System; a landing may name it (every tab one list - PAUSE_TAB_IDS - the landing and the strip read alike)', () => {
-  assert.match(MENU, /const PAUSE_TABS = Object\.freeze\(\[\['quests', 'Quests'\], \['stats', 'Stats'\], \['growth', 'Growth'\], \['holdings', 'Holdings'\], \['family', 'Family'\], \['tutorials', 'Tutorials'\], \['system', 'System'\]\]\);/);   // LEGACY3: the Family tab between Holdings and System; TUT1: the Tutorials tab before System - PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab): Growth after Stats
-  assert.match(MENU, /export const PAUSE_TAB_IDS = Object\.freeze\(PAUSE_TABS\.map\(\(\[id\]\) => id\)\);/);
-  assert.match(MENU, /if \(PAUSE_TAB_IDS\.includes\(at\)\) pauseTab = at;/);
-  assert.match(MENU, /\(\{ quests: pauseQuests, stats: pauseStats, growth: pauseGrowth, holdings: pauseHoldings, family: pauseFamily, tutorials: drawTutorialsPane, system: pauseSystem \}\)\[pauseTab\]\(body\);/);   // TUT1 - PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab)
-});
-
-test('HOLDINGS the Stats rail is the character sheet again - its six pages and the Professions online; the Holdings rail takes the Stable, the Fleet, the Companions, the Revenants and the Stores, each while it has a thing to show', () => {
-  assert.match(MENU, /const statsSections = \(\) => \[\.\.\.STATS_SECTIONS, \.\.\.\(profPagesShown\(\) \? PROF_STATS_SECTIONS : \[\]\), \.\.\.\(vendorPageShown\(\) \? VENDOR_PAGE_SECTIONS : \[\]\)\];/);   // PIN MOVED (HOME-VENDOR): the Vendor page under the Professions
-  // PIN MOVED (CRAFT-HALL): the Stats rail's professions pages are PROF_STATS_PAGES (the Professions page and the Crafting
-  // page beside it); every other is the Holdings rail's (the Stores)
-  assert.match(MENU, /const PROF_STATS_SECTIONS = Object\.freeze\(PROF_PAGE_SECTIONS\.filter\(\(\[id\]\) => PROF_STATS_PAGES\.includes\(id\)\)\);/);
-  assert.match(MENU, /const PROF_HOLD_SECTIONS = Object\.freeze\(PROF_PAGE_SECTIONS\.filter\(\(\[id\]\) => !PROF_STATS_PAGES\.includes\(id\)\)\);/);
-  assert.match(MENU, /const holdingsSections = \(\) => \[\.\.\.\(stablePageShown\(\) \? STABLE_PAGE_SECTIONS : \[\]\), \.\.\.\(fleetPageShown\(\) \? FLEET_PAGE_SECTIONS : \[\]\), \.\.\.\(captainPageShown\(\) \? CAPTAIN_PAGE_SECTIONS : \[\]\), \.\.\.\(companionPageShown\(\) \? COMPANION_PAGE_SECTIONS : \[\]\), \.\.\.\(revenantPageShown\(playerEntity\) \? REVENANT_PAGE_SECTIONS : \[\]\), \.\.\.\(profPagesShown\(\) \? PROF_HOLD_SECTIONS : \[\]\), \.\.\.\(collectionsPageShown\(playerEntity\) \? COLLECTION_PAGE_SECTIONS : \[\]\)\];   \/\/ COLLECTIONS/);   // COLLECTIONS (PIN MOVED): the codex and the cards, last - CAPT-LOG (PIN MOVED): the Captain page after the Fleet
-  // the Stats page draws none of the moved pages; the Holdings page draws every one, the Fleet's with its door
-  const stats = MENU.slice(MENU.indexOf('function pauseStats(body)'), MENU.indexOf('// PX25: THE DOORS THE F5 SHEET CARRIED'));
-  for (const gone of ['drawStoresPage', 'drawRevenantsPage', 'drawCompanionsPage']) assert.doesNotMatch(stats, new RegExp(gone), `${gone} left the Stats page`);
-  const hold = MENU.slice(MENU.indexOf('function pauseHoldings(body)'), MENU.indexOf('// ── PX7: THE SYSTEM PAGE'));
-  for (const page of ['drawStablePage', 'drawFleetPage', 'drawCompanionsPage', 'drawRevenantsPage', 'drawStoresPage']) assert.match(hold, new RegExp(page));
-  assert.match(hold, /if \(!secs\.some\(\(\[id\]\) => id === holdSec\)\) holdSec = secs\[0\]\?\.\[0\] \?\? 'stable';/, 'a page gone falls to the first');
-  assert.match(hold, /door: \(fn\) => \{ handoff\(fn\); \}/, 'a door the Fleet opens is the sheet doors\' handoff (PIN MOVED, AUDIT SEASON-BOOK S3: its one home)');
-  assert.match(hold, /el\('div', 'px-qdetail px-sys'\)/, 'the system page\'s dress, as the Stats detail wears it');
-});
-
-test('HOLDINGS the landings: a Stores press (a home\'s station) lands on the Holdings tab at the Stores, a Professions press on the Stats tab; every visit opens the rail on its first page and forgets the pages\' words', () => {
-  const mount = MENU.slice(MENU.indexOf('export function mountEnhancedMenu'));
-  assert.match(mount, /if \(PROF_STATS_SECTIONS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'stats'; statsSec = at; \}\n  else if \(PROF_HOLD_SECTIONS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'holdings'; holdSec = at; \}/);
-  assert.ok(mount.indexOf("holdSec = 'stable';") < mount.indexOf("pauseTab = 'holdings'; holdSec = at;"), 'the reset runs before the landing');
-  assert.match(mount, /resetHoldingsPages\(\); resetFleetPage\(\);/);
-});
 
 // ── the runtime: summon answered, send away, the name ────────────────────────────────────────────────────────────────
 

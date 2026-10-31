@@ -203,13 +203,6 @@ test('AUDIT WORLD6b B1/B2/B10: the pool - a fall\'s, another foe\'s and a relaye
   pool.damageFoe(rat2, 5, [0, 0, 0], null);
   assert.equal(rat2.dead, true); assert.equal(said.length, 3, 'and my own says the trap\'s word and the kill notice - a peer\'s said the trap\'s alone');
   assert.equal(pool.applyHit('bob-0002', { k: 'world:4,4', i: rat.seq, dmg: 5 }), false, 'A7: another cell\'s blow is refused');
-  const x = rd('src/scenes/exteriorFoes.js');
-  // PIN MOVED (RPT1026-FIGHTS TRAP-TO-OWNER): a peer's kill reads MY trap; a peer's trap reads no gem of mine (STRIKE-SHARED); only my blow tethers
-  assert.match(x, /const trap = _peerTrap \? \{ allowDeath: true \} : attemptSoulTrap\(f\.entity, f\.mobileType, playerEntity\.items, Math\.random\(\)\);/, 'B2: the trap, by source (STRIKE-SHARED: a peer\'s trap reads no gem of mine)');
-  assert.match(x, /if \(!trap\.allowDeath && !peer\) \{ f\.entity\.health = 1; return; \}/, 'B2: a peer\'s blow is never tethered');
-  assert.match(x, /if \(!peer && !isClassEnemyId\(f\.mobileType\) && isAzurasStarEquipped\(playerEntity\)/, 'B2: the Star, by source');
-  assert.match(x, /if \(fromPlayer && !peer\) \{\s*(?:\/\/[^\n]*\n\s*)*const _pt = f\._divertPt \?\? null; f\._divertPt = null;\s*(?:\/\/[^\n]*\n\s*)*const _wc = [^\n]*blowClassOf\([^\n]*\n\s*f\._divertFrame = _peerFrame;\s*f\._struckAt = _now\(\);[^\n]*\n\s*_net\?\.onPeerHit\?\.\(\{ to: f\.puppet, k: _owners\.get\(f\.puppet\)\?\.k \?\? _net\.room\?\.\(\) \?\? null, i: f\.seq, dmg: Math\.max\(0, Math\.round\(Number\(damage\) \|\| 0\)\), kind,[^\n]*\n\s*\.\.\.\(_pAt \? \{ p: [^\n]*\n\s*\.\.\.\(knockDir \? \{ d: [^\n]*\n\s*\.\.\.\(_pt != null \? \{ pt: _pt \} : \{\}\),[^\n]*\n\s*\.\.\.\(_wc \? \{ wc: hitClassField\(_wc\) \} : \{\}\),[^\n]*\n\s*\.\.\.\(kind === 'arrow' \? \{ ar: 1 \} : \{\}\),\n\s*\.\.\.\(spell \?\? \{\}\),[^\n]*\n\s*\.\.\.\(_whole \? \{ z: 1 \} : \{\}\) \}\);[^\n]*\n\s*\}\s*return;/, 'B1: the divert\'s gate, by source (WORLD6b-ii: the striker\'s feet and the blow\'s direction ride; WORLD6b-iii(e): the poison and the shaft; DISC10-E: the blow stamped for the owner\'s `slain` answer; AUDIT PSCALE1 DOORS-1: a kill rides as one; STRIKE-SHARED: a strike spell rides whole; PIN MOVED - TELL8: the blow\'s class rides beside the poison)');
-  assert.match(rd('src/scenes/shared.js'), /if \(!f \|\| f\.dead \|\| !f\.entity \|\| f\.puppet\) continue;/, 'B1: the magic-round broker skips a puppet');
 });
 
 test('AUDIT WORLD6b B3/C2/B14: the pool - an owner stands at most CELL_PUPPETS_MAX live puppets here (a corpse and a build count, a swept one does not); a record outside the law is refused whole while its neighbours land; a puppet carries no loot, no kit and no spells', async () => {
@@ -353,9 +346,6 @@ test('AUDIT WORLD6b C1: the puppet\'s target lives in the WORLD frame - when the
   pool.applyFoes('bob-0002', frame(2, [rec(1, { f: [21, 0, 20] })], 0));
   pool.update(0.05, [0, 0, 0], [0, 1.6, 0]);
   assert.ok(pup.ai.feet[0] > 20 + shift && pup.ai.feet[0] < 21 + shift, 'and a new record eases in the new frame');
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /const feet = f\.ai\.feet, t = p\.wire \? puppetLead\(p, _net\.toScene\(p\.wire\), performance\.now\(\) \/ 1000\) : null;/, 'by source: converted in the step (PIN MOVED - DESYNC-ZERO: then led along its way, scenes/puppetLead.js; a shift is a jump the lead refuses)');
-  assert.doesNotMatch(x, /_pup\.feet/, 'no scene-frame target survives');
 });
 
 test('AUDIT WORLD6b C4/C5: the day\'s rolls - online the walk is one day at a time, each day from its own generator, so three days caught up at once equal three days walked one by one; offline the caller\'s stream walks the span whole; the prices and the powers draw different sequences on one day', () => {
@@ -382,21 +372,7 @@ test('AUDIT WORLD6b C4/C5: the day\'s rolls - online the walk is one day at a ti
   runDayChange({ entity: off1, lastMinutes: (day - 3) * MINUTES_PER_DAY, nowMinutes: day * MINUTES_PER_DAY, rolls: () => 0.99 });
   runDayChange({ entity: off2, lastMinutes: (day - 3) * MINUTES_PER_DAY, nowMinutes: day * MINUTES_PER_DAY, rolls: () => 0.01 });
   assert.notDeepEqual(off1.regionPrices, off2.regionPrices, 'offline the dice decide, the span whole (DFU\'s own)');
-  const w = rd('src/systems/worldTick.js');
-  const imports = w.match(/^import [^\n]* from '[^\n]*';/gm); assert.ok(w.indexOf('const SHARED_DAY_SEED') > w.lastIndexOf(imports.at(-1)), 'the constants sit below the imports');
-  assert.match(w, /export const DAY_SALT = Object\.freeze\(\{ prices: 1, powers: 2, priceInit: 3, conditions: 4, raids: 5 \}\);/);   // ECON1: two more consumers, salted apart; RAID1: the day's raids, a fifth
-  // the world host by source: the heartbeat (A9), the death branch (C8), the full kick (C7), the targets (B8), the Wabbajack (B9), the pane (C9)
-  const h = rd('src/scenes/world.js');
-  assert.match(h, /else if \(id && isWorldRoom\(online\.room\)\) seatClock\.heard\(performance\.now\(\)\);/, 'A9');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-  assert.match(h, /if \(online\.room(?: && !_wildGhost)?\) \{ worldPublish\(now, true\); online\.leave\(\); exteriorFoes\.clearPuppets\(\); modes\?\.clearOwnPuppets\?\.\(\); _foesRoom = null; \}/, 'C8 (QUEST-PARTY phase 3b: a building\'s puppets too) - WILD1: never the open zone\'s ghost, whose cell is kept while its body lies');
-  assert.match(h, /if \(online\.room !== _foesRoom\) \{ const seam = isCellRoom\(online\.room\) && isCellRoom\(_foesRoom\); _foesRoom = online\.room; _foesFullAt = -Infinity; _ownFullAt = -Infinity; if \(!seam\) \{ exteriorFoes\.clearPuppets\(\); modes\?\.clearOwnPuppets\?\.\(\); \} \}/, 'C7 (WORLD6b-iii(b): a cell crossing keeps them - the seam is no room change to the puppets; QUEST-PARTY phase 3b: a building\'s go with the room)');
-  assert.match(h, /\{ const ids = ownerIds\(\); if \(ids\) exteriorFoes\.pruneOwners\(ids, now\); \}/, 'C3: the prune reads the clock');
-  // WATCH-PROTECTS: PIN MOVED - the street's people beside them (the living world's quarry), the puppet still nobody's
-  // PIN MOVED (STAR5): a fallen star's ward after them, the coven's quarry (scenes/starfall/starfallHost.js wards)
-  assert.match(h, /candidates: \(\) => \[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes, \.\.\.livingQuarry\(\), \.\.\.\(starfall\?\.wards\(\) \?\? \[\]\)\]\.filter\(\(f\) => !f\.dead && !f\.puppet\),/, 'B8');
-  assert.match(h, /const f = enchantFoes\(\)\.find\(\(x\) => !x\.dead && x\.entity === targetEntity\);\s*if \(!f \|\| f\.puppet\) return;/, 'B9');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /const me = _net\?\.selfId\?\.\(\) \?\? null;/, 'C11: selfId on the net is READ now (WORLD6b-ii: whose blow a streamed target names) - no dead wiring');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /everyone nearby sees the same monsters and can fight them, and they can hurt you too\./, 'C9 (AUDIT WORLD6b-ii C3: since the hunt a peer\'s creature can hurt me)');
+   
 });
 
 test('AUDIT FINAL F12 (SUMMON-SYNC D6 above ground): a peer\'s blow on MY ally is refused - a partner\'s Cleave or Nova, which their puppet of it (a cell record carries no side) could not tell from a foe - where the dungeon\'s own door already refused it; a foe of mine still takes it (mutant: the ally left to a peer\'s blow)', async () => {

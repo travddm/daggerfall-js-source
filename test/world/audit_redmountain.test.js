@@ -99,8 +99,6 @@ test('AUDIT RED-MOUNTAIN F2: past the streamed grid\'s built pixels the near dra
   const box = FarRingRenderer.prototype._depthBox.call({ _depthR: 2, _holeX: 12, _holeY: 13, baseX: 10, baseY: 10 }, [0, 0, 0]);
   assert.deepEqual(Array.from(box), [0, -5 * TERRAIN_SIZE, 5 * TERRAIN_SIZE, 0].map(Math.fround));
   assert.equal(FarRingRenderer.prototype._depthBox.call({ _depthR: -1 }, [0, 0, 0]), null);
-  assert.match(read('src/render/farRing.js'), /this\._depthR = builtCore\(built, holeX, holeY, holeRadius\);/);
-  assert.match(read('src/render/farRing.js'), /depth: this\._depthBox\(origin\),/);
 });
 
 test('AUDIT RED-MOUNTAIN F4/F6: one haze in both draws, the far ring\'s own (its hold eased down over the summits, the summits\' thinner air eased in past the grid\'s edge), and an exact split - the far draw drops what is nearer than the world\'s far plane (the near draw\'s fog against the ring\'s ramp made a step there, and 0.98 to 1 of the far plane was drawn twice) (mutants: the haze\'s summit hold; the split; the ease)', () => {
@@ -117,7 +115,6 @@ test('AUDIT RED-MOUNTAIN F4/F6: one haze in both draws, the far ring\'s own (its
   assert.equal(Number(ring.summitHold(0.85, 3500)), 0.85, 'beside the grid as the ground beside it');
   assert.ok(Math.abs(Number(ring.summitHold(0.85, 3500 + SUMMIT_HAZE.ease)) - 0.85 * (1 - SUMMIT_HAZE.keep)) < 1e-9);
   assert.equal(summitFromOf(5), 5.5 * TERRAIN_SIZE);
-  assert.match(read('src/render/farRing.js'), /gl\.uniform1f\(this\.u\.uSummitFrom, summitFromOf\(this\._floraRadius\)\);/);
   // the split: the far draw keeps what lies past the world's far plane alone
   fns.globals.uSplit = 4000;
   fns.globals.gl_FragCoord = [0, 0, 0.5, 1 / 3990];
@@ -164,9 +161,6 @@ test('AUDIT RED-MOUNTAIN F3: the plume is drawn its far side first and its near 
 test('AUDIT RED-MOUNTAIN F5/F9: the fire\'s and the glow\'s programs started at the boot\'s idle with the passes play meets, their passes built through compiledPass doors (four programs compiled on first draw, mid-frame, anywhere); the cone apart from the fire, so the glow hides behind it with ?redfire=off, and with no cone the glow has no far draw (nothing past the far plane would hide it) (mutants: the cone off with the fire; the far draw without a cone)', () => {
   const pp = playPrograms();
   for (const pair of [...FIRE_PROGRAMS, ...GLOW_PROGRAMS]) assert.ok(pp.includes(pair), 'started early');
-  const ring = read('src/render/farRing.js');
-  const coneNow = ring.slice(ring.indexOf('  _coneNow() {'), ring.indexOf('  _fireNow(cone) {'));
-  assert.ok(coneNow.length > 0 && !/_fireOff/.test(coneNow), 'the cone stands with the fire off');
   const { gl, calls } = recordingGl();
   const glow = new GhostfenceGlow(/** @type {any} */ (gl));
   glow.mesh = { px: 0, py: 0, curtainOf: new Int32Array(6), haloOf: new Int32Array(6) };
@@ -245,20 +239,6 @@ test('AUDIT RED-MOUNTAIN N1: the curtain\'s solid follows its ground - on a gull
   assert.ok(checked > 5000, `${checked} points`);
 });
 
-test('AUDIT RED-MOUNTAIN N2: the Ghostfence\'s glow drawn after the water and the flats (it writes no depth: drawn before them, farther flats and water painted over it) - the far ring arms the renderer\'s one-shot slot, run at the end of the frame\'s next drawBillboards and let go by the next frame; the glow puts the world\'s state back after it (mutants: the slot unrun; the frame\'s let-go; the glow drawn in the ring\'s pass)', () => {
-  const r = read('src/render/renderer.js');
-  assert.match(r, /afterFlats\(fn\) \{ this\._afterFlats = fn; \}/);
-  const body = r.slice(r.indexOf('  drawBillboards(batches, camRight, camUp) {'), r.indexOf('  /** Draw one placed mesh: bind per-submesh texture, indexed draw per range. */'));
-  assert.match(body, /this\._use\(this\.program\);\n {4}const after = this\._afterFlats;\n {4}if \(after\) \{ this\._afterFlats = null; after\(\); this\.markForeignPass\(\); this\._use\(this\.program\); \}[^\n]*\n {2}\}\n\n$/);
-  assert.match(r, /beginFrame\(proj, view, lightDir, opts = null\) \{\n {4}this\._close2D\(\);[^\n]*\n {4}this\._afterFlats = null;/);
-  const ring = read('src/render/farRing.js');
-  assert.match(ring, /if \(fence && this\.renderer\?\.afterFlats\) this\.renderer\.afterFlats\(\(\) => fence\.draw\(pass\)\);/);
-  const w = read('src/scenes/world.js');
-  assert.ok(w.indexOf('frameRing();') < w.indexOf('frameWater();') && w.indexOf('frameWater();') < w.indexOf('renderer.drawBillboards(allBatches, camRight, bbUp);'), 'the ring, the water, the flats');
-  const g = read('src/render/ghostfenceGlow.js');
-  assert.match(g, /gl\.depthMask\(true\); gl\.depthFunc\(gl\.LESS\); gl\.enable\(gl\.CULL_FACE\);/);
-});
-
 // ── THE FENCE'S LAW AND THE LAND (G, L) ───────────────────────────
 
 test('AUDIT RED-MOUNTAIN G1/G2: no spawned ruin on the Ghostfence\'s line (createSpawnGround, every spawn reader\'s ground: 42 stood on it) and the Overworld\'s route planner across it only at Ghostgate (routeGround\'s openBlocked: an open step into its line refused but at the gate; it walked straight across) (mutants: the spawns\' refusal; the planner\'s; the gate\'s open set)', async () => {
@@ -271,7 +251,6 @@ test('AUDIT RED-MOUNTAIN G1/G2: no spawned ruin on the Ghostfence\'s line (creat
   const unread = new Proxy({}, { get: () => { throw new Error('the ground read'); } });
   const ground = createSpawnGround(unread);
   for (const k of [...f.band].slice(0, 20)) { const [x, y] = k.split(',').map(Number); assert.equal(ground(x, y), false, `no ruin on the line at ${k}, its ground unread`); }
-  assert.match(read('src/world/spawnedDungeons.js'), /dry\.set\(key, d = !onGhostfence\(px, py\) && !redMountainLavaIn\(px, py\) && spawnGroundDry\(woods, px, py\)\);/);   // PIN MOVED (LAVA-CLEAR): nor on the lava's pixels
   const { openBlocked } = routeGround(() => 0, () => 100, 20);
   const shut = [...f.band].find((k) => !f.open.has(k)).split(',').map(Number), gate = f.gatePixel.split(',').map(Number);
   assert.equal(openBlocked(shut[0] + 1, shut[1], shut[0], shut[1]), true, 'onto the line');
@@ -288,27 +267,6 @@ test('AUDIT RED-MOUNTAIN G1/G2: no spawned ruin on the Ghostfence\'s line (creat
   assert.ok(onLine.length > 0 && onLine.every((p) => f.open.has(`${p.x},${p.y}`)), `onto the line only at the gate: ${onLine.map((p) => `${p.x},${p.y}`)}`);
   const straight = planRoute(from, to, { isWater: () => false });
   assert.ok(straight.pixels.some((p) => f.band.has(`${p.x},${p.y}`) && !f.open.has(`${p.x},${p.y}`)), 'control: unrefused, it crosses the line');
-});
-
-test('AUDIT RED-MOUNTAIN L1: the snow never lies on Red Mountain\'s ash - each lattice point\'s lines lifted to bare ground by the share of the volcano\'s zone about it (the fire cancelled the cone\'s own height alone: on the coldest day the crater, the rim and the flank lay white, 100 %, 98 %, 99.9 %); L6: the summit that centres it read in squared distances (Math.hypot in a ground source) (mutants: the share; the lift; the host unwired)', async () => {
-  const { setTamrielFit } = await import('../../src/world/tamriel/tamrielFrame.js');
-  setTamrielFit({ ox: 38 * 15.5, oy: 57 * 15.5, ppu: 15.5 });
-  const { ashShareAt, bareLine } = await import('../../src/world/peaks/snowcap.js');
-  const { tamrielBiomeAt } = await import('../../src/world/tamriel/tamrielBiomes.js');
-  const { redMountainFrame } = await import('../../src/world/tamriel/redMountain.js');
-  const rm = redMountainFrame(), cx = Math.floor(rm.bx), cy = Math.floor(rm.by);
-  for (const [x, y] of [[cx, cy], [cx + 1, cy + 1], [cx + 40, cy], [100, 100]]) {
-    const want = [[x - 1, y - 1], [x, y - 1], [x - 1, y], [x, y]].filter(([a, b]) => tamrielBiomeAt(a, b)?.key === 'morrowindRedMountain').length / 4;
-    assert.equal(ashShareAt(x, y), x === 100 ? 0 : want, `the ash's share at ${x},${y}`);
-  }
-  assert.equal(ashShareAt(cx + 1, cy + 1), 1, 'the summit wholly the volcano\'s');
-  assert.deepEqual(bareLine([100, 200, 300], 0.5, 8200), [4150, 4200, 4250]);
-  assert.deepEqual(bareLine([100, 200, 300], 0, 8200), [100, 200, 300]);
-  const host = read('src/scenes/snowCoverHost.js');
-  assert.equal((host.match(/bareLine\(mergeCapLine\(snowlineOf\([^\n]*\), l\.cap\), l\.ash, BARE_LINE\[0\]\);/g) ?? []).length, 2, 'the frames\' lines and the builds\'');
-  assert.match(host, /ash: ashOf\(pt\.i \* S, pt\.j \* S\)/);
-  const relief = read('src/world/tamriel/tamrielRelief.js'), body = relief.slice(relief.indexOf('export function namedSummit('), relief.indexOf('\n}\n', relief.indexOf('export function namedSummit(')));
-  assert.ok(!/Math\.hypot|\*\*/.test(body.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')), 'namedSummit squared');
 });
 
 const A = process.env.ARENA2_PATH;

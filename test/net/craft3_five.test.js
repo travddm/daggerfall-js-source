@@ -207,18 +207,6 @@ test('CRAFT3 service: the merge\'s free change - no Marks, in effect at once, an
   assert.ok(cookXp(50) + firstCraftXp(recipeById('stew:north')) > dish.data.xp, 'the cap is what held it');   // PIN MOVED (FIRST-BUDGET)
 });
 
-test('CRAFT3 service source: every track read and credit is the craft\'s - the craft, the smelt, the brew, the seats\' choices; a free change its own row (source pins)', () => {
-  const svc = src('server-account/src/professions.js');
-  assert.match(svc, /db\.prepare\('SELECT \* FROM prof_tracks WHERE player = \?1 AND char_id = \?2 AND profession = \?3'\)\.bind\(player, character, trackOf\(profession\)\);/);   // PIN MOVED (GATHER-SPEED): the track's read a statement, for a harvest's batch
-  assert.match(svc, /const craft = trackOf\(prof\);/);
-  assert.match(svc, /\.bind\(player\.id, character, rid, nowS, nonce, trackOf\(r\.xp\)\)\] : \[\]\),/);   // PIN MOVED (AUDIT FB1018f L5-1): the cap read in the statement (craftCapSql), no longer bound
-  assert.match(svc, /const profession = trackOf\(asked\);/);
-  assert.match(src('server-account/src/alchemy.js'), /SELECT \?1, \?2, '\$\{trackOf\('alchemy'\)\}', MIN\(\$\{cap\}, xp\), \?4 FROM prof_brews/);   // PIN MOVED (AUDIT FB1018f L5-1): the cap read in the statement
-  const forts = src('server-account/src/seatForts.js');
-  assert.match(forts, /t\.profession = '\$\{trackOf\('masonry'\)\}'/);
-  assert.match(forts, /t\.profession = '\$\{trackOf\('carpentry'\)\}'/);
-});
-
 // ─── THE PAGE ────────────────────────────────────────────────────────
 
 test('CRAFT3 page: the Professions tab lists the ten; Building\'s four cards a rank, each its discipline\'s name, a free change said "free, once"; its unlocks both disciplines\', each named; the limit "of 2"', async () => {

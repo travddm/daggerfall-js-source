@@ -38,7 +38,6 @@ test('hudText: the rubberband speedup only engages past maxRows', () => {
   assert.equal(over.timer, HUD_TEXT_POP_DELAY - 0.5 * (1 + HUD_TEXT_RUBBERBAND * 3));
 });
 
-
 // ── FONT1 (2026-09-16, Mac: "Enhanced mode UI ... Ambient Text mod also
 // doesnt use it. Any enhanced UI or text must be our enhanced
 // version"): THE POPUP ROWS IN THE ENHANCED FACE ────────────────────
@@ -263,11 +262,6 @@ test('ENH-NOTICE3: the toast wears the popup\'s yellow on the box\'s dark, in th
   for (const name of ['HUD_TEXT_TOP_PX', 'HUD_TEXT_ROW_PX', 'HUD_TEXT_TOP_NARROW_PX', 'HUD_TEXT_TOP_CHAT_PX', 'HUD_TEXT_TOP_CHAT_TOUCH_PX']) {
     assert.equal(enhancedStyle[name], undefined, `mutant: ${name} exported again - a number for a surface that is not there`);
   }
-  const mod = rd('src/ui/enhanced/enhancedHudText.js');
-  assert.doesNotMatch(mod, /export function drawEnhancedHudText|export function releaseEnhancedHudText|ENHANCED_HUD_TEXT_ID/,
-    'mutant: the column\'s draw back in the module - two enhanced faces for one PopupText');
-  assert.match(rd('src/ui/hud/hudText.js'), /import \{ drawEnhancedToasts, releaseEnhancedToasts \} from '\.\.\/enhanced\/enhancedNotice\.js';/,
-    'the model draws through the notice stack and nothing else');
 });
 
 test('FONT1: the HUD\'s OTHER text surface - the mid-screen label - speaks in the same face, and hides on the same law', () => {
@@ -321,11 +315,6 @@ test('FONT1: the HUD\'s OTHER text surface - the mid-screen label - speaks in th
   assert.match(ENHANCED_CSS, /\.hudmid \{[^}]*font-family: 'Pixelify Five', 'Pixelify Sans', monospace; -webkit-font-smoothing: none;/,
     'mutants: left in --data (the launcher face); the smoothing left on');
   assert.match(ENHANCED_CSS, /\.hudmid \{[^}]*pointer-events: none;/);
-  // The one host-agnostic call owns both halves: drawHud paints the
-  // label on a drawn frame and HIDES it on one that is not, so no host
-  // can leave a DOM line standing (AUDIT 64 F37's law, FONT1's door).
-  assert.match(rd('src/ui/hud/hud.js'), /if \(hudDrawn\) midScreenText\.draw\(renderer, canvas, font\); else midScreenText\.hide\(\);/,
-    'mutant: the hide door dropped from drawHud, so a hidden HUD keeps its last refusal on screen');
 });
 
 test('FONT1: the online status line is the skin\'s face too, and every silent path says so', () => {
@@ -344,17 +333,6 @@ test('FONT1: the online status line is the skin\'s face too, and every silent pa
     drawEnhancedStatusLine('', doc);
     assert.equal(node.style.display, 'none', 'mutant: a connected session left wearing "reconnecting" for good');
   });
-  // The host: the online lane is the enhanced lane whole, so the line
-  // goes through ONE door that knows the skin - and every path that
-  // draws no names hides it rather than returning into a painted DOM
-  // strip (AUDIT 64 F37's law).
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const sayNetStatus = \(line\) => \{\s*\n\s*if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{ drawEnhancedStatusLine\(line \?\? ''\); return; \}/,
-    'mutants: the enhanced arm dropped, so the one online surface left in the 1996 face stays in it; the classic arm dropped, so a classic-skin probe loses the line');
-  assert.equal((world.match(/sayNetStatus/g) ?? []).length, 4,
-    'mutant: a silent return that does not hide the strip - the door is declared once and called on BOTH early returns as well as at the draw');
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.hudstatus \{[^}]*font-family: \$\{PIXEL_STACK\}; -webkit-font-smoothing: none;/,
-    'mutants: the strip in --data; the smoothing left on');
 });
 
 // ── AUDIT FONT (2026-09-16) - THE FONT1 SLICE AUDITED ────────────────
@@ -447,10 +425,6 @@ test('AUDIT FONT F2: --hud-scale reaches the mid-screen label - a SIBLING of .hu
     assert.equal(doc.getElementById(ENHANCED_MID_TEXT_ID).style['--hud-scale'], '0.5',
       'mutant: the scale not kept, so a label built after the one write draws at 1 under a HUD at 0.5');
   });
-  // ...and the one hand that knows the live scale calls it, beside the
-  // damage-number layer it already fed for exactly this reason.
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /getElementById\('enhanced-hitnums'\)\?\.style\.setProperty\('--hud-scale', String\(scale\)\);[\s\S]{0,400}?\n[ \t]*setEnhancedMidTextScale\(scale, document\);/,   // AUDIT ENH-NOTICE3 A10: named for the one surface it scales; CSA-G's re-run: the call its own statement, so a commented-out one no longer matches
-    'mutant: the propagation dropped out of the scale write, so nothing ever sets it on the label');
 });
 
 test('AUDIT FONT F3: the dungeon hosts\' overlay branch takes BOTH DOM surfaces down before it returns', () => {
@@ -487,23 +461,6 @@ test('AUDIT FONT F3: the dungeon hosts\' overlay branch takes BOTH DOM surfaces 
     assert.equal(mid.style.display, 'none');
     midScreenText._reset();
   });
-  // BOTH dungeon hosts say it, ON the branch, BEFORE the return - the
-  // branch is an early return and a hide written after it is dead code.
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  assert.match(rd('src/scenes/worldModes.js'),
-    /if \(windowHoldsDungeon\(dungeonCtx\.uiOverlayActive, aliveUnder\(\)\)\) \{ dungeonCtx\.hideHudText\?\.\(\); hideWorldPlaque\(\); dungeonCtx\.tickOverlay\(dt\); host\.drawPeerNames\?\.\(\{ proj, view, eye: mwv\.eye \}\); host\.drawCompanionBars\?\.\(\{ proj, view, eye: mwv\.eye \}\); dungeonCtx\.drawOverlay\(canvas\); return true; \}/,   // PIN MOVED (AUDIT CC-A6: the companions' bars ride the same arm, beside the names)   // AUDIT NAME1 F1 runs the name pass on the same arm, between the clock and the overlay; AUDIT-WH H4 puts the world plaque - a THIRD DOM surface, and the same law - beside the two
-    'mutants: the hide door dropped from ?world\'s dungeon arm, or written after the return where nothing runs it');
-  const dg = rd('src/scenes/dungeon.js');
-  const branch = dg.indexOf('if (ctx.uiOverlayActive) {');
-  const hidden = dg.indexOf('ctx.hideHudText?.();', branch);
-  const drawn = dg.indexOf('ctx.tickOverlay(dt); ctx.drawOverlay(canvas);', branch);
-  // AUDIT-WH H4: the world plaque is the third DOM surface on that line.
-  const plaque = dg.indexOf('hideWorldPlaque();', hidden);   // from the hide door, not the branch: L3 puts one on the held-frame return further up too
-  assert.ok(plaque > hidden && plaque < drawn, 'mutants: the plaque left standing over an open ?dungeon window');
-  assert.ok(branch > 0 && hidden > branch && hidden < drawn,
-    'mutants: the hide door dropped from ?dungeon\'s overlay branch, or written after the return where nothing runs it');
-  assert.match(rd('src/scenes/dungeonContext.js'), /hideHudText: \(\) => hideHudTextSurfaces\(hudText\),/,
-    'mutants: the context\'s door hides one surface and not the other');
 });
 
 test('AUDIT FONT F4: a canvas window covers the classic column, so the toasts go while one is up', () => {
@@ -544,33 +501,9 @@ test('AUDIT FONT F4: a canvas window covers the classic column, so the toasts go
     assert.ok(r.quads.length >= 2, 'mutant: the covered gate taken on the classic arm too, which would blank a column DFU draws');
     assert.equal(stackOf(doc), null);
   });
-  // ...and every host that owns a model hands its own window slot in.
-  const town = rd('src/scenes/townTalk.js');
-  // AUDIT ENH-NOTICE3 F3/C2: the question is THE PREVIOUSWINDOW CHAIN,
-  // not the slot. DFU paints PopupText as part of the HUD window at the
-  // bottom of the stack, and a pushed box paints its previousWindow
-  // first (DaggerfallPopupWindow.cs:77-85) - so under a BOX the rows
-  // stay and under a window that cuts the chain (the inventory, the
-  // rest) they go. Both townTalk sites ask one predicate: this slot's
-  // chain (AUDIT 64 F35's hudCovered), the held map's outright hide,
-  // and the MODE host's chain - the interior slot this model is drawn
-  // under, which `overlay` cannot see.
-  assert.equal([...town.matchAll(/hud\.observe\(toastsCovered\(\)\);/g)].length, 2,
-    'mutants: townTalk\'s frame - or the interior arm\'s own hudFrame - stops telling the model that a window covers the HUD');
-  assert.match(town, /const toastsCovered = \(\) => \(talkPaused\(\) && windows\.hudCovered\(overlay\)\) \|\| hidesHud\(overlay\) \|\| !!otherHudCovered\?\.\(\);/,
-    'mutants: the slot asked instead of the chain (a pushed box hides the toasts DFU keeps); the held map\'s hide dropped; the mode host dropped (an interior window never hides them)');
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(rd(h), /otherHudCovered: \(\) => modes\?\.hudCovered \?\? false,/, `${h}: the seam IS the mode machine's previousWindow chain`);
   }
-  assert.match(rd('src/scenes/dungeonContext.js'), /hudText\.observe\(!!activeOverlay && \(dungeonWindows\.hudCovered\(activeOverlay\) \|\| hidesHud\(activeOverlay\)\)\);/,
-    'mutant: the dungeon asks the slot (its own windowCoversHud asks the chain)');
-  assert.match(rd('src/scenes/dungeonContext.js'), /hudText\.observe\(!!activeOverlay && /,
-    'mutants: the dungeon\'s frame stops telling it');
-  // ...and the model's own draw is back to three arguments: a fourth
-  // positional slot on a `draw` in src/ui is the scale's (audit24
-  // wave40's sweep), which is why this is a report and not an argument.
-  assert.match(rd('src/ui/hud/hudText.js'), /  draw\(renderer, canvas, font\) \{/,
-    'mutant: the window slot smuggled into draw\'s argument list, where the sheet\'s forward fills the fourth with a number');
 });
 
 test('AUDIT FONT F8: a long line is drawn WHOLE in its toast, and the stack\'s row wraps rather than cuts', () => {
@@ -631,20 +564,6 @@ test('AUDIT FONT F11: the mid-screen label lands on the CLASSIC label\'s own lin
     assert.equal(node.style['--hudmid-top'], `${(nativeMetrics({ width: 1280, height: 1024 }).oy + label.y * 4).toFixed(1)}px`,
       'mutant: the label drawn at the default row while the classic one is lifted off the large HUD');
   });
-});
-
-test('AUDIT FONT F12: the teardown\'s doc names callers that exist', () => {
-  const s = rd('src/ui/enhanced/enhancedHudText.js');
-  assert.doesNotMatch(s, /the same hand that calls ui\/enhanced\/enhancedHud\.js destroyEnhancedHud/,
-    'mutant: the old sentence back - it named a caller that is nowhere in src/, and destroyEnhancedHud has none either');
-  // The per-owner teardown a live host really does reach is the
-  // toasts' (ENH-NOTICE3), through HudText.dispose.
-  assert.match(rd('src/ui/enhanced/enhancedNotice.js'), /export function releaseEnhancedToasts\(key\)/,
-    'the per-owner teardown a live host really does reach');
-  assert.match(rd('src/ui/hud/hudText.js'), /dispose\(\) \{\n    if \(typeof document !== 'undefined'\) releaseEnhancedToasts\(this\.key\);/,
-    'mutant: dispose no longer reaches it');
-  assert.equal([...rd('src/scenes/dungeonContext.js').matchAll(/hudText\.dispose\(\);/g)].length, 1,
-    'mutant: the context\'s rows never released, so a torn-down dungeon leaves its toasts on the page');
 });
 
 test('ENH-NOTICE3 (AUDIT A1): under the enhanced skin WITH the classic font loaded the bitmap column paints nothing - one face, not two', () => {

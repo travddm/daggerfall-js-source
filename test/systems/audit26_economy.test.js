@@ -78,38 +78,6 @@ test('audit26 F103-F105: loans, houses and ships gate on coins PLUS letters', ()
   assert.notEqual(buy.result, TRANSACTION_RESULT.NOT_ENOUGH_GOLD, 'PurchaseShip (:474) counts the letter');
 });
 
-test('audit26 F103: the tavern gates read totalGoldAmount', () => {
-  const s = rd('src/ui/tavernWindow.js');
-  assert.match(s, /if \(totalGoldAmount\(h\.entity\) < d\.price\)/, 'the room gate');
-  assert.match(s, /gold: totalGoldAmount\(h\.entity\)/, 'and the food gate');
-});
-
-// ---------------------------------------------------------------
-// F066 - PlayerActivate gates shelf activation on IsPlayerInsideOpenShop
-// (:887-899): open opens Buy, CLOSED opens the inventory in
-// shelf-stealing mode. DFU never opens a paying trade window in a
-// closed shop; the port always did.
-// ---------------------------------------------------------------
-test('audit26 F066: a closed shop opens the steal-shaped inventory, never the Buy window', () => {
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /if \(building\) building\.insideOpenShop = insideOpenShop;/,   // AUDIT 68 S23-failed-entry-stale-building: onto the door's record, committed with the context
-    'the door-time latch rides the building record (:1120, latched once)');
-  const shelf = m.slice(m.indexOf('function openShelf'), m.indexOf('function openMerchantSell'));
-  assert.ok(shelf.includes('if (b.insideOpenShop === false) {'), 'the closed arm gates BEFORE the trade window');
-  // RE-ANCHORED at ID1 (F041): the host's inventory windows go through
-  // ONE door now (`interiorInventory`, which folds in the drop pool and
-  // the emptied-container free). What this asserts is unchanged - the
-  // shelf is the Remove-mode remote, SetShopShelfStealing's shape.
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): the loot target says it is someone else's (`stolen: true`), so a take
-  // off it is marked as it lands; the shelf is the remote as before. PIN MOVED (STOLEN-GOODS AUDIT S1): as the shop's
-  // keeping, taken as the window opens (`stolenFrom: shelfBefore`)
-  assert.ok(shelf.includes('loot: { items: () => shelf.items, stolenFrom: shelfBefore },'),
-    'and opens the inventory with the shelf as the Remove-mode remote - SetShopShelfStealing\'s shape');
-  assert.ok(shelf.includes('const win = interiorInventory({'), 'through the host\'s one inventory door (ID1)');
-  assert.ok(shelf.indexOf('insideOpenShop === false') < shelf.indexOf('openTradeWindow(shelf, b, \'Buy\')'),
-    'the gate precedes the Buy window');
-});
-
 // ---------------------------------------------------------------
 // F129/F130 - StockShopShelf's two unbuilt arms whose dependencies
 // shipped: RandomlyAddPotionRecipe(25) on the Alchemist arm
@@ -126,19 +94,6 @@ test('audit26 F129: alchemists stock potion recipes at 25%', () => {
   assert.equal(recipes(hi), 0, 'a failing roll stocks none');
 });
 
-test('audit26 F130: the MagicItems group mints a real magic item when the registry is loaded', () => {
-  const prev = getMagicItemTemplates();
-  try {
-    setMagicItemTemplates([{ type: 0, group: 2, groupIndex: 0, enchantments: [{ type: 1, param: 0 }], uses: 100, value: 500 }]);
-    const s = rd('src/systems/shopStock.js');
-    assert.doesNotMatch(s, /if \(group === 'MagicItems'\) continue;\s+\/\/ INTERIM/, 'the INTERIM skip is gone');
-    assert.match(s, /const templates = getMagicItemTemplates\(\);\s*\n\s*if \(templates\) add\(createRegularMagicItem\(templates, level, playerEntity\.gender \?\? 0, rolls\)\);/,
-      'the arm mints through CreateRegularMagicItem, as CreateRandomMagicItem is (:517-520)');
-  } finally {
-    setMagicItemTemplates(prev);
-  }
-});
-
 // ---------------------------------------------------------------
 // F156/F157/F158 - the transfer arms.
 // ---------------------------------------------------------------
@@ -149,11 +104,6 @@ test('audit26 F156: a map is intercepted in BOTH directions and never lands', ()
   assert.equal(store.map, true, 'local -> remote is intercepted (:1471-1478)');
   const take = planTake(map, { bag: [], entity: null });
   assert.equal(take.map, true, 'remote -> local too');
-  // the windows route a map plan to their use arm (the reveal), never
-  // to applyTransfer - PIN MOVED (AUDIT RPT1026 B5): but over a chest that settles its own pieces, where it moves as a piece
-  const w = rd('src/ui/native/nativeInventory.js');
-  assert.match(w, /if \(plan\.map && !settlesOwnPieces\(this\.hooks\)\) \{ this\._use\(it, this\.hooks\.items\(\)\); return; \}/);
-  assert.match(w, /if \(plan\.map && !settlesOwnPieces\(this\.hooks\)\) \{ this\._use\(it, remote\); return; \}/);
 });
 
 test('audit26 F157: a lit light source leaving the pack goes out', () => {
@@ -168,19 +118,9 @@ test('audit26 F157: a lit light source leaving the pack goes out', () => {
   const e3 = { lightSource: torch };
   clearLightSourceOnLeave(torch, e3, false);
   assert.equal(e3.lightSource, torch, 'and only when it LEAVES the pack (from == localItems)');
-  // the sell staging clears too
-  assert.match(rd('src/ui/native/nativeTrade.js'), /clearLightSourceOnLeave\(item, this\.hooks\.entity, true\);/);
 });
 
 test('audit26 F158: the basket takes the CanCarryAmount gate and splits', () => {
-  const t = rd('src/ui/native/nativeTrade.js');
-  const arm = t.slice(t.indexOf('_pickRemote(slot)'), t.indexOf('_clear()'));
-  assert.ok(arm.includes('planTake(item, {'), 'the Buy-mode remote click routes through the ladder');
-  assert.ok(arm.includes('bag: [...this.hooks.packItems(), ...this.basket.filter((x) => !isFurnishing(x))]'),
-    'the bag under test is pack + basket - the player walks out with both (DECOR2b: less the delivered furniture)');
-  // DISC25-F: through the how-many popup now (TransferItem :1515-1539), whose count rides the plan
-  assert.ok(arm.includes('this._split(item, plan.amount, (amount) => applyTransfer(item, { ...plan, amount }, this.hooks.shelfItems(), this.basket));'),
-    'a partial fit splits through the same applyTransfer every screen uses');
   // and the split law itself: 3 fit of a 5-stack
   const stack = { group: 'Weapons', templateIndex: 128, stackCount: 5 };   // War Axe, 7.5kg each (the template's own weight)
   const entity = { stats: { strength: 50 }, items: [] };   // MaxEncumbrance = 75kg

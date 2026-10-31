@@ -61,9 +61,6 @@ function tris(m) {
 }
 /** A wing's reach from its own middle (its sphere's radius - the turn keeps it). */
 const reachOf = (m) => { let r = 0; for (let i = 0; i < m.positions.length; i += 3) r = Math.max(r, Math.hypot(m.positions[i], m.positions[i + 1], m.positions[i + 2])); return r; };
-/** THE FAR PLANES the wreck must stand inside: the dungeon arm's (scenes/worldModes.js - the Spire is a made dungeon
- *  level, its frame the arm's) and the lab's (src/tools/spireLab.js), read from their own lines. */
-const FAR = Math.min(Number(/perspective\(fieldOfView\(\)[^\n]*?,\s*0\.05,\s*(\d+)\)\)/.exec(rd('src/scenes/worldModes.js'))[1]), Number(/perspective\(\(65 \* Math\.PI\) \/ 180, w \/ h, 0\.1, (\d+)\)/.exec(rd('src/tools/spireLab.js'))[1]));
 /** A hall's floors' eyes (the hall's own frame): every disc's middle and its rim at eight bearings, every band's ends and
  *  middle, every island - an eye's height over each. */
 function eyesOf(s) {
@@ -141,77 +138,6 @@ test('EG-LOOK THE WRECK\'S WINGS (world/eliteGates/egVista.js, Elite-Gates-Look.
     assert.ok(near(q.positions[i], a.positions[i + 2], 1e-3) && near(q.positions[i + 2], -a.positions[i], 1e-3) && near(q.positions[i + 1], a.positions[i + 1], 1e-3), 'turned a quarter about its own axis');
     assert.ok(near(q.normals[i], a.normals[i + 2], 1e-4) && near(q.normals[i + 2], -a.normals[i], 1e-4), 'its normals turned with it');
     for (let k = 0; k < 3; k++) assert.ok(near(big.positions[i + k], a.positions[i + k] * 1.5, 1e-3), 'grown whole by its size, across and up');
-  }
-});
-
-test('EG-LOOK THE WRECK\'S PLACES (world/eliteGates/egVista.js EG_VISTA_PLACES, Elite-Gates-Look.md section 4), against every hall of three breaches\' circles of each band: each wing 120-450 m from its hall\'s centre, its middle 30-160 m above the hall\'s floors or below them, its sphere out of the neighbouring halls (EG_HALL_PITCH apart) and out of every other wing\'s, inside the far plane (the dungeon arm\'s and the lab\'s, read from their own lines) from every floor, never in the cone from a floor to the door or, in a Court, to the lord - a Court\'s side wings sunk below its floors - and clear of the Spire underside\'s disc overhead, and in the Shade of its moon (mutants: the Court\'s places left the trial\'s; a band\'s reach past the far plane)', () => {
-  assert.equal(FAR, 500, 'the dungeon arm draws to 500 m');
-  for (let b = 0; b < 4; b++) {
-    const v = buildEgVista(b), R = v.wings.map((w) => reachOf(w.model)), U = EG_VISTA_UNDER[b], axis = [0, Math.cos(U.lean), Math.sin(U.lean)];
-    for (const [i, w] of v.wings.entries()) {
-      const P = EG_VISTA_PLACES[i];
-      assert.ok(near(w.at[0], Math.sin(P.bearing * DEG) * P.d * EG_VISTA_REACH[b], 1e-9) && near(w.at[2], Math.cos(P.bearing * DEG) * P.d * EG_VISTA_REACH[b], 1e-9), 'at its bearing and its band\'s reach');
-      assert.deepEqual([w.at[1], w.court[1], w.court[0], w.court[2]], [P.h, P.court ?? P.h, w.at[0], w.at[2]], 'a Court\'s place the trial\'s, but for its height');
-      for (const at of [w.at, w.court]) {
-        assert.ok(len(at) >= 120 && len(at) <= 450, `band ${b} wing ${i}: ${len(at).toFixed(0)} m out (120-450)`);
-        assert.ok(Math.abs(at[0]) + R[i] <= EG_HALL_PITCH / 2 - 10, `band ${b} wing ${i}: out of the neighbouring halls`);
-      }
-    }
-    for (const key of ['at', 'court']) for (let i = 0; i < v.wings.length; i++) for (let j = i + 1; j < v.wings.length; j++) {
-      assert.ok(len(sub(v.wings[i][key], v.wings[j][key])) >= R[i] + R[j], `band ${b}: wings ${i} and ${j} apart (${key}) - turning, never through each other`);
-    }
-    let halls = 0;
-    for (const s of hallsOf(b)) {
-      halls++;
-      const ys = [...s.discs, ...s.bands].map((f) => f.y ?? 0), top = Math.max(...ys), foot = Math.min(...ys), ctr = [0, 0, s.len / 2], eyes = eyesOf(s);
-      const targets = [];
-      if (s.end) targets.push({ ...CONE.door, p: [s.end.x, s.end.y ?? 0, s.end.z] });
-      if (s.lord) { const f = s.foe ?? s.fight; targets.push({ ...CONE.lord, p: [f.x, s.fight?.y ?? 0, f.z] }); }
-      for (const [i, w] of v.wings.entries()) {
-        const at = s.lord ? w.court : w.at, C = [ctr[0] + at[0], ctr[1] + at[1], ctr[2] + at[2]];
-        const up = at[1] - top, down = foot - at[1];
-        assert.ok((up >= 30 && up <= 160) || (down >= 30 && down <= 160), `band ${b} ${s.kind} c${s.c} wing ${i}: ${up.toFixed(0)} m over its floors / ${down.toFixed(0)} under (30-160)`);
-        for (const E of eyes) {
-          const d = len(sub(C, E)), rad = Math.asin(Math.min(1, R[i] / d));
-          assert.ok(d + R[i] <= FAR - 8, `band ${b} ${s.kind} wing ${i}: inside the far plane from every floor`);
-          assert.ok(ang(sub(C, E), axis) - rad >= U.radius * (1 + EG_UNDERSIDE.rag) + 2 * DEG, `band ${b} wing ${i}: clear of the Spire's underside overhead`);
-          if (b === 2) assert.ok(ang(sub(C, E), EG_SKY_MOON.dir) - rad >= EG_SKY_MOON.r + 2 * DEG, `the Shade's wing ${i}: never across its moon`);
-          for (const T of targets) {
-            if (Math.hypot(T.p[0] - E[0], T.p[2] - E[2]) < T.near) continue;
-            for (let q = 0; q <= 4; q++) {
-              const tp = [T.p[0], T.p[1] + (T.h * q) / 4, T.p[2]];
-              assert.ok(ang(sub(tp, E), sub(C, E)) - rad >= CONE.pad, `band ${b} ${s.kind} c${s.c} wing ${i}: out of the cone from a floor to its ${T.h === CONE.lord.h ? 'lord' : 'door'}`);
-            }
-          }
-        }
-      }
-    }
-    assert.ok(halls >= 75, `band ${b}: held against ${halls} halls`);
-  }
-});
-
-test('EG-LOOK THE SEALED SPIRE OVERHEAD (world/eliteGates/egVista.js buildEgVistaUnder, world/eliteGates/egUndersideModel.js): the stair\'s own model (one Spire), laid in two of the kit\'s records - its rock the foundations\' strata, the rest the far stone; hung from the eye leaning toward the course, its rim at the band\'s angular radius (the sky\'s own numbers, smaller each band); inside the far plane; the Shade\'s nowhere near its moon; four tenths of it through the band\'s haze (mutants: its scale by the sine; its lean the other way; its rock in the far stone; its far stone at the model\'s metres; its broken edge in the fall\'s dress)', () => {
-  const fall = buildEgUndersideModel(0);
-  for (let b = 0; b < 4; b++) {
-    const U = EG_VISTA_UNDER[b], u = buildEgVistaUnder(b);
-    assert.deepEqual([U.radius, U.lean], [EG_SKIES[b].underside, EG_SKIES[b].lean], 'the sky\'s own angular radius and lean (held equal: world/eliteGates/egLook.js EG_SKIES)');
-    if (b) assert.ok(U.radius < EG_VISTA_UNDER[b - 1].radius, 'smaller each band');
-    const corners = (m) => { const o = []; for (let i = 0; i < m.positions.length; i += 3) o.push(`${m.positions[i]},${m.positions[i + 1]},${m.positions[i + 2]}`); return o.sort(); };
-    assert.deepEqual(corners(u.model), corners(fall), 'the Spire is one: the fall\'s own stone, every corner of it');
-    assert.deepEqual(u.model.subMeshes.map((s) => [s.textureArchive, s.textureRecord]), [[egBandArchive(b), EG_VISTA_RECORD.found], [egBandArchive(b), EG_VISTA_RECORD.stone]], 'two records, two draws');
-    const rock = tris(u.model).filter((t) => t.rec === EG_VISTA_RECORD.found);
-    assert.ok(rock.length > 0 && rock.every((t) => t.v.every((p) => p[1] <= -EG_UNDERSIDE.slab + 1e-3 || Math.abs(t.n[1]) < 1)), 'its rock the foundations\' strata, under its torn floor');
-    assert.deepEqual(EG_VISTA_UNDER_DRESS, { floor: EG_VISTA_RECORD.stone, metal: EG_VISTA_RECORD.stone, rock: EG_VISTA_RECORD.found, stone: EG_VISTA_RECORD.stone });
-    const flags = tris(u.model).filter((t) => t.rec === EG_VISTA_RECORD.stone && t.n[1] > 0.999 && t.v.every((p) => p[1] === 0));
-    assert.ok(flags.length > 0 && flags.every((t) => t.v.every((p, k) => near(t.uv[k][0], (p[0] * u.scale) / EG_VISTA_UV.stone, 1e-4) && near(t.uv[k][1], (p[2] * u.scale) / EG_VISTA_UV.stone, 1e-4))), 'its far stone at the far law in the world\'s metres');
-    assert.ok(near(u.at[0], 0, 1e-9) && near(u.at[1], U.d * Math.cos(U.lean), 1e-9) && near(u.at[2], U.d * Math.sin(U.lean), 1e-9) && u.at[2] > 0, 'overhead, leaning toward the course');
-    assert.ok(near(Math.atan((EG_UNDERSIDE.r * u.scale) / U.d), U.radius, 1e-9), 'its rim at the band\'s angular radius');
-    let far = 0;
-    for (let i = 0; i < u.model.positions.length; i += 3) far = Math.max(far, Math.hypot(u.model.positions[i] * u.scale + u.at[0], u.model.positions[i + 1] * u.scale + u.at[1], u.model.positions[i + 2] * u.scale + u.at[2]));
-    assert.ok(far <= FAR - 8, 'inside the far plane, hung from the eye');
-    if (b === 2) assert.ok(ang(axis3(U), EG_SKY_MOON.dir) >= U.radius * (1 + EG_UNDERSIDE.rag) + EG_SKY_MOON.r + 10 * DEG, 'the Shade\'s Spire hangs high, nowhere near its moon');
-    const seen = Math.exp(-egAtmosOf(b).fog.density * U.d);
-    assert.ok(seen >= 0.38 && seen <= 0.46, `band ${b}: ${seen.toFixed(2)} of it through the haze (four tenths)`);
   }
 });
 

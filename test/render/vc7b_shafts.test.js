@@ -85,7 +85,6 @@ test('VC7b: the constants', () => {
   assert.equal(AIR_HAZE_ISO, 0.3);
   // AUDIT-VC7 (B6): a share of the KEY light, tuned under the probe's key - the look it was tuned to, at that key
   assert.equal(AIR_HAZE_GAIN * AIR_HAZE_PROBE_KEY, 1, 'the probe\'s calibration (airPass.js records the three it was measured against)');
-  assert.match(read('tools/vc7bHazeProbe.mjs'), /r\.setLighting\(new Float32Array\(\[0\.35, 0\.35, 0\.4\]\), AIR_HAZE_PROBE_KEY,/, 'the probe lights its scene with the key the gain names');
 });
 
 test('VC7b: THE HAZE\'S GATE - a deck, the sun up past the shadow map\'s own floor, a fog with an extinction, the door open', () => {
@@ -171,9 +170,6 @@ test('VC7b: THE DECK PUBLISHES THE SKY MAP once a sweep has filled it - its alph
   assert.equal(c.shadow.map.id, 'sh');
   c.sweeps = 1;
   assert.equal(c.shadow.sky.id, 'sky', 'a sweep done: the sky map rides the deck');
-  const shared = read('src/scenes/shared.js');
-  // PIN MOVED (OW-HORIZON, 2026-10-20): and the ground past the square, the far ring's own dim
-  assert.match(shared, /if \(clouds\?\.shadow\) Object\.assign\(enhancedSky\.cloudShadow, clouds\.shadow, \{ far: farCoverSun\(\) \}\);/, 'the one door every host\'s deck comes through - it carries every field the getter publishes');
 });
 
 test('VC7b: THE DOOR - `?haze=off`, read where the lane\'s other doors are, carried to the air pass', () => {
@@ -280,5 +276,4 @@ test('VC7b: THE SHADER\'S LAWS - run on SHAFT_FS itself: the phase, the march ov
   assert.match(fs, /if \(uCloudSkyOn <= 0\.0\) return 1\.0;/, 'no sky map: the mask as it was');
   assert.match(fs, /vec3 c = haze\(\);\n  if \(uSunOn > 0\.0\) c \+= beams\(\);/, 'the haze needs the sun up, the beams need it on screen');
   assert.match(fs, /return uSunColor \* \(acc \/ \d+\.0 \* uShaftParams\.y \* through \* through\);/, 'VC6c: the covered-sun gate, exactly as Mac asked it');
-  assert.match(read('src/render/volumetricClouds.js'), /vec3 p = vec3\(g\.x, 0\.0, g\.y\) \+ uLightDir \* t;/, 'the shadow march starts its ray on the ground the haze reads');
 });

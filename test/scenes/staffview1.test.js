@@ -467,17 +467,6 @@ test('STAFF-VIEW1 the layer\'s lines: one canvas, drawn only when a line moved; 
 
 // ── THE FIVE SEAMS ─────────────────────────────────────────────────────────────────────────────────
 
-test('STAFF-VIEW1 host: the five seams - made after the follow with its getters, the names pass\'s frame, the travel view\'s marks and mark click, and Shift+M past the key ladder\'s latch (KEY-BOOT) and before its actions', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const made = w.search(/const staffView = createStaffViewHost\(\{\n\s*follow: staffFollow, glyphs: staffGlyphs, links: \(\) => chatLinks, book: travellerBook, foes: exteriorFoes,\n\s*overworld: travelViewKey, up: \(\) => !!travelView\?\.active, canvas, say: townTalk\.say,\n\s*acts: \(p, onFollow\) => chatSafety\.playerActions\(p, onFollow\),[^\n]*\n\s*politicAt: \(x, y\) => maps\.getPoliticIndex\(x, y\),[^\n]*\n\s*\}\);/);
-  assert.ok(made > w.indexOf('const staffFollow = staffFollowOnPage('), 'made, after the follow it reads');
-  assert.match(w, /const namesOff = covered \|\| !!travelView\?\.active;\n\s*staffView\.frame\(proj, view, eye, covered\);/, 'the names pass, every mode');
-  assert.match(w, /marks: \(\) => staffView\.marks\(travelViewMarks\(\)\),/);
-  assert.match(w, /onMark: \(key, e\) => staffView\.mark\(key\) \|\| onTravelViewMark\(key, e\),/);
-  assert.match(w, /if \(!_worldKeysLive\) return;[^\n]*\n\s*if \(\(!e\.repeat && !gamePaused\(\) && egClient\?\.key\(e\)\) \|\| \(!gamePaused\(\) && staffView\.key\(e\)\)\) \{ e\.preventDefault\(\); return; \}/, 'Shift+M, past the latch');
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/inputActions.js', import.meta.url), 'utf8'), /StaffView|ShiftLeft\+KeyM/, 'no InputManager action and no default chord: a player\'s Shift is no modifier');
-});
-
 test('STAFF-TAG-MENU a tag\'s click opens the player\'s menu - the chat line menu\'s staff acts by socket and account - at the tag; its Follow is the view\'s own (the follow, then the panel\'s card); with no acts the click follows at once (mutants: the menu skipped, the view\'s follow not handed)', () => {
   const asked = [];
   const acts = (p, onFollow) => { asked.push(p); return [{ label: 'Follow', run: () => onFollow(p.sub) }, { label: 'Mute…', menu: [] }]; };

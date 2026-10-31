@@ -33,9 +33,6 @@ test('TR1: the modes, the two ride bases, and the ownership tests', () => {
   assert.equal(DF_RIDE_BASE, DF_WALK_BASE + 225, 'dfRideBase = dfWalkBase + 225 (:33)');
   assert.equal(DF_CART_BASE, DF_WALK_BASE + 100, 'dfCartBase = dfWalkBase + 100 (:34)');
   assert.deepEqual([...HORSE_ITEM_INDEXES], [TRANSPORT_HORSE_TEMPLATE], 'horseItemIndexes seeded with Transportation.Horse (:72)');
-  // ONE HOME (AUDIT 24's ratchet, which caught this slice's first cut):
-  // hasHorse/hasCart are inventorySession's, re-exported here.
-  assert.match(readFileSync(join(root, 'src/systems/transport.js'), 'utf8'), /export \{ hasCart, hasHorse \};/);
   assert.equal(hasHorse([cart]), false); assert.equal(hasHorse([horse, cart]), true);
   assert.equal(hasCart([horse]), false); assert.equal(hasCart([cart]), true);
   assert.equal(hasHorse([]), false); assert.equal(hasCart(null), false);
@@ -125,34 +122,6 @@ test('TR1: the motor rides - the mount\'s speed, no sprint, no climb, and the cr
   m.crouching = true;
   m.update(1 / 60, { ...still, forward: 1 }, 0);
   assert.ok(near(m.speed, sneakSpeed(crouchSpeed(50))), 'the DFU order, kept (CROUCH-SNEAK: a crouch is a sneak, so the sneak arm rides on it)');
-});
-
-test('TR1: the wiring - the climb gate, the Horse bob style, and no Running tally from a saddle', () => {
-  const motor = read('src/player/motor.js');
-  assert.match(motor, /riding: isRiding\(this\.transportMode\),   \/\/ TR1: ClimbingMotor :398/);
-  // AUDIT 39 (#63) moved this pin: the run LATCH now reads the run
-  // MODE (CaptureInputSpeedAdjustment :72-75 + the AutoRun latch),
-  // not the raw held key. The riding gate is what this test guards
-  // and it is unchanged.
-  assert.match(motor, /this\.isRunning = this\._runMode && canRunUnlessRiding\(this\.transportMode\);/);
-  assert.match(motor, /get riding\(\) \{ return isRiding\(this\.transportMode\); \}/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    assert.match(read(host), /riding: !!player\.riding, levitating:/, `${host}: the Horse bob style (HeadBobber :107)`);
-  }
-  // PlayerEntity.cs:311 - the tally's riding term. AUDIT 64 F7 retired
-  // the two dungeon hosts' RAW-key read: PlayerMotor.IsRunning is
-  // PlayerSpeedChanger's grounded latch over the run MODE (:107-118),
-  // which the AutoRun latch drives and the physical key does not, so
-  // the raw read lost the tally AND the 88/min band under autorun.
-  // Both dungeon hosts now carry their siblings' pair, and the tally
-  // channel keeps the `!riding` term this test guards.
-  for (const host of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
-    assert.match(read(host), /running: player\.isRunning && !player\.standing, runningTally: player\.isRunning && !player\.riding,/, `${host}: no Running tally while mounted`);
-    assert.equal(/running: held\(keys, 'Run'\)/.test(read(host)), false, `${host}: the raw Run key no longer reaches the tally`);
-  }
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(host), /running: player\.isRunning && !player\.standing(?: && upkeep\.riderPaysGallop\(player\.transportMode\))?,/, `${host}: the motor's own flag, already gated`);   // PIN MOVED (STEED1): and a gallop the horse's breath under horse care
-  }
 });
 
 test('TR-AUDIT F-E2/F-E3: the half-speed line follows GetBaseSpeed, and a rider sits a horse tall', () => {

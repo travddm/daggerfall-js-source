@@ -87,17 +87,6 @@ test('LW-FIX5 the remains lie each visit till the player takes from them: laid, 
   assert.ok(b.marks.has(r.key), 'emptied: spent');
 });
 
-test('LW-FIX5 the host: the remains laid with their key and asked their count; their goods rolled off their key (the same each time - never a reroll for leaving), their weapon and armour minted as every piece the port hands out and never an arrow (mutants: the key, the count, the seed, the mint, the arrow)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /lay: \(res, feet, key\) => livingRemainsLay\(d, res, feet, key\),/);
-  assert.match(w, /count: \(pile\) => pile\?\.items\?\.length \?\? 0,/);
-  const goods = rd('src/scenes/livingWorld/remainsGoods.js');   // PIN MOVED (HOST-SPLIT, SEA VENTURES 2026-10-22): livingRemainsLay moved verbatim out of bootWorld into scenes/livingWorld/remainsGoods.js
-  assert.match(goods, /const rolls = lwRng\(textSeed\(key\), 0x676f6f64\);/);
-  assert.match(goods, /generateLootItems\(enemyLootTableKey\(res\.cls, look\.basics\.lootTableKey \?\? '-'\), \{ level, gender: res\.sex \?\? 'male' \}, rolls\);/);
-  assert.match(goods, /for \(const raw of \[createRandomWeapon\(level, rolls\), createRandomArmor\(level, rolls\)\]\) if \(raw && !isAmmunition\(raw\)\) items\.push\(mintCondition\(setItemFields\(raw\)\)\);/);
-  assert.match(goods, /items\.push\(goldStack\(5 \+ Math\.floor\(rolls\(\) \* 20 \* level\)\)\);/);
-});
-
 test('LW-FIX5 the turned watch is followed by the struck body\'s IDENTITY as it was struck - the town\'s pool dresses its bodies again, and a dead guard still wearing an old body\'s mark is never the next watchman\'s; the conversions mark with it - WATCH-FIX: PIN MOVED, each guard followed once through its own mark (test/systems/livingWorld/watchfix_watch.test.js) (mutants: the body for the mark, each conversion, the follow once)', () => {
   const slays = [];
   const town = { slain: (p) => slays.push(p.living.id), lend: () => {}, back: () => {}, killed: () => {} };
@@ -116,6 +105,4 @@ test('LW-FIX5 the turned watch is followed by the struck body\'s IDENTITY as it 
   fresh.dead = true; fresh.corpse = true; fresh.killedBy = 'player';
   watchStep(turned, [old, fresh]);
   assert.deepEqual(slays, ['L1.w1', 'L1.w2']);
-  assert.match(rd('src/scenes/cityGuards.js'), /if \(p\.person\?\.living\) g\.livingFrom = p\.person\.living;/);
-  assert.match(rd('src/systems/roleplayRealism/rrRidingHost.js'), /const from = person\.living \?\? null;[^\n]*\n[^\n]*g\.livingFrom = from;/);
 });

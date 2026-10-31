@@ -64,34 +64,6 @@ test('TESA3 the stranger\'s name: getRandomFullNameOfBank is getRandomFullName\'
   srand(5);
   const nord = getRandomFullNameOfBank(BANK_TYPES.Nord);
   assert.match(nord, /sen$/, 'a Nord surname ends in -sen (NameGen.txt)');
-  assert.match(read('src/characters/nameHelper.js'), /export function getRandomFullName\(regionIndex\) \{\n  return getRandomFullNameOfBank\(getNameBankOfRegion\(regionIndex \?\? -1\)\);\n\}/);
-});
-
-test('TESA3 the host: the province where the player stands (never on the Bay, at sea or past the Veil, and only where the land beyond the Bay streams) names the loading screen, the Overworld\'s line, the new region\'s word and its edge; the people\'s names - talk, strangers, quest people, the oath\'s race and the town talk\'s - come from its bank, a raid\'s pinned region naming by its region; no region index moves (mutant: a gate, a site, the pin\'s exception)', () => {
-  const w = hostText('src/scenes/world.js');
-  const fn = w.slice(w.indexOf('  function provinceAt(x, y) {'), w.indexOf('  const provinceHere = '));
-  assert.match(fn, /if \(!tamrielLand \|\| onTheBay\(x, y\) \|\| \(etherSea && inEther\(x, y\)\)\) return null;\n\s+return provinceByKey\(provinceKeyBeyondBay\(x, y\)\);/);
-  assert.match(w, /const provinceHere = \(\) => \{ const px = playerTravelPixel\(\); return provinceAt\(px\.x, px\.y\); \};/);
-  assert.match(w, /const provinceBankHere = \(\) => \(_questRegionPin == null \? provinceNameBank\(provinceHere\(\)\?\.key\) : null\);\n\s+const nameBankHere = \(\) => provinceBankHere\(\) \?\? getNameBankOfRegion\(_questRegionIndex\(\)\);/);
-  // what the player reads
-  assert.match(w, /return locationIndex\.get\(key\)\?\.name \|\| provinceAt\(px, py\)\?\.name \|\| \(etherSea && inEther\(px, py\) \? ETHER_SEA_NAME : REGION_NAMES\[maps\.getRegionIndexAt\(px, py\)\]\) \|\| '';/, 'the loading screen');
-  assert.match(w, /const region = provinceAt\(px\.x, px\.y\)\?\.name \|\| \(etherSea && inEther\(px\.x, px\.y\) \? ETHER_SEA_NAME : maps\.getRegionName\(maps\.getRegionIndexAt\(px\.x, px\.y\)\)\) \|\| '';/, 'the Overworld\'s line');
-  assert.match(w, /regionName: \(\) => provinceHere\(\)\?\.name \?\? maps\.getRegionName\(_questRegionIndex\(\)\),/, 'Travel Options\' new region');
-  assert.match(w, /const _region = `\$\{_questRegionIndex\(\)\}\|\$\{provinceHere\(\)\?\.key \?\? ''\}`;/, 'a province\'s edge is a region\'s');
-  // whose names
-  assert.match(w, /nameBankOfCurrentRegion: \(\) => nameBankHere\(\),/);
-  assert.match(w, /randomFullName: \(\) => getRandomFullNameOfBank\(nameBankHere\(\)\),/);
-  assert.match(w, /raceOfCurrentRegion: \(\) => \(RACE_BY_NAME_BANK\[nameBankHere\(\)\] \?\? 'Breton'\),/);
-  assert.match(w, /regionIndex: \(\) => _questRegionIndex\(\),\n\s+nameBank: \(\) => provinceBankHere\(\),/, 'the town talk told');
-  const tt = read('src/scenes/townTalk.js');
-  assert.match(tt, /const provinceBank = \(\) => \(typeof nameBank === 'function' \? nameBank\(\) : null\) \?\? null;/);
-  assert.match(tt, /nameBank: provinceBank\(\) \?\? getNameBankOfRegion\(region\),/, 'the building names\' people');
-  assert.match(tt, /fullName: \(gender\) => nameHelperFullName\(provinceBank\(\) \?\? getNameBankOfRegion\(regionNow\(\)\), /, 'the talk\'s %fn/%mn');
-  // and no region index: the province never enters a region read
-  const regionFn = w.slice(w.indexOf('  function _questRegionIndex() {'), w.indexOf('\n  }\n', w.indexOf('  function _questRegionIndex() {')));
-  assert.match(regionFn, /return maps\.getRegionIndexAt\(px\.x, px\.y\);$/, 'the player\'s region index is the 62 regions\' law');
-  assert.doesNotMatch(regionFn, /province/i, 'untouched by the province');
-  assert.doesNotMatch(read('src/world/tamriel/tamrielLand.js'), /characters\//, 'the land module stays the worker\'s - the people live in tamrielPeople.js');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

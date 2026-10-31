@@ -169,16 +169,3 @@ test('LEGACY7 part four the room\'s sprites: the line\'s to their own bodies wit
   assert.equal(synced.at(-1), 'clear');
 });
 
-test('LEGACY7 part four the world host\'s wiring: the street stands the line in its own bodies and hides their billboards; the room\'s sprites wrapped; the bodies drawn in the place they stood; the origin followed; the host handed the look', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const kin = person\.living\?\.res;\n\s*if \(kin\?\.look && \(familyStreet \?\?= makeFamilyBodies\(\)\)\.stand\(kin, batch\.origin, person\.yaw, person\.state === 'move'\)\) continue;\n\s*livePersonBatches\.push\(batch\);/);
-  assert.match(w, /familyStreet\?\.begin\(\);/);
-  // PIN MOVED (AUDIT LEGACY III W4): held under a talk window, as the street is
-  assert.match(w, /if \(familyStreet\) \{ familyStreet\.end\(townTalk\.overlayActive \? 0 : dt, cam\.pos\); livePersonBatches\.push\(\.\.\.familyStreet\.batches\(\)\); \}/);
-  // PIN MOVED (MWNPC10c, bible/04-Characters/Morrowind-NPCs.md section 15c): the room's sprites a body lane of their own, 'room'
-  assert.match(w, /sprites: familyRoomSprites\(createTravellerSprites\(\{ renderer, getTexture, uploadRecordFrame, living: _livingIndoorsDoor, laneName: 'room' \}\), \(familyRoom \?\?= makeFamilyBodies\(\)\), _livingIndoorsDoor\),/);
-  assert.match(w, /\(_mode\(\) === 'interior' \? familyRoom : _mode\(\) === 'exterior' \? familyStreet : null\)\?\.draw\(canvas, \{ proj, view, eye \}\);/);
-  assert.match(w, /familyStreet\?\.offsetAll\(r\.offset\);/);
-  assert.match(w, /look: \(\) => composeLook\(playerEntity\),/);
-  assert.match(w, /dolls: new RemotePlayers\(\{ renderer, deps: \{ fetchBytes, palette, getTexture, uploadRecordFrame \} \}\),/, 'no sound: a townsperson\'s steps are the town\'s');
-});

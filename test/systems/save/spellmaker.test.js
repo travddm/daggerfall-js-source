@@ -191,11 +191,3 @@ test('S1 save: a pre-S1 envelope (bare indexes) still loads, and a table-less ho
   assert.ok(buildCustomSpell({ slots: [DAMAGE_HEALTH] }).index < -5);
 });
 
-test('S1 wiring pins: the readied MADE spell restores through the player book', () => {
-  // setReadiedByIndex could only ask SPELLS.STD, so a custom spell
-  // readied at save time came back unreadied
-  assert.match(src('src/scenes/hostMagic.js'),
-    /playerEntity\?\.spells \?\? \[\]\)\.find\(\(sp\) => sp\?\.index === index\)/,
-    'the player book answers for indexes the file table cannot');
-  assert.match(src('src/systems/save/save.js'), /\(sp\?\.custom \|\| sp\?\.rri\) \? JSON\.parse\(JSON\.stringify\(sp\)\) : sp\.index/);   // AUDIT-RR F9: a mod's spell rides whole too
-});

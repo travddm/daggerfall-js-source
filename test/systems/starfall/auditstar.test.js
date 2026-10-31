@@ -56,7 +56,6 @@ test('AUDIT STAR W1: every master calls its circle in a line of its own - its na
     assert.match(m.circle(), m.female ? / her circle\./ : / its circle\./, `${m.id}: as it stands`);
   }
   assert.equal('circle' in STAR_AT_TEXT, false, 'the shared line is gone');
-  assert.match(read('src/scenes/starfall/starfallHost.js'), /sayAt\(S, `circle\$\{i\}`, M\.circle\(\)\)/, 'the host says the master\'s own');
 });
 
 test('AUDIT STAR W4: the fight\'s calls each say their own thing - "comes for the star" at most three times over the waves and the masters (mutants: a call of the old set)', () => {

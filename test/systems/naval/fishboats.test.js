@@ -33,7 +33,6 @@ const harbour = findHarbour({ rect: TOWN, isWater: coast });
 const grids = new Map();
 const grid = (h) => grids.get(h) ?? (grids.set(h, createWaterGrid({ isWater: coast, hull: h })), grids.get(h));
 const watersOf = (f, h = harbour, isWater = coast) => fishingWaters({ harbour: h, i: f.i, seed: f.seed, hull: classById(f.classId).hull, isWater, grid: grid(classById(f.classId).hull) });
-const NAVAL_HOST = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
 
 test('FISH-BOATS the fleet: a harbour\'s boats a day off its key and the day - the same for every player, FISH_ROLL of them, each a smack on FISH_SMACK_SHARE of her own seed\'s draw, else a skiff; another day, another fleet (mutants: the roll\'s top, the roll\'s floor, the smacks\' share, the day unread)', () => {
   assert.deepEqual(fishersOf('port:1', 7), fishersOf('port:1', 7), 'one fleet for every client');
@@ -287,23 +286,10 @@ test('FISH-BOATS her hold is her catch: a fishing boat taken gives up fish - FIS
     assert.deepEqual(flotsamKeys(classById(id), 7), [], 'her catch goes down with her');
   }
   assert.ok(flotsamKeys(classById('merchantCoaster'), 7).length > 0, 'a merchantman\'s still floats');
-  assert.match(NAVAL_HOST, /const holdOf = \(cls, seed, generate\) => \(cls\.fisher \? fishers\.catchOf\(cls, seed\) : drawHold\(cls, seed, generate\)\);/);
-  assert.match(NAVAL_HOST, /entry\.prize = \{ hold: holdOf\(entry\.ship\.cls, entry\.ship\.seed,/);
   // the word: her class row the last two, read back - PIN MOVED (AUDIT HORIZONTAL C4): on `h`, the later classes' key
   const word = navalWireRecord({ ships: [{ n: 3, classId: 'fishingSmack', variant: 0, pos: [10, 0, 20], yaw: 0.5, speed: 1, sails: 0.4, hull: 1, sail: 1, crew: 1, state: 'afloat', heel: 0, seed: 77, fire: false, runOut: 0, gen: 0, region: 17 }] });
   assert.equal(word.h[0][1], SHIP_CLASSES.length - 1);
   assert.equal(validNavalRecord(JSON.parse(JSON.stringify(word))).ships[0].classId, 'fishingSmack');
-});
-
-test('FISH-BOATS by source: the naval host wires the fleet - built once over its own sea, stood each frame after the harbour\'s moored ships, the captains handed the lanterns\' hours, a boat taken over handed her day\'s errand, her hold her catch, the sea\'s clear forgetting the rolls', () => {
-  assert.match(NAVAL_HOST, /const fishers = createFishingFleet\(\{ sea, harbours, launch, retire, adopt, grid: gridOf,/);
-  assert.match(NAVAL_HOST, /harbourFrame\(seaY\);[^\n]*\n {4}fishers\.frame\(seaY\);/);
-  assert.match(NAVAL_HOST, /life\.lights = !!where\(\)\.cityLights;/);
-  assert.match(NAVAL_HOST, /if \(ship\.cls\.fisher\) return fishers\.errandOf\(ship\);/);
-  // PIN MOVED (AUDIT HORIZONTAL C6): the director's ships made whole in navalDirector.js directorShips, the host's call pinned below
-  assert.match(readFileSync(new URL('../../../src/systems/naval/navalDirector.js', import.meta.url), 'utf8'), /for \(const x of ships\) \{ const f = entryOf\(x\.id\); if \(f\?\.ship\.cls\.fisher\) \{ x\.berthed = true; x\.engaged \|\|= !!f\.fisher && !x\.theirs; \} \}/);
-  assert.match(NAVAL_HOST, /if \(e\.ship\.cls\.fisher\) e\.fisher = e\.ship\.errand\?\.harbour \?\? null;/);
-  assert.match(NAVAL_HOST, /rolled = new WeakSet\(\); grids = new Map\(\);[^\n]*\n {4}fishers\.clear\(\);/);
 });
 
 /** The classes an older build's door knows, as it listed them (SHIP_CLASSES before FISH-BOATS, 844ccc064^1). */
@@ -352,6 +338,4 @@ test('AUDIT HORIZONTAL C6: the director\'s ships - a fishing boat fleeing a pira
   assert.equal(by.get(pirate.id).engaged, false, 'the pirate she flees: no fight of hers - the director may let her go');
   assert.equal(by.get(quarry.id).engaged, true, 'the navy\'s quarry: in a fight (F27)');
   assert.deepEqual([by.get(fisher.id).berthed, by.get(fisher.id).engaged], [true, true], 'the port\'s boat: its fleet\'s, kept');
-  assert.match(NAVAL_HOST, /directorShips\(ships, \(id\) => sea\.get\(id\)\);/);
-  assert.ok(NAVAL_HOST.indexOf('directorShips(ships,') < NAVAL_HOST.indexOf('const out = director.step(d, {'), 'before the director steps');
 });

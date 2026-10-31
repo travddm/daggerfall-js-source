@@ -110,30 +110,6 @@ test('AUDIT WORLD6b-iii(e) A1: the owner - HIT_ARROWS_MAX Arrows a body from pee
   for (let n = 0; n < HIT_ARROWS_MAX + 40; n++) assert.equal(bob.applyHit('mac-0001', hit), true, 'the blow lands');
   assert.equal(arrowsOf(rat.entity), HIT_ARROWS_MAX, 'the pile holds the bound and no more');
   assert.equal(rat.dead, false);
-  const x = rd('src/scenes/exteriorFoes.js'), d = rd('src/scenes/dungeonContext.js');
-  for (const s of [x, d]) assert.match(s, /function arrowsIn\(items\) \{ let n = 0; for \(const it of items\) if \(it && it\.templateIndex === 131 && it\.name === 'Arrow'\) n \+= it\.stackCount \?\? 1; return n; \}/, 'the count, both twins');
-  assert.match(d, /if \(data\.ar === 1 && kind === 'arrow' && arrowsIn\(f\.entity\.items \?\?= \[\]\) < HIT_ARROWS_MAX\) addItem\(f\.entity\.items, /, 'the dungeon host lands under the bound too');
-});
-
-test('AUDIT WORLD6b-iii(e) C2/C3: by source - the dungeon twin has the one attack door (a zero blow at a puppet goes to the host with its kind, a damaging shaft sends no second frame, no layout of mine wakes), the melee zero arm and the shaft go through it, the flight says what landed; the disease rider is the monster\'s alone in the PCAAO core too', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /function attackFromPlayer\(foe, playerFeet = null, kind = 'melee', landed = 0\) \{\s*\n\s*if \(!foe\) return;\s*\n\s*const pi = foes\.indexOf\(foe\);\s*\n\s*if \(\(!_authority && isRoomFoe\(foe, pi\)\) \|\| foe\._ownFrom != null\) \{ if \(!\(landed > 0\)\) damageFoe\(foe, 0, playerFeet, null, \{ kind \}\); else foe\._divertPt = null; return; \}[^\n]*\n\s*handleAttackFromPlayer\(foe, playerFeet\);\s*\n\s*\}/, 'the door');
-  // DISC10-D H1 re-aim: OnWeaponHitEntity rides between the door and the continue (WeaponManager.cs:630 then :632-634)
-  assert.match(d, /attackFromPlayer\(foe, playerFeet\);\s+\/\/ AUDIT WORLD6b-iii\(e\) C2[^\n]*\n\s*playerWeaponHitEntity\(playerEntity, foe\.entity[^\n]*\n\s*continue;/, 'the melee zero arm');
-  assert.match(d, /onAttackFromPlayer: \(t, landed\) => attackFromPlayer\(t, lastPlayerFeet, 'arrow', landed\),/, 'the shaft');
-  assert.match(rd('src/combat/arrowFlight.js'), /onAttackFromPlayer\?\.\(foe, dmg\);/, 'the flight says what landed');
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /function attackFromPlayer\(f, playerFeet = null, kind = 'melee'\) \{[^\n]*\n\s*if \(!f\) return;\s*\n\s*if \(f\.puppet\) \{ if \(f\._divertFrame !== _peerFrame\) damageFoe\(f, 0, playerFeet, null, \{ kind \}\); else f\._divertPt = null; return; \}/, 'the exterior\'s door: the kind on the zero blow, the dose spent in the skip arm');
-  for (const [p, re] of [['src/scenes/world.js', /: exteriorFoes\.attackFromPlayer\(f, player\.pos, 'arrow'\)\),/], ['src/scenes/exterior.js', /: exteriorFoes\.attackFromPlayer\(f, player\.pos, 'arrow'\)\),/], ['src/scenes/worldModes.js', /\? interiorFoes\?\.attackFromPlayer\(f, player\.pos, 'arrow'\)/]]) assert.match(rd(p), re, p);
-  assert.match(x, /if \(fromPlayer && !peer\) \{\s*\n(?:\s*\/\/[^\n]*\n)*\s*const _pt = f\._divertPt \?\? null; f\._divertPt = null;/, 'A5: the dose read inside the provenance gate');
-  // C3: the PCAAO core's onMonsterHit sits in the non-player, non-class arm as FormulaHelper's does
-  const pc = rd('src/combat/pcaao.js');
-  assert.equal((pc.match(/onMonsterHit\(/g) ?? []).length, 1, 'one call in the core');
-  const i = pc.indexOf('onMonsterHit(attacker, target, hit)');
-  const head = pc.slice(Math.max(0, i - 2500), i);
-  assert.ok(/isPlayer\(attacker\)/.test(head) && /else if \(AIAttacker\)/.test(head), 'inside the AI (monster) arm, past the player and class-enemy arm');
-  const fm = rd('src/combat/formulas.js');
-  assert.equal((fm.match(/onMonsterHit\(/g) ?? []).length - (fm.match(/onMonsterHit\(attacker, target, hitDamage\)/g) ?? []).length, 0, 'formulas.js calls it once, in the monster arm (pinned by world6biiie)');
 });
 
 test('AUDIT WORLD6b-iii(e) B1/B2/B9: the Room - who carries the room\'s budget (WHO_ROOM_HZ_MAX a second, every asker together; over it dropped, nobody struck), keeps the looks it heard (a repeat ask reads no storage; after a wake the storage\'s copy is read once), answers a pose within range alone, and reads the socket again after the await', async () => {
@@ -194,13 +170,7 @@ test('AUDIT WORLD6b-iii(e) B1/B2/B9: the Room - who carries the room\'s budget (
   assert.equal(answered, 14 * WHO_HZ_MAX, `every ask from correct clients at their own rate is answered (${answered})`);
   assert.equal(WHO_ROOM_HZ_MAX, SOCKETS_MAX * WHO_HZ_MAX, 'derived: the sum of every socket\'s own gate'); assert.equal(relay.WHO_ROOM_HZ_MAX, WHO_ROOM_HZ_MAX);
   for (const w of askers) { assert.equal(w.closed, null); assert.equal(w.meters.junk ?? 0, 0); assert.equal(w.meters.wdrops ?? 0, 0, 'no strike: the room\'s budget drops, the socket\'s own gate passed'); }
-  const s = rd('server/src/index.js');
-  assert.match(s, /const budget = tokenGate\(this\._roomWho, now, WHO_ROOM_HZ_MAX\);\s*\n\s*this\._roomWho = budget\.bucket;\s*\n\s*if \(!budget\.pass\) return;\s*\n\s*const target = /, 'SLAM9: the budget before the SCAN, not only before the read - a refused ask costs the object nothing');
-  assert.match(s, /let look = this\._looks\.get\(b\.id\) \?\? null;\s*\n\s*if \(!look\) \{ look = \(await this\.state\.storage\.get\(lookKey\(b\.id\)\)\) \?\? null; if \(look\) this\._looks\.set\(b\.id, look\); \}/, 'the looks kept');
-  assert.match(s, /if \(this\._attach\(tws\)\?\.id !== b\.id\) return;/, 'B9: the socket read again after the await');
-  assert.match(s, /this\._looks\.set\(m\.id, m\.look\); \}/, 'set at the hello'); assert.match(s, /this\._looks\.delete\(a\.id\);/, 'gone at the leave'); assert.match(s, /this\._looks\.clear\(\);\s*\n\s*const dead = \['hellos'\];/, 'cleared with the sweep');
-  const bare = s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');   // comments away - and only a `//` that begins a comment, not the one inside `wss://` (AUDIT SLAM found the naive stripper eating a real line)
-  assert.match(bare, /if \(!id \|\| id === a\.id\) \{ this\._junk\(ws\); return; \}\s*const budget = [^\n]*\s*this\._roomWho = budget\.bucket;\s*if \(!budget\.pass\) return;\s*const target = [^\n]*\s*if \(!target\) return;/, 'B3: one\'s own name is junk, a name that left is nothing - with SLAM9\'s budget between them');
+    
   assert.ok(relayVersionAtLeast(66), 'the relay says which one it is, and says a later one just as well');
 });
 

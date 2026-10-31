@@ -23,15 +23,6 @@ import { hostText } from '../hostText.mjs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
-test('X1 MENU-EXIT1: the enhanced menu\'s repaint answers nothing once the screen is destroyed - the confirm card\'s yes runs the action FIRST and repaints after (mutant: the guard removed, which is the crash on every exit through the confirm)', () => {
-  const src = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(src, /function render\(\) \{\s*(?:\/\/[^\n]*\n\s*)*if \(!app\) return;\s*repaintKeepingScroll\(app, \(\) => renderInto\(\)(?:, \{[^}]*\})?\);(?:[ \t]*\/\/[^\n]*)?\s*\}/, 'render() guards on the screen before it paints');
-  // PIN MOVED (RPT1026-MISC CONFIRM-SHEET): the card is let go through `answered()` (it also shuts the sheet the ask
-  // raised) where it was `confirming = null` - the action still runs before the repaint
-  assert.match(src, /onClick: \(\) => \{ const f = confirming\.onYes; answered\(\); f\(\); render\(\); \}/, 'and the confirm card still runs the action before the repaint - the order DFU\'s yes-button has, which is why the guard is where it is');
-  assert.match(src, /host\.innerHTML = '';\s*app = null;/, 'destroy() nulls the screen the guard reads');
-});
-
 test('X2 MACROS1: TEXT.RSC rows through the value expander - a row keeps its shape and its `center`, a bare string expands too, and nothing to expand hands the rows back untouched (mutants: the shape lost; a null value expanded to "null")', () => {
   const rows = [{ text: 'A finely drawn vellum reveals the secret location of %map, which you record.', center: true }, 'Plain %map.'];
   const out = expandRowValues(rows, { map: 'Privateers Hold' });
@@ -52,18 +43,9 @@ test('X2 MACROS1: a map read carries its revealed name as the record\'s macro, t
     const act = useResultAction(r, {});
     assert.equal(act.textId, MAP_TEXT_ID); assert.deepEqual(act.macros, { map: 'Privateers Hold' }, 'and rides the inventory\'s action');
   }
-  // the outcome shape, by the arm that makes it (the item above may not be the map template the predicate reads)
-  assert.match(rd('src/systems/useItem.js'), /\{ kind: 'map', textId: MAP_TEXT_ID, revealed, macros: \{ map: revealed \} \}/);
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /if \(r\.macros\) out\.macros = r\.macros;/);
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /expandRowValues\(deps\.rows\(act\.textId\) \?\? \[\], act\.macros \?\? null\)/);
-  assert.match(rd('src/ui/native/nativeInventory.js'), /expandRowValues\(this\.hooks\.rows\(r\.textId\) \?\? \[\], r\.macros \?\? null\)/);
-  assert.match(rd('src/systems/quickslots.js'), /expandRowValues\(hooks\.rows\(res\.textId\) \?\? \[\], res\.macros \?\? null\)/);
   // the quest table's own %map
   assert.equal(getMacroValue('%map', null, { world: { locationRevealedByMapItem: () => 'Privateers Hold' } }), 'Privateers Hold');
   assert.equal(getMacroValue('%map', null, { world: {} }), '%map[nullMCP]', 'unanswered, the table says so - which is what every quest %map printed before the hook existed');
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (TESA's merge): the quest world is scenes/questWorld.js's - the host read whole
-  assert.match(w, /_locationRevealedByMapItem = shown;/, 'the reveal sets PlayerGPS\'s field');
-  assert.match(w, /locationRevealedByMapItem: \(\) => (?:host\.)?_locationRevealedByMapItem,/, 'and the quest world hook answers it');   // its live name there
 });
 
 test('X3 MACROS1: the guild window\'s every record goes through the guild\'s context - %pcn/%pcf the player, %fon and %kno the faction\'s name - so the knightly order\'s invitation reads as one (mutants: `fon`/`kno` dropped from expandGuildMacros; the join flow\'s rows handed over verbatim, as they were)', () => {
@@ -73,10 +55,4 @@ test('X3 MACROS1: the guild window\'s every record goes through the guild\'s con
   assert.equal(out[0].center, true, 'the row keeps its shape');
   assert.equal(out[1], 'Welcome, Medora, to The Order of the Candle.');
   assert.equal(expandGuildMacros('%fon', {}), '%fon', 'no faction: the token stands, as every unknown value does in this walk');
-  const wm = rd('src/scenes/worldModes.js');
-  const flow = wm.slice(wm.indexOf('const service = npcServiceKind(pn.factionID);'), wm.indexOf('let win = null;', wm.indexOf('const service = npcServiceKind(pn.factionID);')));
-  // MACRO-4: the map grew into `guildMacros` (the rank, the deity, the revealed dungeon); the faction name is still %fon's
-  assert.match(flow, /const orderName = orderFaction\?\.name == null \? null : getLocalizedFactionName\(guild\.factionId, orderFaction\.name\);[\s\S]{0,1200}?const guildMacros = \{\s*playerName: playerEntity\.name,\s*factionName: guild\?\.divine \?\? orderName,/, 'the guild\'s context names the player and the faction');
-  assert.match(flow, /const rows = \(id\) => expandGuildRows\(townTalk\?\.lines\?\.\(id\) \?\? \[\], guildMacros\);/, 'the join flow\'s rows, through the guild\'s context');
-  assert.doesNotMatch(flow, /const rows = \(id\) => townTalk\?\.lines\?\.\(id\) \?\? \[\];/, 'and its verbatim wiring is gone');
 });

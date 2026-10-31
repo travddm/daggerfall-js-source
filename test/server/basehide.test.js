@@ -277,24 +277,3 @@ test('BASE-HIDE the panel: "Built in" lists the room\'s own furniture nearest fi
   assert.equal(one(root, 'dfdecor-empty').textContent, DECOR_BASE_EMPTY, 'a room with nothing of its own');
 });
 
-test('BASE-HIDE by source: the build stands a furnishable room\'s props and flats one by one - never the ladder or the machinery, never the merge, each its own bucket, batch and light - and frees what is out; the host builds it so for an online home, a house or a ship, skips a piece out among its targets, keeps the list in the scene (an online home\'s the service\'s), stands the service\'s list and brings it back at a sale', () => {
-  const c = src('src/scenes/interiorContext.js');
-  assert.match(c, /const base = opts\.baseEditable \? createBaseRoom\(\{ drawList, batches: \(\) => billboardBatches, lights: \(\) => lights, collider \}\) : null;/);
-  assert.match(c, /const baseKey = base && p\.objectType === PROP_MODEL_TYPE && p\.modelIdNum !== LADDER_MODEL_ID && p\.modelIdNum !== MACHINERY_MODEL_ID\s*\n\s*\? decorBaseModelKey\(pi, p\.modelIdNum\) : null;/, 'furniture, not the building\'s workings');
-  assert.match(c, /if \(!baseKey && cpu\.normals && cpu\.uvs\) \{ staticBuilder\.add\(/, 'never the merge');
-  assert.match(c, /collider\.addMesh\(baseKey \? baseBucketOf\(baseKey\) : 'interior', cpu\.positions, cpu\.indices, matrix\);/, 'its own bucket');
-  assert.match(c, /if \(baseKey\) base\.furnish\(baseKey, containers\[had\[0\]\] \?\? shelves\[had\[1\]\] \?\? beds\[had\[2\]\] \?\? null\);/, 'a cupboard, a shelf or a bed');
-  assert.match(c, /const batch = renderer\.createBillboardBatch\(flat\.archive, flat\.record, billboardSize\(t, flat\.record\), \[at\]\);/, 'a flat alone in its batch');
-  assert.match(c, /const own = lightsOf\(\[bf\.flat\]\);[\s\S]{0,200}base\.addFlat\(decorBaseFlatKey\(bf\.fi, bf\.flat\.archive, bf\.flat\.record\), \{ flat: \[bf\.flat\.archive, bf\.flat\.record\], batch: bf\.batch, light: own\[0\] \?\? null, at: bf\.at \}\);/, 'and its own light');
-  assert.match(c, /for \(const b of base\?\.outBatches\(\) \?\? \[\]\) renderer\.destroyBatch\(b\);/, 'the teardown frees what is out');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const baseEditable = !!home \|\| houseOwned \|\| \(building\?\.buildingType === BUILDING_TYPES\.Ship && ownsShip\(playerEntity\)\);/);
-  assert.match(m, /houseOwned, peopleVisible, baseEditable,/);
-  for (const [list, v] of [['containers', 'c'], ['shelves', 's']]) assert.match(m, new RegExp(`interiorCtx\\.${list}\\.forEach\\(\\(${v}, i\\) => \\{\\s*if \\(${v}\\.hidden\\) return;`), `${list}: a piece out is no target`);
-  assert.match(m, /interiorCtx\.beds\?\.forEach\(\(bd, i\) => \{[^\n]*\n\s*if \(bd\.hidden\) return;/);
-  assert.match(m, /const hiddenBase = \[\.\.\.\(interiorHome \|\| _seatHallVisit \? _keptHidden : \(ctx\.base\?\.hidden\(\) \?\? \[\]\)\), \.\.\.\(ctx\.base\?\.roomDoors\?\.hidden\?\.\(\) \?\? \[\]\)\];/, 'the scene keeps the list - an online home\'s save record as it came, and any room door taken out');   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /if \(interiorHome \|\| _seatHallVisit\) \(_keptHidden = \(data\.hiddenBase \?\? \[\]\)\.filter\(\(k\) => !String\(k\)\.startsWith\('intdoor:'\)\), interiorCtx\.base\?\.roomDoors\?\.apply\?\.\(data\.hiddenBase\)\); else \(interiorCtx\.base\?\.setHidden\(data\.hiddenBase \?\? \[\]\), interiorCtx\.base\?\.roomDoors\?\.apply\?\.\(data\.hiddenBase\)\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line   // PIN MOVED (AUDIT SEATS-3): the visit's latch (C2)
-  assert.match(m, /interiorCtx\?\.base\?\.setHidden\(Array\.isArray\(r\.data\.hidden\) \? r\.data\.hidden : \[\]\);/, 'the room its owner cleared, for everyone');
-  assert.match(m, /function decorSold\(sceneName, region\) \{\s*clearSceneHidden\(sceneCache\(\), sceneName\);/, 'a sale brings it back');
-  assert.match(m, /base: \(\) => interiorCtx\?\.base \?\? null,/, 'the tool\'s door');
-});

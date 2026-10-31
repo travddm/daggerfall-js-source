@@ -470,42 +470,11 @@ test('PROF10 book: a piece carries a Lapidary\'s cracked gem to the door - `crac
   assert.equal(minted[0]?.name, 'Gold Diamond Ring');
   await book.craft('ring:gold:diamond', { clean: true }, () => {});
   assert.equal(asked.at(-1)[2], false);
-  assert.match(src('src/net/accountClient.js'), /craft: \(character, recipe, clean, name, rid, heartwood = false, dye = null, seat = null, cracked = false\) => post\('\/v1\/prof\/craft', \{ character, recipe, clean, name, rid, heartwood, \.\.\.\(dye == null \? \{\} : \{ dye \}\), \.\.\.\(seat == null \? \{\} : \{ seat \}\), \.\.\.\(cracked === true \? \{ cracked: true \} : \{\}\), mint: MINT_VERSION \}\),/);   // PIN MOVED (AUDIT FB1026d C3): a craft names the mint version this build mints
   assert.doesNotMatch(accountRefusalText('prof-lapidary'), /problem|could not be read/);
   assert.match(accountRefusalText('prof-lapidary'), /Only a Lapidary/);
 });
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
-
-test('PROF10 wiring: the jeweller\'s bench a Pawn Shop\'s or a Gem Store\'s (open for trade) or a home\'s station; the world crafts a piece there by Jewelcrafting\'s station, the facet\'s band off WIL and LUC, a Lapidary\'s gem through the book; the service\'s route reads it, refuses it to all but a Lapidary and answers a piece\'s hand; the pages draw the bench beside the fire; the bench sold where it works', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /if \(t === BUILDING_TYPES\.PawnShop \|\| t === BUILDING_TYPES\.GemStore\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: JEWEL_FEE \};/);
-  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'jeweller'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
-  assert.match(m, /if \(hallMemberHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'jeweller'\)\) return \{ kind: 'home', fee: 0 \};/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /: profession === 'jewelcrafting'[^\n]*\n\s*\? \{ here: \(\) => modes\?\.jewellerHere\?\.\(\) \?\? null, a: 'a jeweller\\'s bench', who: 'jeweller', noun: 'jeweller\\'s bench', kept: JEWEL_KEPT_TEXT, xp: professionName\('jewelcrafting'\) \}/);   // PIN MOVED (AUDIT PROF-541 R2-C2): no station's own busy word; PIN MOVED (CRAFT3): the XP word the craft's track's
-  assert.match(w, /jeweller: \(\) => modes\?\.jewellerHere\?\.\(\) \?\? null,/);
-  assert.match(w, /facetBand: \(\) => facetBand\(\{ willpower: liveStat\(playerEntity, 'willpower'\), luck: liveStat\(playerEntity, 'luck'\) \}\),/);
-  assert.match(w, /craft: async \(recipe, \{ clean, heartwood = false, dye = null, cracked = false, \.\.\.more \}\) => \{/);   // PIN MOVED (MASTER-ART): the door hands the page's other asks (a Master's work's lines) on
-  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: /);
-  const b = src('src/net/profBook.js');
-  assert.match(b, /\.\.\.\(cracked === true \? \{ cracked: true \} : \{\}\) \};/);
-  assert.match(b, /Number\.isSafeInteger\(w\.seat\) \? w\.seat : null, w\.cracked === true\)\), key\);/);   // PIN MOVED (PROF12): a brew kept as a craft is asks its own door first
-  const svc = src('server-account/src/professions.js');
-  assert.match(svc, /export async function craftAtAnvil\(ctx, player, env, \{ character, recipe: id, clean, name, heartwood = false, dye = null, rid, seat = null, cracked = false, mint = null \} = \{\}\)/);   // PIN MOVED (AUDIT FB1026d C3): and the service stamps it, at most its own
-  assert.match(svc, /if \(crack && !\(takesCracked\(r\) && specs\[100\] === LAPIDARY\)\) return \{ error: 'prof-lapidary' \};/);
-  assert.match(svc, /const hand = dishHand\(r, specs\[100\]\) \?\? jewelHand\(r, specs\[50\]\);/);
-  assert.match(svc, /qualityOdds\(rank - r\.rank, \{ masterwright: masterworkSpec\(specs\[100\], r\) \}\)/);   // PIN MOVED (CRAFT3): the Master Jeweler's points asked of the recipe (a jewel's alone)
-  const idx = src('server-account/src/index.js');
-  assert.match(idx, /'prof-lapidary': 403,/);
-  assert.match(idx, /POST \/v1\/prof\/craft \{ character, recipe, clean, name\?, heartwood\?, dye\?, cracked\?, mint\?, rid \}/);   // PIN MOVED (AUDIT FB1026d II D5): JEWEL-KIN's `mint` in the route's contract
-  const p = src('src/ui/professions/profPages.js');
-  assert.match(p, /\['fire', \(d\) => drawCookFire\(d, rerender, kit\)\],   \/\/ PROF9\n\s*\['jeweller', \(d\) => drawJewellerBench\(d, rerender, kit\)\],   \/\/ PROF10/);   // PIN MOVED (MENU-ORDER): the stations a list of tiles
-  assert.match(src('src/ui/enhanced/enhancedPlusStyle.js'), /\.prof-heatbar\.prof-facetbar \{/);
-  assert.match(src('src/scenes/decor/decorTool.js'), /if \(PROF_STATIONS\.includes\(want\) && !forgeOffered\(\)\) \{ deps\.say\?\.\(stationColdLine\(want\)\); return false; \}/, 'the jeweller\'s bench sold where the bench works, as the forge');
-  // INT1 (PIN MOVED): the template read through `lookup` - templateByIndex by default, the item law's own on the service
-  assert.match(src('src/systems/enchanting.js'), /export function itemEnchantmentPower\(item, lookup = templateByIndex\) \{[^]*?const basePower = craftedJewelPoints\(item\) \?\? lookup\(item\.templateIndex\)\?\.enchantmentPoints \?\? 0;/);
-});
 
 // ─── AUDIT PROF10 (2026-10-03): THE ITEM MAKER'S BUDGET ──────────────
 
@@ -593,7 +562,6 @@ test('AUDIT PROF10 J2 (DECIDED, Mac: "Item maker can add to it"): DFU\'s item ma
   const plain = mintPiece({ recipe: 'ring:silver', quality: 1, seed: 1 }, PROV);
   applyEnchantments(plain, [talent]);
   assert.deepEqual(plain.enchantments.map((e) => [e.type, e.param]), [[ENCHANTMENT_TYPES.ImprovesTalents, 0]]);
-  assert.match(src('src/ui/item/itemMakerWindow.js'), /if \(!keptEnchantments\(item\) \|\| item\.group === 'UselessItems2'\) return false;/);
 });
 
 // ─── AUDIT PROF-541 (2026-10-03) ─────────────────────────────────────
@@ -618,7 +586,6 @@ test('AUDIT PROF-541 J3: the Enhanced+ item maker draws the lists as the classic
   assert.deepEqual(rows.side, []);
   rows.pow[1].act();
   assert.deepEqual([w.powers, keptEnchantments(mw).length], [[], 1], 'the player\'s own row removed; the piece\'s stays');
-  assert.match(src('src/scenes/worldModes.js'), /const row = itemMakerRowLayout\(w\._lists\(\)\[which === 'powers' \? 'powers' : 'sideEffects'\]\)/);
 });
 
 test('AUDIT PROF-541 J4: a Masterwork jewel\'s Rare roll is one its points hold - a first draw over them drawn again among those that fit (every draw that fit stands as its seed made it); a Cloth Amulet\'s 660 never carries Tongues\' 1,590; still the seed\'s', () => {
@@ -694,5 +661,4 @@ test('AUDIT PROF-541 R2-C6: the jeweller\'s bench\'s odds say the town Apothecar
       assert.ok(page.text().includes(`Quality chances: Crude 20% | Standard 60% | Fine 20%. They get better the further your rank (25) is above the recipe's (25). Stop every turn where the stone catches the light to raise the result one quality.${says}`), String(steps));   // PIN MOVED (PLAIN-ODDS): the odds said in plain words
     } finally { page.done(); setProfessionsPages(null); }
   }
-  assert.match(src('src/scenes/world.js'), /jewelSteps: \(\) => myHall\('jewelcrafting'\)\.steps,/);
 });

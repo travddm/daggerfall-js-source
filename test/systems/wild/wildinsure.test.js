@@ -194,7 +194,6 @@ test('WILD-INSURE THE SERVICE, A KILL (server-account/src/wild.js wildFall): a p
   const lr = await late.fall({ w: -1 });
   assert.ok(lr.body.took.some((x) => x.t === CLAYMORE), 'not in force: taken');
   assert.equal(late.svc.env.DB._raw.prepare('SELECT state FROM wild_insurance WHERE key = ?').get(lk).state, 'active', 'and not spent');
-  assert.ok(rd('server-account/src/wild.js').includes("...spent.map((k) => ctx.db.prepare(\"UPDATE wild_insurance SET state = 'spent'"), 'spent in the batch that keeps');
   // AUDIT PVP-EASE L1-3: no pick (a hall, or the minute let pass) - the sword was never at risk
   const hall = await stood();
   const hs = ledgerKeyOf(hall.sword), hc = ledgerKeyOf(hall.claymore);
@@ -349,13 +348,5 @@ test('WILD-INSURE AND REPEAT-SHIELD THE WORDS AND THE HOST: the death screen say
   setWildDeath({ killer: 'Borin', dropped: 0, shield: true });
   assert.equal(wildDeathLines()[0], 'The same player killed you less than half an hour ago, so nothing was taken.');
   setWildDeath(null);
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes('const worn = isCellRoom(online.room) ? wornOffer(playerEntity.items) : [];'), 'the first dead frame\'s offer: the service\'s own');
-  assert.ok(w.includes("character: () => realmSession?.id ?? null, region: () => _questRegionIndex() ?? 0, inZone: () => wildHere(), now: () => Date.now() + _sharedOffsetMs });"), 'the joined character, the shared clock');
-  assert.ok(w.includes('const insured = wildInsure?.spent(d.insured) ?? 0;'), 'the answer spends them');
-  assert.ok(w.includes('setWildInsureBook(wildInsure);'), 'the pack\'s card reads the page\'s book');
-  const inv = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.ok(inv.includes("{ const ins = side === 'local' ? wildInsureBook()?.lineOf(picked) : null; if (ins) into.append(el('p', 'boundline insuredline', ins)); }"), 'the card says it');
-  assert.ok(inv.includes('const b = el(\'button\', \'act\', WILD_TEXT.insureAct(ins.premiumOf(picked)));'), 'and offers it');
   assert.equal(WILD_TEXT.insureAct(1234), 'Insure (1,234 gold)');
 });

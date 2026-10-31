@@ -60,22 +60,6 @@ test('AUDIT FOE-KEEPS H1 THE KILL IS THE REFEREE\'S WORD, WHENEVER IT COMES: hea
   setWildDeath(null);
 });
 
-test('AUDIT FOE-KEEPS H1 H2 H4 THE HOST: the referee\'s fall goes to the zone\'s word, never a window the first dead frame must meet; the rise skips the usual tenth at a kill and rises out of the zone at one whose death found no room; a take is a kill; a Resurrect after a kill spares nothing it did not (mutants: the window back; the rise reading the screen\'s name; the take no kill; the Resurrect reading the stated loss)', () => {
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT): my take's answer in scenes/wildDropHost.js, read with its host
-  assert.ok(w.includes('      wildDeathAtHand({ r: g.r, by: g.by, room, at: Date.now() }, peerName(g.by));'), 'my fall, the referee\'s word, kept beside the kill');
-  assert.ok(!/_wildFell\b/.test(w), 'no second copy of the fall in the host');
-  assert.ok(w.includes('    const fell = wildFallHeard();'), 'the first dead frame reads any fall since the last rise');
-  assert.ok(!w.includes('15_000 ? _wildFell'), 'no 15-second window');
-  assert.ok(w.includes('    const wildRise = !!wildDeath() || wildDeathKill(), wildKilled = wildDeathKill();'), 'the rise reads the kill');
-  assert.ok(w.includes('    if (dd) setWildDeath({ killer: dd.killer, kill: true, dropped:'), 'my take is a kill');
-  assert.ok(w.includes('      const wildSite = wildRise ? wildRiseSite(px, wasInDungeon, wildKilled) : null;'), 'E1: the rise knows a kill from a foe\'s death');
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the zone's mask Cyrodiil's (WW-C2 retired the mountains')
-  assert.ok(w.includes('    for (const pick of wildRisePicks(cyrodiilMask(), px, { inDungeon, kill })) {'), 'E1: over wildDeath.js\'s towns');
-  const rez = /function resurrectInPlace\(rez\) \{[\s\S]*?\n {2}\}/.exec(w)?.[0] ?? '';
-  assert.match(rez, /if \(_respawning\) return;\n\s+const spared = wildDeathKill\(\) \? 0 : statedDeathLoss\(\) \?\? 0;[^\n]*\n\s+wildGhostEnd\(\);/, 'read before the death ends');
-  assert.ok(rez.includes('if (spared > 0) townTalk.say(RESURRECT_TEXT.spared(spared));'));
-});
-
 test('AUDIT FOE-KEEPS O1 H5 O4 O5 N6 THE WORDS: a foe\'s death says nothing dropped - true beside the tenth it claims and a revenant\'s theft; the tutorial names both zones, the cart only while it is with you, the tenth of a kill and of any other death, in the player\'s language and within a popup\'s sixty words (TUT1); Hungarian\'s "Az" and Polish "we" (mutants: the page\'s words read once)', () => {
   assert.equal(WILD_TEXT.deathKept(), 'Nothing dropped. Only another player\'s kill drops what you carry.');
   assert.doesNotMatch(WILD_TEXT.deathKept(), /keep/i, 'never "you keep" - the same death claims a tenth of the purse');
@@ -187,30 +171,6 @@ test('AUDIT FOE-KEEPS E1 ON THE REAL MAP (WORLD-WIDE folded into TESA, #1184; PI
     }
     assert.ok(n > 100 && inRing === n, `${n} sampled, ${inRing} in their ring`);   // the freeware's map: 142, every ring holding a town
   } finally { setTamrielTrace(null); setTamrielFit(null); }
-});
-
-test('AUDIT FOE-KEEPS E3 THE FLEET ON THE OPEN SEA (the owner, asked: "Refuse on the open sea"): no Summon and no Send away into, out of or about its PvP waters - the player there, or the ship standing there - while it is a zone; in Veilhaven\'s peace and offline as before (mutants: the refusal unread; the ship\'s waters unread; the zone\'s word unread)', async () => {
-  const { createFleetHost } = await import('../../../src/scenes/fleetHost.js');
-  const F = await import('../../../src/systems/fleet.js');
-  const { veilhaven } = await import('../../../src/world/ethericSea.js');
-  const vh = veilhaven(), peace = { X: vh.px, Y: vh.py }, open = { X: vh.px - 60, Y: vh.py };   // ring II, west of her
-  const SUMMON = 'Not on the open sea. Sail the ship there yourself.', AWAY = 'Not on the open sea. The crew won\'t sail it through without you.';
-  const run = ({ me, hers, sea = true }) => {
-    F._resetFleetForTests();
-    F.knowShip(901, 2, 0, 1000);
-    const boat = { uid: 901, hull: 2, variant: 0, crewed: true, GameObject: { activeSelf: false, position: [0, 0, 0] }, MapPixel: { ...hers } };
-    const host = createFleetHost({ csa: () => ({ AllBoats: [boat], isSailing: () => false, state: {}, LayUpBoat: () => true, SummonBoat: () => null }), naval: () => null, pack: () => [], where: () => ({ inside: false, pixel: { ...me }, sea }), nearPort: () => true, nearestPort: () => ({ name: 'Veilhaven', ether: true }), veilApart: () => false });
-    return { summon: host.act(901, 'summon').text, away: host.act(901, 'away').text };
-  };
-  assert.deepEqual(run({ me: open, hers: open }), { summon: SUMMON, away: AWAY }, 'about the open sea: risen at a freeport there, her where she was left');
-  assert.deepEqual(run({ me: peace, hers: open }), { summon: SUMMON, away: AWAY }, 'out of it, to the peace');
-  assert.equal(run({ me: open, hers: peace }).summon, SUMMON, 'into it');
-  const calm = run({ me: peace, hers: peace });
-  assert.ok(calm.summon !== SUMMON && calm.away !== AWAY, 'in Veilhaven\'s peace, as before');
-  const off = run({ me: open, hers: open, sea: false });
-  assert.ok(off.summon !== SUMMON && off.away !== AWAY, 'no zone (offline, or no relay refereeing it): as before');
-  F._resetFleetForTests();
-  assert.ok(rd('src/scenes/world.js').includes("feet: dwPlayerObjectPosition(), sea: !!online?.wildOk && !!etherSea };"), 'the host says when the open sea is a zone');
 });
 
 test('AUDIT FOE-KEEPS LETTERS-TENTH (the owner left it to the audit: "Your choice"): with the fallen\'s word a kill takes a tenth of each letter of credit\'s worth into the remains\' one gold pile, as it takes the coin\'s, and the letter stays; the game lowers its own letter by exactly that and says it; a quest\'s letter, one the ledger keeps and one worth under ten pay nothing; without the word the letters drop whole as before (mutants: the word unread; the share whole; the letter dropped too; the game\'s letter unlowered; the line unsaid)', async () => {

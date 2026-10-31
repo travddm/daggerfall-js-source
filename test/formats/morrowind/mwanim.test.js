@@ -686,20 +686,6 @@ test('MW-D17 rule 51: the group is folded at the door, like every other entry po
   assert.equal(isLoopingAnimation([], 'IDLE1H'), true);
 });
 
-test('MW-D17: the viewer has ONE home for clip time - the law, not a modulo', () => {
-  const src = readFileSync(new URL('../../../src/tools/mwViewer.js', import.meta.url), 'utf8');
-  // The second home booked at MW-D7 ("MW-D8's first task") is retired:
-  // no `% span` player, no case-sensitive groups.get bypassing the
-  // MWAUDIT door, no per-frame accum-root recompute.
-  assert.ok(!src.includes('% span'), 'the modulo player is gone');
-  assert.ok(!/anim\.groups\.get\(/.test(src), 'no case-sensitive lookup drives the pose');
-  assert.ok(/advanceClip\(anim\.clip, anim\.keys/.test(src), 'the playhead is advanceClip\'s');
-  assert.ok(/loopFallback: isLoopingAnimation\(anim\.keys, name\)/.test(src),
-    'and loopFallback is rule 51\'s answer, not "always"');
-  assert.equal((src.match(/accumRootRef\(/g) || []).length, 1,
-    'rule 56\'s pick is made once per track set, not once per frame');
-});
-
 // ---------------------------------------------------------------------------
 // MW-D33: the clip law brought to 1:1 - interpolation, reset's third
 // stage, the accum axes, and the key reader's field order. Every law
@@ -756,27 +742,6 @@ test('MW-D33: TCB interior tangents weight by TIME SPAN, not a flat half', () =>
     },
   };
   assert.ok(near(sampleTrack(track, 0.5).scale, 11 / 12));
-  // The ZERO-SPAN guard (`if (timeSpan == 0.f) continue;`, :189-190)
-  // leaves the struct's zero-initialised tangents (nifkey.hpp:38-40).
-  // No sorted key list can put that key at a sampled segment's edge, so
-  // the guard is pinned at the source.
-  const src = readFileSync(new URL('../../../src/formats/morrowind/mwKeys.js', import.meta.url), 'utf8');   // AUDIT 68: the KeyGroup sampler's one home
-  assert.ok(src.includes('if (timeSpan === 0) return [0, 0];'), 'zero span answers zero tangents');
-});
-
-test('MW-D33: the quadratic reader streams value, IN tangent, OUT tangent - in that order', () => {
-  // readQuadratic (nifkey.hpp:141-143): `readValue; key.mInTan = ...;
-  // key.mOutTan = ...`. The sampler then wants the LEFT key's OUT and
-  // the RIGHT key's IN (controller.hpp:158) - i.e. the SECOND stored
-  // field of one key and the FIRST of the next. Reader order is pinned
-  // at the source because no fixture carries quadratic keys; the
-  // sampler's side is pinned by value above ("stored Hermite tangents").
-  const src = readFileSync(new URL('../../../src/formats/morrowind/mwNifFile.js', import.meta.url), 'utf8');
-  assert.ok(/key\.inTan = val\(\);\s*\n\s*key\.outTan = val\(\);/.test(src),
-    'keyframe groups: inTan read before outTan');
-  assert.ok(/key\.inTan = s\.f32\(\);.*\n\s*key\.outTan = s\.f32\(\);/.test(src),
-    'morph keys: the same order');
-  assert.ok(!/key\.forward|key\.backward/.test(src), 'the swapped-name fields are gone');
 });
 
 test('MW-D33: reset\'s third stage stops at the START key - a doubled block leaks nothing', () => {

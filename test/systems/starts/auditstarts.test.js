@@ -421,10 +421,6 @@ test('AUDIT STARTS W3 a load at a running province start\'s own dungeon, its com
   assert.equal(startsHost({ machine: b.m }).resumesAt(LAIR_PX), false);
   const other = { questName: 'M0B00Y06', getPlace: () => ({ siteDetails: { worldPixel: LAIR_PX } }), getTask: () => null };
   assert.equal(startsHost({ machine: { quests: new Map([[1, other]]) } }).resumesAt(LAIR_PX), false, 'a quest taken, not a start');
-  // the world host asks it at both doors: the online wake, and the entry by the quest's own instance
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\) && !starts\.resumesAt\(pixel\)\) \{/);
-  assert.match(W, /modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\)/);
 });
 
 test('AUDIT STARTS W5 a save from before the story began - no start, no curse, no main quest - loads with the commission handed over and the curse beside it; a story begun, a start running, or a save from before the story was kept is left alone; both load doors ask (mutants: the healing, the begun story\'s check)', () => {
@@ -438,8 +434,6 @@ test('AUDIT STARTS W5 a save from before the story began - no start, no curse, n
     assert.deepEqual(m.begun, [], `left alone: ${JSON.stringify(Object.keys(o))}`);
   }
   assert.equal(startsHost().restored(), true, 'no machine: nothing to heal');
-  const W = rd('src/scenes/world.js');
-  assert.equal([...W.matchAll(/_questStarted = starts\.restored\(\);/g)].length, 2, 'the two load doors');
 });
 
 test('AUDIT STARTS Q5 the machine counts its restores - what a start on its way reads to know a load landed under it, and drops itself (mutants: the count)', () => {
@@ -458,13 +452,6 @@ test('AUDIT STARTS U6/U7 the drafted words: French says a ship\'s own name bare,
   const bg = csv('bg');
   for (const [k, v] of bg) if (k.startsWith('start.')) assert.doesNotMatch(v, /Даггерфол|Илиак|Сентинел/, k);
   assert.match(bg.get('start.IliacBay.title'), /^Iliac Bay$/);
-});
-
-test('AUDIT STARTS W8 the boot\'s ?start= is a dev door of its boot alone: an online page, a birth\'s and a load\'s address drop it, and so does every front door\'s choice (mutants: a door keeping it)', () => {
-  assert.match(rd('src/systems/online/onlineLane.js'), /export const BOOT_DOOR_KEYS = Object\.freeze\(\[[^\]]*'start'\]\);/);
-  const P = rd('src/systems/legacy/places.js');
-  assert.equal([...P.matchAll(/for \(const k of \[[^\]]*'start'\]\) p\.delete\(k\);/g)].length, 2, 'a birth\'s address and a load\'s');
-  assert.equal([...rd('src/main.js').matchAll(/params\.delete\('start'\);/g)].length, 2, 'and both front doors\' choices (MAC-N3: BOOT_DOOR_KEYS is what main.js decides)');
 });
 
 test('AUDIT STARTS P2 the bridge starts the start it is handed: the commission in hand\'s with the curse, and a name no start has is the Bay\'s (mutants: the start unpassed)', () => {

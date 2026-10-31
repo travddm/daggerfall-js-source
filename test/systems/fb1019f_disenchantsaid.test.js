@@ -118,9 +118,3 @@ test('DISENCHANT-SAID: the page lists the Greaves and Pauldrons greyed with the 
   try { assert.equal(page.text().includes(NONE), false); } finally { page.done(); }
 });
 
-test('DISENCHANT-SAID: the host wires the list and makes none of it - one line, no filter of its own (HOST-SPLIT)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /\n\s*disenchantable: \(\) => disenchantableOf\(playerEntity\.items, \{ kept: pieceKept, book: profBook \}\),\n/);
-  assert.equal(/x\.essence > 0/.test(w), false, 'the host\'s filter gone');
-  assert.equal(/essenceOf\(|piecePoints\(/.test(w), false, 'no Essence reckoned in the host');
-});

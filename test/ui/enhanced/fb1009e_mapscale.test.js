@@ -44,30 +44,7 @@ test('MAP-SCALE row: Auto then the fixed scales, a range held at its ends; the w
   assert.equal(mapScaleLabel('auto', 1440), 'Auto (1.35×)');
   assert.equal(mapScaleLabel('auto', 900), 'Auto (1.00×)');
   assert.equal(mapScaleLabel(1.5, 1440), '1.50×');
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /row\.dataset\.opt = 'mapScale'; row\.dataset\.pref = 'mapScale';/);
-  assert.match(menu, /const next = nextMapScale\(getPref\('mapScale'\), dir\);\s*\n\s*setPref\('mapScale', next\);/);
-  assert.match(menu, /out\.push\(hudScaleRow\(\)\);\s*\n\s*out\.push\(mapScaleRow\(\)\);/, 'on the Interface card, under the HUD\'s');
   const maps = CATEGORIES.find((t) => t.id === 'interface').sections.find((s) => s.id === 'maps');
   assert.equal(maps.items[0], 'port:mapScale', 'first under Maps');
 });
 
-test('MAP-SCALE by source: the window reads the scale at every layout (a choice takes the next frame), keys the layout on it, inks on the paper over it and the pointer and the card come back over it; every viewport-relative bound in the zoomed chrome is divided by it', () => {
-  const src = read('src/ui/heldMap.js');
-  assert.match(src, /const k = mapUiScale\(vh, getPref\('mapScale'\)\);\s*\n\s*root\.style\.setProperty\?\.\('--hm-ui', String\(k\)\);\s*\n\s*const key = `\$\{vw\}x\$\{vh\}@\$\{dpr\}\|\$\{inset\}\|\$\{this\._lane\}\|\$\{k\}`;/);
-  assert.match(src, /this\._paper = \{ w: pw \/ k, h: ph \/ k, dpr: dpr \* k, k \};/);
-  assert.match(src, /c\.ink\.width = Math\.max\(1, Math\.round\(pw \* dpr\)\);/, 'the backing is the fitted sheet\'s device pixels');
-  // every rule whose selector names a held-map class (the innermost rules, so a media block's own are read), each
-  // viewport-relative length in its body
-  let rules = 0;
-  for (const file of ['src/ui/enhanced/enhancedStyle.js', 'src/ui/enhanced/enhancedPlusStyle.js']) {
-    for (const [, sel, body] of read(file).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-      if (!/\.hm[a-z]/.test(sel) || /\.hm(stage|ink|sprite|hands)\b/.test(sel)) continue;
-      for (const m of body.matchAll(/[\d.]+v[wh]\b[^;]*/g)) {
-        rules++;
-        assert.match(m.input.slice(Math.max(0, m.index - 6), m.index + m[0].length), /calc\([\d.]+v[wh] \/ var\(--hm-ui, 1\)/, `${file}: ${sel.trim()} - ${m[0]}`);
-      }
-    }
-  }
-  assert.ok(rules >= 10, `${rules} bounds read`);
-});

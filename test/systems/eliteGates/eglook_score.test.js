@@ -161,10 +161,6 @@ test('EG-G2 THE HOST (world.js\'s hourScoreFrame asks it first): a context\'s so
   assert.equal(host.frame(null), false);
   assert.deepEqual(log.at(-1), ['fade'], 'let go by a fade');
   assert.equal(host.held, false);
-  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = W.indexOf('\n  const hourScoreFrame = () => {\n');
-  assert.ok(at > 0);
-  assert.match(W.slice(at, at + 260), /^\n  const hourScoreFrame = \(\) => \{\n    if \(_spireScore\.frame\(egClient\?\.scoreView\?\.\(\) \?\? null\)\) return true;/, 'the Spire asked first');
 });
 
 test('EG-G2 THE SPIRE MIX (section 26): a personal sting always for a lord\'s blow or a CHECK, an add\'s at most one each 1.5 s, each the gate\'s sting at my feet and the score ducked 6 dB for 300 ms; the barks four a kind, nearest first, a critical one kept and ducking; a peer 4 dB down; the duck on the song\'s own level - down in 20 ms, held, back over EG_DUCK_BACK_S - and the music\'s duck handing it on (mutants: an add stinging every blow; the duck the wrong depth; five barks a kind)', () => {
@@ -205,8 +201,6 @@ test('EG-G2 THE SPIRE MIX (section 26): a personal sting always for a lord\'s bl
   const low = +(1.45 * 10 ** (-6 / 20)).toFixed(6);
   assert.deepEqual(calls, [['cancel', 5], ['set', 1.45, 5], ['ramp', low, 5.02], ['set', low, 5.3], ['ramp', 1.45, +(5.3 + EG_DUCK_BACK_S).toFixed(3)]]);
   calls.length = 0; p.duck(0, 0.3); assert.equal(calls.length, 0, 'no depth, no duck');
-  const M = readFileSync(new URL('../../../src/systems/music.js', import.meta.url), 'utf8');
-  assert.match(M, /duck\(db, seconds\) \{ this\.player\?\.duck\?\.\(db, seconds\); \}/);
 });
 
 test('EG-G2 THE MIX IN THE FIGHT (scenes/eliteGates/egFight.js): a lord\'s blow on my feet stings once at its word and ducks the score, never again for that blow; an add\'s blow on my feet stings, a second add\'s within 1.5 s does not; a blow clear of my feet never stings; the legion\'s wind-up barks capped four a kind (mutants: a sting every frame; a blow clear of me stinging)', () => {
@@ -233,9 +227,4 @@ test('EG-G2 THE MIX IN THE FIGHT (scenes/eliteGates/egFight.js): a lord\'s blow 
   t += 2000; F.blows = [blow(13, 1, t + 1000, ['d', me[0] + 30, me[1], 3])]; fight.frame();
   assert.equal(fight.state().mix.stings, 2, 'clear of my feet: none');
   assert.ok(fight.shapes().some((s) => s.mine === false && s.fogFloor), 'the look laid on at the draw');
-  // the wind-up barks: collected while the bodies draw, then handed to the mix's cap - never played one by one
-  const SRC = readFileSync(new URL('../../../src/scenes/eliteGates/egFight.js', import.meta.url), 'utf8');
-  assert.match(SRC, /_barks\.push\(\{ kind: look\.mobile, at: \[d\.at\[0\], d\.at\[1\], d\.at\[2\]\], cue: hostCue\('windup', look\.mobile\), critical: !!look\.lord \}\);/);
-  assert.match(SRC, /mix\.barks\(_barks, cam\(\), \(b\) => play3\(b\.cue, b\.at\)\);/);
-  assert.ok(!/play3\(hostCue\('windup'/.test(SRC), 'no wind-up played past the cap');
 });

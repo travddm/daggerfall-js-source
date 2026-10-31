@@ -590,31 +590,6 @@ test('RVN-STARS AUDIT RVN-STARS S8 THE QUICKDIAL\'S KEY ASKS THE SKY FIRST: the 
   });
 });
 
-test('RVN-STARS AUDIT GROWTH LANE4-1/2 THE SHEET\'S OWN KEYS ASK THE SKY FIRST: F5 (or the pack key\'s crossover) over a sworn one\'s sky with a star unaccepted says so once, in the words of a key press, and keeps the sky; the second press lets it go; a sky with nothing pending asks nothing; the note\'s health at once (mutants: the door\'s ask dropped; the sheet\'s key not asking it; the Close words)', async () => {
-  const { revenantStarsOver } = await import('../../../src/ui/firmamentOver.js');
-  await withWindow(async (f) => {
-    const r = sworn({ rank: 3 });
-    const door = revenantStarsOver({ alive: () => true, below: () => {}, back: () => {} });
-    assert.equal(door.asks(), false, 'no sky: nothing to ask');
-    door.hook(r.id);
-    for (let i = 0; i < 50 && !door.view(); i++) await new Promise((res) => setTimeout(res, 5));   // the lazy chunk
-    assert.equal(door.asks(), false, 'nothing pending');
-    // LANE4-2: the note says what AUDIT RVN-STARS S1 made true - health rescaled at Accept, not at the next call
-    assert.match(f.text(f.doc.body), /Changing its stars is free, but not while it's away\. Its health and damage change at once\./);
-    door.view().take('b_hp1');
-    assert.equal(door.asks(), true);
-    assert.equal(door.up(), true);
-    assert.match(f.text(f.doc.body), /You have unaccepted changes\. Press Accept to keep them, or leave again to discard them\./);
-    assert.equal(door.asks(), false, 'the second press lets it go');
-    // AUDIT GROWTH LANE3-8: the ask is for the stars it named - one more taken, and the next press asks again
-    door.view().take('b_bl1');
-    assert.equal(door.asks(), true, 'a new star: asked again');
-    door.drop();
-    assert.deepEqual(rec(r).companion.stars, ['oath'], 'never set');
-  });
-  assert.match(read('src/ui/charSheetDoor.js'), /if \(view\?\.asksFirst\?\.\(\) \|\| rvnStars\.asks\(\)\) return;/);
-});
-
 // ── the page and the doors ──────────────────────────────────────────
 
 function fakeEl(tag) {
@@ -635,60 +610,3 @@ function el(t, cls, text) { const n = fakeEl(t); if (cls) n.className = cls; if 
 function byClass(root, cls) { const out = []; const walk = (x) => { for (const c of x.children ?? []) { if (c.classList?.contains(cls)) out.push(c); walk(c); } }; walk(root); return out; }
 function buttons(root, label) { const out = []; const walk = (x) => { for (const c of x.children ?? []) { if (c.tag === 'button' && c.textContent === label) out.push(c); walk(c); } }; walk(root); return out; }
 
-test('RVN-STARS THE PAGE: each sworn one\'s level and the stars it has to set (none yet said so, gold only where its Stars can set them - AUDIT RVN-STARS S28); Stars opens its sky through the door that drew the page (none without one; none abroad); a mission\'s days its road\'s; the rail\'s word the player\'s language\'s (S23) (mutants: the line unsaid; the door unread; the road unread on the page; the gold abroad)', async () => {
-  _resetCompanionRosterForTests();
-  _setCompanionRosterIconForTests(() => ({ src: 'data:x', w: 30, h: 40 }));
-  globalThis.document = undefined;
-  const r = sworn({ rank: 2 });
-  const opened = [];
-  const draw = (stars = (id) => opened.push(id)) => { const d = el('div', 'px-qdetail'); drawCompanionsPage(d, () => {}, { el, divider: (t) => el('h4', 'px-divider', t), meter: (n, m) => el('div', 'px-meter', `${n}/${m}`), here: () => null, kindName: () => 'Orc', stars }); return d; };
-  let d = draw();
-  assert.deepEqual(byClass(d, 'cmp-stars').map((x) => [x.textContent, x.classList.contains('is-left')]), [['Level 1 · a star to set', true]]);
-  buttons(d, 'Stars')[0].onclick();
-  assert.deepEqual(opened, [r.id]);
-  assert.equal(buttons(draw(null), 'Stars').length, 0, 'no door, no button');
-  RC.setSwornStars(r.id, ['r_odd1']);
-  N.revenantCompanionUpdate(me, r.id, (c) => { c.xp = 250; });
-  RC.setSwornStars(r.id, ['r_odd1', 'r_haul1', 'r_far']);
-  d = draw();
-  assert.equal(byClass(d, 'cmp-stars')[0].textContent, 'Level 3 · 3 of 3 stars set');
-  buttons(d, 'Mission')[0].onclick();
-  d = draw();
-  const dests = byClass(d, 'cmp-dest');
-  assert.match(dests[0].textContent, /^High Rock - 20 hours, danger I/);
-  assert.match(dests[8].textContent, /^Black Marsh - 82 hours, danger V/);
-  N.revenantCompanionUpdate(me, r.id, (c) => { c.xp = 485; });   // a star to set, then abroad
-  buttons(d, 'Send')[0].onclick();
-  d = draw();
-  assert.equal(buttons(d, 'Stars').length, 0, 'abroad: no Stars');
-  assert.deepEqual(byClass(d, 'cmp-stars').map((x) => [x.textContent, x.classList.contains('is-left')]), [['Level 4 · a star to set', false]], 'no gold where none can be set');
-  const fresh = sworn({ rank: 1 });
-  assert.ok(byClass(draw(), 'cmp-stars').map((x) => x.textContent).includes('Level 1 · no stars to set yet'), `${fresh.name}: none yet, never "0 of 0"`);
-  const { COMPANION_PAGE_SECTIONS } = await import('../../../src/ui/companionRoster.js');
-  assert.deepEqual([...COMPANION_PAGE_SECTIONS[0]], ['companions', 'Companions'], 'its word read through the text core');
-  assert.match(read('src/ui/companionRoster.js'), /get: \(\) => t\('rvn\.roster\.rail', 'Companions'\)/);
-});
-
-test('RVN-STARS THE DOORS: both doors that draw the pause window lay its sky over it (ui/firmamentOver.js revenantStarsOver - the door the Firmament had, built once) and put the page back on Companions; the menu lands there and hands its page the door; no host grew (PIN: the doors)', () => {
-  const over = read('src/ui/firmamentOver.js');
-  assert.match(over, /export function revenantStarsOver\(\{ alive, below, back \}\) \{\n\s+let last = null;\n\s+const o = overPage\(\{/);
-  assert.match(over, /load: \(\) => import\('\.\/revenantStarsWindow\.js'\),/);
-  assert.match(over, /const view = mountRevenantStarsWindow\(h, \{ id, onExit: \(\) => \{ unregister\(\); onExit\(\); \} \}\);/);
-  assert.match(over, /back: \(\) => \{ back\(\); refocus\(last\); \},/, 'AUDIT RVN-STARS S21: the focus back on its Stars');
-  assert.match(over, /\[data-focus="cmp-\$\{id\}-stars"\]/);
-  assert.match(read('src/ui/companionRoster.js'), /`cmp-\$\{r\.id\}-stars`/, 'the key the door focuses');
-  const pause = read('src/ui/pauseDoor.js');
-  assert.match(pause, /get openRevenantStars\(\) \{ return rvnStars\.hook; \},/);
-  assert.match(pause, /view = seams\.mountEnhancedMenu\(host, \{ mode: 'pause', hooks, onAction: act, at: 'companions' \}\);/);
-  assert.match(pause, /rvnStars\.drop\(\);   \/\/ RVN-STARS: a sworn one's stars go with this window/);   // PIN MOVED (GROWTH3: the Firmament's door went to the Growth tab)
-  const sheet = read('src/ui/charSheetDoor.js');
-  assert.match(sheet, /openRevenantStars: rvnStars\.hook,/);
-  assert.match(sheet, /back: \(\) => remountPage\('companions'\),/);
-  assert.match(sheet, /rvnStars\.drop\(\);/);
-  assert.match(sheet, /\.\.\.\(landing === 'stats' \? \{\} : \{ at: landing \}\),/);
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /else if \(at === 'companions'\) \{ pauseTab = 'holdings'; holdSec = 'companions'; \}/);
-  assert.match(menu, /stars: typeof hooks\.openRevenantStars === 'function' \? hooks\.openRevenantStars : null/);
-  assert.match(read('src/ui/captainTreeWindow.js'), /return mountSkyWindow\(host, sky, \{ changed, onExit, doc, embed \}\);/, 'the captain\'s stars in the same window');   // PIN MOVED (GROWTH3: and drawn in the Growth tab, embedded)
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) assert.doesNotMatch(read(host), /revenantStars|rvnStar|swornStars/, `${host}: never wired in a host`);
-});

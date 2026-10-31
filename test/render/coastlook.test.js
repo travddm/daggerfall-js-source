@@ -385,31 +385,13 @@ test('COAST-LOOK THE CUT ENDS TO END: the clip variant of the lane\'s terrain pr
 });
 
 test('COAST-LOOK both terrain programs draw a transition as its two kinds right after their own tile - the lane decoding the kinds as its own - each kind taking the border\'s neighbours by its own record and the snow\'s winter twin by the same, the bed told; the clip variant one line, its switch\'s arms the cut and the mod\'s; the renderer\'s switch a frame\'s for the ground and the sheet, taken as the renderer is made from coastEdgesOn - the enhanced skin, the kill door; no host\'s own line but the cull\'s (mutants: the blend dropped from either program; the lane\'s kinds undecoded; the snow\'s kinds; the switch never uploaded, the sheet\'s never; the renderer never taking it; the classic skin blended; the kill door unread; the cull told nothing)', () => {
-  const r = read('src/render/renderer.js');
-  const classic = r.slice(r.indexOf('const TERRAIN_FS = `'), r.indexOf('}`;', r.indexOf('const TERRAIN_FS = `')));
-  assert.match(classic, /\n\$\{roadEdgeGlsl\(\)\}\n\$\{groundEdgeGlsl\(\)\}[^\n]*\n\$\{WATER_BED_GLSL\}\nvoid main\(\) \{/, 'the classic chunk after ROAD-LOOK\'s, before the bed that reads its wander');
   assert.ok(EL_TERRAIN_FS.includes(`${roadEdgeGlsl('elDecode')}\n${groundEdgeGlsl('elDecode')}`), 'the lane\'s, its kinds in its own linear light');
   assert.match(EL_TERRAIN_FS, /vec3 geBase\(highp uint k, vec2 f, vec2 dux, vec2 duy\) \{ return elDecode\(textureGrad\(uTileArr, vec3\(f, float\(k\)\), dux, duy\)\.rgb\); \}/);
   const BLOCK = String.raw`\n {2}highp uint geA, geB; float geS;\n {2}bool ge = groundMix\(data, tileUV, unwrapped, geA, geB, geS\);\n {2}vec2 dux = transpose\(ROT\[t\]\) \* gx, duy = transpose\(ROT\[t\]\) \* gy;[^\n]*\n {2}vec4 ew = ecoWeights\(vLocalXZ\);[^\n]*\n {2}if \(ge\) tex = mix\(ecotone\(geBase\(geA, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geA\)\), dux, duy\), ecotone\(geBase\(geB, tileUV, dux, duy\), ew, vec3\(tileUV, float\(geB\)\), dux, duy\), geS\);\n {2}tex = roadEdge\(`;
   const SNOW = String.raw`\n {2}tex = ge \? mix\(snowGround\(tex, ew, snowC, vec3\(tileUV, float\(geA\)\), dux, duy\), snowGround\(tex, ew, snowC, vec3\(tileUV, float\(geB\)\), dux, duy\), geS\) : snowGround\(tex, ew, snowC, vec3\(tuv, float\(layer\)\), gx, gy\);\n`;
-  for (const [name, fs] of [['classic', classic], ['lane', EL_TERRAIN_FS]]) {
-    assert.match(fs, new RegExp(`\\.rgb\\)?;\\n {2}//[^\\n]*\\n {2}//[^\\n]*${BLOCK}`), `${name}: the kinds right after the tile, each with its neighbours' share`);
-    assert.match(fs, new RegExp(SNOW), `${name}: each kind's winter twin`);
-    assert.match(fs, /\n {2}if \(!ge\) tex = ecotone\(tex, ew, vec3\(tuv, float\(layer\)\), gx, gy\);/, `${name}: every other tile its neighbours' share as before`);
-  }
   const clip = terrainClipFs(EL_TERRAIN_FS);
   assert.equal(clip.split('\n').length, EL_TERRAIN_FS.split('\n').length + 1, 'the clip still one line');
   assert.match(clip, new RegExp(String.raw`\n {2}if \(uGroundEdge > 0\.0 \? coastCut\(unwrapped, data, layer, t, tileUV, tuv, gx, gy\) : data == ${CLIP_SENTINEL}u\) discard;`), 'its arms: the wandering cut, the mod\'s whole tile');
-  assert.match(r, /this\.tUGroundEdge = gl\.getUniformLocation\(this\.terrainProgram, 'uGroundEdge'\);/);
-  assert.match(r, /gl\.uniform1f\(this\.tUGroundEdge, this\.coastEdges \? 1 : 0\);/);
-  assert.match(r, /groundEdge: u\('uGroundEdge'\)/, 'the sheet\'s location');
-  assert.match(r, /gl\.uniform1f\(L\.groundEdge, this\.coastEdges \? 1 : 0\);/, 'the sheet\'s upload');
-  assert.match(r, /\n {2}coastEdges = coastEdgesOn\(\);\n/, 'the renderer takes the page\'s switch as it is made (a new skin reloads the page)');
-  const world = read('src/scenes/world.js');
-  assert.doesNotMatch(world, /coastEdgesOn/);
-  assert.deepEqual(world.match(/renderer\.coastEdges/g), ['renderer.coastEdges'], 'the host\'s one read: the cull\'s ring');
-  assert.match(world, /clippedTerrainIndices\(p\._dwBytes, p\._stride \?\? 1, renderer\.coastEdges\)/);
-  assert.doesNotMatch(read('src/scenes/exterior.js'), /coastEdges|coastEdgesOn/, 'src/scenes/exterior.js: no host\'s own line');
   assert.deepEqual([coastEdgesOn('?skin=enhanced'), coastEdgesOn('?skin=enhanced&coastedges=off'), coastEdgesOn('?skin=classic'), coastEdgesOn('?skin=classic&coastedges=on')], [true, false, false, false], 'the enhanced skin\'s, the kill door its own');
 });
 

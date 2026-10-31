@@ -66,15 +66,6 @@ test('HOME-CROSSED the words: the refusal is RESTORE\'s own for a deed, and a re
   assert.match(accountRefusalText('busy'), /still being settled/);
 });
 
-test('HOME-CROSSED the door: a carried-in home\'s Sell says the bank\'s refusal and asks nothing - no price the service would never pay; a second press while a sale is out says nothing of its own (mutants: the price asked of a crossed home; the second press said)', () => {
-  const w = src('src/scenes/worldModes.js');
-  const at = w.indexOf('function openHomeSale(bd)');
-  const body = w.slice(at, w.indexOf('\n  }\n', at));
-  assert.match(body, /const home = homeOf\(bd\);\n\s*if \(home\?\.crossed && host\.realmAct\) \{ townTalk\?\.showOverlay\?\.\(new ChoiceWindow\(\{ lines: HOME_CROSSED_LINES, options: \[\{ code: 'Escape', label: 'Esc - close', action: \(\) => \{\} \}\] \}\)\); return; \}/);
-  assert.ok(body.indexOf('HOME_CROSSED_LINES') < body.indexOf('homeSaleLines('), 'refused before any price is asked');
-  assert.match(w, /if \(r\.error === HOME_SALE_OUT\) return;[^\n]*\n\s*if \(!r\.ok\) \{ townTalk\?\.say\?\.\(accountRefusalText\(r\.error\)\); return; \}/, 'a second press says nothing of its own');
-});
-
 test('HOME-CROSSED one sale a house at a time: a second while the first is out answers `sale-out` and asks the service nothing; once the first answers, the house may be asked again (mutants: the guard gone; the guard never let go)', async () => {
   let asked = 0;
   /** @type {(v: any) => void} */

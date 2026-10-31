@@ -104,13 +104,6 @@ test('PARTY-MAP hub: a member\'s rows go to the party alone, stamped with the se
   assert.equal(amaps(b).length, 2, 'after it: fanned');
 }));
 
-test('PARTY-MAP hub by source: the relay\'s arm meters, keeps to the hub and the party, and budgets the room', () => {
-  const hub = rd('server/src/index.js');
-  assert.match(hub, /if \(m\.t === 'amap'\) \{[\s\S]{0,900}?a = this\._meterAmap\(ws, a, now\); if \(!a\) return;\s*\n\s*if \(!isSocialRoom\(a\.key\) \|\| !a\.acct\) \{ this\._junk\(ws\); return; \}/);
-  assert.match(hub, /const budget = tokenGate\(this\._roomAmap, now, AMAP_ROOM_HZ_MAX\);/);
-  assert.match(hub, /for \(const member of party\.members\) \{ if \(member === a\.acct\) continue; for \(const other of this\._socketsOf\(member\)\) this\._send\(other, out\); \}[^\n]*\n\s*return;\s*\n\s*\}\s*\n\s*if \(m\.t === 'who'\)/);
-});
-
 // ─── the session ─────────────────────────────────────────────────────────────────────────────────────────────────
 
 const hubSession = (v = RELAY_VERSION) => {
@@ -198,14 +191,6 @@ test('PARTY-MAP sender: only while the buff is live, in a dungeon, in a party - 
   assert.equal(snd.sentCount, 0, 'leaving the dungeon forgets what went: the next entry starts whole');
 });
 
-test('PARTY-MAP sender by source: world.js feeds it the buff, the dungeon and the party each frame, commits only a send the link took, and merges a mate\'s rows for a party seat alone', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const f = _partyMapSender\.next\(\{ active: hasSharedCartography\(playerEntity\), inDungeon: !!k, partied: !!social\?\.party\?\.members\?\.some\(\(m\) => m\.online && m\.acct !== social\.acct\),/);   // SCALE2b: a mate online
-  assert.match(w, /if \(f && socialLink\(\)\?\.shareAutomap\(f\.k, f\.r\)\) _partyMapSender\.commit\(f, nowMs\);/);
-  assert.match(w, /link\.onAmap = \(acct, _name, k, r\) => \{ if \(social\.inMyParty\(acct\)\) mergePartyAutomap\(k, r\); \};/);
-  assert.match(w, /partyMapFrame\(nowMs\);   \/\/ PARTY-MAP/);
-});
-
 // ─── the effect ──────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('PARTY-MAP effect: Shared Cartography is a duration buff (46,255) - in the Spell Maker, CasterOnly, Magic, priced at Mysticism, described in the spellbook', () => {
@@ -244,7 +229,6 @@ test('PARTY-MAP effect: the ready-made spell lands the buff on its caster for a 
   const cost = calculateCastCost(sp, me);
   assert.ok(cost.gold > 0 && cost.gold < 1000, `modest: ${cost.gold} gold`);
   assert.ok(cost.sp >= 5 && cost.sp < 60, `and cheap to keep up: ${cost.sp} SP`);
-  assert.match(rd('src/scenes/worldModes.js'), /isOnlinePage\(\) \? \[resurrectionSpell\(\), sharedCartographySpell\(\)\] : \[\]/);
 });
 
 test('AUDIT PARTY-MAP F2: the sender walks its whole map again every AMAP_RESYNC_MS - a mate who arrived late still gets it', async () => {

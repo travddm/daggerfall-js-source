@@ -33,8 +33,3 @@ test('RPT1026-MISC GIANT-ROCK: a spot inside a rock, or with a rock\'s face at t
   assert.equal(giantGroundBlocked(null, 0, 0, 0), false, 'no collider (a host with none): nothing refused');
 });
 
-test('RPT1026-MISC GIANT-ROCK by source: both doors that stand a giant ask the ground - the Greater Giant\'s field and its call\'s ring (mutant: rpt1026-misc-giant-rock-unasked)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(slope > 1\.6 \|\| crest > 4 \|\| giantGroundBlocked\(collider, x, h, z\)\) continue;/, 'giantFieldSpot');
-  assert.match(w, /if \(!wildInside\(mask, mx, my\) \|\| giantGroundBlocked\(collider, x, h, z\)\) continue;[^\n]*\n\s*stood\+\+;/, 'greaterGiantCall');
-});

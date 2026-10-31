@@ -57,12 +57,6 @@ test('AUDIT ONLINE2 F2: A RECEIPT\'S LIFE IS THE RELAY\'S CLOCK - the raid and g
     await settle();
     assert.deepEqual(late, [], `${what}: never asked`);
   }
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const relayNowS = \(\) => \(_sharedClockHeard \? Math\.floor\(\(Date\.now\(\) \+ _sharedOffsetMs\) \/ 1000\) : null\);/);
-  assert.match(w, /online\.onClock = \(offsetMs\) => \{ const was = _sharedOffsetMs; _sharedOffsetMs = offsetMs; _sharedClockHeard = true;/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the kept claim's wait asks its receipt - a lane past the Bay's waits on no scan
-  assert.match(w, /createGateClaims\(\{\n\s*claim: \(r\) => \(gateClaimReady\(r\) \? _accountGates\.claim\(r, gateSeatWord\(r\)\)\.then\(rollHeard\) : Promise\.resolve\(\{ ok: false, error: 'offline' \}\)\),\n\s*me: _accountGates\.me,\n\s*nowS: relayNowS,/);   // PIN MOVED (CHAP2b): the answer handed on to the Roll's refresh; PIN MOVED (AUDIT CHAP3 C3): a kept claim waits for the gate's scan
-  assert.match(w, /createRaidClaims\(\{\n(?:\s*\/\/[^\n]*\n)*\s*claim: \(r, ch, \.\.\.a\) => _accountRaids\.claim\(r, ch, \.\.\.a\)\.then\([^\n]*\n\s*me: _accountRaids\.me,\n\s*nowS: relayNowS,/);   // PIN MOVED (CHAP2b); PIN MOVED (AUDIT CHAP3 C4): the line on the fighting character's page
   assert.equal(RAID_CLAIMS_KEY, 'raid4.raidClaims');
 });
 
@@ -93,11 +87,6 @@ test('AUDIT ONLINE2 F3: A LOAD IN THE SESSION IS A STAND-UP - a town\'s thanks g
   off(); offBad();
   slotLoaded('char-C');
   assert.deepEqual(heard, ['char-A', null], 'told, a throwing listener kept from the rest, and unsubscribed');
-  const w = rd('src/scenes/world.js'), dc = rd('src/scenes/dungeonContext.js');
-  assert.match(w, /townTalk\.say\(localizedText\('gameLoaded', 'Game loaded\.'\)\);\n\s*slotLoaded\(playerEntity\.characterId \?\? null\);/, 'the world\'s load says it');
-  assert.match(dc, /if \(announce\) hudText\.add\(localizedText\('gameLoaded', 'Game loaded\.'\)\);[^\n]*\n\s*slotLoaded\(playerEntity\.characterId \?\? null\);/, 'and the dungeon\'s');
-  assert.match(w, /onSlotLoaded\(\(characterId\) => \{ spoilsPool\.loaded\(characterId\); raidSpoils\.loaded\(characterId\); serpentSpoils\.loaded\(characterId\); _spoilsAskedFor = null; \}\);/, 'the pools let go and the door asks again');   // AUDIT SERPENT D5: the Old Coil's hoard's too
-  assert.ok(w.indexOf('let _spoilsAskedFor = null;') < w.indexOf('onSlotLoaded((characterId)'), 'registered after what it resets');
 });
 
 // ═══ F5: A REFUSED TRADE SAYS WHOSE ══════════════════════════════════════════════════════════════

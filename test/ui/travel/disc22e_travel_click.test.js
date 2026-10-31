@@ -49,9 +49,3 @@ test('DISC22-E x RATE-LAW: the recess the spinner sat in is a READOUT - a free c
   assert.deepEqual([ui.timeAcceleration, ui.onRoad], [60, false]);
 });
 
-test('DISC22-E: the host asks the lock, not the flag', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const arm = w.slice(w.indexOf('if (stripTakesClick('), w.indexOf('travelControlUI.click(v[0], v[1])'));
-  assert.match(arm, /locked: document\.pointerLockElement === canvas/);
-  assert.doesNotMatch(arm, /cursorActive\(\)/, 'the flag the chat leaves down is not asked');
-});

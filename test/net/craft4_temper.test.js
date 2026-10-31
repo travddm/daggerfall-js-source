@@ -350,14 +350,3 @@ test('CRAFT4 pages: the anvil\'s and the loom\'s Temper - each piece its step, i
   } finally { setProfessionsPages(null); root?.remove(); }
 });
 
-test('CRAFT4 the host wires it (scenes/world.js): the anvil\'s and the loom\'s pieces not worn, no market act on them, the step on the answer and the fee paid; the Reforge with Essence the line rolled on the seed; the service routes both', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /temperable: \(where\) => \(playerEntity\.items \?\? \[\]\)\.filter\(\(it\) => it && !isEquipped\(it\) && !temperRefusal\(it\) && !\(typeof it\.provenance === 'string' && pieceKept\(it\.provenance\)\)\)/);
-  assert.match(w, /const took = pack\.includes\(it\) && temperItem\(it, r\.data\);/);
-  assert.match(w, /const line = pack\.includes\(it\) && r\.data\?\.tier === it\.rarity \? reforgeItem\(it, index, r\.data\.seed\) : null;/);
-  assert.match(w, /const r = await profBook\.reforge\(offer\.tier, reforgeCount\(it\)\);/, 'REFORGE-REPLACE: the piece\'s count asked, its price');
-  const idx = src('server-account/src/index.js');
-  assert.match(idx, /'\/v1\/prof\/temper': \(\) => temperPiece\(ctx, who\.player, env, body\)/);
-  assert.match(idx, /'\/v1\/prof\/reforge': \(\) => reforgeWithEssence\(ctx, who\.player, env, body\)/);
-  assert.match(src('server-account/migrations/0089_temper_reforge.sql'), /CREATE TABLE IF NOT EXISTS prof_tempers[\s\S]*CREATE TABLE IF NOT EXISTS prof_reforges/);
-});

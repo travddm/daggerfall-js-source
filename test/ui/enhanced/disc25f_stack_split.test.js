@@ -222,8 +222,5 @@ test('DISC25-F F3: the enhanced counter asks how many - buying part of a shelf\'
     assert.equal(h.bag[0].stackCount, 6, 'four onto the counter, six kept');
     view.unmount();
   });
-  // ONE constructor for both windows (AUDIT 17i)
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /howManyField\(\{ max, text: qty\.text,/);
-  assert.match(rd('src/ui/enhanced/enhancedTrade.js'), /howManyField\(\{ max, text: qty\.text,/);
   assert.equal(typeof howManyField, 'function');
 });

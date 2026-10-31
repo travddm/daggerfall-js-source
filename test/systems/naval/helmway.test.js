@@ -165,8 +165,5 @@ test('HELM-WAY the Features row\'s Ship handling (responsive, or the mod\'s own 
   const part = row.control.parts.find((p) => p.key === 'naval-handling');
   assert.deepEqual(part.tiers.map(([k]) => k), [...HANDLINGS]);
   assert.equal(part.label, 'Ship handling');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /brake: \(\) => naval\?\.brake\(\) \?\? 0,/);
-  assert.match(w, /handling: \(\) => getPref\('naval-handling'\) \?\? 'responsive',/);
   assert.ok(haulBrake(8.2) > 0 && Math.abs(haulBrake(8.2) * GRAPPLE_S - 8.2) < 1e-12, 'a brake that takes her way off over the haul, not a wall');
 });

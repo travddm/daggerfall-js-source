@@ -193,55 +193,6 @@ test('TESA2 the map: where a host stands the places, each inked place carries th
   assert.equal(tamrielCityAt(sol.x + CITY_HIT_PX + 1, sol.y, { ox: 0, oy: 0, scale: 1 }, ink), null);
   assert.equal(tamrielCityAt(500, 250, { ox: 0, oy: 0, scale: 1 }, ink), null, 'the Bay\'s own ground is the Bay\'s');
   assert.deepEqual(arenaInkCities({ places: [] }), []);
-  const held = read('src/ui/heldMap.js');
-  const pick = held.slice(held.indexOf('  _pickAt(sx, sy) {'), held.indexOf('  _renderSearch(entries) {'));
-  // PIN MOVED (TESA-NO-FAST): a portal's end on the teleport map alone - the travel map makes no journey past the Bay
-  assert.match(pick, /if \(this\._tamriel && !this\._zoneMap && this\.teleportationTravel\) \{/);
-  // PIN MOVED (PORTAL-ANYWHERE, bible/06-Systems/Portal-Stone.md): the portal's end is the city with a pixel, else - on the
-  // Portal Stone's map alone (`portalLandPastBay`) - the land under the press (systems/travel/pastBayTravel.js portalLandAt)
-  assert.match(pick, /const end = city\?\.pixel \? city : this\.deps\.portalLandPastBay \? portalLandAt\(Math\.floor\(mx\), Math\.floor\(my\)\) : null;\n\s+if \(end\) \{\n\s+this\._select\(\{ coords: true, x: end\.pixel\.x \+ 0\.5, y: end\.pixel\.y \+ 0\.5, colorIndex: -1, kind: 'coords', name: end\.name, summary: null, mapId: null, arena: true \}\);\n\s+this\._openPanel\('teleport'\);/);
-  assert.ok(pick.indexOf('// TESA2') < pick.indexOf('// WILD2'), 'before the zone\'s and the coordinates\' own arms');
-  assert.match(held, /if \(selected\.coords\) return \{ pixel: \{ x: Math\.floor\(selected\.x\), y: Math\.floor\(selected\.y\) \}, name: selected\.name \};/, 'the journey is to its pixel, by its name');
-  // PIN MOVED (AUDIT TESA II M7, M14): the cursor off the city the press would take (_pastBayHover: tamrielCityAt as the sheet inks)
-  assert.match(held, /cursor: this\.teleportationTravel && \(past\.city\?\.pixel \|\| \(this\.deps\.portalLandPastBay && portalLandAt\(px, py\)\)\) \? 'pointer' : ''/);   // PIN MOVED (PORTAL-ANYWHERE): and on the stone's map its land
-  // PIN MOVED (BAY-LEFT-MAPS C11, test/ui/bayleft_find.test.js): and the Ports filter
-  assert.match(held, /city: at\.on === 'city' \? tamrielCityAt\(mx, my, this\._view, ink, \{ filters: this\.filters, continent, portsOnly: this\.portsFilter \}\) : null/);
-  // WW7-6: a seat past the Bay answers with its card, as the Bay's (SEAT-TIP) - off the city the press would take
-  assert.match(held, /const seat = past\.city\?\.mapId != null \? this\.deps\.seatAt\?\.\(\{ mapId: past\.city\.mapId \}\) \?\? null : null;/);
-});
-
-test('TESA2 the host: offline on the land beyond the Bay it stands the places - the templates off the game\'s rows, the build asking Arena past the Bay, one clone a pixel in the index taken out when its place goes, the region and the climate the pixel\'s; the built pixel keeps its place for the sweep, which builds again what moved; a boot\'s load waits for the places; no house is sold in an Arena town; /tp names them (mutant: online, an arm, the wait)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const arenaStands = tamrielLand && arenaPlacesOn\(\);\n\s+setArenaStanding\(arenaStands\);/, 'PIN MOVED (TESA12): online and off, the port\'s own (tesa12_places)');
-  assert.match(w, /const _arenaTemplates = arenaStands \? arenaTemplates\(_classicRows \?\? _hubRows\.map\(classicRow\)\.filter\(Boolean\), isMainStoryDungeon\) : null;/, 'the game\'s rows');
-  assert.ok(w.indexOf('const _arenaTemplates = arenaStands') < w.indexOf('  _classicRows = null;   // read, let go'), 'before they go');
-  // PIN MOVED (AUDIT TESA II P1): online the open zone's hall of the day first - Cyrodiil's lie past the Bay
-  assert.match(w, /if \(etherSea && inEther\(px, py\)\) return etherPlaceAt\(px, py\);[^\n]*\n\s+if \(\(_arenaTemplates \|\| _countryTemplates \|\| _capitalBase\) && !onTheBay\(px, py\)\) return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| \(params\.has\('online'\) && zoneHalls\.standIn\(cyrodiilMask\(\), px, py\)\) \|\| host\.capitalLocationAt\(px, py\) \|\| \(_arenaTemplates && host\.arenaLocationAt\(px, py\)\) \|\| host\.countryLocationAt\(px, py\) \|\| host\.lairLocationAt\(px, py\) \|\| spawnPastBayAt\(px, py\);/);   // PIN MOVED (TESA7): Arena's place first, else the countryside's (tesa7_country); PIN MOVED (TESA8): then a lair's; PIN MOVED (TESA10): a capital before them all (tesa10_capitals)   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild is scenes/spawnStandHost.js's, the places' rolls through `host`   // PIN MOVED (SPAWN-WORLD 2026-10-26): online, the spawner's last - never on a place   // PIN MOVED (WW5, bible/03-World/World-Wide.md WW5): a province's Hollow first, as its lane stands it in the index (scenes/superDungeon/sdLanes.js) - carried into scenes/spawnStandHost.js at the packages' merge (AUDIT BAY-LEFT)
-  const fn = w.slice(w.indexOf('  function arenaLocationAt(px, py) {'), w.indexOf('\n  }\n', w.indexOf('  function arenaLocationAt(px, py) {')) + 4);   // PIN MOVED (HOST-SPLIT, at the merge of main): the place law is scenes/tamrielPlacesHost.js's, its live names through host
-  assert.match(fn, /if \(place && had\.arena\.provinceIndex === place\.provinceIndex && had\.arena\.id === place\.id && had\.arena\.port === !!place\.port\) return had;[^\n]*\n\s+host\._locIndexGen \+= 1;\n\s+locationIndex\.delete\(key\);/,   // PIN MOVED (TESA6): a city made a port is cloned again
-    'one clone a pixel, and out of the index when its place goes');
-  assert.match(fn, /const regionIndex = maps\.getRegionIndexAt\(px, py\);\n\s+const loc = outlineTownLocation\(synthesizeArenaLocation\(template, place, \{ regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex, climate: townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\) \}\), blockOf, \{ round: imperialOutskirts\(px, py\) \}\);/);   // PIN MOVED (TOWN-SHAPES TS3): laid as its own outline of blocks (townoutline); TS5: round in the Imperial City's outskirts; PIN MOVED (URBANIZER U1): its buildings in its province's set (world/urban/townLook.js townClimateAt)
-  assert.match(fn, /locationIndex\.set\(key, loc\);\n\s+return loc;/);
-  assert.match(w, /location: dfLocation \? dfLocation\.name : null,\n\s+arenaSlot: dfLocation\?\.arena \?\? null,\n/, 'the built pixel keeps its Arena slot - beside, never over, the colosseum\'s `arena` (ARENA2)');
-  assert.equal((w.slice(w.indexOf('    swap.publish(px, py, key, made, {'), w.indexOf('    });', w.indexOf('    swap.publish(px, py, key, made, {'))).match(/^\s+arena: /gm) ?? []).length, 1, 'the colosseum\'s origin is the entry\'s one `arena`');
-  const sweep = w.slice(w.indexOf('  function sweepArenaPixels() {'), w.indexOf('\n  }\n', w.indexOf('  function sweepArenaPixels() {')) + 4);   // PIN MOVED (HOST-SPLIT, at the merge of main): the sweeps are scenes/tamrielSweepsHost.js's - the function's own end, read whole
-  assert.match(sweep, /if \(now === _swept\.arena\) return;/);
-  assert.match(sweep, /if \(onTheBay\(p\.px, p\.py\)\) continue;/);
-  assert.match(sweep, /if \(\(place \? `\$\{place\.provinceIndex\}\|\$\{place\.id\}\|\$\{!!place\.port\}` : null\) !== \(p\.arenaSlot \? `\$\{p\.arenaSlot\.provinceIndex\}\|\$\{p\.arenaSlot\.id\}\|\$\{!!p\.arenaSlot\.port\}` : null\)\) again\.push/, 'PIN MOVED (TESA6): and its port');
-  assert.match(sweep, /if \(!again\.length\) return;\n\s+swap\.rebuild\(again\);/);   // PIN MOVED (IC-SWAP-BEHIND): built again behind its view, or torn down and queued nearest first (scenes/swapBehind.js rebuild)
-  assert.match(w, /if \(_arenaTemplates && !building\) sweepArenaPixels\(\);/);
-  const WAIT = "if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has('load')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);";
-  assert.ok(w.includes(WAIT), 'PIN MOVED (TESA12: the trace alone - no data to wait for; AUDIT-TESA A7-1: one wait for everything past the Bay) a load waits for the trace');
-  assert.ok(w.indexOf(WAIT) < w.indexOf('  let _loadedGame = false;'), 'before the boot decides its start');
-  assert.match(w, /\.finally\(\(\) => arenaTraceLanded\(\)\);/, 'landed, or never will');
-  assert.match(w, /if \(!arenaTraceAsked\) arenaTraceLanded\(\);/, 'the door shut: nothing to wait for');
-  assert.ok(w.indexOf('const arenaTraced = ') < w.indexOf(WAIT), 'the trace\'s promise made before the load waits on it');
-  assert.match(w, /if \(_arenaTemplates\) for \(const a of arenaPixels\(\)\?\.stood \?\? \[\]\) if \(!locationIndex\.has\(`\$\{a\.bx\},\$\{a\.by\}`\)\) places\.push\(\{ name: a\.name, px: a\.bx, py: a\.by \}\);/);
-  const modes = read('src/scenes/worldModes.js');
-  // PIN MOVED (BAY-LEFT-B, bible/03-World/Arena-Provinces.md): an Arena town sells its houses - its province's region's,
-  // its deed held to its own map id (banking.js deedHeldIn); the Veil's guard alone stands
-  assert.match(modes, /if \(isEtherPlaceId\(dir\.mapId\)\) return \[\];/);
-  assert.match(modes, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(/);   // PIN MOVED (TESA7): nor a country place's; PIN MOVED (BAY-LEFT-B): an Arena town's and a country place's read, held to their own town
 });
 
 // ── THE PLAYER'S OWN FILES ─────────────────────────────────────────

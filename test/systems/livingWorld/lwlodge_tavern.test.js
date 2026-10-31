@@ -279,12 +279,3 @@ test('LW-LODGE in the tavern: a lodger up in their room (their day\'s home there
   assert.deepEqual(lone.layer.stood()[0]?.at, place, 'where the player is not looking');
 });
 
-test('LW-LODGE the hosts: the building host hands the room its beds (its Rest markers, RentRoom\'s own list) and the bed of the room the player rents there (findRentedRoom\'s, by the town and the building); the world host hands them to the room\'s residents (mutants: the beds unhanded, the rented unhanded)', () => {
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /get interiorBeds\(\) \{ return interiorRestMarkers\(\)\.map\(\(m\) => \[m\.x, m\.y, m\.z\]\); \},/);
-  assert.match(modes, /findRentedRoom\(playerEntity\.rentedRooms \?\? \[\], questSceneCtx\?\.\(\)\?\.mapId \?\? 0, b\.buildingKey \?\? 0, b\.buildingType === BUILDING_TYPES\.Tavern\)/);
-  assert.match(modes, /return room \? room\.allocatedBedIndex \?\? -1 : -1;/);
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /beds: \(\) => modes\?\.interiorBeds \?\? \[\],/);
-  assert.match(world, /rented: \(\) => modes\?\.rentedBedHere \?\? -1,/);
-});

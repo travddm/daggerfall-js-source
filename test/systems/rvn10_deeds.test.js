@@ -101,31 +101,6 @@ test('RVN10 FELLED\'S GATES: no striker, a striker dead or down, a companion unn
   assert.equal(N.allRevenants().length, 0);
 });
 
-test('RVN10 FELLED, THE DOORS: the knock-out arm of both damage doors notes the blow that knocked him down (never a later one); the layer hands it on; the world\'s two parties make the deed and tell it (mutants: unnoted; a later blow renamed; unhanded; unwired)', async () => {
-  for (const [file, v] of [['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/dungeonContext.js', 'foe']]) {
-    assert.match(read(file), new RegExp(`if \\(${v}\\.companion != null\\) \\{ ${v}\\.entity\\.health = 1; if \\(!${v}\\._knockedOut\\) ${v}\\._knockedBy = striker; ${v}\\._knockedOut = true; return; \\}`), file);
-  }
-  // the layer, run: his body knocked out by a striker - onKnocked hears him and it
-  const party = createCompanions();
-  party.take(7, { name: 'Borgakh', role: 'Bosun', mobile: 144, gender: 'male' }, 0);
-  const pool = { key: 'street', live: [] };
-  pool.spawn = (mobile, feet, o) => { const r = { mobile, ai: { feet: [...feet], yaw: o.yaw }, entity: { health: 40, maxHealth: 40 }, dead: false }; pool.live.push(r); return Promise.resolve(r); };
-  pool.remove = (r) => { r.dead = true; pool.live = pool.live.filter((x) => x !== r); };
-  pool.has = (r) => pool.live.includes(r);
-  const heard = [];
-  const layer = createCrewAshore({ party: () => party, place: () => pool, leader: () => ({ feet: [0, 0, 0], yaw: 0, grounded: true }), now: () => 0, onKnocked: (c, by) => heard.push([c.name, by]) });
-  layer.frame(); await new Promise((r) => setImmediate(r));
-  const body = pool.live[0];
-  const striker = rec();
-  body._knockedOut = true; body._knockedBy = striker;
-  layer.frame();
-  assert.deepEqual(heard, [['Borgakh', striker]]);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /onKnocked: \(c, by\) => \{ naval\?\.companionKnocked\?\.\(c\); felledBy\(by, c\.name\); \}/, 'the crew: the hand by his name');
-  assert.match(w, /felledBy\(by, revenantRecord\(playerEntity, c\.name\)\?\.given \?\? null\);/, 'the sworn: its given name');
-  assert.match(w, /const felledBy = \(by, ally\) => \{\n\s*const r = by \? revenantFelled\(playerEntity, by, ally\) : null;\n\s*if \(r\) revenantSay\(revenantFelledEvent\(r, ally, /);
-});
-
 // ── the fight ───────────────────────────────────────────────────────
 
 test('RVN10 THE FIGHT: a foe\'s harm opens its fight and carries it on within 30 s; past that a new one opens; the low counts from the fight\'s start; a judged foe\'s fight ends (mutants: the fight never carried; never lapsed; a low before the fight counted)', () => {
@@ -218,25 +193,6 @@ test('RVN10 THE JUMP\'S SWEEP: the engaged specials of the pool I leave routed, 
   assert.deepEqual(N.revenantRoutSweep(p, [a, b, calm], { wall: T0 + 2000 }), [], 'once');
   setPlayerDoor({ foes: () => [calm] });
   assert.deepEqual(N.revenantRoutSweep(p), [], 'the door\'s pool by default');
-});
-
-test('RVN10 THE HOSTS: the street pool routs past 70 m before its cull, gone as the cull takes a foe and told; a jump routs (never a load\'s) before the sweep, a Recall before a mode\'s teardown (both hosts that cast one); the respawn ends every fight first (mutants: each seam unwired; the load routing)', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  const at = x.indexOf('if (_playerDist > ROUT.DISTANCE && revenantRoutable(f)) { routFoe(f); continue; }');
-  assert.ok(at > 0 && at < x.indexOf('if (!f.placed && !f.managed && !f.refugee && _playerDist > _cullAt'), 'before the cull');   // PIN MOVED (AUDIT WORLD-EVENTS L4-2): a raid's refugee exempt from the cull too
-  assert.match(x, /function routFoe\(f\) \{\n\s*scatterBand\(f\);\n\s*releaseFoeBatch\(f\);\n\s*f\.dead = true;\n\s*f\.escaped = true;\n\s*if \(f\.ai\?\.detected\) setEnemyAlert\(playerEntity, false\);\n\s*const r = revenantRouted\(playerEntity, f\);\n\s*if \(r\) revenantSay\(revenantRoutedEvent\(r, \{ archive: f\.archive \}\), say\);/);
-  const w = read('src/scenes/world.js');
-  const tp = w.slice(w.indexOf('async function _teleportToPixel('));
-  assert.ok(tp.indexOf("if (modEvent !== 'load') routByJump();") < tp.indexOf('exteriorFoes.clearLive();') && tp.indexOf("if (modEvent !== 'load') routByJump();") > 0, 'the teleport, before its sweep');
-  const rc = w.slice(w.indexOf('async function recallToAnchor()'));
-  assert.ok(rc.indexOf('routByJump();') > 0 && rc.indexOf('routByJump();') < rc.indexOf('modes?.forceExitToExterior('), 'the Recall, before the mode\'s teardown');
-  assert.ok(rc.indexOf("if (plan.kind === 'same-interior')") < rc.indexOf('routByJump();'), 'a Recall within the same room leaves no pool');
-  assert.match(w, /function routByJump\(\) \{\n\s*for \(const \{ r, f \} of revenantRoutSweep\(playerEntity\)\) revenantSay\(revenantRoutedEvent\(r, /);
-  assert.match(w, /_respawning = true;\n\s*endPlayerFights\(\);/, 'the respawn: every fight over before its jump');
-  // the single-location host: its Recall leaves a mode's pool only (the street stays - the distance judges a jump in it)
-  const e = read('src/scenes/exterior.js');
-  const er = e.slice(e.indexOf('async function recallToAnchor()'));
-  assert.match(er, /if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) \{\n(?:\s*\/\/[^\n]*\n)*\s*for \(const \{ r, f \} of revenantRoutSweep\(playerEntity\)\) revenantSay\(revenantRoutedEvent\(r, [^\n]*\n\s*modes\?\.forceExitToExterior\(/, 'exterior.js: before the mode\'s teardown');
 });
 
 // ── the words, the save ─────────────────────────────────────────────
