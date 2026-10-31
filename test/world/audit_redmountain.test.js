@@ -314,7 +314,7 @@ test('AUDIT RED-MOUNTAIN L1: the snow never lies on Red Mountain\'s ash - each l
 const A = process.env.ARENA2_PATH;
 const HAVE = !!A && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((n) => existsSync(join(A, n)));
 
-test('AUDIT RED-MOUNTAIN L5 with ARENA2: no carved water within the volcano\'s reach on the freeware\'s trace - a lake or a river the waters\' law carved there would cut the cone away (none does today; the pin holds it so)', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
+test('AUDIT RED-MOUNTAIN L5 with ARENA2: no carved water within the volcano\'s reach on the freeware\'s trace - a lake or a river the waters\' law carved there would cut the cone away (none does today; the pin holds it so)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const bytes = (n) => new Uint8Array(readFileSync(join(A, n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');

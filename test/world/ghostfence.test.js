@@ -146,7 +146,7 @@ test('GHOSTFENCE the places and the roads: the countryside keeps off inside the 
   assert.ok(blocks.every((b) => f.band.has(`${b.x},${b.y}`) && !f.open.has(`${b.x},${b.y}`)));
   assert.match(read('src/world/tamrielRoads.js'), /for \(const o of \[\.\.\.obstacles, \.\.\.held, \.\.\.ghostfenceRoadBlocks\(\)\]\) \{/);
   const R = await import('../../src/world/tamrielRoads.js');
-  assert.equal(R.GROUND_ROLL_VERSION, 6, 'every client\'s roads laid again with the fence');
+  assert.equal(R.GROUND_ROLL_VERSION, 7, 'every client\'s roads laid again with the fence');   // PIN MOVED (HEIGHTMAP-OUT): 7
 });
 
 test('GHOSTFENCE the roads\' build: two towns either side of the fence are joined round it - their road never on its line but at Ghostgate\'s pixels (the real builder over a flat grid)', async () => {
@@ -440,7 +440,7 @@ test('GHOSTFENCE by source: the law pure and one float in every engine (no Math.
   assert.match(read('src/world/tamrielCountry.js'), /if \(!steps \|\| insideGhostfence\(px, py\)\) return null;/);
 });
 
-test('GHOSTFENCE with ARENA2: on the freeware\'s trace the fence closes round Red Mountain on Morrowind\'s land in its zone, no countryside stands within it, no lair on its line, no Arena place within it', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
+test('GHOSTFENCE with ARENA2: on the freeware\'s trace the fence closes round Red Mountain on Morrowind\'s land in its zone, no countryside stands within it, no lair on its line, no Arena place within it', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const { ww5World } = await import('./worldWide/ww5World.mjs');
   const { tamrielHeightByte } = await import('../../src/world/tamriel/tamrielGround.js');
   const { tamrielBiomeAt } = await import('../../src/world/tamriel/tamrielBiomes.js');
@@ -567,7 +567,7 @@ test('LAVA-CLEAR, FENCE-CLEAR the readers: the pixel build asks the clearing of 
   assert.ok(any > 0, 'the rest of its ring stands');
 });
 
-test('LAVA-CLEAR, FENCE-CLEAR with ARENA2: on the freeware\'s ground with the lands on, the kernel lays flats and scoria spires on the crater\'s floor, down a foyada\'s lava and on the fence\'s line - and the build\'s clearing leaves none there (TESA-LANDS met RED-MOUNTAIN at the fold: 449 spires and 9,887 flats on the beds)', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
+test('LAVA-CLEAR, FENCE-CLEAR with ARENA2: on the freeware\'s ground with the lands on, the kernel lays flats and scoria spires on the crater\'s floor, down a foyada\'s lava and on the fence\'s line - and the build\'s clearing leaves none there (TESA-LANDS met RED-MOUNTAIN at the fold: 449 spires and 9,887 flats on the beds)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const { ww5World } = await import('./worldWide/ww5World.mjs');
   const { generatePixelTerrain } = await import('../../src/world/terrain/terrainGen.js');
   const { getWorldClimateSettings } = await import('../../src/formats/mapsFile.js');

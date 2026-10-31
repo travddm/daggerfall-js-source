@@ -1,87 +1,8 @@
 [
   {
-    "name": "AUDITTESA2G-G1-the-bake-masks-the-sea-again",
-    "file": "tools/bakeTamrielRelief.mjs",
-    "old": "    cells[j * w + i] = curve[",
-    "new": "    if (!trace.land[Math.floor(py) * tw + Math.floor(px)]) continue;\n    cells[j * w + i] = curve[",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G1-a-zero-cell-coded",
-    "file": "tools/bakeTamrielRelief.mjs",
-    "old": "    if (!(cells[i] > 0)) throw new Error(`a cell of 0 at ${i}`);",
-    "new": "    if (false) throw new Error(`a cell of 0 at ${i}`);",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G1-the-runs-unfilled",
-    "file": "src/world/tamriel/tamrielRelief.js",
-    "old": "cells.fill(bin.charCodeAt(i + 2), k, k + bin.charCodeAt(i + 1)); ",
-    "new": "",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G1-the-runs-the-wrong-byte",
-    "file": "src/world/tamriel/tamrielRelief.js",
-    "old": "cells.fill(bin.charCodeAt(i + 2), k, k + bin.charCodeAt(i + 1)); ",
-    "new": "cells.fill(bin.charCodeAt(i + 1), k, k + bin.charCodeAt(i + 1)); ",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G1-the-trace-unmasked",
-    "file": "src/world/tamriel/tamrielRelief.js",
-    "old": "  return maskRelief(decodeRelief(RELIEF_DATA), trace);",
-    "new": "  return decodeRelief(RELIEF_DATA);",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G1-the-mask-a-pixel-over",
-    "file": "src/world/tamriel/tamrielRelief.js",
-    "old": "if (!trace.land[Math.floor(y / s) * trace.w + Math.floor(x / s)]) cells[i] = 0;",
-    "new": "if (!trace.land[Math.floor(y / s) * trace.w + Math.floor(x / s) + 1]) cells[i] = 0;",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G2-a-lost-relief-rejects-the-trace",
-    "file": "src/ui/tamrielTrace.js",
-    "old": "trace.relief = await loadRelief(trace).catch((e) => (console.warn('[tamriel] the relief did not load; the authored heights stand:', e?.message ?? e), null));",
-    "new": "trace.relief = await loadRelief(trace);",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G2-the-bake-reads-its-own-output",
-    "file": "tools/bakeTamrielRelief.mjs",
-    "old": "preloadTamrielTrace({ fetchBytes, palette: pal, relief: false, niben: false })",
-    "new": "preloadTamrielTrace({ fetchBytes, palette: pal, niben: false })",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
-    "name": "AUDITTESA2G-G2-the-switch-unread",
-    "file": "src/ui/tamrielTrace.js",
-    "old": "  if (trace && relief) trace.relief = await loadRelief(trace)",
-    "new": "  if (trace) trace.relief = await loadRelief(trace)",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
     "name": "AUDITTESA2G-G3-the-air-s-ground-kept",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/systems/weather/airGround.js",
     "old": "if (v !== stamp) { stamp = v; fields.clear(); tops.clear(); }",
     "new": "if (v !== stamp) { stamp = v; }",
@@ -91,6 +12,8 @@
   },
   {
     "name": "AUDITTESA2G-G3-the-tops-kept",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/systems/weather/airGround.js",
     "old": "if (v !== stamp) { stamp = v; fields.clear(); tops.clear(); }",
     "new": "if (v !== stamp) { stamp = v; fields.clear(); }",
@@ -100,6 +23,8 @@
   },
   {
     "name": "AUDITTESA2G-G3-the-fields-kept",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/systems/weather/airGround.js",
     "old": "if (v !== stamp) { stamp = v; fields.clear(); tops.clear(); }",
     "new": "if (v !== stamp) { stamp = v; tops.clear(); }",
@@ -255,15 +180,6 @@
     ]
   },
   {
-    "name": "AUDITTESA2G-G8-the-fit-in-picture-units",
-    "file": "tools/bakeTamrielRelief.mjs",
-    "old": "  return { ox: fit.ox * fit.ppu, oy: fit.oy * fit.ppu, ppu: fit.ppu };",
-    "new": "  return { ox: fit.ox, oy: fit.oy, ppu: fit.ppu };",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
     "name": "AUDITTESA2G-G10-the-canopy-uncapped",
     "file": "src/scenes/jungleHost.js",
     "old": ", beyond: canopyAt, beyondMax: JUNGLE_CANOPY.fieldMax })",
@@ -375,6 +291,8 @@
   },
   {
     "name": "AUDITTESA2G-J4-the-neighbour-s-peaks-unread",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/world/tamriel/tamrielBiomes.js",
     "old": " ?? (other.length ? peaksAt(/** @type {string} */ (across), ZONES.get(across), px, py) : null);",
     "new": ";",

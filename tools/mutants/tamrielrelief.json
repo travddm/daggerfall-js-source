@@ -1,12 +1,5 @@
 [
   {
-    "name": "TAMRIEL-RELIEF-the-runs-misread",
-    "file": "src/world/tamriel/tamrielRelief.js",
-    "old": "k += bin.charCodeAt(i + 1); i += 3;",
-    "new": "k += bin.charCodeAt(i + 1) - 1; i += 3;",
-    "tests": ["test/world/tamrielrelief.test.js"]
-  },
-  {
     "name": "TAMRIEL-RELIEF-stands-on-any-trace",
     "file": "src/world/tamriel/tamrielRelief.js",
     "old": "  return !!t?.relief && t.relief.length === t.w * RELIEF_SCALE * t.h * RELIEF_SCALE;",
@@ -88,13 +81,6 @@
     "file": "src/world/tamrielRoads.js",
     "old": "  if (trace?.relief) for (let i = 0; i < trace.relief.length; i++) mix(trace.relief[i] + 256);",
     "new": "  if (false) for (let i = 0; i < trace.relief.length; i++) mix(trace.relief[i] + 256);",
-    "tests": ["test/world/tamrielrelief.test.js"]
-  },
-  {
-    "name": "TAMRIEL-RELIEF-the-trace-made-bare",
-    "file": "src/ui/tamrielTrace.js",
-    "old": "  if (trace && relief) trace.relief = await loadRelief(trace)",
-    "new": "  if (false) trace.relief = await loadRelief(trace)",
     "tests": ["test/world/tamrielrelief.test.js"]
   },
   {

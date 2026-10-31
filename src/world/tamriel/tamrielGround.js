@@ -81,7 +81,7 @@ export function authoredHeightByte(px, py, noise = 0) {
   }
   const inland = Math.min(1, coastDistanceAt(px, py) / PLAIN_REACH);
   let h = SHORE_BYTE + (INLAND_BYTE - SHORE_BYTE) * inland + noise;
-  const lift = rangeLift(px, py);
+  const lift = tamrielTrace() ? 0 : rangeLift(px, py);   // HEIGHTMAP-OUT (Tamriel.md): a trace with no relief a plain - the ranges stood as cliffs into its sea
   if (lift > 0) h = Math.max(h, SHORE_BYTE + (SNOW_BYTE - SHORE_BYTE) * lift);
   return Math.max(SHORE_BYTE, Math.min(255, Math.round(h)));
 }

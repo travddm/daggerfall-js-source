@@ -10,7 +10,6 @@ import { join } from 'node:path';
 import { memoryIdb } from '../memoryIdb.mjs';
 import { bootStore, traceKey, keptTrace, keepTrace, loadFits, keptFit, keepFit, keptLandRegions, fnv32, BOOT_CACHE_VERSION } from '../../src/world/tamriel/tamrielBootCache.js';
 import { fitBayToPicture } from '../../src/world/tamriel/tamrielLand.js';
-import { maskRelief } from '../../src/world/tamriel/tamrielRelief.js';
 import { BAY_W, BAY_H } from '../../src/world/tamriel/tamrielFrame.js';
 
 const settle = async (n = 30) => { for (let k = 0; k < n; k++) await new Promise((r) => setTimeout(r, 0)); };
@@ -114,18 +113,17 @@ test('BOOT-CACHE (AUDIT RELEASE R4-4) the fit kept and taken: fitBayToPicture wi
   assert.equal(keptFit(undefined, 'land'), null);
 });
 
-test('BOOT-CACHE (AUDIT RELEASE R4-4) the laws a kept continent stands for, printed under BOOT_CACHE_VERSION: the relief\'s mask and the fit on a fixture - a law moved and the version not, this fails (mutants: the mask\'s rule; the fit\'s)', () => {
+test('BOOT-CACHE (AUDIT RELEASE R4-4) the laws a kept continent stands for, printed under BOOT_CACHE_VERSION: the fit on a fixture - a law moved and the version not, this fails (mutant: the fit\'s)', () => {
   const t = block();
-  const cells = maskRelief(Uint8Array.from({ length: 640 * 400 }, (_, i) => 1 + (i % 200)), t);
   const fit = fitBayToPicture({ bayLand: (x, y) => x > 100 && x < BAY_W - 100 && y > 60 && y < BAY_H - 60, trace: t, around: { ox: 20, oy: 40 }, span: 6, ppus: [18, 19.5] });
-  const print = fnv32(cells, fnv32(JSON.stringify(fit))).toString(36);
-  const PRINTS = Object.freeze({ 1: 'ua6qdv', 2: 'ua6qdv' });   // 2 (NIBEN-SEA): the trace's law moved, the mask's and the fit's not
+  const print = fnv32(JSON.stringify(fit)).toString(36);
+  const PRINTS = Object.freeze({ 2: '1nj4tg3' });   // HEIGHTMAP-OUT: the fit's law alone, the relief's mask retired with its data
   assert.equal(print, PRINTS[BOOT_CACHE_VERSION], `the laws answer otherwise than under BOOT_CACHE_VERSION ${BOOT_CACHE_VERSION}: move it and record '${print}' under the new number`);
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
-test('BOOT-CACHE (AUDIT RELEASE R4-4) with ARENA2: the freeware\'s trace and relief kept at a first boot and taken at the next, byte for byte; with no IndexedDB the boot as before', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
+test('BOOT-CACHE (AUDIT RELEASE R4-4) with ARENA2: the freeware\'s trace kept at a first boot and taken at the next, byte for byte, with no relief (HEIGHTMAP-OUT); with no IndexedDB the boot as before', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
   const bytes = (n) => new Uint8Array(readFileSync(join(/** @type {string} */ (ARENA2), n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');
@@ -135,7 +133,8 @@ test('BOOT-CACHE (AUDIT RELEASE R4-4) with ARENA2: the freeware\'s trace and rel
   await settle();
   const store = bootStore(idb), kept = await keptTrace(store, fresh.cacheKey);
   assert.ok(kept, 'kept at the first boot');
-  for (const f of ['land', 'province', 'relief']) assert.ok(Buffer.from(kept[f]).equals(Buffer.from(fresh[f])), `${f} byte for byte`);
+  for (const f of ['land', 'province']) assert.ok(Buffer.from(kept[f]).equals(Buffer.from(fresh[f])), `${f} byte for byte`);
+  assert.equal(kept.relief, null, 'no relief kept');
   // a returning boot takes what is kept (a record planted under its key, with its own checksum, is what it answers)
   const planted = fresh.land.slice(); planted[0] ^= 1;
   await keepTrace(store, fresh.cacheKey, { ...fresh, land: planted });
@@ -143,10 +142,10 @@ test('BOOT-CACHE (AUDIT RELEASE R4-4) with ARENA2: the freeware\'s trace and rel
   assert.equal(again.cacheKey, fresh.cacheKey);
   assert.ok(Buffer.from(again.land).equals(Buffer.from(planted)), 'taken from the store, not traced again');
   await keepTrace(store, fresh.cacheKey, fresh);
-  // the trace's law and the relief's mask on the freeware's pictures, printed under BOOT_CACHE_VERSION
-  const print = fnv32(fresh.relief, fnv32(fresh.province, fnv32(fresh.land))).toString(36);
-  assert.equal(print, Object.freeze({ 1: '1akglnx', 2: 'cev4vj' })[BOOT_CACHE_VERSION], `the trace or the relief answers otherwise than under BOOT_CACHE_VERSION ${BOOT_CACHE_VERSION}: move it and record '${print}' under the new number`);
+  // the trace's law on the freeware's pictures, printed under BOOT_CACHE_VERSION (HEIGHTMAP-OUT: no relief in the print)
+  const print = fnv32(fresh.province, fnv32(fresh.land)).toString(36);
+  assert.equal(print, Object.freeze({ 2: '1koibnr' })[BOOT_CACHE_VERSION], `the trace answers otherwise than under BOOT_CACHE_VERSION ${BOOT_CACHE_VERSION}: move it and record '${print}' under the new number`);
   const plain = await preloadTamrielTrace({ fetchBytes: async (n) => bytes(n), palette: pal, indexedDBRef: null });
   assert.equal(plain.cacheKey, undefined);
-  for (const f of ['land', 'province', 'relief']) assert.ok(Buffer.from(plain[f]).equals(Buffer.from(fresh[f])));
+  for (const f of ['land', 'province']) assert.ok(Buffer.from(plain[f]).equals(Buffer.from(fresh[f])));
 });

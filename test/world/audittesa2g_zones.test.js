@@ -100,7 +100,7 @@ test('AUDIT TESA II J4: a zone\'s province is read at the wandered point - near 
 
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'MAP.PAL', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
-test('AUDIT TESA II with ARENA2: on the player\'s own trace Red Mountain stands ringed by the Ashlands (where it stood ringed by the Bitter Coast\'s swamp and Stonefalls, none of the Ashlands), the Grazelands north-east of it; and the jungle\'s edge runs straight along a province border for no more than 4 picture units (it ran 7 - 89 km at x 214)', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
+test('AUDIT TESA II with ARENA2: on the player\'s own trace Red Mountain stands ringed by the Ashlands (where it stood ringed by the Bitter Coast\'s swamp and Stonefalls, none of the Ashlands), the Grazelands north-east of it; and the jungle\'s edge runs straight along a province border for no more than 4 picture units (it ran 7 - 89 km at x 214)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const fetchBytes = async (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');

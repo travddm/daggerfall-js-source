@@ -32,7 +32,7 @@ test('AUDIT TESA II G3: the snowpack forgets its points and its systems when the
 
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'WOODS.WLD', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
-test('AUDIT TESA II G3 with ARENA2: a summit past the Bay read before the trace lands reads its relief\'s ground after (mutants: the fields and tops kept)', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
+test('AUDIT TESA II G3 with ARENA2: a summit past the Bay read before the trace lands reads its relief\'s ground after (mutants: the fields and tops kept)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const fetchBytes = async (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
   const { DFPalette } = await import('../../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../../src/ui/tamrielTrace.js');

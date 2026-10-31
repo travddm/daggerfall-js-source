@@ -1,11 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // AUDIT RELEASE R4-4 (bible/01-Overview/audits/Audit-Release-R4.md; the owner: "Take care of exclusions and gaps") - THE
-// BOOT'S CONTINENT, KEPT. Every boot, a returning one too, traced the picture (TMAP00I0 + TAMRIEL2), masked the
-// relief and fitted the Bay to the picture - the same answers from the same inputs, some 0.5-1 s of the page's thread.
-// They are kept in IndexedDB under a print of their inputs - the two pictures' bytes, the palette the trace reads them
-// through, the relief's own data, and BOOT_CACHE_VERSION (moved whenever the trace's, the relief's mask's or the fit's
-// law moves: test/world/smoothland.test.js holds each law's print under it) - and a returning boot takes them:
+// BOOT'S CONTINENT, KEPT. Every boot, a returning one too, traced the picture (TMAP00I0 + TAMRIEL2) and fitted the Bay
+// to the picture - the same answers from the same inputs, some 0.5-1 s of the page's thread. They are kept in IndexedDB
+// under a print of their inputs - the two pictures' bytes, the palette the trace reads them through, a relief's own data
+// (none since HEIGHTMAP-OUT), and BOOT_CACHE_VERSION (moved whenever the trace's or the fit's law moves:
+// test/world/bootcache.test.js holds each law's print under it) - and a returning boot takes them:
 //   - the trace and its relief: one record a print, its arrays' own checksum checked on load (a record that does not
 //     answer to its key, its sizes or its checksum is no record - the boot builds as it always did);
 //   - the fit: kept beside the trace, a record a print of the Bay's land as the fit samples it (fitBayToPicture's own
@@ -17,8 +17,8 @@
 // ═══════════════════════════════════════════════════════════════════
 import { idbStore } from '../roadsCache.js';
 
-/** Moved whenever the trace's law (ui/tamrielTrace.js traceTamrielPicture), the relief's mask (tamrielRelief.js
- *  maskRelief) or the fit's (tamrielLand.js fitBayToPicture) moves - every kept continent is then built again. */
+/** Moved whenever the trace's law (ui/tamrielTrace.js traceTamrielPicture) or the fit's (tamrielLand.js fitBayToPicture)
+ *  moves - every kept continent is then built again. */
 export const BOOT_CACHE_VERSION = 2;   // 2: NIBEN-SEA - the trace opens the Niben's mouth (ui/tamrielTrace.js openNiben)
 const DB = 'dfo-tamriel-boot', STORE = 'continent';
 

@@ -1,26 +1,17 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TAMRIEL-RELIEF (2026-10-24, bible/03-World/Tamriel.md TAMRIEL-RELIEF; the owner, with a heightmap of the whole continent:
-// "Heres the entire tamriel height map btw", then "This is the heightmap. Use it") - THE CONTINENT'S OWN RELIEF: the
-// owner's heightmap laid on the trace of Daggerfall's own map (tools/bakeTamrielRelief.mjs - its land fitted and warped
-// onto the trace's, its brightness made WOODS' bytes by the Bay's own ranks), a height a cell, two cells a picture unit
-// (tamrielReliefData.js). PURE over the trace: the terrain worker and the roads worker hold the same module.
+// TAMRIEL-RELIEF (2026-10-24, bible/03-World/Tamriel.md TAMRIEL-RELIEF) - THE CONTINENT'S RELIEF, as a trace carries it:
+// a height a cell, RELIEF_SCALE cells a picture unit, in WOODS bytes (the trace's `relief`). PURE over the trace: the terrain
+// worker and the roads worker hold the same module. HEIGHTMAP-OUT (2026-10-31, Tamriel.md TAMRIEL-RELIEF): the owner's
+// heightmap and the data baked from it are removed, so no trace carries a relief and the authored law stands everywhere
+// past the Bay (world/tamriel/tamrielGround.js authoredHeightByte). What reads the cells stays for the relief generated
+// from the remake's own sketch (tamriel-remake PLAN).
 //
-//   - IT RIDES ON THE TRACE. The cells are the trace's `relief` (ui/tamrielTrace.js preloadTamrielTrace loads them - the
-//     data is its own chunk, fetched once with the player's two files, never in the boot chunk or a worker's - and every
-//     copy of the trace carries them: world/tamriel/tamrielLand.js setTamrielTrace, the terrain worker's message, the roads
-//     worker's). The heightmap was laid on the picture the trace reads (TMAP00I0 and TAMRIEL2, 320 x 200), so it answers
-//     only while such a trace stands with them; with none (`?tamrieltrace=off`, a picture that reads wrong, a pin's own
-//     trace) the authored law stands, ranges and all (world/tamriel/tamrielGround.js authoredHeightByte).
-//   - THE COAST IS THE TRACE'S: a cell at sea on the trace is 0, so the relief never makes land or water - it only says
-//     how high the land the trace draws stands. AUDIT TESA II G1: the mask is laid HERE, on the player's machine, from the
-//     player's own trace (maskRelief, in loadRelief) - the shipped module holds a height for every cell, the sea's too, so
-//     nothing of the trace (a raster of TAMRIEL2.IMG and TMAP00I0.IMG: Port-Doctrine, A RENDER OF GAME DATA IS GAME DATA)
-//     ships in it. The cells after the mask are the ones the module carried before, to the byte.
+//   - THE COAST IS THE TRACE'S: a cell at sea on the trace is 0, so a relief never makes land or water - it only says
+//     how high the land the trace draws stands.
 //   - THE PEAKS (world/tamriel/tamrielBiomes.js): a province's peaks zone is its highest PEAKS_SHARE of land, never under
-//     PEAKS_FLOOR (`peaksLine`); a range a zone names (Red Mountain) stands at the heightmap's summit nearest the range's
-//     authored place, within NAMED_SEEK (`namedSummit`) - the authored spines were drawn from memory on the lore map,
-//     and on the trace Red Mountain's lies in the sea and the Throat of the World's on Skyrim's north shore.
+//     PEAKS_FLOOR (`peaksLine`); a range a zone names (Red Mountain) stands at the relief's summit nearest the range's
+//     authored place, within NAMED_SEEK (`namedSummit`).
 // ═══════════════════════════════════════════════════════════════════
 import { tamrielTrace, tamrielLandVersion, provinceKeyAt } from './tamrielLand.js';
 import { tamrielFit, bayPictureRect } from './tamrielFrame.js';   // AUDIT TESA II G11: the peaks' share is of the land past the Bay
@@ -40,47 +31,8 @@ export const PEAKS_FLOOR = 40;
 export const NAMED_SEEK = 30;
 export const NAMED_REACH = 10;
 
-/** Cells a picture unit, each way (the bake's RELIEF_SCALE). */
+/** Cells a picture unit, each way. */
 export const RELIEF_SCALE = 2;
-
-/** THE CELLS from the data module's run-length code, base64 - a byte 1..255 is a cell; a 0, a count (1..255) and a byte is
- *  that many cells of the byte (AUDIT TESA II G1: every cell a height, the sea's too - no run means "sea"). Pure.
- *  @param {{ w: number, h: number, scale: number, cells: string }} data */
-export function decodeRelief(data) {
-  const bin = globalThis.atob(data.cells), cells = new Uint8Array(data.w * data.h);
-  for (let i = 0, k = 0; i < bin.length;) {
-    const v = bin.charCodeAt(i);
-    if (v === 0) { cells.fill(bin.charCodeAt(i + 2), k, k + bin.charCodeAt(i + 1)); k += bin.charCodeAt(i + 1); i += 3; } else { cells[k++] = v; i++; }
-  }
-  return cells;
-}
-/** AUDIT TESA II G1: THE TRACE'S MASK ON THE CELLS - a cell whose picture pixel is sea on `trace` is 0 (`cells` written in
- *  place and answered). The player's own trace masks the shipped heights on the player's machine. Pure.
- *  @param {Uint8Array} cells @param {{ w: number, h: number, land: ArrayLike<number> }} trace */
-export function maskRelief(cells, trace) {
-  const s = RELIEF_SCALE, w = trace.w * s;
-  for (let i = 0; i < cells.length; i++) {
-    const x = i % w, y = (i - x) / w;
-    if (!trace.land[Math.floor(y / s) * trace.w + Math.floor(x / s)]) cells[i] = 0;
-  }
-  return cells;
-}
-/** THE RELIEF FOR A TRACE: its cells when the trace is of the picture the heightmap was laid on, masked by the trace's own
- *  land (maskRelief), else null - the data module fetched once, its own chunk (ui/tamrielTrace.js preloadTamrielTrace
- *  hangs the answer on the trace).
- *  @param {{ w: number, h: number, land: ArrayLike<number> }} trace */
-export async function loadRelief(trace) {
-  const { RELIEF_DATA } = await import('./tamrielReliefData.js');
-  if (RELIEF_DATA.scale !== RELIEF_SCALE || trace.w * RELIEF_SCALE !== RELIEF_DATA.w || trace.h * RELIEF_SCALE !== RELIEF_DATA.h) return null;
-  return maskRelief(decodeRelief(RELIEF_DATA), trace);
-}
-
-/** AUDIT RELEASE R4-4: the relief's own data as kept (its cells' text) - what a kept relief is keyed on
- *  (world/tamriel/tamrielBootCache.js), the data module fetched once. @returns {Promise<string>} */
-export async function reliefSource() {
-  const { RELIEF_DATA } = await import('./tamrielReliefData.js');
-  return `${RELIEF_DATA.scale}:${RELIEF_DATA.w}:${RELIEF_DATA.h}:${RELIEF_DATA.cells}`;
-}
 
 /** The installed trace's cells, or null. */
 const reliefCells = () => /** @type {Uint8Array|null} */ (tamrielTrace()?.relief ?? null);

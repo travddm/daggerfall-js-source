@@ -50,6 +50,8 @@ summaries are quoted as UESP's, never as a book's. The Sources section, below, n
   Jerall, the Throat of the World, the Velothi, the Wrothgarians, the Dragontail and Eton Nir are their provinces'
   peaks; the Colovian Highlands (gain 0.6) and the Tenmar Hills (0.4) never reach the line. A peaks zone with seeds is
   a country of its own besides (Wrothgar; the Jerall's Bruma).
+- **HEIGHTMAP-OUT** (2026-10-31, `03-World/Tamriel.md`): the heightmap is removed and no trace carries a relief, so the
+  peaks below follow the authored ranges.
 - **The peaks, on the heightmap** (TAMRIEL-RELIEF, 2026-10-24, `03-World/Tamriel.md`; Recorded choice 14). Where the
   trace stands with the owner's heightmap on it (`tamrielRelief.js` reliefStands), the ranges above give way to the
   relief (`peaksAt`):

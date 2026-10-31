@@ -399,7 +399,7 @@ test('RED-MOUNTAIN its fire: the profile the far draw hides behind the cone\'s o
 const A = process.env.ARENA2_PATH;
 const HAVE = !!A && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((n) => existsSync(join(A, n)));
 
-test('RED-MOUNTAIN with ARENA2: on the freeware\'s trace the volcano stands at Red Mountain\'s summit on the relief - its rim over 6.5 km, the highest ground of Tamriel by 3 km\'s margin over its plateau, the zone at its centre Red Mountain\'s, no Arena place on its summit cone (its lairs stand: Dagoth Ur\'s strongholds), its reach on Morrowind\'s land (AUDIT RED-MOUNTAIN R3/R8: the title claimed a zone about it and no place at all)', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
+test('RED-MOUNTAIN with ARENA2: on the freeware\'s trace the volcano stands at Red Mountain\'s summit on the relief - its rim over 6.5 km, the highest ground of Tamriel by 3 km\'s margin over its plateau, the zone at its centre Red Mountain\'s, no Arena place on its summit cone (its lairs stand: Dagoth Ur\'s strongholds), its reach on Morrowind\'s land (AUDIT RED-MOUNTAIN R3/R8: the title claimed a zone about it and no place at all)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const bytes = (n) => new Uint8Array(readFileSync(join(A, n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');

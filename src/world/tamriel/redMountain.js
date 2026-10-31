@@ -6,7 +6,7 @@
 // Math.cos, Math.exp, Math.atan2 or `**`): the terrain worker reads it too. World samples (6.4 m) and kernel units (1.25 m).
 import { heartsAnchor, RED_MOUNTAIN } from './tamrielBiomes.js';
 import { pictureToBay, tamrielFit, BAY_H } from './tamrielFrame.js';
-import { tamrielLandVersion } from './tamrielLand.js';
+import { tamrielLandVersion, provinceKeyAt } from './tamrielLand.js';
 import { perlinNoise } from '../perlin.js';
 import { TERRAIN_SIZE, STREAMING_TERRAIN_SCALE } from '../terrain/terrainSampler.js';
 
@@ -108,8 +108,10 @@ export function redMountainFrame() {
   const land = tamrielLandVersion(), fit = tamrielFit();
   if (land === _land && fit === _fit) return _frame;
   _land = land; _fit = fit;
+  // HEIGHTMAP-OUT (bible/03-World/Tamriel.md): with no relief the anchor is the authored spine's middle, which lies in the
+  // freeware trace's sea - a cone stands on Morrowind's land or not at all
   const at = heartsAnchor('Morrowind', RED_MOUNTAIN);
-  if (!at) return (_frame = null);
+  if (!at || provinceKeyAt(at[0], at[1]) !== 'Morrowind') return (_frame = null);
   const [bx, by] = pictureToBay(at[0], at[1]);
   const cx = (bx * 128), cy = (MAP_ROWS + 1 - by) * 128, k = 1 / SAMPLE_M;
   const foyada = D.foyada.map((f) => {

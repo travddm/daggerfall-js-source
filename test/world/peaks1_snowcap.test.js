@@ -219,7 +219,7 @@ test('PEAKS1 THE HORIZON WEARS IT: the far ring whitens a vertex over its line b
 const A = process.env.ARENA2_PATH;
 const HAVE = !!A && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((f) => existsSync(join(A, f)));
 
-test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stands high wears its cap - Skyrim\'s summit, the Jerall, the Wrothgarians and the Dragontails white at their tops, the line under them by their zones; Red Mountain\'s ash and the Alik\'r bare; a corner\'s line one number from the four pixels about it (mutants: a zone\'s line, the zones unread past the Bay)', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
+test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stands high wears its cap - Skyrim\'s summit, the Jerall, the Wrothgarians and the Dragontails white at their tops, the line under them by their zones; Red Mountain\'s ash and the Alik\'r bare; a corner\'s line one number from the four pixels about it (mutants: a zone\'s line, the zones unread past the Bay)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)' }, async () => {
   const bytes = (n) => new Uint8Array(readFileSync(join(A, n)));
   const { DFPalette } = await import('../../src/formats/dfPalette.js');
   const { preloadTamrielTrace } = await import('../../src/ui/tamrielTrace.js');

@@ -29,7 +29,6 @@ import { DFPalette } from '../src/formats/dfPalette.js';
 import { MapsFile, LOCATION_TYPES } from '../src/formats/mapsFile.js';
 import { traceTamrielPicture, paletteReader } from '../src/ui/tamrielTrace.js';
 import { fitBayToPicture, setTamrielTrace, tamrielTrace } from '../src/world/tamriel/tamrielLand.js';
-import { loadRelief } from '../src/world/tamriel/tamrielRelief.js';
 import { setTamrielFit, tamrielFit, tamrielFrameInBay, inBay, BAY_W } from '../src/world/tamriel/tamrielFrame.js';
 import { isWaterPixel } from '../src/ui/overworldModel.js';
 import { landAt } from '../src/ui/ink/inkMap.js';
@@ -63,7 +62,6 @@ const picture = new ImgFile(); picture.load(file('TMAP00I0.IMG'), 'TMAP00I0.IMG'
 const picker = new ImgFile(); picker.load(file('TAMRIEL2.IMG'), 'TAMRIEL2.IMG');
 const pal = new DFPalette(); pal.load(file(picture.paletteName || 'ART_PAL.COL'), picture.paletteName || 'ART_PAL.COL');
 const trace = traceTamrielPicture(picker.getDFBitmap(), picture.getDFBitmap(), paletteReader(pal));
-trace.relief = await loadRelief(trace);   // AUDIT TESA II R5: TAMRIEL-RELIEF's cells, as preloadTamrielTrace hangs them
 const woods = new WoodsFile(); woods.load(file('WOODS.WLD'));
 const climatePak = new PakFile(); climatePak.load(file('CLIMATE.PAK'));
 const bayLand = landAt({ heightBytes: woods.heightMapBuffer, width: BAY_W, climateAt: (x, y) => climatePak.getValue(x + 1, y) });

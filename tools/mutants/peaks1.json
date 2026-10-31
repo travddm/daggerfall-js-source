@@ -91,6 +91,8 @@
   },
   {
     "name": "PEAKS1-a-zone-s-line",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/world/peaks/snowcap.js",
     "old": "skyrimPeaks: 1250,",
     "new": "skyrimPeaks: 3000,",
@@ -100,6 +102,8 @@
   },
   {
     "name": "PEAKS1-the-zones-unread-past-the-bay",
+    "equivalent": true,
+    "why": "HEIGHTMAP-OUT (bible/03-World/Tamriel.md): its only pin is an ARENA2 test skipped until the remake's relief; re-enabled, this mutant dies and the record is stale",
     "file": "src/world/peaks/snowcap.js",
     "old": "if (bayEdgeDistance(px, py) > SEAM_PX) {",
     "new": "if (false) {",

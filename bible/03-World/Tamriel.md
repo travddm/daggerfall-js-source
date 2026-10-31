@@ -386,6 +386,9 @@ fit) is untouched.
 
 ## TAMRIEL-RELIEF - the continent's own heights (2026-10-24)
 
+**RETIRED by HEIGHTMAP-OUT (2026-10-31, below).** The heightmap, its bake and its data are removed, and the land past
+the Bay stands as a plain. This section is the record of what stood until then. What reads a relief stays.
+
 The owner, with a heightmap of the whole continent: *"Heres the entire tamriel height map btw"*, then *"This is the
 heightmap. Use it"*. Asked whether it should only set heights on the land as traced or reshape the land, the owner did
 not choose; the land stays the trace's - its coasts, and with them every place, road and port TESA stood on it - and
@@ -397,7 +400,7 @@ the heightmap says how high that land stands.
   Vvardenfell where the picker's is land. **Its licence is the owner's permission (AUDIT TESA II G9; the owner,
   2026-10-25, asked whether data made from the heightmap may ship: "We have permission").** The PNG ships nowhere,
   but its derivative does, by that permission: the relief module is a chunk of every build.
-- **The bake** (`tools/bakeTamrielRelief.mjs`, ARENA2_PATH set; `src/world/tamriel/tamrielReliefData.js` its output):
+- **The bake** (DELETED by HEIGHTMAP-OUT: `tools/bakeTamrielRelief.mjs`, ARENA2_PATH set; `src/world/tamriel/tamrielReliefData.js` its output):
   the heightmap's land (LAND_LEVEL 12 and brighter, pieces under SPECK_PX 30 dropped) is laid on the trace's in two
   steps:
   - the best scale and offset a side (`fitAffine` - 3.41 and 4.05, because the picture's units are 4:3) gets 83% of the
@@ -534,7 +537,7 @@ read as the land it is painted on. Every one of them was a lake (`world/arenaPla
 never reached the city, no port stood on it, and no voyage or packet could sail it.
 
 **The course** (`ui/tamrielTrace.js` `NIBEN_COURSE`, `nibenCells`, `openNiben`, run after `fillSpecks`; `niben` false
-skips it - the relief's bake, `tools/bakeTamrielRelief.mjs`, fits the owner's heightmap to the painting's own coasts). Each run is a
+skips it - the relief's bake, `tools/bakeTamrielRelief.mjs` (DELETED by HEIGHTMAP-OUT), fits the owner's heightmap to the painting's own coasts). Each run is a
 row or a column of picture pixels from one corner to the next:
 - the city's own arm of the lake, from a pixel below the isle's south shore down to the ring's bottom piece (the isle's
   last pixel stays land, under IC-GRAND's twenty-five - `03-World/Arena-Provinces.md`; the canal cuts the rest);
@@ -1258,3 +1261,35 @@ band aids or half assed work"*.
 
 Section A, RELIEF-PEAKS (OURS: DFU stops at the Bay's edge; the large map's law is read off DFU's own WOODS.WLD, and
 the ranges and Red Mountain are the port's own).
+
+## HEIGHTMAP-OUT - the owner's heightmap removed, the land past the Bay a plain (2026-10-31)
+
+The owner decided to remake Tamriel's land (the remake's DECISIONS, 2026-10-31). The heightmap TAMRIEL-RELIEF baked
+had no stated source and is likely an unattributed web image, so it and the data made from it leave the tree. Its
+replacement is to be generated from a sketch of our own, drawn from 3E sources and fitted to the remade trace.
+
+- **DELETED:** `src/assets/tamriel/source/tamriel-heightmap.png` (and its `test/tooling/doctrine.test.js` row),
+  `src/world/tamriel/tamrielReliefData.js` and `tools/bakeTamrielRelief.mjs` (both DELETED), and the loader that hung the cells on the
+  trace (`tamrielRelief.js` decodeRelief, maskRelief, loadRelief, reliefSource). The trace carries no relief, so
+  `reliefStands()` is false everywhere.
+- **How the height falls back** (`tamrielGround.js:"export function authoredHeightByte(px, py, noise = 0) {"`): a
+  trace with no relief stands as the plain alone. That is 0 at sea, SHORE_BYTE (6) at the coast rising to INLAND_BYTE
+  (22) over PLAIN_REACH (6 picture units) from it, and the lattice hash's ±2 on it. The authored ranges' lift
+  (`rangeLift`) is the hand-drawn continent's, with no trace. On the trace they stood as cliffs into the sea (556 shore
+  pixels over byte 40 beside the water on the freeware), so it is not laid there.
+- **What goes with it:** RELIEF-PEAKS' ridges (`tamrielRanges.js` reads no relief and lays none). The peaks zones
+  (`tamrielBiomes.js`) follow the authored ranges, as they did with no relief. DFU's own landforms and hills stay on
+  the plain. Red Mountain's cone (`redMountain.js`) stands about its authored spine's middle, where the relief's summit
+  stood.
+- **What stays:** everything that reads a relief (`reliefAt`, `peaksLine`, `namedSummit`, the ground's relief path, the
+  trace's `relief` through the boot cache, the terrain worker and the roads' print). The remake's relief is laid
+  through it.
+- **Pins:** `test/world/tamrielrelief.test.js` (the height, the straits and the peaks on a relief of its own; the
+  removal by source; with ARENA2, the freeware's trace with no relief, its frame's land and sea the smooth law's, and
+  no shore a cliff); `test/world/bootcache.test.js` (the prints recorded again with no relief).
+- **Mutants:** the 13 records whose code is gone are dropped: AUDITTESA2G G1's six, G2's three and G8's one;
+  NIBEN-relief-bake-reads-the-river; TAMRIEL-RELIEF-the-runs-misread and -the-trace-made-bare. The rest of
+  `tamrielrelief.json` and the 2G records that name the relief's tests run again: all dead.
+  AUDITTESA2G-R1-the-blend-unfloored dies only with ARENA2, as before.
+
+Section A, HEIGHTMAP-OUT (OURS: the land past the Bay is the port's own; the heightmap was never DFU's).

@@ -10,7 +10,8 @@ own release: its module is built and pinned, and not wired.
 
 ## What the mountains were (measured 2026-10-26, the freeware's trace, landforms on)
 
-- **The heights are already placed.** TAMRIEL-RELIEF (`Tamriel.md`) stands the continent's ranges where the owner's
+- **The heights are already placed** (until HEIGHTMAP-OUT, 2026-10-31, `Tamriel.md`: the heightmap is removed and the
+  land past the Bay is a plain). TAMRIEL-RELIEF (`Tamriel.md`) stood the continent's ranges where the owner's
   heightmap has them, and BREATHTAKER's continuation lets them rise past the Bay's 7-bit top. The kernel's ground at the
   relief's summits: Skyrim's summit 3,191 m (Bay pixel 2076,106), the Jerall 2,844 m (2202,332), the shoulder between
   the Reach and the Dragontails 2,739 m (1490,198), Red Mountain 2,343 m (3051,-51) and Eton Nir 1,968 m (377,1375). On

@@ -175,15 +175,6 @@
     ]
   },
   {
-    "name": "NIBEN-relief-bake-reads-the-river",
-    "file": "tools/bakeTamrielRelief.mjs",
-    "old": "palette: pal, relief: false, niben: false })",
-    "new": "palette: pal, relief: false })",
-    "tests": [
-      "test/world/tamrielrelief.test.js"
-    ]
-  },
-  {
     "name": "ZONE-dam-unbuilt",
     "file": "src/systems/wild/cyrodiilZone.js",
     "old": "      dam(bx, by, [ia, ib, ic, id]);\n      continue;",

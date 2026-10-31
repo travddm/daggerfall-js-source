@@ -415,7 +415,7 @@ test('RELIEF-PEAKS with ARENA2: WOODS.WLD\'s large map is the law of its small b
   assert.ok(n > 40, `bytes measured: ${n}`);
 });
 
-test('RELIEF-PEAKS with ARENA2: the ranges past the Bay stand as mountains - over 10 km about each summit the High Peaks, the Jerall, the Reach\'s shoulder and the Velothi span 0.8 km and more (the heightmap alone: 274 to 442 m), the Bay\'s Dragontails 1.4; the steep faces about Bruma the frames\' walls no longer (over 50 degrees under 0.2%, where 2%); Red Mountain the volcano at its summit, over everything about it; the Bay\'s north edge no wall (mutants: the ranges unlaid; the swing; the frames\' strength; the cone; the edge\'s blend)', { skip, timeout: 1200000 }, async () => {
+test('RELIEF-PEAKS with ARENA2: the ranges past the Bay stand as mountains - over 10 km about each summit the High Peaks, the Jerall, the Reach\'s shoulder and the Velothi span 0.8 km and more (the heightmap alone: 274 to 442 m), the Bay\'s Dragontails 1.4; the steep faces about Bruma the frames\' walls no longer (over 50 degrees under 0.2%, where 2%); Red Mountain the volcano at its summit, over everything about it; the Bay\'s north edge no wall (mutants: the ranges unlaid; the swing; the frames\' strength; the cone; the edge\'s blend)', { skip: 'HEIGHTMAP-OUT: the relief is removed until the remake (bible/03-World/Tamriel.md)', timeout: 1200000 }, async () => {
   try {
     const { H } = await world();
     const span = (cx, cy, r = 6, st = 16) => {
