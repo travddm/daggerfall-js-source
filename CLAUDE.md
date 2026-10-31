@@ -2,8 +2,12 @@
 
 The docs are in `docs/`. Start at `docs/README.md`, and read `docs/architecture/` before you change code.
 
-- **Scope**: DFO Online is its own game, not a 1:1 port. Daggerfall Unity (DFU) is the reference: read it first, cite
-  it, and name each departure from it. It is not a target to match.
+- **Scope**: Daggerfall Unity (DFU) is the baseline. A departure from it is allowed only when online play needs it, or
+  when it is a written, agreed design that is better for play. Name each departure where you make it, and say which of
+  the two it is. A departure that makes play or progression feel worse than DFU is a defect: revert it
+  (`docs/README.md`, "Scope").
+- **Comments and tests**: a comment says why, in plain sentences. A test imports the code and runs it
+  (`docs/README.md`, "Code comments"; `docs/testing/writing-tests.md`).
 - **ARENA2 is freeware**: `sh tools/fetch-data.sh <dir>` puts Daggerfall's own data at `<dir>/arena2` (~150 MB, never
   in the repo). Fetch it before work that reads the map, the game's files or the running game, and set `ARENA2_PATH`
   to it.

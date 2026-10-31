@@ -49,10 +49,9 @@ test('a file with no recorded time weighs the median', () => {
 
 - **Import the module and run it.** Assert on what it returns, what it writes and what it sends. A behavioural test
   survives a refactor that keeps the behaviour, and it fails when the behaviour breaks.
-- **Do not read source text to check a single module.** A test that greps a file for a line passes on a comment that
-  quotes the line and fails when correct code moves. Older tests do this, with helpers such as `test/hostText.mjs`
-  (reads a scene host and the modules it wires) and `test/codeOnly.mjs` (blanks comments before matching). Do not
-  copy that style for new code.
+- **Never read source text to check a module.** A test that greps a file for a line passes on a comment that quotes
+  the line and fails when correct code moves. Older tests do this, with helpers such as `test/hostText.mjs` and
+  `test/codeOnly.mjs`. Do not copy that style, and rewrite such a test as a behavioural one when you touch it.
 - **A source sweep is correct only to enforce a rule across many files.** Examples in `test/tree/`:
   - `probegate.test.js`: every `window.__X =` (also `globalThis.` and `self.`) in `src/` must sit behind the
     screenshot gate (`shotMode`, `params.has('shot')`, `pageHas('shot')`) or be listed as always on, with a reason.
