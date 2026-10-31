@@ -407,8 +407,9 @@
   {
     "name": "JUNGLE-ROADSIDE-the-polygons-edges-crossings-unasked",
     "file": "src/world/jungle/jungleRoadside.js",
-    "old": "for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1]]) {",
+    "old": "for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1], [x0 + z0, x1 + z1]]) {",
     "new": "for (const [f0, f1] of []) {",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/world/jungleroadside.test.js"
     ]

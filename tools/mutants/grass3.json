@@ -2,15 +2,17 @@
  {
   "name": "GRASS3-the-placer-reads-a-bilinear-patch-again-so-blades-float-on-hills",
   "file": "src/world/terrain/terrainSurface.js",
-  "old": "  const h = az >= ax\n    ? h00 + az * (h01 - h00) + ax * (h11 - h01)\n    : h00 + ax * (h10 - h00) + az * (h11 - h10);",
+  "old": "  const h = quadValueAt(h00, h10, h01, h11, ax, az, quadCutsSeNw(heightmapData, qx, qz, stride));",
   "new": "  const h = (h00 * (1 - ax) + h10 * ax) * (1 - az) + (h01 * (1 - ax) + h11 * ax) * az;",
+  "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
   "tests": ["test/world/terrain/grass3_surface.test.js"]
  },
  {
   "name": "GRASS3-the-quad-is-cut-on-the-other-diagonal",
   "file": "src/world/terrain/terrainSurface.js",
-  "old": "  const h = az >= ax\n    ? h00 + az * (h01 - h00) + ax * (h11 - h01)\n    : h00 + ax * (h10 - h00) + az * (h11 - h10);",
-  "new": "  const h = az >= ax\n    ? h00 + ax * (h10 - h00) + az * (h11 - h10)\n    : h00 + az * (h01 - h00) + ax * (h11 - h01);",
+  "old": "  const h = quadValueAt(h00, h10, h01, h11, ax, az, quadCutsSeNw(heightmapData, qx, qz, stride));",
+  "new": "  const h = quadValueAt(h00, h10, h01, h11, ax, az, !quadCutsSeNw(heightmapData, qx, qz, stride));",
+  "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
   "tests": ["test/world/terrain/grass3_surface.test.js"]
  },
  {

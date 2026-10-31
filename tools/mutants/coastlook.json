@@ -362,8 +362,9 @@
   {
     "name": "COAST-LOOK-cull-told-nothing",
     "file": "src/scenes/world.js",
-    "old": "clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges)",
-    "new": "clippedTerrainIndices(p._dwBytes, p._stride ?? 1)",
+    "old": "clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges, p.samples)",
+    "new": "clippedTerrainIndices(p._dwBytes, p._stride ?? 1, false, p.samples)",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/render/coastlook.test.js"
     ]

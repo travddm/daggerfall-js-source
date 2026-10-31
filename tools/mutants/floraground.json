@@ -315,8 +315,9 @@
   {
     "name": "FLORA-GROUND-RINGS-the-bed-read-at-the-near-cell",
     "file": "src/world/terrain/terrainSurface.js",
-    "old": "(TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)) * stride, lx, lz);",
-    "new": "(TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)), lx, lz);",
+    "old": "(TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)) * stride, lx, lz, heightmapData, stride);",
+    "new": "(TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)), lx, lz, heightmapData, stride);",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/world/terrain/floraground_rings.test.js"
     ]

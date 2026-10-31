@@ -229,12 +229,12 @@
   {
     "name": "LANDFORM-worker-grid-no-network",
     "file": "src/world/terrain/terrainGenWorker.js",
-    "old": "    const { positions, normals, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates });",
-    "new": "    const { positions, normals, bed } = restrideGrid({ ...m, woods, sites, beyond, climates });",
+    "old": "    const { positions, normals, indices, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates });",
+    "new": "    const { positions, normals, indices, bed } = restrideGrid({ ...m, woods, sites, beyond, climates });",
     "tests": [
       "test/systems/landform.test.js"
     ],
-    "note": "BAY-LEFT-GROUND: re-aimed by content - the kernels carry the sites past the Bay (D1)."
+    "note": "BAY-LEFT-GROUND: re-aimed by content - the kernels carry the sites past the Bay (D1). TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js)."
   },
   {
     "name": "LANDFORM-ring-unlifted",

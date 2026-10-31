@@ -1,0 +1,119 @@
+[
+ {
+  "name": "TERRAIN-CUT-the-fold-turned-against-the-ground",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "  return centreOverMean * saddle < 0;",
+  "new": "  return centreOverMean * saddle > 0;",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-corner-difference-rule-that-keeps-a-rising-ridges-teeth",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "  return centreOverMean * saddle < 0;",
+  "new": "  return Math.abs(h10 - h01) < Math.abs(h00 - h11);",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-centre-read-as-the-corners-mean-so-every-quad-keeps-the-old-cut",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "const MIDDLE_WEIGHTS = [-1, 9, 9, -1];",
+  "new": "const MIDDLE_WEIGHTS = [0, 8, 8, 0];",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-cut-read-one-sample-apart-at-the-far-ring",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "  const x0 = qx * stride;\n  const z0 = qz * stride;",
+  "new": "  const x0 = qx * stride;\n  const z0 = qz;",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-other-cuts-halves-swapped",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "    return ax + az <= 1\n",
+  "new": "    return ax + az >= 1\n",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-other-cut-wound-face-down",
+  "file": "src/world/terrain/terrainQuadCut.js",
+  "old": "    ? [i00, i01, i10, i10, i01, i11]",
+  "new": "    ? [i00, i10, i01, i10, i11, i01]",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-index-buffer-ignores-the-samples",
+  "file": "src/world/terrain/terrainSurface.js",
+  "old": "      const seNw = heightmapData !== null && quadCutsSeNw(heightmapData, x, z, stride);",
+  "new": "      const seNw = false;",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-bed-read-on-the-old-cut",
+  "file": "src/world/terrain/terrainSurface.js",
+  "old": "  const seNw = samples !== null && quadCutsSeNw(samples, qx, qz, stride);",
+  "new": "  const seNw = false;",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-unity-reader-on-the-old-cut",
+  "file": "src/world/terrain/terrainSurface.js",
+  "old": "  if (quadCutsSeNw(heightmapData, qx, qz, stride)) {",
+  "new": "  if (false) {",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-water-sheet-on-the-old-cut",
+  "file": "src/render/waterSurface.js",
+  "old": "    const seNw = samples !== null && quadCutsSeNw(samples, x, z, stride);",
+  "new": "    const seNw = false;",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-coasts-clip-on-the-old-cut",
+  "file": "src/world/deepWater/deepWaterCap.js",
+  "old": "writeQuadTriangles(quad, 0, z * g + x, g, samples !== null && quadCutsSeNw(samples, x, z, stride));",
+  "new": "writeQuadTriangles(quad, 0, z * g + x, g, false);",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-fence-walk-blind-to-the-other-diagonal",
+  "file": "src/scenes/ghostfenceBuild.js",
+  "old": "  cross(az + ax, dz + dx);\n",
+  "new": "",
+  "tests": [
+   "test/world/terrain/terraincut.test.js"
+  ]
+ },
+ {
+  "name": "TERRAIN-CUT-the-grid-job-cuts-without-its-samples",
+  "file": "src/world/terrain/terrainGen.js",
+  "old": "  const indices = buildTerrainIndices(stride, samples);",
+  "new": "  const indices = buildTerrainIndices(stride);",
+  "tests": [
+   "test/world/terrain/restrideworker.test.js"
+  ]
+ }
+]

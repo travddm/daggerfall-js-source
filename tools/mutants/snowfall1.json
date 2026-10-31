@@ -320,8 +320,9 @@
   {
     "name": "SNOWFALL1-grid-value-other-diagonal",
     "file": "src/world/terrain/terrainSurface.js",
-    "old": "  return az >= ax ? v00 + az * (v01 - v00) + ax * (v11 - v01) : v00 + ax * (v10 - v00) + az * (v11 - v10);",
-    "new": "  return az >= ax ? v00 + az * (v01 - v00) + ax * (v10 - v00) : v00 + ax * (v10 - v00) + az * (v11 - v10);",
+    "old": "  return quadValueAt(v00, v10, v01, v11, ax, az, seNw);",
+    "new": "  return quadValueAt(v00, v10, v01, v11, ax, az, !seNw);",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/render/snowfall1_runtime.test.js"
     ]

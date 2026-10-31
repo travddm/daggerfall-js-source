@@ -203,8 +203,9 @@
   {
     "name": "GRASSLIT2-normal-diagonal",
     "file": "src/world/terrain/terrainSurface.js",
-    "old": "    const v = az >= ax ? n00 + az * (n01 - n00) + ax * (n11 - n01) : n00 + ax * (n10 - n00) + az * (n11 - n10);",
-    "new": "    const v = ax >= az ? n00 + az * (n01 - n00) + ax * (n11 - n01) : n00 + ax * (n10 - n00) + az * (n11 - n10);",
+    "old": "    const v = quadValueAt(n00, n10, n01, n11, ax, az, seNw);   // on surfaceHeightAt's triangle",
+    "new": "    const v = quadValueAt(n00, n10, n01, n11, ax, az, !seNw);   // on surfaceHeightAt's triangle",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/render/grasslit2.test.js",
       "test/render/grasslit.test.js"

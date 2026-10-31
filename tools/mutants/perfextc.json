@@ -768,8 +768,9 @@
   {
     "name": "PERF-EXT26-the-worker-copies-the-grid-back-instead-of-transferring",
     "file": "src/world/terrain/terrainGenWorker.js",
-    "old": "    globalThis.postMessage({ t: 'grid', id: m.id, positions, normals, bed }, transfer);",
-    "new": "    globalThis.postMessage({ t: 'grid', id: m.id, positions, normals, bed });",
+    "old": "    globalThis.postMessage({ t: 'grid', id: m.id, positions, normals, indices, bed }, transfer);",
+    "new": "    globalThis.postMessage({ t: 'grid', id: m.id, positions, normals, indices, bed });",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/world/terrain/restrideworker.test.js"
     ]
@@ -786,12 +787,12 @@
   {
     "name": "PERF-EXT26-the-worker-builds-a-different-grid",
     "file": "src/world/terrain/terrainGenWorker.js",
-    "old": "    const { positions, normals, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates });",
-    "new": "    const { positions, normals, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates, stride: 4 });",
+    "old": "    const { positions, normals, indices, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates });",
+    "new": "    const { positions, normals, indices, bed } = restrideGrid({ ...m, woods, roads, sites, beyond, climates, stride: 4 });",
     "tests": [
       "test/world/terrain/restrideworker.test.js"
     ],
-    "note": "BAY-LEFT-GROUND: re-aimed by content - the kernels carry the sites past the Bay (D1)."
+    "note": "BAY-LEFT-GROUND: re-aimed by content - the kernels carry the sites past the Bay (D1). TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js)."
   },
   {
     "name": "PERF-EXT26-the-client-routes-a-grid-reply-into-the-FIFO",

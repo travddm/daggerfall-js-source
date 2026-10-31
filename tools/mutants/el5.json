@@ -285,8 +285,9 @@
   {
     "name": "terrain-no-bounds",
     "file": "src/render/renderer.js",
-    "old": "    return { vao, buffers, indexCount: indexSet.count, bounds: boundsOf(positions) };   // EL5: the replays cull by it",
-    "new": "    return { vao, buffers, indexCount: indexSet.count };",
+    "old": "    return { vao, buffers, indexCount: indices.length, bounds: boundsOf(positions) };   // EL5: the replays cull by it",
+    "new": "    return { vao, buffers, indexCount: indices.length };",
+    "note": "TERRAIN-CUT (PIN MOVED): re-aimed by content - the line it mutates now carries the quad's own cut (terrainQuadCut.js).",
     "tests": [
       "test/render/el5_field.test.js"
     ]
