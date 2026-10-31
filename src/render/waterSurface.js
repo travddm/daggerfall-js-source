@@ -139,8 +139,6 @@ export function tilemapRectHasWater(bytes, dim, width, height, table = WATER_DRA
  * A quad (x, z) of the stride-`stride` grid covers the stride x stride
  * tiles at (x * stride.., z * stride..) - the grid's cell IS the tile at
  * stride 1 (6.4 units), which is the frame the shader samples in.
- * `samples` are a streamed pixel's heightmap: each quad is cut as its ground is (terrainQuadCut.js), so the water's
- * triangles are the ground's. The town's flat grid passes none and keeps its own fixed cut.
  */
 export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TABLE, tileDim = 128, width = tileDim, height = tileDim, samples = null) {
   const g = width / stride + 1;   // WATER-NEXT 2: a grid `width` x `height` tiles (the fixed town's), `tileDim` a row
@@ -162,7 +160,7 @@ export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TAB
   for (let k = 0, o = 0; k < out.length; k += 2) {
     const x = out[k];
     const z = out[k + 1];
-    const seNw = samples !== null && quadCutsSeNw(samples, x, z, stride);
+    const seNw = samples !== null && quadCutsSeNw(samples, x, z, stride);   // the ground's own cut; the town's flat grid has none
     o = writeQuadTriangles(indices, o, z * g + x, g, seNw);
   }
   return indices;

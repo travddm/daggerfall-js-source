@@ -110,11 +110,11 @@ test('EV6: every program and VAO bind in renderer.js funnels through the shadows
   // a third of either is a bind the shadows cannot see
   assert.equal((r.match(/gl\.useProgram\(/g) || []).length, 1, 'only _use touches useProgram');
   assert.equal((r.match(/gl\.bindVertexArray\(/g) || []).length, 2, 'only _bindVao and markForeignPass touch bindVertexArray');
-  // the element-buffer upload that owns no VAO unbinds first, or it
-  // would capture its buffer into whatever drawMesh left bound
-  const ti = bodyOf(r, '_terrainIndices(indices) {');
-  assert.ok(ti.indexOf('this._bindVao(null);') > 0 && ti.indexOf('this._bindVao(null);') < ti.indexOf('ELEMENT_ARRAY_BUFFER'),
-    '_terrainIndices unbinds before touching the element buffer');
+  // PIN MOVED (TERRAIN-CUT): a terrain surface's index buffer is its own, bound while its OWN VAO is bound - never
+  // while whatever drawMesh left bound could capture it
+  const ti = bodyOf(r, 'createTerrainSurface(positions, normals, indices) {');
+  assert.ok(ti.indexOf('this._bindVao(vao);') > 0 && ti.indexOf('this._bindVao(vao);') < ti.indexOf('ELEMENT_ARRAY_BUFFER'),
+    'the surface binds its own VAO before touching the element buffer');
   // AUDIT EV F-DOC5: beginFrame's internal ORDER - shadow reset, then
   // the real bind, then the uniform uploads. Uniforms uploaded before
   // _use would land in whatever foreign program the sky or the ring

@@ -150,8 +150,6 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
  * chord, over the sea: "geometry just being hard squares".)
  * @param {Uint8Array} bytes - the pixel's patched TileMap (z * 128 + x)
  * @param {number} [stride]
- * @param {boolean} [ring]
- * @param {?ArrayLike<number>} [samples] the pixel's heightmap: a quad that stands is cut as its ground is (terrainQuadCut.js)
  * @returns {?Uint32Array} null when no quad or skirt segment is clipped
  */
 export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples = null) {
@@ -171,7 +169,7 @@ export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples =
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (!cut(tz * dim + tx)) { clipped = false; break; }
       }
       if (clipped) { dropped++; continue; }
-      const quad = [0, 0, 0, 0, 0, 0];
+      const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrainQuadCut.js)
       writeQuadTriangles(quad, 0, z * g + x, g, samples !== null && quadCutsSeNw(samples, x, z, stride));
       out.push(...quad);
     }

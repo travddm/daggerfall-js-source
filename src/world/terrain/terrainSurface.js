@@ -93,11 +93,10 @@ export const TERRAIN_SKIRT_DEPTH = 40;
  * `buildTerrainGrid` builds in.
  *
  * WHY THIS IS NOT BILINEAR, which is the whole point of it. The terrain
- * is TRIANGLES: `buildTerrainIndices` cuts every quad on the diagonal
- * from (x, z) to (x+1, z+1) and emits i0,i2,i3 then i0,i3,i1. Inside a
- * quad the drawn surface is therefore two PLANES, and a bilinear patch
- * is a different surface that agrees with it only on the diagonal and
- * at the corners. Anything placed by bilinear sits off the ground it is
+ * is TRIANGLES: `buildTerrainIndices` cuts every quad on one of its
+ * diagonals, the one terrainQuadCut.js decides from the samples (TERRAIN-CUT).
+ * Inside a quad the drawn surface is therefore two PLANES, and a bilinear
+ * patch is a different surface that agrees with it only at the corners. Anything placed by bilinear sits off the ground it is
  * supposed to stand on, by up to a quarter of the quad's saddle term.
  *
  * `scenes/world.js`'s grass placer did exactly that. HOW MUCH IT
@@ -171,7 +170,7 @@ export const walkGroundAt = (heightmapData, lx, lz) => surfaceHeightAt(heightmap
  * FLORA-GROUND, THE RINGS (the coordinator, 2026-10-27: "the coarse surface the player sees and the ground the plants
  * stand on agree at every ring"): THE GROUND A BUILT PIXEL DRAWS, at its ring class - the very vertices and triangles its
  * terrain surface uploads: surfaceHeightAt at the pixel's stride (the near grid's 129 x 129 at 1, the far ring's 33 x 33
- * at 4 - buildTerrainGrid decimates the samples, buildTerrainIndices cuts each quad on the same diagonal), less the bed
+ * at 4 - buildTerrainGrid decimates the samples, buildTerrainIndices cuts each quad as the samples decide), less the bed
  * WATER-NEXT 2 carved under its water (`carve` the bed's depths at that stride - waterBed.js bedFields' carve, a pixel's
  * `_bed.depths` - which carveBed takes off those vertices). Every plant is DRAWN on it (scenes/floraSeat.js seatFlora:
  * each placed on walkGroundAt, then drawn by what this stands over or under that) and the snow lies on it
@@ -201,8 +200,7 @@ export function drawnGroundAt(heightmapData, lx, lz, stride = 1, carve = null) {
  * ghost rows and all) interpolated over the triangle under (lx, lz), cut on
  * surfaceHeightAt's diagonal, then normalised as TERRAIN_FS normalises
  * vNormal. Written into `out` - the placer asks it once a blade.
- * @param {Float32Array} normals the pixel's stride-1 grid normals, vertex (xi, zi) at (zi * 129 + xi) * 3
- * @param {ArrayLike<number>} heightmapData the pixel's samples, which decide each quad's cut (terrainQuadCut.js)
+ * @param {Float32Array} normals the pixel's stride-1 grid normals, vertex (xi, zi) at (zi * 129 + xi) * 3; heightmapData its samples
  * @param {number} lx pixel-local x, 0..TERRAIN_SIZE
  * @param {number} lz pixel-local z, 0..TERRAIN_SIZE
  * @param {number[]|Float32Array} [out]
@@ -273,12 +271,9 @@ export function surfaceNormalFromSamples(heightmapData, lx, lz, stride = 1, out 
  * SNOWFALL1 (2026-10-08): A GRID'S VALUE ON THE DRAWN TRIANGLE - a per-vertex value of a grid laid in the terrain's
  * order (x fastest, `gx` vertices a row, `cell` world units apart: buildTerrainIndices' and flatGrid's) read on the
  * triangle under (lx, lz), cut on surfaceHeightAt's diagonal. WATER-NEXT's bed depths through it are what the carve
- * took off the drawn ground there - for what is laid ON that ground (the snow).
- * A streamed pixel's grid is cut as its samples decide (terrainQuadCut.js): pass them and its stride. A grid with no
- * samples (the town's flatGrid) keeps the south-west to north-east cut its own indices are built on.
+ * took off the drawn ground there - for what is laid ON that ground (the snow). A streamed pixel passes its `samples`
+ * and stride for its cut (terrainQuadCut.js); the town's flatGrid passes none and keeps flat ground's cut.
  * @param {ArrayLike<number>} values gx * gz, x fastest
- * @param {?ArrayLike<number>} [samples] the pixel's heightmap samples, whose quads this grid's quads are
- * @param {number} [stride] the pixel's ring class
  * @returns {number}
  */
 export function gridValueAt(values, gx, gz, cell, lx, lz, samples = null, stride = 1) {
@@ -308,8 +303,8 @@ const UNITY_HEIGHT_PER_STEP = Math.fround((MAX_TERRAIN_HEIGHT * STREAMING_TERRAI
  * 16-bit step, kMaxHeight (32766) of them to the terrain's full height - the
  * scale Unity's terrain tools write as 32766/65535 on the heightmap's 16-bit
  * texture. Terrain.SampleHeight reads those steps: GetInterpolatedHeight over
- * the quad's two triangles, cut on the drawn ground's own diagonal (above),
- * the terrain's height over kMaxHeight a step.
+ * the quad's two triangles, cut on Unity's fixed diagonal (a quad the port
+ * cuts the other way, TERRAIN-CUT, on its own), kMaxHeight steps a height.
  *
  * A step is 1923.75 / 32766 = 0.0587 m, nothing to anything that stands on
  * the ground. It is everything to a law whose line IS the sea: the sampler
@@ -496,15 +491,12 @@ export function buildTerrainGrid(heightmapData, stride = 1, ghost = null) {
   return { positions, normals };
 }
 
-/** Triangle indices for the 129x129 grid (row-major x-fastest).
+/** A pixel's triangle indices for the 129x129 grid (row-major x-fastest),
+ *  each quad cut as terrainQuadCut.js decides from `heightmapData`; with
+ *  none, every quad takes flat ground's south-west to north-east cut.
  *  EV4: `stride` > 1 indexes the matching strided grid and stitches
  *  its skirt - both windings on the skirt quads, so the curtain shows
- *  whichever way the crack is looked through.
- *  Each quad is cut as terrainQuadCut.js decides from the pixel's own
- *  samples, so a pixel's indices are its own. Without samples every quad
- *  takes the south-west to north-east cut: flat ground's indices.
- *  @param {number} [stride]
- *  @param {?ArrayLike<number>} [heightmapData] the pixel's samples */
+ *  whichever way the crack is looked through. */
 export function buildTerrainIndices(stride = 1, heightmapData = null) {
   const hDim = HEIGHTMAP_DIMENSION;
   const g = (hDim - 1) / stride + 1;

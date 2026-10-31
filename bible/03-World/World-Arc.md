@@ -282,6 +282,42 @@ samples; G1/G2's lifted publish), `test/world/terrain/grass3_surface.test.js`,
 `grass3.json`, `auditlandforms.json`, `midring.json`, and `prof4.json`'s
 shallow sink, now in drawnCentre (all dead).
 
+TERRAIN-CUT (2026-10-31, the owner, on the remake's knife ridges in a 3D
+preview: the fixed diagonal zigzags across ridges; fix it in the game too).
+
+What the player saw. A ridge or a valley that runs along the grid's other
+diagonal was drawn as a row of teeth: every quad was cut from (x, z) to
+(x+1, z+1), so each crest sample stood as its own small peak. The teeth
+are 6.4 m apart in the near ring and 25.6 m in the far ring.
+
+The fix. `world/terrain/terrainQuadCut.js` quadCutsSeNw decides each
+quad's diagonal from the pixel's own samples. It estimates the quad's
+centre with a cubic (Catmull-Rom) read of the 4 x 4 samples about it and
+takes the diagonal whose midpoint is nearer that estimate. A crest joins
+along the crest, and a valley floor along the floor. Flat and planar
+ground keep the old cut. The rule "join the corners whose heights differ
+least" was measured and rejected: on a ridge that rises along its length
+it cuts across the crest and keeps the teeth.
+
+One cut, every reader. The pixel's index set is its own, built with its
+grid by `terrainGen.js` restrideGrid on the terrain worker (a near pixel's
+costs about a millisecond). The renderer gives each terrain surface its
+own index buffer, freed with it. These read the same cut:
+surfaceHeightAt, walkGroundAt and drawnGroundAt (the walk floor, the
+flora, the snow), surfaceNormalAt and surfaceNormalFromSamples,
+gridValueAt (the bed's carve), terrainSampleHeightAt, the water's sheet
+(`waterSurface.js` buildPixelWaterIndices), the coast's clip
+(`deepWaterCap.js` clippedTerrainIndices), the fence's and the jungle
+roadside's exact ground walks (both diagonals' crossings are asked), and
+Solitude's cliff skin. The town's flat grid (`waterBed.js` flatGrid)
+keeps its own fixed cut.
+
+What it leaves. The middle ring, FAR-FIELD and the far views draw their
+own coarser grids (`render/midRing.js`, `farRing.js`, `farField.js`) on
+the fixed cut; the snow blanket's InterpolateQuad is the mod's own law.
+Unity cuts its terrain on one diagonal: the departure is the Port-Ledger
+A row (TERRAIN-CUT). Pins: `test/world/terrain/terraincut.test.js`.
+
 ## Milestone 7 - locations on terrain (SHIPPED)
 
 `src/formats/umRandom.js` is a 1:1 translation of Unity.Mathematics

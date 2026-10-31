@@ -86,7 +86,7 @@ test('AUDIT WATER-NEXT P1: the bed is the kernel\'s - carved with the grid by re
   }
   // the kernel's one grid law carries it; the answer's shape is the host's
   const k = rd('src/world/terrain/terrainGen.js');
-  assert.match(k, /const halo = bed && stride === 1 && bedNearEdge\(bed\) \? bedHalo\(ghost, px, py\) : null;\n\s*const indices = buildTerrainIndices\(stride, samples\);\n\s*return \{ positions: grid\.positions, normals: grid\.normals, indices, bed: bed \? gridBed\(grid, bed, stride, halo\) : null \};/);   // PIN MOVED (TERRAIN-CUT): and the grid's own triangles
+  assert.match(k, /const halo = bed && stride === 1 && bedNearEdge\(bed\) \? bedHalo\(ghost, px, py\) : null;\n\s*const indices = buildTerrainIndices\(stride, samples\);[^\n]*\n\s*return \{ positions: grid\.positions, normals: grid\.normals, indices, bed: bed \? gridBed\(grid, bed, stride, halo\) : null \};/);   // PIN MOVED (TERRAIN-CUT): and the grid's own triangles
   assert.match(k, /const grid = restrideGrid\(\{ woods, px, py, stride, samples, landforms, bed: bed \? tilemapBytes : null \}\);/, 'the build\'s grid carves by its own TileMap');
   const g = flatGrid(128, 128, 0);
   const sea = new Uint8Array(128 * 128), kb = gridBed(g, sea, 1);

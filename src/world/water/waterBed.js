@@ -351,7 +351,8 @@ export function waterBedOf(grid, bytes, o = {}) {
 }
 
 /** A flat grid `width` x `height` tiles at height `y` (the fixed town's ground, which DFU lays as one flat quad), the
- *  terrain's vertex order and triangulation (terrainSurface.js buildTerrainIndices), so a bed can be carved in it. */
+ *  terrain's vertex order and its flat ground's triangulation (terrainSurface.js buildTerrainIndices), so a bed can be
+ *  carved in it. */
 export function flatGrid(width, height, y, cell = TILE_UNITS) {
   const gx = width + 1, gz = height + 1;
   const positions = new Float32Array(gx * gz * 3), normals = new Float32Array(gx * gz * 3);

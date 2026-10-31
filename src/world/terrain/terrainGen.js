@@ -291,8 +291,6 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
  * every build and restride, 0.3 ms for a pixel with no water at all and a millisecond or two for a coast's; here it rides
  * the worker with the grid it carves, the build's, the promotion's and the restride's alike.
  * @param {{ woods: object, px: number, py: number, stride?: number, samples: Float32Array, landform?: boolean, roads?: ?object, sites?: ?Uint8Array, beyond?: ?Map<number, number>, climates?: ?Uint8Array, landforms?: ?object, bed?: ?Uint8Array }} job
- * The answer's `indices` are the grid's triangles, each quad cut as the samples decide (terrainQuadCut.js): built here, on
- * the worker with the grid, because a near pixel's cost a millisecond.
  * @returns {{ positions: Float32Array, normals: Float32Array, indices: Uint32Array, bed: ?{depths: Float32Array, sheetDepths: Float32Array, positions: Float32Array, normals: Float32Array} }}
  */
 export function restrideGrid({ woods, px, py, stride = 1, samples, landform = false, roads = null, sites = null, beyond = null, climates = null, landforms = null, bed = null }) {   // AUDIT WATER-NEXT P1: `bed` the TileMap to carve by
@@ -302,7 +300,7 @@ export function restrideGrid({ woods, px, py, stride = 1, samples, landform = fa
   // AUDIT WATER-NEXT F2: a near grid's bed reads its neighbours' tiles across the seams (the ghost is their own kernel),
   // where its water comes near an edge
   const halo = bed && stride === 1 && bedNearEdge(bed) ? bedHalo(ghost, px, py) : null;
-  const indices = buildTerrainIndices(stride, samples);
+  const indices = buildTerrainIndices(stride, samples);   // cut by its samples, here on the worker: a near grid's take a millisecond
   return { positions: grid.positions, normals: grid.normals, indices, bed: bed ? gridBed(grid, bed, stride, halo) : null };
 }
 

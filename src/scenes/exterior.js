@@ -990,7 +990,7 @@ export async function bootExterior(canvas, renderer, params, status) {
 
   // R9 ground GL: cached tile array per archive, the location tilemap,
   // and a flat 2x2 surface at GroundOffset spanning the exact extent
-  // (winding matches buildTerrainIndices' quad diagonal).
+  // (winding matches buildTerrainIndices' flat-ground cut).
   if (!renderer.tileArrays.has(groundArchive)) {
     const groundTex = textureFiles.get(groundArchive);
     // GROUND1/VE2: the tile set a texture mod or pack dresses the archive with (TextureReader.GetTerrainTextureArray) first
