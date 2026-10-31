@@ -37,7 +37,6 @@ export const SET_TIER_BLOW = Object.freeze({
   'blood-for-blood': (v) => v.stack * BLOOD_STACKS,
   constrict: (v) => v.stack * COIL_STACKS,
   'tallow-ward': (v) => v.more,
-  'battlemages-discipline': (v) => v.armed,      // a foe that takes the cast's element whole
   'bound-in-silk': (v) => v.more,
   undertow: (v) => v.more,                       // the open sea
 });
@@ -183,7 +182,7 @@ export function measureGuardKeeps() {
  *  new one has to be measured before the walk passes it. */
 export const SET_TIER_OTHER = Object.freeze(['orc-hide', 'spite', 'ravager', 'shadows-grace', 'eventide', 'forbidden-lore', 'waters', 'eye',
   'burning-gate', 'cleave', 'watch-oath', 'keen-eyed', 'thick-skinned', 'iron-hide', 'sea-scale', 'shed-skin', 'dwemer-brass', 'hour-turns',
-  'battlemages-bearing', 'battlemages-reprieve', 'wyrd-sight', 'soul-harvest', 'spinners-thread', 'mephalas-veil', 'stormwrack', 'captains-due']);
+  'wyrd-sight', 'soul-harvest', 'spinners-thread', 'mephalas-veil', 'stormwrack', 'captains-due']);
 export const POWER_OTHER = Object.freeze(['chain', 'unyielding', 'dawnward', 'fortune', 'tribute', 'mastery', 'venom', 'quake', 'conduit', 'siphon',
   'echo', 'vigil', 'haste', 'fists', 'evade', 'bulwark', 'grace', 'regen', 'absorb', 'climate', 'school', 'longroad', 'bearing', 'hood',
   'pierce', 'attune', 'surge', 'dragonfire']);
