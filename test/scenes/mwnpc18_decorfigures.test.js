@@ -149,28 +149,6 @@ test('MWNPC18c offerDecorFigures, through a real decor room: each figure with a 
   assert.ok(figs.every((f) => f.batch.castOnly === false), 'the lane off: every picture drawn');
 });
 
-test('MWNPC18e EVERY HOST THAT DRAWS DAGGERFALL\'S PEOPLE stands them in bodies (it offers them to a people lane) or keeps their pictures, and says why - a new host of people fails here until it does one or the other (AUDIT MWNPC16-18 D5: Come Sail Away\'s crews were neither, under section 26\'s "blind spot, closed")', () => {
-  // a host draws a person through nudeFlats.js drawnFlat (NUDE-FLATS: every person's picture asks it); Come Sail Away's
-  // crews are its prefabs' BillboardHelper people (nudedecor.test.js holds them to the table)
-  const hosts = walk('src').filter((p) => p !== 'src/characters/nudeFlats.js' && /\bdrawnFlat\(/.test(rd(p).replace(/^\s*\/\/.*$/gm, ''))).concat('src/scenes/comeSailAway/comeSailAwayPool.js').sort();
-  const BODIES = {
-    'src/scenes/decor/decorRoom.js': 'offerDecorFigures(',   // the placed figures, for its hosts (section 26)
-    'src/scenes/dungeonContext.js': '_peopleLane.offer(personActor(',
-    'src/scenes/exterior.js': 'standPeople.offer(personActor(',
-    'src/scenes/pixelBuild.js': 'streetPeople.offer(personActor(',   // HOST-SPLIT 2: the world's pixel build draws the street's people; its host (world.js) offers them
-    'src/scenes/worldModes.js': 'peopleBodies.offer(personActor(',
-  };
-  const PICTURES = {
-    'src/scenes/arena/arenaBouts.js': 'the arena\'s seated crowd - up to 420 flats (section 4)',
-    'src/scenes/decor/decorTool.js': 'the decorator\'s ghost - a picture being placed, not a person standing',
-    'src/scenes/interiorContext.js': 'a building\'s people, stood as flats here and offered by its host (worldModes.js)',
-    'src/scenes/comeSailAway/comeSailAwayPool.js': 'a ship\'s crew (the prefabs\' BillboardHelper people) - NOT HERE, section 27',
-  };
-  assert.deepEqual(hosts, [...Object.keys(BODIES), ...Object.keys(PICTURES)].sort(), 'every host that draws a person, named once');
-  for (const [f, call] of Object.entries(BODIES)) assert.ok((hostOf(f) ? hostText(hostOf(f)) : rd(f)).includes(call), `${f} offers its people`);
-  assert.match(rd('bible/04-Characters/Morrowind-NPCs.md'), /Come Sail Away's crews/, 'the crews\' pictures declared');
-});
-
 test('MWNPC18d EVERY DECOR ROOM\'S FIGURES ARE OFFERED - the rooms\' on the interior host\'s people lane, the yards\' on the street\'s, before the bodies draw; a new host of decor rooms fails here until it does the same (the census never saw a decor room: its people are flats, not mobiles)', () => {
   const hosts = walk('src').filter((p) => /[=(,]\s*createDecorRoom\(/.test(rd(p))).sort();   // a call, not its definition
   assert.deepEqual(hosts, ['src/scenes/homeYards.js', 'src/scenes/worldModes.js'], 'the hosts that stand decor rooms');

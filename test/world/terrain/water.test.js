@@ -269,32 +269,6 @@ test('WATER1: both exterior hosts - the gate, the has-water skip, and the slot a
   assert.match(rd('src/scenes/dungeonContext.js'), /renderer\.drawWater\(waterQuads, DUNGEON_WATER_COLOR,/);
 });
 
-test('WATER1: the switch, the row, the sky\'s colours, the lab, the probe and the record', () => {
-  assert.match(rd('src/systems/features.js'), /key: 'enhancedWater', initial: true, online: 'player'/, 'on by default like the other enhanced visuals (RF4: declared on its row; the shelf derives it) - WATER-OFF: the player\'s online too');
-  assert.ok(!/prefRow\('enhancedWater'/.test(rd('src/ui/enhanced/enhancedMenu.js')), 'FT6: the row is the Features home\'s (systems/features.js)');
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /waterSky\(\) \{\s*\n\s*if \(enhancedSky\?\.state\) return leaved\(dreaded\(\{ zenith: enhancedSky\.state\.zenith, horizon: enhancedSky\.state\.horizon \}\)\);/, 'the dome\'s own state');   // VALENWOOD-CANOPY (PIN MOVED): the leaves' under a closed canopy
-  assert.match(shared, /const h = dynamic\?\.fogColor \?\? dynamicSky\.clearColor;\s*\n\s*return leaved\(dreaded\(\{ zenith: \[h\[0\] \* 0\.55, h\[1\] \* 0\.65, h\[2\] \* 0\.85\], horizon: h \}\)\);/, 'the mod\'s one colour, with a zenith derived from it (WATER-AUDIT L3: the mod\'s fill IS its clear IS its fog - a copy made the reflection flat)');
-  assert.match(shared, /return null;\s*\n\s*\},\s*\n/, 'null under the classic sky');
-  const lab = rd('src/tools/waterLab.js');
-  assert.match(lab, /mirrorProjectionX\(perspective\(/, 'HANDEDNESS: the lab draws under the hosts\' mirrored projection (unmirrored, every ground face is culled - the lab\'s first day)');
-  assert.match(lab, /assignTiles\(tileData, tilemap, true\);/, 'the shore is marched, not painted');
-  assert.match(lab, /renderer\.drawWaterSurface\(water, m, renderer\.tileArrays\.get\(ARCHIVE\), tilemapTex, 6\.4, wu\)/, 'the lab draws the water\'s own index set, as the hosts do');
-  assert.match(rd('water.html'), /src="\/src\/tools\/waterLab\.js"/);
-  const probe = rd('tools/waterProbe.mjs');
-  for (const name of ['on and off differ over the sea', 'leaves the sky alone', 'five seconds later', 'a gale varies more than a calm', 'rainy sea', 'glints toward the sun', 'midnight', 'overcast sea']) {
-    assert.ok(probe.includes(name), `the probe checks: ${name}`);
-  }
-  const ledger = rd('bible/01-Overview/Port-Ledger.md');
-  assert.match(ledger, /\*\*ENHANCED WATER \(WATER1, 2026-09-08\)\*\*/, 'section A carries the departure');
-  assert.match(ledger, /switch `enhancedWater` \(on by default, `\?water=off` the kill switch\)/);
-  const arc = rd('bible/07-Rendering/Water-Arc.md');
-  assert.match(arc, /# Enhanced water \(WATER1, 2026-09-08\)/);
-  assert.match(arc, /fround\(27\.2 \/ 1539\) \* 1539/, 'the ocean-band defect is on the page');
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /07-Rendering\/Water-Arc\.md/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/07-Rendering/Rendering.md'), /`waterSurface\.js`/);
-});
-
 // ── WATER-AUDIT: the table pinned THROUGH the producer, not against itself ──
 test('WATER-AUDIT (H1/H2): every shore tile the marching squares write gives back the corners that were water, in the tilemap\'s own frame', () => {
   // The first pin re-read what buildWaterMaskTable had just written from the

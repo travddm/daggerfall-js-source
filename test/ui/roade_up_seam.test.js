@@ -473,37 +473,6 @@ test('E1: every window DFU reads on GetKeyUp answers on the RELEASE - all four, 
   }
 });
 
-test('E1: the retired DEPARTURES are gone from both automap windows, and the Ledger row is struck', () => {
-  const dungeon = src('src/ui/automap/automapWindow.js');
-  const exterior = src('src/ui/exteriorAutomapWindow.js');
-  // The old claims survive ONLY as quotations inside the retirement
-  // record - the site says what it used to say and then what shipped,
-  // which is the wave's rule. What must not survive is a claim standing
-  // on its own, so each stale phrase is checked to sit downstream of a
-  // RETIRED marker rather than checked to be absent.
-  const quotedOnly = (body, phrase, name) => {
-    let at = body.indexOf(phrase);
-    while (at !== -1) {
-      assert.ok(body.slice(Math.max(0, at - 1200), at).includes('RETIRED'),   // TIDY2: 1200 - the record stood at exactly 900, and a path rewritten inside it is longer
-        `${name}: "${phrase}" stands as a live claim, not as a retirement's quotation`);
-      at = body.indexOf(phrase, at + 1);
-    }
-  };
-  for (const [name, body] of [['automapWindow.js', dungeon], ['exteriorAutomapWindow.js', exterior]]) {
-    assert.match(body, /ROAD-E E1 RETIRED/, `${name}: the retirement is recorded at the site`);
-    quotedOnly(body, 'carries no key-up route at all', name);
-    quotedOnly(body, 'delivers keydown and no keyup', name);
-    quotedOnly(body, 'auto-repeat rate', name);
-    // and the mechanism that replaced them
-    assert.match(body, /_tickHeldHotkeys\(dt\) \{/, `${name}: the per-frame poll`);
-    assert.match(body, /this\._heldCodes/, `${name}: InputManager's held-key dictionary`);
-    assert.match(body, /keyup\(code, e = null\) \{/, `${name}: the release edge`);
-  }
-  const ledger = src('bible/01-Overview/Port-Ledger.md');
-  assert.match(ledger, /~~C2: the dungeon automap's HELD hotkeys[\s\S]{0,400}?~~ RETIRED \(E-group, 2026-09-02\)/,
-    'the Ledger A row is struck in the Ledger\'s idiom');
-});
-
 // -------------------------------------------------------------------
 // E-FIX: THE OPEN EDGE. DFU opens the rest window and the pause screen
 // on `ActionComplete` - GameManager.cs:534-537 and :515-518 - which

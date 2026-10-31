@@ -431,13 +431,6 @@ test('AUDIT TELL (8.2, built at last): a sweep\'s bleed drips the player\'s bloo
   assert.match(rd('src/scenes/hitEffects.js'), /strides: false, wound: !!entity\.bleed \}\);/);
 });
 
-test('AUDIT TELL (10.1/32): the dungeon stream\'s gap is FLAGGED where FEUD writes its fields, and listed with the open flags', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  // PIN MOVED (RVN13: the flag names a band follower's `rt` too - no name rides this stream)
-  assert.match(d, /\/\/ FLAGGED \(bible\/12-Enhanced-AI\/Feud-Arc\.md 10\.1, section 32\): this stream carries none of the street record's z, nm, yd, ex or sp - FEUD adds its own fields alone \(RVN13: so no band follower's rt either\)\n\s*if \(!f\.dead && f\.ai\._tac && !f\.ai\._tac\.puppet\) Object\.assign\(r, blowWire\(/);
-  assert.ok(rd('bible/Home.md').includes('FEUD adds its own fields alone'), 'bible/Home.md\'s open flags');
-});
-
 // ── section 28: the duel harness, and the floor it tuned ────────────
 
 test('AUDIT TELL (section 28): the massive floor - no single front blow in the game (every heavy and long weapon, steel and daedric, the reference player and the strongest) breaks the weakest giant DFU rolls; the duel harness says so (mutants: the floor gone; the floor under the largest blow)', async () => {

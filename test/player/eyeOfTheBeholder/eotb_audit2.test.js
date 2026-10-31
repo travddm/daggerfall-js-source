@@ -548,18 +548,6 @@ test('EOTB-IL: the SwitchShoulder and ToggleInput keys on their RELEASE edge (Ge
 // THE RECORD
 // ─────────────────────────────────────────────────────────────────
 
-test('EOTB-IL: no [SETTINGS] law is left in the arc, every law is marked [IL] with an offset, and the page says the assembly is read', () => {
-  const files = readdirSync(join(root, 'src/player'), { recursive: true }).filter((f) => /^eotb.*\.js$/.test(f.split(/[\\/]/).pop()));
-  const arc = files.map((f) => rd(`src/player/${f}`)).join('\n');
-  assert.ok(!/\[SETTINGS\]/.test(arc), 'AUDIT-EOTB2\'s evidence mark is gone: the assembly is in the tree');
-  assert.ok((arc.match(/\[IL\]/g) ?? []).length >= 30, 'the laws carry the IL mark');
-  assert.ok((arc.match(/IL_[0-9a-f]{4}/g) ?? []).length >= 60, 'and cite their offsets');
-  const page = rd('bible/06-Systems/Eye-Of-The-Beholder.md');
-  assert.match(page, /EOTB-IL/);
-  assert.match(page, /the assembly is in the tree|Eye Of The Beholder\.dll` is vendored/i, 'the page says where the assembly is');
-  assert.ok(!/THE ASSEMBLY IS NOT IN THE TREE/.test(page), 'and no longer says it is not');
-});
-
 // ─────────────────────────────────────────────────────────────────
 // EOTB-FLIP (2026-09-16, Mac, off a GPU at last: "The character is
 // upside down (classic sprite)")

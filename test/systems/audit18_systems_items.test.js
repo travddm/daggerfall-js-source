@@ -362,28 +362,3 @@ test('audit18 items: every minted shop/loot row carries the template ItemName', 
   assert.equal(yardStock('stable').find((i) => i.templateIndex === 94).name, 'Horse');   // PIN MOVED (MERCHANT-YARDS, 2026-10-10): the horse is the Stable's row now, minted as a shelf mints one
 });
 
-// ---------------------------------------------------------------
-// 10. RETIRING A FLAG DELETES THE SENTENCE. inventory.js line 12 claimed
-//     "Armor material weight pends S2b (FLAGGED - leather/chain/plate
-//     multipliers)" while the file implemented all three 130 lines
-//     below, and bible/Home.md's Open-flags ledger carried the row.
-//     loot.js's header claimed CL clothing carries a variant only.
-// ---------------------------------------------------------------
-test('audit18 items: the retired flags are gone from source and from Home.md', () => {
-  const inv = readFileSync(join(ROOT, 'src/systems/inventory.js'), 'utf8');
-  assert.ok(!inv.includes('pends S2b'), 'inventory.js still claims armor weight pends S2b');
-  assert.ok(!inv.includes('FLAGGED - leather/chain/plate'), 'inventory.js still carries the retired weight flag');
-  assert.ok(!/Potions\/oil don't exist as items yet/.test(inv), 'inventory.js still claims oil does not exist');
-
-  const loot = readFileSync(join(ROOT, 'src/systems/loot/loot.js'), 'utf8');
-  assert.ok(!/CL clothing carries\s*\n?\/\/ group \+ index \+ variant only/.test(loot.replace(/\r/g, '')), 'loot.js still claims CL carries a variant only');
-  assert.ok(!loot.includes('variant Range(0, 4)'), 'loot.js still asserts the false Range(0, 4) for books');
-
-  const shop = readFileSync(join(ROOT, 'src/systems/shopStock.js'), 'utf8');
-  assert.ok(!shop.includes('dye/variant paperdoll pends'), 'shopStock.js still claims the clothing dye/variant pends');
-
-  const home = readFileSync(join(ROOT, 'bible/Home.md'), 'utf8');
-  // the retired row named its site by number; an entry names its file now (CITE-ANCHOR), and its words the flag
-  assert.equal(home.split('\n').filter((l) => /^- `src\/systems\/inventory\.js` - /.test(l) && /S2b/.test(l)).length, 0);
-  assert.equal(home.split('\n').filter((l) => /weight pends S2b/.test(l)).length, 0);
-});

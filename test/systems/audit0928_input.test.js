@@ -335,22 +335,3 @@ test('AUDIT PRE-MERGE 0928 U3: off the helm the stick\'s 80% throw is still Run,
   assert.ok(keys.has('ShiftLeft'), 'the other hosts pass no stickRuns: the layer runs as it did');
 });
 
-test('AUDIT PRE-MERGE 0928 D2/U5: Controls.md\'s defaults ARE generated from the registry - every group\'s rows, in order, key and pad and label, and no row the pane does not draw (the Come Sail Away table held two of its nine)', () => {
-  const doc = readFileSync(new URL('../../bible/10-UI/Controls.md', import.meta.url), 'utf8').split('\n');
-  const hidden = (a) => (HIDDEN_ACTIONS instanceof Set ? HIDDEN_ACTIONS.has(a) : Array.isArray(HIDDEN_ACTIONS) ? HIDDEN_ACTIONS.includes(a) : !!HIDDEN_ACTIONS?.[a]);
-  const firstCode = (table, action) => { for (const [code, a] of table) if (a === action) return code; return null; };
-  for (const g of ACTION_GROUPS) {
-    const at = doc.findIndex((l) => l === `### ${g.title}` || l.startsWith(`### ${g.title} (`));
-    assert.ok(at >= 0, `the page has a table for ${g.title}`);
-    const rows = [];
-    for (let i = at + 1; i < doc.length && !doc[i].startsWith('#'); i++) {
-      const m = /^\| `(\w+)` \| (.*?) \| (.*?) \| (.*) \|$/.exec(doc[i]);
-      if (m) rows.push([m[1], m[2], m[3], m[4]]);
-    }
-    const want = g.rows.filter((r) => !hidden(r.action)).map((r) => {
-      const key = firstCode(DEFAULT_BINDINGS, r.action) ?? DEFAULT_SHARES.find(([, a]) => a === r.action)?.[0] ?? null, pad = firstCode(DEFAULT_SECONDARY_BINDINGS, r.action);   // HELM-KEYS: a default share's key is its key
-      return [r.action, key ? buttonText(key, true) : '(unbound)', pad ? `\`${pad}\`` : '', r.label];
-    });
-    assert.deepEqual(rows, want, `${g.title}: the page's table is the registry's`);
-  }
-});

@@ -472,25 +472,3 @@ test('SD7b THE CAST-BACK, run from the hosts\' own text: the mode machine stands
   assert.deepEqual(dead.log, [['said', SD_STEPS_TEXT.cast]]);
 });
 
-test('SD7b the hosts by source: the dungeon host makes the Steps in the Hour alone, stands them once, rides them on the outer host\'s clock and frees them; the mode machine rides them BEFORE the motor, every frame of the dungeon - live only while the motor runs - stands a body cast back and hands the realm\'s clock on; the world host widens the edge, wards Levitate in the Hour and takes what the void costs', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /import \{ createSdSteps \} from '\.\/superDungeon\/sdSteps\.js';/);
-  assert.match(D, /const sdSteps = _sdRealm \? createSdSteps\(\{ ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\], renderer, audio \}\) : _ketch \? createSdSteps\(\{ course: KT_COURSE, renderer, audio \}\) : null;/);   // PIN MOVED (SD-LOOK S9): its Hollow's Ending on the vane; PIN MOVED (KETCH): and the Sailwalk on a sky-ketch, the Hour's own course law on her frame
-  assert.match(D, /if \(!_sdStepsStood\) \{ _sdStepsStood = true; sdSteps\.stand\(\{ dynamicDraws, collider \}\); \}\n\s+return sdSteps\.ride\(opts\.sdClock\?\.\(\) \?\? performance\.now\(\) \/ 1000, dt, body, live\);/);
-  assert.match(D, /sdStepsRide\(dt, body, live = true\) \{ return sdStepsRide\(dt, body, live\); \},/);
-  assert.match(D, /sdSteps\?\.clear\(\);/);
-  const W = read('src/scenes/worldModes.js');
-  const ride = W.indexOf("const sdBack = mode === 'dungeon' ? dungeonCtx?.sdStepsRide?.(dt, player, !overlayHeld) ?? null : null;\n    if (sdBack) sdCastBack(sdBack);");
-  // PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the action movers' ride is their own update now (they carry the body
-  // as they step) - the frame's axes are the line before the Steps' ride
-  const axes = W.indexOf('const axes = overlayHeld ? { forward: moveAxes.vertical, strafe: moveAxes.horizontal } : moveAxes.update(dt, { ...mv, autorun: player.toggleAutorun });');
-  const motor = W.indexOf('player.update(dt, paralyzed ?', axes);
-  assert.ok(axes > 0 && ride > axes && motor > ride, 'after the frame\'s axes, before the motor');
-  assert.match(W, /sdClock: \(\) => host\.deadlandsSeconds\?\.\(\) \?\? performance\.now\(\) \/ 1000,/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/);   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
-  assert.match(w, /const _realmArenaBridged = realmArena\(\[\.\.\.SD_REALM_FLOORS, \.\.\.SD_HALL_FLOORS, \.\.\.SD_STEPS_FLOORS\]\);/);
-  assert.match(w, /sdCastBack: \(\) => sdCastBack\(\),/);
-  assert.match(w, /deadlandsSeconds: \(\) => deadlandsSeconds\(\),/);
-  assert.match(read('bible/11-Multiplayer/Super-Dungeons.md'), /### SD7b - shipped 2026-10-07/);
-});

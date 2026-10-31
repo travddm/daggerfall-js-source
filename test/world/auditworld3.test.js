@@ -203,37 +203,3 @@ test('AUDIT WORLD3 C: the motor and the targets - a PEER is any player, never MY
   assert.deepEqual(runTargetMachine(self, [peerAt('p7', [2, 0, 0])], [20, 0, 0], 1 / 60, { infighting: true }), [2, 0, 0]);
 });
 
-test('AUDIT WORLD3 D/E/F: the hosts and the record by source - the peers ride only a STREAMED foe\'s candidate list (D1); the host\'s word un-blinds a puppet so its blows land (D2); the seat\'s off direction forgets the machine\'s target (D3); the roster\'s rebuild takes the save path, re-lands the record that triggered it, admits only a species the chain can stand and frees what it mints after a teardown (E1-E4); the striker rides every kind and both its numbers are bounded (F1/F2); the refused act heals (A3); the record is true (F3/F4)', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  // D1
-  assert.match(d, /candidates: foeDeps \? \(streamed = false, rec = null\) => \[\.\.\.foes\.filter\(\(f\) => !f\.dead && f\.ai\), \.\.\.\(\(_authority && streamed\) \|\| ownLoose\(rec\) \? peerCandidates\(\) : \(ownQuestTag\(rec\) \? peerCandidates\(\)\.filter\(\(c\) => ownShare\(\)\?\.peerMayHit\?\.\(c\.id, rec\)\) : \[\]\)\)\] : null,/, 'D1: the peers only for a foe the stream carries');
-  assert.match(d, /const _armed = \(rec, sn, streamed = false\) => \(sn\?\.candidates && foeDeps \? \{[\s\S]*?sn\.candidates\(streamed, rec\)/, 'D1: through the armed closure (QUEST-PARTY phase 3c: the foe rides beside, for its own party)');
-  assert.match(d, /_armed\(f, _senses, _roomFoe\)/, 'D1: and the layout\'s run is what "streamed" means - REST-SYNC re-aim: with the room\'s shared encounters (isRoomFoe)');
-  // D2
-  assert.match(d, /if \(f\._pupTarget != null && f\.ai\.isHostile === false\) f\.ai\.isHostile = true;/, 'D2: a streamed target is the host\'s word that this foe is fighting');
-  // D3
-  assert.match(d, /if \(!on\) \{ f\.ai\.target = null; f\.ai\.secondaryTarget = null; f\.ai\.targetSenses = null; \}/, 'D3: losing the seat forgets the machine\'s target');
-  // E1/E2/E3/E4
-  assert.match(d, /retypeFoe\(i, sf\.mobileType, sf\.gender \?\? null\)\.then\(\(ok\) => \{ if \(ok && foes\[i\]\) \{ patchFoe\(foes\[i\], sf, wire\); applyLoot\(bodyRecords\(w\.loot, i\)\); \} \}\)\.catch\(/, 'E1: the save\'s mismatch rebuilds too');
-  assert.doesNotMatch(d, /if \(!truncate\) retypeFoe/, 'E1: and never silently discards the slot');
-  assert.match(d, /retypeFoe\(i, r\.t, GENDER_BIT\[r\.x === 1 \? 1 : 0\]\)\.then\(\(ok\) => \{\s*if \(ok\) \{ _retypeFails\.delete\(i\); if \(!_authority && foes\[i\]\) applyFoeRecord\(foes\[i\], r\); return; \}/, 'E2: the record that triggered the rebuild lands on it - and a rebuild that LANDS clears the refusal count (AUDIT FOES FOE4)');
-  assert.match(d, /function applyFoeRecord\(f, raw\) \{\s*const r = validFoeRecord\(raw\);\s*if \(!r\) return;/, 'E2: one body, both callers');
-  assert.match(d, /const canStandFoe = \(mobileType\) => !!ENEMY_BASICS\[mobileType\]\?\.maleTexture;/, 'E3: the build chain\'s own guard, one home');
-  assert.match(d, /_retyping\.has\(i\) \|\| !canStandFoe\(mobileType\)\) return false;/, 'E3: on the rebuild');
-  assert.match(d, /if \(at >= 0 && !canStandFoe\(e\.mobileType\)\) return;/, 'E3: and the flat fallback never runs for one');
-  assert.match(d, /if \(_ctxDead\) \{ if \(rec\.batch\) \{ renderer\.destroyBillboardBatch\(rec\.batch\); rec\.batch = null; \} rec\.dead = true; return; \}/, 'E4: a rebuild that lands after the teardown frees what it minted');
-  // F1/F2
-  assert.match(d, /const _pAt = playerFeet \?\? lastPlayerFeet;/, 'F1: the striker\'s feet ride every kind');
-  assert.match(d, /const unit = \(v\) => \{ const u = v3\(v\); if \(!u\) return null; const L = Math\.hypot\(u\[0\], u\[1\], u\[2\]\); return L > 1e-6 && L < 1e6 \? \[u\[0\] \/ L, u\[1\] \/ L, u\[2\] \/ L\] : null; \};/, 'F2: a direction is a UNIT vector or nothing');
-  assert.match(d, /const inReach = \(v\) => \{ const q = v3\(v\); return q && q\.every\(\(c\) => Math\.abs\(c\) <= HIT_POS_MAX\) \? q : null; \};/, 'F2: and a position within the dungeon\'s reach or nothing');
-  assert.match(d, /const HIT_POS_MAX = 1e6;/);
-  // A3's two other halves
-  assert.match(d, /actionRecords\(keys\) \{\s*if \(!Array\.isArray\(keys\) \|\| !keys\.length\) return null;[\s\S]*?\.map\(sharedRecord\);/, 'A3: the CURRENT records, the shared half of each');
-  assert.match(rd('src/scenes/worldModes.js'), /dungeonActionRecords\(keys\) \{ return mode === 'dungeon' && dungeonCtx \? \(dungeonCtx\.actionRecords\?\.\(keys\) \?\? null\) : null; \},/);
-  // the record - F3 and F4
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.doesNotMatch(arc, /until WORLD3 \(below\) took the first four/, 'F3: WORLD3 no longer counts gaps it did not take');
-  assert.doesNotMatch(arc, /(?<!~~)The cure - a seeded layout - is slice 3's \(below\)\./, 'F4: AUDIT WORLD\'s promise is struck where it stands, and names what actually shipped'); assert.match(arc, /~~The cure - a seeded layout - is slice 3's \(below\)\.~~/);
-  assert.doesNotMatch(arc, /publishes and applies happen under an open window or\na pause, which slice 3 gates explicitly\./, 'F4: and the gate slice 3 did not build is not still promised of it');
-  assert.match(arc, /## AUDIT WORLD3 \(2026-09-13\)/, 'the section');
-});

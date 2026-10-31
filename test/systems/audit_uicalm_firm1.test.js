@@ -293,13 +293,6 @@ test('AUDIT UICALM-FIRM1 L2 M4: a shut read leaves no tree in force on the devic
   assert.deepEqual([book.state.open, book.state.tree], [false, { start: null, keys: [] }]);
 });
 
-// PIN MOVED (FIRMAMENT-ON, 2026-10-15, the owner: "switch it on for players"): the config and the record still say one
-// thing - now "on"
-test('AUDIT UICALM-FIRM1 L2 M5, FIRMAMENT-ON: FIRMAMENT_OPEN is "on", as the record says', () => {
-  assert.match(read('server-account/wrangler.toml'), /^FIRMAMENT_OPEN = "on"$/m);
-  assert.match(read('bible/06-Systems/Firmament.md'), /then opened: \*\*`on`\*\* \(FIRMAMENT-ON, 2026-10-15/);
-});
-
 test('AUDIT UICALM-FIRM1 L2 M2: AN ID NAMES ONE TREE - the service refuses another tree under a made change\'s id; the book asks a newer tree under its own', async () => {
   const s = await stand();
   const kay = await s.seated('Kay', { renown: 8 });

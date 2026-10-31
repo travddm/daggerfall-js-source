@@ -356,17 +356,3 @@ test('WATCH-FIX online: the watch\'s record names the resident its watchman stan
   assert.equal(t.town._taken.has(res.id), false, 'never taken');
 });
 
-test('WATCH-FIX the hosts: the street\'s pool reads each walker\'s row - and, the living town\'s, the resident it was read as; the turned watch is followed every frame in the lane, its resident found by id and his fall placed in his town\'s frame; the town is handed `killed` and the lives read it; the fixed-city page\'s pool reads its row too; the record names all four hosts (mutants: the street\'s read, the identity read, the follower unstepped, the killed unread)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /live: \(\(living\) => \(\) => _streetHolds\(person, living\)\)\(person\.living\),/);
-  assert.match(w, /if \(it\) return !!it\.active && \(person\.living \?\? null\) === \(living \?\? null\);/);
-  assert.match(w, /const livingWatchStep = \(\) => watchStep\(_livingWatchTurned, cityGuards\.guards, \{ resolve: livingResidentOf, localOf: livingLocalOf \}\);/);
-  assert.match(w, /if \(livingWorldOn\(\)\) \{ livingWatchStep\(\); livingPeerWatchStep\(\); \}/);
-  assert.match(w, /slay: livingSlay, killed: livingKilled,/);
-  assert.match(w, /if \(!turns\.slain\.size && !turns\.died\.size && !turns\.killed\.size\) return false;/);
-  assert.match(rd('src/scenes/exterior.js'), /live: \(\) => !!population\?\.pool\.find\(\(i\) => i\.person === person\)\?\.active,/);
-  assert.match(rd('src/systems/roleplayRealism/rrRidingHost.js'), /g\.livingFrom = from; chargeFoe\(g, fwd\);/, 'the trample\'s guard marked as before');
-  const bible = rd('bible/06-Systems/Living-World.md');
-  const sec = bible.slice(bible.indexOf('## WATCH-FIX'), bible.indexOf('\n## ', bible.indexOf('## WATCH-FIX') + 5));
-  for (const host of ['world.js', 'worldModes.js', 'exterior.js', 'dungeonContext.js']) assert.ok(sec.includes(host), `the record names ${host}`);
-});

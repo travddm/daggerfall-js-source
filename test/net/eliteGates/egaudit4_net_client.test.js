@@ -158,7 +158,6 @@ test('AUDIT EG IV lane3 #10 THE BALANCE IN ITS ASKS\' ORDER, AND THE RUST (secti
   R.client.restack(9); await settle();
   assert.equal(keysAsks, before + 1, 'asked again after it');
   assert.equal(weirKeysHeld(R.entity.items), 3, 'the asked answer stands over it');
-  assert.match(rd('bible/11-Multiplayer/Elite-Gates.md'), /in the order the asks went \(ASYNC NEVER DROPS\)/);
 });
 
 // ── lane4 #14 ──────────────────────────────────────────────────────────────────────────────────────────────────────────

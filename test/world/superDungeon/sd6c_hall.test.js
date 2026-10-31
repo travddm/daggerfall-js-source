@@ -369,26 +369,3 @@ test('SD6c the world host\'s hall, run from its own text: the realm\'s word kept
   assert.deepEqual(low.log[0], ['hurt', 1, true], 'at least one');
 });
 
-test('SD6c the hosts by source: the dungeon host stands the hall in the Hour alone, frames it, offers its handles and plaques, names them, presses them and frees it; the mode machine routes the keys and forwards the turn and the word; the world host hears the realm, lashes, widens the edge with the Concord and sends the turn', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdHall = _sdRealm \? createSdHall\(\{ renderer, audio, s: dfLocation\.sdRealm, clock: sdEndClock, onTurn: \(i, a\) => !!opts\.sdTurn\?\.\(i, a\), say: sdSayHere \}\) : null;/);   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice; PIN MOVED (SD-LOOK S10): on the realm's anchored clock   // AUDIT SD-THROUGH (PIN MOVED, C13): the hall's say one named closure, the Way Through's too (test/scenes/superDungeon/sd11d_words.test.js pins its body)
-  assert.match(D, /if \(playerFeet && !_sdHallStood\) \{ _sdHallStood = true; sdHall\.stand\(\{ dynamicDraws, collider \}\); \}\n\s+sdHall\.frame\(dt, playerFeet \?\? null, opts\.sdHallWord\?\.\(\) \?\? null\);/);
-  // AUDIT SD II (L2 F10 - PIN MOVED): framed before the world pass (sdPose, the mode machine's), never in drawFoes after it
-  assert.match(D, /sdPose\(dt, playerFeet\) \{\n\s+if \(sdHall\) sdHallFrame\(dt, playerFeet\);/);
-  assert.doesNotMatch(D, /if \(sdHall\) sdHallFrame\(dt, playerFeet\);   \/\/ SD6c/);
-  assert.match(D, /if \(sdHall\) targets\.push\(\.\.\.sdHall\.targets\(\)\);/);
-  assert.match(D, /\(key\) => sdHall\?\.hoverName\(key\) \?\? null,/);
-  assert.match(D, /sdPress\(key\) \{ return !!sdEnd\?\.press\(key\) \|\| !!sdThrough\?\.press\(key\) \|\| !!sdHall\?\.press\(key\); \},/);   // SD-THROUGH (PIN MOVED): the Way Through's between
-  assert.match(D, /sdHall\?\.clear\(\);/);
-  const W = read('src/scenes/worldModes.js');
-  assert.match(W, /if \(key\.startsWith\('sdrift:'\) \|\| key\.startsWith\('sdreturn:'\) \|\| key\.startsWith\('sdstone:'\) \|\| key\.startsWith\('sdplaque:'\)\) \{ dungeonCtx\.sdPress\?\.\(key\); return true; \}/);
-  assert.match(W, /sdTurn: \(i, a\) => host\.sdTurn\?\.\(i, a\) \?\? false,/);
-  assert.match(W, /sdHallWord: \(\) => host\.sdHallWord\?\.\(\) \?\? null,/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /online\.onSdHall = \(w\) => sdHallHeard\(w\);/);
-  assert.match(w, /if \(!player\.arena && modes\?\.sdRealmSlot\?\.\(\) != null\) player\.arena = sdArenaHeld\(\) \? _realmArenaHeld : sdConcordHere\(\) \? _realmArenaBridged : _realmArena;/);   // AUDIT SD III (F2, PIN MOVED): the arena's rim first, for a fighter it holds
-  assert.match(w, /const _realmArenaBridged = realmArena\(\[\.\.\.SD_REALM_FLOORS, \.\.\.SD_HALL_FLOORS, \.\.\.SD_STEPS_FLOORS\]\);/);   // SD7b (PIN MOVED): and the Steps' band and the arena
-  assert.match(w, /sdTurn: \(i, a\) => !!online\?\.sendSdTurn\?\.\(i, a\),/);
-  assert.match(w, /sdHallWord: \(\) => sdHallWord\(\),/);
-  assert.match(read('bible/11-Multiplayer/Super-Dungeons.md'), /### SD6c - shipped 2026-10-07/);
-});

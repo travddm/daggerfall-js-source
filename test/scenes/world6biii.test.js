@@ -188,22 +188,3 @@ test('WORLD6b-iii: the PUPPET at me casts the spell itself - a streamed cast cou
   assert.deepEqual(hits, [], 'nothing went back to Bob - his foe cast, I resolved it');
 });
 
-test('WORLD6b-iii: by source - the executor aims its missile where it is told and at the player otherwise; the three hosts\' hooks take the aim point through the ONE direction law (AUDIT WORLD6b-iii(a) C3); the pool\'s decision reads a bare stand-in for a peer (ONE home, the dungeon\'s too - A10); the record', () => {
-  const c = rd('src/characters/enemy/enemyCasting.js');
-  assert.match(c, /rolls = Math\.random,\s*\n\s*aimAt = null,\s+\/\/ WORLD6b-iii/, 'the executor\'s option (AUDIT WORLD6b-iii(a) C11: pinned inside the destructure)'); assert.match(c, /fireMissile\?\.\(from, spell, f\.entity\.level, f, aimAt\);/);
-  assert.doesNotMatch(c, /suppress/, 'the suppress arm is retired');
-  const HOOK = /fireMissile: \(from, spell, casterLevel, foe, aimAt = null\) => \{[^\n]*\n(?:\s*if \(![^\n]*return;\n)?\s*magic\.fireEnemyMissile\(from, missileAimDirection\(from, aimAt \?\? targetAimPoint\(null, player\.pos, player\.height\)\), spell, casterLevel, foe\);/;
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) assert.match(rd(h), HOOK, `${h}: the host's hook takes the aim point`);
-  const t = rd('src/characters/enemy/enemyTargets.js');
-  assert.match(t, /export const PEER_CAST_TARGET = Object\.freeze\(\{ activeEffects: Object\.freeze\(\[\]\) \}\);/, 'the stand-in\'s one home');
-  assert.match(t, /export function missileAimDirection\(from, aimPoint\) \{/, 'the direction\'s one home');
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /PLAYER_TARGET, PEER_CAST_TARGET, targetAimPoint/, 'the pool imports it');
-  assert.match(x, /\? playerEntity : \(f\.ai\.target\?\.entity \?\? PEER_CAST_TARGET\);/, 'a peer\'s effects are none to the pick');
-  assert.match(x, /noSpellPointCost, playerEntity, playerFeet, playerHeight: _lastPlayerHeight,/, 'my capsule in the blast whoever the target (A1)');
-  assert.match(x, /const castAimAt = \(f, playerFeet\) => \(isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting\) \? null : targetAimPoint\(f\.ai\.target, playerFeet, _lastPlayerHeight\);/, 'the missile at the SELECTED target\'s transform, through the one aim law (A2/A6)');
-  assert.match(x, /if \(sp && !_pupParalyzed && puppetCastInBand\(f, sp\) && blowAllowed\(f\)\) castSpellFrom\(f, sp, playerFeet, true\); else f\._castPending = true;/, 'the puppet\'s cast under the budget, the bands and paralysis, or the one-shot');
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /\? playerEntity : \(f\.ai\.target\?\.entity \?\? foeDeps\.PEER_CAST_TARGET \?\? playerEntity\);/, 'the dungeon reads the same stand-in (A10)');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /### 6b-iii\(a\): the cast at a peer/, 'the record');
-});

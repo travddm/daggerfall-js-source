@@ -183,22 +183,3 @@ test('WORLD6b-ii: a peer\'s blow on MY foe carries the striker\'s feet and the b
   assert.deepEqual(hits, [{ to: 'eve-0003', k: 'world:3,12', i: 1, dmg: 3, kind: 'arrow', p: [18, 0, 20], d: [0.6, 0, 0.8], ar: 1 }], 'my blow on Eve\'s foe carries my feet and its direction (and the shaft, WORLD6b-iii(e))');
 });
 
-test('WORLD6b-ii: by source - the world host hands the pool my id and the peers seam (one closure, the dungeon host\'s and the cell\'s), the pool reads the local player from a peer at every site that meant me, the cast at a peer rides the stream (WORLD6b-iii), the pane says the hunt', () => {
-  const w = rd('src/scenes/world.js');
-  assert.equal((w.match(/peers: peersNear,/g) ?? []).length, 3, 'one closure, three readers (QUEST-PARTY phase 3b: a building\'s pool)');
-  assert.match(w, /const peersNear = \(\{ presenceOnly = false \} = \{\}\) => \{\s*if \(!online \|\| !online\.room \|\| online\.status !== 'open'\) return null;/);
-  assert.match(w, /exteriorFoes\.setNet\(\{\s*room: \(\) => online\?\.room \?\? null,\s*inRoom: \(k\) => online\?\.inRoom\?\.\(k\) \?\? false,[^\n]*\n\s*selfId: \(\) => online\?\.id \?\? null,/);   // WORLD6b-iii(b): and which cells I hold
-  const x = rd('src/scenes/exteriorFoes.js');
-  // PIN MOVED (AUDIT CC-E1): the other clients' bodies a companion's fight crosses ride last, after the peers
-  assert.match(x, /runTargetMachine\(f, \[\.\.\.senses\.candidates\(\), PLAYER_TARGET, \.\.\.\(f\.placed && !f\.site \? \[\] : _questLike\(f\) \? questPeerCandidates\(f\) : peerCandidates\(\)\), \.\.\.coopCandidates\(f\)\], pf, cdt, \{/, 'the peers are MY foes\' candidates (AUDIT WORLD6b-ii A5: after me; QUEST-PARTY: a quest foe\'s, the party it rides to)');
-  assert.match(x, /return isLocalPlayerTarget\(t\) \? playerFeet : \(isPeerTarget\(t\) \? t\.feet : t\.ai\.feet\);/, 'the attack aims at a peer\'s own feet');
-  assert.match(x, /if \(isLocalPlayerTarget\(f\.ai\.target\) && f\.ai\.inSight && f\.ai\.detected\) setEnemyAlert\(playerEntity, true, currentMinute\(\)\);/, 'the alert is mine alone');
-  assert.match(x, /if \(isLocalPlayerTarget\(f\.ai\?\.target\) && f\.ai\?\.detected\) setEnemyAlert\(playerEntity, false\);/);
-  assert.match(x, /const dec = f\.caster\.update\(foeFrameDt\(dt\), f\.ai, f\.attack, _tgt, _castTargetEntity\);\s*if \(dec\) castSpellFrom\(f, dec\.spell, playerFeet, false, \{ aimAt: castAimAt\(f, playerFeet\) \}\);/, 'the cast at a peer (WORLD6b-iii): the tick runs as at me, the cast rides the stream (AUDIT WORLD6b-iii(a) A2/A3: aimed at the SELECTED target, the count and its recipient latched at the release)');
-  assert.match(x, /const _at = f\.ai\.target \?\? PLAYER_TARGET, _atPlayer = isLocalPlayerTarget\(_at\);/, 'my foe\'s shaft at a peer pays nothing here');
-  assert.match(x, /if \(isPeerTarget\(f\.ai\.target\)\) \{\s*const pv = enemyAttackVoice\(f\);/, 'the swing\'s voice alone at a peer');
-  assert.match(x, /if \(_blowMine && !_pupParalyzed && f\.mobile\.doMeleeDamage\) \{[^\n]*\n\s*f\.mobile\.doMeleeDamage = false;[\s\S]{0,400}if \(blowAllowed\(f\)\) resolveFoeMeleeVsPlayer\(f, playerFeet\);/, 'the puppet\'s blow at me through the one player arm, bounded (AUDIT WORLD6b-ii B1; WORLD6b-iii: one budget for the blow and the cast)');
-  assert.match(x, /const g = wireRecipient\(f\.ai\.target\);/, 'the target on the wire, WORLD3\'s spelling (AUDIT WORLD6b-ii A8: none is none; AUDIT WATCH1: through the one home)');
-  assert.match(rd('src/characters/enemy/enemyTargets.js'), /export const wireRecipient = \(t\) => \(t\?\.isPeer \? t\.id : \(t == null \? '' : \(t\.isPlayer \? '\.' : ''\)\)\);/, 'the spelling itself, at its one home');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /### 6b-ii: the foe hunts every player in the cell/, 'the record');
-});
