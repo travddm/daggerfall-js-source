@@ -308,5 +308,15 @@
       "test/server/home_cell_order.test.js"
     ],
     "note": "the Guild tab's sale names no cell"
+  },
+  {
+    "name": "YC4-HOME-CELL-the-own-part-five-minutes",
+    "file": "src/systems/online/homeCellSync.js",
+    "old": "export const HOME_OWN_TTL_MS = 60_000;",
+    "new": "export const HOME_OWN_TTL_MS = 300_000;",
+    "tests": [
+      "test/systems/online/homecellsync.test.js"
+    ],
+    "note": "Open Gates, an offer and a hall's rights show up to 5 minutes late at a door"
   }
 ]

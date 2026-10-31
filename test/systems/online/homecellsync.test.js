@@ -116,14 +116,19 @@ test('YC4 the clocks: the cells each HOME_TOWN_TTL_MS with the versions held, th
   assert.equal(state.cellAsks.length, 2);
   const held = new Map(state.cellAsks[1]);
   assert.deepEqual([held.get(CELL_AB), held.get(CELL_CD), held.get(0)], [3, 2, 0], 'the versions held, 0 for a cell that never held a home');
-  assert.equal(state.ownAsks.length, 1, 'the own part waits its own clock');
-  clock.now += HOME_OWN_TTL_MS;
-  await homes.ensure(TOWN);
-  assert.equal(state.ownAsks.length, 2, 'and is asked when it runs out');
-  clock.now += HOME_TOWN_TTL_MS;
+  // the own part's fields (Open Gates, offers, a hall's rights) move no cell version: it is as fresh as the town read
+  assert.equal(HOME_OWN_TTL_MS, HOME_TOWN_TTL_MS);
+  assert.equal(state.ownAsks.length, 2, 'the own part asked with the town read once its clock ran out');
+  clock.now += HOME_OWN_TTL_MS - 1;
+  await homes.ensure(TOWN, { force: true, own: false });
+  assert.equal(state.cellAsks.length, 3);
+  assert.equal(state.ownAsks.length, 2, 'inside its clock: not asked');
+  clock.now += 1;
+  await homes.ensure(TOWN, { force: true, own: false });
+  assert.equal(state.ownAsks.length, 3, 'and asked when it runs out');
   clock.character = 'r9999999999abcdef0123';
-  await homes.ensure(TOWN);
-  assert.deepEqual(state.ownAsks.slice(2), ['r9999999999abcdef0123'], 'another character: its own part at once');
+  await homes.ensure(TOWN, { force: true, own: false });
+  assert.deepEqual(state.ownAsks.slice(3), ['r9999999999abcdef0123'], 'another character: its own part at once');
   // a replica behind the page answers an older version: the cell stands as held
   state.cellsReply = (asked) => ({ ok: true, data: { mapId: TOWN, cells: [{ cell: CELL_AB, ver: 1, homes: [] }], more: [] } });
   await homes.ensure(TOWN, { force: true });

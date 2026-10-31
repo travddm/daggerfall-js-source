@@ -10,9 +10,10 @@
 import { yardCellOf } from '../../net/yardCellLaw.js';
 import { HOME_KEY_MAX, HOME_TOWN_BLOCKS_MAX } from '../../net/homeLaw.js';
 
-/** How long the caller's own part of a town is believed when nothing of the caller's moved - its own writes, a word on a
- *  cell where it holds a row, and a change of character ask it at once. */
-export const HOME_OWN_TTL_MS = 300_000;
+/** How long the caller's own part of a town is believed - its own writes, a word on a cell where it holds a row, and a
+ *  change of character ask it at once. 60 s, as `/v1/homes/town` was: Open Gates, an offer made to the caller, a hall's
+ *  rights and guildmate access move no cell version, so no word comes for them. */
+export const HOME_OWN_TTL_MS = 60_000;
 /** How long a home this page saw go (its own sale, a hub word) stays gone from the shared part. Another isolate of the
  *  service may answer the cell as it stood for its 30 s (homeCells.js HOMES_KEPT_S); the poll's next answer is past it. */
 export const HOME_GONE_HOLD_MS = 60_000;

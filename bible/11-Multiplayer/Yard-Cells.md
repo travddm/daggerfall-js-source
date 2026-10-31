@@ -708,11 +708,12 @@ many cells at once (a guild's heraldry, which redraws all its halls) answers no 
 caller's own rows by building key. It asks a town's cells with the versions it holds when it asks the town today (at
 its gate and at a home's door, at most once in 60 s), and at once on a home word. A word missed while the hub link was
 down is read at the next such ask. It asks its own part when it first asks a town, after each of its own writes, on a
-home word for a cell where it holds an own row, and once 5 minutes have passed. Only those make the own part change, so it is asked far less than the
-town is today. QUEST-HOME's home words (`hearHome`) still make it ask at once.
+home word for a cell where it holds an own row, and once 60 s have passed. Open Gates, an offer made to the caller, a
+hall's rights and guildmate access move no cell version, so no word comes for them: 60 s keeps them as fresh as
+`/v1/homes/town` kept them (review, 2026-10-31; the plan's 5 minutes left them up to 5 minutes old). QUEST-HOME's home words (`hearHome`) still make it ask at once.
 
 The registry knows a town by its map id, not where the player stands, so it asks every cell a town can hold (65) in
-one request, not nearest first (`homeCellSync.js` HOME_TOWN_CELLS). A service that answers the two routes with a 404,
+one request, not nearest first (`homeCellSync.js` HOME_TOWN_CELLS). A service that answers the cells route with a 404,
 400 or 403 is older than acct209: the page reads `/v1/homes/town` from then on.
 
 ### 12.6 Decided (2026-10-29)
