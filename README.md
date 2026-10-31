@@ -22,13 +22,10 @@ The site is `index.html` (what it is, how to play, credits); the game is
 Pages. The landing page takes its palette and fonts from the enhanced skin
 at build (`scripts/landingHtml.mjs`) and carries no game data or imagery.
 
-Docs live in `bible/` - start at `bible/Home.md`.
+Docs live in `docs/` - start at `docs/README.md`.
 
 Original game data (ARENA2) is required and never committed. Point tests at it
-with `ARENA2_PATH`. The player's own copy of The Elder Scrolls: Arena is
-optional - its places stand on the map of Tamriel (`bible/03-World/Arena-Provinces.md`;
-its reader translated from OpenTESArena, MIT) - and is never committed either;
-point tests at it with `ARENA_PATH`.
+with `ARENA2_PATH`.
 
 ## Support development
 
@@ -103,7 +100,7 @@ their names, so `releases/latest/download/DFO-Online-win-x64-setup.exe`
 (and `-mac-arm64.dmg`, `-linux-x86_64.AppImage`) is always the newest,
 and the landing page links each directly. Pushing a tag shaped `app-v*`
 cuts one by hand. Details
-in `bible/01-Overview/Desktop-App.md`; headless proof:
+in `docs/operations/desktop-release.md`; headless proof:
 `xvfb-run -a node tools/appShellProbe.mjs` (point `DAGGER_SHELL_EXE`
 at a packaged binary to prove an installer's payload). The packaged
 app bundles NO game data - same doctrine as the site.
