@@ -168,6 +168,8 @@ export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TAB
   return indices;
 }
 
+/** A streamed pixel's water index set: its TileMap at the draw's table, each quad cut as its `samples` cut the ground. */
+export const buildPixelWaterIndices = (bytes, stride, samples) => buildWaterIndices(bytes, stride, WATER_DRAW_MASK_TABLE, 128, 128, 128, samples);
 
 /** 0..1: the eased wind row's strength on the sky's own scale
  *  (systems/wind/wind.js: a row's vector runs WIND_ROW_CALM to
