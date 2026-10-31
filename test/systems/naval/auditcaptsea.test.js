@@ -1425,7 +1425,7 @@ test('AUDIT CAPTAIN\'S SEA L6/B5/B7: the survey counts a ship once by her seed (
 
 test('AUDIT CAPTAIN\'S SEA L9: a rank won or lost is kept back till the centred label is at rest - never wiped by the lines said in its breath - and the crowns that named the same rank the same way say it in one line (mutants: the wait, the grouping)', () => {
   const src = hostText('src/scenes/world.js');
-  const text = src.slice(src.indexOf('  const _rankLines = [];'), src.indexOf('  // CAPT-BOARD (bible/03-World/Captains-Sea.md): THE HARBOUR OFFICE'));
+  const text = src.slice(src.indexOf('  const _rankLines = [];'), src.indexOf('  // CAPT-BOARD: THE HARBOUR OFFICE'));
   const said = [];
   const label = { timer: 0 };
   const changes = [];

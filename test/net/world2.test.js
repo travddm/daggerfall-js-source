@@ -286,5 +286,5 @@ test('ONLINE-DUNGEON-FOES: a foe past the layout run is neither streamed nor pee
   assert.match(dc, /ONLINE-DUNGEON-FOES \(2026-09-20, Mac:/, 'the note is gone from the site');
   assert.match(dc, /NOT SYNCED\./); assert.match(dc, /NOT REACTIVE\./);
   assert.match(dc, /SUMMON-SYNC \(2026-09-27, Mac: "Finish the 2 gaps"\) paid the last, a summon's foe/, 'the retirement says what paid it');
-  assert.doesNotMatch(dc.slice(dc.indexOf('ONLINE-DUNGEON-FOES (2026-09-20'), dc.indexOf('const _layoutFoes = foes.length;')), /FLAGGED/, 'no longer on the board');
+  assert.doesNotMatch(dc.slice(dc.indexOf('ONLINE-DUNGEON-FOES.'), dc.indexOf('const _layoutFoes = foes.length;')), /FLAGGED/, 'no longer on the board');
 });
