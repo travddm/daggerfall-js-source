@@ -18,7 +18,7 @@ import { createTownTable } from '../../src/world/worldWide/townTable.js';
 import { REGION_NAMES } from '../../src/formats/mapsTables.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const BOOKS = ['market', 'professions', 'writs', 'contracts', 'cards', 'seaBounty', 'npcChapters', 'npcHalls', 'npcReceipts'];
+const BOOKS = ['market', 'professions', 'writs', 'contracts', 'seaBounty', 'npcChapters', 'npcHalls', 'npcReceipts'];
 const TABLES = ['market_listings', 'market_orders', 'market_auctions', 'market_bids', 'guild_writs', 'commissions', 'guild_contracts'];
 const CHILDREN = ['market_reports', 'market_auction_reports'];
 
