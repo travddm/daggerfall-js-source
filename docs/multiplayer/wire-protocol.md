@@ -69,7 +69,7 @@ fewer in a crowd, `POSE_CROWD`); the relay allows `POSE_HZ_MAX` (20/s) and batch
 ## The relay version
 
 ```js
-export const RELAY_VERSION = 'world276';   // src/net/wire.js
+export const RELAY_VERSION = 'world277';   // src/net/wire.js
 ```
 
 The format is `world<N>` (checked by `relayVersionOf` and by `test/net/relayversion.test.js`). It is read by:
