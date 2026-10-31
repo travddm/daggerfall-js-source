@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT CARDS-6 D3 (2026-10-09) - A SEASON BOARD'S NAMES, EVERY HONOUR ON THEM.
+// AUDIT CARDS-6 D3 - A SEASON BOARD'S NAMES, EVERY HONOUR ON THEM.
 //
 // A season board badges its rows with every honour, as the token, a letter
 // and a notice wear them all (letters.js, board.js), never its OWN alone.

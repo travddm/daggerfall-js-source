@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP3a (2026-10-08, Mac: "Keep going with the arc/slices") — MERIT: what
+// CHAP3a — MERIT: what
 // a member did for its chapter this week, from witnessed acts alone
 // (Chapters-Arc 5.1) - its own writ for the chapter (professions.js
 // deliverWrit) and a receipt in the chapter's region (npcReceipts.js

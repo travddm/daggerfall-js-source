@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RENOWN1 (2026-09-24) — THE RENOWN, AS THE SERVICE KEEPS IT.
+// RENOWN1 — THE RENOWN, AS THE SERVICE KEEPS IT.
 //
-// Mac: "What if the leveling system was something seperate unique to
-// online but compatible" (src/net/renown.js carries the whole of the
+// (src/net/renown.js carries the whole of the
 // law and Mac's answers; this file is where the track is kept).
 //
 // ONE TRACK A CHARACTER (migration 0009), keyed by the id the

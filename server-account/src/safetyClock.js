@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE5 + SAFE8 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md sections 6 and 9): THE
+// SAFE5 + SAFE8: THE
 // CHAT SAFETY'S CLOCK - what no request waits on. Every minute (cron.js MINUTE_JOBS 'safety'):
 //   1. the reviewer reads the cases reports opened or grew (TRIAGE_MAX), the most reporters who count first, and gives
 //      each its verdict on the reported account's lines - BEFORE the feed (AUDIT SAFE AI-3: the feed spent the day's

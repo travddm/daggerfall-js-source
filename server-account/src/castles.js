@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DOMAIN2 (2026-10-24, the owner: "Allowing the purchase of the actual
-// castle in major cities (cyrodil excluded), using the instancing system";
-// asked, "One owner per castle", "Silver", "Region holder buys it") - A
-// GUILD'S CASTLE, AS THE SERVICE KEEPS IT (bible/11-Multiplayer/Domains.md
+// DOMAIN2 - A
+// GUILD'S CASTLE, AS THE SERVICE KEEPS IT (
 // section 6; the numbers are src/net/castleLaw.js, which the client reads
 // too).
 //

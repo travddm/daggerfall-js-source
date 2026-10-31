@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2b (2026-10-03, Mac: "plus we need to build motherloads") - THE
-// MOTHERLODES, AS THE SERVICE KEEPS THEM (bible/06-Systems/Professions-Arc.md
+// PROF2b - THE
+// MOTHERLODES, AS THE SERVICE KEEPS THEM (
 // 6 and 38; the law both ends read is src/net/motherlodeLaw.js).
 //
 // ═══ THE DAY'S THREE, PICKED ONCE ════════════════════════════════════
@@ -68,7 +68,7 @@ const rowView = (r) => ({
  * and every strike of it read them all again (ground confirmed before the day began never changes, so the first pick
  * is the day's). The picks are written only under the mark THIS read made, so two first reads racing the day's turn
  * never keep a mix of two picks.
- * AUDIT SCALE II A-5 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): THE PICK IS THE PRIMARY'S.
+ * AUDIT SCALE II A-5: THE PICK IS THE PRIMARY'S.
  * SCALE4g put the motherlodes' read on a session started from the tab's bookmark, which a replica as old as that
  * bookmark may serve - and the day keeps whatever its first read picked. A pixel confirmed in the old day's last moment,
  * read off a replica that had not heard it yet, was never picked, all day. So a day found kept is read where the request

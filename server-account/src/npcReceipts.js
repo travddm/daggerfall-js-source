@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP2b (2026-10-08, Mac: "Keep going with the arc/slices") — THE
+// CHAP2b — THE
 // RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate closed or a raided town
 // defended, by a realm character in a region where a guild it is a member
 // of keeps a chapter, is remembered on its Roll - RECEIPT_REP a guild a

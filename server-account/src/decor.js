@@ -92,8 +92,7 @@ async function realmDecorWrite(ctx, player, at, { mapId, buildingKey, delta, wri
   return piece ? { ok: true, piece, gold: delta, realm: { seq: prep.seq } } : { error: 'no-decor' };   // AUDIT REALM L1-F3: the gold the record moved - the client takes it, never its own sum
 }
 
-/** The home is the caller's: map, key, account, character. ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be
- *  account bound, not character bound"): a home is its ACCOUNT's - every character of it owns it, whichever bought it,
+/** The home is the caller's: map, key, account, character. ACCOUNT-HOMES: a home is its ACCOUNT's - every character of it owns it, whichever bought it,
  *  and the character bound is the one acting (whose record pays) - save a deed the realm gave (FIELD BUGS 2026-10-04d
  *  KNIGHT-HOUSE), which stays its knight's: Daggerfall's house in that one save. GUILD1d (Seats-Arc 8.2: "decor in the
  *  hall by Officers"): or it is a guild's hall and the character is one of its keepers (hallLaw.js
@@ -307,8 +306,7 @@ export async function yardsOf({ db }, _player, { mapId } = {}) {
 }
 
 /**
- * YARD-SNAP (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md YARD-SNAP; migration
- * 0136): A TOWN'S YARDS, ONE ROW. 673,882 yards reads on the day read some 1,400 rows each, sorted (9.1% of the
+ * YARD-SNAP: A TOWN'S YARDS, ONE ROW. 673,882 yards reads on the day read some 1,400 rows each, sorted (9.1% of the
  * database's statement time) for an answer that moves only when a yard piece is written. `home_yards` holds each town's
  * rows as this read takes them, built at the version `home_yards_ver` holds - a number the database moves on every yard
  * row written, by a route, a cascade or a sweep alike (the migration's triggers), in a row of its own (AUDIT LEAN-READS 2
@@ -368,7 +366,7 @@ export function yardRowsOf(/** @type {unknown} */ text) {
 }
 
 /**
- * YARD-SHED (2026-10-06, the account service down - "D1_ERROR: D1 DB is overloaded. Requests queued for too long."): A
+ * YARD-SHED: A
  * TOWN'S YARDS, KEPT. The day before, the accounts database answered 17.4 million reads, 3.0 million of them this town's
  * yards (43 rows each - 131 million rows), each behind its caller's session and player rows: 9 million reads for an
  * answer every caller of a town gets alike, and in the outage 577 of the 930 requests the Worker saw in 45 s. So one
@@ -378,8 +376,7 @@ export function yardRowsOf(/** @type {unknown} */ text) {
  */
 export const YARDS_KEPT_S = 30;
 export const YARDS_KEPT_MAX = 4096;
-/** YARDS-REPLICA (2026-10-16, the account database's primary at its ceiling of round trips again - bible/11-Multiplayer/
- *  Scale-Arc.md YARDS-REPLICA): WHERE A TOWN'S YARDS ARE READ - a read replica, never the primary's queue. The isolates are
+/** YARDS-REPLICA: WHERE A TOWN'S YARDS ARE READ - a read replica, never the primary's queue. The isolates are
  *  many enough that YARDS_KEPT_S keeps almost nothing: 488,075 asks on 2026-10-15 cost the primary 506,889 reads of some
  *  1,100 rows each, the most of its statement time of any read but the session's lookup. SEAT-REPLICA's law, a town at a
  *  time: the read after this isolate's own decor write there starts at the primary ('first-primary', so it sees the
@@ -477,7 +474,7 @@ export async function hideDecorBase(ctx, player, { mapId, buildingKey, character
 }
 
 /**
- * PROF4 (bible/06-Systems/Professions-Arc.md 25): A CRAFTED PIECE SET DOWN - its provenance id kept only where the
+ * PROF4 (25): A CRAFTED PIECE SET DOWN - its provenance id kept only where the
  * account service's own `products` row says the piece is this account's and this template's, and its maker's mark
  * written from that row alone (where its name carries one - a Masterwork, a Master Joiner's furniture), never from what
  * the client sent. A piece whose id the row does not bear out stands as the plain piece it is.

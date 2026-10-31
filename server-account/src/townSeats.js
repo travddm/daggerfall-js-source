@@ -1,10 +1,10 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1a (2026-09-30, Mac: "Finish the seats") - THE SEATS' REGISTRY:
+// SEAT1a - THE SEATS' REGISTRY:
 // the seats the clients derived, witnessed, and the ones enough of them
 // agree on.
 //
-// bible/11-Multiplayer/Seats-Arc.md 3.2 (Mac: "Figure it out"): the
+// 3.2: the
 // servers never hold ARENA2, so they learn the seats from the clients
 // that derived them (src/systems/town/townSeats.js), and trust a seat only
 // when enough agree. ONE TABLE, ONE LAW: a seat is witnessed as the
@@ -110,7 +110,7 @@ async function allSeatRows(db) {
   const { results = [] } = await db.prepare(SEAT_ROWS_SQL).all();
   return results.map(witnessRow);
 }
-/** LEAN-WITNESS (2026-10-19, migration 0135; bible/11-Multiplayer/Scale-Arc.md LEAN-WITNESS): THE SEAT ROWS THE LAW
+/** LEAN-WITNESS: THE SEAT ROWS THE LAW
  *  JUDGES BY - the rows that are not late (idx_world_witness_lean_key), a seat an ignored account answered read whole
  *  (leanWitness.js exactRows). seatFacts' facts and ignored over them are its facts over every row; its witnesses' counts
  *  and audit are not, and nothing but a developer's list reads those. 32,775 rows a read on the day, one seat in 27
@@ -120,15 +120,14 @@ export async function judgedSeatRows(db, nowS) {
   return exactRows(db, 'seat', results.map(witnessRow), (rows) => seatFacts(rows, nowS).ignored);
 }
 
-/** STORM-SHED (2026-10-06 evening, the second overload - "D1 DB is overloaded"): HOW LONG ONE ISOLATE KEEPS THE SEATS'
+/** STORM-SHED: HOW LONG ONE ISOLATE KEEPS THE SEATS'
  *  WITNESS ROWS. Every list, every Watch claim and every witness's report read each `seat` row of world_witness - one a
  *  seat and witness, never trimmed: 4,050 rows a read, the database's costliest read by time in the outage's two hours -
  *  and a client whose Watch claim failed claimed again the moment the answer came, so the read the overload made slow
  *  was asked the faster for it. A seat's facts move with a witness's report and by the week (seatIgnoredAccounts), so a
  *  minute is nothing to them; a report or a strike written here lets them go at once. */
 export const SEAT_ROWS_KEPT_S = 60;
-/** SEAT-REPLICA (2026-10-13, the account database overloaded from 14:11 UTC; bible/11-Multiplayer/Scale-Arc.md
- *  SEAT-REPLICA): WHERE THE KEPT READ IS ASKED - a read replica, never the primary's queue. The rows were 15,899 a read
+/** SEAT-REPLICA: WHERE THE KEPT READ IS ASKED - a read replica, never the primary's queue. The rows were 15,899 a read
  *  on the day, and the isolates many enough that two lists in three missed their isolate's kept copy; in the outage the
  *  read was more than half the primary's statement time and nine in ten of the rows it answered. A read after this
  *  isolate's own write starts at the primary ('first-primary', so it sees the write), and every read after a kept one
@@ -182,7 +181,7 @@ function forgetSeatRows(db, nowS) {
   seatWroteAt.set(root, nowS);   // SEAT-FACTS: no kept row from before it answers here again (keptSeatFacts)
 }
 
-/** SEAT-FACTS (2026-10-13, after SEAT-REPLICA; the owner: "1, 2 and 3"; bible/11-Multiplayer/Scale-Arc.md SEAT-FACTS):
+/** SEAT-FACTS:
  *  THE SEATS AS THE WITNESSES SAY THEY ARE, KEPT ONCE FOR THE WHOLE SERVICE. Each isolate read every seat row a minute
  *  and counted the facts over them on every ask - after SEAT-REPLICA some 100 reads of 15,899 rows a minute on the one
  *  replica, whose p99 went from 2 ms to some 60 ms with them. Now the minute's clock (cron.js `seat-facts`) reads the
@@ -290,7 +289,7 @@ export async function listSeats({ db, nowS }, player, env) {
  * list leaves them. STORM-SHED: the Watch's claims read the isolate's kept rows (seatRowsOf); GATHER-SPEED and
  * MARKET-SPEED kept them too for the asks on a harvest's or a market read's way - a Levy's seat (seatHolding.js levyAt),
  * a Tithe's (titheAt) and a board's Market Hall (seatForts.js listingsCapAt), each of which read every seat row on
- * every harvest, read and buy. D1-LOAD (2026-10-11, the service slow after SEAT-LEASE): AND EVERY OTHER CALLER - the
+ * every harvest, read and buy. D1-LOAD: AND EVERY OTHER CALLER - the
  * standings (every board opened, and a holder's members' Watchtowers every ten minutes), the minute's auctions closed,
  * a Bounty's camp, a pledge - so kept is the rule, not a choice each caller must remember: all 4,050 of the seats'
  * witness rows were STORM-SHED's costliest read by time. A seat's facts move only with a witness's report or a strike

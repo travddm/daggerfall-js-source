@@ -1,12 +1,11 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2a part three (2026-10-01, Mac: "Finish the seats"; "Or we could go
-// ahead and do sieges"; "Continue") - WHAT THE SERVICE SAYS OF A BATTLE:
+// SEAT2a part three - WHAT THE SERVICE SAYS OF A BATTLE:
 // who may enter it (the pass, over the field the fighters' games agree),
 // what it gave (the result off the relay's `s1` receipt), and each
 // fighter's Honours.
 //
-// bible/11-Multiplayer/Seats-Arc.md 6.2, 6.5-6.8. The numbers are
+// 6.2, 6.5-6.8. The numbers are
 // src/net/townSeatLaw.js's; the battle is the relay's (net/siege/siegeRef.js).
 //
 // FACT: the relay has no door to this service. So the pass is an order

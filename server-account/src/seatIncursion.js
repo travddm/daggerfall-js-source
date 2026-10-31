@@ -1,6 +1,6 @@
 // @ts-check
-// AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done"): A DAEDRIC
-// INCURSION'S MARKS (bible/11-Multiplayer/Seats-Arc.md 9.3: "gate kills in the kingdom's regions give double influence,
+// AUDIT-SEATS: A DAEDRIC
+// INCURSION'S MARKS (9.3: "gate kills in the kingdom's regions give double influence,
 // and double Marks (PROF0 10.5)"). SEASON1 part two doubled the influence and left the Marks unpaid, because a kill's
 // region is the claiming client's word until three claims agree - and a faucet is not doubled on one account's word.
 // So the second half is paid at the Turning that settles the week, once the day's region IS agreed

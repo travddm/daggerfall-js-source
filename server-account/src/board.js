@@ -1,10 +1,9 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// NOTICE1 (2026-09-28) - THE NOTICE BOARD'S SERVICE: a town's notes, who
+// NOTICE1 - THE NOTICE BOARD'S SERVICE: a town's notes, who
 // may pin one, and the server's notices.
 //
-// Mac: "The new notice board should be a physical object that houses
-// quests, the player auction house, etc" (bible/06-Systems/
+// (bible/06-Systems/
 // Professions-Arc.md 10, PROF0). What a note is - its words, its days,
 // its button, every bound - is src/net/boardLaw.js, which the client's
 // window reads too; this file is who may do what with one.
@@ -62,7 +61,7 @@ export function boardOpenFor(player, env) {
 const badgeOf = (row, env, nowS) => (row ? { title: titleWorn(row, env) ?? null, glyphs: glyphsShown(row, env, nowS) } : { title: null, glyphs: [] });
 
 /** The expired rows, gone (PROF0 20: "notes deleted on expiry") - `limit` of each table at once, answering how many went.
- *  SCALE4b (2026-10-08): THE SERVICE'S CLOCK'S, never a read's - every board read swept first, two writes on the
+ *  SCALE4b: THE SERVICE'S CLOCK'S, never a read's - every board read swept first, two writes on the
  *  busiest read the board has, and every reader racing every other to run them; server-account/src/cron.js runs it each
  *  hour. Nothing a read answers waits on it: every read of a note or a notice asks `expires_at > now` itself. */
 export async function sweepBoard(db, nowS, limit = 200) {

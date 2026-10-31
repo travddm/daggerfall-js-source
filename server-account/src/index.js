@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1b — THE ACCOUNT SERVICE: a second Cloudflare Worker, over D1.
 //
-// Mac (2026-09-21): "cloud storage and account creation needed for
-// accessing online mode" / "Im not rotating. Lets do this".
+// / "Im not rotating. Lets do this".
 //
 // ═══ WHY THIS IS NOT A ROUTE ON THE RELAY ══════════════════════════
 //
@@ -54,7 +53,7 @@
 //   POST /v1/account/played {}            -> { playedS }
 // MOD1, moderation. The caller must be a moderator or a developer:
 //   POST /v1/mod/mute { target, minutes } -> { ok, target, name, until, order }   (SAFE4: and its act in the record, the order pushed to the relay's door)
-// SAFE1-SAFE8 (bible/11-Multiplayer/Chat-Safety-Arc.md), THE CHAT'S SAFETY:
+// SAFE1-SAFE8, THE CHAT'S SAFETY:
 //   POST /v1/safety/blocks {}                        -> { ok, blocks: [{ sub, name, at }] }   (SAFE1: my block list)
 //   POST /v1/safety/block { target }                 -> { ok, blocks }   /v1/safety/unblock { target } the same
 //   POST /v1/safety/report { target, reason, note?, lines: [{ tab, sub, name, at, text, sg }] } -> { ok, case, repeat?, muted?, order? }   (SAFE3: every line's stamp checked)
@@ -145,7 +144,7 @@
 //   POST /v1/auth/token { character? }    -> { ..., level, xp }   (RENOWN4: xp, the track's total)
 //   (REALM-DOOR: the token says whether that character is one of the account's realm characters, `rc`)
 //   (ARENA4b: and, for a realm character, the level on its tile - its summary's - as `cl`, 1..1000)
-// CHAP1, THE ROLL (bible/11-Multiplayer/Chapters-Arc.md 3): a realm character's standing with Daggerfall's own guilds -
+// CHAP1, THE ROLL (3): a realm character's standing with Daggerfall's own guilds -
 // the twenty-two guild factions' reputation and its memberships - kept here, under the playing tab's lease, while
 // CHAPTERS_OPEN lets the account in (npcRoll.js; the law src/net/npcChapterLaw.js):
 //   POST /v1/chapters/roll { character, lease, seed? } -> { roll, from, seeded? } | { roll: null }   (seeded once from the save - a customs crossing from the epoch capped; what is owed paid)
@@ -158,7 +157,7 @@
 //   POST /v1/chapters/history { region } -> { rows: [{ faction, week, kind, data, name }], zero }   (CHAP4d: a region's Chronicle; AUDIT CHAP4 R10)
 //   POST /v1/chapters/back { character, faction, region, side } -> { ok, event, side } | { error }   (CHAP6b: a Schism's side, a Succession's candidate)
 //   POST /v1/chapters/patron { character, faction, region, marks, rid } -> { ok, season, marks, guildMarks } | { error }   (CHAP7a: a guild's bid for a chapter's patronage)
-// TOWN-ECON TE2 (bible/06-Systems/Town-Economy-Arc.md section 4; AUDIT TOWN-ECON 2 SVC-13: its own list, out of the chapters'):
+// TOWN-ECON TE2 (; AUDIT TOWN-ECON 2 SVC-13: its own list, out of the chapters'):
 //   POST /v1/towns/econ {} -> { ok, towns: [[map, share], ...] }   (every town's players' share of 1 or more, kept by the clock - SVC-3)
 //   POST /v1/towns/witness { town: { map, px, py, region, location }, receipt } -> { ok, counted, confirmed?, why? }   (the town registry, witnessed as a seat is; SVC-1: a Watch tick at its pixel)
 //   POST /v1/towns/watch { receipts, sea? } -> { ok, counted, sea, why, full }   (the Watch's ticks walked in a confirmed town, capped a town a day; SEA-TRADE: `sea` the ticks that vouch a dealing at a port's exchange)
@@ -315,7 +314,7 @@ import { gateStrikeStatement, gateStrikeAnswer, raidStrikeStatement, combatStrik
 import { readBoard, pinNote, takeDownNote, reportNote, moderateNote, postNotice, removeNotice } from './board.js';   // NOTICE1: the Notice Board
 import { craftWritBoard, deliverCraftWrit } from './craftWrits.js';   // CRAFT-WRITS: the guilds' asks of a crafter
 import { profState, profPixels, harvestNode, chooseSpec, withdrawStores, depositStores, smeltAtForge, craftAtAnvil, temperPiece, buyStock, listWrits, deliverWrit } from './professions.js';   // BAG1: a deposit   // PROF1: the professions; PROF2: the forge; PROF3: the anvil and the smith's stock
-import { masterWork } from './masterWork.js';   // MASTER-ART: a Master's work (bible/06-Systems/Professions-Arc.md section 57)
+import { masterWork } from './masterWork.js';     // MASTER-ART: a Master's work
 import { brewAtStation, disenchantPiece, reforgeWithEssence } from './alchemy.js';   // PROF12: Alchemy's brew, Enchanting's disenchant
 import {
   writBoard, postGuildWrit, supplyGuildWrit, withdrawGuildWrit, setWritBudget, postCommission, fulfilCommission, cancelCommission, declineCommission,
@@ -336,8 +335,8 @@ import { SESSION_PASS_HEADER } from '../../src/net/sessionPassLaw.js';   // SESS
 import { PROGRESS_ROUTES, seatRefusalOf, progressConfig, progressRoom, progressSpent } from './progress.js';   // INT16-INT17: a progression claim's seat, and the play that pays for it
 import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/net/realm/realmSaveCodec.js';   // REALM-GZIP: a save rides packed
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
-import { wildInsure, wildPolicies } from './wildInsure.js';   // WILD-INSURE (2026-10-26): a policy on a piece of gear, written against its premium off the record
-import { wildFall, wildCollect, wildReclaim, wildEscrows } from './wild.js';   // INT9: a death in the open zone's drop, taken off the record; MAC (2026-10-14): its killer's piece in escrow - collected, taken back, listed
+import { wildInsure, wildPolicies } from './wildInsure.js';     // WILD-INSURE: a policy on a piece of gear, written against its premium off the record
+import { wildFall, wildCollect, wildReclaim, wildEscrows } from './wild.js';     // INT9: a death in the open zone's drop, taken off the record; MAC: its killer's piece in escrow - collected, taken back, listed
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
 import { runCron } from './cron.js';   // SCALE4b: the service's own clock
@@ -401,8 +400,7 @@ const poiAssetResponse = (/** @type {any} */ r, /** @type {string} */ origin) =>
   },
 });
 /** AUDIT ONLINE A17's law, the service's one answer to a throw: LOGGED, not lost, and a player told nothing about it -
- *  an overloaded D1 a 503 (SCALE4f: counted apart from a bug), any other a 500. HOMES-SHED (2026-10-13, the database
- *  overloaded from 14:11 UTC): the try's catch below, and the one route above it that asks the database (the siege
+ *  an overloaded D1 a 503 (SCALE4f: counted apart from a bug), any other a 500. HOMES-SHED: the try's catch below, and the one route above it that asks the database (the siege
  *  blackout's question), whose throw had left the Worker as a bare 500 - no body, no log line, no metrics point. */
 const thrown = (path, e, origin) => {
   console.error('[account]', path, e?.stack ?? String(e));
@@ -420,13 +418,13 @@ const overloaded = (origin) => {
 /** REALM P1: each realm refusal's status - a bad shape 400 (the default), a character that is not the caller's 404, a
  *  lease another tab holds or a sequence that is not the next 409 (the tab that lost it goes offline), the account's
  *  bound 409, customs refused 403/409, no storage 503. */
-/** INT3/INT4 (the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE JUDGE'S REFUSALS, the same at every route that
+/** INT3/INT4 (the INTEGRITY arc): THE JUDGE'S REFUSALS, the same at every route that
  *  hands a realm character's value to another player - its trade held, its record unread since the judge shipped, a
  *  piece the id ledger marked a duplicate - each a conflict with what stands (realm.js holdRefusal, prepareRealmRecord). */
 const JUDGE_STATUS = Object.freeze({ 'trade-held': 409, 'record-unjudged': 409, 'piece-dupe': 409, 'piece-claimed': 409, 'piece-legacy': 409 });
 /** INT9: a death's drop's refusals - no key to verify or sign with 503, a receipt not the caller's 403, the fallen's own
  *  grace or the room's falls 409; the record's own (REALM_STATUS) after them, a bad shape 400 (the default). */
-const WILD_STATUS = Object.freeze({ 'no-gate-key': 503, 'no-signing-key': 503, 'not-yours': 403, grace: 409, 'fallen-frozen': 409, nonce: 400, 'no-escrow': 404, 'escrow-wait': 409, 'escrow-late': 409, 'escrow-moved': 409, 'escrow-collected': 409, 'escrow-returned': 409, 'sea-prize-moved': 409, 'sea-prize-realm': 403, 'insure-held': 409, 'insure-full': 409, 'insure-piece': 409, 'realm-gold': 409 });   // MAC (2026-10-14): the escrow's; SHIP-PVP: a prize's; WILD-INSURE: a policy's
+const WILD_STATUS = Object.freeze({ 'no-gate-key': 503, 'no-signing-key': 503, 'not-yours': 403, grace: 409, 'fallen-frozen': 409, nonce: 400, 'no-escrow': 404, 'escrow-wait': 409, 'escrow-late': 409, 'escrow-moved': 409, 'escrow-collected': 409, 'escrow-returned': 409, 'sea-prize-moved': 409, 'sea-prize-realm': 403, 'insure-held': 409, 'insure-full': 409, 'insure-piece': 409, 'realm-gold': 409 });     // MAC: the escrow's; SHIP-PVP: a prize's; WILD-INSURE: a policy's
 /** HOME-RENT: a room's refusals - a bad shape 400 (the default). */
 const RENT_STATUS = Object.freeze({
   ...JUDGE_STATUS,
@@ -665,7 +663,7 @@ async function guildOrdersOf(r, s, env, subtle, nowS) {
   return answer;
 }
 
-/** FIELD BUGS 2026-10-14 QUEST-HOME (Mac, 2026-10-15: "Close both"): AN ACT'S ANSWER THAT MOVED A HOME, WITH ITS ORDERS
+/** FIELD BUGS 2026-10-14 QUEST-HOME: AN ACT'S ANSWER THAT MOVED A HOME, WITH ITS ORDERS
  *  SIGNED in place of what it says (`moved`, src/net/homeLaw.js homeMoved) - `homeOrders`, each one town's
  *  (HOME_ORDER_KEYS_MAX buildings at most), which the acting client carries to the hub, whose fan reaches every page
  *  online: a quest never picks its residence in a house bought after a page's boot read, and one picked there and not yet
@@ -789,14 +787,14 @@ const service = {
         ? json({ alg: TOKEN_V, key: pub }, 200, origin)
         : no('no-signing-key', 503, origin);
     }
-    // GRANT3 (bible/11-Multiplayer/Spawn-Grants.md section 13): THE RELAY'S PUBLIC HALF, as openly - every reader checks a
+    // GRANT3: THE RELAY'S PUBLIC HALF, as openly - every reader checks a
     // spawn grant's signature with it, a guest's game too. It verifies the relay's signatures and mints nothing.
     if (path === '/v1/relaykey') {
       const rk = String(env.GATE_PUBLIC_KEY ?? '');
       return rk ? json({ rk }, 200, origin) : no('no-relay-key', 503, origin);
     }
 
-    // RESTORE (2026-09-29, Mac: "I want people to get their stuff back"): HELD FOR MAINTENANCE. The history restore
+    // RESTORE: HELD FOR MAINTENANCE. The history restore
     // (.github/workflows/realm-restore.yml) rewinds the database for a minute to read what was lost, and puts it back;
     // anything written in between would vanish with the rewind. So the job deploys this Worker with MAINTENANCE = "1"
     // first, and every call but the two above is refused for that minute - 503, which a playing tab's checkpoint waits
@@ -896,7 +894,7 @@ const service = {
         return patreonHtml(patreonLinkedPage({ handle: row?.handle ?? '', titles: pledgeTitles(who.tiers, who.status, env) }));
       }
 
-      // GRANT2 (bible/11-Multiplayer/Spawn-Grants.md section 12): THE SPAWN GRANTS' MEASURE - a cell's window of asks,
+      // GRANT2: THE SPAWN GRANTS' MEASURE - a cell's window of asks,
       // posted by the relay and proven by its signature over the exact bytes (the chat feed's kind of door, grants.js)
       if (path === GRANT_FEED_PATH) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -1006,7 +1004,7 @@ const service = {
       if (body === undefined && path === '/v1/realm/lineage') return no('lineage-too-large', 413, origin);
       if (body === undefined && path === '/v1/homes/decor/batch') return no('too-large', 413, origin);   // DECOR-BATCH: past 128 KiB, before a session is read
       if (!body) return no('body', 400, origin);
-      // YARD-SHED (2026-10-06, the service down - "D1 DB is overloaded. Requests queued for too long."): A TOWN'S YARDS NEED
+      // YARD-SHED: A TOWN'S YARDS NEED
       // NO SESSION. Its answer is every caller's alike, any guest's to read (decor.js yardsKept), and the two reads a
       // session costs were most of the database's day - so it is answered here, from the isolate's kept answer, bounded
       // per address in this isolate's memory as a session's door is per account (no write to count it).
@@ -1055,7 +1053,7 @@ const service = {
       const auth = request.headers.get('authorization') ?? '';
       const bearer = /^Bearer (.+)$/.exec(auth)?.[1];
       const secret = bearer ?? (request.method === 'POST' ? body.secret : null);
-      // SESSION-SIGN (sessionPass.js; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, decision 4): A HOT ROUTE
+      // SESSION-SIGN (sessionPass.js; THE PLAN PAST 1,000, decision 4): A HOT ROUTE
       // BELIEVES ITS PASS - who the lookup found, signed for five minutes and bound to this secret - and asks the lookup
       // only for one it cannot believe, minting the next beside its answer
       const hot = passRoute(path, request.method) ? await passKey(env, subtle) : null;
@@ -1081,7 +1079,7 @@ const service = {
       // death. Asked here, once, before any route - but the token's mint, which is no act: it vouches for the account,
       // and mints a tombstone no realm character (REALM-DOOR's `rc` 0, no house, no `ci`), which the relay's door refuses;
       // a page under its death screen still mints for the hub it stands in.
-      // PRIMARY-FOLD (bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000): the door's reads - the tombstone of a body's
+      // PRIMARY-FOLD (THE PLAN PAST 1,000): the door's reads - the tombstone of a body's
       // `character`, and a progression claim's seat and its stream's bucket - in one trip (door.js doorReads), answered in
       // the order each was asked on its own
       const progressRoute = request.method === 'POST' ? PROGRESS_ROUTES[/** @type {keyof typeof PROGRESS_ROUTES} */ (path)] : undefined;
@@ -1106,7 +1104,7 @@ const service = {
         return no('rate', 429, origin);
       }
 
-      // INT16 (bible/06-Systems/Integrity-Arc.md section 7): A PROGRESSION CLAIM IS ITS SEAT'S - Renown, a raid's cleanse, a
+      // INT16: A PROGRESSION CLAIM IS ITS SEAT'S - Renown, a raid's cleanse, a
       // camp, the Watch, a silver find, a profession's XP (progress.js PROGRESS_ROUTES) asked of the account's realm character
       // holding its lease, never one the judge holds, before any route reads a word of it. INT17: and once staff enforce the
       // line, a stream whose bucket play has not refilled is refused, and a Renown report asks no more than the bucket holds.
@@ -1221,7 +1219,7 @@ const service = {
         // too (RENOWN1), and a token wearing a guild is what the hub routes the guild's lines to - that build knows no
         // guild channel and filed them on its World tab, where a reply goes to everyone. It wears no guild instead.
         const guild = renownCharacterOk(body.character) && body.guild === true ? await guildBadgeOf(ctx, who.player.id, body.character, member) : null;
-        // REALM-DOOR (2026-09-29, the field): AND WHETHER THAT CHARACTER IS THE REALM'S. A realm-era tab goes online only
+        // REALM-DOOR: AND WHETHER THAT CHARACTER IS THE REALM'S. A realm-era tab goes online only
         // as a realm character and names it here; a build from before the realm names its offline character, or none.
         // The relay refuses a 0 at its door, so online is the realm's at the servers too. Stamped on every mint, a 0
         // included: a token with no `rc` is a service from before this, which the relay still admits.
@@ -1243,7 +1241,7 @@ const service = {
         // surname, its given name, a Bloodline's mark, the generation's numeral) - off the line the service holds, never a
         // word of the client's
         const house = facts.house;
-        // NAME-AS (2026-10-12): AND THE NAME THE ROOM READS - the account's, or, where the account chose its character's,
+        // NAME-AS: AND THE NAME THE ROOM READS - the account's, or, where the account chose its character's,
         // that realm character's own (`facts.name`, off the same read), where the wire can carry it and it is no other
         // account's username (accounts.js wornNameOf). Never a word of the request: the body names WHICH character, as it
         // always did, and its name is the row's.
@@ -1326,7 +1324,7 @@ const service = {
       }
 
       if (path === '/v1/duel/claim' && request.method === 'POST') {
-        // INT8 (bible/06-Systems/Integrity-Arc.md lane 2): A DUEL'S RESULT, THE RELAY'S - either fighter carries the receipt
+        // INT8 (lane 2): A DUEL'S RESULT, THE RELAY'S - either fighter carries the receipt
         // the referee handed it (src/net/duel/duelReceipt.js `d1`); the session must be one of its two, never the body's word,
         // and accounts.js `claimDuel` counts it once (its bout's id) inside its bounds. No public half here yet: 503, and
         // the client keeps the receipt for its day.
@@ -1336,7 +1334,7 @@ const service = {
       }
 
       if (path === '/v1/wild/fall' && request.method === 'POST') {
-        // INT9 (bible/06-Systems/Integrity-Arc.md lane 2): A DEATH IN THE OPEN ZONE'S DROP, TAKEN OFF THE FALLEN'S JUDGED
+        // INT9 (lane 2): A DEATH IN THE OPEN ZONE'S DROP, TAKEN OFF THE FALLEN'S JUDGED
         // RECORD (wild.js `wildFall`) - against the fall the relay signed (src/net/wild/wildReceipt.js `f1`: the fallen's own tab
         // with its record's `at`, its killer's after the grace), or none (a death to a foe - refused `foe`, FOE-KEEPS). The
         // answer's `order` is the service's word on the records, the room's to keep a deposit on.
@@ -1347,7 +1345,7 @@ const service = {
       }
 
       if ((path === '/v1/wild/collect' || path === '/v1/wild/reclaim' || path === '/v1/wild/escrows') && request.method === 'POST') {
-        // MAC'S DECISION (2026-10-14, the two-phase handoff - wild.js): the killer's worn piece the fall put in ESCROW -
+        // MAC'S DECISION: the killer's worn piece the fall put in ESCROW -
         // collected into the killer's record against the room's signed collect (`g1`, the gate's key), taken back into the
         // fallen's once its killer could no longer collect it, or listed for the fallen's tab
         const wctx = { ...ctx, bucket: env.SAVES };
@@ -1359,7 +1357,7 @@ const service = {
       }
 
       if ((path === '/v1/wild/insure' || path === '/v1/wild/policies') && request.method === 'POST') {
-        // WILD-INSURE (2026-10-26, wildInsure.js): a policy on a piece of gear, written as an act on the record against its
+        // WILD-INSURE: a policy on a piece of gear, written as an act on the record against its
         // premium - kept from a fall at another player's hand while in force, and spent by it - and the policies in force
         // for the character's tab
         const wctx = { ...ctx, bucket: env.SAVES };
@@ -1370,7 +1368,7 @@ const service = {
       }
 
       if ((path === '/v1/sea/wreck' || path === '/v1/sea/prize/collect' || path === '/v1/sea/prize/reclaim') && request.method === 'POST') {
-        // SHIP-PVP (2026-10-22, bible/03-World/Eltheric-Ocean.md SHIP-PVP): a ship wrecked at another captain's guns, against
+        // SHIP-PVP: a ship wrecked at another captain's guns, against
         // the wreck the relay signed (src/net/wild/wildReceipt.js `n1`, the gate's key: her captain's own tab with its
         // record's `at`, her killer's after the grace) - boarded, her hold's share held for her killer; and the prizes
         // collected by the killer's character, or reclaimed by her captain's once its killer left them (seaWreck.js)
@@ -1566,7 +1564,7 @@ const service = {
       }
 
       if (path === '/v1/arena/board' && request.method === 'POST') {
-        // ARENA4: THE ARENA'S BOARDS (Mac: "view your ranking and even player leaderboards"), counted from the rows - the
+        // ARENA4: THE ARENA'S BOARDS, counted from the rows - the
         // season's ratings and its #1, the climb, the fastest Grand Champions, the banners and the Hall of Champions - and
         // the caller's own (`me`).
         return json(await arenaBoardOf(ctx, who.player, env), 200, origin);
@@ -1820,7 +1818,7 @@ const service = {
         // next new name may come - each dropped here, so the page could say neither
         if ((r.error === 'guild-name-word' || r.error === 'guild-rank-word') && typeof r.word === 'string') return json({ error: r.error, why: r.word }, GUILD_STATUS[r.error], origin);   // TEXT-F1: a rank's name's word too
         if (r.error === 'guild-rename-soon' && Number.isSafeInteger(r.at)) return json({ error: r.error, at: r.at }, GUILD_STATUS[r.error], origin);
-        // GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md): a leave's or a disbanding's refusal names everything that holds the guild
+        // GUILD3c: a leave's or a disbanding's refusal names everything that holds the guild
         if (Array.isArray(r.keeps)) return json({ error: r.error, keeps: r.keeps }, GUILD_STATUS[r.error] ?? 400, origin);
         return no(r.error, GUILD_STATUS[r.error] ?? 400, origin);
       }
@@ -1868,7 +1866,7 @@ const service = {
 
       // ═══ TOWN-ECON TE2: THE TOWNS' ECONOMY ════════════════════════════
       //
-      // bible/06-Systems/Town-Economy-Arc.md section 4 (townEcon.js): every town's players' share, read by any session; a
+      // (townEcon.js): every town's players' share, read by any session; a
       // town witnessed by the client standing in it (the registry); the Watch's ticks walked in a town, claimed.
       if (path.startsWith('/v1/towns/')) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2011,7 +2009,7 @@ const service = {
 
       // ═══ HUNTERS-MARK: THE HUNT'S LEDGER ═══════════════════════════════
       //
-      // bible/06-Systems/Bounty-Boards.md section 12: a character's clears read, and a paid bounty reported - bounded, not
+      // a character's clears read, and a paid bounty reported - bounded, not
       // witnessed (hunts.js). The report is a progression claim, asked of the seat at the door (progress.js PROGRESS_ROUTES).
       if (path.startsWith('/v1/hunt/')) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2027,7 +2025,7 @@ const service = {
 
       // ═══ SEA-BOUNTY: A FREEPORT'S BOUNTY BOARD ══════════════════════════
       //
-      // bible/03-World/Eltheric-Ocean.md SEA-BOUNTY: the wanted captains of the open sea and the gold on their heads; a post
+      // SEA-BOUNTY: the wanted captains of the open sea and the gold on their heads; a post
       // off the poster's record, a collect into the killer's - each act its own batch, the gold and the row together
       // (seaBounty.js). The kills are written with their falls (wild.js wildFall).
       if (path.startsWith('/v1/sea/bounty/')) {
@@ -2045,7 +2043,7 @@ const service = {
         return json(r, 200, origin);
       }
 
-      // CREW-SIGNED (2026-10-27, bible/03-World/Shipyards.md CREW-SIGNED): a crew hall's recruit held by the first account
+      // CREW-SIGNED: a crew hall's recruit held by the first account
       // to sign him for his day, let go when he is paid off (crewSigns.js) - no gold moves here
       if (path.startsWith('/v1/crew/')) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2056,7 +2054,7 @@ const service = {
         return json(r, 200, origin);
       }
 
-      // SEA-SEASON (2026-10-22, bible/03-World/Eltheric-Ocean.md SEA-SEASON): the season's deepest voyages and legends
+      // SEA-SEASON: the season's deepest voyages and legends
       // ended - read here; the figures come with each clean checkpoint (seaSeason.js, realm.js checkpointRealm)
       if (path === '/v1/sea/season/board') {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2096,8 +2094,7 @@ const service = {
       }
 
       if (path === '/v1/account/title' && request.method === 'POST') {
-        // EQUIP ONE, OR NONE. Mac: "tap the account icon to equip 1
-        // feature along with signing out." An absent `title` and an
+        // EQUIP ONE, OR NONE. An absent `title` and an
         // explicit `null` both mean take it off - a player may always
         // wear nothing, and there is nothing to refuse them for.
         //
@@ -2121,7 +2118,7 @@ const service = {
 
       // ═══ WITCH1: THE WITCHES' FESTIVAL ════════════════════════════════
       //
-      // bible/06-Systems/Witches-Festival.md: an account's Soul Cakes and what they bought, a find the service's die decides,
+      // an account's Soul Cakes and what they bought, a find the service's die decides,
       // a sale by its request id, and the Hearth Offerings at homes' doors (festival.js).
       if (path.startsWith('/v1/festival/')) {
         if (request.method !== 'POST') return no('method', 405, origin);
@@ -2148,7 +2145,7 @@ const service = {
       }
 
       if (path === '/v1/account/name' && request.method === 'POST') {
-        // NAME-AS (2026-10-12, Mac: "toggle to use their account name or character name for ingame use"): WHICH NAME THE
+        // NAME-AS: WHICH NAME THE
         // ROOM READS - `{ as: 'account' | 'character' }`, the row's choice, which every later mint signs (accounts.js
         // wornNameOf). Nothing to hold, so nothing to refuse but a word that is neither: 400 `no-name-as`.
         const r = await chooseNameAs(ctx, who.player, body.as);
@@ -2186,7 +2183,7 @@ const service = {
         return 'error' in r ? no(r.error, SAFETY_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
       }
 
-      // SAFE4 (bible/11-Multiplayer/Chat-Safety-Arc.md section 5): A MODERATOR'S BAN, UNBAN AND LOOK - sanctions.js. A ban's
+      // SAFE4: A MODERATOR'S BAN, UNBAN AND LOOK - sanctions.js. A ban's
       // order goes back to the moderator's client to carry to its rooms (MOD1's carrier) and to the relay's door.
       // STAFF-PANEL2-FIX: the ban and the unban are safety.js modAct's, as the mute is
       if ((path === '/v1/mod/ban' || path === '/v1/mod/unban' || path === '/v1/mod/strikes') && request.method === 'POST') {
@@ -2197,7 +2194,7 @@ const service = {
         return 'error' in r ? no(r.error, SAFETY_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
       }
 
-      // AUDIT SAFE DOC-4 (bible/11-Multiplayer/Chat-Safety-Arc.md section 9): THE CASES, READ IN THE GAME - a moderator's
+      // AUDIT SAFE DOC-4: THE CASES, READ IN THE GAME - a moderator's
       // list of the open cases, one case, and its dismissal (safety.js); a dismissal's unmute order goes back to the
       // moderator's client to carry, as /mute's does
       if ((path === '/v1/mod/cases' || path === '/v1/mod/case' || path === '/v1/mod/dismiss') && request.method === 'POST') {
@@ -2208,7 +2205,7 @@ const service = {
         return 'error' in r ? no(r.error, SAFETY_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
       }
 
-      // SAFE1, SAFE3, SAFE7 (bible/11-Multiplayer/Chat-Safety-Arc.md): A PLAYER'S BLOCK LIST, A REPORT, THE CODE AGREED - safety.js
+      // SAFE1, SAFE3, SAFE7: A PLAYER'S BLOCK LIST, A REPORT, THE CODE AGREED - safety.js
       if (path.startsWith('/v1/safety/')) {
         if (request.method !== 'POST') return no('method', 405, origin);
         const act = {
@@ -2225,7 +2222,7 @@ const service = {
         return 'error' in r ? no(r.error, SAFETY_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
       }
 
-      // INT6 (bible/06-Systems/Integrity-Arc.md): THE REVIEW - a developer's read of the judge's verdicts and the acts on
+      // INT6: THE REVIEW - a developer's read of the judge's verdicts and the acts on
       // them (review.js): the held, a character's findings, a hold lifted or laid, a rollback to the last clean save, the
       // measure and the budget's config. 403 for a caller who is not one.
       if (path.startsWith('/v1/mod/realm-') && request.method === 'POST') {
@@ -2235,8 +2232,7 @@ const service = {
       }
 
       if (path === '/v1/mod/customs-pass' && request.method === 'POST') {
-        // CUSTOMS-PASS (2026-09-29, Mac, asked what becomes of a character a build from before the realm stranded:
-        // "Staff customs pass"): A DEVELOPER GRANTS ONE ACCOUNT ONE CHARACTER THROUGH CUSTOMS (realm.js). 403 for a
+        // CUSTOMS-PASS: A DEVELOPER GRANTS ONE ACCOUNT ONE CHARACTER THROUGH CUSTOMS (realm.js). 403 for a
         // caller who is not one - the credential is good, the right is not theirs, as the save wall reads it.
         const r = await grantCustomsPass(ctx, who.player, env, { name: body.name, account: body.account, revoke: body.revoke });
         return r.error ? no(r.error, PASS_STATUS[r.error] ?? 400, origin) : json(r, 200, origin);
@@ -2330,8 +2326,7 @@ const service = {
         return 'error' in r ? no(r.error, 404, origin) : json(r, 200, origin);
       }
 
-      // SERVER-POST (2026-10-08, Mac: "an ingame server mailbox that goes next to the hourglass in the pause menu ... First
-      // use is to utilize it for players being granted items"): THE SERVER'S POST - the developers' pieces to one account,
+      // SERVER-POST: THE SERVER'S POST - the developers' pieces to one account,
       // a registered one's alone (the letters' wall, its own word), each perhaps holding an item its reader claims into the
       // online character being played (post.js). Read, claimed and thrown away here; written only by the operator's workflow.
       if (path.startsWith('/v1/post/')) {
@@ -2354,7 +2349,7 @@ const service = {
         return no(r.error, POST_STATUS[r.error] ?? REALM_STATUS[r.error] ?? 400, origin);
       }
 
-      // PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): A
+      // PRIVATE-REPORT: A
       // PLAYER'S PRIVATE REPORT - an exploit, a bug, a security hole - to the readers REPORT_READER_HANDLES names, and
       // their inbox (reports.js). A registered account's alone, the letters' wall with its own word: a guest is a device,
       // and a report a reader cannot answer to anybody is one the next storage clear forgets who sent.

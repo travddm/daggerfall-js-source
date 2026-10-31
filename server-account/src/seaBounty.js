@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-BOUNTY (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-BOUNTY) - A FREEPORT'S BOUNTY BOARD ON THE OPEN SEA'S KILLERS, the service's half. The law is both
+// SEA-BOUNTY - A FREEPORT'S BOUNTY BOARD ON THE OPEN SEA'S KILLERS, the service's half. The law is both
 // ends' (src/net/sea/seaBountyLaw.js); the tables migrations/0146_sea_bounty.sql's.
 //
 //   THE KILL (seaKillSteps): a fall the relay refereed in a room of the open sea (its receipt's `m` - src/net/wire.js

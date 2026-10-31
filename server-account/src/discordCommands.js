@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DISCORD-CODE (2026-10-17, Mac: "Is there a way we can set up something where you can handle all future discord
-// integrations and changes yourself?", then "Do it"; bible/11-Multiplayer/Chat-Safety-Arc.md section 9): THE BOT'S
+// DISCORD-CODE: THE BOT'S
 // COMMANDS, DECLARED ONCE, BESIDE THE SERVICE THAT ANSWERS THEM.
 //
 // Discord is code here. Every command the bot has is in DISCORD_COMMANDS, and the account deploy writes the WHOLE list

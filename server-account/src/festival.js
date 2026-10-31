@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WITCH1 (2026-10-20, the owner: "With Halloween on the horizon. I think its fair to develop our first live event.
-// Daggerfall lore style"; bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, AS THE SERVICE KEEPS IT -
+// WITCH1: THE WITCHES' FESTIVAL, AS THE SERVICE KEEPS IT -
 // an account's Soul Cakes, the day's finds, the Wyrd Sister's sales, and the Hearth Offerings set out at homes' doors.
 // The numbers are src/net/festivalLaw.js, which the client reads too.
 //

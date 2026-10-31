@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT16-INT17 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7; the owner: "Take
-// care of the integrity arc"): PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT PAYS FOR THEM.
+// INT16-INT17: PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT PAYS FOR THEM.
 //
 // The world runs on the player's machine, so a kill's Renown, a find's silver, a camp cleared, a node harvested and the
 // XP a craft earns are each the client's word (a raid's cleanse and a watch's tick are the relay's). Lanes 1-3 bounded
@@ -15,7 +14,7 @@
 // refuses is a request naming an offline id (`char-anything` - each a fresh set of nodes a day), a seat another device
 // took, and a character the judge holds.
 //
-// INT17 - THE PLAY THAT PAYS, MEASURED FIRST (the owner, asked: "Measure first" - as the wealth budget and the boss
+// INT17 - THE PLAY THAT PAYS, MEASURED FIRST (- as the wealth budget and the boss
 // fights' count were). Each stream is a bucket, the wealth budget's own law (budget.js stepBudget): it fills at its
 // line's rate for every second the account played (players.played_s - the service's own count, accounts.js creditPlay:
 // "The client sends no number"), up to its cap, and each claim spends it. While the line only measures, the bucket

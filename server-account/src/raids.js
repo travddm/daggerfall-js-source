@@ -1,15 +1,14 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// RAID4 (2026-09-28) — THE TOWNS DEFENDED, AS THE SERVICE KEEPS THEM.
+// RAID4 — THE TOWNS DEFENDED, AS THE SERVICE KEEPS THEM.
 //
-// Mac, on World Events - Raiding Parties online: "1. Server ... 3. We
-// can also add renown and it's own atheric + armor sets". The relay
+// . The relay
 // keeps a town raid's ledger and, at its cleanse, signs a receipt for
 // each account that struck a raider and stood in the town
 // (src/net/raid/raidReceipt.js - `w1`, under the relay's GATE_SIGNING_KEY).
 // This file is where that receipt is honoured: counted once, and paid
 // in Renown to the character that fought it. Design:
-// bible/03-World/Raiding-Parties.md, "The rewards (RAID4)".
+// "The rewards (RAID4)".
 //
 // ═══ WHOSE WORD, AND WHAT BOUNDS IT ════════════════════════════════
 //
@@ -21,7 +20,7 @@
 // most RAID_CLAIMS_DAY_MAX a game day (a game day is two real hours, and
 // a raid is ten minutes of them), and the key's day must be its own.
 //
-// AUDIT RAID R5 (2026-09-28): AND ITS RENOWN IS THE HOUR'S. It was
+// AUDIT RAID R5: AND ITS RENOWN IS THE HOUR'S. It was
 // credited outside the hour's bound ("one raid, one credit"), and six
 // raids a game day of up to 3,900 each is 11,700 an hour - over half the
 // bound again, for a modified client that names raids the day never

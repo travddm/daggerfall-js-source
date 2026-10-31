@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Network bursts and Server load) - THE RELAY'S NET
+// STAFF-PANEL5-FEEDS - THE RELAY'S NET
 // FEED, KEPT, AND THE PANEL'S NETWORK BURSTS.
 //
 // THE DOOR IN: POST /v1/staff/net-feed, a room's window of the players over a limit (server/src/staffFeeds.js), proven by

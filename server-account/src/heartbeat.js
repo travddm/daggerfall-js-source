@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCALE4c (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's "one heartbeat replacing the mail, beat and board
-// polls", bible/11-Multiplayer/Scale-Arc.md): ONE REQUEST FOR THE THREE CLOCKS A PLAYER'S TAB KEEPS.
+// SCALE4c: ONE REQUEST FOR THE THREE CLOCKS A PLAYER'S TAB KEEPS.
 //
 // A tab at play asked the service on three clocks of its own: the play beat every five minutes (/v1/account/played),
 // the letterbox every three (/v1/mail/inbox), and the Notice Board of the town it stands in every minute
@@ -40,8 +39,7 @@ export async function heartbeat(ctx, player, env, body, sessionId = null) {
       out[name] = { error: 'server' };
     }
   };
-  // BEAT-LAST (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/
-  // Scale-Arc.md BEAT-LAST): THE READS FIRST, THE BEAT LAST. A D1 session sends every statement after a write to the
+  // BEAT-LAST: THE READS FIRST, THE BEAT LAST. A D1 session sends every statement after a write to the
   // primary, so the beat's UPDATE, asked first, sent the box, the board and the post there too - some 1.4 of a
   // heartbeat's 2.6 primary statements, at seven heartbeats a second. None of them reads what the beat writes (the
   // played seconds and the Renown credit), so they go first, on the session's replica, and the beat after them.

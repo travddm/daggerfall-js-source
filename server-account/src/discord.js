@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE8 (2026-10-17, Mac: "We need to find ways to combat this without the need of ingame moderation"; the chat safety
-// plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 9): THE MODERATORS' QUEUE IN DISCORD. A moderator need not be in
+// SAFE8: THE MODERATORS' QUEUE IN DISCORD. A moderator need not be in
 // the game to see what was reported, nor to act on it: every case (safety.js) is a card in a private channel - the
 // lines, the reports, the reviewer's verdict, the account's strikes - with buttons that mute, ban or dismiss it, and a
 // /mod command that looks an account up and mutes, unmutes, bans or unbans it by name.
@@ -132,7 +131,7 @@ const standingOf = (t, nowS) => [isBanned(t, nowS) ? `Banned ${banWord(bannedUnt
  * @param {{ c: any, name: string, target?: any, lines: any[], reasons: string[], notes?: string[], strikes: number, nowS?: number }} o
  */
 export function caseCard({ c, name, target = null, lines, reasons, notes = [], strikes, nowS = 0 }) {
-  // FOE-BOUNDS (bible/11-Multiplayer/Spawn-Grants.md section 21): a case the spawn grants' count opened (its lines under
+  // FOE-BOUNDS: a case the spawn grants' count opened (its lines under
   // GRANT_CASE_TAB, no report, no chat verdict) says so - the chat reviewer never read it, so "found nothing against the
   // code" read as a verdict it never gave
   const spawn = c.source === 'review' && !c.ai_category && lines.some((l) => l.tab === GRANT_CASE_TAB);

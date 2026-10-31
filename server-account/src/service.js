@@ -44,8 +44,7 @@ export const MAX_BODY_BYTES = 4 * 1024;
  *  binding; the binding has no such member and is its own. */
 export const DB_ROOT = Symbol('db-root');
 
-/** GATHER-SPEED / MARKET-SPEED (2026-10-11, Mac: "look at gathering minigame performance and how the server affects it/
- *  slows down, same with the market", then "Do everything. A comprehensive improvement"): READS IN ONE ROUND TRIP. Each
+/** GATHER-SPEED / MARKET-SPEED: READS IN ONE ROUND TRIP. Each
  *  `first()` and `all()` is its own trip from the Worker to the database's primary, and a harvest's answer and a market
  *  read were fifteen to twenty of them in a row - each one the whole distance again, wherever the Worker ran. A batch is
  *  ONE trip, its statements run in order in one transaction (D1's `batch`), so a statement reads what the ones before
@@ -56,13 +55,13 @@ export async function readAll(/** @type {any} */ db, /** @type {any[]} */ statem
   return statements.map((_, i) => out?.[i]?.results ?? []);
 }
 
-/** SCALE4f (2026-10-10): WHETHER AN ERROR IS D1 OVERLOADED - the primary's queue full ("D1 DB is overloaded. Requests
+/** SCALE4f: WHETHER AN ERROR IS D1 OVERLOADED - the primary's queue full ("D1 DB is overloaded. Requests
  *  queued for too long.", D1's code 7429), which #755's deploy met and the service answered as any other fault: `server`,
  *  500. It is still `server` (every book asks that again, and a new word would be a refusal to eight of them), but 503,
  *  so the metrics count an overload apart from a bug. */
 export const d1Overloaded = (/** @type {unknown} */ e) => /overloaded|queued for too long|\b7429\b/i.test(String((/** @type {any} */ (e))?.message ?? e ?? ''));
 
-/** BUSY-GATE (2026-10-13, net/busyLaw.js): THE READS THIS ISOLATE SHEDS, HAVING MET AN OVERLOADED DATABASE. An overload
+/** BUSY-GATE: THE READS THIS ISOLATE SHEDS, HAVING MET AN OVERLOADED DATABASE. An overload
  *  is the primary's queue full; every read sent into it only lengthens it. So for BUSY_SHED_MS after this isolate meets
  *  one, the reads busyLaw.js names are answered as the overload itself is - `server`, 503, with its Retry-After - and
  *  never asked of the database: the clients from before the gate ask them again on their own schedules, each answer now
@@ -76,8 +75,7 @@ export const shedding = (/** @type {string} */ path, /** @type {string} */ metho
 /** BUSY-GATE: a stood service is a fresh isolate - nothing shed. */
 export function _resetBusyShed() { busyShedUntil = 0; slowWaits.length = 0; slowSum.ms = 0; slowSum.trips = 0; }
 
-/** SLOW-SHED (2026-10-19, the account database overloaded again, 18:05-18:25 UTC; bible/11-Multiplayer/Scale-Arc.md
- *  SLOW-SHED): A DATABASE TOO SLOW TO ANSWER IS SHED AS ONE THAT REFUSES. BUSY-GATE's shed opened only on D1's own word
+/** SLOW-SHED: A DATABASE TOO SLOW TO ANSWER IS SHED AS ONE THAT REFUSES. BUSY-GATE's shed opened only on D1's own word
  *  (`overloaded`), and it left the case it could not measure yet - "a slow database that is not yet refusing opens neither
  *  gate". In the overload it is the case that held: 52 refusals logged in twelve minutes while the median request waited
  *  10 s and the region's traders were asked four times as often (each tab's read timing out and asked again).
@@ -120,15 +118,14 @@ export function noteD1Wait(/** @type {number} */ ms, /** @type {number} */ trips
   noteOverload(nowMs);
 }
 
-/** SCALE4d (2026-10-10, Mac: "we just hit 500 online people. I think its time to scale up our server and improve
- *  performance for more people"): THE ROUTES WHOSE READS A D1 READ REPLICA MAY SERVE. The token's mint is a dozen
+/** SCALE4d: THE ROUTES WHOSE READS A D1 READ REPLICA MAY SERVE. The token's mint is a dozen
  *  reads, and a relay deploy asks it of every player in the same minute: the wave that overloaded the one primary on
  *  2026-10-06 (STORM-SHED). Its writes are the primary's - a stale session's touch, and a region's chapters, written
  *  only over the version they read (npcHalls.js) - and its one read-then-write, the arena's #1 counted
  *  again and stored, runs on the binding (index.js, AUDIT SCALE4d A1). Every other route stays on the binding. */
 export const REPLICA_ROUTES = new Map([
   ['/v1/auth/token', 'POST'],
-  // SCALE4g (2026-10-10, Mac: "really future proof our archetecture"; bible/11-Multiplayer/Scale-Arc.md SCALE4g): AND THE
+  // SCALE4g: AND THE
   // READS A PLAYER'S TAB KEEPS ASKING, each on the session of the bookmark it carries (d1BookmarkOf) - the heartbeat (the
   // board, the box, the post; its beat a single UPDATE, which a session sends to the primary), the account view, the
   // realm's list, the professions' state and the day's motherlodes (their pick an INSERT OR IGNORE of a pure roll). Their
@@ -139,8 +136,7 @@ export const REPLICA_ROUTES = new Map([
   ['/v1/realm', 'GET'],
   ['/v1/prof/state', 'POST'],
   ['/v1/prof/motherlodes', 'POST'],
-  // DISPLAY-REPLICA (2026-10-13, the account database's primary capped near 150 requests a second from 14:11 UTC and
-  // every route waiting on it; bible/11-Multiplayer/Scale-Arc.md DISPLAY-REPLICA): AND THE DISPLAY READS - each of them
+  // DISPLAY-REPLICA: AND THE DISPLAY READS - each of them
   // writes nothing (BUSY-GATE checked them statement by statement; the board's #1 is stored on the doors
   // ARENA_HONOUR_PATHS names, never here) and keeps nothing an isolate shares, so a replica's answer is never an
   // isolate's for another caller (the yards, the layouts and the seats' list keep one, and stay on the binding). With
@@ -182,8 +178,7 @@ export function d1BookmarkOf(/** @type {Request} */ request) {
   return typeof b === 'string' && D1_BOOKMARK_RE.test(b) ? b : null;
 }
 
-/** AUDIT SCALE II A-1 (2026-10-11, the audit of SCALE4d-SCALE5d; Mac: "Lets do an audit on everything. Ensure
- *  perfection"): THE MINT STARTS AT THE PRIMARY, WHATEVER BOOKMARK IT CARRIES - SCALE4d's guarantee (REPLICA_CONSTRAINT),
+/** AUDIT SCALE II A-1: THE MINT STARTS AT THE PRIMARY, WHATEVER BOOKMARK IT CARRIES - SCALE4d's guarantee (REPLICA_CONSTRAINT),
  *  which SCALE4g's bookmark had undone. A bookmark is a position the tab has SEEN, and no write route answers one: a
  *  realm join, a create, a leave, another tab's join that took the lease (INT9) - none of them moves it. So a mint
  *  started from it could read a replica from before the tab's own join and sign `rc` 0 (the relay's door word, which
@@ -191,8 +186,7 @@ export function d1BookmarkOf(/** @type {Request} */ request) {
  *  first statement, the session lookup, is the primary's, and every read after it at least that new. */
 export const PRIMARY_FIRST_ROUTES = new Set(['/v1/auth/token']);
 
-/** BOOKMARK-SPIRAL (2026-10-16, the account database's primary "overloaded. Requests queued for too long." from 13:50
- *  UTC, every route 5 to 60 s; bible/11-Multiplayer/Scale-Arc.md BOOKMARK-SPIRAL): THE POLLED DISPLAY READS, ASKED WITH
+/** BOOKMARK-SPIRAL: THE POLLED DISPLAY READS, ASKED WITH
  *  NO BOOKMARK, START AT ANY INSTANCE. The page forgets its bookmark at every other call and keeps an answer's only if
  *  no call went between (net/accountClient.js `_d1Era`) - so once the primary was slow, an answer never came back in
  *  time to be kept, the bookmarked share fell from three in four to one in a hundred, and every one of these started at
@@ -201,7 +195,7 @@ export const PRIMARY_FIRST_ROUTES = new Set(['/v1/auth/token']);
  *  needs back at once (a beat's and a pick's write go to the primary in their own session regardless), so with no
  *  bookmark their session starts wherever D1 places it; the session lookup that misses there asks the primary
  *  (accounts.js resolveSession - a session minted a moment ago). With a bookmark, as before; every other read, as before.
- *  SHED-LONG (2026-10-16, acct145; bible/11-Multiplayer/Scale-Arc.md SHED-LONG): ROLLED BACK - NONE. Read off the live
+ *  SHED-LONG: ROLLED BACK - NONE. Read off the live
  *  service after BUSY-HEART: a request on a D1 session (the replica's reads) waited 31 s on the database for every 5.6 s
  *  one on the binding (the primary) waited - the replica the longer queue, and these six had moved some 40 session
  *  lookups a second onto it. With no bookmark every replica route starts at the primary again; the set stays, empty,
@@ -227,7 +221,7 @@ export function routeDb(/** @type {any} */ db, /** @type {string} */ path, /** @
 }
 
 /** SEAT-REPLICA: a session's newest bookmark, or null (the binding, an older runtime or a harness, keeps none). YARDS-REPLICA
- *  (2026-10-16): here, beside replicaDb, so every kept read that starts its next from the last one's bookmark reads it one way. */
+ *  here, beside replicaDb, so every kept read that starts its next from the last one's bookmark reads it one way. */
 export const bookmarkOf = (/** @type {any} */ session) => { try { const m = session?.getBookmark?.(); return typeof m === 'string' && m ? m : null; } catch { return null; } };
 
 /** SCALE4d: the binding as one D1 session (`withSession`) - every statement counted where the binding's are
@@ -316,7 +310,7 @@ export const saveKey = (playerId, characterId, saveName, part) =>
  *  bound somebody raises by accident. */
 export const SAVE_MAX_BYTES = 4 * 1024 * 1024;
 
-/** RESTORE (2026-09-29): the switch the history restore throws for its minute - MAINTENANCE = "1", a var only its own
+/** RESTORE: the switch the history restore throws for its minute - MAINTENANCE = "1", a var only its own
  *  deploy sets (.github/workflows/realm-restore.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
 export const maintaining = (/** @type {any} */ env) => env?.MAINTENANCE === '1';
 export const SHOT_MAX_BYTES = 256 * 1024;
@@ -348,7 +342,7 @@ export const ROUTES = new Set([
   '/v1/account/insignia', '/v1/account/aura',
   '/v1/broker/settle',   // AUDIT FB1024 (BROKER-RID): a Broker sale whose answer was lost, asked after by its request id
   '/v1/account/icon',   // WITCH1: a profile icon worn, or none
-  // WITCH1 (bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL - the account's cakes, a find, a sale, a town's
+  // WITCH1: THE WITCHES' FESTIVAL - the account's cakes, a find, a sale, a town's
   // offerings, and an offering set out, filled, taken in and taken from
   '/v1/festival/mine', '/v1/festival/find', '/v1/festival/buy', '/v1/festival/town',
   '/v1/festival/offering/set', '/v1/festival/offering/fill', '/v1/festival/offering/take-in', '/v1/festival/offering/take',
@@ -409,9 +403,9 @@ export const ROUTES = new Set([
   // a session.
   '/v1/duel/loss', '/v1/duel/record', '/v1/duel/claim',
   // INT9: a death in the open zone's drop, taken off the fallen's record against the relay's fall (or none, a foe's);
-  // MAC (2026-10-14): its killer's piece in escrow - collected by the killer, taken back by the fallen, listed for it
+  // MAC: its killer's piece in escrow - collected by the killer, taken back by the fallen, listed for it
   '/v1/wild/fall', '/v1/wild/collect', '/v1/wild/reclaim', '/v1/wild/escrows',
-  // WILD-INSURE (2026-10-26): a policy on a piece of gear, written against its premium off the record, and the policies
+  // WILD-INSURE: a policy on a piece of gear, written against its premium off the record, and the policies
   // in force for a character's tab (wildInsure.js)
   '/v1/wild/insure', '/v1/wild/policies',
   // RENOWN1: Renown - what one of the caller's characters earned
@@ -473,7 +467,7 @@ export const ROUTES = new Set([
   '/v1/guilds/castle/buy', '/v1/guilds/castle/sell',   // DOMAIN2: a guild's castle (castles.js)
   // GUILD1e: a guild's own board (guildBoard.js) - read, pinned to and taken down by its members
   '/v1/guilds/board', '/v1/guilds/board/pin', '/v1/guilds/board/take-down',
-  // GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): a new name for a price (guilds.js), and the vault - read, a piece put
+  // GUILD2: a new name for a price (guilds.js), and the vault - read, a piece put
   // in and taken out on the realm record, the guildmaster's grants (guildVault.js)
   '/v1/guilds/rename', '/v1/guilds/vault', '/v1/guilds/vault/put', '/v1/guilds/vault/take', '/v1/guilds/vault/grant',
   // SEAT1a: the seats' witnessed registry (townSeats.js) - the confirmed seats, a seat witnessed, a developer's strike
@@ -518,7 +512,7 @@ export const ROUTES = new Set([
   '/v1/marks/balance', '/v1/marks/exchange', '/v1/marks/find', '/v1/marks/guild/deposit', '/v1/marks/guild/withdraw', '/v1/marks/report',
   '/v1/board/read', '/v1/board/pin', '/v1/board/take-down', '/v1/board/report', '/v1/board/mod/remove', '/v1/board/mod/restore',
   '/v1/board/notice', '/v1/board/notice/remove',
-  // SAFE1-SAFE8 (bible/11-Multiplayer/Chat-Safety-Arc.md): a player's block list, a report, the code of conduct agreed;
+  // SAFE1-SAFE8: a player's block list, a report, the code of conduct agreed;
   // a moderator's ban, unban and look; and the two doors a stranger reaches that prove themselves (SAFE_OPEN_ROUTES);
   // AUDIT SAFE DOC-4: the moderators' read of the cases in the game - the open ones, one, and its dismissal
   '/v1/safety/blocks', '/v1/safety/block', '/v1/safety/unblock', '/v1/safety/report', '/v1/safety/conduct',
@@ -530,7 +524,7 @@ export const ROUTES = new Set([
   // STAFF-PANEL2: the panel's reports - the open cases, one case, a claim and its release, a strike record, and the acts
   '/v1/staff/cases', '/v1/staff/case', '/v1/staff/claim', '/v1/staff/release', '/v1/staff/strikes',
   '/v1/staff/mute', '/v1/staff/ban', '/v1/staff/unban', '/v1/staff/dismiss',
-  // STAFF-BANNED (mob: "we need a tab for banned players as well"): the Banned tab - every account banned now, Admins and Moderators
+  // STAFF-BANNED: the Banned tab - every account banned now, Admins and Moderators
   '/v1/staff/banned',
   // STAFF-PANEL3-DESK: staff notes, the watchlist and its events, your settings; the Admins' server notice, AI check
   // scorecard, and reported board notes (Remove, Restore) and market listings (staffDesk.js)
@@ -642,7 +636,7 @@ export function realmPathOf(path) {
 }
 
 /**
- * POI-1 (2026-10-14; server-account/src/poi.js): THE POI STORE'S PATHS - `{ route, sha?, id? }`, or null for a path that
+ * POI-1: THE POI STORE'S PATHS - `{ route, sha?, id? }`, or null for a path that
  * is not one. Matched as a save slot is, so the 404 knows them: `live` and an asset's GET are read without a session (a
  * live asset; a draft's needs a builder's), the rest behind one.
  *   GET /v1/poi/live | GET /v1/poi/asset/<sha> | PUT /v1/poi/asset/<sha>?kind=mesh|texture

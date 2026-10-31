@@ -1,13 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SILVER-WAYS (2026-10-03, Mac: "Do it") - GUILD CONTRACTS, AS THE SERVICE
+// SILVER-WAYS - GUILD CONTRACTS, AS THE SERVICE
 // KEEPS THEM. A contract is a guild writ for DEEDS: a guild puts up `pay`
 // silver for each defender of a raid in a region, `deeds` of them, held
 // from its treasury while it stands; every account a raid's receipt counts
 // there is paid by it as its claim is counted (raids.js claimRaid's own
 // batch), less the market's 5% tax. The law both ends read is
 // src/net/writLaw.js (GUILD CONTRACTS); the record is
-// bible/06-Systems/Professions-Arc.md 10.5 and bible/06-Systems/Online-Arc.md
+// 10.5 and
 // SILVER-WAYS.
 //
 // ═══ IT MINTS NOTHING ═══════════════════════════════════════════════

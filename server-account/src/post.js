@@ -2,10 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // SERVER-POST - THE SERVICE'S SIDE OF THE SERVER'S POST.
 //
-// Mac: "Let's develop an ingame server mailbox that goes next to the
-// hourglass in the pause menu. It should show notifications whenever
-// players have a message. First use is to utilize it for players being
-// granted items."
 //
 // What a piece is - its bounds and its sender - is src/net/postLaw.js.
 // This file is the four things its reader does with their own: list the

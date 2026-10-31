@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC2 — THE CLOUD SAVE, SERVICE SIDE. The card in D1, the blob in R2.
 //
-// Mac: "Go in order." This is step 4 of the arc's own build order —
+// This is step 4 of the arc's own build order —
 // "the card and the blob, backup only".
 //
 // ═══ THE CLOUD IS A BACKUP. THE LOCAL SAVE IS THE TRUTH ════════════

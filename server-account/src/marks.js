@@ -105,7 +105,7 @@ function whoAsks(player, rid, { needRid = true } = {}) {
 }
 /** The switch - asked AFTER the line an act's request may already have made (AUDIT 28 M2). */
 const shut = (player, env) => (marksOpenFor(player, env) ? null : { error: 'marks-closed' });
-/** AUDIT 625 S1 (Mac: "A week old, like witnesses"): SILVER-FINDS' two faucets open to an account a WEEK registered -
+/** AUDIT 625 S1: SILVER-FINDS' two faucets open to an account a WEEK registered -
  *  the witnesses' own age (nodeLaw.js WITNESS.ageS: a pixel's, a seat's, a market's witness). They are bounded, not
  *  witnessed, so every account added is another day's cap: a week's wait is what an alt costs. Asked after the line, as
  *  the switch is - a find made is answered whatever the clock says now. */

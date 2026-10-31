@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PATREON-LINK (2026-10-01) — A PATRON'S TITLE FOLLOWS THEIR PLEDGE.
+// PATREON-LINK — A PATRON'S TITLE FOLLOWS THEIR PLEDGE.
 //
-// Mac: "With patron and having to manually hand out titles. Im running
-// into a workflow where its really hard to keep up with it" - and, asked
+// and, asked
 // whether patrons should link their own Patreon or he should press a
 // grant button per patron: "Patreon auto-link".
 //

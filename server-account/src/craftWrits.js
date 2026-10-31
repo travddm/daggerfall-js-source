@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CRAFT-WRITS (2026-10-22, the Discord's #feature-feedback, "Crafting seems unrewarding"; the owner: "Why dont you
-// actually build this instead of handing me a small fix?"): THE GUILDS' ASKS OF A CRAFTER, as the service keeps them.
-// The law - what is asked, of whom, for what - is src/net/craftWritLaw.js; the record bible/06-Systems/Professions-Arc.md
+// CRAFT-WRITS: THE GUILDS' ASKS OF A CRAFTER, as the service keeps them.
+// The law - what is asked, of whom, for what - is src/net/craftWritLaw.js; the record
 // section 49.
 //
 //   craftWritBoard   the Work tab's read (/v1/writs/list, beside the Court's): the account's three writs of the UTC day,

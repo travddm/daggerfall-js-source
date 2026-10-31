@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13) - THE FIRMAMENT, AS THE SERVICE KEEPS IT: a character's passive tree (migration 0114), its two
+// FIRM1 - THE FIRMAMENT, AS THE SERVICE KEEPS IT: a character's passive tree (migration 0114), its two
 // purses read off what this service already holds - the Renown track (renownTracks.js) for Stars, the profession
 // tracks (professions.js) for Craft points - and every change judged by the one law both ends read
-// (src/net/firmament/firmamentLaw.js). The record is bible/06-Systems/Firmament.md.
+// (src/net/firmament/firmamentLaw.js). The record is.
 //
 // WHOSE WORD. Nothing a client says about its tree is believed: a change names the WHOLE tree it wants, and the law
 // asks it here against the purses this service counts - a star the sky has not, a star not joined to its start, more

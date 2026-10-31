@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POI-1 (2026-10-14) - THE POI STORE: WHO MAY BUILD, WHO APPROVES, AND WHAT THE WORLD STANDS.
+// POI-1 - THE POI STORE: WHO MAY BUILD, WHO APPROVES, AND WHAT THE WORLD STANDS.
 //
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... a tool my developers can use without having to access the
-// codebase"; asked how a POI reaches players, "I need to be able to approve changes"; asked who uses it, "Developers +
-// Builders" (bible/06-Systems/POI-Editor-Arc.md).
+// asked how a POI reaches players, "I need to be able to approve changes"; asked who uses it, "Developers +
+// Builders".
 //
 // THE ROLES, DERIVED AS EVERY GRANT HERE IS (titles.js): an APPROVER is a handle in APPROVER_HANDLES; a BUILDER is an
 // approver, a developer (DEVELOPER_HANDLES) or a handle in BUILDER_HANDLES. A guest is neither. Read fresh at every call,
@@ -16,7 +15,7 @@
 // while a live revision names them) or REJECTS it with a word. Taking a POI out of the world is a submitted 'retire'
 // revision, approved the same way. A ROLLBACK points the POI at an earlier approved revision, and is a revision of its
 // own. Every approval, rollback and retirement moves the feed's version - the game's one cheap question, "anything new?"
-// (`poiLiveFeed`). AUDIT POI (2026-10-15) held every write here to what it says: a write that changed nothing is never
+// (`poiLiveFeed`). AUDIT POI held every write here to what it says: a write that changed nothing is never
 // answered as one that did, two writes at once meet in the database, and every count is counted where it is written.
 //
 // NOTHING A BUILDER WRITES REACHES A PLAYER BEFORE AN APPROVER SAYS SO: the feed is live revisions only, and an asset no

@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// DOMAIN3 (2026-10-24, the owner: "A transition to tamriel region control
-// instead of just city control"; asked, "Replace seats") - THE REGION'S
+// DOMAIN3 - THE REGION'S
 // CHARTER, as the service learns and reads it (bible/11-Multiplayer/
 // Domains.md section 7).
 //

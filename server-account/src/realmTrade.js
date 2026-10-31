@@ -3,7 +3,7 @@
 // REALM P2.1 — THE TRADE, SETTLED HERE. Two realm characters' goods
 // change hands in one write of both records, or not at all.
 //
-// Mac: "eliminate duping". The plan is bible/06-Systems/Realm-Arc.md
+// . The plan is
 // section 3; the law both ends read is src/net/realm/realmTradeLaw.js.
 //
 // ═══ A HALF, THEN THE OTHER ════════════════════════════════════════

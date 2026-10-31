@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-HIDDEN (2026-10-22, mob: "no tag no faint outline nothing just nothing", "true invis not lattys invis", "we
-// want the player to have no idea we are wathcing them"; design doc "DFO Staff Panel: design", Invisible follow, Flat map's
-// Hide me, and Weak spots "Invisible follow and the in-game view") - A STAFF MEMBER HIDDEN FROM EVERY PLAYER.
+// STAFF-PANEL5-HIDDEN - A STAFF MEMBER HIDDEN FROM EVERY PLAYER.
 //
 // NOT THE GAME'S INVISIBILITY. That one (INVIS-NET, INVIS-LOOK, src/net/remotePlayers.js) still sends the player's position
 // to every game. A hidden staff member is never passed on to anyone: the relay drops what the socket says and leaves it out
@@ -12,9 +10,7 @@
 // Hide me turns it on and Show myself off (/v1/staff/hide). It is read only for an account a role list names (staff.js
 // staffRole: an Admin or a Moderator) that holds a LIVE staff session, so no other account's token mint reads a thing more.
 //
-// STAFF-HIDE-TOGGLE (2026-10-23, mob: "i cant talk in chat?", then "i need to be bale to talk in chat" and "need hide to be
-// a toggle"): 0159 made Hide me ON BY DEFAULT (players.staff_hide, every row 1 - mob, 05:36Z the day before: "a switch in
-// Your settings, on by default"), so a staff member who never pressed it was minted hidden tokens for as long as a staff
+// STAFF-HIDE-TOGGLE: 0159 made Hide me ON BY DEFAULT (players.staff_hide, every row 1), so a staff member who never pressed it was minted hidden tokens for as long as a staff
 // session stood, and the relay drops every line a hidden socket says but the staff channel's (server/src/staffHidden.js
 // hiddenMay) - mob could not talk in chat, and his own game was in no room the pen tool's map reads. Now it is off until
 // pressed, for every member (0165 moves the switch to `staff_hide_on`, default 0, keeping a Hide me pressed since 0159 -
@@ -90,7 +86,7 @@ const LAPSED_SQL = `SELECT 1 AS held FROM (SELECT id, at, key_id, json_extract(d
   WHERE (SELECT staff_hide_on FROM players WHERE id = ?1) = 1 AND NOT EXISTS (SELECT 1 FROM staff_audit e WHERE e.actor = ?1 AND e.at >= h.at AND e.id > h.id
     AND ((e.act = 'hide' AND e.detail = '{"on":false}') OR (e.act = 'logout' AND (e.detail = '{"all":true}' OR json_extract(e.detail, '$.sub') = h.sub))
       OR (e.act = 'key-forget' AND json_extract(e.detail, '$.id') = h.key_id)))`;
-/** AUDIT HIDDEN-UNCOUNTED C1 (the owner, asked: "Last seen when hid"): SINCE WHEN THE ACCOUNT HAS BEEN HIDDEN - while its
+/** AUDIT HIDDEN-UNCOUNTED C1: SINCE WHEN THE ACCOUNT HAS BEEN HIDDEN - while its
  *  game was last minted hidden and nothing has ended it (LAPSED_SQL's own test: one law for "hidden now", the mint's and
  *  the guild's), the first `hidden-token` row of that run - the newest row's subject (one staff session's), after the
  *  latest Show myself before it (by the log's own order, its ids: a press and a mint in one second are still in order).
@@ -103,8 +99,7 @@ const HIDDEN_SINCE_SQL = LAPSED_SQL.replace('SELECT 1 AS held FROM', () => `SELE
 /**
  * THE GAME'S MINT, FOR A HIDDEN STAFF MEMBER: the spectator's token and the mint's answer, or null - the account is no
  * staff, holds no live staff session, or pressed Show myself - when the mint goes on as it always did; or
- * `{ error: 'staff-session-lapsed' }` (STAFF-PANEL5-HIDDEN-FIX, mob: "we want the player to have no idea we are wathcing
- * them"): the staff session the game was hidden by went idle or ran out its 8 hours while the game watched, and nothing
+ * `{ error: 'staff-session-lapsed' }` (STAFF-PANEL5-HIDDEN-FIX): the staff session the game was hidden by went idle or ran out its 8 hours while the game watched, and nothing
  * the staff member did since showed them - no token at all then, never a visible one beside the watched player, until
  * they sign in again (hidden again) or sign out or press Show myself (visible by their own word).
  * @param {any} ctx @param {any} env @param {any} player the mint's account row @param {CryptoKey} key the identity key
@@ -135,7 +130,7 @@ export async function hiddenToken(ctx, env, player, key) {
 }
 
 /**
- * AUDIT HIDDEN-UNCOUNTED C1 (the owner, asked: "Last seen when hid"): WHEN A HIDDEN STAFF MEMBER WENT FROM SIGHT, or null -
+ * AUDIT HIDDEN-UNCOUNTED C1: WHEN A HIDDEN STAFF MEMBER WENT FROM SIGHT, or null -
  * the account is no staff (the mint's own staffRole), or is not hidden now (HIDDEN_SINCE_SQL). Their play beat goes on
  * (accounts.js creditPlay: the seat, Renown and the play clock read it), so whatever shows a player's presence to others
  * reads them as last online at this moment instead (guilds.js viewOf, the Members page and its "N online").

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE4 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system"; the chat safety
-// plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 5): THE RECORD, THE LADDER AND THE BAN.
+// SAFE4: THE RECORD, THE LADDER AND THE BAN.
 //
 // MOD1 wrote who muted a player beside the mute, and cleared it with the mute: a power whose use was forgotten the
 // moment it lapsed, so a player muted every week for a month looked, to the next moderator, like a first offender. Now
@@ -194,7 +193,7 @@ export async function strikesLook({ db, nowS }, actor, env, { target, name, row:
   if (!canModerate(actor, env)) return { error: 'not-moderator' };
   const row = found ?? await findAccount(db, { target, name });
   if ('error' in row) return row;
-  // STAFF-PANEL-SPEED (mob: "The click takes a while before the new page shows"): the strikes and the history, one trip
+  // STAFF-PANEL-SPEED: the strikes and the history, one trip
   const [strikes, acts] = await Promise.all([strikesOf(db, row.id, nowS),
     db.prepare('SELECT kind, until, reason, actor_name, case_id, at, void_at FROM mod_actions WHERE target = ?1 ORDER BY at DESC, id DESC LIMIT ?2').bind(row.id, HISTORY_MAX).all().then((/** @type {any} */ r) => r?.results ?? [])]);
   return {

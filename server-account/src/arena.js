@@ -2,12 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ARENA4 - THE ARENA'S RECORDS, ONLINE.
 //
-// Mac (2026-10-02): "join a team (red and blue) and climb esclating
-// tiers of opponents, or choose to matchmake for a real opponent ...
-// Joining a team comes with it's own enhanced UI where you can view your
-// ranking and even player leaderboards ... Being a top rank PvE fighter
-// comes with it's own title. Being the #1 pvp arena player comes with
-// it's own temporary title/glyph". Design: bible/11-Multiplayer/Arena.md
+// . Design:
 // "7. Online" and "6. Titles and the laurel".
 //
 // ═══ A ROW IS A RECEIPT ════════════════════════════════════════════
@@ -61,17 +56,17 @@ export const ARENA_HALL_MAX = 20;
 /** How long the season's #1 (the laurel) is kept by a Worker before it is counted again, seconds - a token lives five
  *  minutes, so a laurel is at most six behind the board. */
 export const ARENA_CHAMPION_CACHE_S = 60;
-/** STORM-SHED 2 (2026-10-06, the account database's follow-ups): how long the season's #1 as the service last counted
+/** STORM-SHED 2: how long the season's #1 as the service last counted
  *  it (`arena_champions`, migration 0086) is taken as it stands before a reader counts it again, seconds. Every rated
  *  bout recorded counts it at once (claimArena); this bounds whatever else moves the board (an account deleted). */
 export const ARENA_CHAMPION_STORED_S = 600;
-/** SCALE4b (2026-10-08): the service's clock counts the season's #1 again once the kept word is this old - two minutes
+/** SCALE4b: the service's clock counts the season's #1 again once the kept word is this old - two minutes
  *  inside ARENA_CHAMPION_STORED_S, so a reader (a token's mint, an account, a box's or a board's badges) finds it kept and
  *  counts nothing, and writes nothing. A clock that stops leaves the readers counting it as before. */
 export const ARENA_CHAMPION_CLOCK_S = ARENA_CHAMPION_STORED_S - 120;
 const GRAND_TIER = ARENA_TIERS - 1;
 
-// ═══ ARENA4b (2026-10-03) - A BOUT'S RENOWN ═══════════════════════════════════════════════════════════════════════════
+// ═══ ARENA4b - A BOUT'S RENOWN ═══════════════════════════════════════════════════════════════════════════
 //
 // Arena.md 2: "Purses in gold ... Online, renown too, within the renown law's own hourly cap". A ladder WIN and a rated
 // WIN between players pay Renown to the character the claim names, through the renown law's own door
@@ -235,8 +230,7 @@ export async function arenaHonoursOf(ctx, player, nowS) {
   const champion = (await championNow(ctx, nowS)) === player.id;
   return { grand: !!g, champion };
 }
-/** SIGN-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/Scale-Arc.md
- *  SIGN-BATCH): arenaHonoursOf as its reads - the Grand Champion's row, and the kept #1's where this Worker kept none - and
+/** SIGN-BATCH: arenaHonoursOf as its reads - the Grand Champion's row, and the kept #1's where this Worker kept none - and
  *  its answer from theirs, so the doors that read a badge (honours.js withHonours) ask the three games' honours in ONE
  *  batch. The answer is arenaHonoursOf's: a stale #1 counted again and stored as championNow stores it. */
 export function arenaHonoursPlan(/** @type {any} */ ctx, /** @type {any} */ player, /** @type {number} */ nowS) {
@@ -555,8 +549,7 @@ const FAST_SQL = `SELECT g.player AS player, g.at AS at, (SELECT MIN(at) FROM ar
 const MEMBERS_SQL = 'SELECT banner, COUNT(*) AS n FROM arena_members WHERE banner IS NOT NULL GROUP BY banner';
 
 /**
- * ARENA-BOARD (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md ARENA-BOARD;
- * migration 0139): THE BOARD'S COUNTS, EVERY CALLER'S ALIKE, ONE ROW A SEASON - the Grand Champions, the season's rated
+ * ARENA-BOARD: THE BOARD'S COUNTS, EVERY CALLER'S ALIKE, ONE ROW A SEASON - the Grand Champions, the season's rated
  * board, the climb, the fastest, two seasons' standings, both rosters and the banners' members. Ten aggregates over the
  * arena's whole record on every open (28,586 on the day); now the season's kept row while it is the arena's version's
  * (the database moves it on every bout, void, account gone and banner joined or left) and its shape's (these counts' -

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// QL12 (2026-10-19, the owner: "New questlines tying into and introduced the oblivion gates, abyss dungeons, elite
-// dungeons and elite breaches"; bible/06-Systems/Questlines-Arc.md sections 1 (decision 8) and 5.3): THE QUESTLINES'
+// QL12 (2026-10-19,; (decision 8) and 5.3): THE QUESTLINES'
 // CLAIM - what the account service pays a questline, and only against what it witnessed.
 //
 // `POST /v1/ql/claim { line, step, phase, choice? }`, behind a session. Its pay for a registered account (FOUNDER's law,
@@ -34,7 +33,7 @@
 //     witnessed step before it are done. Asked on every claim of those steps, so a line whose steps were done out of
 //     order before B2's order (rows written by acct159-164) still pays it when the last of them lands; the UPDATE's own
 //     WHERE holds it to once, and `title` is answered only by the claim whose write changed the row.
-//   THE PURSE (T-B, bible/06-Systems/Witches-Festival.md "The Starwarden's purse") - Soul Cakes a line's title pays beside
+//   THE PURSE (T-B, "The Starwarden's purse") - Soul Cakes a line's title pays beside
 //     it (QL_PURSES: the Thirteenth of Frostfall's QL_STARWARDEN_CAKES) onto `players.fest_cakes`, IN the title's own
 //     UPDATE - its WHERE the purse's guard, so once an account - and only while the festival is open for the account at
 //     the claim's clock (festival.js festivalOpenFor, festivalLaw.js festivalOpen); a guest's end never reaches the batch.

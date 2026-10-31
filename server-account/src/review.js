@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT6 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE REVIEW - what staff read and do about
+// INT6: THE REVIEW - what staff read and do about
 // the judge's verdicts. Realm-Arc section 4: "the character is flagged for review"; phase 3: "a review tool". A
 // developer's alone (titles.js isDeveloper - the developers' list, as the customs pass is), each act written into the
 // character's findings with who did it, and said by tools/realmReview.mjs:
@@ -43,14 +43,14 @@
 //                            and what the character is owed given as one letter of credit (net/repairLaw.js), the
 //                            repair's way and once a ticket with it - and the law's hold lifted when the purse was all
 //                            it held on (`realm-findings` says the purse a mend is reckoned from)
-//   `letter`                 GUILD-LETTER-FIX (2026-10-25, mob: "do it"): a crime guild's letter sent again or called off
+//   `letter`                 GUILD-LETTER-FIX: a crime guild's letter sent again or called off
 //                            (net/repairLaw.js applyGuildLetter), the repair's way and once a ticket with it - the Staff
 //                            Panel's act alone (staffRealm.js /v1/staff/fix/letter), no door here
-//   `bank`                   STAFF-SET-BANK (2026-10-23, mob: "we need a set bank setting"): a character's bank, still the
+//   `bank`                   STAFF-SET-BANK: a character's bank, still the
 //                            total staff read, set to the gold they name (net/repairLaw.js), the repair's way and once a
 //                            ticket with it - the Staff Panel's act alone (staffRealm.js /v1/staff/fix/bank), no door here
 //
-// THE MEASURE (Mac: "Measure 7 days, then enforce"). realm_wealth_hours keeps each character's hour - the gain no witness
+// THE MEASURE. realm_wealth_hours keeps each character's hour - the gain no witness
 // explained and the seconds it played. The report reads every hour with play enough to say something (MEASURE_PLAYED_MIN),
 // as gold an hour of play, and answers each band's quantiles - the line a budget is set from - beside the `measure`
 // findings: who would have been held at the line standing.
@@ -63,7 +63,7 @@ import { repairOf, applyRepair, purseMendOf, applyPurseMend, bankSetOf, applyBan
 import { lawSigOf } from './verdict.js';   // PURSE-MEND: the signature the purse's finding stands under
 import { isHandleShaped } from '../../src/net/handleShape.js';   // SUMMON-REPAIR: an account named by its handle
 import { wealthOf, goldOf } from './judge.js';   // STAFF-SET-BANK: and a bank's gold as the judge counts it
-import { grantsMeasure } from './grants.js';   // GRANT2: the spawn grants' measure (bible/11-Multiplayer/Spawn-Grants.md section 12)
+import { grantsMeasure } from './grants.js';     // GRANT2: the spawn grants' measure
 import { progressConfig, progressConfigOf, forgetProgressConfig, PROGRESS_LINE, PROGRESS_STREAMS } from './progress.js';   // INT17: the progression claims' line
 import { REALM_LETTER_TEMPLATE } from '../../src/net/realm/realmGoldLaw.js';   // HACKED-GOLD: a trade's letters, at their worth
 
@@ -346,7 +346,7 @@ async function mendAct(ctx, row, by, note, body) {
 }
 
 /**
- * STAFF-SET-BANK (2026-10-23, mob: "we need a set bank setting"): A REALM CHARACTER'S BANK, SET BY STAFF (net/repairLaw.js)
+ * STAFF-SET-BANK: A REALM CHARACTER'S BANK, SET BY STAFF (net/repairLaw.js)
  * - `{ ticket, was, gold }` as the body names them, checked by the law: the record's bank, still the total `was` staff
  * read, made the Empire's account holding `gold` with no other branch holding any, every loan where it stands - the
  * repair's machinery (staffMend), its row in `realm_repairs` naming BANK_SET_FACTION and no bit, `was` the total it found
@@ -386,7 +386,7 @@ const letterAnswer = (/** @type {any} */ r, /** @type {boolean} */ repeat) => ({
 });
 
 /**
- * GUILD-LETTER-FIX (2026-10-25, mob: a player's Dark Brotherhood letter that never came, "do it"): A CRIME GUILD'S LETTER
+ * GUILD-LETTER-FIX: A CRIME GUILD'S LETTER
  * SENT AGAIN OR CALLED OFF BY STAFF (net/repairLaw.js applyGuildLetter) - `{ ticket, guild, op }` as the body names them,
  * checked by the law - the repair's machinery (staffMend): the record seized one sequence on, so the playing tab's next
  * checkpoint is refused and its next join plays the fixed record, which sends the letter the next minute it is outside.
@@ -545,7 +545,7 @@ export const BODY_TABLES = Object.freeze([['gate', 'gate_kills'], ['sd', 'sd_kil
 export const BODY_MEASURE_S_MIN = 60;
 
 /**
- * INT14 - THE BOSS FIGHTS' MEASURE over the last `days` (Mac, 2026-10-10: "Measure, then enforce"): for each fight, the
+ * INT14 - THE BOSS FIGHTS' MEASURE over the last `days`: for each fight, the
  * receipts that carried the relay's count (net/bossBody.js bodyMeasure, kept as each kill row's `body`), the mends
  * each claimed a minute it stood (believed and past the line together, thousandths of a whole - the rate the line is
  * set from) by quantile and at most, how many claimed past the line standing, how many the count felled, and how many

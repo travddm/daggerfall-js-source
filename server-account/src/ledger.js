@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT4 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; rebuilt by its audit the same day): THE
+// INT4: THE
 // LEDGER OF THE VALUABLE PIECES - which realm record holds each one, so a piece in two records at once is seen.
 //
 // ═══ WHAT IT CATCHES, AND WHAT IT DOES NOT ═════════════════════════
@@ -17,8 +17,7 @@
 // picked up, a chest, a peer's hands, none of them witnessed and none needing to be: the holder's next checkpoint
 // without it moves it to the claimant. The holder's checkpoint still WITH it, past DUPE_GRACE_S, settles the claim a
 // COPY: the claimant's copy is written down (item_dupes - it moves that piece by no route, and the claimant's next
-// checkpoint is answered which piece it is) and the holder's piece stays the holder's. AUTO-HOLD (2026-10-16, Mac: "I
-// dont want to have to manually review"): it is the PIECE that is locked, never the character, and a contested claim is
+// checkpoint is answered which piece it is) and the holder's piece stays the holder's. AUTO-HOLD: it is the PIECE that is locked, never the character, and a contested claim is
 // no strike - the holder's checkpoint cannot tell a copier from a receiver whose giver's game died before its record
 // saw the give (a chest, a shop's shelf, a body; the giver rejoins from the service's record, the piece back in its
 // pack), so the claimant's copy is locked and nothing is counted against it. A crafted piece's copy is told by the craft's own record: the account `products` names its
@@ -98,8 +97,7 @@ function insertSteps(db, { player, char, seq, nowS }, rows, onConflict) {
 const overKeys = (/** @type {any} */ db, /** @type {string[]} */ keys, /** @type {any[]} */ binds, /** @type {(m: string) => string} */ sql) =>
   chunks(keys, UID_CHUNK).map((part) => db.prepare(sql(marks(part.length, binds.length + 1))).bind(...binds, ...part));
 
-/** SAVE-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/
- *  Scale-Arc.md SAVE-BATCH): the ledger's two reads of a character's own rows - the keys it holds or claims, its known
+/** SAVE-BATCH: the ledger's two reads of a character's own rows - the keys it holds or claims, its known
  *  copies - as statements, so a checkpoint sends them in the batch that reads its record (each was a round trip of its
  *  own, and a checkpoint is a third of the primary's statements). */
 export const ledgerReads = (/** @type {any} */ db, /** @type {string} */ char) => [
@@ -113,7 +111,7 @@ export const ledgerReads = (/** @type {any} */ db, /** @type {string} */ char) =
  * `copies` the keys this record holds twice (each a copy of its own, charged to it); `forged` the keys it shows on another
  * piece than theirs (the verdict's law findings); `charged` how many claims this checkpoint proved copies (locked on their
  * claimants, in `steps`); `locked` the keys of the copies this record shows (LOCKED_SAID_MAX of them), for its player.
- * SAVE-BATCH (2026-10-16): `known` - the two reads of the character's own rows (ledgerReads) answered already, in the
+ * SAVE-BATCH: `known` - the two reads of the character's own rows (ledgerReads) answered already, in the
  * batch that read its record (realm.js checkpointRealm) - or null, and they are asked here.
  * @param {any} db @param {{ player: string, char: string, seq: number, nowS: number }} at @param {{ key: string, fp: string }[]} pieces
  * @param {{ mine: any, dupes: any } | null} [known]
@@ -354,7 +352,7 @@ export function chargeSteps(db, char, keys, nowS, { strike = true } = {}) {
  * craft's record (RPT1026-LEDGERLAW, `handed_to`), so a contested claim on it is settled for the record the service handed
  * it to, where the account handing it on is the one the record named (AUDIT RPT1026 C1). A batch moving two records runs both
  * records' `left` before either's `entered` (realmTrade.js), so a piece passing between them lands where it went.
- * MAC (2026-10-14, the two-phase handoff): `escrow` a Set of keys - those pieces alone into the service's hands (a
+ * MAC: `escrow` a Set of keys - those pieces alone into the service's hands (a
  * killer's worn piece, held for its collect - server-account/src/wild.js), the rest let go. AUDIT RPT1026 C1: `from` - the
  * account handing the pieces over in the same batch (a realm trade's other side), where no escrow row names it.
  * @param {any} db @param {{ player: string, char: string, seq: number, nowS: number }} at

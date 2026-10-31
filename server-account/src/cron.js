@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SCALE4b (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's D1 discipline, bible/11-Multiplayer/Scale-Arc.md):
+// SCALE4b:
 // THE SERVICE'S OWN CLOCK. Until this the account service had no scheduled job at all, so everything that keeps the
 // database small ran inside somebody's read: the Notice Board swept its expired notes on every look, a guild's board
 // the same, the professions' state pruned old harvests on every gatherer's ask, the market's History deleted nine
@@ -18,7 +18,7 @@
 //   and the day's Motherlodes (motherlodes.js motherlodesOf). EVERY ONE OF THEM STILL RUNS ON ITS READ TOO, exactly as before - a read must never answer from a
 //   world the clock has not caught up with - but the clock has nearly always been first, so the read's own pass finds
 //   nothing due and writes nothing. Each was written for a race (two readers at once), so the clock is one more racer.
-//   REZ-BLOODLINE AUDIT R1 (2026-10-16): and the falls held for a party's Resurrect whose window closed with no tab to
+//   REZ-BLOODLINE AUDIT R1: and the falls held for a party's Resurrect whose window closed with no tab to
 //   close it (legacy.js settleHolds) - the one with no read of its own: the tab that fell closes its own (realmDie),
 //   and a tab killed under its death screen has nobody else to.
 //
@@ -171,7 +171,7 @@ export const MINUTE_JOBS = Object.freeze([
   // with no tab to close it - a page killed under its death screen - takes what a tombstone takes with it (its union, its
   // guild seat, its pieces). The window is the realm's own (REZ_HOLD_S), so the minute is the read that catches it
   ['rez-holds', (ctx) => rounds(() => settleHolds(ctx), REZ_SETTLE_MAX, ctx.budget)],
-  // SAFE5 + SAFE8 (bible/11-Multiplayer/Chat-Safety-Arc.md): the reviewer reads the relay's feed and the reported cases,
+  // SAFE5 + SAFE8: the reviewer reads the relay's feed and the reported cases,
   // and each case's card goes to the moderators' channel - nothing a request waits on (safetyClock.js)
   // STAFF-PANEL5-FREEZE (staffFreeze.js; design doc Weak spots: "A failed push leaves a freeze or unfreeze unapplied"): and a
   // freeze or unfreeze the relay's door did not take, pushed again with a fresh order - the sanctions' own minute, so no
@@ -218,7 +218,7 @@ export const HOUR_JOBS = Object.freeze([
   // every read of an invitation asks `at > now - GUILD_INVITE_TTL_S` (guilds.js)
   ['guild-invites', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM guild_invites WHERE rowid IN (SELECT rowid FROM guild_invites WHERE at <= ?1 LIMIT ?2)', ctx.nowS - GUILD_INVITE_TTL_S), SWEEP_ROWS)],
-  // INT2/INT5 (bible/06-Systems/Integrity-Arc.md): the judge's findings past their keeping, and the wealth's hours past the
+  // INT2/INT5: the judge's findings past their keeping, and the wealth's hours past the
   // window staff set the budget's line from
   ['realm-findings', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM realm_findings WHERE id IN (SELECT id FROM realm_findings WHERE at < ?1 LIMIT ?2)', ctx.nowS - REALM_FINDINGS_KEEP_S), SWEEP_ROWS)],
@@ -230,7 +230,7 @@ export const HOUR_JOBS = Object.freeze([
   // INT9: a death in the zone's drop, kept past its receipt's hour (wild.js - a second asking is answered the first's)
   ['wild-falls', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM wild_falls WHERE r IN (SELECT r FROM wild_falls WHERE at < ?1 LIMIT ?2)', ctx.nowS - WILD_FALLS_KEEP_S), SWEEP_ROWS)],
-  // MAC (2026-10-14, the two-phase handoff): an escrow ENDED (collected, or back with its fallen) kept as long as a fall is -
+  // MAC: an escrow ENDED (collected, or back with its fallen) kept as long as a fall is -
   // a held one never: its piece is in no record but it
   ['wild-escrow', (ctx) => rounds(() => deleted(ctx.db,
     "DELETE FROM wild_escrow WHERE r IN (SELECT r FROM wild_escrow WHERE state != 'held' AND ended_at < ?1 LIMIT ?2)", ctx.nowS - WILD_FALLS_KEEP_S), SWEEP_ROWS)],
@@ -243,7 +243,7 @@ export const HOUR_JOBS = Object.freeze([
   }],
   // CREW-SIGNED (crewSigns.js): a hall's signed recruits, past their day's keeping
   ['crew-signs', (ctx) => rounds(() => deleted(ctx.db, ...crewSweep(ctx.nowS)), SWEEP_ROWS)],
-  // LW15 (bible/06-Systems/Living-World-II.md): the towns' patrons at their traders, the towns waiting (a read reckons its
+  // LW15: the towns' patrons at their traders, the towns waiting (a read reckons its
   // own). AUDIT LW-II P8: while the market is open to everyone (market.js marketOpenFor, no account's - every switch
   // `on`); shut, its every route answers 'market-closed', and the clock paid patrons' gold anyway. AUDIT LW-II-2 S3: and
   // while it is not, every trader's hours are marked as they pass (markPatronsShut), so opening it pays none of them -
@@ -252,7 +252,7 @@ export const HOUR_JOBS = Object.freeze([
   // SAFE5 (safetyClock.js): the feed's old batches, a resolved case's lines past their keeping, a case left open past its
   // own, and the reviewer's old daily counts
   ['safety-sweep', (ctx) => safetySweep(ctx)],
-  // STAFF-PANEL1 (mob, 2026-10-22 12:12Z: "only keep for one month"): the staff audit log's rows past STAFF_AUDIT_KEEP_S -
+  // STAFF-PANEL1: the staff audit log's rows past STAFF_AUDIT_KEEP_S -
   // its trigger refuses a delete of any newer (migration 0144)
   ['staff-audit', (ctx) => rounds(() => deleted(ctx.db,
     'DELETE FROM staff_audit WHERE id IN (SELECT id FROM staff_audit WHERE at < ?1 LIMIT ?2)', ctx.nowS - STAFF_AUDIT_KEEP_S), SWEEP_ROWS)],

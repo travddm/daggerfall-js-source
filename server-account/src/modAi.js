@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE5 (2026-10-17, Mac: "Maybe integrating an AI moderator?", then "Lets do every single thing here"; the chat safety
-// plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 6): THE REVIEWER - a language model that reads chat lines against
+// SAFE5: THE REVIEWER - a language model that reads chat lines against
 // the code of conduct and says which break it, how badly, and why, for the moderators to act on.
 //
 // WHY A MODEL, AND NOT A LONGER WORD LIST. The lines the plan answers to had no listed word in them: a "joke" about
