@@ -266,7 +266,7 @@ test('CLIMB-HANDS II the lens is the frame\'s: the strip the world was drawn int
   // the retro pillarbox: the 2D layer on a canvas of the pillarbox's size, at its place on the real one
   const ui = { width: 960, height: 720, clientWidth: 1280, clientHeight: 720, uiRect: { x: 160, y: 0, w: 960, h: 720 }, canvas: { width: 1280, height: 720 } };
   assert.ok(close(climbLens(ui, { fov, viewport: { x: 0.125, y: 0, w: 0.75, h: 1 } }), { tanX: t * 960 / 720, tanY: t, cx: 160, cy: 100, hx: 160, hy: 100 }), 'the pillarbox');
-  // a retro world projected at its texture's shape: the projection's aspect over the strip's (muzzleRay's law)
+  // a retro world projected at its texture's shape: the projection's aspect over the strip's
   assert.ok(Math.abs(climbLens({ width: 1280, height: 720 }, { fov, aspect: 1.25 }).tanX - t * 1.25) < 1e-12);
   for (const bad of [null, { width: 0, height: 720 }]) assert.equal(climbLens(bad, { fov }), null);
   assert.equal(climbLens({ width: 1280, height: 720 }, { fov: 0 }), null);

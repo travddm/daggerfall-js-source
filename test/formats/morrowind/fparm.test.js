@@ -1310,7 +1310,6 @@ import {
   MW_CLOTHING_TYPE, DF_CLOTHING_ROWS, mwClothingRecord, fpWornAdds,
 } from '../../../src/formats/morrowind/mwItemMap.js';
 import { armorRecords, clothingRecords, raceBeastFlag, pickWeaponRecord, facePools, MOD_WEAPON_TO_MW } from '../../../src/formats/morrowind/mwFirstPerson.js';
-import { OWN_MW_MODELS } from '../../../src/characters/ownModels/ownWeaponModels.js';   // FIELD-GUN-MW2: counted off the table, not typed
 import { OWN_MW_ARMOR } from '../../../src/characters/ownModels/ownArmorModels.js';   // MW-BRIG1: and the armour
 import { CLOAK_NAMES } from '../../../src/characters/ownModels/ownClothingModels.js';   // MW-CLOAK1: and the cloak
 import { CLOTHING_NAME } from '../../../src/formats/morrowind/mwItemMap.js';
@@ -1327,24 +1326,17 @@ test('MW-D28: the map is TOTAL - every DF equippable x material answers, or the 
   assert.deepEqual(holes, [], `unmapped item/material combinations:\n${holes.map((h) => `${h.material} ${h.item}`).join('\n')}`);
   // The space is the REAL space: 19 weapons x 10 materials + 11 armors
   // x 13 materials + 76 wearable garment indices (MW-D30), so removing
-  // an enum entry cannot shrink the claim. Plus one row per weapon of
-  // THE PORT'S OWN (FIELD-GUN-MW2) - counted off the table rather than
-  // typed, because that table's whole defect was being outside a
-  // population somebody had counted by hand.
-  // MW-ASSIGN: and every weapon and armour template a MOD adds, every material of each - counted off their tables too
-  assert.equal(cover.length, 19 * 10 + 11 * 13 + 76 + Object.keys(OWN_MW_MODELS).length + Object.keys(MOD_WEAPON_TO_MW).length * 10 + Object.keys(MOD_ARMOR_ROWS).length * 13);
+  // an enum entry cannot shrink the claim.
+  // MW-ASSIGN: and every weapon and armour template a MOD adds, every material of each - counted off their tables, not
+  // typed, because a population somebody counts by hand misses what lies outside it
+  assert.equal(cover.length, 19 * 10 + 11 * 13 + 76 + Object.keys(MOD_WEAPON_TO_MW).length * 10 + Object.keys(MOD_ARMOR_ROWS).length * 13);
   assert.equal(cover.filter((c) => c.via === 'mod weapon' || c.via === 'mod armor').length, 2 * 10 + 12 * 13, 'Roleplay & Realism Items\' two weapons and twelve pieces are asked');
-  // FIELD-GUN-MW2: and the port's own weapons are IN it. The census
-  // walked `WEAPONS` - DFU's frozen eighteen - so the Dwarven
-  // Thunderlock (template 560, minted at runtime) was never asked
-  // about, and this pin reported total coverage while the gun drew
-  // empty hands in Morrowind first person.
   const own = cover.filter((c) => c.kind === 'own');
   // MW-BRIG1: and the port's own ARMOUR, one row per template x material it dresses, inside the mod's space
   // MW-CLOAK1: and the port's own CLOAK, one row per garment index that wears it (a man's and a woman's of each)
   const cloakIndices = Object.entries(CLOTHING_NAME).filter(([, n]) => CLOAK_NAMES.includes(n)).map(([i]) => Number(i));
   assert.deepEqual(cloakIndices, [154, 155, 191, 192], 'the Casual and Formal Cloak, a man\'s and a woman\'s');
-  assert.equal(own.length, Object.keys(OWN_MW_MODELS).length + OWN_MW_ARMOR.length + cloakIndices.length, 'every own-model weapon, armour piece and cloak answers a row');
+  assert.equal(own.length, OWN_MW_ARMOR.length + cloakIndices.length, 'every own-model armour piece and cloak answers a row');
   assert.deepEqual(own.filter((o) => o.own === 'ownClothingModels').map((o) => o.index), cloakIndices);
   assert.ok(own.every((o) => o.model && o.item), 'an own row names its mesh and its item');
   // MW-STEEL1: the classic walk comes first, so the Steel plate's seven rows stand before the mod's brigandine - a set,

@@ -22,7 +22,6 @@ import { undercroftPopulation, deepFoesOf, undercroftHallNear, UNDERCROFT_DEEP_M
 import { spendAmmoFor, ARROW_TEMPLATE } from '../../../src/systems/inventory.js';
 import { startShotTally, stopShotTally, noteShot, noteShotRecoverable } from '../../../src/systems/shotTally.js';
 import { playerArrowHitFoe } from '../../../src/combat/arrowFlight.js';
-import { PELLET_TEMPLATE } from '../../../src/characters/thunderlockIds.js';
 import { hostText } from '../../hostText.mjs';
 
 const read = (p) => hostText(p);   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld (scenes/questWorld.js, scenes/worldQuickSave.js) - the host read whole
@@ -33,7 +32,7 @@ const realArrows = (items) => items.filter((i) => i.templateIndex === ARROW_TEMP
 // ── ARENA-ARROWS ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('ARENA-ARROWS law: the quiver is counted as the bout begins and what it LOOSED is handed back - real stacks only, never more than went in or was loosed, a stack spent to nothing stood again (mutants: conjured counted; a refund past the mark; the drop handed back; the tally unread; the empty stack lost)', () => {
-  assert.deepEqual([...QUIVER_TEMPLATES], [ARROW_TEMPLATE, PELLET_TEMPLATE], 'every ammunition inventory.js spendAmmoFor spends');
+  assert.deepEqual([...QUIVER_TEMPLATES], [ARROW_TEMPLATE], 'the one ammunition inventory.js spendAmmoFor spends (the Thunderlock\'s pellets went with the guns)');
   const items = [arrows(20), arrows(3, { timeForItemToDisappear: 99 }), arrows(4, { questItem: true })];
   const mark = markQuiver(items);
   assert.deepEqual(mark.map((m) => [m.template, m.count]), [[ARROW_TEMPLATE, 20]], 'the twenty real arrows - not the conjured, not the quest\'s');
@@ -53,14 +52,12 @@ test('ARENA-ARROWS law: the quiver is counted as the bout begins and what it LOO
   assert.equal(drop[0].stackCount, 21);
   assert.equal(refundQuiver([arrows(10)], markQuiver([arrows(15)]), null), 0, 'nothing loosed (no tally), nothing paid');
   // spent to nothing
-  const two = [arrows(2), { name: 'Pellet', group: 'Weapons', templateIndex: PELLET_TEMPLATE, stackCount: 6 }];
+  const two = [arrows(2)];
   const m2 = markQuiver(two);
   spendAmmoFor(two, null); spendAmmoFor(two, null);
-  two.find((i) => i.templateIndex === PELLET_TEMPLATE).stackCount = 1;
   assert.equal(two.some((i) => i.templateIndex === ARROW_TEMPLATE), false, 'the quiver emptied');
-  assert.equal(refundQuiver(two, m2, new Map([[ARROW_TEMPLATE, 2], [PELLET_TEMPLATE, 5]])), 2 + 5);
+  assert.equal(refundQuiver(two, m2, new Map([[ARROW_TEMPLATE, 2]])), 2);
   assert.equal(two.find((i) => i.templateIndex === ARROW_TEMPLATE)?.stackCount, 2, 'a new stack off the copy');
-  assert.equal(two.find((i) => i.templateIndex === PELLET_TEMPLATE)?.stackCount, 6, 'and the Thunderlock\'s pellets too');
   // more than went in: nothing
   const grown = [arrows(5)];
   const m3 = markQuiver(grown);

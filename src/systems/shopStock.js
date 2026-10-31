@@ -103,16 +103,8 @@ export const SHOP_ITEM_GROUPS = Object.freeze({
   [BUILDING_TYPES.FurnitureStore]: [0x08, FURNISHER_CHANCE],
 });
 
-/**
- * PELLETS-SCARCE (2026-10-24, the owner: "Remove their ammo from shops and only have ammo has a rare resource drop (not
- * super duper rare but still rare)"; bible/05-Combat/Dwarven-Thunderlock.md "PELLETS-SCARCE"): NO SHELF SELLS THE
- * DWEMER PELLET. SHOP-PELLETS (2026-10-07) put the Thunderlock's shot on every weapon counter; that line is gone, and
- * every other draw and stack on the shelf is what it was (it drew no roll). A Pellet is found - the loot door's last
- * draw (systems/thunderlock.js, the Dwemer find) and the airship's hold (systems/ketch/ketchSpoils.js; bible/11-Multiplayer/
- * Sky-Ketch.md section 9) - and passes between players by trade. A shop still BUYS one back, as it buys any weapon.
- */
 const WEAPONS_GROUP_ID = 0x03;
-/** THE COUNTER'S ROUNDS (SHOP-PELLETS' law, SHOP-ARROWS' since PELLETS-SCARCE took the Pellet off the counter): `max` at
+/** THE COUNTER'S ROUNDS (SHOP-ARROWS' law): `max` at
  *  a quality-20 Weapon Smith, the shop's own Weapons chance over the Weapon Smith's of it, and a poor shop half of that;
  *  nothing where no weapon is sold. */
 export function shopAmmoStack(buildingType, quality, max) {

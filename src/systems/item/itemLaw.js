@@ -82,8 +82,6 @@ import { DEX_ENEMY_IDS } from '../enemyExpansion/dexIds.js';   // SOUL-LAW: the 
 // (systems/lockpick/lockpickItem.js) pulls its picture, the loot law and the foes' table in.
 import '../professions/profTemplates.js';
 import '../survival/items.js';
-import '../thunderlock.js';
-import '../pistolet.js';   // PISTOLET: the second gun's row, the Thunderlock's way
 import '../gate/gateSpoils.js';
 import '../ayleidStones.js';
 import '../gems.js';   // GEM2: the graded gems' rows
@@ -324,7 +322,7 @@ function tierFindings(/** @type {any} */ item) {
   }
   if (!ROLLED_TIERS.includes(tier)) return ['rarity'];   // 'common' and 'artifact' are the ladder's words for a reading, never written
   if (!TIER_GROUPS.includes(item.group) || item.artifact === true || item.magic === true || item.questItem === true) return ['rarity'];
-  if (item.group === 'Weapons' && isAmmunition(item) && tier !== 'magic') return ['rarity'];   // AUDIT-THUNDERLOCK F4: a Pellet stack rolled Magic before it - kept, never more
+  if (item.group === 'Weapons' && isAmmunition(item) && tier !== 'magic') return ['rarity'];   // ammunition: Magic at most, a stack rolled before kept
   // every line: a kind the group may carry, a param the kind names on this piece, a value inside the widest band
   const own = lines.filter((a) => !isGemLine(a));
   const gems = lines.filter(isGemLine);

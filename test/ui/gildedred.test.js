@@ -9,7 +9,6 @@
 //     loot's gem - each in the table's crimson, and the old gold nowhere in the sheets.
 //   - ON STONE'S GROUND: the post's win line lifts the crimson to its own light, as the audit lifted the darkest three.
 //   - THE PAGE'S INK: DFO Grimoire deepens the crimson into an ink that reads on both its grounds.
-//   - THE GOLD KEPT: the pieces' own art is still gold leaf - the ramp the sprite and the list pictures take.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { RARITIES } from '../../src/systems/loot/lootRarity.js';
@@ -18,7 +17,6 @@ import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { tierMarkCss, TIER_MARKS } from '../../src/ui/lootTierMarks.js';
 import { kitCss, G, RARITY_INK } from '../../src/ui/grimoireDress.js';
 import { LOOT_BANNER_CSS } from '../../src/ui/lootBanner.js';
-import { GILD_RAMP } from '../../src/combat/thunderlockArt.js';
 import { PLUS_THEMES } from '../../src/ui/enhanced/enhancedFrame.js';
 
 const CRIMSON = RARITIES.gilded.colour;
@@ -96,9 +94,4 @@ test('GILDED-RED THE PAGE\'S INK: DFO Grimoire writes the rung in the crimson de
   const [r, g, b] = rgbOf(ink);
   assert.ok(r > 3 * g && r > 3 * b, 'red - not the old amber, whose green stood at half its red');
   assert.ok(kitCss().includes(`${G} .wplaque-row[data-rarity="gilded"] > span:first-child { color: ${ink} !important; }`), 'the plaque\'s row');
-});
-
-test('GILDED-RED THE GOLD KEPT: the pieces\' own art is still gold leaf - every step of the ramp the classic sprite and the list pictures take leans yellow, its green past half its red (mutant: the ramp turned to the crimson)', () => {
-  assert.equal(GILD_RAMP.length, 7);
-  for (const [r, g, b] of GILD_RAMP) assert.ok(r >= g && g >= b && g >= 0.55 * r, `${[r, g, b]} is gold`);
 });

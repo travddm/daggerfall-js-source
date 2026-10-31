@@ -376,7 +376,7 @@ export const ARENA_MATERIAL_MOD = Object.freeze([-1, 0, 0, 1, 2, 3, 3, 4, 5, 6])
 export const ARENA_HAND_MAX = 41;
 export const ARENA_MOD_MAX = 20;
 /** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX, pinned equal - this law imports nothing). */
-export const ARENA_ARMS_TOP_MAX = 32;
+export const ARENA_ARMS_TOP_MAX = 27;
 /** INT7: a signed arms claim (net/identityToken.js `wa`, net/siege/siegeRef.js armsOk - pinned equal): `[reach, bow]`. */
 export const arenaArmsOk = (wa) => Array.isArray(wa) && wa.length === 2 && Number.isInteger(wa[0]) && wa[0] >= 0 && wa[0] <= ARENA_ARMS_TOP_MAX && (wa[1] === 0 || wa[1] === 1);
 /**

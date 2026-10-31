@@ -78,14 +78,6 @@ test('MW-PACE1: no schedule for a machine at rest or a ranged one - the bow\'s h
   const bow = createWeaponMachine(true);
   machineAttack(bow, 'StrikeDown');
   assert.equal(blowSchedule(bow, 50), null, 'a bow');
-  const gun = createWeaponMachine(false);
-  gun.ranged = true; gun.tick = 0.07;
-  machineAttack(gun, 'StrikeDown');
-  assert.equal(blowSchedule(gun, 50), null, 'the port\'s own gun pays the ranged cooldown - ranged');
-  const zero = createWeaponMachine(false);
-  zero.tick = 0;
-  machineAttack(zero, 'StrikeDown');
-  assert.equal(blowSchedule(zero, 50), null, 'a tick that is no tick says nothing');
 });
 
 test('MW-PACE1: blowRate - span over the time left, held to its bounds', () => {

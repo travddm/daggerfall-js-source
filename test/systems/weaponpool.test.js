@@ -10,7 +10,6 @@ import { WEAPONS, WEAPON_MATERIALS, WEAPON_CONDITION_POOL, buildWeapon } from '.
 import { templateByIndex, registerCustomTemplates, registerTemplateOverrides, mintCondition, setItemFields } from '../../src/systems/item/itemTemplates.js';
 import { GROUP_TEMPLATE_INDICES } from '../../src/systems/item/itemTemplatesData.js';
 import { createWeapon, weaponOfMaterial, armorOfMaterial } from '../../src/combat/enemyEquipment.js';
-import { createThunderlock, createPellets, THUNDERLOCK_TEMPLATE } from '../../src/systems/thunderlock.js';
 import { RRI_TEMPLATES, RRI_TEMPLATE_PATCHES } from '../../src/systems/roleplayRealismItems/rriItems.js';
 import { repoolWeaponConditions } from '../../src/systems/conditionRepair.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
@@ -34,7 +33,7 @@ const HELD_SPELL = Object.freeze({ index: 3, name: 'Held Levitate', rangeType: 0
   { type: 14, subType: -1, durationBase: 1, durationMod: 10, durationPerLevel: 1, chanceBase: 0, chanceMod: 0, chancePerLevel: 1,
     magnitudeBaseLow: 0, magnitudeBaseHigh: 0, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1 }] });
 
-test('WEAPON-POOL: every weapon type mints one pool, the Warhammer\'s 1,600, through Daggerfall\'s material ladder - the eighteen classic types, Roleplay & Realism: Items\' two and its eight patched rows, the Thunderlock; ammunition keeps its row, armour its own, and Daggerfall\'s rows stay as they are (mutants: the pool\'s number; the weapon test; the ammunition test; the template test; the viewer\'s pool and its arrow)', () => {
+test('WEAPON-POOL: every weapon type mints one pool, the Warhammer\'s 1,600, through Daggerfall\'s material ladder - the eighteen classic types, Roleplay & Realism: Items\' two and its eight patched rows; ammunition keeps its row, armour its own, and Daggerfall\'s rows stay as they are (mutants: the pool\'s number; the weapon test; the ammunition test; the template test; the viewer\'s pool and its arrow)', () => {
   assert.equal(WEAPON_CONDITION_POOL, 1600);
   assert.equal(WEAPON_CONDITION_POOL, templateByIndex(WEAPONS.Warhammer).hitPoints, 'the Warhammer\'s, the deepest row: no type has less than it had');
   // THE ROWS STAY DAGGERFALL'S (ItemTemplates.txt, verbatim): the departure reads in their place, it does not edit them
@@ -46,16 +45,11 @@ test('WEAPON-POOL: every weapon type mints one pool, the Warhammer\'s 1,600, thr
   const want = LADDER.map((c) => [c, c]);
   assert.deepEqual(Object.fromEntries(types.map((i) => [templateByIndex(i).name, ladderOf((m) => createWeapon(i, m, () => 0.5))])),
     Object.fromEntries(types.map((i) => [templateByIndex(i).name, want])));
-  // the port's own weapon: the Thunderlock, Dwarven as minted (x12 / 4)
-  const gun = createThunderlock();
-  assert.deepEqual([gun.templateIndex, gun.material, gun.maxCondition, gun.currentCondition], [THUNDERLOCK_TEMPLATE, WEAPON_MATERIALS.Dwarven, 4800, 4800]);
   // AMMUNITION KEEPS ITS ROW: CreateWeapon's arrow arm (no material pass, `currentCondition = 0`), the ocean mod's
-  // re-mint of an arrow through the material pass (its row's 1 on the ladder), the Dwemer Pellet
+  // re-mint of an arrow through the material pass (its row's 1 on the ladder)
   const arrows = createWeapon(WEAPONS.Arrow, WEAPON_MATERIALS.Daedric, () => 0.5);
   assert.deepEqual([arrows.maxCondition, arrows.currentCondition], [1, 0]);
   assert.deepEqual(MATERIALS.map((m) => weaponOfMaterial(WEAPONS.Arrow, m).maxCondition), [1, 1, 1, 2, 3, 4, 5, 6, 7, 8]);
-  const pellets = createPellets(5);
-  assert.deepEqual([pellets.maxCondition, pellets.currentCondition], [1, 1]);
   // armour keeps its own row through the plate ladder: a Cuirass's 4,096
   assert.deepEqual([armorOfMaterial(102, 0x0200).maxCondition, armorOfMaterial(102, 0x0209).maxCondition], [4096, 32768]);
   // a weapon whose template is not known mints no condition, as before
@@ -149,8 +143,10 @@ test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s
   const old = (template, material, max, cur, extra = {}) => ({ ...createWeapon(template, material, () => 0.5), maxCondition: max, currentCondition: cur, ...extra });
   // the mod's patch, with the mod off at the load: a Tanto at 40
   const tanto40 = old(WEAPONS.Tanto, WEAPON_MATERIALS.Iron, 40, 10);
-  // a custom row: the Thunderlock's 90, Dwarven (x12 / 4)
-  const gun = { ...createThunderlock(), maxCondition: 270, currentCondition: 270 };
+  // a custom row: Roleplay & Realism: Items' Archer's Axe (513) at its 500, Dwarven (x12 / 4) - the Thunderlock's row
+  // stood here until the guns were removed; registering it again is a no-op when the first test already did
+  registerCustomTemplates(RRI_TEMPLATES);
+  const customRow = old(513, WEAPON_MATERIALS.Dwarven, 1500, 1500);
   // no material at all (a quest's template mint): the row as it stands, x4 / 4
   const bare = { group: 'Weapons', templateIndex: WEAPONS.Wakazashi, name: 'Wakizashi', maxCondition: 200, currentCondition: 100 };
   // made pieces: the smith's quality over the row - a Crude dagger's round(37.5) = 38, a Masterwork's 65
@@ -158,7 +154,7 @@ test('WEAPON-POOL: the fingerprint is the old mint\'s own number - Daggerfall\'s
   const crude = made(0, 38, 38), master = made(4, 65, 13);
   // the share rounds to the nearest point: a steel Saber at 3 and at 1 of 1,050 (x16 / 7)
   const saber3 = old(WEAPONS.Saber, WEAPON_MATERIALS.Steel, 1050, 3), saber1 = old(WEAPONS.Saber, WEAPON_MATERIALS.Steel, 1050, 1);
-  const moved = [tanto40, gun, bare, crude, master, saber3, saber1];
+  const moved = [tanto40, customRow, bare, crude, master, saber3, saber1];
   // and what stays
   const cuirass = { ...armorOfMaterial(102, 0x0200) };   // an iron cuirass's 4,096: its own row, not a weapon
   // AUDIT WEAPON-POOL P6: and every other group a save holds, minted on its own row - a weapon's guard turned on armour

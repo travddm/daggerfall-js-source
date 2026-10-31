@@ -295,23 +295,19 @@ test('ROAD-H H1c: BOTH arrow spawn seams apply it, so every host inherits the bo
   // can forget it. An ENEMY shaft arrives with its own origin already
   // applied (enemyArrowOrigin) and must NOT be offset again.
   //
-  // FIELD-GUN17 re-aimed this pin. The seams now FORK first - a weapon
-  // that knows where its own muzzle is (the Thunderlock, and nothing
-  // else in the game) supplies a camera-space offset and gets it - but
-  // the claim this arm makes is unchanged and is asserted whole: a
-  // PLAYER shaft with no muzzle supplied still takes GetAimPosition,
-  // and an ENEMY shaft still takes its origin bare, at both seams.
-  // AUDIT FIELD-GUN-MW F2 re-aimed this again: the fork is ONE function now (systems/spellcast.js
-  // playerShotOrigin - a world muzzle, a lens muzzle, or GetAimPosition), and both seams call it; the claim is
-  // asserted at the fork's home and the two seams are held to the call.
+  // The fork is ONE function (systems/spellcast.js playerShotOrigin - a world origin a host hands over, or
+  // GetAimPosition), and both seams call it; the claim is asserted at the fork's home and the two seams are held to the
+  // call: a PLAYER shaft with no origin supplied takes GetAimPosition, and an ENEMY shaft takes its origin bare.
+  // PIN MOVED (guns removed): the lens muzzle (playerMuzzleOrigin) went with the guns; the fork keeps `{ world }` alone.
   assert.match(src('systems/spellcast.js'),
-    /export function playerShotOrigin\(eye, lookDir, muzzle\) \{\n\s*if \(muzzle\?\.world\) return \[\.\.\.muzzle\.world\];\n\s*return muzzle \? playerMuzzleOrigin\(eye, lookDir, muzzle\) : playerArrowOrigin\(eye, lookDir\);\n\}/);
+    /export function playerShotOrigin\(eye, lookDir, muzzle\) \{\n\s*if \(muzzle\?\.world\) return \[\.\.\.muzzle\.world\];\n\s*return playerArrowOrigin\(eye, lookDir\);\n\}/);
   assert.match(src('combat/arrowFlight.js'),
     /const origin = meta\.fromPlayer\s*\n\s*\? playerShotOrigin\(from, dir, meta\.muzzle\)\s*\n\s*: \[\.\.\.from\];/);
   assert.match(src('combat/arrowFlight.js'), /this\.arrows\.push\(\{ pos: origin,/);
   assert.match(src('scenes/dungeonContext.js'),
     /const pos = fromPlayer\s*\n\s*\? playerShotOrigin\(from, dir, muzzle\)[^\n]*\n\s*: \[\.\.\.from\];/);
-  assert.match(src('scenes/dungeonContext.js'), /missiles\.push\(\{ arrow: true, flatArchive: orbArchiveFor\(weapon\), weapon, fromPlayer, shooterFoe, aimFoe, pos,/);
+  // PIN MOVED (guns removed): the orb's flatArchive left the missile with the guns
+  assert.match(src('scenes/dungeonContext.js'), /missiles\.push\(\{ arrow: true, weapon, fromPlayer, shooterFoe, aimFoe, pos,/);
   // FlipHorizontal is read LIVE at the loose, off the same stored
   // Controls/Handedness the screen weapon draws by (StartGameBehaviour
   // :269) - DFU reads the one ScreenWeapon field in both places too.

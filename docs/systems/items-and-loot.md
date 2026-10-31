@@ -174,7 +174,7 @@ preference). Off, it writes no field and DFU's loot is unchanged.
 | legendary | A fixed record from `LEGENDARIES`, with its own power |
 | aetheric | A boss's set piece (`src/systems/aetheric.js`); never rolled |
 | artifact | DFU's artifacts, unchanged |
-| gilded | One fixed record (`src/systems/gilded.js`); never rolled |
+| gilded | Fixed records (`src/systems/gilded.js`); never rolled |
 
 - `rollRarity` and `rarityChances` draw a tier from the **source**: a corpse's level, a dungeon's kind
   (`DUNGEON_RARITY_TIER`), a pile or boss multiplier (`SOURCE_MULT`), and the player's Luck (`luckMult`). Tuning

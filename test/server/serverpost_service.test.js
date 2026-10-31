@@ -13,7 +13,7 @@ import { HEARTBEAT_PARTS } from '../../server-account/src/heartbeat.js';
 import { claimPost, deletePost, readPost, postBoxOf } from '../../server-account/src/post.js';
 import { POST_SENDER, POST_BOX_MAX, POST_ID_RE, postHead, postWhole, postItemHead, unclaimedOf } from '../../src/net/postLaw.js';
 import { REFUSALS } from '../../src/net/accountClient.js';
-import { mintHourlock } from '../../src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -63,15 +63,15 @@ test('SERVER-POST the table and the doors: 0093 lays server_post - one piece a b
 test('SERVER-POST the box and a piece opened: newest first, heads alone - the item\'s name and rarity, never its record or a body; unread and unclaimed counted; opened, the whole piece and it reads read; another\'s piece is no piece; a message alone is never unclaimed (mutants: the body in the box; the record in the box; read never stamped; another\'s piece read)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob');
-  const gun = mintHourlock();
+  const oath = mintGilded(DRAGONFIRE_OATH);
   const words = send(svc.env, ann, { batch: 'words', subject: 'Welcome', body: 'Hello there.', at: T0 });
-  const gift = send(svc.env, ann, { batch: 'gift', subject: 'The Hourlock', body: 'For the first clear.', item: gun, at: T0 + 10 });
-  send(svc.env, bob, { batch: 'gift', item: gun, at: T0 + 20 });
+  const gift = send(svc.env, ann, { batch: 'gift', subject: 'The Dragonfire Oath', body: 'For the first clear.', item: oath, at: T0 + 10 });
+  send(svc.env, bob, { batch: 'gift', item: oath, at: T0 + 20 });
 
   const b = await box(svc, ann);
   assert.equal(b.status, 200);
   assert.deepEqual(b.body.post.map((p) => p.id), [gift, words], 'newest first, and only Ann\'s');
-  assert.deepEqual(b.body.post[0], { id: gift, from: POST_SENDER, subject: 'The Hourlock', sentAt: T0 + 10, read: false, item: { name: 'The Hourlock', rarity: 'gilded' }, claimed: false });
+  assert.deepEqual(b.body.post[0], { id: gift, from: POST_SENDER, subject: 'The Dragonfire Oath', sentAt: T0 + 10, read: false, item: { name: 'The Dragonfire Oath', rarity: 'gilded' }, claimed: false });
   assert.deepEqual(b.body.post[1].item, null);
   assert.equal(b.body.post[1].claimed, false, 'a message alone is never waiting to be claimed');
   assert.deepEqual([b.body.unread, b.body.unclaimed, b.body.max], [2, 1, POST_BOX_MAX]);
@@ -97,8 +97,8 @@ test('SERVER-POST THE CLAIM: into the realm character being played - the record 
   const svc = await standService();
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob');
   const R = await seatRealm(svc.env, ann.secret, 'Ann', { name: 'Ann', level: 20, goldPieces: 50, items: [] });
-  const gun = mintHourlock();
-  const gift = send(svc.env, ann, { batch: 'gift', subject: 'The Hourlock', item: gun });
+  const oath = mintGilded(DRAGONFIRE_OATH);
+  const gift = send(svc.env, ann, { batch: 'gift', subject: 'The Dragonfire Oath', item: oath });
   const words = send(svc.env, ann, { batch: 'words', subject: 'Welcome' });
   const claim = (who, b) => svc.call('/v1/post/claim', b, who.secret);
 
@@ -111,10 +111,10 @@ test('SERVER-POST THE CLAIM: into the realm character being played - the record 
   const r = await claim(ann, { id: gift, character: R.id, realm: was });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.deepEqual([r.body.ok, r.body.id, r.body.realm.seq], [true, gift, was.seq + 1]);
-  assert.deepEqual(r.body.item, gun, 'the record as it was sent');
+  assert.deepEqual(r.body.item, oath, 'the record as it was sent');
   assert.equal(R.at().seq, was.seq + 1, 'the record one on');
   const rec = recordOf(svc.env, R.id);
-  assert.deepEqual(rec.items, [gun], 'the item in the record');
+  assert.deepEqual(rec.items, [oath], 'the item in the record');
   assert.equal(rec.goldPieces, 50, 'and nothing else moved');
   const row = svc.env.DB._raw.prepare('SELECT claimed_at, claimed_by, read_at FROM server_post WHERE id = ?').get(gift);
   assert.equal(row.claimed_by, R.id);
@@ -123,14 +123,14 @@ test('SERVER-POST THE CLAIM: into the realm character being played - the record 
   assert.deepEqual([b.post.find((p) => p.id === gift).claimed, b.unclaimed], [true, 0]);
 
   assert.deepEqual(await claim(ann, { id: gift, character: R.id, realm: R.at() }), { status: 409, body: { error: 'post-claimed' } }, 'once');
-  assert.deepEqual(recordOf(svc.env, R.id).items, [gun], 'the record unmoved by the second');
+  assert.deepEqual(recordOf(svc.env, R.id).items, [oath], 'the record unmoved by the second');
   assert.deepEqual(await claim(ann, { id: words, character: R.id, realm: R.at() }), { status: 409, body: { error: 'post-no-item' } });
   const B = await seatRealm(svc.env, bob.secret, 'Bob');
   assert.deepEqual(await claim(bob, { id: gift, character: B.id, realm: B.at() }), { status: 404, body: { error: 'no-post' } }, 'Ann\'s is not Bob\'s');
   assert.deepEqual(await claim(bob, { id: gift, character: R.id, realm: R.at() }), { status: 404, body: { error: 'no-realm-character' } }, 'nor is her character');
 
   // THROWN AWAY: never a gift still waiting
-  const second = send(svc.env, ann, { batch: 'gift-2', item: gun });
+  const second = send(svc.env, ann, { batch: 'gift-2', item: oath });
   assert.deepEqual(await svc.call('/v1/post/delete', { id: second }, ann.secret), { status: 409, body: { error: 'post-unclaimed' } });
   assert.deepEqual(await svc.call('/v1/post/delete', { id: gift }, ann.secret), { status: 200, body: { ok: true, id: gift } }, 'a claimed one may go');
   assert.deepEqual(await svc.call('/v1/post/delete', { id: words }, ann.secret), { status: 200, body: { ok: true, id: words } }, 'and words alone');
@@ -142,8 +142,8 @@ test('SERVER-POST the functions ask again, and the heartbeat carries the box: a 
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const R = await seatRealm(svc.env, ann.secret, 'Ann');
-  const gun = mintHourlock();
-  const gift = send(svc.env, ann, { batch: 'gift', item: gun });
+  const oath = mintGilded(DRAGONFIRE_OATH);
+  const gift = send(svc.env, ann, { batch: 'gift', item: oath });
   const player = svc.env.DB._raw.prepare('SELECT * FROM players WHERE id = ?').get(ann.id);
   const ctx = { db: svc.env.DB, bucket: svc.env.SAVES, rand: (b) => globalThis.crypto.getRandomValues(b), nowS: T0 + 100 };
 
@@ -172,7 +172,7 @@ test('SERVER-POST the functions ask again, and the heartbeat carries the box: a 
 test('AUDIT SERVER-POST the box and the table hold: a gift still waiting is listed however many newer pieces stand before it - the box is the newest fifty, gifts waiting first; the table refuses a piece out of the post\'s bounds; a record that names nothing is no item - unclaimable, and thrown away; another\'s piece is never thrown away; a batch D1 dropped answers 503, the service\'s failure, and the piece still waits (mutants: the box newest-first alone; the table unbounded; another\'s piece thrown away; the dropped batch a refusal)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob');
-  const gift = send(svc.env, ann, { batch: 'old-gift', item: mintHourlock(), at: T0 - 10_000 });
+  const gift = send(svc.env, ann, { batch: 'old-gift', item: mintGilded(DRAGONFIRE_OATH), at: T0 - 10_000 });
   for (let i = 0; i < POST_BOX_MAX + 5; i++) send(svc.env, ann, { batch: `words-${i}`, at: T0 + i });
   let b = (await box(svc, ann)).body;
   assert.equal(b.post.length, POST_BOX_MAX, 'the newest fifty');

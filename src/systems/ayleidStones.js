@@ -5,7 +5,7 @@
 // The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 13; Mac:
 // "what could we do to make it even more amazing, while also balancing
 // everyrhing?", then "Lets go all in"). Two things DFU's roll cannot
-// make, found at the deepest sources through the Thunderlock's registry
+// make, found at the deepest sources through the unique-find registry
 // (lootRarity.js registerUniqueFind) - as LATE finds, the door's last
 // draws (rollLateFinds: the arc's law 9, so no seed's earlier draw
 // moves):
@@ -22,7 +22,7 @@
 // Gems piece is a crystal a slot takes (equipTable.js getEquipSlot) -
 // on DFU's gem art (TEXTURE.254: Turquoise's blue for the Welkynd,
 // Amber's lamplight for the Varla). Registered at import
-// (systems/worldTick.js imports this, the Thunderlock's wire).
+// (systems/worldTick.js imports this).
 // ═══════════════════════════════════════════════════════════════════
 
 import { registerCustomTemplates, mintCondition, setItemFields, registerItemUseHandler } from './item/itemTemplates.js';

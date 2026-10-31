@@ -26,9 +26,8 @@
 //   gilded     - GILDED1 (2026-10-07, Mac: "a new rarity above
 //                atheric ... the most rare and gilded item in the
 //                entire game"): the top of the ladder, over the
-//                artifacts, never rolled - one fixed record, the
-//                Hourlock, the Brass Remnant's rarest spoil
-//                (systems/gilded.js)
+//                artifacts, never rolled - fixed records, each a
+//                world boss's rarest spoil (systems/gilded.js)
 //
 // REPLACE, DON'T LAYER. With the switch on there is ONE ladder: every
 // enchanted item is at least Magic (rarityOf derives it), every rolled
@@ -86,7 +85,6 @@ import { ENCHANTMENT_TYPES } from '../../formats/magicDef.js';
 import { enchantmentName, enchantmentParamName } from '../enchantmentCatalogue.js';
 import { rollSigil, sigilOnline, SIGIL_BANDS } from '../sigil/sigil.js';   // SIGIL1: a weapon won online may carry a sigil
 import { SLOT_RULES, WEAPON_HANDS } from '../../characters/equipRules.js';   // LOOT14: a garment's slot - the feet lean to the feet's skills; GEM1: a weapon's hands, its sockets
-import { THUNDERLOCK_TEMPLATE } from '../../characters/thunderlockIds.js';   // GEM1: the Thunderlock holds a two-hander's sockets - a leaf with no imports
 import { dressClassOf } from '../clothingStanding.js';   // LOOT14: a garment's standing leans to its dress
 import { survivalOn } from '../survival/switch.js';   // LOOT14: the warmth and weatherproof lines' reader - a leaf
 import { hoodCapable } from '../survival/temperature.js';   // LOOT15: Unseen answers a hood (HOOD-SAID's one law)
@@ -141,10 +139,7 @@ export const rarityRank = (item) => RARITIES[rarityOf(item)].rank;
  *  which makes it unstackable (isStackable refuses an enchanted item)
  *  - so a quiver of twenty becomes twenty rows the player has to
  *  carry one at a time. What is ammunition is itemTemplates.js's
- *  registry (isAmmunition), where a mod's own registers.
- *
- *  AUDIT-THUNDERLOCK F4: the Pellet was eligible. A found stack could
- *  roll Magic and shatter itself. */
+ *  registry (isAmmunition). */
 export function rarityEligible(item) {
   if (!item || item.questItem || item.artifact || item.magic || item.rarity || enchanted(item) || item.equipSlot != null) return false;
   if (!wearableItem(item)) return false;   // RARITY-WEAR: no slot, no tier - every affix and a Held enchantment read worn pieces alone
@@ -362,10 +357,6 @@ export function rollRarity(source, rolls = Math.random) {
 
 // ── THE UNIQUE FIND ─────────────────────────────────────────────────
 //
-// Mac, 2026-09-19, of the Dwarven Thunderlock: "This weapon wont be
-// available for purchase and should be one of the rarest items to find
-// in the game."
-//
 // A TIER IS NOT A THING. Everything above decorates an item that DFU's
 // own loot roll already produced - a Legendary is a sword the matrices
 // minted, wearing a name. A unique find is the other question: an item
@@ -374,10 +365,10 @@ export function rollRarity(source, rolls = Math.random) {
 // list instead of promoting something in it.
 //
 // AND IT IS REGISTERED, NOT NAMED. This file is the port's loot
-// ladder; it has no business knowing that a gun exists. A weapon that
-// wants to be findable registers itself (systems/thunderlock.js does,
-// at import), which is the same shape registerCustomTemplates and the
-// equip-sound sink already have.
+// ladder; it has no business knowing every item that can be found. An
+// item that wants to be findable registers itself at import
+// (systems/ayleidStones.js does), which is the same shape
+// registerCustomTemplates and the equip-sound sink already have.
 //
 // THE NUMBERS. Base zero: at source tier 0 - a rat, a shallow crypt -
 // the chance is NOTHING, not "small". It only begins at `minTier`, and
@@ -391,7 +382,7 @@ export const UNIQUE_WEIGHTS = Object.freeze({ base: 0, perTier: 0.35, cap: 6 });
  * Register a find. `mint(rolls)` answers the ITEMS to add (a list, so
  * a weapon can arrive with the ammunition it would be useless
  * without); `minTier` is the source tier it first becomes possible at;
- * `weight` scales its own chance against the others. PELLETS-SCARCE: a
+ * `weight` scales its own chance against the others. A
  * find may carry `weights` of its own ({ base, perTier, cap }, per mille -
  * UNIQUE_WEIGHTS' shape) where the rarest-in-the-game curve is not its
  * rarity, and `final: true` rolls it in rollFinalFinds alone - the door's
@@ -411,7 +402,7 @@ export function uniqueFindChance(find, { kind = 'corpse', tier = 0, boss = false
   if (!find || tier < (find.minTier ?? 4)) return 0;
   const mult = boss ? SOURCE_MULT.boss : (SOURCE_MULT[kind] ?? 1);
   const luckMod = (Math.max(0, Math.min(100, luck | 0)) - 50) * 0.02;   // a hundredth of the tier roll's - luck helps, it does not hand it over
-  const w = find.weights ?? UNIQUE_WEIGHTS;   // PELLETS-SCARCE: a find's own curve
+  const w = find.weights ?? UNIQUE_WEIGHTS;   // a find's own curve
   return Math.max(0, Math.min(w.cap, (w.base + w.perTier * Math.max(0, tier)) * mult * (find.weight ?? 1) + luckMod));
 }
 
@@ -420,7 +411,7 @@ export function uniqueFindChance(find, { kind = 'corpse', tier = 0, boss = false
 export function rollUniqueFinds(source, rolls = Math.random) {
   const out = [];
   for (const find of _uniqueFinds) {
-    if (find.late === true || find.final === true) continue;   // LOOT21: a late find is the door's last roll (rollLateFinds); PELLETS-SCARCE: a final find, its very last (rollFinalFinds)
+    if (find.late === true || find.final === true) continue;   // LOOT21: a late find is the door's last roll (rollLateFinds); a final find, its very last (rollFinalFinds)
     const chance = uniqueFindChance(find, source);
     if (chance <= 0) continue;
     if (rolls() * 1000 < chance) out.push(...(find.mint(rolls) ?? []));
@@ -441,10 +432,9 @@ export function rollLateFinds(source, rolls = Math.random) {
   }
   return out;
 }
-/** PELLETS-SCARCE (bible/05-Combat/Dwarven-Thunderlock.md "PELLETS-SCARCE"): THE FINAL FINDS - a find registered `final`
- *  rolls here, after the door's technique pass, which was its last draw (law 9: every draw a seed made before is the one
- *  it was, and a find under its tier costs no draw). The Dwemer Pellet's find (systems/thunderlock.js) is its one.
- *  Answers the items to add. */
+/** THE FINAL FINDS - a find registered `final` rolls here, after the door's technique pass, which was its last draw
+ *  (law 9: every draw a seed made before is the one it was, and a find under its tier costs no draw). No find is
+ *  registered `final` now. Answers the items to add. */
 let _finalFindsOff = false;
 /** The test seam: the final finds held off (true) for a replay of the draws before them, or back on (false). */
 export function _holdFinalFindsForTests(off) { _finalFindsOff = !!off; }
@@ -1275,7 +1265,7 @@ export function imprintLine(item) {
   return rec && p?.name ? `Imprint: ${p.name} (of ${rec.name})${p.brief ? ` - ${p.brief}` : ''}` : '';
 }
 /** AUDIT LOOT F1: WHETHER A POWER CAN WORK ON A PIECE - Chain Lightning arcs off an arrow (lootPowers.js lootStrike: a
- *  weapon of the Archery skill, the Thunderlock's too) and Earthshaker shakes off a melee blow (any other weapon); every
+ *  weapon of the Archery skill) and Earthshaker shakes off a melee blow (any other weapon); every
  *  other power works on any piece of its group. The imprint offers and the wire takes no power its piece could not use. */
 export function powerFits(item, power) {
   if (!item || !power) return false;
@@ -1525,11 +1515,11 @@ export function craftedRarityWorth(item) {
 
 /** THE HOST DOOR. Roll every eligible item of a freshly generated list
  *  against the source; a no-op with no source, and with the switch off
- *  the DFU loot list untouched but for the final finds (the Pellet). `luck` is the player's
+ *  the DFU loot list untouched but for the final finds. `luck` is the player's
  *  live luck. Returns the list for chaining. */
 export function rollLootRarity(items, sourceIn, { rolls = Math.random, luck = 50, find: findIn = undefined, level = undefined } = {}) {   // PARTY-LOOT: `find` the roll's own finders' word (a room's base reads none of a player's); LOOT-GATE: `level` the roll's own level (a room's base names its own), else the player's
   if (!sourceIn || !Array.isArray(items)) return items;
-  if (!lootRarityOn()) return (items.push(...rollFinalFinds({ ...sourceIn, luck }, rolls)), items);   // AUDIT SHIP C2: the Pellet a find, not a tier - the switch off still drops it, the shelves selling none
+  if (!lootRarityOn()) return (items.push(...rollFinalFinds({ ...sourceIn, luck }, rolls)), items);   // AUDIT SHIP C2: a final find is a find, not a tier - the switch off still drops it
   const source = { ...sourceIn, rollerLevel: sourceIn.rollerLevel ?? level ?? rollerLevel() };
   const find = findIn ?? legendaryFindMult();   // LOOT5: the finders' word, once for the list
   const minted = [];
@@ -1562,7 +1552,7 @@ export function rollLootRarity(items, sourceIn, { rolls = Math.random, luck = 50
   items.push(...(_gemFind?.({ ...source, luck }, rolls) ?? []));   // GEM2: and a graded gem, last of all (systems/gems.js)
   damnPass(minted, rolls);   // TRUE-CURSE: a cursed Legendary weapon damned, after every draw the door made, the gem's too (law 9)
   techniquePass(minted, rolls);   // TECH1: a weapon's technique - after even GEM2's find and TRUE-CURSE's damning (law 9: every draw above is the one it was)
-  items.push(...rollFinalFinds({ ...source, luck }, rolls));   // PELLETS-SCARCE: the final finds - the Dwemer Pellet - the door's last draw now, after the technique's
+  items.push(...rollFinalFinds({ ...source, luck }, rolls));   // the final finds - the door's last draw, after the technique's
   return items;
 }
 /** GEM2 (bible/06-Systems/Gem-Sockets.md section 4): THE WORLD'S GEM FIND - registered by systems/gems.js, which owns the
@@ -1992,7 +1982,7 @@ export function gemKindOf(item) {
 }
 /** GEM1: HOW MANY SOCKETS A PIECE CAN HOLD - its size's. A short blade one, a one-handed weapon two, a two-handed one
  *  three - DFU's own hands table (WEAPON_HANDS: 'Both'), read without the bow-hand setting so a piece's sockets never
- *  move with a switch, and the Thunderlock with the two-handers; a piece of armour or a jewel one (LOOT20's); none for
+ *  move with a switch; a piece of armour or a jewel one (LOOT20's); none for
  *  ammunition, a garment or anything else. */
 export const WEAPON_SOCKETS = Object.freeze({ short: 1, one: 2, two: 3 });
 export function socketMax(item) {
@@ -2001,7 +1991,7 @@ export function socketMax(item) {
   if (isAmmunition(item)) return 0;
   const t = item.templateIndex;
   if (weaponSkillUsed(t) === SKILLS.ShortBlade) return WEAPON_SOCKETS.short;
-  return WEAPON_HANDS[t] === 'Both' || t === THUNDERLOCK_TEMPLATE ? WEAPON_SOCKETS.two : WEAPON_SOCKETS.one;
+  return WEAPON_HANDS[t] === 'Both' ? WEAPON_SOCKETS.two : WEAPON_SOCKETS.one;
 }
 /** GEM1: how many this piece may carry at its tier - a Rare's or a Legendary's its size; a Magic WEAPON one (the weapons'
  *  pass gives it); none else. */
@@ -2278,8 +2268,8 @@ export const championSource = (source, qualityMult = 1) => ({
  *  the sword it swings - a Legendary in a Daedra Lord's hand would have
  *  struck the player with it. The source is corpseSource's.
  *  LOOT7-CHECK CORPSE-FIND: the roll runs over a COPY (the carried cut), and the door's unique find is pushed onto the
- *  list it is handed - so the find landed on the copy and was thrown away with it: no body ever kept one (the
- *  Thunderlock's "tier-4 corpse, about 1 in 700"; 0 of 20,000 level-12 champions' bodies, where the list door kept 111).
+ *  list it is handed - so the find landed on the copy and was thrown away with it: no body ever kept one (0 of 20,000
+ *  level-12 champions' bodies, where the list door kept 111).
  *  What the roll added past the carried pieces goes onto the body. */
 export function rollCorpseLoot(entity, basics, { rolls = Math.random, luck = 50, qualityMult = 1, weights = null, find = undefined, level = undefined } = {}) {   // FOE-CAP: `weights` the plain foe's ladder (systems/foeLootCap.js); AUDIT UPDATE L4: `level` the roller's (LOOT-GATE)
   if (!lootRarityOn() || !entity) return entity?.items ?? [];

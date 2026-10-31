@@ -10,9 +10,8 @@ name: Server post
 #   2. read it; then run again with apply on. One piece to each, once a send an account: the same send run twice
 #      sends once.
 #
-# The item is NAMED, never typed: tools/sendServerPost.mjs mints it with the game's own code (POST_ITEMS - the Hourlock
-# as its drop mints it). Each player claims it from the mailbox beside the hourglass into the online character they
-# are playing.
+# The item is NAMED, never typed: tools/sendServerPost.mjs mints it with the game's own code (POST_ITEMS). Each player
+# claims it from the mailbox beside the hourglass into the online character they are playing.
 
 on:
   workflow_dispatch:
@@ -32,7 +31,6 @@ on:
         type: choice
         options:
           - none
-          - hourlock
       subject:
         description: "Its subject (up to 80 characters)"
         required: true

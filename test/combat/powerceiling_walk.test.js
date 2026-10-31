@@ -10,9 +10,8 @@ import {
   RARITY_ORDER, RARITIES, ROLLED_TIERS, AFFIX_RANGES, AFFIX_KINDS, validAffix, allLegendaries, applyRarity, exaltLegendary,
   legendariesFor, GEM_GRADE_LINES, gemPieceCap, rarityEligible, rarityOf, kindParams,
 } from '../../src/systems/loot/lootRarity.js';
-import '../../src/systems/thunderlock.js';   // The Last Lock, a registered Legendary
 import { AETHERIC_RECORDS, mintAetheric } from '../../src/systems/aetheric.js';
-import { GILDED_RECORDS, GILDED_ERAS, mintGilded } from '../../src/systems/gilded.js';
+import { GILDED_RECORDS, mintGilded } from '../../src/systems/gilded.js';
 import { SIGIL_BANDS, SIGIL_POWER_MAX } from '../../src/systems/sigil/sigil.js';
 import { SIGIL_SETS, tierValues, SET_STAGE_MAX } from '../../src/systems/sigil/sigilSets.js';
 import { TECHNIQUE_BANDS } from '../../src/combat/technique/techniqueRoster.js';
@@ -67,9 +66,8 @@ test('POWER-CEILING THE LINE LAW: a line at its kind\'s top is lawful and one pa
   assert.equal(linesPastCeiling({ affixes: [{ id: 'nope', value: 1 }] }).length, 1, 'a line of no kind is past every ceiling');
 });
 
-test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrobe\'s, the arcane three, a registered one), every Aetheric and Gilded record and era, its lines and its blow - and each as its producer mints it, an Exalted Legendary too (mutants: a Regalia line at the top plus one; the Hourlock\'s damage at 41)', () => {
+test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrobe\'s, the arcane three), every Aetheric and Gilded record, its lines and its blow - and each as its producer mints it, an Exalted Legendary too (mutant: a Regalia line at the top plus one)', () => {
   setPref('lootRarity', true);
-  assert.ok(allLegendaries().some((r) => r.id === 'the-last-lock'), 'the registered record walked too');
   for (const r of allLegendaries()) {
     past(`Legendary ${r.id}`, r);
     for (const base of legendaryBases(r)) {
@@ -86,7 +84,7 @@ test('POWER-CEILING THE RECORDS: every Legendary record (the thirty, the wardrob
     past(`Aetheric ${r.id} minted`, it);
     assert.equal(it.rarity, 'aetheric');
   }
-  for (const r of [...GILDED_RECORDS, ...GILDED_ERAS]) {
+  for (const r of GILDED_RECORDS) {
     past(`Gilded ${r.id}`, r);
     const it = mintGilded(r);
     past(`Gilded ${r.id} minted`, it);
@@ -143,11 +141,14 @@ test('POWER-CEILING THE GEMS: every gem\'s line at every grade under its kind\'s
 test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in every power has a role; a line\'s under the Legendary band\'s top of its kind; every other at or under today\'s strongest of its role (mutants: Ruhn\'s fire past 50; Bound in Silk past 140; a recovery made shorter than any today)', () => {
   // today's strongest of each role - a record past one moves it, and fails here with its name
   const STRONGEST = {
-    above: 75, below: 33, blow: 140, buff: 20, burst: 40, cadence: 3, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
+    // PIN MOVED (guns removed): cadence 3 -> 5, the Hourlock's toll (every third shot) gone; 5 is today's
+    // most frequent (lower is stronger)
+    above: 75, below: 33, blow: 140, buff: 20, burst: 40, cadence: 5, chance: 30, climate: 20, cost: 30, find: 1.5, flat: 8, flatGuard: 5,
     gold: 5, guard: 30, heal: 30, hitCap: 25, magicka: 30, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
     rounds: 4, seconds: 8, shield: 40, ship: 30, spell: 25, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
-  holdRoles(powerNumbers(), 145, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
+  // PIN MOVED (guns removed): the floor 145 -> 141, the Hourlock's and The Last Lock's power numbers gone
+  holdRoles(powerNumbers(), 141, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
 });
 /** THE ROLES HELD: every number has a role; a line's under its kind's Legendary top; every other at or under today's
  *  strongest of its role (`strongest`, as written down - a lower one is lowered there and in the page). */

@@ -23,7 +23,6 @@ import { weightForMaterial, WEAPONS } from '../characters/weapons.js';   // AUDI
 // is a leaf of this module's import graph - it reads the same JSON).
 import { mintCondition, rollPaintingMessage, templateByIndex, isAmmunition } from './item/itemTemplates.js';
 import { isPlate, plateMetal } from './armorMaterials.js';   // AUDIT CLAWS B2: a plate piece's metal, one decode (a leaf)
-import { ammoTemplateFor } from '../characters/thunderlockIds.js';   // what a ranged weapon spends - a leaf, so no cycle (see the file)
 import { isRriStackable } from './roleplayRealismItems/rriRealism.js';   // RRI2: the IsItemStackable override - an added yes (FormulaHelper.cs:2100-2102)
 import { noteShot } from './shotTally.js';   // ARENA-ARROWS: the shots a bout loosed - a leaf, so no cycle
 import { PATRON_COUNTER_MARK, COUNTER_PAID_MARK, COUNTER_VALUE_MARK } from '../net/patronLaw.js';   // AUDIT LW-II-2 S1: a stack keeps the counter's mark (the law imports nothing)
@@ -489,19 +488,12 @@ export const spendArrow = (list) => removeOne(list, ARROW_TEMPLATE,
   { group: 'Weapons', allowQuestItem: false, priorityToConjured: true });
 
 /**
- * THE SHOT'S AMMUNITION, by the weapon that fires it.
- *
- * DFU has one ranged weapon family and therefore one ammunition, so
- * `spendArrow` was the whole law and every host said it by name. The
- * port has two now - the Dwarven Thunderlock spends a Dwemer Pellet -
- * and a host that asks "spend an arrow" while holding a gun is asking
- * the wrong question. This asks the weapon.
- *
- * A bow, or anything else that reaches here, still spends an Arrow:
- * the answer for every classic weapon is unchanged.
+ * THE SHOT'S AMMUNITION, by the weapon that fires it. DFU has one ranged
+ * weapon family and therefore one ammunition: every weapon spends an Arrow.
+ * The hosts pass the weapon so the question stays the weapon's.
  */
-export function spendAmmoFor(list, weapon, shot = null) {
-  const template = ammoTemplateFor(weapon) ?? ARROW_TEMPLATE;
+export function spendAmmoFor(list, _weapon, shot = null) {
+  const template = ARROW_TEMPLATE;
   const opts = { group: 'Weapons', allowQuestItem: false, priorityToConjured: true };
   // ARENA-ARROWS: a REAL round spent is a shot the bout's tally counts (systems/shotTally.js) - asked before it goes
   const real = !isSummoned(getItem(list, opts.group, template, opts));
@@ -513,8 +505,8 @@ export function spendAmmoFor(list, weapon, shot = null) {
 
 /** How much ammunition the pack holds for that weapon - the number the
  *  out-of-ammo sheathe and the quiver both read. */
-export function ammoCountFor(list, weapon) {
-  const template = ammoTemplateFor(weapon) ?? ARROW_TEMPLATE;
+export function ammoCountFor(list, _weapon) {
+  const template = ARROW_TEMPLATE;
   let n = 0;
   for (const it of list ?? []) if (it?.templateIndex === template) n += Math.max(0, it.stackCount ?? 1);
   return n;
@@ -605,7 +597,7 @@ export function unitWeightInKg(item) {
   if (Number.isFinite(item.weightInKg)) return item.weightInKg + (Number.isFinite(item.water) && item.water > 0 ? item.water : 0);
   let base = t ? t.baseWeight : 0;
   if (Number.isFinite(item.water) && item.water > 0) base += item.water;   // SURV2: a waterskin weighs its water
-  if (item.group === 'Weapons' && !isAmmunition(item) && item.material != null) {   // AUDIT 68 S27-ammo-arrow-only: ammunition skips the ladder - the Arrow by index, not by name, and the Dwemer Pellet
+  if (item.group === 'Weapons' && !isAmmunition(item) && item.material != null) {   // AUDIT 68 S27-ammo-arrow-only: ammunition skips the ladder - the Arrow by index, not by name
     base = weightForMaterial(base, item.material);
   }
   if (item.group === 'Armor' && item.material != null) {

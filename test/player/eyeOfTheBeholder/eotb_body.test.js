@@ -469,7 +469,7 @@ test('EOTB5: the mod\u2019s art is EXCLUDED from Vite\u2019s inlining - and sinc
   assert.equal(rule('/x/vendor/immersive-footsteps/Audio/Low_Quality/Climate/LQ_Grass_Footstep_1.mp3'), false, 'AUDIT-IF F1: Immersive Footsteps\' clips are the same class (test/systems/if1_immersivefootsteps.test.js holds the measurement)');
   assert.equal(rule('C:\\x\\vendor\\eye-of-the-beholder\\Textures\\a.png'), false, 'and on a Windows path too');
   assert.equal(rule('/x/src/ui/icons/diamond.png'), undefined, 'and everything OUTSIDE vendor/ keeps Vite\u2019s default - the rule is the class, not the tree');
-  assert.equal(rule('/x/src/assets/mw/textures/thunderlock.dds'), undefined, 'the port\u2019s own assets included');
+  assert.equal(rule('/x/src/assets/mw/textures/breton_m_hair_01.dds'), undefined, 'the port\u2019s own assets included');
 });
 
 test('EOTB5: the module-level body and camera are one pair', () => {

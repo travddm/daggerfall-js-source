@@ -2,10 +2,9 @@
 //
 // THE PIECES THAT FELL THROUGH THE ITEM MAP, ASSIGNED. With Morrowind data attached a hung weapon or a displayed piece
 // of armour is its Morrowind picture (MW-MOUNT) - but only for what the one item map could read: DFU's own weapons and
-// armour. Three kinds stood as their classic sprites instead: the port's own weapon (the Thunderlock, which is its own
-// shipped model in the hand but was never asked for on the icon or the wall), and Roleplay & Realism Items' two
-// weapons and twelve pieces of armour (templates 513-526), which no row knew - in Morrowind first person those
-// weapons drew empty hands, and worn, those pieces were bare skin. Each now resolves as the classic item of its shape.
+// armour. Roleplay & Realism Items' two weapons and twelve pieces of armour (templates 513-526) stood as their classic
+// sprites instead, because no row knew them - in Morrowind first person those weapons drew empty hands, and worn, those
+// pieces were bare skin. Each now resolves as the classic item of its shape.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,7 +15,6 @@ import { ARMOR_ENUM } from '../../../src/combat/enemyEquipment.js';
 import { ARMOR_MATERIAL } from '../../../src/systems/armorMaterials.js';
 import { RRI_CLASSES } from '../../../src/systems/roleplayRealismItems/rriItems.js';
 import { WEAPONS, WEAPON_MATERIALS } from '../../../src/characters/weapons.js';
-import { THUNDERLOCK_TEMPLATE } from '../../../src/characters/thunderlockIds.js';
 import { createFpArm, fpSkeletonPath, FP_CLIP_PATH } from '../../../src/combat/fpArm.js';
 import { createDecorRoom, MW_STAND_ARCHIVE, decorStandsOwn } from '../../../src/scenes/decor/decorRoom.js';
 import { ITEM_GROUP_NAME_BY_CLASS } from '../../../src/systems/loot/loot.js';
@@ -99,11 +97,10 @@ const ARCHIVE = makeBsa(new Map([
   [fpSkeletonPath({}), f('armfp.nif')], [FP_CLIP_PATH, f('armfpweapon.kf')],
   ['meshes/fixture/armfphand.nif', f('armfphand.nif')], ['meshes/fixture/armfparm.nif', f('armfparm.nif')],
   ['meshes/w/weapon.nif', f('weapon.nif')], ['meshes/w/axe.nif', f('weapon.nif')],
-  ['meshes/thunderlock.nif', f('weapon.nif')],   // the port's own shipped model stands in the list as ownMwAssets' archive does
   ['textures/tx_fixture.dds', f('fixture.dds')],
 ]));
 
-test('MW-ASSIGN the wall and the icon: the Thunderlock hangs as its own shipped model and the Archer\'s Axe as Morrowind\'s axe of its material, where both stood as the classic picture (mutants: the own model unasked; the mod\'s weapon unmapped)', async () => {
+test('MW-ASSIGN the wall and the icon: the Archer\'s Axe hangs as Morrowind\'s axe of its material, where it stood as the classic picture (mutant: the mod\'s weapon unmapped)', async () => {
   const archive = await MwBsaFile.open(new Blob([ARCHIVE]));
   const renderer = {
     createCharacterMesh: () => ({ vao: {}, buffers: [] }),
@@ -120,9 +117,6 @@ test('MW-ASSIGN the wall and the icon: the Thunderlock hangs as its own shipped 
   };
   const res = await arm.build({ race: 'fprace', weapon: { group: 'Weapons', templateIndex: STAFF, material: WEAPON_MATERIALS.Iron }, deps });
   assert.equal(res.ok, true, `${res.stage}: ${res.error}`);
-  const gun = await arm.mountPicture({ group: 'Weapons', templateIndex: THUNDERLOCK_TEMPLATE, material: WEAPON_MATERIALS.Dwarven });
-  assert.ok(gun, 'the Thunderlock pictured');
-  assert.match(gun.key, /:daggerfall_thunderlock:256$/, 'its own model');
   const axe = await arm.mountPicture({ group: 'Weapons', templateIndex: 513, material: WEAPON_MATERIALS.Iron });
   assert.ok(axe, 'the Archer\'s Axe pictured');
   assert.match(axe.key, /:iron war axe:256$/, 'Morrowind\'s one-handed axe, of its material');

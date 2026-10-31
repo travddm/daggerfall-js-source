@@ -10,7 +10,7 @@
 // The first find is said and heard (the HUD's line and the level-up's
 // fanfare): "Wyrmbane - a Legendary! It joins your codex." The Codex
 // page (ui/reforgeWindow.js's fourth) lists every Legendary record (the
-// thirty and the Thunderlock's own, AUDIT LOOT F8) and the Aetheric
+// thirty and any registered one, AUDIT LOOT F8) and the Aetheric
 // sets - a found record whole, an unfound one by where it is found.
 //
 // HOW A FIND IS SEEN. A piece taken from a body or a pile is told at the
@@ -32,10 +32,10 @@
 // It rides the character's save (a mod record). OFF IS DFU EXACTLY: no
 // find is said, no imprint is made, and an imprint sleeps.
 //
-// GILDED1 (2026-10-07): and the GILDED rung's records (systems/gilded.js -
-// the Hourlock, one Brass Remnant's spoils in fifty) - the rarest find in
-// the game is said as the rest are ("The Hourlock - a Gilded piece! It
-// joins your codex.") and listed at the page's head, over the Legendaries,
+// GILDED1 (2026-10-07): and the GILDED rung's records (systems/gilded.js) -
+// the rarest find in the game is said as the rest are ("The Dragonfire
+// Oath - a Gilded piece! It joins your codex.") and listed at the page's
+// head, over the Legendaries,
 // as its rung stands over theirs. A save from before it carries no
 // `gilded` map and reads as none found.
 // ═══════════════════════════════════════════════════════════════════
@@ -146,7 +146,7 @@ export const FAMILY_HINT = Object.freeze({
 });
 /** The codex's Legendary rows, the table's order: `{ id, name, group, found, day, hint, power }` - a found record's
  *  name and power, an unfound one's name withheld ("A Legendary of the weapons") and its hint. AUDIT LOOT F8: EVERY
- *  record the tables hold - the thirty and a registered one (the Thunderlock's Last Lock), whose find the codex already
+ *  record the tables hold - the thirty and any registered one, whose find the codex already
  *  took and said - a record of no family saying its own `hint`. */
 export function codexRows() {
   return allLegendaries().map((r) => {
@@ -165,15 +165,12 @@ export function codexSets() {
   }
   return [...sets].map(([set, pieces]) => ({ set, pieces }));
 }
-/** GILDED1: where a Gilded record is said to be - the Hourlock's, the Brass Remnant's spoils (systems/superDungeon/sdSpoils.js). GILDED2:
- *  a record that says its own (`hint` - the gate's Warden's, the Old Coil's) is said by it. */
-export const GILDED_HINT = 'Said to lie in the brass of the Hour, once in a long while';
 /** GILDED1: the Gilded rows, the records' order: `{ id, kind, name, group, found, day, hint, power, lore }` - as a
  *  Legendary's row is, a found one whole and an unfound one by its hint alone. */
 export function codexGilded() {
   return GILDED_RECORDS.map((r) => {
     const day = foundDay('gilded', r.id), found = day != null;
-    return { id: r.id, kind: 'gilded', name: found ? r.name : null, group: r.group, found, day, hint: r.hint ?? GILDED_HINT, power: found ? r.power : null, lore: found ? r.lore : null };
+    return { id: r.id, kind: 'gilded', name: found ? r.name : null, group: r.group, found, day, hint: r.hint ?? null, power: found ? r.power : null, lore: found ? r.lore : null };
   });
 }
 /** How many found, of how many. */

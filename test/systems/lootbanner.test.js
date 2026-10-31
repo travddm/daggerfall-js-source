@@ -20,7 +20,7 @@ import * as B from '../../src/ui/lootBanner.js';
 import * as CX from '../../src/systems/loot/lootCodex.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '../../src/systems/aetheric.js';
-import { mintHourlock } from '../../src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
 import { wildRecord } from '../../src/systems/wild/wildDeath.js';
 import { ITEM_FIELDS } from '../../src/systems/item/itemFields.js';
@@ -209,7 +209,7 @@ test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece sta
   setPref('soundEnhancements', true);
   const me = hero();
   frame(me);
-  me.items.push(mintAetheric(AETHERIC_RECORDS[0]), mintHourlock());
+  me.items.push(mintAetheric(AETHERIC_RECORDS[0]), mintGilded(DRAGONFIRE_OATH));   // the Dragonfire Oath, the Hourlock's place since the guns' removal
   frame(me);
   const big = byClass(doc.body, 'lootbanner');
   assert.deepEqual(big.map((b) => b.dataset.rarity), ['aetheric', 'gilded'], 'the newest on top');

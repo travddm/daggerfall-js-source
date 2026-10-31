@@ -1,7 +1,7 @@
 // LOOT21 - THE AYLEID STONES (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 13; Mac: "what could we do to make it
 // even more amazing, while also balancing everyrhing?", then "Lets go all in").
 //
-// Two things DFU's roll cannot make, found at the deepest sources through the Thunderlock's registry as LATE finds - the
+// Two things DFU's roll cannot make, found at the deepest sources through the loot door's unique-find registry as LATE finds - the
 // door's last draws, so no seed's earlier draw moves (the arc's law 9): the Welkynd Stone from a source of tier 6 (used,
 // your magicka is full) and the Varla Stone from tier 10 (used, every enchanted piece you wear is whole again - a DFU
 // magic item's charges among them). A stone that would do nothing is not spent.
@@ -60,11 +60,11 @@ test('LOOT21: the finds - late, from tier 6 and tier 10, never in rollUniqueFind
   assert.ok(LR.uniqueFindChance(wf, { kind: 'corpse', tier: 6 }) > 0);
   assert.equal(LR.uniqueFindChance(vf, { kind: 'pile', tier: 9 }), 0);
   assert.ok(LR.uniqueFindChance(vf, { kind: 'pile', tier: 10 }) > 0);
-  // rollUniqueFinds never rolls them: at tier 21 it draws once for each find that is not late (none found - a found
-  // Thunderlock's mint draws its own), and with every draw a find, still no stone
+  // rollUniqueFinds never rolls them: at tier 21 it draws once for each find that is not late (none found), and with
+  // every draw a find, still no stone
   let drawn = 0;
   LR.rollUniqueFinds({ kind: 'corpse', tier: 21, boss: true, luck: 50 }, () => { drawn++; return 0.999; });
-  assert.equal(drawn, finds.filter((f) => !f.late && !f.final).length);   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): a final find (the Dwemer Pellet's) is the door's last draw, never rollUniqueFinds'
+  assert.equal(drawn, finds.filter((f) => !f.late && !f.final).length);   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): a final find is the door's last draw, never rollUniqueFinds'
   assert.ok(!LR.rollUniqueFinds({ kind: 'corpse', tier: 21, boss: true, luck: 50 }, () => 0).some((it) => isWelkyndStone(it) || isVarlaStone(it)));
   // rollLateFinds rolls them alone, the Welkynd first
   drawn = 0;
@@ -86,7 +86,7 @@ test('LOOT21: the finds - late, from tier 6 and tier 10, never in rollUniqueFind
   // the gem arc's - off here (a tier with no chance takes no draw), so the stones are this replay's last two draws;
   // test/tech1_roster holds the technique pass the door's very last
   LR._setTechniqueForTests({});
-  LR._holdFinalFindsForTests(true);   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's final find is the door's draw after the technique's - held off here as the technique is; test/systems/pelletsscarce.test.js holds it the door's very last
+  LR._holdFinalFindsForTests(true);   // a final find is the door's draw after the technique's - held off here as the technique is (none is registered since the guns' removal)
   try {
     for (let seed = 1; seed < 30; seed++) {
       const base = lcg(seed);
@@ -113,7 +113,9 @@ test('LOOT21: the finds - late, from tier 6 and tier 10, never in rollUniqueFind
   setPref('lootRarity', false);
   const offList = [createWeapon(120, 1)];
   LR.rollLootRarity(offList, src, { rolls: () => 0 });
-  assert.ok(!offList.some((it) => isWelkyndStone(it) || isVarlaStone(it)) && offList.slice(1).every((it) => /Pellet/.test(it.name)), 'no stone');   // PIN MOVED (AUDIT SHIP C2): the switch off still drops the Pellet's final find - a find, not a tier - and nothing else
+  // the switch off still rolls the final finds (AUDIT SHIP C2), but none is registered since the Dwemer Pellet's went
+  // with the guns, so the list is DFU's alone
+  assert.equal(offList.length, 1, 'no stone, nothing added');
   _resetForTests();
 });
 
@@ -155,7 +157,7 @@ test('LOOT21: the uses through useItem\'s registered arm - the Welkynd fills the
   assert.equal(STONE_TEXT.varla(1), 'The Varla Stone flares and is spent. An enchanted piece you wear is whole again.');
 });
 
-test('LOOT21: the Test Room lays one of each; the registration rides the Thunderlock\'s wire', () => {
+test('LOOT21: the Test Room lays one of each', () => {
   on();
   const added = seedTestLoot({ items: [] }, lcg(1));
   assert.equal(added.filter(isWelkyndStone).length, 1);

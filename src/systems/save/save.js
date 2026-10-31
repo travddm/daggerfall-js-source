@@ -793,6 +793,26 @@ export function dropRetiredCardItems(/** @type {any[]} */ list) {
   return dropped;
 }
 
+/** The templates of the removed guns: the Dwarven Thunderlock (560), the Dwemer Pellet (561) and the Dwarven Pistolet
+ *  (562). The game no longer registers them, so a save's record of one is an item nothing can draw, fire or price. */
+const RETIRED_GUN_TEMPLATES = Object.freeze(new Set([560, 561, 562]));
+/** The Gilded record removed with the guns. A save may hold it on the Long Bow it was last minted as. */
+const RETIRED_GILDED_ID = 'the-hourlock';
+/** Every gun, Pellet stack and Hourlock taken out of `list`, in place - unequipped first, so no slot keeps a piece the
+ *  pack no longer holds; how many went. */
+export function dropRetiredGunItems(/** @type {any} */ entity, /** @type {any[]} */ list) {
+  let dropped = 0;
+  for (let i = list.length - 1; i >= 0; i--) {
+    const item = list[i];
+    const retired = RETIRED_GUN_TEMPLATES.has(item?.templateIndex) || item?.gilded === RETIRED_GILDED_ID;
+    if (!retired) continue;
+    if (entity && isEquipped(item)) unequipSlot(entity, item.equipSlot);
+    list.splice(i, 1);
+    dropped++;
+  }
+  return dropped;
+}
+
 /** PORTAL1 (AUDIT PORTAL1 U9): how many saves this page has restored - every load, whichever host runs it, passes the one
  *  door below, so a host that must end something at EVERY load (scenes/world.js: the portals standing) asks this count
  *  rather than each branch of each load. */
@@ -999,6 +1019,11 @@ export function restorePlayer(entity, snap, spellsByIndex = null) {
   for (const list of savedItemLists(snap, entity)) {
     const n = dropRetiredCardItems(list);
     if (n) console.info(`[save] ${n} card game item(s) from the removed card games dropped`);
+  }
+  // A gun, a Pellet stack or the Hourlock kept from before the guns were removed leaves every list the same way
+  for (const list of savedItemLists(snap, entity)) {
+    const n = dropRetiredGunItems(entity, list);
+    if (n) console.info(`[save] ${n} gun item(s) from the removed guns dropped`);
   }
   giveLockpickGift(entity);   // LOCKPICK: and a picking class from before the lockpick, its picks - at the pack's end too
   entity.activeEffects = (snap.activeEffects ?? []).filter((a) => !a.heldItem && !a.bundleDuel).filter((a) => effectKindLoaded(a.kind)).map(copyEffectEntry);   // E2: a stale pin in an old snapshot cannot re-link - drop it (DFU :2312); AUDIT DUEL1 B4: nor a duel's spell a save from before the filter kept; AUDIT PRE-MERGE 0928 S3: nor an effect of a mod not loaded (Come Sail Away's water walk)

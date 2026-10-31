@@ -86,7 +86,6 @@ const SURV_LOOT = await load('../src/systems/survival/loot.js');
 const SURV_SWITCH = await load('../src/systems/survival/switch.js');
 const FORAGE = await load('../src/systems/foraging/foragingInstall.js');
 const FORAGE_LAW = await load('../src/systems/foraging/foragingLaw.js');
-const THUNDER = await load('../src/systems/thunderlock.js');
 const AYLEID = await load('../src/systems/ayleidStones.js');
 const WALLET = await load('../src/systems/walletItem.js');
 const KEEPSAKE = await load('../src/systems/livingWorld/keepsake.js');
@@ -476,11 +475,8 @@ function sweep({ seeds, run, skip }) {
       }
       for (const id of AETH.PANOPLY_SET_PIECES.map((r) => r.id)) one(AETH.panoplyPieceById(id));   // EG15: and the Broker's weekly sink, by id
     });
-    run('gilded.mintGilded / mintHourlock', (one) => {
+    run('gilded.mintGilded', (one) => {
       for (const r of GILD.GILDED_RECORDS) one(GILD.mintGilded(r));
-      for (const r of GILD.GILDED_ERAS) one(GILD.mintGilded(r));   // GUNS-UNFOUND: the guns minted before, as a save holds them
-      one(GILD.mintHourlock());
-      for (const s of seedsOf(S * 4)) one(GILD.rollHourlock(seeded(s)));   // one draw in fifty
     });
 
     // ── 6. the Reforge, on the pieces the doors above minted ──
@@ -1059,10 +1055,6 @@ function runHomes(run, seedsOf, S, minted) {
       for (const it of items) one(it);
     }
   });
-  run('thunderlock.createThunderlock / createPellets', (one) => {
-    for (let material = 0; material <= 9; material++) one(THUNDER.createThunderlock({ material }));
-    for (const n of [1, 5, 20, 50]) one(THUNDER.createPellets(n));
-  });
   run('ayleidStones / gateSpoils stones', (one) => {
     one(AYLEID.welkyndStone()); one(AYLEID.varlaStone());
     for (const n of [1, 3, 10]) { for (const it of [].concat(GATE.welkyndShards(n) ?? [])) one(it); for (const it of [].concat(GATE.portalStones(n) ?? [])) one(it); }
@@ -1249,7 +1241,10 @@ function runPackActs(run, seedsOf, minted) {
       for (const it of LOOT.generateItems('C', { level: 10, gender: 'male' }, rolls)) INV.addItem(list, copyItem(it));
       for (const it of LOOT.generateItems('C', { level: 10, gender: 'male' }, rolls)) INV.addItem(list, copyItem(it));
       for (const key of LOOT.CLASSIC_RECIPE_KEYS.slice(0, 4)) { INV.addItem(list, LOOT.createPotion(key)); INV.addItem(list, LOOT.createPotion(key)); }
-      INV.addItem(list, Object.assign(THUNDER.createPellets(20))); INV.addItem(list, THUNDER.createPellets(7));
+      // two arrow stacks that merge (the Dwemer Pellets' stacks stood here until the guns were removed)
+      const arrowStack = (count) => Object.assign(ENEMY_EQ.createWeapon(ENEMY_EQ.ARROW_TEMPLATE, 0, seeded(s)), { stackCount: count });
+      INV.addItem(list, arrowStack(20));
+      INV.addItem(list, arrowStack(7));
       for (const it of [...list]) if ((it.stackCount ?? 1) > 1) INV.splitStack(list, it, 1 + Math.floor(rolls() * ((it.stackCount ?? 2) - 1)), { rolls });
       all(list);
     }

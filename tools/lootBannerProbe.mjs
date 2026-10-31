@@ -40,7 +40,7 @@ import { setPref } from '/src/systems/uiPrefs.js';
 import * as LR from '/src/systems/loot/lootRarity.js';
 import { createWeapon } from '/src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '/src/systems/aetheric.js';
-import { mintHourlock } from '/src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '/src/systems/gilded.js';
 import { addItem } from '/src/systems/inventory.js';
 
 setPref('lootRarity', true);
@@ -80,7 +80,7 @@ const SCENES = {
   // three tiers at once, beside two notices: the stack steps under them
   mixed: () => { notice = true; return [tiered('rare', 113, 3), Object.assign(legend('wyrmbane'), { exalted: true }), tiered('legendary', 121, 4)]; },
   // the top tiers: big banners
-  big: () => { notice = false; return [mintAetheric(AETHERIC_RECORDS[0]), mintHourlock(), Object.assign(tiered('rare', 120, 5), { artifact: true, name: 'Mace of Molag Bal' })]; },
+  big: () => { notice = false; return [mintAetheric(AETHERIC_RECORDS[0]), mintGilded(DRAGONFIRE_OATH), Object.assign(tiered('rare', 120, 5), { artifact: true, name: 'Mace of Molag Bal' })]; },
   // a burst: three stand, the best first, the rest wait
   burst: () => { notice = false; return [tiered('rare', 113, 7), tiered('rare', 120, 8), legend('graveward'), tiered('rare', 121, 10), mintAetheric(AETHERIC_RECORDS[0]), tiered('legendary', 121, 9)]; },
 };

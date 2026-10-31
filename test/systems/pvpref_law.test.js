@@ -7,12 +7,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   SIEGE_ROOM, siegeRoomKey, isSiegeRoom, siegeOfRoom, SIEGE_VITALITY, siegeVitality, SIEGE_UNITS_PER_M, SIEGE_REACH, SIEGE_HIT, SIEGE_BLOWS_HZ,
-  SIEGE_CASTS, SIEGE_SPEED, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, SIEGE_WEAPONS, SIEGE_WEAPON_MAX, SIEGE_THUNDERLOCK,
+  SIEGE_CASTS, SIEGE_SPEED, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, SIEGE_WEAPONS, SIEGE_WEAPON_MAX,
   SIEGE_MATERIAL_MOD, SIEGE_FIST_MAX, SIEGE_BONUS, SIEGE_BONUS_MAX, SIEGE_CRIT_MAX, siegeBlowMax, siegeIsBow, siegeHeld, newFighter,
   refereeBlow, refereeCast, refereeStep, siegeNextWave, siegeRise,
 } from '../../src/net/siege/siegeRef.js';
 import { WEAPONS, WEAPON_MATERIALS, weaponMaxDamage, weaponMaterialModifier } from '../../src/characters/weapons.js';
-import { THUNDERLOCK_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 import { damageModifier, handToHandMaxDamage } from '../../src/combat/formulas.js';
 import { pcaaoDamageModifier } from '../../src/combat/pcaao.js';
 import { rrDamageModifierClassic } from '../../src/systems/roleplayRealism/rrRealism.js';
@@ -32,7 +31,6 @@ test('PVP-REF THE TABLES ARE DFU\'S: every weapon template\'s top and every mate
   const ids = Object.entries(WEAPONS).filter(([k]) => k !== 'Arrow');
   assert.deepEqual(Object.entries(SIEGE_WEAPONS), ids, 'the same templates, by name');
   for (const [, w] of ids) assert.equal(SIEGE_WEAPON_MAX[w], weaponMaxDamage(w), `template ${w}`);
-  assert.deepEqual([SIEGE_THUNDERLOCK.template, SIEGE_THUNDERLOCK.max], [THUNDERLOCK_TEMPLATE, weaponMaxDamage(THUNDERLOCK_TEMPLATE)]);
   assert.deepEqual([...SIEGE_MATERIAL_MOD], Object.values(WEAPON_MATERIALS).filter((m) => m >= 0).map(weaponMaterialModifier));
   assert.equal(SIEGE_FIST_MAX, handToHandMaxDamage(100));
   assert.equal(SIEGE_BONUS.strength, Math.floor((100 - 50) / 5), 'FormulaHelper.DamageModifier(100), stock');
@@ -49,9 +47,9 @@ test('PVP-REF THE BUCKETS (6.1: "DFU\'s own damage range for that weapon at that
   for (const [, w] of Object.entries(SIEGE_WEAPONS)) {
     for (let m = 0; m <= 9; m++) assert.equal(siegeBlowMax(w, m), (weaponMaxDamage(w) + weaponMaterialModifier(m) + SIEGE_BONUS_MAX) * SIEGE_CRIT_MAX, `${w}/${m}`);
   }
-  assert.deepEqual([siegeBlowMax(123, 9), siegeBlowMax(113, 0), siegeBlowMax(-1, 0), siegeBlowMax(null, 0), siegeBlowMax(9999, 0), siegeBlowMax(560, 9)], [124, 80, 112, 112, 0, 134]);
+  assert.deepEqual([siegeBlowMax(123, 9), siegeBlowMax(113, 0), siegeBlowMax(-1, 0), siegeBlowMax(null, 0), siegeBlowMax(9999, 0)], [124, 80, 112, 112, 0]);
   assert.equal(siegeBlowMax(113, 42), (6 + 0 + 35) * 2, 'a material past the table: no modifier');
-  assert.deepEqual([siegeIsBow(129), siegeIsBow(130), siegeIsBow(560), siegeIsBow(123), siegeIsBow(-1)], [true, true, true, false, false]);
+  assert.deepEqual([siegeIsBow(129), siegeIsBow(130), siegeIsBow(123), siegeIsBow(-1)], [true, true, false, false]);
   const look = { items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }, { templateIndex: 102, group: 'Armor', equipSlot: 21, material: 9 }] };   // PIN MOVED (AUDIT-SEATS): R8 - held is in a hand (the right's 19; the armour in the left's 21 is still no weapon)
   assert.deepEqual(siegeHeld(look, 123, 9), { w: 123, m: 9 });
   assert.equal(siegeHeld(look, 123, 8), null, 'another material than the one held');

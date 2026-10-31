@@ -55,8 +55,7 @@ export const keyboardLookRate = () => (Math.PI / 180) * KEYBOARD_LOOK_UNITS_PER_
  *  times `sensitivityScale` (MouseLookSensitivity, StartGameBehaviour.cs:217), InvertMouseVertical applied there, after
  *  the axis. The port's frame latch (player/lookFilter.js takeFrameLook) holds the camera's RADIANS, pitch already
  *  inverted - handed to the mods as it was, a turn swayed them a fourteenth of their own (at the default 2.0: 180/pi
- *  over 4). So: degrees, over the field times the setting, the invert undone. The Thunderlock's own feel keeps the
- *  radians its lab is tuned on (gun-proto.html feeds them; FIELD-GUN8's "1:1" is with the lab). */
+ *  over 4). So: degrees, over the field times the setting, the invert undone. */
 export function dfuLookAxes(look) {
   const k = (180 / Math.PI) / (LOOK_SENSITIVITY_FIELD * getFloat('Controls', 'MouseLookSensitivity', 0.1, 16.0));
   return [(look?.[0] ?? 0) * k, (look?.[1] ?? 0) * k * lookInvert()];

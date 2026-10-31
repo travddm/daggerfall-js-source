@@ -207,9 +207,8 @@ test('FA1: every host that MOUNTS a missile arms it and drops its clock on retir
   const read = (f) => hostText(`src/${f}`);
   for (const host of ['scenes/dungeonContext.js', 'scenes/hostMagic.js']) {
     const src = read(host);
-    // FIELD-GUN14: dungeonContext's record is a variable now, because
-    // an arrow can bring its own flat (the Thunderlock's orb) - it is
-    // still 0 for every spell missile, which is what the `0` was.
+    // FIELD-GUN14: dungeonContext names its record in a variable - it
+    // is 0 for every spell missile, which is what the `0` was.
     assert.match(src, /armFlatAnim\(m\.batch, t, archive, (?:0|record), flatAnims, uploadRecordFrame, \{ fps: MISSILE_FPS \}\)/,
       `${host} mounts a missile flat it never animates`);
     assert.match(src, /flatAnims\.remove\(m\.batch\)/,

@@ -41,12 +41,11 @@ test('NAV-E the ten clips (AUDIT NAV1: the run-out the seventh, the ready the ei
   }
 });
 
-test('NAV-E the bake is deterministic and the gun lab\'s kit moved whole: tools/navalSfx.mjs writes the ten shipped files byte for byte, and tools/gunSfx.mjs - on the shared tools/sfxSynth.mjs now - its three as they were (mutants: an unseeded noise, the kit changed under the guns)', () => {
+test('NAV-E the bake is deterministic: tools/navalSfx.mjs writes the ten shipped files byte for byte (mutants: an unseeded noise)', () => {
   const dir = mkdtempSync(join(tmpdir(), 'navsfx-'));
   try {
     execFileSync(process.execPath, [join(root, 'tools/navalSfx.mjs')], { cwd: dir, stdio: 'pipe' });
-    execFileSync(process.execPath, [join(root, 'tools/gunSfx.mjs')], { cwd: dir, stdio: 'pipe' });
-    const files = [...Object.values(NAVAL_SFX_FILES), 'gun-fire-synth.wav', 'gun-reload-open-synth.wav', 'gun-reload-close-synth.wav'];
+    const files = Object.values(NAVAL_SFX_FILES);
     for (const f of files) {
       assert.ok(readFileSync(join(dir, 'public/sfx', f)).equals(readFileSync(join(root, 'public/sfx', f))), `${f}: the bake's bytes`);
     }

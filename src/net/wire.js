@@ -2042,7 +2042,7 @@ export function validPose(p) {
     // (validLook's `class` law): a right-handed human's pose keeps the bytes it always had.
     ...(uint(lh, 1) ? { lh: 1 } : {}),
     // AUDIT MIXED-PAIR L4-3 (bible/05-Combat/Two-Hands.md, Peers on the wire): `ah` 1 when the last strike was a PAIR's
-    // LEFT hand's - a blade-and-Pistolet pair's or two blades' - so the others play it with that hand's weapon and group
+    // LEFT hand's - two blades' - so the others play it with that hand's weapon and group
     // (a shot as a shot, a blade's blow as a blade's) off the two hands the look carries. It changes with `an` alone, so
     // poseChanged's swing edge carries it. OMITTED otherwise: a pose with no left blow keeps the bytes it always had.
     ...(uint(ah, 1) ? { ah: 1 } : {}),

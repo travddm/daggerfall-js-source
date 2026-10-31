@@ -112,9 +112,6 @@ archive keyed by `ownMwDataPath` (`meshes/x.nif`). A file added in the right fol
 template and material each mesh replaces and which Morrowind part slot it fills. A player's loose file with the same
 path replaces the shipped one.
 
-The tree also holds gun meshes (`thunderlock.nif`, `pistolet*.nif`, `Pellet_Shot.fbx`), and
-`ownWeaponModels.js` maps them; both belong to a feature being removed.
-
 ## Tests
 
 `test/formats/morrowind/` runs on synthetic fixtures in `test/fixtures/mw/` (small NIF, KF, ESM, BSA and DDS files plus

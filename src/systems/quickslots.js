@@ -54,7 +54,7 @@ import { isEnchanted } from './inventory.js';   // UI2: an enchanted piece shows
 import { ENCHANTMENT_TYPES } from '../formats/magicDef.js';   // RPT1026-PROGRESS: a worn piece's Cast When Used
 import { isPower } from './enchantmentCatalogue.js';   // AUDIT RPT1026 F2: a power beside Cast When Used, never a side effect's cost
 import { shownSpellName } from './loot/loot.js';   // L10N3e: a slotted spell's name as the book shows it - the stored name stays the canonical one
-import { isAmmunition } from './item/itemTemplates.js';   // THUNDERLOCK-ART: a stack of shot shows its count, never a wear bar (the pack's rule)
+import { isAmmunition } from './item/itemTemplates.js';   // a stack of arrows shows its count, never a wear bar (the pack's rule)
 
 import { expandRowValues } from './quest/questMacros.js';   // MACROS1: a used item's record through its own context (%map)
 import { racialSuppressInventory, LYCANTHROPY_SPELL_TAG } from './lycanthropy.js';   // DISC10-E L3: the pack's refusal, at the two doors that reach into it; HB-LYCFREE: the curse's free spell
@@ -1165,7 +1165,7 @@ export function hotbarView(entity, { readiedIndex = null, size = HOTBAR_CAPACITY
  *  pieces what the pack's tile shows a bar on (armour, and anything enchanted: its powers spend its condition). Never
  *  a gem, a book or a potion - a bar on everything is the noise the bar exists to cut. THUNDERLOCK-ART: and never
  *  ammunition, the pack's own word (ui/enhanced/enhancedInventory.js wearPct: "an arrow is spent, not worn") - a stack of arrows
- *  or pellets slotted as a weapon drew a bar under its count, the two on top of each other. */
+ *  slotted as a weapon drew a bar under its count, the two on top of each other. */
 const showsWear = (kind, item) => !isAmmunition(item) && (kind === 'weapon' || kind === 'shield' || kind === 'light'
   || item.group === 'Armor' || isEnchanted(item));   // AUDIT UI B6: anything enchanted - the Sanguine Rose spends its condition as a ring does (the pack's wearPct)
 

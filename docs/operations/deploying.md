@@ -34,8 +34,7 @@ ones, or let the next push to `main` retry them. Every deploy is idempotent.
 2. Runs `verify.yml` on it (without its own build) in parallel with the site build.
 3. Builds the site: `npm ci`, `npm run build` (Vite, `vite.config.js`, `base: './'`). The build writes the commit
    into `src/buildTag.js` (`prebuild`: `scripts/buildTag.mjs`) and restores the file after (`postbuild`).
-4. Adds previews under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`, and two weapon lab builds
-   (`vite.config.gun.js`, `vite.config.pistol.js`) that belong to features being removed. **A missing
+4. Adds a preview under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`. **A missing
    `chatgpt/exact-face-atlas` branch fails the site deploy.** Remove the step when that preview is no longer wanted.
 5. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
 

@@ -76,7 +76,6 @@ import { installRoleplayRealismItems } from '../../src/systems/roleplayRealismIt
 import { installRoleplayRealism } from '../../src/systems/roleplayRealism/rrInstall.js';
 import { rriMeleeWeaponAnimTime } from '../../src/systems/roleplayRealismItems/rriRealism.js';
 import { liveStat } from '../../src/systems/statMods.js';
-import { THUNDERLOCK_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 import { raisePlayerSkills } from '../../src/scenes/shared.js';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -666,7 +665,7 @@ test('AUDIT MARTIAL L5 M1: EVERY LINE ON BOTH SIDES, EVERY WINDOW AT ITS END - S
   edge('Mark of the Hunt', () => { const me = pathFighter('ranger'); door([], me); const prey = realFoe(ORC); land('huntersMark', rec('p', prey), 10); return { me, prey }; }, ({ me, prey }) => POW.martialBlowPct(me, prey) === N.huntersMark.pct, N.huntersMark.seconds);
 }));
 
-test('AUDIT MARTIAL L5 M2 / L5 L1: THE LAW\'S GUARDS - a mentored Ranger keeps the pounce (held), its powers at the mentor\'s share (MENTOR2 - they had slept); a path restored with one of its skills unmastered (the save restores the id alone) holds nothing; the Thunderlock past 100 is paid on Archery; the hand at rest (restingWeapon) names the form (mutants: the signature through awake; a mastery unread; the Thunderlock unpaid; the resting hand unread)', () => clean(() => {
+test('AUDIT MARTIAL L5 M2 / L5 L1: THE LAW\'S GUARDS - a mentored Ranger keeps the pounce (held), its powers at the mentor\'s share (MENTOR2 - they had slept); a path restored with one of its skills unmastered (the save restores the id alone) holds nothing; the hand at rest (restingWeapon) names the form (mutants: the signature through awake; a mastery unread; the resting hand unread)', () => clean(() => {
   const ranger = pathFighter('ranger');
   ranger.level = 30;
   ranger._mentor = mentorProfile(ranger, [5]);
@@ -678,8 +677,6 @@ test('AUDIT MARTIAL L5 M2 / L5 L1: THE LAW\'S GUARDS - a mentored Ranger keeps t
     assert.equal(MP.martialHeld(forged), null, `${label} unmastered: nothing held`);
     assert.equal(techniqueInHand(forged, { weapon: weapon(have[0] === LB ? WEAPONS.Longsword : WEAPONS.Long_Bow) }), null);
   }
-  const archer = fighter([AR], 200);
-  assert.equal(WM.weaponPastPct(weapon(THUNDERLOCK_TEMPLATE), archer, realFoe(ORC), { online: true }), 40, 'the Thunderlock is scored on Archery, and paid on it');
   const r = pathFighter('ranger');
   assert.equal(techniqueInHand(r, { restingWeapon: weapon(WEAPONS.Long_Bow), weapon: weapon(WEAPONS.Longsword) })?.id, 'huntersMark', 'the lead hand at rest names it');
 }));

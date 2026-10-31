@@ -64,10 +64,9 @@ import { hasResurrect, RESURRECT_REACH, RESURRECT_TEXT, pickFallenBody } from '.
 import { billboardSize, centredBase } from '../world/rmbFlats.js';
 import { betterAmbience } from '../systems/betterAmbience.js';   // IMPACTFEEL: the camera kick a landing spell gives
 import { getPref } from '../systems/uiPrefs.js';   // RPT1026-CLIENT: another player's spell's share of it
-import { SpellImpactFx, SpellImpactPass, SPELL_IMPACT_PROGRAMS, elementFxKind, IMPACT_FX_KINDS } from '../render/spellImpactFx.js';
+import { SpellImpactFx, SpellImpactPass, SPELL_IMPACT_PROGRAMS, elementFxKind, IMPACT_FX_KINDS, missileColourFrom } from '../render/spellImpactFx.js';   // IMPACTFX: a landing spell in light - its element's spray, a heal's rising lines; ART-COLOUR: a missile archive's own colour
 import { warmPrograms } from '../render/warmPrograms.js';   // PERF-COMPILE1: the impact pass at idle
 import { startPrograms } from '../render/glProgram.js';   // SHADER-STALL: and built once its compile is done
-import { orbColourFrom } from '../characters/thunderlockIds.js';   // ART-COLOUR: a missile archive's own colour, the Thunderlock orb's sampler   // IMPACTFX: a landing spell in light - its element's spray, a heal's rising lines
 import { createSpellImpactSounds } from '../systems/spell/spellImpactSound.js';   // IMPACTFX: ...and heard
 import { createMagicCandle } from './magicCandle.js';   // X11: the Light effect's candle
 import { CAPSULE_HEIGHT } from '../player/motor.js';   // PlayerController.height, the candle's y term
@@ -665,7 +664,7 @@ export function createPlayerMagic({
   const impactSounds = createSpellImpactSounds(audio);
   // ART-COLOUR: EACH ELEMENT'S BURST WEARS ITS OWN ART'S COLOUR. Once per element, the first time a missile of it flies
   // or lands, its archive (375-379, missileArchive) is asked for (it is warm by then: the missile itself draws from it)
-  // and its impact flash's first frame - record 1, what the burst is drawn over - sampled the Thunderlock orb's way.
+  // and its impact flash's first frame - record 1, what the burst is drawn over - sampled by missileColourFrom.
   // Its flight record 0 answers if the flash has no colour in it. Until then the burst wears its first guess.
   const _artAsked = new Set();
   function noteElementArt(el) {
@@ -673,7 +672,7 @@ export function createPlayerMagic({
     _artAsked.add(el);
     Promise.resolve().then(() => getTexture(missileArchive(el))).then((t) => {
       if (!t?.getColor32 || !t?.getDFBitmap) return;
-      const sample = (rec) => { try { return (t.recordCount == null || rec < t.recordCount) ? orbColourFrom(t.getColor32(t.getDFBitmap(rec, 0), 0)) : null; } catch { return null; } };
+      const sample = (rec) => { try { return (t.recordCount == null || rec < t.recordCount) ? missileColourFrom(t.getColor32(t.getDFBitmap(rec, 0), 0)) : null; } catch { return null; } };
       const c = sample(1) ?? sample(0);
       if (c) fx.setArtColour(elementFxKind(el), c);
     }).catch(() => { /* the first guess stands */ });

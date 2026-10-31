@@ -11,8 +11,7 @@
 // the climb that pays) is worth this, to effective 140 at 200:
 //
 //   Long Blade    every blow 1% harder (x1.4)                                   the WEAPON BLOW modifier
-//   Archery       every arrow 1% harder (x1.4) - the Thunderlock's shot too,     the WEAPON BLOW modifier
-//                 scored on Archery (its departure)
+//   Archery       every arrow 1% harder (x1.4)                                  the WEAPON BLOW modifier
 //   Axe           a blow at a foe under half its health 2% harder (x1.8):        the WEAPON BLOW modifier
 //                 the axe finishes
 //   Blunt Weapon  a blow at a foe at half its health or more 2% harder (x1.8):   the WEAPON BLOW modifier
@@ -55,10 +54,10 @@ export const WEAPON_GEAR_PER_POINT = 0.44;
 export const WEAPON_GEAR_PCT_MOST = 320;
 
 /** The skill a blow is struck with, by its family (combat/technique/techniqueRoster.js techniqueFamily - an RRI class's
- *  own included): the bare hand Hand-to-Hand, the Thunderlock Archery (it is scored on it). Null for anything else. */
+ *  own included): the bare hand Hand-to-Hand. Null for anything else. */
 const SKILL_OF_FAMILY = Object.freeze({
   longBlade: SKILLS.LongBlade, shortBlade: SKILLS.ShortBlade, axe: SKILLS.Axe, blunt: SKILLS.BluntWeapon,
-  archery: SKILLS.Archery, thunderlock: SKILLS.Archery, handToHand: SKILLS.HandToHand,
+  archery: SKILLS.Archery, handToHand: SKILLS.HandToHand,
 });
 export const blowSkillOf = (weapon) => (weapon ? SKILL_OF_FAMILY[techniqueFamily(weapon) ?? ''] ?? null : SKILLS.HandToHand);
 

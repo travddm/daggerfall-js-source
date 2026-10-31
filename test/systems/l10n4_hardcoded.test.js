@@ -29,7 +29,6 @@ const HARDCODED = {
   'src/characters/orcBody.js': 3,
   'src/characters/ownModels/ownArmorModels.js': 14,
   'src/characters/ownModels/ownClothingModels.js': 2,
-  'src/characters/ownModels/ownWeaponModels.js': 6,   // PISTOLET: the Pistolet's and the Sunken Sovereign's rows - a bone name and two record names the Morrowind item map reports, as the Thunderlock's and the Hourlock's (AUDIT PISTOLET M2)
   'src/characters/paperdoll/paperdollPayload.js': 2,
   'src/characters/undeadBody.js': 8,
   'src/characters/villagerDesigns.js': 27,
@@ -37,7 +36,7 @@ const HARDCODED = {
   'src/combat/combatStats.js': 10,
   'src/combat/diverseWeapons/diverseWeaponsAssets.js': 1,
   'src/combat/enemyEquipment.js': 1,
-  'src/combat/fpArm.js': 73,
+  'src/combat/fpArm.js': 72,   // guns removed: -1
   'src/combat/pcaao.js': 19,
   'src/combat/playerWeapon.js': 2,
   'src/combat/rriEnemyEquipment.js': 9,
@@ -45,7 +44,6 @@ const HARDCODED = {
   'src/combat/siegeCombat.js': 2,
   'src/combat/technique/techniqueRoster.js': 16,
   'src/combat/techniques.js': 16,
-  'src/combat/weapon/weaponRig.js': 1,
   'src/combat/weapon/weaponWidgetAssets.js': 1,
   'src/formats/bookFile.js': 2,
   'src/formats/bssFile.js': 1,
@@ -384,7 +382,7 @@ const HARDCODED = {
   'src/systems/gate/gateOmen.js': 10,
   'src/systems/gate/gateSpoils.js': 3,
   'src/systems/gateTier.js': 4,
-  'src/systems/gilded.js': 16,   // GILDED2: the Dragonfire Oath's and the Sunken Sovereign's names, powers, lore and hints - written as the Hourlock's are   // AUDIT PISTOLET A7 C1 D8: +1, the Sunken Sovereign's saber-era lore - an item's own story, as the records' are
+  'src/systems/gilded.js': 10,   // GILDED2: the Dragonfire Oath's and the Sunken Sovereign's names, powers, lore and hints - an item's own story   // guns removed: -6, the Hourlock and the gun eras gone
   'src/systems/gravestoneLore.js': 16,
   'src/systems/guild/guilds.js': 3,
   'src/systems/handheldTorches.js': 12,
@@ -419,7 +417,7 @@ const HARDCODED = {
   'src/systems/livingWorld/trips.js': 1,
   'src/systems/localeCatalog.js': 3,
   'src/systems/loot/loot.js': 2,
-  'src/systems/loot/lootCodex.js': 12,
+  'src/systems/loot/lootCodex.js': 11,   // guns removed: -1, GILDED_HINT gone
   'src/systems/loot/lootPowers.js': 7,
   'src/systems/loot/lootRarity.js': 250,
   'src/systems/loot/lootScry.js': 8,
@@ -452,7 +450,7 @@ const HARDCODED = {
   'src/systems/party/partyTravelLaw.js': 28,
   'src/systems/peerWord.js': 2,
   'src/systems/physicalItems.js': 25,
-  'src/systems/portBooks.js': 37,   // GUN-LORE: +20, Rourken Thunder (the guns and the shot) - a port book's pages are written into the BOK format's bytes and read whole, and no language holds a -LOC book for one (ui/bookDoor.js), so they are English as On the Burning Doors is
+  'src/systems/portBooks.js': 18,   // a port book's pages are written into the BOK format's bytes and read whole, and no language holds a -LOC book for one (ui/bookDoor.js), so they are English   // guns removed: -19, Rourken Thunder gone
   'src/systems/portPlaces.js': 8,
   'src/systems/portalStone.js': 21,   // PORTAL-BULK: -2, the counter's offer and its sale's line through t() (portal.buy.ask, portal.buy.bought - their plurals the count's)
   'src/systems/potionRecipes.js': 15,
@@ -528,9 +526,7 @@ const HARDCODED = {
   'src/systems/survival/tavernMenu.js': 129,
   'src/systems/survival/temperature.js': 13,
   'src/systems/talk/talk.js': 2,
-  'src/systems/testRoom.js': 59,   // PISTOLET: +2, the test room's two Dwarven Pistolet rows (the Thunderlock's own were counted)
-  'src/systems/thunderlock.js': 11,   // KETCH: +3, the Thunderlock's, the Pistolet's and the Pellet's descriptions, their lore through the dweamer - an item's own record, as its name and power are; the Last Lock's hint 'No longer found' (no gun drops) in its old one's place, no count (AUDIT KETCH L5-10: the reason counted the hint among the three)
-  'src/systems/pistolet.js': 1,   // PISTOLET: the template row's name, 'Dwarven Pistolet' - the Thunderlock's row's is counted the same way
+  'src/systems/testRoom.js': 55,   // guns removed: -4, the test room's gun rows gone
   'src/systems/tradePack.js': 10,
   'src/systems/translationPacks.js': 1,
   'src/systems/travel/travelBands.js': 1,
@@ -568,7 +564,6 @@ const HARDCODED = {
   'src/tools/enhanced/enhancedUI.js': 24,
   'src/tools/enhanced/enhancedVisuals.js': 1,
   'src/tools/firmamentLab.js': 3,
-  'src/tools/gunLab.js': 7,
   'src/tools/mwViewer.js': 9,
   'src/tools/paperdoll/paperdollViewer.js': 18,
   'src/tools/studioLab.js': 3,   // STUDIO1: the studio page's own words to the game's artists (studio.html) - no player reads them
@@ -787,7 +782,7 @@ const HARDCODED = {
   'src/world/oceanHoles.js': 9,
   'src/world/outdoors.js': 2,
   'src/world/passiveFish.js': 5,
-  'src/world/eliteGates/pseudoArchives.js': 48,   // GHOSTFENCE (AUDIT RED-MOUNTAIN, CI): +1, the Ghostfence's art row (GHOSTFENCE_ARCHIVE) - the registry's own words for a developer; LOCKPICK (main): +1, the Lockpick's picture's row (LOCKPICK_ARCHIVE) - the registry's own words for a developer; AUDIT TESA III (at URBANIZER's merge): +1, the towns' fabric's art row (URBAN_ARCHIVE) - the registry's own words for a developer; TESA10 (at the merge of main into TESA): +1, the capitals' row (CAPITAL_ARCHIVE) - the registry's own words for a developer; PISTOLET: +1, the Dwarven Pistolet's art row (PISTOLET_ARCHIVE) - the registry's own words for a developer; WITCH1: +1, the Witches' Festival's pictures' row (FESTIVAL_ARCHIVE) - the registry's own words for a developer; NAVAL-REFIT: +3, the ship's paint's, her cabin's and her name boards' rows (LIVERY_ARCHIVE, CABIN_ARCHIVE, PLAQUE_ARCHIVE) - the registry's own words for a developer, never a player's; STAR4/STAR7: +2, the star's two archives' rows
+  'src/world/eliteGates/pseudoArchives.js': 45,   // guns removed: -3, the guns' art rows gone   // GHOSTFENCE (AUDIT RED-MOUNTAIN, CI): +1, the Ghostfence's art row (GHOSTFENCE_ARCHIVE) - the registry's own words for a developer; LOCKPICK (main): +1, the Lockpick's picture's row (LOCKPICK_ARCHIVE) - the registry's own words for a developer; AUDIT TESA III (at URBANIZER's merge): +1, the towns' fabric's art row (URBAN_ARCHIVE) - the registry's own words for a developer; TESA10 (at the merge of main into TESA): +1, the capitals' row (CAPITAL_ARCHIVE) - the registry's own words for a developer; WITCH1: +1, the Witches' Festival's pictures' row (FESTIVAL_ARCHIVE) - the registry's own words for a developer; NAVAL-REFIT: +3, the ship's paint's, her cabin's and her name boards' rows (LIVERY_ARCHIVE, CABIN_ARCHIVE, PLAQUE_ARCHIVE) - the registry's own words for a developer, never a player's; STAR4/STAR7: +2, the star's two archives' rows
   'src/world/superDungeon/sdDungeon.js': 6,
   'src/world/superDungeon/sdRealm.js': 10,
   'src/world/spawnedDungeons.js': 3,

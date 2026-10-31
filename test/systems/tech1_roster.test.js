@@ -16,7 +16,6 @@ import { rollSerpentSpoils } from '../../src/systems/serpent/serpentSpoils.js';
 import { rollRaidSpoils } from '../../src/systems/raidSpoils.js';
 import { rollCorpseKit } from '../../src/systems/foeLootCap.js';
 import { seedTestLoot, TECHNIQUE_TEST_BASES } from '../../src/systems/testRoom.js';
-import { THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
 import { ACCOUNT_VERSION } from '../../server-account/src/service.js';
 import { ARENA_SPEED_MAX, ARENA_HIT_HZ_MAX } from '../../src/net/arena/arenaLaw.js';
@@ -35,10 +34,10 @@ const withTech = (make, id, value = 20, tier = 'rare') => {
   return it;
 };
 
-test('TECH1 THE ROSTER: twelve techniques, two to each family that swings (a gun one), every DFU weapon in exactly its skill\'s family, the Gauntlets the bare hand\'s, an arrow and a cuirass none (mutants: a technique in a second family; a template in the wrong family; ammunition with a family)', () => {
+test('TECH1 THE ROSTER: twelve techniques, two to each family that swings, every DFU weapon in exactly its skill\'s family, the Gauntlets the bare hand\'s, an arrow and a cuirass none (mutants: a technique in a second family; a template in the wrong family; ammunition with a family)', () => {
   assert.deepEqual(RO.TECHNIQUE_IDS, ['volley', 'pierce', 'leap', 'whirlwind', 'shadowstep', 'lunge', 'cleave', 'execute', 'slam', 'crush', 'kick', 'haymaker']);
   assert.deepEqual(Object.fromEntries(RO.TECHNIQUE_IDS.map((id) => [id, [...RO.TECHNIQUES[id].families]])), {
-    volley: ['archery'], pierce: ['archery', 'thunderlock'], leap: ['longBlade'], whirlwind: ['longBlade'],
+    volley: ['archery'], pierce: ['archery'], leap: ['longBlade'], whirlwind: ['longBlade'],
     shadowstep: ['shortBlade'], lunge: ['shortBlade'], cleave: ['axe'], execute: ['axe'], slam: ['blunt'], crush: ['blunt'],
     kick: ['handToHand'], haymaker: ['handToHand'],
   });
@@ -48,15 +47,12 @@ test('TECH1 THE ROSTER: twelve techniques, two to each family that swings (a gun
   assert.deepEqual([115, 124, 125, 126].map(fam), Array(4).fill('blunt'), 'staff, mace, flail, warhammer');
   assert.deepEqual([127, 128].map(fam), ['axe', 'axe']);
   assert.deepEqual([129, 130].map(fam), ['archery', 'archery']);
-  assert.equal(fam(THUNDERLOCK_TEMPLATE), 'thunderlock', 'the gun, its own family - no volley of pellets');
   assert.equal(fam(131), null, 'an arrow is no weapon that swings');
-  assert.equal(fam(PELLET_TEMPLATE), null, 'nor a Dwemer Pellet');
   // AUDIT TECH1: a Roleplay & Realism weapon keeps its family with its mod's switch off (this suite runs with the mods off)
   assert.deepEqual([fam(513), fam(514)], ['axe', 'blunt'], 'the Archer\'s Axe and the Light Flail - their class, whatever the switch');
   assert.equal(RO.techniqueFamily(gauntlets()), 'handToHand');
   assert.equal(RO.techniqueFamily(cuirass()), null);
   assert.equal(RO.techniqueFamily(ring()), null);
-  assert.deepEqual(RO.techniquesFor({ group: 'Weapons', templateIndex: THUNDERLOCK_TEMPLATE }), ['pierce']);
   assert.deepEqual(RO.techniquesFor(gauntlets()), ['kick', 'haymaker']);
   for (const t of Object.values(RO.TECHNIQUES)) {
     assert.ok(t.fatigue > 0 && t.cooldown > 0 && t.base > 0, `${t.name}: a price and a weight`);
@@ -171,9 +167,8 @@ test('TECH1 THE DOOR: one roll a piece at its tier\'s chance, the door\'s LAST d
   assert.equal(drawn, 0);
   LR._setTechniqueForTests(null);
   // THE DOOR'S LAST DRAW: a door run with the pass off is the door run with it on, line for line, but the technique.
-  // PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's find is a FINAL find - drawn after the technique
-  // (lootRarity.js rollFinalFinds), so the technique's draws move it, as every pass above moves the ones after it (law 9);
-  // it is held off here, and pelletsscarce.test.js pins that it is the door's very last draw
+  // A FINAL find (lootRarity.js rollFinalFinds) is drawn after the technique, so the technique's draws would move it
+  // (law 9); final finds are held off here. No find is registered final since the Dwemer Pellet's went with the guns.
   LR._holdFinalFindsForTests(true);
   const src = { kind: 'corpse', tier: 21, boss: true, family: null };
   const noTech = (it) => { const t = LR.techniqueLineOf(it); return t ? { ...it, affixes: it.affixes.filter((a) => a !== t), value: it.value - LR.affixesWorth([t], it) } : it; };
@@ -214,7 +209,7 @@ test('TECH1 THE DOOR: one roll a piece at its tier\'s chance, the door\'s LAST d
       assert.equal(s.gold, p.gold);
       // PIN MOVED (GILDED2, bible/06-Systems/Gilded.md section 7): the gate's Oath and the serpent's Sovereign are the doors'
       // very last draw, AFTER the technique's - set aside on both sides
-      const unGilded = (list) => list.filter((x) => x.tier !== 'gilded' || x.item.gilded === 'the-hourlock');
+      const unGilded = (list) => list.filter((x) => x.tier !== 'gilded');
       assert.deepEqual(unGilded(s.pieces).map((x) => noTech(x.item)), unGilded(p.pieces).map((x) => x.item), `seed ${seed}: the spoils before it are their seed's`);
       assert.deepEqual(s.card ?? null, p.card ?? null, 'the card before it');
     }

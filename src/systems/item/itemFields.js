@@ -111,7 +111,7 @@ export const ITEM_FIELDS = Object.freeze({
   rarity: oneOf(RARITY_ORDER),
   legendary: str(),
   aetheric: str(),   // SET6: an Aetheric piece's record (systems/aetheric.js) - Ruhn's Regalia
-  gilded: str(),   // GILDED1: a Gilded piece's record (systems/gilded.js) - the Hourlock
+  gilded: str(),   // GILDED1: a Gilded piece's record (systems/gilded.js)
   affixes: list(validAffix),
   qlNamed: bool(),   // AUDIT QUESTLINES REWARD-5: a questline's named piece - its name stands without a metal before it (itemInfo.js withholdsMaterialPrefix)
   exalted: bool(),   // LOOT2 (bible/06-Systems/Loot-Arc.md section 4): a Legendary minted Exalted - one line more, true or absent

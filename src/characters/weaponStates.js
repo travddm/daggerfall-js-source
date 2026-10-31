@@ -72,7 +72,7 @@ export function swingHeft(weightKg, strength) {
  *  mace, a flail, an axe and a warhammer come round a little slower; a staff sweeps quicker than the other two-handers
  *  (every staff takes both hands: 0.97 x 1.06, against a claymore's 1.06 and a warhammer's 1.06 x 1.06 - a sword's
  *  1.0 is still quicker). A two-handed weapon takes SWING_TWO_HANDED on top of its kind. Anything else (the bow's draw,
- *  the port's own gun, which keep their own clocks) reads 1. (AUDIT PRE-MERGE 0929 S2: this said a staff was "a little
+ *  which keeps its own clock) reads 1. (AUDIT PRE-MERGE 0929 S2: this said a staff was "a little
  *  quicker", and the table's dagger row "and the tanto" - DFU draws the tanto as a long blade, fpsWeapon.js, and it
  *  handles as one.) */
 export const SWING_HANDLING = Object.freeze({
@@ -190,16 +190,6 @@ export const BOW_DRAWN_HOLD_FRAME = 3;             // fully drawn; drawback hold
 // mechanics rather than read, which cut frame 6 off every release and
 // started the bow cooldown one classic tick early.
 export const BOW_NUM_FRAMES = { Idle: 1, StrikeUp: 4, StrikeDown: 7 };
-/** The Dwarven Thunderlock's, the port's own weapon: one trigger pull
- *  is its strip's frames - the rest, the flash and the bolt, smoke,
- *  smoke, and three settling (THUNDERLOCK-ART2, the owner's seven; it was
- *  the sheet's six) - on every strike direction, because a gun does not
- *  care which way you dragged. */
-const TL_N = 7;   // THUNDERLOCK-ART2: the strip's frame count (combat/gun/thunderlockStrip.js) - a literal, because this leaf imports nothing (SWING-LAW: tools/neutral/build-viewer.mjs pastes it); thunderlockart2.test.js holds the two equal
-export const THUNDERLOCK_NUM_FRAMES = Object.freeze({
-  Idle: 1, StrikeDown: TL_N, StrikeDownLeft: TL_N, StrikeLeft: TL_N, StrikeRight: TL_N, StrikeDownRight: TL_N, StrikeUp: TL_N,
-});
-
 // FPSWeapon.cs:71 verbatim: the unarmed strike-to-the-LEFT plays its
 // own eight-tick frame list - up and back down again - instead of the
 // generic 5-frame increment. FPSWeapon.AnimateWeapon:500-511 takes
@@ -243,16 +233,7 @@ export function canChangeState(isBow, currentState, nextState) {
  *  the caller must re-read it every step - a sheathed sword flips the
  *  rig between armed and bare-handed while the machine lives on. */
 export function createWeaponMachine(isBow, isUnarmed = false) {
-  // `ranged` and `frames` are the port's own two fields (the Dwarven
-  // Thunderlock): a weapon that pays the bow's cooldown without
-  // drawing like one, and one whose cycle is not five frames. Both
-  // default to the classic answer, so a machine that never sets them
-  // is the machine that has always been here.
-  // FIELD-GUN7: `tick`, `cooldown` and `hitFrame` join `ranged` and
-  // `frames` as the port's own fields. Null in every one of them is
-  // "ask the classic formula", which is what a machine that never
-  // sets them has always done.
-  return { isBow, isUnarmed, ranged: isBow, frames: null, tick: null, cooldown: null, hitFrame: null, state: 'Idle', frame: 0, ticks: 0, acc: 0, cooldownUntil: 0, now: 0, bowIdleDrawn: false, animIndex: 0, damageDone: false, hold: 0 };
+  return { isBow, isUnarmed, state: 'Idle', frame: 0, ticks: 0, acc: 0, cooldownUntil: 0, now: 0, bowIdleDrawn: false, animIndex: 0, damageDone: false, hold: 0 };
 }
 
 export function machineAttack(m, strikeState) {
@@ -301,8 +282,8 @@ export function machineCancelBowDraw(m, liveSpeed = 50) {
  * @returns {{ seconds: number, hitAt: number, step: number } | null}
  */
 export function blowSchedule(m, liveSpeed, animCtx = null, dt = 0) {
-  if (!m || m.state === 'Idle' || (m.ranged ?? m.isBow)) return null;
-  const tick = m.tick ?? getMeleeWeaponAnimTime(liveSpeed, animCtx);
+  if (!m || m.state === 'Idle' || m.isBow) return null;
+  const tick = getMeleeWeaponAnimTime(liveSpeed, animCtx);
   if (!(tick > 0) || !Number.isFinite(tick)) return null;
   const step = dt > 0 ? Math.max(1, Math.ceil(tick / dt - 1e-9)) * dt : tick;
   if (m.isUnarmed && m.state === 'StrikeLeft') {
@@ -312,7 +293,7 @@ export function blowSchedule(m, liveSpeed, animCtx = null, dt = 0) {
   // (handsLaw.js DUAL.FLURRY_FROM_FRAME: the blow thrown from the raised hand) - and (AUDIT 2) to the end of the ticks
   // held after its last frame (an off-hand blow's burden), the hit before them
   const at = Math.max(0, m.frame | 0);
-  return { seconds: (strikeTicks(m) + holdOf(m)) * step, hitAt: Math.max(0, (m.hitFrame ?? HIT_FRAME_MELEE) - at) * step, step };
+  return { seconds: (strikeTicks(m) + holdOf(m)) * step, hitAt: Math.max(0, HIT_FRAME_MELEE - at) * step, step };
 }
 
 /** TWO-HANDS (AUDIT 2): the ticks a melee strike just begun takes from the frame it stands on to its end - FPSWeapon's
@@ -320,7 +301,7 @@ export function blowSchedule(m, liveSpeed, animCtx = null, dt = 0) {
  *  its end (`m.hold`, machineStep). What an off-hand blow's burden is reckoned on (combat/twoHands/handsLaw.js offHandHold). */
 export function strikeTicks(m) {
   if (m.isUnarmed && m.state === 'StrikeLeft') return LEFT_UNARMED_ANIMS.length;
-  const frames = (m.frames ?? MELEE_NUM_FRAMES)[m.state] ?? 5;
+  const frames = MELEE_NUM_FRAMES[m.state] ?? 5;
   return Math.max(0, frames - Math.max(0, m.frame | 0));
 }
 const holdOf = (m) => (m.hold > 0 ? m.hold | 0 : 0);
@@ -347,26 +328,8 @@ export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1
     }
     return events;
   }
-  // `m.frames` is the ONE departure this file carries: a weapon whose
-  // animation is not five melee frames or the bow's draw-and-loose.
-  // The Dwarven Thunderlock's fire cycle is its strip's seven frames
-  // (combat/gun/thunderlockStrip.js, THUNDERLOCK-ART2), and a machine that does not set it
-  // reads exactly the two classic tables it always did.
-  const frames = (m.frames ?? (m.isBow ? BOW_NUM_FRAMES : MELEE_NUM_FRAMES))[m.state] ?? 5;
-  // FIELD-GUN7 (Mac, from play: "It still doesn't feel like the proto
-  // at all"). THE FRAME CLOCK IS THE FEEL, and this was the largest of
-  // the three numbers the lab settled and the game ignored. Both
-  // classic clocks are SPD-DRIVEN - a melee frame is
-  // `3 * (115 - speed) / 980`, which at an average 50 is 0.199s, about
-  // FIVE frames a second - and the lab's gun runs at fourteen. The
-  // port's own weapon was playing its cycle at a third of the speed it
-  // was tuned at, which no amount of recoil or shake on top can
-  // disguise: it IS the difference.
-  //
-  // A gun's mechanism does not care how agile you are. Drawing a
-  // bowstring does, and swinging a blade does, so both classic
-  // formulas stay exactly where they were for everything else.
-  const tick = m.tick ?? (m.isBow ? CLASSIC_UPDATE_INTERVAL : getMeleeWeaponAnimTime(liveSpeed, animCtx));   // AUDIT-RR F1: FPSWeapon's own animTickTime asks FormulaHelper's override (FormulaHelper.cs:830-838); without the ctx the two mods' arms were inert on the swing that lands
+  const frames = (m.isBow ? BOW_NUM_FRAMES : MELEE_NUM_FRAMES)[m.state] ?? 5;
+  const tick = m.isBow ? CLASSIC_UPDATE_INTERVAL : getMeleeWeaponAnimTime(liveSpeed, animCtx);   // AUDIT-RR F1: FPSWeapon's own animTickTime asks FormulaHelper's override (FormulaHelper.cs:830-838); without the ctx the two mods' arms were inert on the swing that lands
   m.acc += dt;
   while (m.acc >= tick) {
     // ARROW2: ONE step per resume, the remainder dropped - FPSWeapon.
@@ -377,9 +340,7 @@ export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1
     // widget's clone (the IL's own coroutine, weaponWidget.js), which
     // then missed the bow's hit frame and never set its cooldown; and a
     // single long frame on the release ran StrikeDown to Idle at once.
-    // The port's own gun (`m.tick`, FIELD-GUN7's lab clock) is no
-    // FPSWeapon and keeps its clock.
-    m.acc = m.tick == null ? 0 : m.acc - tick;
+    m.acc = 0;
     if (m.isUnarmed && m.state === 'StrikeLeft') {
       // FPSWeapon.AnimateWeapon's FIRST arm: the frame comes from
       // leftUnarmedAnims, never from an increment, and the swing ends
@@ -403,21 +364,11 @@ export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1
       if (m.hold > 0 && m.frame >= frames - 1) { m.hold -= 1; continue; }
       m.frame++;
       if (m.frame === (m.isBow ? BOW_SOUND_FRAME : -1)) events.push('bowSound');
-      // FIELD-GUN7: the lab lands the shot on frame 1 - the muzzle
-      // flash - and the melee hit frame is 2, so the damage arrived a
-      // frame after the flash it is supposed to BE.
-      if (m.frame === (m.hitFrame ?? (m.isBow ? HIT_FRAME_BOW : HIT_FRAME_MELEE))) events.push('hit');
+      if (m.frame === (m.isBow ? HIT_FRAME_BOW : HIT_FRAME_MELEE)) events.push('hit');
       if (m.frame >= frames) {
         m.state = 'Idle'; m.frame = 0; m.ticks = 0;
         events.push('done');
-        // AUDIT-THUNDERLOCK F2: `m.ranged`, not `m.isBow`. A bow and
-        // the port's own weapon both pay the ranged cooldown at the
-        // end of a shot; only the bow DRAWS. Written as `?? m.isBow`
-        // so a machine minted before this field existed - every
-        // classic one - still reads exactly as it did.
-        // `m.cooldown` is the Thunderlock's reload in seconds (gunFeel.js thunderlockReloadSeconds),
-        // set before this step. A bow leaves it null and uses getBowCooldownTime.
-        if (m.ranged ?? m.isBow) m.cooldownUntil = m.now + (m.cooldown ?? getBowCooldownTime(liveSpeed));
+        if (m.isBow) m.cooldownUntil = m.now + getBowCooldownTime(liveSpeed);
         break;
       }
     }

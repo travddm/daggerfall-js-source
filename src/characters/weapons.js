@@ -12,8 +12,7 @@ import templates from './itemTemplates.json' with { type: 'json' };
 import { DYE_COLORS, DYE_TARGETS, getDyeColorTable } from './dyes.js';
 import { SKILLS } from '../systems/skills.js';   // GetWeaponSkillIDAsShort's return set
 import { SOUND } from '../systems/soundClips.js';   // F023: GetEquipSound's clips (soundClips is a leaf)
-import { THUNDERLOCK_TEMPLATE, PISTOLET_TEMPLATE, PISTOLET_SPAN } from './thunderlockIds.js';
-import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: a custom weapon class answers its own skill, damage and equip sound (virtuals)   // the port's own weapon - a leaf, so no cycle (see the file)
+import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: a custom weapon class answers its own skill, damage and equip sound (virtuals)
 
 export const WEAPONS = Object.freeze({
   Dagger: 113, Tanto: 114, Staff: 115, Shortsword: 116, Wakazashi: 117,
@@ -96,8 +95,6 @@ const MIN_DAMAGE = new Map([
   [[W.Short_Bow, W.Long_Bow], 5],   // BAL-ARCHERY: +1 over FormulaHelper's 4
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponMinDamage(weapon) {
-  if (weapon === THUNDERLOCK_TEMPLATE) return THUNDERLOCK_SPAN.min;   // THE DEPARTURE, below
-  if (weapon === PISTOLET_TEMPLATE) return PISTOLET_SPAN.min;   // PISTOLET: the second gun's, the same departure
   const cls = customItemClass(weapon);   // RRI1: GetBaseDamageMin
   if (cls?.baseDamageMin) return cls.baseDamageMin();
   const o = _damageOverride.min?.(weapon);   // TryGetOverride("CalculateWeaponMinDamage") - RRI2's weaponBalance registers one
@@ -130,34 +127,12 @@ const MAX_DAMAGE = new Map([
   [[W.Dai_Katana], 21],
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponMaxDamage(weapon) {
-  if (weapon === THUNDERLOCK_TEMPLATE) return THUNDERLOCK_SPAN.max;   // THE DEPARTURE, below
-  if (weapon === PISTOLET_TEMPLATE) return PISTOLET_SPAN.max;   // PISTOLET
   const cls = customItemClass(weapon);   // RRI1: GetBaseDamageMax
   if (cls?.baseDamageMax) return cls.baseDamageMax();
   const o = _damageOverride.max?.(weapon);   // TryGetOverride("CalculateWeaponMaxDamage")
   if (o != null) return o;
   return MAX_DAMAGE.get(weapon) ?? 0;
 }
-
-/**
- * THE ONE WEAPON IN THIS FILE THAT DAGGERFALL DOES NOT HAVE.
- *
- * The Dwarven Thunderlock (systems/thunderlock.js) is the port's own,
- * prototyped in the gun lab before it was built. Its three laws touch
- * this file because this file is where a weapon's damage and skill
- * are answered, and they are written as EXPLICIT ARMS ahead of the
- * verbatim tables rather than as rows inside them - so the DFU tables
- * above and below stay what CalculateWeaponMin/MaxDamage and
- * GetWeaponSkillUsed say, except the bow rows, which BAL-ARCHERY raises
- * by one at each end. The Thunderlock's departure is one arm a reader
- * can see and delete.
- *
- * The span is 7-26 against a Long Bow's 5-19 and a Dai-Katana's 3-21,
- * and it is paid for elsewhere: the heaviest weapon in the game, ammo
- * that costs twice an arrow, and a cycle with a visible reload in it.
- * The numbers themselves live with the weapon; only the hook is here.
- */
-const THUNDERLOCK_SPAN = Object.freeze({ min: 7, max: 26 });
 
 /** DaggerfallUnityItem.GetWeaponSkillUsed + GetWeaponSkillIDAsShort
  *  (DaggerfallUnityItem.cs:910-962), verbatim: the switch is on
@@ -180,13 +155,6 @@ export const WEAPON_SKILL_USED = new Map([
   [[W.Short_Bow, W.Long_Bow], SKILLS.Archery],
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponSkillUsed(templateIndex) {
-  // THE DEPARTURE (see THUNDERLOCK_SPAN above): Mac's call - "should
-  // work with the archery skill" - and its own nature. It is fired
-  // rather than swung and it spends ammunition, so every law that asks
-  // which skill a hit was scored on answers Archery from here, without
-  // any of them learning that a new weapon exists.
-  if (templateIndex === THUNDERLOCK_TEMPLATE) return SKILLS.Archery;
-  if (templateIndex === PISTOLET_TEMPLATE) return SKILLS.Archery;   // PISTOLET: fired, and it spends the Pellet - the same answer
   const cls = customItemClass(templateIndex);   // RRI1: GetWeaponSkillUsed
   if (cls?.weaponSkillUsed) return SKILLS[cls.weaponSkillUsed];
   return WEAPON_SKILL_USED.get(templateIndex) ?? null;

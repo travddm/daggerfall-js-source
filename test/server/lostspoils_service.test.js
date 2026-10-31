@@ -15,9 +15,7 @@ import { POST_BATCH_RE, POST_SENDER, POST_SUBJECT_MAX, POST_BODY_MAX, postHead }
 import { spoilsList } from '../../src/scenes/spoilsPool.js';
 import { sdSpoilsList, sdSpoilsDay } from '../../src/systems/superDungeon/sdSpoils.js';
 import { egSpoilsList, egSpoilsDay } from '../../src/systems/eliteGates/egSpoils.js';
-import { mintHourlock, mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
-import { createPistolet } from '../../src/systems/pistolet.js';
+import { mintGilded, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN } from '../../src/systems/gilded.js';
 
 const nowS = () => Math.floor(Date.now() / 1000);
 /** A floor's leftovers as the pool sends them: each item piece of the spoils as rolled, by its place. */
@@ -48,7 +46,7 @@ test('LOST-SPOILS the law and the door: one route behind a session, a registered
   assert.notEqual(LOST_SENDER, POST_SENDER, 'never the developers\' name');
   const svc = await standService();
   const g = await svc.guest();
-  assert.deepEqual(await lost(svc, g, { day: 20380, pieces: [{ i: 0, item: mintHourlock() }] }), { status: 403, body: { error: 'post-needs-account' } }, 'a guest has no mailbox');
+  assert.deepEqual(await lost(svc, g, { day: 20380, pieces: [{ i: 0, item: mintGilded(DRAGONFIRE_OATH) }] }), { status: 403, body: { error: 'post-needs-account' } }, 'a guest has no mailbox');
   assert.ok(LOST_FINAL.includes('post-needs-account'), 'and the client gives a guest\'s floor to the pack');
 });
 
@@ -147,18 +145,18 @@ test('LOST-SPOILS a send\'s shape and its pieces\' law: places under LOST_INDEX_
   assert.ok(!LOST_FINAL.includes('lost-no-kill'), 'a kill not yet recorded is asked again');
 });
 
-test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: never a gun, and no Gilded but its own (an Hour the Hourlock, a gate the Oath, a Redoubt none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: a gun mailed under an Hour\'s kill; any Gilded under any kill)', async () => {
+test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: no Gilded but its own (a gate the Oath, an Hour and a Redoubt none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: any Gilded under any kill)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const day = 20383;
   assert.equal((await svc.claim(ann, day, nowS())).status, 200);
   sdKill(svc, ann, 12);
   const sdDay = sdSpoilsDay(12), plain = (x) => JSON.parse(JSON.stringify(x));
-  for (const [d, item] of [[sdDay, createThunderlock()], [sdDay, createPistolet()], [sdDay, mintGilded(DRAGONFIRE_OATH)], [day, mintHourlock()]]) {
+  // The Hourlock (an Hour's own Gilded) is gone with the guns: the Last Moment now leaves no Gilded, and a gate only the Oath.
+  for (const [d, item] of [[sdDay, mintGilded(DRAGONFIRE_OATH)], [sdDay, mintGilded(SUNKEN_SOVEREIGN)], [day, mintGilded(SUNKEN_SOVEREIGN)]]) {
     assert.deepEqual((await lost(svc, ann, { day: d, pieces: [{ i: 0, item: plain(item) }] })).body, { error: 'lost-item' }, `${item.name} under ${d}`);
   }
   assert.equal(svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM server_post WHERE to_id = ?').get(ann.id).n, 0);
-  assert.equal((await lost(svc, ann, { day: sdDay, pieces: [{ i: 0, item: plain(mintHourlock()) }] })).status, 200, 'an Hour\'s own');
   assert.equal((await lost(svc, ann, { day, pieces: [{ i: 0, item: plain(mintGilded(DRAGONFIRE_OATH)) }] })).status, 200, 'a gate\'s own');
 });
 
@@ -179,7 +177,7 @@ test('LOST-SPOILS THE CLAIM IS CHARGED TO THE BUDGET: a Lost and Found piece cla
   assert.equal(witnessed(), before, 'never witnessed - charged as the floor\'s piece is');
   // the developers' gift, the same claim: witnessed, as every act of the service's own is
   svc.env.DB._raw.prepare('INSERT INTO server_post (id, to_id, batch, sender, subject, body, item, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-    .run('g'.repeat(24), ann.id, 'a-gift', POST_SENDER, 'A gift', 'For you.', JSON.stringify(mintHourlock()), nowS());
+    .run('g'.repeat(24), ann.id, 'a-gift', POST_SENDER, 'A gift', 'For you.', JSON.stringify(mintGilded(DRAGONFIRE_OATH)), nowS());
   const w0 = witnessed();
   assert.equal((await svc.call('/v1/post/claim', { id: 'g'.repeat(24), character: R.id, realm: R.at() }, ann.secret)).status, 200);
   assert.ok(witnessed() > w0, 'a gift the service minted is witnessed');

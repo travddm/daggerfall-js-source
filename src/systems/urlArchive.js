@@ -16,7 +16,7 @@
 
 /** A `{ has, get, load, loaded, names }` archive over a table of URLs:
  *  `urls` maps each canonical data-files path (`meshes/w/x_sh.nif`,
- *  `textures/thunderlock.dds`) to its URL, or to a function answering
+ *  `textures/brigandine_ebony.dds`) to its URL, or to a function answering
  *  one; `fetchBytes(url)` brings the bytes. Pure and node-testable. */
 export function makeVendoredArchive(urls, fetchBytes) {
   const norm = (p) => String(p).replace(/\\/g, '/').toLowerCase();

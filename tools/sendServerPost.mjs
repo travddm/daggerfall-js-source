@@ -15,26 +15,22 @@
 //   node tools/sendServerPost.mjs --migration hours-first|tamriel                          a frozen send's migration
 //
 // `handles` is comma-separated, as the config's lists are; `item` is one of POST_ITEMS - an item is MINTED here by the
-// game's own code (the Hourlock as its drop mints it, src/systems/gilded.js), never typed into a workflow; `message`
-// takes `\n` for a line break. Every word reaches the statement through sqlText, quotes doubled.
+// game's own code, never typed into a workflow; `message` takes `\n` for a line break. Every word reaches the statement
+// through sqlText, quotes doubled.
 //
-// HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant them ... each the gilded gun"): the post's
-// first use - HOURS_FIRST, the thirteen of the first clear, each sent the Hourlock. That send is migration 0094
-// (`--migration hours-first` prints it), so it lands with the deploy that ships the mailbox. AUDIT SERVER-POST: ITS NAMES
-// AND ITS RECORD ARE FROZEN HERE, never read off the config's list or the game's mint: an applied migration never runs
-// again, so a fourteenth name added to HOURS_FIRST_HANDLES (the title's list) is sent the gun by the workflow - this
-// send's name, `hours-first-hourlock`, once an account - never by an edit of 0094.
+// HOURS-FIRST (2026-10-08): the post's first use - HOURS_FIRST, the thirteen of the first clear. That send is migration
+// 0094 (`--migration hours-first` prints it). Its names and its record are FROZEN here, never read off the config's list
+// or the game's mint, because an applied migration never changes. The item it holds, the Hourlock, is no longer in the
+// game: a claim of it drops the item as an unknown one.
 
 import { readFileSync } from 'node:fs';
 import { isMain } from './lib/isMain.mjs';
 import { HANDLE_RE } from '../src/net/handleShape.js';
 import { POST_BATCH_RE, POST_SENDER, POST_SUBJECT_MAX, POST_BODY_MAX } from '../src/net/postLaw.js';
-import { mintHourlock } from '../src/systems/gilded.js';
 
 /** THE ITEMS A PIECE MAY HOLD, by name - each minted by the game's own code. `none` a message alone. */
 export const POST_ITEMS = Object.freeze({
   none: () => null,
-  hourlock: () => mintHourlock(),   // the Hourlock, as the Brass Remnant's spoils mint it (GUNS-UNFOUND: a gilded bow since 2026-10-23)
 });
 /** How many accounts one send may name. */
 export const POST_RECIPIENTS_MAX = 200;
@@ -56,10 +52,7 @@ export const HOURS_FIRST = Object.freeze({
   ].join('\n'),
 });
 
-/** HOURS-FIRST: the Hourlock's record as 0094 sent it - `mintHourlock()` that day, frozen (a Gilded piece is a static roll:
- *  test/tooling/serverpost_send.test.js holds the two equal, and a change to the mint would make every unclaimed gift a forgery
- *  the client refuses - systems/gilded.js validGildedMarks). GUNS-UNFOUND: the Hourlock is a bow now, so this gun is its
- *  gun era's mint (`mintGilded(HOURLOCK_GUN_ERA)`), lawful still. */
+/** HOURS-FIRST: the Hourlock's record as 0094 sent it, frozen. */
 export const HOURS_FIRST_RECORD = "{\"group\":\"Weapons\",\"templateIndex\":560,\"material\":4,\"flags\":0,\"variant\":0,\"message\":0,\"stackCount\":1,\"name\":\"The Hourlock\",\"value\":39740,\"maxCondition\":4800,\"currentCondition\":4800,\"rarity\":\"gilded\",\"gilded\":\"the-hourlock\",\"affixes\":[{\"id\":\"damage\",\"value\":40},{\"id\":\"stat\",\"param\":\"agility\",\"value\":15},{\"id\":\"skill\",\"param\":33,\"value\":30},{\"id\":\"elemental\",\"param\":\"shock\",\"value\":10}],\"isIdentified\":true}";
 
 /** TAMRIEL-POST (2026-10-28, the owner: "Send a heartfelt, non-ai like message to players in their inbox and attach 10

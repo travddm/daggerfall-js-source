@@ -16,8 +16,8 @@
 // every one KNOWN (`isIdentified`): the name the floor says is the name the pack shows. And the SIGIL STONE - the gate's
 // trophy, one a kill. The spoils are graded whatever the Loot Rarity switch says: their glow is their tier.
 //
-// THE SIGIL STONE IS ITS OWN TEMPLATE (SIGIL_STONE_TEMPLATE, 570 - past DFU's 288, Climates & Calories' 530-541 and the
-// Thunderlock's 560/561), a gem by its group (bound, so no counter buys it - SS4) - and not a renamed gem: every
+// THE SIGIL STONE IS ITS OWN TEMPLATE (SIGIL_STONE_TEMPLATE, 570 - past DFU's 288 and Climates & Calories'
+// 530-541), a gem by its group (bound, so no counter buys it - SS4) - and not a renamed gem: every
 // classic gem is an ingredient, an ingredient STACKS, and a Ruby renamed would merge into the Ruby already in the pack
 // and lose its name and its price. A custom row is no ingredient. SS1 (2026-09-27, Mac: "make sigil stones bound items
 // and stackable"): the row STACKS with its own kind alone - it says `stackable`, as the rations' row does

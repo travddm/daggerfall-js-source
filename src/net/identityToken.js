@@ -361,9 +361,9 @@ export const CHARACTER_LEVEL_MIN = 1;
 export const CHARACTER_LEVEL_MAX = 1000;
 /** ARENA4b: a character level a token may carry - a whole number in bounds, never a stand-in. */
 export const characterLevelIssuable = (cl) => Number.isSafeInteger(cl) && cl >= CHARACTER_LEVEL_MIN && cl <= CHARACTER_LEVEL_MAX;
-/** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX - a Daedric Thunderlock's 26 + 6, pinned equal; its own
+/** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX - a Daedric Dai-Katana's 21 + 6, pinned equal; its own
  *  name, ONE MEMBER ONE EXPORT - this leaf imports only the token's). */
-export const TOKEN_ARMS_TOP_MAX = 32;
+export const TOKEN_ARMS_TOP_MAX = 27;
 /** INT7: an arms claim a token may carry - `[reach, bow]`, the reach a whole number 0..TOKEN_ARMS_TOP_MAX, the bow 0 or 1. */
 export const armsIssuable = (wa) => Array.isArray(wa) && wa.length === 2 && Number.isSafeInteger(wa[0]) && wa[0] >= 0 && wa[0] <= TOKEN_ARMS_TOP_MAX && (wa[1] === 0 || wa[1] === 1);
 

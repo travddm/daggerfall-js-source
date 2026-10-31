@@ -30,8 +30,8 @@ export const postDeleteCall = (io, id) => call(io, '/v1/post/delete', { id });
 export function postNoticeText(event) {
   const where = 'Open the mailbox beside the hourglass in the pause menu, or type /mail.';   // AUDIT SERVER-POST: /mail on either skin - the classic pause has no envelope
   const ps = Array.isArray(event?.post) ? event.post : [];
-  // one piece, new or waiting: by name, and its gift by name (AUDIT SERVER-POST: the thirteen's Hourlock lands with the deploy,
-  // so their first word of it is a sitting's first look - which said only "1 message waiting")
+  // one piece, new or waiting: by name, and its gift by name (AUDIT SERVER-POST: a gift that lands with a deploy
+  // is first heard of in a sitting's first look - which said only "1 message waiting")
   const one = (p) => `Post from ${p.from}: "${p.subject}"${p.item && !p.claimed ? `, with ${p.item.name} to claim` : ''}. ${where}`;
   if (event?.kind === 'new') return ps.length === 1 ? one(ps[0]) : `${ps.length} new messages in your mailbox. ${where}`;
   // PRIVATE-REPORT: a reader's private reports - said apart from the post, and never what they say (the world tab is read

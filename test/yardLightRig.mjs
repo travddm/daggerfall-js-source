@@ -63,7 +63,7 @@ export function exteriorFrame({ lane, night, town, lamps, eye, ranges, tick = ()
     state: { pixelTranslation: (_px, _py, out = [0, 0, 0]) => { out[0] = 0; out[1] = 0; out[2] = 0; return out; } },
     worldLightAnimator: { tick: () => tick(ranges), ranges },
     wod: null, csaOn: () => false, csa: { lights: () => [] },
-    magic: null, _dwFogP: null, playerTorchLight: () => null, thunderlockMuzzleLight: () => null, playerEntity: {}, player: { feetAt: () => [0, 0, 0] },
+    magic: null, _dwFogP: null, playerTorchLight: () => null, playerEntity: {}, player: { feetAt: () => [0, 0, 0] },
     peerTorchLights: () => [], gatePool: null, riteHost: null, camps: { lights: () => [] }, droppedTorches: { lights: () => [] },
     naval: null, festivalStage: null, quays: null,
     poiHost: null,   // PIN MOVED (POI-2): a POI's own lights join the scene's - no POI in this rig

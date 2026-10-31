@@ -263,7 +263,7 @@ let _carry = new WeakMap();
  * SERPENT-SET: and Constrict's stacks at the coiled foe - EG15: and the Battlemage's Discipline, the next weapon blow
  * after a cast (spent by it), at its element's share of the foe - summed and taken of the whole blow with the fraction carried on the weapon; then the Burning Gate's sear, flat. And
  * from the same blow, Cleave: the nearest other foe within CLEAVE_METRES of the one struck takes its share of the blow
- * - a MELEE blow (never a bow's or the Thunderlock's). Nothing for a miss, a blow at a player (a duel), a peer's blow
+ * - a MELEE blow (never a bow's). Nothing for a miss, a blow at a player (a duel), a peer's blow
  * resolved here, or a foe's.
  */
 export function setBlow(weapon, damage, attacker, target, info) {

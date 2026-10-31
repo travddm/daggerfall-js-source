@@ -41,18 +41,20 @@
 import { realmActFirst, prepareRealmRecord, mustChange, dropObjects, dropIfUnnamed, recordMovedOf, REALM_ID_RE } from './realm.js';
 import { giveTradeGoods } from '../../src/net/realm/realmTradeLaw.js';
 import { POST_ID_RE, POST_BOX_MAX, postItemHead } from '../../src/net/postLaw.js';
-import { isLostBatch } from '../../src/net/lostLaw.js';   // LOST-SPOILS: the Lost and Found's pieces, charged to the budget
+import { isLostBatch } from '../../src/net/lostLaw.js';
+import { lawTemplate } from '../../src/systems/item/itemLaw.js';   // a gift of a template the game no longer knows is no item   // LOST-SPOILS: the Lost and Found's pieces, charged to the budget
 import { isReportReader, reportCountsOf } from './reports.js';   // PRIVATE-REPORT: a reader's box counts the reports waiting
 
 /** The record a row holds, or null. AUDIT SERVER-POST: ONE ANSWER to "does this piece hold an item" for the box, the
  *  claim and the throw - a record the box can name (postItemHead) - so no row can be listed as words alone and refused as
  *  holding a gift, or claimed where the box shows nothing to claim. A row the operator wrote is such a record; any other
- *  is no item. */
+ *  is no item - and so is a record of a template the game no longer knows (migration 0094's Hourlock, template 560, sent
+ *  before the guns were removed): it is never written into a character, and the piece can be thrown away. */
 export const recordOf = (/** @type {any} */ row) => {
   if (typeof row?.item !== 'string') return null;
   let r = null;
   try { r = JSON.parse(row.item); } catch { return null; }
-  return r && typeof r === 'object' && !Array.isArray(r) && postItemHead(r) ? r : null;
+  return r && typeof r === 'object' && !Array.isArray(r) && postItemHead(r) && lawTemplate(r.templateIndex) ? r : null;
 };
 
 /** A row's head as the box lists it. */

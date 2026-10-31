@@ -83,7 +83,7 @@ test('SWING-LAW: the heft - a weapon\'s base weight as the arm feels it, (150 - 
   assert.equal(swingHeft(NaN, 50), 1, 'no weight weighs nothing');
 });
 
-test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fpsWeapon.js; the law is a leaf): a dagger, bare hands and claws quick, a sword the measure, the heavy kinds a little slower; both hands 6% more; the bow and the gun keep their own clocks', () => {
+test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fpsWeapon.js; the law is a leaf): a dagger, bare hands and claws quick, a sword the measure, the heavy kinds a little slower; both hands 6% more; the bow keeps its own clock', () => {
   const T = WEAPON_TYPES;
   const kinds = [T.LongBlade, T.LongBlade_Magic, T.Staff, T.Staff_Magic, T.Dagger, T.Dagger_Magic, T.Mace, T.Mace_Magic, T.Flail, T.Flail_Magic, T.Warhammer, T.Warhammer_Magic, T.Battleaxe, T.Battleaxe_Magic, T.Melee, T.Werecreature];
   assert.deepEqual(Object.keys(SWING_HANDLING).map(Number).sort((a, b) => a - b), [...kinds].sort((a, b) => a - b), 'every melee kind, and only they');
@@ -93,7 +93,7 @@ test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fp
   for (let k = 0; k < 14; k += 2) assert.equal(SWING_HANDLING[k], SWING_HANDLING[k + 1], `a magic ${k} handles as its plain one`);
   assert.equal(SWING_TWO_HANDED, 1.06);
   assert.ok(Math.abs(swingHandling(T.LongBlade, true) - 1.06) < 1e-12);
-  assert.equal(swingHandling(T.Bow), 1); assert.equal(swingHandling(T.Thunderlock), 1); assert.equal(swingHandling(undefined), 1);
+  assert.equal(swingHandling(T.Bow), 1); assert.equal(swingHandling(undefined), 1);
   assert.equal(swingFrameSeconds(100, { handling: 0.1 }), SWING_FRAME_MIN, 'no frame under the floor, whatever a handling says');
   assert.equal(swingFrameSeconds(0, { heft: 1 + SWING_HEFT_MAX, handling: swingHandling(T.Warhammer, true) }), SWING_FRAME_MAX, 'nor over the ceiling: two seconds a blow at the most');
 });

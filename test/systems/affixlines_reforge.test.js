@@ -28,7 +28,7 @@ import { seededRng } from '../../src/systems/wind/wind.js';
 import { welkyndShards } from '../../src/systems/gate/gateSpoils.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
 import { itemFindings } from '../../src/systems/item/itemLaw.js';
-import { validGildedMarks, mintHourlock } from '../../src/systems/gilded.js';
+import { validGildedMarks, mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { withDom } from '../invdrag.mjs';
 import { mountReforgeWindow, REFORGE_NOTE, REFORGE_REFUSALS, REFORGED } from '../../src/ui/reforgeWindow.js';
 
@@ -360,7 +360,8 @@ test('REFORGE-REPLACE: the count is the Reforge\'s mark - the item law holds it 
   assert.deepEqual([a.reforges, asMinted(a)], [1, false], 'counted, and off the market');
   assert.equal(asMinted({ ...made(), reforged: 0 }), false, 'an old mark the same');
   // the Gilded rung's piece is its record's, and a count on it a forgery (the Reforge never takes one)
-  const hourlock = mintHourlock();
-  assert.equal(validGildedMarks(hourlock), hourlock);
-  assert.deepEqual([validGildedMarks({ ...hourlock, reforges: 1 }), RF.reforgePrice(hourlock), LR.reforgeableLines(hourlock)], [null, null, []]);
+  // the Dragonfire Oath stands in for the Hourlock, which went with the guns
+  const gilded = mintGilded(DRAGONFIRE_OATH);
+  assert.equal(validGildedMarks(gilded), gilded);
+  assert.deepEqual([validGildedMarks({ ...gilded, reforges: 1 }), RF.reforgePrice(gilded), LR.reforgeableLines(gilded)], [null, null, []]);
 });

@@ -45,7 +45,7 @@ test('shopStock: the stock law - rarity gate, chance, gender swap, horse+cart', 
   // rolls always 0 -> every Dice100 passes -> a weaponsmith at quality
   // 21 stocks EVERY weapon and armor template (rarity <= 21 always)
   const all = stockShopShelf({ buildingType: BUILDING_TYPES.WeaponSmith, quality: 21 }, { level: 1 }, { rolls: () => 0 });
-  const weaponCount = all.filter((it) => it.group === 'Weapons').length;   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): DFU's own weapons alone again - no counter carries the Dwemer Pellet (test/systems/pelletsscarce.test.js)
+  const weaponCount = all.filter((it) => it.group === 'Weapons').length;   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): DFU's own weapons alone again - no counter carries the Dwemer Pellet (gone with the guns)
   const armorCount = all.filter((it) => it.group === 'Armor').length;
   assert.equal(weaponCount, GROUP_TEMPLATE_INDICES.Weapons.length);
   assert.equal(armorCount, GROUP_TEMPLATE_INDICES.Armor.length);

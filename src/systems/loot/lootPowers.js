@@ -69,10 +69,7 @@ import { registerPlayerKillListener } from '../playerKills.js';
 import { registerAbsorptionChance } from '../absorption.js';
 import { registerMagicRoundHook, skyMinutes } from '../worldTick.js';   // TIME1: a moon power answers to the sky's night
 import { setsDueling } from '../sigil/sigilSets.js';
-import { addGoldPieces, addItem } from '../inventory.js';
-import { createPellets } from '../thunderlock.js';   // GILDED1: the Hour Tolls gives a felling shot's pellet back
-import { isGunTemplate } from '../../characters/thunderlockIds.js';   // GUNS-UNFOUND: a gun's shot is a pellet, a bow's an arrow
-import { bowDamageArrow } from '../../combat/enemyEquipment.js';   // GUNS-UNFOUND: the Hourlock's bow gives its arrow back - the one arrow minter
+import { addGoldPieces } from '../inventory.js';
 import { isNight } from '../../world/worldClock.js';
 import { hudText } from '../notify.js';
 import { healMine, manaMine, _resetPlayerHealForTests } from '../playerHeal.js';   // SERPENT-SET: the one heal a power gives, below this file and the sets'
@@ -163,22 +160,14 @@ const freshState = () => ({
 let _s = freshState();
 /** @type {WeakMap<object, number>} */
 let _hexed = new WeakMap();              // a foe's entity -> until when its blows are hexed
-/** @type {WeakMap<object, number>} */
-let _tolls = new WeakMap();              // GILDED1: a tolling weapon -> its landed shots since its last toll
-/** @type {{ foe: object, at: number, weapon?: any } | null} */
-let _lastToll = null;                    // GILDED1: the last foe a tolling weapon's shot landed on, and when (GUNS-UNFOUND: and by what)
 /** @type {WeakSet<object>} */
 let _struck = new WeakSet();             // the foes my blows have landed on (First Blood)
 /** @type {WeakMap<object, { n: number, until: number, at: number }>} */
 let _undertow = new WeakMap();           // GILDED2: a foe -> the Undertow's landed blows on it (its stacks, at most the power's max), until when they hold, and when the last landed (its kill heals - TOLL_REFUND_S's bound; AUDIT WORLD-REWARDS B2: a foe's own, so a swing that strikes two heals for each it fells)
 /** GILDED2: a foe's Undertow stacks now - none once the tide lets it go (AUDIT WORLD-REWARDS B4). */
 const undertowStacks = (foe, now) => { const u = _undertow.get(foe); return u && now < u.until ? u.n : 0; };
-/** GILDED1: THE HOUR TOLLS - is this weapon's next landed shot its toll? Its landed shots are counted on the strike
- *  (lootStrike, after the blow), so the blow asks before the count moves: shots one and two ring nothing, the third tolls. */
-const tollDue = (weapon, p) => !!weapon && (_tolls.get(weapon) ?? 0) === p.every - 1;
-/** GILDED1: how long after its shot landed a foe's fall is the shot's - a kill is told the frame its health ran out,
- *  which is the strike's own frame or the next; a second is a generous bound that a later blow of anything else
- *  replaces (the record is the last landed shot's). */
+/** How long after a blow landed a foe's fall is the blow's - a kill is told the frame its health ran out, which is the
+ *  strike's own frame or the next; a second is a generous bound. */
 export const TOLL_REFUND_S = 1;
 let _say = (line) => { hudText(line); };
 /** The host's voice for a power's line (the HUD's own door by default). */
@@ -249,7 +238,6 @@ export function lootBlow(weapon, damage, attacker, target, info) {
       case 'rage': if (share(attacker) < p.below / 100) pct += p.pct; break;
       case 'execute': if (share(target) < p.below / 100) pct += p.pct; break;
       case 'firstblood': if (!_struck.has(target)) pct += p.pct; break;
-      case 'toll': if (tollDue(weapon, p)) pct += p.pct; break;   // GILDED1: the third that lands
       case 'undertow': pct += p.pct * undertowStacks(target, now); break;   // GILDED2: the blows landed on this foe before (counted to its max at the strike)
       default: break;
     }
@@ -283,7 +271,6 @@ export function lootStrike(attacker, target, damage, weapon, info = null) {
       case 'fists': if (!weapon) again(target, (damage * p.share) / 100, p.name); break;   // BAL7: for half (the record's share)
       case 'conduit': if (whole) gainMana(attacker, p.mana); break;
       case 'flow': if (whole) { _s.flow = Math.min(p.max, flowStacks(now) + 1); _s.flowUntil = now + p.seconds; } break;
-      case 'toll': if (weapon) { _tolls.set(weapon, ((_tolls.get(weapon) ?? 0) + 1) % p.every); _lastToll = { foe: target, at: now, weapon }; } break;   // GILDED1
       case 'dragonfire': if (weapon && foeGroup(target) === p.group) dragonfire(target, (damage * p.share) / 100, p.metres, p.group, p.name); break;   // GILDED2
       case 'undertow': if (weapon && whole) _undertow.set(target, { n: Math.min(p.max, undertowStacks(target, now) + 1), until: now + p.seconds, at: now }); break;   // GILDED2
       default: break;
@@ -489,7 +476,6 @@ export function lootKill(foe) {
       case 'rage': healMine(me, (me.maxHealth * p.heal) / 100); break;
       case 'siphon': gainMana(me, (me.maxMagicka * p.pct) / 100); break;
       case 'tribute': { const g = p.gold * Math.max(1, foe.level | 0); addGoldPieces(me, g); say(`Tribute: ${g} gold.`); break; }
-      case 'toll': if (p.refund && _lastToll?.foe === foe && now - _lastToll.at <= TOLL_REFUND_S && Array.isArray(me?.items)) { addItem(me.items, isGunTemplate(_lastToll.weapon?.templateIndex) ? createPellets(1) : bowDamageArrow()); _lastToll = null; } break;   // GILDED1: the felling shot back - GUNS-UNFOUND: the bow's arrow, a gun era's pellet
       case 'undertow': { const u = _undertow.get(foe); if (u && now - u.at <= TOLL_REFUND_S) { healMine(me, (me.maxHealth * p.heal) / 100); _undertow.delete(foe); } break; }   // GILDED2: a foe it fells, the tide's heal - each its own (AUDIT WORLD-REWARDS B2)
       case 'haste':
         if (now >= _s.hasteReady && door?.castOnPlayer) { _s.hasteReady = now + p.recover; _s.recovering.add('haste'); door.castOnPlayer(hasteBundle(p)); }
@@ -644,7 +630,7 @@ export function lootHudChips(entity, now = _now()) {
 
 /** Tests only: every carry and power fresh, a clock and a chance of their own (seconds, [0, 1)). */
 export function _resetLootPowersForTests() {
-  _carry = new WeakMap(); _resetPlayerHealForTests(); _s = freshState(); _hexed = new WeakMap(); _struck = new WeakSet(); _tolls = new WeakMap(); _lastToll = null;
+  _carry = new WeakMap(); _resetPlayerHealForTests(); _s = freshState(); _hexed = new WeakMap(); _struck = new WeakSet();
   _undertow = new WeakMap();   // GILDED2
   _say = (line) => { hudText(line); };
 }

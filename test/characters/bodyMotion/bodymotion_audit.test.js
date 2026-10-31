@@ -325,7 +325,7 @@ test('AUDIT BODY-MOTION GAIT-4 THE ANKLE: a foot in the air stays within the ank
   }
 });
 
-test('AUDIT BODY-MOTION RIG-4 / DOC-3 / CARRY-10 THE UPPER BODY IS WHOEVER HAS THE ARMS\': over a clip that twists the spine and lifts a collarbone, a bow\'s, a spell\'s, a draw\'s and the long gun\'s arms stay where the clip holds them (the chest, the neck and the collarbones the clip\'s); a torch\'s left collarbone is the clip\'s and its right the layer\'s (mutants: AUDIT-BODY-MOTION-clip-chest-taken, AUDIT-BODY-MOTION-clip-clavicle-taken)', () => {
+test('AUDIT BODY-MOTION RIG-4 / DOC-3 / CARRY-10 THE UPPER BODY IS WHOEVER HAS THE ARMS\': over a clip that twists the spine and lifts a collarbone, a bow\'s, a spell\'s and a draw\'s arms stay where the clip holds them (the chest, the neck and the collarbones the clip\'s); a torch\'s left collarbone is the clip\'s and its right the layer\'s (mutants: AUDIT-BODY-MOTION-clip-chest-taken, AUDIT-BODY-MOTION-clip-clavicle-taken)', () => {
   const ref = (n) => sk.byName.get(n);
   const clipPose = () => {
     const pose = new Map();
@@ -345,7 +345,7 @@ test('AUDIT BODY-MOTION RIG-4 / DOC-3 / CARRY-10 THE UPPER BODY IS WHOEVER HAS T
   };
   const way = (M, a, b) => sub(M.get(ref(b)).t, M.get(ref(a)).t);
   const turnOff = (M, n) => { const a = turnOf(M, ref(n)), b = turnOf(clip, ref(n)); return Math.acos(Math.max(-1, Math.min(1, (a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] + a[4] * b[4] + a[5] * b[5] + a[6] * b[6] + a[7] * b[7] + a[8] * b[8] - 1) / 2))) / RAD; };
-  for (const [name, scene] of [['a bow', { weapon: MW_WEAPON_TYPE.MarksmanBow }], ['a spell', { weapon: MW_WEAPON_TYPE.LongBladeOneHand, spell: true }], ['the draw', { weapon: MW_WEAPON_TYPE.LongBladeOneHand, equip: true }], ['the long gun', { weapon: MW_WEAPON_TYPE.LongBladeOneHand, rifle: true }]]) {
+  for (const [name, scene] of [['a bow', { weapon: MW_WEAPON_TYPE.MarksmanBow }], ['a spell', { weapon: MW_WEAPON_TYPE.LongBladeOneHand, spell: true }], ['the draw', { weapon: MW_WEAPON_TYPE.LongBladeOneHand, equip: true }]]) {
     const M = run(scene);
     for (const side of ['l', 'r']) {
       // the whole body stands on the layer's hips (their height its own), the arms where the clip turns them

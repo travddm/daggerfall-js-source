@@ -72,9 +72,39 @@ export const TECH_FX_RECIPES = Object.freeze(['shock', 'land', 'sweep', 'arc', '
 
 
 /**
+ * A missile record's own colour: the CHROMA-WEIGHTED mean of its opaque texels, normalised so the brightest channel is 1.
+ * A glowing missile sprite is a blown-out white core inside a coloured halo; the core is over-exposed, not white, so a
+ * texel with no saturation does not vote (the weight is alpha times chroma, max channel minus min), and the halo - where a
+ * viewer reads the colour from - decides. A record with no chromatic texel answers its plain alpha-weighted mean, so a
+ * white missile answers white. Normalised, not averaged raw, because the caller wants a light's direction, not its
+ * strength. Null for an empty or black record.
+ */
+export function missileColourFrom(color32) {
+  const d = color32?.colors;
+  if (!d || !d.length) return null;
+  let r = 0, g = 0, b = 0, w = 0;          // chroma-weighted
+  let pr = 0, pg = 0, pb = 0, pw = 0;      // plain alpha-weighted, for the greyscale fallback
+  for (let i = 0; i < d.length; i += 4) {
+    const a = d[i + 3];
+    if (!a) continue;
+    const R = d[i], G = d[i + 1], B = d[i + 2];
+    pr += R * a; pg += G * a; pb += B * a; pw += a;
+    const chroma = Math.max(R, G, B) - Math.min(R, G, B);
+    if (!chroma) continue;
+    const k = a * chroma;
+    r += R * k; g += G * k; b += B * k; w += k;
+  }
+  if (!w) { r = pr; g = pg; b = pb; w = pw; }   // nothing chromatic: the old answer, on purpose
+  if (!w) return null;
+  const peak = Math.max(r, g, b);
+  if (peak <= 0) return null;
+  return [r / peak, g / peak, b / peak];
+}
+
+/**
  * ART-COLOUR (the player: "magic spells are also greenish ... i dont know if the violet effects fit"): A LOOK OUT OF THE
  * ELEMENT'S OWN ART. `rgb` the colour sampled off the element's missile archive (375-379, the player's own ARENA2 -
- * characters/thunderlockIds.js orbColourFrom: chroma-weighted, peak-normalised, so the halo votes and the white core
+ * missileColourFrom, above: chroma-weighted, peak-normalised, so the halo votes and the white core
  * does not), `base` the guess it replaces (its range and timing kept). The art's colour, a shade more saturated so it
  * still reads as light, is the burst's colour; white-hot at birth is that colour lifted most of the way to white; what
  * it cools to is that colour deepened; the light it throws is that colour. Pure. Null for no usable colour.

@@ -12,7 +12,7 @@
 //   F6 the Reforge's window laid: its tabs (the chosen one brass), the Codex's rows of words alone, the salvage's Keep,
 //      a card's line with its press - on both skins; the imprint's press said
 //   F7 the Codex over the pack has the keys - Back closed the pack under it
-//   F8 every Legendary a power, and in the codex - the Thunderlock's Last Lock had none, and its find was said but never
+//   F8 every Legendary a power, and in the codex - a registered Legendary had none, and its find was said but never
 //      listed (the count ran past the rows)
 //   F9 a champion's Rare takes the door's last pass - its chance at a line that does something
 
@@ -23,7 +23,6 @@ import { readFileSync } from 'node:fs';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
 import * as CX from '../../src/systems/loot/lootCodex.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
 import { salvageShards, salvageRefusal, salvagePiece } from '../../src/systems/reforge.js';
@@ -51,16 +50,15 @@ const kids = (n, cls) => (n?.children ?? []).flatMap((c) => [...(c.classList?.co
 const one = (n, cls) => kids(n, cls)[0] ?? null;
 const PV = '00000000000000a2';
 
-test('AUDIT LOOT F1: an imprint offers, and the wire takes, only a power its piece can use - Chain Lightning off an arrow (a bow, the Thunderlock), Earthshaker off a melee blow', () => {
+test('AUDIT LOOT F1: an imprint offers, and the wire takes, only a power its piece can use - Chain Lightning off an arrow (a bow), Earthshaker off a melee blow', () => {
   on();
   const sword = rareOf(createWeapon(120, 1));
   const bow = rareOf(createWeapon(130, 1));
-  const gun = rareOf(createThunderlock());
   const chain = LR.powerOf('stormcaller');
   const quake = LR.powerOf('orsiniums-anvil');
   assert.deepEqual([chain.kind, quake.kind], ['chain', 'quake']);
-  assert.deepEqual([LR.powerFits(sword, chain), LR.powerFits(bow, chain), LR.powerFits(gun, chain)], [false, true, true], 'an arrow arcs');
-  assert.deepEqual([LR.powerFits(sword, quake), LR.powerFits(bow, quake), LR.powerFits(gun, quake)], [true, false, false], 'a melee blow quakes');
+  assert.deepEqual([LR.powerFits(sword, chain), LR.powerFits(bow, chain)], [false, true], 'an arrow arcs');
+  assert.deepEqual([LR.powerFits(sword, quake), LR.powerFits(bow, quake)], [true, false], 'a melee blow quakes');
   for (const id of ['nightwhisper', 'direnni-staff', 'glenmoril-bow', 'warp-edge']) assert.ok(LR.powerFits(sword, LR.powerOf(id)) && LR.powerFits(bow, LR.powerOf(id)), `${id}: any weapon`);
   assert.equal(LR.powerFits(null, chain), false);
   assert.equal(LR.powerFits(sword, null), false);
@@ -196,27 +194,20 @@ test('AUDIT LOOT F7: the Codex over the pack has the keys - Back puts the Codex 
   } finally { globalThis.location = prev; _resetForTests(); }
 });
 
-test('AUDIT LOOT F8: every Legendary a power - the Thunderlock\'s Last Lock too, its shots at the daedra; and every record in the codex, the count the rows\'', () => {
+test('AUDIT LOOT F8: every Legendary a power; and every record in the codex, the count the rows\'', () => {
   on();
   for (const r of LR.allLegendaries()) {
     const p = LR.powerOf(r.id);
     assert.ok(p?.name && p.kind && p.brief && p.brief.length <= 32, `${r.id}: a power, briefed inside the card's 32`);
   }
-  const p = LR.powerOf('the-last-lock');
-  assert.deepEqual([p.name, p.kind, p.pct, [...p.foes]], ['Dwemer Defiance', 'bane', 50, [...LR.FOE_FAMILIES.daedra]]);
-  const lock = legend('the-last-lock', createThunderlock());
-  assert.equal(lock.legendary, 'the-last-lock');
-  const me = { isPlayer: true, items: [lock], health: 50, maxHealth: 100 };
-  equipItem(me, lock);
-  const daedra = { affinity: 'Daedra', careerIndex: 26, health: 100, maxHealth: 100 };   // a Fire Daedra
-  const rat = { affinity: 'Monster', careerIndex: 0, health: 100, maxHealth: 100 };
-  assert.deepEqual([lootBlow(lock, 100, me, daedra, {}), lootBlow(lock, 100, me, rat, {})], [150, 100], 'its shots at the daedra, +50%');
-  const row = () => CX.codexRows().find((r) => r.id === 'the-last-lock');
-  assert.deepEqual([row().found, row().name, row().hint], [false, null, 'No longer found'], 'listed, unfound, by its own hint');   // PIN MOVED (GUNS-UNFOUND): no gun drops, so the hint says so - a held one keeps it
+  // The Last Lock (the Thunderlock's Legendary) went with the guns; Nightwhisper stands in as the one record found
+  const found = legend('nightwhisper');
+  const row = () => CX.codexRows().find((r) => r.id === 'nightwhisper');
+  assert.deepEqual([row().found, row().name], [false, null], 'listed, unfound');
   for (const r of CX.codexRows()) assert.ok(r.hint, `${r.id}: a hint`);
-  CX.noteFind(lock, { quiet: true });
-  assert.deepEqual([row().found, row().name, row().power?.name], [true, 'The Last Lock', 'Dwemer Defiance'], 'found, whole');
+  CX.noteFind(found, { quiet: true });
+  assert.deepEqual([row().found, row().name, row().power?.name], [true, LR.legendaryById('nightwhisper').name, LR.powerOf('nightwhisper').name], 'found, whole');
   assert.deepEqual(CX.codexCount(), { legendary: 1, legendaries: CX.codexRows().length, aetheric: 0, aetherics: CX.codexCount().aetherics, gilded: 0, gildeds: CX.codexGilded().length }, 'the count, the rows\'');
-  assert.ok(CX.imprintChoices(rareOf(createWeapon(120, 1))).some((r) => r.id === 'the-last-lock'), 'its power a found one to imprint');
+  assert.ok(CX.imprintChoices(rareOf(createWeapon(120, 1))).some((r) => r.id === 'nightwhisper'), 'its power a found one to imprint');
 });
 

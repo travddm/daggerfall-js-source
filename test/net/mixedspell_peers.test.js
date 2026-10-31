@@ -1,6 +1,6 @@
 // AUDIT MIXED-PAIR L4-3 / AUDIT SPELL-HAND L4-2 (bible/01-Overview/audits/Audit-Mixed-Pair-Spell-Hand.md; bible/05-Combat/
 // Two-Hands.md, "Peers on the wire"): THE OTHERS SEE THE HANDS. A peer's body held the lead hand's one weapon - a
-// blade-and-Pistolet pair's shot played as a sword blow, a blade's as a shot - and a spell beside a weapon stood the body
+// pair's left blade's blow played with the right hand's weapon - and a spell beside a weapon stood the body
 // in the Spell stance with the weapon out of the hand and played none of its blows. The look carries both hands; the pose
 // carries `ah` (world251), the hand a pair's last strike was; the peer reads both by the local rig's own laws
 // (net/peer/peerBodies.js peerHandsOf).
@@ -10,11 +10,12 @@ import { validPose, poseChanged } from '../../src/net/wire.js';
 import { lerpPose } from '../../src/net/online.js';
 import { peerHandsOf, peerBuildOpts, PeerBodies } from '../../src/net/peer/peerBodies.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
-import { PISTOLET_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 
 const P = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 };
 const sword = { templateIndex: 120, group: 'Weapons', material: 0, equipSlot: EQUIP_SLOTS.RightHand };
-const gunL = { templateIndex: PISTOLET_TEMPLATE, group: 'Weapons', material: 4, equipSlot: EQUIP_SLOTS.LeftHand };
+// A blade pair (a Longsword and a Dagger, both one-handed) is the pair the peer reads; the mixed pair's Pistolet is gone.
+const DAGGER_TEMPLATE = 113;
+const daggerL = { templateIndex: DAGGER_TEMPLATE, group: 'Weapons', material: 4, equipSlot: EQUIP_SLOTS.LeftHand };
 const buckler = { templateIndex: 109, group: 'Armor', material: 0, equipSlot: EQUIP_SLOTS.LeftHand };
 const look = (items) => ({ race: 'Breton', gender: 'male', faceIndex: 0, items });
 
@@ -29,9 +30,9 @@ test('AUDIT MIXED-PAIR L4-3 THE WIRE: `ah` - a pair\'s left hand struck last - s
   assert.ok(poseChanged(validPose({ ...P, an: 1 }), validPose({ ...P, an: 2, ah: 1 })), 'it rides the swing\'s own edge');
 });
 
-test('AUDIT MIXED-PAIR L4-3 / SPELL-HAND L4-2 THE PEER\'S HANDS (peerHandsOf): a blade and a Pistolet are a pair (both hands, the lead off `lh`); one weapon with the other hand empty and a spell readied and drawn is the spell hand; a shield, a light in hand, a sheathed weapon or no spell are not (mutants: the pair read off one hand; the spell hand blind to the light)', () => {
-  const mixed = look([sword, gunL]);
-  assert.deepEqual(peerHandsOf(mixed, { lh: 1 }), { dual: true, lead: 'L', right: sword, left: gunL, spellHand: false });
+test('AUDIT MIXED-PAIR L4-3 / SPELL-HAND L4-2 THE PEER\'S HANDS (peerHandsOf): two blades are a pair (both hands, the lead off `lh`); one weapon with the other hand empty and a spell readied and drawn is the spell hand; a shield, a light in hand, a sheathed weapon or no spell are not (mutants: the pair read off one hand; the spell hand blind to the light)', () => {
+  const mixed = look([sword, daggerL]);
+  assert.deepEqual(peerHandsOf(mixed, { lh: 1 }), { dual: true, lead: 'L', right: sword, left: daggerL, spellHand: false });
   const one = look([sword]);
   assert.equal(peerHandsOf(one, { wd: 1, sr: 1 }).spellHand, true, 'a spell beside the drawn sword');
   assert.equal(peerHandsOf(one, { wd: 0, sr: 1 }).spellHand, false, 'sheathed: DFU\'s two hands');
@@ -54,13 +55,13 @@ test('AUDIT MIXED-PAIR L4-3 / SPELL-HAND L4-2 THE PEER\'S BODY (PeerBodies._arm,
     attack: (strike, o) => { calls.push(['attack', o.hand]); return true; },
   };
   const pb = new PeerBodies({ renderer: {}, createRig: () => ({}), buildOpts: peerBuildOpts });
-  const mixed = look([sword, gunL]);
+  const mixed = look([sword, daggerL]);
   const b = { weapon: null, ammo: 0, held: false, swing: null, cast: null, rig };
   pb._arm(b, { wd: 1, an: 0, cn: 0 }, mixed);
-  assert.deepEqual(calls.filter(([k]) => k === 'weapon' || k === 'off' || k === 'hands').slice(0, 3), [['weapon', 120], ['hands', 'dual:R'], ['off', PISTOLET_TEMPLATE]]);
+  assert.deepEqual(calls.filter(([k]) => k === 'weapon' || k === 'off' || k === 'hands').slice(0, 3), [['weapon', 120], ['hands', 'dual:R'], ['off', DAGGER_TEMPLATE]]);
   calls.length = 0;
   pb._arm(b, { wd: 1, an: 1, cn: 0, ah: 1 }, mixed);
-  assert.deepEqual(calls.filter(([k]) => k === 'attack'), [['attack', 'L']], 'the left hand\'s shot, as the left\'s');
+  assert.deepEqual(calls.filter(([k]) => k === 'attack'), [['attack', 'L']], 'the left hand\'s blow, as the left\'s');
   calls.length = 0;
   pb._arm(b, { wd: 1, an: 2, cn: 0 }, mixed);
   assert.deepEqual(calls.filter(([k]) => k === 'attack'), [['attack', 'R']], 'the right hand\'s blow');

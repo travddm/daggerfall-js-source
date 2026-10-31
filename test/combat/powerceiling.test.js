@@ -20,7 +20,6 @@ import '../../src/systems/firmamentPowers.js';
 import '../../src/systems/weaponMastery.js';
 import '../../src/systems/martialPowers.js';
 import '../../src/systems/arcanePowers.js';
-import '../../src/systems/thunderlock.js';
 import { GILDED_RECORDS } from '../../src/systems/gilded.js';
 import { STARSPUN_SET_PIECES, RAID_SET_PIECES, NUMIDIUM_SET_PIECES, mintAetheric } from '../../src/systems/aetheric.js';
 import { weaponBlowMods, registerWeaponBlowMod } from '../../src/systems/entityMods.js';

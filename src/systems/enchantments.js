@@ -402,7 +402,7 @@ export const repairsObjectsMend = (it) => (it.magic || it.artifact ? CONDITION_A
  *  that wears itself, then the pack), and within a tier the mend order's first (itemTemplates.js mendOrder, the repair
  *  kit's: the lowest share left first, ties in the pack's order). Never what a smith refuses as not
  *  repairable (repairService.js repairRefusal) - DFU's own flag on the quiver it mints at 0 and on the lights, whose
- *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on the Dwemer Pellet, a
+ *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on a
  *  campfire's nights and the rest items' doses (AUDIT REST II H7). RepairsObjects.cs reads no such flag, so a lit
  *  torch first in the pack was refuelled as it burned. An enchanted piece only under AllowMagicRepairs
  *  (RepairsObjects.cs:93). */

@@ -23,7 +23,6 @@ import { isAmmunition, templateByIndex, setItemFields, mintCondition, inventoryI
 import { RRI_TEMPLATES } from '../../../src/systems/roleplayRealismItems/rriItems.js';
 import { isStackable, stacksWith, addItem } from '../../../src/systems/inventory.js';
 import { isDeclaredItemField } from '../../../src/systems/item/itemFields.js';
-import { THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE } from '../../../src/characters/thunderlockIds.js';
 import { execFileSync } from 'node:child_process';
 import { RANDOM_TREASURE_ICONS, validLootItem } from '../../../src/systems/loot/loot.js';
 import { createGateCourt, SPEW_AT_MS, RECEIPT_WAIT_MS, COURT_STRIKE_TEXT } from '../../../src/scenes/gate/gateCourt.js';
@@ -179,9 +178,9 @@ test('WB5 the roll: the seed\'s own - the same spoils every time, another seed\'
   assert.ok(custom > 0, `the custom pieces ride the roll: ${custom}`);
 });
 
-test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (past DFU\'s 288, Climates & Calories\' 530-541 and the Thunderlock\'s 560/561), a gem by group at the gate\'s price with a gem\'s weight and wear and the Ruby\'s art; no ingredient, so it never joins a gem - a Ruby in the pack keeps its row and the stone its name - and (SS1) it stacks with its own kind alone; it rides the loot validator whole, a stack too; and every host has the row, because the hosts\' shared module imports it (mutants: a renamed gem; the hosts\' import pulled)', () => {
+test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (past DFU\'s 288, Climates & Calories\' 530-541), a gem by group at the gate\'s price with a gem\'s weight and wear and the Ruby\'s art; no ingredient, so it never joins a gem - a Ruby in the pack keeps its row and the stone its name - and (SS1) it stacks with its own kind alone; it rides the loot validator whole, a stack too; and every host has the row, because the hosts\' shared module imports it (mutants: a renamed gem; the hosts\' import pulled)', () => {
   assert.equal(SIGIL_STONE_TEMPLATE, 570);
-  assert.ok(SIGIL_STONE_TEMPLATE >= ITEM_TEMPLATES.length && ![THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE].includes(SIGIL_STONE_TEMPLATE) && (SIGIL_STONE_TEMPLATE < 530 || SIGIL_STONE_TEMPLATE > 541), 'past every other row');
+  assert.ok(SIGIL_STONE_TEMPLATE >= ITEM_TEMPLATES.length && (SIGIL_STONE_TEMPLATE < 530 || SIGIL_STONE_TEMPLATE > 541), 'past every other row');
   const t = templateByIndex(SIGIL_STONE_TEMPLATE);
   assert.equal(t.name, SIGIL_STONE.name); assert.equal(t.basePrice, SIGIL_STONE.value); assert.equal(t.custom, true); assert.equal(t.isIngredient, false);
   assert.equal(t.baseWeight, templateByIndex(0).baseWeight, 'a gem\'s weight'); assert.equal(t.hitPoints, templateByIndex(0).hitPoints, 'and wear');

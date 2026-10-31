@@ -6,7 +6,7 @@
 //     PROC_ELEMENTS' order; its level the band its total reads in; nothing for a piece not yet identified, with the
 //     switch off, or with the ladder off; the Morrowind hand's arcane look (one level) for a weapon DFU calls enchanted.
 //   - THE CLASSIC HAND swings the plain sheet while an element shows (plainWeaponType) and draws the outline over the
-//     frame, on its rect and its mirror, measured in the frame's own pixels; the clone and the Thunderlock the same.
+//     frame, on its rect and its mirror, measured in the frame's own pixels; the clone the same.
 //   - THE RENDERER: drawScreenQuadGlow is the fourth 2D primitive, reading a field baked once a frame and look; the
 //     Morrowind pass draws the rings (instanced, a D16 step apart, at a depth the body quad keeps) BEFORE the body and
 //     the charge after, the weapon's shown ranges alone, in a sprite pass alone, and hands every state back.
@@ -26,7 +26,7 @@ import * as LP from '../../src/systems/loot/lootPowers.js';
 import * as WG from '../../src/systems/weaponGlow.js';
 import * as GL from '../../src/render/weaponGlowGlsl.js';
 import { isEnchanted } from '../../src/systems/inventory.js';
-import { mintHourlock, mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { createRegularMagicItem } from '../../src/systems/loot/loot.js';
 import { MAGIC_ITEM_RECORD_SIZE, ENCHANTMENT_TYPES, readMagicDef } from '../../src/formats/magicDef.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
@@ -118,7 +118,7 @@ test('WEAPON-GLOW1: the element is the blow\'s - a minted line names it, at the 
   }
 });
 
-test('WEAPON-GLOW1: the Legendary band reads level 3 - an Exalted\'s own elemental line, and the Hourlock\'s', () => {
+test('WEAPON-GLOW1: the Legendary band reads level 3 - an Exalted\'s own elemental line', () => {
   on();
   // exaltLegendary, the producer of the Exalted line, aimed at its elemental kind
   const it = sword();
@@ -131,10 +131,6 @@ test('WEAPON-GLOW1: the Legendary band reads level 3 - an Exalted\'s own element
   const line = it.affixes.find((a) => a.id === 'elemental');
   assert.ok(line.value > LR.AFFIX_RANGES.elemental.rare[1]);
   assert.deepEqual(WG.weaponGlow(it, { on: true }), { look: line.param, level: 3 });
-  // the Gilded rung's: the Hourlock's line is the Legendary band's top - and it carries no DFU enchantment
-  const hour = mintHourlock();
-  assert.deepEqual(WG.weaponGlow(hour, { on: true }), { look: 'shock', level: 3 });
-  assert.equal(WG.spriteGlow(hour, { on: true }), WG.glowSpec('shock', 3));
   // AUDIT WEAPON-GLOW LAW-2: a Gilded piece with no element is BARE in both hands - its powers are its record's, and
   // it carries no enchantment for the arcane look to say (bible/05-Combat/Weapon-Glow.md "Not done")
   const oath = mintGilded(DRAGONFIRE_OATH);
@@ -245,7 +241,8 @@ test('WEAPON-GLOW1: the classic hand swings the PLAIN sheet while an element sho
   const T = WEAPON_TYPES;
   // AUDIT WEAPON-GLOW DOC-12: every type the table knows - a *_Magic its plain twin, every other itself
   for (const [k, v] of Object.entries(T)) assert.equal(plainWeaponType(v), k.endsWith('_Magic') ? T[k.slice(0, -'_Magic'.length)] : v, k);
-  assert.ok(Object.keys(T).filter((k) => k.endsWith('_Magic')).length >= 8);
+  // PIN MOVED (guns removed): Thunderlock_Magic and Pistolet_Magic left the table - DFU's seven *_Magic types remain
+  assert.ok(Object.keys(T).filter((k) => k.endsWith('_Magic')).length >= 7);
   // Diverse Weapons asks its plain set too, and the item's own answer is unchanged when nothing is said
   on();
   const it = mintRare();
@@ -267,10 +264,6 @@ test('WEAPON-GLOW1: the classic hand swings the PLAIN sheet while an element sho
   // PIN MOVED (TWO-HANDS): a clone's frame is built per hand's item (weaponRig.js cloneFrame - the one hand's, or each of
   // a pair's), its set and outline that item's own
   assert.match(rig, /weaponType: heldType\(item\), material: drawnPiece\(item\)\?\.material \?\? -1, glow: glowOf\(item\),/, 'the clone told the set and the outline');   // PIN MOVED (APPEARANCES): the metal the look's
-  // PIN MOVED (PISTOLET): the frame drawn through the hand's mirror (`uv`), each pistol of a pair outlined by its own
-  // glow, and the field in the art's NATIVE pixels - the Thunderlock's union box, the Pistolet's own texture size (AUDIT
-  // PISTOLET B4: its union box is in design pixels)
-  assert.match(rig, /renderer\.drawScreenQuad\(tex, rect, uv, lit \?\? undefined\);\s*const elementGlow = hand \? glowOf\(playerWeapon\.handItem\(hand\)\) : heldGlowNow\(\);[^\n]*\n\s*if \(elementGlow\) renderer\.drawScreenQuadGlow\?\.\(tex, rect, uv, elementGlow, \{ art: art\.native \? \[art\.native\.w, art\.native\.h\] : \[art\.unionBox\.w, art\.unionBox\.h\], view: \[canvas\.width, canvas\.height\] \}\);/, 'the Thunderlock\'s frame, then its outline - in its art\'s native pixels');
   // PIN MOVED (SPELL-HAND): the sprite's offset is the climb's (`offsetHeight`, built once on the line above) less the
   // spell hand's guard (was: `weaponOffsetHeight() - climbDrop(...)` inline); the glow did not move
   // AUDIT SPELL-HAND L5-9: one pin, in order - the climb's offset, the guard's drop off it, the sprite drawn at their difference

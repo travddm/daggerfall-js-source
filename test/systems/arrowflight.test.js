@@ -86,130 +86,30 @@ test('arrowflight: bare terrain lands it (heightAt floor) + late collider resolv
   assert.equal(a.arrows.length, 0);
 });
 
-// ── FIELD-GUN14 (2026-09-20, Mac: "The projectile that shoots out
-// should be an orb, not an arrow") ─────────────────────────────────
+// ── A player's shot is a shaft ─────────────────────────────────────
 //
-// THE THIRTEENTH TIME, AND THE SAME FAULT: a law written over DFU's
-// own range, asked about this weapon, answering its default. The
-// Thunderlock rides this lane because `isBowWeapon` is "scored on
-// Archery" - which is exactly what let every host's ranged gate take
-// it without being told it exists - and it inherited the bow's
-// PICTURE along with the bow's physics. One module, one model, no
-// fork, and a dwarven firearm fired arrows.
-//
-// The flight is not what changed. These pins hold that: same speed,
-// same sweep, same contact, same lifespan, and a BOW still draws the
-// shaft it always did.
+// The guns' orb lane (FIELD-GUN14) is gone with the guns: every player
+// shot flies at ARROW_FLIGHT_SPEED and draws the 99800 shaft.
 
-/** A stand-in for a host's hitEffects pool - the one door the flight
- *  reaches a billboard through. */
-function flatPool() {
-  const live = [];
-  return {
-    live,
-    showFlyingFlat(archive, pos, opts = {}) {
-      const e = { archive, record: opts.record, at: [pos[0], pos[1], pos[2]], dead: false };
-      live.push(e);
-      return {
-        move(p) { e.at = [p[0], p[1], p[2]]; },
-        retire() { e.dead = true; },
-      };
-    },
-  };
-}
-
-test('FIELD-GUN14: the gun’s shot flies as an ORB, the bow’s as a shaft - one flight, two pictures', async () => {
-  const { createThunderlock } = await import('../../src/systems/thunderlock.js');
-  const { ORB_ARCHIVE, ORB_RECORD, orbArchiveFor } = await import('../../src/characters/thunderlockIds.js');
-  const { missileArchive, ELEMENTS } = await import('../../src/systems/spellcast.js');
-
-  // THE ORB IS DAGGERFALL'S OWN. 375-379 are the spell missiles, each
-  // an animated glowing ball the game already loads - so this is the
-  // port picking one, not the port drawing new art.
-  assert.equal(ORB_ARCHIVE, missileArchive(ELEMENTS.Shock), 'the Thunder-lock fires the SHOCK missile’s flat');
-  assert.equal(ORB_RECORD, 0, 'the flight record - record 1 of the same archive is the impact flash (AUDIT 26 F033)');
-  // and the fork is asked of the WEAPON, once, on a leaf with no imports
-  assert.equal(orbArchiveFor(createThunderlock()), ORB_ARCHIVE);
-  assert.equal(orbArchiveFor({ templateIndex: 130 }), null, 'a Long Bow shoots a shaft');
-  assert.equal(orbArchiveFor({ templateIndex: 120 }), null, 'and so does everything that is not this weapon');
-  assert.equal(orbArchiveFor(null), null);
-
-  for (const [what, weapon, wantsOrb] of [
-    ['the Thunderlock', createThunderlock(), true],
-    ['a Long Bow', { templateIndex: 130, name: 'Long Bow' }, false],
-  ]) {
-    const fx = flatPool();
-    const drawn = [];
-    const f = new ArrowFlight({ getGpuMesh: async () => ({ id: ARROW_MODEL_ID }), collider: null, effects: fx });
-    f.fire([0, 1, 0], [0, 0, 1], { fromPlayer: true, weapon });
-    for (let i = 0; i < 4; i++) { await Promise.resolve(); f.update(1 / 60, {}); }
-    f.draw({ drawMesh: (g, mat) => drawn.push(mat[14]) });
-
-    const shot = f.arrows[0];
-    const speed = wantsOrb ? MISSILE_SPEED : ARROW_FLIGHT_SPEED;
-    assert.ok(Math.abs(shot.pos[2] - 4 * speed / 60) < 1e-9, `${what}: ${wantsOrb ? 'an orb stays on MISSILE_SPEED' : 'a shaft flies at ARROW_FLIGHT_SPEED'}`);
-
-    if (wantsOrb) {
-      assert.equal(fx.live.length, 1, `${what}: one flat`);
-      assert.equal(fx.live[0].archive, ORB_ARCHIVE);
-      assert.equal(fx.live[0].record, ORB_RECORD);
-      assert.equal(drawn.length, 0, `${what}: and NO shaft mesh - the flat is the whole picture`);
-      // the flat is where the shot IS, not where it was a step ago
-      assert.deepEqual(fx.live[0].at, [...shot.pos], `${what}: the flat follows AFTER the advance`);
-      // AND IT GOES OUT WITH THE FLIGHT - while OTHER shots are still
-      // flying, which is the case the all-dead sweep does not cover.
-      // `arrows` is not compacted until every record is dead, so a
-      // spent orb whose flat is only released by that sweep hangs in
-      // the world for as long as anything else is in the air.
-      f.fire([0, 1, 0], [0, 0, 1], { fromPlayer: true, weapon });
-      await Promise.resolve();
-      f.update(1 / 60, {});
-      assert.equal(fx.live.length, 2, `${what}: a second shot, a second flat`);
-      shot.dead = true;
-      f.update(1 / 60, {});
-      assert.equal(fx.live[0].dead, true, `${what}: the spent shot's flat is retired at once`);
-      assert.equal(fx.live[1].dead, false, `${what}: and the one still in the air is not`);
-    } else {
-      assert.equal(fx.live.length, 0, `${what}: no flat`);
-      assert.equal(drawn.length, 1, `${what}: the 99800 shaft, drawn as it always was`);
-      assert.ok(Math.abs(drawn[0] - shot.pos[2]) < 1e-5, `${what}: at the arrow’s own z`);   // float32: the matrix is a Float32Array
-    }
-  }
-});
-
-test('FIELD-GUN14: a host with no effects pool still flies the shot (and draws nothing for it)', async () => {
-  const { createThunderlock } = await import('../../src/systems/thunderlock.js');
+test('arrowflight: a player bow shot flies as the 99800 shaft at ARROW_FLIGHT_SPEED', async () => {
   const drawn = [];
-  const f = new ArrowFlight({ getGpuMesh: async () => ({ id: ARROW_MODEL_ID }), collider: null });   // no `effects`
-  f.fire([0, 1, 0], [0, 0, 1], { fromPlayer: true, weapon: createThunderlock() });
-  for (let i = 0; i < 3; i++) { await Promise.resolve(); f.update(1 / 60, {}); }
-  f.draw({ drawMesh: (g, mat) => drawn.push(mat) });
-  assert.equal(drawn.length, 0, 'no pool, no picture - and no shaft standing in for one');
-  assert.ok(f.arrows[0].pos[2] > 0, 'the shot still flies, which is what the damage rides');
-  // `clear` takes every flat down - worldModes keeps ONE pool across
-  // every building, so a shot in flight when the door closes must not
-  // be drawn in the next one. And that host DROPS its stale flights
-  // through this door rather than by emptying the array, which is the
-  // difference between a released flat and an orb hanging in the next
-  // room.
-  assert.doesNotThrow(() => f.clear());
-  assert.equal(f.arrows.length, 0);
+  const f = new ArrowFlight({ getGpuMesh: async () => ({ id: ARROW_MODEL_ID }), collider: null });
+  f.fire([0, 1, 0], [0, 0, 1], { fromPlayer: true, weapon: { templateIndex: 130, name: 'Long Bow' } });
+  for (let i = 0; i < 4; i++) { await Promise.resolve(); f.update(1 / 60, {}); }
+  f.draw({ drawMesh: (g, mat) => drawn.push(mat[14]) });
 
-  {
-    const fx2 = flatPool();
-    const g = new ArrowFlight({ getGpuMesh: async () => null, collider: null, effects: fx2 });
-    g.fire([0, 1, 0], [0, 0, 1], { fromPlayer: true, weapon: createThunderlock() });
-    g.update(1 / 60, {});
-    assert.equal(fx2.live.length, 1);
-    g.clear();
-    assert.equal(fx2.live[0].dead, true, 'the flat goes down with the flight');
-  }
+  const shot = f.arrows[0];
+  assert.ok(Math.abs(shot.pos[2] - 4 * ARROW_FLIGHT_SPEED / 60) < 1e-9, 'a shaft flies at ARROW_FLIGHT_SPEED');
+  assert.equal(drawn.length, 1, 'the 99800 shaft, drawn as it always was');
+  assert.ok(Math.abs(drawn[0] - shot.pos[2]) < 1e-5, 'at the arrow’s own z');   // float32: the matrix is a Float32Array
 });
 
 test('FIELD-GUN14: the pool grew a flat that FLIES - it moves, it loops, and the flight ends it', async () => {
   const { createHitEffects } = await import('../../src/scenes/hitEffects.js');
   const { MISSILE_FPS } = await import('../../src/render/flatAnimation.js');
-  const { ORB_ARCHIVE } = await import('../../src/characters/thunderlockIds.js');
+  // The flying flat outlived the guns' orb: the spell impacts' sparks (hostMagic.js) fly a missile archive through it.
+  const { missileArchive, ELEMENTS } = await import('../../src/systems/spellcast.js');
+  const ORB_ARCHIVE = missileArchive(ELEMENTS.Shock);
   const settle = () => new Promise((r) => setImmediate(r));
 
   const built = [], destroyed = [];

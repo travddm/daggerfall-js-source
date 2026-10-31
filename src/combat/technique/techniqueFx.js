@@ -56,7 +56,7 @@ const HANDS = new TechHands();
  * the climb's own roll shares it), so a larger one tilts the land against a level sky. A swing's roll leans with the
  * blade's travel: a StrikeLeft (Whirlwind) leans left into it and settles back past level; a StrikeRight (Cleave,
  * Shadowstep, Haymaker) winds up leaning left and lands leaning right. A bow's loose plays no layer of its own: the
- * host's bowSound plays the same ArrowShoot a tick earlier (and a Thunderlock's loose is its own shot), so a second one
+ * host's bowSound plays the same ArrowShoot a tick earlier, so a second one
  * only doubled it. bible/05-Combat/Weapon-Techniques.md THE FEEL's table says each in words.
  */
 const f = Object.freeze;

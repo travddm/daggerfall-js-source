@@ -1,6 +1,6 @@
 // AUDIT 68 (2026-09-24), cluster combat_c - src/combat shieldWidget ..
 // weaponWidgetMotion: the rig's attack gate and held shot, its module
-// singletons, the EOTB canvas, the gun's slide, and the Shield Widget's
+// singletons, the EOTB canvas, and the Shield Widget's
 // material, sheet key and parry ring. Every pin drives a real rig or the
 // real component, and each one failed on the base source.
 import { test } from 'node:test';
@@ -13,7 +13,6 @@ import { eotbBody } from '../../src/player/eyeOfTheBeholder/eotbBody.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
 import { setItemFields, mintCondition } from '../../src/systems/item/itemTemplates.js';
-import { createThunderlock, createPellets } from '../../src/systems/thunderlock.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { setValue } from '../../src/systems/settings/settings.js';
 
@@ -185,42 +184,6 @@ test('AUDIT 68 S09-eotb-canvas-null: Don\'tHideWeapon keeps the first-person wea
     r.frame(1 / 60); r.draw();
     assert.equal(calls, 0, 'and without it the weapon still goes');
   } finally { eotbBody.hides = hides; _resetModSettings(); }
-});
-
-test('AUDIT 68 S09-gun-sliding-offset-off: with Weapon Widget\'s Offset module off, a sheathed Thunderlock leaves the screen', async () => {
-  // a synthetic strip (PIN MOVED, THUNDERLOCK-ART2: the owner's seven 160x98 frames, side by side on a clear page): a dark
-  // box per frame reaching its foot, a flash in frame 1
-  const W = 160 * 7, H = 98;
-  const px = new Uint8Array(W * H * 4);
-  for (let cell = 0; cell < 7; cell++) {
-    const cx = cell * 160 + 60, cy = 40;
-    for (let y = cy; y < H; y++) for (let x = cx; x < cx + 40; x++) { const p = (y * W + x) * 4; px[p] = 40; px[p + 1] = 40; px[p + 2] = 40; px[p + 3] = 255; }
-    if (cell === 1) for (let y = cy; y < cy + 5; y++) for (let x = cx; x < cx + 5; x++) { const p = (y * W + x) * 4; px[p] = 250; px[p + 1] = 250; px[p + 2] = 240; }
-  }
-  const saved = { fetch: globalThis.fetch, createImageBitmap: globalThis.createImageBitmap, OffscreenCanvas: globalThis.OffscreenCanvas };
-  globalThis.fetch = async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(8) });
-  globalThis.createImageBitmap = async () => ({ width: W, height: H, close() {} });
-  globalThis.OffscreenCanvas = class { getContext() { return { drawImage() {}, getImageData: () => ({ width: W, height: H, data: new Uint8ClampedArray(px) }) }; } };
-  try {
-    _resetModSettings();
-    setModSetting('weapon-widget', 'Modules.Offset', false);
-    const gun = createThunderlock();
-    const entity = { items: [gun, createPellets(20)], stats: { speed: 50 }, equip: { slots: { [EQUIP_SLOTS.RightHand]: gun } } };
-    let quads = [];
-    const r = rigOf(entity, { renderer: { uploadTexture: (k, name) => ({ name }), drawScreenQuad: (tex, rect) => quads.push({ tex, rect }) } });
-    r.readyWeapon();
-    for (let i = 0; i < 5; i++) { r.frame(1 / 60); r.draw(); await new Promise((res) => setTimeout(res, 0)); }
-    quads = []; r.frame(1 / 60); r.draw();
-    assert.equal(quads.length, 1, 'drawn: the gun is on screen (the art landed)');
-    r.readyWeapon();
-    assert.equal(r.playerWeapon.sheathed, true);
-    for (let i = 0; i < 600; i++) { r.frame(1 / 60); r.draw(); }
-    quads = []; r.frame(1 / 60); r.draw();
-    assert.equal(quads.length, 0, 'ten seconds sheathed: no slide was ever running, so nothing is drawn');
-  } finally {
-    Object.assign(globalThis, saved);
-    _resetModSettings();
-  }
 });
 
 test('AUDIT 68 S09-v-shield-material-ignored: the Shield Widget draws a minted shield\'s own metal', () => {

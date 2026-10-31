@@ -52,7 +52,6 @@ import { dfmodImgImage, dfmodCifRciImage, dfmodCifRciRect, dfmodGeneration, resa
 import { itemDyeColor, itemDyeTarget } from '../systems/item/itemDye.js';   // DW3: DaggerfallUnityItem.dyeColor, as the port's items carry it
 import { ARTIFACT_MALE_TEXTURE_ARCHIVE, ARTIFACT_FEMALE_TEXTURE_ARCHIVE } from '../systems/loot/loot.js';   // ART-DOLL: an artifact's own doll archive
 import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: a custom class's own archive and record on the doll
-import { ownItemImage } from '../systems/item/itemTemplates.js';   // THUNDERLOCK-ART: a weapon of the port's own wears its own doll layer
 import { clampArmorVariant, armorArchive, HUMAN_MORPHOLOGY, ARMOR_MATERIAL } from '../systems/armorMaterials.js';
 import { raceArt, FACES_PER_RACE, raceByKey } from '../systems/races.js';   // S3c/U9: all eight races
 import { drawnPiece } from '../net/appearanceLaw.js';   // APPEARANCES: a worn piece's look
@@ -181,9 +180,6 @@ export function paperdollItemImage(worn, { gender = 'male', race = 'Breton' } = 
     return { archive, record, dye, target: DYE_TARGETS.WeaponsAndArmor };
   }
   if (item.group === 'Weapons') {
-    // THUNDERLOCK-ART (systems/item/itemTemplates.js ownItemImage): a weapon of the port's own wears its own doll layer - a Gilded piece's gold one
-    const own = ownItemImage(item, { forPaperDoll: true });
-    if (own) return { archive: own.archive, record: own.record, dye: MATERIAL_DYES[item.material ?? 0] ?? DYE_COLORS.Unchanged, target: DYE_TARGETS.WeaponsAndArmor };
     let record = t.playerTextureRecord;
     // an Either-hand weapon worn RIGHT uses the +1 record
     if (item.equipSlot === EQUIP_SLOTS.RightHand && getItemHands(item) === ITEM_HANDS.Either) record += 1;
@@ -439,7 +435,7 @@ function blit(out, img, palette, { rows = null, remap = null, atOffset = null, u
 
 /** FIELD-GUN4: THE OTHER KIND OF LAYER. `blit` above is DFU's own -
  *  palette INDICES through the doll's palette, with 0 transparent and
- *  0xff the cloak's cut-out. The port's own art (systems/thunderlock.js)
+ *  0xff the cloak's cut-out. The port's own art (a stand-in texture)
  *  is truecolor and has no index to give, so it composites straight
  *  in on its alpha. No dye and no remap: a dye is a palette-range
  *  rotation and there is no palette here to rotate.
