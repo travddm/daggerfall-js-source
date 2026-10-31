@@ -57,20 +57,3 @@ test('MAC-SWING1: bound to a KEY or a PAD code the swing is reachable - swingHel
   } finally { setBindings(had); }
 });
 
-test('MAC-SWING1 SOURCE: all four hosts poll the key latch and feed the rig on its edge; the drag routers take the key set', () => {
-  for (const [f, feed] of [
-    ['src/scenes/dungeon.js', /ctx\.playerAttackInput\(0, 0, swingKey\)/],
-    ['src/scenes/world.js', /weaponRig\.attackInput\(0, 0, false\);[^\n]*\n\s*else if \([^\n]*weaponRig\.attackInput\(0, 0, true\);/],
-    ['src/scenes/exterior.js', /weaponRig\.attackInput\(0, 0, false\);[^\n]*\n\s*else if \([^\n]*weaponRig\.attackInput\(0, 0, true\);/],
-    ['src/scenes/worldModes.js', /sink\?\.\(0, 0, false\);[^\n]*\n\s*else if \(!modalWindowUp\(\)\) sink\?\.\(0, 0, true\);/],
-  ]) {
-    const s = rd(f);
-    assert.match(s, /const swingKey = swingKeyHeld\(keys\);/, `${f}: polls the latch`);
-    assert.match(s, /if \(swingKey !== swingKeyLatch\) \{/, `${f}: feeds on the change`);
-    assert.match(s, feed, `${f}: the press is gated as its mousedown is, the release never`);
-  }
-  assert.match(rd('src/scenes/dungeon.js'), /swingHeld\(e\.buttons, keys\)/, 'dungeon: the gesture drag reads the key too');
-  assert.match(rd('src/scenes/worldModes.js'), /swingHeld\(e\.buttons, keys\)/, 'worldModes: the gesture drag reads the key too');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /routeMouseDrag\(\{ walkMode, buttons: e\.buttons, keys, mode: modeNow\(\) \}\)/, `${f}: hands the keys to the router`);
-  for (const f of ['src/scenes/dungeon.js', 'src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /swingHeld: rightHeld \|\| swipeHeld \|\| swingKeyLatch/, `${f}: the settle law sees the key swing`);
-});

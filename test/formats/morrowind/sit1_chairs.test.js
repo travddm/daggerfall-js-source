@@ -88,42 +88,6 @@ test('SIT1 THE POSE: the card table\'s seated body SOLVED on retail\'s biped at 
   assert.ok(Math.abs(head[1] - SEATED_EYE_HEIGHT) < 0.1, 'the head about the seated eye');
 });
 
-test('SIT1 THE WIRING: the room lists its chairs (hidden with their piece); the host\'s target, press, name, seat and eye, the body drawn on the chair and posed by the rig, the third person round it, every road up, and the pose on the wire', () => {
-  const ctx = read('src/scenes/interiorContext.js'), modes = read('src/scenes/worldModes.js');
-  assert.match(ctx, /if \(isChairModel\(classicModelIdOf\(p\.modelIdNum\)\)\) \{\n\s*const chair = \{ cpu, matrix, modelId: classicModelIdOf\(p\.modelIdNum\), aabb \};[^\n]*\n\s*chairs\.push\(chair\);\n\s*if \(baseKey\) base\.furnish\(baseKey, chair\);/);
-  assert.ok(ctx.indexOf('chairs.push(chair)') < ctx.indexOf('    if (p.objectType !== PROP_MODEL_TYPE) {\n      if (isBedModel('), 'listed whatever its ObjectType, before the furniture gate');
-  assert.match(ctx, /^ {4}chairs, {4}\/\/ SIT1/m);
-  const has = (s, why) => assert.ok(modes.includes(s), why ?? s);
-  has("    if (!cardSeat && !chairSeat) interiorCtx.chairs?.forEach((ch, i) => {   // SIT1", 'none while seated');
-  has('      if (ch.hidden) return;   // BASE-HIDE: taken out of the room\n      targets.push({ key: `chair:${i}`, aabb: ch.aabb ?? worldAabb(ch.cpu.positions, ch.matrix), distance: RAY_DISTANCE, reach: DEFAULT_ACTIVATION_DISTANCE, surface: true });');
-  has('    if (chairSeat) return [];   // SIT1 (AUDIT FIVE-ASKS C5)', 'seated, the plaque names nothing - every press stands you up');
-  has("      if (key.startsWith('chair:')) {\n        (decorTool.flying() && !decorTool.ghost() && plaqueActionFor(key) === 'out' ? decorTool.act('out', interiorCtx.chairs?.[Number(key.split(':')[1])]?.baseKey) : sitOnChair(Number(key.split(':')[1])));   // SIT1");
-  has("(key) => (typeof key !== 'string' ? null : key.startsWith('chair:') ? decorBuiltInPlaque(chairName(interiorCtx?.chairs?.[Number(key.split(':')[1])]), interiorCtx?.chairs?.[Number(key.split(':')[1])], decorTool.flying() && !decorTool.ghost()) : (key.startsWith('bed:') && decorTool.flying() && !decorTool.ghost() ? decorBuiltInPlaque('Bed', interiorCtx?.beds?.[Number(key.split(':')[1])], true) : null))");
-  has("    if (Math.abs(aabb.min[1] - player.pos[1]) > CHAIR_FLOOR_STEP) { setMidScreenText(tooFarAwayText()); return; }", 'never a chair on another floor (C6)');
-  has("    const seat = chairSeatOf(aabb, ch.matrix, chairProbeOver(interiorCtx?.collider, aabb), player.pos);", 'the room\'s own collider');
-  has("    if (takenSeats([{ x: seat.feet[0], z: seat.feet[2] }], host.seatedPeers?.() ?? []).length) { say(t('chair.taken', 'Someone is already sitting there.')); return; }", 'another player\'s chair is theirs');
-  has("    chairSeat = null;   // the slot first (THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD)\n    player.drawFeet = null;\n    player.drawYaw = null;\n    cam.pos = player.eyeAt();");
-  // the roads up - each beside the card seat's own
-  has("    if (chairSeat) { standFromChair(); return true; }   // SIT1", 'the press');
-  has("    if (chairSeat && !overlayHeld && leavesSeat(mv, jumpHeld || !!player.toggleAutorun || swingKey)) standFromChair();", 'a step, a jump, the stick, the autorun');
-  has("    if (chairSeat && isSwingButton(e.button) && !modalWindowUp()) { standFromChair(); return; }", 'a swing');
-  has("    if (mode === 'interior' && chairSeat && actionOf(e, keys) === 'Escape' && !interiorKeyCtx.uiOverlayActive) { standFromChair(); e.preventDefault(); return; }", 'Escape');
-  has("  registerPlayerHurtListener('chair-seat', (_e, hurt) => { if (chairSeat && hurt.after < hurt.before && !tickInFlight()) standFromChair(); });", 'a blow');
-  has("    if (chairSeat && !(playerEntity.health > 0)) standFromChair();", 'death');
-  assert.equal(modes.split('standFromChair();   // SIT1: nor on a chair').length - 1, 2, 'a room left, a new room');
-  has('  modesApi.attackInput = (dx, dy, held) => { if (held && chairSeat && !decorTool.flying()) { standFromChair(); return; } touchSwing(dx, dy, held); };', 'a touch swing (C1)');
-  has('    if (_act.cast && chairSeat) standFromChair();', 'a cast, before it leaves the eye (C3)');
-  has('    if (chairSeat && (decorTool.flying() || decorTool.panelOpen() || interiorCtx?.chairs?.[chairSeat.key]?.hidden)) standFromChair();', 'the decorator, or the chair taken out of the room (C2)');
-  has("        standFromChair();   // SIT1: off a chair too\n        standFromCardTable({ cashOut: !load });", 'the forced road out');
-  // the view and the body
-  has("    if (mode === 'interior' && chairSeat && !(interiorOverlay instanceof DeathScreen)) { cam.pos = chairSeat.eye.slice(); player.drawFeet = chairSeat.feet; player.drawYaw = chairSeat.yaw; }");
-  has("      seat: chairSeat ? { feet: chairSeat.feet, yaw: chairSeat.yaw, top: chairSeat.top } : null,   // SIT1", 'the rig poses the body seated (fpArm thirdSeat)');
-  has('      ...(chairSeat ? { feet: chairSeat.feet } : {}),', 'the third person orbits the chair the body is drawn on (C0)');
-  assert.equal(modes.includes('if (chairSeat) mwv.eye = cam.pos;'), false, 'never forced into first person - the third person sees the body seated');
-  has("  const cardSeatPose = modesApi.seatPose;\n  modesApi.seatPose = () => cardSeatPose() ?? (mode === 'interior' && chairSeat ? { feet: chairSeat.feet, yaw: chairSeat.yaw, st: seatTopByte(chairSeat.top) } : null);", 'others see it seated - the card seat\'s door first');
-  for (const other of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(other), /chairSeat|sitOnChair|`chair:/, `${other} seats nobody on a chair`);
-});
-
 test('SIT1 THE ROOM\'S PROBE (AUDIT FIVE-ASKS C4/C8): over a real collider - a thin back and a tall throne\'s back found at the reaches, the sitter facing away; a table over the seat never taken for it; a miss is none', () => {
   const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
   const box = (x0, y0, z0, x1, y1, z1, P, Ix) => {

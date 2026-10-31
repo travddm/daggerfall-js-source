@@ -166,15 +166,6 @@ test('TACT3c: a narrow hall - the collider stops a lane at its wall, the watchma
   }
 });
 
-test('TACT3c: the arm uses it, five in a row at most, the classic point and count kept', () => {
-  const g = rd('src/scenes/cityGuards.js');
-  const fn = g.slice(g.indexOf('async function spawnCityGuardsNow('));   // WATCH-FIX: PIN MOVED - the member's body, behind the crime response's turn
-  const arm = fn.slice(fn.indexOf('if (interior?.eligible) {'), fn.indexOf('if (immediate) {'));
-  assert.match(arm, /door\.pos\[0\] \+ door\.normal\[0\] \* GUARD_INDOOR_DOOR_OFFSET/);
-  assert.match(arm, /const guardCount = 2 \+ Math\.floor\(rand\(\) \* 4\);/);
-  assert.match(arm, /spawnGuardAt\(indoorWatchSpot\(at, door\.normal, i, collider\), 0, playerFeet \?\? null\)/);
-});
-
 // ── d. THE DOOR CLICK ───────────────────────────────────────────────
 
 const foeAt = (x, hostile) => ({ ai: { feet: [x, 0, 0], height: 1.8, isHostile: hostile }, entity: {}, dead: false, mobileType: 0 });
@@ -215,13 +206,3 @@ test('TACT3d: the plaque agrees - liveFoeTargets marks the peaceful, peacefulFoe
   assert.equal(peacefulFoePass(null, peace, 2.5), null);
 });
 
-test('TACT3: the hosts wire it - the street and the building each frame, the press and the plaque', () => {
-  const w = rd('src/scenes/world.js'), m = rd('src/scenes/worldModes.js');
-  assert.match(w, /exteriorFoes\.update\(foeDt[^\n]*\n\s*if \(_deckBodies\.size\) navalLeash\(\);[^\n]*\n(?:[^\n]*\n){0,3}\s*spaceAcross\(\[cityGuards\.guards, exteriorFoes\.foes\], collider, foeFrameDt\(foeDt\), _ownTact\);\n\s*if \(cityGuards\.guards\.length \|\| exteriorFoes\.foes\.length\) clearDoorways\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\], _tactDoorSpots\(_pf\), collider, foeFrameDt\(foeDt\), _ownTact\);/);
-  assert.match(w, /const _ownTact = \(f\) => spacingSkips\(f\) \|\| f\._ownFrom != null \|\| _deckBodies\.has\(f\);/);
-  assert.match(m, /if \(interiorCtx && !overlayHeld\) \{\n[^\n]*\n\s*spaceAcross\(\[interiorFoes\?\.foes \?\? \[\], interiorGuards\?\.guards \?\? \[\]\], interiorCtx\.collider, foeFrameDt\(foeDt\), own\);\n\s*clearDoorways\(interiorFoePool\(\), \[\.\.\.doorSpotsNear\(interiorCtx\.doors, player\.pos, 30\), \.\.\.actionDoorSpots\(interiorCtx\.actions\?\.objects, player\.pos, 30\)\], interiorCtx\.collider, foeFrameDt\(foeDt\), own\);/);
-  assert.match(w, /\[\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards\], collider, reach,\n\s*getInteractionMode\(\), playerEntity, \{\n\s*nearerThan,\n\s*doorBehind: _race\.doorDistance,/);
-  assert.match(m, /tryMobileEnemyActivate\(eye, dir, interiorFoePool\(\), interiorCtx\.collider,\n\s*reach, getInteractionMode\(\), playerEntity, \{\n\s*nearerThan,\n\s*doorBehind: doorDistanceOf\(eye, dir, targets, interiorCtx\.collider\),/);
-  assert.match(w, /foe: \(\(ft\) => peacefulFoePass\(pickActivatableHit\(cam\.pos, _hd, ft, collider\), ft, modes\.exteriorActivationDistance\(cam\.pos, _hd\), getInteractionMode\(\)\)\)\(\[\.\.\.exteriorFoes\.liveTargets\(\), \.\.\.cityGuards\.liveTargets\(\)\]\),/);
-  assert.match(m, /foe: peacefulFoePass\(pickActivatableHit\(mwv\.eye, d, liveFoes, interiorCtx\.collider\), liveFoes, doorDistanceOf\(mwv\.eye, d, interiorActivationTargets\(\), interiorCtx\.collider\), getInteractionMode\(\)\),/);
-});

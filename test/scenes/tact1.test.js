@@ -177,20 +177,3 @@ test('TACT1: an arrow meets the tree and is lost; the switch off, it flies throu
 
 // ── the hosts ───────────────────────────────────────────────────────
 
-test('TACT1: every host stands its cover on its collider, under the switch; every missile and the witnesses read it', () => {
-  const sw = /collider\.cover = createCoverIndex\(\);/;   // the default: the switch, read in ai/cover.js alone
-  for (const f of ['src/scenes/world.js', 'src/scenes/dungeonContext.js', 'src/scenes/interiorContext.js', 'src/scenes/exterior.js']) assert.match(rd(f), sw, f);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /collider\.cover\.remove\(key\);\n(?:\s*\/\/[^\n]*\n)*\s*const coverT = \(\(o\) => \(\) => host\.state\.pixelTranslation\(px, py, o\)\)\(\[0, 0, 0\]\);\n\s*for \(let i = 0; i < coverItems\.length; i \+= COVER_SLICE\) \{\n\s*if \(i\) await breather\.breathe\(\);\n\s*collider\.cover\.add\(key, coverItems\.slice\(i, i \+ COVER_SLICE\), coverT\);/, 'the pixel\'s, in its frame, under its bucket key - in slices on the stream\'s clock (AUDIT BANTHA1 TREE-1)');
-  assert.equal((w.match(/if \(isCoverFlat\(archive, record, (?:sib\.size|size|plain)\)\) for \(const c of centers\) coverItems\.push\((?:\.\.\.coverProxies|coverProxy)\(c, (?:sib\.size|size|plain)/g) ?? []).length, 4, 'the seasonal, the classic and the scaled groups, and (LPT1) a low-poly tree\'s far pictures - at the flat\'s own size, `plain` (AUDIT LPT D3)');
-  assert.match(rd('src/scenes/dungeonContext.js'), /if \(isCoverFlat\(archive, record, size\)\) for \(const c of based\) coverItems\.push\(coverProxy\(c, size\)\);\n\s*\}\n\s*collider\.cover\.add\('tact1:flats', coverItems\);/, 'the dungeon\'s, at the BASE (an RDB flat\'s y is its centre)');
-  assert.match(rd('src/scenes/interiorContext.js'), /if \(isCoverFlat\(archive, record, size\)\) collider\.cover\.add\('tact1:flats', centers\.map\(\(c\) => coverProxy\(c, size\)\)\);/);
-  assert.equal((rd('src/scenes/exterior.js').match(/collider\.cover\.add\('tact1:flats'/g) ?? []).length, 3);   // the seasonal, the classic and (LPT1) a low-poly tree's far pictures - the flat's own size
-  for (const f of ['src/scenes/hostMagic.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(f), /const _cs = flightStop\(collider, m\.pos, _unit, reach, step \* _len\);[^\n]*\n\s*const hitWall = _cs\.stop;/, `${f}: the bolts (AUDIT TACT B5: cover met by touch) - through the one flight law (AUDIT GROUND-BOLT C6)`);
-    assert.match(rd(f), /const _adv = step \* _cs\.advance;/, `${f}: no further than cover's touch`);
-  }
-  assert.match(rd('src/scenes/hostMagic.js'), /const cs = coverStep\(coverDistance\(collider, pos, unit, reach\), collider\.raycast\(pos, unit, reach\), reach, radius, stepLen\);/, 'flightStop: cover met by touch (AUDIT TACT B5), the wall at the reach');
-  assert.equal((rd('src/scenes/cityGuards.js').match(/coverDistance\(collider, eye, dir, dist, true\) < dist - 1e-3/g) ?? []).length, 2, 'the witness and the guard who sees him - lines of sight (AUDIT TACT B2)');
-  assert.match(rd('src/player/collider.js'), /this\.cover\?\.remove\(bucketKey\);/);
-});

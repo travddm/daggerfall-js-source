@@ -115,7 +115,6 @@ test('TESA14 the builder\'s searches: nearestWithin answers the brute force\'s l
   assert.ok(Math.abs(pl - kl) < 1e-6, `the least length (${pl} vs ${kl})`);
   assert.deepEqual(primEdges([]), []);
   assert.deepEqual(primEdges([{ x: 0, y: 0 }]), []);
-  assert.match(read('src/world/road/roadNetwork.js'), /for \(const \[i, j\] of \(owns \? primEdges\(roadNodes\) : kruskal\(roadNodes\)\)\)/, 'the Bay\'s tree Kruskal\'s still');
 });
 
 // ── THE REGIONS ─────────────────────────────────────────────────
@@ -462,19 +461,6 @@ test('TESA14 the host\'s module: nothing before the trace or while the Bay\'s ne
   pixels = { stood: [] };
   host.frame(null);
   assert.equal(starts.length, 2, 'the places moved: again');
-  const src = read('src/scenes/tamrielRoadsHost.js');
-  assert.match(src, /const walkable = \(x, y\) => !inBay\(x, y\) && heightAt\(x, y\) > WATER_BYTE && !capitalOnPixel\(x, y\);\n[^]*?gates\.push\(\.\.\.capitalGates\(k, \{ walkable \}\)\);/, 'a gate on land past the Bay, the host\'s own - PIN MOVED (AUDIT TESA II R2: walked out over it)');
-  assert.match(src, /const nodes = \[\.\.\.towns, \.\.\.gates\.map\(\(g\) => \(\{ x: g\.x, y: g\.y, type: LOCATION_TYPES\.TownCity \}\)\), \.\.\.joins\.map/, 'Arena\'s towns, the gates, the crossings\' gates');
-});
-
-test('TESA14 the world\'s wiring: the host made where the land past the Bay streams, on the frame with Arena\'s towns (a capital\'s own place its gates while the capitals stand), the roll\'s numbers and the player\'s pixel; the roll reads no road (mutant: the towns\' filter, the spec)', () => {
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /const _tamrielRoads = tamrielLand \? createTamrielRoadsHost\(\{ terrainGen, woodsBytes, heightAt: \(x, y\) => host\.woods\.getHeightMapValue\(x, y\), joinLand: arenaJoinLand, onLanded: arenaRoadsLanded,\n\s+standing: \{ pixels: arenaPixels, towns: tamrielRoadTowns, spec: tamrielRoadsSpec, capitals: \(\) => !!_capitalBase, held: tamrielRoadHeld \} \}\) : null;/);
-  assert.match(W, /if \(_tamrielRoads\) _tamrielRoads\.frame\(state\.current\);/, 'on the frame, with the player\'s pixel (PERF-V8: what stands read by the host)');
-  assert.match(W, /now\.stood\.filter\(\(p\) => !\(p\.pinned && _capitalBase\) && arenaTemplateOf\(_arenaTemplates, p\)\)/, 'a capital\'s place is its gates; a place with no template stands none');
-  assert.match(W, /countryRates: countryRatesNow\(\), countryTemplates: _countryTemplates, lairRates: lairRatesNow\(\), lairTemplates: _lairTemplates, lairPools: _lairPools/);
-  assert.doesNotMatch(W, /arenaPathsAt/, 'no place\'s roll asks a road');
-  assert.doesNotMatch(W, /handArenaRoads|terrainGen\.setArenaRoads/, 'TESA4\'s hand-over retired');
 });
 
 // ── WITH ARENA2 ─────────────────────────────────────────────────

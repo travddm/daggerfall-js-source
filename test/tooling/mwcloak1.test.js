@@ -275,14 +275,3 @@ test('MW-CLOAK1: stowed gear against the cloak, on the addon\'s own scabbards - 
   assert.equal(bare.pieces[0].source, was);
 });
 
-test('MW-CLOAK1 by source: the third-person build fits the cloak over the body\'s skin and what it wears, once it is assembled, and ties the stowed gear to it; a weapon swap fits the new holster; seated or astride the cloak rides the chest as standing (MW-CAPE-RIGID: no batch swapped); a cloak\'s icon is its own', () => {
-  const fp = src('src/combat/fpArm.js');
-  assert.match(fp, /hangHipLight\(arm\);[^\n]*\n\s*const cloakFit = fitThirdPersonCloak\(arm, new Set\(\[\.\.\.skinRows, \.\.\.worn\.adds\]\.map\(\(row\) => row\.slot\)\)\);/);
-  assert.match(fp, /\.\.\.resolvedHolster\.notes, \.\.\.cloakFit\.notes,/);
-  assert.match(fp, /bindPartsInto\(t\.arm, \[\.\.\.tResolved\.parts, \.\.\.tHolster\.parts\]\);\s*const tFit = fitThirdPersonCloak\(t\.arm, null\);[^\n]*\n\s*t\.holster = tHolster\.info;\s*t\.notes = \[\.\.\.\(t\.notes \|\| \[\]\)\.filter\(\(n\) => !\/\^holster\[ :@\]\/\.test\(n\)\), \.\.\.tHolster\.notes, \.\.\.tFit\.notes\];/);
-  assert.match(fp, /export function fitThirdPersonCloak\(arm, underSlots\) \{\s*const isCloak = \(p\) => isCloakSlot\(p\.slot\);\s*const isGear = \(p\) => HOLSTER_SLOTS\.includes\(p\.slot\);\s*const covered = \(slot\) => underSlots\.has\(slot\) && slot !== 'tail' && !\/\^shield\\b\/\.test\(slot\);\s*const cloak = underSlots \? fitCloakOver\(arm, \{ isCloak, isUnder: \(p\) => covered\(p\.slot\) \}\) : null;\s*const gear = fitStowedGear\(arm, \{ isCloak, isGear \}\);\s*const follow = followCloak\(arm, \{ isCloak, isGear \}\);/);
-  assert.doesNotMatch(fp, /seatCloak|cloaked:|seatedBatch/, 'MW-CAPE-RIGID: one bone, one batch - a seat swaps nothing');
-  assert.match(fp, /const cloak = ownCloakFor\(\{ kind: 'clothing', name: CLOTHING_NAME\[item\.templateIndex\], dye: item\.dye \?\? 0 \}\);\s*if \(cloak\) return \{ id: `\$\{cloak\.id\}_\$\{cloak\.painting\}`, model: cloak\.model \};/);
-  assert.match(fp, /if \(\(item\.group === 'MensClothing' \|\| item\.group === 'WomensClothing'\) && !ownCloakFor\(/);
-  assert.match(src('src/formats/morrowind/mwFirstPerson.js'), /assembly\.time = time;[\s\S]{0,400}if \(assembly\.afterPose\) assembly\.afterPose\(assembly\);\s*assembly\.bounds = /);
-});

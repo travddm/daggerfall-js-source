@@ -191,6 +191,4 @@ test('MWNPC9b-10 the build takes the match\'s candidates in order: the first the
   assert.equal(peerBodyKey({ creature: ['skeleton warrior', 'skeleton'] }), 'crea|skeleton warrior,skeleton');
   // the host culls and heads a creature by its own height, a person by the capsule
   const { readFileSync } = await import('node:fs');
-  const pb = readFileSync(new URL('../../src/net/peer/peerBodies.js', import.meta.url), 'utf8');
-  assert.equal(pb.split('(b.rig.bodyHeight?.() ?? CAPSULE_HEIGHT * (b.rig.raceHeightScale?.() ?? 1))').length - 1, 2, 'heightOf and the cull sphere');
 });

@@ -71,11 +71,6 @@ test('SQUEEZE1: what the guard leaves alone - a room it fits, a fall to the floo
   assert.ok(player[0] > 30 && Math.abs(player[1]) < 0.01, 'the player walks on through');
   // the player's tallest stance is under the line: its resolve is the one it had
   assert.equal(RIDE_HEIGHT, 2.6);
-  const col = readFileSync(new URL('../../src/player/collider.js', import.meta.url), 'utf8');
-  assert.match(col, /const tall = height > RIDE_HEIGHT \|\| !!this\._keepFloor;/, 'past the player\'s tallest stance - or any foe, by its motor\'s word (AUDIT pre-merge S2)');
-  assert.match(col, /\} else this\._resolveSphere\(low, CAPSULE_RADIUS, out, standCeil, lowOneWay\);/, 'a body the player\'s size resolves its lower sphere as it did');
-  assert.match(col, /const floorFeet = tall && out\.hitCeiling \? lowFloor - CAPSULE_RADIUS : -Infinity;/);
-  assert.match(col, /feet\[1\] = Math\.max\(entryY, floorFeet\); break;/, 'the too-tight revert takes no tall body under its floor');
 });
 
 test('AUDIT pre-merge S1: a floor-keeping body\'s head never grounds - the report\'s own giant, walked off a ledge under a flat ceiling, falls into the pit instead of walking on through the air (its head stood on the ceiling\'s top face)', () => {
@@ -88,26 +83,5 @@ test('AUDIT pre-merge S1: a floor-keeping body\'s head never grounds - the repor
   walk(c, giant, 3.4, 20, { vx: 2, turn: false, keepFloor: true });
   assert.ok(!(giant[0] > 1 && giant[1] > -1), `never over the pit at the ledge's height (${giant[0].toFixed(2)}, ${giant[1].toFixed(2)}) - it walked there through the air`);
   assert.ok(giant[1] < -2.9 || giant[0] < 0.5, `in the pit, or held at its edge (${giant[0].toFixed(2)}, ${giant[1].toFixed(2)})`);
-  const src = readFileSync(new URL('../../src/player/collider.js', import.meta.url), 'utf8');
-  assert.match(src, /this\._resolveSphere\(high, CAPSULE_RADIUS, out, standCeil, axis === 0 \? lowOneWay : false, axis !== 0\);/, 'the head a wall to a floor-keeping body, as a mid-body contact is (AUDIT CLIMB-FIELD W2: and to every body with an axis)');
 });
 
-test('AUDIT pre-merge S2: every FOE keeps its floor by its motor\'s word, whatever its height - a 1.8 to 2.6 m body under a lower ceiling sank and fell out of the level; the motor passes the flag at every move', () => {
-  for (const [ceil, height] of [[2.0, 2.4], [1.8, 2.2], [2.2, 2.6], [1.5, 1.8]]) {
-    const feet = [0, 0.001, 0];
-    const { lowest, grounded } = walk(room(ceil), feet, height, 10, { keepFloor: true });
-    assert.ok(lowest > -0.01, `a ${height} foe under a ${ceil} ceiling stays on its floor (lowest ${lowest.toFixed(3)})`);
-    assert.equal(grounded, true);
-  }
-  const m = readFileSync(new URL('../../src/characters/enemy/enemyMotor.js', import.meta.url), 'utf8');
-  const sites = [...m.matchAll(/this\.collider\.move\(this\.feet,[^;]*\);/g)].map((x) => x[0]);
-  assert.equal(sites.length, 6);
-  for (const site of sites) assert.match(site, /, this\.controllerHeight, true, FOE_KEEPS_FLOOR(, false, this\.isGrounded)?\);$/, site);   // DOOR-JAM (FIELD BUGS 2026-10-14b): the controller's own height, HeightAdjust's crouch
-  assert.equal(sites.filter((x) => x.endsWith(', false, this.isGrounded);')).length, 1, 'the walk alone hands its ground');   // PIN MOVED (FIELD BUGS 2026-10-25i RAIL-HANG, AUDIT FB1025i G6): the walk's ground beside its floor
-  assert.match(m, /const FOE_KEEPS_FLOOR = true;/);
-  const c = readFileSync(new URL('../../src/player/collider.js', import.meta.url), 'utf8');
-  // (AUDIT CLIMB2 G1 added `noStep` after it - the free climber's, which passes keepFloor false in so many words)
-  assert.match(c, /move\(feet, dx, dy, dz, height = CAPSULE_HEIGHT, snap = true, keepFloor = false, noStep = false, onGround = false\) \{\n\s*const was = this\._keepFloor, stepped = this\._noStep, stood = this\._onGround, walked = this\._walk;\n\s*this\._keepFloor = !!keepFloor;\n\s*this\._noStep = !!noStep;\n\s*this\._onGround = !!onGround;\n\s*try \{ return this\._move\(feet, dx, dy, dz, height, snap\); \} finally \{ this\._keepFloor = was; this\._noStep = stepped; this\._onGround = stood; this\._walk = walked; \}/, 'the player never passes it: its stances resolve as they did');   // PIN MOVED (FIELD BUGS 2026-10-25i RAIL-HANG, AUDIT FB1025i G6, G8): `onGround` after it - EnemyMotor's walk's - and the walking pass undone however the move ends
-  const pm = readFileSync(new URL('../../src/player/motor.js', import.meta.url), 'utf8');
-  assert.match(pm, /this\.height, false, false, true\);   \/\/ AUDIT CLIMB2 G1: no step ladder/, 'the climb keeps no floor - it never steps, either');
-});

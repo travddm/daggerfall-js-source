@@ -124,11 +124,9 @@ test('AUDIT 68 S24-string-hash-duplicate: C#\'s string.GetHashCode has one home 
 
 test('AUDIT 68 S24-stat-keys-duplicate: DFCareer.Stats order is ONE array (chargen re-exports statMods\') and the starting fatigue is the multiplier\'s, not a second 64', () => {
   assert.equal(chargen.STAT_KEYS_ORDER, statMods.STAT_KEYS_ORDER, 'one binding, not two equal frozen arrays');
-  assert.doesNotMatch(rd('src/systems/chargen.js'), /\* 64\b/, 'FATIGUE_MULTIPLIER, read from its home');
 });
 
 test('AUDIT 68 S24-levelup-sum-duplicate: SetCurrentLevelUpSkillSum\'s sum has one body - chargen\'s creation anchor calls it rather than an inline copy', () => {
   assert.equal(typeof skills.levelUpSkillSum, 'function', 'the leaf both chargen and advancement read owns it');
   assert.equal(advancement.levelUpSkillSum, skills.levelUpSkillSum, 'advancement re-exports the same function');
-  assert.match(rd('src/systems/chargen.js'), /playerEntity\.startingLevelUpSkillSum = levelUpSkillSum\(playerEntity\);/, 'the anchor is the one law');
 });

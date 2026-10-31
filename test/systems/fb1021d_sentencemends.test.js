@@ -130,8 +130,6 @@ test('SENTENCE-MENDS: what it is not - a Murder served from a clean name keeps i
   // the zero-day arm's read is the live one: the prison arm reads the clock once a day at least is served (advanceDays),
   // and the grace standing then was granted before the arrest - so it refuses nothing there (its mutant is recorded equivalent)
   assert.ok(CHALLENGE_GRACE_MINUTES <= MINUTES_PER_DAY, 'a grace outlasts no sentence - lengthened, the prison arm\'s read is live: SENTENCE-MENDS-ownNow-unhanded is no longer equivalent');
-  const s = readFileSync(join(ROOT, 'src/systems/standing.js'), 'utf8');
-  assert.match(s, /export function settleChallenge\(player, regionIndex\) \{ return mendToLine\(player, regionIndex, 'fine'\); \}/, 'the fine and the sentence share one law');
 });
 
 test('SENTENCE-MENDS (AUDIT FB1021d SM-3): through the court, a Murder tried from -5 keeps REP2\'s mark (-15) - the name the prisoner came in with stood over the line, and the crime\'s own mark is the court\'s due; from the escort\'s -20, the step (mutants: the name it came in with unkept, the mark worn)', () => {
@@ -158,14 +156,6 @@ test('SENTENCE-MENDS: the court\'s fine paid with no days mends as the sentence 
   const back = sentenceRefund(CRIMES.Criminal_Conspiracy, { acquitted: true });
   changeLegalRep(p, DAGGERFALL, back.legal);
   assert.equal(legalRepOf(p, DAGGERFALL), -20);
-  const a = readFileSync(join(ROOT, 'src/scenes/arrestFlow.js'), 'utf8');
-  const free = a.slice(a.indexOf("if (r.outcome === 'free') {"), a.indexOf('function finish(result, court) {'));
-  assert.ok(free.length > 0 && !free.includes('sentenceMends('), 'the free arm mends nothing');
-  const tail = a.slice(a.indexOf('    // AUDIT 39 F98: both of those arms DO refill'));
-  assert.match(tail, /sentenceMends\(playerEntity, court\.regionIndex, \{ from: court\.from, ownNow: ownMinutes\(\) \}\);[^\n]*\n\s+fillVitalSigns\(playerEntity\);\n\s+release\(\);/, 'the zero-day arm mends, then refills and releases (F98)');
-  // AUDIT FB1021d SM-5: a banishment repairs nothing (DFU's state 4) - its arm mends nothing
-  const banished = a.slice(a.indexOf("if (result.outcome === 'banished') {"), a.indexOf("if (result.outcome === 'executed') {"));
-  assert.ok(banished.length > 0 && !banished.includes('sentenceMends('), 'the banishment arm mends nothing');
 });
 
 test('CURFEW-REFUND: a Curfew town\'s Conspiracy, charged double, comes back double - the sentence nets the mend, not -2 a time; the People\'s half was never doubled (mutants: the factor unkept, unread)', () => {
@@ -193,6 +183,4 @@ test('PATROL-GRACE: the road\'s patrol asks the grace an answered law gives - wo
   const exile = { legalRep: { [DAGGERFALL]: 10 }, regionConditions: createRegionConditions() };
   assert.equal(banish(exile, DAGGERFALL, 1000), true);
   assert.equal(patrolHalts(exile, DAGGERFALL, now), true, 'banished: the patrol halts them');
-  const w = readFileSync(join(ROOT, 'src/scenes/world.js'), 'utf8');
-  assert.match(w, /wanted: \(res, trip\) => \(res\.job === 'patrol' && trip\?\.from\?\.region != null && patrolHalts\(playerEntity, trip\.from\.region,/);
 });

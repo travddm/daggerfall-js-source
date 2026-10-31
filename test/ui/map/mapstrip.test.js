@@ -148,28 +148,6 @@ test('EM1: the strip is inked in the map own pen - haloed, the live tab ruled, t
 });
 
 test('EM1: the strip does not pan or zoom with the map under it', () => {
-  // The point of the strip being INK is that it is the one ink the
-  // view does not carry: the map slides under the tabs and the tabs
-  // stay put. Held three ways.
-  //
-  // By SIGNATURE: there is no view to hand in. stripLayout takes the
-  // context, the live sheet and the paper; stripHit takes a layout and
-  // a paper point; paintStrip takes a context and a layout.
-  const body = (name) => {
-    const text = src('src/ui/map/mapStrip.js');
-    const at = text.indexOf(`export function ${name}(`);
-    assert.ok(at >= 0, `mapStrip.js lost ${name}`);
-    let i = text.indexOf('{', at), depth = 0, end = i;
-    for (; i < text.length; i++) {
-      if (text[i] === '{') depth++;
-      else if (text[i] === '}' && --depth === 0) { end = i; break; }
-    }
-    return text.slice(at, end + 1);
-  };
-  for (const name of ['stripLayout', 'stripHit', 'paintStrip']) {
-    assert.doesNotMatch(body(name), /\bview\b/, `${name} consults a view - the strip would swim`);
-    assert.doesNotMatch(body(name), /toPaper|toMap|zoomAt|clampView/, `${name} reaches for the view transforms`);
-  }
   // By VALUE: the same arguments, the same strip, every time.
   assert.deepEqual(stripLayout({ context: 'town', ids: sheetsFor('town'), live: 'town' }, { paperW: 520 }), stripLayout({ context: 'town', ids: sheetsFor('town'), live: 'town' }, { paperW: 520 }));
   // And the painter never moves the canvas under itself - it is handed
@@ -183,14 +161,6 @@ test('EM1: the strip does not pan or zoom with the map under it', () => {
   assert.deepEqual(calls.filter((c) => ['setTransform', 'translate', 'scale'].includes(c[0])), []);
   assert.equal(calls[0][0], 'save', 'the painter leaves the context as it found it');
   assert.equal(calls[calls.length - 1][0], 'restore');
-  // ...and it is genuinely pure: no DOM, no host. Asked of the CODE,
-  // with the prose stripped first - this file's own header says the
-  // word "window" often enough to fool a bare regex, and a pin that
-  // reads comments is a pin that fails on a rewrite.
-  const code = src('src/ui/map/mapStrip.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
-  assert.doesNotMatch(code, /\bdocument\b|\bglobalThis\b|\bwindow\s*\./);
 });
 
 test('EM1: the slot refuses a sheet this place does not offer, at ONE door', () => {

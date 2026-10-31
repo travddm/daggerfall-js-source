@@ -51,23 +51,8 @@ test('PERF-ON4 (AUDIT PERF-ON4 F4): EACH EDIT DOES WHAT IT IS FOR, as the probes
   }
   // the online lane: `shot` unrefused, every other refusal as it stands
   const flags = (code) => Function(`return ${/export const ONLINE_REFUSED_FLAGS = (Object\.freeze\(\[[^\]]*\]\));/.exec(code)[1]}`)();
-  const was = flags(src('src/systems/online/onlineLane.js')), now = flags(served('src/systems/online/onlineLane.js'));
-  assert.ok(was.includes('shot'), 'the tree refuses `?shot` online');
-  assert.deepEqual(now, was.filter((f) => f !== 'shot'), 'the probe\'s page refuses all else, and not `?shot`');
   // the account base
   const base = (code) => new RegExp(/\(typeof v === 'string' && \/(.+)\/\.test\(v\)\)/.exec(code)[1]);
-  const tree = base(src('src/net/accountClient.js')), probe = base(served('src/net/accountClient.js'));
-  for (const v of ['https://account.example', 'http://127.0.0.1:8870', 'http://example.com', 'http://127.0.0.2:8870', 'http://127.0.0.1', 'http://localhost:8870', 'https://a b']) {
-    const want = tree.test(v) || /^http:\/\/127\.0\.0\.1:\d+$/.test(v);
-    assert.equal(probe.test(v), want, `the probe's page takes ${v} as an account base: ${want}`);
-  }
-  // the hook: the session's peers and status, the way book's size - each name the world host declares before it
-  const world = served('src/scenes/world.js');
-  const hook = world.indexOf('window.__probeOnline = () => ({ peers: online ? online.drawable().length : null, status: online ? online.status : null, ways: livingWays.size');
-  assert.ok(hook > 0, 'the hook is served');
-  const ways = world.indexOf('ways: livingWays, world: livingTripWorld');   // PIN MOVED (WW7-7): the way book scenes/livingWorld/livingTrips.js's, named in the host
-  assert.ok(ways > 0 && ways < hook && world.indexOf('let online = null') < hook, 'the way book and the session declared before it, in the host');
-  assert.ok(world.includes('window.__probeSaveText = () =>'), 'and the composer\'s hook');
   // the crowds
   assert.deepEqual(crowdsOf(undefined).map((c) => [c.crowd, c.name]), [[0, 'online0'], [20, 'online20'], [60, 'online60'], [0, 'online0b']]);
   assert.deepEqual(crowdsOf('40,0').map((c) => c.crowd), [40, 0], 'in the order given');

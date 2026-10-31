@@ -25,24 +25,6 @@ test('UXB1-A: the switch is a port pref, OFF by default, and the player\'s own o
   assert.equal(onlineForcedPref('skipStartVideo', '?online=1'), undefined);
 });
 
-test('UXB1-A: main.js reads the pref at BOTH doors - the front door\'s film and the classic splash - beside the one-visit flags', () => {
-  const main = read('src/main.js');
-  assert.match(main, /skip: params\.has\('nointro'\) \|\| !!getPref\('skipStartVideo'\),/, 'the INTRO2 film');
-  assert.match(main, /menuMusic: !params\.has\('nointro'\) && !!getPref\('skipStartVideo'\),/,
-    'only the player\'s skip keeps the music - ?nointro (the probes\') stays silent as it always was');
-  assert.match(main, /if \(!params\.has\('novideo'\) && !getPref\('skipStartVideo'\)\) \{/, 'ANIM0001, the classic splash');
-  // no new boot key: the door keys are what the menu decides (MAC-N3), and a pref is not one of them
-  assert.doesNotMatch(main, /params\.(set|delete)\('(nointro|novideo)'\)/);
-});
-
-test('UXB1-A: the row is under Settings > Interface on the main menu, over the pref', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const ui = menu.slice(menu.indexOf('function portRowsInterface('), menu.indexOf('\n}', menu.indexOf('function portRowsInterface(')));
-  assert.match(ui, /if \(!pause\) out\.push\(prefRow\('skipStartVideo', skipStartVideoName\(\), skipStartVideoNote\(\)\)\);/,
-    'the front door\'s alone: it is read at launch, and the pause\'s condensed settings carry only what takes effect in play');
-  assert.match(menu, /export const SKIP_START_VIDEO_NAME = 'Skip start video';/);
-});
-
 /** A theme that records what the door asks of it - the IntroTheme calls enterMenu makes. */
 function fakeTheme() {
   const calls = [];

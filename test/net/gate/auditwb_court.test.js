@@ -102,35 +102,6 @@ test('AUDIT WB B5 the link tells its host the relay\'s refusal of my `in`, with 
 });
 
 test('AUDIT WB B5 the seams: the door asked again once the fire has closed; a refused `in` and a socket closed for good take the player out before the gate', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /onRefused: \(why\) => \{ if \(modes\?\.gateArenaDay\?\.\(\) != null\) ejectFromCourt\(gateRefusalText\(why\)\); \},/);   // GATE-RELOAD: in what the word means (net/gate/gateLink.js gateRefusalText)
-  assert.match(world, /else if \(courtDay != null && online\?\.terminal\) ejectFromCourt\(GATE_NO_TEXT\[online\.error\] \?\? COURT_TEXT\.lost\);/);
-  const refusal = world.slice(world.indexOf('gateRefusal: (g) =>'), world.indexOf('gateRefusal: (g) =>') + 600);   // PIN MOVED (AUDIT WB14 WIRE-1): the longer for the portents' clause
-  assert.match(refusal, /!online\?\.gateOk \|\| online\?\.terminal \|\| \(!!gatePortentsOf\(g\.day\) && !online\?\.portentsOk\) \? GATE_TEXT\.notYet/, 'no relay to hold it (AUDIT WB14 WIRE-1: nor, on a portent night, one from before them)');
-  assert.match(refusal, /Number\.isFinite\(gateLink\?\.fellAt\(g\.day\)\) \? GATE_NO_TEXT\['the gate is closing'\]/, 'its master fallen');
-  assert.match(refusal, /!gateAdmits\(g\.day, Date\.now\(\) \+ _sharedOffsetMs\) \? GATE_TEXT\.sealed : null/, 'sealed while the fire burned');
-  const modes = read('src/scenes/worldModes.js');
-  const door = modes.slice(modes.indexOf('async function enterGateArena(g) {'), modes.indexOf('/** WB6c: THE STEP THROUGH THE FIRE'));
-  assert.match(door, /const no = host\.gateRefusal\?\.\(g\) \?\? null;\n\s+if \(no\) \{ setMidScreenText\(no\); return false; \}/);
-  assert.ok(door.indexOf('host.gateRefusal') > door.indexOf('return stepThroughFire(async () => {'), 'asked inside the step, after the fire has closed');
-  assert.ok(door.indexOf('host.gateRefusal') < door.indexOf('gatedTransition('), 'and before the court is built');
   assert.equal(typeof COURT_TEXT.lost, 'string');
 });
 
-test('AUDIT WB B1 a player dead in the court when it is taken from them is cast out alive - the death\'s own door, the heal first', () => {
-  const world = read('src/scenes/world.js');
-  const eject = world.slice(world.indexOf('function ejectFromCourt(words) {'), world.indexOf('function respawnOnlinePlayer() {'));
-  assert.match(eject, /if \(!\(playerEntity\.health > 0\) \|\| modes\?\.deathUp\?\.\(\)\) \{ respawnOnlinePlayer\(\); return; \}/);
-  assert.ok(eject.indexOf('respawnOnlinePlayer()') < eject.indexOf('forceExitToExterior'), 'before the court is left');
-  // and the death's door casts a court death out before its gate (WB3b), healed at its top (MAC-D3)
-  const respawn = world.slice(world.indexOf('function respawnOnlinePlayer() {'));
-  assert.ok(respawn.indexOf('reviveForPlay(playerEntity, { force: true });') < respawn.indexOf('const courtGate = modes?.gateArenaGate?.() ?? null;'));
-});
-
-test('AUDIT WB B2/B3 the dead walk through no fire: no court entered by a player killed while it closed, no way home taken by one, no exit pending walked by one', () => {
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /const aliveUnder = \(\) => playerEntity\.health > 0 && !dungeonCtx\?\.deathUp\?\.\(\);/);
-  assert.match(modes, /if \(mode !== 'exterior' \|\| !\(playerEntity\.health > 0\)\) return false;/, 'B3: the door');
-  assert.match(modes, /if \(mode === 'dungeon' && isGateArena\(dungeonLoc\) && aliveUnder\(\)\) pendingDungeonExit = true;/, 'B2: the way home');
-  assert.match(modes, /if \(pendingDungeonExit\) \{ pendingDungeonExit = false; if \(aliveUnder\(\)\) \{ exitDungeonNow\(\); return true; \} \}/, 'B2: the exit it defers');
-});

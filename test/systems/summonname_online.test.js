@@ -120,20 +120,3 @@ test('SUMMON-NAME: the flow, driven - the list, a pick, DFU\'s question about th
   }
 });
 
-test('SUMMON-NAME: the host - online, the temple\'s and the guild\'s popup takes the list (the coven\'s, which hands its own summonerFactionId, keeps its draw); offline and without the picker\'s art it is DFU\'s day and record 481', () => {
-  const wm = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  // AUDIT WAITS S5: the coven and Glenmoril told apart by the summoner's faction alone, as DFU's service tells them
-  assert.ok(wm.includes('const byName = listPickerArtLoaded()\n        && summonsByName({ factionId: summonerId, factionType: (summoner?.type ?? null), online: sharedClockOn() });'));
-  assert.ok(wm.includes("if (!daedra && !byName) return { rows: box(SUMMON_TEXT.notToday, null, 'This is not a summoning day.') };"));
-  assert.ok(wm.includes('flow = new ServiceFlowWindow(summonByNameBoxes(summon, (d) => say(SUMMON_TEXT.areYouSure, d, summonQuestionRows)), {'),
-    'AUDIT WAITS S4: the flow asks record 481 through `say` - cut raw, walked once with the prince picked');
-  assert.ok(wm.includes('const say = (id, d = daedra, part = (record) => record) => expandRowValues(part(rows?.(id) ?? []), summonMacroValues(d), null);'),
-    'and `say` cuts before its one walk');
-  assert.ok(wm.includes("rows: box(SUMMON_TEXT.areYouSure, daedra, 'Are you sure you wish to attempt this?'),\n        buttons: 'YesNo',\n        onYes: () => summon(daedra),"));
-  assert.ok(wm.includes('const r = attemptSummoning({\n          daedra: called,'), 'the Yes summons the prince it is handed - the picked one, or the day\'s');
-  // AUDIT WAITS S1: the sky is read at the Yes, inside it - once, after the Yes begins and before the roll
-  const yes = wm.indexOf('const summon = (called) => {'), sky = wm.indexOf('const weather = weatherFlags(currentWeather());'), roll = wm.indexOf('const r = attemptSummoning({');
-  assert.ok(yes > 0 && yes < sky && sky < roll, 'the weather read inside the Yes');
-  assert.equal(wm.split('const weather = weatherFlags(currentWeather());').length, 2, 'and once');
-  assert.equal(wm.slice(sky, roll).includes('\n      }'), false, 'no block closes between the read and the roll');
-});

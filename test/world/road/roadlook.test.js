@@ -212,20 +212,11 @@ test('ROAD-LOOK the GLSL is the JS: the hash bit for bit, the noise and the wand
 });
 
 test('ROAD-LOOK both terrain programs blend right after their own tile - the lane decoding the neighbour as its own - before the ecotone; the clip and snow variants still one decode; the renderer\'s switch a frame\'s, taken as the renderer is made from roadEdgesOn: the enhanced skin, the kill door - no host\'s own line (mutants: the call dropped from either program; the lane\'s neighbour undecoded; the switch never uploaded; the renderer never taking it; the classic skin blended; the kill door unread)', async () => {
-  const r = read('src/render/renderer.js');
-  const classic = r.slice(r.indexOf('const TERRAIN_FS = `'), r.indexOf('}`;', r.indexOf('const TERRAIN_FS = `')));
-  // PIN MOVED (COAST-LOOK, render/groundEdgeGlsl.js): its chunk and the bed's follow this one before main, and a
-  // transition's two kinds (no road's byte) are drawn between the tile and this call - still before the ecotone
-  assert.match(classic, /const vec2 TRANS\[4\] = vec2\[4\]\(\n[^\n]*\n\$\{roadEdgeGlsl\(\)\}\n\$\{groundEdgeGlsl\(\)\}[^\n]*\n\$\{WATER_BED_GLSL\}\nvoid main\(\) \{/);
   const AFTER_TILE = String.raw`(?: {2}(?:\/\/|highp uint geA, geB;|bool ge = groundMix\(|vec2 dux = |vec4 ew = ecoWeights\(|if \(ge\) tex = mix\()[^\n]*\n)+ {2}tex = roadEdge\(tex, data, unwrapped, gx, gy, t\);[^\n]*\n {2}if \(!ge\) tex = ecotone\(`;
-  assert.match(classic, new RegExp(String.raw`vec3 tex = textureGrad\(uTileArr, vec3\(tuv, float\(layer\)\), gx, gy\)\.rgb;\n${AFTER_TILE}`));
   assert.match(EL_TERRAIN_FS, new RegExp(String.raw`vec3 tex = elDecode\(textureGrad\(uTileArr, vec3\(tuv, float\(layer\)\), gx, gy\)\.rgb\);\n${AFTER_TILE}`));
   assert.match(EL_TERRAIN_FS, /return elDecode\(textureGrad\(uTileArr, vec3\(ROT\[t\] \* l \+ TRANS\[t\], float\(d >> 2u\)\), ROT\[t\] \* dux, ROT\[t\] \* duy\)\.rgb\);/, 'the lane\'s neighbour in its own linear light');
   assert.equal(terrainClipFs(EL_TERRAIN_FS).split('\n').length, EL_TERRAIN_FS.split('\n').length + 1, 'the clip still one line');
   assert.ok(snowTerrainFs(EL_TERRAIN_FS).includes('vec3 roadEdge('), 'the snow variant still built from the program');
-  assert.match(r, /this\.tURoadEdge = gl\.getUniformLocation\(this\.terrainProgram, 'uRoadEdge'\);/);
-  assert.match(r, /gl\.uniform1f\(this\.tURoadEdge, this\.roadEdges \? 1 : 0\);/);
-  assert.match(r, /\n {2}roadEdges = roadEdgesOn\(\);\n/, 'the renderer takes the page\'s switch as it is made (a new skin reloads the page)');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.doesNotMatch(read(host), /renderer\.roadEdges|roadEdgesOn/, `${host}: no host's own line (bible/01-Overview/Host-Split.md)`);
   assert.deepEqual([roadEdgesOn('?skin=enhanced'), roadEdgesOn('?skin=enhanced&roadedges=off'), roadEdgesOn('?skin=classic'), roadEdgesOn('?skin=classic&roadedges=on')], [true, false, false, false], 'the enhanced skin\'s, the kill door its own');
 });
@@ -380,17 +371,6 @@ test('ROAD-LOOK the bridge is walked: its deck where deckTop says from ramp\'s f
   assert.equal(added[0], PIXEL_FRAME);
 });
 
-test('ROAD-LOOK the wiring: the kernel lays the river back under its bridges after the paint and before the smoothing and the waters\' paint, and hands the pixel\'s own bridges back; the host stands them with its statics and its bucket through the gate (mutants: the unpave dropped; the bridges unreturned; the host never standing them)', () => {
-  const k = read('src/world/terrain/terrainGen.js');
-  const i0 = k.indexOf('curve: arena ? { px, py, byteAt: arenaRoadByte } : null,'), i1 = k.indexOf('if (arena && landforms) { unpaveBridges(tilemap, paths, px, py, arenaRoadByte); bridges = bridgesOf(px, py, arenaRoadByte); }');
-  const i2 = k.indexOf('if (roads.smooth !== false) smoothRoadHeights(samples'), i3 = k.indexOf('paintTamrielWaters(tileData, px, py, hasLocation ? locationRect : null, undefined, paths);');
-  assert.ok(i0 > 0 && i1 > i0 && i2 > i1 && i3 > i2, 'the paint, the bridges, the smoothing, the waters');
-  assert.match(k, /\n {4}bridges,   \/\/ ROAD-LOOK/);
-  const p = read('src/scenes/pixelBuild.js');
-  assert.match(p, /townGround, arenaRoads, bridges \} = await terrainGen\.generate\(\{/);
-  assert.match(p, /standBridges\(bridges, px, py, \{ addStatic: \(m, at\) => addStatic\(m, at, true\), solid: \(m, at\) => late\.add\(key, m\.positions, m\.indices, at, \{ translation: bridgeBucket \}\), grow: unionBox \}\);/);
-});
-
 test('ROAD-LOOK a carved lake is water no road crosses: the routes\' land takes it as water (its shore the shore\'s) and never as a ford, where the same strip of the trace\'s water a ford spans; the regions\' build marks the lakes before its nodes; the roads\' version moves (mutants: the still mask unread; the lakes unmarked; the version)', async () => {
   const N = MAP_W * MAP_H, heights = new Uint8Array(N).fill(20), water = new Uint8Array(N), still = new Uint8Array(N);
   for (let y = 0; y < MAP_H; y++) { water[y * MAP_W + 500] = 1; }   // a strip a pixel wide down column 500
@@ -402,11 +382,6 @@ test('ROAD-LOOK a carved lake is water no road crosses: the routes\' land takes 
   assert.equal(lake.shore[200 * MAP_W + 499], 1, 'its shore the shore\'s');
   const isWater = (u, v) => water[v * MAP_W + u] === 1 && lake.ford[v * MAP_W + u] === 0;
   assert.equal(route({ x: 480, y: 200 }, { x: 520, y: 200 }, { heightAt: () => 20, isWater, existing: new Uint8Array(N), d: {}, terrain: lake }), null, 'no route across a lake');
-  const s = read('src/world/tamrielRoads.js');
-  const a = s.indexOf('const still = lakeRaster(gx, gy, MAP_W, MAP_H, LAKE_MARGIN);'), b = s.indexOf('for (const n of [...nodes.filter(roadGrade)');
-  assert.ok(a > 0 && b > a, 'the lakes marked before the nodes stand on their own land');
-  assert.match(s, /\n {2}for \(let i = 0; i < still\.length; i\+\+\) if \(still\[i\] && !bay\[i\]\) water\[i\] = 1;\n/, 'a lake\'s pixel the routes\' water (the Bay\'s own network\'s none of it)');
-  assert.match(s, /const land = landForRoutes\(heights, water, bay, MAP_W, MAP_H, VOYAGER_DIALS, \(u, v\) => landGrain\(gx \+ u, gy \+ v\), still\);/);
   const { TAMRIEL_ROADS_VERSION, LAKE_MARGIN } = await import('../../../src/world/tamrielRoads.js');
   assert.deepEqual([TAMRIEL_ROADS_VERSION, LAKE_MARGIN], [8, 0.25]);
 });

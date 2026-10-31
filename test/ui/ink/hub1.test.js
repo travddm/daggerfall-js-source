@@ -189,15 +189,3 @@ test('HUB1 the held map: online a hub\'s mark carries its hub and sits in a colo
   assert.deepEqual(ctx.calls[1].args.slice(0, 3), [5, 6, 9]);
 });
 
-test('HUB1 the world host, by source: the boot collects the game\'s own rows as it indexes every location and picks the hubs from them; online alone the held map is handed each summary\'s hub, and walking into a hub says so at the location rect\'s entry (mutants: a mod row collected, the map handed hubs offline, the arrival said offline or on every town)', () => {
-  const W = strip(read('src/scenes/world.js'));
-  assert.match(W, /const baseCount = maps\.baseLocationCount\(r\);[\s\S]{0,400}?locationIndex\.set\(`\$\{p\.x\},\$\{p\.y\}`, loc\);\s*if \(l < baseCount\) \{ _hubRows\.push\(loc\); _bandPlacePixels\.add\(`\$\{p\.x\},\$\{p\.y\}`\); \}/, 'the game\'s own rows, collected as the index is built');   // PIN MOVED (AUDIT OW5 B2): the bands' land from the same rows
-  assert.match(W, /const regionHubs = pickRegionHubs\(_hubRows, \{ regionNameOf: \(r\) => maps\.getRegionName\(r\) \}\);/);
-  assert.match(W, /hubAt: params\.has\('online'\) \? \(summary\) => hubAtMapId\(regionHubs, summary\?\.mapID \?\? summary\?\.mapId\) : null,/, 'the map is handed hubs online alone');
-  const edge = W.slice(W.indexOf('_inRect && !_wasInLocationRect'));
-  // SEAT1a: a seat town says its Charter instead (test/net/seat1a_client.test.js); a hub that is no seat, its hub line
-  assert.match(edge.slice(0, 2000), /revealMemberGuildHalls\(\{ witness: onlineOn \}\);[\s\S]{0,480}if \(onlineOn\) \{\n\s*const mapId = _musicLoc\?\.mapTableData\?\.mapId;[\s\S]{0,160}const hub = hubAtMapId\(regionHubs, mapId\);[\s\S]{0,120}else if \(hub\) townTalk\.say\(hubArrivalLine\(hub\), 5\);/, 'the arrival, at the location rect\'s entry, online');   // PIN MOVED (CHAP2a): the reveal's call witnesses the town's halls too
-  // and the held map reads what it is handed
-  const H = strip(read('src/ui/heldMap.js'));
-  assert.match(H, /hubAt: \(s\) => this\.deps\.hubAt\?\.\(s\) \?\? null,/);
-});

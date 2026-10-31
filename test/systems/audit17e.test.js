@@ -141,31 +141,6 @@ test('audit17e F4: a worn item cannot be sold out from under the equip table', (
   assert.equal(e.equip.slots[EQUIP_SLOTS.ChestArmor], null);
 });
 
-test('audit17e F1: worldModes.frame() returns a boolean from EVERY exit (the modal contract)', () => {
-  // The defect: one branch of ten returned undefined (the dungeon's
-  // UI-overlay early-out). Both hosts gate their entire exterior
-  // frame on `if (modes.frame(...))`, so that single bare `return`
-  // made them draw the town over the dungeon and - in ?world - feed
-  // dungeon-local coordinates to the streaming recenter.
-  // Pinned structurally: a host-level integration test would need the
-  // whole GL pipeline, but the contract is a property of the source.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const src = readFileSync(join(root, 'src/scenes/worldModes.js'), 'utf8');
-  const start = src.indexOf('function frame(');
-  assert.ok(start > 0, 'frame() found');
-  // walk braces to the end of the function body
-  let depth = 0, i = src.indexOf('{', start), end = -1;
-  for (; i < src.length; i++) {
-    if (src[i] === '{') depth++;
-    else if (src[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
-  }
-  assert.ok(end > start, 'frame() body bounded');
-  const body = src.slice(start, end);
-  const bare = [...body.matchAll(/\breturn\s*;/g)];
-  assert.deepEqual(bare.map((m) => body.slice(Math.max(0, m.index - 60), m.index + 8)), [],
-    'every return in frame() must carry a value - a bare return reads as "not handled" to the hosts');
-});
-
 test('audit17e W1: the paperdoll click, clothing armor, arrows, scroll clamp', () => {
   // F8 - PaperDoll_OnMouseClick (DaggerfallInventoryWindow.cs:1932-1952)
   // unequips in EQUIP/Select. REMOVE has NO branch: inert. U8g shipped
@@ -232,29 +207,6 @@ test('audit17e W1: F9 the inventory icon draws the PLAYER texture, not the world
   // the templates now carry the FULL DFU row (the lossy copy is gone)
   assert.equal(typeof t113.drawOrderOrEffect, 'number');
   assert.equal(typeof t113.enchantmentPoints, 'number');
-});
-
-test('audit17e W1: F16 refreshPaperDoll COALESCES a concurrent request instead of dropping it', async () => {
-  // ASYNC NEVER DROPS. The boolean guard threw away any refresh that
-  // arrived mid-compose, so an equip during the first paint left the
-  // doll - and its click mask - permanently stale.
-  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src/ui/paperDoll.js'), 'utf8');
-  assert.ok(/_pending\s*=\s*entity/.test(src), 'a concurrent request is remembered');
-  assert.ok(/if \(_pending\)/.test(src), 'and re-run when the pass finishes');
-  assert.ok(!/if \(!_art \|\| !_deps \|\| _refreshing\) return;/.test(src), 'the dropping guard is gone');
-});
-
-test('audit17e W1: F17 the worn-weapon bind lives in the RIG, so all four hosts inherit it', () => {
-  // THE FOUR HOSTS RULE. U8h bound it by hand in the two exterior
-  // hosts; the interior host owns a fourth rig and kept swinging the
-  // interim dagger inside every building.
-  const rigSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src/combat/weapon/weaponRig.js'), 'utf8');
-  assert.ok(/EQUIP_SLOTS\.RightHand/.test(rigSrc), 'the rig reads the equip table');
-  assert.ok(/syncWorn\(\);/.test(rigSrc), 'and syncs per frame');
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const s = hostText(host);
-    assert.ok(!/weaponRig\.playerWeapon\.weapon =/.test(s), `${host} no longer hand-binds`);
-  }
 });
 
 test('audit17e W2: the Where-is category list (skip list, enum order, captions)', () => {

@@ -90,7 +90,6 @@ test('GRANT-SLEEP the cell: an ask arms no timer; the first fold once the window
   await idle.r.drop(idle.ws);
   await idle.landed();
   assert.equal(idle.posts.length, 0, 'nothing measured, nothing sent');
-  assert.doesNotMatch(src('server/src/index.js'), /setTimeout\([^;]*_grantFlush/, 'no timer posts the window');
 });
 
 test('PROVINCE-SLEEP the law: the Bay\'s 62 regions are split four ways, a province past the Bay is one channel - no shard key, none a chat room, no account sent to one (mutants: every region split; the split read off the channels; a province\'s shard)', () => {

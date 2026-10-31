@@ -50,15 +50,9 @@ test('EL6: the constants and the shader laws - the lights archive, the emitter s
   assert.equal(SHADOW_LIGHT_FLATS, LIGHTS_ARCHIVE, 'the flame flats are the lights archive');
   assert.equal(SHADOW_POINT_CASTERS, 12);   // FLICKER-FIX: twelve
   assert.equal(AIR_EMIT_SLACK, 0.15); assert.equal(AIR_AO_RESOLVE, 0.75);
-  const a = read('src/render/airPass.js');
-  assert.match(a, /float ang = bayer4\(gl_FragCoord\.xy\) \* 1\.5707963;/, 'the AO rotation is the 4x4 ordered threshold (AUDIT HQ1: over a quarter turn - a slice is a line)');
-  assert.ok(!/hash\(gl_FragCoord/.test(a), 'no hash rotation left');
-  assert.match(a, /for \(int y = -2; y < 2; y\+\+\) \{\n    for \(int x = -2; x < 2; x\+\+\) \{/, 'and the blur is one 4x4 tile');
   assert.match(BAYER_GLSL, /float bayer4\(vec2 p\) \{/, 'the port\'s one Bayer (orderedDither.js), the skies\' too');
   assert.ok(DITHER_GLSL.includes(BAYER_GLSL), 'the world-fixed cell block composes it - one home');
   assert.equal(BAYER_MEAN, 0.46875);
-  assert.ok(a.includes('${BAYER_GLSL}') && !/const DITHER_GLSL/.test(a), 'airPass takes it, defines none');
-  assert.match(a, /  e \+= \(bayer4\(gl_FragCoord\.xy\) - \$\{BAYER_MEAN\}\) \/ 255\.0;   \/\/ EL6: the dither, at the byte, zero-mean/, 'the resolve dithers');
   const dither = `(bayer4(gl_FragCoord.xy) - ${BAYER_MEAN}) / 255.0`;
   for (const [name, fs] of [['mesh', EL_MESH_FS], ['bb', EL_BB_FS], ['terrain', EL_TERRAIN_FS], ['char', EL_CHAR_FS]]) {
     assert.ok(fs.includes(BAYER_GLSL), `${name} carries the Bayer`);
@@ -68,8 +62,6 @@ test('EL6: the constants and the shader laws - the lights archive, the emitter s
   assert.ok(EL_FAR_RING_FS.includes(BAYER_GLSL));
   assert.ok(EL_FAR_RING_FS.includes(`outColor = vec4(col + ${dither}, 1.0);`), 'the ring\'s sky gradient dithers too');
   assert.match(EL_MESH_FS, /vec3 rel = uPointLights\[i\]\.xyz - uCamPos;\n    if \(length\(rel\) > dist \+ uPointLights\[i\]\.w\) continue;/, 'the in-scatter loop skips a lantern the ray cannot reach');
-  assert.match(a, /return textureLod\(uDepth, \(uRect\.xy \+ wuv \* uRect\.zw\) \/ uCanvas, 0\.0\)\.r;/, 'the depth block samples the canvas-sized frame at the world rect - its one level, by name (AUDIT-VC7 G3)');
-  assert.match(a, /uniform highp sampler2D uDepth;/, 'at a depth\'s precision: a fragment shader\'s samplers are lowp unless told (AUDIT-VC7 G2)');
   for (const [name, fs] of [['mesh', EMIT_MESH_FS], ['bb', EMIT_BB_FS]]) {
     assert.match(fs, /if \(occluded\(\)\) discard;   \/\/ EL6/, `${name}: an emitter behind the frame's depth does not bloom`);
     assert.match(fs, /return viewDist\(gl_FragCoord\.z\) > viewDist\(depthAt\(wuv\)\) \+ 0\.15;/, `${name}: its own slack, in world units`);

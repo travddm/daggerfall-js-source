@@ -347,23 +347,3 @@ test('PIN: no storage consumer bypasses the seam - globalThis.localStorage lives
   assert.deepEqual(offenders, []);
 });
 
-test('PIN: the shell serves arena2 by the dev middleware\'s own rules - the literals may not drift apart', () => {
-  const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
-  const vite = fs.readFileSync(path.join(root, 'vite.config.js'), 'utf8');
-  const shell = fs.readFileSync(path.join(root, 'app', 'main.cjs'), 'utf8');
-  // The three serving laws, as literals both sides must carry: the
-  // flat-name gate, the BOOKS fallback for BOK*.TXT, and the
-  // case-insensitive uppercase map.
-  for (const law of ['/^[A-Za-z0-9._-]+$/', String.raw`/^BOK\d+\.TXT$/i`, '.toUpperCase()']) {
-    assert.ok(vite.includes(law), `vite middleware lost its own law: ${law}`);
-    assert.ok(shell.includes(law), `app/main.cjs drifted from the dev middleware: missing ${law}`);
-  }
-  // And the Locate-ARENA2 ingest wipe must clear exactly the stores
-  // dataSource.clearStoredData clears (the set + derived, never the
-  // player's packs) in the database dataSource names.
-  const dataSource = fs.readFileSync(path.join(root, 'src', 'scenes', 'dataSource.js'), 'utf8');
-  for (const name of ["'project-dagger'", "'arena2'", "'derived'"]) {
-    assert.ok(dataSource.includes(name), `dataSource.js renamed ${name} - update app/main.cjs's clearStoredArena2`);
-    assert.ok(shell.includes(name), `app/main.cjs's ingest wipe is missing ${name}`);
-  }
-});

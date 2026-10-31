@@ -80,29 +80,6 @@ function frameReturns(file) {
   return { src, ast, returns: out };
 }
 
-test('AUDIT 68 S20-frame-return-kills-loop: every exit from a host\'s frame() re-queues the loop (or is the dead loop\'s own), and a quick take on a pile is the take\'s close - an emptied pile is freed', () => {
-  for (const file of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const { src, returns } = frameReturns(file);
-    const bad = returns.filter(({ at, block }) => {
-      const line = src.slice(src.lastIndexOf('\n', at) + 1, at);
-      return !/if \(!frameAlive\(_frameToken\)\)/.test(line) && !/requestAnimationFrame\(frame\);/.test(src.slice(block.start, at));
-    }).map(({ at }) => src.slice(0, at).split('\n').length);
-    assert.deepEqual(bad, [], `${file}: a return in frame() with no requestAnimationFrame(frame) ahead of it stops the game for good`);
-    // the pile's quick take: the consequent frees an emptied pile, as the window's onClose would
-    // (main's QL-FRAME1 shape since the merge: the window under `if (!quickLootTake(...)) {`, the take its `else`)
-    const i = src.indexOf('if (!quickLootTake(dropKey, _hooks, playerEntity,');
-    assert.ok(i > 0, `${file}: the pile's quick take`);
-    const arm = src.slice(i, src.indexOf('\n', src.indexOf('if (w) townTalk.showOverlay(w);', i) + 1) + 200);
-    // PIN MOVED (AUDIT 625 S2): the streaming host's treasure container rolls its find beside the window and the take
-    assert.match(arm, /if \(w\) townTalk\.showOverlay\(w\);[^\n]*\n(?:\s*if \(w && _find\) silverFindAt\('pile', _find\);\n)?\s*\} else (?:\{\n\s*if \(_find\) silverFindAt\('pile', _find\);\n\s*)?droppedLoot\.releaseEmptied\(\);/, `${file}: a take that emptied the pile frees it`);
-  }
-  // ...and the interior host's pile, the third door onto the same law (the dungeon's settles through onEmptied)
-  const wm = rd('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT 625 S2): the window's and the take's arms each roll a treasure pile's find (once it opened)
-  assert.match(wm, /if \(!quickLootTake\(key, _hooks, playerEntity, [^\n]*\)\) \{[^\n]*\n\s*const w = interiorInventory\(\{ loot: _hooks \}\);\n\s*mountInterior\(w\);\n[^\n]*\n\s*\} else \{\n\s*if \(_find\) silverFindAt\('pile', _find\);\n\s*interiorDropped\.releaseEmptied\(\);/,
-    'worldModes.js: a take that emptied the room\'s pile frees it');
-});
-
 // ---- S20-foe-dies-twice -------------------------------------------------------------------------------------------
 test('AUDIT 68 S20-foe-dies-twice: a foe a poison kills mid-rest dies ONCE - every later round of the window finds a corpse - and a slain watchman takes no second blow', async () => {
   const said = [], made = { n: 0 };

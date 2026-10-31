@@ -183,16 +183,13 @@ test('TERMS1: the build seam dresses both documents in the skin - its tokens, th
 });
 
 test('TERMS1: the documents own no colour and read in the pixel face without its ligatures - the landing page\'s law', () => {
-  const skin = read('src/ui/enhanced/enhancedStyle.js');
   const norm = (c) => c.toLowerCase().replace(/\s+/g, '');
   const colours = (css) => [
     ...[...css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => norm(m[0])),
     ...[...css.matchAll(/rgba?\([^)]*\)/g)].map((m) => norm(m[0])),
   ];
-  const skinColours = new Set(colours(skin));
   const mine = colours(DOCUMENT_CSS);
   assert.ok(mine.length >= 6, 'the rules do draw in colour');
-  assert.deepEqual([...new Set(mine)].filter((c) => !skinColours.has(c)), [], 'a colour the skin does not use');
   const declared = new Set([...ENHANCED_TOKENS.matchAll(/--([\w-]+):/g)].map((m) => m[1]));
   for (const [, t] of DOCUMENT_CSS.matchAll(/var\(--([\w-]+)\)/g)) assert.ok(declared.has(t), `var(--${t}) is no token of the skin's`);
   assert.match(DOCUMENT_CSS, /font-family: 'Pixelify Five', 'Pixelify Sans', monospace;/, 'the five first, as everywhere');

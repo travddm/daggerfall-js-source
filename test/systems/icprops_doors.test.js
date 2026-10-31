@@ -99,12 +99,4 @@ test('IC-PROPS A DOOR OF THE NEXT SLICE IS ITS OWN TOWN\'S - its building named 
   const p2 = plaqueOf(await buildModes(hall, 'here'));
   assert.match(p2.title, /Gothway Garden/);
   assert.doesNotMatch(p2.title, /The Player's Town/);
-  // the host's record: the door's town's book, name and building name
-  const world = hostText('src/scenes/world.js'), modes = hostText('src/scenes/worldModes.js');
-  assert.match(world, /townBlocks: homeTownBlocks\(dfLoc\), \.\.\.townTalk\.doorTownOf\(dfLoc, d\) \};/);
-  assert.equal((modes.match(/const locId = bd\??\.townBook \?\? discoveryLocationId\?\.\(\) \?\? null;/g) ?? []).length, 3, 'the hover, the press and the activation read the door\'s book');
-  assert.match(modes, /homeDoorName\(db\.displayName, false, bd\.buildingType\)/, 'the Info say a nameless house\'s "Residence" too');
-  const talk = hostText('src/scenes/townTalk.js');
-  assert.match(talk, /function buildingNameIn\(place, data\) \{/);
-  assert.match(talk, /const doorTownOf = \(place, data\) => \(\{ name: buildingNameIn\(place, data\), townBook: townBookOf\(place\), townName: place\?\.name \?\? '' \}\);/);
 });

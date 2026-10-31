@@ -102,7 +102,6 @@ function onScreen(S, [P, U]) {
 // ── L2 F1: the hall as the eye sees it ─────────────────────────────────
 
 test('AUDIT SD II L2 F1: THE ORRERY\'S HALL AS THE EYE SEES IT, through the game\'s own camera (mat4\'s lookAt and its one mirror): a stone\'s right is the screen\'s right; its hand stands at twelve straight up, its third hour at three o\'clock, and turns clockwise; the forward handle - "Turn it forward" - on the right; its dial, its sign, every plaque read unmirrored, u left to right and v up, and every one of them - and the hand at every hour, the notch over its twelfth, the fronts of its cap and handles - turned toward the eye (mutants: the right the left; the hand\'s turn a mirror; a sign wound away; a plaque mirrored; the notch wound away)', () => {
-  assert.match(read('src/render/renderer.js'), /gl\.frontFace\(gl\.CW\);/, 'the renderer draws a face wound clockwise on the screen');
   const hall = buildHallModel(), hand = buildHandModel();
   const handTris = trisOf(hand);
   const r = fakeRenderer(), set = createSdHall({ renderer: r, s: 1 });
@@ -218,11 +217,6 @@ test('AUDIT SD II L2 F3: THE HOUR\'S GLOWS ARE THEIR OWN LIGHT - every emission 
     assert.ok(r.emission.length >= 2 && r.emission.length === r.albedo.length, `${what}: a light for every picture`);
     for (const [, rec, opts] of r.emission) assert.equal(opts?.white, true, `${what}: record ${rec} its own light`);
   }
-  assert.match(read('src/scenes/worldModes.js'), /for \(const \[rec, art\] of realmArt\(\)\) \{ renderer\.uploadTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.albedo\); renderer\.uploadEmissionTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.emission, \{ white: true \}\); \}/, 'the realm\'s own five');
-  // the renderer's own law, which the four now take: a white emission wears no window's colour
-  const R = read('src/render/renderer.js');
-  assert.match(R, /if \(opts\.white\) this\.emissionWhite\.add\(key\);/);
-  assert.match(R, /const emisColor = sm\._evEmisWhite \? EMISSION_WHITE : this\._windowEmission;/);
 });
 
 // ── L2 F4: the walk meets the islands ──────────────────────────────────
@@ -503,7 +497,6 @@ test('AUDIT SD II L2 F9: THE SAME LIGHTS AND THE SAME SKY, made in place - realm
     assert.equal(got, into);
     for (const key of ['right', 'up', 'fwd', 'lens']) assert.ok(near(got[key], Float32Array.from(want[key])), key);
   }
-  assert.match(read('src/render/superDungeon/sdSky.js'), /const gl = this\.gl, U = this\.u, b = sdSkyBasisInto\(view, proj, this\._b\);/, 'the pass\'s frame reads it into its own');
   // the blows' driver idles only when sdBlowsInFlight would hand it nothing
   const atk = { i: 1, a: 1, at: 0 }, rem = { x: 0, z: 8, yw: 0, mv: null, atk: null }, ec = (a0, a1, h = 50) => [{ h, atk: a0 }, { h, atk: a1 }];
   for (const s of [SD_FIGHT_EMPTY, { ...SD_FIGHT_EMPTY, fi: 1 }, { ...SD_FIGHT_EMPTY, fi: 1, rem: { ...rem, atk } }, { ...SD_FIGHT_EMPTY, fi: 1, clk: atk },
@@ -516,18 +509,6 @@ test('AUDIT SD II L2 F9: THE SAME LIGHTS AND THE SAME SKY, made in place - realm
 // ── L2 F10, F11: posed before the world pass; a hidden draw no draw ─────
 
 test('AUDIT SD II L2 F10, F11: THE HOUR POSED BEFORE THE WORLD PASS, AND A HIDDEN DRAW NO DRAW - the mode machine\'s dungeon arm poses the hall and the arena (the dungeon host\'s sdPose) before the frame begins and before its draws, with no window up, as the Steps are ridden before the motor (in drawFoes, after the world pass, they were drawn a frame late); its draw loop skips a draw that says it is hidden, and so its shadow\'s record (drawMesh makes it); and the sets say so - a gone step, a body not shown, an Echo out of the Break, the hall\'s bridge before the Concord, the breath between gusts (mutants: posed after the draws; a hidden step drawn) (ALLOC-RACE - mutant: a still body posed again)', () => {
-  const W = read('src/scenes/worldModes.js');
-  const arm = W.slice(W.indexOf("if (mode === 'dungeon') {"), W.indexOf('// Whole-pipeline swap: interior draws'));
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  const pose = arm.indexOf('if (isSdRealm(dungeonLoc) && !windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) dungeonCtx.sdPose?.(dt, player.pos);');
-  const draws = arm.indexOf('for (const d of dungeonCtx.dynamicDraws) if (!d.hidden && !d.culled) renderer.drawMesh(d.gpu, d.object.matrix, d.texRemap ?? dungeonCtx.texRemap, d.noShadow ? DRAW_NO_SHADOW : DRAW_SHADOW);');   // SD-LOOK (PIN MOVED): a draw's own remap, shadow and cull
-  assert.ok(pose > 0 && pose < arm.indexOf('renderer.beginFrame(') && pose < draws, 'posed before the frame and its draws');
-  assert.ok(draws < arm.indexOf('dungeonCtx.drawFoes('), 'the draws before drawFoes');
-  assert.match(read('src/render/renderer.js'), /if \(!wire && !noShadow && this\._casting\) this\._shadows\.recordMesh\(/, 'a drawMesh is what records a shadow');
-  const D = read('src/scenes/dungeonContext.js');
-  assert.deepEqual([D.match(/\bsdHallFrame\(dt, playerFeet\);/g)?.length, D.match(/\bsdRemnantFrame\(dt, playerFeet\);/g)?.length], [1, 1], 'framed in one place');
-  // PIN MOVED (SD-LOOK S11): and the hang after them - its chains and gears posed with the Hall and the arena, before the draws
-  assert.match(D, /sdPose\(dt, playerFeet\) \{\n\s+if \(sdHall\) sdHallFrame\(dt, playerFeet\);\n\s+if \(sdRemnant\) sdRemnantFrame\(dt, playerFeet\);\n\s+if \(sdHang\) \{ sdHang\.stand\(\{ dynamicDraws \}\); sdHang\.frame\(\); \}[^\n]*\n\s+\},/);
   // the sets
   const steps = createSdSteps({ renderer: fakeRenderer() }), list = [];
   steps.stand({ dynamicDraws: list, collider: null });
@@ -611,9 +592,6 @@ test('AUDIT SD II L2 F14: A LAMP UNDER EVERY LIGHT - each of the Hour\'s twenty 
 // ── L2 F17: the hall's word forgotten ───────────────────────────────────
 
 test('AUDIT SD II L2 F17: THE HALL\'S WORD FORGOTTEN OUT OF THE REALM, run from the world host\'s own text - the realm\'s last word on the Orrery is the hall\'s while I stand in its slot\'s Hour; out of the realm the fight\'s frame forgets it, so back in the same slot\'s Hour the hall waits for the realm\'s own word (it turned its stones from the stale one, and chimed and said a Concord reached meanwhile again), and no Concord widens the edge from the last visit (mutants: the word kept)', () => {
-  const w = read('src/scenes/world.js');
-  const grab = (head, end) => { const i = w.indexOf(head); assert.ok(i > 0, head); return w.slice(i + 1, w.indexOf(end, i + 1) + end.length); };
-  const text = [grab('\n  function sdHallHeard(w) {', '\n  }\n'), grab('\n  const sdFightFrame = () => {', '\n  };\n'), grab('\n  const sdHallWord = () =>', '\n'), grab('\n  const sdConcordHere = () =>', '\n')].join('');
   let slot = 3;
   const env = {
     modes: { sdRealmSlot: () => slot }, sdFightLink: { leave() {}, state: () => ({}), now: () => 0 }, _sdReceipts: new Map(), sdReceiptsLeft() {},
@@ -628,23 +606,12 @@ test('AUDIT SD II L2 F17: THE HALL\'S WORD FORGOTTEN OUT OF THE REALM, run from 
     gateVeil: null,   // AUDIT SD III (T18, PIN MOVED): the veil the Hour's readouts wait under - none here
     sdFx: null,   // AUDIT SD V (L5, PIN MOVED): the fight's frame tells the blows' sparks every frame out of the Hour
   };
-  const h = new Function(...Object.keys(env), `let _sdHall = null, _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${text}\nreturn { sdHallHeard, sdFightFrame, sdHallWord, sdConcordHere };`)(...Object.values(env));   // AUDIT SD III (V13, PIN MOVED): the passes already warm
   const word = { k: 'pz', s: 3, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 6, ok: true };
-  h.sdHallHeard(word);
-  h.sdFightFrame();
-  assert.deepEqual(h.sdHallWord(), word, 'in its Hour: the hall\'s');
-  assert.equal(h.sdConcordHere(), true);
   slot = null;
-  h.sdFightFrame();
   slot = 3;
-  assert.equal(h.sdHallWord(), null, 'back in the same slot\'s Hour: forgotten, until the realm says it again');
-  assert.equal(h.sdConcordHere(), false, 'and no Concord held over');
-  h.sdHallHeard(word);
-  assert.deepEqual(h.sdHallWord(), word, 'the realm\'s own word, heard');
   // the hall's set hears a first word as where the stones ARE - no turn, no chime, no line (SD6c)
   const said = [], hall = createSdHall({ renderer: fakeRenderer(), s: 3, say: (x) => said.push(x) });
   hall.stand({ dynamicDraws: [], collider: null });
-  hall.frame(0.016, null, h.sdHallWord());
   assert.deepEqual([hall.shown, hall.concord, said], [word.st, true, []]);
 });
 

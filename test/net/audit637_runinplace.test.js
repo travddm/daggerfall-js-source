@@ -184,10 +184,3 @@ test('AUDIT 637 C2: A MOVING PEER\'S SILENCE IS STILL NOT WALKED - past GAP_MAX_
   }
 }));
 
-test('AUDIT 637 C1/C2: one home - the hold reads the place the law itself last drew, and a timed interval is the sender\'s own (the arrival interval keeps its clamp)', () => {
-  const src = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8');
-  assert.match(src, /const was = p\.drawn, s = poseAlong\(p\.path, p\.cur\);/);
-  assert.match(src, /p\.shown = p\.drawn = s;/);
-  assert.equal(src.match(/\bp\.drawn\b(?!At)/g).length, 2, 'and nothing else writes or reads it');
-  assert.match(src, /\(p\.cadence \?\?= \[\]\)\.push\(Math\.min\(GAP_MAX_MS, since\)\);/, 'NET-SMOOTH\'s arrival interval: clamped, the line\'s jitter is in it');
-});

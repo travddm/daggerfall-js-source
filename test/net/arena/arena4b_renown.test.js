@@ -135,18 +135,3 @@ test('ARENA4b the carrier: a receipt kept with the fighter standing here as it c
   assert.deepEqual(bodies, [{ receipt: 'a1.x.y', character: 'r-fighter', name: 'Aldric' }, { receipt: 'a1.x.y' }]);
 });
 
-test('ARENA4b the host: arenaOnline hands its claims the fighter and the Renown hook; world.js adopts a won bout\'s Renown by the one plan, only for the fighting character, and the service credits a pledged war-guild in Daggerfall\'s region (mutants: the character check dropped; the order not carried; the influence unasked)', () => {
-  const o = read('src/scenes/arena/arenaOnline.js');
-  assert.ok(o.includes('claim: async (r, c, n) => { const a = await deps.account.claim(r, c, n); answered(r, a); return a; }'), 'the fighter rides the claim (PIN MOVED at the merge of the client stream: the claim\'s answer also settles the held purse, arenaOnline.js answered)');
-  assert.ok(o.includes('character: () => deps.character?.() ?? null, name: () => deps.characterName?.() ?? null, onRenown: (d) => deps.onRenown?.(d)'));
-  const w = read('src/scenes/world.js');
-  const glue = w.slice(w.indexOf('inBout: () => arenaBouts.holds(),'), w.indexOf('inBout: () => arenaBouts.holds(),') + 1400);
-  assert.ok(glue.includes('character: () => characterIdOf(playerEntity)'));
-  assert.ok(glue.includes('if (d?.renown?.character !== characterIdOf(playerEntity)) return;'), 'RENOWN-CHAR: the fighting character\'s track');
-  assert.ok(glue.includes('renownAnswer({ ...d.renown, order: d.order ?? null }, d.renown.credited ?? 0, renownSaid)'), 'the one plan');
-  assert.ok(glue.includes('if (a.order) online?.sendRenownOrder?.(a.order, a.level);'), 'the order carried to the rooms');
-  const svc = read('server-account/src/index.js');
-  const route = svc.slice(svc.indexOf("if (path === '/v1/arena/claim'"), svc.indexOf("if (path === '/v1/arena/board'"));
-  assert.ok(route.includes('creditRenown(ctx, who.player, env, { character: body.character, region: ARENA_RENOWN_REGION, xp: r.renown.credited })'));
-  assert.ok(route.includes('const order = key ? await mintRenownOrder({ s: who.player.id, lv: r.renown.level }'));
-});

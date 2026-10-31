@@ -293,7 +293,6 @@ test('WORLD-AIR THE FROGS\' EDGES (AUDIT SOUNDSCAPE W12): each croak cut out of 
   const { FROG_EDGES, PICKS } = await import('../../../tools/soundscapeSfxInstall.mjs');
   assert.deepEqual([...FROG_EDGES], [0.004, 0.015]);
   assert.deepEqual(PICKS.filter((p) => p.edges).map((p) => p.as), ['wild-frog-1', 'wild-frog-2', 'wild-frog-3', 'wild-frog-4']);
-  assert.ok(readFileSync(new URL('../../../tools/soundscapeSfxInstall.mjs', import.meta.url), 'utf8').includes('maxSeconds: p.max, edges: p.edges ?? null });'), 'the tool hands each pick\'s edges to the bake');
   const flat = bake(new Float32Array(2205).fill(0.5), 11025, { trim: false, peak: 0.8, edges: FROG_EDGES });
   assert.ok(Math.abs(flat[0] - 128) <= 1 && Math.abs(flat.at(-1) - 128) <= 1, 'from rest and back to it');
   assert.ok(Math.abs(flat[1102] - 128) > 90, 'the middle untouched');

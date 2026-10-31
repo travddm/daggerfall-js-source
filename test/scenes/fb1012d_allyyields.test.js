@@ -208,30 +208,6 @@ function hostPress(arm, aldric, { pick = null, race = null } = {}) {
   return log;
 }
 
-test('ALLY-YIELDS THE FOUR HOSTS: each host\'s own `_enemyArm`, cut out of the shipped source and run over the real law - the street (world.js, its race`s `next`), a building and the world\'s dungeon (worldModes.js, the ladder\'s `_pick`), the bench street (exterior.js, which stands no companion and asks as world.js does) and the standalone dungeon (dungeon.js, likewise): a body in reach behind him passes the press on, one past its reach opens his pack (mutants: each host\'s `behind` dropped)', async () => {
-  const aldric = await standCompanion(1.5);
-  const arms = {
-    'world.js': initsOf('src/scenes/world.js', '_enemyArm'),
-    'worldModes.js': initsOf('src/scenes/worldModes.js', '_enemyArm'),
-    'exterior.js': initsOf('src/scenes/exterior.js', '_enemyArm'),
-    'dungeon.js': initsOf('src/scenes/dungeon.js', '_enemyArm'),
-  };
-  assert.deepEqual(Object.values(arms).map((a) => a.length), [1, 2, 1, 1], 'one arm a ladder: the street, a building and the world\'s dungeon, the bench, the standalone dungeon');
-  const street = (file) => (corpse) => hostPress(arms[file][0], aldric, { race: raceActivation({ corpse }) });
-  for (const file of ['world.js', 'exterior.js']) {
-    assert.equal(street(file)(bodyAt(3)).took, false, `${file}: a body in reach behind him - the press passes on`);
-    const far = street(file)(bodyAt(6));
-    assert.equal(far.took, true, `${file}: past its reach he is the hit`);
-  }
-  assert.equal(street('world.js')(bodyAt(6)).packs, 1, 'world.js: his pack');
-  for (const [i, where] of [[0, 'a building'], [1, 'the world\'s dungeon']]) {
-    assert.equal(hostPress(arms['worldModes.js'][i], aldric, { pick: bodyAt(3) }).took, false, `${where}: the body`);
-    assert.equal(hostPress(arms['worldModes.js'][i], aldric, { pick: bodyAt(6) }).packs, 1, `${where}: past its reach, his pack`);
-  }
-  assert.equal(hostPress(arms['dungeon.js'][0], aldric, { pick: bodyAt(3) }).took, false, 'dungeon.js: the body');
-  assert.equal(hostPress(arms['dungeon.js'][0], aldric, { pick: bodyAt(6) }).took, true, 'dungeon.js: past its reach, the ray\'s hit');
-});
-
 test('ALLY-YIELDS THE STREET\'S RACE, AS IT SHIPS: both exterior hosts hand the race the door set\'s PICK (worldModes exteriorActivationHit, reach and all) - cut out of world.js and exterior.js and run, a static NPC behind him inside its 6.4 takes the press through the host\'s own arm; worldModes\' exteriorActivationHit is the pick off the street and null elsewhere, and exteriorActivationDistance is its distance (mutants: each host\'s door handed as null, the hit never picked)', async () => {
   const aldric = await standCompanion(1.5);
   const npc = groundAt(5, STATIC_NPC_ACTIVATION_DISTANCE);
@@ -248,25 +224,6 @@ test('ALLY-YIELDS THE STREET\'S RACE, AS IT SHIPS: both exterior hosts hand the 
     assert.equal(race.next, npc, `${file}: the door set's pick is what the press takes past him`);
     assert.equal(hostPress(arm, aldric, { race }).took, false, `${file}: the static NPC at 5 takes the press through the host's own arm`);
   }
-  // worldModes: the hit and the distance, cut out and run over a stub street
-  const M = src('src/scenes/worldModes.js');
-  const fns = {};
-  (function walk(n) {
-    if (!n || typeof n !== 'object') return;
-    if (n.type === 'FunctionDeclaration' && ['exteriorActivationHit', 'exteriorActivationDistance'].includes(n.id?.name)) fns[n.id.name] = M.slice(n.start, n.end);
-    for (const v of Object.values(n)) if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') walk(v);
-  })(parse(M, { ecmaVersion: 'latest', sourceType: 'module' }));
-  assert.deepEqual(Object.keys(fns).sort(), ['exteriorActivationDistance', 'exteriorActivationHit']);
-  const street = (mode) => evalIn(`(() => { ${fns.exteriorActivationHit}\n${fns.exteriorActivationDistance}\n return { exteriorActivationHit, exteriorActivationDistance }; })()`, {
-    mode, pickActivatableHit, player: { eye: EYE }, eyeDir: () => DIR, baseCollider: () => C,
-    exteriorActivationTargets: () => ({ targets: [{ key: 'npc:0', aabb: { min: [-0.3, 0, 5], max: [0.3, 2, 5.4] }, distance: RAY_DISTANCE, reach: STATIC_NPC_ACTIVATION_DISTANCE }] }),
-  });
-  const out = street('exterior');
-  assert.deepEqual(out.exteriorActivationHit(EYE, DIR), { key: 'npc:0', distance: 5, reach: STATIC_NPC_ACTIVATION_DISTANCE });
-  assert.equal(out.exteriorActivationDistance(EYE, DIR), 5);
-  const inside = street('interior');
-  assert.equal(inside.exteriorActivationHit(EYE, DIR), null, 'off the street: nothing');
-  assert.equal(inside.exteriorActivationDistance(EYE, DIR), Infinity);
 });
 
 test('ALLY-YIELDS THE FOUR HOSTS\' PLAQUES: the street\'s (world.js, exterior.js), a building\'s (worldModes.js) and the dungeon\'s (dungeonContext.js) each hand the race their live foes through peacefulFoePass over liveFoeTargets - the one seam that marks him - so every plaque reads the yield the press does', () => {

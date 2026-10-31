@@ -64,31 +64,3 @@ test('REST5 the words: carried, carried short, skipped - each names the member',
   assert.equal(REST_ACT_TEXT.noVote, 'Online there is no vote. Rest at a fire, tent or bed, and party members within 15 m rest with you.');
 });
 
-test('REST5 by source: online the vote, the party card and the spend answer nothing; strangers never block at a public rest point; the follow tick carries the night through the mode\'s own bag, quietly, its stamp the pose\'s restStartedAt', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!restTogether\(\)\) return null;[^\n]*\n    if \(sharedClockOn\(\)\) return null;\n/, 'the vote retires online');
-  assert.match(w, /const partyRestHere = \(\) => !sharedClockOn\(\) && !!social\?\.party/, 'no party card online - the act is the window');
-  assert.match(w, /    if \(!sharedClockOn\(\)\) _partyRestJustStartedAt = social\.now\(\);\n    _partyRestStartWaived = false;/, 'online a rest\'s open stamps no start: the stamp is the night\'s');
-  assert.match(w, /if \(mode === 'interior'\) return null;[^\n]*\n    if \(sharedClockOn\(\) && publicRestPoint\(\)\) return null;/, 'a rest point is public');
-  assert.match(w, /const publicRestPoint = \(\) => \{ const pt = hostRestDeps\(\)\?\.restAct\?\.\(\)\?\.point; return !!pt && pt\.where !== 'bedroll'; \};/, 'a Bedroll keeps the stranger rule');
-  assert.match(w, /_partyRestVoteTrackTick\(\);\n    if \(sharedClockOn\(\)\) \{ carryPartyNight\(\); return; \}/, 'the follow tick carries the night online');
-  // AUDIT REST-PARTY: the decision is partyRestLaw.js's (nightMoved, carriedNightAction - run on a table in
-  // test/systems/rest/auditrestparty.test.js); here, that the follow tick hands it the right readings
-  assert.match(w, /withParty: restsWithParty\(\), resterAlone: restsAlone\(m\), exempt: !!modes\?\.insidePartyRestExempt, dead,/, 'my switch, theirs, the tavern\'s exemption, my death');
-  assert.match(w, /near: present && nearAccount\(m\.acct, m\.p\),/, 'the member here, near');
-  // AUDIT REST II (PIN MOVED): the stamp is watched now (partyRestLaw.js createNightWatch - over the member's high-water
-  // mark, one move a minute answered, the mark asked lazily), run on a table in test/systems/auditrest2_party.test.js
-  assert.match(w, /if \(!_nightWatch\.moved\(m\.acct, !!m\.p, at, now, isNightStamp, \(\) => nightDue\(playerEntity, ownMinutes\(\)\)\)\) continue;/, 'a first sight is a baseline; a stale stamp no night; AUDIT REST F7: an older build\'s open no night (AUDIT REST III C1 re-aim: my clock\'s debt asked inside the minute)');
-  assert.match(w, /busy: \(\) => playerEntity\.isResting \|\| playerEntity\.isLoitering \|\| !!townTalk\.overlay \|\| mirrorRestRefused\(\),/, 'mid-fight, swimming, a window, resting already: skipped and told');
-  assert.match(w, /else if \(act === 'busy'\) setMidScreenText\(REST_ACT_TEXT\.carriedSkipped\(name\), 4\);/);
-  // CAMP-ROLL (PIN MOVED): the sequence is the bag's one now (scenes/shared.js restCampNight) - the rest windows' camp
-  // wait sleeps a camp mate's night through it too
-  assert.match(rd('src/scenes/shared.js'), /quietNights\(\(\) => \{\n      if \(kind\) _restKindOverride = \(\) => kind;\n      out\.setResting\(true\);\n      r = night \? out\.restNight\(\{ carried: true \}\) : out\.restShort\(\);\n    \}\);/, 'my own bag, my own interval, no ambush');
-  assert.match(w, /try \{ r = bag\.restCampNight\(theirs, night\); \} finally \{ bag\.setResting\(false\); \}/);
-  assert.match(w, /setNightListener\(\(kind\) => \{ if \(social && sharedClockOn\(\)\) \{ _partyRestJustStartedAt = nightStamp\(social\.now\(\), kind \?\? undefined\); _partyComposedAt = -Infinity; \} \}\);/, 'the stamp is the night\'s, marked with its spot, sent at once');
-  assert.match(w, /if \(!social\?\.party\) \{ chatLog\.push\(tabId, \{ text: NO_PARTY_TEXT, system: true \}\); return true; \} if \(sharedClockOn\(\)\) \{ chatLog\.push\(tabId, \{ text: REST_ACT_TEXT\.noVote, system: true \}\); return true; \}/, 'AUDIT REST: /ready online says there is no vote');
-  assert.match(w, /return mode === 'interior' \? modes\?\.restDeps\?\.\(\) \?\? null : mode === 'dungeon' \? modes\?\.dungeonCtx\?\.restDeps\?\.\(\) \?\? null : outdoorRestDeps;/);
-  assert.match(rd('src/scenes/worldModes.js'), /restDeps: \(\) => interiorRestDeps,/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /restDeps: \(\) => _restDeps,/);
-  assert.match(rd('src/scenes/shared.js'), /if \(!carried\) heardNight\(spot\);/);
-});

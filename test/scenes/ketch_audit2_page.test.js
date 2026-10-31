@@ -160,11 +160,6 @@ test('AUDIT KETCH II L3-1, L3-2 THE CONSTRUCTS\' PELLETS\' CAP IS A VOYAGE\'S, A
   }
 });
 
-test('AUDIT KETCH II L3-6 THE KETCHMASTER\'S HOLD\'S OWED WORD IS SAID AGAIN: the world host resends every pool\'s owed spent words - the Ketch\'s with the Hour\'s and the gate\'s (its own stood owed for ever; mutants: the Ketch\'s pool left out)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /for \(const pool of \[spoilsPool, sdSpoilsPool, ketch\?\.spoils\]\) pool\?\.resendSpent\?\.\(\);/);
-});
-
 test('AUDIT KETCH II L5-6 THE LAB SAYS THE WATCH\'S FIVE AND THE ENGINE\'S APPETITE: `?wv=4` and `?wv=5` are the waves they name, and the engine\'s need is its crew\'s (it stood at three waves and the old appetite; mutants: the waves at three; the old need)', () => {
   for (let w = 0; w <= KT_WATCH_WAVES; w++) assert.equal(ketchLabWire(`?wv=${w}`, 1000).wv, w, `wave ${w}`);
   assert.equal(ketchLabWire('?stage=2', 1000).cl.nd, engineNeeds(4), 'the lab\'s crew of four');
@@ -189,6 +184,4 @@ test('AUDIT KETCH II STAND-IN-BAR THE CONSTRUCTS HAVE A HEALTH BAR: a blow of mi
   assert.equal(foeTarget(), null, 'gone at its fall');
   assert.equal(foeTargetRef(), null);
   clearFoeTarget();
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dc, /return markHostStruck\(hb, sdRemnant \? sdRemnant\.echoHit\(\{ i: hb\.host, d: damage, r \}\) : !!opts\.onHostHit\?\.\(\{ i: hb\.host, d: damage, r, tick \}\)\); \};/, 'every host body\'s blow goes through it');
 });

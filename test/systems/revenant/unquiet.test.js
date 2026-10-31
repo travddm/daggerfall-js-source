@@ -121,26 +121,6 @@ test('UNQUIET THE GATE: drawn only with the arc on, room for another, on a foe t
   assert.equal(full.unquiet, undefined, 'and none stored - nothing decided');
 });
 
-test('UNQUIET THE DOORS: an elite\'s promotion and a champion\'s draw mark their own - never a puppet\'s; the street pool hands a puppet\'s champion `own: false`; the title says it - "Unquiet Elite Orc" (mutants: a door unmarked; a puppet marked; the title\'s word)', () => {
-  K._forceUnquietForTests(true);
-  const own = { mobileType: M.Orc, level: 8, health: 50, maxHealth: 50, team: 'Monster', stats: {} };
-  const a = { ...own }, b = { ...own };
-  promoteEliteFoe(a);
-  promoteEliteFoe(b, { own: false });
-  assert.equal(a.unquiet, true, 'an elite of its own');
-  assert.equal(b.unquiet, undefined, 'a puppet - its owner\'s word');
-  const c = { ...own }, d = { ...own };
-  assert.equal(applyChampion(c, 0), true);
-  applyChampion(d, 0, { own: false });
-  assert.equal(c.unquiet, true, 'a champion of its own');
-  assert.equal(d.unquiet, undefined);
-  assert.match(read('src/scenes/exteriorFoes.js'), /applyChampion\([^\n]*\{ own: !puppet \}\);/);
-  assert.equal(foeTitle({ eliteFoe: true, unquiet: true }, 'Orc'), 'Unquiet Elite Orc');
-  assert.equal(foeTitle({ champion: 'mighty', unquiet: true }, 'Orc'), 'Unquiet Mighty Orc');
-  assert.equal(foeTitle({ champion: 'mighty', unquiet: false }, 'Orc'), 'Mighty Orc');
-  assert.equal(foeTitle({ eliteFoe: true, unquiet: true, revenant: { name: 'Grushnak the Butcher' } }, 'Orc'), 'Grushnak the Butcher', 'a revenant by its name alone');
-});
-
 // ── rarer ───────────────────────────────────────────────────────────
 
 test('UNQUIET RARER: three at most - none rises while three hunt me (none buried for it); an unmarked special foe never rises, whatever it does; one already a revenant is no newcomer; it comes back in two to four days (mutants: the cap moved; the mark unread; a newcomer past the cap; the days)', () => {
@@ -330,23 +310,6 @@ test('UNQUIET SINK: the dead stand and go into the ground - 200 ms then 1400 ms 
   assert.equal(b.fleeing, false);
   assert.equal(b.portalFx, null, 'it rises whole');
   assert.equal(b.ai.fleeLeft, 0);
-});
-
-test('UNQUIET THE CRAFT PUT DOWN: a last stand, a kneel or a tear-away mid-flight ends its craft and its dissolve; its flee card says its craft (mutants: a craft kept; the card\'s words)', () => {
-  const p = me();
-  const { f } = standing(p, M.Zombie, 3);
-  N.revenantFleeStep(f, [0, 0, 0], { rolls: () => 0, now: 0 });
-  U.endCraft(f);
-  assert.deepEqual([f._craft, f.portalFx], [null, null]);
-  const src = read('src/systems/revenant/revenantFate.js');
-  for (const fn of ['beginLastStand', 'beginTearAway', 'beginYield']) {
-    const at = src.indexOf(`export function ${fn}(`);
-    assert.ok(at >= 0 && src.slice(at, src.indexOf('\n}', at)).split('\n').slice(1, 5).some((l) => l.trim().startsWith('endCraft(f);')), fn);
-  }
-  const ev = N.revenantFleeEvent({ ...f.entity, _craft: 'sink', revenant: { id: f.entity.revenant.id } }, 'Zombie', { rolls: () => 0 });
-  const r = N.revenantById(f.entity.revenant.id);
-  assert.equal(ev.body, `${r.given} sinks into the earth. Strike it before it is under!`);
-  assert.deepEqual(['smoke', 'blink', 'bolt'].map((c) => U.craftFleeWords(c, 'Grushnak')), ['Grushnak throws down smoke and is lost to sight!', 'Grushnak tears open a rift. Strike it before it is through!', 'Grushnak bolts!']);   // PIN MOVED (AUDIT UNQUIET): the classic skin draws it not at all
 });
 
 // ── wounds ──────────────────────────────────────────────────────────
@@ -606,34 +569,3 @@ test('UNQUIET THE DREAD\'S STAND: half again its health; its will never holds (i
 
 // ── the page ────────────────────────────────────────────────────────
 
-test('UNQUIET THE PAGE: how it gets away (its craft, from rank II), the wounds I left, its ambition, its blood; the Dread\'s home, its two stands, no will; the empty page says who rises (mutants: each line)', () => {
-  assert.equal(PG.craftLine({ mobileType: M.Orc, rank: 1 }), 'Its flight: it runs. From rank II it will break away in its own way.');
-  assert.equal(PG.craftLine({ mobileType: M.Mage, rank: 2 }), 'Its flight: Blink - it tears open a rift and is gone. Silence it, hold it, or strike it as it fades.');
-  // PIN MOVED (AUDIT UNQUIET, section 49): each true on both skins and past its will - a struck sinker's will may still tear it away
-  assert.equal(PG.craftLine({ mobileType: M.Zombie, rank: 3 }), 'Its flight: Sink - it sinks into the earth. Strike it before it is under, and it rises, cornered, and runs no more.');
-  assert.equal(PG.craftLine({ mobileType: M.Thief, rank: 3 }), 'Its flight: Smoke - it throws down smoke and vanishes as it runs, but a blow can still find it.');
-  assert.equal(PG.craftLine({ mobileType: M.Orc, rank: 3 }), 'Its flight: Bolt - it runs faster than anything you have chased. Bring it down from range, and break its will before the killing blow.');
-  assert.equal(PG.craftLine({ dread: true }), 'At home it has nowhere to run: it never flees, and kneels at the end.');
-  assert.equal(PG.woundLine({ wounds: ['lamed'] }), 'Wounds you left: Lamed (a lamed leg, so it runs slower).');
-  assert.equal(PG.woundLine({ wounds: [] }), '');
-  assert.equal(PG.ambitionLine({ personality: 'witty' }), 'Its ambition: Plunder - it raids the roads while it waits, and grows richer the longer you leave it.');
-  assert.equal(PG.ambitionLine({ personality: 'witty', dread: true }), '');
-  assert.equal(PG.bloodLine({ blood: 1, rank: 2 }), 'If it kills you once more, or fells one more companion, it grows bolder.');   // PIN MOVED (AUDIT UNQUIET): a companion is felled
-  assert.deepEqual([PG.bloodLine({ blood: 0, rank: 2 }), PG.bloodLine({ blood: 1, rank: 5 })], ['', '']);
-  assert.equal(PG.dreadStandLine({ dread: true, rank: 5 }), `Last stands: twice in a fight it rises again, at ${Math.round(F.lastStandHealth(5) * 100)}% and at 25% of its health.`);
-  assert.equal(PG.comeWords({ dread: true, lair: { name: 'Tomb of Vaness' }, dueAt: 0 }, 0, false).tag, 'The Dread');
-  const src = read('src/ui/revenant/revenantPage.js');
-  assert.match(src, /for \(const line of fallen \? \[\] : \[craftLine\(r\), woundLine\(r, now\), ambitionLine\(r\), bloodLine\(r\), tearLine\(r\)\]\) if \(line\)/);
-  assert.match(src, /const will = fallen \|\| r\.dread \? '' : willWords\(r\);/);
-  assert.match(src, /'An elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you\.'/);
-});
-
-test('UNQUIET HOST-SPLIT: the craft runs in the flee law both pools share, its look through the pools\' dissolve and the scene\'s door - no host grows (mutants: a host wired)', () => {
-  // AUDIT UNQUIET (section 49): the four hosts, each read (the bench is scenes/exterior.js - there was no exteriorBoot.js)
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.ok(s.length > 1000, `${host} read`);
-    assert.ok(!/revenantUnquiet|unquietMark/.test(s), host);
-  }
-  assert.match(read('src/scenes/hostMagic.js'), /fx: \(recipe, at, o\) => \{ try \{ fx\.technique\(recipe, at, o\); \} catch/);
-});

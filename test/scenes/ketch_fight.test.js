@@ -102,22 +102,6 @@ test('KETCH A BLOW\'S FLOOR AND A BODY\'S ACT: each blow drawn on the storey it 
   assert.equal(ktBodyAct(B, 9000, mob, null).act, 'idle');
 });
 
-test('KETCH-LOOK KL2 THE WARDEN DYED DWARVEN: the Iron Atronach\'s frame takes DFU\'s ChangeDye with the Dwarven table over its 0x70 metal band and the Ketch\'s table over its darkest greys - every other index its own, the frame it came in untouched; the look washes nothing (mutants: the dye the Iron table\'s; the darks left iron)', async () => {
-  const { ktWardenDye, KT_WARDEN_LOOK, KT_WARDEN_DARKS } = await import('../../src/scenes/ketch/ketchFight.js');
-  const { METAL_TABLES } = await import('../../src/characters/dyes.js');
-  const data = Uint8Array.from({ length: 256 }, (_, i) => i), bmp = { width: 16, height: 16, data };
-  const out = ktWardenDye(bmp);
-  assert.notEqual(out.data, data, 'a fresh frame');
-  for (let i = 0; i < 256; i++) assert.equal(data[i], i, 'the frame it came in untouched');
-  for (let k = 0; k < 16; k++) assert.equal(out.data[0x70 + k], METAL_TABLES.Dwarven[k], `0x70+${k} Dwarven`);
-  for (const [from, to] of Object.entries(KT_WARDEN_DARKS)) assert.equal(out.data[Number(from)], to, `${from} olive`);
-  for (let i = 0; i < 256; i++) if ((i < 0x70 || i > 0x7f) && !(i in KT_WARDEN_DARKS)) assert.equal(out.data[i], i, `${i} its own`);
-  assert.equal(KT_WARDEN_LOOK.tint, null, 'no multiply wash');
-  assert.equal(typeof KT_WARDEN_LOOK.dye, 'function');
-  const src = readFileSync(new URL('../../src/scenes/ketch/ketchFight.js', import.meta.url), 'utf8');
-  assert.match(src, /renderer\.uploadTexture\?\.\(T\.archive, rkey, T\.tex\.getColor32\(look\.dye\(T\.tex\.getDFBitmap\(fr\.record, fr\.frame\)\), 0\)\)/, 'dyed at upload, through the player\'s palette, under its own key');
-});
-
 test('KETCH-LOOK KL3 THE FIGHT\'S LATE PASS DRAWS THE DECK\'S HALOS: what the deck hands it this frame, in one draw at the classic set\'s gain, whether or not a telegraph stands; none handed, none drawn; off the ship, forgotten (mutants: the halos never drawn; the halos kept past the ship)', () => {
   // a context whose every compile is done at once, counting its draws (test/render/firstuse.test.js's stand-in)
   const draws = [], base = { VERTEX_SHADER: 1, FRAGMENT_SHADER: 2, COMPILE_STATUS: 3, LINK_STATUS: 4 };

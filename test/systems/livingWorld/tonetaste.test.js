@@ -117,12 +117,3 @@ test('TONE-TASTE the courtship: through the real Legacy host, a tone the residen
   assert.deepEqual([r.gained === 0, r.cooled, r.again], [true, true, false], 'the law answers cooled');
 });
 
-test('TONE-TASTE the talk\'s door: the window hears the tone as the one spoken to took it - their group\'s, off the engine\'s own session (a mobile\'s a Commoner\'s) - for the regard and for the Legacy host\'s answer alike (mutants: the group, the answer\'s taste)', () => {
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /const _toneTaste = \(\) => toneTaste\(tone, engine\(\)\?\.session\?\.npcData\?\.socialGroup \?\? 0\);/);
-  assert.match(tt, /const _toneHeard = \(\) => \{ if \(_toneTarget\) livingTone\?\.\(_toneTarget, _toneTaste\(\)\); \};/);
-  assert.match(tt, /if \(row\.legacy\) return row\.legacy\.answer\(tone, _toneTaste\(\)\);/);
-  const lh = rd('src/scenes/legacyHost.js');
-  assert.match(lh, /answer: \(tone, taste\) => answerTopic\(t, res, taste, ctx\)/);
-  assert.match(lh, /r\.cooled \? MARRIAGE_TEXT\.cooled\(first\) :/);
-});

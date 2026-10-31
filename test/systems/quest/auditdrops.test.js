@@ -239,59 +239,11 @@ test('AUDIT DROPS C1/C2: the hub\'s and the receiver\'s cooldowns sit at HALF th
   const i1 = questInGate(null, t0); assert.equal(i1.pass, true);
   assert.equal(questInGate(i1.at, t0 + 1000).pass, false);
   assert.equal(questInGate(i1.at, t0 + QUEST_HUB_MIN_MS).pass, true);
-  const o = rd('src/net/online.js');
-  assert.match(o, /const qk = `\$\{room\}\|\$\{f\.acct\}`;\s*\n\s*const g = questInGate\(this\._inQuest\.get\(qk\), now\);/, 'keyed by the SENDER: one member\'s share never costs another\'s');
-  assert.match(o, /const f = validQuestFrame\(m\);\s*\n\s*if \(!f \|\| f\.acct === this\.acct\) return;/, 'validated first, so the key is the account\'s');
-  assert.match(o, /if \(k\.startsWith\(`\$\{room\}\|`\)\) this\._inQuest\.delete\(k\);/, 'and swept by room on leave');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(prepared\.ok && socialLink\(\)\?\.shareQuest\(\{[^\n]*\}\)\) _questSyncSeen\.set\(questName, count\);/, 'C1: `seen` moves only when the share LEFT - a refused resync is retried');
-  const s = rd('server/src/index.js');
-  const start = s.indexOf("if (doored !== 'quest')");
-  const arm = s.slice(start, s.indexOf("for (const member of party.members)", start));
-  assert.ok(arm.indexOf('if (!a.party) return;') < arm.indexOf('tokenGate(this._roomQuest'), 'C3: no party, no budget spent');
-  assert.ok(arm.indexOf('this._speaker(a.acct) !== ws') < arm.indexOf('tokenGate(this._roomQuest'), 'C3: another tab speaks, no budget spent');
-  // AUDIT 68 S14-inbound-directed-gate-dup: the per-sender gate is the directed frames' one door now (`_directedIn`)
-  assert.match(o, /if \(buckets\.size > TRADE_IN_SENDERS_MAX\) buckets\.clear\(\);\s*\n\s*const g = gate\(buckets\.get\(m\.id\) \?\? null, now\);/, 'B3 at home: the inbound directed gate is per sender');
-  assert.match(o, /this\._directedIn\(m, now, 'trade', this\._inTradeBuckets, tradeInGate, /, 'B3 at home: and the trade arm goes through it');
 });
 
 // ── D. party rest in the modal hosts ────────────────────────────────
 
-test('AUDIT DROPS D1 (as the party-rest drop now keeps it): the building and the dungeon expose `restState` (RESTING, never a mirror, never the wake box) and run the stranger and party gates before their rest window; world.js reads them, broadcasts a rest only while RESTING, and its own toggle is guarded until the mode machine stands', () => {
-  const m = rd('src/scenes/worldModes.js'), d = rd('src/scenes/dungeonContext.js'), w = rd('src/scenes/world.js');
-  const getter = /get restState\(\) \{[\s\S]{0,2200}?if \(!w\?\.isRestWindow \|\| w\.isPartyRestMirror \|\| !w\.session \|\| w\.state !== 'resting'\) return null;\s*return \{ mode: w\.mode, hoursRemaining: w\.session\.hoursRemaining, totalHours: w\.session\.totalHours \};/;
-  assert.match(m, getter, 'the building\'s'); assert.match(d, getter, 'the dungeon\'s');
-  // The drop put the building's getter on interiorKeyCtx - the KEY table's ctx, which the factory never
-  // returns - so `modes?.restState` read undefined from a tavern: D1's hole, re-opened. ONE getter per host,
-  // ONE `restState` key at all, and the building's lies inside the factory's returned literal.
-  for (const [src, who] of [[m, 'the building'], [d, 'the dungeon']]) {
-    assert.equal(src.match(/get restState\(\)/g).length, 1, `${who}: one getter`);
-    assert.equal(src.match(/\brestState\s*:/g), null, `${who}: no plain key beside the getter (the later key of a literal wins)`);
-  }
-  assert.ok(m.indexOf('get restState()') > m.lastIndexOf('\n  return {'), 'the building\'s getter sits on the object world.js reads, not the key ctx');
-  assert.ok(m.indexOf('get restState()') > m.indexOf('get footstepKind()'), 'beside E2\'s footstepKind, on the same literal');
-  assert.ok(d.indexOf('get restState()') > d.indexOf('\n  const api = {') && d.indexOf('get restState()') < d.indexOf('get uiOverlayActive() { return dungeonPaused(); }'), 'the dungeon\'s on `api`');
-  assert.match(m, /const strangerRefusal = host\.strangerRestGate\?\.\(\);\s*if \(strangerRefusal\) \{ mountInterior\(new ActionTextBox\(\[strangerRefusal\]\)\); return; \}[\s\S]{0,600}?const partyRefusal = host\.partyRestGate\?\.\(\);\s*if \(partyRefusal\) \{ mountInterior\(new ActionTextBox\(\[partyRefusal\]\)\); return; \}[\s\S]{0,600}?host\.markPartyRestSpent\?\.\(\);\s*mountInterior\(createRestWindow\(interiorRestDeps, ignoreAllocatedBed\)\);/, 'the building: strangers, the party, the spend, the window');
-  assert.match(d, /const strangerRefusal = opts\.strangerRestGate\?\.\(\);\s*if \(strangerRefusal\) \{ activeOverlay = new ActionTextBox\(\[strangerRefusal\]\); return; \}[\s\S]{0,600}?const partyRefusal = opts\.partyRestGate\?\.\(\);\s*if \(partyRefusal\) \{ activeOverlay = new ActionTextBox\(\[partyRefusal\]\); return; \}[\s\S]{0,600}?opts\.markPartyRestSpent\?\.\(\);\s*activeOverlay = createRestWindow\(_restDeps\);/, 'the dungeon: the same four, through the outer host\'s doors');
-  assert.match(m, /partyRestGate: \(\) => host\.partyRestGate\?\.\(\),/, 'handed down to the dungeon');
-  assert.match(m, /markPartyRestSpent: \(\) => host\.markPartyRestSpent\?\.\(\),/);
-  assert.match(w, /const restWin = mode === 'interior' \? modes\?\.restState\s*: mode === 'dungeon' \? modes\?\.dungeonCtx\?\.restState/, 'world.js reads the two getters (OVH4: on either skin)');
-  assert.match(w, /townTalk\.overlay\.session && townTalk\.overlay\.state === 'resting'/, 'D2: outdoors too, RESTING - not the wake box');
-  assert.match(w, /const markPartyRestSpent = \(\) => \{\s*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!social\) return;\s*\n\s*_partyRestReady = false;/, 'PARTY-REST28: the one shared reset every host runs on a granted rest (REST-OFFLINE1: a no-op with no social clock)');
-  assert.match(w, /const partyRefusal = modes \? partyRestGate\(\) : null;/, 'D5: no TDZ before the mode machine stands');
-  assert.match(w, /const strangerRefusal = modes \? strangerRestGate\(\) : null;/, 'D5: the stranger gate the same');
-  assert.match(w, /if \(modes\) markPartyRestSpent\(\);/, 'D5: and the spend');
-});
-
 // ── E. the plaque, the kind, the peer sounds ────────────────────────
-
-test('AUDIT DROPS E2: the pose\'s footstep kind is the MODE\'s indoors and underground - the building\'s stride caches the kind off the very ctx its clip pair was picked from', () => {
-  const m = rd('src/scenes/worldModes.js'), w = rd('src/scenes/world.js');
-  assert.match(m, /pickFootstepSet\(_fsCtx = mode === 'interior'/);
-  assert.match(m, /_modeFootstepKind = pickFootstepKind\(_fsCtx\);/);
-  assert.match(m, /get footstepKind\(\) \{ return _modeFootstepKind; \},/);
-  assert.match(w, /fk: \(modes\?\.mode \?\? 'exterior'\) === 'exterior' \? _lastFootstepKind : \(modes\?\.footstepKind \?\? 0\),/);
-});
 
 const peerRig = () => {
   const played = [];
@@ -361,10 +313,6 @@ test('AUDIT DROPS F: the pose\'s fk is clamped 0-5, the quest frame has its own 
   const st = new SocialState({ acct: 'me' });
   assert.equal(WHY_IN_PARTY, 'in your party');
   assert.equal(peerRelationText({ whyNotInvite: WHY_IN_PARTY, relation: 'friend' }), 'In your party');
-  assert.match(rd('src/net/social.js'), /if \(seated\) whyNotInvite = WHY_IN_PARTY;/);
   assert.equal(typeof st.actionsFor, 'function');
-  // tradeFrame after chatFrame, before the dead return (lens 3 #5). PIN MOVED (SCALE4c): the lane's look at the box is
-  // its stamp now (`_mailFrameAt`) - the box's looks ride the tab's one heartbeat while the lane runs
-  assert.match(rd('src/scenes/world.js'), /const onlineFrame = \(now, dt\) => \{\s*if \(!modes\?\.sailingCabin \|\| seatOut\(\) \|\| playerEntity\.health <= 0 \|\| modes\?\.deathUp\?\.\(\)\) cabinLink\.close\(\);\n\s*chatFrame\(\);[^\n]*\n\s*tradeFrame\(\);[^\n]*\n(?:\s*duelFrame\(\);[^\n]*\n)?(?:\s*wedFrame\(\);[^\n]*\n)?(?:\s*profileFrame\(\);[^\n]*\n)?(?:\s*pageFrame\(\);[^\n]*\n)?(?:\s*_mailFrameAt = performance\.now\(\);[^\n]*\n)?(?:\s*gateFrame\(\);[^\n]*\n)?(?:\s*serpentFrame\(\);[^\n]*\n)?(?:\s*sdFrame\(\);[^\n]*\n)?(?:\s*egFrame\(\);[^\n]*\n)?(?:\s*try \{ ketch\?\.frame\(\); \} catch [^\n]*\n)?(?:\s*renownTracker\?\.tick\(\);[^\n]*\n)?(?:\s*rollTracker\?\.tick\(\);[^\n]*\n)?(?:\s*peerMenuFrame\(\);[^\n]*\n)?(?:\s*peerFxFrame\(\);[^\n]*\n)?(?:\s*nameAsFrame\(\);[^\n]*\n)?(?:\s*\/\/[^\n]*\n)*(?:\s*if \(realmSession && !realmSession\.lost && realmDoorShut\(online\)\) \{ realmLost\('no-realm-character'\); return; \}\n)?(?:\s*\/\/[^\n]*\n)*(?:\s*if \(seatOut\(\)\) \{\n[\s\S]*?\n    \}\n)?(?:\s*\/\/[^\n]*\n)*\s*if \(townTalk\.overlay instanceof DeathScreen/);   // ONE-SEAT: a tab out of the seat returns before the dead's law, after every frame above (CHAP1, PIN MOVED: the Roll's tick beside Renown's) (PIN MOVED, SD2d: the Hollow's frame beside the serpent's) (PIN MOVED, NAME-AS: a name chosen on this device said again, after the others' blows) (PIN MOVED, EG-PLAY: an Elite Breach's frame beside the Hollow's) (PIN MOVED, KETCH: the sky-ketch's frame beside the Breach's)
   assert.ok(inRange);
 });

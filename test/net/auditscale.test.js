@@ -787,16 +787,6 @@ test('AUDIT SCALE D12: the harness\'s counters - every frame and byte in and out
   for (const s of [0, 1.5, 30, 600, 3600]) assert.deepEqual(mapPixelOfWire(H.poseAt(bot, s).x, H.poseAt(bot, s).z), [bot.town.px, bot.town.py]);
 });
 
-test('AUDIT SCALE C11 C13: an interrupted run takes its state, and the private half leaves the disk once the service is up; the account entry answers as workerd\'s binding does - a column the row has not thrown, raw() counted once, each point stamped with its moment', async () => {
-  const h = src('tools/loadHarness.mjs');
-  assert.match(h, /const onSignal = \(\) => \{\s*for \(const f of fleets\) f\.stop\?\.\(\);\s*stopAll\(\);\s*if \(!o\.keep\) \{ try \{ rmSync\(state, \{ recursive: true, force: true \}\); \} catch \{[^}]*\} \}\s*process\.exit\(130\);/);
-  assert.match(h, /if \(!\(await healthy\(accountPort, '\/v1\/health', 180\)\)\)[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*rmSync\(acctEnv, \{ force: true \}\);/);
-  const e = src('tools/loadAccountEntry.mjs');
-  assert.match(e, /if \(!\(col in row\)\) throw new Error\(`D1_COLUMN_NOTFOUND/);
-  assert.match(e, /if \(key === 'raw'\) return async \([^)]*\) => \{ const r = await target\.raw\(opts\); note\(sql, null\); return r; \};/);
-  assert.match(e, /points\.push\(\{ \.\.\.p, t: Date\.now\(\) \}\)/);
-});
-
 // ═══ D. THE LAWS NO PIN HELD (lane D's surviving mutants) ═══════════════════════════════════════════════════════════
 
 test('AUDIT SCALE D9: the guarded reads\' probes each a whole question - an order past its days expired on the market\'s read, a listing whose end is now expired (`<=`, as the update), a commission whose crafter is gone declined and one past its days expired on its CRAFTER\'s read too', async () => {

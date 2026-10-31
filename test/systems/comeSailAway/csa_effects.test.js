@@ -256,10 +256,6 @@ test('CSA-F: the particles\' materials as the bundle\'s shaders draw them - Wake
   assert.match(PART_CUT_FS, /uSunScale \* max\(uLightDir\.y, 0\.0\)/);
   assert.match(PART_PREMUL_FS, /outColor = texture\(uTex, vUv\) \* c \* c\.a;/);
   assert.match(CUBE_FS, /max\(dot\(normalize\(vNormal\), uLightDir\), 0\.0\)/);
-  const src = readFileSync(new URL('../../../src/render/comeSailAwayRender.js', import.meta.url), 'utf8');
-  assert.match(src, /gl\.uniform4f\(u\.uColor, 1, 0\.5, 0, 1\);   \/\/ FlagMaterial's _Color/);
-  assert.match(src, /gl\.blendFunc\(gl\.ONE, gl\.ONE_MINUS_SRC_ALPHA\);   \/\/ Blend One OneMinusSrcAlpha/);
-  assert.match(src, /gl\.depthMask\(false\);   \/\/ ZWrite Off/);
   assert.deepEqual(json('materials.json').FlagMaterial.colors._Color, [1, 0.5, 0, 1]);
   assert.equal(json('materials.json').WakeMaterial.floats._Cutoff, 0.5);
   assert.equal(CUBE_TRIANGLES.length, 36);

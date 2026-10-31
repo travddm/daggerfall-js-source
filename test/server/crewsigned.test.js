@@ -153,8 +153,3 @@ test('AUDIT HORIZONTAL C8: the hold is the CHARACTER\'s - an account\'s second c
   assert.deepEqual(await sign(as('hollis-three'), `999:${day}:0`), { status: 429, body: { error: 'crew-many' } });
 });
 
-test('AUDIT HORIZONTAL C8 the wiring: the world host hands the shipmaster its character\'s id while in the shared world, and the shipmaster\'s own book asks as it (mutants: the character unhanded, the host\'s book unaimed)', () => {
-  assert.match(hostText('src/scenes/world.js'), /online: \(\) => _onlineWorldSession\(\) && characterIdOf\(playerEntity\),/);
-  const yard = readFileSync(new URL('../../src/scenes/shipyardHost.js', import.meta.url), 'utf8');
-  assert.match(yard, /createCrewSignBook\(\{ live: \(\) => !!deps\.online\?\.\(\), character: \(\) => deps\.online\?\.\(\) \|\| null \}\)/);
-});

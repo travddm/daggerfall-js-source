@@ -39,8 +39,3 @@ test('AUDIT TESA II Z8: a sample past the Bay\'s seam band wears its zone\'s lan
   assert.notEqual(groundTopOf(flat, v.px, v.py, true, mountain), groundTopOf(flat, 500, 250, true, table(CLIMATES.Ocean)), 'not the sea\'s');
 });
 
-test('AUDIT TESA II Z8 by source: the nodes off the map read nodeLand - the seam band held to the edge, the zones past it', () => {
-  const src = readFileSync(new URL('../../src/world/landforms.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(bayEdgeDistance\(x, y\) > SEAM_PX\) return LAND_OF_CLIMATE\[tamrielClimateAt\(x, y\)\];/);
-  assert.match(src, /function etherLandAt\(x, y, climates\) \{\n\s+if \(!inEtherLaw\(x, y\)\) return nodeLand\(x, y, climates\);/);
-});

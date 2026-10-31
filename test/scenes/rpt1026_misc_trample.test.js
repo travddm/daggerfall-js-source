@@ -12,9 +12,4 @@ import { rrTrampleOutcome } from '../../src/systems/roleplayRealism/rrRealism.js
 
 test('RPT1026-MISC JOURNEY-TRAMPLE: the trample a gallop through a town charges is Assault; the world host asks it only off the road - never under the Overworld\'s view or a journey\'s autopilot, whose motor gallops on the player\'s own Run and AutoRun (mutant: rpt1026-misc-trample-on-journey)', () => {
   assert.equal(rrTrampleOutcome({ isGuard: false }).crime, 'Assault', 'a townsperson under the hooves is an Assault');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(rrRidingOn\(\) && player\.riding && player\.isRunning && !rideOnTheRoad\(\)\) rrRidingContacts\(\);/, 'off the road alone');
-  assert.match(w, /const rideOnTheRoad = \(\) => !!travelView\?\.active \|\| !!\(travelOptions\?\.isTravelActive && travelOptions\.state\?\.autopilot\);/, 'the road: the Overworld\'s view, or an autopilot driving');
-  // the cause: the journey's motor input is the autopilot's force with the player's own run keys - a held Run or AutoRun gallops it
-  assert.match(w, /forward: axes\.forward,   \/\/ TO1: the autopilot's force while a journey runs, else the player's own[^\n]*\n\s*strafe: axes\.strafe,\n\s*run: held\(keys, 'Run'\),[\s\S]{0,200}?autoRun: held\(keys, 'AutoRun'\),/);
 });

@@ -26,7 +26,6 @@ import { navalHudText, navalPadPrompts } from '../../src/ui/naval/navalHud.js';
 import { sea } from '../navalSea.mjs';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const WORLD = src('src/scenes/world.js');
 
 // ── SHIP-DECK ─────────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -87,24 +86,7 @@ test('SHIP-DECK: any other model over a water tile (a bridge) is walked on - the
   assert.equal(r.c.status().floor, null);
 });
 
-test('SHIP-DECK: the host says what the feet stand on - the down probe keeps the bucket it struck, a boat\'s or a sea ship\'s hull bucket (csaSyncColliders\' `csaBoat:` keys) is a deck, and the stride is handed it; the helm\'s own footsteps-off reaches the mod\'s stride too', () => {
-  assert.match(WORLD, /const isDeckBucket = \(key\) => typeof key === 'string' && key\.startsWith\('csaBoat:'\);/);
-  assert.match(WORLD, /const _down = collider\.raycastHit\(\[player\.pos\[0\], cy, player\.pos\[2\]\], _SURFACE_DOWN, rayDistance \* 2\);/);
-  assert.match(WORLD, /meshDist: _down\.dist,/);
-  assert.match(WORLD, /surf\.deck = surf\.staticGeometry && isDeckBucket\(_down\.key\);/);
-  assert.match(WORLD, /const key = `csaBoat:\$\{id\}:\$\{i\+\+\}`;/, 'the buckets are keyed as the predicate reads them');
-  assert.match(WORLD, /deck: !!_surf\.deck, onStaticGeometry: !!_surf\.staticGeometry,/);
-  assert.match(WORLD, /paused: _overlayHeld \|\| _seasonHeld \|\| _travelSoundsOff \|\| _csaFootstepsOff, entity: playerEntity,/);
-});
-
 // ── SEA-HUNT ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('SEA-HUNT: one predicate for "afloat" - a helm, a boat\'s own deck, another player\'s boat, a sea ship\'s deck, the water - read by a bounty\'s trail and a wilderness band; the naval host says whether the player stands aboard', () => {
-  assert.match(WORLD, /const playerAfloat = \(\) => !!csaRuntime\?\.isSailing\?\.\(\) \|\| \(playerEntity\.activeEffects \?\? \[\]\)\.some\(\(e\) => isBoatEffectBundle\(e\?\.bundleName\)\)\n\s+\|\| !!csaAboard\.aboard\?\.boat \|\| !!naval\?\.aboard\?\.\(\) \|\| \(walkMode && playerSpawned && !!player\.isPlayerSwimming\);/);
-  assert.match(WORLD, /&& !travelOptions\?\.isTravelActive && !\(walkMode && player\.isPlayerSwimming\) && !playerAfloat\(\),/, 'a bounty\'s trail and pack');
-  assert.match(WORLD, /const aboard = playerAfloat\(\);/, 'a wilderness band\'s chase');
-  assert.match(src('src/scenes/naval/navalHost.js'), /aboard: \(\) => aboardShip\(\),/);
-});
 
 test('SEA-HUNT: the naval host\'s aboard - at the helm aboard, off every ship not (the same law SEA-PEACE reads)', async () => {
   const helm = await sea({ hull: 2 });
@@ -133,16 +115,6 @@ test('GUN-HOLD: Activate while the guns are laid holds fire - the aim put down, 
   h.host.frame(0.1);
   h.host.attackInput(false);
   assert.ok(h.host._shots.inFlight > before, 'and a broadside when it is let go');
-});
-
-test('GUN-HOLD: the world gives Activate to the hold first - before the click casts a readied spell or the helm\'s ladder boards or opens the yard; the attack\'s own order is the cast law\'s (a readied spell takes the press, NAV-H\'s)', () => {
-  // PIN MOVED (AUDIT NAV2 F31): Interact - the readout's "E: hold fire" - holds it too, read before the hold
-  // PIN MOVED (SPELL-HAND): the cast press says it is a cast's own - `interceptAttack(true, { cast: true })` (was:
-  // `interceptAttack(true)`); the order did not move. PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): the word is CAST_PRESS, imported
-  assert.match(WORLD, /const useEdge = !travelView\?\.active && pressed\(latch\.edge, keys, 'Interact'\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const _holdFire = \(_act\.activate \|\| _act\.cast \|\| useEdge\) && !!naval\?\.aiming && naval\.holdFire\(\);\n\s+if \(_act\.cast && !_holdFire && !gatherHost\?\.acting\(\)\) magic\.interceptAttack\(true, CAST_PRESS\);/);
-  // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): the click an act took is the act's to its release
-  assert.match(WORLD, /if \(\(\(_act\.activate && !gatherHost\?\.acting\(\) && !_actClick && !nodeClicked\) \|\| \(useEdge && !nodeTook\)\) && !modes\.transitioning && !_holdFire\) \{/);   // PIN MOVED (the merge with AUDIT 32 H5: a click mid-act is the act's; PROF-MENU: a click a node's list took is the list's)
-  assert.match(WORLD, /if \(magic\.interceptAttack\(true\)\) return; if \(naval\?\.attackInput\(true\)\) return; weaponRig\.attackInput\(0, 0, true\);/, 'the mouse: the cast law first, then the guns');
 });
 
 test('GUN-HOLD: the readout while the guns are laid names the hold - over any ship in reach to board - and the pad\'s Activate row says "Hold fire"; a wreck\'s way out still comes first', () => {

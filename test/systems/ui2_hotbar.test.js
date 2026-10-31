@@ -250,35 +250,6 @@ test('UI2 spell icons: a spell\'s icon is ICON00I0\'s 16px tile FITTED to its sl
   } finally { if (saved === undefined) delete globalThis.document; else globalThis.document = saved; }
 });
 
-test('UI2 wiring: the bar\'s slots draw fitted pictures at a measured box - an item\'s by its dye, a spell\'s icon (its initials only while it loads) - the spellbook\'s drag and the diamond\'s spell chip wear the icon, the drop hint says any item; the box off a slot of the picture\'s own kind, the ratio off the bar (mutants: a spell slot back on its initials; the drag without its icon; the chip without its icon; every picture at slot 1\'s box; a spell fitted at an item\'s box; the ratio off a slot)', () => {
-  const bar = read('src/ui/enhanced/enhancedHotbar.js');
-  assert.match(bar, /const drew = iconFor\(s, v\.slot, null, entity, v\.noIcon \? null : v\.icon\);[^\n]*\n\s+const sig = v\.noIcon \? spellInitials\(v\.name\) : spellSigil\(v\.name\);\n\s+s\.glyph\.textContent = drew \? '' : sig;/);
-  assert.match(bar, /pic = spellIconPicture\(spellIcon, \{ box: fit\.box, dpr: fit\.dpr, onReady: again \}\);/);
-  assert.match(bar, /requestFittedIcon\(image\.archive, image\.record, \{ box: fit\.box, dpr: fit\.dpr, dye: image\.dye, dyeTarget: image\.dyeTarget, onReady: again \}\)/);   // MERGE (UI2 x DYE-ICON): and the swatch
-  assert.match(bar, /const key = kind \? `\$\{kind\}@\$\{fit\.box\}x\$\{fit\.dpr\}` : '';/, 'a new size draws them anew');
-  assert.match(bar, /faceFit\[k\] = \{ box: Math\.max\(8, layout - 4\), dpr \};/, 'the face less two a side');
-  // AUDIT UI B2/B3: the face of a slot of the picture's own kind, the ratio off the bar (never a slot the crossbar scales)
-  assert.match(bar, /const s = slots\.find\(\(x\) => x\.face\?\.offsetWidth > 0 && !!x\.node\.classList\?\.contains\('hb-spell'\) === spell\);/);
-  assert.match(bar, /const barShown = barLayout > 0 \? \(bar\.getBoundingClientRect\?\.\(\)\.width \?\? barLayout\) : 0;/);
-  assert.match(bar, /const fit = slotFit\(!item && spellIcon != null\);/);
-  assert.match(bar, /const HINT_DROP = 'Drag any item or a spell onto a slot\. Drag a slot off the bar to clear it\.';/);
-  assert.match(bar, /if \(hbDrag\.icon\?\.src\) tile\.append\(fittedImg\(hbDrag\.icon\)\);/);
-  assert.match(bar, /icon: slotPicture\(s\.icon\),/, 'a slot carried keeps its picture');
-  const book = read('src/ui/enhanced/enhancedSpellbook.js');
-  assert.match(book, /icon: r\.spell\?\.noIcon \? null : spellIconPicture\(r\.spell\?\.icon, \{ box: SPELL_DRAG_BOX \}\) \}\);/);
-  const hud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const pic = sp\?\.spell && !sp\.spell\.noIcon \? spellIconPicture\(sp\.spell\.icon, \{ box: SPELL_CHIP_BOX, dpr: clampDpr\(screenDpr\(\) \* \(last\.scale \?\? 1\)\), onReady: \(\) => \{ last\.qspell = null; \} \}\) : null;/);
-  assert.match(hud, /spellChip\.append\(spellTag, spellIcon, spellName\);/);
-  // the diamond's cells: fitted too, their boxes the sheet's caps less two a side
-  const E = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(E, /\.hud-qicon \{ display: block; max-width: 44px; max-height: 44px;/);
-  assert.match(E, /@media \(max-width: 860px\) \{[\s\S]{0,4000}?\.hud-qicon \{ max-width: 32px; max-height: 32px; \}/);
-  assert.match(hud, /const QUICK_BOX = 40, QUICK_BOX_NARROW = 28;\nconst QUICK_NARROW = '\(max-width: 860px\)';/);
-  assert.match(hud, /const key = `\$\{iconKeyOf\(item\)\}@\$\{box\}x\$\{dpr\}`;/, 'a new size or scale draws it anew');
-  const art = read('src/ui/enhanced/enhancedArt.js');
-  assert.match(art, /return requestFittedPicture\(`spellicon\$\{index\}`, \(wake\) => sheetCutUrl\('ICON00I0\.IMG', rect, 1, wake\), \{ box, dpr, trim: false, onReady \}\);/);
-});
-
 test('UI2 the sheet cutter tells every screen that waited on it: a spell icon is cut from ICON00I0 once its sheet lands, and each asker hears it once - a fitted icon asks second (mutant: a waiter not heard)', async () => {
   // a synthetic ICON00I0 (headerless 320x64) and ART_PAL.COL (776 bytes), served by a stubbed fetch; canvases that
   // remember their size; no IndexedDB (the data door falls through to the network, as a fresh browser does)

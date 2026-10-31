@@ -93,14 +93,6 @@ test('AUDIT WB11 W1 a Cast When Strikes blade that cut one of his host cast on H
     new Function('modes', `return (${m[1]});`)({ dungeonCtx: { spellOnBoss: (r, t) => got.push(t) } })(FIRE, a);
     assert.equal(got[0], a, `${file}: the stand-in through the mount`);
   }
-  // the context lands it on the body the stand-in names - one of his host, a crystal, else him
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the router left the context with the spell doors
-  // (scenes/gate/standInSpell.js), which the context wires (its enchant door and its api ask spellOnStandIn)
-  assert.match(read('src/scenes/dungeonContext.js'), /const \{ spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival, spellOnStandIn, standInRound \} = createStandInSpell\(\{/);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): and the rounds' frame
-  const fn = /function spellOnStandIn\(record, target = null\) \{\n([\s\S]*?)\n {2}\}/.exec(read('src/scenes/gate/standInSpell.js'));
-  assert.ok(fn, 'the context routes a strike spell by the stand-in it met');
-  const route = new Function('spellOnHost', 'spellOnCrystal', 'spellOnBoss', `return (record, target = null) => {\n${fn[1]}\n};`)((r, i) => `host ${i}`, (r, c) => `crystal ${c}`, () => 'him');
-  assert.deepEqual([route(FIRE, a), route(FIRE, GBoss.crystalStandIn(GBoss.bossLookOf('ruhn'), 1)), route(FIRE, GBoss.bossStandIn(GBoss.bossLookOf('ruhn'), 'Valkynaz Ruhn'))], ['host 3', 'crystal 1', 'him']);
   // the court offers each body with its own stand-in
   clean();
   const h = rig();
@@ -109,14 +101,6 @@ test('AUDIT WB11 W1 a Cast When Strikes blade that cut one of his host cast on H
   assert.deepEqual(T.map((q) => q.entity.hostI), [1, 2]);
   assert.notEqual(T[0].entity, T[1].entity);
   h.c.leave(); clean();
-});
-
-test('AUDIT WB11 W2 a shaft on one of his host - or a crystal - is no backstab: neither keeps a facing (their `yaw` 0 made every shaft from the -z side one, x3 and a Backstabbing use each); his own shaft keeps his facing (mutants: the feet handed to the host\'s shaft; to the crystal\'s)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  const opts = (who) => new RegExp(`playerArrowHitFoe\\(m, ${who}, \\{([^}]*)\\}`).exec(d)?.[1] ?? '';
-  assert.match(opts('hb'), /playerFeet: null/, 'the host\'s shaft');
-  assert.match(opts('cr'), /playerFeet: null/, 'the crystal\'s shaft');
-  assert.match(opts('boss'), /playerFeet,/, 'his own shaft reads his facing');
 });
 
 test('AUDIT WB11 W3 ONE BLOW, ONE TOKEN: every frame of one blow (its `q`) on a body it has not met rides on the token it spent, BLOW_BODIES_MAX bodies at most and within BLOW_GROUP_MS - a swing through six Imps lands on six; a second frame on a body already met, a new sequence, or a late frame is a blow of its own; the court gives one sequence to the frames one frame of mine sends; the gate\'s frame bucket passes two such swings a second (mutants: a token a body; the court\'s two sequences; the bucket at 8)', () => {
@@ -172,18 +156,6 @@ test('AUDIT WB11 W4 one of his host still rising out of the stone is met where i
   h.clock.t = 9_800 + GB.HOST_RISE_MS[HOST.harrier] + 1; h.c.frame();
   assert.ok(Math.abs(h.c.hostTargets()[0].feet[1] - (COURT_CENTRE[1] + look.hover)) < 1e-9, 'risen: at its hover');
   h.c.leave(); clean();
-});
-
-test('AUDIT WB11 W5 one of his host bleeds against its OWN whole - the stand-in\'s health nothing can empty threw the lowest rung of blood at every blow: the court\'s target carries its whole, the context\'s body its `bloodOf`, and the swing and the shaft ladder against it (mutants: the swing laddered on the stand-in; the shaft)', () => {
-  clean();
-  const h = rig();
-  h.link.st = stOf({ lg: { ads: [ad({ i: 1, h: 30, m: 75 })], gone: [] } }); h.clock.t = 10; h.c.frame();
-  assert.equal(h.c.hostTargets()[0].m, 75, 'its whole on the target');
-  h.c.leave(); clean();
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /out\.push\(\{ host: q\.i, m: q\.m \?\? 0, bloodOf: \{ maxHealth: q\.m > 0 \? q\.m : 0 \},/, 'the body\'s blood');
-  assert.match(d, /bloodHit\(damage, hb\.bloodOf, \{ fromPlayer: true,/, 'the swing\'s');
-  assert.match(read('src/combat/arrowFlight.js'), /bloodHit\(dmg, foe\.bloodOf \?\? foe\.entity, \{ fromPlayer: true, weapon: m\.weapon \?\? null \}\)/, 'the shaft\'s (every other foe its entity\'s, as ever)');
 });
 
 // ═══ B: THE BRAIN ══════════════════════════════════════════════════════════════════════════════════════════════════

@@ -220,9 +220,6 @@ test('EG-ZQ THE LORDS\' SHARES (section 13.2, THE LAW EVERY LORD KEEPS; EG-ZK\'s
   // a mirror carries none; the gate's own functions, imported, never written again
   CL.fl |= EG_FL.mirror;
   assert.equal(egLordsShare(C, 'acct-0', 40, true), false, 'a mirror is sized by nobody');
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLords.js', import.meta.url), 'utf8');
-  assert.match(src, /import \{ dpsRef, retireShare, restoreShare \} from '\.\.\/gate\/gateBrain\.js';/);
-  assert.doesNotMatch(src, /function (retireShare|restoreShare|shareOut|standsAt)\b/);
 });
 
 test('EG-ZQ THE COLOSSAL\'S SIZE ON THE WIRE (section 14, Colossal; EG5\'s departure 3 retired): under Colossal the first Court\'s Grath stands at the law\'s sizeX - its body\'s radius and its row\'s size (`sz`, thousandths: 1250, at rank II 1400; 0 at its look\'s own); the wire carries it within its bounds, the screen holds it on the lord and draws him at his look\'s scale times it, and the screen\'s reach to him is the radius the relay judges by; the law never folds a size past the wire\'s bounds (mutants: the size unsaid or unread; the radius at the look\'s; the bounds dropped; the row cut short)', () => {

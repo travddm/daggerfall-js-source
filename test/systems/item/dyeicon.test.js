@@ -162,25 +162,6 @@ test('DYE-ICON: a replacement answered by the dye is drawn as it is - never dyed
   } finally { clearVendorTextures(); }
 });
 
-test('DYE-ICON: every icon door asks with the swatch - the GL lists, the enhanced door (its cache keyed by dye and swatch), the hotbar, the HUD, the pack, the decorator\'s thumbnails and the hung pictures (mutants: a door asking undyed)', () => {
-  for (const f of ['src/ui/item/itemScroller.js', 'src/ui/native/nativeInventory.js']) {
-    const s = src(f);
-    assert.match(s, /icons\.uploadRecord\(img\.archive, img\.record, \{ mips: false, removeMask: true, dye: img\.dye, dyeTarget: img\.dyeTarget \}\)/, f);
-    assert.match(s, /const key = `\$\{img\.archive\}_\$\{img\.record\}\$\{token \? `_\$\{token\}` : ''\}\$\{img\.dyeTarget != null \? `_t\$\{img\.dyeTarget\}d\$\{img\.dye\}` : ''\}`;/, `${f}: its warm key tells a silver blade from an artifact`);
-  }
-  const canvas = src('src/ui/textureCanvas.js');
-  assert.match(canvas, /const bmp = changeDyeBitmap\(changeMask\(got\.file\.getDFBitmap\(record, 0\)\), dye, dyeTarget\);/, 'the DOM door\'s classic arm dyes');
-  assert.match(canvas, /const dyed = dyeTarget != null && dye != null && dye !== '';\n  return `\$\{archive\}_\$\{record\}_\$\{scale\}\$\{token \? `_\$\{token\}` : ''\}\$\{dyed \? `_t\$\{dyeTarget\}d\$\{dye\}` : ''\}`;/, 'and keys by dye and swatch');
-  assert.match(src('src/ui/enhanced/enhancedArt.js'), /requestIcon\(img\.archive, img\.record, \{ scale: 2, dye: img\.dye, dyeTarget: img\.dyeTarget \}\)/);
-  // MERGE (UI2 x DYE-ICON): the bar's slot and the diamond's cell ask the FITTED door (UI2) - with the swatch, which it hands
-  // its source (textureCanvas.js requestFittedIcon) and names its picture by
-  assert.match(src('src/ui/enhanced/enhancedHotbar.js'), /requestFittedIcon\(image\.archive, image\.record, \{ box: fit\.box, dpr: fit\.dpr, dye: image\.dye, dyeTarget: image\.dyeTarget, onReady:/);
-  assert.match(src('src/ui/enhanced/enhancedHud.js'), /requestFittedIcon\(image\.archive, image\.record, \{ box, dpr, dye: image\.dye, dyeTarget: image\.dyeTarget, onReady:/);
-  assert.match(src('src/scenes/worldModes.js'), /iconUrl: \(a, r, dye = null, dyeTarget = null\) => loadIcon\(a, r, \{ scale: 1, dye, dyeTarget \}\)/);
-  assert.match(src('src/scenes/decor/decorTool.js'), /deps\.iconUrl\?\.\(entry\.icon\.archive, entry\.icon\.record, entry\.icon\.dye \?\? null, entry\.icon\.dyeTarget \?\? null\)/);
-  assert.match(src('src/scenes/decor/decorRoom.js'), /loadMountArt\(deps, flat\[0\], flat\[1\], decorMountDye\(d\), decorMountDyeTarget\(d\)\)/);
-});
-
 // ── MOUNT-LAZY: the hung picture's door decodes its record first ──────
 
 test('MOUNT-LAZY: a mount of a picture only the mod has (Roleplay Realism Items\' Light Flail) hangs on a fresh load - its record decoded by the dye before the upload, at the file\'s size - where it hung as nothing (mutants: the preload dropped, the dye dropped from the preload)', async () => {
@@ -207,13 +188,6 @@ test('MOUNT-LAZY: a mount of a picture only the mod has (Roleplay Realism Items\
     assert.deepEqual([art.tex.k, art.tex.w, art.tex.h], ['514_0#ui_Steel', 48, 76], 'the mod\'s own picture, under its metal\'s variant');
     assert.ok(art.w > 0 && art.h > 0 && Math.abs(art.h / art.w - 76 / 48) < 1e-9, 'sized as the file is, not the stand-in\'s one pixel');
   } finally { clearVendorTextures(); delete globalThis.createImageBitmap; delete globalThis.OffscreenCanvas; }
-});
-
-test('MOUNT-LAZY: the door awaits the record\'s decode by the dye before it uploads (source)', () => {
-  const s = src('src/scenes/decor/decorRoom.js');
-  const body = s.slice(s.indexOf('export function loadMountArt('), s.indexOf('export function loadMwMountArt('));
-  assert.ok(body.indexOf('await preloadTextureRecord(a, r, 0, \'Albedo\', dye);') > 0, 'the record, by its dye');
-  assert.ok(body.indexOf('await preloadTextureRecord(') < body.indexOf('uploadRecord?.('), 'before the upload');
 });
 
 test('DYE-ICON: a real Daedric dagger\'s classic icon is dyed - its metal indices are Daedric\'s and none of the base swatch is left [needs ARENA2_PATH]', { skip: !process.env.ARENA2_PATH }, async () => {

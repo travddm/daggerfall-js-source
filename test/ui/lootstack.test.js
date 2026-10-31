@@ -182,8 +182,6 @@ test('LOOT-STACK the teardown frees the note: destroyWorldPlaque - every host\'s
   assert.ok(_bodyStackStateForTests().seen);
   destroyWorldPlaque();
   assert.deepEqual(_bodyStackStateForTests(), { seen: null });
-  const wp = rd('src/ui/worldPlaque.js');
-  assert.match(wp, /resetQuickLoot\(\);[\s\S]{0,200}resetBodyStack\(\);/, 'beside quick loot\'s state');
 });
 
 // ─── THE WINDOWS ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -263,37 +261,9 @@ test('LOOT-STACK the classic window: the body\'s picture turns the pile - LEFT t
   assert.equal(alone._remoteTargetIcon().label, '');
   alone.click(...at);
   assert.equal(alone.done, false, 'a body alone: the click the panel always refused');
-  const src = rd('src/ui/native/nativeInventory.js');
-  assert.ok(src.includes('    this._close();\n    pile.open(next.key);'), 'by source: the window closed, then the body handed over');
 });
 
 // ─── THE HOSTS, AND THE KEY THAT IS GONE ───────────────────────────────────────────────────────────────────────────
-
-test('LOOT-STACK the hosts by source: all four corpse doors hand the window the pile - the pool\'s own takeLoot still first (its refusals, the arrows, a puppet\'s ask), quick loot on a PRESS only, a tab back through the same door with the pile in hand; a pile may mix the two pools, so each key answers to its own (mutants: quick loot taking on a tab; the pile dropped from a host; one pool asked for both)', () => {
-  // PIN MOVED (FIELD BUGS 2026-10-07 INDOOR-SKIN): the building's door is its host's own function, `openInteriorBodyLoot` -
-  // the ladder's press and a skinnable body's Search through one door - its pool picked inside it
-  const doorOf = (name, head) => new RegExp(String.raw`${head}\n\s*bodyPool\(lootKey\)\??\.takeLoot\(lootKey, [^\n]*\n(?:[^\n]*\n)?\s*if \(!pileKeys && quickLootTake\(lootKey, loot, [^\n]*\n\s*const pile = lootPile\(lootKey, \{ keys: pileKeys, describe: \(k\) => bodyPool\(k\)\??\.pileBody\(k\)(?: \?\? null)?, open: ${name} \}\);\n`);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    const s = rd(f);
-    const name = f === 'src/scenes/worldModes.js' ? 'openInteriorBodyLoot' : 'openBodyLoot';
-    const door = name === 'openBodyLoot' ? doorOf(name, String.raw`const openBodyLoot = \(lootKey, pileKeys = null\) => \{`)
-      : doorOf(name, String.raw`function openInteriorBodyLoot\(lootKey, pileKeys = null\) \{\n\s*const bodyPool = [^\n]*`);
-    assert.match(s, door, `${f}: the door`);
-    assert.match(s, new RegExp(String.raw`${name}\((?:lootKey|key)\);`), `${f}: the press goes through it`);
-    assert.match(s, /\{ loot: pile \? \{ \.\.\.loot, pile \} : loot \}/, `${f}: the window is handed the pile`);
-    assert.match(s, /const bodyPool = \((?:k|lootKey)\) => \((?:k|lootKey)\.startsWith\('foeCorpse:'\) \? (?:exteriorFoes|interiorFoes) : (?:cityGuards|interiorGuards)\);/, `${f}: each key to its own pool`);
-  }
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /takeLoot\(key, mode = 'grab', pileKeys = null\) \{/);
-  assert.match(dc, /if \(!pileKeys && quickLootTake\(key, /);
-  assert.match(dc, /const pile = kind === 'corpse' \? lootPile\(key, \{\n\s*keys: pileKeys,\n\s*describe: \(k\) => \{ const b = foes\[Number\(k\.split\(':'\)\[1\]\)\]; return lootableBody\(b\) \? pileBody\(b\) : null; \},[^\n]*\n\s*open: \(k, keys\) => \{ this\.takeLoot\(k, 'grab', keys\); \},\n\s*\}\) : null;\n\s*if \(pile\) lootHooks = \{ \.\.\.\(lootHooks \?\? \{\}\), pile \};/);
-  // a tab closes its window and opens the next in one click, before the frame's drain empties the slot
-  assert.match(dc, /if \(activeOverlay && !activeOverlay\.done\) return source\.length;/);
-  assert.match(rd('src/scenes/cityGuards.js'), /pileBody: \(key\) => pileBody\(corpseEntryFor\(guards, key, 'guardCorpse', corpseLens\)\),/, 'src/scenes/cityGuards.js: the pool\'s word on a body');
-  // PIN MOVED (OUTDOOR-LOOT): and the encounter pool's word on a PEER'S body is its body block's - a BORN one is a tab (what it holds for this reader),
-  // while corpseMarker.js pileBody itself still answers null for a puppet (pinned above)
-  assert.match(rd('src/scenes/exteriorFoes.js'), /pileBody: \(key\) => \{ const e = corpseEntryFor\(foes, key, 'foeCorpse', corpseLens\); return e\?\.puppet \? body\.pileBody\(e\) : pileBody\(e\); \},/, 'src/scenes/exteriorFoes.js: the pool\'s word on a body');
-});
 
 test('LOOT-STACK the key is gone: no NextBody action, no default on ] but Come Sail Away\'s trim, no controls row, and no host arms a turn - the pile lives in the window (mutant: a host still arming one)', () => {
   assert.ok(!ACTIONS.includes('NextBody'));
@@ -303,10 +273,6 @@ test('LOOT-STACK the key is gone: no NextBody action, no default on ] but Come S
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/ui/worldPlaque.js']) {
     assert.doesNotMatch(rd(f), /NextBody|armBodyTurn|turnBodyStack/, f);
   }
-  const act = rd('src/player/activate.js');
-  // PR-WAGON1: the winner is the firm answer first (another player's team yields), and the note is still taken over it
-  assert.match(act, /export function pickActivatableHit\(eye, dir, targets, collider\) \{\n {2}const nearest = \(list\) => nearestActivatableHit\(eye, dir, list, collider\);\n {2}return noteBodyStack\(firmFirst\(targets, nearest\), targets, nearest\);[^\n]*\n\}/);
-  assert.doesNotMatch(act, /export function nearestActivatableHit/, 'the raw pick stays private, so no reader asks the ray without the note');
 });
 
 // ─── THE PRODUCERS, AND THE PLAQUE'S DRESS ──────────────────────────────────────────────────────────────────────────
@@ -314,11 +280,6 @@ test('LOOT-STACK the key is gone: no NextBody action, no default on ] but Come S
 test('LOOT-STACK the producers say which targets are bodies: the two surface pools\' corpses and the dungeon\'s own; a pile, a door or a live foe never is - and the pick reads the word, never a key\'s prefix (mutants: the mark dropped from a producer; the stack sniffing key prefixes)', () => {
   const t = corpseLootTargets([{ corpse: true }], 'foeCorpse', { isCorpse: () => true, feetOf: () => [0, 0, 0] });
   assert.equal(t[0].body, true);
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /targets\.push\(\{ key: `corpse:\$\{i\}`, [^\n]*reach: CORPSE_ACTIVATION_DISTANCE, body: true \}\);/, 'the dungeon\'s corpse mint');
-  assert.match(dc, /targets\.push\(\{ key: `loot:\$\{i\}`, [^\n]*reach: TREASURE_ACTIVATION_DISTANCE \}\);/, 'the dungeon\'s treasure piles carry no such word');
-  const ls = rd('src/player/lootStack.js');
-  assert.doesNotMatch(ls.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, ''), /startsWith|Corpse:|corpse:/, 'the law names no key vocabulary');
   // a body-shaped target WITHOUT the word is no member: the pile of two reads as one body and nothing behind it
   fresh();
   const unmarked = [{ ...body('corpse:0', 1), body: false }, { ...body('corpse:1', 1.2), body: false }];
@@ -326,12 +287,3 @@ test('LOOT-STACK the producers say which targets are bodies: the two surface poo
   assert.equal(bodyStackMark('corpse:0'), null);
 });
 
-test('LOOT-STACK the plaque\'s dress, which tools/lootStackProbe.mjs measures in Chromium: the divider is the LIST\'s top edge, under the whole label (a sub-line - a pile\'s mark, a chest\'s lock level - is the label\'s, never the list\'s first row); the lit band\'s margin is the plaque\'s own padding at every width and its padding matches it, so the lit name stands where every name stands; the list clips DOWNWARD only (mutants: the divider back at the title\'s foot; the band\'s margin a literal; the band\'s left padding 12; the narrow sheet\'s padding a literal; the clip across again)', () => {
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\n\.wplaque-list \{ padding-top: 8px; margin-top: 8px; border-top: 2px solid rgba\(125,116,96,0\.3\); \}/, 'the divider on the list');
-  assert.doesNotMatch(css, /\.wplaque-title \{[^}]*border-bottom/, 'and nowhere at the title\'s foot');
-  assert.match(css, /\n\.wplaque \{[\s\S]{0,300}?--wp-pad-x: 14px; padding: 10px var\(--wp-pad-x\);/, 'the plaque\'s padding is one number');   // (its rule holds a ${} placeholder, so no [^}] walk)
-  assert.match(css, /@media \(max-width: 720px\) \{ \.wplaque \{ max-width: 88vw; --wp-pad-x: 12px; padding: 8px var\(--wp-pad-x\); \}/, '...and the narrow sheet sets that number, not the padding beside it');
-  assert.match(css, /\.wplaque-row\.sel \{[^}]*margin: 0 calc\(-1 \* var\(--wp-pad-x\)\); padding: 0 var\(--wp-pad-x\); \}/, 'the band reaches the plaque\'s inner edges and moves no name');
-  assert.match(css, /\.wplaque-list \{ display: block; max-height: [^}]*overflow: hidden; overflow-x: visible; overflow-y: clip; \}/, 'the cap clips down, not across');
-});

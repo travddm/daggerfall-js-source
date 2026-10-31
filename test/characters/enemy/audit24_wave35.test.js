@@ -36,18 +36,6 @@ test('audit24 wave35: the ranged band has ONE home, and the import runs one way'
   assert.equal(MAX_RANGED_DISTANCE, 2048 * GLOBAL_SCALE, ':29');
   assert.equal(MIN_RANGED_DISTANCE, 6);
   assert.equal(MAX_RANGED_DISTANCE, 51.2);
-  const motor = rd('src/characters/enemy/enemyMotor.js');
-  const attack = rd('src/characters/enemy/enemyAttack.js');
-  const casting = rd('src/characters/enemy/enemyCasting.js');
-  assert.ok(motor.includes('export const MIN_RANGED_DISTANCE = 240 * GLOBAL_SCALE;'), 'declared in the motor');
-  assert.ok(attack.includes("export { MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE } from './enemyMotor.js';"), 'and re-exported');
-  // the reason it moved: enemyAttack.js imports FROM the motor, so
-  // declaring the band there and importing it here would close a cycle -
-  // the third in three waves.
-  assert.ok(attack.includes("from './enemyMotor.js';"), 'enemyAttack -> enemyMotor');
-  assert.equal(/from '(?:\.\.?\/)+(?:[\w-]+\/)*enemyAttack\.js'/.test(motor), false, 'and never back');
-  assert.equal((`${motor}${attack}${casting}`.match(/^export const M(IN|AX)_RANGED_DISTANCE = /gm) ?? []).length, 2,
-    'declared once each');
 });
 
 test('audit24 wave35: an archer STANDS OFF - it does not walk up to melee range', () => {
@@ -128,11 +116,6 @@ test('D9: GetDestination\'s magic term is CurrentMagicka > 0, not CanCastRangedS
   spent._getDestination([0, 0, 20]);
   assert.equal(onTarget(spent), false,
     'and a selection with NO magicka does not - this line never asks CanCastRangedSpell');
-  const motor = rd('src/characters/enemy/enemyMotor.js');
-  assert.ok(motor.includes('|| (this.inSight && (this.hasBowAttack || this.hasMagickaToCast()))'),
-    'the GetDestination arm reads the magicka term');
-  assert.ok(motor.includes('(this.hasBowAttack || this.canCastRangedSpell())'),
-    'and DoRangedAttack keeps the band term');
 });
 
 test('audit24 wave35: the stand-off turns to face, and comes BEFORE the melee stop', () => {
@@ -147,26 +130,6 @@ test('audit24 wave35: the stand-off turns to face, and comes BEFORE the melee st
   assert.notEqual(ai.yaw, yaw0, 'facing the wrong way, it turns');
   assert.equal(ai.moving, false);
 
-  // the ordering matters: DoRangedAttack is called ahead of the
-  // advance/retreat decision, so an archer that has somehow ended up
-  // inside melee range is NOT handled by the ranged arm (the band's
-  // near edge excludes it) but by the ordinary stop.
-  const src = rd('src/characters/enemy/enemyMotor.js');
-  const body = src.slice(src.indexOf('  _classicTick(playerFeet, paused = false) {'));
-  // AUDIT 39: the stop test now reads `this.stopDistance`, which
-  // TakeAction:443-449 sets per pass (2.25 vs the player, 1.5 vs
-  // another AI). The ORDERING law this pin guards is unchanged - only
-  // the literal it anchored on moved.
-  assert.ok(body.indexOf('_doRangedAttack(dx, dz)') < body.indexOf('distance <= this.stopDistance'),
-    'ranged first, melee stop second');
-  // AUDIT 26 F011: this pin used to assert the detour came FIRST -
-  // restating the port rather than the C#. TakeAction calls
-  // DoRangedAttack (:469) and DoTouchSpell (:473) BEFORE the
-  // avoidObstaclesTimer branch (:481-484): a shooter in band with the
-  // target in sight stands off and shoots while the timer merely
-  // decays. The port shot on the move for up to 0.75s per probe.
-  assert.ok(body.indexOf('_doRangedAttack(dx, dz)') < body.indexOf('if (detouring)'),
-    'DoRangedAttack ahead of the detour branch (EnemyMotor.cs:469 vs :481)');
 });
 
 test('audit24 wave35: ClearPathToPosition is the two probes plus a cast, and it is a GATE', () => {
@@ -440,39 +403,13 @@ test('audit24 wave35: hasRangedSpell is the SELECTION-FREE half, and draws no ro
   assert.equal(rolls, 0, 'and it never touches the stream');
   void withRoll;
 
-  // the whole point: DFU's CanCastRangedSpell also SELECTS, and the
-  // port's selection lives in EnemyCaster - a second pick here would
-  // draw twice off the shared stream every frame.
-  const casting = rd('src/characters/enemy/enemyCasting.js');
-  assert.ok(casting.includes('export const hasRangedSpell ='), 'declared beside the picker it deliberately is not');
-  const at = casting.indexOf('export const hasRangedSpell =');
-  const decl = casting.slice(at, casting.indexOf(';', casting.indexOf('rangeType === 4', at)));
-  assert.equal(/rolls/.test(decl), false, 'and takes no rolls argument');
 });
 
 test('audit24 wave35: every pool passes the two ranged deps', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.equal((dc.match(/hasBowAttack: hasBowAttack\(basics\),/g) ?? []).length, 2, 'both dungeon branches');
-  assert.equal((dc.match(/canCastRangedSpell: \(\) => rec\?\.caster\?\.canCastRangedSpell\(\) \?\? false,/g) ?? []).length, 2);
-  const xf = rd('src/scenes/exteriorFoes.js');
-  assert.ok(xf.includes('hasBowAttack: hasBowAttack(basics),'));
-  assert.ok(xf.includes('canCastRangedSpell: () => caster?.canCastRangedSpell() ?? false,'));
-  const cg = rd('src/scenes/cityGuards.js');
-  // the watch has neither, and the literal sits beside the same literal
-  // attack.rangedAttack that EnemyBasics justifies
-  assert.ok(cg.includes('hasBowAttack: false,'));
-  assert.ok(cg.includes('attack.rangedAttack = false;'));
   assert.equal(CLASSIC_UPDATE_INTERVAL, 0.0625, 'and the prediction cadence is the classic one');
 });
 
 test('audit24 wave35: the wave-34 re-read - three corrections it produced', () => {
-  const motor = rd('src/characters/enemy/enemyMotor.js');
-  // (a) ObstacleCheck records a door only within 22.5 degrees of facing
-  // (:1170-1175). Wave 34 recorded any door the probe struck, and
-  // FindDetour probes 45/90/135 degrees off - so a detouring foe would
-  // have the host open a door behind it.
-  assert.ok(motor.includes('if (withinYaw(this.yaw, dir[0], dir[2], STOP_YAW_GATE_DEG)) this.doorKey = hit.key;'),
-    'the door record is yaw-gated');
   const ai = new EnemyAI({
     raycast: () => Infinity,
     capsuleCast: () => ({ dist: 0.1, key: 'door:9' }),

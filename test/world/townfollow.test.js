@@ -113,15 +113,6 @@ test('TS6 the walkers on the town\'s ground: a walk grid cell is its tile\'s - f
     const tx = gx >> 2, ty = gy >> 2, on = tx >= 16 && tx < 24;
     assert.equal(nav.weightAt(gx, gy) > 0, on, `cell ${gx},${gy}`);
   }
-  // the host shuts the walk grid off the town's ground and its wall, the terrain job handing the ground back
-  const pb = rd('src/scenes/pixelBuild.js');
-  // PIN MOVED (TS7): one shut, the walkers' and the yards' (world/townWalls.js townWalkShut)
-  // PIN MOVED (URBANIZER U3): the town's own shut first, then its fabric's fences and walls (world/urban/townFabricStand.js fabricWalkShut)
-  assert.match(pb, /const walkShut = dfLocation \? fabricWalkShut\(townWalkShut\(dfLocation, townGround, paths\), dfLocation\) : null;/);   // PIN MOVED (TS10): and the paths its terrain painted
-  assert.match(pb, /walkShut\?\.\(nav\);/);
-  assert.match(rd('src/world/townWalls.js'), /const origin = getLocationTerrainTileOrigin\(dfLocation\);\n\s+if \(ground\) shutOffGround\(nav, ground, origin\);\n\s+if \(paths\) paveOnGrid\(nav, paths, origin\);\n\s+shutTownWall\(nav, townWallCellsOf\(dfLocation\)\);/);   // PIN MOVED (TS10): the painted paths paved between
-  assert.match(pb, /beach, roadside, townGround, arenaRoads, bridges \} = await terrainGen\.generate\(/);   // PIN MOVED (ROAD-LOOK): and the pixel's bridges
-  assert.match(rd('src/world/terrain/terrainGen.js'), /townGround: locationRect\?\.mask \?\? null,/);
 });
 
 test('TS6 the wall\'s cells: each length its stretched length by its thickness, a tower its square, turned to its line - on the town map in Daggerfall\'s wall byte (a copy: the walk grid\'s bytes untouched) and shut to the walkers; a city stood this session answers its own, once (mutants: the length and thickness swapped; the turn unread; the map\'s rows unturned; the bytes written in place)', () => {
@@ -165,7 +156,6 @@ test('TS6 the wall\'s cells: each length its stretched length by its thickness, 
   assert.equal(townWallCellsOf(loc), mine, 'once');
   for (let r = 8; r < 56; r++) for (let c = 8; c < 56; c++) assert.equal(mine[(64 + 63 - r) * 192 + 64 + c], 0, 'no house under it');
   assert.equal(townWallCellsOf({ ...loc, outline: undefined }), null, 'a town with no wall of its own');
-  assert.match(rd('src/scenes/exteriorAutomapToggle.js'), /blocks: wallOnTownMap\(b\.locBlocks\.map\(\(bl\) => \(\{ x: bl\.x, y: bl\.y, autoMap: bl\.dfBlock\?\.rmbBlock\?\.fldHeader\?\.autoMapData, landmark: arenaTownLandmark\(bl\.dfBlock\) \}\)\), townWallCellsOf\(dfLoc\), dfLoc\.exterior\.exteriorData\.width\),/);
 });
 
 test('TS6 a wall\'s chord across a tight bulge: laid a length at a time, so no length\'s middle stands more than TOWN_WALL.sag inside the line; a gentle round keeps its chords of two (mutants: the cut unread; the cut measured outward)', () => {

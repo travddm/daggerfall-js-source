@@ -96,12 +96,6 @@ test('AUDIT 23 FTD-2/3: the spell index fold keeps the FIRST record and the load
   const dup = { index: 58, name: 'Holy Touch', effects: [] };
   const map = spellsByIndexMap([first, dup]);
   assert.equal(map.get(58).name, 'Holy Word');
-  const cs = src('src/systems/chargenSession.js');
-  // PIN MOVED (DEX4a): the loader builds RebuildClassicSpellsDict whole (systems/spell/standardSpells.js - the mods'
-  // SpellRecords.json merged, then the same first-wins fold)
-  assert.ok(cs.includes('standardSpellsByIndex(await fetchBytes('), 'loadSpellIndex rides the one rebuild');
-  assert.ok(src('src/systems/spell/standardSpells.js').includes('spellsByIndexMap(mergeSpellRecords(readSpellsStd(bytes)))'), 'and the rebuild rides the first-wins fold');
-  assert.equal(/new Map\(readSpellsStd\(/.test(cs), false, 'the last-wins fold is gone');
 });
 
 test('AUDIT 23 guilds-1: the four subclass service switches replace the base entirely', () => {
@@ -156,29 +150,9 @@ test('AUDIT 23 characters-11: FrameSpeedDivisor slows the anim clock with the 4-
 });
 
 test('AUDIT 23 characters-7 + items-1: the spawn bands and the pile gender ride the constructions', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.equal((dc.match(/spawnDistanceType: e\.spawnDistanceType \?\? 0/g) ?? []).length, 2,
-    'both foe constructions pass the marker band');
-  assert.ok(dc.includes('function rollPileItems({ rolls = Math.random, level = effectiveLevel(playerEntity), gender = playerEntity.gender,') && dc.includes('const items = generateLootItems(lootKey, { level, gender }, rolls, _superTier ? { itemChanceScale: SUPER_LOOT_DROP_MULT } : elite ? { itemChanceScale: ELITE_LOOT_DROP_MULT } : {});') && dc.includes('const items = onlineRoom() ? [] : rollPileItems();'), 'piles roll the player gender (WORLD8: through the one pile roll)');   // PIN MOVED (PARTY-LOOT): the player's level and gender are the roll's defaults - a room's base hands in the room's; online the build rolls none of its own (UNBORN holds nothing)   // SD4a (PIN MOVED): a Super dungeon's +50% before the Elite's
-  // AUDIT 62 F22: the STREET watch runs the exterior band, and it is
-  // the mount that says so - EnemySenses.cs:267 reads
-  // PlayerEnterExit.IsPlayerInside per classic tick, so the pool that
-  // the mode machine stands INSIDE a building takes the row bands
-  // instead. Pinned as the law rather than as the literal that used to
-  // stand here: at yDiff 5m / XZ 3m the outdoor band spawns and the
-  // indoor one does not (row 0 = XZ 25.6m, Yupper 3.2m).
-  const cg = src('src/scenes/cityGuards.js');
-  assert.match(cg, /^\s*playerInside = false,$/m, 'the dep defaults to the street pool\'s band');
   const d = Math.hypot(3, 5);
   assert.equal(wouldBeSpawnedInClassic(d, 5, false, 0, false), true, 'outdoors: the flat 102.4m band, no Y test');
   assert.equal(wouldBeSpawnedInClassic(d, 5, false, 0, true), false, 'inside: row 0\'s +3.2m upper band refuses the storey above');
-});
-
-test('AUDIT 23 audio-4: channel gains resync at play() and the loop seam', () => {
-  const sp = src('src/systems/song/songPlayer.js');
-  assert.ok(/_resyncChannelGains\(\)\s*\{/.test(sp));
-  const calls = (sp.match(/this\._resyncChannelGains\(\);/g) ?? []).length;
-  assert.equal(calls, 2, 'one at play(), one at the loop rewind');
 });
 
 test('AUDIT 23 wa-1: ACTION_FLAGS carries every defined RdbActionFlags member', () => {

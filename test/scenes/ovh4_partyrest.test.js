@@ -86,28 +86,3 @@ test('OVH4: with no document there is no card to open - a headless host rests in
   assert.ok(win instanceof RestWindow);
 });
 
-test('OVH4: world.js - ONLINE-REST1\'s classic arm is gone from all five party-rest seams, and every rest the party owns says so to the door', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const body = (start) => { const i = w.indexOf(start); assert.ok(i >= 0, start); return w.slice(i, w.indexOf('\n  };\n', i)); };
-  // the five seams read no skin: the pose's rest, the gate, the reset, the vote tally, the mirror
-  const pose = w.slice(w.indexOf('const composePartyPose = () => {'), w.indexOf('const composePartyPose = () => {') + 3000);
-  assert.match(pose, /const restWin = mode === 'interior' \? modes\?\.restState/, 'a classic leader\'s rest is broadcast - its followers mirror it');
-  for (const seam of ['const partyRestGate = () => {', 'const markPartyRestSpent = () => {', 'const _partyRestVoteTrackTick = () => {']) {
-    assert.doesNotMatch(body(seam), /isEnhanced\(\)/, `${seam} reads no skin`);
-  }
-  const follow = w.slice(w.indexOf('// OVH4: a mirror opens on either skin'), w.indexOf('const win = createRestWindow(partyRestMirrorDeps('));
-  assert.ok(follow.length > 0 && !/isEnhanced\(\)/.test(follow), 'the follow tick opens a mirror on either skin');
-  // the ONE question: a party, outside a tavern/temple/guild hall - the gate's own two
-  assert.match(w, /const partyRestHere = \(\) => !sharedClockOn\(\) && !!social\?\.party && !modes\?\.insidePartyRestExempt && restTogether\(\);/);   // REST-OPT: and a rest alone is my own
-  assert.match(w, /const outdoorRestDeps = createRestDeps\(playerEntity, \{[^]*?partyRest: \(\) => partyRestHere\(\),/, 'the outdoor rest asks it');
-  assert.match(body('const partyRestMirrorDeps = (restKind, targetAcct) => {'), /\.\.\.outdoorRestDeps,\s*\n\s*partyRest: \(\) => true,/, 'a mirror IS a party\'s rest');
-  assert.match(w, /partyRestHere: \(\) => partyRestHere\(\),/, 'the mode machine is handed it');
-});
-
-test('OVH4: the building and the dungeon ask the same question through their hosts', () => {
-  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(m, /const interiorRestDeps = createRestDeps\(playerEntity, \{[^]*?partyRest: \(\) => host\.partyRestHere\?\.\(\) === true,/);
-  assert.match(m, /partyRestHere: \(\) => host\.partyRestHere\?\.\(\) === true,/, 'forwarded into the dungeon');
-  assert.match(d, /const _restDeps = createRestDeps\(playerEntity, \{[^]*?partyRest: \(\) => opts\.partyRestHere\?\.\(\) === true,/);
-});

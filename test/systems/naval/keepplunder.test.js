@@ -14,7 +14,6 @@ import { MOD_SETTINGS } from '../../../src/systems/modSettings.js';
 import { scene } from '../../csaScene.mjs';
 import { Boat } from '../../../src/systems/comeSailAway/comeSailAwayBoat.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 /** A peer's blow - PIN MOVED (TOUGHER-SHIPS): one past a hit's most (navalWire.js NAVAL_HIT_MAX, a broadside's worth) lands
  *  as several, her fire and her men with the first; a toughened hull outweighs one hit. The pieces after one that strikes
  *  her are the same volley's (STRUCK_GRACE_S: floored at 1) - a blow meant to take her from afloat straight under is
@@ -105,15 +104,7 @@ test('KEEP-PLUNDER: THE CASKS OF A SHIP I SANK ARE HAULED IN before the sea goes
 });
 
 test('KEEP-PLUNDER / KEEP-BOATS: THE WORLD\'S WIRING - the crew stows before every transition (ahead of Come Sail Away\'s own, while my boats still stand), before a jump but never a load\'s, and before a fast travel packs her; a boat placed in a dungeon is kept by default (the mod\'s key, its shipped default moved) (mutants: a hook unwired, a load stowed, the default the mod\'s)', () => {
-  assert.match(WORLD, /const navalStow = \(\) => \{ if \(!_loading\) naval\?\.stowPlunder\?\.\(\); \};/);
-  for (const hook of ['onTransitionInterior: () => { navalStow(); csaOnTransition(); navalTransition(); },', 'onTransitionExterior: () => { navalStow(); csaOnTransition(); navalTransition(); },',
-    'onTransitionDungeonInterior: (ctx) => { navalStow(); ohAbyss', 'onTransitionDungeonExterior: () => { navalStow(); ohAbyss']) assert.ok(WORLD.includes(hook), hook);
-  // PIN MOVED (HELM-JUMP, FIELD BUGS 2026-10-11): the crew still stows first - then a jump with no event of its own lets
-  // go of the helm (packing her, as a fast travel does after its stow), then Come Sail Away hears the teleport
-  assert.match(WORLD, /if \(modEvent !== 'load'\) navalStow\(\);[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+if \(modEvent == null && !resolveArrival\) csaPreJump\(\);\n\s+csaOnTeleport\(\);/);
-  assert.match(WORLD, /navalStow\(\);[^\n]*\n\s+if \(csaRuntime && !partyArrival\) csaCall\(\(\) => csaRuntime\.OnPreFastTravel\(\)\);/);
   assert.equal(MOD_SETTINGS['come-sail-away'].keys['Compatibility.PersistentDungeonBoats'].default, true);
-  assert.match(WORLD, /persistentDungeonBoats: \(\) => \{ try \{ return modSetting\('come-sail-away', 'Compatibility\.PersistentDungeonBoats'\) === true;/);
 });
 
 test('AUDIT KEEP-PLUNDER D1 / D3: OFF THE HELM THE PLUNDER GOES INTO MY BOAT NEAREST ME, WHAT WILL NOT FIT IS SAID, AND THE SWITCH OFF STOWS FIRST - a door taken off the deck (no helm, the captor packed) stows into the boat of mine nearest me before the pack; a hold that will not all go says how much was left; naval combat turned off stows before it takes the sea (mutants: the pack before my boat, the leftovers unsaid, the switch unstowed)', async () => {

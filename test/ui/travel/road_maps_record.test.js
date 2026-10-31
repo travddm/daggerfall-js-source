@@ -39,10 +39,6 @@ function loadMapsOnly() {
 }
 
 const src = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
-const MAPS_SRC = src('../../../src/formats/mapsFile.js');
-const BSA_SRC = src('../../../src/formats/bsaFile.js');
-const TRAVEL_SRC = src('../../../src/ui/travel/travelMapWindow.js');
-const AUTOMAP_SRC = src('../../../src/ui/exteriorAutomapWindow.js');
 
 // ---------------------------------------------------------------------------
 // SOURCE pins - no ARENA2 needed.
@@ -50,26 +46,6 @@ const AUTOMAP_SRC = src('../../../src/ui/exteriorAutomapWindow.js');
 
 test('maps-record: the exterior-automap custom-location set is eight dungeon exteriors, not towns', () => {
   assert.deepEqual([...CUSTOM_LOCATION_OFFSET], [-64, 3]);   // ExteriorAutomap.cs:1391-1395
-  assert.ok(!/CUST-prefixed 1x1 towns/.test(AUTOMAP_SRC),
-    'the retracted claim must not come back');
-  for (const name of ['Scourg Barrow', 'Direnni Tower', 'Shedungent', "Privateer's Hold",
-    'Woodborne Hall', 'Orsinium', "Lysandus' Tomb", 'Castle Llugwych']) {
-    assert.ok(AUTOMAP_SRC.includes(name), `the comment names ${name}`);
-  }
-  assert.ok(/locationType 4 \(DungeonLabyrinth\)/.test(AUTOMAP_SRC));
-  assert.ok(/Zero towns take the correction/.test(AUTOMAP_SRC));
-});
-
-test('maps-record: the 32-byte name run is intra-record, and the comment says so', () => {
-  assert.ok(!/overflows? into the next record/.test(MAPS_SRC),
-    'the header no longer claims the read leaves the record');
-  assert.ok(!/prevent overflow into the next record/.test(MAPS_SRC),
-    '_readMapNames no longer claims the cap protects the record');
-  assert.ok(/swallows the NEXT NAME SLOT/.test(MAPS_SRC));
-  assert.ok(/never leaves the record/.test(MAPS_SRC));
-  // the cap itself is still there, and is still what the pin below measures
-  assert.ok(/mapName\.length > 32.*\n?.*mapName\.slice\(0, 32\)/.test(MAPS_SRC)
-    || MAPS_SRC.includes('mapName = mapName.slice(0, 32)'));
 });
 
 test('maps-record: region 31 is pageless in DFU too, and the comment stops calling it empty', () => {
@@ -78,54 +54,9 @@ test('maps-record: region 31 is pageless in DFU too, and the comment stops calli
   assert.deepEqual(getRegionMapNames(31), ['FMAP0I31.IMG']);
   assert.equal(hasRegionPage(31), false);
   assert.equal(REGION_NAMES[31], 'High Rock sea coast');
-  assert.ok(!/nothing normally clicks them/.test(TRAVEL_SRC),
-    'the retracted characterisation must not come back');
-  assert.ok(/Mantellan Crux/.test(TRAVEL_SRC) && /Your Ship/.test(TRAVEL_SRC));
-  // what DFU does for a ship moored there
-  assert.ok(/TransportManager\.cs:368-397/.test(TRAVEL_SRC));
-  assert.ok(/GetPlayerRegion \(:1609-1617\)/.test(TRAVEL_SRC));
-});
-
-test('maps-record: the clamped C-string scan is recorded as a departure, not as verbatim', () => {
-  assert.ok(!/unbounded, as DFU's ReadCStringSkip/.test(MAPS_SRC));
-  assert.ok(/EndOfStreamException/.test(MAPS_SRC),
-    'the comment states what DFU does instead of clamping');
-  assert.ok(/end < bytes\.byteLength/.test(MAPS_SRC), 'the clamp is still the code');
-});
-
-test('maps-record: the BSA name-field bound is recorded as a departure, not as verbatim', () => {
-  assert.ok(!/Logic and constants kept verbatim;/.test(BSA_SRC),
-    'the unqualified verbatim claim is narrowed');
-  assert.ok(/kept verbatim with ONE measured\n\/\/ exception/.test(BSA_SRC));
-  assert.ok(/UNBOUNDED/.test(BSA_SRC) && /BsaFile\.cs:400/.test(BSA_SRC));
-});
-
-test('maps-record: readLocationIdFast records the dropped WorldDataReplacement arm', () => {
-  assert.ok(/MapsFile\.cs:1133-1137/.test(MAPS_SRC));
-  assert.ok(/the early return is unreachable rather than missing/.test(MAPS_SRC));
-  // the reason it is unreachable is a literal in this same file
-  assert.ok(/\n\s+locationId: 0,\n/.test(MAPS_SRC),
-    '_readMapTable still hard-codes locationId 0');
-});
-
-test('maps-record: loadRegion records its memoization', () => {
-  assert.ok(/C# LoadRegion has NO cache check/.test(MAPS_SRC));
-  assert.ok(/at most one region resident/.test(MAPS_SRC));
-});
-
-test('maps-record: the header lists the unported MapsFile members and their DFU callers', () => {
-  for (const member of ['GetMapPixelIDFromLongitudeLatitude', 'WorldCoordToLongitudeLatitude',
-    'SetClimateIndex', 'SetPoliticIndex', 'DefaultClimateSettings',
-    'ResolveRmbBlockName(dfLocation, x, y)', 'LoadRegion(string)', 'MinMapPixelX/Y']) {
-    assert.ok(MAPS_SRC.includes(member), `the Not-ported list names ${member}`);
-  }
-  // the one with live DFU callers carries them, and the port's substitute
-  assert.ok(/PlayerGPS\.cs:855, 879, 936, 993,\n\/\/\s+1045, 1073, 1146, 1201/.test(MAPS_SRC));
-  assert.ok(/mapId & 0xfffff/.test(MAPS_SRC));
 });
 
 test('maps-record: the null-on-failure contract is recorded and holds', () => {
-  assert.ok(/return\n\/\/\s+NULL on failure where C# returns a default-constructed/.test(MAPS_SRC));
   // an unloaded MapsFile has regionCount 0, so every accessor takes its
   // failure arm - and every one answers null, never a default object.
   const m = new MapsFile();

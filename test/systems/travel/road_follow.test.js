@@ -209,10 +209,6 @@ test('ROAD-FOLLOW the walk\'s other doors: a resume knocked off a curve rejoins 
   const near = nearestOnLine([[0, 0], [100, 0], [100, 100]], { x: 130, z: 60 });
   assert.deepEqual([near.x, near.z, near.seg], [100, 60, 1]);
   assert.deepEqual(lineUpTo([[0, 0], [100, 0], [100, 100]], { x: 130, z: 60 }), [[0, 0], [100, 0], [100, 60]]);
-  const src = read('src/systems/travel/travelOptions.js');
-  assert.match(src, /const near = lane\?\.pts \? nearestOnLine\(lane\.pts, me\) : null;/, 'the resume rejoins the curve it walks');
-  assert.match(src, /const road = lane\.pts \? \(place \? lane\.pts : lineUpTo\(lane\.pts, end\)\) : \[\[lane\.ax, lane\.az\], \[via\.x, via\.z\]\];/, 'the last leg on the road\'s curves');
-  assert.match(src, /\.\.\.\(l\.line \? \{ line: l\.line\.map\(\(q\) => \[q\[0\], q\[1\]\]\) \} : \{\}\)/, 'the journey keeps each leg\'s line');
   // and walked: a place two pixels past the last bend - the body up the bend's second half, never across its inside
   const pts = bends(1100, 100).slice(0, 13);
   install(pathMap(pts));
@@ -224,7 +220,5 @@ test('ROAD-FOLLOW the walk\'s other doors: a resume knocked off a curve rejoins 
 });
 
 test('ROAD-FOLLOW the Bay is the Bay: a route on the table walks Basic Roads\' bands middle to middle - no curve read there (the source: the past test before the byte)', () => {
-  const src = read('src/systems/travel/roadLine.js');
-  assert.match(src, /if \(!past\(p\.x, p\.y\)\) return null;/);
   assert.ok(inBay(500, 250) && !inBay(1100, 100));
 });

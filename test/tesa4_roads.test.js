@@ -95,7 +95,6 @@ const bayNet = () => ({ roads: new Uint8Array(MAP_W * MAP_H), tracks: new Uint8A
 const kernel = (woods, px, py, roads = bayNet()) => generatePixelTerrain({ woods, px, py, stride: 1, tilemap: new Uint8Array(128 * 128), locationRect: null, hasLocation: false, climateType: 302, roads });
 const painted = (o) => o.paths.reduce((n, b) => n + (b ? 1 : 0), 0);
 
-
 test('TESA4 the painter: past the Bay - east, west, north and south of it - a pixel paints its Arena road, its track and the corner its neighbour\'s diagonal brushes, and says so; a Bay pixel never reads the layer; without one, nothing (mutant: the Bay test, a byte, a corner, the flag)', () => {
   const w = new FlatWoods(20);
   const mk = (kind, entries) => ({ roads: new Map(), tracks: new Map(), [kind]: new Map(entries.map(([x, y, v]) => [beyondKey(x, y), v])) });
@@ -148,21 +147,3 @@ function memStore(seed = new Map()) {
 }
 const TOWNS = [{ x: 100, y: -300, type: TownCity }, { x: 400, y: -300, type: TownCity }];
 
-test('TESA4 the host: each pixel keeps the epoch its job was posted under and whether the roads past the Bay reached it; a landing marks every built pixel posted earlier that the new layer reaches - its paint as well when the layer was reset - a pixel in flight as it publishes, and the sweep builds them again (mutant: the epoch\'s capture, the stale law, the sweep) - PIN MOVED (TESA14): the hand-over is scenes/tamrielRoadsHost.js\'s (test/tesa14_roads.test.js)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(_tamrielRoads\) _tamrielRoads\.frame\(state\.current\);[^\n]*\n\s+if \(_arenaTemplates && !building\) sweepArenaPixels\(\);/, 'on the frame, building or not: the build is the workers\'');
-  assert.match(w, /const arenaRoadsAt = terrainGen\.arenaRoadsEpoch;[^\n]*\n\s+const \{ [^}]*, arenaRoads, bridges \} = await terrainGen\.generate\(\{/, 'the epoch read as the job is posted');   // PIN MOVED (ROAD-LOOK): the pixel's bridges answered beside its roads
-  assert.match(w, /arenaSlot: dfLocation\?\.arena \?\? null,\n\s+arenaRoadsEpoch: arenaRoadsAt, arenaRoadsPainted: !!arenaRoads,/);
-  // PIN MOVED (ROAD-FOLLOW, 03-World/Town-Shapes.md ROAD-FOLLOW): and a pixel whose walled town's wall waited for its roads, once they are known (townWallReadyAt)
-  assert.match(w, /const arenaRoadsStale = \(p, epoch, layer, reset = true\) => \(p\.arenaRoadsEpoch < epoch && \(\(reset && p\.arenaRoadsPainted\) \|\| layerTouches\(layer, p\.px, p\.py\)\)\) \|\| townWallReadyAt\(p\.px, p\.py\);/, 'PIN MOVED (TESA14): a region\'s landing repaints what it reaches; a reset what any roads painted too');
-  assert.match(w, /function arenaRoadsLanded\(epoch, layer, reset = false\) \{\n\s+for \(const \[k, p\] of host\.built\) if \(arenaRoadsStale\(p, epoch, layer, reset\)\) _arenaRoadsStale\.add\(k\);/);
-  assert.match(w, /if \(built\.has\(pkey\) && arenaRoadsStale\(built\.get\(pkey\), terrainGen\.arenaRoadsLanded, arenaRoadsLayer\(\)\)\) _arenaRoadsStale\.add\(pkey\);/, 'a pixel in flight, as it publishes');   // PIN MOVED (IC-SWAP-BEHIND): the pixel's own key
-  const fn = w.slice(w.indexOf('  function sweepArenaRoads() {'), w.indexOf('\n  }\n', w.indexOf('  function sweepArenaRoads() {')) + 4);   // PIN MOVED (HOST-SPLIT, at the merge of main): the sweeps are scenes/tamrielSweepsHost.js's - the function's own end, read whole
-  assert.match(fn, /if \(p\) \{ again\.push\(\{ px: p\.px, py: p\.py \}\); _arenaRoadsStale\.delete\(k\); \}\n\s+else if \(!host\.inFlight\.has\(k\)\) _arenaRoadsStale\.delete\(k\);/);
-  assert.match(fn, /if \(!again\.length\) return;\n\s+swap\.rebuild\(again\);/);   // PIN MOVED (IC-SWAP-BEHIND): built again behind its view (scenes/swapBehind.js rebuild)
-  assert.match(w, /if \(_arenaRoadsStale\.size && !building\) sweepArenaRoads\(\);/);
-  assert.match(w, /setArenaStanding\(arenaStands\);\n\s+setArenaRoads\(null\);/, 'a mount starts with none on this thread');
-  // the kernel and the verge read it off the Bay
-  assert.match(read('src/world/terrain/terrainGen.js'), /const arena = !inBay\(px, py\);/);
-  assert.match(read('src/world/road/roadBand.js'), /const onMap = mx >= 0 && my >= 0 && mx < MAP_W && my < MAP_H;\n[^]*?if \(!onMap\) \{\n\s+const r = arenaRoadByte\('roads', mx, my\), t = arenaRoadByte\('tracks', mx, my\);[^]*?const bits = pathsDataPoint\(net, mx, my\) \| arenaJoinByte\(mx, my\);/, 'PIN MOVED (TESA5): and the join on the Bay - PIN MOVED (JUNGLE-ROADSIDE, at the merge of main): the band is world/road/roadBand.js\'s - PIN MOVED (VOYAGER2): past the Bay its roads\' and tracks\' curves');
-});

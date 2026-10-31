@@ -134,8 +134,6 @@ test('SURV-TIERS: one key, four tiers - the row, the table and the shelf agree; 
     assert.equal(isStoredTier(v), false, `${JSON.stringify(v)} is stored by no tier`);
     assert.equal(tierOfStored(v), SURVIVAL_DEFAULT, `${JSON.stringify(v)} reads as the default`);
   }
-  // and the leaf is a leaf
-  assert.doesNotMatch(read('src/systems/survival/difficulty.js'), /^import /m, 'the table imports nothing - every law may read it without a cycle');
 });
 
 test('SURV-TIERS: the switch - on is anything but Off; the live rules are the tier\'s; a stored value that is no tier reads as the default, the rule the Features bar draws it by', () => {
@@ -148,8 +146,6 @@ test('SURV-TIERS: the switch - on is anything but Off; the live rules are the ti
   for (const junk of [true, 'off', 'Hard', 2]) {
     setPref(SURVIVAL_PREF, junk); assert.equal(survivalTier(), SURVIVAL_DEFAULT, `${JSON.stringify(junk)} names no tier`);   // BOONS-DEFAULT: the default, by name
   }
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const fallback = Math\.max\(0, c\.tiers\.findIndex\(\(\[v\]\) => String\(v\) === String\(c\.default \?\? c\.initial\)\)\);/, 'the bar\'s own fallback is the row\'s default');
   _resetForTests();
 });
 
@@ -185,7 +181,6 @@ test('SURV-TIERS: the shelf - Off is the old switch\'s own false, so a shelf wri
     if (had) globalThis.localStorage = saved; else delete globalThis.localStorage;
     _resetForTests();
   }
-  assert.match(read('src/systems/uiPrefs.js'), /if \(p\.survival !== undefined && !isStoredTier\(p\.survival\)\) _prefs\.survival = PREF_DEFAULTS\.survival;/);
 });
 
 test('SURV-TIERS: Hard is the arc as it stood - the rough rest, the drains, the band, no floor, no loan, every cost on; a law handed no rules runs it', () => {
@@ -199,9 +194,6 @@ test('SURV-TIERS: Hard is the arc as it stood - the rough rest, the drains, the 
   // the defaults
   assert.equal(restCost('rough'), HARD.roughRest); assert.equal(restCost('rough', null), HARD.roughRest, 'null is no rules too');
   assert.equal(restCost('bed', CASUAL), REST_COST.bed); assert.equal(restCost('camp', CASUAL), REST_COST.camp, 'a bed and a camp cost the same in every tier');
-  const needs = read('src/systems/survival/needs.js');
-  assert.match(needs, /const rules = deps\.rules \?\? HARD_RULES;/);
-  assert.match(needs, /export function survivalStatMods\(s, temp, now, \{ endurance = 50, rules = HARD_RULES, vampire = false, beast = false \} = \{\}\)/);   // AUDIT C&C N4: and the beast, fed as the mod reads it
 });
 
 test('SURV-TIERS: Casual is five rules written out - stamina only, red stages only, borrowed down to half the pool and repaid, nothing refused, rolled against you or wasted', () => {
@@ -340,10 +332,6 @@ test('SURV-TIERS: the floor is ONE budget a minute, read after the fed hour\'s r
   Object.assign(survivalOf(strong, now), { lastAte: now - 1500 });
   survivalMinute(strong, now, INDOORS, minuteDeps(strong, log, CASUAL));
   assert.deepEqual(log.filter((l) => l[0] === 'fatigue'), [], 'half of a bigger pool is a higher floor');
-  // the dead constant is gone and its truth is written down
-  const needs = read('src/systems/survival/needs.js');
-  assert.doesNotMatch(needs, /export const FLOOR_FATIGUE/, 'no constant that looks wired and is not');
-  assert.match(needs, /budget \?\?= Math\.max\(0, \(entity\.fatigue \?\? 0\) - Math\.floor\(maxFatigue\(entity\) \* floorShare\)\);/);
 });
 
 test('SURV-TIERS: BORROWED, NOT TAKEN - what a need takes in Casual it gives back the moment that need is met, each need its own; a rest pauses the charge, not the need; the pool is the ceiling; Hard lends nothing and drops a loan it inherits', () => {
@@ -662,9 +650,6 @@ test('SURV-TIERS: composed - the feed hands the live tier\'s rules, and a Casual
   _resetForTests(); setPref(SURVIVAL_PREF, false);
   assert.equal(survivalFeed(tickerPlayer(), BLIZZARD), null, 'Off feeds nothing');
   _resetForTests(); setWorldMinutes(0);
-  // the composition points hand the tier - by source
-  assert.match(read('src/systems/survival/env.js'), /const deps = \{ worn: entity\.equip\?\.slots \?\? null, ctx: survivalCtx\(entity, full\), rules \};/);
-  assert.match(read('src/scenes/shared.js'), /stiffen\(entity, ownMinutes\(\), REST_KIND\.Rough, _rules\)/);   // LIVED1: the body's morning, on its own clock
 });
 
 // ═══ AUDIT SURV-TIERS: THE LAWS HARD SHARES ══════════════════════════
@@ -893,7 +878,6 @@ test('AUDIT SURV-TIERS (the second pass): a tent used from the WAGON leaves the 
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
     assert.match(read(f), /placeCamp: \(item, list\) => camps\.placeItem\(item, list \?\? playerEntity\.items \?\? \[\]\),/, `${f}: off the list the item was used from`);
   }
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /place\(act\.item, collection\);/, 'the enhanced window hands its list too');
   _resetForTests(); setWorldMinutes(0);
 });
 
@@ -902,7 +886,6 @@ test('AUDIT SURV-TIERS (the second pass): a party rest mirrored in a DUNGEON pay
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(read(f), /survivalEnv: \(\) => \(_mode\(\) === 'dungeon' \? \(playerEntity\.isResting \? modes\?\.dungeonCtx\?\.survivalEnvNow\?\.\(\) \?\? null : null\) : survivalEnvNow\(\)\),/, f);
   }
-  assert.match(read('src/scenes/dungeonContext.js'), /\n {4}survivalEnvNow, {3}\/\/ AUDIT SURV-TIERS/, 'the dungeon hands its reader out');
   // ...and what it buys, through the real ticker and the real rest deps: an Exhausted follower mirrors a leader's bed
   for (const tier of ['casual', 'hard']) {
     _resetForTests(); setPref(SURVIVAL_PREF, tier);

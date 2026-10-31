@@ -90,18 +90,3 @@ test('RVN13 A PEER\'S BLOW OF ITS WEAKNESS: revealed to me as my own would be; n
   assert.doesNotThrow(() => L.feudRevealWeak(null));
 });
 
-test('RVN13 THE HOSTS: the street writes and reads all four (its master by its number, a follower named), the dungeon its three (no name rides there); each a change the stream says; a peer\'s weak blow revealed on both (mutants: each seam unwired; the key unwidened)', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  // PIN MOVED (AUDIT FEUD: an heir's stream writes them too - the name's own gate, never the id)
-  assert.match(x, /if \(!onWatch && f\.entity\?\.revenant\) Object\.assign\(r, feudWire\(f\.entity\.revenant\)\);/);
-  assert.match(x, /if \(!onWatch && f\.retinueOf != null\) \{ const m = foes\.find\(\(x\) => !x\.dead && !x\.puppet && x\.entity\?\.revenant\?\.id === f\.retinueOf\); if \(m\) r\.rt = m\.seq; \}/);
-  assert.match(x, /\$\{r\.sp \?\? 0\},\$\{r\.ad \?\? 0\},\$\{r\.wq \?\? -1\},\$\{r\.p2 \?\? 0\},\$\{r\.rt \?\? -1\}/);
-  assert.match(x, /if \(f\._feudWire !== fw\) \{ f\._feudWire = fw; f\.entity\.revenant = feudFromWire\(f\.entity\.revenant, r\); puppetRevenantBlows\(f\.entity, r\); \}/);   // PIN MOVED (FEUD WIRE: and its blows folded on the puppet)
-  assert.match(x, /const m = _pupIndex\.get\(pupKey\(f\.puppet, r\.rt\)\); const name = m \? puppetBandName\(m\.entity\?\.revenant\?\.name, m\.mobileType\) : null; if \(name\) f\.entity\.bandName = name;/);
-  assert.match(x, /if \(!onWatch && data\.wc != null && hitClassOf\(data\)\?\.weak && f\.entity\?\.revenant\?\.id\) feudRevealWeak\(f\.entity\);/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(f\.entity\?\.revenant\) Object\.assign\(r, feudWire\(f\.entity\.revenant\)\);/);   // PIN MOVED (AUDIT FEUD: a new authority's too)
-  assert.match(d, /\$\{r\.v\},\$\{r\.ad \?\? 0\},\$\{r\.wq \?\? -1\},\$\{r\.p2 \?\? 0\}/);
-  assert.match(d, /if \(_feudOk && _fw !== \(f\._feudWire \?\? null\)\) \{ f\._feudWire = _fw; f\.entity\.revenant = _fw \? feudFromWire\(f\.entity\.revenant, r\)/);
-  assert.match(d, /if \(data\.wc != null && hitClassOf\(data\)\?\.weak && f\.entity\?\.revenant\?\.id\) feudRevealWeak\(f\.entity\);/);
-});

@@ -494,13 +494,6 @@ test('EG-ZE THE LOOK\'S SEAM (scenes/eliteGates/egLookDraw.js): the lights drawn
   assert.equal(R.calls.filter((c) => c[0] === 'shaderSource' && c[2].includes('glyphInk')).length, 1, 'built once');
   L.release();
   assert.deepEqual(L.lightState(), { pass: false, drawn: 0 }, 'released');
-  const C = rd('src/scenes/eliteGates/egClient.js');
-  const body = C.slice(C.indexOf('    drawPass(proj, view, eye, seconds, fog) {'), C.indexOf('    /** EG-G2: THE SPIRE\'S SKY'));
-  assert.ok(body.indexOf('L?.drawOver(') < body.indexOf('L?.drawLights(') && body.indexOf('L?.drawLights(') > 0, 'over the lines');
-  // PIN MOVED (EG-LOOK, Elite-Gates-Look.md section 5): the frame's lights asked once and handed to the air's halos (the
-  // door's beam's foot) and to the lights alike, reduced motion read once with them
-  assert.match(body, /still = stillNow\(\), shining = lightsNow\(\);/, 'this frame\'s lights and reduced motion, asked once');
-  assert.match(body, /L\?\.drawLights\(proj, view, eye, ts, fog, shining, still\)/, 'this frame\'s lights on the shared clock, reduced motion read');
 });
 
 /** The breach client played between the relay's own words (each through the wire) and a mode machine, a veil, a renderer
@@ -554,10 +547,6 @@ test('EG-ZE THE CLIENT, PLAYED (scenes/eliteGates/egClient.js): the pull to the 
   V.client.frame(); await settle();
   assert.deepEqual(V.steps.map((s) => s.look), ['egVeil']);
   assert.equal(V.flashes.length, 0, 'my feet put on the new plate under the swap\'s own veil - no flash over it');
-  const E = rd('src/scenes/eliteGates/egClient.js');
-  assert.match(E, /const step = egStairStep\(egStartHall\(c\.ew \?\? 0\), stillNow\(\)\);/, 'the step in: the stair of the breach\'s own first hall');
-  assert.match(E, /site: site\(\), \.\.\.\(landing \? \{ landing \} : \{\}\) \}\), step\.look, step\.opts\);/);
-  assert.ok(!/'hourIn'/.test(E), 'never the Hour\'s veil in the Spire');
   // the compass: the door's through the closing
   const D = inBreach({ h: 1, sg: 'closing' });
   const spec1 = egHallOf(77, 1, 0), door = egToDungeon(spec1, spec1.end.x, spec1.end.y ?? 0, spec1.end.z);

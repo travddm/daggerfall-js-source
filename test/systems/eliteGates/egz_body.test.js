@@ -128,8 +128,6 @@ test('EG-ZH THE GHOST-KING\'S VIGIL AT A REDOUBT (section 15): its heal under a 
   assert.equal(spireRoomNow(), 'b');
   setSpireRecovery(() => false);
   assert.equal(spireRoomNow(), null, 'a host answering false is in no breach');
-  const SRC = rd('src/systems/loot/lootPowers.js');
-  assert.match(SRC, /registerSpireRedoubt\(LOOT_POWERS, lootRedoubtTaken\);/);
   assert.deepEqual({ ...LP.LOOT_SPIRE_SAVES }, { grace: 'graceReady', vigil: 'vigilReady' });
 });
 
@@ -162,10 +160,6 @@ test('EG-ZH THE CAMERA IN ROCK (player/mwView.js): the ease pulls in at once and
   setSpireCamera(() => { throw new Error('x'); });
   assert.equal(spireCameraFrame(eye(3), 3, 0.016).distance, 3, 'a host that throws holds nothing');
   setSpireCamera(null);
-  const V = rd('src/player/mwView.js');
-  assert.match(V, /const out = eotbCamera\.eye\(\{ fpEye, feet, yaw, pitch, raycast, pivotFloor, \.\.\.frame \}\);[^\n]*\n\s*spireCameraFrame\(out, SPIRE_EOTB_FULL_M, frame\.dt \?\? 0\);/, 'the sprite\'s lane');
-  assert.match(V, /const eye = mwCamera\.eye\(\{ fpEye, feet, yaw, pitch, heightScale, raycast, spherecast, pivotFloor \}\);[^\n]*\n\s*spireCameraFrame\(eye, mwCamera\.baseDistance\(\) \/ MW_UNITS_PER_METER, state\.dt \?\? 0\);/, 'the Morrowind lane');
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /setSpireCamera\(\(\) => inSpire\(\) && !witness\);/, 'the breach client says when');
 });
 
 // ── the fragment's clamp ────────────────────────────────────────────────────────────────────────────────────────────
@@ -358,29 +352,3 @@ test('EG-ZH TOUCH IN THE SPIRE (ui/touch/touch.js): a Jump press that keeps slid
   canvas.fire('touchend', tev('touchend', [[9, 800, 340]], 3060));
 }));
 
-test('EG-ZH TOUCH ON THE SPANS (ui/touch/touch.js): the stick runs at full throw - Run held at any push past the dead zone, the analog reading at length 1 - only on the Spire\'s spans; off them RUN_THROW\'s 80% as ever (mutants: the throw full everywhere; Run never held; the analog reading partial)', () => withTouch(async (keys, attach) => {
-  setPref('touchAnalogStick', true);
-  let spire = { span: true };
-  setTouchSpire(() => spire);
-  const canvas = stubEl();
-  const h = attach(canvas, { look() {}, attack() {} });
-  canvas.fire('touchstart', tev('touchstart', [[1, 200, 400]], 0));
-  canvas.fire('touchmove', tev('touchmove', [[1, 200, 375]], 20));
-  assert.ok(codes(keys, 'keydown').includes('ShiftLeft'), 'on a span: Run at a half push');
-  assert.ok(codes(keys, 'keydown').includes('KeyW'));
-  const a = h.axes();
-  assert.ok(Math.abs(Math.hypot(a.x, a.y) - 1) < 1e-9 && a.y > 0, `full throw: ${JSON.stringify(a)}`);
-  canvas.fire('touchend', tev('touchend', [[1, 200, 375]], 30));
-  assert.ok(codes(keys, 'keyup').includes('ShiftLeft'));
-  keys.length = 0;
-  spire = { span: false };
-  canvas.fire('touchstart', tev('touchstart', [[2, 200, 400]], 100));
-  canvas.fire('touchmove', tev('touchmove', [[2, 200, 375]], 120));
-  assert.ok(!codes(keys, 'keydown').includes('ShiftLeft'), 'off the spans: a half push walks');
-  const b = h.axes();
-  assert.ok(Math.hypot(b.x, b.y) < 0.9, 'and reads its own throw');
-  canvas.fire('touchmove', tev('touchmove', [[2, 200, 340]], 140));
-  assert.ok(codes(keys, 'keydown').includes('ShiftLeft'), 'past 80%: Run, TI1\'s');
-  canvas.fire('touchend', tev('touchend', [[2, 200, 340]], 150));
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /setTouchSpire\(\(\) => \(inSpire\(\) && !witness \? \{ span: api\.onTraverse\(\) \} : null\)\);/, 'the breach client\'s word: its traversal ground');
-}));

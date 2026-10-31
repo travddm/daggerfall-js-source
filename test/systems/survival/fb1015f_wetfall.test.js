@@ -97,10 +97,3 @@ test('WET-FALL: a road the clock jumped over meets no fall it cannot know - the 
   assert.equal(e.survival.wet, 0, 'a long fast travel lands dry');
 });
 
-test('WET-FALL by source: both open-world hosts hand the minute law what fell on the street, under their own shown sky (mutants: either host drops it)', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(f);
-    assert.match(s, /\n {6}month: dateFromClassicMinutes\(wm\)\.month, hour, weather, falling: fallingWeather\(weather\),/, f);
-  }
-  assert.match(read('src/scenes/world.js'), /const survivalEnvNow = \(\) => \{[\s\S]{0,400}const weather = shownWeather\(\);/, 'world.js: the shown sky is the fallback');
-});

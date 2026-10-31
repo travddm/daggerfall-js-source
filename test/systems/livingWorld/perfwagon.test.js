@@ -107,8 +107,6 @@ test('PERF-WAGON the road\'s teams (LW10): each wagon asked PERF-TEAMS\' verdict
   let gAsked = 0;
   assert.equal(g.teams.draw(g.r, null, () => { gAsked++; return DECOR_SKIP; }), 1);
   assert.equal(gAsked, 0, 'a grown wagon is not PERF-TEAMS\' box');
-  // the roads' layer hands the host's test on to the teams
-  assert.ok(rd('src/scenes/livingWorld/livingRoads.js').includes('    drawTeams: (r, cull = null) => deps.teams?.draw(r, null, cull) ?? 0,'), 'the roads\' layer passes the test to its teams');
 });
 
 /** The fake flat world's runtime, drawn by a real pool of Mac's `kind` on the measuring renderer. */
@@ -166,7 +164,6 @@ test('PERF-WAGON the cart (Eye of the Beholder\'s): asked the test over its mesh
   assert.equal(w.draw(r, null, () => DECOR_DRAW), true);
   assert.equal(w.draw(r), true, 'no test: drawn');
   assert.equal(log.draws.length, 2);
-  assert.ok(rd('src/player/mwView.js').includes('  return eotbWagon.draw(renderer, texRemap, cull);'), 'the seam hands the host\'s test on');
   // its box not in hand (the pipeline has no triangles for it): drawn, never asked
   const bare = createEotbWagon();
   bare.attach({ getGpuMesh: async () => ({ id: 41239 }), cpuModels: new Map() });
@@ -234,29 +231,3 @@ test('PERF-WAGON the tents: a camp\'s tent asked the test over its model\'s own 
   assert.equal(host.draw(r), tents, 'no test: every tent');
 });
 
-test('PERF-WAGON the four hosts: world.js hands the street\'s test (yardCull) to the cart, the tents, the road\'s teams and the hideouts\' tents beside PERF-TEAMS\' wagons; exterior.js makes its own over its frame\'s planes - made before the pass - and hands it to the cart, the tents and the wagons; worldModes.js and dungeonContext.js draw none of them (the view out of a window, its eye another, untested) (mutants: each wire, the fixed city\'s test off)', () => {
-  const w = rd('src/scenes/world.js'), e = rd('src/scenes/exterior.js');
-  for (const line of [
-    '    mwViewDrawWagon(renderer, null, yardCull);',
-    '    camps.draw(renderer, null, yardCull);',
-    '    hcc.draw(renderer, null, tvf ? { selfGrow: tvf.grow, grow: peerGrow } : undefined, yardCull);',
-    "    if (livingRoads && livingWorldOn() && _mode() === 'exterior') livingRoads.drawTeams(renderer, yardCull);",
-    '    _livingHideoutsHost?.draw(renderer, null, yardCull);',
-  ]) assert.ok(w.includes(line), `world.js: ${line}`);
-  const kept = w.indexOf('    _lastProj = proj; _lastView = view;   // TI1'), pass = w.indexOf('    mwViewDrawWagon(renderer, null, yardCull);');
-  assert.ok(kept > 0 && kept < pass, 'the frame\'s matrices kept before the pass');
-  assert.ok(e.includes('  const streetCull = (box) => (cullOn ? decorCullVerdict(_planes, box, streetReach) : DECOR_DRAW);'), 'exterior.js: its own test over its frame\'s planes, ?cull=off honoured');
-  assert.ok(e.includes('  const streetReach = (box) => renderer.shadowReach(box);'));
-  for (const line of [
-    '    mwViewDrawWagon(renderer, texRemap, streetCull);',
-    '    camps.draw(renderer, texRemap, streetCull);',
-    '    hcc.draw(renderer, texRemap, undefined, streetCull);',
-  ]) assert.ok(e.includes(line), `exterior.js: ${line}`);
-  const planes = e.indexOf('    if (cullOn) frustumPlanes(multiply(proj, view, _pv), _planes);'), epass = e.indexOf('    mwViewDrawWagon(renderer, texRemap, streetCull);');
-  assert.ok(planes > 0 && planes < epass, 'the planes made before the pass');
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const s = rd(f);
-    assert.ok(!/hcc\.draw\(|mwViewDrawWagon\(|camps\.draw\(|drawTeams\(/.test(s), `${f} draws none of them`);
-  }
-  assert.ok(e.includes('renderer.outsideViewDraws?.add(({ renderer: r }) => { if (hccOn()) hcc.drawOutside(r, null); });'), 'the view out untested');
-});

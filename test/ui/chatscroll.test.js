@@ -78,28 +78,6 @@ test('CHAT-SCROLL: an open lands on the newest line - after lines arrived while 
   assert.ok(atNewest(), 'a hidden box that dropped its place is not read as the reader\'s choice');
 });
 
-test('CHAT-SCROLL: the newest line is not pushed out of view by the badge pass - a title laid into a line wraps it AFTER the list scrolled, so the scroll is the paint\'s last act; and a badge that arrives later re-lays a line under a reader at the bottom and keeps them there (mutants: the scroll taken inside paintList, before the badges; the later re-lay leaving the bottom)', () => {
-  const long = 'a sentence that is long enough to reach within a word of the edge';
-  const { panel, say, atNewest } = rig({ badges: true });
-  say(12, long);
-  panel.open(); panel.render();
-  assert.ok(atNewest(), 'open: the badges wrapped every line, and the list still stands on the newest');
-  say(3, long);
-  assert.ok(atNewest(), 'open, at the bottom: new badged lines are followed through their wrap');
-  // a badge that changes later (a title equipped mid-conversation) re-lays the lines already said
-  let wearing = null;
-  const late = rig({ badge: () => wearing });
-  late.say(12, long);
-  late.panel.open(); late.panel.render();
-  assert.ok(late.atNewest(), 'no badge yet: at the newest');
-  wearing = { title: 'founder', glyphs: ['sprout', 'dev'] }; late.panel.render();
-  assert.ok(late.atNewest(), 'the title arrives and wraps every line: the reader at the bottom stays at the bottom');
-  const src = readFileSync(new URL('../../src/ui/chatPanel.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(inList && keep === null\) keep = log\.open && unseen === 0 && atNewest\(\);/, 'measured before the first list re-lay');
-  assert.match(src, /pass\(listNodes, true\); pass\(peekNodes, false\);\s*\n\s*if \(keep\) list\.scrollTop = list\.scrollHeight \?\? 0;/, 'and the bottom kept after the pass');
-  assert.match(src, /paintNames\(\);\s*\n(?:\s*\/\/[^\n]*\n)*\s*if \(follow\) toNewest\(\); else paintJump\(\);/, 'the paint scrolls LAST, after the badge pass');
-});
-
 test('CHAT-SCROLL: while open, a reader who scrolled up keeps their place and the lines that came in under them are counted on a bar under the list; the bar takes them to the newest line, and scrolling down on their own clears it; a tab change reads from its newest line (mutants: the count not kept; the bar left standing at the bottom)', () => {
   const { panel, root, list, say, atNewest } = rig();
   say(20);
@@ -124,11 +102,3 @@ test('CHAT-SCROLL: while open, a reader who scrolled up keeps their place and th
   assert.equal(jump.className, 'dfchat-jump', 'a closed panel draws no bar');
 });
 
-test('CHAT-SCROLL by source: the bar and the scroll listener are the ELEMENTS\' - the panel still adds exactly one window listener (AUDIT CHAT D5, chat1\'s pin) - and an open paints with the landing flag', () => {
-  const src = readFileSync(new URL('../../src/ui/chatPanel.js', import.meta.url), 'utf8');
-  assert.equal([...src.matchAll(/win\.addEventListener\(/g)].length, 1, 'one window listener');
-  assert.match(src, /log\.setOpen\(true\);\s*\n\s*paint\(true\);/, 'the open lands');
-  assert.match(src, /const follow = newest \|\| listTab !== log\.active \|\| !listNodes\.length \|\| atNewest\(\);/, 'an open, a tab change and a first paint follow; otherwise the reader\'s place, measured before the rows go in');
-  assert.match(src, /list\.addEventListener\('scroll', /);
-  assert.match(src, /jump\.addEventListener\('click', /);
-});

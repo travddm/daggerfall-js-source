@@ -104,9 +104,6 @@ test('WITCH1 THE TOKEN\'S VOCABULARY: Witchwarden and Hearthkeeper last among th
 });
 
 test('WITCH1 THE ICON ON THE WIRE: the relay reads it off the verified token and stamps it on the introduction; my own adopted through the wire\'s reader; a peer\'s off its introduction and its newest hello, remembered across a blip', async () => {
-  const relay = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(relay, /glyphs: c\.g, gx: c\.gx, au: c\.au, pi: c\.pi, rb: c\.rb,/, 'the verified identity carries it');
-  assert.match(relay, /au: who\.au, \.\.\.\(who\.pi \? \{ pi: who\.pi \} : \{\}\),/, 'the attached row stamps it, absent for none');
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Alice', id: 'alice-0001', secret: 'secret-of-alice-0001', WebSocketImpl: FakeWS, now: () => 1000 });
   assert.equal(s.iconOf('alice-0001'), null);

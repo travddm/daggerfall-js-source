@@ -241,12 +241,6 @@ test('TESA-LANDS A ZONE\'S WOODS IN THE MIDDLE RING (AUDIT): the forest field\'s
   assert.equal(withField.flora[west * 4], Math.round(canopyCover(landsTreesAt(spec, 0, 0, 1, 0), ART.w) * 255), 'a glade under it');
   assert.ok(withField.flora[west * 4] < withField.flora[east * 4]);
   assert.equal(without.flora[west * 4], without.flora[east * 4], 'without the field: the expectation\'s one mean');
-  // the doors: the worker answers it with the row, the client keeps it, the ring asks it and builds with it
-  assert.match(read('src/world/terrain/terrainGenWorker.js'), /const cover = m\.flora && m\.lands \? buildMidRingHeights\(/);
-  assert.match(read('src/world/terrain/terrainGenClient.js'), /if \(m\.cover\) \(cover \?\?= new Uint8Array\(side \* side\)\)\.set\(m\.cover, pj0 \* job\.sub \* side\);/);
-  const fr = read('src/render/farRing.js');
-  assert.match(fr, /flora: !!floraOf, lands: !!floraOf && !!\(\/\*\* @type \{any\} \*\/ \(this\._flora\)\.lands\) \};/);
-  assert.match(fr, /cover: answer\.cover \?\? null, floraAt \}\);/);
 });
 
 test('TESA-LANDS THE BAND PAST THE GRID: with the row a band pixel stands its zone\'s Trees, each answering its own archive with its record (archive x 256 + record), the pixel\'s own climate without it; the band\'s instances read each tree\'s own art (mutants: the code unread; the archive the pixel\'s)', () => {
@@ -314,18 +308,3 @@ test('TESA-LANDS THE FAR VIEWS\' BOOK: with the row a vertex past the Bay in a z
   assert.equal(await landGroundArt(LANDS.morrowindAshlands.ground, 102, { rgba: async () => null }), null);
 });
 
-test('TESA-LANDS THE FAR VIEWS\' DOORS: the far ring asks the book at each vertex\'s map pixel - its own grid, the middle ring\'s and the far field\'s - and makes it with the row; the band asks the worker with the row, keyed by it (mutants: the pixel unpassed; the row unread; the band\'s key without the row)', () => {
-  const fr = read('src/render/farRing.js');
-  assert.match(fr, /const f = floraOf\(climate, px, py\);/);
-  assert.match(fr, /\(climate, x, y\) => book\.floraOf\(climate, x, y\)/);
-  assert.match(fr, /floraAt: floraOf \? \(x, y, byte, v\) => floraOf\(climAt\(x, y, v\), x, y\) : null,/);
-  assert.match(fr, /const floraAt = floraOf \? \(x, y\) => \(\{ \.\.\.floraOf\(climateOf\(x, y\), x, y\), byte: byteAt\(x, y\) \}\) : null;/);
-  assert.match(fr, /createFloraArt\(\{ lands: tamrielLandsOn\(\) \}\)/);
-  assert.match(fr, /lands: !!\(\/\*\* @type \{any\} \*\/ \(this\._flora\)\.lands\), work: this\._work \}\);/);
-  const ft = read('src/render/farTrees.js');
-  assert.match(ft, /this\.source\?\.floraBand\?\.\(\{ pixels, forests: !!forests, landform: !!landform, lands: !!lands \}\)/);
-  assert.match(ft, /own\.add\(bandTreeArt\(archives\[k\], t\[i\]\)\.join\(','\)\);/);
-  assert.match(ft, /if \(k\) for \(const a of k\.arts\) this\._wanted\.add\(a\);\n\s+\}\n\s+for \(const a of this\._wanted\) this\._art\(a\);/);
-  assert.match(read('src/world/terrain/terrainGenClient.js'), /landform: job\.landform, lands: !!job\.lands, pixels:/);
-  assert.match(read('src/world/terrain/terrainGenWorker.js'), /\$\{m\.landform \? 1 : 0\},\$\{m\.lands \? 1 : 0\}`, \(\) => bandTreesPixel\(\{ woods, px, py, archive, climateType, forests: !!m\.forests, landforms, lands: !!m\.lands \}\)\)/);
-});

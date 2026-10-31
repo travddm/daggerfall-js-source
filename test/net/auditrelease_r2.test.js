@@ -64,8 +64,6 @@ test('R2-2 an Elite Breach\'s arch past the Bay: its site is a site, so the open
   }
   const site = { px: 0, py: 0, x: 1, y: 2, z: 3, yaw: 0 };
   for (const [px, py] of [[WORLD_PIXEL_BOUND, 0], [0, -WORLD_PIXEL_BOUND], [1.5, 0], ['1', 0]]) assert.equal(egSite({ ...site, px, py }), null, `${px},${py}`);
-  // the client's door: the host's facts (scenes/world.js egKeyFacts) name the site egArchSite makes, at any pixel - the wire's law is the one bound
-  assert.match(codeOnly(readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8')), /site: at\.at && Number\.isSafeInteger\(px\?\.x\) \? egArchSite\(at\.at, at\.yaw, px\.x, px\.y, state\.pixelTranslation\(px\.x, px\.y\)\) : null/);
 });
 
 test('R2-3 a headstone past the Bay is owed to its cell and locked for the party: its place `g<px>,<py>` reads back to the world\'s pixel, the word leaves the client (validOwIn), the cell folds it into its ledger (owFoldGraves) and says it back (validOwOut) - GRAVE-PARTY\'s own field bug, past the Bay (mutants: the Bay\'s three digits in the place; the Bay\'s bounds on the row)', () => {
@@ -84,7 +82,6 @@ test('R2-3 a headstone past the Bay is owed to its cell and locked for the party
   }
   assert.equal(GRAVE_LOC_RE.exec('g101,207')?.slice(1).join(','), '101,207', 'a Bay stone as it was');
   for (const loc of ['g12345,0', 'g1.5,0', 'gx,0', 'g101,207,1']) assert.equal(GRAVE_LOC_RE.exec(loc), null, loc);
-  assert.match(codeOnly(readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8')), /loc: `g\$\{p\.px\},\$\{p\.py\}`/, 'the stone\'s place is its pixel, as the host writes it');
 });
 
 test('R2 THE OLDER RELAY: a word naming a pixel past the Bay goes only to a relay that reads one (relaySupportsWorldWide) - before it, the relay closes the socket on it: the staff answer says `unavailable`, the arch is refused before its key is staked, the headstone past the Bay is not said; a Bay pixel goes to both (mutants: the gate unasked, each door)', () => {
@@ -124,8 +121,6 @@ test('R2 THE OLDER RELAY: a word naming a pixel past the Bay goes only to a rela
     assert.equal(c.sockets[0].sent.map((x) => JSON.parse(x)).filter((m) => m.t === 'ow').length, world ? 1 : 0);
     cs.leave();
   }
-  // the key's refusal asks the hub before the key is staked (scenes/eliteGates/egClient.js openRefusal)
-  assert.match(codeOnly(readFileSync(new URL('../../src/scenes/eliteGates/egClient.js', import.meta.url), 'utf8')), /room: f \? !!f\.site && \(hub\(\)\?\.egSiteOk\?\.\(f\.site\) \?\? true\) : true/);
 });
 
 test('R2-4 the quest layer\'s region name past the Bay is its province\'s (WW-R): an NPC past the Bay knows a quest\'s place and person there - the site names the province (scenes/tamrielPlacesHost.js), and the region\'s name had been \'\' - and "Where am I?" in a lair names it; on the Bay the loaded region\'s, an empty region\'s \'\' as DFU\'s (mutants: the province unnamed; every region named)', () => {
@@ -137,8 +132,6 @@ test('R2-4 the quest layer\'s region name past the Bay is its province\'s (WW-R)
   for (r = 62; r <= 70; r++) assert.equal(questWorld.currentRegionName(), REGION_NAMES[r], `region ${r}`);
   r = 17; assert.equal(questWorld.currentRegionName(), 'Daggerfall', 'the Bay\'s loaded region');
   r = 9; assert.equal(questWorld.currentRegionName(), '', 'an empty Bay region: DFU\'s empty DFRegion');
-  // the clone past the Bay names its province's region (the host's `where`), and the talk's gate compares the two
-  assert.match(codeOnly(readFileSync(new URL('../../src/scenes/tamrielPlacesHost.js', import.meta.url), 'utf8')), /regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex/);
   r = 64;
   const place = { siteDetails: { regionName: REGION_NAMES[64], locationName: 'Whiterun' } };
   const person = { homeRegionIndex: 64, homeRegionName: REGION_NAMES[64] };

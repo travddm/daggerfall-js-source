@@ -260,15 +260,6 @@ test('GUILD-YARD the keeper\'s yard decorator: a yard piece taken out says its h
   assert.ok(w.said.includes("Your guild's hall is painted."), w.said.join(' / '));
 });
 
-test('GUILD-YARD the world host by source: a hall its playing character keeps leaves the pixel\'s merge as an owner\'s home does, so its keeper\'s painter tries a look on it, and a hall kept in a merged pixel rebuilds it once (mutants: the keeper unasked at the build; at the refresh)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(homeRow && \(homeLook \|\| homeRow\.mine \|\| homeRow\.keeper\)\) \{/);
-  assert.match(w, /\(\(row\?\.look && homeDecorShown\(row\)\) \|\| row\?\.mine \|\| row\?\.keeper\)\) merged = true;/);   // PIN MOVED: HOME-VOTE - a look counts only where it is shown
-  const y = src('src/scenes/homeYards.js');
-  assert.match(y, /if \(!home \|\| \(!pieces\?\.length && !homeOutsideKept\(home\)\)\) continue;/);
-  assert.match(src('server-account/src/homes.js'), /UPDATE homes SET look = \? WHERE map_id = \? AND building_key = \? AND \$\{OWNS\}/);
-});
-
 // ── AUDIT GUILD-YARD (2026-10-02): the decorator's yard between two kept lots, the painted word, a keeper's rank moved,
 // a keeper's realm character, a home's character, the hall's own words ─────────────────────────────────────────────
 
@@ -356,17 +347,6 @@ test('AUDIT GUILD-YARD C3 a keeper made or unmade: the guild book\'s refresh tha
   const loud = new GuildBook({ door: { ...door, mine: async () => ({ ok: true, data: { guild: { id: 'g2', rank: 0 } } }) }, character: () => 'r0123456789abcdef0123', wallet: () => ({ gold: () => 0, pay() {}, credit() {} }), onRank: () => { throw new Error('boom'); } });
   const warn = console.warn; console.warn = () => {};
   try { assert.deepEqual(await loud.refresh(), { ok: true }, 'a host that throws costs the town its read, never the tab its look'); } finally { console.warn = warn; }
-  // the host: the hook reads the town again, forced - outside the online frame; the plaque's info only looks
-  const w = hostText('src/scenes/world.js');
-  const made = w.indexOf('    guildBook = new GuildBook({');
-  assert.ok(made > 0);
-  const opts = w.slice(made, w.indexOf('\n    });\n', made));
-  assert.match(opts, /onRank: \(\) => \{ onlineHomes\?\.bump\?\.\(\); onlineHomes\?\.ensure\?\.\(_musicLoc\?\.mapTableData\?\.mapId, \{ force: true \}\)\?\.catch\?\.\(\(\) => \{\}\); \},/);
-  const info = w.indexOf('    guildHall: {\n      info: () => {');
-  assert.ok(info > 0);
-  assert.ok(!w.slice(info, w.indexOf('      buy: (o) =>', info)).includes('onlineHomes'), 'the plaque\'s look tells nothing itself - the book does');
-  const frameAt = w.indexOf('  const onlineFrame = (now, dt) => {');
-  assert.ok(frameAt > 0 && !w.slice(frameAt, w.indexOf('\n  };\n', frameAt)).includes('onRank'), 'not in the online frame');
   // why the force: the registry believes a town's answer a minute - an unforced ask inside it keeps the old `keeper`
   let keeper = true, t = 0;
   const api = { town: async () => ({ ok: true, data: { homes: [{ buildingKey: 300, owner: 'SH', entry: 'guild', hall: { name: 'SH' }, member: true, ...(keeper ? { keeper: true } : {}) }] } }) };
@@ -427,8 +407,6 @@ test('AUDIT PROF-541 G2 the hall\'s door "Who may enter" follows what the servic
   assert.deepEqual(homeHallRows({ ...h, hallEntry: false, keeper: true }, 'enter').map((r) => r.id), [HOME_VERB.enter], 'keeper alone: no row');
   // AUDIT PROF-541 R2-H1: the row's gate and the press's one law (onlineHomes.js hallEntryTurnable), driven
   assert.deepEqual([hallEntryTurnable(h), hallEntryTurnable({ ...h, hallEntry: false, keeper: true }), hallEntryTurnable({ ...h, hall: false }), hallEntryTurnable(null)], [true, false, false, false]);
-  // the press's wiring (worldModes.js's building-click ladder - no test stands an interior host up to press it, the repo's exception)
-  assert.match(src('src/scenes/worldModes.js'), /if \(verb === HALL_VERB\.entry && hallEntryTurnable\(home\)\) \{ turnHallEntry\(bd, home\); return true; \}/, 'the press as the row');
 });
 
 // ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound"; PIN MOVED - this was

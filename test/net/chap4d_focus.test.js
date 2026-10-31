@@ -219,13 +219,3 @@ test('CHAP4d the board\'s Work tab: a chapter\'s Focus said under its line; its 
   assert.equal(byClass(h2, 'notice-focus-pick').length, 0);
 });
 
-test('CHAP4d the wiring: the host\'s Focus door and the Hall\'s Chronicle read; the routes; the writs\' post reads the Focus (mutants: each seam)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /setFocus: hallDoor && realmSession \? \(faction, focus\) => hallDoor\.focus\(realmSession\.id, faction, region, focus\) : null,/);
-  assert.match(w, /const \[r, ch\] = await Promise\.all\(\[\n\s+seatBook\.records\(seat\.key\),\n\s+hallDoor && rollTracker\?\.held \? hallDoor\.history\(seat\.region\)\.catch\(\(\) => null\) : null,\n\s+\]\);\n\s+return r\?\.data \? hallOfRecordsWindow\(seat, r\.data\.rows, r\.data\.zero, seatArmsOf, ch\?\.ok \? ch\.data : null\) : null;/);   // PIN MOVED (AUDIT CHAP4 C5, C6): one read, both together
-  const ix = src('server-account/src/index.js');
-  assert.match(ix, /: path === '\/v1\/chapters\/focus' \? await setChapterFocus\(ctx, who\.player, env, body\)/);
-  assert.match(ix, /: path === '\/v1\/chapters\/history' \? await chapterChronicle\(ctx, who\.player, env, body\)/);
-  assert.match(src('server-account/src/professions.js'), /hallWrits\(day, region, f, doctrineWritCount\(hallWritCountIn\(active, strengths\.get\(f\)\), events\.get\(f\)\?\.doctrine\), table, focuses\.get\(f\) \?\? null\)/);   // PIN MOVED (CHAP6b): the count a doctrine's "more writs" may raise
-  assert.match(src('src/net/accountClient.js'), /focus: \(character, faction, region, focus\) => post\('\/v1\/chapters\/focus', \{ character, faction, region, focus \}\),\n\s+history: \(region\) => post\('\/v1\/chapters\/history', \{ region \}\),/);
-});

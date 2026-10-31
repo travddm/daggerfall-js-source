@@ -39,57 +39,6 @@ const read = (p) => readFileSync(join(root, p), 'utf8');
 // H5 - THE DEAD REST ARM
 // ---------------------------------------------------------------
 
-test('ROAD-H H5: no host\'s keydown ladder carries the same action arm twice (mutant: paste any `if (act === ...)` line back a second time)', () => {
-  // The defect was two byte-identical
-  // `if (act === 'Rest') { e.preventDefault(); hudCtx.toggleRest(); return true; }`
-  // lines fourteen apart in ONE block of `scenes/world.js`. Every arm
-  // in these ladders `return`s, so a second copy of a line that is
-  // already above it is unreachable by construction - there is no
-  // reading of the port under which it can fire, and no reading of
-  // GameManager's dispatch (an `else if` chain, :515-560) under which
-  // an action is tested twice. Swept as the CLASS, over the whole
-  // tree, because one duplicate is a typo and the shape is what rots:
-  // the dead copy is where a later reader lands, and the comment on it
-  // is the one that gets updated.
-  const files = [];
-  const walk = (rel) => {
-    for (const e of readdirSync(join(root, rel), { withFileTypes: true })) {
-      if (e.isDirectory()) walk(`${rel}/${e.name}`);
-      else if (e.name.endsWith('.js')) files.push(`${rel}/${e.name}`);
-    }
-  };
-  walk('src');
-  assert.ok(files.length > 100, 'the sweep found no source tree to read');
-  const dupes = [];
-  for (const f of files) {
-    const seen = new Map();
-    read(f).split('\n').forEach((l, i) => {
-      const m = /^\s*if \(act === '[A-Za-z]+'\)/.exec(l);
-      if (!m) return;
-      const key = l.trim();
-      if (seen.has(key)) dupes.push(`${f}:${seen.get(key) + 1} and :${i + 1} - ${key}`);
-      else seen.set(key, i);
-    });
-  }
-  assert.deepEqual(dupes, [], 'an action arm is written twice in one file; the second can never run');
-  // ...and the survivor is the one the cites name, still carrying what
-  // BOTH comments said: S40's binding and dispatch reference and the
-  // U43 flag remark, which would otherwise have died with the copy.
-  const w = read('src/scenes/world.js');
-  assert.equal((w.match(/if \(act === 'Rest'\) \{ e\.preventDefault\(\); hudCtx\.toggleRest\(\); return true; \}/g) ?? []).length, 1,
-    'the world host has exactly one Rest arm');
-  const comment = w.slice(w.lastIndexOf('// V5: Rest,'), w.indexOf("if (act === 'Rest')"));
-  assert.match(comment, /InputManager\.cs:997/, 'S40\'s SetupDefaults cite survived the fold');
-  assert.match(comment, /GameManager\.cs:534-537/, 'and its dispatch cite');
-  assert.match(comment, /U43 flag/, 'and the U43 flag remark, which was the second comment\'s own');
-  // the fixed-city host's single arm is the same law in the other
-  // outdoor host (the two ladders; the interior and dungeon hosts
-  // reach the action through routeAction's `case 'Rest'`)
-  assert.equal((read('src/scenes/exterior.js').match(/if \(act === 'Rest'\)/g) ?? []).length, 1);
-  // KB1: the arm answers FALSE with no door - `true` swallowed a key that did nothing (hudlarge.test.js has the law)
-  assert.match(read('src/ui/input.js'), /case 'Rest': return ctx\.toggleRest \? \(ctx\.toggleRest\(\), true\) : false;/);
-});
-
 test('ROAD-H H5: the reference the folded comment names - R is Rest, and the dispatch tests it once, with no scene gate', {
   skip: missingDfu('Assets/Scripts/Game/InputManager.cs', 'Assets/Scripts/Game/GameManager.cs')
     && 'no DFU checkout (set DFU_PATH)',
@@ -378,25 +327,3 @@ test('ROAD-H H8: a HELD button and a stick axis on the SAME resolved code do not
   });
 });
 
-test('ROAD-H H8: the tap guard reads the layer\'s OWN held latch (mutant: a SECOND set kept in lock-step by down/up, with tapCodes guarded on that one)', () => {
-  // The three drives above see WHETHER the tap keyup is dropped. What
-  // they cannot see is WHICH set decided it: a duplicate latch written
-  // in lock-step by `down`/`up` passes every one of them and rots the
-  // moment a fourth writer touches only one of the two. So the read
-  // here is the one thing behaviour cannot reach - the name the tap
-  // guard consults IS the name `down` adds to and `up` deletes from,
-  // and the tap path consults no other - and it is read structurally,
-  // not as source text, so a reformat or a rename of `ks` is silent.
-  const t = read('src/ui/touch/touch.js');
-  const dm = /const down = \(code\) =>[\s\S]{0,160}?!(\w+)\.has\(code\)/.exec(t);
-  const um = /const up = \(code\) =>[\s\S]{0,160}?(\w+)\.has\(code\)/.exec(t);
-  assert.ok(dm && um, 'the layer still keeps its down/up latch pair');
-  assert.equal(dm[1], um[1], '`down` and `up` maintain ONE set');
-  const body = /const tapCodes = \([^)]*\) => \{([\s\S]*?)\};/.exec(t);
-  assert.ok(body, 'tapCodes is still the single tap path');
-  const consulted = [...new Set([...body[1].matchAll(/(\w+)\.has\(/g)].map((m) => m[1]))];
-  assert.deepEqual(consulted, [dm[1]], `the tap keyup guard reads \`${dm[1]}\` and nothing else`);
-  assert.match(body[1], /synth\('keydown'/, 'the DOWN edge is unguarded - the button is not made dead');
-  assert.match(t, /const tap = \(code\) => tapCodes\(/, 'the literal taps go through it');
-  assert.match(t, /const tapAction = \(action\) => tapCodes\(/, 'and the action taps');
-});

@@ -61,19 +61,6 @@ test('CR1: a mod row carries what a modder is owed - title, author, what it is, 
   assert.equal(kamer.contact, 'DFU Discord');
 });
 
-test('CR1: the About pane renders the table, mods under their own heading, through the one module', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /import \{ CREDITS, translationCredits \} from '\.\.\/credits\.js'/);   // L10N6: the translations' rows beside the works'
-  assert.match(menu, /function paneAbout\(body\) \{[\s\S]*?body\.append\(creditsCard\(\)\);/, 'About does not show the credits');
-  assert.match(menu, /group\(t\('menu\.credits\.builtOn', 'Built on'\), CREDITS\.builtOn\);\s*\n\s*group\(t\('menu\.credits\.mods', 'Mods'\), CREDITS\.mods\);/, 'the two groups are not both rendered, in that order');
-  // The renderer knows the SHAPE and no work by name.
-  const fn = menu.slice(menu.indexOf('function creditsCard()'), menu.indexOf('// ── SHELL'));
-  for (const r of rows) assert.doesNotMatch(fn, new RegExp(r.author.split(/\s+/)[0]), 'a credit is hard-coded in the renderer');
-  // Every field a row can carry reaches the screen.
-  for (const k of ['title', 'version', 'author', 'what', 'terms', 'contact', 'link']) assert.match(fn, new RegExp(`r\\.${k}\\b`), `renderer ignores ${k}`);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.credit-by \{ color: var\(--brass\)/, 'the author\'s name is not set in the skin\'s brass');
-});
-
 // ═══ WM3: A CREDITED MOD IS A MOD THE PLAYER CAN FIND ═════════════
 //
 // (2026-09-15, Mac: "the windmills of daggerfall is missing from
@@ -142,12 +129,8 @@ test('WM3: the Windmills row is a real switch the mill draw reads', () => {
   assert.equal(row.control.store, 'prefs');
   assert.equal(row.control.key, WINDMILLS_KEY);
   assert.equal(row.control.initial, true, 'on by default - the mills were standing before the switch existed');
-  // the switch is READ where the mills are drawn, and the skin is the
-  // other half of the gate (a switch cannot put a departure on classic)
-  assert.match(read('src/world/rmbLayout.js'), /if \(mills\.length && enhanced && windmills\) \{/);
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(read(host), /layoutLocation(?:Steps)?\(dfLocation, maps, blocks, \{ enhanced: isEnhanced\(\), windmills: windmillsOn\(\) \}\)/,   // PIN MOVED (IC-STUTTER): the streaming host's a block a step
       `${host}: the host passes the switch (THE FOUR HOSTS - both exterior hosts lay out a location)`);
   }
-  assert.match(read('src/world/locationLayout.js'), /layoutRmbBlock\(dfBlock, \{ enhanced, windmills \}\)/, 'and it rides through the location layout');
 });

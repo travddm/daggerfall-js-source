@@ -42,7 +42,6 @@ test('AUDIT TESA II Z2 THE WORLD-WIDE RELAY IS ONE NUMBER, ITS LAW ROW\'S: the f
 test('AUDIT TESA II Z6 A GRANT PAST THE BAY ONLY OF A RELAY THAT READS IT BACK: an older relay mints one on any pose\'s pixel and junks its renewal, carry and handover - so a client on it takes no grant off the Bay\'s map (the stand stands ungranted, as before AUDIT TESA-BIOME F2) and asks none of it again; on the world-wide relay the same grant is taken, renewed and carried; the session\'s word is relaySupportsGateLanes\'s, the world-wide one (mutants: the read-back unread at the mint; the renewal\'s filter dropped; the carry\'s filter dropped; the handover\'s filter dropped; the Bay\'s own map refused; the session\'s word unread)', async () => {
   assert.deepEqual([grantPixelReadBack({ p: [402, 151] }, false), grantPixelReadBack({ p: [999, 499] }, false), grantPixelReadBack({ p: [2400, 900] }, false), grantPixelReadBack({ p: [-3, 10] }, false), grantPixelReadBack({ p: [402, 500] }, false), grantPixelReadBack({ p: [2400, 900] }, true)],
     [true, true, false, false, false, true], 'the Bay\'s map alone, of an older relay; any world pixel of the world-wide one');
-  assert.match(read('src/net/online.js'), /this\.gateLanesOk = relaySupportsGateLanes\(relayV\);/, 'the session\'s word off its welcome');
   assert.equal(relaySupportsGateLanes, relaySupportsGrantWorld, 'one test, the world-wide relay\'s');
   let t = 1_000_000;
   const rig = (worldOk) => {

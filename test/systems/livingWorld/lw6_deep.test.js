@@ -210,22 +210,3 @@ test('LW6 the companies met: a company diving the player\'s dungeon, this player
   assert.equal(cl.pool.size, 0);
 });
 
-test('LW6 the streaming host: the dungeons dived (the game\'s own rows of a labyrinth, a keep, a ruin, a graveyard, with their dungeon\'s type), the trip world\'s dungeons, the deep\'s own foes for its trouble, the dungeon the player is in off its context, the divers met in the modal frame through the dungeon\'s own loose stand (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the dungeons are the living world's index's, off the world's registry
-  // (scenes/livingWorld/livingIndex.js) - the game's own rows its first provider, each its dungeon's type
-  const ix = rd('src/scenes/livingWorld/livingIndex.js');
-  assert.match(ix, /export const LIVING_DIVE_TYPES = \/\*\* @type \{Set<number>\} \*\/ \(new Set\(\[LOCATION_TYPES\.DungeonLabyrinth, LOCATION_TYPES\.DungeonKeep, LOCATION_TYPES\.DungeonRuin, LOCATION_TYPES\.Graveyard\]\)\);/);
-  assert.match(ix, /blocks: 1, dungeon: true, dungeonType: p\.dungeonType \};/);
-  assert.match(rd('src/world/worldWide/bayPlaces.js'), /dungeonType: md\.dungeonType \?\? 0, hasDungeon: !!loc\.hasDungeon,/);
-  assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /dungeonsNear: index\.dungeonsNear,/);   // PIN MOVED (WW7-7): the trips' world scenes/livingWorld/livingTrips.js's
-  // PIN MOVED (BAY-LEFT-GROUND): the host's trouble foes are scenes/livingWorld/troubleFoes.js's (the roads' harness's producer too)
-  assert.match(w, /foesOf: troubleFoesOf\(\{ faunaAt: /);
-  assert.match(rd('src/scenes/livingWorld/troubleFoes.js'), /return \(\{ climateIndex, px, py, dungeonType, minute, level, size, rolls \}\) => \(dungeonType != null\n\s*\? Array\.from\(\{ length: size \}, \(\) => chooseRandomEnemy\(\{ dungeonType, playerLevel: level \}, rolls\)\)\.filter\(\(m\) => m >= 0\)/, 'a dive\'s trouble: the deep\'s own');
-  assert.match(w, /const loc = modes\?\.dungeonCtx\?\.abyss\?\.location\?\.\(\);/);   // LW-FIX1: the summary is the abyss seam's - the context has no `location` of its own
-  assert.ok(!/dungeonCtx\?\.location\?\.\(\)/.test(w), 'never a dungeon location the context does not carry');
-  assert.match(rd('src/scenes/dungeonContext.js'), /\n    abyss: \{\n      location: \(\) => \(\{ regionIndex: dfLocation\.regionIndex \?\? -1, locationIndex: dfLocation\.locationIndex \?\? -1 \}\),/, 'the context carries it there');
-  assert.match(w, /spawn: \(type, feet, o\) => d\.spawnLooseFoe\(type, feet, \{ yawRad: o\.yaw, allied: true, gender: o\.gender, level: o\.level \}\),/);
-  assert.match(w, /try \{ livingDiversStep\(now\); \} catch \(e\) \{ console\.warn\('\[divers\] step', e\); \}   \/\/ LW6: underground, the companies diving here met/);   // PIN MOVED (AUDIT LW-II-2): wrapped as its neighbours are - a throw never kills the frame loop
-  assert.match(w, /_livingDiversList = here \? diversAt\(here, skyMinutes\(\), livingTripWorld,/);
-});

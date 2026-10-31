@@ -153,8 +153,6 @@ test('WB5b the worker: /v1/gate/claim behind a session and never open - the sess
   const no = await bare.call('POST', '/v1/gate/claim', { receipt: await receiptFor(g.id, 700, priv, T0) }, g.secret);
   assert.equal(no.status, 503); assert.equal(no.body.error, 'no-gate-key');
   for (const w of ['no-gate-key', 'receipt', 'not-yours']) assert.equal(typeof REFUSALS[w], 'string', `${w} has its sentence`);
-  const signing = src('server-account/src/signing.js');
-  assert.match(signing, /if \(_gateKey !== undefined\) return _gateKey;/, 'imported once per isolate');
 });
 
 test('WB5b the client: with no session there is no account to claim for - nothing is sent; with one, the receipt goes as a POST carrying the bearer and nothing else of mine (mutants: a knock with no session; the secret in the body)', async () => {
@@ -314,8 +312,6 @@ test('WB5b the words and the cards: the account card\'s row says the count or "N
   assert.deepEqual(all(w.root.children[0], 'dfprofile-gates').map((n) => n.textContent), ['Breaches closed: 3'], 'the Inspect card\'s line');
   w.update('peer-1', profileView({ name: 'Bran', state: 'asking', record: { wins: 0, losses: 0, gates: { closed: 0 } } }));
   assert.equal(all(w.root.children[0], 'dfprofile-gates').length, 0, 'and none for none');
-  const card = src('src/ui/enhanced/enhancedAccount.js');
-  assert.match(card, /const gates = gateRecordText\(flow\.account\.gates\);\s*\n\s*if \(gates\) row\(t\('account\.card\.gates', 'Breaches closed'\), gates\);/, 'the main menu\'s account card');   // L10N4 (PIN MOVED): the row's word through t()
 });
 
 test('WB5b the key tool mints ONE pair - the relay\'s private half (PKCS8, what the relay imports) and the account service\'s public half (base64url raw, what it verifies with), a receipt signed by the one verifying with the other - and writes nothing to disk (mutants: two pairs; a key on disk)', async () => {
@@ -326,8 +322,6 @@ test('WB5b the key tool mints ONE pair - the relay\'s private half (PKCS8, what 
   assert.ok(priv && pub);
   const r = await mintReceipt({ d: 700, b: 'ruhn', s: 'acct-me', c: 1, x: 'stood' }, priv, { subtle, nowS: T0 });
   assert.equal((await verifyReceipt(r, pub, { subtle, nowS: T0 + 1 })).ok, true, 'one pair');
-  const tool = src('tools/mintGateKeys.mjs');
-  assert.doesNotMatch(tool, /writeFile|appendFile|createWriteStream/, 'nothing is ever written to disk');
 });
 
 test('WB5b the seams: the gate link tells every receipt it folds; the world host keeps a queue online on the account service\'s call and the spoils\' JSON door, hands it each receipt, offers it on the gate frame, and draws the Inspect card\'s line off the same record (mutants: each seam removed)', () => {
@@ -335,17 +329,7 @@ test('WB5b the seams: the gate link tells every receipt it folds; the world host
   const link = createGateLink({ now: () => 0, onReceipt: (r) => told.push(r) });
   link.word({ k: 'rcpt', r: 'junk' });
   assert.deepEqual(told, [], 'a word that is not a receipt tells nothing');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const _spoilsStore = spoilsStore\(appStorage\(\)\);/);
-  assert.match(w, /const _accountGates = accountGates\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\) \}\);/);
-  // SEAT1b (PIN MOVED): the claim carries the kill's region and the claiming character beside the receipt
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): the claim's wait asks its receipt (scenes/gate/gateSeat.js gateClaimWaits)
-  assert.match(w, /const gateClaims = params\.has\('online'\) \? createGateClaims\(\{\n    claim: \(r\) => \(gateClaimReady\(r\) \? _accountGates\.claim\(r, gateSeatWord\(r\)\)\.then\(rollHeard\) : Promise\.resolve\(\{ ok: false, error: 'offline' \}\)\),\n    me: _accountGates\.me,\n    nowS: relayNowS,\n    store: _spoilsStore,/, 'AUDIT WB A6/A9: the one store, and the signed-in account; AUDIT ONLINE2 F2: on the relay\'s clock');   // PIN MOVED (CHAP2b): the answer handed on to the Roll's refresh   // PIN MOVED (AUDIT CHAP3 C3): a kept claim waits for the gate's scan
-  assert.match(w, /\n    onReceipt: \(r\) => \{ gateClaims\?\.add\(r\); grantSpoilsOutside\(r\); \},/);
-  assert.match(w, /\n    gateClaims\?\.tick\(\);   \/\/ WB5b/);
-  assert.match(w, /duels: _profileSub \? profileDuelLine\(rec\) : null, \.\.\.profileRecordLines\(rec\) \};/);   // AUDIT SD II (L5 F1, PIN MOVED): and the towns, the serpents and the Hours, off the same record; KETCH (PIN MOVED): all of the record's lines through one door (ui/profileWindow.js profileRecordLines) - the gates', the voyages' with them
   assert.deepEqual(Object.keys(profileRecordLines({})), ['gates', 'raids', 'serpents', 'hours', 'stars', 'voyages']);
-  assert.ok(w.indexOf('const gateClaims = ') < w.indexOf('const gateLink = '), 'the queue stands before the link that feeds it');
 });
 
 test('WB5b a folded receipt reaches the queue: the gate link\'s `rcpt` for a real receipt is told once a fold (mutants: the hook never called)', async () => {

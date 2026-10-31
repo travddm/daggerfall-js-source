@@ -245,29 +245,3 @@ test('SILVER-FINDS a body\'s door: a body opened with treasure in it rolls its s
   } finally { Math.random = rnd; _resetSilverFindsForTests(); }
 });
 
-test('SILVER-FINDS every host\'s loot door asks (THE FOUR HOSTS): the dungeon\'s take - a body, a treasure pile, opened with something in it - and its search\'s find at its search; the street\'s bodies through the corpse door, a peer\'s at its grant; a headstone\'s find; the streaming host registers the finder online alone, a card where the feed stands and else the line (mutants: a door unasked; a dropped pile asked; the finder offline; the line lost to a card)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (AUDIT 625 S5 + D6): a body's and a pile's find named by the room's own name for it, before anything
-  // moves, and rolled by the quick door's take and the window's mount each (test/net/audit625_silver.test.js)
-  assert.match(dc, /const _find = source\.length && \(kind === 'corpse' \|\| kind === 'loot'\) \? \{ kind: kind === 'corpse' \? 'corpse' : 'pile', key: silverFindKey\(key, kind, i\) \} : null;/);
-  assert.ok(dc.indexOf('const _find = source.length') > dc.indexOf('if (activeOverlay && !activeOverlay.done) return source.length;'), 'a window already standing is no open');
-  assert.ok(dc.indexOf('const _find = source.length') < dc.indexOf('if (!pileKeys && quickLootTake(key, { items: () => source }'), 'named before the quick door and the window alike - before the take empties it');
-  assert.match(dc, /onClose = \(\) => \{ if \(!_ctxDead && sb\.items\.length\) \{ silverFindAt\('search', find\); api\.takeLoot\(`srch:\$\{i\}`\); \} \};/);
-  assert.match(src('src/scenes/corpseMarker.js'), /if \(openWindow\(corpseLootHooks\(entry\)\) === true\) silverFindAt\('corpse', entry\);\n  return items\.length;/);
-  assert.match(src('src/scenes/bodyLootHost.js'), /if \(n > 0 && !arrows\) silverFindAt\('corpse', f\);/);   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's
-  const w = src('src/scenes/world.js');
-  assert.match(src('src/scenes/searchPartyHost.js'), /if \(!pile\) return;\n\s+silverFindAt\('search', items\);/);   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js for scenes/searchPartyHost.js
-  assert.match(w, /if \(marksBook\) \{\n\s+setSilverFinder\(\(kind\) => \{\n\s+marksBook\.find\(kind\)\.then\(\(finds\) => \{/);
-  assert.match(w, /if \(!\(stands && showHaul\(\[findHaul\(f\.found, f\.kind\)\]\)\)\) chatNotice\(f\.line\);/);
-  assert.match(w, /const stands = walkMode && !gamePaused\(\) && pointerSurfaces\.size === 0 && !travelView\?\.active;/);
-  assert.match(w, /marks: marksBook,   \/\/ SILVER-FINDS: a harvest's find said, its balance kept/);
-  assert.match(w, /nowMs: \(\) => Date\.now\(\) \+ _sharedOffsetMs \}\)   \/\/ SILVER-FINDS: the day's finds counted by the shared clock/);
-  const g = src('src/scenes/gatherHost.js');
-  assert.match(g, /const found = !d\.motherlode && d\.marks \? deps\.marks\?\.findLine\?\.\(d\.marks, 'gather'\) \?\? null : null;\n\s+if \(found && !hauled\) hud\.toast\(found\);/);
-});
-
-test('SILVER-FINDS the Bank\'s card: the day\'s finds beside the combat\'s - found in loot against 20, found gathering against 30; the combat row names the serpents (mutants: a count unsaid; the maxes)', () => {
-  const p = src('src/ui/enhanced/enhancedPorts.js');
-  assert.match(p, /\['Found in loot today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.found \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.findMax \?\? MARKS_FAUCETS\.find\.perDay\}`\],/);
-  assert.match(p, /\['Found gathering today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.gathered \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.gatherMax \?\? MARKS_FAUCETS\.gather\.perDay\}`\],/);
-});

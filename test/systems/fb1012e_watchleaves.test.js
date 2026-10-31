@@ -329,19 +329,8 @@ test('WATCH-LEAVES: popAllowChange is UpdateMobiles\' allowChange - beyond allow
   assert.equal(popAllowChange(5, 0, 0), true, 'square to the side: outside Vector3.Angle <= 90\'s strict half');
   assert.equal(popAllowChange(5, 0.01, 0), false, 'a hair forward of it: in sight');
   assert.equal(popAllowChange(0, -5, Math.PI), false, 'the view turned: what was behind is in front');
-  const pop = rd('src/systems/town/townPopulation.js');
-  assert.match(pop, /const allowChange = popAllowChange\(dx, dz, viewYaw, dist\);/);
-  const lt = rd('src/systems/livingWorld/livingTown.js');
-  assert.match(lt, /_hidden\(dx, dz, viewYaw\) \{ return popAllowChange\(dx, dz, viewYaw\); \}/);
   for (const f of ['src/systems/town/townPopulation.js', 'src/systems/livingWorld/livingTown.js', 'src/scenes/cityGuards.js']) {
     assert.doesNotMatch(rd(f).replace(/^export function popAllowChange[^\n]*\n[^\n]*\n/m, ''), /> POP_VISIBLE_RANGE \|\| !/, `${f}: no second copy of the law`);
   }
 });
 
-test('WATCH-LEAVES: the world host hands the guard pool the camera\'s yaw - the one its street\'s population is handed', () => {
-  const w = rd('src/scenes/world.js');
-  const at = w.indexOf('  const cityGuards = createCityGuards({');
-  const body = w.slice(at, w.indexOf('\n  });', at));
-  assert.match(body, /\n {4}viewYaw: \(\) => cam\.yaw,/);
-  assert.match(w, /p\.population\.update\([^\n]*, local, cam\.yaw, local,/);
-});

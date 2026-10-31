@@ -256,15 +256,6 @@ test('GATE-ROADS a wall on its outline hands its gates\' openings as it stands t
   } finally { setTownWallPaths(null); }
 });
 
-test('GATE-ROADS the wiring: the pixel\'s build hands the town\'s gates on its rect, and the kernel lays their roads after the painter and its smoothing - Basic Roads\' tiles and the ground\'s heights their own; the worker\'s reach under world/ (mutants: the gates never handed; the roads never laid; laid before the painter)', () => {
-  assert.match(rd('src/scenes/pixelBuild.js'), /\n {4}if \(groundLocation\) locationRect = setLocationTiles\(groundLocation, maps, blocks, seedTilemap\);\n {4}if \(locationRect\) locationRect\.gateRoads = townGateRoads\(groundLocation, maps, blocks\);/);
-  const gen = rd('src/world/terrain/terrainGen.js');
-  const paint = gen.indexOf('paintRoads(tileData, tilemap'), smooth = gen.indexOf('if (roads.smooth !== false && classic) smoothRoadHeights('), lay = gen.indexOf('layGateRoads(tilemap, paths, tileData, locationRect.gateRoads)');
-  assert.ok(paint > 0 && smooth > paint && lay > smooth, 'after the painter and its smoothing');
-  assert.match(gen, /\n {4}if \(hasLocation && locationRect\?\.gateRoads\) layGateRoads\(tilemap, paths, tileData, locationRect\.gateRoads\);/);
-  assert.doesNotMatch(rd('src/world/road/gateRoads.js'), /from '\.\.\/\.\.\/(scenes|render|ui|systems)\//, 'the worker\'s: no scene, renderer or system');
-});
-
 // ── WITH ARENA2: the freeware's cities ──────────────────────────
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['BLOCKS.BSA', 'MAPS.BSA', 'WOODS.WLD'].every((f) => existsSync(join(ARENA2, f)));

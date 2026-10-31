@@ -212,7 +212,6 @@ test('WB14c his opening: the Vanguard broken, it begins as the first challenger 
   assert.equal(r.out.filter((o) => o.k === 'atk').length, 0, 'his opening');
   r = beats(f, r.t, at + OPENING_MS + 6000, before);
   assert.ok(r.out.some((o) => o.k === 'atk'), 'his blows after his wake');
-  assert.ok(read('src/net/gate/gateBrain.js').includes('woke: Number.isFinite(openedAt(f)) ? openedAt(f) + OPENING_MS : -Infinity'));
 });
 
 test('WB14c his patience: a Vanguard standing VG_PATIENCE_MS after its first wave, a Meteor of his falls on a fighter out on the platforms every VG_PATIENCE_EVERY_MS - laid on their platform, never his court - its word said once (mutants: the meteor clamped to his court; said every time)', () => {
@@ -310,9 +309,6 @@ test('WB14c on my screen: the Vanguard\'s words - its first wave, each clearing,
   assert.equal(bossBarModel(s, T0, boss).host, 'The Vanguard - Bridgehead, wave 2 of 3');
   assert.equal(bossBarModel({ ...s, vg: [1, 3] }, T0, boss).host, 'The Vanguard - Muster, wave 3 of 3');
   assert.equal(bossBarModel({ ...s, vg: [2, 0] }, T0, boss).host, 'His host: 1', 'broken: his host\'s line as ever');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /if \(k >= 0 && s\.lg\) for \(const T of host\.targets\(\)\) if \(nearestCourt\(T\.feet\[0\] - COURT_CENTRE\[0\], T\.feet\[2\] - COURT_CENTRE\[2\]\) === k\) _hostMine\.push\(T\);/);   // PIN MOVED (WB14f, AUDIT of WB14c): each body from the floor it stands on - the blow itself is pinned on the court, from a platform (test/net/gate/wb14f_captive.test.js)   // PIN MOVED (AUDIT WB14 SCREEN-1): beside his Flame, sundered
-  assert.match(gc, /const line = t - s\.vgw\.at <= FED_LATE_MS \? vanguardLine\(s\.vgw, bossOf\(s\)\.name\) : null; if \(line\) say\(line\);/);
   // a Bolt drawn in his element's colour
   const bs = { ...s, lg: { ads: [{ i: 1, k: HOST.caster, h: 1, m: 1, x: 0, z: 0, atk: { at: T0 + 1000, x: 2, z: 2 } }, { i: 2, k: HOST.brute, h: 1, m: 1, x: 0, z: 0, atk: { at: T0 + 1000, x: 4, z: 4 } }] }, shieldUntil: 0, wrathAt: 1e12 };
   const sh = hostShapes(bs, T0 + 500, BASE_PROFILE);

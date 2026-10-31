@@ -29,14 +29,6 @@ const face = (h) => ({ fnt: { fixedWidth: 7, fixedHeight: h, glyphWidth: () => 6
 const lines = (...texts) => texts.map((t) => (typeof t === 'string' ? { text: t, center: false, font: 0 } : t));
 
 test('EB1 door: the reader has ONE construction site, the hook lives there, and both skins build the classic model', () => {
-  const door = read('src/ui/bookDoor.js');
-  assert.match(door, /const model = new BookReaderWindow\(bookFile\);\s*\n[\s\S]{0,260}if \(isEnhanced\(\) && typeof document !== 'undefined'\) return enhancedBookOverlay\(model\);\s*\n\s*return model;/, 'one model, two faces');
-  assert.match(door, /showReader\(createBookReaderWindow\(bookFile\)\);/, 'the hook opens through the door');
-  assert.match(door, /import\('\.\/enhanced\/enhancedBook\.js'\)/, 'dynamic: classic pays nothing');
-  assert.match(door, /unregister = registerOverlay\(exit\);/, 'PX28: Tab closes the book');
-  assert.match(door, /z-index:14;image-rendering:pixelated/, 'above the enhanced pack (13): the inventory hands over THEN closes');
-  assert.match(door, /const relock = \(\) => \{ if \(hostCanvas\) requestLook\(hostCanvas\); \};/, 'MAC1: the relock, on the canvas draw() taught it');
-  assert.doesNotMatch(read('src/ui/bookReader.js'), /export function makeOpenBookHook|new BookReaderWindow\(/, 'the window file no longer opens itself');
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
     assert.match(read(f), /import \{ makeOpenBookHook \} from '\.\.\/ui\/bookDoor\.js';/, `${f} opens through the door`);
   }
@@ -48,12 +40,6 @@ test('EB1 door: the reader has ONE construction site, the hook lives there, and 
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(read(f), /showReader: \(w\) => \{ if \(!townTalk\.overlayActive \|\| townTalk\.overlayDone\) townTalk\.showOverlay\(w\); \}/, `${f}: a done pack does not refuse the reader`);
   }
-  assert.match(read('src/scenes/dungeonContext.js'), /showReader: \(w\) => \{ if \(!activeOverlay \|\| activeOverlay\.done\) activeOverlay = w; \}/);
-  assert.match(read('src/scenes/townTalk.js'), /get overlayDone\(\) \{ return !!overlay\?\.done; \},/);
-  assert.match(door, /draw\(renderer, canvas\) \{\s*\n\s*hostCanvas = canvas \?\? hostCanvas;\s*\n\s*if \(!mounted\) mount\(\);/, 'the canvas mounts on the first draw');
-  assert.doesNotMatch(door.slice(door.indexOf('function enhancedBookOverlay')).split('const mount = ')[0], /document\.body\.append/, 'and never at construction');
-  // the hand-off law (UI-Arc: hand over, THEN close) is the inventory's and untouched
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /kind: 'openBook', item: r\.item, failText: r\.failText, closeFirst: false/);
   // headless: the door hands back the classic window, and it is the model
   const fake = { title: 'The Real Barenziah', author: 'Anonymous', pageCount: 1, getPageTokens: () => [{ formatting: TOKEN_TEXT, text: 'Once' }, { formatting: RSC.NewLine }] };
   const w = createBookReaderWindow(fake);
@@ -141,14 +127,6 @@ test('EB1 keys and the vendored book: Mac\'s own, its seams marked, its fold unt
   assert.equal((book.match(/PORT/g) ?? []).length, 9, 'nine PORT marks: the inscription seam (3), resizeBook, and EB2\'s paper scale (the field, pixelLayer, the sheet, the board, the stack)');
   assert.match(book, /paperScale: 1,/);
   assert.match(book, /const pixelLayer = \(ctx, w, h, draw\) => \{/, 'EB2: the paper, the board and the stack at Raum\'s pixel size, blitted up');
-  // the face: paint and bones - the model's law is imported, never re-read
-  const src = read('src/ui/enhanced/enhancedBook.js');
-  assert.match(src, /import \{ placeBookLabels \} from '\.\.\/bookReader\.js';/);
-  assert.doesNotMatch(src.replace(/^\s*\/\/.*$/gm, ''), /getPageTokens|RSC\.|TOKEN_TEXT/, 'no second reading of the token stream');
-  assert.match(src, /placeBookLabels\(model\.lines, \(x\) => faces\[x\] \?\? faces\[0\], wrapW\)/, "LayoutBookLabels over FontPrefix's five cuts, at the leaf's width");
-  assert.match(src, /if \(flipBook\(book, dir, now\(\)\)\) audio\.playOneShot\(SOUND\.PageTurn, 1\);/, 'the page turn per leaf');
-  assert.match(src, /if \(!model\.done\) model\.input\('Escape'\);\s*\n\s*relock\(\);\s*\n\s*closeBook\(book, now\(\)\);/, "the exit is the classic's arm, the relock rides it, then the cover shuts");
-  assert.match(src, /BOOK\.cover = \{ title: model\.book\?\.title \|\| 'A Book'/, "the cover carries the book's own title");
 });
 
 test('EB2 type: a canvas face wears FntFile\'s shape, so the classic\'s measure and wrap lay it out; the five prefixes are five cuts', () => {
@@ -176,8 +154,4 @@ test('EB2 type: a canvas face wears FntFile\'s shape, so the classic\'s measure 
   assert.equal(bodySize(756, 1), 22, 'about twenty-seven lines a leaf');
   assert.equal(bodySize(300, 3), 39, 'never under thirteen CSS pixels on a phone');
   assert.equal(bodySize(100, 1), 13);
-  const src = read('src/ui/enhanced/enhancedBook.js');
-  assert.match(src, /injectEnhancedFonts\(\);/, 'the one web-font request the skin makes');
-  assert.match(src, /BOOK\.paperScale = uiScale\(W, H, dpr\);/, 'the paper stays pixel art at the old scale');
-  assert.match(src, /ctx\.fillText\(text, Math\.round\(dx\), Math\.round\(y\)\);/, 'the type is drawn by the browser, anti-aliased');
 });

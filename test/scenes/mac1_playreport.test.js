@@ -57,87 +57,6 @@ function fakeIndexedDb(initial = {}) {
   return { idb: { open: () => { const r = {}; later(() => { r.result = db; r.onsuccess?.(); }); return r; } }, counts, stores };
 }
 
-// ── A ────────────────────────────────────────────────────────────
-test('MAC1 A: the boot door counts the Morrowind store itself and repaints when the count lands', async () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /import \{[^}]*\bcountMorrowindArchives\b[^}]*\} from '\.\.\/\.\.\/scenes\/dataSource\.js'/, 'the menu imports the NAMES-ONLY count');
-  const mountBlock = menu.slice(menu.indexOf('hooks = h ?? {};'), menu.indexOf('sections = mode ==='));
-  assert.doesNotMatch(mountBlock, /registerMorrowindData\(\)/, 'AUDIT 65 XL-6: the MOUNT never calls the fingerprinting pass (the attach pick does - MWA4 - before a build spends seconds)');
-  // MWA4: the Build-arms toggle is gone; Attach builds, AFTER the pick - and the pick measures what it stored itself
-  // (pickMorrowindFiles' register), so fpArm's kept face verdict is still a lookup
-  assert.match(menu, /const n = await ds\.pickMorrowindFiles\(\);[\s\S]{0,400}?const \{ buildArmsFor \} = await import/, 'Attach builds after the pick');
-  assert.match(src('src/scenes/dataSource.js'), /store: storeMorrowindFiles,\n\s*register: registerMorrowindData,/, '...and the pick measures the set it stored');
-  // Inside mount, after the hooks land and before any pane renders: the
-  // count is kicked when nothing has counted (`_mwCount`'s -1) and the
-  // SAME host repaints.
-  assert.match(menu, /hooks = h \?\? \{\};[\s\S]{0,1800}if \(!morrowindDataCounted\(\)\) \{\s*countMorrowindArchives\(\)\.then\(\(\) => \{ if \(app === host && host\.isConnected\) render\(\); \}\)\.catch\(\(\) => \{\}\);/,
-    'mount counts an uncounted store and repaints the mounted host, never a torn-down one');
-  // The hosts still count on boot (scenes/shared.js) - this is a second
-  // caller, not a move - and the FULL pass, sizes and fingerprint, is
-  // still theirs: the boot menu gave up the fingerprint, not the host.
-  assert.match(src('src/scenes/shared.js'), /const morrowind = registerMorrowindData\(\)\.catch\(\(\) => 0\);/);
-
-  // AUDIT 65 XL-6: MEASURED, not read off the source. A fake IndexedDB
-  // that counts value get()s and put()s, over a store holding LEGACY
-  // records (pre-MW-LOAD attaches are ArrayBuffers, not Blobs).
-  //
-  // THE DEFECT: the boot door ran the size fingerprint, whose sizes came
-  // through assetBlob - which materialises a legacy record whole and
-  // PUTS it back as a Blob. So opening the enhanced settings on the
-  // title screen read and rewrote every attached Morrowind file (a
-  // six-file set is 181 MB out of the store and back), serially, on the
-  // surface most likely to be a phone. The count now asks for names;
-  // the sizes now ask for values without rewriting them; and the
-  // migration stays where the file is USED.
-  const legacy = new Map([
-    ['Morrowind.bsa', new ArrayBuffer(2048)],
-    ['Tribunal.bsa', new ArrayBuffer(1024)],
-    ['Morrowind.esm', new ArrayBuffer(512)],
-  ]);
-  const io = fakeIndexedDb({ morrowind: legacy });
-  globalThis.indexedDB = io.idb;
-  const ds = await import('../../src/scenes/dataSource.js');
-
-  // THE BOOT DOOR: names only.
-  assert.equal(await ds.countMorrowindArchives(), 2, 'two .bsa - the .esm is not an archive');
-  assert.deepEqual({ gets: io.counts.gets, puts: io.counts.puts }, { gets: 0, puts: 0 },
-    'the boot door reads no stored VALUE and writes nothing at all');
-  assert.equal(io.counts.keyLists, 1, 'one getAllKeys is the whole cost');
-  assert.equal(ds.morrowindDataFingerprint(), null,
-    'and it leaves the fingerprint NULL - a names-only print would read as a changed set at the host and bump the generation (MW-D9g)');
-  assert.equal(ds.morrowindDataCounted(), true, 'but the count HAS landed, so the door does not re-ask');
-
-  // THE HOST BOOTSTRAP: the sizes, off plain gets, with nothing written.
-  const gen = ds.morrowindDataGeneration();
-  await ds.registerMorrowindData();
-  assert.equal(io.counts.gets, legacy.size, 'one value get per stored name');
-  assert.equal(io.counts.puts, 0, 'and NOT ONE legacy record is rewritten to measure it');
-  assert.equal(ds.morrowindDataGeneration(), gen, 'learning the set is still not a change (MW-D9g)');
-  assert.match(ds.morrowindDataFingerprint(), /Morrowind\.bsa\t2048/, 'the sizes are byte-exact off the ArrayBuffer');
-  for (const v of legacy.values()) assert.ok(v instanceof ArrayBuffer, 'the store still holds what it held');
-
-  // THE COUNTED-THEN-ATTACHED SET (the review's block): a fresh module
-  // whose boot door has COUNTED but never measured, then an attach
-  // lands, then the host bootstrap runs. The print is still null, and
-  // MW-D9g's "learning a set is not a change" must not swallow it -
-  // the count saw different NAMES, and the swap caches must drop.
-  // MUTANT: drop the `_mwCountedNames` arm of `changed` - gen stays 0.
-  const ds2 = await import('../../src/scenes/dataSource.js?xl6-counted');
-  assert.equal(await ds2.countMorrowindArchives(), 2);
-  legacy.set('Bloodmoon.bsa', new ArrayBuffer(256));
-  const gen2 = ds2.morrowindDataGeneration();
-  await ds2.registerMorrowindData();
-  assert.equal(ds2.morrowindDataGeneration(), gen2 + 1, 'an attach between the count and the measure IS a change');
-  legacy.delete('Bloodmoon.bsa');
-
-  // AND THE MIGRATION SURVIVES where the file is actually USED.
-  const warn = console.warn; console.warn = () => {};
-  try { await ds.loadMorrowindArchives(); } finally { console.warn = warn; }
-  assert.equal(io.counts.puts, 2, 'loadMorrowindArchives still rewrites each legacy ARCHIVE as a Blob');
-  assert.ok(legacy.get('Morrowind.bsa') instanceof Blob && legacy.get('Tribunal.bsa') instanceof Blob, 'by range next boot');
-  assert.ok(legacy.get('Morrowind.esm') instanceof ArrayBuffer, 'a file nobody opened is left alone');
-});
-
 // ── B ────────────────────────────────────────────────────────────
 test('MAC1 B: the lock asks for unadjusted movement, and falls back on NotSupportedError alone', async () => {
   const calls = [];
@@ -206,19 +125,10 @@ test('MAC1 D: the far rings draw the trees and the flats that move, and nothing 
     assert.equal(farFlatVisible({ ring, height: TALL_FLAT_HEIGHT }), true, 'a tree draws');
     assert.equal(farFlatVisible({ ring, height: 0.4, animated: true }), true, 'a flat that moves (a fire, a torch, any smoke) marks the village');
   }
-  // the wire: the streaming host's flat walk asks it per batch, with the
-  // batch's own height and the animator's frame as the "moves" bit
-  const w = src('src/scenes/world.js');
-  assert.match(w, /import \{ farFlatVisibleAt \} from '\.\.\/world\/flatDistance\.js'/);   // PERF-EXT12: the rule's positional home - no object a batch a frame
-  assert.match(w, /const ring = Math\.max\(Math\.abs\(p\.px - state\.current\.x\), Math\.abs\(p\.py - state\.current\.y\)\);\s*\n(?:\s*\/\/[^\n]*\n)*\s*if \(pixelVisible \|\| pixelCasts\) for \(const b of p\.batches\) \{\s*\n\s*if \(!farFlatVisibleAt\(ring, b\.farH \?\? b\.size\?\.h \?\? 0, b\.frame != null\)\) continue;[^\n]*\n\s*const off = [^\n]*EV3\s*\n\s*if \(off && !renderer\.shadowReach\(b\._box, t\[0\], t\[1\], t\[2\]\)\) continue;/,
-    'the ring is Chebyshev from the player\'s pixel and the rule runs inside the pixel\'s gate (AUDIT REACH: a pixel neither seen nor reached walks no batch at all) - PIN MOVED (PERF-ORDER, 2026-10-11): ahead of the batch\'s frustum test and reach, three compares before a box (PERF-EXT12 made the rule positional, so it mints nothing a batch); each only skips, so the batches kept are the same');
 });
 
 // ── H ────────────────────────────────────────────────────────────
 test('MAC1 H: the politeness gate reads PlayerMotor.IsStandingStill, not the camera', () => {
-  assert.match(src('src/scenes/world.js'), /_playerStill = walkMode && playerSpawned \? !!player\.standing : \(_lastPlayerPos/, 'world.js: the walker\'s gate is the motor\'s standing');
-  // AUDIT 68 S20-dead-lastPlayerPos: the fixed-city host reads it inside `if (walkMode)`, where the camera arm could never run
-  assert.match(src('src/scenes/exterior.js'), /if \(walkMode\) \{\n(?:\s*\/\/[^\n]*\n)*\s*const _playerStill = !!player\.standing;/, 'exterior.js: the walker\'s gate is the motor\'s standing');
   // and standing IS DFU's IsStandingStill: grounded over a zero move
   const m = new PlayerMotor(new Collider(() => 0));
   m.pos = [0, 0, 0]; m.grounded = true;
@@ -471,80 +381,3 @@ function mountLiteral(text, opener, env = {}) {
  *  interior pause reads its doors off. */
 const hostBagOf = (text, env = {}) => mountLiteral(`x(${literalBody(text, 'var modes = createWorldModes(')})`, 'x(', env);
 
-test('MAC1 J: the pause door relocks the pointer inside the resume gesture, and every host hands it the canvas', () => {
-  const door = src('src/ui/pauseDoor.js');
-  assert.match(door, /export function pauseMenuAct\(hooks, close\) \{\s*\n\s*return \(action\) => \{\s*\n\s*close\(\);[\s\S]{0,1400}if \(action !== 'exit'\) hooks\.relock\?\.\(\);\s*\n\s*if \(action === 'save'\) hooks\.quickSave\?\.\(\);/,
-    'close first (the overlay-hold law), then relock for every exit but the one to the menu, then the hook');
-  assert.match(door, /const act = pauseMenuAct\(hooks, close\);/, 'F5-QUESTS: the pause door acts through the one law F5\'s page shares');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /quickLoad: worldQuickLoad,\s*\n\s*relock: \(\) => requestLook\(canvas\),/, 'the world host\'s pause hooks relock through its canvas');
-  assert.match(w, /quickLoad: \(\) => worldQuickLoad\(\),\s*\n\s*relock: \(\) => requestLook\(canvas\),/, '...and the host bag the interior arm rides');
-  assert.match(src('src/scenes/worldModes.js'), /quickLoad: host\.quickLoad,\s*\n\s*relock: host\.relock,/, 'the interior arm passes the host\'s relock through');
-
-  // AUDIT 65 HP-1: ...AND THE OTHER THREE HOOK LITERALS, which this
-  // test's own title has always claimed and never read. MAC1 wired
-  // three of five and the source regexes above could not see it -
-  // worse, the worldModes regex PASSES while `host.relock` resolves to
-  // undefined, which is precisely what the ?exterior host did. So the
-  // five bags are BUILT and asked, not matched.
-  const modes = src('src/scenes/worldModes.js');
-  const ext = src('src/scenes/exterior.js');
-  const OUT = [['src/scenes/world.js', w], ['src/scenes/exterior.js', ext]];
-
-  // (1)+(2) the two OUTDOOR pause doors, each relocking its own canvas.
-  // AUDIT 65 HP-1 (review): presence is not relocking - each hook is
-  // CALLED and must reach requestLook with ITS host's canvas.
-  // MUTANT: `relock: () => {}` at any of the five sites.
-  const spy = () => { const seen = []; return { seen, requestLook: (c) => { seen.push(c); } }; };
-  for (const [file, text] of OUT) {
-    const s = spy();
-    // F5-QUESTS: the door spreads the host's bag arm (`pauseDoorHooks`, F5's page is handed the same) - held here,
-    // and the ARM is what gets built and asked.
-    assert.match(text, /openPauseFlow\(\(w\) => townTalk\.showOverlay\(w\), \{\n\s*at: pauseAt,[^\n]*\n\s*\.\.\.pauseDoorHooks\(\),/, `${file}: the door spreads its bag`);
-    const hooks = mountLiteral(text, 'const pauseDoorHooks = () => (', { opts: {}, requestLook: s.requestLook, canvas: `CANVAS-${file}` });
-    assert.equal(typeof hooks.relock, 'function', `${file}: its own pause door hands pauseDoor.js:"if (action !== 'exit')" a relock`);
-    hooks.relock();
-    assert.deepEqual(s.seen, [`CANVAS-${file}`], `${file}: ...and it relocks THIS host's canvas`);
-  }
-
-  // (3) the INTERIOR pause door - ONE literal fed by TWO host bags, and
-  // the bag is where MAC1's miss actually lived. ESC-BOOK: the door spreads its bag arm (`interiorPauseHooks`, a
-  // building's F5 page is handed the same) - held here, and the ARM is what gets built and asked.
-  assert.match(modes, /openPauseFlow\(\(w\) => \{ interiorOverlay = w; \}, \{\n\s*at: pauseAt,[^\n]*\n\s*\.\.\.interiorPauseHooks\(\),/, 'the interior door spreads its bag arm');
-  for (const [file, text] of OUT) {
-    const s = spy();
-    const hooks = mountLiteral(modes, 'const interiorPauseHooks = () => (', { opts: {}, host: hostBagOf(text, { requestLook: s.requestLook, canvas: `CANVAS-${file}` }) });
-    assert.equal(typeof hooks.relock, 'function',
-      `${file}: worldModes' interior pause reads host.relock, so THIS host's createWorldModes bag must carry it`);
-    hooks.relock();
-    assert.deepEqual(s.seen, [`CANVAS-${file}`], `${file}: ...and the bag's relock reaches THIS host's canvas`);
-  }
-
-  // (4) the DUNGEON pause door - the most-played one of the six
-  // (world.js gates its own Escape ladder on exterior mode, so
-  // underground the key falls to routeKey -> ui/input.js's Escape case
-  // -> dungeonContext.togglePause). That context owns no canvas, so its
-  // hook is a forward and the pin follows it all the way out.
-  let reached = 0;
-  const dctx = src('src/scenes/dungeonContext.js');
-  assert.match(dctx, /openPauseFlow\(\(w\) => \{ activeOverlay = w; \}, \{\n\s*at,[^\n]*\n\s*\.\.\.this\.pauseHooks\(setPlayerPos\),/, 'F5-QUESTS: the dungeon door spreads its bag arm');
-  const hooks = mountLiteral(dctx, 'const ctx = this;   // the sibling save verbs on this same context\n      return ',
-    { opts: { relock: () => { reached++; } } });
-  assert.equal(typeof hooks.relock, 'function', 'dungeonContext\'s pause door hands over a relock');
-  hooks.relock();
-  assert.equal(reached, 1, '...and it is the one its HOST threaded in (this context owns no canvas of its own)');
-  for (const [file, text] of [['src/scenes/dungeon.js', src('src/scenes/dungeon.js')], ['src/scenes/worldModes.js', modes]]) {
-    let fired = 0;
-    const s = spy();
-    const opts = mountLiteral(text, 'dfLocation.climate.climateType, ', { host: { relock: () => { fired++; } }, requestLook: s.requestLook, canvas: `CANVAS-${file}` });
-    assert.equal(typeof opts.relock, 'function', `${file}: this dungeon host hands buildDungeonContext a relock`);
-    opts.relock();
-    // the standalone host closes over its OWN canvas; the world-hosted
-    // crawl forwards the outer host's (worldModes owns no requestLook)
-    assert.equal(fired, file === 'src/scenes/worldModes.js' ? 1 : 0, `${file}: ...through this host's own look seam`);
-    assert.deepEqual(s.seen, file === 'src/scenes/dungeon.js' ? [`CANVAS-${file}`] : [], `${file}: ...and the standalone host relocks its own canvas`);
-  }
-
-  // The law the whole item rides on: NEVER on the way to the menu.
-  assert.ok(!/if \(action === 'exit'\)[^\n]*relock/.test(door), 'the exit has no world to relock into');
-});

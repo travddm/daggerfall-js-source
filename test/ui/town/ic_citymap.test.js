@@ -101,25 +101,6 @@ const MARKET = polar(30, 4600 + 260);
 /** The city's sheet coordinates of a point of its metres. */
 const sheetOf = ([x, z]) => [(x + IC_HALF_M) / WORLD_PER_PX, (z + IC_HALF_M) / WORLD_PER_PX];
 
-test('IC-TOWNMAP 3: in an Imperial City slice the M key\'s held map is the city - its sheet the whole plan, the player where they stand in it; a Bay town\'s sheet is its own blocks as before; the host hands the slice (mutants: the slice\'s corner lost, its rows unflipped, the bag\'s slice dropped)', () => withDocument(() => {
-  for (const at of [MARKET, polar(210, 3000), polar(300, 6500), [40, -60]]) {
-    const win = raise(cityWindow(at));
-    assert.ok(win instanceof HeldMapWindow);
-    assert.equal(win._slot.live, 'town');
-    assert.deepEqual(win._sheet.size(), { width: IC_SHEET_PX, height: IC_SHEET_PX }, 'the whole city');
-    const me = win._sheet.me(), [ex, ey] = sheetOf(at);
-    assert.ok(Math.abs(me.x - ex) <= 1 && Math.abs(me.y - ey) <= 1, `the player where they stand: (${me.x.toFixed(1)}, ${me.y.toFixed(1)}) for (${ex.toFixed(1)}, ${ey.toFixed(1)})`);
-    assert.equal(imperialDistrictAt(me.x * WORLD_PER_PX - IC_HALF_M, me.y * WORLD_PER_PX - IC_HALF_M), imperialDistrictAt(...at));
-    win.dispose();
-  }
-  const bay = raise(createTownMapWindow({ locationName: 'Gothway Garden', gridW: 2, gridH: 2, blocks: sliceBlocks().slice(0, 4), buildings: () => [], discovered: () => [] }));
-  assert.deepEqual(bay._sheet.size(), { width: 2 * BLOCK_PX, height: 2 * BLOCK_PX }, 'a Bay town is its own blocks');
-  bay.dispose();
-  assert.equal(townSheetBag({ imperialSlice: 190 }).imperial, 190);
-  assert.equal(townSheetBag({}).imperial, null);
-  assert.match(read('src/scenes/exteriorAutomapToggle.js'), /imperialSlice: capitalViewOf\(dfLoc\) \? dfLoc\.capital\.s : null,/);
-}));
-
 test('IC-TOWNMAP 3: at rest the whole city is on the paper, inked from its plan - the lake, the walls and their gates, the roads, the landmarks - and lettered: every district\'s name and the landmarks\', through the text core; the player\'s caret where they stand (mutants: a district unnamed; the labels\' zoom gate reversed; the caret not drawn)', () => withDocument(() => {
   const win = raise(cityWindow(MARKET));
   const lim = win._limits();

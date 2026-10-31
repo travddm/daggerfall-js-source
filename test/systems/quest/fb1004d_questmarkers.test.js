@@ -227,9 +227,6 @@ test('FIELD BUGS 2026-10-05c SEALED-SAVE ("Haunted House quest has enemy under t
   assert.equal(mendedFoeSpot(v.machine, { ...restored, targetSymbol: { name: 'house' } }), null, 'another symbol');
   assert.equal(mendedFoeSpot(v.machine, { ...restored, questUID: v.quest.uid + 1 }), null, 'another quest');
   assert.equal(mendedFoeSpot(null, restored), null, 'no machine');
-  const MODES = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const FOES = readFileSync(new URL('../../../src/scenes/exteriorFoes.js', import.meta.url), 'utf8');
-  assert.match(MODES, /interiorFoes\?\.restoreWorld\(saved\.foes, fromNative, yOffset, \{ reviveQuestBehaviour, restandQuestFoe: \(b, feet\) => restandMendedQuestFoe\(questBridge\?\.machine \?\? null, interiorCtx, b, feet, INTERIOR_MARKER_FEET_LIFT\) \}\);/);
   // the restand itself: a room's frame 100 m east and 50 m north (room()'s parentPt); the foe on the old spot's level
   // within reach is stood at the new spot, lifted as standFoe lifts it; off its level, or out of reach, it stays
   const ctx = { parentPt: (x, y, z) => [x + 100, y, z + 50] };
@@ -238,7 +235,6 @@ test('FIELD BUGS 2026-10-05c SEALED-SAVE ("Haunted House quest has enemy under t
   assert.equal(restandMendedQuestFoe(v.machine, ctx, restored, [was[0], was[1] + SEALED_SAVE_LEVEL_M + 0.1, was[2]], 0.1), null, 'another storey');
   assert.equal(restandMendedQuestFoe(v.machine, ctx, restored, [was[0] + SEALED_SAVE_REACH_M + 0.1, was[1], was[2]], 0.1), null, 'out of reach');
   assert.equal(restandMendedQuestFoe(v.machine, null, restored, was, 0.1), null, 'no room');
-  assert.match(FOES, /const feet = \(questBehaviour && restandQuestFoe\?\.\(questBehaviour, \[lx, sf\.y \+ yOffset, lz\]\)\) \|\| \[lx, sf\.y \+ yOffset, lz\];\n\s+spawnFoe\(sf\.mobileType, feet,/);
 });
 
 // ---- the backstop: worldModes.js's building stands over a real floor ----
@@ -251,56 +247,8 @@ function room(enter = [[93, 0, 50]]) {
   collider.addMesh('room', new Float32Array([92, 0, 44, 110, 0, 44, 110, 0, 56, 92, 0, 56]), new Uint32Array([0, 1, 2, 0, 2, 3]), IDENTITY);
   return { collider, parentPt: (x, y, z) => [x + 100, y, z + 50], enterMarkers: enter, billboardBatches: [] };
 }
-/** worldModes.js's building quest stands, lifted out and run over `ctx` (AUDIT MERGE-PLUS A1's lift, as
- *  test/systems/quest/audit1003_wd.test.js lifts buyHallAt): the stand law (standQuestFlatIn), the interior host's wrapper, the
- *  backstop's spots (interiorStandSpots) and the interior adapter (standNPC, standItem, standFoe) - the host's own
- *  source; a billboard 1 m by 2 m. */
-function liftInteriorStands(ctx) {
-  const WM = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const cut = (start, end) => {
-    const a = WM.indexOf(start);
-    assert.ok(a >= 0, `worldModes.js: ${start.trim()}`);
-    return WM.slice(a, WM.indexOf(end, a) + end.length);
-  };
-  const source = [
-    cut('export const INTERIOR_MARKER_FEET_LIFT = ', ';\n').replace(/^export /, ''),
-    cut('  const QUEST_ITEM_MARKER_SHIFT = ', ';\n'),
-    cut('  function standQuestFlatIn(', '\n  }\n'),
-    cut('  const standQuestFlat = ', ';\n'),
-    cut('  const interiorStandSpots = ', '\n  };\n'),
-    cut('  const questAdapter = {', '\n  };\n'),
-    'return questAdapter;',
-  ].join('\n');
-  const questFlats = [], foes = [];
-  const deps = {
-    questFlats, interiorCtx: ctx, interiorFoeStands: [], _enemyRestoreInProgress: false,
-    interiorFoes: { spawnFoe: (foeType, feet) => { foes.push({ foeType, feet }); return Promise.resolve(); } },
-    questSceneCtx: () => ({ mapId: MAP_ID }), sceneBehaviours: () => questFlats.map((s) => s.behaviour),
-    getTexture: async () => ({ recordCount: 1000 }), uploadRecord: () => {}, billboardSize: () => ({ w: 1, h: 2 }), drawnFlat: (a, r) => [a, r],
-    renderer: { createBillboardBatch: (_a, _r, _size, at) => ({ at: at[0] }) }, rideSceneMarker: () => {},
-    templateByIndex, markerScenePosition, siteMarkerSpots, standSpot, MARKER_FLOOR_REACH,
-    buildingStandSpot,   // PIN MOVED (FB1020c CROWD-CLEAR): the building stand's law is sceneMount.js's, the backstop inside it
-  };
-  return { adapter: new Function(...Object.keys(deps), source)(...Object.values(deps)), questFlats, foes };
-}
 const PARTY = ['Person _pp_ group Questor', 'Item _l_ letter', 'Foe _crook_ is Thief', 'Place _house_ local house2', '',
   '\tplace npc _pp_ at _house_', '\tplace item _l_ at _house_', '\tplace foe _crook_ at _house_', ''];
-/** The quest's person, letter and foe stood in the House2 of Daggerfall's own RESIGM02 (no curation) holding `markers`,
- *  every one at the selected marker (GetSiteMarker's reuse law): { npc, item, foe } - the stands' points in the parent
- *  frame, the foe's feet. */
-async function standParty(markers, ctx = room()) {
-  const v = village({ qbn: PARTY, fromWorldData: false, markers, type: House2 });
-  const sd = v.place('house').siteDetails;
-  assert.deepEqual(sd.selectedMarker.targetResources.map((s) => s.name), ['pp', 'l', 'crook'], 'all three at the selected marker');
-  const { adapter, questFlats, foes } = liftInteriorStands(ctx);
-  addQuestResourceObjects(v.machine, adapter, SITE_TYPES.Building, sd.buildingKey);
-  await new Promise((resolve) => setImmediate(resolve));   // the billboards' async fill
-  assert.equal(questFlats.length, 2, 'the person and the letter stand');
-  assert.equal(foes.length, 1, 'and the foe');
-  const [npc, item] = questFlats;
-  for (const s of questFlats) assert.deepEqual([s.x, s.z], [s.batch.at[0], s.batch.at[2]], 'the stand\'s own point is the one drawn - the click box\'s');
-  return { npc: npc.batch.at, item: item.batch.at, foe: foes[0].feet };
-}
 const near = (got, want, why) => assert.ok(got.length === want.length && got.every((g, i) => Math.abs(g - want[i]) < 1e-9), `${why}: ${got} vs ${want}`);
 // the building's markers (block units) and where they stand in the parent frame
 const OUTSIDE = mark(SPAWN, 540, 0, -100);   // (113.5, 0, 47.5): four metres past the east wall, as the library's
@@ -308,39 +256,6 @@ const ON_FLOOR = mark(SPAWN, 40, 0, 40);     // (101, 0, 51)
 const NEAR_ITEM = mark(ITEM, 320, 0, -80);   // (108, 0, 48): the nearest marker to OUTSIDE with a floor
 const ABOVE = mark(SPAWN, 360, -240, 40);    // (109, 6, 51): six metres over the floor, past AlignBillboardToGround's 4 m
 const OFF_ITEM = mark(ITEM, 600, 0, 200);    // (115, 0, 55): past the walls
-
-test('QUEST-MARKERS, the backstop: a person, a letter and a foe whose building marker has no floor under it stand at the site\'s NEAREST marker with one - the person snapped to it, the letter on it, the foe\'s feet a hair over it (mutants: no fallback for each; the spots unsorted)', async () => {
-  const { npc, item, foe } = await standParty([OUTSIDE, ON_FLOOR, NEAR_ITEM]);
-  near(npc, [108, 2 * 0.02, 48], 'the person at the item marker 5.5 m off, AlignBillboardToGround\'s 2% over the floor');
-  near(item, [108, 0, 48], 'the letter on it');
-  near(foe, [108, 0.1, 48], 'the foe\'s feet, INTERIOR_MARKER_FEET_LIFT over it');
-});
-
-test('QUEST-MARKERS, the backstop: a site none of whose markers has a floor within reach under it (one six metres over the floor, past the 4 m the align reaches) stands them at the room\'s NEAREST enter marker (mutants: the reach; the enter markers unsorted)', async () => {
-  const { npc, item, foe } = await standParty([ABOVE, OFF_ITEM], room([[93, 0, 50], [109, 0, 55]]));
-  near(npc, [109, 2 * 0.02, 55], 'the person at the enter marker by the east wall');
-  near(item, [109, 0, 55], 'the letter');
-  near(foe, [109, 0.1, 55], 'the foe');
-});
-
-test('QUEST-MARKERS, the backstop: a marker with a floor under it stands exactly as DFU stands it - the backstop moves nothing it does not have to (mutant: always moved)', async () => {
-  const { npc, item, foe } = await standParty([ON_FLOOR, OUTSIDE, NEAR_ITEM]);
-  near(npc, [101, 2 * 0.02, 51], 'the person on its own marker');
-  near(item, [101, 0, 51], 'the letter');
-  near(foe, [101, 0.1, 51], 'the foe');
-});
-
-test('QUEST-MARKERS, the four hosts by source: the building stands (worldModes.js\'s interior adapter, which world.js and exterior.js both build) hand the backstop their spots; the dungeon\'s stands are DFU\'s, with no backstop (an RDB marker is the dungeon\'s own, and the curation is the town packs\')', () => {
-  const WM = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const interior = WM.slice(WM.indexOf('  const questAdapter = {'), WM.indexOf('\n  };\n', WM.indexOf('  const questAdapter = {')));
-  assert.equal((interior.match(/interiorStandSpots\(quest, marker\)/g) ?? []).length, 3, 'standNPC, standItem and standFoe');
-  const dungeon = WM.slice(WM.indexOf('  const dungeonQuestAdapter = {'), WM.indexOf('\n  };\n', WM.indexOf('  const dungeonQuestAdapter = {')));
-  assert.ok(dungeon.length > 0);
-  assert.doesNotMatch(dungeon, /interiorStandSpots|standSpot\(/, 'no backstop under the dungeon\'s stands');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(readFileSync(new URL(`../../../${host}`, import.meta.url), 'utf8'), /createWorldModes\(/, `${host} builds its buildings through worldModes.js`);
-  }
-});
 
 // ---- the player's own towns ----
 

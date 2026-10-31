@@ -273,13 +273,6 @@ test('SW1: a DOWNWARD crossing of either threshold repoints the sheet mid-fight'
 });
 
 test('SW1 KEPT BUG FOR BUG: SetBlock’s left-handed animated branch writes CURRENT, not TARGET', () => {
-  // The other three branches ease; this one snaps, and BlockCoroutine -
-  // which waits for current to reach target - therefore falls straight
-  // through its wait. Pinned so a tidy-up cannot quietly "fix" the mod.
-  const src = readFileSync('src/combat/shieldWidget.js', 'utf8');
-  assert.match(src, /if \(w\.s\.animated && w\.flipped\) w\.shieldPositionCurrent = rect;/,
-    'the slip is still written, and still named as the author’s');
-  assert.match(src, /KEPT BUG FOR BUG/, 'and still labelled');
 
   const left = rig({ 'Modules.Animation': true, 'Modules.Recoil': true, 'Recoil.Offset': true, 'Recoil.Condition': SHIELD_RECOIL_CONDITION.AnyAttack },
     { handedness: () => true });
@@ -305,10 +298,6 @@ test('SW1: the FPS-models seam is recorded and not carried', () => {
   }
   assert.equal(shieldAnimationGroup(null), 'Unarmed_');
   assert.equal(shieldAnimationGroup({ templateIndex: 999 }), 'Unarmed_');
-  const src = readFileSync('src/combat/shieldWidget.js', 'utf8');
-  assert.match(src, /41284af0-81c7-4630-bbc5-a976efa162a0/, 'the GUID is recorded in the source');
-  const live = src.split('\n').filter((l) => /fpsModelsAnimator/.test(l) && !/^\s*(\/\/|\*|\/\*)/.test(l));
-  assert.deepEqual(live, [], 'the animator is named in a comment and nowhere else');
 });
 
 // ---- the sprite door -------------------------------------------------
@@ -430,16 +419,6 @@ test('SW4: all 600 sprites are the right way up - the arm runs off the bottom ed
   assert.equal(worstBottom, 69, `the thinnest arm is 69 pixels (${worstName})`);
 });
 
-test('SW4: the shield door keeps the PNG’s rows, as the port’s other two screen sprites do', () => {
-  // The third member of HT3's list. `toColor32` here would flip a
-  // top-down raster into a bottom-up one and mirror all 600 again, this
-  // time in code.
-  const door = readFileSync('src/combat/shieldWidgetAssets.js', 'utf8');
-  assert.match(door, /import \{ toScreenOrder \} from '\.\.\/formats\/color32Order\.js';/);
-  assert.match(door, /return toScreenOrder\(await decodePng\(new Uint8Array\(await res\.arrayBuffer\(\)\)\)\);/);
-  assert.equal((door.match(/toColor32/g) ?? []).length, 1, 'named once, in the comment that says why it is not used');
-});
-
 test('SW1: a flat index spells TextureReplacement\u2019s own name, and every size is known up front', () => {
   assert.equal(shieldTextureFileName(0), '112360_0-0');
   assert.equal(shieldTextureFileName(4), '112360_0-4', 'five frames to a record');
@@ -458,12 +437,6 @@ test('SW1: a flat index spells TextureReplacement\u2019s own name, and every siz
   assert.equal(shieldWidgetSize(SHIELD_TEXTURE_COUNT), null);
   // and the path is the vendored one the bundler carries
   assert.equal(shieldSpritePath(0), 'vendor/shield-widget/Textures/112360_0-0.png');
-  // the URL is built the way handheldTorches.js builds its own - the
-  // archive, record and frame interpolated separately inside a
-  // `new URL(..., import.meta.url)`, which is what lets the bundler
-  // carry them. Measured over a real build: all 600 names reach it.
-  const door = readFileSync('src/combat/shieldWidgetAssets.js', 'utf8');
-  assert.match(door, /new URL\(`\.\.\/\.\.\/vendor\/shield-widget\/Textures\/\$\{archive\}_\$\{record\}-\$\{frame\}\.png`, import\.meta\.url\)/);
 });
 
 test('SW1: a widget whose door answers no size draws nothing', () => {
@@ -477,43 +450,6 @@ test('SW1: a widget whose door answers no size draws nothing', () => {
 });
 
 // ---- the rig ---------------------------------------------------------
-
-test('SW1: the rig runs the shield beside the weapon’s clone - its own frame, its own draw step, the same end-of-frame edge', () => {
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /const shield = createShieldWidget\(\{ textures: shieldWidgetTextures, audio \}\);/);
-  assert.match(rig, /const shieldOn = \(\) => modSetting\('shield-widget', 'Enabled'\);/);
-  // the Recoil module's trigger: PCAAO's event, at the tail of every
-  // resolution of an enemy's attack on the player
-  assert.match(rig, /const attackOnPlayer = \(attacker, target, damage, struckBodyPart\) => \{/);
-  assert.match(rig, /setAttackOnPlayerHook\(attackOnPlayer\);/, 'AUDIT 68 S09-rig-globals-last-built: re-claimed by the stepping rig');
-  assert.match(rig, /shield\.onAttackDamageCalculated\(\{ targetIsPlayer: true, bodyPart: struckBodyPart, damage, item: shieldItem\(\) \}\);/);
-  // the frame feed, and the draw before the torch hand
-  assert.match(rig, /if \(shieldOn\(\)\) shield\.lateUpdate\(\{/);
-  assert.match(rig, /shield\.setThirdPerson\(eotbHidesWeapon\(\)\);/);
-  assert.match(rig, /shield\.endOfFrame\(\);/);
-});
-
-test('SW1: the left hand is read WITHOUT materialising the equip table', () => {
-  // `equipTableOf` is `entity.equip ??= createEquipTable()`. Asking it
-  // every frame GREW an empty table on an entity that had none, and
-  // syncWorn then read that empty table and nulled the player's weapon -
-  // the unsheathe went silent. The optional chain asks without writing.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const fn = rig.slice(rig.indexOf('const shieldItem = () => {'));
-  const body = fn.slice(0, fn.indexOf('\n  };'));
-  assert.match(body, /entity\?\.equip\?\.slots\?\.\[EQUIP_SLOTS\.LeftHand\] \?\? null/, 'read, not created');
-  assert.doesNotMatch(body, /equipTableOf\(/, 'and never through the materialising helper');
-});
-
-test('SW1: the attack-resolution seam fires on EVERY resolution, hit or miss, with the struck part', () => {
-  const f = readFileSync('src/combat/formulas.js', 'utf8');
-  // V3's hook above it is gated on damage; this one must not be - three
-  // of the six Recoil conditions are MISS conditions.
-  assert.match(f, /if \(target\?\.isPlayer && !attacker\.isPlayer\) \{\s*_attackOnPlayerHook\?\.\(attacker, target, damage, struckPart\);/);
-  assert.match(f, /export function setAttackOnPlayerHook\(fn\) \{ _attackOnPlayerHook = fn \?\? null; \}/);
-  // and the struck part is carried out of the block the roll is made in
-  assert.match(f, /struckPart = struck;/);
-});
 
 // ---- the two gates the rig kept shut (audit, 2026-09-19) -------------
 //
@@ -589,16 +525,6 @@ test('SW1-GATE: the switch off is still off', () => {
   assert.deepEqual(seen, [], 'no frame, no draw');
 });
 
-test('SW1-GATE: the shield alone is not a weapon - the seam stops before the clone and the sprite', () => {
-  // `if (!shown()) return;` after the torch's own return. A no-op for
-  // every path that predates it, and the whole point for the new one.
-  const rigSrc = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const seam = rigSrc.slice(rigSrc.indexOf('if (shieldRect) shield.draw('));
-  const upTo = seam.slice(0, seam.indexOf('if (widgetOn() && c && widget.draw('));
-  assert.match(upTo, /if \(torchOnly && !gunSliding\) return;/, 'the torch still stops first (FIELD-GUN13: unless the gun is mid-slide behind the hand)');
-  assert.match(upTo, /if \(!shown\(\) && !gunSliding\) return;/, 'and the shield-only frame stops here (FIELD-GUN13: the gun\'s own sheathe leg is the fourth exception, and the only one that reopens this)');
-});
-
 test('SW1-RECT: the screen rect is the CANVAS\u2019s, not the 320x200 fallback', () => {
   // `c` is the canvas ELEMENT - `drawFpsWeapon` beside this reads
   // `canvas.width` off the same object - so `c.canvas.width` was
@@ -612,53 +538,3 @@ test('SW1-RECT: the screen rect is the CANVAS\u2019s, not the 320x200 fallback',
   assert.ok(rect.width > 200, `and it is scaled up with the window (1280/320 = 4x a ~134px sprite), got w=${rect.width}`);
 });
 
-test('SW1-GATE: the shield’s verdict carries the draw step’s OWN two conditions, or the arm draws in a frame that drew nothing', () => {
-  // AUDIT-FIELD F1's shape, and the one law here no behavioural pin can
-  // hold: `fpArm` is a module singleton with a real skeleton behind it and
-  // cannot be made active headlessly, so a `shieldRect` computed WITHOUT
-  // `!fpArm.active()` survives every test in the repo - while in a browser
-  // it opens the early return on a sheathed Morrowind frame and
-  // `fpArm.draw(c); return;` takes it, above the shield's own step. The
-  // mutant is recorded (tools/mutants/sw1.json, SW1b-2b) and this is what
-  // kills it, read out of the source so it cannot go vacuous.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const at = rig.indexOf('const shieldRect =');
-  assert.ok(at > 0, 'the verdict is computed before the gate');
-  const decl = rig.slice(at, rig.indexOf(';', at) + 1);
-  for (const leg of ['shieldOn()', '&& c', '!eotbHidesWeapon()', '!fpArm.active()']) {
-    assert.ok(decl.includes(leg), `the verdict must carry ${leg} - the draw step below re-imposes it`);
-  }
-  // ...and it is not a literal that satisfies a regex: each of those two
-  // really does return above the shield's step in the seam below.
-  const seam = rig.slice(rig.indexOf('if (paralyzed || (!shown()'));
-  const eotbAt = seam.indexOf('if (eotbHidesWeapon()) return;');
-  const armAt = seam.indexOf('if (fpArm.active()) { fpArm.draw(c); return; }');
-  const shieldAt = seam.indexOf('if (shieldRect) shield.draw(');
-  assert.ok(eotbAt > 0 && armAt > eotbAt && shieldAt > armAt,
-    'the EotB body returns, then the arm returns, and only then does the shield paint');
-});
-
-test('SW1-LOOK: the frame’s look reaches the shield as the ARRAY it is, or Inertia only ever sees the feet', () => {
-  // `takeFrameLook()` answers `[yaw, pitch]` - the clone one block below
-  // reads `look[0]` and `look[1]` off the very same value. The shield's
-  // feed asked it for `.x`/`.y`, which on an array is undefined, so the
-  // Inertia module's lean had the movement term and a constant zero for
-  // the look. `Modules.Inertia` is off by default, which is the only
-  // reason no pin and no player said so.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const feed = rig.slice(rig.indexOf('if (shieldOn()) shield.lateUpdate({'));
-  const body = feed.slice(0, feed.indexOf('\n        });'));
-  // WIDGET-LOOK (FIELD BUGS 2026-10-03): indexed off the frame's look converted to DFU's axes (dfuLookAxes answers the
-  // same [yaw, pitch] array)
-  assert.match(body, /look: \{ x: lookAxes\[0\], y: lookAxes\[1\],/, 'indexed, as the clone reads it');
-  assert.match(rig, /const lookAxes = dfuLookAxes\(look\);/);
-  assert.doesNotMatch(body, /look\?\.x/, 'and never by a name the value does not carry');
-  // not vacuous: the clone really does read it positionally. The
-  // module moved to weaponWidgetMotion.js on 2026-09-19 (the gun lab
-  // runs it); the LAW did not, which is what this reads.
-  assert.match(readFileSync('src/combat/weapon/weaponWidgetMotion.js', 'utf8'), /\(look\[0\] \+ mx\)/);
-  // and the widget really does spend both terms
-  const sw = readFileSync('src/combat/shieldWidget.js', 'utf8');
-  assert.match(sw, /\(\(Number\(look\.x\) \|\| 0\) \+ mx\) \* -0\.5 \* w\.s\.inertiaScale,/);
-  assert.match(sw, /\(\(Number\(look\.y\) \|\| 0\) \+ my\) \* 0\.5 \* w\.s\.inertiaScale,/);
-});

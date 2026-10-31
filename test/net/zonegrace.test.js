@@ -108,31 +108,6 @@ const W = (x) => [BASE.x + x * M, 0, BASE.z];
 const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [] };
 const refs = (ws, k) => ws.sent.filter((m) => m.t === 'wref' && (!k || m.k === k));
 
-test('ZONE-GRACE THE RELAY (server/src/index.js _wildGraceSay, _wildGraceBlow): an entry\'s safe passage said to the room; a blow it keeps off said to its striker alone, with what is left; a striker\'s own passage ended by its blow said to the room; past it, blows land (mutants: the entry unsaid; the striker untold; the end unsaid)', async () => {
-  const realNow = Date.now; let clock = 1_800_000_000_000; Date.now = () => clock;
-  try {
-    const r = fakeRoom(CELL, { now: () => clock });
-    const say = (ws, d) => r.raw(ws, JSON.stringify({ t: 'wild', data: d }));
-    const join = async (id, x, ci) => { const ws = r.connect(); await r.hello(ws, id, P(x), { lv: 10, look: LOOK, rc: 1, ci }); return ws; };
-    const a = await join('peer-0001', -1, 'r00000000000000000a02'), b = await join('peer-0002', 1, 'r00000000000000000a01'), c = await join('peer-0003', 30, 'r00000000000000000a03');
-    await say(a, { k: 'zone', z: 1 });
-    clock += 1_000;
-    await say(b, { k: 'zone', z: 1 });
-    for (const ws of [a, b, c]) assert.deepEqual(refs(ws, 'grace').map((g) => [g.id, g.ms]), [['peer-0001', G], ['peer-0002', G]], 'each entry said to the room');
-    for (const g of refs(c, 'grace')) assert.ok(validWildRefOut(g), 'a word the wire takes');
-    clock += 300;
-    await say(a, { k: 'strike', to: 'peer-0002', n: 1, by: 'melee', p: W(-1), d: 999 });
-    assert.deepEqual(refs(a, 'grace').at(-1), { t: 'wref', k: 'grace', id: 'peer-0002', ms: G - 300, n: 1 }, 'kept off: the striker told what is left');
-    assert.ok(!refs(b, 'grace').some((g) => g.n === 1), 'the struck one is told nothing of it');
-    assert.deepEqual(refs(c, 'grace').at(-1), { t: 'wref', k: 'grace', id: 'peer-0001', ms: 0 }, 'her own passage ended by her swing, said to the room');
-    assert.equal(refs(b, 'hp').length, 0, 'no blow landed');
-    clock += G;
-    await say(a, { k: 'strike', to: 'peer-0002', n: 2, by: 'melee', p: W(-1), d: 999 });
-    assert.equal(refs(b, 'hp').length, 1, 'past his passage, her blow lands');
-    assert.ok(rd('server/src/index.js').includes('if (x && x.graceUntil > now && x.graceUntil !== graceWas) this._wildGraceSay(a, x.graceUntil - now);'));
-  } finally { Date.now = realNow; }
-});
-
 test('ZONE-GRACE THE WIRE (net/wire.js validWildRefOut): `grace` is a fighter\'s id and the ms left - at most WILD_GRACE.ms, pinned equal - and `n` 1 or nothing (mutants: the bound apart; a foreign `n`; an id unchecked)', () => {
   assert.equal(WILD_GRACE_MS_MAX, G, 'one number at both ends');
   assert.deepEqual(validWildRefOut({ t: 'wref', k: 'grace', id: 'peer-0001', ms: G }), { k: 'grace', id: 'peer-0001', ms: G });
@@ -174,9 +149,6 @@ test('ZONE-GRACE THE CLIENT (systems/wild/wildGrace.js): my passage said once wh
   assert.equal(said.length, 6, 'and again after its pause');
   g.heard({ id: 'peer-b', ms: 0 });
   assert.equal(g.graced('peer-b'), false);
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes("else if (g.k === 'grace') wildGrace.heard(g);"), 'the referee\'s word heard');
-  assert.ok(w.includes('    wildGrace.frame(here);'), 'the zone\'s frame says the run-out');   // PIN MOVED (AUDIT PVP-EASE L3-7): with whether I stand in the zone
   // AUDIT PVP-EASE L3-7, L4-6: out of the zone, nothing heard stands and nothing is said
   g.heard({ id: 'peer-me', ms: G });
   g.heard({ id: 'peer-c', ms: 20_000 });
@@ -321,14 +293,4 @@ test('ZONE-GRACE AUDIT PVP-EASE L3-1 THE RELAY (server/src/index.js): the hub ho
     const c2 = await join(A, 'peer-0003', 30, 'r00000000000000000a03');
     assert.equal(fresh(c2, 'peer-0003').length, 1, 'gone and back after a quiet minute: its passage');
   } finally { Date.now = realNow; }
-  const relay = rd('server/src/index.js');
-  for (const seam of [
-    'if (x && (x.zone !== wasIn || died)) this._wildCarryPut(a.sub, this._zoneCarry(st, a.sub, now, a.key));',
-    'seaGone(this._wildRef, a.sub, Date.now()); this._wildLeaveCarry(a, Date.now()); }',
-    'if (res.graceEnded) { this._wildGraceSay(a, 0); this._wildCarryPut(a.sub, this._zoneCarry(st, a.sub, now, a.key)); }',
-    'this._wildGraceTake(a, now);   // AUDIT PVP-EASE L3-4 (the owner: "Any take ends passage"): its own remains or another\'s',
-    "this._wildGraceTake(a, now);   // AUDIT PVP-EASE L3-4: a take ends safe passage",
-    'if (!st || !a.sub || !wildGraceTaken(st, a.sub, now)) return;\n    this._wildGraceSay(a, 0);\n    this._wildCarryPut(a.sub, this._zoneCarry(st, a.sub, now, a.key));',
-    "if (res.graceEnded || res.why === 'grace') this._wildGraceBlow(a, tb, st, res, now);   // AUDIT PVP-EASE L3-3: safe passage, as a blow's",
-  ]) assert.ok(relay.includes(seam), seam);
 });

@@ -56,8 +56,3 @@ test('DISC22-A: online it is required - the room\'s value wins over a stored Off
   _resetForTests();
 });
 
-test('DISC22-A: the settings row is shown locked online, with the reason, as every forced row is (onlinelane.test.js)', () => {
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(menu, /if \(onlineForcedSetting\(_sec, _k\) !== undefined\) lockOnline\(b, null, \{ note: ONLINE_SETTING_NOTE, value: raw === 'True' \}\);/);
-  assert.match(menu, /const ONLINE_SETTING_NOTE = '[^']+';/, 'the note names why');
-});

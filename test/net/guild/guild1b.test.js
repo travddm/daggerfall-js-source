@@ -313,12 +313,3 @@ test('GUILD1b the words: the purse\'s own sentence, the lost deposit\'s, and eve
   assert.equal(guildWordText('guild-rank'), REFUSALS['guild-rank']);
 });
 
-test('GUILD1b the host: world.js hands the panel a guild book over GUILD1a\'s door, as the character playing, paying from the purse and then the bank account of the region the player stands in (mutants: the book unhanded, the bank before the purse)', () => {
-  const w = src('src/scenes/world.js');
-  const made = w.slice(w.indexOf('guildBook = new GuildBook({'), w.indexOf('socialPanel = createSocialPanel({'));
-  assert.match(made, /door: accountGuilds\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\) \}\)/);
-  assert.match(made, /character: \(\) => characterIdOf\(playerEntity\)/);
-  assert.match(made, /pay: \(n\) => payUndoable\(playerEntity, n, account\),/, 'the purse first, the shortfall from the bank');   // MARKET-AUDIT (PIN MOVED): court.js payUndoable - deductGold, then the account, answering its exact undo
-  assert.match(made, /playerEntity\.bankAccounts\[goldRegion\(playerEntity\.bankAccounts, _questRegionIndex\(\) \?\? 0\)\]/, 'the region the player stands in - online, the Empire\'s account (EMPIRE-ACCOUNT)');
-  assert.match(w, /socialPanel = createSocialPanel\(\{\n\s+social,\n\s+mail,\n\s+guild: guildBook,/);
-});

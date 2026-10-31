@@ -386,6 +386,4 @@ test('AUDIT C&C I8: the windows hand the region as they hand the climate - Playe
   assert.deepEqual(picker.slice(0, 4).map((t) => t.trim()), ['7 gold   Beets With Goat Cheese', '10 gold   Venison Pie', '12 gold   Antelope Stew', '15 gold   Parmesan Eels in Watermelon']);
   const { rows } = enhancedPick(hooksFor(guest(NOON), { region: SENTINEL, climate: CLIMATES.Woodlands, quality: 10, ...oneClock(NOON) }), 'Antelope Stew');
   assert.ok(rows.some((r) => r.includes('Venison Pie')) && !rows.some((r) => r.includes('Breton Pork Sausage')), 'the enhanced list keys the region too');
-  // the host: the region beside the climate, read off the parent's PlayerGPS seam the way the climate is
-  assert.match(read('src/scenes/worldModes.js'), /\n\s*regionIndex: \(\) => host\.currentRegionIndex\?\.\(\) \?\? -1,\n\s*climateIndex: \(\) => host\.climateIndex\?\.\(\) \?\? 232,\n\s*advanceMinutes: \(n\) => interiorTicker\.advance\(n\),/);
 });

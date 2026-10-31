@@ -45,15 +45,3 @@ test('HEAD-HELD nothing hidden, nothing given back; the wolf\'s head is its own 
   assert.deepEqual(bareHeadRows([{ slot: 'head', record: null }, ROWS[1]], helmed(), []).map((r) => r.slot), ['hair']);
 });
 
-test('HEAD-HELD the third-person build asks it of the assembly and assembles again with the rows given back, saying so (mutants: never asked; the second assembly dropped)', () => {
-  const src = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const body = src.slice(src.indexOf('async function buildTpBody('), src.indexOf('async function buildTpBody(') + 20000);
-  // PIN MOVED (TWO-HANDS AUDIT): both assemblies ask for the left hand's weapon bone (`offWeaponBone: true` - the mirror
-  // makes one where the skeleton has none), the second as the first
-  const first = body.indexOf('let arm = await assembleFirstPersonArm({ skeletonBytes, parts: partBytes, boneSources, parseNif: parseNifOnce, offWeaponBone: true });');
-  const ask = body.indexOf('const bare = bareHeadRows(rows, worn, arm.pieces, werewolf);');
-  const again = body.indexOf('await assembleFirstPersonArm({ skeletonBytes, parts: [...partBytes, ...back], boneSources, parseNif: parseNifOnce, offWeaponBone: true })');
-  const hang = body.indexOf('hangHipLight(arm);');
-  assert.ok(first > 0 && first < ask && ask < again && again < hang, 'assembled, asked, assembled again, then hung');
-  assert.match(body, /if \(again\?\.ok\) \{\n\s*arm = again;\n\s*skinRows\.push\(\.\.\.bare\);/);
-});

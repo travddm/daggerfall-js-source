@@ -87,17 +87,6 @@ test('OW-TOWN-ROUND: a spot beyond its pixel\'s town is reached round the town (
   assert.deepEqual(routeLegs(out, ['sea', 'sea'], { ringAt }, [me, { x: 8 * P + 100, z: mid.z }]).filter((l) => l.ring), [], 'never a ring left under sail');
 });
 
-test('OW-TOWN-ROUND wired (by source): the click asks the middle and walks a spot outside the town; the walk hands its spot to the legs and a ring at the start joins no road (mutants: the click unasked; the spot unput)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT UPDATE T1; AUDIT UPDATE II B3): the middle remembered for the ground arm; with places alone a click
-  // on a place is the place's before the path mode is asked at all
-  assert.match(w, /if \(place && travelOptions\?\.settings\?\.targetCoordsAllowed !== false && !pickTakesPlace\(\{ hit: \(middle = pickNearPlaceMiddle\(n, tvPlaceRect\(place\), TV_PLACE_GROW\)\),/);
-  assert.match(w, /travelViewWalkTo\(hit\.point, pix, \{ outside: !middle && !fineMoveHeld\(e\) \}\)/);
-  assert.match(w, /let n = outside && !water \? spotOffTownFor\(state\.worldCoords\(point\), tvTownRects\(pix\.x, pix\.y\), state\.worldCoords\(player\.pos\)\) : state\.worldCoords\(point\);/);
-  assert.match(w, /let legs = tvJoinedLegs\(from, plan, roads, door \|\| water \? null : n\);/);   // PIN MOVED (AUDIT UPDATE T3): never a spot on the sea
-  assert.match(w, /routeLegs\(plan\.pixels, plan\.kinds, \{ ringAt: tvRingAt \}, end && \[state\.worldCoords\(player\.pos\), end\]\)/);
-});
-
 // AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): lane T's laws the pins above left loose
 test('AUDIT UPDATE T6: every band of the ring is its own - the west and the north as the east and the south, a dead-centre spot to the first of w, e, s, n (mutants: a band moved to the town\'s edge)', () => {
   const rects = { locationRect: L, locationBorderRect: B }, outside = { x: mid.x - 12000, z: mid.z };

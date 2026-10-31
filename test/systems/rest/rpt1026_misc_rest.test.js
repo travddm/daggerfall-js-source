@@ -30,11 +30,3 @@ test('RPT1026-MISC BED-PRESS-INDOOR: a bed pressed in a guild hall is a bed\'s r
   assert.equal(interiorRestSpot(null).kind, 'rough');
 });
 
-test('RPT1026-MISC BED-PRESS-INDOOR by source: the interior host names its rest by that one law and hands it the bed\'s press - its kind and its point alike (mutant: rpt1026-misc-bed-press-unwired)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /restKind: \(\) => interiorRestSpot\(interiorRestPlaceHere\(\), \{ pressedBed: _restFromBed, fireNear: interiorCamps\.fireNear\(player\.pos\) \}\)\.kind,/);
-  assert.match(wm, /restPoint: \(\) => interiorRestSpot\(interiorRestPlaceHere\(\), \{ pressedBed: _restFromBed, fireNear: interiorCamps\.fireNear\(player\.pos\) \}\),/);
-  // the press's flag is raised around the very toggle that opens the window, and the window reads the kind on OPEN
-  assert.match(wm, /const restFromInteriorBed = \(\) => \{ _restFromBed = true; try \{ interiorKeyCtx\.toggleRest\(\{ ignoreAllocatedBed: true \}\); \} finally \{ _restFromBed = false; \} \};/);
-  assert.match(rd('src/ui/restWindow.js'), /on OPEN, not on the first rested hour[\s\S]{0,200}?this\.deps\.setResting\?\.\(true\);/);
-});

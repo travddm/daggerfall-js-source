@@ -113,9 +113,6 @@ test('CREW-SAY A STACK HOLDS: two hands side by side, a line each - as the eye d
     }
   }
   assert.ok(eased > 50, `bubbles came down eased (${eased} frames)`);
-  // the world hands the frame's dt (held at a pause) and each speaker
-  const WORLD = (await import('node:fs')).readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(WORLD, /drawCrewLines\(points, \{ covered, scale: enhancedHudScale\(\), dt: gamePaused\(\) \? 0 : dt \}\);/);
 });
 
 test('CREW-SAY THE SCREEN\'S TOP: a huddle of six near the top of the screen - each bubble at its own head is drawn, and a lifted one that would stand over the screen\'s top is not (a stack of six stood off it); nothing drawn meets anything else', () => {

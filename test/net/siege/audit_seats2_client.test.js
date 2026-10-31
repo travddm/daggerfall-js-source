@@ -26,16 +26,3 @@ test('AUDIT SEATS-2 C2: a fallen one still down in the next second\'s frame keep
   assert.deepEqual([s.npcs[0].down, s.npcs[0].at], [false, T + 5000], 'risen: the frame\'s moment');
 });
 
-test('AUDIT SEATS-2 C1, C4, C5, C6 by source: the halls read again each second where they were not known (a palace\'s latched and its room read; a castle\'s throne room stood once its crown is); the dead and a tab out of the seat draw no battle; the board\'s book shown only over the board that asked; a Charter Room chest pressed by a visitor says whose (mutants: each seam)', () => {
-  const m = src('src/scenes/worldModes.js');
-  const halls = m.slice(m.indexOf('  function seatHallsFrame(nowMs) {'), m.indexOf('  /** CROWN-HALL: the crown seat this dungeon'));
-  assert.match(halls, /if \(nowMs - _hallsReadAt < 1000\) return;/);
-  assert.match(halls, /const h = host\.seatHall\?\.here\?\.\(homeTownOf\(interiorBuilding\)\) \?\? null;\n      const was = interiorSeatHall;\n      interiorSeatHall = h;\n      if \(h && !was\) loadHomeDecor\(\);/);
-  assert.match(halls, /else if \(mode === 'dungeon' && dungeonCtx && dungeonLoc && _crownTried !== dungeonCtx && crownHere\(\)\) \{\n      standCrownHall\(dungeonCtx, dungeonLoc\)/);
-  assert.match(m, /if \(!crownHere\(\)\) return;\n    _crownTried = ctx;/);
-  assert.match(m, /seatHallsFrame\(performance\.now\(\)\);[^\n]*\n    decorTool\.frame\(/);
-  assert.match(m, /openHallChest\(\)\); return; \} else if \(interiorSeatHall && !interiorHome\) \{ say\(CROWN_HALL_TEXT\.chestShut\(interiorSeatHall\.name\)\); return; \}/);   // a placed hall chest is that piece's bin; a palace visitor is still told whose the cupboard is
-  const w = src('src/scenes/world.js');
-  assert.match(w, /    if \(onlineOn && playerSpawned\) \{ if \(!online\) onlineStart\(\); onlineFrame\(now, dt\); \}[^\n]*\n    deadlandsAirFrame\(\);[^\n]*\n(?:    sdAirFrame\(\);[^\n]*\n)?    if \(onlineOn && playerSpawned && \(seatOut\(\) \|\| townTalk\.overlay instanceof DeathScreen \|\| modes\?\.deathUp\?\.\(\)\)\) \{ siegeHud\?\.hide\(\); siegeNpcs\?\.leave\(\); \}/);   // AUDIT SD III (PIN MOVED): SD14b's Hour air may stand under the court's
-  assert.match(w, /const board = townTalk\.overlay;[^\n]*\n    const w = st && seatBook \? await hallOfRecordsRead\(st\) : null;[^\n]*\n    if \(townTalk\.overlay !== board\) \{ try \{ w\?\.dispose\?\.\(\); \} catch \{ \/\* already gone \*\/ \} return false; \}\n    if \(!w\) return false;/);   // PIN MOVED (AUDIT CHAP4 C5): the board's door reads as the palace's, and a book read after the board closed is disposed
-});

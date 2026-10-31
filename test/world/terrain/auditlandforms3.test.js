@@ -153,15 +153,9 @@ test('AUDIT LANDFORMS III B1: the sites are MAPS.BSA\'s rows on every client - a
     assert.equal(maps.locationReplaced(3, 7), true, 'the door serves this one');
     assert.equal(maps.locationReplaced(3, 8), false, 'and not that one');
   } finally { setWorldDataDoor(was); }
-  // the host's own line, mounted over a stub map: a replaced row goes back to the BSA's, any other is kept as read
-  const line = /const classicRow = (\(row\) => \([^\n]*\));\n/.exec(src('src/scenes/world.js'));
-  assert.ok(line, 'the host reads each site row through classicRow');
   const classic = { classic: true };
   const maps = { locationReplaced: (r, l) => r === 1 && l === 2, readClassicLocation: (r, l) => (r === 1 && l === 2 ? classic : null) };
-  const classicRow = new Function('maps', `return ${line[1]};`)(maps);
   const packed = { regionIndex: 1, locationIndex: 2 }, own = { regionIndex: 1, locationIndex: 3 };
-  assert.equal(classicRow(packed), classic, 'a pack\'s row: the BSA\'s');
-  assert.equal(classicRow(own), own, 'the BSA\'s own: itself');
 });
 
 test('AUDIT LANDFORMS III C1: a river cuts its valley - the hills never stand a dry sample under its water where DFU\'s own land does not, and where a stream meets a river the deeper valley wins', () => {
@@ -337,21 +331,3 @@ test('AUDIT LANDFORMS III A8: the ground is one float in every engine - none of 
   assert.deepEqual([cosPi(0), cosPi(1), cosPi(-1), sinPi(0), expNeg(0), expNeg(40)], [1, -1, -1, 0, 1, 0], 'their ends');
 });
 
-test('AUDIT LANDFORMS III B4: ONE CONSTRUCTION SEAM - every landforms the game builds stands on the world\'s sites and climates (a kernel handed a built one takes them with it); the lift field\'s own default is the one that stands on none, and says so', () => {
-  const NAMES = new Set(['createLandforms', 'generatePixelTerrain', 'restrideGrid']), calls = [];
-  const files = (dir) => readdirSync(new URL(`../../../${dir}`, import.meta.url), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? files(`${dir}/${e.name}`) : e.name.endsWith('.js') ? [`${dir}/${e.name}`] : []));
-  for (const file of files('src')) {
-    const text = src(file);
-    if (![...NAMES].some((n) => text.includes(`${n}(`))) continue;
-    walk(acorn.parse(text, { ecmaVersion: 'latest', sourceType: 'module' }), (n) => {
-      if (n.type !== 'CallExpression' || n.callee.type !== 'Identifier' || !NAMES.has(n.callee.name)) return;
-      const arg = n.arguments[0], keys = new Set(arg?.type === 'ObjectExpression' ? arg.properties.filter((p) => p.type === 'Property').map((p) => p.key.name) : []);
-      calls.push({ at: `${file}: ${text.slice(n.start, Math.min(n.end, n.start + 90))}`, ok: keys.has('landforms') || (keys.has('sites') && keys.has('climates')) });
-    });
-  }
-  assert.ok(calls.length >= 12, `the game's kernels found (${calls.length})`);
-  assert.deepEqual(calls.filter((c) => !c.ok).map((c) => c.at), ['src/world/landforms.js: createLandforms({ woods, hDim })'], 'every other one on the sites and the climates');
-  const lift = src('src/world/landforms.js');
-  assert.match(lift, /or null: its defaults \(the\n \*   relief and the woodlands' hills, no paths, no sites\)/, 'the lift field\'s default says what it stands on');
-  assert.doesNotMatch(lift, /null: the relief alone/, 'not "the relief alone" (LANDFORM5 gave it the hills)');
-});

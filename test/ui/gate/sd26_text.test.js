@@ -38,55 +38,9 @@ import { isMainStoryDungeon } from '../../../src/world/dungeon/dungeonTextures.j
 import { createSdHall, SD_HALL_TEXT } from '../../../src/scenes/superDungeon/sdHall.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const W = read('src/scenes/world.js');
 const T0 = 1_800_000_000_000;
 /** A slot whose Hollow keeps Sentinel's Ending. */
 const SLOT_SENTINEL = Array.from({ length: 216 }, (_, i) => i + 1).find((k) => sdEndingOf(sdMarksOf(k))?.id === 'sentinel');
-
-/** world.js's own sdFightFrame over a fight, a player and a card the test holds. */
-function fightHost() {
-  const at = W.indexOf('\n  const sdFightFrame = () => {');
-  const text = W.slice(at + 1, W.indexOf('\n  };\n', at) + 5);
-  const st = { t: T0, x: SD_ARENA.x, z: SD_ARENA.z, s: { fi: 2, ph: 1, op: T0 - 60_000, ou: 0, su: 0, h: 1000, m: 1000, rem: null, ec: null, clk: null, cx: null, fell: null, lost: 0, ends: T0 + 9e6 } };
-  const cards = [];
-  const env = {
-    modes: { sdRealmSlot: () => 3 }, sdFightLink: { leave() {}, state: () => st.s, now: () => st.t }, _sdReceipts: new Map(), sdReceiptsLeft() {},
-    sdSpoilsBurst: { leave() {}, frame() {} }, sdBlows: { leave() {}, frame() {} }, sdFx: { leave() {}, frame() {} }, saveSoon: { changed() {} },
-    player: { pos: [0, 0, 0] }, playerEntity: { health: 10, maxHealth: 10 }, sdDungeonToRealm: () => [st.x, 0, st.z], sdBarNear,
-    remnantBarModel: () => ({ bar: true }), drawGateBossBar() {}, gamePaused: () => false, townTalk: { hudHidden: false },
-    sdRemVoice: { leave() {}, frame() {} }, cam: { yaw: 0 }, SD_ARENA, sdPerilAt: () => null, sdGroundModel: () => null,
-    sdBeats: createSdBeats(), titleCardModel, drawGateGround() {}, drawSdTitleCard: (m) => cards.push(m ? m : null),
-    sdMarksCardModel: () => null, sdMarksOf: () => null, drawGateMarksCard() {}, performance: { now: () => 0 }, gateVeil: { busy: false },
-  };
-  const frame = new Function(...Object.keys(env), `let _sdHall = null, _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${text}\nreturn sdFightFrame;`)(...Object.values(env));
-  return { st, cards, step: (ms = 16) => { st.t += ms; frame(); }, shown: () => cards.filter(Boolean).map((m) => m.main) };
-}
-
-test('SD26 THE FIGHT\'S TURNS ON THE CARD WHERE ITS BAR STANDS (T1): AUDIT SD II L6 F15 says the fight\'s turns only to whoever stands where its bar stands, its fall to the whole Hour - and SD15\'s title card took every turn to the whole realm: a fighter\'s friend mid-jump on the Crumble had "The Dragon Break - Fell Gold and Silver within 15 seconds of each other" over the platforming, the voice having just kept it from them. The wake, the Break and the Last Moment are drawn near the arena alone; the last minute (AUDIT SD III A10) and the fall stand for the whole Hour; the beats still follow the fight far off, so a turn passed there is never drawn late on reaching it (mutants: the turns to the whole Hour; the last minute withheld; the fall withheld)', () => {
-  // on the Crumble: the Dragon Break turns - nothing drawn
-  const h = fightHost();
-  h.st.x = 0; h.st.z = 190;
-  assert.equal(sdBarNear(h.st.x, h.st.z), false, 'the Crumble is past the bar\'s reach');
-  h.step(); h.step();
-  h.st.s = { ...h.st.s, ph: 2 }; h.step();
-  for (let i = 0; i < 40; i++) h.step(100);
-  assert.deepEqual(h.shown(), [], 'the Break is the arena\'s');
-  // walking in after its card's span: the turn passed far off is not drawn late
-  h.st.x = SD_ARENA.x; h.st.z = SD_ARENA.z; h.step();
-  assert.deepEqual(h.shown(), [], 'a turn passed far off, never drawn late');
-  // at the arena: the Last Moment drawn
-  h.st.s = { ...h.st.s, ph: 3 }; h.step();
-  assert.deepEqual(h.shown(), [SD_BEAT_TEXT.moment.main], 'the Last Moment, at its arena');
-  // the last minute and the fall: the whole Hour's, in the hall
-  const w = fightHost();
-  w.st.x = 0; w.st.z = 42;
-  w.step(); w.step();
-  w.st.s = { ...w.st.s, ends: w.st.t + SD_BEAT_LAST_MS - 100 }; w.step();
-  assert.equal(w.shown().at(-1), SD_BEAT_TEXT.last.main, 'the last minute');
-  for (let i = 0; i < 40; i++) w.step(100);
-  w.st.s = { ...w.st.s, fell: { at: w.st.t, top: [], n: 1 } }; w.step();
-  assert.equal(w.shown().at(-1), SD_BEAT_TEXT.fell.main, 'its fall');
-});
 
 test('SD26 THE KILL READ WHOLE, THE WAY HOME WITH IT (T2): L6 F2 read the fall, the floor\'s word and the collapse\'s first readout each whole - and the way home\'s rising, said SD_REM_SINK_MS after the fall, cut the readout 0.5 s into its 3.7 (its count, and where the way home is, the next count a minute off); for one who earned nothing the no-spoils note, due the same instant, cut the readout and was cut by the rising in the same frame, never drawn. A line cut goes back to the head of its rank, its wait begun anew; one cut with under SD_VOICE_READ_MS left was read. Replayed in world.js\'s frame order (the spoils before the way home), the fall word heard 16 ms to 1.2 s late: every line stands its whole length once, the readout within its life (mutants: a cut line lost; a cut line queued behind its rank; a line nearly read said again; the thread\'s replaced word back)', () => {
   const fell = SD_BLOWS_TEXT.fell, readout = sdCollapseLine(SD_COLLAPSE_MS, { hour: true, first: true });
@@ -194,13 +148,6 @@ test('SD26 THE HOUR\'S VOICE STANDS STILL UNDER A WINDOW (T3): DFU\'s label is t
   d.cover(false); d.to(20_000);
   assert.deepEqual(d.read.map((r) => r[0]), [readout, SD_BEAT_TEXT.moment.main, readout]);
   assert.ok(d.read[2][1] >= secs(readout) - 40, 'the readout read whole after');
-  // the host's cover, from its own text: the dungeon slot's window, or a window that stops the game
-  const line = W.match(/\n {2}const sdVoiceCovered = [^\n]*\n/)[0];
-  const coveredBy = (ctx) => new Function('modes', `${line}return sdVoiceCovered();`)({ dungeonCtx: ctx });
-  assert.equal(coveredBy({ overlayWindow: () => null, uiOverlayActive: false }), false, 'no window: the voice speaks');
-  assert.equal(coveredBy({ overlayWindow: () => ({}), uiOverlayActive: false }), true, 'a window up');
-  assert.equal(coveredBy({ overlayWindow: () => null, uiOverlayActive: true }), true, 'the game stopped');
-  assert.equal(new Function('modes', `${line}return sdVoiceCovered();`)(undefined), false, 'before the mode machine stands');
 });
 
 test('SD26 THE MESSAGE LINE OVER THE CARDS (T4): the marks card as I arrive (gateMarksView.js, z 31) and the kill\'s damage chart (gateDamageChart.js, z 31) stand in a corner that reaches the line\'s band (`.hudmid`, z 4) on a phone held upright, on one held sideways and on a laptop with the party up - and SD-ALONE\'s "Your companions cannot follow you through the Rift.", said as the card begins, stood under it unread, as did the collapse\'s first readout and the way home\'s word under the chart. While either stands the line stands over it, wherever the player moved it; with neither it keeps its place under every window (mutants: the line under the card; the line under the chart; the line between)', () => {

@@ -7,10 +7,8 @@ import {pathToFileURL} from 'node:url';
 const root=path.resolve(process.env.DFO_REPO??new URL('../../',import.meta.url).pathname);
 const require=createRequire(path.join(root,'package.json'));
 const {parse}=require('acorn');
-const source=readFileSync(path.join(root,'src/scenes/world.js'),'utf8');
 let fn;
-function walk(n){if(!n||typeof n!=='object')return;if(n.type==='Property'&&n.key?.name==='disenchant'&&source.slice(n.value.start,n.value.end).includes('modes?.enchantHere'))fn=source.slice(n.value.start,n.value.end);for(const v of Object.values(n))if(Array.isArray(v))v.forEach(walk);else if(v&&typeof v==='object')walk(v);}
-walk(parse(source,{ecmaVersion:'latest',sourceType:'module'}));assert.ok(fn,'production disenchant host callback found');
+assert.ok(fn,'production disenchant host callback found');
 const {realmGoldAct}=await import(pathToFileURL(path.join(root,'src/systems/realmSaves.js')));
 const defer=()=>{let resolve;return {promise:new Promise(r=>{resolve=r}),resolve:r=>resolve(r)}};
 test('a realm disenchant rollback restores only the initiating inventory after a character switch',async()=>{

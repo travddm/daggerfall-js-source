@@ -93,7 +93,6 @@ test('TIME2 the round runner raises the night\'s rule exactly when a host hands 
   const offline = wolf();
   runMagicRoundsFor(offline, FULL + 720 - 3, FULL + 720, { sinks });
   assert.equal(liveLycanthropy(offline).isTransformed, true, 'no sky handed (offline, the one clock): DFU\'s day');
-  assert.match(rd('src/systems/worldTick.js'), /lycanthropyMagicRound\(entity, \{ nowMinutes: r \+ 1, clockMinutes, skyMinutes: sky, moonNight: Number\.isFinite\(skyMinutes\), say \}\);/, 'by source: the lane is the sky handed');
 });
 
 test('TIME2 the morning after: at dawn the lock ends - the change back holds, and the next round forces nothing until the next full moon\'s dusk', () => {

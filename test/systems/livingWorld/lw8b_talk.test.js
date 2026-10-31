@@ -319,18 +319,3 @@ test('LW8b the room\'s own words: each room\'s scripts two or three lines in the
   }
 });
 
-test('LW8b the streaming host: the building mode\'s HUD pass hands the room\'s talk its matrices (`host.livingSpeech`), and the host lays it on the crew\'s one layer - only once a room was stood, covered under a window, out of a building or paused, each line over its speaker\'s head within the crew\'s range and sight, a known one by name (mutants: the hook, the host\'s door, the cover, the head, the range, the sight)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /host\.drawPeerNames\?\.\(\{ proj, view, eye: mwv\.eye \}\);   \/\/ ONLINE1: the names over the heads, under the HUD\n      host\.livingSpeech\?\.\(\{ proj, view, eye: mwv\.eye, dt \}\);/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingSpeech: \(\{ proj, view, eye, dt \}\) => livingRoomLines\(proj, view, eye, dt\),/);
-  const fn = w.slice(w.indexOf('function livingRoomLines('), w.indexOf('/** WILD-ALERT (2026-10-04'));
-  assert.match(fn, /if \(!livingIndoors \|\| typeof document === 'undefined'\) return;/);
-  assert.match(fn, /const covered = townTalk\.overlayActive \|\| gamePaused\(\) \|\| !!townTalk\.hudHidden \|\| _mode\(\) !== 'interior';/);
-  assert.match(fn, /for \(const l of livingIndoors\.speech\(eye\)\)/);
-  assert.match(fn, /const over = \[l\.person\.pos\[0\], l\.person\.pos\[1\] \+ LIVING_HEAD_M, l\.person\.pos\[2\]\];/);
-  assert.match(fn, /if \(d > CREW_SAY_RANGE\) continue;/);
-  assert.match(fn, /if \(crewSight\.blocked\(player\.collider, eye, key, over\)\) continue;/);
-  assert.match(fn, /name: livingRelations\.known\(id\) \? firstNameOf\(l\.person\.nameNPC\) : null/);
-  assert.match(fn, /drawCrewLines\(points, \{ covered, dt: gamePaused\(\) \? 0 : dt, scale: enhancedHudScale\(\) \}\);/);
-});

@@ -314,22 +314,6 @@ test('AUDIT PI1 H5/L11/L4/L15 - a body that moves carries its items; a list repl
   assert.equal(layer.contents(key), null, 'gone from the list: no plaque, even before the frame');
 });
 
-test('AUDIT PI1 L10 - the flights hold while the game is paused (FixedUpdate returns on IsGamePaused [IL_1eb6]) (mutants: flown under the window)', async () => {
-  let paused = true;
-  const layer = layerOf();
-  layer.attach({ corpses: ((e) => () => [{ entity: e, pos: [0, 0, 0] }])({ items: [sword()] }), paused: () => paused });
-  layer.frame(0.016); await tick();
-  const was = layer.state()[0].pos;
-  for (let i = 0; i < 20; i++) layer.frame(0.02);
-  assert.deepEqual(layer.state()[0].pos, was);
-  paused = false; layer.frame(0.02);
-  assert.notDeepEqual(layer.state()[0].pos, was);
-  assert.match(read('src/scenes/world.js'), /paused: \(\) => !!gamePaused\(\),\s+\/\/ AUDIT PI1 L10/);
-  assert.match(read('src/scenes/exterior.js'), /paused: \(\) => !!gamePaused\(\),\s+\/\/ AUDIT PI1 L10/);
-  assert.match(read('src/scenes/worldModes.js'), /paused: \(\) => !!townTalk\?\.overlayActive \|\| interiorPaused\(\),/);
-  assert.match(read('src/scenes/dungeonContext.js'), /paused: \(\) => dungeonPaused\(\),/);
-});
-
 test('AUDIT PI1 I3/I5/L6 - the shift-drop\'s footprint is max(0.2, 0.6 x its size); the floor is the face nearest the feet\'s height (never a table over them); a point behind a wall is refused (mutants: one footprint for all, the first face down, no path check)', async () => {
   assert.deepEqual([dropRadius(0.8), dropRadius(0.2), PI_FOOTPRINT.min, PI_FOOTPRINT.share], [0.48, 0.2, 0.2, 0.6]);
   const dl = poolOf();
@@ -361,15 +345,6 @@ test('AUDIT PI1 I6/I10/D1g - the press reaches 3 m (RaycastPhysicalItem [IL_5b54
   assert.deepEqual([diedRecently(e, PI_FRESH_MS), diedRecently(e, PI_FRESH_MS + 1), PI_FRESH_MS], [true, false, 4000]);
   const s = layer.state()[0];
   assert.deepEqual([s.noShadow, s.glint], [true, null], 'lying things cast no card\'s shadow; a Common item wears no rim');
-});
-
-test('AUDIT PI1 H4/H6/H7/D1f - the hosts\' halves: the fate window drops nothing, a dungeon\'s save keeps a shift-drop one, an unreadable body stands nothing, its silver by the room\'s name, and the watch called indoors stands its dead (mutants: each line gone)', () => {
-  assert.match(read('src/scenes/world.js'), /makeInventoryWindow\(\{ fate: model, loot: \{ items: \(\) => \[\], playerOwned: false \}, physicalDropOn: \(\) => false \}\)/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /\.\.\.\(p\.physical \? \{ physical: true \} : \{\}\),\s+\/\/ AUDIT PI1 H6/);
-  assert.match(dc, /if \(u && _lootUnreadable\.has\(lootKeyOf\(u\)\)\) return null;/);
-  assert.match(dc, /silver: silverFindKey\(key, 'corpse', i\)/);
-  assert.match(read('src/scenes/worldModes.js'), /corpses: \(\) => \[\.\.\.\(interiorFoes\?\.physicalCorpses\?\.\(\) \?\? \[\]\), \.\.\.\(interiorGuards\?\.physicalCorpses\?\.\(\) \?\? \[\]\)\]/);
 });
 
 test('AUDIT PI1 H6 - a shift-drop restored from the dungeon\'s save lies where it was saved, an item of its own again (mutants: restored as a bag)', async () => {

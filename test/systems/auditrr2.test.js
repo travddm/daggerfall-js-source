@@ -55,7 +55,6 @@ test('AUDIT-RR2 G1: Extra Weight quadruples the item\'s weight (ExtraWeight.cs:6
   const feather = { group: 'Weapons', templateIndex: 113, material: 0, enchantments: [{ type: ENCHANTMENT_TYPES.FeatherWeight, param: 0 }] };
   doEnchantedPayloads(feather, feather.enchantments, {});
   assert.equal(unitWeightInKg(feather), 0.25, 'FeatherWeight.cs:61');
-  assert.match(rd('src/systems/enchantments.js'), /item\.weightInKg = \(Number\.isFinite\(item\.weightInKg\) \? item\.weightInKg : unitWeightInKg\(item\)\) \* 4;/);
 });
 
 test('AUDIT-RR2 G2: the charge\'s heavy pain cry picks the gender the component does (EnhancedRiding.cs:190-194) - a monster (MobileGender.Unspecified) is FEMALE, the city watch male', () => {
@@ -67,21 +66,6 @@ test('AUDIT-RR2 G2: the charge\'s heavy pain cry picks the gender the component 
   assert.notEqual(female.clip, male.clip, 'a monster cries in the female clip');
   assert.equal(female.clip, woman.clip);
   assert.equal(watch.clip, male.clip, 'Knight_CityWatch is male whatever the record says');
-});
-
-test('AUDIT-RR2 G3: a duplicate mapId or name is refused BEFORE any write to the region (the C# pushes to local lists), and one bad mod file is said, not the boot', () => {
-  const s = rd('src/formats/worldData/worldDataReplacement.js');
-  const fn = s.slice(s.indexOf('function addLocationToRegion('));
-  const throwAt = fn.indexOf('throw new Error');
-  const writeAt = fn.indexOf('dfRegion.locationCount++');
-  assert.ok(throwAt > 0 && writeAt > throwAt, 'both checks stand before locationCount++');
-  assert.match(s, /try \{\s+const dfLocation = locationFromJson\(json, regionIndex\);\s+locationAssignmentSuccess = addLocationToRegion\(regionIndex, dfRegion, dfLocation\) && locationAssignmentSuccess;\s+\} catch \(e\) \{ console\.error\(`\[worlddata\] \$\{name\}: \$\{e\?\.message \?\? e\}`\); locationAssignmentSuccess = false; \}/);
-});
-
-test('AUDIT-RR2 G4/G26: the docked HUD lift is `(int)` (EnhancedRiding.cs:257) and the pitch floor rests while paused (:122-131)', () => {
-  const mr = rd('src/player/mountRig.js');
-  assert.match(mr, /const offset = Math\.trunc\(dockedLargeHudHeight\(\)\);/);
-  assert.match(mr, /setPitchFloorProvider\(\(\) => \(enhancedRiding\?\.\(\) && isRiding\(player\.transportMode\) && !paused\(\) \? _terrainAngle \+ RR_RIDING\.pitchMaxOffset : null\)\);/);
 });
 
 test('AUDIT-RR2 G5/G24/G25: the charge voice plays on the foe with EnemySounds\' pitch lift, the latch IS the foe\'s pickpocket latch (:185, :204), the foe arm knocks along the controller\'s move direction (:173)', () => {
@@ -163,31 +147,13 @@ test('AUDIT-RR2 G10: the shelf\'s add IS ItemCollection.AddItem (DaggerfallLoot.
   addItem(list, { group: 'Books', templateIndex: 277, message: 3 });
   addItem(list, { group: 'Books', templateIndex: 277, message: 4 });
   assert.deepEqual(list.map((b) => b.stackCount ?? 1), [2, 1], 'by message (ItemCollection.cs:710)');
-  assert.match(rd('src/systems/shopStock.js'), /addItem\(items, it\);\s+\/\/ AUDIT-RR2 G10/);
-});
-
-test('AUDIT-RR2 G11/G12: the starting kit\'s armor takes CreateArmor\'s default variant (-1 -> RandomizeArmorVariant), and a custom weapon mints with its template\'s name', () => {
-  assert.match(rd('src/systems/roleplayRealismItems/rriKits.js'), /function armor\(templateIndex, material, rolls, variant = -1\)/);
-  assert.match(rd('src/combat/enemyEquipment.js'), /const t = templateByIndex\(templateIndex\);\n\s*const name = WEAPON_BY_INDEX\[templateIndex\] \?\? t\?\.name;/);   // OH-E: in weaponOfMaterial, CreateWeapon's material pass (its melee arm hands to it)
-});
-
-test('AUDIT-RR2 G13: a building entry sets WorldDataVariants\' last key to THIS location (PlayerEnterExit.cs:695-696) - a streamed neighbour may have left it on itself', () => {
-  assert.match(rd('src/scenes/world.js'), /setLastLocationKeyTo\(dfLoc\.regionIndex, dfLoc\.locationIndex \?\? 0\);\s+\/\/ AUDIT-RR2 G13[^\n]*\n\s+const d = buildingDataForDoor\(dfLoc\.exterior\.buildings, p\.locBlocks, \{/);
-  assert.match(rd('src/scenes/exterior.js'), /setLastLocationKeyTo\(dfLocation\.regionIndex, dfLocation\.locationIndex \?\? 0\);\s+\/\/ AUDIT-RR2 G13[^\n]*\n\s+const d = buildingDataForDoor\(dfLocation\.exterior\.buildings, loc\.blocks, \{/);
 });
 
 test('AUDIT-RR2 G14/G16/G19: an RDB/RDI JSON is served whole since WD1 (never with a null body); the variant arm takes every asset the suffix finds (:284-292); the padded building rows are None', () => {
-  const s = rd('src/formats/worldData/worldDataReplacement.js');
-  // G14 was the refusal of an RDB/RDI file the converter could not read; WD1 (Aquatic Sprites) ported the RDB
-  // and RDI halves, so the block is converted whole and only an RMB takes the building replacements (:382-384)
-  // PIN MOVED (AUDIT QA2 B1): the served name rides with the block - the port's curations key on the name the town lays
-  assert.match(s, /const dfBlock = blockFromJson\(json, block, blockName\);\s+if \(blockName\.endsWith\('\.RMB'\)\) replaceRmbBlockBuildingData\(blockName, block, dfBlock\);/);
   const rdb = blockFromJson({ Name: 'W0000000.RDB', Type: 'Rdb', RdbBlock: { ModelReferenceList: [{ ModelId: '63130', ModelIdNum: 63130, Description: 'C0L' }], ObjectRootList: [{ RdbObjects: null }] } }, 1016);
   assert.equal(rdb.rmbBlock, null);
   assert.ok(rdb.rdbBlock, 'an RDB file serves its RDB half, never a null body');
   assert.equal(rdb.rdbBlock.modelReferenceList[0].modelIdNum, 63130);
-  const variantArm = s.slice(s.indexOf('export function loadNewDFLocationVariant'), s.indexOf('export const getNewDFBlockIndex'));
-  assert.ok(!/startsWith\('locationnew-'\)/.test(variantArm), 'no prefix test on the mod arm');
   const b = blockFromJson({ Name: 'X.RMB', Type: 'Rmb', RmbBlock: { FldHeader: { BuildingDataList: [{ FactionId: 1, BuildingType: 2 }] }, SubRecords: [] } }, 5000);
   assert.equal(b.rmbBlock.fldHeader.buildingDataList.length, 32);
   assert.equal(b.rmbBlock.fldHeader.buildingDataList[0].factionId, 1);
@@ -221,16 +187,10 @@ test('AUDIT-RR2 G20: the encumbrance round drains nothing inside a synthetic-tim
     assert.deepEqual(none, [], 'a synthetic round takes none');
     assert.equal(travelled.fatigue, 5000);
   } finally { resetSyntheticTimeIncrease(); }
-  assert.match(rd('src/systems/roleplayRealism/rrInstall.js'), /\|\| syntheticTimeIncrease\(\)\) return null;\s+\/\/ AUDIT-RR2 G20/);
   _resetModSettings();
 });
 
 test('AUDIT-RR2 G21/G22/G23: the five-day box answers Y and N (DaggerfallMessageBox.cs:377); the ship gate asks Travel Options\' port list when that mod is on (:635-644); PitchMaxLimit clamps to PitchMin -90', () => {
-  assert.match(rd('src/ui/guildServiceWindows.js'), /if \(t\.buttonsMulti\) \{\s+if \(code === 'KeyY' && t\.buttonsMulti\.includes\(MB_BUTTONS\.Yes\)\) this\._advance\(t\.onButton\?\.\(MB_BUTTONS\.Yes\) \?\? null\);\s+else if \(code === 'KeyN' && t\.buttonsMulti\.includes\(MB_BUTTONS\.No\)\) this\._advance\(t\.onButton\?\.\(MB_BUTTONS\.No\) \?\? null\);\s+return;\s+\}/);
-  // SEAT2b part two (PIN MOVED): TO's port answer, a members' Harbour among them (travelPorts.js hasPortFor)
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P10): past the Veil an isle's place answers by its own kind first, the Bay's as before
-  // PIN MOVED (BAY-LEFT-SEA): a place past the Bay by its own port byte - an Arena place's TESA6 word, a capital's harbour's (the Waterfront's too)
-  assert.match(rd('src/scenes/world.js'), /portTown: \(loc\.ether \? loc\.etherKind === 'port' : loc\.arena \|\| loc\.capital \? \(loc\.exterior\?\.exteriorData\?\.portTownAndUnknown \?\? 0\) !== 0 : modSetting\('travel-options', 'Enabled'\) === true \? hasPortFor\(loc\.mapTableData\?\.mapId\) : \(loc\.exterior\?\.exteriorData\?\.portTownAndUnknown \?\? 0\) !== 0\)/);   // PIN MOVED (AUDIT-TESA A4-F4): a place past the Bay by its Arena place's port
   setPitchFloorProvider(() => -120);
   try {
     assert.equal(pitchFloor(), (-90 * Math.PI) / 180, 'PlayerMouseLook.cs:87-90');

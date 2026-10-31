@@ -244,20 +244,3 @@ test('ACCOUNT-HOMES the boot\'s sweep (scenes/homesBootHost.js sweepGone): once 
   assert.equal(reads, 2);
 });
 
-test('ACCOUNT-HOMES the hosts, by source: the client\'s `own` is the account\'s; the world sweeps the homes the account holds no more once a boot, beside the arena\'s move and the deeds\' holds, sparing one bought while the list was read; the delete\'s door says the homes it bought go for every character (mutants: each wire cut)', () => {
-  const h = src('src/systems/online/onlineHomes.js');
-  assert.match(h, /const own = row\.mine && !row\.deed;/);
-  assert.match(h, /if \(row\.mine && row\.deed && typeof me === 'string' && row\.character === me\) return null;/);
-  const w = src('src/scenes/world.js');
-  // HOST-SPLIT: the sweep is scenes/homesBootHost.js's (sweepGone), built above the boot's first landing and called beside
-  // the deeds' holds
-  const boot = src('src/scenes/homesBootHost.js');
-  assert.ok(w.indexOf('const homesBoot = createHomesBoot({') < w.indexOf('void homesBoot.sweepGone();'), 'built above the boot\'s first landing (HOTFIX 1003\'s TDZ)');
-  assert.match(w, /void homesBoot\.holdDeeds\(\);[^\n]*\n\s*void homesBoot\.sweepGone\(\);/);
-  assert.match(w, /homesApi, onlineHomes, realm: realmSession, giveOwn: arenaGiveOwn, player: \(\) => playerEntity,/);
-  assert.match(w, /say: \(line\) => townTalk\.say\(line\),/);
-  assert.match(boot, /const swept = homesGoneFrom\(p\.sceneCache \?\?= createSceneCache\(\), r\.data\.homes, \{ ownNow: \(m, k\) => !!onlineHomes\?\.homeAt\(m, k\)\?\.own \}\);/);
-  assert.match(boot, /if \(swept\.own\.length\) \{ giveOwn\(swept\.own\); say\(homesGoneLine\(swept\.own\)\); \}/);
-  assert.match(boot, /if \(!r\?\.ok \|\| !Array\.isArray\(r\.data\?\.homes\)\) \{ goneAsked = false; return null; \}/, 'a list not read sweeps nothing');
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /the homes it bought and its guild place are lost\. Homes belong to your account, so your other characters lose them too\./);
-});

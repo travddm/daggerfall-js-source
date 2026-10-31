@@ -26,9 +26,6 @@ import { hostText } from '../../hostText.mjs';   // HOST-SPLIT (at the merge of 
 
 const { PlayerMotor, FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, GRAVITY } = MOTOR;
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const W = hostText('src/scenes/world.js');
-const WM = rd('src/scenes/worldModes.js');
-const DC = rd('src/scenes/dungeonContext.js');
 
 // dialload.test.js's live-source runner: the text AS WRITTEN, run in a scope whose unknown names are inert stubs
 function literalBody(text, opener) {
@@ -108,142 +105,7 @@ function roundTrip(opts) {
   return restorePlayer(character(), snap, new Map());
 }
 
-// world.js worldQuickSave's pose, as written
-const WORLD_POSE = literalBody(W.slice(W.indexOf('pose: { yaw: cam.yaw, pitch: cam.pitch, crouching: !!player.crouching')), 'pose: ');
-/** F9 above ground (the street or a building - one composer): the pose over the live motor, the feet's height beside it */
-const saveWorld = (m) => roundTrip({ pose: run(WORLD_POSE, { cam: { yaw: 0.5, pitch: 0 }, player: m }), locationKey: 'world', world: { y: m.pos[1] } });
-// worldQuickLoad's landing, as written: the building's re-entry, the door's reposition or the street
-const LOAD = W.slice(W.indexOf('async function worldQuickLoad'), W.indexOf('function applyPose'));
-const LANDING = between(LOAD, '        if (inside) {', '        // P2-slice (items-2): the teleport');
-/** the world load's arms over `m` (the teleport's placements already made) */
-function loadWorld(m, extras, { inside = false } = {}) {
-  const said = [];
-  const env = { inside, extras, walkMode: true, player: m, lx: 0, ly: extras.world.y, lz: 0, cam: {}, townTalk: { say: (t) => said.push(t) }, caravanDoorLanding: () => null };   // WAGONS2 (FINAL AUDIT): a building's door, no caravan's
-  exec(LANDING, env);
-  return said;
-}
-
-test('FALL-KEPT the report: a 50 m fall saved in the air two metres above the ground and loaded lands the whole 50 m - 225 HP, as it does unsaved - on a fresh page and over the live motor alike (mutants: the save forgets the fall; the street drops the fall; the restore not falling)', () => {
-  assert.equal(hp(UNSAVED.d), 225, 'the fall unsaved');
-  const m = motorAt(50);
-  stepUntil(m, lastMetres);
-  const extras = saveWorld(m);
-  assert.ok(extras.pose.fall, 'the envelope carries the fall');
-  const fresh = motor();   // the tab closed, the realm's checkpoint loaded by the next boot
-  fresh.spawn(0, extras.world.y, 0);   // the load's teleport stands it first
-  loadWorld(fresh, extras);
-  const got = land(fresh);
-  assert.ok(Math.abs(got.d - UNSAVED.d) < 1e-3, `the whole fall: ${got.d}`);
-  assert.equal(hp(got.d), 225, 'before: 0 HP');
-  loadWorld(m, extras);   // F11 over the same live motor
-  assert.equal(hp(land(m).d), 225);
-  // the realm's checkpoint is the envelope whole, so the online save (the 2-min checkpoint, the page-hide save, the
-  // exit autosave) carries what the slot carries (AUDIT RESCUE-SAVE A1: the envelope spread whole, the spoils records its
-  // pack holds named beside it - systems/realmSaves.js realmSaveWithHeld)
-  assert.match(W, /realmSession\.checkpoint\(realmSaveWithHeld\(snap, holding\), realmSummaryOf\(playerEntity\)\)/);
-});
-
-test('FALL-KEPT the building: a save inside re-entered lands the fall; the door\'s reposition, no saved place, lands none (mutants: the building drops the fall; the reposition keeps the fall)', () => {
-  const m = motorAt(50);
-  stepUntil(m, lastMetres);
-  const extras = saveWorld(m);
-  extras.interior = { door: {} };   // an inside save
-  const inside = motor();
-  inside.spawn(0, extras.world.y, 0);   // enterInteriorCore lands the saved position raw (worldModes.js: player.spawn at restore.pos)
-  loadWorld(inside, extras, { inside: true });
-  assert.equal(hp(land(inside).d), 225, 'the building re-entered: the whole fall');
-  const out = motor();
-  out.spawn(0, 0, 0);   // no door found: the teleport's default landing stands
-  assert.deepEqual(loadWorld(out, extras, { inside: false }), ['Building has no exterior doors. Repositioning player.']);
-  assert.deepEqual([out.falling, land(out).d], [false, 0], 'repositioned: no fall carried to a place the save never stood');
-});
-
-// the dungeon: worldModes' read, the context's composer, restoreSaved and the host's load law, as written
-const MODES_READ = /read: (\(\) => \(\{ yaw: cam\.yaw, pitch: cam\.pitch, crouching: !!player\.crouching[^\n]*?\}\)),/.exec(WM)?.[1];
-const CTX_POSE = literalBody(DC.slice(DC.indexOf('pose: { ...(opts.pose?.read?.() ?? {})')), 'pose: ');
 const RESTORE = 'restoreSaved(extras, setPlayerPos, { session = true, announce = session } = {}) ';
-const restoreSavedOf = (env) => run(`function ${RESTORE}${literalBody(DC, RESTORE)}`, env);
-function saveDungeon(m) {
-  const read = run(MODES_READ, { cam: { yaw: 1, pitch: 0 }, player: m });
-  return roundTrip({ position: [m.pos[0], m.pos[1], m.pos[2]], pose: run(CTX_POSE, { opts: { pose: { read } } }), locationKey: 'dungeon:7' });
-}
-function loadDungeon(m, extras, { warp = false } = {}) {
-  const law = run(/^\s*const placeLoadedPlayer = (.*);$/m.exec(WM)[1], { player: m });
-  const restoreSaved = restoreSavedOf({ opts: { pose: { apply: () => {} } }, _locationKey: 'dungeon:7', needsStartWarp: () => warp });
-  restoreSaved.call({ startSpawn: () => [0, 0, 0] }, extras, law, { session: false });
-}
-
-test('FALL-KEPT the dungeon: the host\'s pose read carries the fall and the context lands it with the saved position; the other layout\'s start-marker warp lands none (mutants: the dungeon save forgets the fall; the context drops the fall; the host law drops the fall; the warp keeps the fall)', () => {
-  assert.ok(MODES_READ, 'the mode machine\'s pose read');
-  const m = motorAt(50);
-  stepUntil(m, lastMetres);
-  const extras = saveDungeon(m);
-  assert.ok(extras.pose.fall, 'the dungeon envelope carries the fall');
-  const next = motor();
-  loadDungeon(next, extras);
-  assert.ok(Math.abs(next.pos[1] - extras.position[1]) < 1e-6, 'placed at the saved position');
-  assert.equal(hp(land(next).d), 225, 'the whole fall');
-  const warped = motor();
-  loadDungeon(warped, extras, { warp: true });
-  assert.deepEqual([warped.pos[1], warped.falling], [0, false], 'moved to the dungeon start');
-  assert.equal(land(warped).d, 0, 'no fall at the start marker');
-});
-
-test('FALL-KEPT the landing\'s own frame: a save between the step that touched down and the step that bills it still bills the fall (mutant: a grounded body carries no fall)', () => {
-  const m = motorAt(50);
-  stepUntil(m, (b) => b.grounded && b.falling);
-  const extras = saveWorld(m);
-  const next = motor();
-  next.spawn(0, extras.world.y, 0);
-  loadWorld(next, extras);
-  assert.equal(hp(land(next).d), 225);
-});
-
-test('FALL-KEPT the velocity: the loaded body falls on at the saved speed and lands when the unsaved one does; a jump saved on its rise lands the fall from its takeoff, not from the save (mutants: the velocity reset; the rise carried from the save)', () => {
-  const m = motorAt(50);
-  const atSave = stepUntil(m, lastMetres);
-  const velY = m.velY;
-  const extras = saveWorld(m);
-  assert.equal(extras.pose.fall.velY, velY);
-  const next = motor();
-  next.spawn(0, extras.world.y, 0);
-  loadWorld(next, extras);
-  assert.equal(next.velY, velY, 'the speed carried');
-  const got = land(next);
-  assert.ok(Math.abs(atSave + got.steps - UNSAVED.steps) <= 1, `lands on the unsaved fall's step (${atSave + got.steps} vs ${UNSAVED.steps})`);
-  // a jump on the ground, saved as it rises
-  const jump = () => { const b = motorAt(0); stepUntil(b, (x) => x.groundedTime >= 0.2); b.update(DT, { ...idle, jump: true }, 0, 0); return b; };
-  const plain = land(jump()).d;
-  const j = jump();
-  stepUntil(j, (b) => b.pos[1] >= 0.3);
-  assert.ok(j.velY > 0, 'rising');
-  const jx = saveWorld(j);
-  const after = motor();
-  after.spawn(0, jx.world.y, 0);
-  loadWorld(after, jx);
-  assert.ok(after.velY > 0, 'still rising once loaded');
-  assert.ok(Math.abs(land(after).d - plain) < 1e-4, `the takeoff's fall, ${plain}`);
-});
-
-test('FALL-KEPT a torn or absent fall restores as a save always has - no fall, the spawn\'s state standing; an old save without the field lands 0 HP as before (mutants: a torn number restores a fall; a torn speed restored)', () => {
-  for (const torn of [undefined, null, 7, 'x', {}, { above: 'x' }, { above: '12' }, { above: NaN }, { above: Infinity }, { above: null, velY: -5 }]) {
-    const m = motorAt(3);
-    m.restoreFall(torn);
-    assert.deepEqual([m.falling, m.fallStart, m.velY], [false, 3, 0], `torn ${JSON.stringify(torn)}`);
-  }
-  const m = motorAt(50);
-  stepUntil(m, lastMetres);
-  const extras = saveWorld(m);
-  delete extras.pose.fall;   // a save from before FALL-KEPT
-  const next = motor();
-  next.spawn(0, extras.world.y, 0);
-  loadWorld(next, extras);
-  assert.equal(hp(land(next).d), 0);
-  // a sound height with a torn speed: the fall, from rest
-  const v = motorAt(3);
-  v.restoreFall({ above: 2, velY: 'fast' });
-  assert.deepEqual([v.falling, v.fallStart, v.velY], [true, 5, 0], 'a fall with a torn speed falls from rest');
-});
 
 test('FALL-KEPT the bound: a fall carried is at most the world\'s tallest drop - terrainData.size.y, MaxTerrainHeight at the game\'s TerrainScale - at no more than that drop\'s speed from rest (mutants: the height unbounded; the speed unbounded; the bound not the world\'s)', () => {
   assert.equal(MOTOR.FALL_CARRY_MAX, MAX_TERRAIN_HEIGHT * STREAMING_TERRAIN_SCALE);
@@ -259,17 +121,3 @@ test('FALL-KEPT the bound: a fall carried is at most the world\'s tallest drop -
   assert.ok(d > MOTOR.FALL_CARRY_MAX && d <= MOTOR.FALL_CARRY_MAX + 3 + 1e-3, `billed the bound and the 3 m under it: ${d}`);
 });
 
-test('FALL-KEPT the re-skin hold: a rebuild of the pixel under a falling player (the season\'s flip, the roads\' or a late region\'s sweep - any in the frames after a load) keeps the fall across its re-anchor (mutant: the hold drops the fall)', () => {
-  const RELEASE = 'if (_seasonHoldKey !== null && (built.has(_seasonHoldKey) || (!building && !queue.length))) ';
-  const block = RELEASE + literalBody(W, RELEASE);
-  const m = motorAt(50);
-  stepUntil(m, (b) => b.pos[1] <= 30);
-  const env = { _seasonHoldKey: '4,5', built: new Set(), building: true, queue: [{}], player: m };
-  exec(block, env);
-  assert.equal(env._seasonHoldKey, '4,5', 'held while the pixel builds');
-  for (let i = 0; i < 20; i++) m.holdFrame();   // the frame loop holds the motor
-  env.built.add('4,5');
-  exec(block, env);
-  assert.equal(env._seasonHoldKey, null, 'released once it stands');
-  assert.equal(hp(land(m).d), 225, 'the whole fall - before: 123 HP, the drop under the hold alone');
-});

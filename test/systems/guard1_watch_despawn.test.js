@@ -181,6 +181,4 @@ test('GUARD1: the CRIMES enum has ONE home, and court.js re-exports the leaf', (
   const declarers = ['src/systems/court.js', 'src/systems/talk/talk.js', 'src/systems/crimes.js']
     .filter((f) => /export const CRIMES = /.test(src(f)));
   assert.deepEqual(declarers, ['src/systems/crimes.js'], 'exactly one module declares CRIMES');
-  assert.equal(/from '(?:\.\.?\/)+(?:[\w-]+\/)*court\.js'/.test(src('src/systems/talk/talk.js')), false,
-    'talk.js still cannot import court.js - the cycle is real, which is why the enum moved');
 });

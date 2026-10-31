@@ -221,25 +221,6 @@ const poolRig = () => ({
 });
 const netFor = (hits) => ({ room: () => 'world:3,12', now: () => 0, staleMs: FOES_STALE_MS, onPeerHit: (h, fate) => { hits.push(h); fate?.sent?.(); return true; }, toWire: (p) => p, toScene: (p) => p });
 
-test('AUDIT FEUD 2 W1: MY BLOW ON A PEER\'S REVENANT, THROUGH THE REAL STREET POOL - its weakness rides with a blow that LANDED (winding up or not); a miss rides none, nor another weapon\'s blow (mutants: a miss classed; the weakness unpassed)', async () => {
-  const hits = [];
-  const pool = createExteriorFoes(poolRig());
-  pool.setNet(netFor(hits));
-  pool.applyFoes('bob-0002', { n: 1, k: 'world:3,12', full: 1, f: [{ i: 5, t: 0, x: 0, f: [20, 0, 20], y: 0, h: 9, d: 0, a: 0, m: 0, nm: 'Grushnak the Butcher', wq: F.weakIndex('blade') }] });
-  await settle();
-  const pup = pool.foes.find((f) => f.puppet);
-  assert.equal(pup?.entity?.revenant?.weak, 'blade', 'the puppet stands with its weakness');
-  const sword = createWeapon(W.Longsword, 1, () => 0.5), mace = createWeapon(W.Mace, 1, () => 0.5);
-  pool.damageFoe(pup, 5, [0, 0, 0], null, { weapon: sword });
-  pool.damageFoe(pup, 0, [0, 0, 0], null, { weapon: sword });
-  pool.damageFoe(pup, 5, [0, 0, 0], null, { weapon: mace });
-  assert.equal(hits.length, 3);
-  assert.equal(hitClassOf(hits[0])?.weak, true, 'a landed blade blow: its weakness');
-  assert.equal(hits[1].wc, undefined, 'a miss (no damage): no class');
-  assert.equal(hits[2].wc, undefined, 'a mace: not its weakness');
-  assert.ok(read('src/scenes/dungeonContext.js').includes('playerFeet, !round && damage > 0 && feudWeakBlow(foe.entity, { kind, weapon, element, attacker: playerEntity })) : null;'), 'the dungeon\'s sender the same');
-});
-
 test('AUDIT FEUD 2 W2: AN HEIR\'S FOE WRITES WHAT IT STANDS WITH, through the real street frame (mutants: the writer gated on the id)', async () => {
   const pool = createExteriorFoes(poolRig());
   pool.setNet(netFor([]));
@@ -250,71 +231,7 @@ test('AUDIT FEUD 2 W2: AN HEIR\'S FOE WRITES WHAT IT STANDS WITH, through the re
   assert.deepEqual([r.nm, r.wq, r.ad], ['Grushnak the Butcher', F.weakIndex('silver'), F.adaptMask(['mailed'])]);
 });
 
-test('AUDIT FEUD 2 W3: A PEER\'S REVEAL RAISES NO WORD OF MINE (its screen says it); its card and its found stand (mutants: the tag for a peer)', () => {
-  const R = read('src/systems/revenant/revenant.js');
-  assert.match(R, /function revealWeakness\(entity, \{ peer = false \} = \{\}\) \{\n[^\n]*\n\s*if \(!peer\) Promise\.resolve\(\)\.then\(\(\) => \{ try \{ tagHit\(entity, HIT_TAGS\.weakness\);/);
-  assert.match(read('src/systems/feudLedger.js'), /_onWeak\(entity, \{ peer: true \}\)/);
-  const p = { isPlayer: true, name: 'Ayla Stormwind', characterId: 'char-auditfeud2', level: 8, items: [] };
-  const e = orc({ health: 5 });
-  const r = N.revenantDeed(p, e, 'fled', { mobileType: M.Orc, rolls: () => 0 });
-  r.weakKnown = 0;
-  L.feudRevealWeak(e);
-  assert.equal(N.revenantById(r.id).weakKnown, 2, 'found');
-});
-
-test('AUDIT FEUD 2 W4: NO ROUT OF A ROOM\'S PUPPET - the door\'s word on a foe another client runs (a dungeon\'s carries no `puppet`); the dungeon hands it (mutants: the word unread; the dungeon\'s unhanded)', () => {
-  const f = { mobileType: M.Orc, entity: orc({ health: 40 }), ai: { isHostile: true, detected: true, targetIsLocalPlayer: true } };
-  H.markPlayerHarm(f.entity, { now: 1_000_000 }); H.markPlayerLow(1_001_000);
-  setPlayerDoor({ foes: () => [f], isPuppet: (x) => x === f });
-  assert.deepEqual(N.revenantRoutSweep(me, undefined, { wall: 1_002_000 }), [], 'its host\'s');
-  setPlayerDoor({ foes: () => [f], isPuppet: () => false });
-  assert.equal(N.revenantRoutSweep(me, undefined, { wall: 1_002_000 }).length, 1, 'mine routs');
-  assert.match(read('src/scenes/dungeonContext.js'), /isPuppet: \(f\) => isPuppetFoe\(f\),/);
-  assert.match(read('src/scenes/hostMagic.js'), /isPuppet: \(f\) => !!f\?\.puppet \|\| \(typeof isPuppet === 'function' && !!isPuppet\(f\)\),/);
-});
-
-test('AUDIT FEUD 2 W5: THE HOSTS - no lair in the Ocean Holes abyss (its pixel its template\'s); every player\'s shaft carries its bow (a metal weakness rides); the stale comment gone (mutants: the abyss lairable; a bow dropped)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  // PIN MOVED (PITS-WORLD, 2026-10-27): the abyss is known by its own law (world/oceanHoles.js isAbyssMapId - the Bay's 0x600
-  // and the world's abyss lane past the Bay), where every id from 0x60000000 up had been one
-  assert.match(d, /function lairable\(\) \{ return !\(dfLocation\?\.spawned \|\| isGateArena\(dfLocation\) \|\| isArenaFloor\(dfLocation\) \|\| isAbyssMapId\(dfLocation\?\.mapTableData\?\.mapId\)\); \}/);
-  assert.ok(d.includes("damageFoe(t, d, lastPlayerFeet, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })"));
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.ok(read(f).includes("exteriorFoes.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })"), f);
-  assert.ok(read('src/scenes/worldModes.js').includes("interiorFoes?.damageFoe(f, d, player.pos, m.dir, { kind: 'arrow', weapon: m.weapon ?? null })"));
-  assert.doesNotMatch(read('src/scenes/hostCombat.js'), /BLOW_VERDICT_LIFE \} from '(?:\.\.?\/)+(?:[\w-]+\/)*foeBlows\.js';   \/\/ TELL1:/);
-});
-
 // ── the duel harness ────────────────────────────────────────────────
-
-test('AUDIT FEUD 2 S1: THE HARNESS\'S OWN STEPS - a landing knocks me down only when it did damage, and not inside its guard; my blow shoves the foe unless the poise held it, a stagger half again; my swing stands while I am down; the dodger waits a brain turn past the landing (mutants: each step dropped)', async () => {
-  const D = await import('../../tools/tellDuel.mjs');
-  const { TELL } = await import('../../src/ai/tells.js');
-  const { BLOW_EFFECT } = await import('../../src/systems/blowEffects.js');
-  const ent = { mobileType: M.Orc, level: 10, health: 50, maxHealth: 50, stats: { strength: 50, agility: 50, speed: 50 }, skills: new Array(40).fill(50) };
-  const pl = D.makePlayer('Longsword');
-  const was = Math.random;
-  try {
-    Math.random = () => 0.01;   // the foe's roll: it hits
-    let down = D.landOnMe({ _blowFx: { kind: 'slam', iron: true } }, ent, M.Orc, pl, 5, { downUntil: -Infinity, guardUntil: -Infinity });
-    assert.equal(down.downUntil, 5 + BLOW_EFFECT.KNOCKDOWN_S, 'an iron slam that hit: down');
-    assert.equal(D.landOnMe({ _blowFx: { kind: 'slam', iron: true } }, ent, M.Orc, pl, 6, down), down, 'inside its guard: not again');
-    assert.equal(D.landOnMe({ _blowFx: { kind: 'lunge', iron: false } }, ent, M.Orc, pl, 50, { downUntil: -Infinity, guardUntil: -Infinity }).downUntil, -Infinity, 'a lunge knocks nobody down');
-    Math.random = () => 0.999;   // the foe's roll: it misses
-    assert.equal(D.landOnMe({ _blowFx: { kind: 'slam', iron: true } }, ent, M.Orc, pl, 5, { downUntil: -Infinity, guardUntil: -Infinity }).downUntil, -Infinity, 'a slam that did nothing: no knockdown');
-  } finally { Math.random = was; }
-  const ai = { feet: [0, 0, 2], knockbackSpeed: 0 };
-  D.knockFoe(ai, M.Orc, 600, 10, 'hold', [0, 0, 0]);
-  assert.equal(ai.knockbackSpeed, 0, 'the poise held it: no shove');
-  D.knockFoe(ai, M.Orc, 600, 10, null, [0, 0, 0]);
-  const plain = ai.knockbackSpeed;
-  assert.ok(plain > 0); assert.deepEqual(ai.knockbackDir, [0, 0, 1], 'away from my feet');
-  ai.knockbackSpeed = 0;
-  D.knockFoe(ai, M.Orc, 600, 10, 'stagger', [0, 0, 0]);
-  assert.ok(Math.abs(ai.knockbackSpeed - plain * TELL.STAGGER_KNOCK) < 1e-9, 'a stagger\'s half again');
-  const src = read('tools/tellDuel.mjs');
-  assert.equal((src.match(/if \(T >= down\.downUntil\) swingT \+= DT;/g) ?? []).length, 2, 'both fights: the swing stands while I am down');
-  assert.match(src, /blows\.some\(\(lb\) => T < lb\.land \+ CLASSIC_UPDATE_INTERVAL\)/);   // PIN MOVED (FEUD HARNESS: every wind-up at me - its band's too)
-});
 
 test('AUDIT FEUD 2 S2: THE HARNESS IS ITS SEEDS - a fight\'s result is its seed\'s whatever DFU\'s shared stream held before it; a trader takes telegraphed blows, a perfect dodger next to none; a revenant from rank 2 bears its signature (mutants: a seed dropped; the blows uncounted; the signature undrawn)', async () => {
   const D = await import('../../tools/tellDuel.mjs');

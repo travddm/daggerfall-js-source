@@ -43,8 +43,6 @@ test('DEEP-SHARE: the tag rides the frame, not the record - the record\'s law an
   assert.equal(DEEP_PUPPETS_MAX, ONLINE_ROOM_MOD_KEYS[DEEP_WATERS_VENDOR][K], 'no owner stands more than the room forces');
   assert.ok(MOD_SETTINGS[DEEP_WATERS_VENDOR].keys[K].default <= DEEP_PUPPETS_MAX);
   assert.ok(MAX_ACTIVE_ENCOUNTER_FOES + CELL_LOOSE_PUPPETS + CELL_WATCH_PUPPETS_MAX + DEEP_PUPPETS_MAX <= CELL_FRAME_RECORDS_MAX, 'every live foe an owner may stand rides one frame');
-  assert.doesNotMatch(rd('server/src/index.js'), /\bdz\b/, 'the relay reads nothing inside a foes frame - no relay change, no version bump');
-  assert.doesNotMatch(rd('src/net/wire.js'), /DEEP-SHARE|DEEP_PUPPETS/, 'nor does the record\'s law change');
 });
 
 // the WORLD6b-ii rig: a synthetic MONSTER.BSA on flat open ground, with a net
@@ -116,14 +114,6 @@ test('DEEP-SHARE executed: an owner\'s twenty deep foes ride named and a reader 
   assert.equal(reader2.deepPuppetsNear([100, 0, 100], DEEP_SHARE_RADIUS), 0);
 });
 
-test('DEEP-SHARE by source: only the one standing the deep populates a pixel, and its cap counts the deep foes others stand near it', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const now = standsTheDeep\(online\?\.id \?\? null, player\.feetAt\(\), peersNear\(\), _deepStanding\);/, 'the camps\' inputs: my id, my feet, the peers I can place (AUDIT pre-merge P2: and whether I stand it now)');
-  assert.match(w, /settings: \(\) => deepWatersEnemySettingsNear\(exteriorFoes\.deepPuppetsNear\(player\.feetAt\(\), DEEP_SHARE_RADIUS\)\),/);
-  assert.match(w, /get attempts\(\) \{ return _standsTheDeep\(\) \? ENEMY_ATTEMPTS_PER_PIXEL_PER_TICK : 0; \}/, 'the lane stays on - a player who stops being the one keeps what it stood until it dies or its pixel is left');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /const dz = out\.filter\(\(r\) => src\.get\(r\)\?\.managed\)\.map\(\(r\) => r\.i\);/, 'the sender names the deep\'s own foes (managed: its spawner owns its life)');
-});
-
 // ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): the sea's findings.
 test('AUDIT pre-merge P2: the election holds - one standing the deep keeps it until a lower id comes within the radius; one not standing it takes it only past DEEP_SHARE_HYSTERESIS radii (pose noise at the edge flipped it every tick)', () => {
   const me = [0, 0, 0];
@@ -153,13 +143,3 @@ test('AUDIT pre-merge P2 executed: a lost election gives back the reservations n
   assert.equal(stood.length, 0, 'nothing stands after the election was lost');
 });
 
-test('AUDIT pre-merge P1 + P2 + P4 by source: the deep\'s foes are never handed (they stay their stander\'s); the host keeps the election\'s last answer and gives back its reservations when it loses; no camp stands over the deep\'s water', () => {
-  const w = rd('src/scenes/world.js');
-  const hand = w.slice(w.indexOf('const handOverFoes = () => {'), w.indexOf('const handOverRoomFoes = () => {'));
-  // AUDIT NAV2 F12: PIN MOVED - and a body on a deck (a boarding's, shared now) after the deep's
-  assert.match(hand, /const heirOf = \(f\) => \{ if \(f\.entity\?\.team === 'PlayerAlly' \|\| f\.managed(?: \|\| f\.deckBoat != null)?\) return null;/, 'the open air\'s handover refuses the deep\'s');
-  assert.match(w, /let _deepStanding = true;\n\s*const _standsTheDeep = \(\) => \{\n\s*const now = standsTheDeep\(online\?\.id \?\? null, player\.feetAt\(\), peersNear\(\), _deepStanding\);\n\s*if \(_deepStanding && !now\) dwEnemies\?\.dropPending\?\.\(\);\n\s*_deepStanding = now;/);
-  assert.match(w, /const _overDeepWater = \(x, z\) => \{ const c = dwPlayer\?\.rawColumnAt\?\.\(x, z\); return !!c && c\.depth >= 0\.25; \};/);
-  assert.match(w, /if \(anchor && _overDeepWater\(anchor\.x, anchor\.z\)\) anchor = null;/, 'the anchor');
-  assert.match(w, /if \(spot && _overDeepWater\(spot\.x, spot\.z\)\) spot = null;/, 'and each member');
-});

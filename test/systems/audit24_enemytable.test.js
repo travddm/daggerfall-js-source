@@ -204,11 +204,6 @@ test('audit24 wave23: there is exactly ONE encounter table', () => {
   // only one of them could be gated.
   assert.equal(ENCOUNTER_TABLES, ENCOUNTER_TABLES_SRC,
     'the same frozen array object, not two arrays that happen to agree');
-  const src = readFileSync(new URL('../../src/systems/encounters.js', import.meta.url), 'utf8');
-  assert.match(src, /import \{ ENCOUNTER_TABLES \} from '\.\.\/characters\/encounterTables\.js';/);
-  assert.match(src, /^export \{ ENCOUNTER_TABLES \};$/m);
-  assert.doesNotMatch(src, /export const ENCOUNTER_TABLES = Object\.freeze\(\[/,
-    'and no second literal has grown back');
 });
 
 // ---- the RACE TEMPLATES -------------------------------------------
@@ -321,8 +316,6 @@ test('audit24 wave23: loot.js views the one item-group table, it does not copy i
       `loot's ${k} is the SAME frozen array, not one that happens to agree`);
   }
   assert.equal(Object.keys(ITEM_GROUPS).length, 12);
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/loot/loot.js', import.meta.url), 'utf8'),
-    /PlantIngredients1: \[8, 9/, 'and no literal has grown back');
 });
 
 test('audit24 wave23: GetMaterialArmorValue has ONE implementation', () => {
@@ -333,8 +326,6 @@ test('audit24 wave23: GetMaterialArmorValue has ONE implementation', () => {
   // and that the two copies drifted (both inventing Chain2 = 0x0101
   // where DFU has 0x0103).
   assert.equal(eeMaterialArmorValue, materialArmorValue, 'the same function object');
-  const ee = readFileSync(new URL('../../src/combat/enemyEquipment.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(ee, /\[7, 9, 9, 11, 13, 15, 15, 17, 19, 21\]/, 'no second plate ladder');
 
   // and the one that survived is DaggerfallUnityItem.cs:1007-1050's
   // switch, verbatim - including that Chain2 is 0x0103 and that
@@ -395,12 +386,6 @@ test('audit24 wave23: the activation distances have ONE home', () => {
     'STATIC_NPC_ACTIVATION_DISTANCE', 'MOBILE_NPC_ACTIVATION_DISTANCE', 'PICKPOCKET_DISTANCE']) {
     assert.equal(TALK[k], ACTIVATE[k], `talk.js re-exports ${k}`);
   }
-  const talkSrc = readFileSync(new URL('../../src/systems/talk/talk.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(talkSrc, /export const \w*ACTIVATION_DISTANCE = /, 'no second declaration');
-  assert.doesNotMatch(talkSrc, /export const RAY_DISTANCE = /);
-  assert.doesNotMatch(talkSrc, /export const PICKPOCKET_DISTANCE = /);
   // and GlobalScale itself comes from MeshReader, not a second 0.025
   assert.equal(ACTIVATE.GLOBAL_SCALE, GLOBAL_SCALE);
-  assert.doesNotMatch(readFileSync(new URL('../../src/player/activate.js', import.meta.url), 'utf8'),
-    /export const GLOBAL_SCALE = /);
 });

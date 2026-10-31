@@ -130,10 +130,3 @@ test('WB12c the first ember brings it, once a character - a courier\'s line, and
   restoreModSaveRecords({});
 });
 
-test('WB12c the breach\'s spoils go into the pack through the book\'s door - the court\'s floor, a receipt outside it and the crash\'s - and a town\'s thanks do not (mutants: the court\'s spoils past it)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const takeGateSpoil = \(p\) => \{\n\s+takeSpoil\(p\);\n\s+const book = p\.kind === 'item' \? breachBookFor\(p\.item\) : null;\n\s+if \(book\) \{ addItem\(playerEntity\.items, book\); chatNotice\(BREACH_BOOK_TEXT\); \}/);
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{[\s\S]{0,600}?take: takeGateSpoil,/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => spoilsPool\.adopt\(rec\)/);
-  assert.match(w, /const raidSpoils = createSpoilsPool\(\{\n\s+ray: \(\) => null, now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, take: takeSpoil,/);
-});

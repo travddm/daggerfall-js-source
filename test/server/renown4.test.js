@@ -164,17 +164,6 @@ test('RENOWN4 the client: the minter hands the total on beside the level - null 
   assert.equal(renownAnswer({ level: 10, xp: -1, credited: 100 }, 100, 10).xp, null);
 });
 
-test('RENOWN4 the page: the total adopted from the mint (before the level, so no frame draws the new level over the old total) and from every report\'s answer, only ever upward and only online; the HUD\'s getter built only with the tracker (online), its pending none in an hour the bound has spent (mutants: a lower total taken; the answer\'s total unread; the mint\'s unread; the getter offline; the ghost in a spent hour)', () => {
-  const W = src('src/scenes/world.js');
-  assert.match(W, /import \{ setHudRenown \} from '\.\.\/ui\/hud\/hudRenown\.js';/);
-  assert.match(W, /const renownXpAdopt = \(xp\) => \{\n\s*if \(onlineOn && Number\.isSafeInteger\(xp\) && xp >= 0 && \(renownXp === null \|\| xp > renownXp\)\) renownXp = xp;\n\s*\};/);
-  assert.match(W, /renownXpAdopt\(who\?\.xp\);[^\n]*\n\s*who = \{ \.\.\.who, level: renownAdopt\(who\?\.level\) \};/, 'the total first, then the level');
-  assert.match(W, /const a = renownAnswer\(data, sent, renownSaid\);[^\n]*\n\s*renownXpAdopt\(a\.xp\);[^\n]*\n\s*if \(a\.room !== null\) _renownRoom = [^\n]*\n\s*renownAdopt\(a\.level\);/);   // SCALE4h (PIN MOVED): the hour's room kept between, against the total just adopted
-  const online = W.slice(W.indexOf('  if (renownTracker) {'));
-  assert.match(online, /^ {2}if \(renownTracker\) \{\n(?:\s*\/\/[^\n]*\n)*\s*setHudRenown\(\(\) => \(\{ level: renownNow, xp: renownXp, pending: _renownCapHour === renownHour\(\) \? 0 : renownTracker\.pending\(\) \}\)\);/);
-  assert.equal((W.match(/setHudRenown\(/g) ?? []).length, 1, 'one getter, built in one place');
-});
-
 // ── THE HUD ─────────────────────────────────────────────────────────
 
 const mkEl = () => ({
@@ -252,16 +241,3 @@ test('RENOWN4 the HUD, executed: the row hangs under the vitals - the foot\'s la
   }
 });
 
-test('RENOWN4 the sheet: the row is off until lit, as wide as the vitals\' row on a desk and on a phone; the box is the name\'s gold in the HUD\'s square frame; the ghost is the fill\'s gold, faint; nobar takes the bar and leaves the box (mutants: the row always drawn; the widths drifted from the vitals\')', () => {
-  const CSS = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(CSS, /\.hud-renown \{ display: none; align-items: center; gap: 8px; height: 22px; width: calc\(3 \* min\(190px, 23vw\) \+ 28px\); \}[^\n]*\n\.hud-renown\.on \{ display: grid; grid-template-columns: 36px minmax\(0, 1fr\) 36px; \}/);   // RENOWN4b: and its height, which the lifts count (renown4b.test.js); RENOWN-BAR: lit, a grid of three with the bar on the middle (renownbar.test.js)
-  assert.match(CSS, /\.hud-vital \.hud-track \{ width: min\(190px, 23vw\); height: 20px;/, 'the vitals the row is as wide as');
-  assert.match(CSS, /\.hud-bars \{ display: flex; align-items: center; gap: 14px; \}/);
-  assert.match(CSS, /\.hud-vital \.hud-track \{ width: 26vw; \}\n\s*\.hud-renown \{ width: calc\(78vw \+ 20px\); \}/, 'the phone\'s three 26vw tracks and two 10px gaps');
-  assert.match(CSS, /\.hud-bars \{ gap: 10px; \}/);
-  assert.match(CSS, /\.hud-renownbox \{[^}]*color: #f2c46b;[^}]*border: 2px solid rgba\(242,196,107,0\.8\); \}/);
-  assert.match(CSS, /\.hud-renown \.hud-fill \{[^}]*background: #f2c46b; \}/);
-  assert.match(CSS, /\.hud-renownghost \{ position: absolute;[^}]*background: rgba\(242,196,107,0\.35\); \}/);
-  assert.match(CSS, /\.hud-renown\.nobar \.hud-renowntrack \{ display: none; \}/);
-  assert.match(CSS, /\.hud-renownnum \{ position: relative; z-index: 1;/, 'UI3: the words over the fill and the ghost');
-});

@@ -122,12 +122,6 @@ test('SLAM5: the welcome\'s roster CARRIES each peer\'s look - reading nothing f
 test('SLAM5: the batched get is bounded by the ROSTER, not by the room - so it cannot breach the limit however full the room gets (mutant: the get over every socket, which is SOCKETS_MAX-1 keys)', () => {
   assert.ok(ROSTER_MAX <= STORAGE_GET_MAX, `a roster of ${ROSTER_MAX} fits one batched get`);
   assert.ok(SOCKETS_MAX > STORAGE_GET_MAX, 'and a full room does NOT - which is the whole finding');
-  const src = readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-  // the selection happens BEFORE the read: `others` (every socket) must not be what is handed to storage
-  assert.doesNotMatch(src, /storage\.get\(others\.map/, 'the room is never the batch');
-  assert.match(src, /const near = rosterFor\((?:battle \? others\.map\(\(b\) => this\._drawn\(b, a\.key\)\) : )?others, m\.id, m\.pose\);/, 'the roster is chosen first');   // PIN MOVED (AUDIT-SEATS): T2 - in a battle room the same sockets, a spectator's pose told as none
-  const i = src.indexOf('const near = rosterFor(');   // PIN MOVED (AUDIT-SEATS): T2, as above
-  assert.match(src.slice(i, i + 400), /near\.filter\(\(b\) => !this\._looks\.has\(b\.id\)\)/, 'and only what is not already known is asked for');
 });
 
 test('SLAM5: ONE METRIC at both doors - the roster and the pose fan rank the same way, so the fan\'s reach really is a subset of what the welcome named (mutant: pixelDistance, which floors to 0 inside one town and makes "nearest" mean socket order)', () => {

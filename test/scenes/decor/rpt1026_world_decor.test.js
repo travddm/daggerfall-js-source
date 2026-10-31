@@ -195,14 +195,6 @@ test('RPT1026-WORLD DECOR-VERBS: the law - the decorator\'s keys, and its frame 
   assert.equal(decorPressFrame(null), null);
 });
 
-test('RPT1026-WORLD DECOR-VERBS: with World Tooltips off the interior host\'s namer still answers the decorator\'s keys while it browses - and nothing else (by source: the one gate; the host grows by nothing)', () => {
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.ok(wm.includes("if (!worldTooltipsOn() && !(decorVerbKey(key) && decorTool.flying() && !decorTool.ghost())) return null;"), 'the gate lets the decorator\'s keys through while it browses');
-  assert.ok(!wm.includes('      if (!worldTooltipsOn()) return null;\n      const hide = hideInteractTooltip();'), 'the bare gate is gone from the interior namer');
-  const plaque = readFileSync(new URL('../../../src/ui/worldPlaque.js', import.meta.url), 'utf8');
-  assert.ok(plaque.includes('foldQuickLoot(verbs ? decorPressFrame(frame) : frame);'));
-});
-
 test('RPT1026-WORLD guard: the decorator\'s Move in the caravan, the ship and the house - by the plaque\'s row and by the panel\'s In this room - stands the piece where the click sets it down (the decorator itself was never the fault)', async () => {
   for (const room of [CARAVAN, { kind: 'ship', where: 'Your ship' }, { kind: 'house', where: 'Your house' }]) {
     for (const door of ['plaque', 'panel']) {

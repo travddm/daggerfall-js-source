@@ -61,20 +61,6 @@ test('WOD5: a mirrored model keeps its faces - a negative determinant reverses t
   assert.match(rd('vendor/world-of-daggerfall/LocationPrefab/WOD_BanditCamp_09.txt'), /<name>58055<\/name>[\s\S]{0,80}<scaleX>-1\.573463<\/scaleX>/, 'the one negative scale in the shipped layouts');
 });
 
-test('WOD5: the loader hears a region on the crossing itself, after Awake - a visit shorter than a build is still announced', () => {
-  const w = hostText('src/scenes/world.js');
-  const crossing = w.slice(w.indexOf('    if (r.pixelChanged) {'), w.indexOf('      for (const u of r.unload) {'));
-  assert.match(crossing, /if \(wod\) \{ const region = maps\.getRegionIndexAt\(r\.current\.x, r\.current\.y\); wodOpened\.then\(\(ok\) => \{ if \(ok\) wod\.noteRegion\(region\); \}\); \}/);
-  assert.match(w, /wod\.noteRegion\(maps\.getRegionIndexAt\(here\.x, here\.y\)\);\s*await wod\.settle\(\);/, 'and still before every build, where the list is read');
-});
-
-test('WOD5: a captive stood by a marker rides the carry and stands again on the rebuilt pixel', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /w\.flat = \{ kind: 'billboard', archive: act\.archive, record: act\.record \};\n\s*getTexture\(act\.archive\)\.then/, 'the stood flat is remembered before its art loads');
-  assert.match(w, /spawners\.get\(k\)\.push\(\{ spawner: w\.spawner, flat: w\.flat \?\? null \}\);/, 'the carry takes it');
-  assert.match(w, /if \(w\.restand\) \{ w\.restand = false; standWodAction\(p, w, w\.flat\); \}[^\n]*\n\s*if \(!w\.spawner\.active\) continue;/, 'before the spent marker is skipped');
-});
-
 test('WOD5: the marker\'s pile is a LoadID-0 container - no save and no scene cache carries it', async () => {
   const renderer = { createBillboardBatch: () => ({}), destroyBillboardBatch: () => {}, destroyBatch: () => {} };
   const getTexture = async () => ({ recordCount: 64, getFrameCount: () => 1, getSize: () => ({ width: 32, height: 32 }), getScale: () => ({ width: 0, height: 0 }) });

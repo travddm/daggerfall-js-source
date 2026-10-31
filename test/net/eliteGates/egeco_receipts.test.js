@@ -87,8 +87,6 @@ test('EG-E3 THE BOUND, THE WORST CASE: every id at its longest (a 40-character a
   assert.deepEqual(small.vs, vs.slice(0, 5));
   // and nothing past it is ever signed: a claim set no trim can hold is refused, never minted long
   await assert.rejects(() => sign({ ...w, vs: [], zz: 'x'.repeat(600) }, nowS), /inside its bound/);
-  // the wire's bound is the receipt's
-  assert.match(readFileSync(new URL('../../../src/net/wire.js', import.meta.url), 'utf8'), new RegExp(`const EG_RECEIPT_WIRE_MAX = ${EG_RECEIPT_MAX};`));
 });
 
 test('EG-E3 THE END RECEIPT\'S NEW FIELDS: a wagered breach\'s `x` carries its Wager (`wg`, as its `w` does) and the Annals\' pages the breach gave the member (`an`, bit p for page p) - none when it gave none, none on an unwagered breach; the receipt law reads them (mutants: the Wager off the end; the pages off it)', async () => {

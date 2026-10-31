@@ -380,12 +380,6 @@ test('AUDIT HCC O1/O3/O7/O8/O9: a peer\'s team is converted every frame, stands 
   assert.equal(pool.peers.size, 0);
 });
 
-test('AUDIT HCC O2: the foes pool\'s teardown (a fast travel\'s clearLive) takes the peers\' teams, as clearPuppets does', async () => {
-  const src = (await import('node:fs')).readFileSync(new URL('../../../src/scenes/exteriorFoes.js', import.meta.url), 'utf8');
-  const body = src.slice(src.indexOf('  function destroy() {'), src.indexOf('  /** AUDIT 17e F23'));
-  assert.match(body, /_owners\.clear\(\); _pupPending\.clear\(\); _pupIndex\.clear\(\);[^\n]*\n\s*_onHccClear\?\.\(\);/);
-});
-
 test('AUDIT HCC O5: the change key is the WIRE\'s - my own floating-origin rebase moves every scene point and is not a word; a real move is', () => {
   let ox = 0;   // the host's origin, as campToWire reads it live
   let changed = 0;

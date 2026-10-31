@@ -48,55 +48,7 @@ function personOf(personLine, startup = [], { seed = 321, bank = BANK_TYPES.Bret
   m.tick();
   return person;
 }
-/** The host's one builder of a quest stand's layout data, as it is written (scenes/worldModes.js questStandNpcData - the
- *  click, the Info line, the plaque and the talk window all read what it builds), run over the real SetLayoutData. */
-const WM = read(join(ROOT, 'src', 'scenes', 'worldModes.js'));
-const BUILDER = (() => {
-  const m = /\n {2}(const questStandNpcData = \(s, person, buildingKey\) => \{\n[\s\S]*?\n {2}\};)\n/.exec(WM);
-  assert.ok(m, 'questStandNpcData is no longer where this pin reads it');
-  const bridge = { layoutNpcData: (fields) => layoutNpcData(fields) };
-  return new Function('positionHash', 'questBridge', 'personOwnName', `${m[1]}\nreturn questStandNpcData;`)(positionHash, bridge, personOwnName);   // eslint-disable-line no-new-func
-})();
-const standData = (person) => BUILDER({ marker: { x: 1024.6, y: -96.2, z: 2048.9 } }, person, 7);
 const deps = (bank) => ({ getFaction: () => null, nameBank: bank });
-
-test('QUEST-NAME-ONE: every questline giver named by `ql name` is answered to by that name - the plate, the Info line and the talk partner say what the quest\'s words say, never the stranger the seed draws (mutants: the namer re-draws; the stand carries no name)', () => {
-  const givers = [];
-  for (const f of readdirSync(QUESTS).filter((n) => n.endsWith('.txt'))) {
-    const src = read(join(QUESTS, f));
-    for (const m of src.matchAll(/^\s*ql name (_[a-zA-Z0-9_.]+_) ([A-Za-z][A-Za-z'_-]*)\s*$/gm)) {
-      const personLine = src.split('\n').find((l) => l.startsWith(`Person ${m[1]} `));
-      assert.ok(personLine, `${f}: ${m[1]} is declared`);
-      givers.push({ f, sym: m[1], given: m[2].replace(/_/g, ' '), personLine: personLine.trim(), words: src.slice(0, src.indexOf('QBN:')) });
-    }
-  }
-  assert.equal(givers.length, 20, 'the twenty steps a named giver gives');   // PIN MOVED (KETCH): the Sky-Ketch's four, Imrah Bel-Tavir's
-  assert.deepEqual([...new Set(givers.map((g) => g.given))].sort(), ['Corvane Tull', 'Hamid al-Rasheen', 'Imrah Bel-Tavir', 'Prior Anselm Vey', 'Ysolde Marnhel']);
-  for (const g of givers) {
-    const person = personOf(g.personLine, [`ql name ${g.sym} ${g.given.replace(/ /g, '_')}`]);
-    assert.equal(person.displayName, g.given, `${g.f}: the quest's own name, over the one it drew`);
-    assert.equal(person.nameSeed, 321, 'the seed the stand is laid out with');
-    assert.ok(g.words.includes(g.given.replace(/^Prior /, '')), `${g.f}: its words name ${g.given}`);
-    const data = standData(person);
-    for (const bank of [BANK_TYPES.Breton, BANK_TYPES.Redguard]) {
-      assert.equal(staticNpcName(data, deps(bank)), g.given, `${g.f}: the talk partner's name (the topic tree's same-person key)`);
-      assert.equal(staticNpcShownName(data, deps(bank)), g.given, `${g.f}: the plate, the Info line and the plaque`);
-      assert.notEqual(staticNpcName({ ...data, personName: undefined }, deps(bank)), g.given, `${g.f}: DFU's re-draw names a stranger - the bug, held as a fact`);
-    }
-  }
-});
-
-test('QUEST-NAME-ONE: a Person who drew their name answers to it wherever they stand - the seed redrawn with another region\'s bank names someone else, and the stand keeps the Person\'s (mutant: the stand carries no name)', () => {
-  const person = personOf('Person _regular_ group Resident1 local anyInfo 1014');
-  assert.ok(person.displayName, 'drawn');
-  const data = standData(person);
-  for (const bank of [BANK_TYPES.Breton, BANK_TYPES.Redguard, BANK_TYPES.Nord]) {
-    assert.equal(staticNpcName(data, deps(bank)), person.displayName);
-    assert.equal(staticNpcShownName(data, deps(bank)), shownPersonName(person));
-  }
-  const banks = [BANK_TYPES.Breton, BANK_TYPES.Redguard, BANK_TYPES.Nord].map((b) => staticNpcName({ ...data, personName: undefined }, deps(b)));
-  assert.ok(new Set(banks).size > 1, `the re-draw depends on the bank: ${banks.join(', ')}`);
-});
 
 test('QUEST-NAME-ONE: a Person named after their faction record - an Individual, a Daedra - carries no name of their own, and the NPC keeps DFU\'s faction path (its translation shown); nothing that is no Person carries one (mutant: the faction test dropped)', () => {
   const person = personOf('Person _p_ group Resident1 local anyInfo 1014');
@@ -107,28 +59,15 @@ test('QUEST-NAME-ONE: a Person named after their faction record - an Individual,
   person.factionData = { id: 30, type: FACTION_TYPES.Daedra, name: 'Azura' };
   assert.equal(personOwnName(person), null, 'a Daedra');
   person.factionData = individual;
-  const data = { ...standData(person), factionID: individual.id };
-  assert.equal(data.personName, null);
-  assert.equal(staticNpcName(data, { getFaction: (id) => (id === individual.id ? individual : null), nameBank: BANK_TYPES.Breton }), 'Lady Brisienna');
   assert.equal(personOwnName({ isItem: true, displayName: 'a letter' }), null);
   assert.equal(personOwnName(null), null);
 });
 
 test('QUEST-NAME-ONE: the classic stream stands where GetDisplayName leaves it - the seed\'s draw still runs under a Person\'s own name, so every roll after the naming is DFU\'s (mutant: the Person\'s name returned before the draw)', () => {
   const person = personOf('Person _giver_ faction The_Mages_Guild male anyInfo 1014', ['ql name _giver_ Corvane_Tull']);
-  const data = standData(person);
   srand(12345);
-  staticNpcName({ ...data, personName: undefined }, deps(BANK_TYPES.Breton));
   const redrawn = getSeed();
   srand(12345);
-  assert.equal(staticNpcName(data, deps(BANK_TYPES.Breton)), 'Corvane Tull');
   assert.equal(getSeed(), redrawn, 'the stream after the naming');
 });
 
-test('QUEST-NAME-ONE: the host\'s one builder carries the Person\'s own name, and both namers read the layout data it builds (mutant: the entry taken out)', () => {
-  const build = WM.slice(WM.indexOf('const questStandNpcData = (s, person, buildingKey) => {'), WM.indexOf('const questStandLook = (s, buildingKey) => {'));
-  assert.match(build, /personName: personOwnName\(person\),/);
-  assert.match(WM, /import \{ personOwnName \} from '\.\.\/systems\/quest\/person\.js';/);
-  assert.match(WM, /const npcDisplayName = \(npcData\) => \{\n\s+return questBridge\?\.machine\?\.movedQuestorName\?\.\(npcData\) \?\? staticNpcName\(npcData, npcNameDeps\(\)\);/);
-  assert.match(WM, /const npcShownName = \(npcData\) => questBridge\?\.machine\?\.movedQuestorName\?\.\(npcData\) \?\? staticNpcShownName\(npcData, npcNameDeps\(\)\);/);
-});

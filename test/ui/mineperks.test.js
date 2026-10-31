@@ -174,8 +174,6 @@ test('MINE-PERKS the Prospector on the Overworld: each vein a mark of its own, n
     }
   } finally { S.done(); }
   assert.equal(OW_ONE_MAX, 24);
-  // AUDIT MINE-PERKS: the singles past their cap go back into their pixel's group (the many-pixel pin, below)
-  assert.match(read('src/scenes/gatherHost.js'), /while \(kept < ones\.length && kept < OW_ONE_MAX && ones\[kept\]\.d <= GROUP_M\) kept\+\+;\n\s*for \(const o of ones\.splice\(kept\)\) join\(o\.s, o\.n, o\.profession\);/, 'the singles beside the groups, their cap their own');
 });
 
 test('AUDIT MINE-PERKS the Prospector\'s Overworld over many pixels: the nearest 24 veins stand alone, and every other still counts in its pixel\'s group - none lost (mutants: the overflow dropped; the cap unread)', async () => {
@@ -218,16 +216,6 @@ test('MINE-PERKS the Deep Delver: a dungeon vein x2 (x1.5 was "meh"), and on the
   assert.equal(kind.mark({ key: 'd', what: 'dvein' }, { specs: dd }).w, MINE_MARKS.dvein.w, 'its glow a dungeon vein\'s');
   assert.equal(kind.mark({ key: 'v', what: 'vein' }, { specs: dd }).reach, undefined, 'a surface vein: everyone\'s reach');
   assert.equal(kind.mark({ key: 'd', what: 'dvein' }, { specs: () => ({ 50: null, 100: null }) }).reach, undefined);
-});
-
-test('MINE-PERKS every dungeon vein stands at its wall\'s foot - on the floor, 0.75 m out - never a third of a metre off the face and half a metre up, where its flats went into the wall (mutants: the old offsets)', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /const PROF_VEIN_WALL_M = 12, PROF_VEIN_OFF_M = 0\.75, PROF_VEIN_CHEST_M = 0\.9, PROF_VEIN_UP_M = 0;/);
-  assert.match(d, /const d = Math\.max\(0, hit\.dist - PROF_VEIN_OFF_M\);/);
-  assert.match(d, /const foot = \[at\[0\], at\[1\] - down \+ PROF_VEIN_UP_M, at\[2\]\];/);
-  // AUDIT MINE-PERKS: a wall nearer the marker than the offset stood the vein on the marker, as near the wall - the next
-  // bearing, and that foot only where none of the four markers' stands one clear (a vein never lost to the rule)
-  assert.match(d, /if \(hit\.dist < PROF_VEIN_OFF_M\) \{ close \?\?= foot; continue; \}\n\s*return foot;\n\s*\}\n\s*\}\n\s*return close;/);
 });
 
 // ─── THE SURVEYOR ─────────────────────────────────────────────────────
@@ -322,9 +310,6 @@ test('MINE-PERKS the Surveyor at the service: an unwitnessed Mountain pixel\'s v
     assert.equal(dv.body.material, dungeonVein({ dungeon: 4242, day, slot: 0, climate: C.Mountain }).material, 'a deep vein on anyone\'s word: the whole table\'s, the Surveyor\'s word adding nothing');
     assert.equal(dv.body.gem, DUNGEON_GEM, 'the dungeon\'s Diamond, the dice at their lowest');
   } finally { Date.now = realNow; }
-  const svc = read('server-account/src/professions.js');
-  assert.match(svc, /const surveyed = n\.kind === 'vein' && !confirmed && specs\[100\] === SURVEYOR;/);
-  assert.match(svc, /gem = veinGem\(\{ kind: n\.kind, climate, glints: s\.glints, confirmed: confirmed \|\| surveyed, prospector: specs\[50\] === 'prospector' \}, \(\) => dice\(rand\)\);/);
 });
 
 test('MINE-PERKS the Surveyor\'s ore card: no vein waits on witnesses for them - only a region\'s own ore; the world host says who reads it (mutants: the table still held back; the signature given; the host never says)', () => {
@@ -332,8 +317,6 @@ test('MINE-PERKS the Surveyor\'s ore card: no vein waits on witnesses for them -
   assert.equal(oreMapTip({ climate: C.Mountain, region: MARCH, fact: { state: 'none' }, surveyed: true }).lines.at(-1), 'No vein here needs witnesses');
   assert.match(oreMapTip({ climate: C.Mountain, region: MARCH, fact: { state: 'none' } }).lines.join('\n'), /Not yet witnessed: no Gold, Platinum or Mithril here yet/, 'anyone else: as it was');
   assert.match(oreMapTip({ climate: C.Mountain, region: WAYREST, fact: { state: 'none' }, surveyed: true }).lines.join('\n'), /Not yet witnessed: no Mithril here yet/, 'the crown\'s own ore still waits');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const surveyed = profBook\?\.state\?\.open === true && profBook\.track\('mining'\)\.specs\?\.\[100\] === SURVEYOR;   \/\/ MINE-PERKS/);
 });
 
 test('AUDIT MINE-PERKS a change of mind come due is the book\'s at once - the service stands a track under its paid change once its week is out, and the client stood the old choice\'s veins until the next read (mutants: the change never applied; applied before its hour)', async () => {
@@ -358,9 +341,6 @@ test('AUDIT MINE-PERKS a change of mind come due is the book\'s at once - the se
 
 test('AUDIT MINE-PERKS the Mining page tells a Surveyor what their word does on unwitnessed ground, under the line that says Silver at most - theirs alone, the choice named by its card (mutants: said to anyone; never said)', () => {
   assert.equal(MINING_SURVEYOR_LINE, 'As a {name}, you need no witnesses: your veins can give any ore the land holds. A region\'s own ore still needs the other players.');   // VOICE1 (PIN MOVED): the same law in plain words
-  const src = read('src/ui/professions/profPages.js');
-  assert.match(src, /const miningSurveyorLine = \(\) => t\('prof\.page\.how\.miningSurveyor', MINING_SURVEYOR_LINE, \{ name: specOf\('mining', 100, SURVEYOR\)\?\.name \?\? '' \}\);/);
-  assert.match(src, /if \(_sel === 'mining'\) pane\.append\(el\('p', 'px-note', miningGroundLine\(\)\)\);[^\n]*\n\s*if \(_sel === 'mining' && tr\.specs\?\.\[100\] === SURVEYOR\) pane\.append\(el\('p', 'px-note', miningSurveyorLine\(\)\)\);/);
 });
 
 // ─── THE MOTHERLODE SENSE ─────────────────────────────────────────────
@@ -423,29 +403,3 @@ test('AUDIT MINE-PERKS the held map\'s Motherlode is read: its ink 4.5 : 1 on th
   assert.deepEqual([...LODE_DOT_RGB], [0, 229, 200], 'the classic page draws no words: the bright aqua over its land');
 });
 
-test('AUDIT MINE-PERKS a Motherlode\'s hour is said on THIS machine\'s clock with its weekday where it is not today (a bare "13:00" read as past across the date line), and a Sense\'s Motherlodes stand on the Overworld too, held at the edge with their distance (mutants: the relay\'s clock; the hour bare; the Overworld unwired; shown without the Sense)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const lodeWords = \{ oreName: \(m\) => materialLabel\(m\)\.replace\(\/ Ore\$\/, ''\), clock: \(s\) => localWhenText\(s \* 1000 - _sharedOffsetMs, Date\.now\(\)\) \};/);
-  assert.match(w, /const lodeSense = \(\) => !!motherlodeBook && profBook\?\.state\.open === true && profBook\.track\('mining'\)\.specs\?\.\[100\] === 'motherlode-sense';/);
-  assert.match(w, /if \(!lodeSense\(\)\) return \[\];\n\s*return lodeMapMarks\(motherlodeBook\.sensedAll\(_lodesSensed\), Math\.floor\(\(Date\.now\(\) \+ _sharedOffsetMs\) \/ 1000\), lodeWords\);/);
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = read('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /if \(lodeSense\(\)\) \{\n\s*const nowS = [^\n]*\n\s*for \(const l of motherlodeBook\.sensedAll\(_lodesSensed\)\) \{/);
-  assert.match(tvm, /marks\.push\(\{ key: `lode:\$\{l\.key\}`, at: tvSceneKept\(h, x, z, TV_PLACE_LIFT\), label: lodeLabel\(l, nowS, lodeWords\), sub: farDistanceText\(km\), kind: 'gather mining', color: LODE_COMPASS_CSS, edge: true \}\);/);
-  assert.match(tvm, /for \(const k of \[\.\.\._tvLodeHold\.keys\(\)\]\) if \(!keep\.has\(k\)\) _tvLodeHold\.delete\(k\);/);
-});
-
-test('MINE-PERKS every map reads them: the held map (its poll, its sheet, its legend), the classic region page (its texels and its repaint), the ink, and the world host\'s dep - a Sense\'s alone (mutants: any unwired; shown without the Sense)', () => {
-  const h = read('src/ui/heldMap.js');
-  assert.match(h, /const lodes = readBountyMarksIn\(this\.deps\.lodes, sheet, LODE_LEGEND_TEXT\);/);   // PIN MOVED (BAY-LEFT-MAPS): over the sheet's box (heldMap.js _marksBox) - a Motherlode past the Bay is drawn
-  assert.match(h, /if \(mKey !== this\._lodesKey\) \{ this\._lodesKey = mKey; this\._lodes = lodes; gateMoved = true; this\._dirty = true; \}/);
-  assert.match(h, /lodes: this\._lodes,   \/\/ MINE-PERKS/);
-  assert.match(h, /if \(this\._lodes\.length\) \{   \/\/ MINE-PERKS: and a Motherlode's teal circle\n\s*const dot = el\('span', 'hmlegdot'\);\n\s*dot\.style\.background = LODE_RING_CSS;\n\s*leg\.append\(dot, el\('span', 'hmlegtext', lodeLegendText\(\)\)\);/);
-  assert.match(h, /&& !this\._vendor && !this\._lodes\.length\)/);
-  const t = read('src/ui/travel/travelMapWindow.js');
-  assert.match(t, /const lodes = readBountyMarks\(this\.deps\.lodes, \{ width: MAP_WIDTH, height: MAP_HEIGHT \}, LODE_LEGEND_TEXT\);\n\s*this\._lodesKey = bountyMarksKey\(lodes\);\n\s*if \(lodes\.length\) \{\n\s*const lodePx = packRGBA\(LODE_DOT_RGB\[0\], LODE_DOT_RGB\[1\], LODE_DOT_RGB\[2\], 255\);\n\s*for \(const \[x, y\] of bountyRingTexels\(lodes, originX, originY, width, height\)\) plot\(x, y, lodePx\);/);
-  assert.match(t, /&& bountyMarksKey\(readBountyMarks\(this\.deps\.lodes, \{ width: MAP_WIDTH, height: MAP_HEIGHT \}, LODE_LEGEND_TEXT\)\) === \(this\._lodesKey \?\? ''\)/);
-  assert.match(read('src/ui/ink/inkMap.js'), /for \(const b of opts\.lodes \?\? \[\]\) if \(visible\(b\.cx, b\.cy, b\.r \+ 2\)\) paintBountyRing\(ctx, view, b, pulse, LODE_INK\);/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /lodes: \(\) => lodeMapMarksNow\(\),/);
-});

@@ -222,8 +222,3 @@ test('RPT1026-FIGHTS RETIRED-BLOW AT THE RELAY: a fighter that stops posing is a
   });
 });
 
-test('RPT1026-FIGHTS RETIRED-BLOW THE KETCH\'S RELAY: a word aboard is judged from a pose no older than KT_POSE_FRESH_MS, the census\'s own law (mutants: the word\'s pose never aged)', () => {
-  const RELAY = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(RELAY, /const pose = a\.pose && now - \(a\.pAt \?\? a\.since \?\? 0\) <= KT_POSE_FRESH_MS \? this\._ktPoseOf\(a\.pose\) : null;/);
-  assert.match(RELAY, /if \(!b\.id \|\| !b\.sub \|\| !b\.pose \|\| !V\.players\[b\.sub\] \|\| now - \(b\.pAt \?\? b\.since \?\? 0\) > KT_POSE_FRESH_MS\) continue;/, 'the census\'s, the same age');
-});

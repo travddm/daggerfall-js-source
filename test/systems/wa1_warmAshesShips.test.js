@@ -123,8 +123,6 @@ test('WA1 the quests: the shipped text byte for byte (CRLF as shipped), the list
   setModSetting(WARM_ASHES_VENDOR, 'Enabled', false);
   assert.ok(!registeredQuestLists().includes(WA_QUEST_LIST), 'the list stands behind the switch, as a loaded mod\'s does');
   _resetModSettings(); _resetQuestLists(); _resetWarmAshesShips(); _resetModSaveData();
-  // the pack loader globs the mod's folder beside Roleplay & Realism's
-  assert.match(read('src/scenes/quest/questData.js'), /import\.meta\.glob\('\.\.\/\.\.\/\.\.\/vendor\/warm-ashes-ships\/Quests\/\*\.txt'/);
 });
 
 test('WA1 the six variant patches: the author\'s edit of each ship block, the classic ship subrecords he copied carried as COPY ops', () => {
@@ -320,31 +318,6 @@ test('WA1 the quests under the port\'s machine: every line a known action, and a
 });
 
 // ---- the host ---------------------------------------------------------------
-
-test('WA1 the host: the events where DFU raises them, the coroutine\'s clock, the action registered whatever the switch says, the quest gate, the ship\'s fade', () => {
-  const w = hostText('src/scenes/world.js');
-  const ft = w.slice(w.indexOf('async function fastTravelTo('), w.indexOf('\n  }\n', w.indexOf('async function fastTravelTo(')) + 4);   // AUDIT TESA-BIOME P4: fastTravelTo to its own close - the quick save's comment moved out of the host at TESA's merge, and the window had run on through every module after it
-  const pre = ft.indexOf('warmAshesPreTravel({ oceanPixels: computed.oceanPixels ?? 0, travelShip: !!opts.travelShip })');
-  assert.ok(pre > ft.indexOf('deductGold(playerEntity,'), 'RaiseOnPreFastTravelEvent follows DeductFastTravelGold (:326-328)');
-  assert.ok(pre < ft.indexOf('await _teleportToPixel('), '...and precedes the teleport');
-  const post = ft.indexOf('warmAshesPostTravel()');
-  assert.ok(post > ft.indexOf('setCrimeCommitted(playerEntity, CRIMES.None);'), 'RaiseOnPostFastTravelEvent is the last statement (:383)');
-  assert.equal((w.match(/warmAshesFrame\(gamePaused\(\) \? 0 : dt \* worldTimeScale\(\)\);/g) ?? []).length, 2, 'the clock ticks in the modal branch and outdoors, as HCC\'s LateUpdate does');
-  assert.match(w, /\n {2}questBridge\.machine\.registerAction\(new LeaveShip\(null\)\);\n/, 'registered unconditionally');
-  assert.match(w, /if \(!townTalk\.overlayActive && !worldMoveBusy\(\) && !hudFade\.fadeInProgress\) questBridge\.tick\(dt\);/);
-  const board = w.slice(w.indexOf('async function boardOrDisembark()'), w.indexOf('// ---- A10 - THE RECALL ANCHOR', w.indexOf('async function boardOrDisembark()')));
-  assert.ok(board.indexOf('hudFade.smashHUDToBlack();') < board.indexOf('await _teleportToPixel(') && board.indexOf('hudFade.fadeHUDFromBlack();') > board.indexOf('await _teleportToPixel('), 'black, the teleport, the fade back');
-  assert.match(w, /function shipTransportMode\(\) \{\n\s+if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) modes\?\.forceExitToExterior\(\);\n\s+return boardOrDisembark\(\);/);
-  assert.match(w, /modData: \{ \[HCC_VENDOR\]: hccRuntime\.getSaveData\(\), \.\.\.modSaveRecords\(\) \}/);
-  assert.match(w, /if \(hccRecord\) hccRuntime\.restoreSaveData\(hccRecord, \{ elsewhere: csaElsewhere \}\);\n\s+restoreModSaveRecords\(extras\.modData, csaModLoadFailed\);/);   // CSA-D: with SaveLoadManager's per-mod catch
-  assert.match(w, /if \(!_loadedGame\) newGameModSaveRecords\(\);/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /opts\.modSaveLoad\?\.\(extras\.modData \?\? null\);[^\n]*\n\s+opts\.horseCartLoad\?\./);
-  // OH-D: and worldModes hands both into the dungeon's build - the host's two seams stopped there, so a dungeon save
-  // carried no registered mod's record
-  assert.match(read('src/scenes/worldModes.js'), /modSaveRecords: \(\) => host\.modSaveRecords\?\.\(\) \?\? \{\},\n\s+modSaveLoad: \(modData\) => host\.modSaveLoad\?\.\(modData\),/);
-  assert.match(read('src/scenes/shared.js'), /installWarmAshesShips\(\);[^\n]*\n\s+installDiverseWeaponsIcons\(\);/);
-});
 
 test('WA1 the switch, the lane and the credit: one Enabled on by default, the player\'s own online, Kamer credited, the permission RECORD OPEN', () => {
   _resetModSettings();

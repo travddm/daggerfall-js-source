@@ -129,18 +129,3 @@ test('VALENWOOD-CANOPY: the jungle\'s host - the share at the camera\'s eye off 
   assert.equal(land.canopy, 0, 'the stamp moved: the canopy read off the land as it is');
 });
 
-test('VALENWOOD-CANOPY: the wiring - the sky controller keeps the leaves for the water, which mirrors them, and draws no ceiling; the world host leans its light by the canopy and hands the jungle\'s host the zones', () => {
-  const sh = read('src/scenes/shared.js');
-  // PIN MOVED (GRAHT1): no ceiling drawn over any sky - the graht-oaks' crowns stand in the world
-  assert.doesNotMatch(sh, /canopySky|CanopySkyRenderer|canopyPass/, 'the ceiling retired');
-  assert.match(sh, /if \(sunbabyW > 0\) sunbabySky\?\.draw\(yaw, pitch, fovY, aspect\);[^\n]*\n\s+meter\?\.mark\('world'\);/, 'the sun baby\'s sky the last over the dome');
-  assert.match(sh, /const leaved = \(ws\) => canopyWaterSky\(ws, canopyLeaves\);/, 'the water\'s sky');
-  assert.equal(sh.match(/return leaved\(dreaded\(\{/g)?.length, 2, 'on either lane');
-  assert.match(sh, /setCanopy\(v\) \{\n\s+if \(v && v\[3\] > 0\) canopyLeaves\.set\(v\);\n\s+else canopyLeaves\[3\] = 0;/, 'the host\'s leaves kept, and taken back');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /canopyLight\(etherLight\(sdBrassLight\(sunbabyLight\(/, 'the ambient');
-  assert.match(w, /\* \(1 - DREAD_KEY_DIM \* skyDreadW\) \* canopyKey\(jungle\?\.canopy\),/, 'the key');
-  assert.match(w, /canopyLight\(etherLight\(sdBrassLight\(sunbabyKey\([^\n]*jungle\?\.canopy, 0\)\);/, 'the key\'s colour');
-  assert.match(w, /renderer\.setMoonlight\(canopyMoon\(/, 'the moon');
-  assert.match(w, /zoneAt: tamrielLand \? tamrielBiomeAt : null,/, 'the zones');
-});

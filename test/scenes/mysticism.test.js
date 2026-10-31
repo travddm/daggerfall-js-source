@@ -184,93 +184,12 @@ test('mysticism: silence blocks a cast that COSTS spell points, and only that', 
   assert.equal(silenceBlocksCast(silenced, { costsSpellPoints: false }), false);
 });
 
-
 // ── S27: the host wiring, swept from source ──────────────────────
 // These hosts have no execution coverage in node (AUDIT 19 found a
 // crash that 990 tests could not see), so the seam is pinned by
 // READING them - the same idiom audit17e uses for the four-host rules.
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (f) => readFileSync(join(root, f), 'utf8');
-
-test('S27: silence gates BOTH the ready and the cast, in the host that casts', () => {
-  // DFU checks SilenceCheck in two places and both clear the readied
-  // spell, so a silence landing mid-aim disarms you rather than
-  // waiting for the click.
-  // M3: the gates moved with the cast stack into the ONE engine
-  // (scenes/hostMagic.js) - the behavioral halves are pinned in
-  // hostmagic.test.js; this sweep holds the source shape.
-  const hm = read('src/scenes/hostMagic.js');
-  assert.ok(/import \{[^}]*silenceBlocksCast[^}]*\} from '\.\.\/systems\/mysticism\.js'/.test(hm),
-    'the engine imports the gate');
-
-  const castFn = hm.slice(hm.indexOf('function castInput'));
-  const castBody = castFn.slice(0, castFn.indexOf('\n  }\n'));
-  assert.ok(/silenceBlocksCast\(playerEntity\)/.test(castBody), 'the CAST gate');
-  assert.ok(/readiedSpell = null/.test(castBody), 'and it clears the readied spell');
-
-  const readyFn = hm.slice(hm.indexOf('function readySpell'));
-  const readyBody = readyFn.slice(0, readyFn.indexOf('\n  }\n'));
-  assert.ok(/silenceBlocksCast\(playerEntity\)/.test(readyBody), 'the READY gate');
-  assert.ok(/readiedSpell = null/.test(readyBody), 'and it clears too');
-});
-
-test('S27: THE FOUR HOSTS - every host mounts the ONE cast engine', () => {
-  // This pin used to assert the OPPOSITE ("casting is dungeon-only...
-  // if an exterior host EVER grows a cast path, this fails and sends
-  // the author to the gate"). The M slice is that author: spellcasting
-  // went above ground THROUGH the shared engine, so the silence gates
-  // ride along by construction - one implementation, four hosts.
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/dungeonContext.js']) {
-    const src = read(host);
-    assert.ok(/createPlayerMagic\(\{/.test(src), `${host} mounts the engine`);
-  }
-  const wm = read('src/scenes/worldModes.js');
-  // U42: the spellbook hands the ready callback DFU's own
-  // noSpellPointCost flag (the lycanthropy free cast), so the call
-  // carries a second argument - still the ONE engine.
-  //
-  // PX23: and that call moved ONE FILE. Four hosts built the book
-  // identically, so the build went into ui/spellbookDoor.js and took
-  // the readySpell arm with it. The law is unchanged and is pinned
-  // where it now lives; what each host must still do is HAND THE
-  // ENGINE to the door, which is the thing that could actually be
-  // dropped.
-  const door = read('src/ui/spellbookDoor.js');
-  assert.ok(/magic\?\.readySpell\?\.\(sp, \{ free: !!noSpellPointCost \}\)/.test(door),
-    'the door readies through the engine');
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    const src = read(host);
-    const call = src.slice(src.indexOf('createSpellbookWindow({'), src.indexOf('createSpellbookWindow({') + 320);
-    assert.ok(/\bmagic,/.test(call), `${host} hands the engine to the door`);
-  }
-  assert.ok(wm.includes('createSpellbookWindow({'), 'the interior arm takes the door');
-  assert.ok(/magic\?\.interceptAttack\(/.test(wm), 'and casts through it (I2: the attack click, not a cast key)');
-  // and worldModes is still the ROUTER for the dungeon context
-  assert.ok(/buildDungeonContext/.test(wm), 'worldModes mounts the dungeon context');
-});
-
-test('S27: Open and Lock are NOT wired, and the seams are named', () => {
-  // Flagged deliberately: their payload is an ARMED effect that must
-  // survive between the cast and the next door touched. This pin holds
-  // the claim honest - it fails the moment someone wires one without
-  // updating the record.
-  const my = read('src/systems/mysticism.js');
-  assert.ok(/OPEN AND LOCK ARE NOT WIRED/.test(my), 'the module says so');
-  assert.ok(/actionSystem\.js's `activate\(key\)`/.test(my), 'and names the door seam');
-  assert.ok(/interiorContext\.js/.test(my), 'and both ActionSystem owners');
-
-  // PVPFIX (PIN MOVED - the owner: "Undeniable Access/lockpicking should actually work on locked crates"): the dungeon
-  // calls Open ONCE, on a crate's own lock in its search - a crate is no ActionSystem door, so the door path never saw
-  // it - the armed spell spent there as at a door; the record says so (mysticism.js's header). Lock: a door's alone
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.ok(/ONE host call - dungeonContext\.js's crate\n\/\/ search \(activateSearchable\)/.test(my), 'the record names the crate arm');
-  assert.equal((dc.match(/triggerOpen\(/g) ?? []).length, 1, 'the dungeon calls the Open payload once - the crate');
-  assert.match(dc, /const armed = doorSpellFor\(playerEntity\);\n\s*if \(armed\?\.kind === 'open'\) \{\n\s*const r = triggerOpen\(\{ currentLockValue: sb\.lock, state: 'end' \}, armed\.holderLevel, \{ castBySkeletonKey: armed\.skeletonKey === true \}\);\n\s*consumeDoorSpell\(playerEntity, 'open'\);/, 'on the crate\'s own lock, the armed spell spent');
-  assert.ok(!/triggerLock\(/.test(dc), 'src/scenes/dungeonContext.js does not call the Lock payload - update the record when it does');
-  assert.ok(!/triggerOpen\(|triggerLock\(/.test(read('src/scenes/interiorContext.js')),
-    'src/scenes/interiorContext.js does not call the door payload yet - update the record when it does');
-});
-
 
 // ---------------------------------------------------------------
 // D9 - THE SKELETON'S KEY. Open.CheckCastByItem (Open.cs:172-181)

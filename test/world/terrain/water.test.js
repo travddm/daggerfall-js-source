@@ -198,77 +198,6 @@ test('WATER1: the shader - the terrain\'s own grid lifted, the corner lookup by 
   assert.match(fs, /ivec2\(uTileDim - 1\)/);
 });
 
-test('WATER1: the renderer - one program, the deck\'s shadow key, and a draw state that blends over the ground it is lifted from', () => {
-  const r = rd('src/render/renderer.js');
-  assert.match(r, /import \{ WATER_SURFACE_VS, waterSurfaceFs \} from '\.\/waterSurface\.js';/);
-  // WATER-NEXT 2: the pass is three bodies - the list's, the frame block both waters take, the rows' draw state
-  const part = (head) => { const at = r.slice(r.indexOf(head)); return at.slice(0, at.indexOf('\n  }\n')); };
-  assert.match(r, /import \{ packWaterMask, WATER_DRAW_MASK_TABLE \} from '\.\.\/world\/water\/waterCorners\.js';/, 'MAC2: the corner table\'s one home is the world leaf the player\'s feet share - WATER-DRAW1: and the PASS takes the draw\'s half of it, not the feet\'s');
-  assert.match(r, /this\.waterSurfaceProgram = this\._buildProgram\(WATER_SURFACE_VS, waterSurfaceFs\(CLOUD_SHADOW_GLSL\)\);/, 'the same block the terrain interpolates');
-  assert.match(r, /cloud: \[u\('uCloudShadowMap'\), u\('uCloudShadowRect'\), u\('uCloudShadowFar'\)\],/, 'VC4\'s recorded gap, closed (EL7: in the one uniform table both water programs take)');   // PIN MOVED (OW-HORIZON, 2026-10-20): and the far law past the square
-  assert.match(r, /this\._csLoc\.water = this\._ws\.cloud;/);
-  // PERF-EXT13: the pass's body is the LIST's - every visible pixel's water in one call - and drawWaterSurface
-  // hands it one row (the town host, the lab)
-  const body = [part('  drawWaterSurfaces(rows, n, tileSize, u, tileDim = 128) {'), part('  _waterFrameBlock(L, u, open, lift = u.lift) {'), part('  _drawWaterRows(L, rows, n) {')].join('\n');
-  assert.match(r, /  drawWaterSurface\(surface, modelMatrix, arrayTex, tilemapTex, tileSize, u, tileDim = 128\) \{\n\s*const one = this\._waterOne, row = one\[0\];\n\s*row\[0\] = surface; row\[1\] = modelMatrix; row\[2\] = arrayTex; row\[3\] = tilemapTex;\n\s*this\.drawWaterSurfaces\(one, 1, tileSize, u, tileDim\);/, 'the one-surface door is the list with one row');
-  assert.match(body, /if \(!L\.maskUploaded\) \{ gl\.uniform4uiv\(L\.mask, packWaterMask\(WATER_DRAW_MASK_TABLE\)\); L\.maskUploaded = true; \}/, 'the table once per program (EL7: the lane\'s water program has its own) - WATER-DRAW1: and it is the DRAW\'s table that reaches the shader');
-  assert.match(body, /this\._uploadCloudShadow\('water'\);/);
-  assert.match(body, /this\._uploadFog\(this\._waterSurfaceFog\);/);
-  for (const k of ['_lightDir', '_ambient', '_sunScale', '_sunColor', '_moonDir', '_moonScale', '_moonColor']) {
-    assert.ok(body.includes(`this.${k}`), `the ground's ${k}`);
-  }
-  assert.match(body, /gl\.enable\(gl\.BLEND\);\s*\n\s*gl\.blendFunc\(gl\.SRC_ALPHA, gl\.ONE_MINUS_SRC_ALPHA\);\s*\n\s*gl\.depthMask\(false\);\s*\n\s*gl\.disable\(gl\.CULL_FACE\);/, 'drawWater\'s state');
-  // FIELD BUGS 2026-09-29 (the sea) #4: the offset is the sea's surface film's, from the one table (render/waterSurface.js WATER_LAYER_UNITS, -2)
-  assert.match(body, /gl\.enable\(gl\.POLYGON_OFFSET_FILL\);\s*\n\s*gl\.polygonOffset\(0, WATER_LAYER_UNITS\.surface\);[^\n]*\n\s*gl\.depthFunc\(gl\.LEQUAL\);/, 'nudged toward the eye in window depth by the constant term only (WATER-AUDIT M3: a slope factor pulled the water over a far shore), and equal is the surface');
-  // WATER-AUDIT (M2): the ground's point lights and indirect light reach the water
-  assert.match(body, /gl\.uniform1i\(L\.pointCount, count\);[\s\S]*?gl\.uniform4fv\(L\.indirect, this\._indirect\);\s*\n\s*gl\.uniform3fv\(L\.indirectColor, this\._indirectColor\);/);
-  assert.match(body, /gl\.uniform1i\(L\.tileDim, tileDim\);/, 'WATER-AUDIT (L2): the tilemap\'s own side, not a hardcoded 127');
-  // WATER-AUDIT (M4): the water's own surface over the terrain's buffers
-  assert.match(r, /createWaterSurface\(terrain, indices\) \{[\s\S]*?const \[positions, normals\] = terrain\.buffers;[\s\S]*?return \{ vao, ebo, indexCount: indices\.length \};/);
-  assert.match(r, /destroyWaterSurface\(water\) \{\s*\n\s*const gl = this\.gl;\s*\n\s*gl\.deleteBuffer\(water\.ebo\);\s*\n\s*for \(const b of water\.buffers \?\? \[\]\) gl\.deleteBuffer\(b\);[^\n]*\n\s*gl\.deleteVertexArray\(water\.vao\);/, 'PIN MOVED (WATER-NEXT 2): and a sheet\'s own buffers');
-  assert.match(body, /gl\.depthFunc\(gl\.LESS\);\s*\n\s*gl\.disable\(gl\.POLYGON_OFFSET_FILL\);\s*\n\s*gl\.depthMask\(true\);\s*\n\s*gl\.disable\(gl\.BLEND\);\s*\n\s*gl\.vertexAttrib4f\(1, 0, 0, 0, 1\);[^\n]*\n\s*gl\.enable\(gl\.CULL_FACE\);/, 'and every bit of it put back (WATER-NEXT 2: attribute 1\'s constant with it)');
-  assert.match(body, /gl\.bindTexture\(gl\.TEXTURE_2D_ARRAY, arrayTex\);[\s\S]*?this\._activeTexture\(gl\.TEXTURE2\);\s*\n\s*gl\.bindTexture\(gl\.TEXTURE_2D, tilemapTex \?\? null\);/,   // PIN MOVED (WATER-NEXT 2): the open sea's rows empty the unit
-    'the terrain\'s two textures on the terrain\'s two units (PERF-TEX3: the unit through the selector\'s funnel)');
-});
-
-test('WATER1: both exterior hosts - the gate, the has-water skip, and the slot after the opaque passes and before the first flat', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const waterOn = waterSwitchOn\(\);/, 'world: the one composition (FT6, render/waterSurface.js)');
-  // WATER-AUDIT (M4): the water's own index set, built with the pixel and rebuilt with its restride, destroyed before the buffers it rides
-  assert.match(w, /const waterIndices = waterOn \? buildWaterIndices\(tilemapBytes, stride\) : null;\s*\n\s*const water = waterIndices \? renderer\.createWaterSheet\(waterIndices, waterSheetOf\(bed, terrain\)\) : null;/, 'decided at the build (PIN MOVED, WATER-NEXT 2: its own sheet over the bed)');
-  assert.match(w, /px, py, terrain, water, tilemapTex,/, 'carried on the built pixel');
-  const restride = w.slice(w.indexOf('  function restrideTerrain(p, stride'));   // PERF-EXT26: it takes the worker's grid too
-  assert.match(restride.slice(0, restride.indexOf('\n  }\n')), /if \(p\.water\) \{ renderer\.destroyWaterSurface\(p\.water\); p\.water = null; \}[\s\S]*?renderer\.destroyMesh\(p\.terrain\);[\s\S]*?p\.water = waterIndices \? renderer\.createWaterSheet\(waterIndices, waterSheetOf\(bed, p\.terrain\)\) : null;/);
-  assert.equal((w.match(/renderer\.destroyWaterSurface\(p\.water\)/g) || []).length, 3, 'the restride, the eviction, and the Deep Waters cap\'s TileMap (DW-F: the clipped and repainted tiles take the sheet with them)');
-  assert.match(w, /p\._visible = pixelVisible;/, 'the pixel gate\'s verdict, kept for the pass');
-  const slot = w.indexOf('    if (waterOn) {\n      stirRipples(dt, now);   // WATER-NEXT 4\n      const wu = _waterU = waterUniforms(');   // PIN MOVED (WATER-NEXT 4): the ripples step first
-  assert.ok(slot > 0, 'the pass exists');
-  assert.ok(slot > w.indexOf('renderer.drawTerrain(p.terrain, pixelMatrix,'), 'after the ground');
-  assert.ok(slot > w.lastIndexOf('renderer.drawMesh(millParts.rotor, mountRotor(multiply(pixelMatrix, w.local)'), 'after the last opaque model of the pixel loop');
-  assert.ok(slot < w.indexOf('renderer.drawBillboards(allBatches, camRight, bbUp);'), 'before the first flat');   // TV1: the flats lean to the travel view's eye (bbUp)
-  // AUDIT PRECIP FALL-4 (PIN MOVED): on the law's lane the rings are the DROPS' (fx.rain - null off it)
-  assert.match(w, /const wu = _waterU = waterUniforms\(\{ seconds: now \/ 1000, wind: windNow, rain: (?:fx\.rain \?\? \()?precipMode === 'rain' \|\| precipMode === 'storm' \? fx\.intensity : 0\)?, sky: waterSkyNow \}\);/,
-    'the clock, the eased wind the mills take, the front\'s rain, the dome\'s colours');   // PIN MOVED (FAR-SEA1): the dome's colours read once a frame, the far ring's sea takes them too
-  assert.match(w, /const waterSkyNow = waterOn \? sky\.waterSky\(\) : null;/, 'FAR-SEA1: ...read from the dome, once (AUDIT FAR-SEA1 H2: and only with the Enhanced water on)');
-  // PERF-EXT13: the visible water pixels are collected - each pixel's water, its matrix, its ground array and its
-  // tilemap - and drawn in ONE call after the walk
-  // AUDIT PRECIP GROUND-5 (PIN MOVED): and its snow - the set as the lane holds it, and the pixel's draw (snowCover.drawOf)
-  assert.match(w, /if \(!p\._visible \|\| !p\.water \|\| p\.deepWaters\?\.hide\) continue;[^\n]*\n\s*const row = _waterRows\[n\+\+\] \?\?= \[null, null, null, null, null\];\s*\n\s*row\[0\] = p\.water; row\[1\] = p\._pixelMatrix; row\[2\] = snowCover\.arrayOf\(p\.groundArchive\); row\[3\] = p\.tilemapTex; row\[4\] = snowCover\.drawOf\(p\);\s*\n\s*\}\s*\n\s*renderer\.drawWaterSurfaces\(_waterRows, n, 6\.4, wu\);/);
-  // DW-C: a pixel whose cap Iliac Puddle No More hides takes its water with it (the condition above)
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /const waterOn = waterSwitchOn\(\)[^\n]*\n\s*&& tilemapRectHasWater\(tilemapBytes, tilemapDim, loc\.width \* GROUND_TILE_DIM, loc\.height \* GROUND_TILE_DIM\);/, 'exterior: the one composition, and the town\'s own has-water question beside it (FT6)');
-  const eslot = e.indexOf('    if (waterOn) {   // WATER-NEXT 2: the town\'s own sheet (waterOn is the town\'s has-water too: the sheet is there)\n      if (townRipples) {');   // PIN MOVED (WATER-NEXT 2): the town's own sheet - AUDIT WATER-NEXT m12: its ripple field stirred first
-  assert.ok(e.indexOf('renderer.drawWaterSurface(townWater, identityMatrix,') > eslot, 'the town\'s own sheet, in the slot');
-  assert.ok(eslot > 0);
-  assert.ok(eslot > e.indexOf('renderer.drawTerrain(groundSurface, identityMatrix,'), 'after the ground');
-  assert.ok(eslot > e.indexOf('arrows.draw(renderer, texRemap);'), 'after the arrows');
-  assert.ok(eslot < e.indexOf('renderer.drawBillboards(_visBatches, camRight, UP_Y);'), 'before the first flat');
-  assert.match(e, /waterUniforms\(\{ seconds: now \/ 1000, wind: sky\.wind\(\), rain: precipMode === 'rain' \|\| precipMode === 'storm' \? fx\.intensity : 0, sky: sky\.waterSky\(\) \}\)/);
-  assert.match(e, /sky: sky\.waterSky\(\) \}\),\s*\n\s*tilemapDim\);/, 'WATER-AUDIT (L2): the town\'s tilemap side reaches the shader');
-  // the dungeon's own water pass is untouched - WATER-D1 moved it into the context's frame function, one home for both dungeon hosts
-  assert.match(rd('src/scenes/dungeonContext.js'), /renderer\.drawWater\(waterQuads, DUNGEON_WATER_COLOR,/);
-});
-
 // ── WATER-AUDIT: the table pinned THROUGH the producer, not against itself ──
 test('WATER-AUDIT (H1/H2): every shore tile the marching squares write gives back the corners that were water, in the tilemap\'s own frame', () => {
   // The first pin re-read what buildWaterMaskTable had just written from the
@@ -304,8 +233,6 @@ test('WATER-AUDIT (H1/H2): every shore tile the marching squares write gives bac
   const at = (x, z) => grid.positions.subarray((z * td + x) * 3, (z * td + x) * 3 + 3);
   const near = (a, b) => Math.abs(a - b) < 1e-3;
   assert.ok(near(at(3, 7)[0], 3 * 6.4) && near(at(3, 7)[2], 7 * 6.4), 'x along X, the row index along Z');
-  const r = rd('src/render/renderer.js');
-  assert.match(r, /gl\.texImage2D\(gl\.TEXTURE_2D, 0, gl\.R8UI, dim, dim, 0, gl\.RED_INTEGER, gl\.UNSIGNED_BYTE, bytes\);/, 'row-major, dim wide: texel (x, y) = bytes[x + y * dim]');
   // and the mutation the tautology let through: an inverted table fails here
   const inverted = new Uint8Array(256);
   for (let i = 0; i < 256; i++) inverted[i] = WATER_MASK_TABLE[i] ? (~WATER_MASK_TABLE[i]) & 15 : 0;

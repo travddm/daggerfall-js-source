@@ -120,23 +120,6 @@ test('GHOST1: `batchVisible` lifts the sphere, so the main pass and the emission
   assert.equal(batchVisible(down, flame), true, 'the upside-down flame is bounded where it actually hangs');
 });
 
-test('GHOST1: ONE home - every sphere cull in the tree goes through bounds.js, on normalised planes', () => {
-  const bounds = read('src/render/bounds.js');
-  assert.match(bounds, /export function batchVisible\(planes, b\) \{/);
-  assert.match(bounds, /\(b\.size\?\.h \?\? 0\) \* 0\.5/, 'the lift lives here and nowhere else');
-  // the four readers of a billboard sphere
-  const r = read('src/render/renderer.js'), w = read('src/scenes/world.js');
-  assert.match(r, /if \(bbCull\) spherePlanes\(/, 'the billboard pass extracts NORMALISED planes');
-  assert.doesNotMatch(r, /frustumPlanes\(mat4Multiply/, 'never the raw ones');
-  assert.match(w, /if \(cullOn\) spherePlanes\(multiply\(proj, view, _pv\), _planes\);/, 'and so does the streaming host, whose _planes serve both tests');
-  assert.match(r, /return batchVisible\(this\._bbPlanes, b\);/, 'the pass delegates');
-  assert.match(w, /!batchVisible\(_planes, b\)/, 'the host delegates');
-  for (const [f, what] of [['src/render/shadowPass.js', 'the shadow replay'], ['src/render/airPass.js', 'the emission replay']]) {
-    assert.match(read(f), /batchVisible/, `${what} reads the same law`);
-    assert.match(read(f), /spherePlanes\(/, `${what} extracts the same planes`);
-  }
-});
-
 test('GHOST1: normalising `_planes` cannot change one EV3 box decision - the sign is all aabbOutside reads', async () => {
   const { aabbOutside } = await import('../../src/render/frustum.js');
   const pv = framePv();

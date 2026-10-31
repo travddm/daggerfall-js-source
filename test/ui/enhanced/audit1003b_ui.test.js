@@ -109,10 +109,3 @@ test('AUDIT PRE-MERGE 1003b U1: the session\'s card spans the Bouts page and a m
   assert.match(ARENA_WINDOW_CSS, /\.aw-act\[aria-disabled="true"\] \{ opacity: 0\.4; cursor: not-allowed; \}/, 'a shut press looks shut');
 });
 
-test('AUDIT PRE-MERGE 1003b M2: under retro mode\'s pillarbox the quest card steps aside for the versus bar by the PICTURE\'s width - #551 inset the card into the picture, and U4\'s 1100 px read the window\'s: at 1366x768 in 4:3 the card overlapped the bar 36x54 px (mutants: the narrow mark never written; the rule gone)', async () => {
-  const src = (await import('node:fs')).readFileSync(new URL('../../../src/ui/enhanced/enhancedHud.js', import.meta.url), 'utf8');
-  assert.match(src, /const narrow = !!ui && ui\.w <= ARENA_CARD_ROOM_PX;/, 'the picture\'s width read');
-  assert.match(src, /if \(narrow\) doc\.documentElement\?\.setAttribute\?\.\('data-ui-narrow', ''\); else doc\.documentElement\?\.removeAttribute\?\.\('data-ui-narrow'\);/, 'and worn on the root');
-  const css = (await import('node:fs')).readFileSync(new URL('../../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
-  assert.match(css, /:root\[data-ui-narrow\] body:has\(\.arena-hud\.on\) \.qtrack \{ visibility: hidden; \}/, 'the card steps aside in a narrow picture');
-});

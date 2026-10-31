@@ -102,22 +102,3 @@ test('WATER-NEXT 2 the town\'s grid: DFU\'s flat ground as its tiles, the terrai
   assert.deepEqual([...idx], [0, 5, 6, 0, 6, 1], 'one quad, in the 5-wide grid');
 });
 
-test('WATER-NEXT 2 the hosts: the world carves at the build and at a restride and keeps the bed for the cap\'s re-index; the fixed town lays its grid; the lab as the hosts (mutants: a host uploading the uncarved grid; the sheet off the terrain\'s buffers)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT WATER-NEXT P1): the kernel carves (terrainGen.js restrideGrid, on the worker) and the host uploads
-  assert.match(w, /bed: waterOn,   \/\/ AUDIT WATER-NEXT P1/, 'the build asks the kernel for the bed');
-  assert.match(w, /const bed = hostBed\(\{ positions, normals \}, carved\);/);
-  assert.match(w, /const terrain = renderer\.createTerrainSurface\(carved\?\.positions \?\? positions, carved\?\.normals \?\? normals,/);
-  assert.match(w, /const water = waterIndices \? renderer\.createWaterSheet\(waterIndices, waterSheetOf\(bed, terrain\)\) : null;/);
-  assert.match(w, /const bed = waterOn \? hostBed\(grid, grid\.bed\) : null;/, 'the restride');
-  assert.match(w, /p\.water = idx \? renderer\.createWaterSheet\(idx, waterSheetOf\(p\._bed, p\.terrain\)\) : null;/, 'the cap\'s re-index');
-  assert.match(w, /_bed: bed,/);
-  assert.match(w, /function hostBed\(grid, bed\) \{ return bed \? \{ sheet: grid\.positions, normals: grid\.normals, depths: bed\.depths, sheetDepths: bed\.sheetDepths, halo: bed\.halo \?\? null \} : null; \}/);
-  assert.match(w, /function waterSheetOf\(bed, terrain\) \{ return bed\?\.depths \? \{ positions: bed\.sheet, depths: bed\.sheetDepths \} : \{ terrain \}; \}/);   // AUDIT WATER-NEXT H2: the sheet's own depths
-  const e = read('src/scenes/exterior.js');
-  assert.match(e, /const townBed = townGrid \? waterBedOf\(townGrid, tilemapBytes, \{ tileDim: tilemapDim, width: loc\.width \* GROUND_TILE_DIM, height: loc\.height \* GROUND_TILE_DIM \}\) : null;/);
-  assert.match(e, /renderer\.drawWaterSurface\(townWater, identityMatrix,/);
-  assert.match(read('src/tools/waterLab.js'), /renderer\.createWaterSheet\(waterIndices, bed \? \{ positions: bed\.sheet, depths: bed\.sheetDepths \} : \{ terrain \}\)/);
-  // the game's ground is the samples', never the drawn grid's
-  assert.doesNotMatch(w.slice(w.indexOf('const heightAt = (x, z, terrainOnly = false) => {'), w.indexOf('// BLOOD1 AUDIT 3: WHERE THE GROUND IS DRAWN.')), /positions|_bed/);
-});

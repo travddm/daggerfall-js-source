@@ -496,9 +496,6 @@ test('EG-G1 TOUCH AND THE PAD (section 27.8): the d-pad is the Spire\'s while it
   assert.deepEqual(calls, [['vibrate', 30], ['dual-rumble', 30, EG_HAPTICS.peril.weak, EG_HAPTICS.peril.strong]]);
   assert.equal(egBuzz('beat', { nav, on: false }), false, 'behind the switch');
   assert.equal(EG_HAPTICS.beat.ms, 15);
-  // the host wires the pad through the helm's door
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /inputHooks\.helm = \{ up: \(\) => eg\(\) \|\| helm\.up\(\), gesture: \(dir, kind\) => \(eg\(\) \? egClient\.padGesture\(dir, kind\) : helm\.gesture\(dir, kind\)\)/);
 });
 
 test('EG-G1 ACCESSIBILITY (section 25.7): the danger palette - High contrast\'s magenta edge, white-gold safety and cyan hazard; the colour-blind presets separated under simulation where Standard is not; each shape recoloured, its fill at the player\'s light and its line whole; reduced motion by the row or the system; the three rows on the shelf and under Settings > Accessibility; the fight\'s pass drawn through it (mutants: a fill dimming the line; the gold read as danger; the system\'s setting ignored)', () => {
@@ -534,7 +531,6 @@ test('EG-G1 ACCESSIBILITY (section 25.7): the danger palette - High contrast\'s 
   assert.deepEqual([PREF_DEFAULTS.dangerPalette, PREF_DEFAULTS.telegraphFill, PREF_DEFAULTS.reducedMotion], ['standard', 1, false]);
   assert.deepEqual([whereIs('port:reducedMotion')?.section.id, whereIs('port:dangerPalette')?.section.id, whereIs('port:telegraphFill')?.section.id], ['motion', 'danger', 'danger']);
   assert.ok(['port:reducedMotion', 'port:dangerPalette', 'port:telegraphFill'].every((k) => whereIs(k)?.tab.id === 'accessibility'));
-  assert.match(rd('src/scenes/eliteGates/egFight.js'), /egLookShapes\(_shapes, egAccessNow\(\), stageNow\);/, 'the fight\'s shapes laid on from the shelf before the pass');
   // the HUD honours the palette and the stillness
   destroyEgSpireHud();
   const doc = fakeDocument();

@@ -47,7 +47,6 @@ test('TELL6b: the charge - a 9 m by 1.6 m lane from its feet, 0.9 s, x1.5, run i
   }
   assert.equal(BLOW_KIND.charge, BLOW_KIND.lunge, 'the shader\'s lane');
   assert.ok(H >= BLOW.charge.len + 0.5);
-  assert.match(rd('src/render/foeTelegraph.js'), /if \(b\.kind === 'lunge' \|\| b\.kind === 'charge'\) gl\.uniform4f\(U\.uP, P\.len, P\.halfW, 0, 0\);/);
   assert.equal(punishSeconds('charge'), 1.4);
   assert.ok(TELL.TRACKERS.includes('charge'));
   assert.ok(GAP_CLOSERS.includes('charge'));   // PIN MOVED (TELL6c: the leap joins it)

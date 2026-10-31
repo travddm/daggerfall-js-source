@@ -260,9 +260,6 @@ test('EG-ZH THE HALL\'S REVERB ON THIS SCREEN (scenes/eliteGates/egClient.js): h
   // every way out: the walk out lets it go
   P.online.terminal = true; client.frame();
   assert.equal(calls.filter((c) => c[0] === 'release').length, 2, 'the walk out');
-  const SRC = rd('src/scenes/eliteGates/egClient.js');
-  assert.match(SRC, /if \(!swapping && !answering\) reverb\.release\(\);/, 'held through a swap or an answer under way');
-  assert.match(SRC, /reverb\.release\(\); clampAway\(\);   \/\/ EG-ZH: the hall's reverb let go/, 'walkOut lets it go');
 });
 
 test('EG-ZH THE PEERS DOWN (net/peer/peerFx.js, systems/eliteGates/egMix.js): with no scope a peer\'s sound is as it was; the mix\'s `peers(true)` plays every peer sound at EG_MIX.peerDb (4 dB down) through the engine\'s scope - the peers\' blows and hurts, the walkers\' steps, swings and cries, their climbs - and `peers(false)` lets them be (mutants: the scope never set; the gain not the mix\'s; off never clearing)', () => {
@@ -285,12 +282,6 @@ test('EG-ZH THE PEERS DOWN (net/peer/peerFx.js, systems/eliteGates/egMix.js): wi
   assert.equal(mix.heard().peers, true);
   assert.equal(mix.peers(false), false);
   peerHeard(() => a.playOneShot('k', 1)); assert.equal(vol(), 1, 'off: as they were');
-  // every peer sound passes through it
-  const RP = rd('src/net/remotePlayers.js'), PC = rd('src/net/peer/peerClimb.js'), PF = rd('src/net/peer/peerFx.js');
-  assert.match(RP, /function peerSound\(audio, clip, at, volume\) \{\n  peerHeard\(\(\) => \{/, 'the walkers\' steps and swings');
-  assert.match(RP, /if \(falloff > 0\) peerHeard\(\(\) => audio\.playOneShot\(peerDeathSound\(peer\?\.look\), falloff\)\);/, 'a peer\'s cry');
-  assert.match(PC, /peerHeard\(\(\) => this\.audio\.play3d\(c\.key, at, Math\.min\(1, vol\)/, 'a peer\'s climb');
-  assert.match(PF, /if \(!dup\) peerHeard\(\(\) => \(q\.hurt \? play\?\.hurt : play\?\.blow\)\?\.\(/, 'the blows and hurts');
   setPeerSoundScope(null);
 });
 

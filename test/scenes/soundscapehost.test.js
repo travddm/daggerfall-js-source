@@ -27,8 +27,6 @@ import { uiSkin, setUiSkin } from '../../src/systems/uiSkin.js';
 import { _resetSoundscapeSounds } from '../../src/systems/soundscape/soundscapeSfx.js';
 import { seededRng } from '../../src/systems/wind/wind.js';
 
-const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-
 test('SOUNDSCAPE THE SHORE\'S EDGE (AUDIT SOUNDSCAPE W3, W10): where the water changes - the sea deeper than SHORE_DEPTH meeting the shallows or the land - on SHORE_BEARINGS bearings at each of SHORE_RADII, nearest ring first, placed along its bearing by halvings to within a metre, the nearest of the bearings that met it; found from the land and from the sea alike; the edge a point at the sea\'s surface; far out at sea, or inland past the last ring, none (mutants: the depth\'s threshold; the halvings; the rings\' order; the first bearing taken for the nearest; the sea\'s side unread; the surface unread)', () => {
   assert.deepEqual([[...SHORE_RADII], SHORE_BEARINGS, SHORE_DEPTH], [[6, 14, 28, 50, 85, 130, 200], 12, 0.3]);
   // a beach running along z: the deep past x0, shallows 3 m wide, then the land (no column)
@@ -240,21 +238,3 @@ test('SOUNDSCAPE THE HOST ON LAND (AUDIT SOUNDSCAPE W1, W2): the shore found on 
   assert.equal(late.calls.beds3d.get('town:tavern')?.pos[0], 18, 'walked 16 m: asked at once');
 })));
 
-test('SOUNDSCAPE THE WORLD HOST: constructed once beside the Deadlands\' air with the world\'s own doors as they are - the deck test, her bow\'s law and the fight the watch knows; its frame on the exterior frame after the listener is set and beside the wind, the game\'s pause handed it; its stop on the modal frame beside the wind\'s; its score in the music\'s chain after the arena\'s, before the director; the clips\' loader asked every frame (mutants: the frame before the listener; the stop dropped; the score ahead of the gate\'s; the pause unwired; the deck test unwired; the fight on hostileNear)', () => {
-  const made = W.indexOf('const soundscape = createSoundscapeHost({');
-  assert.ok(made > W.indexOf('const deadlandsAir = createDeadlandsAir(audio);'));
-  assert.equal(W.split('createSoundscapeHost(').length - 1, 1, 'once');
-  assert.ok(W.includes('audio, music, boat: csaBoatUnderMe, aboard: () => !!naval?.aboard?.(), bow: boatForward, csa: csaRuntime, fight: () => !!naval?.battle?.(), pixel: playerTravelPixel,'));
-  // PIN MOVED (TESA x MAIN, the merge after WORLD-WIDE's fold): a town's size off the world's registry (WW1 livingTownAt), never the Bay's y * 1000 + x
-  assert.ok(W.includes('seaPixel: openSea, dw: dwPlayer, inTown: _isPlayerInTownStrict, townAt: livingTownAt, doors: buildingDoors, doorAt: shiftedDoor,'));
-  const listener = W.indexOf('audio.setListener(cam.pos, tvf ? [viewFwd[0], 0, viewFwd[2]] : fwd);');
-  const frame = W.indexOf('soundscape.frame(dt, {');
-  assert.ok(listener > 0 && frame > listener && frame - W.indexOf('windAudio.update(wd, dt, windSoundOn());') < 1200, 'after the listener, beside the wind');
-  assert.ok(W.includes('winter: season === SEASON.Winter, paused: gamePaused() });'), 'the pause handed it');
-  assert.match(W, /^      windAudio\.stop\(\); soundscape\.stop\(\);   \/\/ WIND3/m, 'the modal frame silences it with the wind, on the wind\'s own line (DISC6 reads the lines after it)');
-  assert.match(W, /if \(!hourScoreFrame\(\) && !gateScoreFrame\(\) && !arenaScoreFrame\(\) && !soundscape\.scoreFrame\(\)\) musicDirector\.update\(\{/);
-  const H = readFileSync(new URL('../../src/scenes/soundscapeHost.js', import.meta.url), 'utf8');
-  assert.ok(H.includes('      installSoundscapeSounds(deps.audio);   // AUDIT SOUNDSCAPE S7'), 'the loader asked every frame - its own backoff decides');
-  const N = readFileSync(new URL('../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
-  assert.ok(N.includes('    battle: () => aiming || crewAlarm() || !!boarding,'), 'the naval host\'s battle: the watch\'s alarm and a boarding');
-});

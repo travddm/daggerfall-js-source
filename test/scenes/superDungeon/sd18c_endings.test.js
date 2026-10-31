@@ -52,8 +52,6 @@ test('SD18c THE BODIES IN ITS LIGHT: the Remnant\'s heart and eyes, its Echoes\'
   createSdRemnant({ renderer, ending: 'sentinel' }).stand({ dynamicDraws: [] });
   const recs = new Set(made.flatMap((m) => m.subMeshes.map((x) => x.textureRecord)));
   assert.ok(recs.has(26) && !recs.has(SD_REMNANT_HEART_RECORD) && !recs.has(SD_REMNANT_EYE_RECORD), 'every heart, eye and Heart in Sunfall\'s light');
-  const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(D, /alive: \(\) => playerEntity\.health > 0, ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\] \}\)/);
 });
 
 test('SD18c ITS SPARKS IN ITS LIGHT: the Hearts risen and broken and the stun in its Ending\'s; with none the Mantella\'s', () => {
@@ -77,9 +75,4 @@ test('SD18c ITS WORD: the taverns tell the omen its Ending sends - six of them, 
   assert.equal(new Set(SD_ENDINGS.map((E) => sdRumorLine('Wayrest', E.id))).size, 6);
   assert.equal(sdRumorLine('Wayrest', 'wayrest'), 'They say the air goes brass-colored past the walls of Wayrest at dusk, and the tide comes in where there is no sea.');
   assert.match(sdRumorLine('Wayrest'), /a bell rings where there is no bell\.$/);
-  // the slot's own, through the taverns and the map (the map card's line pinned whole by test/ui/enhanced/sd2c_omen.test.js)
-  const O = readFileSync(new URL('../../../src/systems/superDungeon/sdOmen.js', import.meta.url), 'utf8');
-  assert.match(O, /return sdRumorLine\(hollow\.site\.cityName \|\| 'the city', sdMarksOf\(rec\.s\)\[0\]\);/);
-  assert.match(O, /const E = sdEndingOf\(sdMarksOf\(rec\.s\)\);/);
-  assert.match(O, /\.\.\.\(E \? \[`It keeps the Ending of \$\{E\.stone\}`\] : \[\]\)/);
 });

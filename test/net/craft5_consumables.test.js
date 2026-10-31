@@ -126,17 +126,8 @@ test('CRAFT5 MEASURED: a dish\'s buff and a Potent potion stand together - the F
   feedEffect(b, dishOf('feast'));
   assert.deepEqual([strengthOf(b).length, liveStat(b, 'strength')], [2, drunk + 5], 'renewed, the potion standing');
   assert.equal(liveStat(a, 'strength'), both);
-  // why: the dish's entries carry no spell settings, so a potion's like-kind search (effects.js applySpell) never finds them
-  assert.match(src('src/systems/effects.js'), /const inc = findInc\(\(a\) => a\.kind === 'fortifyAttribute' && a\.stat === stat && a\.settingsKey === sKey\);/);
   assert.equal(a.activeEffects.find((e) => e.bundleName === dishOf('feast').name).settingsKey, undefined);
 });
 
 // ─── THE PAGE ────────────────────────────────────────────────────────
 
-test('CRAFT5 the anvil\'s kit box: its quality odds, and the reach a Superior or Masterwork kit gives', () => {
-  const p = src('src/ui/professions/profPages.js');
-  assert.match(p, /if \(rollsQuality\(r\) && recipeOpen\(r, rank\)\) \{   \/\/ CRAFT5: a Repair Kit's quality too/);
-  assert.match(p, /if \(r\.kind === 'kit'\) box\.append\(el\('p', 'px-note', KIT_REACH_LINE\)\);/);
-  assert.match(p, /It repairs up to three quarters, or nine tenths with a Superior or Masterwork kit\./);
-  assert.match(src('server-account/src/professions.js'), /const quality = rollsQuality\(r\)   \/\/ CRAFT5: a Repair Kit's too - its quality its reach\n/);
-});

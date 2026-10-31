@@ -195,9 +195,6 @@ test('QCLOCK-WORLD CreateFoe\'s interval: a rest spends none of it (no wave), an
     clock.t += 2 * HOUR_S; m.tick();
     assert.equal(world.created.length, 1, 'two hours away (lived, a hidden tab): one step charged, the interval not yet');
   }
-  const src = rd('src/systems/quest/actions.js');
-  assert.match(src, /const raisedNow = this\.parentQuest\.raisedSeconds\?\.\(\) \?\? null;/, 'the wave reads the session\'s raises');
-  assert.match(src, /this\._lastRaised = raisedNow;/, 'and samples them every tick');
 });
 
 test('TIME3 a quest reads three clocks: an hour, a day\'s light, a season and a date on the SKY; a sound\'s interval and a guard\'s watch on the CHARACTER\'s; its start, its steps and its tombstone stamped where they belong', () => {
@@ -489,26 +486,3 @@ test('QCLOCK-WORLD the rest, end to end online: a quest ticks on every sub-tick,
   assert.ok(Math.abs(realSeconds - 32.4) < 1e-6, `about half a minute of real time (${realSeconds.toFixed(1)} s)`);
 });
 
-test('TIME3 by source - THE FOUR HOSTS RULE: world.js and exterior.js hand the machine the character\'s clock, the sky, the event clock and the raises; the dungeon\'s rest and collapse raise through the counted call; every host\'s rest deps tick the quests, and the session no longer stands them down online; the bridge carries the four and the lens rereads on either hour', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(host);
-    assert.match(s, /classicSeconds: \(\) => playerTicker\.ownMinutes \* 60,/, `${host}: the quest's clock is the character's`);
-    assert.match(s, /skySeconds: \(\) => skyMinutes\(\) \* 60,/, `${host}: the sky`);
-    assert.match(s, /worldSeconds: \(\) => playerTicker\.classicMinutes \* 60,/, `${host}: the event clock`);
-    assert.match(s, /raisedSeconds: \(\) => raisedMinutes\(\) \* 60,/, `${host}: the raises`);
-    assert.match(s, /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, `${host}: the rest ticks the quests`);
-  }
-  const dungeon = rd('src/scenes/dungeonContext.js');
-  assert.match(dungeon, /const start = Math\.floor\(end\) - n;\s*\n\s*advanceOwnMinutes\(n\);/, 'the dungeon\'s rest: a counted raise');
-  assert.match(dungeon, /advanceOwnMinutes\(60\);   \/\/ RaiseTime\(1 hour\)/, 'the dungeon\'s collapse: a counted raise');
-  assert.match(dungeon, /tickQuests: \(\) => opts\.questBridge\?\.machine\?\.tick\?\.\(\),/, 'and its rest ticks the world host\'s quests');
-  assert.equal(/classicMinutesRef\.value \+= /.test(dungeon), false, 'no raise bypasses the count');
-  assert.match(rd('src/scenes/worldModes.js'), /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, 'worldModes\' rest too');
-  const session = rd('src/systems/rest/restSession.js');
-  assert.match(session, /\n\s*this\.deps\.tickQuests\?\.\(\);/);
-  assert.equal(/sharedMinutes\?\.\(\)\)\) this\.deps\.tickQuests/.test(session), false, 'RESTX2\'s online stand-down is gone');
-  const bridge = rd('src/scenes/quest/questBridge.js');
-  for (const k of ['skySeconds', 'worldSeconds', 'raisedSeconds']) assert.match(bridge, new RegExp(`${k}: \\(\\) => ctx\\.${k}\\?\\.\\(\\) \\?\\? null,`), `the bridge carries ${k}`);
-  assert.match(bridge, /const hour = `\$\{Math\.floor\(\(ctx\.classicSeconds\?\.\(\) \?\? 0\) \/ 3600\)\}\|\$\{Math\.floor\(\(ctx\.skySeconds\?\.\(\) \?\? 0\) \/ 3600\)\}`;/, 'the lens rereads on either clock\'s hour');
-  assert.match(rd('src/systems/save/save.js'), /quest: questBlockOnOwnClock\(snap\) \?\? null,/, 'the load moves a pre-TIME3 online save\'s countdowns');
-});

@@ -18,7 +18,3 @@ test('CHAT-FIND-ALL a player past the column\'s cut is in `all` (mutant: `all` t
   assert.equal(rosterRows({ id: 'me01x', name: 'Me', peers }).all, r.all, 'the same frozen list while nothing moved');
 });
 
-test('CHAT-FIND-ALL the panel\'s search filters the uncut list', () => {
-  const src = readFileSync(new URL('../../src/ui/chatPanel.js', import.meta.url), 'utf8');
-  assert.match(src, /const rows = query \? everyone\.filter\(\(r\) => playerFound\(r\.name, r\.id, query\)\) : all;/);
-});

@@ -315,9 +315,6 @@ test('GRASS-PX: the renderer compiles the game\'s stages, uploads the sheet with
 });
 
 test('GRASS-PX: the row, its default, and the host reading it live', () => {
-  // FT18: the style is a PART of the one grass row - its drawer, under the density's bar - so "beside the density
-  // dial" is structural now, and the inertness GRASS AUDIT 1 made the note say is where the control stands
-  const world = read('src/scenes/world.js');
   const row = FEATURES.find((f) => f.id === 'grass');
   assert.equal(row.control.key, 'grassDensity', 'the bar is the density');
   const part = row.control.parts.find((pt) => pt.key === 'grassStyle');
@@ -326,17 +323,8 @@ test('GRASS-PX: the row, its default, and the host reading it live', () => {
   assert.deepEqual({ ...row.control.also.find((a) => a.key === 'grassStyle') }, { store: 'prefs', key: 'grassStyle', initial: 'meadow', online: 'player' });
   assert.equal(row.group, 'sight'); assert.deepEqual([...row.kinds], ['enhanced']); assert.match(row.effect, /the style at once\.$/);
   assert.ok(row.note.includes('in the enhanced outdoors'), 'GRASS AUDIT 1: the row says what it is inert without');
-  assert.ok(world.includes('vertsPerBlade: labGrass._meadow ? labGrass.vertsCards : labGrass._oneQuad ? labGrass.vertsFar : labGrass.verts'), 'GRASS AUDIT 1: the stats say which blade the frame drew (MEADOW1: or which cards)');
   assert.equal(FEATURE_PREF_DEFAULTS.grassStyle, 'meadow', 'the shelf\'s default is the row\'s');
   assert.deepEqual(['pixel', 'smooth', undefined, 'junk', 'meadow'].map(pixelGrass), [true, false, true, true, true], 'MEADOW1: the meadow is a pixel style');
-  const at = world.indexOf('labGrass.draw(proj, view, new Float32Array(cam.pos), windClock,');   // PIN MOVED (AUDIT MEADOW1): the gust wave's clock
-  assert.ok(at > 0);
-  const call = world.slice(at, world.indexOf(');', at) + 2);
-  assert.ok(call.endsWith("LAB_GRASS.range, getPref('grassStyle'));"), 'the draw\'s last word is the row\'s, read every frame - a uniform, so no reload');
-  // the probe drives the pixel style on a real GL and counts its colours
-  const probe = read('tools/grassFieldProbe.mjs');
-  assert.ok(probe.includes("frame(200, 'pixel')") && probe.includes('out.pixel.tones < out.at200.tones * 0.5'), 'the probe draws the pixel style and holds that it takes fewer colours');
-  assert.ok(probe.includes('out.pxSheet.soft === 0'), '...and reads the sheet back off the GPU with a hard alpha');
 });
 
 /** a cell's blades as the placer shapes them, for the slot rig (perf2's own) */
@@ -377,9 +365,6 @@ test('GRASS-PX2: in the pixel style every cell draws the ONE-QUAD blade - the sp
   // and back: the style is read every draw, not latched
   r.draw(proj, view, new Float32Array(eye), 0, light, wind, 300, 'smooth');
   assert.equal(r.drawn.farSlots, 0);
-  // the probe counts it on a real GL
-  const probe = read('tools/grassFieldProbe.mjs');
-  assert.ok(probe.includes('out.pixelShipped.drawn.verts < out.shipped.drawn.verts * 0.5'), 'the probe holds the pixel frame under half the smooth frame\u2019s vertices');
 });
 
 const HL_SHIPPED = 39;   // the shipped sheet's highlight texels (AUDIT GRASS-PX4 F1: a threshold that moves by one changes it)

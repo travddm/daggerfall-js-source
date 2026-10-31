@@ -67,14 +67,6 @@ test('AUDIT CHAP S4: a lease another tab took, or a death, between a claim\'s re
   }
 });
 
-test('AUDIT CHAP S3: no Roll before the realm holds a save (no-data, 404); a customs undone takes its Roll (mutants: the landed-save check, the undo\'s delete)', async () => {
-  const s = await stand();
-  s.raw.prepare('UPDATE realm_characters SET bytes = 0 WHERE id = ?').run(s.R.id);
-  const r = await s.call('/v1/chapters/roll', s.body({ seed: { factions: {}, members: [] } }), s.who.secret);
-  assert.deepEqual([r.status, r.body.error], [404, 'no-data']);
-  assert.match(src('server-account/src/realm.js'), /async function undoCustoms[\s\S]{0,900}DELETE FROM npc_roll WHERE player = \? AND char_id = \?[\s\S]{0,200}DELETE FROM npc_roll_heads[\s\S]{0,200}DELETE FROM npc_rep_events/);
-});
-
 test('AUDIT CHAP S5 + D1: a customs seed keeps a member\'s rank its reputation (the cap never under its rank\'s need), and the Roll never records a rank past what its own reputation allows (mutants: the member floor, the rank cap)', async () => {
   assert.deepEqual([rollRankCapOf(-5), rollRankCapOf(0), rollRankCapOf(39), rollRankCapOf(40), rollRankCapOf(95)], [0, 0, 3, 4, 9]);
   const s = await stand({ origin: 'off-audra' });

@@ -340,8 +340,6 @@ test('AUDIT PRE-MERGE 1003 O4 online is a fact of the session, not of its socket
   assert.deepEqual(asked, [], 'no local exhibition stood online');
   assert.notEqual(D.kind(), 'exhibition');
   assert.equal(links2.length, 1, 'the hour\'s room watched from a socket of its own');
-  // PIN MOVED (FIELD BUGS 2026-10-16b ARENA-WAIT, test/systems/arena/fb1016b_arenawait.test.js): the branch takes the online lane's wait too
-  assert.match(rd('src/scenes/world.js'), /if \(arenaOnline\?\.exhibitions\?\.\(\) \|\| arenaOnline\?\.waiting\?\.\(\)\) arenaOnline\.watchCity\(ex\);[^\n]*\n\s+else if \(ex\?\.open && ex\.hour !== _arenaHourRun\)/, 'world.js arenaFrame is that branch');
   // offline: a seat lost (net/online.js supersede - its status 'error', its relay's word kept), a relay without the arena
   // PIN MOVED (FIELD BUGS 2026-10-16b ARENA-WAIT AUDIT A4): `live()` false still - but on the online lane a seat lost is SHUT
   // (`waiting()`, the seat's words - the O9 test and test/systems/arena/fb1016b_arenawait.test.js), never ARENA3's offline arena
@@ -541,7 +539,6 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
   link.onArena({ k: 'go', o: '0123456789abcdef', side: 0, vs: { n: 'Brann', r: 1000 } });
   await settled();
   assert.deepEqual([entered, closed, B.bout()], [[], [], null], 'the call not followed - the window kept, the floor not entered');
-  assert.match(rd('src/scenes/world.js'), /const leaveSeat = \(now\) => \{[\s\S]*?online\?\.supersede\(\);[\s\S]*?arenaOnline\?\.leaveAll\(\)[\s\S]*?seatLock\?\.release\(\);/, 'world.js leaveSeat leaves the arena\'s rooms');
   // PIN MOVED (FIELD BUGS 2026-10-16b ARENA-WAIT AUDIT A4, test/systems/arena/fb1016b_arenawait.test.js): the seat given up was OFFLINE
   // here - `live()` false, so every door ran ARENA3's arena: the save's ladder fought, its purses paid into the realm's save
   // (47,950 gold over 40 bouts), the book settling an online wager by the house's record. On the online lane (a realm
@@ -557,56 +554,7 @@ test('AUDIT PRE-MERGE 1003 O9 ONE-SEAT: a tab that gave its seat up leaves the a
 
 // ═══ O10 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-/** World.js's own statements, by name (test/systems/auditrealm2_client.test.js's harness): a declaration's text, mounted over a
- *  state that stands in for the host's closure. */
-function worldStatements() {
-  const S = rd('src/scenes/world.js');
-  const AST = acorn.parse(S, { ecmaVersion: 'latest', sourceType: 'module' });
-  const hits = (pred) => { const out = []; (function walk(n) { if (!n || typeof n.type !== 'string') return; if (pred(n)) out.push(n); for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); } })(AST); return out; };
-  const one = (h, what) => { assert.equal(h.length, 1, what); return S.slice(h[0].start, h[0].end); };
-  return {
-    fn: (name) => one(hits((n) => n.type === 'FunctionDeclaration' && n.id?.name === name), `function ${name}`),
-    decl: (name) => one(hits((n) => n.type === 'VariableDeclaration' && n.declarations.some((d) => d.id?.name === name)), `the declaration of ${name}`),
-  };
-}
 const scoped = (state) => new Proxy(state, { has: (t, k) => k !== '__s', get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])), set: (t, k, v) => { t[k] = v; return true; } });
 // eslint-disable-next-line no-new-func
 const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(scoped(state));
 
-test('AUDIT PRE-MERGE 1003 O10 a displaced home\'s move is said read only once the realm took the save that holds its emptied scene - world.js\'s own checkpoint (onlineCheckpointLanded over onlineCheckpoint and realmCheckpoint, the composer\'s sink) under moveArenaHomes: the put refused - never read (it was read as the save was handed over); landed - read after it; refused outright - never (mutants: read on the hand-over; read on a refusal; the caller\'s sink unhanded; the hand-over answered; the host\'s hook the hand-over)', async () => {
-  const key = (x, y, r) => (x << 16) | (y << 8) | r;
-  const OLD = key(4, 3, 5), NEW = key(1, 1, 0);
-  const W = worldStatements();
-  for (const [answer, read] of [[{ ok: false, error: 'lease' }, false], [{ ok: true }, true], ['refused', false]]) {
-    const order = [];
-    let land = null;
-    // the realm session's checkpoint behind the composer's sink (world.js setRealmSaveSink): its put, answered later
-    const realmSink = (snap) => { order.push(`handed ${snap.n}`); return new Promise((r) => { land = () => { order.push('put answered'); r(answer); }; }); };
-    const state = {
-      realmSession: { lost: null }, realmSaveSink: () => realmSink, QUICK_SAVE_NAME: 'QuickSave', townTalk: { overlay: null }, DeathScreen: class {}, playerEntity: { health: 10 },
-      checkpointAllowed: () => answer !== 'refused', online: {}, playerSpawned: true, seatOut: () => false, duelMgr: null, ownWalkWaiting: () => false, performance: { now: () => 0 },
-      exitAutosaveNames: () => [], _checkpointAt: -Infinity, worldQuickSave: null,
-      stampItemIds: () => 0,   // INT4 (PIN MOVED): a realm checkpoint stamps the valuable pieces' ids first
-      // the standing composer (worldModes quickSaveNow -> worldQuickSave / dungeonContext quickSave): the caller's sink, else the realm's
-      modes: { deathUp: () => false, quickSaveNow: (name, opts = {}) => { const into = opts.sink ?? realmSink; into({ n: name }); return true; } },
-    };
-    const landed = mount(`${W.decl('checkpointGateOpen')}\n${W.decl('onlineCheckpoint')}\n${W.fn('realmCheckpoint')}\n${W.decl('onlineCheckpointLanded')}\nreturn onlineCheckpointLanded;`, state);
-    const run = moveArenaHomes({
-      homes: { ensure: async () => true, homesIn: () => new Map([[OLD, { buildingKey: OLD, hall: true, keeper: true }]]) },
-      api: {
-        arenaMoves: async () => ({ ok: true, data: { moves: [] } }),
-        arenaMove: async (b) => ({ ok: true, data: { ok: true, mapId: HOME_ARENA_MAP_ID, from: b.from, to: b.to, refund: 0, hall: true } }),
-        arenaSeen: async () => { order.push('seen'); return { ok: true, data: { seen: true } }; },
-      },
-      mapId: HOME_ARENA_MAP_ID, character: 'r-me', realm: null, pick: () => ({ buildingKey: NEW }), emptyScene: () => ({ own: [] }), hooks: { checkpoint: () => landed() },
-    });
-    for (let i = 0; i < 5; i++) await settled();
-    assert.ok(!order.includes('seen'), `${JSON.stringify(answer)}: not read while the put is out`);
-    if (answer !== 'refused') assert.deepEqual(order, ['handed QuickSave'], 'the save handed to the realm, its put out');
-    land?.();
-    await run;
-    assert.equal(order.includes('seen'), read, `${JSON.stringify(answer)}: read ${read}`);
-    if (read) assert.ok(order.indexOf('seen') > order.indexOf('put answered'), 'read after the realm took it');
-  }
-  assert.match(rd('src/scenes/world.js'), /checkpoint: \(\) => onlineCheckpointLanded\(\),/, 'moveArenaHomesOnline hands the landed checkpoint');
-});

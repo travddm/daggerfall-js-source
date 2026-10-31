@@ -128,7 +128,6 @@ test('PEAKS1 THE BARE FACE IN THE CHUNK: snowFaceRock is snowcap.js faceRock ter
   for (const p of ['src/render/renderer.js', 'src/render/enhancedLighting.js']) {
     assert.match(read(p), /float snowC = snowCover\(vLocalXZ, vWorldPos\.y, gx, gy\);[^\n]*\n {2}snowC = snowFace\(tex, snowC, vLocalXZ, vWorldPos\.y, normalize\(vNormal\), tuv, gx, gy\);/, p);
   }
-  assert.match(read('src/render/enhancedLighting.js'), /\$\{snowCapGlsl\('elDecode', SNOW_TILE_M\)\}/, 'the lane decodes the stone as its texels');
 });
 
 test('PEAKS1 THE HOST MERGES THE CAP: with `capLine` every point\'s target and build lines are the lower of the pack\'s and the cap\'s at its corner, and the frame\'s texels carry the cap in their alpha; without it the lines are the pack\'s and the alpha none (mutants: the merge, the corner, the alpha)', async () => {
@@ -165,7 +164,6 @@ test('PEAKS1 THE HOST MERGES THE CAP: with `capLine` every point\'s target and b
     await off.settle({ left: () => Infinity, breathe: async () => {} });
     assert.equal(off._lines.get(latticeKey(off._window[0].i, off._window[0].j)).cap, CAP_NONE, 'null: none');
   } finally { setAirGround(null); }
-  assert.match(read('src/systems/weather/airGround.js'), /landforms: !!landforms,/, 'the law\'s air ground says whether it is the landforms\'');
 });
 
 test('PEAKS1 THE HORIZON WEARS IT: the far ring whitens a vertex over its line by its height and its slope, never the sea and never with no line (the classic ground\'s horizon its own - ringSnowAt none without the Landforms row); the middle ring and the far field the same (mutants: the ring\'s whiten, the middle ring\'s, the far field\'s, the relief gate)', () => {

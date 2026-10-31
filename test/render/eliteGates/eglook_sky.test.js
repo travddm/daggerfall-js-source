@@ -139,7 +139,6 @@ test('EG-LOOK THE SKY\'S PIXEL (SD-LOOK\'s pixel law): the fetch snaps the ray t
 
 test('EG-LOOK ONE UNDERSIDE, NEVER TWO (section 4: "The sky\'s painted disc goes"): no painter and no fetch paints the Spire\'s underside - it is the wreck\'s model (world/eliteGates/egVista.js) at EG_SKIES\' angular size; the skies\' colours are the band\'s air\'s (world/eliteGates/egAtmos.js - one home), the stair\'s void read from them (mutants: the disc painted again; a sky colour of its own)', () => {
   for (const fs of [...EG_SKY_PAINT_FS, EG_SKY_FS]) assert.ok(!/UNDER|underside|LEAN/.test(fs), 'no underside in the sky');
-  assert.ok(!/underside|EG_SKIES/.test(rd('src/render/eliteGates/egSkyPass.js').replace(/^\/\/.*$/gm, '')), 'the fetch reads no underside');
   for (let b = 0; b < 4; b++) {
     const A = EG_ATMOS[b].sky;
     assert.equal(EG_SKIES[b].zenith, A.zenith); assert.equal(EG_SKIES[b].horizon, A.horizon); assert.equal(EG_SKIES[b].deep, A.up);
@@ -213,10 +212,6 @@ test('EG-LOOK THE FETCH AND THE LOOK\'S SKY (render/eliteGates/egSkyPass.js, sce
   assert.equal(sky.draw(I, I, 1, 1, null), false, 'another band than the map holds: nothing');
   sky.destroy(); sky.destroy();
   assert.deepEqual(R.count(), {}, 'the fetch and its map freed, once');
-  // the look
-  const D = rd('src/scenes/eliteGates/egLookDraw.js');
-  assert.match(D, /drawSky\(proj, view, seconds, fog = null, gain = 1\) \{/, 'world.js\'s word kept');
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /const painted = !!L\?\.paintSky\(vp, lane, ts\);/, 'painted from the client\'s pass');
   const Q = recordingGl(), look = createEgLookDraw({ gl: /** @type {any} */ (Q.gl), lite: false });
   look.setCircle(7, 1, 0);
   assert.equal(look.drawSky(I, I, 40, null, 1), false, 'the first frame: no map yet');

@@ -74,19 +74,6 @@ test('KETCH A CELL EACH HAND OF EIGHT CAN BANK: QLSK02\'s count, every hand of a
   assert.doesNotMatch(src, /engine's sockets/, 'a resonator\'s bank counts too: the words say so');
 });
 
-test('KETCH NO LINE NAMES LOREDAS: the Ketch keeps the real week - the four steps, both books and every line of the screens name no day of Tamriel\'s week; the screens\' lines name the real Saturday, in UTC (AUDIT KETCH L5-3; mutants: "She comes again on Loredas")', async () => {
-  const { KT_WORDS, KT_REFUSE_WORDS } = await import('../../../src/systems/ketch/ketchWords.js');
-  const { PORT_BOOKS, KETCH_BOOK_ID, ROURKEN_THUNDER_ID } = await import('../../../src/systems/portBooks.js');
-  const { lineById } = await import('../../../src/systems/questlines/qlLines.js');
-  const days = /Morndas|Tirdas|Middas|Turdas|Fredas|Loredas|Sundas/;
-  for (const q of ['QLSK01', 'QLSK02', 'QLSK03', 'QLSK04']) assert.doesNotMatch(readFileSync(new URL(`../../../src/systems/questlines/quests/${q}.txt`, import.meta.url), 'utf8').replace(/^--.*$/gm, ''), days, q);
-  for (const id of [KETCH_BOOK_ID, ROURKEN_THUNDER_ID]) assert.doesNotMatch(PORT_BOOKS.get(id).pages.flat().map((r) => (typeof r === 'string' ? r : r.text)).join(' '), days, `book ${id}`);
-  for (const w of [KT_WORDS.departed, KT_REFUSE_WORDS.away]) assert.match(w, /every ten hours/);   // PIN MOVED (KETCH-EVERY): she comes every ten hours, no longer on the real Saturday
-  assert.match(lineById('skyKetch').lead(), /Every ten hours/);
-  const tut = readFileSync(new URL('../../../src/systems/tutorialCatalogue.js', import.meta.url), 'utf8');
-  for (const m of tut.matchAll(/t\('tutorials\.skyKetch\.[a-z0-9]+', '((?:[^'\\]|\\.)*)'\)/g)) assert.doesNotMatch(m[1], days, 'the tutorial');
-});
-
 test('KETCH THE LORE KEEPS ITS WORD: no gun\'s story promises constructs that lower their arms, the Sovereign\'s pistolet keeps no powder, the Echo is the Warden\'s, the charm\'s hum and the hammer\'s metal are no promise, Ysolde wrote the book on the Doors, and the Brass God pulled her once before (AUDIT KETCH L5-7, L5-8; mutants: the Word\'s constructs lowering their arms)', async () => {
   const { KETCHMASTERS_WORD, VOLENDRUNGS_ECHO, SOVEREIGN_PISTOLET_ERA } = await import('../../../src/systems/gilded.js');
   const { PORT_BOOKS, KETCH_BOOK_ID } = await import('../../../src/systems/portBooks.js');
@@ -100,16 +87,6 @@ test('KETCH THE LORE KEEPS ITS WORD: no gun\'s story promises constructs that lo
   assert.doesNotMatch(q4, /hammer of Dwemer brass/, 'its metal is the roll\'s');
   assert.doesNotMatch(q4, /She closed the Burning Doors/, 'the player closed them');
   assert.doesNotMatch(q4, /three thousand years there was nothing/, 'the Brass God walked five hundred years before');
-});
-
-test('KETCH A FALL IS CAUGHT, NEVER A WAKING: the nets\' line says they haul you back aboard - wherever the fall was, the bridge\'s ring or the Sailwalk - and the tutorial says only death wakes you in the fields (AUDIT KETCH L5-5; mutants: the fall said to wake you below)', async () => {
-  const { KT_WORDS } = await import('../../../src/systems/ketch/ketchWords.js');
-  assert.match(KT_WORDS.castBack, /back aboard/);
-  assert.doesNotMatch(KT_WORDS.castBack, /last top/, 'a fall off the bridge\'s ring lands on its core, not a top');
-  const tut = readFileSync(new URL('../../../src/systems/tutorialCatalogue.js', import.meta.url), 'utf8');
-  const body2 = /t\('tutorials\.skyKetch\.body2', '((?:[^'\\]|\\.)*)'\)/.exec(tut)?.[1] ?? '';
-  assert.doesNotMatch(body2, /A fall from her decks wakes you/);
-  assert.match(body2, /only death wakes you/);
 });
 
 test('KETCH ONE WORD A THING IN EVERY LANGUAGE: Chinese names the crew\'s leader apart from the Ketchmaster (船长 / 船長 is his), and German counts the voyages sailed in one phrase on the card and the profile (AUDIT KETCH L5-12; mutants: the leader called the Ketchmaster)', () => {

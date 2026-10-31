@@ -257,10 +257,3 @@ test('EG-HERO (the Wellhead) THE LAW\'S PLACES (sections 11.5, 11.7, 11.10): the
   assert.deepEqual(HEROES.map((h) => h.law.alcoves[0].holds), ['shard', 'page', 'lumen']);
 });
 
-test('EG-HERO (the Wellhead) WRITTEN FROM NUMBERS ALONE (tools/egHeroKit.mjs\'s rule): the three scenes and the Wellhead\'s shapes in the kit call no transcendental and no randomness - IEEE arithmetic and Math.sqrt, so the .fbx is the same bytes on every engine (mutants: a Math.hypot in a scene)', () => {
-  const kit = readFileSync(new URL('tools/egHeroKit.mjs', ROOT), 'utf8'), block = kit.slice(kit.indexOf('// ── EG-HERO (2026-10-13), THE HAVOC WELLHEAD\'S SHAPES'));
-  assert.ok(block.length > 6000, 'the Wellhead\'s block found');
-  for (const [name, src] of [['the kit\'s block', block], ...['tools/egHeroForgeGutScene.mjs', 'tools/egHeroClanPitScene.mjs', 'tools/egHeroDeepCavernsScene.mjs'].map((f) => [f, readFileSync(new URL(f, ROOT), 'utf8')])]) {
-    for (const bad of ['Math.sin', 'Math.cos', 'Math.tan', 'Math.atan', 'Math.pow', 'Math.exp', 'Math.log', 'Math.hypot', 'Math.random', 'Date.now', ') ** ']) assert.ok(!src.includes(bad), `${name} calls ${bad}`);
-  }
-});

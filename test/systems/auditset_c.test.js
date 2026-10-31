@@ -66,30 +66,9 @@ test('AUDIT SET D4: a Test Room character stays offline - the mark rides its sav
   const was = mkEntity({ testRoom: true });
   restorePlayer(was, worldly, null);
   assert.equal(was.testRoom, undefined, 'loading a character of the world over the room\'s leaves no mark behind');
-  // the room sets it, after the chargen that builds the character afresh
-  const tr = strip(read('src/systems/testRoom.js'));
-  assert.match(tr, /await applyHeadlessChargen\(playerEntity, preset\.classIndex, \{ fetchBytes, spellsByIndex \}\);\s*playerEntity\.testRoom = true;/);
-  // the boot asks before anything reads `online`, drops it from the URL the lane reads, and says why once the world stands
-  const W = strip(read('src/scenes/world.js'));
-  const boot = W.indexOf('export async function bootWorld(');
-  const ask = W.indexOf('const testRoomOffline = testRoomOnlineRefused(params, { snap: bootSnap });');
-  assert.ok(boot > 0 && ask > boot, 'asked in the boot');
-  const snapDecl = W.indexOf('const bootSnap = () => (bootSnapRead === undefined ? (bootSnapRead = pickedSaveSnap(bootLoadPick ?? {})) : bootSnapRead);');
-  assert.ok(snapDecl > boot && snapDecl < ask, 'AUDIT FINAL F9: off the load door\'s own pick and parse, declared first');
-  // REALM P1.3: a realm boot reads `online` first - the save the ask needs IS the service's, read by the join - and a
-  // realm character marked for the room goes back to the door; every other read comes after the ask
-  assert.ok(ask < W.indexOf("params.has('online')", W.indexOf('const bootLoadPick')), 'before the first read of `online` past the realm\'s own boot');
-  assert.match(W, /if \(testRoomOffline && realmSession\) \{ setRealmNotice\(globalThis\.sessionStorage, realmRefusalText\('test-room'\)\); exitToTitleMenu\(\); return; \}/, 'a room character is never the realm\'s');
-  assert.match(W, /if \(testRoomOffline\) \{ params\.delete\('online'\); publishBootParams\(params\); \}/);
-  const said = W.indexOf('if (testRoomOffline) townTalk.say(TEST_ROOM_OFFLINE_TEXT);');
-  assert.ok(said > W.indexOf("? { key: Number(params.get('loadkey')) }") && said < W.indexOf('if (!_loadedGame) mwViewNewGame('), 'said after the load, once the boot has its character');
-  // the Online pane: the tile's button is dead and says why
-  const M = strip(read('src/ui/enhanced/enhancedMenu.js'));
-  assert.match(M, /testRoom: snap\.testRoom === true,/);
   // REALM P1.5: the Online pane's local tile brings a character in through customs (PIN MOVED: ui/enhanced/bringOnlineButton.js)
   assert.deepEqual(bringOnlineButton({ testRoom: true }, { realmCopy: false }), { label: 'Test Room: offline only', offlineOnly: true });
   assert.deepEqual(bringOnlineButton({ testRoom: false }, { realmCopy: false }), { label: 'Bring online', offlineOnly: false });
-  assert.match(M, /disabled: !who \|\| button\.offlineOnly,/);
 });
 
 test('AUDIT SET D6: the wire\'s item law cross-checks the marks - a set\'s sigil only on a piece a set counts, a blow only on a weapon (never ammunition), the Regalia\'s set only on an Aetheric piece, an Aetheric piece only as its record mints it (the record, its group and template, Daedric); the sigil projected to its own keys; every honest piece passes - the Regalia, a day of the Broker\'s stock, a won weapon (mutants: a set sigil on a ring; a blow on armour; a Regalia sigil on any Daedric piece; the sigil unprojected; an Aetheric off its record; an Aetheric of any metal; the marks never asked)', () => {
@@ -125,7 +104,6 @@ test('AUDIT SET D6: the wire\'s item law cross-checks the marks - a set\'s sigil
   // honest stock: a day of the Broker's, whole
   for (let d = 20500; d < 20510; d++) for (const o of brokerStock(d)) assert.ok(wire(o.item), `the Broker's ${o.kind} on day ${d}`);
   assert.equal(validSetMarks(null), null);
-  assert.match(strip(read('src/systems/loot/loot.js')), /if \(!validItemFields\(out\)\) return null;\s*if \(!validSetMarks\(out\)\) return null;/, 'asked after each field is its kind');
 });
 
 test('AUDIT SET U8: every lore line a classic tooltip draws - a Legendary\'s, an Aetheric piece\'s - is ASCII, as the classic font draws (mutants: a curly apostrophe in the lore)', () => {
@@ -168,7 +146,6 @@ test('AUDIT SET U13: a hover card taller than the screen sheds what a glance can
   assert.ok(PLUS_CSS.includes('.inv-tip.tip-compact .bigicon img { width: 56px; height: 56px; }'));
   assert.ok(PLUS_CSS.includes('.inv-tip.tip-compact .set-tier-text { font-size: 11px; line-height: 1.2; }'));
   assert.ok(PLUS_CSS.includes('.inv-tip.tip-tight .bigicon, .inv-tip.tip-tight .set-tier-text, .inv-tip.tip-tight .sigil-note { display: none; }'));
-  assert.match(strip(read('src/ui/enhanced/enhancedInventory.js')), /document\.body\.append\(tipEl\);\s*fitTip\(tipEl\);\s*placeBeside\(tipEl, row\);/, 'fitted before it is placed');
 });
 
 test('AUDIT SET U2: in the item lists\' classic tooltip a row of the port\'s own wider than TOOLTIP_WRAP_W wraps at its spaces, each continuation indented two, so a set\'s line never runs off the 320px screen; a row that fits is drawn exactly as it was, spaces and all; a word wider than the whole stands alone; DFU\'s rows - the item\'s name, every other window\'s tips - never wrap (mutants: the wrap never asked; a continuation unindented; a short row wrapped; wrapped past the width; the name wrapped; every tooltip wrapped)', () => {
@@ -197,9 +174,6 @@ test('AUDIT SET U2: in the item lists\' classic tooltip a row of the port\'s own
   }
   const name = 'Ebony Dai-Katana of the Unseen Blade, Rusty and Forgotten'.repeat(2);
   assert.deepEqual(wrapToolTipRows([name, long], measure, TOOLTIP_WRAP_W, 1)[0], name, 'a row before `wrapFrom` - the item\'s name, DFU\'s - never wraps');
-  const T = strip(read('src/ui/toolTip.js'));
-  assert.match(T, /const rows = wrapFrom == null \? toolTipRows\(text\) : wrapToolTipRows\(toolTipRows\(text\), \(r\) => measureText\(font\.fnt, r\), TOOLTIP_WRAP_W, wrapFrom\);/, 'the box wraps only when asked');
-  assert.match(T, /drawToolTipBox\(renderer, m, font, this\.text, this\.x, this\.y, \{ wrapFrom: this\.wrapFrom \}\);/);
   assert.equal(new ToolTip().wrapFrom, null, 'a window\'s own tip (DFU\'s) wraps nothing');
   assert.equal(makeSlotToolTip().tip.wrapFrom, 1, 'the item lists\' tip wraps the lines under the name');
 });

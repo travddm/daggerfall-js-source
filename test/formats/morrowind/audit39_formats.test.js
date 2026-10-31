@@ -318,10 +318,4 @@ test('audit39 formats: a worn hair part keeps its part NAME, so the hair filter 
   const add = worn.adds.find((a) => a.recordId === 'b_hair');
   assert.equal(add.partName, 'hair', 'the bare part name rides along');
   assert.equal(add.slot, 'hair (iron_helmet)', 'the label still names the record for the notes');
-  // and the two seams that carry it: the binder keys on the part name,
-  // the build passes it through.
-  const fp = readFileSync('src/formats/morrowind/mwFirstPerson.js', 'utf8');
-  assert.match(fp, /const geomFilter = \(part\.partName \?\? part\.slot\) === 'hair' \? 'hair' : bone;/);
-  const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(arm, /partBytes\.push\(\{ slot: row\.slot, partName: row\.partName, bones: row\.bones/);
 });

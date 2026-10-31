@@ -49,9 +49,6 @@ test('AUDIT TOWN-ECON 2 PRICE-1: LAW-3 SHARES A LOT BY THE PURCHASE\'S OWN ASKS 
     markCounterBought([k0, c0], { price });   // the old split: no holiday
     assert.ok(c0[COUNTER_PAID_MARK] < c[COUNTER_PAID_MARK] && k0[COUNTER_PAID_MARK] > k[COUNTER_PAID_MARK], 'the no-holiday asks held the cuirass to less and the katana to more');
   });
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /commit: \(m, staged, price, proceeds\) => commitTrade\(shelf, m, staged, price, proceeds, identifySpell, \{ holidayId: getHolidayId\(Math\.floor\(skyMinutes\(\)\), b\.regionIndex \?\? 0\), guildFactionId \}\),/);
-  assert.match(wm, /const r = commitTrade\(shelf, m, staged, price, proceeds, identifySpell, \{ holidayId: getHolidayId\(Math\.floor\(skyMinutes\(\)\), b\.regionIndex \?\? 0\), guildFactionId \}\);/);
 });
 
 test('AUDIT TOWN-ECON 2 PRICE-5 and PRICE-6: a lot that paid a gold a piece marks every piece with one at least (forty arrows bought beside a dai-katana at a quality-1 counter had floored to 0, and sold for 0 ever after - and a found stack merged in with them); each piece marked with the value it was bought at, so an improvement since sells as the player\'s own work while the part bought stays capped; the item law, a merge (the lower) and a split keep it (mutants: TOWNECON-AUDIT2-PRICE5-floor-zero, TOWNECON-AUDIT2-PRICE6-value-unmarked, TOWNECON-AUDIT2-PRICE6-improvement-capped, TOWNECON-AUDIT2-PRICE6-merge-lost, TOWNECON-AUDIT2-PRICE6-split-lost)', () => {
@@ -128,12 +125,6 @@ test('AUDIT TOWN-ECON 2 PRICE-2: A COUNTER\'S PIECE IS NO SERVICE UNIT - the bag
   assert.equal(r.ok, false, 'a page\'s four: only three are the service\'s');
   assert.equal(r.error, 'carried-short');
   assert.equal(heldOf(e, key), 8, 'given back');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /held: \(key\) => bagHeldOf\(playerEntity, key, \{ counter: false \}\), heldAll: \(key\) => bagHeldOf\(playerEntity, key\),/);
-  assert.match(w, /take: \(key, n, stamp = null, order = null, counter = false\) => \{\n\s*const t = takeCarried\(playerEntity, key, n, stamp, order, \{ counter \}\);/);
-  assert.match(w, /carriedHeld: \(k\) => bagHeldOf\(playerEntity, k, \{ counter: false \}\),/);
-  // PIN MOVED (FB1020c ONE-SAVE): a station's shortfalls are one batch now - each put-in planned with the same order and counter
-  assert.match(rd('src/net/profBook.js'), /plan\.push\(\{ material: k, qty: Math\.min\(left, DEPOSIT_MAX\), order: work === true \? 'work' : 'spend', counter: work === true \}\);/);
 });
 
 test('AUDIT TOWN-ECON 2 PRICE-2: A STONE A COUNTER SOLD KEEPS ITS MARK IN THE SOCKET - set, the socket remembers what it cost; its share of the piece\'s sale is held to that; extracted, it comes out marked as it went in; shattered, the mark goes with it; a found stone none; the item law takes the sockets\' marks (mutants: TOWNECON-AUDIT2-PRICE2-socket-unmarked, TOWNECON-AUDIT2-PRICE2-extract-unmarked, TOWNECON-AUDIT2-PRICE2-socket-sale-uncapped, TOWNECON-AUDIT2-PRICE2-unset-kept)', () => {

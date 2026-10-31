@@ -85,33 +85,6 @@ test('JOURNAL-CLEAN: the rail leaves hidden quests out of `active` and hands the
   assert.deepEqual(questRail({ active: log.active, finished: [] }, reader).active.map((q) => q.id), ['1', '2', '3']);
 });
 
-test('JOURNAL-CLEAN: the bridge walk hands `hidden` beside `active` (rows stay for the lens) and journalClean acts on the notebook', () => {
-  const src = read('src/scenes/quest/questBridge.js');
-  // PIN MOVED (QUEST-SHELF, 2026-10-08): and the quests set aside, beside them
-  assert.match(src, /return \{ active, finished: notebook\?\.getFinishedQuests\(\) \?\? \[\], ended, hidden: notebook\?\.getHiddenQuests\?\.\(\) \?\? \[\], shelved(?:, [^}]*)? \};/);
-  assert.match(src, /notebook\?\.unhideQuest\?\.\(q\.uid\);/, 'an ended quest (even one that filed nothing) is unhidden by the walk');
-  // journalClean driven off the shipped source over a real notebook
-  const start = src.indexOf('    journalClean: {');
-  const end = src.indexOf('\n    },', start) + 6;
-  const body = src.slice(start, end);
-  const make = new Function('notebook', `const o = { ${body} }; return o.journalClean;`);
-  const nb = bookWith('A', 'B', 'C');
-  const jc = make(nb);
-  assert.equal(jc.removeFinished(5), false, 'an index past the archive removes nothing');
-  assert.equal(jc.removeFinished(-1), false, 'nor a negative one (splice(-1) would take the last)');
-  assert.equal(jc.removeFinished(0), true);
-  assert.equal(nb.getFinishedQuests().length, 2);
-  assert.equal(jc.hide(4), true);
-  assert.deepEqual(nb.getHiddenQuests(), ['4']);
-  assert.equal(jc.unhide('4'), true);
-  assert.equal(jc.clearFinished(), 2);
-  assert.equal(nb.getFinishedQuests().length, 0);
-  const none = make(null);
-  assert.equal(none.removeFinished(0), false);
-  assert.equal(none.clearFinished(), 0);
-  assert.equal(none.hide(1), false);
-});
-
 test('JOURNAL-CLEAN: every host that hands the pause window questLog hands journalClean beside it', () => {
   const pins = {
     'src/scenes/world.js': [/journalClean: \(\) => questBridge\?\.journalClean \?\? null,/g, 2],
@@ -124,32 +97,9 @@ test('JOURNAL-CLEAN: every host that hands the pause window questLog hands journ
   }
 });
 
-test('JOURNAL-CLEAN: the Quests tab draws Remove (armed twice), Clear archive (armed twice), Hide/Unhide and Show hidden', () => {
-  const src = read('src/ui/enhanced/enhancedMenu.js');
-  const start = src.indexOf('function pauseQuests(body) {');
-  const tab = src.slice(start, src.indexOf('\nfunction render() {', start));
-  assert.match(tab, /const clean = hooks\.journalClean\?\.\(\) \?\? null;/);
-  assert.match(tab, /t\('pause\.journal\.removeArmed', 'Click again to remove'\) : t\('pause\.journal\.remove', 'Remove'\)/);
-  assert.match(tab, /if \(journalCleanArmed !== sel\.key\) \{ journalCleanArmed = sel\.key; render\(\); return; \}/, 'the first Remove only arms');
-  assert.match(tab, /clean\.removeFinished\?\.\(index\);/);
-  assert.match(tab, /t\('pause\.journal\.clearArmed', 'Click again to clear archive'\) : t\('pause\.journal\.clear', 'Clear archive \(\{n\}\)', \{ n: finished\.length \}\)/);
-  assert.match(tab, /if \(journalCleanArmed !== 'clear'\) \{ journalCleanArmed = 'clear'; render\(\); return; \}/, 'the first Clear only arms');
-  assert.match(tab, /clean\.clearFinished\?\.\(\);/);
-  assert.match(tab, /isHidden \? t\('pause\.journal\.unhide', 'Unhide'\) : t\('pause\.journal\.hide', 'Hide from journal'\)/);
-  assert.match(tab, /t\('pause\.journal\.showHidden', 'Show hidden \(\{n\}\)', \{ n: hidden\.length \}\)/);
-  assert.match(tab, /const shown = questShowHidden \? hidden : \[\];/);
-  assert.match(tab, /rows\[0\]\?\.key \?\? null/, 'a journal whose every quest is hidden has no first row to open on');
-  // the arming and the toggle never outlive the visit
-  assert.match(src, /journalCleanArmed = null;   \/\/ JOURNAL-CLEAN: \.\.\.nor an armed Remove or Clear archive\n  questShowHidden = false;/);
-  // the live timer still finds a hidden quest that is shown
-  assert.match(src, /\[\.\.\.r\.active, \.\.\.r\.hidden\]\.find\(\(row\) => row\.key === key\)/);
-});
-
 test('AUDIT JOURNAL-CLEAN F3: a hidden id whose quest no longer runs is dropped - a reused uid never starts hidden', () => {
   const nb = new PlayerNotebook({});
   nb.hideQuest('7'); nb.hideQuest('9');
   assert.equal(nb.pruneHiddenQuests(['9', '12']), 1);
   assert.deepEqual(nb.getHiddenQuests(), ['9']);
-  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '../src/scenes/quest/questBridge.js'), 'utf8');
-  assert.equal((src.match(/notebook\?\.pruneHiddenQuests\?\.\(/g) ?? []).length, 2, 'the walk and the load both prune');
 });

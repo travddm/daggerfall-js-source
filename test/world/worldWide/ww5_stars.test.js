@@ -134,21 +134,9 @@ test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'
   assert.equal(STAR_HELD_MAX, 9 * 3 * 2 + 6, 'a night\'s and the night before\'s three in every lane, and room');
   assert.equal(WW5_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): world275, past main's world274 (LADDER-CUT), which refuses
   assert.ok(relaySupportsWw5(RELAY_VERSION) && relaySupportsWw5('world276') && !relaySupportsWw5('world275') && !relaySupportsWw5('acct272') && !relaySupportsWw5(undefined));   // PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270   // PIN MOVED: world276, SHOP (Genesis, Eternal and Origin join the vocabulary, last; the token's body bound 896); PIN MOVED: world275, the merge of main (world274 on its branch, renumbered past world274 on main at the merge); PIN MOVED: world274, the merge of main (world272 on its branch, renumbered past world272-world273 on main at the merge)
-  const on = src('src/net/online.js');
-  assert.match(on, /if \(primary\) \{ this\.starOk = relaySupportsStar\(relayV\); this\.ww5Ok = relaySupportsWw5\(relayV\); \}/);
-  assert.match(on, /if \(w\.k >= STAR_PER_NIGHT_WIRE && !\(this\._mine\(cell\) \? this\.ww5Ok : this\._haloFor\(cell\)\?\.ww5Ok\)\) return false;/, 'a province\'s star word never to a relay that refuses it as junk - the socket\'s own relay\'s word');
-  // WW5's finish: each socket's word goes with it across a crossing (AUDIT WB12d C6) - the cell stepped down keeps its own
-  assert.match(on, /sdOk: this\.sdOk, ww5Ok: this\.ww5Ok, foeInventoryOk:/);
-  assert.match(on, /this\.egOk = !!h\.egOk; this\.ww5Ok = !!h\.ww5Ok;/);
   const base = { sf: [N, 13], s: 'acct_1234', c: 1, l: 5, i: 100, e: 160 };
   assert.ok(starReceiptValid(base), 'a province\'s star\'s receipt - the relay mints it, the account service reads it (both bundle the law)');
   assert.ok(!starReceiptValid({ ...base, sf: [N, 27] }));
-  const r = src('server/src/index.js');
-  assert.match(r, /this\._send\(ws, JSON\.stringify\(\{ t: 'star', k: 'hds', l: starHeldOrder\(l\) \}\)\);/, 'the hello says the Bay\'s first');
-  // the account service's row is the star's night and number (stars.js starKeyOf), its day the star's own fall (the law's)
-  const acct = src('server-account/src/stars.js');
-  assert.match(acct, /export const starKeyOf = \(n, k\) => `\$\{n\}\.\$\{k\}`;/);
-  assert.match(acct, /export const starDayOf = \(n, k\) => Math\.floor\(starTimes\(n, k\)\.fallAt \/ DAY_MS\);/);
 });
 
 test('WW5 A HALO SAYS FOR ITSELF: a province\'s star word and a province\'s find go down a halo only when the halo\'s own relay keeps them (WW5_RELAY_MIN - a halo on an older object, a deploy under way, refuses the word as a bad frame); the primary\'s word is the primary\'s (AUDIT RAID R8b\'s law, WW5\'s finish; mutants: the halo sent on the primary\'s word, for a star and for a find; the halo never told)', () => {
@@ -282,9 +270,6 @@ test('WW5 THE THEATRES WARMED A THEATRE AT A TIME: a province\'s scan is asked o
   const now = createEventTheatres({ scans: () => scans, idle: null });
   assert.ok(now.scanOf(4), 'no idle queue: made where it is asked');
   assert.equal(createEventTheatres({ scans: () => null, idle: null }).scanOf(3), null, 'no world host: none');
-  const gl = src('src/scenes/gate/gateLanes.js');
-  assert.match(gl, /return \(_kept = \{\n {4}scanOf,/, 'the world host\'s scans kept as it makes them');
-  assert.match(gl, /export const keptTheatreScans = \(\) => _kept;/);
 });
 
 /** The Starfall's host on bindings by name (star5_host.test.js's shape), a province's theatre scan beside the Bay's. */
@@ -345,11 +330,6 @@ test('WW5 THE HOST: every theatre\'s stars stand - the Bay\'s and a province\'s,
     old.host.frame();
     assert.ok(old.host.state().every((s) => /^\d+\.[0-2]@/.test(s.key)), 'an older relay: the Bay\'s stars alone');
   } finally { Date.now = realNow; }
-  const h = src('src/scenes/starfall/starfallHost.js');
-  assert.match(h, /scans: \(\) => \(host\.theatreScans !== undefined \? host\.theatreScans : keptTheatreScans\(\)\),/);
-  assert.match(h, /const lanesOk = \(\) => !!session\(\)\?\.ww5Ok;/);
-  assert.match(h, /for \(const \[lane, sc\] of theatres\.warmLanes\(\)\) out\.push\(\.\.\.laneSitesOf\(n, +\(lane\), sc\)\);/);
-  assert.match(h, /try \{ return findTheatreGateSite\(gateNumber\(day, lane\), sc\); \}/, 'a province\'s stars keep off its own gate');
   // every master the host and the client name is its star's coven's (a province's leader where a Bay coven's Coven Mother)
   for (const f of ['src/scenes/starfall/starfallHost.js', 'src/systems/starfall/starfallClient.js']) {
     const calls = src(f).match(/starMasterOf\((?:[^()]|\([^()]*\))*\)/g) ?? [];

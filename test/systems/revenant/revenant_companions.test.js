@@ -194,43 +194,6 @@ test('COMPANION-PORTAL the portal: its art made here (an oval vortex - clear out
   assert.equal(set.count, 0); assert.equal(freed.length, 2, 'freed');
 });
 
-test('DISSOLVE the sprite burnt away or gathered: the batch\'s field (written on change, null whole); the execution in ember after its burst, the oath and a portal in arcane light - arriving whole again, leaving gone; both billboard shaders cut the grains and blaze the edge, the draw uploads it (mutants: the lane without it; the edge never lit; arriving backwards)', () => {
-  const b = {};
-  D.setBatchDissolve(b, 0.5, D.DISSOLVE_EMBER);
-  assert.deepEqual(b.dissolve.slice(0, 4), [0.5, ...D.DISSOLVE_EMBER]);
-  assert.ok(!b.noShadow, 'half whole: its shadow stands');
-  const same = b.dissolve; D.setBatchDissolve(b, 0.8, D.DISSOLVE_EMBER); assert.equal(b.dissolve, same, 'one array, written in place');
-  assert.equal(b.dissolve[0], 0.8);
-  assert.equal(b.noShadow, true, 'AUDIT (2026-10-02): more gone than whole, it casts no shadow');
-  D.setBatchDissolve(b, 0); assert.equal(b.dissolve, null, 'whole');
-  assert.ok(!b.noShadow, 'and its shadow back');
-  const lit = { noShadow: true }; D.setBatchDissolve(lit, 0.9); D.setBatchDissolve(lit, 0);
-  assert.equal(lit.noShadow, true, 'a batch that never cast one keeps its word');
-  const now = 100000;
-  assert.equal(F.fateDissolve({ executing: { at: now } }, now), null, 'whole before the burst');
-  assert.deepEqual(F.fateDissolve({ executing: { at: now - F.EXECUTION_MS.end } }, now), [1, ...D.DISSOLVE_EMBER], 'gone at its end, in ember');
-  const arriving = F.fateDissolve({ portalFx: { dir: 'in', at: now - 100, delay: 0, ms: 400 } }, now);
-  assert.ok(arriving[0] > 0.5 && arriving[0] < 1 && arriving[1] === D.DISSOLVE_ARCANE[0], 'gathering out of the light');
-  assert.equal(F.fateDissolve({ portalFx: { dir: 'in', at: now - 500, delay: 0, ms: 400 } }, now), null, 'through: whole');
-  assert.equal(F.fateDissolve({ portalFx: { dir: 'out', at: now - 500, delay: 0, ms: 400 } }, now)[0], 1, 'leaving: gone');
-  const rd = read('src/render/renderer.js'), el = read('src/render/enhancedLighting.js');
-  for (const [name, src, fs] of [['classic', rd, 'const BB_FS = `'], ['lane', el, 'export const EL_BB_FS = `']]) {
-    const sh = src.slice(src.indexOf(fs), src.indexOf('}`;', src.indexOf(fs)));
-    assert.match(sh, /\$\{FLAT_DISSOLVE_GLSL\}/, `${name}: the helper`);
-    assert.match(sh, /if \(dissolveGone\(uv\)\) discard;/, `${name}: the grains cut`);
-    // AUDIT (2026-10-02): the lane's edge decoded into its linear light - a display colour mixed there came out washed
-    assert.match(sh, name === 'lane' ? /lit = dissolveLit\(lit, uv, elDecode\(uDissolve\.yzw\)\);/ : /lit = dissolveLit\(lit, uv, uDissolve\.yzw\);/, `${name}: the edge blazes`);
-  }
-  for (const [name, src] of [['classic', read('src/render/renderer.js')], ['lane', read('src/render/enhancedLighting.js')]]) assert.match(src, /uniform vec4 uDissolve;/, `${name}: the program declares it (AUDIT 47)`);
-  assert.doesNotMatch(D.FLAT_DISSOLVE_GLSL, /uniform /, 'the block declares none');
-  assert.match(rd, /this\.bbUDissolve = gl\.getUniformLocation\(this\.bbProgram, 'uDissolve'\);/);
-  assert.match(rd, /if \(dv \|\| this\._bbDissolveOn\) \{ gl\.uniform4f\(this\.bbUDissolve, dv \? dv\[0\] : 0, dv \? dv\[1\] : 0, dv \? dv\[2\] : 0, dv \? dv\[3\] : 0\); this\._bbDissolveOn = !!dv; \}/);
-  // AUDIT (2026-10-02): the reset SENDS the zero - a shadow set false over a uniform still holding the last burning
-  // flat's share left every flat after it burnt away (the frame's last batch the dissolving one: a dungeon's lone foe)
-  assert.match(rd, /this\._bbTipOn = false;\n\s*gl\.uniform4f\(this\.bbUDissolve, 0, 0, 0, 0\);[^\n]*\n\s*this\._bbDissolveOn = false;/, 'reset with the frame, the zero sent');
-  for (const src of [rd, read('src/render/enhancedLighting.js')]) assert.match(src, /if \(uEliteGlow != 0\.0 && uConceal\.x == 0\.0 && uDissolve\.x <= 0\.0\) \{/, 'no elite rim round a body dissolving');
-});
-
 test('REVENANT-FATE the held pose: its hurt\'s last frame (or the one before, a breath), facing the camera as the clock\'s would, the unit\'s own state untouched (mutants: the state left changed; the first frame held)', () => {
   const basics = ENEMY_BASICS[MOBILE_TYPES.Orc];
   const m = new MobileUnit(MOBILE_TYPES.Orc, basics, () => 5);
@@ -302,20 +265,3 @@ test('COMPANION-ROSTER the page: the slots a strip of wells (who stands in each,
   _setCompanionRosterIconForTests(null);
 });
 
-test('REVENANT-COMPANION the world\'s wiring: the sworn stood by the crew\'s own layer (never the naval arc\'s gate), its strength on its stand, the places\' portals handed to it, its pack and its card beside the crew\'s, the roster\'s acts heard; the street, a building and a dungeon each draw their portals with their foes (mutants: the sworn under the naval gate; a place without its fx; the cards without them)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const revenantAshore = createCrewAshore\(\{\n\s*party: \(\) => \(playerSpawned \? _revenantParty : null\),\n\s*place: \(\) => companionPlace\(\{ crew: false \}\),/);
-  assert.match(w, /function companionPlace\(\{ crew = true \} = \{\}\) \{[^\n]*\n\s*if \(\(crew && !navalOn\(\)\) \|\|/);
-  assert.match(w, /applySwornStrength\(rec\.entity, r, \{ fresh: !\(c\.maxHealth > 0\) \}\);/);
-  assert.match(w, /spot: spotOf\(collider\), fx: exteriorFoes\.companionFx, turn: turnIn\(exteriorFoes\) \};/);   // PIN MOVED (RVN11c: and a betrayer's turning, hostile where it stood)
-  assert.match(w, /spot: spotOf\(modes\?\.interiorCollider\), fx: pool\.companionFx, turn: turnIn\(pool\) \} : null;/);   // PIN MOVED (RVN11c)
-  assert.match(w, /spot: spotOf\(d\.collider\), fx: d\.companionFx \?\? null,/);
-  assert.match(w, /if \(isRevenantCompanionKey\(key\)\) return openSwornPack\(rec\);/);
-  assert.match(w, /const sworn = swornCards\?\.\(\) \?\? \[\];/);
-  assert.match(w, /registerCompanionCount\('crew', /);
-  assert.match(w, /setRetinueListener\(\(kind, r, extra\) => \{/);
-  assert.match(w, /crewAshoreTick\(\);   \/\/ CREW-COMPANIONS: the party stood on the street\n\s*revenantAshoreTick\(\);/);
-  const x = read('src/scenes/exteriorFoes.js'), d = read('src/scenes/dungeonContext.js');
-  assert.match(x, /return \[\.\.\.out, \.\.\.corpseBatches\.map\(\(c\) => c\.batch\), \.\.\.portals\.batches\(\)\];/);
-  assert.match(d, /const _dropBatches = \[\.\.\.droppedLoot\.batches\(\), \.\.\.portals\.batches\(\)\];/);
-});

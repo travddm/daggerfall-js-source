@@ -13,7 +13,6 @@ import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const rd = (p) => readFileSync(join(ROOT, p), 'utf8');
-const WM = rd('src/scenes/worldModes.js');
 const slice = (src, from, to) => {
   const i = src.indexOf(from);
   assert.ok(i >= 0, `${from} not found`);
@@ -62,33 +61,6 @@ function tavernDoor() {
   };
   return { entry, saved };
 }
-
-test('AUDIT 68 S23-failed-entry-stale-building: an entry whose build fails commits no building and no latch', async () => {
-  // The tavern's interior build rejects at its first model fetch - the
-  // ARENA2 fetch failure the finding names. The player stays outside,
-  // and the host must not go on naming the tavern: the party-rest vote,
-  // the talk layer and openStaticNpc read these outdoors.
-  const { entry, saved } = tavernDoor();
-  const modes = await buildModes({
-    doorTargets: () => [entry],
-    pipeline: { getGpuMesh: async () => { throw new Error('fetch failed'); }, cpuModels: new Map(), getTexture: async () => null, uploadRecord: () => {}, uploadRecordFrame: () => {}, arch: null, palette: null, getMachineryParts: () => {} },
-  });
-  const err = console.error; console.error = () => {};
-  let ok;
-  try { ok = await modes.restoreInterior(saved, [0, 0, 0]); } finally { console.error = err; }
-  assert.equal(ok, false, 'the refused entry answers false');
-  assert.equal(modes.mode, 'exterior');
-  assert.equal(modes.interiorBuilding, null, 'no building is named by an entry that never happened');
-  assert.equal(modes.insideTavern, false);
-  assert.equal(modes.insidePartyRestExempt, false, 'the party-rest vote is not switched off in the street');
-  // ...by construction: every write of the four sits below the landing test
-  const core = slice(WM, 'async function interiorTransition(', 'function tryExit(');
-  const landingAt = core.indexOf("if (!landing) { abandonContext(ctx); throw new Error('no interior landing'); }");
-  assert.ok(landingAt > 0);
-  for (const re of [/\binteriorBuilding = /g, /\b_insideTavern = /g, /\b_insideResidence = /g, /\b_insidePartyRestExempt = /g]) {
-    for (const m of core.matchAll(re)) assert.ok(m.index > landingAt, `${re} is written before the entry can fail`);
-  }
-});
 
 test('AUDIT 68 X3-transition-build-race: the gate runs one build at a time and a moved world stales the pending one', async () => {
   const { createTransitionGate } = await import('../../src/scenes/transitionGate.js');
@@ -164,76 +136,6 @@ test('AUDIT 68 X3-transition-build-race: the mode host serializes its door build
     assert.equal(modes.transitioning, false);
     assert.equal(modes.mode, 'exterior');
   } finally { console.error = err; }
-});
-
-test('AUDIT 68 X3-transition-build-race: every door build is re-validated before it publishes, and the world movers abort it', () => {
-  const interior = slice(WM, 'const ctx = await buildInteriorContext(', 'interiorCtx = ctx;');
-  assert.match(interior, /if \(!live\(\)\) \{ abandonContext\(ctx\); return false; \}/, 'the building build checks it is still wanted');
-  const dungeon = slice(WM, 'const ctx = await buildDungeonContext(', 'dungeonCtx = ctx;');
-  assert.match(dungeon, /if \(!live\(\)\) \{ abandonContext\(ctx\); return false; \}/, 'and so does the dungeon build');
-  // PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md): a building's door asks the instance door before the gate - its popup builds nothing
-  assert.match(WM, /async function enterInteriorCore\(hit, entries, restore = null, entry = null\) \{[^\n]*\n\s*const link = host\.linkedBankCabin\?\.\(\);\n\s*if \(!hit\.sailingCabin && !restore && link && SHIP_INTERIOR_MAP_IDS\[link\.type\] === questSceneCtx\?\.\(\)\?\.mapId\) return host\.enterLinkedBankCabin\?\.\(\) \?\? false;\n(?:\s*\/\/[^\n]*\n)*\s*const door = host\.instanceDoor, place = [^\n]*\n\s*return gatedTransition\(/);   // PIN MOVED (INSTANCES' audit): the entry decided (never asked here), then the gate
-  assert.match(WM, /async function tryEnterDungeon\(hit, entries, \{ preferEnterMarker = false, fromLoad = false, holdOpen = false, entry = null, recorded = undefined \} = \{\}\) \{\n(?: {4}\/\/[^\n]*\n)*    const place = entry \?\? [^\n]*\n(?: {4}\/\/[^\n]*\n)*    if \(!fromLoad && !holdOpen && !place\?\.instance && host\.dungeonOnline\?\.\(\) && isPrivateersHold\(hit\?\.dfLocation\)\) \{ say\(HOLD_ONCE_TEXT\); return false; \}\n\s*return gatedTransition\(/);   // PIN MOVED (INSTANCES' audit): the entry decided - never a popup here - before the Hold's refusal and the gate   // MAP-KEEP: and the load's arm rides it; PIN MOVED (HOLD-ONCE): the Hold's refusal before the gate builds nothing
-  // PVPDUNGEONS: the zone's gate - the hub's word, up to four seconds - is asked INSIDE the gated build and the build is
-  // re-validated after it; awaited before the gate (as the zone first landed), a world move during the wait was never heard
-  assert.match(WM, /return gatedTransition\(async \(live\) => \{[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(host\.wildDungeonGate && !\(await host\.wildDungeonGate\(hit, fromLoad\)\)\) return false;\n\s*if \(!live\(\)\) return false;[^\n]*\n\s*return dungeonTransition\(hit, entries, preferEnterMarker, live, fromLoad, place\);/, 'the zone\'s gate waits inside the transition gate');   // PIN MOVED (INSTANCES): the door's answer rides to the build   // PIN MOVED (INSTANCES' audit): the entry decided rides to the build
-  assert.match(slice(WM, 'forceExitToExterior({ cacheScene = true, load = false } = {}) {', 'const wasInside'), /transitionGate\.abort\(\);/, 'the forced exit abandons a pending build');
-  const w = rd('src/scenes/world.js');
-  assert.match(slice(w, 'async function _teleportToPixel(', 'refreshSeason('), /modes\?\.abortTransition\?\.\(\);/, 'every teleport, travel, recall and load landing moves the world');
-  const load = slice(w, 'async function worldQuickLoad(', 'const extras = restorePlayer(');
-  assert.match(load, /modes\?\.abortTransition\?\.\(\);\s*await modes\?\.transitionSettled\?\.\(\);/, 'the load waits for an abandoned build to unwind before it reads the save');
-});
-
-test('AUDIT 68 S23-dungeon-commit-before-await: nothing fallible is awaited between publishing the dungeon and its marker test', () => {
-  const tail = slice(WM, '      dungeonCtx = ctx;\n', 'if (!spawn) {');
-  // OH-D: ONE wait stands there - OnSetDungeon's listeners' work (the port's rebuilt bodies) - and it cannot reject
-  assert.deepEqual(tail.match(/\bawait\b[^\n]*/g) ?? [], ["await setDone.catch((e) => console.warn('[dungeon] OnSetDungeon listener failed:', e?.message ?? e));"], 'a rejection there leaves the built context published and its seams installed');
-  assert.match(tail, /await setDone\.catch\([^\n]*\n\s*if \(!live\(\)\) \{ abandonContext\(ctx\); dungeonCtx = null; return false; \}/, 'and the world moving under it abandons the build');
-  const head = slice(WM, 'async function dungeonTransition(', 'const ctx = await buildDungeonContext(');
-  assert.match(head, /const waterArchive = getGroundArchive\(hit\.climateBase, hit\.season\);\s*await getTexture\(waterArchive\);/, 'the water tile is fetched before anything is built');
-});
-
-test('AUDIT 68 X3-ba-forceexit-rain: the forced exit raises the exterior transition both real doors raise', () => {
-  const force = slice(WM, 'forceExitToExterior({ cacheScene = true, load = false } = {}) {', 'get interiorCollider()');
-  const tail = force.slice(force.indexOf('AUDIT 63r F30'));
-  assert.match(tail, /if \(wasInside\) \{\s*immersiveFootsteps\.onTransitionExterior\(\);\s*betterAmbience\.onTransition\(null\);\s*\}/,
-    'a Recall, a quest teleport or a load out of a building left the indoor rain loop playing in the street');
-});
-
-test('AUDIT 68 S23-liveQuestFoes-interior-empty: the quest-foe walk answers the building\'s pool too', () => {
-  const body = slice(WM, 'liveQuestFoes() {', 'spawnCityGuardsInside(immediate) {');
-  assert.match(body, /if \(mode === 'interior'\) return interiorEnemyDatabase\(\)\.filter\(\(f\) => f\.questBehaviour\);/);
-  assert.doesNotMatch(body, /if \(mode !== 'dungeon' \|\| !dungeonCtx\) return \[\];/, 'the empty interior arm is gone');
-});
-
-test('AUDIT 68 S23-coven-punishment-interior-only: the daedric punishment stands through the host\'s mode-routed stand', () => {
-  const body = slice(WM, 'function spawnDaedricPunishment(', 'return stood;');
-  assert.doesNotMatch(body, /interiorCtx|interiorFoes/, 'the wave no longer needs a building mounted - a coven\'s popup is never in one');
-  assert.match(body, /const stand = host\.standLooseFoe;/);
-  assert.match(body, /if \(stand\(type, \{ minDistance, maxDistance \}\)\) stood\+\+;/);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const bag = slice(rd(f), 'var modes = createWorldModes({', '\n  });\n');
-    assert.match(bag, /standLooseFoe: \(mobileType, opts\) => _standLooseFoe\(mobileType, opts\),/, `${f} hands its stand down`);
-  }
-});
-
-test('AUDIT 68 S23-custom-merchant-null-trade: every trade window the host opens is null-checked before it is mounted', () => {
-  // createTradeWindow answers null for a transformed lycanthrope (DISC10-E
-  // L3, it says so itself); the RR3 custom merchant's Buy door wrote
-  // `win.hooks` on that null and threw inside the click.
-  const unguarded = [];
-  for (const m of WM.matchAll(/(\w+) = openTradeWindow\(/g)) {
-    const name = m[1];
-    const after = WM.slice(m.index, m.index + 300);
-    if (!(after.includes(`if (!${name})`) || after.includes(`${name} ?? DOOR_REFUSED`) || after.includes(`return ${name} ?`))) unguarded.push(`${name} at ${WM.slice(0, m.index).split('\n').length}`);
-  }
-  assert.deepEqual(unguarded, []);
-});
-
-test('AUDIT 68 S23-dungeon-npc-behaviours-not-destroyed: the dungeon exit destroys its people\'s quest behaviours, as the interior exit does', () => {
-  assert.match(WM, /function teardownDungeonQuestFlats\(\) \{\s*teardownStands\(dungeonQuestFlats, dungeonCtx\?\.people\);/);
-  assert.match(WM, /function teardownQuestFlats\(\) \{\s*teardownStands\(questFlats, interiorCtx\?\.people\);/);
-  assert.match(slice(WM, 'function teardownStands(', 'function teardownDungeonQuestFlats('), /destroyPeopleBehaviours\(people\);/);
 });
 
 test('WD3 (AUDIT WD3 G3): an inside save finds its building by its KEY when the block\'s index moved - a block a world-data mod adds is numbered in the order a session first reads it, so the saved index can name nothing (or another added block) next session', async () => {

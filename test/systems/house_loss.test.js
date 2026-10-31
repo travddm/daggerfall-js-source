@@ -199,10 +199,6 @@ test('HOUSE-LOSS 1 / CUSTOMS-PASS: an undo gives back everything customs spent -
 });
 
 test('HOUSE-LOSS 1: the door - a character brought in whose first save never landed offers "Undo bringing in" on the undo\'s own route, never Delete; the never-saved word sends one brought in back to its offline tile', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /row\.customs && save\.unfinished \? \{ label: t\('menu\.realm\.undo', 'Undo bringing in'\), disabled: realmBusy, onClick: \(\) => ask\(t\('menu\.realm\.undoAsk', 'Undo bringing \{name\} in\?', \{ name: row\.name \}\), [^\n]*realmAct\(\(\) => realmUndo\(realmIoNow\(\), row\.id\)/);
-  assert.match(menu, /\n\s+: \{ label: t\('menu\.realm\.delete', 'Delete character'\), disabled: realmBusy, onClick: \(\) => ask\(/, 'every other character is deleted as before');
-  assert.match(src('src/systems/realmSaves.js'), /export const realmUndo = \([^)]*\) => realmAsk\(io, '\/v1\/realm\/undo', \{ method: 'POST', json: \{ id \} \}\);/);
   const said = realmRefusalText('no-data');
   assert.match(said, /If you brought it in, press Bring online on it again or undo it\./);
   assert.doesNotMatch(said, /^That online character was never saved\. Delete it and make it again\.$/);

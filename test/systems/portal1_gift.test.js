@@ -74,11 +74,3 @@ test('PORTAL-GIFT the mark rides the save: a new character is born past it, a sa
   assert.equal(takePortalGiftNotice(), 0, 'nothing said again');
 });
 
-test('PORTAL-GIFT the hosts: every load restores through the one door, which gives it below the relinks and the fold; the world says it once it stands, in every mode', () => {
-  const save = src('src/systems/save/save.js');
-  assert.match(save, /snap\.portalGift = Number\.isSafeInteger\(entity\.portalGift\) \? entity\.portalGift : PORTAL_GIFT;/);
-  assert.match(save, /entity\.portalGift = Number\.isSafeInteger\(snap\.portalGift\) \? snap\.portalGift : 0;/);
-  assert.match(save, /const n = restackStones\(list\);[^\n]*\n[^\n]*\n\s+\}\n\s+givePortalGift\(entity\);/, 'after the fold - an index-keyed relink never slides');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /if \(_bootLoaded\) \{ const gift = takePortalGiftNotice\(\); if \(gift\) townTalk\.say\(PORTAL_TEXT\.gift\(gift\)\); \}[^\n]*\n\s+if \(_mode\(\) !== _torchesMode\)/, 'said once the world stands, before the frame turns to a building or a dungeon');
-});

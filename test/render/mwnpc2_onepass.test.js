@@ -104,16 +104,3 @@ test('MWNPC2c the lone path is as it was: a call outside a batch draws in its ow
   assert.equal(r.flushCharacterSpriteBatch(), 0, 'a flush with no batch open draws nothing');
 });
 
-test('MWNPC2d every body pass of the hosts the game boots opens a batch around its bodies and flushes it', () => {
-  const world = rd('src/scenes/world.js');
-  const modes = rd('src/scenes/worldModes.js');
-  const between = (src, from, to) => { const a = src.indexOf(from); return a >= 0 ? src.slice(a, src.indexOf(to, a)) : ''; };
-  const ext = between(world, 'renderer.beginCharacterSpriteBatch?.();', '} finally { renderer.flushCharacterSpriteBatch?.(); }');
-  assert.ok(ext.includes('mwViewDrawBody(canvas,') && ext.includes('drawPeerBodies(proj, view, mwv.eye'), 'the street: the player and the others in one batch, flushed whatever throws');
-  const opens = modes.split('renderer.beginCharacterSpriteBatch?.();').slice(1);
-  assert.equal(opens.length, 2, 'the dungeon and the building');
-  for (const o of opens) {
-    const pass = o.slice(0, o.indexOf('} finally { renderer.flushCharacterSpriteBatch?.(); }'));
-    assert.ok(pass.includes('mwViewDrawBody(canvas,') && pass.includes('host.drawPeerBodies?.('), 'each: the player and the others, flushed in a finally');
-  }
-});

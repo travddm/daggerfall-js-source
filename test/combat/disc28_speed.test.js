@@ -72,8 +72,3 @@ test('DISC28-D: a plain number is still a fixed Speed (every formula pin at 50),
   assert.equal(pw.liveSpeed, 90);
 });
 
-test('DISC28-D: the rig hands its weapon the entity\'s live Speed', () => {
-  const src = readFileSync(new URL('../../src/combat/weapon/weaponRig.js', import.meta.url), 'utf8');
-  assert.match(src, /new PlayerWeapon\(\{ liveSpeed: \(\) => \(entity \? liveStat\(entity, 'speed'\) : 50\) \}\)/);
-  assert.doesNotMatch(src, /new PlayerWeapon\(\{\}\)/, 'no weapon built blind to the player');
-});

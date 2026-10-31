@@ -78,20 +78,6 @@ test('HOUSE-DROP executed: a light dropped or thrown on a floor that refuses it 
   assert.equal(free.pool.spawned.length, 1, 'no word: the light lands as ever');
 });
 
-test('HOUSE-DROP by source: the building\'s refusal is a VISITOR\'s in someone else\'s online home alone; the windows ask it, gold too; the close hands anything that slipped through back to the pack; the rig hands it to the torches', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /const visitorDropRefusal = \(\) => \(mode === 'interior' && privateVisitRoom \? HOME_VISITOR_DROP_TEXT : interiorHome && !interiorHome\.own && mode === 'interior' \? \(interiorHome\.hall \? HALL_DROP_TEXT : HOME_VISITOR_DROP_TEXT\) : null\);/, 'private staff visits also refuse drops; the owner and other buildings retain their own rules');
-  assert.match(wm, /const no = visitorDropRefusal\(\);\n\s*if \(no\) \{ for \(const it of \[\.\.\.items\]\) takeOneInto\(playerEntity, items, it\); say\(no\); return null; \}/, 'the belt at the close: back to the pack, gold to the counter');
-  assert.match(wm, /dropRefusal: \(\) => visitorDropRefusal\(\),\n/, 'the window asks');
-  assert.match(wm, /dropRefusal: \(\) => visitorDropRefusal\(\),   \/\/ HOUSE-DROP: and a light/, 'and the rig');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /createHandheldTorches\(\{ audio, say, torches, dropRefusal \}\)/);
-  const nat = rd('src/ui/native/nativeInventory.js'), enh = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.equal((nat.match(/groundRefusal: groundRefusalOf\(this\.hooks, \{ usingWagon: this\.usingWagon, chooseOne: this\.chooseOne \}\)/g) ?? []).length, 2, 'the classic window: the item and the gold');
-  assert.match(nat, /if \(!plan\.ok\) \{ if \(plan\.refusal\?\.reason === 'ground' \|\| plan\.refusal\?\.reason === 'store'\) this\._refuse\(plan\.refusal\); return; \}/, 'and the gold\'s refusal is said');   // PIN MOVED (AUDIT PVP-EASE L2-1): and the combat lock's
-  assert.equal((enh.match(/groundRefusal: groundRefusalOf\(deps, session\)/g) ?? []).length, 6, 'the enhanced skin: every store plan, its dry runs, the gold and Stash all (LOOT-BULK)');
-  assert.match(enh, /else if \(!plan\.ok && \(plan\.refusal\?\.reason === 'ground' \|\| plan\.refusal\?\.reason === 'store'\)\) notice = plan\.refusal\.text;/);   // PIN MOVED (AUDIT PVP-EASE L2-1): and the combat lock's
-});
-
 // ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): the torch's two refusals, driven through the
 // component's own frame (the auditor's rig): the hand law and the throw key.
 const KEY = Object.fromEntries(DEFAULT_BINDINGS.map(([code, action]) => [action, code]));

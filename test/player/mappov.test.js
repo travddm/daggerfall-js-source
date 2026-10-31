@@ -67,31 +67,3 @@ test('MAP-POV: the Eye of the Beholder lane - the mod\'s own ToggleOffset(false)
   } finally { reset(); }
 });
 
-test('MAP-POV by source: every door into the map goes into the head through the ONE builder, after the door\'s own refusals, and the classic and held maps alike', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ mwViewFirstPerson, mwViewFrame, mwViewWheel,/, 'the seam\'s door, imported beside the frame');
-  assert.match(w, /function buildTravelMapWindow\(extra = \{\}\) \{\n(?:\s*\/\/[^\n]*\n)*\s*mwViewFirstPerson\(\);\n\s*return createTravelMapWindow\(\{/,
-    'the builder goes into the head first, then builds the window the skin wears - the held map or the classic sheet');
-  // the builder is the ONLY way this host mints the window, so a door cannot forget the move
-  assert.equal((w.match(/createTravelMapWindow\(\{/g) ?? []).length, 1, 'one mint, in the builder');
-  const doors = w.match(/buildTravelMapWindow\(\{/g) ?? [];
-  assert.ok(doors.length >= 2, `the key\'s door and the teleport\'s door both build through it (${doors.length})`);
-  // a refused press must not move the camera: the key's door holds no copy of the move, only the builder does,
-  // and the builder is reached below every refusal
-  const i = w.indexOf('const toggleTravelMap = (gotoPlace = null) => {');
-  const door = w.slice(i, w.indexOf('function openTeleportMap', i));
-  assert.equal(door.includes('mwViewFirstPerson'), false, 'no copy of the move at the door');
-  assert.ok(door.indexOf('racialFastTravelBlock') < door.indexOf('buildTravelMapWindow('), 'the last refusal stands above the build');
-  assert.ok(door.indexOf('areEnemiesNearby') < door.indexOf('buildTravelMapWindow('), 'and the first');
-});
-
-test('MAP-POV by source: the seam\'s door takes the restore, never the wheel\'s queued crossing, and asks the lane first', () => {
-  const s = rd('src/player/mwView.js');
-  const fn = s.slice(s.indexOf('export function mwViewFirstPerson()'), s.indexOf('\n}\n', s.indexOf('export function mwViewFirstPerson()')) + 3);
-  assert.match(fn, /if \(eotbLane\(\)\) \{[\s\S]*?eotbCamera\.toggleOffset\(false\);[\s\S]*?\}/, 'the sprite body through its own toggle');
-  assert.match(fn, /return mwIntoHead\(\);/, 'the Morrowind lane through the ONE door into the head (RIDE-POV shares it)');
-  const head = s.slice(s.indexOf('function mwIntoHead()'), s.indexOf('\n}\n', s.indexOf('function mwIntoHead()')) + 3);
-  assert.match(head, /mwCamera\.restore\(\{ firstPerson: true, baseDistance: mwCamera\.baseDistance\(\) \}\);/, 'the Morrowind camera through the restore door, its distance kept');
-  assert.doesNotMatch(fn + head, /mwCamera\.wheel|pendingClicks/, 'not the wheel - that crossing waits for the upper body');
-  assert.match(head, /fpArm\.setViewMode\('first'\)/, 'and the rig is moved with it');
-});

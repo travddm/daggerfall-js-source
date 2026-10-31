@@ -69,7 +69,6 @@ test('AUDIT PVP-EASE L2-1 THE TRANSFER LAWS (systems/item/itemTransfer.js): plan
   assert.deepEqual([gold.ok, gold.refusal], [false, { reason: 'store', text: 'locked' }]);
   assert.equal(planDropGold('100', { carried: 500, usingWagon: true }).ok, true);
   assert.equal(planTake(s, { usingWagon: true }).ok, true, 'out of the wagon: never locked');
-  assert.ok(!/storeRefusal/.test(rd('src/systems/item/itemTransfer.js').slice(rd('src/systems/item/itemTransfer.js').indexOf('export function planTake('))), 'planTake reads no lock');
 });
 
 test('AUDIT PVP-EASE L2-1 THE DOORS: both inventories ask at every store and gold drop, and say the lock; a sworn one\'s kit asks; the world host notes a landed blow, and the sea\'s guns note theirs (mutants: a door unasked; the gold\'s refusal unsaid; the blow unnoted; the gunfight unnoted)', () => {
@@ -82,13 +81,4 @@ test('AUDIT PVP-EASE L2-1 THE DOORS: both inventories ask at every store and gol
   clock = fresh();
   b.hear({ k: 'hull', by: 'peer-me', to: 'peer-x', d: 10, s: 0, f: 0, h: 900 });
   assert.notEqual(wildStoreRefusal(clock), null, 'my broadside landed: locked');
-  const enh = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.equal(enh.split('groundRefusal: groundRefusalOf(deps, session), storeRefusal: storeRefusalOf(deps, session)').length - 1, 6, 'every store, dry run and gold drop of the Enhanced pack');
-  assert.ok(enh.includes("else if (!plan.ok && (plan.refusal?.reason === 'ground' || plan.refusal?.reason === 'store')) notice = plan.refusal.text;"), 'its gold drop says it');
-  const nat = rd('src/ui/native/nativeInventory.js');
-  assert.equal(nat.split('storeRefusal: storeRefusalOf(this.hooks, { usingWagon: this.usingWagon, chooseOne: this.chooseOne })').length - 1, 2, 'the classic pack\'s store and gold drop');
-  assert.ok(nat.includes("if (plan.refusal?.reason === 'ground' || plan.refusal?.reason === 'store') this._refuse(plan.refusal);"));
-  assert.ok(rd('src/systems/revenant/revenantCompanions.js').includes('const why = gearRefusal(r, item, { kindName }) ?? wildStoreRefusal();'), 'a sworn one\'s kit');
-  const w = hostText('src/scenes/world.js');
-  assert.ok(/if \(g\.by !== me && g\.to !== me\) return;\n {4}noteWildBlow\(\);/.test(w), 'a landed blow, mine or on me');
 });

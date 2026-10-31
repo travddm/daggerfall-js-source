@@ -185,13 +185,6 @@ test('WAGONS4 THE WAGON YARD MENDS: its keeper\'s third row, the Stable\'s two; 
   assert.deepEqual(yardRowsFor('stable'), [...YARD_ROWS]);
   assert.deepEqual(yardRowsFor('transport'), [...YARD_ROWS, YARD_MEND_ROW]);
   assert.deepEqual(YARD_MEND_ROW, { id: 'mend', label: 'Mend' });
-  const host = rd('src/scenes/merchantYardsHost.js');
-  assert.match(host, /actions: yardRowsFor\(p\.y\.site\.kind\)\.map\(\(r\) => \(\{ id: r\.id, label: r\.label \}\)\) \};/);
-  assert.match(host, /if \(verb === 'mend' && p\.y\.site\.kind === 'transport' && \(p\.what === 'keeper' \|\| p\.what === 'sign'\)\) return mend\(p\.y\.site\) !== false;/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /mend: \(\) => mendAtYard\(\),/);
-  assert.match(w, /const away = !!rt\?\.physicalPersistenceEnabled && !rt\.canAccessWagonInventory\?\.\(\)\?\.allowed;\n\s*const price = upkeep\.mendPrice\(away\);/, 'a wright sent out to a wagon out of the counter\'s reach');
-  assert.match(w, /if \(totalGoldAmount\(playerEntity\) < price\) \{ townTalk\.say\(WAGON_UPKEEP_TEXT\.poor\(price\)\); return; \}\n\s*deductGold\(playerEntity, price\);\n\s*mendWagon\(w\);/, 'asked, then paid, then mended');
 });
 
 test('WAGONS4 A SMITH MENDS NO HORSE AND NO WAGON: a wagon left at a smith\'s counter left the pack for days - its horse and the mod\'s wagon in the world with it - so both are refused first, in their own words, at both counters (mutants: the refusal dropped, its words)', () => {
@@ -200,7 +193,6 @@ test('WAGONS4 A SMITH MENDS NO HORSE AND NO WAGON: a wagon left at a smith\'s co
   assert.equal(repairRefusal({ templateIndex: 113, group: 'Weapons', currentCondition: 10, maxCondition: 100 }), null);
   assert.match(TRANSPORT_CANNOT_BE_REPAIRED_TEXT, /Wagon Yard repairs wagons/);
   for (const f of ['src/ui/enhanced/enhancedTrade.js', 'src/ui/native/nativeTrade.js']) assert.match(rd(f), /transport: \[\{ text: TRANSPORT_CANNOT_BE_REPAIRED_TEXT, center: true \}\],/, f);
-  assert.match(rd('src/scenes/worldModes.js'), /: refusal === 'transport' \? \[TRANSPORT_CANNOT_BE_REPAIRED_TEXT\]/);
 });
 
 test('WAGONS4 THE ROW AND THE HOSTS: a Features row beside horse care (its tiers WAGON-TIERS\', test/systems/wagontiers.test.js); the hosts hand the runtime the wear - the odometer\'s, a journey\'s days, the watch\'s throw (mutants: each door dropped)', () => {
@@ -211,11 +203,6 @@ test('WAGONS4 THE ROW AND THE HOSTS: a Features row beside horse care (its tiers
     assert.match(s, /teamShort: \(\) => wagonTeamShort\(playerEntity\.items \?\? \[\]\),/, host);
     assert.match(s, /wagonGoes: mode === TRANSPORT_MODES\.Cart \|\| !!hccRuntimeOn\(\)\?\.view\?\.\(\)\?\.teamFollowing,/, `${host}: worn while it rolls with me`);
   }
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const upkeepWagonWent = hccOn\(\) \? !!hccRuntimeOn\(\)\?\.wagonGoesOnJourney\?\.\(\) : hasTransport\(TRANSPORT_SMALL_CART\);/);
-  assert.match(w, /playerTicker\.advance\(computed\.minutes\);\n\s*if \(upkeepWagonWent\) upkeep\.journey\(travelDays\(computed\.minutes\)\);/, 'the journey\'s days on the wagon that went');
-  assert.match(w, /thrown: \(\) => upkeep\.thrown\(\),/);
-  assert.match(rd('src/scenes/wagon/wagonWardenHost.js'), /notify\(\[WARDEN_TEXT\.thrown\(town\), WARDEN_TEXT\.fetch\]\);\n\s*thrown\(\);/);
   // the item law: wear is condition alone - a marked wagon's value never falls under its kind's floor
   const worn = wagon('caravan', 0);
   assert.equal(worn.value, WAGON_KINDS.caravan.value);

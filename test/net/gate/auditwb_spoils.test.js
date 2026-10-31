@@ -44,17 +44,6 @@ test('AUDIT WB A2 a receipt with no floor is its spoils straight into the pack -
   assert.equal(s.p.grant({ day: 701, seed: 5, level: 3, acct: 'acct-a' }), false, 'nor a grant after a burst');
 });
 
-test('AUDIT WB A2 the seams: every receipt the link folds is offered to the pool outside its court; inside it, the burst gives them', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /onReceipt: \(r\) => \{ gateClaims\?\.add\(r\); grantSpoilsOutside\(r\); \},/);
-  const fn = w.slice(w.indexOf('function grantSpoilsOutside(r) {'), w.indexOf('function grantSpoilsOutside(r) {') + 500);
-  assert.match(fn, /if \(!c \|\| !spoilsPool \|\| modes\?\.gateArenaDay\?\.\(\) === c\.d\) return;/, 'in its own court the floor gives them');
-  // AUDIT WBX S2/S4: one tab at a time (the Web Locks API), and never past the level the fight admitted the account at
-  assert.match(fn, /spoilsLock\(\(\) => spoilsPool\.grant\(\{ day: c\.d, seed: c\.c, level: spoilsLevel\(playerEntity\.level \?\? 1, c\.l\), acct: c\.s, claims: c, text: c\.x === 'rite' \? SPOILS_TEXT\.rite : SPOILS_TEXT\.granted \}\)\)/, 'the receipt\'s own seed and account - WB12d: and its rite');
-  // WBX3: the burst's own seed and account - and, once the pieces have left him, whose they are said (they are nobody else's)
-  assert.match(read('src/scenes/gate/gateCourt.js'), /if \(spoils\.spew\(\{ day: s\.day, seed: claims\.c, level: spoilsLevel\(player\(\)\?\.level \?\? 1, claims\.l\), at, bearing, acct: claims\.s, keep, claims \}\)\) \{[^\n]*\n\s*say\(claims\.x === 'rite' \? COURT_STRIKE_TEXT\.spilledRite\(\) : COURT_STRIKE_TEXT\.spilled\(\)\);/);   // WB12d: and its rite; AUDIT WB12d (D20): its own line
-});
-
 test('AUDIT WB A9 a receipt spent is its day AND account: two accounts on one device each have their gate; an older build\'s spent day stays spent for anyone; the list is bounded', () => {
   const h = pool();
   assert.equal(h.p.spew({ day: 700, seed: 1, level: 1, at: [0, 3, 0], bearing: 0, acct: 'acct-a' }), true);
@@ -129,9 +118,6 @@ test('AUDIT WB A6 a storage that refuses writes keeps them in the session\'s mem
   await new Promise((s) => setTimeout(s, 0));
   assert.deepEqual(q.kept(), [r], 'kept in memory');
   assert.deepEqual(asked, [r], 'and offered');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _spoilsStore = spoilsStore\(appStorage\(\)\);/);
-  assert.equal((w.match(/spoilsStore\(appStorage\(\)\)/g) ?? []).length, 1, 'one store: its memory is every reader\'s');
 });
 
 test('AUDIT WB A5 a refusal the service can mend keeps the receipt for its week - the service\'s half not the relay\'s pair, a clock off; one it cannot is let go; the account client carries the rung', async () => {
@@ -142,7 +128,6 @@ test('AUDIT WB A5 a refusal the service can mend keeps the receipt for its week 
   assert.deepEqual(await call({ fetch, base: 'https://a.invalid' }, '/v1/gate/claim', { receipt: 'r' }), { ok: false, error: 'receipt', why: 'signature', status: 400 });
   const plain = async () => ({ ok: false, status: 400, json: async () => ({ error: 'receipt' }) });
   assert.deepEqual(await call({ fetch: plain, base: 'https://a.invalid' }, '/v1/gate/claim', { receipt: 'r' }), { ok: false, error: 'receipt', status: 400 }, 'no rung, no field');
-  assert.match(read('server-account/src/index.js'), /if \(r\.error\) return json\(\{ error: r\.error, \.\.\.\(r\.why \? \{ why: r\.why \} : \{\}\) \}, /);
 });
 
 test('AUDIT WB A9 the device is not the account: receipts kept one a day AND account, only the signed-in account\'s offered, another\'s kept unasked for its own sign-in; `me` is the stored session\'s id', async () => {

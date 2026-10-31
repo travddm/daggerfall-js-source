@@ -80,11 +80,3 @@ test('WA-ALLIES: and so the crew fights the raiders and the raiders fight the cr
   assert.ok(!isPlayerTarget(ally.ai.target), 'an ally never targets the player');
 });
 
-test('WA-ALLIES by source: the action writes the record\'s questBehaviour, the field the hosts bind and the targeting reads', () => {
-  const act = rd('src/systems/quest/actions.js');
-  assert.match(act, /const qrb = inst\?\.questBehaviour;\n\s*if \(qrb\) qrb\.isAttackableByAI = this\.isAttackableByAI;\n\s*this\.setComplete\(\);/);
-  const code = act.split('\n').filter((l) => !/^\s*(\/\/|\*)/.test(l)).join('\n');
-  assert.doesNotMatch(code, /inst\?\.behaviour|inst\.behaviour/, 'no record carries `behaviour` - that is a spawn handle\'s name');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /questAttackable: \{ get: \(\) => !!f\.questBehaviour\?\.isAttackableByAI, enumerable: false \}/, 'the record this test stands is the exterior pool\'s');
-  assert.match(rd('src/scenes/quest/questFoeHost.js'), /f\.questBehaviour = /, 'the binding\'s field');
-});

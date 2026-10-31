@@ -147,11 +147,6 @@ test('AUDIT 65 CV-1: the enhanced skin reads the same law - the number AND the m
   // so was handToHandDamage; the skill accessor was the odd one out.
   assert.deepEqual(m.handToHandDamage, { min: handToHandMinDamage(live), max: handToHandMaxDamage(live) });
   assert.equal(m.attributes.length > 0, true);
-  // The accessor's ONE consumer draws the value text and the bar from
-  // it, so the meter tracks the same figure the attribute bars do.
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /el\('span', 'v', m\.skillText \? m\.skillText\(id\) : String\(m\.skill\(id\)\)\)/, 'the number reads through the model');   // SOFTCAP1: \"85 (150)\" while mentoring
-  assert.match(menu, /skillMeter\(m\.skillBase \? m\.skillBase\(id\) : m\.skill\(id\), mastered\)/, '...and so does the meter beside it');   // SOFTCAP6: and the mastery's gold track   // SOFTCAP1: the 0..100 bar and the gold 100..200 one
   // sheetModel's empty-entity path stays safe: `entity ?? {}` and
   // skillValue({}, id) is 0.
   assert.equal(sheetModel(undefined).skill(SKILLS.HandToHand), 0, 'the art-less/entity-less path still answers 0');
@@ -173,14 +168,6 @@ test('AUDIT 65 CV-2: PLAYER_BODY_RADIUS is player/motor.js\'s own controller rad
   // controller.radius wherever it reads one (PlayerHeightChanger.cs:530,
   // EnemyMotor.cs:679/:1144) and the port's own player sweep agrees.
   assert.notEqual(PLAYER_BODY_RADIUS, 0.35 + 0.06, 'm_SkinWidth 0.06 is not added');
-  // ONE DFU MEMBER, ONE EXPORT: spellcast must IMPORT the radius, not
-  // spell 0.35 a second time.
-  const sc = src('src/systems/spellcast.js');
-  assert.match(sc, /import \{ CAPSULE_RADIUS \} from '\.\.\/player\/motor\.js';/);
-  assert.match(sc, /export const PLAYER_BODY_RADIUS = CAPSULE_RADIUS;/);
-  assert.ok(!/PLAYER_BODY_RADIUS = 0\.35/.test(sc), 'the literal is not restated here');
-  // and the false premise the module used to carry is gone
-  assert.ok(!/the\n \*  player's is the same radius/.test(sc), "the \"player's is the same radius\" sentence is retired");
 });
 
 test('AUDIT 65 CV-2: a blast meets the PLAYER at 4.0 + 0.35, two-sided, through the real explodeAt seam', () => {
@@ -288,12 +275,6 @@ test('AUDIT 65 CV-2: EVERY player-side capsule call carries the player body, at 
     assert.ok(!line.replace(/PLAYER_BODY_RADIUS/g, 'PBR').includes('BODY_CAPSULE_RADIUS'),
       `${f}: the foe constant is not applied to the player - ${line}`);
   }
-  // The axis inset takes the MEASURED body too, not the module constant.
-  // A crouched (0.9) player keeps a real segment, feet+0.35..feet+0.55,
-  // where a 0.45 body collapses to one point at 0.45 (Unity's rule for a
-  // capsule shorter than its own diameter) - so the two sweep different
-  // SHAPES, not merely different rims.
-  assert.match(src('src/systems/spellcast.js'), /const half = Math\.min\(bodyRadius, h \/ 2\);/);
   assert.equal(sphereOverlapsCapsule([0.29, 0.9, 0], 0.1, [0, 0, 0], 0.9, PLAYER_BODY_RADIUS), false,
     'a crouched PLAYER is clear of a burst 0.29 to the side of its crown');
   assert.equal(sphereOverlapsCapsule([0.29, 0.9, 0], 0.1, [0, 0, 0], 0.9), true,

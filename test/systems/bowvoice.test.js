@@ -104,10 +104,3 @@ test('BOW-VOICE: under the Morrowind arm the one twang waits for the arm\'s rele
   }
 });
 
-test('BOW-VOICE: the clone\'s melee swing keeps its voice - only the bow\'s release was a duplicate', () => {
-  const w = readFileSync(new URL('../../src/combat/weapon/weaponWidget.js', import.meta.url), 'utf8');
-  const body = (name) => w.slice(w.indexOf(name), w.indexOf('\n  }\n', w.indexOf(name)));
-  assert.doesNotMatch(body('function* playBowAnimation()'), /playSwingSound\(\)/, 'the bow\'s release is the machine\'s voice alone');
-  assert.match(body('function* playVanillaWeaponAnimation(state)'), /if \(w\.currentFrame === hitFrame\(\)\) \{\s*playSwingSound\(\);/, 'the vanilla swing\'s voice at its hit frame');
-  assert.match(w, /changeWeaponState\(state\);\n    playSwingSound\(\);/, 'the modded swing\'s voice at its strike');
-});

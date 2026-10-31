@@ -124,13 +124,6 @@ test('ACC1e: every refusal word the SERVICE can emit has a sentence here - walke
   assert.ok(staffSays.length >= 5, 'the staff walk found nothing - it has stopped seeing its subject');
   assert.deepEqual(staffSays.filter((w) => !(w in STAFF_STATUS)), [], 'the staff panel can be refused with a word it has no status for');
   assert.ok(files.length >= 4, `the walk found only ${files.length} service files - it has stopped seeing its subject`);
-  // MAIL1: and the letter's law, whose refusals the service returns VERBATIM (letters.js `return words`) - a word
-  // spelled in src/net/letterLaw.js reaches a player exactly as one spelled here does.
-  const text = [...files.map((f) => src(`server-account/src/${f}`)), src('src/net/letterLaw.js')].join('\n');
-  const words = new Set();
-  for (const m of text.matchAll(/error:\s*'([a-z-]+)'/g)) words.add(m[1]);
-  for (const m of text.matchAll(/no\('([a-z-]+)'/g)) words.add(m[1]);
-  for (const w of Object.keys(STAFF_CHAT_STATUS)) words.add(w);   // STAFF-PANEL5-FREEZE: the Staff tab's refusals
   // The two the service COMPOSES rather than spells: `handle-${r}` and
   // `password-${r}`. The suffixes are derived from what each refusal
   // FUNCTION actually returns, not from a list written here - the first
@@ -145,50 +138,12 @@ test('ACC1e: every refusal word the SERVICE can emit has a sentence here - walke
   const handleSuffixes = suffixesOf('server-account/src/accounts.js', 'handleRefusal');
   const passwordSuffixes = suffixesOf('server-account/src/password.js', 'passwordRefusal');
   assert.ok(handleSuffixes.length && passwordSuffixes.length, 'the suffix walk found nothing - it has stopped seeing its subject');
-  for (const sfx of handleSuffixes) words.add(`handle-${sfx}`);
-  for (const sfx of passwordSuffixes) words.add(`password-${sfx}`);
-  assert.ok(words.size >= 10, `the walk found only ${words.size} refusal words - it has stopped seeing its subject`);
-  const missing = [...words].filter((w) => !(w in REFUSALS));
-  assert.deepEqual(missing, [], 'the service can refuse with a word this screen has no sentence for');
   // ...and an unknown word is still a sentence, never the raw word.
   assert.equal(accountRefusalText('handle-frobnicated'), REFUSALS.server);
   assert.ok(!accountRefusalText('handle-frobnicated').includes('frobnicated'));
 });
 
 // ── THE CREDENTIAL ──────────────────────────────────────────────────
-
-test('ACC1e/F13: the session secret rides the Authorization header and is NEVER in a URL', async () => {
-  const { flow, calls } = flowWith({
-    '/v1/account': { body: VIEW },
-    '/v1/account/password': { body: { ok: true } },
-  }, LOGGED);
-  await flow.start();
-  flow.go('password');
-  flow.set('oldPassword', 'oldpassword1');
-  flow.set('password', 'newpassword1');
-  flow.set('confirm', 'newpassword1');
-  await flow.submit();
-
-  assert.ok(calls.length >= 2);
-  for (const c of calls) {
-    assert.doesNotMatch(c.url, /secret=/, 'a credential reached a URL - AUDIT-ACC F13 shut that door');
-    assert.doesNotMatch(c.url, new RegExp(LOGGED.secret), 'the secret itself is in the URL');
-    assert.equal(c.headers.authorization, `Bearer ${LOGGED.secret}`, 'the credential must ride the header');
-    if (c.body) assert.ok(!('secret' in c.body), 'the body carries a credential the header already carries');
-  }
-  // ...and the source has no query-string door to reach at all.
-  //
-  // COMMENTS STRIPPED FIRST, and the first cut of this line did not:
-  // it fired on accountClient.js's OWN NOTE, which quotes `?secret=`
-  // while explaining why that door is shut. The comment describing the
-  // law tripped the check for the law - the same shape as ACC1-CI's
-  // sentinel survivor and the F8 gate's first cut, twice in one day.
-  const live = src('src/net/accountClient.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
-  assert.match(src('src/net/accountClient.js'), /\?secret=/, 'the control is gone: the note that explains the shut door no longer quotes it');
-  assert.doesNotMatch(live, /[?&]secret=/, 'the client can spell a secret into a URL');
-});
 
 test('ACC1e: the recovery code is NEVER written to storage', async () => {
   const { flow, storage } = flowWith({

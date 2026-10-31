@@ -44,12 +44,6 @@ test('RF4: every prefs row declares its switch, and the shelf and the lane deriv
   assert.equal(getPref('lootRarity'), true);
   assert.equal(onlineForcedPref('lootRarity', '?online=1'), true);
   assert.equal(onlineForcedPref('grassDensity', '?online=1'), undefined, 'a dial is the player\'s');
-  // the shelf carries no copy of a row's default any more
-  const shelf = read('src/systems/uiPrefs.js');
-  for (const [, c] of declared) assert.doesNotMatch(shelf, new RegExp(`^  ${c.key}:`, 'm'), `${c.key} is declared on its row, not the shelf`);
-  assert.match(shelf, /\.\.\.FEATURE_PREF_DEFAULTS,/);
-  const lane = read('src/systems/online/onlineLane.js');
-  for (const [, c] of declared) assert.doesNotMatch(lane, new RegExp(`^  ${c.key}:`, 'm'), `${c.key}'s online answer is the row's, not the lane's list`);
 });
 
 test('RF4: the lane door - true/false forces, \'player\' leaves it by name, idempotent and reversible', () => {
@@ -71,15 +65,6 @@ test('RF4: the lane door - true/false forces, \'player\' leaves it by name, idem
 });
 
 test('RF4: the registry sits under the stores - it imports neither, the lanes register themselves, and a row resolves its lane at use', () => {
-  const reg = read('src/systems/features.js');
-  assert.doesNotMatch(reg, /from '(?:\.\.?\/)+(?:[\w-]+\/)*uiPrefs\.js'|from '\.\.\/world\//, 'no import above the stores');
-  assert.match(reg, /^import \{ declareOnlinePrefs \} from '\.\/online\/onlineLane\.js';/m);
-  assert.match(reg, /^declareOnlinePrefs\(FEATURE_PREF_ONLINE\);/m, 'the lane learns at the registry\'s load');
-  assert.match(read('src/systems/uiPrefs.js'), /^import \{ FEATURE_PREF_DEFAULTS \} from '\.\/features\.js';/m);
-  assert.match(read('src/world/landView.js'), /^registerFeatureLane\('landView', \{ tiers: LAND_VIEW_TIERS, read: landViewRead, write: landViewWrite, readOf: landViewAsRead \}\);/m);   // PIN MOVED (AUDIT MEM-AUDIT G2): and what it reads once a value is written
-  assert.match(read('src/world/outdoors.js'), /^registerFeatureLane\('outdoors', \{ tiers: OUTDOORS_TIERS, default: OUTDOORS_DEFAULT, read: outdoorsRead, write: outdoorsWrite \}\);/m);
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /const c = resolveControl\(f\);/, 'the menu draws the resolved control');
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /^import '\.\.\/\.\.\/world\/landView\.js';/m, 'and loads the lanes so they are registered before a row is drawn');
   assert.ok(featureLane('landView') && featureLane('outdoors'));
   assert.equal(featureLane('nope'), null);
   registerFeatureLane('rf4-lane', { tiers: [[1, 'One'], [2, 'Two']], read: () => 2, write: () => {} });

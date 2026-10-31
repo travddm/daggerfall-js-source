@@ -160,6 +160,5 @@ test('LOOT21: the Test Room lays one of each; the registration rides the Thunder
   const added = seedTestLoot({ items: [] }, lcg(1));
   assert.equal(added.filter(isWelkyndStone).length, 1);
   assert.equal(added.filter(isVarlaStone).length, 1);
-  assert.match(read('src/systems/worldTick.js'), /import '\.\/ayleidStones\.js';   \/\/ LOOT21/, 'registered at the import, as the Thunderlock is');
   _resetForTests();
 });

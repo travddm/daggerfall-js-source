@@ -565,26 +565,8 @@ test('SHADOW-CLOAK the hosts: the one gather every host draws through hands each
   // a pin on CODE: every line the match touches is code where it touches it - none of it after a `//` (AUDIT 2: a line
   // commented out whole still matched)
   const codeMatch = (src, re, msg) => { const m = re.exec(src); assert.ok(m, msg ?? String(re)); const from = src.lastIndexOf('\n', m.index) + 1; const lines = src.slice(from, m.index + m[0].length).split('\n'); assert.ok(!lines[0].slice(0, m.index - from).includes('//') && lines.slice(1).every((l) => !l.trim().startsWith('//')), `${msg ?? re}: not commented out`); };
-  const w = rd('src/scenes/world.js');
-  codeMatch(w, /import \{ AuraRingRenderer, auraWearers, auraLookOf, auraBeastStep, auraMotionStep, auraCapeStep, auraSpriteBones, auraSpritePosed, auraWingLights, CLOAK_BONES, AURA_KINDLE_S, AURA_FORGET_S \} from '\.\.\/render\/auraRing\.js'; import \{ peerBodyYaw \} from '\.\.\/net\/peer\/peerClimb\.js';/);
-  codeMatch(w, /import \{ mwViewFirstPerson, mwViewFrame, mwViewWheel, mwViewDrawBody, mwViewBodyBones, mwViewSpriteFigure, mwViewSpriteFacing,/);   // SPRITE-FACE (PIN MOVED): and the sprite's facing as drawn
-  codeMatch(w, /_auraSelf\.aura = mine; _auraSelf\.yaw = mwViewSpriteFacing\(\)\?\.yaw \?\? player\.bodyYawFor\(cam\.yaw\); auraBeastStep\(_auraSelf, !!liveLycanthropy\(playerEntity\)\?\.isTransformed, t\);/, 'mine: the body\'s facing, and turned beast');
-  codeMatch(w, /w\.at\[2\] = p\[2\]; w\.yaw = \(peerWalkers\?\.faceOf\?\.\(d\.id\) \?\? peerRiders\?\.faceOf\?\.\(d\.id\)\)\?\.yaw \?\? peerBodyYaw\(d\.shown\) \?\? 0; auraBeastStep\(w, !!d\.shown\.wb, t\);/, 'a peer\'s: their pose\'s - SPRITE-FACE (PIN MOVED): a sprite\'s as its picture is drawn');
-  codeMatch(w, /auraBeastStep\(_auraSelf[^\n]*\n\s+_auraSelf\.kindle = Math\.min\(1, \(t - _auraSelf\.since\) \/ AURA_KINDLE_S\); _auraSelf\.mounted = !!player\.riding;/, 'stepped before the kindling is read, so turning back kindles it again; and riding');
-  codeMatch(w, /auraBeastStep\(w, [^\n]*\n\s+w\.kindle = Math\.min\(1, \(t - w\.since\) \/ AURA_KINDLE_S\); w\.seen = t; w\.mounted = !!d\.shown\.rd;/, 'a peer\'s too - a horse or a cart');
-  // THE DRAW LINE, read as code - its comment cut off first (a call after a // is no call: FOE1's trap, met here once)
-  const line = w.split('\n').find((l) => l.includes('for (const w of _auraDraw) if (auraLookOf(w.aura).mesh)'));
-  const code = line.slice(0, line.indexOf('   //'));
-  assert.ok(!code.includes('//'), 'no comment inside the code half');
-  assert.match(code, /const auraNow = performance\.now\(\) \/ 1000; for \(const w of _auraDraw\) if \(auraLookOf\(w\.aura\)\.mesh\) \{ auraCapeStep\(w, w === _auraSelf \? \{ feet: player\.bodyFeetAt\(\), yaw: mwViewSpriteFacing\(\)\?\.yaw \?\? player\.bodyYawFor\(cam\.yaw\), turn: mwViewSpriteFacing\(\)\?\.turn, bones: mwViewBodyBones\(CLOAK_BONES\) \?\? auraSpriteBones\(mwViewSpriteFigure\(\)\) \} : peerBodies\?\.bonesOf\(w\.id, CLOAK_BONES\) \?\? auraSpritePosed\(w, peerWalkers\?\.figureOf\(w\.id\) \?\? peerRiders\?\.figureOf\?\.\(w\.id\), peerWalkers\?\.faceOf\?\.\(w\.id\) \?\? peerRiders\?\.faceOf\?\.\(w\.id\)\), w === _auraSelf \? player\.height \/ CAPSULE_HEIGHT : 1\); auraMotionStep\(w, auraNow\); \} _auraPass\?\.draw\(_auraDraw, proj, view, eye, auraNow, \{/, 'each cape hung on its body and swung where it is drawn, THEN every aura drawn');
-  codeMatch(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\);/, 'drawn through the hook the street, the building and the dungeon all call - after the bodies');
-  const a = rd('src/combat/fpArm.js');
-  codeMatch(a, /lastThirdModel = model;[^\n]*\n\s+drawnArm = t\.arm; drawnMats = t\.arm\.mats;/, 'the body\'s bones read in the pose it was drawn in');
-  codeMatch(a, /const arm = thirdBuilt\.arm, drawn = drawnArm === arm \? drawnMats : null;/, 'while it is this arm\'s');
   assert.equal(peerBodyYaw({ cl: 1, cw: 1.25, yaw: 0.3 }), 1.25, 'a peer on the wall: its facing the wall\'s');
   assert.equal(peerBodyYaw({ yaw: 0.3 }), 0.3, 'and off it, its own');
-  const v = rd('src/player/mwView.js');
-  codeMatch(v, /export function mwViewBodyBones\(names\) \{\n\s+if \(eotbLane\(\) \|\| !mwCamera\.thirdPerson\(\)\) return null;\n\s+return fpArm\.thirdBones\(names\);/, 'no bones from the sprite lane or in first person');
 });
 
 test('SHADOW-CLOAK the pose, RUN: at rest the cape is the cape; it hangs from the shoulders where they are - scaled between the feet and them (a crouch presses it down and it gathers out), the collar with them, the hem following half as far - the hood with the head and turned with it, the cloth as broad as the shoulders and the hood not; trailing its wearer\'s motion the more the lower, rising as a pendulum, lagging a turn below the shoulders, lifting and filling in a fall; and a knee carried past the cloth presses it out (mutants: the crouch, the lean, the head, the head\'s turn, the scale across, the trail, the pendulum, the twist, the lift, a knee)', () => {

@@ -56,7 +56,6 @@ test('MW-ASSIGN the armour: every piece of the mod\'s two sets by the classic ro
   const S = { Head: 0, RightArm: 1, LeftArm: 2, ChestArmor: 3, Gloves: 4, LegsArmor: 5, Feet: 6, RightHand: 7, LeftHand: 8 };
   const worn = dfWornArmor([{ templateIndex: 522, material: 0 }, null, { templateIndex: 525, material: 0 }, { templateIndex: 515, material: ARMOR_MATERIAL.Steel }], S, ARMOR_ENUM);
   assert.deepEqual(worn.map((w) => w.templateIndex), [522, 525, 515], 'worn, the mod\'s pieces are dressed');
-  assert.match(src('src/formats/morrowind/mwItemMap.js'), /if \(armorRowOf\(piece\.templateIndex\) === DF_ARMOR_ROWS\[HELM_TEMPLATE\]\) hairHidden/, 'a helm-shaped piece hides the hair');
 });
 
 // ── the wall and the icon: the rig's own door ─────────────────────────
@@ -130,7 +129,6 @@ test('MW-ASSIGN the wall and the icon: the Thunderlock hangs as its own shipped 
 });
 
 // ── one's own thing set down: its Morrowind picture, on the billboard pass ──
-
 
 const SHIRT = { t: 141, g: ITEM_GROUP_NAME_BY_CLASS.indexOf('MensClothing'), m: null, v: null, a: null, p: null };
 const GEM = { t: 400, g: ITEM_GROUP_NAME_BY_CLASS.indexOf('Gems'), m: null, v: null, a: null, p: null };

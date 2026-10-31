@@ -178,8 +178,6 @@ test('AUDIT FLICKER S2: A RE-ANCHOR KEEPS THE GRID - walking past the hold moved
   assert.ok(worstNew < 0.02, `every point keeps its phase in every cascade (worst ${worstNew.toFixed(4)} of a texel)`);
   assert.ok(worstOld > 0.2, `the old re-anchor jumped the grid (${worstOld.toFixed(3)} of a texel)`);
   assert.ok(SUN_ANCHOR_HOLD > 1, 'the hold');
-  // the pass hands it the light and the far texel, at the travel view's scale
-  assert.match(rd('src/render/shadowPass.js'), /sunAnchorFor\(f\.eye, this\._sunAnchor, f\.lightDir, sunTexelWorld\(SHADOW_CASCADES\.length - 1, k\)\);/);
 });
 
 // ── P1: a flat's lamp read, off its own card ───────────────────────────────────────────────────────────────────────
@@ -337,14 +335,3 @@ test('AUDIT FLICKER P3: A FLOATING-ORIGIN CROSSING KEEPS THE LAMPS - the kept co
 
 // ── R1-R4: the records ─────────────────────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT FLICKER R2-R4: the recentre moves the flats the next replay reads, the four flat lists keep their shadows off screen, and a door crossed either way discards the replay (source pins; R1 is invislook\'s)', () => {
-  const w = rd('src/scenes/world.js');
-  const i = w.indexOf('// AUDIT FLICKER R2:');
-  assert.ok(i > 0 && i < w.indexOf('renderer.shadowOriginShift?.(r.offset);') + 400, 'R2 sits with the renderer\'s shift');
-  const r2 = w.slice(i, i + 1600);
-  assert.match(r2, /if \(p\._t\) state\.pixelTranslation\(p\.px, p\.py, p\._t\);/, 'the pixel-placed flats: their translation re-made');
-  for (const list of ['peerRiders', 'peerWalkers', 'bandSprites', 'yards']) {
-    assert.match(w, new RegExp(`if \\(${list}\\) for \\(const b of ${list}\\.batches\\(\\)\\) \\{ if \\(cullOn && billboardOutside\\(b\\)\\) \\{ if \\(renderer\\.shadowReachBatch\\(b\\)\\) castBatches\\.push\\(b\\); continue; \\} allBatches\\.push\\(b\\); \\}`), `R3: ${list} casts off screen`);
-  }
-  assert.match(rd('src/render/renderer.js'), /const cut = this\._everyLightNow !== this\._everyLightPrev;[^\n]*\n\s*if \(cut\) sp\.discard\(\);/, 'R4: either way');   // PIN MOVED (EMPTY-HOLD, 2026-10-06): the door's edge is named once - the replay's discard and the pass's hold (a cut is never held) read the same one
-});

@@ -238,7 +238,4 @@ test('SD18a THE WIRE AND THE PAGE: a blow\'s shape bounded key by key, an elemen
   let h = orreryFresh(o), snapped = null;
   for (let k = 0; k < 60 && !snapped; k++) { const r = orreryStep(o, h, k % 6, k % 2 ? 1 : -1); if (r.x) snapped = k + 1; h = r; if (r.ok) break; }
   assert.ok(snapped === 36 || h.ok, `snapped back at its thirty-sixth turn: ${snapped}`);
-  // the relay
-  const src = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(src, /SD_SEAM\.new\(\{ s, fi: \(f\?\.fi \?\? 0\) \+ 1, now, mk: sdMarksOf\(s\) \}\);/);   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
 });

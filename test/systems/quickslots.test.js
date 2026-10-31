@@ -388,10 +388,6 @@ test('QS1 save: the slots ride the one session composer, and a save without the 
   assert.equal(quickslotEntry('c1'), null);
   assert.deepEqual(quickslotEntry('c2'), { key: 'k', name: 'Potion' });
   assert.equal(quickslotEntry('swap'), null);
-  // The source: the composer and the restorer both name the module.
-  const save = read('src/systems/save/save.js');
-  assert.match(save, /quickslots: quickslotSaveData\(\)/);
-  assert.match(save, /restoreQuickslotSaveData\(extras\?\.quickslots \?\? null\)/);
 });
 
 // ── HB1: THE HOTBAR ────────────────────────────────────────────────

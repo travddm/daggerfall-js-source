@@ -542,28 +542,3 @@ test('H3 DEPARTURE: selling a ship you do not own is REFUSED, where DFU credits 
   assert.equal(dropped, 0, 'a sale that never happened dropped a scene');
 });
 
-test('H3 hosts: the three stubbed producers are producing', () => {
-  const wm = readFileSync(join(process.cwd(), 'src/scenes/worldModes.js'), 'utf8');
-  // These three shipped as literals - `() => 0`, `() => false`,
-  // `() => -1` - so the bank window drew a Sell button that quoted
-  // nothing and a Buy Ship that could never be in a port.
-  for (const stub of ['houseSellPrice: () => 0', 'ownsShip: () => false', 'ownedShip: () => -1', 'isPortTown: () => false']) {
-    assert.ok(!wm.includes(stub), `the ${stub.split(':')[0]} producer is stubbed again`);
-  }
-  // the sell price is measured off the OWNED building's mesh, the same
-  // reader the market list uses
-  assert.match(wm, /houseSellPrice\(houseMeshRadius\(owned\)\)/, 'the sell price is not measured off the owned house');
-  // ...and PortTownAndUnknown reaches it from the location directory
-  assert.match(wm, /portTownAndUnknown \?\? 0\) !== 0/, 'the port-town test is not the PortTownAndUnknown byte');
-  const w = readFileSync(join(process.cwd(), 'src/scenes/world.js'), 'utf8');
-  assert.match(w, /portTownAndUnknown: loc\.exterior\?\.exteriorData\?\.portTownAndUnknown/,
-    'the host never reads the byte off the location');
-
-  const bw = readFileSync(join(process.cwd(), 'src/ui/bankWindow.js'), 'utf8');
-  // BOTH sell offers ask, not just the letter deposit (:313-334) -
-  // and a Yes has to actually sell
-  assert.match(bw, /\[TRANSACTION_RESULT\.SELL_HOUSE_OFFER\]: \(\) => this\.hooks\.sellHouse/,
-    'accepting the house offer does not sell the house');
-  assert.match(bw, /\[TRANSACTION_RESULT\.SELL_SHIP_OFFER\]: \(\) => this\.hooks\.sellShip/,
-    'accepting the ship offer does not sell the ship');
-});

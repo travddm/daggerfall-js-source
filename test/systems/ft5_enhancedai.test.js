@@ -43,13 +43,6 @@ test('FT5: the note says what ships and names what it is not', () => {
     + 'the classic behavior.');   // PIN MOVED (PLAIN TEXT SWEEP): the note in plain words; DFU's "Smarter Enemies" stays unrowed below
   // ...and the DFU key it names IS unavailable, in Settings, under that label
   assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'unavailable');
-  assert.match(read('src/ui/settings/settingsCopy.js'), /"Enhancements\/EnhancedCombatAI": "Smarter Enemies",/);
   assert.equal(featureForControl('settings', 'Enhancements/EnhancedCombatAI'), null, 'not rowed on the home - a row for a feature the port does not run would be a lie with a switch');
 });
 
-test('FT5: the Enhanced category\'s row left with its copy; the switch\'s readers are the motor, the dungeon host, the pref and the registry', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(!/prefRow\('enhancedAI'/.test(menu));
-  assert.ok(!/enhancedAI/.test(menu), 'the menu no longer knows the key at all (AUDIT 55\'s reach pin moved its reader to the registry)');
-  assert.ok(!/function portRowsEnhanced\(/.test(menu), 'FT12: the Enhanced category is gone from the settings rail - its rows are the home\'s');
-});

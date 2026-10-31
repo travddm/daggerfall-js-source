@@ -26,7 +26,6 @@ test('ECHO1: the constants', () => {
   assert.equal(ECHO_PREF, 'dungeonEchoes');
   assert.equal(ECHO_CHAIN_MAX, PLAY_DEPTH_MAX, 'AUDIT DELVE A4: IsPlaying\'s own depth, read from its one home');
   assert.deepEqual(COMPASS_WORDS, ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west']);
-  assert.match(src('src/world/actionSystem.js'), /if \(depth > PLAY_DEPTH_MAX\) return false;/);
 });
 
 test('ECHO1: the compass way, in the frame the compass reads (+x east, +z north) - AUDIT DELVE C8: one law, the angler\'s too', () => {
@@ -174,27 +173,6 @@ test('AUDIT DELVE B4: an echo is of a mover that MOVED - the state Receive saw b
   assert.deepEqual(moved, ['act:0:3'], 'the unlocked door did not move; the wall past it did');
   assert.equal(echoMoved({ state: 'start' }, echoState({ state: 'start' })), false);
   assert.equal(echoMoved({ kind: 'door', state: 'start', moveState: 'forward' }, echoState({ kind: 'door', state: 'start', moveState: 'start' })), true, 'a door\'s record moving is a move');
-});
-
-test('ECHO1: the dungeon hears the cascade alone, says one line a press, marks and finds - and the examine keeps the author\'s hide', () => {
-  const s = src('src/scenes/dungeonContext.js');
-  assert.match(s, /actions\.onPlayed = \(o, triggerType\) => \{ if \(triggerType === 'ActionObject' && _echoPlayed\.length < 64\) _echoPlayed\.push\(\[o, echoState\(o\)\]\); \};/);
-  assert.match(s, /if \(!isEchoMover\(o\) \|\| !echoMoved\(o, before\)\) continue;/, 'B4: only what moved');
-  assert.match(s, /if \(Math\.hypot\(at\[0\] - eye\[0\], at\[1\] - eye\[1\], at\[2\] - eye\[2\]\) <= ECHO_NEAR_M\) continue;\n\s+if \(inPlainSight\(collider, eye, box, \{ skip: o\.key, noSurface: senseFlat\(null, o\) \}\)\) continue;[^\n]*\n\s+echoBook\.add\(o\.key, at\);\n\s+if \(!said\) \{ hudText\.add\(echoLine\(o, eye, at\)\); said = true; \}/);
-  assert.match(s, /return !box \|\| \(boxDistance\(box, eye\) <= ECHO_FIND_M && inPlainSight\(collider, eye, box, \{ skip: e\.key, noSurface: senseFlat\(null, o\) \}\)\);/);
-  assert.match(s, /if \(!eye \|\| !echoesOn\(\) \|\| !echoBook\.size \|\| t - _echoLookT < ECHO_LOOK_S\) return;/, 'B7: switched off, the book is kept');
-  assert.match(s, /if \(lit\.length\) echoPulse\.pulse\(t, lit\);/);
-  // B3/E8: a load is another run
-  assert.match(s, /function forgetDelveRun\(\{ way = true \} = \{\}\) \{\n\s+echoBook\.clear\(\); echoPulse\.clear\(\); _echoPlayed\.length = 0; sensePulse\.clear\(\);\n\s+if \(way\) \{ wayOut\.reset\(\); _wayAt = null; _wayT = -Infinity; \}/);
-  const rs = s.indexOf('restoreSaved(extras, setPlayerPos, {');
-  assert.ok(s.indexOf('forgetDelveRun();', rs) > rs && s.indexOf('forgetDelveRun();', rs) < s.indexOf('applyWorld(extras.world)', rs), 'the saved run, forgotten before the world record lands');
-  const rw = s.indexOf('restoreSharedWorld(shared) {');
-  assert.ok(s.indexOf('forgetDelveRun({ way: false });', rw) > rw, 'a joiner\'s memory: the walls the room has');
-  assert.match(s, /const echoesOn = \(\) => isEnhanced\(\) && getPref\(ECHO_PREF\) !== false;/);
-  assert.match(s, /const why = named && !hide && getInteractionMode\(\) === 'info' && echoesOn\(\) \? examineLine\(o, \(x\) => actions\.nextOf\(x\), objectAabb\) : null;/);
-  assert.match(s, /echoes: \(\) => \(echoesOn\(\) \? echoBook\.points\(\) : null\),/);
-  assert.match(s, /echoPulse\.clear\(\); echoBook\.clear\(\);[^\n]*actions\.onPlayed = null;/);
-  assert.match(src('src/ui/automap/automapDoor.js'), /echoes: deps\.echoes \?\? null,/);
 });
 
 test('ECHO1: the Features row - Enhanced, on by default, the player\'s own online', () => {

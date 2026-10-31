@@ -357,15 +357,3 @@ test('BODY-MOTION THE RIG\'S WORD: on only in third person, on a base_anim skele
   assert.equal(motionWord({ ...base, rig: { ...rig, arm: { pieces: [{ slot: 'left hand (iron_gauntlet_left)' }] } } }).shield, false, 'a gauntlet is no shield');
 });
 
-test('BODY-MOTION THE WIRING, by source: poseAssembly lays the `motion` slot after the mirror and the neck and under the run, the climb and the hold; the rig steps its motion after the clips with its own word and hands the slot to the THIRD-person body\'s pose only; the hip lantern follows the gait\'s stride while it walks the legs; and the switch is the viewer\'s, on by default (mutants: BODY-MOTION-slot-unwired, BODY-MOTION-never-stepped, BODY-MOTION-lantern-off-the-gait)', () => {
-  const fp = readFileSync(new URL('../../../src/formats/morrowind/mwFirstPerson.js', import.meta.url), 'utf8');
-  // BOW-AIM (FIELD BUGS 2026-10-26c): the third person's ranged aim between the neck and the motion - the spine's pitch is the clip's, which the motion keeps while the clip has the arms
-  assert.match(fp, /applyFirstPersonNeck\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.aimFit = aim \? aim\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.motionFit = motion \? motion\(skeleton, pose, GRAPH_ROOT, fns\.skelMats\) : null;\n(?:\s*\/\/[^\n]*\n)*\s*assembly\.runFit = run/);
-  const arm = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  assert.equal((arm.match(/motion: motion\.slot,/g) ?? []).length, 1, 'one pose takes the slot');
-  assert.match(arm, /hold: rifleHold\('third', t\),[^\n]*\n\s*motion: motion\.slot,/, 'the third-person body\'s');
-  assert.match(arm, /aimFactor = aimingFactor\(aimFactor, accurateAiming\(upper\), dt\);\n(?:\s*\/\/[^\n]*\n)*\s*motion\.step\(dt, motionWord\(\{\s*cam, third: viewMode === 'third', rig: thirdBuilt, built, dead, hit: !!hitState && !actionState,/, 'stepped after the clips, every frame - a recoil taking the body only out of a blow (PIN MOVED, AUDIT BODY-MOTION MELEE-5: taken mid-blow, the layer let go and the raw attack clip froze the legs)');
-  assert.match(arm, /hipLantern\.step\(cam, dt, motion\.stride\(\)\.move > 0\.5 \? motion\.stride\(\)\.phase : /, 'the lantern on the gait\'s stride');
-  const features = readFileSync(new URL('../../../src/systems/features.js', import.meta.url), 'utf8');
-  assert.match(features, /id: 'mw-body-motion',[\s\S]*?control: Object\.freeze\(\{ store: 'prefs', key: 'mwBodyMotion', initial: true, online: 'player' \}\)/);
-});

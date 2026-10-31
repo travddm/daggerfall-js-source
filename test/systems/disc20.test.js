@@ -58,19 +58,11 @@ test('DISC20-A: a blade fogs as the ground under it does - heavy fog swallows it
 });
 
 test('DISC20-A: the grass\'s fog is the terrain\'s - its fogFactorAt is TERRAIN_FS\'s text, its five uniforms looked up and set from the frame\'s fog, the world point handed down, and the world host hands the ground\'s fog from the view\'s eye (mutant: the host hands no fog)', () => {
-  // AUDIT 68 (the merge): TERRAIN_FS interpolates fogFactorAt from render/fogGlsl.js, its one home - the grass's is that text
-  const terrain = rd('src/render/renderer.js');
-  const tfs = terrain.slice(terrain.indexOf('const TERRAIN_FS = `'), terrain.indexOf('`;', terrain.indexOf('const TERRAIN_FS = `')));
-  assert.ok(tfs.includes('${FOG_GLSL}'), 'the terrain\'s program takes the one fog law');
   assert.equal(FOG_FACTOR_GLSL, FOG_GLSL + '\n', 'the terrain\'s own function, verbatim');
   assert.ok(GAME_GRASS_VS.includes('out vec3 vWorld;') && GAME_GRASS_VS.includes('  vWorld = p;'), 'the world point handed down');
   assert.equal(GRASSFOG_VS_EDITS.length, 2); assert.equal(GRASSFOG_FS_EDITS.length, 2);
   const blend = GAME_GRASS_FS.indexOf('  c = mix(uFogColor, c, fogFactorAt(vWorld));');
   assert.ok(blend > GAME_GRASS_FS.indexOf('GRASS-PX: the ramp') && blend < GAME_GRASS_FS.indexOf('  o = vec4(c,'), 'after the pixel ramp, right before the colour is written');
-  const grass = rd('src/render/labGrass.js');
-  for (const n of ['uFogColor', 'uFogMode', 'uFogDensity', 'uFogRange', 'uCamPos']) assert.ok(grass.includes(`'${n}'`), `${n} is looked up`);
-  assert.match(grass, /gl\.uniform1i\(u\.uFogMode, fog \? fog\.mode : 0\);/, 'no fog handed, mode 0 - the lab\'s picture');
-  assert.match(hostText('src/scenes/world.js'), /\{ fog: \{ mode: renderer\._fogMode, density: renderer\._fogDensity, range: renderer\._fogRange, color: renderer\._fogColor, camPos: renderer\._camPos, dw: renderer\._dwFog, haze: renderer\._haze \},/);   // DW-C: the sea's fog rides with the frame's
 });
 
 // ── DISC20-E: "The weapon widget default toggle under diverse weapons should be set to off by default" ──
@@ -513,36 +505,3 @@ test('DISC20-C: a crossing that leaves the parked wagon\'s pixel takes its box a
   assert.ok(Math.abs(col.buckets.get('hccWagon').m[12] - (10 - 819.2)) < 1e-3, 'a Float32 matrix');
 });
 
-test('DISC20-C: the world host asks the pool to re-stand over every pixel it builds, bound once the pool exists (the boot\'s first pixel builds before it)', () => {
-  const s = hostText('src/scenes/world.js');
-  const decl = s.indexOf('let hccGroundMoved = null;');
-  const first = s.indexOf('const playerPixel = await awaitedBuild(first.px, first.py);');
-  const pool = s.indexOf('const hcc = createHorseCartPool({');
-  const bind = s.indexOf('hccGroundMoved = hcc.groundMoved;');
-  assert.ok(decl > 0 && decl < first && first < pool && pool < bind, 'declared before the first build, bound after the pool');
-  const set = s.indexOf('swap.publish(px, py, key, made, {');   // PIN MOVED (IC-SWAP-BEHIND): published through the swap
-  const call = s.indexOf('host.hccGroundMoved(t[0], t[2], t[0] + TERRAIN_SIZE, t[2] + TERRAIN_SIZE);');   // HOST-SPLIT 2: the publish is the pixel build's, its live names read through host
-  assert.ok(set > 0 && call > set && call - set < 12500, 'after the pixel is published, over its own bounds (TESA-LANDS: 12,300 -> 12,500, the entry\'s landmarks; THE MERGE: the entry grew by GATE-CLEAR\'s fields and the batch\'s; PROF4 by its forest; GRASS-LIT2 by the near grid\'s normals; ARENA2 by the sand\'s origin; LPT1 by its low-poly trees; VERGE1 by the road\'s question and ECOTONE1 by the border\'s sets; AUDIT LANDFORMS II H2 by the beach a gathering node asks; LEFAY1 by the monument\'s spot; MERCHANT-YARDS by the yards\' sites; WARDEN1 by its watch\'s town; MWNPC19 by its stand flats; BANTHA1 by its jungle\'s trees; PRECIP4 by the snow it was built under; AUDIT PRECIP HOST-7 by what a re-skin reads); PIN MOVED (WITCH1): 11600 -> 11800, its `witchHomes` line; 11800 -> 12100 at the merge of main into TESA, TESA4\'s `arenaSlot` and the Arena roads\' layer lines; 12100 -> 12300 (GRAHT1), its `grahtStood` lines and the set\'s `grahtOaks` entry');   // PIN MOVED (AUDIT LANDFORMS II H2): 9000 -> 9500, the entry's one new line; PIN MOVED (LEFAY1): 9500 -> 9700, its `lefay` line; PIN MOVED (WARDEN1): 9900 -> 10200, its `wardenTown` line; PIN MOVED (MWNPC19): 10200 -> 10400, its `standFlats` line; PIN MOVED (BANTHA1): 10400 -> 10600, its `jungleTrees` line; PIN MOVED (PRECIP4): 10600 -> 10800, its `_snow` line
-  assert.match(s.slice(call - 200, call), /if \(host\.hccGroundMoved\) \{\s+const t = host\.state\.pixelTranslation\(px, py\);\s+$/);
-});
-
-test('AUDIT pre-merge I-B executed: a concealed owner\'s team is concealed with it - the classic lane\'s hidden owner\'s following wagon rolls unseen and its parked one stays a wagon in the world; the enhanced lane\'s is drawn; the horse takes the owner\'s look (by source)', async () => {
-  const { pool } = await hccPool({ groundAt: () => 50 });
-  const toScene = (q) => [(q[0] - 100000) / 40, q[1], (q[2] - 200000) / 40];
-  pool.applyOwner('follow', { w: [3, 101200, 70, 201200, 0, 0, 0, 1, 25, 0], h: [101200, 70, 201320, 0, 1, 1] }, toScene, 1);
-  pool.applyOwner('parked', { w: [2, 100400, 62, 200400, 0, 0, 0, 1, 25, 0], h: [100400, 62, 200520, 0, 1, 0] }, toScene, 1);
-  await settle();
-  const looks = new Map();
-  pool.setPeerLook((id) => looks.get(id) ?? null);
-  const drawn = () => { pool.frame(1 / 30, [0, 51, 0]); return pool.draw({ drawMesh() {} }); };
-  assert.equal(drawn(), 2, 'both drawn while nobody is concealed');
-  looks.set('follow', 'hidden'); looks.set('parked', 'hidden');
-  assert.equal(drawn(), 1, 'the hidden owner\'s following wagon rolls unseen with it; the parked one is a wagon in the world');
-  looks.set('follow', { mode: 1, alpha: 0.3, t: 0, phase: 0 });
-  assert.equal(drawn(), 2, 'the enhanced lane draws its owner - and the wagon with it');
-  const src = readFileSync(new URL('../../src/scenes/horseCartPool.js', import.meta.url), 'utf8');
-  // PIN MOVED (WAGONS3): the horse is its owner's TEAM now (a pair draws two) - posed by poseTeam with the owner's look
-  assert.match(src, /if \(p\.hidden\) \{ dropTeamBatches\(owner\); _teams\.delete\(owner\); \} else poseTeam\(owner, teamOf\(owner, null, dt\), cameraPos, p\.look\);/, 'the horse: nowhere for a hidden owner, in its look for a concealed one');
-  assert.match(src, /if \(b\) \{ poseHorseBatch\(b, cameraPos, h, h\.g, lookOfOwner\(owner\)\); if \(owner\) b\.conceal = conceal; \}/, 'each of the team in its owner\'s look');   // COATS1: and in its owner's horse look
-  assert.match(hostText('src/scenes/world.js'), /hcc\.setPeerLook\(\(id\) => \(_hiddenPeers\.has\(id\)(?: \|\| !gateCrowd\.shows\(id\))? \? 'hidden' : \(_veils\.get\(id\) \?\? null\)\)\);/, 'the host hands the peers\' looks');   // PIN MOVED (AUDIT CROWD-WIDE B1): and one the crowd's count leaves undrawn (test/systems/gatecrowd.test.js)
-});

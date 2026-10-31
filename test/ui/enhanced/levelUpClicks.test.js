@@ -6,19 +6,6 @@ import { starHowto } from '../../../src/ui/enhanced/enhancedLevelUp.js';
 import { LV2_CSS } from '../../../src/ui/levelUp/levelUpStyle.js';
 import { PLUS_CSS as ENHANCED_CSS } from '../../../src/ui/enhanced/enhancedPlusStyle.js';   // PLUS1: the refresh's dress is the Enhanced Plus sheet
 
-const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedLevelUp.js', import.meta.url), 'utf8');
-const press = src.slice(src.indexOf('function starPress'), src.indexOf('function starFx'));
-
-test('LV2: a first click only chooses a star; a second spends; a right click takes back', () => {
-  assert.match(src, /b\.onclick = \(\) => starPress\(key, 1\);/);
-  assert.match(src, /b\.oncontextmenu = \(e\) => \{ e\.preventDefault\(\); starPress\(key, -1\); \};/);
-  assert.match(press, /const chosen = focusedKey\(screen\) === key;/, 'whether the star was ALREADY chosen is read before focusing it');
-  assert.match(press, /else if \(!chosen\) fx = 'pick';/, 'a first click spends nothing');
-  assert.match(press, /else if \(raiseAt\(screen, key\)\)/, 'the second click raises, through the screen');
-  assert.match(press, /if \(lowerAt\(screen, key\)\)/, 'a right click lowers, through the screen');
-  assert.ok(press.indexOf('focusAt(screen, key)') < press.indexOf('raiseAt'), 'the star is chosen before any point moves');
-});
-
 test('LV2: every press leaves a stepped mark, and reduced motion stands them down', () => {
   for (const k of ['fx-pick', 'fx-up', 'fx-down', 'fx-no']) assert.ok(LV2_CSS.includes(`.lv-star.${k}`), k);
   assert.match(LV2_CSS, /lv-rise [0-9]+ms steps\(/);

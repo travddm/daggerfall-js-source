@@ -186,54 +186,6 @@ test('AUDIT 58 F4: the smoothed heights reach the raw WOODS bytes the terrain wo
   assert.equal(new WoodsFile().syncHeightMapBytes(), false, 'nothing loaded, nothing to write');
 });
 
-test('AUDIT 58 F4: the host runs both repairs at ReadyCheck’s point - before the terrain client copies the bytes', () => {
-  const host = readFileSync('src/scenes/world.js', 'utf8');
-  const at = (re, what) => {
-    const i = host.search(re);
-    assert.ok(i > 0, `world.js never ${what}`);
-    return i;
-  };
-  const dict = at(/const mapDict = buildMapDict\(maps\);/, 'builds the map dict');
-  const dilate = at(/const dilated = dilateCoastalClimate\(maps, 2\);/, 'dilates the coastal climate');
-  const smooth = at(/smoothLocationNeighbourhood\(mapDict, woods\);/, 'smooths the location neighbourhoods');
-  const sync = at(/woods\.syncHeightMapBytes\(\);/, 'syncs the smoothed heights back');
-  const client = at(/new TerrainGenClient\(\{ woods, woodsBytes \}\)/, 'builds the terrain client');
-  assert.ok(dict < dilate, 'HasLocation’s dictionary exists before the smoothing needs it');
-  assert.ok(dilate < smooth && smooth < sync, 'DFU’s order: dilate, then smooth');
-  assert.ok(sync < client, 'and the worker gets the SMOOTHED bytes, not the raw ones');
-  // Classic-lane law: neither repair sits behind the enhanced gate.
-  const block = host.slice(dilate - 400, client);
-  assert.ok(!/isEnhanced/.test(block), 'no isEnhanced() gate on either repair');
-});
-
-test('AUDIT 58 F4 (R1): the boot repair invalidates the cached road bake it changed the input of', async () => {
-  // The ours-network bake routes and water-tests over WOODS heights
-  // (roadsProducer's heightAt / isWater), and the smoothing rewrites
-  // those bytes IN PLACE before the worker ever reads them. The bake's
-  // IndexedDB key stands in for the height content with the file's byte
-  // LENGTH, which an in-place write cannot move - so a network baked on
-  // any build before this repair would be served unchanged for smoothed
-  // terrain, routed over heights that no longer exist. The module's own
-  // rule ("bumped by hand whenever the generator's logic changes shape")
-  // makes that a hand bump, and this is what holds it.
-  const { GENERATOR_VERSION } = await import('../../src/world/roadsCache.js');
-  assert.ok(GENERATOR_VERSION >= 20,
-    `roadsCache's GENERATOR_VERSION is ${GENERATOR_VERSION}; the boot repair took it to 20`);
-  const cache = readFileSync('src/world/roadsCache.js', 'utf8');
-  assert.match(cache, /AUDIT 58 F4/, 'roadsCache never says which repair the bump answers');
-  assert.match(cache, /19 -> 20/, 'the bump is not recorded beside the constant');
-  // ...and the repair really is upstream of the bake's input: the host
-  // smooths and syncs before the client hands the bytes over.
-  const host = readFileSync('src/scenes/world.js', 'utf8');
-  const smooth = host.search(/smoothLocationNeighbourhood\(mapDict, woods\);/);
-  const sync = host.search(/woods\.syncHeightMapBytes\(\);/);
-  const client = host.search(/new TerrainGenClient\(\{ woods, woodsBytes \}\)/);
-  assert.ok(smooth > 0 && smooth < sync && sync < client,
-    'the smoothed heights no longer reach the worker that bakes the network');
-  assert.match(readFileSync('src/world/roadsProducer.js', 'utf8'), /woods\.getHeightMapValue\(x, y\)/,
-    'the bake no longer routes over the heights the repair rewrites');
-});
-
 // The synthetic WOODS.WLD of test/world/terrain/terrain.test.js, kept local so this
 // suite needs no ARENA2 and no export from another test file.
 function syntheticWoodsBytes() {

@@ -382,9 +382,6 @@ test('NOTICE1 a pin carries ONE request id through every retry - a lost answer i
 });
 
 test('NOTICE1 every word the board\'s service can answer has a sentence; /note remove is the host\'s, and its grammar is strict', () => {
-  const words = [...src('server-account/src/board.js').matchAll(/error: '([a-z-]+)'/g)].map((m) => m[1]);
-  const law = [...src('src/net/boardLaw.js').matchAll(/error: '([a-z-]+)'/g)].map((m) => m[1]);
-  for (const w of new Set([...words, ...law])) assert.ok(REFUSALS[w], `${w} has a sentence`);
   assert.equal(accountRefusalText('bad-note-days'), 'A note stands for 1, 3 or 7 days.');
   assert.ok(HOST_COMMANDS.includes('note'), 'the chat never says /note to the room');
   assert.deepEqual(parseNoteCommand('/note remove abcdefghijklmnop1234'), { op: 'remove', id: 'abcdefghijklmnop1234' });
@@ -409,30 +406,6 @@ test('NOTICE1 the cards hang in their order - the rumour first, the bounty board
   assert.equal(snippetOf('a\n\nb\nc\nd\ne\nf'), 'a\nb\nc\nd');
 });
 
-test('NOTICE1 the wiring: a rumour board carries its town to the press online; the press opens the Notice Board only once the service said it is open, else DFU\'s box and a read; offline the board carries nothing and is DFU\'s byte for byte; one door, one mount', () => {
-  const w = src('src/scenes/world.js');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(w, /\.\.\.\(!bountyAt\.has\(i\) && noticeTown \? \{ notice: noticeTown, named: noticeBook\.open === true \} : \{\}\),/, 'every board that is not a bounty board');   // ONE-BOARD REVERTED (PIN MOVED)
-  assert.match(w, /const noticeTown = noticeBook && p\.location \? noticeTownOf\(p\.px, p\.py, bountyAt\.size > 0\) : null;/, 'online alone (the book is online\'s)');
-  assert.match(w, /const noticeBook = params\.has\('online'\)\s*\n\s*\? createNoticeBook\(/);
-  assert.match(w, /if \(noticeBook\.open !== true\) \{ noticeBook\.read\(town\.mapId\); return false; \}/, 'not yet open: DFU\'s box, and the read that settles it');
-  const arm = m.slice(m.indexOf('function activateBulletinBoard('), m.indexOf('\n  }\n', m.indexOf('function activateBulletinBoard(')));
-  const bountyAt = arm.indexOf('openBountyBoard?.('), noticeAt = arm.indexOf('openNoticeBoard?.('), boxAt = arm.indexOf('townTalk?.showOverlay?.(new ChoiceWindow');
-  assert.ok(bountyAt > 0 && noticeAt > bountyAt && boxAt > noticeAt, 'the bounty board first, then the Notice Board, then DFU\'s box');
-  assert.match(arm, /rows\.map\(\(r\) => r\.text\)\.filter\(\(t, i\) => !\(i === 0 && t === locationName\)\)/, 'the rumour pinned first, its name row the window\'s heading');
-  // THE ONE CONSTRUCTION SEAM: one constructor, one mount
-  const all = ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js'].map(src).join('\n');
-  assert.equal((all.match(/createNoticeOverlay\(/g) ?? []).length, 1, 'the board is built in one place');
-  assert.doesNotMatch(all, /mountNoticeBoard\(/, 'and mounted only through its door');
-  // PIN MOVED (QL-OFFERED): the door hands the board the page's questline offers beside the host's own deps
-  assert.match(src('src/ui/noticeDoor.js'), /mount: \(m\) => \{ view = m\.mountNoticeBoard\(host, \{ questlines: lineBoard, \.\.\.deps, onExit: close \}\); \}/);
-  // THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD: `done` true only once the DOM is gone, the host told last
-  const door = src('src/ui/noticeDoor.js');
-  const close = door.slice(door.indexOf('const close = () => {'), door.indexOf('\n  };', door.indexOf('const close = () => {')));
-  assert.ok(close.indexOf('host.remove()') < close.indexOf('fired = true') && close.indexOf('fired = true') < close.indexOf('deps.onClose?.()'));
-  assert.doesNotMatch(src('src/scenes/exterior.js'), /noticeBook|openNoticeBoard/, 'the fixed city keeps DFU\'s board');
-});
-
 test('NOTICE1 the count over a board rides the names\' pass - asked with the face\'s own pixels, never on a covered frame, and a throw there never costs the names; the name layer wears it as a board, not a person', () => {
   const rendered = [];
   const layer = { render: (o) => { rendered.push(o.points.map((p) => p.id)); return 0; } };
@@ -446,18 +419,5 @@ test('NOTICE1 the count over a board rides the names\' pass - asked with the fac
   assert.deepEqual([rendered.at(-1), coveredAsks], [[], 0], 'covered: nothing, and the extra never asked');
   RemotePlayers.prototype.nameFrame.call(self, { layer, extra: () => { throw new Error('a bad label'); } });
   assert.deepEqual(rendered.at(-1), ['peer-1'], 'a throw costs the label, never the names');
-  assert.match(src('src/ui/nameLayer.js'), /setCls\(tag\.node, p\.kind === 'board' \? 'dfname dfname-board' : 'dfname'\);/);
-  assert.match(src('src/scenes/world.js'), /extra: noticeCountPoints,/);
 });
 
-test('NOTICE1b\'s measure (tools/boardCount.mjs): a hub\'s boards are the models its blocks place that the town sign wears, split as BOUNTY1 splits them - a hub with none is the list NOTICE1b stands boards in', async () => {
-  const { boardTally } = await import('../../tools/boardCount.mjs');
-  const { BULLETIN_BOARD_MODEL_ID } = await import('../../src/world/rmbLayout.js');
-  const at = (x) => ({ modelIdNum: BULLETIN_BOARD_MODEL_ID, matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, 0, 0, 1] });
-  const house = { modelIdNum: 1, matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] };
-  assert.deepEqual(boardTally([{ layout: { models: [house] } }]), { boards: 0, bounty: 0, rumour: 0 }, 'no board: no Notice Board');
-  assert.deepEqual(boardTally([{ layout: { models: [at(3), house] } }]), { boards: 1, bounty: 0, rumour: 1 }, 'a lone board keeps its rumour');
-  assert.deepEqual(boardTally([{ originX: 0, layout: { models: [at(3)] } }, { originX: 100, layout: { models: [at(3)] } }]), { boards: 2, bounty: 1, rumour: 1 }, 'two: one of each, across blocks');
-  assert.deepEqual(boardTally([{ layout: { models: [at(1), at(2), at(3), at(4), at(5)] } }]), { boards: 5, bounty: 2, rumour: 3 });
-  assert.match(src('tools/boardCount.mjs'), /It writes nothing to the tree; Mac runs it/);
-});

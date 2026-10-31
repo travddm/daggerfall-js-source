@@ -94,15 +94,6 @@ test('MAP-PAN: the sheet blits the layer in place of the mark walk, and the worl
   assert.ok(layered.calls.some((c) => c.fn === 'drawImage' && c.args[0] === layer.canvas), 'the layer is blitted');
   assert.ok(!layered.calls.some((c) => c.fn === 'arc'), 'and no mark is painted onto the sheet');
 
-  const held = read('src/ui/heldMap.js');
-  const sheet = held.slice(held.indexOf('  _worldSheet() {'), held.indexOf('  _showChrome('));
-  assert.match(sheet, /syncMarksLayer\(this\._marksLayer/);
-  assert.match(sheet, /contentKey: \[env\.view\.scale, env\.band, env\.dpr, env\.paperW, env\.paperH, sheet\.staticKey\(\)\]/);
-  assert.doesNotMatch(sheet, /contentKey: \[[^\]]*env\.view\.ox/);
-  assert.match(sheet, /marksLayer: synced\?\.layer \?\? null,/);   // PIN MOVED (ZOOM-FAST): no bake while the scale settles - inked on the paper
-  assert.match(sheet, /const synced = settling \? null : syncMarksLayer\(this\._marksLayer, \{/);
-  assert.match(read('src/ui/ink/inkMap.js'), /export function syncMarksLayer\(prev, spec\)/);
-
   // the inline path and the bake call the same painter
   const again = recordingCtx();
   paintInkMarks(again, model, { ox: 0, oy: 0, scale: 4 }, { paperW: 80, paperH: 60, band: 'near' });

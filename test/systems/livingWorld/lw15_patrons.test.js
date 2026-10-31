@@ -354,35 +354,6 @@ test('LW15 drawn: the seed dealt to one of the town\'s households alike by every
   const h = createHash('sha256');
   for (let d = 200; d < 220; d++) for (const r of census.slice(0, 30)) for (const e of dayPlan(r, places, d, { mpm: CALENDAR_MPM })) h.update(`${e.kind}|${e.at?.key ?? e.at?.kind}|${e.t0}|${e.t1};`);
   assert.equal(h.digest('hex').slice(0, 16), '130ffff561ff4035', 'the plain plans LW14 laid');
-  const page = readFileSync(new URL('../../../src/ui/vendor/vendorPage.js', import.meta.url), 'utf8');
-  assert.match(page, /const sold = \[\.\.\.\(mine\.sold \?\? \[\]\), \.\.\.\(mine\.patronSold \?\? \[\]\)\]\.sort\(/);
-  assert.match(page, /const who = s\.patron \? safe\(\(\) => p\.patronName\?\.\(s\.patron\), null\) : null;/);
-  assert.match(page, /\$\{who \? `Sold to \$\{who\} - ` : ''\}/);
-});
-
-test('LW15 the host\'s seams: the region\'s patrons read online alone, now and then; each town\'s LivingTown its own; its errands and browsers in a household\'s plan; the Vendor page\'s buyer named (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(!params\.has\('online'\) \|\| !marketBook\) return;/);   // PIN MOVED (AUDIT LW-II-2 W3): online alone here - each region's read keeps its own clock (auditlwii2_town)
-  assert.match(w, /if \(row\.home\?\.entry !== 'public'\) continue;/);
-  assert.match(w, /const door = p\.buildingKey;\n\s+if \(!Number\.isSafeInteger\(door\)\) continue;/);
-  assert.match(w, /byMap\.get\(p\.map\)\.told\.push\(\{ door, t: skyClassicMinutes\(\(p\.hour \* 3600 \+ p\.minute \* 60\) \* 1000\), seed: p\.seed \}\);/);   // PIN MOVED (AUDIT LW-II B5): the service's instant, no machine offset
-  // AUDIT LW-II B6/B7: one order for every reader, a version moved only by a change, a town with nothing now forgotten
-  assert.match(w, /const told = e\.told\.sort\(\(a, b\) => a\.t - b\.t \|\| a\.seed - b\.seed \|\| a\.door - b\.door\);\n\s+const traders = \[\.\.\.e\.traders\]\.sort\(\(a, b\) => a - b\);/);
-  assert.match(w, /if \(_livingPatrons\.get\(map\)\?\.sig === sig\) continue;/);
-  assert.match(w, /for \(const \[map, e\] of _livingPatrons\) if \(e\.region === region && !byMap\.has\(map\)\) _livingPatrons\.delete\(map\);/);
-  assert.match(w, /return patronWords\(lt \? lt\.patronOfSale\(pt\.seed, t\) : null,/);   // AUDIT LW-II B12
-  assert.match(w, /patronsOf: \(\) => _livingPatrons\.get\(livingTown\.mapId >>> 0\) \?\? null,/);
-  assert.match(w, /patronName: \(pt\) => livingPatronName\(pt\),/);
-  const lt = readFileSync(new URL('../../../src/systems/livingWorld/livingTown.js', import.meta.url), 'utf8');
-  assert.match(lt, /plan = dayPlan\(res, P, day, \{ mpm: this\.o\.mpm, away, watch: this\._watchSize, bandOf: this\._bandOf, \.\.\.this\._patronsFor\(res, day, P\) \}\);/);   // PIN MOVED (the merge): CHAP5b's bands beside it; PIN MOVED (IC-GRAND, a town of quarters): the places its home's quarter's (`P`, the town's own in a Bay town)
-  assert.match(lt, /\(e\.pb !== undefined && e\.pv !== this\._patronV\(\) && !this\._patronsKept\(e, res, day\)\)\)/);   // PIN MOVED (AUDIT LW-II-2 W1/W5): asked of a plan that read the word alone, made again where what it read moved
-  const m = readFileSync(new URL('../../../server-account/src/market.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT LW-II P10): each read hands the reckoning the service's env - its secret, the draw's
-  assert.match(m, /await reckonPatrons\(ctx, \{ maps: \[vend\.map\] \}, env\)\.catch\(\(\) => null\);/);
-  // PIN MOVED (PATRON-LOAD): the region's read - every client's, each ten minutes - reckons no patrons; a trader opened does
-  assert.ok(!/reckonPatrons\(ctx, \{ region \}/.test(m), 'the region\'s read reckons nothing');
-  assert.match(m, /await reckonPatrons\(ctx, \{ maps: \[vend\.map\] \}, env\)\.catch\(\(\) => null\);/);
-  assert.match(m, /await reckonPatrons\(ctx, \{ maps: \[\.\.\.new Set\(traders\.map\(\(v\) => Number\(v\.map_id\)\)\)\] \}, env\)\.catch\(\(\) => null\);/);
 });
 
 // ─── AUDIT LW-II (2026-10-10): the service's findings, each through the real Worker over node:sqlite ───

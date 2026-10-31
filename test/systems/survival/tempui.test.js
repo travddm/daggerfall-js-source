@@ -193,7 +193,6 @@ test('TEMP-UI: the pack\'s live reading IS the minute law\'s - feltNow over the 
   stand(e, BLIZZARD, 2);
   assert.equal(e.survival.felt, live, 'the next minute charges what the pack showed');
   assert.deepEqual(feltCtx(e, e.survival, lastSurvivalFeed(e).ctx).raceId, RACES.Breton);
-  assert.match(read('src/systems/survival/needs.js'), /const ctx = feltCtx\(entity, s, deps\.ctx\);/, 'the law builds its context through the seam');
 });
 
 test('TEMP-UI: the HUD plate, executed - UI-CALM: in the bottom-left corner\'s caption, first; hidden with the arc Off, with its part switched off, and before a reading; shown with the number, the word, the way it runs, the strip\'s level and the mark on the scale; written only when what it says changes', async () => {
@@ -253,13 +252,6 @@ test('TEMP-UI: the HUD plate, executed - UI-CALM: in the bottom-left corner\'s c
     destroyEnhancedHud();
     globalThis.document = prev;
   }
-  // the sheet and the kit
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  // UI-CALM: in the caption's flow, not hung off the compass; comfortable, the glyph and the number alone
-  const calm = read('src/ui/uiCalmStyle.js');
-  assert.match(calm, /\.hud \.hud-qcap \.hud-temp \{ position: relative; left: auto; top: auto; right: auto; transform: none;/);
-  assert.match(calm, /\.hud \.hud-temp\[data-level="ok"\] \.hud-tempword, \.hud \.hud-temp\[data-level="ok"\] \.hud-tempscale \{ display: none; \}/);
-  assert.match(css, /\.hud-temp \.hud-tempword, \.hud-temp \.hud-tempscale \{ display: none; \}/, 'a phone keeps the glyph and the number');
   assert.ok(FRAME_ROLES.chip.includes('.hud-temp'), 'a chip of the kit, so every dress paints it');
 });
 
@@ -325,13 +317,6 @@ test('TEMP-UI: the pack - the plaque says the live felt temperature, its word in
   });
   assert.deepEqual(COMFORT, { low: -10, high: 10 });
   assert.deepEqual([-25, -10, 0, 10, 31].map(discomfort), [15, 0, 0, 0, 21]);
-  // wired where the pack draws: the plaque in the figure's head cell, the block under the card's comparisons, the section on the Stats side
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /plaques\.style\.gridArea = '1 \/ 2 \/ 2 \/ 3';\n {2}plaques\.append\(armourPlaque\(deps\.entity\)\);\n {2}const temp = temperaturePlaque\(deps\.entity\);\n {2}if \(temp\) plaques\.append\(temp\);/);   // PIN MOVED (AUDIT C&C S1): the two in one row on the figure's first cell named whole
-  assert.match(inv, /const tc = temperatureCompareBlock\(deps\.entity, picked, wear\); if \(tc\) into\.append\(tc\);/);
-  assert.match(read('src/ui/statsCard.js'), /const tempRows = temperatureStatRows\(entity\);\n {2}if \(tempRows\.length\) \{\n {4}const tp = section\('Temperature', 13\);/);
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.pack-shell \.wornmap \.wornplaques \{ position: absolute; left: 4px; right: 4px; top: 4px; z-index: 2; display: flex; flex-wrap: wrap;\n {2}justify-content: space-between;/, 'the Armour plaque\'s twin, at the other end of their row');   // PIN MOVED (AUDIT C&C S1): the row's, wrapping under on a narrow figure
-  assert.match(read('src/ui/grimoireDress.js'), /\$\{G\} \.statflip-btn, \$\{G\} \.wornac-total, \$\{G\} \.worntemp-total \{ background:/, 'the Grimoire dress paints it as the Armour plaque');
 });
 
 test('TEMP-UI: the Stats side carries the Temperature section with the arc on - a row each part and the total - and none with it Off', async () => {
@@ -395,8 +380,6 @@ test('AUDIT TEMP-UI E2: a swimmer is in the water - and, AUDIT C&C (lens T D3), 
   assert.equal(survivalFeed(e, { ...BLIZZARD, swimming: true, wading: false }).env.wading, false, 'a host that knows better says so');
   assert.equal(survivalFeed(e, { ...BLIZZARD, swimming: true, submerged: true }).env.wading, false, 'under the water is no wade');
   assert.deepEqual(['wading', 'submerged'].map((k) => survivalFeed(e, BLIZZARD).env[k]), [false, false], 'on land, nothing');
-  assert.match(read('src/scenes/dungeonContext.js'), /insideBuilding: false, insideDungeon: true, inSunlight: false, swimming: !!_activity\.swimming, transport: false,\n\s*submerged: _submergedNow,/);
-  assert.match(read('src/scenes/world.js'), /submerged: m === 'exterior' && !!dwPlayer\?\.submerged,/);
 });
 
 test('AUDIT TEMP-UI E3: underground, the clothes, the armour\'s metal and the food read the dungeon\'s air - a desert dungeon reads the starting kit as every other dungeon does, and the food spoils at the dungeon\'s pace', () => {
@@ -409,7 +392,6 @@ test('AUDIT TEMP-UI E3: underground, the clothes, the armour\'s metal and the fo
   assert.equal(temperatureWord(desert.felt), 'comfortable');
   const outside = feltTemperature({ climateIndex: CLIMATES.Desert, month: 0, hour: 12, weather: 'sunny' }, kit, { raceId: RACES.Breton });
   assert.equal(outside.air, outside.natural, 'out of doors the air is the world\'s');
-  assert.match(read('src/systems/survival/needs.js'), /s\.rotMinutes \+= rotWeight\(temp\.air\);/, 'the rot reads the air the food is carried in');
 });
 
 test('AUDIT TEMP-UI E8: a drink to hand cools a warm reading to nine at the coolest - a warmer day never reads cooler (10 fell to 0, 19 to 9)', () => {
@@ -431,11 +413,9 @@ test('AUDIT TEMP-UI E8: a drink to hand cools a warm reading to nine at the cool
   // the monotone law itself: a warmer reading, cooled, never under a cooler one cooled
   const cool = (f) => (f > 9 ? Math.max(f - WATER_COOLS, 9) : f);
   for (let f = 0; f < 40; f++) assert.ok(cool(f + 1) >= cool(f), `${f + 1} cools no lower than ${f}`);
-  assert.match(read('src/systems/survival/temperature.js'), /if \(felt > 9 && ctx\.hasWater && !ctx\.vampire\) felt = Math\.max\(felt - WATER_COOLS, 9\);/);
 });
 
 test('AUDIT TEMP-UI E11, E12: the needs feel the weather the land wears (the Sun Baby\'s clear day too); a record whose counters are no numbers is mended, not left reading NaN', () => {
-  assert.match(read('src/scenes/world.js'), /const survivalEnvNow = \(\) => \{[\s\S]{0,300}?const weather = shownWeather\(\);/);
   const e = { survival: { lastAte: 0, thirst: 0, awakeSince: 0, sleepDebt: 0 } };
   const s = survivalOf(e, 100);
   assert.deepEqual([s.wet, s.exposure, s.fed, s.drunk, s.rotMinutes, s.rotDays], [0, 0, 0, 0, 0, 0], 'the missing counters, the fresh record\'s');

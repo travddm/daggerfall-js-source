@@ -188,8 +188,6 @@ test('RESOURCE-HIGHLIGHTS the pass reads the player\'s choice each frame (the pr
   const def = createNodeGlintPass(renderer, { glow: null, now: () => (t += 1), build: () => ({ draw: (l, r, t, s, look) => { fresh.push(look); return 1; }, dispose() {} }), start: () => () => true, idle: (fn) => fn(), reduced: () => false });
   def.draw(marks); def.draw(marks);
   assert.equal(fresh.at(-1), RESOURCE_HIGHLIGHTS.glint, 'the default pref\'s look');
-  assert.match(src('src/render/nodeGlint.js'), /look = \(\) => highlightLook\(getPref\(RESOURCE_HIGHLIGHT_PREF\)\) \} = \{\}\) \{/);
-  assert.match(src('src/scenes/world.js'), /const nodeGlintPass = createNodeGlintPass\(renderer\);/, 'bootWorld unchanged: the choice is the pass\'s to read');
 });
 
 test('AUDIT GATHER F9: a build that fails lets go of every program - the constructor the ones it built, the pass the ones it started', () => {

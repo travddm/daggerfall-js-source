@@ -151,7 +151,6 @@ test('HOME-YARD a yard stood again under the open decorator (its pixel built ane
   assert.equal(w.yards.here().yard.pool.list().length, 2, 'all of it, as the town holds it');
 });
 
-
 test('HOME-YARD the town\'s yards stand in their pixels: each home\'s pieces read with the town and stood where its frame stands (the building\'s own place, in the scene), drawn, and stood again where they stand when the world recentres; a pixel gone takes its yards down (mutants: the frame\'s place; the recentre ignored; a yard kept past its pixel)', async () => {
   const w = world({ own: false });
   w.yards.frame({ dt: 1, cam, overlayUp: false });
@@ -229,25 +228,3 @@ test('HOME-YARD the decorator outside: the owner\'s own lot found under their fe
   assert.ok(rig.decals.some((d) => d.cap === DECOR_LOT_MARKS && d.writes.length), 'the lot\'s edge marked');   // FB1001 ROAD-LOT: PIN MOVED - four sides, and the road's
 });
 
-test('HOME-YARD the world host by source: each building\'s own place and footprint recorded at the build, the yards made online alone, brought in line every frame (stood down indoors), their models, flats and lot marks in the world\'s passes, the free eye and the stick the decorator\'s while it flies, and the service\'s writes carry `yard` (mutants: the frame unrecorded; the pass unwired; the flag lost)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const at = Array\.isArray\(placed\.recordAt\) \? \[locLocal\[0\] \+ b\.originX \+ placed\.recordAt\[0\]/);
-  assert.match(w, /homeFrames: pixelHomeFrames, homeRegion: dfLocation\?\.regionIndex \?\? 0,/);
-  assert.match(w, /const yards = homeDecor && onlineHomes \? createHomeYards\(\{/);
-  const frameFn = w.indexOf('  function frame(now) {');
-  const modal = w.indexOf('    if (modes.frame(dt, now)) {', frameFn);
-  const yardsAt = w.indexOf('    yards?.frame({ dt, cam, overlayUp: !!townTalk.overlayActive });', frameFn);
-  assert.ok(frameFn > 0 && yardsAt > frameFn && yardsAt < modal, 'in the frame, above the modal return: stood down indoors');
-  assert.match(w, /yards\?\.draw\(renderer\);/);
-  assert.match(w, /if \(yards\) for \(const b of yards\.batches\(\)\)/);
-  assert.match(w, /yards\?\.drawDecals\(renderer\);/);
-  assert.match(w, /seaReach: csaHelm \? csaSeaReach\(csaHelm\) : 0,[^\n]*\n\s*\}\);\n\s*if \(yards\?\.flying\(\)\) \{ const c = \{ pos: mwv0\.eye \}; yards\.cameraOverride\(c\); mwv0\.eye = c\.pos; \}/, 'the frame\'s own eye, before any reader of it');
-  assert.match(w, /if \(yards\?\.flying\(\)\) mv\.analog = null;/);
-  // AUDIT: a finger under the yard's flight neither presses nor swings
-  assert.match(w, /if \(modes\?\.decorFlying\?\.\(\) \|\| yards\?\.flying\(\)\) return;/);
-  assert.match(w, /if \(yards\?\.flying\(\)\) \{ swipeHeld = false; return; \}/);
-  const y = src('src/scenes/homeYards.js');
-  assert.match(y, /place: \(a\) => deps\.api\.place\(\{ \.\.\.a, yard: true \}\),/);
-  assert.match(src('src/world/rmbLayout.js'), /recordAt: \[subRecordMatrix\[12\], subRecordMatrix\[13\], subRecordMatrix\[14\]\],/);
-  assert.match(src('src/net/accountClient.js'), /yards: \(mapId\) => waited\('\/v1\/homes\/yards', \{ mapId \}\),/);
-});

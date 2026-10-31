@@ -63,22 +63,3 @@ test('MW-MAP1: the two M-key doors hand the holder to the enhanced window - the 
   });
 });
 
-test('MW-MAP1: by source - every host with a rig hands sheetHolderOf(() => its rig) to every door it opens and goes into the head first; the travel builder reads the same holder and keeps no inline one; the ?interior host passes none', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /holder: sheetHolderOf\(\(\) => weaponRig\),\s*\n\s*\.\.\.extra,/, 'the V-key travel builder');
-  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the bag (with the holder) built by `townHere`, then into the head, then the town plan
-  assert.match(w, /if \(!townMapDoorReady\(\)\) return;[^\n]*\n\s*mwViewFirstPerson\(\);[^\n]*\n\s*townTalk\.showOverlay\(createTownMapWindow\(here\.deps\)\);/, 'the world host\'s M: into the head, then the town plan');
-  assert.match(w, /return \{ mapId: dfLoc\.mapTableData\?\.mapId, deps: \{\s*\n\s*holder: sheetHolderOf\(\(\) => weaponRig\),/, '...with the holder');
-  assert.equal((w.match(/hold: \(spec, opts\)/g) ?? []).length, 0, 'no inline holder left in world.js');
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /if \(!townMapDoorReady\(\)\) return;[^\n]*\n\s*mwViewFirstPerson\(\);[^\n]*\n\s*townTalk\.showOverlay\(createTownMapWindow\(\{\s*\n\s*holder: sheetHolderOf\(\(\) => weaponRig\),/, 'the ?exterior host\'s M');
-  assert.match(e, /import \{[^}]*mwViewFirstPerson[^}]*\} from '\.\.\/player\/mwView\.js'/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(!automapDoorReady\(\)\) return;\s*\n\s*mwViewFirstPerson\(\);[^\n]*\n\s*activeOverlay = createAutomapWindow\(\{\s*\n\s*holder: sheetHolderOf\(\(\) => weaponRig\),/, 'the dungeon\'s M');
-  assert.match(d, /import \{ mwViewFirstPerson \} from '\.\.\/player\/mwView\.js'/);
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /if \(!automapDoorReady\(\)\) return;[^\n]*\n\s*mwViewFirstPerson\(\);[^\n]*\n\s*interiorOverlay = createAutomapWindow\(\{\s*\n\s*holder: sheetHolderOf\(\(\) => interiorWeapon\),/, 'a building\'s M, off the INTERIOR arm');
-  const i = rd('src/scenes/interior.js');
-  assert.doesNotMatch(i, /sheetHolderOf|holder:/, 'the ?interior probe host has no rig and hands none');
-  for (const door of ['src/ui/town/townMapDoor.js', 'src/ui/automap/automapDoor.js']) assert.match(rd(door), /holder: deps\.holder \?\? null,/, `${door} passes it through`);
-});

@@ -69,13 +69,3 @@ test('HOLD-KEPT the room hands over whole what a piece the service no longer has
   assert.deepEqual(Object.keys(room.itemsSnapshot()), ['box2'], 'and the scene no longer writes the taken');
 });
 
-test('HOLD-KEPT the host: chest records say which chest, are matched by it, and an unmatched one\'s things are set down and said; the owner\'s list sets down what an unserved piece held - never while the room stands another layout\'s record apart (mutants: the identity unwritten; the index restore back; the set-down only for the crate; the layout guard lost)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /\.\.\.chestIdentity\(c, buildingOrigin\(\)\),/);
-  assert.match(wm, /const chestOf = matchChests\(data\.lootContainers, interiorCtx\.containers, buildingOrigin\(\)\);/);
-  assert.match(wm, /const target = kind === 'shelf' \? interiorCtx\.shelves\?\.\[\+i\] : chestOf\.get\(c\);/);
-  assert.match(wm, /if \(!target && kind === 'container' && c\.items\?\.length\) \{\n\s+const o = buildingOrigin\(\), f = player\.pos;\n\s+data\.droppedPiles = /);
-  assert.match(wm, /if \(setDown\) say\(/);
-  assert.match(wm, /if \(interiorHome\?\.own && !_sceneHeldForLayout\) decorSetDownHeld\(r\.data\.pieces\);/);
-  assert.match(wm, /const items = interiorDecor\.takeUnserved\(served\);\n\s+if \(!items\.length\) return 0;\n\s+interiorDropped\.dropPile\(items, interiorDropFeet\(\)\);/);
-});

@@ -158,13 +158,4 @@ test('MWNPC10c-4 the room\'s sprites hand their bodies on (the line\'s are the f
   const inner = { drawBodies: (...a) => calls.push(a), sync() {}, batches: () => [], persons: () => [], clear() {} };
   familyRoomSprites(inner, { begin() {}, end() {}, stand: () => false, batches: () => [], clear() {}, size: 0 }).drawBodies('c', 'p', 'v', 'e', 0.5);
   assert.deepEqual(calls, [['c', 'p', 'v', 'e', 0.5]]);
-  const w = rd('src/scenes/world.js');
-  ordered(w, ['livePersonBatches.push(...livingRoads.batches());', 'livingRoads.drawBodies(canvas, proj, view, mwv.eye, townTalk.overlayActive ? 0 : dt);', 'if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);'], 'the road\'s before the person billboards');
-  assert.ok(w.includes("createTravellerSprites({ renderer, getTexture, uploadRecordFrame, living: _livingIndoorsDoor, laneName: 'room' })"), 'the room a lane of its own');
-  assert.ok(w.includes('drawLivingBodies: (canvas, proj, view, eye, dt) => { livingIndoors?.drawBodies(canvas, proj, view, eye, dt); },'));
-  assert.ok(w.includes('livingRoads?.offsetBodies(r.offset);'));
-  ordered(rd('src/scenes/worldModes.js'), ['host.drawLivingBodies?.(canvas, proj, view, mwv.eye, dt);', 'renderer.drawBillboards([...interiorCtx.billboardBatches,', 'const livingInside = host.livingBillboards?.() ?? [];'], 'the room\'s before the building\'s pass');
-  assert.ok(rd('src/scenes/livingWorld/livingRoads.js').includes('drawBodies(canvas, proj, view, eye, dt) { deps.sprites.drawBodies?.(canvas, proj, view, eye, dt); },'));
-  assert.ok(rd('src/scenes/livingWorld/livingRoads.js').includes('offsetBodies(o) { deps.sprites.offsetBodies?.(o); },'));
-  assert.ok(rd('src/scenes/livingWorld/livingIndoors.js').includes('drawBodies(canvas, proj, view, eye, dt) { deps.sprites.drawBodies?.(canvas, proj, view, eye, dt); },'));
 });

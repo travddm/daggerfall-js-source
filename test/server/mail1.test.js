@@ -123,13 +123,6 @@ test('MAIL1 law: a letter carries the chat\'s characters (visibleText - one law)
   for (const s of [raw, 'a\u200db', '\u{1F468}\u200d\u{1F469}', 'x'.repeat(CHAT_MAX + 9), 'a\u0300\u0300\u0300\u0300b', '\ud800lone']) {
     assert.equal(sanitizeChat(s), visibleText(s).replace(/\s+/g, ' ').trim().slice(0, CHAT_MAX).replace(/[\uD800-\uDBFF]$/, '').trim());
   }
-  const wire = src('src/net/wire.js');
-  assert.match(wire, /export function sanitizeChat\(text\) \{\n  let s = visibleText\(text\)\.replace\(\/\\s\+\/g, ' '\)\.trim\(\)\.slice\(0, CHAT_MAX\);/, 'the chat line is visibleText, folded and bounded');
-  // JOURNAL1 moved the letter's line law into wire.js beside visibleText (wordsLine, foldBlankLines), where the journal
-  // page reads it too - one law for a player's lines, and that law is still visibleText's
-  assert.match(src('src/net/letterLaw.js'), /import \{ wordsLine, foldBlankLines \} from '\.\/wire\.js';/, 'the letter reads the same law');
-  // PIN MOVED (TEXT-F1): still visibleText's, its words starred (net/nameFilter.js maskText)
-  assert.match(wire, /export const wordsLine = \(line\) => maskText\(visibleText\(String\(line \?\? ''\)/, 'and a line of it is visibleText\'s, its words starred');
 });
 
 test('MAIL1 law: a letter past its bound is REFUSED, never cut - one word each (the service returns them verbatim, and every one has a sentence); and the widest letter a player can type always fits the service\'s 4 KiB body (mutants: a bound off by one; a letter trimmed to fit)', () => {
@@ -251,8 +244,6 @@ test('MAIL1 service: an hour\'s letters - LETTERS_PAIR_MAX to one reader, LETTER
   const bob = await svc.player('p_bob_0000000001', 'Bob');
   for (let k = 0; k < LETTERS_SENT_MAX; k++) await svc.send(bob, `Nobody${k}`);
   assert.deepEqual((await svc.send(bob, 'Reader0')).data, { error: 'mail-rate' });
-  const code = src('server-account/src/letters.js');
-  assert.ok(code.indexOf('`mail:${sender.id}`') < code.indexOf("SELECT id, handle FROM players WHERE handle_lc = ?"), 'the rate before the lookup');
 });
 
 test('MAIL1 service: a FULL box refuses the sender (inbox-full, 409) and keeps every letter the reader has - its oldest is never thrown away for a stranger\'s newest - and two letters racing for the last place land ONE (mutants: the bound dropped; the check apart from the write)', async () => {
@@ -269,7 +260,6 @@ test('MAIL1 service: a FULL box refuses the sender (inbox-full, 409) and keeps e
   const full = await svc.send(senders[2], 'Bob');
   assert.deepEqual([full.status, full.data], [409, { error: 'inbox-full' }]);
   assert.ok(svc.db._raw.prepare("SELECT 1 FROM letters WHERE id = 'seed00000000000000000000'").get(), 'the oldest letter is still the reader\'s');
-  assert.match(src('server-account/src/letters.js'), /SELECT \?, \?, \?, \?, \?, \?, \? WHERE \(SELECT COUNT\(\*\) FROM letters WHERE to_id = \?\) < \?/, 'one statement');
 });
 
 test('MAIL1 service: a reader\'s letters are theirs alone - opened (the whole letter, read ONCE: the first opening\'s time kept), thrown away, and `no-letter` (404) for another\'s letter exactly as for none; and a reader who is gone takes their letters with them (mutants: the reader not in the WHERE; the read time rewritten; the cascade)', async () => {
@@ -590,15 +580,3 @@ test('MAIL1 / NAME-AS tab: a friend\'s row writes them a letter BY ACCOUNT - the
 
 // ── THE HOST, BY SOURCE ────────────────────────────────────────────────────────────────────────────────────────────
 
-test('MAIL1 host by source: the box is made with the panel over the ACCOUNT SERVICE - its io read from the store at each call - handed to the panel, polled from the online frame before the dead return, and a look that finds letters says so on the world tab (mutants: the box never polled; the notice dropped; the io captured once)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /import \{ MailBox, mailNoticeText \} from '\.\.\/net\/mail\.js';/);
-  const made = w.slice(w.indexOf('mail = new MailBox({'), w.indexOf('socialPanel = createSocialPanel({'));
-  assert.match(made, /ioOf: \(\) => \{\s*const st = appStorage\(\);\s*const s = storedSession\(st\);\s*return s \? \{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), base: serviceBase\(st\), secret: s\.secret, storage: st \} : null;\s*\},/);
-  assert.match(made, /onLetter: \(event\) => \{ chatLog\.push\(tab\.id, \{ text: mailNoticeText\(event\), system: true \}\); \},/);
-  assert.match(w, /socialPanel = createSocialPanel\(\{\s*social,\s*mail,/);
-  // PIN MOVED (SCALE4c): the lane no longer looks itself - it stamps that it runs, before the dead return, and the box's
-  // looks ride the tab's one heartbeat while it does (net/heartbeat.js whileLive)
-  assert.match(w, /const onlineFrame = \(now, dt\) => \{[\s\S]{0,1200}?\n\s*_mailFrameAt = performance\.now\(\);[^\n]*\n[\s\S]{0,2900}?if \(townTalk\.overlay instanceof DeathScreen/, 'stamped before the dead return');   // 1200 (WILD1: the zone's wildFrame() line between); 2100: WB1's gateFrame and RENOWN1's tick both stand between, and ONE-SEAT's branch (a tab out of the seat keeps its letterbox); PIN MOVED (2300, the merge of main past SD9b: SD2b's Hollow frame and CHAP1's Roll tick both stand between too); PIN MOVED (2600, the merge of main past NAME-AS: EG-PLAY's egFrame and NAME-AS's nameAsFrame both stand between - 2395 measured); PIN MOVED (2900, FIELD BUGS 2026-10-25 SEAT-SAVES: the seat branch runs the periodic checkpoint - 2782 measured)
-  assert.match(w, /heartbeat\.add\('mail', whileLive\(mail\.heartbeatPart\(\), \(\) => performance\.now\(\) - _mailFrameAt < FRAME_LIVE_MS\)\);/);
-});

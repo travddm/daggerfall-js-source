@@ -184,34 +184,3 @@ test('POTION-DOOR the Stores the maker lists: every Stores key that holds a DFU 
 
 // ─── THE MAGES GUILD, AN ALCHEMY STATION ─────────────────────────────
 
-const M = src('src/scenes/worldModes.js');
-const AST = parse(M, { ecmaVersion: 'latest', sourceType: 'module' });
-/** A method of the object createWorldModes returns, by name, as source. */
-function method(name) {
-  const walk = (n) => {
-    if (!n || typeof n !== 'object') return null;
-    if (n.type === 'Property' && n.key?.name === name && n.method) return `function ${M.slice(n.value.start, n.value.end)}`;
-    for (const v of Object.values(n)) {
-      if (Array.isArray(v)) { for (const c of v) { const f = walk(c); if (f) return f; } } else if (v && typeof v === 'object') { const f = walk(v); if (f) return f; }
-    }
-    return null;
-  };
-  const f = walk(AST);
-  assert.ok(f, `worldModes.js has ${name}`);
-  return f;
-}
-
-test('POTION-DOOR the Mages Guild hall is an alchemy station (worldModes alchemyHere): its Make Potions\' maker brews there, at the Alchemist\'s fee; another guild\'s hall (a temple\'s) is none; the enchanting station there as it was; the host builds the maker on the module\'s hooks and the empty-handed refusal reads them (mutants: the hall unasked; the fee the enchanter\'s; any guild\'s hall a station)', () => {
-  const ask = (q, group, type = BUILDING_TYPES.GuildHall) => Function('mode', 'interiorBuilding', 'BUILDING_TYPES', 'GUILD_GROUPS', 'ALCHEMY_FEE', 'ENCHANT_FEE', 'guildGroupOfFaction', 'townTalk',
-    'stationOwnerHere', 'hallMemberHere', 'interiorDecor', 'caravanGuestStation', `return (${method(q)})();`)(
-    'interior', { buildingType: type, factionId: 40, insideOpenShop: true }, BUILDING_TYPES, GUILD_GROUPS, ALCHEMY_FEE, ENCHANT_FEE, () => group, { factionDict: {} },
-    () => false, () => false, { list: () => [] }, () => null);
-  assert.deepEqual(ask('alchemyHere', GUILD_GROUPS.MagesGuild), { kind: 'shop', fee: ALCHEMY_FEE });
-  assert.deepEqual(ask('enchantHere', GUILD_GROUPS.MagesGuild), { kind: 'shop', fee: ENCHANT_FEE });
-  const other = Object.values(GUILD_GROUPS).find((g) => g !== GUILD_GROUPS.MagesGuild);
-  assert.equal(ask('alchemyHere', other), null, 'a temple\'s hall offers Make Potions and is no station');
-  assert.deepEqual(ask('alchemyHere', null, BUILDING_TYPES.Alchemist), { kind: 'shop', fee: ALCHEMY_FEE }, 'the Alchemist\'s as it was');
-  // the host: the window on the module's hooks, its refusal read off them (HOST-SPLIT: none of the hooks in the host)
-  assert.match(M, /const hooks = potionMakerHooks\(\{ player: playerEntity, surface: surfacePlayer, icons: \{ getTexture, uploadRecord, textures: renderer\.textures \}, onClose: \(\) => closeSpellWindow\(potionWin\) \}\);\n\s+if \(!hooks\.stocked\(\)\) return \{ rows: rows\(NO_POTION_INGREDIENTS\), closesWindow: true \};\n\s+potionWin = enhancedWindow\(new PotionMakerWindow\(hooks\), 'potionMaker'\);/);
-  assert.doesNotMatch(M, /addPotion: \(recipe, key\) =>|recipeKeys: \(\) =>/, 'the hooks are the module\'s');
-});

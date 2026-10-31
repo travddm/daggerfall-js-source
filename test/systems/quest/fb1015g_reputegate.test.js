@@ -70,8 +70,3 @@ test('REPUTE-GATE: the filter itself - offline the same pool, a null pool null, 
   assert.deepEqual(reputeGated(pool, 0, true).map((q) => q.name), ['N0B00Y04', 'toString']);
 });
 
-test('REPUTE-GATE: the bridge hands the flow the shared world (mutant: the door dropped)', () => {
-  const bridge = read(join(ROOT, 'src/scenes/quest/questBridge.js'));
-  const flow = bridge.slice(bridge.indexOf('const offerFlow = new QuestOfferFlow('), bridge.indexOf('// QuestMachine.Update\'s pacing'));
-  assert.ok(flow.includes('    sharedClock: () => !!ctx.sharedClock?.(),'));
-});

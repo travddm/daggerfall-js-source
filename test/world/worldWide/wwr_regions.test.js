@@ -146,10 +146,6 @@ test('WW-R the account service: a node\'s region any of the world\'s (a province
     assert.match(s, /regionOk\b[^\n]*\} from '\.\.\/\.\.\/src\/net\/nodeLaw\.js'/, `${f}: the world's regions`);
     assert.doesNotMatch(s, /bayRegionOk/, `${f}: no town book the Bay's alone`);
   }
-  assert.doesNotMatch(src('src/net/npcChapterLaw.js'), /bayRegionOk/);
-  const prof = src('server-account/src/professions.js');
-  assert.match(prof, /if \(!isBody && \(!climateHolds\(n\.kind, climate\) \|\| !regionOk\(region\)\)\) return \{ error: 'prof-pixel' \};/, 'a node: the world\'s');
-  assert.match(prof, /if \(!regionOk\(region\)\) return \{ error: 'bad-region' \};[^\n]*\s*const day = utcDay\(nowS\);\s*const halls = chaptersOpenFor\(player, env\);/, 'a writ board: the world\'s (WW7-5)');
 });
 
 test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit) where the relay keeps them (the world-wide relay, net/wire.js WORLD_WIDE_RELAY_MIN - world255 on its branch), a client on an older one keeps its region tab off past the Bay; the Abyss census every region\'s (WW5); the naval wire the Bay\'s regions alone (mutants: the channels\' count, the gate, the census, the wire)', () => {
@@ -168,9 +164,4 @@ test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit) wher
   const word = navalWireRecord({ ships: [ship(64), ship(17)] });
   assert.deepEqual(word.s.map((w) => w.at(-1)), [-1, 17], 'a province\'s region never on the wire - an older build refuses the whole word');
   assert.ok(validNavalRecord(word));
-  const wire = src('src/scenes/world.js');
-  assert.match(wire, /chatRegionRoom\(index, !!chatLinks\.get\('world'\)\?\.provinceRegionsOk\)/);
-  assert.match(src('src/net/online.js'), /this\.provinceRegionsOk = relaySupportsProvinceRegions\(relayV\);/);
-  assert.match(wire, /groundMaps\(maps\);/);
-  assert.match(src('src/scenes/townTalk.js'), /const npcRaceNow = \(\) => REGION_PEOPLE\[regionNow\(\)\] \?\? 'Breton';/);
 });

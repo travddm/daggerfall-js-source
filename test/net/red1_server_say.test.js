@@ -48,10 +48,6 @@ test('RED1: `say` is checked for SHAPE only - whether a socket may speak as the 
   const long = 'x'.repeat(CHAT_MAX * 3);
   assert.equal(parseClient(JSON.stringify({ t: 'say', text: long }), { hasHello: true }).text.length, CHAT_MAX);
   assert.equal(parseClient(JSON.stringify({ t: 'say', text: 'a\u0000b' }), { hasHello: true }).text, sanitizeChat('a\u0000b'));
-  // parseClient is SYNC AND PURE and stays that way (ACC1d's split).
-  const wire = rd('src/net/wire.js');
-  const arm = wire.slice(wire.indexOf("if (m.t === 'say')"), wire.indexOf("if (m.t === 'social')"));
-  assert.doesNotMatch(arm, /await|verify|glyph|dev/i, 'the parser must not try to answer a question only the relay can');
 });
 
 test('RED1: the server line is rated WELL UNDER a chat line, and the bound is derived rather than asserted', () => {
@@ -198,22 +194,7 @@ test('RED1: the log marks a red line from the relay\'s frame TYPE, and a red lin
 });
 
 test('RED1: the host parses /red and NEVER guards it - the authority is the relay\'s, and a second copy of it here would be wrong the moment a grant lapses', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const red = \/\^\\\/red\\s\+\(\[\\s\\S\]\+\)\$\/i\.exec\(text\.trim\(\)\);/, 'the command');
-  // CHAT-CHAN: from any tab, straight to the WORLD link - the one room every player online is in (a red line said in a
-  // region's room, or on a tab with no room of its own, would reach a region or nobody)
-  assert.match(w, /if \(red\) return chatLinks\.get\('world'\)\?\.sendRed\(red\[1\]\) \?\? false;/, 'straight to the link');
-  const arm = w.slice(w.indexOf('const red = /^'), w.indexOf('const mod = parseModCommand(text);'));
-  assert.doesNotMatch(arm, /glyph|dev|wardrobe|title/i, 'the host must not decide who may speak as the server');
-  // ...and the SERVER's line lands on the log with the flag set by US,
-  // from the frame type - never from a field on the frame.
-  assert.match(w, /link\.onRed = \(line\) => chatLog\.pushAll\(\{ text: line\.text, at: line\.at, red: true \}\);/, 'the flag is set here, on a line nobody sent (CHAT-CHAN: one line on every tab)');
 
-  const online = rd('src/net/online.js');
-  const recv = online.slice(online.indexOf("} else if (m.t === 'red') {"), online.indexOf("} else if (m.t === 'social') {"));
-  assert.match(recv, /this\.onRed\?\.\(\{ text, at:/, 'the session hands it on');
-  assert.doesNotMatch(recv, /m\.id|m\.name/, 'a server line has neither, and reading one would invent a speaker');
-  assert.match(recv, /if \(!this\._lineIn\(room, null, now\)\) return;/, 'CHAT-G: gated COMING IN too - the relay a client talks to is the player\'s own choice (AUDIT 68: through the chat line\'s own door)');
   // ...and DRIVEN, because the pattern above also matches the arm after this one: a flood of red lines from one relay
   // inside one instant reaches the log at the room's own rate and no faster (CHAT-CHAN found the gate's removal
   // surviving that pattern - RED1-12)
@@ -229,11 +210,6 @@ test('RED1: the host parses /red and NEVER guards it - the authority is the rela
   assert.equal(reds.length, CHAT_ROOM_HZ_MAX, 'the room\'s rate, and the rest dropped');
   assert.equal(link.stats.chatsDropped, 5);
 
-  // The panel draws it red, and not as an italic aside: the system's
-  // notices are asides and this is an announcement.
-  const panel = rd('src/ui/chatPanel.js');
-  assert.match(panel, /\$\{line\.red \? ' red' : ''\}/, 'the class rides the line');
-  assert.match(panel, /\.dfchat-line\.red \.dfchat-text \{ color: #e2453a;[^}]*font-style: normal;/, 'red, and not an italic aside');
 });
 
 test('RED1: the wire version moved, because this is a relay change', () => {

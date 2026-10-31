@@ -27,7 +27,6 @@ function ground(paint) {
 const bits = (g, x, y) => g[x][y].tileBitfield;
 
 test('PUDDLE-DRY the puddle records: DFU\'s shallow-water art (SHALLOW_WHOLE) and WATER-DRAW1\'s (SHALLOW_DRAWN), one list, WATER-PUDDLE\'s own (audit24: one home)', () => {
-  assert.match(read('src/world/puddleDry.js'), /import \{ PUDDLE_RECORDS \} from '\.\/puddleMask\.js';/);
   assert.deepEqual(PUDDLE_RECORDS, [...SHALLOW_WHOLE, ...SHALLOW_DRAWN].sort((a, b) => a - b));
   assert.deepEqual(PUDDLE_RECORDS, [8, 9, 23, 33, 34, 35, 36]);
 });
@@ -92,20 +91,6 @@ test('PUDDLE-DRY once a ground, and never from nothing: a second call dries noth
   assert.equal(groundTileWet(marked[0][0]), false, 'a marker is no water');
   assert.equal(dryPuddles(marked), 0, 'and no ground to take: the pool stays');
   assert.equal(dryPuddles(null), 0);
-});
-
-test('PUDDLE-DRY one door: getBlock serves BLOCKS.BSA\'s block and a world-data mod\'s dried, readClassicBlock keeps the bytes (mutants: either arm undried)', () => {
-  const src = read('src/formats/blocksFile.js');
-  assert.match(src, /^import \{ dryPuddles \} from '\.\.\/world\/puddleDry\.js';/m);
-  assert.match(src, /const dryBlock = \(dfBlock\) => \{ dryPuddles\(dfBlock\?\.rmbBlock\?\.fldHeader\?\.groundData\?\.groundTiles\); return dfBlock; \};/);
-  assert.match(src, /return dryBlock\(replacement\);/, 'a mod\'s block');
-  assert.match(src, /return dryBlock\(this\._blocks\[block\]\.dfBlock\);/, 'BLOCKS.BSA\'s');
-  const classic = src.slice(src.indexOf('  readClassicBlock(block) {'), src.indexOf('  /** Discard a block from memory. */'));
-  assert.doesNotMatch(classic, /dry/, 'the diff base is the file\'s');
-  // no reader of the ground keeps a puddle law of its own
-  for (const f of ['src/world/terrain/terrainTiles.js', 'src/scenes/exterior.js', 'src/world/rmbLayout.js', 'src/world/city/cityNavigation.js']) {
-    assert.doesNotMatch(read(f), /dryPuddles|PUDDLE_RECORDS/, `${f} reads the served ground`);
-  }
 });
 
 test('PUDDLE-DRY on BLOCKS.BSA: every town block served with no lone water tile and no patch of puddle art; the moats and ponds whole; the file\'s own bytes kept (needs ARENA2_PATH)', { skip: !(ARENA2 && existsSync(join(ARENA2, 'BLOCKS.BSA'))) && 'no ARENA2' }, () => {

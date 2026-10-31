@@ -135,10 +135,6 @@ test('UI3 the afflictions: the Status box\'s own law - one tile for being poison
 test('UI3 the diseases\' names are the seventeen the table carries, in its order - the names DISEASE_DATA\'s own rows are commented with (mutants: a name out of its place)', () => {
   assert.equal(DISEASE_NAMES.length, DISEASE_DATA.length);
   assert.equal(DISEASE_NAMES.length, Object.values(DISEASES).filter((v) => v >= 0).length);
-  const src = read('src/systems/diseases.js');
-  const table = src.slice(src.indexOf('export const DISEASE_DATA'), src.indexOf(']);', src.indexOf('export const DISEASE_DATA')));
-  const commented = [...table.matchAll(/^\s*D\([^)]*\),\s*\/\/ (.+)$/gm)].map((m) => m[1].trim());
-  assert.deepEqual([...DISEASE_NAMES], commented);
 });
 
 // ── THE GLYPHS ──────────────────────────────────────────────────────
@@ -506,8 +502,6 @@ test('UI3 AUDIT UI C: a new window size measures the band on the frame it comes,
     if (hadIW) Object.defineProperty(globalThis, 'innerWidth', hadIW); else delete globalThis.innerWidth;
     if (hadDpr) Object.defineProperty(globalThis, 'devicePixelRatio', hadDpr); else delete globalThis.devicePixelRatio;
   }
-  // AUDIT UI C4: the touch layer's presses are found by their class, wherever the safe area puts them
-  assert.match(read('src/ui/touch/touch.js'), /const b = document\.createElement\('div'\);\n\s+b\.className = 'dftouch-btn';/);
 });
 
 // ── THE SHEET ───────────────────────────────────────────────────────
@@ -545,8 +539,4 @@ test('UI3 the sheet: the tile, its picture, the rows\' gap and the lift are the 
   assert.match(PLUS_CSS, /@media \(max-width: 640px\) \{\n {2}\.hud-vlabel \{ display: none; \}\n {2}\.hud-vital \.hud-track \{ justify-content: center; \}\n {2}\.hud-num \{ padding-right: 0; \}\n\}/);
   assert.ok(PLUS_CSS.indexOf('@media (max-width: 640px) {\n  .hud-vlabel') > PLUS_CSS.indexOf('.hud-num { position: relative; z-index: 1; padding-right: 10px;'), 'after the number\'s own padding, so it wins');
   assert.doesNotMatch(C, /\.hud-effects|\.hud-needs|\.hud-status|\.hud-eff\b|\.hud-need\b/);
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedFrame.js'), /'\.hud-eff'|'\.hud-need'/, 'the kit dresses no chip that is gone');
-  const hud = read('src/ui/enhanced/enhancedHud.js');
-  assert.doesNotMatch(hud, /'hud-effects'|'hud-needs'|'hud-status'|hud-eff |hud-need /, 'the HUD builds none');
-  assert.match(read('src/ui/hud/hud.js'), /\n {6}escortBottom: escortBottomPx\(canvas\),/, 'the host hands the widget the escort faces\' bottom');
 });

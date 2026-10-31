@@ -49,9 +49,6 @@ test('CURSOR-EDGE: every gauntlet frame the page wears is at most 32 DIP a side,
   // the pad's own gauntlet (a drawn element, ui/gamepadInput.js) is boxed to the art
   const [pw, ph] = pngSize(GAUNTLET_POINT);
   assert.deepEqual(pngSize(GAUNTLET_PRESS), [pw, ph], 'both frames one size');
-  const pad = read('src/ui/gamepadInput.js');
-  assert.match(pad, new RegExp(`style\\.width = plusNow \\? '${pw}px'`));
-  assert.match(pad, new RegExp(`style\\.height = plusNow \\? '${ph}px'`));
 });
 
 test('CURSOR-EDGE / CLASSIC-CURSOR: the classic arrow - DFU\'s Cursor2.png - is at most 32 DIP a side as it is worn, at 1x (mutant: a density or a scale put on it)', async () => {

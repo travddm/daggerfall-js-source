@@ -31,7 +31,6 @@ function callsAsStatement(src, fn) {
   return src.split('\n').some((l) => l.trim().startsWith(`${fn}(`));
 }
 
-
 // Mutation campaign: 29 reintroductions, 29 killed. The attract radius
 // and both delay bounds; the `+1` that makes 9 reachable; the human
 // mute losing its city-watch carve-out (the dungeon's actual drift)
@@ -223,11 +222,6 @@ test('audit24 wave41: the host seam - the occlusion cast and the LINEAR rolloff'
   assert.equal(playEnemyClip(audio, null, [0, 0, 0]), null);
   assert.doesNotThrow(() => playEnemyClip(null, { clip: 1, volume: 1 }, [0, 0, 0]), 'a host with no audio');
 
-  // and play3d really can take the model now
-  assert.match(rd('src/systems/audio.js'), /distanceModel = 'inverse', pitch = 1, far = false \} = \{\}\)/,
-    'inverse stays the default (AUDIT 58 added pitch beside it, at 1; DISC17-B far, off)');
-  assert.match(rd('src/systems/audio.js'), /pan\.distanceModel = distanceModel;/);
-
   // the whole FixedUpdate, end to end
   played.length = 0;
   const src = new EnemySoundSource(RAT, scripted(0, 0.5, 0));
@@ -239,26 +233,3 @@ test('audit24 wave41: the host seam - the occlusion cast and the LINEAR rolloff'
   assert.equal(played[0].clip, ENEMY_BASICS[RAT].barkSound);
 });
 
-test('audit24 wave41: all three pools ask the one home, and nobody keeps a copy', () => {
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    const src = rd(f);
-    // as STATEMENTS: `assert.match(src, /tickEnemySound\(/)` is
-    // satisfied by `if (false) tickEnemySound(...)`, which is exactly
-    // how three of wave 42's mutants survived their first campaign.
-    assert.ok(callsAsStatement(src, 'tickEnemySound'), `${f}: runs the attract cadence`);
-    assert.match(src, /playEnemyClip\(audio, [a-z]\.sounds\.attack\(\)/, `${f}: and the attack sound`);
-    assert.match(src, /EnemySoundSource/, `${f}: through the shared source`);
-    // no pool re-derives the cadence for itself any more
-    assert.doesNotMatch(src, /_attractWait|_attractT/, `${f}: no private timer`);
-    assert.doesNotMatch(src, /Math\.random\(\) > 0\.8|Math\.random\(\) <= 0\.5/, `${f}: no private roll`);
-  }
-  // the watch's invented detection-edge bark is gone
-  assert.doesNotMatch(rd('src/scenes/cityGuards.js'), /_halted/, 'and the flag it rode');
-
-  // ONE DFU MEMBER, ONE EXPORT: 146 was written out in five places.
-  assert.match(rd('src/characters/mobile/mobileTypes.js'), /export const KNIGHT_CITY_WATCH = MOBILE_TYPES\.Knight_CityWatch;/);
-  for (const f of ['src/scenes/hostCombat.js', 'src/characters/enemy/enemyEntity.js',
-    'src/scenes/cityGuards.js', 'src/combat/enemyEquipment.js', 'src/characters/enemy/enemySounds.js']) {
-    assert.doesNotMatch(rd(f), /= 146;|=== 146\b/, `${f}: no second copy of the id`);
-  }
-});

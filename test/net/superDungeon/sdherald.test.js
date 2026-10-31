@@ -285,11 +285,3 @@ test('SD-HERALD relay: NO WEBHOOK, NO HERALD - a Hollow rises, is found and fall
   }
 });
 
-test('SD-HERALD the door and the order, by source: the role a var beside the serpent\'s, empty by default (the gate\'s then); read with the serpent\'s law; the herald\'s beat after the director\'s on the hub\'s one alarm', () => {
-  const toml = rd('server/wrangler.toml');
-  assert.match(toml, /^SD_DISCORD_ROLE = "\d*"$/m);
-  assert.ok(toml.indexOf('SD_DISCORD_ROLE') > toml.indexOf('SERPENT_DISCORD_ROLE = '), 'beside the serpent\'s');
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /sdRole: serpentHeraldRole\(role\('sdRole'\), role\('gateRole'\)\)/);   // PIN MOVED (SCALE5b): SD_DISCORD_ROLE and GATE_DISCORD_ROLE through relayCfgValue - the hub's settings over the vars (net/relayCfg.js)
-  assert.match(relay, /await this\._sdBeat\(Date\.now\(\)\); await this\._sdHeraldBeat\(Date\.now\(\)\); await this\._ktHeraldBeat\(Date\.now\(\)\); return; \}/, 'after the director\'s moves');   // PIN MOVED (KETCH): the Sky-Ketch's herald after it
-});

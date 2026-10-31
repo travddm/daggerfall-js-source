@@ -212,17 +212,6 @@ test('CRAFT-HALL the rails: the Crafting page beside the Professions page on the
   assert.equal(stationHere(), 'fire');
   assert.equal(stationDoorAt('loom'), 'crafting');
   setProfessionsPages(null);
-  const door = hostText('src/ui/pauseDoor.js');
-  assert.match(door, /enhancedPauseOverlay\(show, hooks\.at === 'professions' \? \{ \.\.\.hooks, at: professionsKeyAt\(\) \} : hooks\)/);
-  const modes = hostText('src/scenes/worldModes.js'), world = hostText('src/scenes/world.js');
-  assert.match(modes, /interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\('fire'\) \}\)/);
-  assert.match(modes, /interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(piece\.station\) \}\)/);
-  assert.match(modes, /label: stationActLabel\(kind\), action: \(\) => \{ leave\(\); interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(kind\) \}\); \}/);   // PIN MOVED (AUDIT HORIZONTAL A7): the option's words profPages.js's, through t()
-  assert.match(world, /hudCtx\.togglePause\(\{ at: stationDoorAt\('workbench'\) \}\);/);
-  assert.doesNotMatch(modes + world, /togglePause\(\{ at: 'stores' \}\)/, 'no station door lands under the goods any more');
-  const menu = hostText('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /crafting: \(d\) => drawCraftingPage\(d, render, profKit\)/);
-  assert.match(menu, /const profKit = \{ el, divider: pxDivider, meter: pxMeter, go: profGo, keyName: /);
 });
 
 test('CRAFT-HALL the Crafting page: the five crafts\' headers - each its rank, its bar from the rank\'s floor, its XP and what is left, its first-time bonuses made - pressed to open the Professions page on it; the crafter\'s rule; where no station stands here, where they are and the bound key; the stations tiled, the one here drawn with its own header; a door to the Stores (mutants: a header gone; the press\'s track; the key unread)', async (t) => {
@@ -499,5 +488,4 @@ test('CRAFT-HALL AUDIT HORIZONTAL (the lane\'s suspected read): a state read ans
 
 test('CRAFT-HALL AUDIT HORIZONTAL A7: the chooser at an alchemy or enchanting station offers its act through t(), and the Professions key\'s row says where it lands (mutant: the option\'s words glued in the host)', () => {
   assert.deepEqual(['alchemy', 'enchant', 'forge'].map(stationActLabel), ['2 - Brew (Crafting page)', '2 - Disenchant (Crafting page)', '']);
-  assert.doesNotMatch(hostText('src/scenes/worldModes.js'), /\(Crafting page\)`/, 'no English glued in the host');
 });

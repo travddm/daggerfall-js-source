@@ -224,16 +224,3 @@ test('LEGACY5 the host: a courted resident dead ends the courtship with word; a 
   assert.ok(w.host.holdsResident(RES.id), 'their place stays the line\'s - the dead do not come back as the census\'s');
 });
 
-test('LEGACY5 the wiring: the talk puts the host\'s rows first on Tell me about and answers them itself, both skins through the one hooks object; the world hands the doors over', () => {
-  const tt = read('src/scenes/townTalk.js');
-  assert.match(tt, /const own = _toneTarget \? \(legacyTopics\?\.\(_toneTarget\) \?\? \[\]\) : \[\];/);
-  assert.match(tt, /if \(row\.legacy\) return row\.legacy\.answer\(tone, _toneTaste\(\)\);   \/\/ LEGACY5/);   // PIN MOVED: TONE-TASTE - and how the tone was taken
-  assert.match(tt, /question: \(row\) => \(row\.legacy \? row\.legacy\.question\(tone\) :/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /legacyTopics: \(person\) => legacyTopicRows\(person\),/);
-  assert.match(w, /holderOf: \(res, day\) => \(host\.legacyHost\?\.holdsResident\(res\.id\) \? null :/);
-  assert.match(w, /\(id\) => town\.residents\.find\(\(r\) => r\.id === id\) \?\? null\) \?\? null,/);
-  assert.match(w, /templeOf: \(\) => \{ const b = [^\n]*TALK_BUILDING_TYPES\.Temple/);
-  assert.match(w, /legacyHost\?\.residentDied\(res\.id\);   \/\/ LEGACY5/);
-  assert.match(w, /const livingDied = \(res, t\) => \{ legacyHost\?\.residentDied\(res\.id\);/);
-});

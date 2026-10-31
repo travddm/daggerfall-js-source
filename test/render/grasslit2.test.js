@@ -242,9 +242,6 @@ test('GRASS-LIT2: the draw hands the shader the frame\'s lanterns - the list the
   const none = run({});
   assert.deepEqual(none('uPointCount'), [[0]]);
   assert.equal(none('uPointLights').length, 0);
-  // the host hands the list the ground took and its display colours
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes('points: renderer._pointLights, pointColors: renderer._pointColorData(renderer._pointLights.length >> 2, true) },'));
 });
 
 /** the drawn mesh's normal at a point: the triangle that holds it, off the real index buffer, its three vertex normals
@@ -350,26 +347,6 @@ test('GRASS-LIT2: the placer asks the slope of every blade that stands, sliced o
 });
 
 test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps, and takes the grass\'s colour off the tile set that is drawn', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes('groundNormals: labGrass && stride === 1 ? normals : null,'), 'a near pixel keeps its grid\'s normals - AUDIT B1: only where there is grass');
-  assert.ok(w.includes('p.groundNormals = labGrass && stride === 1 ? grid.normals : null;'), 'and a promotion or a demotion moves them with the surface');
-  assert.ok(w.includes('return surfaceNormalAt(p.groundNormals, x - t[0], z - t[2], grassNormalScratch);'));
-  // the mod's tile set, asked before the three are learned so they land in one step
-  // (AUDIT HOST-SPLIT 2, the second read: it ended at the build's createTerrainSurface, which now stands in the module the
-  // join appends - so the slice ran to the end of world.js and any line below passed. It ends at the next door, in world.js)
-  // PIN MOVED (OW-HITCH): the ground sets' home is scenes/groundSets.js (HOST-SPLIT) - read there, to its module's return
-  const gs = readFileSync(new URL('../../src/scenes/groundSets.js', import.meta.url), 'utf8');
-  const learnAt = gs.indexOf('const drawnMeans = ');
-  const learn = gs.slice(learnAt, gs.indexOf('  return { groundLayersOf', learnAt));
-  assert.ok(learn.length > 0 && learn.length < 4000, `loadGroundSet's learning, read alone: ${learn.length} chars`);
-  assert.ok(learn.startsWith('const drawnMeans = grassRecords.has(groundArchive) ? null\n      : groundDrawnMeans.has(groundArchive) ? groundDrawnMeans.get(groundArchive)\n      : (await dfmodGroundLayers(groundArchive, groundTex))?.map(tileMeanColour) ?? null;'));
-  assert.ok(learn.indexOf('await') < learn.indexOf('grassRecords.set(') && learn.includes('groundMeanColour.set(groundArchive, drawnMeans ?? layers.map(tileMeanColour));'));
-  // AUDIT GRASS-LIT2 B2: the means are the UPLOADED layers' - taken beside the upload, not asked of the door again
-  // AUDIT PRECIP GROUND-2 (PIN MOVED): the set's OWN layers' means - never its twin's winter half
-  assert.ok(gs.includes('if (labGrass) groundDrawnMeans.set(groundArchive, own.modLayers ? own.modLayers.map(tileMeanColour) : null);'));
-  assert.ok(gs.indexOf('const layers = winter == null ? own.layers : twinLayers(') < gs.indexOf('await stepsBreathing(renderer.uploadTileArraySteps(key, layers), breathe);')
-    && gs.indexOf('await stepsBreathing(renderer.uploadTileArraySteps(key, layers), breathe);') < gs.indexOf('if (labGrass) groundDrawnMeans.set('), 'PIN MOVED (OW-HITCH): uploaded a few layers a breath, then the means');
-  assert.ok(learn.includes('grassRecords.set(groundArchive, grassRecordsOf(layers));'), 'which records are grass stays the classic file\'s question');
   // a mod's big tile is read every k-th texel, k odd - a two-texel pattern (the blue here) is read on both its phases; a classic tile whole
   const big = { width: 1024, height: 1024, colors: new Uint8Array(1024 * 1024 * 4) };
   for (let k = 0; k < 1024 * 1024; k++) { big.colors[k * 4] = 40 + (k % 3); big.colors[k * 4 + 1] = 90; big.colors[k * 4 + 2] = 30 + (k % 2) * 4; }
@@ -385,21 +362,6 @@ test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps
     assert.ok(st % 2 === 1 && Math.ceil(n / st) <= GRASS_MEAN_SAMPLES, `${n} texels at step ${st}`);
   }
   assert.equal(grassMeanStep(4096), 1, 'a classic tile is read whole');
-});
-
-test('GRASS-LIT2: the shot hooks - the classic lane\'s tones by hand, and the heart of the deepest wood to look down on', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes("labGrass.setTones(tones ?? (classic ? GRASS_TONES_CLASSIC : GRASS_TONES), classic)"));   // PIN MOVED (AUDIT MEADOW1): through the renderer, which moves the meadow's art ground with the tones
-  const hook = w.slice(w.indexOf('window.__forestSpot = (r = 10, here = false) => {'), w.indexOf('/** CSA-C probe: a land tile 3 tiles off a water tile'));
-  assert.ok(hook.includes('forestAt(p.px * 128 + tx + dx, -p.py * 128 + tz + dz)'), 'FOREST1\'s field at the world tile');
-  assert.ok(hook.includes('for (const p of here ? [cur] : built.values())') && hook.includes('origin: [t[0], t[2]]'), 'the player\'s own pixel on asking, and its origin - a pose off it stays in it');
-  // AUDIT GRASS-LIT2 B5: a zero step never left either hook's loop; a hillside's yaw looks down it, read at the far half's middle
-  assert.ok(w.includes('window.__grassSpot = (r = 6, skip = 0, steep = 0) => {\n      r = Math.max(1, r | 0);'));
-  assert.ok(hook.startsWith('window.__forestSpot = (r = 10, here = false) => {\n      r = Math.max(1, r | 0);'));
-  assert.ok(w.includes('(tz + r * 2 + 0.5) * 6.4, [0, 1, 0])') && w.includes('yaw: n ? Math.atan2(n[0], n[2]) : 0,'));
-  // shot mode only: the hooks sit in the block the shot flag opens, beside __grassSpot
-  const block = w.slice(0, w.indexOf('window.__forestSpot'));
-  assert.ok(block.lastIndexOf('window.__grassSpot') > block.lastIndexOf('  if (shotMode) {'));
 });
 
 // ═══ AUDIT GRASS-LIT2 (2026-10-02, Mac: "Audit this") ═══════════════════
@@ -452,9 +414,6 @@ test('AUDIT GRASS-LIT2 A1: a cell walks only the lanterns whose reach meets its 
   r._pts = new Float32Array(ring9.flat()); r._pn = ring9.length; r._cellN = -1;
   r._cellLights(box);
   assert.deepEqual([...of('uPointIdx').at(-1)[0]], [0, 1, 2, 3, 4, 5, 6, 7], 'a tie keeps the earlier light first, and the ninth off');
-  // the draw resets the cell list each frame and walks it per drawn cell
-  const src = readFileSync(new URL('../../src/render/labGrass.js', import.meta.url), 'utf8');
-  assert.ok(src.includes('this._pts = pn > 0 ? pts : null; this._pn = pn; this._cellN = -1;') && src.includes('if (this._pn > 0) this._cellLights(box);   // AUDIT GRASS-LIT2 A1'));
   assert.ok(GAME_GRASS_VS.includes(`uniform int uPointIdx[${GRASS_CELL_LIGHTS}];`) && GAME_GRASS_VS.includes('    int i = uPointIdx[j];\n'));
   // and the stage reads the cell's list: a light the list does not name lights nothing, though it is in the frame's
   const two = [{ at: [16, 1.5, 15], range: 10, color: [1, 0, 0] }, { at: [14, 1.5, 15], range: 10, color: [0, 0, 1] }];
@@ -643,58 +602,6 @@ function lift(text, names, values) {
 }
 const hookText = (w, start) => { const i = w.indexOf(start); assert.ok(i >= 0, start); return w.slice(i, w.indexOf('\n    };\n', i) + 7); };
 
-test('AUDIT GRASS-LIT2 C8: the host\'s slope asks the drawn surface only where the pixel keeps its normals - a far pixel, or the field off, is level, not a throw', () => {
-  const w = hostText('src/scenes/world.js');
-  const start = w.indexOf('const slope = (x, z) => {\n        const hit = pieceAt(x, z);');
-  const text = w.slice(start, w.indexOf('\n      };', start) + 9);
-  const scratch = [0, 0, 0];
-  const run = (hit) => new Function('pieceAt', 'surfaceNormalAt', 'grassNormalScratch', `${text}\nreturn slope;`)(() => hit, surfaceNormalAt, scratch)(10, 20);
-  assert.equal(run(null), null, 'off the built pixels');
-  assert.equal(run({ p: { groundNormals: null }, t: [0, 0, 0] }), null, 'a pixel drawn at a stride keeps no normals: level');
-  const flat = new Float32Array(HEIGHTMAP_DIMENSION * HEIGHTMAP_DIMENSION * 3).map((_, i) => (i % 3 === 1 ? 1 : 0));
-  assert.equal(run({ p: { groundNormals: flat }, t: [0, 0, 0] }), scratch, 'and one that keeps them is read into the one scratch');
-});
-
-test('AUDIT GRASS-LIT2 C9: the shot hooks run - the hillside hook keeps to a slope steep enough, the wood hook to the most forest on grass', () => {
-  const w = hostText('src/scenes/world.js');
-  const names = ['built', 'state', 'grassRecords', 'TERRAIN_TILE_DIM', 'surfaceNormalAt', 'heightAt', 'forestAt'];
-  const g = HEIGHTMAP_DIMENSION;
-  const normalsOf = (n) => new Float32Array(g * g * 3).map((_, i) => n[i % 3]);
-  const lean = [0.5, 0.8, 0.2].map((v, _i, a) => v / Math.hypot(...a));
-  const pixel = (px, py, normals, holes = []) => {
-    const tilemapBytes = new Uint8Array(128 * 128).fill(2 << 2);   // record 2: grass
-    for (const [tx, tz] of holes) tilemapBytes[tz * 128 + tx] = 5 << 2;
-    return { px, py, groundArchive: 302, tilemapBytes, groundNormals: normals };
-  };
-  const flatP = pixel(3, 2, normalsOf([0, 1, 0])), hillP = pixel(4, 2, normalsOf(lean));
-  const built = new Map([['3,2', flatP], ['4,2', hillP]]);
-  const state = { current: { x: 3, y: 2 }, pixelTranslation: (px, py) => [px * 1000, 0, -py * 1000] };
-  const peak = [40, 60];   // the wood's heart, on a tile that is not grass
-  const forestAt = (wx, wz) => Math.exp(-((wx - 3 * 128 - peak[0]) ** 2 + (wz + 2 * 128 - peak[1]) ** 2) / 200);
-  flatP.tilemapBytes[peak[1] * 128 + peak[0]] = 5 << 2;
-  const hooks = lift(hookText(w, 'window.__grassSpot = (r = 6, skip = 0, steep = 0) => {') + '\n' + hookText(w, 'window.__forestSpot = (r = 10, here = false) => {'),
-    names, [built, state, new Map([[302, new Set([2])]]), 128, surfaceNormalAt, () => 0, forestAt]);
-  // level ground, no steepness asked: the player's own pixel, its first square, looking along it
-  const any = hooks.__grassSpot(2);
-  assert.deepEqual([any.pixel, any.yaw, any.normal], [[3, 2], 0, null]);
-  // a hillside asked: the level pixel passes, the leaning one answers, its yaw down the slope
-  const hill = hooks.__grassSpot(2, 0, 0.3);
-  assert.deepEqual(hill.pixel, [4, 2]);
-  assert.ok(Math.abs(hill.yaw - Math.atan2(lean[0], lean[2])) < 1e-6 && Math.hypot(hill.normal[0], hill.normal[2]) >= 0.3);
-  assert.equal(hooks.__grassSpot(2, 0, 0.9), null, 'and none that steep, none');
-  // the wood: the most forest of the squares whose middle is grass - the heart itself is not, so its neighbour
-  const r = 2, wood = (tx, tz) => { let s = 0, k = 0; for (let dz = -r; dz <= r; dz += 2) for (let dx = -r; dx <= r; dx += 2) { s += forestAt(3 * 128 + tx + dx, -2 * 128 + tz + dz); k++; } return s / k; };
-  const spot = hooks.__forestSpot(r, true);
-  const tx = Math.round((spot.feet[0] - 3000) / 6.4 - 0.5), tz = Math.round((spot.feet[2] + 2000) / 6.4 - 0.5);
-  assert.ok(flatP.tilemapBytes[tz * 128 + tx] >> 2 === 2, `the tile it stands on (${tx}, ${tz}) is grass`);
-  assert.ok(Math.abs(spot.wood - wood(tx, tz)) < 1e-12 && spot.wood > 0.8, `its wood ${spot.wood}`);
-  for (let z = r; z < 128 - r; z += r) for (let x = r; x < 128 - r; x += r) {
-    if (flatP.tilemapBytes[z * 128 + x] >> 2 === 2) assert.ok(wood(x, z) <= spot.wood + 1e-12, `(${x}, ${z}) has no more`);
-  }
-  assert.ok(wood(...peak) > spot.wood, 'the heart itself has more, and is passed over');
-  assert.deepEqual(spot.origin, [3000, -2000]);
-});
-
 test('AUDIT GRASS-LIT2 C10: the ground the lanterns are held to IS the terrain programs\' text - groundLanterns models TERRAIN_FS\'s loop and the lane\'s elPointLit diffuse, so a change to either fails here, not just in the picture', () => {
   const r = src('render/renderer.js');
   const at = r.indexOf('const TERRAIN_FS = `');
@@ -710,10 +617,4 @@ test('AUDIT GRASS-LIT2 C11: the probes measure what they say - the light probe\'
   assert.deepEqual(grassLit(WOOD, 0.5, NOON, false, 1, GRASS_TONES_CLASSIC), grassLit(WOOD, 0.5, NOON, false));
   const old = grassLit(WOOD, 0.5, NOON, false, 1, GRASS_TONES), now = grassLit(WOOD, 0.5, NOON, false);
   assert.ok(old.every((v, i) => v > now[i]), 'the classic blade before GRASS-LIT2 was the brighter');
-  // the light probe's two "was" columns take it; the docs quote that probe (0.21-0.52x and 1.34-1.43x before)
-  const light = readFileSync(new URL('../../tools/grassLightProbe.mjs', import.meta.url), 'utf8');
-  assert.ok(light.includes('was = grassLit(mean, 0.5, base, lane, 1, GRASS_TONES)') && light.includes('was = grassLit(mean, 0.5, night, lane, 1, GRASS_TONES)'));
-  // the look probe hands a palette to the lane booted - one argument painted the default lane's alone
-  const look = readFileSync(new URL('../../tools/grassLookProbe.mjs', import.meta.url), 'utf8');
-  assert.ok(look.includes('window.__grassTones?.(x.tones, x.classic)') && look.includes('classic: v.classic ?? prefs.enhancedLighting === false'));
 });

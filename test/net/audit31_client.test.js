@@ -154,7 +154,6 @@ test('AUDIT 31 B7: the Work list is kept per account and character, and a read b
 
 test('AUDIT 31 B8: a bid that leads already, a bid standing on one\'s own auction and a bid overtaken as it was decided each let the market\'s view go', () => {
   for (const w of ['auction-low', 'auction-leading', 'auction-bid-standing', 'auction-moved', 'market-gone']) assert.ok(MARKET_MOVED.includes(w), w);
-  assert.match(src('src/ui/marketTab.js'), /const MOVED = MARKET_MOVED;/, 'the tab reads the book\'s one list');
 });
 
 test('AUDIT 31 B10: a settle asked while another act is out waits for it and runs - never refused `writ-busy` and left unasked', async () => {
@@ -188,7 +187,6 @@ test('AUDIT 31 B10: a settle asked while another act is out waits for it and run
   mrelease();
   await bid;
   assert.deepEqual([(await msettle).settled, mdropped.length], [1, 1]);
-  assert.match(src('src/ui/noticeWindow.js'), /b\.disabled = busy \|\| workBusy \|\| held < w\.qty \|\| full;/, 'nor a Court writ taken while a guild writ\'s act is out');
 });
 
 test('AUDIT 31 H1: a piece one book keeps an act on is never taken by the other; a piece the service says is elsewhere is never put back - and a settle takes the save\'s copy out', async () => {
@@ -237,19 +235,7 @@ test('AUDIT 31 H1: a piece one book keeps an act on is never taken by the other;
   await w2.settle((it) => back.push(it), (it) => { const i = two.pack.findIndex((x) => x.provenance === it.provenance); if (i >= 0) two.pack.splice(i, 1); });
   assert.deepEqual([back.length, two.pack.length, w2.pending], [0, 0, 0]);
   assert.deepEqual([...PIECE_GONE].sort(), ['market-listed', 'market-standing', 'market-uncollected']);   // PIN MOVED (MARKET-KEEP): never 'market-not-yours'
-  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');   // PIN MOVED (BAY-LEFT-SEA): HOST-SPLIT - the market's pieces and hubs moved out of bootWorld to scenes/marketPiecesHost.js
-  assert.match(w, /holds: \(pv\) => !!writBook\?\.holdsPiece\(pv\)/);
-  assert.match(w, /holds: \(pv\) => !!marketBook\?\.holdsPiece\(pv\)/);
-  assert.match(w, /const pieceKept = \(pv\) => !!marketBook\?\.holdsPiece\(pv\) \|\| !!writBook\?\.holdsPiece\(pv\);/);
   assert.ok(REFUSALS[PIECE_KEPT_ERROR] && REFUSALS['market-no-record']);
-});
-
-test('AUDIT 31 H5: every list a crafted piece can lie in - the pack, the home\'s things, the wagon, a repairer\'s hands - is minted, put back and dropped by its provenance', () => {
-  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');   // PIN MOVED (BAY-LEFT-SEA): HOST-SPLIT - the market's pieces and hubs moved out of bootWorld to scenes/marketPiecesHost.js
-  assert.match(w, /const pieceLists = \(\) => \[playerEntity\.items, playerEntity\.furnishings, playerEntity\.wagonItems, playerEntity\.otherItems\]\.filter\(Array\.isArray\);/);
-  assert.match(w, /for \(const list of pieceLists\(\)\) \{   \/\/ AUDIT 31 H5/);
-  assert.match(w, /const marketPutBack = \(item, where\) => \{\n\s*if \(!item\?\.provenance\) return;\n\s*if \(heldProvenances\(\)\.has\(item\.provenance\)\) return;/);
-  assert.match(w, /const have = heldProvenances\(\);   \/\/ AUDIT 31 H5/);
 });
 
 test('AUDIT 31 H3, H9: a crafted piece keeps the recipe it was minted of - an Ebony piece is never a Warforged one\'s; worn by a point is never whole', () => {

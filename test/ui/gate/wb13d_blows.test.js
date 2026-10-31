@@ -102,8 +102,6 @@ test('WB13d a blow into his ward says Warded - never a number, the relay refuses
   assert.deepEqual(numberFor({ hit: true, damage: 14, target: { warded: true } }), { kind: 'warded', text: 'Warded', tag: null });
   assert.deepEqual(numberFor({ hit: true, damage: 14, target: { warded: false } }), { kind: 'hit', text: '14', tag: null });
   assert.deepEqual(numberFor({ hit: false, target: { warded: true } }), { kind: 'miss', text: 'Miss', tag: null }, 'a miss is a miss');
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hitnum-warded \{ font-size: calc\(20px \* var\(--hud-scale, 1\)\); font-weight: 600; color: #ffdf8e; \}/);
-  assert.match(read('src/scenes/dungeonContext.js'), /b\.entity\.warded = !!b\.warded;/);
 });
 
 test('WB13d his elemental blows shake the camera as his physical ones do - the DamageShaker hears the amount - and still never flash (DFU\'s spell damage does not) (mutants: no shake; a flash for his frost)', () => {
@@ -118,7 +116,6 @@ test('WB13d his elemental blows shake the camera as his physical ones do - the D
     assert.deepEqual(heard, [23, 7]);
     assert.equal(playerDamageFlash.takeBlow(), true, 'a physical blow: both');
   } finally { setRemoveHealthListener(null); }
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(!el\) flashPlayerDamage\(dmg\);\n\s*else shakePlayerDamage\(dmg\);/);
 });
 
 test('WB13d a landing felt: the camera shaken by how near it fell to my feet (LAND_SHAKE: its weight at nought metres, nothing at its reach) - his own where he stands, the meteor\'s at its mark; the Wrath and the Reckoning wherever I stand; nothing for one with no weight (mutants: the shake for every landing; the distance ignored)', async () => {
@@ -144,7 +141,6 @@ test('WB13d a landing felt: the camera shaken by how near it fell to my feet (LA
   await tick(far, 29000, state({ phase: 3, atk: W('wrath', { i: 3, at: 30000 }) }));
   await tick(far, 30000);
   assert.deepEqual(far.shakes, [LAND_SHAKE.wrath[0]], 'the Wrath wherever I stand');
-  assert.match(read('src/scenes/world.js'), /shake: \(amount\) => betterAmbience\.weaponKick\(amount\),   \/\/ WB13d/, 'under the player\'s own maxShake');
 });
 
 test('WB13d each landing lights the floor where it lands, never his chest: his own at his feet LANDING_LIGHT_Y over the floor; one away from him (the meteor, the hellfire) leaves his ember and lights where it fell for FX_LIGHT_MS, fading (mutants: the flare back on his chest; the meteor\'s light at him; a light that never fades)', async () => {

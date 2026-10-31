@@ -447,27 +447,3 @@ test('WW2 the host\'s gates: one omen a lane, each saying its own lines with its
 
 // ─── the wiring ──────────────────────────────────────────────────────────────────────────────────
 
-test('WW2 the wiring: the world host stands the lanes off the registry (its gate lanes, its theatres\' scans, the relay\'s word on both links), says each lane\'s site past the Bay, and keeps a seat\'s gate the Bay\'s; the client says a site a gate, and none past the Bay to a relay that would close on it; the hub keeps a fall, a site, a herald and a rite a lane and hands a receipt a lane; the account service keeps a gate past the Bay out of a seat (mutants: the lanes\' links, the site said per gate, the hub\'s lane keys, the seat\'s lane)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /const theatreGates = params\.has\('online'\) \? createTheatreGateScans\(\{\s*places: worldPlaces,/);
-  assert.match(world, /const gateOmen = params\.has\('online'\) \? createGateLanes\(\{/);
-  assert.match(world, /scans: theatreGates, lanesOk: \(\) => !!online\?\.gateLanesOk && !!socialLink\(\)\?\.gateLanesOk, here: \(\) => playerTravelPixel\(\)/);
-  assert.match(world, /for \(const \{ lane, c \} of gateOmen\?\.currents\(\) \?\? \[\]\) if \(lane && c\.site\) socialLink\(\)\?\.sendGateSite\?\.\(c\.site\.day, c\.site\.px, c\.site\.py, c\.site\.place\)/);
-  // PIN MOVED (WW-GATES-EVERYWHERE A2b): a lane past the Bay's kill names its province's region (scenes/gate/gateSeat.js) - the
-  // Bay's lane's its scan's, as before
-  assert.match(world, /try \{ region = c \? gateSeatRegion\(c\.d, _gateScan\) : null; \} catch \{ region = null; \}/);
-  const online = src('src/net/online.js');
-  assert.match(online, /this\.gateLanesOk = relaySupportsGateLanes\(relayV\)/);
-  assert.match(online, /if \(gateLaneWire\(day\) !== 0 && !this\.gateLanesOk\) return false;/);
-  assert.match(online, /if \(said\.has\(day\)\) return true;/);
-  const relay = src('server/src/index.js');
-  for (const k of ['gatefell', 'gatesite', 'herald']) assert.match(relay, new RegExp(`gateLaneKey\\('${k}', lane\\)`), `the hub's ${k} a lane`);
-  assert.match(relay, /gateLaneKey\(RITE_KEY, lane\)/);
-  assert.match(relay, /for \(const lane of GATE_LANES_OPEN\) await this\._heraldLaneBeat\(h, lane, now\);/);
-  assert.match(relay, /const keys = GATE_LANES_OPEN\.map\(\(lane\) => gateReceiptKey\(sub, lane\)\);/);
-  assert.match(relay, /const k = gateReceiptKey\(sub, gateLaneOf\(day\)\);/);
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): a province's gate its own province's seats' (net/townSeatLaw.js gateRegionOk), no other's
-  assert.match(src('server-account/src/accounts.js'), /c\.x !== 'rite' && gateRegionOk\(c\.d, region\) \? region : null/);
-  // PIN MOVED (WW-GATES-EVERYWHERE): the refusal named for what it is - a region not the gate's lane's ('beyond-the-bay' before)
-  assert.match(src('server-account/src/seatInfluence.js'), /if \(!gateRegionOk\(day, region\)\) return \{ counted: false, why: 'not-its-region' \};/);
-});

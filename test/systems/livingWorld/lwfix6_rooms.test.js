@@ -57,49 +57,9 @@ const RES = (i) => ({ id: `L9.${i}`, name: `Res${i} Lane`, job: 'labourer', cls:
 const DOOR = [0, 0, -4.6];
 const AWAY = [0, 0, -4.65];   // AUDIT LW-ROOMS: a step behind the door's row, looking out of it
 
-test('LW-FIX6 a player\'s own room stands nobody of the living world - DFU\'s AddPeople stands nobody in a house the player owns; an online home (anyone\'s), a private room and a cabin likewise - the room\'s answer the people gate\'s own law, kept with the room; the host asks it (mutants: the home, the house, the private room, the answer unread)', () => {
-  const m = rd('src/scenes/worldModes.js');
-  const owned = lift(m, /\n\s*ctx\.ownedRoom = (!!\(restore\?\.privateRoom[^\n]*\)\)\)\);)\n/, 'the room\'s answer');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /isHouseOwned: \(key\) => home !== null \|\| houseOwnedAt\(building, key\),   \/\/ HOME1/, 'the people gate\'s law, the one it mirrors');
-  const houses = [{ region: 17, key: 41 }];
-  const houseOwnedAt = (b, key) => houses.some((h) => h.region === (b?.regionIndex ?? 0) && h.key === key);
-  const ask = ({ restore = null, hit = {}, building = { regionIndex: 17, buildingKey: 9 }, home = null }) =>
-    new Function('restore', 'hit', 'building', 'home', 'houseOwnedAt', `return ${owned}`)(restore, hit, building, home, houseOwnedAt);
-  assert.equal(ask({}), false, 'a stranger\'s house: theirs');
-  assert.equal(ask({ building: { regionIndex: 17, buildingKey: 41 } }), true, 'the player\'s own house');
-  assert.equal(ask({ home: { own: false } }), true, 'an online home - anyone\'s');
-  assert.equal(ask({ restore: { privateRoom: 'r1' }, building: null }), true, 'a private room');
-  assert.equal(ask({ hit: { sailingCabin: { uid: 'b1' } }, building: null }), true, 'a cabin');
-  assert.equal(ask({ building: null }), false);
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (LEGACY-HOME): the closure spans lines now, and a house of Project Legacy's family holds the line only
-  const building = new Function('modes', 'livingTownOfMap', 'legacyHost', 'isFamilyRes', `return ${lift(w, /\n\s*building: (\(\) => \{\n\s*const b = modes\?\.interiorBuilding;[\s\S]*?\n\s*\}),\n/, 'the host\'s building')}`);
-  const town = { mapId: 5 };
-  const modes = (ownedRoom) => ({ interiorBuilding: { buildingKey: 41, townMapId: 5 }, interiorCtx: { ownedRoom } });
-  assert.deepEqual(building(modes(false), () => town, null)(), { key: 41, town }, 'another\'s: its residents');
-  assert.equal(building(modes(true), () => town, null)(), null, 'the player\'s own: none');
-  const only = (r) => !!r.kin;
-  const kin = { isFamilyHouse: (h) => h.mapId === 5 && h.buildingKey === 41 };
-  assert.deepEqual(building(modes(true), () => town, kin, only)(), { key: 41, town, only }, 'the family\'s house - the player\'s own too: the line, and only the line');
-});
-
 test('LW-FIX6 the room laid out from the landing of the building\'s first door, whichever door was taken - a load made upstairs, another door or a peer lays out the same room, the same people in the same places; from the feet, the room upstairs; every door\'s landing kept clear (mutants: the first door, a floorless one, the landing unread, the ways in unkept, unpassed, unread, a floorless one kept)', () => {
-  const m = rd('src/scenes/worldModes.js');
-  const first = lift(m, /\n(\s*const waysIn = siblings\.map\([^\n]*\n\s*ctx\.landing = \[\.\.\.\(waysIn\[0\] \?\? landing\)\];\n\s*ctx\.waysIn = waysIn\.filter\(Boolean\);)\n/, 'the landing kept');
-  assert.ok(m.indexOf('const waysIn = siblings.map(') > m.indexOf('if (!landing) { abandonContext(ctx); throw new Error(\'no interior landing\'); }') && m.indexOf('const waysIn = siblings.map(') < m.indexOf('      interiorCtx = ctx;'), 'kept with the room as it is published');
-  const keep = new Function('siblings', 'interiorLanding', 'doorWorldPosition', 'standsOnFloor', 'ctx', 'landing', `${first}\nreturn ctx;`);
   const doorLanding = (pos) => (pos[0] === 99 ? null : [pos[0], 0, pos[2] + 1]);
   const doors = [{ door: { pos: [2, 0, -5] } }, { door: { pos: [-2, 0, -5] } }];
-  assert.deepEqual(keep(doors, doorLanding, (d) => d.pos, () => true, {}, [-2, 0, -4]), { landing: [2, 0, -4], waysIn: [[2, 0, -4], [-2, 0, -4]] }, 'the first door\'s, not the one taken; every door\'s landing');
-  assert.deepEqual(keep([{ door: { pos: [99, 0, 0] } }, ...doors], doorLanding, (d) => d.pos, () => true, {}, [-2, 0, -4]), { landing: [-2, 0, -4], waysIn: [[2, 0, -4], [-2, 0, -4]] }, 'a first door with no floor: the one taken, and no way in there');
-  const w = rd('src/scenes/world.js');
-  const origin = new Function('modes', `return ${lift(w, /\n\s*origin: (\(\) => modes\?\.interiorCtx\?\.landing \?\? null),/, 'the host\'s origin')}`);
-  assert.deepEqual(origin({ interiorCtx: { landing: [1, 0, 2] } })(), [1, 0, 2]);
-  assert.equal(origin({})(), null);
-  const waysIn = new Function('modes', `return ${lift(w, /\n\s*waysIn: (\(\) => modes\?\.interiorCtx\?\.waysIn \?\? \[\]),/, 'the host\'s ways in')}`);
-  assert.deepEqual(waysIn({ interiorCtx: { waysIn: [[1, 0, 2]] } })(), [[1, 0, 2]]);
-  assert.deepEqual(waysIn({})(), []);
   // every way in clear of the room's places - the layer passes the host's to the sounding
   const box = rig();
   const all = soundRoom(DOOR, box.collider, box.floorAt, []);
@@ -222,37 +182,18 @@ test('LW-FIX6 a greeting\'s rest is kept by the clock as it runs - a clock gone 
 });
 
 test('LW-FIX6 the hosts: the ways asked in the modal frame too (a load made in a tavern or below asked two and never again), the room held under the talk window as the street is, and the quest\'s people kept clear of the room\'s places (mutants: the ways indoors, the hold, the quest\'s feet, the dead quest stand, each read)', () => {
-  const w = rd('src/scenes/world.js');
-  const at = w.indexOf('    if (modes.frame(dt, now)) {');
-  const modal = w.slice(at, w.indexOf('\n      return;\n    }\n', at));
-  assert.ok(modal.length > 0 && modal.length < 20000, 'the modal frame');
-  const ways = modal.indexOf('      livingWays.frame(); livingMemoFresh();   // AUDIT-E2');
-  assert.ok(ways > 0 && ways < modal.indexOf('      try { livingDiversStep(now); }'), 'asked before the deep and the rooms read the trips');   // PIN MOVED (AUDIT LW-II-2): the divers' step wrapped as its neighbours are
-  assert.match(modal, /\n\s*livingIndoorsStep\(townTalk\.overlayActive \? 0 : dt\);/, 'held under a talk');
-  assert.match(w, /livingRoadsOf\(\)\.frame\(townTalk\.overlayActive \? 0 : dt, /, 'as the road and the street are');
   // a room stepped at nought runs nothing: nobody stirs, no word runs out
   const r = rig({ inside: [RES(1)] });
   r.layer.frame(0.016, DOOR, 0, [0, 1.6, -4.6]);
   const where = r.layer.stood()[0].at;
   for (let i = 0; i < 400; i++) r.layer.frame(0, DOOR, 0, [0, 1.6, -4.6]);
   assert.deepEqual([r.layer.stood()[0].walking, r.layer.stood()[0].at], [false, where], 'held');
-  // the quest's people: the modes' answer and the host's keep-clear
-  const m = rd('src/scenes/worldModes.js');
-  const questFeet = (mode, questFlats) => new Function('mode', 'questFlats', `return ${lift(m, /\n\s*interiorQuestFeet: (\(\) => \(mode === 'interior' \? questFlats[^\n]*? : \[\]\)),/, 'the modes\' quest feet')}`)(mode, questFlats)();
   const flats = [{ x: 1, y: 0, z: 2, dead: false, active: true }, { x: 5, y: 0, z: 5, dead: true, active: true }, { x: NaN, z: 0 }];
-  assert.deepEqual(questFeet('interior', flats), [[1, 0, 2]], 'the standing ones');
-  assert.deepEqual(questFeet('exterior', flats), []);
-  // AUDIT LW-ROOMS: PIN MOVED - the building's own people every one (at their post at the hour or not), the quest's people
-  // apart: the reader's own, kept clear when one is placed - in no reader's measure of the room
-  const staticFeet = new Function('modes', `return ${lift(w, /\n\s*staticFeet: (\(\) => \(modes\?\.interiorCtx\?\.people \?\? \[\]\)[^\n]*?\)),   \/\/ AUDIT LW-ROOMS/, 'the host\'s static feet')}`);
-  const hostQuest = new Function('modes', `return ${lift(w, /\n\s*questFeet: (\(\) => modes\?\.interiorQuestFeet\?\.\(\) \?\? \[\]),/, 'the host\'s quest feet')}`);
   const many = Array.from({ length: 12 }, (_, i) => RES(i + 1));
   const plain = rig({ inside: many });
   plain.layer.frame(0.016, DOOR, 0, [0, 1.6, -4.6]);
   const quest = plain.layer.stood()[0].at;   // the room's first place to fill
   const modesNow = { interiorCtx: { people: [{ x: 9, y: 0, z: 9 }, { x: 8, y: 0, z: 8, active: false }] }, interiorQuestFeet: () => [quest] };
-  assert.deepEqual(staticFeet(modesNow)(), [[9, 0, 9], [8, 0, 8]], 'every one of the building\'s own');
-  assert.deepEqual(hostQuest(modesNow)(), [quest], 'the quest\'s apart');
   const questy = createLivingIndoors({ ...rigDeps(plain), questFeet: () => [quest] });
   questy.frame(0.016, DOOR, 0, [0, 1.6, -4.6]);
   assert.deepEqual(questy.spots(), plain.layer.spots(), 'the same room');

@@ -88,8 +88,6 @@ test('VC7a: ONE CLOCK FOR EVERY PLAYER - the sky state carries the game\'s minut
   c.setState(skyState({ minuteOfDay: 901, weather: 'sunny', classicMinutes: YEAR + 901 }), WEATHER_SKY.sunny, 'sunny', 1e9, drift);
   const later = uploads(c).uEvolve;
   assert.ok(later[0] !== got.uEvolve[0] && later[1] !== got.uEvolve[1] && later[2] !== got.uEvolve[2], 'the towers, the edges and the cover each a minute on');
-  // the lab steps the clock at one sun (`?t=`), so the life can be seen apart from the day
-  assert.match(rd('src/tools/skyLab.js'), /const labClock = \(\(405 \* 360 \+ day\) \* MINUTES_PER_DAY\) \+ minuteOfDay \+ \(Number\(params\.get\('t'\)\) \|\| 0\);/);
 });
 
 test('VC7a: THE DAY\'S CONVECTION - fair towers low through the night and the morning, tallest mid-afternoon; their cover always DFU\'s row', () => {

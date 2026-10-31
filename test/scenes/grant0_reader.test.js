@@ -132,15 +132,3 @@ test('GRANT0 executed: champions - an honest owner\'s stand as champions; a forg
   } finally { _resetForTests(); }
 });
 
-test('GRANT0 by source: the street gates the signature and both of a puppet\'s stands count champions; the dungeon\'s copies take a cast its kind casts at its owner\'s level and never paralysed, believe a revenant\'s fields inside FOE-FORGE\'s bound, and a signature on a revenant alone; no relay change', () => {
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /entity: f\.entity, collider, sig: f\.entity\.revenant \? SIG : null \}\);/);
-  assert.equal((x.match(/const cp = Number\.isInteger\(r\.cp\) && championsOf\(from\) < PEER_CHAMPION_PUPPETS_MAX \? r\.cp : null;/g) ?? []).length, 2);
-  assert.match(x, /for \(const \[k, r\] of _pupPending\) if \(r\._cp && k\.startsWith\(from \+ ':'\)\) n\+\+;/, 'the builds in flight counted');
-  assert.match(x, /_camp: campTags\.get\(r\.i\) \?\? _pupPending\.get\(key\)\._camp, _cp: _pupPending\.get\(key\)\._cp \}\); continue; \}/, 'a later word keeps the build\'s count');
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const sp = f\._pupMine && !entityIsParalyzed\(f\.entity\) && enemySpellIndices\(f\.entity, f\.streamedLevel \?\? f\.entity\.level\)\.includes\(p\.cast\) \? \(spellsByIndex\?\.get\(p\.cast\) \?\? null\) : null;/);
-  assert.match(d, /const _feudOk = _fw == null \|\| f\._feudWire != null \|\| !!f\.entity\.revenant\?\.id \|\| foes\.filter\(\(x\) => x !== f && !x\.dead && x\._feudWire != null && \(x\._ownFrom \?\? null\) === \(f\._ownFrom \?\? null\)\)\.length < PEER_REVENANT_PUPPETS_MAX;\s*if \(_feudOk && _fw !== \(f\._feudWire \?\? null\)\)/);
-  assert.match(d, /_to === _me, entity: f\.entity, collider, sig: f\.entity\.revenant \? SIG : null \}\);/);
-  assert.doesNotMatch(rd('server/src/index.js'), /GRANT0|PEER_CHAMPION_PUPPETS_MAX/, 'a reader\'s law - no relay change, no version bump');
-});

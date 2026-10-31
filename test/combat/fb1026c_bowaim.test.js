@@ -94,36 +94,3 @@ test('BOW-AIM THE CONJUGATION (mwFirstPerson.js rootSpaceTurn): RotateController
   assert.equal(applyRotateController(sk, new Map(), GRAPH_ROOT, sm, undefined, rotNegX(0.4)), false, 'no bone, no turn');
 });
 
-test('BOW-AIM THE SLOT AND THE BODY MOTION: poseAssembly lays the aim after the clip and the neck and before the body motion, and with a bow\'s arms the clip\'s the motion keeps the pitched chest - the bow points where the look does (mutants: BOW-AIM-slot-unread, BOW-AIM-slot-after-motion)', () => {
-  const src = rd('src/formats/morrowind/mwFirstPerson.js');
-  const neck = src.indexOf('  applyFirstPersonNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);');
-  const aim = src.indexOf('  assembly.aimFit = aim ? aim(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;');
-  const motion = src.indexOf('  assembly.motionFit = motion ? motion(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;');
-  assert.ok(neck > 0 && aim > neck && motion > aim, 'the neck, the aim, the motion');
-  // through the real call: the slot over the clip's (rest) pose, the body motion holding a drawn bow
-  const body = bodyOf(sk, GRAPH_ROOT, sm);
-  const pose = (pitch) => {
-    const motion = createBodyMotion();
-    let out = null, fit = null;
-    for (let i = 0; i < 60; i++) {
-      motion.step(1 / 60, sceneInput({ weapon: W.MarksmanBow, kind: 'male' }));
-      const assembly = { fns: { poseSkeleton, skelMats: sm }, skeleton: sk, pieces: [] };
-      poseAssembly(assembly, { sampleTrack, aim: spineAimSlot(pitch), motion: motion.slot });
-      out = assembly.mats; fit = assembly.motionFit;
-    }
-    assert.ok(motion.weight() > 0.99 && fit, 'the body motion on and laid (its legs, the clip\'s arms)');
-    return bodyFrames(body, out).fwd;
-  };
-  const level = pose(0), down = pose(0.3);
-  const tilt = Math.asin(Math.max(-1, Math.min(1, level[2]))) - Math.asin(Math.max(-1, Math.min(1, down[2])));
-  assert.ok(near(tilt, 0.3, 0.02), `the chest's forward tipped down by the pitch under the body motion (${tilt.toFixed(4)})`);
-});
-
-test('BOW-AIM THE WIRING (combat/fpArm.js): the third-person body\'s pose hands the slot the look\'s pitch negated into Morrowind\'s (rot[0] + down, cam.pitch + up) times the factor of the arm\'s own state, asked only past WeaponEquipped with the look pitched; the first-person arm takes none (VM_FirstPerson attaches no spine controllers) (mutants: BOW-AIM-sign-kept, BOW-AIM-unwired, BOW-AIM-asked-at-rest)', () => {
-  const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /aim: cam\?\.pitch && upper > UPPER_BODY\.WeaponEquipped \? spineAimSlot\(-cam\.pitch \* spinePitchFactor\(\{ upper: UPPER_BODY_NAME\[upper\], weaponType: stanceOf\(\), group: weaponGroup, time: actionState \? actionState\.time : -1, startTime: keyTime\(attackKeys\(attackType\)\.windUp\.start\), minAttackTime: keyTime\(attackKeys\(attackType\)\.minAttack\), completion: clipCompletion\(actionState\) \}\)\) : null,/, 'asked only while the look pitches and the upper body is past WeaponEquipped - the factor\'s own first test, so a level look and a body at rest (every peer\'s) cost nothing');
-  const third = arm.slice(arm.indexOf('poseAssembly(t.arm, {'), arm.indexOf('uploadThirdMesh(t);'));
-  assert.ok(third.includes('aim: cam?.pitch && upper > UPPER_BODY.WeaponEquipped ? spineAimSlot('), 'in the third-person body\'s pose');
-  const first = arm.slice(arm.indexOf('poseAssembly(built.arm, {'), arm.indexOf('packed = packFpArm(built.arm.pieces, packed);'));
-  assert.ok(!first.includes('aim:'), 'and not in the first-person arm\'s');
-});

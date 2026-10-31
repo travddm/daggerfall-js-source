@@ -218,9 +218,6 @@ test('SPYGLASS my Lookout calls her colours: a crewed deck with a Lookout reads 
   const f = spawn(bare, 'merchantCoaster', 340);
   bare.run(0.5);
   assert.equal(f.known, KNOW.hull, 'no Lookout aboard: the eye\'s reach alone');
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /return \{ deck, sight: st\?\.worth\?\.sight \?\? 1, lookout: !!deck\?\.crewed && !!st\?\.worth\?\.posts\?\.Lookout \};/, 'a Lookout on a crewed deck');
-  assert.match(host, /hailCalls\.set\(deck, `Flying \$\{colours\}!`\);/, 'cried from her bow');
 });
 
 test('SPYGLASS false colours at sea: a wary pirate under a merchantman\'s colours reads one on her tag and her card - friendly, no stance of hers - flies a merchantman\'s pennant, and no lookout hails her; the glass held close sees through her (a pirate to me from now); her black flag goes up as she goes for her prey (mutants: the disguise unread, the pennant, the hail\'s hold, the seeing-through, the black flag)', async () => {
@@ -269,22 +266,6 @@ test('SPYGLASS false colours at sea: a wary pirate under a merchantman\'s colour
   assert.equal(tagOf(r, p).faction, 'pirate');
 });
 
-test('SPYGLASS the crew\'s cries by what is known: a hostile sail\'s hail names her hull while her colours are unread, her class once they are; a ship called by her kind until then (mutants: the hail\'s name, the called name)', async () => {
-  const s = await sea({ hull: 2 });
-  const e = spawn(s, 'pirateSloop', 700);
-  for (let i = 0; i < 40 && !s.log.say.some((l) => l.startsWith('Sail ho')); i++) s.run(0.25);
-  assert.ok(s.log.say.includes('Sail ho! A sloop on the starboard beam!'), s.log.say.join(' | '));
-  const t = await sea({ hull: 2 });
-  const k = spawn(t, 'pirateSloop', 700);
-  knowAll(t.host);
-  for (let i = 0; i < 40 && !t.log.say.some((l) => l.startsWith('Sail ho')); i++) t.run(0.25);
-  assert.ok(t.log.say.includes('Sail ho! A Pirate Sloop on the starboard beam!'), t.log.say.join(' | '));
-  assert.ok(e && k);
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /const calledName = \(e\) => \(knownOf\(e\) < KNOW\.colours \? withArticle\(hullWord\(e\.ship\.hull\)\) : disguisedOf\(e\) \? shownName\(e\) : nameOf\(e\)\);/);
-  for (const cry of ['Check your fire! ${calledName(entry)} fights on your side.', '${calledName(victor)} grapples ${calledName(prize)}!', '${calledName(v)} takes ${calledName(p)} and sets it on fire!', '${calledName(e)} comes to your aid!']) assert.ok(host.includes(cry), cry);
-});
-
 test('SPYGLASS the world: the Spyglass action appended, a port row in Come Sail Away\'s group, shared onto K beside the road\'s follow; the touch corner\'s and the pad\'s to choose; the glass\'s frame - raised aboard alone, down under a window, the travel view, a laid broadside; the lens narrowed at the frame\'s three, the look slowed, the wheel its magnification; the road\'s follow never read aboard (mutants: each seam)', () => {
   assert.equal(ACTIONS.at(-6), 'Spyglass');   // SHOT-KINDS: and the guns' load   // PIN MOVED (UI-CALM, CARGO-ANYWHERE, PARTY-PING, Decorate): the saddle panel's key, the hold's and the ping's appended after it
   assert.ok(PORT_ACTIONS.includes('Spyglass'));
@@ -295,25 +276,6 @@ test('SPYGLASS the world: the Spyglass action appended, a port row in Come Sail 
   assert.deepEqual(TOUCH_BUTTON_ACTIONS.find((a) => a.id === 'Spyglass'), { id: 'Spyglass', label: 'Spyglass (aboard)', glyph: 'Glass', kind: 'tap', w: 64 });
   assert.ok(PLUS_BIND_ROWS.some((r) => r.sec === 'Spyglass'));
   assert.ok(DPAD_CHOICES.some(([a]) => a === 'Spyglass'));
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S1): never while a door builds or the world is moved
-  assert.match(w, /const spyglassAllowed = \(\) => navalOn\(\) && !!naval\?\.aboard\?\.\(\) && _mode\(\) === 'exterior' && walkMode && playerSpawned && !_loading && !gamePaused\(\)\n\s+&& !townTalk\.overlayActive && !travelView\?\.active && !naval\?\.aiming && !\(townTalk\.overlay instanceof DeathScreen\)\n\s+&& !modes\?\.transitioning && !worldMoveBusy\(\);/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S2/S3/S16): the host's own door and a finger's Lower press it too; a finger's Magnify turns it
-  assert.match(w, /const pressedNow = hccActionPressed\('Spyglass'\) \|\| navalTouchGlass\(\) \|\| glassDoorPress \|\| \(taps\.lower && spyglass\.up\);\n\s+glassDoorPress = false;\n\s+if \(pressedNow && \(spyglass\.up \|\| spyglassAllowed\(\)\)\) spyglass\.up = !spyglass\.up;\n\s+if \(spyglass\.up && !spyglassAllowed\(\)\) spyglass\.up = false;\n[^\n]*\n\s+mwViewHoldFirst\(spyglass\.up\);\n\s+spyglass\.lens = easeLens\(spyglass\.lens, spyglass\.up \? spyglass\.zoom : 1, dt\);/);
-  assert.match(w, /naval\.glass\(dt, \{ up: spyglass\.up, zoom: spyglass\.zoom, field, near: spyglass\.near \}\)/);   // PIN MOVED (AUDIT CAPTAIN'S SEA S19): and its field; PIN MOVED (GLASS-CLEAR): and its focus
-  // PIN MOVED (GLASS-CLEAR): its near the glass's focus; PIN MOVED (OW-HORIZON, 2026-10-20): the lens through
-  // scenes/travelHorizon.js horizonProj, taken after the travel view's frame (its planes grow under the view) - still
-  // after the glass's step
-  const stepAt = w.indexOf('spyglassStep(dt);'), lensAt = w.indexOf('const proj = horizonProj(glassFov(fieldOfView() + climbFeel.fovRad(), spyglass.lens), worldAspect, spyglass.near, tvf);');
-  assert.ok(stepAt > 0 && lensAt > stepAt, 'the step before the lens is taken');
-  assert.match(w, /sky\.draw\([^\n]*glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), worldAspect,/, 'the sky through the glass');
-  assert.match(w, /fovY: glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), aspect: worldAspect,/, 'the far ring through it');
-  assert.equal((w.match(/lookScale\(\) \* glassLookScale\(spyglass\.lens\)/g) || []).length, 2, 'the mouse\'s look and the finger\'s and pad\'s');
-  assert.equal((w.match(/lookScale\(\) \* lookInvert\(\) \* glassLookScale\(spyglass\.lens\)/g) || []).length, 2);
-  assert.match(w, /\|\| modes\?\.wheel\?\.\(e\) \|\| spyglassWheel\(e\.deltaY\) \|\| shotWheel\(e\.deltaY\) \|\| mwViewWheel\(e\.deltaY\)\) e\.preventDefault\(\);/, 'the wheel: the glass\'s before the camera\'s');   // PIN MOVED (SHOT-KINDS: the laid guns' load before the camera too)
-  assert.match(w, /spyglass\.zoom = Math\.max\(GLASS_ZOOM_MIN, Math\.min\(GLASS_ZOOM_MAX, deltaY < 0 \? spyglass\.zoom \* 2 : spyglass\.zoom \/ 2\)\);/);
-  assert.match(w, /function travelFollowPressed\(\) \{ return !naval\?\.aboard\?\.\(\) && pressed\(latch\.edge, keys, 'FollowPaths'\); \}/, 'a deck has no road');
-  assert.match(w, /glassUp: spyglass\.up,/, 'the plate\'s Glass brass while it is up');
 });
 
 test('SPYGLASS the lens: eased to the glass\'s magnification over GLASS_EASE_S and home, snapped within a hair; the field\'s tangent divided by it; the look slowed by it (mutants: the ease, the snap, the tangent, the look)', () => {

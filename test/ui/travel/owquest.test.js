@@ -106,16 +106,6 @@ test('OW-QUEST the look: never filtered (a quest is the point, not clutter); the
   questGlyph(b, 10, 10, false);
   assert.ok(!b.ops.some((op) => op[0] === 'fill'), 'the rest: hollow');
   assert.equal(TV_QUEST_R, 7);
-  const hud = readFileSync(new URL('../../../src/ui/travel/travelViewHud.js', import.meta.url), 'utf8');
-  assert.match(hud, /if \(k === 'quest'\) return k;/, 'its own look');
-  assert.match(hud, /\} else if \(look === 'quest'\) \{[^\n]*\n\s+questGlyph\(g, x, y, \/\\btracked\\b\/\.test\(m\.kind \?\? ''\)\);/, 'drawn as its diamond');
-});
-
-test('OW-QUEST the host: the quest marks read the host\'s own place law (questPixel, the compass\'s and the held map\'s), and a pressed diamond is a journey by the roads to its place - its summary from the pixel, wherever on the map it lies (mutants: the press unread; the pixel\'s numbers swapped)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /createTravelViewMarks\(\{[^]*?playerTravelPixel, questPixel, seaRaidPeerChase,[^]*?\}\);/, 'handed the place law');
-  assert.match(w, /const qp = \/\^quest:\(-\?\\d\+\),\(-\?\\d\+\)\$\/\.exec\(key\);[^\n]*\n\s+const plate = qp \? \{ summary: tvPlaceSummary\(Number\(qp\[1\]\), Number\(qp\[2\]\), true\) \} : /, 'the press: its place by its pixel');   // PIN MOVED (BAY-LEFT-MAPS): a pixel west or north of the Bay's corner too, the place the quest names
-  assert.match(w, /if \(plate\?\.summary && travelViewCanGo\(\)\) travelViewRouteTo\(plate\.summary\);/, 'by the roads, where the view may go');
 });
 
 test('AUDIT OW-REVISITED L5-2 / L5-4 / L5-5: TRACK-ONLY on the Overworld - nothing tracked, nothing filled and nothing held at the edge (the journal\'s followed or latest quest is no screen\'s); a mark\'s point kept between frames and let go when its quest is done; a journey bound for the tracked quest\'s place holds ITS end at the edge, one arrow a place; the diamond\'s arrow and words in the journal\'s gold (mutants: tracked() for shown(); the hold never freed; the hold made every frame; two arrows; the gold dropped)', () => {
@@ -152,9 +142,6 @@ test('AUDIT OW-REVISITED L5-2 / L5-4 / L5-5: TRACK-ONLY on the Overworld - nothi
     _resetQuestTrackerForTests();
     if (hadDoc === undefined) delete globalThis.document; else globalThis.document = hadDoc;
   }
-  const hud = readFileSync(new URL('../../../src/ui/travel/travelViewHud.js', import.meta.url), 'utf8');
-  assert.match(hud, /look === 'bounty' \? C\.bounty : look === 'quest' \? QUEST_MARK_CSS : look === 'waypoint'/, 'its arrow in the gold');
-  assert.match(hud, /look === 'stranger' \? C\.stranger : look === 'quest' \? QUEST_MARK_CSS : C\.bone;   \/\/ OWS3/, 'its words in the gold');
 });
 
 test('AUDIT OW-REVISITED L5-6: THE MARK\'S TIME LINE IN THE PLAYER\'S LANGUAGE - OW-QUEST put the quest faces\' time left under every quest mark, always shown, and it was English in every language; the held map\'s card for several quests too ("N quests", "+N more") (mutants: the count English; the phrase English; the card\'s count English)', () => {

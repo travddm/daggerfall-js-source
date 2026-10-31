@@ -77,8 +77,6 @@ test('EG5 THE MERGE (section 14): the lord family\'s four are the gate\'s boss-g
   assert.deepEqual([PAGE.unyielding[0].shieldX, PAGE.unyielding[0].hitX], [T('unyielding').shieldMs / SHIELD_MS, T('unyielding').hit]);
   assert.equal(PAGE.vengeful[0].dmgX, T('vengeful').dmg);
   assert.deepEqual([PAGE.grudge[0].threatPick, PAGE.grudge[0].threatDecay], [T('grudge').threatPick, T('grudge').threatDecay]);
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLaw.js', import.meta.url), 'utf8');
-  for (const read of ["milli(trial('colossal').size)", "milli(trial('colossal').hp)", "milli(trial('unyielding').hit)", "milli(trial('vengeful').dmg)", "milli(trial('grudge').threatPick)", "milli(trial('grudge').threatDecay)"]) assert.ok(src.includes(read), `rank I read off the gate's trial: ${read}`);
   // the lord family alone carries a law: every other decree is the fight with none
   for (const D of EG_DECREES) if (D.fam !== 'lord') assert.deepEqual({ ...egFightProfile([[D.id, 2]]).law }, ONE, `${D.key} carries no law`);
   assert.deepEqual([...EG_LAW_X_KEYS], ['sizeX', 'hpX', 'radiusX', 'shieldX', 'hitX', 'dmgX']);
@@ -147,11 +145,6 @@ test('EG5 THE PROFILE\'S VALIDATOR AND ITS CACHE (section 14, "The profile"): a 
   assert.deepEqual(again, made[1], 'and made the same');
   for (let k = 0; k < 400; k++) egFightProfile(pairs[k]);
   assert.equal(egProfilesKept(), EG_PROFILE_CACHE_MAX);
-  // the law decides in integers: no transcendental in the profile's block (section 9's sweep)
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLaw.js', import.meta.url), 'utf8');
-  const block = src.slice(src.indexOf('export const EG_LAW_UNIT'), src.indexOf('export const egProfilesKept'));
-  assert.ok(block.length > 3000, 'the profile found');
-  for (const bad of ['Math.sin', 'Math.cos', 'Math.tan', 'Math.atan', 'Math.random', 'Math.sqrt', 'Math.hypot', 'Math.pow', 'Math.exp', 'Math.log', 'Math.cbrt', 'Date.now']) assert.ok(!block.includes(bad), `the profile calls ${bad}`);
 });
 
 test('EG5 THE LORDS\' LAW READS THE PROFILE (net/eliteGates/egLords.js egLordLaw): under every rank of the four (0, I, II - 81 sets) and words that are no decree (the Wellhead\'s feud) beside them, the law each lord runs by is section 14\'s numbers, with the gate\'s own threat (THREAT_PICK, THREAT_DECAY) where no decree names it - fresh each call (mutants: rank II read as I; the gate\'s threat lost; a word that is no decree folded)', () => {

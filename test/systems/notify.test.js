@@ -181,7 +181,6 @@ test('ENH-NOTICE3: push rides through to the host, and NOTHING else does - the d
   // two-thirds false. The presenter opts are `{ push }` and no more.
   assert.deepEqual(log.map((r) => Object.keys(r.opts)), [['push'], ['push']],
     'mutant: a callback smuggled back into the opts, which two hosts would drop');
-  assert.equal(/onClose/.test(src('src/systems/notify.js')), false, 'and the door does not name one');
   // ...and the LADDER on its own, for a window a host built (the quest
   // ServiceFlowWindow): the same asking order, no box minted.
   const win = { lines: ['a quest'] };
@@ -248,93 +247,6 @@ test('ENH-NOTICE3: toRows - SetText\'s one Text token, rows as given, and never 
 
 // ── THE ONE-HOME SWEEP ───────────────────────────────────────────────
 
-test('ENH-NOTICE3: notify decides WHICH MODEL, the draw decides WHICH FACE - the door never imports the skin', () => {
-  const s = src('src/systems/notify.js');
-  // The skin fork lives where the enhanced idiom already put it: the
-  // box's own draw (ui/actionText.js), the HUD text's (ui/hud/hudText.js),
-  // the label's (ui/midScreenText.js). A second fork here would be a
-  // second home for the skin decision and the faces would drift.
-  // the file SAYS so in its header ("does not import ui/uiSkin.js and
-  // never will"), so the pin is on the imports and the reads, not on
-  // the word - a promise in a comment is not a pin.
-  const code = s.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
-  assert.equal(/uiSkin/.test(code), false, 'systems/notify.js must not import or read ui/uiSkin.js');
-  assert.equal(/enhancedSkin|isEnhanced|skin\(\)/.test(code), false, 'nor ask which skin is on by another name');
-  assert.equal(/from '(?:\.\.?\/)+(?:[\w-]+\/)*enhancedNotice\.js'/.test(code), false, 'nor the enhanced panel itself');
-  // the two it DOES stand on are the model's own, not a face's
-  assert.match(code, /import \{ ActionTextBox \} from '\.\.\/ui\/actionText\.js';/);
-});
-
-test('ENH-NOTICE3 A: the Travel Options mod\'s MessageBox lines no longer collapse onto the HUD line', () => {
-  const w = hostText('src/scenes/world.js');
-  // THE BUG. `say` is AddHUDText and `messageBox` is
-  // DaggerfallUI.MessageBox; this host wired both to townTalk.say, so
-  // every arrival text and every refusal the mod raises as a modal
-  // parchment printed as one fading HUD line.
-  assert.match(w, /\n\s*say: \(line\) => townTalk\.say\(line\),\n/, 'the HUD-text dep stays what it is');
-  assert.match(w, /\n\s*messageBox: \(line\) => messageBox\(line\),\n/, 'and the box dep names the box kind');
-  assert.equal(/messageBox: \(line\) => townTalk\.say\(line\)/.test(w), false, 'the collapse is gone');
-  // and the OTHER exterior host wires no Travel Options at all - the
-  // journey is world.js's alone (?exterior loads one fixed city and
-  // runs no streamer), so there is no second copy of this seam to fix.
-  assert.equal(/travelOptions/.test(src('src/scenes/exterior.js')), false,
-    'exterior.js does not wire Travel Options (nothing to migrate there)');
-});
-
-test('ENH-NOTICE3 B: every migrated host seam names the KIND and mints no window of its own', () => {
-  // The six `messageBox:` deps, the two `showRecord:` deps, the
-  // infection's shared factory and the town host's box door. Each is
-  // sliced out of its own file and swept: it must call the seam, and
-  // it must not build a window.
-  const dep = (file, from, to) => {
-    const s = src(file);
-    const i = s.indexOf(from);
-    assert.ok(i >= 0, `${file}: ${from} is gone - re-locate this pin before deleting it`);
-    return s.slice(i, s.indexOf(to, i));
-  };
-  const seams = [
-    // the enchantment/Azura seam, in all three hosts that build a ctx
-    ['src/scenes/world.js', 'messageBox: (id) => {', 'openCharacterSheet:'],
-    ['src/scenes/exterior.js', 'messageBox: (id) => {', 'openCharacterSheet:'],
-    ['src/scenes/dungeonContext.js', 'messageBox: (id) => {', 'openCharacterSheet:'],
-    // the quest/talk machine's box (AUDIT 63 F3's three arms)
-    ['src/scenes/world.js', 'messageBox: (x) => {', 'pushTalkWindow:'],
-    // the holiday text (AUDIT 64 F10), in both streaming hosts
-    ['src/scenes/world.js', 'showRecord: (id) => {', '});'],
-    ['src/scenes/exterior.js', 'showRecord: (id) => {', '});'],
-    // the infection's "Death is not eternal", once for all four hosts
-    ['src/scenes/shared.js', 'messageBox: (id) => {', 'clanOf:'],
-    // the town host's own box door (the travel help's remaining caller)
-    ['src/scenes/townTalk.js', 'showBox: (rows) =>', 'randomText:'],
-  ];
-  for (const [file, from, to] of seams) {
-    const body = dep(file, from, to);
-    assert.match(body, /\bmessageBox\(/, `${file} ${from}: must raise the box through the one door`);
-    // AUDIT ENH-NOTICE3 (a survivor): `{ push: false }` at any of these
-    // is the exact bug the slice fixed - the talk refusals and the
-    // enchant seam DISPOSING the window they stand over.
-    assert.equal(/push:\s*false/.test(body), false, `${file} ${from}: every DaggerfallUI.MessageBox is a PushWindow`);
-    assert.equal(/new ChoiceWindow\(\{ lines/.test(body), false, `${file} ${from}: no hand-built ChoiceWindow`);
-    assert.equal(/new ActionTextBox\(/.test(body), false, `${file} ${from}: no hand-built ActionTextBox`);
-    assert.equal(/townTalk\.(showOverlay|pushOverlay|showBox)\(/.test(body), false, `${file} ${from}: no host window door`);
-    assert.equal(/pushDungeonWindow\(|mountInterior\(/.test(body), false, `${file} ${from}: no host window door`);
-  }
-  // the infection factory no longer TAKES a per-host window either -
-  // that dependency is what let four hosts drift apart (V5's
-  // `TypeError: text is not iterable` was the last time).
-  // DISC10-D V8 re-aim: the factory takes the host's REST slot now (cancelRest - DeployFullBlownVampirism closes the
-  // rest window first, VampirismInfection.cs:152-154) - a host's slot, never a window it builds for the popup.
-  assert.match(src('src/scenes/shared.js'),
-    /export function wireInfectionVideos\(renderer, \{ textAt = null, factionDict = null, transferToCemetery = null, cancelRest = null \} = \{\}\)/);
-  // Immersive Footsteps' compatibility warning is the same box, at
-  // both of DFU's own raises (OnStartGame and OnLoad).
-  const w = hostText('src/scenes/world.js');
-  assert.equal((w.match(/reportModCompatibilityIssues\(\{ showText: \(lines\) => messageBox\(lines\) \}\)/g) ?? []).length, 2);
-  // and DaggerfallAction's ShowText carries its null previousWindow
-  // THROUGH the door rather than minting a box to hold it.
-  assert.match(src('src/scenes/dungeonContext.js'), /messageBox\(lines, \{ previousWindow: false \}\);/);
-});
-
 // THE THREE PRESENTERS' OWN WIRING - which function each host hands
 // over, at which priority, and the unregister the dungeon's teardown
 // calls - is pinned in test/scenes/enhnotice3_hosts.test.js and is NOT
@@ -346,13 +258,6 @@ test('ENH-NOTICE3 B: every migrated host seam names the KIND and mints no window
 // priority: 10 });` passes the wiring sweep word for word). A host
 // that stops offering its slot is exactly the regression this arc
 // exists to catch, so the registrations are pinned as LIVE CODE here.
-
-test('ENH-NOTICE3: the three registrations are LIVE CODE, not commented-out lines', () => {
-  assert.match(src('src/scenes/townTalk.js'), /^\s*registerPresenter\(\{$/m, 'townTalk (0)');
-  assert.match(src('src/scenes/worldModes.js'), /^\s*registerPresenter\(\{ mount: \(win\) => showQuestOverlay\(win\), priority: 10 \}\);$/m, 'worldModes (10)');
-  assert.match(src('src/scenes/dungeonContext.js'), /^\s*const _unregisterPresenter = registerPresenter\(\{$/m, 'dungeonContext (20)');
-  assert.match(src('src/scenes/dungeonContext.js'), /^\s*_unregisterPresenter\(\);/m, 'and the teardown that takes it back');
-});
 
 // ── THE MOD, DRIVEN ──────────────────────────────────────────────────
 

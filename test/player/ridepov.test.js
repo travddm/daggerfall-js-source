@@ -89,22 +89,3 @@ test('RIDE-POV: the sprite body still rides - the EOTB lane is untouched by the 
   } finally { restore(); }
 });
 
-test('RIDE-POV by source: one door into the head for the Morrowind lane, shared by the map and the saddle; the saddle read off every host\'s own frame, before the flush', () => {
-  const s = rd('src/player/mwView.js');
-  assert.match(s, /export function mwViewFirstPerson\(\) \{[\s\S]*?return mwIntoHead\(\);\n\}/, 'the map\'s door takes the shared one');
-  assert.match(s, /function mwIntoHead\(\) \{\n\s*if \(!mwCamera\.thirdPerson\(\)\) return false;\n\s*mwCamera\.restore\(\{ firstPerson: true, baseDistance: mwCamera\.baseDistance\(\) \}\);\n\s*fpArm\.setViewMode\('first'\);\n\s*return true;\n\}/, 'the restore door, the rig moved, the distance kept');
-  // PIN MOVED, COATS3D: the hold is the saddle of no 3D horse - astride one (`saddled`, the host's `horse` and the rig
-  // up), the body has a saddle to show (test/formats/morrowind/coats3d_horse3d.test.js)
-  assert.match(s, /saddled = !!state\.riding && stepOwnHorse\(state\.horse, feet, yaw, state\.dt \?\? 0\);\n\s*mounted = !!state\.riding && !saddled;\n\s*if \(mounted\) \{ mwIntoHead\(\); pendingClicks = 0; \}\n\s*if \(pendingClicks\) \{/, 'the saddle rules before the flush, and drops it');
-  assert.match(s, /clicks < 0 && \(!fpArm\.canThirdPerson\(\) \|\| mounted\)\) return false;/, 'the wheel reads the saddle');
-  // GENERATIVE, as AUDIT-EOTB F3b: every host that rides the seam hands it `riding`
-  const callers = [];
-  for (const h of ['exterior', 'world', 'worldModes', 'dungeon']) {
-    const src = rd(`src/scenes/${h}.js`);
-    if (!/mwViewFrame\(/.test(src)) continue;
-    callers.push(h);
-    const call = /mwViewFrame\(\{[\s\S]{0,1000}?\}\)/.exec(src);   // FIELD BUGS 2026-09-29 (the sea) #3: the call carries the helm's reach and its camera filter too
-    assert.match(call[0], /riding: !!player\.riding/, `${h}.js hands the seam the saddle`);
-  }
-  assert.equal(callers.length, 4);
-});

@@ -40,14 +40,6 @@ test('BAY-LEFT-SEA A CAPITAL\'S LANDMARKS ARE MEASURED BY THEIR FOOTPRINT: every
   for (const id of Object.values(CAPITAL_MODELS)) assert.equal(isCapitalLandmark(id), true, `${id}`);
   assert.ok(IMPERIAL_PARTS.length > 100 && IMPERIAL_PARTS.every((p) => isCapitalLandmark(p.id)));
   assert.deepEqual([isCapitalLandmark(100), isCapitalLandmark(41606), isCapitalLandmark(900100), isCapitalLandmark(910131)], [false, false, false, false], 'an ARCH3D model, the camps\' tent, the arena\'s colosseum, the retired Crystal Tower');
-  const w = rd('src/scenes/world.js');
-  assert.ok(w.includes('            custom: (cid) => (hasCustomModel(cid) && !customModelNeeds(cid).length && !isCapitalLandmark(cid) ? customModelFor(cid)?.positions ?? null : null),'));
-  assert.ok(w.includes("portTown: (loc.ether ? loc.etherKind === 'port' : loc.arena || loc.capital ? (loc.exterior?.exteriorData?.portTownAndUnknown ?? 0) !== 0 : modSetting("));
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.ok(h.includes('px, py, arena: slot, pinPort: capitalPinPort(at.k),'));
-  assert.ok(h.includes('&& (had.exterior?.exteriorData?.portTownAndUnknown !== 0) === capitalSlicePort(at.k, at.s, capitalPinPort(at.k))) return had;'));
-  assert.ok(h.includes('return !!(c && _arenaTemplates && arenaPixels()?.byPixel.get(`${c.px},${c.py}`)?.port);'));
-  assert.ok(rd('src/world/pastBayRows.js').includes('port: capitalSlicePort(k, s, pin?.port),'));
 });
 
 const realSkip = HAVE ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)';

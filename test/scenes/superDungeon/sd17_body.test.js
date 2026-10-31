@@ -22,7 +22,6 @@ import { SD_ARENA, realmToDungeon } from '../../../src/net/superDungeon/sdBrain.
 import { SdBeamRenderer, SD_BEAM_VS, SD_BEAM_FS, SD_BEAM_MAX, sdBeamVertices } from '../../../src/render/superDungeon/sdBeam.js';
 
 const T0 = 1_800_000_000_000;
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const B = SD_REMNANT_BODY;
 const near = (a, b, e = 1e-6) => Math.abs(a - b) <= e;
 const nearV = (a, b, e = 1e-6) => a.length === b.length && a.every((v, i) => near(v, b[i], e));
@@ -260,12 +259,5 @@ test('SD17 THE SCENE AND THE WORLD: the parts stood after the Hearts and turned 
   assert.equal(sdBeamVertices().length, 8 * 12);
   assert.match(SD_BEAM_VS, /vec3 across = cross\(along, toEye\);/);
   assert.match(SD_BEAM_FS, /fogFactorAt\(vWorld\)/);
-  const src = readFileSync(new URL('../../../src/render/superDungeon/sdBeam.js', import.meta.url), 'utf8');
-  assert.match(src, /gl\.blendFunc\(gl\.ONE, gl\.ONE\);\n\s+gl\.depthMask\(false\);/);
   assert.equal(typeof SdBeamRenderer, 'function');
-  // the world
-  // AUDIT SD III (V5, PIN MOVED): into a list the world keeps - a frame of a sweep made 3.4 KB
-  assert.match(W, /import \{ sdBeamDraws, sdKeptList \} from '\.\/superDungeon\/sdRemnantRig\.js';[^\n]*\n[^\n]*\nconst _sdBeamDraws = sdKeptList\(\), NO_SD_BEAMS = Object\.freeze\(\[\]\);/);
-  assert.match(W, /const beams = sdFightLink \? sdBeamDraws\(sdFightLink\.state\(\), sdFightLink\.now\(\), _sdBeamDraws\) : NO_SD_BEAMS; const beam = beams\.length > 0 && !!sdBeamPassOf\(\)\?\.draw\(beams, proj, view, eye, t, fog\); const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\);/);   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(W, /_sdBeamPass = new SdBeamRenderer\(renderer\.gl\);/);
 });

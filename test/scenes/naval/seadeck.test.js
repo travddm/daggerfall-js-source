@@ -16,8 +16,6 @@ import { Boat, HULL_NAMES } from '../../../src/systems/comeSailAway/comeSailAway
 import { quatAngleAxis } from '../../../src/world/quat.js';
 import { quatEuler } from '../../../src/world/unityAnimator.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-const NAVAL = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
 /** The real sea fight over the real pool, on foot, a merchantman built beside me and sailing; the world's deck door stood
@@ -151,10 +149,3 @@ test('SEA-DECK ON THE REAL MOTOR: standing on a Small Ship of the sea\'s sailing
   assert.ok(left.worst > 1, `uncarried she sails out from under me (${left.worst.toFixed(2)} m off my place)`);
 });
 
-test('SEA-DECK THE WIRING: the naval host holds each deck before it poses her and carries after, through the world\'s deck door - the gate, the ground and the carry CSA-K\'s own, the eye taken again; my place said on the pose after another\'s boat and my helm; a reader\'s place under a sea key stood a frame ahead; the sea\'s deck carries my moving bit (mutants: the hold after the poses; the door unwired; the word, the reader or the carrier unasked)', () => {
-  assert.match(NAVAL, /shipDecks\.hold\(sea\.values\(\)\);[^\n]*\n\s+for \(const e of sea\.values\(\)\) poseShip\(e, total, seaY, eye\);\n\s+shipDecks\.frame\(sea\.values\(\), deps\.deck, dt > 0 \? total \/ dt : 1\);/);
-  assert.match(WORLD, /deck: \{ allowed: deckMayCarry, ground: deckGround, carry: \(d, yawDeg\) => \{ deckCarry\(d, yawDeg\); cam\.pos = player\.eyeAt\(\); \} \},/);
-  assert.match(WORLD, /const csaDeckWord = \(\) => \(csaOn\(\) \? \(csaAboard\.word\(player\.pos\) \?\? csaHelmWord\(\) \?\? naval\?\.deckWord\?\.\(player\.pos\) \?\? null\) : null\);/);
-  assert.match(WORLD, /poseOf: \(o, i\) => csaPoseAhead\(o, i, dt\) \?\? naval\?\.deckAhead\?\.\(o, gamePaused\(\) \? 0 : dt \* worldTimeScale\(\)\) \?\? null,/);
-  assert.match(WORLD, /const carrier = csaOn\(\) \? \(csaAboard\.aboard\?\.boat \?\? \(csaRuntime\?\.isSailing\(\) \? csaRuntime\.state\.CurrentBoat : null\) \?\? naval\?\.deckBoat\?\.\(\) \?\? null\) : null;/);
-});

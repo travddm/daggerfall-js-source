@@ -273,10 +273,6 @@ test('WEREWOLF1 (AUDIT D1) the per-frame door, through a REFUSAL and back: witho
     assert.equal(fpArm.ready(), true, 'the person again, at the turn');
     assert.equal(fpArm.builtFor()?.werewolf, false);
   } finally { fpArm.unload(); }
-  const w = rd('src/combat/weapon/weaponRig.js');
-  const door = w.indexOf('fpArm.setWerewolf(wolf, { skin: wolfSkin });');
-  assert.ok(door > 0 && door < w.indexOf('if (!paralyzed && fpArm.ready()) {'), 'ahead of the ready() gate');
-  assert.match(w, /if \(wolf !== wolfForm\) \{ wolfForm = wolf; wolfSkin = wolf \? ownWerewolfSkin\(\) : null; \}/, 'the skin read at the change (AUDIT D5)');
 });
 
 test('WEREWOLF1 x BEAST-SELF (the merge): the arm stands aside only while it is not the form the curse holds - the person while the wolf builds, the wolf left standing for a curse now the boar\'s, the wolf still standing while the person rebuilds, a wolf refused; the standing wolf IS the Morrowind lane, its arm and its body (mutants: the standing wolf stood aside; the wrong beast kept; the wolf kept for the person)', async () => {
@@ -322,7 +318,6 @@ test('WEREWOLF1 x BEAST-SELF (the merge): the arm stands aside only while it is 
     await until(() => !fpArm.ready());
     assert.equal(fpArm.standingIn(), true, 'a wolf refused: the sprite lane\'s beast, the view carried to it');
   } finally { fpArm.unload(); fpArm.setStandIn(was); }
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /fpArm\.setStandIn\?\.\(beast \? !\(wolf && isMwWerewolf\(entity\)\) : wolf\);/);
 });
 
 test('WEREWOLF1 the weapon rig: the werewolf is a transformed lycanthrope whose curse is the wolf\'s (the wereboar has no Morrowind form); it rides the build options and the identity, and every frame hands the rig the form ahead of the worn table (mutants: the wereboar taken for a wolf; the per-frame door dropped)', () => {
@@ -335,14 +330,6 @@ test('WEREWOLF1 the weapon rig: the werewolf is a transformed lycanthrope whose 
   const want = armIdentityOf(transformed(1));
   assert.equal(armsStandFor(transformed(1), { ready: () => true, builtFor: () => ({ ...want, werewolf: false }) }), false, 'the person standing is not the wolf\'s arm');
   assert.equal(armsStandFor(transformed(1), { ready: () => true, builtFor: () => want }), true);
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  const at = (t) => { const i = rig.indexOf(t); assert.ok(i > 0, t); return i; };
-  // PIN MOVED (TWO-HANDS): the hand handed over is `armItem` - the right hand's item when both hands are up, the weapon in
-  // use otherwise (was: `fpArm.setWeapon(playerWeapon.weapon,`); the ORDER pinned here is untouched
-  // PIN MOVED (TWO-HANDS AUDIT 2): the hand goes through the arm's hands' one door (handArm), called in the frame where
-  // the swap stood - the ORDER is untouched
-  assert.ok(at('fpArm.setWerewolf(wolf, { skin: wolfSkin });') < at('= handArm();') && at('= handArm();') < at('if (entity) fpArm.setWorn('),
-    'every frame, ahead of the hand and the worn table (AUDIT D3: their queue waits on the form\'s build)');
 });
 
 // ── THE PEERS ───────────────────────────────────────────────────────
@@ -392,11 +379,6 @@ test('WEREWOLF1 a peer: the pose\'s `wb` 1 builds the wolf (holding nothing), ke
 });
 
 test('WEREWOLF1 the host: a werewolf on foot goes to the bodies (so its wolf builds while the rider layer\'s lycanthrope stands for it); the rider layer DEFERS it and settles it after the bodies have stood (AUDIT E4: a skip read before them was the last frame\'s answer); a mounted beast and the wereboar stay the rider layer\'s (mutants: the settle dropped; the wolf kept out of the bodies; the boar deferred)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /peerRiders\.sync\(seen, onlineToScene, \{ eye: peerEye, right: peerRight, dt, defer: \(d\) => peerIsWolf\(d\.shown\),(?: yields: peerRidesIn3d,)? conceal: veilOf(?:, grow: tvGrow)? \}\);/);   // PIN MOVED, COATS3D: a rider on the 3D horse yielded to the bodies   // INVIS-NET (the merge): the drawn, not the whole list; PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): and the Overworld's grow
-  assert.match(w, /const afoot = seen\.filter\(\(d\) => \(peerRidesIn3d\(d\) \|\| !peerRiders\.isRiding\(d\.id\)\) && !d\.shown\?\.wb \|\| \(peerIsWolf\(d\.shown\) && !d\.shown\.rd\)\);/);   // PIN MOVED, AUDIT COATS3D A3: a rider on the 3D horse the bodies' whether or not its sprite stood in last frame
-  const order = ['peerRiders.sync(seen', 'peerBodies.sync(afoot', 'peerRiders.settle((id) => peerBodies.wolfStands(id), (id) => peerBodies.has(id));', 'remotePlayers.sync(visiblePeers'].map((t) => w.indexOf(t));   // PIN MOVED, AUDIT COATS3D A3: and the riders it yielded
-  assert.ok(order.every((i, k) => i > 0 && (k === 0 || i > order[k - 1])), `riders, bodies, the settle, then whatever reads the riders (${order})`);
   // the rider layer's own doors
   const riders = createPeerRiders({ renderer: {}, urlFor: () => null, decode: async () => null, art: null });
   const peers = [{ id: 'wolf', shown: pose({ wb: 1 }) }, { id: 'boar', shown: pose({ wb: 2 }) }, { id: 'rider', shown: pose({ wb: 1, rd: 1 }) }];

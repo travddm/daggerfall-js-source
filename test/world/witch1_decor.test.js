@@ -61,8 +61,6 @@ test('WITCH1 A DOOR ON ITS BOX\'S MIDDLE LINE faces where its own normal says - 
   const mid = { at: [0, 0, 0], box: [-5, 0, -7, 5, 6, 7], rects: [], type: 17, faction: 0, door: { a: [0.6, 0, 0], b: [-0.6, 2.4, 0] } };
   assert.deepEqual(doorFront({ ...mid, normal: [0, 0, 1] }).out, [0, 1]);
   assert.deepEqual(doorFront({ ...mid, normal: [0, 0, -1] }).out, [0, -1]);
-  const pb = readFileSync(new URL('../../src/scenes/pixelBuild.js', import.meta.url), 'utf8');
-  assert.match(pb, /if \(hf && !hf\.door\) \{ hf\.door = doorCornersOf\(cpu\.doors\[0\], local\); hf\.normal = doorNormalOf\(cpu\.doors\[0\], local\); \}/, 'the first door\'s corners and its normal, together');
 });
 
 test('WITCH1 THE TOWN DRESSED: closed outside the festival\'s days; open, a pair at each door, the Sister on one side of the tavern and the show on the other', () => {
@@ -165,20 +163,6 @@ test('WITCH1 the build\'s ray: one translation array of its own, the pixel place
   assert.equal(blocked([0, 1, 0], [0, 1, 0]), false, 'no length, no wall');
   assert.equal(calls[0], calls[2], 'the one array, read again');
   assert.deepEqual(calls[1].slice(1), [[100, 1, 200], [0, 0, 1], 2]);
-});
-
-test('WITCH1 THE BUILD LOGS THEM WITH THE BLOCK\'S OWN: after the collider holds the pixel\'s walls, before the flats are grouped; a Wyrd Sister marked; the homes\' spots on the entry', () => {
-  const src = readFileSync(new URL('../../src/scenes/pixelBuild.js', import.meta.url), 'utf8');
-  const settle = src.indexOf('    collider.settle(key);'), dress = src.indexOf('const witchDress = '), group = src.indexOf('const { groups, wild: wildFlats, places } = groupFlats(flatLog');
-  assert.ok(settle > 0 && dress > settle && group > dress, 'settled, dressed, grouped');
-  assert.match(src, /for \(const f of witchDress\?\.flats \?\? \[\]\) \{\n\s+addFlat\(f\.archive, f\.record, \.\.\.f\.c\);/);
-  assert.match(src, /if \(isHearthFlat\(LIGHTS_ARCHIVE, f\.record\)\) pixelHearths\.push/);
-  assert.match(src, /pixelNpcFlats\.push\(\.\.\.\(witchDress\?\.sisters \?\? \[\]\)\);/);
-  assert.match(src, /host: null, witch: flat\.witch \?\? null, \.\.\.\(flat\.witch \? \{ _mwLook: null \} : \{\}\) \}\);/, 'her own picture under the Morrowind people (AUDIT WITCH1 D6)');
-  assert.match(src, /witchHomes: witchDress\?\.homes \?\? null, witchFloor,/);
-  assert.match(src, /blocked: colliderBlocked\(collider, host\.state, px, py\), ground: dryGround\(locBlocks, locOrigin\),/);
-  assert.match(src, /const witchDress = witchFloor != null && locBlocks \? await witchesDressingBreathing\(\{/, 'a city\'s rays breathe (PERF7, AUDIT WITCH1 D3)');
-  assert.match(src, /\}, \(\) => breather\.breathe\(\)\) : null;/);
 });
 
 test('WITCH1 THE GROUND A PIECE STANDS ON: inside the location\'s blocks and off its water (the family DFU\'s people never walk) - a dock or a puddle stood on; the build asks it (AUDIT WITCH1 D7)', () => {

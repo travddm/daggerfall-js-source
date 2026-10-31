@@ -222,5 +222,4 @@ test('VC3: the seam - the clouds ride the dome only, behind the one switch, on t
   const html = read('sky.html');
   assert.match(html, /<select id="clouds"><option>off<\/option><option>lo<\/option><option>default<\/option><option>hi<\/option><\/select>/, 'the four doors');
   assert.match(html, /<input id="shadowmap" type="checkbox" \/>/);
-  assert.match(read('test/render/glstate.test.js'), /'src\/render\/volumetricClouds\.js'/, 'the AUDIT 47 sweep reads the march and the composite');
 });

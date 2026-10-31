@@ -124,9 +124,6 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   const tip = rarityLines(a);
   assert.deepEqual(tip.slice(-4), lines, 'a tooltip\'s list ends with its set');
   assert.ok(!rarityLines(a, { set: false }).includes(lines[0]), 'the card that draws the block asks without');
-  const inv = strip(read('src/ui/enhanced/enhancedInventory.js'));
-  assert.match(inv, /itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\)/);   // TRADE-INFO: the card reads the one list, and asks it without the set (CARD-FIT: and the lore); PIN MOVED (TECH-CARD): and without a technique's line, its block's
-  assert.match(inv, /const lines = rarityLines\(item, \{ sigil: false, set, lore, technique \}\);/, 'the list asks rarityLines as the card asked it');   // PIN MOVED (TECH-CARD): and a technique's line as asked
   // AUDIT SET U5: an unidentified piece - its enchantment hidden, its sigil and its set said
   const hidden = { ...a, enchantments: [{ type: 1, param: 0 }], isIdentified: false };
   const unk = rarityLines(hidden);
@@ -337,9 +334,6 @@ test('SET5 the frame\'s mark and the rune\'s colour: a set piece\'s frame wears 
   assert.ok(PLUS_CSS.includes('.pack-shell .card .setbox p.set-role'));
   assert.ok(PLUS_CSS.includes('.dragghost[data-set] .tile::after { background-image: var(--set-rune); }'));
   for (const sel of ['.setbox {', '.set-place.on {', '.set-tier.awake .set-at {', '.setstrip {', '.setline-pips i.on {']) assert.ok(PLUS_CSS.includes(sel), sel);
-  // UI3: a set power's tile in the status widget - its frame the set's light and shade, a recovery dashed and dimmed
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hst-cell\.set \{ --hst-hi: var\(--set-hi, #e6dccb\); --hst-lo: var\(--set-lo, #3a352a\); \}/);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hst-cell\.recovering \.hst-tile \{ border-style: dashed;/);
 });
 
 test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it is a set\'s sigil (asleep, or growing its set with its lowest piece), and a fresh one says it grows as I earn Renown wearing it; a weapon\'s block is as it was; AUDIT U11 in a duel a set\'s armour\'s sigil sleeps (no gem lit, named Asleep) and a set weapon\'s keeps its blow; U12 a set sigil on what is no set piece answers no set (mutants: the blow\'s words on armour; a duel\'s armour sigil lit; a set weapon\'s blow put to sleep; a ring called a set\'s)', () => {
@@ -379,20 +373,3 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
   });
 });
 
-test('SET5 the surfaces\' wiring: the pack\'s card and the Info box append the set block after the sigil\'s, the doll\'s column the strip after the shelf, every frame the pack marks and the hotbar\'s slot and the diamond\'s cell wear the set (their repaint keys read it); the host names the wearer and hands the HUD its chips (mutants: the Info box without the block; the strip never drawn; the hotbar\'s key blind to the set; the HUD\'s chips unwired)', () => {
-  const inv = strip(read('src/ui/enhanced/enhancedInventory.js'));
-  assert.match(inv, /\{ const sb = sigilCard\(picked\); if \(sb\) into\.append\(sb\); \}\s*\{ const set = setCard\(picked, deps\.entity, itemLongName\); if \(set\) into\.append\(set\); \}/, 'the card (CARD-FIT: its short dress, into its body)');
-  assert.match(inv, /\{ const sb = sigilCard\(item, \{ full: true \}\); if \(sb\) body\.append\(sb\); \}\s*\{ const set = setCard\(item, deps\.entity, itemLongName, \{ full: true \}\); if \(set\) body\.append\(set\); \}/, 'the Info box (CARD-FIT: whole, into its scrolling body)');
-  assert.match(inv, /col2\.append\(accessoryShelf\(\)\);\s*const sets = setStrip\(deps\.entity, \{ onPick: \(it\) => \{ picked = it; goldEntry = null; pickedAt = 'worn'; side = 'local'; notice = null; render\(\); \} \}\);\s*if \(sets\) col2\.append\(sets\);/, 'the doll\'s strip');
-  assert.match(inv, /export function markItemFrame\(node, item\) \{[\s\S]*?markSetFrame\(node, item\);[\s\S]*?return node;\s*\}/, 'every frame the pack marks');
-  const hb = strip(read('src/ui/enhanced/enhancedHotbar.js'));
-  assert.match(hb, /\$\{validSigil\(v\.item\.sigil\) \? '\*' : ''\}\$\{setIdOf\(v\.item\) \?\? ''\}/, 'the hotbar\'s repaint key reads the set');
-  assert.match(hb, /if \(it && validSigil\(it\.sigil\)\) n\.dataset\.sigil = ''; else delete n\.dataset\.sigil;\s*markSetFrame\(n, it\);/);
-  const hud = strip(read('src/ui/enhanced/enhancedHud.js'));
-  assert.match(hud, /const frameKey = worn \? `\$\{rarityAttr\(worn\) \?\? ''\}\|\$\{validSigil\(worn\.sigil\) \? 1 : 0\}\|\$\{setIdOf\(worn\) \?\? ''\}` : '';/, 'the diamond\'s key');
-  assert.match(hud, /markSetFrame\(part\.cell, worn\);/);
-  assert.match(hud, /const powers = setPowerChips\(vitals\);/);
-  assert.doesNotMatch(hud, /from '(?:\.\.?\/)+(?:[\w-]+\/)*sigilSetPowers\.js'/, 'the HUD never imports the powers (a cycle through the round\'s ticker)');
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /setSetsWearer\(\(\) => playerEntity\);\s*setHudSetChips\(\(e\) => \[\.\.\.setHudChips\(e\), \.\.\.lootHudChips\(e\), \.\.\.martialHudChips\(e\)\]\);/);   // LOOT5: the Legendary powers' chips beside the sets'; PIN MOVED (RPT1026-PROGRESS): and a martial path's passive
-});

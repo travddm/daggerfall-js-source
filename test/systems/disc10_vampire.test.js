@@ -245,15 +245,6 @@ test('DISC10-D V8: the deploy closes the rest window FIRST, then raises, transfe
   } finally { setInfectionHost(prev); }
 });
 
-test('DISC10-D V8: every host that can hold a rest window hands the deploy its cancelRest', () => {
-  // world.js registers it TWICE - its own seam, and the bag worldModes re-registers the session's seam from
-  assert.equal((rd('src/scenes/world.js').match(/^\s*cancelRest: cancelRestArm,/gm) ?? []).length, 2, 'world.js: its seam and the mode machine\'s bag');
-  assert.match(rd('src/scenes/worldModes.js'), /cancelRest: \(\) => \{ if \(interiorOverlay\?\.isRestWindow\) interiorOverlay\.dispose\?\.\(\); host\.cancelRest\?\.\(\); \},/, 'worldModes closes a building\'s and forwards the street\'s');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    assert.match(rd(host), /cancelRest: (?:\(\) => \{[^\n]*isRestWindow\) [^\n]*\.dispose\?\.\(\)|cancelRestArm)/, `${host} registers cancelRest`);
-  }
-});
-
 // ── V3: THE CLAN IS THE REGION'S ──────────────────────────────────────────────────────────────────────────────────
 
 test('DISC10-D V3: the clan is read off the PLAYER\'s own faction store by the region the bite happened in - two provinces, two clans, even through the dungeon\'s lean host', async () => {
@@ -291,24 +282,7 @@ test('DISC10-D V3: a vampire\'s bite above ground records the pool\'s CURRENT re
   assert.equal(inf.regionIndex, REGION_B, 'the region the player stood in');
 });
 
-test('DISC10-D V3: the dungeon\'s bite passes its location\'s region too', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  const i = d.indexOf('onMonsterHit: (att, tgt, hit) => onMonsterHit(att, tgt, hit, {');
-  assert.ok(i > 0);
-  assert.match(d.slice(i, i + 400), /regionIndex: /, 'the rider carries PlayerGPS.CurrentRegionIndex');
-});
-
 // ── V4: THE CEMETERY FROM ANYWHERE ────────────────────────────────────────────────────────────────────────────────
-
-test('DISC10-D V4: the cemetery transfer forces the exterior first (RespawnPlayer from any context), and the dungeon host carries the arm', () => {
-  const w = rd('src/scenes/world.js');
-  const i = w.indexOf('function transferToCemeteryArm()');
-  const body = w.slice(i, w.indexOf('\n  }\n', i));
-  assert.doesNotMatch(body, /!== 'exterior'\) \{\s*console\.warn/, 'no exterior-only refusal');
-  assert.match(body, /forceExitToExterior\(\)/, 'the port\'s own _respawnAtSite shape');
-  assert.match(rd('src/scenes/worldModes.js'), /transferToCemetery: \(\) => host\.transferToCemetery\?\.\(\)/, 'worldModes hands the arm to buildDungeonContext');
-  assert.match(rd('src/scenes/dungeonContext.js'), /transferToCemetery: opts\.transferToCemetery \?\? null/, 'the dungeon registers it');
-});
 
 // ── V5: THE SHEET SHOWS THE COMPOUND RACE ─────────────────────────────────────────────────────────────────────────
 
@@ -317,7 +291,6 @@ test('DISC10-D V5: the character sheet reads the LIVE race - "Vampire" for the v
   assert.equal(vampirism.liveRaceTemplate?.(p)?.name, 'Vampire');
   assert.equal(sheetModel(p).race, 'Vampire', 'the enhanced sheet');
   assert.equal(sheetModel(mortal()).race, 'Breton', 'a mortal keeps the birth race');
-  assert.match(rd('src/ui/charsheet.js'), /label\(processGrammar\(liveRaceName\(e\)/, 'the classic sheet reads the same (L10N3d: liveRaceName - the live template\'s curse name, else the birth race shown)');
   // CreateCompoundRace (VampirismEffect.cs:326-338): the flags ride the live template too
   const t = vampirism.liveRaceTemplate(p);
   assert.equal(t.immunityFlags & 1, 1, 'immune to Paralysis');

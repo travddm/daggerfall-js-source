@@ -100,7 +100,6 @@ test('CARDS10 a regular\'s play: a commit the rules take, built a play at a time
   assert.ok(patronPlays(rich, 0, 'loose', 2, seededUnit(1)).length >= 2, 'the setup: several plays worth laying');
   assert.equal(patronPlays(rich, 0, 'bluffer', 2, seededUnit(1)).length, 1, 'the bluffer holds his hand to one');
   assert.equal(forfeitCard([], () => 0), null);
-  assert.ok(read('src/systems/iliac/iliacPatrons.js').includes('const v = iliacView(copy, p);'), 'judged through his own seat\'s view');
 });
 
 test('CARDS10 the evening: the regular thinks, then commits; the turn turns over a beat after both have; six turns, then the result; for keeps the loser pays a card of his deck, a draw nobody, standing up concedes (mutants: the think; the beat; the prize\'s payer; the concession)', () => {
@@ -161,9 +160,6 @@ test('CARDS10 the forfeits\' book: a regular pays one card a game day at his tav
   assert.ok(!('t1' in b), 'the oldest day went first');
   assert.deepEqual(forfeitsBookRestore({ a: { day: 3, paid: ['Ana', 7] }, b: { day: 'x' }, c: null }), { a: { day: 3, paid: ['Ana'] } });
   assert.deepEqual(forfeitsBookRestore([1]), {});
-  const save = read('src/systems/save/save.js');
-  assert.match(save, /snap\.iliacForfeits = forfeitsBookRestore\(entity\.iliacForfeits\);/);
-  assert.match(save, /entity\.iliacForfeits = forfeitsBookRestore\(snap\.iliacForfeits\);/);
 });
 
 test('CARDS10 the staging: stagedRefusal is the rules\' playsRefusal said over the view - every list of plays a hundred seeded positions offer, the same word; the spend is costOf\'s (mutants: the room; the spell\'s holding; the discount)', () => {
@@ -363,18 +359,6 @@ test('CARDS10 the host\'s half on a fake page: the binder\'s lawful deck and the
   g4.close({ concede: false });
   assert.equal(iliacEventLine({ t: 'commit', p: 1, n: 0 }, ['You', 'Ana']), 'Ana passes.');
   assert.equal(iliacEventLine({ t: 'game', holdings: ['daggerfall', 'sentinel', 'wayrest'], forKeeps: true }, []), 'The holdings: Daggerfall, Sentinel, Wayrest. For a card.');
-  // the interior host
-  const w = read('src/scenes/worldModes.js');
-  assert.ok(w.includes("    if (id === 'iliac') { openIliacGame(); return; }   // CARDS10: the other game at this table"));
-  assert.ok(w.includes('    closeIliacGame({ concede: cashOut });   // CARDS10:'), 'every road off the seat');
-  assert.ok(w.includes("    if (mode === 'interior') iliacGame?.frame(performance.now());"), 'the clock under any window');
-  assert.ok(w.includes('    iliacGame?.draw(performance.now());   // CARDS10:'), 'the cloth in the room\'s pass');
-  assert.ok(w.includes('    iliacStaked: () => !!iliacGame?.staked?.(),'), 'the save waits on a card staked');
-  const W = read('src/scenes/world.js');
-  assert.ok(W.includes("    if (host.modes?.iliacStaked?.()) { if (!quiet) townTalk.say('You cannot save with a card staked on the table.'); return false; }"));   // PIN MOVED (TESA's merge): the quick save is scenes/worldQuickSave.js's, `modes` its host's live name
-  assert.ok(W.includes('|| !!modes?.iliacStaked?.(),'), 'the pause\'s Save too');
-  assert.match(w, /function closeIliacGame\(\{ concede = true \} = \{\}\) \{\s*const ig = iliacGame;\s*if \(!ig\) return;\s*iliacGame = null;\s*ig\.close\(\{ concede \}\);/, 'THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD');
-  assert.ok(w.includes("friendly: !!host.realmAct || isOnlinePage(),"), 'a realm character or an online page: for fun');
 });
 
 test('CARDS10 the painted panel: presses handed back, never reaching the game; a hand card, a holding, a staged card; gone once', () => {

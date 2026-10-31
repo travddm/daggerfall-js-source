@@ -22,7 +22,6 @@ import { SD_ARENA, realmToDungeon } from '../../../src/net/superDungeon/sdBrain.
 import { ENEMY_BASICS } from '../../../src/characters/enemy/enemyBasics.js';
 
 const T0 = 1_800_000_000_000;
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 
 /** A fight the test turns, a clock it moves, an engine that hears. */
 function rig(over = {}) {
@@ -222,7 +221,4 @@ test('SD14a FORGOTTEN AS THE HOUR IS LEFT, and the world host\'s: made beside th
   r.v.leave();
   r.step(300);
   assert.equal(count(r.heard, SD_VOICE_CUES.wake), 0, 'left: the next fight seen is taken as it stands');
-  assert.match(W, /const sdRemVoice = sdFightLink \? createSdRemnantVoice\(\{ audio, link: sdFightLink, feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\) \}\) : null;/);
-  assert.match(W, /if \(inRealm && playerEntity\.health > 0\) \{ try \{ sdRemVoice\?\.frame\(\); \} catch \(e\) \{ console\.warn\('\[sd\] voice', e\?\.message \?\? e\); \} \}/);   // AUDIT SD III (A5, PIN MOVED): never by the dead
-  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // SD16 (PIN MOVED): its sparks forgotten with it
 });

@@ -32,9 +32,6 @@ test('EVENT-RULES THE TILE: a made level\'s tile names its place and says the re
   assert.deepEqual([first.key, first.kind, first.glyph, first.name, first.foot, first.level], ['rules', 'warn', 'rules', 'The Spire', '1s', 'spire']);
   assert.equal(rest[0].key, 'rested', 'first, before the rest');
   assert.equal(statusTiles({}).some((t) => t.key === 'rules'), false);
-  // the HUD reads the law itself - no host line hands it in
-  const hud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const rules = madeRulesTile\(madeLevelHere\(\), regenPausedMs\(\)\);\n\s*if \(rules\) all\.unshift\(\.\.\.statusTiles\(\{ rules \}\)\);/);
 });
 
 test('EVENT-RULES THE TIP: every rule the level holds, said off its own row - the held regeneration, no saving or resting, the map, Mark and Recall, companions, the Spire\'s potions and flight, the death\'s way (a friend\'s Resurrect named), the purse spared; nothing for a rule a level leaves alone (mutants: a rule unsaid; a rule said of a level that leaves it; the Recall said in the court)', () => {

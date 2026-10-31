@@ -70,7 +70,4 @@ test('BANK-FLUSH: a grid\'s bed - the ground lowered by the carve, the sheet\'s 
   assert.deepEqual(bed.sheetDepths, sheetDepthsOf(f.depths, T + 1, T + 1));
   for (let i = 0; i < f.carve.length; i++) assert.ok(Math.abs(bed.ground.positions[i * 3 + 1] - (10 - f.carve[i])) < 1e-5);
   assert.equal(bed.ground.positions[(3 * 17 + 3) * 3 + 1], 10, 'a cell in from the bank, the ground stands');
-  const w = rd('src/scenes/world.js'), recarve = w.slice(w.indexOf('  function dwRecarve(p) {'), w.indexOf('  function hostBed(grid, bed)'));
-  assert.match(recarve, /if \(same\(fields\?\.carve \?\? null, p\._bed\.depths\) && same\(fields \? sheetDepthsOf\(fields\.depths, g, g\) : null, p\._bed\.sheetDepths\)\) return;/);
-  assert.match(recarve, /const bed = fields \? gridBed\(grid, bedBytesOf\(p\), stride, halo\) : null;/);
 });

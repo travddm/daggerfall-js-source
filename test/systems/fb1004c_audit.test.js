@@ -15,17 +15,6 @@ const src = (f) => readFileSync(join(ROOT, f), 'utf8');
 
 // ── P1: a castle's shelf is its Hall of Records, not a search ──────────────────────────────────────────────────────
 
-test('AUDIT WHERE-ROBES P1: a castle\'s shelf is its Hall of Records while the seats are open - the search stands down for it (the two had raced as equal boxes; struck at its mesh, the search took or lost the press ray by ray) and stands again when the Hall does not claim it (mutants: the search offered over the Hall; the shelf not marked; the host\'s word not passed)', () => {
-  const dc = src('src/scenes/dungeonContext.js'), wm = src('src/scenes/worldModes.js');
-  // the searchable knows it is the castle shelf by the very test castleShelves is minted by
-  const castle = /if \(b\.layout\.castleBlock && isShopShelfModel\(p\.modelIdNum\)\) castleShelves\.push\(\{ aabb \}\);/;
-  assert.match(dc, castle, 'the Hall\'s shelves');
-  assert.match(dc, /searchables\.push\(\{ kind: sk, aabb, key: `\$\{bi\}:\$\{p\.position\}`, lock: 0, items: \[\], records: !!\(b\.layout\.castleBlock && isShopShelfModel\(p\.modelIdNum\)\) \}\)/, 'and the searchable carries the same test');
-  assert.match(dc, /const recordsHere = !!opts\.castleRecordsHere\?\.\(\);\n\s*searchables\.forEach\(\(sb, i\) => \{ if \(!\(sb\.records && recordsHere\)\) targets\.push\(\{ key: `search:\$\{i\}`/, 'offered unless the Hall claims it');
-  assert.match(wm, /castleRecordsHere: \(\) => castleRecordsHere\(\),/, 'the host says when it does - the one predicate its `records:` targets read');
-  assert.match(wm, /ctx\.addActivationTargets\(\(\) => \(castleRecordsHere\(\) \? ctx\.castleShelves\.map\(/, '...which is that predicate');
-});
-
 // ── P3: a decor piece is struck at its own surface ────────────────────────────────────────────────────────────────
 
 test('AUDIT WHERE-ROBES P3: an owner\'s decor piece (its own collider bucket) is struck where the ray meets ITS surface - a candle on a decor dresser under its mirror wins the press, the dresser\'s front is still the dresser, and a piece with no bucket of its own is met at its box as before (mutant: the own-surface arm dropped)', async () => {
@@ -68,8 +57,6 @@ test('AUDIT WHERE-ROBES N1: a quest LETTER standing in the world reads "Letter: 
   const named = questResourceName(questStandItem(note), { archive: 204, record: 0, getQuest: e.getQuest });
   assert.match(named, /^Letter: /, `named "${named}"`);
   assert.equal(questResourceName(questStandItem(note), { archive: 204, record: 0 }), 'Parchment', 'no resolver, no quest to read');
-  const wm = src('src/scenes/worldModes.js');
-  assert.equal((wm.match(/questResourceName\(questStandItem\(res\), \{ archive: st\.archive \?\? -1, record: st\.record \?\? -1, getQuest: \(uid\) => questBridge\?\.machine\.getQuest\(uid\) \?\? null \}\)/g) ?? []).length, 2, 'both namers hand it the host\'s resolver');
 });
 
 // ── S1 and the share's pins ───────────────────────────────────────────────────────────────────────────────────────

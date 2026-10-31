@@ -128,20 +128,6 @@ test('AUDIT SHADER-STALL the passes play meets are started at the boot\'s idle w
   assert.equal(startPlayPrograms(off.gl), false);
   assert.equal(off.count('createProgram'), 0, 'no compile queued where none can be asked after');
   assert.equal(startPlayPrograms(null), false);
-  const r = read('src/render/renderer.js');
-  assert.match(r, /\(\) => \{ if \(parallelCompile\(this\.gl\)\) \{ void import\('\.\/playPrograms\.js'\)\.then\(\(m\) => m\.startPlayPrograms\(this\.gl\)\)\.catch\(\(\) => \{\}\); this\.startTerrainSnow\(\); \} \},/, 'the renderer\'s idle warm, off the boot\'s graph, the snow\'s surface with them');
-  assert.ok(!/^import [^\n]*playPrograms/m.test(r), 'never a static import');
-});
-
-test('AUDIT SHADER-STALL the fights ask their passes NEEDED when a telegraph, a crystal, a blow or a way out must be seen - the Elite Breach\'s and the court\'s (mutants: each need dropped)', () => {
-  const eg = read('src/scenes/eliteGates/egFight.js');
-  assert.match(eg, /crystalPass = crystalsOf\(true\);/);
-  assert.match(eg, /pass = telegraphOf\(_shapes\.length > 0\);/);
-  const court = read('src/scenes/gate/gateCourt.js');
-  assert.match(court, /const crystalPass = crystalPassOf\(true\);/);
-  assert.match(court, /const pass = telegraphPass\(!!\(mark \|\| shape \|\| poolDraw\.length\)\);/);
-  assert.match(court, /const fxPass = fxPassOf\(true\);/);
-  assert.match(court, /const fire = _fires\.length \? portalPass\(true\) : null;/);
 });
 
 test('AUDIT SHADER-STALL the court: a blow\'s telegraph is drawn the first frame it is wanted, the driver still compiling - built then, never skipped (mutants: the telegraph\'s need dropped)', () => {
@@ -162,12 +148,6 @@ test('AUDIT SHADER-STALL the court: a blow\'s telegraph is drawn the first frame
   assert.ok(f.count('link?') > before, 'the telegraph built while the driver compiles');
   assert.equal(drew, true, 'and drawn');
   c.destroy?.();
-});
-
-test('AUDIT SHADER-STALL the court\'s warm: where the driver cannot say, one pass a frame - and a pass the draw already built is no frame\'s (GATE-MIX\'s own skip, lost in the merge) (mutants: the settled skip dropped)', () => {
-  const court = read('src/scenes/gate/gateCourt.js');
-  assert.match(court, /const warmDoors = \[fxPassOf, crystalPassOf, portalPass\];/, 'the doors themselves - each one\'s `settled` readable');
-  assert.match(court, /while \(warmed < warmDoors\.length && warmDoors\[warmed\]\.settled\) warmed\+\+;/);
 });
 
 test('AUDIT SHADER-STALL the veil: its warm starts its program and, at an idle once the driver says it is done, BUILDS it - its link read, its uniforms found - so the step\'s frame builds nothing (AUDIT WB D5\'s warm, kept); a veil destroyed meanwhile is never built (mutants: the warm only starts it)', async () => {

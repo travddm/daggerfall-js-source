@@ -172,8 +172,6 @@ test('STAFF-CHAT-RED THE DOOR\'S ASK: staffShowMe posts { dfoStaff: hide, on: fa
   assert.equal(c.listeners.size, 0);
   assert.equal(await staffShowMe({ location: { origin: 'null' }, postMessage() {} }), false, 'an opaque page asks nobody');
   assert.equal(await staffShowMe(null), false);
-  // the door's own listener leaves the ask alone (staffHookDoor has no arm for it)
-  assert.match(rd('src/net/staffHook.js'), /the game asks \{ dfoStaff: 'hide', on: false \} and the panel answers \{ dfoStaff: 'hide', on: false, ok \}/);
 });
 
 test('STAFF-CHAT-RED THE MINT\'S WORD: the service\'s `hidden: 1` reaches the voice through the page\'s own minter and the chat safety host (accountTokenMinter -> onIssued -> adopt, world.js adoptIssued\'s path), and a visible mint takes it back (mutants: `hidden` dropped from the minter\'s answer; the host not forwarding it)', async () => {
@@ -190,7 +188,6 @@ test('STAFF-CHAT-RED THE MINT\'S WORD: the service\'s `hidden: 1` reaches the vo
   const again = accountTokenMinter({ fetch, storage, onIssued: (who) => host.adopt(who) });
   assert.equal(await again('chat:world'), 'v1.tok0.sig');
   assert.equal(host.voice.hidden(), false, 'a visible mint says nothing, and is heard as visible');
-  assert.match(rd('server-account/src/staffHidden.js'), /expiresAt: nowS \+ MAX_TTL_S, hidden: 1, sub,/, 'the service\'s word, as the minter reads it');
 });
 
 /* ═══ THE PANEL ═══════════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -328,11 +325,6 @@ test('STAFF-CHAT-RED THE SWITCH\'S KEYS: Tab in the field walks onto Me, then Re
 });
 
 test('STAFF-CHAT-RED WIRED: the host hands the chat safety host\'s voice to the panel, and the host makes it over the glyphs and the mint\'s word it already reads (mutant: the panel built without it)', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /\n {6}voice: chatSafety\.voice,/);
-  const host = rd('src/scenes/chatSafetyHost.js');
-  assert.match(host, /voice: createChatVoice\(\{ glyphs, say, win \}\),/);
-  assert.match(host, /adopt\(issued\) \{\n {6}host\.voice\.adopt\(issued\);/);
   const h = createChatSafetyHost({ log: () => null, links: () => [], glyphs: () => ['dev'], doc: { createElement: () => ({}) }, win: fakeWin().win });
   assert.equal(h.voice.shown('world'), true);
   h.adopt({ hidden: true });

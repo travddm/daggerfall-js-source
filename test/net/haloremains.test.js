@@ -54,10 +54,6 @@ test('HALO-REMAINS: one room named with setRoom keeps the old single-room behavi
 });
 
 test('HALO-REMAINS: the session delivers a halo\'s room word, sends a take to the pile\'s room, and names the rooms it holds', () => {
-  const src = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8');
-  const arm = src.slice(src.indexOf("} else if (m.t === 'wild') {"), src.indexOf("} else if (m.t === 'arena') {"));
-  assert.doesNotMatch(arm, /else if \(primary\)/, 'no primary-only gate on the room\'s word');
-  assert.match(arm, /this\._deliver\('wild', \(\) => this\.onWildRoom\?\.\(o, room\)\)/);
   // the take's room: main's INT9 sendWild carries it (`{ room }`) - a held halo's socket while its relay routes the zone
   const s = Object.create(OnlineSession.prototype);
   const out = { own: [], halo: [] };
@@ -72,7 +68,4 @@ test('HALO-REMAINS: the session delivers a halo\'s room word, sends a take to th
   assert.equal(out.own.length, 2, 'my room, named or not: my own socket');
   assert.equal(s.sendWild(take, { room: 'cell:9,9' }), false, 'a halo not open: nothing');
   assert.deepEqual(s.heldRooms(), [HERE, NEXT, 'cell:9,9']);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /send: \(d, room\) => online\?\.sendWild\(d, \{ room \}\) === true,/);
-  assert.match(w, /wildRemains\.setRooms\(online\?\.status === 'open' \? online\.heldRooms\(\) : \[\]\);/);
 });

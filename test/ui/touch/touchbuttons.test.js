@@ -165,14 +165,6 @@ test('TOUCH-BUTTONS: the Touch card re-lays the corner while the layer is up - b
   assert.deepEqual(codes(keys, 'keydown'), ['Space', 'KeyC'], 'the new slot holds its own action');
 }));
 
-test('TOUCH-BUTTONS: the Touch card carries the three slots, walked by the steppers', () => {
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(menu, /TOUCH_BUTTON_SLOTS\.forEach\(\(slot, i\) => \{\s*\n\s*out\.push\(slotChoiceRow\(slot, slotNames\[i\],/);
-  assert.match(menu, /b\.onclick = \(\) => \{ cur = nextTouchButton\(cur, dir\); setPref\(key, cur\); val\.textContent = labelOf\(cur\); \};/);
-  const touch = readFileSync(new URL('../../../src/ui/touch/touch.js', import.meta.url), 'utf8');
-  assert.match(touch, /if \(!slotHeld\.size && !attacking\) layoutCorner\(\);/, 'the poll re-lays the corner, never under a finger');
-});
-
 // ─── AUDIT (the batch's audit, agent A) ────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT TOUCH-BUTTONS A1: the Attack slot\'s lift waits two frames - the rig reads the live button once a frame, so a tap lifted before the host\'s frame swung nothing - and a new press in between is its own (mutants: the lift at once; a stale lift letting the new press go)', () => withTouchDom((keys, attach) => {

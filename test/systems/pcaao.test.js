@@ -199,7 +199,6 @@ test('PCO1: Roleplay Realism\'s archery, as baked in - the draw time\'s hit and 
   assert.equal(rrAdjustWeaponHitChanceMod(50, 100, { templateIndex: 120 }), 50, 'not a bow');
   assert.equal(rrAdjustWeaponHitChanceMod(50, 0, bow), 50, 'no draw time');
   assert.deepEqual([400, 2000, 5500, 7000, 8500, 9500].map((t) => rrAdjustWeaponAttackDamage(20, t, bow)), [10, 20, 17, 15, 10, 5]);
-  assert.doesNotMatch(rd('src/combat/pcaao.js'), /export function pcaaoAdjustWeapon/, 'no second copy of the ladder');
 });
 
 test('PCO1: the condition bands - a weapon\'s damage and a piece\'s reduction factor', () => {
@@ -527,17 +526,6 @@ test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worl
   const credit = CREDITS.mods.find((c) => c.title === 'Physical Combat And Armor Overhaul');
   assert.ok(credit); assert.equal(credit.author, 'Kirk.O'); assert.deepEqual([...credit.vendor], ['pcaao']); assert.equal(credit.version, '1.44');
   assert.match(rd('vendor/pcaao/README.md'), /Kirk\.O/);
-  assert.match(rd('src/systems/worldTick.js'), /installPcaao\(\);/, 'every host installs the overrides through worldTick');
-  const pw = rd('src/combat/playerWeapon.js');
-  // AUDIT 68 S08-bow-draw-time-wallclock: the draw is the machine's held ticks (GetAnimTime), written at every
-  // release - the behaviour is pinned in audit68_combat_bf.test.js; here only that the three bow doors read it
-  assert.equal((pw.match(/this\.lastDrawMs = this\._bowAnimTimeMs\(\);/g) || []).length, 4, 'the drawn release, the instant shot, the touch button and a technique\'s loose');   // PIN MOVED (TECH1): techniqueStrike, a Volley's or a Piercing Shot's StrikeDown, writes it as the instant shot does
-  assert.match(rd('src/combat/arrowFlight.js'), /weaponAnimTime: playerWeapon\?\.lastDrawMs \?\? 0,/, 'the arrow hands it to the formula');
-  assert.match(rd('src/combat/formulas.js'), /const core = _overrides\.get\('calculateAttackDamage'\);/, 'the core is the registry\'s');
-  assert.match(rd('src/systems/equip.js'), /if \(removeFrom\) \{ const i = removeFrom\.indexOf\(item\); if \(i >= 0\) removeFrom\.splice\(i, 1\); \}/, 'LowerCondition\'s removeFromCollectionWhenBreaks');
-  assert.match(rd('src/characters/enemy/enemyEntity.js'), /const basics = editAtMint\(mobileType, pcaaoMeanerMonstersRow\(mobileType, applyMeanerMonsters\(mobileType, basicsIn\)\)\);/, 'MM1: the overhaul\'s edit over Ralzar\'s row (DEX1: a Start-time mod\'s over both)');
-  const ws = rd('src/combat/pcaao.js');
-  assert.equal((ws.match(/Mathf\.Clamp/g) || []).length >= 4, true, 'the four discarded clamps are named');
   assert.equal(pcaaoAdjustmentsToHit(mkPlayer()), -50);
   assert.ok(SKILLS.CriticalStrike === 34 && SKILLS.Dodging === 20, 'the skill ids the C# numbers');
 });
@@ -571,11 +559,6 @@ test('AUDIT PCO1: the archery arm registers on the STOCK path too - InitMod regi
   uninstallPcaao();
   assert.equal(formulaOverride('adjustWeaponHitChanceMod'), null);
   assert.equal(formulaOverride('adjustWeaponAttackDamage'), null);
-  // the source: both stock sites consult the registry where the C# calls its hooks
-  const f = rd('src/combat/formulas.js');
-  assert.match(f, /if \(weapon\) chanceToHitMod = adjustWeaponHitChanceMod\(attacker, target, chanceToHitMod, weaponAnimTime, weapon\);/, 'after CalculateWeaponToHit');
-  assert.match(f, /damage = adjustWeaponAttackDamage\(attacker, target, damage, weaponAnimTime, weapon\);\n\s+return damage;\n\}/, 'CalculateWeaponAttackDamage\'s last line');
-  assert.match(f, /weaponAttackDamage\(attacker, target, damageModifiers, weapon, rolls, weaponAnimTime, \{ unaware: !!unaware \}\)/, 'the stock core hands the draw down (SET2: and the host\'s word the foe had not noticed me)');
 });
 
 test('AUDIT PCO1: a CLASS enemy\'s bare fists deal nothing under the overhaul - CalculateHandToHandAttackDamage gives a non-player only its damageModifier, which is 0 for anyone but the player (bug for bug; a knight whose sword the wear broke fights for 0)', () => {

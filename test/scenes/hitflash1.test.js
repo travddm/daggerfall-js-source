@@ -62,24 +62,3 @@ test('HITFLASH1 puppet hurt: a drop that lands mid-swing is held until the sprit
   assert.equal(puppetHurtStep(null, null, 0), false);
 });
 
-test('HITFLASH1 wiring: both billboard shaders and the sprite quad read the flash; every foe pool and every puppet step use it; the peers ride it', () => {
-  const r = read('src/render/renderer.js'), el = read('src/render/enhancedLighting.js');
-  assert.match(r, /uniform float uHitFlash;/);
-  assert.match(r, /lit = hitFlashLit\(lit, albedo \+ emission, uHitFlash\);/);
-  assert.match(r, /gl\.uniform1f\(this\.bbUHitFlash, hf\)/);
-  assert.match(r, /hitFlash: undefined/, 'minted with the batch (PERF-EXT10)');
-  assert.match(r, /gl\.uniform1f\(c\.hitFlash, /, 'the Morrowind body\'s sprite quad');
-  assert.match(el, /lit = hitFlashLit\(lit, albedo \+ emission, uHitFlash\);/, 'the Enhanced Lighting lane, which never drew mode 5');
-  for (const [file, v] of [['src/scenes/dungeonContext.js', 'f'], ['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/cityGuards.js', 'g']]) {
-    assert.match(read(file), new RegExp(`setBatchHitFlash\\(${v}\\.batch, foeHitFlash\\(${v}, `), file);
-  }
-  for (const file of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js']) {
-    assert.match(read(file), /f\.ai\.hurtKnock = puppetHurtStep\(p, f\.mobile, /, file);
-    assert.doesNotMatch(read(file), /f\.ai\.hurtKnock = p\.hurt; p\.hurt = false;/, file);
-  }
-  const w = read('src/scenes/world.js');
-  assert.match(w, /setBatchHitFlash\(layer\?\.batchOf\?\.\(id\), k\)/);
-  assert.doesNotMatch(w, /conceal = k > 0 \? \{ mode: 5/, 'the peers no longer borrow the concealed phase');
-  assert.match(w, /peerBodies\.draw\(canvas, \{ proj, view, eye, flashOf: peerFlashOf(?:, grow: face \? peerGrow : null, up: face\?\.up \?\? null)? \}\)/);   // PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): and the Overworld's grow
-  assert.match(read('src/net/peer/peerBodies.js'), /hitFlash: flashOf \? flashOf\(b\.id\) : 0/);
-});

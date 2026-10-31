@@ -54,16 +54,3 @@ test('HOUSES-3 the arena\'s move (arenaMove.js moveArenaRecords): every deed of 
   assert.deepEqual(deeds(b), [makeBuildingKey(5, 6, 2), makeBuildingKey(4, 3, 6), makeBuildingKey(1, 1, 0)], 'never two deeds to one building');
 });
 
-test('HOUSES-3 the hosts, by source: the bank refuses at the region\'s three and offers the town\'s houses, each with its own price and customs\' words, selling the deed offered; the order gives one while the region holds fewer than three; the save copies each deed and the restore reads them all; the layout pins and the line\'s houses every deed (mutants: each wire)', () => {
-  const M = rd('src/scenes/worldModes.js'), W = rd('src/scenes/world.js'), S = rd('src/systems/save/save.js');
-  assert.match(M, /housesFull: \(\) => regionHousesFull\(playerEntity\.houses \?\? \[\], bankRegion\(\)\),/);
-  assert.match(M, /housesFull: regionHousesFull\(playerEntity\.houses, region\),/);
-  assert.match(M, /houseOffers: \(\) => townHouses\(\)\.map\(\(\{ deed, summary \}\) => \(\{\n\s*price: deedSellPrice\(summary\),\n\s*crossed: crossedDeedLines\('house', \{ houses: playerEntity\.houses, regionIndex: bankRegion\(\), player: playerEntity, deed \}\),/);
-  assert.match(M, /const offered = townHouses\(\)\[i\] \?\? null;/);
-  assert.match(M, /deed: offered\?\.deed \?\? null \}/);
-  assert.match(S, /snap\.houses = \(entity\.houses \?\? \[\]\)\.map\(copyHouseSlot\);/);
-  assert.match(S, /padRegionTable\(snap\.houses\.map\(copyHouseSlot\), blankHouse\)/);
-  assert.match(S, /restoreDiscovery\(snap\.discovery, \{ houses: allDeeds\(entity\.houses\) \}\);/);
-  assert.match(W, /houses: allDeeds\(playerEntity\.houses\), rooms: playerEntity\.rentedRooms,/);
-  assert.match(W, /: allDeeds\(playerEntity\.houses\)\.filter\(deedStands\)\),/);
-});

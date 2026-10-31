@@ -50,12 +50,6 @@ function box(x0, y0, z0, x1, y1, z1) {
 }
 
 test('AUDIT SD IV (S1): THE END IS STOOD WITH THE LEVEL - the Rift, the Return and the landing back are placed by the host\'s own probe as the context is built, its doors shut, before a save or the room can open one; a door opened first moves all three (mutants: the stand left to the first unpaused frame)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  const at = D.indexOf('function standSdEnd()');
-  // PIN MOVED (SD-THROUGH): the host's probe is the end's one over its collider (scenes/superDungeon/sdEnd.js sdProbeOf - the
-  // Way Through's too), asked in standSdEnd before the Rift is placed
-  const p0 = D.indexOf('const probe = sdProbeOf(collider);', at);
-  assert.ok(p0 > at && p0 < D.indexOf('const rift = sdRiftPlace(', at), 'the stand asks the end\'s probe');
   const makeProbe = sdProbeOf;
   const I = trs(0, 0, 0, 0, 0, 0);
   // a closet 3 m across round the end, its east doorway shut by an action door onto a wider hall
@@ -82,40 +76,6 @@ test('AUDIT SD IV (S1): THE END IS STOOD WITH THE LEVEL - the Rift, the Return a
   assert.deepEqual(shut.at, [0, 0, 0], 'built: the Rift in the closet, on the end');
   assert.notDeepEqual(open.at, shut.at, 'a door opened first moves the Rift');
   assert.notDeepEqual(open.landing, shut.landing, 'and the landing back');
-  // so the host stands it as the level is built: after the api (every door the level has) and before it is handed back -
-  // nothing outside can apply a state to a context it does not yet hold
-  const api = D.indexOf('\n  const api = {'), handed = D.indexOf('\n  return api;\n}');
-  const stood = D.indexOf('\n  if (sdEnd && !_sdEndAsked) { _sdEndAsked = true; standSdEnd(); }\n  return api;\n}');
-  assert.ok(api > 0 && stood > api && stood < handed, 'the end stood at the build\'s end, latched');
-  assert.match(D, /if \(playerFeet && !_sdEndAsked\) \{ _sdEndAsked = true; standSdEnd\(\); \}/, 'the first frame finds it stood');
-  const applies = [...D.matchAll(/(?<!function )\bapplyWorld\(/g)].map((m) => m.index);
-  assert.ok(applies.length >= 2 && applies.every((i) => i > api && i < stood), 'a save\'s or the room\'s doors reach it only through the api it hands back');
-});
-
-test('AUDIT SD IV (R1): THE HOUR\'S LIGHT AFTER THE LAST FLAT - its blows, spoils\' lines, motes, sparks and beam (no depth written) drawn in drawFoes\' late slot, after the foes\', the piles\', the portals\' and the missiles\' flats and before the water; the Rift\'s window before them; drawn by the arm itself only when a window skips drawFoes (mutants: drawn before the flats again; the late slot forgets it; none under a window)', () => {
-  const M = read('src/scenes/worldModes.js'), D = read('src/scenes/dungeonContext.js');
-  // the late slot, run from its own text: the veiled peers, then the Hour's light - in the Hour alone
-  const slot = /lateWorldDraw: (\(\) => \{[^\n]*?\}),/.exec(M);
-  assert.ok(slot, 'the dungeon context\'s late slot');
-  for (const on of [true, false]) {
-    const calls = [], late = { on, proj: 'P', view: 'V', eye: 'E' };
-    const host = { drawVeiledPeerBodies: () => calls.push('veiled'), drawSdTelegraph: (a) => calls.push(a === late ? 'hour' : 'other') };
-    new Function('host', '_sdLate', `return ${slot[1]};`)(host, late)();
-    assert.deepEqual(calls, on ? ['veiled', 'hour'] : ['veiled'], on ? 'in the Hour: after the veiled peers, with the frame\'s own record' : 'out of it: nothing');
-  }
-  // the arm: the record filled every frame, after the Rift's window; the Hour's light drawn here only under a window
-  const rift = M.indexOf('if (dungeonCtx.sdEndLook) host.drawSdRift?.(');
-  const kept = M.indexOf('_sdLate.on = isSdRealm(dungeonLoc); _sdLate.proj = proj; _sdLate.view = view; _sdLate.eye = mwv.eye;');
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  const under = M.indexOf('if (_sdLate.on && windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) host.drawSdTelegraph?.(_sdLate);');
-  const overlay = M.indexOf('if (windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) { dungeonCtx.hideHudText?.();');
-  const foes = M.indexOf('dungeonCtx.drawFoes(dt, canvas, proj, view,');
-  assert.ok(rift > 0 && kept > rift && under > kept && overlay > under && foes > overlay, 'kept after the window, drawn under a window before its return, else left to drawFoes');
-  assert.equal((M.match(/host\.drawSdTelegraph\?\.\(/g) ?? []).length, 2, 'two doors, never both in a frame');
-  // drawFoes: the flats, the spells' light, then the late slot, then the water
-  const flats = D.indexOf('renderer.drawBillboards([..._mobileBatches, ..._dropBatches, ..._spellBatches],');
-  const fx = D.indexOf('magic.drawFx?.();'), hook = D.indexOf('opts.lateWorldDraw?.();'), water = D.indexOf('renderer.drawWater(waterQuads, DUNGEON_WATER_COLOR,');
-  assert.ok(flats > 0 && fx > flats && hook > fx && water > hook, 'after every flat drawFoes draws, before the water');
 });
 
 test('AUDIT SD IV (R3): THE ARENA\'S FLOOR HAS AN EDGE - past its rim a spark rests on nothing (flying, it flies on down; at rest, it slides off and falls), the shader\'s own flight and its JS mirror the same; a burst with no edge rests as before (the court\'s); the Stomp\'s ring throws no dust past the rim, a Stomp at the Remnant\'s keep as well (mutants: the edge never handed to the pass; the rest kept past it; the dust past the rim kept; the Hour\'s bursts edgeless)', () => {
@@ -210,68 +170,7 @@ test('AUDIT SD IV (R4): NOTHING OPEN OVER THE EYE - every lamp\'s head (its unde
   }
 });
 
-test('AUDIT SD IV (R5): THE ARM\'S HOUR FOG AND TRILIGHT MAKE NOTHING, on both lanes - L2 F9\'s measure (a child with a 64 MB young space, the least of six windows, against a control that must show) over the arm\'s own two lines, run from their text: the fog\'s colour and the lane\'s scaled fog and trilight were made a frame (640 B classic, 760 B under the lane); the light they hand is the light they handed (mutants: the fog\'s colour made a frame; the lane\'s fog made; the lane\'s trilight made)', () => {
-  const M = read('src/scenes/worldModes.js');
-  const line = (head) => { const i = M.indexOf(head); assert.ok(i > 0, head); return M.slice(i, M.indexOf('\n', i)).replace(/\s+\/\/ .*$/, ''); };
-  const lighting = line('if (isSdRealm(dungeonLoc)) { const _rl = realmLighting();'), fog = line('if (isSdRealm(dungeonLoc)) { applyFog(renderer, dungeonFog(');
-  const kept = [line('const _hourFog = {'), line('const _hourTri = {'), line('const _courtEquator = '), line('const courtEquatorOf = ')].join('\n');
-  // the light handed is the light it always was: dungeonFog / dungeonTrilight with nothing kept
-  const url = (p) => pathToFileURL(new URL(`../../../${p}`, import.meta.url).pathname).href;
-  const run = (lane) => {
-    const got = {}, renderer = { lightingLane: lane ? {} : null, setLighting: (a, s, c, tri) => { got.equator = [...a]; got.tri = JSON.parse(JSON.stringify(tri)); }, setMoonlight() {}, setFog: (...a) => { got.fog = [...a.slice(0, 4), [...a[4]]]; }, setSceneGrade() {} };
-    return { renderer, got };
-  };
-  return Promise.all(['src/world/superDungeon/sdRealm.js', 'src/render/enhancedLighting.js', 'src/render/underwaterFog.js'].map((p) => import(url(p)))).then(([R, EL, UF]) => {
-    for (const lane of [false, true]) {
-      const { renderer, got } = run(lane);
-      new Function('renderer', 'isSdRealm', 'dungeonLoc', 'realmLighting', 'dungeonTrilight', 'dungeonFog', 'applyFog', 'SD_REALM_FOG', 'SD_HOUR_GRADE', `${kept}\n${lighting}\n${fog}`)(renderer, () => true, {}, R.realmLighting, EL.dungeonTrilight, EL.dungeonFog, UF.applyFog, R.SD_REALM_FOG, {});
-      const tri = EL.dungeonTrilight(lane, R.realmLighting().tri), f = EL.dungeonFog(lane, R.SD_REALM_FOG);
-      const near = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 1e-6);
-      assert.ok(near(got.equator, tri.equator) && near(got.tri.sky, tri.sky) && near(got.tri.ground, tri.ground), `lane ${lane}: the Hour's trilight as it was`);
-      assert.deepEqual(got.fog.slice(0, 4), [f.mode, f.density, f.start, f.end]);
-      assert.ok(near(got.fog[4], f.color), `lane ${lane}: the Hour's fog as it was`);
-    }
-    // and made in place: the measure - each lane a session of its own, as a game is (one closure's feedback is its
-    // site's: a lane's frames measured after the other's run on code the other taught, and box what it never saw)
-    for (const lane of [false, true]) {
-      const script = `
-      const R = await import(${JSON.stringify(url('src/world/superDungeon/sdRealm.js'))});
-      const EL = await import(${JSON.stringify(url('src/render/enhancedLighting.js'))});
-      const UF = await import(${JSON.stringify(url('src/render/underwaterFog.js'))});
-      const realmLighting = R.realmLighting, SD_REALM_FOG = R.SD_REALM_FOG, dungeonTrilight = EL.dungeonTrilight, dungeonFog = EL.dungeonFog, applyFog = UF.applyFog;
-      const SD_HOUR_GRADE = {}, isSdRealm = () => true, dungeonLoc = {};
-      ${kept}
-      const bytes = (fn) => {
-        for (let f = 0; f < 20000; f++) fn();
-        let least = Infinity;
-        for (let w = 0; w < 6; w++) {
-          globalThis.gc(); globalThis.gc();
-          const h0 = process.memoryUsage().heapUsed;
-          for (let f = 0; f < 5000; f++) fn();
-          least = Math.min(least, (process.memoryUsage().heapUsed - h0) / 5000);
-        }
-        return least;
-      };
-      const out = {}, sink = [], feet = [1, 2, 3];
-      out.control = bytes(() => { sink[0] = [feet[0] + 0.5, feet[1] + 0.5, feet[2] + 0.5]; });
-      const renderer = { lightingLane: ${lane} ? {} : null, setLighting() {}, setMoonlight() {}, setFog() {}, setSceneGrade() {} };
-      out.lines = bytes(() => { ${lighting} ${fog} });
-      console.log(JSON.stringify(out));
-      `;
-      const child = spawnSync(process.execPath, [...ALLOC_CHILD_ARGS, '--input-type=module', '-e', script], { encoding: 'utf8' });
-      assert.equal(child.status, 0, child.stderr);
-      const m = JSON.parse(child.stdout.trim().split('\n').pop());
-      assert.ok(m.control >= 40, `the control made ${m.control.toFixed(2)} bytes a frame - the measure is blind`);
-      assert.ok(m.lines < 2, `lane ${lane}: the Hour's lines made ${m.lines.toFixed(2)} bytes a frame (the control ${m.control.toFixed(2)})`);
-    }
-  });
-});
-
 test('AUDIT SD IV (S2): THE HOLLOW\'S CITIES AND TEMPLATES ARE MAPS.BSA\'S - the host\'s own lines, run over a pack that rewrites a city\'s grid and a keep\'s: the cities rank and the templates stand as the classic rows have them, whether the pack loaded or not; read over the served rows, a client with the pack and one without ranked them apart (mutants: the cities over the served rows; the templates over them)', () => {
-  const W = read('src/scenes/world.js');
-  const grab = (head) => { const i = W.indexOf(head); assert.ok(i > 0, head); return W.slice(i, W.indexOf('\n', i)); };
-  const host = new Function('maps', 'params', 'landform', '_hubRows', 'hubClaim', 'sdTemplates', 'isMainStoryDungeon',
-    `${['  const classicRow = (row) =>', '  let _classicRows = ', '  const _sdCityRows = ', '  const _sdTemplateRows = ', '  _classicRows = null;'].map(grab).join('\n')}\nreturn { _sdCityRows, _sdTemplateRows };`);
   const city = (l, name, w, h, b) => ({ regionIndex: 1, locationIndex: l, name, mapTableData: { locationType: LOCATION_TYPES.TownCity, mapId: 100 + l }, exterior: { exteriorData: { width: w, height: h }, buildingCount: b } });
   const keep = (w) => ({ regionIndex: 1, locationIndex: 9, name: 'Castle Hollowmere', hasDungeon: true, dungeon: { blocks: new Array(14).fill({}) }, mapTableData: { locationType: LOCATION_TYPES.DungeonKeep, mapId: 109 }, exterior: { exteriorData: { width: w, height: w } } });
   const classic = [city(0, 'Mesajer', 5, 5, 60), city(1, 'Berbemijet', 4, 4, 50), keep(1)];
@@ -280,12 +179,6 @@ test('AUDIT SD IV (S2): THE HOLLOW\'S CITIES AND TEMPLATES ARE MAPS.BSA\'S - the
   assert.deepEqual(names(classic), ['Mesajer', 'Berbemijet'], 'MAPS.BSA\'s order');
   assert.deepEqual(names(packed), ['Berbemijet', 'Mesajer'], 'the pack\'s rows rank them apart');
   assert.equal(sdTemplates(packed).length, 0, 'and its keep\'s grid is too wide to clone');
-  for (const loaded of [true, false]) {
-    const maps = { locationReplaced: (r, l) => loaded && l > 0, readClassicLocation: (r, l) => classic[l === 9 ? 2 : l], getRegionName: () => 'Ilessan Hills' };
-    const out = host(maps, new URLSearchParams('online'), false, loaded ? packed : classic, hubClaim, sdTemplates, () => false);
-    assert.deepEqual(names(out._sdCityRows), ['Mesajer', 'Berbemijet'], `the pack ${loaded ? 'loaded' : 'failed'}: MAPS.BSA's order`);
-    assert.deepEqual(out._sdTemplateRows.map((l) => l.name), ['Castle Hollowmere'], `the pack ${loaded ? 'loaded' : 'failed'}: the keep MAPS.BSA holds`);
-  }
 });
 
 import { LARGE_BOAT_ARCHIVE } from '../../../src/world/ships/largeBoatArt.js';

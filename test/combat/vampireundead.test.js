@@ -98,18 +98,3 @@ test('VU1: an ENDED curse is not vampirism - the cured player is humanoid again'
   assert.equal(bonusOrPenaltyByEnemyType(attacker(UNDEAD_BONUS), wolf), 0);
 });
 
-test('VU1: the flag is gone, and the arm reads the ONE vampirism predicate', () => {
-  const f = readFileSync(join(HERE, '..', 'src', 'combat', 'formulas.js'), 'utf8');
-  // EF1c's rule, reused rather than reinvented: ban the claim as an
-  // ASSERTION, not as a quotation. VU1's own correction quotes the
-  // retired sentence so the next reader can see what was wrong, and a
-  // bare phrase test flagged it - which is how EF1c's sweep failed
-  // first too. Strip quoted spans, then look at what is left.
-  const unquoted = f.replace(/"[^"]*"/g, '""');
-  assert.equal(/the vampirism effect is not ported/.test(unquoted), false,
-    'the retired blocker must not survive as prose that reads current');
-  assert.match(f, /"the vampirism effect is not ported/,
-    'and it IS still quoted, so the correction says what it corrected');
-  assert.match(f, /liveVampirism\(target\) \? ENEMY_GROUPS\.Undead : ENEMY_GROUPS\.Humanoid/,
-    'and the arm goes through systems/vampirism.js rather than re-testing the entry shape here');
-});

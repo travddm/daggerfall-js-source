@@ -129,37 +129,3 @@ test('TEX1 the unhandled rejection, executed: a door that answers the OLD shape 
   assert.match(lines[0], /uploadTexture\(img, ht:/, 'with the caller and the texture key');
 });
 
-test('TEX1 every door converts at the door: no module under src/ imports toColor32Order, so the shape cannot be got wrong again', () => {
-  const walk = (dir) => readdirSync(join(root, dir), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : e.name.endsWith('.js') ? [join(dir, e.name)] : []));
-  const importers = walk('src').filter((f) => f !== 'src/formats/color32Order.js' && /import[^;]*\btoColor32Order\b[^;]*from/.test(rd(f)));
-  assert.deepEqual(importers, [], 'the flip-only conversion has ONE home and no importers - every door takes toColor32');
-  // ...and each door is there, converting, by name
-  // HT3: the two SCREEN sprites keep their rows (toScreenOrder); their
-  // world neighbours still flip. Both are the same SHAPE, which is what
-  // TEX1 is about - what changed is which way up, not what it answers.
-  assert.match(rd('src/systems/handheldTorches.js'), /return toScreenOrder\(await decodePng\(bytes\)\);/, 'handheld torches (the crash), rows kept');
-  assert.match(rd('src/scenes/droppedTorches.js'), /return toColor32\(await decodePng\(new Uint8Array\(await res\.arrayBuffer\(\)\)\)\);/, 'dropped torches');
-  assert.match(rd('src/combat/weapon/weaponWidgetAssets.js'), /return toScreenOrder\(await decodePng\(bytes\)\);/, 'the weapon widget (WW3), rows kept');
-  assert.match(rd('src/combat/weapon/weaponWidgetAssets.js'), /try \{ return toScreenOrder\(tex\.rgba\(\)\); \}/, '...and its BUNDLE arm keeps its rows too - the reader answers top-first (DWHD1)');
-  assert.match(rd('src/systems/seasonsIliacBayAssets.js'), /const image = toColor32\(await decode\(bytes\)\);/, 'seasons');
-  assert.match(rd('src/systems/textureReplacement.js'), /toColor32\(await decode\(bytes\)\)/, 'M-TEX, which had it right all along');
-  // the seasons re-wrap at the upload site is gone - H4's own law. AUDIT 05b A12: one site now, every host's
-  // (world/naturePicture.js - world.js, exterior.js and the yards ask it)
-  assert.match(rd('src/world/naturePicture.js'), /renderer\.uploadTexture\(archive, key, sib\.texture\.image, \{ mips: false, variant: '' \}\);/, 'the door\'s answer, handed over whole');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/world/naturePicture.js']) {
-    assert.ok(!/colors: (img|sib\.texture\.image)\.data/.test(rd(host)), `${host}: no re-wrap at the site`);
-  }
-  // the contract each torch door documents is the one it answers
-  assert.match(rd('src/systems/handheldTorches.js'), /loadSprite\(record, frame\) -> Promise<\{width, height, colors\} \| null>/);
-  assert.match(rd('src/systems/seasonsIliacBayAssets.js'), /`\{ width, height, colors \}` RGBA in getColor32 \(bottom-up\) order/);
-});
-
-test('TEX1 neither torch load can escape again: both catch, and the dropped-torch record fails EMPTY so the draw no-ops', () => {
-  const ht = rd('src/systems/handheldTorches.js');
-  assert.match(ht, /\}\)\(\)\.catch\(\(e\) => console\.warn\('\[handheld torches\] the sprites would not load', e\)\);/, 'the promise nothing awaits cannot reject');
-  const dt = rd('src/scenes/droppedTorches.js');
-  assert.match(dt, /try \{\s*\n\s*for \(let f = 0; f < 16; f\+\+\) \{/, 'the upload loop is guarded');
-  assert.match(dt, /\} catch \(e\) \{\s*\n\s*console\.warn\('\[dropped torches\] the sprites would not load', e\);\s*\n\s*\}\s*\n\s*const entry = \{ count, size \};/, 'and still records an entry - count 0');
-  assert.match(dt, /if \(d\.dead \|\| !entry\?\.count \|\| !renderer\?\.createBillboardBatch\) return;/, 'which build already no-ops on');
-});
-

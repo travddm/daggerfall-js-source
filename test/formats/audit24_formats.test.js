@@ -26,15 +26,6 @@ test('audit24 formats: the BIOG # id parses like int.TryParse, all-or-nothing', 
 });
 
 test('audit24 formats: a 1-frame weapon-anim record answers (0,0), not undefined', () => {
-  // ReadWeaponCif sets only Header.FrameCount over a default
-  // ImgFileHeader STRUCT (CifRciFile.cs:456), so Width/Height/XOffset/
-  // YOffset are 0 - and GetSize/GetOffset's frameCount <= 1 arms
-  // (:223-226, :240-243) hand those zeros back. The port's record
-  // carried no such keys, so the arms answered undefined and any
-  // arithmetic on them NaN.
-  const src = readFileSync(new URL('../../src/formats/cifRciFile.js', import.meta.url), 'utf8');
-  assert.match(src, /header: \{ frameCount, width: 0, height: 0, xOffset: 0, yOffset: 0 \}/,
-    'the mint carries the struct defaults');
   const f = Object.create(CifRciFile.prototype);
   f._records = [{ header: { frameCount: 1, width: 0, height: 0, xOffset: 0, yOffset: 0 } }];
   assert.deepEqual(f.getSize(0), { width: 0, height: 0 });

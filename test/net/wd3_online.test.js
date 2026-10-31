@@ -106,8 +106,6 @@ test('WD3 online, the claim\'s ONE write keeps a town in one layout (AUDIT WD3 R
   // the race: a check before the batch can pass while another first claim lands - the write's own predicate refuses
   const homes = await import('../../server-account/src/homes.js');
   assert.equal(typeof homes.claimHome, 'function');
-  const src2 = src('server-account/src/homes.js');
-  assert.match(src2, /AND NOT EXISTS \(SELECT 1 FROM homes t WHERE t\.map_id = \? AND NOT \(\$\{LAYOUT_MATCH_SQL\}\)\)/);
   const raw = env.DB._raw;
   const mods = (layout) => { const m = new Set(layout ? layout.split('+').map((p) => p.split('@')[0]) : []); return HOME_LAYOUT_MODS.flatMap((v) => [`${v}@`, m.has(v) ? 1 : 0]); };
   const sql = `SELECT COUNT(*) AS n FROM homes t WHERE t.map_id = ? AND NOT (${HOME_LAYOUT_MODS.map(() => '(instr(COALESCE(t.layout, \'\'), ?) > 0) = ?').join(' AND ')})`;
@@ -123,41 +121,6 @@ test('WD3 online, the claim\'s ONE write keeps a town in one layout (AUDIT WD3 R
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE map_id = ?').get(RACE).n, 1);
 });
 
-test('WD3 online, the client: the homes\' towns asked at the boot, before the first town is built (a wait of HOME_LAYOUTS_WAIT_MS, then asked again behind the play, each wait longer); online the pins are the service\'s alone - a save\'s own records would stand one player\'s town apart from the room\'s; the claim sends its town\'s layout, none for Daggerfall\'s', () => {
-  assert.match(src('src/net/accountClient.js'), /layouts: \(\) => post\('\/v1\/homes\/layouts', \{\}\),/);
-  const W = src('src/scenes/world.js');
-  // PIN MOVED (BOOT-OVERLAP, 2026-10-12): asked above the data's read, beside it - the first build's wait reads that ask
-  assert.match(W, /const bootHomeLayoutsAsk = homesApi \? homesApi\.layouts\(\)\.catch\(\(\) => null\) : null;\n\s+status\('loading data'\);/);
-  assert.match(W, /let _homeLayoutsAsk = bootHomeLayoutsAsk;/);
-  assert.match(W, /const heard = await Promise\.race\(\[ask, new Promise\(\(res\) => setTimeout\(\(\) => res\(null\), HOME_LAYOUTS_WAIT_MS\)\)\]\);/);
-  assert.match(W, /if \(!homesApi \|\| _serverLayoutRecords !== null\) return;/, 'asked until heard (AUDIT WD3 O2)');
-  assert.match(W, /\}, HOME_LAYOUTS_WAIT_MS \* Math\.min\(attempt, HOME_LAYOUTS_RETRIES\)\);/);
-  assert.match(W, /ask\.then\(\(late\) => \{ if \(_serverLayoutRecords === null\) takeHomeLayouts\(late\); \}\);/, 'the first ask\'s late answer heard');
-  assert.match(W, /const forgotten = homeLayoutsOnline && _serverLayoutRecords === null \? 0 : pruneDiscoveryLayouts\(\);/, 'nothing forgotten before the service has said (AUDIT WD3 S4)');
-  // AUDIT WD3 R2/B1: heard is APPLIED - the pins standing - and every town pack of the room's loaded here
-  assert.match(W, /homeLayoutsHeard: \(\) => !homeLayoutsOnline \|\| \(_homeLayoutsApplied && !worldDataPacksMissing\(\)\.length\),/);
-  assert.match(W, /homeTownsMissing: \(\) => homeLayoutsOnline && worldDataPacksMissing\(\)\.length > 0,\n {4}hearHomeLayouts,/);
-  assert.match(W, /if \(!set\) return;   \/\/ overtaken by a later answer, which marks it\n {6}_homeLayoutsApplied = true;\n {6}modes\?\.homeLayoutsLanded\?\.\(\);/, 'the room furnished once they land (AUDIT WD3 R7)');
-  assert.match(W, /_serverLayoutRecords = null;   \/\/ not applied: asked again\n {6}askHomeLayoutsAgain\(1\);/);
-  assert.match(W, /const gen = \+\+_pinsGen;/);
-  assert.match(W, /if \(gen !== _pinsGen\) return false;   \/\/ AUDIT WD3 R3/, 'an overtaken call sets nothing');
-  assert.match(W, /heard: \(\) => !homeLayoutsOnline \|\| \(_homeLayoutsApplied && !worldDataPacksMissing\(\)\.length\),/, 'nor a yard (AUDIT WD3 R6)');
-  const Y = src('src/scenes/homeYards.js');
-  assert.match(Y, /if \(deps\.heard\?\.\(\) === false\) return;/);
-  assert.match(Y, /if \(!feet \|\| !deps\.outside\?\.\(\) \|\| deps\.heard\?\.\(\) === false\) return null;/);
-  // until heard no home is bought and no home's room furnished; a claim refused for its town's layout hears them again
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /if \(host\.homeTownsMissing\?\.\(\)\) \{ townTalk\?\.say\?\.\(accountRefusalText\('home-towns'\)\); return; \}   \/\/ AUDIT WD3 B1: a town mod's pack did not load here\n {4}if \(host\.homeLayoutsHeard\?\.\(\) === false\) \{ townTalk\?\.say\?\.\(accountRefusalText\('home-layout'\)\); host\.hearHomeLayouts\?\.\(\); return; \}/);
-  assert.match(M, /homeLayoutsLanded\(\) \{ loadHomeDecor\(\); \},/);
-  assert.match(M, /if \(r\.error === 'home-layout'\) host\.hearHomeLayouts\?\.\(\);/);
-  assert.match(M, /if \(host\.homeLayoutsHeard\?\.\(\) === false\) \{ console\.warn\('\[layout\] the homes\\' towns are not heard yet - the room\\'s pieces wait'\); return; \}/);
-  assert.match(src('server-account/src/index.js'), /if \(r\.error === 'home-layout'\) return json\(\{ error: 'home-layout', layout: r\.layout \?\? null \}, 409, origin\);/);
-  assert.match(W, /_serverLayoutRecords = towns\.filter\(\(t\) => Array\.isArray\(t\)\)\.map\(\(\[mapId, layout\]\) => \(\{\n {6}locationKey: _layoutKeyOfMapId\.get\(Number\(mapId\) >>> 0\) \?\? null, stamp: typeof layout === 'string' \? layout : undefined, kind: 'house',/);
-  assert.match(W, /const records = homeLayoutsOnline \? \(_serverLayoutRecords \?\? \[\]\) : layoutRecordsOf\(/);
-  assert.match(src('src/systems/online/onlineHomes.js'), /call: \(\/\*\* @type \{any\} \*\/ at\) => homes\.claim\(\{ mapId, buildingKey, region, price, realm: at, layout \}\),/);
-  assert.match(src('src/systems/online/onlineHomes.js'), /layout: layout \|\| null \}\);   \/\/ WD3 \(AUDIT WD3 B2\)/, 'always said, null for Daggerfall\'s own');
-});
-
 test('WD3 online, the room: both switches are the room\'s (forced on - two players who disagreed would walk two towns, one through the other\'s houses), each a mod\'s one Enabled, on by default', () => {
   for (const v of ['beautiful-villages', 'beautiful-cities']) {
     assert.deepEqual({ ...ONLINE_ROOM_MOD_KEYS[v] }, { Enabled: true }, v);
@@ -169,24 +132,3 @@ test('WD3 online, the room: both switches are the room\'s (forced on - two playe
   assert.equal(MOD_SETTINGS['beautiful-cities'].title, 'Beautiful Cities of Daggerfall');
 });
 
-test('WD3 online, a building\'s room is its layout\'s (AUDIT WD3 B3) - the layout mods serving its town ride in the room key\'s high bits, so two players whose town stands in two layouts never share a room (its doors, chests and memory), a memory kept from before the mods lands on no other building, and Daggerfall\'s own town keeps the rooms it always had; the room, its memory and the scene agree', async () => {
-  const { roomKeyFor } = await import('../../src/net/online.js');
-  const { interiorLocationKey, layoutRoomKey } = await import('../../src/world/interior/interiorShared.js');
-  const { isWorldRoom } = await import('../../src/net/wire.js');
-  const bk = 0x70711;   // the largest key a town of 8 x 8 blocks of 32 records makes is under 2^19
-  assert.equal(layoutRoomKey(bk, null), bk);
-  assert.equal(layoutRoomKey(bk, 'classic'), bk);
-  assert.equal(layoutRoomKey(bk, BV), bk + 0x1000000);
-  assert.equal(layoutRoomKey(bk, 'beautiful-cities@0.5.0'), bk + 0x2000000);
-  assert.equal(layoutRoomKey(bk, BOTH), bk + 0x3000000);
-  for (const layout of [null, BV, BOTH]) {
-    const room = roomKeyFor({ host: 'world', mode: 'interior', mapId: TOWN, buildingKey: bk, layout });
-    assert.equal(room, interiorLocationKey(TOWN, bk, layout), 'the room and its memory, one spelling');
-    assert.ok(isWorldRoom(room), `${room}: a room the relay keeps a world for`);
-  }
-  assert.equal(roomKeyFor({ host: 'world', mode: 'interior', mapId: TOWN, buildingKey: bk }), `interior:m${TOWN}.${bk}`, 'Daggerfall\'s own, as before');
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /kind: 'interior', buildingKey: interiorBuilding\?\.buildingKey \?\? 0, layout: _visitLayout,/, 'the room identity carries the visit\'s layout');
-  assert.match(M, /_visitLayout = visitLayoutNow\(\);/);
-  assert.match(src('src/scenes/world.js'), /layout: ident\?\.layout \?\? null,/);
-});

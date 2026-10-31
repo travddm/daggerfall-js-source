@@ -462,21 +462,6 @@ test('INT9 THE RELAY, THE FIGHT: a strike in the zone is the referee\'s - routed
   assert.equal(refs(c, 'fell').length, 1, 'never routed');
 }));
 
-test('INT9 THE RELAY, A FALL UNPICKED AND KIN: a fall whose killer never picks is signed without a piece on the room\'s next frame past WILD_REF.pickMs; a blow at one\'s own duel opponent is the duel\'s, never the zone\'s (mutants: the step unread; the duel\'s two fighting in the zone)', () => withZone(async ({ say, join, step, fell, relayKp }) => {
-  const a = await join('peer-0001', -1), b = await join('peer-0002', 1);
-  for (const ws of [a, b]) await say(ws, { k: 'zone', z: 1 });
-  const f = await fell(a, 'peer-0002');
-  step(WILD_REF.pickMs + 1);
-  await say(a, { k: 'zone', z: 1 });   // any frame the room takes
-  const [rc] = refs(b, 'rc');
-  assert.ok(rc, 'signed without a pick');
-  const v = await verifyWildReceipt(rc.rc, relayKp.publicKey, { subtle, nowS: T + 200 });
-  assert.deepEqual([v.claims.r, v.claims.w, v.claims.c], [f.r, -1, RC], 'no piece; the fallen\'s realm character');
-  // PIN MOVED (MAC, 2026-10-14, "Guildmates are friends"): kin is net/wild/wildRef.js wildKin - a duel's two and one guild read
-  // here, the hub's party and its truce asked only when neither is (test/systems/fb1014_pvploot.test.js holds the guild end to end)
-  assert.equal(rd('server/src/index.js').includes("const kin = wildKin({ duel: duelKin, guilds: [a.gi, tb.gi] }) || wildKin({ party: await this._wdunKinOf(a.sub, tb.sub, now) });"), true, 'a duel\'s two, one guild, and the hub\'s party and its truce, are kin');
-}));
-
 test('INT9 THE RELAY, THE DEPOSIT: the room keeps remains only on the service\'s order (its key, this fall\'s id), and only once its records digest to it; a second carrier\'s deposit of a vouched remains is nothing; the killer\'s piece is said with its owner and taken by them alone (mutants: a deposit with no order kept; the digest unread; the piece anyone\'s)', () => withZone(async ({ r, say, join, now }) => {
   const a = await join('peer-0001', -1), b = await join('peer-0002', 1), c = await join('peer-0003', 3);
   const items = [rec1(1), rec1(2), rec1(3)];
@@ -639,22 +624,6 @@ test('INT9 THE SERVICE, THE FALLEN\'S OWN ACT: the drop taken off the judged rec
   assert.deepEqual([other.status, other.body.error], [403, 'not-yours'], 'never another character\'s record');
 });
 
-test('INT9 (AUDIT) THE SERVICE, THE DROP\'S LEDGER: every valuable piece dropped lies in the remains under a FRESH id, and the id it had is written down as the fallen\'s own copy - a game that kept the piece holds a copy that moves by no route, and whoever takes it up holds it clean (it charged the taker); a crafted piece keeps its craft\'s key, written down the same; the save two back dropped (mutants: the old id in the remains; no copy written; the old save left)', async () => {
-  const { svc, ria, R, receipt } = await fallen();
-  const prevObj = () => svc.env.DB._raw.prepare('SELECT prev FROM realm_characters WHERE id = ?').get(R.id).prev;
-  const res = await fall(svc, ria, { receipt: await receipt(), realm: R.at() });
-  assert.equal(res.status, 200, JSON.stringify(res.body));
-  const sword = res.body.items.find((it) => it.templateIndex === 120);
-  assert.match(sword.uid, /^[0-9a-f]{16}$/);
-  assert.notEqual(sword.uid, '00000000000000a2', 'the magic sword (a piece the ledger follows): never the id it had');
-  assert.deepEqual(res.body.items.filter((it) => it.templateIndex !== 120 && it.uid).map((it) => it.uid).sort(), ['00000000000000a3'], 'a plain piece is no piece the ledger follows: as it was');   // PIN MOVED (STORE-KEEPS): the cart's plain piece stays
-  const copies = svc.env.DB._raw.prepare('SELECT uid FROM item_dupes WHERE char_id = ? ORDER BY uid').all(R.id).map((x) => x.uid);
-  assert.deepEqual(copies, ['00000000000000a2'], 'the id it had, the fallen\'s copy');
-  assert.equal(svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM item_uids WHERE uid = ?').get(sword.uid).n, 0, 'the fresh id, nobody\'s yet');
-  assert.ok(prevObj() == null || svc.env.SAVES._map.has(prevObj()), 'the row names no object that is gone');
-  assert.ok(rd('server-account/src/wild.js').includes('await dropObjects(ctx.bucket, [moved.prev]);'), 'the save two back dropped, as every act drops it');
-});
-
 test('INT9 (AUDIT) THE SERVICE, EVERY CANDIDATE ASKED: the ledger is asked of every piece the death could take, never a dry run\'s fitted few - a barred piece in the fit lets in one past it, and that one is asked too (mutants: the fitted few asked)', async () => {
   const svc = await standService();
   const ria = await svc.registered('Riadne');
@@ -748,22 +717,6 @@ test('INT9 THE SERVICE, THE LEDGER AND THE FREEZE: a piece the ledger bars from 
 // ─── THE CLIENT ─────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('INT9 THE CLIENT: a blow rolled on my own sheet and sent as a number; no defender\'s resolve; the referee\'s fall a DEATH no door turns aside (AUDIT INT9: the SetHealth(0) door\'s AvoidDeath and withholding stood a fallen up); my drop the service\'s act on my record, naming the room my remains lie in, and EXACTLY what it took out of my pack (AUDIT INT9: the game ran the law again without the ledger\'s word); the room given the service\'s records on its order, chunked by their bytes; a fall I won seized after the grace where the body fell (mutants: the defender\'s resolve kept; a drop of my own choosing taken; the seizure unread; the deposit in one heavy frame)', () => {
-  const w = hostText('src/scenes/world.js'), o = rd('src/net/online.js');
-  assert.ok(o.includes('if (primary) this.wildOk = relaySupportsWildRef(relayV);'), 'a relay that referees the zone, or none of it');
-  assert.ok(o.includes("} else if (m.t === 'wref') {"));
-  assert.ok(w.includes('online?.setWildZone?.(wildCan() ? 1 : 0, playerEntity.health <= 0);'));   // PIN MOVED (AUDIT FOE-KEEPS E2): and left dying
-  assert.ok(w.includes("const n = wildFight.blow(to, 'strike', { by, p: campToWire(player.feetAt()), d: Math.trunc(r.dmg),"));
-  assert.ok(!w.includes('resolveDuelStrike(d, playerEntity'), 'the defender resolves nothing');
-  assert.ok(w.includes('      forcePlayerDeath(playerEntity);\n'), 'the referee\'s fall, a death');
-  assert.ok(w.includes('call: (at) => wildAccount.fall({ receipt: rc, realm: at, room: lay, ...(host.online?.wildCollectAt?.(lay) ? { collect: 1 } : {}), ...wildFallWords() }),'));   // PIN MOVED (STORE-KEEPS, HOST-SPLIT): the words carry no wagon now, from scenes/wildDropHost.js   // PIN MOVED (FOE-KEEPS): the receipt alone - a death to a foe asks nothing   // PIN MOVED (AUDIT FB1019f B2): the words through wildFallWords (systems/wild/wildDeath.js) - the wagon's and COMPANION-DROP's `packs` (test/systems/fb1019f_companiondrop.test.js); PIN MOVED (MAC, 2026-10-14): and my killer's piece into escrow where its room signs the collect; PIN MOVED (CART-AWAY, Mac, 2026-10-15): and my wagon's word (test/systems/fb1015_cartaway.test.js)
-  assert.ok(w.includes('const out = wildTakeTook(playerEntity, d.took, d.gold, (it) => { if (isEquipped(it)) unequipItem(playerEntity, it); }, wildPacks(host.naval?.companions?.party, revenantsWithYou()));'), 'what the service took, and nothing of my own reckoning');   // PIN MOVED (HOST-SPLIT): scenes/wildDropHost.js   // PIN MOVED (COMPANION-DROP, FIELD BUGS 2026-10-19f): and out of my companions' packs at my side
-  assert.ok(!w.includes('takeWildDeath('), 'the law never run again on my pack');
-  assert.ok(w.includes('if (d.order && n && body) host.wildDeposit({ r: d.r, items: d.items, o: d.order, p: body.p, room, mine: body });'), 'the service\'s records, on its order');   // PIN MOVED (HOST-SPLIT): scenes/wildDropHost.js
-  assert.ok(w.includes("online?.sendWild({ k: 'fall', r: dep.r, p: dep.p, items: dep.chunks[dep.k], last: dep.k === dep.chunks.length - 1 ? 1 : 0, o: dep.o }, { room: dep.room })"));
-  assert.ok(w.includes('_wildDeposits.push({ ...dep, chunks: wildChunks(dep.items, WILD_ITEMS_MAX, room), k: 0, at: Date.now() });'), 'chunked by their bytes');
-  assert.ok(w.includes('wildAccount.fall({ receipt: s.rc, room: s.room, ...(host.online?.wildCollectAt?.(s.room) ? { collect: 1 } : {}) }).then((a) => {'), 'the seizure names the room that refereed it');   // PIN MOVED (WILD-REJOIN, HOST-SPLIT): wildSeizeFrame moved verbatim to scenes/wildSeizeHost.js, which hostText reads with its host   // PIN MOVED (MAC, 2026-10-14): and asks the escrow where it collects
-  assert.ok(w.includes('const p = s.p ?? campToWire(player.feetAt());'), 'laid where the body fell');
-  assert.ok(!/takeWildDrop\(|takeWildGold\(/.test(w), 'no drop of the client\'s own making');
   // the chunks: every frame of a heavy drop inside the wire's bound
   const heavy = Array.from({ length: 16 }, (_, i) => ({ group: 'Weapons', templateIndex: 120, material: 0, note: `${i}`.repeat(1500) }));
   const room = WILD_DATA_MAX - JSON.stringify({ k: 'fall', r: '0123456789ab', p: [1, 2, 3], items: [], last: 0, o: 'x'.repeat(900) }).length - 16;

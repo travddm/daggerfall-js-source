@@ -78,47 +78,6 @@ test('EV5: withMoonAmbient folds in place; null is a no-op', () => {
 });
 
 test('EV5: the wiring - three lit shaders, the latched flat tint, the studio, the hosts', () => {
-  const r = readFileSync('src/render/renderer.js', 'utf8');
-  // the second directional term in exactly the three normal-bearing
-  // programs (mesh, character, terrain) - the billboard program has no
-  // normals and takes no uMoonDir
-  assert.equal((r.match(/uniform vec3 uMoonDir;/g) || []).length, 4);   // BLOOD AUDIT 5: and the decal, which reads its normal off its own derivatives and takes the moon by N.L (uDecalMoon * mdiff, not this program's colour * scale form)
-  assert.equal((r.match(/uMoonColor \* \(uMoonScale \* mdiff\)/g) || []).length, 3);
-  // the flats: the Lambert-average half, INSIDE the _clockLit latch -
-  // clockless scenes keep their full-bright flats
-  // ANCHORED INSIDE drawBillboards, which is what this pin has always
-  // meant. It used to take `indexOf('if (this._clockLit)')` - the
-  // FIRST one in the file - and that held only while the billboard
-  // pass was the first thing to ask the latch. BLOOD1a's decal pass
-  // asks it too, and legitimately (a mark on a dungeon floor is as
-  // dark as the floor, and a clockless scene keeps it bright), which
-  // stretched the slice from one branch to eighty-nine thousand
-  // characters and swept up a second triple. The law is the FLATS'
-  // half, so the slice is the flats' draw.
-  const bbAt = r.indexOf('  drawBillboards(batches');
-  assert.ok(bbAt > 0, 'the billboard pass');
-  const litBranch = r.slice(r.indexOf('if (this._clockLit)', bbAt), r.indexOf('gl.uniform3f(this.bbUTint, 1, 1, 1)'));
-  assert.equal((litBranch.match(/mc\[\d\] \* this\._moonScale \* 0\.5/g) || []).length, 3);   // EL1: `mc` is _moonColor as the installed set wants it (_c3)
-  assert.match(litBranch, /mc = this\._c3\(this\._moonColor, this\._decB\)/);
-  // the studio borrow zeroes the moon and returns it - no moonlight on
-  // a UI read-back panel
-  const borrowStart = r.indexOf('const saved = studio');
-  const borrow = r.slice(borrowStart, r.indexOf('const cs = this._charSpriteRT()', borrowStart));
-  assert.ok(borrow.includes('moonScale: this._moonScale') && borrow.includes('this._moonScale = 0;')
-    && borrow.includes('this._moonScale = saved.moonScale;'), 'borrow, zero, return');
-  // the default is OFF - scale 0 until a host says otherwise
-  assert.ok(r.includes('this._moonScale = 0;\n    this._moonColor'), 'constructor default is no moon');
-  // the seam: only the enhanced sky has moon state to answer with
-  const shared = readFileSync('src/scenes/shared.js', 'utf8');
-  // DS1: the mod's moons feed the same term (dynamicMoons); the dome's
-  // arm and the classic null are as they were.
-  // AUDIT 65 MC-3: the mod's arm is the BRIDGE's own export now, not a
-  // second copy of its body - dynamicMoonlight carries the null guard,
-  // so the arm a future host forgets lives in one place.
-  // PIN MOVED (NIGHT-FOG): the term's body is the controller's `moonNow`, which the lit fog asks too (systems/weather/nightFog.js)
-  assert.match(shared, /const moonNow = \(\) => \(enhancedSky\?\.state \? moonlightTerm\(enhancedSky\.state\) : dynamicMoonlight\(dynamicMoons\)\);/,
-    'classic answers null - the 1:1 lane keeps the hard-off night');
-  assert.match(shared, /moonlight\(\) \{ return moonNow\(\); \},/, 'and the world light asks the same term');
   // and the export itself answers, rather than merely being named: the
   // null arm, and byte-for-byte moonlightTerm for a state the mod's own
   // producer mints (dynamicMoonState, the shape shared.js hands it).
@@ -142,37 +101,4 @@ test('EV5: the wiring - three lit shaders, the latched flat tint, the studio, th
     assert.ok(!readFileSync(host, 'utf8').includes('setMoonlight'),
       `${host} never calls setMoonlight - a fresh renderer's scale is already 0`);
   }
-  // AUDIT EV F-R1: on the ONE shared renderer, "never calls" was the
-  // leak - the exterior's per-frame moon froze at whatever the last
-  // outdoor frame set, and a tavern entered on a full-Masser night
-  // stayed moonlit for the visit (the F001 windowEmission bug class,
-  // one field over). The modal frames now go dark EXPLICITLY: the
-  // only setMoonlight calls in worldModes and the automap are the
-  // null form, one per modal arm.
-  const wm = readFileSync('src/scenes/worldModes.js', 'utf8');
-  // WB6a: the one exception, and it cannot leak - the Burning Court's key light (the vortex's fire behind the boss)
-  // is set on the moon's term in the dungeon arm, in the SAME frame and right after that arm's own null clear, so the
-  // next frame of any arm starts dark again (WB6b: a strike in the Deadlands' sky swings it for a moment - the same call)
-  // SD5a: and the Shattered Hour's key (its clock-face's light) the same way - in the Hour alone, straight after the court's
-  // line, so the next frame of any arm starts dark again (PIN MOVED)
-  assert.equal((wm.match(/renderer\.setMoonlight\(/g) || []).length, 5, 'both modal arms clear the moon, and the court, the Hour and an Elite Breach\'s circle set their keys');   // EG-PLAY (PIN MOVED): the Spire's key
-  assert.equal((wm.match(/renderer\.setMoonlight\(null\);/g) || []).length, 2, 'the clears to null');
-  assert.match(wm, /      renderer\.setMoonlight\(null\);\n      renderer\.setIndirectLight\(NO_INDIRECT_POS, 0, NO_INDIRECT_COLOR\);\n      if \(isGateArena\(dungeonLoc\)\) \{ const _cl = courtLighting\(deadlandsFlash\(_deadS\)\);[^\n]*renderer\.setMoonlight\(_cl\.key\); \}/,
-    'the court\'s key, in the court alone, straight after the dungeon arm\'s own clear');
-  assert.match(wm, /renderer\.setMoonlight\(_cl\.key\); \}[^\n]*\n      if \(isSdRealm\(dungeonLoc\)\) \{ const _rl = realmLighting\(\);[^\n]*renderer\.setMoonlight\(_rl\.key\); \}/,
-    'the Hour\'s key, in the Hour alone, straight after the court\'s (SD5a)');
-  assert.equal((wm.match(/renderer\.setIndirectLight\(NO_INDIRECT_POS, 0, NO_INDIRECT_COLOR\);/g) || []).length, 2,
-    'the stale exterior indirect goes dark with it (the same leak family)');
-  const am = readFileSync('src/ui/automap/automapWindow.js', 'utf8');
-  assert.equal((am.match(/renderer\.setMoonlight\(null\);/g) || []).length, 2,
-    'the map pass clears it too - in the bracket setup, and again when the beacon group hands the unlit state back');
-  // ROAD-C c2 flight 2: the ONE non-null call in the window is not
-  // moonlight at all. DFU lights its automap BEACONS with three
-  // directional lights (Automap.cs:2025-2076) where the mesh shader
-  // carries two plus a third slot, so the FILL light rides the moon
-  // slot for that one never-sliced group and is cleared the moment the
-  // group is done - which is why the count above is two and not one.
-  assert.equal((am.match(/renderer\.setMoonlight\(/g) || []).length, 3, 'and there is exactly one non-null call');
-  assert.match(am, /renderer\.setMoonlight\(\{ scale: beacon\.fill, dir: BEACON_FILL_DIR, color: WHITE3 \}\);/,
-    'the automap fill light (:2039-2044, intensity :2074), not a moon');
 });

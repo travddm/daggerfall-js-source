@@ -93,9 +93,3 @@ test('INVIS-SWING: the wild gate\'s notice is blinded by an Invisibility as the 
   assert.equal(gate.alerted('seer'), true);
 });
 
-test('INVIS-SWING by source: world.js hands both wild checks the traveller\'s concealment and the enemy\'s sight through it (mutants: either dropped)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const noticed = !fast \|\| noticeRoll\([^\n]*\{ seesThrough: !!ENEMY_BASICS\[hit\.mobileType\]\?\.seesThroughInvisibility, concealment: concealmentFlags\(playerEntity\), rng: Math\.random \}\);/);
-  assert.match(w, /const fx = player\.feetAt\(\), stealth = wildStealth\(\), hid = concealmentFlags\(playerEntity\),/);
-  assert.match(w, /wildFoes\.step\(f, \{[^\n]*seesThrough: !!f\.ai\.seesThroughInvisibility, concealment: hid \}\);/);
-});

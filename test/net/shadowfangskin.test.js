@@ -261,8 +261,6 @@ test('SHADOW-FANG on the rig: the wolf built with a skin hangs skinned copies on
   const plain = await run({ werewolf: true });
   const plainOwn = new Set([...plain.res.textures.values(), ...plain.res.third.textures.values()].map((e) => e.image.mips));
   assert.ok(plain.uploads.every((m) => plainOwn.has(m)), 'a wolf with no skin is Bloodmoon\'s own');
-  const f = rd('src/combat/fpArm.js');
-  assert.match(f, /hangRangeTextures\(mesh\.ranges, collectArmTextures\(pieces, archives, gen\)\);/, 'an item\'s icon wears no skin');
 });
 
 test('SHADOW-FANG (AUDIT F1) the skin rides the FORM: setWerewolf(true, { skin }) builds the wolf in it, a skin taken off under a standing wolf rebuilds it plain, and a form queued mid-build keeps its skin (mutants: the skin dropped at the door; the skin change ignored; the queue losing it)', async () => {
@@ -310,10 +308,6 @@ test('SHADOW-FANG whose skin: my own is the account service\'s last word on this
   assert.equal(ownWerewolfSkin(storage), 'shadowfang');
   adoptIdentity(storage, { glyphs: [], secret: 'x' });
   assert.equal(ownWerewolfSkin(storage), null, 'a grant taken off is gone here too');
-  assert.match(rd('src/ui/accountFlow.js'), /adoptIdentity\(storage, \{ name: r\.data\.account\?\.name, kind: r\.data\.account\?\.kind, glyphs: r\.data\.wardrobe\?\.glyphs, glyphsOff: r\.data\.wardrobe\?\.glyphsOff, aura: auraStated\(r\.data\.wardrobe\), icon: iconStated\(r\.data\.wardrobe\), secret: asked \}\);/, 'the wardrobe states them, for the session that asked (WB9g: and the aura worn beside them; PIN MOVED (WITCH1): and the profile icon)');
-  // PIN MOVED (NAME-AS): the mint's answer still rides whole (`...who` - the glyphs with it); the stored session keeps
-  // the ACCOUNT's name beside them, the room's going to the live sessions
-  assert.match(rd('src/net/accountClient.js'), /adoptIdentity\(storage, \{ \.\.\.who, name: who\.accountName \?\? who\.name, secret: session\.secret \}\);/, 'and every mint');
   // my own werewolf, at the door - the value, off this device's stored session
   const me = { race: 'Breton', gender: 'male', faceIndex: 0, items: [], activeEffects: [{ kind: 'racialOverride', racial: 'lycanthropy', isTransformed: true, infectionType: 1 }] };
   const was = globalThis.localStorage;

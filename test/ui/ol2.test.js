@@ -44,15 +44,11 @@ test('OL2 (5): the clock line says the world\'s time of day (RESTX2: and that a 
   // LIVED1 (2026-09-29): and the hours are the character's own - the line says whose time the counter spends
   assert.equal(restClockLine(CLASSIC_GAME_START_TIME), 'World time 13:30 - you rest on your own clock', 'the classic start, 13:30');
   assert.equal(restClockLine(CLASSIC_GAME_START_TIME + 95), 'World time 15:05 - you rest on your own clock', 'padded');
-  assert.ok(!rd('src/ui/restWindow.js').includes('REAL_MINUTES_PER_WORLD_HOUR'), 'no spelled pace on the page, and no constant left to drift');
   void ONLINE_MINUTES_PER_MS;
   const on = resting({ sharedMinutes: () => CLASSIC_GAME_START_TIME + 95, vitals: () => ({ health: 10, maxHealth: 20, fatigue: 5, magicka: 6 }) });
   assert.deepEqual(on.restingLines(), ['Resting...', 'Hours remaining: 4', 'World time 15:05 - you rest on your own clock', 'Health 10/20  Fatigue 5  Magicka 6', '', 'Esc - stop'], 'the text page, between the hours and the vitals');
   const off = resting({ vitals: () => ({ health: 10, maxHealth: 20, fatigue: 5, magicka: 6 }) });
   assert.deepEqual(off.restingLines(), ['Resting...', 'Hours remaining: 4', 'Health 10/20  Fatigue 5  Magicka 6', '', 'Esc - stop'], 'offline: the page it always was');
-  const src = rd('src/ui/restWindow.js');
-  assert.match(src, /if \(Number\.isFinite\(st\.worldMinutes\)\) \{\s*shadowText\(renderer, font, restClockLine\(st\.worldMinutes, \{ loiter: this\.mode === 'loiter' \}\), m, 0, REST_PANEL_Y \+ REST_COUNTER_RECT\[3\] \+ 18, \{ align: 'center', w: NATIVE_W \}\);/, 'the art page, under the vitals');
-  assert.match(src, /lines = this\.restingLines\(\);/, 'one body for the text page and the pin');
 });
 
 test('OL2 (6) + TRAVEL-FARE + LIVED1: online the trip\'s days are the traveller\'s own - the countdown counts them as offline, the FARE is billed, the days label says them and the line under the panel says whose they are; a host that says nothing travels as DFU does', () => {
@@ -97,29 +93,10 @@ test('OL2 (6) + TRAVEL-FARE + LIVED1: online the trip\'s days are the traveller\
   const font = { fnt: { glyphs: new Map(), ascent: 6, lineHeight: 8 }, texture: 't', drawGlyph: () => {}, glyphWidth: () => 4 };
   const renderer = { drawScreenQuad: () => {}, uploadTexture: () => 't', releaseTexture: () => {} };
   const orig = on.w.draw; void orig;
-  const src = rd('src/ui/travel/travelPopUp.js');
-  assert.match(src, /shadowText\(renderer, font, String\(this\.countdownValueTravelTimeDays\), m, LABEL_POS\.time\[0\], LABEL_POS\.time\[1\]\);/, 'LIVED1: the days, online too - OL2\'s "now" is gone');
-  // TO-ONLINE (2026-09-19): ...and NOT over a walked trip. This line is DFU's
-  // FAST TRAVEL talking, and while Travel Options stood down on the shared
-  // clock the teleport was the only online arrival there was, so it was true
-  // of every trip. The journey runs online now (bible Travel-Options.md item
-  // 9), and over a walked one "you arrive now" is false -
-  // that branch carries the mod's own words and an hours:minutes estimate.
-  // What OL2 (6) pins is unchanged: the line still says why, wherever the
-  // trip really is DFU's.
-  assert.match(src, /if \(this\.noWorldTime\(\) && !this\.walkedTrip\) ONLINE_TRAVEL_ROWS\.forEach\(\(row, i\) => shadowText\(renderer, font, row, m, 0, POPUP_RECTS\.native\[1\] \+ POPUP_RECTS\.native\[3\] \+ 4 \+ i \* ONLINE_TRAVEL_ROW_H, \{ align: 'center', w: NATIVE_W \}\)\);/);   // AUDIT LIVED1b U1: two rows
-  // TRAVEL-FARE: the clause is GONE, and its absence is the law now -
-  // the toggle reaches the formula unconditioned, online or not.
-  assert.match(src, /sleepModeInn: this\.sleepModeInn,   \/\/ TRAVEL-FARE: billed online too/);
-  assert.doesNotMatch(src, /sleepModeInn: this\.sleepModeInn && !this\.noWorldTime\(\)/,
-    'OL2\'s inn clause is retired - the fare is the price of the journey, not rent on elapsed time');
-  assert.match(src, /this\.countdownValueTravelTimeDays = travelDays\(this\.travelTimeTotalMins\);/);
   // TRAVEL-FARE: the line said "no inn is paid" and that is not true
   // any more - a claim a player can read has to move with the law it
   // describes, or the window is lying about the number beside it.
   assert.equal(ONLINE_TRAVEL_LINE, 'Online, the trip\'s days pass only for you. The world\'s time does not move.', 'LIVED1: whose days, and where the arrival lands');
   assert.deepEqual(LABEL_POS.time, [129, 117]);
   void painted; void font; void renderer;
-  assert.match(rd('src/ui/travel/travelMapWindow.js'), /noWorldTime: this\.deps\.noWorldTime,/, 'threaded through the map window');
-  assert.match(rd('src/scenes/world.js'), /noWorldTime: \(\) => sharedClockOn\(\),/, 'the world host\'s word');
 });

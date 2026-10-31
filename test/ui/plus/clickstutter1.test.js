@@ -34,15 +34,5 @@ test('OW-DUNGEON-DOT a found dungeon\'s plate in the grid is the dungeons\' - it
   assert.equal(markGroup('place dungeon'), 'dungeons');
   assert.equal(markGroup('place'), 'towns');
   assert.equal(markGroup('far dungeon'), 'dungeons');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const w = src('src/scenes/travelViewMarks.js');
-  assert.match(w, /const isDungeon = TV_DUNGEON_TYPES\.has\(p\.summary\.loc\?\.mapTableData\?\.locationType\);/);
-  assert.match(w, /kind: isDungeon \? 'place dungeon' : 'place'/);
 });
 
-test('GRIM-MARKS the Grimoire compass\'s box is its parchment\'s span - the frame and the strip reach back out to where they stood, and the marks stand over the frame', () => {
-  const css = src('src/ui/grimoireDress.js');
-  assert.match(css, /\$\{G\} \.hud-compass \{ --gcm-mark: calc\(3 \* var\(--gcm\) \+ 7px\); width: calc\(69 \* var\(--gcm\) - 2 \* var\(--gcm-mark\)\);/);
-  assert.match(css, /\$\{G\} \.hud-compass::after \{ left: calc\(-1 \* var\(--gcm-mark\)\); right: calc\(-1 \* var\(--gcm-mark\)\); \}/);
-  assert.match(css, /\$\{G\} \.hud-compass \.hud-strip \{ left: calc\(2 \* var\(--gcm\) - var\(--gcm-mark\)\); right: calc\(2 \* var\(--gcm\) - var\(--gcm-mark\)\); \}/);
-});

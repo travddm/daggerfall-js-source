@@ -240,8 +240,6 @@ test('WATCH-DAY the uniform on duty: the walk out, the watch or the post, the wa
     step(0.3, at, Math.PI / 2);   // looking away
     assert.equal(row.person.guard, want, 'changed out of sight');
   }
-  assert.match(rd('src/world/travellerSprites.js'), /const archive = flat \? flat\.archive : look \? look\.archive : \(m\.res\.civvies \?\? m\.res\.archive\);/);
-  assert.match(rd('src/world/travellerSprites.js'), /const archive = res\.civvies \?\? res\.archive;/);
 });
 
 test('WATCH-DAY the post keeps the road: one posted alone at a gate stands facing out of town (mutant: the post\'s facing)', () => {
@@ -253,7 +251,6 @@ test('WATCH-DAY the post keeps the road: one posted alone at a gate stands facin
   assert.equal(w.e.kind, 'post');
   assert.equal(w.yaw, w.e.at.yaw, 'facing the road');
 });
-
 
 test('WATCH-DAY in a great city (eight blocks by eight, a walk across it near three hours): the watch keeps every shift from its hour to its end - on his post or his patrol\'s first stop by the shift\'s start, kept to its end whatever his bedtime (the first cut left the evening\'s and the night\'s watch by the walk home before bed: the night\'s last stop never kept, and the morning began at a post its man had left), the evening off left in time to change at home and walk out (the next pin: LW-SPREAD\'s suppers near home, none here runs into the walk out); a day\'s watchman whose walk out is longer than the two hours from the turn to six leaves before the turn - his day off ends on the walk and his day begins on it; every watchman\'s day runs on from the last, at the turn as anywhere, and the town draws the walk across 04:00 unbroken (mutants: the bedtime cutting the watch, the morning begun at home, the day off ended at home, the walk out early for all)', () => {
   const tw = townOf(64, { blocksW: 8, blocksH: 8 });

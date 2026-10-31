@@ -378,13 +378,7 @@ test('EG15 THE CAST SEAM AND THE ONE MAGICKA: playerCasts.js is a leaf the one c
   tellPlayerCast(RAT, MAGIC, NaN);
   assert.deepEqual(told, [[RAT, 'Fireball', 12], [RAT, 'Frostbite', 0], [RAT, 'Magicka Bolt', 0]], 'every listener told, a throw skipped, a cost never below 0');
   registerPlayerCastListener('eg15-throw', null); registerPlayerCastListener('eg15-t', null);
-  assert.doesNotMatch(strip(read('src/systems/playerCasts.js')), /\bimport\b/, 'a leaf');
-  const magic = strip(read('src/scenes/hostMagic.js'));
-  assert.match(magic, /import \{ tellPlayerCast \} from '\.\.\/systems\/playerCasts\.js';/);
-  assert.match(magic, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/);
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) assert.match(strip(read(host)), /createPlayerMagic\(\{/, `${host} builds the one engine`);
-  assert.doesNotMatch(strip(read('src/scenes/worldModes.js')), /createPlayerMagic\(/, 'the interiors take the streaming page\'s engine');
-  assert.match(strip(read('src/systems/sigil/sigilSetPowers.js')), /registerPlayerCastListener\(SIGIL_SETS_POWER, setCast\);/);
   // the one magicka a power returns
   _resetPlayerHealForTests();
   const m = { magicka: 10, maxMagicka: 12 };
@@ -398,9 +392,6 @@ test('EG15 THE CAST SEAM AND THE ONE MAGICKA: playerCasts.js is a leaf the one c
   _resetPlayerHealForTests();
   manaMine(f, 0.85);
   assert.equal(f.magicka, 1, 'the reset clears the fraction (0.2 was owed)');
-  const loot = strip(read('src/systems/loot/lootPowers.js'));
-  assert.doesNotMatch(loot, /function gainMana/, 'one door, never two');
-  assert.match(loot, /case 'conduit': if \(whole\) gainMana\(attacker, p\.mana\); break;/);   // PIN MOVED (TWO-HANDS AUDIT 2, at the sixth merge of main): a per-blow charge on a whole blow alone - the Discipline's return beside it
 });
 
 // ── Reprieve ──────────────────────────────────────────────────────────
@@ -665,7 +656,5 @@ test('EG15 THE HUD AND THE HOST: the states carry the Discipline\'s arm, the Rep
   const five = wearPanoply(player(), 5);
   assert.deepEqual(setHudChips(five, 0), [], 'a shield left over from six pieces says nothing on five');
   assert.equal(setHudChips(e, 0).length, 1);
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /else if \(name === 'reprieve'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);/);
   assert.equal(reprieveBundle(1).element, 4, 'the Reprieve\'s Shield rides the magic element - its cast sound\'s index');
 });

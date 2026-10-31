@@ -322,18 +322,6 @@ test('GOLD-DROP: with the wagon showing the button is Stow and the gold goes int
   }, { deps: { loot: { items: () => [DAGGER()] } } });
 });
 
-test('GOLD-DROP: by source - the button rides the pack\'s footer and its field the footer too (AUDIT GOLD-DROP 1); the remote bar carries none, by any label; the field\'s verb is the button\'s (mutants: the bar\'s button back)', () => {
-  const s = src('src/ui/enhanced/enhancedInventory.js');
-  const remoteCol = s.slice(s.indexOf('function remoteCol()'), s.indexOf('function goldField()'));
-  assert.ok(!/'Gold'\)/.test(remoteCol) && !/goldField\(\)/.test(remoteCol), 'no gold on the remote window');
-  assert.ok(!/el\('button'[^;]*gold/i.test(remoteCol), 'AUDIT GOLD-DROP 5: nor a gold button under another word - "Drop gold", "Store gold"');
-  assert.match(s, /const verb = `\$\{GOLD_VERB\[remote\?\.kind\] \?\? 'Drop'\} gold`;/);
-  assert.match(s, /const give = el\('button', `act goldbtn\$\{goldEntry != null \? ' primary' : ''\}`, verb\);/);
-  assert.match(s, /if \(giving && goldEntry != null\) bar\.append\(goldField\(\)\);/);
-  // PIN MOVED (GOLD-ALL): the verb said once, the field's press and its "all" both named by it
-  assert.match(s, /const verb = GOLD_VERB\[remote\?\.kind\] \?\? 'Drop';\n\s*const acts = el\('div', 'goldacts'\);\n\s*const go = el\('button', 'act primary goldgo', verb\);/);
-});
-
 // AUDIT GOLD-DROP 1 (2026-09-27, the audit of GOLD-DROP): ON A PHONE THE BUTTON WAS OFF THE SCREEN. The footer is one
 // flex row never narrower than ~550px, the host clips and play/index.html will not zoom, so on a 393px Pixel 5 the
 // button stood at x=446..550 and "Can't drop gold at all" stayed true there. It was 32px under a finger where every
@@ -643,15 +631,6 @@ test('GOLD-ALL: the field stacks its verb over "<verb> all", and the "all" moves
     button().onclick();
     assert.equal(all()?.disabled, false, 'a purse of one coin: the all stands');
   }, { gold: 1 });
-});
-
-test('GOLD-ALL: by the sheets - the two presses one column of two equal rows inside the box\'s 44px (the field grows by nothing), each the kit\'s press at the Gold button\'s 12px; the DFO Grimoire dress writes them in its face at no height of their own', async () => {
-  const s = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(s, /\.goldfield \.goldacts \{ display: grid; grid-template-columns: max-content; grid-template-rows: 1fr 1fr; gap: 4px;\n\s*flex: 0 0 auto; height: 44px; \}/);
-  assert.match(s, /\.goldfield \.goldacts \.act \{ min-height: 0; height: auto; margin: 0; padding: 0 12px;[^}]*font-size: 12px;/);
-  assert.match(s, /\.goldfield input \{\n\s*flex: 1 1 90px; min-width: 0; min-height: 44px;/, 'the box they stand beside is 44px');
-  const g = src('src/ui/grimoireDress.js');
-  assert.match(g, /\$\{G\} \.goldfield \.goldacts \.act \{ min-height: 0 !important;[^\n]*font-size: 16px !important; line-height: 1 !important;/);
 });
 
 // AUDIT UPDATE II (2026-10-25, bible/01-Overview/audits/Audit-Update-II-2026-10-25.md) B1

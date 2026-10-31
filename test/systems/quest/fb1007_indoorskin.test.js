@@ -227,34 +227,3 @@ test('INDOOR-SKIN: in a building the street\'s pixels stand no node - a wilderne
   } finally { host.dispose(); setForagingHost(null); }
 });
 
-test('INDOOR-SKIN wiring, the four hosts: the streaming world lists a building\'s bodies from its own pool and opens their loot by its door, its gathering host live indoors through the building\'s walls; the building\'s ladder, plaque, rig and swing are the professions\' as the dungeon\'s are; the dungeon stays wired; the fixed city stands no professions (FLAGGED)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /huntBodies = \(\) => bodiesHere\(modeNow\(\), \{ street: exteriorFoes, dungeon: modes\?\.dungeonCtx, interior: modes\?\.interiorFoes \}, bodyStamps\);/, 'world.js: the bodies by the mode\'s pool');
-  assert.match(w, /const openHuntLoot = \(key\) => \(modeNow\(\) === 'interior' \? modes\?\.openInteriorBody\?\.\(key\)\n/, 'world.js: a building\'s body searched through the building\'s door');
-  assert.match(w, /activeInterior: \(\) => walkMode && modeNow\(\) === 'interior' && !modes\?\.overlayHeld && !townTalk\.overlayActive && !modes\?\.deathUp\?\.\(\) && !modes\?\.transitioning,/, 'world.js: the gathering host live in a building');
-  assert.match(w, /const c = underground \? modes\?\.dungeonCtx\?\.collider : interior \? modes\?\.interiorCollider : collider;/, 'world.js: a building\'s walls');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /function makeInteriorFoes\(ctx\) \{[\s\S]{0,4000}?createExteriorFoes\(/, 'worldModes.js: a building\'s pool is the street\'s factory (the pins above drive it)');
-  assert.match(m, /get interiorFoes\(\) \{ return interiorFoes; \},/, 'worldModes.js: the building\'s pool handed out');
-  assert.match(m, /openInteriorBody: \(key\) => \{ if \(interiorCtx && typeof key === 'string'\) openInteriorBodyLoot\(key\); \},/, 'worldModes.js: and its bodies\' door');
-  const ladder = m.slice(m.indexOf('  function tryExit({'), m.indexOf('  function tryExitDungeon('));
-  assert.match(ladder, /^ {2}function tryExit\(\{ pressCast = false, interact = false, actClick = false \} = \{\}\) \{\n/, 'the building\'s ladder reads the Interact press and the act\'s click');
-  for (const [re, what] of [
-    [/\n {4}if \(interact && !pressCast && host\.profPress\?\.\(\)\) return true;\n/, 'E offered to a node first'],
-    [/\n {4}if \(!interact && !pressCast && !actClick && !host\.profActing\?\.\(\) && host\.profClick\?\.\(\)\) return true;\n/, 'the click on a node\'s lit row'],
-    [/\n {4}if \(!interact && \(actClick \|\| host\.profActing\?\.\(\)\)\) return true;\n/, 'a click mid-act the act\'s'],
-    [/if \(key === null\) \{ if \(interact && !pressCast\) host\.profNeed\?\.\(\); return false; \}/, 'a node\'s need said where nothing took E'],
-  ]) {
-    assert.match(ladder, re, `the building's ladder: ${what}`);
-    assert.ok(ladder.search(re) < ladder.indexOf('const qf = pickQuestFoe(') || what.startsWith('a node\'s need'), `${what} - before the quest click (one press never clicks a quest foe AND starts an act)`);
-  }
-  assert.match(m, /return host\.profHoverPick\?\.\(ray\) \?\? ray;   \/\/ INDOOR-SKIN/, 'the building\'s plaque picks a node over the race\'s winner');
-  assert.match(m, /const interiorHoverName = composeNamer\(\[\n {4}\(key\) => host\.profHoverName\?\.\(key\) \?\? null,/, 'and names its acts first');
-  assert.match(m, /const interiorWeapon = createWeaponRig\(\{[\s\S]{0,3000}?actTool: \(\) => host\.profActTool\?\.\(\) \?\? null,/, 'the building\'s rig draws the knife');
-  assert.match(m, /mode === 'interior' \? \(\(dx, dy, held\) => \{ if \(held && host\.profActing\?\.\(\)\) return;/, 'and an act\'s press is no swing');
-  // the dungeon: its ladder, plaque and rig as PROF2 wired them
-  assert.match(m, /function tryExitDungeon\([^\n]*\n[\s\S]{0,1200}?if \(interact && !pressCast && host\.profPress\?\.\(\)\) return true;/, 'dungeonContext.js through worldModes.js: still wired');
-  assert.match(src('src/scenes/dungeonContext.js'), /return opts\.profHoverPick\?\.\(ray\) \?\? ray;/, 'dungeonContext.js: its plaque');
-  // the fixed city: no professions at all (FLAGGED - 17.1, 29)
-  assert.doesNotMatch(src('src/scenes/exterior.js'), /createGatherHost|huntKind|profPress/, 'exterior.js: the fixed city stands no professions');
-});

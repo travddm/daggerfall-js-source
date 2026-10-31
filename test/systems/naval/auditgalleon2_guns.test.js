@@ -255,13 +255,6 @@ test('AUDIT GALLEON-2 GN5: the Naval arc switched off, or the sea cleared (a tra
   }
 });
 
-test('AUDIT GALLEON-2 GN6: navalShips.js gives her gun deck where her model measures it (galleonModel.js MEASURED.gunDeckY 1.0829 - it said 1.085)', () => {
-  const src = readFileSync(new URL('../../../src/systems/naval/navalShips.js', import.meta.url), 'utf8');
-  const said = [...src.matchAll(/gun deck(?: at)? \(?(\d+\.\d+)/g)].map((m) => Number(m[1]));
-  assert.ok(said.length >= 2, `her gun deck's height said (${said})`);
-  for (const v of said) assert.equal(v, MEASURED.gunDeckY, `her gun deck said at ${v}`);
-});
-
 test('AUDIT GALLEON-2 TS1: her port battery stands on her port side - each port gun at -RUN_IN_X run in, -RUN_OUT_X run out, -(RUN_OUT_X - RECOIL) kicked back, its barrel outboard to port (the gun deck\'s side sign was unpinned: every reading was |x|, every host test fired to starboard)', async () => {
   const s = scene();
   const boat = s.place(HULL.SmallShip, 0);

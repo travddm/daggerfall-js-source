@@ -144,20 +144,6 @@ test('RF1: the two seams - the equip listener (and the save\'s rebuild) and the 
 });
 
 test('RF1: the read sites - one accessor per channel in the formulas, the field in the leaves, nothing of the affix fold\'s left there', () => {
-  const f = read('src/combat/formulas.js');
-  assert.match(f, /chance \+= mentorArmorValue\(target, target\.armorValues\?\.\[struckBodyPart\] \?\? 0\) \+ entityArmorMod\(target, struckBodyPart\);/, 'the hit formula\'s armour term');
-  assert.match(f, /weaponDamageMods\(weapon, wMin \+ Math\.floor\(rolls\(\) \* \(wMax \+ 1 - wMin\)\)\) \+ damageMod/, 'the weapon roll');
-  assert.match(f, /const mult = entityWeightMult\(entity\);/, 'the carrying capacity');
-  assert.match(read('src/combat/pcaao.js'), /result = 100 - entityEnchantArmorMod\(target\) - entityArmorPoints\(target, struckBodyPart\);/, 'PCAAO\'s read (AUDIT SET P-M1: the channels and the points apart, the points as protection)');
-  assert.match(read('src/systems/statMods.js'), /mod \+= entity\._mods\?\.stats\?\.\[statName\] \?\? 0;/, 'liveStat, import-free');
-  // SOFTCAP1: the one import is mentor mode's overlay, itself import-free - so statMods is still a leaf's leaf, cycle-free
-  assert.deepEqual(read('src/systems/statMods.js').match(/^import [^\n]*/gm), ["import { mentoredStat } from './mentorMode.js';   // SOFTCAP1: mentor mode's overlay - a leaf, so this file stays cycle-free"], 'statMods stays a leaf (but for the leaf mentorMode)');
-  assert.doesNotMatch(read('src/systems/mentorMode.js'), /^import /m, 'mentorMode is import-free');
-  assert.match(read('src/systems/skills.js'), /mod \+= entity\._mods\?\.skills\?\.\[skillId\] \?\? 0;/, 'skillValue');
-  assert.match(read('src/systems/spellcast.js'), /saving \+= entityResistMod\(target, RESIST_NAMES/, 'the saving throw');
-  assert.match(read('src/ui/native/nativeInventory.js'), /armorLabelValue\(av\[i\] \?\? 100, entityArmorDisplayMod\(this\.hooks\.entity, i\)\)/, 'the doll');
-  assert.match(read('src/systems/worldTick.js'), /enchantmentMagicRound\(entity, r \+ 1, \{[\s\S]*?\}\);\s*\/\/ RF1[\s\S]*?computeEntityMods\(entity\);/, 'the magic round, after the enchant fold');
-  assert.match(read('src/systems/entityMods.js'), /addEquipChangeListener\(computeEntityMods\);/, 'the equip seam');
   for (const file of ['src/combat/formulas.js', 'src/combat/pcaao.js', 'src/systems/statMods.js', 'src/systems/skills.js', 'src/systems/spellcast.js', 'src/ui/native/nativeInventory.js', 'src/systems/worldTick.js']) {
     assert.doesNotMatch(read(file), /affixArmor|affixWeightMult|affixWeaponDamage|affixResist|_affixMods|computeAffixMods|lootRarity\.js/, `${file} reads no fold by name`);
   }

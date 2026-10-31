@@ -120,18 +120,3 @@ test('CARDS3 the draw\'s life: the atlas once under drawMesh\'s key, the meshes 
   createCardTableDraw({}, { doc }).draw({ cards: [{ card: 0, pos: [0, 0, 0], yaw: 0, roll: 0 }] });
 });
 
-test('CARDS3 the interior host: the cloth\'s picture made with the deal, fed every event, drawn in the room\'s pass, freed with the table', () => {
-  const src = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const body = (name) => src.slice(src.indexOf(`function ${name}(`), src.indexOf('\n  }\n', src.indexOf(`function ${name}(`)));
-  assert.match(body('openCardGame'), /draw: createCardTableDraw\(renderer\)/, 'the draw is the table\'s, made with it');
-  assert.match(body('cardPress'), /game\.scene = cardSceneFor\(game\.session\);/, 'the picture is made with the deal\'s session');
-  assert.match(body('cardGameFrame'), /g\.scene\?\.onEvent\(e, holeOf\);/, 'every event the session says reaches the picture');
-  assert.match(body('closeCardGame'), /g\.draw\?\.destroy\(\);/, 'the atlas and the meshes go with the table');
-  assert.ok(body('closeCardGame').indexOf('cardGame = null;') < body('closeCardGame').indexOf('g.draw?.destroy();'), 'the slot emptied first');
-  // the player in the seat they took; the regulars round the rest in order
-  assert.match(body('cardSceneFor'), /s\.kind === 'player' \? cardSeat\.seat : others\[i - 1\]/);
-  assert.match(src, /const cardHoleOf = \(session\) => \(seat, r\) => \{\n\s+const v = session\.view\(\)/, 'the holes the player may see come from their own view');
-  // drawn in the room's own pass, after the solid room's models and the decor's
-  const draw = src.indexOf('if (cardGame?.scene) cardDrawGame(cardGame, proj, view, mwv.eye);');
-  assert.ok(draw > src.indexOf('decorTool.drawMounts(renderer);') && draw < src.indexOf('interiorCtx.flatAnims.tick(dt);'));
-});

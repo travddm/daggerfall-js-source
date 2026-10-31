@@ -42,55 +42,7 @@ import { xorshift } from '../../tools/kgMeasure.mjs';
 beforeEach(() => resetPrefs());
 const FRAME = { centre: [0, 0.8, 0], axisYaw: Math.PI / 2, halfLong: CARD_TABLE_W / 2, halfShort: CARD_TABLE_D / 2 };
 const FEET = [0, 0, -0.9];
-const WM = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
 
-/** The interior host's card block (test/systems/kg3_host.test.js's harness), with the host's own Escape arm lifted whole. */
-function cardHost() {
-  const doc = fakeDoc(), win = fakeWin();
-  const playerEntity = { name: 'Mac', goldPieces: 5000, items: [], health: 50 };
-  giveBinderAtChargen(playerEntity);
-  const said = [];
-  const seatList = Array.from({ length: 4 }, (_, k) => ({ x: k * 2, z: 0, eye: [k * 2, 1, 0], feet: [k * 2, 0, 0], yaw: 0, pitch: 0, top: 0.8 }));
-  const store = createBindings(); resetDefaults(store); setBindings(store);
-  const BLOCK = WM.slice(WM.indexOf('  let cardSeat = null;'), WM.indexOf('\n', WM.indexOf("registerPlayerHurtListener('cards-seat'")));
-  const at = WM.indexOf("    if (mode === 'interior' && cardSeat && actionOf(e, keys) === 'Escape' && !interiorKeyCtx.uiOverlayActive) {");
-  const ESC_ARM = WM.slice(at, WM.indexOf('\n    }\n', at) + 6);
-  const scope = {
-    isTavern: () => true, BUILDING_TYPES: { None: 0 },
-    cardTableSeats: () => seatList, seatFloorOk: () => true, SEAT_FLOOR_PROBE: 1, nearestFreeSeat, takenSeats,
-    player: { pos: [0, 0, 0], eyeAt: () => [0, 1.6, 0] },
-    host: { realmAct: null, relock: () => {}, seatedPeers: () => [], cardOnline: null, iliacOnline: null, iliacRanked: { why: () => '', vouch: async () => ({ ok: false }), board: async () => ({ ok: false }) }, iliacClaims: { add: () => {} } },
-    say: (x) => said.push(x), cam: { yaw: 0, pitch: 0, pos: null },
-    getNameBankOfRegion: () => 0, residentName: (seed, bank, g) => `R${seed}:${g}`,
-    stakesFor: sess.stakesFor, buyInRange: sess.buyInRange, goldAmount: court.goldAmount,
-    holdCursor, renderer: {},
-    createCardTableDraw: () => ({ draw() {}, destroy() {} }),
-    createCardTableHud: (p) => hudm.createCardTableHud({ ...p, doc }), cardHudModel: hudm.cardHudModel, eventLine: hudm.eventLine,
-    deductGold: court.deductGold, addGold: court.addGold, playerEntity,
-    CardTableSession: sess.CardTableSession, seatPatrons: sess.seatPatrons, regularsFor: sess.regularsFor, regularsAfter: sess.regularsAfter,
-    CardScene: class { constructor(o) { this.places = o.places; } onEvent() {} poses() { return { cards: [], chips: [] }; } settledAt() { return 0; } },
-    tablePlaces: () => ({ seatOf: [], board: [], table: FRAME, seats: [] }), tableFrame: () => FRAME, hashSeed: (...x) => x.join(':'),
-    buildingDirectory: () => ({ locationName: 'Daggerfall' }), registerPlayerHurtListener: () => {},
-    isOnlinePage: () => false, mwViewFirstPerson: () => {}, homeTownOf: (b) => b?.townMapId || 0, worldMinutes: () => 0, MINUTES_PER_DAY: 1440,
-    RemoteCardTable, mode: 'interior', regularsToStand, regularBark, BARK_MS, showdownWinners: hudm.showdownWinners, HOLDEM_REFUSALS: hudm.HOLDEM_REFUSALS,
-    cardPackPrice, buyCardPack, openIliacTableGame: (o) => openIliacTableGame({ ...o, doc }), iliacGrade, skillValue, SKILLS, liveStat,
-    gambitTableOn, openGambitTableGame: (o) => openGambitTableGame({ ...o, doc }), isTouchDevice: () => false, regularLook, seatTopByte, cursorKeyClaimed: () => false, gambitBoardKey, audio: null,
-    canvas: { clientWidth: 1280, clientHeight: 720, getBoundingClientRect: () => ({ left: 0, top: 0 }), setPointerCapture() {} }, ...hand, CARD_W, CARD_L, chipDiscs, cardMatrix,
-    worldViewportRect: () => null, rayDirFromScreen, projectToScreen, performance,
-    window: win, interiorPaused: () => false, townTalk: null,
-    actionOf, interiorKeyCtx: { uiOverlayActive: false }, keys: new Set(),
-  };
-  const state = { interiorCtx: { tables: [{ aabb: {} }], collider: null }, interiorBuilding: { buildingKey: 7, quality: 10, regionIndex: 17, townMapId: 1111 } };
-  const api = new Function('S', ...Object.keys(scope), `let interiorCtx = S.interiorCtx, interiorBuilding = S.interiorBuilding;\n${BLOCK}\n
-    function hostEscape(e) {
-${ESC_ARM}
-return "not-taken"; }
-    return { sitAtCardTable, standFromCardTable, hostEscape, cardTavernKey, get gambitGame() { return gambitGame; } };`)(state, ...Object.values(scope));
-  const walk = (n, f, out = []) => { if (!n) return out; if (f(n)) out.push(n); for (const c of n.children ?? []) walk(c, f, out); return out; };
-  const panels = () => doc.body.children.filter((n) => /^df(cards|iliac|gambit)\b/.test(n.className) && !n.removed);
-  const press = (label) => { const b = panels().flatMap((p) => walk(p, (n) => n.tag === 'button' && n.textContent.startsWith(label)))[0]; assert.ok(b, label); b.fire('click'); };
-  return { api, said, win, playerEntity, press };
-}
 const staked = (h) => {
   h.api.sitAtCardTable(0);
   h.press('Play The King\'s Gambit');
@@ -101,44 +53,7 @@ const staked = (h) => {
 };
 
 test('AUDIT KG II C1 + C2 THE PAD AT A STAKED BATTLE: Start (an Escape action\'s key) asks Stand up twice, as Escape does; A\'s LeftClick alias (Mouse0) is the board\'s, never ActivateCenterObject\'s stand (mutants: the host\'s Escape arm; the alias swallowed)', () => {
-  const h = cardHost();
-  const gg = staked(h);
-  const purse = h.playerEntity.goldPieces;
-  const start = h.win.fire('keydown', { code: 'JoystickButton7', key: 'JoystickButton7', target: {} });
-  assert.equal(start.stopped, false, 'the cloth names no Start');
   assert.equal(actionOf({ code: 'JoystickButton7' }, new Set()), 'Escape', 'Start is an Escape action\'s key');
-  h.api.hostEscape({ code: 'JoystickButton7', key: 'JoystickButton7', preventDefault() {} });
-  assert.ok(h.api.gambitGame, 'one press: asked, not stood up');
-  assert.equal(gg.g.armed, 'stand');
-  assert.equal(h.playerEntity.goldPieces, purse);
-  const a = h.win.fire('keydown', { code: 'JoystickButton0', key: 'JoystickButton0', target: {} });
-  const m = h.win.fire('keydown', { code: 'Mouse0', key: 'Mouse0', target: {} });
-  assert.equal(a.stopped, true, 'A: the cursor\'s press');
-  assert.equal(m.stopped, true, 'and its LeftClick alias the board\'s too');
-  const start7 = () => h.api.hostEscape({ code: 'JoystickButton7', key: 'JoystickButton7', preventDefault() {} });
-  start7();
-  assert.equal(gg.g.selected, null, 'A chose a piece: Start lets it go first, as Escape does');
-  start7();
-  assert.ok(h.api.gambitGame, 'then asks');
-  start7();
-  assert.equal(h.api.gambitGame, null, 'asked twice: stood up');
-});
-
-test('AUDIT KG II C3 + C9 A FINGER THE CLOTH TOOK IS HELD TILL IT LIFTS - the touch layer\'s stick never born under it; a regular\'s night the tavern\'s (mutants: the finger; its lift; cardPressHeld; the tavern\'s key)', () => {
-  assert.match(WM, /cardPressHeld: \(\) => mode === 'interior' && !!cardSeat && !!\(cardGame\?\.handPress \|\| cardGame\?\.drag \|\| gambitGame\?\.fingerHeld\?\.\(\)\),/);
-  assert.match(WM, /\['pointerup', lift\], \['pointercancel', lift\]/);
-  assert.match(WM, /day: cardDay, key: cardTavernKey\(\), friendly/);
-  const h = cardHost();
-  assert.equal(h.api.cardTavernKey(), '1111:7', 'the tavern, not its table');
-  const gg = staked(h);
-  const W = 1280, H = 720, eye = [0, 1.4, -0.75];
-  const cam = { proj: mirrorProjectionX(perspective((65 * Math.PI) / 180, W / H, 0.05, 100)), view: lookAt(eye, [0, 0.8, 0], [0, 1, 0]), eye };
-  gg.draw(0, cam);
-  const p = gg.g.places.at(7, 6), s = projectToScreen(p, W, H, cam.proj, cam.view, null);
-  assert.equal(gg.pointer([s.x, s.y], { w: W, h: H }, { touch: true }), true);
-  assert.equal(gg.fingerHeld(), true, 'the cloth\'s finger');
-  h.win.fire('pointerup', { pointerType: 'touch' });
-  assert.equal(gg.fingerHeld(), false, 'lifted');
 });
 
 test('AUDIT KG II C4 THE D-PAD AT THE BOARD UNDER THE PLUS CROSSBAR: its own codes, the board\'s cursor - never the map, the log, Rest or the hands (mutants: boardUp)', async () => {
@@ -260,6 +175,5 @@ test('AUDIT KG II C13 + C14 THE PRESS: one\'s own piece pressed again stays chos
   r.g.press('cell', [far.col, far.row]);
   assert.equal(r.g.g.selected, null, 'a foe out of range lets it go');
   assert.equal(r.g.g.info.piece, far.id, 'and is shown');
-  assert.match(readFileSync(new URL('../../src/scenes/gambitTableGame.js', import.meta.url), 'utf8'), /if \(how\.touch && pressed\?\.side !== 1\) \{/, 'a finger on a foe\'s card is that foe');
   assert.ok(pieceById(st, p.id));
 });

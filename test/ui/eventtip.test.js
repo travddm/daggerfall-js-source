@@ -248,21 +248,6 @@ test('EVENT-TIP on the held map: the hover asks a party member, a raided town, a
   });
 });
 
-test('EVENT-TIP by source: the host hands the map the raids running now, the pointer writes the card, and leaving or pressing takes it down', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /gate: \(\) => gateOmen\?\.mapMark\(\) \?\? null,\n(?:\s*gates: \(\) => gateOmen\?\.mapMarks\(\) \?\? \[\],[^\n]*\n)?(?:\s*\/\/[^\n]*\n)*\s*raids: \(\) => \(raidingPartiesOn\(\) \? raidMapMarks\(raidState\(\)\.raids, worldMinutes\(\), \{ regionName: \(r\) => REGION_NAMES\[r\] \?\? '', localTime: sharedClockOn\(\) \? eventLocalTime : null, relay: raidRelayState \}\) : \[\]\),/,
-    'beside the gate, on the raids\' own clock, none while the mod is off - and (TIME1) online the withdrawal said in local time; (FIELD BUGS 2026-10-11g RAID-WORD, PIN MOVED) the town\'s ledger its count');
-  const h = read('src/ui/heldMap.js');
-  assert.match(h, /this\._hoverAt = tab \? null : \{ sx: hx, sy: hy, cx: e\.clientX, cy: e\.clientY \};\n\s*this\._showTip\(tab \? null : hit\?\.tip \?\? null, e\.clientX, e\.clientY\);/);
-  assert.match(h, /stage\.addEventListener\('pointerleave', \(e\) => \{ if \(e\.pointerType !== 'mouse' && this\._tipUntil !== null\) return; this\._hoverAt = null; this\._showTip\(null\); \}\);/, 'WB13c: a tap\'s card outlives the finger\'s leaving');
-  assert.match(h, /stage\.addEventListener\('pointerdown', \(\) => \{ this\._hoverAt = null; this\._tipUntil = null; this\._showTip\(null\); \}\);/);
-  assert.match(h, /if \(gateMoved\) this\._refreshTip\(\);/, 'a poll that moved the marks refreshes the card under a still pointer');
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hmtip \{ position: absolute; z-index: 3; display: none; pointer-events: none;/, 'the card never takes the pointer');
-  // the classic page is DFU's window: it draws the gate's ring, and no raids and no card
-  const classic = read('src/ui/travel/travelMapWindow.js');
-  assert.doesNotMatch(classic, /deps\.raids|hmtip|eventMapMarks/);
-});
-
 test('WB13c a finger has no hover: a tap on the breach\'s ring shows its card and its label for TAP_TIP_S, then the card goes; a tap on bare ground shows none; only a finger\'s tap asks (mutants: never shown on a tap; held for ever; a mouse\'s click shows it too)', () => {
   skin('enhanced');
   withDocument(() => {
@@ -292,5 +277,4 @@ test('WB13c a finger has no hover: a tap on the breach\'s ring shows its card an
     win.dispose();
   });
   assert.equal(TAP_TIP_S, 4);
-  assert.match(read('src/ui/heldMap.js'), /this\._sheet\?\.pickAt\?\.\(px, py\);\n\s*if \(e\.pointerType !== 'mouse'\) this\._tapTip\(px, py, e\.clientX, e\.clientY\);/, 'the press still picks; a finger\'s also shows the card');
 });

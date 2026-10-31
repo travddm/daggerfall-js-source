@@ -156,12 +156,3 @@ test('GPU-TRAIL the fps counter hands its last second, a new object each second 
   } finally { globalThis.document = prev.d; globalThis.window = prev.w; _resetFrameClock(); }
 });
 
-test('GPU-TRAIL by source: the entry counts the canvas before the renderer is made, behind a door the shell opens, and starts the trail on the fps counter\'s seconds (mutants: the door after the renderer; the trail on a tab; the trail never started)', () => {
-  const main = rd('src/main.js');
-  const door = main.indexOf("const gpuTrail = typeof globalThis.daggerShell?.gpuTrail === 'function'");
-  assert.ok(door > 0, 'the door is the shell\'s');
-  assert.match(main, /\? await import\('\.\/render\/gpuTrail\.js'\)\.then\(\(m\) => m\.gpuTrailOn\(canvas, globalThis\.daggerShell\.gpuTrail\)\)\.catch\(\(\) => null\) : null;/);
-  assert.ok(door < main.indexOf('const renderer = new Renderer(canvas);'), 'counted before the renderer makes its first object');
-  assert.doesNotMatch(main, /^import .*gpuTrail/m, 'behind a door - the entry\'s static reach is BOOT2\'s');
-  assert.match(main, /const fps = mountFpsCounter\(\{[^\n]*\n {2}gpuTrail\?\.start\(renderer, fps\.last\);/);
-});

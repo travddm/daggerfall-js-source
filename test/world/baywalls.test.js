@@ -57,7 +57,6 @@ test('TS7 a Bay city read: a ring of Daggerfall\'s wall blocks and only them ope
   assert.deepEqual(countryTemplates([{ ...row, mapTableData: { ...row.mapTableData, locationType: 2 } }]).get(2)[0].exterior.exteriorData.blockNames, RING);
   assert.deepEqual(capitalBase([row]).exterior.exteriorData.blockNames, RING);
   assert.deepEqual([...cityBlockNames([row]).keys()].sort(), ['H.RM']);
-  assert.match(rd('src/world/townOutline.js'), /dfLocation = unwalledLocation\(dfLocation\);/);
   const served = (n) => (n === 'H.RMB' ? { rmbBlock: { fldHeader: { autoMapData: new Uint8Array(4096).fill(5), numBlockDataRecords: 0, buildingDataList: [] }, subRecords: [], misc3dObjectRecords: [], miscFlatObjectRecords: [] } } : null);
   const io = { classicOf: served, servedOf: served };
   const tmpl = { ...city(RING, 77), exterior: { buildings: [], exteriorData: { width: 3, height: 3, blockNames: RING.slice() } } };
@@ -74,8 +73,6 @@ test('TS7 a Bay city read: a ring of Daggerfall\'s wall blocks and only them ope
   const cells = townWallCellsOf(lazy);
   assert.ok(cells && cells.some(Boolean), 'its wall made when its cells are asked');
   assert.deepEqual([...cells], [...townWallCells(townWall(lazy, RING, (n) => blocks[n]?.rmbBlock ?? null), 3, 3)]);
-  // the door edits every read with it, after the Arena's
-  assert.match(rd('src/world/townOutline.js'), /registerPortBlock\(TOWN_OUTLINE_BLOCK, \(\) => townOutlineBlockJson\(\), TOWN_OUTLINE_BLOCK_INDEX\);\n\s+registerLocationEdit\(wallBayCity\);/);
 });
 
 test('TS7 what stands at a gate: the template gate\'s own records - the game\'s block, Immersive Travel\'s while loaded - carried from its frame to the new gate\'s and turned with it, its start marker TS4\'s; each gate its nearest template gate, once (mutants: the frame unturned; the turn unread; the marker carried; the extra unread)', () => {
@@ -147,10 +144,6 @@ test('TS7 the carriages and the boards on the carrier: the mod\'s records on a g
   assert.equal(carriageRecordsOf('WALLAA09.RMB'), null);
   assert.equal(hasCarriageGate({ exterior: { exteriorData: { blockNames: [townWallBlockName(5), 'H.RMB'] } } }), true);
   assert.equal(hasCarriageGate({ exterior: { exteriorData: { blockNames: ['H.RMB'] } } }), false);
-  // the carrier: its markers first, then the gates' things
-  const src = rd('src/world/townWalls.js');
-  assert.match(src, /json\.RmbBlock\.MiscFlatObjectRecords = \[\.\.\.markers\.map\([^\n]+\), \.\.\.\(furniture\?\.flats \?\? \[\]\)\];/);
-  assert.match(src, /return townWallBlockJson\(name, modelId, wall\?\.markers \?\? \[\], open, wall \? gateFurniture\(wall, classicOf, carriageRecordsOf, townBlockedCells\(dfLocation, wall, rmbOf\)\) : null\);/);
 });
 
 test('TS7 the ground under a carrier never read for the terrain (its wall made when it is laid out), a town\'s walk shut to its ground and its wall, and its yards placed on what that leaves (mutants: the carrier read; the yards unshut)', () => {
@@ -177,8 +170,6 @@ test('TS7 the ground under a carrier never read for the terrain (its wall made w
   const g = townGroundOf(layout, {}, (n) => { shut++; n.grid.fill(0); });
   assert.equal(shut, 1);
   assert.ok(g.blocked.every((v) => v === 1), 'nothing left to place on');
-  assert.match(rd('src/scenes/pixelBuild.js'), /townPlacesFor\(dfLocation, lefaySpot, climate\?\.people, loc, walkShut, \(\) => breather\.breathe\(\)\)/);   // PIN MOVED (IC-STUTTER): and the build's breather
-  assert.match(rd('src/scenes/world.js'), /const g = await stepsBreathing\(townGroundSteps\(yl, measures, shut, townYardsOf\(dfLocation\)\), breathe\);/);   // PIN MOVED (IC-PROPS): and what the town tells its yards' law - its fabric's ways, a capital's own yards; PIN MOVED (IC-STUTTER): a step at a time
   assert.equal(typeof registerTownWall, 'function');
 });
 

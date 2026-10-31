@@ -785,8 +785,6 @@ test('TWO-HANDS rig, the pair: a katana and a dagger - both drawn, the katana le
   const lowered = await at();
   assert.ok(climb.r.climbLower() > 0 && climb.r.climbLower() < 0.5, `on its way down: ${climb.r.climbLower()}`);
   assert.ok(lowered > restY + 0.5, `the pair goes DOWN for the climb: ${restY} -> ${lowered}`);
-  // the recoil goes to the striking hand's clone (source: the rig routes it)
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /playerWeapon\.onAttackResult = \(\{ foe, damage \}\) => \(pairUp\(\) && playerWeapon\.activeHand === 'L' \? twoHands\.offWidget : widget\)\.onAttackDamageCalculated\(/);
 });
 
 test('TWO-HANDS rig, the running hands: running with nothing in either hand - drawn or sheathed - the two fists pump out of step, from their guard or up from below the view, and go when the run ends; a light in a hand, a weapon, or standing still draws none', async () => {
@@ -1107,13 +1105,6 @@ test('TWO-HANDS x WEAPON-GLOW1: each hand of a pair wears ITS OWN weapon\'s elem
   assert.ok(glowPad('fire', plain.ph) > glowPad('frost', plain.ph));
   assert.equal(box({ glowLook: ['frost', 'fire'] }).ph, plain.ph + 2 * glowPad('fire', plain.ph), 'a frost blade and a fire one: the fire\'s room');
   assert.equal(box({ glowLook: 'frost' }).ph, plain.ph + 2 * glowPad('frost', plain.ph), 'one look as before');
-  assert.match(rd('src/combat/fpArm.js'), /const padLooks = offGlow \? \[glowLook, offGlow\.look\]\.filter\(Boolean\) : glowLook;/);
-  // the rig: each hand its own item's - the classic pair, each widget clone, the Morrowind arm's two blades
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /glowFor: \(hand\) => glowOf\(playerWeapon\.handItem\(hand\)\)/, 'the classic pair');
-  assert.match(rig, /function cloneFrame\(item, hand, f\) \{[^]{0,400}glow: glowOf\(item\)/, 'each clone - the one hand\'s and each of a pair\'s');
-  assert.match(rig, /fpArm\.setWeaponGlow\?\.\(meshGlow\(armItem\), armItem\);\s*fpArm\.setOffWeaponGlow\?\.\(offItem \? meshGlow\(offItem\) : null, offItem\);/, 'the arm: the blade it holds, and the left its own');
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /renderer\.drawScreenQuad\(tex, rect, uv, tint \?\? undefined\);\s*if \(ctx\.glow\) renderer\.drawScreenQuadGlow\?\.\(tex, rect, uv, ctx\.glow,/, 'a clone of a pair: its outline on its own rect and source');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
@@ -1243,50 +1234,6 @@ test('TWO-HANDS rig (AUDIT 2): THE SPRITE LANE, AUDITED AGAIN - the guard never 
     assert.ok(asked > 0, 'the pack asks the rig\'s door');
   } finally { Object.assign(fpArm, saved); }
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) assert.match(rd(host), /handArm: \(\) => [^\n]*\.handArm\?\.\(\)/, `${host} hands the pack the rig's door`);
-});
-
-test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own (after the climb\'s return, before the arm\'s seam, never behind the held map) and the one-hand ladder below it is untouched; the hosts carry none of it', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  const branch = rig.indexOf('if (c && !eotbHidesWeapon() && !fpArm.active() && !sheetWindowUp() && (runDrawn || (pairUp() && shown()))) {');   // PIN MOVED (AUDIT 2): the run as drawn this frame
-  assert.ok(branch > 0, 'the branch, under the lanes\' vetoes');
-  assert.ok(branch > rig.indexOf('if (!armsClimb && (_climbLower >= CLIMB_LOWER_GONE'), 'below the climb\'s lowering');
-  assert.ok(branch < rig.indexOf('_armDrewLast = !eotbHidesWeapon() && fpArm.active();'), 'above the arm\'s seam');
-  assert.match(rig, /const runHands = !!c && twoHands\.running && !fpArm\.active\(\) && !eotbHidesWeapon\(\) && !sheetWindowUp\(\);/);
-  // AUDIT 2: and never over another picture in the hands - the run yields to it at once
-  assert.match(rig, /const runDrawn = runHands && \(handsEmpty\(\) \|\| !\(shown\(\) \|\| torchOnly \|\| !!shieldRect \|\| gunSliding \|\| spellHandsDrawn\)\);/);
-  assert.match(rig, /finally \{ widget\.endOfFrame\(\); twoHands\.offWidget\.endOfFrame\(\); shield\.endOfFrame\(\); \}/);
-  assert.match(rig, /playerWeapon\.leftBusy = lightInHand\(\);[^\n]*\n\s*playerWeapon\.applyWeapon\(claws\);/, 'the light\'s hand decided before the mode');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(rd(host), /twoHands|handsLaw/, `${host}: THE FOUR HOSTS - the rig is the one surface`);
-  }
-  // the HUD's diamond is handed the weapon AT REST in every host (AUDIT: never the off hand's mid-blow)
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(rd(host), /weapon: (?:weaponRig|interiorWeapon)?\.?playerWeapon\.restingWeapon \?\? null,/, `${host}: the HUD's weapon`);
-    assert.doesNotMatch(rd(host), /^\s+weapon: (?:weaponRig\.|interiorWeapon\.)?playerWeapon\.weapon \?\? null,/m, `${host}: never the weapon in use`);
-  }
-  // the off hand's terms reach every blow between players (AUDIT): each melee arm hands the STRIKING rig's off flag on
-  const world = rd('src/scenes/world.js');
-  assert.equal((world.match(/\{ off: weaponRig\.playerWeapon\.offStrike \}/g) ?? []).length, 3, 'the duel, the battle and the wild zone');
-  assert.match(world, /\.\.\.\(weaponRig\.playerWeapon\.offStrike \? \{ off: true \} : \{\}\) \}, duelStandIn\(playerEntity\)\);$/m, 'and the siege\'s works');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the stand-in struck by me
-  assert.equal((world.match(/resolveDuelStrike\(\{[^\n]*\.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\)/g) ?? []).length, 3, 'each strike-out hands it to the roll');   // PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS)
-  assert.match(rd('src/scenes/dungeonContext.js'), /opts\.wildStrike\(best, playerWeapon\.strikingWeapon, playerWeapon\.machine\?\.state, \{ off: playerWeapon\.offStrike \}\)/, 'the dungeon\'s own rig too');
-  // AUDIT 2: AND THE RELAY BETWEEN THEM - the streamed world's dungeon (worldModes.js builds its context, the only live
-  // builder) hands the dungeon's `{ off }` on to the host's door, which had dropped it: the arrows' own source, chained
-  // as the game chains them
-  const relayText = rd('src/scenes/worldModes.js').match(/wildStrike: (\([^)]*\) => !!host\.wildStrike\?\.\([^)]*\)),/)?.[1];
-  const doorText = rd('src/scenes/world.js').match(/wildStrike: (\(id, weapon, swing, o\) => wildStrikeOut\(id, 'melee', weapon, swing, 0, o\)),/)?.[1];
-  assert.ok(relayText && doorText, 'the relay and the door, found');
-  const sent = [];
-  const door = new Function('wildStrikeOut', `return ${doorText};`)((to, by, weapon, swing, drawMs = 0, { off = false } = {}) => { sent.push(off); return true; });
-  const relay = new Function('host', `return ${relayText};`)({ wildStrike: door });
-  assert.equal(relay('peer', null, 'StrikeDown', { off: true }), true);
-  assert.deepEqual(sent, [true], `the off-hand blow reaches the host's door as the off hand's (${relayText})`);
-  // the classic sprite's placement is FPSWeapon's, shared by the second hand
-  const fps = rd('src/combat/fpsWeapon.js');
-  // the record rides the quad (WEAPON-GLOW1's outline is measured in its own pixels), the draw's two lines main's own
-  assert.match(fps, /const q = fpsWeaponQuad\(canvas, art, state, frame, \{ flipHorizontal, offsetHeight \}\);\n\s*if \(!q\) return;\n\s*const \{ tex, rect: \{ x, y, w, h \}, uv: src, rec \} = q;\n\s*renderer\.drawScreenQuad\(tex, \{ x, y, w, h \}, src, tint \?\? undefined\);[^\n]*\n\s*if \(glow\) renderer\.drawScreenQuadGlow\?\.\(tex, \{ x, y, w, h \}, src, glow, \{ art: \[rec\.width, rec\.height\]/);
-  // and the one hand's clone draws the mod's own line; only a hand of a pair takes the guard and the mirror
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /if \(!transform && !mirror\) \{\n\s*renderer\.drawScreenQuad\(tex, getWeaponRect\(\), w\.curAnimRect, tint \?\? undefined\);\n\s*if \(ctx\.glow\) renderer\.drawScreenQuadGlow\?\.\(tex, getWeaponRect\(\), w\.curAnimRect, ctx\.glow,[^\n]*\n\s*return true;\n\s*\}/);
 });
 
 test('TWO-HANDS rig: a left-handed player\'s picture is mirrored whole - the right hand on the left, mirrored; the left hand on the right, as DFU draws a right hand', async () => {

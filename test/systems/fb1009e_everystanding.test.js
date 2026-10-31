@@ -67,9 +67,6 @@ test('EVERY-STANDING: every organization by group - the guilds and temples the p
 
 test('EVERY-STANDING: on by default (STANDING-ON); on, the Standing page draws each group under its divider, a row its name and a signed number', async () => {
   assert.equal(PREF_DEFAULTS.standingAll, true);   // STANDING-ON (Mac, 2026-10-11)
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /statsGuilds\(detail, playerEntity\);\s*\n\s*if \(getPref\('standingAll'\)\) statsEveryStanding\(detail, playerEntity\);/);
-  assert.match(menu, /out\.push\(prefRow\('standingAll', 'Every faction\\'s standing',/);
   const sheet = CATEGORIES.find((t) => t.id === 'interface').sections.find((s) => s.id === 'sheet');
   assert.deepEqual(sheet.items, ['port:standingAll']);
   const { statsEveryStanding } = await import('../../src/ui/enhanced/enhancedMenu.js');

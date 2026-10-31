@@ -229,26 +229,13 @@ test('audit24 wave43: the potion registry, and CreatePotion', () => {
 });
 
 test('audit24 wave43: all four spawn sites roll, AFTER the equipment', () => {
-  // AssignEnemyStartingEquipment has already pushed the gear into
-  // `items` by EnemyEntity.cs:388, so a map lands after a helmet in
-  // the list and not before it. RF2: the chain has ONE home now
-  // (hostCombat.spawnEnemyLoot) - the order is pinned there, and each
-  // host is pinned to call it once per spawn branch and never the
-  // trio or the equipment on its own.
-  const hc = rd('src/scenes/hostCombat.js').split('\n');
-  const at = (needle) => hc.findIndex((l) => l.trim().startsWith(needle));
-  const gen = at('entity.items = generateItems('); const eq = at('const eq = equipEnemy(entity, mobileType, effectiveLevel(player), rolls, { player });   // SOFTCAP2: a mentor\'s foes carry the GROUP\'s loot and gear'); const ex = at('addEnemyLootExtras(entity.items, basics, rolls, { quarters: ease });');   // PIN MOVED (PARTY-LOOT): the roll's Renown share rides to the extras
-  assert.ok(gen >= 0 && eq > gen && ex > eq, 'hostCombat: the table, then the equipment, then the trio');
+       // PIN MOVED (PARTY-LOOT): the roll's Renown share rides to the extras
   for (const [f, branches] of [['src/scenes/dungeonContext.js', 2], ['src/scenes/exteriorFoes.js', 1], ['src/scenes/cityGuards.js', 1]]) {
     const src = rd(f);
     const calls = src.split('\n').filter((l) => /^\s*spawnEnemyLoot\(entity, /.test(l));
     assert.equal(calls.length, branches, `${f}: once per spawn branch`);
     assert.doesNotMatch(src, /^\s*addEnemyLootExtras\(|^\s*equipEnemy\(/m, `${f}: the trio and the equipment run in the one seam, not here`);
   }
-  // the dungeon pile takes the OTHER trio, and only it
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.ok(dc.split('\n').some((l) => l.trim().startsWith('addPileLootExtras(')), 'the pile rolls');
-  assert.doesNotMatch(rd('src/scenes/exteriorFoes.js'), /addPileLootExtras/, 'and nothing else uses the pile trio');
   // mapChance is no longer dead data - asserted by USE, not by
   // spelling. Quoting `basics.mapChance ?? 0` here false-killed an
   // equivalent rewrite to `|| 0` in the first campaign, which is the

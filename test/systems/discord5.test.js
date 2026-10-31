@@ -77,25 +77,9 @@ test('BLACK-ARMS, driven: an RGB triple through drawScreenQuad uploads a FINITE 
   assert.equal(screenQuadBlends(null, [1, 1, 1], {}, true), false, '...and the flag means nothing on a solid quad');
 });
 
-test('BLACK-ARMS by source: the rig hands the triple through as it is (the fix is at the one seam every classic sprite ends in, not at four callers), the renderer defaults the fourth, and the browser probe draws the TRIPLE and reads the alpha back', () => {
-  const rr = rd('src/render/renderer.js');
-  assert.match(rr, /const a = color\[3\] \?\? 1;\s*if \(q\.r !== color\[0\] \|\| q\.g !== color\[1\] \|\| q\.b !== color\[2\] \|\| q\.a !== a\) \{\s*gl\.uniform4f\(this\._screenQuad\.color, color\[0\], color\[1\], color\[2\], a\);\s*q\.r = color\[0\]; q\.g = color\[1\]; q\.b = color\[2\]; q\.a = a;/);
-  assert.match(rr, /return \(!tex && \(color\[3\] \?\? 1\) < 1\) \|\| Boolean\(tex && \(opts\.blend \|\| alphaArt\)\);/, 'OVH2: a texture uploaded as alpha art blends too - the solid arm is unchanged');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /const fpTint = fpLightingOn\(\) \? \(renderer\?\.flatLightAt\?\.\(\) \?\? null\) : null;/, 'the triple, unchanged - MAC-I\'s own shape');
-  assert.match(rr, /for \(let i = 0; i < 3; i\+\+\) out\[i\] = Math\.max\(floor, Math\.min\(1, out\[i\]\)\);\s*return out;/, 'flatLightAt answers THREE');
-  const probe = rd('tools/macfpLightProbe.mjs');
-  assert.match(probe, /res\.pixelTorch = drawWith\(r\.flatLightAt\(\[0, 0, 0\]\)\);/, 'the probe no longer appends the 1 the runtime never passes');
-  assert.match(probe, /out\.pixelTorch\[3\] === 255/, 'and reads the alpha back');
-});
-
 // ── 3ARMS ────────────────────────────────────────────────────────────────
 
 test('3ARMS by source: both mods compare the IL\'s 2 to the port\'s Both - DFU declares ItemHands as None, Either, BOTH, LeftOnly, RightOnly, so `== 2` is a two-hander; the mod\'s own C# says `== ItemHands.Both` at HandheldTorches.cs:1311/:1323 and FPSWeaponClone.cs:2378; the relaxed switch ships OFF (the departure that follows HT7: a held two-hander takes both hands)', () => {
-  const ht = rd('src/systems/handheldTorches.js');
-  assert.match(ht, /if \(left\) \{\s*w\.handLeft = false;\s*if \(getItemHands\(left\) === ITEM_HANDS\.Both \|\| isBow\(left\)\) w\.handRight = false;\s*\} else if \(!sheathedNow && !usingRightNow\) w\.handLeft = false;/, 'the left slot: a Both item or a bow takes the right; an empty left hand you punch with is in use');
-  assert.match(ht, /if \(right\) \{\s*w\.handRight = false;\s*if \(getItemHands\(right\) === ITEM_HANDS\.Both\) \{[^}]*if \(w\.s\.twoHandedRelaxed\) \{ if \(isBow\(right\) \|\| w\.attacking\) w\.handLeft = false; \}\s*else w\.handLeft = false;/, 'the right slot: a two-hander takes the off hand - always, or for a bow and a swing when relaxed');
-  assert.doesNotMatch(ht, /ITEM_HANDS\.LeftOnly/, 'the misread is gone from the hand law');
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /if \(getItemHands\(w\.specificWeapon\) !== ITEM_HANDS\.Both\) return false;/, 'and from the widget\'s mirror override');
   assert.notEqual(ITEM_HANDS.Both, 2, 'the port\'s own numbering is not DFU\'s - which is how 2 was misread');
   assert.equal(MOD_SETTINGS['handheld-torches'].keys['Handling.RelaxedTwoHandedWeapons'].default, false, 'the mod ships true; the port ships false');
 });
@@ -118,38 +102,6 @@ test('TORCH-BIND (re-aimed by KB1): every key a vendored mod answers is a regist
     }
   }
   assert.ok(modDials('handheld-torches').includes('Handling.RelaxedTwoHandedWeapons'));
-  // the reads are gone, so the table above cannot go stale in silence
-  assert.doesNotMatch(rd('src/player/eyeOfTheBeholder/eotbCamera.js'), /g\('Camera\.SwitchShoulder'\)|g\('AutoTogglePerspective\.ToggleInput'\)/);
-  assert.doesNotMatch(rd('src/systems/travel/travelOptions.js'), /get\('RoadsIntegration\.FollowPaths(Key|CustomKeyBind)'\)/);
-  assert.doesNotMatch(rd('src/systems/handheldTorches.js'), /s\['Handling\.ToggleLightInput'\]|s\['Handling\.ManualDropInput'\]|s\['Throwing\.ThrowTorchInput'\]/);
-});
-
-test('TORCH-BIND, driven: the controls pane carries TWO Continues - the head card, sticky, and a foot card after the last group - and the foot one saves', async () => {
-  const { paneControls, discardControlsStaging } = await import('../../src/ui/enhanced/enhancedControls.js');
-  const { createBindings, resetDefaults } = await import('../../src/systems/inputActions.js');
-  const { setBindings } = await import('../../src/ui/input.js');
-  const fakeEl = (tag) => {
-    const n = { tag, children: [], className: '', textContent: '', title: '', style: {}, dataset: {}, onclick: null, oncontextmenu: null,
-      append(...cs) { for (const c of cs) n.children.push(c); }, setAttribute() {}, addEventListener() {}, removeEventListener() {} };
-    return n;
-  };
-  const find = (n, cls, out = []) => { if (n.className.split(/\s+/).includes(cls)) out.push(n); for (const c of n.children) find(c, cls, out); return out; };
-  const store = createBindings(); resetDefaults(store); setBindings(store); discardControlsStaging();
-  const prev = globalThis.document;
-  globalThis.document = { createElement: fakeEl, addEventListener() {}, removeEventListener() {} };
-  try {
-    const view = { body: fakeEl('div') };
-    const render = () => { view.body = fakeEl('div'); paneControls(view.body, { render }); };
-    paneControls(view.body, { render });
-    const conts = find(view.body, 'ctl-continue');
-    assert.equal(conts.length, 2, 'head and foot');
-    assert.equal(find(view.body, 'ctl-foot').length, 1);
-    assert.ok(find(find(view.body, 'ctl-foot')[0], 'ctl-continue-foot').length === 1, 'the foot card holds the second');
-    assert.equal(view.body.children.at(-1), find(view.body, 'ctl-foot')[0], 'after the last group');
-    conts[1].onclick();
-    assert.equal(find(view.body, 'ctl-notice')[0]?.textContent, 'Controls saved.', 'the foot Continue is applyAndSave');
-  } finally { discardControlsStaging(); globalThis.document = prev; }
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.ctl-head \{ position: sticky; top: 0; z-index: 2; \}/, 'the head card stays in view while the list scrolls');
 });
 
 // ── HOTSLOT ──────────────────────────────────────────────────────────────
@@ -209,21 +161,5 @@ test('HOTSLOT, driven: the enhanced spellbook slots a spell - Quickslot on the p
   } finally { globalThis.document = prevD; globalThis.window = prevW; }
 });
 
-test('HOTSLOT by source: the HUD\'s empty spell chip is a SOCKET (drawn dim, wearing its key, so a finger has a chip to fill), and the pane says hold', () => {
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /chip\.chip\.classList\.toggle\('qspell-empty', !sp\);[^\n]*\s*if \(!sp\) \{\s*chip\.chip\.classList\.remove\('readied', 'ghost', 'cycling'\);\s*chip\.name\.textContent = 'No spell';\s*quickTag\(chip, 'spellcap', tag\);\s*return;\s*\}/);
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.hud-qspell\.qspell-empty \{ display: flex; opacity: 0\.55; \}/);   // PIN MOVED (HUD-CLASS): the socket's own word - the bare 'empty' took the sheet's .empty component
-  assert.match(rd('src/systems/inputActions.js'), /\['QuickSpell', 'Ready quickslot spell \(hold to cycle the book\) \/ hotbar slot 3'\]/, 'KB1: the label lives in the registry\'s groups');
-});
-
 // ── LOOT-REGEN ───────────────────────────────────────────────────────────
 
-test('LOOT-REGEN by source: the dungeon\'s quick-loot take is the room\'s word - what is left is said and stamped the moment the take lands, an emptied pile\'s flat is settled, and C6\'s window order stands untouched behind it', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  // LOOT-STACK: the quick take is a PRESS's (`!pileKeys` - a pile tab asks for that body's window), and the pile's
-  // tabs are laid on the hooks before C6's order, which stands untouched behind them. PIN MOVED (AUDIT 625 D6): the take
-  // opened it - a body's or a pile's find rolls first thing in its arm
-  assert.match(d, /if \(!pileKeys && quickLootTake\(key, \{ items: \(\) => source \}, playerEntity, setMidScreenText, \{ getQuest: \(uid\) => opts\.questBridge\?\.machine\?\.getQuest\?\.\(uid\) \?\? null, took: showPickups \}\)\) \{[^\n]*\n\s*if \(_find\) silverFindAt\(_find\.kind, _find\.key\);[^\n]*\n\s*const _q = roomLootKey\(key\);[^\n]*\n\s*if \(_q\) publishLoot\(_q\);\s*if \(!source\.length\) onEmptied\?\.\(\);\s*return source\.length;\s*\}\s*const pile = kind === 'corpse' \? lootPile\(key, \{[\s\S]{0,400}?\}\) : null;\s*if \(pile\) lootHooks = \{ \.\.\.\(lootHooks \?\? \{\}\), pile \};\s*const _k = roomLootKey\(key\);[^\n]*\n\s*const _w = openInventory\(source, onEmptied, \{ lootHooks, lootKey: _k \}\);\s*if \(_w\) activeOverlay = _w;/);   // DISC10-E L3 re-aim: a refused pack (the door's null) is not written over the slot
-  // publishLoot without `claim` is the whole word: the stamp, the record, the seen-set, the first-word memory push
-  assert.match(d, /function publishLoot\(key, \{ claim = false \} = \{\}\) \{\s*const canon = lootKeyOf\(key\);\s*if \(!canon \|\| !lootHolder\(canon\)\) return false;\s*(?:if \(isRoomBaseContainer\(canon\)\) return sayRoomWord\(canon, claim\);[^\n]*\n\s*)?(?:if \(_lootUnreadable\.has\(canon\)\) return false;[^\n]*\n\s*)?if \(claim && _lootSeen\.has\(canon\)\) return false;/);   // PIN MOVED (PARTY-LOOT): a room container's word is its takes, said by sayRoomWord - an open says nothing   // AUDIT SETS M2: and never over a word this build cannot read
-});

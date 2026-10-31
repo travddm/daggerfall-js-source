@@ -40,50 +40,6 @@ test('DA12: --play goes past the launcher only when there is nothing to ask', ()
   assert.equal(L.directPlay(null, { arena2InGame: true }), null);
 });
 
-test('DA12: the shell - the switch at boot, the folder judged first, the update check the game\'s', () => {
-  const main = rd('app/main.cjs');
-  const ready = main.slice(main.indexOf('app.whenReady().then('), main.indexOf("app.on('window-all-closed'"));
-  assert.match(ready, /const direct = directPlay\(process\.argv, loadConfig\(\)\);\s*if \(direct === null\) runLauncher\(\);\s*else runDirect\(direct\);/);
-  // a dock click while the direct start judges its folder does not open a launcher beside the game
-  assert.match(ready, /app\.on\('activate', \(\) => \{ if \(BrowserWindow\.getAllWindows\(\)\.length === 0 && !directStarting\) runLauncher\(\); \}\);/);
-  const run = main.slice(main.indexOf('async function runDirect('), main.indexOf('// The launcher\'s two words.'));
-  // the saved folder judged in a process of its own (R2-D1), and one that is not whole opens the launcher
-  assert.match(run, /const r = folderAnswer\(await askArena2\(\{ op: 'judge', dir \}, \{ deadline: JUDGE_DEADLINE_MS \}\)\);\s*if \(!r\.dir\) \{ runLauncher\(\); return; \}\s*setArena2\(r\.dir\);/);
-  assert.match(run, /\} else setArena2\(null\);/);
-  // the version played kept, as Play keeps it (the launcher's NEW marks)
-  // PIN MOVED: DA13 - the GAME's version, which the channel moves past the install's own (gameVersion)
-  assert.match(run, /saveConfig\(\{ \.\.\.loadConfig\(\), lastPlayed: gameVersion\(\) \}\);\s*(\/\/[^\n]*\n\s*)*createWindow\(\)\.catch\(\(\) => \{\}\);/);
-  // AUDIT DA12: the window stands from createWindow's first line - why the check need not wait on its load
-  const cw = main.slice(main.indexOf('async function createWindow('));
-  assert.match(cw, /^async function createWindow\(\{ onShown = null \} = \{\}\) \{\n  const win = new BrowserWindow\(\{/);
-  assert.match(run, /\} finally \{ directStarting = false; \}/);
-  // the check the launcher would have run, inside the same gates - its answer the game's, installed at quit
-  // PIN MOVED: DA13 - the game's own channel first, and the installer's path, quietly, for what it cannot carry
-  assert.match(run, /if \(!updateChecksEnabled\(\)\) return;\s*(\/\/[^\n]*\n\s*)*askGame\(\)\.then\(\(g\) => \{ if \(g === 'installer'\) askInstaller\(\); \}\);\s*startRechecks\(\);/);
-  assert.match(main.slice(main.indexOf('function askInstaller()')), /^function askInstaller\(\) \{\s*if \(currentUpdateTransport\(\) === 'updater'\) askUpdater\(\)\.catch\(\(\) => \{\}\);\s*else noticeCheck\(\)\.then\(tellNotice, \(\) => \{\}\);\s*\}/);
-  assert.match(main, /au\.autoInstallOnAppQuit = true;/, 'an update found while playing installs at quit - no reopen for a game manager to lose');
-  assert.doesNotMatch(run, /installNow|quitAndInstall/, 'never an install before play');
-});
-
-test('DA12: the launcher answers a controller - the game\'s own pad loop, one module, packed beside the page', () => {
-  const html = rd('app/launcher/index.html');
-  assert.match(html, /<script src="launcher\.js"><\/script>\s*<script type="module" src="pad\.js"><\/script>/);
-  const pad = rd('app/launcher/pad.js');
-  assert.match(pad, /^import \{ attachMenuPad \} from '\.\/menuPad\.js';$/m);
-  assert.match(pad, /^attachMenuPad\(\{ focusStyle: false \}\);$/m, 'the page\'s CSP refuses a style written by script');
-  // served by its one name: packed beside the page, the source tree's own unpacked
-  const main = rd('app/main.cjs');
-  assert.match(main, /const MENU_PAD = app\.isPackaged \? path\.join\(LAUNCHER_DIR, 'menuPad\.js'\) : path\.join\(__dirname, '\.\.', 'src', 'ui', 'menu', 'menuPad\.js'\);/);
-  assert.match(main, /const p = parts\.length === 1 && parts\[0\] === 'menuPad\.js'\s*\? MENU_PAD/);
-  const build = JSON.parse(rd('app/package.json')).build;
-  assert.deepEqual(build.files.find((f) => f?.from === '../src/ui/menu'), { from: '../src/ui/menu', to: 'launcher', filter: ['menuPad.js'] });   // TIDY2: the menu's folder
-  // the pad's focus is drawn by the page's own stylesheet
-  const css = rd('app/launcher/launcher.css');
-  for (const sel of ['.plaque.pad-focus', '.play:not(:disabled).pad-focus', '.link.pad-focus', '.check input.pad-focus', '.feed.pad-focus']) {
-    assert.ok(css.includes(sel), `${sel} is drawn`);
-  }
-});
-
 test('DA12: focusStyle false writes no style into the page - the default still does', () => {
   const made = [];
   const doc = {

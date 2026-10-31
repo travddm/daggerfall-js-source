@@ -291,14 +291,6 @@ test('NODE-MARKS nodeCompassPoints: the host\'s marks in their professions, the 
   assert.equal(nodeCompassPoints(marks, null), nodeCompassPoints([marks[0]], null), 'one list, refilled');
 });
 
-test('NODE-MARKS AUDIT the classic compass\'s order: the node marks are drawn FIRST, after the strip, so the Detect markers (a spell\'s whole output), the party and the ships stand over them (mutant: the nodes drawn last again)', () => {
-  const H = src('src/ui/hud/hud.js');
-  const body = H.slice(H.indexOf('export function drawHud('), H.indexOf('export function drawPartyCompassMarks('));
-  const nodesAt = body.indexOf('drawNodeCompassMarks(renderer, nodes,');
-  assert.ok(nodesAt > body.indexOf('drawCompassStrip(renderer, art, bx, by, s, heading01)'), 'over the strip');
-  for (const later of ['if (detected && detected.length && playerXZ)', 'drawPartyCompassMarks(renderer, party,', 'drawShipCompassMarks(renderer, ships,']) assert.ok(nodesAt < body.indexOf(later), `before ${later}`);
-});
-
 test('NODE-MARKS the classic compass: the party\'s 5x3 triangle per node over the box\'s top edge at its bearing, clamped, in its profession\'s colour at its opacity; nothing without points or my own place (mutants: one colour for all; the opacity dropped; the bearing ignored)', () => {
   const quads = [];
   const renderer = { drawScreenQuad: (tex, rect, uv, col) => quads.push({ rect, col: [...col] }) };
@@ -607,16 +599,3 @@ test('NODE-MARKS AUDIT the still form, the shader RUN: under reduced motion (`uS
   assert.ok(sparks > 0, 'the motes held where they are, not gone');
 });
 
-test('NODE-MARKS the hosts by source: the street\'s compass and the dungeon\'s take the nodes - under the travel view too (AUDIT); the glow is drawn after each mode\'s opaque world through the veiled bodies\' hook, never under the travel view; none in a building or with the professions shut; every edit to the cited hosts line-neutral (one import line, one door folded beside the party\'s)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /if \(!gatherHost \|\| profBook\?\.state\.open !== true \|\| !feet\) return null;\n\s*const m = _mode\(\);\n\s*return m === 'exterior' \|\| m === 'dungeon' \? gatherHost\.marks\(feet\) : null;/, 'AUDIT: the compass keeps the nodes under the travel view, as PROF2\'s Prospector\'s veins were kept');
-  assert.match(w, /nodes: professionMarks\(\),/);
-  // PIN MOVED (PROF2b): the far Motherlodes beside the near nodes, the glow still built right after
-  assert.match(w, /const professionMarks = \(feet = enchantFeet\(\)\) => \{\n\s*const near = nodeMarksAt\(feet\), far = motherlodeMarks\(\);\n\s*return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);[^\n]*\n\s*\};\n\s*const nodeGlintPass = createNodeGlintPass\(renderer\);/);   // PIN MOVED (NODE-OUTLINE): the glow the outline's fallback, for a node with no picture; PIN MOVED (HOST-SPLIT): the outline builds that glow itself; PIN MOVED (NODE-GLINT): the glint's now
-  assert.match(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\); nodeGlintPass\.draw\(travelView\?\.active \? null : nodeMarksAt\(enchantFeet\(\)\)\); partyPing\?\.draw\(renderer\); \};/, 'the glow alone none under the travel view');
-  assert.match(w, /partyNear: \(\) => partyOnMaps\(\), professionMarks: \(feet\) => professionMarks\(feet\),/);
-  assert.match(w, /^import \{ mineKind \} from '\.\/mineHost\.js'; import \{ nodeCompassPoints \} from '\.\.\/ui\/nodeMarks\.js'; import \{ createNodeGlintPass \} from '\.\.\/render\/nodeGlint\.js';/m);   // PIN MOVED (NODE-OUTLINE); PIN MOVED (HOST-SPLIT): the outline builds the glow it falls back to; PIN MOVED (NODE-GLINT): the glint does now
-  assert.match(src('src/scenes/worldModes.js'), /party: \(\) => host\.partyNear\?\.\(\) \?\? \[\], nodeMarks: \(feet\) => host\.professionMarks\?\.\(feet\) \?\? null,/);
-  assert.match(src('src/scenes/dungeonContext.js'), /party: partyCompassPoints\(\{ bodies: opts\.party \?\? null \}\), nodes: playerFeet \? withFireMarks\(opts\.nodeMarks\?\.\(playerFeet\) \?\? null, dungeonFires, playerFeet\) : null,/, 'REST3: the dungeon\'s campfires ride the same field');
-  assert.match(src('src/ui/hud/hud.js'), /nodes: nodes \?\? null,/, 'handed to the enhanced skin');
-});

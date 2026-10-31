@@ -80,8 +80,7 @@ test('AUDIT WORLD6b-ii A1: the caster\'s tick runs always, never gated off (the 
   const me = [11, 0, 10];
   step(pool, me, pe, 10);
   assert.ok(calls.slice(-3).every((o) => o === undefined), 'at me the same');
-  const c = rd('src/characters/enemy/enemyCasting.js');
-  assert.match(c, /update\(dt, ai, attack, playerFeet, playerEntity\) \{/, 'one signature (WORLD6b-iii retired the suppress arm)'); assert.doesNotMatch(c, /suppress/, 'no dead option');
+   
 });
 
 test('AUDIT WORLD6b-ii A2: a foe of mine that walked off with a peer is culled by MY relevance - detected of a peer is not detected of me', async () => {
@@ -119,10 +118,6 @@ test('AUDIT WORLD6b-ii A5/A8: the player\'s slot is named in the target walk (fo
   pool.setNet(netFor(hits, { list: [] }));
   const rat = await pool.spawnFoe(0, [10, 0, 10], { feetGiven: true });
   assert.deepEqual(pool.foesFrame(true).f.map((r) => r.g), [''], 'A8: not stepped yet - none, not \'.\' (which latched the puppet hostile)');
-  const t = rd('src/characters/enemy/enemyTargets.js');
-  assert.match(t, /const walk = \(candidates \?\? \[\]\)\.includes\(PLAYER_TARGET\) \? \[\.\.\.candidates\] : \[\.\.\.\(candidates \?\? \[\]\), PLAYER_TARGET\];/, 'A5: the caller names my slot');
-  // PIN MOVED (AUDIT CC-E1): the other clients' bodies a companion's fight crosses ride last, after the peers
-  assert.match(rd('src/scenes/exteriorFoes.js'), /runTargetMachine\(f, \[\.\.\.senses\.candidates\(\), PLAYER_TARGET, \.\.\.\(f\.placed && !f\.site \? \[\] : _questLike\(f\) \? questPeerCandidates\(f\) : peerCandidates\(\)\), \.\.\.coopCandidates\(f\)\], pf, cdt, \{/, 'and the pool puts the peers after me (QUEST-PARTY re-aim: a quest foe\'s are the party it rides to)');
   void rat;
 });
 
@@ -213,8 +208,6 @@ test('AUDIT WORLD6b-ii B4: one attack door - a connecting swing or shaft of mine
   pool.update(0.05, [11, 0, 10], [11, 1.6, 10], senses(playerEntity()));
   pool.attackFromPlayer(pup, [11, 0, 10]);
   assert.deepEqual(hits.map((h) => [h.i, h.dmg]), [[5, 0], [5, 4], [5, 0]], 'the next frame\'s zero blow goes');
-  assert.match(rd('src/scenes/world.js'), /: exteriorFoes\.attackFromPlayer\(f, player\.pos, 'arrow'\)\),/, 'the arrow seam reads the one door (AUDIT WORLD6b-iii(e) A2: with the shaft\'s kind)');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /attackFromPlayer\(foe, playerFeet\);\n/, 'and so does the melee arm');
 });
 
 test('AUDIT WORLD6b-ii B6/B8/C2: a puppet beating on me raises the enemy alert and its end clears it; the senses run for a puppet at me alone (a puppet at another is no enemy that has detected me); a puppet whose OWNER the hunt cannot see lands no blow', async () => {

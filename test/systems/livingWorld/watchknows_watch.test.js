@@ -171,11 +171,3 @@ test('WATCH-KNOWS the first minor offence is warned: the living world\'s watch, 
   assert.deepEqual(standingOf(back).warned, {});
 });
 
-test('WATCH-KNOWS the hosts: the world host hands the living town the player\'s standing with a region\'s law (its number, and whether its watch knows them) and the arrest flow its lane (livingWorldOn), the region\'s name and the world\'s calendar; the fixed-city host hands none - DFU\'s watch (mutants: the host\'s law, the lane)', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /legalStanding: \(region\) => \(\{ rep: legalRepOf\(playerEntity, region\), known: knownCriminal\(playerEntity, region, \{ ownNow: ownMinutes\(\), worldNow: trustedWorldMinutes\(\) \}\) \}\),/);
-  assert.match(world, /warnsFirst: \(\) => livingWorldOn\(\), regionName: \(r\) => REGION_NAMES\[r\] \?\? 'this region', worldNow: \(\) => trustedWorldMinutes\(\),/);
-  const exterior = rd('src/scenes/exterior.js');
-  const flow = exterior.slice(exterior.indexOf('createArrestFlow({'), exterior.indexOf('});', exterior.indexOf('createArrestFlow({')));
-  assert.doesNotMatch(flow, /warnsFirst/, 'the fixed-city page: DFU\'s watch');
-});

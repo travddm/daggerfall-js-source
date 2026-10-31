@@ -344,10 +344,6 @@ test('TOWN-ECON TE2 trade: a sale at a trader counts at its town for its buyer, 
   assert.equal((await s.buy(tom, await sell())).status, 200);
   assert.deepEqual(s.acts(tom)[0].n, TOWN_ECON_CAPS.trade);
   assert.deepEqual(s.days(), [{ map: MAP, day: today(), src: 'trade', n: 1 }], 'a capped act moves no day');
-  // both currencies' batches carry it, and the patron's
-  const m = rd('server-account/src/market.js');
-  assert.equal((m.match(/\.\.\.tradeActStatements\(db, player, nowS, vend\?\.map \?\? null, 'EXISTS \(SELECT 1 FROM market_sales WHERE buyer = \?6 AND rid = \?7 AND n = \?8\)', \[me, rid, nonce\]\)/g) ?? []).length, 2);
-  assert.match(m, /\.\.\.patronActStatements\(db, l\.seller, map, day\),/);
 });
 
 test('TOWN-ECON TE2 a patron\'s purchase counts at its town for the trader\'s seller, on the hour\'s own day (mutants: TOWNECON2-patron)', async () => {

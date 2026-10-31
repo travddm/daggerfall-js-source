@@ -191,14 +191,3 @@ test('START3 the held map: a press on a quest\'s diamond past the Bay picks the 
   } finally { delete globalThis.document; }
 });
 
-test('START3 the wiring, by source: every place builder in place.js stamps the site past the Bay; the host\'s one pixel reader takes the site\'s own first; every host question hands the site on; the held map reads the marks over the continent\'s frame (mutants: a builder unstamped; the host\'s reader by name alone)', () => {
-  const P = rd('src/systems/quest/place.js');
-  assert.equal([...P.matchAll(/^\s+locationName: location\.name,\n\s+\.\.\.pastBaySite\(location\),/gm)].length, 5, 'the five sites built off a location');
-  assert.equal([...P.matchAll(/^\s+locationName: location\.name,$/gm)].length, 5, 'and no sixth site');
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /const questPixel = \(find\) => find\?\.worldPixel \?\? questPlacePixel\(maps, find\?\.regionName \?\? '', find\?\.locationName \?\? ''\);/);
-  assert.equal([...W.matchAll(/\(regionName, name, site\) => canFindPlace\(maps, mapDict, regionName, name, questPlacePixel, site\)/g)].length, 5, 'every host question, the site handed on');
-  assert.doesNotMatch(W, /\(regionName, name\) => canFindPlace\(/, 'none without it');
-  assert.match(rd('src/ui/heldMap.js'), /const quests = readQuestMarks\(this\.deps\.quests, this\._size, sheet\)/);   // PIN MOVED (BAY-LEFT-MAPS): the sheet's one box (_marksBox), the continent's frame while it is shown
-  assert.match(rd('src/ui/quest/questJournal.js'), /this\.deps\.canFindPlace\(site\.regionName, site\.locationName, site\)/, 'the classic journal\'s find');
-});

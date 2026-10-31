@@ -349,12 +349,7 @@ test('FAR-FLORA the canopy\'s art: the opaque texels\' mean over every Tree reco
 });
 
 test('FAR-FLORA the program: the canopy\'s four bytes at location 5, its share by the band\'s crossfade, and every ring lane\'s land the ground\'s light and the canopy\'s - the flats\' light, grained - mixed by the cover; the grain 1 off, crowns and groves about 1 near, faded to 1 where they fall under a fragment (mutant: the attribute, the share, the lanes\' mix, the flats\' light, the off test, the fade)', () => {
-  const fr = readFileSync('src/render/farRing.js', 'utf8');
-  assert.ok(fr.includes('layout(location=5) in vec4 aCanopy;'));
-  assert.ok(fr.includes('vFlora = aCanopy.x * (uCanopyBand.z > 0.5 ? smoothstep(uCanopyBand.x, uCanopyBand.y, max(cb.x, cb.y)) : 1.0);') && fr.includes('vCanopy = aCanopy.yzw;') && fr.includes('vColor = aColor;'));
-  const classicFs = fr.slice(fr.indexOf('const FS = `#version 300 es'));
   const MIX = 'vCanopy * floraLight(uAmbient, uSunColor, sun, uMoonColor, uMoonScale) * floraGrain(vWorld.xz), vFlora);';
-  assert.ok(classicFs.includes('${FLORA_GLSL}') && classicFs.includes(`vec3 lit = mix(vColor * (uAmbient + uSunColor * (sun * diff) + uMoonColor * (uMoonScale * mdiff)), ${MIX}`));
   for (const fs of [EL_FAR_RING_FS, classicShadowLane().farRingFs]) {
     assert.ok(fs.includes('float floraGrain(vec2 xz)') && fs.includes(`vec3 lit = mix(elDecode(vColor) * (uAmbient + uSunColor * (sun * diff) + uMoonColor * (uMoonScale * mdiff)), ${MIX.replace('vCanopy', 'elDecode(vCanopy)')}`), 'the lanes');
   }

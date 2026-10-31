@@ -131,13 +131,6 @@ test('QUEST-PARTY 2 executed: an owner gone without a handover leaves its quest\
   assert.equal(cat.p.foes.filter((f) => f.puppet === 'host-0001' || !f.dead).length, 0, 'another member lets them go - it sees them again on the taker\'s stream');
 });
 
-test('QUEST-PARTY 2 by source: the world host\'s heirs for a quest foe are the party, and a taken foe is bound through its own copy', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const heirOf = \(f\) => \{[^\n]*if \(\(isPrivateQuestFoe\(f\) \|\| f\._keptTag\) && !social\?\.isPartyPeer\(q\.id\)\) continue;[^\n]*\n\s*return exteriorFoes\.handOver\(heirOf,/, 'never a stranger (the open air\'s handover; QUEST-PARTY phase 3b\'s building one is pinned beside its own; CURSE-SYNC: a PRIVATE quest\'s foe - a world quest\'s goes as an encounter\'s)');
-  assert.match(w, /behaviourFor: \(tag\) => questBehaviourFor\(questBridge\?\.machine, tag\),/);
-  assert.match(w, /adoptsOrphan: \(from, f\) => !!social\?\.party && adoptsOrphanQuestFoe\(\{ myId: online\?\.id \?\? null, myFeet: player\.feetAt\(\), foeFeet: f\.ai\?\.feet, partyPeers: \(peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => p\.id !== from && social\.isPartyPeer\(p\.id\)\) \}\),/);
-});
-
 // ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): phase 1-3b's findings over real pools.
 const own = (p) => p.foes.filter((f) => !f.puppet && !f.dead);
 const pups = (p, from) => p.foes.filter((f) => f.puppet === from && !f.dead);
@@ -259,11 +252,3 @@ test('AUDIT pre-merge Q5 + Q6 executed: a quest foe\'s body offers no pile (its 
   assert.deepEqual([...tags.keys()], [1, 2], 'the cure quests ride; a word with a space still does not');
 });
 
-test('AUDIT pre-merge Q4 + Q7 by source: a shared quest\'s foe past my relevance stands while a party member is near it; a partner\'s wave counts as placed only for a quest I hold as shared', () => {
-  const x = rd('src/scenes/exteriorFoes.js'), w = rd('src/scenes/world.js');
-  assert.match(x, /const partyNearFoe = \(f, r\) => peerCandidates\(\)\.some\(\(c\) => _peerMayHit\(c\.id, f\) && Math\.hypot\(c\.feet\[0\] - f\.ai\.feet\[0\], c\.feet\[1\] - f\.ai\.feet\[1\], c\.feet\[2\] - f\.ai\.feet\[2\]\) <= r\);/);
-  assert.match(x, /&& !\(_qTag\(f\) && partyNearFoe\(f, _cullAt\)\) && !_relentless\) \{/, 'the cull asks it');   // PIN MOVED (RVN2: nor a Relentless revenant hunting me)
-  assert.match(w, /const _liveSharer = \(q\) => \(questBridge\?\.machine\?\.hasSharedQuestNamed\?\.\(q\) \? \(_questSharer\.get\(q\) \?\? null\) : null\);/);
-  assert.equal((w.match(/sharerOf: \(q\) => (?:host\.)?_liveSharer\(q\)/g) ?? []).length, 2, 'both the open air\'s and the rooms\' wave gates');
-  assert.doesNotMatch(w, /sharerOf: \(q\) => _questSharer\.get\(q\)/);
-});

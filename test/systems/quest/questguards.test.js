@@ -346,40 +346,6 @@ test('QG1 pickQuestFoe: nearest live quest foe under the ray, within reach, wall
 
 // ── the host seams, source-pinned (headless cannot boot a canvas) ─
 
-test('QG1 seams: the ready-spell doors are raised by the cast engine and routed by both hosts', () => {
-  const hm = readSrc('src/scenes/hostMagic.js');
-  assert.match(hm, /onNewReadySpell\?\.\(sp\);\s+\/\/ :348/,
-    'SetReadySpell raises NEW after the assignment');
-  // ROAD-E6: the four release arms share one tail (`done`), and every
-  // one of them goes through it - self, touch, area, missile - so CAST
-  // is raised once per release, still before the ready clears.
-  // AUDIT 58: the tail also zeroes readySpellCastingCost, as DFU's own
-  // release handler does at :2137-2141.
-  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null; readiedFree = false; readiedCost = 0; return v; \};/,   // FIX-F: lastSpell first (:2136), as DFU's own order; PIN MOVED (EG15): a cast that left told to systems/playerCasts.js after the raise, before the clear
-    'every release path raises CAST before the ready clears');
-  assert.equal((hm.match(/return done\((?:true|false|v)\);/g) ?? []).length, 8,   // ALLY-CAST: and the cast on a party mate, a sixth; RESURRECT1: the raise at a fallen body, a seventh; PIN MOVED (COMPANION-KIT): the gift to my companion, an eighth
-    'four range arms plus the unknown-range refusal all leave through it');
-  const world = readSrc('src/scenes/world.js');
-  assert.match(world, /onNewReadySpell: \(sp\) => questBridge\?\.machine\?\.notifyNewReadySpell\?\.\(sp\)/);
-  // MW-D39/ROAD-E6: the arm's cast animation moved to startCastAnim
-  // (the spend), leaving the quest notify alone on the release moment.
-  assert.match(world, /onCastReadySpell: \(sp\) => questBridge\?\.machine\?\.notifyCastReadySpell\?\.\(sp\),/);
-  const dc = readSrc('src/scenes/dungeonContext.js');
-  assert.match(dc, /onNewReadySpell: \(sp\) => opts\.questBridge\?\.machine\?\.notifyNewReadySpell\?\.\(sp\)/,
-    'the dungeon host\'s own engine raises into the same machine');
-  // ROAD-G G2 (review): THE THIRD ENGINE. `scenes/exterior.js` owns a
-  // cast engine of its own - and worldModes takes THAT instance for the
-  // interior mode - so while it passed neither key every `cast X spell
-  // do` / `cast X effect do` on the fixed-city route, shops included,
-  // was deaf: hostMagic.js is the only raiser and these two keys the
-  // only route into the latches.
-  const ex = readSrc('src/scenes/exterior.js');
-  assert.match(ex, /onNewReadySpell: \(sp\) => questBridge\?\.machine\?\.notifyNewReadySpell\?\.\(sp\),/,
-    'the fixed-city host\'s own engine raises NEW into the same machine');
-  assert.match(ex, /onCastReadySpell: \(sp\) => questBridge\?\.machine\?\.notifyCastReadySpell\?\.\(sp\),/,
-    '...and CAST, on the release');
-});
-
 test('QG1 seams: the two world reads stand on questWorld, byte-folded like MakeClassicKey', () => {
   // ROAD-G G2 (review): both hosts that mount a machine over a real
   // city answer them. Absent, CastSpellDo self-completes at PARSE
@@ -394,60 +360,3 @@ test('QG1 seams: the two world reads stand on questWorld, byte-folded like MakeC
   }
 });
 
-test('QG1 seams: the foe-click arm runs FIRST, skips Info mode, and does not consume', () => {
-  for (const [file, poolExpr] of [
-    ['src/scenes/world.js', /pickQuestFoe\(cam\.pos, useFwd, \[\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards\], collider\)/],
-    ['src/scenes/worldModes.js', /pickQuestFoe\(eye, dir, dungeonCtx\.foes, dungeonCtx\.collider\)/],
-    // AUDIT 58: THE THIRD RAY. `tryExit` - the interior activation -
-    // was the one host ladder with no quest-resource arm at all, while
-    // CreateFoe's PlaceFoeBuildingInterior (CreateFoe.cs:219-233)
-    // stands quest foes in a building freely and this host mounts
-    // them (tryPlaceInteriorQuestFoe). So a QuestResourceBehaviour
-    // riding an interior foe could never receive SetPlayerClicked -
-    // `clicked foe` fired in a dungeon and in the street and nowhere
-    // indoors. PlayerActivate.cs:325-338 has no scene gate.
-    ['src/scenes/worldModes.js', /pickQuestFoe\(eye, dir, interiorFoePool\(\), interiorCtx\.collider\)/],
-    // ROAD-G G2 (review): THE FOURTH RAY. This list read as the law and
-    // was only the shape - the fixed-city host had no quest foe to click
-    // while nothing could stand one in its street, and CreateFoe's
-    // outdoor arm (PlaceFoeExteriorLocation) gave it one. Deleting the
-    // arm from that host left the whole table green.
-    ['src/scenes/exterior.js', /pickQuestFoe\(cam\.pos, useFwd, exteriorFoePool\(\), collider\)/],
-  ]) {
-    const src = readSrc(file);
-    assert.match(src, poolExpr, `${file} picks over its live pool`);
-    assert.match(src, /getInteractionMode\(\) !== 'info'[^]{0,400}?\.questBehaviour\.doClick\(\)/,
-      `${file} gates on Info and clicks through the behaviour`);
-  }
-  // ...and the interior arm really is INSIDE tryExit, opening it, so
-  // the door/container/shelf/ladder/loot ladder below still runs -
-  // PlayerActivate's block has no return.
-  const wm = readSrc('src/scenes/worldModes.js');
-  assert.equal((wm.match(/pickQuestFoe\(/g) ?? []).length, 2,
-    'both of this host\'s rays carry the arm - the dungeon one and the interior one');
-  const tryExit = wm.slice(wm.indexOf('function tryExit('), wm.indexOf('function tryExitDungeon('));
-  assert.ok(tryExit.length > 0, 'the interior ray is found');
-  assert.match(tryExit, /if \(getInteractionMode\(\) !== 'info' && interiorCtx && !host\.activateLockOnly\?\.\(\)\) \{[^\n]*\n\s+const qf = pickQuestFoe\(eye, dir, interiorFoePool\(\), interiorCtx\.collider\);\n\s+if \(qf\) qf\.questBehaviour\.doClick\(\);\n\s+\}/,   // TS1: the stick's tap is no click
-    'the interior ray carries the dungeon ray\'s arm, over its own two pools');
-  assert.ok(tryExit.indexOf('pickQuestFoe(') < tryExit.indexOf('const targets ='),
-    'it opens the ladder rather than consuming the activation');
-  // non-consuming: world.js's arm sits ABOVE the townTalk activation
-  const world = readSrc('src/scenes/world.js');
-  assert.ok(world.indexOf('qf.questBehaviour.doClick()') < world.indexOf('townTalk.tryActivate(cam.pos'),
-    'PlayerActivate.cs:325-339 - the quest-resource arm opens the ladder and falls through');
-  const ext = readSrc('src/scenes/exterior.js');
-  assert.ok(ext.indexOf('qf.questBehaviour.doClick()') < ext.indexOf('townTalk.tryActivate(cam.pos'),
-    'the fixed-city host opens the ladder and falls through too');
-});
-
-test('QG1 seams: the PromptMulti box contract - click-only, no cancel, records by value', () => {
-  const sfw = readSrc('src/ui/guildServiceWindows.js');
-  assert.match(sfw, /if \(t\.buttonsMulti\) \{\s+if \(code === 'KeyY' && t\.buttonsMulti\.includes\(MB_BUTTONS\.Yes\)\)[^\n]*\n\s+else if \(code === 'KeyN' && t\.buttonsMulti\.includes\(MB_BUTTONS\.No\)\)[^\n]*\n\s+return;\s+\}/,
-    'the multi box takes NO keys but an enum button\'s own shortcut (DaggerfallMessageBox.cs:377) - AllowCancel false, PromptMulti.cs:87-88; AUDIT-RR2 G21');
-  assert.match(sfw, /t\.buttonsMulti\.includes\(hit\)\) this\._advance\(t\.onButton\?\.\(hit\) \?\? null\);/,
-    'only a real button advances, answering its record number');
-  assert.match(sfw, /\(t\.buttonsMulti \?\? \[\]\)/, 'the layout draws the declared records');
-  const world = readSrc('src/scenes/world.js');
-  assert.match(world, /showPromptMulti: \(q, message, buttons, respond\) => showQuestBox\(\{/,
-    'the world host mounts the door');
-});

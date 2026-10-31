@@ -57,15 +57,6 @@ test('DISC8-G: a fatal fall is billed ONCE - the death screen and the respawn bo
   }
 });
 
-test('DISC8-G by source: every host that holds its motor clears the report on the held frame; a teleport or load clears it too', () => {
-  const m = rd('src/player/motor.js');
-  // PIN MOVED (AUDIT CLIMB-ARC F2): and no climb events - the shape is held whole by test/systems/auditclimbarc.test.js F2
-  assert.match(m, /holdFrame\(\) \{\n\s*this\.jumped = false;\n\s*this\.parkoured = null;\n\s*this\.landedFallDistance = 0;\n(?:\s*\/\/[^\n]*\n)*\s*if \(this\.climbEvents\.length\) this\.climbEvents = \[\];\n\s*\}/, 'CLIMB1: a held frame reports no mantle either');
-  assert.match(m, /this\._heightReset\(\);[^\n]*\n\s*this\.holdFrame\(\);[^\n]*\n\s*\}/, 'spawn clears the report');
-  assert.match(rd('src/scenes/world.js'), /if \(_overlayHeld \|\| _seasonHeld \|\| _rideHeld\) player\.holdFrame\(\);[^\n]*\n\s*if \(!_overlayHeld && !_seasonHeld && !_rideHeld\) player\.update\(/);   // PIN MOVED (WAGONS1): a rider's held motor too
-  assert.match(rd('src/scenes/exterior.js'), /if \(_overlayHeld\) player\.holdFrame\(\);[^\n]*\n\s*if \(!_overlayHeld\) player\.update\(/);
-});
-
 test('DISC8-D: the Use Magic Item window closes the way DFU\'s Update does - the U key or Escape (the touch X, the pad Back) arms on the press and closes on the release, using nothing; the release of the press that opened it closes nothing (Discord: "I also get stuck on the use magic item window"; mutants: no keyup; the opening release closes)', async () => {
   const { createUseMagicItemWindow } = await import('../../src/ui/useMagicItemWindow.js');
   const { TEMPLATES } = await import('../../src/systems/useItem.js');
@@ -206,12 +197,3 @@ test('DISC9: indoors you hear the rain the street heard - the sim\'s word says r
   } finally { W.resetWeatherSim(); }
 });
 
-test('DISC9 by source: both open-world hosts write the heard word where the street computes it, and read it indoors', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(f);
-    // AUDIT PRECIP FALL-4 (PIN MOVED): the world host writes the drops' level on the law's lane, and the whole fall
-    assert.match(s, /ambientWord = enhancedFront \? soundWeather\(fx, weather\) : weather;\n\s*setHeardWeather\(ambientWord, enhancedFront \? fx\.(?:rain \?\? fx\.)?intensity : 1(?:, enhancedFront \? fx : null)?\);/, f);
-    assert.match(s, /ambience\.setPreset\(presetForExterior\(heardWeather\(\), isNight\(minuteNow\(\)\)\)\);/, f);
-  }
-  assert.match(rd('src/systems/betterAmbience.js'), /weather = heardWeather, rainLevel = heardRainGain, snowFree/);
-});

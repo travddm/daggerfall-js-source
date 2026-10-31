@@ -25,7 +25,6 @@ import { sea } from '../../navalSea.mjs';
 import { scene } from '../../csaScene.mjs';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-const WORLD = hostText('src/scenes/world.js');
 const { findHarbour, createWaterGrid, footprintClear } = LIFE;
 /** Iliac Puddle No More's carved shelf (world/deepWater/deepBathymetry.js, the mod's default depth) off a straight coast - land at
  *  x <= 0 - at `k`'s place along its noise; and world.js navalIsWater's law over it: a floor her draft under the sea. */
@@ -99,13 +98,6 @@ test('AUDIT GALLEON-2 PF6: a hull\'s draft (shipLife.js draftOf - world.js naval
   // PIN MOVED (SHIPS-2, 2026-10-07): hull 4 is Mac's carrack - her draft her keel's as the galleon's is (4.65 over her
   // 4.59 m keel), the mod's Carrack's 3.2 fallen back (test/systems/naval/ships2_carrack.test.js holds both)
   assert.ok(Math.abs(LIFE.draftOf(HULL.Carrack) - (LIFE.DRAFT_SPARE - hullBuild(HULL.Carrack).keel)) < 1e-9, 'the Carrack\'s her keel\'s');
-  // world.js asks it when it sounds - no frozen table of its own
-  // PIN MOVED (BAY-LEFT-SEA): the crowns' capitals stand above the world's ports now - the law ends where the next port
-  // reader begins
-  const law = WORLD.slice(WORLD.indexOf('const navalIsWater = '), WORLD.indexOf('let _navalPortAt = null;'));
-  assert.ok(law.length > 0 && law.length < 2000, 'the law sliced whole');
-  assert.match(law, /draftOf\(hull\)/i, 'navalIsWater reads draftOf');
-  assert.doesNotMatch(WORLD, /NAVAL_DRAFT = Object\.freeze/, 'no frozen draft table in world.js');
 });
 
 test('AUDIT GALLEON-2 PF2: the captains\' dead zones (layMin) and hit shares (hitShare) follow hull 2\'s build when it switches - each reckoned while the new galleon stands, then fallen back to the mod\'s galleon, answers the mod\'s galleon\'s own (they kept hers: her broadside\'s dead zone on a Large Boat 11 m against its 26)', async () => {

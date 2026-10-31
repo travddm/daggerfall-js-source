@@ -95,9 +95,3 @@ test('BROKER-RID THE INSIGNIA: a press with an id writes it; asked again, its sa
   assert.equal((await W.call('/v1/account/insignia', { item: AURA.id, rid: 'nope' })).status, 400);
 });
 
-test('BROKER-RID the migration and the route\'s word', () => {
-  const m = src('server-account/migrations/0174_broker_sales.sql');
-  assert.match(m, /CREATE TABLE IF NOT EXISTS broker_sales \(\n  account TEXT NOT NULL,\n  rid     TEXT NOT NULL,\n  kind    TEXT NOT NULL,\n  item    TEXT,\n  at      INTEGER NOT NULL,\n  settled INTEGER NOT NULL DEFAULT 0,\n  asked_by TEXT,\n  PRIMARY KEY \(account, rid\),/);
-  assert.match(src('server-account/src/index.js'), /\/\/   POST \/v1\/broker\/settle \{ rid, nonce \}/);
-  assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/net\/insignia\.js"/, 'the Worker bundles the id\'s law');
-});

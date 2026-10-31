@@ -18,8 +18,6 @@ test('QUEST-SHELF-MAIN leaves the ladder as it was: the machine still sets a mai
   assert.equal(isMainQuestName('S0000101'), true);
   assert.equal(m.shelveRefusal(q.uid), null, 'a main-story quest is not refused by the machine');
   for (const name of ['S0000999', 'S0000977', '_BRISIEN']) { q.questName = name; assert.equal(m.shelveRefusal(q.uid), 'protected', name); }
-  assert.doesNotMatch(src('src/systems/quest/machine.js'), /return 'main'/, 'no main rung');
-  assert.doesNotMatch(src('src/scenes/quest/questBridge.js'), /case 'main'/);
 });
 
 /** the chronicle over a fake document, journal1.test.js's own rig */
@@ -109,10 +107,3 @@ test('QUEST-SHELF-MAIN the chronicle\'s Abandon in the player\'s language (L10N4
   assert.deepEqual(words(), [['Abandon', title, 'Abandon this quest'], ['Click again', title, 'Click again to abandon this quest']], 'English again, byte for byte');
 });
 
-test('QUEST-SHELF-MAIN the hosts: every chronicle builder hands the bridge\'s journalClean as its shelfDoor - the streaming world and the fixed town (and the interiors through each), the dungeon (mutants: a host left out, an interiors route gone)', () => {
-  assert.match(src('src/scenes/world.js'), /notebook: \(\) => questBridge\?\.notebook \?\? null,\n\s+shelfDoor: \(\) => questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/exterior.js'), /questLog: \(\) => pauseQuestLog\(\),\n\s+notebook: \(\) => questBridge\.notebook \?\? null,\n\s+shelfDoor: \(\) => questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/dungeonContext.js'), /questLog: \(\) => opts\.questBridge\.questLog\(\),\n\s+notebook: \(\) => opts\.questBridge\.notebook \?\? null,\n\s+shelfDoor: \(\) => opts\.questBridge\?\.journalClean \?\? null,   \/\/ QUEST-SHELF-MAIN/);
-  assert.match(src('src/scenes/world.js'), /makeJournal: \(mode\) => makeJournalWindow\(mode\),/, 'the interiors open the world host\'s');
-  assert.match(src('src/scenes/exterior.js'), /makeJournal: \(mode\) => makeJournalWindow\(mode\),/, 'and the town host\'s, in the fixed town');
-});

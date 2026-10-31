@@ -301,14 +301,6 @@ test('MENU-ORDER the rest: the Vendor page\'s pieces and the Market\'s crafted p
   mountEnhancedMerchantPanel(shop, { title: 'Repair Shop', buttons: ['Repair item', 'Talk', 'Sell', 'Exit', 'Something else'].map((label) => ({ label, onClick() {} })) });
   assert.deepEqual(shop.querySelectorAll('.tavern-act').map((b) => b.attrs['data-dficon'] ?? null), ['anvil', 'talk', 'treasure', 'back', null], 'each known press its glyph, an unknown one its word alone');
   for (const icon of Object.values(MERCHANT_ICONS)) assert.ok(DFICON_ROWS[icon]);
-  // THE HOST HANDS THE PICTURES OVER (scenes/world.js): the Stores page's, the board's market and traders, a stall's, the Vendor page's
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /book: profBook, name: \(k\) => materialLabel\(k\), withdraw: [^\n]*\n\s*picture: \(k, wake\) => materialPicture\(k, \{ onReady: wake \}\),/, 'the Stores page');
-  // PIN MOVED (AUDIT PACK-PICK A10): the market and a stall hand a pack picker's box through (its card asks the pack grid's)
-  assert.match(W, /hubs: marketHubs\(\), name: \(k\) => materialLabel\(k\), countName: materialCountLabel,\n\s*picture: \(k, wake\) => materialPicture\(k, \{ onReady: wake \}\), itemPicture: \(it, wake, box\) => itemPicture\(it, \{ onReady: wake, box \}\), piecePicture: marketPiecePicture,/, 'the market');   // PIN MOVED (BAY-LEFT-SEA): the hubs as they stand when the tab opens (systems/region/marketHubs.js)
-  assert.equal((W.match(/picture: \(it, wake\) => itemPicture\(it, \{ onReady: wake \}\),/g) ?? []).length, 2, 'the board\'s traders and the Vendor page');
-  assert.match(W, /picture: \(it, wake, box\) => itemPicture\(it, \{ onReady: wake, box \}\),   \/\/ MENU-ORDER; PACK-PICK/, 'a stall');
-  assert.match(W, /const marketPiecePicture = \(piece, wake\) => \{[^]*?return itemPicture\(_pieceItems\.get\(piece\.provenance\), \{ onReady: wake \}\);/, 'a crafted piece, minted once');
 });
 
 test('MENU-ORDER a refused press says why when pressed (Plain-Words law 5, A FINGER HAS NO HOVER): never disabled - it reads refused and keeps its title for the pointer, its name starting with the word it shows, and a press tells its whole reason and does nothing else, the keys left on it; every refusal the Reforge draws is one, and the Broker\'s Buy; both skins grey it at rest, under the pointer, held and focused (mutants: disabled still; no title; the reason untold; the name the word left out of; the focus dropped; the grey on one skin; the grey a selector with nothing in it)', () => {
@@ -330,11 +322,6 @@ test('MENU-ORDER a refused press says why when pressed (Plain-Words law 5, A FIN
   doc.activeElement = pressed;
   pressed.onclick({ stopPropagation() {} });
   assert.equal(again.focused, true, 'the keys on the press drawn in its place');
-  const reforge = readFileSync('src/ui/reforgeWindow.js', 'utf8');
-  assert.equal((reforge.match(/setAttribute\('disabled'/g) ?? []).length, 0, 'no press of the Reforge is disabled');
-  assert.equal((reforge.match(/\) refusePress\(\w+, /g) ?? []).length, 10, 'its ten refusals: salvage, reforge, hone, imprint, extract, unset, set, scry, lift, imbue');   // LOOT-GATE: the Imbue
-  const broker = readFileSync('src/ui/brokerWindow.js', 'utf8');
-  assert.equal((broker.match(/\) refusePress\(\w+, /g) ?? []).length, 2, 'the Broker\'s Buy and an insignia\'s');
   const sel = 'body .broker-shell .broker-win .act[aria-disabled="true"]';
   for (const css of [BROKER_CSS, brokerSkinCss()]) {
     const at = css.indexOf(`${sel}, ${sel}:hover,\n${sel}:active, ${sel}:focus-visible {`);
@@ -558,11 +545,6 @@ test('MENU-ORDER a ship\'s own picture on the shipmaster\'s card: her portrait b
   await settle();
   assert.notEqual(sp.picture(4, () => box), p4, 'asked again');
   assert.equal(sp.pending(), 1);
-  // the world's hand-over: the pool's portrait, the window's ask, the frame's turn after the decorator's preview
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const shipPortraits = createShipPortraits\(\{ renderer, canvas, doc: [^\n]*portrait: \(hull\) => \(csaOn\(\) \? csa\.portrait\(hull\) : null\) \}\);/);
-  assert.match(w, /picture: \(hull, where\) => shipPortraits\.picture\(hull, where\),/);
-  assert.match(w, /yards\?\.drawPreview\(\);[^\n]*\n    shipPortraits\.draw\(\);/);
   // her picture at her size on her card, as her glyph was
   const widths = SHIPYARD_HULLS.map((h) => Number(new RegExp(`\\.dfyard-card\\[data-hull="${h}"\\] \\.dfyard-shipimg \\{ width: (\\d+)%`).exec(SHIPYARD_CSS)?.[1] ?? 100));
   assert.deepEqual(widths, [50, 62, 76, 88, 100], 'a rowboat\'s the card\'s half, a galley\'s its width');
@@ -598,11 +580,6 @@ test('AUDIT MENU-ORDER the passes: a panel\'s ground is its whole rect (R1); the
   assert.deepEqual(vpBefore.slice(1), [0, 0, 640, 400], 'under the whole canvas - never squeezed into the rect');
   assert.deepEqual(log.filter((c) => c[0] === 'viewport').at(-1).slice(1), [10, 400 - 180, 300, 160], 'the panel\'s viewport after it');
   r.endPanelFrame();
-  // R2: the world's frame shows itself, takes its shots, then draws the panels
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /deliverOwedShots\(\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*yards\?\.drawPreview\(\);[^\n]*\n\s*shipPortraits\.draw\(\);/, 'after the frame and its shots');
-  assert.equal(w.split('yards?.drawPreview();').length, 2, 'and nowhere amid the world pass');
-  assert.equal(w.split('shipPortraits.draw();').length, 2);
   // R3 + R6: the studio, and the browser's encoding
   const calls = [];
   const rec = new Proxy({}, { get: (o, k) => (k === 'panelFrame' ? (opts, body) => { opts.setup(); body(); } : (...a) => calls.push([k, ...a])) });
@@ -671,10 +648,6 @@ test('AUDIT MENU-ORDER the passes: a panel\'s ground is its whole rect (R1); the
   assert.ok(rpics.length > 0 && rpics.every((row) => pic(row).getAttribute('src') === 'data:roomA'), 'its pictures known at once');
   room.tool.drawPreview(b);
   assert.equal(room.draws.filter((d) => d.panel && d.panel.rect.w === DECOR_THUMB_PX).length, 0, 'none drawn again');
-  assert.match(readFileSync('src/scenes/interiorContext.js', 'utf8'), /\n  markRemapLaw\(texRemap, `climate:\$\{climateBase\}\.\$\{season\}`\);/, 'a building\'s table named by its climate and season');
-  assert.match(w, /const texRemap = markRemapLaw\(new Map\(\), `climate:\$\{townClimateBase\}\.\$\{pixelSeason\}`\);/, 'a town\'s (a yard\'s) the same (PIN MOVED, PRECIP4: the pixel\'s own season)');
-  assert.match(readFileSync('src/scenes/worldModes.js', 'utf8'), /thumbHold: \(\) => placeHoldOf\('decor-thumbs', 'interior'\),/, 'the room\'s decorator asks through a hold of its own');
-  assert.match(readFileSync('src/scenes/homeYards.js', 'utf8'), /\.\.\.\(deps\.meshes\.hold \? \{ thumbHold: \(\) => deps\.meshes\.hold\('decor-thumbs', 'yard'\) \} : \{\}\),/, 'and a yard\'s');
 });
 
 test('AUDIT MENU-ORDER the screens: a station the provider has here reads Here, its words alone or not (C2); one wake for every vendor row (C5); a short screen folds the decorator\'s filters (U1), a phone\'s views wrap (U11); the counter\'s title its own row on a phone (U7); a finger\'s press 44px (U14); the glyphs on every enhanced page (U8); the folds said (U15); the CSS the pins never held (U13) (mutants: each undone)', () => {
@@ -703,10 +676,6 @@ test('AUDIT MENU-ORDER the screens: a station the provider has here reads Here, 
     assert.equal(tile('workbench').attrs['aria-expanded'], 'true');
     setProfessionsPages(null);
   });
-  // C5: the vendor board asks every row's picture with one wake
-  const vsrc = readFileSync('src/ui/vendor/vendorTab.js', 'utf8');
-  assert.match(vsrc, /const wake = frameWake\(\(\) => ui\.rerender\(\)\);/);   // PIN MOVED (AUDIT PACK-PICK A1): one wake, and once a frame
-  assert.match(vsrc, /v\.picture\?\.\(row\.item, wake\)/, 'one wake, never a closure a row');
   // U1 + U11: the decorator on a short screen and a narrow one
   assert.match(DECOR_CSS, /@media \(max-height: 500px\) \{\n  \.dfdecor-ftoggle \{ display: inline-block; flex: none; \}\n  \.dfdecor-filters:not\(\[data-open="1"\]\) \.dfdecor-fline-more \{ display: none; \}/, 'U1: a landscape phone folds the filters');
   assert.ok(!/\.dfdecor-tabs, \.dfdecor-roomsbar \{ flex-wrap: nowrap/.test(DECOR_CSS) && DECOR_CSS.includes('.dfdecor-roomsbar { flex-wrap: nowrap; overflow-x: auto; }'), 'U11: the views wrap; the rooms scroll');

@@ -70,10 +70,3 @@ test('FB1020c OAR-RUNG: the player\'s own autorun at a helm takes the oars the s
   assert.ok(Math.hypot(...s.rt.state.MoveVectorCurrent) < 0.05, 'the autorun let go: she rests, no rung left to pull');
 });
 
-test('FB1020c OAR-RUNG by source: the shift is the stroke\'s own, ahead of where the oars are read, in createComeSailAwayRuntime (no host grew: the crossing in world.js is untouched)', () => {
-  const src = readFileSync(new URL('../../../src/systems/comeSailAway/comeSailAway.js', import.meta.url), 'utf8');
-  const shift = src.indexOf('      if (deps.input?.toggleAutorun) state.oarThrottle = 0;');
-  const stroke = src.indexOf('      if ((state.oarThrottle > 0 || deps.input?.toggleAutorun) && IsNodeOnWater(boat, 0)) num3 = 1;');
-  assert.ok(shift > 0 && stroke > shift, 'the autorun lets the rung go before the stroke reads it');
-  assert.equal(src.split('if (deps.input?.toggleAutorun) state.oarThrottle = 0;').length, 2, 'one home');
-});

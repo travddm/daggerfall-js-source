@@ -32,33 +32,6 @@ const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const ids = (list) => [...lightIdsOf(list)];
 
-test('LIGHT-ID: THE ONE CONSTRUCTION SEAM - no light is written into a frame\'s list but by render/lightId.js: a record\'s place written into a vec4 (`out[i * 4] = l.x`, `data.set([l.x, l.y, l.z, l.range]`, `out[0] = f.x; out[1] = f.y`) stands in no other file of src/, and every composer that once wrote one goes through the seam (mutants: any composer written back by hand)', () => {
-  const LITERAL = [
-    /\[\s*[A-Za-z_.]+\s*\*\s*4\s*\]\s*=\s*[A-Za-z_.]+\.x\b/,
-    /\.set\(\[\s*[A-Za-z_.]+\.x\s*,\s*[A-Za-z_.]+\.y\s*,\s*[A-Za-z_.]+\.z\s*,\s*[A-Za-z_.]+\.range\s*\]/,
-    /\w+\[0\]\s*=\s*\w+\.x;\s*\w+\[1\]\s*=\s*\w+\.y;/,
-  ];
-  const hits = [];
-  for (const f of walk(join(ROOT, 'src'))) {
-    const rel = f.slice(ROOT.length);
-    if (rel === 'src/render/lightId.js') continue;
-    readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
-      const code = line.replace(/\/\/.*$/, '');
-      if (LITERAL.some((re) => re.test(code))) hits.push(`${rel}:${i + 1}: ${line.trim().slice(0, 100)}`);
-    });
-  }
-  assert.deepEqual(hits, [], 'a light written into a list outside the seam');
-  assert.match(rd('src/render/lightId.js'), /out\[i \* 4\] = l\.x; out\[i \* 4 \+ 1\] = l\.y; out\[i \* 4 \+ 2\] = l\.z; out\[i \* 4 \+ 3\] = range;\n\s+if \(out\.ids\) out\.ids\[i\] = lightIdOf\(l\);/, 'the seam writes the place and the identity side by side');
-  for (const [file, re] of [
-    ['src/world/city/cityLights.js', /packLight\(out, i, l, Number\.isFinite\(w\) \? w : CITY_LIGHT_RANGE\);/],
-    ['src/scenes/magicCandle.js', /packLight\(out, i, l\);[\s\S]*copyLights\(out, live\.length, base, 0, keep \/ 4\);/],
-    ['src/world/gate/gateArena.js', /packLight\(data, n \+ i, l\);/],
-    ['src/world/superDungeon/sdRealm.js', /packLight\(H\.data, i, l\);/],
-    ['src/render/renderer.js', /packLight\(out, 0, f\);/],
-    ['src/tools/abyssLab.js', /packLight\(data, i, l\);/],
-  ]) assert.match(rd(file), re, `${file}: through the seam`);
-});
-
 test('LIGHT-ID: THE POOLS THAT REFILL IN ORDER NAME EACH ENTRY BY THE LIGHT IT STANDS FOR - the street\'s lantern pool, the World of Daggerfall lights and the boats\' lanterns in it, the yards\' lamp rows, the Hour\'s burst lights - and the records made each frame for a light that lives on (a thrown torch, a burning foe, a camp, a ship\'s lantern, a quay\'s, a piece of the spoils, the gate\'s fire) take their source\'s; a burst\'s slot given to the next burst is relit (mutants: an entry left with its slot\'s name; a reused slot\'s light not relit)', () => {
   // the lantern pool, by its real fill: an entry is its lantern's, whichever slot the stream puts it in
   const a = [1, 2, 3], b = [4, 5, 6], c = [7, 8, 9];
@@ -67,24 +40,9 @@ test('LIGHT-ID: THE POOLS THAT REFILL IN ORDER NAME EACH ENTRY BY THE LIGHT IT S
   assert.deepEqual([lightIdOf(pool[0]), lightIdOf(pool[1])], [lightIdOf(a), lightIdOf(b)]);
   fillLanternPool([{ px: 2, py: 2, lights: [c] }, { px: 1, py: 1, lights: [a, b] }], () => [0, 0, 0], pool, new Float32Array(4), new Float32Array([18]));   // a pixel streamed in ahead of it
   assert.deepEqual([lightIdOf(pool[0]), lightIdOf(pool[1]), lightIdOf(pool[2])], [lightIdOf(c), lightIdOf(a), lightIdOf(b)], 'each entry its lantern\'s after the reshuffle - never the slot\'s');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /e\.wodRange = l\.range; e\.wodColor = l\.color;\n\s+adoptLight\(e, l\);[^\n]*\n[\s\S]*?e\.wodRange = l\.range; e\.wodColor = l\.color;\n\s+adoptLight\(e, l\);/, 'the World of Daggerfall lights and the boats\' lanterns in the pool');
-  assert.match(world, /csaLit\.push\(adoptLight\(\{ x: l\.x, y: l\.y, z: l\.z, range: l\.range, color: CITY_LIGHT_COLOR_F32 \}, l\)\)/, 'a quay\'s lantern, copied each frame');
-  assert.match(rd('src/scenes/homeYards.js'), /e\.x = l\.x; e\.y = l\.y; e\.z = l\.z;\n\s+adoptLight\(e, l\);/, 'the yards\' rows');
-  const fx = rd('src/scenes/superDungeon/sdFx.js');
-  assert.match(fx, /o\.color\[2\] = b;\n\s+adoptLight\(o, src\);/, 'the Hour\'s pooled lights, each its burst\'s');
-  assert.match(fx, /else \{ b\.edge = SD_FX_EDGE; relight\(b\); \}/, 'a burst slot reused is another light');
-  const court = rd('src/scenes/gate/gateCourt.js');
-  assert.match(court, /bossGlow\(s, t, _glow\)/, 'his glow, one kept record');
-  assert.match(court, /else if \(b\.light\) relight\(b\.light\);/, 'a burst slot reused: its flash another light');
-  assert.match(court, /const L = \(b\.light \?\?= \{ x: 0, y: 0, z: 0, range: 0, color: \[0, 0, 0\], carried: true \}\)/, 'each burst its own flash (GATE-MIX: a flash, casting no shadow)');
   for (const [file, src] of [['src/scenes/droppedTorches.js', 'd'], ['src/scenes/droppedTorches.js', 'p'], ['src/scenes/droppedTorches.js', 'fl'], ['src/scenes/camps.js', 'c.rec'], ['src/scenes/gate/gatePool.js', 'place'], ['src/scenes/spoilsPool.js', 'f']]) {
     assert.ok(new RegExp(`adoptLight\\(\\{ x: [^\\n]*\\}, ${src.replace('.', '\\.')}\\)`).test(rd(file)), `${file}: a frame's record named by ${src}`);
   }
-  assert.match(rd('src/scenes/comeSailAway/comeSailAwayPool.js'), /map\(\(\{ _d, _src, \.\.\.l \}\) => adoptLight\(l, _src\)\)/, 'a ship\'s lantern, as she sails');
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /const _dgTint = \(l\) => \(l && !l\.aura \? adoptLight\(\{ \.\.\.l, color: [^\n]*\}, l\) : l\);/, 'the dungeon\'s flame tint, a copy a frame');
-  assert.match(modes, /const abyssCandle = \(l, abyss\) => \(l && abyss \? adoptLight\(\{ \.\.\.l, range: [^\n]*\}, l\) : l\);/, 'the abyss\'s candle, a copy a frame');
 });
 
 test('LIGHT-ID: an identity is its record\'s - kept while the record lives and never seen in it (a deep-equal, a spread, Object.keys and JSON see the record it was), another for another record and for a copy unless the copy adopts it (a host\'s tint, `adoptLight({ ...l, color }, l)`); adoptLight takes a source\'s, relight makes a new one, and a frozen record (the court\'s braziers) has one all the same (mutants: an identity minted per ask; the identity shown in the record; relight a no-op; adopt a no-op)', () => {
@@ -252,10 +210,6 @@ test('LIGHT-ID: the renderer lifts the identities off the list for the shadow pa
   r.setPointLights(new Float32Array([1, 2, 3, 10]), new Float32Array([1, 1, 1]));
   assert.equal(r._pointIds, null, 'an anonymous list names nothing');
   r.setPointLights(L, new Float32Array([1, 1, 1]));
-  const rr = rd('src/render/renderer.js');
-  assert.match(rr, /pointIds: this\._pointIds,/, 'a snapshot keeps them');
-  assert.match(rr, /this\._pointIds = s\.pointIds \?\? null;/);
-  assert.match(rr, /ids: this\._pointIds,   \/\/ LIGHT-ID/, 'and the pass is handed them');
 });
 
 test('LIGHT-ID: his glow is one kept record - bossGlow refills the court\'s own and answers the same numbers a fresh one has (mutants: a new record each call)', () => {

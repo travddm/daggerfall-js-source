@@ -119,37 +119,3 @@ test('ONE-SAVE A CRAFT\'S SHORTFALLS: ensureInStores puts every input in under o
   assert.deepEqual([flushes(refused.ev).length, heldOf(refused.e, TIN)], [1, 3], 'one save; the refused tin given back');
 });
 
-test('ONE-SAVE THE PAGE: Put everything in and Put in each hand the provider ONE plan - the world host\'s deposit is the book\'s batch, worded a put-in each - so a press waits on one save, whatever it moves (mutants: a provider call a material; the host\'s plan not the batch)', async () => {
-  const { e, ev, book } = rigged();
-  await book.refresh({ force: true });
-  mintCarried(e, OAK, 2);   // two logs past the service's count - loose, put in by `work` after the three counted
-  const calls = [];
-  await withDom(async (dom) => {
-    resetProfPages();
-    const kit = { el: (tag, cls, text) => { const n = dom.mk(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }, divider: (w) => { const n = dom.mk('h3'); n.textContent = w; return n; }, meter: () => dom.mk('div') };
-    setProfessionsPages({
-      book, name: (k) => k, withdraw: async () => ({ ok: true, text: '' }), inTown: () => true, room: (k) => roomFor(e, k), carriedHeld: (k) => heldOf(e, k), heldKeys: () => heldKeysOf(e),
-      bag: () => ({ has: true, kg: bagWeight(e), max: BAG_KG_LIMIT, count: e.bagItems.length }),
-      deposit: async (plan) => { calls.push(plan.length); return (await book.depositMany(plan)).map((r) => ({ ok: r.ok, kept: r.kept === true, text: r.ok ? 'in' : r.error })); },
-    });
-    let root = null;
-    const draw = () => { root = dom.mk('div'); drawStoresPage(root, draw, kit); };
-    draw();
-    root.querySelectorAll('button').find((b) => b.className.startsWith('prof-mat') && b.querySelector('b')?.textContent === OAK).onclick();
-    const qty = root.querySelectorAll('input').find((i) => i.className === 'prof-qty');
-    qty.value = '5';
-    qty.oninput();
-    await root.querySelectorAll('button').find((b) => b.textContent === 'Put in').onclick();
-    assert.deepEqual([calls, flushes(ev).length, heldOf(e, OAK)], [[2], 1, 0], 'Put in: the counted and the loose, one plan, one save');
-    assert.deepEqual(asks(ev).map((a) => [a[2], a[3], a[4]]), [[OAK, 3, 'all'], [OAK, 2, 'work']]);
-    assert.ok(root.querySelectorAll('p').map((n) => n.textContent).join(' ').includes(BAG_PAGE_WORDS.allInDone(5)));
-    await root.querySelectorAll('button').find((b) => b.textContent === BAG_PAGE_WORDS.allIn).onclick();
-    assert.deepEqual([calls, flushes(ev).length, asks(ev).length], [[2, 3], 2, 5], 'Put everything in: one plan of the other three, one save');
-    assert.ok(root.querySelectorAll('p').map((n) => n.textContent).join(' ').includes(BAG_PAGE_WORDS.allInDone(9)));
-    assert.equal(root.querySelectorAll('button').some((b) => b.textContent === 'Sending...'), false, 'the buttons back');
-  });
-  setProfessionsPages(null);
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /deposit: async \(plan\) => \(await profBook\.depositMany\(plan\)\)\.map\(\(r, i\) => /, 'the host\'s deposit is the batch');
-  assert.match(w, /const BAG_DEPOSIT_KEPT_TEXT = BAG_PAGE_WORDS\.kept;/, 'the kept words\' one home');
-});

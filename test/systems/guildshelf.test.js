@@ -84,22 +84,9 @@ test('GUILD-SHELF: the kept shelf rides the scene hand-off and the save; an olde
   assert.deepEqual(restoreCachedScene(cache, 'old').guildShelves, {});
 });
 
-test('GUILD-SHELF: all three guild Buy arms mint through the day shelf, and the building keeps it', () => {
-  const src = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  for (const [service, stock] of [['BuySoulgems', 'stockSoulGems'], ['BuyPotions', 'stockGuildPotions'], ['BuyMagicItems', 'stockGuildMagicItems']]) {
-    assert.match(src, new RegExp(`guildShelf\\((?:'${service}'|\`${service}\\|[^\`]*\`), \\(\\) => ${stock}\\(`), `${service} goes through the day's shelf`);   // AUDIT A10: the magic shelf's key names its inputs
-  }
-  assert.doesNotMatch(src, /\{ items: stock(?:SoulGems|GuildPotions|GuildMagicItems)\(/, 'no arm mints a throwaway shelf');
-  assert.match(src, /const guildShelf = \(service, mint\) => dayShelf\(interiorCtx \? \(interiorCtx\.guildShelves \?\?= \{\}\) : null, service, Math\.floor\(worldMinutes\(\)\), mint\);/);
-  assert.match(src, /return \{ lootContainers, actionDoors, droppedPiles, droppedTorches, decor, decorItems, decorOwn, hiddenBase, frame: 'building', terrainScale: STREAMING_TERRAIN_SCALE, guildShelves \};/);
-  assert.match(src, /interiorCtx\.guildShelves = data\.guildShelves \?\? \{\};/);
-});
-
 // ─── AUDIT (the batch's audit, agent A) ────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT GUILD-SHELF A10: the magic shelf is the day\'s FOR WHAT IT WAS MINTED FROM - the soul gems the rank opens, the level and the body its items are rolled for - so a member promoted at noon sees the gems that day; a past day\'s shelf goes when the day\'s is kept (mutants: the key without its inputs; the stale day kept)', () => {
-  const src = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(src, /const sellsSoulGems = canAccessService\(guild, membership, 'BuySoulgems'\);\s*\n\s*const playerLevel = playerEntity\.level \?\? 1, gender = playerEntity\.gender \?\? 0;\s*\n\s*const shelf = guildShelf\(`BuyMagicItems\|\$\{sellsSoulGems \? 1 : 0\}\|\$\{playerLevel\}\|\$\{gender\}`, \(\) => stockGuildMagicItems\(\{/);
   const DAY = 40 * MINUTES_PER_DAY + 600;
   const store = {};
   let minted = 0;

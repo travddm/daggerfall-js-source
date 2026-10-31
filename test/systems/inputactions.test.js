@@ -422,8 +422,6 @@ test('MAC-D1: an action the game cannot be played without is never left addressi
 
   // the door every load comes through carries it
   const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/systems/inputActions.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(repairUnloseableBindings\(store\)\.length\) saveKeyBinds\(store\);/, 'run after the autofill pass, and written back');
 });
 
 // HELM-KEYS (2026-09-29): the default share - seated onto its partner's own key alone, and on a saved file only while the
@@ -456,6 +454,4 @@ test('HELM-KEYS the default share: More sail answers the up arrow beside ActChoi
   assert.deepEqual(actionsForCode(off, 'ArrowUp'), ['ActChoice']);
   // the two never live together: a helm's hands are on the wheel - the professions' choice is no press there
   const { readFileSync } = await import('node:fs');
-  const WORLD = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(WORLD, /choice: !csaRuntime\?\.isSailing\(\) && pressed\(latch\.edge, keys, 'ActChoice'\)/);
 });

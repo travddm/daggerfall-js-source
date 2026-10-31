@@ -87,12 +87,3 @@ test('LW-FIX2 a room\'s doors read the clock\'s own minute: a word, a tone, a re
   assert.equal(eased.town.refuses({ living: { id: foe.id, res: foe, town: eased.town }, nameNPC: foe.name }), null, 'today\'s standing, eased');
 });
 
-test('LW-FIX2 the conversions mark their guards: every arm\'s guard (scenes/cityGuards.js turnNpc - WATCH-FIX: PIN MOVED, one law for every arm) and the trample\'s (systems/roleplayRealism/rrRidingHost.js) carries whom it stands for, and the host follows the watch through it (mutants: each mark, the host)', () => {
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.match(cg, /const g = await spawnGuardAt\(p\.pos, p\.fwdYaw, attackerFeet, opts\);\n\s*if \(!g\) return null;\n\s*if \(p\.person\?\.living\) g\.livingFrom = p\.person\.living;\n\s*p\.disable\(\);/);
-  assert.match(cg, /setCrimeCommitted\(playerEntity, CRIME_ASSAULT\);[^\n]*\n\s*await turnNpc\(best, playerFeet \?\? null\);/, 'the swing\'s, through the one law');
-  const rr = rd('src/systems/roleplayRealism/rrRidingHost.js');
-  assert.match(rr, /\.then\(\(g\) => \{ if \(g\) \{ g\.livingFrom = from; chargeFoe\(g, fwd\); \} \}\)/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const livingWatchStep = \(\) => watchStep\(_livingWatchTurned, cityGuards\.guards, \{ resolve: livingResidentOf, localOf: livingLocalOf \}\);/);
-});

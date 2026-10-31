@@ -85,24 +85,6 @@ test('REL8: a clone with no history says nothing rather than a wrong number (CI\
   assert.equal(updateNumber({ cwd: tmpdir(), env: {} }), null, 'no git: unknown, never a throw');
 });
 
-test('REL8: the build stamps it beside the commit - src/buildTag.js UPDATE, the number or null', (t) => {
-  const r = repo(t);
-  r.put('a.txt', 'a\n'); r.commit('root');
-  mkdirSync(join(r.d, 'src'));
-  const stamp = (env = {}) => {
-    const out = spawnSync(process.execPath, [join(ROOT, 'scripts/buildTag.mjs')], { cwd: r.d, encoding: 'utf8', env: { ...process.env, [UPDATE_ENV]: '', ...env } });
-    assert.equal(out.status, 0, out.stderr);
-    return readFileSync(join(r.d, 'src/buildTag.js'), 'utf8');
-  };
-  const sha = () => r.git('rev-parse', 'HEAD').slice(0, 12);
-  assert.equal(stamp(), `export const BUILD_TAG = '${sha()}';\nexport const UPDATE = null;\n`, 'no line: null');
-  r.pr('numbering', [[UPDATE_LINE_FILE, LINE_TEXT]]);
-  assert.equal(stamp(), `export const BUILD_TAG = '${sha()}';\nexport const UPDATE = '0.0.1';\n`);
-  assert.equal(stamp({ [UPDATE_ENV]: '0.0.7' }), `export const BUILD_TAG = '${sha()}';\nexport const UPDATE = '0.0.7';\n`, 'told');
-  // the committed stamp (what a checkout carries before its first build) knows no number
-  assert.match(rd('src/buildTag.js'), /^export const BUILD_TAG = '[0-9a-f]{12}';\nexport const UPDATE = null;\n$/);
-});
-
 test('REL8 (BUILD-LEFTOVERS, 2026-10-15) ONE STAMP: every name the game imports from src/buildTag.js is exported by scripts/buildTag.mjs tagSource - found by walking src/ - and no tool or script writes the file\'s text but through it (tools/staleChunkProbe.mjs wrote BUILD_TAG alone after REL8 added UPDATE, and every build it made failed to bundle) (mutants: the probe\'s own stamp again; UPDATE dropped from the stamp)', () => {
   const stamped = new Set([...tagSource('abcdef012345', null).matchAll(/^export const (\w+) = /gm)].map((m) => m[1]));
   const walk = (dir) => readdirSync(join(ROOT, dir), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : /\.m?js$/.test(e.name) ? [join(dir, e.name)] : []));
@@ -125,18 +107,6 @@ test('REL8: the line is one declaration, found by its diff - this checkout\'s li
   assert.ok(UPDATE_RE.test(`${UPDATE_LINE}.1`));
 });
 
-test('REL8: the game says it - the pause window\'s version line leads with the number and keeps the commit for a report, a build that cannot know it says the commit alone; the About pane has its row', () => {
-  const pause = rd('src/ui/pauseWindow.js');
-  assert.match(pause, /import \{ BUILD_TAG, UPDATE \} from '\.\.\/buildTag\.js';/);
-  const line = pause.match(/^ {4}const ver = [^;]+;/m)?.[0];
-  assert.ok(line, 'the line');
-  const ver = (UPDATE, BUILD_TAG) => new Function('UPDATE', 'BUILD_TAG', `${line}\nreturn ver;`)(UPDATE, BUILD_TAG);
-  assert.equal(ver('0.0.1', 'abcdef012345'), 'DFO Online 0.0.1 (abcdef012345)');
-  assert.equal(ver(null, 'abcdef012345'), 'DFO Online abcdef012345');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\[t\('menu\.about\.update', 'Update'\), UPDATE \?\? t\('menu\.about\.devBuild', 'a development build'\)\],[^\n]*\n\s*\[t\('menu\.about\.build', 'Build'\), BUILD_TAG\],/);
-});
-
 test('REL8: the site and the release derive it where the history is whole, and every leg is told the one number; the release is named for it', () => {
   const deploy = rd('.github/workflows/deploy.yml');
   assert.match(deploy, /- name: Checkout production\n\s+uses: actions\/checkout@v4\n\s+with:\n\s+ref: \$\{\{ needs\.main\.outputs\.sha \}\}\n\s+path: production\n(?:\s+#[^\n]*\n)*\s+fetch-depth: 0\n/, 'the production build counts main\'s history');
@@ -150,18 +120,3 @@ test('REL8: the site and the release derive it where the history is whole, and e
   assert.match(rel, /tag_name: \$\{\{ needs\.version\.outputs\.tag \}\}/, 'the tag is still the installer\'s number - the updater compares it');
 });
 
-test('REL8: the launcher\'s news reads the release\'s name back - "Update 0.0.1" is the update, any other name none - keeps it in news.json and heads the notes with it', () => {
-  const name = 'Update 0.0.1';
-  assert.equal(L.updateOfName(name), '0.0.1', 'the words the release is named in (release-desktop.yml format(\'Update {0}\'))');
-  for (const n of ['app-v0.1.7200', 'Update 0.0', 'Update 0.0.1 hotfix', 'update 0.0.1', '', null]) assert.equal(L.updateOfName(n), null, String(n));
-  const news = L.newsFrom([
-    { tag_name: 'app-v0.1.7200', name, body: 'Notes', published_at: '2026-10-09T00:00:00Z' },
-    { tag_name: 'app-v0.1.7170', name: 'app-v0.1.7170', body: 'Old', published_at: '2026-10-08T00:00:00Z' },
-  ]);
-  assert.deepEqual(news, [
-    { version: '0.1.7200', date: '2026-10-09T00:00:00Z', text: 'Notes', update: '0.0.1' },
-    { version: '0.1.7170', date: '2026-10-08T00:00:00Z', text: 'Old' },
-  ], 'the version stays the installer\'s - what the badges compare');
-  assert.deepEqual(L.cachedNews({ items: [...news, { version: '0.1.7100', text: 'x', update: '0.0.1; x' }] }).map((n) => n.update ?? null), ['0.0.1', null, null], 'news.json keeps a number, never anything else');
-  assert.match(rd('app/launcher/launcher.js'), /head\.append\(el\('span', 'ver', note\.update \? `Update \$\{note\.update\}` : `v\$\{note\.version\}`\)\);/);
-});

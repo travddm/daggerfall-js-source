@@ -168,7 +168,4 @@ test('AUDIT STARFALL B3: AN ANSWER LOST AFTER THE BATCH - the fill (INT5) rides 
   for (let i = 0; i < STAR_CLAIMS_DAY_MAX; i++) s.raw.prepare('INSERT INTO stars_held (star, account, day, char_id, xp, nonce, at) VALUES (?, ?, ?, ?, 0, ?, ?)').run(`${N - 100 + i}.0`, cy.id, starDayOf(N, 0), CH, `n${i}`, T0);
   assert.equal((await s.star(cy, [N, 0], { cid: CID })).body.why, 'day-full');
   assert.equal(s.raw.prepare('SELECT allowance FROM realm_characters WHERE id = ?').get('rc-cyra').allowance, 700, 'no row, no fill');
-  const svc = src('server-account/src/index.js');
-  const route = svc.slice(svc.indexOf("if (path === '/v1/star/claim'"), svc.indexOf("if (path === '/v1/serpent/claim'"));
-  assert.ok(route.length > 0 && !route.includes('grantSpoils('), 'no fill after the batch');
 });

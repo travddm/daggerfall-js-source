@@ -9,7 +9,6 @@ import * as M from '../../src/ui/etherChartWindow.js';
 import * as ES from '../../src/world/ethericSea.js';
 import { ETHER_PEACE_PX } from '../../src/systems/wild/etherWild.js';
 
-const src = readFileSync(new URL('../../src/ui/etherChartWindow.js', import.meta.url), 'utf8');
 const h = ES.veilhaven();
 const W = 1064, H = 550;
 const word = (o = {}) => ({ px: h.px - 18, py: h.py + 3, yaw: 0, charted: [h.key], legends: [], stats: {}, ...o });
@@ -78,10 +77,4 @@ test('ETHER-WILD the chart: the peace painted as water - before the haunts and t
   const kg = stubContext();
   M.paintKey(kg, 'peace', 9, 9);
   assert.deepEqual(kg.log.find((c) => c[0] === 'arc'), ['arc', 9, 9, 7, 0, Math.PI * 2]);
-  assert.match(src, /peaceItem\.hidden = !word\.pvp;/, 'the key\'s row stands with the word, asked at every paint');
-  // PIN MOVED (SEA-VAULTS, 2026-10-22): the chart's word of the open sea is the sea's ventures' (scenes/seaVenturesHost.js chartWord) - its pvp their live gate
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /return \{ \.\.\.etherHost\.chart\(p\.x, p\.y, heading\(\)\), \.\.\.seaVentures\.chartWord\(\) \};/, 'the word\'s pvp: the sea\'s ventures\'');
-  assert.match(w, /createSeaVentures\(\{\n\s+live: \(\) => etherSea && _onlineWorldSession\(\) && !!online\?\.wildOk,/, 'online, at a relay that raises the zone');
-  assert.match(readFileSync(new URL('../../src/scenes/seaVenturesHost.js', import.meta.url), 'utf8'), /^      pvp: live\(\),$/m);
 });

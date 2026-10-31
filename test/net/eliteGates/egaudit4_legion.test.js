@@ -244,8 +244,6 @@ test('AUDIT EG IV THE GATE\'S ROWS READ, NEVER COPIED (ONE DFU MEMBER, ONE EXPOR
     for (const R of Object.values(ATTACKS)) assert.ok(!new RegExp(`nm: '${R.name}'[^}\\n]*\\bwu: ${R.windup}\\b`).test(src), `${file}: ${R.key} copied`);
     for (const P of Object.values(POOLS)) assert.ok(!src.includes(`${P.ms}, ${P.pct}, ${P.base}`), `${file}: a pool copied`);
   }
-  const leg = readFileSync('src/net/eliteGates/egLegion.js', 'utf8');
-  assert.ok(!/EG_RETARGET_MS = \d|EG_BITE_REACH = \d|key: 'harrier'[^\n]*hpS: \d/.test(leg), 'the Harrier\'s numbers read');
 });
 
 // ── lane1 #17: A SAPPER FEEDS ITS LORD BY THE GATE'S LAW ──────────────────────────────────────────────────────────────

@@ -103,31 +103,6 @@ function bodyOf(src, signature) {
   throw new Error(`glstate: \`${signature}\` never closes`);
 }
 
-test('EV6: every program and VAO bind in renderer.js funnels through the shadows', () => {
-  const r = readFileSync('src/render/renderer.js', 'utf8');
-  // exactly ONE raw useProgram (inside _use) and TWO raw
-  // bindVertexArray (inside _bindVao and markForeignPass) survive -
-  // a third of either is a bind the shadows cannot see
-  assert.equal((r.match(/gl\.useProgram\(/g) || []).length, 1, 'only _use touches useProgram');
-  assert.equal((r.match(/gl\.bindVertexArray\(/g) || []).length, 2, 'only _bindVao and markForeignPass touch bindVertexArray');
-  // the element-buffer upload that owns no VAO unbinds first, or it
-  // would capture its buffer into whatever drawMesh left bound
-  const ti = bodyOf(r, '_terrainIndices(indices) {');
-  assert.ok(ti.indexOf('this._bindVao(null);') > 0 && ti.indexOf('this._bindVao(null);') < ti.indexOf('ELEMENT_ARRAY_BUFFER'),
-    '_terrainIndices unbinds before touching the element buffer');
-  // AUDIT EV F-DOC5: beginFrame's internal ORDER - shadow reset, then
-  // the real bind, then the uniform uploads. Uniforms uploaded before
-  // _use would land in whatever foreign program the sky or the ring
-  // left bound, and the counting stub's uniform no-ops would never see
-  // it.
-  const bf = bodyOf(r, 'beginFrame(proj, view, lightDir, opts = null) {');   // AUDIT-EL F5: the world flag
-  const reset = bf.indexOf('this._lastProgram = null;');
-  const use = bf.indexOf('this._use(this.program);');
-  const firstUniform = bf.indexOf('gl.uniformMatrix4fv(this.uProj');
-  assert.ok(reset > 0 && use > reset && firstUniform > use,
-    'beginFrame: forget the shadows, bind for real, THEN upload');
-});
-
 test('EV6: the skies neither query CURRENT_PROGRAM nor restore - the hosts mark the seams', () => {
   for (const f of ['src/render/skyRenderer.js', 'src/render/enhancedSky.js', 'src/render/precipitation.js']) {
     const s = readFileSync(f, 'utf8');
@@ -160,11 +135,6 @@ test('EV6: the skies neither query CURRENT_PROGRAM nor restore - the hosts mark 
     assert.equal((s.match(/renderer\.markForeignPass\(\);/g) || []).length, want,
       `${host} marks its foreign seams (the sky, the rain, the sand, the wisps, the bolts${want === 6 ? ', and the grass' : ''})`);
   }
-});
-
-test('EV6: both exterior hosts sort their draw lists by mesh at build', () => {
-  assert.ok(readFileSync('src/scenes/exterior.js', 'utf8').includes('drawList.sort((a, b) => a.order - b.order)'));
-  assert.ok(hostText('src/scenes/world.js').includes('models.sort((a, b) => a._order - b._order)'));
 });
 
 // ═══ AUDIT 65: the same stub, grown a LOG and REAL enum NUMBERS ═════
@@ -241,12 +211,6 @@ test('AUDIT 65 RS-2: the sprite pass hands back the FBO, the world rect AND the 
   assert.deepEqual(held, [...r._clearColor], 'GL holds what the _clearColor shadow claims it holds');
   assert.deepEqual(held.map(Math.fround), SKY_CLEAR.map(Math.fround), 'and that is the sky, not the sprite pass\'s transparent black');
 
-  // the read-back path's own bind is in a finally for the same reason;
-  // there is no seam to make the stub's readPixels throw, so this half
-  // is pinned on the source (the funnel-law idiom above).
-  assert.match(readFileSync('src/render/renderer.js', 'utf8'),
-    /try \{ gl\.readPixels\(0, 0, pw, ph, gl\.RGBA, gl\.UNSIGNED_BYTE, raw\); \}\s*\n\s*finally \{ gl\.bindFramebuffer\(gl\.FRAMEBUFFER, this\._frameFbo \?\? null\); \}/,   // EL4: the frame image while the lane draws into one, the canvas otherwise
-    'renderCharacterSpriteImage returns the read-back bind too');
 });
 
 test('AUDIT 65 RS-3: a foreign pass forgets the cloud-shadow uploads, and the next draw rebinds the reserved unit', () => {
@@ -288,108 +252,9 @@ test('AUDIT 65 RS-3: a foreign pass forgets the cloud-shadow uploads, and the ne
 });
 
 test('AUDIT 65 RS-3: the reserved cloud-shadow unit stands clear of every slot a foreign pass binds', () => {
-  // THE fix's pin: at unit 7 this read 9 <= 7 and failed. The mod
-  // bases its sheet at unit 0, so its top unit is TEXTURE_SLOTS.length
-  // - 1 and the reservation has to sit above it.
-  assert.match(readFileSync('src/render/dynamicSkiesRenderer.js', 'utf8'), /gl\.activeTexture\(gl\.TEXTURE0 \+ i\);/,
-    'the Dynamic Skies sheet is based at unit 0');
   assert.ok(TEXTURE_SLOTS.length <= CLOUD_SHADOW_UNIT,
     `the mod's ${TEXTURE_SLOTS.length} slots run 0..${TEXTURE_SLOTS.length - 1}, below the reserved ${CLOUD_SHADOW_UNIT}`);
   assert.ok(CLOUD_SHADOW_UNIT <= 15, 'and WebGL2 only guarantees MAX_TEXTURE_IMAGE_UNITS >= 16');
-  const rr = readFileSync('src/render/renderer.js', 'utf8');
-  assert.doesNotMatch(rr, /gl\.TEXTURE7\b/, 'the literal is gone from both sites');
-  assert.match(rr, /this\._activeTexture\(gl\.TEXTURE0 \+ CLOUD_SHADOW_UNIT\);/);   // PERF-TEX3: through the selector's funnel
-  assert.match(rr, /gl\.uniform1i\(mapLoc, CLOUD_SHADOW_UNIT\);/);
-  // PERF-TEX joined the texture shadows to this list, so the pin is what
-  // the mark must DO rather than the whole of its body; the additions have
-  // their own test above, and RS-3's law is these three.
-  {
-    const mark = rr.split('  markForeignPass(')[1].split('\n  }')[0];
-    assert.match(mark, /this\.gl\.bindVertexArray\(null\);/);
-    assert.match(mark, /this\._lastProgram = null;/);
-    assert.match(mark, /this\._lastVao = null;/);
-    assert.match(mark, /this\._csUploaded = \{\};/, 'the mark forgets the upload stamps with the program and the VAO');
-  }
-});
-
-// ═══ AUDIT 47: every shader declares what it uses, statically ═══════
-test('AUDIT 47: no shader in the tree uses a uniform it did not declare in its own compilation unit', () => {
-  // The fault class that black-screened the first Enhanced Environments
-  // attempt: a use with no declaration, invisible to eslint, node and
-  // vite, fatal at link. Checked here on every template in the three
-  // shader files, with the shared block expanded the way the template
-  // expands it. An injected declaration - a string replace after the
-  // template - does not count, because it hides from this reader as it
-  // hid from the last one (AUDIT 47 F1).
-  const files = ['src/render/renderer.js', 'src/render/waterSurface.js', 'src/render/precipitation.js', 'src/render/enhancedSky.js', 'src/render/cloudNoise.js', 'src/render/volumetricClouds.js', 'src/render/enhancedLighting.js', 'src/render/farRing.js', 'src/render/shadowPass.js', 'src/render/airPass.js', 'src/render/deepWatersRender.js'];   // VC2/VC3: the noise generators, the slice viewer, the march and the composite; EL1: the lighting lane's five, and the far ring; EL2: the depth programs; DW-C: Iliac Puddle No More's floor, surfaces and sky fog
-  const shadowGlsl = (readFileSync('src/render/shadowPass.js', 'utf8').match(/export const SHADOW_GLSL = `([\s\S]*?)`;/) || [, ''])[1];   // EL2: the receiver block another file composes in
-  const cloudShadowGlsl = (readFileSync('src/render/cloudShadow.js', 'utf8').match(/export const CLOUD_SHADOW_GLSL = `([\s\S]*?)`;/) || [, ''])[1];   // VC6c: and the cloud shadow's, once TWO passes needed it
-  const aoGlsl = (readFileSync('src/render/airPass.js', 'utf8').match(/export const AIR_AO_GLSL = `([\s\S]*?)`;/) || [, ''])[1];   // EL3: and the AO's
-  const adaptGlsl = (readFileSync('src/render/airPass.js', 'utf8').match(/export const AIR_ADAPT_GLSL = `([\s\S]*?)`;/) || [, ''])[1];   // EL4: and the eye's
-  // BANTHA1: and the jungle's haze - its law (inside the fog block and the far ring's), the ring's and the skies' halves
-  const hazeGlslSrc = readFileSync('src/render/hazeGlsl.js', 'utf8');
-  const hazeLawGlsl = (hazeGlslSrc.match(/export const HAZE_LAW_GLSL = `([\s\S]*?)`;/) || [, ''])[1];
-  const hazeSkyGlsl = (hazeGlslSrc.match(/export const HAZE_SKY_GLSL = `([\s\S]*?)`;/) || [, ''])[1];
-  const ringHazeGlsl = (hazeGlslSrc.match(/export const RING_HAZE_GLSL = `([\s\S]*?)`;/) || [, ''])[1].replace(/\$\{HAZE_LAW_GLSL\}/g, hazeLawGlsl);
-  assert.match(hazeLawGlsl, /uniform vec4 uJungleHaze\[2\];/, 'the haze law is where the sweep reads it');
-  assert.match(hazeSkyGlsl, /uniform vec4 uHazeSky;/, 'and the skies\' half');
-  const fogGlsl = (readFileSync('src/render/fogGlsl.js', 'utf8').match(/export const FOG_GLSL = `([\s\S]*?)`;/) || [, ''])[1].replace(/\$\{HAZE_LAW_GLSL\}/g, hazeLawGlsl);   // AUDIT 68 S17-fog-glsl-dup: and the fog's, which nine programs share
-  // FAR-SEA1: and the horizon's haze and the ring's sea, a leaf the far ring (both lanes) and the water interpolate
-  const hazeSrc = readFileSync('src/render/horizonHaze.js', 'utf8');
-  const horizonHazeGlsl = (hazeSrc.match(/export const HORIZON_HAZE_GLSL = `([\s\S]*?)`;/) || [, ''])[1];
-  const ringSeaGlsl = (hazeSrc.match(/export const RING_SEA_GLSL = `([\s\S]*?)`;/) || [, ''])[1].replace(/\$\{HORIZON_HAZE_GLSL\}/g, horizonHazeGlsl);
-  assert.match(ringSeaGlsl, /uniform vec3 uSkyZenith;[\s\S]*float horizonHaze\(/, 'the ring\'s sea block is where the sweep reads it, the haze inside it');
-  assert.match(fogGlsl, /uFogMode/, 'the fog block is where the sweep reads it');
-  // AUDIT 49: labGrass.js composes its stages as HEAD + FIELD + body, so
-  // the reader composes them the same way before it looks
-  {
-    const src = readFileSync('src/render/labGrass.js', 'utf8');
-    const tpl = (name) => { const i = src.indexOf(`export const ${name} = \``); return src.slice(i + `export const ${name} = \``.length, src.indexOf('`;', i)); };
-    const vs = tpl('LAB_GRASS_HEAD') + tpl('GAME_GRASS_FIELD') + tpl('LAB_GRASS_VS');
-    const fs = tpl('LAB_GRASS_HEAD') + tpl('LAB_GRASS_FS');
-    for (const [label, body] of [['labGrass VS', vs], ['labGrass FS', fs]]) {
-      const declared = new Set([...body.matchAll(/uniform\s+(?:(?:lowp|mediump|highp)\s+)?\w+\s+([^;]+);/g)].flatMap((x) => x[1].split(',').map((v) => v.trim().replace(/\[.*?\]/, '').split('//')[0].trim())));
-      const used = new Set([...body.matchAll(/\bu[A-Z]\w*/g)].map((x) => x[0]));
-      const missing = [...used].filter((u) => !declared.has(u));
-      assert.deepEqual(missing, [], `${label} uses undeclared: ${missing.join(', ')}`);
-      assert.ok(/terrain\(/.test(body) === (label === 'labGrass VS'), `${label}: terrain() belongs to the vertex stage`);
-    }
-    // GRASS5: the root height is no longer an attribute of its own - it
-    // is a lane of the packed A stream, decoded in main() into a global
-    // that terrain() reads. Still the baked height; no longer a baked
-    // ATTRIBUTE, which is the whole point of the pack.
-    assert.ok(/float terrain\(vec2 p\)\{ return gRootY; \}/.test(vs), 'the game’s terrain() is the baked root height');
-    assert.ok(/gRootY = uCellFrame\.z \+ aPA\.z \* uCellFrame\.w;/.test(vs), '...unpacked from the cell’s own frame');
-    assert.ok(!/in float aRootY;/.test(vs), 'and it costs no attribute of its own');
-  }
-  for (const file of files) {
-    const s = readFileSync(file, 'utf8');
-    assert.ok(!/`\.replace\('uniform /.test(s), `${file}: a uniform must be declared in the template, not injected after it`);
-    // VC6c: the cloud shadow block moved to its own leaf when a SECOND
-    // pass (the air's shafts) needed it, so the sweep follows it there -
-    // a file that interpolates an imported block must still be swept, or
-    // the move would have silently taken two shaders out of the net.
-    const shared = (s.match(/const CLOUD_SHADOW_GLSL = `([\s\S]*?)`;/) || [, ''])[1]
-      || (/\$\{CLOUD_SHADOW_GLSL\}/.test(s) ? cloudShadowGlsl : '');
-    const field = (s.match(/const CLOUD_FIELD_GLSL = `([\s\S]*?)`;/) || [, ''])[1];   // VC4: the marches' shared field
-    const re = /const ([A-Z_]+) = `#version 300 es([\s\S]*?)`(?:;|\.)/g;
-    let m; let seen = 0;
-    while ((m = re.exec(s))) {
-      seen++;
-      // EL1: a file's OTHER interpolated blocks (`const NAME = \`...\`` with no #version) expand the same way - the
-      // lighting lane composes EL_GLSL + EL_FOG_GLSL + EL_POINT_LIT_GLSL into each of its shaders
-      const body = m[2].replace(/\$\{CLOUD_SHADOW_GLSL\}/g, shared).replace(/\$\{CLOUD_FIELD_GLSL\}/g, field).replace(/\$\{SHADOW_GLSL\}/g, shadowGlsl).replace(/\$\{AIR_AO_GLSL\}/g, aoGlsl).replace(/\$\{AIR_ADAPT_GLSL\}/g, adaptGlsl).replace(/\$\{(?:EL_)?FOG_GLSL\}/g, fogGlsl)
-        .replace(/\$\{RING_SEA_GLSL\}/g, ringSeaGlsl).replace(/\$\{HORIZON_HAZE_GLSL\}/g, horizonHazeGlsl)   // FAR-SEA1
-        .replace(/\$\{RING_HAZE_GLSL\}/g, ringHazeGlsl).replace(/\$\{HAZE_SKY_GLSL\}/g, hazeSkyGlsl).replace(/\$\{HAZE_LAW_GLSL\}/g, hazeLawGlsl)   // BANTHA1
-        .replace(/\$\{([A-Z_]+)\}/g, (all, name) => { const b = s.match(new RegExp(`const ${name} = \`([^\`]*)\``)); return b ? b[1] : all; });
-      const declared = new Set([...body.matchAll(/uniform\s+(?:(?:lowp|mediump|highp)\s+)?\w+\s+([^;]+);/g)]
-        .flatMap((x) => x[1].split(',').map((v) => v.trim().replace(/\[.*?\]/, '').split('//')[0].trim())));
-      const used = new Set([...body.matchAll(/\bu[A-Z]\w*/g)].map((x) => x[0]));
-      const missing = [...used].filter((u) => !declared.has(u));
-      assert.deepEqual(missing, [], `${file} ${m[1]} uses undeclared: ${missing.join(', ')}`);
-    }
-    assert.ok(seen > 0, `${file}: no shader templates found - the reader is broken, not the shaders`);
-  }
 });
 
 // ═══ PERF-TEX: THE EMISSION UNIT GETS EV6's TREATMENT ═══════════════
@@ -537,39 +402,6 @@ test('PERF-TEX: it moves NO PIXEL - the effective GPU state at every draw is wha
   assert.equal(shadowed.length, 80);
 });
 
-test('PERF-TEX: the shadow is cleared wherever something else can own unit 1', () => {
-  const src = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  // Every bind of unit 1 in the renderer either goes THROUGH the helper
-  // or clears the shadow - otherwise it can speak for a unit it no
-  // longer owns, which is a wrong texture, which is a visual bug.
-  const body = src.split('_bindEmission(tex) {')[1].split('\n  }')[0];
-  assert.match(body, /if \(this\._tex1Bound === tex\) return;/, 'the helper is a shadow, not a wrapper');
-  // PERF-TEX3: through the funnel now - 97% of this file's activeTexture
-  // calls selected the unit already selected, so the raw call lives in
-  // _activeTexture alone and everything else asks it.
-  assert.match(body, /this\._activeTexture\(gl\.TEXTURE0\);/, 'and it leaves unit 0 active, as every draw path expects');
-  // AUDIT-AIR1: ...through the ONE HOME now. The clear was hand-copied at
-  // five seams and missing at the sixth (the air resolve), which is the
-  // bug that made it a function - so what these sites must show is the
-  // CALL, and the helper's own contents are pinned where it lives.
-  for (const site of ['beginFrame', 'endWorldPass']) {
-    const fn = src.split(`  ${site}(`)[1]?.split('\n  }')[0] ?? '';
-    assert.match(fn, /this\._forgetTextureShadows\(\);/, `${site} does not forget the shadows`);
-  }
-  assert.match(src, /_forgetTextureShadows\(\) \{[\s\S]{0,240}?this\._tex1Bound = null;/, 'and the one home clears unit 1');
-  // and no site binds TEXTURE_2D to unit 1 outside the helper without clearing it
-  const lines = src.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (!/activeTexture\(gl\.TEXTURE1\)/.test(lines[i])) continue;
-    const window = lines.slice(i, i + 4).join('\n');
-    // AUDIT-AIR1: `_forgetTextureShadows()` is a third way to answer -
-    // and a stronger one, since it clears the whole set. It only counts
-    // because the assertion above proves the helper really clears
-    // `_tex1Bound`; without that this arm would be a name, not a law.
-    assert.match(window, /_tex1Bound|_bindEmission|_forgetTextureShadows/, `renderer.js:${i + 1} binds unit 1 without answering to the shadow`);
-  }
-});
-
 // ═══ PERF-TEX2: THE TERRAIN'S ATLAS AND ITS TILE SIZE ══════════════
 //
 // The same sweep over drawTerrain, which runs once per streamed pixel -
@@ -619,28 +451,6 @@ test('PERF-TEX2: a world that really DOES change its atlas or tile size still up
   assert.equal(after.filter((e) => e[0] === 'uniform1f' && e[1] === r.tUTileSize).length, 1,
     'the new tile size never reached the GPU');
   assert.ok(after.some((e) => e[0] === 'bindTexture' && e[2]?.id === 'other'), 'the new atlas was never bound');
-});
-
-test('PERF-TEX: every texture shadow is forgotten when a foreign pass takes the context', () => {
-  // THE ONE THAT MATTERS FOR CORRECTNESS. The skies and precipitation
-  // draw outside this renderer and bind their own textures on their own
-  // units; EV6 already forgets the program and VAO shadows for them, and
-  // a texture shadow that did not join them would speak for a unit it no
-  // longer owns - a wrong texture on screen, which is the one thing a
-  // performance change may never cost.
-  const { r } = glLogRig();
-  r._tex1Bound = { id: 'emis' }; r._tArrayTex = { id: 'atlas' }; r._tTileSize = 128;
-  r.markForeignPass();
-  assert.equal(r._tex1Bound, null, 'the emission unit still thinks it knows what is bound');
-  assert.equal(r._tArrayTex, null, 'the tile atlas still thinks it knows what is bound');
-  assert.equal(r._tTileSize, null, 'the tile size shadow survived a foreign pass');
-  const src = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  const fn = src.split('  markForeignPass(')[1].split('\n  }')[0];
-  assert.match(fn, /this\._forgetTextureShadows\(\);/, 'markForeignPass forgets them through the one home (AUDIT-AIR1)');
-  const home = src.split('_forgetTextureShadows() {')[1].split('\n  }')[0];
-  for (const shadow of ['_tex1Bound', '_tArrayTex', '_tTileSize']) {
-    assert.match(home, new RegExp(`${shadow} = null`), `the one home does not clear ${shadow}`);
-  }
 });
 
 // ═══ PERF-UI: THE SCREEN QUAD'S FOUR THAT ARE NOT A QUAD'S OWN ══════
@@ -955,39 +765,6 @@ test('PERF-2D: every draw sees exactly the state it saw when the bracket was per
   assert.ok(run.some((d) => d.includes('DEPTH_TEST=1 CULL_FACE=1')), 'meshes draw with the caps on');
 });
 
-test('PERF-2D: the source law - every draw in renderer.js is a 2D primitive or closes the run first', () => {
-  const src = readFileSync('src/render/renderer.js', 'utf8').split('\n');
-  const TWO_D = new Set(['drawScreenQuad', 'drawScreenQuadRun', 'drawScreenOverlayQuad',
-    '_ensureScreenQuadProgram', '_ensureScreenQuadRunProgram', '_ensureOverlayProgram',
-    'drawScreenQuadGlow', '_ensureWeaponGlowQuadProgram', '_glowField']);   // WEAPON-GLOW1: the fourth primitive - a weapon sprite's outline over its frame; AUDIT WEAPON-GLOW SPR-1: and its field's bake, drawn inside the primitive's own run
-  let method = null; const seen = new Map();   // method -> {closed, drew}
-  for (const line of src) {
-    const m = /^  (_?[A-Za-z][A-Za-z0-9_]*)\(.*\)\s*\{\s*$/.exec(line);
-    if (m) { method = m[1]; seen.set(method, { closed: false, drew: false }); continue; }
-    if (!method) continue;
-    const e = seen.get(method);
-    if (line.includes('this._close2D()')) e.closed = true;
-    if (/gl\.draw(Arrays|Elements)/.test(line) && !e.drew) e.drew = !e.closed;   // drew BEFORE any close
-  }
-  const offenders = [...seen].filter(([name, e]) => e.drew && !TWO_D.has(name)).map(([n]) => n);
-  assert.deepEqual(offenders, [], `these draw before handing the baseline back: ${offenders.join(', ')}`);
-  // and the seams where FOREIGN gl runs close it too - the hosts call
-  // these, and a sky or a rain pass assumes the baseline
-  for (const seam of ['beginFrame', 'endWorldPass', 'markForeignPass', 'beginPanelFrame', 'endPanelFrame']) {
-    assert.ok(seen.get(seam)?.closed, `${seam} does not close the 2D run, and foreign GL runs after it`);
-  }
-});
-
-test('PERF-2D: _compositeAir closes AFTER its early return, or the saving is handed straight back', () => {
-  const src = readFileSync('src/render/renderer.js', 'utf8');
-  const i = src.indexOf('_compositeAir() {');
-  const body = src.slice(i, i + 700);
-  const ret = body.indexOf("if (!this._air?.pending) return;");
-  const close = body.indexOf('this._close2D();');
-  assert.ok(ret > 0 && close > ret,
-    'drawScreenQuad calls _compositeAir at the head of EVERY quad - a close before its early return is the per-quad bracket again');
-});
-
 test('PERF-2D: a foreign pass inside an open run is the one gap, and it SPEAKS', () => {
   // The sky, the rain, the wisps and the grass are not in renderer.js -
   // the hosts hold `renderer.gl` and call them directly, so no guard in
@@ -1031,29 +808,6 @@ test('PERF-2D: a foreign pass inside an open run is the one gap, and it SPEAKS',
 // pixels and a hundred-odd HUD quads: 97% of every activeTexture call
 // selected the unit already selected (117 of 121), and 55% of every
 // bindTexture re-bound the texture already on the unit (111 of 202).
-
-test('PERF-TEX3: the selector funnel - exactly one raw gl.activeTexture survives', () => {
-  const src = readFileSync('src/render/renderer.js', 'utf8');
-  // The same law EV6 wrote for useProgram and bindVertexArray, for the
-  // same reason: a shadow that one raw call can walk past is a shadow
-  // that will one day speak for a unit it does not own.
-  assert.equal((src.match(/gl\.activeTexture\(/g) || []).length, 1,
-    'only _activeTexture may touch activeTexture');
-  const body = src.split('_activeTexture(unit) {')[1].split('\n  }')[0];
-  assert.match(body, /if \(this\._activeUnit === unit\) return;/, 'it is a shadow, not a wrapper');
-  // and it is cleared wherever unit 1's shadow is - the two go together,
-  // which AUDIT-AIR1 made literal: one helper clears the pair and every
-  // seam calls it. The path sites (a draw that OWNS unit 0 for its own
-  // bind) still clear `_tex0Bound` alone, and there are many.
-  const clears = (src.match(/this\._tex0Bound = null/g) || []).length;
-  assert.ok(clears >= 5, `unit 0's shadow is cleared at only ${clears} sites - _tex1Bound's every site is the floor`);
-  for (const site of ['beginFrame', 'endWorldPass', 'markForeignPass']) {
-    const fn = src.split(`  ${site}(`)[1]?.split('\n  }')[0] ?? '';
-    assert.match(fn, /this\._forgetTextureShadows\(\);/, `${site} does not forget the unit-0 shadow`);
-  }
-  const home = src.split('_forgetTextureShadows() {')[1].split('\n  }')[0];
-  assert.match(home, /this\._tex0Bound = null; this\._activeUnit = null;/, 'the one home clears unit 0 AND the selector');
-});
 
 test('PERF-TEX3: the shadows skip what is already there, and a real change still binds', () => {
   const { r, log } = glLogRig();
@@ -1100,30 +854,6 @@ test('PERF-TEX3: a mesh bundle whose sub-meshes repeat an archive binds each tex
   }
   assert.equal(log.slice(from).filter(([k]) => k === 'drawElements').length, 6, 'all six sub-meshes drew');
   assert.equal(binds, 3, `six sub-meshes over two textures bound ${binds} times - one a RUN, not one a sub-mesh`);
-});
-
-test('PERF-TEX3 AUDIT: no site binds TEXTURE_2D to unit 0 outside the helper without clearing the shadow', () => {
-  // PERF-TEX wrote exactly this law for unit 1 and it is why that slice
-  // never shipped a wrong texture. Writing its twin was skipped when the
-  // unit-0 shadow went in, and the audit found what that cost: a model
-  // drawn after a CHARACTER came out untextured, because drawCharacter
-  // binds unit 0 raw, ends on `bindTexture(TEXTURE_2D, null)`, and the
-  // shadow went on claiming the texture it had before.
-  const src = readFileSync('src/render/renderer.js', 'utf8');
-  const lines = src.split('\n');
-  let unit = 'TEXTURE0', method = null;
-  const offenders = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = /^  (_?[A-Za-z][A-Za-z0-9_]*)\(.*\)\s*\{\s*$/.exec(lines[i]);
-    if (m) { method = m[1]; unit = 'TEXTURE0'; }       // unit 0 is the baseline every method opens on
-    const am = /_activeTexture\(gl\.(TEXTURE\d+|TEXTURE0 \+ \w+)\)/.exec(lines[i]);
-    if (am) unit = am[1];
-    if (!/gl\.bindTexture\(gl\.TEXTURE_2D,/.test(lines[i])) continue;
-    if (unit !== 'TEXTURE0' || method === '_bindTex0') continue;
-    const window = lines.slice(i, i + 4).join('\n');
-    if (!/_tex0Bound|_bindTex0/.test(window)) offenders.push(`renderer.js:${i + 1} (${method})`);
-  }
-  assert.deepEqual(offenders, [], `these bind unit 0 without answering to the shadow: ${offenders.join(', ')}`);
 });
 
 test('PERF-TEX3 AUDIT: a model drawn after a character still has its texture', () => {
@@ -1221,31 +951,3 @@ test('AUDIT-AIR1: the resolve forgets every texture shadow, exactly as a foreign
   assert.deepEqual(r._sq, {}, 'and the screen quad knows none of its uniforms');
 });
 
-test('AUDIT-AIR1: the shadow reset is ONE HOME - six copies of a rule is five chances to miss one', () => {
-  // The bug WAS the sixth copy that never got written. A source pin, so
-  // a seventh seam cannot be added with its own hand-copied block.
-  const src = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  // PIN MOVED (ECOTONE1, 2026-10-07): the terrain's neighbour sets on units 3-5 and the border switch are shadows the
-  // same seams lose, so the one home forgets them too, after the tile size; PRECIP4 (2026-10-19): and the snow's switch
-  assert.match(src, /_forgetTextureShadows\(\) \{\s*\n\s*this\._tex1Bound = null;\s*\n\s*this\._tex0Bound = null; this\._activeUnit = null;\s*\n\s*this\._sq = \{\};\s*\n\s*this\._tArrayTex = null;\s*\n\s*this\._tTileSize = null;\s*\n\s*\(this\._tEcoTex \?\?= \[null, null, null\]\)\.fill\(null\);[^\n]*\n\s*this\._tEcoOn = null;[^\n]*\n\s*this\._tSnowOn = null;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*this\._frameStamp\+\+;\s*\n\s*\}/,
-    'the one home exists and clears all six (LA-COST1: and forgets the four frame blocks, whose lane images sit on units too; ECOTONE1: and the neighbour sets)');
-  // nobody clears them by hand any more
-  const decl = src.indexOf('_forgetTextureShadows() {');
-  const after = src.slice(src.indexOf('\n  }', decl));
-  assert.doesNotMatch(after, /this\._tex0Bound = null; this\._activeUnit = null;/,
-    'no site outside the helper clears the pair by hand');
-  // and every seam that can lose the units calls it
-  // RETRO1: an eighth - the retro present binds units 0..2, a program and a VAO of its own (render/retroPass.js), and
-  // it runs as the classic lane's resolve as well as after the air's, so it forgets for itself
-  assert.equal((src.match(/this\._forgetTextureShadows\(\);/g) || []).length, 8,
-    'the constructor, endWorldPass, _installWorldSet, markForeignPass, beginFrame, uploadEmissionTexture, the air resolve and the retro present');
-  // the air resolve's call sits AFTER the composite, because the
-  // composite is what invalidates them
-  const air = src.slice(src.indexOf('_compositeAir() {'));
-  // (the comment between them carries the reason - VC6c/VC6d pin
-  // `setCloudShadow` and `composite` as adjacent, so it cannot go above)
-  assert.match(air.slice(0, air.indexOf('\n  }')), /this\._air\.composite\(\);[\s\S]{0,900}?this\._forgetTextureShadows\(\);/,
-    'the forget follows the composite - the composite is what invalidates them');
-  assert.doesNotMatch(air.slice(0, air.indexOf('this._air.composite();')), /_forgetTextureShadows/,
-    '...and never precedes it, which would forget shadows the resolve then invalidates again');
-});

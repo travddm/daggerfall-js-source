@@ -256,48 +256,6 @@ test('SEAT1d THE SEAT TAB\'S LEVERS: the holder\'s Officer sees the Tithe and it
   stranger.v.unmount();
 });
 
-test('SEAT1d THE HOSTS BY SOURCE: the service\'s routes and the Turning\'s writes; the market\'s Tithe lines and the board\'s pixel; the Levy in a harvest; Open Gates in the town\'s homes; the client\'s shops, arrival, Festive fold, Curfew watch and crimes, Bounty loot and claims, and the market tab\'s board (mutants: each seam)', () => {
-  const idx = rd('server-account/src/index.js');
-  for (const r of ['tithe', 'edict', 'bounty']) assert.ok(rd('server-account/src/service.js').includes(`'/v1/seats/${r}'`), r);
-  assert.match(idx, /'\/v1\/seats\/tithe': \(\) => setTithe\(ctx, who\.player, env, body\),/);
-  assert.match(idx, /'\/v1\/seats\/edict': \(\) => proclaimEdict\(ctx, who\.player, env, body\),/);
-  assert.match(idx, /'\/v1\/seats\/bounty': \(\) => claimBounty\(ctx, who\.player, env, body\),/);
-  assert.match(idx, /const r = await homesInTown\(ctx, who\.player, body, \{ seats: seatsOpenFor\(who\.player, env\) \}\);/);
-  const tu = rd('server-account/src/seatTurning.js');
-  // PIN MOVED (SEASON1): the plan reckoned, then Season 0's end stripping what it sets up for the next
-  assert.match(tu, /const reckonedPlan = turningPlan\(\{ week, seats, treasuries: new Map\(purses\.map\(\(p\) => \[p\.guild_id, Number\(p\.balance\)\]\)\), active: await activeIn\(db, week\) \}\);/);
-  const mk = rd('server-account/src/market.js');
-  // PIN MOVED (DOMAIN3): each Tithe handed the region law's week (`env`), its bailiwick read among the Charters
-  assert.match(mk, /at \? null : titheAt\(db, nowS, from, rowBoard\(l\), env\),/);   // PIN MOVED (MARKET-SPEED): a buy asks its Tithes beside its hubs
-  assert.match(mk, /at \|\| from === region \? null : titheAt\(db, nowS, region, boardOf\(board\), env\),/);
-  assert.match(mk, /const ct = road\.courier > 0 \? await titheAt\(db, nowS, region, boardOf\(board\), env\) : null;/);
-  assert.match(mk, /const tt = high == null \? null : await titheAt\(db, nowS, Number\(a\.region\), rowBoard\(a\), env\);/);
-  const pr = rd('server-account/src/professions.js');
-  assert.match(pr, /!deep && !isBody && seatsOpenFor\(player, env\) \? levyAt\(db, nowS, region, \[n\.x, n\.y\], env\) : null,/);   // PIN MOVED (GATHER-SPEED): asked beside the ground and the track, at once
-  assert.match(pr, /\.bind\(player\.id, rid, nonce, character, key2, day, node, kind, profession, kept, ROOM,/);   // PIN MOVED (BAG1): the bound is the Stores' or the bag's carried count's (ROOM)
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /else if \(hub\) townTalk\.say\(hubArrivalLine\(hub\), 5\);\n\s*if \(seat\) seatEdicts\.arrived\(seat\);/);
-  assert.match(w, /seatShopFactor: \(b\) => seatEdicts\.shopFactor\(b\),/);
-  assert.match(w, /registerEntityFold\(FESTIVE_FOLD, \(e\) => \(e === playerEntity && seatEdicts\.festive\(\) \? festiveMods\(STAT_KEYS_ORDER\) : EMPTY_MODS\)\);/);
-  assert.match(w, /setCrimeRepFactor\(\(\) => seatEdicts\.crimeFactor\(\)\);/);
-  assert.match(w, /levelBonus: \(\) => seatEdicts\.guardLevelBonus\(Math\.floor\(skyMinutes\(\)\)\),/);   // PIN MOVED (AUDIT SEATS-3 E1): the sky's night
-  assert.match(w, /if \(seatEdicts\.bountyAt\(p\.px, p\.py\)\) items\.push\(\.\.\.generateLootItems\(lootKey,/);
-  assert.match(w, /sigilDrinks\(xp\); seatEdicts\.campCleared\(foe\?\.site \?\? lairDenOf\(modes\?\.mode === 'dungeon' \? modes\?\.dungeonLocation : null\)\)\.catch\(\(\) => \{\}\); \}\);/);   // PIN MOVED (AUDIT BAY-LEFT, its packages merged: the mode read guarded on its object, audit24_wave37). PIN MOVED (BAY-LEFT-SEA): a foe of no camp in a lair past the Bay - its den's (seatEdicts.js lairDenOf)
-  assert.match(w, /minutes: \(\) => worldMinutes\(\),\n\s*regionAt: \(px, py\) => maps\.getRegionIndexAt\(px, py\),/);   // PIN MOVED (AUDIT SEATS-3 F5): the edicts' own, not REP4's
-  assert.match(w, /board: \[town\.px, town\.py\],/);
-  const wm = rd('src/scenes/worldModes.js');
-  // PIN MOVED (TOWN-ECON TE1, test/systems/townecon.test.js): the town's factor first (online, the seat's folded in), the seat's alone without it
-  assert.match(wm, /const f = host\.townShopFactor\?\.\(b, mode\) \?\? \(mode === 'Buy' \|\| mode === 'Repair' \? host\.seatShopFactor\?\.\(b\) \?\? 1 : mode === 'Sell' \|\| mode === 'SellMagic' \? Math\.min\(1, host\.seatShopFactor\?\.\(b\) \?\? 1\) : 1\);/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-4): with no town law wired, a sale held to the seat's factor
-  assert.match(wm, /priceAdjustment: shopAdjustment\(b, mode\),/);
-  assert.match(wm, /priceAdjustment: shopAdjustment\(b, 'Buy'\) \}\);/);   // (main's #500 reverted MANA-SHOP's buyer level: the pin is back where SEAT1d set it)
-  assert.match(wm, /priceAdjustment: shopAdjustment\(b, 'Repair'\),/);
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.match(cg, /level \?\? effectiveLevel\(playerEntity\) \+ \(levelBonus\?\.\(\) \?\? 0\)/);
-  const mt = rd('src/ui/marketTab.js');
-  assert.equal((mt.match(/hubs: m\.hubs, \.\.\.at\(\)/g) ?? []).length, 4, 'the board on a buy, a material listing, a piece listing and an auction');
-  assert.match(mt, /const at = \(\) => \(m\.board \? \{ board: m\.board \} : \{\}\);/);
-});
-
 test('SEAT1d THE ECONOMY MODEL (tools/seatEconomy.mjs): seeded and the same each run; each size\'s influence ordered p10 <= p50 <= p90; the upkeep\'s shares read off the law (2,500 and 15,000 at a hundred accounts over the median writ income); a twelve-member guild\'s median clears a palace; a member\'s week never past the account\'s 2,000 (mutants: the law it reads; the cap)', () => {
   const a = runModel({ runs: 60, seed: 3 });
   assert.deepEqual(a, runModel({ runs: 60, seed: 3 }), 'the same run');

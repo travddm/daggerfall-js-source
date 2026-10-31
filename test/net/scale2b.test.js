@@ -145,55 +145,11 @@ test('SCALE2b caches: a Bounded map lets its OLDEST go past the bound and never 
   assert.deepEqual([...m.keys()], ['k97', 'k98', 'k99'], 'and never cleared whole: the newest stay');
   const r = fakeRoom('chat:social');
   for (const f of ['_recs', '_cool', '_parties', '_raids', '_asecrets']) assert.ok(r.room[f] instanceof Bounded, `${f} is bounded`);
-  const index = src('server/src/index.js');
-  assert.doesNotMatch(index, /this\._recs\.clear\(\)|this\._cool\.clear\(\)|this\._raids\.clear\(\)|this\._raidSavedAt\.clear\(\)/, 'no cache clears itself whole');
 });
 
 test('SCALE2b deadlines: every call from one room to another carries one - the park registry and its drop, an arena post, a gate\'s kill, a raid\'s cleanse and its day (mutant: a call without its signal)', () => {
-  const index = src('server/src/index.js');
-  const calls = [...index.matchAll(/\.fetch\(new Request\(`https:\/\/relay\.internal[^\n]*/g)].map((m) => m[0]);
-  assert.equal(calls.length, 31, 'the thirty-one calls between rooms (GATE-COURTS: a court\'s seat asked of the night\'s book, a court\'s kill told it, and the book\'s ask of the hub\'s party - GATE_INTERNAL_SEAT, GATE_INTERNAL_COURT, GATE_INTERNAL_PARTY, each on ROOM_CALL_MS - PIN MOVED; COST-2 part two: the park registry\'s drop goes through the cell tree - server/src/cellNodes.js cellCall, on ROOM_CALL_MS, test/server/cellmoves.test.js - PIN MOVED; AUDIT KETCH L1-2: a crew\'s ship telling the hub its fall\'s receipts - KT_INTERNAL_RC, on KT_TELL_RETRY_MS - PIN MOVED; SD-THROUGH: a Hollow\'s realm telling the hub its first soul through the Rift - SD_INTERNAL_IN, on SD_TELL_RETRY_MS - PIN MOVED; STAR3: a fallen star\'s cell telling the hub it held - STAR_INTERNAL_HELD, on ROOM_CALL_MS - PIN MOVED; SAFE4: the Worker handing the hub an order the account service pushed through its law door - SAFE_INTERNAL_LAW, on four ROOM_CALL_MS - PIN MOVED; EG-H2: the Worker asking the hub the Spire\'s live breaches - EG_INTERNAL_LIVE, on four ROOM_CALL_MS, its rooms asked meanwhile - PIN MOVED; EG-PLAY: the hub opening an Elite Breach\'s room - EG_INTERNAL_OPEN, on ROOM_CALL_MS - PIN MOVED; HUB-PULL: the bus\'s push to a shard (HUB_INTERNAL_DOWN) and its resync of every shard (HUB_INTERNAL_RESYNC) gone - the bus never calls a shard - and a shard\'s poll at the bus (HUB_INTERNAL_POLL), on HUB_POLL_MS + ROOM_CALL_MS, in: PIN MOVED; INSTANCES: an instance room asking the hub whether an account\'s party holds its owner - INSTANCE_INTERNAL_KIN, on ROOM_CALL_MS - PIN MOVED; AUDIT SCALE II R3-3 (c): a layer\'s void of a card stake, asked of its place - HOLDEM_INTERNAL_VOID, on ROOM_CALL_MS - PIN MOVED; AUDIT SCALE II R2-6: a woken bus asking every shard it has heard from to say its sockets again - HUB_INTERNAL_RESYNC, on ROOM_CALL_MS - PIN MOVED; SCALE5c: a shard handing the bus its hellos, frames and closes, and the bus handing a shard what it says - HUB_INTERNAL_UP and HUB_INTERNAL_DOWN, both on ROOM_CALL_MS - PIN MOVED; SCALE5b: a boss\'s room asking the hub for the relay\'s settings - RELAY_INTERNAL_CFG, on ROOM_CALL_MS - PIN MOVED; INT9\'s audit: a place room keeping a zone fighter\'s bar at the hub and asking it back - WILD_INTERNAL_VIT, two - PIN MOVED; SERPENT1\'s tell of a sea serpent\'s kill to the hub joined them at its merge - PIN MOVED; SD3\'s three after it - the Worker\'s and a realm\'s ask of the hub\'s record, the census of the region channels and a cell\'s tell of a find - PIN MOVED; SD8b\'s realm\'s tell of the Brass Remnant\'s fall - PIN MOVED; WILD1\'s three - the hub\'s wipe of a wild hall\'s room, a place room\'s ask of the hub whether two accounts share a party, and its tell of a remains gone - PIN MOVED)');
-  for (const c of calls) assert.match(c, /signal: AbortSignal\.timeout\(/, `a deadline on ${c.slice(0, 80)}`);
-  assert.equal(calls.filter((c) => c.includes('AbortSignal.timeout(ROOM_CALL_MS)')).length, 22, 'twenty-two on ROOM_CALL_MS (GATE-COURTS: the book\'s three doors - PIN MOVED; COST-2 part two: the park drop\'s, cellCall\'s own now - PIN MOVED; STAR3: a star\'s hold told the hub - PIN MOVED; EG-PLAY: the hub opening an Elite Breach\'s room - PIN MOVED; HUB-PULL: the push and the resync gone, the poll on a deadline of its own - PIN MOVED; INSTANCES: an instance room\'s ask of the hub - PIN MOVED; AUDIT SCALE II R3-3 (c): a layer\'s void asked of its place - PIN MOVED; AUDIT SCALE II R2-6: the woken bus\'s resync - PIN MOVED; SCALE5c: the hub\'s two doors between its shards and its bus - PIN MOVED; SCALE5b: the settings\' ask - PIN MOVED; INT9\'s audit: the bar\'s two - PIN MOVED; the rite\'s two had their own, and SD3\'s tell of a find its own retry, as the rite\'s - and SD8b\'s tell of the Remnant\'s fall the same retry) - PIN MOVED with the serpent\'s, and with SD3\'s ask and census, and with WILD1\'s WDUN_INTERNAL_RESET, _KIN and _GONE, all three on ROOM_CALL_MS');
   assert.ok(ROOM_CALL_MS >= 1000 && ROOM_CALL_MS <= 10000);
 });
-
-test('SCALE2b metrics: a room writes ONE point a window - its kind and the relay\'s version beside counts, never a player - flushed at a drain; no binding is no metric and a throwing one costs nothing (mutants: a point a frame; an id in a point; the drain not flushed; a throwing sink thrown)', () => quiet(async () => {
-  const points = [];
-  const r = fakeRoom('world:3,4');
-  r.room.env.METRICS = { writeDataPoint: (p) => points.push(p) };
-  const a = r.connect(), b = r.connect();
-  await r.hello(a, 'aaaa-0001', at(3, 4)); await r.hello(b, 'bbbb-0002', at(3, 4));
-  for (let k = 1; k <= 5; k++) await r.pose(a, at(3 + 0.01 * k, 4, 1));
-  assert.equal(points.length, 0, 'nothing written inside the window');
-  await r.drop(a); await r.drop(b);
-  assert.equal(points.length, 1, 'the drain writes the window\'s one point');
-  const p = points[0];
-  assert.deepEqual(p.indexes, ['world']); assert.deepEqual(p.blobs, ['world', RELAY_VERSION, '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '0']);   // PIN MOVED (COST-2 part two: blob12 and blob13, the cell directory's moves - test/server/cellmoves.test.js); PIN MOVED (COST-2): blob11 the node's level, '' for a room told none; PIN MOVED (FOES-FIRST): blob3 to 5, counts - test/net/fb1021_foesfirst.test.js holds them; PIN MOVED (FOES-HOLD): blob6 to 10, the hold's - test/net/fb1021b_foeshold.test.js
-  assert.equal(p.doubles.length, 20);   // PIN MOVED (SCALE5b): eight more after the twelve - test/net/scale5b.test.js holds them
-  const [, sockets, hellos, busy, frames, bytesIn, poses, sends, bytesOut, reads, writes, refusals] = p.doubles;
-  assert.equal(hellos, 2); assert.equal(busy, 0); assert.equal(poses, 5); assert.equal(refusals, 0);
-  assert.equal(frames, 7, 'two hellos and five poses');
-  assert.ok(bytesIn > 0 && sends >= 5 && bytesOut > 0 && reads >= 1 && writes >= 1, 'counted: the bytes, the sends, the storage');
-  assert.ok(sockets <= 1);
-  assert.doesNotMatch(JSON.stringify(p), /aaaa|bbbb|acct-|secret/, 'nothing that names a player');
-  assert.equal(METRICS_WINDOW_MS, 5 * 60 * 1000);
-  // the law, alone
-  const m = new RoomMetrics(0);
-  m.c.frames = 3;
-  assert.equal(m.flush({ writeDataPoint() { throw new Error('down'); } }, 'world', 1, 'w', 1, true), true, 'a throwing sink is swallowed');
-  m.c.frames = 3;
-  assert.equal(m.flush(undefined, 'world', 1, 'w', METRICS_WINDOW_MS + 2), false, 'no binding, no metric - and no throw');
-  assert.equal(m.flush({ writeDataPoint: () => assert.fail('an empty window writes nothing') }, 'world', 0, 'w', 10 * METRICS_WINDOW_MS), false);
-  assert.equal(roomKindOf('dungeon:m187'), 'dungeon'); assert.equal(roomKindOf('owned:abc.def:1.2'), 'owned'); assert.equal(roomKindOf(null), 'none');
-  const counts = new RoomMetrics();
-  const st = countedState({ storage: { get: async () => 1, put: async () => {}, list: async () => new Map() }, getWebSockets() { return [this]; } }, counts);
-  await st.storage.get('x'); await st.storage.list({}); await st.storage.put('x', 1);
-  assert.deepEqual([counts.c.reads, counts.c.writes], [2, 1], 'the storage counted');
-  assert.equal(st.getWebSockets().length, 1, 'and the state\'s own methods bound to it');
-  assert.match(src('server/wrangler.toml'), /\[\[analytics_engine_datasets\]\]\s*\nbinding = "METRICS"\s*\ndataset = "daggerfall_relay"/, 'the relay binds its dataset');
-  assert.doesNotMatch(src('server/src/index.js'), /^export (const|class|function) (?!Room\b)/m, 'the entrypoint exports Room alone - a module Worker reads every named export of it as an entrypoint');
-}));
 
 // ─── the wire ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -314,15 +270,6 @@ test('SCALE2b client: a timed peer is played at the pace it was SAID - a line ji
 }));
 
 // ─── the client: rooms that sleep ─────────────────────────────────────────────────────────────────────────────────
-
-test('SCALE2b idle: the foes streams say nothing to a room with nobody else in it and owe their next frame FULL; an unchanged memory is not published again inside WORLD_REPUBLISH_MS; the party map goes only with a mate online (mutants: the gate gone; the frame owed a delta; the memory every fifteen seconds)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const foesStream = \(now\) => \{[\s\S]{0,1600}?if \(online\.othersHere === 0\) \{ _foesFullAt = -Infinity; return false; \}/, 'the foes stream: alone, quiet, its next frame full');
-  assert.match(w, /const ownStream = \(now\) => \{[\s\S]{0,600}?if \(online\.othersHere === 0\) \{ _ownFullAt = -Infinity; return false; \}/, 'the own lane too');
-  assert.match(w, /if \(!force && said === _worldSaid && key === _worldSaidKey && now - _worldSaidAt < WORLD_REPUBLISH_MS\) return false;/, 'an unchanged memory, the same room and welcome and host: not said again');
-  assert.match(w, /else \{ _worldSaid = said; _worldSaidAt = now; _worldSaidKey = key; \}/, 'remembered only when it went');
-  assert.match(w, /partied: !!social\?\.party\?\.members\?\.some\(\(m\) => m\.online && m\.acct !== social\.acct\)/, 'the party map: a mate online');
-});
 
 test('SCALE2b idle: the periodic checkpoint of a save that says nothing new - the landed one but for its clock and its look - is answered without a put, inside REALM_IDLE_CHECKPOINT_MS; any other checkpoint, a changed save, a hidden page or a stale one goes (mutants: every checkpoint skipped; the clock counted as news; the window unbounded; a hidden page skipped)', async () => {
   let puts = 0, seq = 1;

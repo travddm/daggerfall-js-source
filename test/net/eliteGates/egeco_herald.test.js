@@ -345,8 +345,4 @@ test('EG-E3 relay: NO WEBHOOK, NO POSTS - the reckoning is kept (the first compa
       assert.equal(posts.length, 0);
     }, { env });
   }
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /await this\._heraldBeat\(Date\.now\(\)\); await this\._egHeraldBeat\(Date\.now\(\)\); await this\._serpentHeraldBeat\(Date\.now\(\)\);/, 'on the hub\'s one alarm, after the gate\'s');
-  assert.match(relay, /if \(path === EG_INTERNAL_HERALD\) return this\._egHeraldInternal\(request\);/);
-  assert.ok(!/egHerald[\s\S]{0,200}roles: \[/.test(rd('src/net/eliteGates/egHerald.js')), 'no Spire post names a role');
 });

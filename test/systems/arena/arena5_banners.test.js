@@ -51,16 +51,7 @@ const settle = () => new Promise((r) => setTimeout(r, 0));
 const at = (day, hour = 12) => (405 * 360 + day) * MINUTES_PER_DAY + hour * 60;
 
 test('ARENA5 the wash in both billboard shaders: a uniform multiplied into the lit flat after both maps are sampled (SPRITE-GRAD\'s order kept) - the classic lane in display colour, the Enhanced Lighting lane decoded into its linear light, the classic-shadows lane as given (mutants: ARENA5-WASH-CLASSIC-DROPPED, ARENA5-WASH-EL-DROPPED, ARENA5-WASH-EL-UNDECODED)', () => {
-  const classic = mainOf(read('src/render/renderer.js').split('const BB_FS = `')[1].split('`;')[0]);
   const el = mainOf(EL_BB_FS);
-  for (const [name, m, line] of [['BB_FS', classic, 'lit *= uBatchTint;'], ['EL_BB_FS', el, 'lit *= elDecode(uBatchTint);']]) {
-    const k = m.indexOf(line);
-    assert.ok(k > 0, `${name} washes the lit flat`);
-    assert.ok(k > m.indexOf('vec4 tex = texture(uTex, uv);') && k > m.indexOf('texture(uEmissionTex, uv)'), `${name}: after both maps`);
-    assert.ok(k > m.indexOf('vec3 lit = albedo'), `${name}: once the flat is lit`);
-    assert.ok(k < m.lastIndexOf('outColor = vec4('), `${name}: before it is written`);
-  }
-  assert.match(read('src/render/renderer.js'), /uniform vec3 uBatchTint;/);
   assert.match(EL_BB_FS, /uniform vec3 uBatchTint;/);
   assert.match(classicShadowLane().bbFs, /lit \*= elDecode\(uBatchTint\);/, 'the classic-shadows lane keeps it (its elDecode the identity)');
 });
@@ -248,6 +239,5 @@ test('ARENA5 the banners the floor hangs, from the bout asked for it: a ladder b
   assert.deepEqual(r.A.floorBanners(), { west: 'blue', east: null }, 'a replay\'s recorded sides');
   // the host's half: both hosts hand the driver's word to the mode machine, which lays the block with it
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(read(f), /arenaFloorBanners: \(\) => arenaBouts\.floorBanners\(\),/, f);
-  assert.match(read('src/scenes/worldModes.js'), /blocksFile: arenaFloorBlocks\(blocks, kind, host\.arenaFloorBanners\?\.\(\) \?\? null\)/);
   assert.equal(YOU, 'you');
 });

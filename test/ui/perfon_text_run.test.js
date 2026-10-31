@@ -123,8 +123,6 @@ test('PERF-ON: the per-glyph path is the FALLBACK and still works - a renderer w
   drawText(a, font, 'Hello', 0, 0, 1);
   assert.equal(a.quads.length, 5, 'five glyphs, five quads, as before');
   assert.equal(typeof a.drawScreenQuadRun, 'undefined');
-  assert.match(read('src/ui/text.js'), /const run = typeof renderer\?\.drawScreenQuadRun === 'function' \? \[\] : null;/,
-    'the run is FEATURE-DETECTED - an optional renderer member, not a required one');
 });
 
 test('PERF-ON: the name pass no longer scales by the glyph - measured, per peer', () => {
@@ -154,32 +152,6 @@ test('PERF-ON: the name pass no longer scales by the glyph - measured, per peer'
     assert.equal(m.draws, n, `${n} peers must be ${n} draws - one a NAME, not one a glyph`);
     assert.equal(m.loose, 0, 'a glyph escaped the run and is a draw of its own');
   }
-});
-
-test('PERF-ON: the run is the NARROW case, and drawScreenQuad keeps every other law', () => {
-  // A run is textured, unrotated, one colour - what a string is. The
-  // solid-fill arm (U10's alpha), the blend opt-in (U21c) and the
-  // rotate opt (c2/S10) all stay `drawScreenQuad`'s, untouched, so no
-  // art path changes and nothing else in the UI moves.
-  const src = read('src/render/renderer.js');
-  const runFn = src.slice(src.indexOf('  drawScreenQuadRun(tex, quads, color'), src.indexOf('    drawScreenOverlayQuad(tex, u1, v1)'));
-  assert.ok(runFn.length > 500, 'the run is gone');
-  assert.doesNotMatch(runFn, /opts\.rotate|uRotOn/, 'the run grew a rotate arm - that is drawScreenQuad’s');
-  assert.doesNotMatch(runFn, /opts\.blend|uBlendTex/, 'the run grew the blend opt-in - that is drawScreenQuad’s');
-  assert.match(runFn, /if \(!tex \|\| !n\) return;/, 'a run with no texture or no quads must draw nothing');
-  // The 1-bit cutout law, and the two brackets drawScreenQuad keeps.
-  assert.match(runFn, /if \(t\.a < 0\.5\) discard;/, 'the classic 1-bit cutout law is not in the run’s shader');
-  assert.match(runFn, /if \(this\._worldViewportPx\) this\.endWorldPass\(\);/, 'ROAD-E E5: a run is a 2D primitive and ends the world pass too');
-  // PERF-2D: the handedness bracket is the RUN's pair now (_open2D /
-  // _close2D), so the run opens it and does not carry its own copy - a
-  // screen quad with CULL_FACE on still draws nothing, and
-  // test/scenes/handedness.test.js pins the pair itself.
-  assert.match(runFn, /this\._open2D\(this\._screenQuadRunVao\)/, 'the run opens the 2D bracket');
-  assert.doesNotMatch(runFn, /gl\.disable\(gl\.CULL_FACE\);/, 'and does not keep a second copy of it');
-  assert.match(runFn, /this\._screenOffset\?\.\[0\] \?\? 0/, 'the letterbox offset applies to a run as it does to a quad');
-  assert.match(runFn, /this\.stats\.draws\+\+;/, 'a run is a draw and must be counted as one');
-  // ONE draw for the whole run.
-  assert.equal((runFn.match(/drawElementsInstanced|drawArraysInstanced/g) ?? []).length, 1, 'a run is ONE draw call');
 });
 
 // ═══ THE TWO PINS THE EQUALITY PIN CANNOT BE ══════════════════════

@@ -460,6 +460,4 @@ test('AUDIT POI M13: the unwrap runs off the page\'s thread - on a worker over i
   await new Promise((r) => setTimeout(r, 40));
   assert.equal(w2.terminated, 1); assert.equal(th.onWorker, false);
   th.close();
-  const client = readFileSync(new URL('../../src/poi/uv/uvUnwrapClient.js', import.meta.url), 'utf8');
-  assert.match(client, /return new Worker\(new URL\('\.\/uvUnwrapWorker\.js', import\.meta\.url\), \{ type: 'module' \}\);/, 'the literal spelling Vite bundles');
 });

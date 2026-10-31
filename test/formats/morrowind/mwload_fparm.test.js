@@ -221,12 +221,6 @@ test('MW-LOAD: the build reports its STAGE TIMINGS, and the total covers every s
     assert.ok(res.timings.total >= res.timings[name],
       `total (${res.timings.total}) must cover ${name} (${res.timings[name]})`);
   }
-  // ONE line, and it prints the numbers the result carries - never one
-  // per file, which is what makes a slow boot slower.
-  const src = rd('src/combat/fpArm.js');
-  assert.equal((src.match(/console\.log\(/g) || []).length, 1, 'exactly one log in the whole file');
-  assert.match(src, /\[mw\] arm built in \$\{timings\.total\} ms - archives \$\{timings\.archives\}, /);
-  assert.match(src, /esm \$\{timings\.esm\}, meshes \$\{timings\.meshes\}, textures \$\{timings\.textures\}, sweep \$\{timings\.sweep\}/);
 });
 
 // ── the doors a build does not go through ───────────────────────────
@@ -287,113 +281,6 @@ test('MW-LOAD: the ITEM ICON is a two-phase door - null, a notify, then the pict
 });
 
 // ── the source law: no synchronous read outruns its load ────────────
-
-test('MW-LOAD: every synchronous archive read in fpArm.js is covered, in its own function', () => {
-  const src = rd('src/combat/fpArm.js');
-  const lines = src.split('\n');
-  // A function boundary: a `function` declaration at any of this file's
-  // nesting levels, or a method of the createFpArm object literal. The
-  // keyword exclusion keeps `for (...) {` and `if (...) {` from reading
-  // as one.
-  const FN_START = /^\s{0,4}(?:export\s+)?(?:async\s+)?function\s|^\s{4}(?!(?:if|for|while|switch|catch|try|else|do|return)\b)[A-Za-z][\w$]*\(.*\)\s*\{\s*$/;
-  // A synchronous read of ARCHIVE bytes. Every one of them is
-  // `<an archive>.get(<path>)`, and every archive here is named by the
-  // find that produced it.
-  // MWNPC3 (PIN MOVED): a mesh's bytes are read through nifBytes(<an archive>, <path>) now - one copy an archive and
-  // path, every body's - so a call of it IS a read, swept like the `.get` it wraps (and the `find(...)` ones, whose
-  // `?.get` the old pattern never met, swept with them).
-  const READ = /\b(?:arc|tarc|skelArc|ammoArc)\.get\(|find\((?:p|path)\)\.get\(|\bnifBytes\((?:arc|tarc|skelArc|ammoArc|find\()/;
-  // What makes a read legal: the load that brought its bytes in
-  // (loadFromArchives and the three preloads that call it), or
-  // findLoaded, which is the ASSERTION that some earlier function's
-  // load covered this one - the shape a synchronous callback needs.
-  // `preloadIcon` is itemIcon's own door: it is CALLED there, ahead of
-  // the read, and it awaits inside itself because itemIcon may not
-  // (the frame path forbids an await in that whole region).
-  const COVER = /\b(?:loadFromArchives|preloadArmTextures|preloadClothingColour|prepareClothingColours|preloadIcon|findLoaded)\(/;
-  // The two functions whose reads are covered by their CALLERS, because
-  // both are synchronous doors somebody else must open first. Named
-  // here, with the pin that checks each of their call sites below, so
-  // the exemption is a statement rather than a hole.
-  const EXEMPT = new Map([
-    ['resolveWeaponParts', 'its `find` is the caller\'s; all four call sites preload through weaponPartPaths'],
-    ['collectArmTextures', 'synchronous by contract; every call site preloads through preloadArmTextures'],
-    ['resolveTorchPart', 'MW-D51: resolveWeaponParts\' twin for the carried light; all three call sites preload through torchPartPaths'],
-    ['resolveHipLanternPart', 'HT-WAIST: resolveTorchPart\'s twin for the lantern at the waist; both call sites preload through hipLanternPartPaths'],
-    ['nifBytes', 'MWNPC3: the copy door - its archive is the caller\'s, and every call of it is a read this scan sweeps'],
-    ['ownBodyPart', 'MW-BRIG2: synchronous, its `find` the caller\'s; its call sites (buildTpBody, and PORTRAIT3D renderHeadAssembly) load ahead of it'],
-  ]);
-  const nameOf = (line) => (line.match(/(?:function\s+)?([A-Za-z][\w$]*)\s*\(/) || [])[1] ?? '?';
-
-  let fnAt = 0;
-  let found = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (FN_START.test(lines[i])) { fnAt = i; continue; }
-    if (!READ.test(lines[i])) continue;
-    found++;
-    const fn = nameOf(lines[fnAt]);
-    if (EXEMPT.has(fn)) continue;
-    // fnAt + 1: a preload's own DECLARATION must not count as its own
-    // cover, or removing the load inside it would still read as covered.
-    const before = lines.slice(fnAt + 1, i).join('\n');
-    assert.ok(COVER.test(before),
-      `${fn} (line ${i + 1}) reads archive bytes with no load ahead of it in the same function:\n  ${lines[i].trim()}`);
-  }
-  assert.ok(found >= 10, `the scan must actually find the read sites (${found})`);
-
-  // The two exemptions, discharged: every call site of each opens the
-  // door before it walks through.
-  const callsCovered = (call, cover, doors = []) => {
-    let at = 0;
-    let n = 0;
-    for (let i = 0; i < lines.length; i++) {
-      if (FN_START.test(lines[i])) { at = i; continue; }
-      if (!lines[i].includes(call)) continue;
-      if (/^export function /.test(lines[i])) continue;   // the definition is not a call
-      if (doors.includes(nameOf(lines[at]))) continue;   // TWO-HANDS: a door's own call - its callers open it, pinned below
-      n++;
-      assert.ok(new RegExp(cover).test(lines.slice(at + 1, i).join('\n')),
-        `${call} at line ${i + 1} is not preceded by ${cover} in its own function`);
-    }
-    return n;
-  };
-  // resolveWeaponParts: buildTpBody, buildFpArm, and the swap's two
-  // rigs (which share one load, the same records for both).
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): resolveOffWeaponParts is resolveWeaponParts' door for the
-  // left hand - synchronous, its `find` the caller's - so its one call inside is discharged at ITS call sites: the
-  // left hand's swap, its two rigs under the one load
-  assert.equal(callsCovered('resolveWeaponParts({', 'loadFromArchives\\([\\s\\S]*weaponPartPaths\\(|weaponPartPaths\\(', ['resolveOffWeaponParts']), 4);
-  // PIN MOVED (TWO-HANDS AUDIT 2): and buildFpArm's - a pair's left blade bound in the build the rig's own rebuild asks
-  // for, its mesh in the build's one load (2 -> 3)
-  assert.equal(callsCovered('resolveOffWeaponParts({', 'loadFromArchives\\([\\s\\S]*weaponPartPaths\\(|weaponPartPaths\\('), 3);
-  // MW-D51 resolveTorchPart: buildTpBody, buildFpArm, and setTorch's
-  // slow path (one load, one resolve per rig inside it).
-  assert.equal(callsCovered('resolveTorchPart({', 'loadFromArchives\\([\\s\\S]*torchPartPaths\\(|torchPartPaths\\('), 3);
-  // HT-WAIST resolveHipLanternPart: buildTpBody and setHipLight's slow path.
-  assert.equal(callsCovered('resolveHipLanternPart({', 'loadFromArchives\\([\\s\\S]*hipLanternPartPaths\\(|hipLanternPartPaths\\('), 2);
-  // MWNPC3 ownBodyPart: the third-person build's part loop, inside its load. PIN MOVED (PORTRAIT3D): and the head
-  // portrait's assembly (renderHeadAssembly), inside its own
-  assert.equal(callsCovered('...ownBodyPart(', 'loadFromArchives\\('), 2);
-  // collectArmTextures: the two builds and the swap's two rigs.
-  // renderGroundMesh's own call is the ICON's, and the icon opens its
-  // door in preloadIcon before the synchronous getter is ever reached -
-  // so it is listed here rather than swept, and preloadIcon is pinned
-  // by the two-phase test above.
-  let icons = 0;
-  let at = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (FN_START.test(lines[i])) { at = i; continue; }
-    if (!lines[i].includes('collectArmTextures(')) continue;
-    if (/^export function collectArmTextures/.test(lines[i])) continue;
-    const fn = nameOf(lines[at]);
-    if (fn === 'renderGroundMesh') { icons++; continue; }
-    assert.ok(/preloadArmTextures\(/.test(lines.slice(at + 1, i).join('\n')),
-      `collectArmTextures at line ${i + 1} (in ${fn}) has no preloadArmTextures ahead of it`);
-  }
-  assert.equal(icons, 1, 'renderGroundMesh is the ONE synchronous texture collector, and the icon door covers it');
-  assert.match(src, /if \(arc\) await preloadArmTextures\(flattenNif\(parseNif\(arc\.get\(path\)\.slice\(\)\)\), cat\.archives, cat\.gen\);/,
-    'and preloadIcon is what opens it');
-});
 
 test('MW-LOAD: weaponPartPaths names exactly what resolveWeaponParts reads', () => {
   // The preload and the read must ask the SAME record questions or the

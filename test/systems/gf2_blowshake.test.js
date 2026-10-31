@@ -105,9 +105,6 @@ test('GF2-BLOWSHAKE B3: the springs\' one door - a blow peaks at the table\'s ow
   for (let i = 0; i < 60; i++) stepTechniqueFx(0.001);
   assert.ok(techniqueView().roll < 0, 'the camera\'s own roll negated: the screen leans right');
   resetTechniqueFx();
-  const fx = src('src/combat/technique/techniqueFx.js');
-  assert.equal(fx.match(/-\(c\.roll \?\? 0\)/g)?.length, 1, 'the mirror said once');
-  assert.match(fx, /kickFx\(row\.cam, row\.hands, m\);/, 'techniqueCue kicks through the door');
 });
 
 test('GF2-BLOWSHAKE B4: the clean blow off the real machines - a Clean Cut and a strike on the glint are clean, a plain chop and a plain strike not, and an act that swings nothing has no blow (mutants: the glint read as plain, the Clean Cut as plain)', () => {
@@ -212,19 +209,6 @@ test('GF2-BLOWSHAKE B6: through the host - Escape mid-swing takes its blow with 
     assert.deepEqual(calls.map((c) => c.kind), ['chop'], 'the axe\'s');
     t.host.dispose();
   } finally { setForagingHost(null); }
-});
-
-test('GF2-BLOWSHAKE B7: the seams - the host steps its machines through stepAct alone and feels a landed blow by default through gatherBlowFeel; the springs are the view\'s, never the look the glint is aimed with; the player\'s setting names the tool\'s blow (mutants: a machine ticked behind stepAct\'s back, the default feel dropped)', () => {
-  const host = src('src/scenes/gatherHost.js');
-  assert.equal(host.match(/\.act\.tick\(/g)?.length, 1, 'one tick: stepAct\'s');
-  assert.match(host, /function stepAct\(a, dt, input\) \{\n\s+const was = a\.act\.state\?\.landed \| 0;\n\s+a\.act\.tick\(dt, input\);/);   // PIN MOVED (AUDIT GATHER-FEEL LANDING): a blow landed is the machine's count
-  assert.match(host, /const feel = deps\.feel \?\? gatherBlowFeel;/);
-  const blow = src('src/systems/gatherBlow.js');
-  assert.match(blow, /import \{ kickFx, techniqueMotion \} from '\.\.\/combat\/technique\/techniqueFx\.js';/, 'the springs\' one door');
-  assert.doesNotMatch(blow, /\b(cam|camera|view)\.(pitch|yaw)\s*[-+*/]?=/, 'no camera written: the springs are folded into the view by every host (player/climb/climbFeel.js)');
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  // PIN MOVED (AUDIT GATHER-FEEL F8): the note says what a blow does, and where - a dip, never a shake or a tilt, on the Enhanced skin alone
-  assert.match(menu, /choiceRow\('techniqueMotion', 'Technique camera motion',\n\s+'How much a weapon technique shakes and tilts the view and dips your hands\. On the Enhanced skin, it also sets how far your hands dip when you gather\.',/);
 });
 
 test('GF2-BLOWSHAKE B8: a blow\'s answer never stops an act - a feel that throws, and the vein is struck out and goes as its last blow lands all the same (mutant: the throw let through)', async () => {

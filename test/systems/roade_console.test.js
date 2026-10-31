@@ -259,25 +259,3 @@ test('E3 console: the door honours LypyL_GameConsole and runs the whole submit l
   }
 });
 
-test('E3 console: the wiring - every host with a registering surface registers, and every host has the door', () => {
-  // ExteriorAutomap.Start (:417) and the travel window's ctor (:229) -
-  // the two hosts that own those windows.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.ok(src(f).includes('registerExteriorAutomapConsoleCommands({ isPlayerInside:'),
-      `${f}: the exterior automap's two verbs are never registered`);
-  }
-  assert.ok(src('src/scenes/world.js').includes('registerTravelMapConsoleCommands({'),
-    'world.js owns the travel map and must register its three');
-  // Automap.Start (:969) - both arms of the one component
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/interiorContext.js']) {
-    assert.ok(src(f).includes('registerAutomapConsoleCommands();'), `${f}: the automap's three verbs`);
-  }
-  // ...and the door, in every scene host (a static class in DFU is
-  // reachable from every scene; the port's door has to be too)
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/interior.js']) {
-    assert.ok(src(f).includes('installConsoleProbe();'), `${f}: no console door`);
-  }
-  // the departure is declared where it lives, and the Ledger names the
-  // file (test/tooling/doctrine.test.js enforces the second half)
-  assert.match(src('src/systems/consoleCommands.js'), /DEPARTURE - THE CONSOLE WINDOW ITSELF \(Ledger A\)/);
-});

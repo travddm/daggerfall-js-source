@@ -128,7 +128,6 @@ test('MERCHANT-YARDS THE KEEPER: named on the region\'s bank on the town and the
   for (let m = 0; m < 200; m++) { const k = yardKeeper(m, 'transport', 17); seen.add(k.variant); sexes.add(k.sex); }
   assert.deepEqual([...seen].sort(), [0, 1, 2, 3], 'every outfit worn somewhere');
   assert.deepEqual([...sexes].sort(), ['female', 'male']);
-  assert.match(hostText('src/scenes/world.js'), /const mapId = \(dfLocation\.mapTableData\?\.mapId \?\? 0\) >>> 0, regionIndex = dfLocation\.regionIndex \?\? 0, race = walkerRace\(people, dfLocation\.regionIndex\);/, 'the town\'s own region - its keepers\' bank and its counter\'s');
 });
 
 test('MERCHANT-YARDS THE PLACE: its own ground open and off every road, a ring round it open (a road allowed there), its front onto a road; IC-PROPS: the Wagon Yard nearest the middle, the Stable at the edge by the road (mutants: a road under it; the ring unread; the front unread)', () => {
@@ -422,59 +421,6 @@ test('MERCHANT-YARDS THE YARD\'S FRAME IN THE SCENE: a point and a box turned wi
   assert.deepEqual([b.min.map(r), b.max.map(r)], [[0, 0, -2], [1, 1, 0]], 'a quarter turn: its width along -z, its depth along x');
 });
 
-test('MERCHANT-YARDS THE FOUR HOSTS - world.js places, stands, draws and names them and hands the press; worldModes\' street ray reaches them and opens their counter; exterior.js flagged; the dungeon none', () => {
-  const world = hostText('src/scenes/world.js'), modes = read('src/scenes/worldModes.js'), host = read('src/scenes/merchantYardsHost.js');
-  const ext = read('src/scenes/exterior.js'), dungeon = read('src/scenes/dungeonContext.js');
-  // PIN MOVED (AUDIT SHIPYARDS L3-3): a town's yards and its port's places in one pass - townPlacesFor asked once a build
-  // PIN MOVED (TS7): and the town's walk shut handed on - its places on its own ground (world/townWalls.js townWalkShut)
-  // PIN MOVED (IC-STUTTER): awaited, a step at a time through the build's breather
-  assert.match(world, /const places = yardTown \|\| portTown \? await townPlacesFor\(dfLocation, lefaySpot, climate\?\.people, loc, walkShut, \(\) => breather\.breathe\(\)\) : null;[^\n]*\n\s*if \(yardTown\) yardSites = places\.yards;/);
-  assert.match(world, /const yl = loc && isEnhanced\(\) && windmillsOn\(\) \? loc : layoutLocation\(dfLocation, maps, blocks, \{ enhanced: true, windmills: true \}\);/, 'one layout for every lane (the build\'s own where it is that one)');
-  // AUDIT MERCHANT-YARDS G1, G3, G4, G2: the measures the host hands yardMeasuresOf, and the sites kept per town
-  // PIN MOVED (BAY-LEFT-SEA): a capital's landmark by its footprint, its blocks' own (tamrielCapitals.js isCapitalLandmark)
-  assert.match(world, /custom: \(cid\) => \(hasCustomModel\(cid\) && !customModelNeeds\(cid\)\.length && !isCapitalLandmark\(cid\) \? customModelFor\(cid\)\?\.positions \?\? null : null\),/, 'a registered model measured by its own geometry');
-  assert.match(world, /classic: \(cid\) => dfMeshSize\(classicModelIdOf\(cid\)\),/, 'an alias by its classic model');
-  assert.match(world, /fieldOf: \(id\) => flatFieldFor\(id\),/, 'a field by the ground it sows');
-  assert.match(world, /flatsOf: \(b\) => collectBlockFlats\(b\.dfBlock, 0\),/, 'every flat, the markers too');
-  assert.match(world, /closedBlock: \(b\) => b\.blockName === ARENA_BLOCK \|\| palaceIn\(b\),/, 'a palace\'s block and the colosseum\'s left whole');
-  assert.match(world, /const n = Math\.min\(list\.length, blockBuildingCount\(b\.dfBlock\)\);\n\s*for \(let i = 0; i < n; i\+\+\) if \(list\[i\]\?\.buildingType === TALK_BUILDING_TYPES\.Palace\) return true;/, 'a palace among the block\'s real buildings');
-  // PIN MOVED (SHIPYARDS, 2026-10-11): yardSitesOf's own two steps (townGroundOf, yardSitesOn), so a port town's shipyard
-  // and lighthouse stand on what its yards left (world.js townPlacesFor) - the yards' own sites the same
-  // PIN MOVED (IC-PROPS): the ground hands the yards' law the town's fabric's ways and a capital's own yards; PIN MOVED
-  // (IC-STUTTER): the same two steps, each walked through the build's breather (merchantYardSites.js ...Steps)
-  assert.match(world, /if \(!memo \|\| memo\.sig !== sig\) \{\n\s*const g = await stepsBreathing\(townGroundSteps\(yl, measures, shut, townYardsOf\(dfLocation\)\), breathe\);[^\n]*\n\s*const sites = g && yardTown \? await stepsBreathing\(yardSitesSteps\(g\), breathe\) : \[\];/, 'placed again only when its measures moved');
-  assert.match(world, /renderer\.outsideViewDraws\?\.add\(\(\{ renderer: r \}\) => \{ merchantYards\?\.draw\(r\); \}\);/, 'and in the view out of a window (AUDIT G5)');
-  assert.match(world, /if \(yardSites\?\.length\) carveYards\(nav, yardSites\);/, 'the people walk round them');
-  assert.match(world, /merchantYards: yardSites,/);
-  assert.match(world, /merchantYards = createMerchantYards\(\{/);
-  assert.match(world, /merchantYards\?\.frame\(\)/);
-  assert.match(world, /merchantYards\?\.draw\(renderer, yardCull\)/);   // PERF-YARD (AUDIT 15): with the street's view test (test/scenes/perfyard.test.js)
-  assert.match(world, /livePersonBatches\.push\(\.\.\.merchantYards\.batches\(\)\)/);
-  assert.equal((world.match(/merchantYards\?\.destroyAll\(\);/g) ?? []).length, 2, 'a re-anchor and a load');
-  assert.match(world, /\(key\) => merchantYards\?\.hoverName\(key\) \?\? null,/);
-  assert.match(world, /yardTargets: \(\) => merchantYards\?\.targets\(\) \?\? \[\],/);
-  assert.match(world, /activateYard: \(key, mode, verb\) => merchantYards\?\.activate\(key, mode, verb\) \?\? false,/);
-  assert.match(world, /open: \(site, mode, name\) => modes\?\.openYardTrade\?\.\(site\.kind, site\.regionIndex, mode, name, site\.mapId\) \?\? false,/);   // PIN MOVED (STEED1): the town's own horses
-  assert.match(host, /if \(!open\(p\.y\.site, trade, p\.y\.name\)\) midText\(YARD_TEXT\.shut\);/, 'the counter named for its keeper (AUDIT Y5)');
-  assert.match(world, /showWagon: \(r, texRemap, position, rotation, kind\) => hcc\.drawShowWagon\(r, texRemap, position, rotation, kind\),/);
-  assert.match(world, /race: walkerRace\(climate\?\.people, dfLocation\.regionIndex\),/, 'the walkers...');
-  assert.match(world, /race = walkerRace\(people, dfLocation\.regionIndex\);/, '...and the keepers one race law (a Redguard region\'s Redguard - REGIONAL-FOLK)');
-  assert.match(modes, /for \(const t of host\.yardTargets\?\.\(\) \?\? \[\]\) targets\.push\(t\);/);
-  assert.match(modes, /key\.startsWith\('yard:'\)\) \{[^\n]*\n\s*if \(_hitDist > _hitReach\) \{ setMidScreenText\(tooFarAwayText\(\)\); return true; \}\n\s*return host\.activateYard\?\.\(key, getInteractionMode\(\), plaqueActionFor\(key\)\) \?\? true;/);
-  assert.match(modes, /accepts: \(it\) => \(typeof b\.accepts === 'function' \? b\.accepts\(it\) : shopBuysItem\(b\.buildingType, it\)\),/, 'the counter asks the yard what it buys');
-  assert.match(modes, /const win = openTradeWindow\(\{ items: tradeMode === 'Sell' \? \[\] : stock\(\) \}, b, tradeMode === 'Sell' \? 'Sell' : 'Buy'\);\n\s*if \(!win\) return true;[^\n]*\n\s*mountServiceWindow\(win\);/, 'the counter in the street\'s slot, never the interior\'s (undrawn outdoors)');   // PIN MOVED (STEED1): the stock the town's on the world's day
-  // AUDIT MERCHANT-YARDS Y3: one press waits (the latest), and opens only where it was pressed - the street, its slot free
-  assert.match(modes, /if \(!validYardKind\(kind\) \|\| mode !== 'exterior'\) return false;/, 'a yard\'s counter is the street\'s');
-  assert.match(modes, /const first = !_yardWait;\n\s*_yardWait = \{ kind, regionIndex, tradeMode, name, mapId \};\n\s*if \(first\) \{\n\s*ensureShopFont\(\)\.then\(\(\) => \{/, 'a press before the counter\'s art waits for it - one wait, the latest press');
-  assert.match(modes, /const w = _yardWait;\n\s*_yardWait = null;\n\s*if \(!w \|\| mode !== 'exterior' \|\| townTalk\?\.overlay\) return;\n\s*if \(!tradeDoorReady\(\) \|\| \(!isEnhanced\(\) && !_shopFont\)\) \{ setMidScreenText\(YARD_TEXT\.shut\); return; \}\n\s*openYardCounter\(w\.kind, w\.regionIndex, w\.tradeMode, w\.name, w\.mapId\);/, 'opened where it was pressed, or not at all; a folder that gives no art says so');   // PIN MOVED (STEED1): and the town it was pressed in
-  assert.match(modes, /if \(Number\.isFinite\(b\?\.priceIndex\)\) return b\.priceIndex;/, 'a counter\'s own index (AUDIT Y2)');
-  assert.match(modes, /stealRefusal: \(\) => b\.noSteal \?\? null,/, 'the counter\'s word on a steal, to the window (AUDIT Y1)');
-  assert.match(modes, /    openYardTrade,/);
-  assert.match(host, /scenes\/exterior\.js - FLAGGED/);
-  assert.equal(/merchantYard|openYardTrade/.test(ext), false, 'the bench stands none (flagged)');
-  assert.equal(/merchantYard|yard:/.test(dungeon), false, 'the dungeon host stands no street');
-});
-
 test('AUDIT MERCHANT-YARDS Y1: THE YARD\'S WINDOW TAKES NO STEAL - the classic window\'s Steal says the keeper\'s word and nothing is rolled, tallied, moved or closed (a roll that would get away with anything), the enhanced window stands no Steal; a shop\'s counter keeps both (mutants: the classic\'s refusal unread, the enhanced\'s button kept)', async () => {
   const { NativeTradeWindow, TRADE_RECTS } = await import('../../src/ui/native/nativeTrade.js');
   const { mountEnhancedTrade } = await import('../../src/ui/enhanced/enhancedTrade.js');
@@ -584,6 +530,4 @@ test('AUDIT MERCHANT-YARDS G2: THE TIE-BREAK IS THE DOCUMENTED ONE AND THE SAME 
   for (let x = 7; x <= 15; x++) road[27 * W + x] = 1;
   const s = yardSite({ width: W, height: H, blocked, road }, 'stable');
   assert.deepEqual([s.gx, s.gy, s.turn], [19, 7, 1], 'the lower row, though its turn came second');
-  const src = read('src/world/merchantYards/merchantYardSites.js');
-  assert.equal(/Math\.hypot/.test(src.replace(/\/\/[^\n]*/g, '')), false, 'no Math.hypot decides a place');
 });

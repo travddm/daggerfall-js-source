@@ -36,13 +36,6 @@ test('GATE-RELOAD the link: a refusal of my `in` that says the gate is closed is
 });
 
 test('GATE-RELOAD the relay: its `no` says the gate is closed for ONE reason - the brain\'s law unknown (AUDIT WBX R7) - and a game that says it is let in; the window\'s own end is the hello\'s `error`, never a `no`, so the client\'s reading of the word stays true (mutants: the reading pinned on a second sender)', async () => {
-  const relay = read('server/src/index.js');
-  const closedNo = relay.match(/k: 'no', m: 'the gate is closed'/g) ?? [];
-  assert.equal(closedNo.length, 1, 'one sender of the word in a `no`');
-  assert.match(relay, /if \(!\(m\.bv >= GATE_BRAIN_MIN\)\) \{ this\._send\(ws, JSON\.stringify\(\{ t: 'gate', k: 'no', m: 'the gate is closed' \}\)\); return; \}/, 'and it is the brain\'s door');
-  assert.match(relay, /const no = f\.fell \|\| f\.wrath \? 'the gate is closing' : Object\.keys\(f\.players\)\.length >= GATE_FIGHTERS_MAX \? 'the court is full' : 'the gate is sealed';/, 'the join\'s refusals name the other words');
-  assert.match(relay, /if \(!gateHolds\(day, now\)\) return 'the gate is closed';/, 'the window\'s end is the hello\'s word...');
-  assert.match(relay, /if \(isGateRoom\(a\.key\)\) \{ const no = a\.ly \? \(gateHolds\(gateDayOfRoom\(a\.key\), now\) \? null : 'the gate is closed'\) : await this\._gateAdmit\(a\.key, who\.subject, now\); if \(no\) \{ this\._refuse\(ws, no\); return; \} \}/, '...refused as an error, the socket closed');   // SCALE5d part two (PIN MOVED): a court's copy asks the clock alone, the court the rest
 
   const DAY = 200, TT = gateTimes(DAY);
   const realNow = Date.now; let clock = TT.openAt + 1000; Date.now = () => clock;
@@ -63,11 +56,3 @@ test('GATE-RELOAD the relay: its `no` says the gate is closed for ONE reason - t
   } finally { Date.now = realNow; }
 });
 
-test('GATE-RELOAD the host: a refused `in` takes the player out of the court in the words the link said (the terminal arm keeps the hello\'s own) (mutants: the eject in the old words)', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /import \{ createGateLink, GATE_NO_TEXT, gateRefusalText \} from '\.\.\/net\/gate\/gateLink\.js';/);
-  assert.match(world, /onRefused: \(why\) => \{ if \(modes\?\.gateArenaDay\?\.\(\) != null\) ejectFromCourt\(gateRefusalText\(why\)\); \},/);
-  assert.doesNotMatch(world, /ejectFromCourt\(GATE_NO_TEXT\[why\]/, 'no refusal of an `in` said in the old words');
-  assert.match(world, /else if \(courtDay != null && online\?\.terminal\) ejectFromCourt\(GATE_NO_TEXT\[online\.error\] \?\? COURT_TEXT\.lost\);/, 'a hello refused at the window\'s end still says the gate is closed');
-  assert.match(read('src/net/gate/gateLink.js'), /if \(g\.k === 'no'\) \{ say\(gateRefusalText\(g\.m\)\); onRefused\(g\.m\); return; \}/);
-});

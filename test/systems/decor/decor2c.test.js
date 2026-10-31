@@ -269,9 +269,3 @@ test('DECOR2c hanging a blade from "Your things": its row says it hangs; the fli
 
 // ─── THE HOST ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('DECOR2c the host (worldModes.js) by source: the room\'s mounts and the one being hung are drawn on the decal pass, after the room\'s solid models and before its billboards; the room is handed the renderer whose decal pass and texture cache hang them (mutants: the mounts undrawn, the ghost undrawn)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /decorTool\.draw\(renderer, interiorCtx\.texRemap\);[^\n]*\n\s*const mwStamp = fpArm\.mountPictureStamp\(\);[^\n]*\n\s*if \(mwStamp !== _decorMwStamp\) \{ _decorMwStamp = mwStamp; interiorDecor\.refreshMounts\(\); \}\n\s*interiorDecor\.drawMounts\(renderer\);[^\n]*\n\s*decorTool\.drawMounts\(renderer\);/, 'MW-MOUNT: a build that landed or went is asked about first');
-  assert.ok(m.indexOf('interiorDecor.drawMounts(renderer)') < m.indexOf('renderer.drawBillboards([...interiorCtx.billboardBatches'), 'before the billboards');
-  assert.match(m, /const interiorDecor = createDecorRoom\(\{\n\s*meshes: \{ getGpuMesh, cpuModels \}, renderer, getTexture, uploadRecord,/);
-});

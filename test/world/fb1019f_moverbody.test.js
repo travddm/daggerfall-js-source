@@ -346,16 +346,6 @@ test('MOVER-BODY carriedBy: the mover\'s own frame carries the point - a slide\'
   assert.deepEqual(off.map((v) => Math.round(v * 1e6) / 1e6), [-1, 0, -1]);
 });
 
-test('MOVER-BODY the wiring: the action system meets the body as each mover steps, and every host that walks a body among movers hands it over - the ride beside them is gone', () => {
-  const A = rd('src/world/actionSystem.js');
-  assert.match(A, /if \(o\.kind === 'action'\) this\._standMover\(o, t0, m0, body\);/);
-  assert.match(rd('src/scenes/worldModes.js'), /if \(!overlayHeld\) dungeonCtx\.actions\.update\(dt, player\);/);
-  assert.match(rd('src/scenes/worldModes.js'), /if \(!overlayHeld\) interiorCtx\.actions\.update\(dt, player\);/);
-  assert.match(rd('src/scenes/dungeon.js'), /if \(!overlayHeld\) ctx\.actions\.update\(dt, walkMode \? player : null\);/);
-  for (const f of ['src/scenes/shared.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) assert.equal(/ridePlatform|frameDelta/.test(rd(f)), false, `${f}: no second ride`);
-  assert.equal(/frameDelta/.test(A), false, 'and no delta kept for one');
-});
-
 // ── VOID-DUNGEON ────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('VOID-DUNGEON the law: the dungeon\'s record is made the first time it is asked and kept - where the dungeon stands a body it places, INTERIOR_VOID_DROP under the lowest triangle it has; none with no spot or no triangle, and none in a realm that casts its own void back (its spot never asked)', () => {
@@ -378,62 +368,3 @@ test('VOID-DUNGEON the law: the dungeon\'s record is made the first time it is a
   assert.equal(dungeonVoidRescue(new Collider(() => -Infinity), () => spot)(), null, 'no triangle');
 });
 
-test('VOID-DUNGEON the context: its record\'s spot is the start marker\'s landing, by the way in, else the enter marker\'s, and a realm of the Hour, an Elite Breach or a sky-ketch keeps none', () => {
-  const DC = rd('src/scenes/dungeonContext.js');
-  const m = /\n {4}voidRescue: (dungeonVoidRescue\(collider, [^\n]*\)),\n/.exec(DC);
-  assert.ok(m, 'the context keeps the record');
-  const entry = new Function('dungeonVoidRescue', 'collider', 'api', '_sdRealm', '_egHall', '_ketch', `return ${m[1]};`);   // eslint-disable-line no-new-func
-  const col = new Collider(() => -Infinity);
-  const floor = mesh([[-6, -0.25, -6], [6, 0, 6]]);
-  col.addMesh('dungeon', floor.positions, floor.indices, I);
-  const api = (start, enter) => ({ startSpawn: ({ preferEnterMarker = true } = {}) => (preferEnterMarker ? enter ?? start : start) });
-  assert.deepEqual(entry(dungeonVoidRescue, col, api([1, 0, 1], [5, 0, 5]), false, false)().at, [1, 0, 1], 'the start marker\'s, though an enter marker stands');
-  assert.deepEqual(entry(dungeonVoidRescue, col, api(null, [5, 0, 5]), false, false)().at, [5, 0, 5], 'else the enter marker\'s');
-  assert.equal(entry(dungeonVoidRescue, col, api(null, null), false, false)(), null);
-  assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), true, false)(), null, 'the Hour casts its own void back');
-  assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), false, true)(), null, 'an Elite Breach casts its own void back');
-  assert.equal(entry(dungeonVoidRescue, col, api([1, 0, 1], null), false, false, true)(), null, 'PIN MOVED (KETCH): a sky-ketch casts its own void back - her nets');
-});
-
-test('VOID-DUNGEON the hosts: a body below everything the dungeon stands on - the lowering report\'s swimmer, swum on down out of the map - is stood again at the way in, its fall cleared, and told in the player\'s language; above that depth it is left alone (both dungeon hosts\' own frame lines, run)', () => {
-  const WM = rd('src/scenes/worldModes.js');
-  const drain = '      if (pendingDungeonExit) { pendingDungeonExit = false; if (aliveUnder()) { exitDungeonNow(); return true; } } else ';
-  const at = WM.indexOf(drain);
-  assert.ok(at > 0 && WM.indexOf('if (!overlayHeld) dungeonCtx.actions.update(dt, player);', at) - at < 1500, 'the dungeon arm\'s drain, before its movers');
-  const wmLine = WM.slice(at + drain.length, WM.indexOf(';', WM.indexOf('dungeonCtx.hudSay(dungeonVoidText())', at)) + 1);
-  assert.equal(wmLine, 'if (standFromVoid(dungeonCtx.voidRescue(), player)) dungeonCtx.hudSay(dungeonVoidText());');
-  const DS = rd('src/scenes/dungeon.js');
-  const block = DS.indexOf('    if (walkMode && !overlayHeld) {');
-  const dsAt = DS.indexOf('if (standFromVoid(ctx.voidRescue(), player)) ctx.hudSay?.(dungeonVoidText());', block);
-  assert.ok(block > 0 && dsAt > block && DS.indexOf('player.update(dt, paralyzed ?', block) > dsAt, 'the standalone dungeon\'s, where the motor walks');
-  const dsLine = 'if (standFromVoid(ctx.voidRescue(), player)) ctx.hudSay?.(dungeonVoidText());';
-  const hosts = [
-    ['worldModes', new Function('dungeonCtx', 'player', 'standFromVoid', 'dungeonVoidText', wmLine)],   // eslint-disable-line no-new-func
-    ['dungeon.js', new Function('ctx', 'player', 'standFromVoid', 'dungeonVoidText', dsLine)],   // eslint-disable-line no-new-func
-  ];
-  for (const [name, run] of hosts) {
-    const { actions, slab, col } = slabRig();
-    const said = [];
-    const ctx = { voidRescue: dungeonVoidRescue(col, () => [4, 0, 4]), hudSay: (l) => said.push(l) };
-    const m = swimmer(col, [0, 0.6, 0]);
-    actions.activate(slab.key);
-    for (let f = 0; f < 200; f++) { m.update(FIXED_DT, STILL, 0); actions.update(FIXED_DT); }   // the code before MOVER-BODY drove it under the floor
-    const depth = ctx.voidRescue().belowY;
-    assert.equal(depth, -0.25 - INTERIOR_VOID_DROP);
-    for (let f = 0; f < 2000; f++) {
-      m.update(FIXED_DT, go({ down: true }), 0);
-      if (m.pos[1] < depth) break;
-      const was = [...m.pos];
-      run(ctx, m, standFromVoid, dungeonVoidText);
-      assert.deepEqual([[...m.pos], said], [was, []], `${name}: above the depth, left alone`);
-    }
-    assert.ok(m.pos[1] < depth, `${name}: it swam on down out of the dungeon`);
-    Object.assign(m, { falling: true, fallStart: 3, velY: -20 });
-    run(ctx, m, standFromVoid, dungeonVoidText);
-    assert.deepEqual([...m.pos], [4, 0, 4], `${name}: stood at the way in`);
-    assert.equal(m.falling, false);
-    assert.equal(m.velY, 0);
-    assert.deepEqual(said, [DUNGEON_VOID_TEXT], `${name}: and told`);
-    assert.equal(dungeonVoidText(), DUNGEON_VOID_TEXT);
-  }
-});

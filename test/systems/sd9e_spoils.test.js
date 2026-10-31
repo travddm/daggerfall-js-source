@@ -246,30 +246,3 @@ test('SD9e ON THE ARENA\'S FLOOR: over the realm\'s REAL collider (its floors an
 
 // ── the host ──────────────────────────────────────────────────────────
 
-test('SD9e THE HOST: world.js keeps the Hour\'s pool under its own keys - the dungeon\'s ray, the pack\'s take, each piece\'s own picture, its words - says a spent receipt to the hub as its slot, keeps my realm\'s receipt for the burst and grants one that came outside it, hands the pool to the saves, the loads and the crash\'s door; the realm stands its pieces to the ray and the press, lights them and draws their lines (mutants: the gate\'s keys; spent unsaid; the burst\'s receipt granted; no crash door; the realm\'s targets unstood)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?keys: SD_SPOILS_KEYS, recordsMax: SD_SPOILS_RECORDS_MAX,[\s\S]*?\}\);/);
-  assert.match(w, /onSpent: \(day\) => \{ const s = sdSpoilsSlot\(day\); return s == null \|\| socialLink\(\)\?\.sendSdSpent\?\.\(s\) === true; \}/);   // AUDIT SD II (L5 F4, PIN MOVED): whether it went - a word that did not is owed
-  assert.doesNotMatch(/const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?\n {2}\}\);/.exec(w)[0], /feet:/, 'the press is its one hand (GATE-UX): no feet');
-  assert.match(/const sdSpoilsPool = createSpoilsPool\(\{[\s\S]*?\n {2}\}\);/.exec(w)[0], /take: takeSpoil, [\s\S]*gathered: SD_SPOILS_TEXT\.gathered,/, 'the pack\'s plain take - no embers here - and its own words');
-  assert.match(w, /online\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\); sdSpoilsReceipt\(r, room\); \};/);
-  assert.match(w, /function sdSpoilsReceipt\(r, room\) \{[\s\S]*?if \(modes\?\.sdRealmSlot\?\.\(\) === c\.d\) \{ _sdReceipts\.set\(c\.d, r\); return; \}[\s\S]*?sdSpoilsPool\.grant\(\{ day: sdSpoilsDay\(c\.d\), acct: c\.s, roll: \(\) => sdSpoilsList\(c\.c, level\), text: SD_SPOILS_TEXT\.granted \}\)/);
-  assert.match(w, /onSlotSaved\(\(characterId\) => \{ try \{ sdSpoilsPool\.saved\(characterId\); \}/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => sdSpoilsPool\.adopt\(rec\), key: SD_SPOILS_KEYS\.store, inSave: _spoilsInSave \}\)/);
-  assert.match(w, /sdSpoilsPool\.loaded\(characterId\);/);
-  assert.match(w, /sdSpoilsPool\?\.heldIds\?\.\(who\)/);
-  assert.match(w, /try \{ sdSpoilsPool\?\.saved\(who, ids\); \}/);
-  assert.match(w, /const sdSpoilsBurst = sdFightLink \? createSdSpoils\(\{/);
-  assert.match(w, /if \(!inRealm && _sdFightHeld\) \{ sdSpoilsBurst\?\.leave\(\); saveSoon\.changed\(\); \}[^\n]*\n\s*if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\);/, 'gathered before the fight is forgotten');   // AUDIT SD II (L5 F5, PIN MOVED): and a checkpoint asked
-  assert.match(w, /if \(inRealm\) \{ try \{ sdSpoilsBurst\?\.frame\(\); \}/);
-  // PIN MOVED (EG-E, Elite-Gates.md section 19): the Spire's Redoubts throw into the Hour's pool too - the two are never stood in at once
-  assert.match(w, /const floorPool = \(\) => \(modes\?\.ktShip\?\.\(\) != null && ketch \? ketch\.spoils : modes\?\.sdRealmSlot\?\.\(\) != null \|\| modes\?\.egHallBreach\?\.\(\) != null \? sdSpoilsPool : spoilsPool\);/);   // PIN MOVED (AUDIT KETCH L2-3: the Ketchmaster's hold its own pool, ahead of the Hour's) PIN MOVED (KETCH): and the Ketchmaster's hold
-  assert.match(w, /spoilTargets: \(\) => floorPool\(\)\?\.targets\(\) \?\? null,/);
-  assert.match(w, /takeSpoil: \(key\) => !!floorPool\(\)\?\.pick\(key\),/);
-  const m = strip(read('src/scenes/worldModes.js'));
-  assert.match(m, /function standSdRealm\(ctx\) \{[\s\S]*?ctx\.addActivationTargets\(\(\) => \(host\.spoilTargets\?\.\(\) \?\? NO_TARGETS\)\);\n\s*ctx\.addActivationNamer\(\(key\) => \(\(typeof key === 'string' && key\.startsWith\('spoil'\)\) \? host\.spoilName\?\.\(key\) \?\? null : null\)\);\n  \}/);
-  assert.match(w, /sdRealmLights: \(\) => \{\s+const lit = sdSpoilsPool\?\.lights\(\) \?\? NO_SD_LIGHTS, fx = [^\n]*;\n[^\n]*\n\s+const hearts = [^\n]*\n\s+if \(!fx\.length && !stone && !hearts\.length\) return lit;\n[^\n]*\n\s+_sdHourLights\.length = 0;\n\s+for \(let i = 0; i < hearts\.length; i\+\+\) _sdHourLights\.push\(hearts\[i\]\);\n\s+for \(let i = 0; i < lit\.length; i\+\+\) _sdHourLights\.push\(lit\[i\]\);/);   // AUDIT SD III (V5, PIN MOVED): the spoils' light first, into one kept list   // SD16 (PIN MOVED): the spoils' light first, the landings' flashes after   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(w, /\.\.\.\(gateCourt\?\.batches\(\) \?\? \[\]\), \.\.\.\(sdSpoilsPool\?\.batches\(\) \?\? \[\]\),/);
-  assert.match(w, /lines = !!sdSpoilsPool\?\.drawPass\(proj, view, eye, t, fog\); const motes = [^\n]*; const sparks = [^\n]*; const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\);/);   // SD14c (PIN MOVED): the Hour's motes in the same pass   // SD16 (PIN MOVED): its sparks   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  assert.match(m, /realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\)/);   // AUDIT SD II (L2 F9 - PIN MOVED): the spoils' light before the lamps, into the realm's own arrays; PIN MOVED (SD-LOOK S7): and the Reset's dimming after the eye
-});

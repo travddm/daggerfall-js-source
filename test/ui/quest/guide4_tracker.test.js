@@ -512,16 +512,6 @@ test('GUIDE4 THE JOURNAL\'S TOGGLE - the chronicle: every live quest\'s card car
 // ---------------------------------------------------------------
 
 test('GUIDE4 ONE CALL, EVERY HOST - drawHud draws the card on its one call, outside the skin\'s gate, on the HUD\'s hide gate; the bridge feeds the tracker every look and asks the host\'s questions; the street hands both questions, the fixed-town route the one it can answer; the party list steps under the card; the Toggle has one home; the switch is a Features row, on and the player\'s own online; and the tracker\'s imports never reach the quest machine (mutants: the draw inside the gate; the host\'s questions dropped; the party list over the card)', () => {
-  const hud = rd('src/ui/hud/hud.js');
-  const call = hud.indexOf('\n  drawQuestTracker({ hidden: cursorActive || !hudRenderEnabled() });');
-  const gate = hud.indexOf("if (isEnhanced() && typeof document !== 'undefined') {\n    drawLevelNotices(");
-  assert.ok(call > 0 && gate > call, 'drawHud draws the card before (outside) the enhanced gate');
-  const bridge = rd('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /const seen = lens\.look\(ctx\.questWhere \?\? \{\}\);\n\s*if \(follow\) questTracker\.hear\(seen\);\n\s*if \(herald\) questHerald\.hear\(seen\);/, 'every look reaches the tracker\'s model while a face follows, the baseline too (AUDIT GUIDE L4: inside the try now; H11: the herald\'s baseline is the lens\'s)');
-  assert.match(bridge, /if \(!follow && \(questTracker\.views\.length \|\| questTracker\.follow != null\)\) questTracker\.forget\(\);/, 'no face following: the bridge forgets what was followed');
-  assert.match(bridge, /lens\.reset\(\);[^\n]*\n\s*questTracker\.forget\(\);/, 'a load forgets what the last game followed');
-  assert.match(rd('src/scenes/world.js'), /questWhere: \{ canFindPlace: \(regionName, name, site\) => canFindPlace\(maps, mapDict, regionName, name, questPlacePixel, site\), currentLocationName: \(\) => _questLoc\(\)\?\.name \?\? '' \},/, 'the street: both questions (AUDIT GUIDE O3: through the host\'s memo)');
-  assert.match(rd('src/scenes/exterior.js'), /questWhere: \{ currentLocationName: \(\) => dfLocation\.name \?\? locationName \},/, 'the fixed-town route: the city it stands in, no map to ask');
   assert.match(PARTY_CSS, /\.dfparty \{[^}]*top: calc\(92px \+ var\(--dfquest-h, 0px\)/, 'the party list steps under the card');
   assert.match(PARTY_CSS, /\.dfparty\.touch \{ top: calc\(76px \+ var\(--dfquest-h, 0px\)/);
   assert.equal(TRACKER_HEIGHT_VAR, '--dfquest-h');

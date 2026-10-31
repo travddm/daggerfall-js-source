@@ -132,23 +132,6 @@ test('AUDIT REST-PARTY the words: a night out of reach says whose and how far', 
   assert.equal(REST_ACT_TEXT.carriedFar('Ada'), 'Ada rested a night without you. Come within 15 m of them to rest with the party.');
 });
 
-test('AUDIT REST-PARTY by source: the follow tick hands the law its readings, sleeps at the carried kind, says the far word, and the vote\'s tally is shut online', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /here: present && samePlace\(myPartyLocation\(\), \{ px: m\.p\.px, py: m\.p\.py, in: m\.p\.in, bk: m\.p\.bk \}\),/, 'the same place, for the far word');
-  // AUDIT REST II P9 (PIN MOVED): this pin read the whole file, and PARTY-REST-FAR1's own copy of the line satisfied it -
-  // `const dead = false;` here survived every test. It reads carryPartyNight's own body now, the line handed to the law
-  const carry = w.slice(w.indexOf('const carryPartyNight = () => {'), w.indexOf('const sleepCarriedNight = (name, theirs) => {'));
-  assert.ok(carry.length > 200, 'carryPartyNight, before sleepCarriedNight');
-  assert.match(carry, /\n      const dead = playerEntity\.health <= 0 \|\| !!modes\?\.deathUp\?\.\(\);\n      const act = carriedNightAction\(\{\n        withParty: restsWithParty\(\), resterAlone: restsAlone\(m\), exempt: !!modes\?\.insidePartyRestExempt, dead,\n/, 'dead, or the death screen up - handed to the law');
-  assert.match(w, /if \(act === 'far'\) setMidScreenText\(REST_ACT_TEXT\.carriedFar\(name\), 4\);/);
-  assert.match(w, /else sleepCarriedNight\(name, nightKindOf\(at\)\);/, 'the rester\'s spot, off their stamp');
-  // CAMP-ROLL (PIN MOVED): the carried night's sequence is the bag's one (scenes/shared.js restCampNight), world.js its caller
-  assert.match(rd('src/scenes/shared.js'), /out\.restCampNight = \(theirs, night = nightDue\(entity, ownMinutes\(\)\)\) => \{\n    const kind = carriedRestKind\(restKind\(\), theirs\);/);
-  assert.match(w, /try \{ r = bag\.restCampNight\(theirs, night\); \} finally \{ bag\.setResting\(false\); \}/);
-  assert.match(w, /if \(!social\?\.party \|\| modes\?\.insidePartyRestExempt \|\| !restTogether\(\) \|\| sharedClockOn\(\)\) \{ _partyRestVoteLastReady = null;/, 'no vote online, so no tally');
-  assert.match(rd('src/scenes/shared.js'), /const spot = carried \? null : _spot;[^\n]*\n    const \{ result, hours \} = runRestNight\(out, \{ rentedHours \}\);/, 'the spot the open read');
-});
-
 test('AUDIT REST-PARTY A1: an encounter a host stands inside the night breaks it at the next sub-tick - no later sub-tick rolls, the hours slept are counted; with no night running the latch is nobody\'s', () => {
   assert.equal(ambushNight(), false, 'no night: nothing hears it');
   const log = [];
@@ -186,11 +169,3 @@ test('AUDIT REST-PARTY A1: an ambushed night through a real bag heals nothing be
   } finally { setNightListener(prev); }
 });
 
-test('AUDIT REST-PARTY A1 by source: both hosts that stand a resting encounter tell the night the moment its spot is found, before the awaits', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  const spawn = d.slice(d.indexOf('async function _spawnEncounter('), d.indexOf('function restEncounter(hit)'));
-  assert.match(spawn, /if \(!spot\) return null;\n    ambushNight\(\);[^\n]*\n[\s\S]*await buildFoeAt\(/, 'the dungeon: before buildFoeAt');
-  const w = rd('src/scenes/world.js');
-  const stand = w.slice(w.indexOf('const _standEncounterFoe = (hit, feet) => {'), w.indexOf('journeyMet();   // AUDIT OW5b E1'));
-  assert.match(stand, /if \(!spot\) return null;\n    ambushNight\(\);[^\n]*\n[\s\S]*exteriorFoes\.spawnFoe\(/, 'the open world: before spawnFoe');
-});

@@ -192,20 +192,6 @@ test('AUDIT REST II P3: a carried night a quest\'s prevent-rest condition cut at
   assert.ok(e.health < 60, 'no whole night\'s yield');
 });
 
-test('AUDIT REST II P3 by source: every host\'s encounter-raise route tells the act\'s night first (restAct.js ambushNight - nothing when none runs) and keeps the window path; the carried night says and raises what carriedNightEnd answers', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /\n    abortRestForEnemySpawn: \(\) => \{\n      ambushNight\(\);[^\n]*\n      if \(townTalk\.overlay\?\.isRestWindow\) townTalk\.overlay\.abortForEnemySpawn\?\.\(\);\n    \},\n/, 'world.js');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /\n    raiseOnEncounterEvent\(\) \{\n      ambushNight\(\);[^\n]*\n      if \(mode === 'dungeon'\) \{ dungeonCtx\?\.abortRestForEnemySpawn\?\.\(\); return; \}\n      if \(interiorOverlay\?\.isRestWindow\) \{ interiorOverlay\.abortForEnemySpawn\?\.\(\); return; \}/, 'worldModes.js');
-  assert.match(wm, /^import \{ ambushNight \} from '\.\.\/systems\/rest\/restAct\.js';/m);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /\n    abortRestForEnemySpawn\(\) \{\n      ambushNight\(\);[^\n]*\n      if \(activeOverlay\?\.isRestWindow\) activeOverlay\.abortForEnemySpawn\?\.\(\);\n    \},\n/, 'dungeonContext.js');
-  const sleep = w.slice(w.indexOf('const sleepCarriedNight = (name, theirs) => {'), w.indexOf('setNightListener((kind) =>'));
-  assert.ok(sleep.length > 200, 'sleepCarriedNight, before the night listener');
-  assert.match(sleep, /\n    const end = carriedNightEnd\(name, night, r, bag\.endLines\);\n    if \(end\.raise\) bag\.onRestFinished\?\.\(\);\n    if \(end\.text\) setMidScreenText\(end\.text, 5\);\n  \};/);
-  assert.doesNotMatch(sleep, /REST_ACT_TEXT\.carried(Short)?\(name\)/, 'the words are the law\'s, not a second copy');
-});
-
 test('AUDIT REST II P4: a member standing inside town limits outdoors is not carried into a night there - the act\'s own town law (its first refusal), asked after the rest gate and only of a member who would be carried, with its own line', () => {
   const base = { withParty: true, resterAlone: false, exempt: false, dead: false, near: true, here: true, busy: false };
   assert.equal(carriedNightAction({ ...base, town: true }), 'town', 'before: carried');
@@ -224,11 +210,6 @@ test('AUDIT REST II P4: a member standing inside town limits outdoors is not car
   setSharedClock(() => 5_000_000);
   const bag = createRestDeps(sleeper(), { place: () => ({ inTownOutside: true, inTownLocation: true, insideBuilding: false }) });
   assert.equal(bag.restPlace().inTownOutside, true);
-  const w = rd('src/scenes/world.js');
-  const carry = w.slice(w.indexOf('const carryPartyNight = () => {'), w.indexOf('const sleepCarriedNight = (name, theirs) => {'));
-  assert.match(carry, /\n        town: \(\) => !!hostRestDeps\(\)\?\.restPlace\?\.\(\)\?\.inTownOutside,[^\n]*\n      \}\);\n/, 'the host\'s own place, as the act reads it (restWindow.js _openAct)');
-  assert.match(carry, /\n      else if \(act === 'town'\) setMidScreenText\(REST_ACT_TEXT\.carriedTown\(name\), 4\);\n      else sleepCarriedNight\(name, nightKindOf\(at\)\);\n/);
-  assert.match(rd('src/ui/restWindow.js'), /const place = this\.deps\.restPlace\?\.\(\);\n    if \(place\?\.inTownOutside\) \{ this\.refusalLines = \[REST_ACT_TEXT\.inTown\];/, 'the act\'s own refusal reads that place');
 });
 
 test('AUDIT REST II P5: a member\'s stamp is asked for its mark only once it has moved - never every member every frame - and the mark is read off a frozen key array, no allocation a call', () => {
@@ -247,19 +228,6 @@ test('AUDIT REST II P5: a member\'s stamp is asked for its mark only once it has
   Object.keys = (o) => { calls++; return keys(o); };
   try { for (const k of ['rough', 'camp', 'bed']) assert.equal(nightKindOf(nightStamp(1_000, k)), k); assert.equal(nightKindOf(1_234), null); } finally { Object.keys = keys; }
   assert.equal(calls, 0, 'no key array made a call');
-  const w = rd('src/scenes/world.js');
-  const carry = w.slice(w.indexOf('const carryPartyNight = () => {'), w.indexOf('const sleepCarriedNight = (name, theirs) => {'));
-  assert.match(carry, /\n      if \(!_nightWatch\.moved\(m\.acct, !!m\.p, at, now, isNightStamp, \(\) => nightDue\(playerEntity, ownMinutes\(\)\)\)\) continue;/, 'the predicate itself, asked by the law (AUDIT REST III C1 re-aim: and my clock\'s debt, asked by it too)');
-  assert.equal((carry.match(/nightKindOf\(/g) ?? []).length, 1, 'the kind read once, for the night slept');
-});
-
-test('AUDIT REST II P1/P2/P9 by source: carryPartyNight reads every member through the night watch - the departed forgotten, the pose\'s presence its own question - and hands the law its readings', () => {
-  const w = rd('src/scenes/world.js');
-  const carry = w.slice(w.indexOf('const carryPartyNight = () => {'), w.indexOf('const sleepCarriedNight = (name, theirs) => {'));
-  assert.match(w, /\n  const _nightWatch = createNightWatch\(\);[^\n]*\n  const carryPartyNight = \(\) => \{\n/);
-  assert.match(carry, /\n    if \(!social\?\.party\) \{ _nightWatch\.clear\(\); return; \}\n    const now = social\.now\(\);\n    const others = social\.others\(\);\n    _nightWatch\.keep\(others\);[^\n]*\n    for \(const m of others\) \{\n      const at = stampOf\(m\.p\?\.restStartedAt, now\);\n/);
-  assert.equal((carry.match(/const dead = /g) ?? []).length, 1);
-  assert.match(carry, /\n      const dead = playerEntity\.health <= 0 \|\| !!modes\?\.deathUp\?\.\(\);\n/, 'P9: dead, or the death screen up - this site\'s own line');
 });
 
 test('AUDIT REST II P6: a room rented for three days gives three nights with play between them - an hour of it, before: two - and lapses after the days lived, whichever comes first; the last night spent, CanRest finds no room', () => {

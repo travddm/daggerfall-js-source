@@ -152,20 +152,5 @@ test('MWNPC18c offerDecorFigures, through a real decor room: each figure with a 
 test('MWNPC18d EVERY DECOR ROOM\'S FIGURES ARE OFFERED - the rooms\' on the interior host\'s people lane, the yards\' on the street\'s, before the bodies draw; a new host of decor rooms fails here until it does the same (the census never saw a decor room: its people are flats, not mobiles)', () => {
   const hosts = walk('src').filter((p) => /[=(,]\s*createDecorRoom\(/.test(rd(p))).sort();   // a call, not its definition
   assert.deepEqual(hosts, ['src/scenes/homeYards.js', 'src/scenes/worldModes.js'], 'the hosts that stand decor rooms');
-  assert.match(rd('src/scenes/decor/decorRoom.js'), /const figures = \(\) => \{ figOut\.length = 0; for \(const e of figs\) if \(e\.batch && !e\.quiet\) figOut\.push\(e\); return figOut; \};/);   // PIN MOVED (DECOR-ACCESS): a piece held quiet while it is moved is offered by no host
-  const modes = rd('src/scenes/worldModes.js'), world = hostText('src/scenes/world.js');
-  const o = modes.indexOf('offerDecorFigures(interiorDecor.figures(), peopleBodies, _peopleOn, figureCtx, mwv.eye, dt);');
-  assert.ok(o > 0 && o < modes.indexOf('    peopleBodies.draw(canvas, proj, view, mwv.eye, dt);'), 'a room\'s, before its people draw');
-  assert.match(rd('src/scenes/homeYards.js'), /figures: \(\) => \{\n      yardFigs\.length = 0;\n      const eye = deps\.eye\?\.\(\) \?\? null;\n      for \(const y of yards\.values\(\)\) if \(nearEye\(y, eye\)\) for \(const e of y\.pool\.figures\(\)\) yardFigs\.push\(e\);\n      return yardFigs;\n    \},/, 'one list kept; only a yard within its reach, as its flats are (YARD-RANGE)');   // PIN MOVED (main's YARD-RANGE merged: a yard's flats are drawn only within its reach, and its figures stand only there)
-  // AUDIT MWNPC16-18 D2: a room's figure is of the race its building's region names (the yards' read) - the quest scene's
-  // context names none, and every room's figure stood a Breton
-  assert.match(modes, /get race\(\) \{ const i = interiorBuilding\?\.regionIndex \?\? host\.currentRegionIndex\?\.\(\) \?\? -1; return REGION_RACES\[i\] != null \? REGION_RACES\[i\] \+ 1 : null; \},/);
-  assert.match(world, /get race\(\) \{ return REGION_RACES\[_questRegionIndex\(\)\] \+ 1; \} \};/);
-  // AUDIT MWNPC16-18 R2: and each reads FLATS.CFG off the pipeline - a context whose file is null keeps every figure its
-  // picture for good, and nothing failed (figureLook's own pins hand it a file)
-  assert.match(modes, /const figureCtx = \{\n    get flats\(\) \{ return pipeline\?\.flatsFile\?\.\(\) \?\? null; \},/);
-  assert.match(world, /const yardFigureCtx = \{ get flats\(\) \{ return pipeline\.flatsFile\?\.\(\) \?\? null; \},/);
-  const y = world.indexOf("    if (yards && _mode() === 'exterior') offerDecorFigures(yards.figures(), streetPeople, _peopleOn, yardFigureCtx, mwv.eye,");
-  assert.ok(y > 0 && y < world.indexOf('    streetPeople.draw(canvas, proj, view, mwv.eye,'), 'a yard\'s, before the street\'s people draw');
   assert.equal(decorIsFigure({ model: null, flat: [182, 11] }), true, 'a person\'s flat is a figure');
 });

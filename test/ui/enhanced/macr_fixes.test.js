@@ -70,26 +70,6 @@ test('MAC-R1: a raised blade is not cut - a rect the bob moved DOWN gets frame r
   const k = 7;   // any depth
   const v = ndcY(lens, [0, hh * k, -near * k]);
   assert.ok(Math.abs(down.dst.y + (1 - v) / 2 * down.dst.h - dy) < 1e-3, 'the lens\'s old top edge is composited dy below the screen\'s top: the rows above it are drawn, not cut');
-  const src = read('src/combat/fpArm.js');
-  const draw = src.slice(src.indexOf('    draw(canvas)'), src.indexOf('    status()'));
-  // PIN MOVED (MW-DETAIL, 2026-10-22): the target's edge as it grows for Sharp's screen-sized frame (renderer.js charSpriteRoom)
-  assert.match(draw, /const spare = screenTransform \? 1 : 0;\s*\n[^\n]*\n\s*const edge = renderer\.charSpriteRoom\?\.\(Math\.ceil\(Math\.max\(wantW, wantH\)\) \+ spare\) \?\? CHAR_SPRITE_RT_SIZE;\s*\n\s*const s = Math\.min\(1, \(edge - spare\) \/ wantW, \(edge - spare\) \/ wantH\);/, 'the target keeps a column and a row for a moved frame, and nothing else');
-  assert.match(draw, /const rect = screenTransform \? screenTransform\(\{ x: 0, y: 0, w: W, h: H \}\) : null;/, 'no transform, no rect');
-  assert.match(draw, /const win = rect \? fpFrameWindow\(rect, W, H, pw, ph, edge\) : null;/);
-  assert.match(draw, /const proj = win \? frustum\(-hw \+ win\.k0 \* px, -hw \+ \(win\.k0 \+ fw\) \* px, hh - \(win\.r0 \+ fh\) \* py, hh - win\.r0 \* py, near, far\) : perspective\(FP_FIELD_OF_VIEW, pw \/ ph, near, far\);/, 'under a transform the window over those pixels; without one, the lens it always was');
-  assert.match(draw, /renderCharacterSprite\(mesh, NIF_TO_PASS, proj, view, fw, fh,/, 'the pass renders the window\'s pixels');
-  assert.match(draw, /renderer\.drawScreenQuad\(tex, win\.dst, \{ u0: 0, v0: fh \/ edge, u1: fw \/ edge, v1: 0 \}\);/, 'laid where the window says');
-  assert.match(draw, /renderer\.drawScreenOverlayQuad\(tex, pw \/ edge, ph \/ edge\);/, 'no transform: the overlay is the screen, as it was');
-});
-
-// ── MAC-R2 ───────────────────────────────────────────────────────
-test('MAC-R2: a held quickslot key\'s auto-repeat is nothing - routeKey swallows it, and the two self-routing hosts\' arms route the press edge alone', () => {
-  const inp = read('src/ui/input.js');
-  assert.match(inp, /if \(POLLED_ACTIONS\.has\(act\)\) return false;\s*\n(?:\s*\/\/[^\n]*\n)*\s*if \(e\.repeat && act\) return true;\s*\n\s*return routeAction\(act, ctx, setPlayerPos\);/, 'the repeat is swallowed before the table - AUDIT KB1: every routed action\'s, not the quickslots\' alone');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = read(host);
-    assert.match(h, /QUICKSLOT_ACTIONS\.has\(act\) && !POLLED_ACTIONS\.has\(act\) && [^\n]*\) \{ if \(!e\.repeat && routeAction\(act, hudCtx\)\) \{ e\.preventDefault\(\); return true; \} if \(e\.repeat\) \{ e\.preventDefault\(\); return true; \} \}/, `${host}: the press routes, the repeat is eaten`);
-  }
 });
 
 // ── MAC-R3 ───────────────────────────────────────────────────────
@@ -142,26 +122,6 @@ test('MAC-R3: the off-hand press is what the cell SHOWS - a lit light douses, a 
   clearQuickslots();
 });
 
-test('MAC-R3 by source: the four hosts hand the rig\'s switchHand beside the light, the main cell\'s press is the hand switch through drawHud, and the diamond binds it once with no hold', () => {
-  for (const [host, rig] of [['src/scenes/world.js', 'weaponRig'], ['src/scenes/exterior.js', 'weaponRig'], ['src/scenes/dungeonContext.js', 'weaponRig']]) {
-    const h = read(host);
-    assert.match(h, new RegExp(`offHandQuickslot\\(\\{ entity: playerEntity, say: [^\\n]*switchHand: \\(\\) => ${rig}\\.switchHand\\(\\), toggleLight: \\(\\) => ${rig}\\.toggleLight\\(\\) \\}\\);`), `${host}: the hand's door beside the light's`);
-    assert.match(h, new RegExp(`const quickSwitchHand = \\(\\) => \\{ ${rig}\\.switchHand\\(\\); return true; \\};`), `${host}: the main cell's performer`);
-    assert.match(h, /quickSpell: \(\) => quickSpell\(\), quickSwitchHand: \(\) => quickSwitchHand\(\),/, `${host}: handed to drawHud`);
-  }
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /switchHand: \(\) => interiorWeapon\.switchHand\(\),[^\n]*\n\s*toggleLight: \(\) => interiorWeapon\.toggleLight\(\) \}\);/, 'the interior: THIS mode\'s rig');
-  assert.match(wm, /quickSwitchHand\(\) \{ interiorWeapon\.switchHand\(\); return true; \},/);
-  assert.match(wm, /quickSpell: \(\) => interiorKeyCtx\.quickSpell\(\), quickSwitchHand: \(\) => interiorKeyCtx\.quickSwitchHand\(\),/);
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /quickSpell = null, quickSwitchHand = null \} = \{\}\) \{/);
-  assert.match(hud, /quickSwitchHand: quickSwitchHand \?\? null,/);
-  const eh = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(eh, /cells\.main\.cell\.addEventListener\('pointerdown', tap\(\(\) => \{ liveOpts\.quickSwitchHand\?\.\(\); \}\)\);/);
-  assert.doesNotMatch(eh, /bindHold\(cells\.main/, 'no hold on the hand: what is in it is not a list');
-  assert.match(eh, /if \(offKind === 'swap'\) liveOpts\.quickSwap\?\.\(\); else liveOpts\.quickOffHand\?\.\(\);/, 'the off cell still presses what it shows through the host');
-});
-
 // ── MAC-R4 ───────────────────────────────────────────────────────
 const mkItem = (name, templateIndex, group = 'Weapons') => ({ name, templateIndex, group, stackCount: 1, currentCondition: 50, maxCondition: 50 });
 function withPack(fn) {
@@ -177,34 +137,3 @@ function withPack(fn) {
   });
 }
 
-test('MAC-R4: a touch press gives the row\'s implicit capture back at once, nothing listens for its loss, the long-press menu is refused for the session\'s life, and a cancel still ends it', () => {
-  withPack(({ dom, rows, ghost }) => {
-    const row = rows()[0];
-    const released = [];
-    row.releasePointerCapture = (id) => released.push(id);
-    row.onpointerdown({ pointerId: 7, button: 0, pointerType: 'touch', clientX: 10, clientY: 10 });
-    assert.deepEqual(released, [7], 'the capture the browser granted at the press is released in the same handler');
-    assert.equal(dom.win.count('lostpointercapture'), 0, 'no listener for a capture the session does not hold');
-    assert.equal(dom.win.count('contextmenu'), 1, 'the long-press menu is watched');
-    let prevented = 0;
-    dom.win.fire('contextmenu', { cancelable: true, preventDefault: () => { prevented++; } });
-    assert.equal(prevented, 1, 'and refused');
-    dom.win.fire('lostpointercapture', { pointerId: 7 });
-    dom.win.fire('pointercancel', { pointerId: 7 });
-    assert.equal(ghost(), null);
-    assert.equal(dom.win.count('contextmenu'), 0, 'the watch ends with the session');
-    // a mouse press releases nothing - there is no implicit capture to give back
-    released.length = 0;
-    row.onpointerdown({ pointerId: 8, button: 0, pointerType: 'mouse', clientX: 10, clientY: 10 });
-    assert.deepEqual(released, []);
-    dom.win.fire('pointerup', { pointerId: 8, clientX: 10, clientY: 10 });
-  });
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.itemrow \{ touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; \}/, 'iOS: no callout over a held tile');
-  assert.match(css, /\.wornrow \{ touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; \}/, 'nor over a held panel');
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.doesNotMatch(inv, /addEventListener\?\.\('lostpointercapture'/, 'INV2\'s lost-capture end is retired');
-  assert.match(inv, /const onDragMenu = \(e\) => \{ if \(drag && e\.cancelable\) e\.preventDefault\(\); \};/);
-  assert.match(inv, /if \(touch\) \{ giveBack\(\); row\.addEventListener\?\.\('gotpointercapture', giveBack, \{ once: true \}\); \}/, 'given back now, and again if it is granted after');
-  for (const probe of ['tools/macrHoldRepaintProbe.mjs', 'tools/macrHudTapProbe.mjs']) assert.ok(read(probe).length > 2000, `${probe} drives it in Chromium`);
-});

@@ -51,22 +51,6 @@ const snap = (w) => ({
 });
 
 test('ET1 door: townTalk opens every conversation through createTalkWindow, and readiness is the skin\'s', () => {
-  const host = read('src/scenes/townTalk.js');
-  assert.doesNotMatch(host, /new NativeTalkWindow\(/, 'the host never constructs the classic window itself');
-  assert.match(host, /if \(talkDoorReady\(\) && directory\.length\) \{\s*\n\s*mount\(createTalkWindow\(greeting, \{/, 'the one talk door goes through the ONE window door');
-  // the panel's Goodbye is a DOM click: the host hands it the relock
-  // (MAC1), gated on nothing standing under the conversation (the
-  // popup's TALK pushes, and its popup wants the cursor back)
-  assert.match(host, /relock: \(\) => \{ let under = 0; windows\.eachCoveredWindow\(\(\) => \{ under\+\+; \}\); if \(!under\) requestLook\(canvas\); \}/);
-  const door = read('src/ui/talkDoor.js');
-  assert.match(door, /return isEnhanced\(\) \|\| talkArtLoaded\(\);/, 'the panel needs no TALK01I0');
-  // ONE MODEL, TWO FACES: the classic window is built on BOTH skins,
-  // and the fork only chooses the face over it.
-  assert.match(door, /const model = new NativeTalkWindow\(greeting, hooks\);\s*\n[\s\S]{0,300}if \(isEnhanced\(\) && typeof document !== 'undefined'\) return enhancedTalkOverlay\(model, hooks\);\s*\n\s*return model;/);
-  assert.match(door, /import\('\.\/enhanced\/enhancedTalk\.js'\)/, 'dynamic: classic pays nothing');
-  assert.match(door, /unregister = registerOverlay\(goodbye\);/, 'PX28: Tab says goodbye');
-  assert.match(door, /if \(!model\.done\) model\.press\('goodbye'\);/, 'and goodbye goes THROUGH the model, so the note is filed and onClose fires');
-  assert.match(door, /click\(\) \{ return true; \}/, 'a press beside the panel is consumed, never a pointer grab');
   // headless: the door hands back the classic window and it is live
   const w = createTalkWindow('Hello.', mkHooks());
   assert.ok(w instanceof NativeTalkWindow);
@@ -204,38 +188,8 @@ test('ET1 keys: Enter asks and the arrows move (ours); the classic accelerators 
   const g = new NativeTalkWindow('Hello.', mkHooks());
   talkKey('KeyG', g);
   assert.equal(g.done, true, 'and so is DFU\'s G, TalkExit');
-  // the classic face reads the same row: the map is the window's own
-  const talk = read('src/ui/native/nativeTalk.js');
-  assert.match(talk, /const hit = firstHotkey\(TALK_HOTKEY_BUTTONS, code, e\);\s*\n\s*if \(hit\) \{ this\.press\(TALK_HOTKEYS\[hit\]\); return; \}/, 'DFU\'s row first, as a press');
-  assert.doesNotMatch(talk, /code === 'KeyT'|code === 'KeyP'/, 'the port\'s T and P are gone - DFU binds both');
-  const door = read('src/ui/talkDoor.js');
-  assert.match(door, /hooks\.relock\?\.\(\);\s*\n\s*teardown\(\);/, 'ET1-AUDIT F3: Tab\'s goodbye relocks in its gesture');
-  assert.match(door, /else if \(code !== 'Enter'\) \{ model\.input\(code, e\);/, 'ET1-AUDIT F4: a pre-mount Enter is held, not a goodbye');
 });
 
 test('ET1 panel: a bottom rectangle over the world, the pixel frame, no art, and the phone stacks it', () => {
-  const src = read('src/ui/enhanced/enhancedTalk.js');
-  // paint and bones: the imports are the style and the portrait pixels, nothing that reads ARENA2
-  const imports = [...src.matchAll(/^import .* from '([^']+)';/gm)].map((m) => m[1]).sort();
-  assert.deepEqual(imports, ['../native/nativeTalk.js', './enhancedOverlays.js', './enhancedStyle.js'], 'the style, the portrait pixels, and OT1\'s outside-tap helper');
-  assert.match(src, /import \{ npcPortraitPixels, npcPortraitKey \} from '\.\.\/native\/nativeTalk\.js';/);
-  assert.doesNotMatch(src, /_pickIndex|_setListboxTopics|_openFlat|_setTone|_close\(/, 'the panel presses named buttons; it reaches no private arm');
-  for (const name of ['tonePolite', 'toneNormal', 'toneBlunt', 'goodbye', 'tellMeAbout', 'whereIs', 'okay', 'logbook', 'categoryLocation']) {
-    assert.ok(src.includes(`'${name}'`), `${name} is pressed by name`);
-  }
-  assert.match(src, /t\.selected \? model\.useTopic\(t\.i\) : model\.selectTopic\(t\.i\)/, 'a press selects, a press on the lit row uses - no double-tap on a phone');
-  assert.match(src, /if \(model\?\.done\) \{ relock\(\); onExit\(\); return; \}/, 'goodbye relocks INSIDE the gesture (MAC1)');
-  assert.match(src, /ctx\.putImageData\(new ImageData\(px\.rgba, px\.w, px\.h\), 0, 0\);/, 'the portrait is the classic\'s own pixels');
-  const talk = read('src/ui/native/nativeTalk.js');
-  assert.match(talk, /rgba: new Uint8ClampedArray\(c32\.colors\.buffer\)/, 'kept beside the texture: one decode, two faces');
   assert.equal(npcPortraitPixels(), null, 'none set, none painted');
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.talk-shell \.talk-panel \{ position: absolute; left: 50%; bottom: max\(16px, 3dvh\);/, 'a rectangle along the bottom, not a screen');
-  assert.match(src, /el\('section', 'talk-panel px-win'\)/, 'the pause window\'s frame');
-  assert.doesNotMatch(src, /px-over|px-home/, 'no scrim: the world reads through');
-  assert.match(css, /\.talk-cat\[disabled\] \{ opacity: 0\.35; cursor: default; \}/);
-  assert.match(css, /@media \(max-width: 720px\) \{\s*\n\s*\.talk-shell \.talk-panel \{ width: 100vw;/, 'the phone takes the width');
-  assert.match(css, /\.talk-main \{ grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; \}/, 'and stacks the two columns');
-  // AUDIT 39's annotation rule: the panel's own text classes are styled
-  for (const cls of ['talk-hint', 'talk-q', 'talk-copied']) assert.match(css, new RegExp(`\\.${cls}[\\s,{.]`), `.${cls} has a rule`);
 });

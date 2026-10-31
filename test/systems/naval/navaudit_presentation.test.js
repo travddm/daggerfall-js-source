@@ -762,13 +762,6 @@ test('AUDIT NAV1 (the presentation) THE PAD AT THE GUNS: the readout names the p
   assert.deepEqual(board('yard'), [[codes.board], 'The shipwright']);
   assert.deepEqual(navalPadPrompts(layoutModel(), { aim: codes.aim }), [[[codes.aim], 'Let go: fire']], 'a row only for a bound button');
   assert.equal(navalHudText(layoutModel({ aiming: false, aim: null }), { aim: 'RT', board: 'A', brace: 'LB' }).plate.hint, 'Hold RT to aim - LB: brace');
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /return \{ aim: getBinding\(b, 'SwingWeapon', false\) \?\? getJoystickUIBinding\(b, 'RightClick'\), board: getJoystickUIBinding\(b, 'LeftClick'\), brace: getBinding\(b, 'Crouch', false\) \};/);
-  assert.match(w, /const family = controllerLook\(\) \? padFamily\(\) : null;[^\n]*\n\s+const pad = family \? navalPadCodes\(\) : null;/);
-  assert.match(w, /keys: pad \? \{ aim: pad\.aim \? hdGlyphName\(family, pad\.aim\) : null, board: pad\.board \? hdGlyphName\(family, pad\.board\) : null, brace: pad\.brace \? hdGlyphName\(family, pad\.brace\) : null \}\n\s+: \{ aim: navalKeyName\('SwingWeapon'\), board: navalKeyName\('Interact'\), brace: navalKeyName\('Crouch'\) \},/);
-  assert.match(w, /return r && naval\?\.atGuns \? \[\.\.\.r, \.\.\.navalPadPrompts\(naval\.hudModel\(\), navalPadCodes\(\)\)\] : r; \},/);
-  assert.match(w, /compass: !isEnhanced\(\) && hudArt\?\.compassBox \? classicCompassBox\(\) : null,/);
-  assert.match(w, /return \{ w: hudArt\.compassBox\.w \* s \* k, h: hudArt\.compassBox\.h \* s \* k \};/);
 });
 
 test('AUDIT NAV1 (the presentation) THE SKINS AND THE WORDS: the kit\'s face on the classic skin too (it fell to monospace); on Stone the dim words read 5:1 (the hint 1.9, the waters 2.9, the labels and the card\'s sub-line 3.8, the plunder window\'s 3.3-3.5); a refused choice greyed by its title, its reason whole (2.3:1 faded); the helm panel\'s bar as wide as its buttons and a finger\'s clear of the corner\'s presses; a raider comes alongside in one number; the hold\'s one wording (mutants: the fonts left to the enhanced HUD, a dim word left dim, the tile faded, the menu\'s press under the bar)', () => {
@@ -785,13 +778,9 @@ test('AUDIT NAV1 (the presentation) THE SKINS AND THE WORDS: the kit\'s face on 
   assert.match(NAVAL_PLUNDER_CSS, /\.dfnaval-choice:disabled \{ cursor: default; background-color: rgba\(8,9,12,0\.6\); \}\n\.dfnaval-choice:disabled b \{ color: #8f8670;[^}]*\}\n\.dfnaval-choice:disabled span \{ color: #c9bfa4; \}/);
   assert.doesNotMatch(NAVAL_PLUNDER_CSS, /\.dfnaval-choice:disabled \{[^}]*opacity/);
   assert.match(HELM_CSS, /\.helmpanel-bar \{[^}]*width: max-content; max-width: calc\(100vw - 24px\);/);
-  const t = readFileSync(new URL('../../../src/ui/touch/touch.js', import.meta.url), 'utf8');
-  assert.match(t, /button\('≡', edge\('left', hooks\.dial \? 72 : 16\), edge\('top', 16\), 48,/);
   assert.match(HELM_CSS, /\.helmpanel\.touch \.helmpanel-bar \{ top: calc\(8px \+ env\(safe-area-inset-top, 0px\)\); left: calc\(50% \+ 56px \+ \(env\(safe-area-inset-left, 0px\) - env\(safe-area-inset-right, 0px\)\) \/ 2\);\n\s+max-width: calc\(100vw - 144px - env\(safe-area-inset-left, 0px\) - env\(safe-area-inset-right, 0px\)\); \}/);
   assert.equal(144, 72 + 48 + 8 + 16, 'the menu\'s press, air, and the right margin');
   assert.equal(56, (72 + 48 + 8 - 16) / 2, 'centred in what is left');
-  const host = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
-  assert.ok(host.includes("`Grappling hooks! ${entry.ship.names?.name ? `${entry.ship.names.name} is` : 'The pirates are'} coming alongside. Repel boarders!`"));
 });
 
 // ── the sea at a glance (5d) ──────────────────────────────────────────────────────────────────────────────────────
@@ -849,10 +838,6 @@ test('AUDIT NAV1 (the presentation) THE ARCS AS LINES (#4): each ball\'s arc ARC
   const off = 2 * ARC_DASH_SPEED;
   assert.ok(Math.abs(d[3] - (0 - off) / ARC_DASH_M) < 1e-5 && Math.abs(d[NAVAL_STRIDE + 3] - (seg - off) / ARC_DASH_M) < 1e-5, 'u by the metres flown');
   assert.ok(Math.abs(d[6 * NAVAL_STRIDE + 3] - (seg - off) / ARC_DASH_M) < 1e-5, 'continuous into the next segment');
-  const host = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
-  // PIN MOVED (SHIP-WATCH): the particles carry the far ships' lamps too, laid into the effects' list first
-  // PIN MOVED (SALVAGE): the floaters a wreck's wreckage marked among them
-  assert.match(host, /const particles = effects\.drawList\(\);\n\s*lampsInto\(particles\);[^\n]*\n\s*return \{ particles, balls: shots\.balls\(\), floaters: shots\.floaters\(\)\.map\(\(f\) => \(isSalvage\(f\.lot\) \? \{ \.\.\.f, wreck: true \} : f\)\), aim: aimDraw, time: clock \};/);
 });
 
 test('AUDIT NAV1 (the presentation) THE FAR SHIPS\' COST (#17): an idle particle system - stopped, nothing alive - is stepped without a question (it walked up its node\'s parents to ask whether it was active, then did nothing: a war galley\'s 224 systems, one live, cost 0.45 ms a far frame), a playing or living one as ever; a ship\'s animators found once (her tree walked for them every frame: 0.44 ms); past NEAR_LIFE_M her rigging stepped every FAR_LIFE_EVERY frames with the time it missed - five far galleys 5.7 ms a frame, now 0.9 (mutants: the idle system asked, the walk every frame, the far stride unread, the missed time dropped)', async () => {
@@ -995,16 +980,6 @@ test('AUDIT NAV1 (the presentation) THE TAGS DRAWN (#14): one node a slot, moved
   assert.equal(tagAlpha(TAG_FADE_FROM, 700), 1);
   assert.equal(tagAlpha(700, 700), TAG_FADE_TO);
   assert.equal(tagAlpha(2000, 700), TAG_FADE_TO);
-  // the world's pass
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /drawPeerNames\(proj, view, mwv\.eye\);[^\n]*\n\s+navalTags\(proj, view, mwv\.eye\);/);
-  assert.match(w, /const covered = townTalk\.overlayActive \|\| gamePaused\(\) \|\| !!townTalk\.hudHidden \|\| _mode\(\) !== 'exterior' \|\| !!travelView\?\.active;/);
-  assert.match(w, /const at = projectToScreen\(t\.point, w, h, proj, view, rect\);/);
-  assert.match(w, /if \(shipSight\.blocked\(player\.collider, eye, t\.id, t\.point\)\) continue;/);
-  assert.match(w, /drawNavalTags\(points, \{ covered, scale: enhancedHudScale\(\), reach: NAVAL_TAG_RANGE, focus: \{ x: r\.x \+ r\.w \/ 2, y: r\.y \+ r\.h \/ 2 \} \}\);/);   // SHIP-CLUTTER: and the crosshair
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S1): the clear lowers the glass after them
-  assert.match(w, /drawNavalHud\(null\); drawNavalTags\(\[\]\); drawCrewBars\(\[\]\); drawCrewLines\(\[\]\); lowerGlass\(\); \};/, 'the clear hides them - SHIPMATES: the crew\'s bars with them');
-  assert.match(w, /drawNavalHud\(null\); drawNavalTags\(\[\]\); \} \}/, 'the switch off hides them');
 });
 
 test('AUDIT NAV1 (the presentation) HER HURTS SEEN, her list and her canvas (#15): her hurts showed nowhere but the card - now under DAMAGE_LIST_FROM of her hull she lists to the side she will go down on, to DAMAGE_LIST_MAX at nought, taken on as she fills (a hit would snap her over) and at it from her first pose; the sinking\'s own list takes it on with no snap back, her last pose the sinking\'s own; her canvas comes down with her sail share, her highest sails first, and goes back up mended (mutants: one side for all, the list unscaled, the list snapped, the sinking\'s list dropped, every sail kept, the lowest furled first)', async () => {

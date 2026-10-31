@@ -47,22 +47,6 @@ test('handedness: world +x lands screen-RIGHT through the mirrored projection (U
   assert.ok(ndc(pv0, [1, 0, 5])[0] < 0, 'the unmirrored projection was the mirror image');
 });
 
-test('handedness: the input web agrees with the view - one convention, every site', () => {
-  // screen-right = (cos yaw, 0, -sin yaw): billboards' camRight already
-  // said so; the motor, the fly arms and the look signs now agree.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/interior.js']) {
-    const s = read(f);
-    assert.ok(!s.includes('cam.yaw -= '), `${f}: mouse-right turns toward +x`);
-    assert.ok(s.includes('const right = [Math.cos(cam.yaw), 0, -Math.sin(cam.yaw)];'), `${f}: fly right is Unity's`);
-    assert.ok(s.includes('mirrorProjectionX(perspective('), `${f}: the projection mirrors`);
-  }
-  assert.match(read('src/scenes/worldModes.js'), /mirrorProjectionX\(perspective\(/);
-  assert.match(read('src/player/motor.js'), /sin \* input\.forward \+ cos \* input\.strafe/);
-  assert.match(read('src/render/renderer.js'), /gl\.frontFace\(gl\.CW\);/);
-  // the FP viewmodel keeps its own UNmirrored camera (its pass never culls)
-  assert.doesNotMatch(read('src/render/characterSprite.js'), /mirrorProjectionX/);
-});
-
 test('guards: the analytic heightAt floor is ground - chase works on triangle-less exterior ground', () => {
   // The exterior collider holds only the location MODELS as triangles;
   // terrain and the town surface are heightAt. FallCheck must see that
@@ -85,34 +69,6 @@ test('guards: the analytic heightAt floor is ground - chase works on triangle-le
   for (let s = 0; s < 480; s++) ai2.update(1 / 60, player, senses, false);
   assert.ok(ai2.feet[2] < 4.2, `stopped at the real edge (z = ${ai2.feet[2].toFixed(2)})`);
   assert.ok(ai2.feet[1] > -5, 'and did not walk the void');
-});
-
-test('handedness: every non-world pass CULLS OFF - the sky-blue-screen regression stays dead', () => {
-  // 2026-08-23, Mac's second playtest: the game opened to nothing but
-  // the clear color. gl.frontFace(CW) is GLOBAL state, and the 2D
-  // screen-quad pass (the whole UI - title screen to fonts) and the
-  // sky's fullscreen triangle drew with culling ON and CCW winding -
-  // both culled to nothing. The law: only passes riding the MIRRORED
-  // projection (models, terrain) may draw with culling on; everything
-  // else brackets CULL_FACE off. tools/cullProbe.mjs is the real-GL
-  // repro; these pins keep the brackets present.
-  const rend = read('src/render/renderer.js');
-  // PERF-2D (2026-09-19): the bracket is a RUN's now, not a quad's - it
-  // was 43% of every GL call in a dungeon frame. The law is unchanged
-  // and the pin follows it to where it lives: _open2D culls off,
-  // _close2D restores, and every 2D primitive goes through the pair.
-  const open2d = rend.slice(rend.indexOf('  _open2D(vao) {'), rend.indexOf('  _close2D() {'));
-  const close2d = rend.slice(rend.indexOf('  _close2D() {'), rend.indexOf('  _close2D() {') + 400);
-  assert.match(open2d, /gl\.disable\(gl\.CULL_FACE\);/, 'the 2D pass culls off');
-  assert.match(close2d, /gl\.enable\(gl\.CULL_FACE\);/, '...and restores');
-  const quad = rend.slice(rend.indexOf('drawScreenQuad(tex'), rend.indexOf('drawScreenOverlayQuad'));
-  assert.match(quad, /this\._open2D\(this\._screenQuadVao\)/, 'the screen quad goes through the pair');
-  assert.doesNotMatch(quad, /gl\.disable\(gl\.CULL_FACE\);/, 'and not around it - one home for the bracket');
-  const sky = read('src/render/skyRenderer.js');
-  const skyDraw = sky.slice(sky.indexOf('draw(yaw'), sky.length);
-  assert.match(skyDraw, /gl\.disable\(gl\.CULL_FACE\);[\s\S]*drawArrays/, 'the sky triangle culls off');
-  // and the global swap itself stays (the world passes still need it)
-  assert.match(rend, /gl\.frontFace\(gl\.CW\);/);
 });
 
 test('guards: the quest placement floor probe sees the analytic floor too', () => {

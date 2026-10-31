@@ -137,9 +137,4 @@ test('65 SL-4: reactionMods leaves the envelope - a five-wide legacy key never r
   // (PlayerEntity.cs:128-129; Reset() at :794-819 does not clear it).
   assert.equal(playerEntity.reactionMods.length, SOCIAL_GROUP_COUNT, 'the shared entity is BUILT with the eleven');
 
-  // (4) the source: REP_ARRAYS names the reputations ALONE
-  assert.match(read('src/systems/save/save.js'), /^const REP_ARRAYS = \['sGroupReputations'\];$/m,
-    'SerializablePlayer.cs:152-162 is the reputations\' cite and nothing else\'s');
-  assert.doesNotMatch(read('src/systems/classicSave.js'), /^\s*reactionMods:/m,
-    'and the classic import mints no snapshot key nothing reads');
 });

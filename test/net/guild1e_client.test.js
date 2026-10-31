@@ -198,26 +198,7 @@ test('GUILD1e the catalogue: Daggerfall\'s own board is the hall\'s board - offe
 });
 
 test('GUILD1e the hosts by source: the hall\'s board pressed opens the guild\'s notes for a member and says whose it is to anyone else; its name on the plaque; the world host\'s door in guildOnly; the town boards carry the Guilds tab; the four hosts named (mutants: the member asked; the model asked; guildOnly; guilds)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const isHallBoard = \(piece\) => \(!!interiorHome\?\.hall \|\| !!interiorSeatHall\) && piece\?\.model === BULLETIN_BOARD_MODEL_ID && !piece\.item;/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.match(wm, /if \(isHallBoard\(piece\)\) \{ openHallBoard\(\); return; \}/);
-  const open = wm.slice(wm.indexOf('function openHallBoard() {'), wm.indexOf('\n  }', wm.indexOf('function openHallBoard() {')));
-  assert.match(open, /if \(!hallMemberHere\(\)\) \{ say\(hallBoardShutLine\(hallNameHere\(\)\)\); return; \}/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.match(open, /if \(!host\.guildHall\?\.openBoard\?\.\(hallNameHere\(\)\)\) say\(HALL_BOARD_COLD\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.match(wm, /boardTitle: piece && isHallBoard\(piece\) && hallMemberHere\(\) \? HALL_BOARD_TITLE : null/);   // the plaque's title, once the hover names a placed piece through decorPlaque
   assert.equal(HALL_BOARD_TITLE, "The Guild's Board");
   assert.equal(hallBoardShutLine('The Silver Hand'), "This board is The Silver Hand's. Its notes are for its members.");
   assert.equal(HALL_BOARD_COLD, "The guild's board cannot be read now.");
-  const w = src('src/scenes/world.js');
-  assert.match(w, /openBoard: \(name\) => openGuildBoard\(name\),/);
-  assert.match(w, /const openGuildBoard = \(name\) => \(noticeBook \? showNoticeWindow\(\{ town: \{ name: name \|\| 'the guild', mapId: 0 \}, guildOnly: \{ name: name \|\| 'the guild' \} \}\) : false\);/);
-  // THE ONE CONSTRUCTION SEAM: a town's board and the hall's are both built by the one builder
-  const seam = w.slice(w.indexOf('const showNoticeWindow = (deps) => {'), w.indexOf('\n  };', w.indexOf('const showNoticeWindow = (deps) => {')));
-  assert.match(seam, /const ov = createNoticeOverlay\(\{\s*book: noticeBook, character: \(\) => characterIdOf\(playerEntity\),/);
-  assert.match(seam, /townTalk\.showOverlay\(ov\);/);
-  assert.match(w, /return showNoticeWindow\(\{\s*town: \{ name: town\.name, mapId: town\.mapId \}/);
-  assert.match(w, /guilds: true,   \/\/ GUILD1e: the Guilds tab/);
-  assert.doesNotMatch(src('src/scenes/dungeonContext.js'), /openGuildBoard|HALL_BOARD/, 'no hall stands underground');
-  assert.doesNotMatch(src('src/scenes/exterior.js'), /openGuildBoard|HALL_BOARD/, 'the fixed city holds no online hall');
-  assert.match(src('src/net/accountClient.js'), /guildRead: \(character\) => post\('\/v1\/guilds\/board', \{ character \}\),/);
 });

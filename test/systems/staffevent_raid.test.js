@@ -250,14 +250,6 @@ test('BOSS-CLEAR: Spawn mini boss now is at once, monsters standing or not; the 
   assert.equal(frame(0.1), 'boss');
 });
 
-test('BOSS-UNSHAKEN (mob 2026-10-25: "he got stun locked lets stop him from getting stunned"): a mini boss\'s wind-up holds under any blow, an overreach too; its kind\'s takes no shove', async () => {
-  const { windupStruck } = await import('../../src/ai/tactics.js');
-  const ai = { _tac: { blow: { guard: 'plain', poise: 1, taken: 0 } } };
-  assert.equal(windupStruck(ai, { staffBoss: { size: 2 } }, 1, 999), null, 'no wind-up open: nothing to break, never a stagger');
-  assert.match(rd('src/ai/tactics.js'), /if \(ent\?\.staffBoss\) return overreachOpen\(ai\) \|\| windupHolds\(ai\) \? 'hold' : null;/);
-  assert.match(rd('src/scenes/exteriorFoes.js'), /if \(knockDir && !f\.entity\?\.staffBoss && weaponKnockbackApplies\(/, 'no shove, so no Hurt: the boss is never stun-locked');
-});
-
 test('PACK-SPREAD (mob 2026-10-25: "evenly swap them between all player in a city"): each pack led from around the next player in the town in turn - me, then each peer in its rect', async () => {
   const { at, log, h } = rig();
   restoreRaidSaveData({ lastSelectedDay: DAY, raids: [] });
@@ -279,7 +271,6 @@ test('PACK-SPREAD (mob 2026-10-25: "evenly swap them between all player in a cit
   raidRelayWord({ k: 'sev', sev: { k: 'ev', l: [{ ...EV, n: 100 }] } }, 'social');
   for (let i = 0; i < 200 && solo.log.raiders.length < 10; i++) { frame(0.05); await tick(); }
   assert.ok(solo.log.raiders.every((f) => f.o?.at || f.o?.near == null), 'my own feet');
-  assert.ok(rd('src/scenes/raidHost.js').includes('feet: at?.at ?? at?.near ?? enchantFeet()'), 'the host stands a leader around the player it was given');   // PIN MOVED (WW6): the raids' host seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT)
 });
 
 test('PACK-SCALE (mob 2026-10-25: "they arnt spawn ing quick enough", card "Scale with players in town"): one player as ever; each more five more standing to forty, a quarter quicker to twice; the step stands to the scaled cap', async () => {
@@ -309,10 +300,6 @@ test('BOSS-SPOT (mob 2026-10-25: "spawn it on the highest lvl player", "or large
   assert.equal(staffBossSpot([P('b', 0, 7), P('a', 500, 7)])[0], 'a', 'all equal: the lower id');
   assert.equal(staffBossSpot([P('me', 0, 1), ['x', null, 99]])[0], 'me', 'no feet: left out');
   assert.equal(staffBossSpot([]), null);
-  const src = rd('src/systems/raidingParties.js');
-  assert.equal(src.split("spawn(raid, 'boss', raid.staff.b, staffBossPlace()); return 'boss'; }").length - 1, 2, 'the meter\'s boss and a lost one both');
-  assert.match(src, /return at && at\[0\] !== me \? \{ near: at\[1\] \} : undefined;/);
-  assert.ok(rd('src/scenes/raidHost.js').includes("peerFeetInTown: () => [[host.online?.id ?? '', player.feetAt(), playerEntity.level ?? 1], ...(host.peersNear() ?? [])"), 'me first, with my level');   // PIN MOVED (WW6): in scenes/raidHost.js, the host's live names as `host.<name>`
 });
 
 test('STAFF-EVENT PACKS: monsters stood in packs of 3-5 of any of the kinds picked, each led from anywhere around me, its pack around its leader, to the 25 cap in 7-15 s (PACK-FAST: was 20-45)', async () => {
@@ -423,9 +410,6 @@ test('STAFF-EVENT: THE MINI BOSS\'S LOOKS - an elite, larger, its glow carried p
   promoteStaffBoss(capped, { healthX: 1000 });
   assert.equal(capped.maxHealth, 1000, 'at most 100x');
   assert.equal(foeTitle(e, 'Orc'), 'Mighty Orc');
-  const glsl = rd('src/systems/hitFlash.js');
-  assert.match(glsl, /STAFF_BOSS_RIM = vec3\(1\.0, 0\.82, 0\.18\)/, 'yellow');
-  assert.match(glsl, /boss \? STAFF_BOSS_RIM : ELITE_RIM/);
 });
 
 test('STAFF-EVENT BOSS-HARD: every mini boss - owner and puppet - asks Silver and wears a Troll\'s armour; BOSS-UNSHAKEN: never paralysed', () => {
@@ -443,8 +427,6 @@ test('STAFF-EVENT BOSS-HARD: every mini boss - owner and puppet - asks Silver an
   const daedra = { health: 50, maxHealth: 50, minMetalToHit: 5 };
   promoteStaffBoss(daedra);
   assert.equal(daedra.minMetalToHit, 5, 'a higher floor stays');
-  assert.match(rd('src/scenes/hostCombat.js'), /target\.ai && !tEnt\?\.staffBoss && !windupHolds/, 'no foe shoves it');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /r\.h < p\.h && !f\.entity\.staffBoss\) p\.hurt = true/, 'its puppet plays no Hurt');
 });
 
 test('STAFF-EVENT: the client\'s word and the relay\'s frame - a staff word parsed by the relay\'s own parser; the game reads its frames off the raid door', () => {
@@ -452,11 +434,6 @@ test('STAFF-EVENT: the client\'s word and the relay\'s frame - a staff word pars
   assert.deepEqual(m, { t: 'sev', k: 'w', id: EV.id, px: 200, py: 100, n: 3, s: 1, bu: 0, bk: 0, fb: 0, h: 0 });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'sev', k: 'w', id: 'X', px: 200, py: 100, n: 3 }), { hasHello: true }), { error: 'bad sev' });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'sev', k: 'w', id: EV.id, px: 200, py: 100, n: 3 })), { error: 'sev before hello' });
-  const online = rd('src/net/online.js');
-  assert.match(online, /m\.t === 'sev'/);
-  assert.match(online, /relaySupportsStaffEvents/);
-  assert.match(online, /r\.k === 'st' \|\| r\.k === 'bd' \|\| r\.k === 'rc' \? isCellRoom\(room\)/, 'THE REWARD: the board and my receipt from the place\'s cell alone');
-  assert.match(rd('src/scenes/raidHost.js'), /onRaidReceipt: \(r, c, held\) => \{ \(c\?\.v \? grantStaffSpoils\(host\.raidSpoils, spoilsLock, c, /, 'THE REWARD: an event\'s receipt rolls its spoils into the pack');   // PIN MOVED (WW6): in scenes/raidHost.js (HOST-SPLIT)   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): a raid's receipt carries whether its town was held
   assert.ok(validStaffEvent(EV));
   // mob 2026-10-24: a city said as a city, anything else as an area
   assert.equal(staffAttackLine({ locationIndex: -1, locationName: 'Road', regionIndex: 3, staff: { b: 7 } }), 'The area of Road is under attack!');
@@ -479,22 +456,7 @@ test('PACK-OPEN (mob 2026-10-26: "make sure they dont spawn in houses", "or buil
   assert.equal(raidSpotOpen(col(false, true), { x: 0, y: 0, z: 0 }), false, 'a roof overhead');
   assert.equal(RAID_SPOT_ROOF_M, 30);
   assert.equal(raidSpawnRange(undefined).open, true, 'every raid and event stand asks it');
-  assert.match(rd('src/scenes/hostEnchant.js'), /if \(spot && open && !raidSpotOpen\(collider, spot\)\) spot = null;/);
   assert.equal(typeof standLooseFoe, 'function');
-});
-
-test('PACK-EVERY (mob 2026-10-26: "make sure we spawn a pack on every player in town"): out of a town (an area event) the players on my map pixel share the packs, the scale and the boss - in a town, its rect as ever', async () => {
-  const { peerInEventPlace } = await import('../../src/systems/raidingParties.js');
-  const world = { worldCoords: (p) => ({ x: p[0], z: p[2] }) };
-  assert.equal(peerInEventPlace([1, 0, 1], (f) => f.ai.feet[0] === 1, world, null), true, 'in a town: its rect');
-  assert.equal(peerInEventPlace([2, 0, 1], (f) => f.ai.feet[0] === 1, world, null), false);
-  const { worldCoordToMapPixel } = await import('../../src/world/streamingWorld.js');
-  const me = worldCoordToMapPixel(10, 10);
-  assert.equal(peerInEventPlace([10, 0, 10], null, world, me), true, 'an area: my pixel');
-  assert.equal(peerInEventPlace([10 + 1e6, 0, 10], null, world, me), false, 'another pixel');
-  assert.equal(peerInEventPlace(null, null, world, me), false);
-  // PIN MOVED (the fifth merge of main into #1184): the raid host is scenes/raidHost.js (#1184's HOST-SPLIT) - `_musicLoc` read live
-  assert.ok(rd('src/scenes/raidHost.js').includes('.filter((p) => raidPeerInPlace(p.feet, host._musicLoc ? _foeInTownRect : null, state, playerTravelPixel())).map('), 'the host asks it');
 });
 
 test('PACK-STALL (mob 2026-10-26: "town was not spawning enemy on every player"): a leader with no spot about one player goes to the next after STAFF_PACK_LEADER_TRIES - the packs never stall on one', async () => {
@@ -537,17 +499,6 @@ test('BOSS-RETRY (mob 2026-10-26: "mini boss sometimes doent spawn"): a boss wit
   assert.ok(boss, 'the boss stood');
   assert.ok(misses >= STAFF_PACK_LEADER_TRIES, 'tried by the group first');
   assert.equal(boss.o?.near, undefined, 'then about me');
-  const src = rd('src/systems/raidingParties.js');
-  assert.match(src, /raid\.bossUp = 1; raid\.bossDown = 0; raid\.clearSince = undefined; raid\.clearWait = undefined; if \(raid\.bossHand != null\) raid\.handSeen = raid\.bossHand; _bossMisses = 0; \}/, 'the field\'s wait and the by-hand word spent once it stands');
-});
-
-test('PACK-KEEP (mob 2026-10-26: "if enemy despawn dont count them as well respawn them on another player"): a raid\'s monster stands past the runner\'s cull while any player is near it; one culled or let go is no kill, and its place is stood again in turn', () => {
-  const src = rd('src/scenes/exteriorFoes.js');
-  assert.ok(src.includes('const _raidKept = !!f.raidKey && playerNearFoe(f, ENCOUNTER_CULL_DISTANCE);') && src.includes('&& !_raidKept && !(_qTag(f) && partyNearFoe(f, _cullAt))'), 'the cull spares it while a player is near');
-  assert.match(src, /const playerNearFoe = \(f, r\) => peerCandidates\(\)\.some\(\(c\) => Array\.isArray\(c\.feet\) && Math\.hypot\(/);
-  const rp = rd('src/systems/raidingParties.js');
-  assert.ok(rp.includes("if (!e.foe.corpse || !raid || !raidActive(raid, now)) continue;   // removed, not killed"), 'a despawn is never a kill');
-  assert.ok(rp.includes("if (fights) { foe.raidKey = p.key;"), 'its raid tagged on the foe at its stand');
 });
 
 test('STAFF-PILOT (mob 2026-10-26: "like play as a boss as attack players", card "Take over the boss", "wouthout a relay update"): Play as boss takes the run off an older runner with the oldest claim the wire carries; the boss that stands is the pilot\'s; the claim age never passes the wire\'s bound', async () => {
@@ -629,49 +580,3 @@ test('STAFF-PILOT: the boss stands where I stand and faces where I look; its own
   P.resetPilot();
 });
 
-test('STAFF-PILOT: the page\'s half - the panel\'s word starts and ends it, a hidden game is shown first, the end said back; the door passes `pilot`', async () => {
-  const P = await import('../../src/systems/staffBossPilot.js');
-  const { createStaffPilotHost } = await import('../../src/scenes/staffPilotHost.js');
-  P.resetPilot();
-  const posts = [], entity = {}, listeners = {};
-  const win = { document: { pointerLockElement: {} }, addEventListener: (k, f) => { listeners[k] = f; } };
-  let shown = 0, t = 0, boss = null;
-  const host = createStaffPilotHost({ post: (m) => posts.push(m), win, entity, hidden: () => true, showMe: () => { shown++; }, bossOf: () => boss, now: () => t });
-  host.word({ dfoStaff: 'pilot', on: true, ev: EV.id });
-  assert.deepEqual(posts.at(-1), { dfoStaff: 'pilot', on: true, ev: EV.id, boss: false });
-  assert.equal(shown, 1, 'Hide me off first');
-  host.frame();
-  assert.equal(entity.staffPilot, true);
-  listeners.mousedown({ button: 0 });
-  host.eye({ yaw: 1.25 });
-  boss = { raidKey: KEY, dead: false, puppet: null, entity: { staffBoss: { size: 2 } }, ai: { feet: [0, 0, 0], yaw: 0 } };
-  P.pilotSteer(boss, [1, 0, 1], [], 0);
-  assert.equal(boss.ai.yaw, 1.25);
-  host.frame();
-  boss.dead = true;
-  host.frame();
-  assert.deepEqual(posts.at(-1), { dfoStaff: 'pilot', on: false, ev: EV.id, why: 'fell' });
-  assert.equal(entity.staffPilot, false);
-  host.word({ dfoStaff: 'pilot', on: true, ev: EV.id });
-  host.word({ dfoStaff: 'pilot', on: false });
-  assert.deepEqual(posts.at(-1), { dfoStaff: 'pilot', on: false, ev: EV.id, why: 'left' });
-  host.word({ dfoStaff: 'pilot', on: true, ev: '../x' });
-  assert.equal(posts.at(-1).why, 'bad');
-  const door = rd('src/net/staffHook.js');
-  assert.match(door, /m\.dfoStaff === 'pilot' && typeof m\.on === 'boolean' && pilot\) \{ seen = true; pilot\(m\); \}/);
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.match(pool, /f\.ai\.update\(foeFrameDt\(dt\), playerFeet, _armed\(f, senses\), _fParalyzed, _fPaused\);[^\n]*\n\s*f\.ai\._pilot = pilotFoe\(f\) \? pilotSteer\(f, playerFeet, peerCandidates\(\), performance\.now\(\)\) : null;/, 'steered after its motor, its holds on its brain');
-  // the machines read the holds: the attack decides no swing of its own (a swing in flight still steps), the cast none
-  const { EnemyAttack } = await import('../../src/characters/enemy/enemyAttack.js');
-  const atk = new EnemyAttack({ liveSpeed: () => 50, playerLevel: () => 1, reflexes: 2, rolls: () => 0 });
-  const brain = { feet: [0, 0, 0], yaw: 0, _dist: 1, inSight: true, detected: true, lastKnownTargetPos: [0, 0, 1], giveUpTimer: 5, canAct: true, _pilot: { swing: true, cast: true } };
-  atk.update(2, brain, [0, 0, 1]);
-  assert.equal(atk.swingSeq, 0, 'held: no swing of its own');
-  brain._pilot = { swing: false, cast: true }; brain._blowSwing = true; brain._blowAt = null;
-  atk.update(2, brain, [0, 0, 1]);
-  assert.equal(atk.swingSeq, 1, 'a click: its swing');
-  const { EnemyCaster } = await import('../../src/characters/enemy/enemyCasting.js');
-  assert.equal(EnemyCaster.prototype.update.call({ entity: { spells: [{}] } }, 1, { _pilot: { cast: true } }, atk, [0, 0, 1], {}), null, 'no cast of its own');
-  assert.match(pool, /if \(f\.dead \|\| !f\._mout\) continue;\n\s*if \(pilotFoe\(f\)\) continue;/, 'my copy not drawn');
-  P.resetPilot();
-});

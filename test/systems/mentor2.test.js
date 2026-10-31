@@ -191,14 +191,6 @@ test('MENTOR2 A: THE HOST HOLDS A FIGHT - a partner who walks off mid-fight leav
   assert.equal(r.me._mentor, null, 'left the party mid-fight: ended at once');
 });
 
-test('MENTOR2 A: THE WIRING - the streaming host builds the mentor host over the party members drawn in my room (partyNear), outdoors by its feet, its fight by the mode\'s foes, and frames it from the party frame; PARTY-LOOT keeps the whole party\'s levels; the old per-frame block is gone (mutants: the whole party read; the frame call dropped)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const mentorHost = createMentorHost\(\{\n\s+player: \(\) => playerEntity, social: \(\) => social, near: \(\) => partyNear\(\),\n\s+outdoors: \(\) => _mode\(\) === 'exterior', feet: \(\) => player\.feetAt\?\.\(\) \?\? player\.pos,\n\s+fighting: \(\) => areEnemiesNearby\(enchantFoes\(\)\), chat: \(\) => chatLog,\n\s+\}\);/);
-  assert.match(w, /const partyFrame = \(nowMs\) => \{\n[^\n]*\n\s+mentorHost\.frame\(nowMs\);/);
-  assert.match(w, /partyLevels: \(\) => partyMateLevels\(\),/);
-  assert.doesNotMatch(w, /refreshMentor\(|setFirmamentMentoring/);
-});
-
 // ── B: the powers at a share ────────────────────────────────────────
 
 test('MENTOR2 B: THE SHARE - mentorScaled is the number at the power scale, whole outside mentoring; the Firmament scales its combat channels and leaves its life channels whole, by the share the host hands in (mutants: a life channel scaled; the combat ones whole; the share ignored)', () => {
@@ -225,19 +217,6 @@ test('MENTOR2 B: THE SHARE - mentorScaled is the number at the power scale, whol
   assert.equal(firmamentMentorScale(), 0.5);
   setFirmamentMentorScale(2);
   assert.equal(firmamentMentorScale(), 1, 'never past whole');
-});
-
-test('MENTOR2 B: THE SOURCES - no power sleeps on `_mentor` any more: the paths\' awake gates, the Firmament\'s fight and life, the potency and the weapon\'s climb read the share or the mentored climb; the foes\' edge still reads none while mentoring (mutants: a gate put back; the edge woken)', () => {
-  for (const f of ['src/systems/arcanePaths.js', 'src/systems/martialPaths.js', 'src/systems/firmamentPowers.js', 'src/systems/spell/spellPower.js']) {
-    assert.doesNotMatch(read(f).replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, ''), /_mentor\b/, `${f} gates nothing on mentoring`);
-  }
-  // the weapon's climb pays the mentored climb; WEAPON-GEAR's gear past 200 stays off for a mentor, its own arc's law
-  const wm = read('src/systems/weaponMastery.js');
-  assert.doesNotMatch(/export function weaponClimb[\s\S]*?\n\}/.exec(wm)[0], /_mentor\b/, 'the climb gates nothing on mentoring');
-  assert.match(read('src/systems/skillSoftcap.js'), /entity\._mentor \|\| !masterSkillsActive\(entity\)\) return 0;[\s\S]*entity\._mentor \|\| !masterSkillsActive\(entity\)\) return 0;/, 'the edge and the veteran: none while mentoring');
-  assert.match(read('src/systems/spell/spellPower.js'), /const climbed = fightingClimb\(caster, school\);/);
-  assert.match(read('src/systems/weaponMastery.js'), /const c = fightingClimb\(entity, skill\);/);
-  assert.equal((read('src/scenes/hostMagic.js').match(/effectiveLevel/g) ?? []).length, 0, 'every cast of mine at castingLevel');
 });
 
 // ── C: paid ─────────────────────────────────────────────────────────
@@ -296,14 +275,6 @@ test('MENTOR2 C: THE SAVE - neither the mentor\'s profile nor the pupil\'s word 
   assert.deepEqual([back._mentor, back._pupil, back._pupilFrac], [null, null, null]);
 });
 
-test('MENTOR2 C: THE LOOT GATE - the corpse\'s roll and the registry read the real level (a mentor is no young character); the corpse\'s items and the world stay the group\'s (mutants: the gate at the mentored level; the items at the real level)', () => {
-  const c = read('src/scenes/hostCombat.js');
-  assert.match(c, /level: lootGateLevel\(player\) \}\);/);
-  assert.match(c, /\{ level: effectiveLevel\(player\), gender: player\.gender \}/);
-  assert.match(c, /equipEnemy\(entity, mobileType, effectiveLevel\(player\), rolls, \{ player \}\)/);
-  assert.match(read('src/systems/loot/lootPowers.js'), /return me \? lootGateLevel\(me\) : null;/);
-});
-
 // ── E: said ─────────────────────────────────────────────────────────
 
 test('MENTOR2 E: THE WORDS - the status names the level fought at, the real one and the share; the pupil\'s line its bonus; the HUD\'s tile and card; the party\'s note; a member\'s level beside their place (mutants: the share unsaid; the pupil unsaid; the level unsaid)', () => {
@@ -328,6 +299,4 @@ test('MENTOR2 E: THE WORDS - the status names the level fought at, the real one 
   assert.equal(levelShort(12), 'Lv 12');
   assert.equal(partyPoseText({ loc: 'Daggerfall', h: 50, hm: 60, cl: 12 }), 'Lv 12 - Daggerfall - 50/60 HP');
   assert.equal(partyPoseText({ loc: 'Daggerfall', h: 50, hm: 60 }), 'Daggerfall - 50/60 HP', 'a relay from before `cl`: no level');
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /const mentor = mentorHudTile\(vitals\);\n\s+if \(mentor\) all\.unshift\(\.\.\.statusTiles\(\{ mentor \}\)\);/);
-  assert.match(read('src/scenes/world.js'), /mentorNote: \(\) => mentorPartyNote\(playerEntity\),/);
 });

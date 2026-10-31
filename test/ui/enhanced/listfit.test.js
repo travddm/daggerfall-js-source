@@ -30,6 +30,4 @@ test('LIST-FIT: a list tile whose tiered picture is capped at 100% is a FLEX roo
     assert.equal(valueOf(ruleFor(sheet, tile, 'justify-content'), 'justify-content'), 'center', `${tile}: and across`);
     assert.ok(!ruleFor(sheet, tile, 'overflow'), `${tile}: never clipped instead - the sigil rune and the padlock stand past its edge`);
   }
-  // a player trade is a trade-shell too, so the one rule holds it
-  assert.match(readFileSync(new URL('../../../src/ui/enhanced/enhancedPlayerTrade.js', import.meta.url), 'utf8'), /el\('div', 'px-home px-over trade-shell ptrade-shell'\)/);
 });

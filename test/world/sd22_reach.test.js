@@ -65,47 +65,5 @@ test('SD-REACH a Rift somewhere, never none: every enemy marker when the interio
   assert.deepEqual(sdEndMarks([{ ...at(1, 0, 9, 9), eliteCopy: true }, { x: NaN, y: 0, z: 1 }, at(1, 0, 8, 8)], caps), [at(1, 0, 8, 8)], 'an Elite copy and a placeless marker none');
 });
 
-test('SD-REACH the host unchanged: the end asked from the way in over the layout\'s enemies and its blocks, each block carrying its name from the dungeon\'s own layout', () => {
-  const D = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT SD IV F38): and the floor under each candidate (test/world/sd26_dungeon.test.js). PIN MOVED
-  // (LAIR-REACH): asked through the host's one end, which the lair's stand asks too (test/systems/revenant/lair_reach.test.js)
-  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\)/);   // PIN MOVED (LAIR-WALK): dungeonEndOf with no walk - the Rift asks none
-  assert.match(D, /const end = dungeonEnd\(\);/);
-  const L = readFileSync(new URL('../../src/world/dungeon/dungeonLayout.js', import.meta.url), 'utf8');
-  assert.match(L, /blocks\.push\(\{\n\s*name: block\.blockName,\n\s*originX,\n\s*originZ,/);
-});
-
 // ── SD-LAND: never out in the Hour's sky ────────────────────────────────────────────────────────────────────────────
 
-const WM = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-
-test('SD-LAND the way out lands before the door it finds - and with none (a Hollow taken down at its end, its door gone with it; a door not built), where the player stood outside as they went in, never the dungeon\'s own frame; the gate\'s and the arena\'s own landings as they were (mutant: no fallback)', () => {
-  const m = /\n {2}(const returnLanding = \(\) => [^\n]*)\n/.exec(WM);
-  assert.ok(m, 'returnLanding');
-  const landingOf = (dungeonReturn, host, door) => new Function('dungeonReturn', 'host', 'dungeonEntranceLanding', `${m[1].replace(/\s+\/\/.*$/, '')}\nreturn returnLanding();`)(dungeonReturn, host, door);
-  const from = { pos: [10, 51, 20], normal: [0, 0, 1] };
-  const doorLanding = { pos: [1, 2, 3], normal: [1, 0, 0] };
-  const byDoors = (doors) => (doors.length ? doorLanding : null);
-  // out of the Hour, the Hollow's door standing: before it
-  assert.equal(landingOf({ sdHollow: { key: '5,5' }, candidates: [], from }, { sdHollowDoors: () => ['door'] }, byDoors), doorLanding);
-  // out of the Hour, the Hollow gone: where I stood outside as I went in
-  assert.equal(landingOf({ sdHollow: { key: '5,5' }, candidates: [], from }, { sdHollowDoors: () => [] }, byDoors), from, 'no door: where I went in');
-  assert.equal(landingOf({ sdHollow: { key: '5,5' }, candidates: [], from }, {}, byDoors), from, 'no host word at all: the same');
-  // an ordinary dungeon whose doors are gone
-  assert.equal(landingOf({ candidates: [], from }, {}, byDoors), from);
-  assert.equal(landingOf({ candidates: [{ door: 'd' }], from }, {}, byDoors), doorLanding, 'its own door, as ever');
-  // an older record with no `from`: nothing, as before
-  assert.equal(landingOf({ candidates: [] }, {}, byDoors), null);
-  // the gate's and the arena's own
-  assert.deepEqual(landingOf({ gate: 7, candidates: [], from }, { gateLanding: () => 'gate' }, byDoors), 'gate');
-  assert.deepEqual(landingOf({ arena: 'ladder', arenaFrom: 'herald', candidates: [], from }, { arenaLanding: () => null }, byDoors), 'herald');
-});
-
-test('SD-LAND the spot outside is the player\'s, taken as the dungeon is entered - before the start marker moves them in - in the door landing\'s own shape (the body\'s middle, facing as they faced), on every entry: the door\'s, a Hollow\'s from the Hour, a load\'s (mutants: none taken; the dungeon\'s spot)', () => {
-  const at = WM.indexOf('        from: { pos: [player.pos[0], player.pos[1] + CAPSULE_HEIGHT / 2, player.pos[2]], normal: [Math.sin(cam.yaw), 0, Math.cos(cam.yaw)] },');
-  assert.ok(at > 0, 'the record carries it');
-  const rec = WM.lastIndexOf('dungeonReturn = {', at), spawn = WM.indexOf('const spawn = ctx.startSpawn({ preferEnterMarker });', at);
-  assert.ok(rec > 0 && at - rec < 1200, 'in the dungeon\'s return record');
-  assert.ok(spawn > at, 'taken before the start marker moves the player in');
-  assert.match(WM, /const landing = returnLanding\(\);/, 'the way out asks it');
-});

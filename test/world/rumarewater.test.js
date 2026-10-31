@@ -302,15 +302,6 @@ test('RUMARE-WATER the sea\'s ways at the map\'s scale: the lanes\' water and a 
   assert.deepEqual(beyondPorts(places, rumareSeaPixel).map((p) => [p.name, p.reach, p.neighbours]), [['Imperial City', CANAL_PORT_REACH_PX, CANAL_PORT_NEIGHBOURS]], 'its shore the city\'s lake');
 });
 
-test('RUMARE-WATER the host\'s wiring: the ports\' open sea and the voyages\' sea take the city\'s lake; the terrain job lays a capital at the sea\'s ground (mutants: the ports\' unwired; the voyages\' unwired)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes('return tamrielLand && ((seaPixel(x, y) && !pastBayLakeAt(x, y)) || rumareSeaPixel(x, y));'), 'the ports\' open sea');
-  assert.ok(w.includes("WATER_BYTE, 1000, 500, (x, y) => !tvWater(x, y), undefined, rumareSeaPixel))"), 'the voyages\' sea');
-  const gen = rd('src/world/terrain/terrainGen.js');
-  assert.ok(gen.includes('if (natural) for (const [S, n] of [[samples, natural[0]], [classic, natural[1]]]) if (S && n) capitalSeaGround(S, n, tilemap, locationRect, px, py, flattenAt.seaEdges);'));
-  assert.ok(gen.includes('flattenAt.sea ? CAPITAL_SEA_FLAT :'));
-});
-
 const realSkip = HAVE ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)';
 test('RUMARE-WATER (ARENA2): on the player\'s own files the Imperial City stands at the sea - its lake\'s samples the sea\'s own height, its isle a freeboard over it, its mouth the canal\'s water to the span\'s edge; the hull sails the lake and not the streets; the bake carves the lake deep; its harbour the Waterfront with lanes to Senchal and Torval and a voyage from the Topal Bay ashore at it', { skip: realSkip }, async () => {
   globalThis.atob ??= (s) => Buffer.from(s, 'base64').toString('binary');

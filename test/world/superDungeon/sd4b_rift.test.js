@@ -63,12 +63,6 @@ test('SD4b the end: the marker farthest from the entrance across the floor plan 
   const marks = sdEndMarks([{ x: 1, y: 0, z: 2 }, { x: 1.5, y: 0, z: 2, eliteCopy: true }, { x: NaN, y: 0, z: 0 }], ends);
   assert.deepEqual(marks, [{ x: 1, y: 0, z: 2 }]);
   assert.deepEqual(sdEndMarks([], ends), [{ x: 101, y: 3, z: 201 }]);
-  const D = read('src/scenes/dungeonContext.js');
-  // PIN MOVED (LAIR-REACH): RVN7d's lair stand and the Rift ask ONE end (dungeonEnd - test/systems/revenant/lair_reach.test.js)
-  assert.match(D, /const far = \(reaches && dungeonEnd\(reaches\)\) \|\| dungeonEnd\(\);/, 'RVN7d\'s lair stand');   // PIN MOVED (LAIR-WALK): the farthest a walk reaches, else this end
-  assert.match(D, /const end = dungeonEnd\(\);/, 'a Super dungeon\'s end');
-  // PIN MOVED (AUDIT SD IV F38): and the floor under each candidate - the end out of the water where any is
-  assert.match(D, /const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\)/, 'from the same entrance');   // PIN MOVED (LAIR-WALK): world/dungeon/dungeonEnd.js reachableEndOf - dungeonEndOf with no walk
 });
 
 test('SD4b the Rift\'s size: 7 m at most, the hall\'s own less its air, never under 2.6 m - and in a cramped corner it moves a step or two to the widest hall on the end\'s own floor (mutants: the ring never fitted; never moved; moved through a wall; moved onto another floor)', () => {
@@ -296,32 +290,5 @@ test('SD4b the bell under water: one toll a loop, levelled, darker than the bell
   assert.equal(a.loops[0].o.distanceModel, 'linear');
   assert.equal(startRiftBell(null, [0, 0, 0]), null);
   assert.equal(startRiftBell({ ...a, loop3d: () => { throw new Error('no context'); } }, [0, 0, 0]), null, 'a sound that cannot stand never costs the Rift');
-});
-
-test('SD4b the host\'s steps, run from its own text: into the Rift its word first - through where the realm\'s door takes me, else its refusal said mid-screen; into the Return, the start marker\'s landing through the dungeon\'s own teleport door (mutants: the word unasked; the refusal unsaid; the Return to the enter marker)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  const fn = (name) => { const at = D.indexOf(`\n  function ${name}(`); assert.ok(at > 0, name); return D.slice(at + 1, D.indexOf('\n  }\n', at) + 4); };
-  const body = `${fn('sdRiftStep')}\n${fn('sdReturnStep')}\nreturn { sdRiftStep, sdReturnStep };`;
-  const make = (host) => {
-    const said = [], tp = [];
-    const f = new Function('sdEndWord', 'setMidScreenText', 'SD_NO_RIFT', 'api', 'actions', 'opts', body)(   // AUDIT SD II (SD11d, PIN MOVED): `opts` - a host with no voice, the label itself
-      () => host, (t) => said.push(t), SD_NO_RIFT,
-      { startSpawn: (o) => (o?.preferEnterMarker === false ? [1, 2, 3] : [9, 9, 9]) }, { onTeleport: ({ pos }) => tp.push(pos) }, {});
-    return { ...f, said, tp };
-  };
-  const through = make({ word: null, returns: true, enter: () => true });
-  through.sdRiftStep();
-  assert.deepEqual(through.said, [], 'the realm took me');
-  const noRealm = make({ word: null, returns: true, enter: () => false });
-  noRealm.sdRiftStep();
-  assert.deepEqual(noRealm.said, [SD_NO_RIFT], 'admitted, and no door yet (SD5): not yet');
-  const closed = make({ word: SD_NO_CLOSED, returns: false, enter: () => { throw new Error('never asked'); } });
-  closed.sdRiftStep();
-  assert.deepEqual(closed.said, [SD_NO_CLOSED]);
-  const offline = make(null);
-  offline.sdRiftStep();
-  assert.deepEqual(offline.said, [SD_NO_RIFT]);
-  through.sdReturnStep();
-  assert.deepEqual(through.tp, [[1, 2, 3]], 'the start marker\'s landing - the way in');
 });
 

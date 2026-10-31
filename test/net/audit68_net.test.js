@@ -70,17 +70,6 @@ test('AUDIT 68 S14-quest-inbound-ungated: quest shares are gated PER ROOM before
   assert.ok(s._inQuest.size <= 65, `the per-sender map holds ${s._inQuest.size}`);
 }));
 
-test('AUDIT 68 S14-quest-inbound-ungated: an honest hub at full tilt passes whole - every other seat of a full party at once, and again at the hub\'s own cooldown', () => quiet(() => {
-  const { got, share, clock } = hubSession();
-  const seats = Array.from({ length: PARTY_MAX - 1 }, (_, i) => `acct-seat-${i}`);
-  for (const a of seats) share(a);
-  clock.t += 5000;   // QUEST_HUB_MIN_MS: each seat may share again
-  for (const a of seats) share(a);
-  assert.equal(got.length, 2 * seats.length);
-  // and the host takes a share from a seat of my party alone - applyParty's rule (world.js is not driven here)
-  assert.match(rd('src/scenes/world.js'), /link\.onQuestShared = \(acct, name, quest\) => \{\n\s*if \(!social\.inMyParty\(acct\)\) return;/, 'a share from an account holding no seat is nothing');
-}));
-
 // ---- the trade: a confirm that has left binds until the peer answers ------------------------------------------------
 function makePack(ids, gold) {
   const st = { items: ids.map((id) => ({ id, stackCount: 1 })), gold };

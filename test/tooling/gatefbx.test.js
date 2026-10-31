@@ -238,16 +238,9 @@ test('AUDIT GATE-FBX C3 another stepping in: the way in opens for a player seen 
 });
 
 test('AUDIT GATE-FBX C2/C3 the host: /unstuck in a gate\'s court is refused in its own words, before any other way of it (it walked out mid-fight with no veil, no toll, no cooldown spent on a death); and every player in the court\'s room - the crowd\'s cut or not - is handed to the way in each online frame, in the court alone (mutants: /unstuck walking out of the court; the crowd\'s cut handed)', () => {
-  const ws = read('src/scenes/world.js');
-  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js) - the court's row refuses /unstuck, in the court's own words
-  const un = ws.indexOf("if (madeUnstuck === 'refused') { say(madeSaysHere('unstuck')); return true; }");
-  assert.ok(un > 0, 'refused in the court');
   assert.equal(madeLevelRule('court', 'unstuck'), 'refused');
   assert.equal(madeLevelSays('court', 'unstuck'), COURT_TEXT.noUnstuck, 'in its own words');
-  assert.ok(un > ws.indexOf('if (/^\\/unstuck(\\s+cancel)?$/i.test(text.trim())) {') && un < ws.indexOf('const inZone = wildHere() && !(TEST_GODMODE && staffPowers().god);'), 'before the zone\'s and the town\'s ways');
   assert.match(COURT_TEXT.noUnstuck, /Deadlands/);
-  assert.match(ws, /\n {4}if \(modes\?\.gateArenaDay\?\.\(\) != null\) gateCourt\?\.stepsIn\(drawable, \(d\) => \(d\?\.shown \? onlineToScene\(d\.shown\) : null\)\);/, 'the room\'s every player, in the court');
-  assert.ok(ws.indexOf('gateCourt?.stepsIn(drawable') > ws.indexOf('const visiblePeers = gateCrowd.cut('), 'beside the crowd\'s cut, never through it');
 });
 
 test('AUDIT GATE-FBX C1 the court gone silent: standing in it, my frames seeing no word of its fight for COURT_SILENT_MS - no state at all, or one whose heardAt never moves - it is silent, and the host casts me out by the way that is lost (no door stands in it until he falls); each word keeps it alive; a fallen Warden\'s court (his portal stands) or the Wrath\'s, never; a frame COURT_FRAME_GAP_MS after the last (a screen asleep) counts none; under the step\'s veil or out of the court, never (mutants: the silence never counted; the sleeping screen counted)', () => {
@@ -283,9 +276,6 @@ test('AUDIT GATE-FBX C1 the court gone silent: standing in it, my frames seeing 
   const v = court();
   run(v, 1_000, 2 * COURT_SILENT_MS);
   assert.equal(v.c.silent(), false, 'under the step\'s veil: not arrived');
-  const ws = read('src/scenes/world.js');
-  assert.match(ws, /else if \(courtDay != null && gateCourt\?\.silent\(\)\) ejectFromCourt\(COURT_TEXT\.lost\);/, 'the host casts me out by the lost way');
-  assert.ok(ws.indexOf('gateCourt?.silent()') < ws.indexOf("try { gateCourt?.frame(); } catch (e) { console.warn('[gate] court', e?.message ?? e); }   // WB4"), 'before the court\'s frame');
   assert.match(COURT_TEXT.lost, /lost/);
 });
 

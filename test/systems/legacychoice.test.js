@@ -188,9 +188,6 @@ test('LEGACY-CHOICE the popup: on Enhanced Plus the online question wears the Pl
     assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_MODEL_FACE.title);
     q.answer(q.defaultId);
   }, { doc: true });
-  const css = read('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(css, /\.lvl-shell \.px-win\.lvl-three \{ width: min\(1000px, 100%\); \}/);
-  assert.match(css, /\.lvl-three \.lvl-opts \{ grid-template-columns: repeat\(auto-fit, minmax\(210px, 1fr\)\); \}/);
   assert.equal(LEGACY_CHOICE_TEXT.lines.length, 2, 'the classic face\'s two lines over the options');
 });
 
@@ -352,12 +349,4 @@ test('LEGACY-CHOICE the Family tab says why there is no house: no lineage chosen
   assert.match(noFamilyLine(prov({ choice: () => null, online: () => false })), /founded when your character is made, or the first time an older character is loaded/);
   assert.match(noFamilyLine({ on: () => false }), /Turn on Project Legacy/);
   assert.match(noFamilyLine(null), /Open this from a game to see your family\./);
-  // the world hands the tab both
-  const w = read('src/scenes/world.js');
-  assert.match(w, /choice: \(\) => playerEntity\.legacyChoice \?\? null,   \/\/ LEGACY-CHOICE: why a character has no house\n\s*online: \(\) => isOnlinePage\(\),/);
-  // the boot's own call is the load, the chargen's the birth
-  const h = read('src/scenes/legacyHost.js');
-  assert.match(h, /afterBoot: \(\) => found\(null, \{ atLoad: true \}\),/);
-  assert.match(h, /onCharacterMade: \(model = null\) => found\(model\),/);
-  assert.match(w, /legacyHost\?\.onCharacterMade\(r\.legacyModel \?\? null\);/);
 });

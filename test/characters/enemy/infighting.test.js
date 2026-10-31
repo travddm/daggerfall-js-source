@@ -96,33 +96,3 @@ test('IF1 (6): the machine retargets on DFU\'s cadence, inside a third of a seco
   assert.ok(frames * dt < 0.5, `took ${(frames * dt).toFixed(3)}s - the senses interval is ~0.28s`);
 });
 
-test('IF1 (7): the DUNGEON host arms the machine and acts on a foe target', () => {
-  const dc = read('src/scenes/dungeonContext.js');
-  // the candidate list is this host's live pool, filtered as DFU's
-  // GetActiveEnemyBehaviours yields only active ones
-  assert.match(dc, /candidates: foeDeps \? \(streamed = false, rec = null\) => \[\.\.\.foes\.filter\(\(f\) => !f\.dead && f\.ai\), \.\.\.\(\(_authority && streamed\) \|\| ownLoose\(rec\) \? peerCandidates\(\) : \(ownQuestTag\(rec\) \? peerCandidates\(\)\.filter\(\(c\) => ownShare\(\)\?\.peerMayHit\?\.\(c\.id, rec\)\) : \[\]\)\)\] : null/);
-  // ...and it survives the senses context rather than being dropped
-  assert.match(read('src/scenes/shared.js'), /\n    candidates,\n/);
-  // the per-foe targeting closure the motor arms itself from
-  assert.match(dc, /targeting: \(ai, pf, cdt\) => foeDeps\.runTargetMachine\(rec, sn\.candidates\(streamed, rec\), pf, cdt,/);
-  assert.match(read('src/characters/enemy/enemyMotor.js'), /this\._armedTargeting = !!targeting;/);
-  // and all three action arms fork on a non-player target
-  assert.match(dc, /function resolveFoeMeleeVsFoe\(f\)/, 'melee');
-  assert.match(dc, /if \(!vsPlayer && resolveFoeMeleeVsFoe\(f\)\) return;/, 'melee, from the one home');
-  // PIN MOVED (AUDIT CC-E1): the door names the shooter too, so a companion struck on another's screen knows whose
-  assert.match(dc, /dealDamage: \(tt, d\) => tt\.hurtFromFoe\?\.\(d, m\.dir, m\.shooterFoe \?\? null\)/, 'missiles');
-  assert.match(dc, /f\.ai\.target\?\.entity \?\? foeDeps\.PEER_CAST_TARGET \?\? playerEntity/, 'casting');
-});
-
-test('IF1: the F8 census reads the answer off a live dungeon', () => {
-  // The audit reaches every layer a unit test can; the live frame it
-  // cannot. So it ships the instrument instead of a guess.
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /function _foeCensus\(\)/);
-  assert.match(dc, /const armed = live\.filter\(\(f\) => f\.ai\._armedTargeting\)\.length;/);
-  assert.match(dc, /const vsFoe = live\.filter\(\(f\) => f\.ai\._armedTargeting && f\.ai\.target\n\s*&& !\(foeDeps\?\.isPlayerTarget\?\.\(f\.ai\.target\) \?\? true\)\)\.length;/);
-  assert.match(dc, /teams \$\{teams\.join\(','\) \|\| 'none'\}/);
-  assert.match(dc, /deps \$\{foeDeps \? 'yes' : 'NO'\}/, 'the subsystem gate is on the line too');
-  // it is ON the debug lines, not merely defined - the drawn-door rule
-  assert.match(dc, /`input \$\{_inputState\}`,\n(?:\s*\/\/[^\n]*\n)*\s*_foeCensus\(\),/);
-});

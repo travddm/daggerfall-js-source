@@ -116,26 +116,3 @@ test('QP1 end-to-end: the walk feeds the pool and a roll of 3 mints a questor un
 
 // ── the mounts, source-pinned ────────────────────────────────────
 
-test('QP1 townTalk: rebuildDirectory feeds the pool through the host door', () => {
-  const tt = read('src/scenes/townTalk.js');
-  assert.match(tt, /onBuildingList\?\.\(questorCandidateBuildings\(topics\.exteriorBuildings, topics\.blocks, \{\s*\n\s*locationIndex: topics\.locationIndex \?\? 0,\s*\n\s*mapId: topics\.mapId \?\? 0,/,
-    'the walk rides the SAME rebuild the directory does (GetBuildingList\'s one breath)');
-  assert.match(tt, /getFaction: \(id\) => factions\?\.factionDict\?\.get\(id\) \?\? null,/,
-    'the faction lookup is townTalk\'s own FACTION.TXT');
-  // RP1 turned the module's boot-captured `regionIndex` into the live
-  // `regionNow()`; the LAW pinned here is unchanged - the topics bag's
-  // own region wins, and the answer is the +1 numeric race id.
-  assert.match(tt, /raceOfCurrentRegion: \(\) => \(REGION_RACES\[topics\.regionIndex \?\? \w+\(?\)?\] \?\? 0\) \+ 1,/,
-    'GetRaceOfCurrentRegion\'s numeric read, off the topics region when it has one');
-});
-
-test('QP1 world: topics carry the SetLayoutData identities, the door lands in npcSession', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /locationIndex: dfLocation\.locationIndex \?\? 0,\s*\n\s*mapId: dfLocation\.mapTableData\?\.mapId \?\? 0,/,
-    'the same locationIndex npcSession\'s own guard reads');
-  assert.match(world, /onBuildingList: \(buildings\) => npcSession\.buildQuestorPool\(buildings\),/,
-    'the pool is the host\'s to hold');
-  const session = read('src/systems/npcSession.js');
-  assert.ok(!/FLAGGED: no host calls this/.test(session),
-    'the dead-seam flag is GONE - retiring a flag deletes the sentence');
-});

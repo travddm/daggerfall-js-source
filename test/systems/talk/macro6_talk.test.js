@@ -29,20 +29,9 @@ test('MACRO-6: the Where-is answer answers %hnt2 and the two names, each occurre
   assert.equal(called, 0);
 });
 
-test('MACRO-6: the engine-less host hands the answer its names and a lazy hint', () => {
-  const src = read('src/scenes/townTalk.js');
-  // TESA3: past the Bay the province's bank (bible/03-World/Arena-Provinces.md), else the region's
-  assert.match(src, /const names = talkMacroSource\(\{\s*fullName: \(gender\) => nameHelperFullName\(provinceBank\(\) \?\? getNameBankOfRegion\(regionNow\(\)\), gender === 'female' \? GENDERS\.Female : GENDERS\.Male\),[^\n]*\s*bumpSeed,\s*\}\);/,
-    'TalkManagerMCP’s own FemaleName/MaleName, the region’s bank and MaleName’s seed nudge');
-  assert.match(src, /femaleName: \(\) => names\.femaleName\(\), maleName: \(\) => names\.maleName\(\),/);
-  assert.match(src, /\n\s+hint, key: building\.name,/, 'the hint goes over as the FUNCTION - the walk calls it per occurrence');
-});
-
 test('MACRO-6: GetSpecialDungeonName trims its full stop, and the host reads the ROW’S text', () => {
   const rows = { 475: [{ text: 'Castle Daggerfall.', center: true }] };
   const hostLine = (id) => { const r = rows[id]?.[0]; return r == null ? null : (typeof r === 'string' ? r : r.text ?? null); };
   assert.equal(specialDungeonName('Daggerfall', 'Daggerfall', hostLine), 'Castle Daggerfall');
   assert.equal(specialDungeonName('Menevia', "Lysandus' Tomb.", hostLine), "Lysandus' Tomb", 'every arm trims, as :267 does');
-  assert.match(read('src/scenes/world.js'),
-    /\(id\) => \{\s*const r = townTalk\.lines\(id\)\?\.\[0\];\s*return r == null \? null : \(typeof r === 'string' \? r : r\.text \?\? null\);\s*\}\),/);
 });

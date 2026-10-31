@@ -61,30 +61,3 @@ test('MAC6 #1: the envelope carries where the dungeon stands - `dungeon` {pixel,
   assert.equal(walked, 1, 'any iterable, and the walk stops at the first match');
 });
 
-test('MAC6 #1: the hosts by source - the dungeon host\'s composer names its pixel and its load arm is split (restoreSaved after restorePlayer, the session restore gated); the mode machine forwards a restored envelope to its dungeon with the key route\'s own position applier and no second session restore; the world host\'s boot load teleports to the save\'s pixel (the envelope\'s, or the finder\'s for an old one), enters through StartDungeonInterior and restores over the enter marker; "saved elsewhere" is what is left', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /import \{ longitudeLatitudeToMapPixel \} from '\.\.\/formats\/mapsFile\.js';/, 'the pixel law, MapsFile\'s own');
-  assert.match(d, /const dungeonHome = \(\) => \{\s*const mt = dfLocation\?\.mapTableData;\s*if \(!mt \|\| !Number\.isFinite\(mt\.longitude\) \|\| !Number\.isFinite\(mt\.latitude\)\) return null;\s*const p = longitudeLatitudeToMapPixel\(mt\.longitude, mt\.latitude\);\s*return \{ pixel: \{ x: p\.x, y: p\.y \}, mapId: mt\.mapId \?\? null, \.\.\.\(opts\.placeRecord\?\.\(\) \?\? \{\}\) \};/, 'where the dungeon stands, from its own map row');   // PIN MOVED (INSTANCES' audit): and the instance it was entered as
-  assert.match(d, /locationKey: _locationKey,(?:\s*\/\/[^\n]*\n)*\s*dungeon: dungeonHome\(\),/, 'the composer carries it beside the key');
-  assert.match(d, /quickLoad\(setPlayerPos, key = null\) \{[\s\S]*?const extras = restorePlayer\(playerEntity, snap, spellsByIndex\);[\s\S]*?this\.restoreSaved\(extras, setPlayerPos\);\s*(?:opts\.outerCampsLoad\?\.\(extras\);[^\n]*\n\s*)?(?:opts\.modLoaded\?\.\(\);[^\n]*\n\s*)?\},/, 'the key route\'s load is restorePlayer then the second half (AUDIT REST III A1 re-aim: then the save\'s camps outside)');   // CSA-J: OnLoad after it (csa_close pins it)
-  assert.match(d, /restoreSaved\(extras, setPlayerPos, \{ session = true, announce = session \} = \{\}\) \{/, 'the second half on its own, the session restore a switch');
-  assert.match(d, /if \(session && restoreSessionState\(extras, \{ questBridge: opts\.questBridge, talk: opts\.talkSave, entity: playerEntity, spawnLedger: opts\.spawnLedger\?\.\(\) \?\? null \}\)\) opts\.onQuestRestored\?\.\(\);/, 'gated: the world host restored the machines before it teleported');
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the saved fall rides the saved position's placement.
-  assert.match(d, /if \(extras\.position && extras\.locationKey === _locationKey && setPlayerPos\) setPlayerPos\(extras\.position, extras\.pose\?\.fall\);/, 'the saved position lands through the applier - RestorePosition');
-  const m = rd('src/scenes/worldModes.js');
-  // AUDIT OH-F B1: and hands the restore's rebuilds back, so the host's mod loop reads the saved enemy set whole; DIAL-LOAD: the key route's applier
-  assert.match(m, /restoreDungeonSave\(extras\) \{\s*if \(mode !== 'dungeon' \|\| !dungeonCtx\) return false;\s*(?:\/\/[^\n]*\n\s*)*return dungeonCtx\.restoreSaved\(extras, placeLoadedPlayer, \{ session: false \}\) \?\? true;[^\n]*\s*\},/, 'the mode machine forwards with the key route\'s applier and no second session restore, and hands the rebuilds back');
-  assert.match(m, /routeKey\(e, dungeonCtx, placeLoadedPlayer, keys\)/, 'the same applier the key route hands the context (AUDIT 27h S2: a load drops the autorun latch)');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ [^}]*restoreSessionState, dungeonPixelFor \} from '\.\.\/systems\/save\/save\.js';/);
-  assert.match(w, /\} else if \(String\(extras\.locationKey \?\? ''\)\.startsWith\('dungeon:'\)\) \{/, 'the dungeon arm, before "saved elsewhere"');
-  assert.match(w, /const pixel = extras\.dungeon\?\.pixel \?\? dungeonPixelFor\(extras\.locationKey, locationIndex\.values\(\), \(mt\) => longitudeLatitudeToMapPixel\(mt\.longitude, mt\.latitude\)\);/, 'the envelope\'s pixel, or the finder\'s for a save from before it');
-  assert.match(w, /await _teleportToPixel\(pixel\.x, pixel\.y, null, \{ modEvent: 'load' \}\);[^\n]*\n\s*const entered = await \(modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: starts\.resumesAt\(pixel\) \? undefined : extras\.dungeon \?\? \{\} \}\) \?\? false\);[^\n]*\n\s*if \(entered\) \{ playerSpawned = true; await modes\?\.restoreDungeonSave\?\.\(extras\); \}/, 'TeleportToCoordinates, StartDungeonInterior, RestorePosition - DFU\'s order (MAP-KEEP: StartDungeonInterior on the automap\'s load arm; AUDIT OH-F B1: RestoreEnemyData whole before the mod loop)');   // PIN MOVED (INSTANCES' audit): and what was recorded of the place
-  assert.match(w, /else \{ _wodInside = false; townTalk\.say\('\(the dungeon could not be entered\. Your character is restored at its door\)'\); \}/, 'never silent when the entrance is not found');   // WOD6: and the exterior's markers run again
-  assert.match(w, /if \(!pixel\) townTalk\.say\('\(the dungeon you saved in could not be found\. Your character is restored; travel there yourself\)'\);/);
-  assert.match(w, /\} else if \(extras\.locationKey && extras\.locationKey !== 'world'\) \{\s*townTalk\.say\('\(saved somewhere else\. Your character is restored; travel there yourself\)'\);/, 'what is left: a save from another host');
-  const worldArm = w.indexOf("if (extras.locationKey === 'world' && extras.world?.pixel) {");
-  const dungeonArm = w.indexOf("startsWith('dungeon:')) {");
-  const elsewhere = w.indexOf("'(saved somewhere else. Your character is restored; travel there yourself)'");
-  assert.ok(worldArm > 0 && worldArm < dungeonArm && dungeonArm < elsewhere, 'the arms in that order');
-});

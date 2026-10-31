@@ -179,10 +179,3 @@ test('GRASS-ON: the cells in view are drawn nearest first in the sprite styles -
   assert.equal(meadow.drawn.kept, 5 * perCell);
 });
 
-test('GRASS-ON: the world host hands the field `?provoke=last`, the door to time it under GL\'s own convention on a machine\'s own GPU (mutant: the door shut)', () => {
-  const w = read('src/scenes/world.js');
-  assert.ok(w.includes("new LabGrassRenderer(renderer.gl, { provoke: pageParam('provoke') !== 'last' })"));
-  assert.equal((w.match(/new LabGrassRenderer\(/g) || []).length, 1, 'the grass\'s one host builds the one field');
-  const lab = read('src/render/labGrass.js');
-  assert.ok(lab.includes("this._pv = provoke ? (gl.getExtension('WEBGL_provoking_vertex') ?? null) : null;"));
-});

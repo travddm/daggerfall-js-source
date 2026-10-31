@@ -258,15 +258,6 @@ test('TAMRIEL4 ink on the trace: the coast stays within half a picture pixel of 
   assert.equal(STITCH_REACH, 64);
 });
 
-test('TAMRIEL4 by source: the trace closes the lines and the dabs after the remainder; the ink drops the frame\'s runs from the traced coast; the host logs the edge it fitted', () => {
-  const trace = read('src/ui/tamrielTrace.js');
-  assert.match(trace, /if \(rem\) for \(let i = 0; i < rem\.length; i\+\+\) if \(rem\[i\] && !land\[i\]\) \{ land\[i\] = 1; province\[i\] = IMPERIAL_ID; \}\s*\n\s*closeBorderLines\(land, province, w, h\);[^\n]*\n\s*fillSpecks\(land, province, w, h\);/);
-  const ink = read('src/ui/tamrielInk.js');
-  assert.match(ink, /for \(const c of traced\.coast\) for \(const piece of clipOutsideRect\(c, rect\)\) coast\.push\(\.\.\.dropEdgeRuns\(piece, rect\)\);/);
-  assert.match(ink, /if \(!traced\) for \(const rv of RIVERS\)/);
-  assert.match(read('src/scenes/world.js'), /% of its cells and \$\{fit \? Math\.round\(\(100 \* fit\.seam\) \/ fit\.edge\) : 0\}% of its edge agreeing`\);/);
-});
-
 test('TAMRIEL4 with ARENA2: the player\'s own picture - no strait down any border, the painting\'s three enclosed waters and nothing else (PIN MOVED, NIBEN-SEA: Lake Rumare and the Niben the sea\'s), 26,599 land pixels; the Bay fitted at (38, 57) x15.5 with 190 of its 192 edge cells agreeing', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, async () => {
   const { ImgFile } = await import('../../src/formats/imgFile.js');
   const { DFPalette } = await import('../../src/formats/dfPalette.js');

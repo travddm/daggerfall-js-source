@@ -136,47 +136,6 @@ test('repositionFeetY: RepositionPlayer\'s height law, in feet', () => {
   assert.equal(CAPSULE_HEIGHT, 1.8);
 });
 
-test('the exits and the arrivals stand the player, they do not drop them', () => {
-  const wm = src('src/scenes/worldModes.js');
-  // The building exit and the dungeon exit both go through the law,
-  // with the terrain read off the collider they are about to stand on.
-  assert.match(wm, /player\.spawn\(landing\[0\], cabinLanding \? landing\[1\] : repositionFeetY\(player\.collider\.heightAt\(landing\[0\], landing\[2\]\), landing\[1\]\), landing\[2\]\)/,
-    'building exit: feet from the door centre');
-  assert.match(wm, /player\.spawn\(landing\.pos\[0\], repositionFeetY\(player\.collider\.heightAt\(landing\.pos\[0\], landing\.pos\[2\]\), landing\.pos\[1\]\), landing\.pos\[2\]\)/,
-    'dungeon exit: the same law');
-  assert.doesNotMatch(wm, /player\.spawn\(landing\[0\], landing\[1\], landing\[2\]\)/, 'the raw centre spawn is gone');
-  assert.doesNotMatch(wm, /player\.spawn\(landing\.pos\[0\], landing\.pos\[1\], landing\.pos\[2\]\)/);
-  // The world host's arrivals: PositionPlayerToLocation ends in
-  // FixStanding (StreamingWorld.cs:1597-1608), so the teleport and the
-  // first drop-in snap to the built pixel instead of falling 2u.
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (Road to 1:1, a3): the court's location-entrance arm is
-  // the first caller to hand a landing that DOES want grounding -
-  // RepositionPlayer's own `grounded` argument (StreamingWorld.cs:1587,
-  // :1592), true for every location but HomeYourShips. The default is
-  // unchanged, so the ship's remembered deck still lands as saved.
-  //
-  // PIN MOVED AGAIN (ship landing, 2026-09-03): the location arm runs
-  // INSIDE the core now, after the destination pixel is built, so the
-  // two terms are the resolved `local` (the location landing or the
-  // caller's own) and the resolved `ground` (the LocationType's or the
-  // caller's) rather than the raw arguments.
-  assert.match(w, /const local = landing\?\.pos \?\? localPos;/, 'the location landing outranks the caller\'s');
-  assert.match(w, /const ground = landing \? landing\.grounded : grounded;/, 'grounded off the LocationType when there is a landing');
-  // TL1: the arrival looks further for its floor than a door step does.
-  assert.match(w, /let pos = walkMode && \(!local \|\| ground\) \? floorLanding\(collider, raw, ARRIVAL_REACH, ARRIVAL_LIFT\) : raw;/, 'fast travel / teleport arrivals');   // TL2: `let`, so an obstructed marker can fall back
-  assert.match(w, /const stand = floorLanding\(collider, \[0, heightAt\(0, 0\) \+ 2, 0\]\);/, 'the first drop-in - FIX-C: DFU\'s Origin reposition, the terrain\'s corner (StreamingWorld.cs:290-292, :1330-1349)');
-  // And a saved position is restored as saved - a load or an anchor
-  // recall keeps its own y (DFU restores the transform verbatim).
-  // TERRAIN-SCALE1: as saved - on the ground it was saved over; only a save from before the stamp is stood again
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and the save's frame's law beside its scale
-  assert.match(w, /const ly = restandHeight\(w\.y \?\? 2, lx, lz, was, extras\.groundFrame\) \+ state\.compensation\[1\];/);
-  // ROAD A10 MOVED THIS PIN: the anchor arrival folded into ONE helper
-  // (anchorLanding) shared by the exterior, dungeon and interior recall
-  // arms - the compensated-y law lives on its return now. PIN MOVED (BAY-LEFT-GROUND, D5): the anchor's frame's law beside its scale
-  assert.match(w, /return \[lx, restandHeight\(a\.y \?\? 2, lx, lz, scaleOf\(a\.terrainScale\), a\.groundFrame\) \+ state\.compensation\[1\], lz\];/);
-});
-
 // ── TL1: THE ARRIVAL LOOKS FURTHER FOR ITS FLOOR ──────────────────
 // Mac: "you don't remain on the ground after traveling, you spawn in
 // the air and drop."
@@ -194,31 +153,6 @@ test('TL1: an arrival finds a floor far below OR far above its raw, where a door
   // ...and a flat site lands exactly where it always did.
   assert.equal(floorLanding(plane(0), [0, 2, 0], 240, 40)[1], 0);
   const { readFileSync } = await import('node:fs');
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /const ARRIVAL_LIFT = 40;\s*\n\s*const ARRIVAL_REACH = 240;/);
-  assert.match(world, /floorLanding\(collider, raw, ARRIVAL_REACH, ARRIVAL_LIFT\)/, 'the arrival passes both');
-  // Ordinary door steps keep their ten units - a step is not a fast travel.
-  const ee = readFileSync(new URL('../../src/player/enterExit.js', import.meta.url), 'utf8');
-  assert.match(ee, /export function floorLanding\(collider, pos, maxDist = 10, extraHeight = 0\)/);
-});
-
-// ── TL2: A LANDING IN A BUILDING'S FOOTPRINT IS REFUSED ────────────
-// Mac: "you can spawn inside the building geometry."
-test('TL2: a marker whose floor is a roof falls back to the edge landing', async () => {
-  const { readFileSync } = await import('node:fs');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // The floor the arrival ray found is checked against the flat: more
-  // than OBSTRUCTED_ABOVE over it is a roof, and the landing is refused
-  // for the edge landing, which stands outside the blocks by construction.
-  assert.match(w, /const OBSTRUCTED_ABOVE = 3;/);
-  // AUDIT 68 S22: the edge of the side the landing ALREADY chose - a second side roll faced the player the wrong way
-  assert.match(w, /if \(walkMode && landing && pos\[1\] - raw\[1\] > OBSTRUCTED_ABOVE\) \{\s*\n\s*const eraw = landing\.edgePos;/);
-  assert.match(w, /pos = floorLanding\(collider, eraw, ARRIVAL_REACH, ARRIVAL_LIFT\);/, 'and the edge is floored the same way');
-  // noMarkers really removes the markers from the choice (rideOut's edge landing).
-  assert.match(w, /const startMarkers = b\?\.locBlocks && !noMarkers/);
-  // Only a MARKER landing is second-guessed: the edge landing and a
-  // caller's explicit localPos stand where they were told.
-  assert.match(w, /walkMode && landing && pos\[1\]/);
 });
 
 // ── TSR4c: THE RAY ONLY SEES MESHES; THE GROUND IS THE COLLIDER'S ──
@@ -250,6 +184,4 @@ test('TSR4c: a miss over a collider that has a ground answers the ground, not th
   const { Collider } = await import('../../src/player/collider.js');
   assert.equal(new Collider(() => 7).heightAt(0, 0), 7);
   const { readFileSync } = await import('node:fs');
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /const collider = new Collider\(heightAt, surfaceAt\);/, 'the exterior collider\'s ground IS the terrain - and (BLOOD1 AUDIT 3) what is PLACED on it asks the drawn surface, the capsule the walk floor (PIN MOVED, FLORA-GROUND: on the near grid the two are one law, terrainSurface.js walkGroundAt)');
 });

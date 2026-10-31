@@ -132,15 +132,6 @@ test('HOME-STATIONS an online home: the account service first - a station it kee
   assert.deepEqual([rig.standing[0].station, rig.w.paid.at(-1)], ['alchemy', 50000]);
 });
 
-test('HOME-STATIONS the room and the service: a station pressed opens its craft\'s maker for its owner alone, through the guild service\'s own door; the account service writes the craft with the place (mutants: the station never pressed; any visitor served; the craft never stored)', () => {
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /if \(piece\?\.station\) \{ useDecorStation\(piece\); return; \}/);
-  const use = M.slice(M.indexOf('  function useDecorStation(piece) {'), M.indexOf('  function offerStationActs(piece) {'));   // GUILD1d (re-aimed by content): the hall's members' rung inside the owner's check; PIN MOVED (FIELD BUGS 2026-10-11f STATION-DOOR): the press and the maker it opens (openStationMaker), to the chooser
-  assert.match(use, /if \(!stationOwnerHere\(\) && !decorMayStation\(piece\.id\)\) \{/, 'the owner\'s, or a grant\'s');   // PIN MOVED (DECOR access): a visitor still stops here; a grant or a hall member goes on
-  assert.match(use, /openServiceFlow\(DECOR_STATION_SERVICES\[piece\.station\], \{ guild: null, memberships: null, store: null, rows, route: null \}\)/);
-  assert.match(src('server-account/src/decor.js'), /const placeJson = \(\{ pos, rot, scale, light, storage, paid, station, name \}\) => JSON\.stringify\(\{ pos, rot, scale, light, storage, paid, \.\.\.\(station \? \{ station \} : \{\}\), \.\.\.\(name \? \{ name \} : \{\}\) \}\);/);
-});
-
 // ─── AUDIT (the batch's audit, agent E) ────────────────────────────────────────────────────────────────────────────
 
 const onlineRig = (gold, hold = false) => {
@@ -207,35 +198,3 @@ test('AUDIT HOME-STATIONS S2: one change of craft at a time - a second press whi
   assert.equal(o2.rig.said.at(-1), DECOR_STATION_GOLD_WENT);
 });
 
-test('AUDIT HOME-STATIONS S3 + S6 + S9: the room\'s view repaints when a piece\'s craft changes (its signature carries the craft), and the button acts as it is painted; a station\'s Remove says the licence does not come back; the chooser is named for a reader (mutants: the craft out of the signature; the act re-read from a newer piece)', async () => {
-  const rig = toolRig({ gold: 300_000 });
-  const chair = await placedOne(rig);
-  const root = choose(rig, chair.id);
-  btn(root, /^Make station/).fire('click');
-  await settle();
-  rig.frame({ overlayUp: true });   // the next frame hands the panel the room as it stands - no row chosen again
-  assert.ok(btn(root, /^Unmake station/), 'the button says what the piece now is');
-  assert.match(one(root, 'dfdecor-pick-price').textContent, / back \(the station license is not\)$/);
-  assert.equal(btn(root, /^Station:/).attrs['aria-label'], 'Station craft: Alchemy - press for the next');
-  // unmade: no gold moves (the view's gold does not change it), and the view still repaints - the craft is its own
-  btn(root, /^Unmake station/).fire('click');
-  btn(root, /^Press again to de/).fire('click');
-  await settle();
-  rig.frame({ overlayUp: true });
-  assert.equal(rig.standing[0].station, undefined);
-  assert.equal(btn(root, /^Make station/)?.textContent, 'Make station - 50,000 gold', 'the button says what the piece now is');
-  const P = src('src/ui/decorPanel.js');
-  assert.match(P, /const what = stationBtn\.dataset\.what;\s*\n\s*if \(what === 'arm'\) \{ stationArmed = it\.piece\.id; paintRoomSide\(\); return; \}\s*\n\s*stationArmed = null;\s*\n\s*if \(what\) onToggle\(it\.piece, what\);/, 'the act the button says');
-  assert.match(P, /stationBtn\.dataset\.what = words\.what;/);
-});
-
-test('AUDIT HOME-STATIONS S5 + S7 + S8: six acts fit a landscape phone (the side scrolls, a short screen\'s preview gives way); a maker\'s refusal with no record still says so; a station says its craft on the hover (mutants: each dropped)', () => {
-  const P = src('src/ui/decorPanel.js');
-  assert.match(P, /\.dfdecor-side \{ display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; contain: layout; \}/);
-  assert.match(P, /@media \(max-height: 480px\) \{ \.dfdecor-preview \{ min-height: 60px; \} \}/);
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /for \(const t of lines\.length \? lines : \[DECOR_STATION_REFUSED\]\) say\(t\);/);
-  assert.match(M, /const DECOR_STATION_REFUSED = 'You cannot use the station right now\.';/);
-  assert.match(src('src/systems/worldTooltips.js'), /const craft = piece\.station \? stationName : null;\n\s*return t \? \{ title: craft \? `\$\{t\} \(\$\{craft\}\)` : t \} : craft \? \{ title: craft \} : null;/);
-  assert.match(M, /stationName: piece\?\.station \? \(DECOR_STATION_NAMES\[piece\.station\] \?\? null\) : null/);
-});

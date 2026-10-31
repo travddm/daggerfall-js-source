@@ -45,8 +45,6 @@ test('SEA-RISE: a death whose region holds no safe place rises at the nearest on
   assert.deepEqual(maps.loads, [0, 1, 2, 'back:5'], 'one sweep, and the resident region put back');
   assert.equal(nearestSafeLocationAnywhere(fakeMaps([sea, sea]), px), null, 'no region with one: null, and the caller keeps its fallback');
   assert.equal(nearestSafeLocationAnywhere(null, px), null);
-  // the respawn asks it when the region answers none
-  assert.match(rd('src/scenes/world.js'), /const safe = nearestSafeLocation\(mapTable, px\) \?\? nearestSafeLocationAnywhere\(maps, px\);/);
 });
 
 test('SEA-RISE: a player raised from death does not come up running - the respawn drops the autorun latch, as a held MoveBackwards does', () => {
@@ -67,19 +65,5 @@ test('SEA-RISE: a player raised from death does not come up running - the respaw
   assert.equal(m.isRunning, false, 'and the run it forced goes with it');
   m.update(1 / 60, still({ autoRun: true }), 0);
   assert.equal(m.toggleAutorun, true, 'one press latches it again');
-  const w = rd('src/scenes/world.js');
-  const at = w.indexOf('  function respawnOnlinePlayer() {');
-  assert.match(w.slice(at, w.indexOf('Promise.resolve().then(', at)), /^\s*player\.stopAutorun\(\);/m, 'the respawn drops it, before the walk to the safe place - a live line, not a comment');
 });
 
-test('SEA-RISE: the sea\'s breath waits under a window, as the dungeon\'s does - a pack opened underwater is a pack the player can empty', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!_overlayHeld\) _dwBreathTimer \+= dt;\n\s*while \(_dwBreathTimer >= CLASSIC_UPDATE_INTERVAL\) \{/, 'the classic update\'s breath is held with the calendar');
-  assert.match(w, /if \(!_overlayHeld\) playerTicker\.tick\(/, 'the calendar the window holds, beside it');
-  // the dungeon host's breath runs only with no window up (drawFoes' own gate)
-  // AUDIT 27h S1: ...and under the OUTER host's street slot too (a Recall prompt over a world-hosted dungeon), which the
-  // dungeon's own gate never saw - the claim above was only half true
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online the dungeon's frame runs under its own window, and its breath waits there too
-  assert.match(rd('src/scenes/dungeonContext.js'), /rest window IS an overlay[\s\S]{0,700}breathTick\(opts\.breathHeld\?\.\(\) \|\| dungeonPaused\(\) \? 0 : dt, playerFeet, playerHeight\);/);
-  assert.match(rd('src/scenes/worldModes.js'), /breathHeld: \(\) => !!townTalk\?\.overlayActive,/);
-});

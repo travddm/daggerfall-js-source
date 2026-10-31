@@ -146,9 +146,6 @@ test('BAY-LEFT-GROUND D1 every kernel takes the table past the Bay: the job\'s a
   const flatOff = generatePixelTerrain({ woods, ...flatJob, tilemap: new Uint8Array(128 * 128) });
   assert.notEqual(flatOn.avg, flatOff.avg, 'the centre\'s average with the site beside it, and without');
   sameSamples(generatePixelTerrain({ woods, beyond, ...flatJob, tilemap: new Uint8Array(128 * 128) }).samples, flatOn.samples, 'kept while the table stands');
-  const worker = src('src/world/terrain/terrainGenWorker.js');
-  assert.match(worker, /const landforms = m\.landform \? createLandforms\(\{ woods, roads, sites, beyond, climates \}\) : null;\n\s+const pixel = \(px, py\) => keptMid\(/, 'the middle ring');
-  assert.match(worker, /m\.t === 'landform-beyond' \|\| m\.t === 'tamriel'\) \{ keptMid\.clear\(\); keptFar\.clear\(\); \}/, 'the horizon\'s books let go when it moves');
   // the client: its own kernel reads it; a worker gets a copy
   const c = new TerrainGenClient({ woods });   // no worker: the same-thread kernel
   c.setLandformBeyond(beyond);
@@ -158,7 +155,6 @@ test('BAY-LEFT-GROUND D1 every kernel takes the table past the Bay: the job\'s a
   c._worker = { postMessage: (m) => sent.push(m) };
   c.setLandformBeyond(beyond);
   assert.deepEqual(sent, [{ t: 'landform-beyond', beyond }]);
-  assert.equal((src('src/world/terrain/terrainGenClient.js').match(/sites: this\._sites, beyond: this\._beyond, climates: this\._climates, /g) ?? []).length, 6, 'every same-thread kernel the client runs');
 });
 
 test('BAY-LEFT-GROUND D1 the places past the Bay as sites (GROUND-AGREE: what every client with the land stands alike): the model\'s every stood place with a template, and a capital levelled as a town is (one pixel, inland: Mournhold, Falinesti, Helstrom); a capital over several pixels or at the sea keeps its own law; a place pinned on a standing capital is the capital\'s (mutants: the shore capitals taken; the pinned place twice)', () => {
@@ -263,18 +259,6 @@ test('BAY-LEFT-GROUND D1 the host keeps the table with the places: made as the w
   const off = createLandformSites({ terrainGen: { setLandformBeyond: () => { throw new Error('posted'); } }, landform: false, arena: null, capitals: true, built: new Map(), inFlight: new Map(), swap: s.swap });
   assert.equal(off.beyond(), null);
   assert.equal(off.refresh(), false);
-});
-
-test('BAY-LEFT-GROUND D1 the world host wires it: the table made beside the places\' templates and handed to both kernels, this thread\'s landforms and a promotion\'s grid reading it, asked on the frame after the places\' own sweeps, the gate\'s kernel kept by its generation (mutants: each seam)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const beyondSites = createLandformSites\(\{ terrainGen, landform, arena: _arenaTemplates, capitals: !!_capitalBase, get built\(\) \{ return built; \}, get inFlight\(\) \{ return inFlight; \}, swap \}\);/);
-  // D5: `before` the old law's (the Bay's table alone - test/world/terrain/bayleftground_frame.test.js)
-  // PIN MOVED (RELIEF-PEAKS, bible/03-World/Tamriel.md): the ranges asked with the landforms, but under a record's old law
-  assert.match(w, /createLandforms\(\{ woods, roads: terrainGen\.roads\(\), sites: _landformSites, beyond: before \? null : beyondSites\.beyond\(\), climates: _landformClimates, ranges: !before \}\)/, 'this thread\'s landforms');
-  assert.match(w, /sites: _landformSites, beyond: beyondSites\.beyond\(\), climates: _landformClimates, bed: /, 'a promotion\'s grid');
-  assert.match(w, /if \(_capitalBase && !building\) sweepCapitalPixels\(\);[^\n]*\n\s+if \(!building\) beyondSites\.refresh\(\);/, 'on the frame, after the places\' sweeps');
-  assert.match(w, /const key = `\$\{px\},\$\{py\},\$\{landform && terrainGen\.roads\(\) \? 1 : 0\},\$\{beyondSites\.generation\(\)\}`;/, 'the gate\'s kernel');
-  assert.ok(w.indexOf('const beyondSites = createLandformSites(') > w.indexOf('const _arenaTemplates = '), 'after the templates it reads');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;

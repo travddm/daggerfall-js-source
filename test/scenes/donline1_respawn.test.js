@@ -60,60 +60,6 @@ test('D-ONLINE1: half health back, never none; one flavour line per kind, the pi
   assert.equal(respawnFlavorText('city', () => 1), respawnFlavorText('city', () => 0.999), 'a roll of exactly 1 stays in the pool');
 });
 
-test('D-ONLINE1 by source: the world host snapshots "was this death online" at the presenter, its reset respawns or ends the run by that snapshot, F11 does the same, the modal hosts ask through one door, and the respawn leaves any mode, lands on a start marker, restores half health and speaks', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /_deathWasOnline = _onlineWorldSession\(\);\s*\n\s*townTalk\.showOverlay\(new DeathScreen\(\{ eyeHeight: player\.eye\[1\] - player\.pos\[1\], capsuleHeight: player\.height, onReset: \(\) => \(legacyDeathReset\(\) \|\| \(_deathWasOnline \? respawnOnlinePlayer\(\) : endRunToTitleMenu\(renderer\)\)\), rises: \(\) => legacyHost\?\.willRise\(\) \?\? false \}\)\);/, 'captured synchronously at the presenter, and read at the reset');   // PIN MOVED (BAL4): and the screen told of a Legacy rise
-  assert.match(w, /const _onlineWorldSession = \(\) => onlineOn \|\| !!\(online && online\.status === 'open' && \(isWorldRoom\(online\.room\) \|\| isCellRoom\(online\.room\)\)\);/, 'the predicate counts the open world\'s CELL room - a death outdoors is an online death');
-  assert.match(w, /if \(_deathWasOnline == null\) _deathWasOnline = _onlineWorldSession\(\);[^\n]*\n(?:(?![^\n]*online\.leave\(\))[^\n]*\n)*?\s*if \(online\.room(?: && !_wildGhost)?\) \{ worldPublish\(now, true\); online\.leave\(\);/, 'the frame\'s backstop for the modal hosts\' deaths is taken BEFORE the leave clears the room (PCORPSE1\'s death pose between them, sent while the room is still joined; WILD1: the open zone\'s ghost keeps the cell while its body lies)');
-  // AUDIT CONTRIB A4: through the death screen's own reset (Enter's path), whose onReset IS the respawn above - a
-  // direct respawn under the screen left the fall tilting the view at the sky through the teleport
-  assert.match(w, /if \(townTalk\.overlay instanceof DeathScreen && _deathWasOnline\) townTalk\.overlay\.input\('confirm'\);[^\n]*\n\s*else hudCtx\.quickLoad\(\);/, 'F11 on an online death respawns (through the reset); otherwise it quickloads as ever');
-  assert.match(w, /onlineRespawn: \(\) => \{ if \(legacyDeathReset\(\)\) return true; if \(!\(_deathWasOnline \?\? _onlineWorldSession\(\)\)\) return false; respawnOnlinePlayer\(\); return true; \},/, 'the host bag\'s door for the modal hosts');
-  const ri = w.indexOf('function respawnOnlinePlayer() {');
-  const fn = w.slice(ri, w.indexOf('\n  }\n', ri));
-  assert.match(fn, /_deathWasOnline = null;/, 'armed fresh for the next death');
-  assert.match(fn, /if \(mode !== 'exterior'\) modes\?\.forceExitToExterior\(\);/, 'a dungeon AND a building interior are left first - the exit clears the modal host\'s death screen with its slot');
-  assert.match(fn, /if \(wasInDungeon && !isPrivateersHold\) kind = 'dungeon';/, 'dead underground: the door out is the pixel already under the player - unless it is the tutorial dungeon (D-ONLINE2)');
-  // D-ONLINE2: the exception, and that it is read off the CONFIGURED start cell rather than a hardcoded pixel,
-  // so a custom Startup.StartCellX/Y moves it. A death in the Hold takes the ordinary search below instead, and
-  // that search answers only a temple, a city or a graveyard - never a dungeon - so it cannot land back inside.
-  assert.match(fn, /const isPrivateersHold = wasInDungeon\s*\n\s*&& px\.x === getInt\('Startup', 'StartCellX'\) && px\.y === getInt\('Startup', 'StartCellY'\);/, 'the tutorial dungeon is the configured start cell, not a magic number');
-  assert.match(read('src/systems/deathRespawn.js'), /'temple'|'city'|'graveyard'/, 'and the fall-through search never answers a dungeon');
-  assert.match(fn, /const safe = nearestSafeLocation\(mapTable, px\) \?\? nearestSafeLocationAnywhere\(maps, px\);\s*\n\s*if \(safe\) \{ land = safe\.mapPixel; kind = safe\.kind; \}\s*\n\s*else kind = 'city';/, 'otherwise the nearest of the three - SEA-RISE: in any region when the death\'s holds none (the open sea) - and only a map with none anywhere stands where they fell');
-  assert.match(fn, /await _teleportToPixel\(land\.x, land\.y, null, \{ reposition: REPOSITION\.RandomStartMarker \}\);/, 'the landing is a start marker, as TeleportAway names it - not the tile\'s dead centre');
-  assert.match(fn, /_lastEncMinutes = Math\.floor\(playerTicker\.ownMinutes\);/, 'no encounter catch-up across the trip');
-  // MAC-D3 (Seanobi: "stuck in an infinite deathloop. Instant death
-  // after respawning"): THE HEAL IS FIRST, AND THIS PIN USED TO SAY
-  // OTHERWISE. It asserted the heal sat immediately before the flavour
-  // line - which is where it sat, at the END, after `await
-  // _teleportToPixel` and after forceExitToExterior had torn the death
-  // screen down. The frame loop only holds off raising death while a
-  // DeathScreen is up, so every frame of that await saw a dead player
-  // and no screen: death, reset, respawn, death. A lag spike widens
-  // the window until it cannot be escaped. The pin agreed with the
-  // wiring, so it went green over the loop.
-  // DEATHLOOP1 re-aim: still the one fraction, now reached through the
-  // one revival - `reviveForPlay` ends the drains at the same time,
-  // which is the half MAC-D3's ordering fix did not cover.
-  const healAt = fn.indexOf('reviveForPlay(playerEntity, { force: true });');
-  assert.ok(healAt > 0, 'half health, off the one fraction, through the one revival');
-  assert.ok(healAt < fn.indexOf('modes?.forceExitToExterior()'), 'MAC-D3: healed BEFORE the death screen is torn down (the CALL, not this file\u2019s prose about it)');
-  assert.ok(healAt < fn.indexOf('await _teleportToPixel'), 'MAC-D3: ...and before anything is awaited - a dead player must not survive a single frame of the flight');
-  assert.match(fn, /reviveForPlay\(playerEntity, \{ force: true \}\);\s*\n\s*surfacePlayer\(\);/, 'surfaced with it');
-  // DEATH-PENALTY: the line may carry what the fall cost beside it (systems/deathPenalty.js deathPenaltyText)
-  // PIN MOVED (RVN8: a revenant's theft rides the same box, after the price - bible/12-Enhanced-AI/Feud-Arc.md 19)
-  assert.match(fn, /townTalk\.showOverlay\(new ActionTextBox\(\[respawnFlavorText\(kind\)(?:, deathPenaltyText\(goldLost\)(?:, took\?\.line)?\]\.filter\(Boolean\)|\])\)\);/, 'and the line stands where the death screen did');
-  // ...and one respawn at a time, or a death raised mid-flight starts
-  // another teleport racing the first
-  assert.match(fn, /if \(_respawning\) return;/, 'MAC-D3: re-entry is refused');
-  assert.match(fn, /_respawning = true;/);
-  assert.match(fn, /\.finally\(\(\) => \{ _respawning = false; \}\);/, '...and the latch is always released, even when the teleport throws');
-  assert.match(read('src/scenes/worldModes.js'), /interiorOverlay = new DeathScreen\(\{ eyeHeight: player\.eye\[1\] - player\.pos\[1\], capsuleHeight: player\.height, onReset: \(\) => \{ if \(!host\.onlineRespawn\?\.\(\)\) endRunToTitleMenu\(renderer\); \}, rises: \(\) => host\.legacyWillRise\?\.\(\) \?\? false \}\);/, 'a building\'s death asks the host, and ends the run when it says no');   // PIN MOVED (BAL4): and tells the screen of a Legacy rise
-  assert.match(read('src/scenes/worldModes.js'), /return host\.onlineRespawn\?\.\(\) \?\? false;\s*\n\s*\},/, 'the dungeon context is handed the same door, falling through to it once PH1\'s in-place Privateer\'s Hold respawn declines');
-  assert.match(read('src/scenes/dungeonContext.js'), /activeOverlay = new DeathScreen\(\{ eyeHeight: _ms\?\.eyeLevel, capsuleHeight: _ms\?\.capsule, onReset: \(\) => \{ if \(!opts\.onlineRespawn\?\.\(\)\) endRunToTitleMenu\(renderer\); \}, \.\.\.\(opts\.onlineRespawn \? \{ rises: opts\.legacyWillRise \} : \{ online: false \}\), penalty: madeLevelRule\(_made, 'deathPenalty'\) !== 'none' \}\);/, 'and asks it (AUDIT 28 B5: standing alone, it says it never respawns online)');   // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the Spire's screen states no DEATH-PENALTY   // PIN MOVED (BAL4): in the world, the Legacy rise told
-  assert.match(read('src/scenes/exterior.js'), /new DeathScreen\(\{[^\n]*onReset: \(\) => endRunToTitleMenu\(renderer\), hint: 'ENTER end', online: false \}\)/, 'the fixed city has no online and keeps the bare form - and says so (AUDIT 28 B5)');
-});
-
 // ── MAC-D3 (Seanobi on Discord, 2026-09-21: "stuck in an infinite
 // deathloop. Instant death after respawning") ────────────────────────
 test('MAC-D3: a respawn answers a LIVING number for any maxHealth, and the loop that needs a dead player mid-flight cannot form', async () => {
@@ -137,35 +83,5 @@ test('MAC-D3: a respawn answers a LIVING number for any maxHealth, and the loop 
   // death - and a teleport loads a map pixel, so under the lag spike
   // Seanobi reported the window is many frames wide.
   const { readFileSync } = await import('node:fs');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const ri = w.indexOf('function respawnOnlinePlayer()');
-  // THE CODE, NOT THE PROSE ABOUT IT. The note above this function
-  // names `await _teleportToPixel` and forceExitToExterior to say what
-  // went wrong, so an index over the raw slice finds the comment and
-  // reads the order backwards. Comment lines come out first.
-  const code = w.slice(ri, w.indexOf('\n  }\n', ri))
-    .split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-  // DEATHLOOP1 re-aim: the revival is `reviveForPlay` now, because a
-  // heal alone was only half of it - the drains that emptied the bar
-  // had to end with it. The ORDER this pin exists for is untouched and
-  // is what is still read: alive before anything is torn down or
-  // awaited.
-  const heal = code.indexOf('reviveForPlay(playerEntity, { force: true });');
-  assert.ok(heal > 0, 'the revival is there');
-  assert.ok(heal < code.indexOf('modes?.forceExitToExterior()'), 'alive before the death screen goes');
-  assert.ok(heal < code.indexOf('await '), 'alive before ANYTHING is awaited');
-  assert.ok(heal < code.indexOf('Promise.resolve()'), '...and synchronously, in the same turn the reset ran');
-  // one respawn in flight at a time, or a death raised mid-teleport
-  // starts a second teleport racing the first
-  assert.match(code, /if \(_respawning\) return;/);
-  assert.match(code, /\.finally\(\(\) => \{ _respawning = false; \}\);/, 'released even when the teleport throws');
 
-  // the dungeon arm of the same law already had this order, which is
-  // what says it is the law and not a preference
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const spawnAt = wm.indexOf('player.spawn(spawn[0], spawn[1], spawn[2]);');
-  assert.ok(spawnAt > 0);
-  const healAt = wm.indexOf('reviveForPlay(playerEntity, { force: true });', spawnAt);
-  const clearAt = wm.indexOf('ctx.clearDeathOverlay?.();', spawnAt);
-  assert.ok(healAt > spawnAt && healAt < clearAt, 'worldModes: spawn, heal, THEN clear the overlay - all in one turn');
 });

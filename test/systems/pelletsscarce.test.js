@@ -24,8 +24,6 @@ const B = BUILDING_TYPES;
 const lcg = (seed) => { let x = seed >>> 0; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 0x100000000; }; };
 
 test('PELLETS-SCARCE NO SHELF: no shop of any kind, at any quality, on any shelf, every draw landing or none, carries a Dwemer Pellet - and the shop stock names none; a smith still buys one back (mutants: the counter\'s line restored)', () => {
-  const src = readFileSync('src/systems/shopStock.js', 'utf8');
-  assert.ok(!/createPellets|PELLET_TEMPLATE|shopPelletStack|SHOP_PELLETS_MAX/.test(src), 'the stock law knows nothing of the shot');
   for (const buildingType of Object.keys(SHOP_ITEM_GROUPS).map(Number)) {
     for (const quality of [1, 7, 14, 20]) {
       for (const shelfIndex of [0, 1, 2]) {

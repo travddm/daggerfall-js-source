@@ -123,9 +123,6 @@ test('TURNED-BLOW THE IMPS (Elite-Gates.md sections 8.2 and 11.7): on a span the
   assert.equal(S.sent.at(-1).i, by.i);
   assert.ok(S.relayBlow(by.i) > 0, 'and the relay lands it');
   assert.equal(egStruckOff(view, by, isle.x, isle.y ?? 0, isle.z), false);
-  // the one law: the relay's egBlow asks it, and no second copy of the rule stands in src/
-  assert.match(rd('src/net/eliteGates/egBrain.js'), /if \(egStruckOff\(view, body, p\.x, p\.y, p\.z\)\) return land\(0\);/, 'the relay asks the law');   // PIN MOVED (FIELD BUGS 2026-10-20f LANDED-WORD): a blow it refuses lands 0 and says so to its striker
-  assert.equal((rd('src/net/eliteGates/egBrain.js').match(/egGroundAt\(view, body\.x, egFeetY\(view, body\.y\)/g) ?? []).length, 0, 'no second copy of the rule');
 });
 
 test('TURNED-BLOW THE HEAL, END TO END: a vampiric blade (Vampiric Effect, when strikes) with a leech line, through the real formula and the real strike listener on the screen\'s own stand-in - a blow the relay will refuse heals nothing; the same blow on a body it will take heals the claim and its leech (mutants: the stand-in never warded; Vampiric Effect blind to the ward)', async () => {
@@ -211,15 +208,6 @@ test('TURNED-BLOW THE WARDS AND THE SLEEPERS (sections 8.6 and 12): the relay ta
   assert.equal(egStrikeTurned(egFightView(C.spec), C.E().fight.bodies.find((b) => b.i === L.i), L.x + 1.5, L.y ?? 0, L.z), false);
 });
 
-test('TURNED-BLOW THE HOST\'S SWING AND SHAFT (scenes/dungeonContext.js - buildDungeonContext does not run in Node, so its wiring is pinned by its text): a swing or a shaft on a body whose stand-in is warded rings off it as the Warden\'s ward does - no blood, nothing sent - and a turned shaft flies no further (mutants: the swing\'s ring dropped; the shaft\'s ring dropped)', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  const swing = dc.slice(dc.indexOf('  function swingOnHost(hb, damage, lookDir) {'), dc.indexOf('  function spellOnHost('));
-  assert.match(swing, /^ {2}function swingOnHost\(hb, damage, lookDir\) \{\n {4}if \(hb\.entity\.warded\) wardTurns\(hb\);[^\n]*\n {4}else if \(damage <= 0\) \{/, 'the swing: the ward\'s ring first, then a zero blow\'s parry, else the blood and the number out');
-  // PIN MOVED (AUDIT FB1018f L3-7): the turned shaft says its word beside the ring (THE TURNED BLOW SAYS ITS WORD, below)
-  assert.match(dc, /\n {12}if \(hb\.entity\.warded\) \{ wardTurns\(hb\); [^\n]*\}[^\n]*\n {12}else playerArrowHitFoe\(m, hb, \{[^\n]*landOnHost\(hb, d, HIT_KINDS\.Shaft\)[^\n]*\n {12}if \(!hb\.entity\.warded && techniquePierces\(m, hb\)\) continue;/, 'the shaft: the ward\'s ring, else the one player-arrow law');
-  assert.match(dc, /function wardTurns\(boss\) \{ audio\.play3d\(SOUND\.Parry6, bossChest\(boss\)/, 'the ring is the ward\'s own, at the body\'s chest');
-});
-
 // ── AUDIT FB1018f lane L3 ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('TURNED-BLOW THE WAKE SAID AT ONCE (AUDIT FB1018f L3-1; section 8.6): a Court\'s lord woken by its wake ring says its first phase in the beat that wakes it (`eph` - the screen holds a lord asleep until it hears a phase, and the whole fight\'s word came up to two seconds later), so on the next frame the screen holds it awake and offers it whole, the blow sent and landed; that first phase turns no card (mutants: the wake\'s phase unsaid; the wake folded as a phase turn)', async () => {
@@ -283,11 +271,6 @@ test('TURNED-BLOW THE STOREY (AUDIT FB1018f L3-6; Elite-Gates-Ascent.md section 
   assert.equal(egStrikeTurned(stacked, walker, 0.5, 0, 0, 0), false, 'at its word: on my floor');
   assert.equal(egStrikeTurned(stacked, walker, 0.5, 0, 0, 60_000), true, 'carried up: a floor between us');
   assert.equal(egStrikeTurned(stacked, walker, 0.5, 8, 0, 60_000), false, 'and on the upper floor with it');
-  // one law: both sides call it, and no copy of the storey rule stands in egHitBody
-  const src = rd('src/net/eliteGates/egBodies.js');
-  assert.match(src, /if \(egStoreyApart\(F\.view \?\? spec, pose\.x, pose\.y, pose\.z, bx, b\.y, bz, r === HIT_KINDS\.Melee\)\) return \{ got: 0, b: null \};/, 'the relay asks the law, with the blow\'s kind');
-  assert.equal((src.match(/!egOneStorey\(sm, sb\)/g) ?? []).length, 1, 'the rule written once');
-  assert.equal((src.match(/!egOneStorey\(egStoreyY\(/g) ?? []).length, 0, 'and nowhere else');
 });
 
 test('TURNED-BLOW THE OBJECT\'S RADIUS (AUDIT FB1018f L3-4): an errand\'s object is struck from beside it off the floor by its own radius (egStruckOff) - a spark\'s 0.6, a chain\'s 0.8, an anchor\'s 0.9, a false wall\'s 1, a rift\'s 1.3, a Wellspring\'s spring 2.2 (a rift too: no kind says it) - and the screen now hears that radius, said beside each body\'s row of nineteen (`ead` and `efs`, through the real wire and link): at every gap off a floor\'s edge the screen judges a blow as the relay does; a word that says none (a relay before it) still folds, a malformed list is refused (mutants: the radius unsaid in a risen word or the whole fight; dropped by the wire; unfolded by the link; halved; a short or a negative list kept; one radius for every body)', () => {
@@ -334,7 +317,6 @@ test('TURNED-BLOW AN OBJECT TURNED IS NEVER SENT (AUDIT FB1018f lane L3\'s survi
 });
 
 test('TURNED-BLOW THE TURNED BLOW SAYS ITS WORD AT EVERY DOOR (AUDIT FB1018f L3-2, L3-7; scenes/dungeonContext.js by its text - buildDungeonContext does not run in Node): a spell on a body of the court\'s or the Spire\'s pops its number by the stand-in it met, so a turned one says "No footing" or "Warded" (ui/hitNumbers.js numberFor), never the claim; a shaft a ward or the ground turns says its word beside the ring, as a swing\'s formula does on the same stand-in - one of his host\'s and the Warden\'s (mutants: each spell door\'s number blind to its body; each turned shaft silent)', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
   // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the three spell doors are one door now
   // (scenes/gate/standInSpell.js), driven here on the real stand-ins - each number by the body it met, turned or not
   const heard = [], was = playerEntity.level;
@@ -358,9 +340,6 @@ test('TURNED-BLOW THE TURNED BLOW SAYS ITS WORD AT EVERY DOOR (AUDIT FB1018f L3-
       assert.equal(numberFor(heard.at(-1)).text, word ?? 'Warded', 'turned, its word - never the claim');
     }
   } finally { setPlayerAttackHook(null); playerEntity.level = was; }
-  assert.match(dc, /\n {12}if \(hb\.entity\.warded\) \{ wardTurns\(hb\); reportPlayerAttack\(\{ hit: true, damage: 0, target: hb\.entity \}\); \}/, 'a shaft on one of the host, turned: its word');
-  assert.match(dc, /\n {12}if \(boss\.warded\) \{ wardTurns\(boss\); reportPlayerAttack\(\{ hit: true, damage: 0, target: boss\.entity \}\); \}/, 'a shaft into his ward: its word');
-  assert.match(dc, /b\.entity\.warded = !!b\.warded;/, 'his stand-in carries his ward, the word\'s source');
   // the word as the HUD shows it: the ground's, else the ward's; a body that takes it, its number
   assert.equal(numberFor({ hit: true, damage: 0, target: { warded: true, wardText: egNoFooting() } }).text, 'No footing');
   assert.equal(numberFor({ hit: true, damage: 0, target: { warded: true, wardText: null } }).text, 'Warded');

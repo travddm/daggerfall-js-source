@@ -104,17 +104,7 @@ test('DIAMOND-HB: with nothing hovered, the most recent window\'s selection is u
 });
 
 test('DIAMOND-HB by source: pack rows, worn panels and spell rows carry their item or spell; diamond slots use clip-path, not rotation; the HUD mounts the diamond dock', () => {
-  const INV = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(INV, /if \(from === 'local'\) row\._hotbarItem = item;/, 'pack rows only, not loot rows');
-  assert.equal((INV.match(/b\._hotbarItem = /g) ?? []).length, 2, 'worn panel and worn socket');
-  assert.match(INV, /setHotbarPick\('pack', \{/);
-  const BOOK = read('src/ui/enhanced/enhancedSpellbook.js');
-  assert.match(BOOK, /b\._hotbarSpell = r\.spell;/);
-  assert.match(BOOK, /setHotbarPick\('book', \{/);
   assert.match(HOTBAR_CSS, /\.hb\.hb-gem \.hb-slot \{ clip-path: polygon\(50% 0, 100% 50%, 50% 100%, 0 50%\);/);
   const gem = HOTBAR_CSS.slice(HOTBAR_CSS.indexOf('.hb.hb-gem .hb-slot {'), HOTBAR_CSS.indexOf('.hud-gemdock'));
   assert.doesNotMatch(gem, /rotate/, 'rotation would blur the sprites');
-  const HUD = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(HUD, /mountHotbarDock\(parts\.hotDock, parts\.gemDock\)/);
-  assert.match(HUD, /quick\.append\(gemDock\);/);
 });

@@ -538,8 +538,6 @@ test('AUDIT GATHER-FEEL RECENTRE: the gatherer\'s own ear - the net\'s place and
     assert.deepEqual(round(clack.at), round(shifted(was)), 'at its vein, carried with the land');
     t.host.dispose();
   } finally { setForagingHost(null); }
-  assert.match(src('src/scenes/world.js'), /remotePlayers\?\.rebaseSounds\?\.\(r\.offset\);[^\n]*\n\s*gatherHost\?\.rebase\(r\.offset\);/, 'the recentre block carries the gathering\'s ear, beside the peers\' sounds');
-  assert.match(src('src/net/remotePlayers.js'), /rebaseSounds\(offset\) \{\n\s*if \(!offset\) return;\n\s*this\._gatherSounds\.rebase\(offset\);/, 'and the peers\' gathering, by the offset');
 });
 
 // ═══ THE FEEL ════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -590,7 +588,6 @@ test('AUDIT GATHER-FEEL R16: the springs are the view\'s, never the look the gli
   feel.view(view, true);
   assert.ok(Math.abs(view[6]) > 1e-4 || Math.abs(view[9]) > 1e-4, 'the view dipped');
   assert.deepEqual([cam.yaw, cam.pitch], [0.3, -0.1], 'the camera\'s look untouched');
-  assert.match(src('src/scenes/world.js'), /view: \(\) => \(\{ yaw: \(cam\.yaw \* 180\) \/ Math\.PI, pitch: \(cam\.pitch \* 180\) \/ Math\.PI \}\),/, 'the gathering host aims with the camera\'s own look');
   resetTechniqueFx();
 });
 
@@ -606,7 +603,6 @@ test('AUDIT GATHER-FEEL R5/R7/F4: the tables the record states, by their numbers
   assert.ok(GATHER_SOUND.THRASH_SLIP_GAIN > 1, 'slipping: louder');
   assert.deepEqual([GATHER_SOUND.PLIP_MIN_S, GATHER_SOUND.PLIP_MAX_S, GATHER_SOUND.PITCH_JITTER], [2.2, 5.5, 0.05]);
   assert.equal(PEER_GATHER_CUE_MS, 0.75 * 1000 / POSE_HZ, 'three quarters of a pose at the top rate - no floor of the climb\'s; PIN MOVED (AUDIT GATHER F8): a whole pose dropped honest beats measured a frame early');
-  assert.match(src('src/scenes/mineHost.js'), /\* @param \{\{ dungeon: number, day: number, climate: number, confirmed\?: boolean,\n \*   wall: \(marker: number, bearing: number\) => \(number\[\]\|null\) \}\} p\n \*\/\nexport function standDungeonVeins\(/, 'its doc on it, its parameters typed');
 });
 
 // ═══ THE VEIN, ITS CHUNKS AND ITS CRACKS (lane V) ════════════════════════════════════════════════════════════════════

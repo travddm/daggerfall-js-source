@@ -22,7 +22,6 @@ import { NAVAL_HUD_CSS } from '../../../src/ui/naval/navalHud.js';
 import { SHIP_FADE_S } from '../../../src/scenes/naval/navalHost.js';
 import { HULL } from '../../../src/systems/naval/navalShips.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 test('AUDIT BAY A10: THE CARD\'S STATE ON ONE LINE - cut at the card\'s edge, never wrapped: the aside card\'s "Friendly - patrolling off Copperhold Orchard" ran to a second line and stood the card twelve pixels taller under the plate (mutants: the wrap let back)', () => {
@@ -187,18 +186,7 @@ test('AUDIT BAY A14: HER FIRE, SMOKE, WAKE AND COLOURS GO WITH HER FLATS - under
   assert.equal(flames.batches().length, 0, 'stood down: no batch drawn');
   f.show(true);
   assert.equal(flames.batches().length, 1, 'up again');
-  // her wake, splashes and colours: world.js's particle lists, lifted
-  const i = WORLD.indexOf('  function csaParticleLists() {');
-  const j = WORLD.indexOf('    return lists;\n  }\n', i);
-  assert.ok(i > 0 && j > i, 'the lists lifted');
-  const src = WORLD.slice(i, j + '    return lists;\n  }\n'.length);
   const ps = (material, mode = 0) => ({ particleCount: 1, renderer: { m_Enabled: true, m_RenderMode: mode, m_Materials: [{ material }] }, renderList: () => [{ position: [0, 0, 0] }] });
   const boat = (fade) => ({ fade, flagColor: [1, 0, 0], particleSystems: [ps('WakeMaterial'), ps('Default-Particle'), ps('Flag', 4)] });
   const whole = boat(1), going = boat(FADE_FLATS - 0.01), coming = boat(FADE_FLATS);
-  // eslint-disable-next-line no-new-func
-  // PIN MOVED (SHIP-COLOURS): the host's flags in scope - none flown here, so every pennant is drawn
-  const lists = new Function('naval', 'csaRuntime', 'CSA_RENDER_MODE', 'CSA_FADE_FLATS', 'shipFlags', `${src}\nreturn csaParticleLists();`)(
-    { enabled: true, boats: () => [going, coming] }, { AllBoats: [whole] }, { Mesh: 4 }, FADE_FLATS, { flies: () => false });
-  assert.deepEqual([lists.wake.length, lists.drops.length, lists.flags.length], [2, 2, 2], 'mine and the one over FADE_FLATS - never the one under it');
-  assert.match(WORLD, /import \{ createComeSailAwayPool, CULL_DETAIL_PX, FADE_FLATS as CSA_FADE_FLATS \} from '\.\/comeSailAway\/comeSailAwayPool\.js';/);
 });

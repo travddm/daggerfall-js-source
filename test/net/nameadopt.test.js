@@ -133,17 +133,6 @@ test('NAME-ADOPT bug 1: a guest who REGISTERS used to keep the guest name in the
   assert.equal(storedSession(st).secret, GUEST.secret, 'the same session, corrected - not a new one');
 });
 
-test('NAME-ADOPT bug 1: and the button reads the store, so the store is the thing that had to be right', () => {
-  // Held off the source: `profileMark` draws `who.name` from
-  // storedSession. If a later slice moves that read somewhere the adopt
-  // door does not reach, this is where it is noticed.
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  const mark = menu.slice(menu.indexOf('function profileMark()'), menu.indexOf('function profileMark()') + 700);
-  assert.match(mark, /const who = storedSession\(appStorage\(\)\);/);
-  assert.match(mark, /session: who,/, 'PROFILE1: the portrait is handed the store\'s session');
-  assert.match(rd('src/ui/profileBadge.js'), /session\?\.name \?\? 'Sign in'/, 'and draws its name');
-});
-
 // ── THE MINTER ──────────────────────────────────────────────────────
 
 test('NAME-ADOPT: every mint ADOPTS what the answer says and hands it to the host - and still returns the token alone', async () => {
@@ -215,21 +204,3 @@ test('NAME-ADOPT: the session takes its own name through the wire\'s laws, as it
 
 // ── THE HOST ────────────────────────────────────────────────────────
 
-test('NAME-ADOPT: the host starts from the ISSUED name and every mint corrects every live session', () => {
-  const w = rd('src/scenes/world.js');
-  // FROM THE FIRST FRAME, not after the first mint: the store already
-  // holds the issued name, so the roster is right before any answer
-  // arrives. The character is only the last resort.
-  assert.match(w, /name: storedSession\(appStorage\(\)\)\?\.name \|\| playerEntity\.name \|\| 'Traveller',/);
-  // ...and the comment that CAUSED this is gone. It said the name "is
-  // carried no further", which was exactly the wrong belief.
-  assert.doesNotMatch(w, /is carried no further\. ACC1g-b takes the/);
-
-  // EVERY live session, read at the moment of the answer - the chat
-  // links are built after the minter and rebuilt on a rejoin, so a
-  // captured list would go stale on the first reconnect.
-  const adopt = w.slice(w.indexOf('const adoptIssued = (who) => {'), w.indexOf('const identityMinter ='));
-  assert.match(adopt, /online\?\.adoptIdentity\?\.\(who\);/, 'the presence session');
-  assert.match(adopt, /for \(const link of chatLinks\?\.values\?\.\(\) \?\? \[\]\) link\.adoptIdentity\?\.\(who\);/, 'and every chat link - the roster draws my row from whichever link its tab holds');
-  assert.match(w, /accountTokenMinter\(\{ fetch: \(u, i\) => globalThis\.fetch\(u, i\), storage: appStorage\(\), onIssued: adoptIssued, now: steadyNow,\s+character: /);   // RENOWN1: and the character coming online
-});

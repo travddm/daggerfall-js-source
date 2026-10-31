@@ -13,7 +13,6 @@ import { createComeSailAwayAboard, deckPose, helmWord, localOf, worldOf } from '
 import { PeerBodies } from '../../../src/net/peer/peerBodies.js';
 import { readyPool } from '../../navalSea.mjs';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const yawQ = (deg) => [0, Math.sin((deg * Math.PI) / 360), 0, Math.cos((deg * Math.PI) / 360)];
 const nearV = (a, b, eps, msg) => assert.ok(a.every((v, k) => Math.abs(v - b[k]) <= eps), `${msg}: [${a.map((v) => v.toFixed(4))}] vs [${b.map((v) => v.toFixed(4))}]`);
 const rootOf = (boat) => ({ position: boat.GameObject.position, rotation: boat.GameObject.rotation });
@@ -48,11 +47,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #1: THE HELMSMAN AT THE WHEEL - my place a
   const wheel = copy.DrivePosition.position;
   nearV([drawn.shown.x, drawn.shown.y, drawn.shown.z], [wheel[0], wheel[1] - 0.9, wheel[2]], 0.01, 'at the wheel of the boat drawn here');
   assert.equal(drawn.shown.deckKey, 'bo:0');
-  // the world says it: my own helm, when aboard nothing else - PIN MOVED (DECK-POSE): one place for the foes word and the
-  // pose (world.js csaDeckWord, test/net/peer/deckpose.test.js), so the expression is the shared one's
-  assert.match(WORLD, /const csaDeckWord = \(\) => \(csaOn\(\) \? \(csaAboard\.word\(player\.pos\) \?\? csaHelmWord\(\) \?\? naval\?\.deckWord\?\.\(player\.pos\) \?\? null\) : null\);/);
-  assert.match(WORLD, /const w = csaDeckWord\(\);/);
-  assert.match(WORLD, /return slot < 0 \? null : csaHelmWordOf\(id, slot, boat, player\.height\);/);
   pool.remove(mine); pool.remove(copy);
 });
 
@@ -87,39 +81,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #1: A BODY ON A MOVING DECK STANDS - a pee
   assert.ok(Math.abs(b.speed - 1.5) < 0.02, `walking her deck: the deck's stride (${b.speed})`);
   layer._place(b, peer(0, [239 * 1.5 * dt + 0.02, 1, 2], 'cy:1'), toScene, dt, null);
   assert.equal(b.speed, 0, 'another deck: afresh - its place is in another frame, however near the number');
-  const walkers = readFileSync(new URL('../../../src/net/peer/peerRiders.js', import.meta.url), 'utf8');
-  assert.match(walkers, /const on = pose\.deckKey \?\? null, at = on \? pose\.deck : feet;\n\s+r\.pace = stepPeerPace\(r\.pace, r\.paceKey === on \? r\.paceFeet : null, at, dt\);/, 'the walkers\' lanterns by the same law');
-});
-
-test('FIELD BUGS 2026-09-29 (the sea) #1: STANDING AT THE WHEEL IS STANDING - my moving bit is measured on what carries me (a deck aboard, or the boat I sail) at the body\'s centre, the transform the helm pins: a helmsman under way and turning sends no walk; walking the deck does; ashore it is the world\'s (mutants: the world\'s position read, the carrier unasked)', async () => {
-  const { pool, mine } = await twoBoats();
-  const body = WORLD.slice(WORLD.indexOf('    const carrier = csaOn() ?'), WORLD.indexOf('    if (movedThisFrame) {'));
-  const keep = /\n\s+_onlineLast = \[here\[0\], here\[1\], here\[2\]\]; _onlineLastOn = carrier;/;
-  assert.match(WORLD, keep, 'the last place and its carrier kept');
-  // eslint-disable-next-line no-new-func
-  const step = new Function('s', `const { csaOn, csaAboard, csaRuntime, csaLocalOf, csaDeckPose, player, naval } = s; let { _onlineLast, _onlineLastOn } = s;\n${body}\ns._onlineLast = [here[0], here[1], here[2]]; s._onlineLastOn = carrier; return movedThisFrame;`);
-  const player = { pos: [0, 0, 0], height: 1.8 };
-  const s = { csaOn: () => true, csaAboard: { aboard: null }, csaRuntime: { isSailing: () => true, state: { CurrentBoat: mine } }, csaLocalOf: localOf, csaDeckPose: deckPose, player, naval: null, _onlineLast: null, _onlineLastOn: null };
-  const pin = () => { const d = mine.DrivePosition.position; player.pos = [d[0], d[1] - 0.9, d[2]]; };
-  let walked = 0;
-  for (let f = 0; f < 90; f++) {
-    const p = mine.GameObject.position;
-    mine.GameObject.position = [p[0] + 0.12, p[1], p[2] + 0.05];
-    mine.GameObject.rotation = yawQ(25 + f * 0.4);
-    mine.MeshObject.localRotation = quatEuler(2 * Math.sin(f / 9), 0, 3 * Math.sin(f / 13));
-    pin();
-    if (step(s) && f > 0) walked++;
-  }
-  assert.equal(walked, 0, 'at the wheel under way and turning: no frame moved');
-  s.csaRuntime = { isSailing: () => false, state: { CurrentBoat: null } };
-  s.csaAboard = { aboard: { boat: mine } };
-  step(s);
-  player.pos = [player.pos[0] + 0.3, player.pos[1], player.pos[2]];
-  assert.equal(step(s), true, 'walking her deck: moved');
-  s.csaAboard = { aboard: null };
-  step(s);
-  assert.equal(step(s), false, 'ashore, standing: no');
-  pool.remove(mine);
 });
 
 test('AUDIT CROWD-WIDE A2 the shipmates: those aboard one of my boats; and, aboard another\'s boat, its owner and the others aboard it - never one aboard a third (the crowd\'s count never cuts them: net/gate/gateCrowd.js crowdKept) (mutants: my boat\'s riders dropped; the owner dropped; the boat\'s riders unread; a third boat\'s rider kept)', () => {

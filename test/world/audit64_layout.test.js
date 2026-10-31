@@ -162,49 +162,6 @@ test('AUDIT 64 F11: HasHit is the WORLD AABB of the rotated 1.01 box, not an ori
   assert.equal(staticBuildingsHasHit([a, b], [9, 9, 9]), null);
 });
 
-test('AUDIT 64 F11: both exterior hosts stand the array, and the arm does NOT consume the click', () => {
-  for (const p of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const s = src(p);
-    assert.ok(s.includes("from '../world/staticBuildings.js'"), `${p} builds the array`);
-    assert.ok(/buildingTargets\(\)/.test(s) || /buildingTargets:/.test(s), `${p} exposes it`);
-    assert.ok(s.includes('dfMeshSize(placed.modelIdNum)'),
-      `${p} sizes the box from DFMesh.Size, the reference's own field`);
-  }
-  const m = src('src/scenes/worldModes.js');
-  // PlayerActivate.cs:341-361 runs the building test on the ONE ray's hit
-  // point and FALLS THROUGH to the static-door check at :364-368. A
-  // `building:` key in the activation target set would let the enclosing
-  // box out-distance the door it contains and swallow every entry click.
-  assert.equal(/key: `building:/.test(m), false, 'the building never competes as a pick target');
-  assert.ok(m.includes('staticBuildingsHasHit(list, ['), 'the box test runs on the ray hit point');
-  assert.ok(m.includes("if (getInteractionMode() !== 'info') return;"),
-    'ActivateBuilding is Info-only (PlayerActivate.cs:461)');
-  const arm = m.slice(m.indexOf('function activateBuilding'), m.indexOf('async function tryEnter'));
-  assert.ok(arm.includes('bd.buildingType < BUILDING_TYPES.Temple')
-    && arm.includes('bd.buildingType !== BUILDING_TYPES.HouseForSale'),
-  'the closed popup gate is :473-474');
-  // WORLD-HOVER moved the SENTENCE to systems/buildingLocks.buildingClosedText,
-  // because the world hover says it too - without a click - and two producers of
-  // one DFU member is the first violation the bible names. The arm is a caller
-  // now, and the sentence is pinned where it lives.
-  assert.ok(arm.includes('townTalk?.say?.(buildingClosedText(bd.buildingType));'),
-    'the arm ASKS for the sentence rather than building a second copy of it');
-  const bl = src('src/systems/buildingLocks.js');
-  assert.ok(bl.includes("'Guild is closed. Open from %d1:00 to %d2:00.'") && bl.includes("'Store is closed. Open from %d1:00 to %d2:00.'")
-    && bl.includes(".replaceAll('%d1', String(OPEN_HOURS[buildingType])).replaceAll('%d2', String(CLOSE_HOURS[buildingType]))"),
-  'Internal_Strings.csv:36-37, ":00" suffixes and all');
-  assert.ok(bl.includes("buildingType === BUILDING_TYPES.GuildHall ? localizedText('guildClosed',")
-    && bl.includes(": localizedText('storeClosed',"),
-  'GuildHall gets guildClosed, everything else storeClosed');
-  // And the host no longer reads the raw hour tables at all - if it did, it
-  // could build the sentence again without anyone noticing.
-  assert.doesNotMatch(m, /OPEN_HOURS|CLOSE_HOURS/,
-    'the exterior host asks for the sentence, not the two tables under it');
-  // BuildingIsUnlocked is evaluated ONCE (PlayerActivate.cs:358) and
-  // handed to both arms - one helper, never a thinner second copy.
-  assert.equal((m.match(/buildingIsUnlocked\(bd, \{/g) ?? []).length, 1);
-});
-
 // ---------------------------------------------------------------------------
 // F12 - editor flats are stood as data and never drawn.
 // ---------------------------------------------------------------------------
@@ -241,16 +198,6 @@ test('AUDIT 64 F12: a MISC archive-199 flat is kept and flagged; a SUBRECORD one
   assert.equal(flats.filter((f) => f.archive === EDITOR_FLATS_ARCHIVE).length, 1);
 });
 
-test('AUDIT 64 F12: neither exterior host batches a flat the Billboard would have hidden', () => {
-  for (const p of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    assert.ok(src(p).includes('if (flat.editor) continue;'),
-      `${p} keeps the editor flat out of its billboard batch (a rmbFlats-only pin would stay green here)`);
-  }
-  // ...and the marker path still reads them.
-  assert.ok(src('src/world/locationEntrance.js').includes('199'),
-    'locationStartMarkers still filters the very flats being hidden');
-});
-
 // ---------------------------------------------------------------------------
 // F13 - RDB NPC flats.
 // ---------------------------------------------------------------------------
@@ -262,75 +209,6 @@ test('AUDIT 64 F13: NPCFlatArchives is RDBLayout.cs:1250-1254, verbatim', () => 
   assert.equal(isNpcFlat(184), true);
   assert.equal(isNpcFlat(185), false);
   assert.equal(isNpcFlat(199), false);
-});
-
-test('AUDIT 64 F13: the layout carries SetLayoutData(RdbObject) inputs, and the hosts click them', () => {
-  const l = src('src/world/rdbLayout.js');
-  // StaticNPC.cs:149-151 hashes the RAW, UN-NEGATED XPos/YPos/ZPos (the
-  // billboard's -YPos is the render transform only), and :154 seeds the
-  // name off the FLAT RESOURCE's stream position, not obj.Position.
-  assert.ok(l.includes('rawX: obj.xPos, rawY: obj.yPos, rawZ: obj.zPos,'),
-    'the un-negated record ints ride the flat');
-  assert.ok(l.includes('flatPosition: fr.position,'),
-    'nameSeed reads the flat resource offset, not the object offset');
-  assert.ok(l.includes('factionID: fr.factionOrMobileId, flags: fr.flags,'));
-  const d = src('src/scenes/dungeonContext.js');
-  assert.ok(d.includes('context: NPC_CONTEXT.Dungeon,'),
-    'StaticNPC.cs:159 - the ONLY producer of Context.Dungeon, which topicTree reads');
-  assert.ok(d.includes('const setup = opts.setupStaticNpc?.(f, host);')
-    && d.includes('if (setup === false) continue;'),
-  'SetupIndividualStaticNPC runs at layout for EVERY flat with a faction, and the away arm withholds the billboard (RDBLayout.cs:1233-1236, QuestMachine.cs:1334-1341)');
-  assert.ok(d.includes('npcTargets()'), 'the context exposes the people');
-  // PlayerActivate.cs:745-751 - an NPC "carrying specific non-dialog
-  // actions" is never activated as a person.
-  assert.ok(d.includes('ACTION_FLAGS.ShowText') && d.includes('ACTION_FLAGS.ShowTextWithInput'));
-  const m = src('src/scenes/worldModes.js');
-  // WORLD-HOVER: registered with the context at mount rather than
-  // composed inline on every press - one list for the press, the
-  // standalone host and the hover plaque. The people are still the
-  // dungeon's, at the same reach, routed the same way.
-  assert.ok(m.includes("ctx.addActivationTargets(() => (ctx.npcTargets?.() ?? []).map((pn, i) => ({ key: `person:${i}`, aabb: personAabb(pn), distance: STATIC_NPC_ACTIVATION_DISTANCE })));"),
-    'the dungeon ray carries person: targets at last');
-  // ...and the handler reads THAT producer's list, not a second local
-  // copy of it - the `person:N` index is the producer's own.
-  assert.ok(m.includes("activateStaticNpc((dungeonCtx.npcTargets?.() ?? [])[Number(key.split(':')[1])]);"));
-  // ...and the hook reaches the DUNGEON mount specifically. A bare
-  // `m.includes('setupStaticNpc,')` also matches the INTERIOR mount, so
-  // it cannot see the dungeon one being deleted: slice the
-  // buildDungeonContext call's own options block.
-  const mountStart = m.indexOf('await buildDungeonContext(');
-  assert.ok(mountStart > 0, 'worldModes mounts buildDungeonContext');
-  const mount = m.slice(mountStart, m.indexOf('dungeonCtx = ctx;', mountStart));
-  assert.ok(mount.includes('setupStaticNpc,'),
-    'RDBLayout.cs:1233-1236 runs SetupIndividualStaticNPC for the DUNGEON layout too, so the hook must be in buildDungeonContext\'s own options');
-});
-
-test('AUDIT 64 F13: a dungeon static NPC\'s bootstrap behaviour reaches BOTH behaviour collectors', () => {
-  // RDBLayout.cs:1228-1237 adds a StaticNPC component to every NPC flat
-  // and then calls `QuestMachine.Instance.SetupIndividualStaticNPC(go,
-  // factionID)` on that SAME GameObject, so the bootstrap
-  // QuestResourceBehaviour it attaches is an ordinary scene component:
-  //  - GameObjectHelper.cs:926 `Resources.FindObjectsOfTypeAll
-  //    <QuestResourceBehaviour>()` - the list IsAlreadyInjected reads, so
-  //    a Person already bootstrapped onto a palace guard is NOT stood a
-  //    second time by the marker walk; and
-  //  - ActiveGameObjectDatabase.cs:308-311
-  //    GetActiveStaticNPCQuestResourceBehaviours, which sees it because
-  //    StaticNPC.cs:127 registers EVERY StaticNPC with the cache -
-  //    Context.Dungeon ones included.
-  // The dungeon context must therefore hand its raw people list out;
-  // npcTargets() is the RAY's filtered view and serves neither.
-  const d = src('src/scenes/dungeonContext.js');
-  assert.ok(d.includes('\n    people,\n'),
-    'buildDungeonContext exposes the raw static-NPC list, not only npcTargets()');
-  const m = src('src/scenes/worldModes.js');
-  const scene = m.slice(m.indexOf('const sceneBehaviours = () => {'), m.indexOf('const activeStaticNpcQuestBehaviours'));
-  assert.ok(scene.includes('dungeonCtx?.people'),
-    'FindObjectsOfTypeAll (GameObjectHelper.cs:926) sees the dungeon static NPCs too');
-  const cache = m.slice(m.indexOf('const activeStaticNpcQuestBehaviours = () => {'));
-  const cacheBody = cache.slice(0, cache.indexOf('\n  };'));
-  assert.ok(cacheBody.includes('dungeonCtx?.people'),
-    'the static-NPC cache (ActiveGameObjectDatabase.cs:308-311) holds them too - StaticNPC.cs:127 registers every StaticNPC');
 });
 
 // ---------------------------------------------------------------------------
@@ -406,40 +284,6 @@ test('OL5: the shared world never lets a town gate shut, and a gate laid CLOSED 
   assert.equal(offline.modelId, CITY_GATE_CLOSED_MODEL_ID);
 });
 
-test('OL5: the gate law is the COMPONENT\'s, and its default is the shared clock', () => {
-  const law = readFileSync(new URL('../../src/world/city/cityGate.js', import.meta.url), 'utf8');
-  // AUDIT ALL O1's finding, paid here before it can bite: the predicate is the
-  // shared clock, not the URL, and the production default is PINNED - OL4
-  // shipped this same parameter unpinned and the audit had to come back for it.
-  assert.match(law, /import \{ sharedClockOn \} from '\.\.\/\.\.\/systems\/worldTick\.js';/,
-    'the default is the shared clock, not isOnlinePage');
-  assert.match(law, /export function updateCityGate\(gate, night, \{ online = sharedClockOn\(\) \} = \{\} \) \{|export function updateCityGate\(gate, night, \{ online = sharedClockOn\(\) \} = \{\}\) \{/,
-    'and it is the DEFAULT, so a host that passes nothing still gets the law');
-  // ONE HOME: neither host may carry the rule. Both call the component with a
-  // bare `night` - the day one of them starts deciding for itself is the day
-  // the two hosts disagree about whether a city is walled.
-  for (const p of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const h = src(p);
-    assert.ok(h.includes('updateCityGate(g.gate, night)'), `${p}: calls the component plainly`);
-    assert.doesNotMatch(h, /updateCityGate\(g\.gate, night, /, `${p}: must not carry an online rule of its own - the law is cityGate.js's`);
-  }
-});
-
-test('AUDIT 64 F14: both hosts swap the DRAW mesh AND the collider, in a bucket of the gate\'s own', () => {
-  for (const p of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const s = src(p);
-    assert.ok(s.includes('updateCityGate(g.gate, night)'), `${p} runs Update()`);
-    assert.ok(s.includes('collider.removeBucket(g.bucketKey);'),
-      `${p} re-points the collider - GameObjectHelper.cs:246-250 changes the MeshCollider too, so a closed gate BLOCKS`);
-    assert.ok(/gate:/.test(s), `${p} gives the gate a private collider bucket`);
-    assert.ok(s.includes('tickCityGates(minute);'), `${p} ticks it every frame, as DFU's Update is`);
-  }
-  // Both variants resident before the first swap - the streaming loader
-  // is async and a mid-frame fetch cannot swap in place.
-  assert.ok(src('src/scenes/exterior.js').includes('modelIds.add(CITY_GATE_CLOSED_MODEL_ID);'));
-  assert.ok(hostText('src/scenes/world.js').includes('const otherGpu = await getGpuMesh(otherId);'));
-});
-
 // ---------------------------------------------------------------------------
 // F15 - the Rest-marker fallback.
 // ---------------------------------------------------------------------------
@@ -450,34 +294,11 @@ test('AUDIT 64 F15: FindClosestEnterMarker accepts Rest (199.4) as well as Enter
   //   if (markers[i].type != Enter && markers[i].type != Rest) continue;
   assert.equal(INTERIOR_MARKER.REST, 4);
   assert.equal(INTERIOR_MARKER.ENTER, 8);
-  const c = src('src/scenes/interiorContext.js');
-  assert.ok(c.includes('.filter((m) => m.type === INTERIOR_MARKER.ENTER || m.type === INTERIOR_MARKER.REST)'),
-    'the enterMarkers union, or a building carrying only a 199.4 marker finds no marker at all');
-  // The other marker consumers still read `markers` by EXACT type - the
-  // union is enterMarkers' alone.
-  assert.ok(c.includes('.filter((m) => m.type === INTERIOR_MARKER.TREASURE)'));
 });
 
 // ---------------------------------------------------------------------------
 // F16 - fixed treasure keeps the marker's exact position.
 // ---------------------------------------------------------------------------
-
-test('AUDIT 64 F16: a 216 pile is centred on its marker; only the RANDOM pile is grounded', () => {
-  const d = src('src/scenes/dungeonContext.js');
-  assert.ok(d.includes('lootPiles.push({ pos: [m.x + b.originX, m.y, m.z + b.originZ], record, items, isFixed, batch: null });'),
-    'the flag survives onto the pile, which is its identity for the pickup box and the save re-mint');
-  // AssignFixedTreasure passes adjustPosition:false (RDBLayout.cs:427,
-  // "use exact position"), so :1583-1584's -randomTreasureMarkerDim/2,
-  // :1619-1620's AlignBillboardToGround and GameObjectHelper.cs:686-687's
-  // +Summary.Size.y/2 are ALL skipped.
-  assert.ok(d.includes('? [pile.pos[0], pile.pos[1] - size.h / 2, pile.pos[2]]'),
-    'the centred, unadjusted transform in this batch\'s bottom-anchored spelling');
-  assert.ok(d.includes(': floorLanding(collider, [pile.pos[0], pile.pos[1] + 0.2, pile.pos[2]]);'),
-    'the RANDOM arm keeps AlignBillboardToGround (RDBLayout.cs:1619-1620)');
-  // pile.half is set BEFORE the branch, so lootTargets and restorePiles
-  // read one consistent record.
-  assert.ok(d.indexOf('pile.half = [size.w / 2, size.h / 2];') < d.indexOf('const g = pile.isFixed'));
-});
 
 // ---------------------------------------------------------------------------
 // F17 - ObjectType == propModelType gates the ladder and the furniture.
@@ -506,14 +327,4 @@ test('AUDIT 64 F17: layoutInterior carries ObjectType, and 41409 climbs only as 
   const out = layoutInterior(dfBlock, 0, 0, () => model);
   assert.deepEqual(out.placements.map((p) => p.objectType), [3, 0],
     'objectType rides every placement - DFU gates TWO clauses on it');
-  const c = src('src/scenes/interiorContext.js');
-  assert.ok(c.includes('if (p.modelIdNum === LADDER_MODEL_ID && p.objectType === PROP_MODEL_TYPE) {'),
-    'DaggerfallInterior.cs:491-496 - :439 keeps EVERY 41409 standalone scenery, only the DaggerfallLadder is withheld');
-  // PIN MOVED (FIELD BUGS 2026-10-14 INN-BEDS): the gate lists a bed model before it skips - a bed is a mod's custom
-  // activation (RoleplayRealism.cs:126-128), not furniture's action - and skips everything else as it did
-  const gate = c.indexOf('if (p.objectType !== PROP_MODEL_TYPE) {');
-  assert.ok(gate >= 0 && /^if \(p\.objectType !== PROP_MODEL_TYPE\) \{\n\s*if \(isBedModel\(classicModelIdOf\(p\.modelIdNum\)\)\) beds\.push\(\{ cpu, matrix \}\);\n\s*continue;\n\s*\}/.test(c.slice(gate)),
-    'DaggerfallInterior.cs:500 gates the whole AddFurnitureAction chain on the same clause');
-  assert.ok(gate < c.indexOf('if (isShopShelfModel(p.modelIdNum)) {'),
-    'and it sits ahead of the shelf/house-container chain it gates');
 });

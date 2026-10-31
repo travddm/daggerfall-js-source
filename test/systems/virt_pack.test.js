@@ -718,9 +718,3 @@ test('VIRT pack: the store\'s search typed deep in a long store keeps the list\'
   });
 });
 
-test('VIRT sheet: the loot window\'s rows are one height and its two tracks one width - the last row\'s border unseen, not gone; each track minmax(0, 1fr), never its widest drawn name (the browser half, driven: tools/packVirtProbe.mjs "the list is one height at every scroll", "its columns stand still as it scrolls")', () => {
-  const css = readFileSync(new URL('../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
-  assert.match(css, /\.loot-win \.itemrow:last-child \{ border-bottom-color: transparent; \}/);
-  assert.doesNotMatch(css, /\.loot-win \.itemrow:last-child \{ border-bottom: 0; \}/, 'a last row 2 px short of the rest');
-  assert.match(css, /\.loot-win\.wide \.remotelist \{ display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
-});

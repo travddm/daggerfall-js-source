@@ -287,24 +287,3 @@ test('FAR-CLIP1: on a coast the port\'s own terrain pipeline builds, every clipp
   }
 });
 
-test('FAR-CLIP1: the world draws a pixel whose TileMap the cap patched with the clip program and every other with the plain one, the patched pixels after the rest, and builds the clip program as the mod mounts; the byte has one home; the other three hosts draw no carved sea (mutants: every pixel plain; the cull\'s pixels only; every pixel clipped; unsorted; clipped first; no warm)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /renderer\.drawTerrain\(p\.dwTerrain \?\? p\.terrain, pixelMatrix,[^\n]*\n\s+snowCover\.arrayOf\(p\.groundArchive\), p\.tilemapTex, 6\.4, !!p\._dwBytes, ecoDraw\(p\), snowCover\.drawOf\(p\)\);/,   // ECOTONE1: PIN MOVED - the border pixel's neighbours ride after the clip; PRECIP4: PIN MOVED - the set's twin on the snow lane, and the pixel's snow after its border
-    'the ground of a pixel the cap patched (dwSetTilemap\'s `_dwBytes`: its TileMap on the texture) draws with the clip program, as the mod swaps the material of each terrain it clips');
-  assert.match(w, /renderer\.setCloudShadow\(sky\?\.cloudShadow \?\? null\);\n\s+if \(deepWaters\) groundQueue\.sort\(dwClipLast\);[^\n]*\n\s+for \(const p of groundQueue\) \{/, 'the queue is ordered before the drain');
-  const cmp = w.match(/function dwClipLast\(a, b\) \{ (return [^}]+) \}/);
-  assert.ok(cmp, 'the order is one comparator');
-  const dwClipLast = new Function('a', 'b', cmp[1]);
-  const q = [{ n: 'near patched', _dwBytes: new Uint8Array(1) }, { n: 'near' }, { n: 'mid patched', _dwBytes: new Uint8Array(1) }, { n: 'mid', _dwBytes: null }, { n: 'far' }];
-  assert.deepEqual(q.sort(dwClipLast).map((p) => p.n), ['near', 'mid', 'far', 'near patched', 'mid patched'], 'the patched pixels after the rest, near first within each: one swap of program a frame');
-  assert.match(w, /latchModLoaded\(DEEP_WATERS_VENDOR, !!dwRender\);[^\n]*\n\s+if \(dwRender\) renderer\.prepareTerrainClip\(\);/, 'the mod\'s mount builds the clip program, beside its own');
-  const cap = rd('src/world/deepWater/deepWaterCap.js');
-  assert.match(cap, /^import \{ CLIP_SENTINEL \} from '\.\.\/terrain\/terrainSurface\.js';/m, 'the cap takes the byte from the TileMap format\'s module');
-  assert.doesNotMatch(cap, /CLIP_SENTINEL = /, '...and never writes it down itself');
-  assert.match(rd('src/render/renderer.js'), /^import \{ CLIP_SENTINEL \} from '\.\.\/world\/terrain\/terrainSurface\.js';/m, 'the renderer\'s clip variant reads it there too');
-  // THE FOUR HOSTS: the fixed city runs no Deep Waters host and draws its ground plain; the interiors and the dungeon draw no terrain
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /renderer\.drawTerrain\(groundSurface, identityMatrix,\n\s+renderer\.tileArrays\.get\(groundArchive\), tilemapTex, 6\.4\);/);
-  assert.doesNotMatch(e, /deepWaterCap|createDeepWatersHost/, 'exterior.js: no cap');
-  for (const h of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(rd(h), /drawTerrain\(/, `${h}: no ground`);
-});

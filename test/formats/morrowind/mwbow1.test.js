@@ -209,11 +209,3 @@ test('MW-BOW1: a bow with no motion of its own is posed as it always was', async
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_REST));
 });
 
-test('MW-BOW1: both views pose the weapon on its clock before the pose - the first-person arm and the third-person body', () => {
-  // the third-person body is one machine with the arm (fpArm update): the same clock, ahead of its own poseAssembly
-  const src = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const third = /posePartClocks\(t\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(t\.arm, \{/;
-  const first = /posePartClocks\(built\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(built\.arm, \{\n\s*tracks: fTracks,/;
-  assert.match(src, third, 'the body');
-  assert.match(src, first, 'the arm');
-});

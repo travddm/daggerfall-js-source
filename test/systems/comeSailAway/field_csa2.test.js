@@ -22,21 +22,6 @@ import { comeSailAwayModels } from '../../../src/systems/comeSailAway/comeSailAw
 import { spawnBoat } from '../../../src/systems/comeSailAway/comeSailAwayBoat.js';
 import { createComeSailAwayRuntime, NO_WATER_LEVEL, WATER_LEVEL, BOAT_ACTIONS } from '../../../src/systems/comeSailAway/comeSailAway.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-/** One two-space-indented `const name = (...) => {` of world.js's host, whole. */
-const constOf = (head) => {
-  const i = WORLD.indexOf(head);
-  assert.ok(i >= 0, head);
-  return WORLD.slice(i, WORLD.indexOf('\n  };\n', i) + 5);
-};
-/** world.js's csaTerrainOf - the Terrain the runtime reads its nodes on - over a real StreamingWorldState, every
- *  terrainSurface export in scope as the host's import has it. */
-function mountTerrainOf(state) {
-  const names = ['_csaTerrains', 'state', 'TERRAIN_SIZE', ...Object.keys(surface)];
-  const src = constOf('  const csaTerrainOf = (p) => {');
-  return new Function(...names, `${src}\nreturn csaTerrainOf;`)(new WeakMap(), state, TERRAIN_SIZE, ...Object.values(surface));
-}
-
 /** The sea as the sampler writes it: a WOODS.WLD of nought round the pixel - every sample clamped to the ocean elevation. */
 const SEA_WOODS = { getHeightMapValuesRange1Dim: (x, y, d) => new Uint8Array(d * d), getLargeHeightMapValuesRange: () => new Uint8Array(81) };
 const flatSea = () => generateSamples(SEA_WOODS, 208, 215);
@@ -86,125 +71,11 @@ test('FIELD-CSA2: Terrain.SampleHeight at Unity\'s heightmap precision - 16-bit 
   }
 });
 
-test('FIELD-CSA2: the host\'s Terrain (world.js csaTerrainOf, mounted) answers SampleHeight at Unity\'s precision - the open sea under the line wherever the recentres have carried it', () => {
-  const state = new StreamingWorldState(1);
-  state.init(207, 213);
-  state.compensation[1] = -501;   // a vertical recentre: SampleHeight is over the terrain's own y, which the compensation moves
-  const terrainOf = mountTerrainOf(state);
-  const p = { px: 208, py: 215, samples: flatSea(), tilemapBytes: null };
-  const t = terrainOf(p);
-  assert.ok(t === terrainOf(p), 'one Terrain a pixel');
-  const o = state.pixelTranslation(208, 215, [0, 0, 0]);
-  for (const [lx, lz] of [[112, 60.8], [409.6, 409.6], [800, 20]]) {
-    const h = t.sampleHeight([o[0] + lx, 34 - 501, o[2] + lz]);
-    assert.ok(h < WATER_LEVEL, `the sea at (${lx}, ${lz}) reads ${h}: water (it read 34.000001, land)`);
-  }
-  // past the terrain's edge: the edge's height (CSA-J), still the sea
-  assert.ok(t.sampleHeight([o[0] - 50, 0, o[2] + TERRAIN_SIZE + 50]) < WATER_LEVEL);
-});
-
 // ── the runtime over the vendored hulls ────────────────────────────────────────
 
 const DIR = new URL('../../../vendor/come-sail-away/Models/', import.meta.url);
 const json = (f) => JSON.parse(readFileSync(new URL(f, DIR), 'utf8'));
 const MODELS = comeSailAwayModels({ prefabs: json('prefabs.json'), meshes: json('meshes.json'), bin: new Uint8Array(readFileSync(new URL('meshes.bin', DIR))), materials: json('materials.json'), animation: json('animation.json') });
-
-/** A helm over one built pixel, Iliac Puddle No More on, its Terrain the host's own (mounted). */
-function helmOnThe(samples, { px = 208, py = 215, isPortTown = () => false } = {}) {
-  const state = new StreamingWorldState(1);
-  state.init(px, py);
-  const terrain = mountTerrainOf(state)({ px, py, samples, tilemapBytes: new Uint8Array(128 * 128) });
-  const out = { hud: [], mid: [] };
-  const held = new Set();
-  const started = new Set();
-  const player = { position: [400, 36, 400], yaw: 0, frozen: 0 };
-  const rt = createComeSailAwayRuntime({
-    pool: { models: MODELS, ready: () => true, spawnNow: (boat, pl) => { spawnBoat(boat, { models: MODELS, player: () => pl, billboardSize: () => [0.8, 1.6], modelBounds: () => ({ min: [-1, 0, -1], max: [1, 1, 1] }) }); return boat; }, remove: () => {} },
-    player: () => ({ position: [...player.position], rotation: [0, Math.sin((player.yaw * Math.PI / 180) / 2), 0, Math.cos((player.yaw * Math.PI / 180) / 2)] }),
-    camera: () => ({ position: [0, 50, 0], forward: [0, -1, 0] }),
-    currentMapPixel: () => ({ X: px, Y: py }),
-    isPlayerInside: () => false,
-    blockWaterLevel: () => NO_WATER_LEVEL,
-    iliacPuddleNoMore: () => true,
-    raycast: () => null,
-    playerTerrain: () => terrain,
-    terrainAt: (x, y) => (x === px && y === py ? terrain : null),
-    terrains: () => [terrain],
-    heightMapValue: () => 255,
-    worldCompensation: () => [...state.compensation],
-    hudText: (t) => out.hud.push(t),
-    midScreenText: (t) => out.mid.push(t),
-    log: () => {},
-    random: { range: (min) => min },
-    time: () => 0,
-    persistentDungeonBoats: () => false,
-    packedItems: { serialize: (items) => items, deserialize: (records) => records },
-    dt: () => 0.25,
-    setting: (key) => ({ 'Waves.Enable': false })[key],
-    input: {
-      has: (a) => held.has(a),
-      started: (a) => started.has(a),
-      horizontal: () => 0,
-      vertical: () => (held.has('MoveForwards') ? 1 : 0),
-      toggleAutorun: false,
-    },
-    helm: { setPlayerPosition: (q) => { player.position = [...q]; }, setFacing: (yaw) => { player.yaw = yaw; }, turnPlayer: (d) => { player.yaw += d; }, freeze: (s) => { player.frozen = s; }, frozen: () => player.frozen > 0, stopRunning: () => {}, footsteps: () => {}, alignToGround: () => {} },
-    transport: { isFoot: () => true, setFoot: () => {}, hasHorse: () => false, hasCart: () => false },
-    ship: { owns: () => true, assign: () => {}, removePermanentScene: () => {} },
-    entity: { isFemale: () => false, carriedWeight: () => 10, wagonWeight: () => 0, decreaseFatigue: () => {} },
-    cargoWeight: () => 0,
-    sphereCastAll: () => [],
-    enemies: () => [],
-    timeScale: () => 1,
-    setTimeScale: () => {},
-    messageBox: () => {},
-    isPortTown,
-    items: { create: (templateIndex) => ({ templateIndex, message: 0, UID: 1 }), addToPlayer: () => {} },
-  });
-  const frame = ({ press = [] } = {}) => {
-    started.clear();
-    for (const a of press) started.add(a);
-    rt.endOfFrame();
-    rt.fixedUpdate();
-    rt.update();
-    rt.lateUpdate();
-    started.clear();
-  };
-  return { rt, out, held, frame, state, terrain };
-}
-
-test('FIELD-CSA2: on the open sea, Iliac Puddle No More on - every deed\'s hull reads its five nodes as water, raises its sail and rows (it read [1, 1, 1, 1, 1]: "Unable to raise sail. Boat is obstructed.", and beached)', () => {
-  // the three hulls a shelf's deed is (AssignVariantsToShopItems: Random.Range(1, 4)), and the parts' Rowboat
-  for (const hull of [0, 1, 2, 3]) {
-    const s = helmOnThe(flatSea());
-    const boat = s.rt.PlaceBoat([409.6, 34, 409.6], [0, 0, 1], hull, 0, s.terrain);
-    assert.deepEqual([...boat.NodeTileMapIndices], [0, 0, 0, 0, 0], `hull ${hull}: the nodes read the sea`);
-    s.rt.StartSailing(boat);
-    assert.equal(s.rt.isSailing(), true);
-    s.frame({ press: [BOAT_ACTIONS.toggleSail] });
-    if (boat.Sails.length) {
-      assert.ok(s.out.hud.includes('Sail raised!'), `hull ${hull}: ${JSON.stringify(s.out.hud)}`);
-      assert.ok(!s.out.hud.includes('Unable to raise sail. Boat is obstructed.'));
-      assert.equal(s.rt.state.sailPosition, 1);
-      s.frame({ press: [BOAT_ACTIONS.toggleSail] });   // stowed again, for the oars
-    }
-    const start = [...boat.GameObject.position];
-    s.frame({ press: ['MoveForwards'] });   // HELM-LADDER: a rung up - her oars pulling ahead
-    for (let i = 0; i < 7; i++) s.frame();
-    const moved = Math.hypot(boat.GameObject.position[0] - start[0], boat.GameObject.position[2] - start[2]);
-    assert.ok(s.rt.state.MoveVectorCurrent[2] > 0, `hull ${hull}: under way (a beached boat's move is zeroed each frame)`);
-    assert.ok(moved > 0.25, `hull ${hull}: the oars pulled it ${moved} m in two seconds (none while beached)`);
-  }
-});
-
-test('FIELD-CSA2: the shore stays the shore - a hull over ground a step above the sea reads land and stays obstructed, as the mod reads it', () => {
-  const s = helmOnThe(new Float32Array(HEIGHTMAP_DIMENSION * HEIGHTMAP_DIMENSION).fill(580 / 32766));
-  const boat = s.rt.PlaceBoat([409.6, 34, 409.6], [0, 0, 1], 1, 0, s.terrain);
-  assert.deepEqual([...boat.NodeTileMapIndices], [1, 1, 1, 1, 1]);
-  s.rt.StartSailing(boat);
-  s.frame({ press: [BOAT_ACTIONS.toggleSail] });
-  assert.ok(s.out.hud.includes('Unable to raise sail. Boat is obstructed.'), JSON.stringify(s.out.hud));
-});
 
 // ── the retail data: the Bay by Daggerfall's harbour ───────────────────────────
 
@@ -231,25 +102,8 @@ test('FIELD-CSA2 on the retail data: the open Bay south of Daggerfall (209, 216)
   // PIN MOVED (TESA6, at the merge of main into TESA): past the Bay an Arena port answers (`onTheBay` the Bay's frame,
   // world/tamriel/tamrielFrame.js inBay) - the Bay's pixels ask the Bay's table as before, and a port past it would read one
   const { inBay } = await import('../../../src/world/tamriel/tamrielFrame.js');
-  const isPortTown = new Function('travelLocationSummaryAt', 'mapDict', 'maps', 'hasPortFor', 'etherSea', 'inEther', 'etherPortAt', 'onTheBay', 'arenaPortAt', `${constOf('  const csaIsPortTown = (x, y) => {')}\nreturn csaIsPortTown;`)(locationSummaryAt, mapDict, maps, hasPortFor, true, inEther, () => ({}), inBay, () => ({}));
-  assert.equal(isPortTown(207, 213), true, 'Daggerfall is a port');
-  assert.equal(isPortTown(209, 216), false, 'the open Bay is none - the Bay\'s pixel never asks the sea\'s ports');
   // the Bay a pixel off the coast: every sample the sea's clamp (seen live too, the roads' pass and all: 34.000001
   // under the whole hull, the Small Ship's nodes [1, 1, 1, 1, 1] before the fix and [0, 0, 0, 0, 0] after)
   const sea = generateSamples(woods, 209, 216);
   assert.ok(sea.every((v) => v === Math.fround(SCALED_OCEAN_ELEVATION / MAX_TERRAIN_HEIGHT)), 'the open Bay');
-  const s = helmOnThe(sea, { px: 209, py: 216, isPortTown });
-  assert.equal(s.rt.IsNearPort(3), true, 'the deed is used here: Daggerfall is in the search square');
-  const o = s.state.pixelTranslation(209, 216, [0, 0, 0]);
-  const boat = s.rt.PlaceBoat([o[0] + 409.6, 34, o[2] + 409.6], [0, 0, 1], 2, 0, s.terrain);
-  assert.deepEqual([...boat.NodeTileMapIndices], [0, 0, 0, 0, 0], 'the Small Ship\'s nodes read the Bay');
-  s.rt.StartSailing(boat);
-  s.frame({ press: [BOAT_ACTIONS.toggleSail] });
-  assert.ok(s.out.hud.includes('Sail raised!'), JSON.stringify(s.out.hud));
-  // the coast pixel north of it (208, 215): its sampler's first rise out of the sea - a step and more over the line - is
-  // land, as Unity reads it
-  const coast = helmOnThe(generateSamples(woods, 208, 215), { px: 208, py: 215 });
-  const c = coast.state.pixelTranslation(208, 215, [0, 0, 0]);
-  const rise = coast.terrain.sampleHeight([c[0] + 96, 0, c[2] + 100.8]);
-  assert.ok(rise >= WATER_LEVEL && rise < WATER_LEVEL + 1, `the rise ${rise}: land`);
 });

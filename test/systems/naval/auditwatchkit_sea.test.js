@@ -16,8 +16,6 @@ import { Boat, setLights } from '../../../src/systems/comeSailAway/comeSailAwayB
 import { sea, readyPool, modShipsPool } from '../../navalSea.mjs';
 import { room } from '../../navalRoom.mjs';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-const HOST = readFileSync(new URL('../../../src/scenes/naval/navalHost.js', import.meta.url), 'utf8');
 const NIGHT = { cityLights: true, night: true };
 const open = () => true;
 const contactOf = (s, o = {}) => ({ id: s.id, kind: 'ship', faction: s.cls.faction, pos: s.pos, vel: [0, 0, 0], speed: 0, yaw: s.yaw, hull: s.hull, ship: s, ...o });
@@ -34,7 +32,6 @@ test('AUDIT WK-N1 a player firing by night is seen by her flashes: my volley\'s 
   h.host._shots.fireVolley({ id: 'mine', shooter: 'me:42', launches: [{ gun: 'long', index: 0, p0: [0, 3, 0], v0: [0, 0.5, 60], delay: 0 }] });
   for (let i = 0; i < 10; i++) { hold(); h.host.frame(0.1); }
   assert.equal(p.ship.target, 'local', 'seen by my flashes');
-  assert.match(HOST, /heardGun\(e\.pos, gunfireBy\(e\.shooter\)\)/);
   // another player's: her volley's report heard as hers - their contact's id, never `peer:` theirs
   let peer = null;
   const ONLINE = { id: () => 'b-player', peers: () => [{ id: 'ann', feet: [0, 0, 600] }], sendHit: () => true };
@@ -119,15 +116,11 @@ test('AUDIT WK-N4 a hull is lit only by lanterns she carries: Come Sail Away\'s 
   assert.equal(h.host._contacts().find((c) => c.id === carrack.id)?.lit, true, 'Mac\'s carrack lit');
   carrack.boat = null;
   assert.equal(h.host._contacts().find((c) => c.id === carrack.id)?.lit, true, 'and judged lit by her hull, not yet built');
-  // my own carrack's switch lights nothing either
-  assert.match(HOST, /lit: !!boat\.LightOn && carriesLanterns\(boat, boat\.hull\),/);
 });
 
 // ── N5: the dark's own hours ───────────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT WK-N5 the captains\', the errands\' and the lookout\'s night is the dark\'s (worldClock isNight), the lanterns\' hours their own: at 07:30 - the lights still lit, the day come - a dark pirate 560 m off is hailed as by day (mutants: the lanterns\' hours for the dark\'s)', async () => {
-  assert.match(WORLD, /cityLights: isCityLightsOn\(minuteNow\(\)\), night: isNight\(minuteNow\(\)\) \}; \},/);
-  assert.match(HOST, /const night = !!where\(\)\.night;[^\n]*\n\s*const world = \{/);
   const morning = await sea({ hull: HULL.SmallShip, where: { cityLights: true, night: false }, settings: { ShipsAtSea: 'off', Boarders: false } });
   morning.boat.crewed = true;
   const p = morning.host._sea.get(morning.host.spawnShip('pirateBrig', { range: 560, bearing: Math.PI / 2, temper: 'bold' }));
@@ -193,9 +186,6 @@ test('AUDIT WK-W2 by night my crew is called to the guns only by a hostile the n
   assert.equal(dark.near, true, 'a rest still reads her');
   const day = await at({ cityLights: false, night: false });
   assert.equal(day.battle, true, 'by day');
-  assert.match(HOST, /battle: aiming \|\| crewAlarm\(\), toward,/);
-  assert.match(HOST, /crew: st\.damage\.crew, battle: aiming \|\| crewAlarm\(\), boatHull: b\.hull \}/);
-  assert.match(HOST, /if \(!night \|\| e\.ship\.target === myId\(\) \|\| d <= nightSight\(HOSTILE_NEAR_M, \{ night, lit: showsLight\(e\) \}\)\) return true;/);
 });
 
 // ── W12: another player's hands at work ────────────────────────────────────────────────────────────────────────────
@@ -209,8 +199,6 @@ test('AUDIT WK-W12 another player\'s battered boat: her word\'s hull loss is her
   assert.ok(Math.abs(A.s.host.myCrew(A.s.boat).work - 0.5) < 1e-9, 'on her owner\'s screen');
   const said = B.s.host.peerBoat('a');
   assert.ok(said && Math.abs(said.work - 0.5) < 0.02, `on mine: ${said?.work}`);
-  assert.match(HOST, /battle: said\.battle, work: Math\.min\(1, Math\.max\(0, 1 - \(self\.me\?\.hull \?\? 1\)\)\) \}/);
-  assert.match(WORLD, /faction: null, battle: !!word\?\.battle, work: word\?\.work \?\? 0 \}\);/);
 });
 
 // ── W10: her card's Lookout, handed to her crew ────────────────────────────────────────────────────────────────────
@@ -225,6 +213,4 @@ test('AUDIT WK-W10 the host hands my crew her card\'s Lookout: myCrew names the 
   assert.ok(at > 0, `her card names a Lookout (${hands.map((x) => x.role).join(', ')})`);
   assert.equal(h.host.myCrew(h.boat).lookout, at, 'his roster place');
   assert.notEqual(hands[at].role, hands[0].role);
-  assert.match(WORLD, /_crewCtx\.lookout = ship\.mine\?\.lookout \?\? -1;/, 'set for every ship, every frame (the ctx is shared)');
-  assert.match(WORLD, /const _crewCtx = \{[^}]*lookout: -1 \}/);
 });

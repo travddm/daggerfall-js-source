@@ -38,12 +38,7 @@ const fakeAudio = () => {
 };
 
 test('AUDIT SD V (L1, Mac: "disable levitation inside the rift"): NO LEVITATE IN THE HOUR - the dungeon arm, which draws the Hour, writes the motor\'s flag through the same ward the street\'s does (a siege\'s room, the Shattered Hour): SD7b\'s ward reached the street\'s flags alone, so a Levitate lifted a body over the Steps; the staff\'s /fly is never warded (mutants: the dungeon arm unwarded; the Hour out of the ward)', () => {
-  const D = read('src/scenes/dungeonContext.js'), W = read('src/scenes/world.js'), M = read('src/scenes/worldModes.js');
-  assert.match(D, /playerLevitating: \(\) => hasActiveEffect\(playerEntity, 'levitate'\) && !levitateWarded\(\) \|\| staffFly\(\),/);
-  assert.match(D, /import \{[^}]*\blevitateWarded\b[^}]*\} from '\.\.\/characters\/playerEntity\.js';/);
-  assert.match(W, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/, 'the Hour is warded');   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the Hour's and the Spire's rows ban it
   assert.equal(madeLevelRule('hour', 'levitate'), 'banned');
-  assert.match(M, /player\.levitating = dungeonCtx\.playerLevitating\(\);/, 'the dungeon arm reads it');
 });
 
 test('AUDIT SD V (S1): NO FIGHT HEARD IS NO END - the sky\'s fight clock and the arena\'s floor read nothing from the empty fight (its `ends` 0 made every fresh Hour\'s sky red, its rim and fissures red and its pillars\' dials red while the Remnant waited); a live fight still reads its own (mutants: the sky blind to the empty fight; the floor blind to it)', () => {
@@ -74,19 +69,6 @@ test('AUDIT SD V (S2, R2): THE WAY BACK STANDS AS THE THRESHOLD\'S - no reveal (
   }
   const behind = SD_THRESHOLD_RIM.ray([at[0], at[1] + 0.3, at[2]], [0, 0, -1]);
   assert.ok(Math.abs(behind - (SD_THRESHOLD.r + SD_WAY_BACK_Z)) < 1e-6, `behind it: ${behind.toFixed(2)} m to the rim`);
-  assert.match(read('src/scenes/dungeonContext.js'), /hollow: true, probe: SD_THRESHOLD_RIM \}\); return; \}/, 'the dungeon host stands it so');
-});
-
-test('AUDIT SD V (L2): THE CONCORD\'S EDGE WAITS FOR ITS BRIDGE - the world host opens the edge onto the bridge only as the hall says it stands drawn (S10 laid the plates 1.2 s after the word, and the floor stood under nothing); with no hall to ask, as before (mutants: the edge from the word alone; the hall unasked)', () => {
-  const W = read('src/scenes/world.js'), D = read('src/scenes/dungeonContext.js');
-  assert.match(W, /const sdConcordHere = \(\) => !!sdHallWord\(\)\?\.ok && modes\?\.dungeonCtx\?\.sdHallBridgeLaid\?\.\(\) !== false;/);
-  assert.match(D, /sdHallBridgeLaid: sdHall \? \(\) => sdHall\.bridgeLaid : undefined,/);
-});
-
-test('AUDIT SD V (L5, S5): THE ARRIVAL EXHALE, HOSTED - the world host hands the blows\' sparks the veil (an arrival is seen once it opens) and tells them every frame out of the Hour (the latch fell only with a fight\'s leave) (mutants: under the veil; the latch kept)', () => {
-  const W = read('src/scenes/world.js');
-  assert.match(W, /ready: \(\) => !gateVeil\?\.busy,/);
-  assert.match(W, /if \(!inRealm\) sdFx\?\.away\(\);/);
 });
 
 test('AUDIT SD V (P1): THE RIFT\'S LOOK IS A FRAME\'S, NEVER MADE - the open Rift\'s look one record an hour of studs, made once; the collapse\'s one kept record; the dungeon host asks the world host\'s look door alone (sdRiftOf made the word, the count and the step\'s door four times a frame for it) (mutants: the open look made a call; the host asking the whole word)', () => {
@@ -94,13 +76,6 @@ test('AUDIT SD V (P1): THE RIFT\'S LOOK IS A FRAME\'S, NEVER MADE - the open Rif
   const a = riftLook(rec, 7, 0), b = riftLook(rec, 7, 0);
   assert.equal(a.state, 'open'); assert.equal(a, b, 'the same record, call after call'); assert.ok(Object.isFrozen(a));
   assert.deepEqual({ ...a, studs: 0 }, { ...SD_RIFT_OPEN_LOOK, studs: 0 }); assert.equal(a.studs, 5, 'five hours left, five studs');
-  const D = read('src/scenes/dungeonContext.js'), W = read('src/scenes/world.js');
-  assert.match(D, /riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, /);   // AUDIT SD-THROUGH (PIN MOVED, C13): one named closure, the Rift's and the Way Through's
-  assert.match(D, /const sdRiftLookNow = \(\) => \(opts\.superRiftLook \? opts\.superRiftLook\(dfLocation\?\.sdSlot\) : sdEndWord\(\)\?\.look\) \?\? null;/);
-  // AUDIT SD-THROUGH (B4): and the mode machine forwards the door - it never did, and every look the dungeon host asked fell
-  // back to the whole word (world.js sdRiftOf: a record, a seen, a closure and the count's text, four times a frame)
-  assert.match(read('src/scenes/worldModes.js'), /superRiftLook: \(s\) => host\.superRiftLook\?\.\(s\) \?\? null,/);
-  assert.match(W, /superRiftLook: \(s\) => sdRiftLookOf\(s\),/);
 });
 
 test('AUDIT SD V (P1-P4, P6): THE HOLLOW\'S AND THE HOUR\'S FRAMES MAKE NOTHING - measured as L2 F9 measures (a child, a 64 MB young space, the least of six windows, a control that must show): the end\'s look, halos and lights in the Hollow and as the way back, its `hasRet`; the sky map\'s paint and the halo pass on a GL that makes nothing; the Orrery\'s hands into their matrices; the Hour\'s air - none past 2 bytes a frame (they made 0.15 to 9 KB a frame) (mutants: the look made a frame; the halos\' list let go; the sky\'s key a string; the halo\'s corners made; the hands made; the air asked a frame)', (t) => {

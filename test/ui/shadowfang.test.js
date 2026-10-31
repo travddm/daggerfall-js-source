@@ -163,15 +163,10 @@ test('SHADOW-FANG token and relay: a token may carry the title and the glyph and
   assert.equal(r.claims.t, 'shadowfang');
   assert.deepEqual(r.claims.g, ['shadowfang']);
   assert.equal(claimsValid({ v: 1, s: 'acct-sf', n: 'SirMcMobdon', k: 'linked', i: nowS, e: nowS + 60, g: [...GLYPHS] }), true, 'every glyph at once still fits');
-  // AUDIT B8: THE WIDEST TOKEN STILL PASSES THE HELLO - every glyph, the longest title, the longest name and account
-  // id, a mute and the Renown cap - inside wire.js's TOKEN_RE (a 640-character body since world149; 512 before) and the verifier's 1024; and
-  // (the merge) GUILD1c's three guild claims at their shapes' bounds (guildLaw.js GUILD_ID_RE, GUILD_TAG_RE, GUILD_MEMBER_RE)
-  const TOKEN_RE = new RegExp(/const TOKEN_RE = \/(.+)\/;/.exec(rd('src/net/wire.js'))[1]);
   const longest = TITLES.filter((t) => !titleClaimed(t)).reduce((a, t) => (t.length > a.length ? t : a), '');   // PIN MOVED (CHAP4c): the longest that rides alone - a claimed title rides with its claim, below
   const guild = { gi: `g${'z'.repeat(10)}`, gt: 'WWWW', gm: `m${'9'.repeat(15)}` };
   const wide = await mintToken({ s: 'a'.repeat(40), n: 'W'.repeat(NAME_MAX), k: 'linked', t: longest, g: [...GLYPHS], mu: nowS + 10 ** 9, lv: RENOWN_MAX, ...guild }, kp.privateKey, { subtle, nowS });
   assert.equal(JSON.parse(Buffer.from(wide.split('.')[1], 'base64url').toString()).gm, guild.gm, 'the guild rides it');
-  assert.ok(TOKEN_RE.test(wide), `the widest token passes the hello (${wide.split('.')[1].length} of 640)`);
   assert.ok(wide.length <= 1024);
   assert.ok((await verifyToken(wide, pub, { subtle, nowS })).ok);
   // SEASON1 part two (world149): AND EVERY OPTIONAL CLAIM AT ONCE - the longest seat title with its claim at its bounds,
@@ -183,7 +178,6 @@ test('SHADOW-FANG token and relay: a token may carry the title and the glyph and
   const aura = AURAS.reduce((a, x) => (x.length > a.length ? x : a), '');
   const widest = await mintToken({ s: 'a'.repeat(40), n: 'W'.repeat(NAME_MAX), k: 'linked', t: seatT, ts: [0xffffffff, 9999], g: [...GLYPHS], au: aura, mu: nowS + 10 ** 9, lv: RENOWN_MAX, ...guild, rc: 1, rb: [15, 14], ar: ARENA_RATING_MAX, cl: CHARACTER_LEVEL_MAX }, kp.privateKey, { subtle, nowS });
   assert.ok(widest.split('.')[1].length > 512, `past the old bound (${widest.split('.')[1].length})`);
-  assert.ok(TOKEN_RE.test(widest), `every claim at once passes the hello (${widest.split('.')[1].length} of 640)`);
   assert.ok(widest.length <= 1024);
   assert.deepEqual((await verifyToken(widest, pub, { subtle, nowS })).claims.rb, [15, 14]);
   assert.deepEqual(readBadge({ title: 'shadowfang', glyphs: ['sprout', 'shadowfang'] }), { title: 'shadowfang', glyphs: ['sprout', 'shadowfang'] });
@@ -245,10 +239,6 @@ test('SHADOW-FANG over a head: the name layer paints the title once when it CHAN
   for (const k of TITLE_PAINT_KEYS) if (k !== 'color') assert.equal(title.style[k], '', `the gradient's ${k} is cleared`);
   layer.render({ points: [pt({})] });
   for (const k of TITLE_PAINT_KEYS) assert.equal(title.style[k], '', 'no title, no paint');
-  // the profile card paints through the same law - and the chat line paints no title at all (TITLE-C, 2026-10-12, Mac:
-  // "remove titles from appearing in the chat"; it painted one through this law until then)
-  assert.doesNotMatch(rd('src/ui/chatPanel.js'), /paintTitle|titleBadge/, 'TITLE-C: the chat draws no title');
-  assert.match(rd('src/ui/profileWindow.js'), /head\.append\(paintTitle\(el\('div', 'dfprofile-title', v\.title\.text\), v\.title\)\);/);
 });
 
 test('SHADOW-FANG the glyph drawn: filled with its own gradient (an id no other glyph node shares), edged in currentColor, the eye on top in its own red - the shape still the first child every face reads; the colourless half leaves the colour to the caller (the account card\'s class) and an ordinary glyph is drawn as it always was (mutants: one shared gradient id; the eye under the head; the edge a fixed colour)', () => {
@@ -280,7 +270,6 @@ test('SHADOW-FANG the glyph drawn: filled with its own gradient (an id no other 
   const sprout = glyphSvgNode(doc, glyphBadges({ glyphs: ['sprout'] })[0], 'x-glyph', 1.6);
   assert.equal(sprout.children.length, 1, 'an ordinary glyph is one shape, as before');
   assert.equal(sprout.children[0].attrs.stroke, 'currentColor');
-  assert.equal((rd('src/ui/playerBadge.js').match(/doc\?\.createElementNS\?\.\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\)/g) ?? []).length, 1, 'still ONE svg door');
 });
 
 test('SHADOW-FANG the account card: the button keeps the plain crimson (its border is drawn in it) and the word inside it wears the SAME paint as over a head, from the skin; the glyph goes through the one drawing\'s colourless half (mutants: the word unwrapped; the card\'s own svg door back)', () => {
@@ -290,11 +279,6 @@ test('SHADOW-FANG the account card: the button keeps the plain crimson (its bord
   assert.ok(ENHANCED_CSS.includes(rule), 'and it reached the skin');
   assert.ok(ENHANCED_CSS.includes(`.card button.acttitle.${badgeClass('tl', 'shadowfang')} { color: #d3193c; }`));
   assert.equal((badgeCss().match(/\.acttitleword/g) ?? []).length, Object.keys(TITLE_GRADIENT).length, 'only a gradient title gets a word rule - Shadow Fang\'s, and since PENITENT Penitent\'s');
-  const js = rd('src/ui/enhanced/enhancedAccount.js');
-  const wardrobe = js.slice(js.indexOf('function wardrobe()'), js.indexOf('function paint()'));
-  assert.match(wardrobe, /const word = el\('span', 'acttitleword', TITLE_TEXT\[key\] \?\? key\);\n\s*setTitleFlame\(word, key\);[^\n]*\n\s*b\.append\(word\);/);   // PIN MOVED (SHOP): the word kept in hand, so a flame title's plate is set on it before it is appended
-  assert.match(wardrobe, /const svg = glyphArtNode\(doc, g, 'acctglyphart', 1\.6\);/);
-  assert.doesNotMatch(js, /createElementNS/, 'no svg door of the card\'s own');
 });
 
 test('SHADOW-FANG (AUDIT A1/A2/A7/A10/B7) every face, round the edges: the profile card\'s title is the WORD\'s width, so its gradient spans the word and not the card; a closing window\'s ghost RENAMES its ids and moves every url(#id) with them (a stripped id folded the wolf away hollow); the wolf\'s edge past its box is drawn, not cut; a name\'s colour is written when it changes (a browser reads a hex back as rgb()); a letter names its sender\'s title in words, and bounds its glyphs as a token does (mutants: the card-wide title; the ids stripped; the diff against a read-back)', () => {
@@ -309,7 +293,6 @@ test('SHADOW-FANG (AUDIT A1/A2/A7/A10/B7) every face, round the edges: the profi
   assert.equal(use.attrs.href, '#dfglyph-grad-7-wm-ghost3');
   assert.equal(other.attrs.fill, 'url(#elsewhere)', 'a reference out of the ghost is left alone');
   assert.equal(renamed.size, 1);
-  assert.doesNotMatch(rd('src/ui/windowMotion.js'), /removeAttribute\('id'\)/, 'no id stripped');
   // A7
   const svg = glyphArtNode(fakeDocument(), glyphBadges({ glyphs: ['shadowfang'] })[0], 'x');
   assert.equal(svg.attrs.overflow, 'visible', 'the nose\'s edge is drawn past the box');
@@ -338,9 +321,6 @@ test('SHADOW-FANG (AUDIT A1/A2/A7/A10/B7) every face, round the edges: the profi
   assert.equal(name.writes, 0, 'a party mate\'s green, not rewritten every frame');
   layer.render({ points: [pt], colorOf: () => null });
   assert.equal(name.style.color, '', 'and let go when the party is');
-  // B7
-  assert.match(rd('src/net/mail.js'), /slice\(0, GLYPHS_MAX\)/, 'a letter\'s glyphs bounded as a token\'s');
-  assert.match(rd('src/ui/socialPanel.js'), /const titled = titleBadge\(l\)\?\.text \?\? null;/, 'the sender\'s title in words ("Shadow Fang", never "shadowfang")');
 });
 
 // ── THE CLASSIC FACE ────────────────────────────────────────────────

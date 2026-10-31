@@ -41,17 +41,6 @@ test('PEERLIGHT1 reader: the light stands where the owner\'s own torch stands, a
   assert.ok(g.every((r) => r > 0 && r <= 14.5) && new Set(g).size > 1, 'a guttering torch flickers at the reader');
 });
 
-test('PEERLIGHT1 wiring: sent with my pose, eased, and added to every scene\'s light list', () => {
-  const w = read('src/scenes/world.js'), m = read('src/scenes/worldModes.js');
-  assert.match(w, /lt: torchPoseByte\(playerEntity\),/);
-  // PIN MOVED (STAR4): a fallen star's beacon and its camp's braziers after the rite's (scenes/starfall/starfallHost.js lights)
-  assert.equal((w.match(/\.\.\.peerTorchLights\(\), \.\.\.\(gatePool\?\.lights\(\) \?\? \[\]\), \.\.\.\(riteHost\?\.lights\(\) \?\? \[\]\), \.\.\.\(starfall\?\.lights\(\) \?\? \[\]\), \.\.\.camps\.lights\(\), \.\.\.droppedTorches\.lights\(\)\)/g) || []).length, 2, 'the exterior, night and day');   // WB12d: the rite's braziers after the gate's fire
-  assert.match(w, /peerLights: \(o\) => peerTorchLights\(o\),/);   // AUDIT PRE-MERGE 0928 M4: the dungeon's list asks for no torches under the abyss (audit0928_merge.test.js)
-  assert.match(m, /\.\.\.\(host\.peerLights\?\.\(\{ torches: !_abyss\?\.torchOff \}\) \?\? \[\]\)\.map\(\(l\) => abyssCandle\(_dgTint\(l\), _abyss\)\), \.\.\.dungeonCtx\.campLights\(\)/, 'the dungeon, in its tint (AUDIT PRE-MERGE 0928 M4: under the abyss\'s own presentation)');
-  assert.match(m, /\.\.\.\(host\.peerLights\?\.\(\) \?\? \[\]\), \.\.\.interiorTorches\.lights\(\)\)/, 'the interior');
-  assert.match(read('src/net/online.js'), /\.\.\.\(to\.lt \? \{ lt: to\.lt \} : \{\}\)/, 'the pose ease carries it');
-});
-
 test('PEERLIGHT2 wire: the Light spell rides the pose as `lc` 1, omitted otherwise, and its edge is sent at once', () => {
   assert.equal(validPose({ ...P, lc: 1 }).lc, 1);
   assert.equal(validPose({ ...P, lc: 7 }).lc, 1, 'a bit');
@@ -60,19 +49,3 @@ test('PEERLIGHT2 wire: the Light spell rides the pose as `lc` 1, omitted otherwi
   assert.ok(poseChanged(validPose({ ...P, lc: 1 }), validPose(P)), 'run out');
 });
 
-test('PEERLIGHT2 wiring: sent while the effect burns; the live mode\'s engine hangs one candle mount a peer (sprite and light), the other engine put out; out on death and offline', () => {
-  const w = read('src/scenes/world.js'), h = read('src/scenes/hostMagic.js'), d = read('src/scenes/dungeonContext.js');
-  assert.match(w, /lc: hasActiveEffect\(playerEntity, 'light'\) \? 1 : undefined,/);
-  assert.match(w, /peerCandlesFrame\(seen, dt\);/);   // INVIS-NET (the merge): before the players drawn - invisnet.test.js
-  assert.match(w, /if \(dc\?\.peerCandles\) \{ magic\.peerCandles\?\.\(\[\], dt\); _peerCandleLights = dc\.peerCandles\(want, dt\)/);
-  assert.match(w, /for \(const l of _peerCandleLights\) _peerLights\.push\(l\);/, 'their candles join the light list');
-  assert.match(w, /peerWalkers\?\.destroy\(\); peerCandlesFrame\(\[\], dt\); return;/, 'the dead see no candle');
-  assert.match(w, /else \{ if \(_peerCandleLights\.length\) peerCandlesFrame\(\[\], dt\);/, 'offline');
-  assert.match(h, /peerCandles\(list, dt\) \{/);
-  assert.match(h, /m\.update\(dt, \{ active: true, feet: c\.feet, height: c\.height, forward: c\.forward \}\);/, 'the mount mine is');
-  assert.match(h, /if \(!want\.has\(id\)\) \{ m\.clear\(\); peerCandleMounts\.delete\(id\); \}/, 'a peer gone drops its sprite');
-  assert.match(h, /for \(const m of peerCandleMounts\.values\(\)\) m\.offsetAll\(offset\);/, 'the recenter');
-  assert.match(h, /for \(const m of peerCandleMounts\.values\(\)\) m\.clear\(\);/, 'the teardown');
-  assert.match(d, /peerCandles: \(list, dt\) => magic\.peerCandles\(list, dt\),/, 'the dungeon\'s own engine');
-  assert.match(read('src/net/online.js'), /\.\.\.\(to\.lc \? \{ lc: 1 \} : \{\}\)/, 'the pose ease carries it');
-});

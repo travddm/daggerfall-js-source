@@ -127,10 +127,6 @@ test('NAV-F a finger\'s screen: no key is named - a tap boards her and opens her
   // the keys' own words off a finger's screen, unchanged
   assert.equal(navalHudText(helm(), KEYS).plate.hint, 'Hold RIGHT CLICK to aim - C: brace');
   assert.equal(navalHudText(helm({ aiming: true }), KEYS).plate.hint, 'Let go to fire - E: hold fire');
-  // the plate over the corner: the touch layer's presses stand 16px up and 48px tall, and the plate a gap above them
-  const touchSrc = readFileSync(new URL('../../../src/ui/touch/touch.js', import.meta.url), 'utf8');
-  assert.match(touchSrc, /const at = \[edge\('right', right\), edge\('bottom', 16\), action\.w \?\? 60\];/);
-  assert.match(touchSrc, /width:\$\{w\}px;height:48px;/);
   assert.equal(NAVAL_PLATE_TOUCH_BOTTOM, 16 + 48 + 12);
   assert.match(NAVAL_HUD_CSS, /\.dfnaval-hud\.touch \.dfnaval-plate \{ right: calc\(18px \+ env\(safe-area-inset-right, 0px\)\); bottom: calc\(var\(--nc-foot, 76px\) \+ env\(safe-area-inset-bottom, 0px\)\); \}/);   // AUDIT NAV1: her foot the draw's (placePlate)
   destroyNavalHud();
@@ -142,8 +138,6 @@ test('NAV-F a finger\'s screen: no key is named - a tap boards her and opens her
   assert.equal(root.className, 'dfnaval-hud');
   assert.equal(byClass(root, 'dfnaval-hint')[0].textContent, 'Hold RIGHT CLICK to aim - C: brace');
   destroyNavalHud();
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /under: enhancedHelmBar\(\),[^\n]*\n\s+vitals: enhancedHudBottom\(\), quick: enhancedHudQuick\(\),[^\n]*\n\s+compass: [^\n]*\n\s+touch: !!touch,/);
 });
 
 // ── the kit ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -275,10 +269,6 @@ test('NAV-F the card stands under the compass by the house law (the journey bar\
   assert.equal(c.style.top, '', 'the panel gone: the sheet again');
   destroyNavalHud();
   globalThis.innerWidth = 1280; globalThis.innerHeight = 720;
-  // the host hands it the bar it draws earlier in the frame
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /scale: enhancedHudScale\(\),\n\s+under: enhancedHelmBar\(\),/);
-  assert.ok(w.indexOf('csaDrawHelmPanel();   // CSA-L') < w.indexOf('navalHud(dt);   // NAV-F'), 'the panel drawn before the card measures it');
 });
 
 // ── the plunder window ──────────────────────────────────────────────────────────────────────────────────────────

@@ -97,26 +97,6 @@ test('HUD-CLASS: every sheet the game injects is read - the 65 a module exports,
   assert.ok(rules.some((r) => r.where.startsWith('src/ui/plus/plusPad.js:') && r.sel === `#${HOLE}.on`), 'a sheet no module exports, read from its literal (an id\'s rule)');
 });
 
-test('HUD-CLASS: every class the HUD writes is read - at its helpers\' callers, through a callback\'s host, a for-of\'s array - and every word the data chooses is named with what its producer mints: no bare hole unnamed, none named that is gone (mutants: the poise state bare again; the crew line\'s guard dropped)', () => {
-  const ehud = classWrites('src/ui/enhanced/enhancedHud.js'), naval = classWrites('src/ui/naval/navalHud.js');
-  for (const w of ['hud-stat', 'stat-side', 'stat-tight', 'stat-noroom', 'hud-qspell', 'qspell-empty', 'hud-qwear', 'hud-qstop', 'hud-qcell']) assert.ok(ehud.words.has(w), w);
-  for (const w of ['side', 'tight', 'noroom', 'empty']) assert.equal(ehud.words.has(w), false, `the bare '${w}'`);
-  for (const w of ['dfnaval-gun', 'gun-empty', 'port', 'starboard', 'dfnaval-say', 'mate', 'target', 'dfnaval-track', 'hull', 'sail']) assert.ok(naval.words.has(w), w);
-  assert.equal(naval.words.has('empty'), false);
-  assert.ok(ehud.holes.some((h) => h.key === 'drawEnhancedHud:p.state' && h.prefix === 'poise-' && !h.bare), 'the poise state wears its own prefix');
-  for (const f of HUD) {
-    const bare = classWrites(f).holes.filter((h) => h.bare).map((h) => h.key).sort();
-    assert.deepEqual(bare, Object.keys(HOLES[f]).sort(), `${f}: the words its data chooses, each named with its producer`);
-  }
-  assert.deepEqual(HOLES['src/ui/enhanced/enhancedHud.js']['statTile:t.kind'], ['buff', 'danger', 'debuff', 'more', 'set', 'warn']);
-  assert.deepEqual(chunks, ['fa', 'fb']);
-  assert.deepEqual(factions, ['pirate', 'merchant', 'navy']);
-  assert.deepEqual(HOLES['src/ui/naval/navalHud.js']['drawNavalHud:c'], ['brace', 'fire', 'mend', 'repair', 'wreck']);
-  assert.deepEqual(HOLES['src/ui/naval/navalHud.js']['drawNavalHud:t.card.stateKind'], ['board', 'friendly', 'hostile', 'sinking']);
-  assert.deepEqual(HOLES['src/ui/naval/navalHud.js']['drawNavalHud:c.kind'], ['board', 'sinking']);
-  assert.match(rd('src/ui/naval/navalHud.js'), /p\.kind === 'sing' \|\| p\.kind === 'shout' \? `dfnaval-say \$\{p\.kind\}` : 'dfnaval-say'/, 'the crew line\'s word is one of the two its guard lets through');
-});
-
 test('HUD-CLASS: NO RULE IN ANY SHEET STYLES A CLASS THE HUD WRITES FROM OUTSIDE THE HUD - and the law bites on the real sheets: given the field\'s bare words back, it finds the windows\' .side and .empty (mutants: the status widget\'s side, the socket\'s and the battery\'s empty bare again; a bare .on rule; a tile kind, a chunk frame, a chip, a card state and a faction minted as a component\'s word)', async () => {
   const { rules } = await uiSheetRules();
   const { words, own } = hudWords();

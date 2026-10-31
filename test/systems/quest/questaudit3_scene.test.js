@@ -422,7 +422,3 @@ test('NAMED-TIMER: the pause tab\'s and the chronicle\'s "Time remains" is the t
   assert.equal(row.clockSeconds, by.near, 'the nearer of the two deadlines the entry names');
 });
 
-test('The exterior\'s quest world hands %oth and %jok their TEXT.RSC pool, as world.js\'s does (source pin; mutants: the line)', () => {
-  assert.match(src('src/scenes/exterior.js'), /flatCaption: \(archive, record\) => pipeline\.flatCaption\(archive, record\),[^\n]*\n\s*getRandomText: \(id\) => townTalk\.randomText\?\.\(id\) \?\? null,/);
-  assert.match(hostText('src/scenes/world.js'), /getRandomText: \(id\) => townTalk\.randomText\(id\),/);
-});

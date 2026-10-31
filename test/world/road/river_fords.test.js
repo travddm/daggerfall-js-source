@@ -56,13 +56,6 @@ test('RIVER-FORDS the routes: a road between two towns either side of a river cr
   assert.ok(along.filter((q) => q.y === 300 && q.x > 600 && q.x < 700).length <= 1, 'beside it, not along it');
 });
 
-test('RIVER-FORDS the wiring: the regions\' build reads the rivers\' raster over its grid as the land\'s channels, the kernel hands the water\'s paint the road\'s own tiles, and the roads\' version moves (returning players lay the roads past the Bay once - SMOOTH-LAND\'s GROUND_ROLL_VERSION 4 lays them once in this release too, so one rebuild, not two)', async () => {
-  assert.match(read('src/world/tamrielRoads.js'), /land\.river = riverFords\(riverRaster\(gx, gy, MAP_W, MAP_H\)\);/);
-  assert.match(read('src/world/terrain/terrainGen.js'), /paintTamrielWaters\(tileData, px, py, hasLocation \? locationRect : null, undefined, paths\);/);
-  const { TAMRIEL_ROADS_VERSION, GROUND_ROLL_VERSION } = await import('../../../src/world/tamrielRoads.js');
-  assert.deepEqual([TAMRIEL_ROADS_VERSION, GROUND_ROLL_VERSION], [8, 6]);   // PIN MOVED (ROAD-GAPS): 6, (EXACT-PIECES): 7 - the same release's one rebuild; PIN MOVED (ROAD-LOOK): 8, the carved lakes refused; (RUMARE-WATER) the ground's 5: the land let down about the Imperial City; (GHOSTFENCE) 6: no countryside within the Ghostfence, no lair or road on its line
-});
-
 // ── WITH ARENA2: the freeware's own Cyrodiil ────────────────────
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));

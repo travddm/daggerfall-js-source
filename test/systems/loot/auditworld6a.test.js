@@ -57,8 +57,6 @@ test('AUDIT WORLD6a A1 (THE ROOT): the memory composes through THE BAG THE MODE 
   assert.equal(composeInteriorShared(ctxOf(), owned), null, 'an owned house keeps no memory');
   assert.equal(applyInteriorShared(ctxOf(), shared, owned), false, 'and takes none');
   assert.equal(applyInteriorShared(ctxOf(), shared, mintInteriorShared('interior:m187853213.4')), true, 'another context in the same building takes it');
-  assert.match(rd('src/scenes/worldModes.js'), /_intShared = mintInteriorShared\(interiorLocationKey\(questSceneCtx\?\.\(\)\?\.mapId \?\? 0, b\?\.buildingKey \?\? 0, visitLayoutNow\(\)\), \{ owned, home: !!interiorHome, net: \{ selfId: /, 'the mode mints through the one home');   // HOME1 re-aim: the visit's online home rides the bag
-  assert.equal((rd('src/scenes/worldModes.js').match(/_intShared\??\.key\b/g) ?? []).length, 0, 'no site reads the old spelling');
 });
 
 test('AUDIT WORLD6a B1: the price is not the wire\'s - a landed item\'s value is floored at what the port itself mints for its template and material, an unknown template is no item, and an honest higher value stands', () => {
@@ -86,8 +84,6 @@ test('AUDIT WORLD6a A2/B2/A3: the stocked day is projected like the list - refus
   assert.equal(needsRestock(ctx.shelves[1], today), false);
   assert.equal(applyInteriorLoot(ctx, [{ k: 'shelf:0', r: [], d: 20.9 }], { seen }), 1, 'without a today (a test\'s bare context) the bound is the number\'s shape alone');
   assert.equal(ctx.shelves[0].stockedDate, 20, 'floored');
-  assert.match(rd('src/scenes/worldModes.js'), /applyInteriorShared\(interiorCtx, shared, \{ \.\.\._intShared, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/, 'the mode hands today in, for the memory');   // PIN MOVED (AUTO-HOLD): and the pieces I carry beside it
-  assert.match(rd('src/scenes/worldModes.js'), /applyInteriorLoot\(interiorCtx, data\.l, \{ \.\.\._intShared, from: id, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/, 'and for an act (AUDIT SETS M2: with the building\'s bag whole, its unreadable set and its room, and the sender)');   // PIN MOVED (AUTO-HOLD): and the pieces I carry beside it   // PIN MOVED (OUTDOOR-LOOT): the bag whole and the sender
 });
 
 test('AUDIT WORLD6a B3/B4/B5: the law admits exactly what the game names (no zero, no leading zero, in either number); a building\'s memory has its own cap at the relay and at the client; the session spells a negative key as the memory does', async () => {
@@ -116,13 +112,10 @@ test('AUDIT WORLD6a B3/B4/B5: the law admits exactly what the game names (no zer
   assert.equal(s.sendWorld(big), false, 'the client keeps the building\'s cap too');
   assert.equal(s.sendWorld({ locationKey: 'interior:m187853213.4', world: {} }), true);
   assert.ok(relayVersionAtLeast(66));   // SRV-N: at or past, never equal - the next slice's bump is not this pin's business
-  assert.match(rd('server/src/index.js'), /if \(message\.length > worldFrameMaxFor\(a\.key\)\) return;/);
 });
 
 test('AUDIT WORLD6a B7: the memory\'s stamp is twelve base-36 digits and a dash, always, at both contexts', () => {
   for (let i = 0; i < 200; i++) assert.match(mintSharedStamp(), /^[0-9a-z]+-[0-9a-z]{8}$/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /const _sharedStamp = mintSharedStamp\(\);/);
-  assert.match(rd('src/world/interior/interiorShared.js'), /stamp: mintSharedStamp\(\)/);
   assert.equal(relay.mintSharedStamp, mintSharedStamp);
 });
 

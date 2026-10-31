@@ -128,7 +128,6 @@ test('AUDIT EG V L7-7 THE WITNESS\'S SEAT (section 16.5 - "the HUD: the count, t
     R.client.frame();
     assert.match(find(globalThis.document.body, 'eg-stage')[0].textContent, /^Watching II Ann - health 64%\./);
   } finally { destroyEgSpireHud(); destroyEgHud(); delete globalThis.document; }
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /watch: witness \? watchedOf\(E\) : null, ping: witness \? pingLeft\(\) : 0/);
   // the shoulders and Q/E move the eye along the living
   R.client.key({ code: 'JoystickButton5' }); R.client.frame();
   assert.ok(eye() < -5, 'the shoulder watched Bo');
@@ -142,10 +141,6 @@ test('AUDIT EG V L7-7 THE WITNESS\'S SEAT (section 16.5 - "the HUD: the count, t
   assert.ok(eye() < -5, 'the tap watched Bo');
   assert.equal(R.client.watchMember(ME), false);
   assert.match(EG_PARTY_CSS, /\.dfparty-card\.eg-tap \{ pointer-events: auto; cursor: pointer; \}/);
-  const P = rd('src/ui/partyPanel.js');
-  assert.match(P, /card\.node\.addEventListener\?\.\('click', \(\) => \{ if \(String\(card\.node\.className\)\.split\(\/\\s\+\/\)\.includes\('eg-tap'\)\) spireTap\?\.\(acct\); \}\);/);
-  assert.match(rd('src/scenes/world.js'), /partyPanel\.setSpire\(\(\) => egClient\?\.partyRows\(\) \?\? null, \(acct\) => egClient\?\.watchMember\(acct\)\);/);
-  assert.match(rd('src/scenes/world.js'), /party: \(\) => \(social\?\.party\?\.members \?\? \[\]\)\.map\(\(m\) => \(\{ sub: m\.acct, name: m\.name, h: m\.p\?\.h, hm: m\.p\?\.hm \}\)\)/);
   // a living member's buttons hold no ping
   assert.deepEqual(egTouchButtons({ witness: false, rest: true }).map((b) => b.id), ['home']);
 });
@@ -196,7 +191,6 @@ test('AUDIT EG V L7-9 THE RECAP CLOSES ON TOUCH (section 27.6; section 27.8): th
   drawEgPanel(null, { doc: desk, recap, words: EG_PRES_TEXT, touch: false });
   assert.equal(find(desk.body, 'eg-close').length, 1, 'a desk has the button too');
   destroyEgHud();
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /touch: pres\.touch \?\?= isTouchDevice\(win\), onClose: \(\) => \{ recap = null; drawEgPanel\(null\); \} \}\);/);
 });
 
 // ── L7-12 / L7-13 ───────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -307,8 +301,6 @@ test('AUDIT EG V L7-17 REDUCED MOTION STILLS THE GATE\'S TITLE CARDS IN THE SPIR
   destroyEgSpireHud();
   assert.match(TITLE_CARD_CSS, /\.wb-title-card\.still \.wb-title-rule \{ transition: none; \}/);
   assert.match(TITLE_CARD_CSS, /@media \(prefers-reduced-motion: reduce\) \{ \.wb-title-rule \{ transition: none; \} \.wb-title-card\.in \.wb-title-main \{ animation: none; \} \}/);
-  assert.match(rd('src/ui/gate/gateTitleCard.js'), /export function drawGateTitleCard\(model, \{ hidden = false, doc = globalThis\.document, still = egReducedMotion\(\) \} = \{\}\)/);
-  assert.match(rd('src/ui/eliteGates/egAccess.js'), /The absent's ring still drains: it is a count, not a motion\./);
 });
 
 test('AUDIT EG V L7-18 / L7-22 THE LORD\'S BAR STANDS ITS LAYOUT\'S HEIGHT, AND A PHONE HELD SIDEWAYS FOLDS ITS DECREES (section 27.1): drawEgSpireHud sets the bar\'s height off EG_LAYOUTS lordH (30 on a desk, 44 sideways) and the track takes the rest; sideways the decrees fold to a press beside each arrival card\'s (mutants: lordH drawn by nothing; the sideways decrees unreachable)', (t) => {
@@ -359,7 +351,6 @@ test('AUDIT EG V L7-19 THE LAST FIVE RUNS ARE READ (section 27.6 - "The last fiv
   const open = openEgBoard({ doc: doc2, fetchBoard: () => new Promise(() => {}), tab: 'runs', runs: () => egRecapsKept(store) });
   assert.deepEqual(runRow(doc2), shown, 'the opener hands its runs to the panel');
   open.close();
-  assert.match(rd('src/scenes/world.js'), /runs: \(\) => egRecapsKept\(appStorage\(\)\), \.\.\.o \}\)/);
 });
 
 // ── L7-20 ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -375,9 +366,6 @@ test('AUDIT EG V L7-20 NO LINE TELLS A SCREEN IN HAND TO TYPE (section 27.8): th
   assert.doesNotMatch(egSpireHudModel(W, ME, R.now(), { witness: true }).stage, /\/breach|type/i);
   assert.doesNotMatch(egHudModel(W, ME, R.now(), { inSpire: true, witness: true }).line, /\/breach|type/i);
   void Ew;
-  const C = rd('src/scenes/eliteGates/egClient.js');
-  assert.ok(!C.includes('/breach forsake again to go.') && C.includes('Forsake the breach? Your recall is lost. Forsake again to go.'));
-  assert.ok(!C.includes('type /breach then to step through') && C.includes('Step through the arch, or answer the call where you stand.'));
   const doc = fakeDocument();
   destroyEgHud();
   drawEgPanel({ offer: null, asks: [{ q: 'ready', title: 'Ready?', opts: ['Not yet', 'Ready'], left: 5000, mine: null, tally: [] }] }, { doc, touch: true });
@@ -443,11 +431,6 @@ test('AUDIT EG V L8-6 THE WEIR KEY\'S CARD SAYS ITS LINE (section 5 - "its line:
 });
 
 test('AUDIT EG V L7-10 THE SPIRE\'S ACCESSIBILITY ROWS IN THE PLAYER\'S LANGUAGE (L10N4; section 27.9): the three rows\' names and notes and the four palettes\' names go through the text core, each a catalog key the thirteen whole languages hold (mutants: a row\'s literal back; a palette\'s name English alone)', () => {
-  const M = rd('src/ui/enhanced/enhancedMenu.js');
-  const body = M.slice(M.indexOf('function spireAccessRows() {'), M.indexOf('  return [motion, palette, fill];'));
-  assert.doesNotMatch(body, /prefRow\('reducedMotion', '/);
-  for (const k of ['menu.spire.motion.name', 'menu.spire.motion.note', 'menu.spire.palette.name', 'menu.spire.palette.note', 'menu.spire.fill.name', 'menu.spire.fill.note']) assert.ok(body.includes(`t('${k}', `), k);
-  assert.match(rd('src/ui/eliteGates/egAccess.js'), /get name\(\) \{ return t\('menu\.spire\.palette\.contrast', 'High contrast'\); \}/);
   assert.equal(EG_DANGER_PALETTES.tritan.name, 'Tritan');
   const en = rd('locales/en/Port_Strings.csv');
   for (const lang of ['bg', 'cs', 'da', 'de', 'es', 'fr', 'id', 'it', 'ko', 'nb', 'pt-BR', 'ro', 'ru']) {

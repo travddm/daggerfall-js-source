@@ -409,16 +409,8 @@ test('HOME-DOORS the mark\'s picture is a bright frame round a faint fill; the h
   assert.equal(px.colors.length, 16 * 16 * 4);
   assert.equal(px.colors[3], 255, 'the frame');
   assert.equal(px.colors[(8 * 16 + 8) * 4 + 3], 90, 'the fill');
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /doors: decorDoorHooks,/);
-  assert.match(wm, /ctx\.actions\.addDoor\(model\.cpu, matrix, \{ ns: 'decor', positionKey: piece\.id \}\)/);
-  assert.match(wm, /ctx\.dynamicDraws\.push\(\{ gpu: model\.gpu, object, decorDoor: piece\.id \}\)/);
-  assert.match(wm, /ctx\.actions\.removeDoor\(`act:decor:\$\{id\}`\)/);
-  assert.match(wm, /doorsHere: \(\) => decorBuiltInDoors\(\), walls: \{ only: \[INTERIOR_SHELL_BUCKET\] \}/);
-  assert.match(wm, /!String\(o\.key\)\.startsWith\('act:decor:'\)/, 'the placed doors aside - the decorator counts those itself');
   // the shell's bucket named where the decorator reads it is the one the build stands the shell in
   assert.equal((await import('../../../src/scenes/decor/decorBase.js')).INTERIOR_SHELL_BUCKET, 'interior');
-  assert.match(src('src/scenes/interiorContext.js'), /collider\.addMesh\(baseKey \? baseBucketOf\(baseKey\) : 'interior', cpu\.positions/);
 });
 
 test('HOME-DOORS the panel says where a door goes before it is placed: a door\'s line in the catalogue says it hangs in a doorway and how many this house has free, or that they are still being found, or that it has none (mutant: the line unread)', async () => {

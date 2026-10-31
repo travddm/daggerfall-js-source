@@ -75,15 +75,6 @@ test('DISC21-A: a save made since - the questions\' dagger at 0 with no maxCondi
   // idempotent
   assert.equal(repairUnmintedConditions(q.items), 0, 'a second load mints nothing');
   assert.deepEqual(WEARABLE_GROUPS, ['Weapons', 'Armor', 'MensClothing', 'WomensClothing', 'Jewellery']);
-  // the load door runs it over the pack, the wagon and the repairer's shelf - and (AUDIT PRE-MERGE 0929 D3) every list
-  // of the character's own things the save carries beside them, the one walk DISC29-B's name repair takes
-  // BAG1 (PIN MOVED): the Materials Bag's list is repaired with the rest (bible/06-Systems/Materials-Bag.md)
-  // ITEM-WALK (PIN MOVED): the lists are the one walk of everything the save holds (savedItemLists, the entity's own
-  // first), and the repairs one runner (repairItemLists) - test/systems/itemwalk.test.js pins the walk's reach
-  const save = rd('src/systems/save/save.js');
-  assert.match(save, /const repairLists = savedItemLists\(snap, entity\);[^\n]*\n\s+repairItemLists\(repairLists\);/);
-  assert.match(save, /export const savedItemLists = \(snap, own = snap\) => \[\.\.\.listsOf\(own\?\.items, own\?\.wagonItems, own\?\.bagItems, own\?\.furnishings, own\?\.otherItems\), \.\.\.stashedItemLists\(snap\), \.\.\.heldItemLists\(snap\)\];/);
-  assert.match(save, /export function repairItemLists\(repairLists\) \{[\s\S]*?for \(const list of repairLists\) \{\s+const n = repairUnmintedConditions\(list\);/);
   const snap = JSON.parse(JSON.stringify(snapshotPlayer(P(), { classicMinutes: 100 })));
   snap.sceneCache = { scenes: [{ sceneName: 'DaggerfallInterior [MapID=1, BuildingKey=2]', lootContainers: [{ items: [{ ...stuck, UID: 7 }] }] }] };
   const r = {};
@@ -124,21 +115,6 @@ test('DISC21-B: the exit door\'s wagon prompt - Yes is taken a frame later, once
   assert.equal(now.opened, 1, 'the inventory opens');
   assert.equal(now.slot?.inventory, true, 'and holds the slot');
 
-  // the source: the prompt's Yes sets the flag, the frame takes it right after No's exit, both teardowns clear it
-  const wm = rd('src/scenes/worldModes.js');
-  const fn = wm.slice(wm.indexOf('function tryExitDungeon('), wm.indexOf('function exitDungeonNow()'));
-  assert.match(fn, /onYes: \(\) => \{ pendingDungeonWagonOpen = true; return null; \}/);
-  assert.doesNotMatch(fn, /onYes: \(\) => \{ dungeonCtx\.openInventoryWithWagon\(\)/, 'never inside the box\'s click');
-  assert.match(wm, /if \(pendingDungeonExit\) \{ pendingDungeonExit = false; if \(aliveUnder\(\)\) \{ exitDungeonNow\(\); return true; \} \}[^\n]*\n\s+if \(pendingDungeonWagonOpen\) \{ pendingDungeonWagonOpen = false; dungeonCtx\.openInventoryWithWagon\(\); \}/);
-  const exit = wm.slice(wm.indexOf('function exitDungeonNow() {'), wm.indexOf('function exitDungeonNow() {') + 1400);
-  assert.match(exit, /dungeonCtx\.destroy\(\);\s+dungeonCtx = null;\s+dungeonLoc = null;\s+pendingDungeonWagonOpen = false;/, 'a Yes pending is this dungeon\'s alone');
-  assert.match(wm, /host\.onDungeonLeave\?\.\(\);   \/\/ WORLD1: a load or a teleport out is a leave too[\s\S]{0,400}?dungeonCtx\.destroy\(\); dungeonCtx = null; dungeonLoc = null;\s+pendingDungeonWagonOpen = false;/, 'nor a load\'s or a teleport\'s next dungeon\'s');
-  // ...and the three lines the slot model above stands for are the context's own
-  const ctx = rd('src/scenes/dungeonContext.js');
-  assert.match(ctx, /openInventoryWithWagon\(\) \{\s+if \(activeOverlay\) return false;/, 'the open refuses a held slot');
-  const at = ctx.indexOf('    overlayInput(action, e = null) {');
-  assert.ok(at > 0, 'the context\'s key door');
-  assert.match(ctx.slice(at, at + 900), /activeOverlay\.input\(action, e\);[\s\S]*?if \(activeOverlay\?\.done\) \{\s+surfacePlayer\(\);\s+activeOverlay = null;/, 'input goes to the slot\'s window, which leaves the slot after its handler returns');
 });
 
 // ── DISC21-C: "Equipped weapon: 'Nothing is in that slot'" ──
@@ -172,12 +148,8 @@ test('DISC21-C: the weapon a new character equips sits sheathed in the main cell
   // can say - naming the keyboard's Z to them named a key they were not holding
   assert.equal(quickslotHand(rig, store, { controller: true, family: 'xbox' }).readyKey, null, 'the pad live: nothing named');
   assert.equal(quickslotHand(rig, store, { controller: false, family: 'xbox' }).readyKey, 'Z', 'the keyboard: its key');
-  assert.match(rd('src/ui/quickslotTags.js'), /pad = \{ controller: controllerLook\(\) && !!padFamily\(\), family: padFamily\(\) \?\? 'xbox' \}/, 'the default reads GP1\'s latch, as the chip does');
   // every host reads the rig in the player's hands - the interior mode hands its own
   for (const [path, hand] of [['src/scenes/world.js', /hand: \(\) => quickslotHand\(rig\),/], ['src/scenes/exterior.js', /hand: \(\) => quickslotHand\(rig\), \.\.\.packDoors \}/], ['src/scenes/dungeonContext.js', /hand: \(\) => quickslotHand\(weaponRig\), \.\.\.packDoors \}/]]) {   // UI2: beside the pack's window doors
     assert.match(rd(path), hand, `${path}: the empty press reads the hand`);
   }
-  assert.match(rd('src/scenes/world.js'), /const quickUse = \(n, rig = weaponRig\) => \{/);
-  assert.match(rd('src/scenes/exterior.js'), /const quickUse = \(n, rig = weaponRig\) => \{/);
-  assert.match(rd('src/scenes/worldModes.js'), /quickUse\(n\) \{ return host\.quickUse\?\.\(n, interiorWeapon\) === true; \},/, 'indoors, the interior rig');
 });

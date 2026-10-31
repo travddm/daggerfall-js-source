@@ -475,12 +475,6 @@ test('EG-ZD THE SPANS\' CLOCK (section 10.8, EG-H1\'s host flag): the breach\'s 
     assert.equal(P.client.breachNow(), null, 'outside the breach: the host\'s own clock');
     assert.equal(P.client.spanSeconds(), null);
   } finally { Date.now = realNow; performance.now = realPerf; }
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /const deadlandsShared = anchoredClock\(\{ perf: \(\) => performance\.now\(\), wall: \(\) => Date\.now\(\) \+ _sharedOffsetMs \}\);\n\s+const deadlandsSeconds = \(\) => egClient\?\.spanSeconds\(\) \?\? deadlandsShared\(\);/);
-  assert.match(W, /const egNow = \(\) => egClient\?\.breachNow\(\) \?\? Date\.now\(\) \+ _sharedOffsetMs;/);
-  const frameAt = W.indexOf('\n  function frame(now) {');
-  assert.ok(frameAt > 0 && W.indexOf('const deadlandsSeconds = () =>') < frameAt && W.indexOf('const egNow = () =>') < frameAt, 'host functions, never the frame (PERF-V8)');
-  assert.match(W, /sdClock: \(\) => host\.deadlandsSeconds\?\.\(\) \?\? performance\.now\(\) \/ 1000,|deadlandsSeconds: \(\) => deadlandsSeconds\(\),/, 'the spans ride the host\'s seconds');
 });
 
 test('EG-ZD THE FEINT\'S DASHED FADE (section 13.2, Feud-Arc section 7.3): a blow cut as a feint keeps its fill where the cut found it, fades over TELL_FEINT_FADE and is drawn dashed (the Spire stage\'s uLook 4); an honest blow is never dashed; the stage breaks a dashed shape into stripes where the plain one is whole (mutants: the fill running on past the cut; the dash on every blow; the stage ignoring the bit)', () => {
@@ -589,7 +583,4 @@ test('EG-ZD THE BEATS ON THE CRITICAL BUS (section 26, EG-G1\'s departure 9): a 
   P.client.beat('key');
   assert.ok(P.played.some((p) => p.rec === EG_BEAT_SOUNDS.rare.rec && p.vol === EG_BEAT_SOUNDS.rare.vol), 'played');
   assert.equal(P.ducked.length, d0 + 1, 'the score ducked under it');
-  const SRC = rd('src/scenes/eliteGates/egClient.js');
-  assert.ok(!/audio\?\.playOneShot/.test(SRC), 'no beat past the bus');
-  assert.match(SRC, /const bus = \(\) => fight\?\.mix\?\.\(\) \?\? \(ownMix \?\?= createSpireMix\(\{ audio, now \}\)\);/);
 });

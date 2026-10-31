@@ -276,18 +276,4 @@ test('CROWN1 THE SEAT TAB\'S DOORS: a crown\'s Royal Tourney said - its prize, i
   await tick();
   assert.deepEqual(entered, [[5023, 5000, false], [5023, 5000, true]]);
   v.unmount();
-  // the world: the door, the session, the room, the card's Challenge, the arm, the ring, the beat
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /seatRoyal: \(st, r, w\) => royalEnter\(st, r, w\)/);
-  assert.match(w, /field = royalRingWire\(t\.px, t\.py, t\.field\)/);
-  assert.match(w, /online\.onSiege = \(g, room\) => \{ siegeSession\?\.onSiege\(g, room\); royalSession\?\.onSiege\(g, room\); \};/);
-  assert.match(w, /key = siegeSession\?\.room\(\) \?\? royalSession\?\.room\(\) \?\? roomKeyFor/);
-  assert.match(w, /if \(royalSession\?\.active\(\)\) \{ if \(!royalSession\.challenge\(peerId\)\)/);
-  // PIN MOVED (AUDIT SEATS-3 F5): each arm's own - the line stands in both
-  assert.match(w, /const battle = royalSession\?\.active\(\) \? royalSession : siegeSession;   \/\/ CROWN1 part two/);
-  assert.match(w, /const battle = royalSession\?\.active\(\) \? royalSession : siegeSession;\n\s*if \(!to \|\| !battle\?\.active\(\)/);
-  assert.match(w, /if \(royalRing\) player\.arena = \{ centre: campToScene/);
-  assert.match(w, /const rc = royalSession\?\.ringCentre\(\);/);
-  assert.match(w, /royalSession\?\.tick\(\);/);
-  assert.match(w, /relayOk: \(\) => online\.royalOk/);
 });

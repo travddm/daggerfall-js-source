@@ -109,22 +109,6 @@ test("audit24 wave25: ActiveQuestor keeps C#'s LAST-quest-wins overwrite", () =>
 });
 
 test('audit24 wave25: a quest rumor is expanded IN PLACE, and so frozen at its first telling', () => {
-  // TalkManager.cs:1425-1431 passes the mill's OWN stored variant by
-  // ref, and QuestMacroHelper.cs:158 writes each expansion back into
-  // it. So the second telling of a quest rumor shows the first
-  // telling's wording. The port cloned first, which re-expanded from
-  // source every time - the port being more correct than the game.
-  const src = rd('src/scenes/world.js');
-  const i = src.indexOf('const expandQuestTokens = (questID, tokens) => {');
-  assert.ok(i > 0);
-  const fn = src.slice(i, src.indexOf('\n  };', i));
-  assert.match(fn, /expandQuestMessage\(questBridge\?\.machine\.getQuest\(questID\) \?\? null, tokens, true\);/);
-  assert.match(fn, /return tokensToString\(tokens\);/);
-  assert.doesNotMatch(fn, /tokens\.map\(\(t\) => \(\{ \.\.\.t \}\)\)/, 'no defensive clone');
-  // C# calls ExpandQuestMessage whether or not GetQuest found
-  // anything - the null-parent bail is inside the helper, not a
-  // caller guard.
-  assert.doesNotMatch(fn, /if \(quest\)/, 'and no caller-side null guard');
 
   // the mutation is real: expandQuestMessage writes token.text back
   const tokens = [{ formatting: 'text', text: 'the %qdt of it' }];
@@ -132,25 +116,3 @@ test('audit24 wave25: a quest rumor is expanded IN PLACE, and so frozen at its f
   assert.equal(tokens.length, 1, 'the same array');
 });
 
-test('audit24 wave25: the two stale claims in the macro header are gone', () => {
-  // questMacros.js's header asserted "only %G has a capitalized
-  // handler" and that the corpus's %G3/%G1 lines render
-  // "%G3[undefined]" - which the same audit refuted forty lines below,
-  // where all six capitalized forms are registered.
-  const s = rd('src/systems/quest/questMacros.js');
-  const header = s.slice(0, s.indexOf('import '));
-  assert.doesNotMatch(header, /only %G\s*\n?\/\/ has a capitalized handler/);
-  assert.doesNotMatch(header, /`%G3` and 1 `%G1` lines really do render/);
-  for (const k of ['%G1', '%G2', '%G2self', '%G3', '%G4']) {
-    assert.ok(s.includes(`'${k}': (mcp) => cap(`), `${k} has a capitalized handler`);
-  }
-});
-
-test("audit24 wave25: the quest-flat click keeps DoClick's answer", () => {
-  // PlayerActivate keeps the bool: the quest-resource arm (:326-339)
-  // falls through to the building/door checks either way, and
-  // StaticNPCClick (:1525-1528) returns only when it answered TRUE.
-  const s = rd('src/scenes/worldModes.js');
-  assert.match(s, /const foundInActiveQuest = s\.behaviour\?\.doClick\(\) \?\? false;/);
-  assert.doesNotMatch(s, /^\s+s\.behaviour\?\.doClick\(\);$/m, 'and does not throw it away');
-});

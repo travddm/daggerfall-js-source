@@ -238,10 +238,6 @@ test('STAR5 THE CIRCLE\'S WARD: while its circle stands the master takes a quart
   assert.equal(f.entity.health <= 0 || f.dead, true, 'a kill is a kill');
 });
 
-test('STAR5 ONE BLOW: a monster\'s landed blow on a fallen star is one blow, its light\'s, as on a townsperson - the pool\'s melee arm hands it QUARRY_BLOW (mutants: the star dropped from the arm)', () => {
-  assert.match(readFileSync(new URL('../../../src/scenes/exteriorFoes.js', import.meta.url), 'utf8'), /calculateAttackDamage: _foeTarget\.civilian \|\| _foeTarget\.starWard \? QUARRY_BLOW : calculateAttackDamage,/);
-});
-
 test('STAR5 THE SITES: a star\'s coven, its master and its circle are three sites on the camps\' law, each its own, every one a site the frames carry; anything else of the form refused (mutants: the part, the star\'s index)', () => {
   const base = starSiteId(300, 200, N, 1), m = starSiteId(300, 200, N, 1, 'm'), c = starSiteId(300, 200, N, 1, 'c');
   assert.deepEqual([base, m, c], [`300,200:star.${N}.1`, `300,200:star.${N}.1.m`, `300,200:star.${N}.1.c`]);

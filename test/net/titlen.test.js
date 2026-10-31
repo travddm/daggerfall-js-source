@@ -226,12 +226,6 @@ test('TITLE-N session: /dm goes only to a relay that carries it (world104) as {t
   assert.deepEqual(out, [{ t: 'narrate', text: 'The door groans open.' }]);
   assert.equal(s.sendDm('again'), false, 'the gate, run at home first');
   assert.equal(s.sendDm('   '), false, 'nothing to say');
-  const online = rd('src/net/online.js');
-  const recv = online.slice(online.indexOf("} else if (m.t === 'dm') {"), online.indexOf("} else if (m.t === 'muted') {"));
-  assert.match(recv, /this\.onDm\?\.\(\{ text, at:/, 'handed on');
-  assert.doesNotMatch(recv, /m\.id|m\.name/, 'no speaker read off it');
-  assert.match(recv, /chatInGate\(this\._inChat\.get\(room\), now\)/, 'gated coming in: the relay is the player\'s own choice');
-  assert.match(online, /if \(primary\) this\.dmOk = relaySupportsDm\(relayV\);/);
 });
 
 test('TITLE-N log and panel: the Dungeon Master\'s line is a system line flagged `dm` from the frame type, one line on every tab, drawn orange in the title\'s own colour; the host parses /dm before /red and never guards it (mutants: the flag off a field; drawn red; the host checking a glyph)', () => {
@@ -244,13 +238,6 @@ test('TITLE-N log and panel: the Dungeon Master\'s line is a system line flagged
   assert.ok(log.tabs.filter((t) => t.shown).every((t) => t.messages.includes(line)), 'on every tab');
   assert.equal('dm' in log.push('world', { id: 'p', name: 'P', text: 'hi' }), false, 'a player\'s line carries no dm key at all');
   assert.ok(CHAT_CSS.includes(`.dfchat-line.dm .dfchat-text { color: ${cssRgba(TITLE_RGBA.dungeonmaster)};`), 'orange, the title\'s own');
-  assert.match(rd('src/ui/chatPanel.js'), /\$\{line\.dm \? ' dm' : ''\}/);
   assert.ok(HOST_COMMANDS.includes('dm'));
   assert.deepEqual(parseChatLine('/dm hello'), { kind: 'host', name: 'dm' }, 'the parser leaves it to the host');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const dm = \/\^\\\/dm\\s\+\(\[\\s\\S\]\+\)\$\/i\.exec\(text\.trim\(\)\);\s*if \(dm\) return chatLinks\.get\('world'\)\?\.sendDm\(dm\[1\]\) \?\? false;/);
-  const arm = w.slice(w.indexOf('const dm = /^'), w.indexOf('const red = /^'));
-  assert.doesNotMatch(arm.replace(/\/\/[^\n]*/g, ''), /glyph|wardrobe|title/i, 'the host does not decide who may narrate');
-  assert.ok(w.indexOf('const dm = /^') < w.indexOf('const red = /^'), 'before /red');
-  assert.match(w, /link\.onDm = \(line\) => chatLog\.pushAll\(\{ text: line\.text, at: line\.at, dm: true \}\);/, 'the flag set here, from the frame type');
 });

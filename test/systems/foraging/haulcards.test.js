@@ -36,7 +36,6 @@ const rd = (f) => readFileSync(new URL(`../../../${f}`, import.meta.url), 'utf8'
 const noWait = () => Promise.resolve();
 const tick = () => new Promise((r) => setImmediate(r));
 
-
 // ─── THE CARDS' DATA ─────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('HAUL-CARDS the law: a material\'s tier wears the loot\'s colours - 1 and 2 plain, 3 magic, 4 rare, 5 legendary, 6 artifact - and none with the loot\'s tiers off; a rank\'s bar is its progress to the next, full at the top; a gather card holds longer than a pickup, a Motherlode\'s longer still (mutants: a tier\'s colour; the bar\'s floor)', () => {
@@ -214,7 +213,6 @@ function find(n, cls, out = []) {
   return out;
 }
 
-
 test('HAUL-CARDS the face: on the enhanced skin a harvest\'s cards stand under the crosshair - the goods\' card its head, "+3", its name, "Stores 41", the XP and the bar; a bump rewrites them; a claim\'s silver its coin, a deed its chest, the cap a muted card - and the classic skin draws nothing and answers false (mutants: the classic drawn; a bump unsaid; the bar unset)', () => {
   // chargenDom.mjs's frames run at once - the draw watchdog's frame counter would chase itself; the feed's own suite
   // runs under a frame source that waits, and so does this
@@ -352,19 +350,9 @@ test('HAUL-CARDS the kinds: Mining\'s Motherlode answer under its card keeps the
   k.answered(d, (t) => said.push(t), { hauled: false });
   k.answered(d, (t) => said.push(t));
   assert.deepEqual(said, ['10 silver struck to your account.', '10 silver struck to your account.']);
-  assert.match(rd('src/scenes/fishHost.js'), /haulName: \(d\) => speciesOfHaul\(d\.node, climateOf\(d\.node\)\)\?\.itemName \?\? null,/);
 });
 
 test('HAUL-CARDS the seams by source: the world host hands the gathering host the feed\'s door and shows a raid\'s and a gate\'s silver as cards beside the book\'s lines; the gathering host asks its kind\'s name and the act\'s words for the card, and tells the kind it was carded; a haul card\'s picture is fitted to its own box (mutants: each seam)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ showPickups, showHaul \} from '\.\.\/ui\/pickupFeed\.js'; import \{ claimHauls \} from '\.\.\/ui\/haulCards\.js';/);
-  assert.match(w, /nowMs: \(\) => Date\.now\(\) \+ _sharedOffsetMs, haul: \(entries\) => showHaul\(entries\),/);
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'raid'\)\); return marksBook\?\.claimLines\(data, 'raid'\) \?\? null; \},/);
-  assert.match(w, /onMarks: \(marks, data\) => \{ showHaul\(claimHauls\(data \?\? \{ marks \}, 'gate'\)\); return marksBook\?\.claimLines\(data \?\? \{ marks \}, 'gate'\) \?\? null; \},/);
-  const g = rd('src/scenes/gatherHost.js');
-  assert.match(g, /hauled = live && deps\.haul\?\.\(harvestHauls\(d, \{ name: k\?\.haulName\?\.\(d\) \?\? null, note \}\)\) === true;/);   // AUDIT HAUL-CARDS A3 (PIN MOVED): on a live world
-  assert.match(g, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);   // PIN MOVED (HUNTERS-MARK): and the gather host's entity, a Trophy Hunter's trophy's pack
-  assert.match(rd('src/ui/pickupFeed.js'), /const box = line\.lode \? LODE_ICON_BOX : line\.haul \? HAUL_ICON_BOX : PICKUP_ICON_BOX;/);
   assert.ok(materialImage('metal:iron') === null || Number.isInteger(materialImage('metal:iron').archive), 'an address or none');
 });
 

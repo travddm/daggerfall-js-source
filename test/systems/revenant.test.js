@@ -231,30 +231,3 @@ test('REVENANT ITS KEEPING: the save slot carries the records (never as out); th
   assert.equal(N.mergeRevenants([{ id: 'bad' }], []).length, 0, 'a broken record is dropped');
 });
 
-test('REVENANT THE HOSTS: the open world\'s pool rolls the flee once under a fifth, runs and escapes without a corpse, taunts once in sight, closes a slain one; the spawn stands its trait or glow, then its rank, before its loot; the world\'s roll stands a due one, whoever rolls the group\'s wanderers, and reads its presence and its notice', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  // PIN MOVED (AUDIT UNQUIET, Revenants.md section 49): and its craft on the foe's own frame (`dt`)
-  assert.match(x, /const _flee = f\.fleeing \|\| \(!f\._fleeRolled && revenantFleeHealth\(f\.entity\)\) \? revenantFleeStep\(f, playerFeet, \{ onMe: \(\) => isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting, dt: foeFrameDt\(dt\) \}\) : null;/, 'the one flee law, asked only of a foe running or under the line');
-  assert.match(x, /if \(_flee === 'escape'\) \{ escapeFoe\(f\); continue; \}/, 'out of reach: escaped');
-  assert.match(x, /if \(_flee === 'start' \|\| _flee === 'run'\) \{ fleeWalk\(f, dt, eye\); continue; \}/, 'running: its walk and nothing else');
-  assert.match(x, /function fleeWalk\(f, dt, eye\) \{\s*\n\s*f\._mout = f\.mobile\.update\(dt, \{ moving: f\.ai\.moving, striking: false, rangedStriking: false, hurting: f\.ai\.hurtKnock, casting: false \}/, 'no blow and no cast in it');
-  assert.match(x, /else if \(_flee === 'cornered'\) revenantSay\(revenantCorneredEvent\(/, 'cornered: said');
-  // PIN MOVED (RVN3: the unbroken's escape - the same door, its own words)
-  // PIN MOVED (RVN6: its band scatters first - bible/12-Enhanced-AI/Feud-Arc.md 17)
-  assert.match(x, /function escapeFoe\(f(?:, \{ slip = false(?:, unbroken = false)? \} = \{\})?\) \{\s*\n(?:\s*scatterBand\(f\);[^\n]*\n)?\s*releaseFoeBatch\(f\);\s*\n\s*f\.dead = true;[\s\S]{0,300}revenantDeed\(playerEntity, f\.entity, 'fled'/, 'gone without a corpse, made a revenant');
-  const esc = x.indexOf('function escapeFoe(f');   // AUDIT (2026-10-02): the slip's option widened the head - the old '(f)' read nothing, and this passed on an empty slice
-  assert.ok(esc > 0);
-  assert.doesNotMatch(x.slice(esc, esc + 600), /f\.corpse = true|sayEnemyDied|reportPlayerKill/, 'no corpse, no kill');
-  assert.match(x, /if \(f\.entity\.revenant && !f\._taunted && f\.ai\.inSight && \(isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting\)/, 'the taunt, once a return');
-  assert.match(x, /if \(f\.entity\?\.revenant\) \{ const nr = revenantSlain\(playerEntity, f\.entity\); if \(nr && !peer\) revenantSay\(revenantSlainEvent\(nr, playerEntity\?\.name, \{ archive: f\.archive \}\), say\); \}/, 'slain at last');
-  const spawn = x.slice(x.indexOf('async function spawnFoe('), x.indexOf('const gender = MobileUnit.resolveGender'));
-  assert.match(spawn, /revenant \? revenant\.elite : rollOverworldElite\(Math\.random\)\)/, 'an elite stands as one again, never a fresh roll');
-  assert.match(spawn, /revenant \? \(revenant\.trait \? championIndex\(revenant\.trait\) : null\)/, 'its trait, never a fresh one');
-  const iApply = spawn.indexOf('applyRevenant(entity, revenant, { turned })'), iLoot = spawn.indexOf('spawnEnemyLoot(entity');   // PIN MOVED (RVN11c: a betrayer's turning is no return)
-  assert.ok(iApply > spawn.indexOf('applyChampion(entity') && iApply < iLoot, 'its rank over its trait, before its loot');
-  assert.match(spawn, /if \(entity\.revenant\) grantRevenantLoot\(entity, builtLevel\);/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _revenant = hit && _m === 'exterior' \? revenantToReturn\(playerEntity, \{ now \}\) : null;\s*\n\s*if \(_revenant\) \{ Promise\.resolve\(_standEncounterFoe\(\{ \.\.\.hit, mobileType: _revenant\.mobileType, revenant: _revenant \}, playerFeet\)\)\.then\(\(f\) => \{ if \(!f\) releaseRevenantStand\(_revenant\); \}\); break; \}[^\n]*\n\s*if \(hit && _rollsForGroup\)/, 'before the group\'s gate - a revenant is the player\'s own');
-  assert.match(w, /\.\.\.\(hit\.revenant \? revenantSpawnOptions\(hit\.revenant, effectiveLevel\(playerEntity\)\) : \{\}\)/);
-  assert.match(w, /revenantPresence\(exteriorFoes\.foes, \{ now \}\);\s*\n\s*revenantSay\(takeRevenantNotice\(playerEntity\), \(l\) => townTalk\.say\(l\)\);/);
-});

@@ -192,11 +192,6 @@ test('CACHE-COPY: the copy binds its empty vertex array through the renderer\'s 
 });
 
 test('CACHE-COPY: the GPU check for the machines that flickered (tools/fixtures/depth-copy-check.html, src/tools/depthCopyCheck.js) copies with shadowPass.js\'s own copy shaders - never a restated pair - reads back with a JS twin of the very pattern its shader writes, two layers\' values thousands of 24-bit units apart, and its verdict names a blind check first, then a wrong draw copy, before the blit (mutants: the twin drifting from the shader; the control not read; the verdict reading the blit before the draw copy)', () => {
-  const mod = readFileSync(new URL('../../src/tools/depthCopyCheck.js', import.meta.url), 'utf8');
-  assert.match(mod, /^import \{ DEPTH_COPY_VS, DEPTH_COPY_FS \} from '\.\.\/render\/shadowPass\.js';$/m, 'the shipped pair, one home');
-  assert.equal(/gl_FragDepth = texelFetch\(/.test(mod), false, 'no copy shader of its own');
-  const page = readFileSync(new URL('../../tools/fixtures/depth-copy-check.html', import.meta.url), 'utf8');
-  assert.match(page, /import \{ runDepthCopyCheck, verdictOf \} from '\/src\/tools\/depthCopyCheck\.js';/);
   // the twin: the shader's coefficients, read off its own text, give the JS pattern at every texel, layer and round
   const m = /\(p\.x \* (\d+) \+ p\.y \* (\d+) \+ layer \* (\d+) \+ round \* (\d+)\) % (\d+)/.exec(PATTERN_GLSL);
   assert.ok(m, 'the shader\'s pattern');

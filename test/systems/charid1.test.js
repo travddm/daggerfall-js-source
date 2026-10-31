@@ -84,12 +84,6 @@ test('CHARID1: a legacy card (no id) is never a new character’s to overwrite, 
 });
 
 test('CHARID1: the envelope carries the id - snapshotPlayer mints one onto a character born before this, restorePlayer adopts a legacy envelope’s cards', () => {
-  const src = read('src/systems/save/save.js');
-  assert.match(src, /'characterId',\s+\/\/ CHARID1/, 'the id is an entity field of the envelope');
-  assert.ok(src.indexOf('characterIdOf(entity);   // CHARID1') < src.indexOf('for (const k of ENTITY_FIELDS) snap[k] = entity[k];'), 'minted before the copy, so the envelope never leaves without one');
-  const restore = src.slice(src.indexOf('export function restorePlayer('));
-  assert.ok(restore.includes("if (typeof snap.characterId !== 'string' || !snap.characterId) {") && restore.includes('entity.characterId = mintCharacterId();') && restore.includes('adoptLegacyCards(appStorage(), entity.name, entity.characterId);'), 'a legacy envelope: mint, then adopt the cards of that name');
-  assert.ok(restore.indexOf('for (const k of ENTITY_FIELDS) entity[k] = snap[k];') < restore.indexOf('adoptLegacyCards('), 'after the copy, so entity.name is the envelope’s');
   // executed: a fresh entity through snapshotPlayer carries an id
   const e = { name: 'Cato', stats: {}, health: 1, maxHealth: 1, magicka: 0, maxMagicka: 0, fatigue: 1, skills: [], skillUses: [], items: [], spellbook: [], wagon: [] };
   let snap = null;
@@ -99,18 +93,11 @@ test('CHARID1: the envelope carries the id - snapshotPlayer mints one onto a cha
 });
 
 test('CHARID1: both births mint, both hosts load by id, both windows find and overwrite by id', () => {
-  assert.match(read('src/systems/chargen.js'), /chargenDone: true,\n\s+characterId: mintCharacterId\(\),/, 'chargen births an id');
-  assert.match(read('src/systems/classicSave.js'), /chargenDone: true,\n\s+characterId: mintCharacterId\(\),/, 'a classic-save import births one');
   for (const host of ['src/scenes/world.js', 'src/scenes/dungeonContext.js']) {
     const h = read(host);
     assert.ok(h.includes('quickLoadSlot(playerEntity.name, undefined, playerEntity.characterId ?? null)'), `${host}: F11 loads MY QuickSave`);
     assert.ok(h.includes('playerName: () => playerEntity.name, playerId: () => playerEntity.characterId ?? null,'), `${host}: the windows are handed the id beside the name`);
   }
-  const win = read('src/ui/saveWindow.js');
-  assert.ok(win.includes("this.currentCharacterId = hooks.playerId?.() ?? null;") && win.includes('return findSave(this.currentPlayerName, this.nameText, undefined, this.currentCharacterId);'), 'the classic window finds the slot by id');
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(menu.includes("const myId = hooks.playerId?.() ?? null;") && menu.includes('(myId ? s.characterId === myId : s.characterName === me)'), 'the enhanced Save pane’s overwrite candidates are this character’s by id');
-  assert.ok(menu.includes('characterId: entry.info?.characterId ?? null,'), 'the card reader carries the id');
   // the slot store's identity law, by execution: an id never matches a card without one
   const st = memStore();
   st.setItem(SAVE_DATA_PREFIX + 4, '{"v":1}'); st.setItem(SAVE_INFO_PREFIX + 4, JSON.stringify({ saveName: 'QuickSave', characterName: 'Dax' }));

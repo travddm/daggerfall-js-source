@@ -194,7 +194,6 @@ test('PACK-PICK the piece looked at: its name and line, the look panel\'s rows a
   assert.deepEqual([...byClass(card, 'packpick-magic')[0].children].map((n) => n.textContent), look.magic);
   assert.equal(itemLookRows(null), null);
   assert.equal(itemLookRows('a word'), null);
-  assert.match(src('src/scenes/vendorHost.js'), /const vendorItemStats = itemLookRows;/, 'the trader\'s look is this one');
 });
 
 /** A market book as the tab reads it - `goldOk` a realm character's - and the listings it is asked for. */

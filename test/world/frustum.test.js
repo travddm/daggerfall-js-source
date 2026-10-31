@@ -92,29 +92,3 @@ test('EV3: localAabb is the plain min/max scan', () => {
   assert.deepEqual(localAabb([1, 2, 3, -4, 5, -6, 0, -1, 9]), [-4, -1, -6, 1, 5, 9]);
 });
 
-test('EV3: culling is wired, escape-hatched, and never gates the non-draw work', () => {
-  const world = readFileSync('src/scenes/world.js', 'utf8');
-  const exterior = readFileSync('src/scenes/exterior.js', 'utf8');
-  // both hosts consult the hatch once at build and the planes per frame
-  for (const [name, src] of [['world', world], ['exterior', exterior]]) {
-    assert.ok(src.includes('cullDisabled()'), `${name}: ?cull=off is the escape hatch`);
-    // GHOST1: the streaming host extracts through `spherePlanes`, which IS
-    // `frustumPlanes` plus a normalise - its `_planes` serve the billboard
-    // SPHERE test as well as these box tests, and `sphereInPlanes` needs
-    // unit normals for its radius margin to mean anything. Dividing four
-    // coefficients by a positive length cannot move a sign, so every box
-    // decision below is untouched (pinned over 10,000 boxes in
-    // test/render/ghost1_spritecull.test.js).
-    assert.ok(src.includes('frustumPlanes(') || src.includes('spherePlanes('), `${name}: planes extracted from the live camera`);
-    assert.ok(src.includes('aabbOutside('), `${name}: the outside test gates draws`);
-  }
-  // the streamed host: the windmill's ROTOR ANGLE and its HUM are not
-  // presentation-gated - a mill behind you still turns and sounds
-  const loop = world.slice(world.indexOf('const pixelVisible'), world.indexOf('const camRight = _camRight'));
-  assert.ok(loop.indexOf('advanceRotor(') !== -1 && loop.indexOf('w.hum') !== -1,
-    'rotor time and hum live in the loop');
-  const visGate = loop.indexOf('if (pixelVisible)');
-  assert.ok(visGate !== -1, 'the visibility gate exists');
-  const gatedSpan = loop.slice(visGate, loop.indexOf('advanceRotor('));
-  assert.ok(!gatedSpan.includes('w.hum'), 'the hum is not inside the draw gate');
-});

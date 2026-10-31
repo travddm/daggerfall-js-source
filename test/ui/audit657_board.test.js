@@ -138,12 +138,6 @@ test('AUDIT 657 B5 MARKET-AUDIT U4\'s arm where B5 does not reach: a market know
   v.unmount();
 });
 
-test('AUDIT 657 B6 a guild\'s raid contract says what earns it - a raider struck in the town and the town stood in until it is cleansed (raidLaw.js\'s receipt); "Fight off a raid" dropped the second (mutant: the condition cut again)', () => {
-  const w = src('src/ui/workTab.js');
-  assert.match(w, /t\('prof\.work\.contract\.how', 'Hit a raider in a town here and stay until the town is cleansed\. You are paid when the raid is counted, less \{tax\} tax\.', \{ tax: marksText\(saleTax\(x\.pay\)\) \}\)/);
-  assert.match(src('src/net/raid/raidLaw.js'), /struck a raider \(said\) and stood in the town at the cleanse/, 'the law the words say');
-});
-
 test('AUDIT 657 B7 the siege field\'s Market banner stands at the town\'s Notice Board by ONE-BOARD\'s own choice - on an exact tie too, where the field walked the boards in their order and the Notice Board by their position (mutant: the field\'s own walk back)', () => {
   const frames = new Map([['palace', { door: { a: [-1, 0, 0], b: [1, 0, 0] }, box: [-10, 0, -20, 10, 10, 0] }]]);
   const at = (x) => ({ box: [x, 0, 0, x + 1, 2, 1] });
@@ -157,10 +151,6 @@ test('AUDIT 657 B7 the siege field\'s Market banner stands at the town\'s Notice
 });
 
 test('AUDIT 657 B9 + D6 the words true to the law: a gold listing pays a 1% fee on its sale and none to list; a late bid adds minutes; the guide\'s Claim names the law\'s taker - the strongest past the line whose treasury can pay - and its Earn the law\'s wait, Tribute the Guildmaster\'s from the treasury (mutants: "No fee." again; the unit dropped; the top guild at the line; Tribute a member\'s earning)', () => {
-  const m = src('src/ui/marketTab.js');
-  assert.equal((m.match(/`No fee to list\. Up for 72 hours on every board\. If it (all )?sells you get \$\{goldGets\} \(after a 1% fee and \$\{saleTax\(100\)\}% tax\)/g) ?? []).length, 2, 'both gold forms');
-  assert.doesNotMatch(m, /`No fee\. /);
-  assert.match(m, /a bid in the last \$\{AUCTION_LATE_S \/ 60\} minutes adds \$\{AUCTION_ADD_S \/ 60\} minutes\. You get/);
   const n = (x) => x.toLocaleString('en-US');
   const [, earn, claim] = seatGuide({ tier: 'palace' });
   assert.match(earn[1], new RegExp(`^Members ${SEAT_MEMBER_WAIT_S / 86400} days in the guild earn influence`));

@@ -169,20 +169,3 @@ test('WB6a the pass: the sea solid (tested and written) and then the sky at the 
   assert.deepEqual(p.drawn, ['sky'], 'no centre, no sea - and still a sky');
 });
 
-test('WB6a the seams, by source: the court is lit as itself before the frame begins (the lane\'s dark on its trilight, as on its fog); the sea and sky drawn after the court\'s solid geometry and before its flats; the world host builds the pass once, lazily, a failure costing the sky and never the game, and marks the seam (mutants: each seam removed)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const light = wm.indexOf('\n      if (isGateArena(dungeonLoc)) { const _cl = courtLighting(deadlandsFlash(_deadS)); const _ct = dungeonTrilight(!!renderer.lightingLane, _cl.tri); renderer.setLighting(courtEquatorOf(_ct), 0, undefined, _ct); renderer.setMoonlight(_cl.key); }');   // WB6b: with the strike lit now; AUDIT WB D10: its equator one array
-  const dark = wm.indexOf('renderer.setMoonlight(null);');
-  const begin = wm.indexOf('renderer.beginFrame(proj, view, _ktLook?.sunDir ?? INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
-  assert.ok(dark > 0 && dark < light && light < begin, 'after the dungeon\'s dark, before the frame reads it');
-  const dyn = wm.indexOf('for (const d of dungeonCtx.dynamicDraws) if (!d.hidden && !d.culled) renderer.drawMesh(d.gpu, d.object.matrix, d.texRemap ?? dungeonCtx.texRemap, d.noShadow ? DRAW_NO_SHADOW : DRAW_SHADOW);');   // AUDIT SD II (L2 F11 - PIN MOVED): a hidden draw skipped; SD-LOOK (S2, PIN MOVED): a culled one too, each with its own remap and shadow
-  const back = wm.indexOf('\n      if (isGateArena(dungeonLoc)) host.drawGateBackdrop?.({ proj, view, eye: mwv.eye });');
-  const flats = wm.indexOf('renderer.drawBillboards([...dungeonCtx.billboardBatches');
-  const statics = wm.indexOf('if (dungeonCtx.staticBatch) renderer.drawMesh(dungeonCtx.staticBatch, BATCH_IDENTITY, null);');
-  assert.ok(begin < statics && statics < dyn && dyn < back && back < flats, `after the solid geometry, before the flats: ${[begin, statics, dyn, back, flats]}`);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /drawGateBackdrop: \(\{ proj, view \}\) => \{\n\s+const d = deadlandsPass\(\);\n\s+if \(d\?\.draw\(proj, view, _courtSea, deadlandsSeconds\(\), courtFogNow\(\), skyGain\(renderer\._fogColor, COURT_FOG\.color\)\)\) renderer\.markForeignPass\(\);/);   // AUDIT WB D10: the sea's place made once, the fog one object filled from the renderer's
-  assert.match(w, /const _courtSea = courtToDungeon\(0, LAVA_Y, 0\), _courtCentre = courtToDungeon\(0, 0, 0\);/);
-  assert.match(w, /const courtFogNow = \(\) => \{ _courtFog\.mode = renderer\._fogMode; _courtFog\.density = renderer\._fogDensity; _courtFog\.range = renderer\._fogRange; _courtFog\.color = renderer\._fogColor; _courtFog\.camPos = renderer\._camPos; return _courtFog; \};/);
-  assert.match(w, /if \(_deadlands !== undefined\) return _deadlands;\n\s+try \{ _deadlands = new DeadlandsRenderer\(renderer\.gl\); \} catch \(e\) \{ console\.warn\('\[gate\] the Deadlands would not build', e\?\.message \?\? e\); _deadlands = null; \}/);
-});

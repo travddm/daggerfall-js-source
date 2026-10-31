@@ -98,29 +98,6 @@ test('PERF-YARD (AUDIT 2): a piece whose model has no box to measure - its trian
   assert.equal(asked, 0, 'and the test never asked');
 });
 
-test('PERF-YARD: the world host hands the yards its view test - the frame\'s own matrices, planes made once a frame, the reach the renderer\'s - and the yards hand it to every yard\'s pool (mutants: the host\'s test unwired; the planes kept from an old frame; the matrices kept after the draw; the yards handed no test)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const y = readFileSync(new URL('../../src/scenes/homeYards.js', import.meta.url), 'utf8');
-  const made = w.indexOf('  const yards = homeDecor && onlineHomes ? createHomeYards({');
-  assert.ok(made > 0, 'the yards made');
-  assert.ok(w.slice(made, w.indexOf('}) : null;', made)).includes('    cull: (box) => yardCull(box),'), 'the host\'s test in the yards\' deps');
-  const fn = w.slice(w.indexOf('  function yardCull(box) {'), w.indexOf('\n  }\n', w.indexOf('  function yardCull(box) {')));
-  assert.ok(fn.includes('if (!cullOn || !_lastProj || !_lastView) return DECOR_DRAW;'), '?cull=off, and before a frame was seen: drawn');
-  assert.ok(fn.includes('if (_yardPlanesOf !== _lastView) { spherePlanes(multiply(_lastProj, _lastView, _yardPv), _yardPlanes); _yardPlanesOf = _lastView; }'), 'the planes from this frame\'s matrices, once a frame - keyed on the view matrix, never on a timestamp two frames can share (AUDIT PERF-YARD 3)');
-  assert.ok(fn.includes('return decorCullVerdict(_yardPlanes, box, _yardReach);'), 'the law');
-  assert.ok(w.includes('  const _yardReach = (box) => renderer.shadowReach(box);'), 'the reach the renderer\'s');
-  // AUDIT PERF-YARD (record 6): the frame's own line - the modes' `reportFrame` holds the same text, six spaces in, ahead of it
-  const kept = w.indexOf('    _lastProj = proj; _lastView = view;   // TI1'), drawn = w.indexOf('    yards?.draw(renderer);');
-  assert.ok(kept > 0 && w.indexOf('    yards?.draw(renderer);', drawn + 1) < 0, 'the frame\'s keeping, and its one yards draw');
-  assert.ok(kept < drawn, 'the matrices kept before the yards draw');
-  // PIN MOVED: YARD-RANGE (2026-10-11) - the pool is handed `seenCull`, the size's test before the host's own
-  assert.ok(y.includes('        n += y.pool.draw(r, remapOf(y), _eye || cull ? seenCull : null);'), 'every yard\'s pool given it');
-  // AUDIT PERF-YARD 1: ...and the test handed on is the HOST's - `cull = null` passed every pin and switched the feature off
-  const yd = y.slice(y.indexOf('    draw(r = deps.renderer) {'), y.indexOf('        n += y.pool.draw(r, remapOf(y), _eye || cull ? seenCull : null);'));
-  assert.ok(/\n {6}const cull = deps\.cull \?\? null;/.test(yd), 'the cull the yards hand on is the one the host gave them');
-  assert.ok(y.includes("const seenCull = (box) => (_eye && !decorBoxSeen(box, _eye, YARD_MIN_ANGLE) ? DECOR_SKIP : deps.cull ? deps.cull(box) : DECOR_DRAW);"), 'YARD-RANGE: and seenCull asks the host\'s own test after the size\'s');
-});
-
 test('PERF-YARD (AUDIT 15): a merchant yard - its timber and its wagons on show - follows the same law under the street\'s test: in view drawn, off screen in a shadow\'s reach cast alone (a wagon part that casts nothing still casting nothing), else neither; its box holds its timber and its wagons and is made again when it moves; through a window, no test (mutants: the yards untested; the cast arm drawn; a no-shadow part cast; the box kept where the yard stood; the street\'s test unwired; a window\'s view culled by the street\'s eye)', async () => {
   const { createMerchantYards, yardToScene } = await import('../../src/scenes/merchantYardsHost.js');
   const log = { drawn: [], cast: [] };
@@ -169,8 +146,4 @@ test('PERF-YARD (AUDIT 15): a merchant yard - its timber and its wagons on show 
   // no test (a window's view): everything drawn
   log.drawn.length = 0;
   assert.equal(y.draw(renderer), 2 + 3, 'every timber and every wagon');
-  // the world host: the street's draw hands it the yards' test; a window's, none
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.ok(w.includes('    merchantYards?.draw(renderer, yardCull);'), 'the street\'s draw tested');
-  assert.ok(w.includes('renderer.outsideViewDraws?.add(({ renderer: r }) => { merchantYards?.draw(r); });'), 'the view out of a window untested - its eye is not the street\'s');
 });

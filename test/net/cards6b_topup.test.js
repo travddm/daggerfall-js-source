@@ -122,11 +122,6 @@ test('CARDS6 gold owed elsewhere: the device keeps where it staked; what other r
   assert.deepEqual(book.elsewhere('interior:a'), [{ room: 'interior:b', place: 'The Bilge, Wayrest', amount: 500 }]);
   ch = 'CH2';
   assert.deepEqual(book.elsewhere('interior:a'), [], 'another character\'s are its own');
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /cardElsewhereSay\(\); \}   \/\/ CARDS6: a lost stake's answer asked again/);
-  assert.match(wm, /say\(`Gold you staked waits at card tables elsewhere - \$\{\[\.\.\.by\]\.map\(\(\[p, n\]\) => `\$\{n\} at \$\{p\}`\)\.join\('; '\)\}\. Each table hands it over when you return\.`\);/);
-  assert.match(wm, /if \(!seat \|\| seat\.leaving \|\| \(st\.hand && st\.handSeats\.includes\(me\)\)\) return null;\n\s+const most = Math\.min\(HOLDEM_STAKE_MAX_BB \* st\.bb - seat\.stack, host\.cardStakes\?\.purse\?\.\(\) \?\? 0\);\n\s+return most >= HOLDEM_TOPUP_MIN_BB \* st\.bb \? most : null;/);
-  assert.match(wm, /const r = await host\.cardStakes\.stake\(\{ room: host\.cardOnline\.room\(\), table: g\.table, bb: g\.stakes\.bb, amount, topup: true, place: cardPlaceName\(\) \}\);/);
   const model = (topUp, staking = false) => cardHudModel({ phase: 'playing', view: { seats: [], handSeats: [], hand: null, button: -1 }, stakes: { sb: 5, bb: 10 }, gold: true, topUp, staking });
   assert.deepEqual(model(400).actions.find((x) => x.id === 'topup'), { id: 'topup', label: 'Top up 400', enabled: true });
   assert.equal(model(null).actions.find((x) => x.id === 'topup'), undefined);

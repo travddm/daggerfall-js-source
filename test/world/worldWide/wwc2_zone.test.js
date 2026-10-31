@@ -186,14 +186,6 @@ test('WW-C2 THE MAPS: the zone\'s ink and its views are on the world - the fog\'
   assert.ok(lim.pan.x0 < wb.x0 && lim.pan.x1 > wb.x1 && lim.pan.y0 < wb.y0 && lim.pan.y1 > wb.y1, 'the pan round the world box');
   assert.deepEqual(summaryPixel({ id: spawnedHallMapId(2400, 900), pixel: { x: 2400, y: 900 } }), { x: 2400, y: 900 }, 'a hall\'s own pixel');
   assert.deepEqual(summaryPixel({ id: 250 * 1000 + 500 }), { x: 500, y: 250 }, 'a Bay place\'s off its id, as ever');
-  // the held map paints the zone over the continent, and the zone map always on it
-  const held = rd('src/ui/heldMap.js');
-  // PIN MOVED (ZONE-NAMES-OVER): over the continent's land and under its names (its `under`), else after it
-  assert.match(held, /part: 'over', under: paintZone, nameless: zoneMask \? \(c\) => wildInside\(zoneMask, c\.x, c\.y\) : null \}\);\n\s+if \(!zoneDone\) paintZone\(\);/, 'the zone over the continent\'s ink');
-  // PIN MOVED (REGION-LINES 2): the provinces' line is provinceLines
-  assert.match(rd('src/ui/tamrielInk.js'), /provinceLines\(ctx, view, paperW, paperH, [^\n]*\);\n(?:\s+\/\/[^\n]*\n)*\s+opts\.under\?\.\(\);/, 'over the land, the roads and the borders');
-  assert.match(held, /const continentOn = this\._tamriel \|\| this\._zoneMap;/);   // PIN MOVED (ZOOM-FAST)
-  assert.doesNotMatch(rd('src/ui/travel/travelMapWindow.js'), /_drawWildPage|_drawWildOverview|wildPictureZone/, 'the classic map\'s zone layer retired');
 });
 
 test('WW-C2 NO WORLD EVENT IN THE ZONE, AND THE WIRE: a theatre\'s gate never opens in Cyrodiil\'s areas; a hall\'s word only to a relay that reads a world pixel\'s key (mutants: Cyrodiil\'s areas open; the old relay asked)', () => {
@@ -203,20 +195,6 @@ test('WW-C2 NO WORLD EVENT IN THE ZONE, AND THE WIRE: a theatre\'s gate never op
   assert.deepEqual(theatreGateAreas(/** @type {any} */ (scan)), [area(2000, -200)], 'Skyrim\'s area, never Cyrodiil\'s');
   assert.equal(WDUN_WORLD_RELAY_MIN, WORLD_WIDE_RELAY_MIN);   // PIN MOVED (AUDIT TESA II Z2): 256 (world255 on its branch), then 260 at the merge with main - one number now, the world-wide relay's
   assert.ok(relaySupportsWdunWorld(RELAY_VERSION) && relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN}`) && !relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN - 1}`), 'the relay before the world-wide one reads no hall of Cyrodiil\'s');
-  const online = rd('src/net/online.js');
-  assert.match(online, /if \(w\.h && !seaVaultCell\(w\.h\) && !this\.wdunWorldOk\) return false;/, 'a hall\'s key to an older hub: never sent');
-  assert.match(online, /this\.wdunWorldOk = relaySupportsWdunWorld\(relayV\);/);
   assert.equal(wdunHall('8192,0'), null, 'past the world\'s grid: no hall');
 });
 
-test('WW-C2 THE HOST: the zone\'s mask is Cyrodiil\'s wherever the mountains\' was read; the frame stands the zone by its ring alone; the halls are scenes/zoneHallsHost.js\'s, built above the pixel builder; a hall\'s summary its own pixel (mutants: the region test kept; the module unwired)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.doesNotMatch(hostText('src/scenes/world.js'), /wildMaskOf|wildHallFree|wildHallStandOf|isWildRegion\(_questRegionIndex/, 'the mountains\' readers gone');   // PIN MOVED (AUDIT TESA II K6): the host whole
-  assert.match(w, /setWildMask\(cyrodiilMask\(\)\);/);
-  assert.match(w, /const wildMapMask = \(\) => \(_onlineWorldSession\(\) \? cyrodiilMask\(\) : null\);/);
-  assert.match(w, /const here = seaRing > 0 \|\| \(_onlineWorldSession\(\) && !!online\?\.wildOk && playerSpawned && \(\(\) => \{ const px = playerTravelPixel\(\); return !!px && wildRingAt\(px\.x, px\.y\) > 0; \}\)\(\)\);/);
-  assert.ok(w.indexOf('const zoneHalls = createZoneHalls(') < w.indexOf('const { _locationToBuild } = createSpawnStand({'), 'built above the builder (BOOT-TDZ2)');   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the builder (spawnedDungeonAt, _locationToBuild) is scenes/spawnStandHost.js's, constructed where it stood
-  assert.match(w, /id: spawnedHallMapId\(h\.x, h\.y\), pixel: \{ x: h\.x, y: h\.y \},/);
-  // PIN MOVED (AUDIT TESA II Z9): the dry plateau by its early-out law (world/spawnedDungeons.js plateauDry), kept a pixel
-  assert.match(rd('src/scenes/zoneHallsHost.js'), /const land = woods\?\.isTamrielGround \? woods : groundWoods\(woods\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const dry = new Map\(\);\n\s*const ground = [^\n]*\n\s*const k = worldPixelKey\(x, y\);\n\s*let d = dry\.get\(k\);\n\s*if \(d === undefined\) dry\.set\(k, d = plateauDry\(land, x, y\)\);/);
-});

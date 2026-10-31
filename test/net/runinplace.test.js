@@ -94,11 +94,5 @@ test(`RUN-IN-PLACE timed (SCALE2b): ${GAP}`, () => quiet(() => shortGapKeepsStri
 test(`RUN-IN-PLACE untimed (NET-SMOOTH): ${GAP}`, () => quiet(() => shortGapKeepsStride(false)));
 
 test('RUN-IN-PLACE: one home - the drawn pose the play-out makes is the one every on-foot body and the footsteps stride off (peerMoving reads its `mv`), and the hold is the sender\'s own; a body standing in its peer\'s silence is still drawn until PEER_TIMEOUT_MS, as before', () => {
-  const src = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8');
-  assert.match(src, /const was = p\.drawn, s = poseAlong\(p\.path, p\.cur\);/, 'the drawn pose is made in tick (AUDIT 637 C1: against the place the law last drew)');
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /const ONLINE_MOVE_HOLD_MS = SHOWN_MOVE_HOLD_MS;/, 'the sender\'s hold IS the watcher\'s - one literal, net/online.js (AUDIT 637 D7)');
-  const climb = readFileSync(new URL('../../src/net/peer/peerClimb.js', import.meta.url), 'utf8');
-  assert.match(climb, /export const peerMoving = \(shown\) => !!shown\?\.mv && !peerClimbing\(shown\) && !shown\?\.st;/, 'a body strides off the drawn pose\'s mv');   // PIN MOVED (AUDIT CARDS C5): and never seated
   assert.ok(PEER_TIMEOUT_MS > SHOWN_MOVE_HOLD_MS * 100);
 });

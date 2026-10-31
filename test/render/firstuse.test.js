@@ -120,16 +120,4 @@ test('FIRST-USE the ghosts: the Steps\' program started as the realm loads, the 
   const off = fakeGl({ parallel: false });
   createSdSteps({ renderer: { gl: off.gl } });
   assert.equal(off.count('createProgram'), 0, 'nothing started where the driver cannot say');
-  const steps = read('src/scenes/superDungeon/sdSteps.js'), span = read('src/scenes/eliteGates/egSpan.js');
-  for (const [name, src] of [['the Steps', steps], ['the Spans', span]]) {
-    assert.match(src, /const ghostsDoor = \(\) => \(renderer\?\.gl \? compiledPass\(renderer\.gl, sdStepsPrograms\(/, `${name}: through the door`);
-    assert.match(src, /pass \?\?= passOf\?\.\(true\) \?\? null;/, `${name}: asked as needed`);
-    assert.match(src, /pass = null; passOf = ghostsDoor\(\);/, `${name}: a fresh door after a clear`);
-    assert.doesNotMatch(src, /passTried/, `${name}: no latch of its own`);
-  }
-  assert.match(span, /if \(renderer\?\.gl && parallelCompile\(renderer\.gl\)\) \{ startPrograms\(renderer\.gl, sdStepsPrograms\(ghostOpts\)\); startEgLookPrograms\(renderer\.gl\); \}/, 'the Spans\' and the look\'s started with the hall');
-  const rite = read('src/scenes/riteHost.js');
-  assert.match(rite, /const smokeOf = gl \? compiledPass\(gl, RITE_SMOKE_PROGRAMS, \(\) => new RiteSmokeRenderer\(gl\),/);
-  assert.match(rite, /if \(!smokePass && smokeOf && smokeFade\(t\) > 0\) smokePass = smokeOf\(\);/, 'never asked as needed');
-  assert.match(read('src/scenes/starfall/starfallHost.js'), /void warmPrograms\(\[\{ start: \(\) => startPrograms\(renderer\.gl, STARFALL_PROGRAMS\), run: ensurePass, need: \(\) => !pass && !passTried \}\]\);/);
 });

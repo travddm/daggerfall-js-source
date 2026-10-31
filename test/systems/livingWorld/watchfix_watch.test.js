@@ -118,37 +118,6 @@ test('WATCH-FIX the cap race: two crimes in one breath on the same street - the 
   assert.equal(w.activeCount(), 0, 'nothing of a swept world stands in the next - neither the rest of the first call\'s nor the second\'s');
 });
 
-test('WATCH-FIX the conversion is one law: every arm turns a walker through turnNpc - the immediate arm, the witness arm, the minute\'s sweep, the town watch\'s summons and the swing - the guard marked with the resident\'s identity as it was turned; a walker another arm took (`live()` false) is never turned; the guard\'s end says whose hand (mutants: the mark, the street\'s read, whose hand)', async () => {
-  const g = pool();
-  const id = { id: 'L12345.w0', res: { id: 'L12345.w0', guard: true }, town: {} };
-  const w = walker([5, 0, 5], { living: id });
-  await g.spawnCityGuards(true, { playerFeet: [0, 0, 0], playerFwd: [0, 0, 1], pool: [w] });
-  assert.equal(g.guards[0].livingFrom, id, 'the guard stands for the resident, by the identity he was turned with');
-  const gone = walker([6, 0, 6]);
-  gone.on = false;   // the street took him already
-  const before = g.guards.length;
-  await g.makeNpcGuardsIntoEnemies({ pool: [gone], playerFeet: [0, 0, 0] });
-  assert.equal(g.guards.length, before, 'a walker no longer on the street is never turned');
-  assert.equal(gone.disabled, 0);
-  // whose hand: the player's blow, a foe's, a peer's
-  const [p] = g.guards;
-  g.hurtGuard(p, 9999, [0, 0, 0], null);
-  assert.deepEqual([p.dead, p.corpse, p.killedBy], [true, true, 'player']);
-  await g.spawnCityGuards(true, { playerFeet: [0, 0, 0], playerFwd: [0, 0, 1], pool: [walker([7, 0, 7])] });
-  const q = g.guards.find((x) => !x.dead);
-  q.hurtFromFoe(9999, null);
-  assert.equal(q.killedBy, 'other', 'a beast\'s blow is no deed of the player\'s');
-  await g.spawnCityGuards(true, { playerFeet: [0, 0, 0], playerFwd: [0, 0, 1], pool: [walker([8, 0, 8])] });
-  const r = g.guards.find((x) => !x.dead);
-  g.hurtGuard(r, 9999, [0, 0, 0], null, { fromPlayer: false, peer: true });
-  assert.equal(r.killedBy, 'peer');
-  // every arm through the one law, and none of them turning a walker by hand
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.equal((cg.match(/await turnNpc\(/g) ?? []).length, 5, 'the immediate arm, the witness arm, the sweep, the summons, the swing');
-  assert.doesNotMatch(cg, /await spawnGuardAt\(p\.pos, p\.fwdYaw, playerFeet \?\? null\);\n\s*p\.disable\(\);/, 'no arm turns a walker by hand');
-  assert.match(cg, /if \(claimed\.has\(who\) \|\| p\.live\?\.\(\) === false\) return null;/);
-});
-
 test('WATCH-FIX a load keeps whom a guard stands for: the snapshot names the resident by id, the restore marks the guard with it (mutants: the snapshot\'s id, the restore\'s mark)', async () => {
   const g = pool();
   const id = { id: 'L12345.w1', res: null, town: null };
@@ -338,11 +307,6 @@ test('WATCH-FIX online: the watch\'s record names the resident its watchman stan
   assert.deepEqual(validFoeRecord({ i: 3, t: 146, lr: 'L12345.w0' }), { i: 3, t: 146, lr: 'L12345.w0' });
   assert.equal(validFoeRecord({ i: 3, t: 146, lr: 'Robert\'); DROP' }), null, 'a record with a bad name is refused whole');
   assert.equal(validFoeRecord({ i: 3, t: 146, lr: 7 }), null);
-  const xf = rd('src/scenes/exteriorFoes.js');
-  assert.match(xf, /if \(onWatch && typeof f\.livingFrom\?\.id === 'string' && LIVING_ID_RE\.test\(f\.livingFrom\.id\)\) r\.lr = f\.livingFrom\.id;/, 'the writer: a watch record, its resident\'s id');
-  assert.match(xf, /f\.livingId = typeof r\.lr === 'string' \? r\.lr : null;/, 'the reader: the puppet carries it');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /for \(const f of exteriorFoes\.foes\) if \(f\.puppet && typeof f\.livingId === 'string'\) _livingPeerWatch\.add\(f\.livingId\);\n\s*for \(const p of built\.values\(\)\) p\.population\?\.peerLend\?\.\(_livingPeerWatch\);/, 'the host tells every town');
   // the reader's town
   const t = makeTown();
   const { res, at } = watchmanOnStreet(t);

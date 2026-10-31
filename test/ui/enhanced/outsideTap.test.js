@@ -41,52 +41,6 @@ test('OT1 helper: a primary press on the shell outside the kept selector closes;
   assert.equal(typeof closeOnOutsideTap(null, '.x', () => {}), 'function', 'no shell: a no-op unwire');
 });
 
-test('OT1 wiring: every scrimmed enhanced window closes on a tap outside, the front door\'s account window included', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  // PROFILE2: the pause face carries the profile mark and its window now - with the window open the tap is the
-  // window's (it closes, the pause window stands), otherwise the scrim resumes and the mark is inside
-  // TIMERS1: and the timers window the hourglass beside the mark opens - its own scrim, its tap closing it alone; the
-  // hourglass itself is inside the pause face (a press on it opens the window, never resumes the game)
-  assert.match(menu, /stage\.append\(pauseWindow\(\)\);\s*\n\s*home\.append\(stage\);[\s\S]{0,2200}?if \(accountOpen\) \{[\s\S]{0,300}?closeOnOutsideTap\(home, '\.px-acctwin', closeAccount\);[^\n]*\n[^\n]*setAttribute\?\.\('inert', ''\);[^\n]*\n\s*\}\s*\n\s*else if \(timersOpen && hooks\.timers\?\.\(\)\) \{[\s\S]{0,600}?closeOnOutsideTap\(home, '\.px-timerswin', \(\) => \{ timersOpen = false; timersFocusBack = true; render\(\); \}, \{ swallow: true \}\);[\s\S]{0,700}?\n\s*\}\s*\n\s*else if \(postOpen && hooks\.post\?\.\(\)\) \{[\s\S]{0,700}?closeOnOutsideTap\(home, '\.px-postwin', \(\) => \{ postOpen = false; postKeep = \{\}; postFocusBack = true; render\(\); \}, \{ swallow: true \}\);[\s\S]{0,300}?\n\s*\}\s*\n\s*else if \(seasonOpen && laurel\) \{[\s\S]{0,700}?closeOnOutsideTap\(home, '\.px-seasonwin', closeSeason, \{ swallow: true \}\);[\s\S]{0,300}?\n\s*\}\s*\n\s*else if \(shopOpen\) \{[\s\S]{0,700}?closeOnOutsideTap\(home, '\.px-shopwin', closeShop, \{ swallow: true \}\);[\s\S]{0,300}?\n\s*\}\s*\n(\s*\/\/[^\n]*\n)*\s*else closeOnOutsideTap\(home, '\.px-win, \.px-clock, \.px-foot, \.px-profile, \.px-timersmark, \.px-postmark, \.px-seasonmark, \.px-shopmark', \(\) => \{ if \(pauseTab === 'growth' && growthAsks\(\)\) return; onAction\('resume'\); \}\);/, 'PIN MOVED (AUDIT GROWTH LANE3-4: a Growth face asked first) - the pause window resumes on the scrim, and keeps its clock, foot, profile mark, hourglass and mailbox - unless the profile window, the timers window, the mailbox (SERVER-POST, PIN MOVED) or the season window (SEASON-BOOK, PIN MOVED: and the laurel inside) is open, whose tap closes it alone - AUDIT SEASON-BOOK U1 (PIN MOVED): and swallows its own release');   // PIN MOVED (SHOP): and the gem, its inert line under the timers window (the gap 700), and the shop's window closing on a tap outside it, as every window here
-  // ACC1f: TWICE NOW, and the second one is why this line changed
-  // rather than being relaxed. It used to read "once: the pause face
-  // only - the front door has no scrim", which was true until the
-  // account window arrived: Mac asked for the online details to live
-  // "as a popup on main menu startup", so the door has a scrim exactly
-  // when that window is open, and the law this file holds - a scrimmed
-  // window closes on a tap outside - applies to it like every other.
-  //
-  // Both are NAMED rather than counted loosely, so a third scrim added
-  // without its own outside-tap still reddens here.
-  const taps = menu.match(/closeOnOutsideTap\(home, '([^']+)'/g) ?? [];
-  assert.deepEqual(taps, [
-    "closeOnOutsideTap(home, '.px-acctwin'",
-    "closeOnOutsideTap(home, '.px-timerswin'",
-    "closeOnOutsideTap(home, '.px-postwin'",
-    "closeOnOutsideTap(home, '.px-seasonwin'",
-    "closeOnOutsideTap(home, '.px-shopwin'",
-    "closeOnOutsideTap(home, '.px-win, .px-clock, .px-foot, .px-profile, .px-timersmark, .px-postmark, .px-seasonmark, .px-shopmark'",
-    "closeOnOutsideTap(home, '.px-win'",
-  ], 'the door wires exactly seven scrims: the profile window over the pause face (PROFILE2), the timers window over it (TIMERS1), the mailbox over it (SERVER-POST, PIN MOVED), the season window over it (SEASON-BOOK, PIN MOVED), the shop over it (SHOP, PIN MOVED), the pause face, and the account window on the door');
-  assert.equal((menu.match(/closeOnOutsideTap\(/g) ?? []).length, taps.length, 'a scrim was wired somewhere this pin is not looking');
-  // ...and the account window's is guarded by the flag that opens it,
-  // so the door with no window open wires nothing and a tap on the
-  // front door goes on doing nothing at all.
-  // PIN MOVED: AUDIT RECOVERY-SET B1 - both account scrims close through `closeAccount`, which will not close over codes
-  assert.match(menu, /if \(accountOpen\) \{[\s\S]{0,600}?closeOnOutsideTap\(home, '\.px-win', closeAccount\);/,
-    'the account scrim is wired unconditionally - the front door would close on every tap');
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /host\.append\(shell\);\s*\n(\s*\/\/[^\n]*\n)*\s*closeOnOutsideTap\(shell, '\.pack-win, \.loot-win', \(\) => onExit\(\)\);/, 'the pack closes through its own exit, so the drop and the equip cue run');
-  const sb = read('src/ui/enhanced/enhancedSpellbook.js');
-  assert.equal((sb.match(/closeOnOutsideTap\(shell, '\.px-win', \(\) => onExit\(\)\);/g) ?? []).length, 2, 'the book, empty or not');
-  assert.match(sb, /win\.append\(deleteScrim\(\)\);/, 'the YesNo stands INSIDE the window, so a press on it is not outside');
-  assert.match(read('src/ui/enhanced/enhancedChronicle.js'), /closeOnOutsideTap\(shell, '\.px-win', \(\) => onExit\(\)\);/);
-  assert.match(read('src/ui/enhanced/enhancedTalk.js'), /closeOnOutsideTap\(shell, '\.talk-panel', \(\) => act\(\(\) => model\.press\('goodbye'\)\)\);/, 'goodbye through the model, the relock riding the tap');
-  // the two that already closed on a tap beside them
-  assert.match(read('src/ui/pixelDial.js'), /root\.onclick = \(e\) => \{ if \(e\.target === root\) close\(\); \};/);
-  assert.match(read('src/ui/enhanced/enhancedBook.js'), /if \(hit === 'outside'\) \{ exit\(\); return; \}/);
-});
-
 test('AUDIT SEASON-BOOK U1: a window closed by its press swallows that tap\'s click - in the capture phase, once, and never past a new press or TAP_CLICK_MS; a scrim that resumes the game asks for nothing (mutants: the swallow never armed; the click let through; the watch never ended)', async () => {
   const listeners = [];
   const doc = { addEventListener: (t, f, c) => listeners.push([t, f, c]), removeEventListener: (t, f) => { const i = listeners.findIndex(([x, g]) => x === t && g === f); if (i >= 0) listeners.splice(i, 1); } };

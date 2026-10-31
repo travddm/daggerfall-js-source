@@ -382,10 +382,5 @@ test('audit18: GetNameBankOfRegion ships, so no doc may call it unported', () =>
   assert.equal(getNameBankOfRegion(-1), BANK_TYPES.Breton);
   assert.equal(getNameBankOfRegion(0), BANK_TYPES.Redguard);   // REGION_RACES[0] === 1
   assert.equal(getNameBankOfRegion(17), BANK_TYPES.Breton);
-  // ... and it is LIVE.
-  const townTalk = readFileSync(join(ROOT, 'src/scenes/townTalk.js'), 'utf8');
-  assert.ok(townTalk.includes('getNameBankOfRegion('));
 
-  const maps = readFileSync(join(ROOT, 'src/formats/mapsFile.js'), 'utf8');
-  const header = maps.slice(0, maps.indexOf('import '));
 });

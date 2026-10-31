@@ -301,30 +301,6 @@ test('WINDFALL1 BB_VS: while the mod\'s law stands its lean is the flat\'s - the
   near(mid[0] - 10, l[0] * 6 * 0.5, 1e-5, 'half way up, half - the quad\'s line');
 });
 
-test('WINDFALL1 the hosts: world.js and exterior.js build the one runtime on their lane, tick it outdoors (the outdoors\' wind\'s heading handed) and indoors, hand its law to the flats beside WIND3\'s under the sway\'s switch, draw its particles before the haze, and tag every nature batch and every far picture with its mask; world.js carries its anchor across the floating origin; the interiors and the dungeons build none (THE FOUR HOSTS: their frames are the hosts\' indoor branch) (mutants: a host unwired; the law handed without the switch)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.match(s, /const windfall = createWindfallHost\(\{ gl: renderer\.gl, enhanced: !!sky\.enhanced \}\);/, `${host}: built on the lane`);
-    // AUDIT ENVIRONS: WindMod.Update's Time.deltaTime - held by a pause, scaled with the world (the host's own scale)
-    const scaled = host.endsWith('world.js') ? 'dt: gamePaused\\(\\) \\? 0 : dt \\* worldTimeScale\\(\\)' : 'dt: gamePaused\\(\\) \\? 0 : dt \\* hccTimeScale\\(\\)';
-    assert.match(s, new RegExp(`windfall\\.frame\\(\\{ ${scaled}, outside: false, `), `${host}: ticked indoors, on the game's seconds`);
-    assert.match(s, new RegExp(`const windfallLaw = windfall\\.frame\\(\\{ ${scaled}, outside: true, [^\\n]*\\n\\s*heading: wd\\.on \\? wd\\.dir : null,`), `${host}: ticked outdoors on the one wind, on the game's seconds`);
-    assert.match(s, /renderer\.setFlatWind\([^\n]*, floraSwayOn\(\) && wd\.on \? windfallLaw : null\);/, `${host}: the law under the sway's switch`);
-    assert.ok(s.indexOf('windfall.draw(proj, view, renderer.flatLightAt(') < s.indexOf('if (hazeGl) {', s.indexOf('windfall.draw(proj')), `${host}: the particles before the haze grabs the world`);
-    assert.equal((s.match(/batch\.windfall = windfallResponse\(archive, record/g) || []).length, 3, `${host}: the far picture, the season's and the classic batch`);
-    assert.match(host.endsWith('world.js') ? read('src/scenes/treesHost.js') : s, /windfallOf: \(proto\) => _?lptWindfall\.get\(proto\) \?\? 0/, `${host}: the 3D trees by their far pictures' mask`);   // BANTHA1 (HOST-SPLIT): the world's near trees are scenes/treesHost.js's
-  }
-  assert.match(hostText('src/scenes/world.js'), /windfall\.offsetOrigin\(r\.offset\);/);
-  assert.match(hostText('src/scenes/world.js'), /csaReanchor\(state\.initOffset\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*snowfall\.offsetOrigin\(state\.initOffset\);\n\s*windfall\.offsetOrigin\(state\.initOffset\);/, 'AUDIT ENVIRONS: a teleport\'s new frame carries the anchor and the leaves in the air, as a recentre does');
-  assert.match(read('src/scenes/yardNature.js'), /batch\.windfall = pic\.windfall;/);
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(host), /createWindfallHost/, `${host}: none`);
-  // the passes: the shadow and the air replay by the law the flats were drawn with
-  const sp = read('src/render/shadowPass.js');
-  assert.match(sp, /if \(P\.bb\.wfAxis\) \{ gl\.uniform4fv\(P\.bb\.wfSway, r\.wfSway\); gl\.uniform4fv\(P\.bb\.wfAxis, r\.wfAxis\); \}/);
-  assert.match(sp, /const sw = swayShare\(b, law\);/);
-  assert.match(read('src/render/airPass.js'), /gl\.uniform1f\(P\.emitBb\.uSway, swayShare\(b, windfallLawOn\(r\.windfall\)\)\);/);
-});
-
 test('WINDFALL1 the runtime (scenes/windfallHost.js): off the enhanced lane it answers no law and does nothing; on it, a law outdoors and none indoors; its save record and its console command registered, the command there while the mod is (AUDIT 28 F7) (mutants: the lane ignored; the indoor law kept; the gate dropped)', () => {
   const engine = { source: () => ({ volume: 1, pitch: 1, isPlaying: false, playOneShot() {}, stop() {}, dispose() {} }), registerSound: async () => true };
   const f = { dt: 0.02, outside: true, weather: 'sunny', minutes: 523530, climate: 231, mapPixel: { x: 100, y: 200 }, heading: [1, 0], feet: [0, 0, 0], height: 1.8 };

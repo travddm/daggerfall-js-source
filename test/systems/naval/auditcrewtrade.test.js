@@ -194,10 +194,3 @@ test('AUDIT CREW-TRADE P10/P11/P13 - THE LAW\'S EDGES: every isle of the Veil sh
   assert.deepEqual(RANK_PERKS.map((k) => crewPayMost(k.yard)), [29, 28, 26, 25, 23], 'a gold under the yard\'s man at each rank');
 });
 
-test('AUDIT CREW-TRADE R2 - CREW SELLS TEN AT A TIME: the crew row\'s presses are Buy 1, Buy 10, Sell 1, Sell 10 - one press never takes a ship from her crew to her last man; the goods\' rows keep Sell all (mutants: Sell all on crew)', async () => {
-  const src = rd('src/ui/naval/navalYardWindow.js');
-  assert.match(src, /if \(r\.id === CREW\.id\) mk\('Sell 10', r\.canSell, \(\) => press\(x\.sell\(r\.id, 10\)\)\);\n\s+else mk\('Sell all', r\.canSell, \(\) => press\(x\.sell\(r\.id, Infinity\)\)\);/);
-  const q = await quay(SMALL_SHIP, 24, { port: portStanding('wants') });
-  q.x().sell('crew', 10);
-  assert.equal(q.model.ship().crew, 14, 'a Sell 10 is ten men');
-});

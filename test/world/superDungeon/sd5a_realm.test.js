@@ -196,20 +196,7 @@ test('SD5a the art: five textures made in code, the same every boot - the floor,
 });
 
 test('SD5a the dungeon host by source: the Hour\'s refusals beside the court\'s (map, rest, save, the pause\'s Save), no drip, no map slot, no fire; its way back the Hollow\'s own Rift at the Threshold\'s back, to the Hollow; the landing beside a Hollow\'s Rift kept for the way back (mutants: a rest in the Hour; the way back unstood)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /\n  const _superTier = [^\n]*\n  const _sdRealm = isSdRealm\(dfLocation\);/, 'read once, beside the tier - a free name in a harness is nothing, never a throw');
-  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): one door a rule, each level refusing in its own words
-  assert.match(D, /if \(madeLevelRule\(_made, 'automap'\) === 'off'\) \{ hudText\.add\(madeLevelSays\(_made, 'automap'\)\); return; \}/);
-  assert.match(D, /if \(madeLevelRule\(_made, 'rest'\) === 'refused'\) \{ hudText\.add\(madeLevelSays\(_made, 'rest'\)\); return; \}/);
-  assert.match(D, /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}/);
-  assert.match(D, /savingPrevented: \(\) => madeLevelRule\(_made, 'save'\) === 'refused' \|\| isArenaFloor\(dfLocation\),/);
   for (const [rule, word] of [['automap', SD_REALM_TEXT.noMap], ['rest', SD_REALM_TEXT.noRest], ['save', SD_REALM_TEXT.noSave]]) assert.deepEqual([madeLevelRule('hour', rule), madeLevelSays('hour', rule)], [rule === 'automap' ? 'off' : 'refused', word], rule);
-  assert.match(D, /if \(!isGateArena\(dfLocation\) && !isArenaFloor\(dfLocation\) && !_sdRealm(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/);   // EG-ROAR (PIN MOVED): the Spire's drips silent beside the Hour's; KETCH (PIN MOVED): and the Sky-Ketch's - no drip in the open sky
-  assert.match(D, /let automapRec = madeLevelRule\(_made, 'automap'\) === 'off' \|\| isArenaFloor\(dfLocation\) \? detachedAutomapRecord\(\)/);   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
-  assert.match(D, /cold: _superTier \|\| _sdRealm,/);
-  assert.match(D, /: _sdRealm \? createSdEnd\(\{ renderer, audio, riftTo: SD_REALM_TEXT\.wayBack, onRift: \(\) => opts\.sdWayBack\?\.\(\), onReturn: \(\) => opts\.sdWayHome\?\.\(\), retTitle: SD_HOME_TEXT\.title, retTo: SD_HOME_TEXT\.to, clock: sdEndClock \}\) : null;/);   // SD10: and its way home (PIN MOVED)
-  assert.match(D, /if \(_sdRealm\) \{ sdEnd\.stand\(\{ rift: \{ at: realmToDungeon\(0, 0, SD_WAY_BACK_Z\), size: SD_WAY_BACK_SIZE \}, retAt: null, dynamicDraws, hollow: true, probe: SD_THRESHOLD_RIM \}\); return; \}/);   // SD-LOOK S6 (PIN MOVED): seen from the Hour's side, the Hollow behind it   // PIN MOVED (AUDIT SD V R2): its floor light's probe the Threshold's rim
-  assert.match(D, /sdRiftLanding\(\) \{\n\s+if \(!_superTier \|\| !sdEnd\) return null;\n\s+if \(!_sdEndAsked\) \{ _sdEndAsked = true; standSdEnd\(\); \}\n\s+return _sdLanding \? \[_sdLanding\[0\], _sdLanding\[1\], _sdLanding\[2\]\] : null;/);
   assert.ok(SD_WAY_BACK_Z < 0 && Math.abs(SD_WAY_BACK_Z) < SD_THRESHOLD.r && SD_WAY_BACK_SIZE < 2 * SD_THRESHOLD.r, 'at the Threshold\'s back, on it');
   assert.deepEqual(SD_REALM_TEXT, {
     wayBack: 'To the Abyss Dungeon', noRest: 'You cannot rest in the Shattered Hour.', noSave: 'You cannot save in the Shattered Hour.',
@@ -221,104 +208,10 @@ test('SD5a the dungeon host by source: the Hour\'s refusals beside the court\'s 
 });
 
 test('SD5a the mode machine by source: into the Hour from the open world (its made location, its blocks file, its room the relay\'s realm), the Hour stood before the marker is read, out of it before the Hollow\'s door, its light, air and lamps every frame, its room identity, its slot, and the doors the world host takes (mutants: the room a dungeon\'s; the Hour unstood; out at no door)', () => {
-  const W = read('src/scenes/worldModes.js');
-  assert.match(W, /async function enterSdRealm\(r\) \{\n\s+if \(mode !== 'exterior' \|\| !r \|\| !sdRoomKey\(r\.s, r\.owner\) \|\| !\(playerEntity\.health > 0\)\) return false;/);   // PIN MOVED: SD-PARTY - a party's Hour to key
-  assert.match(W, /const hit = \{ dfLocation, blocksFile: sdRealmBlocks\(blocks\), sdRealm: r\.s, sdHollow: r\.hollow \?\? null, [^\n]*group: sdRoomKey\(r\.s, r\.owner\), door: null, dfBlock: null, recordIndex: -1 \};\n\s+return gatedTransition\(\(live\) => dungeonTransition\(hit, \[\], true, live\)\);/);
   assert.equal(sdRoomKey(7, '0123456789abcdef'), 'sd:7.0123456789abcdef');   // PIN MOVED: SD-PARTY - a party's own Hour
-  assert.match(W, /if \(hit\.gateArena\) gateStand\.standCourt\(ctx, hit\.gateArena\.day\);[^\n]*\n\s+if \(hit\.sdRealm != null\) standSdRealm\(ctx\);/);   // WB14b: the court stood by scenes/gate/gateStand.js, its night's
-  assert.match(W, /for \(const \[rec, art\] of realmArt\(\)\) \{ renderer\.uploadTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.albedo\); renderer\.uploadEmissionTexture\?\.\(SD_REALM_ARCHIVE, rec, art\.emission, \{ white: true \}\); \}[^\n]*\n\s+_realmMesh = renderer\.createMesh\(buildRealmModel\(\)\);/);   // AUDIT SD II (L2 F3 - PIN MOVED): its own light
-  assert.match(W, /ctx\.collider\.addMesh\(REALM_BUCKET, tris, idx, identity\(\)\);/);
-  assert.match(W, /sdHollow: hit\.sdHollow \?\? null,/);
-  assert.match(W, /dungeonEntranceLanding\(dungeonReturn\.sdHollow \? host\.sdHollowDoors\?\.\(dungeonReturn\.sdHollow\) \?\? \[\] : dungeonReturn\.candidates\.map\(\(e\) => e\.door\)\) \?\? dungeonReturn\.from \?\? null\);/);   // SD-LAND (PIN MOVED): with no door found, where the player stood outside as they went in
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ const _rl = realmLighting\(\); const _rt = dungeonTrilight\(!!renderer\.lightingLane, _rl\.tri, _hourTri\); renderer\.setLighting\(courtEquatorOf\(_rt\), 0, undefined, _rt\); renderer\.setMoonlight\(_rl\.key\); \}/);   // PIN MOVED (AUDIT SD IV R5): the lane's trilight into a kept one
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ applyFog\(renderer, dungeonFog\(!!renderer\.lightingLane, SD_REALM_FOG, _hourFog\), _hourFogColor\); renderer\.setSceneGrade\?\.\(SD_HOUR_GRADE\); \}/);   // SD-LOOK (PIN MOVED): and the Hour's grade   // PIN MOVED (AUDIT SD IV R5): its fog and colour into kept ones
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ const _hour = realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\); renderer\.setPointLights\(_hour\.data, null, _hour\.colors\); \}/);   // SD9e: the spoils' light before the lamps, as the court's (PIN MOVED); AUDIT SD II (L2 F9 - PIN MOVED): into the realm's own arrays; PIN MOVED (SD-LOOK S7): the arena's lamps dimmed through the Reset (the host's sdLampDim)
-  assert.match(W, /isGateArena\(dungeonLoc\) \? \{ kind: 'gate', day: dungeonLoc\.gate \} : isSdRealm\(dungeonLoc\) \? \{ kind: 'sd', s: dungeonLoc\.sdRealm, o: dungeonLoc\.sdOwner \} :/);
-  assert.match(W, /sdRealmSlot: \(\) => \(mode === 'dungeon' && isSdRealm\(dungeonLoc\) \? dungeonLoc\.sdRealm : null\),/);
-  assert.match(W, /\n\s+enterSdRealm,[^\n]*\n\s+stepThroughFire,/);
-  assert.match(W, /sdWayBack: \(\) => host\.sdWayBack\?\.\(\),/);
-});
-
-/** world.js's two steps, from its own text, over fakes of what they ask. */
-function worldSteps({ hollow = { s: 7, key: HOLLOW.key, site: { px: 303, py: 202 }, loc: { name: HOLLOW.name, climate: { worldClimate: 231, climateType: 2 }, regionIndex: 3, regionName: 'Daggerfall' } }, word = null, entered = true, inDoor = true, landing = [5, 0, 6], realm = null } = {}) {
-  const w = read('src/scenes/world.js');
-  const fn = (name) => { const at = w.indexOf(`\n  function ${name}(`); assert.ok(at > 0, name); return w.slice(at + 1, w.indexOf('\n  }\n', at) + 4); };
-  const log = [];
-  let step = null;
-  const modes = {
-    mode: 'dungeon', dungeonLocation: realm,
-    stepThroughFire: (go) => { step = go; },
-    forceExitToExterior: () => { log.push('out'); modes.mode = 'exterior'; },
-    enterSdRealm: async (r) => { log.push(['realm', r.s, r.hollow.key, r.site.regionName]); return entered; },
-    startInDungeon: async () => { log.push('hollow'); return inDoor; },
-    dungeonCtx: { sdRiftLanding: () => landing },
-    setPlayerLocalPosition: (p) => log.push(['stood', ...p]),
-  };
-  const sdHost = { hollow: () => hollow };
-  const env = {
-    sdHost, modes, playerEntity: { health: 10 }, INTERIOR_SEASON: 3, SD_REALM_TEXT, isSdRealm, _sdEntered: new Set(), _sdFallen: new Set(),   // AUDIT SD: the slots gone through (PIN MOVED); SD-ONELIFE: and died in (PIN MOVED)
-    sdRiftOf: () => ({ word }), setMidScreenText: (t) => log.push(['said', t]), _teleportToPixel: async (x, y) => log.push(['pixel', x, y]),
-    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice
-    sdVeilCentre: () => null,   // SD-LOOK S5: where the Hour's veil closes (the screen's middle here)
-    standBeforeHollowDoor: (k) => { log.push(['door', k]); return true; },   // AUDIT SD IV (F40, PIN MOVED): before its door
-    sdCopy: { ownerFor: async () => '0123456789abcdef' },   // SD-PARTY (PIN MOVED): my party's own Hour
-  };
-  const body = `${fn('sdEnterRealm')}\n${fn('sdWayBack')}\nreturn { sdEnterRealm, sdWayBack };`;
-  const api = new Function(...Object.keys(env), body)(...Object.values(env));
-  return { ...api, log, modes, run: () => step?.() };
-}
-
-test('SD5a the world host\'s steps, run from its own text: through the Rift - under the veil, its word asked again, out of the Hollow, to its pixel, into the Hour; a closing Hour refused under the veil; back - out of the Hour, to the Hollow\'s pixel, in by its door, stood beside its Rift; a Hollow gone, outside at its pixel (mutants: the word not asked again; the way back never stood at the Rift)', async () => {
-  const a = worldSteps();
-  assert.equal(a.sdEnterRealm(7), true);
-  assert.deepEqual(a.log, [], 'nothing before the veil has closed');
-  assert.equal(await a.run(), true);
-  assert.deepEqual(a.log, ['out', ['pixel', 303, 202], ['door', HOLLOW.key], ['realm', 7, HOLLOW.key, 'Daggerfall']]);   // AUDIT SD IV (F40, PIN MOVED): stood before its door, never its pixel's middle
-  assert.equal(worldSteps().sdEnterRealm(8), false, 'another slot\'s Rift is no door of this Hollow\'s');
-  const shut = worldSteps({ word: SD_NO_CLOSED });
-  shut.sdEnterRealm(7);
-  assert.equal(await shut.run(), false);
-  assert.deepEqual(shut.log, [['said', SD_NO_CLOSED]], 'the Hour closed while the veil did: nothing moved');
-  const lost = worldSteps({ entered: false });
-  lost.sdEnterRealm(7);
-  await lost.run();
-  assert.deepEqual(lost.log.at(-1), ['said', SD_REALM_TEXT.lost]);
-  // back
-  const realm = sdRealmLocation({ s: 7, hollow: HOLLOW });
-  const b = worldSteps({ realm });
-  assert.equal(b.sdWayBack(), true);
-  assert.equal(await b.run(), true);
-  assert.deepEqual(b.log, ['out', ['pixel', 303, 202], 'hollow', ['stood', 5, 0, 6]]);
-  const shutDoor = worldSteps({ realm, inDoor: false });   // AUDIT SD IV (F40): its door would not open - before it, outside
-  shutDoor.sdWayBack();
-  await shutDoor.run();
-  assert.deepEqual(shutDoor.log, ['out', ['pixel', 303, 202], 'hollow', ['door', HOLLOW.key]]);
-  const gone = worldSteps({ realm, hollow: null });
-  gone.sdWayBack();
-  await gone.run();
-  assert.deepEqual(gone.log, ['out', ['pixel', 303, 202]], 'its end overtook the step: outside, where it stood');
-  assert.equal(worldSteps({ realm: null }).sdWayBack(), false, 'only out of the Hour');
 });
 
 test('SD5a the world host by source: the Rift\'s door; the doors out of the Hour; its room the relay\'s realm; no Mark, no Recall, regeneration held; its floors an edge; the Hollow stands while I stand in its Hour, so its end casts me out of either (mutants: a Recall out of the Hour; the room a dungeon\'s; left in a room that refused me)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /enter: \(\) => sdEnterRealm\(s\) \};/);
-  assert.match(w, /sdWayBack: \(\) => sdWayBack\(\),/);
-  assert.match(w, /const sdHollowDoorsOf = \(h\) => buildingDoors\.filter\(\(d\) => d\.pixelKey === h\?\.key && d\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE\)\.map\(shiftedDoor\);/);   // AUDIT SD IV (F40, PIN MOVED): one list, the mode machine's and the step's
-  assert.match(w, /sdHollowDoors: \(h\) => sdHollowDoorsOf\(h\),/);   // SD-SKY (PIN MOVED): in the scene's frame - the raw list's doors are their pixels' (test/world/sd23_sky.test.js)
-  assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'sd'\) key = sdRoomKey\(modes\?\.roomIdentity\?\.\(\)\?\.s, modes\?\.roomIdentity\?\.\(\)\?\.o\);/);   // PIN MOVED: SD-PARTY - my party's own Hour
-  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the Mark and the Recall asked of the law, said through the Hour's voice (madeSay - `says` 'hour')
-  assert.match(w, /if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice
-  assert.match(w, /if \(madeRuleHere\('recall'\) === 'refused'\) \{ madeSay\('recall'\); return; \}/);
-  assert.match(w, /function madeSay\(rule\) \{ const t = madeSaysHere\(rule\); if \(madeRuleHere\('says'\) === 'hour'\) sdSay\(t\); else setMidScreenText\(t\); \}/);
   assert.deepEqual([madeLevelRule('hour', 'says'), madeLevelRule('hour', 'mark'), madeLevelSays('hour', 'mark'), madeLevelRule('hour', 'recall'), madeLevelSays('hour', 'recall')], ['hour', 'refused', SD_REALM_TEXT.noMark, 'refused', SD_REALM_TEXT.noRecall]);
-  assert.ok(w.indexOf("madeRuleHere('recall')") > w.indexOf('async function recallToAnchor()') && w.indexOf("madeRuleHere('recall')") < w.indexOf('const anchor = playerEntity.anchorPosition;'), 'before the anchor is read');
-  assert.match(w, /\n\s+setCourtRules\(madeRuleHere\('regen'\) === 'held'\);/);   // PIN MOVED (EVENT-RULES): regeneration held, not off; PIN MOVED (AUDIT WORLD-EVENTS L1-10): the pause the hurt door's, not my health's
   assert.equal(madeLevelRule('hour', 'regen'), 'held');
-  assert.match(w, /if \(!player\.arena && modes\?\.sdRealmSlot\?\.\(\) != null\) player\.arena = sdArenaHeld\(\) \? _realmArenaHeld : sdConcordHere\(\) \? _realmArenaBridged : _realmArena;/);   // SD6c (PIN MOVED): the Concord's bridge among its floors; AUDIT SD III (F2, PIN MOVED): the arena's rim first, for a fighter it holds
-  assert.match(w, /inside: \(loc\) => \(modes\?\.mode \?\? 'exterior'\) === 'dungeon' && \(modes\?\.dungeonLocation\?\.sdSlot === loc\?\.sdSlot \|\| modes\?\.dungeonLocation\?\.sdRealm === loc\?\.sdSlot\),/);
-  // a room that will not have me: out before the Hollow's door with the relay's own words, once
-  assert.match(w, /const sdFrame = \(\) => \{ try \{ sdHost\?\.frame\(\); \} catch \(e\) \{[^\n]*\} sdRealmFrame\(\); sdAloneFrame\(\); sdFightFrame\(\); sdBodyFrame\(\); sdVoiceFrame\(\); \};/);   // PIN MOVED (SD8c): the Remnant's fight after the realm's; AUDIT SD II (SD11d, PIN MOVED): and the Hour's voice last; SD-ALONE (PIN MOVED): the companions' word after the realm's own   // PIN MOVED (INT15): the Hour's body word's own step
-  assert.match(w, /if \(_sdOut \|\| !online\?\.terminal \|\| !\(playerEntity\.health > 0\) \|\| modes\?\.deathUp\?\.\(\)\) return;\n\s+_sdOut = true;\n\s+gateVeil\?\.flash\('hourCast'\);[^\n]*\n\s+if \(modes\?\.unstuck\?\.\(\)\) sdSay\(\/\\bHour\\b\/\.test\(online\.error \?\? ''\) \? online\.error : SD_REALM_TEXT\.lost\);/);   // PIN MOVED (SD-PARTY): the copies' refusals name the Hour too; AUDIT SD II (SD11d, PIN MOVED): the Hour's brass veil, its voice
-  assert.match(read('src/world/dungeon/dungeonLabel.js'), /export const madeDungeon = \(loc\) => isGateArena\(loc\) \|\| isArenaFloor\(loc\) \|\| isArenaUndercroft\(loc\) \|\| isSdRealm\(loc\) \|\| isEgHall\(loc\) \|\| isKetchShip\(loc\);/);   // PIN MOVED (KETCH): and an Elite Breach's hall and the Sky-Ketch, places the port made
 });

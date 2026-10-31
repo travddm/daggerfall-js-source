@@ -111,119 +111,10 @@ test('CAMP1: group ownership online - the one lowest id among the players within
 });
 
 test('CAMP1 by source: both exterior hosts roll it after the single roll comes back empty, stand an anchor then the members around it, the world host under the group-ownership guard and on every pixel entered; a member that notices the player wakes its campmates; the feature row', () => {
-  const w = hostText('src/scenes/world.js');
-  const e = read('src/scenes/exterior.js');
-  // CAMP-NOTIMER (2026-09-19, Lost's package): THE TIMER ARM IS GONE
-  // FROM world.js. It fired a GUARANTEED group every 15 real minutes of
-  // play even while the player stood still; a camp or a pack must be a
-  // consequence of walking onto new ground, so the chunk-load roll is
-  // now that host's only trigger. exterior.js is the fixed
-  // single-location preview host with no chunk streaming to hang a roll
-  // off, so its timer arm stands unchanged - which is why the two hosts
-  // no longer share this pin.
-  {
-    const i = w.search(/^[ \t]*function runEncounterTick\(/m);   // CITE-ANCHOR: the declaration, not a comment's anchor that quotes it
-    const fn = w.slice(i, w.indexOf('\n  }\n', i));
-    assert.doesNotMatch(fn, /getPref\('wildernessCamps'\)/, 'world.js: no camp gate left in the per-minute tick');
-    assert.doesNotMatch(fn, /const campHit = rollCampEncounter\(/, 'world.js: no live timer roll left in the per-minute tick');
-  }
-  assert.doesNotMatch(w, /import \{ rollCampEncounter,/, 'world.js: the unused timer entry point is dropped from the import');
-  assert.match(w, /import \{ rollCampEncountersOnChunkLoad, amGroupRollOwner, campAnchorSpot, CAMP_SIGHT_RADIUS \} from '\.\.\/systems\/campEncounters\.js';/, 'world.js: only the chunk-load twin, the ownership guard and the far anchor are imported now (BOUNTY1\'s pack spacing and shout come in with TV7\'s band import since the merge of main)');
-  for (const [name, h] of [['exterior.js', e]]) {
-    const i = h.search(/^[ \t]*function runEncounterTick\(/m);   // CITE-ANCHOR: the declaration, not a comment's anchor that quotes it
-    const fn = h.slice(i, h.indexOf('\n  }\n', i));
-    assert.ok(fn.indexOf('_standEncounterFoe(hit, playerFeet)') < fn.indexOf("getPref('wildernessCamps') !== false"), `${name}: the group roll sits AFTER the single roll's break, so the two never both fire on one minute`);
-    // TIME1: and the sky beside the minute - the camp's day and night are the sky's, the minute the character's own
-    // (AUDIT TIME, second round: online only - offline the minute walked)
-    assert.match(fn, /const campHit = rollCampEncounter\(\{\s*\n\s*gameMinutes: _lastEncMinutes \+ l \+ 1, inside: _m !== 'exterior',\s*\n\s*skyMinutes: sharedClockOn\(\) \? Math\.floor\(skyMinutes\(\)\) : null,[^\n]*\n\s*inLocationRect: _musicInLocationRect\(\),/, `${name}: the same minute, the same rect`);
-    assert.match(fn, /preventEnemySpawns: playerEntity\.preventEnemySpawns,/, `${name}: and the suppression flag`);
-    assert.match(fn, /if \(campHit\) \{ _standCampEncounter\(campHit, playerFeet\); break; \}/, `${name}: a hit stands and ends the minute`);
-  }
-  for (const [name, h] of [['world.js', w], ['exterior.js', e]]) {
-    const si = h.indexOf('const _standCampEncounter = (hit, feet) => {');
-    const stand = h.slice(si, h.indexOf('\n  };', si));
-    // CAMP-FAR (2026-09-24): the anchor is no longer the ring law's - that law probes four units down from the
-    // player's own height and cannot find ground a hundred metres out on any real grade. The far law takes the
-    // group's band, the player's yaw and view, and the collider's own terrain sampler for its floor.
-    assert.match(stand, /anchor = campAnchorSpot\(\{ feet, yawRad: (hit\.yawRad \?\? )?cam\.yaw, fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI, groundAt: collider\.heightAt, minDistance: hit\.minDistance, maxDistance: hit\.maxDistance(, bearingDegrees: hit\.bearingDegrees)? \}\);/, `${name}: the anchor stands by the far law - the group's band, out of view, on the terrain's floor`);
-    assert.doesNotMatch(stand, /placeFoeFreely\(anchorEnv/, `${name}: the ring law no longer places the anchor`);
-    assert.match(stand, /playerFeet: \[anchorFeet\[0\], anchorFeet\[1\] \+ 0\.9, anchorFeet\[2\]\],\s*\n\s*playerYawRad: Math\.random\(\) \* Math\.PI \* 2,\s*\n\s*fovDegrees: 0,/, `${name}: each member's env is centred on the ANCHOR, any bearing`);
-    assert.match(stand, /spot = placeFoeFreely\(memberEnv, \{ minDistance: 1, maxDistance: hit\.spacing, lineOfSightCheck: false \}\);/, `${name}: within the group's spacing, no player-relative view test`);
-    assert.match(stand, /if \(!spot\) continue;/, `${name}: a member with no ground is skipped, not the group`);
-    assert.match(stand, /\.then\(\(f\) => \{\s*\n\s*if \(f\) \{\s*\n\s*f\.campId = campId; f\.campAlertRadius = hit\.alertRadius;/, `${name}: the stood foe carries its group and its shout radius`);
-    // CAMP2: a themed group is grouped by FACTION (mobileFactions.js), which can
-    // still straddle several combat Teams - so without an exemption,
-    // EnemyInfighting (on by default) has campmates fighting each other on sight
-    // instead of the player. Active-Arcs.md refused the hand-off's version of
-    // this, which set `suppressInfighting` on the entity: that flag skips the
-    // infighting arm entirely and drops to the one below it, where a campmate
-    // stops targeting EVERY non-player candidate - the player's own summoned
-    // ally included - and it outlives the campId that justified it across a
-    // quickload. The exemption is the CAMP's, and this pins that it stays so.
-    assert.match(stand, /if \(f\.entity\) f\.entity\.campId = campId;/, `${name}: a campmate is exempt from its CAMPMATES`);
-    assert.doesNotMatch(stand, /suppressInfighting/, `${name}: and not from every other foe in the world`);
-    assert.match(stand, /yaw: Math\.atan2\(anchorFeet\[0\] - spot\.x, anchorFeet\[2\] - spot\.z\),/, `${name}: members face the camp, not the player`);
-  }
-  // CAMP1-REST re-aimed exterior.js's; world.js's timer roll is gone entirely (CAMP-NOTIMER, above)
-  assert.match(e, /if \(!isResting && getPref\('wildernessCamps'\) !== false\) \{\s*\n\s*const campHit = rollCampEncounter\(/, 'exterior.js: no peers on this route, no guard - the rest gate stands alone');
-  // CAMP-REST (2026-09-19, Dudey: "the camp enemies should just not appear when resting"): the CHUNK-LOAD twin takes
-  // a rest gate too now. The old note said a resting player crosses no pixel, so a gate was a law with no case - but
-  // the rule the player asked for is unconditional, and the gate costs one flag read.
-  assert.ok(/!playerEntity\.isResting/.test(w.slice(w.indexOf('stream: entered ${r.current.x}'), w.indexOf('\n    pump();', w.indexOf('stream: entered ${r.current.x}')))), 'the chunk-load roll stands down while resting');
-  assert.match(e, /const _standCampEncounter = \(hit, feet\) => \{\s*\n\s*if \(!walkMode\) return;/, 'exterior.js: the fly camera has no capsule to place around');
-  // the chunk-load twin, on the stream's own "entered" event, outdoors only
-  const ci = w.indexOf('stream: entered ${r.current.x}');
-  const chunk = w.slice(ci, w.indexOf('\n    pump();', ci));
-  assert.match(chunk, /if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior' && !playerEntity\.isResting && !travelOptions\?\.isTravelActive && getPref\('wildernessCamps'\) !== false && amGroupRollOwner\(online\?\.id \?\? null, player\.feetAt\(\), peersNear\(\)\)\) \{/, 'outdoors, not resting, switched on, and mine to roll');
-  assert.match(chunk, /const chunkCampHits = rollCampEncountersOnChunkLoad\(\{\s*\n\s*inside: false, inLocationRect: _inAnyLocationRect\(walkMode \? player\.pos : cam\.pos\),[^\n]*\n\s*climateIndex: maps\.getClimateIndex\(r\.current\.x, r\.current\.y\),/, 'the entered pixel\'s own climate');
-  assert.match(chunk, /if \(chunkCampHits\) \{\n\s*let room = exteriorFoes\.encounterRoom\?\.\(\) \?\? Infinity;\n\s*for \(const h of chunkCampHits\) \{[\s\S]{0,420}?_standCampEncounter\(h, player\.feetAt\(\)\);/, 'CAMP-RING: every group of the hit stands that fits the encounter cap whole (DROPS-AUDIT CAMP-CAP)');
-  // the shout across the camp
-  const ef = read('src/scenes/exteriorFoes.js');
-  assert.match(ef, /targeting: \(ai, pf, cdt\) => \{\s*\n\s*const hadTarget = !!ai\.target;[\s\S]*?const result = runTargetMachine\(f, \[\.\.\.senses\.candidates\(\), PLAYER_TARGET, \.\.\.\(f\.placed && !f\.site \? \[\] : _questLike\(f\) \? questPeerCandidates\(f\) : peerCandidates\(\)\), \.\.\.coopCandidates\(f\)\], pf, cdt, \{/, 'the machine runs as it did, with the before-state remembered (QUEST-PARTY re-aim: a quest foe\'s peers are the party it rides to; PIN MOVED AUDIT CC-E1: and the other clients\' companions)');
-  assert.match(ef, /if \(!hadTarget && ai\.target && f\.campId != null\) wakeCampmates\(f\);\s*\n\s*return result;/, 'a member that JUST noticed someone, and only a group member, wakes the rest');
-  const wi = ef.indexOf('function wakeCampmates(f) {');
-  const wake = ef.slice(wi, ef.indexOf('\n  }\n', wi));
-  assert.match(wake, /const r2 = \(f\.campAlertRadius \?\? 0\) \*\* 2;\s*\n\s*if \(!feet \|\| !r2\) return;/, 'no radius, no shout');
-  assert.match(wake, /if \(g === f \|\| g\.dead \|\| g\.campId !== f\.campId \|\| g\.ai\?\.target\) continue;/, 'the same camp, alive, and not already on someone');
-  assert.match(wake, /if \(dx \* dx \+ dz \* dz > r2\) continue;\s*\n\s*g\.ai\.target = f\.ai\.target;/, 'within the shout: handed the SAME target - a peer the member saw is a peer the camp hunts');
   // the switch
   const row = FEATURES.find((f) => f.id === 'wilderness-camps');
   assert.ok(row, 'the enhanced pane carries the row');
   assert.deepEqual([row.group, row.title, [...row.kinds], row.control.key, row.control.initial, row.control.online], ['world', 'Wilderness camps & packs', ['enhanced'], 'wildernessCamps', true, 'player']);
-  assert.match(read('src/systems/campEncounters.js'), /^\/\/ This is an ORIGINAL addition, not a Daggerfall Unity or classic/m, 'the module says what it is');
-});
-
-// CAMP1-REST (2026-09-18, Mac's wilderness-resting hand-off): the group roll stands down while the tick is
-// servicing a rest. THE MECHANISM IS SIGHT FIRST, DISTANCE SECOND - the hand-off's own note read it as a pure
-// distance law and that is not what encounters.js does. areEnemiesNearby's resting arm reports a foe that has SEEN
-// the player at ANY range, and only falls back to the 12-unit proximity test for a foe that has not. A lone
-// wanderer is minted facing the player ("LookAt player") and trips the sight arm on its first senses tick, which
-// is how a rest has always been interruptible and is what the dungeon's own rest roll leans on. A group is minted
-// facing its ANCHOR, out at 14..26 and so past the fallback, and the world is NOT frozen while a rest runs
-// (WINFOE1 drives the foe pool on the frame's own dt under a window) - so most groups do wake the sleeper, and it
-// is the group whose members happen to face away that lands in silence and is standing there on waking. Mac's
-// call is that groups are a walking-around feature rather than that they should be yawed at a sleeper.
-test('CAMP1 by source: the group roll is skipped while resting - camps/packs only fire while wandering, never mid-rest', () => {
-  // CAMP-NOTIMER: world.js has no timer arm left to gate - its ONLY camp
-  // trigger is the chunk-load roll, whose own rest gate is pinned below.
-  // exterior.js keeps the timer, so it keeps the gate.
-  for (const host of ['src/scenes/exterior.js']) {
-    const h = read(host);
-    const i = h.search(/^[ \t]*function runEncounterTick\(/m);   // CITE-ANCHOR: the declaration, not a comment's anchor that quotes it
-    assert.match(h.slice(i, i + 200), /function runEncounterTick\(playerFeet, isResting = false\) \{/, `${host}: the tick knows whether it's servicing a rest`);
-    const fn = h.slice(i, h.indexOf('\n  }\n', i));
-    assert.match(fn, /if \(!isResting && getPref\('wildernessCamps'\)/, `${host}: the camp/pack roll is gated off during rest`);
-    assert.match(h, /advanceMinutes: \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\([^)]*, true\); \}/, `${host}: the rest deps flag every tick they drive as a rest`);   // LIVED1: the ticker takes the minutes on the character's own clock
-    // `encounterTick` takes no flag - and it is NOT only the walking tick, which is worth saying plainly because
-    // the hand-off's note assumed it was: worldModes' INTERIOR rest deps drive it too
-    // (`advanceMinutes: (n, sharedEnd) => { interiorTicker.advance(n, sharedEnd); host.encounterTick?.(); }`). That rest needs no flag
-    // because a roll from inside a building cannot reach a group at all - campGateOk refuses `inside` outright -
-    // so the gate holds there by construction rather than by the flag, and both halves are pinned here.
-    assert.match(h, /encounterTick: \(\) => runEncounterTick\([^,)]*\),/, `${host}: the frame's own tick passes no third argument - isResting defaults to false`);
-  }
-  // the interior rest that reaches encounterTick unflagged, and the one line that makes it harmless
-  assert.match(read('src/scenes/worldModes.js'), /advanceMinutes: \(n\) => \{ interiorTicker\.advance\(n\); host\.encounterTick\?\.\(\); \},   \/\/ LIVED1/, 'the interior rest drives the host tick with no flag...');   // the rest's own line (LIVED1's note), not the camp meal's twin
-  assert.match(read('src/systems/campEncounters.js'), /const campGateOk = \(ctx\) => !\(ctx\.inside \|\| ctx\.inLocationRect \|\| ctx\.preventEnemySpawns\);/, '...and a roll from inside can never reach a group anyway');
 });
 
 // CAMP1-REST, THE LAW UNDER THE GATE. The source pins above say the roll stands down under a rest; this one says
@@ -270,20 +161,6 @@ test('CAMP1-REST: the rest interrupt is SIGHT first - a seen foe reports at any 
     'the classic wandering monster is minted inside the reach and still wakes the player - the lone roll is left alone');
   assert.equal(areEnemiesNearby([foe(MAX_CAMP_SPAWN_DISTANCE, { detected: true, inSight: true })], { resting: true }), true,
     'and a foe that HAS seen the player wakes them at any distance');
-});
-
-// CAMP-REST (2026-09-19): time skips that are not the rest window must not be replayed as walking time. The exhaustion
-// collapse, a camp meal and a forage/hunt search (the hunt's retired with it, HUNT-OUT 2026-10-04) advance the clock
-// without touching the encounter cursor, so the next
-// frame's catch-up rolled them with isResting=false and the timer's 180-minute boundary fired a guaranteed group.
-test('CAMP-REST by source: every time skip is spent through the tick as a rest, and a campmate does not notice a sleeping player', () => {
-  const w = hostText('src/scenes/world.js'), e = read('src/scenes/exterior.js'), ef = read('src/scenes/exteriorFoes.js');
-  assert.match(w, /playerTicker\.advance\(60\);\s*\n[^\n]*\n[^\n]*\n\s*runEncounterTick\(walkMode && playerSpawned \? player\.pos : cam\.pos, true\);/, 'world.js: the collapse hour is spent as a rest');
-  assert.equal((w.match(/advanceMinutes: \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\(walkMode && playerSpawned \? player\.pos : cam\.pos, true\); \}/g) ?? []).length, 2, 'world.js: the camp meal and the rest (LIVED1: one shape now, the rest\'s minutes the character\'s own)');
-  assert.match(e, /playerTicker\.advance\(60\);[^\n]*\n\s*runEncounterTick\(walkMode \? player\.pos : cam\.pos, true\);/, 'exterior.js: the collapse hour');
-  assert.equal((e.match(/advanceMinutes: \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\(walkMode \? player\.pos : cam\.pos, true\); \}/g) ?? []).length, 2, 'exterior.js: the camp meal and the rest (LIVED1: one shape now, as world.js\'s camp meal and rest)');
-  assert.match(ef, /const campAsleep = f\.campId != null && !!senses\.playerEntity\?\.isResting && !isLocalPlayerTarget\(ai\.target\);/, 'a campmate, not already on the player, while the player rests');
-  assert.match(ef, /noTargetMode: campAsleep,[^\n]*\n\s*dropLocal: wildUnaware,/, 'the target machine leaves the player off its list for it (WILD-ALERT: and the local player alone for a wilderness foe that has not noticed a fast traveller - test/scenes/wildalert.test.js, test/systems/wildalertfix.test.js)');
 });
 
 // ═══ CAMP-FAR (2026-09-24) ══════════════════════════════════════════

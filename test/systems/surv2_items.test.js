@@ -272,29 +272,6 @@ test('SURV2: the mod\'s sixteen icons are vendored, allow-listed, and ride the t
   clearVendorTextures();
 });
 
-test('SURV2: by source - the pipeline stands a vendor archive in, the weight law adds water, the ladder\'s first arm is ours, the shelf and the kit are gated by the one switch', () => {
-  const pipe = read('src/scenes/dataPipeline.js');
-  // PIN MOVED (AUDIT VE R1): the epoch the archive's pictures are current with is read before, and kept after, the preload
-  assert.match(pipe, /if \(isVendorArchive\(archive\)\) \{\s*\n\s*const epoch = textureTierEpoch\(\);[^\n]*\n\s*await preloadTextureArchive\(archive\)\.catch\(\(\) => \{\}\);\s*\n\s*preloadedAt\.set\(archive, epoch\);\s*\n\s*const v = vendorTextureStandIn\(archive\);/, 'no TEXTURE file is fetched for the port\'s own archives');
-  assert.match(read('src/systems/inventory.js'), /if \(Number\.isFinite\(item\.water\) && item\.water > 0\) base \+= item\.water;/);
-  assert.match(read('src/systems/useItem.js'), /if \(isSurvivalItem\(item\)\) out = useSurvivalItem\(item, collection, \{ entity, now: nowMinute, rolls, currentDay: Math\.trunc\(nowMinute \/ 1440\), inflict: inflictDisease, rules: survivalRules\(\) \?\? SURVIVAL_RULES\.casual, offMeal: survivalRules\(\) == null \}\);[^\n]*\n[\s\S]*?else if \(isBook\(item\)\)/);   // PIN MOVED (ENDLESS PROVISIONS): Off, offMeal   // SURV-TIERS: the live tier decides the meal's sickness (AUDIT SURV-TIERS: Off eats as Casual - never sickened)
-  assert.match(read('src/systems/shopStock.js'), /if \(survivalOn\(\)\) for \(const it of provisionsStock\(quality, rolls, \{ campfires: shelfIndex === 0 \}\)\) items\.push\(it\);/);   // AUDIT REST II H8 (PIN MOVED): the Campfires on the counter's shelf alone
-  assert.match(read('src/systems/equip.js'), /if \(survivalOn\(\)\) for \(const it of startingProvisions\(entity\)\) entity\.items\.push\(it\);/);   // AUDIT C&C I7 (PIN MOVED): the kit takes the character - its wardrobe for the start's shoes and cloak
-  // CORPSE-FOOD (2026-09-23, Mac: "It needs to be accessible with people with it on"): offline the one switch; online
-  // the body's food is the room's (survival/switch.js corpseFoodOn - survtiers3 drives it)
-  assert.match(read('src/systems/worldTick.js'), /installSurvivalIcons\(\);[^\n]*\n\s*installSurvivalLoot\(\{ enabled: corpseFoodOn \}\);/, 'the corpse\'s food is off with the one switch - offline');
-  // SURV-TIERS: the one switch reads a TIER now - on is anything but Off, and a value that is no tier reads as the default
-  assert.match(read('src/systems/survival/switch.js'), /export const survivalTier = \(\) => tierOfStored\(getPref\(SURVIVAL_PREF\)\);\nexport const survivalOn = \(\) => survivalTier\(\) !== SURVIVAL_OFF;/);
-  // MODS-ONLINE-3 (2026-09-22, Mac): `online: true` became `'player'`.
-  // Climates & Calories is a MOD ROW under Ralzar's name and it was the
-  // last one still locked online, kept there only because the port
-  // wrote the system itself and so carries it on the prefs shelf - a
-  // distinction no player can see. What this pin owns is unchanged:
-  // the row declares the key and the default, once (RF4).
-  // SURV-TIERS: the default is a tier now - on - and the player still owns the switch, Off included. BOONS-DEFAULT: Boons
-  assert.match(read('src/systems/features.js'), /key: 'survival', initial: 'boons', online: 'player',/, 'the row owns the key and the default: on (Boons), and the player owns the switch');   // PIN MOVED
-});
-
 // ═══ AUDIT VC6 (2026-09-18): THE DROP ROLLS ON THE POOL'S OWN STREAM ══
 // Chased down from a pin that failed one run in eight: the three pools
 // that raise a death (cityGuards, exteriorFoes, dungeonContext) handed

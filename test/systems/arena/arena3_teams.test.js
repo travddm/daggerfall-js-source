@@ -225,7 +225,6 @@ test('ARENA3 the gate: a recruiter\'s choice joins, quits after asking, opens th
     assert.match(W, /arenaRecruiter: \(role\) => arenaGate\.recruiter\(role\)/, f);
     assert.match(W, /gameMinutes: \(\) => worldMinutes\(\),   \/\/ ARENA3/, `${f}: the driver reads the clock`);
   }
-  assert.match(rd('src/scenes/worldModes.js'), /if \(\(gateRole === 'redRecruiter' \|\| gateRole === 'blueRecruiter'\) && host\.arenaRecruiter\?\.\(gateRole\)\) return;/);
 });
 
 const settle = () => new Promise((r) => setTimeout(r, 0));

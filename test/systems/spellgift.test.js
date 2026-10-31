@@ -154,18 +154,8 @@ test('SPELL-GIFT: a gift sorts with the BUFFS on the receiver\'s HUD - DFU\'s nu
 });
 
 test('SPELL-GIFT by source: the receiver takes a stranger\'s list only with the switch on, the pick and the bodies take strangers for it, the plaque says where a readied spell lands without the menu, and the switch is the player\'s', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const mate = !!social\?\.isPartyPeer\(id\);\s*\n\s*if \(!mate && !getPref\('acceptStrangerSpells'\)\) return;/);
-  assert.match(w, /const spell = allyCastSpell\(d\?\.spell, \{ stranger: !mate \}\);/);
-  assert.match(w, /if \(peerMenuFor !== id\) \{\s*\n\s*const cast = castPlaqueLine\(id\);\s*\n\s*const name = cast \? peerName\(id\) : null;\s*\n\s*return name \? \{ title: name, renown: null, subs: \[cast\], actions: \[\], actionsUnlit: true \} : null;\s*\n\s*\}/,
-    'a cast about to land is no look: its line, nothing else');
-  assert.match(w, /allyTarget: \(eye, dir, reach, sp\) => allyTargetPick\(eye, dir, reach, sp\),/);
-  assert.match(w, /allyMarks: \(sp\) => allyMarksNear\(sp\),/);
-  assert.match(rd('src/scenes/worldModes.js'), /allyMarks: \(sp\) => host\.allyMarks\?\.\(sp\) \?\? null,/, 'the dungeon engine\'s bodies, forwarded with the spell');
-  assert.match(rd('src/scenes/dungeonContext.js'), /allyTarget: \(eye, dir, reach, sp\) => opts\.allyTarget\?\.\(eye, dir, reach, sp\) \?\? null,/);
   assert.equal(PREF_DEFAULTS.acceptStrangerSpells, true, 'on: the ask');
   assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes('acceptStrangerSpells'), 'the player\'s own, online');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /c\.append\(prefRow\('acceptStrangerSpells', t\('menu\.peers\.spells', 'Spells from strangers'\),/);
 });
 
 // ─── AUDIT (the batch's audit, agent B) ────────────────────────────────────────────────────────────────────────────

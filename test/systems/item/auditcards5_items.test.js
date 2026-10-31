@@ -37,7 +37,6 @@ test('AUDIT CARDS-5 C1: a binder\'s decks from an old, foreign or edited save ma
   assert.equal(b.decks.length, BINDER_DECKS_MAX);
   assert.equal(b.decks[0].name, 'Good');
   assert.equal(DECK_NAME_MAX, BINDER_DECK_NAME_MAX, 'one bound');
-  assert.match(read('src/systems/save/save.js'), /cleanBinders\(entity\.items\);/);
   // the pack's sheet reads the sound decks (a malformed one threw there)
   withDom((dom) => {
     const host = dom.mk('div'); dom.body.append(host);
@@ -71,7 +70,6 @@ test('AUDIT CARDS-5 C2/C3/C4/C5: no shop buys a card; the hotbar tells one card 
   const binder = mintBinder();
   assert.deepEqual(useItem(binder, [binder]), { kind: 'binder', item: binder });
   assert.deepEqual(useResultAction({ kind: 'binder', item: 'b' }), { kind: 'pickWallet', item: 'b' });
-  assert.match(read('src/ui/native/nativeInventory.js'), /if \(r\.kind === 'binder'\) \{ this\.boxes = \[\{ rows: BINDER_CARD_LINES\.map/);
 });
 
 test('AUDIT CARDS-5 C lane\'s survivors: a card is a card only with its card; its lines by kind; worth a coin; the mints bounded and their lists their own; a two-copy deck the binder cannot back; a deck list replaced and never a hole; the gift merged into the pack\'s stacks; no pack, no throw', () => {

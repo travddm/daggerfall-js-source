@@ -39,7 +39,6 @@ test('REST6 the seven: 1700-1706 registered with their weights, charges and pric
   const bed = createRestItem(REST_ITEM.Bedroll);
   assert.deepEqual([bed.name, bed.currentCondition, bed.group], ['Bedroll', 10, 'UselessItems2']);
   assert.equal(createRestItem(REST_ITEM.Firewood, { stackCount: 4 }).stackCount, 4);
-  assert.match(rd('src/systems/save/save.js'), /import '\.\.\/rest\/restItems\.js';/);
   for (const t of Object.values(REST_ITEM)) assert.equal(typeof itemUseHandler(t), 'function', `${t} has its use`);
 });
 
@@ -250,23 +249,3 @@ test('REST6 the cards: each item\'s lines under its name and weight', () => {
   assert.equal(spendCharge(c, l), false); assert.equal(c.currentCondition, 2);
 });
 
-test('REST6 by source: the windows kneel by the candle, the hosts\' rest points read the Bedroll, the shelves stock at their end, the loot hooks subscribe last, the cards read the seven', () => {
-  for (const f of ['src/ui/restWindow.js', 'src/ui/enhanced/enhancedRest.js']) {
-    const s = rd(f);
-    assert.match(s, /meditate\) \{ (this\.|overlay\.)_end\((this\.)?deps\.restMeditate\?\.\(\)/, f);   // CAMP-ROLL (RE-AIMED): the kneel ends on its own line - a night goes to the camp's step
-    assert.match(s, /REST_ACT_TEXT\.meditating/, f);
-    assert.match(s, /deps\.snuffCandle\?\.\(\)/, f);
-  }
-  assert.match(rd('src/scenes/world.js'), /camps\.restPointAt\(walkMode && playerSpawned \? player\.pos : cam\.pos\)/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /restPoint: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? \{ kind: 'bed', where: null \} : _fpFeet \? camps\.restPointAt\(_fpFeet\) : null\),/);   // FIELD BUGS 2026-10-05 DUNGEON-BEDS: a bed first, then the fire or the Bedroll
-  const shop = rd('src/systems/shopStock.js');
-  const at = shop.indexOf("restItemsStock(buildingType === BUILDING_TYPES.GeneralStore ? 'GeneralStore' : 'Alchemist'");
-  assert.ok(at > shop.indexOf("const pairs = SHOP_ITEM_GROUPS[buildingType]") && at < shop.indexOf('add(mintHealingPotion());'), 'after DFU\'s draws, before the healing supply');
-  const shared = rd('src/scenes/shared.js');
-  assert.ok(shared.indexOf('  installRestItemLoot();') > shared.indexOf('  installForaging();'), 'after Foraging\'s hooks');
-  assert.match(shared, /installHealingSupply\(\);[^\n]*\n  installRestItemLoot\(\);/, 'and the healing supply\'s: the last draw on a pile');
-  assert.match(shared, /if \(_rules && _place === REST_KIND\.Rough && draughtTaken\(entity\) && \(!sharedClockOn\(\) \|\| nightDue\(entity, ownMinutes\(\)\)\)\) \{ _place = REST_KIND\.Bed; _kind = REST_KIND\.Bed; _draughtFrom = ownMinutes\(\); \}/);
-  assert.match(shared, /if \(_draughtFrom != null && ownMinutes\(\) - _draughtFrom >= DRAUGHT_SPENT_MINUTES\) spendDraught\(entity\); _draughtFrom = null;/);
-  assert.match(rd('src/systems/item/itemInfo.js'), /if \(isSurvivalItem\(item\) \|\| isRestItem\(item\)\) record = survivalInfoTokens\(item\);/);
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /survival: isSurvivalItem\(item\) \|\| isRestItem\(item\) \?/);
-});

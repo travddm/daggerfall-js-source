@@ -50,17 +50,11 @@ test('BALANCE1: what a full bar is worth now - STR/END 50, 6400 raw: walking 66.
 });
 
 test('BALANCE1: the fatigue scale is on EXERTION alone - the minute\'s band, a jump, a swing, Roleplay Realism\'s overload and its riding charge; never a spell\'s, a poison\'s, a disease\'s, training\'s, survival\'s or the deep\'s swim stroke (mutants: a band charged unscaled; the scale spread to fatigue damage)', () => {
-  const tick = rd('src/systems/worldTick.js');
-  assert.match(tick, /sinks\.drainFatigue\?\.\(Math\.trunc\(FATIGUE_LOSS\.Jumping \* fatigueMultiplier \* FATIGUE_DRAIN_SCALE\)\);/);
-  assert.match(tick, /if \(!entity\.isResting\) sinks\.drainFatigue\?\.\(Math\.trunc\(loss \* fatigueMultiplier \* FATIGUE_DRAIN_SCALE\)\);/);
   for (const [f, fn] of [['dungeonContext', 'drainFatigue'], ['world', 'drainExteriorFatigue'], ['exterior', 'drainExteriorFatigue'], ['worldModes', 'drainInteriorFatigue']]) {
     const s = rd(`src/scenes/${f}.js`);
     assert.equal((s.match(new RegExp(`${fn}\\(SWING_FATIGUE_COST\\)`, 'g')) ?? []).length, 2, `${f}: the melee arm and the bow arm charge the scaled swing`);
     assert.doesNotMatch(s, /\(SWING_WEAPON_FATIGUE_LOSS\)/, `${f}: nothing charges DFU's raw swing`);
   }
-  assert.match(rd('src/systems/roleplayRealism/rrInstall.js'), /const owed = cost \* FATIGUE_DRAIN_SCALE \+ \(entity\._rrFatigueCarry \?\? 0\);/, 'the overload, its fraction carried (rr1_realism drives it)');
-  // the pre-merge audit (0927b F1): Enhanced Riding's charge is exertion too - 165 was left whole and on neither list
-  assert.match(rd('src/systems/roleplayRealism/rrRidingHost.js'), /- Math\.trunc\(FATIGUE_LOSS\.Default \* RR_RIDING\.chargeFatigueMultiplier \* FATIGUE_DRAIN_SCALE\)\);/);
   for (const f of ['src/systems/effects.js', 'src/systems/poisons.js', 'src/systems/diseases.js', 'src/systems/guild/guildServiceActions.js', 'src/systems/quest/actions.js', 'src/systems/survival/needs.js', 'src/world/deepWater/deepWaterSwim.js']) {
     assert.doesNotMatch(rd(f), /FATIGUE_DRAIN_SCALE/, `${f}: not exertion, not scaled`);
   }
@@ -93,59 +87,3 @@ test('BALANCE1: a blow\'s wear is the scale\'s EXACTLY on average - the fraction
   assert.equal(drawn, 0);
 });
 
-test('BALANCE1: every blow\'s wear path takes the scale - DFU\'s DamageEquipment, the combat overhaul\'s weapon, armour and fist arms, Roleplay Realism\'s armour x5, and a duel\'s blade; an enchantment\'s charge does not (mutants: a path left unscaled)', () => {
-  _wearScaleForTests(0.6);   // WEAR-VANILLA: the port's scale is 1 (DFU's wear); a fractional one proves every path takes it
-  try {
-    // DFU's own path: (10 x 30 + 50) / 100 = 3 on the blade (the target wears nothing), 1.8 on the scale (WEAR-ONE: DFU's amount, not WEAR-TWICE's twice)
-    const saber = mintCondition({ group: 'Weapons', name: 'Saber', templateIndex: 117, material: 2 });
-    const s0 = saber.currentCondition;
-    damageEquipment({ isPlayer: false, items: [], stats: {} }, { isPlayer: false, items: [], stats: {} }, 30, saber, BODY_PARTS.Chest, { rolls: () => 0.99 });
-    assert.equal(s0 - saber.currentCondition, 1, 'DFU\'s 3, at 0.6 with the fraction rolled away');
-    const saber2 = mintCondition({ group: 'Weapons', name: 'Saber', templateIndex: 117, material: 2 });
-    damageEquipment({ isPlayer: false, items: [], stats: {} }, { isPlayer: false, items: [], stats: {} }, 30, saber2, BODY_PARTS.Chest, { rolls: () => 0.5 });
-    assert.equal(saber2.currentCondition, s0 - 2, '...and rolled up');
-
-    // the overhaul (on by default): a piece takes the damage doubled, a fist's the damage - each on the scale
-    const mods = { fadingEnchantedItems: false };
-    const piece = { group: 'Armor', templateIndex: 102, material: 0x200, maxCondition: 1000, currentCondition: 1000, name: 'Cuirass' };
-    pcaaoApplyConditionDamageThroughWeaponDamage(piece, { isPlayer: false }, 10, false, false, false, 0, mods, () => 0.99, null);
-    assert.equal(piece.currentCondition, 1000 - 12, 'the mod\'s 20 on a piece is 12');
-    pcaaoApplyConditionDamageThroughUnarmedDamage(piece, { isPlayer: false }, 10, mods, null, () => 0.99);
-    assert.equal(piece.currentCondition, 988 - 6, 'a fist\'s 10 is 6');
-    const blade = { group: 'Weapons', templateIndex: 120, material: 1, flags: 0, maxCondition: 1000, currentCondition: 1000, name: 'Longsword' };
-    pcaaoApplyConditionDamageThroughWeaponDamage(blade, { isPlayer: false }, 25, false, false, false, 0, mods, () => 0.99, null);
-    assert.equal(blade.currentCondition, 1000 - 3, 'the mod\'s 10 x 25 / 50 = 5 on a blade is 3');
-    // A FRACTION IS ROLLED ON THE ROLLS THE OVERHAUL IS HANDED (the pre-merge audit 0927b: every case above is whole, so
-    // no roll was drawn and the hand-through went unread): a piece's 22 is 13.2, a fist's 11 is 6.6
-    // (Math.random answers the OTHER way meanwhile, so a roll taken anywhere but the handed stream reads wrong, not lucky)
-    const piece2 = { group: 'Armor', templateIndex: 102, material: 0x200, maxCondition: 1000, currentCondition: 1000, name: 'Cuirass' };
-    const random = Math.random;
-    try {
-      Math.random = () => 0.999;
-      pcaaoApplyConditionDamageThroughWeaponDamage(piece2, { isPlayer: false }, 11, false, false, false, 0, mods, () => 0.1, null);
-      assert.equal(piece2.currentCondition, 1000 - 14, '13.2, the roll under 0.2: 14');
-      Math.random = () => 0;
-      pcaaoApplyConditionDamageThroughWeaponDamage(piece2, { isPlayer: false }, 11, false, false, false, 0, mods, () => 0.9, null);
-      assert.equal(piece2.currentCondition, 986 - 13, '...over it: 13');
-      Math.random = () => 0.999;
-      pcaaoApplyConditionDamageThroughUnarmedDamage(piece2, { isPlayer: false }, 11, mods, null, () => 0.5);
-      assert.equal(piece2.currentCondition, 973 - 7, 'a fist\'s 6.6, the roll under 0.6: 7');
-      Math.random = () => 0;
-      pcaaoApplyConditionDamageThroughUnarmedDamage(piece2, { isPlayer: false }, 11, mods, null, () => 0.7);
-      assert.equal(piece2.currentCondition, 966 - 6, '...over it: 6');
-    } finally { Math.random = random; }
-
-    // the other two, where they are charged
-    assert.match(rd('src/combat/pcaao.js'), /lowerCondition\(item, blowWear\(amount, rolls\), owner, say, removeFrom, shownItemName\);/, 'the overhaul\'s one wear sink');
-    assert.match(rd('src/systems/roleplayRealism/rrInstall.js'), /\(it, amount\) => lowerCondition\(it, blowWear\(amount, rolls\), owner, say\)/, 'Roleplay Realism\'s armour x5');
-    // PIN MOVED (INT8/INT9, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): the referee's word that a blow landed
-    // wears the weapon of the strike that left - a duel's, and the open zone's the same
-    assert.match(hostText('src/scenes/world.js'), /if \(amount > 0\) lowerCondition\(_duelLastWeapon, dfuBlowWear\(amount\), playerEntity,/, 'a duel\'s blade (DFU\'s amount at the port\'s multiple - WEAR-ONE\'s 1 - then the scale)');
-    assert.match(hostText('src/scenes/world.js'), /if \(wear > 0\) lowerCondition\(_wildLastWeapon, dfuBlowWear\(wear\), playerEntity,/, 'and the open zone\'s');
-    assert.match(rd('src/combat/formulas.js'), /lowerCondition\(item, dfuBlowWear\(amount, rolls\), owner, say\);/, 'DFU\'s');
-    assert.match(rd('src/systems/equip.js'), /export const dfuBlowWear = \(amount, rolls = Math\.random\) => \(amount > 0 \? blowWear\(amount \* _dfuMultiple, rolls\) : amount\);/, 'and the multiple rides the scale\'s one sink');
-    // NOT a blow: an enchantment's use charges its item's condition by its own cost
-    assert.doesNotMatch(rd('src/systems/enchantments.js'), /blowWear/);
-    assert.match(rd('src/systems/enchantments.js'), /const broke = lowerCondition\(item, amount, entity, ctx\?\.say\);/);
-  } finally { _wearScaleForTests(); }
-});

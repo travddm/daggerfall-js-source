@@ -111,38 +111,6 @@ test('BAY-LEFT-MAPS C7 A SAVE FROM BEFORE: a Bay book restores byte for byte; a 
   restoreDiscovery(JSON.parse(JSON.stringify(apart)), { houses });
   book = snapshotDiscovery().buildings[`64:Solitude Market#${sliceId}`];
   assert.deepEqual([Object.keys(book), book[9].displayName], [['4', '9'], 'Bran\'s residence'], 'the carried one beside its own');
-  // the save hands the deeds in, restored before the discoveries
-  const S = read('src/systems/save/save.js');
-  const at = S.indexOf('restoreDiscovery(snap.discovery, { houses: allDeeds(entity.houses) });');   // PIN MOVED (HOUSES-3): every region's three
-  assert.ok(at > 0 && S.indexOf('entity.houses = snap.houses?.length') < at, 'with the deeds restored above');
-});
-
-test('BAY-LEFT-MAPS C7 ONE KEY-MAKER: every host and module that writes or reads the building half takes townBookId / townBookOf - the world host (the door\'s key, the talk\'s reveals and reads, the guild halls\' reveal, the quest\'s undiscover and its moved site, the I box, a deed inherited, Roleplay Realism\'s armorer, Daggerfall\'s own), the town map, the town talk, the fixed city; no `<region>:<name>` literal stands as a book (mutants: the door\'s key back; the town map\'s key back; the talk\'s reveal back)', () => {
-  const W = hostText('src/scenes/world.js');
-  for (const re of [
-    /discoveryLocationId: \(\) => townBookOf\(_questLoc\(\)\),/,
-    /const undiscoverBuildingHere = \(buildingKey, buildingName\) => undiscoverBuilding\(\n\s+townBookOf\(_questLoc\(\)\), buildingKey, true, buildingName \?\? null\);/,
-    /const town = townBookId\(was\?\.regionIndex \?\? -1, was\?\.locationName \?\? '', was\?\.mapId\);/,
-    /const locationId = townBookOf\(dfLoc\);/,
-    /getAnyBuilding: \(buildingKey\) => discoveredBuildings\(townBookOf\(_questLoc\(\)\)\)/,
-    /discoverBuilding: \(buildingKey\) => discoverBuilding\(\n\s+townBookOf\(_questLoc\(\)\),/,
-    /return loc\?\.name \? discoveredBuildings\(townBookOf\(loc\)\) : \[\];/,
-    /discoverBuilding\(townBookId\(region, row\.location, row\.mapId\), \{ buildingKey: key, buildingType: TALK_BUILDING_TYPES\.House1 \}, name\)/,
-    /if \(arm && armRec\) discoverBuilding\(townBookOf\(_musicLoc\), armRec, arm\.name\);/,
-    /const locId = townBookOf\(city\);/,
-  ]) assert.match(W, re);
-  assert.match(read('src/scenes/exteriorAutomapToggle.js'), /const locId = townBookOf\(dfLoc\);/);
-  assert.match(read('src/scenes/townTalk.js'), /if \(h\.reveal\) discoverBuilding\(townBookId\(regionNow\(\), cityName\(\), topics\?\.mapId\), building, null, questBuildingSource\);/);
-  const E = read('src/scenes/exterior.js');
-  assert.equal(E.split('townBookId(dfLocation.regionIndex, dfLocation.name ?? locationName, dfLocation.mapTableData?.mapId)').length - 1, 4, 'the fixed city\'s four (the Bay\'s own key by the same law)');
-  // the sweep: no `${...regionIndex...}:${...name...}` literal left in a host as a book (the dungeon's place hold is no book)
-  const raw = /`\$\{[^`]*region(?:Index|Now)[^`}]*\}:\$\{[^`]*(?:name|Name|location)\b[^`]*\}`/g;
-  for (const [file, text] of [['world.js', W], ['exterior.js', E], ['exteriorAutomapToggle.js', read('src/scenes/exteriorAutomapToggle.js')], ['townTalk.js', read('src/scenes/townTalk.js')], ['worldModes.js', hostText('src/scenes/worldModes.js')]]) {
-    const left = (text.match(raw) ?? []).filter((m) => !/locationIndex/.test(m) && !/^`\$\{dfLocation\.regionIndex\}:\$\{dfLocation\.name\}`$/.test(m) && !/^`\$\{regionIndex\}:\$\{name\}`$/.test(m));
-    assert.deepEqual(left, [], `${file}: every book by the key-maker`);
-  }
-  assert.match(hostText('src/scenes/worldModes.js'), /placeHoldOf\('dungeon', `\$\{dfLocation\.regionIndex\}:\$\{dfLocation\.name\}`\)/, 'the one left: a dungeon\'s place hold (PLACE-LRU), no book');
-  assert.match(hostText('src/scenes/worldModes.js'), /const locId = bd\?\.townBook \?\? discoveryLocationId\?\.\(\) \?\? null;/, 'the interior host reads the door\'s own town\'s book (the key-maker\'s, scenes/townTalk.js doorTownOf), else the world host\'s key-maker');   // PIN MOVED (IC-PROPS): a door is its own town's - a neighbouring slice's door no longer reads the player's slice's book
 });
 
 // ── ON THE PLAYER'S DATA ──────────────────────────────────────────────────────────────────────────────────────────

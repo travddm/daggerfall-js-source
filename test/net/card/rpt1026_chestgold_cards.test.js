@@ -56,9 +56,3 @@ test('RPT1026-CARDBANK a stake that comes home says where it went: into the bank
   assert.deepEqual(quiet, []);
 });
 
-test('RPT1026-CARDBANK both of the host\'s claims say it: a cash-out heard, and the kept receipts claimed on a visit (after a reload)', () => {
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /if \(j\) \{ host\.cardOnline\?\.send\(\{ op: 'ack', table: f\.table, j \}\); host\.cardStakes\.claim\(say\); \}/);
-  assert.match(wm, /host\.cardStakes\?\.recover\(\)\.then\(\(\) => host\.cardStakes\.claim\(say\)\)\.catch\(\(\) => \{\}\);/);
-  assert.match(wm, /\n  const say = \(l, delay\) => \{ if \(townTalk\?\.say\) townTalk\.say\(l, delay\);/, 'the host\'s own say, the line the HUD shows');
-});

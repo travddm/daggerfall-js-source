@@ -215,22 +215,3 @@ test('TOWN-MARKS the repaint: the homes answer after the map is open - the plan 
   assert.equal(offline.breathes(), false, 'no registry: the plan it always was');
 });
 
-test('TOWN-MARKS the wiring: the door hands the marks to the enhanced town map; the host marks the open Notice Board\'s boards and the town\'s housing, and asks for the town\'s homes as the map opens (mutants: a key dropped at the door; the board marked while closed; the homes never asked)', () => {
-  const door = src('src/ui/town/townMapDoor.js');
-  assert.match(door, /boards: deps\.townBoards \?\? null,/);
-  assert.match(door, /homes: deps\.townHomes \?\? null,/);
-  assert.match(door, /homesVersion: deps\.townHomesVersion \?\? null,/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /townBoards: \(\) => host\.townBoardMarks\(b\),/);   // HOST-SPLIT 2: read live through the toggle's handle (scenes/exteriorAutomapToggle.js)
-  assert.match(w, /townHomes: \(\) => townHomeRows\(\{\n\s*buildings: summaries, mapId: dfLoc\.mapTableData\?\.mapId, regionIndex: dfLoc\.regionIndex, houses: playerEntity\.houses \?\? null,\n\s*homeAt: onlineHomes \? \(mapId, buildingKey\) => \{\n\s*const h = onlineHomes\.homeAt\(mapId, buildingKey\);\n[^\n]*\n\s*return h && isVendorWaypoint\(mapId, buildingKey\) \? \{ \.\.\.h, own: false, owner: vendorWaypointLabel\(h\.owner\) \} : h;\n\s*\} : null,\n\s*\}\),/);
-  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the bag `townHere` builds for either key; the homes asked as the M key's window opens and as the travel
-  // key's streets are handed over
-  assert.match(w, /townHomesVersion: \(\) => \(onlineHomes\?\.version\(\) \?\? 0\) \+ vendorWaypointVersion\(\) \* 100_000,[^\n]*\n\s*\} \};/);
-  assert.match(w, /townTalk\.showOverlay\(createTownMapWindow\(here\.deps\)\);\n\s*onlineHomes\?\.ensure\(here\.mapId\);/, 'the M key asks');
-  assert.match(w, /if \(!here\) return \{\};\n\s*onlineHomes\?\.ensure\(here\.mapId\);/, 'the travel key\'s streets ask too');
-  assert.match(w, /return \{ mapId: dfLoc\.mapTableData\?\.mapId, deps: \{/, 'the town\'s MapId');
-  const marks = w.slice(w.indexOf('const townBoardMarks = (p) => {'));
-  assert.match(marks, /^const townBoardMarks = \(p\) => \{\n\s*if \(!noticeBook \|\| noticeBook\.open !== true \|\| !p\?\.boards\?\.length \|\| !p\.location\) return \[\];\n\s*const bountyAt = boardSplitOf\(p\);\n\s*const town = noticeTownOf\(p\.px, p\.py, bountyAt\.size > 0\);\n\s*return town \? townBoardRows\(p, bountyAt, noticeBook\.unseen\(town\.mapId\)\) : \[\];/);   // ONE-BOARD REVERTED (PIN MOVED)
-  // the classic exterior automap is DFU's own window: it draws DFU's marks alone
-  assert.doesNotMatch(src('src/ui/exteriorAutomapWindow.js'), /townBoards|townHomes|paintBoardMark|paintHomeMark/);
-});

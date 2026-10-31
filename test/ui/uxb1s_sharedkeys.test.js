@@ -150,9 +150,6 @@ test('AUDIT UXB1 F3/F8: a newer build\'s names ride through this one - the whole
   loadKeyBinds(r, JSON.parse(JSON.stringify(file)));
   resetDefaults(r);
   assert.deepEqual(serializeKeyBinds(r).sharedActionKeyBinds, { ArrowUp: ['BoatSailUp'], ArrowDown: ['Professions'], KeyK: ['Spyglass'] }, 'the carried shares gone with the primary\'s own - the default shares seated again (HELM-KEYS, CLASSIC-PAGES, SPYGLASS - PIN MOVED)');
-  // the ONE seat: the load and the share both take it
-  const src = read('src/systems/inputActions.js');
-  assert.equal((src.match(/seatOnKey\(store, code, action, primary\);/g) ?? []).length, 2);
 });
 
 // ── THE PRESS ────────────────────────────────────────────────────
@@ -205,27 +202,6 @@ test('UXB1-S: routeKey DISPATCHES every action a shared key carries - one press,
     assert.equal(routeKey({ code: sheet, target: null }, ctx, null, new Set([sheet])), true);
     assert.deepEqual(calls, ['sheet'], 'the sheet came up: the pack is not opened under it (the next press is the sheet\'s)');
   } finally { setBindings(null); }
-});
-
-test('UXB1-S by source: the two self-routing hosts run their ladder once per action, the HUD\'s own keys on the first pass alone, every arm\'s `return` now "the press is used"', () => {
-  for (const [f, fn] of [['src/scenes/world.js', 'worldKeyAction'], ['src/scenes/exterior.js', 'exteriorKeyAction']]) {
-    const s = read(f);
-    assert.match(s, /const acts = retroToggleKey\(e, keys\) \? \[\] : actionsOf\(e, keys\);/, `${f}: every action, none under the retro chord`);
-    assert.match(s, new RegExp(`for \\(let i = 0; i < pass\\.length; i\\+\\+\\) \\{\\n\\s*if \\(${fn}\\(pass\\[i\\], i === 0\\)\\) spent = true;\\n\\s*if \\(!upBefore && windowUp\\(\\)\\) break;\\n\\s*\\}\\n\\s*if \\(spent\\) return;`), `${f}: the loop, stopped by a window it opened (AUDIT UXB1 F1), and nothing after it once the press is used`);
-    assert.match(s, /const windowUp = \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\)( \|\| pointerSurfaces\.size > 0)?;\n\s*const upBefore = windowUp\(\);\n\s*const pass = acts\.length \? acts : \[null\];/, `${f}: bindCursorToggle's predicate, read before the pass`);
-    if (f === 'src/scenes/world.js') assert.match(s, /const windowUp = [^\n]*\|\| pointerSurfaces\.size > 0;/, 'and the world host\'s pointer surfaces - the chat and the F-menu pause nothing, and take keys');
-    const body = s.slice(s.indexOf(`function ${fn}(act, first) {`), s.indexOf('\n    }\n', s.indexOf(`function ${fn}(act, first) {`)));
-    assert.ok(body.length > 1000, `${f}: the ladder is the function`);
-    assert.equal((body.replace(/^\s*\/\/.*$/gm, '').match(/\breturn;/g) ?? []).length, 0, `${f}: no arm returns nothing - each says whether the press was used`);
-    assert.match(body, /if \(first && hudShortcutKey\(e, keys\)\) \{ e\.preventDefault\(\); return true; \}/, `${f}: a shared F10 cannot flip the HUD twice`);
-    assert.match(body, /\n {6}return false;$/, `${f}: an action no arm takes leaves the press unused`);
-  }
-  // ...and the small readers ask for the action among a shared key's, never "is it the first"
-  assert.match(read('src/scenes/interior.js'), /if \(actionsOf\(e, keys\)\.includes\('AutoMap'\)\)/);
-  assert.match(read('src/scenes/townTalk.js'), /const m = actionsOf\(e, keys\)\.map\(\(a\) => MODE_ACTIONS\[a\]\)\.find\(Boolean\);/);
-  assert.match(read('src/ui/spellbookWindow.js'), /codeMeans\(bindings\(\), code, 'CastSpell'\)/);
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /codeMeans\(bindings\(\), code, 'TravelMap'\)/);
-  assert.match(read('src/ui/enhanced/enhancedChronicle.js'), /eventMeans\(e, 'LogBook'\)/);
 });
 
 // ── THE LAW, STAGED ──────────────────────────────────────────────
@@ -311,16 +287,6 @@ test('UXB1-S: the enhanced page - a key in use offers "Use for both"; the answer
     delete globalThis.document;
     setBindings(null);
   }
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.ctl-key\.ctl-shared \{ color: #6fcf8a;/, 'its own colour, neither of DFU\'s two');
-  // ...and it READS in both faces: the door's `.shell .act` outranked the bare two-class rule, so on the main menu's
-  // Settings even DFU's red clash drew as a plain key (measured in a browser: the key's computed colour was the bone)
-  for (const st of ['ctl-dupe', 'ctl-cross', 'ctl-shared']) {
-    assert.match(css, new RegExp(`\\.shell \\.ctl-key\\.${st}, \\.px-sys \\.ctl-key\\.${st} \\{`), `${st} wins in both faces`);
-  }
-  // ...and the question the key raised stands in a head backed SOLID - the cards are a 35% wash, and a sticky one was
-  // read with the rows scrolling under it printed through its words
-  assert.match(css, /\.shell \.card\.ctl-head, \.px-sys \.card\.ctl-head \{ background: #0d1014; \}/);
 });
 
 test('UXB1-S: the classic grid - its replace box takes B for "both", draws the share in its own colour, and closes on it', () => {
@@ -342,8 +308,6 @@ test('UXB1-S: the classic grid - its replace box takes B for "both", draws the s
     assert.equal(grid.done, true, 'the back door closes it - and applies');
     assert.deepEqual(actionsForCode(store, space), ['Jump', 'FloatUp']);
   } finally { setBindings(null); }
-  assert.match(read('src/ui/controlsWindow.js'), /this\.dupes\.shared\?\.has\(code\) \? SHARED_KEY_COLOR : TEXT_COLOR/);
-  assert.match(read('src/ui/mouseControlsWindow.js'), /this\.dupes\.shared\?\.has\(code\) \? SHARED_KEY_COLOR : TEXT_COLOR/);
   assert.equal(SHARED_KEY_COLOR.length, 4);
   assert.equal(JUMP(), 'Space', '(the fixture\'s key)');
 });

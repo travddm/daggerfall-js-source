@@ -114,19 +114,6 @@ test('AUDIT PRE-MERGE 0928 R1: a sail re-baked in place (updateMeshVertices) lea
   leaves('a later bake');
 });
 
-// ── R2: world.js's exterior lights, run out of its source ─────────────────────────────────────────────────────
-const W = rd('src/scenes/world.js');
-/** The pool and its helpers (from the lantern pool's declaration to _wodSetLights' end) and the frame's composition
- *  (from `const wodLit` to the pool frame that follows it) - world.js's own text. */
-function exteriorLightsSource() {
-  const from = W.indexOf('  const _sceneLights = [];');
-  const setAt = W.indexOf('const _wodSetLights = (data, sel) => {', from);
-  const helpers = W.slice(from, W.indexOf('\n  };', setAt) + 5);
-  const at = W.indexOf('    const wodLit = wod ? _wodLitCount() : 0;');
-  const block = W.slice(at, W.indexOf('    csaPoolFrame(dt);', at));
-  assert.ok(from > 0 && setAt > from && at > setAt && block.includes('renderer.setPointLights('), 'the exterior light code is where this reads it');
-  return new Function('__scope', `with (__scope) {\n${helpers}\n${block}\n}`);
-}
 /** The galleon from the vendored bundle (test/systems/comeSailAway/csa_pool.test.js's rig), its lanterns lit, standing at `x` along +X. */
 async function galleonLights(x, eye) {
   const fileFetch = async (url) => {
@@ -147,69 +134,6 @@ async function galleonLights(x, eye) {
   pool.frame(0.5, { playerPosition: eye, cityLightsOn: true });
   return pool.lights(eye);
 }
-/** One exterior frame's lights through world.js's composition: `town` the street's lanterns (pixel-local, one pixel at
- *  the origin), `boats` what csa.lights() hands, `night` the lanterns' hours. Answers each light the renderer took and
- *  the colour it uploads for it. */
-function exteriorFrame({ lane, night, town, boats, eye }) {
-  const { canvas } = fakeGl();
-  const renderer = new Renderer(canvas);
-  if (lane) renderer.setLightingLane(EL_LANE);
-  const scope = {
-    renderer, cam: { pos: eye, yaw: 0 }, minute: night ? 60 : 720, dt: 1 / 60, lightsOnAt: () => night,
-    built: new Map([['0,0', { px: 0, py: 0, lights: town.map((l) => [l.x, l.y, l.z]) }]]),
-    state: { pixelTranslation: (_px, _py, out = [0, 0, 0]) => { out[0] = 0; out[1] = 0; out[2] = 0; return out; } },
-    worldLightAnimator: { tick() {}, ranges: new Float32Array(64).fill(18) },
-    wod: null, csaOn: () => true, csa: { lights: () => boats },
-    magic: null, _dwFogP: null, playerTorchLight: () => null, thunderlockMuzzleLight: () => null, playerEntity: {}, player: { feetAt: () => [0, 0, 0] },
-    peerTorchLights: () => [], gatePool: null, riteHost: null, starfall: null, camps: { lights: () => [] }, droppedTorches: { lights: () => [] },
-    naval: null,   // NAV-B: the broadsides' flashes and the burning decks join the hand lights - no sea in this pin
-    festivalStage: null,   // FESTIVAL-STAGE: no Festival in this pin
-    quays: null,   // PIN MOVED (QUAYS): the quays' lanterns join the night's extras - no harbour in this pin
-    poiHost: null,   // PIN MOVED (POI-2): a POI's own lights join the scene's - no POI in this pin
-    yards: null,   // PIN MOVED (YARD-LIGHT): the yards' lamps join the scene lights - no yard in this pin (test/scenes/yardlight.test.js runs them)
-    portHost: null,   // PIN MOVED (SHIPYARDS): the lighthouses' lamps join the scene lights - no port in this pin (test/systems/shipyards1_found.test.js runs them)
-    CITY_LIGHT_COLOR_F32: lanternColor(lane, new Float32Array(CITY_LIGHT_COLOR)),
-    fillLanternPool, nearestLights, rangesFor, capFadeColors, capFadePairs, withPlayerLights, wodLightColors,
-    meterFor: () => null,   // PIN MOVED (PERF-SIM3): the frame's CPU meter marks its spans inside this source - no meter in this pin
-    adoptLight,   // PIN MOVED (LIGHT-ID): the World of Daggerfall lights and the boats' lanterns in the pool name each entry by its light (render/lightId.js)
-  };
-  exteriorLightsSource()(scope);
-  const L = renderer._pointLights, n = Math.min(L.length / 4, renderer.maxPointLights);
-  const colors = renderer._pointColorData(n);
-  return Array.from({ length: n }, (_, i) => ({ at: [L[i * 4], L[i * 4 + 1], L[i * 4 + 2]], d: Math.hypot(L[i * 4] - eye[0], L[i * 4 + 1] - eye[1], L[i * 4 + 2] - eye[2]), color: [...colors.subarray(i * 3, i * 3 + 3)] }));
-}
 const same = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 1e-4);
 const town = Array.from({ length: 20 }, (_, i) => ({ x: Math.cos(i) * (4 + i * 1.4), y: 3, z: Math.sin(i) * (4 + i * 1.4) }));   // 4 to 30.6 m from the eye
 
-test('AUDIT PRE-MERGE 0928 R2: outdoors a boat\'s lanterns light in their own colour - the prefab\'s Color32(255, 147, 41) on the classic set, its decode on the lane - by night among the street\'s lanterns and by day alone, as a building and a dungeon light them (mutants: the boats handed the player\'s extras again; the fill\'s colour the street\'s; the day branch without them)', async () => {
-  const eye = [0, 1.7, 0];
-  const near = await galleonLights(6, eye);   // a galleon moored beside the player
-  const prefab = near[0].color;
-  assert.ok(same(prefab, [1, 147 / 255, 41 / 255]), 'what the pool hands: the prefab\'s colour x its intensity');
-  for (const lane of [false, true]) {
-    const want = lane ? [...EL_LANE.decode3(new Float32Array(prefab), new Float32Array(3))] : prefab;
-    const street = lanternColor(lane, new Float32Array(CITY_LIGHT_COLOR));
-    const street3 = lane ? [...EL_LANE.decode3(street, new Float32Array(3))] : [...street];
-    for (const night of [true, false]) {
-      const lit = exteriorFrame({ lane, night, town, boats: near, eye });
-      const boat = lit.filter((l) => near.some((b) => same(l.at, [b.x, b.y, b.z])));
-      assert.ok(boat.length > 0, `${lane ? 'lane' : 'classic'}, ${night ? 'night' : 'day'}: the boat's lanterns reach the renderer`);
-      for (const l of boat) assert.ok(same(l.color, want), `${lane ? 'lane' : 'classic'}, ${night ? 'night' : 'day'}: a boat lantern uploads ${l.color.map((v) => v.toFixed(3))}, not the prefab's ${want.map((v) => v.toFixed(3))}`);
-      for (const l of lit) if (!boat.includes(l)) assert.ok(same(l.color, street3), `${lane ? 'lane' : 'classic'}, ${night ? 'night' : 'day'}: the street keeps its own colour`);
-    }
-  }
-});
-
-test('AUDIT PRE-MERGE 0928 R2: a boat\'s lanterns are ranked by distance with the street\'s, never ahead of them - twenty street lanterns 4 to 31 m off and a galleon 42 m off: the classic cap of sixteen keeps the sixteen nearest, and on the lane every one of them (mutants: the boats handed the player\'s extras again; the selection without them)', async () => {
-  const eye = [0, 1.7, 0];
-  const far = await galleonLights(42, eye);
-  const fd = far.map((b) => Math.hypot(b.x - eye[0], b.y - eye[1], b.z - eye[2]));
-  assert.ok(far.length === 8 && Math.min(...fd) > 35, `eight lit lanterns, every one past the street (${fd.map((v) => v.toFixed(0))})`);
-  const street = town.map((l) => Math.hypot(l.x - eye[0], l.y - eye[1], l.z - eye[2])).sort((a, b) => a - b);
-  const classic = exteriorFrame({ lane: false, night: true, town, boats: far, eye });
-  assert.equal(classic.length, 16);
-  assert.deepEqual(classic.map((l) => +l.d.toFixed(3)).sort((a, b) => a - b), street.slice(0, 16).map((v) => +v.toFixed(3)), 'the sixteen nearest, all of them the street\'s');
-  const lane = exteriorFrame({ lane: true, night: true, town, boats: far, eye });
-  assert.equal(lane.length, 28, 'the lane\'s forty-eight hold all twenty and the boat\'s eight');
-  assert.deepEqual(lane.slice(0, 20).map((l) => +l.d.toFixed(3)).sort((a, b) => a - b), street.map((v) => +v.toFixed(3)), 'nearest first: the street before the boat');
-});

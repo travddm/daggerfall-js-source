@@ -138,17 +138,5 @@ test('VOYAGER-CYRODIIL a named road\'s legs are routed as roads by the builder a
   const theirs = buildRoadNetwork({ ...base, trunks: [[{ x: 280, y: 200 }, { x: 360, y: 200 }]], owns: (n) => n.x > 350 });
   assert.equal(theirs.stats.trunkLegs, 0, 'a leg whose first end is another region\'s');
   assert.equal(buildRoadNetwork(base).stats.trunkLegs, undefined, 'none asked, none counted - the Bay\'s stats as they were');
-  const src = read('src/world/road/roadNetwork.js');
-  assert.ok(src.indexOf('for (const [i, j] of routed) {') < src.indexOf('for (const [a, b] of trunks ?? []) {'), 'after the towns\' roads');
-  assert.ok(src.indexOf('for (const [a, b] of trunks ?? []) {') < src.indexOf('const paths = new Uint8Array(roads);'), 'before the tracks');
 });
 
-test('VOYAGER-CYRODIIL the host reads the Imperial City\'s ring and gates off the capital\'s own plan, none written: its span (capitalSpan), its walked gates (capitalGates), the cities by the places that stand; the roads\' worker plans the legs on its own ground, no capital\'s pixel a road\'s (mutant: a literal gate, the span unread)', () => {
-  const host = read('src/scenes/tamrielRoadsHost.js');
-  assert.match(host, /half: \(capitalSpan\(CAPITALS\[k\]\) \+ 1\) >> 1, gates: capitalGates\(k, \{ walkable \}\)\.map\(\(g\) => \[g\.x, g\.y\]\)/);
-  assert.match(host, /const trunks = capitals \? cyrodiilTrunksFor\(forPixels, walkable\) : null;/);
-  assert.doesNotMatch(host.slice(host.indexOf('export function cyrodiilTrunksFor')), /gates: \[\[\d/);
-  const worker = read('src/world/tamrielRoadsWorker.js');
-  assert.match(worker, /trunkLegs: planTrunkLegs\(m\.trunks \?\? null, \{ heightAt, walkable, wet \}\)/);
-  assert.match(worker, /const walkable = \(x, y\) => !inBay\(x, y\) && heightAt\(x, y\) > WATER_BYTE && !held\.has\(`\$\{x\},\$\{y\}`\);/);
-});

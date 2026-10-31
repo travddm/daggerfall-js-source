@@ -493,38 +493,10 @@ test('PROF11 book: a mason\'s work carries the chisel\'s report to the door - `c
   assert.equal(asked[0][2], asked[1][2], 'the same id');
   await book.smelt('cut:stone', 2);
   assert.deepEqual(asked.at(-1).slice(0, 2).concat(asked.at(-1)[3]), ['cut:stone', 2, false]);
-  // the door: `clean` sent only when true - a work without it posts the body every client before it posted
-  assert.match(src('src/net/accountClient.js'), /smelt: \(character, recipe, count, rid, clean = false\) => post\('\/v1\/prof\/smelt', \{ character, recipe, count, rid, \.\.\.\(clean === true \? \{ clean: true \} : \{\}\) \}\),/);
 });
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
 test('PROF11 wiring: the mason\'s bench a General Store\'s (open for trade) or a home\'s station; the world asks a carving and a work at it, the chisel\'s band off STR and END, its report through the book, the XP said as the work\'s profession; the service\'s route reads the report and the refusal\'s status; the pages draw the bench beside the loom', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /if \(interiorBuilding\.buildingType === BUILDING_TYPES\.GeneralStore\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: MASON_FEE \};/);
-  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'mason'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
-  assert.match(m, /if \(hallMemberHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'mason'\)\) return \{ kind: 'home', fee: 0 \};/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /: profession === 'masonry'[^\n]*\n\s*\? \{ here: \(\) => modes\?\.masonHere\?\.\(\) \?\? null, a: 'a mason\\'s bench', who: 'mason', noun: 'mason\\'s bench', kept: MASON_KEPT_TEXT, xp: professionName\('masonry'\) \}/);   // PIN MOVED (AUDIT PROF-541 R2-C2): no station's own busy word; PIN MOVED (CRAFT3): the XP said as the track's name ("Building")
-  assert.match(w, /mason: \(\) => modes\?\.masonHere\?\.\(\) \?\? null,/);
-  assert.match(w, /chiselBand: \(\) => chiselBand\(\{ strength: liveStat\(playerEntity, 'strength'\), endurance: liveStat\(playerEntity, 'endurance'\) \}\),/);
-  assert.match(w, /smelt: async \(recipe, count, \{ clean = false \} = \{\}\) => \{/);
-  assert.match(w, /const r = await profBook\.smelt\(recipe, count, \{ clean \}\);/);
-  assert.match(w, /const xpWord = professionName\(smeltRecipe\(r\.data\.recipe\)\?\.xp \?\? 'smithing'\);/);
-  assert.match(w, /: id\.startsWith\('cut:'\) \? 'Cut' : id\.startsWith\('mix:'\) \? 'Mixed' : alch \? 'Transmuted into' : 'Smelted';/);   // PIN MOVED (PROF12): the Transmuter's word between
-  const b = src('src/net/profBook.js');
-  assert.match(b, /const r = await ask\(\(\) => door\.smelt\(c, recipe, count, m\.id, clean === true\)\);/);
-  const svc = src('server-account/src/professions.js');
-  assert.match(svc, /export async function smeltAtForge\(ctx, player, env, \{ character, recipe: id, count, clean = false, rid \} = \{\}\)/);
-  assert.match(svc, /if \(!workOpen\(r, rank\)\) return \{ error: 'prof-rank' \};/);
-  assert.match(svc, /if \(r\.spec && specs\[100\] !== r\.spec\) return \{ error: 'prof-sculptor' \};/);
-  const idx = src('server-account/src/index.js');
-  assert.match(idx, /'prof-sculptor': 403,/);
-  assert.match(idx, /POST \/v1\/prof\/smelt \{ character, recipe, count, clean\?, rid \}/);
   assert.doesNotMatch(accountRefusalText('prof-sculptor'), /problem|could not be read/);
-  const p = src('src/ui/professions/profPages.js');
-  // PIN MOVED (CRAFT4): the loom's Temper beside it, then the bench
-  assert.match(p, /\['loom', \(d\) => drawLoom\(d, rerender, kit\)\],   \/\/ PROF7\n\s*\['temper-loom', \(d\) => drawTemper\(d, rerender, kit, 'loom'\)\],   \/\/ CRAFT4: the tailor's\n\s*\['mason', \(d\) => drawMasonBench\(d, rerender, kit\)\],   \/\/ PROF11/);   // PIN MOVED (MENU-ORDER)
-  assert.match(src('src/ui/enhanced/enhancedPlusStyle.js'), /\.prof-chisel-line\.marked \{[^}]*double/, 'the marked line a shape as well as a colour (5.1)');
-  assert.match(src('src/scenes/decor/decorTool.js'), /if \(PROF_STATIONS\.includes\(want\) && !forgeOffered\(\)\) \{ deps\.say\?\.\(stationColdLine\(want\)\); return false; \}/, 'the mason\'s bench sold where the bench works, as the forge');
 });

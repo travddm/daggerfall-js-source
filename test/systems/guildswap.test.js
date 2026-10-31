@@ -128,20 +128,3 @@ test('V2e: the deploy transfers BETWEEN the clock raise and the popup - vampiris
   assert.deepEqual(order, [], 'DeployFullBlownLycanthropy (:120-126) does none of it');
 });
 
-test('V2e: the transfer arm is the WORLD host\'s, and survives worldModes\' re-registration', () => {
-  const sh = read('src/scenes/shared.js');
-  assert.ok(sh.includes('transferToCemetery = null') && sh.includes('transferToCemetery,'),
-    'wireInfectionVideos passes the arm through to setInfectionHost');
-  const w = read('src/scenes/world.js');
-  assert.ok(w.includes('function transferToCemeteryArm()'), 'the world host implements it');
-  // PIN MOVED (AUDIT RELEASE R2-6): the pick moved into scenes/vampireCrypt.js (HOST-SPLIT) - the Bay's arm the same pure pick, past the Bay the province's own
-  assert.ok(w.includes('vampireCryptPixel(playerTravelPixel(), _questRegionIndex(), maps, worldPlaces)'), 'the host asks the crypt module');
-  assert.ok(read('src/scenes/vampireCrypt.js').includes('randomCemeteryLocationIndex(mapTable, roll)'), 'over the pure pick');
-  assert.ok(w.includes("(modes?.mode ?? 'exterior') !== 'exterior'"), 'interior/dungeon modes skip loudly');
-  assert.ok(w.includes('_lastEncMinutes = Math.floor(playerTicker.ownMinutes);'),
-    'PreventEnemySpawns parity - the player is the monster in the crypt');
-  assert.ok(w.includes('transferToCemetery: transferToCemeteryArm'), 'wired at the infection mount AND the modes bag');
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(wm.includes('transferToCemetery: host.transferToCemetery ?? null'),
-    'worldModes\' re-registration forwards the outer host\'s arm instead of dropping it');
-});

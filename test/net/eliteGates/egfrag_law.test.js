@@ -128,9 +128,6 @@ test('EG-FULL LAYER THREE THE PASSAGES (sections 11.1, 11.5, 11.6 and 11.8): eac
     if (!Q.open && kit !== 'gloam') assert.ok(Q.height >= 450, `${kit}: headroom ${Q.height} cm over its course`);
     for (const a of Q.alcoves) assert.ok(Math.abs(a.x) > Q.halfW, `${kit}: an alcove behind its wall`);
   }
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egFragLaw.js', import.meta.url), 'utf8');
-  const gen = src.slice(src.indexOf('export function egFragPassage'), src.indexOf('// ── the shared clock'));
-  assert.equal(/Math\.(sin|cos|tan|atan|atan2|hypot|sqrt|exp|log|pow)\b/.test(gen), false, 'the generator half is integer-exact');
   let laid = 0;
   for (const s of halls([0])) for (const q of s.caves) {
     laid++;

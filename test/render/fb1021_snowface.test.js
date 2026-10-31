@@ -38,7 +38,6 @@ test('SNOW-FACE THE CHUNK READS NO SLOPE: the ground\'s cover is its height\'s a
   assert.match(core, /float snowCover\(vec2 local, float y, vec2 gx, vec2 gy\) \{/);
   assert.match(core, /float snowLaid\(vec2 local, float y, vec2 gx, vec2 gy\) \{/);
   assert.doesNotMatch(core, /smoothstep\(0\.62|n\.y|vNormal|aNormal/, 'no face sheds it');
-  assert.match(read('src/render/waterSurface.js'), /float pc = snowCover\(vLocalXZ, vWorldPos\.y, wgx, wgy\);/, 'the water\'s bed');
   for (const p of ['src/render/renderer.js', 'src/render/enhancedLighting.js']) assert.match(read(p), /float snowC = snowCover\(vLocalXZ, vWorldPos\.y, gx, gy\);/, p);
   const [ox, oz] = ecoOrigin(917, 472), f = chunk([ox, oz, 0]);
   // AUDIT FB1021 L1-5: every second world tile of the pixel, not four places - the patches round a cover a shade under
@@ -102,7 +101,4 @@ test('LANE-TURN: a pixel built under the other lane goes to the REBUILD the seas
   host.tick({ px: 200, py: 100 });
   assert.deepEqual(reskin.take(built), ['200,100'], 'built on the lane, the lane turned off: rebuilt off it, at once');
   assert.deepEqual(skinned, [], 'never sent to the skin');
-  // why a skin cannot serve: the build's own re-skin refuses a pixel with no `_skin` (off the lane) and any off the lane
-  assert.match(read('src/scenes/pixelBuild.js'), /const p = built\.get\(key\), sk = p\?\._skin;\n {4}if \(!sk \|\| !snowCover\?\.on\) return false;/);
-  assert.match(read('src/scenes/world.js'), /markReskin: \(key\) => _reskin\.skin\(key\), markRebuild: \(key\) => _reskin\.mark\(key\),/);
 });

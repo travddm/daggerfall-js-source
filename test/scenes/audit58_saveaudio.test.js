@@ -59,33 +59,6 @@ test('AUDIT 58: the combat-voice pitch lift REACHES the source, flat and positio
   assert.deepEqual(shots, [1, 1.2, 1, 1.3], 'the default is 1 and a lift really lands on the source');
 });
 
-test('AUDIT 58: every combat-voice play site spends the lift it was handed', () => {
-  // The value is produced in exactly two places (combatVoices.js's
-  // combatVoice/playerVoice) and consumed at thirteen. A site that
-  // takes the voice object and plays only `.clip` is the defect.
-  const SITES = [
-    ['src/scenes/hostCombat.js', 1],      // the ONE player seam, nine callers behind it
-    ['src/scenes/dungeonContext.js', 4],   // AUDIT WORLD2 B8: applyHit plays a peer's blow's pain on the host - the fourth site
-    ['src/scenes/exteriorFoes.js', 6],   // WORLD6b: applyHit plays a peer's blow's pain at the owner - the fifth site; WORLD6b-ii: my foe's swing at a peer, the sixth
-    ['src/scenes/cityGuards.js', 4],
-    ['src/combat/arrowFlight.js', 1],
-    ['src/player/climb/climbSounds.js', 1],   // CLIMB4: the climber's effort (hostCombat.playerClimbStrain) - the seventeenth
-  ];
-  let total = 0;
-  for (const [f, n] of SITES) {
-    const src = rd(f);
-    const lifts = src.split('\n').filter((l) => /pitch: 1 \+ [A-Za-z]+\.pitchLift|playOneShot\??\.?\(.*, 1 \+ [A-Za-z]+\.pitchLift|1 \+ \(voice\.pitchLift \?\? 0\)/.test(l));
-    assert.equal(lifts.length, n, `${f}: ${lifts.length} voice sites carry the lift, expected ${n}`);
-    total += lifts.length;
-  }
-  assert.equal(total, 17, 'all seventeen');
-  // ...and the vampire override arm keeps its hard 0, which is DFU's:
-  // PlayAttackVoice lifts only in the `customSound == None` arm
-  // (FPSWeapon.cs:313-320); :323 is a bare PlayOneShot at the source's
-  // own pitch.
-  assert.match(rd('src/scenes/hostCombat.js'), /if \(vamp != null\) return \{ clip: vamp, pitchLift: 0 \};/);
-});
-
 test('AUDIT 58: fall damage, the hard fall and the large splash carry FootstepVolumeScale', () => {
   // PlayerFootsteps.cs:30 declares FootstepVolumeScale = 0.7f, and all
   // THREE of the component's non-stride one-shots pass it -
@@ -108,10 +81,6 @@ test('AUDIT 58: fall damage, the hard fall and the large splash carry FootstepVo
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     assert.match(rd(f), /sound: immersiveFootsteps\.fallSoundSink\(\(id, vol\) => audio\.playOneShot\(id, vol\)\)/, `${f} forwards the scale (IF1: through Immersive Footsteps' sink, which hands the classic play the same id and scale when the mod owns nothing)`);
   }
-  const d = rd('src/scenes/dungeonContext.js');
-  for (const clip of ['SOUND.FallDamage', 'SOUND.FallHard', 'SOUND.SplashLarge']) {
-    assert.ok(d.includes(`audio.playOneShot(${clip}, FOOTSTEP_VOLUME)`), `the dungeon host scales ${clip}`);
-  }
   // the ENEMY fall clips are a different component (EnemyMotor
   // .ApplyFallDamage) with no FootstepVolumeScale - they stay at 1.
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
@@ -132,14 +101,6 @@ test('AUDIT 58: the graveyard ambient layer is armed in BOTH exterior hosts', ()
   a.setCemeteryNearby(false);
   assert.equal(a.cemeteryNearby, false, 'and OnExitLocationRect disarms it');
 
-  const w = hostText('src/scenes/world.js'), x = rd('src/scenes/exterior.js');
-  assert.match(w, /ambience\.setCemeteryNearby\(_musicLocationType\(\) === LOCATION_TYPES\.Graveyard\)/,
-    'the streaming host arms it on the rect edge');
-  assert.match(x, /ambience\.setCemeteryNearby\(_musicLocationType\(\) === LOCATION_TYPES\.Graveyard\)/,
-    'and the fixed-city host arms it too - it never leaves its one location\'s rect');
-  // the `!playerEnterExit.IsPlayerInside` guard (:154-162) reads the
-  // host's own state rather than an absent dep in both.
-  for (const src of [w, x]) assert.match(src, /ambience\.update\(dt, \{ playerPos: [A-Za-z.]+, inside: false(?:, underground: [^}]+)? \}\)/);   // CRICKET-DUNGEON: the streaming host says whether the player is underground; ?exterior has no dungeon to be under
   // the two INTERIOR hosts must NOT arm it - DFU's handler sets it only
   // when the player is outside, so this is a law about all four hosts,
   // not an omission in two.

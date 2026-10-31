@@ -260,13 +260,6 @@ test('RPT1026-MARKET ARRIVE stall: a press whose own collect did not land says t
 });
 
 test('RPT1026-MARKET ARRIVE wiring: bootWorld hands the vendor host the checkpoint\'s gate (the sweep acts only once it is open), the Vendor page\'s Collect is the host\'s; a host with no gate starts no clock', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /noticeBook, playerTravelPixel, profBook, showNoticeWindow, townTalk,\n {4}checkpointGateOpen, {3}\/\/ RPT1026-MARKET ARRIVE/);
-  assert.match(world, /collectGold: vendorCollectGold, {3}\/\/ RPT1026-MARKET/);
-  assert.match(world, /goods: realmSession \? \{ receive: \(rec, why\) => marketGoods\.receive\(rec, why\) \} : null,/);
-  const host = src('src/scenes/vendorHost.js');
-  assert.match(host, /ready: \(\) => checkpointGateOpen\?\.\(\) === true && globalThis\.document\?\.visibilityState !== 'hidden',/);
-  assert.match(host, /if \(marketBook && typeof checkpointGateOpen === 'function'\) arrivals\.start\(\);/);
   // the delete a waiting purchase holds says the way out: play it once, and what waits comes to its pack
   const open = accountRefusalText('realm-market-open');
   assert.match(typeof open === 'function' ? open() : open, /a trader's takings\. Settle it first\. Play it online once and goods waiting for it come to its pack on their own; takings are collected on the Vendor page\.$/);

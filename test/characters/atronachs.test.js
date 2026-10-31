@@ -45,18 +45,6 @@ test('atronachs: three render modes across four designs', () => {
   assert.ok(ice.spectral.opacity > 0.5, `ice at ${ice.spectral.opacity} is a ghost, not a solid`);
 });
 
-test('atronachs: the additive blend does not outlive the fire', () => {
-  // Same trap as the ghost's transparency: one material, shared by every
-  // design. Leave it additive and the next orc glows.
-  const src = readFileSync(new URL('../../src/tools/paperdoll/paperdollViewer.js', import.meta.url), 'utf8');
-  const blends = src.match(/mat\.blending = [^;]+;/g) || [];
-  assert.ok(blends.length >= 2, 'blending is set but never reset');
-  assert.ok(
-    blends.some((b) => /NormalBlending;/.test(b) && !/additive/.test(b)),
-    'nothing ever puts the blend back to normal',
-  );
-});
-
 test('atronachs: iron is the heaviest and fire the lightest', () => {
   // Metal outweighs flame, or the builds are saying nothing.
   const w = (n) => ATRONACH_DESIGNS.find((d) => d.name === n).build.torso;

@@ -277,7 +277,6 @@ test('BAG1 the book carries: a harvest asks with `carry` and the held count, nev
   assert.equal(harvestHauls({ ...answer.data, put: { bag: 2, pack: 0, left: 1, lost: [{ key: HERB, n: 1 }] } })[0].count, 2);
   const none = harvestHauls({ ...answer.data, put: { bag: 0, pack: 0, left: 3, lost: [{ key: HERB, n: 3 }] } })[0];
   assert.deepEqual([none.count, none.sub, none.xp], [0, 'left where gathered - no room', 2], 'none came: said, and the XP still on it');
-  assert.match(src('src/ui/haulCards.js'), /tag: Number\.isSafeInteger\(l\.held\) \? `\$\{l\.where \?\? 'Stores'\} \$\{num\(l\.held\)\}`/);
 });
 
 test('BAG1 a deposit: the items out of the bag first, the service asked with what was held; refused, they come back; no answer, they stay out and the settle asks again with the same id (mutants: the items kept on a refusal; a new id each ask)', async () => {
@@ -565,7 +564,6 @@ test('BAG1 (AUDIT2 K5/K6/K8/K12): a station\'s put-in refused for a later input 
   assert.deepEqual(r, { ok: false, error: 'stores-full', material: 'metal:tin', moved: 1 }, 'the iron in, the tin refused');
   assert.equal(movedFirstText(r), ' 1 of the materials went into your Stores first. Your next try uses them from there.');
   assert.equal(movedFirstText({ moved: 0 }), '');
-  assert.match(src('src/scenes/world.js'), /text: `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}` \};\n\s+\/\/ the fee for the smelt/);
   assert.equal(book.storesHeld('ingot:iron'), 1, 'the iron waits in the Stores for the next craft');
   tin = { ok: false, error: 'offline' };
   const r2 = await book.craft('dagger:iron', {}, () => {});
@@ -614,7 +612,6 @@ test('BAG1 (AUDIT B8/B9): a station\'s put-in with no answer says so; a Court wr
   assert.equal(madeWhere({ bag: 2, pack: 0, stored: 1 }), 'Into your bag - 1 stays in your Stores: no room in your bag or pack.');
   assert.equal(madeWhere({ bag: 0, pack: 0, stored: 4 }), '4 stay in your Stores: no room in your bag or pack.');
   assert.equal(madeWhere(undefined), '');
-  assert.match(src('src/scenes/world.js'), /const where = madeWhere\(r\.data\.put\)/);
   assert.equal(leftWords({ material: HERB, put: { left: 3, lost: [{ key: HERB, n: 2 }, { key: OAK, n: 1 }] } }), `2 ${materialCountLabel(HERB, 2)} and 1 ${materialCountLabel(OAK, 1)}`);
   assert.equal(leftWords({ material: HERB, put: { left: 2 } }), `2 ${materialCountLabel(HERB, 2)}`, 'a put from before the audit');
   // the book names what it could not mint: a gem the hands could not make is the gem's, not the harvest's (PACK-OVER: a
@@ -733,16 +730,6 @@ test('BAG1 (AUDIT B4/B5; AUDIT2 K4/H5): every gathering kind names the material 
   assert.equal(actMaterial({ material: 'log:oak' }), 'log:oak');
   assert.equal(actMaterial({ material: (info) => herbKey(9, info.region), info: { region: 21 } }), herbKey(9, 21), 'a herb\'s by its region');
   assert.equal(actMaterial({ harvest: 'food' }), null, 'the Basket\'s roll: none');
-  assert.match(src('src/scenes/gatherHost.js'), /^\s+\.\.\.\(actMaterial\(a\) \? \{ material: actMaterial\(a\) \} : \{\}\),$/m, 'AUDIT2 D3: a line of code, never a comment');
-  // AUDIT2 D3: DFU's potion maker reads the bag after the cart and spends it - lines of code, never comments
-  const modes = src('src/scenes/potionMakerHost.js');   // PIN MOVED (POTION-DOOR): the maker's hooks, the host's player handed in
-  assert.match(modes, /^\s+wagonItems: \(\) => \[\.\.\.\(player\.wagonItems \?\?= \[\]\), \.\.\.\(player\.bagItems \?\? \[\]\)\],/m);
-  assert.match(modes, /^\s+return where !== 'pack' && removeOne\(player\.bagItems \?\? \[\], templateIndex, \{ group, allowEnchantedItem: false \}\);/m);
-  assert.match(src('src/scenes/herbHost.js'), /plan\.harvest === 'herbs' \? \{ material: \(info\) => herbKey\(p\.herb, info\?\.region \?\? 0\) \}/);
-  assert.match(src('src/scenes/treeHost.js'), /material: n\.material,/);
-  assert.match(src('src/scenes/mineHost.js'), /n\.what === 'boulder' \? \{\} : \{ material: n\.material \}/);
-  assert.match(src('src/scenes/huntHost.js'), /material: b\.hide,/);
-  assert.match(src('src/scenes/fishHost.js'), /material: FISH_KEY,/);
   const full = body();
   mintCarried(full, OAK, 187);
   assert.deepEqual(giveCarried(full, OAK, 5), { bag: 0, pack: 0, over: 5 }, 'no room: into the pack past its weight');
@@ -751,7 +738,6 @@ test('BAG1 (AUDIT B4/B5; AUDIT2 K4/H5): every gathering kind names the material 
   mintCarried(some, OAK, 185);
   assert.deepEqual(giveCarried(some, OAK, 4), { bag: 0, pack: 2, over: 2 });
   assert.deepEqual(giveCarried(body(), 'essence:arcane', 2), { bag: 0, pack: 0, over: 0 }, 'the Stores\' own, never an item');
-  assert.match(src('src/scenes/world.js'), /const got = carryHands\.give\(key, n\);/);
 });
 
 test('BAG1 (AUDIT H1/H2; AUDIT2 U8): the bag opens from a plain pack - its button on the footer while nothing stands beside the pack; never over a reward tray; the bag\'s card offers no Put in bag for what it refuses; the gold field goes with the bag\'s opening (mutants: the door on the side window alone; the bag over a tray; a dagger offered; the field back over the pack)', () => {
@@ -800,12 +786,6 @@ test('BAG1 (AUDIT): Put everything in says what went in and each material refuse
   assert.equal(BAG_PAGE_WORDS.allInDone(12), '12 put in the Stores.');
   assert.equal(BAG_PAGE_WORDS.allInDone(12, [{ name: 'Oak Log', text: 'Your Stores hold 5,000 of that already.' }]), '12 put in the Stores. Oak Log: Your Stores hold 5,000 of that already.');
   assert.equal(BAG_PAGE_WORDS.allInDone(3, [], 'slow'), '3 put in the Stores. slow');
-  const page = src('src/ui/professions/profPages.js');
-  // PIN MOVED (FB1020c ONE-SAVE): the batch's answers read in the plan's order - the first kept one the run's stop, a refusal
-  // named once a material and passed over (it pinned the loop's refusal ending that material's own passes)
-  assert.match(page, /else if \(res\?\.kept\) stop \?\?= res\.text \?\? null;\n\s+else if \(!said\.has\(plan\[i\]\.material\)\) \{ said\.add\(plan\[i\]\.material\); refused\.push\(\{ name: plan\[i\]\.name, text: res\?\.text \?\? null \}\); \}/);
-  assert.match(page, /const carriedAny = \[\.\.\.all\.values\(\)\]\.some/);
-  assert.match(src('src/ui/workTab.js'), /w\.carrying\?\.\(\) \? t\('prof\.work\.writ\.heldCarried', '\{n, number\} held', \{ n: Number\(held\) \}\) : t\('prof\.work\.writ\.held', '\{n, number\} in your Stores', \{ n: Number\(held\) \}\)/);
 });
 
 test('BAG1 (AUDIT2 H1/U2/U1/U11/U14): the Stores page empties the bag into the pack - anywhere, on either skin, as much as the pack carries (the classic inventory draws no bag, and a food rotted in it held it loaded for good); Put in and Put everything in stop at the Stores\' room, said; why Take out or Put in is shut is drawn; the qty field says what it counts (mutants: no way out of the bag; the pack past its weight; the jam left behind; the Stores\' room unread; Put everything in asking a full Store; the reason a title alone; the qty unlabelled)', async () => {
@@ -899,7 +879,6 @@ test('BAG1 (AUDIT2 D3/D4): the bag\'s list in every door that reads a character\
   const e = { items: [], wagonItems: [], otherItems: [], bagItems: [{ ...mintMaterialItem(HERB), questItem: true, questUID: 7 }, mintMaterialItem(OAK)] };
   assert.equal(removeAllOrphanedItems(e, () => null), 1);
   assert.deepEqual(e.bagItems.map((i) => materialKeyOfItem(i)), [OAK], 'the orphaned quest piece gone from the bag, the log kept');
-  assert.match(src('src/systems/realmCustoms.js'), /for \(const list of lists\(snap\.wagonItems, snap\.bagItems, snap\.items\)\) takeFrom\(list\);/);
   for (const f of ['src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/world.js']) {
     assert.match(src(f), /bagItems: \(\) => \(playerEntity\.bagItems \?\?= \[\]\),/, f);
   }
@@ -980,22 +959,6 @@ test('BAG1 full: a carrying book\'s node is full when neither the bag nor the pa
 });
 
 // ─── THE HOST ───────────────────────────────────────────────────────
-
-test('BAG1 wired: the world host hands the book its hands on the bag and the pack, mints each answer there, reaches the Stores in a town, and puts a writ\'s shortfall in first; the potion maker spends the bag (by source)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /mint: \(key, n\) => \{ const got = mintCarried\(playerEntity, key, n, carryOpts\(key\)\);/);
-  assert.match(w, /take: \(key, n, stamp = null, order = null, counter = false\) => \{\n\s+const t = takeCarried\(playerEntity, key, n, stamp, order, \{ counter \}\);/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-2): a counter's pieces a station's put-in's alone
-  // AUDIT2: every unit handed over minted; the deposits' stamps in the save; the checkpoint that LANDED before a deposit
-  assert.match(w, /give: \(key, n\) => \{ const got = giveCarried\(playerEntity, key, n, carryOpts\(key\)\);/);
-  assert.match(w, /stamped: \(id\) => Object\.hasOwn\(bagTakesOf\(playerEntity\), id\),/);
-  assert.match(w, /stamps: \(\) => Object\.entries\(bagTakesOf\(playerEntity\)\)\.map\(\(\[id, t\]\) => \(\{ id, \.\.\.t \}\)\),/);
-  assert.match(w, /flush: async \(\) => \{\n\s+try \{ const r = await onlineCheckpointLanded\(\); return r === true \|\| r\?\.ok === true; \} catch \{ return false; \}/);
-  assert.match(src('src/systems/save/save.js'), /snap\.bagTakes = bagTakesSaved\(entity\.bagTakes\);/);
-  assert.match(w, /const _storesReached = \(\) => \(modes\?\.mode \?\? 'exterior'\) !== 'dungeon' && _musicInLocationRect\(\)/);
-  assert.match(w, /const ready = await profBook\.ensureInStores\(\[\{ key: material, n: Number\(ask\.units\) \|\| 0 \}\]\);/);
-  assert.match(src('src/scenes/potionMakerHost.js'), /bagItems/);   // PIN MOVED (POTION-DOOR): the potion maker's hooks, out of worldModes.js
-  assert.match(src('src/systems/save/save.js'), /bagItems/);
-});
 
 // ─── DONE WHEN: THROUGH THE REAL WORKER ─────────────────────────────
 

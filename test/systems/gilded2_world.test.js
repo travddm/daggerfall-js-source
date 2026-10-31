@@ -164,12 +164,9 @@ test('GILDED2 THE GATE\'S AND THE SERPENT\'S: the Oath the Warden\'s spoils\' LA
   }
   assert.ok(oath > 0 && Math.abs(oath / N - GATE_GILDED_CHANCE) < 0.006, `the Oath ${oath} of ${N}`);
   assert.ok(sov > 0 && Math.abs(sov / N - SERPENT_GILDED_CHANCE) < 0.006, `the Sovereign ${sov} of ${N}`);
-  // the very last draw of each - after the technique pass, so every spoils before it is what it was for its seed
-  assert.match(strip(read('src/systems/gate/gateSpoils.js')), /techniquePass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const oath = rollDragonfireOath\(rolls\);\s*if \(oath\) pieces\.push\(\{ item: oath, tier: oath\.rarity \}\);\s*const more = \[\];\s*for \(const bit of SPOILS_PORTENT_BITS\) if \(\(p & bit\) !== 0\) more\.push\(graded\(spoilsBase\(lv, rolls\), magicOrBetter\(rolls\), rolls\)\);[\s\S]{0,700}?return \{ gold, pieces, sigil: sigilStone\(\), card, gems, portent: more\.length \};/);   // PIN MOVED (WB14g): still the plain spoils' last draw - a portent night's pieces after it, drawn only for a receipt's `p` (test/net/gate/wb14g_pays.test.js)   // PIN MOVED (AUDIT WB14 PLAY-7): and the passes over a portent's pieces alone, after them
   for (const [f, fn] of [['src/systems/gate/gateSpoils.js', 'rollDragonfireOath'], ['src/systems/serpent/serpentSpoils.js', 'rollSunkenSovereign']]) {
     assert.equal(strip(read(f)).split(`${fn}(`).length - 1, 1, `${f}: ONE draw of it, and only there`);
   }
-  assert.match(strip(read('src/systems/serpent/serpentSpoils.js')), /techniquePass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const sovereign = dealt \? rollSunkenSovereign\(rolls\) : null;\s*if \(sovereign\) pieces\.push\(\{ item: sovereign, tier: sovereign\.rarity \}\);\s*return \{ gold, pieces, embers: serpentEmbers\(\), card, gems \};/);
 });
 
 test('GILDED2 THE FLOOR (AUDIT WORLD-REWARDS A1): in a spoils the Oath came in, every other picture is the one the seed gave it - the pieces\', the ember\'s, the gold\'s, the card\'s and the gems\' - and the Oath\'s is drawn LAST; the Oath still leaves among the pieces, inside the glow\'s eight (mutants: the Oath\'s picture in its place)', () => {

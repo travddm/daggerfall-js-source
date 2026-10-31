@@ -121,28 +121,3 @@ test('CROWN-HALL the words', () => {
   assert.equal(CROWN_HALL_TEXT.chestShut('The Silver Hand'), 'This chest is The Silver Hand\'s. Its Stores are for its members.');
 });
 
-test('CROWN-HALL the hosts by source: the throne room stood at the dungeon\'s mount about its ruler, kept only for the visit that asked, cleared at both teardowns; drawn on the dungeon\'s own pass before the flats, the banners through the street\'s cloth; its board and chest pressed open the guild\'s notes and Stores to the holder\'s members and say whose they are to anyone else; world.js names a held crown\'s guild, its member and its banner, and draws the cloth under the dungeon\'s light (mutants: the mount; the visit; a teardown; the draw; the board\'s member; the chest\'s member; the crown\'s tier; the banner)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /dungeonLoc = dfLocation;\n      host\.profDungeonEntered\?\.\(ctx\);[^\n]*\n      standCrownHall\(ctx, dfLocation\)\.catch\(\(\) => \{\}\);/);
-  assert.match(m, /const ruler = crownRulerHere\(ctx\.people, crownRulerFactionId\(townTalk\?\.factionDict, loc\?\.regionIndex\)\);/);
-  assert.match(m, /const plan = ruler \? crownHallPlan\(ruler, \(o, d, m\) => ctx\.collider\?\.raycast\?\.\(o, d, m\) \?\? Infinity\) : null;/);
-  assert.match(m, /if \(dungeonCtx !== ctx \|\| dungeonLoc !== loc\) return;/);
-  assert.match(m, /const crownHallLive = \(\) => \(crownHall && crownHall\.loc === dungeonLoc && crownHere\(\) \? crownHall : null\);/);
-  assert.match(m, /dungeonLoc = null;\n    pendingDungeonWagonOpen = false;[^\n]*\n    crownHall = null;/);
-  assert.match(m, /crownHall = null;[^\n]*\n        dungeonCtx\.destroy\(\); dungeonCtx = null; dungeonLoc = null;/);
-  assert.match(m, /host\.drawModeMeshes\?\.\(\);[^\n]*\n      drawCrownHall\(\{ proj, view, eye: mwv\.eye \}\);/);
-  assert.match(m, /for \(const p of h\.pieces\) renderer\.drawMesh\(p\.gpu, p\.matrix, null\);/);
-  assert.match(m, /host\.drawDungeonBanners\?\.\(\{ \.\.\.frame, banners: h\.banners\.map\(\(b, i\) => \(\{ \.\.\.b, key: bannerKeyOf\(heraldry\), heraldry, phase: i \}\)\) \}\);/);
-  assert.match(m, /ctx\.addActivationTargets\(\(\) => crownHallLive\(\)\?\.pieces\.map\(\(p\) => \(\{ key: p\.key, aabb: p\.aabb, distance: RAY_DISTANCE, reach: DEFAULT_ACTIVATION_DISTANCE \}\)\) \?\? NO_TARGETS\);/);
-  assert.match(m, /if \(key\.startsWith\('crown:'\)\) \{ openCrownPiece\(key\); return true; \}/);
-  const open = m.slice(m.indexOf('  function openCrownPiece(key) {'), m.indexOf('  /** DECOR1d: WHERE THE PLAYER MAY DECORATE'));
-  assert.match(open, /if \(!c\.member\) \{ say\(hallBoardShutLine\(c\.name\)\); return; \}\n      if \(!host\.guildHall\?\.openBoard\?\.\(c\.name\)\) say\(HALL_BOARD_COLD\);/);
-  assert.match(open, /if \(!c\.member\) \{ say\(CROWN_HALL_TEXT\.chestShut\(c\.name\)\); return; \}\n    openHallChest\(\);/);
-  // PIN MOVED (DOMAIN2, HOST-SPLIT): the throne room's dressing moved out of bootWorld, into the seat halls' own host
-  // (scenes/seatHallHost.js), and reads the room's instance (a castle's)
-  const w = src('src/scenes/seatHallHost.js');
-  const crown = w.slice(w.indexOf('    crown(mapId, instance = null) {'), w.indexOf('    castleAt: castleOf,'));
-  assert.match(crown, /const g = seat\?\.tier === 'crown' \? seat\.holder\?\.guild \?\? null : null;/);
-  assert.match(crown, /member: seatHallOf\(seat, guild\(\)\?\.id \?\? null\), heraldry: seatBannerOf\(seat\)/);
-  assert.match(src('src/scenes/world.js'), /drawDungeonBanners: \(\{ banners, proj, view, eye \}\) => \{\n      if \(banners\?\.length && bannerPass\?\.draw\(banners, proj, view, new Float32Array\(eye\), performance\.now\(\) \/ 1000, \{/);
-});

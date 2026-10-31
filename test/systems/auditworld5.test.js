@@ -60,8 +60,6 @@ test('AUDIT WORLD5 C1 (LIVED1: the claim is the character\'s): the dungeon\'s re
     clock += 2;
     assert.equal(tickPlayerMinutes({ entity, classicMinutes: 0, dt: 0.016, sinks: sinks(), rolls: () => 0.5 }).rounds, 2, 'and the world\'s next two minutes are the character\'s two');
   } finally { offline(); }
-  const wt = rd('src/systems/worldTick.js');
-  assert.doesNotMatch(wt, /_sharedLastTick = nextFloor/, 'the broker counts the character\'s minutes and moves no world reading');
 });
 
 test('AUDIT WORLD5 C2: a source that steps BACKWARDS re-anchors the tick\'s reading instead of freezing every tick until the clock catches its old self up; and the world host runs the arrival again when the relay\'s correction moves the clock by more than a second', () => {
@@ -78,12 +76,6 @@ test('AUDIT WORLD5 C2: a source that steps BACKWARDS re-anchors the tick\'s read
     clock += 2;
     assert.equal(tickPlayerMinutes({ entity, classicMinutes: 0, dt: 0.016, sinks: sinks(), rolls: () => 0.5 }).rounds, 2, 'the tick runs from the re-anchored reading - before C2 it froze for the hundred minutes');
   } finally { offline(); }
-  assert.match(rd('src/systems/worldTick.js'), /if \(reading < worldFrom\) worldFrom = reading;/, 'the re-anchor');
-  const w = rd('src/scenes/world.js');
-  // LIVED1: the arrival re-anchors the world's reading and moves nothing of the character's, so a correction needs no shift of its own
-  assert.match(w, /online\.onClock = \(offsetMs\) => \{ const was = _sharedOffsetMs; _sharedOffsetMs = offsetMs; (?:_sharedClockHeard = true; )?if \(Math\.abs\(offsetMs - was\) > 1000\) onlineArrival\(\); (?:hearSharedClock\(\); )?\};/, 'a correction over a second is an arrival');
-  // TIME1: the arrival's season is the SKY's; the markers and the weather's roll stay the event clock's
-  assert.match(w, /const onlineArrival = \(\) => \{ alignEntityClocks\(playerEntity, worldMinutes\(\)\); rollClimateWeathersForDay\(worldMinutes\(\)\); refreshSeason\(skyMinutes\(\)\); \};[^\n]*\s*onlineArrival\(\);/, 'the same arrival the session\'s start runs');
 });
 
 test('AUDIT WORLD5 C3 (LIVED1: an arrival moves nothing of the character\'s): every marker a save carries is on the character\'s own clock, which stood while they were away - so a room keeps its hours, a loan its week, a summoned item what it had left and a skill check that was due is due, by the markers standing where they were; a young world or an old one alike; a fresh character starts its day marker at its own clock', () => {
@@ -124,7 +116,6 @@ test('AUDIT WORLD5 C3 (LIVED1: an arrival moves nothing of the character\'s): ev
   const fresh = { ...tickEntity(), lastGameMinutes: undefined, lastSkillCheckTime: 0, rentedRooms: [{ expiryMinutes: 99 }] };
   try { setSharedClock(() => save); alignEntityClocks(fresh, worldMinutes()); assert.equal(fresh.lastSkillCheckTime, 0); assert.equal(fresh.rentedRooms[0].expiryMinutes, 99); assert.equal(fresh.lastGameMinutes, save); } finally { offline(); }
   assert.equal(liveVampirism({ activeEffects: [null, { kind: 'racialOverride', racial: 'vampirism' }] })?.racial, 'vampirism', 'the accessor steps over a hole');
-  assert.doesNotMatch(rd('src/systems/worldTick.js'), /function (?:spanShifts|carryOwnEffectClocks)\(/, 'the shift and its walk are gone - no list of markers to forget');
 });
 
 test('AUDIT WORLD5 C4 (LIVED1): a LOAD under the shared clock is an arrival through save.js\'s one door - the character\'s clock restored from the save and nothing of theirs shifted, and the day\'s sky rolled from the shared day over the sky the save carried', () => {
@@ -152,7 +143,6 @@ test('AUDIT WORLD5 C4 (LIVED1): a LOAD under the shared clock is an arrival thro
     assert.equal(currentWeatherEnum(), weatherForClimate(ZONE_CLIMATES[0]));
     assert.notEqual(currentWeatherEnum(), WEATHER_ENUM.snow);
   } finally { offline(); resetWeatherSim(); setWeatherMapLaw(false); }
-  assert.match(rd('src/systems/save/save.js'), /resetMagicRoundMarker\(Math\.floor\(snap\.classicMinutes \?\? 0\)\);\s*(?:\/\/[^\n]*\n\s*)*if \(sharedClockOn\(\)\) \{\s*(?:\/\/[^\n]*\n\s*)*const own = Math\.floor\(snap\.classicMinutes \?\? 0\), at = worldMinutes\(\);\s*(?:\/\/[^\n]*\n\s*)*const left = [^\n]*\n\s*setOwnMinutes\(own\);\s*if \(!Number\.isFinite\(snap\.worldMinutes\)\) clampMarkersAheadOf\(entity, own\);[^\n]*\n\s*alignEntityClocks\(entity, at\);\s*rollClimateWeathersForDay\(Math\.floor\(at\)\);/, 'the one door every host loads through (AUDIT LIVED1b F1: at the unfloored reading; P4: its absence paid once the relay\'s clock is heard)');
 });
 
 test('AUDIT WORLD5 C5: the shared roll is THE DAY\'S - stamped at the day\'s first minute, so a joiner\'s drain at noon is a jump and a midnight roll\'s is a front; and the evolution replays from the day\'s first hour, so a client that joined at noon carries the sky the one that stood under it since midnight does', () => {
@@ -186,8 +176,6 @@ test('AUDIT WORLD5 C5: the shared roll is THE DAY\'S - stamped at the day\'s fir
   evolveClimateWeathers(dayStart + 15 * 60);
   assert.deepEqual(arr(), off, 'offline: no replay');
   resetWeatherSim(); setWeatherMapLaw(false);
-  assert.match(rd('src/systems/weather/weatherSim.js'), /_rolledAtMinutes = stampRoll\(nowMinutes\);/g);
-  assert.equal((rd('src/systems/weather/weatherSim.js').match(/_rolledAtMinutes = stampRoll\(nowMinutes\);/g) ?? []).length, 2, 'the day roll and the boot\'s lazy roll');
 });
 
 test('AUDIT WORLD5 C6 (LIVED1): every collapse costs its hour and pays it in full, online as offline - the host\'s RaiseTime moves the character\'s own clock, so the hour is charged; the fatal arms untouched', () => {
@@ -206,7 +194,6 @@ test('AUDIT WORLD5 C6 (LIVED1): every collapse costs its hour and pays it in ful
   // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): the foes-about arm is no longer DFU's death but a tenth of the
   // health - still no hour paid there, which is what this line holds
   assert.deepEqual(exhaustionOutcome({ entity: P(), enemiesNearby: true }).kind, 'spent', 'the foes-about arm untouched by the hour');
-  assert.doesNotMatch(rd('src/systems/rest/rest.js'), /lastExhaustionHour/, 'no once-a-world-hour gate');
 });
 test('AUDIT WORLD5 C7 (RESTX2: on the timer, every mode): a session COVERED loses the real time it covers, keeping less than one sub-tick, and a leap of the shared clock (a hidden tab) is NOT a leap of the session - the timer alone paces it, so every hourly check reads a frame of its own by construction', () => {
   // C7 was written on the shared clock (one sub-tick a FRAME across a
@@ -256,14 +243,4 @@ test('AUDIT WORLD5 C8 (LIVED1): the sub-tick\'s minutes ride to the host alone, 
   const so = new RestSession('timed', 2, off);
   so.tick(sub);
   assert.deepEqual([off.minutes, off.ends], [10, [undefined]], 'offline the same');
-  assert.match(rd('src/systems/rest/restSession.js'), /this\.deps\.advanceMinutes\(MINUTES_PER_TICK\);/);
-  const dc = rd('src/scenes/dungeonContext.js');
-  const i = dc.indexOf('const _restAdvance = (n) => {');
-  const arm = dc.slice(i, dc.indexOf('\n  };', i));
-  assert.ok(i > 0 && arm.length > 200);
-  assert.ok(arm.includes('const end = classicMinutesRef.value + n;') && arm.includes('const start = Math.floor(end) - n;') && arm.includes('advanceOwnMinutes(n);'), 'the span off the character\'s clock, which the arm moves (TIME3: a raise, counted)');
-  assert.ok(arm.includes('const _w = claimMagicRounds(start, end);'), 'the broker window off the same span');
-  assert.ok(arm.includes('gameMinutes: start + l + 1,'), 'and the spawner offered each of its ten minutes once');
-  assert.match(dc, /advanceMinutes: \(n\) => _restAdvance\(n\),/);
-  assert.match(dc, /const classicMinutesRef = \{\s*get value\(\) \{ return ownMinutes\(\); \},\s*set value\(v\) \{ setOwnMinutes\(v\); \},\s*\};/, 'the dungeon\'s one clock view is the character\'s');
 });

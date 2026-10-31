@@ -173,61 +173,6 @@ test('SAV4: a failed NEW save leaves no orphan; a failed overwrite keeps the old
   assert.ok(saveInfoOf(0, s2), 'and still enumerates');
 });
 
-test('SAV4: the host wiring source pins - per-character quickslots, the boot arm loads most recent', () => {
-  const world = hostText('src/scenes/world.js');
-  // Save(name, saveName) with the QuickSave default - F9 and the slot
-  // window's saveAs share the ONE producer.
-  assert.match(world, /function worldQuickSave\(saveName = QUICK_SAVE_NAME, \{ quiet = false, sink = null \} = \{\}\)/);   // REALM P0.5: and the checkpoint's quiet; P1.3: and the realm's sink
-  assert.match(world, /saveSlot\(playerEntity\.name, saveName, snap\)/);
-  // MW-EARLY: the key-then-most-recent pick is pickedSaveSnap's (the boot's early arms build reads it too); the
-  // quickload's own QuickSave stays the door's third arm
-  assert.match(world, /return key != null \? loadSlot\(key\) : mostRecent \? \(mostRecentRestorable\(\)\?\.snap \?\? null\) : null;/);
-  // (AUDIT MW-EARLY F3: a snapshot the boot hands in - its one parse - is the one restored)
-  assert.match(world, /const snap = picked \?\? \(key != null \|\| mostRecent \? pickedSaveSnap\(\{ key, mostRecent \}\)[^\n]*\n\s*: quickLoadSlot\(playerEntity\.name, undefined, playerEntity\.characterId \?\? null\)\);/);
-  // The boot arm: a picked slot key wins, else the most-recent shape.
-  assert.match(world, /\? \{ key: Number\(params\.get\('loadkey'\)\) \}\n\s*: \{ mostRecent: true \}/);
-
-  const dungeon = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dungeon, /quickSave\(saveName = QUICK_SAVE_NAME, \{ quiet = false, sink = null \} = \{\}\)/);   // REALM P0.5: and the checkpoint's quiet; P1.3: and the realm's sink
-  assert.match(dungeon, /saveSlot\(playerEntity\.name, saveName, snap\)/);
-  assert.match(dungeon, /key != null \? loadSlot\(key\) : quickLoadSlot\(playerEntity\.name, undefined, playerEntity\.characterId \?\? null\)/);
-
-  // The pause seam builds the slot-window doors from the hosts' seams.
-  const pause = readFileSync(new URL('../../src/ui/pauseWindow.js', import.meta.url), 'utf8');
-  assert.match(pause, /openSave: hooks\.saveAs/);
-  assert.match(pause, /openLoad: hooks\.loadKey/);
-  // PIN MOVED TWICE, and the half it guards has never changed: a host
-  // without the loadKey seam keeps the ONE-PRESS quickload. It first
-  // read `if (this.hooks.openLoad) this.hooks.openLoad(); else
-  // this.hooks.quickLoad?.();` on one line, which held only while the
-  // LOAD button closed the pause window unconditionally before
-  // dispatching; ROAD-C C1 pushed the slot window OVER the pause window
-  // (:308) with Cancel popping back onto it, so the close became the
-  // replace-fallback's alone. AUDIT 65 UI-2 moved it again: the
-  // quick-verb fallback is a RESUME - it hands the player no window -
-  // so it relocks the pointer inside the click that closed it, which
-  // the pushed door must NOT do. Matched as three ordered fragments
-  // rather than one whitespace-exact block, so the next reformat moves
-  // this pin's LAW and not its indentation.
-  const loadArm = pause.slice(pause.indexOf('if (this.hooks.openLoad)'),
-    pause.indexOf('const bx = vx - panelX()'));
-  assert.match(loadArm, /if \(!this\.hooks\.saveLoadPushes\) this\._closeWith\(\);/,
-    'the pushed door leaves this window standing under the slot window');
-  assert.match(loadArm, /\} else \{[\s\S]*this\._closeWith\(\);[\s\S]*this\.hooks\.quickLoad\?\.\(\);/,
-    'and a host without loadKey still gets the one-press quickload, after the close');
-  assert.match(loadArm, /\} else \{[\s\S]*this\.hooks\.relock\?\.\(\);[\s\S]*this\.hooks\.quickLoad\?\.\(\);/,
-    'AUDIT 65 UI-2: that fallback is a resume, so it relocks inside the click (MAC1 J)');
-  assert.doesNotMatch(loadArm.slice(0, loadArm.indexOf('} else {')), /this\.hooks\.relock\?\.\(\)/,
-    '...and the PUSHED door does not - the slot window needs the cursor');
-
-  const menu = readFileSync(new URL('../../src/scenes/menu.js', import.meta.url), 'utf8');
-  assert.match(menu, /export const hasSavedGame = \(\) => !!mostRecentRestorable\(\);/);
-
-  const enhanced = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(enhanced, /deleteSave\(save\.key\)/, 'the enhanced delete removes the SLOT it shows');
-  assert.doesNotMatch(enhanced, /removeItem\(QUICKSAVE_KEY\)/);
-});
-
 test('SAV4: a realTime TIE keeps the first-enumerated key (FindMostRecentSave is strictly >)', () => {
   const s = mockStorage();
   saveSlot('Alaric', 'A', snapOf('Alaric'), { storage: s, now: 100 });

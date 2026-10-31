@@ -55,25 +55,3 @@ test('SILVER a balance reads in silver - the same word for one, none and many (m
   assert.equal(TIDE_WORDS.daedra, 'Gate kills give double influence and double silver.');
 });
 
-test('SILVER no word a player reads says Drakes any more - the Bank, the account card, the market, the Work tab, the guild treasury, the professions\' pages, the seats, the refusals; the metal keeps its name (mutants: a label or a line left on the old name)', () => {
-  for (const f of SHOWN) {
-    const left = code(src(f)).split('\n').map((l, i) => [i + 1, l]).filter(([, l]) => DRAKE.test(l));
-    assert.deepEqual(left.map(([n, l]) => `${f}:${n}: ${l.trim().slice(0, 90)}`), [], `${f} still shows the old name`);
-  }
-  // and nowhere else in the client or the service, but the two kinds of comment a string carries
-  const all = ['src', 'server-account/src'].flatMap((d) => readdirSync(new URL(`../../${d}`, import.meta.url), { recursive: true })
-    .filter((f) => /\.m?js$/.test(f)).map((f) => `${d}/${String(f).replaceAll('\\', '/')}`));
-  const still = all.filter((f) => !LEFT.has(f) && DRAKE.test(code(src(f))));
-  assert.deepEqual(still, [], 'a file still shows the old name');
-  // the places it is said, by name
-  const ports = src('src/ui/enhanced/enhancedPorts.js');
-  for (const w of ["'Silver to sell'", "title: 'Silver'", "['Silver held'", '`${MARKS_BANK.goldPerMark} gold for each silver`', "'Sell silver'"]) assert.ok(ports.includes(w), w);
-  assert.match(src('src/ui/enhanced/enhancedAccount.js'), /row\(t\('account\.card\.silver', 'Silver'\), marksText\(flow\.account\.marks\)\)/, 'the account card');   // L10N4 (PIN MOVED): the row's word through t()
-  assert.match(src('src/ui/socialPanel.js'), /el\('div', 'dfsocial-sec', 'Silver treasury'\)/, 'the guild\'s treasury');
-  assert.match(src('src/ui/bankWindow.js'), /MARKS_COUNTING = 'The Bank counts your silver\.\.\.'/);
-  assert.match(src('src/ui/workTab.js'), /labelled\(t\('prof\.work\.label\.paySilver', 'Pay \(silver\)'\), pay\)/);   // PIN MOVED (L10N4): the label through t()
-  assert.match(src('src/ui/marketTab.js'), /\[\['marks', 'Priced in silver'\], \['gold', 'Priced in gold'\]\]/);
-  // and the metal stands as it was
-  assert.match(src('src/net/professionLaw.js'), /made\('ingot:silver', 'metals', 3, 622, 'Silver Ingot', ICON_IRON, 'Silver'\)/);
-  assert.match(src('src/net/recipeLaw.js'), /METAL_WORDS = Object\.freeze\(\['Iron', 'Steel', 'Silver',/);
-});

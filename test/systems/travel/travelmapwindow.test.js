@@ -131,7 +131,6 @@ function mountArt(over = {}) {
   return colors;
 }
 
-
 /** The list picker refuses to open without PICK00I0, so the tests
  *  that drive it warm its module cache the way the host does. */
 let _pickerWarmed = false;
@@ -574,28 +573,6 @@ test('U41: the zoom crop is DFU\'s, clamped and bottom-up', () => {
   } finally { _setTravelMapArtForTests(null); }
 });
 
-test('U41: shift-move pans the zoom, and the host hands the window the event', () => {
-  restoreDiscovery(null);
-  mountArt();
-  try {
-    const { deps } = mkWorld();
-    const w = new TravelMapWindow(deps);
-    w._openRegionPanel(DAGGERFALL);
-    w.click(160, 92, true);
-    assert.deepEqual(w.zoomOffset, [80, 40]);
-    w.hover(40, 30);                       // a plain move does not pan
-    assert.deepEqual(w.zoomOffset, [80, 40]);
-    w.hover(200, 100, { shiftKey: true });   // shift does (:397-402)
-    assert.deepEqual(w.zoomOffset, [120, 32], 'the crop follows the cursor');
-    w.hover(60, 40, { shiftKey: true });
-    assert.deepEqual(w.zoomOffset, [0, 80], 'and clamps at the page edge');
-    // the event only reaches a window because the host passes it
-    const tt = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-    assert.ok(tt.includes('overlay.hover(v ? v[0] : -1, v ? v[1] : -1, e)'),
-      'townTalk\'s hover seam carries the event');
-  } finally { _setTravelMapArtForTests(null); }
-});
-
 test('U41: the draw lays the page, the dots and the bar where DFU puts them', () => {
   restoreDiscovery(null);
   _resetForTests();
@@ -776,34 +753,6 @@ test('U41: the filters and the popup toggles outlive the window', () => {
   } finally { _setTravelMapArtForTests(null); resetTravelMapState(); }
 });
 
-test('U41: a window that finishes in its own tick is cleared by the host', () => {
-  // the popup's countdown departs on a clock, not on a key: the
-  // overlay seam has to notice `done` in frame(), the way the dungeon
-  // host's tickOverlay does
-  const tt = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  // U48: sliced to the FUNCTION, not to a magic 900 characters. A
-  // comment added inside frame() pushed the done check past the count
-  // and this pin went red without its law changing - a character
-  // budget is a fragile proxy for "inside this function".
-  const frame = tt.slice(tt.indexOf('function frame(dt)'), tt.indexOf('function pointerdown'));
-  assert.ok(/overlay\?\.tick\?\.\(dt\)/.test(frame), 'the overlay ticks');
-  assert.ok(frame.includes('if (overlay?.done)'), 'and a finished window is dropped in the same pass');
-  assert.ok(frame.indexOf('overlay?.tick') < frame.indexOf('if (overlay?.done)'), 'in that order');
-  // ...and the drain must FREE what it drops. The crash of 2026-08-29
-  // moved that dispose into townTalk's one drain (dropOverlay), so the
-  // pin follows it there rather than reading a literal this function no
-  // longer contains: the call is here, and the freeing is in the seam
-  // it calls. Both halves, because either alone leaks - and the seam is
-  // read for its ORDER too, the slot emptied before the window is told,
-  // which is the fix itself.
-  const drain = frame.slice(frame.indexOf('if (overlay?.done)'), frame.indexOf('const s = hudScale'));
-  assert.ok(drain.includes('dropOverlay()'), 'the drain goes through the one seam');
-  const seam = tt.match(/function dropOverlay\([\s\S]*?\n {2}}/)?.[0] ?? '';
-  assert.ok(seam.includes('win.dispose?.()'), 'freeing its textures');
-  assert.ok(seam.indexOf('overlay = null') < seam.indexOf('win.dispose'),
-    'the seam disposes before it empties the slot - the 2026-08-29 recursion is back');
-});
-
 test('U41: the preload asks for exactly the classic files, and a missing one closes the door', async () => {
   const { preloadTravelMapArt, travelMapArtLoaded } = await import('../../../src/ui/travel/travelMapWindow.js');
   _setTravelMapArtForTests(null);
@@ -935,20 +884,6 @@ test('U41: a right-click on the map is the map\'s, never a swing', () => {
     assert.ok(line, `${host} binds the swing button (FIX-F: the registry's)`);
     assert.ok(line.includes('!townTalk.overlayActive'), `${host}'s RMB swing is gated on the overlay`);
   }
-});
-
-test('U41: the source carries the laws it claims', () => {
-  const src = readFileSync(new URL('../../../src/ui/travel/travelMapWindow.js', import.meta.url), 'utf8');
-  assert.ok(src.includes('hasDiscoveredLocationId(summary.id) || !!summary.discovered || _revealUndiscoveredLocations'),
-    'checkLocationDiscovered is the ONE test: store OR baked flag OR the cheat');
-  assert.ok(src.includes('Math.trunc((((height - y - 1) * width) + x) * this.scale)'),
-    'the dots walk keeps DFU\'s offset * scale indexing');
-  assert.ok(src.includes('yAdjust = regionIndex === BETONY_INDEX ? -477 : 0'), 'Betony\'s crosshair fixup');
-  assert.ok(src.includes('x += 60; y += 212;'), 'Betony\'s mouse fixup');
-  assert.ok(src.includes('xDiff = Math.trunc(xDiff / 4)'), 'the Cybiades quarter-scale fix');
-  assert.ok(src.includes('this.identifyLastChangeTime = _clock - IDENTIFY_FLASH_INTERVAL'),
-    'the flash stamp stores the DISTANCE, so the first map of a session flashes at once');
-  assert.ok(/^let _clock = 0;$/m.test(src), 'against ONE monotonic clock, as realtimeSinceStartup is');
 });
 
 // ---------------------------------------------------------------

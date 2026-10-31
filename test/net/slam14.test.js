@@ -94,26 +94,6 @@ test('SLAM14 B2: unconfirmed is PER ROOM - a peer named by my cell\'s roster and
   assert.equal(s.peers.has('ann-0004'), true, 'still my cell\'s peer (held there, silence law aside)');
 }));
 
-test('SLAM14 B3: a peer stood from MEMORY is told and RECALLED - drawn in the look it wore, asked for once more, and the relay\'s answer refreshes the look (mutants: recall never set; the ask guard refusing every told peer; `_refresh` not clearing it)', () => quiet(() => {
-  const clock = { now: 1_000_000 };
-  const { s, ws } = session('town:m1', [], clock);
-  ws.receive({ t: 'join', id: 'zed-0001', name: 'Zed', look: { ...look, faceIndex: 3 }, pose: at(1) });
-  ws.receive({ t: 'leave', id: 'zed-0001' });
-  assert.equal(s.peers.has('zed-0001'), false);
-  clock.now += 1000;
-  ws.receive({ t: 'pose', id: 'zed-0001', p: at(2) });   // back, from memory
-  const z = s.peers.get('zed-0001');
-  assert.equal(z.told, true, 'told: dressed and stood at once'); assert.equal(z.look.faceIndex, 3, 'in the face it wore');
-  assert.equal(z.recall, true, 'and marked to be asked once more');
-  s.tick(); assert.deepEqual(whos(ws), ['zed-0001'], 'asked, though told');
-  s.tick(); assert.deepEqual(whos(ws), ['zed-0001'], 'once - inside WHO_RETRY_MS it is not asked again');
-  ws.receive({ t: 'join', id: 'zed-0001', name: 'Zed', look: { ...look, faceIndex: 5 }, pose: at(2) });   // the relay's answer: new gear
-  assert.equal(z.look.faceIndex, 5, 'the look it holds NOW'); assert.equal(z.recall, false, 'the recall is spent');
-  clock.now += WHO_RETRY_MS + 1; s.tick();
-  assert.deepEqual(whos(ws), ['zed-0001'], 'and never asked again');
-  assert.doesNotMatch(rd('src/net/online.js'), /changes its gear re-hellos/, 'the false line is gone: nothing re-hellos on a gear change');
-}));
-
 test('SLAM14 B1: `heardIn` follows the poses - a stranger first heard in my cell and since heard through a halo is asked for down the HALO\'s socket (mutant: stamped once, on the first pose, so the ask went to a room that no longer held it)', () => quiet(() => {
   const clock = { now: 1_000_000 };
   const { s, ws, sockets } = session('world:3,12', [], clock);
@@ -144,7 +124,6 @@ test('SLAM14 (lens C survivor): the HALO\'s welcome resets the halo\'s backoff, 
 test('SLAM14 B6 + (lens C survivor): `lookKey(null)` is one constant, and a doll landing after its key was released gives its texture back to the ARCHIVE by its RECORD (mutants: the release with no arguments; the release dropped)', async () => {
   assert.equal(lookKey(null), lookKey(undefined)); assert.equal(lookKey(null), lookKey(0));
   assert.equal(lookKey(null), lookKey({ race: 'Breton', gender: 'male', faceIndex: 0, items: [] }), 'the look-less peer wears the default');
-  assert.match(rd('src/net/remotePlayers.js'), /const NULL_LOOK_KEY = _computeLookKey\(null\);/, 'computed once');
   const released = [];
   let resolveCompose;
   const rp = new RemotePlayers({

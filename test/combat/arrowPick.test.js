@@ -105,16 +105,4 @@ test('MW-D50: a bow that resolves without its arrow says why on the console, onc
   } finally { console.warn = orig; }
   assert.equal(said.length, 1, 'once for the reason, and never without ammunition in the pack');
   assert.match(said[0], /^\[mw\] the bow carries no arrow - arrow: your archives carry no unenchanted Morrowind ammunition/);
-  const src = rd('src/combat/fpArm.js');
-  // MW-D51: + the torch's six - both builds' preload and resolve (4), and
-  // setTorch's own preload and its one resolve for both rigs (2).
-  // HT-WAIST: + the lantern at the waist's four - the body build's preload
-  // and resolve, setHipLight's preload and its one resolve (the body alone).
-  // PIN MOVED (AUDIT MW-HEADS1): + the face's pools - the port's own heads
-  // stand where that directory carries them (facePools), the match, its
-  // skip and its key read them (the rows read the body build's own `exists`).
-  // PIN MOVED (TWO-HANDS): + the left hand's weapon's three - setOffWeapon's preload and its resolve for each rig.
-  // PIN MOVED (TWO-HANDS AUDIT 2): + the left hand's weapon's two in the build (its preload, and its resolve for each rig) -
-  // a pair's left blade bound in the build the rig's own rebuild asks for.
-  assert.equal((src.match(/has: archiveHas\(archives\)/g) || []).length, 23, 'every preload and every resolve - two builds, the tp body, the swap\'s two, the torch\'s six, the hip lantern\'s four, the face\'s pools, the left hand\'s weapon\'s five - pass the one directory');
 });

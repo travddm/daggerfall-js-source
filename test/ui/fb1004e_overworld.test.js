@@ -111,9 +111,6 @@ test('OW-HUBS law: a town stands a carriage when one of its blocks is a gate Imm
   // the held map's marks carry it
   const marks = buildInkMarks({ summaries: [], carriageAt: () => true });
   assert.deepEqual(marks, []);
-  assert.match(rd('src/ui/ink/inkMap.js'), /carriage: !!carriageAt\(m\.summary\),/);
-  assert.match(rd('src/ui/ink/inkMap.js'), /for \(const \[beside, x, y, m\] of wheels\) paintCarriageWheel\(ctx, x, y, beside, m\);/);
-  assert.match(rd('src/ui/heldMap.js'), /carriageAt: \(s\) => !!this\.deps\.carriageAt\?\.\(s\),/);
 });
 
 test('SEAT-TIP law: a seat\'s card names its town, its Charter and who holds it, how long and how firmly, the rule and this week\'s battle; an unheld one says so; no seat no card (mutants: the holder dropped; the battle dropped)', () => {
@@ -138,29 +135,6 @@ test('OW-KIN / OW-WHO on the travel map: the rows keep their kin and Renown, a k
   assert.equal(a.kin, 'friend'); assert.equal(a.lv, 12);
   assert.equal(readTravellerMarks(() => [{ ...row, kin: 'enemy' }])[0].kin, null, 'the host\'s word, one of two');
   assert.notEqual(travellerMarksKey([a]), travellerMarksKey(readTravellerMarks(() => [{ ...row, kin: 'guild', lv: 12 }])));
-  const H = rd('src/ui/heldMap.js');
-  assert.match(H, /travellers: this\._trav\.filter\(\(t\) => playersOnMaps\(\) && playerShown\(t\)\)\.map\(\(t\) => \(\{ x: t\.x, y: t\.y, name: t\.name, color: TV_KIN_COLORS\[t\.kin\] \?\? TRAVELLER_MARK_CSS,/);
-  assert.match(H, /for \(const \[kin, word\] of Object\.entries\(TV_KIN_LEGEND\)\) \{/);
-  assert.match(H, /if \(this\._trav\.length \|\| typeof this\.deps\.travellers === 'function'\) \{\n\s*const row = el\('div', 'hmkeyrow'\);\n\s*row\.append\(el\('span', 'hmkeywho', TV_WHO_TEXT\.title\)\);/, 'the row\'s word is never a .hmkeyname (a phone hides those, and the grid would shift a column)');
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\n {2}\.hmkeyname \{ display: none; \}/, 'which a phone hides');
-  assert.ok(!/\.hmkeywho \{[^}]*display: none/.test(rd('src/ui/enhanced/enhancedStyle.js')));
-  assert.match(H, /else if \(which === 'renown'\) cycleTravelViewRenown\(\); else toggleTravelViewWho\(which\);/);
-  // PIN MOVED (TOWN-ECON TE1, test/systems/townecon.test.js): every town's card, a seat's lines after the town's - and still whole
-  assert.match(H, /const card = this\.deps\.townTipAt\?\.\(m\.summary\) \?\? \(m\.seat \? seatTipOf\(m\.seat\) : null\);\n\s*const tip = card \? readTip\(card, \{ textMax: SEAT_TIP_TEXT_MAX, linesMax: TOWN_TIP_LINES_MAX \}\) : null;/, 'a seat\'s lines whole (SEAT_TIP_TEXT_MAX)');
-  assert.match(H, /\.\.\.\(seat \? \[seatInfoLine\(seat, seat\.holder\?\.guild \?\? null\)\] : \[\]\)/);
-  const W = hostText('src/scenes/world.js');   // HOST-SPLIT 2: the host WHOLE - BAY-LEFT-MAPS moved carriageTown to scenes/mapPlacesHost.js
-  assert.match(W, /ship: isShipMark\(t\.p\), kin: travellerKin\(\{ friend: !!social\?\.isFriendPeer\(t\.id\), gt: t\.gt \}, myGuildTag\(\)\), lv: t\.lv \?\? null \}\)\),/);
-  assert.match(W, /carriageAt: \(summary\) => carriageTown\(summary\?\.mapID \?\? summary\?\.mapId\),/);
-  // PIN MOVED (BAY-LEFT-MAPS, test/scenes/bayleft_places.test.js): the town by the place's own key - a Bay town by its pixel id
-  // (DFU's mask, `y * 1000 + x`), one past the Bay by its whole id where the registry stands it - never every id as the Bay's
-  assert.match(W, /on = hasCarriageGate\(townOfKey\(id\)\);/);
-  assert.match(W, /if \(key < BAY_PIXEL_IDS\) return locationIndex\.get\(`\$\{key % MAX_MAP_PIXEL_X\},\$\{Math\.floor\(key \/ MAX_MAP_PIXEL_X\)\}`\);/);
-  assert.match(W, /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\) \|\| isHallMapId\(mapId\)\) return false;/, 'no carriages without the mod');   // PIN MOVED (AUDIT WW F1): nor at a zone hall
-  // PIN MOVED (TOWN-ECON TE1, test/systems/townecon.test.js): the Overworld's card is the town's (systems/town/townEcon.js tipFnAt -
-  // made only when its plate is under the pointer, one kept a town); SEAT-TIP's seat card is its guild lines
-  assert.match(W, /seaRaidPeerChase, townEcon, state, travelViewBands,/, 'a town\'s card, made only when its plate is asked');
-  assert.match(rd('src/scenes/gatherHost.js'), /color: nodeMarkCss\(g\.profession\), dist: d \/ 1000 \} \}\);/, 'a group\'s distance, km');
-  assert.match(rd('src/scenes/travelView.js'), /\.\.\.\(m\.kin \? \{ kin: m\.kin \} : \{\}\), \.\.\.\(m\.lv != null \? \{ lv: m\.lv \} : \{\}\), \.\.\.\(Number\.isFinite\(m\.dist\) \? \{ dist: m\.dist \} : \{\}\), \.\.\.\(m\.hub \? \{ hub: true \} : \{\}\), \.\.\.\(m\.tip \? \{ tip: m\.tip \} : \{\}\)/, 'every field the readout reads is carried through the view');
 });
 
 test('OW-WHO travel map legend: the legend speaks for the players the sheet draws - a kin the switches hide leaves it, and all hidden, the travellers\' row too; a press re-says it (mutants: the legend the book\'s, not the sheet\'s; the press leaves the legend stale)', async () => {

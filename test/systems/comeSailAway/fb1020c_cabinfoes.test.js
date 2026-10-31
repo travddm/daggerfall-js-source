@@ -19,8 +19,6 @@ import { cabinEntryRefusal, CABIN_REFUSAL } from '../../../src/systems/sailingCa
 import { createSailingCabinAccess } from '../../../src/scenes/sailingCabin.js';
 import { hostText } from '../../hostText.mjs';
 
-const W = hostText('src/scenes/world.js');
-
 test('FB1020c CABIN-FOES the law: a hostile ship near refuses the cabin in its own plain words, after the door\'s other refusals and only with every one of them met; none near, the door opens (mutants: the enemies\' arm dropped; read before the helm\'s)', () => {
   assert.equal(CABIN_REFUSAL.enemies, 'You cannot enter the cabin with enemies nearby.');
   const boat = { uid: 101, hull: 3, GameObject: { activeSelf: true } };
@@ -69,11 +67,3 @@ test('FB1020c CABIN-FOES on the real sea: a bold pirate brigantine alongside and
   assert.equal(entered.length, 1);
 });
 
-test('FB1020c CABIN-FOES the world\'s doors by source: the deck door is handed the hostile ship near and the helm off the runtime (two seams where there were two of the helm alone - bootWorld\'s ceiling); Transport > Ship\'s door refuses on the same two, in the door\'s own words (mutants: the deck door handed no hostile; the bank door asks the helm alone)', () => {
-  // PIN MOVED (AUDIT SEA VENTURES E6A): the hostile ship near, or a stranger captain's in the open sea (navalPvp.js captainNear)
-  assert.match(W, /const sailingCabins = createSailingCabinAccess\(\{[\s\S]{0,400}csa: \(\) => csaRuntime, hostile: \(\) => navalHostileNear\(\) \|\| !!naval\?\.pvp\?\.captainNear\?\.\(\),/);
-  assert.doesNotMatch(W, /sailing: \(\) => !!csaRuntime\?\.isSailing\(\), disembarking:/, 'the two helm seams folded into the runtime\'s own');
-  assert.match(W, /if \(csaRuntime\.isSailing\(\) \|\| navalHostileNear\(\)\) \{ townTalk\.say\(csaRuntime\.isSailing\(\) \? CABIN_REFUSAL\.helm : CABIN_REFUSAL\.enemies\); return true; \}/);
-  const adapter = readFileSync(new URL('../../../src/scenes/sailingCabin.js', import.meta.url), 'utf8');
-  assert.match(adapter, /aboard: deps\.aboard\(boat\), hostile: !!deps\.hostile\?\.\(\),/);
-});

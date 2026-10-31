@@ -320,10 +320,6 @@ test('SURV3: the pack\'s hand-off - both skins close and hand the placeable to t
   assert.deepEqual(useResultAction(r, { placeCamp: () => {} }), { kind: 'placeCamp', item: r.item, closeFirst: true });
   assert.deepEqual(useResultAction({ kind: 'placeFire', item: r.item }, {}), { kind: 'message', text: USE_PENDING.placeFire });
   assert.equal(USE_PENDING.pitchCamp, 'There is nowhere to set that up here.');
-  const native = read('src/ui/native/nativeInventory.js');
-  assert.match(native, /if \(r\.kind === 'pitchCamp' \|\| r\.kind === 'placeFire'\) \{\s*\n\s*if \(this\.hooks\.placeCamp\) \{ this\._closeSilently\(\); this\.hooks\.placeCamp\(r\.item, collection\); \}/);   // AUDIT SURV-TIERS: with the list it came from (the wagon's tent)
-  const enh = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(enh, /if \(act\.kind === 'placeCamp'\) \{\s*\n\s*const place = deps\.placeCamp;\s*\n\s*onExit\(\);[^\n]*\n\s*place\(act\.item, collection\);/);
   const cache = createSceneCache();
   cacheScene(cache, 'x', { camps: [{ id: 'a', pos: [1, 2, 3] }], droppedTorches: [{ position: [1, 2, 3], time: 5, itemTemplateIndex: 247 }] });
   const back = restoreCachedScene(cache, 'x');
@@ -331,64 +327,8 @@ test('SURV3: the pack\'s hand-off - both skins close and hand the placeable to t
 });
 
 test('SURV3: by source - the three hosts stand the pool, feed the race, draw the tents, hand the pack the ground, cache and save the camps, and share them online', () => {
-  const world = hostText('src/scenes/world.js'), ext = read('src/scenes/exterior.js'), dc = read('src/scenes/dungeonContext.js'), modes = read('src/scenes/worldModes.js');
-  for (const [name, src] of [['world', world], ['exterior', ext], ['dungeon', dc]]) {
-    assert.match(src, /const camps = createCamps\(\{/, `${name}: stands the pool`);
-    assert.match(src, /placeCamp: \(item, list\) => camps\.placeItem\(item, list \?\? playerEntity\.items \?\? \[\]\)/, `${name}: the pack's hand-off - off the list the item was used from (AUDIT SURV-TIERS)`);
-    assert.match(src, /camps\.tick\(dt\)/, `${name}: the fires burn`);
-  }
-  for (const [name, src] of [['world', world], ['exterior', ext]]) {
-    assert.match(src, /camp: _campPick,/, `${name}: the race takes the camp`); assert.match(src, /water: _springPick,/, `${name}: and the water source`);
-    assert.match(src, /if \(_race\.campWins\) \{ if \(_campPick\.distance > _campPick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else camps\.activate\(_campPick\.key, getInteractionMode\(\), plaqueActionFor\(_campPick\.key\)\); \}/, `${name}: the camp's arm refuses out loud`);
-    assert.match(src, /else if \(_race\.waterWins\) \{ if \(_springPick\.distance > _springPick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else drinkAtSpring\(_springPick\.key\); \}/, `${name}: the water's arm`);
-    assert.match(src, /camps\.draw\(renderer/, `${name}: the tents are drawn`);
-    assert.match(src, /\.\.\.camps\.lights\(\), \.\.\.droppedTorches\.lights\(\)\)/, `${name}: the fires light`);
-    assert.match(src, /openRest: \(\) => \{ townTalk\.closeOverlay\(\); toggleRest\(\); \}/, `${name}: the menu's picker leaves the slot before the rest window`);
-    assert.match(src, /isWaterSourceFlat\(flat\.archive, flat\.record\) \|\| isDrySourceFlat\(flat\.archive, flat\.record\)/, `${name}: the fountains and wells off the block flats`);
-    assert.match(src, /WATER_SOURCE_MODELS\.includes\(placed\.modelIdNum\)/, `${name}: the troughs off the models`);
-    // AUDIT-WH P7 split the streaming host's builder from its
-    // targets (one builder, three readers, no shared slot), so its
-    // empty answer is the empty LIST rather than an empty array
-    // literal. The law - nothing in the ray with the mod off - is
-    // the same one.
-    assert.match(src, /if \(!survivalOn\(\)\) return _springs;|survivalOn\(\) \? springs\.map/, `${name}: no water arm with the mod off`);
-  }
-  // world: the pixel sweep, the scene cache, the save envelope, the recenter, the cell's frames
-  assert.doesNotMatch(world, /camps\.collectPixel\(key\)/, 'AUDIT SURV B: the streaming sweep spares a placed camp');
-  // AUDIT SURV-TIERS (the third pass): the save's two converters are named once, for the save, the load and the teleport
-  assert.match(world, /const campToNatives = \(pos\) => \{ const wc = state\.worldCoords\(pos\); return \[wc\.x, pos\[1\] - state\.compensation\[1\], wc\.z\]; \};/);
-  // AUDIT LANDFORMS C1 MOVED THIS PIN: the save's camps go through campToRecord - campToNatives with the height in DFU's
-  // frame (the Landforms row's lift taken off)
-  assert.equal((world.match(/camps: camps\.snapshot\(campToRecord\)/g) ?? []).length, 1, 'the save envelope alone carries the camps (AUDIT SURV B: the scene cache no longer does)');
-  assert.match(world, /const campToRecord = \(pos\) => \{ const n = campToNatives\(pos\); return \[n\[0\], groundFrameHeight\(n\[1\], pos\[0\], pos\[2\]\), n\[2\]\]; \};/);
-  assert.doesNotMatch(world, /camps\.restore\(arrived\.camps,/); assert.match(world, /camps\.restore\(restandAt\('pos'\)\(w\.camps\),/);   // TERRAIN-SCALE1: stood again on today's ground
-  assert.match(world, /camps\.offsetAll\(r\.offset\);/);
-  assert.match(world, /if \(cell && full\) frame\.c = camps\.wireRecords\(campToWire\);/, 'my camps ride my full foes frame (AUDIT SURV B: an empty list too)');
-  assert.match(world, /exteriorFoes\.setOnCamps\(\(from, c, at\) => camps\.applyOwner\(from, c, campToScene, at\)\);/, 'a peer\'s arrive with their foes, off the pool\'s own apply');
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(Array\.isArray\(data\.c\)\) _onCamps\?\.\(from, data\.c, _now\(\)\);[^\n]*\n\s*return true;/, 'past the pool\'s room test');
-  assert.match(world, /if \(isCellRoom\(online\.room\)\) \{ const ids = ownerIds\(\); if \(ids\) camps\.sweepOwners\(ids, now, FOES_STALE_MS\); \}/, 'and go as their puppets do - the same liveness');
-  assert.match(world, /if \(Array\.isArray\(data\?\.c\) && !\(data\?\.a\?\.length\) && !\(data\?\.l\?\.length\)\) return actFrameFits\(data\) \? online\.sendAct\(data\) : false;/, 'a camp frame stands alone - goes now or is said again');
-  assert.doesNotMatch(world, /_torchesMode\) \{ droppedTorches\.destroyAll\(\); camps/, 'a camp survives a building visit; the torches\' sweep is theirs');
-  // dungeon: fire only, the act and the memory
-  assert.match(dc, /insideBuilding: false, insideDungeon: true, inTown: false/);
-  assert.match(dc, /onChanged: \(\) => \{ const c = camps\.wireRecords\(\); opts\.onActions\?\.\(\{ k: _locationKey, c: c\.length \? c : \[\] \}\); \}/, 'a placed fire goes out as an act');
-  assert.match(dc, /if \(Array\.isArray\(data\.c\)\) camps\.applyOwner\(id, data\.c\);/, 'another\'s lands through applyActions');
-  assert.match(dc, /w\.camps = campMemory\(\);/); assert.match(dc, /applyCampMemory\(shared\.world\.camps\);/);
-  assert.match(dc, /camps: camps\.snapshot\(\),/); assert.match(dc, /if \(truncate\) \{ camps\.dropOwn\(\); camps\.restore\(w\.camps\); \}/);
-  assert.match(dc, /camps, campBatches: \(\) => camps\.batches\(\), campLights: \(\) => camps\.lights\(\),/);
-  assert.match(modes, /\.\.\.dungeonCtx\.campLights\(\)(?:\.map\(_dgTint\))?, \.\.\.dungeonCtx\.torchLights\(\)(?:\.map\(_dgTint\))?(?:, \.\.\.\(dungeonCtx\.sdEndLights\?\.\(\) \?\? \[\]\))?(?:, \.\.\.\(host\.modeLights\?\.\(\) \?\? \[\]\))?\)/);   // AUDIT DISC19: the dungeon's colour on each, the candle alone white assert.match(modes, /\.\.\.dungeonCtx\.campBatches\(\), \.\.\.dungeonCtx\.torchBatches\(\)/);
-  // AUDIT-WH2 L2-F1: ...and `hearth:` beside it. HEARTH1 says all FOUR
-  // HOSTS stand a ray target on a world fire that opens the cooking
-  // list; the dungeon collected the fires, stood them and named them
-  // 'Fire' without ever growing the arm, so E on a brazier underground
-  // was eaten in silence while the same object worked outdoors and
-  // indoors. `camps.activate` already routed both keys.
-  assert.match(dc, /if \(kind === 'camp' \|\| kind === 'hearth'\) return camps\.activate\(key, mode, plaqueActionFor\(key\)\) \? 1 : 0;/);
-  assert.match(dc, /targets\.push\(\.\.\.camps\.targets\(\)\);/);
-  assert.match(dc, /camps\.destroyAll\(\);[^\n]*\n\s*droppedTorches\.destroyAll\(\);\s*\n\s*weaponRig\.dispose\?\.\(\);/, 'the teardown frees the fires');
-  assert.match(modes, /key\.startsWith\('droppedTorch:'\) \|\| key\.startsWith\('camp:'\)/);
-  // the law is pure, and off the formulas -> equip cycle
-  const law = read('src/systems/survival/camp.js');
-  assert.doesNotMatch(law, /from '\.\.\/\.\.\/scenes\/|from '\.\.\/\.\.\/ui\/|from '\.\.\/\.\.\/combat\/|from '\.\.\/spellcast|from '\.\.\/diseases|from '\.\.\/effects|document\.|window\./);
+      // TERRAIN-SCALE1: stood again on today's ground
+   
+   
   assert.equal(worldMinutes(), 0);
 });

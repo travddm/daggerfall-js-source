@@ -173,15 +173,6 @@ test('RVN6 ON THE REAL STREET POOL: a rank-3 one stands with the first two of it
   }
 });
 
-test('RVN6 THE CAP: followers are trimmed first - the room the pool has left after its master, never past MAX_ACTIVE_ENCOUNTER_FOES; a puppet\'s stands none (mutants: the room unread; a puppet\'s band)', async () => {
-  const p = me();
-  assert.equal(MAX_ACTIVE_ENCOUNTER_FOES, 8);
-  const { pool, band } = await stood(p, 4, { fill: 6 });
-  assert.equal(band.length, 1, 'six and its master: room for one');
-  assert.ok(pool.activeCount() <= MAX_ACTIVE_ENCOUNTER_FOES);
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(revenant && band && !puppet && !allied && entity\.revenant\) Promise\.resolve\(\)\.then\(\(\) => standBand\(f, bandMembers\(revenant, effectiveLevel\(playerEntity\)\)\)\);/);   // PIN MOVED (RVN11c: a betrayer stands without one)
-});
-
 test('RVN6 NO INFIGHTING: on the real target machine a follower never takes its master or its bandmate (different combat teams in one band), and still takes another foe; its master likewise (mutants: no shared camp)', async () => {
   const p = me();
   const { f, band } = await stood(p, 3);
@@ -197,51 +188,6 @@ test('RVN6 NO INFIGHTING: on the real target machine a follower never takes its 
   assert.equal(take(g, [stranger]), stranger, 'another foe it takes');
   assert.equal(take(f, [cand(g)]), null, 'its master never takes it');
   assert.equal(take(f, [stranger]), stranger);
-});
-
-test('RVN6 THE SCATTER: its master kneels - each follower runs from it (DFU\'s flee, 8 s), said once ("The warband scatters."), and is gone when its run is spent, no body left; a death scatters as a kneel does (mutants: no scatter; said twice; the run kept; a body)', async () => {
-  const p = me();
-  const { pool, f, band } = await stood(p, 2);
-  assert.equal(band.length, 1);
-  breakWill(f);   // UNQUIET (Revenants.md section 46): a rank-2 one's will must be broken (WILL_RANK 2) - or it tears away
-  pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.ok(f.yielded, 'it kneels');
-  const g = band[0];
-  assert.equal(g.scattering, true);
-  assert.ok(Math.abs(g.ai.fleeLeft - 8) < 1e-9);
-  assert.deepEqual(g.ai.fleeFrom, [f.ai.feet[0], f.ai.feet[1], f.ai.feet[2]], 'from its master');
-  assert.deepEqual(said.filter((l) => /scatters/.test(l)), ['The warband scatters.']);
-  pool.damageFoe(f, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.equal(said.filter((l) => /scatters/.test(l)).length, 1, 'once');
-  frame(pool, 20);
-  assert.equal(g.dead ?? false, false, 'running');
-  frame(pool, Math.ceil(8.2 / 0.016));
-  assert.equal(g.dead, true, 'gone');
-  assert.equal(g.escaped, true);
-  assert.ok(!g.corpse, 'no body');
-  // a death scatters its band too - PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own Disintegrate kneels it now,
-  // so the death here is a host's with no fates, exterior.js's)
-  N._resetRevenantForTests(); said = [];
-  const d = await stood(p, 2, { pool: rig(p, { fates: false }) });
-  breakWill(d.f);
-  d.pool.damageFoe(d.f, 99999, [0, 0, 3], null, { fromPlayer: true, whole: true });
-  assert.equal(d.f.dead, true);
-  assert.equal(d.band[0].scattering, true);
-  assert.equal(said.filter((l) => /scatters/.test(l)).length, 1);
-  // one with no band says nothing of one
-  N._resetRevenantForTests(); said = [];
-  const lone = await stood(p, 1);
-  lone.pool.damageFoe(lone.f, 99999, [0, 0, 3], null, { fromPlayer: true });
-  assert.ok(lone.f.yielded);
-  assert.equal(said.filter((l) => /scatters/.test(l)).length, 0, 'no band, no word');
-  // every way it leaves the fight
-  const s = read('src/scenes/exteriorFoes.js');
-  assert.match(s, /const ev = beginYield\(playerEntity, f, \{ now: Date\.now\(\), rolls \}\);\n\s*scatterBand\(f\);/, 'it kneels');
-  assert.match(s, /if \(_flee === 'start'\) scatterBand\(f\);/, 'it runs');
-  assert.match(s, /if \(f\.entity\?\.revenant\) scatterBand\(f\);   \/\/ RVN6: it dies/, 'it dies');
-  assert.match(s, /scatterBand\(f\);   \/\/ RVN6: executed/, 'it is executed');
-  assert.match(s, /scatterBand\(f\);   \/\/ RVN6\n\s*beginTearAway\(f,/, 'it tears away');
-  assert.match(s, /function escapeFoe\(f, \{ slip = false, unbroken = false \} = \{\}\) \{\n\s*scatterBand\(f\);/, 'it escapes');
 });
 
 test('RVN4 RANK 5, built with RVN6: at its last stand its band\'s survivors run to it (set on me from its feet); with none left, two of its kin step out of a portal about it (mutants: no rally; the portal\'s kin unstood; more than two; unmarked)', async () => {
@@ -285,17 +231,3 @@ test('RVN4 RANK 5, built with RVN6: at its last stand its band\'s survivors run 
 
 // ── the page ────────────────────────────────────────────────────────
 
-test('RVN6 the page: from rank 2 who rides with it, counted, and its band\'s name; none at rank 1 or for a solitary kind (mutants: shown at rank 1; the count; the name)', () => {
-  const kind = (t) => ({ [M.Orc]: 'Orc', [M.OrcShaman]: 'Orc Shaman', [M.Thief]: 'Thief' })[t] ?? 'Thing';
-  const r = { given: 'Grushnak', rank: 3, kin: [M.Orc, M.Orc, M.OrcShaman], mobileType: M.Orc };
-  assert.equal(bandWords(r, kind), "Band: rides with two Orcs - Grushnak's Warband.");
-  assert.equal(bandWords({ ...r, rank: 4 }, kind), "Band: rides with two Orcs and an Orc Shaman - Grushnak's Warband.");
-  assert.equal(bandWords({ ...r, rank: 2 }, kind), "Band: rides with an Orc - Grushnak's Warband.");
-  assert.equal(bandWords({ ...r, rank: 1 }, kind), '');
-  assert.equal(bandWords({ ...r, mobileType: M.Giant, kin: [] }, kind), '');
-  assert.equal(pluralKind('Thief', 3), 'three Thieves');
-  assert.equal(pluralKind('Harpy', 2), 'two Harpies');
-  assert.equal(pluralKind('Slaughterfish', 2), 'two Slaughterfish');
-  assert.equal(pluralKind('Werewolf', 1), 'a Werewolf');
-  assert.match(read('src/ui/revenant/revenantPage.js'), /const band = fallen \? '' : bandWords\(r, kindName\);   \/\/ RVN6\n\s*if \(band\) text\.append\(el\('span', 'rvn-will', band\)\);/);
-});

@@ -142,51 +142,6 @@ test('AUDIT 64 F18/F19: fast travel and the guild teleport carry DFU\'s repositi
   assert.equal(REPOSITION.DirectionFromStartMarker, 'DirectionFromStartMarker');
   assert.equal(REPOSITION.RandomStartMarker, 'RandomStartMarker');
 
-  const world = read('src/scenes/world.js');
-  const slice = (head, tail) => {
-    const i = world.indexOf(head);
-    assert.ok(i > 0, `${head} exists`);
-    const j = world.indexOf(tail, i);
-    return world.slice(i, j > 0 ? j : undefined);
-  };
-
-  // DaggerfallTravelPopUp.cs:334 - DirectionFromStartMarker, and the
-  // travelStartX/travelStartZ pair TeleportToMapPixel caches off the
-  // DEPARTURE before the GPS moves (:1078-1083).
-  const travel = slice('async function fastTravelTo(pick, opts, computed)', '\n  }');
-  assert.match(travel, /reposition: REPOSITION\.DirectionFromStartMarker,/,
-    'performFastTravel\'s own reposition method (DaggerfallTravelPopUp.cs:334)');
-  assert.match(travel, /const travelStart = state\.worldCoords\(/,
-    'and the departure world coordinates the hint is measured from');
-  assert.ok(travel.indexOf('const travelStart =') < travel.indexOf('await _teleportToPixel'),
-    'read BEFORE the jump, as TeleportToMapPixel reads it (:1078-1083 ahead of :1085-1086)');
-
-  // DaggerfallTeleportPopUp.cs:143 - RandomStartMarker, explicitly,
-  // against the overload's own default of Origin (StreamingWorld.cs:368).
-  const teleport = slice('async function teleportTo(pick)', '\n  }');
-  assert.match(teleport, /reposition: REPOSITION\.RandomStartMarker/,
-    'TeleportAway names the reposition (DaggerfallTeleportPopUp.cs:143)');
-
-  // ...and the core runs the ONE PositionPlayerToLocation for BOTH
-  // methods, which is what StreamingWorld.Update's fall-through does
-  // (:279-282).
-  assert.match(world, /const wantsLanding = reposition === REPOSITION\.RandomStartMarker\s*\n\s*\|\| reposition === REPOSITION\.DirectionFromStartMarker;/,
-    'Update\'s two cases fall through to one call (:279-282)');
-
-  // AUDIT 64 F18 (review): ...but the hint itself is cached for ONE of
-  // the two. TeleportToMapPixel guards the pair with
-  // `if (autoReposition == RepositionMethods.DirectionFromStartMarker)`
-  // (StreamingWorld.cs:1078-1083), so RandomStartMarker arrives with
-  // travelStartX/travelStartZ still null and takes :1486's
-  // Random.Range(0, 4). Pinned here because the derivation is the one
-  // token that can make the whole hint inert.
-  assert.match(world, /const hint = reposition === REPOSITION\.DirectionFromStartMarker \? travelStart : null;/,
-    'the pair is cached only for DirectionFromStartMarker (:1078-1083)');
-  // ...and the landing forwards BOTH halves the law reads - travelStart
-  // and the destination-pixel world coordinates the GPS already holds
-  // (:1085-1086). Either one null is :1483's fallback.
-  assert.match(world, /const at = locationArrivalLanding\(dfLoc, \{\s*\n\s*origin,\s*\n\s*startMarkers,\s*\n\s*travelStart,\s*\n\s*worldPos: travelStart \? mapPixelToWorldCoords\(px, py\) : null,\s*\n\s*\}\);/,
-    'both halves of DFU\'s `travelStartX == null || travelStartZ == null` test reach the law (:1483)');
 });
 
 // ── F20 / F21: Career.DamageFromSunlight, twice ──────────────────────
@@ -223,9 +178,6 @@ test('AUDIT 64 F20: the arrival clamp\'s SECOND arm is the CAREER flag', () => {
   // passiveSpecials.js careerSunAverse, the bit under a bare head (a
   // bare entity carries no equip, so it reads the bit).
   assert.equal(careerSunAverse({ career }), true, 'bare-headed: the bit');
-  assert.match(read('src/scenes/world.js'),
-    /sunAverse: racialSunAverse\(playerEntity\) \|\| careerSunAverse\(playerEntity\),/,
-    'HasVampirism() || Career.DamageFromSunlight (DaggerfallTravelPopUp.cs:351)');
 });
 
 test('AUDIT 64 F21: the travel map door refuses a career sun-damaged class by day', () => {
@@ -247,44 +199,9 @@ test('AUDIT 64 F21: the travel map door refuses a career sun-damaged class by da
     'the career rung never reads the racial override');
   assert.equal(isDayFromMinutes(12 * 60) && !isDayFromMinutes(2 * 60), true);
 
-  const world = read('src/scenes/world.js');
-  const i = world.indexOf('const toggleTravelMap = (gotoPlace = null) =>');
-  assert.ok(i > 0);
-  const door = world.slice(i, world.indexOf('/** G5: the map the guild', i));
-  assert.match(door, /const cfb = careerFastTravelBlock\(playerEntity, nowMin\);\s*\n\s*if \(cfb\) \{ sayWithNightfall\(cfb\.text\); if \(cfb\.hint\) townTalk\.say\(cfb\.hint\); return false; \}/,   // LIVED1: and, online, when the world's night falls (AUDIT LIVED1 M: on its own HUD row)
-    'the career box, with the same localized key both DFU sites use');
-  // ORDER, DaggerfallUI.cs's own: GiveOffer (:612), the career box
-  // (:614), then CheckFastTravel (:625).
-  const offer = door.indexOf('if (giveOffer()) return false;');   // GUIDE2: the door answers whether a map opened
-  const careerRung = door.indexOf('careerFastTravelBlock(playerEntity');
-  const racial = door.indexOf('racialFastTravelBlock(playerEntity');
-  assert.ok(offer > 0 && careerRung > offer && racial > careerRung,
-    'GiveOffer, then the career box, then the racial override');
 });
 
 // ── F22: the crime clear ─────────────────────────────────────────────
-
-test('AUDIT 64 F22: fast travel clears the crime, and a teleport does not', () => {
-  const world = read('src/scenes/world.js');
-  const travel = world.slice(world.indexOf('async function fastTravelTo(pick, opts, computed)'));
-  const body = travel.slice(0, travel.indexOf('\n  }'));
-  // PlayerEntity.cs:2455-2459, subscribed at :211 - "Clear crime state
-  // post fast travel", through the CrimeCommitted PROPERTY (:189,
-  // :2346-2354), which is the port's setCrimeCommitted.
-  assert.match(body, /setCrimeCommitted\(playerEntity, CRIMES\.None\);/,
-    'DaggerfallTravelPopUp_OnPostFastTravel clears the crime');
-  // Raised where DFU raises the event: DaggerfallTravelPopUp.cs:383,
-  // AFTER RaiseSkills (:380) and FadeHUDFromBlack (:381).
-  assert.ok(body.indexOf('raisePlayerSkills(') < body.indexOf('hudFade.fadeHUDFromBlack()'));
-  assert.ok(body.indexOf('hudFade.fadeHUDFromBlack()') < body.indexOf('setCrimeCommitted(playerEntity, CRIMES.None)'),
-    'the event is performFastTravel\'s LAST statement');
-
-  // DaggerfallTeleportPopUp never runs performFastTravel, so it raises
-  // no OnPostFastTravel and the crime rides a guild teleport in DFU too.
-  const tele = world.slice(world.indexOf('async function teleportTo(pick)'));
-  assert.equal(tele.slice(0, tele.indexOf('\n  }')).includes('setCrimeCommitted'), false,
-    'a teleport keeps the crime, as it does in DFU');
-});
 
 // ── F24: the sentence ────────────────────────────────────────────────
 

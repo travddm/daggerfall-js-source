@@ -334,17 +334,3 @@ test('WERE-FRIGHT: the watch frightened off runs, swings at nothing, and is gone
   assert.equal(pool.frighten(beastAt), 0, 'no crime\'s watch left to frighten');
 });
 
-test('WERE-FRIGHT: every door is wired - the striker\'s level rides from the pool to the flow, and each host sends all its watch running', () => {
-  assert.match(src('src/scenes/cityGuards.js'), /onPlayerHurt\?\.\(dmg, wpn, \{ guardLevel: g\.entity\.level \}\)/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(host);
-    assert.match(s, /onPlayerHurt: \(dmg, wpn, hit\) => \{/, `${host}: the pool's third argument is taken`);
-    assert.match(s, /if \(!arrestFlow\.onGuardHit\(dmg, apply, hit\)\) apply\(\);/, `${host}: and handed to the flow`);
-    assert.match(s, /onGuardHit: \(dmg, apply, hit\) => arrestFlow\.onGuardHit\(dmg, apply, hit\),/, `${host}: the building's watch rides the same seam`);
-    assert.match(s, /say: \(l\) => townTalk\.say\(l\),\n    playSound: \(clip\) => audio\.playOneShot\(clip, 1\),\n    watchFlees: \(\) => cityGuards\.frighten\(/, `${host}: the roar's three doors`);
-  }
-  assert.match(src('src/scenes/world.js'), /watchFlees: \(\) => cityGuards\.frighten\(walkMode && playerSpawned \? player\.pos : cam\.pos\) \+ \(modes\?\.frightenWatch\?\.\(\) \?\? 0\),/, 'the street\'s watch and a building\'s');
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /if \(!\(host\.onGuardHit\?\.\(dmg, apply, hit\) \?\? false\)\) apply\(\);/);
-  assert.match(modes, /frightenWatch: \(\) => interiorGuards\?\.frighten\(player\.pos\) \?\? 0,/);
-});

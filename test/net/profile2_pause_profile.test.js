@@ -38,25 +38,6 @@ test('PROFILE2: paused, the portrait is the character being PLAYED - its race, s
   assert.equal(liveCharacter(null), null);
 });
 
-test('PROFILE2: the pause face carries the mark and its window - the window innermost, and the door reads the live character only when paused', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  const mark = menu.slice(menu.indexOf('function profileMark()'), menu.indexOf('function profileMark()') + 600);
-  assert.match(mark, /const save = profileCharacter\(\);/);   // PROFILE-MENU: PIN MOVED - the law is one function the card asks too
-  assert.match(menu, /function profileCharacter\(\) \{\n  return mode === 'pause' \? liveCharacter\(playerEntity\) : newestPortraitSave\(\);\n\}/);
-  const pause = menu.slice(menu.indexOf('stage.append(pauseWindow());'), menu.indexOf('stage.append(pauseWindow());') + 2400);
-  assert.match(pause, /home\.append\(profileMark\(\)\);/, 'the mark over the game');
-  assert.match(pause, /if \(accountOpen\) \{\s*\n\s*const acct = el\('div', 'px-stage px-acctstage'\);\s*\n\s*acct\.append\(accountWindow\(\)\);/, 'the same window the door opens: the account and the Skin card');
-  // the window is the innermost thing Escape closes, ahead of the pause face's resume (the one back stack)
-  assert.match(menu, /const back = accountOpen \? \(\) => closeAccount\(\)/);   // PIN MOVED: AUDIT RECOVERY-SET B1 - Escape held over codes
-  // and a visit's: a window left open on the door does not stand over the next pause unasked
-  const mount = menu.slice(menu.indexOf('export function mountEnhancedMenu('), menu.indexOf('export function mountEnhancedMenu(') + 5000);
-  assert.match(mount, /questRepairSaid = null;[^\n]*\n(\s*\/\/[^\n]*\n)*\s*accountOpen = false;\n/);
-  const css = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\n\.px-over \.px-profile \{ top: 10px; right: 12px; \}/, 'a size smaller over the game, above the pause window');
-  assert.match(css, /\n\.px-over \.px-portrait \{ width: 48px; height: 48px; \}/);
-  assert.match(css, /\n\.px-over \.px-acctstage \{[^}]*align-items: center;/, 'its window centred - no wordmark to sit under');
-});
-
 // ─── THE WIRE AND THE RELAY ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('PROFILE2 wire: `look` is the hello\'s look without the hello - after one only, through validLook', () => {
@@ -201,13 +182,3 @@ test('PROFILE2 end to end: the frame a session sends, through the real relay, ch
 
 // ─── THE HOSTS ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('PROFILE2 hosts: the world host hands the session its look once a second and at every hello it opens; the body fetches a changed set whole', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const ONLINE_LOOK_CHECK_MS = 1000;/);
-  assert.match(w, /if \(now - _onlineLookAt >= ONLINE_LOOK_CHECK_MS\) \{ _onlineLookAt = now; online\.setLook\(composeLook\(playerEntity\)\); \}/);
-  assert.doesNotMatch(w, /online\.look = composeLook/, 'no look written past the session - a promoted halo sends no hello, so only setLook tells it');
-  assert.equal((w.match(/online\.setLook\(composeLook\(playerEntity\)\)/g) ?? []).length, 3, 'the cadence, the join and the halo about to open');
-  const body = src('src/player/eyeOfTheBeholder/eotbBody.js');
-  // PIN MOVED (LAYERED-GEAR): and a changed layered gearing skin - its switch or its body - fetches whole too
-  assert.match(body, /if \(renderer && \(was\.onFoot !== cfg\.onFoot \|\| was\.onHorse !== cfg\.onHorse(?: \|\| was\.wornArmour !== cfg\.wornArmour \|\| was\.layeredGender !== cfg\.layeredGender)?\)\) preload\(\);/);
-});

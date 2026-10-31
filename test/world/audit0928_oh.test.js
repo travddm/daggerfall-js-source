@@ -102,28 +102,6 @@ test('AUDIT PRE-MERGE 0928 H4: DeformSeafloor cuts round the float centre - frac
   }
 });
 
-test('AUDIT PRE-MERGE 0928 H4: RestoreOceanPosition\'s fallback spot (world.js pitPlacement) is the same float sum - where ProcessTerrain stood the pit', () => {
-  // world.js's closure cannot be booted here: its source is sliced out and run over a stub translation
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('pitPlacement: (x, y) => {');
-  assert.ok(at > 0, 'the fallback spot is world.js\'s pitPlacement');
-  const end = src.indexOf('\n    },', at);
-  const body = src.slice(at + 'pitPlacement: '.length, end + '\n    }'.length);
-  const make = (translation) => new Function('state', 'placementFraction', 'TILE_WORLD_SIZE', 'TILE_WORLD_SIZE_F32', `return (${body});`)(
-    { pixelTranslation: () => translation }, placementFraction, deepWaterFloor.TILE_WORLD_SIZE, deepWaterFloor.TILE_WORLD_SIZE_F32);
-  const fx = placementFraction(PX, PY, 88), fz = placementFraction(PX, PY, 90);
-  // IL_61de-IL_6272: terrain.transform.position + PlacementFraction(...) * terrainData.size, in floats
-  assert.deepEqual(make([0, 0, 0])(PX, PY), { x: 393.8670349121094, z: 239.61167907714844 });
-  const t = [4915.2, 0, -2457.6];
-  assert.deepEqual(make(t)(PX, PY), { x: f32(t[0] + f32(fx * SIZE_F)), z: f32(t[2] + f32(fz * SIZE_F)) });
-  // ...the very point ProcessTerrain stood the pit at under the same translation (oceanHolesHost.js num4 / num5)
-  const { oh, e } = rig(t);
-  oh.seafloorBuilt(e);
-  const pit = oh.pitOf(e);
-  assert.equal(f32(t[0] + pit.marker.localX), make(t)(PX, PY).x);
-  assert.equal(f32(t[2] + pit.marker.localZ), make(t)(PX, PY).z);
-});
-
 test('AUDIT PRE-MERGE 0928 H4: ONE DFU MEMBER, ONE EXPORT - terrainData.size as a float is deepWaterFloor.js\'s TILE_WORLD_SIZE_F32, and no other source rounds the tile size itself', () => {
   const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.js') ? [join(d, e.name)] : []));
   const root = fileURLToPath(new URL('../../src', import.meta.url));

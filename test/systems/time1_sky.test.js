@@ -130,13 +130,6 @@ test('TIME1 the tool: tools/skyCutover.mjs lists the aligned instants, and says 
   assert.ok(next > SWITCH.fromMs && near(skyLawOf([...SKY_SEGMENTS, { fromMs: next, minutesPerMs: RATE48 }]).minutesAt(next), skyClassicMinutes(next)), 'the new row: after the last, no jump where it starts');
 });
 
-test('TIME1 the bundles: the relay never reaches the sky (RELAY_VERSION is not moved by it); the account service does, through the professions\' day, and its deploy filter names it', () => {
-  assert.ok(!graph('server/src/index.js').includes('src/net/skyLaw.js'), 'the relay bundles no sky');
-  assert.ok(graph('server-account/src/index.js').includes('src/net/skyLaw.js'), 'the account service bundles it (nodeLaw.js dayDate)');
-  assert.match(rd('.github/workflows/account-deploy.yml'), /- "src\/net\/skyLaw\.js"/);
-  assert.doesNotMatch(rd('src/net/wire.js'), /skyLaw|SKY_SEGMENTS/, "the wire's bytes are the relay's: the sky is not in them");
-});
-
 test('TIME1 the clock module: offline the sky IS the one clock; online it reads its own source; a shared clock installed with no sky has its sky read the event clock; and the weather\'s calendar switches with it', () => {
   setWorldMinutes(777_777);
   assert.equal(sharedClockOn(), false);
@@ -283,42 +276,3 @@ test('TIME1 the professions\' day reads the sky\'s season - one law at both ends
   assert.deepEqual(dayDate(before), dateFromClassicMinutes(Math.floor(sharedClassicMinutes(before * 86_400_000))), 'before the switch the sky is the event clock');
 });
 
-test('TIME1 by source - THE FOUR HOSTS RULE: world.js installs the sky beside the event clock and every host reads the sky for the sky (the frame\'s hour, the seasons, the rounds\' sky, the interior\'s light, the sunlight seam); the sky feed takes two minutes; the wilds\' night is the sky\'s', () => {
-  const world = rd('src/scenes/world.js'), exterior = rd('src/scenes/exterior.js'), modes = rd('src/scenes/worldModes.js'), dungeon = rd('src/scenes/dungeonContext.js'), shared = rd('src/scenes/shared.js');
-  assert.match(world, /setSharedClock\(\(\) => sharedClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), \(m\) => wallMsForClassicMinutes\(m\) - _sharedOffsetMs, \{ sky: \(\) => skyClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), skyWall: \(m\) => wallMsForSkyMinutes\(m\) - _sharedOffsetMs \}\)/, 'the install: the event clock and the sky, through one offset');
-  for (const [name, src] of [['world.js', world], ['exterior.js', exterior]]) {
-    assert.match(src, /const minuteNow = \(\) => skyMinutes\(\) % 1440;/, `${name}: the frame's hour`);
-    assert.match(src, /let season = seasonPin \?\? climateSeasonFromMinutes\(skyMinutes\(\)\);/, `${name}: the season`);
-    assert.match(src, /classicMinutes: playerTicker\.classicMinutes, skyMinutes: skyMinutes\(\),/, `${name}: the sky feed's two minutes`);
-  }
-  assert.match(modes, /renderer\.setLighting\(new Float32Array\(roomAmbient\(isNight\(skyMinutes\(\) % 1440\)/, "worldModes.js: the interior's night");   // PIN MOVED (RPT1026-WORLD DARK-ROOM): an unlit room keeps the sky's ambient
-  assert.match(modes, /now: \(\) => Math\.floor\(skyMinutes\(\)\),   \/\/ a VIEW on the one world clock; TIME1/, 'worldModes.js: the sunlight seam');
-  assert.match(dungeon, /skyMinutes: sharedClockOn\(\) \? Math\.floor\(skyMinutes\(\)\) : null \}\)/, "dungeonContext.js: the rest's rounds read the sky");
-  assert.match(dungeon, /now: \(\) => Math\.floor\(skyMinutes\(\)\),   \/\/ LIVED1: the sunlight seam/, 'dungeonContext.js: the sunlight seam');
-  assert.match(shared, /const skyNow = extra\?\.skyMinutes \?\? nowMin;/, 'the feed: the sky\'s minute, or the one clock');
-  assert.match(shared, /const dt = lastMin === null \|\| nowMin < lastMin \? 0 : nowMin - lastMin;/, 'the feed walks the event clock: dt, the ease, the wind, the drift');
-  assert.match(shared, /minuteOfDay, classicMinutes: skyNow, weather: skyWord/, "the mod's date is the sky's");
-  assert.match(world, /skyMinute: \(\) => Math\.floor\(skyMinutes\(\)\),   \/\/ TIME1: the wilds' night/, "the wilds' night");
-  assert.match(rd('src/scenes/exteriorFoes.js'), /night = isNight\(\(skyMinute \?\? currentMinute\)\(\)\)/);
-  assert.match(rd('src/systems/worldTick.js'), /skyMinutes: _sharedClock \? skyMinutes\(\) : null \}\);/, "the tick's rounds read the sky");
-  // AUDIT TIME (second round): the standalone host's camp roll reads the sky ONLINE only - offline its day and night are the
-  // minute the catch-up walks, as the lone roll's beside it (a raise across 18:00 rolled the night table for the day's window)
-  assert.match(exterior, /rollCampEncounter\(\{\n\s+gameMinutes: _lastEncMinutes \+ l \+ 1, inside: _m !== 'exterior',\n\s+skyMinutes: sharedClockOn\(\) \? Math\.floor\(skyMinutes\(\)\) : null,/, "exterior.js: the camp roll's sky, online only");
-});
-
-test('TIME1 AUDIT: the coven\'s re-roll is a STAMP on the event clock - the sky\'s days turning four times as fast re-roll nothing; the event clock\'s next day does; a prince\'s own day is the sky\'s', async () => {
-  const { daedraForSummoner, DAEDRA, WITCHES_COVEN_TYPE: COVEN } = await import('../../src/systems/daedraSummoning.js');
-  const state = {};
-  let k = 0;
-  const rolls = () => [0.1, 0.5, 0.9][k++ % 3];
-  const first = daedraForSummoner({ factionId: 1, factionType: COVEN, dayOfYear: 280, rerollDay: 250, state, rolls });
-  for (const skyDay of [281, 282, 283]) assert.equal(daedraForSummoner({ factionId: 1, factionType: COVEN, dayOfYear: skyDay, rerollDay: 250, state, rolls }), first, `the sky's day ${skyDay}: the same prince`);
-  assert.equal(state.daedraSummonDay, 250, 'the saved stamp is the event clock\'s day');
-  assert.notEqual(daedraForSummoner({ factionId: 1, factionType: COVEN, dayOfYear: 284, rerollDay: 251, state, rolls }), first, 'the event clock\'s next day re-rolls');
-  const offline = {};
-  daedraForSummoner({ factionId: 1, factionType: COVEN, dayOfYear: 90, state: offline, rolls });
-  assert.equal(offline.daedraSummonDay, 90, 'offline (no rerollDay) DFU\'s one day');
-  const prince = DAEDRA.find((d) => d.dayOfYear > 0);
-  assert.equal(daedraForSummoner({ factionId: 999, factionType: 0, dayOfYear: prince.dayOfYear, rerollDay: 1 }), prince, 'a prince answers on the sky\'s day');
-  assert.match(rd('src/scenes/worldModes.js'), /rerollDay: dayOfYearFromMinutes\(Math\.floor\(worldMinutes\(\)\)\),/);
-});

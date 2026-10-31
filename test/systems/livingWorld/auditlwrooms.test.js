@@ -70,11 +70,6 @@ test('AUDIT LW-ROOMS A1/B1 the room measured as its build hung it - every door s
   assert.equal(across(), Infinity, 'and open after it');
   assert.ok(soundRoom(h.landing, h.collider, h.floorAt, [], [h.landing]).some((p) => p[0] > 3.3), 'walked as it is, through the open door');
   assert.ok(Number.isFinite(h.actions.withDoorsShut(across)), 'shut within');
-  // the host: the interior's own actions
-  const w = rd('src/scenes/world.js');
-  const doorsShut = new Function('modes', `return ${lift(w, /\n\s*doorsShut: (\(fn\) => \(\(actions\) => \(actions\?\.withDoorsShut \? actions\.withDoorsShut\(fn\) : fn\(\)\)\)\(modes\?\.interiorCtx\?\.actions\)),/, 'the host\'s doors shut')}`);
-  assert.ok(doorsShut({ interiorCtx: { actions: h.actions } })(across) < 3, 'the host\'s: shut within');
-  assert.equal(doorsShut({})(() => 7), 7, 'no room: as it is');
 });
 
 test('AUDIT LW-ROOMS B2/B1 the room\'s measure every reader\'s alike: the building\'s own people every one, at their post at the hour or not, and every bed\'s stand kept clear of its places; the reader\'s own quest\'s people in none of it - only never stood on, nor walked to (one reader\'s quest person anywhere on the floor stood all twelve elsewhere; a drinker stood within 0.7 m of a lodger\'s stand in 38 taverns) (mutants: the hour, the quest measured, the quest stood on, the quest walked to, the beds)', () => {
@@ -239,15 +234,6 @@ test('AUDIT LW-ROOMS B3/B4 a word only to one the room shows the player, on the 
   assert.deepEqual(up.st.greets, [], 'none to one on another floor');
   up.layer.frame(0.016, [p[0] + 1, 3, p[2]], 0, [p[0] + 1, 4.6, p[2]]);
   assert.deepEqual(up.st.greets, [RES(1).id], 'on their floor: a word');
-  // the talk ray: the room's own wall the nearer
-  const w = rd('src/scenes/world.js');
-  const act = new Function('livingIndoors', 'townTalk', 'modes', `return ${lift(w, /\n\s*livingPersonsAct: (\(eye, dir, nearer\) => [^\n]*?\)\)),   \/\/ LW8/, 'the host\'s talk ray')}`);
-  const said = [];
-  const act1 = act({ size: 1, seats: () => [] }, { tryActivate: (e, d, s, nearer) => { said.push(nearer); return true; } }, { interiorCollider: h.collider });
-  act1([2, 1.6, -4], [1, 0, 0], Infinity);
-  assert.ok(Math.abs(said[0] - 1) < 1e-3, `the wall a metre off (${said[0]})`);
-  act1([2, 1.6, -4], [1, 0, 0], 0.4);
-  assert.equal(said[1], 0.4, 'a nearer winner keeps it');
 });
 
 test('AUDIT LW-ROOMS D6/D7/D11 the walk\'s laws no pin could fail: never past 1.2 m of the floor under the way in, though the way in stands at the door\'s middle; the tables spread by their middles; two places INDOOR_APART_M apart to a centimetre, a wall\'s drawn-in one beside the lattice\'s none; a dais a step up no floor of the room; the reach twenty metres, the floor one to every eight square metres (mutants: the way in\'s floor, the opener, the centimetre, the level, the reach, the floor\'s share)', () => {

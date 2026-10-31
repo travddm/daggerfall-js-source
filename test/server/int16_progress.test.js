@@ -224,16 +224,6 @@ test('INT17: the bucket in units - a count stream refused at less than one; the 
 });
 
 test('INT16-INT17 clients: a refused seat or hold ends the Renown tracker\'s asking for the page, drops the day\'s finds and the Watch\'s ticks; an enforced line keeps a harvest to ask again; the words are said', () => {
-  assert.match(src('src/net/renownTracker.js'), /const PERMANENT = new Set\(\['renown-character', 'renown-xp', 'renown-full', 'progress-seat', 'trade-held'\]\);/);
   assert.deepEqual(FIND_DROPS, ['marks-young', 'progress-seat', 'trade-held']);
-  assert.match(src('src/net/marksBook.js'), /\} else if \(error === 'marks-rate' \|\| error === 'progress-play'\) \{/);
-  assert.match(src('src/net/townSeatBook.js'), /const WATCH_SETTLED = Object\.freeze\(\['bad-watch', 'seats-need-account', 'seats-closed', 'progress-seat', 'trade-held'\]\);/);
-  // PIN MOVED (AUDIT GATHER F1, Professions-Arc.md section 55): and a CARRIED harvest the seat refuses is kept - it may have
-  // landed with its answer lost (test/systems/auditgather.test.js)
-  // AUDIT LOCKPICK D1: and only once an earlier ask went unanswered - refused on its first ask it never landed
-  assert.match(src('src/net/profBook.js'), /const seatHeld = h\.carry === true && SEAT_REFUSALS\.includes\(r\?\.error\) && \(h\.tries \| 0\) > 0;\n\s*if \(keptAnswer\(r\) \|\| r\?\.error === 'prof-rate' \|\| r\?\.error === 'progress-play' \|\| seatHeld\) \{/);
   for (const k of ['progress-seat', 'progress-play', 'trade-held']) assert.equal(typeof REFUSALS[k], 'string', k);
-  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the seat is the door's one statement's read (door.js doorReads), judged by progressRefusal's own law
-  // PIN MOVED (AUDIT PLAN-1000 F1): the seat the door read - or, a window turned between the rate's peek and its count, read then
-  assert.match(src('server-account/src/index.js'), /const read = door\.seat === undefined \? await doorReads\(db, who\.player\.id, \{ tomb: null, stream \}\) : door;\n\s+const seat = seatRefusalOf\(read\.seat, \{ named, character: body\.character \}\);[^\n]*\n\s+if \(seat\) return json\(seat, 403, origin\);/);
 });

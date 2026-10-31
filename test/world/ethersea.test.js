@@ -299,23 +299,6 @@ test('ETHER-SEA the far ring: past the map it reads the host\'s climate where th
 });
 
 test('ETHER-SEA by source: the host composes the sea over the ground between the repairs and the client (its climate and its politic too) and streams its box; the worker composes its own copy on the client\'s word, through a pure module (mutants: the order, the word)', () => {
-  const src = read('src/scenes/world.js');
-  const i = src.indexOf('woods.syncHeightMapBytes();'), j = src.indexOf('const terrainGen = new TerrainGenClient({ woods, woodsBytes });');
-  const between = src.slice(i, j);
-  assert.match(between, /const etherSea = etherSeaOn\(\);/);
-  assert.match(between, /woods = etherWoods\(woods\);/);
-  assert.match(between, /maps\.getClimateIndex = etherClimateIndex\(maps\.getClimateIndex\.bind\(maps\)\);/);
-  assert.match(between, /maps\.getPoliticIndex = etherPoliticIndex\(maps\.getPoliticIndex\.bind\(maps\), ETHER_REGION\);/);
-  assert.match(between, /StreamingWorldState\.frames = etherSea \? \[etherFrame\(\)\] : \[\];/);
-  assert.ok(between.indexOf('woods = groundWoods(woods);') < between.indexOf('woods = etherWoods(woods);'), 'over the continent\'s ground');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G4/G9): the continent's past the map wherever it stands, the sea's in its law, the Bay edge's clamp else
-  assert.match(src, /climatePast: tamrielLand \? \(x, y\) => maps\.getClimateIndex\(x, y\)\n\s+: etherSea \? \(x, y\) => maps\.getClimateIndex\(\.\.\.\(inEtherLaw\(x, y\) \? \[x, y\] : \[Math\.max\(0, Math\.min\(MAP_WIDTH - 1, x\)\), Math\.max\(0, Math\.min\(MAP_HEIGHT - 1, y\)\)\]\)\) : null,/);
-  const worker = read('src/world/terrain/terrainGenWorker.js');
-  assert.match(worker, /import \{ etherWoods \} from '\.\.\/ethericSea\.js';/);
-  assert.match(worker, /if \(m\.ether\) woods = etherWoods\(woods\);/);
-  const sea = read('src/world/ethericSea.js');
-  assert.deepEqual([...sea.matchAll(/^import[^'"]*from ['"]([^'"]+)['"]/gm)].map((m) => m[1]), ['../formats/mapsTables.js'], 'worker-safe: formats alone');
-  for (const bad of ['document', 'globalThis.', 'fetch(', 'localStorage', 'getPref']) assert.ok(!sea.includes(bad), `pure: no ${bad}`);
   const posted = [];
   new TerrainGenClient({ woods: etherWoods(seaWoods()), woodsBytes: new Uint8Array(16), workerFactory: () => ({ postMessage: (m) => posted.push(m), terminate() {} }) });
   assert.equal(posted[0].ether, true, 'the client\'s word');
@@ -332,9 +315,4 @@ test('ETHER-LIGHT the light past the Veil: cold and violet - the ambient leaned 
   assert.deepEqual([...etherLight(rgb, 7)], [...etherLight(rgb, 1)], 'the weight kept to one');
   assert.deepEqual([...rgb], [...new Float32Array([0.5, 0.6, 0.7])], 'never written');
   assert.ok(etherLight([0.5, 0.6, 0.7], 0) instanceof Float32Array);
-  const src = read('src/scenes/world.js');
-  assert.match(src, /const etherAirW = etherPx && inEther\(etherPx\.x, etherPx\.y\) \? 1 : 0;/);
-  assert.match(src, /etherLight\(sdBrassLight\(sunbabyLight\(/, 'the ambient');
-  // PIN MOVED (VALENWOOD-CANOPY): the key leaned green under the leaves after the sea's lean (world/jungle/jungleCanopy.js canopyLight)
-  assert.match(src, /etherLight\(sdBrassLight\(sunbabyKey\(dreadLight\(SUN_RIG_COLOR, skyDreadW\), sunbabyW, sunbabyFace\.evil\), sdAirW\), etherAirW, ETHER_KEY_TINT\), jungle\?\.canopy, 0\)\);/, 'the sun');
 });

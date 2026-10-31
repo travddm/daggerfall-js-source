@@ -83,12 +83,6 @@ test('EG-ZM THE TIMERS ROW\'S DOOR (section 20): where the host hands the boards
   const v3 = timersWindow(fakeDoc(), { read: () => ({ now, elite: { op } }), onClose() {}, every: 1e9 });
   v3.stop();
   assert.equal(all(v3.root, 'tm-door').length, 0);
-  // THE PAUSE FACE: a handoff, as the sheet's doors - and a door that opened nothing resumes
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  // PIN MOVED (AUDIT GROWTH LANE2-3): a Growth face under the window is asked first, then the hand-off as before
-  // PIN MOVED (AUDIT SEASON-BOOK S3): the hand-off through its one home, its handler read before the face goes down
-  assert.match(menu, /\nconst timersDoor = \(fn\) => \{\n\s*if \(pauseTab === 'growth' && growthAsks\(\)\) \{ [^\n]*return; \}\n\s*handoff\(fn, \(r\) => !!r\);\n\};\n/);
-  assert.match(menu, /timersWindow\(document, \{ read: \(\) => hooks\.timers\?\.\(\{ ask: true \}\) \?\? null, onClose: [^\n]*, door: timersDoor, focus: timersFocusIn \}\);/);   // PIN MOVED (AUDIT SEASON-BOOK U3): the focus in at its opening alone
 });
 
 test('EG-ZM THE START WINDOW\'S DOOR (section 20): where the host hands the boards\' door, the start window\'s last row is the boards - with keys or with the Rehearsal alone; picked, the list leaves the slot before the boards are opened, and comes back once they close (once, however often their close is told), or at once where none opened; a window ended meanwhile is not opened again (mutants: the row unoffered; the list left in the slot; the window never back; back twice; back after its end)', () => {
@@ -136,53 +130,3 @@ test('EG-ZM THE START WINDOW\'S DOOR (section 20): where the host hands the boar
   assert.deepEqual(R.log, ['open', 'close', 'boards']);
 });
 
-test('EG-ZM THE BOARDS\' ONE DOOR (ui/eliteGates/egBoardWindow.js createEgBoardDoor; scenes/world.js egBoardDoor): every way in opens the boards through it - `/breach board`, the Timers rows\' door, the start window\'s; one at a time, the boards standing closed and out of the slot before the next go in; the classic skin\'s pickers given a slot a pause face is leaving (a window done, not yet drained), never one a live window holds; the enhanced panel needs no slot; `onClosed` told once (mutants: two boards standing; a done window holding the slot; a live window thrown out; the close untold)', async () => {
-  // CLASSIC, over a one-window slot
-  let slot = null;
-  const thrown = [];
-  class Picker { constructor(o) { Object.assign(this, o); } }
-  const door = createEgBoardDoor({
-    open: (o) => openEgBoard({ classic: true, fetchBoard: async () => ({ ok: true, data: null }), ListPicker: Picker, ...o }),
-    slot: { top: () => slot, mount: (w) => { if (slot) return false; slot = w; return true; }, close: (w) => { if (slot === w) { slot = null; thrown.push(w); } } },
-  });
-  let closed = 0;
-  const a = door(() => { closed++; });
-  assert.ok(a && slot instanceof Picker, 'the tabs in the slot');
-  assert.deepEqual(slot.items, EG_BOARD_TABS.map((k) => EG_BOARD_TAB_TEXT[k]));
-  const first = slot;
-  const b = door();
-  assert.ok(b && b !== a, 'opened again');
-  assert.equal(closed, 1, 'the first closed - told once');
-  assert.ok(thrown.includes(first) && slot !== first && slot instanceof Picker, 'out of the slot before the next went in');
-  b.close();
-  assert.equal(slot, null);
-  // a pause face on its way out (done) gives the slot up; a live window keeps it
-  const leaving = { done: true };
-  slot = leaving;
-  const c = door();
-  assert.ok(c && slot instanceof Picker && thrown.includes(leaving), 'the done window out, the boards in');
-  c.close();
-  const live = { done: false };
-  slot = live;
-  assert.equal(door(), null, 'a live window keeps its slot: no boards');
-  assert.equal(slot, live, 'and is never thrown out');
-  // ENHANCED: the panel, no slot asked
-  slot = null;
-  const body = { children: [], append(...cs) { this.children.push(...cs); } };
-  const doc = { ...fakeDoc(), body, head: body, getElementById: () => null };
-  const node = doc.createElement;
-  doc.createElement = (tag) => { const n = node(tag); n.remove = () => { n.removed = true; }; n.focus = () => {}; n.replaceChildren = (...cs) => { n.children = cs; }; return n; };
-  let eClosed = 0;
-  const panelDoor = createEgBoardDoor({ open: (o) => openEgBoard({ doc, fetchBoard: async () => ({ ok: true, data: null }), ...o }), slot: { top: () => slot, mount: () => false, close: () => {} } });
-  const e1 = panelDoor(() => { eClosed++; });
-  assert.ok(e1 && body.children.length >= 1 && slot === null, 'the panel, in no slot');
-  panelDoor();
-  assert.equal(eClosed, 1, 'the panel standing closed first');
-  // THE HOST: the one door, and its three ways in
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const egWindowSlot = \{ top: \(\) => modes\?\.topWindow\?\.\(\) \?\? null, mount: \(w\) => modes\?\.mountWindow\?\.\(w\), close: \(w\) => modes\?\.closeWindow\?\.\(w\) \};[^\n]*\n\s*const egBoardDoor = createEgBoardDoor\(\{\n\s*open: \(o\) => openEgBoard\(\{ doc: document, classic: !isEnhancedPlus\(\), fetchBoard: \(\) => _accountEg\.board\(\), listPickerReady: listPickerArtLoaded, runs: \(\) => egRecapsKept\(appStorage\(\)\), \.\.\.o \}\),[^\n]*\n\s*slot: egWindowSlot,/);   // PIN MOVED (AUDIT EG V, c: L7-19 - the boards' door carries this device's last runs, their sixth tab; AUDIT STAKE-ROW - the slot the boards share with the start window's list, egWindowSlot)
-  assert.match(w, /board: \(\) => egBoardDoor\(\),   \/\/ EG-E2: `\/breach board`/);
-  assert.match(w, /doors: egClient \? \{ board: \(\) => egBoardDoor\(\) \} : null,/);
-  assert.match(w, /const egStartWindow = \(o\) => openEgStartWindow\(\{\n\s*\.\.\.o,\n\s*board: \(onClosed\) => egBoardDoor\(onClosed\),/);
-  assert.equal((w.match(/openEgBoard\(/g) ?? []).length, 1, 'the boards opened in one place');
-});

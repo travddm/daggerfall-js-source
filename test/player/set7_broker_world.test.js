@@ -101,8 +101,6 @@ test('SET7 her turn: to a player within BROKER_NOTICE_M, back out of the gate be
   assert.equal(turnToward(0, 1, -5), 0, 'a clock run backwards turns nothing');
 });
 
-
-
 /** A fake renderer and texture: the court's own billboard seam (createBillboardBatch, textures.has), and the meshes' -
  *  her cage's (createMesh, drawMesh, the gate's art uploaded). */
 function fakeArt() {
@@ -596,36 +594,3 @@ test('SET7 the race: the Broker is a family of her own - she beats what is behin
   assert.equal(raceActivation({}).brokerWins, false, 'no Broker never wins');
 });
 
-
-test('SET7 the host\'s seams: online alone (with the omen), stood each frame right after the gate, on the flats\' axis in the street, raced and armed after the gate in the press, raced and named after it in the plaque, the sale through the law behind the pack\'s carry gate and its clink, the stock and the record the shared clock\'s day, the record in every host\'s save, the window\'s chunk warmed with the doors (mutants: each seam removed) - BROKER-CAGE: her site the omen\'s cage site, her freedom the rite\'s cleared word, her cage drawn beside the circle', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const sigilBroker = gateOmen \? createSigilBroker\(\{/, 'with the omen: online alone');
-  assert.match(w, /site: \(\) => gateOmen\.cageSite\(\),/, 'BROKER-CAGE: the breach the clock is about, omen to midnight');
-  assert.match(w, /freed: \(day, px, py\) => _relayKeepsRite === false \|\| !!riteHost\?\.isCleared\(day, px, py, _relayKeepsCage !== true\),/, 'BROKER-CAGE: free once every one of the faithful fell - AUDIT C6: the hub\'s word alone where the relay says it; C4: free where the relay stands no faithful');
-  assert.match(w, /freedAt: \(day, px, py\) => riteHost\?\.clearedAt\(day, px, py\) \?\? NaN,/, 'AUDIT C8: when the hub said it');
-  assert.match(w, /const onRelayVersion = \(v\) => \{ [^\n]*?_relayKeepsRite = relaySupportsRite\(v\); _relayKeepsCage = relaySupportsCage\(v\);/, 'AUDIT C4, C6: read off every welcome\'s relay (PIN MOVED, SCALE5c: after the page keeps whether the relay has the hub\'s shards)');
-  assert.match(w, /let _relayKeepsRite = null, _relayKeepsCage = null;/, 'unknown until a welcome says - caged meanwhile');
-  assert.match(w, /heightAt: \(x, z\) => surfaceAt\(x, z\),/, 'the drawn ground, as the circle stands on');
-  assert.match(w, /site: \(\) => gateOmen\.cageSite\(\),[^\n]*\n(?:[^\n]*\n){0,12}\s*say: \(text\) => townTalk\.say\(text\),/, 'AUDIT W4: her words to the HUD\'s lines, as a static NPC\'s Info says');
-  assert.match(w, /if \(_torchesMode === 'exterior'\) \{ closeBrokerDoor\(\); sigilBroker\?\.destroyAll\(\); \}/, 'AUDIT W2: the street left - her window shut and her post down');
-  assert.match(w, /gone: \(\) => closeBrokerDoor\(\),/, 'midnight: her window shut');
-  assert.match(w, /riteHost\?\.draw\(renderer, null, mwv\.eye\);[^\n]*\n\s*sigilBroker\?\.draw\(renderer\);/, 'BROKER-CAGE: her cage drawn beside the circle');
-  const gateFrame = w.indexOf('try { if (gatePool?.frame(dt)) warmGateVeil(); }'), brokerFrame = w.indexOf('try { sigilBroker?.frame(dt); }');
-  assert.ok(gateFrame > 0 && brokerFrame > gateFrame && brokerFrame - gateFrame < 400, 'stood right after the gate');
-  assert.match(w, /if \(sigilBroker && _mode\(\) === 'exterior'\) livePersonBatches\.push\(\.\.\.sigilBroker\.batches\(\)\);/);
-  assert.match(w, /const _brokerPick = sigilBroker \? pickActivatableHit\(cam\.pos, useFwd, sigilBroker\.targets\(\), collider\) : null;/);
-  assert.match(w, /else if \(_race\.brokerWins\) \{ if \(_brokerPick\.distance > _brokerPick\.reach\) setMidScreenText\(tooFarAwayText\(\)\); else sigilBroker\.activate\(_brokerPick\.key, getInteractionMode\(\)\); \}/, 'the arm after the gate\'s, refusing out loud past her reach');
-  assert.ok(w.indexOf('if (_race.gateWins)') < w.indexOf('else if (_race.brokerWins)') && w.indexOf('else if (_race.brokerWins)') < w.indexOf('else if (_race.campWins)'), 'the arms in the race\'s tie order');
-  assert.match(w, /broker: sigilBroker \? pickActivatableHit\(cam\.pos, _hd, sigilBroker\.targets\(\), collider\) : null,/, 'the plaque races her');
-  assert.match(w, /\(key\) => gatePool\?\.hoverName\(key\) \?\? null,[^\n]*\n\s*\(key\) => sigilBroker\?\.hoverName\(key\) \?\? null,/, 'and names her, after the gate');
-  assert.match(w, /const sale = makeBrokerSale\(offer, \{\s*\n\s*items: playerEntity\.items, day: brokerDay\(_brokerNow\(\)\),\s*\n\s*canCarry: \(item, rest\) => planTake\(item, \{ bag: rest, entity: playerEntity, dryRun: true \}\)\.ok,/, 'the sale through the law, behind the pack\'s carry gate');
-  assert.match(w, /if \(!sigilBroker\?\.stands\(\) \|\| _mode\(\) !== 'exterior'\) return \{ ok: false, reason: 'gone' \};/, 'a window on her gone or caged sells nothing, nor one carried off the street (AUDIT W2)');
-  assert.match(w, /audio\.playOneShot\(SOUND\.GoldPieces, 1\);\s*\n\s*surfacePlayer\(\);\s*\n\s*return sale;/, 'a concluded deal clinks');
-  assert.match(w, /items: \(\) => spendableStonesIn\(playerEntity\.items \?\? \[\]\), locked: \(\) => stoneCount\(lockedStonesIn\(playerEntity\.items \?\? \[\]\)\),/, 'the purse: the stones a sale may spend, and the locked ones beside them - counted over their stacks (SS1)');
-  assert.match(w, /if \(win\) townTalk\.showOverlay\(win\);/);
-  assert.match(w, /const _brokerNow = \(\) => Date\.now\(\) \+ _sharedOffsetMs;/, 'the shared clock\'s day, never this machine\'s');
-  assert.match(read('src/scenes/shared.js'), /import '\.\.\/systems\/sigil\/sigilBroker\.js';/, 'the record\'s save slot in every host');
-  assert.match(read('src/ui/enhanced/enhancedChunk.js'), /\(\) => import\('\.\.\/brokerWindow\.js'\),/, 'warmed with the doors');
-  const door = read('src/ui/brokerDoor.js');
-  assert.match(door, /load: \(\) => import\('\.\/brokerWindow\.js'\),/, 'the door\'s chunk through the one home');
-});

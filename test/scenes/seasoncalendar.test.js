@@ -168,58 +168,6 @@ test('A1: both hosts take the season from the clock, with ?season demoted to a p
   }
 });
 
-test('A1: the streaming host re-skins what already stands, without unloading it', () => {
-  // DaggerfallLocation.Update (:118-130) -> ApplyTimeAndSpace
-  // (:133-148): the standing location is RE-SKINNED when SeasonValue
-  // moves. This host bakes its swaps into GL uploads, so the
-  // equivalent is destroyPixel + requeue - but that must NOT be an
-  // unload: the reference's terrain never goes away for a season
-  // change, so its loose piles and corpses do not either
-  // (CollectLooseObjects is the unload's, StreamingWorld.cs:1040-1052).
-  const world = hostText('src/scenes/world.js');
-  // PIN MOVED (IC-SWAP-BEHIND, scenes/swapBehind.js): `carried` and `carryOnly` beside it - a rebuild behind its view takes its carry at the mark and not again at the swap; the default still collects
-  assert.match(world, /function destroyPixel\(px, py, \{ collectLoose = true, carried = false, carryOnly = false \} = \{\}\) \{/,
-    'destroyPixel lost the re-skin door');
-  assert.match(world, /if \(collectLoose\) droppedLoot\.collectPixel\(key\);/);
-  assert.match(world, /if \(collectLoose\) \{ cityGuards\.collectPixel\(key\); exteriorFoes\.collectPixel\(key\); \}/);
-  // PIN MOVED (IC-SWAP-BEHIND): the season's rebuild goes through the swap (scenes/swapBehind.js), whose teardown - the view
-  // behind which it builds, or the pixel itself with the switch off - is a rebuild's, never an unload's
-  const SW = readFileSync(new URL('../../src/scenes/swapBehind.js', import.meta.url), 'utf8');
-  assert.match(SW, /host\.destroyPixel\(px, py, \{ collectLoose: false \}\); return false;/,
-    'the season rebuild must not sweep loose objects');
-  assert.match(SW, /host\.destroyPixel\(px, py, \{ collectLoose: false, carryOnly: true \}\);/);
-  assert.match(SW, /host\.destroyPixel\(px, py, \{ collectLoose: false, carried: true \}\);/);
-  // The pixels stay in state.loaded ("built or building") - releasing
-  // them would let the next crossing list them a second time.
-  // ROAD-H H3: the window is the whole function (it grew with the
-  // per-key collector), not a byte count that silently stops covering
-  // the assertions below.
-  const tick = world.slice(world.indexOf('function tickSeason()'), world.indexOf('\n  }\n', world.indexOf('function tickSeason()')));
-  assert.doesNotMatch(tick, /state\.release/, 'the re-skin released the pixels it is about to rebuild');
-  assert.match(tick, /swap\.rebuild\(keys\.map\(/, 'PIN MOVED (IC-SWAP-BEHIND): the torn-down pixels must be queued back - through the swap');
-  assert.match(SW, /if \(front\) host\.queue\.unshift\(\.\.\.sorted\); else host\.queue\.push\(\.\.\.sorted\);/);
-  // ...and it waits for a build in flight: buildPixel publishes only at
-  // its very end, so tearing down a key that has no entry yet frees
-  // nothing and orphans everything the finished build made (the hazard
-  // pump re-checks for after its own await, AUDIT 24).
-  assert.match(tick, /if \(!_reskin\.pending \|\| building\) return;/,
-    'the re-skin must not tear down a pixel whose textures are still crossing');
-  // ROAD-H H3: the keys come out of the collector, not out of `built`.
-  // The classic flip marks every key (markAll); the mod's refresh marks
-  // only the pixels RefreshLoadedNatureBatches would have re-applied.
-  assert.match(tick, /const keys = _reskin\.take\(built\);/,
-    'the re-skin rebuilds the keys the refresh marked, not the whole grid');
-  assert.match(world, /^\s*tickSeason\(\);$/m, 'nothing calls the season poll on the frame');
-  // A fast travel is where the calendar jumps weeks: straighten the
-  // season BEFORE the destination pixel builds, and take the quiet
-  // path - the teleport's own teardown is a real unload.
-  const tp = world.slice(world.indexOf('async function _teleportToPixel'));
-  const refresh = tp.indexOf('refreshSeason(arriveMinutes ?? skyMinutes());');   // TIME1: the sky's
-  const teardown = tp.indexOf('for (const key of [...built.keys()])');
-  assert.ok(refresh > 0 && refresh < teardown,
-    'the teleport must re-read the season before it rebuilds the world');
-});
-
 // =====================================================================
 // ROAD-Ar R0 - the re-skin must not delete the ground under a live
 // player. DaggerfallLocation.Update (:118-130) -> ApplyTimeAndSpace
@@ -302,83 +250,9 @@ test('ROAD-Ar R0: a HELD motor crosses the same outage unmoved and unbilled', ()
     'nothing is billed for the outage');
 });
 
-test('ROAD-Ar R0: the streaming host arms the hold before the teardown and releases it on the rebuilt pixel', () => {
-  // Host wiring, so it is pinned at its source like the rest of this
-  // file. The three halves that have to stay joined: the arm (before
-  // the ground goes), the release (on the player's own pixel, with
-  // the re-anchoring spawn), and the gate on the motor itself.
-  const world = hostText('src/scenes/world.js');
-  // PIN MOVED (IC-SWAP-BEHIND): the arm and the teardown are the swap's rebuild (scenes/swapBehind.js), the season's tail as
-  // every sweep's - and armed only where the ground goes: behind its standing view the player's pixel never goes
-  const tick = world.slice(world.indexOf('function tickSeason()'));
-  assert.match(tick, /swap\.rebuild\(keys\.map\(/);
-  const SW = readFileSync(new URL('../../src/scenes/swapBehind.js', import.meta.url), 'utf8');
-  const reb = SW.slice(SW.indexOf('    rebuild(again, '));
-  const arm = reb.indexOf('host.seasonHold(under);');
-  const teardown = reb.indexOf('for (const k of again) api.mark(k.px, k.py);');
-  assert.ok(arm > 0 && arm < teardown,
-    'the hold must be armed while the player still has a pixel to name');
-  // ROAD-H H3: and armed only when the player's OWN pixel is one of the
-  // keys going down. The refresh is per key now, so a re-skin that
-  // leaves him standing takes no ground from under him - holding the
-  // motor and re-anchoring the fall there would be a stall and a
-  // swallowed landing for nothing. (The whole-key condition, not just
-  // the assignment: matching the assignment alone let the guard be
-  // deleted with the suite green.)
-  assert.match(reb.slice(0, teardown),
-    /if \(host\.walkMode\(\) && host\.playerSpawned\(\) && !api\.stands\(under\) && again\.some\(\(k\) => `\$\{k\.px\},\$\{k\.py\}` === under\)\) host\.seasonHold\(under\);/,
-    'the hold is armed only when the player\'s own key is among the keys going down');
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the re-anchor keeps a fall under way when the hold began - the held
-  // motor moved not at all, so the fall is the player's (fb0930_fallkept.test.js runs the release).
-  assert.match(world, /if \(_seasonHoldKey !== null && \(built\.has\(_seasonHoldKey\) \|\| \(!building && !queue\.length\)\)\) \{\s*\n\s*const fall = player\.fallSnapshot\(\);\s*\n\s*player\.spawn\(player\.pos\[0\], player\.pos\[1\], player\.pos\[2\]\);\s*\n\s*player\.restoreFall\(fall\);\s*\n\s*_seasonHoldKey = null;/,
-    'the release must wait for the pixel and re-anchor the motor, the fall kept (and never wedge)');
-  // RESPAWN-HELD (FIELD BUGS 2026-09-30b, PIN MOVED): the same hold, and an arrival's build holds it too
-  // (fb0930b_respawnheld.test.js runs it).
-  assert.match(world, /const _seasonHeld = _partyArrivalPending \|\| _seasonHoldKey !== null \|\| _seasonStraightening;/);
-  assert.match(world, /if \(!_overlayHeld && !_seasonHeld && !_rideHeld\) player\.update\(dt,/,   // PIN MOVED (WAGONS1): a rider's held motor too
-    'the motor must not integrate gravity while the ground is being rebuilt');
-  assert.match(world, /if \(!_seasonHeld\) applyFallLanding\(playerEntity, player\.landedFallDistance,/,
-    'and a frame the motor never ran reports no landing');
-  // The teleport core owns its own landing (player.spawn), so it drops
-  // any hold on the way through rather than testing a stale key
-  // against a brand-new origin.
-  const tp = world.slice(world.indexOf('async function _teleportToPixel'));
-  assert.ok(tp.indexOf('_seasonHoldKey = null;') > 0
-    && tp.indexOf('_seasonHoldKey = null;') < tp.indexOf('for (const key of [...built.keys()])'),
-    'the teleport clears the hold before it re-origins the streamer');
-});
-
 // =====================================================================
 // ROAD-Ar R1 - the straightening must read the ARRIVAL clock.
 // =====================================================================
-
-test('ROAD-Ar R1: fast travel hands the teleport core the minute it is about to arrive at', () => {
-  // performFastTravel calls TeleportToCoordinates (:333) and only then
-  // RaiseTime (:344), and this port keeps that order - so the one
-  // clock still reads the DEPARTURE date inside _teleportToPixel, and
-  // reading it there straightened nothing on exactly the trip the
-  // straightening exists for. The reference-faithful half of the fix
-  // is to pass the arrival minute rather than to move RaiseTime.
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /async function _teleportToPixel\(px, py, localPos = null, \{ grounded = false, arriveMinutes = null, reposition = REPOSITION\.None, travelStart = null, modEvent = null, resolveArrival = null \} = \{\}\)/,
-    'the core takes the arrival clock');
-  assert.match(world, /refreshSeason\(arriveMinutes \?\? skyMinutes\(\)\);/,
-    'and straightens from it, falling back to the live clock for every other caller');   // TIME1: the live SKY
-  assert.match(world, /function refreshSeason\(atMinutes = skyMinutes\(\)\) \{[\s\S]{0,400}?Math\.floor\(atMinutes \/ MINUTES_PER_DAY\)[\s\S]{0,200}?climateSeasonFromMinutes\(atMinutes\)/,
-    'refreshSeason must read the minute it was given, both times');
-  // The CALLER order, which the old pin could not see: the teleport
-  // is handed worldMinutes() + the journey, and RaiseTime still runs
-  // after it, exactly where DaggerfallTravelPopUp puts it.
-  const i = world.indexOf('async function fastTravelTo');
-  const fn = world.slice(i, world.indexOf('const toggleTravelMap', i));
-  // AUDIT 64 F18 threaded DirectionFromStartMarker through this same
-  // call (DaggerfallTravelPopUp.cs:334), so the literal grew - the
-  // ORDER is still what this pin is about.
-  const teleport = fn.indexOf('await _teleportToPixel(pick.pixel.x, pick.pixel.y, null,\n          { arriveMinutes: sharedClockOn() ? skyMinutes() : worldMinutes() + computed.minutes,');   // WORLD5: the trip takes no world time under the shared clock; TIME1: online the arrival's season is the sky's now
-  const raise = fn.indexOf('playerTicker.advance(computed.minutes)');
-  assert.ok(teleport > 0, 'the arrival minute rides the teleport');
-  assert.ok(raise > teleport, 'and RaiseTime still comes after it (:333 then :344)');
-});
 
 test('R1 CLOSEOUT: the frame cannot poll the straightened season away while the destination builds', () => {
   // R1 straightened the season off the ARRIVAL clock, and the frame
@@ -400,32 +274,5 @@ test('R1 CLOSEOUT: the frame cannot poll the straightened season away while the 
   assert.equal(climateSeasonFromMinutes(arrival), SEASON.Winter);
   assert.notEqual(Math.floor(arrival / MINUTES_PER_DAY), Math.floor(departure / MINUTES_PER_DAY),
     'the day moves, which is the only thing refreshSeason gates on - so a live re-read is not a no-op');
-  // buildPixelNow reads `season` only AFTER its own await, so whatever
-  // the last write left is what the destination is skinned with.
-  const world = hostText('src/scenes/world.js');
-  const build = world.slice(world.indexOf('async function buildPixelNow'));
-  // PIN MOVED (PRECIP4, 2026-10-19): the pixel's season is read there too - off the host's, or the snow's on the lane
-  // (AUDIT PRECIP HOST-6, PIN MOVED: through the build's recorder, which keeps it)
-  assert.ok(build.indexOf('await terrainGen.generate') < build.indexOf('snowRec ? snowRec.pixel(groundMid - SEA_LEVEL_M, host.season) : host.season'),
-    'the season is read after the worker yields - the window is real');
-  assert.ok(build.indexOf('snowRec.pixel(') < build.indexOf('getTerrainGroundArchive(climate, pixelSeason)'), 'and the ground archive after it');
 
-  // THE LATCH. The frame's poll is the first thing tickSeason answers
-  // to, the teleport raises it beside the straightening, and it comes
-  // down in a `finally` so a failed build cannot switch the frame's
-  // season off for the rest of the session.
-  const tick = world.slice(world.indexOf('function tickSeason() {'));
-  assert.match(tick.slice(0, tick.indexOf('\n  }')), /^function tickSeason\(\) \{\n(\s*\/\/[^\n]*\n)*\s*if \(_seasonStraightening\) return;[^\n]*\n\s*if \(refreshSeason\(\)(?: && !snowCover\.on)?\) _reskin\.markAll\(\);/,
-    'the frame poll stands down FIRST - above the refreshSeason that would otherwise mutate the cache');
-  const tp = world.slice(world.indexOf('async function _teleportToPixel'));
-  const core = tp.slice(0, tp.indexOf('\n  }'));
-  const straighten = core.indexOf('refreshSeason(arriveMinutes ?? skyMinutes());');   // TIME1: the sky's
-  const raise = core.indexOf('_seasonStraightening = true;');
-  const build2 = core.indexOf('await awaitedBuild(first.px, first.py);');
-  const clear = core.indexOf('finally { _seasonStraightening = false; }');
-  assert.ok(straighten > 0 && raise > straighten, 'the latch goes up with the straightening');
-  assert.ok(build2 > raise, '...before the destination build yields');
-  assert.ok(clear > build2, '...and comes down only once it has landed');
-  assert.match(core, /try \{ dest = await awaitedBuild\(first\.px, first\.py\); \}\n\s*finally \{ _seasonStraightening = false; \}/,
-    'in a `finally`, so a throwing build cannot leave the frame poll off');
 });

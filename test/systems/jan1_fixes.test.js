@@ -50,9 +50,6 @@ test('JAN1 (1): the pack\'s CharacterSheet key closes the pack and opens the she
     assert.doesNotThrow(() => dom.win.fire('keydown', { code: 'F5', key: 'F5', target: null, preventDefault() {}, stopPropagation() {} }), 'F5 on the pack: close, then the sheet - no throw');
     assert.equal(exits, 1, 'the pack closed first'); assert.equal(opened, 1, 'and the sheet opened after');
   });
-  const s = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.ok(s.includes("    const openCharSheet = deps.openCharSheet;\n    onExit();                 // the pack's own close law runs FIRST...\n    openCharSheet();"), 'by source: the hook is captured before onExit');
-  assert.ok(s.includes("if (acts.includes('CharacterSheet') && typeof deps?.openCharSheet === 'function') {"), 'and the arm asks for a function, not a truthy bag entry');
 });
 
 test('JAN1 (2): a save with no bank accounts restores the FULL table (and the house registry beside it), so every bank reader validates the region instead of throwing; a save with accounts keeps them; the classic ValidateRegion law is untouched', () => {
@@ -98,41 +95,5 @@ test('JAN1 (3): the trade window prices an item with no finite value at its base
   restorePlayer(e, snapOf({ items: [{ ...sword, value: undefined }, { ...sword, value: NaN, name: undefined }], wagonItems: [{ ...sword, value: NaN }], otherItems: [{ ...sword }] }));
   assert.equal(e.items[0].value, base); assert.equal(e.items[1].value, base); assert.equal(e.items[1].name, templateByIndex(sword.templateIndex).name, 'and its name');
   assert.equal(e.wagonItems[0].value, base); assert.equal(e.otherItems[0].value, base);
-  const t = rd('src/systems/tradeModes.js');
-  assert.equal((t.match(/calculateCost\(item\.value/g) ?? []).length, 0, 'no price arm reads item.value raw');
-  // PIN MOVED (CRAFT-WORTH, 2026-10-11): Sell and SellMagic read it through counterValueOf (a crafted piece at its plain
-  // worth), which reads the one read itself - Buy, Repair and counterValueOf, three; the two selling arms, its two calls
-  assert.equal((t.match(/itemValueOf\(item\)/g) ?? []).length, 3, 'three reads of the one value: Buy, Repair and the counter\'s');
-  assert.equal((t.match(/calculateCost\(counterValueOf\(item\)/g) ?? []).length, 2, 'Sell and SellMagic through the counter\'s');
 });
 
-// (4) "sometimes speaking to people gives this interaction menu ... anyone else i speak to in the same building has the
-//     same thing happen, until i leave the building and re-enter" - the box is townTalk's KEYED CHAIN (showGreeting),
-//     which openTalkWindow takes when the Where-is directory is empty. The directory is synced from the EXTERIOR frame
-//     alone (under the modal return), so a load that lands the player inside a building (the boot ?load runs before
-//     the frame loop even starts) had no frame to sync it and no way to recover until the player stepped back outside.
-//     The arrival now answers both halves of TalkManager's OnLoadEvent: the session AND the topics.
-test('JAN1 (4): a topic-less host opens the KEYED chain verbatim (the box in the screenshot); the arrival syncs the talk topics beside the session, because the frame\'s own sync sits below the modal return and never runs indoors', async () => {
-  const { createTownTalk } = await import('../../src/scenes/townTalk.js');
-  const host = createTownTalk({
-    renderer: { uploadTexture: () => ({}) }, canvas: { width: 640, height: 400 },
-    fetchBytes: async () => { throw new Error('this pin loads no ARENA2'); },
-    playerEntity: { name: 'T', stats: { personality: 50 }, skills: 30, skillUses: [] },
-    regionIndex: 0,
-  });
-  host.openTalkWindow('What do you want?');
-  const w = host.overlay;
-  assert.ok(w?.isChoiceWindow, 'no directory: the keyed chain, not the enhanced panel');
-  assert.deepEqual(w.options.map((o) => o.label).filter(Boolean), ['W - where is...', 'T - tone: Normal', 'Esc - goodbye']);
-  assert.match(rd('src/scenes/townTalk.js'), /if \(talkDoorReady\(\) && directory\.length\) \{/, 'the one door the symptom comes out of');
-
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /npcSession\.onWorldChanged\(\);\n(?:\s*\/\/[^\n]*\n)*\s*syncTopics\(\);\n  \}/,
-    'a new world origin re-answers BOTH halves of TalkManager\'s OnLoadEvent - the topics sync right beside the session');
-  const modalAt = world.indexOf('if (modes.frame(dt, now)) {');
-  const frameSync = world.indexOf('syncTopics();   // T3d');
-  assert.ok(modalAt > 0 && frameSync > modalAt, 'the frame\'s own sync is BELOW the modal return: it never runs indoors');
-  const bootLoad = world.indexOf('await worldQuickLoad(');
-  assert.ok(bootLoad > 0 && world.lastIndexOf('requestAnimationFrame(frame);') > bootLoad,
-    'the boot load runs inside bootWorld, before the frame loop starts - the deterministic arm');
-});

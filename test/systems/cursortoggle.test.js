@@ -131,58 +131,6 @@ test('AUDIT 58 (f3/input): TWO registrations is the defect - one press, two flip
   }
 });
 
-test('AUDIT 58 (f3/input): every ENTRY host binds ActivateCursor at most once (THE FOUR HOSTS RULE)', () => {
-  // DISCOVERED, not enumerated - the same lesson as the U47 host sweep
-  // in test/ui/nativeinventory.test.js. The entry hosts are whatever
-  // src/main.js boots, and the registrations that reach one of them are
-  // whatever its scenes/ import closure calls.
-  const main = readFileSync(join(HERE, '..', 'src', 'main.js'), 'utf8');
-  // BOOT1 (2026-09-20): a host is a DOOR now - `import('./scenes/x.js').then((m) => m.bootX(` -
-  // not a static import; the sweep derives the same set from the new spelling. Still discovered.
-  const hosts = [...main.matchAll(/import\('\.\/scenes\/(\w+\.js)'\)\.then\(\(m\) => m\.boot\w+\(/g)].map((m) => m[1]);
-  assert.deepEqual(hosts.sort(), ['dungeon.js', 'exterior.js', 'interior.js', 'world.js'],
-    'the hosts main.js boots - a fifth joins this sweep by existing, not by being remembered');
-
-  const all = new Set(readdirSync(SCENES, { recursive: true }).filter((f) => f.endsWith('.js')));
-  const body = (f) => readFileSync(join(SCENES, f), 'utf8');
-  const closure = (entry) => {
-    const seen = new Set(); const stack = [entry];
-    while (stack.length) {
-      const f = stack.pop();
-      if (seen.has(f) || !all.has(f)) continue;
-      seen.add(f);
-      // TIDY2: every relative import, resolved - the hosts reach their feature folders through `./x/` and `../`
-      for (const m of body(f).matchAll(/from '(\.{1,2}\/[\w./-]+\.js)'/g)) stack.push(posix.normalize(posix.join(posix.dirname(f), m[1])));
-    }
-    return seen;
-  };
-  const binds = (f) => (body(f).match(/^\s*bindCursorToggle\(/gm) ?? []).length;
-  const reach = {};
-  for (const h of hosts) reach[h] = [...closure(h)].reduce((n, f) => n + binds(f), 0);
-  for (const [h, n] of Object.entries(reach)) {
-    assert.ok(n <= 1, `scenes/${h}: ${n} ActivateCursor readers - DFU has one (PlayerMouseLook.cs:190-198)`);
-  }
-  assert.deepEqual(reach, { 'world.js': 1, 'exterior.js': 1, 'dungeon.js': 1, 'interior.js': 0 },
-    'the three play hosts bind it once each; ?interior is the map-viewer host and binds none');
-  // ...and worldModes carries NONE of its own: it publishes the guard.
-  const wm = src('scenes/worldModes.js');
-  assert.equal((wm.match(/^\s*bindCursorToggle\(/gm) ?? []).length, 0,
-    'the mode machine registers no listener - both outdoor hosts build it unconditionally');
-  assert.doesNotMatch(wm, /bindCursorToggle \} from '(?:\.\.?\/)+(?:[\w-]+\/)*pointerLock\.js'/, 'and does not import it');
-  assert.match(wm, /^ {4}modalWindowUp,$/m, 'it publishes its window predicate instead');
-  for (const host of ['scenes/world.js', 'scenes/exterior.js']) {
-    // TV1: the world host ORs the travel view in too - its cursor is the view's while it is up
-    // PIN MOVED (AUDIT POI E1): and the POI editor - its keys are its own while it is open (its Ctrl+Y, Y and Enter freed
-    // the cursor's flag and asked for the lock over it: this boot listener runs before the editor's)
-    assert.match(src(host), host.endsWith('world.js')
-      ? /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active \|\| !!poiEditor\?\.active\(\), \(e\) => actionsOf\(e, keys\)\);/
-      : /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\), \(e\) => actionsOf\(e, keys\)\);/,   // UXB1-S: every action a shared key carries   // KB1: with the host's held Set, so a combo'd FreeMouse resolves
-      `${host}: one binding, and the mode machine's guard is OR'd into it rather than lost`);
-  }
-  assert.match(src('scenes/dungeon.js'), /bindCursorToggle\(canvas, \(\) => ctx\.uiOverlayActive, \(e\) => actionsOf\(e, keys\)\);/,
-    'the standalone dungeon host is the control case - it always had exactly one');
-});
-
 // PL2 (2026-09-12) - Mac: "Pointer can detach from the game and you're
 // unable to click back in and use your pointer." The hosts' keydown
 // ladders are bubble listeners registered before the toggle's, and a

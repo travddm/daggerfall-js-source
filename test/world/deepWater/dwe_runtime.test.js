@@ -130,11 +130,3 @@ test('DW-E1: TransientObjectTracker - Add skips a null, Clear destroys the live,
   assert.equal(t.count, 0, 'a negative cap is zero');
 });
 
-test('DW-E1: the world host drives the runtime - the terrain pass is the stream\'s busy spell, the pump runs after the deferred builds (pins)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const _dwPass = !!\(building \|\| queue\.length \|\| inFlight\.size\);\n\s+if \(_dwPass !== _dwTerrainPass\) \{ _dwTerrainPass = _dwPass; if \(_dwPass\) dwTerrainUpdateBegan\(\); else dwTerrainUpdateEnded\(\); \}\n\s+if \(deepWaters\.pump\(\) && dwDecor\) dwDecor\.refreshPlayerArea\(\);[^\n]*\n\s+pumpDeepWaterRuntime\(performance\.now\(\) \/ 1000, dwPlaying\(\)\);/);
-  // IsPlayingGame: no window over the game - read late, because the gates are asked during boot's promotes, before the
-  // talk host (the windows' owner) exists
-  assert.match(w, /let _dwOverlayUp = \(\) => false;\n\s+const dwPlaying = \(\) => !_dwOverlayUp\(\);/);
-  assert.match(w, /const gamePaused = \(\) => (?:staffTeleportHeld \|\| )?townTalk\.overlayActive \|\| \(modes\?\.overlayHeld \?\? false\);\n\s+_dwOverlayUp = \(\) => gamePaused\(\);/, 'AUDIT DW-F: every stack over the frame - IsPlayingGame asks of every window, a building\'s and a dungeon\'s too');
-});

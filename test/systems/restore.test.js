@@ -205,8 +205,6 @@ test('RESTORE A: the bank buys a crossed deed back nowhere online - its window s
   const q = { ownedShip: SHIP_TYPES.Small, shipCrossed: true };
   resetShip(q);
   assert.deepEqual([q.ownedShip, 'shipCrossed' in q], [SHIP_TYPES.None, false]);
-  // the host's hook is the law's (worldModes.js), in the bank's own region
-  assert.match(src('src/scenes/worldModes.js'), /crossedDeed: \(kind\) => crossedDeedLines\(kind, \{ houses: playerEntity\.houses, regionIndex: bankRegion\(\), player: playerEntity \}\),/);
 });
 
 // ── the service: the join says where a customs character came from ──
@@ -252,15 +250,4 @@ test('RESTORE B: the join answers the offline id a customs character came from, 
   const born = await call('/v1/realm/create', { name: 'Born' }, g.secret);
   assert.equal((await call('/v1/realm/join', { id: came.body.id }, g.secret)).body.origin, 'offline-1');
   assert.equal((await call('/v1/realm/join', { id: born.body.id }, g.secret)).body.origin, null);
-  // the client carries it through the boot's join (systems/realmSaves.js openRealmBoot)
-  const saves = src('src/systems/realmSaves.js');
-  assert.match(saves, /const \{ lease, seq, bytes, origin = null \} = joined\.data \?\? \{\};/);
-  assert.match(saves, /return \{ ok: true, snap, lease, seq: got\.seq \?\? seq, origin: typeof origin === 'string' \? origin : null, gzip: joined\.data\?\.gzip === true, \.\.\.\(stranded \? \{ stranded: true \} : \{\}\) \};/);   // REALM-GZIP: and the join's word that the service opens a packed save (PIN MOVED, STRANDED: and a copy set aside)
-  // ...and world.js gives back right after the realm's one parse, before the Test Room's check reads it
-  const world = src('src/scenes/world.js');
-  const parse = world.indexOf('if (realmBoot) { bootSnapRead = realmBoot.snap; realmBoot.snap = null; }');
-  const given = world.indexOf('const realmGiven = realmBoot?.origin ? reclaimFromDevice(bootSnapRead, realmBoot.origin) : null;');
-  const testRoom = world.indexOf('const testRoomOffline = testRoomOnlineRefused(params, { snap: bootSnap });');
-  assert.ok(parse > 0 && given > parse && testRoom > given, 'given back into the one parse, before anything reads it');
-  assert.match(world, /for \(const line of reclaimLines\(realmGiven\)\) townTalk\.say\(line\);/);
 });

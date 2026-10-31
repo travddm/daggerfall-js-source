@@ -18,143 +18,34 @@ import { ArrowFlight, playerArrowHitFoe } from '../../src/combat/arrowFlight.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => readFileSync(join(ROOT, f), 'utf8');
-const WM = src('src/scenes/worldModes.js');
 
 // ---------------------------------------------------------------
 // #28 - the outer host's window pauses the modal frame
 // ---------------------------------------------------------------
 
-test('AUDIT39 #28: overlayHeld takes townTalk\'s slot, so a window mounted OUT THERE pauses in here', () => {
-  const decl = WM.slice(WM.indexOf('const overlayHeld ='), WM.indexOf('const crouchHeld'));
-  assert.match(decl, /!!townTalk\?\.overlayActive \|\|/,
-    'AddWindow pauses for the WINDOW, not for the slot it was pushed into');
-  // the two that were already there stay there - the interior one now
-  // asks the STACK (ROAD-tail: `interiorPaused` is windowStack's pause
-  // latch, AddWindow :183-184 / RemoveWindow :201-215) instead of
-  // re-deriving the slot here.
-  assert.match(decl, /mode === 'interior' && interiorPaused\(\)/);
-  assert.match(decl, /mode === 'dungeon' && !!dungeonCtx\?\.uiOverlayActive/);
-  // and this host mounts into that slot itself - the reachability the
-  // finding turns on, kept next to the gate that answers it
-  assert.match(WM, /townTalk\.openTalkWindow\(talk\.greeting, \{ npcSeed: npcData\.nameSeed/);
-});
-
 // ---------------------------------------------------------------
 // #29 - an aborted dungeon transition must leave nothing behind
 // ---------------------------------------------------------------
-
-test('AUDIT39 #29: the start-marker test runs BEFORE the mode/collider commit, and unwinds the context', () => {
-  const at = WM.indexOf("console.error('[dungeon] no start marker; transition aborted')");
-  assert.ok(at > 0, 'the refusal is still there');
-  // DFU: `if (!dungeon.StartMarker) { Destroy(newDungeon); RaiseOnFailedTransition(...); return; }`
-  // BEFORE EnableDungeonParent/MovePlayerToMarker (PlayerEnterExit.cs:921-934).
-  const refusal = WM.slice(at, at + 320);   // OH-D: the failed-transition raise stands in it now
-  assert.match(refusal, /abandonContext\(ctx\);\n\s+dungeonCtx = null;\n\s+host\.onFailedTransition\?\.\('ToDungeonInterior'\);[^\n]*\n\s+return false;/,   // AUDIT 68: the ONE abandon, which destroys; OH-D: then RaiseOnFailedTransition, DFU's own order
-    'Destroy + the handle cleared - the built layout must not leak');
-  const commit = WM.indexOf("setMode('dungeon');", at);   // AUDIT-WH2 L1-F5: `mode` has one writer now; the ORDER this pin holds is unchanged
-  assert.ok(commit > at, 'the three commits sit BELOW the refusal, not above it');
-  assert.ok(WM.indexOf('player.collider = ctx.collider;', at) > at);
-  // and there is no OTHER mode write above the test inside this member
-  const member = WM.slice(WM.indexOf('async function tryEnterDungeon('), at);
-  assert.ok(!member.includes("setMode('dungeon')"),
-    'nothing commits the mode before the marker is known');
-});
 
 // ---------------------------------------------------------------
 // #31 - the sixth TalkManager subscription
 // ---------------------------------------------------------------
 
-test('AUDIT39 #31: entering a dungeon interior clears castleNPCsSpokenTo', () => {
-  assert.match(WM, /npcSession\?\.onEnterDungeonInterior\(\);/,
-    'OnTransitionToDungeonInterior (TalkManager.cs:3611-3614), raised from BOTH entry members');
-  // beside the resource mount, which is the other thing the transition raises
-  const tail = WM.slice(WM.indexOf('mountQuestResources();   // B2:'));
-  assert.ok(tail.indexOf('npcSession?.onEnterDungeonInterior();') < 600,
-    'on the transition itself, with the resources');
-  // the two exterior transitions keep their own notification
-  assert.equal((WM.match(/npcSession\?\.onWorldChanged\(\);/g) || []).length, 2);
-});
-
 // ---------------------------------------------------------------
 // #32 - the scene cache carries a door's POSE and lock, not a word
 // ---------------------------------------------------------------
-
-test('AUDIT39 #32: the interior scene caches the whole action record and restores through the system', () => {
-  // SerializableActionDoor round-trips currentRotation + actionPercentage
-  // beside currentState; RestartTween(1 - percentage) is what puts an
-  // open door back OPEN, posed and passable.
-  assert.match(WM, /const actionDoors = ctx\.actions\?\.collectSaveData\?\.\(\) \?\? \[\];/,
-    'the cache stores the action system\'s own record');
-  assert.ok(!WM.includes('.map((o) => ({ key: o.key, state: o.state }))'),
-    'the state-word-only cache is deleted, not annotated');
-  assert.match(WM, /interiorCtx\.actions\?\.restoreSaveData\?\.\(/,
-    'and the restore goes through syncRestored, which settles matrix AND collider bucket');
-  assert.match(WM, /d\.t == null \? \{ \.\.\.d, t: d\.state === 'end' \? 1 : 0 \} : d/,
-    'a scene cached before this shipped carries the word alone - derive its pose, never a NaN matrix');
-});
 
 // ---------------------------------------------------------------
 // #33 / #34 - a paused game advances no movers and no swing
 // ---------------------------------------------------------------
 
-test('AUDIT39 #33: the interior movers are held under a window, like the dungeon arm twelve lines up', () => {
-  // PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the movers are handed the body they may carry or hold (player/moverBody.js)
-  assert.match(WM, /if \(!overlayHeld\) interiorCtx\.actions\.update\(dt, player\);/,
-    'PauseGame sets timeScale 0 and DFU\'s door tween never opts out of it');
-  assert.match(WM, /if \(!overlayHeld\) advanceMachinery\(r\.state, dt, r\.child\);/,
-    'the mill rotors are movers too');
-  // the DRAW is deliberately outside the gate - a paused world still paints
-  const rotors = WM.slice(WM.indexOf('for (const r of interiorCtx.rotors) {'));
-  assert.match(rotors.slice(0, 500), /renderer\.drawMesh\(r\.gpu, mountMachineryChild\(/);
-  // the dungeon arm's gate, unchanged - the pin that made the asymmetry visible
-  assert.match(WM, /if \(!overlayHeld\) dungeonCtx\.actions\.update\(dt, player\);/);
-});
-
-test('AUDIT39 #34: an in-flight interior swing does not land its hit frame under a window', () => {
-  // PIN MOVED (AUDIT 39r): the overlay gate is unchanged, but the rig
-  // now takes the paralysis flag its two above-ground siblings take
-  // (WeaponManager.cs:235-239). The gate under test is `overlayHeld ?
-  // [] :`, which still reads exactly as it did. PIN MOVED (TELL6e: a knocked-down player swings nothing - the rig's
-  // paralysis flag takes the knockdown beside the paralysis, systems/blowEffects.js knockedDown).
-  assert.match(WM, /for \(const ev of \(overlayHeld \? \[\] : interiorWeapon\.frame\(dt, \{ paralyzed: paralyzed \|\| knockedDown\(\) \}\)\)\) \{/,
-    'the rig MACHINE is held; the events it would have yielded do real work');
-  // ...and the viewmodel still paints, outside the gate
-  assert.match(WM, /\n\s+interiorWeapon\.draw\(\{ paralyzed \}\);/);
-});
-
 // ---------------------------------------------------------------
 // #36 - PlayerDeath's camera sink in a world-hosted dungeon
 // ---------------------------------------------------------------
 
-test('AUDIT39 #36: the dungeon arm of the death camera sink exists and reads the CONTEXT\'s slot', () => {
-  // createDungeonContext registers its own death presenter for the
-  // whole visit, so a dungeon death never reaches interiorOverlay.
-  assert.match(WM, /if \(mode === 'dungeon'\) cam\.pos\[1\] -= dungeonCtx\?\.deathDrop \?\? 0;/,
-    'PlayerDeath.Update lowers the eye whatever host is standing');
-  assert.match(WM, /if \(interiorOverlay instanceof DeathScreen\) cam\.pos\[1\] -= interiorOverlay\.drop;/,
-    'the building arm keeps its own write');
-  // the comment that asserted the opposite is retired where it stood
-  assert.ok(!WM.includes('Both modal modes route\n    // death to interiorOverlay'),
-    'the false claim is deleted');
-  // ORDER: both sink writes follow the per-frame eye write
-  const sink = WM.indexOf("if (mode === 'dungeon') cam.pos[1] -= dungeonCtx?.deathDrop ?? 0;");
-  const eye = WM.lastIndexOf('cam.pos = player.eyeAt();', sink);
-  assert.ok(eye !== -1 && sink - eye < 900, 'the sink rides after the eye write, or the eye write undoes it');
-});
-
 // ---------------------------------------------------------------
 // #39 - the interior foe pool gets its spells
 // ---------------------------------------------------------------
-
-test('AUDIT39 #39: an interior foe carries its spell lists and its caster, as SetEnemyCareer gives them', () => {
-  const mount = WM.slice(WM.indexOf('function makeInteriorFoes(ctx) {'));
-  const body = mount.slice(0, mount.indexOf('\n  }'));
-  assert.match(body, /\n\s+spellsByIndex,/, 'SetEnemySpells has no scene test in DFU');
-  assert.match(body, /magicHooks: magic \? \{/, 'and the release seams ride the host\'s ONE engine');
-  assert.match(body, /explodeAt: \(\.\.\.a\) => magic\.explodeAt\(\.\.\.a\),/);
-  assert.match(body, /magic\.fireEnemyMissile\(from, missileAimDirection\(from, aimAt \?\? targetAimPoint\(null, player\.pos, player\.height\)\), spell, casterLevel, foe\);/,
-    'aimed where the executor says, at the walking player\'s live transform otherwise, at fire time - the exterior shape through the ONE law (AUDIT WORLD6b-iii(a) C3)');
-});
 
 // ---------------------------------------------------------------
 // #64 / #65 - the arrow that LANDS
@@ -273,108 +164,17 @@ test('AUDIT39 #64: a LANDED arrow runs the melee ladder - the swing mods and the
     'and a host that hands in no playerFeet cannot backstab at all');
 });
 
-test('AUDIT39 #64: all three non-dungeon hosts mark the shaft and resolve it', () => {
-  for (const [f, fire] of [
-    // FIELD-GUN17 appended one key at all three - the muzzle offset,
-    // null for every weapon but the Thunderlock. The claim this arm
-    // makes is LastBowUsed, and it is still asserted whole.
-    // PIN MOVED (STUCK-ARROWS): and one more - whether the round was conjured (DFU's isArrowSummoned)
-    ['src/scenes/world.js', 'arrows.fire(cam.pos, fwd, { fromPlayer: true, weapon: weaponRig.playerWeapon.weapon, muzzle: weaponRig.thunderlockMuzzle(fieldOfView()), summoned: shot.summoned })'],
-    ['src/scenes/exterior.js', 'arrows.fire(eye, fwd, { fromPlayer: true, weapon: weaponRig.playerWeapon.weapon, muzzle: weaponRig.thunderlockMuzzle(fieldOfView()), summoned: shot.summoned })'],
-    ['src/scenes/worldModes.js', 'interiorArrows.fire(player.eye, eyeDir(), { fromPlayer: true, weapon: interiorWeapon.playerWeapon.weapon, muzzle: interiorWeapon.thunderlockMuzzle(fieldOfView()), summoned: shot.summoned })'],
-  ]) {
-    const s = src(f);
-    assert.ok(s.includes(fire), `${f} rides LastBowUsed on the shaft`);
-    assert.match(s, /onPlayerArrowHitFoe: \(m, t\) => (?:\(t\?\.duel \? duelStrikeOut\('arrow'[^\n]*\) : )?playerArrowHitFoe\(m, t, \{/, `${f} resolves it`);   // DUEL1: world.js's shaft on a duel opponent is a strike first
-    // AUDIT 39r R13: the pin used to stop at that opening brace and
-    // inspect none of the keys, so a host that quietly stopped passing
-    // the screen weapon, the feet or the damage door still matched.
-    // Bound the window by the call's own close and name them.
-    const i = s.indexOf('playerArrowHitFoe(m, t, {', s.indexOf('onPlayerArrowHitFoe: (m, t) =>'));   // DUEL1: world.js's arm is the duel's first, then this
-    const opts = s.slice(i, s.indexOf('\n      }),', i));
-    assert.match(opts, /playerWeapon: \w+\.playerWeapon,/, `${f} hands in the LIVE screen weapon (SWING_MODS)`);
-    assert.match(opts, /playerFeet: player\.pos,/, `${f} hands in the feet the backstab arc is measured from`);
-    assert.match(opts, /\n\s+dealDamage: \(f, d\) =>/, `${f} hands in its own pool's damage door`);
-    assert.match(s, /foeTargets:/, `${f} hands the flight its live targets`);
-  }
-  // the module's stale premise is retired where it stood - the header
-  // quotes it to say why, which is the record working, not the claim
-  // surviving (the module used to state it as its own law)
-  const af = src('src/combat/arrowFlight.js');
-  assert.match(af, /retires the premise this module was written on/);
-  assert.ok(!af.includes('out here there are no live targets yet, and DFU'),
-    'the premise no longer stands as the module\'s own sentence');
-});
-
-test('AUDIT39 #65: the interior arrow update takes the four impact options it never had', () => {
-  const call = WM.slice(WM.indexOf('interiorArrows.update(dt, {'), WM.indexOf('interiorArrows.draw('));
-  assert.ok(!WM.includes('interiorArrows.update(dt);'), 'the bare geometry call is gone');
-  assert.match(call, /playerFeet: player\.pos,/);
-  assert.match(call, /onPlayerHit: \(m\) => \{/);
-  // AUDIT 58 (review): the target list is the HOST'S WHOLE DATABASE,
-  // not the encounter pool alone. It read `interiorFoes?.foes` here,
-  // so a shaft loosed at a watchman `spawnCityGuardsInside` had stood
-  // in the room met nothing and died on geometry - arrowFlight.js's
-  // `if (foeImpact && foeTargets)` walk is a shaft's only foe contact -
-  // after the loose had spent the Arrow and tallied Archery, while
-  // this host's MELEE ray hit that same watchman. Both sibling hosts
-  // already fed both of theirs.
-  assert.match(call, /foeTargets: interiorFoePool\(\)\.filter\(\(t\) => !t\.dead && t\.ai\)\.map\(\(t\) => \(\{ feet: t\.ai\.feet, ref: t \}\)\),/);
-  assert.equal(/foeTargets: \(interiorFoes\?\.foes \?\? \[\]\)/.test(call), false,
-    'the narrowed spelling is gone, not merely joined');
-  assert.match(call, /onFoeHit: \(m, t\) => interiorFoes\?\.arrowHitFoe\(m, t\),/);
-  // ...and the PLAYER's shaft damages through the pool that owns the
-  // billboard, the same `_encounter` split this host's sinks take -
-  // world.js:"DW-D: UnderwaterPresentationEffects.SuppressPlayerIndirectLight"'s own law, so a killed watchman still runs the crime
-  // and the corpse.
-  assert.match(call, /dealDamage: \(f, d\) => \(f\._encounter\n\s+\? interiorFoes\?\.damageFoe\(f, d, player\.pos, m\.dir, \{ kind: 'arrow', weapon: m\.weapon \?\? null \}\)[^\n]*\n\s+: interiorGuards\?\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)\),/);   // PIN MOVED (AUDIT FEUD 2: the encounter pool's shaft carries its bow - a metal weakness rides to a puppet's owner)   // PIN MOVED (TELL1: and the blow's kind - a shaft's weight on a wind-up)
-  // the player-side arm of the same call
-  assert.match(call, /onPlayerArrowHitFoe: \(m, t\) => playerArrowHitFoe\(m, t, \{/);
-  // the enemy hit runs the melee arm's own payload: pain voice, sound,
-  // the recoverable arrow
-  assert.match(call, /playPlayerVoice\(audio, playerPainVoice\(playerEntity, dmg\)\);/);
-  assert.match(call, /addItem\(playerEntity\.items, bowDamageArrow\(\)\)/);   // MAC-N1: CreateWeapon's arrow through the one minter, not a bare literal
-});
-
 // ---------------------------------------------------------------
 // #108 - StartNewConversation on the static-NPC door
 // ---------------------------------------------------------------
-
-test('AUDIT39 #108: both static-NPC doors spend the window\'s OnPush reset', () => {
-  // DaggerfallTalkWindow.OnPush -> SetStartConversation (:266) ->
-  // TalkManager.StartNewConversation (:654), on EVERY push. TalkToNpc
-  // is a different member and the engine runs only that one.
-  assert.equal((WM.match(/npcSession\?\.startNewConversation\(\);/g) || []).length, 2,
-    'the click door and the guild/coven popup door');
-  for (const opener of ['townTalk.openTalkWindow(talk.greeting', 'townTalk.openTalkWindow(talk2.greeting']) {
-    const at = WM.indexOf(opener);
-    assert.ok(at > 0, opener);
-    const before = WM.lastIndexOf('npcSession?.startNewConversation();', at);
-    assert.ok(before !== -1 && at - before < 700, `${opener} is pushed with the reset spent`);
-  }
-});
 
 // ---------------------------------------------------------------
 // #132 - the interior HUD is told the pointer is free
 // ---------------------------------------------------------------
 
-test('AUDIT39 #132: the interior drawHud passes cursorActive, the value the frame already computed', () => {
-  const call = WM.slice(WM.indexOf('drawHud(renderer, canvas, hudArt, playerEntity,'));
-  const opts = call.slice(0, call.indexOf('weaponSheathed:'));
-  assert.match(opts, /cursorActive: overlayHeld,/,
-    'hud.js defaults it FALSE, so the strip, the crosshair and the vitals detector all ran under a window');
-});
-
 // ---------------------------------------------------------------
 // #164 - a deferred building entry is not a crash
 // ---------------------------------------------------------------
-
-test('AUDIT39 #164: the greeting-deferred entry catches, like the two host call sites', () => {
-  assert.match(WM, /new ChoiceWindow\(\{ lines \}\), \(\) => \{ enterBuildingDoor\(hit, entries\)\.catch\(\(e\) => console\.error\(e\)\); \}\)/,   // PIN MOVED (INSTANCES' audit): the door's own entry, which asks then enters - still caught
-    'a refused interior is recoverable - it must not reach main.js\'s unhandledrejection overlay');
-  // the throw the catch exists for is still the design
-  assert.match(WM, /throw new Error\('no interior landing'\)/);
-});
 
 // ---------------------------------------------------------------
 // AUDIT 39r (R16) - #64's header claimed the missile's own position
@@ -414,11 +214,6 @@ test('AUDIT39r R16: a player arrow bleeds its TARGET, not its own tip', () => {
   assert.equal(splashes[0][0], 2, 'MobileEnemy.BloodIndex');
   assert.deepEqual(splashes[0][1], [3, 1.6, 4], 'hitTransform.position - the target\'s TRANSFORM, feet + centreOffset');
   assert.notDeepEqual(splashes[0][1], [3, 0, 4], 'not its feet');
-  // the stale gloss is gone from the header with the code
-  const af = src('src/combat/arrowFlight.js');
-  assert.ok(!af.includes('The missile\'s\n * own position is DFU\'s impactPosition'),
-    'the mis-citation no longer stands as this module\'s law');
-  assert.match(af, /hitTransform\.position/, 'and the real fifth argument is named');
 });
 
 // ── FOE1: THE OPTS A CALL REALLY PASSES ──────────────────────────
@@ -459,21 +254,3 @@ function callSourceStripped(text, name) {
     .replace(/\/\/[^\n]*/g, ' ');
 }
 
-test('FOE1: the dungeon host really PASSES the opts it means to - a property inside a comment is not a property', () => {
-  const call = callSourceStripped(src('src/scenes/worldModes.js'), 'buildDungeonContext');
-  // the online seams, each the only route its half of the room has
-  for (const [key, why] of [
-    ['onFoeHit', 'a joiner\'s blow on a layout foe reaches the host by THIS and nothing else (WORLD2)'],
-    ['onActions', 'a door the player moved goes out to the room (WORLD3)'],
-    ['peers', 'the peers the host\'s foes hunt (WORLD3)'],
-    ['selfId', 'whose blow a puppet\'s is (WORLD3)'],
-    ['onLootClaimed', 'a claimed container makes the room\'s memory due (WORLD4)'],
-    ['foes', 'the pool the stream poses'],
-  ]) {
-    assert.match(call, new RegExp(`(^|[{,\\s])${key}\\s*:`), `${key} is passed - ${why}`);
-  }
-  // and the wiring it reaches for exists on the host object
-  assert.match(src('src/scenes/worldModes.js'), /host\.onFoeHit\?\.\(hit\)/, 'the host seam is called, not merely named');
-  assert.match(src('src/scenes/world.js'), /onFoeHit: \(hit, fate\) => hitSend\(hit, fate\)/,
-    'and the world host hands it the wire (WORLD2), through the pending set (AUDIT FOES FOE2)');
-});

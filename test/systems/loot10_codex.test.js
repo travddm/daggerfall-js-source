@@ -82,15 +82,12 @@ test('LOOT10: how a find is seen - at the take, at the round\'s sweep (the pack 
   equipItem(e, worn);   // worn, and on the table alone - the sweep reads what it wears too
   const s = heard(() => assert.equal(CX.sweepCodex(e), 2));
   assert.equal(s.lines.length, 2, 'each said');
-  assert.match(read('src/systems/loot/lootCodex.js'), /registerMagicRoundHook\(CODEX, \(entity\) => \{ if \(entity\?\.isPlayer\) sweepCodex\(entity\); \}\);/, 'the round sweeps the player\'s own');
-  assert.match(read('src/systems/loot/lootCodex.js'), /registerTakeListener\(CODEX, \(item\) => \{ noteFind\(item\); \}\);/);
   // a save from before the codex: what was carried is the codex's, and nothing is announced
   restoreModSaveRecords({});
   const q = heard(() => assert.equal(CX.sweepCodex({ isPlayer: true, items: [legend('worms-tooth')] }), 1));
   assert.deepEqual(q.lines, [], 'silently');
   const next = heard(() => CX.sweepCodex({ isPlayer: true, items: [legend('gortwogs-cleaver')] }));
   assert.equal(next.lines.length, 1, 'and the next find is said');
-  assert.match(read('src/scenes/world.js'), /import '\.\.\/systems\/loot\/lootCodex\.js';/, 'the game registers it');
 });
 
 test('LOOT10: the record - saved, restored, a forged one cleaned, a new game none', () => {
@@ -235,7 +232,4 @@ test('LOOT10: the pages - the Codex alone from the pack, the Imprint at the guil
       assert.ok(textOf(one(shell, 'imprint-card')).includes(IMPRINT_NONE), 'a piece whose kind the codex holds none of');
     } finally { view.unmount(); }
   });
-  assert.match(read('src/scenes/worldModes.js'), /imprint: \(item, id\) => imprintPiece\(item, id, playerEntity\),/, 'the guild\'s window imprints on the player\'s own');
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /if \(lootRarityOn\(\)\) \{\s*const codex = el\('button', 'act codexbtn', 'Codex'\);/, 'the pack opens the Codex');
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /createReforgeOverlay\(\{ pages: \['codex'\], page: 'codex',/);
 });

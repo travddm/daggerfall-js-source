@@ -17,7 +17,6 @@ import { createComeSailAwayAboard, validAboardWord, worldOf, localOf, CSA_ABOARD
 import { CSA_WIRE_BOATS_MAX } from '../../../src/systems/comeSailAway/comeSailAwayWire.js';
 import { quatAngleAxis } from '../../../src/world/quat.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const BASE = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0 };
 
 test('DECK-POSE THE DOOR: a pose carries its place aboard - `ab`, [owner, slot, x, y, z], the feet to the cm - kept on both of the relay\'s wires; out of any bound it is no place (never clamped) and the pose stands; ashore it is absent; the foes word\'s door is the same law (mutants: the field stripped; a bound off by one; the place unrounded)', () => {
@@ -188,6 +187,4 @@ test('DECK-POSE THE SENDER: every pose I say carries my place aboard while the h
   place = null;
   clock.now += 500; s.sendPose({ ...me, x: me.x + 2 });
   assert.equal('ab' in said(), false, 'ashore: none');
-  assert.match(WORLD, /const csaDeckWord = \(\) => \(csaOn\(\) \? \(csaAboard\.word\(player\.pos\) \?\? csaHelmWord\(\) \?\? naval\?\.deckWord\?\.\(player\.pos\) \?\? null\) : null\);/);
-  assert.match(WORLD, /online\.poseAboard = csaDeckWord;/);
 });

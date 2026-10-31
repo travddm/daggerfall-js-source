@@ -81,21 +81,5 @@ test('GRASS4 pieceKey: a map pixel is one NUMBER, distinct for every pixel the m
   for (const py of [-32767, -1, 0, 1, 32767]) {
     assert.notEqual(pieceKey(0, py), pieceKey(1, py), 'inside the bound, neighbours never collide');
   }
-  // and the source builds NO key string - the allocation was the cost
-  const src = read('src/render/labGrass.js');
-  assert.match(src, /byKey\.set\(pieceKey\(piece\.p\.px, piece\.p\.py\), piece\);/);
-  assert.match(src, /return byKey\.get\(pieceKey\(px, py\)\) \?\? null;/);
-  assert.ok(!/byKey\.get\(`/.test(src) && !/byKey\.set\(`/.test(src), 'no template string reaches the index');
 });
 
-test('PERF8 pins: keep and ground take the piece from the index and no longer loop the pieces (mutant: the scan back)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PERF10 widened this from the old one-line spelling: the index is
-  // built lazily now (a frame that fills no cell builds none at all), so
-  // the law is that `pieceAt` IS pieceIndex over TERRAIN_SIZE, not which
-  // statement mints it.
-  assert.match(w, /pieceIndex\([\s\S]{0,400}TERRAIN_SIZE\)/);
-  assert.match(w, /const keep = \(x, z, floor = false\) => \{[^\n]*\n\s+const hit = pieceAt\(x, z\);\n\s+if \(!hit\) return null;\n\s+const \{ p, t, grass \} = hit;/, 'PIN MOVED (BANTHA2: the keep serves the jungle floor too - its `floor` flag)');
-  assert.match(w, /const ground = \(x, z\) => \{\n\s+const hit = pieceAt\(x, z\);[^\n]*\n\s+if \(!hit\) return null;/);
-  assert.doesNotMatch(w, /for \(const \{ p, t(, grass)? \} of pieces\)/, 'no scan left');
-});

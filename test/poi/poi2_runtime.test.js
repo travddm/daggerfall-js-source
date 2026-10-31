@@ -384,7 +384,6 @@ test('POI-2 RECORDS: the POI archive owns its number - no other picture archive 
   };
   walk('src');
   assert.deepEqual(owners, ['src/poi/poiRuntime.js']);
-  assert.match(src('src/scenes/poiHost.js'), /scenes\/world\.js - WIRED[\s\S]*scenes\/worldModes\.js - its interiors stand no street[\s\S]*scenes\/exterior\.js - FLAGGED[\s\S]*scenes\/dungeonContext\.js - stands no street/);
 });
 
 test('POI-3 THE HOST\'S PICK: the part a ray meets, by its own triangles through its drawn matrix - the nearest of two, from either side, none past its reach or beside it; the box asked first; a draft\'s colliders held while the editor drags and stood once it ends (mutants: the nearest not kept; the matrix uninverted; the drag\'s hold unread)', async () => {

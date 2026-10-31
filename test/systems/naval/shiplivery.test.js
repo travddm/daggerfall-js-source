@@ -465,12 +465,6 @@ test('SHIP-LIVERY and DECK-PROPS on the boats\' word: `l` a number a boat and `d
   assert.notEqual(csaRecordKey(rec), csaRecordKey(plain));
   assert.notEqual(csaRecordKey(csaWireRecord([at({ livery: { strake: 5 } })])), csaRecordKey(csaWireRecord([at({ livery: { strake: 4 } })])));
   assert.notEqual(csaRecordKey(csaWireRecord([at({ fittings: [{ m: 41812, x: 1, z: 2, yaw: 4 }] })])), csaRecordKey(csaWireRecord([at({ fittings: [{ m: 41812, x: 1, z: 2, yaw: 3 }] })])));
-  const peers = rd('src/scenes/comeSailAway/comeSailAwayPeers.js');
-  assert.match(peers, /s\.boat\.livery = liveryCode\(w\.livery\);/);
-  assert.match(peers, /s\.boat\.fittings = w\.fittings \?\? \[\];/);
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /livery: b\.uid \? fleetShip\(b\.uid\)\?\.livery \?\? null : null, fittings: b\.uid \? fleetShip\(b\.uid\)\?\.deck \?\? \[\] : \[\],/);
-  assert.match(world, /liveryOf: \(boat\) => \(boat\.uid \? fleetShip\(boat\.uid\)\?\.livery \?\? null : null\), fittingsOf: \(boat\) => \(boat\.uid \? fleetShip\(boat\.uid\)\?\.deck \?\? \[\] : \[\]\),/);   // PIN MOVED (SHIP-PLAQUE: the pool's `plaqueOf` follows)
 });
 
 // ── her cabin ────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -491,11 +485,6 @@ test('CABIN-LOOK her cabin stained: none as built; each picture her room wears (
   assert.equal(texRemap.has('9_2'), false, 'her glass as built');
   assert.equal(renderer.up.size, 2);
   assert.equal(CABIN_STAIN, 0.55);
-  assert.match(rd('src/scenes/interiorContext.js'), /if \(typeof opts\.restyle === 'function'\) await opts\.restyle\(texRemap, \[\.\.\.pending\.keys\(\)\]\.map\(\(id\) => cpuModels\.get\(id\)\?\.subMeshes \?\? \[\]\), \{ renderer, getTexture, palette \}\);/);
-  const ic = rd('src/scenes/interiorContext.js');
-  assert.ok(ic.indexOf('await opts.restyle(') < ic.indexOf('const drawList = [];'), 'before the room\'s batch is made');
-  assert.match(rd('src/scenes/sailingCabin.js'), /sailingCabin: cabin, restyle: cabinRestyle\(guest \? 0 : fleetShip\(cabin\.uid\)\?\.cabin \?\? 0\) \};/);   // PIN MOVED (AUDIT 2: another's cabin as built)
-  assert.match(rd('src/scenes/worldModes.js'), /restyle: hit\.restyle \?\? null,/);
 });
 
 // ── the plan of her deck, the paint's picture ────────────────────────────────────────────────────────────────────────

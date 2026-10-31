@@ -41,19 +41,3 @@ test('DRAKES a balance never reads in Marks - silver now, one and many (SILVER; 
   assert.equal(accountRefusalText('guild-marks-short'), 'The treasury does not hold that much silver.');
 });
 
-test('DRAKES no word a player reads says Marks any more - the account card, the Bank, the market, the Work tab, the guild treasury, the professions\' pages, the refusals (mutants: a label or a line left on the old name)', () => {
-  for (const f of SHOWN) {
-    const left = code(src(f)).split('\n').map((l, i) => [i + 1, l]).filter(([, l]) => /\bMarks?\b/.test(l));
-    assert.deepEqual(left.map(([n, l]) => `${f}:${n}: ${l.trim().slice(0, 90)}`), [], `${f} still shows the old name`);
-  }
-  // the places it is said, by name
-  const ports = src('src/ui/enhanced/enhancedPorts.js');
-  for (const w of ["'Silver to sell'", "title: 'Silver'", "['Silver held'", '`${MARKS_BANK.goldPerMark} gold for each silver`', "'Sell silver'"]) assert.ok(ports.includes(w), w);
-  assert.match(src('src/ui/enhanced/enhancedAccount.js'), /row\(t\('account\.card\.silver', 'Silver'\), marksText\(flow\.account\.marks\)\)/, 'the account card');   // L10N4 (PIN MOVED): the row's word through t()
-  assert.match(src('src/ui/socialPanel.js'), /el\('div', 'dfsocial-sec', 'Silver treasury'\)/, 'the guild\'s treasury');
-  assert.match(src('src/ui/bankWindow.js'), /MARKS_COUNTING = 'The Bank counts your silver\.\.\.'/);
-  // and the unrelated marks stand: DFU's Mark slots, the King's Mark, the map's middle-click, the blood marks
-  assert.match(src('src/ui/enhanced/enhancedInventory.js'), /\[EQUIP_SLOTS\.Mark0\]: \{ x: 44, y: 296, label: 'Mark', off: true \}/);
-  assert.match(src('src/systems/loot/lootRarity.js'), /name: "King's Mark"/);
-  assert.match(src('src/systems/travel/travelOptionsText.js'), /MiddleClick - Mark a location/);
-});

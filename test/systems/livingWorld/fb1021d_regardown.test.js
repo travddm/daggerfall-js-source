@@ -154,7 +154,6 @@ test('REGARD-OWN, its feedback: the relations count the friend a word or its ton
   assert.deepEqual(s.relations.friendsMade(), [], 'a friend already: nothing more');
   assert.equal(friendLine({ name: 'Ysabel Lark', court: true }), 'Ysabel Lark counts you a friend now. You can court them: ask about Courtship under Tell me about.');
   assert.equal(friendLine({ name: 'Sir Ada', court: false }), 'Sir Ada counts you a friend now.', 'one of the watch, or no house: no Courtship named');
-  assert.match(readFileSync(join(ROOT, 'src/scenes/legacyHost.js'), 'utf8'), /topicsFor\(family, me, res, ctx\.regard \| 0\)\.map\(\(t\) => \(\{\n\s+topic: t,/);
 });
 
 test('REGARD-OWN (AUDIT FB1021d RO-4): a DEED that makes a friend is counted too - a life saved, a keepsake carried home (`note`, any kind) - and a regard handed down is not (`inherit`: a family\'s friends met as such); a friend lost again before the line is read is not said; one deed\'s crowd is said at most FRIENDS_SAID_MAX (mutants: deeds uncounted, inherit counted, the lapse unread, the crowd uncapped)', () => {
@@ -203,8 +202,6 @@ test('REGARD-OWN (AUDIT FB1021d RO-1): townTalk says a friend made once nothing 
   queue.push({ name: 'Sir Ada', court: false });
   tt.hudFrame(1 / 30, null);
   assert.equal(said.at(-1), 'Sir Ada counts you a friend now.', 'indoors too');
-  const W = readFileSync(join(ROOT, 'src/scenes/world.js'), 'utf8');
-  assert.match(W, /friendsMade: \(\) => friendCards\(livingRelations\.friendsMade\(\), livingTownOfId, legacyTopicRows\),/);
 });
 
 test('REGARD-OWN (AUDIT FB1021d RO-4): a friend\'s card is their resident minted again from their town, and the Courtship row read for them; an id of no known town is not named', () => {

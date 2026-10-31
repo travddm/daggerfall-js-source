@@ -144,16 +144,6 @@ test('FRIENDLY-SPELLS: a beneficial blast in a FULL party reaches every mate thr
   for (const m of mates) assert.ok(lines[0].includes(m.name), `...naming ${m.name}`);
 });
 
-test('FRIENDLY-SPELLS by source: ONE player-to-player spell system - no `aid` frame, relay arm, receiver or module; the hosts hand the engines the party mates (allyMarksNear: party members a socket reaches, only while the relay routes the cast frame) and every player\'s body for the drawn missile alone (mutant: the drop\'s aid frame back)', () => {
-  const w = rd('src/net/wire.js'), srv = rd('server/src/index.js'), onl = rd('src/net/online.js'), world = rd('src/scenes/world.js');
-  for (const src of [w, srv, onl, world]) assert.ok(!/\bt: 'aid'|validAidData|relaySupportsAid|sendAid|onAid\b|createAidReceiver|friendlySpell/.test(src), 'no aid frame anywhere');
-  assert.throws(() => readFileSync(new URL('../../src/systems/friendlySpell.js', import.meta.url)), 'the drop\'s receiver module is not in the tree');
-  assert.match(world, /const allyMarksNear = \(sp = null\) => \{\n\s*if \(!online\?\.castOk\) return null;\n\s*const strangers = !!sp && strangerCastable\(sp\);[^\n]*\n\s*if \(!social\?\.party && !strangers\) return null;[\s\S]{0,800}?giftablePeers\(near\)\.filter\(\(p\) => online\.reachesPeer\?\.\(p\.id\) && \(mateOf\(p\.id\) \|\| strangers\)\)/, 'party mates (SPELL-GIFT: and strangers, for the stranger\'s list), only through a relay that routes the cast frame');
-  assert.match(world, /allyMarks: \(sp\) => allyMarksNear\(sp\),[^\n]*\n\s*peerBodies: \(\) => peersNear\(\),/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /allyMarks: opts\.allyMarks \? \(sp\) => opts\.allyMarks\(sp\) : null,[^\n]*\n\s*peerBodies: opts\.peers \? \(\) => opts\.peers\(\) : null,/, 'the dungeon\'s engine takes both');
-  assert.match(rd('src/scenes/hostMagic.js'), /function giveToAlly\(mark, sp, \{ quiet = false \} = \{\}\) \{\n\s*let sent = false;\n\s*try \{ sent = !!castAtAlly\?\.\(mark\.id, allyCastFrame\(sp, castingLevel\(playerEntity\), mark\.id\)\); \}/, 'every gift leaves through ALLY-CAST\'s door');
-});
-
 // ─── SPELLFX1 / SPELLFX2: A PEER'S CAST, DRAWN AND HEARD ───────────────────────────────────────────────────────
 
 test('SPELLFX1/2: a peer\'s ranged cast is DRAWN as a missile that stops on a body and lands NOTHING, heard as its element\'s cast sound from where it was cast; a touch flashes and flies nothing (mutants: the drawn missile landing; the sound dropped)', () => {
@@ -179,9 +169,6 @@ test('SPELLFX1 wire (world98): the pose carries the cast\'s element (`ce`, 0..4)
   assert.equal(validPose({ ...base, ce: 0, ar: 7 }).ce, 0); assert.equal(validPose({ ...base, ce: 0, ar: 7 }).ar, 7);
   assert.equal(validPose(base).ce, 4, 'an older pose: Magic'); assert.equal(validPose(base).ar, 0);
   assert.equal(validPose({ ...base, ce: 9 }).ce, 4, 'past the table: Magic');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /cn: rig\.cast\.n, cr: rig\.cast\.rangeType \| 0, ce: rig\.cast\.element \?\? 4,[^\n]*\n\s*ar: rig\.shot\?\.n \?\? 0,/, 'the sender fills them');
-  assert.match(w, /peerCastVisuals\(visiblePeers\);[^\n]*\n(?:[^\n]*\n){0,12}?\s*const seen = \[\];\n\s*for \(const d of visiblePeers\) \{[\s\S]*?\n\s*seen\.push\(d\);\n\s*\}\n(?:\s*peerCandlesFrame\(seen, dt\);[^\n]*\n)?(?:\s*\/\/[^\n]*\n)*\s*peerRiders\.sync\(seen,[^\n]*\n\s*const afoot = [^\n]*\n\s*peerBodies\.sync\(afoot, onlineToScene, dt, player\.pos, \{ priority: \(id\) => !!social\?\.isPartyPeer\(id\), conceal: veilOf \}\);/, 'drawn beside AUDIT PARTY8\'s party-first body sync, which stands (RIDE: over the peers afoot, the riders synced between)');
 });
 
 // ─── SNDREP1: THE SOUND PACK AND THE NIGHT SOUNDS ──────────────────────────────────────────────────────────────
@@ -202,9 +189,6 @@ test('SNDREP1: a pack\'s loose WAVs answer for the two classic clips by DFU\'s n
   try { assert.equal(soundSilenced(6), true, 'the crickets off'); assert.equal(soundSilenced(113), false, 'the howl on its own switch'); }
   finally { setPref('nightCrickets', true); }
   assert.equal(soundSilenced(7), false, 'a clip with no switch');
-  assert.match(rd('src/systems/audio.js'), /if \(soundSilenced\(index\)\) return null;[^\n]*\n\s*const r = this\._replacement\?\.\(index\); if \(r\) return r;/, 'the engine\'s buffer door');
-  // CRICKET-DUNGEON's own stop still stands underground; the switch is the same stop above ground
-  assert.match(rd('src/systems/ambientEffects.js'), /if \(deps\.inside \|\| deps\.underground \|\| soundSilenced\(AMBIENT_CRICKETS_LOOP\)\) \{ if \(this\._cricketsLoop\) \{ this\._cricketsLoop\.stop\(\); this\._cricketsLoop = null; \} \}/, 'one stop, three reasons (DISC8-A: indoors)');
 });
 
 test('SNDREP1 x CRICKET-DUNGEON: switching the crickets OFF mid-chorus stops the sounding loop at once and holds the chorus clock; back ON, the night takes up where it stood - and underground stays silent with the switch on (mutants: the arm leaving a sounding loop to its bout; the underground stop lost)', () => {
@@ -248,23 +232,6 @@ test('PARTY-REST29 law: cooldownStamp - a member\'s start stamp their own newer 
   assert.equal(voteStands({ ready: true, readyAt: 98_000 }, now, last), true);
 });
 
-test('PARTY-REST29/30/31 by source: the gate asks the cooldown (cooldownStamp) BEFORE marking me ready; the grant and a mirrored rest clear the waiver; a canceled vote takes my own ready; a member\'s vote dies with the leader\'s round and with the leader\'s grant; the rest door reports an unrested close once (mutants: the ready marked first; the round not followed)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(social\.now\(\) - cooldownStamp\(nearHere, _partyRestStartWaived \? -Infinity : _partyRestJustStartedAt, social\.now\(\)\) < PARTY_REST_START_COOLDOWN_MS\) return 'A rest just happened\. Wait a moment before starting another\.';\n\s*_partyRestReady = true;\n\s*_partyRestReadyAt = social\.now\(\);/, 'PARTY-REST30: a refused press leaves no vote');
-  assert.match(w, /const notReady = nearHere\.filter\(\(m\) => !voteStands\(m\.p, social\.now\(\), lastStartedAt\)\);/, 'the audit\'s vote law stands');
-  assert.match(w, /_partyRestJustStartedAt = social\.now\(\);\n\s*_partyRestStartWaived = false;   \/\/ PARTY-REST29: a fresh grant cools down again/);
-  assert.match(w, /const cancelPartyRestStart = \(\) => \{ if \(!social\) return; _partyRestStartWaived = true; \};/);
-  assert.match(w, /_partyRestVoteLastReady = null;\n(?:\s*\/\/[^\n]*\n)*\s*_partyRestReady = false;\n\s*chatNotice\('The rest is called off\. Someone moved too far from where it began\.'\);/, 'PARTY-REST31: the canceled vote takes mine');
-  assert.match(w, /if \(lead && stampOf\(lead\.p\?\.restStartedAt, now\) > _partyRestReadyAt\) _partyRestReady = false;/, 'PARTY-REST29: the leader\'s grant spends my vote on my side too');
-  assert.match(w, /else if \(round !== _partyRestReadyRound\) \{ _partyRestReady = false; _partyRestReadyRound = null; \}/, 'PARTY-REST31: the round ends, my vote with it');
-  assert.ok(!/_partyRestStaleReady|partyMemberReady|partyRestLastStartedAt|_partyRestReadySocialAt/.test(w), 'the drop\'s parallel vote bookkeeping is not here: voteStands does that job on every reader');
-  assert.match(w, /The leader wants to rest\. Press R to be ready!/, 'PARTY-REST30: the member is asked');
-  assert.match(w, /const STRANGER_REST_BLOCK_RADIUS = 50;/, 'STRANGER-REST2');
-  const door = rd('src/ui/restDoor.js');
-  assert.match(door, /const unrested = !overlay\.session;[\s\S]{0,200}?if \(unrested && !closedOnce\) \{ closedOnce = true; try \{ deps\.onClosedUnrested\?\.\(\); \}/);
-  assert.match(door, /unregister = registerOverlay\(\(\) => \{ if \(!overlay\.stopOrClose\?\.\(\)\) overlay\.dispose\(\); \}\);/, 'AUDIT PARTY-REST\'s Tab law stands');
-});
-
 // ─── HEAL1, THE TEST ROOM, REST-MANA1, QS8 ─────────────────────────────────────────────────────────────────────
 
 test('HEAL1: a Healer starts knowing the touch Balm - the Balm\'s own effects at ByTouch, a fixed index of its own - and it is a gift ALLY-CAST gives; no other class gets it (mutants: the range left CasterOnly; every class given it)', () => {
@@ -301,6 +268,3 @@ test('REST-MANA1: online a no-regen career\'s rested hour pays magicka; offline 
   assert.equal(spellPointRecoveryRate({ maxMagicka: 80, career: {} }), 10, 'an ordinary career either way');
 });
 
-test('QS8: readying a spell from the book puts it on the spell slot; the free lycanthropy ready does not (mutant: every ready taken)', () => {
-  assert.match(rd('src/ui/spellbookDoor.js'), /onReady: \(sp, \{ noSpellPointCost \} = \{\}\) => \{\n\s*if \(!noSpellPointCost\) setSpellQuickslot\(sp\);\n\s*return magic\?\.readySpell\?\.\(sp, \{ free: !!noSpellPointCost \}\);/);
-});

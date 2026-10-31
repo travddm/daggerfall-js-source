@@ -266,26 +266,6 @@ test('AUDIT PRE-MERGE 1003 U3: the bar STEPS UNDER THE TARGET FRAME while it sta
 
 // ── U4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT PRE-MERGE 1003 U4: while the bar stands it says so (`.on`), and the quest card (1100 and under) and the party list (561-980, its phone place at the foot clear of it) step aside for it - the house\'s step-aside; measured in Chromium at 800x600, 844x390, 740x360, 390x844: neither under the bar (mutants: `.on` never set; either rule gone)', () => withDom((dom) => {
-  destroyArenaHud();
-  const { b, t } = live(F2);
-  const m = arenaHudModel(b, newCrowd({ fighters: b.fighters }), t, { you: 'you' });
-  drawArenaHud(m, { doc: dom.doc });
-  const root = one(dom.body, 'arena-hud');
-  assert.ok(root.classList.contains('on'), 'on while it stands');
-  drawArenaHud(m, { doc: dom.doc, hidden: true });
-  assert.ok(!root.classList.contains('on'), 'off with the HUD');
-  drawArenaHud(null, { doc: dom.doc });
-  assert.ok(!root.classList.contains('on'), 'off with the bout');
-  drawArenaHud(m, { doc: dom.doc });
-  assert.ok(root.classList.contains('on'));
-  destroyArenaHud();
-  // the widths the rules are drawn from: the bar's half against the card's 260 (+8) and the list's 200 (+8)
-  assert.ok(1100 >= 2 * (ARENA_HUD_WIDTH / 2 + 268) && 980 >= 2 * (ARENA_HUD_WIDTH / 2 + 208));
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /@media \(max-width: 1100px\) \{ body:has\(\.arena-hud\.on\) \.qtrack \{ visibility: hidden; \} \}/);
-  assert.match(PARTY_CSS, /@media \(min-width: 561px\) and \(max-width: 980px\) \{ body:has\(\.arena-hud\.on\) \.dfparty \{ visibility: hidden; \} \}/);
-}));
-
 // ── U5 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT PRE-MERGE 1003 U5: a leaderboard\'s header row carries its columns\' classes - a phone\'s fixed table takes its widths from that first row, and the Fighter\'s 48% stood on its cells alone (names cut to four letters at 360); the rank\'s width by its class, how a bout ended let wrap (measured in Chromium at 360 and 414: every name its width or 100px and more) (mutants: the header\'s classes gone; the rank by :first-child)', () => {

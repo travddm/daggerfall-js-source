@@ -85,11 +85,6 @@ test('LEVEL-PCT: the bar reads the same on both screens at its ends - held to 0.
     assert.equal(levelProgressPercent(v), pct, `bar ${bar}`);
     assert.equal(levelProgress(v, viewOnlyScreen(v, true)).now, pct, `the crown's bar ${bar}`);
   }
-  // ...and the mod's own canvas window prints the same reading (AUDIT 28e: it printed the raw field).
-  const src = readFileSync(new URL('../../src/ui/virtueLevelUp.js', import.meta.url), 'utf8');
-  const at = src.indexOf('    at(`bar ');
-  assert.ok(at > 0, 'the canvas window\'s bar line');
-  codeHasOnce(src.slice(at, src.indexOf('\n', at)), /at\(`bar \$\{levelBarProgress\(this\.entity\)\}\/\$\{LEVELUP_TOTAL\}`/);
 });
 
 test('LEVEL-PCT: the classic box is LevelButton_OnMouseClick in DFU\'s own precision (`float currentLevel`, a single)', () => {

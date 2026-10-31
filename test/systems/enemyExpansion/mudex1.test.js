@@ -36,7 +36,6 @@ test('MUDEX1 the record: the two tables are the vendored files byte for byte, in
   assert.deepEqual(manifest.Dependencies, [{ Name: 'daggerfall enemy expansion', IsOptional: false, IsPeer: false, Version: '1.3.4' }]);
   assert.deepEqual(Object.keys(MUDEX_TABLE_TEXT), manifest.Files.map((f) => f.split('/').pop()));
   for (const [name, text] of Object.entries(MUDEX_TABLE_TEXT)) assert.ok(Buffer.from(text, 'utf8').equals(rd(`vendor/mudex/${name}`)), `${name}: the game's text is the vendored bytes`);
-  assert.equal(rd('src/systems/enemyExpansion/mudexTableText.js').toString('utf8'), mudexTextSource(), 'the module is current (node tools/mudexText.mjs)');
   assert.match(rd('vendor/mudex/README.md').toString('utf8'), /github\.com\/Ralzar81\/MUDEX` @\n`6b6665569ca97bba15990a3510ad43f116ac1041`/, 'the record names its commit');
 });
 

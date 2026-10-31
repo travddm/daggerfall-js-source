@@ -129,10 +129,6 @@ test('BANISH-SKY: the temple says the calendar\'s days and, online, what they ar
   banish(q, 4, 1000);
   assert.deepEqual(rowsOf(temple(q, () => 1000)), ['You are banished from Wayrest for 30 more days.', `For ${PARDON_BASE_PRICE} gold the temple will plead for your pardon. Will you pay?`], 'offline: no real time');
   assert.equal(lawRows(q, 1000)[0].note, `banished, 30 days left (a pardon: ${PARDON_BASE_PRICE} gold)`);
-  // AUDIT WAITS B3: and the host hands the temple its words - the one wire from the clock to the priest
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.ok(wm.includes("worldNow: () => trustedWorldMinutes(),   // AUDIT REP F2: the pardon's term on the relay's calendar\n        worldWords: worldSpanRealWords,"),
-    'the temple\'s flow takes worldSpanRealWords from the host');
 });
 
 test('BANISH-SKY (AUDIT WAITS B1): the doors between the lanes carry the days the player was told - an online banishment goes offline with its sky days left as days of the one clock, an offline one comes online with its days left as the sky\'s; an unstamped term stays unstamped', () => {

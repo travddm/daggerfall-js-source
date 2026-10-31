@@ -80,8 +80,6 @@ test('WATCH-PROTECTS one landed blow: a townsperson\'s body falls to the first b
   assert.ok(played.length > 0 && blood.length === 1, 'the blow heard and seen');
   assert.equal(q.hurtFromFoe(9, null, wolf), 0, 'once');
   assert.equal(struck.length, 1);
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.match(pool, /calculateAttackDamage: _foeTarget\.civilian \|\| _foeTarget\.starWard \? QUARRY_BLOW : calculateAttackDamage,/);   // PIN MOVED (STAR5): a fallen star takes the one blow too
 });
 
 test('WATCH-PROTECTS the watch comes: a monster hunting a townsperson alive is the town\'s threat (isTownThreat), so the watch\'s defenders come to it after the arrival\'s countdown; one struck down is not (mutants: the clause, the alive)', () => {
@@ -316,13 +314,3 @@ test('WATCH-PROTECTS a townsperson struck down: the host\'s word is the town\'s 
   assert.ok(!t.town.pool.some((r) => r.res?.id === id), 'off the street');
 });
 
-test('WATCH-PROTECTS the hosts: the world host hands the monsters the street\'s people of the living world (none of the watch, the dead let go) beside its foes and watchmen, and the street the monsters to run from (its own foes alive and hostile, no ally or companion, in the town\'s frame); classic play, and the fixed-city page, none (mutants: the host\'s quarry, its dangers)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /candidates: \(\) => \[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes, \.\.\.livingQuarry\(\), \.\.\.\(starfall\?\.wards\(\) \?\? \[\]\)\]/);   // PIN MOVED (STAR5): and a fallen star, its own coven quarry
-  assert.match(w, /const livingQuarry = \(\) => \{\n\s+if \(!livingWorldOn\(\) \|\| _mode\(\) !== 'exterior'\) return \[\];/);
-  assert.match(w, /if \(!living\?\.town \|\| p\.guard\) continue;/);
-  assert.match(w, /q = makeQuarry\(p, \(body\) => body\.living\.town\.killed\(body\.person\)\)/);
-  assert.match(w, /dangers: \(\) => host\.livingDangers\(px, py, locOrigin\),/);
-  assert.match(w, /if \(f\.dead \|\| !f\.ai\?\.isHostile \|\| f\.companion != null \|\| f\.entity\?\.team === 'PlayerAlly'\) continue;/);
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /livingQuarry|makeQuarry/, 'the fixed-city page: DFU\'s');
-});

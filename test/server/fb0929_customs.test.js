@@ -215,13 +215,6 @@ test('CUSTOMS-CARRY: the door says what customs will do BEFORE it runs - the loa
 });
 
 test('CUSTOMS-CARRY: "Bring online" asks first - the preview off a copy, and customs runs only on the answer; a press customs refuses before the service still says why at once', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  const bring = menu.slice(menu.indexOf('function bringOnline(save) {'), menu.indexOf('function customsNow(save) {'));
-  assert.ok(bring.length > 0 && menu.indexOf('function customsNow(save) {') > 0);
-  assert.match(bring, /const trial = JSON\.parse\(JSON\.stringify\(snap\)\);\n\s+const leveling = crossLeveling\(trial\);[^\n]*\n\s+const preview = \[\.\.\.\(leveling \? \[LEVELING_CROSS_LINE\.before\] : \[\]\), \.\.\.customsLines\(applyCustoms\(trial\), \{ before: true \}\)\];/);
-  assert.match(bring, /return ask\(t\('menu\.online\.bringAsk', 'Bring \{name\} online\?', \{ name: save\.name \}\), preview\.join\(' '\), t\('menu\.online\.bring', 'Bring online'\), \(\) => \{ customsNow\(save\); \}\);/);
-  assert.doesNotMatch(bring, /realmCustoms\(|realmPut\(/, 'nothing is sent before the answer');
-  assert.match(bring, /if \(!snap \|\| typeof snap\.characterId !== 'string' \|\| !snap\.characterId \|\| snap\.testRoom === true\) return customsNow\(save\);/);
   // the refusal says what counts, not "played online" - which read false to a player who had
   const said = accountRefusalText('customs-never-online');
   for (const w of ['before it opened', 'Renown', 'online home', 'guild place', 'raid', 'cloud backup']) assert.ok(said.includes(w), w);

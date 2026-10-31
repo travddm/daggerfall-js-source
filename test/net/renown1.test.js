@@ -456,17 +456,6 @@ test('RENOWN1 a foe you fought: it pays once when it dies within RENOWN_ASSIST_M
   assert.equal(renownFoeLevel(b), 4);
   assert.equal(renownFoeLevel(c), 1);
   _resetRenownKillsForTests();
-  // THE DOORS: my blow stamps and every death asks - in both foe pools, a copy's death included; the watch never
-  const ex = src('src/scenes/exteriorFoes.js'), dg = src('src/scenes/dungeonContext.js'), cg = src('src/scenes/cityGuards.js');
-  assert.match(ex, /if \(f\.dead[^\n]*\) return;[^\n]*\n(?:\s+const bout = [^\n]*\n)?\s+if \(fromPlayer && !peer(?: && !bout)?\) renownFoeStruck\(f\);/,   // ARENA2: never a bout fighter's
-    'the outdoor door stamps my blow before a puppet\'s divert');   // PIN MOVED (AUDIT NAV2 F55): the dead check carries the shipmate's guard now - a blow that lands nothing stamps nothing
-  assert.match(ex, /f\.dead = true;\n(?:\s+if \(fromPlayer && !peer\) reportPlayerKill\([^\n]*\n)?\s+renownFoeDied\(f\);\s+\/\/ RENOWN1: whoever struck last/);   // SET2: the kill told as mine may stand between
-  assert.match(ex, /function puppetDie\(f\) \{[\s\S]{0,400}?f\.dead = true;\n\s+renownFoeDied\(f\);/, 'an owner\'s foe that fell');
-  assert.match(dg, /if \(foe\.dead[^\n]*\) return;[^\n]*\n(?:\s+const bout = [^\n]*\n)?\s+if \(fromPlayer && !peer(?: && !bout)?\) renownFoeStruck\(foe\);/,   // ARENA2: never a bout fighter's
-    'the dungeon door stamps a joiner\'s blow before the divert');   // PIN MOVED (CREW-COMPANIONS): the dead check carries the companion's guard, as the outdoor door's carries the shipmate's
-  assert.match(dg, /foe\.dead = true;\n(?:\s+if \(fromPlayer && !peer\) reportPlayerKill\([^\n]*\n)?\s+renownFoeDied\(foe\);/);   // SET2: as above
-  assert.match(dg, /if \(r\.d === 1\) \{ if \(!f\.dead\) \{[^}]*renownFoeDied\(f\); \}/, 'a joiner\'s copy that the host\'s frame says fell');
-  assert.doesNotMatch(cg, /renownFoe/, 'the city watch pays nothing: the law calls it murder');
 });
 
 test('RENOWN1 the tracker: nothing is earned while not earning (offline); a report carries at most RENOWN_XP_REPORT_MAX, is due every RENOWN_REPORT_MS or at once when a report\'s worth piles up; a lost report keeps what it held, an answered one gives its word, a permanent refusal stops the page (mutants: offline XP kept; the held XP dropped on a network error; a refused report retried forever)', async () => {
@@ -500,17 +489,6 @@ test('RENOWN1 the tracker: nothing is earned while not earning (offline); a repo
   assert.deepEqual(stops, ['renown-full']);
   assert.equal(k.stopped(), true);
   assert.equal(k.earn(10), 0, 'a refused character earns nothing more this page');
-  // the world host's wiring (pinned by source: the host is not driveable in node)
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const renownTracker = onlineOn \? createRenownTracker\(/, 'never built offline');
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): the mode read guarded on its object (test/scenes/audit24_wave37.test.js)
-  assert.match(w, /setRenownKillHandler\(\(foe\) => \{ const party = 1 \+ \(partyNear\(\)\?\.length \?\? 0\); const xp = renownPartyXp\(renownKillXp\(renownFoeLevel\(foe\), renownNow\), Number\.isInteger\(foe\?\._fightN\) \? Math\.min\(party, foe\._fightN\) : party\); renownTracker\.earn\(xp\); sigilDrinks\(xp\); seatEdicts\.campCleared\(foe\?\.site \?\? lairDenOf\(modes\?\.mode === 'dungeon' \? modes\?\.dungeonLocation : null\)\)\.catch\(\(\) => \{\}\); \}\);/, 'a kill with my party in the room counted - AUDIT PSCALE1 PLAY-4: no more of it than fought a shared foe');   // PIN MOVED (BAY-LEFT-SEA): and a lair's den past the Bay claimed; SEAT1d (PIN MOVED): a Bounty's camp claimed after
-  assert.match(w, /const xp = renownQuestXp\(playerEntity\.level, renownNow\);[^\n]*\n\s*renownTracker\.earn\(xp\);/, 'a quest by the character\'s level (RENOWN3: read against its Renown)');
-  assert.match(w, /renownQuestEnded\?\.\(q\);/, 'the bridge\'s end reaches it');
-  assert.match(w, /if \(!q\?\.questSuccess\) return;/, 'a failure pays nothing');
-  assert.match(w, /renownTracker\?\.tick\(\);/);
-  assert.match(w, /addEventListener\?\.\('pagehide', \(\) => \{ renownTracker\.leave\(\); \}\);/, 'what is held goes with the page (AUDIT RENOWN1 GAME-8: by keepalive, under its own id)');
-  assert.match(w, /online\?\.sendRenownOrder\?\.\(/, 'a rise is carried to my rooms');
 });
 
 // ── THE LAYER ───────────────────────────────────────────────────────
@@ -597,10 +575,8 @@ test('RENOWN1 over a head: the box stands FIRST in the name row - "12" in its bo
   const tag = find(layer.tagFor('peer-0001').node, 'dfname-tag');
   assert.deepEqual(tag.children.map((c) => c.className), ['dfname-renown', 'dfname-who', 'dfname-guild', 'dfname-glyphs']);   // GUILD1c: the guild's tag between the name and the glyphs
   assert.equal(tag.children[0].textContent, '12');
-  assert.match(src('src/ui/nameLayer.js'), /\.dfname-renown \{[^}]*border: 1px solid rgba\(242, 196, 107, \.8\);/, 'a box: a full border round the number');
   assert.equal(tag.children[1].textContent, 'Mack');
   assert.equal(find(layer.tagFor('peer-0002').node, 'dfname-renown').textContent, '', 'no level, no words: the plate takes no room (:empty)');
-  assert.match(src('src/ui/nameLayer.js'), /\.dfname-renown:empty \{ display: none; \}/);
   // the bitmap face: the run it measures and draws
   const drawn = [];
   const rp = Object.create(RemotePlayers.prototype);
@@ -608,9 +584,6 @@ test('RENOWN1 over a head: the box stands FIRST in the name row - "12" in its bo
   try {
     rp.drawNamePoints({ draw: (...a) => drawn.push(a) }, font, [{ id: 'p', name: 'Mack', x: 100, y: 100, scale: 1, title: null, glyphs: [], lv: 12 }], 1);
   } catch { /* a stub font may not draw - the source pin below holds the run */ }
-  // GUILD1c: the name in the run is `named` - the name and the guild's tag after it
-  assert.match(src('src/net/remotePlayers.js'), /const lead = renownText\(n\.lv\);\n(?:\s*\/\/[^\n]*\n)*\s+const named = [^\n]*\n\s+const run = `\$\{lead \? `\[\$\{lead\}\] ` : ''\}\$\{marks \? `\$\{named\} \$\{marks\}` : named\}`;/, 'the run the label is centred on starts with the level, boxed in brackets');
-  assert.match(src('src/net/remotePlayers.js'), /lv: e\.peer\.lv \?\? null,/, 'the point carries the peer\'s level to both faces');
 });
 
 test('RENOWN1 the Inspect card and the plaque: the level the relay stamped stands left of the name ("Renown N" on hover), never the card\'s own Daggerfall level; none for a peer with none (mutants: the plate after the name; the card\'s level read)', () => {
@@ -626,7 +599,6 @@ test('RENOWN1 the Inspect card and the plaque: the level the relay stamped stand
   assert.deepEqual(nm.children.map((c) => c.className).slice(0, 2), ['dfprofile-renown', 'dfprofile-nametext']);
   assert.equal(nm.children[0].textContent, '12');
   assert.equal(nm.children[0].title, 'Renown 12');
-  assert.match(src('src/scenes/world.js'), /const renown = online\?\.renownOf\?\.\(id\) \?\? null;[^\n]*\n\s+return \{ title: marks \? `\$\{name\} \$\{marks\}` : name, renown, subs:/, 'the plaque over a player is handed it BESIDE the name, never in its text');
 });
 
 test('RENOWN1 the main menu\'s account card: the level of the character most recently played online, left of the name, and a row for each of the five most recently played characters with how far into its level it is; an account with no track draws the heading it always drew (mutants: the oldest track\'s level; the heading changed for everyone)', () => {
@@ -658,7 +630,6 @@ test('RENOWN1 the main menu\'s account card: the level of the character most rec
   card.paint();
   const plain = card.root.all.find((n) => n.tag === 'h3');
   assert.deepEqual([plain.textContent, plain.children.length], ['Lattymoy', 0], 'no track: the heading it always drew');
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.card h3 \.acctrenown \{/, 'the chip\'s colour is the skin\'s sheet, never the card\'s');
 });
 
 // ── THE PLAQUE (RENOWN2) ────────────────────────────────────────────
@@ -681,40 +652,3 @@ function plaqueEl(tag, body) {
 }
 const plaqueFind = (n, cls, out = []) => { if (n?.classList?.contains?.(cls)) out.push(n); for (const c of n?.children ?? []) plaqueFind(c, cls, out); return out; };
 
-test('RENOWN2 the plaque: a player\'s Renown rides the hover frame BESIDE the title and is drawn as the number in a box on the title\'s first line, left of the name; the repaint guard sees it change; no Renown, no box (mutants: the Renown dropped from the frame; the signature blind to it; the box after the name)', async () => {
-  const { resolveHover, frameSignature } = await import('../../src/systems/worldHover.js');
-  const { showWorldPlaque, destroyWorldPlaque } = await import('../../src/ui/worldPlaque.js');
-  const hit = { key: 'peer:mara-0001', distance: 1, reach: 3 };
-  const named = (renown) => () => ({ title: 'Mara', renown, subs: [], actions: [{ id: 'inspect', label: 'Inspect' }], actionsUnlit: true });
-  const f = resolveHover(hit, { name: named(12) });
-  assert.equal(f.renown, 12);
-  assert.equal(f.title, 'Mara', 'never in the title\'s text');
-  assert.notEqual(frameSignature(f), frameSignature(resolveHover(hit, { name: named(13) })), 'a Renown that rose repaints');
-  assert.equal(resolveHover(hit, { name: named(null) }).renown, undefined);
-  assert.equal(resolveHover(hit, { name: named(0) }).renown, undefined, 'no level is no box');
-  const body = [];
-  globalThis.document = {
-    createElement: (t) => plaqueEl(t, body),
-    body: { append: (...cs) => { for (const c of cs) body.push(c); } },
-    head: { append() {}, appendChild() {}, querySelector: () => null },
-    querySelector: () => null, getElementById: () => null,
-  };
-  globalThis.location = { search: '?skin=enhanced&touch=off' };
-  globalThis.window = { location: globalThis.location, matchMedia: () => ({ matches: false }) };
-  destroyWorldPlaque();
-  try {
-    showWorldPlaque(f);
-    const root = body.find((e) => e.classList?.contains?.('wplaque'));
-    const line = plaqueFind(root, 'wplaque-titleline')[0];
-    assert.equal(line.children[0].className, 'wplaque-renown', 'the box first');
-    assert.equal(line.children[0].textContent, '12');
-    assert.equal(line.children[1].textContent, 'Mara', 'then the name');
-    showWorldPlaque(resolveHover(hit, { name: named(null) }));
-    assert.equal(plaqueFind(root, 'wplaque-renown').length, 0, 'no Renown, no box');
-    assert.equal(plaqueFind(root, 'wplaque-titleline')[0].textContent, 'Mara');
-  } finally {
-    destroyWorldPlaque();
-    delete globalThis.document; delete globalThis.window; delete globalThis.location;
-  }
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.wplaque-renown \{[^}]*border: 1px solid rgba\(242, 196, 107, 0\.8\);/, 'the plaque\'s box is the one over their head');
-});

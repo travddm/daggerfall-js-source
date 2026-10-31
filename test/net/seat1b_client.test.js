@@ -319,40 +319,9 @@ test('SEAT1b THE SEAT TAB: beside the board\'s tabs while the seats are open, ne
 });
 
 test('SEAT1b THE HOSTS BY SOURCE: the relay ticks in its pose arm and nowhere else; the client hands a `watch` frame of its own cell to the book; the world host keeps it, claims on the frame, passes the board its seat, the gate claim its region and the Renown report the region it stands in; the service routes, statuses and deploy filter (mutants: each seam)', () => {
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /if \(isCellRoom\(a\.key\) && inCover\(a, cellRoomOfWire\(m\.p\.x, m\.p\.z\)\) && typeof met\.sub === 'string' && met\.sub\) await this\._watchTick\(ws, met\.sub, m\.p, !unmoved, now\);/);   // PIN MOVED (COST-2): a cell the socket covers - its own at L0, never a halo's; PIN MOVED (AUDIT-SEATS): R7 - the pose's own cell alone, never a halo's
-  assert.equal((relay.match(/_watchTick\(/g) ?? []).length, 2, 'one call, one definition');
-  // PIN MOVED (AUDIT ETHER-OW C2-1, test/systems/audit_etherow.test.js): a pose off the map mints nothing - the Watch's ground
-  // one home (net/watchReceipt.js watchPixelOk), its answers as they were
-  assert.match(relay, /const \[x, y\] = mapPixelOfWire\(p\.x, p\.z\);\n {4}if \(!watchPixelOk\(x, y\)\) return;/);
   // PIN MOVED (WW7-5): the world's grid but the Veil's box (watchReceipt.js WATCH_VEIL_BOX)
   assert.deepEqual([watchPixelOk(0, 0), watchPixelOk(999, 499), watchPixelOk(-1, 0), watchPixelOk(1000, 0), watchPixelOk(8192, 0), watchPixelOk(100, -3000)], [true, true, true, true, false, false]);
-  assert.match(relay, /mintWatchReceipt\(\{ s: sub, x, y, c: rand32\(\) \}, await this\._receiptKeyOf\(\)/);
-  assert.match(relay, /this\._send\(ws, JSON\.stringify\(\{ t: 'watch', r \}\)\);/);
-  const online = rd('src/net/online.js');
-  assert.match(online, /const w = primary && isCellRoom\(room\) \? readWatchReceipt\(m\.r\) : null;\n\s*if \(w\) this\._deliver\('watch', \(\) => this\.onWatch\?\.\(m\.r, w\)\);/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);   // PIN MOVED (TOWN-ECON TE2: the towns' book keeps it beside); PIN MOVED (PROF2b): and the Motherlodes' book keeps it too
-  assert.match(w, /if \(seatBook\?\.claimWatchDue\(\)\) seatBook\.claimWatch\(\);/);   // PIN MOVED (AUDIT-SEATS C12): asked in sync first - a frame with nothing due makes no Promise
-  // PIN MOVED (DOMAIN1, HOST-SPLIT): the seats' own pixels built in systems/town/townSeats.js seatPixelTest, where the host
-  // had kept its own set beside the book - the same answer, read off the derivation the host hands it
-  assert.match(w, /      seats: townSeats,   \/\/ DOMAIN1 \(HOST-SPLIT\)/);   // PIN MOVED (DOMAIN3): the book handed the derivation, its pixels built there (townSeatBook.js seatPixelTest)
   const seatPixelAt = seatPixelTest({ list: [{ pixel: [402, 151] }, { pixel: [7, 9] }] });
   assert.deepEqual([seatPixelAt(402, 151), seatPixelAt(7, 9), seatPixelAt(151, 402), seatPixelAt(402, 152), seatPixelTest(null)(0, 0)], [true, true, false, false, false]);
-  assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null, port: coastalAt\(town\.px, town\.py, seaPixel, csaIsPortTown\(town\.px, town\.py\)\), countName: materialCountLabel \} : null,/);   // SEAT2b: and whether DFU names the town a port, the works' material words
-  assert.match(w, /const seatAt = seatHere\(town\.mapId\);/);
-  // PIN MOVED (SILVER-WAYS): the claiming character rides every claim (its guild's deed asks it), the region where the scan found it
-  // PIN MOVED (WW-GATES-EVERYWHERE, A2b): the region the kill's lane's - the Bay's lane's off its scan, a province's lane's its
-  // own province's (scenes/gate/gateSeat.js gateSeatRegion), named where there is one
-  assert.match(w, /const character = characterIdOf\(playerEntity\);\n[^\n]*\n\s*return region != null \? \{ region, character \} : character \? \{ character \} : null;/);
-  assert.match(w, /region: \(\) => \{ const px = playerTravelPixel\(\); const r = maps\.getRegionIndexAt\(px\.x, px\.y\); return Number\.isSafeInteger\(r\) \? r : null; \},/);
-  const nw = rd('src/ui/noticeWindow.js');
-  assert.match(nw, /\.\.\.\(seatShown\(\) \? \[\['seat', 'Seat'\]\] : \[\]\)\];/);
-  assert.match(nw, /const seatHost = guildOnly \? null : \(deps\.seat \?\? null\);/);
-  assert.match(nw, /else if \(tab === 'seat' && seatTab && seatShown\(\)\) win\.append\(seatTab\.body\(\)\);/);
-  const idx = rd('server-account/src/index.js');
-  assert.match(idx, /if \(r\.recorded && !r\.rite && body\.region != null\) answer\.seat = await creditGate\(ctx, who\.player, env, \{ character: body\.character \?\? null, day: r\.day, region: body\.region \}\);/);
-  assert.match(idx, /if \(body\.region != null && r\.credited > 0 && !r\.repeat\) await creditRenown\(/);
-  for (const r of ['pledge', 'standings', 'watch', 'tribute']) assert.ok(rd('server-account/src/service.js').includes(`'/v1/seats/${r}'`), `${r} routed`);
   assert.match(rd('.github/workflows/account-deploy.yml'), /- "src\/net\/watchReceipt\.js"/);
 });

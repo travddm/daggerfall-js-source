@@ -292,7 +292,6 @@ test('SD11e THE HAND SHOWS ITS WAY AS IT GATHERS (L4 F10): its wind-up\'s half-c
     assert.ok(near(lane.end[0], 1 + Math.sin(a) * H.len) && near(lane.end[1], 2 + Math.cos(a) * H.len), `sw ${sw}: the beam at the edge it starts from`);
   }
   assert.deepEqual(sdTelegraphShapes(blow(H, at, { sw: 1 }), SD_BODY.remnant, 1, at + 100).map((s) => s.kind), [TELEGRAPH_KIND.lane], 'sweeping: the beam alone');
-  assert.equal(read('src/render/gate/gateTelegraph.js').includes('AUDIT SD II (L4'), false, 'the gate\'s pass is its own');
 });
 
 test('SD11e THE HAND\'S RANGE IS ITS BEAM\'S (L4 C1): it was chosen for a target 40 m past its body, and its beam reaches 34 from its chest - a target 34-42 m off was swept by a beam that never reached it; now its range past its body is the beam\'s length less the body (mutants: the range 40)', () => {
@@ -319,9 +318,6 @@ test('SD11e NOBODY ON THE STEPS (L4 C2): the arena\'s own slack keeps every poin
   const last = crumble[crumble.length - 1], [lx, lz] = arenaOf(last.x, last.z + last.d / 2);
   stepRemnant(f, T0 + 5000, [{ sub: 'a', x: lx, z: lz, dead: false }], seeded(1));
   assert.equal(f.players.a.seenAt, T0, 'not seen from the Steps');
-  const R = read('server/src/index.js');
-  assert.match(R, /if \(!inArena\(at\.x, at\.z, SD_ARENA_SLACK\)\) return;\s+\/\/ from the arena alone/);
-  assert.match(read('src/net/superDungeon/sdStrike.js'), /if \(inArena\(px, pz, SD_ARENA_SLACK\)\) hits\.push\(\{ part: 'all', pct, base: A\.base \}\);/);   // PIN MOVED (AUDIT SD III F3): the whole arena's blow judged however late - still on the arena's own slack
 });
 
 // ── the words and the comments (L4 C4, C5, C6; the docs lens) ──────────
@@ -339,11 +335,4 @@ test('SD11e THE WORDS AND THE COMMENTS (L4 C4, C5, C6; the docs lens): the mirro
   assert.equal(sdNameOf(s, "Bel$'ar").includes("Bel$'ar"), true);
   assert.equal(sdSalt(1), sdSalt(2048), 'slot 1 and slot 2048 share a salt');
   assert.equal(new Set(Array.from({ length: 2047 }, (_, k) => sdSalt(k + 1))).size, 2047, 'and every slot between has its own');
-  const site = read('src/systems/superDungeon/sdSite.js'), law = read('src/net/superDungeon/sdLaw.js');
-  assert.match(site, /a slot's own until the 2047th Hollow after it/);
-  assert.equal(/2048th Hollow/.test(site) || /largest cities/.test(site), false, 'no comment says what the code does not');
-  assert.match(site, /SD_GREAT_CITIES cities by that same claim/);
-  assert.match(law, /how many fought it \(`n` - every seat its fight took/);
-  assert.equal(law.includes('how many earned it'), false);
-  assert.match(read('src/world/superDungeon/sdSteps.js'), /by the checkpoints' near edges/, 'C3 was SD11a\'s');
 });

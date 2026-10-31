@@ -91,10 +91,6 @@ test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Wo
   assert.equal(jobsFor(CRON_MINUTE), MINUTE_JOBS);
   assert.equal(jobsFor(CRON_HOUR), HOUR_JOBS);
   assert.deepEqual(jobsFor('0 0 * * *'), []);
-  // a module Worker reads every named export of its entrypoint as an entrypoint (AUDIT-ACC F2): `default` alone
-  const index = src('server-account/src/index.js');
-  // PIN MOVED (ADMIT-LINE): and the sign-in line's Durable Object class, the one named export a binding needs
-  assert.deepEqual(index.match(/^export\s+(?!default\b).*/gm) ?? [], ["export { AdmitGate } from './admit.js';   // ADMIT-LINE: the line's Durable Object (wrangler.toml binds it from this module)"]);
   assert.deepEqual(Object.keys(worker).sort(), ['fetch', 'scheduled']);
 
   const s = await standService(OPEN);

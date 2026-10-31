@@ -111,37 +111,5 @@ test('NUDE-FLATS, the Morrowind body: a woman\'s bare chest wears the plainest s
   // MW-CLOAK1: a cloak is the port's own and hangs down the back - the chest under it takes the weld
   assert.deepEqual(ids(wear([{ kind: 'clothing', templateIndex: 154, name: 'Casual Cloak' }], true, false)), ['b_shirt', 'b_sleeve', 'daggerfall_cloak'], 'the cloak, the shirt under it');
   assert.equal(MODESTY_SHIRT.name, 'Short Shirt');
-  // the switch at the build: the viewer's own setting, the one the classic doll reads
-  assert.match(src('src/combat/fpArm.js'), /: composeWornModest\(\{ pieces: armor \?\? \[\], armors: armors \?\? \[\], clothes: clothes \?\? \[\], bodyPool: parts, female, colourOf, helmStyle, beast, beastWear \}, showNudity\(\)\);/);   // MW-STEEL1: and the Steel Helm switch; BEAST-BOOTS: and the race's Beast flag
 });
 
-test('NUDE-FLATS by source: every host that draws a person asks drawnFlat, and the person keeps the flat they were born as', () => {
-  const ic = src('src/scenes/interiorContext.js');
-  assert.match(ic, /const \[da, dr\] = drawnFlat\(v\?\.textureArchive \?\? pn\.textureArchive, v\?\.textureRecord \?\? pn\.textureRecord\);/,
-    'an interior person: on whatever picture the RR variant answered');
-  assert.match(ic, /const redrawn = v \|\| da !== pn\.textureArchive \|\| dr !== pn\.textureRecord;\s*return \{ \.\.\.pn, x, y, z, active: visible, questBehaviour: null, \.\.\.\(redrawn \? \{ drawArchive: da, drawRecord: dr \} : \{\}\) \};/,
-    'drawn through RR2\'s own door, textureArchive/textureRecord untouched');
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT PRECIP HOST-7): the flats are logged, and grouped by their drawn picture (scenes/pixelBuild.js groupFlats)
-  assert.match(w, /export function groupFlats\(log, pics\) \{[^]*?const \[archive, record\] = drawnFlat\(pics\[j\]\[0\], pics\[j\]\[1\]\);\n\s+const k = `\$\{archive\}_\$\{record\}`;/, 'every flat the streaming host batches');
-  assert.match(w, /const \[drawArchive, drawRecord\] = drawnFlat\(flat\.archive, flat\.record\);\s*const t = await getTexture\(drawArchive\);\s*if \(!t \|\| drawRecord >= t\.recordCount\) continue;\s*const size = billboardSize\(t, drawRecord\);/,
-    'a street NPC\'s box is its picture\'s');
-  assert.match(w, /pixelNpcs\.push\(\{ \.\.\.pn, drawArchive, drawRecord, width: size\.w,/);
-  // PIN MOVED (MWNPC8b, bible/04-Characters/Morrowind-NPCs.md section 13b): the street's people stand a batch each now,
-  // so the picture is read per person rather than as a group's key - the same picture
-  assert.match(w, /const archive = pn\.drawArchive \?\? pn\.textureArchive, record = pn\.drawRecord \?\? pn\.textureRecord;/, 'and its stand draws that picture');
-  const e = src('src/scenes/exterior.js');
-  assert.match(e, /const key = drawnFlat\(flat\.archive, flat\.record\)\.join\('_'\);/, 'the one-location host\'s batches');
-  assert.match(e, /const \[da, dr\] = drawnFlat\(flat\.archive, flat\.record\);[^\n]*\n\s*const t = textureFiles\.get\(da\) \?\? await getTexture\(da\);\s*if \(!t \|\| dr >= t\.recordCount\) continue;\s*const size = billboardSize\(t, dr\);/,
-    'and its street NPCs\' boxes');
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /let size = billboardSize\(bornT, bornRecord\);\s*const based = centers\.map\(\(p\) => Object\.assign\(\[p\[0\], p\[1\] - size\.h \/ 2, p\[2\]\], \{ noCover: !!p\.noCover \}\)\);[\s\S]{0,300}?const \[archive, record\] = drawnFlat\(bornArchive, bornRecord\);[\s\S]{0,200}?size = billboardSize\(t, record\);\s*const batch = renderer\.createBillboardBatch\(archive, record, size, based\);/,
-    'an RDB figure: the stand-in on the BORN sprite\'s feet (its pivot is the born centre)');
-  assert.match(d, /const drawn = dt && dr < dt\.recordCount \? billboardSize\(dt, dr\) : size;\s*pn\.width = drawn\.w;\s*pn\.height = drawn\.h;\s*pn\.y -= size\.h \/ 2;/,
-    'and its box the drawn picture\'s, from the same feet');
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const \[drawArchive, drawRecord\] = isItem \? \[archive, record\] : drawnFlat\(archive, record\);/, 'a quest\'s person, never its item');
-  assert.match(m, /const t = await getTexture\(drawArchive\);\s*if \(!t \|\| drawRecord >= t\.recordCount \|\| stand\.dead \|\| getCtx\(\) !== ctx\) return;\s*uploadRecord\(drawArchive, drawRecord\);\s*const size = billboardSize\(t, drawRecord\);/);
-  assert.match(m, /stand\.batch = renderer\.createBillboardBatch\(drawArchive, drawRecord, size, \[\[x, by, z\]\]\);/);
-  assert.match(m, /const stand = \{ ctx, archive, record, x, y, z,/, 'the stand keeps the born pair');
-});

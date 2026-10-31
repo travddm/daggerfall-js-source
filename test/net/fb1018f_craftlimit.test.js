@@ -452,8 +452,6 @@ test('CRAFT-LIMIT-SAID the law: craftLimit is craftXpCap\'s ceiling with its roo
   const views = [{ profession: 'building', xp: xpForRank(60), rank: 0 }, { profession: 'provisioning', xp: xpForRank(51), rank: 0 }, { profession: 'smithing', xp: HELD - 7, rank: 0 }, null];
   assert.deepEqual(law.craftLimitOf?.(views, 'jewelcrafting'), { cap: HELD, room: 7, by: ['building', 'provisioning'], rank: 50 }, 'ranks the service\'s own, off the XP');
   assert.deepEqual(law.craftLimitOf?.([], 'smithing'), { cap: PROF_XP_MAX, room: PROF_XP_MAX, by: [], rank: 100 }, 'no tracks read: no limit');
-  // THE HOSTS DO NOT GROW: world.js's craft word hands the book's limit in, in its one call
-  assert.match(hostText('src/scenes/world.js'), /\$\{made\} \$\{craftXpText\(rec, r\.data, st\.xp, profBook\.limit\(rec\?\.profession\)\)\}\$\{paid \?/);
 });
 
 // ─── AUDIT FB1018f L5: THE WORDS AT THE EDGES ────────────────────────

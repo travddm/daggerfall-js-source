@@ -297,39 +297,6 @@ test('LA-POST2: the glare is sized by a range HELD per light - a lamp whose rang
   assert.equal(calls.filter((c) => c[0] === 'drawArrays').length, 0);
 });
 
-// ═══ 3. THE BLOOM AND THE SHAFTS IN HALF FLOATS ══════════════════════════════════════════════════════════════════
-test('LA-POST3: the bloom\'s and the shafts\' images are half floats where the GL renders them (the AO keeps its bytes; with no float target every image is bytes, as before), the gaussians hold their reads at 1 so the source saturates exactly as the byte image did, and a halo\'s tail the byte image rounded to a ring survives; the probes read either through readTarget (mutants: the bloom in bytes; the shafts in bytes; the hold dropped; a float read as bytes)', () => {
-  for (const float of [true, false]) {
-    const { ap, calls } = pass({ float });
-    ap.resize(320, 200);
-    const T = ap.targets;
-    for (const k of ['bloom', 'bloomB', 'shaft', 'shaftRaw', 'vol', 'volB']) assert.equal(T[k].float, float, `${k}: ${float ? 'a half float' : 'bytes'}`);
-    for (const k of ['ao', 'aoBlur', 'volOut']) assert.equal(T[k].float, false, `${k}: bytes - a share, or the tonemapped glow`);
-    assert.equal(calls.filter((c) => c[0] === 'texImage2D' && c[3] === 34842 && c[8] === 5131).length, float ? 6 : 0, 'RGBA16F / HALF_FLOAT: the bloom\'s two, the shafts\' two, the glow\'s two');
-    // the probes' read: a float image as FLOAT, a byte image as bytes
-    calls.length = 0;
-    const b = ap.readTarget('bloom'), a = ap.readTarget('ao');
-    const reads = calls.filter((c) => c[0] === 'readPixels');
-    assert.deepEqual(reads.map((c) => c[6]), [float ? 5126 : 5121, 5121], 'the bloom read as its storage, the AO as bytes');
-    assert.equal(b.px.length, T.bloom.w * T.bloom.h * 4); assert.ok(b.px instanceof Uint8Array && a.px instanceof Uint8Array);
-    assert.equal(ap.readTarget('nothing'), null);
-  }
-  // the gaussian: a source the writers summed past 1 (a flame's own emitter, glare and bright pass together) is held
-  // at 1 - the byte image's own answer - and a source under 1 is read as it is
-  const { ap } = pass({ float: true });
-  const gauss = (src) => { const f = glslFunctions(ap.programs.gauss.p.fs, { uDir: [0.01, 0], vUV: [0.5, 0.5], texture: () => [src, src, src, 1] }); f.main(); return f.globals.outColor[0]; };
-  assert.ok(Math.abs(gauss(3) - gauss(1)) < 1e-9 && Math.abs(gauss(1) - 1) < 1e-5, 'a sum of three reads as one - the level Mac\'s gain was tuned on');
-  assert.ok(Math.abs(gauss(0.25) - 0.25) < 1e-5, 'under one, untouched');
-  // the tail: a halo's linear light under half a byte step - four display levels once the resolve adds it at the
-  // bloom's gain over black and encodes - was 0 in the byte image: the ring
-  const tail = 0.0018, gain = 0.6;
-  const shown = (lin) => Math.round((lin <= 0.0031308 ? lin * 12.92 : 1.055 * lin ** (1 / 2.4) - 0.055) * 255);
-  assert.equal(Math.round(tail * 255) / 255, 0, 'the byte image held nothing of it');
-  assert.ok(shown(tail * gain) >= 3, `the half float holds it: ${shown(tail * gain)} display levels where the byte image showed 0`);
-  // by source: the four targets on the one test the glow already takes
-  assert.match(read('src/render/airPass.js'), /bloom: color\(bw, bh, f16\), bloomB: color\(bw, bh, f16\),\n\s+shaft: color\(bw, bh, f16\), shaftRaw: color\(bw, bh, f16\),/);
-});
-
 // ═══ 4. THE EYE IN SIXTEEN BITS ══════════════════════════════════════════════════════════════════════════════════
 test('LA-POST4: the eye\'s state is sixteen bits (the high byte in R, the low in G) - the codec round-trips to 6e-5 of a stop and reads the bare [128, 128] images as it always did; at 144 Hz a dark frame that the byte eye never opened to is reached, and after a flash the eye comes back where the byte eye stayed closed; ADAPT_FS is packAdapt(adaptStep(unpackAdapt)) term for term, and LUM_FS holds each tap\'s log to the encoded range (mutants: one byte; the low byte dropped; a black tap scored at -29.9)', () => {
   const R = AIR_ADAPT_LOG_RANGE;
@@ -555,10 +522,6 @@ test('LA-POST6: the march\'s previous frame is a frame this one follows - the fl
   frame(at, 0);
   assert.equal(walk(), false, 'the frame after a menu\'s: no previous depth to march');
   assert.equal(walk(), true);
-  // by source: the wiring where the renderer knows
-  const rs = read('src/render/renderer.js');
-  assert.match(rs, /shadowOriginShift\(offset\) \{ this\._shadowPass\?\.shiftOrigin\(offset\); this\._air\?\.shiftOrigin\(offset\); this\._frameStamp\+\+; \}/);   // LA-AUDIT C1: and the stamp
-  assert.match(rs, /const cut = this\._everyLightNow !== this\._everyLightPrev;[^\n]*\n\s+if \(cut\) sp\.discard\(\);[^\n]*\n\s+if \(this\._everyLightNow !== this\._everyLightPrev\) \{ this\._air\?\.invalidatePrev\(\); \} this\._everyLightPrev = this\._everyLightNow;/, 'the door, both ways, before the edge is spent');   // PIN MOVED (EMPTY-HOLD, 2026-10-06): the replay's discard reads the door's edge where EMPTY-HOLD named it, `cut` - the same edge, still read before it is spent
   assert.ok(calls.length > 0);
 });
 

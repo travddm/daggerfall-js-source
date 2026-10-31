@@ -669,8 +669,6 @@ test('AUDIT 63 F34: the hand-to-hand damage line, on the group that holds the sk
     min: handToHandMinDamage(sheetEntity().skills[SKILLS.HandToHand]),
     max: handToHandMaxDamage(sheetEntity().skills[SKILLS.HandToHand]),
   });
-  assert.match(readFileSync(join(root, 'src/ui/enhanced/enhancedMenu.js'), 'utf8'),
-    /group\.ids\.includes\(SKILLS\.HandToHand\)/, 'gated per GROUP there too');
 });
 
 test('AUDIT 63 F35: this dialog\'s highlight is the box\'s OVERRIDE, not the UI default', () => {

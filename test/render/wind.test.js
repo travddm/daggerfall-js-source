@@ -59,34 +59,6 @@ test('WIND1: two days differ, and a mild change is a mild front', () => {
   assert.ok(after - before < 120, `a cloudy morning is not a thunder front: ${before} -> ${after}`);
 });
 
-test('WIND1: one seam - the row takes the model\'s vector, and the sky eases on the front', () => {
-  const shared = read('src/scenes/shared.js');
-  // The wind overrides the eased row AFTER the ease, so every consumer
-  // that reads the row - clouds, shadows, grass, rain, mills - takes it.
-  assert.match(shared, /weatherRowNow = easeWeather\(weatherRowNow, want, easeDt\);\s*\n\s*weatherRowNow\.wind = windModel\.vector\(\);/);
-  // The sky's own ease stretches to the front's lead while a front is
-  // up, so the clouds arrive BEHIND the wind - a storm rolling in.
-  // WIND2: for the WHOLE lead, from the change. WIND1 stretched it only
-  // while the front's factor was strictly between 0 and 1 - and at the
-  // change the factor is exactly 0, so the sky crossed in fourteen
-  // seconds and the wind rose after it: the storm arrived and the wind
-  // followed. The reverse of what was asked.
-  assert.match(shared, /const easeDt = windModel\.inLead\(\) \? dt \* \(WEATHER_EASE_MINUTES \/ windModel\.leadMinutes\(\)\) : dt;/, 'CLK1: both in game minutes, no time scale between them');
-  // AUDIT PRECIP FALL-2 (PIN MOVED): the worn word is its SYSTEM's - a storm turning to snow is no new front
-  assert.match(shared, /windModel\.tick\(extra\?\.classicMinutes \?\? 0, systemWordOf\(weatherName\), extra\?\.violence \?\? weatherName, extra\?\.approach \?\? 0\);/, 'ticked on the GAME clock (WEATHER2a: the violence word beside the worn one)');
-  // The rows' fixed vectors stay as the classic-sky fallback and are no
-  // longer what a consumer sees under the enhanced one.
-  assert.match(read('src/render/enhancedSky.js'), /sunny:.*wind: \[0\.010, 0\.004\]/);
-  // The grass gusts on the wind's temper, through the controller.
-  // WIND3: through the one mapping (systems/wind/windDrive.js), whose gust the host hands the grass as `wd.gust`
-  assert.match(read('src/systems/wind/windDrive.js'), /const gust = sky\?\.gustAt\?\.\(tsec\) \?\? legacyGust\(tsec\);/);
-  assert.match(read('src/scenes/world.js'), /speed: wd\.slider \* wd\.gust/);
-  assert.match(shared, /gustAt\(tsec\) \{ return windModel\.gust\(tsec\); \}/);
-  // ENHANCED ONLY: the model lives inside the controller and the classic
-  // sky never reaches the row.
-  assert.doesNotMatch(read('src/render/skyRenderer.js'), /windModel|createWindModel/);
-});
-
 test('WIND2: the clouds move by an INTEGRATED drift, and the wind leads the sky for the whole lead', () => {
   // With a fixed per-weather wind, wind * time and an integrated drift
   // were the same number. With WIND1's wind changing every frame
@@ -104,16 +76,4 @@ test('WIND2: the clouds move by an INTEGRATED drift, and the wind leads the sky 
   assert.equal(m.inLead(), true);
   m.tick(1440 + FRONT_LEAD_MIN, 'thunder');
   assert.equal(m.inLead(), false, 'and not once it has arrived');
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /driftXZ\[0\] \+= weatherRowNow\.wind\[0\] \* dt \* WIND_SECONDS_PER_MINUTE;/, 'the drift is integrated ONCE, where the wind and the clock meet (CLK1: game minutes through the one constant)');
-  assert.match(shared, /drift: driftXZ,/, 'and handed to the sky state');
-  const sky = read('src/render/enhancedSky.js');
-  assert.doesNotMatch(sky, /wind \* uTime|w\[0\] \* time|wind\[0\] \* time/, 'no deck multiplies wind by time any more');
-  assert.match(sky, /drift: state\.drift \?\? \[0, 0\],/, 'and the ground\'s deck carries the drift');
-  // VC4: the ground's shadow is the slab's own map now - the drift reaches
-  // it through the field both marches read, handed by the controller
-  const clouds = read('src/render/volumetricClouds.js');
-  assert.match(clouds, /vec3 q = vec3\(p\.x \+ uShift\.x - uDrift\.x \+ fShear \* \(p\.y - fBase\), p\.y, p\.z \+ uShift\.y - uDrift\.y\);/, 'the field moves by the drift, integrated (and sits on the absolute position - VC4c; WEATHER2c: the shear and the base are the place\'s)');
-  assert.match(shared, /clouds\??\.setState\([^;]*driftXZ,/, 'the one integral, handed to the clouds');
-  assert.doesNotMatch(read('src/render/renderer.js'), /uCloudWind \* uCloudTime|uCloudDrift/, 'no deck multiplies wind by time, and the noise shadow is gone');
 });

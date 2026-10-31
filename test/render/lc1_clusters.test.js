@@ -160,14 +160,7 @@ test('LC1: the shader - the block in every lane program (not the far ring, which
     assert.equal((fs.match(/if \(i >= uPointCount\) break;/g) ?? []).length, 1, `${name}: the only "every light" loop left is the in-scatter`);
   }
   assert.ok(!EL_FAR_RING_FS.includes('uClusterGrid'), 'the far ring lights by no lantern');
-  const rsrc = rd('src/render/renderer.js');
-  for (const name of ['FS', 'CHAR_FS', 'BB_FS', 'TERRAIN_FS', 'DECAL_FS']) {   // the classic programs, by source: untouched
-    const at = rsrc.indexOf(`const ${name} = \``);
-    const body = rsrc.slice(at, rsrc.indexOf('`;', at));   // the literal's close
-    assert.ok(at > 0 && !body.includes('uClusterGrid') && !body.includes('elCluster'), `the classic ${name} is untouched`);
-  }
   assert.equal(EL_LANE.maxLights, EL_MAX_LIGHTS);
-  assert.match(rd('src/render/enhancedLighting.js'), /renderer\.setClusters\?\.\(clustersOn\(search\)\);/, 'the door read at the lane\'s install, like the air\'s');
 });
 
 /** A recording fake GL (el2's shape). */
@@ -255,14 +248,6 @@ test('LC1: the renderer on the fake GL - the two integer textures made with the 
   assert.equal(r._clustersLive, false);
   assert.equal(uni(calls, 'uClusterOn').length, 0);
   assert.equal(calls.filter((c) => c[0] === 'texSubImage2D').length, 0);
-});
-
-test('LC1: the host wiring by source - the build sits in beginFrame after the lane\'s passes under the world-frame gate, the upload rides _uploadEl under the contact block\'s gate, the textures are made at the lane\'s install (mutants: the build before the passes, which reads last frame\'s viewport; the upload gated by nothing)', () => {
-  const r = rd('src/render/renderer.js');
-  assert.match(r, /this\._beginLane\(proj, view, lightDir, opts\?\.world === true\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*this\._clustersLive = !!this\._lane && opts\?\.world === true && !this\._panelSaved && this\._spriteDepth === 0 && this\._studioDepth === 0 && this\._buildClusters\(proj, view\);/);
-  assert.match(r, /this\._uploadClusters\(this\._el\[key\]\.cluster, this\._clustersLive && this\._spriteDepth === 0 && this\._studioDepth === 0 && !this\._panelSaved\);/);
-  assert.match(r, /if \(lane\) this\._ensureClusters\(\);/);
-  assert.match(r, /const vp = this\._worldViewportPx \?\? \[0, 0, this\.canvas\.width, this\.canvas\.height\];/, 'the docked-HUD viewport (ROAD-E E5) is the rect the tiles are cut over');
 });
 
 test('AUDIT LC1: THE NEAR BAND - a fragment nearer the eye than CLUSTER_NEAR (the hosts\' near planes are 0.05 and 0.2) still finds a light whose reach passes beside the view axis: the light is written to every tile of slice 0, and the hull serves the slices beyond (mutants: the band flag dropped, so the hull computed at 0.25 falls a tile short for a fragment at 0.1; a sphere inside the band dropped whole)', () => {

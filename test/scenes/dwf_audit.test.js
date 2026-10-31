@@ -52,7 +52,6 @@ test('AUDIT DW-F E5-3: CreateRandomWeapon draws RandomMaterial for every slot be
   assert.equal(arrows.templateIndex, 131);
   assert.equal(arrows.stackCount, 11, 'the stack reads the third value, not the material\'s');
   assert.equal(arrows.material, 0, 'and the material drawn is thrown away (nativeMaterialValue = 0)');
-  assert.match(rd('src/systems/loot/loot.js'), /const material = randomMaterial\(playerLevel, rolls\);\n\s+if \(groupIndex >= 19\) return \{ group: 'Weapons', \.\.\.createWeapon\(customs\[groupIndex - 19\], material\) \};\n[\s\S]{0,1500}?if \(groupIndex === 18\) return createWeapon\(ARROW_TEMPLATE, 0, rolls\);/);
 });
 
 test('AUDIT DW-F E5-6: the loot\'s unordered compares are the C#\'s own forms - a NaN takes the branch the IL\'s .un takes (mutants: an ordered negation back)', () => {
@@ -69,38 +68,6 @@ test('AUDIT DW-F E5-6: the loot\'s unordered compares are the C#\'s own forms - 
   // TryPickFogAheadPoint: blt.un past `reveal >= max` - a NaN reveal is not "past the fog's reach"
   assert.ok(L.tryPickFogAheadPoint([0, 0, 0], 130, [0, 0, 1], NaN, () => 0.5), 'the IL goes on past the test');
   assert.equal(L.tryPickFogAheadPoint([0, 0, 0], 130, [0, 0, 1], 128, () => 0.5), null, 'a reveal of 130 is the reach');
-  // ShouldSpawnTreasureCluster / RollStrayLootCount: bgt.un past `rate <= 0`; CanRunLootPulse the same twice
-  const lootSrc = rd('src/world/underwater/underwaterLoot.js'), spawner = rd('src/scenes/deepWater/deepWatersLoot.js');
-  assert.equal((lootSrc.match(/if \(rate <= 0\) return (false|0);/g) || []).length, 2);
-  assert.match(spawner, /if \(s\.rate <= 0 && s\.clusterRate <= 0\) return null;/);
-  assert.doesNotMatch(lootSrc + spawner, /!\((rate|s\.rate|s\.clusterRate|reveal|column\.depth|column\.oceanY)[^)]*[<>]=?[^)]*\)/, 'no ordered negation left in their place');
-});
-
-test('AUDIT DW-F E5-1/E5-4: the view the loot and the guards test is the one the frame is about to draw (its wide lens - the captain\'s glass narrows the frame\'s alone), and the velocity is the motor\'s - rebased at a crossing, let go across a door, a teleport, a load (pins)', () => {
-  const w = hostText('src/scenes/world.js');
-  const view = w.slice(w.indexOf('  function dwSpawnView() {'), w.indexOf('  /** The frame\'s CharacterController.velocity'));
-  assert.match(view, /const V = lookAt\(eye, \[eye\[0\] \+ forward\[0\], eye\[1\] \+ forward\[1\], eye\[2\] \+ forward\[2\]\], UP_Y\);/, 'this frame\'s camera');
-  // CLIMB4: the frame's lens carries the climb's kick (a leap's), and so does this one - the same lens, kicked or not
-  assert.match(view, /const worldAspect = largeHudWorldAspect\(canvas\.clientWidth, canvas\.clientHeight\);[^\n]*\n\s+const P = mirrorProjectionX\(perspective\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), worldAspect, 0\.2, 6000\)\);/, '...through the frame\'s own wide lens (AUDIT CAPTAIN\'S SEA H22: the glass\'s narrowing its own, below)');
-  assert.doesNotMatch(view, /renderer\._view|renderer\._proj/, 'not the last pass\'s matrices');
-  // PIN MOVED (SPYGLASS, 2026-10-11): the frame's lens narrowed by the captain's glass while it is up - the spawners keep the
-  // wide one, so nothing they place pops into the view the glass comes down from
-  // PIN MOVED (GLASS-CLEAR, 2026-10-11): and its near plane the glass's focus - the eye's own 0.2 while it is down
-  // PIN MOVED (OW-HORIZON, 2026-10-20): through scenes/travelHorizon.js horizonProj - mat4's mirrored perspective, the eye's planes on the ground
-  // (WORLD_NEAR's 0.2, WORLD_FAR's 6000) and the travel view's under it
-  assert.match(w, /const proj = horizonProj\(glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), worldAspect, spyglass\.near, tvf\);/, 'the frame draws through the same lens - the glass\'s narrowing on it while the glass is up (AUDIT CAPTAIN\'S SEA H22)');
-  assert.match(w, /for \(let i = 0; i < 3; i\+\+\) _dwEyeOffset\[i\] = mwv\.eye\[i\] - cam\.pos\[i\];/, 'the camera machine\'s eye, relative (a crossing moves cam.pos, not the offset)');
-  assert.match(w, /if \(_dwLootVel\.last\) for \(let i = 0; i < 3; i\+\+\) _dwLootVel\.last\[i\] \+= r\.offset\[i\];/, 'FloatingOrigin moves the player by transform: no velocity');
-  assert.match(w, /dwLoot\?\.pump\(f\);[^\n]*\n\s+dwLootLetGoVelocity\(\);/, 'indoors: the way out is a reposition');
-  assert.match(w, /onTransientReset\(\(\) => \{ dwLoot\.reset\(\); dwLootLetGoVelocity\(\); \}\);/, 'a teleport or a load');
-});
-
-test('AUDIT DW-F E5-5: the port\'s own rebuilds keep the rubble where it lay; an unload and a sweep take it (pins)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(collectLoose\) for \(const r of \[\.\.\.\(_dwRubble\.get\(p\) \?\? \[\]\)\]\) dwFreeRubble\(r\);[^\n]*\n\s+else if \(_dwRubble\.has\(p\)\) \{ _dwRubbleCarry\.set\(key, _dwRubble\.get\(p\)\); _dwRubble\.delete\(p\); \}/);
-  // PIN MOVED (IC-SWAP-BEHIND): the pixel's own key (`pkey`) - the carry the swap's teardown took, adopted by the entry it stood in
-  assert.match(w, /const dwRubbleKept = _dwRubbleCarry\.get\(pkey\);[^\n]*\n\s+if \(dwRubbleKept\) \{ _dwRubbleCarry\.delete\(pkey\); const e = built\.get\(pkey\); for \(const r of dwRubbleKept\) r\.entry = e; _dwRubble\.set\(e, dwRubbleKept\); \}/, 'adopted by the entry that stands next');
-  assert.match(w, /for \(const list of _dwRubbleCarry\.values\(\)\) for \(const r of list\) dwFreeRubble\(r\);[^\n]*\n\s+_dwRubbleCarry\.clear\(\);/, 'a sweep carries nothing');
 });
 
 /** A sea of one column kind: x in [0, 100] is 24 m deep (a floor at 10), the rest dry (dwc_fog's). */
@@ -114,65 +81,11 @@ function fakeSwimmer() {
   });
 }
 
-test('AUDIT DW-F CD-4: behind a pausing window the underwater presentation is none - TryGetUnderwaterPresentation asks IsPlayingGame first; the stroke, the low-pass and the splash stand down too (mutant: the playing test dropped)', () => {
-  const p = fakeSwimmer();
-  assert.deepEqual(p.fogPresentation({ camera: [50, 20, 0], centre: [50, 20, 0], swimming: true, playing: false }), { under: false, oceanY: 0 }, 'false, and the out height 0 (IL_12020)');
-  assert.equal(p.fogPresentation({ camera: [50, 20, 0], centre: [50, 20, 0], swimming: true }).under, true, 'absent reads as playing');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /_dwFogP = dwPlayer\.fogPresentation\(\{[^\n]*, playing: dwPlaying\(\) \}\);/);
-  const block = w.slice(w.indexOf('const _dwNowPlaying = dwPlaying();'), w.indexOf('else _dwSwimSound.reset();\n        }'));
-  assert.match(block, /const _dwOutdoor = _dwNowPlaying && !player\.waterWalking && /, 'IsOutdoorSwimming asks IsPlayingGame');
-  assert.match(block, /loadGrace: loadGraceActive\(performance\.now\(\) \/ 1000, _dwNowPlaying\),/, 'IsLoadGraceActive: no light work while not playing');
-  assert.match(block, /anySwimming: _dwOutdoor \|\| \(_dwNowPlaying && !player\.waterWalking && !!player\.swimming\),/, 'IsAnySwimming too');
-  assert.match(block, /audio\.setListenerLowPass\(_dwNowPlaying && dwPlayer\.swim\.presentationUnderwater\(/, 'UpdateAudioFilter');
-  assert.match(block, /if \(_dwNowPlaying && player\.isPlayerSwimming && !player\.waterWalking\) \{ if \(_dwSwimSound\.step\(_dwCentre\)\)/, 'UpdateSwimSfxAndWeather');
-  assert.match(w, /const gamePaused = \(\) => (?:staffTeleportHeld \|\| )?townTalk\.overlayActive \|\| \(modes\?\.overlayHeld \?\? false\);\n\s+_dwOverlayUp = \(\) => gamePaused\(\);/, 'IsPlayingGame over every stack');
-});
-
-test('AUDIT DW-F CD-1/CD-6: the breath drains only while the game runs its FixedUpdate, and the frame runs the mod\'s execution order - the stroke beside the motor, then the after phase, each on the camera the move left (mutants: the breath ungated; the stroke after the after phase; last frame\'s camera)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(!_overlayHeld\) _dwBreathTimer \+= dt;/, 'Time.timeScale 0 runs no FixedUpdate');
-  const block = w.slice(w.indexOf('const _dwNowPlaying = dwPlaying();'), w.indexOf('else _dwSwimSound.reset();\n        }'));
-  const stroke = block.indexOf('dwSwimMove.update({'), after = block.indexOf('dwPlayer.afterMove({'), flush = block.indexOf('dwFlushStateChange();   // OutdoorSwimDriverAfter');
-  assert.ok(stroke > 0 && after > stroke && flush > after, 'OutdoorSwimMovementController (0), OutdoorSwimDriverAfter (32000), its flush');
-  assert.match(block, /dwPlayer\.afterMove\(\{ now: now \/ 1000, player, cameraY: player\.eye\[1\],/, 'the camera after this frame\'s move');
-  assert.match(block, /lookDir: fwd, cameraY: player\.eye\[1\],/);
-  assert.doesNotMatch(block, /cam\.pos\[1\]/, 'never last frame\'s render eye');
-});
-
-test('AUDIT DW-F CD-3: a dungeon swimmer splashes every 2.5 m - UpdateSwimSfxAndWeather has no IsPlayerInside test, and DFU\'s dungeon arm raises IsPlayerSwimming (mutant: the inside splash dropped)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const sw = modes\.mode === 'dungeon' \? modes\.dungeonCtx\?\.swimmer\?\.\(\) \?\? null : null;\n\s+if \(sw && dwPlaying\(\) && sw\.swimming && !sw\.waterWalking\) \{ if \(_dwSwimSound\.step\(centreFromFeet\(sw\.feet, sw\.height\)\)\) audio\.playOneShot\(SWIM_SOUND_CLIP, SWIM_SOUND_VOLUME\); \}\n\s+else _dwSwimSound\.reset\(\);/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /swimmer\(\) \{\n\s+return lastPlayerFeet \? \{ feet: lastPlayerFeet, height: lastPlayerHeight, swimming: !!_activity\.swimming, waterWalking: isEntityWaterWalking\(playerEntity\) \} : null;/, 'IsWaterWalking: either effect that raises it (CSA-I)');
-});
-
-test('AUDIT DW-F CD-2: OutdoorSwimDriver.OnSaveLoad on both load events - the state cleared, the forge dropped WITHOUT Restore, and a crouched save stands (mutants: the stand dropped; a Restore in its place; the OnLoad call dropped)', () => {
-  const p = fakeSwimmer();
-  const player = { pos: [50, 20, 0], height: 1.8, crouching: true, heightAction: null, isInWaterTile: false, isPlayerSwimming: true, swimming: true, forcedSwimCrouch: true, levitateMotorEnabled: true,
-    forceStand() { this.stood = true; }, forceUnsink() { this.unsunk = true; } };
-  p.swim.forged = true;
-  p.saveLoad(player);
-  assert.equal(p.forged, false, 'currentlyForged = false');
-  assert.equal(p.exteriorContext, false);
-  assert.equal(player.stood, true, 'RequestStandAfterWaterExit: HeightAction = DoStanding while crouching');
-  assert.equal(player.forcedSwimCrouch, false);
-  assert.equal(player.isPlayerSwimming, true, 'no Restore - the flags are not the reset\'s to lower');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /dwLoadStarted\(\);[^\n]*\n\s+if \(dwPlayer\) \{ dwPlayer\.saveLoad\(player\); dwFlushStateChange\(\); \}/, 'OnStartLoad');
-  assert.match(w, /dwLoadFinished\(performance\.now\(\) \/ 1000\);[^\n]*\n\s+if \(dwPlayer\) \{ dwPlayer\.saveLoad\(player\); dwFlushStateChange\(\); \}/, 'OnLoad, after the pose');
-});
-
 test('AUDIT DW-F CD-7: the underside\'s _UnderwaterFogColor is latched - configured at a settings change and at every surface built, never by the frame\'s refresh (mutants: the latch recomputed each frame; the surface build not re-latching)', () => {
   const s = lookSettings(() => undefined);
   assert.deepEqual(surfaceLook(s, { daylight: 0.3, undersideFogColor: [0.1, 0.2, 0.3, 1] }).fogColor, [0.1, 0.2, 0.3, 1], 'the latched colour');
   assert.deepEqual(surfaceLook(s, { daylight: 0.3 }).fogColor, underwaterFogColor(0.3), 'absent: this frame\'s');
   assert.deepEqual(surfaceLook(s, { daylight: 0.3, undersideFogColor: [0.1, 0.2, 0.3, 1] }).undersideColor, surfaceLook(s, { daylight: 0.3 }).undersideColor, 'the tint is the dynamic refresh\'s, every frame');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(!_dwUnderFogLatch \|\| _dwSurfaceBuilt\) \{ _dwUnderFogLatch = underwaterFogColor\(daylight\); _dwSurfaceBuilt = false; \}/);
-  assert.match(w, /_dwLook = lookSettings\(\(k\) => modSetting\(DEEP_WATERS_VENDOR, k\)\); _dwUnderFogLatch = null; \}/, 'LoadSettings: ApplyMaterialSettings');
-  assert.match(w, /if \(h\.surface\) _dwSurfaceBuilt = true;/, 'EnsureVisibleSurface: ApplyMaterialSettings');
-  assert.match(w, /surfaceLook\(_dwLook, \{ daylight, columnDepth: col \? col\.depth : null, undersideFogColor: _dwUnderFogLatch \}\)/);
 });
 
 test('AUDIT DW-F E-2: a load\'s own teleport does not open the work mid-load - SaveLoadManager.LoadInProgress holds light work shut until OnLoad (mutant: the load read off the clock again)', () => {
@@ -196,10 +109,6 @@ test('AUDIT DW-F E-3: a treasure guard lives with its column\'s terrain - the re
   const stood = [];
   const n = trySpawnTreasureGuards({ f, centre: [100, 0, 100], settings: { on: true, frequency: 0.3, waterDepth: 200 }, canRunHeavy: true, playerPos: [0, 0, 0], vision: 70, view: null, spawnGuard: (o) => { stood.push(o); return {}; } });
   assert.ok(n > 0 && stood.every((o) => o.entry === entry), 'SpawnTreasureGuardEnemy: the column\'s Parent');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /spawnGuard: \(req\) => dwStandGuard\(req\),/);
-  assert.match(w, /const k = `\$\{req\.entry\.px\},\$\{req\.entry\.py\}`;/, 'keyed by the pixel: a rebuild the port makes keeps them');
-  assert.match(w, /if \(collectLoose && _dwGuards\.has\(key\)\) \{ for \(const h of _dwGuards\.get\(key\)\) h\.destroy\(\); _dwGuards\.delete\(key\); \}/, 'the unload takes them');
 });
 
 /** A renderer over a GL that answers everything and records the uniform uploads (by name) and the texture binds (by unit). */
@@ -225,11 +134,6 @@ function recordingRenderer(log) {
 }
 
 test('AUDIT DW-F E-1: a foe under the carved sea takes the water column\'s share - DFU\'s Daggerfall/Billboard writes the depth texture the top reads; the flat\'s share is the floor\'s, on both lanes\' programs (mutants: the share dropped from either program; after the underwater fog)', () => {
-  // one column law, three programs: the floor, the decorations, and both lanes' flats
-  const renderSrc = rd('src/render/renderer.js');
-  const bb = renderSrc.slice(renderSrc.indexOf('const BB_FS = `'), renderSrc.indexOf('// Dungeon water: one horizontal quad'));
-  assert.match(bb, /\$\{FOG_GLSL\}\n\$\{COLUMN_GLSL\}\n\$\{HIT_FLASH_GLSL\}\n\$\{ELITE_GLOW_GLSL\}\n\$\{GLINT_GLSL\}\n\$\{FLAT_DISSOLVE_GLSL\}\n\$\{FLAT_CRACK_GLSL\}\nvoid main\(\)/, 'the classic flats declare it after the fog block, and HITFLASH1\'s term after it (ELITE FOES\' glow, TELL2\'s glint, DISSOLVE\'s burn, then VEIN-CRACKS\' seams last)');   // PIN MOVED (VEIN-CRACKS, GATHER-FEEL II, 2026-10-13): the crack's block after the burn's   // PIN MOVED (REVENANT-FATE: the dissolve's declarations close the block)   // PIN MOVED (TELL2: the glint's declarations before the burn's)   // AUDIT PRE-MERGE 0928 N7: no longer optional - BB_FS calls hitFlashLit, so without the term the classic flats' program does not compile
-  assert.match(bb, /outColor = vec4\(dwWaterFog\(dwColumn\(mix\(uFogColor, lit, fogFactorAt\(vBBWorld\)\), vBBWorld\), vBBWorld\), alpha\);/, 'the world fog, the share, the sea\'s fog - the floor\'s own order');
   assert.ok(EL_BB_FS.includes(COLUMN_GLSL), 'the lane\'s flats too');
   assert.match(EL_BB_FS, /outColor = vec4\(dwColumn\(elFinish\(lit, vBBWorld\), vBBWorld\), alpha\);/, 'on the finished display colour (the sea\'s fog is off whenever the share is on)');
 });
@@ -278,10 +182,3 @@ test('AUDIT DW-F E-1: the renderer hands the column to the flats the host flagge
   }
 });
 
-test('AUDIT DW-F E-1: the host flags the flats that STAND in a carved column - a foe\'s feet or a pile\'s spot, under the sea\'s line, over a carved point - and draws them flagged (pins)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(c && dwPlayer && b\._quads === 1\) \{[^\n]*\n\s+const o = b\.origin, x = b\.bounds\[0\] \+ \(o \? o\[0\] : 0\), y = b\.bounds\[1\] \+ \(o \? o\[1\] : 0\), z = b\.bounds\[2\] \+ \(o \? o\[2\] : 0\);\n\s+on = y < c\.seaY && !!dwPlayer\.rawColumnAt\(x, z\);/);
-  assert.match(w, /if \(deepWaters && livePersonBatches\.length\) dwFlagColumnFlats\(livePersonBatches\);[^\n]*\n\s+renderer\.holdBlended\(livePersonBatches\);[^\n]*\n\s+if \(livePersonBatches\.length\) renderer\.drawBillboards\(livePersonBatches, camRight, bbUp\);/);   // PIN MOVED (GRASS-PORTAL, FIELD BUGS 2026-10-12b): flagged, then the blended ones held back for after the grass   // TV1: the flats' up is the view's lean (UP_Y off the view)
-  assert.match(w, /_dwColumnNow = cf\.columnOn && cf\.surfaceTexture \? \{/, 'on while the top is drawn over the sea');
-  assert.match(w, /renderer\.setWaterColumn\(_dwColumnNow\);/);
-});

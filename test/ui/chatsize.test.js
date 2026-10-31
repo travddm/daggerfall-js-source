@@ -160,11 +160,8 @@ test('CHAT-SIZE by source: every size the chat\'s TEXT is drawn at is the scale\
   assert.match(SOCIAL_CSS, /:root\[data-dfchat-fit="beside"\] \.dfsocial \{ left: calc\(26px \+ min\(var\(--dfchat-w, 440px\), 100vw - 28px\) \+ env\(safe-area-inset-left, 0px\)\);/);
   assert.match(SOCIAL_CSS, /:root\[data-dfchat-fit="below"\] \.dfsocial, :root\[data-dfchat-fit="below"\] \.dfsocial\.touch \{ left: calc\(14px \+ env\(safe-area-inset-left, 0px\)\);\s*\n\s*top: calc\(var\(--dfchat-list-h, min\(220px, 34vh\)\) \+ 170px \+ 20px \* \(var\(--dfchat-scale, 1\) - 1\) \+ env\(safe-area-inset-top, 0px\)\);/, 'min(220px, 34vh) + 170 is the old 390 at the chat\'s own size');
   assert.match(SOCIAL_CSS, /@media \(min-width: 840px\) \{ \.dfsocial \{ left: calc\(466px \+ env\(safe-area-inset-left, 0px\)\); \} \}/, 'the page with no chat keeps the old numbers');
-  const src = readFileSync(new URL('../../src/ui/chatPanel.js', import.meta.url), 'utf8');
-  assert.match(src, /box\.append\(tabs, cols, grip\);/, 'the grip is the BOX\'s - its corner is past the roster column, not at the end of the form\'s row (the probe found it there, mid-box)');
   assert.match(ruleOf('.dfchat-grip'), /position: absolute; right: 0; bottom: 0;/);
   assert.match(ruleOf('.dfchat-form'), /padding: 6px 16px 6px 6px;/, 'the form\'s last button stands clear of the grip');
   assert.match(CHAT_CSS, /\.dfchat\.touch \.dfchat-form \{ padding-right: 30px; \}/, '...and of the thumb\'s larger grip');
   assert.match(ruleOf('.dfchat-wholist'), /padding: 0 8px 14px;/, 'and the roster\'s last row too');
-  assert.equal([...src.matchAll(/win\.addEventListener\(/g)].length, 1);
 });

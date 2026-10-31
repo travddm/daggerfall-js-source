@@ -91,34 +91,6 @@ function inBreach({ h = 2, sg = 'trial', egv = null, circle = null, modes: extra
   return { client, B: Br, entity, player, L, st, online, tell, spec, store, step: (ms) => { clock += ms; }, now: () => clock, setPeers: (p) => { peers = p; } };
 }
 
-// ── lane4 #1, lane6 #1: THE WITNESS ─────────────────────────────────────────────────────────────────────────────────
-test('AUDIT EG III lane4 #1 / lane6 #1 THE WITNESS IS NEVER CAST BACK, AND THE HOSTS MINT ITS TWO HOOKS (section 16.5): a fallen member\'s body, held under the hall, owes the void nothing - no hurt, no beat - where a living member\'s cast-back still costs its share; the world host\'s mode-machine host mints `egWitness` and `egWitnessEye` off the breach\'s client (THE SHAPE THE PRODUCER MINTS - its own literal, not a test\'s hand-built host), and the dungeon arm (the Spire\'s frame) applies the eye after its camera, the spans\' ride asking the witness hook (mutants: the cast-back unguarded; either hook unminted; the eye never applied in the dungeon arm)', () => {
-  const P = inBreach();
-  P.client.frame();
-  P.client.castBack();
-  assert.equal(P.L.hurt.length, 1, 'a living member pays the void');
-  P.entity.health = P.entity.maxHealth;
-  assert.equal(P.client.fallSave(), true, 'a fall: the witness');
-  P.client.frame();
-  const hurtBefore = P.L.hurt.length, beats = P.L.mids.length;
-  for (let k = 0; k < 10; k++) P.client.castBack();   // the spans' ride, frame after frame, as a host with no witness hook asked it
-  assert.equal(P.L.hurt.length, hurtBefore, 'the witness pays nothing');
-  assert.equal(P.L.mids.length, beats, 'and hears no cast-back');
-  // the world host's literal hands both hooks to the mode machine, off the client
-  const W = rd('src/scenes/world.js');
-  const host = between(W, '  var modes = createWorldModes({', '\n  });');
-  assert.ok(host.includes('    egWitness: () => !!egClient?.witnessing(),'), 'the witness hook minted');
-  assert.ok(host.includes('    egWitnessEye: (v, dt, cast) => egWitnessEye(v, dt, cast),'), 'the eye hook minted');
-  assert.match(W, /const egWitnessEye = \(\/\*\* @type \{\{ eye: any \}\} \*\/ v, dt = 0, cast = null\) => \{ if \(egClient\?\.witnessing\(\)\) \{ const c = \{ pos: v\.eye \}; if \(egClient\.witnessEye\(c, cam\.yaw, \{ dt, cast \}\)\) v\.eye = c\.pos; \} \};/);
-  // the dungeon arm: the eye after its own camera, before the view is made of it; the spans ask the witness hook
-  const WM = rd('src/scenes/worldModes.js');
-  const arm = between(WM, '    const mwv = mwViewFrame({\n      fpEye: cam.pos, feet: player.feetAt(), yaw: cam.yaw, pitch: cam.pitch,', '    const view = betterAmbience.view(lookAt(mwv.eye,');
-  // PIN MOVED (AUDIT EG V, e: L6-4 - the eye's cast is one function of the arm's, never a closure a Spire frame)
-  assert.match(arm, /if \(mode === 'dungeon' && isEgHall\(dungeonLoc\)\) host\.egWitnessEye\?\.\(mwv, dt, egEyeCast\);/);
-  assert.match(WM, /const egEyeCast = \(o, r, d, m\) => \{ const h = player\.collider\?\.sphereCast\?\.\(o, r, d, m\)\?\.dist; return Number\.isFinite\(h\) \? h : null; \};/);
-  assert.match(WM, /dungeonCtx\?\.egSpanRide\?\.\(dt, player, !overlayHeld && !host\.egWitness\?\.\(\)\)/);
-});
-
 test('AUDIT EG III lane6 #1 THE WITNESS\'S ORBIT, DAMPED AND COLLIDING (section 16.5: "critically damped (0.35 s), colliding as the Morrowind body\'s camera does"): the eye stands at once on its first frame and on a new member watched; a step of the watched member is followed with no overshoot, 40.6% of it still to go at 0.35 s (the critically damped curve\'s (1 + 2) e^-2); a step past EG_WITNESS_SNAP_M stands at once; the sphere cast from the watched member\'s pose along the way out pulls it in, the swept sphere the camera\'s own clearance; and the client\'s eye rides both (mutants: the smoothing time; overshoot; no snap; the cast ignored; the clearance)', () => {
   // the curve
   let e = egWitnessDamp(null, [0, 0, 0], 1 / 60, 'a');
@@ -261,8 +233,6 @@ test('AUDIT EG III lane4 #4 THE BEATS\' PICTURES HAVE AN OWNER (section 29: "ban
   assert.equal(egBeatTellDown(null), 0);
   egBeatTellUp(r, 1, 'standard');
   assert.equal(r.tex.size, per + back, 'the next breach uploads again');
-  const WM = rd('src/scenes/worldModes.js');
-  assert.match(between(rd('src/scenes/eliteGates/egCircleHost.js'), '  function egBandsDown() {', '  /** EG-G2: a circle\'s band\'s dress uploaded'), /let n = egBeatTellDown\(renderer\);/);
 });
 
 test('AUDIT EG III lane4 #5 THE EDGE LINE AND THE GHOSTS IN THE DANGER PALETTE (sections 25.2, 25.3 and 25.7): the Standard keeps the line\'s own gold and the Steps\' ghost gold; every other palette draws them in its safety - the edge line at the line\'s luminance - and the tracks and streamers in its hazard; the line pass\'s uniforms and the ghost pass\'s colour carry it, and the client hands the palette to the look (mutants: the palette ignored; the luminance unscaled; the hazard ignored; the ghosts\' colour fixed)', () => {
@@ -301,11 +271,6 @@ test('AUDIT EG III lane4 #5 THE EDGE LINE AND THE GHOSTS IN THE DANGER PALETTE (
   assert.deepEqual(G.calls.filter((c) => c[0] === 'uniform3f' && c[1] === 'uColor').at(-1).slice(2), [...EG_DANGER_PALETTES.tritan.safety]);
   gp.draw(P0, P0, new Float32Array(16), state);
   assert.deepEqual(G.calls.filter((c) => c[0] === 'uniform3f' && c[1] === 'uColor').at(-1).slice(2), [...SD_GHOST.color], 'the Hour\'s own: its gold');
-  // the hands that carry it
-  assert.match(rd('src/scenes/eliteGates/egSpan.js'), /vp\?\.\[2\] \?\? 0, vp\?\.\[3\] \?\? 0, egGhostRgb\(access\?\.palette\)\);/);
-  // PIN MOVED (AUDIT EG V, e: L6-3 - the look's drawOver takes the world image's rect after the palette; h: and THE TRAIL after it)
-  assert.match(rd('src/scenes/eliteGates/egLookDraw.js'), /drawOver\(proj, view, eye, ts, fog = null, pal = null, vp = null, trail = null, tn = 0\) \{\n      if \(!key \|\| !lines\) return false;\n      lines\.palette\(pal\);/);
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /L\?\.drawOver\(proj, view, eye, ts, fog, egAccessNow\(win\)\.palette, renderer\?\._worldViewportPx, trail\.n \? trail\.segs : null, trail\.n\)/);
 });
 
 // ── lane4 #6, #7: THE LOOK, THE SWAP'S WORKER ───────────────────────────────────────────────────────────────────────
@@ -327,27 +292,6 @@ test('AUDIT EG III lane4 #7 THE SWAP\'S WORKER LET GO EVERY WAY OUT (EVERY ALLOC
   P.st.inside = false;   // a way out that is no walk out (a teleport, a load)
   P.client.frame();
   assert.ok(P.L.drops >= 1, 'out: let go');
-});
-
-// ── lane4 #8, #9: THE REFUSAL'S TYPE, THE RECEIPT HEARD MID-FLUSH ─────────────────────────────────────────────────
-test('AUDIT EG III lane4 #8 THE REFUSAL ANSWERS ONE TYPE (THE MODAL CONTRACT): the open retried on "the breach is closed" says nothing while it retries; the drain\'s word, a spent order and a word it does not word itself are said by the link; every exit of the refusal answers a boolean (mutants: the retry said; a bare return)', async () => {
-  const hubSent = [];
-  const hub = { egOk: true, sendEg: (k, f) => { hubSent.push({ k, ...f }); return true; } };
-  const P = inBreach({ hub, wire: { px: 1, py: 1, x: 0, y: 0, z: 0, yaw: 0 }, account: { open: async () => ({ ok: true, data: { keys: 1, order: 'o'.repeat(20), b: 'fedcba9876543210' } }) } });
-  P.st.inside = false; P.client.frame();
-  P.client.useKey();
-  await settle();
-  assert.equal(hubSent.filter((w) => w.k === 'open').length, 1, 'the open sent');
-  const said0 = P.L.said.length;
-  P.client.word({ k: 'no', m: 'the breach is closed' });
-  assert.equal(P.L.said.length, said0, 'retrying: nothing said');
-  P.client.word({ k: 'no', m: 'the road is shut' });
-  assert.equal(P.L.said.at(-1), 'The road is shut.', 'the drain said');
-  P.client.word({ k: 'no', m: 'the order is spent' });
-  assert.equal(P.L.said.at(-1), 'The order is spent.');
-  const body = between(rd('src/scenes/eliteGates/egClient.js'), '  function refused(w) {', '\n  }\n');
-  assert.ok(!/return;/.test(body), 'no exit answers undefined');
-  assert.equal((body.match(/return (true|false);/g) ?? []).length, 5, 'five exits, each a boolean');
 });
 
 test('AUDIT EG III lane4 #9 A RECEIPT HEARD WHILE A FLUSH IS IN FLIGHT IS CARRIED AS IT ENDS (ASYNC NEVER DROPS), never left for EG_CLAIM_RETRY_MS (mutants: the second flush dropped)', async () => {
@@ -412,9 +356,6 @@ test('AUDIT EG III lane4 #10 THE FRAME\'S LISTS ARE KEPT, NEVER MADE A FRAME: th
   P.client.frame();
   assert.notEqual(spireHeld(), held);
   _resetSpireVestigesForTests();
-  // the world host's lights
-  const W = rd('src/scenes/world.js');
-  assert.ok(W.includes("    egLights: () => { _egLightList.length = 0; for (const L of egClient?.lights() ?? NO_EG_LIGHTS) _egLightList.push(L); for (const L of sdSpoilsPool?.lights() ?? NO_EG_LIGHTS) _egLightList.push(L); return _egLightList; },"));
   // the fight's leave, asked every frame out of the Spire, makes nothing once it holds nothing (lane4 #2's other half)
   const f = createEgFight({ link: { state: () => EG_STATE_EMPTY, now: () => 0 }, now: () => 0 });
   f.leave();

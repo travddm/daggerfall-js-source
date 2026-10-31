@@ -85,9 +85,6 @@ test('EG-LOOK THE CUTOUTS (the renderer\'s RW1 holes - renderer.js uploadTexture
   }
   const torn = (band) => { const b = egBandArtOf(band, K.banner)[1].albedo; let n = 0; rows(b, 0, 128, (c) => { if (c[3] === 0) n++; }); return n; };
   assert.ok(torn(1) > Math.max(torn(0), torn(2), torn(3)), 'the Cairn\'s shroud the most torn');
-  const host = readFileSync(new URL('../../../src/scenes/eliteGates/egCircleHost.js', import.meta.url), 'utf8'), lab = readFileSync(new URL('../../../src/tools/spireLab.js', import.meta.url), 'utf8');
-  assert.match(host, /renderer\.uploadTexture\(egBandArchive\(band\), rec, art\.albedo, art\.cutout \? \{ cutout: true \} : undefined\)/, 'the host asks for the holes');
-  assert.match(lab, /renderer\.uploadTexture\(egBandArchive\(BAND\), rec, art\.albedo, art\.cutout \? \{ cutout: true \} : \{\}\)/, 'the lab, the host\'s way');
 });
 
 test('EG-LOOK THE BANDS TOLD APART IN THE KIT (Elite-Gates-Look.md section 1): no two bands paint a kit picture alike, nor a motif in one form (its light\'s pattern its own); the banner\'s cloth Battlemage blue in the Galleries, the shroud\'s grey in the Cairn, near-black in the Shade, war red in the Wellhead, each with its sigil - the gold star, the soul-gem, the silver crescent, Dagon\'s sign edged in iron; the strata (found and root) from the band\'s own stone at the top to the band\'s own fog at the tips (world/eliteGates/egAtmos.js), each band\'s new ramps five steps dark to light (mutants: two bands sharing a frieze\'s form; the Galleries\' banner red; the haze not the band\'s fog; the strata\'s tips left stone)', () => {

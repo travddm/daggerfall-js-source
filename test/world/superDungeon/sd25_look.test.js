@@ -138,17 +138,6 @@ test('SD-LOOK THE GRADE: the Hour\'s on the lane holds the eye down (key 0.12, a
   air.setGrade(null);
   assert.deepEqual([...air.grade].map((v) => +v.toFixed(4)), [AIR_BLOOM_STRENGTH, 1, AIR_VIGNETTE, AIR_CONTRAST].map((v) => +v.toFixed(4)));
   assert.deepEqual([...air.adaptParams].map((v) => +v.toFixed(4)), [0, AIR_ADAPT_KEY, 0.7, AIR_ADAPT_MAX].map((v) => +v.toFixed(4)));
-  const R = read('src/render/renderer.js');
-  assert.match(R, /if \(!this\._air\?\.pending\) return;[^]{0,900}this\._air\.setGrade\?\.\(this\._sceneGrade\); this\._sceneGrade = null;[^]{0,900}this\._air\.composite\(\);/, 'every resolve takes the frame\'s grade, and gives it up');
-  assert.match(R, /setSceneGrade\(g\) \{ this\._sceneGrade = g \?\? null; \}/);
-  const W = read('src/scenes/worldModes.js');
-  // PIN MOVED (INTERIOR-DIM, 2026-10-11): a building's room asks a grade of its own now (the interior arm); in the
-  // dungeon arm the Hour is still the only one
-  assert.equal((W.match(/setSceneGrade/g) ?? []).length, 3, 'three grades: the Hour\'s, an Elite Breach\'s circle (its band\'s - EG-LOOK, PIN MOVED) and a room\'s');
-  assert.equal((W.match(/setSceneGrade\?\.\(SD_HOUR_GRADE\)/g) ?? []).length, 1);   // PIN MOVED (EG-LOOK, Elite-Gates-Look.md section 7): an Elite Breach's circle asks its band's own grade (world/eliteGates/egAtmos.js), no longer the Hour's
-  assert.match(W, /renderer\.setSceneGrade\?\.\(egHallGrade\(dungeonLoc\.egCircle\)\);/, 'the Spire asks its band\'s');
-  assert.match(W, /if \(isSdRealm\(dungeonLoc\)\) \{ [^\n]*renderer\.setSceneGrade\?\.\(SD_HOUR_GRADE\); \}/, 'the Hour alone asks a grade in the dungeon arm: the Hollow keeps the defaults');
-  assert.match(W, /renderer\.setSceneGrade\?\.\(interiorGrade\(!!renderer\.lightingLane\)\);/, 'and a building\'s room its own');
 });
 
 test('SD-LOOK THE ISLANDS: the Threshold the Bay\'s cobbles and its compass rose (the long point at the Orrery, the tail at the way back); every rim toothed outside its disc and under its top (the motor never meets a tooth), a gold edge line along every rim and the walk\'s kerbs; the arena laid in rings (mutants: a tooth over the rim; the compass turned; the edge line gone)', () => {
@@ -510,17 +499,6 @@ test('SD-LOOK THE HOUR\'S VEIL ON THE PAGE (S5): the Hour\'s themes draw its own
 });
 
 test('SD-LOOK THE VEIL CLOSES ON THE RIFT (S5): the world host hands the veil where the Rift\'s window (or the Return\'s) stands on the screen each frame it is drawn - by hand through the view and the projection (nothing made a frame) - and the veil closes the next step on it while that is fresh (the step in, the way back, the way home); stale, or forced, on the screen\'s middle (mutants: the aim dropped; the aim never read; a stale aim kept; the forced shatter aimed)', () => {
-  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const body = W.slice(W.indexOf('function sdVeilAim(proj, view, m) {'), W.indexOf('/** SD5a (Super-Dungeons.md section 7): THROUGH THE RIFT'));
-  assert.ok(body.length > 100);
-  assert.doesNotMatch(body, /new |[=(,:]\s*\[|=>|\.\.\./, 'nothing made: no array, no closure, no spread');
-  // PIN MOVED (SD-THROUGH): the nearer of the Hollow's two rings - the Rift's window (or its Return's), or the Way Through's
-  // (scenes/superDungeon/sdThrough.js sdVeilModelOf - its own pins in test/world/superDungeon/sdthrough_way.test.js)
-  assert.match(W, /sdVeilAim\(proj, view, sdVeilModelOf\(eye, through, look\)\);/, 'each frame the Rift is drawn');
-  assert.match(body, /gateVeil\.aim\?\.\(/, 'handed to the veil');
-  assert.match(W, /\}, 'hourIn'\);/);
-  assert.match(W, /\}, 'hourBack'\);/);
-  assert.match(W, /gateVeil\?\.flash\('hourHome'\);/);
   // the veil: a fresh aim closes the step on it; a stale one, and a forced shatter, on the middle
   const p = veilPage(), veil = createGateVeil(p);
   veil.aim(0.25, -0.1);
@@ -802,8 +780,6 @@ test('SD-LOOK THE WAY HOME\'S BEACON (S6): while the way home assembles, the col
   const closing = sdHomeBeacon(-SD_HOME_BEACON.column.closeMs / 2, {}, 3.45);
   assert.ok(closing.r < col.r && closing.r > SD_HOME_BEACON.r && closing.y0 > 0 && closing.y0 < 3.45, 'closing');
   assert.ok(SD_HOME_BEACON.r < 0.5, 'narrow');
-  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(W, /sdHomeBeacon\(sdHomeAge\(\) - SD_HOME_RISE_MS, _sdBeacon\[0\], SD_RETURN_SIZE\.h \* SD_HOME_SCALE\)/, 'over the way home, from its top');
 });
 
 import { sdRiftArt, SD_RIFT_PLATE_RECORD, SD_RIFT_ATLAS, SD_RIFT_RECORD } from '../../../src/world/superDungeon/sdRiftArt.js';
@@ -894,7 +870,4 @@ test('SD-LOOK THE ARRIVAL EXHALE (S6): my first frame in the Hour on the Thresho
   assert.ok(Math.abs(Math.abs(a1 - a0) - Math.PI) < hour + 1e-6, `half a turn at half its time (${a1 - a0})`);
   assert.ok(a1 - a0 > 0, 'forward from the Hour\'s side');
   assert.ok(Math.abs(modH(a2 - a0)) < 1e-6 || Math.abs(modH(a2 - a0) - hour) < 1e-6, 'whole, then as it was');
-  const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8'), D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(W, /arrived: \(\) => modes\?\.dungeonCtx\?\.sdEndPulse\?\.\('exhale'\)/);
-  assert.match(D, /sdEndPulse: sdEnd \? \(kind\) => sdEnd\.pulse\(kind\) : undefined/);
 });

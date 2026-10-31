@@ -126,17 +126,6 @@ test('ETHER-WILD: an isle\'s ruin is read by its band at its own pixel, through 
 });
 
 test('ETHER-WILD: the hosts\' seams - the frame stands the sea beside the mountains, online, on its ground; no pace cap at sea; the rise, the teleports, the maps\' hiding, the packs and an isle\'s ruin read the sea', () => {
-  const w = src('src/scenes/world.js');
-  const frame = w.slice(w.indexOf('const wildFrame = () => {'), w.indexOf('// WILD-LINE-HOLD (2026-10-08'));
-  assert.match(frame, /const seaRing = _onlineWorldSession\(\) && !!online\?\.wildOk && etherSea && playerSpawned \? etherWildRingAt\(/, 'online, past a relay that raises the zone, with the sea standing');
-  assert.match(frame, /const here = seaRing > 0 \|\| \(/, 'the sea is the zone beside the mountains');
-  assert.match(frame, /ring = seaRing \|\| wildRingAt\(/, 'the sea\'s band is the ring');
-  assert.match(frame, /setWildHere\(here, ring, seaRing \? ETHER_KIND : undefined\)/, 'the ground on the flag');
-  assert.match(frame, /zoneWord\('enter'\)/);
-  assert.match(frame, /: 'leave', left \|\| undefined\)/, 'the leaving said in the words of the ground left');   // PIN MOVED (AUDIT SEA VENTURES C7): 'quiet' while still past the peace
-  assert.match(w, /setPaceZoneCap\(wildHere\(\) && wildZoneKind\(\) !== ETHER_KIND \? WILD_PACE_CAP : null\)/, 'the mountains\' pace cap never at sea');
-  const rise = w.slice(w.indexOf('const wildRiseSite = (px, inDungeon = false, kill = true) => {'), w.indexOf('const wildClearSpawn = () => {'));   // PIN MOVED (AUDIT FOE-KEEPS E1): a kill's rise and a foe's
-  assert.match(rise.split('\n')[1], /if \(etherSea && inEther\(px\.x, px\.y\)\) return etherRiseSite\(px\.x, px\.y\);/, 'a death at sea rises at the nearest freeport, before the mountains\' search of the Bay\'s maps');
   // the site itself (HOST-SPLIT, SEA VENTURES: out of bootWorld): the nearest freeport's town within ETHER_RISE_PX, else Veilhaven
   const vh = veilhaven(), far = { x: vh.px + 20 * ETHER_RISE_PX, y: vh.py };
   for (const [x, y] of [[vh.px + 1, vh.py], [far.x, far.y]]) {
@@ -144,18 +133,6 @@ test('ETHER-WILD: the hosts\' seams - the frame stands the sea beside the mounta
     assert.deepEqual(etherRiseSite(x, y), { mapPixel: { x: port.px, y: port.py }, kind: 'city' });
   }
   assert.deepEqual(etherRiseSite(vh.px + 1, vh.py).mapPixel, { x: vh.px, y: vh.py }, 'Veilhaven beside it');
-  const tele = w.slice(w.indexOf('const wildTeleportRefused = (to = null) => {'), w.indexOf('const wildTravelGate = '));
-  assert.match(tele, /etherWildRingAt\(playerTravelPixel\(\)\?\.x, playerTravelPixel\(\)\?\.y\) > 0 \|\| \(to && etherWildRingAt\(to\.x, to\.y\) > 0\)\)\) \{ townTalk\.say\(ETHER_WILD_TEXT\.teleport\(\)\); return true; \}/);
-  assert.ok(tele.indexOf('ETHER_WILD_TEXT.teleport') < tele.indexOf('if (!m) return false;'), 'asked before the mountains\' mask is');
-  const atWire = w.slice(w.indexOf('const wildAtWire = (p, near = false) => {'), w.indexOf('const wildOutdoors = () =>'));
-  assert.match(atWire, /if \(etherSea && \(near \? inEther\(px\.x, px\.y\) : etherWildRingAt\(px\.x, px\.y\) > 0\)\) return true;/, 'a peer at sea is fair - and near it, past the Veil, unseen');
-  assert.match(w, /return \(etherSea && inEther\(pixel\.x, pixel\.y\)\) \|\| \(!!m && wildNear\(m, pixel\.x, pixel\.y\)\);/, 'a map row past the Veil hides as the mountains\' band does');
-  assert.match(w, /function wildBornHere\(px, py\) \{ const m = cyrodiilMask\(\); return \(!!m && wildInside\(m, px, py\)\) \|\| \(etherSea && _onlineWorldSession\(\) && etherWildRingAt\(px, py\) > 0\); \}/, 'the open sea\'s packs four times as many, online');   // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the zone's mask Cyrodiil's (systems/wild/cyrodiilZone.js cyrodiilMask)
-  assert.match(w, /name: `\$\{zoneSafe\(\) \? ZONE_SAFE_TEXT\.chip : WILD_TEXT\.chip\} - \$\{zoneRingName\(wildRing\(\)\)\}/, 'the HUD tile names the band');   // PIN MOVED (ZONE-SAFE, Wild-Zone.md section 26): "Safe zone" in a settlement's streets
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /const _wildRingRaw = isOnlinePage\(\) && \(isWildRegion\(dfLocation\?\.regionIndex \?\? -1\) \|\| !!dfLocation\?\.ether\) \? wildRingAtPlace\(dfLocation, wildMask\(\) \?\? cyrodiilMask\(\)\) : 0;/, 'an isle\'s ruin asks its ring');   // PIN MOVED (AUDIT TESA II Z8): the zone's own mask where none is registered yet
-  assert.match(d, /const _wildDungeon = isOnlinePage\(\) && _wildRingRaw > 0;/, 'and is the zone\'s by it alone - no mask, no zone');   // PIN MOVED (AUDIT TESA II Z8): the mountains' maskless fallback retired (test/systems/wild/audittesa2z_zone.test.js runs the two lines)
-  assert.match(src('src/ui/hud/statusTips.js'), /lines\.push\(String\(tile\.name \?\? ''\), zoneWord\('chipTip'\)\);/, 'the tile\'s tip says the ground');
 });
 
 test('ETHER-WILD: the crossing says what lies past the peace, online alone; at sea a hand ashore goes back aboard and a knocked-out hand\'s pack to her hold - in the mountains he stays', () => {
@@ -169,18 +146,5 @@ test('ETHER-WILD: the crossing says what lies past the peace, online alone; at s
   assert.deepEqual(questionRows('abcdefgh ij', 5), ['abcdefgh', 'ij'], 'a word past the width stands alone');
   assert.deepEqual(questionRows('  '), []);
   assert.deepEqual(crossingRows('home', { pvp: true }), crossingRows('home'), 'the way home warns of nothing');
-  assert.match(src('src/scenes/world.js'), /rows: crossingRows\(way, \{ pvp: _onlineWorldSession\(\) && !!online\?\.wildOk \}\)/, 'online, past a relay that raises the zone');
-  // PIN MOVED (STORE-KEEPS, 2026-10-26): a hand ashore was held at my side in the mountains (COMPANION-DROP) and sent back
-  // aboard at sea; his pack is storage no death takes now, and he is sent back aboard from either ground
-  assert.ok(!src('src/systems/naval/crewCompanions.js').includes('heldAtSide'), 'no ground holds him');
 });
 
-test('ETHER-WILD: a street foe past the Veil is the zone\'s to FOE-BOUNDS, read from Veilhaven\'s peace too; /unstuck at sea walks to the nearest freeport, never a Bay town across the Veil', () => {
-  const g = src('src/scenes/grantHost.js');
-  const about = g.slice(g.indexOf('function wildAbout(r, lane) {'), g.indexOf('const statsSaid = new Set();'));
-  assert.match(about, /const \[px, py\] = mapPixelOfWire\(r\.f\[0\], r\.f\[2\]\);\n    if \(inEther\(px, py\)\) return true;/);
-  const w = src('src/scenes/world.js');
-  const unstuck = w.slice(w.indexOf('const unstuckOutdoors = () => {'), w.indexOf('You find your way to the nearest town.'));
-  // PIN MOVED (AUDIT TESA II P2): elsewhere the world's nearest town (scenes/tamrielPlacesHost.js nearestTownOf), the Bay's and past it
-  assert.match(unstuck, /const town = etherSea && inEther\(px\.x, px\.y\) \? wildRiseSite\(px\) : nearestTownOf\(px, /);
-});

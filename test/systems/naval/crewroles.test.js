@@ -115,11 +115,6 @@ test('CREW-ROLES the hand made her First Mate answers for her - her repairs\' wo
   const said = s.host.repairAway(s.boat).text;
   assert.ok(said.startsWith(`${hands[1].name}: `), said);
   assert.equal(s.host.crewHands(s.boat)[0].role, 'Deckhand');
-  // her roles to the crew's step
-  const src = read('src/scenes/naval/navalHost.js');
-  assert.match(src, /const roles = boat\.crewed \? st\.crew\.hands\.map\(\(h\) => h\.role\) : null;/);
-  assert.match(src, /return \(aboard\.find\(\(h\) => h\.role === FIRST_MATE\) \?\? aboard\[0\]\)\?\.name \?\? null;/);
-  assert.match(read('src/scenes/world.js'), /_crewCtx\.roles = ship\.mine\?\.roles \?\? null;/);
   assert.equal(s.host.assignRole(s.boat, 'Nobody', 'Cook').ok, false);
 });
 

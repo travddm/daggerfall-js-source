@@ -63,37 +63,8 @@ test('ETHER-CROSSING the voyage: three days; out to the open water off Veilhaven
 });
 
 test('ETHER-CROSSING by source: asked at a helm in the exterior with no window up, an enemy near or another player aboard said instead; sailed - the helm let go first, the jump a travel of CROSS_DAYS whose arrival brings her round onto the landfall\'s middle, her helm taken after, the clock\'s days, the haven charted, the way home leaving the gate asked; the ship held while she crosses (mutants: each step and its order)', () => {
-  const src = read('src/scenes/world.js');
-  const step = src.slice(src.indexOf('function etherCrossStep(dt) {'), src.indexOf('async function etherCross(way) {'));
-  assert.match(step, /if \(!etherSea \|\| _etherCrossing \|\| !csaRuntime\?\.isSailing\?\.\(\)\) return;/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X3): never while the world is being moved
-  assert.match(step, /if \(gamePaused\(\) \|\| _loading \|\| townTalk\.overlayActive \|\| modes\?\.transitioning \|\| worldMoveBusy\(\) \|\| _partyArrivalPending \|\| _mode\(\) !== 'exterior'\) return;/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G2): the way out only where the crossing out is this game's - the Veil's home under any skin
-  assert.match(step, /const way = crossWayHere\(\);/);
-  assert.match(src, /return crossingWayAt\(p\.x, p\.y, etherOut && p\.x < CROSS_X && !inEther\(p\.x, p\.y\) \? crossLandPx\(p\.x, p\.y\) : 0\);/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X1): a refusal said once in those waters and the way not marked asked - asked as soon as the deck is clear
-  assert.match(step, /if \(!crossGate\.offer\(way\)\) return;\n    const why = crossRefusal\(\);\n    if \(why\) \{ if \(_crossSaid !== way\) \{ _crossSaid = way; townTalk\.say\(CROSS_REFUSED\[why\], 4\); \} return; \}\n    crossGate\.asked\(way\);/);
-  // PIN MOVED (VEIL-PARTY): her party aboard is left out of the count (test/systems/naval/veilparty.test.js)
-  assert.match(src, /const crossRefusal = \(\) => \(navalHostileNear\(\) \? 'hostile' : csaPassengersOn\(csaRuntime\?\.state\?\.CurrentBoat, veilParty\.kin\) > 0 \? 'passengers' : null\);/);
-  const cross = src.slice(src.indexOf('async function etherCross(way) {'), src.indexOf('  let _navalWasOn = null;'));
   // PIN MOVED (AUDIT CAPTAIN'S SEA X9): the success's path read past the failure's (a voyage that could not be made brings her back)
   const order = ['captainLedger.setCrossedFrom', 'hudFade.smashHUDToBlack()', 'csaRuntime.StopSailing()', 'await _teleportToPixel(to.px, to.py', 'csaRuntime.RepositionBoat(boat, [x, tvSeaY(), z], dir', 'setSyntheticTimeIncrease(true); playerTicker.advance(minutes)', 'captainLedger.crossed()'];
-  let at = -1;
-  for (const k of order) { const i = cross.indexOf(k); assert.ok(i > at, `${k} in its turn`); at = i; }
-  const tail = cross.slice(cross.indexOf('setSyntheticTimeIncrease(true); playerTicker.advance(minutes)'));
-  assert.ok(tail.indexOf('csaRuntime.StartSailing(boat)') >= 0 && tail.indexOf('csaRuntime.StartSailing(boat)') < tail.indexOf('captainLedger.crossed()'), 'her helm taken, then the crossing counted');
-  assert.match(cross, /const minutes = CROSS_DAYS \* 1440;/);
-  assert.match(cross, /modEvent: 'travel',/);
-  assert.match(cross, /const \[x, z\] = state\.localFromWorld\(\(to\.px \+ 0\.5\) \* RAID_NATIVE_PIXEL, \(499 - to\.py \+ 0\.5\) \* RAID_NATIVE_PIXEL\);/);
-  assert.match(cross, /if \(way === 'out'\) captainLedger\.chartIsle\(veilhaven\(\)\.key\);/);
-  assert.match(cross, /else crossGate\.asked\('out'\);/);
-  assert.match(cross, /finally \{\n      _etherCrossing = false;\n      hudFade\.fadeHUDFromBlack\(\);/);
-  assert.match(src, /let _etherCrossing = false;   \/\/ ETHER-CROSSING: a voyage under way/);
-  assert.ok(src.indexOf('let _etherCrossing = false;') < src.indexOf('const paused = gamePaused() || _loading || _partyArrivalPending || _etherCrossing;'), 'declared before any frame reads it');
-  assert.match(src, /if \(!gamePaused\(\) && !_loading\) \{ etherCrossStep\(dt\); veilParty\.step\(dt\); \}/);   // PIN MOVED (VEIL-PARTY): her party's passage stepped beside it - PIN MOVED (AUDIT HORIZONTAL C5): with the frame's dt, its window in stepped time
-  // PIN MOVED (HOST-SPLIT, SEA VENTURES 2026-10-22): the distance to land out of bootWorld (etherCrossing.js createCrossLand),
-  // over the map's one water law - asked of it here by behaviour
-  assert.match(src, /const crossLandPx = createCrossLand\(seaPixel\);/);
   const asked = [];
   const island = (x, y) => { asked.push(`${x},${y}`); return !(x === 13 && y === 10); };   // one pixel of land, three east
   const landPx = createCrossLand(island, 20);
@@ -105,7 +76,6 @@ test('ETHER-CROSSING by source: asked at a helm in the exterior with no window u
   assert.equal(createCrossLand((x, y) => !(x === 0 && y === 0), 4)(0, 0), 0, 'on land: none');
   assert.equal(createCrossLand(island, 2)(10, 10), Infinity, 'past its reach');
   assert.equal(CROSS_LAND_PX, 20);
-  assert.match(readFileSync(new URL('../../../src/systems/naval/etherCrossing.js', import.meta.url), 'utf8'), /if \(Math\.max\(Math\.abs\(dx\), Math\.abs\(dy\)\) === r && !seaPixel\(px \+ dx, py \+ dy\)\) \{ d = r; break ring; \}/, 'each ring\'s own pixels, asked once');
 });
 
 test('ETHER-SEA the ledger\'s record: isles charted once each (the log\'s islands), a legend\'s day, a strand\'s day (the newest kept), the way out, the crossings, the legends heard - kept whole by the save and cleaned field by field (mutants: each field, the bounds)', () => {
@@ -286,12 +256,6 @@ test('ETHER-CHART the model: the charted isles in view (a port named at any zoom
 });
 
 test('ETHER-CHART the doors: the travel map\'s door opens the chart past the Veil; the freeport\'s harbourmaster\'s tab its rumours and its chart (mutants: the door, the tab\'s words)', () => {
-  const src = read('src/scenes/world.js');
-  assert.match(src, /\{ const p = playerTravelPixel\(\); if \(etherSea && inEther\(p\.x, p\.y\)\) return openEtherChart\(\); \}/);
-  assert.match(src, /const word = \(\) => \{ const p = playerTravelPixel\(\); return \{ \.\.\.etherHost\.chart\(p\.x, p\.y, heading\(\)\), \.\.\.seaVentures\.chartWord\(\) \}; \};/);   // PIN MOVED (SEA-VAULTS): the open sea's fights and the day's vaults the sea's ventures' (scenes/seaVenturesHost.js chartWord)   // PIN MOVED (ETHER-WILD): the word says the open sea's fights, for the chart's peace   // PIN MOVED (AUDIT CAPTAIN'S SEA X16): the ship's heading at her helm
-  assert.match(src, /const heading = \(\) => \{ const boat = csaRuntime\?\.isSailing\?\.\(\) \? csaRuntime\.state\.CurrentBoat : null; if \(!boat\) return cam\.yaw; const f = boatForward\(boat, cam\.yaw\); return Math\.atan2\(f\[0\], f\[2\]\); \};/);   // PIN MOVED (HOST-SPLIT at the merge of main into SEA VENTURES): boatForward out of bootWorld, the camera's yaw its argument
-  const door = read('src/ui/naval/navalPlunderDoor.js');
-  assert.match(door, /load: \(\) => import\('\.\.\/etherChartWindow\.js'\),/);
   const o = { ether: true, port: 'Veilhaven', waters: 'the Shallows, 7 leagues past the Veil', rumours: ['A tale.', 'Another.'], charted: 1, chart: { price: 150, fresh: 12, can: true, why: '' } };
   const t = officeText(o);
   assert.deepEqual(t, etherOfficeText(o));

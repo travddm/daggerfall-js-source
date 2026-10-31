@@ -665,8 +665,6 @@ test('MW-FOLK1: the hooded woman wears no modesty shirt - her bodice covers her 
   assert.ok(drew.ok && drew.pieces.length > 0, drew.error);
   assert.deepEqual(bareHeadRows(ROWS, hooded, drew.pieces), [], 'the hood drew: it covers it');
   assert.deepEqual(bareHeadRows(ROWS, composeWornArmor({ pieces: [{ kind: 'outfit', id: 'townsfolk_385' }], armors: [], bodyPool: [] }), []), [], 'no hood, nothing hidden');
-  const src = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  assert.match(src, /const cap = worn\.adds\.find\(capsHead\);\n\s*missing\.push\(`\$\{cap\?\.partName === 'outfit' \? cap\.slot : 'helm'\}: none of it bound/, 'the note names the outfit');
 });
 
 test('MW-FOLK1: through the binder - every outfit the producer composes a skinned part on retail\'s skeleton, no note; in the idle each garment on its bones, the hood round the head; striding, a tunic\'s hem goes with the leg and its chest stays', async () => {

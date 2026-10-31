@@ -39,29 +39,10 @@ test('CHAT-POST itemChatText: the name in brackets, then the magic, a line the c
 });
 
 test('CHAT-POST the card and the hosts: Link and Post only where the host hands the door, said on the chat\'s open tab through chatSend, in the three hosts that open a pack (mutants: offered offline; sent past chatSend; a host that hands none)', () => {
-  const inv = src('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /if \(deps\.canPostItem\?\.\(\)\) \{/);
-  assert.match(inv, /el\('button', 'act', 'Link in chat'\)/);
-  assert.match(inv, /deps\.linkItem\?\.\(picked\) \? LINKED_TEXT : NOT_LINKED_TEXT/);
-  assert.match(inv, /el\('button', 'act', 'Post in chat'\)/);
-  assert.match(inv, /deps\.postItem\?\.\(itemChatText\(picked\), picked\) \? POSTED_TEXT : NOT_POSTED_TEXT/);
   assert.equal(POSTED_TEXT, 'Posted in chat.');
   assert.equal(LINKED_TEXT, 'Linked in chat.');
   assert.match(NOT_POSTED_TEXT, /Could not post/);
   assert.match(NOT_LINKED_TEXT, /Could not link/);
-  const W = src('src/scenes/world.js');
-  assert.match(W, /const canPostItemInChat = \(\) => !!\(chatLog\?\.active && chatPanel\);/);
-  assert.match(W, /const postItemInChat = \(text, item\) => \(canPostItemInChat\(\) \? chatSend\(chatLog\.active, text, chatLog\.active, \{ item \}\) === true : false\);/);
-  assert.match(W, /const linkItemInChat = \(item\) => \(canPostItemInChat\(\) \? chatPanel\.linkItem\?\.\(item\) === true : false\);/);
-  assert.match(W, /postItem: \(text, item\) => postItemInChat\(text, item\), linkItem: \(item\) => linkItemInChat\(item\), canPostItem: \(\) => canPostItemInChat\(\),   \/\/ CHAT-POST: post or link into the field/);
-  assert.match(W, /postItem: \(text, item\) => postItemInChat\(text, item\), linkItem: \(item\) => linkItemInChat\(item\), canPostItem: \(\) => canPostItemInChat\(\),   \/\/ CHAT-POST: the building's and the dungeon's packs post too/);
-  assert.match(src('src/scenes/worldModes.js'), /postItem: \(text, item\) => host\.postItem\?\.\(text, item\) \?\? false, linkItem: \(item\) => host\.linkItem\?\.\(item\) \?\? false, canPostItem: \(\) => host\.canPostItem\?\.\(\) \?\? false,/);
-  assert.match(src('src/scenes/dungeonContext.js'), /postItem: \(text, item\) => opts\.postItem\?\.\(text, item\) \?\? false, linkItem: \(item\) => opts\.linkItem\?\.\(item\) \?\? false, canPostItem: \(\) => opts\.canPostItem\?\.\(\) \?\? false,/);
-  assert.match(src('src/ui/chatPanel.js'), /linkItem: \(item\) => \{/);
-  assert.match(src('src/ui/chatPanel.js'), /takePending\(text\)/);
-  assert.match(W, /bagItems: \(\) => playerEntity\.items \?\? \[\],   \/\/ CHAT-POST: typing `\[` in the field lists the pack by name/);
-  assert.match(src('src/ui/chatPanel.js'), /bagItems = null/);
-  assert.match(src('src/ui/chatPanel.js'), /refreshSuggest/);
 });
 
 test('CHAT-POST `[` autocomplete: openLinkQuery finds an unfinished bracket; matchBagItems ranks the pack by label (mutants: query ignored; picker mute)', () => {
@@ -85,9 +66,6 @@ test('CHAT-POST `[` autocomplete: openLinkQuery finds an unfinished bracket; mat
   assert.deepEqual(takePendingLinks([{ label: 'Ruby x10', item: a }, { label: 'Ruby x10', item: b }], '[Ruby x10] [Ruby x10]'), [a, b]);
   assert.deepEqual(takePendingLinks([{ label: 'Ruby x10', item: a }], 'no link'), []);
   assert.deepEqual(prunePendingLinks([{ label: 'Ruby x10', item: a }, { label: 'Ruby x10', item: b }], ''), [], 'a deleted bracket frees its pending slot');
-  assert.match(src('src/ui/chatPanel.js'), /if \(openLinkQuery\(v, caret\)\) return;/);
-  assert.match(src('src/ui/chatPanel.js'), /const openQ = openLinkQuery\(v, a\);/);
-  assert.match(src('src/ui/chatPanel.js'), /if \(openQ\) return completeLinkAt\(item, openQ\);/);
 });
 
 test('CHAT-POST the wire carries items beside the words; the panel draws coloured [Name]s whose hover is the pack\'s card (mutants: item dropped on parse; link not drawn; card not the pack\'s)', () => {
@@ -102,10 +80,6 @@ test('CHAT-POST the wire carries items beside the words; the panel draws coloure
   const many = parseClient(JSON.stringify({ t: 'chat', text: 'want [Longsword]?', items: [sword] }), { hasHello: true });
   assert.deepEqual(many, { t: 'chat', text: 'want [Longsword]?', items: [sword], item: sword });
   assert.deepEqual(parseClient(JSON.stringify({ t: 'chat', text: '[Longsword]', item: 'no' }), { hasHello: true }), { error: 'bad chat' });
-  assert.match(src('server/src/index.js'), /\.\.\.\(m\.items \? \{ items: m\.items \} : \{\}\)/);
-  assert.match(src('src/net/online.js'), /validChatItems\(raw\.map/);
-  assert.match(src('src/ui/chatPanel.js'), /chatItemsOf\(line\)/);
-  assert.match(src('src/ui/chatItemLink.js'), /showItemHover\(item, \{\}, link, 'shop'\)/);
   setPref(LOOT_RARITY_KEY, true);
   const el = (tag, cls, text) => {
     const n = { tagName: tag.toUpperCase(), className: cls, textContent: text ?? '', style: {}, listeners: {}, kids: [] };

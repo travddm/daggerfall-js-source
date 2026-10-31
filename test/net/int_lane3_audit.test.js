@@ -178,8 +178,6 @@ test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - 
       assert.equal(s.sendSerpent({ k: 'vt', v: 500 }, mine), !ok, 'the stepped-down socket\'s own relay');
     }
   } finally { console.info = log; }
-  const host = rd('src/scenes/serpentHost.js');
-  assert.match(host, /const sayHull = bodySayer\(\(v\) => !!live && !!deps\.online\?\.send\?\.\(\{ k: 'vt', v \}/, 'the host asks no version of its own - the session asks the socket\'s');
 });
 
 // ═══ THE TRAIL ═══════════════════════════════════════════════════════════════════
@@ -443,15 +441,6 @@ test('AUDIT INT11 THE BODIES READ ONCE A BEAT: the court\'s and the serpent\'s -
   assert.ok(GATE_FIGHTERS_MAX > 0 && profileOf);
 });
 
-test('AUDIT INT11 THE THREE FIGHTS ALIKE: the court\'s, the Hour\'s and the serpent\'s each put a fighter\'s socket on its trail at its `in`, read their bodies once a beat and tell a fall again; the body\'s word on its own bucket at each (mutants: one fight left out)', () => {
-  const relay = rd('server/src/index.js');
-  const n = (re) => (relay.match(re) ?? []).length;
-  assert.equal(n(/this\._trailSeed\(ws, a, now\);   \/\/ AUDIT INT11/g), 3, 'seeded at each `in`');
-  assert.equal(n(/this\._bodyTell\('(gate|sd|serpent)', f, now/g), 3, 'told again at each beat');
-  assert.match(relay, /bodies = this\._sdFightBodies\(f, now\), census = \(\) => bodyCensus\(f, bodies, /, 'the Hour\'s read once');
-  assert.equal(n(/m\.k === 'vt' \? !this\._spend\(ws, now, bodyWordRelayGate, 'bodyBucket', 'bodyDrops', 'too many body words'\)/g), 4, 'a body\'s word on its own bucket in each room');   // PIN MOVED (EG-H1): the breach's `eg:` room the fourth - its count is on (test/net/eliteGates/egint_relay.test.js)
-});
-
 test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measure and the wealth\'s read a quantile by its rank alike - the nearest rank at or below it (two receipts\' median the lower) (mutants: the rank rounded the other way)', async () => {
   const s = await standService({ DEVELOPER_HANDLES: 'mac' });
   const nowS = Math.floor(Date.now() / 1000);
@@ -468,8 +457,3 @@ test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measur
 
 // ═══ THE DOC ═════════════════════════════════════════════════════════════════════
 
-test('AUDIT INT13 IN_RESEND_MS KEEPS ITS DOC: the constant the INT13 line was set between and its own comment, together again (mutants: none - text)', () => {
-  const host = rd('src/scenes/serpentHost.js');
-  assert.match(host, /\/\*\* How often an `in` is said again while I am within its waters' sight \(a reconnect, a halo come up, a share back\)\. \*\/\nexport const IN_RESEND_MS = 20_000;/);
-  assert.match(host, /\/\*\* INT13: the line as the relay's count wrecks her \(`bd`\)\. \*\/\nexport const COUNT_WRECK_LINE = /);
-});

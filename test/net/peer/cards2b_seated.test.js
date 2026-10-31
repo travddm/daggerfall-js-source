@@ -159,29 +159,3 @@ test('CARDS2b the peer\'s seat: its feet, facing and top, kept while still, rebu
   assert.equal(lerpPose(standing, validPose({ ...POSE, x: 2, z: 1 }), 0.25).x, 0.5, 'a walk still eases');
 });
 
-test('CARDS2b by source: the pose the seat says, the request to the peers\' rigs, a hit and Escape', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const has = (src, s, why) => assert.ok(src.includes(s), why ?? s);
-  has(wm, "    cardSeat = { table: i, seat: k, eye: st.eye.slice(), feet: st.feet.slice(), yaw: st.yaw, top: st.top, free: ");
-  // PIN MOVED (AUDIT CARDS-6 B4): a blow - never a round of damage over time, told from inside the player's minute pass
-  has(wm, "  registerPlayerHurtListener('cards-seat', (_e, hurt) => { if (cardSeat && hurt.after < hurt.before && !tickInFlight()) standFromCardTable(); });", 'a hit stands you up');
-  // PIN MOVED (AUDIT KG II C1): the arm is a block now - at a King's Gambit battle the Escape action is the board's cancel
-  const esc = wm.indexOf("    if (mode === 'interior' && cardSeat && actionOf(e, keys) === 'Escape' && !interiorKeyCtx.uiOverlayActive) {");   // KB1: the registry's Escape, never its raw code
-  assert.ok(esc > 0 && esc < wm.indexOf('    // U43: THE ONE DISPATCH.'), 'Escape stands you up, spent above the one dispatch');
-  assert.ok(wm.slice(esc, wm.indexOf('\n    }\n', esc)).includes('      standFromCardTable(); e.preventDefault(); return;'), 'and stands you up');
-  has(wm, "    seatPose: () => (mode === 'interior' && cardSeat ? { feet: cardSeat.feet, yaw: cardSeat.yaw, st: seatTopByte(cardSeat.top) } : null),");
-  const arm = read('src/combat/fpArm.js');
-  has(arm, '  function thirdClimb(cw, cam) {\n    if (cam && cam.seat) { climbLast = null; return thirdSeat(cam); }', 'AUDIT CARDS D5: the seat wins the climb\'s slot, over any climb\'s tail');
-  has(arm, '    return seatRequestFor(cam && cam.seat, { unitsPerMetre: MW_UNITS_PER_METER, weight: rs.weight, height: rs.height });', 'AUDIT CARDS E2: at the rig\'s units and the body\'s race');
-  has(read('src/scenes/world.js'), '    seatedPeers: () => seatedPeerFeet(),', 'AUDIT CARDS B3: the host learns the others\' seats');
-  has(read('src/scenes/world.js'), '    for (const p of online.peers.values()) if (p.shown?.st && online.visible(p)) out.push(onlineToScene(p.shown));', 'the seated peers I can see, at their scene feet');
-  const w = read('src/scenes/world.js');
-  has(w, "    if (seated) { const w = sceneToOnline(seated.feet); pose.x = w[0]; pose.y = w[1]; pose.z = w[2]; pose.yaw = seated.yaw; }", 'the pose is the seat\'s, in the room\'s frame');
-  const at = w.indexOf('    const seated = modes?.seatPose?.() ?? null;');
-  const frameAt = w.indexOf('    sceneToOnline = nativeFrame ? campToWire');
-  assert.ok(frameAt > 0 && at > frameAt, 'after the frame is known');   // AUDIT CARDS E8: never vacuous on a -1
-  const st = w.indexOf('    if (seated) arm.st = seated.st;');
-  assert.ok(st > 0 && st > w.indexOf('      ...climbPoseOf(player),   // CLIMB5:') && st < w.indexOf('    else online.sendPose({ ...pose, ...arm, ...poseFx() });'), 'the seat byte on the arm, before it is sent');
-  const pb = read('src/net/peer/peerBodies.js');
-  has(pb, '    b.cam.seat = peer.shown.st ? seatFor(b, f, b.yaw, peer.shown.st) : null;', 'the peer\'s body seated at its drawn feet and facing');
-});

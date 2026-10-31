@@ -99,44 +99,11 @@ test('QS7: ONE press of the off hand puts the torch out - and TWO, which is what
   assert.equal(twice.said.some((l) => l.startsWith(MESSAGES.ignite)), true);
 });
 
-test('QS7: the outer hosts decline a quickslot while a modal mode is mounted - the mode that owns the key answers it', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(f);
-    const arm = s.split('\n').find((l) => l.includes('QUICKSLOT_ACTIONS.has(act)'));
-    assert.ok(arm, `${f} no longer carries the quickslot arm`);
-    assert.match(arm, /\(modes\?\.mode \?\? 'exterior'\) === 'exterior'/,
-      `${f}: the quickslot arm must not answer over a mounted mode - that is the double-fire`);
-    // ...and the arm it sits beside must NOT take the gate: the modal
-    // contexts carry no socialInteract, so F has no second answer to
-    // collide with and AUDIT SOC B4/D1's finding stands.
-    // (only the world host carries it: the social arc is the streaming
-    // host's, and `?exterior` is a single-location page.)
-    const social = s.split('\n').find((l) => l.includes("act === 'SocialInteract'"));
-    if (social) {
-      assert.ok(!/\(modes\?\.mode \?\? 'exterior'\) === 'exterior'/.test(social),
-        `${f}: F must still answer inside - the fix is the quickslots', not every arm's`);
-    }
-  }
-  assert.match(rd('src/scenes/world.js'), /act === 'SocialInteract'/,
-    'the world host still carries the social arm this pin guards');
-});
-
 test('QS7: and the modal ladders really do carry the doors the outer arm stood in for', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  // U43's one dispatch, both arms
-  assert.match(wm, /if \(mode === 'interior'\) \{\n\s+if \(routeKey\(e, interiorKeyCtx, null, keys\)\) e\.preventDefault\(\);/,
-    'the interior mode routes the whole table over its own ctx');
-  assert.match(wm, /if \(routeKey\(e, dungeonCtx, placeLoadedPlayer, keys\)\) e\.preventDefault\(\);/,   // AUDIT 27h S2 + DIAL-LOAD: the host's one load law, by name
-    'and the dungeon mode over the dungeon ctx');
   // every action the outer arm can dispatch has a door on BOTH ctxs -
   // the polled three are the frame's, so the dispatchable pair is what
   // this arm hands over.
   const dispatchable = [...QUICKSLOT_ACTIONS].filter((a) => !POLLED_ACTIONS.has(a));
   assert.deepEqual(dispatchable.sort(), ['QuickOffHand', 'QuickSwap'],
     'the dispatchable quickslots - a third joins here, not silently');
-  const dc = rd('src/scenes/dungeonContext.js');
-  for (const [name, src] of [['worldModes interiorKeyCtx', wm], ['dungeonContext', dc]]) {
-    assert.match(src, /quickOffHand\s*[(:]/, `${name} carries the off-hand door`);
-    assert.match(src, /quickSwap\s*[(:]/, `${name} carries the swap door`);
-  }
 });

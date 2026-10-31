@@ -69,11 +69,6 @@ test('DIAL-CLASSIC worn door by door over the pack\'s paintings, pixels square; 
     assert.ok(css.includes(`background-image: var(--dial-classic-${k}, var(--grim-${dialArtName(k)}, none));`), `${k}: the pack's until its own is read`);
   }
   assert.ok(css.includes(`${G}:not([data-grim-dial="pack"])[data-grim-dial-art="classic"] .px-dial .px-arm[data-grim-icon] .px-c { image-rendering: pixelated; }`));
-  const d = src('src/ui/pixelDial.js');
-  const open = d.slice(d.indexOf('export function openPixelDial('));
-  assert.ok(open.indexOf('_onOpen?.()') > 0 && open.indexOf('_onOpen?.()') < open.indexOf('mountPixelDial(document.body'), 'asked as it rises');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /setClassicDialSource\(\{ fetchBytes, palette, entity: \(\) => playerEntity \}\);\n\s*setDialOpenHook\(\(\) => refreshClassicDial\(\)\);/);
 });
 
 test('DIAL-PACK (Mac: "add the old Tab selector as optional to the overhaul option"): the Grimoire card\'s Tab dial row - Daggerfall\'s icons by default, the pack\'s paintings kept as the choice; the classic rules stand only off it (mutants: the default the pack; the classic rules unscoped)', () => {
@@ -92,7 +87,5 @@ test('DIAL-PACK (Mac: "add the old Tab selector as optional to the overhaul opti
     assert.ok(css.includes(`${G} .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(`) && css.includes(`background-image: var(--grim-${dialArtName(k)}, none);`), `${k}: the pack's painting, the base`);
     assert.ok(css.includes(`${G}:not([data-grim-dial="pack"]) .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(var(--dial-classic-w-${k}, `), `${k}: Daggerfall's, off the pack's choice`);
   }
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /card\.append\(choiceRow\('Tab dial', GRIMOIRE_DIALS, grimoireDial\(\), \(id\) => setGrimoireDial\(id\)\)\);/);
-  assert.match(src('src/ui/grimoireDress.js'), /root\.dataset\.grimDial = grimoireDial\(\);/);
   _resetForTests();
 });

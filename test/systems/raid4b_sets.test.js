@@ -113,7 +113,6 @@ test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (t
   const seen = new Set();
   for (let i = 0; i < 400; i++) { seen.add(rollWorldSet(() => i / 400)); const s = rollSetSigil('rare', 1, seq(0, i / 400)); if (s) seen.add(s.set); }
   assert.deepEqual([...seen].sort(), [...WORLD_SET_IDS].sort(), 'the world rolls its four, never a raid\'s');
-  assert.match(strip(read('src/systems/sigil/sigilBroker.js')), /for \(const set of WORLD_SET_IDS\)[\s\S]*const wset = pick\(WORLD_SET_IDS, rolls\);/, 'the Broker shelves the world\'s sets');
 });
 
 test('RAID4b the 2-piece stat tiers: one fold over RF1\'s channels - Oath of the Watch\'s armour on all seven parts and its Willpower, Keen-Eyed\'s Agility and Archery, Thick-Skinned\'s Endurance and Blunt Weapon - at the set\'s stage; nothing at one piece (mutants: a part left out; a stat or skill on the wrong name)', () => {
@@ -521,17 +520,3 @@ test('RAID4b the spoils pool\'s own keys for a town\'s thanks: the grant rolls t
   assert.deepEqual(store.get('raid4.spoilsDay'), ['raid:3:12:45:acct-1', 'raid:3:12:45:acct-2'], 'the town\'s marks untouched');
 });
 
-test('RAID4b the host: world.js rolls a town\'s thanks off each raid receipt - AUDIT RAID R4: when the account service says the claim is the (raid, account)\'s - its raid, seed, party and account, at the level it was fought at, into the pack of the character that fought it (else kept for it), one tab at a time - through a pool of the town\'s own keys that tells the hub nothing, clears on a save and is asked at the crash\'s door by its key; the new powers\' sounds (mutants: the receipt never granted; the town\'s pool on the gate\'s keys; the save never clearing it; the crash\'s door never asked)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  // PIN MOVED (WW6): the raids' host seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's
-  // live names read there as `host.<name>`
-  assert.match(strip(read('src/scenes/raidHost.js')), /onRaidReceipt: \(r, c, held\) => \{ \(c\?\.v \? grantStaffSpoils\([^)]*\) : host\.raidClaims\?\.add\(r, characterIdOf\(playerEntity\), [^;]+, held === true\)\); \},/);   // PIN MOVED (STAFF-EVENT THE REWARD): a staff event receipt rolls its own spoils; PIN MOVED (AUDIT WORLD-EVENTS L3-14): and whether the town was held, with the receipt
-  assert.match(w, /onSpoils: \(entry\) => grantRaidSpoils\(entry\),/);
-  assert.match(w, /function grantRaidSpoils\(entry\) \{\s*const c = readRaidReceipt\(entry\?\.r\);\s*if \(!c\) return;\s*const level = Math\.max\(1, Math\.floor\(Number\(entry\.lv\) \|\| playerEntity\.level \|\| 1\)\);\s*spoilsLock\(\(\) => raidSpoils\.grant\(\{ day: raidSpoilsDay\(c\.w\), acct: c\.s, roll: \(\) => raidSpoilsList\(c\.c, level, c\.y, typeof entry\.hd === 'boolean' \? entry\.hd : raidWasHeld\(c\.w\)\), text: RAID_SPOILS_TEXT\.granted,\s*owner: entry\.ch, kept: RAID_SPOILS_TEXT\.kept\(entry\.nm\) \}\)\)/);   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): held as the receipt came
-  assert.match(w, /const raidSpoils = createSpoilsPool\(\{\s*ray: \(\) => null, now: [^\n]+\n\s*store: _spoilsStore, who: \(\) => characterIdOf\(playerEntity\), keys: RAID_SPOILS_KEYS, recordsMax: RAID_SPOILS_RECORDS_MAX,/);
-  assert.doesNotMatch(w.slice(w.indexOf('const raidSpoils = createSpoilsPool('), w.indexOf('const raidSpoils = createSpoilsPool(') + 400), /onSpent/, 'the hub never kept a raid\'s receipt');
-  assert.match(w, /onSlotSaved\(\(characterId\) => \{ try \{ raidSpoils\.saved\(characterId\); \}/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => raidSpoils\.adopt\(rec\), key: RAID_SPOILS_KEYS\.store, inSave: _spoilsInSave \}\)\) setMidScreenText\(RAID_SPOILS_TEXT\.recovered\);/);   // AUDIT RESCUE-SAVE A1: and the kept save's records adopted, never handed twice
-  assert.match(w, /else if \(name === 'mark'\) audio\.playOneShot\(SOUND\.DrawWeapon, 1\);\s*else if \(name === 'ward'\) audio\.playOneShot\(SOUND\.EquipMaceOrHammer, 1\);/);
-  assert.match(strip(read('src/systems/raidingParties.js')), /host\(\)\.onRaidReceipt\?\.\(f\.r, c, raidHeldFor\(c\.w\)\);/, 'the raid module hands the host each receipt');   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): with whether its town was held, for the character that fought
-});

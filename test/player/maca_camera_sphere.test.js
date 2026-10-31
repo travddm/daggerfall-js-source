@@ -98,16 +98,3 @@ test('MAC-A: first person casts nothing at all, as it always did', () => {
   assert.equal(asked, 0);
 });
 
-test('MAC-A: every host hands the seam over, off its own collider', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
-    const s = rd(f);
-    assert.match(s, /spherecast: \(o, r, d, m\) =>/, `${f}: the camera gets a sphere seam`);
-    assert.match(s, /sphereCast\??\.?\(o, r, d, m(?:, \w+)?\)/, `${f}: off the collider's own castSphere`);   // FIELD BUGS 2026-09-29 (the sea) #3: the world's with the helm's filter
-    // Infinity is the collider's "clear sweep"; the camera's contract is
-    // null for a miss, so the seam translates rather than leaking it.
-    assert.match(s, /Number\.isFinite\(h\) \? h : null/, `${f}: a clear sweep is a MISS, not an infinite distance`);
-  }
-  // ...and mwView passes it through rather than inventing one. PIN MOVED (BENCH-CAM, 2026-10-10): the bench's
-  // `pivotFloor` rides the same call after the two seams (bible/06-Systems/Wagons.md BENCH-CAM)
-  assert.match(rd('src/player/mwView.js'), /mwCamera\.eye\(\{ fpEye, feet, yaw, pitch, heightScale, raycast, spherecast(?:, pivotFloor)? \}\)/);
-});

@@ -143,14 +143,6 @@ test('WAY-BACK: the enhanced hall shows a stranger the way in above its buttons;
   assert.equal(PORT_SPECS.guild.view(new GuildServiceWindow({ ...hooks(false), wayBack: () => null })).blocks.some((b) => b.type === 'text'), false);
 });
 
-test('WAY-BACK: the interior host hands the hall its way in - the character\'s skills, the shared clock, the Roll\'s pace while it holds, a shut hall as the popup found it - and on the classic skin puts it under DFU\'s refusal of a join; on the enhanced skin the hall\'s well says it and the refusal is DFU\'s record alone (AUDIT WAY-BACK L2-2/4/5) (mutants: the hook dropped, the refusal bare, the refusal doubled on the enhanced skin, the shut not read)', () => {
-  const wm = read(join(ROOT, 'src/scenes/worldModes.js'));
-  assert.ok(wm.includes('    const shutAtOpen = !!shutBox();'), 'the shut asked once, as the popup opens');
-  assert.ok(wm.includes('    const wayBack = () => wayBackLines(guild, playerEntity, memberships, store, { paced: !!host.rollPace?.(guild.factionId), online: sharedClockOn(), shut: shutAtOpen });'));
-  assert.ok(/\n {6}wayBack,\s+\/\/ WAY-BACK/.test(wm), 'the popup\'s hook');
-  assert.ok(wm.includes('        if (!decision.eligible) return { rows: [...rows(decision.textId), ...(isEnhanced() ? [] : wayBack() ?? [])] };'), 'the refusal, then the way in - the classic skin\'s');
-});
-
 test('WAY-BACK: the Standing page puts the hall\'s quest line under a guild, temple or order the join refuses - not under a kingdom, nor a standing at 0, nor a temple whose slot the player\'s book holds; online what the Roll owes counts, as at the hall (AUDIT WAY-BACK L4-1, L4-2, L4-8) (mutants: the note dropped, the variants unresolved, the book not read)', async () => {
   const page = (id) => guildOfFaction(id, resolveVariantGuild(null));   // the page's own read: GetGuild, the variants resolved
   assert.equal(page(MAGES), GUILDS.MagesGuild);

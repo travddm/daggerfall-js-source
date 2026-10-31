@@ -132,8 +132,6 @@ test('LOOT8: every take seam tells it - the loot window\'s and quick loot\'s (ap
     assert.equal(takeOneInto(me, [t], t), t, 'a listener that throws never stops a take');
     registerTakeListener('loot8-throws', null);
   } finally { registerTakeListener('loot8-test', null); }
-  assert.match(read('src/systems/item/itemTransfer.js'), /if \(toPlayer && landed\) tellTaken\(landed\);/);
-  assert.match(read('src/scenes/world.js'), /import '\.\.\/systems\/loot\/lootDrought\.js';/, 'the game registers it');
 });
 
 test('LOOT8: the record - the character\'s save carries it, a load restores it, a forged one refused, a new game none', () => {

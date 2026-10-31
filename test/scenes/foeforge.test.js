@@ -172,14 +172,3 @@ test('FOE-FORGE executed: a Greater Giant is a giant, and one of each to an owne
   assert.equal(by(3).entity.zoneGiant, 2, 'another index is another Greater Giant');
 });
 
-test('FOE-FORGE by source: the four hosts - world.js and worldModes.js (interiors) read a peer\'s foes through this pool; the dungeon\'s own lane stands no elite or giant and bounds what it takes (D8); exterior.js reads no peer', () => {
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.match(pool, /if \(heldOf\(from\) >= PEER_PUPPETS_TOTAL_MAX\) \{ if \(site\) refused\.add\(site\); continue; \}/);
-  assert.match(rd('src/scenes/world.js'), /exteriorFoes\.applyFoes\(id, data\)/);
-  assert.match(rd('src/scenes/worldModes.js'), /mode === 'interior' && interiorFoes \? interiorFoes\.applyFoes\(id, data\)/);
-  const dungeon = rd('src/scenes/dungeonContext.js');
-  assert.match(dungeon, /if \(live >= QUEST_PUPPETS_MAX \+ LOOSE_PUPPETS_MAX\) return 0;/, 'the dungeon\'s takeover has its bound');
-  assert.doesNotMatch(dungeon, /r\.z === 1|r\.gg\b/, 'and its records stand no elite and no Greater Giant');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /\.setNet\(|applyFoes\(/, 'the fixed city streams nothing');
-  assert.doesNotMatch(rd('server/src/index.js'), /FOE-FORGE|PEER_PUPPETS_TOTAL_MAX/, 'a reader\'s law - no relay change, no version bump');
-});

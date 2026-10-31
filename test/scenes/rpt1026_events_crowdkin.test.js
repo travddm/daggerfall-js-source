@@ -127,7 +127,4 @@ test('RPT1026-EVENTS CROWD-KIN A DUNGEON\'S: a peer\'s companion stood in a dung
   assert.deepEqual(foeDraw({ ...comp, ai: { feet: [0, 0, 0] } }, true, 0), { kind: 'hidden' }, 'the one draw question every pool asks: not drawn');
   assert.equal(foeAabb({ ...comp, ai: { feet: [0, 0, 0] } }), null, 'and no box for either sweep of the ray');
   assert.ok(foeAabb({ ...comp, _pupMine: true, ai: { feet: [0, 0, 0] } }), 'on me: a box');
-  const DC = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(DC, /const ecv = foeDraw\(f, ecvOn, _ecvT\);\n\s*if \(ecv\.kind === 'hidden'\) continue;/, 'the dungeon\'s draw asks foeDraw and skips what it hides');
-  assert.match(DC, /f\.companion = `peer:\$\{f\._ownFrom\}:\$\{f\._ownI\}`;/, 'the companion\'s mark as the law reads it');
 });

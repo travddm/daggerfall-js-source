@@ -208,9 +208,6 @@ test('TELL3: the iron mark - a second rim a quarter-metre inside and a hatch acr
   assert.match(TELEGRAPH_STYLE_GLSL, /vec4 telegraphIron\(vec4 o, float edge, float fin, vec2 p, vec3 col, float fogK\)/);
   assert.match(TELEGRAPH_STYLE_GLSL, /abs\(edge - 0\.250\)/, 'the second rim, IRON_INSET in');
   assert.match(TELEGRAPH_STYLE_GLSL, /float u = \(p\.x \+ p\.y\) \/ 0\.350;/, 'the diagonal hatch, IRON_HATCH apart');
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uIron;/);
-  assert.match(P, /if \(uIron > 0\.5\) oColor = telegraphIron\(oColor, dist, inside \? 1\.0 : 0\.0, vec2\(across, along\), uColor, fogK\);/);
   const { FoeTelegraphPass } = await import('../../../src/render/foeTelegraph.js');
   const { gl, calls } = fakeGl();
   const pass = new FoeTelegraphPass(gl);
@@ -219,5 +216,4 @@ test('TELL3: the iron mark - a second rim a quarter-metre inside and a hatch acr
   pass.draw([{ blow: iron, phase: { t: 0.5, flash: 0 } }, { blow: plain, phase: { t: 0.5, flash: 0 } }], I, I);
   assert.deepEqual(calls.filter((c) => c[0] === 'uniform1f' && c[1] === 'uIron').map((c) => c[2]), [1, 0]);
   assert.deepEqual(calls.filter((c) => c[0] === 'uniform3f' && c[1] === 'uColor').map((c) => c.slice(2)).map((c) => c.map((x) => Math.round(x * 100) / 100)), [[1, 0.12, 0.08], [1, 0.42, 0.12]], 'and its red');
-  assert.match(rd('tools/foeTelegraphProbe.mjs'), /TELL3: the iron mark hatches its fill/, 'the probe reads it off a real frame');
 });

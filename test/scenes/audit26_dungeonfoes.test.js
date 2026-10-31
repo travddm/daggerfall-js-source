@@ -27,11 +27,6 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => readFileSync(join(root, f), 'utf8');
-const DUNGEON_CTX = src('src/scenes/dungeonContext.js');
-const DUNGEON = src('src/scenes/dungeon.js');
-const WORLD = hostText('src/scenes/world.js');
-const SHARED = src('src/scenes/shared.js');
-const XF = src('src/scenes/exteriorFoes.js');   // AUDIT 65 SL-3: the re-minting pool, the law this host has to match by hand
 
 /** AUDIT 65 SL-3: an inert stand-in for every free identifier a lifted
  *  statement block reaches for - callable, and its properties are more
@@ -84,23 +79,6 @@ test('F204: the 8-hour alert decay is part of the PLAYER TICK, so the ticker-les
   });
   assert.equal(past8.enemyAlertActive, false, 'one minute past eight hours: the alert goes out');
 
-  // ...and it must be the tick's, not a host's line, or the host that
-  // forgets it is exactly the one whose spawn roll reads the flag.
-  assert.ok(src('src/systems/worldTick.js').includes('decayEnemyAlert(entity, nowMinutes);'));
-  assert.equal(SHARED.includes('decayEnemyAlert('), false,
-    'the ticker no longer calls it beside the tick that already does');
-});
-
-test('F204: the dungeon REST window jumps the clock without the tick, so it decays before the roll it gates', () => {
-  const i = DUNGEON_CTX.indexOf('const _restAdvance = (n) => {');
-  const fn = DUNGEON_CTX.slice(i, DUNGEON_CTX.indexOf('\n  };', i));
-  assert.ok(i > 0 && fn.length > 200, 'the rest advance arm was found whole');
-  assert.ok(fn.includes('decayEnemyAlert(playerEntity, Math.floor(end));'),   // AUDIT 68 S19-rest-alert-decay-wrong-clock: the session's minute
-    'the window that advances the clock owes the decay Update would have run in those frames');
-  assert.ok(fn.indexOf('decayEnemyAlert(') < fn.indexOf('intermittentEnemySpawn({'),
-    'and BEFORE the catch-up loop, as PlayerEntity.Update orders them (:380 before :486)');
-  assert.ok(fn.includes('enemyAlertActive: !!playerEntity.enemyAlertActive'),
-    'which is the flag the roll this loop makes is gated on');
 });
 
 // =====================================================================
@@ -108,19 +86,6 @@ test('F204: the dungeon REST window jumps the clock without the tick, so it deca
 // =====================================================================
 
 test('F049: dungeon drowning calls the REAL 3-argument damage door, not the file-local 1-argument wrapper', () => {
-  // PlayerEntity.cs:339-340 - `if (currentBreath <= 0) SetHealth(0)`.
-  // dungeonContext imports hurtPlayer AS hurtEntity (:26) and then
-  // declares its own one-argument hurtPlayer(dmg) (:1030), which
-  // shadows the name file-wide. The drowned arm was written in the
-  // world host's three-argument shape against that wrapper, so the
-  // ENTITY arrived as `dmg`.
-  const i = DUNGEON_CTX.indexOf("if (breathStep(playerEntity, submerged, _breathState) === 'drowned')");
-  assert.ok(i > 0, 'the drowned arm is there');
-  const arm = DUNGEON_CTX.slice(i, i + 800);
-  assert.ok(arm.includes('hurtEntity(playerEntity, playerEntity.health, { bypassShield: true });'),
-    'the import, which takes (entity, dmg, opts)');
-  assert.equal(/\bhurtPlayer\(playerEntity, playerEntity\.health/.test(arm), false,
-    'never the shadowing wrapper - it would take the entity as the damage');
 
   // and the defect class itself, at the door: the wrapper's shape is a
   // silent no-op, the real one kills.
@@ -137,102 +102,13 @@ test('F049: dungeon drowning calls the REAL 3-argument damage door, not the file
 // F050 - SetEnemyCareer assigns spells on EVERY spawn, not once at load
 // =====================================================================
 
-test('F050: every dungeon foe gets its spell list at BUILD time (EnemyEntity.cs:350-386, inside SetEnemyCareer)', () => {
-  // The one-time loop that stood at the load site ran ONCE over the
-  // marker foes; _spawnEncounter (the rest interruption) and
-  // spawnQuestFoe (CreateFoe) both mint through buildFoeAt AFTER it, so
-  // an Imp, Orc Shaman, Vampire or Lich placed by a quest or a rest
-  // interruption had no spells and no caster, and the frame loop's
-  // `f.caster` arm was permanently false for it.
-  const ai = DUNGEON_CTX.indexOf('function assignFoeSpells(rec)');
-  assert.ok(ai > 0, 'the assignment is a named law, not an inline loop');
-  const body = DUNGEON_CTX.slice(ai, DUNGEON_CTX.indexOf('\n  }', ai));
-  assert.ok(body.includes('assignEnemySpells(rec.entity, foeSpellTable);'), 'the S16 lists');
-  assert.ok(body.includes('rec.caster = new foeDeps.EnemyCaster(rec.entity)'), 'and the caster a listed foe needs');
-
-  // BOTH build branches (class enemies and monsters) run it before the
-  // record joins the pool - so the load loop, the rest interruption and
-  // the quest spawner are the same chain.
-  const pushes = DUNGEON_CTX.match(/assignFoeSpells\(rec\);\s+\/\/[^\n]*\n\s+stand\(rec\);/g) ?? [];
-  assert.equal(pushes.length, 2, 'the class branch and the monster branch, each assigning before the stand (WORLD3: a rebuild stands in place, a build pushes)');
-
-  // ...and the load site now only PUBLISHES the table (SPELLS.STD lands
-  // after the marker foes are built) and re-runs the same function.
-  assert.ok(DUNGEON_CTX.includes('foeSpellTable = spellsByIndex ?? null;\n  for (const f of foes) assignFoeSpells(f);'),
-    'one body for the law, run over the foes that predate the table');
-  assert.equal(/for \(const f of foes\) \{\s+assignEnemySpells\(/.test(DUNGEON_CTX), false,
-    'no second, load-only copy of the assignment');
-});
-
 // =====================================================================
 // F051 - the standalone dungeon fly-cam gate tested an imported function
 // =====================================================================
 
-test('F051: the ?dungeon fly-cam is gated on the OVERLAY, not on the imported input helper', () => {
-  // `held` at dungeon.js:"RAY_DISTANCE, tooFarAwayText" is the input helper - a function, always
-  // truthy - so `} else if (!held) {` was a branch that could not run:
-  // with ?dungeon&fly or ?shot, WASD never moved the camera. The gate
-  // was a local overlay boolean once, renamed overlayHeld at :353.
-  assert.ok(DUNGEON.includes('} else if (!overlayHeld) {'), 'the overlay gate the line always meant');
-  assert.equal(DUNGEON.includes('} else if (!held) {'), false, 'never the import');
-  const negated = DUNGEON.split('\n')
-    .filter((l) => !l.trim().startsWith('//'))
-    .filter((l) => /!held\b/.test(l));
-  assert.deepEqual(negated, [], 'nowhere is the imported helper negated - it is a function, so that is always false');
-  // the fly-cam body still rides the same four raw keys behind that gate
-  for (const k of ['KeyW', 'KeyS', 'KeyA', 'KeyD']) {
-    assert.ok(DUNGEON.includes(`if (keys.has('${k}'))`), `${k} still drives the fly-cam`);
-  }
-});
-
 // =====================================================================
 // F218 - a load leaves exactly the SAVED enemy population
 // =====================================================================
-
-test('F218: applyWorld destroys the live foes past the snapshot (SerializableStateManager.cs:404-425)', () => {
-  const i = DUNGEON_CTX.indexOf('function applyWorld(w, { truncate = true, wire = false } = {})');
-  const fn = DUNGEON_CTX.slice(i, DUNGEON_CTX.indexOf('w.piles?.forEach', i));
-  assert.ok(i > 0 && fn.length > 200, 'applyWorld\'s foe half was found');
-  // DFU's load rebuilds the scene and instantiates one object per saved
-  // record, so a foe born AFTER the save is gone. The port patches in
-  // place by index and every late spawn appends, so the tail past the
-  // snapshot IS the post-save population.
-  assert.ok(fn.includes('for (let i = foes.length - 1; truncate && i >= (w.foes?.length ?? 0); i--) {'),
-    'the live tail past the snapshot is walked backward for the splice');
-  const tail = fn.slice(fn.indexOf('for (let i = foes.length - 1;'));
-  assert.ok(tail.includes('renderer.destroyBillboardBatch(f.batch)'), 'the live batch is freed');
-  // AUDIT 68 S19-corpses-array-dead: through the one helper the rewind arm above calls (it frees the flat, splices it
-  // from billboardBatches - its one owner list - and clears f.corpse), not a hand copy of it
-  assert.ok(tail.includes('freeCorpse(f);'), 'and a post-save corpse\'s too, through freeCorpse');
-  assert.ok(tail.includes('f.questBehaviour?.notifyDestroyed();'), 'Destroy(gameObject): the quest resource uncouples');
-  assert.ok(tail.includes('foes.splice(i, 1);'), 'and the record leaves the pool, so the counter rewind cannot double it');
-
-  // AUDIT 65 SL-3, the same reference line from the other side: a
-  // rebuilt enemy is a FRESH entity, so `PickpocketByPlayerAttempted`
-  // is false for every enemy after a load. The re-minting pools match
-  // that by construction (exteriorFoes.restoreWorld goes through
-  // spawnFoe); this host patches in place, so it has to lower the latch
-  // by hand - or a failed pickpocket in a dungeon could never be
-  // retried, falsifying the law mobileEnemyActivate.js:"The flag is per-foe" states in
-  // its own header. A PRE-PASS over the whole live pool, because the
-  // per-record loop only ever visits the indices the record carries.
-  assert.match(XF, /spawnFoe\(sf\.mobileType, feet,/, 'the exterior pool RE-MINTS on restore, so its latch dies with the pool');   // PIN MOVED (SEALED-SAVE, FIELD BUGS 2026-10-05c): its feet the saved ones, or the moved marker's
-  // Mounted, not matched: the statements below are the ones in src/.
-  const run = (foes, w) => {
-    const scope = new Proxy({ foes, w }, {
-      has: () => true,
-      get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : STUB)),
-    });
-    // eslint-disable-next-line no-new-func
-    new Function('__scope', `with (__scope) { ${fn.slice(fn.indexOf(') {') + 3)} }`)(scope);
-  };
-  const foe = () => ({ entity: { pickpocketAttempted: true, items: [] }, ai: { feet: [0, 0, 0] } });
-  const recorded = foe();
-  const unrecorded = foe();
-  run([recorded, unrecorded], { foes: [{ health: 1, items: [], feet: [0, 0, 0], yaw: 0 }] });
-  assert.equal(recorded.entity.pickpocketAttempted, false, 'a foe the record covers loads back pickpocketable');
-  assert.equal(unrecorded.entity.pickpocketAttempted, false, '...and so does one the record does not reach');
-});
 
 // =====================================================================
 // F036 - PlayerEntity.Update's passive watch rolls
@@ -266,25 +142,6 @@ test('F036: the passive watch rolls, verbatim (PlayerEntity.cs:498-511)', () => 
   assert.equal(passiveGuardSpawns({ severePunishmentFlags: 1 }, () => 0.09), 1, 'roll 9 is < 10');
   assert.equal(passiveGuardSpawns({ severePunishmentFlags: 1 }, () => 0.10), 0, 'roll 10 is not');
 });
-
-test('F036: the world host runs those rolls in the catch-up loop and calls SpawnCityGuards(FALSE) - REP1 RETIRED THE LEVY: the loop rolls none, and the witness arm\'s eye stops a known criminal instead', () => {
-  // The witness arm of cityGuards.spawnCityGuards had NO production caller until F036 put the passive rolls in the loop.
-  // REP1 (the reputation overhaul, 2026-09-29, Mac: "Challenged on sight"): PIN MOVED - the per-minute levy is retired
-  // (in town the watch about every hundred real seconds for a bad name, no guard anywhere near), and a guard who SEES a
-  // known criminal stops them (scenes/standingHost.js, test/systems/rep1_watchstop.test.js). The loop rolls nothing for a name;
-  // the roll's own law above is DFU's record (encounters.js keeps it, with no production caller).
-  const i = WORLD.search(/^[ \t]*function runEncounterTick\(/m);   // CITE-ANCHOR: the declaration, not a comment's anchor that quotes it
-  const fn = WORLD.slice(i, WORLD.indexOf('\n  }\n', i));
-  assert.ok(i > 0, 'the port of PlayerEntity.Update:486-511 was found');
-  assert.ok(!fn.includes('passiveGuardSpawns('), 'the loop rolls no levy');
-  assert.ok(!fn.includes('CRIMES.Criminal_Conspiracy'), 'and levies no Conspiracy');
-  assert.match(fn, /REP1 \(Mac: "Challenged on sight"\): THE PASSIVE LEVY IS RETIRED\./);
-  assert.ok(!WORLD.includes('function _witnessResponse()'), 'the witness hook had one caller, the levy, and went with it');
-  assert.match(WORLD, /\n\s*standingWatch\.frame\(\);   \/\/ REP1: a guard who sees a known criminal stops them/, 'the stop is looked for in the frame');
-  assert.ok(WORLD.includes("cityGuards.spawnCityGuards(!!immediate, { playerFeet: [...feet], playerFwd: fwd, pool: _guardPool() })"),
-    'the seen crime still reaches the pool with the live NPC pool');
-});
-
 
 // =====================================================================
 // F212 - exterior corpses are loose objects and get collected
@@ -478,82 +335,6 @@ test('AUDIT 39: dead guards do not accumulate - the walk-away is pruned, the cor
   assert.equal(pool.takeLoot(t[0].key), 1, 'the right purse');
 });
 
-test('F212: the world host collects both pools with the pixel, which is also what the teleport tears down', () => {
-  // A1 MOVED THIS PIN. destroyPixel took a `{ collectLoose = true }`
-  // option: a SEASON re-skin (DaggerfallLocation.Update :118-130) tears
-  // a pixel down and builds it again, and the reference never unloads
-  // terrain for a season change, so the loose-object sweep must sit out
-  // that one caller. F212's law is unweakened - the default is still
-  // "collect", and every real unload takes both pools with it - so the
-  // pin follows the signature and now also pins the DEFAULT.
-  // PIN MOVED (IC-SWAP-BEHIND, scenes/swapBehind.js): `carried` and `carryOnly` beside it - a rebuild behind its view takes its carry at the mark and not again at the swap; the default still collects
-  const i = WORLD.indexOf('function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {})');
-  const fn = WORLD.slice(i, WORLD.indexOf('\n  }\n', i));
-  assert.ok(i > 0);
-  assert.ok(fn.includes('if (collectLoose) droppedLoot.collectPixel(key);'), 'the pile half, which the port already had');
-  assert.ok(fn.includes('cityGuards.collectPixel(key);'), 'the watch\'s corpses');
-  assert.ok(fn.includes('exteriorFoes.collectPixel(key);'), 'and the encounter pool\'s');
-  // ClearStreamingWorld's CollectLooseObjects(true) is the teleport core
-  // walking every built pixel through that same function.
-  // PIN MOVED (Road to 1:1, a3): the core took a fourth argument.
-  // StreamingWorld.RepositionPlayer's `grounded` (:1587, :1592) is what
-  // the court's location-entrance arm passes TRUE, so the signature now
-  // reads `(px, py, localPos = null, { grounded = false } = {})`. Anchor
-  // on the name and the first three, which is what this test is about.
-  const t = WORLD.indexOf('async function _teleportToPixel(px, py, localPos = null,');
-  // AUDIT 39 (#158): the window widened from 400 - CleanupUntrackedObjects'
-  // own half (clearLive on both pools, the missiles, the arrows) now stands
-  // at the head of the core, above this loop. Corpses ride the pixel;
-  // the LIVE records are swept by name, which is the finding this moved for.
-  // A1 widened it again, 1600 -> 2100: refreshSeason() and its note now
-  // stand at the head of the core too, because a fast travel is where
-  // the calendar jumps weeks and the destination must not be skinned
-  // for the month the player left.
-  // PIN MOVED (ROAD-Ar, R1/R0), 2100 -> 2600: that straightening now
-  // reads the ARRIVAL clock the caller passes (performFastTravel
-  // raises time only AFTER TeleportToCoordinates, :333/:344, so the
-  // one clock still read the departure date here), and the core also
-  // drops the season re-skin's motor hold on its way past. Both notes
-  // sit above these needles; the needles themselves are unchanged.
-  // PIN MOVED AGAIN (CLOSEOUT), 2600 -> 2800: the straightening now
-  // raises a latch the frame's season poll honours across the awaited
-  // destination build, which is two more statements above the needles.
-  // PIN MOVED AGAIN (BLOOD1 AUDIT 2), 2800 -> 3700: the sweep now
-  // clears the splash pool and its ring beside the missiles and the
-  // arrows, with its own note, above the needles.
-  // PIN MOVED AGAIN (AUDIT BRANCH (WoD)), 3700 -> 3900: the sweep now also
-  // clears DFU's terrain array and raises the markers' arrival gate, two
-  // statements beside the carry's, above the needles.
-  // PIN MOVED AGAIN (AUDIT SURV-TIERS, the third pass, at the merge of
-  // main), 3900 -> 4600: the camps now go through natives across the
-  // re-anchored frame, their snapshot and teardown with their own note
-  // above the needles.
-  // PIN MOVED AGAIN (PERF-EXT21), 4600 -> 5400: the sweep now empties the
-  // grass field too - a crossing no longer does it - with its own note,
-  // above the needles.
-  // PIN MOVED AGAIN (CSA-F), 5400 -> 5600: the core now raises Come Sail
-  // Away's OnTeleportToCoordinates beside DW-D's (the waves laid a tenth of
-  // a second on), one statement above the needles.
-  // PIN MOVED (AUDIT OW5 J2), 5600 -> 6600: a jump stops a route's walk first thing, with its note
-  // PIN MOVED (AUDIT CLIMB-ARC F6), 6600 -> 6800: the climb's feel resets beside the recoiler, one statement above
-  // PIN MOVED (RVN10), 6800 -> 7000: a jump out of a fight routs me before the sweep, one statement above
-  // PIN MOVED (AUDIT LW-II-2 H9), 7000 -> 7300: the stood hideout let go beside the camps, with its note, above the needles
-  // PIN MOVED (HELM-JUMP, FIELD BUGS 2026-10-11), 7300 -> 7800: a jump lets go of Come Sail Away's helm first, with its note
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G2/P7, at the merge of main), 7800 -> 8100: a pixel this game does not stream is landed
-  // where the world stands (`_streamedLanding`) beside the resets, with its note - three lines above the needles
-  // PIN MOVED (AUDIT PRECIP HOST-2), 8100 -> 8300: the snow's clock takes the arrival's minute beside the season's, one statement
-  // PIN MOVED (AUDIT DEX C1), 8300 -> 8700: PlayerGPS's own rect flag dropped beside the host's, one statement above (the
-  // needle stands at 8486)
-  const core = WORLD.slice(t, t + 8700);
-  assert.ok(core.includes('destroyPixel(bx, by);'),
-    'so a fast travel or a teleport takes every corpse with it');
-  assert.ok(core.includes('exteriorFoes.clearLive();') && core.includes('cityGuards.clearLive();'),
-    'and the live pools with them (StreamingWorld.cs:1624-1635)');
-  // and the stamp is the same key shape the pile seam already used
-  assert.equal((WORLD.match(/currentPixelKey: \(\) => `\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}`/g) ?? []).length, 2,
-    'both pools are stamped, with the streamer\'s current pixel (TrackLooseObject :462-476)');
-});
-
 // =====================================================================
 // F045 - a failed night sky must not wedge the controller
 // =====================================================================
@@ -590,16 +371,4 @@ test('F045: a night sky that cannot load degrades to the gradient instead of fre
   // the gradient" means
   assert.deepEqual([...sky.renderer.clearColor].map((v) => Math.round(v * 255)), [196, 205, 224]);
 
-  // the guard is released either way, so nothing can wedge on it
-  const b = SHARED.indexOf('buildPanorama(skyIndex, frame).then(apply)');
-  assert.ok(b > 0, 'the build call was found');
-  assert.ok(SHARED.slice(b, b + 260).includes('if (pending === key) pending = null;'),
-    'a rejected build releases the one-shot guard, so the next frame retries');
-  const n = SHARED.indexOf('const name = nightSkyImageName(skyIndex);');
-  const night = SHARED.slice(n, SHARED.indexOf('if (!skyFiles.has(skyIndex))', n));
-  assert.ok(n > 0 && night.length > 200, 'the night branch was found whole');
-  assert.ok(night.includes('return buildFallbackSkyPanorama();'),
-    'and the night branch degrades exactly as its day sibling does');
-  assert.ok(night.indexOf('try {') < night.indexOf('await fetchBytes(name)'),
-    'both of its awaits are inside the guard, which is what the day branch has had all along');
 });

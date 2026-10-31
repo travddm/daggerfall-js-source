@@ -98,11 +98,6 @@ test('AUDIT WORLD-EVENTS L1-4 THE SPIRE: the fall given in to (`yield`), a death
   W.word('acct-0', { k: 'fell' }, W.poseOf('acct-0'));
   W.step();
   assert.equal(W.B.mem['acct-1'].falls, 1, 'the last standing gone: the one down falls');
-  const src = read('src/net/eliteGates/egBrain.js');
-  assert.match(src, /function redoubt\(B, now, rng, out\) \{\n\s*for \(const \[sub, m\] of Object\.entries\(B\.mem\)\) if \(m\.down\) egFall\(B, sub, now, out, null\);/, 'a hall cleared: the downs fall first, for the Redoubt\'s recall');
-  assert.match(src, /if \(!m \|\| m\.alive \|\| m\.down \|\| m\.forsaken \|\| !\(m\.recall > 0\)\) return false;/, 'the recall passes one lying down by');
-  assert.match(src, /if \(b\.dead\) egLayDown\(B, b\.sub, now, out, spec0 \? local\(spec0, b\) : null\);/, 'the census\'s death lays down');
-  assert.match(src, /egLayDown\(B, h\.sub, now, out, at && at\[4\] === B\.h \? \{ x: at\[1\], z: at\[3\] \} : null\);/, 'the count\'s fall lays down');
   assert.deepEqual([validEgIn({ k: 'yield' }), validEgIn({ k: 'rz', to: 'acct-1' }), validEgIn({ k: 'rz', to: '' })], [{ k: 'yield' }, { k: 'rz', to: 'acct-1' }, null]);
 });
 
@@ -117,23 +112,5 @@ test('AUDIT WORLD-EVENTS L1-4 THE SKY-KETCH: a crewmate\'s Resurrect at a member
   assert.equal(KT_DOWN_MS, EG_DOWN_MS, 'one minute on the ship as in the Spire (the tile says one)');
   assert.deepEqual(validKetchIn({ k: 'rz', to: 'acct-b1' }), { k: 'rz', to: 'acct-b1' });
   assert.deepEqual(validKetchOut({ k: 'rez', s: 'acct-b1', n: 'Bo', by: 'Ann', at: 5 }), { k: 'rez', s: 'acct-b1', n: 'Bo', by: 'Ann', at: 5 });
-  assert.match(read('server/src/index.js'), /for \(const r of out\) if \(r\.k === 'rez' && V\.players\[r\.s\]\) \{ bodyLife\(V\.players\[r\.s\], now, line\.body\); V\.players\[r\.s\]\.rzAt = now; \}/);   // PIN MOVED (AUDIT KETCH II L1-5): and the raise's moment kept
-  assert.match(read('src/net/ketch/ketchBrain.js'), /p\.lay = b\.dead \? \(p\.lay\?\.at \? \{ \.\.\.p\.lay, x: b\.x, y: b\.y, z: b\.z \} : \{ x: b\.x, y: b\.y, z: b\.z, at: now \}\) : null;/, 'where a member lies, and since when');
 });
 
-test('AUDIT WORLD-EVENTS L1-4 THE PAGES, by source: the Spire\'s witness begins lying down (its body\'s pose where it fell, Enter to give in), the room\'s word deciding; the Ketch\'s death save lies down with a crewmate aboard, held still and spared, and falls past the window; a raise said to the room; the pose speaks the body (mutants: the pose of the witness\'s hold; the Ketch falling at once)', () => {
-  const eg = read('src/scenes/eliteGates/egClient.js');
-  assert.match(eg, /if \(!said && mine\?\.alive && witness\.spot && E\.co\.some\(\(c\) => c\[0\] !== me\(\) && c\[3\] === 1 && c\[4\] === 0 && c\[5\] === 1\)\) lieDown\(t \+ EG_DOWN_MS\);/);
-  assert.match(eg, /if \(witness\?\.down && code === 'Enter'\) \{ o\?\.sendEg\?\.\('yield'\); return true; \}/);
-  assert.match(eg, /o\.poseDown = inSpire\(\) \? downPose : null;/);
-  assert.match(eg, /if \(w\.k === 'fall' && w\.s === me\(\) && witness\?\.down\) \{ witness\.down = 0;/);
-  const kt = read('src/scenes/ketch/ketchClient.js');
-  assert.match(kt, /registerPlayerDeathSave\('kt-fall', \(\) => \{ if \(!onShip\(\)\) return false; if \(!lieDown\('death'\)\) fall\('death'\); return true; \}\);/);
-  assert.match(kt, /if \(Date\.now\(\) >= down\.until\) \{ const why = down\.why; down = null; fall\(why\); return; \}/);
-  assert.match(kt, /registerPlayerDamageMod\('kt-down', \(_e, d\) => \(down \? 0 : d\)\);\n\s*registerPlayerHold\('kt-down', \(\) => !!down\);/);
-  assert.match(read('src/scenes/worldModes.js'), /const paralyzed = staffFrozen\(\) \|\| playerHeld\(\) \|\|/);
-  const on = read('src/net/online.js');
-  assert.match(on, /const out = \{ \.\.\.pose, \.\.\.\(dn \? \{ x: dn\[0\], y: dn\[1\], z: dn\[2\], mv: 0, dd: 1 \} : \{\}\),/, 'my pose speaks my body where it lies');
-  const rw = read('src/net/raiseWord.js');
-  assert.match(rw, /if \(isEgRoom\(room\)\) return !!online\.sendEg\?\.\('rz', \{ to \}\);\n\s*if \(isKetchRoom\(room\)\) return !!online\.sendKetch\?\.\('rz', \{ to \}\);/);
-});

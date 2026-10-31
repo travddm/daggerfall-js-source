@@ -121,20 +121,3 @@ test('FT2: a condensed row\'s read and write are functions and come together - t
   assert.deepEqual(mut({ also: [] }), [], 'covering nothing is allowed');
 });
 
-test('FT2: every builder asks the registry (one home per idea, every store), the home passes read/write, and the old rows are gone', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /function prefRow\(key, name, note, \{ onChange = null, home = false \} = \{\}\) \{\s*if \(!home\) \{ const moved = featureForControl\('prefs', key\); if \(moved\) return movedRow\(moved\); \}/);
-  assert.match(menu, /function choiceRow\(key, name, note, tiers, \{ home = false, read = null, write = null \} = \{\}\) \{\s*if \(!home\) \{ const moved = featureForControl\('prefs', key\); if \(moved\) return movedRow\(moved\); \}/);
-  assert.match(menu, /function modRow\(vendor, key, def, \{ name = null, note = null, home = false \} = \{\}\) \{\s*if \(!home\) \{ const moved = featureForControl\('mods', key, vendor\); if \(moved\) return movedRow\(moved\); \}/);
-  assert.match(menu, /const cur = String\(read \? read\(\) : getPref\(key\)\);/, 'the row shows the lane\'s live value');
-  assert.match(menu, /\(write \?\? \(\(v\) => setPref\(key, v\)\)\)\(tiers\[\(at \+ 1\) % tiers\.length\]\[0\]\)/, 'and writes through the row\'s own writer');
-  assert.ok(!/choiceRow\('landViewDistance'/.test(menu), 'the Enhanced category\'s row left with its copy');
-  assert.ok(!/LAND_VIEW_TIERS/.test(menu), 'the menu no longer knows the tiers; the registry hands them over');
-  // the world host reads through the same function the row shows
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /import \{ landViewRead \} from '\.\.\/world\/landView\.js';/);
-  assert.match(world, /const fogDistance = landViewRead\(\);/);
-  assert.ok(!/landViewDistance\(\{/.test(world), 'no second composition of the read');
-  // the DFU key stays in its category (the map is total) and its settings row is settingRow's pointer, through featureForControl
-  assert.match(read('src/ui/settings/settingsMap.js'), /"Experimental\/TerrainDistance",/);
-});

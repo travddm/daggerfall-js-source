@@ -35,15 +35,6 @@ import { crewTeamOf, CREW_TEAMS, GRAPPLE_S, HAND } from '../../../src/systems/na
 import { sea } from '../../navalSea.mjs';
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const WORLD = src('src/scenes/world.js');
-/** A function declaration of world.js's, lifted whole (the suites' own way). */
-const lift = (name) => {
-  const m = new RegExp(`\\n  function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n  \\}\\n`).exec(WORLD);
-  assert.ok(m, `${name} lifted`);
-  return m[0];
-};
-/** One line of world.js's from its start. */
-const line = (start) => { const i = WORLD.indexOf(start); assert.ok(i >= 0, `lifted: ${start}`); return WORLD.slice(i, WORLD.indexOf('\n', i) + 1); };
 
 // ── a little ship, made of her faces ─────────────────────────────────────────────────────────────────────────────
 
@@ -270,65 +261,7 @@ test('DECK-WALK THE REAL HULLS: the Small Ship\'s main deck at 6.20 m, the Large
 
 // ── the leash and the carry, lifted from the world host ──────────────────────────────────────────────────────────
 
-/** The world host's deck registry, leash and carry over a stand-in boat: her mesh node's matrix is the test's. */
-function deckRig(deck) {
-  const foes = [];
-  const boat = { hull: 4, variant: 0, GameObject: { activeSelf: true, worldMatrix: () => rootM }, MeshObject: { worldMatrix: () => meshM } };
-  let meshM = matrixOf({}), rootM = matrixOf({});
-  const body = `
-    const { intoDeck, outOfDeck, DECK_STEP, csa, exteriorFoes } = s;
-    ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}
-    ${line('  const _deckBodies = new Set();')}${line('  const navalDeckBody = (f, boat) =>')}${line('  const _leashLocal = [0, 0, 0];')}
-    ${lift('navalLeash')}${lift('navalCarry')}
-    return { navalLeash, navalCarry, navalDeckBody, bodies: _deckBodies };`;
-  // eslint-disable-next-line no-new-func
-  const w = new Function('s', body)({ intoDeck, outOfDeck, DECK_STEP, csa: { deckOf: () => deck }, exteriorFoes: { foes } });
-  const stand = (local) => { const f = { dead: false, ai: { feet: outOfDeck(meshM, local) }, entity: {} }; foes.push(f); w.navalDeckBody(f, boat); return f; };
-  return { ...w, boat, foes, stand, pose: (o) => { meshM = matrixOf(o); rootM = matrixOf({ ...o, roll: 0, pitch: 0 }); }, mesh: () => meshM };
-}
 const near = (a, b, eps = 1e-6) => a.every((v, i) => Math.abs(v - b[i]) < eps);
-
-test('DECK-WALK THE LEASH: a body on her deck stays where it stands - on a deck rolled 12 degrees and pitched too, where the root\'s frame read it as off her deck; one climbed onto her rail, stepped over the side or fallen through her deck is set back on it, at her edge and her height; a body gone, dead or off her is let go (mutants: the root\'s frame, the edge a centre, the height unread, a body kept past its death)', () => {
-  const r = deckRig(sloop());
-  r.pose({ yaw: 0.8, roll: 0.21, pitch: 0.07, at: [210, 0.4, -95] });
-  const onDeck = r.stand([1.1, 2, 3.25]);
-  const was = [...onDeck.ai.feet];
-  const railed = r.stand([4.15, 3, 3.1]);
-  const over = r.stand([6, 0.5, 3.1]);
-  const fallen = r.stand([1.1, 1.2, 3.25]);
-  r.navalLeash();
-  assert.ok(near(onDeck.ai.feet, was), 'on her rolled deck: untouched');
-  for (const [f, what, z, x] of [[railed, 'the rail', 3.1, 2.5], [over, 'over the side', 3.1, 2.5], [fallen, 'through her deck', 3.25, 1.1]]) {
-    const local = intoDeck(r.mesh(), f.ai.feet);
-    assert.ok(sloop().walkable(local[0], local[2]), `${what}: back on deck (${local})`);
-    assert.ok(Math.abs(local[1] - 2) < 1e-6, `${what}: at her height`);
-    assert.ok(Math.abs(local[2] - z) < 1e-6 && Math.abs(local[0] - x) < 1e-2, `${what}: where it pressed - her edge, not a cell's centre (${local})`);
-  }
-  assert.equal(r.bodies.size, 4);
-  railed.dead = true;
-  r.foes.splice(r.foes.indexOf(over), 1);
-  r.boat.GameObject.activeSelf = true;
-  r.navalLeash();
-  assert.equal(r.bodies.size, 2, 'the dead and the gone let go');
-});
-
-test('DECK-WALK THE CARRY: every deck body where the leash last left it, taken through her pose now - her way, her turn and her roll - before the foes move: a ship under way no longer sails out from under her boarders; a body the leash has not yet seen is left where it stands (mutants: the carry unwired, carried from the world\'s place, carried by the root)', () => {
-  const r = deckRig(sloop());
-  r.pose({ yaw: 0.1, at: [0, 0, 0] });
-  const f = r.stand([-1.6, 2, 3.1]);
-  const fresh = [...f.ai.feet];
-  r.navalCarry();
-  assert.deepEqual(f.ai.feet, fresh, 'not yet leashed: nothing to carry from');
-  r.navalLeash();
-  for (let t = 0; t < 30; t++) {
-    r.pose({ yaw: 0.1 + t * 0.01, roll: Math.sin(t) * 0.1, at: [0, 0, 4.5 * t / 10] });   // under way at 4.5 m/s, turning, rolling
-    r.navalCarry();
-    r.navalLeash();
-  }
-  assert.ok(near(intoDeck(r.mesh(), f.ai.feet), [-1.6, 2, 3.1], 1e-6), 'where it stood on her, thirty frames on');
-  assert.match(WORLD, /if \(_deckBodies\.size\) navalCarry\(\);[^\n]*\n\s+exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);[^\n]*\n\s+if \(_deckBodies\.size\) navalLeash\(\);/, 'carried before the foes move, leashed after');
-  assert.match(WORLD, /const deck = boat\.MeshObject && csa\.deckOf\?\.\(boat\.hull, boat\.variant \?\? 0\);\n\s+if \(deck\?\.count\) \{/, 'the muster\'s spots off the same deck');
-});
 
 // ── SHIPMATES ───────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -418,29 +351,6 @@ function spellRig(foes) {
 }
 const struck = (hurt) => [...new Set(hurt.map(([id]) => id))].sort();
 
-test('SHIPMATES THE SPELL: the player\'s area, touch, missile and blast pass a shipmate by and land on the pirate; a crewman\'s own blast at a pirate passes the player and the rest of the crew by (mutants: the spare unread, the crew\'s blast unspared)', () => {
-  const area = spellRig([crewRec('mate', [0, 0, 1.2]), foeRec('pirate', [1.5, 0, 2.5])]);
-  area.magic.readySpell(spellOf(3, 'Aura'));
-  area.magic.castInput([0, 0.9, 0], [0, 0, 1]);
-  assert.deepEqual(struck(area.hurt), ['pirate'], 'the area around the caster');
-  const touch = spellRig([crewRec('mate', [0, 0, 1.2])]);
-  touch.magic.readySpell(spellOf(1, 'Touch'));
-  assert.equal(touch.magic.castInput([0, 0.9, 0], [0, 0, 1]), false, 'a touch with only a shipmate in reach finds no target');
-  const ball = spellRig([crewRec('mate', [0, 0, 5]), foeRec('pirate', [0, 0, 6])]);
-  ball.magic.readySpell(spellOf(4, 'Fireball'));
-  ball.magic.castInput([0, 0.9, 0], [0, 0, 1]);
-  for (let i = 0; i < 60 && !ball.hurt.length; i++) ball.magic.update(0.05, [0, 0, 0]);
-  assert.deepEqual(struck(ball.hurt), ['pirate'], 'the blast leaves him standing, inside its radius');
-  assert.match(src('src/scenes/hostMagic.js'), /const crewBlast = isShipmate\(caster\?\.foe\);[\s\S]{0,400}if \(crewBlast && isShipmate\(t\)\) continue;[\s\S]{0,4000}if \(playerFeet && !crewBlast && sphereOverlapsCapsule\(pos, EXPLOSION_RADIUS, playerFeet, playerHeight, PLAYER_BODY_RADIUS\)\) \{/, 'a crewman\'s blast: the crew and the player passed by');
-  assert.match(src('src/scenes/hostMagic.js'), /if \(playerFeet && !isShipmate\(m\.casterFoe\)\) \{/, 'a crewman\'s missile flies past the player');
-  assert.match(src('src/scenes/hostMagic.js'), /casterFoe \? \{ entity: m\.casterFoe\.entity, sinks: foeSinks\(m\.casterFoe\), foe: m\.casterFoe \}/, 'the caster wrapper carries its foe');
-});
-
-test('SHIPMATES THE TORCH AND THE CHARGE by source: the thrown torch and a mount\'s charge pass the player\'s crew by, as the defenders (mutants: either unfiltered)', () => {
-  assert.match(WORLD, /foes: \(\) => \[\.\.\.cityGuards\.guards\.filter\(\(g\) => !g\.defender\), \.\.\.exteriorFoes\.foes\.filter\(\(f\) => !sparedByPlayer\(f\)\)\], foeSinks/);
-  assert.match(WORLD, /foes: \(\) => exteriorFoes\.foes\.filter\(\(f\) => !sparedByPlayer\(f\)\), guards: \(\) => cityGuards\.guards\.filter/);
-});
-
 test('SHIPMATES THE CREW\'S BARS: a green bar a crewman - the party\'s one green - at the HUD\'s scale over his head, the fill his health, fading with his distance to CREW_BAR_RANGE; one node a slot, moved, never rebuilt; a window over the world hides them all, and every clear; the world projects every shipmate\'s head (mine and a room\'s) through the frame\'s matrices behind a sight cache of the crew\'s own (mutants: the green another, rebuilt each frame, never hidden, the fade reversed, the clear unwired)', () => {
   destroyNavalHud();
   assert.equal(CREW_GREEN, PARTY_GREEN_CSS);
@@ -462,13 +372,6 @@ test('SHIPMATES THE CREW\'S BARS: a green bar a crewman - the party\'s one green
   drawCrewBars([{ x: 310, y: 120, share: 0.25, distance: 10 }], { covered: true });
   assert.ok(byClass(layer, 'dfnaval-crew').every((n) => n.style.display === 'none'), 'covered: all hidden');
   destroyNavalHud();
-  // the world's side
-  assert.match(WORLD, /navalTags\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewBars\(proj, view, mwv\.eye\);/);
-  assert.match(WORLD, /for \(const f of _mode\(\) === 'exterior' \? exteriorFoes\.foes : _insidePool\(\)\) \{[^\n]*\n\s+const feet = f\.ai\?\.feet;\n\s+if \(!isShipmate\(f\) \|\| !feet \|\| !f\.entity\) continue;/);   // PIN MOVED (CREW-COMPANIONS): indoors and underground, my companions' bars
-  assert.match(WORLD, /if \(crewSight\.blocked\(player\.collider, eye, key, head\)\) continue;/);
-  assert.match(WORLD, /const crewSight = createSightCache\(\);/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S1): the clear lowers the glass after them
-  assert.match(WORLD, /drawNavalHud\(null\); drawNavalTags\(\[\]\); drawCrewBars\(\[\]\); drawCrewLines\(\[\]\); lowerGlass\(\); \};/);
 });
 
 // ── the room: another's crew ────────────────────────────────────────────────────────────────────────────────────

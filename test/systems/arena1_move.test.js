@@ -95,13 +95,6 @@ test('ARENA1 move: every other record keyed there names no building - a room at 
     const item = { repairData: { mapId: MAP, buildingKey: OLD } };
     assert.equal(isBeingRepairedAt(item, makeBuildingKey(4, 4, 2), MAP), true);
   } finally { _resetLayoutPins(); }
-  // a quest site there is chosen again (Place.reseatMovedSite asks recordStands); an inside save stands outside
-  assert.match(read('src/systems/quest/place.js'), /if \(recordStands\(held\)\) return sd\.unseated \? this\._seatBack\(held\) : false;/);   // FIELD BUGS 2026-10-04d RESEAT-GAPS: asked of the record the site holds
-  assert.match(read('src/systems/layoutPins.js'), /if \(_displaced\(rec\)\) return false;\n\s*return layoutsMatch\(rec\.layout, layoutStampOfMapId\(rec\.mapId\)\);/);
-  assert.match(read('src/scenes/worldModes.js'), /if \(!cabin && d\.buildingKey && arenaRecordDisplaced\(\{ mapId: questSceneCtx\?\.\(\)\?\.mapId \?\? 0, buildingKey: d\.buildingKey \}\)\) \{/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /if \(!homeLayoutsOnline\) moveArenaDeed\(\);/, 'offline, before the pins are read');
-  assert.match(w, /notice: \(\) => \{ const show = \(\) => \{ try \{ townTalk\.showOverlay\(new ActionTextBox\(\[\.\.\.ARENA_TEXT\.deedMoved\]\)\); \}/);
 });
 
 test('ARENA1 gate: the Herald is known by his record, and his click opens the notice; the others talk as the city\'s people do', () => {
@@ -112,8 +105,6 @@ test('ARENA1 gate: the Herald is known by his record, and his click opens the no
   assert.ok(Object.isFrozen(ARENA_TEXT) && Object.isFrozen(ARENA_TEXT.heraldNotice));
   assert.equal(ARENA_TEXT.heraldNotice[0], 'The Arena of Daggerfall');
   assert.match(ARENA_TEXT.heraldNotice.join(' '), /Bouts begin soon/);
-  // ARENA2: his choice now (the host's - scenes/world.js arenaHerald); a host with no arena driver keeps the notice
-  assert.match(read('src/scenes/worldModes.js'), /if \(!info && arenaGatePersonOf\(pn\)\?\.role === 'herald'\) \{ if \(!host\.arenaHerald\?\.\(\)\) townTalk\?\.showOverlay\?\.\(new ActionTextBox\(\[\.\.\.ARENA_TEXT\.heraldNotice\]\)\); return; \}/);
 });
 
 test('ARENA1 move (ARENA2): a deed to a GEMSAL03 house moves to a house of its kind standing in Daggerfall, in both layouts', { skip: !HAS_ARENA2 && 'ARENA2_PATH not set' }, async () => {

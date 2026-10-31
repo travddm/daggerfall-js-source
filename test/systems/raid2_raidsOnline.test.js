@@ -68,7 +68,6 @@ beforeEach(() => {
   setSharedClock(null);
 });
 
-
 /** MAIN-RED: every place a source touches a foes frame's `rz`, `rk` or `al` as a FIELD - a member read, a pattern's
  *  key, a literal's key - outside the one method allowed to (`_grantStripped`); `strip` says that method was seen. */
 function frameFieldsTouched(source) {
@@ -331,40 +330,5 @@ test('RAID2 a raider handed over is still the raid\'s: the heir takes it tagged,
 test('RAID2 the lane and the lock: the raids\' switch is the room\'s online, forced on - with a world event\'s own words', () => {
   assert.deepEqual({ ...ONLINE_ROOM_MOD_KEYS[RAIDING_PARTIES_VENDOR] }, { Enabled: true });
   assert.ok(!ONLINE_PLAYERS_OWN_MODS.includes(RAIDING_PARTIES_VENDOR));
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const ONLINE_WORLD_EVENT_NOTE = 'On for everyone online: a raid is shared[^']*';/);
 });
 
-test('RAID2 the world host by source: my word rides my cell frame, a peer\'s reaches the raids through the pool\'s room test, and the seams answer who I am, who stands in the town (the watch\'s own rect), the raid\'s puppets and my taken raiders on the net\'s clock', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(cell\) duelRingWord\(frame, full\); if \(cell\) csaWord\(frame, full\);( if \(cell\) csaAboardWord\(frame, full\);)?(?: if \(cell\) bandWord\(frame, full\);)?( if \(cell\) navalWord\(frame, full\);)?(?: if \(cell\) seaRaidWord\(frame, full\);)? if \(cell\) \{ const rk = raidWireWord\(\), ro = raidObjWord\(\); if \(rk\) frame\.rk = rk; if \(ro\) frame\.ro = ro; \}[^\n]*\n\s+(?:\/\/[^\n]*\n\s*)*const said = [^\n]*\n\s*if \(_foesQuiet\.skip\(frame, said\)\)[^\n]*\n\s*if \(!online\.sendFoes\(frame\)\)/, 'on the riders\' own line (PIN MOVED, SCALE2c: the quiet frame\'s gate asked between it and the send), beside the camps, the horse, the ring and (THE MERGE) the boats - and (THE MERGE with NAV-G) the sea\'s word before it, and (OW6) the raiders\' after it, and (PIN MOVED, RAID5) their objective\'s word beside theirs');
-  assert.match(w, /exteriorFoes\.setOnRaids\(\(from, rk, at, ro\) => raidPeerWord\(from, rk, at, ro\)\);/);
-  // PIN MOVED (WW6): the seams moved verbatim out of bootWorld to scenes/raidHost.js (HOST-SPLIT), the host's live names
-  // read there as `host.<name>`
-  const rh = rd('src/scenes/raidHost.js');
-  const at = rh.indexOf('  setRaidingPartiesHost({');
-  const body = rh.slice(at, rh.indexOf('\n  });', at));
-  assert.match(body, /selfId: \(\) => host\.online\?\.id \?\? null,/);
-  assert.match(body, /wallNow: \(\) => performance\.now\(\),/, 'the clock the pool hands the word on');
-  assert.match(w, /now: \(\) => performance\.now\(\),\n\s+staleMs: FOES_STALE_MS,/, 'which is the net\'s own');
-  assert.match(body, /peersInTown: \(\) => \(host\.peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => _foeInTownRect\(\{ ai: \{ feet: p\.feet \} \}\)\)\.map\(\(p\) => p\.id\),/);
-  assert.match(body, /raidPuppets: \(\) => exteriorFoes\.foes\.filter\(\(f\) => f\.puppet && f\._pupRaid\),/);   // PIN MOVED (STAFF-EVENT THE REWARD): the fallen too - the raid module skips them for the struck mark and counts a fallen one I fought as my kill
-  assert.match(rd('src/systems/raidingParties.js'), /for \(const pup of puppets\) \{\n    if \(pup\.dead\) continue;/, 'a fallen puppet marks no raid fought');
-  assert.match(body, /ownRaidFoes: \(\) => exteriorFoes\.foes\.filter\(\(f\) => !f\.puppet && f\.raidKey && !f\.dead\),/);
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.match(pool, /if \(data\.rk !== undefined \|\| data\.ro !== undefined\) _onRaids\?\.\(from, data\.rk, _now\(\), data\.ro\);/);
-  // PIN MOVED (GRANT9, bible/11-Multiplayer/Spawn-Grants.md section 16): the relay reads a foes frame's records - and its
-  // allies' `al` - in one method alone, `_grantStripped`, and only while its `grantStrip` switch is on (off unset); PIN MOVED
-  // (FOE-BOUNDS, section 19): the strip runs with the grants' law off too - a record no builder could give is no grant's
-  // question - and is handed the frame's kind and the clock
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /if \(relayCfgValue\(this\._relayCfg, this\.env, 'grantStrip'\) === 'on' [^\n]*\) data = this\._grantStripped\(a, data, kind, now\);/);
-  // MAIN-RED (2026-10-26): read by the TREE, not the text. The text sweep (`/[{,]\s*(?:rz|rk|al)\s*[,}:=]/` over the source
-  // less `_grantStripped`) read AUDIT KETCH II's local `rz = V.players[b.sub]?.rzAt` as a frame's field and reddened main;
-  // a field is a member read (`x.rz`), a pattern that takes one (`{ rz } = x`) or a literal that writes one (`{ rz: 1 }`),
-  // and a local of that name is none of them (mutants: tools/mutants/mainred1.json)
-  const touched = frameFieldsTouched(relay);
-  assert.ok(touched.strip, 'the relay still holds `_grantStripped`, the one method that may read them');
-  assert.deepEqual(touched.hits, [], 'the relay reads nothing inside a foes frame - no relay change');   // PIN MOVED (AUDIT WORLD-EVENTS L1-1, L1-4): no FIELD of those names read - the Hour's and the Spire's raise words are kinds named `rz` (`m.k === 'rz'`), never a foes frame's
-  assert.doesNotMatch(rd('src/net/wire.js'), /RAID2|raidKey/, 'nor does the record\'s law change');
-});

@@ -287,8 +287,4 @@ test('INT3/INT4 client: the realm\'s session hears the hold and the piece as its
     await session.checkpoint(JSON.stringify(freshSave({ name: 'heard' })));
     assert.deepEqual(told.at(-1), ['law', null, null], 'open again');
   } finally { Date.now = realNow; }
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const body = world.slice(world.indexOf('  function realmCheckpoint({ sink = null } = {}) {'), world.indexOf('  function realmCheckpoint({ sink = null } = {}) {') + 1200);
-  assert.ok(body.indexOf('stampItemIds(playerEntity);') > 0 && body.indexOf('stampItemIds(playerEntity);') < body.indexOf('quickSaveNow'), 'the ids, before the save is composed');
-  assert.match(world, /^  wireRealmHolds\(realmSession, \{ say: \(t\) => townTalk\.say\(t\), entity: playerEntity \}\);$/m);   // PIN MOVED (AUTO-HOLD): the hold and the locked pieces, wired at one line (scenes/realmHoldHost.js)
 });

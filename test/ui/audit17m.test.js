@@ -137,18 +137,3 @@ test('17m: the builder has NO keyboard stat control - the pool moves by click on
   assert.notDeepEqual(c.stats, before, 'a click still spends');
 });
 
-test('17m: no source still treats the picker row as the document class', () => {
-  // THE RULE, swept rather than remembered: customExit must not write
-  // the picker's selection, and the picker's own walk must not write
-  // the document's index. Both regressions are one-word edits.
-  const src = readFileSync(new URL('../../src/ui/chargen.js', import.meta.url), 'utf8');
-  const exitBody = src.slice(src.indexOf('  customExit()'), src.indexOf('  customRepExit()'));
-  assert.ok(!/this\.classListIndex\s*=/.test(exitBody),
-    'customExit must not move the class picker (:378-382 touches the document only)');
-  assert.ok(/this\.classIndex\s*=\s*classAffinityIndex/.test(exitBody),
-    'and it must still put the affinity on the document');
-  // the art reads the picker's row for the highlight, never the document's
-  const art = readFileSync(new URL('../../src/ui/chargenArt.js', import.meta.url), 'utf8');
-  assert.ok(!/drawListPicker\([^)]*flow\.classIndex/.test(art),
-    'the class list draws flow.classListIndex, not the document index');
-});

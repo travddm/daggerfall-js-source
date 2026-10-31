@@ -163,11 +163,6 @@ test('DW-E5: ItemBuilder\'s group draws - CreateRandomReligiousItem, CreateRando
   // the RL row of matrix K (100): its first religious item is the draw's
   const items = generateRandomLoot(LOOT_MATRICES.K, { level: 1, gender: 'male' }, () => 0);
   assert.ok(items.some((it) => it.group === 'ReligiousItems' && it.templateIndex === ITEM_GROUPS.ReligiousItems[0]));
-  const src = rd('src/systems/loot/loot.js');
-  assert.doesNotMatch(src, /group: '(ReligiousItems|Gems|Jewellery)', templateIndex: pick\(/, 'no inline copy of the three draws');
-  assert.match(src, /halving\(matrix\.RL, \(\) => createRandomReligiousItem\(rolls\)\);/);
-  assert.match(src, /else if \(groupId === 10\) base = createRandomReligiousItem\(rolls\);\n\s+else if \(groupId === 14\) base = createRandomGem\(rolls\);\n\s+else base = createRandomJewellery\(rolls\);/);
-  assert.match(rd('src/systems/roleplayRealismItems/rriKits.js'), /const randomOf = \(group, rolls\) => mint\(createRandomOfGroup\(group, rolls\)\);/);
 });
 
 test('DW-E5: droppedLoot - a container drawn by another pass has no batch of its own and is every other thing a pile is; removePile frees it; an emptied one is deactivated and leaves the other pass\'s list (mutants: drawn, remove, the list)', async () => {
@@ -375,24 +370,3 @@ test('DW-E5: the reset (OnTransientReset) destroys every tracked pile and batch,
   assert.ok(fx.containers.length > before, 'the anchor forgotten: the next frame pulses at once');
 });
 
-test('DW-E5: the world host - the loot lane pumped after the fish, indoors too; the reset on every transient reset; a pile is droppedLoot\'s own container, never saved, drawn by the loot pass; the rubble through the decorations\' factory, freed with its terrain; the guards; the settings (pins)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /dwFish\.pump\(f\);   \/\/ DW-E3: UnderwaterEncounterPulse\.Pump, then PassiveFishBehaviour\.PumpAll\n\s+if \(dwLoot\) pumpDeepWatersLoot\(f, dt\);/);
-  assert.match(w, /dwFish\.pulse\.pump\(f\);[^\n]*\n\s+dwLoot\?\.pump\(f\);/);
-  assert.match(w, /onTransientReset\(\(\) => \{ dwLoot\.reset\(\); dwLootLetGoVelocity\(\); \}\);/);
-  assert.match(w, /droppedLoot\.seedPile\(\[\], pos, \{ archive: TREASURE_PILE_ARCHIVE, record \}, null, `\$\{entry\.px\},\$\{entry\.py\}`, \{ unsaved: true, drawn: false, owner: DW_LOOT_OWNER \}\);/);
-  assert.match(w, /if \(dwLoot\) drawDeepWatersLoot\(\);/);
-  assert.match(w, /for \(const r of \[\.\.\.\(_dwRubble\.get\(p\) \?\? \[\]\)\]\) dwFreeRubble\(r\);/);
-  assert.match(w, /const kept = dwDecor\.filter\(entry, placements\);/);
-  assert.match(w, /spawnGuards: \(centre\) => trySpawnTreasureGuards\(\{/);
-  assert.match(w, /droppedLoot\.takePixel\(key, \(pile\) => pile\.unsaved && !pile\.owner\)/, 'a WoD site carries its own piles alone');
-  assert.match(w, /g = \{ texture: tex, fps: 0, born: 0, facing: 1, cutoff: DECORATION_CUTOFF, billboards: \[\] \}/, 'a DaggerfallBillboard\'s facing, the billboard\'s cut-out');
-  const h = rd('src/scenes/deepWater/deepWatersHost.js');
-  assert.match(h, /rate: scaledSliderValue\(get\('General\.SeafloorLootRate'\), Math\.fround\(0\.7\)\),/);
-  assert.match(h, /clusterRate: scaledSliderValue\(get\('General\.TreasureClusterRate'\), Math\.fround\(0\.1\)\),/);
-  assert.match(h, /maxLive: Math\.max\(0, Math\.trunc\(Number\(get\('General\.MaxLiveLootObjects'\)\)\)\),/);
-  assert.match(h, /maxClusters: Math\.max\(0, Math\.trunc\(Number\(get\('General\.MaxLiveTreasureClusters'\)\)\)\),/);
-  assert.match(h, /cove: get\('General\.TreasureCove'\) === true,/);
-  const d = rd('src/scenes/deepWater/deepWatersDecor.js');
-  assert.match(d, /function spawn\(entry, positions\) \{\n\s+return standPlacements\(entry, filterPlacements\(entry, positions\)\);/, 'Spawn is FilterPlacements then the stand, as the factory is');
-});

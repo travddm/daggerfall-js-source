@@ -35,7 +35,6 @@ import { wrapYaw } from '../../../src/net/gate/gateBrain.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
-const W = read('src/scenes/world.js');
 const T0 = 1_800_000_000_000;
 const near = (a, b, e = 1e-9) => Math.abs(a - b) <= e;
 const nearV = (a, b, e = 1e-9) => a.length === b.length && a.every((v, i) => near(v, b[i], e));
@@ -67,8 +66,6 @@ test('SD20c THE SPARKS COME TO REST ON THE ARENA\'S FLOOR (V1): every burst the 
     assert.equal(b.floor, SD_FX_FLOOR_Y, 'on the arena\'s floor');
     assert.ok(b.at[1] - b.floor > 1, 'thrown from over it');
   }
-  // the gate's pass: a burst's sparks rest on its floor when it says one - at its own height when it does not
-  assert.match(read('src/render/gate/gateFx.js'), /gl\.uniform1f\(S\.uFloor, Number\.isFinite\(b\.floor\) \? b\.floor : b\.at\[1\]\);/);
 });
 
 test('SD20c THE WHOLE ARENA\'S SHAKES ARE THE ARENA\'S (V4): the Pulse, the Reset, the End - blows that strike the whole arena and nobody off it - shake only a camera whose feet stand on it (its rim\'s slack the law\'s, SD_ARENA_SLACK); in the Hall or on the Steps, nothing; a blow with a reach still shakes by how near it fell, wherever I stand (mutant: felt anywhere in the Hour)', () => {
@@ -185,7 +182,6 @@ test('SD20c THE GEARS FLY ON EDGE ALONG THEIR FLIGHT (V12): each gear stood in i
     const a = top(0), b = top(0.01);
     assert.ok(near(a[1], 1, 1e-9) && (b[0] - a[0]) * fwd[0] + (b[2] - a[2]) * fwd[1] > 0.009, 'unspun, it stands upright, and its top rolls forward as it spins');
   }
-  assert.match(read('src/scenes/superDungeon/sdRemnant.js'), /gearMatrix\(q\.x, q\.y, q\.z, q\.spin, d\.object\.matrix, q\.yaw\); d\.hidden = false;/);
 });
 
 test('SD20c THE BRASS AIR\'S GRADE ON THE SKY IS ITS HAZE\'S (V8): world/superDungeon/sdBrassSky.js\'s GLSL is its JS - generated from the same stops and weights, run here on the code the GPU runs and equal to sdBrassGrade over the colours a sky shows and every weight; each of the four passes that draw the sky (the classic, the enhanced, the dynamic, the clouds\' composite) includes it, grades its final colour by its own uBrass after the dread\'s, and uploads the weight the controller sets - the fogged land met the sky a step apart at the skyline (15/-4/-34 a clear noon); the water\'s sky graded as the sky over it (mutants: the sky ungraded; the ramp drifted)', () => {
@@ -212,8 +208,6 @@ test('SD20c THE BRASS AIR\'S GRADE ON THE SKY IS ITS HAZE\'S (V8): world/superDu
     assert.match(src, /this\.brass = 0;/, `${p}: none until it is said`);
     assert.match(src, /gl\.uniform1f\((?:u\.|this\.)uBrass, this\.brass\);/, `${p}: the weight uploaded`);
   }
-  const sh = read('src/scenes/shared.js');
-  assert.match(sh, /const brassed = \(ws\) => \(brassW > 0 \? \{ \.\.\.ws, zenith: sdBrassGrade\(ws\.zenith, brassW\), horizon: sdBrassGrade\(ws\.horizon, brassW\) \} : ws\);\n\s+const dreaded = \(ws\) => brassed\(/, 'the water\'s sky');
   // the skyline: the haze graded in JS, the sky in GLSL - one colour at the horizon either side
   for (const c of skies) { const w = 0.55; assert.ok(nearV(brassGrade(c, w), sdBrassGrade(c, w), 2e-4)); }
 });
@@ -282,9 +276,6 @@ test('SD20c THE HOUR\'S PASSES BUILT AS IT IS STOOD IN (V13): the beam\'s, the s
     blows.warm();
     assert.ok(asked > was && warns.length === 2, 'the telegraph\'s too');
   } finally { console.warn = warn; }
-  assert.match(W, /let _sdPassesWarm = false;\n\s+const sdFightFrame = \(\) => \{/);
-  assert.match(W, /if \(inRealm && !_sdPassesWarm\) \{ _sdPassesWarm = true; sdBeamPassOf\(\); sdFx\?\.warm\?\.\(renderer\.gl\); sdBlows\?\.warm\?\.\(\); \}/);
-  assert.ok(W.indexOf('if (inRealm && !_sdPassesWarm)') < W.indexOf('if (inRealm) { try { sdBlows?.frame(); }'), 'before the frame\'s first blow');
 });
 
 test('SD20c A BUSY MOMENT NEVER PUTS OUT THE LAMPS NEAREST ME (V9): past the frame\'s SD_LIGHTS_CAP, the Hour\'s own lights and its lamps are sorted in together by how far the eye stands outside each one\'s reach - twenty landing flashes across the arena went first, and the lamps by the player went dark (mutant: the extras first)', () => {

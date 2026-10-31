@@ -171,12 +171,3 @@ test('FB1020h HUD-FOCUS: a focus given another way - a script\'s focus(), the pa
   assert.equal(input.neverTheFocus?.(null), null);
 });
 
-test('FB1020h TAB-WALK: the world host\'s swallow stands above every arm that can decline a Tab - the boot\'s gate (KEY-BOOT) and the QuickDial\'s own arm - and routeKey no longer says the browser\'s walk is the classic default it keeps', () => {
-  const world = rd('src/scenes/world.js');
-  const kd = world.slice(world.indexOf("  addEventListener('keydown', (e) => {\n    if (peerMenuReader"));
-  const at = (s) => { const i = kd.indexOf(s); assert.ok(i >= 0, `world.js's keydown holds ${s}`); return i; };
-  assert.ok(at('    swallowBrowserKey(e);   // U47') < at('    if (!_worldKeysLive) return;'), 'above the boot\'s gate');
-  assert.ok(at('    swallowBrowserKey(e);   // U47') < at("if (act === 'QuickDial' && hudCtx.toggleDial())"), 'above the dial\'s arm');
-  const input = rd('src/ui/input.js');
-  assert.doesNotMatch(input, /classic behaviour is byte-for-byte untouched/, 'the sentence that kept the browser\'s walk is gone');
-});

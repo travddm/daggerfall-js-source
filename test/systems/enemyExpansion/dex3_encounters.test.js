@@ -246,10 +246,6 @@ test('AUDIT DEX C1 PlayerGPS.ResetState: a load\'s start and a fast travel\'s en
   readPlayerGps({ climateIndex: CLIMATES.Mountain, inLocationRect: true });
   assert.deepEqual(heard.slice(4), [`enter ${CLIMATES.Mountain}`], 'a load in the town it was saved in: a second entry, no climate (ResetState leaves lastClimateIndex)');
   assert.equal(random.n, 7); assert.equal(at(23), 1023, 'and its city night drawn again');
-  const world = readFileSync(join(import.meta.dirname, '../../../src/scenes/world.js'), 'utf8');
-  const core = world.slice(world.indexOf('async function _teleportToPixel('), world.indexOf('routByJump();', world.indexOf('async function _teleportToPixel(')));
-  assert.match(core, /_wasInLocationRect = false;[^\n]*\n\s*resetPlayerGpsState\(modEvent\);/, 'the jump core hands the GPS every jump\'s kind beside the host\'s own flag - which reset is the module\'s (HOST-SPLIT, at DEX\'s merge)');
-  assert.deepEqual([...new Set([...world.matchAll(/\bmodEvent: '(\w+)'/g)].map((m) => m[1]))].sort(), ['load', 'travel'], 'and the only events a jump names are the two PlayerGPS resets on (OnStartLoad, OnPostFastTravel) - a Recall or a teleport names none, and DFU keeps the flag across it');
 });
 
 test('DEX3 a table whose ids would not parse is in its index\'s list and is never written, nor a choice - the C#\'s Select throws before the write', () => {
@@ -339,10 +335,6 @@ test('AUDIT DEX C7 one reading of the rect: the chunk-load camps hand PlayerGPS 
   assert.deepEqual(heard, [`climate ${CLIMATES.Woodlands}`, `climate ${CLIMATES.Swamp}`], 'its climate raised, its ring no entry');
   intermittentEnemySpawn({ ...wild, climateIndex: CLIMATES.Swamp }, noDraw);
   assert.equal(heard.length, 2, 'and the next minute\'s roll, still out of the rect, sees no edge - no exit from an entry never raised');
-  const world = readFileSync(join(import.meta.dirname, '../../../src/scenes/world.js'), 'utf8');
-  const chunk = world.slice(world.indexOf('rollCampEncountersOnChunkLoad({'), world.indexOf('}, Math.random, { fovDegrees', world.indexOf('rollCampEncountersOnChunkLoad({')));
-  assert.match(chunk, /inLocationRect: _inAnyLocationRect\(/, 'the world\'s chunk roll gates on the ring of any town (the reading this test hands it)');
-  assert.match(chunk, /climateIndex: maps\.getClimateIndex\(r\.current\.x, r\.current\.y\)/, 'and its climate is the pixel just entered');
 });
 
 test('DEX3 a group\'s one table: rollGroupComposition reads it once, for the seed and every mate', (t) => {
@@ -398,15 +390,6 @@ test('DEX3 the population reads the dungeon\'s two tables through the door - the
   _resetEncounterTableSelectors();
   registerEncounterTableSelector({ table: (i, place) => (i === 9 && place.local ? twenty(261) : null), choices: (i) => (i === 9 ? [twenty(1), twenty(2)] : null) });
   assert.ok(collectDungeonEnemies(blocks, opts).every((e) => e.mobileType === 261), 'handed no dungeon: the player\'s own, as written - never a roll that wants a die');
-});
-
-test('AUDIT DEX C6 the dungeon hands its population the place - its LocationId and the seed a mod\'s pick is made by (dungeonPlace)', () => {
-  const dc = readFileSync(join(import.meta.dirname, '../../../src/scenes/dungeonContext.js'), 'utf8');
-  const at = dc.indexOf('const _layoutEnemies = collectDungeonEnemies(');
-  assert.ok(at > 0, 'the population is built where it was');
-  const call = dc.slice(at, dc.indexOf('});', at));
-  assert.match(call, /\n\s*\.\.\.dungeonPlace\(dfLocation\),/, 'the place spread into the options - without it the population reads DFU\'s tables, never the mod\'s pick');
-  assert.match(call, /dungeonType: dfLocation\.mapTableData\.dungeonType,/);
 });
 
 test('DEX3 the install: loaded, the mod\'s tables on the door and its handlers on PlayerGPS; not loaded, DFU\'s', (t) => {

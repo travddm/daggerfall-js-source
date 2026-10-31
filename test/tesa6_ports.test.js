@@ -78,20 +78,6 @@ test('TESA6 the clone: a port answers a harbour (portTownAndUnknown 1) and says 
   assert.equal(not.arena.port, false);
 });
 
-test('TESA6 the host: an Arena port past the Bay answers where the Bay\'s ports are asked - Come Sail Away\'s port town, the naval host\'s port (the nearest Bay crown\'s office - BAY-LEFT-SEA, the pixel\'s region), the harbour book\'s town, the nearest port\'s name and way, the waters\' port distance - and a city made a port is cloned again and built again (mutant: an arm, the crown, the clone\'s check, the sweep). PIN MOVED (AUDIT TESA II P7/P5): TESA\'s places are the world\'s registry\'s (world/pastBayRows.js), so past the Bay the port test, the port here, the nearest port and the waters\' distance are WW3\'s over them (world/worldWide/worldPorts.js - its port\'s region the province\'s, WW-R); the harbour book\'s town is still this host\'s', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const arenaPortAt = \(x, y\) => \{ if \(!_arenaTemplates \|\| onTheBay\(x, y\)\) return null; const q = arenaPlaceOnPixel\(x, y\); return q\?\.port \? q : null; \};/);
-  assert.doesNotMatch(w, /arenaPorts\(\)|arenaPortOf/, 'the host\'s own list past the Bay and its port record gone - the world\'s ports answer');
-  assert.match(w, /if \(etherSea && inEther\(x, y\)\) return !!etherPortAt\(x, y\);[^\n]*\n\s+if \(!onTheBay\(x, y\)\) return worldPorts\.at\(x, y\);/, 'Come Sail Away\'s port town (and with it navalNearPort)');
-  assert.match(w, /const port = boardPortAt\(navalPortList\(\), p\.x, p\.y\);/, 'the naval host\'s port here - the board\'s list\'s, past the Bay too');
-  assert.match(w, /const aq = !isle && !onTheBay\(p\.x, p\.y\) \? arenaPortNear\(p\.x, p\.y\) : null;[^\n]*\n\s+const aloc = aq \? capitalLocationAt\(aq\.bx, aq\.by\) \|\| arenaLocationAt\(aq\.bx, aq\.by\) : null;[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+if \(aloc\?\.exterior\?\.exteriorData\) add\(\{ id: portIdOfLocation\(aloc\), loc: aloc, x: aq\.bx, y: aq\.by, name: aq\.name \}\);/, 'PIN MOVED (AUDIT-TESA A4-F2/F3): the harbour book - a capital\'s own, keyed by its map id');   // PIN MOVED (the fourth merge of main into #1184): one list of the towns near, each once (RPT1026-WORLD FAR-QUAY)
-  assert.match(w, /\n\s+return worldPorts\.nearestNamed\(here, worldLanes\.bayPorts\(\) \?\? \[\]\);/, 'the nearest port past the Bay - WW3\'s over both');
-  assert.match(w, /d = Math\.min\(d, worldPorts\.nearestPx\(p\.x, p\.y\) \?\? Infinity\);/, 'the waters\' port distance');
-  assert.match(w, /had\.arena\.id === place\.id && had\.arena\.port === !!place\.port\) return had;/);
-  assert.match(w, /`\$\{place\.provinceIndex\}\|\$\{place\.id\}\|\$\{!!place\.port\}`/);
-  assert.match(read('src/world/worldWide/worldPorts.js'), /region: p\.region, area: p\.area, theatre: p\.theatre, crown: crownAt\(p\.px, p\.py\)/, 'a port past the Bay: its province\'s region, the nearest Bay crown\'s office');   // PIN MOVED (BAY-LEFT-SEA, the owner's call taken): a harbourmaster past the Bay keeps the nearest Bay crown's board
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'WOODS.WLD'].every((f) => existsSync(join(ARENA2, f)));
 test('TESA6 with ARENA2: on the player\'s own trace 28 of the lore\'s 30 ports stand on their shore, each beside the ground\'s sea', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

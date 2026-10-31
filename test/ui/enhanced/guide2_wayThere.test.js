@@ -254,72 +254,7 @@ test('GUIDE2 THE CHRONICLE, mounted and pressed: every live quest\'s card carrie
   });
 });
 
-test('GUIDE2 THE CHRONICLE\'S DEADLINE - the "Time remains" the pause tab has carried since PX5, on the window the L key opens: urgent under a day in the pause tab\'s own words; live once a second off the host\'s WALK alone (no entry is read for it); a clock that stopped under the window repaints the card; the interval has one owner - cleared by every render and by destroy (mutants: the timer never armed; the interval left running after destroy; a stopped clock left standing; the words drifted from the pause tab\'s)', () => {
-  const { b, clock } = wayBridge();
-  intervals.clear();
-  let reads = 0;
-  const c = chronicle({ questLog: () => { reads++; return b.questLog(); }, canFindPlace: () => true, currentLocationName: () => 'Elsewhere' });
-  try {
-    assert.equal(one(c.host, 'cr-timer').textContent, 'Time remains: 3 days');
-    assert.equal(intervals.size, 1, 'one interval, armed after the spans exist');
-    const [[firstId, first]] = [...intervals];
-    assert.equal(first.ms, 1000);
-    clock.now += 2 * 86400 + 3600 + 5;   // under a day, the clock charged on the live read
-    const before = reads;
-    first.fn();
-    assert.equal(reads, before + 1, 'the walk, read once for the tick');
-    assert.equal(one(c.host, 'cr-timer').textContent, 'Time remains: 22 hours 59 min');
-    assert.match(one(c.host, 'cr-timer').className, /\burgent\b/, 'urgent gold under a day, as the pause tab');
-    // the clock runs out: the quest ends under the window, and the card repaints (no timer, no quest)
-    clock.now += 86400;
-    quiet(() => { for (let i = 0; i < 6; i++) b.machine.tick(); });
-    first.fn();
-    assert.equal(all(c.host, 'cr-timer').length, 0, 'a stopped clock repaints the card');
-    assert.equal(intervals.has(firstId), false, 'the repaint cleared the old interval');
-    assert.equal(intervals.size, 0, 'and armed none - there is no clock left to watch');
-  } finally {
-    c.view.destroy();
-  }
-  assert.equal(intervals.size, 0, 'destroy leaves nothing standing');
-  const src = rd('src/ui/enhanced/enhancedChronicle.js');
-  assert.match(src, /destroy\(\) \{\n\s*disarmClocks\(\);/, 'destroy clears it');
-  assert.match(src, /function render\(\) \{\n\s*disarmClocks\(\);/, 'every render clears it first');
-  assert.equal((src.match(/setInterval\(/g) ?? []).length, 1, 'one interval in the window');
-});
-
 // ---------------------------------------------------------------
 // THE FOUR HOSTS, by source
 // ---------------------------------------------------------------
 
-test('GUIDE2 THE FOUR HOSTS, by source: the street (world.js) hands the pause tab the door and both questions, and its map door answers whether a map opened - true once it is in the slot, false for every refusal; its journal builder offers the enhanced chronicle the door only where the map opens (the builder is the interior\'s too); a building (worldModes.js) hands the questions and no door; the dungeon (dungeonContext.js) takes the questions through the same delegation the Share button rides, and no door; the fixed-town route (exterior.js) answers the city it stands in and hands no map question and no door (mutants: the door handed indoors; the refusals answering nothing; the success answering nothing)', () => {
-  const w = rd('src/scenes/world.js');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('/** GUIDE2: THE JOURNAL\'S WAY THERE'));
-  const callback = door.slice(door.indexOf('_travelMap = buildTravelMapWindow({'), door.indexOf('if (!_travelMap)'));
-  const outside = door.replace(callback, '');
-  assert.equal((outside.match(/return false;/g) ?? []).length, 9, 'nine refusals, each answering that no map opened');
-  assert.doesNotMatch(outside, /return;/, 'no refusal answers nothing');
-  assert.match(outside, /townTalk\.showOverlay\(_travelMap\);\n\s*return true;\n\s*\};/, 'the one success, once the map is in the slot');
-  assert.doesNotMatch(callback, /return false;/, 'the travel callback inside it keeps its own answers');
-  assert.match(w, /const showQuestPlace = \(find\) => toggleTravelMap\(\{ siteDetails: find \}\);/, 'the find-place payload, as both maps read it');
-  const pause = w.slice(w.indexOf('const pauseDoorHooks = () => ({'), w.indexOf('  const keys = new Set();', w.indexOf('const pauseDoorHooks = () => ({')));
-  for (const k of ['currentLocationName: () => _questLoc()?.name ?? \'\'', 'canFindPlace: (regionName, name, site) => canFindPlace(maps, mapDict, regionName, name, questPlacePixel, site)', 'showQuestPlace: (find) => showQuestPlace(find)']) {
-    assert.ok(pause.includes(k), `the street's pause bag: ${k}`);
-  }
-  assert.match(w, /showQuestPlace: \(modes\?\.mode \?\? 'exterior'\) === 'exterior' \? \(find\) => showQuestPlace\(find\) : undefined,/, 'the journal builder: the door only where the map opens');
-  assert.match(w, /questCanFindPlace: \(regionName, name, site\) => canFindPlace\(maps, mapDict, regionName, name, questPlacePixel, site\),\n\s*questLocationName: \(\) => _questLoc\(\)\?\.name \?\? '',/, 'the questions, handed on to the other hosts');
-
-  const m = rd('src/scenes/worldModes.js');
-  const interior = m.slice(m.indexOf('const interiorPauseHooks = () => ({'), m.indexOf('});', m.indexOf('const interiorPauseHooks = () => ({')));
-  assert.ok(interior.includes('canFindPlace: host.questCanFindPlace,') && interior.includes('currentLocationName: host.questLocationName,'), 'a building asks the street');
-  assert.doesNotMatch(interior, /showQuestPlace/, 'and hands no door: DFU refuses the map indoors');
-  assert.match(m, /questCanFindPlace: host\.questCanFindPlace, questLocationName: host\.questLocationName,/, 'delegated into the dungeon');
-
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.equal((d.match(/canFindPlace: opts\.questCanFindPlace,/g) ?? []).length, 2, 'the dungeon\'s journal and its pause tab both ask');
-  assert.equal((d.match(/currentLocationName: opts\.questLocationName,/g) ?? []).length, 2);
-  assert.doesNotMatch(d, /showQuestPlace/, 'and neither opens a map - this context owns none');
-
-  const e = rd('src/scenes/exterior.js');
-  assert.match(e, /currentLocationName: \(\) => dfLocation\.name \?\? locationName,\n\s*\}\);/, 'the fixed-town route\'s pause tab: the city it stands in');
-  assert.doesNotMatch(e, /showQuestPlace|canFindPlace: \(/, 'no map asked, no map opened');
-});

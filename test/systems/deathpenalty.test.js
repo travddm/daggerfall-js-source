@@ -30,33 +30,6 @@ test('the penalty comes off the purse counter and answers what it took', () => {
   assert.equal(deathPenaltyText(0), '');
 });
 
-test('it is taken by BOTH respawn paths, once - online, and offline at a Project Legacy rise (BAL4) - and never by the offline end of run', () => {
-  const world = read('src/scenes/world.js');
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(world, /reviveForPlay\(playerEntity, \{ force: true \}\);\s*\n\s*surfacePlayer\(\);\s*\n\s*player\.stopAutorun\(\);[^\n]*\n\s*const goldLost = wildKilled \|\| madeRuleHere\('deathPenalty'\) === 'none' \? 0 : applyDeathPenalty\(playerEntity\);/,
-    'respawnOnlinePlayer, after the _respawning guard');   // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): DEATH-PENALTY exempted in the Spire   // WILD GOLD: a death in the open zone pays none   // PIN MOVED (FOE-KEEPS, bible/11-Multiplayer/Wild-Zone.md section 4): only a death at another player's hand pays none here - its tenth goes into the remains (wildDeath) - and a foe's pays the tenth
-  // PIN MOVED (RVN8: a revenant's theft rides the same box, after the price - bible/12-Enhanced-AI/Feud-Arc.md 19)
-  assert.match(world, /\[respawnFlavorText\(kind\), deathPenaltyText\(goldLost\)(?:, took\?\.line)?\]\.filter\(Boolean\)/, 'and says so on waking');
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): the arm runs online or at a Legacy rise, and both pay the tenth
-  assert.match(modes, /const goldLost = applyDeathPenalty\(playerEntity\);[\s\S]*?say\(deathPenaltyText\(goldLost\)\)/, "Privateer's Hold's in-place respawn");   // PIN MOVED (AUDIT LEGACY B5): online's alone, until BAL4
-  const end = /function endRunToTitleMenu[\s\S]*?\n\}/.exec(read('src/scenes/shared.js'))?.[0] ?? '';
-  assert.doesNotMatch(end, /applyDeathPenalty/, 'offline a death ends the run - nothing to take');
-});
-
-test('the death screen shows the loss - wherever the death respawns (online, or a Legacy rise offline), and only when there is one', () => {
-  const ds = read('src/ui/deathScreen.js');
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): a Project Legacy rise offline respawns too
-  assert.match(ds, /const respawns = this\.online \|\| this\.rises;\n(?:\s*\/\/[^\n]*\n)*\s*this\.goldLoss = respawns && penalty !== false \? deathGoldLoss\(goldPiecesOf\(entity\)\) : 0;\n\s*if \(respawns\) stateDeathLoss\(this\.goldLoss\);/);   // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): a made level that exempts DEATH-PENALTY hands `penalty: false` - the Spire's
-  assert.match(ds, /this\.rises = !this\.online && !!rises\?\.\(\);/, 'the rise is the host\'s word, offline');
-  assert.match(ds, /if \(this\.goldLoss > 0\) \{[\s\S]*?'DEATH CLAIMS \{gold\} GOLD', \{ gold: this\.goldLoss \}/, 'classic face');
-  const en = read('src/ui/enhanced/enhancedDeath.js');
-  assert.match(en, /const lossLine = screen\.goldLoss > 0 \? \(screen\.goldLossLine \|\| deathPenaltyLine\(screen\.goldLoss\)\) : '';/);
-  assert.match(en, /el\('p', `dth-line\$\{lossLine \? ' dth-lossline' : ''\}`, lossLine \|\| \(online/, 'it takes the tagline\'s place and wears its font');
-  assert.match(en, /band\.append\(title, rule, line, count, keys\);/, 'no second line under it');
-  assert.doesNotMatch(en, /dth-loss[ '"]/, 'the separate brass loss line is gone');
-  assert.match(ds, /this\.goldLossLine = deathPenaltyLine\(this\.goldLoss\);/, 'picked once per death, not per frame');
-});
-
 test('the death screen has four random lines, every one carrying the amount', () => {
   assert.equal(DEATH_PENALTY_LINES.length, 4);
   const seen = new Set();

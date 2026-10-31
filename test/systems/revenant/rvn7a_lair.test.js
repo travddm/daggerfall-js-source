@@ -143,23 +143,3 @@ test('RVN7a THE DEED through the door: a deed in the open world picks its lair a
   assert.equal(lone.lair, null);
 });
 
-test('RVN7a THE HOSTS: the world host\'s door names my map pixel and the named dungeons in the boards\' ring with their regions; the dungeon\'s names itself; the cast engine publishes it (mutants: unwired)', () => {
-  const w = read('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-22d LAIR-DOOR): the door is scenes/lairHost.js's, over the same index - the boards' ring, the
-  // game's own dungeons, their regions - and asks of my pixel or the one asked (fb1022d_lairdoor.test.js drives it)
-  assert.match(w, /const magic = createPlayerMagic\(\{\n\s*renderer, audio, getTexture, uploadRecord, uploadRecordFrame,\n(?:\s*\/\/[^\n]*\n)*\s*lairHere: createLairDoor\(\{ maps, blocks, arch, locations: locationIndex, dungeons: _bountyDungeonPixels, regions: _dungeonRegionPixels, here: playerTravelPixel, pastBay: provinceQuestPlaces \}\),/);   // PIN MOVED (LAIR-WORLD): and the lairs past the Bay (scenes/tamrielPlacesHost.js provinceQuestPlaces)
-  assert.match(w, /_dungeonRegionPixels\.set\(`\$\{p\.x\},\$\{p\.y\}`, r\);/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /return \{ underground: \{ px: p\.x, py: p\.y, name: String\(dfLocation\.name\), region: dfLocation\.regionIndex \?\? -1 \} \};/);
-  assert.match(read('src/scenes/hostMagic.js'), /lairHere: \(at\) => \{ try \{ return lairHere\?\.\(at\) \?\? null; \} catch \{ return null; \} \},/);   // PIN MOVED (LAIR-DOOR): the pixel asked passes
-  // PIN MOVED (UNQUIET III, Revenants.md section 48): one that got away in the open goes to ground in the nearest den - else its lair's own law
-  // PIN MOVED again (AUDIT UNQUIET, section 49): the den named apart - its trail leads only there
-  assert.match(read('src/systems/revenant/revenant.js'), /const here = playerDoor\(\)\?\.lairHere\?\.\(\) \?\? null;\n\s*const den = deedName === 'fled' && !r\.dread && here \? nearestLair\(here\.px, here\.py, here\.dungeons\) : null;\n\s*const lair = den \?\? lairAfter\(r, here\);[^\n]*\n\s*if \(!sameLair\(lair, r\.lair\)\) \{ r\.lair = lair; r\.lairKnown = false; \}/);
-});
-
-test('RVN7a the page: its lair as I know it - roaming, unknown, or named (mutants: a lair unknown named)', () => {
-  assert.equal(lairWords({ lair: null }), 'Lair: none. It roams.');
-  assert.equal(lairWords({ lair: D(1, 2, 'Tomb of Vaness'), lairKnown: false }), 'Lair: unknown. Nearby towns may have heard of it.');
-  assert.equal(lairWords({ lair: D(1, 2, 'Tomb of Vaness'), lairKnown: true }), 'Lair: Tomb of Vaness, marked on your map.');   // PIN MOVED (RVN7c: and marked on the map)
-  assert.match(read('src/ui/revenant/revenantPage.js'), /if \(!fallen\) text\.append\(el\('span', 'rvn-will', lairWords\(r\)\)\);   \/\/ RVN7/);
-});

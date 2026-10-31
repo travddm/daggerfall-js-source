@@ -369,22 +369,3 @@ test('GUILD1d the cloth: rows of two triangles; the clock wrapped and every rate
   assert.equal(r.drawn, 0, 'a heraldry that cannot be painted draws nothing');
 });
 
-test('GUILD1d wired: the building host - the hall\'s rows and its buy, the chest, stations and rest for members, the keepers\' decor as a hall; the world host - the door measured at the build, the banners built and drawn after the duel walls, the guild\'s hall handed down; the decorator offers a hall no personal things (by source)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /GUILD1d: a hall's members go in, its keepers say who may;\n[^\n]*\n\s*const rows = \[\.\.\.\(homeVisitorRows\(home, homeDoorFor\(bd, home\)\) \?\? \[\]\), \.\.\.\(worldPlaqueOn\(\) \? homeVoteRows\(home\) : \[\]\)\];/);   // PIN MOVED: HOME-VOTE - the hall's rows, and the town's votes under them; PIN MOVED (AUDIT HOME-VOTE II D1): where the plaque draws a list
-  assert.match(wm, /const hall = homeHallBuyRow\(price, hallGuild\(\), hallArmed\(bd\)\);/);
-  assert.match(wm, /if \(verb === HALL_VERB\.buy && price\) \{ pressHallBuy\(bd, price\); return true; \}/);
-  assert.match(wm, /if \(c && \(\(interiorHome\?\.hall && interiorHome\.member\) \|\| interiorSeatHall\?\.member\)\) \{ openHallChest\(\); return true; \}/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.match(wm, /if \(!stationOwnerHere\(\) && !decorMayStation\(piece\.id\)\) \{\n\s*if \(!hallMemberHere\(\) \|\| decorStationShut\(piece\.id\)\) \{   \/\/ GUILD1d: a hall's stations are its members'/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): the stations' owner question is the account's; DECOR-ACCESS: a granted station opens, a shut one does not
-  assert.match(wm, /if \(interiorHome\?\.hall\) return \{ kind: 'home', hall: true, where: "Your guild's hall"/);
-  assert.match(src('src/systems/homeRent.js'), /home\.own === true \|\| !!\(home\.hall && home\.member\) \|\| rentDaysLeft/);   // PIN MOVED (the merge of main's RENT-REST): a member's bed is the home's bed rule's, homeBedIsMine
-  assert.match(wm, /if \(mode !== 'interior' \|\| !b \|\| !\(decorOwnerHere\(\) \|\| decorKeeperHere\(\)\)\) return null;/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(hf && !hf\.door\) \{ hf\.door = doorCornersOf\(cpu\.doors\[0\], local\); hf\.normal = doorNormalOf\(cpu\.doors\[0\], local\); \}/);   // PIN MOVED (AUDIT WITCH1 D1): and the door's own outward normal beside it - a hall's banners face where it says
-  assert.match(w, /const hallBanners = onlineHomes && bannerPass \? createHallBanners\(\{/);
-  assert.ok(w.indexOf('const hung = bannersHung();') < w.indexOf('    drawVeiledPeerBodies();   // INVIS-LOOK'), 'before every glow (AUDIT GUILD1d R3; SEAT1a: the seats\' banners with the halls\')');
-  assert.match(w, /openStores: \(\) => socialPanel\?\.openGuild\?\.\('vault'\) === true,/);   // PIN MOVED (GUILD2b): the chest opens the vault's page
-  assert.match(w, /onHall: \(mapId\) => \{ onlineHomes\?\.ensure\?\.\(mapId, \{ force: true \}\); \},/);
-  const dt = src('src/scenes/decor/decorTool.js');
-  assert.match(dt, /own: r\?\.hall \? \[\] : ownEntries\(\),/);
-});

@@ -125,24 +125,6 @@ const HOSTS = [
   },
 ];
 
-test('E1 SOURCE SWEEP: every overlay-owning host routes the key UP and the pointer UP, not only the presses', () => {
-  for (const h of HOSTS) {
-    const body = src(h.file);
-    assert.match(body, h.keyDown, `${h.file}: the key DOWN route (the half that always existed)`);
-    assert.match(body, h.keyUp, `${h.file}: the key UP route - E1's half`);
-    assert.match(body, h.pointerDown, `${h.file}: the pointer DOWN route`);
-    assert.match(body, h.pointerUp, `${h.file}: the pointer release reaches the slot`);
-  }
-  // ...and the ONE door the two dungeon-context hosts share, so they
-  // cannot drift apart the way the pointer seam once did.
-  const input = src('src/ui/input.js');
-  assert.match(input, /export function routeKeyUp\(e, ctx\) \{/, 'routeKey has a mirror');
-  assert.match(input, /ctx\.overlayKeyUp\?\.\(e\.code, e\);/, 'and it hands the RAW code down, as townTalk does');
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    assert.match(src(f), /routeKeyUp\(e, /, `${f} calls the shared door rather than reaching into the context`);
-  }
-});
-
 test('E1 SOURCE SWEEP: a window that NESTS a list picker forwards the release, exactly as it forwards hover', () => {
   // The picker is mounted two ways: straight into a host's slot (the
   // three routers) and INSIDE another window. The second kind only

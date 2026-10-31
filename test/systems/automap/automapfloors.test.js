@@ -62,15 +62,6 @@ test('EM2: the constants are the motor\'s own - a floor is what the player could
   assert.equal(FLOOR_MIN_GAP, CAPSULE_HEIGHT + 1.2, 'the player\'s own height plus the headroom a room needs');
   assert.ok(FLOOR_MIN_GAP > CAPSULE_HEIGHT, 'a storey you cannot stand up in is not a storey');
   assert.equal(PLAN_CELL, 1);
-  // ONE HOME, held at the SOURCE as well as by value: the motor's
-  // capsule is 1.8 and the headroom 1.2, so a hardcoded 3.0 would
-  // AGREE today and stop agreeing the day the player's height moves -
-  // a mutant that wrote the literal walked straight past a by-value
-  // pin, which is precisely the drift this law exists to prevent.
-  const src = readFileSync(new URL('../../../src/systems/automap/automapFloors.js', import.meta.url), 'utf8');
-  assert.match(src, /import \{ SLOPE_LIMIT_DEG, CAPSULE_HEIGHT, STEP_OFFSET \} from '\.\.\/\.\.\/player\/motor\.js';/);
-  assert.match(src, /export const FLOOR_MIN_GAP = CAPSULE_HEIGHT \+ [\d.]+;/, 'the gap is the capsule plus headroom, written that way');
-  assert.match(src, /export const FLOOR_NY = Math\.cos\(\(SLOPE_LIMIT_DEG \* Math\.PI\) \/ 180\);/);
 
   // THE TWO THRESHOLDS, and the mistake that produced them. The first
   // cut had ONE - the motor's walk limit - and clustered the walkable

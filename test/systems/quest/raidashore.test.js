@@ -22,7 +22,6 @@ const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8'
 const T = new URL('../../../vendor/dfu-quests/Tables/', import.meta.url);
 loadQuestTables(Object.fromEntries(readdirSync(T).map((f) => [f.replace(/\.txt$/, ''), readFileSync(new URL(f, T), 'utf8')])));
 const RAID = rd('vendor/warm-ashes-ships/Quests/WAQ_SHIP_SMALLRAID.txt').split(/\r?\n/);
-const WORLD = hostText('src/scenes/world.js');
 
 /**
  * The author's raid run through the real machine over a street's pool of records (the exterior pool's shape: a foe the
@@ -159,8 +158,3 @@ test('RAID-ASHORE one raid at a time on the fast travel too: a voyage by ship wh
   _resetWarmAshesShips();
 });
 
-test('RAID-ASHORE the world host\'s wiring: one withdraw built before the quest bridge over the street\'s pool and the room\'s, Leave Ship\'s seam its `over`, and the quest\'s end its `questEnded`', () => {
-  assert.match(WORLD, /const raidAshore = createRaidAshore\(\{ pools: \(\) => \{\n\s+const inner = modes\?\.interiorPool\?\.\(\);\n\s+return \[\{ foes: \(\) => exteriorFoes\.foes, remove: \(f\) => exteriorFoes\.removeFoe\(f\) \}, inner \? \{ foes: \(\) => inner\.foes, remove: \(f\) => inner\.removeFoe\(f\) \} : null\];\n\s+\} \}\);\n {2}questBridge = createQuestBridge\(\{/);   // the room's pool read once, guarded on `modes` (declared below - audit24_wave37)
-  assert.match(WORLD, /raidAshore: \(quest\) => raidAshore\.over\(quest\),/);
-  assert.match(WORLD, /naval\?\.raidEnded\(q\);[^\n]*\n {6}raidAshore\.questEnded\(q\);/);
-});

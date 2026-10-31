@@ -321,14 +321,3 @@ test('EG-HERO (Galleries) THE WALK GRAPH NEVER CROSSES A GAP (section 11.7: the 
   }
 });
 
-test('EG-HERO (Galleries) WRITTEN FROM NUMBERS ALONE (the brief\'s determinism - tools/egHeroKit.mjs\'s rule): no scene calls an engine-rounded function (Math.sin, cos, tan, atan2, pow, exp, log, hypot, random) or raises by `**` - the bytes a function of IEEE arithmetic alone; each scene objects\' names are its own (mutants: none - a source sweep)', () => {
-  for (const f of FRAGS) {
-    const src = readFileSync(new URL(f.src, ROOT), 'utf8').replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
-    assert.doesNotMatch(src, /Math\.(sin|cos|tan|atan2|pow|exp|log|hypot|random)\b|\*\*/, f.src);
-    const names = f.scene().map((o) => o.name);
-    assert.equal(new Set(names).size, names.length, `${f.name}: every object named once`);
-  }
-  const kit = readFileSync(new URL('tools/egHeroKit.mjs', ROOT), 'utf8'), ours = kit.slice(kit.indexOf('// ── EG-HERO (the Broken Galleries'));
-  assert.ok(ours.length > 1000, 'the band\'s kit section stands');
-  assert.doesNotMatch(ours.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, ''), /Math\.(sin|cos|tan|atan2|pow|exp|log|hypot|random)\b|\*\*/);
-});

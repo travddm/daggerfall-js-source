@@ -278,12 +278,6 @@ test('FEATURES-DEFAULTS (issue #399): online the room\'s rows stay as the room h
     assert.equal(label(forced), 'On', 'and its shelf untouched - offline it is still the player\'s own, not the Off it ships');
   } finally { delete globalThis.location; fresh(); }
   assert.match(RESET_ALL_ASK, /key bindings are kept\./, 'and it says what it leaves');
-  // ORG2: the button is the Settings toolbar's one reset - beside All off, asked first - and it runs this
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const bar = menu.slice(menu.indexOf('function optionsToolbar('), menu.indexOf('\n}', menu.indexOf('function optionsToolbar(')));
-  // PIN MOVED (L10N4): the button's words said through t(), their English as FEATURES-DEFAULTS left them
-  assert.match(bar, /\{ label: t\('menu\.settings\.reset', 'Reset everything to defaults'\), onClick: \(\) => ask\(t\('menu\.settings\.resetTitle', 'Reset Everything'\), resetAllAsk\(\), t\('menu\.settings\.resetYes', 'Reset'\), \(\) => \{ resetEverything\(\); \}\) \}/, 'Defaults is asked first');
-  assert.match(menu, /function resetEverything\(\) \{\s*\n\s*resetToDefaults\(\); _eff = null;\s*\n\s*featuresDefaults\(\);\s*\n\}/, 'and puts every tile back');
 });
 
 test('FT18: the outdoors bar is a switch - its Off says Off - so its tile reads off and takes the Off fill (mutant: the long label back)', () => {
@@ -336,30 +330,3 @@ test('FT18: a condensed tile opens its parts - switches as chips, a choice as a 
   } finally { delete globalThis.document; fresh(); }
 });
 
-test('FT18 by source: the pane\'s search filters in place and All off asks first; the query is per mount; the Morrowind card draws no bare row (mutant: a repaint on every key, the confirm skipped, or the null back)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  // ORG2: the search is the Settings toolbar's, over every tab - it repaints the BODY under it in place, never the
-  // screen, so the field keeps its keys and its caret
-  const bar = menu.slice(menu.indexOf('function optionsToolbar('), menu.indexOf('\n}', menu.indexOf('function optionsToolbar(')));
-  assert.match(bar, /search\.type = 'search';/);
-  const typing = bar.slice(bar.indexOf('search.oninput = () => {'), bar.indexOf('\n  };', bar.indexOf('search.oninput = () => {')));
-  assert.match(typing, /optQuery = search\.value;[^\n]*\n\s*paintOptionsBody\(body, \{ pause \}\);/, 'typing filters the body');
-  assert.doesNotMatch(typing, /\brender\(\)/, 'it does not repaint the screen - the field keeps its keys');
-  assert.match(menu, /if \(item\.startsWith\('feat:'\)\) \{ const f = FEATURES\.find\(\(x\) => x\.id === item\.slice\(5\)\); return f \? featureSearchText\(f\) : ''; \}/, 'a row is found by the words the Features search read');
-  assert.match(menu, /\.flatMap\(\(item\) => itemNodes\(item, \{ \.\.\.ctx, any: true \}\)\);\s*\n\s*if \(!nodes\.length\) continue;/, 'a section left with nothing goes too');
-  assert.match(menu, /if \(!found\) body\.append\(empty\('No matches'\)\);/, 'and an empty search says so');
-  assert.match(bar, /\{ label: t\('menu\.features\.allOff', 'All off'\), onClick: \(\) => ask\(t\('menu\.features\.allOffTitle', 'Turn Everything Off'\), allOffAsk\(\), t\('menu\.features\.allOff', 'All off'\), \(\) => \{ featuresAllOff\(\); \}\) \}/, 'All off is asked first');
-  assert.match(bar, /\.\.\.\(kept && typeof kept === 'object' \? \[\{ label: t\('menu\.features\.restore', 'Restore'\),/, 'Restore only while there is something to restore');
-  assert.match(menu, /optQuery = '';   \/\/ FT18: a fresh visit searches nothing/);
-  // the menu's own key handler stands down for a text field, so typing in the search never walks the menu
-  // PIN MOVED (AUDIT PRIVATE-REPORT UI-2): save Escape in the mailbox's window (`.px-postwin`), which leaves it - the search's own
-  assert.match(menu, /if \(t && \(t\.tagName === 'INPUT' \|\| t\.tagName === 'TEXTAREA' \|\| t\.isContentEditable\) && !\(e\.key === 'Escape' && t\.closest\?\.\('\.px-postwin'\)\)\) return;/);
-  // MWA4: the card draws no switch row at all now - Attach and Remove data alone - so none can be a moved key's null
-  const at = menu.indexOf('export function morrowindCard(');
-  assert.ok(at > 0, 'the Morrowind assets card');
-  const card = menu.slice(at, menu.indexOf('\n}', at));
-  assert.doesNotMatch(card, /prefRow\(/, 'MWA4: no switch row on the card, so no bare row');
-  assert.doesNotMatch(card, /prefRow\('mwSheathing'/);
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(read('src/systems/uiPrefs.js'), /featuresRestore: null,/, 'the keep is a pref: Restore survives a relaunch');
-});

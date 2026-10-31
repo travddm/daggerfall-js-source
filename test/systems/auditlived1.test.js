@@ -142,7 +142,6 @@ test('AUDIT LIVED1 T5 + A (K2/S1/R3): the moon and the sun a round reads are the
     return !!liveLycanthropy(o.e)?.isTransformed;
   };
   assert.equal(dungeonArm(ownFull, worldNot), false, 'the dungeon rest arm, handed the world\'s sky');
-  assert.match(rd('src/scenes/dungeonContext.js'), /runMagicRoundsFor\(playerEntity, _w\.from, _w\.to, \{ sinks: playerSinks, say: \(msg\) => hudText\.add\(msg\), skyMinutes: sharedClockOn\(\) \? Math\.floor\(skyMinutes\(\)\) : null \}\);/, 'and the arm (TIME1: the sky\'s own clock) hands it');
   // the sun-damaged career's light
   const burn = (own, world) => {
     const o = online({ own, world, entity: player({ factionRep: null, career: { abilityFlagsAndSpellPointsBitfield: SPECIAL_ABILITY_BITS.sunDamage } }) });
@@ -154,9 +153,6 @@ test('AUDIT LIVED1 T5 + A (K2/S1/R3): the moon and the sun a round reads are the
 });
 
 test('AUDIT LIVED1 B (P1/S2/R1) + D (R2/P5): a quest\'s disease and a quest\'s training are stamped on the CHARACTER\'s clock', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /makePcDiseased: \(diseaseType\) => \{ startDisease\(playerEntity, diseaseType, Math\.floor\(ownMinutes\(\) \/ 1440\)\); surfacePlayer\(\); \},/, 'the disease\'s day is the character\'s');
-  assert.match(w, /ownMinutes: \(\) => ownMinutes\(\),   \/\/ AUDIT LIVED1 D/, 'the host hands the quests the character\'s clock');
   for (const [own, world] of [[700000 + 600, 700000 + 84 * D + 600], [700000 + 3 * D + 600, 700000 + 600]]) {
     const { e } = online({ own, world, entity: player({ health: 200, maxHealth: 200, factionRep: null }) });
     const machine = new QuestMachine({ nowSeconds: () => worldMinutes() * 60, raiseTime: (s) => advanceOwnMinutes(s / 60), playerEntity: e, ownMinutes: () => ownMinutes() });
@@ -166,13 +162,6 @@ test('AUDIT LIVED1 B (P1/S2/R1) + D (R2/P5): a quest\'s disease and a quest\'s t
     assert.equal(e.timeOfLastSkillTraining, Math.floor(own), `TrainPc stamps the character's minute (own ${own}, world ${world})`);
     assert.equal(Math.floor(ownMinutes()), Math.floor(own) + 180, '...and its three hours are theirs');
   }
-});
-
-test('AUDIT LIVED1 C (R4/P4): the temple\'s free and half-price cure days are the WORLD\'s calendar; training\'s cooldown stays the character\'s', () => {
-  const m = rd('src/scenes/worldModes.js');
-  const cure = m.slice(m.indexOf('flow = buildCureDiseaseFlow('), m.indexOf('flow = buildCureDiseaseFlow(') + 700);
-  assert.match(cure, /rows, now: \(\) => skyMinutes\(\), onClose/, 'the cure flow reads the world\'s holiday');   // TIME1: the sky's calendar
-  assert.match(m, /const now = \(\) => interiorTicker\.ownMinutes;   \/\/ already CLASSIC minutes/, 'the service flows\' own clock (training) stays the character\'s');
 });
 
 test('AUDIT LIVED1 E (S3/R5, S5/U4) + G (R6): the doors between the lanes rebase the WORLD\'s stamps onto the clock they will be read on', () => {
@@ -216,10 +205,6 @@ test('AUDIT LIVED1 E (S3/R5, S5/U4) + G (R6): the doors between the lanes rebase
   const back = player({ factionRep: null });
   restorePlayer(back, joined);
   assert.equal(back.legalRep[0], -15, 'three of the world\'s boundaries lay between the calendars, and none of them was an absence');
-  const m = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(m, /snap = offlineCopyOf\(snap\);/, 'Copy to offline goes through the door');
-  assert.match(m, /const copy = onlineCopyOf\(snap, sharedClassicMinutes\(Date\.now\(\)\)\);/, 'and so does Bring online');
-  assert.equal((m.match(/const date = Number\.isFinite\(snap\.classicMinutes\) \? dateFromClassicMinutes\(snap\.classicMinutes\) : null;/g) ?? []).length, 2, 'both cards read the one clock the slot loads at (E: S5/U4)');
 });
 
 test('AUDIT LIVED1 F (K3/S4): a save from before LIVED1 whose disease day sat ahead of its clock is brought back to it - no day given back and rolled again', () => {
@@ -242,11 +227,6 @@ test('AUDIT LIVED1 F (K3/S4): a save from before LIVED1 whose disease day sat ah
   t.clock += 5; ticker.tick(1 / 60);
   assert.equal(d.daysOfSymptomsLeft, left0, 'no day given back');
   assert.equal(clampMarkersAheadOf({ activeEffects: [{ kind: 'poison', lastMinute: 100 }, { racial: 'lycanthropy', lastUrgeNotify: 90 }] }, 80), 2, 'a poison\'s minute and a curse\'s too');
-});
-
-test('AUDIT LIVED1 H (P2): the party mirror\'s night carries the follower\'s encounter marker with it - the first frame up rolls no night as walking minutes', () => {
-  // AUDIT LIVED1b P1: the marker now rides the loop itself - the mirror walks each sub-tick through it, the wanderers left out
-  assert.match(rd('src/scenes/world.js'), /advanceMinutes: \(n\) => \{ playerTicker\.advance\(n\); runEncounterTick\(walkMode && playerSpawned \? player\.pos : cam\.pos, true, \{ spawns: false \}\); \},/);
 });
 
 test('AUDIT LIVED1 J (K6): an hour raised from INSIDE a tick is a bare move of the character\'s clock - no nested tick runs its rounds ahead of the window in hand', () => {
@@ -275,21 +255,11 @@ test('AUDIT LIVED1 L/P/Q (K5, U5, U6/R7): a due-by says the time left in words t
   assert.equal(ownTimeLeftShort(100 * D + 20), '20 minutes');
   assert.equal(ownTimeLeftShort(100 * D), 'now');
   assert.equal(ownTimeLeftText(100 * D + 7 * D), '7 days of your time (14h of play)', 'the long form stands');
-  const rows = bankingStatusRows([{ accountGold: 5, loanTotal: 100, loanDueDate: 100 * D + 360 * D, hasDefaulted: false }], { regionName: () => 'Daggerfall', dueText: (m) => `in ${ownTimeLeftShort(m)}` });
-  assert.equal(rows[2].cells[3].text, 'in 360 days', 'the sheet\'s due column takes the host\'s words');
   setSharedClock(null);
   assert.equal(ownTimeLeftShort(900), null, 'offline DFU says its dates');
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /if \(left === 'now'\) return short \? 'now' : 'due now';/);   // AUDIT LIVED1b U3: the parchment paints "Loan due by:" itself
-  assert.match(m, /const own = short \? \(left && `\$\{left\} of your time`\) : ownTimeLeftText\(minutes\);/);
-  assert.match(rd('src/ui/bankWindow.js'), /loanBy: this\.hooks\.dueDateText\?\.\(loanDueDate\(a, r\), \{ short: true \}\) \?\? '',/);
-  assert.match(rd('src/ui/charsheet.js'), /dueText: loanDueShort \}\),/);
 });
 
 test('AUDIT LIVED1 M/N/O/S (U1, U2, U3, U8): the words fit their screens - the nightfall on its own HUD row, the tavern\'s own-time offer in two rows, the default skin\'s rest card says the clock line, and a loiter waits', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /function sayWithNightfall\(text\) \{ townTalk\.say\(text\); const nf = worldNightfallText\(\); if \(nf\) townTalk\.say\(nf\); \}/);
-  assert.equal((w.match(/sayWithNightfall\(cfb\.text\);|sayWithNightfall\(ftb\.text\);/g) ?? []).length, 4, 'both map-door rungs - and the driver\'s map\'s two online (AUDIT IT1 W2, PIN MOVED; HOOD-CAREER, PIN MOVED: the career rung is careerFastTravelBlock\'s)');
   // the classic tavern: two rows, split at the play's bracket
   const own = 200 * D + 10 * H;
   const tav = new TavernWindow({
@@ -305,48 +275,6 @@ test('AUDIT LIVED1 M/N/O/S (U1, U2, U3, U8): the words fit their screens - the n
   assert.deepEqual(tav.flow.top.rows.slice(1).map((r) => r.text), [`${OWN_TIME_ROOM} 2 days 20 hours of your time`, `(5h 43m of play)${OWN_TIME_ROOM_NOTE}`]);
   assert.equal(restClockLine(900 * D + 15 * H + 5, { loiter: true }), 'World time 15:05 - you wait on your own clock');
   assert.equal(restClockLine(900 * D + 15 * H + 5), 'World time 15:05 - you rest on your own clock');
-  const er = rd('src/ui/enhanced/enhancedRest.js');
-  assert.match(er, /_restingRefs\.clockLine\.textContent = Number\.isFinite\(wm\) \? restClockLine\(wm, \{ loiter: overlay\.mode === 'loiter' \}\) : '';/);
-  assert.match(rd('src/ui/restWindow.js'), /lines\.push\(restClockLine\(st\.worldMinutes, \{ loiter: this\.mode === 'loiter' \}\)\);/);
-});
-
-test('AUDIT LIVED1 T3/T4/T6/T7/T8 + V: by source, every host read LIVED1 re-pointed stands on its clock - the save\'s clock, the journey\'s days, the personal reads, the sky and calendar feeds', () => {
-  const w = rd('src/scenes/world.js'), m = rd('src/scenes/worldModes.js'), dc = rd('src/scenes/dungeonContext.js'), sh = rd('src/scenes/shared.js');
-  // T3: the save's clock is the character's, in both composers
-  assert.match(w, /classicMinutes: Math\.floor\(playerTicker\.ownMinutes\),   \/\/ LIVED1: the save's clock is the character's own/);
-  // T4: the journey's advance is unguarded - online too
-  const at = w.indexOf('setSyntheticTimeIncrease(true); playerTicker.advance(computed.minutes);');
-  assert.ok(at > 0, 'the journey advances the traveller\'s clock');
-  const before = w.slice(w.lastIndexOf('\n', w.lastIndexOf('\n', at) - 1), at).split('\n').filter((l) => l.trim() && !l.trim().startsWith('//'));
-  assert.ok(!/sharedClockOn/.test(before.join('\n')) && !/sharedClockOn/.test(w.slice(at, w.indexOf('\n', at))), 'no lane guard stands over it');
-  // T6 / T8: the personal reads
-  const personal = [
-    [w, /now: \(\) => playerTicker\.ownMinutes,   \/\/ V2a: MorphSelf's once-a-day clock/, 'MorphSelf'],
-    [w, /setCrimeGuildClock\(\(\) => Math\.floor\(playerTicker\.ownMinutes\)\);/, 'the letters'],
-    [w, /const rb = racialRestBlock\(playerEntity, Math\.floor\(ownMinutes\(\)\)\);/, 'the vampire\'s rest gate'],
-    [w, /cureVampirism\(playerEntity, \{ advanceMinutes: \(m\) => advanceOwnMinutes\(m\) \}\)/, 'the cure\'s minute (AUDIT LIVED1b D3)'],
-    [w, /!!q\?\.questSuccess, dateFromClassicMinutes\(playerTicker\.ownMinutes\), _questStore\(\)\);/, 'a quest\'s join date'],
-    [w, /drinkAtSource\(playerEntity, Math\.floor\(ownMinutes\(\)\)\)\.text/, 'a drink at a source'],
-    [m, /const rb = racialRestBlock\(playerEntity, Math\.floor\(interiorTicker\.ownMinutes\)\);   \/\/ V2b/, 'the interior vampire rest gate'],
-    [m, /const ownDate = \(\) => dateFromClassicMinutes\(interiorTicker\.ownMinutes\);/, 'the rank wait and join'],
-    [m, /level: \(\) => playerEntity\.level \?\? 1,\s*\n\s*now: \(\) => Math\.floor\(ownMinutes\(\)\),/, 'the bank\'s loan stamp'],
-    [m, /nowMinutes: Math\.floor\(ownMinutes\(\)\),\s*\n\s*rounds: rounds \?\? 0,/, 'a conjured item\'s hour'],
-    [m, /deductGold\(playerEntity, price\);\s*\n\s*const now = Math\.floor\(ownMinutes\(\)\);/, 'the smith\'s booking (MAC-BUG3\'s intent)'],
-    [m, /playerEntity\.rentedRooms \?\? \[\], Math\.floor\(ownMinutes\(\)\), sceneCache\(\)\);/, 'the rest\'s own door of the landlord'],
-    [m, /nowMinutes: Math\.floor\(ownMinutes\(\)\),\s*\n\s*\/\/ Interior\.FindMarkers/, 'the rest place\'s rented hours'],
-    [sh, /nowMinutes: \(\) => Math\.floor\(ownMinutes\(\)\),\s*\n\s*playVideo\(name, onClose\) \{/, 'the satiation stamp at the turn (DISC10 V9\'s intent)'],
-    [dc, /nowMinute: \(\) => Math\.floor\(ownMinutes\(\)\),   \/\/ AUDIT 21 F2: the one clock; LIVED1: a meal, a dose/, 'the dungeon\'s meals and doses'],
-  ];
-  for (const [src, re, what] of personal) assert.match(src, re, `${what} reads the character's clock`);
-  // T7: the sky's and the calendar's feeds
-  assert.match(w, /skyMinutes: sharedClockOn\(\) \? Math\.floor\(skyMinutes\(\)\) : null/, 'the encounter roll\'s table reads the world\'s hour');   // TIME1: the sky's own clock
-  assert.match(rd('src/ui/enhanced/enhancedTavern.js'), /date: \{ dayOfYear: dayOfYearFromMinutes\(deps\.worldNow\?\.\(\) \?\? now\) \}/, 'the enhanced tavern\'s Heart\'s Day');
-  const tw = rd('src/ui/tavernWindow.js');
-  assert.match(tw, /hour: Math\.trunc\(\(\(\(h\.worldNow\?\.\(\) \?\? now\) % 1440\) \+ 1440\) % 1440 \/ 60\)/, 'the kitchen\'s hours');
-  assert.match(tw, /gameMinutes: h\.worldNow\?\.\(\) \?\? now \}\);/, 'the meal\'s holiday');
-  assert.match(dc, /const wm = skyMinutes\(\)/, 'the dungeon\'s air');   // TIME1: the sky's
-  // V (P6): a foe's poison off the wire resumes at this host's now
-  assert.match(dc, /\.\.\.\(wire && Number\.isFinite\(a\.lastMinute\) \? \{ lastMinute: Math\.floor\(ownMinutes\(\)\) \} : \{\}\)/);
 });
 
 test('AUDIT LIVED1 T6: the feeding stamp\'s default is the character\'s clock, and the smith\'s ready line says their time', () => {

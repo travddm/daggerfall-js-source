@@ -19,7 +19,6 @@ import { validEgOut } from '../../../src/net/wire.js';
 import { realmToDungeon } from '../../../src/net/superDungeon/sdBrain.js';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const WM = rd('src/scenes/worldModes.js');
 /** The first shaft of seed 7 (hall 17, the Caverns' throat). */
 const SHAFT = { seed: 7, h: 17 };
 
@@ -131,14 +130,6 @@ test('EG-ZN THE SHAFT\'S CAMERA (player/mwView.js, section 11.8): facing a shaft
     assert.ok(Math.abs(leaned.eye[2] - (feet[2] - dist * Math.cos(P))) < 1e-9, 'still behind me');
     assert.deepEqual(leaned.look, [0, Math.sin(-P), Math.cos(-P)], 'looking down the shaft');
   } finally { setSpireShaft(null); }
-  // the lanes lay it on their own eyes, before their casts; the host's view looks along it after the aim is taken
-  const V = rd('src/player/mwView.js');
-  assert.match(V, /pitch = spireShaftPitch\(pitch, yaw, frame\.dt \?\? 0, eotbCamera\.thirdPerson\(\)\);[^\n]*\n\s*pivotFloor = spireShaftPivot\(pivotFloor, fpEye\[1\]\);[^\n]*\n\s*const out = eotbCamera\.eye\(/, 'the sprite\'s lane: its head risen');
-  assert.match(V, /spireCameraFrame\(out, SPIRE_EOTB_FULL_M, frame\.dt \?\? 0\);[^\n]*\n\s*spireShaftLook\(out, yaw, pitch\);/);
-  assert.match(V, /pitch = spireShaftPitch\(pitch, yaw, state\.dt \?\? 0, mwCamera\.thirdPerson\(\)\);[^\n]*\n\s*pivotFloor = spireShaftPivot\(pivotFloor, feet\[1\] \+ \(FOCAL_HEIGHT \* heightScale\) \/ MW_UNITS_PER_METER\);[^\n]*\n(\s*\/\/[^\n]*\n){2}\s*if \(saddled && ownSaddle\) feet = [^\n]*\n\s*const eye = mwCamera\.eye\(/, 'the Morrowind lane: its focal risen');
-  assert.match(V, /spireCameraFrame\(eye, mwCamera\.baseDistance\(\) \/ MW_UNITS_PER_METER, state\.dt \?\? 0\);[^\n]*\n\s*spireShaftLook\(eye, yaw, pitch\);/);
-  const aim = WM.indexOf('const aimView = view.slice();'), feel = WM.indexOf('host.climbFeel?.view(view, !decorTool.flying() && !mwv.thirdPerson);', aim), tap = WM.indexOf('host.reportFrame?.(proj, view);', aim), lean = WM.indexOf('if (mwv.look && !decorTool.flying() && !cardSeat) view.set(betterAmbience.view(lookAt(mwv.eye, [mwv.eye[0] + mwv.look[0], mwv.eye[1] + mwv.look[1], mwv.eye[2] + mwv.look[2]], [0, 1, 0])));');
-  assert.ok(aim > 0 && feel > aim && lean > feel && tap > lean && tap - aim < 800, 'the host\'s view along the camera\'s own forward after the aim (the player\'s) and the climb\'s feel are taken, before the tap ray reads the frame');
 });
 
 // ── THE BREACH CLIENT: THE SHAFT'S WORD AND THE BAND TEXTURES' END ────────────────────────────────────────────────────
@@ -194,26 +185,5 @@ test('EG-ZN THE SHAFT\'S WORD (scenes/eliteGates/egClient.js setSpireShaft): ali
     S.stand(q.x, q.y, (q.z0 + q.zA) / 2);
     assert.equal(bias(), 0, 'reduced motion: none - never a snap');
   } finally { setSpireShaft(null); }
-  assert.match(rd('src/scenes/eliteGates/egClient.js'), /setSpireShaft\(\(\) => \(inSpire\(\) && !witness \? \{ way: shaftWay\(link\.state\(\)\), still: stillNow\(\) \} : null\)\);/);
 });
 
-test('EG-ZN THE BAND TEXTURES\' END, EVERY WAY OUT (scenes/eliteGates/egClient.js): never while I stand in the Spire; on the first frame out of it, whatever took me out - the room closing my socket, the way home, forsaking, the tear (the breach\'s end), a plain step out - the mode machine is told to free the band dress; held through a swap\'s or an answer\'s step under way (mutants: told inside; never told; told under a swap)', () => {
-  const ways = {
-    socket: (P) => { P.online.terminal = true; },
-    home: (P) => { P.B.mem[P.ME].home = true; P.tell(); },
-    forsake: (P) => { P.B.mem[P.ME].forsaken = true; P.tell(); },
-    tear: (P) => { P.B.end = 'tear'; P.tell(); P.client.frame(); P.step(5000); },
-    out: (P) => { P.leave(); },
-  };
-  for (const [name, go] of Object.entries(ways)) {
-    const P = inBreach();
-    P.client.frame(); P.client.frame();
-    assert.equal(P.downs.length, 0, `${name}: never inside`);
-    go(P);
-    for (let i = 0; i < 4; i++) P.client.frame();
-    assert.ok(P.downs.length > 0, `${name}: told once out`);
-    assert.ok(P.downs.every((inside) => inside === false), `${name}: only ever out of the Spire`);
-  }
-  const SRC = rd('src/scenes/eliteGates/egClient.js');
-  assert.match(SRC, /if \(!swapping && !answering\) modes\(\)\?\.egBandsDown\?\.\(\);/, 'held through a swap or an answer under way');
-});

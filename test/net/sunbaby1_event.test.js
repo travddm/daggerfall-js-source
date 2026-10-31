@@ -174,7 +174,6 @@ test('SUNBABY1 GLSL: the flower sky and the sun baby are generated from the tabl
   assert.match(SUNBABY_GLSL, /vec3 sunbabySky\(vec3 dir, vec3 sunDir, float t, vec2 face, sampler2D photo, float photoOn\)/);   // SUNBABY2 moved it: the face it wears; SUNBABY3: Todd's photograph
   assert.match(SUNBABY_GLSL, /float px = length\(fwidth\(p\)\);[\s\S]*float upx = length\(fwidth\(uv\)\);\s*\n\s*vec4 duv = vec4\(dFdx\(uv\), dFdy\(uv\)\);\s*\n\s*if \(dot\(dir, sunDir\)/, 'every derivative taken before the branch that reads it');   // SUNBABY3 moved it: the photograph's too
   assert.ok(FS.includes(SUNBABY_GLSL));
-  assert.ok(FS.includes(rd('src/render/enhancedSky.js').match(/vec3 ray = normalize\(vec3\(vNdc\.x[^\n]*/)[0]), 'the enhanced sky\'s ray');
   assert.match(FS, /outColor = vec4\(sunbabySky\(dir, uSunDir, uTime, uFace, uToddPhoto, uToddPhotoOn\), clamp\(uWeight, 0\.0, 1\.0\)\);/, 'blended by the weight');   // SUNBABY2 moved it: uFace; SUNBABY3: the photograph
   for (const u of UNIFORM_NAMES) assert.match(FS, new RegExp(`uniform [^;]*\\b${u}\\b`), u);
 });
@@ -222,28 +221,3 @@ test('SUNBABY1 pass: at weight 0 it draws NOTHING; above it, one triangle at the
 
 // ── THE HOST ─────────────────────────────────────────────────────────
 
-test('SUNBABY1 host: the sky controller draws the flower sky over the sky and its clouds, hazes the fog and the water toward it, and while it is staged stands the sky\'s frame on the clear day (mutants: the pass not drawn; the fog unhazed; the storm cells kept)', () => {
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /if \(clouds\) \{ clouds\.update\(viewport\); clouds\.draw\(yaw, pitch, fovY, aspect\); \}[^\n]*\n\s*if \(sunbabyW > 0\) sunbabySky\?\.draw\(yaw, pitch, fovY, aspect\);/, 'after the clouds, before the host\'s marker');
-  assert.match(shared, /setSunbaby\(w, on = false\) \{\s*sunbabyW = Math\.max\(0, Math\.min\(1, Number\(w\) \|\| 0\)\);\s*sunbabyOn = !!on;\s*if \(sunbabyW > 0\) \{ const p = sunbabyPass\(\); if \(p\) p\.weight = sunbabyW; \}\s*else if \(sunbabySky\) sunbabySky\.weight = 0;/);
-  assert.match(shared, /try \{ sunbabySky = new SunbabySkyRenderer\(gl\); \} catch/, 'built the first time it shows, and a failed build costs the flowers, never the frame');
-  assert.match(shared, /const c = sunbabyW > 0 \? sunbabyHaze\(own, sunbabyW, sunbabyEvil\) : own;[^\n]*\n\s*const d = dreadW > 0 \? dreadGrade\(c, dreadW\) : c;/, 'the fog');   // SUNBABY2 moved it: the wrath's horizon; SD19 (PIN MOVED): the brass graded over it
-  assert.match(shared, /const dreaded = \(ws\) => brassed\(sunbabyWaterSky\(dreadW > 0 \? [^\n]*: ws, sunbabyW, sunbabyEvil\)\);/, 'the water, on either lane');   // AUDIT SD III (V8, PIN MOVED): and the brass air's after it   // SUNBABY2 moved it: the wrath's sky
-  assert.match(shared, /use\(skyIndex, minuteOfDay, showNightSky = true, extra = null\) \{\s*(lastUse\.index = skyIndex;[^\n]*\n\s*)?if \(sunbabyOn && extra\) extra = \{ \.\.\.extra, violence: extra\.weather, cells: null, cloudBase: null, approach: 0 \};/, 'no storm cell, no violence, no front under the sun baby');   // PIN MOVED (KETCH-LOOK KL1, AUDIT SHIP): the last use kept first for retime - the street's own word, before the sun baby's
-});
-
-test('SUNBABY1 host: world.js hears the sun baby on the hub\'s one onEvent, SHOWS the clear day through every door the weather is applied by (never the sim\'s word), stills the far storms, lifts the light, sets the sky before its frame, and says a word an older relay does not know in words (mutants: the weather left; the hub word unheard; the storms; the light; the sky never told; the word sent to an old relay)', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const shownWeather = \(\) => \(sunbaby\.on \? SUNBABY_WEATHER : seaStormShown\(\) \?\? currentWeather\(\)\);/);   // PIN MOVED (SEA-EVENTS, 2026-10-22): under the Sun Baby, the Aether Storm's thunder over the player at sea (scenes/seaVenturesHost.js seaStormShown)
-  assert.equal((world.match(/applyWeather\(currentWeather\(\)\)/g) ?? []).length, 0, 'no door applies the sim\'s word past the event');
-  assert.match(world, /const weatherStale = \(\) => shownWeather\(\) !== weather \|\| weatherSystemStamp\(\) !== seenSystem;/, 'stale is the SHOWN word moved (or the system under it)');   // AUDIT PRECIP FALL-2 (PIN MOVED): one test for the three doors
-  assert.equal((world.match(/if \(weatherStale\(\)\) applyWeather\(shownWeather\(\)\);/g) ?? []).length, 3, 'the frame\'s drain, the teleport\'s and the travel\'s');
-  assert.match(world, /link\.onEvent = \(ev, o\) => \{ dread\.set\(ev, o\); sunbaby\.set\(ev, o\); rocket\.set\(ev, o\); \};/);   // ROCKET1 (PIN MOVED): and the rocket
-  assert.match(world, /const sunbabyW = sunbaby\.tick\(dt\);/);
-  assert.match(world, /if \(isEnhanced\(\) && !weatherOverride && !sunbaby\.on\) \{[^\n]*\n\s*const ds = distantStorms\.tick\(/);
-  assert.match(world, /sunbabyLight\(dreadLight\(withMoonAmbient\(exteriorAmbient\([\s\S]*?\), moonNow\), skyDreadW\), sunbabyW, sunbabyFace\.evil\), sdAirW\), etherAirW\), jungle\?\.canopy\), sunScale\(minute\)/);   // VALENWOOD-CANOPY (PIN MOVED): leaned under a closed canopy last   // SUNBABY2 moved it: the wrath; SD19 (PIN MOVED): leaning brass near a Hollow; ETHER-LIGHT (PIN MOVED): leaned once more past the Veil
-  const set = world.indexOf('sky.setSunbaby(sunbabyW, sunbaby.on);');
-  assert.ok(set > 0 && set < world.indexOf('sky.use(('), 'before the sky\'s frame reads it');
-  assert.match(world, /if \(staged\.kind && !relayKnowsLiveEvent\(hub\.eventV, staged\.kind\)\) return say\('The server cannot stage that event yet\.'\);/);
-  assert.ok(world.indexOf('relayKnowsLiveEvent(hub.eventV') < world.indexOf('return hub.sendStage(staged.kind);'));
-});

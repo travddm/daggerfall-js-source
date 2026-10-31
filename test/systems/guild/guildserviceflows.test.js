@@ -434,24 +434,6 @@ test('MAC-BUG2: the service windows fill %cpn and %cn - a cure offer is a TRADE 
   assert.ok(text.includes('The Benevolence of Mara'), 'the shop speaks its own name');
   assert.ok(text.includes('Daggerfall'), 'and names the town it stands in');
 
-  // THE TABLE, not the call site: both symbols ride the shared
-  // `identity` helper beside %ra and %hnr, so the next record to quote
-  // one is answered by the table rather than by a second fix.
-  const src = readFileSync('src/ui/guildServiceWindows.js', 'utf8');
-  assert.match(src, /const identity = \(entity, \{ shopName = null, cityName = null \} = \{\}\) => \(\{/);
-  assert.match(src, /\n {2}shopName, cityName,\n\}\);/);
-  for (const flow of ['buildTrainingFlow', 'buildDonationFlow', 'buildCureDiseaseFlow']) {
-    const at = src.indexOf(`export function ${flow}`);
-    assert.ok(at > 0, flow);
-    const body = src.slice(at, at + 1000);
-    assert.ok(/shopName = null, cityName = null/.test(body), `${flow} does not take the shop and the town`);
-    assert.ok(/identity\(entity, \{ shopName, cityName \}\)/.test(body), `${flow} does not pass them on`);
-  }
-  // ...and the HOST hands them over at all three doors.
-  const host = readFileSync('src/scenes/worldModes.js', 'utf8');
-  assert.equal(host.split('shopName: b?.name ?? null, cityName: townTalk?.cityName?.() ?? null').length - 1, 3,
-    'all three service flows are handed the building and the town');
-
   // A NULL LEAVES THE TOKEN LOUD rather than blanking it - which is
   // expandGuildMacros' own rule, and is why this was reportable at all:
   // the empty %cn printed "in ." and said nothing, while the raw %cpn

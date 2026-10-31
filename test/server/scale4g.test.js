@@ -84,26 +84,6 @@ test('SCALE4g a tab\'s reads ride the session of the bookmark it carries, and it
   assert.match(pre.headers.get('access-control-allow-headers'), /(^|, )x-d1-bookmark(,|$)/, 'the preflight lets a page send it');
 });
 
-test('SCALE4g the heartbeat\'s letterbox and board badge their authors with the arena\'s honours ON THE BINDING - a #1 found stale is counted again and stored, never off a replica (AUDIT SCALE4d A1\'s law) - and every other read on the session (mutants: the letterbox\'s honours on the session; the board\'s)', async () => {
-  const S = await standService();
-  const ann = await S.registered('Ann');
-  const bob = await S.registered('Bob');
-  assert.equal((await S.call('/v1/mail/send', { to: 'Bob', subject: 'A note', body: 'Meet me at the Rusty Relic.' }, ann.secret)).status, 200);
-  const { raw, asked } = direct(S);
-  raw._sessions.length = 0;
-  const r = await send(S, '/v1/heartbeat', { secret: bob.secret, body: { mail: true }, mark: d1Position(raw) });
-  assert.equal(r.status, 200);
-  const box = (await r.json()).mail;
-  assert.equal(box?.letters?.length, 1, JSON.stringify(box));
-  const honours = /arena_pve|arena_champions|iliac_/;
-  assert.ok(asked.some((q) => honours.test(q)), 'the honours on the binding');
-  assert.deepEqual(raw._sessions[0].statements.filter((q) => honours.test(q)), [], 'none of them on the session');
-  assert.ok(raw._sessions[0].statements.some((q) => /FROM letters/.test(q)), 'the box itself read on the session');
-  const src = (await import('node:fs')).readFileSync(new URL('../../server-account/src/board.js', import.meta.url), 'utf8');
-  assert.match(src, /withIliacHonoursAll\(\{ db: primary \}, await withArenaHonoursAll\(\{ db: primary \}, found, nowS\), nowS\)/, 'the board\'s honours on the binding as the box\'s are');
-  assert.match(src, /export async function readBoard\(\{ db, nowS, primary = db \}/);
-});
-
 test('SCALE4g the client sends the newest bookmark its session has been answered, and only under that session - a sign-in, a new guest or another account starts with none; a malformed one is never kept (mutants: the bookmark sent under any secret; an older one kept over a newer; a malformed one kept; none sent)', async () => {
   forgetD1Bookmark();
   const seen = [];

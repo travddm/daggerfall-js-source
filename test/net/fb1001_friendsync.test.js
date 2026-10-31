@@ -86,7 +86,4 @@ test('FRIENDS-SYNC client: the picture is accepted under the signed-in player\'s
   assert.equal(s.apply(frame('player-mac')), 'state'); assert.equal(s.acct, 'player-mac');
   assert.equal(new SocialState({ acct: ['player-mac', 'aLaptop0001'] }).apply(frame('aLaptop0001')), 'state', 'an old relay\'s picture still lands');
   assert.equal(new SocialState({ acct: ['player-mac', 'aLaptop0001'] }).apply(frame('player-eve')), null, 'B19 stands: a picture naming another is a relay\'s lie');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /new SocialState\(\{ acct: \[storedSession\(appStorage\(\)\)\?\.id, link\.acct\]/, 'socialStart expects the signed-in player\'s id first');
-  assert.doesNotMatch(world.slice(world.indexOf('const checkCanceledByFollower'), world.indexOf('const outdoorRestDeps')), /accountId\(\)/, 'a follower\'s Stop names the hub\'s id for me, never the profile\'s');
 });

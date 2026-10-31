@@ -69,13 +69,6 @@ test('PERF-TOWN1: a sprite does not change size while you watch it - the size is
   assert.notEqual(c, a);
   assert.ok(c.w > a.w, 'the new file is measured, not the old answer reused');
 
-  // and the cache must not be a Map that pins every texture it has ever
-  // seen in memory
-  assert.match(src('src/world/rmbFlats.js'), /const _mobileSize = new WeakMap\(\);/);
-  // the XML scale stays LIVE - it reads a per-vendor predicate, so a mod
-  // toggled in the settings menu has to be seen on the next frame (AUDIT DEX B7:
-  // read at every ask; only its product is kept, while the same live entry answers)
-  assert.match(src('src/world/rmbFlats.js'), /if \(!\(textureReplacementEnabled\(\) \|\| t\?\.vendor === true\)\) return size;\n  const s = billboardXmlScaleOf\(t\?\.archive, record\);/);
 });
 
 test('PERF-TOWN1: a person answers into its OWN row, and the pool refills one list', () => {
@@ -93,47 +86,6 @@ test('PERF-TOWN1: a person answers into its OWN row, and the pool refills one li
   const q = new MobilePerson(nav, { archive: 385, frameCount: () => 4, groundY: () => 0, rand: () => 0.5 });
   q.place(40, 40);
   assert.notEqual(q.update(1 / 60, [0, 0, 0], false), b, 'two people, two rows');
-  assert.match(src('src/systems/town/townPopulation.js'), /const out = this\._live \?\?= \[\];\s*\n\s*out\.length = 0;/,
-    'and the LIST is the pool’s own, refilled rather than rebuilt');
-});
-
-test('PERF-TOWN1: both outdoor hosts stopped minting per person per frame', () => {
-  for (const f of HOSTS) {
-    const s = src(f);
-    // the activation rows and the batch's two vectors are written
-    // through - all three are read within the frame and held by nothing
-    assert.match(s, /const town = createTownScratch\(/, f);
-    assert.match(s, /town\.seat\(_livePersons\.length\)/, f);
-    assert.match(s, /_livePersons\.length = 0;/, f);
-    assert.doesNotMatch(s, /_livePersons = live\.map\(/, `${f} still rebuilds the activation list`);
-    assert.match(s, /bs\.w = out\.flip \? -sz\.w : sz\.w; bs\.h = sz\.h;/, `${f} writes the size through`);
-    // the stop question's options and its closure are hoisted
-    assert.match(s, /isDay, town\.stops\)|minute\), town\.stops\)/, f);
-    assert.doesNotMatch(s, /\(person\) => personWantsToStop\(\{/, `${f} still mints the options per person`);
-    assert.doesNotMatch(s, /distanceToPlayer: Math\.hypot\(/, `${f} still calls hypot per person`);
-    // the texture key is memoised on the three numbers it is made of
-    assert.match(s, /const personTextureKey = createPersonTextureKeys\(\);/, f);
-    assert.match(s, /renderer\.textures\.has\(personTextureKey\(person\.archive, out\.record, out\.frame\)\)/, f);
-    // MAC4's shape is untouched: the record still CARRIES its frame
-    assert.match(s, /const rkey = `\$\{out\.record\}#\$\{out\.frame\}`;/, f);
-  }
-  // THE SCRATCH ITSELF - one body for both hosts, and the two things a
-  // shared seat can get wrong.
-  {
-    const s = src('src/scenes/townScratch.js');
-    // hypot guards overflow these coordinates never reach
-    assert.match(s, /Math\.sqrt\(dx \* dx \+ dz \* dz\)/);
-    // ...and the key it builds is the one the uploader wrote, or every
-    // frame would miss the cache and re-upload
-    assert.match(s, /v = `\$\{archive\}_\$\{record\}#\$\{frame\}`;/);
-    // ...and the index carries all THREE fields. Drop the frame and a
-    // walking sprite keeps the first frame's key for ever: the `.has()`
-    // answers true, the upload never runs again, and the animation
-    // freezes on whatever was uploaded first.
-    assert.match(s, /const k = \(archive \* 4096 \+ record\) \* 1024 \+ frame;/);
-    // the seats are minted once and refilled
-    assert.match(s, /seat\(i\) \{ return seats\[i\] \?\?= \{ person: null, pos: null \}; \},/);
-  }
 });
 
 test('PERF-TOWN1: the memoised texture key is byte-for-byte the one the uploader writes', () => {

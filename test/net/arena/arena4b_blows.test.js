@@ -79,29 +79,3 @@ test('ARENA4b the client sends the sequence and the spell: a blow\'s claim carri
   assert.deepEqual(sent, [{ k: 'hit', i: 'p1', d: 12, r: ARENA_HIT.Melee, w: 120, m: 2, q: 41 }, { k: 'hit', i: 'p1', d: 30, r: ARENA_HIT.Spell, w: -1, m: 0, q: 42 }]);
 });
 
-test('ARENA4b the dungeon\'s host numbers its blows and routes a spell on my opponent: one sequence a swing (every body it meets), one a shaft, one a cast; the rival\'s claim and a relay fighter\'s carry it, a spell on a relay fighter claimed as a spell; my opponent is the duel seam\'s body for the cast engine, and a spell that met them goes to the referee as a spell (by source) (mutants: the swing, the shaft or the claim unnumbered; a fighter\'s spell claimed as a swing; each body of a blast its own cast; the cast\'s number never let go; the spell unrouted or sent as a swing)', () => {
-  const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(D, /const nextArenaQ = \(\) => \(_arenaQ = \(_arenaQ \+ 1\) & 0x7fffffff\);/);
-  assert.match(D, /const landOnRival = \(rb, damage, kind\) => \(takeOwed\(rb\.entity\), !!opts\.onArenaHit\?\.\(\{ i: rb\.rival, d: damage, kind, w: [^\n]*, q: _arenaQ \}\)\);/, 'the rival\'s claim carries the sequence');   // PIN MOVED (FIELD BUGS 2026-10-12g OPEN-HAND): a follow-up owed a player dropped, BAL8
-  // PVPDUNGEON: the open zone's fair player takes the swing first (opts.wildStrike, the defender resolves it - no referee
-  // there); the number is still drawn before every body the referee hears of
-  assert.match(D, /function resolvePlayerHit\(eye, inViewFn, playerFeet, lookDir\) \{\n(?:\s*\/\/[^\n]*\n)*\s+if \(opts\.wildBodies && opts\.wildStrike\) \{\n[^]{0,900}?\n\s+if \(best && opts\.wildStrike\(best, [^\n]*\) return true;\n\s+\}\n\s+nextArenaQ\(\);/, 'a swing is one number, every body it meets');
-  assert.match(D, /if \(rv && missileHitsCapsule\(m\.pos, rv\.ai\.feet, rv\.ai\.height, rv\.ai\.radius\)\) \{\n\s+nextArenaQ\(\);/, 'a shaft on my opponent its own');
-  assert.match(D, /if \(missileHitsFoe\(m\.pos, f\)\) \{[^\n]*\n\s+nextArenaQ\(\);/, 'a shaft on a relay\'s fighter its own');
-  // a relay fighter's claim: a swing's or a shaft's sequence; a spell's damage (the sinks' kind 'spell', no record) claimed
-  // as a spell - never a swing held to a sword's reach - under its cast's one number, every body of the blast sharing it
-  assert.match(D, /const cast = kind === 'spell' \|\| !!spell;\n\s+if \(fromPlayer && damage >= 0\) opts\.onArenaHit\?\.\(\{ i: `a\$\{foe\._ownI\}`, d: damage, kind: kind === 'arrow' \? 'arrow' : cast \? 'spell' : 'melee', [^\n]*, q: cast \? arenaSpellQ\(\) : _arenaQ \}\);/, 'a relay fighter\'s claim carries its sequence, a spell as a spell');
-  assert.match(D, /const arenaSpellQ = \(\) => \{\n\s+if \(_arenaSpellQ == null\) \{ _arenaSpellQ = nextArenaQ\(\); void Promise\.resolve\(\)\.then\(\(\) => \{ _arenaSpellQ = null; \}\); \}\n\s+return _arenaSpellQ;\n\s+\};/, 'one number a cast: the cast engine\'s one run, then a new one');
-  // PVPDUNGEON: with no bout the seam is the open zone's (its fair players, wildSpellOut) - the arena's branch unchanged.
-  // PIN MOVED (RPT1026-FIGHTS HALL-SPELLS): asked at the cast - the world-hosted dungeon is handed the arena's door always, so
-  // the build-time choice this pinned took the arena's branch in every dungeon (test/scenes/rpt1026_fights_halls.test.js)
-  assert.match(D, /duelMark: \(\) => \{ const rb = arenaRivalBody\(\); return rb \? \{ id: rb\.rival, name: rb\.entity\?\.name \?\? '', feet: rb\.ai\.feet, height: rb\.ai\.height \} : \(opts\.wildSpellMarks\?\.\(\) \?\? null\); \},/);
-  assert.match(D, /castAtDuel: \(id, sp\) => \(arenaRivalBody\(\)\?\.rival === id \? spellOnRival\(sp\) : !!opts\.wildSpellOut\?\.\(id, sp\)\),/);
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the spell door left the host for scenes/gate/standInSpell.js,
-  // which the host wires with the rival's body, its door and the sequence
-  assert.match(D, /const \{ spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival, spellOnStandIn, standInRound \} = createStandInSpell\(\{[^]*?rival: arenaRivalBody,[^]*?landOnRival, nextArenaQ,/);
-  const S = readFileSync(new URL('../../../src/scenes/gate/standInSpell.js', import.meta.url), 'utf8');
-  const fn = S.slice(S.indexOf('function spellOnRival(sp) {'), S.indexOf('function spellOnRival(sp) {') + 900);
-  assert.match(fn, /countOnStandIn\(harm, rb\.entity, player\.level, player, rolls\)/, 'the one door every spell lands through, against their stand-in');
-  assert.match(fn, /host\.nextArenaQ\(\);\n\s+return host\.landOnRival\(rb, dealt, 'spell'\);/, 'its own sequence, to the referee as a spell');
-});

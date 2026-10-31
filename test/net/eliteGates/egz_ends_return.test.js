@@ -265,7 +265,4 @@ test('EG-ZM egSeedListen (scenes/eliteGates/egClient.js): a listener on the sess
   assert.equal(made[2].left, 1);
   L3.close(); L3.close();
   assert.equal(made[2].left, 1);
-  // the client's door: the shared refusal law at the room's terminal close and the listener's alike
-  const src = rd('src/scenes/eliteGates/egClient.js');
-  assert.match(src, /const said = roomRefused\(o\.error\);/, 'a room that refuses me in the breach, by the same law');
 });

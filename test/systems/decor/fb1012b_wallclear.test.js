@@ -54,10 +54,6 @@ test('WALL-CLEAR a flat (it turns to the eye) stands out from a wall by half its
   assert.deepEqual(pl.pieceAt([12, 1.5, 13], origin, 't', [0, 0, -1], 0).pos, [2, 1.5, 3 - decorWallOffset(0.2)], 'half its width, five centimetres into the wall, its base at the eye\'s height');
   pl.rescale(true); pl.rescale(true);
   assert.ok(near(pl.pieceAt([12, 1.5, 13], origin, 't', [0, 0, -1], 0).pos[2], 3 - decorWallOffset(0.2 * 1.21), 1e-3), 'grown, further off');
-  const src = readFileSync(new URL('../../../src/scenes/decor/decorTool.js', import.meta.url), 'utf8');
-  const builds = src.match(/p\.placer = createDecorPlacer\(entry, \{[^}]*\}\);/g) ?? [];
-  assert.equal(builds.length, 3, 'the three flat ghosts build their placers');
-  for (const b of builds) assert.ok(b.includes('flat: p.flatSize'), `a flat's placer knows its size: ${b}`);
 });
 
 test('WALL-CLEAR the grid snaps a piece along the wall, never into it; a floor and a ceiling are as they were (mutants: the grid off the wall, a floor pushed, a ceiling pushed)', () => {

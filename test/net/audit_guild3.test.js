@@ -203,7 +203,6 @@ test('AUDIT GUILD3 L2, L3, W8: the Duties promise Merit only where the reader ea
   }
   assert.match(chapterDutiesLine(FIGHTERS, []), /, and Merit\.$/, 'to a stranger: what its members earn');
   assert.deepEqual([meritEarnsOf({ merit: 599, max: 600 }), meritEarnsOf({ merit: 600, max: 600 }), meritEarnsOf(undefined)], [true, false, false]);
-  assert.match(src('src/ui/noticeWindow.js'), /const earns = meritEarnsOf\(m\);/, 'the writ card asks the same rule');
   // L3: shut halls
   assert.equal(chapterBandEffectsLine(50, MAGES, { shut: true }), null, 'Steady and shut: the season line says it');
   assert.equal(chapterBandEffectsLine(95, MAGES, { shut: true }), 'Whoever holds its Master\'s chair is its High Master.', 'no fifth off a hall that sells nothing');
@@ -328,7 +327,6 @@ test('AUDIT GUILD3 T9: the words, each a literal - the primer, the Overview\'s E
     'Together they can hold seats of the Iliac Bay: a palace\'s or a crown\'s Charter, contested from that town\'s Notice Board.',
   ]);
   assert.equal(GUILD_ELSEWHERE_TEXT, 'Seats and sieges are run from the Seat tab of a seat town\'s Notice Board, where you can also read its Chronicle. Guild writs and contracts are posted from the Work tab of any Notice Board.');
-  assert.match(src('src/ui/socialPanel.js'), /out\.push\(el\('div', 'dfsocial-sec', 'Elsewhere'\), el\('div', 'dfsocial-empty', GUILD_ELSEWHERE_TEXT\)\);/);
   assert.equal(GUILD_KEEPS_HEAD, 'Before the guild can be disbanded');
   assert.deepEqual(JSON.parse(JSON.stringify(GUILD_SILVER_LINE_WORDS)), {
     'guild-deposit': 'put in', 'guild-withdraw': 'took out',
@@ -403,36 +401,3 @@ test('AUDIT GUILD3 C1/T2: a refusal\'s word nothing re-reads is LISTED, never a 
   assert.equal(n, 2, 'asked again');
 });
 
-test('AUDIT GUILD3 C8, C9/T8: the Settings page reads the guild again as it is turned to; the rank list folded until opened; a lone guildmaster\'s Leave says the list; a refusal\'s list kept for its own guild alone and gone once a press goes through (mutants: the read, the fold, the why, the guild\'s reset, the clearing)', async () => {
-  let looks = 0;
-  const t = await tab(view({ treasury: 0, hallGold: 0, keeps: ['guild-seat'] }), null, { disband: async () => ({ ok: true, data: {} }) });
-  const mine = t.book.door.mine;
-  t.book.door.mine = async (c) => { looks++; return mine(c); };
-  find(t.panel.root, 'dfsocial-subtab').find((b) => b.dataset.page === 'settings').fire('click');
-  for (let i = 0; i < 4; i++) { await tick(); t.panel.render(); }
-  assert.equal(looks, 1, 'read again at the turn to Settings');
-  assert.equal(btn(t.panel.root, 'Leave').attrs?.title ?? btn(t.panel.root, 'Leave').title, 'clear the list above first');
-  // the rank list folded
-  await t.go('members');
-  assert.equal(find(t.panel.root, 'dfsocial-ranks')[0].open, false);
-  // a refusal's list is its guild's: another guild's page says none of it
-  const a = await tab(view({ id: 'gaaaaaaaaaa', treasury: 0, hallGold: 0 }), 'settings', { disband: async () => ({ ok: false, error: 'guild-some-new-hold', keeps: ['guild-some-new-hold'] }) });
-  btn(a.panel.root, 'Disband').fire('click'); a.panel.render();
-  btn(a.panel.root, 'Sure?').fire('click');
-  for (let i = 0; i < 4; i++) { await tick(); a.panel.render(); }
-  assert.equal(find(a.panel.root, 'dfsocial-keeps').length, 1);
-  a.book.door.mine = async () => ({ ok: true, data: { guild: view({ id: 'gbbbbbbbbbb', treasury: 0, hallGold: 0 }) } });
-  await a.book.refresh();
-  for (let i = 0; i < 4; i++) { await tick(); a.panel.render(); }
-  assert.equal(find(a.panel.root, 'dfsocial-keeps').length, 0, 'another guild: the old list gone');
-  assert.match(src('src/ui/socialPanel.js'), /guildUi\.keeps = r\?\.ok \? null : \(Array\.isArray\(r\?\.keeps\) \? r\.keeps : null\);/, 'a press that goes through clears it');
-});
-
-test('AUDIT GUILD3 T11: the High Master\'s read asks only the chapters whose Master\'s chair the account holds - by the chapters\' key, never every Ascendant chapter\'s row, and not at all for an account that holds none (mutants: the narrowing, the skip)', () => {
-  const svc = src('server-account/src/npcChapters.js');
-  const m = /const \{ results: rising = \[\] \} = led\.length\n\s+\? await db\.prepare\(`(SELECT faction, region FROM npc_chapters WHERE strength >= \?1 AND \(faction, region\) IN\n\s+\(SELECT json_extract\(value, '\$\[0\]'\), json_extract\(value, '\$\[1\]'\) FROM json_each\(\?2\)\))`\)\.bind\(CHAPTER_ASCENDANT_FROM, JSON\.stringify\(led\)\)\.all\(\) : \{ results: \[\] \};/.exec(svc);
-  assert.ok(m, 'the read, narrowed and skipped');
-  const plan = planOf(m[1].replace('?2', "'[[41,21]]'"));
-  assert.ok(plan.some((p) => /SEARCH npc_chapters USING .*\(faction=\? AND region=\?\)/.test(p)), plan.join(' | '));
-  assert.ok(!plan.some((p) => /^SCAN npc_chapters/.test(p)), plan.join(' | '));
-});

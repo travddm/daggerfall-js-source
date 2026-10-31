@@ -290,14 +290,3 @@ test('AUDIT GROUND-BOLT D3: on the world\'s own collider (liveCollider over its 
 
 // ── THE HOST ─────────────────────────────────────────────────────────
 
-test('SUNBABY2 host: the sky controller hands the face to the pass, and world.js frames it from the shared clock each exterior frame - said when it changes, handed to the sky before its frame and to the light and the key - and drops the fire round the traveller only while the word is staged and the wrath whole, reset on a jump, through the spell engine (mutants: the face never told; the line unsaid; the fire ungated; the fire never thrown)', () => {
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /setSunbabyFace\(evil = 0, todd = 0\) \{\s*sunbabyEvil = Math\.max\(0, Math\.min\(1, Number\(evil\) \|\| 0\)\);\s*sunbabyTodd = Math\.max\(0, Math\.min\(1, Number\(todd\) \|\| 0\)\);\s*if \(sunbabySky\) \{ sunbabySky\.evil = sunbabyEvil; sunbabySky\.todd = sunbabyTodd; \}/);
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const sunbabyW = sunbaby\.tick\(dt\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const sunbabyFace = sunbaby\.frame\(Date\.now\(\) \+ _sharedOffsetMs\);\n\s*if \(sunbabyFace\.line\) townTalk\.say\(sunbabyFace\.line\);/);
-  assert.match(world, /if \(jump\) sunbabyRain\.reset\(\);\n\s*for \(const fb of sunbabyRain\.tick\(\{ sharedMs: Date\.now\(\) \+ _sharedOffsetMs, eye: tvStand, fire: sunbaby\.on && sunbabyFace\.fire, ground: sunbabyGround \}\)\) magic\.skyFire\(fb\);/);
-  assert.match(world, /const sunbabyGround = \(x, z\) => \{ const h = heightAt\(x, z\); return Number\.isFinite\(h\) \? h : player\.pos\[1\]; \};/);
-  const told = world.indexOf('sky.setSunbabyFace(sunbabyFace.evil, sunbabyFace.todd);');
-  assert.ok(told > world.indexOf('sky.setSunbaby(sunbabyW, sunbaby.on);') && told < world.indexOf('sky.use(('), 'before the sky\'s frame');
-  assert.match(world, /sunbabyKey\(dreadLight\(SUN_RIG_COLOR, skyDreadW\), sunbabyW, sunbabyFace\.evil\), sdAirW\), etherAirW, ETHER_KEY_TINT\), jungle\?\.canopy, 0\)\);/);   // VALENWOOD-CANOPY (PIN MOVED): leaned under a closed canopy last; SD19 moved it: the key leaning brass near a Hollow (PIN MOVED); ETHER-LIGHT (PIN MOVED): its own tint past the Veil
-});

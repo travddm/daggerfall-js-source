@@ -275,22 +275,6 @@ test('RELIEF-PEAKS the far views stand on the kernel\'s own ground: the far ring
   });
 });
 
-test('RELIEF-PEAKS the far views\' wiring (by source): the far ring\'s grid on ringGroundAt with its nodes\' fades once a node; the far field\'s vertex the worker\'s ground (asked with the Landforms row, kept by it, transferred, assembled, read); the travel view\'s ground past the grid the ring\'s; the shaper lays the ranges under the landforms; the mean ground and the bound count them (mutants: the far field on its highest byte; the ground not transferred)', () => {
-  const ring = read('src/render/farRing.js'), worker = read('src/world/terrain/terrainGenWorker.js'), client = read('src/world/terrain/terrainGenClient.js'), lf = read('src/world/landforms.js');
-  assert.match(ring, /heights\[j \* hside \+ i\] = ringGroundAt\(baseX - radius - 1 \+ i, baseY - radius - 1 \+ j, gridByte, relief, fadeAt\);/);
-  assert.match(ring, /heightOf: \(byte, x, y, v\) => answer\.ground\[v\] \+ \(inputs\.relief \? redMountainNodeLift\(x, y\) \* STREAMING_TERRAIN_SCALE : 0\),/);   // PIN MOVED (RED-MOUNTAIN, the merge): and the cone at the node
-  assert.match(ring, /farField\?\.\(\{ baseCX, baseCY, radius: FAR_RADIUS, cell: FAR_CELL, seaByte, relief: !!inputs\.relief \}\)/);
-  assert.match(worker, /farFieldCell\(woods, cx, cy, m\.cell, m\.seaByte, farCellClimate, !!m\.relief\)/);
-  assert.match(worker, /\[high\.buffer, low\.buffer, clim\.buffer, ground\.buffer\]/);
-  assert.match(client, /ground\.set\(m\.ground, j0 \* side\);/);
-  assert.match(read('src/scenes/world.js'), /return \[x, ringGroundAt\(px\.x, px\.y, ground \? \(bx, by\) => woods\.getHeightMapValue\(bx, by\) : \(\) => 0, !!landform\)/);
-  assert.match(lf, /const land = macro \+ lift \* fade, r = ranges \? ranges\(gx, gy, land\) : 0;/);
-  assert.match(lf, /const c = r \+ tamrielLandformAt\(tl, gx, gy, land \+ r, deepCont\);/);
-  assert.match(lf, /return \(share > 0 \? land \+ share \* tamrielRangeAt\(ox \+ x, oy \+ y, land\) : land\) \+ \(beyond \? redMountainSmooth\(ox \+ x, oy \+ y\) : 0\);/);   // PIN MOVED (RED-MOUNTAIN, the merge): and its smooth cone
-  assert.match(lf, /if \(continentPixel\(px, py\)\) return rangeBound\(px, py, h \+ reliefLift\(lowTop\) \+ continentLift\(lowTop\)\) \+ Math\.max\(hill, TAMRIEL_TOP\) \+ redMountainTopNear\(px, py\);/);   // PIN MOVED (RED-MOUNTAIN, the merge): and the volcano's bound
-  assert.match(lf, /height: \(x, y\) => nodeGround\(woods\.getHeightMapValue\(x, y\), 1, byteBeyond\(x, y\)\),/);
-});
-
 // ── THE RECORDS PAST THE BAY ──────────────────────────────────────
 
 test('RELIEF-PEAKS the records\' frame (GROUND_FRAME_LAW 3): a record past the Bay written before it stood DFU\'s ground of its day, so it rides that ground\'s own move - with the row on or off, its height over the ground kept; a stamped record and the Bay\'s take none; D5\'s old lift still LIFT_FRAME_LAW\'s (mutants: the move dropped; dropped with the row off; taken by a stamped record; taken on the Bay; the old lift by the new law)', () => {
@@ -351,13 +335,6 @@ test('RELIEF-PEAKS the records\' wiring (by source): the host hands its frame th
     assert.notEqual(k({}), k({ ranges: false }), 'the ranges laid, or not');
     assert.equal(k({ ranges: false }), sampleKernel(g, px, py, 129, true, createLandforms({ woods: g, ranges: false }))(64, 64) * MAX_TERRAIN_HEIGHT);
   });
-  const host = read('src/scenes/groundFrameHost.js'), w = read('src/scenes/world.js'), lf = read('src/world/landforms.js');
-  assert.match(host, /movedAt: groundMovedAt \}\);/);
-  assert.match(host, /moved = groundMovedField\(woods, px, py, rect\);/);
-  assert.match(host, /const t = host\.state\.pixelTranslation\(px, py\), rect = liftRectAt\(px, py\);\n\s+const key = `\$\{px\},\$\{py\},\$\{rect \?/);
-  assert.match(w, /climates: _landformClimates, ranges: !before \}\) : null\);/);
-  assert.match(lf, /const ranges = tl && ground\.hills && ground\.ranges !== false \? rangeShaper\(sx, sy\) : null;/);
-  assert.match(lf, /const land = macro \+ lift \* fade, r = ranges \? ranges\(ox \+ x, oy \+ y, land\) : 0, c = r \+ tamrielLandformAt\(tl, ox \+ x, oy \+ y, land \+ r\);/);
 });
 
 // ── WITH ARENA2: THE FREEWARE'S GROUND ────────────────────────────

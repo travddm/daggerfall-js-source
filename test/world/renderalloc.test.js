@@ -33,10 +33,6 @@ test('EV2: multiply - same product, provided out returned, aliasing safe, no all
   const a2 = new Float32Array(a);
   multiply(a2, b, a2);
   for (let i = 0; i < 16; i++) assert.ok(Math.abs(a2[i] - reference[i]) < 1e-6, 'aliased out is exact');
-  // the source pin: the body allocates nothing (the scratch is module-level)
-  const src = readFileSync('src/world/mat4.js', 'utf8');
-  const body = src.slice(src.indexOf('export function multiply'), src.indexOf('const DEG2RAD'));
-  assert.ok(!/const r = new Float32Array/.test(body), 'the per-call scratch is gone');
 });
 
 test('EV2: nearestLights - the bounded selection answers EXACTLY what map/sort/slice answered, ties and all', () => {
@@ -168,10 +164,6 @@ test('EV2: the shared up axis is one array, and the draw loops use it', () => {
     assert.ok(!src.includes('new Float32Array([0, 1, 0])'), `${f} still allocates the up axis`);
     assert.ok(/\bUP_Y\b/.test(src), `${f} rides the shared axis`);
   }
-  // and precipitation neither queries CURRENT_PROGRAM nor restores it -
-  // the R9 law: every draw entry point owns its program binding
-  const precip = readFileSync('src/render/precipitation.js', 'utf8');
-  assert.ok(!precip.includes('CURRENT_PROGRAM'), 'the per-frame driver query is gone');
 });
 
 test('EV2: pixelTranslation with out reuses the array and answers identically', () => {

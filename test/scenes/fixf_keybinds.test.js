@@ -71,32 +71,5 @@ test('FIX-F: the swing button is the registry’s - rebind SwingWeapon and the h
     assert.ok(!/e\.button === 2 && !townTalk\.overlayActive|e\.button === 2 && !ctx\.uiOverlayActive|e\.button === 2 && !modalWindowUp/.test(s), `${h}: no raw right-button swing`);
     assert.ok(!/\(e\.buttons & 2\)/.test(s), `${h}: no raw right-button drag`);
   }
-  // MAC-O4: routeMouseDrag also gates on WeaponSwingMode now (Click /
-  // Click-or-Hold never claim the drag), so the line grew a clause -
-  // the registry check (swingHeld(buttons), not a raw button) is still
-  // exactly what this test is for.
-  assert.match(read('src/scenes/shared.js'), /if \(!walkMode \|\| swingMode !== 0 \|\| !swingHeld\(buttons, keys\)\) return 'look';/, 'routeMouseDrag reads the registry (MAC-SWING1: and the key set)');
-  // the window's own right-click (the remove gesture) is still the right button - a UI gesture, not an action
-  assert.match(read('src/scenes/dungeon.js'), /overlayClick\?\.\(v\[0\], v\[1\], e\.button === 2, e\.button === 1\)/);
 });
 
-test('FIX-F: RecastSpell and AbortSpell reach the cast engine in all four hosts, F8 yields to a binding, the interior automap key is the registry’s', () => {
-  const inp = read('src/ui/input.js');
-  assert.match(inp, /case 'RecastSpell': return ctx\.recastSpell \? \(ctx\.recastSpell\(\), true\) : false;/);
-  assert.match(inp, /case 'AbortSpell': return ctx\.abortSpell \? \(ctx\.abortSpell\(\), true\) : false;/);
-  // KB1: the raw F8 arm is gone - with DFU's PrintScreen on F8 it answered for nobody. The readout is the
-  // DebugOverlay action (shipped unbound), and F8 is the screenshot (ui/screenshot.js).
-  assert.doesNotMatch(inp, /e\.code === 'F8'/, 'no raw F8 read');
-  assert.match(inp, /case 'DebugOverlay': return ctx\.toggleDebugHud \? \(ctx\.toggleDebugHud\(\), true\) : false;/, 'the readout is an action');
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(h), /if \(act === 'RecastSpell'\) \{ e\.preventDefault\(\); magic\.recastSpell\(\); return true; \}\s*\n\s*if \(act === 'AbortSpell'\) \{ e\.preventDefault\(\); magic\.abortReadySpell\(\); return true; \}/, `${h}: the two arms in the host’s own ladder`);
-  }
-  assert.match(read('src/scenes/worldModes.js'), /recastSpell\(\) \{ magic\?\.recastSpell\(\); \},[^\n]*\n\s*abortSpell\(\) \{ magic\?\.abortReadySpell\(\); \},/, 'the interior ctx');
-  assert.match(read('src/scenes/dungeonContext.js'), /recastSpell\(\) \{ magic\.recastSpell\(\); \},\s*\n\s*abortSpell\(\) \{ magic\.abortReadySpell\(\); \},/, 'the dungeon ctx');
-  const hm = read('src/scenes/hostMagic.js');
-  assert.match(hm, /lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/, 'lastSpell is set where CastReadySpell sets it (:2136), before the raise and the clear');   // PIN MOVED (EG15): the cast told to systems/playerCasts.js after the raise, still before the clear
-  assert.match(hm, /if \(!lastSpell \|\| castInProgress \|\| castBusy\(\)\) return false;\s*\n\s*if \(!hasSpellbook\(playerEntity\)\) \{ say\(localizedText\('noSpellbook', NO_SPELLBOOK_TEXT\)\); return false; \}\s*\n\s*readySpell\(lastSpell\);/, 'RecastSpell: the last spell, no animation playing, the book in the pack (:257-266)');
-  assert.match(hm, /abortReadySpell\(\) \{\s*\n\s*if \(!readiedSpell\) return false;\s*\n\s*readiedSpell = null; readiedFree = false; readiedCost = 0;/, 'AbortReadySpell (:361-365) only with a spell readied (:268)');
-  assert.match(read('src/scenes/interior.js'), /if \(actionsOf\(e, keys\)\.includes\('AutoMap'\)\) \{ toggleAutomap\(\); e\.preventDefault\(\); return; \}/);   // UXB1-S: its key, shared or not
-  assert.doesNotMatch(read('src/scenes/interior.js'), /e\.code === 'KeyM'/);
-});

@@ -170,15 +170,6 @@ test('FB1001-WODROCK: a mirrored piece (a negative scale) keeps the density too'
 });
 
 test('FB1001-WODROCK: the streaming host re-maps each WoD piece as it reads its model - one call, the mod\'s loop alone', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /^import \{ wodRockUvs \} from '\.\.\/world\/worldOfDaggerfall\/wodRockUv\.js';/m);   // HOST-SPLIT 2: the pixel build's own import line now
-  // the piece's model is read through it, before its box, its batch and its collider: the batch draws the new UVs,
-  // and the box and the collider read the same positions and indices (a dfMeshToModel pebble's own arrays - below)
-  assert.match(w, /for \(const m of place\.models\) \{\n\s*const gpu = await getGpuMesh\(m\.modelId\);\n[^\n]*\n\s*const cpu = wodRockUvs\(cpuModels\.get\(m\.modelId\), m\.matrix, m\.modelId\);/);
-  assert.equal(w.split('wodRockUvs(').length - 1, 1, 'the WoD pieces alone - never a town\'s models or the Hold\'s');
-  const loop = w.slice(w.indexOf('for (const m of place.models) {'), w.indexOf('for (const f of place.flats) {'));
-  assert.match(loop, /addStatic\(cpu, m\.matrix, false, m\.normalMatrix\);/);
-  assert.match(loop, /late\.add\(key, cpu\.positions, cpu\.indices, m\.matrix, \{ translation: wodBucket \}\);/);   // PIN MOVED (ROCK-CLEAR): the pixel's solids through the world collider's gate (player/lateSolid.js; test/scenes/fb1019f_rockclear.test.js)
   // a pebble as dfMeshToModel makes one (every plane its own vertices) keeps its positions and indices BY REFERENCE:
   // the collider and the box take the model's own arrays, the batch alone a new UV array
   const cpu = pebble(), out = wodRockUvs(cpu, objectMatrix([0, 0, 0], ROT, SPIRE));

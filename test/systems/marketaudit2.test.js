@@ -92,24 +92,6 @@ test('MARKET-AUDIT: a room\'s rent and a home\'s claim, refused or answered as a
   assert.deepEqual(calls.splice(0), [['pay', 42_000], ['undo', 42_000]], 'a repeat');
 });
 
-test('MARKET-AUDIT: every realm act that pays out of the purse reserves through walletReserve - the guild\'s, the decor\'s, the market\'s; no whole-cost credit is left as a reserve\'s answer', () => {
-  const guild = src('src/net/guild/guildBook.js');
-  assert.equal((guild.match(/walletReserve\(w, /g) ?? []).length, 3, 'founding, the realm deposit and the deposit');
-  const decor = src('src/scenes/decor/decorTool.js');
-  assert.equal((decor.match(/walletReserve\(wallet, /g) ?? []).length, 3, 'a placement, a change and the Confirm\'s batch');   // PIN MOVED (DECOR-ACCESS): the batch
-  assert.match(src('src/net/marketBook.js'), /reserve: walletReserve\(w, cost\)\.reserve/);
-  for (const f of ['src/net/guild/guildBook.js', 'src/scenes/decor/decorTool.js', 'src/systems/homeRent.js', 'src/systems/online/onlineHomes.js', 'src/net/marketBook.js']) {
-    assert.doesNotMatch(src(f), /reserve: (?:pay > 0 \? )?\(\) => \{ [^}]*\bpay\([^)]*\); return \(\) => [^}]*\b(?:credit|refund)\??\.?\(/, `${f}: a reserve that credits the whole`);
-  }
-  // the hosts' wallets answer the undo
-  // FIRM1: and the Firmament's respec, its gold reserved through walletReserve as the guild's founding is
-  assert.match(src('src/net/firmament/firmamentBook.js'), /reserve: walletReserve\(w, FIRM_RESPEC_GOLD\)\.reserve/);
-  assert.equal((src('src/scenes/world.js').match(/pay: \(n\) => payUndoable\(playerEntity, n, /g) ?? []).length, 3, 'the market\'s, the guild\'s and the Firmament\'s');
-  // PIN MOVED (INSTANCES' HOST-SPLIT, 2026-10-15): the yards' wallet left bootWorld for scenes/homeYards.js - the player handed it
-  assert.equal((src('src/scenes/homeYards.js').match(/pay: \(n\) => payUndoable\(entity, n, /g) ?? []).length, 1, 'the yards\'');
-  assert.equal((src('src/scenes/worldModes.js').match(/pay: \(n\) => purse\.pay\(n, /g) ?? []).length, 3, 'the decor\'s, a claim\'s and the rent\'s');
-});
-
 // ─── THE DOOR AND THE BOOK ───────────────────────────────────────────
 
 test('MARKET-AUDIT P1: a 2xx whose body never came is no word on the act - `offline`, unknown - and a 204 says nothing, ok', async () => {

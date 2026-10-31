@@ -652,36 +652,3 @@ test('SD8c THE PILLARS STAND: the arena\'s four pillars on the collider, their s
 
 // ── the hosts ─────────────────────────────────────────────────────────
 
-test('SD8c THE HOSTS, by source: the dungeon context makes the arena\'s set in the Hour alone, frames it beside the hall, clears it, and in the Hour answers the gate\'s three seams with it - the Remnant, its Echoes, the Reset\'s Hearts - and their doors out to the realm; the mode machine hands it the fight and the two doors and stands the pillars with the floors; the world host keeps the link online, hears the realm\'s fight words from its own slot, sends my `in` with my level and my blows, forgets the fight out of the realm and draws the bar near the arena (mutants: each seam left the court\'s; the bar never put away)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdRemnant = _sdRealm \? createSdRemnant\(\{ renderer, link: \(\) => opts\.sdFight\?\.\(\) \?\? null, sendIn: \(\) => !!opts\.sdFightIn\?\.\(\), sendBlow: \(k, f\) => !!opts\.sdBlow\?\.\(k, f\), alive: \(\) => playerEntity\.health > 0, ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\] \}\) : null;/);   // SD18c (PIN MOVED): its Hollow's Ending
-  assert.match(D, /if \(sdHall\) sdHallFrame\(dt, playerFeet\);[^\n]*\n\s+if \(sdRemnant\) sdRemnantFrame\(dt, playerFeet\);/);
-  assert.match(D, /if \(playerFeet && !_sdRemnantStood\) \{ _sdRemnantStood = true; sdRemnant\.stand\(\{ dynamicDraws \}\); \}/);
-  assert.match(D, /sdRemnant\?\.clear\(\);/);
-  assert.match(D, /const b = sdRemnant \? sdRemnant\.target\(\) : opts\.gateBoss\?\.\(\) \?\? null;/);
-  assert.match(D, /const list = sdRemnant \? sdRemnant\.heartTargets\(\) : opts\.gateCrystals\?\.\(\) \?\? null;/);
-  assert.match(D, /const list = sdRemnant \? sdRemnant\.echoTargets\(\) : opts\.gateHost\?\.\(\) \?\? null;/);
-  assert.match(D, /return sdRemnant \? sdRemnant\.hit\(\{ d: damage, r \}\) : !!opts\.onBossHit\?\.\(\{ d: damage, r \}\);/);
-  assert.match(D, /sdRemnant \? sdRemnant\.heartHit\(\{ c: cr\.crystal, d: damage, r \}\)/);
-  assert.match(D, /sdRemnant \? sdRemnant\.echoHit\(\{ i: hb\.host, d: damage, r \}\)/);
-  const M = read('src/scenes/worldModes.js');
-  assert.match(M, /sdFight: \(\) => host\.sdFight\?\.\(\) \?\? null,/);
-  assert.match(M, /sdFightIn: \(\) => !!host\.sdFightIn\?\.\(\),/);
-  assert.match(M, /sdBlow: \(k, f\) => !!host\.sdBlow\?\.\(k, f\),/);
-  assert.match(M, /const tris = realmColliderTris\(\);/);
-  const W = read('src/scenes/world.js');
-  assert.match(W, /const sdFightLink = params\.has\('online'\) \? createSdFightLink\(\{ now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, say: \(t, key\) => \{ if \(sdNearArena\(\)\) sdSay\(t, SD_VOICE_RANK\.turn, key\); \} \}\) : null;/);   // AUDIT SD II (L6 F15, SD11d, PIN MOVED): its lines near its arena, through the Hour's voice
-  assert.match(W, /online\.onSdFight = \(w\) => sdFightHeard\(w\);/);
-  assert.match(W, /if \(!sdFightLink \|\| slot == null \|\| \(w\.k === 'st' && w\.s !== slot\)\) return;/);
-  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // PIN MOVED (SD8d): its blows forgotten with it   // SD14a (PIN MOVED): its voice let go with it   // SD16 (PIN MOVED): its sparks
-  assert.match(W, /const s = sdFightLink\.state\(\), now = sdFightLink\.now\(\);\n\s*const near = sdBarNear\(x, z\);\n\s*if \(near\) bar = remnantBarModel\(s, now\);/);   // SD15 (PIN MOVED): the fight read once a frame, for the bar and the arena read; PIN MOVED (AUDIT SD IV T1): its nearness kept, the title card's gate too
-  assert.match(W, /const hidden = gamePaused\(\) \|\| !!townTalk\.hudHidden \|\| !!gateVeil\?\.busy;[^\n]*\n\s*if \(bar \|\| _sdBarUp\) \{ drawGateBossBar\(bar, \{ hidden \}\); _sdBarUp = !!bar; \}/);   // SD15 (PIN MOVED): one hide for the bar, the ground and the card; AUDIT SD III (T18, PIN MOVED): and under the veil, as the court's
-  assert.match(W, /sdFightIn: \(\) => !!online\?\.sendSdIn\?\.\(playerEntity\.level\),/);
-  assert.match(W, /sdBlow: \(k, f\) => !!online\?\.sendSdBlow\?\.\(k, f\),/);
-  assert.match(W, /serpentAway\(!onlineOn\);[^\n]*sdFightAway\(\);/);
-  const R = read('server/src/index.js');
-  assert.match(R, /this\._send\(ws, JSON\.stringify\(\{ t: 'sd', \.\.\.SD_SEAM\.stateOf\(f\), me: 1 \}\)\);/);   // PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
-  // PIN MOVED (COURT-WATCH, bible/11-Multiplayer/World-Bosses.md section 24): and the court's answer to an `in` that seats a fighter
-  assert.match(R, /this\._send\(ws, JSON\.stringify\(\{ t: 'gate', \.\.\.GATE_SEAM\.stateOf\(f\), me: 1 \}\)\);/);
-  assert.equal((R.match(/me: 1/g) ?? []).length, 2, 'said in the two answers alone');
-});

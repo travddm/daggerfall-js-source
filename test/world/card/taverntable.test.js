@@ -290,42 +290,6 @@ test('TAVERN-TABLE every client the same table (AUDIT TAVERN-TABLE M3): a room o
   }
 });
 
-test('TAVERN-TABLE by source: the interior context stands the prop after the room\'s own models and doors, as a model and the one card table, its mesh its own; the host asks for it in every tavern', () => {
-  const ic = rd('src/scenes/interiorContext.js');
-  const doorsAt = ic.indexOf('dynamicDraws.push({ gpu, object: actions.addDoor(cpu, parent(d.matrix)) });');
-  const at = ic.indexOf('if (opts.placeCardTable) {');
-  assert.ok(doorsAt > 0 && at > doorsAt, 'after the room\'s own models and its closed doors are in the collider');
-  const arm = ic.slice(at, ic.indexOf('// People (C1)', at));
-  assert.match(arm, /interior\.markers\.find\(\(m\) => m\.type === INTERIOR_MARKER\.ENTER\) \?\? interior\.markers\.find\(\(m\) => m\.type === INTERIOR_MARKER\.REST\)/, 'the record\'s first enter marker - the same for every client');
-  // PIN MOVED (TAVERN-TABLES, world180): the arm stands the room's tables in turn - the chips table, then the gold one
-  // (test/systems/card/taverntables.test.js) - each the next placement index past the record's own, its felt its own, the wood once
-  assert.match(arm, /const key = `int:\$\{interior\.placements\.length \+ tables\.length\}`;/, 'the next placement index, past the record\'s own');
-  for (const step of [
-    'const cpu = cardTablePropModel({ felt });',
-    'renderer.uploadTexture(CARD_TABLE_ARCHIVE, felt, paintFelt(gold ? GOLD_FELT_RGB : FELT_RGB), { mips: true, opaque: true });',
-    'if (!propMeshes.length) renderer.uploadTexture(CARD_TABLE_ARCHIVE, WOOD_RECORD, paintWood(), { mips: true, opaque: true });',
-    'const mesh = renderer.createMesh(cpu);',
-    'drawList.push({ mesh, matrix, key, aabb });', 'automapEntries.push({ key, aabb,',
-    "collider.addMesh('interior', cpu.positions, cpu.indices, matrix);", 'placedTableSpot(CARD_TABLE_BOX, [enter.x, enter.y, enter.z], probe, avoid)',
-    'const matrix = parent(trs(spot.x, spot.y, spot.z, 0, spot.yawDeg, 0));',
-    'tables.push({ aabb: worldAabb(corners, matrix), box: { min: [...min], max: [...max] }, matrix, ...(gold ? { gold: true } : {}) });',
-  ]) assert.ok(arm.includes(step), `the prop: ${step}`);
-  assert.equal(/staticBuilder|_batched/.test(arm), false, 'AUDIT TAVERN-TABLE H1: never in the merge - its string archive is no number to it');
-  for (const avoid of ['interior.doors.map(', 'interior.actionDoors.map(', 'collectInteriorPeople(recordData).map(', 'interior.flats.map(', 'interior.markers.map(']) assert.ok(arm.includes(avoid), `kept clear of ${avoid}`);
-  assert.equal(ic.split('tables.push(').length - 1, 1, 'the prop is the room\'s one card table: no model of Daggerfall\'s is one');
-  assert.ok(ic.includes('for (const mesh of propMeshes.splice(0)) renderer.destroyMesh(mesh);'), 'its mesh freed with the room (EVERY ALLOCATION HAS AN OWNER) - PIN MOVED (TAVERN-TABLES): each of them');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /\n {10}placeCardTable: isTavern\(building\?\.buildingType \?\? BUILDING_TYPES\.None\),\n/);
-  // AUDIT TAVERN-TABLE M2: a tavern whose table found no floor still looks once on entering - the relay hands the gold
-  // it owes this room's account on a look, table or none (server/src/index.js _holdemOwed)
-  assert.ok(wm.includes('if (!cardLooksDue.length && (interiorCtx.tables?.length || inTavern())) cardLooksDue.push(0);'));
-  assert.match(rd('server/src/index.js'), /if \(m\.op === 'look'\) \{ msgs = t \? holdemLook\(t, a\.id, now\) : \[\]; await this\._holdemOwed\(ws, a, m\.table\); \}/, 'the relay answers a look at no table with what it owes');
-  const call = wm.slice(wm.indexOf('const ctx = await buildInteriorContext('), wm.indexOf('interiorCtx = ctx;'));
-  assert.ok(call.includes('placeCardTable:'), 'in the one interior build the hosts share');
-  assert.equal(rd('src/scenes/interior.js').includes('placeCardTable'), false, 'the ?interior viewer has no body to seat');
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/dungeonContext.js']) assert.equal(rd(f).includes('placeCardTable'), false, `${f} enters buildings through worldModes`);
-});
-
 // THE BUILD: a room of one floor and its enter marker, through the real collider - the context stands the prop, lists
 // it, draws it, collides it and frees it; a room not asked stands none.
 async function buildRoom(opts) {

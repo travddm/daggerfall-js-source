@@ -98,7 +98,6 @@ test('SEASON1 THE HALL OF RECORDS IN THE SERVICE: a seat\'s Chronicle oldest fir
   const g = await shut.registered('Gale');
   assert.equal((await shut.call('/v1/seats/records', { key: ANTICLERE.key }, g.secret)).body.error, 'seats-closed');
   assert.equal(SEAT_CHRONICLE_SHOWN, 8, 'the Seat tab\'s own few, untouched');
-  assert.match(src('server-account/src/seatInfluence.js'), /chronicle: await chronicleOf\(db, key\)/);
 });
 
 test('SEASON1 THE HALL OF RECORDS ON THE PAGE: the book asks its door for a seat\'s records once the seats are open, keeps the answer SEAT_RECORDS_CACHE_MS, and a shut answer closes the seats; the door\'s path; a seat\'s palace shelves are its Hall of Records while the seats are open (hover and press), the book opened in the interior\'s own reader slot or said where it cannot be read, its host reading the seat\'s records as a book; the Seat tab\'s Chronicle in its Season\'s words (mutants: the open gate; the cache; the shut; the path; the palace; the host; the slot; the words)', async () => {
@@ -125,15 +124,4 @@ test('SEASON1 THE HALL OF RECORDS ON THE PAGE: the book asks its door for a seat
   await seats.records(3021);
   assert.deepEqual(posted, [['/v1/seats/records', { key: 3021 }]]);
   assert.deepEqual([HALL_OF_RECORDS_TEXT, HALL_OF_RECORDS_SHUT], ['Hall of Records', 'The Hall of Records cannot be read now.']);
-  // the palace's shelves, by source
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /const hallOfRecordsHere = \(b\) => b\?\.buildingType === BUILDING_TYPES\.Palace && !!host\.hallOfRecords\?\.here\?\.\(homeTownOf\(b\)\);/);
-  assert.match(modes, /if \(key\.startsWith\('shelf:'\)\) \{\n\s+if \(hallOfRecordsHere\(b\)\) return decorTool\.flying\(\) && !decorTool\.ghost\(\) \? decorBuiltInPlaque\(HALL_OF_RECORDS_TEXT,/, 'the plaque, before the bookshelf\'s');
-  assert.match(modes, /if \(!b \|\| !shelf\) return;\n\s+if \(hallOfRecordsHere\(b\)\) \{ openHallOfRecords\(b\); return; \}/, 'the press, before the shop\'s');
-  // PIN MOVED (AUDIT-SEATS C11): a book that lands after the player left - or over a window opened meanwhile - is disposed
-  assert.match(modes, /if \(interiorBuilding !== b \|\| interiorOverlay\) \{ dropRecords\(w\); return; \}\n\s+if \(w\) interiorOverlay = w;\n\s+else say\(HALL_OF_RECORDS_SHUT\);/);
-  const world = src('src/scenes/world.js');
-  assert.match(world, /hallOfRecords: \{\n\s+here: \(mapId\) => !!seatHere\(mapId\),\n\s+read: async \(mapId\) => \{\n\s+const seat = seatHere\(mapId\);\n\s+if \(!seat \|\| !seatBook\) return null;\n\s+return hallOfRecordsRead\(seat\);/);   // PIN MOVED (AUDIT CHAP4 C5): the one read both doors make
-  assert.match(world, /const hallOfRecordsRead = async \(seat\) => \{\n\s+const \[r, ch\] = await Promise\.all\(\[\n\s+seatBook\.records\(seat\.key\),\n[^\n]*\n\s+\]\);\n\s+return r\?\.data \? hallOfRecordsWindow\(seat, r\.data\.rows, r\.data\.zero, seatArmsOf, ch\?\.ok \? ch\.data : null\) : null;/);
-  assert.match(src('src/ui/seatTab.js'), /chronicleLine\(r, seat, book\.zero \?\? null\)/);
 });

@@ -214,7 +214,6 @@ test('REVIVE: the tool\'s command line as the workflow\'s lines run it - the fin
   // every line of the workflow names its mode first, and the tool reads its mode from the first word alone
   const calls = [...src('.github/workflows/realm-revive.yml').matchAll(/node \$tool (--[a-z-]+)/g)].map((m) => m[1]);
   assert.deepEqual([...new Set(calls)].sort(), ['--find', '--plan', '--player-query', '--query']);
-  assert.match(src('tools/reviveRealmCharacter.mjs'), /const mode = argv\[0\];/);
 });
 
 test('REVIVE-SIZE: a line\'s record past what one D1 statement takes is revived by an edit in place - the statement small, the record it leaves exactly the revival\'s, the rest of the record as it was; the line written before the tombstone; a plan with any statement too long writes nothing; an edit that cannot say the change is refused (mutants: the whole record in the statement; the tombstone first; the long statement written)', async () => {

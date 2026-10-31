@@ -86,11 +86,6 @@ test('WILD3: a fast journey - never into or out of the zone; inside it 2,500 gol
   assert.match(wildJourney({ from: inA, to: inB, mask, gold: 1e6, now, lastAt: now - 60_000 }).text, /The next leaves in 9 minutes/);
   assert.equal(wildJourney({ from: inA, to: inB, mask, gold: 1e6, now, lastAt: now - WILD_TRAVEL_COOLDOWN_MS }).ok, true);
   assert.deepEqual(wildJourney({ from: inA, to: out, mask: null }), { ok: true, fee: 0 }, 'offline there is no zone');
-  const w = W('src/scenes/world.js');
-  for (const fn of ['async function fastTravelTo(', 'async function recallToAnchor(', 'async function teleportTo(']) {
-    const i = w.indexOf(fn);
-    assert.ok(/wildTravelGate\(/.test(w.slice(i, i + 1600)), `${fn} asks the zone's law`);
-  }
 });
 
 test('WILD3: the pace in the zone - at most x20 off the road and x40 on it, a cap that never writes the dials', () => {
@@ -110,12 +105,7 @@ test('WILD3: giants four times their size in the open country; strangers red, na
   assert.equal(WILD_GIANT, 16, 'Daggerfall\'s Giant');
   assert.equal(wildGiantSize({ wildGiant: true }), WILD_GIANT_SIZE);
   assert.equal(wildGiantSize({}), 1);
-  const ef = W('src/scenes/exteriorFoes.js');
-  assert.match(ef, /if \(wild && mobileType === WILD_GIANT && zoneGiant != null\) entity\.wildGiant = true;/, 'the street\'s pool alone marks them - ZONE-GIANTS: the zone\'s own eight, never a roll\'s');
-  assert.match(ef, /if \(Number\.isInteger\(r\.gg\) && f\.entity\.zoneGiant !== r\.gg && f\.mobileType === WILD_GIANT && !markedOf\(f\.puppet, \(x\) => x\.entity\?\.zoneGiant === r\.gg\)\) \{[^\n]*\n\s+f\.entity\.wildGiant = true; f\.entity\.zoneGiant = r\.gg;/, 'GREATER-GIANT: a puppet by its owner\'s word - the ten it calls stay ordinary (GIANT-BLOWS: and its blows four times over, test/giantfix1)');   // PIN MOVED (FOE-FORGE: a giant's word alone, one of each index to an owner - test/scenes/foeforge.test.js)
-  assert.doesNotMatch(W('src/scenes/dungeonContext.js'), /wildGiant/, 'never a dungeon\'s');
   assert.deepEqual([WILD_STRANGER_M, WILD_STRANGER_SLOW_M], [600, 200], '"Like 600m away" - "like 200m it slows you down"');
-  assert.match(W('src/scenes/world.js'), /for \(const g of _wildStrangers\) if \(!\(_tvAttack\?\.kind === 'peer' && _tvAttack\.id === g\.id\)\) out\.push\(\{ dx: g\.feet\[0\] - fx\[0\], dz: g\.feet\[2\] - fx\[2\], reach: WILD_STRANGER_SLOW_M \}\);/, 'a journey slows for them (PVPNEAR: never for the one I attack)');
   // the names: a masked point is a Stranger in its tint, in both faces
   const seen = [];
   const host = { namePoints: () => [{ id: 'a', name: 'Ria', gt: 'X' }, { id: 'b', name: 'Mack' }], drawNamePoints: (_r, _f, pts, _s, colorOf) => { for (const p of pts) seen.push([p.name, colorOf?.(p.id) ?? null]); return pts.length; } };

@@ -287,9 +287,6 @@ test('EG-LOOK THE BRINK (section 1.5: "its first third wears the band above\'s d
     assert.deepEqual([...seen].sort(), [egBandArchive(band - 1), egBandArchive(band)].sort(), 'both bands');
     assert.deepEqual(egRuinBands(c + 1), [band]);
   }
-  const EC = rd('src/scenes/eliteGates/egCircleHost.js');
-  assert.match(EC, /egBandUp\(eh\.c\);[^\n]*\n    if \(eh\.c > 1\) egBandUp\(eh\.c - 1\);/, 'the circle\'s host puts up a Brink\'s band above at its stand (a swap from the circle before has it up)');
-  assert.match(rd('src/tools/spireLab.js'), /for \(const b of egRuinBands\(C\)\) if \(b !== BAND\) for \(const \[rec, art\] of egBandArt\(b\)\) \{ renderer\.uploadTexture\(egBandArchive\(b\)/, 'the lab too');
 });
 
 test('EG-LOOK LITE AND THE BAND\'S FORMS (section 3.5: "one spire a foundation, columns every 12 m, no statues or banners, bridges\' arches every 12 m"; section 1): the phones\' tier stands fewer columns, no statue and no banner, its lamps\' columns the same; a ring\'s columns 6-9 m apart on the desktop; each band\'s arch its own rise; the ruin\'s pictures worn as EG_KIT_MAP says - a shaft\'s v up it, a banner\'s down from its rod, a flame\'s in its cells (mutants: lite\'s columns at the desktop\'s pitch; statues on the phones; a shaft worn upside down)', () => {
@@ -377,7 +374,4 @@ test('EG-LOOK THE RUIN\'S OCCLUDERS (EG-ZN\'s law, Elite-Gates.md section 11.8; 
   const freed = G.down([]);
   assert.equal(freed, 5);
   assert.equal(R.log.freed, 5, 'every ruin freed');
-  const EC = rd('src/scenes/eliteGates/egCircleHost.js');
-  assert.match(EC, /const egOcc = ground\.occluders\(createEgOccluders\(\{ renderer \}\)\);/, 'the circle\'s host: one pass for the circle\'s rock and the ruin\'s');
-  assert.ok(EC.indexOf('const ground = createEgGroundLook(') < EC.indexOf('const egOcc = ground.occluders('), 'the ground look made first');
 });

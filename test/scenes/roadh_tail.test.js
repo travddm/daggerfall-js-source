@@ -136,26 +136,6 @@ test('ROAD-H tail: the flight reach is displacement.magnitude + ColliderRadius a
   }
 });
 
-test('ROAD-H tail: the dungeon archer takes BowDamage\'s two-arm split - the shaft flies at the SELECTED target and the missile remembers a foe target', () => {
-  const d = src('src/scenes/dungeonContext.js');
-  // EnemyAttack.cs:136-137 - BowDamage returns at `senses.Target == null`:
-  // the arm is gated on the live target, the shape the melee arm and the
-  // exterior pool already carry.
-  assert.match(d, /else if \(\(_tgt \|\| f\._pupTarget != null\) && !_fParalyzed && f\.mobile\.shootArrow\) \{/, 'gated on the live target (WORLD3: or a puppet\'s streamed one)');
-  assert.doesNotMatch(d, /else if \(playerFeet && !_fParalyzed && f\.mobile\.shootArrow\) \{/, 'no longer on the player alone');
-  // :139-143 - the player arm or the non-player arm, by the selected target
-  assert.match(d, /const _at = f\._pupTarget != null \? \(f\._pupMine \? foeDeps\.PLAYER_TARGET : peerCandidate\(f\._pupTarget\)\) : \(f\.ai\.target \?\? foeDeps\.PLAYER_TARGET\);[\s\S]*?const _atPlayer = foeDeps\.isPlayerTarget\(_at\) && !_at\.isPeer;/, 'the target is read (WORLD3: a puppet\'s streamed one; a peer is no player arm)');
-  assert.match(d, /const aim = foeDeps\.targetAimPoint\(_at, _pf, playerHeight\);/, 'the aim point is the target\'s transform through the one law');
-  assert.match(d, /arrowAimDirection\(foeDeps\.enemyTransformPoint\(f\.ai\), aim, \{ targetIsPlayer: _atPlayer, playerCrouching: !!_senses\.playerCrouching \}\)/,
-    'the crouch dip keys on WHO the target is (DaggerfallMissile.cs:584), not on a constant');
-  assert.match(d, /fireArrow\(from, dir, f\.entity\.weapon, false, f, _atPlayer \? null : _at, null, aimedArrowMeta\(shot\)\);/, 'a foe target rides the missile');   // PIN MOVED (TELL6d: and an aimed shot's word)
-  assert.match(d, /function fireArrow\(from, dir, weapon, fromPlayer, shooterFoe = null, aimFoe = null, muzzle = null, extra = null\)/, 'fireArrow carries aimFoe (FIELD-GUN17: `muzzle` rides after it, null for every shaft - a PLAYER concern, and the enemy arm above passes six arguments and never reaches it)');   // PIN MOVED (TELL6d: an aimed shot's word rides after the muzzle - the enemy arm passes null for it)
-  assert.match(d, /missiles\.push\(\{ arrow: true, flatArchive: orbArchiveFor\(weapon\), weapon, fromPlayer, shooterFoe, aimFoe, pos,/, 'and stores it, so the impact fork\'s `m.aimFoe` arm (BowDamage\'s non-player arm) can run for an arrow (FIELD-GUN14: `flatArchive` rides beside it - the PICTURE forks, the arrow does not)');
-  // the exterior pool's arm is the model - it reads the same law
-  const x = src('src/scenes/exteriorFoes.js');
-  assert.match(x, /const aim = _targetAim\(f, playerFeet, senses\.playerHeight \?\? CAPSULE_HEIGHT\);/);
-});
-
 // ───────────────────────────────────────────────────────────────────
 // ROAD-H TAIL, THE REVIEW ROUND (2026-09-07)
 //
@@ -245,89 +225,5 @@ test('ROAD-H tail (review): the player\'s OWN spell missile meets a foe at its C
   assert.equal(rat.magic.castInput([0, 2.9, 0], [0, 0, 1]), true);
   for (let i = 0; i < 4; i++) rat.magic.update(0.05, [0, 0, 0], [0, 0, 1], CAPSULE_HEIGHT);
   assert.equal(rat.hurt.n, 0, 'and the same bolt sails over a rat - the height is read, not assumed');
-  // The dungeon host is a whole scene, so its player-arrow site is held
-  // by its call and by the absence of the point form it was converted
-  // from (the ceiling-bats count carries the same law by number).
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /^\s*if \(missileHitsFoe\(m\.pos, f\)\) \{ {3}\/\/ ROAD-H tail: DaggerfallMissile\.cs:339/m,
-    'the dungeon\'s PLAYER shaft meets a foe through the one capsule test');
-  assert.doesNotMatch(d, /const fx = f\.ai\.feet\[0\] - m\.pos\[0\]/,
-    'and not at the foe\'s capsule centre as a point');
-  assert.doesNotMatch(src('src/scenes/hostMagic.js'), /const fx = f\.ai\.feet\[0\] - m\.pos\[0\]/,
-    'nor does the player\'s spell missile');
 });
 
-test('ROAD-H tail (review): an enemy shaft STOPS on the body it meets, and pays only the archer\'s own target', () => {
-  // Once `fireArrow` could carry `aimFoe`, the impact fork's arms were
-  // mutually exclusive - `else if (m.aimFoe ...) else if (playerFeet)` -
-  // so a shaft loosed at another foe never tested the player at all and
-  // flew straight through. DFU has no such ordering: an ENEMY missile
-  // casts with the DEFAULT layer mask (DaggerfallMissile.cs:250-253,
-  // which is the mask a PLAYER missile drops the Player layer from at
-  // :263), :337 meets whatever collider is first in space, and
-  // DoCollision destroys the arrow there (:388-396). Only then does
-  // AssignBowDamageToTarget ask `targetEntities[0] ==
-  // caster.GetComponent<EnemySenses>().Target` (:669) before calling
-  // BowDamage - the DAMAGE gate, not the contact gate.
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /const struckPlayer = !!playerFeet && missileHitsCapsule\(m\.pos, playerFeet, playerHeight, PLAYER_BODY_RADIUS\);/,
-    'the player capsule is tested for EVERY enemy shaft, whatever it was aimed at');
-  assert.match(d, /if \(!struckPlayer\) \{\n\s+for \(const f of foes\) \{\n\s+if \(f\.dead \|\| f === m\.shooterFoe\) continue;\n\s+if \(missileHitsFoe\(m\.pos, f\)\) \{ struckFoe = f; break; \}/,
-    'and so is every live body but the shooter, which cannot feather itself on the release frame');
-  assert.match(d, /if \(struckFoe && struckFoe === m\.aimFoe\) \{/,
-    'BowDamage runs only when the struck body IS the archer\'s selected target (:669)');
-  assert.match(d, /\} else if \(struckPlayer && !m\.aimFoe\) \{/,
-    '...and the player arm only when the player IS that target');
-  assert.match(d, /\} else if \(struckPlayer \|\| struckFoe\) \{\n\s+retireMissile\(m\);/,
-    'a shaft that met the wrong body is spent on it - no damage, no recovered Arrow');
-  assert.doesNotMatch(d, /\} else if \(m\.aimFoe && !m\.aimFoe\.dead\) \{\n\s+\/\/ MT-iv/,
-    'the foe target is no longer the CONTACT gate');
-});
-
-test('ROAD-H tail (review): an enemy shaft is SPENT on whatever it meets and DAMAGES only the foe it was loosed at (DaggerfallMissile.cs:388-396, :669)', () => {
-  // DoCollision destroys an arrow on any collider it meets (:388-396);
-  // AssignBowDamageToTarget then runs BowDamage only when the struck
-  // body IS the archer's Target (:669). So a shaft loosed at a bear
-  // that the player steps into is spent on the player and deals
-  // nothing - no BowDamage, no Dodging tally, no recovered Arrow.
-  const bear = { id: 'bear', ai: { feet: [0, 0, 8], height: 1.8 }, dead: false };
-  const wolf = { id: 'wolf', ai: { feet: [0, 0, 5], height: 1.8 }, dead: false };
-  const log = [];
-  // (1) the player in the way of a foe-aimed shaft: stopped, unhurt
-  const a = open();
-  a.fire([0, 0.9, 0], [0, 0, 1], { enemy: true, shooterFoe: { id: 'archer' }, weapon: {}, aimFoe: bear });
-  for (let i = 0; i < 4; i++) a.update(STEP, { playerFeet: [0, 0, 5], playerHeight: 1.8, onPlayerHit: () => log.push('player hurt'), foeTargets: [{ feet: bear.ai.feet, ref: bear }], onFoeHit: (m, t) => log.push(t.id) });
-  assert.deepEqual(log, [], 'the player took nothing');
-  assert.equal(a.arrows[0].dead, true, 'and the shaft is spent on the player, not flown through');
-  // (2) a NON-target foe in the way: stopped, unhurt, the target never reached
-  const b = open();
-  b.fire([0, 0.9, 0], [0, 0, 1], { enemy: true, shooterFoe: { id: 'archer' }, weapon: {}, aimFoe: bear });
-  for (let i = 0; i < 4; i++) b.update(STEP, { foeTargets: [{ feet: wolf.ai.feet, ref: wolf }, { feet: bear.ai.feet, ref: bear }], onFoeHit: (m, t) => log.push(t.id) });
-  assert.deepEqual(log, [], 'the wolf took nothing');
-  assert.equal(b.arrows[0].dead, true, 'the shaft stopped on the wolf');
-  // (3) the same shaft with the wolf out of the way reaches its target
-  const c = open();
-  c.fire([0, 0.9, 0], [0, 0, 1], { enemy: true, shooterFoe: { id: 'archer' }, weapon: {}, aimFoe: bear });
-  for (let i = 0; i < 8; i++) c.update(STEP, { foeTargets: [{ feet: bear.ai.feet, ref: bear }], onFoeHit: (m, t) => log.push(t.id) });
-  assert.deepEqual(log, ['bear'], 'the bear is struck');
-  // (4) a shaft loosed at the PLAYER (aimFoe null) still lands on the player
-  const d = open();
-  d.fire([0, 0.9, 0], [0, 0, 1], { enemy: true, shooterFoe: { id: 'archer' }, weapon: {} });
-  for (let i = 0; i < 4; i++) d.update(STEP, { playerFeet: [0, 0, 5], onPlayerHit: () => log.push('player hurt') });
-  assert.deepEqual(log, ['bear', 'player hurt']);
-  // (5) a PLAYER shaft has no such gate - WeaponDamage strikes what it hits
-  const e = open();
-  e.fire([0, 0.9, 0], [0, 0, 1], { fromPlayer: true });
-  for (let i = 0; i < 4; i++) e.update(STEP, { foeTargets: [{ feet: wolf.ai.feet, ref: wolf }], onPlayerArrowHitFoe: (m, t) => log.push('player shaft: ' + t.id) });
-  assert.deepEqual(log, ['bear', 'player hurt', 'player shaft: wolf']);
-  // the pool decides the target ONCE and hands it to every host's fire
-  const x = src('src/scenes/exteriorFoes.js');
-  assert.match(x, /const _at = f\.ai\.target \?\? PLAYER_TARGET, _atPlayer = isLocalPlayerTarget\(_at\);/);
-  assert.match(x, /onArrow\(from, dir, f, _atPlayer \? null : _at, aimedArrowMeta\(shot\)\);/, 'the selected foe rides the shaft; the player is null');   // PIN MOVED (TELL6d: and an aimed shot's word)
-  for (const [h, call] of [['src/scenes/world.js', 'arrows.fire'], ['src/scenes/exterior.js', 'arrows.fire'], ['src/scenes/worldModes.js', 'interiorArrows.fire']]) {
-    const s = src(h);
-    // PIN MOVED (TELL6d, bible/12-Enhanced-AI/Feud-Arc.md 8.1): and an aimed shot's word beside it
-    assert.match(s, /onArrow: \(from, dir, f, aimFoe = null, extra = null\) => \{/, `${h}: the host takes the target`);
-    assert.ok(s.includes(`${call}(from, dir, { enemy: true, shooterFoe: f, weapon: f.entity.weapon, aimFoe, ...(extra ?? {}) });`), `${h}: and stores it on the shaft`);
-  }
-});

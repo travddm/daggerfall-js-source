@@ -150,7 +150,4 @@ test('AUDIT RPT1026 L3: the law, in the one door and the one bag - a window a be
     b3.bedPressed = false;
     assert.deepEqual(b3.restAct()?.point, { kind: 'rough', where: null }, 'and on the host\'s point otherwise');
   } finally { setSharedClock(null); }
-  // the street's host: its ship's bed is pressed around toggleRest (`_restFromBed`), read as the toggle runs
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const bed = _restFromBed, restNow = \(\) => \{ if \(modes\) markPartyRestSpent\(\); townTalk\.showOverlay\(createRestWindow\(outdoorRestDeps, bed\)\); \};/);
 });

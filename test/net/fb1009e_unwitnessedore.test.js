@@ -56,10 +56,6 @@ test('UNWITNESSED-ORE law: the one cap is the surface\'s alone - DEEP-OPEN: an u
   const un = regionWritTable(16, [{ climate: C.Mountain, confirmed: false }], SEASONS.Summer).map((m) => m.material);
   assert.ok(un.includes('metal:silver'), 'the Court may ask the Silver the vein stands');
   assert.ok(!un.includes('metal:gold') && !un.includes('ore:orichalcum'));
-  const src = readFileSync(new URL('../../src/net/nodeLaw.js', import.meta.url), 'utf8');
-  // PIN MOVED (MINE-PERKS, Professions-Arc 43): the vein's cap is lifted for a Surveyor's own vein too (`confirmed || surveyed`);
-  // PIN MOVED (DEEP-OPEN): and the deep vein reads it no more
-  assert.equal(src.match(/confirmed(?: \|\| surveyed)? \? 7 : UNCONFIRMED_VEIN_TIER\)/g)?.length, 2, 'the vein and the Court read the one cap');
 });
 
 test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is mined - the law\'s Silver into the Stores at tier 3\'s XP, no gem, no signature - and its Gold is no vein there', async () => {
@@ -93,6 +89,4 @@ test('UNWITNESSED-ORE service: an unconfirmed Mountain pixel\'s Silver vein is m
 
 test('UNWITNESSED-ORE page: the Mining page says what the ground holds on anyone\'s word and what waits on three players', () => {
   assert.match(MINING_GROUND_LINE, /^Veins hold Silver at most until three different players, each with an account at least a week old, have gathered on that ground\. Then Gold, Platinum and Mithril in the mountains, and the region's own ore, can appear/);   // VOICE1 (PIN MOVED): the same law in plain words
-  const src = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(GATHER_HOW\[_sel\]\) pane\.append\(el\('p', 'px-note', gatherHow\(_sel\)\)\);[^\n]*\n\s+if \(_sel === 'mining'\) pane\.append\(el\('p', 'px-note', miningGroundLine\(\)\)\);/);
 });

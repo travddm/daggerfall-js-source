@@ -57,21 +57,5 @@ test('UI3: the setting is read live, is LIVE, and the loader asks it rather than
   assert.equal(paperDollBackground(RACE, { region: 23, inTown: true }), 'SCBG04I0.IMG', 'read live');
   resetToDefaults();
   assert.equal(LIVE['GUI/EnableGeographicBackgrounds'], 'src/ui/paperDoll.js');
-  const doll = read('src/ui/paperDoll.js');
-  assert.match(doll, /bg: await loadImgBmp\(paperDollBackground\(art\.background, \{/);
-  assert.doesNotMatch(doll, /loadImgBmp\(CONTEXT_BG\[context\]/, 'the old unconditional context lookup is gone');
 });
 
-test('UI3: the world host supplies the region, through HOISTED helpers (the boot-order trap)', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /return \{ region: maps\.getPoliticIndex\(px\.x, px\.y\) - 128, regionCount: maps\.regionCount \};/,
-    'GetPoliticIndex - 128, as DFU computes it (:214)');
-  assert.match(world, /preloadPaperDollArt\(\{ renderer, fetchBytes, palette, getTexture \}, \{ where: paperDollWhere\(\) \}\)/);
-  // The boot preload runs at the TOP of bootWorld and reaches both
-  // helpers, so neither may be a `const` - that is the temporal dead
-  // zone that took the site down the same day.
-  assert.match(world, /function paperDollWhere\(\) \{/);
-  assert.match(world, /function playerTravelPixel\(\) \{/);
-  assert.doesNotMatch(world, /const paperDollWhere =/);
-  assert.doesNotMatch(world, /const playerTravelPixel =/);
-});

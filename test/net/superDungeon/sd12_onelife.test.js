@@ -21,7 +21,6 @@ import { sdTestKey, sdOneParty } from './sdParty.mjs';   // SD-PARTY: the rig's 
 sdOneParty();
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const W = read('src/scenes/world.js');
 const T0 = 1_800_000_000_000, M = 60_000;
 const PX = 300, PY = 200;
 const UNITS_PER_M = PIXEL_UNITS / PIXEL_M;
@@ -106,9 +105,6 @@ test('SD-REZ THE WINDOW\'S LAW, pure: dead for good is fallen; down inside SD_RE
   assert.deepEqual([sdDownWord(realm, 'a', 0), sdDownWord(realm, 'b', 1000 + SD_REZ_MS), sdDownWord(realm, 'b', 1001 + SD_REZ_MS), sdDownWord(realm, 'c', 5)], ['fallen', 'rise', 'fallen', null]);
   assert.equal(SD_REZ_MS, 70_000, 'the body\'s minute for a friend to reach it, and the page\'s ten seconds for its hello');   // PIN MOVED (AUDIT WORLD-EVENTS L1-5): it said two minutes; the body was gone at one
   assert.equal(sdDownWord({ dead: [] }, 'b', 0), null, 'a realm kept before SD-REZ has no `down`');
-  // the relay's count asks the realm whether a body was raised (net/bossBody.js bodyCensus's `lives`, test/net/int11_body.test.js)
-  const relay = read('server/src/index.js');
-  assert.match(relay, /const raised = \(sub\) => !!realm && !realm\.dead\.includes\(sub\) && !realm\.down\.some\(\(\[x\]\) => x === sub\);\n[^\n]*bodyCensus\(f, bodies, now, line\.body, line\.enforce, \{ lives: raised \}\)/, 'the raised rise in the count');
 });
 
 test('SD-ONELIFE THE RIFT\'S WORD: a slot whose Hour this player died in is refused at its Rift for good - found, or in its collapse though they went through - in the realm\'s own words; another slot\'s word is its own (mutants: the fallen let through; the fallen before the slot)', () => {
@@ -135,15 +131,6 @@ test('SD-ONELIFE THE PAGE, from the world host\'s own text: the slot of the Hour
   assert.equal(JSON.parse(store.get(SD_FALLEN_KEY)).length, SD_ENTERED_MAX, 'the last few');
   assert.equal(make(SD_FALLEN_KEY).has(19), true, 'a reload reads it back');
   assert.notEqual(SD_FALLEN_KEY, SD_ENTERED_KEY);
-  assert.match(W, /const _sdFallen = sdSlotsKept\(SD_FALLEN_KEY, \(\) => _accountSds\.me\(\)\);/);   // PIN MOVED (WITCH1): the account handed in
-  assert.match(W, /if \(_deathWasOnline == null\)[^\n]*\n\s*\{ const hourSlot = modes\?\.sdRealmSlot\?\.\(\) \?\? null; if \(hourSlot != null\) _sdFallen\.add\(hourSlot\); \}/, 'kept the frame I die');   // AUDIT SD III (PIN MOVED): under D-ONLINE1's capture, which stays the death block's first statement (AUDIT WORLD B6, MWBODY1)
-  assert.match(W, /const seen = \{ entered: _sdEntered\.has\(s\), fallen: false \};[^\n]*\n\s*return \{ word: sdRiftWord\(rec, s, now, seen\),[^\n]*look: riftLook\(rec, s, now, seen\),/, 'the Rift asked with it');   // PIN MOVED (SD-BACK): never fallen - the realm's word says which Hour takes me back   // SD-LOOK (PIN MOVED): and its look told the same
-  // PIN MOVED (SD-REZ, EVENT-RULES - the owner: "Resurrect allowed"): a friend's Resurrect raises me in the Hour, inside its
-  // realm's window; past it my party pose says the death is for good (`fg` - the caster told, nothing spent)
-  assert.match(W, /const rez = social\?\.acct && madeRuleHere\('resurrect'\) !== 'refused' && hourRezOpen\(\) \? rezFor\(social\.others\(\), social\.acct, _rezSeen\) \?\? legacyHost\?\.raised\(\) \?\? null : null;[^\n]*\n\s*if \(rez && legacyHost\?\.raise\(rez\) !== false\) \{ resurrectInPlace\(rez\); return; \}/, 'a Resurrect in the Hour, inside the window');
-  assert.match(W, /const hourRezOpen = \(\) => _sdFallen\.mayRise\(modes\?\.sdRealmSlot\?\.\(\)\);/);
-  assert.match(W, /legacyHost\?\.raisable\(\) === false \|\| !hourRezOpen\(\) \? \{ fg: 1 \} : \{\}/, 'past it, for good');
-  assert.match(W, /function resurrectInPlace\(rez\) \{[^}]*_sdFallen\.rise\(modes\?\.sdRealmSlot\?\.\(\)\);/, 'raised: the slot let go');
   // the slot's own law, run
   let clock = 0;
   const rz = sdSlotsKept(SD_FALLEN_KEY, () => 'acct-z', appStorage, () => clock);

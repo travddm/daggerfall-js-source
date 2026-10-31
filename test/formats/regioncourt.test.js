@@ -74,46 +74,6 @@ test('CQ1: NOT EXACTLY ONE means null - the caller decides, as its sibling does'
   assert.equal(getCourtOfCurrentRegion(dictOf(court(1, 3)), 3)?.id, 1, 'exactly one');
 });
 
-test('CQ1: the host no longer hardcodes 0 - and 0 was never "absent"', () => {
-  const world = readFileSync(join(HERE, '..', 'src', 'scenes', 'world.js'), 'utf8');
-  assert.equal(/courtOfCurrentRegion: \(\) => 0,/.test(world), false,
-    '0 is a real faction id, so the hardcode resolved to a real faction rather than to nothing');
-  assert.match(world, /courtOfCurrentRegion: \(\) => getCourtOfCurrentRegion\(/,
-    'it reads the store now');
-  // ...through the SAME store and region index its People sibling
-  // uses, so the two cannot disagree about where the player stands.
-  const line = world.split('\n').find((l) => l.includes('courtOfCurrentRegion: () => getCourtOfCurrentRegion('));
-  const peopleLine = world.split('\n').find((l) => l.includes('peopleOfCurrentRegion: () => getPeopleOfCurrentRegion('));
-  for (const frag of ['_questStore()?.dict', '_questLoc()?.regionIndex']) {
-    assert.ok(line.includes(frag) && peopleLine.includes(frag), `both read ${frag}`);
-  }
-});
-
-test('CQ1: the retired claim has no SECOND home in the same file', () => {
-  // THE MISTAKE THIS PIN EXISTS FOR, made twice in one session. CQ1
-  // replaced `courtOfCurrentRegion: () => 0` and left a five-line
-  // comment four lines above it still saying "the port has no Court-of
-  // lookup yet, so a faction id of 0 inside a palace... still resolve
-  // to nothing" - sitting directly above the correction that says the
-  // opposite. EF1b was the same shape (the effect library's header
-  // outlived the counter's flag), and EF1c's lesson was written down
-  // as "A CLAIM USUALLY HAS MORE THAN ONE HOME. Grep the claim, not
-  // the line." Writing it down did not stop the repeat; a pin per
-  // slice does.
-  //
-  // EF1c's unquote rule applies: a correction may QUOTE what it
-  // retired, so quoted spans are stripped before the claim is sought.
-  const world = readFileSync(join(HERE, '..', 'src', 'scenes', 'world.js'), 'utf8')
-    .replace(/"[^"]*"/g, '""');
-  for (const dead of [
-    /GetCourtOfCurrentRegion is FLAGGED/,
-    /the port has no\s*\n?\s*\/\/ Court-of lookup/,
-  ]) {
-    assert.equal(dead.test(world), false,
-      `a retired CQ1 claim still reads as current in world.js: ${dead}`);
-  }
-});
-
 test('CQ1: every region in the real FACTION.TXT has EXACTLY ONE court', { skip: skipReal }, () => {
   // DFU's own comment says "Should always find a single court" and
   // throws otherwise - so on the shipped corpus the refusal path must

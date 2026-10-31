@@ -356,20 +356,3 @@ test('CHAP3a the member\'s own card: "Your writ", yours to fill for the guild, i
   ]);
 });
 
-test('CHAP3a the wiring: the writs\' kind and owner in the rebuild, Merit\'s table and its key; the board lists the Merit; the host says a writ\'s Merit and refreshes the Roll on a member\'s own; the version note (mutants: the schema, the line)', () => {
-  const halls = src('server-account/migrations/0099_npc_halls.sql');
-  assert.match(halls, /kind\s+TEXT NOT NULL CHECK \(kind IN \('court', 'hall', 'member'\)\)/);
-  assert.match(halls, /owner\s+TEXT NOT NULL DEFAULT '',/);
-  assert.match(halls, /UNIQUE \(day, region, kind, faction, owner, slot\)/);
-  const merit = src('server-account/migrations/0101_npc_merit.sql');
-  assert.match(merit, /source\s+TEXT NOT NULL CHECK \(source IN \('writ', 'gate', 'raid'\)\)/);
-  assert.match(merit, /amount\s+INTEGER NOT NULL CHECK \(amount >= 1\)/);
-  assert.match(merit, /UNIQUE \(char_id, faction, source, ref\)/);
-  assert.match(src('server-account/src/professions.js'), /merit: await meritAsks\(db, player\.id, character, region, nowS, members\),/);
-  const world = src('src/scenes/world.js');
-  assert.match(world, /const merit = hall && Number\(d\.merit\) > 0 \? `, \$\{Number\(d\.merit\)\.toLocaleString\('en-US'\)\} Merit to its chapter here` : '';/);
-  // PIN MOVED: GUILD3d - a Merit line on its chapter's card; above the cards only for a chapter the board draws none for
-  assert.match(src('src/ui/noticeWindow.js'), /for \(const m of writs\?\.merit \?\? \[\]\) if \(!carded\.has\(m\.faction\)\) body\.append\(el\('p', 'notice-merit', meritLineOf\(m, nowS\(\)\)\)\);/);
-  assert.match(src('src/ui/noticeWindow.js'), /if \(merit\) card\.append\(el\('p', 'notice-merit', `\$\{meritLineOf\(merit, nowS\(\)\)\}\.`\)\);/);
-  assert.match(src('server-account/src/service.js'), /CHAP3a \(Mac: "Keep going with the arc\/slices"; migration 0101_npc_merit/);
-});

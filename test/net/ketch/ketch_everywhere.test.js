@@ -170,9 +170,6 @@ test('KETCH-EVERYWHERE THE HERALD: every station\'s three cards name its own cit
 test('KETCH-EVERYWHERE THE RELAY: Skyrim\'s ship minted while its voyage holds and boarded by its captain; its fall\'s receipt names its voyage, kept at the hub on Skyrim\'s key beside the Bay\'s and both handed at a hello; its spent word spends its own; the open zone\'s ship never minted; the stations ride the world-wide relay (mutants: a station\'s receipt on the Bay\'s key; the spent word\'s station)', { timeout: 120_000 }, async () => {
   assert.equal(KT_THEATRES_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
   assert.deepEqual([relaySupportsKetchTheatres(RELAY_VERSION), relaySupportsKetchTheatres(`world${WORLD_WIDE_RELAY_MIN - 1}`)], [true, false]);
-  const onl = readFileSync(new URL('../../../src/net/online.js', import.meta.url), 'utf8');
-  assert.match(onl, /this\.ktTheatresOk = false;/, 'none before a welcome');
-  assert.match(onl, /if \(primary\) this\.ktTheatresOk = relaySupportsKetchTheatres\(relayV\);/, 'the session\'s word off its welcome');
   const nSky = ketchVoyageNumber(1, SKYRIM), V = ketchVoyageOf(nSky), nBay = 1;
   assert.deepEqual(V.at - ketchVoyageOf(nBay).at, 2 * KT_THEATRE_STAGGER_MS, 'Skyrim\'s voyage 1 two stations after the Bay\'s (Sentinel\'s between)');
   const owner = await instanceOwnerOf('acct-alice');

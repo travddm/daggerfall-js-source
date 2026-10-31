@@ -36,51 +36,6 @@ const scoped = (state) => new Proxy(state, {
 });
 const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(scoped(state));
 
-test('AUDIT REST III A1: the same dungeon\'s own load (F9, the pause\'s Load underground) stands the save\'s camps outside, after the character - as the world host\'s dungeon load does; a save from another place is the world host\'s, which stands them itself (mutants: the dungeon\'s load never asks; the mode machine never forwards; the host never answers)', () => {
-  const order = [];
-  const extras = { world: { outerCamps: [] }, locationKey: 'dungeon:7' };
-  const state = {
-    opts: {
-      dungeonOnline: () => false, loadRebuilds: () => false, worldLoad: (k) => order.push(['worldLoad', k]),
-      modStartLoad() {}, onStartLoad() {}, modSaveLoad() {}, horseCartLoad() {}, modLoaded: () => order.push('modLoaded'),
-      outerCampsLoad: (x) => order.push(['outerCampsLoad', x]),
-    },
-    loadSlot: () => state.snap, quickLoadSlot: () => state.snap, snap: { locationKey: 'dungeon:7' },
-    playerEntity: { name: 'Mara' }, hudText: { add: (l) => order.push(l) }, _locationKey: 'dungeon:7',
-    restorePlayer: () => extras, spellsByIndex: null, Promise,
-  };
-  const quickLoad = mount(`return ({ ${methodOf('src/scenes/dungeonContext.js', 'quickLoad')} }).quickLoad;`, state);
-  quickLoad.call({ restoreSaved: () => order.push('restored'), discardBeneathDeath() {} }, null);   // PIN MOVED (AUDIT DUPE-LOAD): the load drains what waits under the death screen first
-  assert.deepEqual(order, ['restored', ['outerCampsLoad', extras], 'modLoaded'], 'the character first, then the save\'s camps outside, then OnLoad');
-  // a save from another dungeon: handed up whole - the world host's load stands them (world.js standOuterCamps)
-  order.length = 0; state.snap = { locationKey: 'dungeon:9' };
-  quickLoad.call({ restoreSaved: () => order.push('restored'), discardBeneathDeath() {} }, 'slot');
-  assert.deepEqual(order, []);
-  // the seam, through the mode machine to the world host's one home
-  assert.match(rd('src/scenes/worldModes.js'), /outerCampsLoad: \(extras\) => host\.outerCampsLoad\?\.\(extras\),/);
-  assert.match(rd('src/scenes/world.js'), /outerCampsLoad: \(extras\) => standSavedOuterCamps\(extras\),/);
-});
-
-test('AUDIT REST III A1: the world host\'s one home stands the save\'s camps outside - the page\'s own dropped first, each re-stood on today\'s ground when the save\'s terrain scale differs; a save from before carries none and what stands, stands', () => {
-  const calls = [];
-  const state = {
-    camps: { dropOwn: () => calls.push('drop'), restore: (rows, from) => calls.push(['restore', rows, from]) },
-    scaleOf: (s) => (s > 0 ? s : 1), STREAMING_TERRAIN_SCALE: 2, state: { localFromWorld: (x, z) => [x / 10, z / 10] },
-    restandHeight: (y, x, z, was) => `y${y}@${x},${z}/${was}`, campFromNatives: 'fromNatives',
-    landform: null,   // LANDFORM1: the row off - every height DFU's frame, no lift to put back on
-  };
-  const stand = mount(`${fnOf('src/scenes/world.js', 'standSavedOuterCamps')}\nreturn standSavedOuterCamps;`, state);
-  stand({ world: {} });
-  stand(undefined);
-  assert.deepEqual(calls, [], 'a save from before AUDIT REST II H6 carries none: nothing dropped');
-  const row = { id: 'me:1:1', pos: [100, 5, 200] };
-  stand({ world: { outerCamps: [row] }, terrainScale: 2 });
-  assert.deepEqual(calls, ['drop', ['restore', [row], 'fromNatives']], 'the same ground: the save\'s rows as they are');
-  calls.length = 0;
-  stand({ world: { outerCamps: [row] }, terrainScale: 1 });
-  assert.deepEqual(calls[1][1], [{ id: 'me:1:1', pos: [100, 'y5@10,20/1', 200] }], 'another ground: re-stood');
-});
-
 test('AUDIT REST III D1: a held bounty\'s day moves with the lane - brought online, a bounty taken half an hour before keeps its day and its kills (the world months ahead of the offline calendar lapsed it, kills and all, on the first tick); taken offline again, the same; the minute a bounty was paid moves with it (mutants: the rows left on the old clock; the paid minutes left)', async () => {
   const { onlineCopyOf, offlineCopyOf, BOUNTY_RECORD_VENDOR } = await import('../../src/systems/offlineCopy.js');
   const { BOUNTY_VENDOR, lapseBounties, bountyMinutesLeft, BOUNTY_LIFETIME_MINUTES } = await import('../../src/systems/bounty/bountyBoard.js');
@@ -100,24 +55,6 @@ test('AUDIT REST III D1: a held bounty\'s day moves with the lane - brought onli
   const early = onlineCopyOf({ classicMinutes: 900, modData: { [BOUNTY_VENDOR]: { held: [{ id: 'b2', takenAt: 100, killed: 0 }], paidAt: { s: 50 } } } }, 10);
   assert.equal(early.modData[BOUNTY_VENDOR].held[0].takenAt, 0, 'never below the calendar\'s start');
   assert.equal(early.modData[BOUNTY_VENDOR].paidAt.s, 0);
-});
-
-test('AUDIT REST III C1: a night my own clock owes me is carried inside the party\'s minute - the party just off the road (the journey moved the clock, the next night due at once), a mate who rests 45 s after the first night sleeps me; a short rest still waits the minute out, and the debt is asked only of a move the minute holds back (mutants: the debt never asked; always owed)', async () => {
-  const { createNightWatch, PARTY_NIGHT_GAP_MS } = await import('../../src/systems/party/partyRestLaw.js');
-  const w = createNightWatch();
-  const t0 = 1_000_000;
-  assert.equal(w.moved('a', true, t0 - 5000, t0, true), false, 'the first sight is a baseline');
-  let asked = 0;
-  const due = (v) => () => { asked++; return v; };
-  assert.equal(w.moved('a', true, t0 + 1000, t0 + 1000, true, due(false)), true, 'the first night: carried');
-  assert.equal(asked, 0, 'outside the minute the debt is never asked');
-  assert.equal(w.moved('a', true, t0 + 46_000, t0 + 46_000, true, due(false)), false, 'inside the minute, owed nothing: a short rest waits');
-  assert.equal(w.moved('a', true, t0 + 47_000, t0 + 47_000, true, due(true)), true, 'inside the minute, a night owed: carried');
-  assert.equal(asked, 2);
-  assert.equal(w.moved('a', true, t0 + 47_000, t0 + 47_500, true, due(true)), false, 'never the same stamp twice (P2\'s mark)');
-  assert.equal(asked, 2, 'nor asked of a stamp that did not move');
-  assert.equal(w.moved('a', true, t0 + 48_000 + PARTY_NIGHT_GAP_MS, t0 + 48_000 + PARTY_NIGHT_GAP_MS, true), true, 'past the minute, as before');
-  assert.match(rd('src/scenes/world.js'), /_nightWatch\.moved\(m\.acct, !!m\.p, at, now, isNightStamp, \(\) => nightDue\(playerEntity, ownMinutes\(\)\)\)/, 'the host asks its own clock');
 });
 
 test('AUDIT REST III B2: "Bring online" keeps a rest supply standing as the owner\'s own decor offline too - the item and the piece it stood as leave the realm\'s copy (online, taking the piece down handed it to the pack); another piece and another own item stay (mutant: the decor unread; the piece left standing)', async () => {

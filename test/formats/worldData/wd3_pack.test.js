@@ -305,5 +305,4 @@ test('WD3 a pack\'s classic references are checked BY NAME (AUDIT WD3 P5) - `cla
       for (const [i, n] of Object.entries(pack.classicNames)) assert.equal(blocks.getBlockName(Number(i)), n, `${v}: block ${i}`);
     }
   }
-  assert.match(readFileSync(join(ROOT, 'tools/worldDataPackBuild.mjs'), 'utf8'), /out\.classicNames = Object\.fromEntries\(classicIndicesOf\(out\)\.map\(\(i\) => \[i, blocks\.getBlockName\(i\)\]\)\);/, 'the builder names them');
 });

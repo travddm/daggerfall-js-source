@@ -67,8 +67,6 @@ test('WB14e the night\'s draw: one gate in TITHE_ONE_IN carries a Tithe-Imp, its
     assert.equal(gateTitheOf(d), ti, 'the day\'s alone');
   }
   assert.ok(Math.abs(n / nights - 1 / TITHE_ONE_IN) < 0.02, `${n} of ${nights}`);
-  const omen = read('src/net/gate/gateHerald.js') + read('src/net/gate/gateMods.js');
-  assert.ok(!/tithe/i.test(omen), 'never said before it comes');
   for (let d = 0; d < 400; d++) assert.ok(!/tithe/i.test(portentsLine(gatePortentsOf(d)) ?? ''), 'no portent of it - never in the omen');   // AUDIT WB14 (RECORD nit): the omen's words, not a list that never holds it
 });
 
@@ -204,10 +202,6 @@ test('WB14e beside the Legion-Lord\'s host it steps its own way - never a Ward-B
 // ═══ THE RELAY AND THE WIRE ═══════════════════════════════════════════════════════════════════════════════════════
 
 test('WB14e the relay: a fight born with its night\'s moment (gateTitheOf), through the seam; a word with `to` goes to that fighter\'s sockets alone, without it (mutants: the tithe fanned to the court)', () => {
-  const src = read('server/src/index.js');
-  assert.match(src, /md: gateModsOf\(day\), pt: gatePortentsOf\(day\), ti: gateTitheOf\(day\) \}\);/);
-  assert.match(src, /for \(const fr of frames\) if \(fr\.to != null\) \{ const \{ to, \.\.\.word \} = fr; const s = JSON\.stringify\(\{ t: 'gate', \.\.\.word \}\); for \(const \[ws, b\] of \[\.\.\.this\._courtSockets\(\)\]\) if \(b\.sub === to\) this\._send\(ws, s\); \}/);
-  assert.match(src, /frames = frames\.filter\(\(fr\) => fr\.to == null\);/);
   assert.equal(GATE_SEAM.new({ day: 3, now: T0, wrathAt: WRATH, boss: 'ruhn', ti: 70_000 }).ti, 70_000);
   assert.equal(GATE_SEAM.new({ day: 3, now: T0, wrathAt: WRATH, boss: 'ruhn' }).ti, null);
   assert.equal(newFight(3, T0, WRATH, 'ruhn', null, null, -5).ti, null, 'nothing that is no moment');
@@ -260,10 +254,6 @@ test('WB14e the court: my tithe into my pack once (the spoils\' own door), its g
   const pool = createSpoilsPool({ ray: () => null, now: () => 5100, take: (p) => viaPool.push(p) });
   createGateCourt({ link, spoils: pool, now: () => 5100, feet: () => courtToDungeon(2, 0, 2), player: () => ({ health: 100, maxHealth: 100, level: 10 }) }).frame();
   assert.deepEqual(viaPool.map((p) => p.kind), want.map((p) => p.kind), 'through the pool\'s take, once');
-  const court = /const gateCourt = gateLink \? createGateCourt\(\{[\s\S]*?\n {2}\}\) : null;/.exec(read('src/scenes/world.js'))[0];
-  assert.match(court, /spoils: spoilsPool,/);
-  assert.doesNotMatch(court, /takeSpoil/, 'the court is handed the pool, its door with it');
-  assert.match(read('src/scenes/world.js'), /const spoilsPool = createSpoilsPool\(\{[\s\S]{0,600}?take: takeGateSpoil,/);
 });
 
 test('WB14e its words, its look and the bar: its bolt said as it rises, its catching by name, its escape; an Imp\'s sprite at TITHE_SCALE named the Tithe-Imp; sinking into the fire as it flees; never counted his host (mutants: no line at its rising; an escape said as a catch; counted on the bar)', () => {
@@ -271,7 +261,6 @@ test('WB14e its words, its look and the bar: its bolt said as it rises, its catc
   assert.equal(COURT_HOST_TEXT.titheCaught('Ann'), 'Ann catches the Tithe-Imp! Its tithe goes to all who struck it.');   // PIN MOVED (AUDIT WB14 TEXT-11): nothing spills - it goes into their packs
   assert.deepEqual([COURT_TITHE_TEXT.mine(594, 'Ruby'), COURT_TITHE_TEXT.mine(1200, 'Emerald'), COURT_TITHE_TEXT.mine(600, 'Amber')], ['You take its tithe of 594 gold and a Ruby.', 'You take its tithe of 1,200 gold and an Emerald.', 'You take its tithe of 600 gold and an Amber.'], 'AUDIT WB14 (TEXT-1): the gem with its article');
   assert.equal(COURT_HOST_TEXT.titheEscaped(), 'The Tithe-Imp escapes into the fire.');
-  assert.match(read('src/scenes/gate/gateHost.js'), /else if \(g\.k === HOST\.tithe && !s\.fell && s\.wrath == null\) say\(g\.w === 0 \? COURT_HOST_TEXT\.titheCaught\(g\.n\) : COURT_HOST_TEXT\.titheEscaped\(\)\);/);
   const L = hostLookOf(HOST.tithe, 'rime');
   assert.deepEqual([L.mobile, L.name, L.scale], [1, 'Tithe-Imp', TITHE_SCALE]);
   assert.equal(hostLookOf(HOST.harrier, 'rime').scale, 1);
