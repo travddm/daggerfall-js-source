@@ -1,8 +1,8 @@
-# Mods, `vendor/`, and Daggerfall Unity as the reference
+# Mods, `vendor/`, and Daggerfall Unity as the baseline
 
 This page covers how the game carries Daggerfall Unity (DFU) mods: what `vendor/` holds, how a vendored mod's switches
 work (`src/systems/modSettings.js`), how a player's own `.dfmod` bundle is read, and how DFU's source is used as the
-reference.
+baseline.
 
 ## What a "mod" is here
 
@@ -118,9 +118,9 @@ A texture mod has no code, only DFU's asset-injection names packed into a bundle
 - Loose replacement textures and music (picked folders) use the same naming, through `textureReplacement.js` and
   `musicReplacement.js`. All replacement is gated by DFU's `Enhancements/AssetInjection` setting.
 
-## Daggerfall Unity as the reference
+## Daggerfall Unity as the baseline
 
-The game is its own design, not a copy of DFU. DFU is where to look first:
+DFU is the baseline: the game departs from it only as `docs/README.md` allows. Look in DFU first:
 
 - **Read DFU before building a system it has.** Grep this tree for the DFU class name and its constants; a port may
   already exist.
