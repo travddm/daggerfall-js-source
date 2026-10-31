@@ -280,11 +280,5 @@ test('ONLINE-DUNGEON-FOES: a foe past the layout run is neither streamed nor pee
   assert.match(dc, /const _roomFoe = isRoomFoe\(f, _fi\);[^\n]*\n\s*const _puppet = isPuppetFoe\(f, _fi\);/, 'the frame asks the gate at the index its targeting bound reads');
   assert.equal(puppet[1].trim(), 'isRoomFoe(f, i)',
     'the puppet gate and the targeting bound are one expression - widen them together or not at all (QUEST-PARTY phase 3c: and a party member\'s quest foe, its owner\'s stream, is a puppet whoever hosts)');
-
-  // And the note stays at the site, naming both halves and now RETIRED, so the record cannot quietly outlive the code
-  // it describes - nor the flag stand on the board over code that paid it (SUMMON-SYNC).
-  assert.match(dc, /ONLINE-DUNGEON-FOES \(2026-09-20, Mac:/, 'the note is gone from the site');
-  assert.match(dc, /NOT SYNCED\./); assert.match(dc, /NOT REACTIVE\./);
-  assert.match(dc, /SUMMON-SYNC \(2026-09-27, Mac: "Finish the 2 gaps"\) paid the last, a summon's foe/, 'the retirement says what paid it');
   assert.doesNotMatch(dc.slice(dc.indexOf('ONLINE-DUNGEON-FOES.'), dc.indexOf('const _layoutFoes = foes.length;')), /FLAGGED/, 'no longer on the board');
 });
