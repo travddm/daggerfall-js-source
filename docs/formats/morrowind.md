@@ -16,9 +16,10 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   (`characters/npcBodies.js`).
 - Without Morrowind data every character keeps the classic sprite or paperdoll. Every consumer must work in that state.
 - The reference is OpenMW (GPL). `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` state that OpenMW was used for
-  behaviour only and no code was ported. `mwTexture.js` describes its path-correction functions as a verbatim
-  translation of OpenMW's `misc/resourcehelpers.cpp`. Read a module's header for its own statement before you bring in
-  more of OpenMW's logic.
+  behaviour only and no code was ported. `mwTexture.js` was rewritten from the file-format documentation and the
+  behaviour of Morrowind data, without OpenMW code; `test/formats/morrowind/mwtexture_parity.test.js` holds it to the
+  answers of the module it replaced. The repository is MIT: do not copy OpenMW code. Read a module's header for its
+  own statement before you bring in more of OpenMW's logic.
 
 ## Data plumbing (`src/scenes/dataSource.js`)
 
