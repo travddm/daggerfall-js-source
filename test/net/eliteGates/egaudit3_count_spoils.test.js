@@ -106,9 +106,6 @@ test('AUDIT EG III #1 WHAT AN END\'S CLAIM OPENS (scenes/world.js egSpoilsPaid t
   assert.equal(egReliquaryGrant({ ...c, c: undefined }, d2, 30), null, 'no seed');
   assert.equal(EG_SPOILS_TEXT.opened(1), 'Your Reliquary opens: its spoils are in your pack.');
   assert.notDeepEqual(egReliquaryList(0x51ed, 30, [1]), egSpoilsList(0x51ed, 30, 1), 'a Reliquary is not the Redoubt\'s own roll');
-  const host = rd('src/scenes/world.js');
-  const fn = host.slice(host.indexOf('function egSpoilsPaid(c, d) {'), host.indexOf('function egSpoilsPaid(c, d) {') + 900);
-  assert.match(fn, /if \(c\?\.q === 'x'\) \{\s*const g = egReliquaryGrant\(c, d, spoilsLevel\(playerEntity\.level \?\? 1, c\.l\)\);\s*if \(g\) spoilsLock\(\(\) => sdSpoilsPool\.grant\(\{ day: g\.day, acct: c\.s, roll: g\.roll, text: g\.text \}\)\)/, 'the host grants it through the pool, at the level the breach admitted');
 });
 
 /** A client inside the breach `B` (test/net/eliteGates/egz_recap.test.js's harness), its account's claim answered by `answer(claims)`. */

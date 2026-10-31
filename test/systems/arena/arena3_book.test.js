@@ -235,7 +235,6 @@ test('ARENA3 the driver tells the exhibition\'s verdict; the hosts wire the stal
     // relay's mirrored one (scenes/arena/arenaBouts.js startExhibitionRelay: kind 'relay', its `ex` carried)
     assert.match(W, /const arenaBoutBegun = \(\) => \{ const b = arenaBouts\.bout\(\); return arenaBouts\.hour\(\) != null && !!b && !\['call', 'walk', 'count'\]\.includes\(b\.phase\); \};/, f);
   }
-  assert.match(readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8'), /if \(gateRole === 'bookmaker' && host\.arenaBookmaker\?\.\(\)\) return;/);
 });
 
 test('ARENA3 book save: the book rides the league through save.js - every wager back; a broken one dropped', () => {

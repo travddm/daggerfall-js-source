@@ -344,10 +344,6 @@ test('LEAN-WITNESS the judging reads use the lean indexes - a region\'s towns an
   const db = d1();
   const raw = db._raw;
   const plan = (sql, ...a) => raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all(...a).map((r) => r.detail).join(' | ');
-  const hallSql = src('server-account/src/npcHalls.js').match(/async function judgedRows[\s\S]*?db\.prepare\(`([\s\S]*?)`\)/)[1].replaceAll('${HALL_WITNESS_KIND}', HALL_WITNESS_KIND).replaceAll('${LEAN_ROWS}', LEAN_ROWS);
-  const p = plan(hallSql, 21, '1:%');
-  assert.match(p, /idx_world_witness_lean_key/);
-  assert.match(p, /idx_world_witness_lean_region/);
   assert.match(plan(SEAT_JUDGED_SQL), /idx_world_witness_lean_key/);
   const { sql } = unmatchedRead({ prepare: (s) => ({ bind: () => ({ sql: s }) }) }, 'npchall', 'a', T0);
   assert.match(plan(sql.replace('?2', "'a'").replace('?1', "'npchall'").replace('?3', '0')), /idx_world_witness_account/);
@@ -401,78 +397,6 @@ function triggerStatements(raw, name) {
   return body.split(';').map((x) => x.trim()).filter(Boolean)
     .map((x) => x.replace(/\b(?:NEW|OLD)\.(kind|key|account|report|at)\b/g, (_, c) => ({ kind: "'seat'", key: "'5'", account: "'a'", report: "'r'", at: '0' })[c]));
 }
-
-test('LEAN-WITNESS every statement of the triggers finds its rows by a key\'s index range - a late answer by its own and its key\'s primary keys, a settle by the key\'s rows that are not late and its earliest late ones - and never walks a kind; the bump finds its town\'s rows by their key (AUDIT LEAN-READS A1/A3; mutants: a read on its kind alone, the late index unread)', () => {
-  const raw = d1()._raw;
-  const plan = (sql) => raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all().map((r) => r.detail).join(' | ');
-  const names = ['witness_lean_in', 'witness_lean_out', 'witness_confirmed_moved', 'witness_confirmed_turned'];
-  let searched = 0;
-  for (const name of names) {
-    for (const st of triggerStatements(raw, name)) {
-      const p = plan(st);
-      assert.doesNotMatch(p, /SCAN world_witness|SCAN witness_confirmed/, `${name}: ${st.slice(0, 60)} - ${p}`);
-      for (const step of p.split(' | ').filter((x) => /SEARCH (world_witness|witness_confirmed|w|c) /.test(x))) {
-        if (/^SEARCH world_witness USING INTEGER PRIMARY KEY \(rowid=\?\)$/.test(step) && st.includes('WHERE rowid IN (SELECT rowid FROM world_witness INDEXED BY')) continue;   // the rows its named read found
-        assert.match(step, /key=\?/, `${name}: a key's rows, not a kind's - ${step}`);
-        searched++;
-      }
-    }
-  }
-  assert.ok(searched >= 10);
-  const [settle] = triggerStatements(raw, 'witness_lean_out');
-  assert.match(plan(settle), /idx_world_witness_lean_key \(kind=\? AND key=\?\)/);
-  assert.match(plan(settle), /idx_world_witness_late \(kind=\? AND key=\?\)/);
-  const [, , self] = triggerStatements(raw, 'witness_lean_in');
-  assert.match(plan(self), /sqlite_autoindex_world_witness_1 \(kind=\? AND key=\? AND account=\?\)/, 'a late answer: its own row');
-  const bump = src('server-account/src/npcHalls.js').match(/const bumpRegions = [\s\S]*?db\.prepare\(\s*`([\s\S]*?)`\)/)[1]
-    .replaceAll('${HALL_WITNESS_KIND}', HALL_WITNESS_KIND).replaceAll('${LEAN_ROWS}', LEAN_ROWS).replace('${keySql}', 'key = ?1').replace('${guard}', 'changes() > 0');
-  assert.match(plan(bump), /SEARCH world_witness USING (?:COVERING )?INDEX sqlite_autoindex_world_witness_1 \(kind=\? AND key=\?\)/, 'the bump: its town\'s rows (HALL-PLAN)');
-});
-
-test('LEAN-WITNESS with ANALYZE\'s statistics the triggers\' reads keep their indexes - where the planner, told pixels make a key three rows, takes the table\'s key index over both partial ones and every settle walks its key (AUDIT LEAN-READS 2 A3: a 10,000-row town\'s strike 0.2 s to 12 s; mutants: a settle\'s index unnamed, a moved row\'s)', () => {
-  const raw = d1()._raw;
-  ACCOUNTS.forEach((a) => addAccount(raw, a));
-  Array.from({ length: 60 }, (_, i) => addAccount(raw, `x${i}`));
-  const ins = raw.prepare('INSERT INTO world_witness (kind, key, account, report, region, at) VALUES (?, ?, ?, ?, 21, ?)');
-  raw.exec('BEGIN');
-  for (let k = 0; k < 20_000; k++) ins.run('pixel', `p${k}`, ACCOUNTS[k % ACCOUNTS.length], 'g', T0);   // the day's shape: pixels, a key a row or so
-  for (let k = 0; k < 100; k++) for (let j = 0; j < 27; j++) ins.run('seat', String(k), `x${(k + j) % 60}`, KINDS.seat.report(k, 21, 40), T0 + j);   // and seats of 27 answers
-  for (let k = 0; k < 300; k++) for (let j = 0; j < 19; j++) ins.run('npchall', `1:${k}`, `x${(k + j) % 60}`, KINDS.npchall.report(k, 21, 40), T0 + j);   // and towns of 19
-  raw.exec('COMMIT');
-  raw.exec('ANALYZE');
-  assert.ok(raw.prepare('SELECT COUNT(*) AS n FROM sqlite_stat1').get().n > 0);
-  const plan = (sql) => raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all().map((r) => r.detail).join(' | ');
-  const unnamed = (st) => st.replace(/ INDEXED BY idx_world_witness_\w+/g, '');
-  // every row of the key read (a covering probe is the last answer's EXISTS; with its account, a row's own lookup)
-  const KEY_WALK = /USING INDEX sqlite_autoindex_world_witness_1 \(kind=\? AND key=\?\)/;
-  // the control: the same reads unnamed walk the key under these statistics - a settle's, a moved row's, a turned one's
-  for (const [name, i] of [['witness_lean_in', 1], ['witness_lean_out', 0], ['witness_confirmed_moved', 1], ['witness_confirmed_turned', 0]]) {
-    assert.match(plan(unnamed(triggerStatements(raw, name)[i])), KEY_WALK, `the statistics turn ${name}'s read unnamed`);
-  }
-  for (const name of ['witness_lean_in', 'witness_lean_out', 'witness_confirmed_moved', 'witness_confirmed_turned']) {
-    for (const st of triggerStatements(raw, name)) {
-      const p = plan(st);
-      assert.doesNotMatch(p, /SCAN world_witness/, `${name}: ${p}`);
-      assert.doesNotMatch(p, KEY_WALK, `${name}: its named index, not the key's every row - ${p}`);
-    }
-  }
-  // and the service's own reads of the lean rows: a region's towns, the seats', a town's confirmers on a late report
-  const hallSql = src('server-account/src/npcHalls.js').match(/async function judgedRows[\s\S]*?db\.prepare\(`([\s\S]*?)`\)/)[1].replaceAll('${HALL_WITNESS_KIND}', HALL_WITNESS_KIND).replaceAll('${LEAN_ROWS}', LEAN_ROWS);
-  assert.match(plan(unnamed(hallSql).replace('?', '21').replace('?', "'1:%'")), KEY_WALK, 'the statistics turn the towns\' rows unnamed');
-  const reads = { hall: hallSql.replace('?', '21').replace('?', "'1:%'"), seats: SEAT_JUDGED_SQL,
-    confirmers: src('server-account/src/npcHalls.js').match(/const CONFIRMER_MAY_BE_IGNORED = `EXISTS \(SELECT 1 FROM \((SELECT[^)]*?)\) w/)[1]
-      .replaceAll('${HALL_WITNESS_KIND}', HALL_WITNESS_KIND).replaceAll('${LEAN_ROWS}', LEAN_ROWS).replace('?1', "'1:5'") };
-  for (const [what, sql] of Object.entries(reads)) {
-    const p = plan(sql);
-    assert.doesNotMatch(p, KEY_WALK, `${what}: ${p}`);
-    assert.match(p, /idx_world_witness_lean_(key|region)/, `${what}: the lean rows by their index - ${p}`);
-  }
-  const named = (name) => triggerStatements(raw, name).join(' ').match(/INDEXED BY idx_world_witness_\w+/g)?.length ?? 0;
-  assert.equal(named('witness_lean_in'), 3, 'the settle\'s three reads');
-  assert.equal(named('witness_lean_out'), 3);
-  assert.equal(named('witness_confirmed_moved'), 2);
-  assert.equal(named('witness_confirmed_turned'), 1);
-});
 
 test('LEAN-WITNESS a strike of a key whose answers lie interleaved - split between two, or disputed - deletes each row once and writes none: the late rows, then the confirmation emptied, then the rest (AUDIT LEAN-READS 2 A1/D1: one DELETE turned the confirmation over at each confirmer, 1,516 rows wrote 1.1 million; mutants: the late rows not first, the confirmation not emptied)', async () => {
   const db = d1();

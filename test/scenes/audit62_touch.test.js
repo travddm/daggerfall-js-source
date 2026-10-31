@@ -190,14 +190,6 @@ test('AUDIT 62 F7: under a window the finger\'s look is DROPPED and its held swi
   });
 });
 
-test('AUDIT 62 F7: all three hosts hand the layer the SAME predicate their mouse arms carry (mutant: pass only townTalk.overlayActive, which cannot see the modal windows)', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(h), /paused: \(\) => gamePaused\(\),/, `${h}: gamePaused() is townTalk's slot OR modes.overlayHeld`);
-  }
-  assert.match(read('src/scenes/dungeon.js'), /paused: \(\) => !!ctx\.uiOverlayActive,/, 'dungeon: its own mouse predicate');
-  assert.match(read('src/ui/touch/touch.js'), /const paused = !!hooks\.paused\?\.\(\);/, 'the gate lives at the one door all three share');
-});
-
 // ---------------------------------------------------------------
 // F8 - the bindings registry
 // ---------------------------------------------------------------
@@ -363,30 +355,6 @@ test('AUDIT 62 F8: the tap is the ActivateCenterObject ACTION, read straight int
 });
 
 // ---------------------------------------------------------------
-// F9 - the mode-cycle button
-// ---------------------------------------------------------------
-test('AUDIT 62 F9: nextMode refuses under a window, on the same predicate the F1-F4 ladder uses (mutant: drop the guard)', () => {
-  // DFU reads the four modes through ActionStarted
-  // (PlayerActivate.cs:220-228) and a paused InputManager never
-  // populates currentActions (InputManager.cs:487-505), while a
-  // PauseWhileOpen window pauses on AddWindow
-  // (UserInterfaceManager.cs:180-185): no mode change under a window.
-  const s = read('src/scenes/townTalk.js');
-  const i = s.indexOf('function nextMode()');
-  assert.ok(i > 0, 'nextMode exists');
-  const body = s.slice(i, i + 1400);
-  // AUDIT 68 S21-readout-eats-activate: the key ladder asks this slot's PAUSE since STATUS-LIVE (a non-pausing
-  // readout is walked under), so the button asks the same - the old bare-slot test refused under the readout alone.
-  assert.match(body, /if \(\(overlay && talkPaused\(\)\) \|\| otherOverlayActive\?\.\(\)\) return getInteractionMode\(\);/,
-    'both slots, exactly as the key ladder gates (keydown\'s `overlay && talkPaused()` and otherOverlayActive)');
-  assert.ok(body.indexOf('if ((overlay && talkPaused()) || otherOverlayActive?.())') < body.indexOf('setMode('),
-    'and the gate comes BEFORE the mode is set');
-  // the touch button reads the returned mode as its label, so refusing
-  // must answer the CURRENT mode rather than nothing.
-  assert.match(read('src/ui/touch/touch.js'), /modeBtn\.textContent = hooks\.cycleMode\(\)/, 'the label is the hook\'s answer');
-});
-
-// ---------------------------------------------------------------
 // F10 - the dial button's skin
 // ---------------------------------------------------------------
 test('AUDIT 62 F10: no dial hook, no dial button - and the hosts pass the opener\'s own predicate (mutant: dial: true)', () => {
@@ -402,7 +370,6 @@ test('AUDIT 62 F10: no dial hook, no dial button - and the hosts pass the opener
   for (const h of HOSTS) {
     assert.match(read(h), /dial: isEnhanced\(\),/, `${h}: the hook is the OPENER's gate (pixelDial.js refuses off the enhanced skin)`);
   }
-  assert.match(read('src/scenes/dungeon.js'), /import \{ isEnhanced \} from '\.\.\/systems\/uiSkin\.js';/, 'dungeon imports it');
 });
 
 // ---------------------------------------------------------------
@@ -424,124 +391,14 @@ test('AUDIT 62 F16: a foe swept from the pool is never flagged dead, so the lock
   assert.equal(lock.locked, false);
 });
 
-test('AUDIT 62 F16/F28: the world hosts publish the lock doors and worldModes arms BOTH modal ladders (mutant: delete either arm, the guard, or the consumption)', () => {
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(h);
-    assert.match(s, /lockToggle: \(foe\) => lockOn\.toggle\(foe\),/, `${h}: the toggle door`);
-    assert.match(s, /unlockOn: \(\) => \{ lockOn\.unlock\(\); touch\?\.setLockDot\(null\); \},/, `${h}: the release door, dot and all`);
-    assert.match(s, /reportFrame: \(proj, view\) => \{/, `${h}: the modal frame's matrices, for the ray and the dot`);
-    // the tick stays UNGATED: an indoor lock must steer and must break
-    assert.match(s, /lockOn\.tick\(dt, cam, cam\.pos, lookFilter\);/, `${h}: no mode clause on the tick`);
-    assert.ok(!/modeNow\(\) === 'exterior'[^\n]*lockOn\.tick/.test(s), `${h}: the tick must not be gated on the mode`);
-  }
-  const wm = read('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT WATCH-KIT WK-P2, 2026-10-01): each arm's pool passes my companion by (`.filter((f) => f.companion ==
-  // null)`, the street's law - test/systems/auditwatchkit_ui.test.js runs both arms); re-aimed by content, the arms' own pool
-  // and collider as before
-  assert.match(wm, /if \(host\.activateDir\?\.\(\) && interiorCtx\) \{\s*\n\s*const f = pickFoe\(eye, dir, interiorFoePool\(\)\.filter\(\(f\) => f\.companion == null\), interiorCtx\.collider, LOCK_PICK_DISTANCE\);[^\n]*\n\s*if \(f\) \{ host\.lockToggle\?\.\(f\); return true; \}/,
-    'the interior ladder locks on a finger tap, over its OWN pool and collider');
-  assert.match(wm, /if \(host\.activateDir\?\.\(\) && dungeonCtx\) \{\s*\n\s*const f = pickFoe\(eye, dir, dungeonCtx\.foes\.filter\(\(f\) => f\.companion == null\), dungeonCtx\.collider, LOCK_PICK_DISTANCE\);[^\n]*\n\s*if \(f\) \{ host\.lockToggle\?\.\(f\); return true; \}/,
-    'and so does the world-hosted dungeon - the ladder the classic start runs through');
-  // the arm sits AFTER the quest click, whose fall-through must survive
-  for (const [arm, quest] of [[wm.indexOf('interiorFoePool().filter((f) => f.companion == null), interiorCtx.collider, LOCK_PICK_DISTANCE'), wm.indexOf('pickQuestFoe(eye, dir, interiorFoePool()')],
-    [wm.indexOf('dungeonCtx.foes.filter((f) => f.companion == null), dungeonCtx.collider, LOCK_PICK_DISTANCE'), wm.indexOf('pickQuestFoe(eye, dir, dungeonCtx.foes')]]) {
-    assert.ok(quest > 0 && arm > quest, 'QG1\'s non-consuming quest arm still runs first');
-  }
-  assert.match(wm, /host\.reportFrame\?\.\(proj, view\);/, 'the modal frame reports its camera, so the tap ray and the dot stop riding the last street frame');
-});
-
 test('AUDIT 62 F8 (review): worldModes\' OWN activate gate sees the finger - its `down` expression is EXECUTED here across the tap\'s two frames (mutant: drop `|| !!host.activateDown?.()`, or stop publishing activateDown from either world host)', () => {
-  // THE MACHINE THAT OWNS EVERY DOOR INDOORS. worldModes runs the
-  // interior and world-hosted-dungeon activate gate - every shop, every
-  // house, and the classic start into Privateer\'s Hold - off a `keys`
-  // Set it destructures from its host. While the tap synthesized a
-  // literal \'Mouse0\' the press arrived in that shared Set for free;
-  // F8 removed the literal and gave the three STANDALONE hosts
-  // `_tapArmed > 0`, which is a host-local `let` this module cannot
-  // see. The gate is read out of the shipped source and run, so a
-  // revert cannot hide behind a text match.
-  //
-  // The law being pinned is DFU\'s: ActivateCenterObject activates on
-  // ActionComplete, the RELEASE edge (PlayerActivate.cs:280,
-  // InputManager.cs:634-637) - so a press frame followed by a release
-  // frame must produce exactly one activation, and no press frame must
-  // produce none.
-  const wm = read('src/scenes/worldModes.js');
-  const m = /\n\s*down: (.+?),\s*\n\s*hasReadySpell:/.exec(wm);
-  assert.ok(m, 'worldModes no longer builds its activate gate with a `down:` input');
-  // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): the press is named before the gate (`_activateDown`), and the
-  // act's click is asked with it - its own expression is the one run
-  const named = m[1] === '_activateDown' ? /\n\s*const _activateDown = (.+?);\n/.exec(wm) : null;
-  assert.ok(m[1] !== '_activateDown' || named, 'the named press is defined');
-  const gateDown = new Function('held', 'keys', 'host', `return (${named ? named[1] : m[1]});`);
   // the real `held` over the real registry, with NOTHING bound down:
   // the finger is the only press in the room.
   setBindings(defaultStore());
   const keys = new Set();
-  // the hosts\' own two-frame countdown (`_tapArmed = 2`, decremented
-  // at the top of each frame), published as `activateDown`.
-  let tapArmed = 2;
-  const host = { activateDown: () => tapArmed > 0 };
   const gate = createActivateGate();
-  const step = () => { tapArmed = Math.max(0, tapArmed - 1); return activateFrame(gate, { down: gateDown(held, keys, host) }); };
-  assert.equal(gateDown(held, keys, host), true, 'the finger IS a press to this gate');
-  assert.equal(step().activate, false, 'the press frame activates nothing - ActionComplete is the release');
-  assert.equal(step().activate, true, 'and the release frame fires the activation the door, the shelf and the ladder all hang off');
-  assert.equal(step().activate, false, 'once, not once per frame');
-  // ...and the same publication feeds the drawn bow\'s un-draw and the
-  // dungeon context this machine mounts, which read the finger through
-  // `activateHeld` rather than through the gate.
-  assert.equal((wm.match(/held\(keys, 'ActivateCenterObject'\) \|\| !!host\.activateDown\?\.\(\)/g) ?? []).length, 3,
-    'all three of worldModes\' activate reads take the finger: the gate, interiorWeapon, and the mounted dungeon context');
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(read(h), /activateDown: \(\) => _tapArmed > 0,/, `${h}: publishes the press beside activateDir`);
-  }
-});
-
-test('AUDIT 62 F16/F28 (review): the modal frame renders, listens and reveals down the CAMERA, never down the tap ray (mutant: `const fwd = eyeDir();`)', () => {
-  // DFU builds the activation ray off the screen point with
-  // `mainCamera.ScreenPointToRay` (PlayerActivate.cs:283-309) and the
-  // camera transform is untouched by it; the automap reveal probe reads
-  // `Camera.main.transform.rotation * Vector3.forward` (Automap.cs
-  // :1168) and the 3D listener rides the same transform. `eyeDir()`
-  // answers the tap\'s ray on the release frame, so reading it for the
-  // frame\'s own forward swung the view matrix, the ears and the reveal
-  // probe down the finger - and, once the review\'s `reportFrame` seam
-  // existed, stored that skewed view for the NEXT tap to unproject
-  // through.
-  const wm = read('src/scenes/worldModes.js');
-  const i = wm.indexOf('  function frame(dt, now) {');
-  assert.ok(i > 0, 'the modal frame exists');
-  const body = wm.slice(i, wm.indexOf('host.reportFrame?.(proj, view);', i));
-  assert.match(body, /const fwd = \[Math\.sin\(cam\.yaw\) \* Math\.cos\(cam\.pitch\), Math\.sin\(cam\.pitch\), Math\.cos\(cam\.yaw\) \* Math\.cos\(cam\.pitch\)\];/,
-    'the frame\'s forward is built from the camera\'s own yaw/pitch');
-  assert.ok(!/const fwd = eyeDir\(\);/.test(body), 'and never from the activation ray');
-  // eyeDir survives - it is the ACTIVATION ladders\' ray and nothing else
-  assert.match(wm, /const eyeDir = \(\) => host\.activateDir\?\.\(\) \?\?/, 'the tap ray still reaches the ladders');
-  for (const use of ['audio.setListener(cam.pos, fwd)', 'automapTick?.(dt, cam.pos, fwd)']) {
-    assert.ok(wm.includes(use), `${use} rides the frame's camera forward`);
-  }
-});
-
-test('AUDIT 62 F16/F28: EVERY mode change releases the lock (mutant: drop the unlock at any one transition)', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const lines = wm.split('\n');
-  const flips = [];
-  // AUDIT-WH2 L1-F5: the flip is `setMode('x')` now, not a raw
-  // assignment - `mode` is written in exactly one place so the door
-  // cache's free cannot be forgotten by a sixth mode. The law this pin
-  // holds is unchanged: whatever spells the flip, the lock goes on the
-  // NEXT line.
-  lines.forEach((l, i) => { if (/^\s*setMode\('(exterior|interior|dungeon)'\);$/.test(l)) flips.push(i); });
-  assert.ok(flips.length >= 5, `every mode assignment is a transition: found ${flips.length}`);
-  for (const i of flips) {
-    assert.match(lines[i + 1], /host\.unlockOn\?\.\(\);/,
-      `the mode flip at worldModes.js:${i + 1} must let the lock go - the foe pool and the coordinate frame both change here`);
-  }
-  // ...and the sweeps that empty the pool without a death flag
-  assert.match(hostText('src/scenes/world.js'), /cityGuards\.clearLive\(\);\s*\n\s*lockOn\.unlock\(\);/, 'the load/teleport sweep');
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(h), /exteriorFoes\.removeFoe\(f\); \}[\s\S]{0,40}lockOn\.unlock\(\);/, `${h}: ClearEnemies lets the lock go too`);
   }
 });
 

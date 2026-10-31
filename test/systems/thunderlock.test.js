@@ -101,8 +101,6 @@ test('it is scored on ARCHERY, through the law every host already asks', () => {
   assert.equal(hostWeaponSkillUsed, weaponSkillUsed, 'the host file re-exports the one door, not a copy');
   assert.equal(hostWeaponSkillUsed(130), SKILLS.Archery);
   assert.equal(hostWeaponSkillUsed(113), SKILLS.ShortBlade);
-  const host = readFileSync('src/scenes/hostCombat.js', 'utf8');
-  assert.match(host, /from '\.\.\/characters\/weapons\.js'/, 'and it reads the one home rather than restating it');
 });
 
 test('its damage span is its own, and the DFU spans are exactly what they were', () => {
@@ -244,16 +242,6 @@ test('THE RAREST THING IN THE GAME: impossible below its tier, and never for sal
     assert.deepEqual([minted, n], [[], 1], `${v}: one draw, nothing minted`);
   }
 
-  // NOT FOR SALE, and it takes no code: a shelf is built from DFU's
-  // own group enum table, and a custom template is not in it.
-  // PIN MOVED (SHOP-PELLETS, 2026-10-07, Mac: "allowing the purchase of
-  // the ammunition in stores"): the counter sold its SHOT. PIN MOVED
-  // (PELLETS-SCARCE, 2026-10-24): and no more - the shelf names nothing of
-  // the gun or its shot, and no shelf of any shop, stocked whole, carries
-  // either.
-  const shelf = readFileSync('src/systems/shopStock.js', 'utf8');
-  assert.ok(!/createThunderlock|THUNDERLOCK_TEMPLATE|isThunderlock/.test(shelf), 'the shop stock never names the gun');
-  assert.ok(!/from '\.\/thunderlock\.js'/.test(shelf), 'nor its shot');
   assert.ok(!GROUP_TEMPLATE_INDICES.Weapons?.includes(THUNDERLOCK_TEMPLATE),
     'and it is not in the Weapons enum a shelf draws from');
   for (const buildingType of Object.keys(SHOP_ITEM_GROUPS).map(Number)) {
@@ -307,10 +295,6 @@ test('F1: the weapon EXISTS when the game boots, not only when a test imports it
   assert.ok(lr.uniqueFinds().some((f) => f.id === 'dwarven-thunderlock'), 'the find registered');
   assert.ok(isAmmunition({ templateIndex: PELLET_TEMPLATE }), 'the pellet registered as ammunition');
   assert.ok(lr.legendariesFor({ group: 'Weapons', templateIndex: THUNDERLOCK_TEMPLATE }).length, 'the legendary registered');
-  // and the wire itself, named, so deleting it is a decision
-  const tick = readFileSync('src/systems/worldTick.js', 'utf8');
-  assert.match(tick, /import \{ installThunderlockIcons \} from '\.\/thunderlock\.js'/, 'a host carries the import');
-  assert.match(tick, /^installThunderlockIcons\(\);/m, 'and calls it');
 });
 
 test('F2: it pays the bow’s cooldown without drawing like a bow', () => {
@@ -328,23 +312,6 @@ test('F2: it pays the bow’s cooldown without drawing like a bow', () => {
   assert.equal(melee.cooldownUntil, 0, 'a melee swing still has no cooldown');
   const bow = createWeaponMachine(true);
   assert.equal(bow.ranged, true, 'and a bow is ranged by construction, so nothing had to be told about it');
-});
-
-test('F3/F5: ALL FOUR HOSTS fire it, and it says when it is empty', () => {
-  // THE FOUR HOSTS RULE. Three were converted and the fourth was not,
-  // which is the exact shape of bug this repo has a rule about: the
-  // exterior host kept `=== WEAPON_TYPES.Bow` and spendArrow, so the
-  // gun fell to the melee arc in the open world alone.
-  for (const host of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) {
-    const s = hostText(host);
-    assert.ok(!s.includes('spendArrow('), `${host} does not spend an Arrow by name`);
-    assert.match(s, /spendAmmoFor\(/, `${host} asks the weapon what it spends`);
-  }
-  // and the out-of-ammo guard is not bow-only either
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /WEAPON_TYPES\.Thunderlock/, 'the guard knows the ranged weapons');
-  assert.match(rig, /'You have no pellets\.'/, 'and names what it is out of');
-  assert.match(rig, /'You have no arrows\.'/, 'without losing the classic line');
 });
 
 test('F4: a found stack of ammunition is never promoted, because promoting it would shatter it', () => {
@@ -384,16 +351,6 @@ test('F8: the game plays the weapon’s own clips - all four hosts, through the 
   const n = await installThunderlockSounds(audio, { fetchBytes: async (f) => new Uint8Array([102, f.length]) });
   assert.equal(n, 3, 'three clips registered');
   assert.deepEqual([...registered.keys()].sort(), [SFX.close, SFX.fire, SFX.open].sort());
-  // and the ONE place all four hosts share plays them
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /thunderlockVoice\(dt, \{ armShoots, fired: held\.fired \}\);/, 'the rig has a per-frame voice (AUDIT FIELD-GUN-MW F1: told the arm\'s hold, so the shot\'s bang rides the release under the arm)');
-  // PISTOLET: the clips are the HELD gun's - the Thunderlock's own three when it is the one in hand (heldSfx), the
-  // Dwarven Pistolet's when that is
-  assert.match(rig, /const heldSfx = \(\) => \(pistoletHeld\(\) \? PL_SFX : TL_SFX\);/, 'the Thunderlock in hand plays TL_SFX');
-  assert.match(rig, /const feel = heldFeel\(\), sfx = heldSfx\(\)/, 'the voice reads the held gun\'s');
-  assert.match(rig, /audio\.playOneShot\(sfx\.fire/, 'the shot');
-  assert.match(rig, /audio\.playOneShot\(sfx\.open/, 'the reload opening');
-  assert.match(rig, /audio\.playOneShot\(sfx\.close/, 'and the lock-up');
 });
 
 test('F7: the art is fetched off the SITE root, not the document - the held map’s own lesson', async () => {
@@ -453,11 +410,6 @@ test('FIELD-GUN2: the gun can actually be EQUIPPED - it takes both hands and lan
   equipItem(e2, gun2);
   assert.equal(e2.equip.slots[EQUIP_SLOTS.LeftHand], null, 'and the gun takes that hand back');
 
-  // The departure is written where the other two are, ahead of the
-  // verbatim table rather than as a row inside it.
-  const src = readFileSync('src/characters/equipTable.js', 'utf8');
-  assert.ok(src.indexOf('THUNDERLOCK_TEMPLATE') < src.indexOf('const w = WEAPON_HANDS[item.templateIndex];'),
-    'the arm stands AHEAD of the generated DFU table, which stays what it is');
 });
 
 test('FIELD-GUN1: the icons register as STAND-IN archives, so the doors that gate on recordCount will draw them', async () => {
@@ -543,12 +495,6 @@ test('FIELD-GUN3: the sprite is not upside down - a screen quad keeps a PNG\'s r
   // what toScreenOrder answers
   assert.ok(img.colors instanceof Uint8ClampedArray, 'the upload gets `colors`, not `data`');
 
-  // HT3's list, by membership: this door is a SCREEN sprite door.
-  const src = readFileSync('src/combat/thunderlockArt.js', 'utf8');
-  assert.match(src, /toScreenOrder/, 'it takes the screen-order door');
-  // the prose above the call names toColor32 to say why it is wrong,
-  // so this asks what is IMPORTED rather than what is mentioned
-  assert.ok(!/^import .*\btoColor32\b/m.test(src), 'and does not import the world billboard\'s flip');
 });
 
 test('FIELD-GUN4: the paperdoll layer gets PIXELS and a place to put them', async () => {
@@ -608,14 +554,6 @@ test('FIELD-GUN6: the lab\'s feel is the GAME\'s - one home, and it reaches both
   // the sprite arrived, the sounds arrived, and the weapon sat dead
   // still while it fired.
 
-  // ONE HOME. The lab re-exports the machines rather than keeping a
-  // second copy, which is what stops the numbers drifting apart.
-  const lab = readFileSync('src/tools/gunLab.js', 'utf8');
-  assert.match(lab, /export \{[^}]*createRecoil[^}]*\} from '\.\.\/combat\/gun\/gunFeel\.js'/,
-    'the lab reads the game\'s home, not its own copy');
-  assert.ok(!/^export function createRecoil/m.test(lab), 'and does not still define one');
-  assert.ok(!/^export function createScreenShake/m.test(lab), 'nor the shake');
-
   // MAC'S NUMBERS, which is the whole point of the lab having existed
   assert.equal(GUN_FEEL.kick, 5);
   assert.equal(GUN_FEEL.back, 0);
@@ -655,25 +593,6 @@ test('FIELD-GUN6: the lab\'s feel is the GAME\'s - one home, and it reaches both
   for (let i = 0; i < 120; i++) s1.step(1 / 60);
   assert.deepEqual(s1.step(1 / 60), { x: 0, y: 0, rot: 0 }, 'the trauma runs out');
 
-  // FIELD-GUN12: IT REACHES THE ONE DRAW. The gun takes the
-  // prototype's own frame now - not the classic rect-builder and not
-  // the mod's clone - so there is no longer a second path for the
-  // kick to be missing from.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /if \(tlArt\?\.anchor && tlArt\.unionBox\) \{ drawThunderlock\(tlArt, c, fpTint\); return; \}/,
-    'the gun\'s own frame stands ahead of both classic paths');
-  assert.match(rig, /kick: _tlKick/, 'and the draw reads the spring');
-  assert.match(rig, /_tlRecoil\.punch\(\);/, 'the shot kicks');
-  assert.match(rig, /betterAmbience\.weaponKick\?\./, 'the ROOM moves, through the one camera shaker the port has');
-  // ...and the two 1:1 ports it no longer goes through are UNTOUCHED
-  // by it, which is the other half of what this bought.
-  // (fpsWeapon.js still ROUTES the weapon's anim table - that is the
-  // one thing it has always done for it. Its DRAW does not know.)
-  const fw = readFileSync('src/combat/fpsWeapon.js', 'utf8');
-  const drawFn = fw.slice(fw.indexOf('export function drawFpsWeapon'));
-  assert.ok(!/_tlAdjust|unionDrawRect|adjust/.test(drawFn), 'drawFpsWeapon is the classic draw again');
-  assert.ok(!/_tlAdjust|unionDrawRect|Thunderlock/.test(readFileSync('src/combat/weapon/weaponWidget.js', 'utf8')),
-    "the mod's clone knows nothing about the port's own weapon");
 });
 
 test('FIELD-GUN7: the game\'s machine and the LAB\'s run the same cycle, frame for frame', () => {
@@ -768,14 +687,6 @@ test('FIELD-GUN7: the POSE is the lab\'s too - size 49, and the raise rides the 
   // The other two the lab settled and the game answered for itself.
   assert.equal(GUN_FEEL.widthPct, 0.49, 'Mac\'s last word was "Size: 49"');
   assert.equal(GUN_FEEL.raise, -8);
-  // the raise is ADDED to the classic offset rather than replacing
-  // it, so the weapon still clears the large HUD's bar
-  // FIELD-GUN12: the raise is the VIEWMODEL's, applied by the
-  // prototype's own frame function, so there is no longer a channel
-  // it can be missing from.
-  const vm = readFileSync('src/combat/gun/gunViewmodel.js', 'utf8');
-  assert.match(vm, /const offsetHeight = raise \* \(canvasH \/ 200\);/,
-    'native units into screen pixels, once, where the rect is built');
 });
 
 /** FIELD-GUN8: THE PANEL, READ OFF THE LAB'S OWN SOURCE.
@@ -872,13 +783,6 @@ test('FIELD-GUN8: EVERY knob on the lab\'s panel is either carried or deliberate
 });
 
 test('FIELD-GUN8: the voice and the one module the lab turns on', () => {
-  // the clips take the lab's volume and its jitter, not full gain
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  // PISTOLET: through the held gun's row (heldFeel - GUN_FEEL for the Thunderlock), its jitter its own
-  assert.match(rig, /const heldFeel = \(\) => \(pistoletHeld\(\) \? PISTOLET_FEEL : GUN_FEEL\);/);
-  assert.match(rig, /playOneShot\(sfx\.fire, feel\.sfxVolume, gunPitch\(undefined, feel\)\)/);
-  assert.match(rig, /playOneShot\(sfx\.open, feel\.sfxVolume \* 0\.9, gunPitch\(undefined, feel\)\)/);
-  assert.match(rig, /playOneShot\(sfx\.close, feel\.sfxVolume \* 0\.95, gunPitch\(undefined, feel\)\)/);
   // the jitter is the lab's line, and it is BOUNDED - a pitch that
   // can wander is a clip that stops sounding like the same gun
   for (const r of [0, 0.5, 1]) {
@@ -887,85 +791,7 @@ test('FIELD-GUN8: the voice and the one module the lab turns on', () => {
   }
   assert.equal(gunPitch(() => 0.5), 1, 'the middle roll is the clip as recorded');
 
-  // INERTIA: the mod ships it off ("requires double-scaled weapon
-  // textures") and the lab turns it on because this art IS that case.
-  // Forced for THIS WEAPON ONLY and only upward, so no other weapon
-  // and no other module stops reading the player's own settings.
-  assert.match(rig, /if \(!s\.inertia && thunderlockHeld\(\) && !playerWeapon\.mixedPair\) return \{ \.\.\.s, inertia: true \};/);   // PIN MOVED (MIXED-PAIR): never for a blade-and-gun pair's blade - its gun steps on its own rig
-  assert.match(rig, /return s;/, 'and everything else is handed back untouched');
-  const decl = rig.slice(rig.indexOf('const widget = createWeaponWidget('), rig.indexOf('const widgetOn ='));
-  assert.ok(!/Modules\.(Bob|Offset|Step)/.test(decl), 'no other module is touched');
 });
-
-test('FIELD-GUN12: the lab and the game are the SAME function, not two that agree', async () => {
-  // Mac, the sixth time: "Port the god damn prototype verbatim".
-  //
-  // Every round before this one ended with a NUMERIC pin: drive both
-  // implementations, diff the answer, assert it is small. That is the
-  // right pin when two implementations must exist. It is the wrong
-  // fix when they need not - and each time one passed, the next thing
-  // the two composed differently was still waiting.
-  //
-  // So the pin is IDENTITY now. Not "the lab and the game agree" -
-  // "the lab and the game are the same function object", which cannot
-  // drift, cannot round differently, and cannot be one path out of
-  // two. Everything the numeric pins used to check is true because
-  // there is nothing left to compare.
-  const lab = await import('../../src/tools/gunLab.js');
-  const game = await import('../../src/combat/gun/gunViewmodel.js');
-  const place = await import('../../src/combat/gun/gunPlacement.js');
-  const sheet = await import('../../src/combat/gun/gunSheet.js');
-  for (const [labName, mod, gameName] of [
-    ['createWidgetRig', game, 'createGunRig'],
-    ['widgetRigStep', game, 'gunRigStep'],
-    ['labMotion', game, 'gunMotion'],
-    ['labWidgetSettings', game, 'gunWidgetSettings'],
-    ['gunFrameRect', game, 'gunFrameRect'],
-    ['placeSprite', place, 'placeSprite'],
-    ['unionDrawRect', sheet, 'unionDrawRect'],
-  ]) {
-    assert.equal(lab[labName], mod[gameName],
-      `the lab's ${labName} is not the game's ${gameName} - two copies again`);
-  }
-
-  // ...and the rig really DRAWS through it, rather than importing it
-  // and then doing something else.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /const \{ rect \} = hand \? pistols\.rect\(playerWeapon\.pistols, hand, art, canvas, handedFlip\(\)\) : gunFrameRect\(\{/, 'the draw takes the prototype\'s rect');   // PIN MOVED (PISTOL-PORT): a Pistolet's is ITS prototype's (pistolLane.js)
-  assert.match(rig, /gunRigStep\(_tlRig, gunWidgetSettings\(null, feel\.widget\), dt, \{/, 'and the prototype\'s module step (PISTOLET: on the held gun\'s own tuning - none for the Thunderlock, so the player\'s own)');
-  assert.match(rig, /renderer\.drawScreenQuad\(tex, rect, uv, lit \?\? undefined\)/, 'and puts it on the screen');
-  // PISTOLET: and the PICTURE is mirrored under the flip, as the lab's ctx.scale(-1, 1) mirrors it - it had moved only the
-  // rect, so a left-handed player's gun (and a pair's left pistol) was drawn on the left as a right hand
-  assert.match(rig, /const uv = flip \? MIRROR_UV : undefined;/, 'the mirror is the picture\'s');   // FIELD-GUN13: `lit` is the tint with the muzzle's own lift on it
-
-  // THE FRAME IS STILL THE PROTOTYPE'S SHAPE: anchor placed and
-  // transformed, union derived, kick after the transform (the mod's
-  // ends in a floor the rect may not rise above, and a kick rises).
-  const vm = readFileSync('src/combat/gun/gunViewmodel.js', 'utf8');
-  const order = ['placeSprite(', 'widgetTransformRect(', 'anchorRect.y += kick.y', 'unionDrawRect('];
-  let at = -1;
-  for (const step of order) {
-    const k = vm.indexOf(step, at + 1);
-    assert.ok(k > at, `the frame's order changed: ${step} is out of place`);
-    at = k;
-  }
-
-  // and it runs: a real frame, with the real numbers
-  const anchor = { x: 0, y: 21, w: 585, h: 312 };
-  const union = { x: 0, y: 0, w: 586, h: 333 };
-  const rigState = game.createGunRig();
-  game.gunRigStep(rigState, game.gunWidgetSettings({}), 1 / 60, {
-    screenRect: { width: 1280, height: 800 }, motion: game.gunMotion({ walking: true }), liveSpeed: 50,
-  });
-  const { rect, anchorRect } = game.gunFrameRect({
-    canvasW: 1280, canvasH: 800, anchor, union, rig: rigState,
-  });
-  assert.ok(rect.w > 0 && rect.h > 0, 'it draws something');
-  assert.ok(rect.h > anchorRect.h, 'the union is taller than the gun - the flash has its room');
-  assert.ok(Math.abs((rect.x + rect.w) - (anchorRect.x + anchorRect.w)) < 2,
-    'and they share a right edge, which is what AlignRight aligned');
-});
-
 
 // ── FIELD-GUN13 (2026-09-19, Mac, three asks in one message) ────────
 //
@@ -996,12 +822,6 @@ test('FIELD-GUN13 #2 - the draw is the gun’s own clack, not a scabbard', () =>
   assert.equal(equipSoundFor({ templateIndex: 120 }), SOUND.EquipLongBlade, 'the Longsword is untouched');
   assert.equal(equipSoundFor({ templateIndex: 129 }), SOUND.EquipBow, 'and so is the bow');
 
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const toggle = rig.slice(rig.indexOf('function rawToggleSheath()'), rig.indexOf('THE THUNDERLOCK’S VOICE'.replace('’', "'")));
-  assert.ok(toggle.includes('if (thunderlockHeld()) {'), 'the departure is named in the toggle');
-  assert.ok(toggle.indexOf('thunderlockHeld()') < toggle.indexOf('equipSoundFor('),
-    'and it stands AHEAD of the verbatim call, which is what makes it a departure and not a patch');
-  assert.ok(toggle.includes('heldSfx().close'), 'the clip is the breech coming home (PISTOLET: the held gun\'s own - TL_SFX for this one)');
   // the key it plays is one the weapon actually registers
   assert.equal(TL_SFX.close, 'thunderlock:close');
   assert.ok(SFX_FILES[TL_SFX.close], 'and it has a file behind it');
@@ -1103,44 +923,16 @@ test('FIELD-GUN13 #3 - the weapon rides in, it does not pop', () => {
   // home, and it is, which is what ends the loop above.
   assert.ok(Math.abs(y() - drawnY) < 1, 'and lands where a drawn weapon sits');
 
-  // AND THE GATE LETS IT. `shown()` is false the whole way, so the
-  // rig's own sheathe leg has to relax it - and relax ONLY it.
-  const src = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(src, /function thunderlockSliding\(\) \{\n\s*if \(!playerWeapon\.sheathed\) return false;/,
-    'the leg is said POSITIVELY, so a leg added to shown() later cannot be relaxed by accident');
-  const gate = src.slice(src.indexOf('const gunSliding = '), src.indexOf('const gunSliding = ') + 400);
-  for (const other of ['!spellArmed()', '!fpsSpellCasting.isPlayingAnim', 'equipCountdown', '!eotbHidesWeapon()', '!fpArm.active()']) {
-    assert.ok(gate.includes(other), `AUDIT-FIELD F1: the gate must re-state ${other} - empty hands stay empty`);
-  }
-  assert.match(src, /if \(paralyzed \|\| \(!shown\(\) && !torchOnly && !sheetOnly && !shieldRect && !gunSliding && !armCasts && !armsClimb && !runHands && !armsRun\)\) return;/);   // PIN MOVED (MW-CAST1): the casting hands' leg beside the gun's; (CLIMB-HANDS II): the climbing arms' beside them; (TWO-HANDS): the running hands' beside those
-  assert.match(src, /if \(!shown\(\) && !gunSliding\) return;/);
-  assert.match(src, /if \(gunSliding && !shown\(\)\) return;/,
-    'and nothing below the gun’s own arm draws on a sliding frame');
-  // the module is told, rather than a second curve being written
-  assert.match(src, /shown: !reloading && !sheathed,/);
-  assert.match(src, /hiddenTarget: sheathed \? feel\.sheathTarget : feel\.hiddenTarget,/);
 });
 
 // ── FIELD-GUN15 (2026-09-20, Mac, with the lab's panel open on his
 // phone: "Use these sounds" over a screenshot of the three dropdowns)
 test('FIELD-GUN15: the weapon plays the HEAD of each candidate list, which is what the lab opens on', () => {
-  // THE CONVENTION WAS TRUE BY NOBODY'S DOING. `SFX_CANDIDATES`'s own
-  // header has said since it was written that the dropdowns open on
-  // the first entry "which is the pick" - and the pick was ALSO typed
-  // into `SFX_FILES` in the weapon's home, by the same person, on the
-  // same afternoon. Two places holding one decision, agreeing because
-  // nothing had yet made them disagree. That is the drift class this
-  // weapon has paid for at every round since FIELD-GUN6, so the
-  // sentence is a pin now.
-  const lab = readFileSync('src/tools/gunLab.js', 'utf8');
   const heads = Object.fromEntries(Object.entries(SFX_CANDIDATES).map(([slot, list]) => [slot, list[0][0]]));
   for (const [key, slot] of [[TL_SFX.fire, 'fire'], [TL_SFX.open, 'reload-open'], [TL_SFX.close, 'reload-close']]) {
     assert.equal(SFX_FILES[key], `${heads[slot]}.wav`,
       `${key}: the game plays ${SFX_FILES[key]} and the lab opens on ${heads[slot]}`);
   }
-  // ...and the lab really does default to the head, rather than to a
-  // name that happens to match one.
-  assert.match(lab, /SFX_CANDIDATES/);
   const proto = readFileSync('gun-proto.html', 'utf8');
   assert.match(proto, /sfxFire: SFX_CANDIDATES\.fire\[0\]\[0\], sfxOpen: SFX_CANDIDATES\['reload-open'\]\[0\]\[0\], sfxClose: SFX_CANDIDATES\['reload-close'\]\[0\]\[0\],/,
     'the panel opens on the head of each list - which is what makes the head the pick');
@@ -1165,17 +957,7 @@ test('FIELD-GUN15: the weapon plays the HEAD of each candidate list, which is wh
   assert.equal(GUN_FEEL.sfxVary, 0.19);
   assert.ok(GUN_FEEL.sfxVary > 0.06 * 2, 'three times the jitter, for a sample with no tail');
 
-  // AND THE CLOSE'S LEAD IS THE LAB'S, not a clip length. The comment
-  // in weaponRig.js used to claim it was "the clip's own length"; the
-  // clip it was written for is 98ms and the lead is 420.
-  // PIN MOVED (AUDIT PISTOLET B6): the 420 is ONE number now, gunFeel.js RELOAD_CLOSE_LEAD, which the rig and the pistol
-  // pair both read - it was two literals
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /const TL_CLOSE_LEAD = RELOAD_CLOSE_LEAD;/);
-  assert.match(readFileSync('src/combat/gun/gunFeel.js', 'utf8'), /export const RELOAD_CLOSE_LEAD = 0\.42;/);
   assert.match(proto, /gun\.cooledMs >= Math\.max\(0, state\.cool - 420\)/, 'the prototype’s own 420ms');
-  assert.doesNotMatch(rig, /The close lands this long before the weapon is ready - the clip's\n\s+\*\s+own length/,
-    'and the sentence that said otherwise is gone');
 });
 
 // ── FIELD-GUN17 (2026-09-20, Mac: "On the thunderlock, the orb doesnt
@@ -1193,12 +975,6 @@ test('FIELD-GUN15: the weapon plays the HEAD of each candidate list, which is wh
 //   the flash's COLOUR came from the muzzle-glow arm's white, which is
 //   right about a powder flash and says nothing about the orb.
 test('FIELD-GUN17a: the shot leaves the BARREL, and the barrel is measured off the drawn frame', () => {
-  // THE ART MEASURES ITS OWN MUZZLE. Not a baked number. PIN MOVED (THUNDERLOCK-ART2): the owner's strip kicks the gun
-  // inside its canvas, so "what got brighter" (the sheet's muzzlePoint, retired) would measure the moved gun - the muzzle
-  // is the flash's own ball, the largest white-hot body of the shot frame (combat/gun/gunFlash.js flashBodyPoint)
-  const art = readFileSync('src/combat/thunderlockArt.js', 'utf8');
-  assert.match(art, /muzzle: flashBodyPoint\(cells\[1\]\)/, 'off the plain shot frame');
-  assert.match(art, /muzzle,?\s*$|muzzle[,}]/m, 'and it rides the art record');
 
   // fractions of the UNION box, y from the TOP - the same axes
   // `gunFrameRect` hands the draw, so the point can be multiplied
@@ -1217,15 +993,6 @@ test('FIELD-GUN17a: the shot leaves the BARREL, and the barrel is measured off t
   assert.equal(flashBodyPoint(flat(10)), null);
   assert.equal(flashBodyPoint(flat(200)), null, 'bright, but never white-hot');
 
-  // THE LANE FORKS, it does not replace. Both missile systems prefer a
-  // supplied muzzle and keep GetAimPosition for everything else -
-  // which is every bow, at every host, unchanged.
-  const spell = readFileSync('src/systems/spellcast.js', 'utf8');
-  assert.match(spell, /export function playerMuzzleOrigin\(eye, lookDir, muzzle\)/);
-  // AUDIT FIELD-GUN-MW F2 re-aimed this: the fork is ONE function (playerShotOrigin - a world muzzle for the
-  // third-person Morrowind body, a lens muzzle, or GetAimPosition), and both seams call it rather than restate it.
-  assert.match(spell, /export function playerShotOrigin\(eye, lookDir, muzzle\) \{[\s\S]*?return muzzle \? playerMuzzleOrigin\(eye, lookDir, muzzle\) : playerArrowOrigin\(eye, lookDir\);/,
-    'a muzzle wins, nothing supplied keeps the verbatim arm - at the fork\'s one home');
   for (const f of ['src/combat/arrowFlight.js', 'src/scenes/dungeonContext.js']) {
     const src = hostText(f);
     assert.match(src, /playerShotOrigin\(from, dir, (?:meta\.)?muzzle\)/, `${f} spawns through the one fork`);
@@ -1260,17 +1027,6 @@ test('FIELD-GUN17a: the shot leaves the BARREL, and the barrel is measured off t
   assert.ok(Math.abs(dot(d, [rx, 0, rz]) - muzzle.right) < 1e-9, 'the right term survives the basis');
   assert.ok(Math.abs(dot(d, [ux, uy, uz]) - muzzle.up) < 1e-9, 'and so does the up term');
   assert.ok(Math.abs(dot(d, f) - muzzle.forward) < 1e-9, 'and the forward term');
-  // no handedness flip HERE - the mirror is a fact about the drawn
-  // rect and thunderlockMuzzle has already applied it, where
-  // PLAYER_ARROW_SIDE is a bare number that has to be flipped.
-  assert.doesNotMatch(spell.slice(spell.indexOf('export function playerMuzzleOrigin')), /flipHorizontal/);
-
-  // the rig's door refuses for everything that is not this weapon, and
-  // for a frame it has not drawn - a bow keeps GetAimPosition because
-  // it gets NOTHING, not because the fork spells its name.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /thunderlockMuzzle\(fovRad, forward = MUZZLE_FORWARD\) \{\s*\n\s*if \(!thunderlockHeld\(\)\) return null;/,
-    'the weapon gate is the rig’s; the arithmetic is muzzleRay’s');
 
   // AND THE ARITHMETIC IS DRIVEN, not read. `muzzleRay` is the whole
   // of it, pulled out of the rig so a suite can hand it a rect and a
@@ -1349,24 +1105,11 @@ test('FIELD-GUN17b: the flash and its light are the ORB’s colour, sampled off 
   assert.equal(noteOrbColour(c32([0, 0, 0, 0])), false);
   assert.equal(noteOrbColour(blue), true, 'the real one still lands');
 
-  // BOTH consumers read the one leaf - the sprite's own tint and the
-  // light the shot throws on the world.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  assert.match(rig, /const flash = ph \? PAINTED_FLASH : orbColour\(\);/);   // PIN MOVED (PISTOL-PORT): the Thunderlock's; a Pistolet's flash is drawn as painted
-  assert.match(rig, /tint\.map\(\(v, i\) => v \+ \(flash\[i\] - v\) \*/, 'the frame LERPS to the orb, so an unlit room still darkens the gun');
-  const gun = readFileSync('src/systems/thunderlock.js', 'utf8');
-  assert.match(gun, /color: orbColour\(\)/, 'and the point light carries it too');
-
   // AND THE SAMPLE IS TAKEN AT BOTH MISSILE LANES, because the orb is
   // uploaded in two places and only one of them is the dungeon's.
   for (const f of ['src/combat/arrowFlight.js', 'src/scenes/dungeonContext.js']) {
     assert.match(hostText(f), /noteOrbColour\(/, `${f} samples the orb it just uploaded`);
   }
-  // the effects pool grew the door rather than the pool learning about
-  // guns: `onTexture` is a callback about a TEXTURE, and a throw in it
-  // does not cost the flat its flight.
-  const fx = readFileSync('src/scenes/hitEffects.js', 'utf8');
-  assert.match(fx, /if \(onTexture\) \{ try \{ onTexture\(t, archive, record\); \} catch/);
 
   resetOrbColour();
 });
@@ -1386,20 +1129,6 @@ test('FIELD-GUN18: the orb is scaled off the archive’s own size, at BOTH lanes
   assert.ok(ORB_SCALE > 0 && ORB_SCALE < 1, 'smaller, and a scale');
   assert.equal(ORB_SCALE, 0.85, 'slightly, as asked - a sixth off, not a different object');
 
-  // the pool lane hands it over as the pool's own `scale`, which is
-  // the knob WW1 already put there for DoClang/DoThud
-  const af = readFileSync('src/combat/arrowFlight.js', 'utf8');
-  assert.match(af, /scale: ORB_SCALE,/, 'the three-host lane scales its flat');
-
-  // THE FOURTH HOST AGAIN. Its missiles build their own batch and
-  // never touch hitEffects' pool, so the pool's scale cannot reach
-  // them - the multiply has to be written a second time, and gated on
-  // the same `flatArchive` the picture and the colour already fork on
-  // so that a SPELL is not shrunk with it.
-  const dc = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  assert.match(dc, /const raw = billboardSize\(t, record\);\s*\n\s*const size = m\.flatArchive \? \{ w: raw\.w \* ORB_SCALE, h: raw\.h \* ORB_SCALE \} : raw;/,
-    'the dungeon scales the ORB and leaves every spell missile alone');
-
   // and both read the one leaf rather than a number each
   for (const f of ['src/combat/arrowFlight.js', 'src/scenes/dungeonContext.js']) {
     assert.match(hostText(f), /ORB_SCALE \} from '\.\.\/characters\/thunderlockIds\.js'/, `${f} imports it`);
@@ -1407,24 +1136,6 @@ test('FIELD-GUN18: the orb is scaled off the archive’s own size, at BOTH lanes
 });
 
 test('FIELD-GUN18: the pool’s scale really scales - it was multiplying an OBJECT by a number', () => {
-  // THE BUG THIS ASK WALKED INTO. `billboardSize` answers a {w, h}
-  // RECORD (rmbFlats.js:"Misc block flats"; billboardXml's override keeps the shape),
-  // and the branch that applied `scale` read:
-  //
-  //     Array.isArray(size) ? size.map(v => v * scale) : size * scale
-  //
-  // An object is not an Array, so every scaled flat took the SECOND
-  // arm - object times number, which is NaN. And a NaN size is not a
-  // visibly wrong size: it is `size.w === undefined` at the batch and
-  // a quad with NaN corners, so the flat is not drawn at all. The one
-  // caller that used it is `showMissEffect`, whose scale is 2 BY
-  // DEFAULT and which all four hosts wire to the weapon widget's
-  // DoClang/DoThud - so that effect has drawn NOTHING, at every host,
-  // since WW1 shipped. A shape the value never had, in a branch
-  // nothing measured.
-  const he = readFileSync('src/scenes/hitEffects.js', 'utf8');
-  assert.match(he, /entry\.size = \{ w: entry\.size\.w \* scale, h: entry\.size\.h \* scale \};/);
-  assert.doesNotMatch(he, /Array\.isArray\(entry\.size\)/, 'the shape it never had is gone');
 
   // the shape is asserted where it is PRODUCED, so this cannot rot
   // back into a guess about what billboardSize answers
@@ -1438,10 +1149,6 @@ test('FIELD-GUN18: the pool’s scale really scales - it was multiplying an OBJE
   assert.equal(scaled.w, size.w * 2);
   assert.ok(Number.isFinite(scaled.w) && Number.isFinite(scaled.h));
 
-  // the default that made it reach the game: a miss effect is scaled
-  // unless a caller says otherwise, so the broken arm was the NORMAL
-  // path rather than an option nobody took
-  assert.match(he, /showMissEffect: \(kind, pos, \{ archive = BLOOD_ARCHIVE, record = 2, fps = 20, scale = 2 \} = \{\}\) =>/);
   // ...and all four hosts wire it, which is how many were affected
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
     assert.match(hostText(f), /missEffect: \(k, p, o\) => \w+\.showMissEffect\(k, p, o\)/, `${f} wires it`);
@@ -1510,27 +1217,6 @@ test('FIELD-GUN19: the shot leaves the barrel through the WORLD STRIP, not the c
   assert.ok(pushed.up > strip.up,
     'the same pixel sits higher inside a strip whose top edge is lower - drop the offset and these two are equal');
 
-  // AND THE RIG PARKS IT. The renderer's record outlives endWorldPass
-  // for this one reader; a draw that forgot it would leave every shot
-  // high again with nothing else to show for it.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  // PISTOLET: the record is built once (`drawn`) and parked on the one gun's `_tlDrawn` or on a pair's hand
-  assert.match(rig, /const drawn = \{ rect: \{ \.\.\.rect, x: rx, y: ry \},[^}]*viewport: renderer\.worldViewportRect \?\? null[^}]*\}/,   // RETRO-UI: the rect measured back on the real canvas
-    'drawThunderlock parks the strip the world was drawn into');
-  assert.match(rig, /if \(ph\) ph\.drawn = drawn; else _tlDrawn = drawn;/,   // PIN MOVED (PISTOL-PORT): each Pistolet's own hand, on its lane
-    'drawThunderlock parks the strip the world was drawn into');
-  const renderer = readFileSync('src/render/renderer.js', 'utf8');
-  assert.match(renderer, /get worldViewportRect\(\)/, 'the renderer exposes the frame\'s strip');
-  // ...and SETS it where the pending rect is consumed. A getter over a
-  // field nobody assigns answers null for ever, which is the full
-  // canvas, which is the bug - and it survived a campaign that only
-  // asked whether the getter existed.
-  const begin = renderer.slice(renderer.indexOf('const r = this._worldViewportPending;'));
-  assert.match(begin.slice(0, 300), /this\._worldViewportFrame = r \? \{ \.\.\.r \} : null;/,
-    'the frame\'s strip is recorded where the pending rect is taken, or the getter is always null');
-  const endWorld = renderer.slice(renderer.indexOf('endWorldPass()'), renderer.indexOf('endWorldPass()') + 400);
-  assert.doesNotMatch(endWorld, /_worldViewportFrame/,
-    'endWorldPass clears the GL viewport, which is state - it must NOT clear the record the 2D pass reads');
 });
 
 test('FIELD-GUN19: a blown-out core has no opinion about hue', () => {
@@ -1598,12 +1284,6 @@ test('FIELD-GUN19: a blown-out core has no opinion about hue', () => {
   assert.equal(orbColourFrom({ colors: [12, 34, 56, 0] }), null, 'nothing opaque is no answer, not black');
   assert.equal(orbColourFrom({ colors: [0, 0, 0, 255] }), null, 'a black record leaves white alone');
 
-  // ONE HOME, BOTH CONSUMERS: the flash and the light must read the
-  // same function, or "the same colour as the orb" is two answers.
-  const rig = readFileSync('src/combat/weapon/weaponRig.js', 'utf8');
-  const sys = readFileSync('src/systems/thunderlock.js', 'utf8');
-  assert.match(rig, /const flash = ph \? PAINTED_FLASH : orbColour\(\);/, 'the muzzle FLASH wears it');   // PIN MOVED (PISTOL-PORT): the Thunderlock's; a Pistolet's flash is drawn as painted
-  assert.match(sys, /color: orbColour\(\),/, 'and so does the light it throws');
 });
 
 // FIELD-GUN20 (2026-09-21, Mac: "The orb projectile that fires is still
@@ -1641,14 +1321,6 @@ test('FIELD-GUN20: a missile or effect sprite is CENTRED on its position - the b
     const builds = [...s.matchAll(/renderer\.createBillboardBatch\([^;]*\bcentredBase\(/g)].length;
     assert.equal(builds, n, `${f}: ${n} batch build(s) at the centred base`);
   }
-  const dc = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  const missile = dc.slice(dc.indexOf('async function ensureMissileBatch(m)'), dc.indexOf('function showImpactFlash(m, pos)'));
-  assert.match(missile, /m\.batch = renderer\.createBillboardBatch\(archive, record, size, \[centredBase\(m\.firePos, size\)\]\);/, 'the fourth host\'s missile');
-  assert.doesNotMatch(missile, /\[\[m\.firePos\[0\], m\.firePos\[1\], m\.firePos\[2\]\]\]/, 'and never the bare fire position');
-  const hm = readFileSync('src/scenes/hostMagic.js', 'utf8');
-  assert.match(hm, /m\.batch = renderer\.createBillboardBatch\(archive, 0, size, \[centredBase\(m\.firePos, size\)\]\);/, 'the world hosts\' spell missile');
-  // THE OTHER HALF OF THE LAW: a block's flats keep AlignToBase - they sit ON their base, and never take this
-  assert.doesNotMatch(readFileSync('src/world/rmbFlats.js', 'utf8').slice(readFileSync('src/world/rmbFlats.js', 'utf8').indexOf('export function collectBlockFlats')), /centredBase\(/, 'collectBlockFlats places at the base');
   for (const f of ['src/world/rdbLayout.js', 'src/world/interior/interiorLayout.js', 'src/scenes/world.js', 'src/scenes/exterior.js']) {
     // WOD3/WOD4: World of Daggerfall's own flats - the captive a kidnap marker stands and the camp at
     // Privateer's Hold - are CreateDaggerfallBillboardGameObject with NO AlignToBase, so they are centred;

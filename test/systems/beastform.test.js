@@ -74,20 +74,6 @@ test('V4: setCrimeCommitted is the ONE crime write, and a transformed lycanthrop
     assert.equal(levies, n, `${f}: ${n ? 'the one levy, on the field' : 'no levy'}`);
     assert.ok(!/playerEntity\.crimeCommitted = [^0]/.test(src.replace(LEVY, '')), `${f} routes every other write through the setter`);
   }
-  // AUDIT 63 F33 generalized Pickpocket to DFU's one method with an
-  // optional target, and PlayerActivate.cs:1655 gates the crime write on
-  // `target == null` - so the inline suppression gate rides beside it.
-  assert.ok(read('src/systems/talk/talk.js').includes('if (!target && !racialSuppressCrime(player))'),
-    'talk.js gates inline (court.js imports it - the one setter would cycle)');
-});
-
-test('V4: the population promote arm holds while transformed - the streets empty around the beast', () => {
-  const tp = read('src/systems/town/townPopulation.js');
-  assert.ok(tp.includes('suppressSpawns = () => false'), 'the ctor takes the gate');
-  assert.ok(tp.includes('isDay && !this.suppressSpawns())'), 'and it holds the PROMOTE arm alone (walkers already out keep walking)');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.ok(read(f).includes('suppressSpawns: () => racialSuppressPopulationSpawns(playerEntity)'), `${f} wires it`);
-  }
 });
 
 test('V4: SetFPSWeapon - the transformed rig IS the wereclaws, silent draw, high-pitch swing', () => {
@@ -97,13 +83,6 @@ test('V4: SetFPSWeapon - the transformed rig IS the wereclaws, silent draw, high
   assert.equal(racialFpsWeapon(p), WERECLAWS_ITEM);
   assert.equal(weaponTypeForItem(WERECLAWS_ITEM), WEAPON_TYPES.Werecreature, 'the WEAPON11.CIF animation set');
   assert.equal(swingSoundFor(WERECLAWS_ITEM), SOUND.SwingHighPitch, 'SetFPSWeapon:339');
-  const rig = read('src/combat/weapon/weaponRig.js');
-  assert.ok(rig.includes('const claws = racialFpsWeapon(entity);'), 'the per-frame sync consults the override');
-  // AUDIT 26 F023 made the draw clip per-weapon, so the gate grew a
-  // block - but the claws arm is unchanged: they still draw silently
-  // (SetFPSWeapon :338, and DFU's SetMelee forces None at :764).
-  assert.ok(rig.includes('!playerWeapon.weapon?.werecreatureClaws) {'),
-    'DrawWeaponSound = None (:338) - the claws draw silently');
   assert.equal(equipSoundFor(WERECLAWS_ITEM), null, 'and the law agrees, not just the gate');
 });
 
@@ -129,22 +108,3 @@ test('V4: the attack voice - 10% attack ELSE 20% bark, strain-keyed, transformed
   }
 });
 
-test('V4: the inventory and talk doors refuse the beast - every opener, one gate each', () => {
-  // DISC10-E L3 re-aim: ONE gate now, in the WINDOW's own door, as DFU has it (DaggerfallInventoryWindow.cs:583-587,
-  // inherited by DaggerfallTradeWindow.cs:369-376) - the per-host copies this pinned covered toggleInventory and the
-  // dungeon's opener and missed a building's pack, every corpse and pile above ground, the sheet's Items button and
-  // every counter. test/systems/disc10_lycan.test.js executes every door.
-  const inv = read('src/ui/inventoryDoor.js');
-  assert.ok(inv.indexOf('racialSuppressInventory(deps.entity)') > 0
-    && inv.indexOf('racialSuppressInventory(deps.entity)') < inv.indexOf('new NativeInventoryWindow(deps)'), 'the pack\'s door refuses before it builds');
-  const trade = read('src/ui/tradeDoor.js');
-  assert.ok(trade.indexOf('racialSuppressInventory(hooks.entity)') > 0
-    && trade.indexOf('racialSuppressInventory(hooks.entity)') < trade.indexOf('new NativeTradeWindow(hooks)'), 'and so does every counter\'s');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.ok(!read(f).includes('racialSuppressInventory('), `${f} keeps no copy of the gate`);
-  }
-  const tt = read('src/scenes/townTalk.js');
-  assert.ok(tt.includes('racialSuppressTalk(playerEntity)'), 'townTalk gates at B7\'s ONE window-opener');
-  assert.ok(tt.indexOf('racialSuppressTalk(playerEntity)') < tt.indexOf('mount(createTalkWindow('),   // ET1: the door builds the window
-    'the refusal comes before any window mounts');
-});

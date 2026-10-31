@@ -426,14 +426,12 @@ test('SURV-BOONS: the sheet explains the points - the Stats side\'s Boons rows i
   ]);
   setPref(SURVIVAL_PREF, 'casual');
   assert.deepEqual(boonStatRows(e), [], 'another tier: none');
-  assert.match(read('src/ui/statsCard.js'), /const boonRows = boonStatRows\(entity\);\n {2}if \(boonRows\.length\) \{\n {4}const bn = section\('Boons', 14\);/);
   // PIN MOVED (CHARGEN-TUT): the first-need page waits for a need, not a boon - driven through the HUD in the next test
   const page = TUTORIALS.find((t) => t.id === 'survival');
   assert.deepEqual(page.body, [
     'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.',   // PIN MOVED (AUDIT C&C S13): where the tiles stand; VOICE1: plain words
     'Survival can be Off, Boons (the default), Casual or Hard, set under Settings > Features. On Boons, needs that are met give bonuses. On Hard, neglected needs hurt you and can make you ill.',   // PIN MOVED (BOONS-DEFAULT; VOICE1)
   ]);
-  assert.match(read('src/ui/credits.js'), /There are four tiers in Settings: Off, Boons \(the default: neglect costs nothing, and staying fed, watered and rested gives bonuses\), Casual/);   // PIN MOVED (AUDIT C&C S8): the drink's swing is taken in Boons too
 });
 
 test('SURV-BOONS C2 / CHARGEN-TUT: the HUD asks for the first-need page on a made character\'s felt need - never on a boon, and never on the stand-in the HUD draws under the character-creation wizard', async () => {

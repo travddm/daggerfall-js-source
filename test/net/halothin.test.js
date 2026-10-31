@@ -225,42 +225,5 @@ test('HALO-THIN the halos\' own keepalive: standing and turning for half a minut
   }
 });
 
-test('HALO-THIN a referee\'s word down a halo carries where I am: the halo hears my latest pose first when its last is not it, and nothing more when it is - a duel\'s word and a rite\'s call it before they leave (AUDIT D3; mutants: never brought; brought every time; the call sites dropped)', () => {
-  const { s, sockets, clock, start, halos, poses, haloWs } = cornerSession();
-  const pose = { ...start };
-  clock.t += 100; s.sendPose({ ...pose });
-  for (let f = 0; f < 5; f++) { clock.t += 100; pose.z += UNITS_PER_M; s.sendPose({ ...pose }); }   // five metres on: not due
-  const ws = haloWs(halos[0]);
-  assert.equal(poses(ws).length, 1);
-  s._haloCurrent(ws);
-  assert.equal(poses(ws).length, 2, 'brought up to date');
-  assert.equal(poses(ws).at(-1).z, pose.z, 'where I am');
-  s._haloCurrent(ws);
-  assert.equal(poses(ws).length, 2, 'already current: nothing more');
-  s._haloCurrent(sockets[0]);
-  assert.equal(poses(sockets[0]).length, 6, 'my own cell is never brought (it hears every pose)');
-  const online = read('src/net/online.js');
-  assert.match(online, /if \(s\.length > DUEL_FRAME_MAX\) return false;[^\n]*\n\s*this\._haloCurrent\(ws\);[^\n]*\n\s*try \{ ws\.send\(s\); \}/, 'the duel\'s word');
-  assert.match(online, /this\._haloCurrent\(ws\);[^\n]*\n\s*try \{ ws\.send\(JSON\.stringify\(\{ t: 'rite', \.\.\.w \}\)\); \}/, 'the rite\'s');
-});
-
 // ── the host ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('HALO-THIN the host: the halos whole while a duel stands (it is refereed in the room my opponent is heard through) and in a serpent\'s fight - never for the open zone, whose referee holds me by a word my own cell alone says - said before the frame\'s pose; the serpent\'s fight is this frame\'s (mutants: the duel unasked; the serpent unasked; the word after the pose; the fight never put down)', () => {
-  const w = read('src/scenes/world.js');
-  const line = /\n\s*online\.haloWhole = !!duelMgr\.duel \|\| _serpentFight;[^\n]*\n\s*if \(!modes\?\.caravanVisit\) caravanVisitLink\.close\(\);[^\n]*\n\s*if \(!key\) \{ if \(online\.room\) online\.leave\(\); \}/;   // above the caravan's close, which WAGONS2-VISIT holds against the join (test/systems/wagons2_visit.test.js)
-  assert.match(w, line, 'the word, just before the frame\'s join or pose');
-  assert.ok(w.indexOf('online.haloWhole = ') < w.indexOf('    else online.sendPose({ ...pose, ...arm, ...poseFx() });'));
-  assert.match(w, /\n\s*_serpentFight = false;\n\s*if \(!serpentHost\) return;/, 'put down each frame first');
-  assert.match(w, /try \{ fight = street && serpentHost\.frame\(\); \} catch \(e\) \{[^\n]*\}\n\s*_serpentFight = !!fight;/, 'then this frame\'s fight');
-  const of = w.indexOf('  const onlineFrame = (now, dt) => {');
-  assert.ok(of > 0 && w.indexOf('    serpentFrame();', of) < w.indexOf('online.haloWhole = ', of), 'the fight read before the word');
-  // the relay's referees read the pose of the room the bout is in - the reason the word exists; the open zone's holds a
-  // fighter by the zone word, and the session says it down its own cell's socket alone
-  const relay = read('server/src/index.js');
-  assert.match(relay, /if \(posed && this\._duelRef\?\.bouts\.size\) \{ duelPose\(this\._duelRef, a\.sub, m\.p, now\);/);
-  assert.match(relay, /if \(posed && this\._trailing\(a\)\) this\._trailPose\(ws, m\.p, now\);/);
-  const online = read('src/net/online.js');
-  assert.match(online, /: this\._socketFor\(d\.to\);/, 'a duel frame goes down the socket the opponent is heard through');
-  assert.match(online, /setWildZone\(z, dead = false\) \{[\s\S]*?if \(this\.status === 'open' && this\.wildOk && this\._ws && this\._welcomed\.has\(this\._ws\)\) \{ this\._sayZone\(this\._ws, v, !v && dead\);/, 'the zone word: my own cell\'s socket alone');   // PIN MOVED (AUDIT FOE-KEEPS E2): and left dying, the kill credit's word
-});

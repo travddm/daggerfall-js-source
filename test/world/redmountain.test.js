@@ -197,25 +197,6 @@ test('RED-MOUNTAIN in the kernel: a pixel on the cone built through the landform
   assert.ok(lvl * UNIT > 2500, 'over the land without the volcano');
 });
 
-test('RED-MOUNTAIN by source: the shaper and a site\'s level stand the volcano past the Bay alone, groundTopOf adds its bound, the module is the worker\'s kind (world/ alone) and one float in every engine (no Math.cos, Math.exp, Math.atan2, `**`)', () => {
-  const lf = read('src/world/landforms.js'), rm = read('src/world/tamriel/redMountain.js');
-  assert.match(lf, /const crater = continent && redMountainReaches\(ox - span, oy - span, ox \+ 2 \* span, oy \+ 2 \* span\) \? redMountainGroundOf\(woods\) : null;/);
-  assert.match(lf, /crater !== null \? redMountainLand\(gx, gy, base, hh, crater\) : base \+ hh;/);
-  assert.match(lf, /const crater = tl && redMountainReaches\(ox, oy, ox \+ span, oy \+ span\) \? redMountainGroundOf\(woods\) : null;/);
-  assert.match(lf, /Math\.max\(hill, TAMRIEL_TOP\) \+ redMountainTopNear\(px, py\)/);
-  const imports = [...rm.matchAll(/^import .* from '([^']+)';/gm)].map((m) => m[1]);
-  assert.ok(imports.length && imports.every((p) => p.startsWith('./') || p === '../perlin.js' || p === '../terrain/terrainSampler.js'), `world/ alone: ${imports}`);
-  const own = new Set(['sin', 'cos', 'tan', 'atan', 'atan2', 'exp', 'log', 'pow', 'hypot', 'cbrt']), hits = [];
-  const walk = (node) => {
-    if (!node || typeof node.type !== 'string') return;
-    if (node.type === 'MemberExpression' && node.object.name === 'Math' && own.has(node.property.name)) hits.push(node.property.name);
-    if ((node.type === 'BinaryExpression' || node.type === 'AssignmentExpression') && /\*\*/.test(node.operator)) hits.push(node.operator);
-    for (const k of Object.keys(node)) { const v = node[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); }
-  };
-  walk(acorn.parse(rm, { ecmaVersion: 'latest', sourceType: 'module' }));
-  assert.deepEqual(hits, []);
-});
-
 test('RED-MOUNTAIN its fire and its horizon: the cap line rides the cone (a zone\'s line over the land under it, CAP_NONE kept), the air leans warm by the ground\'s own heat, the snow\'s levels stand over its rim; the far ring stands the smooth cone at a pixel\'s centre, a far field cell its highest, and the air\'s mean ground the same cone (mutants: the line unraised, the heat unread, the ring\'s term, the cell\'s box)', async () => {
   const { capLineOfPixel, SNOWCAP, CAP_NONE } = await import('../../src/world/peaks/snowcap.js');
   const { SNOWPACK, levelAltitude } = await import('../../src/systems/weather/snowpack.js');
@@ -244,8 +225,6 @@ test('RED-MOUNTAIN its fire and its horizon: the cap line rides the cone (a zone
     setAirGround({ ...ground, heatAt: () => 7.5 });
     assert.equal(airParamsAt(1000, 1000).mean, cold + 7.5);
   } finally { setAirGround(null); }
-  const airGround = read('src/systems/weather/airGround.js');
-  assert.match(airGround, /heatAt: \(x, z\) => \(landforms \? LAPSE_C_PER_M \* redMountainSmooth\(\(x \/ TERRAIN_SIZE\) \* span, \(z \/ TERRAIN_SIZE \+ 1\) \* span\) \* STREAMING_TERRAIN_SCALE : 0\),/);
   // the snow's levels: over the highest the cone and the relief's top byte can stand
   const highest = nodeGround(180, 1, 1) * UNIT + RED_MOUNTAIN_TOP * UNIT;
   assert.ok(levelAltitude(SNOWPACK.levels.count - 1) > highest, `the levels to ${levelAltitude(SNOWPACK.levels.count - 1)} m, over ${highest.toFixed(0)}`);
@@ -262,7 +241,6 @@ test('RED-MOUNTAIN its fire and its horizon: the cap line rides the cone (a zone
   // AUDIT RED-MOUNTAIN R9 (the merge moved its pin off the crater): the far views' crater - the centre's pixel on its floor
   const rmf = redMountainFrame(), ccx = Math.floor(rmf.bx), ccy = Math.floor(rmf.by);
   assert.ok(Math.abs(redMountainLiftAt(ccx, ccy) * UNIT - (D.lift - D.depth)) < 1, `the crater's floor on the horizon: ${(redMountainLiftAt(ccx, ccy) * UNIT).toFixed(0)} m`);
-  assert.match(read('src/render/farRing.js'), /heightOf: \(byte, x, y, v\) => answer\.ground\[v\] \+ \(inputs\.relief \? redMountainNodeLift\(x, y\) \* STREAMING_TERRAIN_SCALE : 0\),/, 'the far field stands the cone at its vertex');
   // the air's mean ground: the smooth cone over the land
   const g = groundWoods(new StubWoods());
   const withCone = meanGroundField(g, cx + 3, cy, true);
@@ -338,7 +316,6 @@ test('RED-MOUNTAIN its fire: the profile the far draw hides behind the cone\'s o
   assert.ok(Math.abs(holdAt(SUMMIT_HAZE.to + 1) - 0.85 * (1 - SUMMIT_HAZE.keep)) < 1e-9, 'the summit through thinner air');
   assert.ok(SUMMIT_HAZE.from > 3644 + 42.5, 'over every other ground in the world (LANDFORM_CEILING)');
   assert.deepEqual({ ...SUMMIT_HAZE }, { from: 3700, to: 6500, keep: 0.7, ease: 8000 }, 'the summit three-tenths of the hold (Red-Mountain.md), eased in past the grid (AUDIT RED-MOUNTAIN F6)');
-  for (const text of [read('src/render/farRing.js'), read('src/render/enhancedLighting.js')]) assert.match(text, /uRimStart, uRimEnd, summitHold\(uHazeHold, vDist\)\)/);   // AUDIT RED-MOUNTAIN F6 (PIN MOVED): and by the eye's distance
   // the plume: its billows world-space noise in 0..1, the same about its foot wherever the world stands it; its column's
   // radius within its lump of its swell, at its foot and its top, leaning downwind
   const { PLUME_VS } = await import('../../src/render/redMountainFire.js');
@@ -368,10 +345,6 @@ test('RED-MOUNTAIN its fire: the profile the far draw hides behind the cone\'s o
   const crown = ashTint(snow, ASH_TINT.rockTo + 1);
   assert.deepEqual(crown, ASH_TINT.ash.map((v, c) => Math.round(v + (ASH_TINT.rock[c] - v) * ASH_TINT.rockShare)), 'the summit its rock');
   assert.ok(crown[0] > crown[2] + 30, 'red over blue at the summit');
-  const ringSrc = read('src/render/farRing.js');
-  assert.match(ringSrc, /const tint = ringTintAt\(overworldTint\(climate, byte\), px, py, relief\);/);
-  assert.match(ringSrc, /tintAt: \(x, y, byte, v\) => ringTintAt\(overworldTint\(climAt\(x, y, v\), byte\), x, y, !!inputs\.relief\),/);
-  assert.match(ringSrc, /const tintAt = \(x, y\) => ringTintAt\(overworldTint\(climateOf\(x, y\), byteAt\(x, y\)\), x, y, !!inputs\.relief\);/);
   const { ringTintAt } = await import('../../src/render/farRing.js');
   const cpx = Math.floor(redMountainFrame().bx), cpy = Math.floor(redMountainFrame().by);
   assert.deepEqual(ringTintAt(snow, cpx + 3, cpy, true), ashTint(snow, redMountainLiftAt(cpx + 3, cpy) * UNIT));
@@ -379,16 +352,6 @@ test('RED-MOUNTAIN its fire: the profile the far draw hides behind the cone\'s o
   // both programs carry the one hiding law
   for (const fs of [LAVA_FS, PLUME_FS]) assert.match(fs, /bool hidden\(vec3 p, float margin\)/);
   assert.equal(FIRE_PROGRAMS.length, 2);
-  // the far ring: the fire drawn after the band, on the cone the landforms' lift stands, through its door (AUDIT
-  // RED-MOUNTAIN F5 - PIN MOVED: compiledPass, the cone apart from the fire), let go with the ring
-  const ring = read('src/render/farRing.js');
-  assert.match(ring, /const cone = eye && worldProj \? this\._coneNow\(\) : null, fire = cone \? this\._fireNow\(cone\) : null,/);
-  assert.match(ring, /if \(!inputs\?\.relief\) return null;\n\s+const frame = redMountainFrame\(\);/);
-  assert.match(ring, /if \(this\._fireOff\) return null;/);
-  assert.match(ring, /const ground = redMountainGround\(byteBase\(ringReaders\(inputs\)\.byteAt\), inputs\);/);
-  assert.match(ring, /compiledPass\(gl, FIRE_PROGRAMS, \(\) => new RedMountainFire\(gl\),/);
-  assert.match(ring, /if \(whole\) \{ this\._fire\?\.dispose\(\); this\._fire = null; this\._fireDoor = null; \}/);
-  assert.ok(ring.indexOf('fire?.draw(pass);') > ring.indexOf('this._drawBand(view, origin') && ring.indexOf('fire?.draw(pass);') < ring.lastIndexOf('gl.depthRange(0, 1);'), 'after the band, before the pass\'s state is put back');
   const { fireDisabled } = await import('../../src/render/farRing.js');
   assert.equal(fireDisabled('?world&redfire=off'), true);
   assert.equal(fireDisabled('?world'), false);

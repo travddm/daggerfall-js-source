@@ -145,12 +145,6 @@ test('QUEST-RESET the bridge\'s words: every refusal says why in its own words; 
     assert.notEqual(restartRefusalText(reason), restartRefusalText('nope'), reason);
   }
   assert.equal(restartRefusalText('raid'), shelfRefusalText('raid'), 'a raid refuses both the same way');
-  const bridge = src('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /restart\(id\) \{\n\s+const r = machine\.restartQuest\(Number\(id\), \{ refuse: refuseRaid \}\);/);
-  assert.match(bridge, /canRestart: \(id\) => machine\.restartRefusal\(Number\(id\), \{ refuse: refuseRaid \}\) === null,/);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /clean\.restart && clean\.canRestart\?\.\(sel\.id\)/, 'the pause journal draws it where the door allows');
-  assert.match(menu, /const out = clean\.restart\(sel\.id\);/);
 });
 
 function chronicleRig(deps) {

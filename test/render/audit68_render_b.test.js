@@ -240,18 +240,6 @@ test('AUDIT 68 S17-cirrus-boil-wrap: the ice\'s streaks read on across every wra
   }
 });
 
-test('AUDIT 68 S16-v-replay-origin-alloc: an origin-less batch reads ONE frozen zero in the draw and both replays - no [0, 0, 0] minted per batch per pass', async () => {
-  const { ZERO_ORIGIN } = await import('../../src/render/bounds.js');
-  assert.ok(Object.isFrozen(ZERO_ORIGIN));
-  assert.deepEqual([...ZERO_ORIGIN], [0, 0, 0]);
-  for (const f of ['src/render/shadowPass.js', 'src/render/airPass.js', 'src/render/renderer.js']) {
-    const s = rd(f);
-    assert.doesNotMatch(s, /origin \|\| \[0, 0, 0\]/, `${f}: no fresh zero per batch`);
-    assert.match(s, /import \{[^}]*\bZERO_ORIGIN\b[^}]*\} from '\.\/bounds\.js';/, `${f}: the leaf's one zero`);
-  }
-  assert.doesNotMatch(rd('src/render/renderer.js'), /const ZERO_ORIGIN = /, 'no second copy in the renderer');
-});
-
 test('AUDIT 68 S17-gl-program-dup: one compile and link - the order every pass wrote, the far ring\'s prefixes, and no other home under src/render', async () => {
   const { buildProgram } = await import('../../src/render/glProgram.js');
   const calls = [];

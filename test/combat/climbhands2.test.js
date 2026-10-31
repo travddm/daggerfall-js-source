@@ -326,11 +326,4 @@ test('CLIMB-HANDS II the Morrowind arms climb sheathed: drawn while their pose i
     Object.assign(fpArm, saved);
     resetToDefaults(); _resetModSettings();
   }
-  // the gate's sixth exception, beside the five, and the lowering reads the same answer
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  // PIN MOVED (TWO-HANDS): the running hands' two exceptions are named between them and join the gate after it (was: the
-  // gate on the next line, ending at `!armsClimb`)
-  assert.match(rig, /const armsClimb = fpArm\.active\(\) && !!fpArm\.climbPosed\?\.\(\);\n(?:\s+\/\/[^\n]*\n)*\s+const runHands = [^\n]*\n\s+const armsRun = [^\n]*\n\s+if \(paralyzed \|\| \(!shown\(\) && !torchOnly && !sheetOnly && !shieldRect && !gunSliding && !armCasts && !armsClimb && !runHands && !armsRun\)\) return;/);
-  assert.match(rig, /if \(_climbLower > 0 && !armsClimb\) \{/);
-  assert.match(rd('src/combat/fpArm.js'), /climbPosed\(\) \{ return climbHands && viewMode === 'first' && !held; \},/, 'the arm says it is posed on the climb: first person, the hands on the stone, no sheet');
 });

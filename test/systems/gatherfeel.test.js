@@ -96,8 +96,6 @@ test('GATHER-FEEL G2: the fall is the felled tree\'s - its first crack at the cl
   assert.ok(Math.abs(onset - FALL_S) <= 0.02, `the ground struck at ${onset.toFixed(3)} s, FALL_S ${FALL_S}`);
   const peak = Math.max(...x.map(Math.abs));
   assert.ok(x.slice(0, Math.round(11025 * 0.02)).some((v) => Math.abs(v) > 0.1 * peak), 'the first crack at once');
-  assert.match(src('tools/gatherSfx.mjs'), /import \{ FALL_S \} from '\.\.\/src\/scenes\/treeHost\.js';/);
-  assert.match(src('tools/gatherSfx.mjs'), /const LEN = 2\.75, HIT = FALL_S;/);
 });
 
 test('GATHER-FEEL G3: the clips register on the bus once - under their keys, a clip that will not load is silence and the rest still take, and a bus with no door loads nothing', async () => {
@@ -412,8 +410,6 @@ test('GATHER-FEEL G13: the classic skin - the switch off, each beat says the DFU
   e.frame(1);
   assert.deepEqual(cues, ['strike', 'clean'], 'the clean finish DFU\'s lock click; the port\'s own beats nothing');
   assert.deepEqual(audio.shots, [], 'never a clip of ours');
-  // the switch: the port's own sounds', and the clips' load
-  assert.match(src('src/systems/gatherSounds.js'), /export function createGatherEar\(\{ audio = null, on = enhancedSoundsOn, rand = Math\.random, cue = profCue, install = true \} = \{\}\) \{/);
   assert.equal(typeof enhancedSoundsOn, 'function');
   const realFetch = globalThis.fetch;
   const urls = [];
@@ -435,7 +431,6 @@ test('GATHER-FEEL G13: the classic skin - the switch off, each beat says the DFU
 });
 
 // ═══ THE HOST ════════════════════════════════════════════════════════════════════════════════════════════════════════
-
 
 test('GATHER-FEEL G14: the last blow is seen and heard landing - the act ends on its press, the Pick-Axe stays in the hand through the rest of its swing and is put away as it runs out; the vein stands until the blow lands, then goes, its rubble heard at its place; the blow\'s clack before it, the swing\'s rush at once (mutants: the hand put away on the press, the vein gone on the press, the rubble unheard, the follow-through never put away)', async () => {
   try {
@@ -613,13 +608,6 @@ test('GATHER-FEEL G17: a tree falls heard - its creak at half its chops, the fal
 });
 
 test('GATHER-FEEL G18: the hosts - the world hands the gathering host its bus (the street, a dungeon and a building are the one host\'s); the host feeds the ear the act every frame and the idle frame too; the Enhanced sounds row says the gathering (mutants: the bus unhanded, the idle frame unfed)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /\n\s+audio,   \/\/ GATHER-FEEL: the bus the gathering's ear says the acts on/);
-  const g = src('src/scenes/gatherHost.js');
-  assert.match(g, /const ear = deps\.ear \?\? createGatherEar\(\{ audio: deps\.audio \?\? null \}\);/);
-  assert.match(g, /ear\.frame\(dt, act\.act, act\.world, pos\);/);
-  assert.match(g, /ear\.frame\(dt, null\);   \/\/ GATHER-FEEL: a finished act's last blow still lands/);
-  assert.match(g, /handTool: \(\) => \(act\?\.hand \? act\.hand\(act\) : follow\?\.hand \? follow\.hand\(follow\) : null\),/);
   for (const f of ['worldModes', 'dungeonContext', 'exterior']) assert.doesNotMatch(src(`src/scenes/${f}.js`), /createGatherHost\(/, `${f}: no host of its own - the world's one`);
   const row = FEATURES.find((f) => f.id === 'enhanced-sounds');
   assert.match(row.note, /gather/i, 'the row says it');

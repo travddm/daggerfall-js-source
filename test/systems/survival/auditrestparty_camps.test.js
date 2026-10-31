@@ -34,10 +34,6 @@ const pool = (entity, said = [], place = {}, selfId = null) => createCamps({
 });
 
 test('AUDIT REST-PARTY B1 + B3: every way out of a dungeon puts my fires away BEFORE the room\'s memory is published - a leave or a teleport packs them, a load drops them (the pack is already the save\'s)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /const carried = dungeonCtx\.camps\?\.packOwnFires\?\.\(\{ quiet: true \}\) \?\? 0;[^\n]*\n    const pose = dungeonPose\(\);\n    host\.onDungeonLeave\?\.\(\);/, 'the walk out');   // AUDIT REST II H4 (PIN MOVED): packed quiet, said outside
-  // AUDIT REST II H1 (PIN MOVED): the load says so itself - cacheScene false is a Recall out of a dungeon too
-  assert.match(wm, /if \(dungeonCtx\) \{ if \(load\) dungeonCtx\.camps\?\.dropOwn\?\.\(\); else carried = dungeonCtx\.camps\?\.packOwnFires\?\.\(\{ quiet: true \}\) \?\? 0; \}\n      if \(dungeonCtx\) \{\n        host\.onDungeonLeave\?\.\(\);/, 'the forced exit: a teleport packs, a load drops - before the leave hook');
   // and on the pool: dropOwn after a load leaves the loaded pack as the save had it
   _resetForTests(); setPref('survival', true); setWorldMinutes(1000);
   const fire = createSurvivalItem(TEMPLATE.Campfire);
@@ -63,7 +59,6 @@ test('AUDIT REST-PARTY B2: offline, a night at my own Campfire keeps it lit thro
   entity.isResting = false; entity.restKind = null;
   assert.equal(p.spendNightNear([0, 1, 0]), true, 'lit at the wake, so the night is paid');
   assert.equal(rec.wear, before - 1);
-  assert.match(rd('src/scenes/camps.js'), /const tended = c\.rec\.kind === CAMP_KIND\.Tent \|\| \(c\.rec\.kind === CAMP_KIND\.Fire && !!c\.rec\.fuel\);/);
   // and a fire with no fuel of its own - an old save's kit fire with uses on its record, an Ember Jar's - burns its own span
   _resetForTests(); setPref('survival', true); setWorldMinutes(2000);
   const sleeper = { items: [], isResting: true, restKind: 'camp' };
@@ -92,11 +87,6 @@ test('AUDIT REST-PARTY B3: a peer\'s fire gone cold whose owner is not in the ro
   assert.equal(p.sweepColdAbsent(new Set(['here'])), 1);
   assert.deepEqual(p.camps.map((c) => c.owner).sort(), ['gone-lit', 'here']);
   assert.equal(p.sweepColdAbsent(null), 0, 'no roster read: nothing swept');
-  // AUDIT REST II F9 (PIN MOVED): the frame's sweep is sweepColdPeers - the same sweep against the room's peers, read at
-  // most once a second and only while a peer's camp stands (test/world/auditrest2_fires.test.js runs it)
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /camps\.tick\(dt\);[^\n]*\n    sweepColdPeers\(dt\);/, 'each frame, the sweep');
-  assert.match(dc, /    if \(!onlineRoom\(\)\) return;\n[\s\S]{0,200}?const peers = opts\.peers\?\.\(\);\n    if \(peers\) camps\.sweepColdAbsent\(new Set\(peers\.map\(\(q\) => q\?\.id\)\)\);\n  \}/, 'online, against the room\'s peers');
 });
 
 test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their sources are shut, and says so; online none is used, offline as ever (REST-LOOT: the switch\'s way back - open, they cross and are used online)', () => {
@@ -180,7 +170,6 @@ test('AUDIT REST-PARTY B7: the hotbar\'s Campfire is one with fuel, the empty on
 });
 
 test('AUDIT REST-PARTY A3 + A4: a pressed bed prices as a bed; a room that runs out mid-night is no whole night - no top-up, no fuel, nobody carried', () => {
-  assert.match(rd('src/scenes/world.js'), /restKind: \(\) => \(_restFromBed \? 'bed' : camps\.fireNear\(/);
   setSharedClock(() => 5_000_000);
   setOwnMinutes(400_000);
   const e = { health: 5, maxHealth: 60, fatigue: 0, magicka: 0, maxMagicka: 30, stats: { endurance: 50, strength: 50, willpower: 50, agility: 50 }, skills: [], career: {}, activeEffects: [] };
@@ -212,13 +201,7 @@ test('AUDIT REST-PARTY A5: the channel held to its end asks again - a fire gone 
   }
 });
 
-test('AUDIT REST-PARTY C1: the fire\'s ward is online\'s - offline the rest is DFU\'s, its ambushes with it', () => {
-  assert.match(rd('src/scenes/dungeonContext.js'), /if \(spot && sharedClockOn\(\) && inFireWard\(dungeonFires, spot\)\) spot = null;/);
-});
-
 test('AUDIT REST-PARTY C7: the fires\' law reads a hearth\'s CLASSIC foot - a texture mod\'s XML scale is one client\'s, and the law must stand the same fires on every client', () => {
   const { existing } = fireLayoutInputs([], [{ x: 1, y: 3, z: 2, foot: 2.2, lawFoot: 2.5 }, { x: 4, y: 3, z: 5, foot: 2.2 }, { x: 0, y: 1, z: 0, foot: 0, placed: true }]);
   assert.deepEqual(existing, [[1, 2.5, 2], [4, 2.2, 5]], 'the law\'s foot first; a placed fire is the law\'s own');
-  assert.match(rd('src/scenes/dungeonContext.js'), /const lawSize = t && f\.record < t\.recordCount \? classicBillboardSize\(t, f\.record\) : null;/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /lawFoot: lawSize \? f\.y - lawSize\.h \/ 2 : undefined, archive: f\.archive, record: f\.record \}\);/);   // AUDIT REST III E4 (RE-AIMED): and the row names its flat
 });

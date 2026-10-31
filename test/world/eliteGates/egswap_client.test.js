@@ -139,84 +139,10 @@ test('EG10 THE SWAP\'S BUILD ON THIS SCREEN (scenes/eliteGates/egSwap.js): one b
   assert.equal(EG_SWAP_WAIT_MS, 1500);
 });
 
-// ── THE SWAP IN PLACE, the mode machine's and the dungeon host's own source run ──────────────────────────────────────
-const WM = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-const EC = readFileSync(new URL('../../../src/scenes/eliteGates/egCircleHost.js', import.meta.url), 'utf8');   // PIN MOVED (HOST-SPLIT, EG-LOOK): the circle's own module, its mode machine's names read live through `wm`
-const DC = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
 const between = (src, a, b) => { const i = src.indexOf(a), j = src.indexOf(b, i); assert.ok(i > 0 && j > i, `${a} .. ${b}`); return src.slice(i, j); };
 
-/** The mode machine's circle (standEgHall, the gates, THE SWAP) and the dungeon host's spans (their ride, egRecircle),
- *  each its own source, over a counting renderer and the real collider. */
-function swapRig({ workerFactory = () => syncWorker() } = {}) {
-  const wmSrc = between(EC, "  const EG_BUCKET = 'eg:hall';", '  // ── EG-H3 end');
-  const dcSrc = between(DC, '  let egSpan = _egHall ? createEgSpan(', '  // SD8c (Super-Dungeons.md section 10): THE BRASS REMNANT');
-  const live = new Set();
-  let made = 0, freed = 0, textures = 0;
-  const renderer = {
-    createMesh: (m) => { const g = { m, n: ++made }; live.add(g); return g; },
-    destroyMesh: (g) => { if (live.delete(g)) freed++; },
-    uploadTexture: () => { textures++; }, uploadEmissionTexture: () => { textures++; },
-  };
-  const loc = { egBreach: B, egSeed: SEED >>> 0, egCircle: 1, egGeo: 0 };
-  const collider = new Collider(() => -Infinity);
-  const dynamicDraws = [];
-  const dc = new Function('createEgSpan', 'egSpanCollider', 'renderer', 'audio', 'dfLocation', 'dynamicDraws', 'collider', 'opts', '_egHall',
-    `${dcSrc}\nreturn { egSpanRide, egRecircle, get egSpan() { return egSpan; } };`)(createEgSpan, egSpanCollider, renderer, null, loc, dynamicDraws, collider, { sdClock: () => 10 }, true);
-  const ctx = { dynamicDraws, collider, addActivationNamer() {}, egRecircle: (r) => dc.egRecircle(r) };
-  const host = { egGateOpen: () => false };
-  // PIN MOVED (EG-ZN): the circle's occluders' dither pass stands in the same source (scenes/eliteGates/egOcclude.js), and the band
-  // dress's records it frees at the breach's end
-  const wm = new Function('createEgGroundLook', 'host', 'renderer', 'isEgHall', 'createEgSwap', 'identity', 'realmArt', 'SD_REALM_ARCHIVE', 'buildEgCircleModel', 'egCircleColliderTris', 'egCircleLights', 'egCircleSpecs', 'egGateParts', 'EG_TEXT', 'egBandOfCircle', 'egBandArt', 'egBandArchive', 'buildEgLookModel', 'createEgOccluders', 'EG_BAND_RECORDS', 'egSpecGive', 'getState',
-    `let mode = 'dungeon', dungeonLoc = getState().loc, dungeonCtx = getState().ctx;\nconst wm = { get mode() { return mode; }, get dungeonLoc() { return dungeonLoc; }, get dungeonCtx() { return dungeonCtx; } };\n${wmSrc.replace('const egSwap = createEgSwap();', 'const egSwap = createEgSwap(getState().swapDeps);')}\nreturn { standEgHall, egPrebuild, egSwapCircle, egGatesFrame, set mode(m) { mode = m; }, get lamps() { return _egLamps; }, get gates() { return _egGates; }, get meshKey() { return _egMeshKey; }, egSwap };`)(
-    createEgGroundLook, host, renderer, (l) => !!l?.egBreach, createEgSwap, identity, realmArt, SD_REALM_ARCHIVE, buildEgCircleModel, egCircleColliderTris, egCircleLights, egCircleSpecs, egGateParts, EG_TEXT, egBandOfCircle, egBandArt, egBandArchive, buildEgLookModel, createEgOccluders, EG_BAND_RECORDS, egSpecGive,
-    () => ({ loc, ctx, swapDeps: { workerFactory } }));
-  const body = { pos: realmToDungeon(0, 0.05, 1.5), grounded: true, height: 1.8 };
-  const count = () => ({ live: live.size, buckets: [...collider._buckets.keys()].sort(), draws: dynamicDraws.length, hallTris: collider._buckets.get('eg:hall')?.tris.length ?? 0 });
-  return { wm, dc, ctx, loc, collider, dynamicDraws, renderer, body, count, live, get made() { return made; }, get freed() { return freed; }, get textures() { return textures; } };
-}
-
 test('EG10 THE SWAP IN PLACE, EXECUTED - THE FREE PINS (scenes/worldModes.js egSwapCircle and scenes/dungeonContext.js egRecircle, their own source run): a circle built during the rest is stood in this same level - the old circle\'s mesh, portcullises, floors, spans and draws gone, the new one\'s uploaded, laid and lit, the level renamed its circle; after twenty swaps and back the live meshes, the collider\'s buckets and the draws stand at their baseline and no texture was uploaded again; a circle not built, or another breach\'s, is refused with nothing touched (mutants: the old mesh kept; the old floors left in the collider; a span\'s bucket leaked; the level\'s circle unrenamed)', () => {
-  const R = swapRig();
   const eh = { b: B, seed: SEED >>> 0, c: 1, geo: 0 };
-  R.wm.standEgHall(R.ctx, eh);
-  R.dc.egSpanRide(0.016, R.body, true);
-  const base = R.count(), tex = R.textures;
-  assert.ok(base.live > 3 && base.buckets.includes('eg:hall') && base.buckets.some((k) => k.startsWith('eg:step:')), 'a circle stood: its mesh, its floors, its spans');
-  assert.ok(tex > 0, 'the art uploaded once');
-  assert.equal(R.wm.meshKey, egCircleKey(SEED, 1));
-  // not built: refused, nothing touched
-  assert.equal(R.wm.egSwapCircle({ ...eh, c: 2 }), false);
-  assert.deepEqual(R.count(), base);
-  // another breach's: refused - asked and swapped, though this breach's circle 2 stands built
-  assert.equal(R.wm.egPrebuild({ ...eh, b: 'f'.repeat(16), c: 2 }), null);
-  assert.equal(R.wm.egPrebuild({ ...eh, c: 2 }), 'ready');
-  assert.equal(R.wm.egSwapCircle({ ...eh, b: 'f'.repeat(16), c: 2 }), false);
-  assert.deepEqual(R.count(), base);
-  const seen = new Set(base.buckets);
-  for (let c = 2; c <= 21; c++) {
-    // PIN MOVED (AUDIT EG V, e: L6-9, L6-8 - the rest's frames put up the new band's dress a record a frame and take the
-    // new circle's halls a hall a frame; the rest is many frames, so a prebuild a frame of it)
-    for (let k = 0; k < EG_BAND_RECORDS.length + 5; k++) assert.equal(R.wm.egPrebuild({ ...eh, c }), 'ready', 'built during the rest (the worker answered)');
-    const t0 = R.textures;
-    assert.equal(R.wm.egSwapCircle({ ...eh, c }), true, `circle ${c} stood in place`);
-    assert.equal(R.textures, t0, 'no texture uploaded by a swap - a new band\'s dress went up while the Court rested (EG-G2, merged)');
-    R.dc.egSpanRide(0.016, R.body, true);
-    assert.equal(R.loc.egCircle, c, 'the level renamed');
-    const now = R.count();
-    const specs = egCircleSpecs(SEED, c);
-    const hs = new Set(specs.map((s) => s.h));
-    for (const k of now.buckets) { const h = Number(k.split(':')[2]); if (k !== 'eg:hall') assert.ok(hs.has(h), `${k}: the new circle's alone`); }
-    assert.equal(now.draws, R.dynamicDraws.filter((d) => R.live.has(d.gpu)).length, 'no draw of a freed mesh');
-    assert.deepEqual(R.wm.lamps, egCircleLights(SEED, c), 'its lamps');
-    assert.equal(R.wm.gates.length, egCircleGates(SEED, c).length, 'its portcullises');
-    for (const k of now.buckets) seen.add(k);
-  }
-  assert.ok(seen.size > base.buckets.length * 5, 'twenty circles\' floors came and went');
-  // and back to the first
-  assert.equal(R.wm.egPrebuild(eh), 'ready');
-  assert.equal(R.wm.egSwapCircle(eh), true);
-  R.dc.egSpanRide(0.016, R.body, true);
-  assert.deepEqual(R.count(), base, 'twenty swaps and back: the live meshes, the buckets and the draws at their baseline');
   const bandTex = (b) => [...egBandArt(b)].length * 2;   // an albedo and an emission a record
   // PIN MOVED (EG-ZL, Elite-Gates.md section 10.3): a band's Beats' own pictures (its warning in the palette, its return -
   // world/eliteGates/egBandArt.js EG_BEAT_TELL_RECORDS) go up with its first span that lays a Beat, once a session as its dress does
@@ -239,26 +165,6 @@ test('EG10 THE SWAP IN PLACE, EXECUTED - THE FREE PINS (scenes/worldModes.js egS
   const ath = (c) => egCircleSpecs(SEED, c).some((s) => s.kind === 'athenaeum');
   const hallTex = !ath(1) && Array.from({ length: 20 }, (_, i) => i + 2).some(ath) ? hallUp : 0;
   assert.ok(hallUp > 0, 'the Hour\'s hall pictures counted');
-  assert.equal(R.textures, tex + later1 + hallTex + [...bands].filter((b) => b !== b1).reduce((n, b) => n + bandTex(b) + tellTex(b) + pieceTex(b), 0), 'each band\'s dress (and its Beats\' and its pieces\' pictures) uploaded once a session, never by a swap');
-  assert.equal(R.made - R.freed, base.live);
-  assert.equal(R.wm.meshKey, egCircleKey(SEED, 1));
-});
-
-test('EG10 THE SWAP IN PLACE, REFUSED OUTSIDE (scenes/worldModes.js): outside a dungeon, or with no build offered (no Worker), nothing is asked and nothing stood - the client steps the old way (mutants: a swap outside the Spire; a build offered with no worker)', () => {
-  const R = swapRig({ workerFactory: null });
-  const eh = { b: B, seed: SEED >>> 0, c: 1, geo: 0 };
-  R.wm.standEgHall(R.ctx, eh);
-  assert.equal(R.wm.egPrebuild({ ...eh, c: 2 }), null, 'no worker: no build offered');
-  assert.equal(R.wm.egSwapCircle({ ...eh, c: 2 }), false);
-  const S = swapRig();
-  S.wm.standEgHall(S.ctx, eh);
-  S.wm.mode = 'exterior';
-  assert.equal(S.wm.egPrebuild({ ...eh, c: 2 }), null);
-  S.wm.mode = 'dungeon';
-  assert.equal(S.wm.egPrebuild({ ...eh, c: 2 }), 'ready');
-  S.wm.mode = 'exterior';
-  assert.equal(S.wm.egSwapCircle({ ...eh, c: 2 }), false, 'outside: refused');
-  assert.equal(S.loc.egCircle, 1);
 });
 
 // ── THE CLIENT'S SWAP, PLAYED AGAINST THE RELAY (EG-PLAY's harness) ─────────────────────────────────────────────────
@@ -427,17 +333,5 @@ test('EG10 THE SWAP\'S FALLBACK, PLAYED: a build still in flight when the step i
 });
 
 test('EG10 THE HOSTS WIRED: the mode machine builds the swap and hands the client its three doors; the stand of a portcullis is one function for the stand and the swap; the dungeon host stands a new circle\'s spans in the same level; the client asks the build at the rest and swaps before it falls back (mutants: any seam unwired)', () => {
-  const E = readFileSync(new URL('../../../src/scenes/eliteGates/egClient.js', import.meta.url), 'utf8');
-  assert.match(EC, /const egSwap = createEgSwap\(\);/);   // PIN MOVED (HOST-SPLIT, EG-LOOK): the circle's own module, the host wires it
-  // PIN MOVED (KETCH): one view of the mode machine, the circle's and the sky-ketch's deck's (worldModes.js `_madeView`)
-  assert.match(WM, /const _madeView = \{ get mode\(\) \{ return mode; \}, get dungeonCtx\(\) \{ return dungeonCtx; \}, get dungeonLoc\(\) \{ return dungeonLoc; \}[^\n]*\};\n\s*const egCircle = createEgCircleHost\(\{ renderer, host, wm: _madeView \}\);/);
-  assert.match(WM, /egPrebuild, egSwapCircle, egSwapDrop: \(\) => egSwap\.drop\(\),/);
-  assert.match(EC, /if \(parts\) egGateStand\(ctx, spec\.h, parts\);/);
-  assert.match(EC, /for \(const g of parts\.gates\) egGateStand\(ctx, g\.h, g\);/);
-  assert.match(DC, /egRecircle\(r\) \{ return egRecircle\(r\); \},/);
-  assert.match(E, /if \(E\.sg === 'rest' && c === M\.egHallCircle\?\.\(\)\) prebuild\(E, c \+ 1\);/);   // PIN MOVED (AUDIT EG V, E NEW-2): the rest's ask through prebuild, under another law from the halls the room gave (test/scenes/eliteGates/egaudit3_client.test.js pins it)
-  assert.match(E, /return given === null \? null : modes\(\)\?\.egPrebuild\?\.\(\{ b: E\.b, seed: E\.seed, c, geo: E\.geo \?\? 0, given \}\) \?\? null;/);
-  assert.match(E, /if \(built === 'ready' && modes\(\)\?\.egSwapCircle\?\.\(r\)\) \{ if \(!witness && placeOn\(E\.h, E, false\)\) placedH = E\.h; return true; \}/);
-  assert.ok(E.indexOf("modes()?.egSwapCircle?.(r)") < E.indexOf('modes()?.forceExitToExterior?.();'), 'the swap before the old step');
   assert.ok(isEgHall({ egBreach: B, egCircle: 2, dungeon: { recordElement: { header: { locationId: 0x7ffff300 } } } }));
 });

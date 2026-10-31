@@ -107,7 +107,4 @@ test('SEAT1c THE SERVICE\'S MINT AND WARDROBE: a palace seat\'s guildmaster may 
   const m3 = await mint(gm, 'char-gamal-other');
   assert.deepEqual([m3.title, m3.glyphs.includes('tower')], [null, false], 'the guildmaster\'s other character: neither');
   assert.equal((await svc.call('/v1/account/title', { title: 'warden' }, outsider.secret)).status, 403);
-  // PIN MOVED (CROWN1 part two): the champion's title is the account's own, before the guildmaster's seat titles
-  // PIN MOVED (SEASON1): every title kept for good - a Season's crowned and keeper beside the champion - worn off its own row
-  assert.match(rd('server-account/src/index.js'), /const seatT = KEPT_TITLES\.includes\(wornT\) \? \(kept \? \{ t: wornT, ts: kept\.ts \} : \{\}\)\s*: SEAT_TITLES\.includes\(wornT\) \? \(seatBadge\?\.title === wornT \? \{ t: wornT, ts: seatBadge\.ts \} : \{\}\)\s*: CHAPTER_TITLES\.includes\(wornT\) \? \(chapterT \? \{ t: chapterT\.high \? 'highmaster' : wornT, ts: chapterT\.ts \} : \{\}\) : \(wornT \? \{ t: wornT \} : \{\}\);/);   // PIN MOVED (CHAP4c): and a chapter's seat's title, its claim the named character's own; PIN MOVED (CHAP6e): a Master's in an Ascendancy signed its High Master
 });

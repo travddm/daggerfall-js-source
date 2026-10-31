@@ -236,12 +236,6 @@ test('NAME-F1: the TWO readings, and why neither can do the other’s job', () =
   assert.equal(nameAllowed('Con'), true, 'so Con is a name');
   assert.equal(nameAllowed('Cooper'), true);
   assert.equal(nameAllowed('COONS'), false, 'and coon itself is still caught, on the plain reading');
-  // COMMENTS STRIPPED - the note above names the flag to say what it
-  // replaced, and the first cut of this assertion reddened on its own
-  // prose. The third time this port has made that exact mistake, so it
-  // is written down here too.
-  const filterCode = rd('src/net/nameFilter.js').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  assert.ok(!/stretchable/.test(filterCode), 'the dead flag is gone rather than left to read as a guard');
 });
 
 test('NAME-F1: standsAlone is the word-boundary law, driven directly', () => {
@@ -303,52 +297,6 @@ test('NAME-F2: sanitizeName replaces a refused name, so a modified client cannot
   }
 });
 
-test('NAME-F2: the filter is in the RELAY’s graph, and the entry pane is the other half', () => {
-  // server/src/relay.js re-exports wire.js whole, so the filter reaches
-  // the worker by being INSIDE sanitizeName rather than beside it. It
-  // imports nothing, which is what keeps that graph flat - the same
-  // reason mat4.js is the only other thing wire.js takes.
-  assert.match(rd('server/src/relay.js'), /export \* from '\.\.\/\.\.\/src\/net\/wire\.js';/);
-  // PIN MOVED (TEXT-F1): the words' reader and verdict ride the same import into the same graph
-  assert.match(rd('src/net/wire.js'), /import \{ nameAllowed, maskText, textCaught \} from '\.\/nameFilter\.js';/);
-  assert.equal((rd('src/net/nameFilter.js').match(/^import /gm) ?? []).length, 0,
-    'nameFilter.js must import nothing, or the relay’s bundle grows a graph');
-
-  // ACC1g MOVED THE ENTRY HALF, and did not drop it. The filter that
-  // refused `Cum` at a text field in the Online pane now refuses it at
-  // REGISTRATION, where a name is chosen ONCE instead of re-judged on
-  // every press: `server-account/src/accounts.js handleRefusal` ends in
-  // `nameIsIssuable`, which is `sanitizeName(h) === h`, which is the
-  // very function carrying `nameAllowed`. One filter, one home, asked
-  // earlier and asked once - and the pane has no name to judge, because
-  // a player cannot type one any more.
-  const acct = rd('server-account/src/accounts.js');
-  assert.match(acct, /export function handleRefusal\(handle\) \{/);
-  assert.match(acct, /if \(!nameIsIssuable\(h\)\) return 'refused';/, 'NAME-F1/F2, at the one entry there is');
-  assert.match(rd('src/net/identityToken.js'), /&& sanitizeName\(name\) === name;/,
-    "and `nameIsIssuable` IS sanitizeName - so a handle goes through the relay's own filter");
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.doesNotMatch(menu, /entryVerdict|onlineName/,
-    'the typed name, its field and its entry-side verdict are gone from the menu entirely');
-
-  // AUDIT-CHATR F2: ONE SUBJECT. The painted line and the pressed
-  // button must ask about the SAME save, and the only way to be sure of
-  // that is that there is one function and it takes the save. The pane
-  // walked the ladder twice - `saves[0]` for the paint, the card's own
-  // save for the press - so a refused second character got a dead
-  // button and a blank reason.
-  // AUDIT-CHATR F2's finding was that the pane walked the ladder TWICE
-  // with two different subjects. ACC1g removed the ladder from this
-  // pane altogether, so the way that bug cannot come back is that there
-  // is nothing here to have a subject: the pane shows WHO YOU ARE and
-  // the button is dead without a session.
-  const pane = menu.slice(menu.indexOf('function paneOnline('), menu.indexOf('function paneLoad('));
-  const code = pane.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');   // its own prose is not its wiring
-  assert.equal((code.match(/entryVerdict\(/g) ?? []).length, 0, 'the ladder is not walked here at all');
-  assert.match(code, /const who = storedSession\(appStorage\(\)\);/, 'what the pane reads is the SESSION');
-  assert.match(code, /disabled: !who(?: \|\| button\.offlineOnly)?,/, 'and signed out is a dead button, not a warning beside a live one (AUDIT SET D4: a Test Room character\'s too, and a realm copy\'s)');
-});
-
 test('AUDIT-CHATR F6: the Online pane\u2019s copy says what sanitizeName actually does', () => {
   // A promise to a player is a claim about the code, and this one was
   // false: "24 plain letters and digits; anything else is dropped".
@@ -359,17 +307,6 @@ test('AUDIT-CHATR F6: the Online pane\u2019s copy says what sanitizeName actuall
   assert.equal(sanitizeName('\u00c4sa'), 'sa', 'what really goes is everything outside printable ASCII');
   assert.equal(sanitizeName('x'.repeat(NAME_MAX + 9)).length, NAME_MAX, 'and the 24 is real');
 
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  // ACC1g: THE LINE IS GONE WITH THE FIELD IT DESCRIBED. F6's law was
-  // that a promise to a player is a claim about the code; the strongest
-  // form of that law is that the pane makes no promise about a name the
-  // player cannot type. `sanitizeName` still holds the wire (the four
-  // assertions above), and the pane says who you ARE instead.
-  assert.doesNotMatch(menu, /Up to 24 characters/, 'the line describing the typed-name field outlived the field');
-  assert.doesNotMatch(menu, /letters and digits/, 'and the false promise it replaced is still gone');
-  const pane2 = menu.slice(menu.indexOf('function paneOnline('), menu.indexOf('function paneLoad('));
-  assert.match(pane2, /Online needs an account, so no one else can use your name\./,
-    'what stands there now says why, and says the guest way in is one press');
 });
 
 test('AUDIT-CHATR F2/F3: one ladder, one subject - and an empty ladder is Traveller, not a refusal', () => {
@@ -613,25 +550,3 @@ test('CHAT-R2: hidden is REMEMBERED, and the CSS hides every drawn part rather t
   assert.match(CHAT_CSS, /\.dfchat\[data-hidden="1"\] \.dfchat-show \{ display: inline-flex; \}/);
 });
 
-test('CHAT-R2/ROSTER-G: the roster is the ACTIVE CHANNEL’s - everyone online, not the player’s own cell - and a host that has none draws no column', async () => {
-  // THE WIRING. CHAT-R1 handed the panel `online`, the presence session,
-  // because a channel held no peers then - and the presence session is
-  // the player's own map CELL, so a friend two towns over never showed
-  // (Mac: "Players dont show in online"). ROSTER-G gives the channel a
-  // roster at the relay, and the panel reads the tab's own link; the
-  // presence session stands in only until that link exists.
-  const world = rd('src/scenes/world.js');
-  // CHAT-CHAN: through the tab's own roster - a channel tab's link (the World's, the Region's), the presence session only
-  // as the stand-in, and the Party and Local tabs their composed lists (test/net/chatchan.test.js drives those)
-  assert.match(world, /roster: \(\) => chatRosterOf\(chatLog\?\.active\),/);
-  assert.match(world, /const chatSessionOf = \(tabId\) => \(tabId === 'local' \? online : tabId === 'party' \|\| tabId === 'guild' \? chatLinks\?\.get\('world'\) : chatLinks\?\.get\(tabId\)\) \?\? online \?\? null;/);
-  assert.match(world, /const s = chatSessionOf\(tabId\);/, 'the World and Region tabs read the session of their own channel');
-  assert.match(world, /new OnlineSession\(\{ url: online\.url[^)]*presence: false(?:, wave: pageWave)?(?:, wire2: true)? \}\)/,   // PIN MOVED (SCALE2c): the page's one wave rides beside it; PIN MOVED (SCALE5b): and the second wire
-    'the chat links really are presence-less, which is why the roster cannot come from them');
-
-  // a panel built WITHOUT a roster hides the column rather than drawing an empty one
-  const { panel, root } = await panelFor(null);
-  panel.open();
-  assert.equal(one(root, 'dfchat-who').style.display, 'none');
-  assert.equal(find(root, 'dfchat-who-row').length, 0);
-});

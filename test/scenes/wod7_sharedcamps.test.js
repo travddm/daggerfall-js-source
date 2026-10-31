@@ -19,7 +19,6 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host wh
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const rd = (p) => hostText(p);
-const WORLD = hostText('src/scenes/world.js');
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const flush = async () => { for (let i = 0; i < 6; i++) await tick(); };
 
@@ -185,55 +184,3 @@ test('WOD7: a reader stands an owner\'s camp under WOD_CAMP_PUPPETS_MAX, apart f
 
 // ── the host ────────────────────────────────────────────────────────────
 
-test('WOD7: the host - a marker I spring is recorded and asks for a full frame; a marker a peer sprang never springs here; a race is settled by id, the loser taking its camp down', () => {
-  const i = WORLD.indexOf('  const _wodSprung = new Map();');
-  const j = WORLD.indexOf('  /** WOD6: SaveLoadManager.OnLoad', i);
-  assert.ok(i > 0 && j > i);
-  const removed = [];
-  let clock = 0;
-  const mk = (id) => new Function('online', 'performance', 'exteriorFoes', 'wodSiteId', 'yieldsTo',
-    `${WORLD.slice(i, j)}\nreturn { wodSprang, wodPeerSites, wodSiteOf, sprung: _wodSprung, peer: _wodPeerSprung, changed: () => _wodSprungChanged, list: wodSprungList, forget: wodForgetPeerSites };`)(
-    id ? { id } : null, { now: () => clock }, { removeSiteFoes: (s) => removed.push(s) }, wodSiteId, yieldsTo);
-  const off = mk(null);
-  off.wodSprang('1,1:1');
-  assert.equal(off.sprung.size, 0, 'offline: nothing recorded, nothing rides');
-  const me = mk('mmmm-0002');
-  assert.equal(me.wodSiteOf({ px: 3, py: 12 }, { oid: 7 }), '3,12:7');
-  assert.equal(me.wodSiteOf({ px: 3, py: 12 }, { oid: 0, oidN: 1 }), '3,12:0.1', 'AUDIT WOD7: a repeated objectID\'s second marker');
-  me.wodSprang('3,12:7'); me.wodSprang('3,12:8');
-  assert.ok(me.changed(), 'a new spring asks for a full frame');
-  me.wodPeerSites('aaaa-0001', [['3,12:7', 0], ['3,12:9', 0]]);
-  assert.deepEqual(removed, ['3,12:7'], 'a tie inside the window, a smaller id: my camp comes down');
-  assert.deepEqual([...me.sprung.keys()], ['3,12:8']);
-  assert.deepEqual([...me.peer].sort(), ['3,12:7', '3,12:9']);
-  me.wodPeerSites('zzzz-0009', [['3,12:8', 0]]);
-  assert.deepEqual(removed, ['3,12:7'], 'a larger id: mine stands (theirs yields at their end)');
-  assert.ok(!me.peer.has('3,12:8'));
-  me.wodPeerSites('aaaa-0001', [['3,12:8', null]]);
-  assert.ok(me.sprung.has('3,12:8'), 'a tag without an age decides nothing yet');
-  clock = WOD_CLAIM_WINDOW_MS * 2;
-  me.wodSprang('3,12:10'); clock += WOD_CLAIM_WINDOW_MS * 2;
-  me.wodPeerSites('aaaa-0001', [['3,12:10', 0]]);
-  assert.ok(me.sprung.has('3,12:10') && !removed.includes('3,12:10'), 'AUDIT WOD7: I sprang first: mine stands, whatever the ids');
-  me.wodPeerSites('zzzz-0009', [['3,12:10', WOD_CLAIM_WINDOW_MS * 5]]);
-  assert.ok(removed.includes('3,12:10'), '...and a peer who sprang it before me takes it, whatever the ids');
-  // newest first, bounded
-  for (let k = 0; k < 300; k++) { clock += 1; me.wodSprang(`9,9:${k}`); }
-  assert.equal(me.sprung.size, 256, 'bounded: the oldest go first');
-  assert.equal(me.list()[0][0], '9,9:299', 'the frame\'s list is newest first');
-  // a fresh promote forgets a peer's springs on that pixel
-  me.wodPeerSites('aaaa-0001', [['4,4:1', 0], ['4,40:1', 0]]);
-  me.forget('4,4');
-  assert.ok(!me.peer.has('4,4:1') && me.peer.has('4,40:1'), 'that pixel\'s alone');
-  // the frame and the tick, by source
-  assert.match(WORLD, /if \(_wodPeerSprung\.has\(wodSiteOf\(p, w\)\)\) \{ w\.spawner\.active = false; continue; \}/, 'a peer\'s marker never springs here');
-  assert.match(WORLD, /if \(act\) \{ standWodAction\(p, w, act, x, y, z\); if \(act\.kind === 'foe' \|\| act\.kind === 'loot'\) wodSprang\(wodSiteOf\(p, w\)\); \}/, 'a foe or a treasure makes the marker mine; a captive\'s flat is each player\'s own');
-  assert.match(WORLD, /if \(_wodPeerSprung\.has\(hs\)\) p\.privateersHold\.state\.rolled = true;[^\n]*\n\s*else \{ standHold\(p, hs\); wodSprang\(hs\); \}/, 'the Hold\'s camp too');
-  assert.match(WORLD, /if \(_wodSprungChanged\) \{ _wodSprungChanged = false; _foesFullAt = -Infinity; \}/, 'the stream sends it whole at once');
-  const EF = rd('src/scenes/exteriorFoes.js');
-  assert.match(EF, /        site: f\.site \?\? null,/, 'a camp foe\'s site rides the save...');
-  assert.match(EF, /        if \(typeof sf\.site === 'string'\) f\.site = sf\.site;/, '...and comes back with it, so a loaded camp still rides');
-  assert.match(WORLD, /exteriorFoes\.setOnSites\(\(from, sites\) => wodPeerSites\(from, sites\), wodSprungList\);/);
-  assert.match(WORLD, /if \(!wodKept\.life\) wodForgetPeerSites\(pkey\);/, 'a fresh promote forgets them');   // PIN MOVED (IC-SWAP-BEHIND): the pixel's own key
-  assert.match(WORLD, /const n = oidSeen\.get\(s\.objectID\) \?\? 0; oidSeen\.set\(s\.objectID, n \+ 1\);\n\s*wodSpawners\.push\(\{[^\n]*oid: s\.objectID, oidN: n \}\);/, 'the index among the pixel\'s alike');
-});

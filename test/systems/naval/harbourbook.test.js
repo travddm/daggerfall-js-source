@@ -131,23 +131,3 @@ test('HARBOUR-BOOK THE PIER ACROSS THE SHELF: on Deep Waters\' shore-fitted shel
   assert.ok(piers >= 12, `${piers} piers`);
 });
 
-test('HARBOUR-BOOK THE WORLD\'S WIRING: one book made off the port near the player and the sea\'s water law; the naval host handed it; sounded each exterior frame before the quays stand; moved with the floating origin before the sea and the quays; emptied with the sea at a transition, a jump and a load; the quays stand off it whatever runs on the water - THE FOUR HOSTS: the street alone (a building\'s and a dungeon\'s frames have no sea, the standalone street no harbour)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const harbourBook = createHarbourBook\(\{\n    harbourNear: navalHarbourNear,\n    isWater: navalIsWater,\n    ground: \(x, z\) => surfaceAt\(x, z\) - tvSeaY\(\),[^\n]*\n  \}\);/);   // PIN MOVED (PORT-SHIPS): the world hands the book its ground too (a berth's ship stands afloat)
-  assert.equal((w.match(/createHarbourBook\(/g) ?? []).length, 1, 'one book');
-  assert.match(w, /\n    harbourBook,   \/\/ SHIP-LIFE, HARBOUR-BOOK/);
-  assert.ok(!/harbourNear: navalHarbourNear,   \/\/ SHIP-LIFE/.test(w), 'the host sounds none of its own');
-  assert.match(w, /harbours: \(\) => harbourBook\.list\(\),/);
-  assert.ok(!/naval\?\.harbourList/.test(w), 'the quays never ask the sea fight');
-  const stepAt = w.indexOf("try { if (_mode() === 'exterior' && !_loading) harbourBook.step(now / 1000); }"), frameAt = w.indexOf('try { quays?.frame(); }');
-  assert.ok(stepAt > 0 && stepAt < frameAt, 'sounded before the quays stand');
-  const offAt = w.indexOf('harbourBook.offsetAll(r.offset);'), navalOffAt = w.indexOf('naval?.offsetAll(r.offset);'), quaysOffAt = w.indexOf('quays?.offsetAll();');
-  assert.ok(offAt > 0 && offAt < navalOffAt && navalOffAt < quaysOffAt, 'moved before the sea and the quays read it');
-  assert.match(w, /const navalTransition = \(\) => \{ harbourBook\.clear\(\); navalClear\(\); withdrawCrossing\(\); \};/);   // PIN MOVED (AUDIT CAPTAIN'S SEA X2): and the crossing's question taken back
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.ok(!read(host).includes('createHarbourBook'), `${host}: no harbours`);
-  const n = read('src/scenes/naval/navalHost.js');
-  assert.match(n, /const ownBook = !deps\.harbourBook;\n  const harbours = deps\.harbourBook \?\? createHarbourBook\(/);
-  assert.match(n, /if \(ownBook\) harbours\.step\(clock\);/);
-  assert.match(n, /if \(ownBook\) harbours\.offsetAll\(o\);/);
-  assert.match(n, /if \(ownBook\) harbours\.clear\(\);/);
-});

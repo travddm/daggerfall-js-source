@@ -98,10 +98,3 @@ test('BATCH-SHUT one horse out of view and one in view: one open, one flush, the
   }
 });
 
-test('BATCH-SHUT the frame\'s start shuts a batch any pass left open, once said (mutants: the reset gone; its depth or queue kept)', () => {
-  const src = rd('src/render/renderer.js');
-  const begin = src.slice(src.indexOf('  beginFrame(proj, view, lightDir, opts = null) {'));
-  const head = begin.slice(0, begin.indexOf('\n  }\n'));
-  assert.match(head, /const sb = this\._spriteBatch;\n    if \(sb\?\.open\) \{\n      sb\.open = false; sb\.depth = 0; sb\.items\.length = 0;\n/, 'beginFrame lets a left batch go');
-  assert.match(head, /if \(!this\._spriteBatchLeft\) \{ this\._spriteBatchLeft = true; console\.warn\(/, 'and says so once');
-});

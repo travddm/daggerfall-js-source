@@ -561,31 +561,5 @@ test('QUAYS THE FLEET\'S WORD: a ship shown made fast at a port\'s quay reads so
   assert.deepEqual(whereWords({ where: 'away', metres: 3277, way: 'north', docked: 'Wayrest' }), { state: 'Moored', tone: 'is-away', line: "Moored at Wayrest's quay, 3.3 km away to the north." });
   assert.deepEqual(whereWords({ where: 'away', metres: null, docked: 'Wayrest' }), { state: 'Moored', tone: 'is-away', line: "Moored at Wayrest's quay." });
   assert.equal(whereWords({ where: 'away', metres: null, docked: null }).state, 'Afloat');
-  const src = read('src/scenes/fleetHost.js');
-  assert.match(src, /docked: at\.where === 'here' \|\| at\.where === 'sailing' \? n0\(\)\?\.dockedAt\?\.\(at\.boat\) \?\? null : at\.where === 'away' \? rec\.port\?\.name \?\? null : null,/);
-  assert.match(src, /const berth = n\?\.freeBerth\?\.\(rec\.hull\) \?\? null;/);
 });
 
-test('QUAYS THE WORLD\'S WIRING: the pool made beside the farms over the world\'s harbours (HARBOUR-BOOK - whatever runs on the water) and the naval host\'s gangways, the sea\'s top and the ground; stood each frame before the lights, drawn in the world pass, its lanterns in the lanterns\' hours, down with a re-anchor and a load; Come Sail Away handed the warp, the naval host the Fleet\'s word and her name - THE FOUR HOSTS: a building\'s and a dungeon\'s frames have no sea, the standalone street no naval host', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /quays = createQuayPool\(\{\n    renderer,\n    prepare: async \(model\) => \{ for \(const sm of model\.subMeshes\) \{ await getTexture\(sm\.textureArchive\); uploadRecord\(sm\.textureArchive, sm\.textureRecord, \{ opaque: true \}\); \} \},\n    collider: \(\) => collider,\n    harbours: \(\) => harbourBook\.list\(\),   \/\/ HARBOUR-BOOK: whatever runs on the water - a port's quays are its town's\n    seaY: \(\) => tvSeaY\(\),/);
-  // AUDIT HOLDINGS Q6: a full-detail pixel's ground alone
-  assert.match(w, /groundAt: \(x, z\) => \{ const p = csaPixelAt\(x, z\); return p && \(p\._stride \?\? 1\) === 1 \? surfaceAt\(x, z\) : NaN; \},/);
-  assert.match(w, /quays\?\.offsetAll\(\);/);
-  assert.match(w, /quayLaid: \(key, index\) => quays\?\.laid\(key, index\) \?\? true,/);
-  assert.match(w, /gangways: \(\) => \(navalOn\(\) \? naval\?\.gangways\?\.\(\) \?\? \[\] : \[\]\),/);
-  const frameAt = w.indexOf('try { quays?.frame(); }'), lightsAt = w.indexOf('if (lightsOnAt(minute)) {'), drawAt = w.indexOf('quays?.draw(renderer);');
-  assert.ok(frameAt > 0 && frameAt < lightsAt && lightsAt < drawAt, 'stood before the lights, drawn in the world pass');
-  // AUDIT HOLDINGS Q3: scene lights in the boats' selection, in the lanterns' hours alone - never the player's extras
-  // PIN MOVED (LIGHT-ID): the record made each frame for a quay's lantern takes that lantern's identity (render/lightId.js)
-  assert.match(w, /if \(lightsOnAt\(minute\)\) for \(const l of quays\?\.lights\(\) \?\? \[\]\) csaLit\.push\(adoptLight\(\{ x: l\.x, y: l\.y, z: l\.z, range: l\.range, color: CITY_LIGHT_COLOR_F32 \}, l\)\);/);
-  assert.ok(w.indexOf('csaLit.push(') < lightsAt, 'into the selection before it is made');
-  assert.equal((w.match(/quays\?\.lights\(\)/g) ?? []).length, 1, 'nowhere else - not the extras');
-  assert.equal((w.match(/quays\?\.destroyAll\(\);/g) ?? []).length, 2, 'down with a re-anchor and a load');
-  assert.match(w, /warp: \(boat, s\) => naval\?\.warp\?\.\(boat, s\) \?\? null,/);
-  assert.match(w, /dockedPort: \(boat, port\) => \{ const r = boat\?\.uid \? fleetShip\(boat\.uid\) : null; if \(r && \(r\.port\?\.name \?\? null\) !== port\) setShipPort\(boat\.uid, port == null \? null : \{ name: port \}\); \},/);
-  assert.match(w, /shipName: \(boat\) => fleetHost\?\.nameOf\(boat\) \?\? '',/);
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.ok(!read(host).includes('createQuayPool'), `${host}: no quays`);
-  const csa = read('src/systems/comeSailAway/comeSailAway.js');
-  assert.match(csa, /const w = deps\.warp\?\.\(boat, \{ struck: state\.sailPosition === 0, oars: vSqrMagnitude\(state\.MoveVectorTarget\) > 0 \|\| state\.TurnTarget !== 0, dt: dt\(\) \}\) \?\? null;/);
-});

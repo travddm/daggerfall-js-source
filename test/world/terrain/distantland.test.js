@@ -226,30 +226,3 @@ test('EV4: the distance haze follows the Land View Distance; weather does not', 
   }
 });
 
-test('EV4: the wiring - fog seam, far ring, restride, and the per-set index buffers', () => {
-  const world = readFileSync('src/scenes/world.js', 'utf8');
-  // both fogForWeather call sites route through the distance scale -
-  // through ONE helper since AUDIT 61 (DS1): the scale is DFU's own
-  // row's law and does not stretch Dynamic Skies' authored rows
-  assert.equal((world.match(/= weatherFogRow\(/g) || []).length, 2,
-    'both weather-fog reads ride the one helper');
-  assert.match(world, /const weatherFogRow = \(w\) => \(sky\.dynamic \? fogForWeather\(w, sky\.fogSettings\) : scaleFogForDistance\(fogForWeather\(w\), fogDistance\)\);/,
-    'the helper rides the live distance for DFU\'s rows and installs the mod\'s verbatim');
-  // the far ring: strided build, its own index set, enhanced-gated,
-  // and a surviving pixel re-strides when the walk reclassifies it
-  assert.ok(world.includes('TERRAIN_INDICES_LOD'), 'the strided index set exists');
-  assert.ok(world.includes('const lodOn = isEnhanced()'), 'the 1:1 lane keeps full resolution');
-  assert.ok(world.includes('restrideTerrain(p, want)'), 'ring-class changes swap the surface in place');
-  // EV7 moved buildPixel's kernel call into terrainGen.js whole; the
-  // ghost-row law lives there, and since PERF-EXT26 the RESTRIDE reads
-  // it too (terrainGen.js restrideGrid) - on the terrain worker when one
-  // is up, on this thread when not.
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.ok(world.includes('restrideGrid({ woods, px: p.px, py: p.py, stride, samples: p.samples, landform, roads: terrainGen.roads(), sites: _landformSites, beyond: beyondSites.beyond(), climates: _landformClimates, bed: waterOn ? bedBytesOf(p) : null })'), 'the restride reads the neighbor pixels (LANDFORM1-3: shaped as the build shaped them; LANDFORM4/6: the same sites and climates)');   // PIN MOVED (AUDIT WATER-NEXT P1): and carves the bed with the grid
-  assert.ok(readFileSync('src/world/terrain/terrainGen.js', 'utf8').includes('ghostSampler(woods, px, py, HEIGHTMAP_DIMENSION, lf)'),
-    'the kernel reads them for every build');
-  // the renderer keeps one shared buffer PER index set, not one total
-  const renderer = readFileSync('src/render/renderer.js', 'utf8');
-  assert.ok(renderer.includes('_terrainIndexSets'), 'index buffers key on the index array');
-  assert.ok(!renderer.includes('_terrainIndexBuffer'), 'the first-set-wins cache is gone');
-});

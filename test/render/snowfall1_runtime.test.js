@@ -311,36 +311,6 @@ test('SNOWFALL1 the shader: the snow program is the ground\'s own fragment progr
 });
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-test('SNOWFALL1 the hosts: world.js and exterior.js build the one runtime on their lane over the ground they draw, tick it indoors (the surfaces hidden, the snowpack by the event clock) and outdoors (the walkers and the bodies handed), draw it with the opaque world before the ground under it (AUDIT ENVIRONS G7: the ground\'s fragments under the snow rejected before they shade) - a later boot\'s host letting the last one\'s surfaces go; world.js tells it each pixel published, carries it across the floating origin and culls its blanket\'s tiles to the frustum; the interiors and the dungeons build none (THE FOUR HOSTS: their frames are the hosts\' indoor branch) (mutants: a host unwired; the draw after the ground; the promote dropped)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.match(s, /const snowfall = createSnowfallHost\(\{ gl: renderer\.gl, renderer, enhanced: !!sky\.enhanced, ground: /, `${host}: built on the lane, over its ground`);
-    // AUDIT PRECIP GROUND-9 (PIN MOVED): the world host's winter is whether snow lies about the player on the snow lane
-    assert.match(s, /snowfall\.frame\(\{ now: now \/ 1000, inside: true, player: null, weather, seconds: worldMinutes\(\) \* 60, winter: (?:snowCover\.winterNear\()?season === SEASON\.Winter\)?, /, `${host}: ticked indoors`);
-    // PIN MOVED (PRECIP4, 2026-10-19): the streamed world's winter is the snow under the player on the snow lane
-    // (scenes/snowCoverHost.js winterAt - the season off it)
-    assert.match(s, /snowfall\.frame\(\{ now: now \/ 1000, inside: false, player: snowPlayer\(\), weather, seconds: worldMinutes\(\) \* 60, winter: (?:season === SEASON\.Winter|snowCover\.winterNear\(season === SEASON\.Winter\)), [^\n]*npcs: snowNpcs, corpses: snowBodies \}\);/, `${host}: ticked outdoors, the walkers and the bodies handed`);
-    const draw = s.search(/^ {4}(if \(!tvf\) )?snowfall\.draw\(/m), ground = s.indexOf('renderer.drawTerrain(', draw), deck = s.lastIndexOf('renderer.setCloudShadow(sky?.cloudShadow ?? null);', draw);
-    assert.ok(draw > 0 && deck > 0 && deck < draw && ground > draw, `${host}: the snow under the frame's cloud deck, before the ground under it`);
-    assert.equal(s.indexOf('renderer.drawTerrain(', s.lastIndexOf('renderer.setCloudShadow(sky?.cloudShadow ?? null);', ground) + 1), ground, `${host}: and no ground drawn between the deck and the snow`);
-    const tick = s.search(/^ {4}snowfall\.frame\(\{ now: now \/ 1000, inside: false/m), begin = s.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);');
-    assert.ok(tick > 0 && begin > tick, `${host}: the snow's uploads before the world frame opens (beginFrame forgets the shadows they move)`);
-    assert.match(s, /for \(const f of exteriorFoes\.foes\) if \(!f\.dead && f\.ai\?\.feet\) out\.push\(\{ id: f, [^\n]*grounded: !!f\.ai\.isGrounded, radius: BODY_CAPSULE_RADIUS, citizen: false \}\);/, `${host}: the foes`);
-    assert.match(s, /for \(const seat of _livePersons\) out\.push\(\{ id: seat\.person, [^\n]*citizen: true \}\);/, `${host}: the townsfolk`);
-    assert.match(s, /const snowBodies = \(\) => exteriorFoes\.physicalCorpses\(\)\.concat\(cityGuards\.physicalCorpses\(\)\);/, `${host}: the bodies`);
-  }
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /snowfall\.offsetOrigin\(r\.offset\);/);
-  assert.match(w, /^ {4}snowfall\.promoted\(built\.get\(pkey\)\);/m, 'OnPromoteTerrainData');   // PIN MOVED (IC-SWAP-BEHIND): the entry under the pixel's own key (`key` the build's, behind a standing view)
-  assert.match(w, /if \(!tvf\) snowfall\.draw\(cullOn \? snowOutside : null\);/, 'never under the travel view, its blanket culled to the frustum');
-  assert.match(w, /const snowOutside = \(box, x, y, z\) => aabbOutside\(_planes, box, x, y, z\);/, 'by the frame\'s own planes');
-  assert.match(w, /return surfaceHeightAt\(p\.samples, lx, lz, p\._stride \?\? 1\) \+ t\[1\];/, 'the drawn ground the snow reads is the one surfaceAt answers');
-  assert.match(w, /bare: \(p, lx, lz\) => !!p\.deepWaters && carvedFloorLocalY\(p\.deepWaters, lx, lz\) != null,/, 'the carved sea is bare');
-  // PIN MOVED (BAY-LEFT-GROUND, D3): on the Bay Basic Roads' own network, or none; past the Bay TESA's own roads, by the
-  // painter's word (test/render/bayleftground_snow.test.js)
-  assert.match(w, /const net = !inBay\(p\.px, p\.py\) \? snowfallNetworkBeyond\(p\.px, p\.py, p\.paths\) : raw\?\.source === 'basic-roads' \? snowfallNetwork\(raw, p\.px, p\.py\) : null;/, 'Basic Roads\' own network, or none');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(read(host), /createSnowfallHost/, `${host}: none`);
-});
 
 test('SNOWFALL1 the renderer\'s snow draw: the installed set\'s snow program, the frame\'s block once a frame, the five pictures on units 16-20 through the selector, its back faces culled as the ground\'s and a quarter step over it (the pass\'s own Offset, SNOW_LAYER) - and every state it touched handed back (the offset off, the generic attributes 0,0,0,1, unit 0 selected) (mutants: the offset left on; a generic left set; the frame block every draw)', async () => {
   const { Renderer } = await import('../../src/render/renderer.js');

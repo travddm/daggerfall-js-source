@@ -47,9 +47,6 @@ test('L10N3d crossings: the afloat latch says cannotFloat in the player\'s langu
   const w = new PlayerWeapon();
   assert.deepEqual([w.toggleHand({ apply: false, bowSwitching: false }), w.toggleHand({ apply: false, bowSwitching: false })].sort(),
     [USING_RIGHT_HAND_TEXT, USING_LEFT_HAND_TEXT].sort(), 'the hand\'s name, in any language (the rig reads it, and says the row)');
-  const rig = readFileSync(new URL('../../src/combat/weapon/weaponRig.js', import.meta.url), 'utf8');
-  assert.match(rig, /say\(line === USING_RIGHT_HAND_TEXT \? localizedText\('usingRightHand', 'Using weapon in right hand\.'\) : localizedText\('usingLeftHand', 'Using weapon in left hand\.'\)\);/);
-  assert.equal(/\bsay\(line\);/.test(rig), false, 'never the bare English');
 });
 
 test('L10N3d crossings: the pinched purse - youPinchedGoldPiece for one coin, youPinchedGoldPieces with %d filled AFTER the lookup', () => {
@@ -78,14 +75,9 @@ test('L10N3d crossings: the dungeon-texture tile shows DFU\'s words in the playe
   assert.deepEqual(st.labels, en.labels, 'the law under the words never moves');
   assert.deepEqual(barReading(st), barReading(en), 'a choice with no Off in either language');
   assert.equal(classicSegment(row, st), 0, 'All off still presses Classic');
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(src, /el\('button', `ft-segb\$\{i === r\.off \? ' off' : ''\}`, st\.shown\?\.\[i\] \?\? L\)/, 'the bar draws the shown word, else the law\'s');
 });
 
 test('L10N3d crossings: the menu clock reads the time off the date - never by splitting a formatted line at " on ", which a translation\'s pattern need not contain', () => {
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.equal(/split\(' on '\)/.test(src), false);
-  assert.match(src, /el\('span', 'px-clocktime', formatText\('\{0:00\}:\{1:00\}:\{2:00\}', d\.hour, d\.minute, d\.second\)\)/);
   assert.equal(tm.formatText('{0:00}:{1:00}:{2:00}', 7, 5, 0), '07:05:00');
 });
 

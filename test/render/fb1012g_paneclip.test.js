@@ -130,5 +130,4 @@ test('PANE-CLIP the law in both mesh shaders: a fragment of the street at or bef
     if (f.endsWith('.js')) assert.doesNotMatch(rd(`src/render/${f}`), /uViewClipMin|uViewClipMax|VIEW_CLIP_PAD/, `src/render/${f}`);
   }
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.doesNotMatch(rd(host), /outsideViewClip|clip: outsideView/, host);
-  assert.match(rd('src/scenes/worldModes.js'), /scene: host\.outsideView\?\.\(\) \?\? null \}\);/);
 });

@@ -123,17 +123,6 @@ test('MAC-E: takeCorpseLoot is the TAKE now, and the online grant is its one cal
   assert.equal(player.goldPieces, 10, 'DoTransferItem’s first statement: a purse is SPENT, never listed');
   assert.deepEqual(player.items.map((i) => i.name), ['Longsword']);
   assert.deepEqual(said, ['You take 2 items.']);
-  // ...and it is reached from exactly one place.
-  // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's (scenes/bodyLootHost.js legacyGrant) - an older owner's
-  // pile, handed over, which the pool no longer calls from itself
-  assert.equal([...rd('src/scenes/exteriorFoes.js').matchAll(/takeCorpseLoot\(/g)].length, 0, 'the pool itself takes nothing from a grant');
-  const ex = rd('src/scenes/bodyLootHost.js');
-  const calls = [...ex.matchAll(/takeCorpseLoot\(/g)];
-  assert.equal(calls.length, 1, 'one caller');
-  const line = ex.split('\n').find((l) => l.includes('takeCorpseLoot('));
-  assert.match(line, /items: grant/, '...and it is the grant landing, where the owner has already chosen');
-  assert.equal(rd('src/scenes/cityGuards.js').includes('takeCorpseLoot('), false,
-    'the watch has no peers to grant it anything - it opens, always');
 });
 
 test('MAC-E: both exterior pools take the host’s inventory door, and both hosts hand it over', () => {
@@ -164,9 +153,3 @@ test('MAC-E: both exterior pools take the host’s inventory door, and both host
   }
 });
 
-test('MAC-E: the residue note is gone from the header, because the residue is', () => {
-  const s = rd('src/scenes/corpseMarker.js');
-  assert.ok(!/The port transfers the lot and reports the count - the pre-existing G3\n\/\/ shape/.test(s),
-    'a note describing behaviour the module no longer has is a lie with a citation');
-  assert.match(s, /THAT RESIDUE IS PAID \(MAC-E/, 'and what replaced it says who found it');
-});

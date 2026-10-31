@@ -73,12 +73,6 @@ test('STAR8 THE LINE: the Festival\'s, tier 3 - from level 6, online, a register
   assert.deepEqual([QL_TITLES.at(-2) /* PIN MOVED (KETCH): the Sky-Ketch's Skyfarer after it */, TITLES.at(-22) /* PIN MOVED (SHOP): Genesis joined the list last */ /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */ /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): the festival's two after it; (KETCH) and the Skyfarer */, qlTitleBit('starwarden'), TITLE_TEXT.starwarden], ['starwarden', 'starwarden', 32, 'Starwarden']);
 });
 
-test('STAR8 THE WITNESSES on the service: a star held - a row of stars_held inside the line\'s window - and the third such row for the three (mutants: the table, the offset)', () => {
-  const sql = read('server-account/src/questlines.js');
-  assert.match(sql, /star: `\(SELECT MIN\(s\.at\) FROM stars_held s WHERE s\.account = \?1 AND \$\{WINDOW\('s'\)\}\)`,/);
-  assert.match(sql, /stars3: `\(SELECT s\.at FROM stars_held s WHERE s\.account = \?1 AND \$\{WINDOW\('s'\)\} ORDER BY s\.at, s\.star LIMIT 1 OFFSET 2\)`,/);
-});
-
 test('STAR8 THE SEASON: the line begins only on the Festival\'s days - the festival\'s own calendar, read off the runner\'s clock; out of season the window draws it not at all, in season locked with what it waits on, and it begins (mutants: the opener unread; the calendar unread)', () => {
   const probe = (ms, o = {}) => ({ level: () => 10, online: () => true, registered: () => true, lineDone: () => false, need: (n) => !!NEED_CHECKS[n]?.(ms), ...o });
   assert.equal(lineOpens(LINE, probe(OUT)), false, 'the Festival over');

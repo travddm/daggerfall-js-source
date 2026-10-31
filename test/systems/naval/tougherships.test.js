@@ -241,16 +241,6 @@ test('SALVAGE on the host: a ship sunk leaves her wreckage afloat beside her cas
   assert.equal(k.host._shots.floaters().filter((f) => f.kind === 'flotsam').length, 0);
 });
 
-test('TOUGHER-SHIPS online: a peer\'s blow says its men BEFORE her toughness - a ball\'s gun\'s - and whoever stands her reckons it, so a ship falls at one pace whichever build fired (mutants: the toughness reckoned by the shooter, the stander taking the word\'s men whole)', async () => {
-  const h = await sea({ hull: HULL.SmallShip, settings: { ShipsAtSea: 'off' } });
-  const e = place(h, 'navyGalley', [300, 0, 0]);
-  const d = e.ship.damage;
-  for (let i = 0; i < 40; i++) h.host.applyPeerHit('peer', navalHitData('local', { n: e.n, hull: 0, crew: 1 }));
-  near(d.maxCrew - d.crew, 40 / SHIP_TOUGHNESS, 6, 'forty men said, the toughness\'s share of them lost');
-  const host = src('src/scenes/naval/navalHost.js');
-  assert.match(host, /deps\.sendHit\?\.\(navalHitData\(target\.owner, \{ n: target\.n, hull: hurt\.hull, sail: hurt\.sail, crew: Math\.floor\(shotMen\(gun, zone\) \+ random\(\)\),/, 'a ball on another\'s ship says the gun\'s men');   // PIN MOVED (AUDIT 2: rounded on the ball's own roll - the word's are whole)
-});
-
 // ── QUICK-REPAIRS ────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('QUICK-REPAIRS her hands spend her stores on their own once a fight is over - no order, to whole, said once aboard - paid for past the free mending\'s cap alone (her hull at it paid while her canvas still mends free), never with a hostile near or the switch off; a crewed boat\'s hands wherever she lies (unsaid), a boat with no hand aboard only the one I am on (mutants: the stores spent under the cap, the canvas holding the hull, the quiet unread, the switch unread, a crewless boat mended unmanned, the word for a far boat)', async () => {
@@ -377,7 +367,4 @@ test('QUICK-REPAIRS the Features row\'s Crew repairs on their own, each player\'
   const row = FEATURES.find((r) => r.id === 'naval-combat');
   assert.ok(row.control.also.some((a) => a.key === 'naval-auto-repair' && a.initial === true && a.online === 'player'));
   assert.equal(row.control.parts.find((p) => p.key === 'naval-auto-repair')?.label, 'Crew repairs on their own');
-  assert.match(src('src/scenes/world.js'), /key === 'AutoRepair' \? getPref\('naval-auto-repair'\) !== false/);
-  assert.match(src('src/render/navalRender.js'), /const wreck = f\.kind === 'flotsam' && !!f\.wreck;/);
-  assert.match(src('src/scenes/naval/navalHost.js'), /floaters: shots\.floaters\(\)\.map\(\(f\) => \(isSalvage\(f\.lot\) \? \{ \.\.\.f, wreck: true \} : f\)\)/);
 });

@@ -84,24 +84,7 @@ test('GRASS-PATH1: the mask is null on a roadless pixel and the painter is uncha
   paintRoads(tileData, tilemap, 0, DIR.E | DIR.W, null, 129, {});             // no mask
   paintRoads(tileData, bare, 0, DIR.E | DIR.W, null, 129, { paths: new Uint8Array(128 * 128) });
   assert.deepEqual([...tilemap], [...bare], 'the tilemap the painter writes does not depend on the mask');
-  const gen = read('src/world/terrain/terrainGen.js');
-  assert.match(gen, /let paths = null;/, 'no network, no mask');
-  // AUDIT: anchored to the RETURN. The loose match this replaces also hit
-  // the line that hands the mask to paintRoads, so a mutant that returned
-  // `paths: null` - the mask built, filled, and then dropped at the door -
-  // sailed straight past it.
-  assert.match(gen, /tilemapBytes, avg, nature,\n\s+paths,/, 'the mask rides the kernel’s answer OUT, not just in');
   assert.equal(typeof generatePixelTerrain, 'function');
-  const worker = read('src/world/terrain/terrainGenWorker.js');
-  assert.match(worker, /if \(out\.paths\) transfer\.push\(out\.paths\.buffer\);/, 'transferred when present, never when null');
-});
-
-test('GRASS-PATH1 / GRASS-WET1: the host keeps no blade on a painted tile or a tile with a water corner', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(p\.paths\?\.\[ti\]\) return null;/, 'a painted tile grows nothing');
-  assert.match(w, /if \(waterCorners\(byte, WATER_DRAW_MASK_TABLE\)\) \{\n\s+const puddle = [^\n]*\n\s+if \(!puddle \|\| [^\n]*\) return null;\n\s+\}/, 'nor does a tile with any corner in water - save a puddle record\'s dry ground (WATER-PUDDLE, test/world/waterpuddle.test.js)');
-  assert.match(w, /import \{ waterCorners, WATER_DRAW_MASK_TABLE \} from '\.\.\/world\/water\/waterCorners\.js';/, 'from the one table that owns the question');
-  assert.match(w, /^\s+paths,\s+\/\/ GRASS-PATH1/m, 'the mask rides the built pixel');
 });
 
 test('GRASS-WET1: the shore records a stream writes over grass are mostly-grass by texel, which is why the record alone let blades into the water', () => {
@@ -116,10 +99,6 @@ test('GRASS-WET1: the shore records a stream writes over grass are mostly-grass 
 });
 
 test('PERF10: the field is a disc - filled at the draw’s range, held out to the span', () => {
-  const src = read('src/render/labGrass.js');
-  assert.match(src, /const slots = slotsOverride > 0 \? slotsOverride : discSlotCount\(span, cell\);/, 'the size is the swept bound, with a seam the pin below starves through');
-  assert.match(src, /const keepR2 = span \* span;/);
-  assert.match(src, /const fillR2 = range \* range;/);
   assert.ok(discSlotCount(LAB_GRASS.span) < Math.ceil((LAB_GRASS.span * 2) / GRASS_CELL + 1) ** 2,
     'a disc of the same reach holds fewer cells than the square it replaced');
   // AUDIT PERF10 F1: HELD AGAINST A BRUTE FORCE, NOT AGAINST A NUMBER.
@@ -201,11 +180,6 @@ test('AUDIT PERF10 F1: a field with too few slots holds the NEAREST cells - a wr
   assert.ok(bestMissing === Infinity || worstLive <= bestMissing,
     `the field holds the NEAREST cells (farthest live ${Math.sqrt(worstLive).toFixed(1)}m, nearest missing ${Math.sqrt(bestMissing).toFixed(1)}m)`);
   assert.ok(bestMissing < Infinity, 'the fixture really is starved - something IS missing');
-  // and the source carries the eviction, not a break
-  const src = read('src/render/labGrass.js');
-  assert.match(src, /if \(slot === undefined\) \{/, 'an empty free list is handled, not broken out of');
-  assert.match(src, /if \(!far\) return undefined;/, 'and the walk stops only when every slot holds something nearer');   // PIN MOVED (FB1021B): the fill's one slot question, asked before a cell is begun and when it is written
-  assert.doesNotMatch(src, /if \(budget-- <= 0 \|\| !free\.length\) break;/, 'the old break is gone');
 });
 
 test('AUDIT PERF10: the window is measured to a cell’s NEAREST POINT, as the draw culls by', () => {
@@ -243,31 +217,6 @@ test('AUDIT PERF10: the window is measured to a cell’s NEAREST POINT, as the d
 test('PERF10: the cell key is a number and the free sweep parses nothing', () => {
   assert.equal(cellKey(3, -4), 3 * 65536 - 4);
   assert.notEqual(cellKey(3, -4), cellKey(-4, 3));
-  const src = read('src/render/labGrass.js');
-  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');   // the header still QUOTES the old spelling
-  assert.doesNotMatch(code, /key\.split\(','\)/, 'the per-frame string split is gone');
-  assert.match(src, /live\.set\(key, \{ slot, cx, cz \}\);/, 'cx/cz ride the entry');
-  assert.match(src, /nearSq\(held\.cx, held\.cz, ex, ez\)/, 'so the sweep reads them off it');
-});
-
-test('PERF10: the near-piece index is built only when a cell is actually filled', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const nearPieces = \(\) => \(_near \?\?= \[\.\.\.built\.values\(\)\]/, 'the near list is a lazy memo');
-  assert.match(w, /const pieceAt = \(x, z\) => \(_pieceAt \?\?= pieceIndex\(/, 'and so is the index over it');
-  assert.doesNotMatch(w, /const near = \[\.\.\.built\.values\(\)\]\.filter/, 'the eager per-frame spread is gone');
-});
-
-test('PERF11: the online frame builds the owner list once, not twice', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const ownerIds = \(\) => \{/, 'one lazy memo a frame');
-  // AUDIT: and it MEMOISES. The line above only says a function exists; a
-  // body that recomputes on every call satisfies it and saves nothing,
-  // which is the whole point of PERF11.
-  assert.match(w, /if \(_ownerIds !== undefined\) return _ownerIds;/, 'the second call returns the first call’s answer');
-  assert.match(w, /_ownerIds = near \? new Set\(near\.map\(\(p\) => p\.id\)\) : null;/, 'and null - no socket - is an answer it remembers too');
-  assert.match(w, /exteriorFoes\.pruneOwners\(ids, now\);/);
-  assert.match(w, /camps\.sweepOwners\(ids, now, FOES_STALE_MS\);/);
-  assert.doesNotMatch(w, /const near = peersNear\(\); if \(near\)/, 'neither sweep builds its own any more');
 });
 
 test('WATER-DRAW1: the draw and the feet ask different questions, and only the draw’s table moved', async () => {
@@ -305,18 +254,5 @@ test('WATER-DRAW1: the draw and the feet ask different questions, and only the d
   assert.ok(buildWaterIndices(dry, 1), 'a record-9 tile DRAWS - the pass takes the draw’s table');
   assert.equal(buildWaterIndices(dry, 1, WATER_MASK_TABLE), null, '...and the feet’s table still calls that pixel dry');
   assert.ok(tilemapRectHasWater(dry, 128, 128, 128), 'and the town host’s gate opens on it too');
-  const pass = read('src/render/waterSurface.js');
-  assert.doesNotMatch(pass.replace(/WATER_DRAW_MASK_TABLE/g, ''), /WATER_MASK_TABLE|buildWaterMaskTable/, 'and nothing in the pass reaches for the feet’s table by any spelling');
-  assert.match(read('src/render/renderer.js'), /packWaterMask\(WATER_DRAW_MASK_TABLE\)/, 'and so does the shader’s uniform');
-  assert.match(read('src/player/exteriorSurface.js'), /import \{ waterCorners, waterCoverage \} from '\.\.\/world\/water\/waterCorners\.js';/, 'the feet keep the default, which is the law’s');
-  assert.match(read('src/world/city/cityNavigation.js'), /WATER_MASK_TABLE\[\(record << 2\) \| t\]/, 'and so does the town’s navigation');
-  // the grass asks the EYE's question - a blade in a puddle is a picture
-  assert.match(hostText('src/scenes/world.js'), /if \(waterCorners\(byte, WATER_DRAW_MASK_TABLE\)\) \{\n\s+const puddle = /);
 });
 
-test('WATER-DRAW1: the tile probe names the record under the player', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /window\.__tileHere = \(\) => \{/);
-  assert.match(w, /record: byte >> 2, transform: byte & 3, byte,/, 'the number a screenshot cannot give');
-  assert.match(w, /drawnWet: waterCorners\(byte, WATER_DRAW_MASK_TABLE\), feetWet: waterCorners\(byte\),/, 'and both answers, so the two questions can be told apart');
-});

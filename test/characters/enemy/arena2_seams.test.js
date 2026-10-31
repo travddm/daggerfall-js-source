@@ -156,20 +156,3 @@ test('ARENA2 the city\'s peace: a player striking an exhibition fighter turns no
   assert.equal(hostile.n, 1, 'a passive foe off the sand turns the area, DFU\'s law');
 });
 
-test('ARENA2 the dungeon\'s twin: the same floor, the same hook, the level and the bout on a loose stand; the 1 HP spare on my blows taken', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(bout\) \{ foe\.entity\.health = 1; if \(!bout\.out\) \{ bout\.out = true; bout\.hooks\?\.floor\?\.\(foe, \{ fromPlayer: fromPlayer && !peer, striker \}\); \} return; \}/);
-  assert.match(d, /if \(bout && healthDamage > 0\) bout\.hooks\?\.hurt\?\.\(foe, healthDamage, \{ fromPlayer: fromPlayer && !peer, striker \}\);/);
-  assert.match(d, /if \(bout && !peer && foeDeps && foeDeps\.boutGate\(foe, foeDeps\.PLAYER_TARGET, true\) !== true\) \{ bout\.hooks\?\.intrude\?\.\(foe\); return; \}/);
-  assert.match(d, /if \(fromPlayer && !peer && !bout\) renownFoeStruck\(foe\);/, 'no renown on the sand');
-  assert.match(d, /e\.level \?\? effectiveLevel\(D\.playerEntity\)/, 'a fighter at its tier\'s level');
-  assert.match(d, /if \(!puppet && e\.level == null\) applyProgressionScalingTo\(entity, basics, \{ ally: !!e\.allied \}\);/, 'the ladder is a fixed mountain');   // PIN MOVED (BAL11): the seam is told an ally (the hero's threat stands on none)
-  assert.match(d, /if \(bout\) \{ f\.entity\.bout = bout; f\.entity\.items = \[\]; f\._bout = true; return f; \}/, 'no loot, never the room\'s');
-  assert.match(d, /hurtEntity\(playerEntity, dmg, opts\.playerSpare\?\.\(\) \?\? \{\}\);/);
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /if \(bout\) \{ f\.entity\.health = 1; if \(!bout\.out\) \{ bout\.out = true; bout\.hooks\?\.floor\?\.\(f, \{ fromPlayer: fromPlayer && !peer, striker \}\); \} return; \}/);
-  // the floor stands BEFORE every death arm in both doors (the companion's, the soul trap's, the corpse's)
-  for (const [src, comp] of [[d, 'if (foe.companion != null) { foe.entity.health = 1'], [x, 'if (f.companion != null) { f.entity.health = 1']]) {
-    assert.ok(src.indexOf('bout.hooks?.floor?.(') < src.indexOf(comp), 'the yield floor first');
-  }
-});

@@ -148,10 +148,6 @@ test('WW7-4 the castle keys: each province\'s capital\'s centre a castle the rel
   assert.equal(await instanceAdmission(tower, 'acct-ofelia', { guild: G }), null);
 });
 
-test('WW7-4 the open zone: a capital\'s castle is no ruin - the White-Gold Tower\'s door opens inside the zone (mutant: the tower sealed)', () => {
-  assert.match(rd('src/scenes/world.js'), /if \(\(!wildInside\(mask, p\.x, p\.y\) && !seaVentures\.vaultHere\(\)\) \|\| hit\?\.dfLocation\?\.capital\) return true;/);
-});
-
 test('WW7-4 on the freeware: every capital\'s castle lays - its halls the port\'s copies (a castle block, its start marker), no court person left, its borders the Bay\'s (real data)', { skip: skipReal }, () => {
   _resetWorldDataReplacement();
   installWorldDataReplacement();

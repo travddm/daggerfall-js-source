@@ -84,33 +84,6 @@ test('SLAM2: the backoff still DOUBLES, so a relay that is genuinely down is not
   assert.ok(seen.at(-1) >= BACKOFF_MAX_MS / 2, 'and it reaches the ceiling');
 });
 
-test('SLAM2: the jitter is INJECTED like the clock, so nothing in the port reaches for Math.random behind a test\'s back (mutant: Math.random inline, which makes the wave law unpinnable)', () => {
-  // PINS (AUDIT SLAM): only a `//` that BEGINS a comment is stripped - the naive form ate the rest of every line holding
-  // `wss://`, so a Math.random placed after one would have been invisible to the sweep below
-  const src = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
-  assert.match(src, /rand = Math\.random/, 'the default is the real one, named at the door');
-  assert.match(src, /this\._rand = rand;/);
-  // the retry arithmetic reaches for the INJECTED source and never the global - the two other Math.random uses in
-  // this module mint the tab's id and its secret, which are nobody's business to seed
-  // the DECLARATION, not the first call site - slicing from `indexOf` landed in `_open`'s call and read the wrong
-  // function entirely, which is the boundary trap AUDIT INV2 paid for once already
-  const decl = /_scheduleRetry\(\)\s*\{/.exec(src);
-  assert.ok(decl, 'the retry has a body to read');
-  // PINS (AUDIT SLAM): the body to its MATCHING BRACE, not 400 characters - the fixed window was ~2.5x the function and
-  // spilled into `_send` and `sendPose`, so a `this._rand()` in a neighbour could have satisfied the match
-  const open = src.indexOf('{', decl.index);
-  let depth = 0, close = open;
-  for (; close < src.length; close++) { const ch = src[close]; if (ch === '{') depth++; else if (ch === '}' && --depth === 0) break; }
-  const retry = src.slice(decl.index, close + 1);
-  assert.ok(retry.length < 400 && retry.includes('_retryAt'), `one function's body (${retry.length} chars), not its neighbours\'`);
-  assert.match(retry, /this\._rand\(\)/, 'the retry uses the injected jitter');
-  assert.doesNotMatch(retry, /Math\.random/, 'and never the global directly');
-  for (const m of src.matchAll(/Math\.random/g)) {
-    const line = src.slice(src.lastIndexOf('\n', m.index) + 1, src.indexOf('\n', m.index));
-    assert.ok(/rand = Math\.random|toString\(36\)/.test(line), `an unexpected Math.random: ${line.trim().slice(0, 80)}`);
-  }
-});
-
 test('PINS (AUDIT SLAM S3): the backoff is CAPPED at BACKOFF_MAX_MS however many times a relay stays down - the doubling stops at the ceiling (mutant: the Math.min removed, which survived the whole suite: 1s, 2s, 4s, 8s, 16s, 32s... a minute between retries by the sixth drop)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1_000_000;

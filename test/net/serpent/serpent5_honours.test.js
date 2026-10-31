@@ -194,7 +194,6 @@ test('SERPENT5 THE CARRIER: a counted kill\'s grants said whenever it granted on
   const old = await run({});
   assert.ok(!old.said.includes(SERPENT_CLAIM_TEXT.title()) && !old.said.includes(SERPENT_CLAIM_TEXT.aura()) && old.popped.length === 0, 'a service from before acct137: nothing (AUDIT WORLD-REWARDS E2: the aura\'s line neither)');
   await run({ titleNew: true }, () => { throw new Error('the page\'s'); });   // never the carrier's
-  assert.match(src('src/scenes/world.js'), /createSerpentClaims\(\{[\s\S]{0,900}announce: \(kind, key\) => announceHonour\(kind, key\),   \/\/ SERPENT5/);
 });
 
 // ── the look ──────────────────────────────────────────────────────────

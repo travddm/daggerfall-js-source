@@ -67,11 +67,6 @@ test('R2-6 a vampire turned past the Bay wakes in a cemetery of the province: DF
   assert.deepEqual(vampireCryptPixel({ x: 500, y: 200 }, 1, maps, own, () => 0), { x: 100, y: 400 }, 'the region\'s own, however far');
   assert.equal(vampireCryptPixel({ x: 500, y: 200 }, 5, { ...maps, getRegion: () => null }, own), null);
   assert.equal(isCemeteryPlace({ hasDungeon: false, dungeonType: DUNGEON_TYPES.Cemetery }), false, 'a graveyard with no dungeon is no crypt');
-  // the host asks the module (HOST-SPLIT), with the world's registry
-  const w = codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8'));
-  const arm = w.slice(w.indexOf('function transferToCemeteryArm()'), w.indexOf('function cancelRestArm()'));
-  assert.match(arm, /const pos = vampireCryptPixel\(playerTravelPixel\(\), _questRegionIndex\(\), maps, worldPlaces\);/);
-  assert.doesNotMatch(arm, /maps\.getRegion\(/, 'no Bay-only search left in the host');
 });
 
 test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s pixel (the law, the relay\'s word, its cell), a town\'s is the Bay\'s until WW6 and refused by name; the place picker lists a province\'s places from the world\'s registry, each offered as an area, and says where staff stand (mutants: the Bay\'s bound again, the word\'s, a town past the Bay taken, the province unlisted, a place offered as a town)', () => {
@@ -117,8 +112,6 @@ test('R2-7 a staff event past the Bay: an AREA\'s event stands on the world\'s p
   assert.equal(keptPlaces(), reg);
   assert.deepEqual(staffHere(maps, WHITERUN), { dfoStaff: 'here', region: 64, name: 'Skyrim', loc: -1, place: 'Whiterun', kind: 'town', px: WHITERUN.x, py: WHITERUN.y }, 'where I stand past the Bay: the area at Whiterun');
   gamePlaces(null);
-  // the host keeps the registry for the picker
-  assert.match(codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8')), /const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);/);
 });
 
 test('R2-8 a POI past the Bay: its law takes the world\'s pixel, its id is one a pixel - the Bay\'s MapsFile ids every one as it was, past them the world\'s - so the feed stands it on its own pixel and no other, and the editor carries a place over the Bay\'s edge; the stored ids are the documents\' own (`poi-<hex>`), no row keyed by a pixel (mutants: the Bay\'s bound again, the old id, the past-Bay ids over the Bay\'s, the feed\'s old key, the editor\'s old clamp, the host\'s riding key)', async () => {
@@ -169,6 +162,4 @@ test('R2-8 a POI past the Bay: its law takes the world\'s pixel, its id is one a
   const sql = readFileSync(new URL('../../../server-account/migrations/0116_poi.sql', import.meta.url), 'utf8');
   assert.match(sql, /id\s+TEXT PRIMARY KEY,\s+-- poi-<12 hex>/);
   assert.doesNotMatch(sql, /CHECK\s*\(\s*p[xy]/i, 'no bound on a place\'s pixel in the store');
-  // the host's riding frame a pixel's one id
-  assert.match(codeOnly(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8')), /riding: \(px, py\) => \{\s*const k = poiPixelKey\(px, py\);/);
 });

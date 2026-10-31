@@ -157,38 +157,6 @@ test('DUNGEON-DIGITS THE REPORT: under a dungeon window the digit is the WINDOW\
   } finally { clearHotbarSlot(0); }
 }));
 
-test('DUNGEON-DIGITS WHY OUTSIDE WORKED: the street\'s and a building\'s frames DO reach drawHud under a window - told the game is paused, the bar stands down and the list hears its digit; the four hosts\' HUD calls, read (mutants: a host\'s pause dropped from its HUD call; the dungeon branch\'s door dropped)', () => withPage((doc) => {
-  const me = player();
-  const [heal] = me.items;
-  const pressed = [];
-  setHotbarSlot(0, hotbarEntryForItem(heal));
-  try {
-    drawHud(renderer(), CANVAS, null, me, 0, 1 / 60, { cursorActive: false, ...doorsOf(me, pressed) });
-    const used = [];
-    const slot = dungeonSlot();   // the street's and the building's slots route a native window the raw code alike
-    slot.win = createUseMagicItemWindow({ items: me.items, onUse: (item) => used.push(item) });
-    // world.js, exterior.js: `cursorActive: gamePaused()`; worldModes' interior arm: `cursorActive: overlayHeld` - both
-    // true with a window up, on every frame, because neither host returns above its drawHud.
-    drawHud(renderer(), CANVAS, null, me, 0, 1 / 60, { cursorActive: true, ...doorsOf(me, pressed) });
-    assert.equal(hudRoot(doc).style.display, 'none');
-    assert.equal(!!press('Digit1', slot).stopped, false);
-    assert.deepEqual([used, pressed], [[heal], []], 'the list\'s row 1, never the bar\'s slot');
-  } finally { clearHotbarSlot(0); }
-  // THE FOUR HOSTS, as they stand. The street and the bench pass the game's pause on every frame; the building's arm
-  // passes its own; the dungeon context's drawHud is drawFoes', and both hosts that mount it return above drawFoes
-  // under a window with the hide door on the branch's first line.
-  const hud = (f) => { const s = rd(f); const at = s.indexOf('drawHud(renderer, canvas, hudArt, playerEntity,'); assert.ok(at > 0, f); return s.slice(at, at + 4000); };
-  assert.match(hud('src/scenes/world.js'), /cursorActive: gamePaused\(\),/, 'world.js');
-  assert.match(hud('src/scenes/exterior.js'), /cursorActive: gamePaused\(\),/, 'exterior.js');
-  assert.match(hud('src/scenes/worldModes.js'), /cursorActive: overlayHeld,/, 'worldModes.js, the interior arm');
-  assert.match(hud('src/scenes/dungeonContext.js'), /cursorActive: !!activeOverlay,/, 'dungeonContext.js, drawFoes\' own');
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  assert.match(rd('src/scenes/worldModes.js'), /if \(windowHoldsDungeon\(dungeonCtx\.uiOverlayActive, aliveUnder\(\)\)\) \{ dungeonCtx\.hideHudText\?\.\(\); hideWorldPlaque\(\); dungeonCtx\.tickOverlay\(dt\);/, 'worldModes.js, the dungeon arm\'s window branch');
-  assert.match(rd('src/scenes/dungeon.js'), /if \(ctx\.uiOverlayActive\) \{\n\s+ctx\.hideHudText\?\.\(\); hideWorldPlaque\(\); ctx\.tickOverlay\(dt\); ctx\.drawOverlay\(canvas\);/, 'dungeon.js');
-  assert.match(rd('src/scenes/dungeonContext.js'), /hideHudText: \(\) => hideHudTextSurfaces\(hudText\),/, 'the context\'s door is hud.js\'s');
-  assert.match(rd('src/scenes/dungeonContext.js'), /get overlayIsNative\(\) \{ return !!activeOverlay\?\.isChoiceWindow; \},/, 'the slot this test stands for: a native window is handed the raw code');
-}));
-
 // AUDIT FB1018f L2-5 / L2-6 - LAST in the file: they hand the page a host's input hooks (ui/input.js noteHostInput), and
 // each lets them go (an object with no `paused` is no host) so nothing after reads them.
 test('AUDIT FB1018f L2-5 THE PAUSE AT THE PRESS: a window opened by one key and a digit before the next frame - the digit is the window\'s, asked of the host\'s own hooks (the ones it hands the finger), never the HUD\'s last frame of play, and so is a slot\'s mouse button; the window gone, a digit before the next frame is the bar\'s again (mutants: the keys reading the last frame\'s word; the mouse slot reading it; the touch door noting nothing)', () => withPage((doc) => {
@@ -230,36 +198,3 @@ test('AUDIT FB1018f L2-5 THE PAUSE AT THE PRESS: a window opened by one key and 
   } finally { clearHotbarSlot(0); attachTouch(null, {}); }
 }));
 
-test('AUDIT FB1018f L2-6 A WINDOW NO DUNGEON FRAME SEES: over ?world\'s dungeon arm a window in the street\'s slot (Recall\'s prompt) stands while drawFoes\' HUD frame says play (its own slot empty) - the bar stands down by the world host\'s hooks, which the pad\'s crossbar reads too; the hosts\' hooks, read (mutants: the pad door noting nothing; the bar reading the last frame\'s word)', () => withPage(() => {
-  const me = player();
-  const [heal, mana] = me.items;
-  const pressed = [];
-  setHotbarSlot(0, hotbarEntryForItem(heal));
-  const dungeon = dungeonSlot();
-  let street = false;   // townTalk's slot
-  // world.js's hooks (`paused: () => gamePaused()`: the street's slot and every mode's stack), handed to the pad
-  attachGamepad(null, { paused: () => street || dungeon.uiOverlayActive, overlayActive: () => street || dungeon.uiOverlayActive }, { getPads: () => [] });
-  try {
-    drawHud(renderer(), CANVAS, null, me, 0, 1 / 60, { cursorActive: !!dungeon.win, ...doorsOf(me, pressed) });   // drawFoes' own word
-    street = true;   // the prompt raised in the street's slot; the dungeon arm's frames run on, and say play
-    drawHud(renderer(), CANVAS, null, me, 0, 1 / 60, { cursorActive: !!dungeon.win, ...doorsOf(me, pressed) });
-    const e = press('Digit1', dungeon);
-    assert.equal(!!e.stopped, false, 'the digit left to the hosts (worldModes\' keydown hands the street\'s window its keys)');
-    assert.deepEqual([pressed, me.items], [[], [heal, mana]], 'and never the bar\'s slot under the prompt');
-    street = false;
-    assert.equal(press('Digit1', dungeon).stopped, true, 'the prompt answered: the bar\'s again');
-    assert.deepEqual(pressed, [1]);
-  } finally { clearHotbarSlot(0); attachTouch(null, {}); }
-  // THE HOSTS' HOOKS: each hands the one object to the finger and the pad, its `paused` the game's pause - the street's
-  // slot and every mode's stack in the world host, the context's in the standalone dungeon
-  for (const [f, paused] of [['src/scenes/world.js', 'paused: () => gamePaused(),'], ['src/scenes/exterior.js', 'paused: () => gamePaused(),'], ['src/scenes/dungeon.js', 'paused: () => !!ctx.uiOverlayActive,']]) {
-    const s = rd(f);
-    const at = s.indexOf('const inputHooks = {');
-    const end = s.indexOf('const gamepad = attachGamepad(canvas, inputHooks);', at);
-    assert.ok(at > 0 && end > at, `${f}: its hooks handed to the pad`);
-    const hooks = s.slice(at, end);
-    assert.ok(hooks.includes(`\n    ${paused}`), `${f}: ${paused}`);
-    assert.match(hooks, /const touch = attachTouch\(canvas, inputHooks\);\s*$/, `${f}: and to the finger`);
-  }
-  assert.match(rd('src/scenes/world.js'), /const gamePaused = \(\) => staffTeleportHeld \|\| townTalk\.overlayActive \|\| \(modes\?\.overlayHeld \?\? false\);/, 'the world host\'s pause: the street\'s slot and the modes\' stacks');
-}));

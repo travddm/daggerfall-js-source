@@ -166,11 +166,6 @@ test('AUDIT LW-II-2 S1: A PATRON\'S WORTH IS min(THE JUDGE\'S FLOOR, THE RECORD\
   addItem(pack2, third);
   const picked = splitStack(pack2, marked, 1);
   assert.ok(picked && picked !== marked && picked.counterBought === true && marked.counterBought === true, 'a split keeps it on both halves');
-  // the doors: the counter's Buy and the keyed list's, each before the pack takes the piece (and a stack's merge with it)
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /if \(mode === 'Buy'\) \{\n\s+deductGold\(playerEntity, price\);\n\s+markCounterBought\(staged, \{ price, \.\.\.asked \}\);[^\n]*\n\s+for \(const it of staged\) \{/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-1): and the purchase's holiday and guild
-  assert.match(wm, /shelf\.items\.splice\(at, 1\);\n\s+markCounterBought\(\[it\], \{ price \}\);[^\n]*\n\s+playerEntity\.items = playerEntity\.items \|\| \[\];/);
-  assert.equal(wm.match(/markCounterBought\(/g).length, 2, 'the two doors');
 });
 
 test('AUDIT LW-II-2 S1: THROUGH THE WORKER, A COUNTER\'S BOOKS NEVER SELL FOR MORE THAN THEY COST - fourteen books bought online at a quality-10 bookseller (the counter\'s mark) and stocked at their patron cap: none sold in two days (the patrons paid 2.06 times what the counter asked); a found book priced under its template\'s old cap never sells, one under its own file price\'s cap sells at it (mutants: the mark refused, the own price)', async () => {

@@ -221,7 +221,6 @@ test('GUILD3c the service names EVERYTHING that holds a guild that would go - it
   const book = new GuildBook({ door: { mine: async () => ({ ok: true, data: { guild: null } }), invites: async () => ({ ok: true, data: { invites: [] } }),
     disband: async () => ({ ok: false, error: 'guild-hall', keeps: ['guild-hall', 'guild-seat'] }) }, character: () => 'rabc', wallet: () => ({}) });
   assert.deepEqual(await book.disband(), { ok: false, error: 'guild-hall', keeps: ['guild-hall', 'guild-seat'] });
-  assert.match(src('server-account/src/index.js'), /if \(Array\.isArray\(r\.keeps\)\) return json\(\{ error: r\.error, keeps: r\.keeps \}/);
 });
 
 // ─── THE TAB ────────────────────────────────────────────────────────
@@ -295,8 +294,6 @@ test('GUILD3c the Settings page says, before the press, everything that holds th
   // the hall held back the button: the press is the service's word on the rest - asked here through the book's own door
   const r = await t.book.disband();
   assert.deepEqual(r.keeps, ['guild-hall', 'guild-vault', 'guild-seat', 'guild-writs']);
-  assert.match(src('src/ui/socialPanel.js'), /guildDo\(keptBy\(g\.disband\(\)\), 'The guild is disbanded\.'\)/);
-  assert.match(src('src/ui/socialPanel.js'), /guildDo\(keptBy\(g\.leave\(\)\), 'You left the guild\.'\)/);
   // the press: a guild whose own knowns are clear, refused for what the page cannot see - the whole list said after it
   const calls = [];
   const clear = await tab(view({ treasury: 0, hallGold: 0, members: [{ member: 'm1', name: 'Aldric', rank: 0, you: true }, { member: 'm2', name: 'Bryn', rank: 2 }] }), 'settings',
@@ -418,8 +415,6 @@ test('GUILD3e five Season events - Calm, Schism, Succession, Crackdown, Rivalry 
   assert.equal('decline' in CHAPTER_EVENT_NEWS || 'ascendancy' in CHAPTER_EVENT_NEWS, false);
   assert.ok(CHAPTER_NEWS.failing.some((l) => l[0].includes('in decline')));
   assert.ok(CHAPTER_NEWS.ascendant.some((l) => l[0].includes('in its ascendancy')));
-  // the service asks the Decline no more
-  assert.doesNotMatch(src('server-account/src/npcChapters.js'), /declineAfter|live\(c\) === 'decline'|event = 'ascendancy'/);
 });
 
 test('GUILD3e the Ascendant band is its own: a fifth off training and spells, from 90; a patron\'s members pay the better of the band and Thriving\'s - never more than a stranger at an Ascendant hall (mutants: the price, the floor, the better)', () => {

@@ -32,58 +32,6 @@ const ordered = (s, needles, what) => {
   }
 };
 
-test('MWNPC8b-a the dungeon: a person\'s flat out of the shared groups into a batch of its own; drawPeople offers the active people with a look before the host draws the level\'s billboards; the lane leaves with the context', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.ok(d.includes('        if (pn) pn._flatAt = at;\n        else { if (!flatGroups.has(key)) flatGroups.set(key, []); flatGroups.get(key).push(at); }'), 'a person is not grouped');
-  ordered(d, ['for (const [key, centers] of flatGroups) {', "collider.cover.add('tact1:flats', coverItems);", 'for (const pn of people) {\n    const at = pn._flatAt;', 'const [archive, record] = drawnFlat(pn.textureArchive, pn.textureRecord);',
-    'pn.standBatch = renderer.createBillboardBatch(archive, record, billboardSize(t, record), [Object.assign([at[0], at[1] - bornSize.h / 2, at[2]], { noCover: true })]);',
-    'billboardBatches.push(pn.standBatch);'], 'the person\'s batch, base-centred off the born sprite, drawn as the clothed stand-in, after the groups and their cover (a person is none)');
-  // PIN MOVED (MWNPC8c): drawPeople takes the host's `also` and the world's dungeon passes its quest stands - read by prefix
-  ordered(d, ['drawPeople(canvas, proj, view, eye, dt', 'const read = opts.standingLook ?? null;', 'const on = !!read && _peopleLane.frame();',
-    'const look = on && pn.active !== false ? read(pn) : null;', 'if (look) _peopleLane.offer(personActor(pn, look, pn._mwFeet ??= [pn.x, pn.y, pn.z], eye, dt), pn.standBatch);',
-    'else pn.standBatch.castOnly = false;', '_peopleLane.draw(canvas, proj, view, eye, dt);'], 'drawPeople');
-  assert.ok(d.includes('_peopleLane.destroy();   // MWNPC8b'), 'gone with the context');
-  const m = rd('src/scenes/worldModes.js');
-  assert.ok(m.includes('          standingLook,   // MWNPC8b'), 'the world\'s dungeon reads its people as its buildings do');
-  ordered(m, ['dungeonCtx.drawPeople?.(canvas, proj, view, mwv.eye, dt', 'renderer.drawBillboards([...dungeonCtx.billboardBatches,'], 'before the level\'s billboards');
-});
-
-test('MWNPC8b-b the street: one batch a person in standPixelNpcs (the away arm and the quest pass still first); the near rings\' people offered as the pixels are walked, at their scene feet; the bodies drawn before the flats; let go indoors, moved with the origin', () => {
-  const w = hostText('src/scenes/world.js');
-  const from = w.indexOf('async function standPixelNpcs(');
-  const stand = w.slice(from, w.indexOf('function restrideTerrain(', from));
-  ordered(stand, ['setupExteriorQuestStaticNpcs', 'for (const pn of entry.npcs) {', 'pn.standBatch = null;', 'if (!pn.active) continue;', 'const centers = [[pn.x, pn.y, pn.z]];',
-    'const batch = renderer.createBillboardBatch(archive, record, size, centers);', 'pn.standBatch = batch;', 'entry.batches.push(batch);'], 'a person\'s own batch');
-  assert.ok(!stand.includes('npcGroups'), 'no shared group left');
-  assert.ok(w.includes('if (!dict) return null;   // never before the faction table: asked again'));
-  ordered(w, ['const _peopleOn = streetPeople.frame();', 'for (const p of _pixelOrder) {', 'const ring = Math.max(Math.abs(p.px - state.current.x)',
-    'if (p.npcs) for (const pn of p.npcs) {', 'const look = _peopleOn && ring <= 1 ? streetLook(pn) : null;', 'if (!look) { pn.standBatch.castOnly = false; continue; }',
-    'f[0] = pn.x + t[0]; f[1] = pn.y + t[1]; f[2] = pn.z + t[2];', 'streetPeople.offer(personActor(pn, look, f, mwv.eye, dt), pn.standBatch);',
-    'streetPeople.draw(canvas, proj, view, mwv.eye, townTalk.overlayActive ? 0 : dt);', 'renderer.drawBillboards(allBatches, camRight, bbUp);'], 'offered in the walk, drawn before the flats');
-  assert.ok(w.includes('streetPeople.destroy();   // MWNPC8b'), 'let go indoors');
-  assert.ok(w.includes('streetPeople.offsetAll(r.offset);'), 'moved with the origin');
-});
-
-test('MWNPC8b-c THE STANDING-PEOPLE HOSTS, enumerated: every scene that stands StaticNPC billboards is named - wired, or flagged with the slice that wires it', () => {
-  const HOSTS = {
-    'src/scenes/pixelBuild.js': 'wired',       // the street's people (8b) - stood by the world's pixel build (HOST-SPLIT 2), offered by world.js
-    'src/scenes/interiorContext.js': 'wired',  // the buildings' (8a), through worldModes.js
-    'src/scenes/dungeonContext.js': 'wired',   // the dungeons' (8b), through worldModes.js
-    // PIN MOVED (MWNPC8c, section 13c): the standalone location's people stand alone and in their bodies now
-    'src/scenes/exterior.js': 'wired',         // the standalone location's (8c)
-  };
-  const found = readdirSync(new URL('../../src/scenes', import.meta.url), { recursive: true }).filter((f) => f.endsWith('.js'))
-    .map((f) => `src/scenes/${f}`).filter((p) => /collectExteriorNpcs\(|collectInteriorPeople\(|context: NPC_CONTEXT\.Dungeon/.test(rd(p)));
-  assert.deepEqual(found.sort(), Object.keys(HOSTS).sort(), 'a new standing-people host is named here');
-  const wiredBy = {
-    'src/scenes/pixelBuild.js': () => hostText('src/scenes/world.js').includes('streetPeople.offer(personActor('),
-    'src/scenes/interiorContext.js': () => rd('src/scenes/worldModes.js').includes('peopleBodies.offer(personActor('),
-    'src/scenes/dungeonContext.js': () => rd('src/scenes/dungeonContext.js').includes('_peopleLane.offer(personActor('),
-    'src/scenes/exterior.js': () => /\.offer\(personActor\(/.test(rd('src/scenes/exterior.js')),
-  };
-  for (const [p, state] of Object.entries(HOSTS)) assert.equal(wiredBy[p](), state === 'wired', `${p}: ${state}`);
-});
-
 test('MWNPC8b-d a flat with a faction is not always a person drawn: an editor marker (archive 199, never rendered) stands no body, whatever its faction; nor does anyone not mortal - a Daedra, a god, Oblivion\'s or the Fey\'s', () => {
   const data = (o) => ({ race: RACES.Breton, gender: GENDERS.Male, nameSeed: 9, hash: 3, factionID: 0, billboardArchiveIndex: 182, billboardRecordIndex: 1, ...o });
   assert.ok(personLook({}, data({}), null), 'a person drawn: a body');

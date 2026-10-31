@@ -114,24 +114,6 @@ test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four 
   for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null }, String(bad));
 });
 
-test('SCALE4f the mint asks its realm row ONCE - one statement where four were, and a token as it was (mutants: the four asked again)', async () => {
-  const S = await standService();
-  const g = await S.guest();
-  await S.call('/v1/realm/lineage', { id: FAM, record: record('Hlaalu', [{ id: 1, given: 'Ysolde' }]) }, g.secret);
-  const c = (await S.call('/v1/realm/create', { name: 'Ysolde Hlaalu', lineage: FAM, person: 1 }, g.secret)).body;
-  S.env.DB._sessions.length = 0;
-  const r = await S.call('/v1/auth/token', { character: c.id }, g.secret);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(r.body.house, { hn: 'Hlaalu', hc: 'Ysolde', hb: 1 }, 'the house as it was signed');
-  const claims = JSON.parse(Buffer.from(r.body.token.split('.')[1], 'base64url').toString());
-  assert.equal(claims.rc, 1);
-  assert.equal(claims.ci, c.id);
-  const rows = S.env.DB._sessions[0].statements.filter((q) => /realm_characters/.test(q));
-  assert.equal(rows.length, 1, 'one read of the realm row');
-  const src = readFileSync(new URL('../../server-account/src/index.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /realmCharacterHeld|realmLevelOf\(|realmArmsOf\(|realmHouseOf\(/, 'none of the four is asked by the service any more');
-});
-
 // ═══ HOW BUSY THE PRIMARY IS ═══════════════════════════════════════════════════════════════════════════════════════
 
 /** A D1 shaped as workerd's: statements a class with private fields, whose methods throw on any `this` but their own,

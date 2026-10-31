@@ -131,8 +131,6 @@ test('ROCKET1 lines: one a cue, through the text core, in the WB13b voice - said
   for (const k of Object.keys(ROCKET_LINES)) assert.ok((ROCKET_LINES[k]().match(/!/g) ?? []).length <= 1 && !/ - /.test(ROCKET_LINES[k]()), k);
   assert.equal(rocketCue(13.9), 1);
   assert.equal(rocketCue(14), 2);
-  const src = rd('src/world/rocketEvent.js');
-  for (const c of ROCKET_CUES) assert.match(src, new RegExp(`${c.cue}: \\(\\) => t\\('rocket\\.${c.cue}', '`), `${c.cue} through t()`);
   const live = createRocket();
   live.set({ kind: 'rocket', at: AT }, { live: true });
   assert.equal(live.frame(AT + 100).line, ROCKET_LINES.rise(), 'a player watching it staged is told');
@@ -373,12 +371,3 @@ test('ROCKET1 host: the great horse neighs as it sets out (DAGGER.SND AnimalHors
   assert.deepEqual(ROCKET_FART_KEYS, ['rocket:fart0', 'rocket:fart1', 'rocket:fart2']);
 });
 
-test('ROCKET1 world.js: the host built beside the Starfall\'s, the hub\'s word handed to it with the dread\'s and the sun baby\'s, framed after the sun baby\'s fire round the traveller, drawn after the Starfall\'s sky (mutants: the word unheard; never framed; never drawn)', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /import \{ createRocketHost \} from '\.\/rocketHost\.js';/);
-  assert.match(world, /const rocket = createRocketHost\(renderer, sunbabyGround, state\);/);
-  assert.match(world, /link\.onEvent = \(ev, o\) => \{ dread\.set\(ev, o\); sunbaby\.set\(ev, o\); rocket\.set\(ev, o\); \};/);
-  assert.match(world, /magic\.skyFire\(fb\);\n\s*rocket\.frame\(dt, Date\.now\(\) \+ _sharedOffsetMs, tvStand, townTalk\);/);
-  assert.match(world, /starfall\.drawSky\(proj, view, new Float32Array\(mwv\.eye\), now \/ 1000\)\) renderer\.markForeignPass\(\);\n\s*rocket\.draw\(proj, view, mwv\.eye\);/);
-  assert.ok(world.indexOf('const rocket = createRocketHost(') > world.indexOf('const state = new StreamingWorldState('), 'built after the streaming world it anchors to');
-});

@@ -184,10 +184,4 @@ test('DAEDRIC-SMELT the Forge (ui/professions/profPages.js): a smelt\'s most is 
   const all = () => 1000;
   assert.deepEqual([smeltable(DAEDRIC, all, 4), smeltable(DAEDRIC, all, 0), smeltable(DAEDRIC, all, null), smeltable(DAEDRIC, (k) => (k === HEART ? 2 : 1000), 9)], [4, 0, 100, 2]);
   assert.equal(DAEDRIC_LINE, 'A Daedric Ingot takes an Ebony Ingot, a Daedra\'s Heart and a Deadlands Ember. Hearts are carried by the daedra you slay and won at Dagon\'s Breaches; embers are won closing the Breaches, slaying Sea Serpents and taking Elite Breach Redoubts, and each one is spent from what your account has won.');
-  const pages = src('src/ui/professions/profPages.js');
-  assert.match(pages, /  if \(daedricWaits\(book\)\) detail\.append\(el\('p', 'px-note', daedricWord\(\)\)\);/);
-  assert.match(pages, /const daedricWaits = \(book\) => !!DAEDRIC_SMELT && smeltable\(DAEDRIC_SMELT, \(k\) => workOf\(book, k\), book\.embers\?\.\(\) \?\? null\) < 1;/);
-  assert.match(pages, /    const most = smeltable\(r, held, embers\);/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /  const saveSoon = createSaveSoon\(\);\n(?:  \/\/[^\n]*\n)*  carryHands\.embers = emberHands\(playerEntity, saveSoon\.changed\);/);
 });

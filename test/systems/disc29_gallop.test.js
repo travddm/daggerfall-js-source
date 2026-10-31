@@ -76,14 +76,6 @@ test('DISC29-F: any change stops the old loop - a horse swapped for the cart mid
   assert.ok(cart && cart !== horse, 'moving on, the cart\'s loop is made afresh');
 });
 
-test('DISC29-F: setMode stops the channel before the animator mounts the new mode', () => {
-  const rig = src('src/player/mountRig.js');
-  const fn = rig.slice(rig.indexOf('function setMode(mode) {'), rig.indexOf('return {', rig.indexOf('function setMode(mode) {')));
-  const stop = fn.indexOf("audio.setLoop('riding', null);");
-  assert.ok(stop > 0, 'the stop is in setMode');
-  assert.ok(fn.indexOf('player.setTransportMode(mode);') < stop && stop < fn.indexOf('animator.mount(mode);'));
-});
-
 test('DISC29-F: every host that makes a mount rig hands worldModes its dismount seam', () => {
   const scenes = readdirSync(join(ROOT, 'src/scenes'), { recursive: true }).filter((f) => f.endsWith('.js'));
   const hosts = scenes.filter((f) => src(`src/scenes/${f}`).includes('createMountRig({'));

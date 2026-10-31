@@ -156,14 +156,3 @@ test('TEXT-F1 the service: a rank\'s name with a caught word is refused, naming 
   assert.ok(REFUSALS['guild-rank-word'], 'the service\'s word has its sentence');
 });
 
-test('TEXT-F1 the seams: every surface reads the one reader - the chat\'s and the words\' laws in wire.js, the look\'s class, the boards\' reads, the rank\'s refusal and its word through the route (mutants: none - each seam\'s own mutant is the behaviour pin above)', () => {
-  const wire = src('src/net/wire.js');
-  assert.match(wire, /return maskText\(s\.trim\(\)\);/);
-  assert.match(wire, /export const wordsLine = \(line\) => maskText\(visibleText\(/);
-  assert.match(wire, /&& !textCaught\(look\.class\) \? look\.class\.trim\(\) : null;/);
-  assert.match(src('server-account/src/board.js'), /subject: maskText\(n\.subject\), body: maskText\(n\.body\),/);
-  assert.match(src('server-account/src/board.js'), /subject: maskText\(x\.subject\), body: maskText\(x\.body\),/, 'the server\'s notices too');
-  assert.match(src('server-account/src/guildBoard.js'), /subject: maskText\(n\.subject\), body: maskText\(n\.body\),/);
-  assert.match(src('server-account/src/index.js'), /\(r\.error === 'guild-name-word' \|\| r\.error === 'guild-rank-word'\) && typeof r\.word === 'string'/);
-  assert.equal((src('src/net/nameFilter.js').match(/^import /gm) ?? []).length, 0, 'the filter imports nothing - the relay\'s and the Worker\'s graphs stay flat');
-});

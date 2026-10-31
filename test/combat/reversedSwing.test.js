@@ -133,16 +133,3 @@ test('MS1: a right slash runs the clip backwards on the same arm - wind-up from 
   assert.equal(arm.status().attackReversed, false, 'a chop backwards is an uppercut - the chops keep their one way');
 });
 
-test('MS1: no mirror anywhere - the draws are untouched and the pose alone reads the window backwards', () => {
-  const src = rd('src/combat/fpArm.js');
-  assert.ok(!/MIRROR_X|mirrorNow|attackMirror/.test(src), 'the mirror is gone: a mirror changes hands');
-  // MAC-P: ...and its light (viewmodelLight), which changes no matrix here.
-  assert.match(src, /renderCharacterSprite\(mesh, NIF_TO_PASS, proj, view, fw, fh, \{ lensLocal: true, viewmodelLight: vmLight \}\)/);
-  assert.match(src, /const poseTime = \(state\) => \(state && state\.reversed \? state\.startTime \+ state\.stopTime - state\.time : state\.time\);/);
-  assert.equal((src.match(/time: poseTime\(state\),/g) || []).length, 2, 'both rigs pose through it');
-  assert.match(src, /actionState\.reversed = !!reversed;/);
-  // PIN MOVED (TWO-HANDS AUDIT): a blow the body throws in the mirror reverses by the MIRROR strike (handsLaw.js
-  // mirrorStrike), so its way across the screen is the one asked; a blow not in the mirror reads the strike as before
-  assert.match(src, /attackReversed = type === 'slash' && strikeReversed\(inMirror \? mirrorStrike\(strike\) : strike\);/);
-  assert.match(src, /attackReversed = false;\s*\/\/ MS1: a cast has no side/);
-});

@@ -57,8 +57,6 @@ test('MWNPC5b-a a CAST-ONLY billboard records its shadow and draws nothing - in 
   assert.ok(drawn.includes('shown'), 'the plain billboard draws');
   assert.ok(!drawn.includes('body') && !drawn.includes('veiled'), 'a cast-only one does not - opaque or concealed');
   assert.deepEqual(recorded.map((b) => b.vao.id), ['shown', 'body', 'veiled'], 'and every one casts');
-  const air = rd('src/render/airPass.js');
-  assert.ok(air.includes('if (!b?.vao || b._dead || b.conceal || b.castOnly || b.emissionOff) continue;'), 'the bloom replay skips it too');
 });
 
 /** a rig that records how it is drawn */
@@ -119,30 +117,6 @@ test('MWNPC5b-c the switch: the Features row `mwNpcBodies` - Off, Near, All, the
   assert.deepEqual([row.group, row.kinds, row.control.store, row.control.key, row.control.initial, row.control.online], ['world', ['enhanced'], 'prefs', 'mwNpcBodies', NPC_BODIES_DEFAULT, 'player']);
   assert.deepEqual(row.control.tiers.map(([v]) => v), Object.keys(NPC_BODY_TIERS), 'every tier the lane has, and no other');
   assert.equal(FEATURE_PREF_DEFAULTS.mwNpcBodies, NPC_BODIES_DEFAULT);
-  const lane = rd('src/characters/npcBodies.js');
-  assert.ok(lane.includes("return isEnhanced() && morrowindDataCount() > 0 && getPref('mwNpcBodies') !== 'off';"), 'the lane wanted: the enhanced skin, the data, and not Off');
-});
-
-test('MWNPC5b-d the dungeon context by source: the lane a frame (none while unwanted, the old one let go), the class foes offered dressed, the dead from the kill, the sync before the cast-only, one bind, the veiled after the last flat, and the lane gone with the context', () => {
-  const c = rd('src/scenes/dungeonContext.js');
-  const at = (s) => { const i = c.indexOf(s); assert.ok(i > 0, `present: ${s.slice(0, 70)}`); return i; };
-  const lane = at('const npcLane = npcBodiesOn() ? (_npcLane ??= createHostNpcBodies({ renderer, collider: () => collider })) : null;');
-  at('if (!npcLane && _npcLane) { _npcLane.destroy(); _npcLane = null; }');
-  const begin = at('npcLane?.begin();');
-  const loop = at('    for (const f of foes) {\n      _fi++;\n      if (f.dead) continue;');
-  assert.ok(lane < begin && begin < loop, 'begun before the foes are walked');
-  // PIN MOVED (MWNPC9, bible/04-Characters/Morrowind-NPCs.md section 14b): a creature Morrowind matches is offered too
-  const reset = at('        f.batch.castOnly = false;\n        if (npcLane && isBodyFoe(f)) { npcLane.stand(\'foe\', foeActor(f, foeId(f), { scale: szE }), f.batch.conceal ?? null, f.batch.hitFlash || 0, foeFx(f)); _npcStood.push(f); }   // AUDIT MW-NPC D3: the size its sprite is\n        _mobileBatches.push(f.batch);');
-  // PIN MOVED (AUDIT MW-NPC D3): each body at the size its sprite is drawn, the dead at its corpse's
-  const dead = at("if (npcLane && f.dead && f.corpse && isBodyFoe(f) && f.ai) { npcLane.stand('foe', foeActor(f, foeId(f), { scale: eliteSize(f.entity) }), null, 0, foeFx(f, f.corpseBatch)); _npcStood.push(f); }");   // PIN MOVED (STAFF-EVENT): the body as large as its corpse, read off eliteSize - a staff mini boss's own size too
-  const sync = at('npcLane.end(dt, eye);');
-  const cast = at("for (const f of _npcStood) { const b = f.dead ? f.corpseBatch : f.batch; if (b) b.castOnly = npcLane.has('foe', foeId(f)); }");
-  const bind = at('try { npcLane.draw(canvas, { proj, view, eye }); } finally { renderer.flushCharacterSpriteBatch?.(); }');
-  const flats = at('renderer.drawBillboards([..._mobileBatches, ..._dropBatches, ..._spellBatches],');
-  assert.ok(reset < dead && dead < sync && sync < cast && cast < bind && bind < flats, 'offered, synced, cast-only, drawn - and the billboards after');
-  assert.ok(at('if (f.corpseBatch) f.corpseBatch.castOnly = false;') < sync, 'every corpse drawn again unless its body stands this frame');
-  assert.ok(at('_npcLane?.drawVeiled();') < at('    opts.lateWorldDraw?.();'), 'the veiled after the last opaque flat, beside the peers\'');
-  at('_npcLane?.destroy(); _npcLane = null;   // MWNPC5b');
 });
 
 test('MWNPC5b-e THE FOE HOSTS, ENUMERATED: every module that dresses a foe\'s billboard is named - wired, or flagged with the slice that wires it', () => {

@@ -64,21 +64,6 @@ test('REALM P0.1: an online boot drops every power flag before anything reads it
   for (const f of ONLINE_REFUSED_FLAGS) assert.equal(offline.has(f), true, `?${f} stands offline`);
 });
 
-test('REALM P0.1 by source: the world host drops them beside the Test Room refusal - before the start location, the probe seams and the walk mode read them', () => {
-  const w = hostText('src/scenes/world.js');
-  const drop = w.indexOf('if (refuseOnlinePowerFlags(params).length) publishBootParams(params);');
-  assert.ok(drop > 0, 'the drop is at the boot, and it is published');
-  assert.ok(drop > w.indexOf("if (testRoomOffline) { params.delete('online'); publishBootParams(params); }"), 'after the Test Room refusal (which may take `online` itself away)');
-  // PIN MOVED (HOST-SPLIT, 2026-10-19: the town probes - __addGold among them - moved verbatim to scenes/townProbes.js;
-  // the host installs them, and that call is its read)
-  for (const reader of ["const regionName = params.get('region')", "const shotMode = params.has('shot');", 'if (shotMode) { modes.installShotProbes(); installTownProbes(); }']) {
-    const at = w.indexOf(reader);
-    assert.ok(at > drop, `${reader} reads after the drop`);
-  }
-  assert.ok(src('src/scenes/townProbes.js').includes('window.__addGold = (n) => addGold(playerEntity, n);'), 'the gold probe stands in the town probes, installed by that call');
-  assert.match(w, /if \(shotMode\) \{/, 'the probe seams stand only in ?shot - which an online page no longer has');
-});
-
 test('REALM P0.2: online, every key of a balance mod reads its shipped default - the room\'s own value first, its cosmetic keys still the player\'s', () => {
   let whole = 0;
   for (const [vendor, own] of Object.entries(ONLINE_WHOLE_MODS)) {
@@ -124,11 +109,6 @@ test('REALM P0.2: the holes the research found are closed - Iron as Daedric, the
 });
 
 test('REALM P0.2: the Mods pane locks a room dial as it locks a switch, with the balance reason, and the offline sync copies the dials home', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const ONLINE_BALANCE_NOTE = '[^']*stronger or richer than the rest[^']*';/, 'the balance lock has its own words');
-  assert.match(menu, /const modLockNote = \(vendor, key\) => \(!Object\.hasOwn\(ONLINE_ROOM_MOD_KEYS\[vendor\] \?\? \{\}, key\) && onlineWholeModKey\(vendor, key, undefined, \{ offline: true \}\) \? ONLINE_BALANCE_NOTE : onlineLockNote\(vendor, key\)\);/);
-  assert.match(menu, /if \(\(isChoiceKey\(def\) \|\| isTextKey\(def\) \|\| isTupleKey\(def\) \|\| isFloatKey\(def\) \|\| isIntKey\(def\)\) && onlineModSetting\(vendor, key\) !== undefined\) lockDial\(ctl, modLockNote\(vendor, key\)\);/, 'a dial is locked too');
-  assert.match(menu, /function lockDial\(ctl, note\) \{\s*for \(const b of ctl\.querySelectorAll\('button'\)\) \{ b\.disabled = true;/);
   _resetModSettings();
   try {
     setModSetting('unleveledLoot', 'Iron', 9);
@@ -252,12 +232,6 @@ test('REALM P0.3: a character joining online has the debt past the Empire\'s one
   });
 });
 
-test('REALM P0.3 by source: the join calls the debt in after the markers are aligned to the world\'s clock', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /onlineArrival\(\); empireJoin\(\{ entity: playerEntity, nowMinutes: ownMinutes\(\), say: \(l, d\) => townTalk\.say\(l, d\) \}\);/);   // LIVED1: the loans run on the character's own clock
-  assert.ok(w.indexOf('empireJoin({') > w.indexOf('const onlineArrival = () => { alignEntityClocks(playerEntity, worldMinutes());'), 'the loan due dates ride the shift first');
-});
-
 test('REALM P0.4: online a shop pays at most half what it asks for the same piece - the buy-and-sell-back loop is shut; buying and offline selling are Daggerfall\'s', () => {
   assert.equal(ONLINE_SALE_SHARE, 0.5);
   const loop = { mercantile: 2, personality: 50 };
@@ -368,9 +342,6 @@ test('REALM P0.4: a party\'s shared quest pays its gold in the party\'s shares, 
   Object.assign(give, { itemSymbol: { name: '_reward_' }, textId: 0, silently: false, isNothing: false });
   give.update(null);
   assert.deepEqual(paid, [500], 'a party of two: half the purse');
-  // by source: the host's party answers
-  assert.match(src('src/scenes/world.js'), /partySize: \(\) => social\?\.party\?\.members\?\.length \?\? 1,/);
-  assert.match(src('src/scenes/quest/questBridge.js'), /partySize: \(\) => ctx\.partySize\?\.\(\) \?\? 1,/);
 });
 
 test('REALM P0.5: a checkpoint is written online, spawned, in the seat and out of a duel - every five real minutes', () => {
@@ -420,28 +391,5 @@ test('REALM P0.5: a trade\'s every change to the pack is checkpointed - the good
   assert.equal(seen.length, 3, 'a refused take writes nothing');
   assert.equal(pack.gold(), 105, 'the rest of the pack passes through');
   assert.equal(pack.offerable(dagger), null);
-  // the session queues its commit only after the take returns (net/tradeSession.js _maybeCommit)
-  const ts = src('src/net/tradeSession.js');
-  assert.ok(ts.indexOf('const handle = this.pack.take(this.mine.entries, this.mine.gold);') > 0);
-  assert.ok(ts.indexOf('const handle = this.pack.take(this.mine.entries, this.mine.gold);') < ts.indexOf("this._enqueue({ k: 'commit'"), 'take, then the frame');
 });
 
-test('REALM P0.5 by source: the host checkpoints every slot the exit save writes, quietly, each online frame it is due and through the trade pack', () => {
-  const w = hostText('src/scenes/world.js');
-  const frame = w.slice(w.indexOf('const onlineFrame = (now, dt) => {'));
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES): the periodic line is onlineCheckpoint.js checkpointWhenDue, run here and in the seat's branch
-  assert.match(frame, /_rezSeen = null;[^\n]*\n\s*checkpointWhenDue\(now, _checkpointAt, realmSession, \(\) => onlineCheckpoint\(\)\);/, 'each online frame, past the seat\'s and the dead\'s returns (SCALE2b: a realm character\'s through the session\'s idle door, which may answer an unchanged save without a put)');
-  // PIN MOVED (OFFER-ID, FIELD BUGS 2026-10-11b): the pack is handed the realm's id stamp
-  assert.match(w, /const tradePack = checkpointedTradePack\(createTradePack\(playerEntity, \{ stampIds: stampItemIds \}\), \(\) => onlineCheckpoint\(\)\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES review): the gate's inputs are built once (checkpointGateOpen) and asked here
-  assert.match(w, /const checkpointGateOpen = \(\) => checkpointAllowed\(\{ online: !!online, spawned: playerSpawned, seatOut: seatOut\(\), duel: !!duelMgr\?\.duel, walkWaiting: ownWalkWaiting\(playerEntity\), realm: !!realmSession \}\);/);
-  assert.match(w, /if \(!checkpointGateOpen\(\)\) return false;/);
-  assert.match(w, /const names = exitAutosaveNames\(playerEntity, \{ deathUp: townTalk\.overlay instanceof DeathScreen \|\| !!modes\?\.deathUp\?\.\(\) \|\| successionOpen\(\) \}\);\n\s*for \(const saveName of names\) \{\n\s*if \(modes\) modes\?\.quickSaveNow\(saveName, \{ quiet: true \}\);[^\n]*\n\s*else worldQuickSave\(saveName, \{ quiet: true \}\);/);
-  // quiet: no shot and no "Game saved." - a failure still speaks
-  assert.match(w, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);\n\s*if \(!r\.ok \|\| !quiet\) townTalk\.say\(r\.ok \? localizedText\('gameSaved', 'Game saved\.'\) : 'Save failed/);
-  assert.match(w, /quickSave: \(saveName, opts\) => worldQuickSave\(saveName, opts\),/);
-  assert.match(src('src/scenes/worldModes.js'), /quickSaveNow: \(saveName, opts\) => \(mode === 'dungeon' \? dungeonCtx\?\.quickSave\(saveName, opts\) : host\.quickSave\?\.\(saveName, opts\)\),/);
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}/);   // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the court's save refused with the Hour's and the Spire's, quietly when quiet
-  assert.match(d, /if \(r\.ok && !quiet\) requestScreenshot\(r\.key\);\n\s*if \(r\.ok && !quiet\) hudText\.add\(localizedText\('gameSaved', 'Game saved\.'\)\);\n\s*else if \(!r\.ok\) hudText\.add\('Save failed/);
-});

@@ -46,12 +46,6 @@ test('MACRO-3: record 1016’s %mpw row becomes one row per power, keeping its a
 });
 
 test('MACRO-3: the four boxes walk their records, each with the source DFU hands it', () => {
-  const inv = read('src/ui/native/nativeInventory.js');
-  assert.match(inv, /rows: expandRowValues\(this\.hooks\.rows\?\.\(ITEM_BROKEN_TEXT_ID\)\s+\?\? \[\{ text: 'This item is broken\.', center: true \}\], \{ it: this\._longName\(it\) \}\),/, 'broken: the item names %it');
-  assert.match(inv, /lines: expandRowValues\(this\.hooks\.rows\?\.\(GOLD_TO_DROP_TEXT_ID\)[^\n]*, null\),/, 'drop gold: %gii is the world’s');
-  assert.match(inv, /powersRows\(rows\(INFO_TEXT_POWERS\) \?\? \[\], magicPowersLines\(it, \{ identified: itemIsIdentified\(it\), lines: rows \}\)\)/, 'item powers: %mpw');
-  assert.match(read('src/systems/quickslots.js'), /expandRowValues\(rows\(id\) \?\? \[\], \{ it: itemLongName\(r\.item\) \}\)/, 'the quickslot refusal names the item too');
-  assert.match(read('src/scenes/shared.js'), /announceMastery\(id, \{ box, rows: \(\) => expandRowValues\(plainLines\(lines\?\.\(MASTERY_TEXT_ID\)\), null\) \}\);/, 'mastery: %pcn and %ski are globals');
   // and the walks really fill them
   setMacroWorld(() => ({ nowSeconds: () => 0, hooks: { playerName: () => 'Aldric Vane', getGoldPieces: () => 412 } }));
   try {

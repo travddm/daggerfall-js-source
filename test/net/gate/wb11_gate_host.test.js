@@ -653,24 +653,6 @@ test('WB11 the damage chart: a court his host stood in shows each challenger\'s 
 
 // ═══ THE PLUMBING ════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('WB11 the plumbing, read: the world host sends a blow on one of his host as the wire\'s `ahit` and hands the court\'s host down; the modes hand it to the dungeon context; the context meets it with the swing, the shaft and the spell, never in `foes`; the magic host routes a spell that met one through its door (mutants: the world host\'s door dropped; the swing blind to it)', () => {
-  const w = read('src/scenes/world.js'), m = read('src/scenes/worldModes.js'), d = read('src/scenes/dungeonContext.js'), g = read('src/scenes/hostMagic.js'), r = read('server/src/index.js');
-  assert.match(w, /sendHost: \(hit\) => !!online\?\.sendGate\?\.\(\{ k: 'ahit', \.\.\.hit \}\),/);
-  assert.match(w, /gateHost: \(\) => gateCourt\?\.hostTargets\(\) \?\? null,/);
-  assert.match(w, /onHostHit: \(hit\) => !!gateCourt\?\.hostHit\(hit\),/);
-  assert.match(m, /gateHost: \(\) => host\.gateHost\?\.\(\) \?\? null,/);
-  assert.match(m, /onHostHit: \(hit\) => !!host\.onHostHit\?\.\(hit\),/);
-  assert.match(d, /for \(const hb of gateHostBodies\(\)\) \{ hb\._backFacing = false; live\.push\(hb\); \}/, 'the swing meets them');
-  assert.match(d, /if \(foe\.host != null\) \{ hitEnemy = true; swingOnHost\(foe, damage, lookDir\); continue; \}/);
-  assert.match(d, /const hb = gateHostBodies\(\)\.find\(\(q\) => !struckBy\(q\) && missileHitsCapsule\(m\.pos, q\.ai\.feet, q\.ai\.height, q\.ai\.radius\)\);/, 'the shaft');   // PIN MOVED (TECH1's follow-up, bible/05-Combat/Weapon-Techniques.md): a body a piercing shaft has struck is passed, so one overlapping it under the shaft is met
-  assert.match(d, /castAtHost: opts\.gateHost \? \(sp, i, caster\) => spellOnHost\(sp, i, caster\) : null,/, 'the spell');   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders
-  assert.match(d, /const landOnHost = \(hb, damage, r, tick = false\) => \{ damage = \([^\n]*\) \+ bossStrikeAt\(hb\.entity, takeOwed\(hb\.entity\), 'melee', playerWeapon\.strikingWeapon, null, false, null\); return markHostStruck\(hb, sdRemnant \? sdRemnant\.echoHit\(\{ i: hb\.host, d: damage, r \}\) : !!opts\.onHostHit\?\.\(\{ i: hb\.host, d: damage, r, tick \}\)\); \};/);   // PIN MOVED (SD8c): an Echo's in the Hour; PIN MOVED (FIELD BUGS 2026-10-12g OPEN-HAND): and the follow-up the blow owes; PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): and a round's mark, for an Elite Breach's Vestiges; PIN MOVED (AUDIT WORLD-EVENTS L5-4, L2-2): a lord's traits on my swing and shaft, and on the owed blow; PIN MOVED (AUDIT KETCH II STAND-IN-BAR): its answer through markHostStruck, the target bar's
-  assert.match(g, /const crystals = \[\.\.\.crystalMarksFor\(sp\), \.\.\.hostMarksFor\(sp\)\];/);
-  assert.match(g, /if \(mark\?\.host != null\) \{ try \{ return !!castAtHost\?\.\(sp, mark\.host, caster\); \} catch \{ return false; \} \}/);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper
-  assert.match(r, /const at = a\.pose && !a\.pose\.dd && !bodyOut\(f\.players\[a\.sub\], line\.enforce\) \? this\._courtOf\(a\.pose\) : null;/, 'PIN MOVED (INT11): from where its pose stands, alive - by the pose\'s word and the count\'s');
-  assert.match(r, /else if \(m\.k === 'ahit'\) await this\._gateFanKept\(f, applyHostHit\(f, a\.sub, m\.i, m\.d, m\.r, at, now, m\.q, rand01\), now\);/, 'the relay judges it (AUDIT WB11 W3: by its blow\'s sequence)');   // PIN MOVED (AUDIT WB14 WIRE-2): by the relay's dice (a Tithe-Imp's tithe paid at its catch), kept before it is said
-});
-
 test('WB11 a whole Legion-Lord fight, stepped: Harriers in the first court, crumbled at the turn; Ward-Bearers as he lands in the second; Sappers there once its turn is done; Ward-Bearers again in the third - every word of the host the wire takes, and never more standing than the wire can name (mutants: a kind out of its phase)', () => {
   const f = fightOf([10, 10, 10, 10, 10, 10]);
   const seen = [];

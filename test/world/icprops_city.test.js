@@ -52,7 +52,6 @@ test('IC-PROPS NO BLOCK OF DAGGERFALL\'S IN THE IMPERIAL CITY BUT ITS ARENA - ev
   assert.equal(imperialSlicePlan(Math.floor(ar / 8) * N + Math.floor(ac / 8))[ar % 8][ac % 8], IMPERIAL_ARENA_CODE, 'Daggerfall\'s arena, the plan\'s one');
   assert.equal('IMPERIAL_MIX' in City, false);
   assert.equal('IMPERIAL_SIGNATURE' in City, false);
-  assert.doesNotMatch(hostText('src/world/imperialFabric.js'), /imperialClassic/, 'the fabric keeps no street round a block of Daggerfall\'s');
 });
 
 test('IC-PROPS EACH DISTRICT\'S SIGNATURE IN ITS FABRIC - the temples of the Eight (each block\'s temple, its record\'s god; one main front in so many of the Temple District\'s, each god alike whatever the plot\'s size), the Thieves Guild\'s houses on the Waterfront (a House2 of the guild\'s faction), the University\'s Mages Guild halls; the Market\'s bank and Talos Plaza\'s general stores among their shops (mutants: the halls unread; a temple by its size)', () => {

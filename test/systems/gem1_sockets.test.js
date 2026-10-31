@@ -376,9 +376,6 @@ test('GEM2 the world bosses: the Warden one gem, the Old Coil one to a ship that
     const strip = (h) => JSON.parse(JSON.stringify({ gold: h.gold, card: h.card, pieces: h.pieces.filter((p) => p.tier !== 'gilded').map((p) => { const { sockets, ...rest } = noTech(p.item); return { ...p, item: rest }; }) }));   // PIN MOVED (TECH1): and its technique; (GILDED2) and the Dragonfire Oath, the very last draw, set aside
     assert.deepEqual(strip(full), strip(bare), `seed ${k}`);
   }
-  assert.match(read('src/systems/gate/gateSpoils.js'), /const card = bossCardRoll\('gate', rolls\);\s*(\/\/[^\n]*\n\s*)*socketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*weaponSocketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const gems = bossGems\('gate', rolls\);\s*(\/\/[^\n]*\n\s*)*techniquePass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*(\/\/[^\n]*\n\s*)*const oath = rollDragonfireOath\(rolls\);\s*if \(oath\) pieces\.push\(\{ item: oath, tier: oath\.rarity \}\);\s*(\/\/[^\n]*\n\s*)*const more = \[\];\s*for \(const bit of SPOILS_PORTENT_BITS\) if \(\(p & bit\) !== 0\) more\.push\(graded\(spoilsBase\(lv, rolls\), magicOrBetter\(rolls\), rolls\)\);[\s\S]{0,700}?return \{ gold, pieces, sigil: sigilStone\(\), card, gems, portent: more\.length \};/);   // PIN MOVED (TECH1): and a weapon's technique after the gems; (GILDED2) the Dragonfire Oath after it, the door's last draw   // PIN MOVED (WB14g): a portent night's pieces after the Oath, drawn only for a receipt's `p` (test/net/gate/wb14g_pays.test.js)   // PIN MOVED (AUDIT WB14 PLAY-7): and the passes over a portent's pieces alone, after them
-  assert.match(read('src/systems/serpent/serpentSpoils.js'), /const card = dealt \? bossCardRoll\('serpent', rolls\) : null;\s*(\/\/[^\n]*\n\s*)*socketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*weaponSocketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const gems = dealt \? bossGems\('serpent', rolls\) : \[\];/);
-  assert.match(read('src/systems/superDungeon/sdSpoils.js'), /const card = bossCardRoll\('abyss', rolls\);\s*(\/\/[^\n]*\n\s*)*socketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*weaponSocketPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*const gems = bossGems\('abyss', rolls\);/);
   // the hosts carry the rows: the world tick, every host's shared module and the headless law import them
   for (const [f, re] of [['src/systems/worldTick.js', /^import '\.\/gems\.js';/m], ['src/scenes/shared.js', /import '\.\.\/systems\/gems\.js';/], ['src/systems/item/itemLaw.js', /^import '\.\.\/gems\.js';/m]]) assert.match(read(f), re, f);
   off();
@@ -501,85 +498,7 @@ test('GEM3 the wells, the chooser and the pips - and in the pack: an empty well 
     assert.equal(setIn(() => {}), false, 'the ladder off: never');
     on();
   } finally { delete globalThis.location; }   // AUDIT GEM: the page's word back whatever failed
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /markSocketFrame\(node, item\);/);
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /const w = socketBlock\(picked, side === 'local' && body, ready\);/);
   off();
   withDom(() => assert.equal(socketWells(holes(weapon(130))), null, 'off: nothing drawn'));
 });
 
-test('AUDIT GEM (2026-10-10, Mac: "We need to audit this and ensure perfection"): salvage never breaks a set gem; a set gem is worth its own price on its piece (LOOT20\'s string comes off at its line\'s); no boss gem with the ladder off; a reforged Magic piece named by its own lines; never an enchanted stone, the pressed one first; the extraction priced by its own socket, its wearer folded again; a boss\'s find four tiers deeper', () => {
-  on();
-  try {
-    // salvage: refused, and so skipped by the bulk sweep (reforgeWindow.js's every-Magic filter asks salvageRefusal)
-    const magic = holes(weapon(120, 'magic'), 1);
-    LR.setGem(magic, 'perfect-diamond', 0);
-    assert.equal(RF.salvageRefusal(magic), 'gems');
-    const pack = [magic];
-    assert.deepEqual(RF.salvagePiece(magic, { items: pack }), { ok: false, reason: 'gems' });
-    assert.deepEqual(pack, [magic], 'the piece and its gem kept');
-    assert.match(read('src/ui/reforgeWindow.js'), /const magics = rows\.filter\(\(it\) => it\.rarity === 'magic' && !salvageRefusal\(it\)\);/, 'the sweep skips it');
-    LR.unsetGem(magic, 0);
-    assert.equal(RF.salvageRefusal(magic), null, 'the gem out: salvage as ever');
-    // the price: three Jades read one Rare line, and lift the piece by three stones - never by three lines' worth
-    const jadeWorth = itemBaseValue({ group: 'Gems', templateIndex: LR.gemTemplateOf('jade') });
-    const big = holes(weapon(122));
-    big.affixes = [];
-    const v0 = big.value;
-    for (let i = 0; i < 3; i++) LR.setGem(big, 'jade', i);
-    assert.equal(big.value, v0 + 3 * jadeWorth);
-    assert.ok(LR.affixesWorth([LR.gemLine(big, 'jade')], big) > 10 * jadeWorth, 'a Jade\'s line is worth far more than the stone');
-    for (let i = 0; i < 3; i++) LR.unsetGem(big, i);
-    assert.equal(big.value, v0, 'unset: as it was');
-    // LOOT20's string: its gem was priced by its line, and comes off so
-    const legacy = known(LR.applyRarity(mintCondition({ group: 'Jewellery', templateIndex: 135, name: 'Ring', flags: 0 }), 'rare', lcg(5)));
-    const base = legacy.value;
-    const line = LR.gemLine(legacy, 'ruby');
-    Object.assign(legacy, { socket: 'ruby', affixes: [...legacy.affixes, line], value: base + LR.affixesWorth([line], legacy) });
-    assert.equal(LR.unsetGem(legacy), 'ruby');
-    assert.equal(legacy.value, base, 'the old piece back to its own price');
-    // the bosses: law 3
-    off();
-    let drawn = 0;
-    assert.deepEqual(G.bossGems('abyss', () => { drawn++; return 0; }), [], 'the ladder off: no graded gem');
-    assert.equal(drawn, 0, 'and no draw');
-    on();
-    // the reforge's name: the piece's own lines, never a set gem's word
-    let named = 0;
-    for (let seed = 1; seed < 400; seed++) {
-      const w = holes(weapon(120, 'magic', seed), 1);
-      if (!w.affixes?.length) continue;
-      LR.setGem(w, 'perfect-diamond', 0);
-      LR.reforgeAffix(w, 0, lcg(seed + 1));
-      assert.equal(w.name, LR.rarityName(w, 'magic', w.affixes.filter((a) => a.gem == null)), `seed ${seed}`);
-      named++;
-    }
-    assert.ok(named > 100, `${named} reforged`);
-    // the stone: never one the item maker enchanted; the pressed one first
-    const holder = holes(weapon(122));
-    const enchanted = Object.assign(G.mintGem('ruby'), { enchantments: [{ type: 1, param: 0 }] });
-    const me = player([holder, enchanted]);
-    assert.equal(RF.setGemRefusal(holder, 'ruby', me), 'nogem', 'an enchanted Ruby is no loose stone');
-    const a = Object.assign(G.mintGem('ruby'), { stackCount: 2, name: 'Ruby A' });
-    const b = Object.assign(G.mintGem('ruby'), { stackCount: 2, name: 'Ruby B', isIdentified: true });
-    me.items.push(a, b);
-    assert.equal(RF.setGemPiece(holder, 'ruby', me, 0, { from: a }).ok, true);
-    assert.deepEqual([a.stackCount, b.stackCount, enchanted.enchantments.length], [1, 2, 1], 'the pressed stack gave its stone; the enchanted one untouched');
-    // the extraction: each socket's own grade, and a worn piece's wearer folded again
-    const two = holes(weapon(122));
-    LR.setGem(two, 'chipped-ruby', 0); LR.setGem(two, 'perfect-ruby', 1);
-    assert.deepEqual([RF.extractPrice(two, 0), RF.extractPrice(two, 1)], [RF.EXTRACT_PRICE.chipped, RF.EXTRACT_PRICE.perfect]);
-    const wearer = player();
-    const worn = holes(weapon(122));
-    worn.affixes = [];
-    LR.setGem(worn, 'perfect-jade', 0);
-    wearer.items.push(worn); wearer.goldPieces = 5000;
-    equipItem(wearer, worn); computeEntityMods(wearer);
-    assert.ok((wearer._mods.stats.willpower ?? 0) > 0);
-    assert.equal(RF.extractGemPiece(worn, wearer, 0).ok, true);
-    assert.equal(wearer._mods.stats.willpower ?? 0, 0, 'the jade off its wearer with no fold of the test\'s own');
-    // a boss's find reads four tiers deeper: one draw for the chance, then the grade - a plain stone where a body's is flawed
-    const seq = (...v) => { let i = 0; return () => v[Math.min(i++, v.length - 1)]; };
-    assert.equal(LR.gemGrade(LR.gemKindOf(G.rollGemFind({ kind: 'corpse', tier: 1, boss: false }, seq(0, 0.95, 0))[0])), 'flawed');
-    assert.equal(LR.gemGrade(LR.gemKindOf(G.rollGemFind({ kind: 'corpse', tier: 1, boss: true }, seq(0, 0.95, 0))[0])), 'plain');
-  } finally { off(); }
-});

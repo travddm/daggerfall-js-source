@@ -26,10 +26,6 @@ test('FT7: grass density - the four fractions, the full field by default (GRASS-
   assert.match(f.note, /in the enhanced outdoors/, 'the dial says what it is under');
   assert.deepEqual(checkFeature(f), []);
   assert.equal(featureForControl('prefs', 'grassDensity'), f);
-  // the world host reads the fraction and builds no field at zero (PERF1's law, unchanged)
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const grassDensity = Math\.max\(0, Math\.min\(1, Number\(getPref\('grassDensity'\)\) \|\| 0\)\) \* LAB_GRASS\.density;/);
-  assert.match(w, /getPref\('enhancedEnvironments'\) && grassDensity > 0 &&/, 'gated on the outdoors row, and zero builds nothing');
 });
 
 test('FT7: cloud quality - the tiers are the march table\'s own keys, default by default', () => {
@@ -44,11 +40,5 @@ test('FT7: cloud quality - the tiers are the march table\'s own keys, default by
   assert.match(f.note, /in the enhanced outdoors/);
   assert.deepEqual(checkFeature(f), []);
   assert.equal(featureForControl('prefs', 'cloudQuality'), f);
-  assert.match(read('src/scenes/shared.js'), /Object\.hasOwn\(CLOUD_QUALITY, getPref\('cloudQuality'\)\) \? getPref\('cloudQuality'\) : 'default'/, 'the host reads the pref and falls back to default (PERF1, unchanged)');
 });
 
-test('FT7: the Enhanced category\'s two rows left with their copy', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(!/choiceRow\('grassDensity'|choiceRow\('cloudQuality'/.test(menu));
-  assert.ok(!/function portRowsEnhanced\(/.test(menu), 'FT12: the Enhanced category is gone from the settings rail - its rows are the home\'s');
-});

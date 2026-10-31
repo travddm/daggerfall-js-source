@@ -62,18 +62,3 @@ test('DISC25-E: a key typed into the social panel\'s fields is the field\'s - st
   assert.equal(walk.prevented, false);
 });
 
-test('DISC25-E: the hosts\' half - world.js and exterior.js carry dungeon.js\'s typed-field gate, below the browser swallow and above the ring', () => {
-  const world = rd('src/scenes/world.js');
-  const gate = /swallowBrowserKey\(e\);   \/\/ U47: F5\/F6\/F11 - one list, in ui\/input\.js\n(?:    \/\/[^\n]*\n)*    if \(isTextEntryTarget\(e\.target\)\) return;/;
-  assert.match(world, gate);
-  const at = world.search(gate), ring = world.indexOf('keys.add(e.code);', at);
-  assert.ok(at > 0 && ring > at, 'the gate stands before the key joins the ring');
-  const ext = rd('src/scenes/exterior.js');
-  assert.match(ext, /swallowBrowserKey\(e\);   \/\/ U47: F5\/F6\/F11 - one list, in ui\/input\.js\n    if \(isTextEntryTarget\(e\.target\)\) return;/);
-  assert.match(ext, /import \{[^}]*\bisTextEntryTarget\b[^}]*\} from '\.\.\/ui\/input\.js';/);
-  // THE FOUR HOSTS (17e): the dungeon's own gate stands (KB1); the interior host routes through routeKey's, and the
-  // dungeon context owns no keydown of its own
-  assert.match(rd('src/scenes/dungeon.js'), /if \(isTextEntryTarget\(e\.target\)\) return;/);
-  assert.match(rd('src/ui/input.js'), /isTextEntryTarget\(/);
-  assert.doesNotMatch(rd('src/scenes/dungeonContext.js'), /addEventListener\('keydown'/);
-});

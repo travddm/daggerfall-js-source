@@ -96,13 +96,10 @@ test('WB12a the names on screen: the plaque, the banner and the map\'s legend sa
   assert.equal(GATE_CLAIM_TEXT.guest, 'Breach not recorded. Add a username within a week to keep it.');
   assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.');   // SILVER: the currency's name; PIN MOVED (SILVER-WAYS): the day's cap the gates' and the raids'; PIN MOVED (EG-E1): and the Spire's Redoubts', under the same cap; PIN MOVED (STAR7): and the held stars'
   assert.equal(profileGateLine({ gates: { closed: 3 } }), 'Breaches closed: 3');
-  assert.match(read('src/ui/enhanced/enhancedAccount.js'), /if \(gates\) row\(t\('account\.card\.gates', 'Breaches closed'\), gates\);/);   // L10N4 (PIN MOVED): the row's word through t()
   assert.equal(accountRefusalText('short'), 'Your account has too few embers for that.');   // AUDIT WB12d (A4): a rite's ember counts
   assert.deepEqual([BROKER_TEXT.trade, BROKER_TEXT.steal, BROKER_TEXT.gone], ['Trades in Deadlands Embers', 'The Broker\'s eyes never leave her embers.', 'The Sigil Broker leaves for the night.']);   // BROKER-CAGE: midnight takes her, not the breach (a Warden fallen early leaves her standing)
   assert.equal(INSIGNIA_LINE.title, 'A title worn over your name');
   assert.ok(INSIGNIA_CARD.title[1].includes('the breach\'s fire') && /your account's embers/.test(INSIGNIA_CARD.title[2]) && /your account's embers/.test(INSIGNIA_CARD.aura[2]));   // AUDIT WB12d (A4)
-  assert.match(read('src/scenes/world.js'), /return \{ subject: 'Dagon\\'s Breach', body: state \? `Near \$\{near\}\. /);
-  assert.match(read('src/systems/sigil/sigilSetPowers.js'), /Wrath of the Warden! \$\{struck\} \$\{struck === 1 \? 'foe' : 'foes'\} struck\./);
 });
 
 test('WB12a the arch is still the gate: pressed it answers as a gate, the relay\'s refusal words are protocol and keep their bytes, the Gatebreaker title and the Burning Court stay (mutants: the protocol renamed)', () => {

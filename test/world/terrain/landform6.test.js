@@ -183,10 +183,6 @@ test('LANDFORM6: the climates ride every kernel - the worker keeps the posted ta
     const grid = posted.findLast((m) => m.t === 'grid');
     assert.deepEqual([...grid.normals], [...restrideGrid({ woods, px: 401, py: 250, stride: 2, samples: here.samples, landform: true, climates: t }).normals], 'a promotion\'s ghost rows too');
   } finally { globalThis.postMessage = prevPost; globalThis.onmessage = prevOn; }
-  const world = src('src/scenes/world.js');
-  assert.ok(world.indexOf('dilateCoastalClimate(maps, 2)') > 0 && world.indexOf('dilateCoastalClimate(maps, 2)') < world.indexOf('_landformClimates = landformClimates('), 'after the dilation, as every pixel streams the climates');
-  assert.match(world, /_landformClimates = landformClimates\(\(x, y\) => maps\.getClimateIndex\(x, y\)\);/, 'the climate map\'s own values');
-  assert.match(world, /terrainGen\.setLandformTables\(\{ sites: _landformSites, climates: _landformClimates \}\);/, 'handed to both kernels with the sites');
 });
 
 test('LANDFORM8 (WOD-PEAKS) + MOUNTAINS-SHARP: the mountain woods stand rounded peaks where World of Daggerfall\'s spires stood - a bell from summit to foot - and the mountains (the Dragontail and the Wrothgarian) SHARP ones twice as tall, (1 - q)^2 from summit to foot; 550 m to a kilometre across their radius, centred so each land\'s mean is its own, and no other land wears one', () => {

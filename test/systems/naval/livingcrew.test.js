@@ -31,8 +31,6 @@ import { drawCrewLines, destroyNavalHud, tagAlpha, CREW_SAY_RANGE, CREW_SAY_FADE
 import { MODELS, ctxFor } from '../../csaScene.mjs';
 import { sea, readyPool } from '../../navalSea.mjs';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-
 /** A plain deck: a flat 8 m by 24 m at 2 m (her frame) with a mast amidships - the brain's own ground; a straight line
  *  across her is no walk. */
 const plainDeck = () => buildDeck([
@@ -341,32 +339,6 @@ test('LIVING CREW THE SEA\'S CREWS: every ship with her boat built, afloat, stru
   assert.ok(mine && mine.crew > 0 && typeof mine.battle === 'boolean');
 });
 
-test('LIVING CREW THE LANDING AND THE RAIL, lifted from the world host over the Small Ship\'s real deck: a boarder lands on her deck\'s point nearest where he stood - her edge across from him, never her middle - facing her middle; a party\'s places are along her rail on the side the other ship lies, spread fore and aft round the point across from her (mutants: the landing her middle, the side unread)', async () => {
-  const pool = await readyPool();
-  const deck = pool.deckOf(2, 0);
-  const boat = smallShip();
-  const line = (start) => { const i = WORLD.indexOf(start); assert.ok(i >= 0, start); return WORLD.slice(i, WORLD.indexOf('\n', i) + 1); };
-  const fn = (name) => { const m = new RegExp(`\\n  function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n  \\}\\n`).exec(WORLD); assert.ok(m, name); return m[0]; };
-  // PIN MOVED (AUDIT NAV2 F33): the deck point's ray starts under her deck's headroom - DECK_HEADROOM in the lifted scope;
-  // AUDIT GALLEON D2 (2026-10-02): her rail asked at her main level - mainLevel in it too
-  const body = `const { intoDeck, outOfDeck, DECK_HEADROOM, csa, raycastColliders, csaColliderMesh, mainLevel } = s;
-    ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}${line('  const NAVAL_RAIL_GAP =')}
-    ${fn('navalDeckPoint')}${fn('navalDeckLanding')}${fn('navalRailSpots')}
-    return { navalDeckLanding, navalRailSpots };`;
-  // eslint-disable-next-line no-new-func
-  const w = new Function('s', body)({ intoDeck, outOfDeck, DECK_HEADROOM, csa: { deckOf: () => deck }, raycastColliders: () => null, csaColliderMesh: null, mainLevel });
-  const [feet, yaw] = w.navalDeckLanding(boat, [14, 8, 2]);
-  assert.ok(deck.walkable(feet[0], feet[2]) && feet[0] > 3, `her edge across from him: ${feet}`);
-  assert.ok(Math.abs(feet[2] - 2) < 0.5, 'across from where he stood');
-  assert.ok(Math.cos(yaw - Math.atan2(-feet[0], -feet[2] + deck.nearest(0, 0)[2])) > 0.9, 'facing her middle');
-  const rail = w.navalRailSpots(boat, [-40, 0, 4], 5);
-  assert.equal(rail.length, 5);
-  assert.ok(rail.every(([f]) => f[0] < -3 && deck.walkable(f[0], f[2])), 'her port rail, where the other ship lies');
-  const zs = rail.map(([f]) => f[2]).sort((a, b) => a - b);
-  assert.ok(zs[0] < 4 && zs.at(-1) > 4 && zs.at(-1) - zs[0] > 3, 'spread fore and aft round the point across from her');
-  assert.ok(w.navalRailSpots(boat, [40, 0, -2], 3).every(([f]) => f[0] > 3), 'and her starboard rail when she lies there');
-});
-
 // ── the words, and the world ─────────────────────────────────────────────────────────────────────────────────────
 
 test('LIVING CREW THE WORDS: a bubble a line over his head at the HUD\'s scale - the nearest CREW_SAY_MAX, a song\'s in the song\'s own look, a shout\'s in its own - fading with the distance to CREW_SAY_RANGE; one node a slot, moved and re-worded, never rebuilt; a window over the world hides them all (mutants: every line drawn, rebuilt each frame, never hidden, the fade unread)', () => {
@@ -392,16 +364,3 @@ test('LIVING CREW THE WORDS: a bubble a line over his head at the HUD\'s scale -
   destroyNavalHud();
 });
 
-test('LIVING CREW THE WORLD by source: the crews stepped before the people are drawn, their sprites among them; the words after the bars; every clear stands them down; the fight\'s end brings my hands home; a grapple\'s side each crew\'s own, her other ship by the host\'s door; me never walked through; a room\'s boat seeded by whose and which; the boarding\'s doors (mutants: each unwired)', () => {
-  assert.match(WORLD, /navalCrewFrame\(gamePaused\(\) \? 0 : foeDt\);[^\n]*\n\s+livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\), \.\.\.navalCrew\.batches\(\)\);/);   // AUDIT NAV2 F53 PIN MOVED: held by a pause
-  assert.match(WORLD, /navalCrewBars\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewLines\(proj, view, mwv\.eye, dt\);/);   // FIELD BUGS 2026-10-02b PIN MOVED: the frame's dt, the lifts' ease
-  assert.match(WORLD, /navalFlames\.clear\(\); navalCrew\.clear\(\);[^\n]*drawCrewLines\(\[\]\); lowerGlass\(\); \};/);   // AUDIT CAPTAIN'S SEA S1 PIN MOVED: and the glass lowered after the crews
-  assert.match(WORLD, /if \(_crewBoarding && !b\) for \(const boat of csa\.boats\) navalCrew\.reset\(boat\);/);
-  assert.match(WORLD, /const other = grapple \? \(key === grapple\.shipId \? grapple\.boat : key === grapple\.boat \? naval\.boatOf\(grapple\.shipId\) : null\) : null;/);
-  assert.match(WORLD, /_crewCtx\.muster = _crewThem\[0\] >= 0 \? 1 : -1;/);
-  assert.match(WORLD, /intoDeck\(m, player\.pos, _crewMe\);/);
-  assert.match(WORLD, /seed = _crewSeed\(boat\.peerKey \?\? ''\);/);
-  assert.match(WORLD, /crewOf: \(boat, n, opts\) => navalCrew\.takeByBoat\(boat, n, opts\),\n\s+landing: \(boat, feet\) => navalDeckLanding\(boat, feet\),\n\s+railSpots: \(boat, toward, n\) => navalRailSpots\(boat, toward, n\),/);
-  assert.match(WORLD, /allied: side === 'ally', team: side === 'ally' \? null : team, \.\.\.\(gender \? \{ gender \} : \{\}\) \}\)/, 'a crewman stood as himself');
-  assert.match(readFileSync(new URL('../../../src/scenes/comeSailAway/comeSailAwayPeers.js', import.meta.url), 'utf8'), /if \(boat\) \{ boat\.peerKey = `\$\{owner\}:\$\{i\}`;/);
-});

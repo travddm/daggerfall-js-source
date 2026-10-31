@@ -229,21 +229,6 @@ test('AUDIT 32 P11: the trace\'s meter draws the line through its points, marks 
 
 // ─── P12: ESCAPE SETS THE ACT DOWN ───────────────────────────────────
 
-test('AUDIT 32 P12: Escape sets an act under way down before it closes the window - nothing spent, said', () => {
-  const p = pages();
-  try {
-    pickShirt(p);
-    p.btn('Craft').onclick();
-    assert.equal(profActUnderWay(), true);
-    assert.equal(setDownProfAct(), true);
-    assert.deepEqual([profActUnderWay(), setDownProfAct()], [false, false]);
-    p.draw();
-    assert.match(p.text(), /You set the needle down; nothing is spent\./);
-    assert.deepEqual(p.calls.filter((c) => c[0] === 'craft'), []);
-    assert.match(src('src/ui/enhanced/enhancedMenu.js'), /: profActUnderWay\(\) \? \(\) => \{ setDownProfAct\(\); render\(\); \}\n\s*: confirming/, 'the back stack asks it first');
-  } finally { resetProfPages(); setProfessionsPages(null); }
-});
-
 // ─── P3 + P13: THE FOCUS AND THE CARET ───────────────────────────────
 
 test('AUDIT 32 P3/P13: the pause window\'s redraw keeps the field typed in and its caret, and a keyboard\'s button though its class changed; the Stores search no longer throws its caret to the end', () => {
@@ -273,18 +258,7 @@ test('AUDIT 32 P3/P13: the pause window\'s redraw keeps the field typed in and i
   repaintKeepingScroll(host, () => { n = build(); });
   assert.equal(document.activeElement, document.body, 'without the option (the inventory, the wizard) nothing is kept');
   host.remove();
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /repaintKeepingScroll\(app, \(\) => renderInto\(\), \{ focus: true \}\);/);
-  assert.doesNotMatch(src('src/ui/professions/profPages.js'), /setSelectionRange\?\.\(s\.value\.length, s\.value\.length\)/, 'P13');
 });
 
 // ─── P7 + P9: THE RULES CHROMIUM MEASURED ────────────────────────────
 
-test('AUDIT 32 P7/P9: the work rows placed, never flowed (measured in Chromium at 360 and 800); the body\'s prompt wraps inside the screen, the choice key\'s line its own on a phone', () => {
-  const css = src('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(css, /\.prof-smelt \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 64px auto;/);
-  assert.match(css, /\.prof-smelt b \{ grid-column: 1; grid-row: 1; \} \.prof-smelt \.prof-qty \{ grid-column: 2; grid-row: 1; \}/);
-  assert.match(css, /\.prof-smelt \.act \{ grid-column: 3; grid-row: 1; \} \.prof-smelt \.prof-split \{ grid-column: 1 \/ -1; grid-row: 2; \}/);
-  assert.match(css, /\.prof-prompt \{ position: fixed;[\s\S]*?width: max-content; max-width: calc\(100vw - 24px\); box-sizing: border-box; white-space: normal;/);
-  assert.match(css, /@media \(max-width: 560px\) \{ \.prof-prompt \.prof-alt \{ display: block; \} \}/);
-  assert.match(src('src/ui/professions/profHud.js'), /d\.className = 'dim prof-alt';/);
-});

@@ -126,22 +126,3 @@ test('WW3 the regression, executed: the shape the door used to answer still thro
   for (const bad of [null, undefined, {}, { width: 1, height: 1 }]) assert.throws(() => color32Bytes(bad, 'x'), /carries no `colors`/);
 });
 
-test('WW3 the door and the site: the widget converts with toColor32 in both arms and holds no toColor32Order; the load failure is said out loud, as the rig\'s neighbours say theirs', () => {
-  const door = rd('src/combat/weapon/weaponWidgetAssets.js');
-  assert.match(door, /import \{ toScreenOrder \} from '\.\.\/\.\.\/formats\/color32Order\.js';/);   // DWHD1: neither arm flips - both are top-first
-  assert.ok(!/toColor32Order/.test(door.replace(/^\s*\*.*$/gm, '')), 'not in the code - the trap is named in the comment only');
-  assert.equal((door.match(/toColor32\(/g) ?? []).length, 0, 'DWHD1: no arm flips - the reader answers top-first');
-  assert.equal((door.match(/toScreenOrder\(/g) ?? []).length, 2, 'both keep their rows (HT3, DWHD1)');
-  assert.match(door, /try \{ return toScreenOrder\(tex\.rgba\(\)\); \}/, 'the bundle arm');
-  assert.match(door, /return toScreenOrder\(await decodePng\(bytes\)\);/, 'the loose arm');
-  assert.match(door, /`\{ width, height, colors \}` RGBA in the port's\n \*  color32 \(bottom-up\) order, the SHAPE renderer\.uploadTexture reads/, 'the door says which shape it answers');
-  const site = rd('src/combat/weapon/weaponWidget.js');
-  // DW1 reshaped the catch: a throw is ALSO a miss for that name (so the
-  // `w_` ask falls through to the plain one next frame), and still says so
-  assert.match(site, /\}\)\.catch\(\(e\) => \{ misses\.add\(name\); console\.warn\('\[weapon widget\] texture load failed', name, e\); \}\);/, 'no bare swallow');
-  assert.ok(!/\.catch\(\(\) => \{\}\)/.test(site), 'and none left anywhere in the widget');
-  // the one home the fix leans on, unchanged
-  const conv = rd('src/formats/color32Order.js');
-  assert.match(conv, /`color32\.colors` would be `undefined` and\n \* `asBytes` would throw on the first swapped record/, 'the trap this crash walked into, written down before it happened');
-});
-

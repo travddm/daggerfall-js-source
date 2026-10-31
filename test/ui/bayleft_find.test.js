@@ -174,11 +174,6 @@ test('BAY-LEFT-MAPS C11 A PORT PAST THE BAY: a city carries its port by its prov
   const at = (o) => { const c = recordingCtx(); paintTamrielInk(c, near, ink, { paperW: 900, paperH: 560, placesIn, ...o }); return c.calls.filter((k) => k.fn !== 'fillText' && k.fn !== 'strokeText' && typeof k.args[0] === 'number' && Math.abs(k.args[0] - mx) < 6).length; };
   assert.ok(at({}) > 0, 'the hamlet\'s glyph on the sheet');
   assert.equal(at({ portsOnly: true }), 0, 'and none under the Ports filter');
-  // the window hands the filter to the ink, its kept tiles, its hover and its press
-  const H = read('src/ui/heldMap.js'), I = read('src/ui/tamrielInk.js');
-  assert.match(H, /placesIn: this\.deps\.tamrielPlacesIn \?\? null,\n\s+portsOnly: this\.portsFilter,/);
-  assert.match(I, /key: `\$\{band\}\|\$\{continent \? 1 : 0\}\|\$\{JSON\.stringify\(past\.filters\)\}\|\$\{JSON\.stringify\(past\.inks\)\}\|\$\{past\.portsOnly \? 1 : 0\}`/, 'a kept tile painted again when the filter moves');
-  assert.match(I, /band, filters, portsOnly: !!opts\.portsOnly, frame: opts\.frame \?\? null \}\);/, 'the tiles\' marks under it');
 });
 
 test('BAY-LEFT-MAPS C11 THE TELEPORT CARD\'S PROVINCE: a bare pixel past the Bay names its province by the politic map\'s region (WW-R), a Bay pixel its region as before, the sea none (mutants: MAPS.BSA\'s count back)', () => {

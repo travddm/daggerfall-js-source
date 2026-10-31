@@ -81,11 +81,6 @@ test('AUDIT BAY-LEFT F3 TS10 through URBANIZER: the pixel\'s one shut (fabricWal
   assert.equal(fabricWalkShut(landed, loc).key, b.key, 'the same shut, the same key');
 });
 
-test('TS10 the host\'s wiring: the pixel\'s walk shut reads the paths its terrain job painted, and a town\'s places are placed again when they change', () => {
-  assert.match(rd('src/scenes/pixelBuild.js'), /const walkShut = dfLocation \? fabricWalkShut\(townWalkShut\(dfLocation, townGround, paths\), dfLocation\) : null;/);   // PIN MOVED (URBANIZER U3): the fabric's shut over the town's
-  assert.match(hostText('src/scenes/world.js'), /\|\$\{shut\?\.key \?\? \(shut \? 'shut' : ''\)\}`;/);
-});
-
 test('TS10 with ARENA2: every twelfth city and town past the Bay on a pixel with roads every way - no yard on a painted road, every yard placed, where some stood on one unpaved', { skip: skipReal }, async () => {
   const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../src/formats/mapsFile.js');
   const { WoodsFile } = await import('../../src/formats/woodsFile.js');

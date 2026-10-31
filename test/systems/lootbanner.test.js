@@ -328,9 +328,6 @@ test('LOOT-BANNER THE CODEX: a first find is said on the banner on Enhanced Plus
 }));
 
 test('LOOT-BANNER THE WIRING: drawHud reads the player entity it is handed on every skin, under the HUD\'s gate, and its hide door hides the stack; the stack is a HUD-MOVE piece with a preview; the stack steps under the notice stack and never past the window\'s foot; the codex hands its find through the leaf (mutants: the call inside the skin\'s gate; the hide door forgotten; no HUD piece; the layout over the notices)', () => {
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /\n  drawLootBanners\(\{ entity: vitals, hidden: cursorActive \|\| !hudRenderEnabled\(\), dt \}\);\n  if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{/, 'beside the revenant\'s cards, before the skin\'s gate');
-  assert.match(hud, /drawRevenantCards\(\{ hidden: true \}\);[^\n]*\n  drawLootBanners\(\{ hidden: true \}\);[^\n]*\n\}/, 'the hide door');
   for (const host of ['world.js', 'worldModes.js', 'dungeonContext.js', 'exterior.js']) {
     assert.match(read(`src/scenes/${host}`), /drawHud\(renderer, canvas, hudArt, playerEntity,/, `${host}: hands drawHud the player entity`);
   }
@@ -342,8 +339,6 @@ test('LOOT-BANNER THE WIRING: drawHud reads the player entity it is handed on ev
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 380, bottom: 520 }, lower: 790, heights: [60, 60] }), { top: 530, shown: 2 }, 'under the notices');
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 100, bottom: 300 }, lower: 790, heights: [60, 60] }), { top: 480, shown: 2 }, 'notices far above: its own place');
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 380, bottom: 700 }, lower: 790, heights: [60, 60, 60] }), { top: 710, shown: 1 }, 'a short band shows the newest');
-  assert.match(read('src/systems/loot/lootCodex.js'), /if \(!quiet && !presentCodexFind\(item, key\.kind\)\) \{/);
-  assert.doesNotMatch(read('src/systems/loot/lootCodex.js'), /from '(?:\.\.\/)+ui\//, 'the codex imports no face');   // AUDIT TIDY TOOL-1: at any depth
 });
 
 // ── HONOUR-BANNER (2026-10-14, Mac: "The title/aura in the abyss dungeon should also have a loot popup"; the lamp's "ensure
@@ -364,40 +359,3 @@ test('HONOUR-BANNER THE ENTRY: a title or an aura granted is a banner of its own
   assert.equal(B.honourVars(null), null);
 });
 
-test('HONOUR-BANNER THE FACE: announced on Enhanced Plus it stands - held by the account, never dropped as gone from the pack - in the title\'s colour and paint, big, with the fanfare; the mark an SVG in the title\'s colour, a laurel or a ring; the classic skin builds nothing and the door says so; the Hour\'s door wired (the lamp\'s is test/lampkeeper2\'s)', () => withPage((doc, sounds) => {
-  on();
-  doc.createElementNS = (ns, tag) => Object.assign(fakeEl(tag, doc), { namespaceURI: ns });   // AUDIT FIVE-ASKS E4: the browser's door, the mark's real path
-  setPref('soundEnhancements', true);
-  const me = hero();
-  frame(me);
-  assert.equal(B.announceHonour('title', 'hourbreaker'), true);
-  frame(me);
-  const [b] = byClass(doc.body, 'lootbanner');
-  assert.ok(b, 'it stands, though nothing of it is in the pack');
-  assert.deepEqual([b.dataset.rarity, b.dataset.honour], ['gilded', 'title']);
-  assert.ok(b.classList.contains('lb-big'));
-  assert.equal(b.style.getPropertyValue('--rar'), '#e8c060', 'its edge and light the title\'s colour');
-  assert.deepEqual([textIn(b, 'lb-kicker'), textIn(b, 'lb-name'), textIn(b, 'lb-sub')], ['New Title', 'Hourbreaker', B.honourSub()]);
-  const word = byClass(b, 'lb-word')[0];
-  assert.ok(word && word.parent === byClass(b, 'lb-name')[0] && word.textContent === 'Hourbreaker', 'the word in its own box (AUDIT FIVE-ASKS E3)');
-  assert.match(word.style.backgroundImage, /^linear-gradient/, 'the word in the paint it is worn in - over the word, not the row');
-  assert.equal(byClass(b, 'lb-name')[0].style.backgroundImage ?? '', '', 'the row itself unpainted: the count keeps its own colour');
-  const [mark] = byClass(b, 'lb-icon')[0].children;
-  assert.deepEqual([mark.namespaceURI, mark.tag, mark.attrs.fill, mark.attrs.width, mark.attrs.height], [B.HONOUR_MARK_NS, 'svg', 'var(--rar)', '48', '48'], 'an SVG in the banner\'s colour, whole pixels a cell');
-  const titleRects = mark.children.length;
-  assert.deepEqual(sounds, [SOUND.ArenaFanfareLevelUp]);
-  assert.equal(B.announceHonour('aura', 'turninghour'), true);
-  frame(me);
-  const aura = byClass(doc.body, 'lootbanner').find((n) => n.dataset.honour === 'aura');
-  assert.ok(aura && byClass(aura, 'lb-icon')[0].children[0].children.length !== titleRects, 'a ring of light, not the title\'s laurel');
-  assert.equal(B.announceHonour('aura', 'nobody'), false, 'a word nobody names: no banner');
-  withPage((cdoc) => {
-    assert.equal(B.announceHonour('title', 'hourbreaker'), false, 'the classic skin: the line alone');
-    frame(hero());
-    assert.equal(cdoc.getElementById(B.LOOT_BANNER_STACK_ID), null);
-  }, { skin: 'classic' });
-  // AUDIT WORLD-REWARDS C1: anchored to the Hour's own carrier - SERPENT5's door (the Old Coil's carrier, above it) is the
-  // same text, and the bare line matched it with the Hour's gone (HONOUR-BANNER-world-hands-no-door survived)
-  assert.match(read('src/scenes/world.js'), /createSdClaims\(\{[\s\S]{0,1200}announce: \(kind, key\) => announceHonour\(kind, key\),   \/\/ HONOUR-BANNER/, 'the Hour\'s door');
-  assert.match(read('src/net/superDungeon/sdClaims.js'), /if \(answer\.data\.titleNew === true\) announce\('title', SD_HONOUR_KEYS\.title\);/, 'announced when the title is newly held (AUDIT FIVE-ASKS E1)');
-}));

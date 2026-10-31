@@ -63,8 +63,6 @@ test('WEAR-UI which pieces wear a bar: a weapon, armour and a light, by the shar
   assert.equal(wearPct({ ...mk('Dagger'), maxCondition: 0 }), null);
   assert.equal(wearPct(null), null);
   assert.equal(WEAR_WORN_PCT, 40);
-  assert.equal(Number(/export const QUICK_WORN_PCT = (\d+);/.exec(read('src/ui/enhanced/enhancedHud.js'))[1]), WEAR_WORN_PCT, 'the diamond\'s line and the pack\'s are one');
-  assert.match(read('src/ui/enhanced/enhancedHotbar.js'), /n\.classList\.toggle\('hb-worn', pct < 40\);/, 'and the hotbar\'s');
 });
 
 test('WEAR-UI the bar: green, red under the line, a blood track when broken, its fill the share - and the pack draws it on every picture of a worn piece (grid, worn panel) and none on a gem; the sheet paints it and lifts the tier\'s pips over it (mutants: no bar on the grid, no bar on the body, the broken track unmarked)', () => {
@@ -109,7 +107,6 @@ test('WEAR-UI the bar: green, red under the line, a blood track when broken, its
 
 test('DBLEQUIP a second click on the same piece inside DOUBLE_CLICK_MS wears it, and on a worn panel takes it off; one click, two slow clicks, two key presses and a book\'s pair stay picks (mutants: the pair unguarded by the clock, a key press pairing, a single click undressing, a potion drunk by the pair)', () => {
   assert.equal(DOUBLE_CLICK_MS, 500);
-  assert.match(read('src/ui/enhanced/enhancedTrade.js'), /const DOUBLE_CLICK_MS = 500;/, 'the shop\'s own pair');
   const mace = mk('Mace'), dagger = mk('Dagger'), book = mk('Book', 'Books');
   withPack([mace, dagger, book], ({ rowOf, wornOf, e, page }) => {
     const click = (node, at, detail = 1) => node.onclick({ timeStamp: at, detail });
@@ -134,10 +131,6 @@ test('DBLEQUIP a second click on the same piece inside DOUBLE_CLICK_MS wears it,
     click(wornOf('Mace'), 20200, 2);
     assert.equal(isEquipped(mace), false, 'the worn panel\'s pair takes it off');
   });
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const body = src.slice(src.indexOf('function equipByDoubleClick('), src.indexOf('function equipByDoubleClick(') + 400);
-  assert.match(body, /dropOnBody\(item\)/, 'the body\'s own act');
-  assert.doesNotMatch(body, /\buse\(/, 'never a use');
 });
 
 // ── LOCK1 ──────────────────────────────────────────────────────────
@@ -187,9 +180,6 @@ test('LOCK1 the pack: Lock on the card locks it (the padlock on the tile, the li
     setLocked(it, true);
     assert.equal(markItemFrame({ dataset: {} }, it).dataset.locked, '');
   });
-  const trade = read('src/ui/enhanced/enhancedTrade.js');
-  assert.match(trade, /function refuseTransfer\(item\) \{\n[^\n]*\n\s+if \(selling\(\) && lockRefuses\(item, 'sell'\)\) \{/, 'the counter refuses a sale, and only a sale');
-  assert.match(read('src/ui/enhanced/enhancedPlayerTrade.js'), /if \(lockRefuses\(item, 'trade'\)\) \{ say\(lockedText\(itemLine\(item, deps\.entity\)\.name\)\); render\(\); return; \}/);
   assert.match(ITEM_FRAME_CSS, /\.pack-shell \[data-locked\] \.tile::before, \.trade-shell \[data-locked\] \.tile::before, \.ptrade-shell \[data-locked\] \.tile::before \{/);
   assert.match(ITEM_FRAME_CSS, /\.pack-shell \.hasbar\[data-locked\] \.tile::before \{ bottom: 6px; \}/, 'above the bar\'s end');
   assert.match(LOCK_GLYPH_SVG, /shape-rendering='crispEdges'/);

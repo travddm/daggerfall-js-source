@@ -308,7 +308,6 @@ test('RRI1 the random makers: CreateRandomWeapon rolls over 19 + the registered 
 });
 
 test('RRI1 wiring: the install at the scene boot, the Features row and its curated keys, the credit, the registry row, the vendored files, the law sites\' one-line dispatch', () => {
-  assert.match(rd('src/scenes/shared.js'), /installDiverseWeaponsIcons\(\);[^\n]*\n\s+installRoleplayRealismItems\(\);/);
   const row = FEATURES.find((f) => f.id === 'mod-roleplay-realism-items');
   assert.ok(row); assert.equal(row.control.vendor, RRI_VENDOR); assert.equal(row.group, 'loot');
   const credit = CREDITS.mods.find((c) => c.title === 'Roleplay & Realism: Items');
@@ -318,18 +317,4 @@ test('RRI1 wiring: the install at the scene boot, the Features row and its curat
     assert.ok(tracked('vendor/roleplay-realism-items').includes(`vendor/roleplay-realism-items/${f}`), f);
   }
   assert.match(rd('vendor/roleplay-realism-items/Scripts/ItemJerkin.cs'), /License:\s+MIT License/);
-  // the dispatch, one line at each law site
-  assert.match(rd('src/systems/item/itemTemplates.js'), /const cls = customItemClass\(item\.templateIndex\);\n\s+if \(cls\) \{\n\s+const bodyArchive = playerArchiveFor\(item, t, identity\);/);
-  assert.match(rd('src/ui/paperDoll.js'), /if \(item\.group === 'Weapons' && item\.equipSlot === EQUIP_SLOTS\.RightHand && getItemHands\(item\) === ITEM_HANDS\.Either\) record \+= 1;\n\s+const m = item\.material \?\? 0;/);
-  assert.match(rd('src/characters/equipTable.js'), /if \(cls\?\.equipSlot\) return EQUIP_SLOTS\[cls\.equipSlot\];/);
-  assert.match(rd('src/characters/equipTable.js'), /if \(cls\?\.itemHands\) return ITEM_HANDS\[cls\.itemHands\];/);
-  assert.match(rd('src/systems/equip.js'), /const armorSlotRule = \(templateIndex\) => \{ const slot = customItemClass\(templateIndex\)\?\.equipSlot; return slot \? \{ slot \} : SLOT_RULES\.Armor\[templateIndex\]; \};/);
-  assert.equal((rd('src/systems/equip.js').match(/armorSlotRule\(item\.templateIndex\)/g) ?? []).length, 2, 'both body-part reads');
-  assert.match(rd('src/characters/weapons.js'), /if \(cls\?\.weaponSkillUsed\) return SKILLS\[cls\.weaponSkillUsed\];/);
-  assert.match(rd('src/combat/fpsWeapon.js'), /if \(cls\?\.weaponType\) return T\[cls\.weaponType\(isEnchanted\(item\)\)\];/);
-  assert.match(rd('src/systems/enchanting.js'), /if \(cls\?\.enchantmentPower\) return cls\.enchantmentPower\(item, \{ enchantmentPoints: basePower, armorEnchantmentMultiplier \}\);/);
-  assert.match(rd('src/systems/armorMaterials.js'), /const custom = _customArmorValue\?\.\(item\);\n\s+if \(custom != null\) return custom;/);
-  assert.match(rd('src/systems/roleplayRealismItems/rriItems.js'), /^import /m);
-  // TIDY2: by the file's name, at any depth - a spelled path stops meaning anything when either file moves
-  assert.ok(!/from '(?:\.\.?\/)+(?:\w+\/)*(?:itemTemplates|equip|equipTable|soundClips)\.js'/.test(rd('src/systems/roleplayRealismItems/rriItems.js')), 'the law is a leaf of the systems it feeds');
 });

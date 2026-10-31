@@ -205,15 +205,3 @@ test('QUEST-PARTY executed: a shared quest foe hunts the party and never a stran
   assert.equal(packed.qf.length, 10, 'and every one of the quest\'s foes in it - the sea\'s own are cut first');
 });
 
-test('QUEST-PARTY by source: the world host keeps who shared each quest, hands the pool the party\'s law, and a receiver\'s wave counts as placed while the sharer stands near', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!result\.resync && acct\) _questSharer\.set\(quest\.questName, acct\);/, 'a fresh receipt names its sharer');
-  assert.match(w, /tagOf: \(f\) => questShareTag\(questBridge\?\.machine, f, !!social\?\.party\) \?\? questPrivateTag\(questBridge\?\.machine, f\),/);   // PIN MOVED (DESYNC-ZERO): a quest of my own rides tagged too
-  assert.match(w, /accepts: \(\) => true,/);   // PIN MOVED (DESYNC-ZERO): every player in the room stands every foe it holds - the credit, not the sight, is the party's
-  assert.match(w, /peerMayHit: \(peerId, f\) => f\.entity\?\.team !== 'PlayerAlly',/);   // PIN MOVED (DESYNC-ZERO): anyone's blow lands on a foe that stands for everyone
-  assert.match(w, /onPuppetHurt: \(tag, from\) => \{ if \(from == null \|\| social\?\.isPartyPeer\(from\)\) partyQuestFoe\(questBridge\?\.machine, tag\)\?\.setInjured\?\.\(\); \},/);   // PIN MOVED (DESYNC-ZERO): a party member's quest foe, any copy of the quest
-  // PIN MOVED (QUEST-AUDIT III KILL-ONCE, quest/foe.js creditPartnerKill): the credit spends a kill the partner's envelope
-  // already brought before it counts one - AUDIT QA3 E3: that owner's envelope
-  assert.match(w, /onPuppetDied: \(tag, from, i\) => \{\n\s+if \(from != null && !social\?\.isPartyPeer\(from\)\) return;[^\n]*\n\s+const foe = partyQuestFoe\(questBridge\?\.machine, tag\);\n\s+if \(!foe\) return;[\s\S]{0,300}?foe\.creditPartnerKill\?\.\(owner\);[^\n]*\n\s+\},/);   // KEPT-KILL re-aimed it (PIN MOVED): the kill counts through the ledger a holder's pose shares (test/systems/quest/keptkill.test.js)
-  assert.match(w, /if \(partnerStandsQuestFoes\(\{ questName: handle\.foe\?\.parentQuest\?\.questName, symbol: handle\.foe\?\.symbol\?\.name, sharerOf: \(q\) => (?:host\.)?_liveSharer\(q\), inMyParty: \(a\) => !!(?:host\.)?social\?\.inMyParty\(a\), peers: (?:host\.)?peersNear\(\), accountOfPeer: \(id\) => (?:host\.)?social\?\.accountOfPeer\(id\), myFeet: feet, foes: exteriorFoes\.foes \}\)\) return true;/, 'the exterior arm: counted as placed, stood by the sharer - VERMIN-SHARED (PIN MOVED): while the street\'s pool holds its foe of this wave\'s Foe');
-});

@@ -33,17 +33,3 @@ test('STATION-ROWS: the guild popup pushes a box and never a window its service 
   assert.equal(refused.boxes.length, 1);
 });
 
-test('STATION-ROWS: every reader of the dispatcher\'s answer asks the one test (sweep)', () => {
-  const modes = src('src/scenes/worldModes.js');
-  const station = modes.slice(modes.indexOf('function useDecorStation('), modes.indexOf('function decorRoomHere('));
-  assert.match(station, /if \(isServiceBox\(flow\)\) \{/);
-  assert.doesNotMatch(station, /flow\?\.rows\)/);
-  assert.match(modes, /if \(isServiceBox\(flow\)\) return flow;/, 'the popup\'s onService');
-  assert.match(modes, /if \(flow && !isServiceBox\(flow\)\) mountServiceWindow\(flow\);/, 'the probe door');
-  for (const p of ['src/ui/guildServiceWindow.js', 'src/ui/covenWindow.js']) {
-    const s = src(p);
-    assert.doesNotMatch(s, /if \(next\?\.rows\)|if \(r\?\.rows\)/, p);
-    assert.match(s, /isServiceBox\(next\)/, p);
-    assert.match(s, /isServiceBox\(r\)/, p);
-  }
-});

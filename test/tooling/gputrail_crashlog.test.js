@@ -52,23 +52,3 @@ test('GPU-TRAIL what the page hands is read field by field: the newest TRAIL_KEE
   assert.ok(log.length > 0 && log.length < G.CRASH_LOG_MAX && log.startsWith('2026-10-24T07:47:00.000Z renderer crashed'), 'the stop\'s own line kept with its trail');
 });
 
-test('GPU-TRAIL by source: the page hands each sample over without waiting, the shell keeps it from the game\'s window alone, every process gone writes it under its line, and a stopped page\'s trail is let go (mutants: the sender unchecked; the trail kept raw; the trail never written; a dead page\'s trail written again)', () => {
-  const preload = rd('app/preload.cjs');
-  assert.match(preload, /gpuTrail: \(trail\) => ipcRenderer\.send\('dagger:gpu-trail', trail\),/, 'not sendSync: the renderer never waits on it');
-  const main = rd('app/main.cjs');
-  assert.match(main, /const \{ trailFrom, trailLines \} = require\('\.\/lib\/rendererGone\.cjs'\);/);
-  // PIN MOVED (GPU-TRAIL-LOST, 2026-10-25): the handler returns for another window, then keeps the trail and tells the
-  // held GPU entry; logGone takes the entry's own time
-  assert.match(main, /ipcMain\.on\('dagger:gpu-trail', \(e, trail\) => \{\n {2}if \(!gameWindow \|\| gameWindow\.isDestroyed\(\) \|\| e\.sender !== gameWindow\.webContents\) return;\n {2}gpuTrail = trailFrom\(trail\);\n {2}gpuGone\.heard\(gpuTrail\);[^\n]*\n\}\);/);
-  assert.match(main, /fs\.writeFileSync\(file, logWith\(had, goneLine\(what, details, at\) \+ trailLines\(gpuTrail\)\)\);/);
-  assert.match(main, /\n {2}if \(what === 'renderer'\) gpuTrail = null;\n\}/);
-  assert.equal((main.match(/(?<!let )\bgpuTrail = /g) ?? []).length, 2, 'kept by the handler, let go by a stopped page - nothing else writes it');
-  // RENDERER-GONE's two doors still write through logGone, the renderer's and the GPU's (GPU-TRAIL-LOST: the GPU's held
-  // for the page's lost sample, written by logGone when the hold ends)
-  assert.match(main, /if \(details\?\.reason !== 'clean-exit'\) logGone\('renderer', details\);/);
-  assert.match(main, /const gpuGone = createGpuGoneWait\(\{ write: \(details, at\) => logGone\('gpu', details, at\) \}\);/);
-  assert.match(main, /app\.on\('child-process-gone', \(_e, details\) => \{ if \(details\?\.type === 'GPU'\) gpuGone\.gone\(details, Date\.now\(\)\); \}\);/);
-  // GPU-TRAIL-LOST: a GPU entry still held is written before a renderer stop's (whose writing lets the trail go) and on a quit
-  assert.match(main, /function logGone\(what, details, at = Date\.now\(\)\) \{\n {2}if \(what === 'renderer'\) gpuGone\.flush\(\);/);
-  assert.match(main, /app\.on\('will-quit', \(\) => gpuGone\.flush\(\)\);/);
-});

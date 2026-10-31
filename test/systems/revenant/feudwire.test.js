@@ -175,18 +175,6 @@ test('FEUD WIRE THE SIGNATURE: its owner flags it; the puppet strikes it at x2.0
   assert.equal(PB.puppetBlow(at({ ...rec, wk: 2 }, F.SIG)).mult, BLOW.slam.mult, 'no flag: its shape\'s');
 });
 
-test('FEUD WIRE THE HOSTS: both pass the signature\'s numbers to the puppet\'s blow; both streams key `rb` and stand the puppet\'s fold when it changes - the dungeon gives its own back when the record says none (mutants: each seam unwired; a key unwidened)', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  assert.match(x, /me: recipientIsMe\(f, r\.b \?\? r\.g \?\? p\.target\), entity: f\.entity, collider, sig: f\.entity\.revenant \? SIG : null \}\);/);   // PIN MOVED (GRANT0, Spawn-Grants.md section 8: the signature believed on a revenant alone)
-  assert.match(x, /\$\{r\.p2 \?\? 0\},\$\{r\.rt \?\? -1\},\$\{r\.rb \?\? 0\}(?:,\$\{traitWireKey\(r\)\})?\$\{r\.wk !== undefined/);   // PIN MOVED (AUDIT WORLD-EVENTS L5-10): and the boss's wrath and live ward
-  assert.match(x, /const fw = `\$\{r\.ad \?\? 0\},\$\{r\.wq \?\? -1\},\$\{r\.p2 \?\? 0\},\$\{r\.rb \?\? 0\}`; if \(f\._feudWire !== fw\) \{ f\._feudWire = fw; f\.entity\.revenant = feudFromWire\(f\.entity\.revenant, r\); puppetRevenantBlows\(f\.entity, r\); \}/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /me: _to != null && _me != null && _to === _me, entity: f\.entity, collider, sig: f\.entity\.revenant \? SIG : null \}\);/);   // PIN MOVED (GRANT0)
-  assert.match(d, /\$\{r\.v\},\$\{r\.ad \?\? 0\},\$\{r\.wq \?\? -1\},\$\{r\.p2 \?\? 0\},\$\{r\.rb \?\? 0\}(?:,\$\{traitWireKey\(r\)\})?\$\{r\.wk !== undefined/);
-  assert.match(d, /const _fw = r\.ad !== undefined \|\| r\.wq !== undefined \|\| r\.p2 !== undefined \|\| r\.rb !== undefined \? `\$\{r\.ad \?\? 0\},\$\{r\.wq \?\? -1\},\$\{r\.p2 \?\? 0\},\$\{r\.rb \?\? 0\}` : null;/);
-  assert.match(d, /: \(f\.entity\.revenant\?\.id \? f\.entity\.revenant : null\); puppetRevenantBlows\(f\.entity, r\); \}/);
-});
-
 test('FEUD WIRE THROUGH THE REAL STREET POOL: a peer\'s revenant stands with its owner\'s blows - said again once, phase two folded on them, withdrawn given back; an heir\'s foe writes them (mutants: the reader unwired; the key unwidened; the writer unwritten)', async () => {
   const pool = createExteriorFoes(poolRig());
   pool.setNet(netFor());

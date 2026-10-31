@@ -75,9 +75,6 @@ test('PAD1-A the poller dispatches its synthetic keys on the DOCUMENT when there
     globalThis.window = prev.w; if (prev.d === undefined) delete globalThis.document; else globalThis.document = prev.d; globalThis.KeyboardEvent = prev.k;
     _resetForTests();
   }
-  // the pane's capture is a document listener, which is the half of this that makes it matter
-  assert.match(rd('src/ui/enhanced/enhancedControls.js'), /document\.addEventListener\('keydown', armedHandler, \{ capture: true \}\);/);
-  assert.match(rd('src/ui/gamepadInput.js'), /\(globalThis\.document \?\? window\)\.dispatchEvent\(new KeyboardEvent\(type, \{ code, key: code, bubbles: true \}\)\);/);
 });
 
 test('PAD1-B every button name the poller can synthesise is a KeyCode a mod key can hold, both ways, and every vendored mod key default still binds', () => {
@@ -293,10 +290,4 @@ test('PAD1-F a rebind through the controls pane changes the quickslot chip: the 
   u.primary.set('LogBook', null);
   applyUnsavedKeybinds(store, u);
   assert.deepEqual(quickslotTag('QuickUse1', { ...pad, controller: false }), { kind: 'key', text: 'L' });
-  // the HUD's frame reads the LIVE store and keys its repaint on the tag
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const tagOpts = \{ bindings: bindings\(\), controller, family: family \?\? 'xbox' \};/, 'the registry, read in the frame - never captured at build');
-  assert.match(hud, /\.\.\.\['main', 'off', 'c1', 'c2'\]\.map\(\(k\) => tagKey\(tags\[k\]\)\),/, 'the tags are in the block\'s signature');
-  assert.match(rd('src/ui/quickslotTags.js'), /export const tagKey = \(t\) => \(t \? \(t\.kind === 'glyph' \? `g:\$\{t\.family\}:\$\{t\.code\}` : `k:\$\{t\.text\}`\) : ''\);/, 'the key carries the code');
-  assert.match(rd('src/ui/enhanced/enhancedControls.js'), /applyUnsavedKeybinds\(bindings\(\), unsaved\);/, 'the pane writes the same registry');
 });

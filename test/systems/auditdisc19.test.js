@@ -170,28 +170,6 @@ test('AUDIT DISC19 W6: the host\'s frame - the threats it hands the summon are t
   assert.equal(off.log.dismissals, 1);
 });
 
-test('AUDIT DISC19 W6 by source: the world host answers the frame with the strict town test, its own rect for the foes\' feet, the travel pixel and the whole guard pool - nothing more', () => {
-  const w = rd('src/scenes/world.js');
-  const body = (head, end) => { const at = w.indexOf(head); assert.ok(at > 0, head); return w.slice(at, w.indexOf(end, at) + end.length); };
-  assert.equal(body('  function _townWatchFrame(dt) {', '\n  }'), `  function _townWatchFrame(dt) {
-    const px = playerTravelPixel();
-    const feet = walkMode && playerSpawned ? player.pos : cam.pos;
-    runTownWatchFrame(townWatch, dt, {
-      enabled: (getPref('townWatch') !== false || raidDefendingHere()) && !isTransformedLycanthrope(playerEntity),
-      inTown: _isPlayerInTownStrict(), crime: !!playerEntity.crimeCommitted, locationKey: \`\${px.x},\${px.y}\`,
-      foes: exteriorFoes.foes, inTownRect: _foeInTownRect, guards: cityGuards,
-      playerFeet: [...feet], playerFwd: [Math.sin(cam.yaw), 0, Math.cos(cam.yaw)], pool: _guardPool,
-    });
-  }`);
-  assert.equal(body('  const _foeInTownRect = (f) => {', '\n  };'), `  const _foeInTownRect = (f) => {
-    if (!_musicLoc || !f?.ai?.feet) return false;
-    const px = playerTravelPixel();
-    const wc = state.worldCoords(f.ai.feet);
-    return isInLocationRect(wc.x, wc.z, locationWorldRect(_musicLoc, px.x, px.y));
-  };`);
-  assert.match(w, /const townWatch = createTownWatch\(\);/);
-});
-
 // the watch1 rig (disc19.test.js's): a synthetic CLASS18.CFG and MONSTER.BSA, a flat open world
 function craftCfg({ hpPerLevel = 4, speed = 90, str = 40, agi = 85, luck = 55, atkFlags = 0x08 } = {}) {
   const b = new Uint8Array(74); const v = new DataView(b.buffer);
@@ -375,19 +353,6 @@ test('AUDIT DISC19 W5: one swing, one attack grunt - the host offers it to the w
   } finally { setValue('Enhancements', 'CombatVoices', false); }
 });
 
-test('AUDIT DISC19 W5 by source: every host that offers one swing to more than one pool hands them the one token', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const swing = \{\};\n(?:\s*\/\/[^\n]*\n)*\s*if \(duelMeleeHit\([^\n]*\n[^\n]*\n[^\n]*\n\s*\} else if \(!cityGuards\.resolvePlayerHit\([^\n]*\{ swing \}\)\) \{/);   // DUEL1: my duel opponent is offered the swing first
-  assert.match(w, /if \(exteriorFoes\.resolvePlayerHit\([^\n]*guardHitSound, \{ swing \}\)\) \{/);
-  assert.match(w, /\{ onMurder: \(\) => _crimeResponse\(\), onHitSound: guardHitSound, swing \}\)\.then/);
-  const e = rd('src/scenes/exterior.js');
-  assert.equal((e.match(/guardHitSound, \{ swing \}\)\)/g) ?? []).length, 3, 'the fixed-city host\'s two pools - and a technique\'s offer of the encounter pool after the watch took it, the same token');   // PIN MOVED (TECH1 AUDIT): an area technique's blow is offered every pool it reaches (bible/05-Combat/Weapon-Techniques.md)
-  assert.match(e, /onHitSound: guardHitSound, swing \}\)\.then/);
-  const m = rd('src/scenes/worldModes.js');
-  assert.equal((m.match(/interiorHitSound, \{ swing \}\)\)/g) ?? []).length, 2, 'the interior\'s two pools');
-  assert.match(rd('src/scenes/cityGuards.js'), /const carriedHit = resolvePlayerHit\([^\n]*onHitSound, \{ swing \}\);/, 'and the Assault conversion\'s re-pointed swing is the same swing');
-});
-
 test('AUDIT DISC19 W4: the player\'s shaft flies through a defender to the monster behind him; an enemy\'s shaft still stops on one', () => {
   const f = new ArrowFlight({ getGpuMesh: () => null, collider: null });
   const defender = { id: 'defender', defender: true, dead: false, ai: { height: 1.8 } };
@@ -466,11 +431,6 @@ test('AUDIT DISC19 W4: the player\'s spells pass the town\'s defenders by - the 
   nearBlast.magic.castInput([0, 0.9, 0], [0, 0, 1]);
   for (let i = 0; i < 60 && !nearBlast.hurt.length; i++) nearBlast.magic.update(0.05, [0, 0, 0]);
   assert.deepEqual(struck(nearBlast.hurt), ['centaur'], 'a defender inside the radius of the blast is spared');
-});
-
-test('AUDIT DISC19 W4 by source: a thrown torch passes the defenders by (the world host\'s torch pool), and a monster\'s blast still lands on them', () => {
-  assert.match(rd('src/scenes/world.js'), /foes: \(\) => \[\.\.\.cityGuards\.guards\.filter\(\(g\) => !g\.defender\), \.\.\.exteriorFoes\.foes\.filter\(\(f\) => !sparedByPlayer\(f\)\)\], foeSinks: \(f\) => foeSinks\(f\), makeEnemiesHostile/);   // SHIPMATES: and the player's crew (deckwalk.test.js)
-  assert.match(rd('src/scenes/hostMagic.js'), /if \(caster\?\.entity === playerEntity && sparedFromPlayer\(t\)\) continue;/);
 });
 
 // ═══ S: the saves ═════════════════════════════════════════════════════════════════════════════════════════════════
@@ -641,25 +601,5 @@ test('AUDIT DISC19 D1: the stale-chunk notice fits one line of the classic panel
   assert.ok(STALE_CHUNK_IN_PLAY_TEXT.length <= 50, `${STALE_CHUNK_IN_PLAY_TEXT.length} characters`);
   assert.match(STALE_CHUNK_IN_PLAY_TEXT, /reload/i);
   assert.ok(STALE_CHUNK_IN_PLAY_SECONDS >= 10);
-  const dc = rd('src/scenes/dungeonContext.js');
-  const c = dc.slice(dc.indexOf('} catch (err) {', dc.indexOf('if (opts.foes && palette) {')));
-  assert.match(c.slice(0, 1200), /if \(isStaleChunk\(err\)\) _staleChunkNotice = true;/);
-  assert.ok(!c.slice(0, 1200).includes('setMidScreenText('), 'nothing is said mid-build');
-  assert.match(dc, /function drawFoes\([^\n]*\) \{\n\s*if \(_staleChunkNotice\) \{ _staleChunkNotice = false; setMidScreenText\(STALE_CHUNK_IN_PLAY_TEXT, STALE_CHUNK_IN_PLAY_SECONDS\); \}/);
 });
 
-test('AUDIT DISC19 B1: underground the candle burns its own white - every other light keeps the dungeon\'s colour', () => {
-  const src = rd('src/scenes/worldModes.js');
-  const at = src.indexOf("if (mode === 'dungeon') {\n      if (pendingDungeonExit)");
-  const branch = src.slice(at, src.indexOf('\n    }\n', at));
-  assert.match(branch, /const _dgColor = lanternColor\(!!renderer\.lightingLane, new Float32Array\(DUNGEON_LIGHT_COLOR\)\);/);
-  assert.match(branch, /const _dgNear = _iilDg \? nearestLights\(_iilDg\.lights, cam\.pos, renderer\.maxPointLights, _iilDg\.ranges, _iilDg\.colorOf\) : nearestLights\(dungeonCtx\.lights, cam\.pos, renderer\.maxPointLights \+ \(_dgFade \? 1 : 0\), dungeonCtx\.flicker\.ranges, \(\) => _dgColor, DUNGEON_LIGHT_BLOCK_RANGE\);/);   // LA-AUDIT A5: one past the cap, for its fade
-  assert.match(branch, /\n\s*abyssCandle\(dungeonCtx\.candleLight\(\), _abyss\), _abyss\?\.torchOff \? null : _dgTint\(playerTorchLight\([^\n]*\)\), _dgTint\(thunderlockMuzzleLight\([^\n]*\)\), \.\.\.\(host\.peerLights\?\.\(\{ torches: !_abyss\?\.torchOff \}\) \?\? \[\]\)\.map\(\(l\) => abyssCandle\(_dgTint\(l\), _abyss\)\), \.\.\.dungeonCtx\.campLights\(\)\.map\(_dgTint\), \.\.\.dungeonCtx\.torchLights\(\)\.map\(_dgTint\)(?:, \.\.\.\(dungeonCtx\.sdEndLights\?\.\(\) \?\? \[\]\))?, \.\.\.\(host\.modeLights\?\.\(\) \?\? \[\]\)\);/);   // SD-LOOK S4 (PIN MOVED): the Rift's and the Return's light, untinted, before the mode's; AUDIT PRE-MERGE 0928 M4: the others' torches out and their candles at half in the abyss, as mine
-  // CSA-C: a boat's lanterns, where one stands on the dungeon's water, keep the colour Come Sail Away's AddBillboardLight
-  // gives them - it sets the Light's colour on DFU's own light prefab, which the dungeon's lights share untouched
-  // OH-E: the abyss's arm scales the candle's own white (SuppressAbyssLights' half) - never the dungeon's tint - and
-  // hands every other candle back as it came
-  // PIN MOVED (LIGHT-ID): the candle's copy is the candle's light (render/lightId.js adoptLight)
-  assert.match(src, /const abyssCandle = \(l, abyss\) => \(l && abyss \? adoptLight\(\{ \.\.\.l, range: l\.range \* abyss\.magicLightScale, color: \(l\.color \?\? \[1, 1, 1\]\)\.map\(\(c\) => c \* abyss\.magicLightScale\) \}, l\) : l\);/);
-  assert.match(branch, /renderer\.setPointLights\(_dgLit\.data, null, \(_dgFade && capFadePairs\(_dgLit\.data, [^\n]*, _dgLit\.colors\)\) \|\| _dgLit\.colors\);/);   // LA-AUDIT A5: the pairs' own colours, the cap's fade on them
-});

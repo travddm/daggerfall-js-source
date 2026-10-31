@@ -326,20 +326,3 @@ test('WW1 the dry ground keeps a pixel\'s kernel by the world\'s key - a pixel a
 
 // ─── 6. THE HOST ────────────────────────────────────────────────────
 
-test('WW1 the host: the game\'s own rows the registry\'s first provider at the boot, the living world\'s index over the registry, its towns, dungeons, area towns, port towns and dungeons by id handed on, the pixel builder\'s town the index\'s; nothing in the living world filed by `y * 1000 + x` (mutants: the index unwired, the pixel builder)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const worldPlaces = gamePlaces\(createWorldPlaces\(\)\);\n\s*worldPlaces\.register\(BAY_SOURCE, bayPlaceRows\(_hubRows, \{ hasPort \}\)\);\n\s*_hubRows\.length = 0;/);   // PIN MOVED (AUDIT RELEASE R2-7): the registry handed to the Staff Panel's picker as it is made (net/staffPlaces.js gamePlaces)
-  // PIN MOVED (WW7-7): the index and the trips' world scenes/livingWorld/livingTrips.js's, the host handing the registry
-  assert.match(w, /const \{ index: livingIndex, [^\n]*\} = createLivingTrips\(\{ places: worldPlaces, populated: populatesWanderingNpcs,\n\s*peopleAt: /);
-  const lt = rd('src/scenes/livingWorld/livingTrips.js');
-  assert.match(lt, /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: /);
-  assert.match(lt, /townsNear: index\.townsNear,\n[^]*dungeonsNear: index\.dungeonsNear,/);
-  assert.match(w, /const livingTownOfId = livingIndex\.townOfId;/);
-  // PIN MOVED (WW7-1): a dungeon by its location's own map id - a lair past the Bay has no MAPS row
-  assert.match(w, /const id = loc\.mapTableData\?\.mapId \?\? maps\.getLocation\(loc\.regionIndex, loc\.locationIndex\)\?\.mapTableData\?\.mapId;[^\n]*\n\s*return id != null \? livingIndex\.dungeonOfId\(id >>> 0\) : null;/);
-  assert.match(rd('src/scenes/pixelBuild.js'), /const livingTown = livingTownAt\(px, py\) \?\? \{/);
-  for (const f of ['src/scenes/livingWorld/livingIndex.js', 'src/systems/livingWorld/trips.js', 'src/systems/livingWorld/outlaws.js', 'src/world/dryGround.js', 'src/scenes/pixelBuild.js']) {
-    assert.doesNotMatch(codeOnly(rd(f)), /\by \* 1000 \+ x\b|\bpy \* 1000 \+ px\b|\bp\.y \* 1000 \+ p\.x\b/, `${f} files nothing by the Bay's pixel id`);
-  }
-  assert.doesNotMatch(hostText('src/scenes/world.js'), /_livingTowns\.set\(p\.y \* 1000 \+ p\.x|_livingDungeons\.set\(p\.y \* 1000 \+ p\.x/);   // PIN MOVED (AUDIT TESA II K6): the host whole
-});

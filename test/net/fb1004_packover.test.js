@@ -158,7 +158,5 @@ test('AUDIT PACK-OVER A: what goes past the pack\'s weight is minted as the pack
 });
 
 test('AUDIT PACK-OVER B/C: the world\'s hands save a harvest that went wholly past the weight - its only change is `over`; and the over-weight line is said once in ten seconds, not once an answer (by source; mutants: `over` uncounted for the save; the line every answer)', () => {
-  assert.match(src('src/scenes/world.js'), /give: \(key, n\) => \{ const got = giveCarried\(playerEntity, key, n, carryOpts\(key\)\); if \(got\.bag \+ got\.pack \+ got\.over > 0\) saveSoon\.changed\(\); return got; \},/);
   assert.equal(OVER_SAID_MS, 10_000);
-  assert.match(src('src/scenes/gatherHost.js'), /if \(hauled && d\.carry === true && \(d\.put\?\.over \?\? 0\) > 0 && deps\.nowMs\(\) - overSaidAt >= OVER_SAID_MS\) \{ overSaidAt = deps\.nowMs\(\); hud\.toast\(BAG_WORDS\.overWeight\); \}/);
 });

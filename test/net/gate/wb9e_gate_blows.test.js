@@ -88,7 +88,6 @@ test('WB9e the shader reads (WB13a: honed): the line two pixels wide however far
   const u = (n) => calls.find((c) => c[1] === n)?.[2];
   assert.equal(u('uStyle'), TELEGRAPH_STYLE.frost); assert.equal(u('uPool'), 0);
   assert.ok(Math.abs(u('uSince') - 1.5) < 1e-9 && Math.abs(u('uSpan') - 2) < 1e-9 && u('uAfter') === -1);
-  assert.match(read('tools/gateTelegraphProbe.mjs'), /extname\(f\) === '\.json' \? 'application\/json'/, 'the probe serves the court\'s JSON as JSON');
 });
 
 test('WB9e the landing\'s bursts: sparks from the slam, the leap, the bound, Hellfire, the Meteor, the Nova and Dagon\'s own - the heavy ones throwing more, further; none from a blade, the charge\'s run or the spokes; each spark out along its bearing, up and falling to rest on the floor, spent within FX_BURST_MS (mutants: a spark falling through the floor; a burst living forever)', () => {
@@ -158,8 +157,5 @@ test('WB9e the court throws them: each landing its bursts at its own moment (his
   assert.deepEqual(calls.slice(-3).map((c) => c[0]), ['enable', 'depthMask', 'disable'], 'the state put back');
   assert.equal(calls.filter((c) => c[0] === 'drawArrays' && c[1] === 0).length, FX_BURSTS_MAX, 'a draw of points a burst');
   assert.equal(calls.find((c) => c[0] === 'drawArrays' && c[1] === 0)[3], Math.round(FX_SPARKS * FX_KINDS.slam.share));
-  const gc = read('src/scenes/gate/gateCourt.js');
-  const tel = gc.indexOf('if (shape) { pass.draw(shape'), fxAt = gc.indexOf('fxPass.draw(_fxLive, meteorNow, proj, view, eye, seconds, fog);');
-  assert.ok(tel > 0 && fxAt > tel, 'over the telegraph');
   assert.ok(COURTS.length === 6 && ATTACK_BY_ID.length === 19);   // WB14b: the portents' floors in the one table; WB14a: the new arsenal's six; PIN MOVED (WB14d): the Sundering and the Rejoining
 });

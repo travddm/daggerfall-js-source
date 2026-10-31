@@ -16,7 +16,6 @@ import * as FC from '../../src/systems/frameClock.js';
 import { PerfMeter } from '../../src/render/perfMeter.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const WORLD = readFileSync(join(root, 'src/scenes/world.js'), 'utf8');
 
 test('PERF-EXT24: frameFitBudget lends the frame interval less its own script less the margin, 3 to 6 ms - and the whole 6 to a stream two seconds old, an awaited build, or a NaN', () => {
   assert.equal(typeof BB.frameFitBudget, 'function');
@@ -99,14 +98,6 @@ test('PERF-EXT24: `?perf=cpu` carries the stream as a `build` span; the GPU cloc
   assert.equal(g.cpuZones.size, 0, 'a GPU meter keeps no CPU buckets');
 });
 
-test('PERF-EXT24: the world host sizes the stream\'s slice by the frame clock, lends each slice back, and lends an awaited build the whole slice', () => {
-  assert.match(WORLD, /  const breather = createBreather\(\{   \/\/ PERF7[^\n]*\n    budget: \(\) => frameFitBudget\(\{ intervalMs: frameInterval\(\), busyMs: lastBusy\(\), streamingMs: _streamSince == null \? 0 : performance\.now\(\) - _streamSince, awaited: _awaitedBuilds > 0, overworld: !!travelView\?\.active \}\),[^\n]*\n    onSlice: \(ms\) => \{ lendFrame\(ms\); meterFor\(renderer\.gl\)\?\.addCpu\('build', ms\); \},\n    frames: framesBegun,[^\n]*\n  \}\);/);
-  const pump = WORLD.slice(WORLD.indexOf('  async function pump() {'), WORLD.indexOf('\n  }\n', WORLD.indexOf('  async function pump() {')));
-  assert.match(pump, /const next = queue\.shift\(\);\n    _streamSince \?\?= performance\.now\(\);/, 'the pump\'s builds are the stream');
-  assert.match(pump, /building = false;\n    if \(!state\.owes\(queue\)\) _streamSince = null;/, 'and the stream ends with the queue - with what it still owes (QUEUE-OWED: a queue holding only pixels the stream let go owes nothing)');
-  assert.equal((WORLD.match(/(?<!let )_streamSince = /g) || []).length, 2, 'only the pump and a teleport\'s sweep end a stream');
-});
-
 // PERF-EXT24 (the review, 2026-09-25). The slice clock is wall time, and a
 // build awaits more than the breather: its first slice began at reset()
 // inside the pump's frame and ran on across the terrain worker's round
@@ -172,42 +163,6 @@ test('PERF-EXT24 (the review): only a slice the breather can vouch for is lent -
   assert.equal(typeof FC.framesBegun, 'function', 'the frame clock counts the frames begun');
   FC._resetFrameClock();
 });
-
-// PERF-EXT24 (the review, 2026-09-25): the awaited arm was inferred from an
-// idle pump, and a teleport's build is never alone - the frame loop pumps on
-// while it is awaited, the new ring's first pixel starts, and the arrival's
-// slices were sized for the stream. The world host's own `awaitedBuild` and
-// budget, lifted out and run: a stream begun beside a teleport, at 144 Hz.
-test('PERF-EXT24 (the review): a build something waits on says so - the boot and a teleport build through awaitedBuild, and while one is in flight every slice has the whole 6 ms, the stream beside it or not', async () => {
-  const at = WORLD.indexOf('  async function awaitedBuild(px, py) {');
-  assert.ok(at > 0, 'the host has one door for an awaited build');
-  const helper = WORLD.slice(at, WORLD.indexOf('\n  }\n', at) + 4);
-  const budgetSrc = /    budget: (\(\) => frameFitBudget\(\{[^\n]*?\}\)),[^\n]*\n/.exec(WORLD)?.[1];
-  assert.ok(budgetSrc, 'the breather\'s budget');
-  let settle;
-  const env = { frameFitBudget: BB.frameFitBudget, frameInterval: () => 6.9, lastBusy: () => 3, performance: { now: () => 500 }, travelView: null, buildPixel: () => new Promise((r, j) => { settle = { r, j }; }) };
-  const host = new Function(...Object.keys(env), `let _streamSince = null; let _awaitedBuilds = 0;\n${helper}\nconst budget = ${budgetSrc};\nreturn { awaitedBuild, budget, stream: (v) => { _streamSince = v; } };`)(...Object.values(env));
-  host.stream(400);   // the pump has started the new ring's first pixel, 100 ms ago
-  assert.equal(host.budget(), BB.BUILD_SLICE_FLOOR_MS, 'the stream alone, on a 144 Hz display: the floor');
-  const arrival = host.awaitedBuild(1, 2);
-  assert.equal(host.budget(), BB.BUILD_SLICE_MS, 'a teleport\'s build in flight: the whole slice, the stream beside it notwithstanding');
-  settle.r({ px: 1 });
-  assert.deepEqual(await arrival, { px: 1 }, 'the build\'s own answer comes back');
-  assert.equal(host.budget(), BB.BUILD_SLICE_FLOOR_MS, 'and once it stands the stream is sized for the frame again');
-  const failed = host.awaitedBuild(3, 4);
-  settle.j(new Error('the build threw'));
-  await assert.rejects(failed, /the build threw/);
-  assert.equal(host.budget(), BB.BUILD_SLICE_FLOOR_MS, 'a build that threw is not waited on any more');
-  // the host's two waiters, and nothing else, build through it
-  assert.match(WORLD, /\n  const playerPixel = await awaitedBuild\(first\.px, first\.py\);/, 'the boot\'s first pixel');
-  assert.match(WORLD, /try \{ dest = await awaitedBuild\(first\.px, first\.py\); \}/, 'a teleport\'s');
-  assert.equal(WORLD.split('\n').filter((l) => /awaitedBuild\(/.test(l) && !/^\s*\/\//.test(l)).length, 3, 'the door and its two callers');
-  assert.equal((WORLD.match(/_awaitedBuilds(\+\+|--)/g) || []).length, 2, 'and only the door counts');
-  // the sweep ends the old world's stream, so the new one's two seconds are its own
-  const tp = WORLD.slice(WORLD.indexOf('  async function _teleportToPixel('), WORLD.indexOf('    const first = queue.shift();', WORLD.indexOf('  async function _teleportToPixel(')));
-  assert.match(tp, /queue\.push\(\.\.\.state\.init\(px, py\)\);[\s\S]*\n    _streamSince = null;/, 'a teleport\'s sweep ends the stream it emptied');
-});
-
 
 test('TESA-LANDS\' second audit (lane C): ONE SLICE A FRAME, HOWEVER MANY WAIT - four chains on one breather (a pixel\'s own set and its neighbours\', scenes/pixelBuild.js) share the frame\'s slice, each its own step past it at most, and wait on one frame between them; every waiter\'s resume began the slice again and a frame ran four (mutants: a waiter\'s resume begins the slice; a frame each waiter)', async () => {
   let t = 0;

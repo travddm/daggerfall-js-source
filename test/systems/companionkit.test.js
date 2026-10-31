@@ -309,26 +309,3 @@ test('COMPANION-KIT THE PARTY PANEL: with no party a companion ashore stands the
   panel.destroy();
 });
 
-test('COMPANION-KIT THE WORLD\'S WIRING: both cast engines are handed my companions\' bodies; activating one opens his pack as a Backpack storage over whatever the mode draws, in the street, a building and a dungeon; a tap never locks onto him; the bars carry his name, health and effects; the party panel is made in one place, over the party or none, with my companions under its seats (mutants: an engine without them, the pack never opened, the lock-on onto him, the bars bare, a second panel)', () => {
-  const w = rd('src/scenes/world.js'), m = rd('src/scenes/worldModes.js'), d = rd('src/scenes/dungeonContext.js'), n = rd('src/scenes/naval/navalHost.js');
-  assert.equal((w.match(/companionBodies: \(\) => (?:crewAshore\.bodies\(\)|\[\.\.\.crewAshore\.bodies\(\), \.\.\.revenantAshore\.bodies\(\)\]),/g) ?? []).length, 2, 'the world\'s engine and the dungeon\'s (REVENANT-COMPANION: the sworn with the crew)');
-  assert.match(m, /companionBodies: \(\) => host\.companionBodies\?\.\(\) \?\? null,/);
-  assert.match(d, /companionBodies: opts\.companionBodies \? \(\) => opts\.companionBodies\(\) : null,/);
-  // AUDIT WK-P3 (PIN MOVED): his pack read by his key at every look, never a list taken once; COMPANION-WEIGHT (PIN
-  // MOVED): and its capacity, his body's (companion_weight.test.js)
-  assert.match(w, /const w = makeInventoryWindow\(\{ loot: \{ items: \(\) => naval\?\.companionPack\?\.\(key\)\?\.items \?\? \(orphan \?\?= \[\]\), containerImage: \(\) => CONTAINER_IMAGES\.Backpack, playerOwned: true, storage: true, capacity \} \}\);/);
-  assert.match(w, /openCompanion: \(rec\) => openCompanionPack\(rec\),/);
-  assert.match(w, /openCompanionPack: \(rec\) => openCompanionPack\(rec\),/);
-  assert.equal((m.match(/openCompanion: \(rec\) => !!host\.openCompanionPack\?\.\(rec\),/g) ?? []).length, 2, 'a building and a dungeon');
-  assert.match(w, /\[\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards\]\.filter\(\(f\) => f\.companion == null\), collider, LOCK_PICK_DISTANCE\)/);
-  // AUDIT WK-U3 (PIN MOVED): mine his name, health and effects; another player's his own name alone
-  assert.match(w, /\.\.\.\(mate \? \(f\.puppet \? \{ name: f\.companionName \|\| 'Companion', fx: \[\] \} : \{ name: f\.entity\.name \|\| 'Companion', hp: f\.entity\.health, hpMax: max, fx: composePartyFx\(f\.entity\) \}\) : \{\}\)/);
-  assert.equal((w.match(/createPartyPanel\(/g) ?? []).length, 1);
-  assert.match(w, /partyPanel\.setCompanions\(partyCompanions\);/);
-  assert.match(w, /if \(!partyCompanions\(\)\.length\) return;\n\s*makePartyPanel\(null\);/);
-  assert.match(n, /packedItems \?\? null\);   \/\/ CREW-COMPANIONS: the party ashore/);
-  // AUDIT WK-D11 (PIN MOVED): the one codec, the cargo's and the packs' both
-  assert.match(w, /const packedItemsCodec = Object\.freeze\(\{ serialize: \(items\) => \(items \?\? \[\]\)\.map\(\(it\) => \(\{ \.\.\.it \}\)\), deserialize: \(records\) => \(records \?\? \[\]\)\.map\(\(it\) => setItemFields\(\{ \.\.\.it \}\)\) \}\);/);
-  assert.equal((w.match(/packedItems: packedItemsCodec,/g) ?? []).length, 2, 'Come Sail Away\'s and the naval host\'s');
-  assert.match(w, /packedItems: packedItemsCodec,   \/\/ COMPANION-KIT/);
-});

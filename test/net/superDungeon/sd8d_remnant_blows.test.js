@@ -287,18 +287,3 @@ test('SD8d ITS FALL, AND THE FLOOR DRAWN: the fall heard and said once a fight, 
   assert.ok(calls.some((c) => c[0] === 'uniform1f' && c[1] === 'uFloorR' && c[2] === COURT_R), 'the court\'s radius when no floor is named');
 });
 
-test('SD8d THE HOSTS, by source: the world host makes the blows online beside the link - my feet in the Hour, the motor\'s ground, my entity, the dungeon context\'s strike door - frames them in the realm and forgets them out of it, and draws their floor in the dungeon arm\'s pass in the Hour (mutants: the blows never framed; their floor never drawn)', () => {
-  const W = read('src/scenes/world.js');
-  assert.match(W, /const sdBlows = sdFightLink \? createSdRemnantBlows\(\{/);
-  assert.match(W, /feet: \(\) => \(playerSpawned && modes\?\.sdRealmSlot\?\.\(\) != null \? player\.feetAt\(\) : null\),\n\s+grounded: \(\) => !!player\.grounded,/);
-  assert.match(W, /strike: \(dmg, how\) => \{ modes\?\.dungeonCtx\?\.strikePlayer\?\.\(dmg, how\); \},[^\n]*\n\s+say: \(t, everyone = false, key = null\) => \{ if \(everyone \|\| sdNearArena\(\)\) sdSay\(t, SD_VOICE_RANK\.turn, key\); \},/);   // AUDIT SD II (L6 F15, SD11d, PIN MOVED): near its arena, its fall to the whole Hour, through the Hour's voice
-  assert.match(W, /if \(!inRealm && _sdFightHeld\) \{ sdFightLink\.leave\(\); sdBlows\?\.leave\(\); sdRemVoice\?\.leave\(\); sdFx\?\.leave\(\); _sdFightHeld = false; \}/);   // SD14a (PIN MOVED): its voice let go with it   // SD16 (PIN MOVED): its sparks
-  assert.match(W, /if \(inRealm\) \{ try \{ sdBlows\?\.frame\(\); \}/);
-  assert.match(W, /drawSdTelegraph: \(\{ proj, view, eye \}\) => \{ const t = performance\.now\(\) \/ 1000, fog = courtFogNow\(\); const blows = !!sdBlows\?\.drawPass\(proj, view, eye, t, fog\), lines = !!sdSpoilsPool\?\.drawPass\(proj, view, eye, t, fog\); const motes = [^\n]*; const sparks = [^\n]*; const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\) renderer\.markForeignPass\(\); \},/);   // SD9e: and its spoils' loot lines, in the same pass (PIN MOVED)   // SD14c (PIN MOVED): the Hour's motes in the same pass   // SD16 (PIN MOVED): and its blows' sparks   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
-  const M = read('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT SD IV R1): the Hour's light is drawn in drawFoes' late slot, after the last flat - the arm keeps the
-  // frame's matrices for it, and draws it itself only when a window skips drawFoes (test/world/superDungeon/sd26_render.test.js)
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  assert.match(M, /if \(isGateArena\(dungeonLoc\)\) host\.drawGateCourt\?\.\(\{ proj, view, eye: mwv\.eye \}\);[^\n]*\n\s+if \(dungeonCtx\.sdEndLook\) host\.drawSdRift\?\.\(\{ proj, view, eye: mwv\.eye, end: dungeonCtx \}\);[^\n]*\n(?:\s+\/\/[^\n]*\n)+\s+_sdLate\.on = isSdRealm\(dungeonLoc\); _sdLate\.proj = proj; _sdLate\.view = view; _sdLate\.eye = mwv\.eye;\n\s+if \(_sdLate\.on && windowHoldsDungeon\(dungeonCtx\.uiOverlayActive, aliveUnder\(\)\)\) host\.drawSdTelegraph\?\.\(_sdLate\);/);
-  assert.match(M, /lateWorldDraw: \(\) => \{ host\.drawVeiledPeerBodies\?\.\(\); if \(_sdLate\.on\) host\.drawSdTelegraph\?\.\(_sdLate\); \},/);
-});

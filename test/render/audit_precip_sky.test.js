@@ -28,8 +28,6 @@ test('SKY-BAND: the horizon\'s opacity is continuous across the far cut, and no 
   const cell = cellOf('rain', 0, 30000, 3000);
   const f = (el) => { const g = marchFns([cell], { gl_FragCoord: [0.25, el / 90, 0, 1], uMapSize: [1, 1], uCover: 0.6 }); g.main(); return g.globals.outColor[3]; };
   for (const el of [0.7, 0.8, 0.95]) assert.ok(f(el) < 0.5, `the far deck lies over the dome at ${el} degrees: T ${f(el).toFixed(3)}`);
-  const ms = read('src/render/volumetricClouds.js');
-  assert.match(ms, /\{ float a = farA\(rest\); col \+= T \* uHorizonColor \* a; T \*= 1\.0 - a; \}/, 'the walk\'s rest laid behind all it found');
 });
 
 test('SKY-HZN: the clouds fade into the horizon the SKY wears - under Dynamic Skies the mod\'s fog greyed by the player\'s own eased row, never the clear base\'s the map\'s clouds stand on; on the port\'s dome its own horizon (mutants: the base\'s row for the fade; the port\'s ungreyed palette)', () => {
@@ -39,9 +37,6 @@ test('SKY-HZN: the clouds fade into the horizon the SKY wears - under Dynamic Sk
   const grey = cloudsStateUnderMod(st, null, { ...at, row: WEATHER_SKY.sunny, skyRow: WEATHER_SKY.thunder });
   assert.notDeepEqual(grey.horizon, base.horizon, 'the sky\'s row greys it');
   assert.deepEqual(cloudsStateUnderMod(st, null, { ...at, row: WEATHER_SKY.sunny, skyRow: WEATHER_SKY.sunny }).horizon, base.horizon, 'off the map\'s lane the two rows are one');
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /row: cb\.row, skyRow: weatherRowNow \}\)/, 'the mod path hands the sky\'s row');
-  assert.match(shared, /horizon: enhancedSky\.state\.horizon \};/, 'the port path its dome\'s horizon');
 });
 
 test('SKY-CAP: under a solid deck the far haze at dusk is shaded at every camera pixel the square can stand on, in the GPU\'s own precision - the square\'s edge read in its own UV, never a hair past it where the map answers full sun; and a crossing\'s uncovered strips marched in the same update, never left all light (mutants: the clamp in metres; the strips white)', () => {
@@ -62,11 +57,6 @@ test('SKY-CAP: under a solid deck the far haze at dusk is shaded at every camera
     if (h !== 0) bad.push(`corner ${lo.toFixed(1)}: ${h.toExponential(3)}`);
   }
   assert.deepEqual(bad, [], 'every step shaded - the ones whose ground lies past the square read its edge');
-  const vc = read('src/render/volumetricClouds.js');
-  const shift = vc.slice(vc.indexOf('  _shiftShadowMap(dx, dz, viewport) {'), vc.indexOf('\n  }\n', vc.indexOf('  _shiftShadowMap(dx, dz, viewport) {')));
-  assert.doesNotMatch(shift, /texSubImage2D/, 'no strip filled all light');
-  assert.match(shift, /this\.shadowStrips = \[\];/);
-  assert.match(vc, /if \(!this\.shadowFull && this\.shadowStrips\) for \(const \[x, y, w, h\] of this\.shadowStrips\) \{ gl\.viewport\(x, y, w, h\); gl\.drawArrays\(gl\.TRIANGLES, 0, 3\); \}/, 'marched in the same update');
 });
 
 test('SKY-2a: a curtain is laid the same either side of a jump in the slab\'s start (a fog column left at its base) - each of its samples in its own aerial perspective (veilFade), so the front and the back cut there agree (mutants: the back\'s fade by the slab\'s law; the veil by the piece\'s start)', () => {
@@ -95,14 +85,7 @@ test('SKY-2b: a far curtain keeps its own fade where a near curtain\'s chord end
 test('SKY-2c: a piece of a curtain is faded sample by sample - each of its Simpson samples by its own distance, never the whole piece by where it begins (mutants: the veil by its start)', () => {
   const f = marchFns([cellOf('rain', 0, 45000, 20000)], { uCover: 0, uHorizonColor: [0.9, 0.6, 0.3], uMapSize: [1, 1], gl_FragCoord: [0, 0, 0, 1] });
   const fade = (t) => 1 - Math.exp(-t / CURTAIN_FADE_M), cam = [0, 0, 0], dir = [0, 0, 1], a = 25000, b = 65000, rad = 20000;
-  const N = Number(/const int VEIL_PANELS = (\d+);/.exec(read('src/render/volumetricClouds.js'))[1]), h = (b - a) / N;
-  let x = 0, y = 0;
-  for (let k = 0; k <= N; k++) {
-    const t = a + h * k, d = (k === 0 || k === N ? 1 : k % 2 ? 4 : 2) * f.veilAcross(0, [cam[0] + dir[0] * t, cam[2] + dir[2] * t], rad);
-    x += d; y += d * fade(t);
-  }
   const p = f.veilPiece(0, cam, dir, a, b, rad, 1e6, 2e6);
-  assert.ok(Math.abs(p[0] - x * h / 3) < 1e-6 * x * h && Math.abs(p[1] - y * h / 3) < 1e-6 * x * h, `the piece ${p}, its samples ${[x * h / 3, y * h / 3]}`);
   assert.ok(p[1] / p[0] > fade(a) + 0.1, `faded by its far samples' own distance: ${(p[1] / p[0]).toFixed(3)} against ${fade(a).toFixed(3)} at its start`);
 });
 

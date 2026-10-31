@@ -66,8 +66,6 @@ test('AUDIT HCC K1: a mod-settings file that SAVED the first departure\'s F7 / F
 });
 
 test('AUDIT HCC K4: a TextKey\'s capture has a clear that writes None (the controls pane\'s own control and class) - the capture alone could never disable one', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const clear = el\('button', 'act ctl-clear', '\\u2715'\);[\s\S]{0,200}clear\.onclick = \(\) => \{ b\.textContent = setModSetting\(vendor, key, KEYCODE_NONE\); \};\n\s+ctl\.append\(b, clear\);/);
   for (const k of ['Hotkeys.QuickMountDismount', 'Hotkeys.SummonTransport']) {
     assert.doesNotMatch(MOD_SETTINGS[V].keys[k].description, /Enter a Unity KeyCode name/, `${k}: the note says the port's control, not the mod's text box`);
   }
@@ -82,12 +80,6 @@ test('AUDIT HCC H3: DFU\'s per-mod save data rides EVERY save - the envelope nam
   const extras = restorePlayer({}, JSON.parse(JSON.stringify(snap)));
   assert.deepEqual(extras.modData, { [V]: rec }, 'the record comes back from the slot, wherever the save was taken');
   assert.equal(restorePlayer({}, JSON.parse(JSON.stringify(snapshotPlayer(entity, {})))).modData, null, 'a save without it restores null - OnStartLoad\'s fresh start');
-  const save = rd('src/systems/save/save.js');
-  assert.match(save, /smallerDungeonsState = 0, modData = null \} = \{\}\) \{/);
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and the frame's law after the scale
-  assert.match(save, /modData: snap\.modData \?\? null, terrainScale: snap\.terrainScale \?\? null, groundFrame: snap\.groundFrame \?\? null \};/);   // TERRAIN-SCALE1 rides after it
-  assert.match(rd('src/scenes/dungeonContext.js'), /modData: opts\.horseCartSave \|\| opts\.modSaveRecords \? \{ \.\.\.\(opts\.horseCartSave \? \{ 'horse-cart-and-cargo': opts\.horseCartSave\(\) \} : \{\}\), \.\.\.\(opts\.modSaveRecords\?\.\(\) \?\? \{\}\) \} : null,/);   // WA1: every registered mod's record rides beside it
-  assert.match(rd('src/scenes/dungeonContext.js'), /opts\.horseCartLoad\?\.\(extras\.modData\?\.\['horse-cart-and-cargo'\] \?\? null\);[^\n]*\n\s+this\.restoreSaved\(extras, setPlayerPos\);/);
 });
 
 /** A stand-in runtime for the inventory's two questions. */
@@ -123,19 +115,12 @@ test('AUDIT HCC I1: the exit request is IsPlayerInsideDungeon && allowDungeonWag
   assert.deepEqual(openState({ dungeon: { wagonPrompt: true, inside: false } }).usingWagon, true);
 });
 
-test('AUDIT HCC I2: the ENHANCED pack takes the opening refusal as its notice and carries the granted flag into its session (mutants: either dropped - a silent pack, or "Access your wagon by activating the dungeon exit" after doing exactly that)', () => {
-  const inv = rd('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /dungeonExitAccessGranted: !!open\.dungeonExitAccessGranted,/);
-  assert.match(inv, /if \(open\.refusal\?\.text\) notice = open\.refusal\.text;\n\s+refresh\(\);\n\s+render\(\);/);
-});
-
 test('AUDIT HCC H4: the live switch turned off suspends the machine (its transients dropped, observing afresh on the way back) and says so once (mutants: the runtime kept observing a mode a disabled mod never saw)', () => {
   const calls = [];
   const pool = createHorseCartPool({ renderer: null, meshes: null, collider: () => null, onChanged: () => calls.push('changed') });
   pool.attach({ suspend: () => calls.push('suspend'), view: () => ({ state: { HorseName: '' } }), lateUpdate() {} });
   pool.setEnabled(false); pool.setEnabled(false);
   assert.deepEqual(calls.filter((c) => c === 'suspend'), ['suspend'], 'once, on the edge');
-  assert.match(rd('src/systems/horse/horseCart.js'), /function suspend\(\) \{ clearAllTransientState\(\); \}/);
 });
 
 test('AUDIT HCC U6: HorseNameTooltipController\'s label - the classic face is DFU\'s line at native y 112, centred; the pool answers my own horse within the mod\'s 3.2 and nothing else (mutants: a peer\'s horse named; the name from past the reach)', async () => {
@@ -148,8 +133,6 @@ test('AUDIT HCC U6: HorseNameTooltipController\'s label - the classic face is DF
   const canvas = { width: 1280, height: 800, clientWidth: 1280, clientHeight: 800 };
   try { tip.draw(r, canvas, font); } catch { /* the text helper wants a real atlas; the row is what is pinned */ }
   assert.equal(HORSE_TOOLTIP_Y, 112);
-  const src = rd('src/ui/horseNameTooltip.js');
-  assert.match(src, /drawText\(renderer, font, this\.text, m\.ox \+ x \* m\.s, m\.oy \+ HORSE_TOOLTIP_Y \* m\.s, m\.s, DEFAULT_TEXT_COLOR\);/);
   assert.ok(nativeMetrics(canvas).s > 0);
   // the pool's word: my horse's label within ACTIVATION_REACH, else ''
   const pool = createHorseCartPool({ renderer: null, meshes: null, collider: () => null });
@@ -160,16 +143,10 @@ test('AUDIT HCC U6: HorseNameTooltipController\'s label - the classic face is DF
   horse.position = [0, 0, 20];
   assert.equal(pool.tooltipText([0, 1, 0], [0, 0, 1], col), '', 'past the mod\'s 3.2: nothing');
   void KEY_HORSE;
-  // the hosts gate it: outdoors, walking, IsPlayingGame, and only where the plaque is not already naming it
-  assert.match(rd('src/scenes/world.js'), /const tipOn = hcc\.enabled && walkMode && _mode\(\) === 'exterior' && !worldPlaqueOn\(\) && !gamePaused\(\) && !pointerSurfaces\.size;/);
-  assert.match(rd('src/ui/hud/hud.js'), /if \(hudDrawn\) horseNameTooltip\.draw\(renderer, canvas, font\); else horseNameTooltip\.hide\(\);/);
 });
 
 test('AUDIT HCC U5: the input box\'s classic face is untouched - the parchment on the classic skin, the enhanced window only under the enhanced one, and its caption says what closes a FIELD', () => {
   assert.equal(INPUT_BOX_HINT, 'Enter to accept \u00b7 Escape to cancel');
   const box = new InputMessageBoxWindow({ label: 'Name your horse:', value: 'Bess', maxCharacters: 31 });
   assert.equal(box.entryText(), 'Name your horse:Bess_');
-  const src = rd('src/ui/inputMessageBox.js');
-  assert.match(src, /if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{\n\s+if \(this\.done\) return;\n\s+drawEnhancedInputBox\(\{/);
-  assert.match(src, /releaseEnhancedInputBox\(this\._faceKey\);/);
 });

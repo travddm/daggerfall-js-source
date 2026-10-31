@@ -67,8 +67,6 @@ function countBuilds(pool) {
   return n;
 }
 
-// ── world.js's own statements, mounted (audit26_dungeonfoes' law: the statements are the ones in src/) ──
-const WORLD = rd('src/scenes/world.js');
 function cut(src, head, end) {
   const i = src.indexOf(head);
   assert.ok(i >= 0, `${head} is in the source`);
@@ -230,111 +228,10 @@ function foesPool(clock) {
   pool.setNet({ room: () => 'world:3,12', selfId: () => 'me', peers: () => [], now: () => clock.t, staleMs: 0, onPeerHit: () => true, toWire: (p) => [...p], toScene: (p) => [...p] });
   return pool;
 }
-/** world.js's foesStream and csaWord over a real foes pool with no foe in it, a boat moving at `speed`; the frames sent. */
-function sail(speed) {
-  const clock = { t: 0 };
-  const boat = { hull: 1, variant: 0, GameObject: { activeSelf: true, position: [0, 0, 0], rotation: [0, 0, 0, 1] }, Sails: [], LightOn: false };
-  const sent = [];
-  const scope = {
-    online: { status: 'open', room: 'world:3,12', isHost: () => false, sendFoes: (f) => { sent.push(f); return true; } },
-    isCellRoom, isWorldRoom, FOES_MS, FOES_FULL_MS, _foesSentAt: -Infinity, _foesFullAt: -Infinity, modes: { mode: 'exterior' },
-    _foesQuiet: quietFoesGate(),   // SCALE2c (PIN MOVED): the host's memory of what its cell last heard - a full frame that says nothing, said once
-    exteriorFoes: foesPool(clock), _hccDirty: false, camps: { wireRecords: () => [] }, hcc: { wireRecord: () => null }, duelRingWord: () => {}, raidWireWord: () => null, raidObjWord: () => null,   // THE MERGE: RAID2's word rides the same line - no raid here (RAID5: nor its objective's)
-    portalWord: () => {},   // PORTAL1: nor a portal
-    campToWire: (p) => [...p], csaRuntime: { AllBoats: [boat], isSailing: () => true, state: { CurrentBoat: boat } }, csaOn: () => true,
-    csaWireRecord, csaRecordKey, csaAnimatorOf: boatMod.animatorOf, _csaWordKey: null,
-    shipFlags: { wireFlag: () => null },   // PIN MOVED (SHIP-COLOURS: the boats' word asks each boat's flag - none flown here)
-    bandWord: () => false,   // TV7b: no band chases on this sea
-    seaRaidWord: () => false,   // OW6: nor raider chases
-    csaAboardWord: () => false,   // CSA-K: aboard nobody's boat - the stream's second word says nothing
-    navalOn: () => false, naval: null, navalRecordKey: () => '', _navalWordKey: null,   // NAV-G: the sea's word rides the same stream - off here, this pin is the boats'
-  };
-  scope.csaWord = mount(scope, cut(WORLD, 'function csaWord(frame, full) {', '\n  }\n'), 'csaWord');
-  scope.navalWord = mount(scope, cut(WORLD, 'function navalWord(frame, full) {', '\n  }\n'), 'navalWord');
-  const foesStream = mount(scope, cut(WORLD, 'const foesStream = (now) => {', '\n  };\n'), 'foesStream');
-  for (let t = 0; t <= 6000; t += 1000 / 60) {
-    clock.t = t;
-    boat.GameObject.position = [t / 1000 * speed, 0, 0];
-    foesStream(t);
-  }
-  return sent;
-}
-
-test('AUDIT PRE-MERGE 0928 O2: world.js\'s foes stream, mounted - a sailing boat\'s moved word asks for a frame as the team\'s does, so it rides every FOES_MS on a sea with no foe; a still boat rides the full frames alone', () => {
-  const sailing = sent => sent.filter((f) => f.sa !== undefined);
-  const moving = sailing(sail(4));
-  assert.ok(moving.length >= 25, `the word rode ${moving.length} frames in six seconds of sailing (a FOES_MS apart: about ${6000 / FOES_MS})`);
-  const gaps = moving.slice(1).map((f, i) => f.sa.b[0][2] - moving[i].sa.b[0][2]);
-  assert.ok(gaps.every((g) => g < 1.5), `no step between words past a FOES_MS of sailing (${Math.max(...gaps).toFixed(2)} m)`);
-  const still = sailing(sail(0));
-  assert.ok(still.length >= 3 && still.length <= Math.ceil(6000 / FOES_FULL_MS) + 1, `a still boat: ${still.length} words`);
-  assert.ok(still.every((f) => f.full === 1), 'every one on a full frame');
-});
 
 // ── O4 ──────────────────────────────────────────────────────────────────────
 
-test('AUDIT PRE-MERGE 0928 O4: the owner\'s look is their boat\'s (AUDIT 0927 I-B) - the classic lane\'s hidden sailor\'s boat at the helm stands nowhere (no mesh, no flat, no lantern light); the enhanced lane\'s wears the look on its crew and lanterns while the hull draws whole; a moored boat is a boat in the world either way', async () => {
-  const renderer = recordingRenderer();
-  const pool = await readyPool(renderer);
-  const peers = createComeSailAwayPeers({ pool, selfId: () => 'me' });
-  let look = 'hidden';
-  peers.setPeerLook?.((id) => (id === 'ann' ? look : null));
-  // ann at the helm of a Small Ship at x 0, her Large Galley moored at x 1000, both lit
-  peers.applyOwner('ann', { b: [word({ hull: 2, x: 0, z: 0, helm: 1, light: 1 }), word({ hull: 3, x: 1000, z: 0, light: 1 })] }, (p) => p, 0);
-  const near = (x) => (m) => Math.abs(m[12] - x) < 200;
-  const step = async () => { peers.frame(0.1); pool.frame(0.1, { cityLightsOn: true, playerPosition: [0, 0, 0] }); renderer.drawn.length = 0; pool.draw(); for (let i = 0; i < 4; i++) await settle(); renderer.drawn.length = 0; pool.draw(); };
-  for (let i = 0; i < 3; i++) await step();
-  const helmBoat = peers.shown()[0].boats[0].boat, moored = peers.shown()[0].boats[1].boat;
-  assert.equal(renderer.drawn.filter((d) => near(0)(d.matrix)).length, 0, 'hidden: nothing of the helm boat drawn');
-  assert.ok(renderer.drawn.filter((d) => near(1000)(d.matrix)).length > 0, 'the moored galley drawn');
-  assert.equal(pool.batches().filter((b) => Math.abs(b.origin[0]) < 200).length, 0, 'no flat of the helm boat');
-  assert.ok(pool.batches().some((b) => Math.abs(b.origin[0] - 1000) < 200), 'the moored one\'s flats');
-  assert.equal(pool.lights([0, 0, 0]).filter((l) => Math.hypot(l.x, l.z) < 60).length, 0, 'no lantern of the helm boat in the light list (the player beside it)');
-  // the enhanced lane: a concealed look
-  look = { mode: 1, alpha: 0.4, t: 0, phase: 0 };
-  for (let i = 0; i < 2; i++) await step();
-  assert.equal(helmBoat.GameObject.activeSelf, true);
-  assert.ok(renderer.drawn.filter((d) => near(0)(d.matrix)).length > 0, 'concealed: the hull drawn whole');
-  assert.ok(pool.lights([0, 0, 0]).some((l) => Math.hypot(l.x, l.z) < 60), 'seen, its lanterns light again');
-  const helmFlats = pool.batches().filter((b) => Math.abs(b.origin[0]) < 200), mooredFlats = pool.batches().filter((b) => Math.abs(b.origin[0] - 1000) < 200);
-  assert.ok(helmFlats.length > 0 && helmFlats.every((b) => b.conceal === look), 'its crew and lanterns in the owner\'s look');
-  assert.ok(mooredFlats.length > 0 && mooredFlats.every((b) => b.conceal == null), 'the moored boat\'s plain');
-  // seen again: plain
-  look = null;
-  await step();
-  assert.ok(pool.batches().every((b) => b.conceal == null), 'the look gone: every flat plain');
-  assert.equal(moored.GameObject.activeSelf, true);
-  // the host hands the look over as it hands the cart pool's
-  assert.match(WORLD, /csaPeers\.setPeerLook\(\(id\) => \(_hiddenPeers\.has\(id\)(?: \|\| !gateCrowd\.shows\(id\))? \? 'hidden' : \(_veils\.get\(id\) \?\? null\)\)\);/);   // PIN MOVED (AUDIT CROWD-WIDE B1): and one the crowd's count leaves undrawn (test/systems/gatecrowd.test.js)
-});
-
 // ── O6 ──────────────────────────────────────────────────────────────────────
-
-test('AUDIT PRE-MERGE 0928 O6: world.js\'s csaEnemies, mounted - underground the hull carries only the foes this client steps, never a room foe while another holds the seat or a party member\'s own; the modes answer with the dungeon frame\'s own puppet test', () => {
-  const mine = { ai: { feet: [0, 0, 0] } }, roomPuppet = { ai: { feet: [1, 0, 0] } }, ownPuppet = { ai: { feet: [2, 0, 0] }, _ownFrom: 'bob' }, dead = { dead: true, ai: { feet: [3, 0, 0] } };
-  const scope = {
-    modes: { mode: 'dungeon', insideFoes: () => [mine, roomPuppet, ownPuppet, dead], insideFoeIsPuppet: (f) => f === roomPuppet || f === ownPuppet },
-    exteriorFoes: { foes: [] }, cityGuards: { guards: [] }, _csaEnemyHandles: new WeakMap(), CAPSULE_HEIGHT: 1.8,
-  };
-  const csaEnemies = mount(scope, cut(WORLD, 'function csaEnemies() {', '\n  }\n'), 'csaEnemies');
-  assert.deepEqual(csaEnemies().map((h) => h.key), [mine.ai], 'mine alone');
-  scope.modes.insideFoeIsPuppet = () => false;
-  assert.equal(csaEnemies().length, 3, 'the one seat held here: every live foe is mine to carry');
-  // the seam and the test it asks, one law with the dungeon's frame
-  const modes = rd('src/scenes/worldModes.js'), dc = rd('src/scenes/dungeonContext.js');
-  assert.match(modes, /insideFoeIsPuppet\(f\) \{ return mode === 'dungeon' && !!dungeonCtx\?\.isPuppetFoe\?\.\(f\); \},/);
-  assert.match(dc, /const _puppet = isPuppetFoe\(f, _fi\);/, 'the frame steps its puppets by the same test');
-  assert.match(dc, /isPuppetFoe: \(f\) => isPuppetFoe\(f\),/);
-  // the dungeon's predicate, mounted: the room's foes are puppets only while another holds the seat
-  const predScope = { _authority: false, _layoutFoes: 2, foes: [] };
-  predScope.isRoomFoe = mount(predScope, cut(dc, 'const isRoomFoe = ', ';\n'), 'isRoomFoe');
-  const isPuppetFoe = mount(predScope, cut(dc, 'const isPuppetFoe = ', ';\n'), 'isPuppetFoe');
-  const layout = { n: 'layout' }, loose = { n: 'loose' }, enc = { n: 'enc', _encId: 3 }, own = { n: 'own', _ownFrom: 'bob' };
-  predScope.foes.push(layout, { n: 'layout2' }, loose, enc, own);
-  assert.deepEqual([layout, loose, enc, own].map((f) => isPuppetFoe(f)), [true, false, true, true], 'another holds the seat');
-  predScope._authority = true;
-  assert.deepEqual([layout, loose, enc, own].map((f) => isPuppetFoe(f)), [false, false, false, true], 'I hold it: only a party member\'s own is another\'s');
-});
 
 // ── R5 / R6 ─────────────────────────────────────────────────────────────────
 

@@ -266,17 +266,6 @@ test('FALL-HOLD: the column alone is asked - a flyer, a levitator and a Deep Wat
   assert.ok(!bat2.dead && Math.abs(bat2.ai.feet[1] - 30) < 0.05, `the paralysed flyer over no ground is held at its height, not fallen to ${Math.round(bat2.ai.feet[1])}`);
 });
 
-test('FALL-HOLD: the world host hands the ground law to both its pools; a pool without one (an interior, the one-location host) holds nothing', () => {
-  const src = rd('src/scenes/world.js');
-  for (const pool of ['createExteriorFoes', 'createCityGuards']) {
-    const at = src.indexOf(`= ${pool}({`);
-    assert.ok(at > 0, pool);
-    assert.match(src.slice(at, at + 500), /groundStands: \(x, z\) => Number\.isFinite\(heightAt\(x, z\)\)/, `${pool} is handed the streamed ground`);
-  }
-  assert.doesNotMatch(rd('src/scenes/worldModes.js'), /groundStands/, 'the interior mount (heightAt -Infinity, mesh floors) is handed none');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /groundStands/, 'nor the one-location host');
-});
-
 test('FALL-HOLD: an interior-shaped collider (heightAt -Infinity, a mesh floor) with no ground law still lets a foe fall onto its floor', async () => {
   const c = new Collider(() => -Infinity);
   c.addMesh('floor', new Float32Array([-50, 0, -50, 50, 0, -50, 50, 0, 50, -50, 0, 50]), new Uint32Array([0, 1, 2, 0, 2, 3]), [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);

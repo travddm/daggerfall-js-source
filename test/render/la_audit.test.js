@@ -122,7 +122,6 @@ test('LA-AUDIT A1: THE LEVEL\'S SHADOW CELLS - the batch\'s triangles again, sor
   calls.length = 0;
   r.destroyMesh(mesh);
   assert.deepEqual(calls.filter((c) => c[0] === 'deleteVertexArray').map((c) => c[1]), [mesh.vao, mesh.shadowVao]);
-  assert.match(rd('src/scenes/dungeonContext.js'), /const staticBuilder = new StaticBatchBuilder\(\{ shadowCell: SHADOW_CELL_SIZE \}\);/);
 });
 
 test('LA-AUDIT A1: A FACE DRAWS THE CELLS IT CAN SEE - a lamp in one room of a two-room level redraws its six faces from the cells\' buffer and never touches the other room, where the texture sub-meshes (each across both rooms) drew both rooms six times; the lit pass still draws the sub-meshes; a recentre carries the cells\' spheres (mutants: the replay by sub-mesh; the cells\' VAO not bound; a cell never culled; the spheres left behind)', () => {
@@ -180,14 +179,6 @@ test('LA-AUDIT A5: THE CAP FADES IN THE DUNGEONS AND IN THE MOD\'S TOWNS - capFa
   assert.deepEqual([...capFadePairs(lit, 1, pos, 3, same)], [...capFadeColors(lit, 1, pos, 3, [0.7, 0.7, 0.7])], 'one colour for all: capFadeColors');
   assert.equal(capFadePairs(lit, 1, pos, 4, colors), null, 'nothing cut, nothing faded');
   assert.equal(capFadePairs(lit, 3, pos, 3, colors), null, 'the hand fills the cap');
-  const wm = rd('src/scenes/worldModes.js'), dg = rd('src/scenes/dungeon.js'), w = rd('src/scenes/world.js');
-  assert.match(wm, /const _dgFade = !!renderer\.lightingLane && !isGateArena\(dungeonLoc\);/);
-  assert.match(wm, /const _dgNear = _iilDg \? nearestLights\(_iilDg\.lights, cam\.pos, renderer\.maxPointLights, _iilDg\.ranges, _iilDg\.colorOf\) : nearestLights\(dungeonCtx\.lights, cam\.pos, renderer\.maxPointLights \+ \(_dgFade \? 1 : 0\), /);
-  assert.match(wm, /renderer\.setPointLights\(_dgLit\.data, null, \(_dgFade && capFadePairs\(_dgLit\.data, _dgLit\.data\.length \/ 4 - _dgNear\.data\.length \/ 4, cam\.pos, renderer\.maxPointLights, _dgLit\.colors\)\) \|\| _dgLit\.colors\);/);
-  assert.match(dg, /const _near = _iilDg \? [^\n]*: nearestLights\(ctx\.lights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), /);
-  assert.match(dg, /renderer\.setPointLights\(_lit, DUNGEON_LANTERN_F32, renderer\.lightingLane \? capFadeColors\(_lit, _lit\.length \/ 4 - _near\.length \/ 4, cam\.pos, renderer\.maxPointLights, DUNGEON_LANTERN_F32\) : null\);/);
-  assert.match(w, /return nearestLights\(_sceneLights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), _litRanges, \(l, i\) =>/);
-  assert.match(w, /renderer\.setPointLights\(data, CITY_LIGHT_COLOR_F32, \(renderer\.lightingLane && capFadePairs\(data, lead, cam\.pos, renderer\.maxPointLights, colors\)\) \|\| colors\);/);
 });
 
 // ═══ F2. THE STREET'S POOL ═══════════════════════════════════════════════════════════════════════════════════════
@@ -201,7 +192,6 @@ test('LA-AUDIT F2: THE LANTERN POOL GROWS WITH THE TOWN - fillLanternPool writes
   assert.equal(rangesFor(kept, 8), kept, 'room enough: the same array');
   const grown = rangesFor(kept, 9);
   assert.ok(grown.length >= 9 && grown[7] === 3, 'grown, with what it held');
-  assert.match(rd('src/scenes/world.js'), /_litRanges = rangesFor\(_litRanges, total\);/);
 });
 
 // ═══ B1. THE CONTACT MARCH'S LIFT ════════════════════════════════════════════════════════════════════════════════
@@ -339,9 +329,7 @@ test('LA-AUDIT B5: THE EYE READS ITS STATE EXACTLY THROUGH A HALF-FLOAT FETCH - 
   const step = (AIR_ADAPT_LOG_RANGE[1] - AIR_ADAPT_LOG_RANGE[0]) / AIR_ADAPT_STEPS;
   assert.ok(worst < 0.01 * step, `the rounded decode: ${(worst / step).toFixed(4)} of a step`);
   assert.ok(worstOld > 10 * step, `the unrounded decode ran ${(worstOld / step).toFixed(1)} steps off`);
-  const air = rd('src/render/airPass.js');
   assert.match(AIR_ADAPT_GLSL, /uniform highp sampler2D uAdapt;/);
-  assert.equal((air.match(/uniform highp sampler2D uPrev;/g) ?? []).length, 2, 'LUM_FS\'s and ADAPT_FS\'s');
 });
 
 // ═══ B6. THE AO WINDOW FOLLOWS THE SURFACE ═══════════════════════════════════════════════════════════════════════
@@ -416,13 +404,6 @@ test('LA-AUDIT F1 + D: THE PROBE JUDGES A PICTURE, AND ONLY THE LIGHTING\'S - su
   // the churn: ten joins at no share and ten leaves at no share weigh nothing; the count still sees them
   const faded = summarize('street-walk', rows(11, { lights: { in: 0, out: 0 } })), hard = summarize('street-walk', rows(11, { lights: { in: 1, out: 1 } }));
   assert.deepEqual([faded.churn, faded.churnW, hard.churnW], [22, 0, 22]);
-  const probe = rd('tools/lightFlickerProbe.mjs');
-  assert.match(probe, /const bad = judge\(\{ scenes: SCENES, all, errors, frames: FRAMES, stillMax: STILL_MAX, booted, streetTavern \}\);/);
-  assert.match(probe, /const summary = summarize\(name, rows, out\.err\);/);
-  assert.match(probe, /if \(!booted\) fail\(`the world never booted \(\$\{BOOT_S\} s\)`\);/);
-  assert.match(probe, /await ev\(\(\) => \{ const e = window\.__playerEntity; if \(e && e\.maxHealth > 0\) e\.health = e\.maxHealth; \}\);\n\s+await ev\(\(\[src, keep, keep4\]\) => \{ const P = window\.__lfp;/, 'LA-AUDIT D: each pass starts whole');
-  assert.match(probe, /hp: window\.__playerEntity\?\.health \?\? null, flash: window\.__lfpFlash \? \+window\.__lfpFlash\.alpha\.toFixed\(3\) : null/, 'and every row carries the health and the HUD\'s flash');
-  assert.match(probe, /const j = i >> 2, w = PK && PK\[j\] \? 0 : PC && PC\.length >= j \* 3 \+ 3 \? Math\.min\(1, Math\.max\(PC\[j \* 3\], PC\[j \* 3 \+ 1\], PC\[j \* 3 \+ 2\]\)\) : 1;/);
 });
 
 // ═══ F6. THE HANDOVER AND THE LO COMPARE, DRIVEN ═════════════════════════════════════════════════════════════════

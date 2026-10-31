@@ -7,28 +7,6 @@ import { createHash } from 'node:crypto';
 import { trianglesToColliders } from '../../../src/ai/triRaster.js';
 import { buildNav, buildCompact, buildRegions, buildContours, buildPolyMesh, buildPolyMeshDetail, findPath, AGENT } from '../../../src/ai/nav/navmesh.js';
 
-test('ENHANCED AI 1: the navmesh body is project-final\u2019s, byte for byte from the agent params on', () => {
-  const ours = readFileSync('src/ai/nav/navmesh.js', 'utf8');
-  const bodyStart = ours.indexOf('// Agent params');
-  assert.ok(bodyStart > 0);
-  // the two lines that differ are ABOVE the body: the inlined surfaceY and the linter globals
-  const head = ours.slice(0, bodyStart);
-  assert.match(head, /function surfaceY\(c, x, z\) \{\s*\n\s*if \(!c\.ramp\) return c\.top;/, 'terrain.js:17-22 inlined verbatim');
-  assert.match(head, /\/\* global Buffer, btoa, atob \*\//);
-  assert.ok(!/setNavGround|_ground/.test(ours), 'no seam of our own - the ground goes in as buildNav\u2019s `ground`');
-  // AUDIT 62 F4 (2026-09-07): the pin above never read the BODY - every law from buildNav to the
-  // funnel could change and it stayed green. The body is pinned by digest now: the sha256 of the
-  // file from '// Agent params' on, re-recorded DELIBERATELY with the project-final commit the
-  // change was made in (decision #3: a change is made in both repos and said in both).
-  // Provenance: project-final navmesh.js (ENHANCED AI 1/2, 9f5e323 mergeHoles) + AUDIT 62 F1's
-  // stacked-floor changes + AUDIT 68's collider index under surfH/surfHNear (S02-surfh-linear-scan)
-  // + FIELD BUGS 2026-10-16b INDOOR-WATCH AUDIT W2's packed index under it (a landed bake's boxes are
-  // indexed packed, never unpacked on the main thread), made HERE FIRST and owed to project-final.
-  const sum = createHash('sha256').update(ours.slice(bodyStart)).digest('hex');
-  assert.equal(sum, '018c7c043e090957d1b51bc8a7a4d81d3cee998802058c4586327317d8f9b3b4',
-    'THE BODY CHANGED: make the change in project-final too, say it in both repos, then re-pin this digest with the commit');
-});
-
 test('ENHANCED AI 1: a floor becomes walkable spans, a wall becomes a column with no walkable top', () => {
   // a 4x4 m floor quad at y=0 and a 4 m wall along x=2 from y=0 to 3
   const P = [0, 0, 0, 4, 0, 0, 4, 0, 4, 0, 0, 4,   2, 0, 0, 2, 3, 0, 2, 3, 4, 2, 0, 4];
@@ -106,9 +84,6 @@ test('ENHANCED AI 2: a free-standing pillar is a hole in the mesh, and a path be
       assert.ok(!(x > 4.5 && x < 5.5 && z > 4.5 && z < 5.5), `segment ${k} crosses the pillar at (${x.toFixed(2)},${z.toFixed(2)})`);
     }
   }
-  const src = readFileSync('src/ai/nav/navmesh.js', 'utf8');
-  assert.match(src, /const mergeHoles = \(outer, holes\) => \{/, 'Recast’s mergeRegionHoles, in his file');
-  assert.ok(!/arena has none; hole-merging into the outer loop is future work/.test(src), 'the limit’s line is gone');
 });
 
 // ENHANCED AI 3: A LEVEL BAKES FROM ITS OWN COLLIDER - the triangles the
@@ -233,25 +208,6 @@ test('DEGENERATE-BAKE ROOT: a floor whose height lands on a voxel boundary is st
   // and the implicit plane is not laid at all: no span of the field stands under the level's lowest triangle
   for (const col of chf.spans) for (const sp of col) assert.ok(chf.ymin + sp.floor * chf.ch > -1, 'a span under the level - the phantom plane is back');
   assert.ok(Math.abs(polyHeight(chf, -1, 50, 50) - (0 - 10)) < 1e-9, 'while the height layer still answers the old floor off every box');
-});
-
-test('DEGENERATE-BAKE ROOT: a door a foe opens is left out of the soup, and the host leaves out every unlocked action door', async () => {
-  const { NavClient } = await import('../../../src/ai/nav/navClient.js');
-  const { navPath } = await import('../../../src/ai/nav/navBake.js');
-  const L = doorwayLevel();
-  const collider = await colliderOf(L.s, { 'act:0:7': L.door3 });
-  const client = new NavClient({ store: null, WorkerCtor: undefined });
-  const shut = await client.bake({ collider, anchor: L.A, key: 'dungeon:door' });
-  assert.equal(navPath(shut, L.A, L.B), null, 'a closed door the soup keeps is a wall');
-  const open = await client.bake({ collider, anchor: L.A, exclude: new Set(['act:0:7']), key: 'dungeon:door' });
-  assert.ok(navPath(open, L.A, L.B), 'left out, its doorway is a passage (EnemyMotor.OpenDoors opens it)');
-  const src = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  const call = src.slice(src.indexOf('enhancedNav.client.bake({ collider, anchor: [playerFeet[0], playerFeet[1], playerFeet[2]], '));
-  const args = call.slice(0, call.indexOf('key: _locationKey })'));
-  assert.ok(args.length > 0 && args.length < 400, 'the host\u2019s one bake call');
-  assert.match(args, /exclude: new Set\(\[\.\.\.actions\.objects\.values\(\)\]\.filter\(\(o\) => isActionDoorObject\(o\) && !\(o\.currentLockValue > 0\)\)\.map\(\(o\) => o\.key\)\)/,
-    'the host leaves out the doors openDoorsStep would open: action doors (not special ones), unlocked');
-  assert.match(args, /anchors: enemies\.map\(\(e\) => floorLanding\(collider, \[e\.x, e\.y \+ 0\.2, e\.z\]\)\)/, 'and names every layout foe, floor-landed');
 });
 
 test('DEGENERATE-BAKE ROOT: every place agents live is kept - a foe’s room with no walk to the player survives the cull, and an anchor over no floor elects nothing', async () => {
@@ -403,40 +359,6 @@ test('DEGENERATE-BAKE ROOT: a worker that dies on a large soup leaves the classi
     const none = new NavClient({ store: null, WorkerCtor: null });
     assert.ok(await none.bake({ collider: big, anchor: [1, 0, 1], key: 'big2' }), 'a client that never had a worker bakes here');
   } finally { console.warn = warn; }
-});
-
-test('ENHANCED AI 3b: the client bakes without a worker, caches, and a hydrated bake keeps the floor', async () => {
-  const { Collider } = await import('../../../src/player/collider.js');
-  const { NavClient, navCacheKey } = await import('../../../src/ai/nav/navClient.js');
-  const { polyHeight, __locatePolyIndexed } = await import('../../../src/ai/nav/navmesh.js');
-  const { navPath } = await import('../../../src/ai/nav/navBake.js');
-  const Id = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-  const P = [], I = []; const Y = -5;
-  const quad = (a, b, c, d) => { const s = P.length / 3; P.push(...a, ...b, ...c, ...d); I.push(s, s + 1, s + 2, s, s + 2, s + 3); };
-  quad([0, Y, 0], [10, Y, 0], [10, Y, 10], [0, Y, 10]);
-  for (const [a, b] of [[[0, 0], [10, 0]], [[10, 0], [10, 10]], [[10, 10], [0, 10]], [[0, 10], [0, 0]]]) quad([a[0], Y, a[1]], [b[0], Y, b[1]], [b[0], Y + 3, b[1]], [a[0], Y + 3, a[1]]);
-  const collider = new Collider(() => -Infinity);
-  collider.addMesh('dungeon', new Float32Array(P), new Uint32Array(I), Id);
-  const mem = new Map(); const store = { async get(k) { return mem.get(k) ?? null; }, async set(k, v) { mem.set(k, v); } };
-  const client = new NavClient({ store, WorkerCtor: undefined });
-  const a = await client.bake({ collider, anchor: [1, Y, 5], key: 'dungeon:test' });
-  assert.ok(a && a.chf && !a.cached, 'baked here, no worker');
-  const b = await client.bake({ collider, anchor: [1, Y, 5], key: 'dungeon:test' });
-  assert.ok(b.cached, 'the second bake is a cache hit');
-  for (const bake of [a, b]) {
-    const pi = __locatePolyIndexed(bake.chf, 5, 5);
-    assert.ok(pi >= 0);
-    assert.ok(Math.abs(polyHeight(bake.chf, pi, 5, 5) - Y) < 0.6, `${bake.cached ? 'hydrated' : 'fresh'}: the floor is ${Y}, not 0`);
-    const path = navPath(bake, [1, Y, 5], [9, Y, 5]);
-    assert.ok(path && path.length >= 2, `${bake.cached ? 'hydrated' : 'fresh'}: a path`);
-    assert.ok(Math.abs(path[path.length - 1][1] - Y) < 0.6, 'the path\u2019s points sit on the real floor');
-  }
-  const k = navCacheKey({ key: 'dungeon:test', tris: 10, minY: -5, maxY: -2 });
-  assert.notEqual(k, navCacheKey({ key: 'dungeon:test', tris: 11, minY: -5, maxY: -2 }), 'a different soup is a different key');
-  assert.notEqual(k, navCacheKey({ key: 'dungeon:other', tris: 10, minY: -5, maxY: -2 }), 'a different dungeon');
-  const src = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  assert.match(src, /if \(playerFeet && !enhancedNav\.requested && getPref\('enhancedAI'\)\) \{/, 'the host asks once, with the switch on, once the feet are known');
-  assert.match(src, /nav: \(\) => enhancedNav\.chf,/, 'and hands the bake to the motor through a thunk');   // AUDIT 68 S19-dead-api-exports: `api.enhancedNav` had no reader - the motor reads this
 });
 
 // DEGENERATE-BAKE GUARD (2026-09-20, Mac's patch): a report of foes

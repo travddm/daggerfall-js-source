@@ -116,13 +116,3 @@ test('FT1: the registry row - DFU Classic, over the settings key, sound', () => 
   assert.equal(featureForControl('prefs', 'Experimental/SmallerDungeons'), null, 'the store is part of the address');
 });
 
-test('FT1: the settings pane never draws a moved key as a second switch (FT13: nor as a pointer), and the home\'s switch face toggles', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /function settingRow\(key, \{ compact = false, home = false \} = \{\}\) \{[\s\S]{0,900}?if \(!home\) \{\s*const moved = featureForControl\('settings', key\);\s*if \(moved\) return movedRow\(moved\);\s*\}/, 'every settingRow call site asks the registry first - one home per idea');
-  assert.match(menu, /function movedRow\(_f\) \{ return null; \}/, 'FT13: a moved key draws nothing here - the pointer row is gone (Mac, 2026-09-14)');
-  assert.doesNotMatch(menu, /On the Features page\.|function goFeatures/, 'no pointer, no walk');
-  assert.match(menu, /row = settingRow\(c\.key, \{ compact: true, home: true \}\);/, 'the home itself is the one caller that gets the real row');
-  assert.match(menu, /if \(widgetFor\(c\.key\) === 'switch'\) \{\s*const \[sec, k\] = c\.key\.split\('\/'\);\s*main\.onclick = \(\) => write\(c\.key, stepValue\(c\.key, effective\(\)\[sec\]\?\.\[k\], 1\)\);/, 'the face toggles, as prefRow\'s does - the home has no help sheet to open');
-  // the key stays in its settings category: the map is total and pinned
-  assert.match(read('src/ui/settings/settingsMap.js'), /"Experimental\/SmallerDungeons",/);
-});

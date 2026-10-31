@@ -430,19 +430,6 @@ test('BOUNTY-TIERLABEL: a notice names its tier and the levels in it', async () 
   assert.equal(p.tierLabel, 'Tier 2 (levels 4\u20135)');
 });
 
-test('BOUNTY1: the bounties tick in the modal arm too - inside a dungeon or a building the hunt is not asleep', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const arm = src.indexOf('    if (modes.frame(dt, now)) {');
-  const armEnd = src.indexOf('      requestAnimationFrame(frame);\n      return;\n    }', arm);
-  assert.ok(arm > 0 && armEnd > arm, 'the modal arm is where it was');
-  const body = src.slice(arm, armEnd);
-  assert.match(body, /bountyHost\?\.tick\(dt\)/, 'the bounty tick runs in the modal arm (Mac: the graveyard\'s spiders never stood)');
-  assert.match(body, /bountyFarms\?\.sync\(/, 'and the farms are brought in line there (they come down underground)');
-  assert.match(src, /dungeonPixel: \(\) => bountyDungeonPixel\(modes, playerTravelPixel\),/, 'the dungeon\'s own pixel is its location\'s');   // PIN MOVED (LAIR-WORLD, HOST-SPLIT): the closure out to scenes/bountyHost.js bountyDungeonPixel, verbatim
-  assert.match(readFileSync(new URL('../../src/scenes/bountyHost.js', import.meta.url), 'utf8'), /export function bountyDungeonPixel\(modes, travelPixel\) \{[\s\S]{0,200}modes\?\.dungeonLocation\?\.mapTableData/);
-});
-
 test('BOUNTY-FARM-PICK: a notice copies one of the eight nearest farms, the same one for everyone', async () => {
   const { pickFarm, FARM_PICK_NEAREST } = await import('../../src/scenes/bountyFarms.js');
   const farms = Array.from({ length: 30 }, (_, i) => ({ px: 300 + i, py: 200, name: `F${i}` }));

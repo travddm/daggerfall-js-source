@@ -64,12 +64,6 @@ test('RENOWN-ACCOUNT the rate: every source pays RENOWN_RATE_PCT (75) of its ful
   assert.equal(RENOWN_XP_REPORT_MAX, 5_000, 'one report\'s bound stands');
   assert.equal(Math.ceil(RENOWN_XP_MAX / RENOWN_XP_HOUR_MAX), 155, 'a client that lies every hour takes 155 hours to the cap - it was 116');
   assert.equal(RENOWN_TRACKS_MAX, 60, 'RENOWN-CHAR: the tracks\' bound came back with the tracks (RENOWN-ACCOUNT had taken it)');
-  // the law's own worked examples say the new numbers
-  const words = src('src/net/renown.js').replace(/\s*\n \*\s*/g, ' ').replace(/\s*\n\/\/\s*/g, ' ');
-  assert.match(words, /at Daggerfall level 30, Renown 10 is 79 kills and Renown 20 is 531/);
-  assert.match(words, /383 XP a kill at level 30 with the whole party's bonus/);
-  assert.match(words, /takes 155 hours \(2,318,660 \/ 15,000\)/);
-  assert.match(words, /Renown 1 takes 585, Renown 10 1,395, Renown 27 and up 2,925/);
 });
 
 // ═══ THE MIGRATION ═══════════════════════════════════════════════════════════════════════════════

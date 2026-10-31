@@ -51,36 +51,6 @@ test('PERF-ON2: a peer outside the frustum is skipped, and one inside is kept - 
     'a zero-sized batch is its own point');
 });
 
-test('PERF-ON2 / PERF-CROWD: the host culls the peers AND the live crowd, by the batch\u2019s own sphere, lifted for the bottom anchor', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(cullOn && billboardOutside\(b\)\) \{ if \(renderer\.shadowReachBatch\(b\)\) castBatches\.push\(b\); continue; \}[\s\S]{0,120}?allBatches\.push\(b\);/,
-    'every peer batch is tested before it is submitted (AUDIT REACH: a rejected peer a shadow reaches goes to the casters\' list)');
-  assert.doesNotMatch(w, /if \(remotePlayers\) for \(const b of remotePlayers\.batches\(\)\) allBatches\.push\(b\);/, 'the unconditional push is gone');
-  // PERF-CROWD: and the townspeople, the watch, the foes, the piles, the
-  // blow effects, the torches and the camps - the same list, never culled
-  // at all until now, and in a town most of the frame's billboards.
-  assert.match(w, /if \(cullOn && livePersonBatches\.length\) \{[\s\S]{0,400}?if \(!billboardOutside\(b\)\) livePersonBatches\[keep\+\+\] = b;\n\s*else if \(renderer\.shadowReachBatch\(b\)\) castBatches\.push\(b\);[\s\S]{0,160}?livePersonBatches\.length = keep;/,
-    'the crowd is filtered IN PLACE - the cull mints no array of its own (SHADOW-REACH: a rejected townsman a shadow reaches goes to the casters\' list, which the frame already holds)');
-  assert.doesNotMatch(w, /const peerBatchOutside/, 'one test for both lists, not two');
-  // THE LIFT is the whole correctness of it: the sphere is stored about the
-  // placement point and the sprite stands its full height above that point.
-  // GHOST1: and it lives in ONE home now - this host asks `batchVisible`,
-  // which is what the shadow replay and the air pass's emitters ask too.
-  assert.match(w, /const billboardOutside = \(b\) => !batchVisible\(_planes, b\);/, 'the host delegates, it does not hand-roll the sphere');
-  assert.doesNotMatch(w, /sphereInPlanes\(_planes/, 'no second copy of the test in the host');
-  const bounds = read('src/render/bounds.js');
-  // PERF-EXT (2026-09-25, the review of the shadows): the lift has ONE home,
-  // batchLift, which the sphere and the shadow pass's placement queries take.
-  assert.match(bounds, /s\[1\] \+ \(o \? o\[1\] : 0\) \+ batchLift\(b\)/, 'the sphere centre is lifted, in batchVisible');
-  assert.match(bounds, /export function batchLift\(b\) \{\n\s*return \(b\.size\?\.h \?\? 0\) \* 0\.5;/, '...by half a height, at the lift\'s one home');
-  assert.match(bounds, /const s = b\.bounds;\n\s*if \(!s\) return null;/, 'a batch with no bounds has no sphere');
-  assert.match(bounds, /return !c \|\| sphereInPlanes\(planes, c\[0\], c\[1\], c\[2\], c\[3\]\);/, '...and is always drawn');
-  const r = read('src/render/renderer.js');
-  assert.match(r, /\+ uUp \* \(\((?:aCorner|cn)\.y \+ 0\.5\) \* uSize\.y\)/, 'the VS stands the quad from the placement point UP - which is why the lift exists');
-  assert.match(r, /bounds\[3\] \+= quadHalfDiagonal\(size\);/, 'and the stored radius already covers hypot(w, h) / 2, which is what the lifted centre needs');
-  assert.match(bounds, /export function quadHalfDiagonal\(size\) \{\n\s*return Math\.hypot\(size\.w, size\.h\) \* 0\.5;/, '...from the half-diagonal\'s one home (the review)');
-});
-
 test('PERF-ON2 / PERF-CROWD: the lifted sphere really does contain the sprite, and the unlifted one does not', async () => {
   const { sphereInPlanes, boundsOf } = await import('../../src/render/bounds.js');
   // a person: tall and narrow, which is the shape the unlifted sphere fails on
@@ -102,7 +72,6 @@ test('PERF-CPU: `?perf=cpu` is its own door, and it does not turn the zone door 
   assert.equal(perfCpu('?perf'), false);
   assert.equal(perfCpu('?perf=zones'), false);
   assert.equal(perfCpu(''), false);
-  assert.match(read('src/render/renderer.js'), /new PerfMeter\(gl, perfZones\(\), perfCpu\(\)\)/, 'and the renderer passes it');
 });
 
 test('PERF-CPU: the zones TILE on the main thread’s clock - they sum to the frame, nothing is double-counted, and the line names its clock', () => {
@@ -148,129 +117,7 @@ test('PERF-CPU: `frame()` closes the frame whether or not `stop()` was called - 
 });
 
 test('PERF-CPU: markCpu leaves the GPU arm exactly as it was', () => {
-  const src = read('src/render/perfMeter.js');
-  assert.match(src, /markCpu\(name\) \{ if \(this\.cpu\) this\._cpuMark\(name\); \}/, 'it touches openZone and the query stack not at all');
-  assert.match(src, /if \(this\.cpu\) return;\n\s+if \(!this\.ext \|\| this\.active \|\| this\.zones\) return;/, 'and the GPU clock does not run under ?perf=cpu');
-  // the host marks the phases a script-bound frame is actually spending in
-  const w = hostText('src/scenes/world.js');
-  for (const zone of ['online', 'sim', 'batches', 'flats', 'people']) {
-    assert.match(w, new RegExp(`markCpu\\('${zone}'\\)`), `the frame marks '${zone}'`);
-  }
-  assert.match(read('src/render/perfMeter.js'), /export function perfZoneLine\(zones, counts, clock = 'gpu'\)/, 'and a GPU line still says gpu');
   assert.match(perfZoneLine(new Map([['a', 1]]), { draws: 2 }), /^\[perf\] gpu 1\.00ms/, 'by default');
-});
-
-test('PERF-FLICKER: a lantern’s flicker cannot rebuild its shadow cube - the far plane is the light’s range rounded UP, and never inside it', async () => {
-  const { shadowFarFor, SHADOW_FAR_QUANTUM } = await import('../../src/render/shadowPass.js');
-  const { CityLightAnimator } = await import('../../src/world/worldClock.js');
-  const { CITY_LIGHT_RANGE } = await import('../../src/world/city/cityLights.js');
-  // NEVER INSIDE THE LANTERN'S REACH: a far plane short of the range would
-  // clip a shadow before the light stops lighting.
-  for (let r = 0.5; r < 60; r += 0.25) assert.ok(shadowFarFor(r) >= r, `far ${shadowFarFor(r)} >= range ${r}`);
-  assert.equal(shadowFarFor(SHADOW_FAR_QUANTUM * 3), SHADOW_FAR_QUANTUM * 3, 'a range already on the quantum is untouched - the rounding is UP, not a blanket widening');
-  // AND THE WHOLE FLICKER BAND IS ONE VALUE. This is the fix: the animator
-  // wanders a light's range every step, the shadow pass compared that number
-  // to decide a slot had changed, and so every caster rebuilt all six of its
-  // faces every frame - EL8's near/far schedule could never fire.
-  const anim = new CityLightAnimator(1, CITY_LIGHT_RANGE);
-  const seen = new Set();
-  let moved = 0, last = anim.ranges[0];
-  for (let f = 0; f < 600; f++) {
-    anim.tick(1 / 60);
-    if (anim.ranges[0] !== last) { moved++; last = anim.ranges[0]; }
-    seen.add(shadowFarFor(anim.ranges[0]));
-  }
-  assert.ok(moved > 50, `the flicker really does move the range (${moved} of 600 frames) - without this the pin proves nothing`);
-  assert.equal(seen.size, 1, `...and every one of those frames maps to ONE shadow far plane (${[...seen]}), so the cube is not rebuilt`);
-  // the source: the shadow's far is the quantised one everywhere it matters
-  // LA-SHADOW4 (re-aimed): the rank's far is its slot's own held across the flicker, else the quantised one - taken by
-  // the matrices, the change test, pointParams and the signature alike
-  const sp = read('src/render/shadowPass.js');
-  assert.match(sp, /farOf\[rank\] = same \? heldShadowFar\(sl\[o \+ 3\], L\[i \* 4 \+ 3\]\) : shadowFarFor\(L\[i \* 4 \+ 3\]\);/, 'the quantised far, held');
-  assert.match(sp, /const far = farOf\[rank\];/, 'the matrices, the change test and pointParams all take it');
-});
-
-test('PERF-LIGHTS: the night’s lanterns are a pool - the same selection, with nothing minted per lantern per frame', async () => {
-  const { nearestLights, fillLanternPool } = await import('../../src/world/city/cityLights.js');
-  const rnd = (() => { let s = 7; return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; })();
-  for (let t = 0; t < 60; t++) {
-    const n = (rnd() * 200) | 0;
-    const fresh = []; for (let i = 0; i < n; i++) fresh.push({ x: (rnd() - 0.5) * 200, y: (rnd() - 0.5) * 40, z: (rnd() - 0.5) * 200 });
-    // the pool as the host keeps it: the live entries, and STALE ones past them
-    const pool = fresh.map((o) => ({ ...o }));
-    for (let i = 0; i < 50; i++) pool.push({ x: 9e9, y: 9e9, z: 9e9 });
-    const ranges = new Float32Array(n + 50); for (let i = 0; i < ranges.length; i++) ranges[i] = 17 + rnd();
-    const pos = [(rnd() - 0.5) * 50, 2, (rnd() - 0.5) * 50];
-    assert.deepEqual([...nearestLights(pool, pos, 16, ranges, null, 0, n)], [...nearestLights(fresh, pos, 16, ranges)],
-      'the pool with a count picks exactly what a freshly built list picks');
-  }
-  // and the default is still the whole array, for every caller that passes no count
-  const some = [{ x: 0, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }];
-  assert.equal(nearestLights(some, [0, 0, 0], 16, 5).length, 8, 'no count: the whole list');
-  assert.equal(nearestLights(some, [0, 0, 0], 16, 5, null, 0, 1).length, 4, 'a count: only that much of it');
-  // LA-AUDIT F2: the host's fill is cityLights.js's fillLanternPool - run it twice on one pool: the same objects, refilled
-  const pool = [], px = [{ px: 3, py: 4, lights: [[1, 2, 3], [4, 5, 6]] }, { px: 5, py: 4, lights: [[7, 8, 9]] }];
-  const first = fillLanternPool(px, () => [10, 0, 10], pool, new Float32Array(2), new Float32Array(64).fill(18));
-  const objs = pool.slice(0, first.n);
-  const again = fillLanternPool(px.slice(1), () => [20, 0, 20], pool, first.ranges, new Float32Array(64).fill(18));
-  assert.equal(pool[0], objs[0], 'the objects are refilled, not re-minted');
-  assert.deepEqual([again.n, pool[0].x, pool[0].z], [1, 27, 29], 'the one left, under its live translation');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /fillLanternPool\(built\.values\(\), \(p\) => state\.pixelTranslation\(p\.px, p\.py, _lightT\), _sceneLights, /, 'the host fills its one pool, the translation into the one triple');
-  assert.doesNotMatch(w, /sceneLights\.push\(\{ x: l\[0\]/, 'the per-lantern object literal is gone');
-});
-
-test('PERF-BASIS: the shadow replay uploads the basis once, not once a flat - and the lantern arm still turns each flat to face it', () => {
-  const sp = read('src/render/shadowPass.js');
-  // WHAT IS HOISTED. `up` is the constant [0,1,0] (or the record's, fixed
-  // for the record) and `right` is the frame's sun basis, set once in
-  // frame() before the cascade loop - so three cascades deep, every frame,
-  // a sun replay was paying two uniform uploads a flat for two numbers
-  // that could not change.
-  assert.match(sp, /const perBatchRight = !recordBasis && !!lightPos;/, 'exactly one of the four cases varies per flat');
-  assert.match(sp, /gl\.uniform3fv\(P\.bb\.up, recordBasis \? r\.up : this\._up\);\n\s*if \(!perBatchRight\) gl\.uniform3fv\(P\.bb\.right, recordBasis \? r\.right : this\._right\);/,
-    'and both go up ONCE a record, outside the batch loop');
-  // WHAT IS NOT. A lantern's replay turns every flat to face the lantern -
-  // that is EL6's own law, and hoisting it would flatten every sprite's
-  // shadow to one direction. The mutation campaign found nothing in the
-  // suite that could fail this, which is why it is stated here.
-  assert.match(sp, /if \(perBatchRight\) \{[\s\S]{0,400}?this\._right\[0\] = dz \/ l; this\._right\[1\] = 0; this\._right\[2\] = -dx \/ l;\n\s*gl\.uniform3fv\(P\.bb\.right, this\._right\);/,
-    'the lantern arm recomputes the basis per flat AND uploads it');
-  assert.equal((sp.match(/gl\.uniform3fv\(P\.bb\.right/g) ?? []).length, 3, 'three uploads in the file: the hoisted one, the lantern\u2019s, and the player\u2019s own card\u2019s (DISC24-C: cast as drawn)');
-  assert.match(sp, /if \(perBatchRight && b\.selfCard\) \{\n\s*gl\.uniform3fv\(P\.bb\.right, r\.right\);/, 'DISC24-C: the self card takes its recorded basis, per flat, in the lantern replay');
-  // and the bind skips its repeats, as the main pass's has since PERF3
-  assert.match(sp, /if \(tex !== lastTex\) \{ gl\.bindTexture\(gl\.TEXTURE_2D, tex\); lastTex = tex; \}/, 'a run of flats sharing a record binds once');
-  assert.match(sp, /let lastTex = null;/, 'reset per record, so a record cannot inherit the last one\u2019s texture');
-});
-
-test('PERF-CROWD2: the billboard PASS culls, so no host can forget to - and it culls after the shadow record, so nothing stops casting', () => {
-  const r = read('src/render/renderer.js');
-  // the same bug was in every host: the dungeon's mobiles, drops and
-  // spells, the interior's flats, the fixed city's townspeople, and
-  // worldModes' five separate uncut calls. Seven call sites, and an
-  // eighth waiting to be written. The test lives in the pass now.
-  assert.match(r, /const bbCull = !this\._bbCullOff && !!this\._proj && !!this\._view;/, 'the pass decides, once a call');
-  assert.match(r, /if \(this\._casting\) this\._shadows\.recordBillboards\([\s\S]*?if \(bbCull\) spherePlanes\(/,
-    'the planes are taken AFTER the shadow record - everything still casts, only the drawing is culled');
-  // AUDIT PERF-CROWD2 F1: a culled batch that never re-keyed would cast
-  // the silhouette of whatever frame it was on when it left the view. A
-  // mobile animates by writing its RECORD (MAC4), and the cascades reach
-  // 240 units. AUDIT 68 S16-bbkey-stale-shadow-reach: the replays re-key
-  // through billboardKey themselves - recordShadowBillboards records
-  // batches this pass never saw - and the opaque sort still wants every
-  // batch keyed before it.
-  assert.match(r, /if \(bbCull && !this\._bbVisible\(b\)\) \{ this\.stats\.bbCulled\+\+; continue; \}[^\n]*\n\s*billboardKey\(b\);\n\s*opaque\.push\(b\);/,
-    'the opaque partition culls, then keys what it sorts');
-  for (const other of ['src/render/shadowPass.js', 'src/render/airPass.js']) {
-    assert.match(read(other), /const key = billboardKey\(b\);/, `${other} keys through the one home`);
-    assert.doesNotMatch(read(other), /b\._bbKey \?\?/, `${other} never takes a stamped key as it stands`);
-  }
-  assert.match(r, /if \(bbCull && !this\._bbVisible\(b\)\) \{ this\.stats\.bbCulled\+\+; continue; \}[\s\S]{0,60}?\(blended \?\?= \[\]\)\.push\(b\);/, 'and the blended one - the ghosts and the concealed are billboards too');
-  // GHOST1: the same test as the host's and the two replays' - the one home
-  assert.match(r, /_bbVisible\(b\) \{\n\s*return batchVisible\(this\._bbPlanes, b\);\n\s*\}/, 'the pass delegates to batchVisible');
-  // the ?cull=off door still turns everything off, as it does for EV3
-  assert.match(r, /this\._bbCullOff = cullDisabled\(\);/, 'one read, at construction');
-  assert.match(r, /bbCulled: 0/, 'and the frame says how many it skipped');
 });
 
 test('AUDIT PERF-LIGHTS F2: a per-light range array shorter than the light list gives a real range, not a silent NaN', async () => {

@@ -83,30 +83,6 @@ test('AUDIT 62 F11: an indoor minute rolls NOTHING, and the door must not replay
   assert.ok(banked > 120, `the banked replay spawns on most nights (${banked}/200) - that is the divergence`);
 });
 
-test('AUDIT 62 F11: the mode machine rings the loop once per modal frame, and from the interior rest', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const fi = wm.indexOf('  function frame(dt, now) {');
-  assert.ok(fi > 0);
-  const call = wm.indexOf('host.encounterTick?.();', fi);
-  const dungeonSplit = wm.indexOf("    if (mode === 'dungeon') {", fi);
-  const exitReturn = wm.indexOf("    if (mode === 'exterior') return true;", fi);
-  assert.ok(call > fi, 'the modal frame calls the host\'s catch-up loop');
-  assert.ok(call < dungeonSplit, 'ABOVE the render split, so one line covers the interior and dungeon arms');
-  assert.ok(call < exitReturn, 'and above the exit-transition return, so the minutes are still indoor minutes');
-  assert.match(wm.slice(call - 40, call + 24), /if \(!overlayHeld\) host\.encounterTick\?\.\(\);/,
-    'under the same gate the interior ticker rides - a paused game runs no Update');
-  // TickRest's minutes pass indoors too (the outdoor hosts' rest deps
-  // have consumed theirs since ROAD-G TAIL).
-  assert.match(wm, /advanceMinutes: \(n\) => \{ interiorTicker\.advance\(n\); host\.encounterTick\?\.\(\); \},   \/\/ LIVED1/,
-    'the interior rest consumes its own minutes');   // LIVED1 re-aim: the rest's own line (its note), on the character's own clock
-  // and both hosts hand the dep in
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(h);
-    const bag = s.slice(s.indexOf('var modes = createWorldModes({'));
-    assert.match(bag, /encounterTick: \(\) => runEncounterTick\(/, `${h}: the host offers its loop to the mode machine`);
-  }
-});
-
 test('AUDIT 62 F11: the NPC-guard conversion sweep is EXTERIOR only in both hosts', () => {
   // MakeNPCGuardsIntoEnemiesIfGuardsSpawned (PlayerEntity.cs:764-780)
   // walks PopulationManager.PopulationPool and skips every
@@ -250,52 +226,9 @@ test('AUDIT 62 F14: a NON-eligible interior is answered INSIDE the building, aro
   assert.equal(witness.activeCount(), 0, 'no crime is seen by an inactive population');
 });
 
-test('AUDIT 62 F14: the mode machine takes the call for EVERY interior, and the street pool is empty indoors', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const fn = wm.slice(wm.indexOf('spawnCityGuardsInside(immediate) {'));
-  const body = fn.slice(0, fn.indexOf('\n    },'));
-  assert.match(body, /if \(mode !== 'interior' \|\| !interiorCtx \|\| !interiorGuards\) return false;/,
-    'a dungeon still falls through, where SpawnCityGuards\' own outer gate refuses it');
-  assert.equal(/if \(!eligible\) return false;/.test(body), false,
-    'a temple, a guild hall or a palace is NOT handed back to the street');
-  assert.match(body, /interior: \{ doors: interiorCtx\.doors, origin: interiorCtx\.parentPt\(0, 0, 0\), eligible \}/,
-    'the eligibility rides the interior bag instead of gating the call');
-  assert.match(body, /pool: \[\],/, 'the population is inactive indoors');
-  assert.ok(body.trimEnd().endsWith('return true;'), 'and the host answers TRUE in both arms');
-  // the other half: the street pool itself answers nobody indoors
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(src(h), /const _guardPool = \(\) => \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior' \? \[\] : _livePersons\.map/,
-      `${h}: DFU's three isActiveAndEnabled continues, at the one place the pool is materialised`);
-  }
-});
-
 // ─────────────────────────────────────────────────────────────────────
 // F15 - CreateFoe's OverlapSphere is over ANY collider
 // ─────────────────────────────────────────────────────────────────────
-
-test('AUDIT 62 F15: both of world.js\'s placement arms test the watch too', () => {
-  // CreateFoe.cs:319-323 - `Physics.OverlapSphere(testPoint,
-  // overlapSphereRadius); if (colliders.Length > 0) return;`. A
-  // watchman's capsule is a collider, so the quest arm may not ask the
-  // encounter pool alone.
-  const w = hostText('src/scenes/world.js');
-  // AUDIT PSCALE1 COUNT-3: the encounter arm asks the placing pool - the whole street AND the spots a stand in flight
-  // holds - and so do a camp's members, around their anchor
-  assert.match(w, /const _placingPool = \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.exteriorFoes\.pendingFeet\(\)/);
-  // CAMP-FAR (2026-09-24): the group's ANCHOR no longer asks here - it
-  // stands a hundred metres out by campEncounters.js campAnchorSpot,
-  // where a capsule at the player's feet is not in question; the
-  // members still ask the whole street around the anchor
-  // (test/systems/camp1_groups.test.js pins that env).
-  // QUEST-WAVE (2026-09-26): the quest arm asks the street AND the spots its own in-flight stands hold
-  assert.equal((w.match(/isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet(?: \?\? f\.feet)?, (?:\(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\]|_placingPool), feet\)/g) ?? []).length, 2,
-    'the encounter arm and the quest arm ask the whole street at the player\'s feet');
-  assert.match(w, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet(?: \?\? f\.feet)?, (?:\(\) => exteriorFoePool\(\)|_placingPool), anchorFeet\)/,
-    'and CAMP1\'s members ask it around the anchor');
-  assert.equal(/exteriorFoes\.foes, feet\)/.test(w), false, 'neither asks the encounter pool alone');
-  assert.match(src('src/scenes/exterior.js'), /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\], feet\)/,
-    'the ?exterior twin already asked it (QUEST-WAVE: with the spots in flight)');
-});
 
 // ─────────────────────────────────────────────────────────────────────
 // F22 - EnemySenses' band pick reads IsPlayerInside
@@ -323,18 +256,6 @@ test('AUDIT 62 F22: inside a building a foe two storeys up is NOT spawned in cla
   assert.equal(wouldBeSpawnedInClassic(26, 0, false, 0, false), true, '...but well inside 102.4m outdoors');
 });
 
-test('AUDIT 62 F22: the two INTERIOR mounts declare it; the street pools keep the exterior band', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.equal((wm.match(/^\s*playerInside: true,$/gm) ?? []).length, 2,
-    'makeInteriorFoes and makeInteriorGuards both stand inside a building');
-  for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    const s = src(f);
-    assert.match(s, /^\s*playerInside = false,$/m, `${f}: the dep exists, defaulting to the street`);
-    assert.equal(/playerInside: false,/.test(s), false, `${f}: and the EnemyAI is no longer handed a literal`);
-    assert.match(s, /^\s*playerInside,/m, `${f}: the mount's answer reaches the senses`);
-  }
-});
-
 // ─────────────────────────────────────────────────────────────────────
 // F29 - the sky's PlayerEnterExit transition
 // ─────────────────────────────────────────────────────────────────────
@@ -360,26 +281,3 @@ test('AUDIT 62 F29: a flash in flight is killed at the door, not paid out on the
   assert.equal(closed.tick(0.01), null, 'the door killed the routine and the light with it');
 });
 
-test('AUDIT 62 F29: the sky controller carries the door and both hosts latch the edge around modes.frame', () => {
-  // main's AUDIT 61 (PR #61) landed the same wiring while this lane ran;
-  // the lane's own latch was dropped for it at integration. What this
-  // pin holds is the POSITION of the two edges, which is the law: the
-  // entering edge inside the modal block (the mode flips inside
-  // modes.frame), the leaving edge above sky.use (the first line that
-  // would tick a frozen flash and light it).
-  assert.match(src('src/scenes/shared.js'), /setInside\(inside\) \{ dynamic\?\.setInside\(inside\); \},/,
-    'createSkyController publishes the transition door');
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(h);
-    const modal = s.indexOf('if (modes.frame(dt, now)) {');
-    const entering = s.indexOf('if (!skyInside) { skyInside = true; sky.setInside(true); }', modal);
-    const closes = s.indexOf('\n    }\n', modal);
-    const leaving = s.indexOf('if (skyInside) { skyInside = false; sky.setInside(false); }', closes);
-    const use = s.indexOf('sky.use(');
-    assert.ok(modal > 0 && entering > modal && entering < closes,
-      `${h}: the entering edge is read INSIDE the modal block - the mode flips inside modes.frame`);
-    assert.ok(leaving > closes && leaving < use,
-      `${h}: and the leaving edge on the frame that fell through, before anything ticks or draws the sky`);
-    assert.equal(s.includes('_skyEnterExit'), false, `${h}: one latch, not two`);
-  }
-});

@@ -195,13 +195,6 @@ test('SHARE-MEND once: a deliberate share is always answered; a sync\'s refusal 
   assert.equal(sayShareRefusal(said, 'a-cass', 'M0B00Y00', g, true), true, 'another sharer is said');
 });
 
-test('SHARE-MEND the host: a sync goes out marked, and the receiver says a refusal through the once-law with the sender\'s build (mutants: the sync unmarked; the refusal said every time)', () => {
-  const W = src('src/scenes/world.js');
-  assert.match(W, /socialLink\(\)\?\.shareQuest\(\{ questName: prepared\.questName, displayName: prepared\.displayName, data: \{ \.\.\.prepared\.data, sync: 1 \} \}\)/);
-  assert.match(W, /if \(!sayShareRefusal\(_questRefusalSaid, acct, quest\.questName, result, quest\.data\?\.sync === 1, `\$\{quest\.data\?\.shareId \?\? ''\}\|\$\{quest\.data\?\.build \?\? ''\}`\)\) return;\n\s*setMidScreenText\(shareRefusedLine\(result, who, label, quest\.data\?\.build \?\? null\)\);/);   // PIN MOVED (QUEST-AUDIT III SHARE-WORDS): the line is questShare.js shareRefusedLine's, with the sender's build
-  assert.match(W, /const _questRefusalSaid = new Set\(\);/);
-});
-
 // ─── AUDIT (the batch's audit, agent D) ────────────────────────────────────────────────────────────────────────────
 
 test('AUDIT SHARE-MEND D3: the markers are made whole AFTER the shape check - a Place whose symbol is no string is refused in words ("did not match"), where the mend threw out of the receipt and the frame was dropped unsaid (mutants: the mend first)', () => {

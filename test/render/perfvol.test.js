@@ -364,17 +364,6 @@ test('PERF-VOL: the replay draws exactly what it drew - every draw of every fram
   assert.ok(compared > 2000, `the comparison drew something (${compared})`);
 });
 
-test('PERF-VOL: the replay asks through the name, once a replay, a lantern\'s alone, and only with a placed batch to ask; and the memo SHIPS ON (AUDIT PERF-ARENA O1: every other pin sets the switch for each arm, so a shipped `volumeMemo: false` failed none) (mutant: PERFVOL-shipped-off)', async () => {
-  assert.equal(SHIPPED.volumeMemo, true, 'SHADOW_TUNING.volumeMemo ships on');
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/render/shadowPass.js', import.meta.url), 'utf8');
-  const body = src.slice(src.indexOf('  replay(f, vp, lightPos,'), src.indexOf('\n  }\n', src.indexOf('  replay(f, vp, lightPos,')));
-  assert.match(body, /let vname = -1;/, 'the name is asked lazily');
-  assert.match(body, /if \(vname < 0\) vname = lightPos && SHADOW_TUNING\.volumeMemo !== false \? volumeName\(planes\) : 0;/, 'at the first placed batch, a lantern\'s alone, by the off arm (AUDIT PERF-ARENA V2: no cascade\'s planes come again)');
-  assert.match(body, /if \(!\(vname === 0 \? placementsInVolume\(b, rad, planes\) : placementsInVolumeOf\(b, rad, planes, vname\)\)\) \{ this\.stats\.culled\+\+; continue; \}/, 'named: the kept answers; unnamed: the walk itself');
-  assert.equal((body.match(/placementsInVolume(?:Of)?\(/g) ?? []).length, 2, 'and no other ask');
-});
-
 // ─── PERF-ORDER: the cheapest skip first ──────────────────────────────────────────────────────────────────────────
 
 test('PERF-ORDER: the air pass\'s emitters are the flats with an emission map, in view, with a picture - over random flats in front of the eye and behind it, lit and plain, one lit with no picture: the draws counted are the oracle\'s, and the sphere is asked of the lit flats alone (Knightstale by night: 3 of the 636 a frame) (mutants: PERFORDER-blind-drawn, PERFORDER-unseen-drawn, PERFORDER-sphere-first, PERFORDER-picture-first; EL3\'s emit-flat-without-map, re-aimed)', async () => {

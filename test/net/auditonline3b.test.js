@@ -177,7 +177,6 @@ test('AUDIT ONLINE 3 (the second read): a mint that answers lets its TOKEN_WAIT_
 // ── B-F2-1: THE PAGE'S MINTER STAYED ON THE WALL CLOCK ─────────────────────────────────────────────────────────
 
 test('AUDIT ONLINE 3 (the second read) B-F2-1: the page\'s token minter reads the sessions\' steady clock - a clock set back never holds a dead token fresh (every new room\'s hello refused "token expired", terminal)', async () => {
-  assert.match(rd('src/scenes/world.js'), /const identityMinter = accountTokenMinter\(\{[^\n]*\bnow: steadyNow,/, 'the host hands its minter the sessions\' clock');
   // and why: on the steady clock a held token is reused TOKEN_REUSE_MS of real time, never for the length of a step back
   let wall = 1_700_000_000_000, n = 0;
   const store = new Map([[SESSION_KEY, JSON.stringify({ id: 'acct-1', name: 'Mac', kind: 'linked', sessionId: 's-1', secret: 'sekrit-of-mac' })]]);

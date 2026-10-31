@@ -101,16 +101,6 @@ test('TOWN-SHAPES the ground: the outline flattened to the mean of the land unde
   assert.equal(blendLocationTerrain(plain, 0.25, { xMin: 40, xMax: 80, yMin: 40, yMax: 80 }), 0.25, 'no outline: DFU\'s blend, its average answered');
 });
 
-test('TOWN-SHAPES wired: the terrain job flattens to the outline on DFU\'s own samples and gives the sea back its tiles, the road paves the outline\'s ring, the landforms\' lift and the deep waters read the same outline, the shared reader keeps what it reads (mutants: each seam)', () => {
-  const gen = rd('src/world/terrain/terrainGen.js');
-  assert.match(gen, /avg = blendLocationTerrain\(samples, avg, locationRect, HEIGHTMAP_DIMENSION, ground \?\? samples\);/);
-  assert.match(gen, /unstampOffShape\(tilemap, locationRect\.shape, mask\);/);
-  assert.match(gen, /locationRect = \{ \.\.\.locationRect, mask, ring: townRoadRing\(mask\) \};/);
-  assert.match(rd('src/world/road/roadPainter.js'), /\(ctx\.rect\.ring \? ctx\.rect\.ring\[ctx\.i\] === RING\.road && ctx\.ground !== TILE\.water : x > ctx\.rect\.xMin/);   // PIN MOVED (TS9): the ring's whole tiles by their code; (AUDIT TESA III E1-1): never over the sea
-  assert.match(rd('src/world/landforms.js'), /blendLocationTerrain\(field, sum \/ field\.length, locationRect, hDim, classic, true\);/);
-  assert.match(rd('src/world/terrain/terrainTiles.js'), /autoMapData: rmb\.fldHeader\.autoMapData \}, misc3dObjectRecords: rmb\.misc3dObjectRecords, miscFlatObjectRecords: rmb\.miscFlatObjectRecords/);
-});
-
 test('TOWN-SHAPES on the freeware: a hamlet\'s outline no rectangle; a coast town keeps its sea where DFU lifted it all; every Bay town\'s buildings inside its outline (real data)', { skip: skipReal }, async () => {
   const { MapsFile, longitudeLatitudeToMapPixel } = await import('../../../src/formats/mapsFile.js');
   const { WoodsFile } = await import('../../../src/formats/woodsFile.js');

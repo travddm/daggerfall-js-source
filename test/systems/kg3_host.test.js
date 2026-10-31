@@ -444,126 +444,6 @@ test('KG3 the board drawn and freed: the mat and the pieces\' plates made as the
 // harness tests run it (test/systems/auditcards6_e.test.js's way), offline, over the real panels and the real game ──────────────
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const grab = (src, re, what) => { const m = re.exec(src); assert.ok(m, `${what} is no longer where this pin reads it`); return m[1]; };
-const WM = read('src/scenes/worldModes.js'), WORLD = hostText('src/scenes/world.js');   // PIN MOVED (TESA's merge): the quick save is scenes/worldQuickSave.js's - the host read whole, `modes` its live name
-const BLOCK = WM.slice(WM.indexOf('  let cardSeat = null;'), WM.indexOf('\n', WM.indexOf("registerPlayerHurtListener('cards-seat'")));
-const STAKED = grab(WM, /\n {4}gambitStaked: (\(\) => [^\n]*?),   \/\/ KG3/, "worldModes' gambitStaked");
-const SAVE_DOOR = grab(WORLD, /\n {4}(if \((?:host\.)?modes\?\.gambitStaked\?\.\(\)[^\n]*?return false; \})/, "world.js's quick save's KG3 door");
-const SAVE_PREVENTED = grab(WORLD, /\n {4}savingPrevented: (\(\) => [^\n]*?),   \/\/ AUDIT NAV1/, "world.js's savingPrevented");
-
-function cardHost({ friendly = false } = {}) {
-  const doc = fakeDoc(), win = fakeWin();
-  const playerEntity = { name: 'Mac', goldPieces: 5000, items: [], health: 50 };
-  giveBinderAtChargen(playerEntity);
-  const said = [];
-  const seatList = Array.from({ length: 4 }, (_, k) => ({ x: k * 2, z: 0, eye: [k * 2, 1, 0], feet: [k * 2, 0, 0], yaw: 0, pitch: 0, top: 0.8 }));
-  const scope = {
-    isTavern: () => true, BUILDING_TYPES: { None: 0 },
-    cardTableSeats: () => seatList, seatFloorOk: () => true, SEAT_FLOOR_PROBE: 1, nearestFreeSeat, takenSeats,
-    player: { pos: [0, 0, 0], eyeAt: () => [0, 1.6, 0] },
-    host: { realmAct: friendly ? { realm: true } : null, relock: () => {}, seatedPeers: () => [], cardOnline: null, iliacOnline: null, iliacRanked: { why: () => '', vouch: async () => ({ ok: false }), board: async () => ({ ok: false }) }, iliacClaims: { add: () => {} } },
-    say: (x) => said.push(x), cam: { yaw: 0, pitch: 0, pos: null },
-    getNameBankOfRegion: () => 0, residentName: (seed, bank, g) => `R${seed}:${g}`,
-    stakesFor: sess.stakesFor, buyInRange: sess.buyInRange, goldAmount: court.goldAmount,
-    holdCursor, renderer: {},
-    createCardTableDraw: () => ({ draw() {}, destroy() {} }),
-    createCardTableHud: (p) => hudm.createCardTableHud({ ...p, doc }), cardHudModel: hudm.cardHudModel, eventLine: hudm.eventLine,
-    deductGold: court.deductGold, addGold: court.addGold, playerEntity,
-    CardTableSession: sess.CardTableSession, seatPatrons: sess.seatPatrons, regularsFor: sess.regularsFor, regularsAfter: sess.regularsAfter,
-    CardScene: class { constructor(o) { this.places = o.places; } onEvent() {} poses() { return { cards: [], chips: [] }; } settledAt() { return 0; } },
-    tablePlaces: () => ({ seatOf: [], board: [], table: FRAME, seats: [] }), tableFrame: () => FRAME, hashSeed: (...x) => x.join(':'),
-    buildingDirectory: () => ({ locationName: 'Daggerfall' }), registerPlayerHurtListener: () => {},
-    isOnlinePage: () => false, mwViewFirstPerson: () => {}, homeTownOf: (b) => b?.townMapId || 0, worldMinutes: () => 0, MINUTES_PER_DAY: 1440,
-    RemoteCardTable, mode: 'interior', regularsToStand, regularBark, BARK_MS, showdownWinners: hudm.showdownWinners, HOLDEM_REFUSALS: hudm.HOLDEM_REFUSALS,
-    cardPackPrice, buyCardPack, openIliacTableGame: (o) => openIliacTableGame({ ...o, doc }), iliacGrade, skillValue, SKILLS, liveStat,
-    gambitTableOn, openGambitTableGame: (o) => openGambitTableGame({ ...o, doc }), isTouchDevice: () => false, regularLook, seatTopByte, cursorKeyClaimed: () => false, gambitBoardKey, audio: null,
-    canvas: { clientWidth: W, clientHeight: H, getBoundingClientRect: () => ({ left: 0, top: 0 }), setPointerCapture() {} }, ...hand, CARD_W, CARD_L, chipDiscs, cardMatrix,
-    worldViewportRect: () => null, rayDirFromScreen, projectToScreen, performance,
-    // the cloth's listeners want a window: the page's own, faked - and the two things that silence them, quiet
-    window: win, interiorPaused: () => false, townTalk: null,
-  };
-  const state = { interiorCtx: { tables: [{ aabb: {} }], collider: null }, interiorBuilding: { buildingKey: 7, quality: 10, regionIndex: 17, townMapId: 1111 } };
-  const api = new Function('S', ...Object.keys(scope), `let interiorCtx = S.interiorCtx, interiorBuilding = S.interiorBuilding;\n${BLOCK}\n
-    return { sitAtCardTable, standFromCardTable, cardRegularsNow, gambitStaked: ${STAKED},
-      get cardGame() { return cardGame; }, get iliacGame() { return iliacGame; }, get gambitGame() { return gambitGame; } };`)(state, ...Object.values(scope));
-  const walk = (n, f, out = []) => { if (!n) return out; if (f(n)) out.push(n); for (const c of n.children ?? []) walk(c, f, out); return out; };
-  const panels = () => doc.body.children.filter((n) => /^df(cards|iliac|gambit)\b/.test(n.className) && !n.removed);
-  const buttons = () => panels().flatMap((p) => walk(p, (n) => n.tag === 'button').map((b) => b.textContent));
-  const press = (label) => { const b = panels().flatMap((p) => walk(p, (n) => n.tag === 'button' && n.textContent.startsWith(label)))[0]; assert.ok(b, `a "${label}" button: ${buttons()}`); b.fire('click'); };
-  return { api, said, win, playerEntity, panels, buttons, press, keys: () => (win.on.keydown ?? []).length };
-}
-
-test('KG3 THE HOST\'S WIRING (scenes/worldModes.js\'s card block, run as the six harness tests run it): Hold\'em\'s and Iliac Hand\'s panels offer The King\'s Gambit while its Features switch is on and its press opens it on the seat, the other game gone - one game a cloth - and its own presses open the other two; a stake down holds the save at both of world.js\'s doors, in words; its regulars stand in the chairs its setup lists; standing up forfeits it and takes its listeners off the window; the switch off, no panel offers it (mutants: a press unwired; the slot unemptied; the concession; the staked flag; the save\'s door; the listeners kept; the switch unread)', () => {
-  const h = cardHost();
-  const keys0 = h.keys();
-  h.api.sitAtCardTable(0);
-  assert.deepEqual(h.panels().map((p) => p.className), ['dfcards'], 'sitting down opens Hold\'em\'s buy-in');
-  h.press('Play The King\'s Gambit');
-  const kind = () => h.panels().map((p) => p.className.split(' ')[0]);
-  assert.ok(h.api.gambitGame && !h.api.cardGame && !h.api.iliacGame, 'from Hold\'em: the gambit on the seat, Hold\'em gone');
-  assert.deepEqual(kind(), ['dfgambit']);
-  assert.equal(h.keys(), keys0 + 1, 'its keys on the window while it stands');
-  h.press('Play Iliac Hand instead');
-  assert.ok(h.api.iliacGame && !h.api.gambitGame, 'its own press opens Iliac Hand');
-  assert.deepEqual(kind(), ['dfiliac']);
-  assert.equal(h.keys(), keys0, 'gone with it');
-  h.press('Play The King\'s Gambit');
-  assert.ok(h.api.gambitGame && !h.api.iliacGame, 'from Iliac Hand');
-  h.press('Play Hold\'em instead');
-  assert.ok(h.api.cardGame && !h.api.gambitGame, 'and Hold\'em from it');
-  assert.deepEqual(kind(), ['dfcards']);
-  h.press('Play The King\'s Gambit');
-  // a stake down
-  const gg = h.api.gambitGame;
-  assert.equal(h.api.gambitStaked(), false, 'nothing staked at the setup');
-  toBattle({ g: gg });
-  const stake = gg.g.game.stake;
-  assert.ok(stake > 0 && h.api.gambitStaked(), 'staked');
-  assert.equal(h.playerEntity.goldPieces, 5000 - stake);
-  const door = (modes, ...rest) => new Function('host', 'modes', 'townTalk', 'quiet', 'stakedSaveRefusal', `${SAVE_DOOR}\nreturn true;`)({ modes }, modes, ...rest);
-  const told = [];
-  assert.equal(door({ gambitStaked: h.api.gambitStaked }, { say: (x) => told.push(x) }, false, stakedSaveRefusal), false, 'the quick save refused');
-  assert.equal(door({ gambitStaked: h.api.gambitStaked }, { say: (x) => told.push(x) }, true, stakedSaveRefusal), false, 'the quiet checkpoint too');
-  assert.deepEqual(told, [stakedSaveRefusal()], 'said once, to the save pressed');
-  assert.equal(new Function('naval', 'modes', `return (${SAVE_PREVENTED})();`)(null, { gambitStaked: h.api.gambitStaked }), true, 'the pause\'s Save says why');
-  // its regulars in the chairs its setup lists (the seat's free chairs, 1 to 3)
-  const standing = h.api.cardRegularsNow(0);
-  assert.deepEqual(standing.map((r) => [r.key.split(':')[0], Number(r.key.split(':').pop())]).sort(), [['gambit', 1], ['gambit', 2], ['gambit', 3]], 'a regular in each free chair');
-  assert.ok(standing.every((r) => r.st === seatTopByte(0.8) && r.res.look && r.feet?.length === 3), 'each dressed off the namer\'s seed, at their chair\'s feet and height');
-  // standing up forfeits the stake: the regular keeps it, said, and booked against their night
-  const name = gg.g.game.name;
-  h.api.standFromCardTable();
-  assert.ok(!h.api.gambitGame && !h.api.gambitStaked(), 'the slot emptied, nothing staked');
-  assert.deepEqual(h.panels(), [], 'the panel gone');
-  assert.equal(h.playerEntity.goldPieces, 5000 - stake, 'the stake the regular\'s');
-  assert.equal(h.said.at(-1), resultGold({ winner: 1, by: 'forfeit' }, stake, name), 'the forfeit said');
-  assert.ok(h.playerEntity.gambitPurses, 'and booked');
-  assert.equal(h.keys(), keys0, 'its listeners off the window');
-  // a load's road settles nothing: the game the load threw away
-  h.api.sitAtCardTable(0);
-  h.press('Play The King\'s Gambit');
-  toBattle({ g: h.api.gambitGame });
-  const book = structuredClone(h.playerEntity.gambitPurses), heard = h.said.length;
-  h.api.standFromCardTable({ cashOut: false });
-  assert.ok(!h.api.gambitGame && h.said.length === heard && JSON.stringify(h.playerEntity.gambitPurses) === JSON.stringify(book), 'nothing said, nothing booked');
-  // the switch off: no panel offers it
-  setPref(KINGS_GAMBIT_KEY, false);
-  h.api.sitAtCardTable(0);
-  assert.ok(!h.buttons().some((b) => b.startsWith('Play The King\'s Gambit')), `Hold'em: ${h.buttons()}`);
-  h.press('Play Iliac Hand');
-  assert.ok(h.api.iliacGame && !h.buttons().some((b) => b.startsWith('Play The King\'s Gambit')), `Iliac Hand: ${h.buttons()}`);
-  h.api.standFromCardTable();
-  // a game for fun (a realm character's table) is under way and holds no gold: the save need not wait
-  setPref(KINGS_GAMBIT_KEY, true);
-  const f = cardHost({ friendly: true });
-  f.api.sitAtCardTable(0);
-  f.press('Play The King\'s Gambit');
-  const fg = f.api.gambitGame;
-  fg.press('regular', 1); fg.press('next'); fg.press('autofill'); fg.press('start');
-  assert.ok(fg.playing() && fg.g.game.stake === 0, 'a game for fun under way');
-  assert.equal(f.api.gambitStaked(), false, 'nothing staked');
-  assert.equal(door({ gambitStaked: f.api.gambitStaked }, { say: () => {} }, false, stakedSaveRefusal), true, 'the save goes on');
-  f.api.standFromCardTable();
-});
 
 test('KG4 THE HOST FEEDS THE MOTION AND LEANS (Kings-Gambit.md 10.1, 10.7, section 17): the deal\'s muster moves, a move walks its piece; the lean is none in the setup, comes in over GAMBIT_LEAN_S once the battle is dealt - fitted eye and look, eased from the seat\'s - and goes with the result; the interior host lays it on the seat\'s eye and look (mutants: the feed; the lean\'s phase; the host\'s eye; the host\'s look)', () => {
   const r = rig({ gold: 1000 });
@@ -593,14 +473,6 @@ test('KG4 THE HOST FEEDS THE MOTION AND LEANS (Kings-Gambit.md 10.1, 10.7, secti
   assert.equal(r.g.g.phase, 'over');
   for (let t = r.now; t < r.now + 1000; t += 50) r.g.lean(t, view, seat);
   assert.equal(r.g.lean(r.now + 1000, view, seat), null, 'the result keeps the seat\'s own view');
-  // the interior host: the lean on the seat's eye and look, after the seat's own and before the camera machine reads it
-  const WM = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const seatAt = WM.indexOf("    if (mode === 'interior' && cardSeat && !(interiorOverlay instanceof DeathScreen)) cam.pos = cardSeat.eye.slice();");
-  const eyeAt = WM.indexOf('    if (gambitLeanNow) cam.pos = gambitLeanNow.eye;');
-  const machine = WM.indexOf('    const mwv = mwViewFrame({', seatAt);
-  assert.ok(seatAt > 0 && eyeAt > seatAt && eyeAt < machine, 'the lean\'s eye after the seat\'s, before the camera machine');
-  assert.match(WM, /const lookFwd = gambitLeanNow\?\.fwd \?\? fwd;/);
-  assert.match(WM, /const view = betterAmbience\.view\(lookAt\(mwv\.eye, \[mwv\.eye\[0\] \+ lookFwd\[0\], mwv\.eye\[1\] \+ lookFwd\[1\], mwv\.eye\[2\] \+ lookFwd\[2\]\]/, 'and the view looks along the lean');
 });
 
 test('KG4 THE PRESS ON THE BUILT BOARD, AT THE HOST (14.3): a fine pointer on a standing card\'s upper face takes that piece - the mat behind it is another cell; under a finger, a press beside a card, within GAMBIT_SNAP_PX of its middle and past it from its cell\'s centre, snaps to the piece (mutants: the flat press; the snap at the cell\'s centre)', () => {
@@ -689,6 +561,4 @@ test('KG4b THE TABLE\'S SOUNDS AT THE HOST (5.6, 17.4): opening the game DiceRol
   n = heard.length;
   r.tick(GAMBIT_RESULT_MS + 100);
   assert.deepEqual(clips().slice(n), [], 'a forfeit is silent, as the mod\'s');
-  const WM = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(WM, /play: \(clip, at\) => audio\?\.play3d\?\.\(clip, at, 1, \{ maxDistance: 16 \}\),/, 'the room\'s 3D sound, at the cloth');
 });

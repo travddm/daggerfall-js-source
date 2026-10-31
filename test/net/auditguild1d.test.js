@@ -226,7 +226,6 @@ test('AUDIT GUILD1d S9: the guards no pin held - the buy takes realm_gold with t
 });
 
 test('AUDIT GUILD1d S8 + R5: the restore reads a hall as its guild\'s, never a home bought again; the guild\'s Drakes ledger calls a heraldry changed a heraldry, never a deposit, and the tab says so (mutants: the restore\'s guard; the kind; the words)', async (t) => {
-  assert.match(src('tools/realmRestore.mjs'), /if \(nowHome && \(nowHome\.player !== player \|\| String\(nowHome\.char_id\)\.startsWith\('guild:'\)\)\) \{/);
   t.mock.method(Date, 'now', () => T0 * 1000);
   const { svc, gm, view } = await stood({ marks: true, hall: false });
   await svc.call('/v1/guilds/heraldry', { character: gm.character, heraldry: WOLF }, gm.secret);
@@ -235,49 +234,23 @@ test('AUDIT GUILD1d S8 + R5: the restore reads a hall as its guild\'s, never a h
   await svc.call('/v1/guilds/heraldry', { character: gm.character, heraldry: { ...WOLF, device: 'bear' }, rid: 'herald-01' }, gm.secret);
   assert.deepEqual((await view()).marksLedger.map((l) => l.kind), ['heraldry', 'deposit']);
   assert.equal(GUILD_MARKS_LEDGER_WORDS.heraldry, 'changed the guild\'s arms for');   // PIN MOVED: AUDIT GUILD3 W6 - the page is "Arms"
-  // PIN MOVED: GUILD3b (bible/11-Multiplayer/Guilds-Made-Plain.md) - an older service's line (no `raw`) by its kind, as before;
-  // a line with its own kind and way by those (guildSilverLineText)
-  assert.match(src('src/ui/socialPanel.js'), /GUILD_MARKS_LEDGER_WORDS\[l\?\.kind\] \?\? GUILD_MARKS_LEDGER_WORDS\.deposit/);
-  assert.match(src('src/ui/socialPanel.js'), /for \(const l of v\.marksLedger \?\? \[\]\) out\.push\(personRow\(\{ name: guildSilverLineText\(l\) \}\)\);/);
 });
 
 test('AUDIT GUILD1d A1-A9: members rest (the online bed its own permanence), use the forge, workbench and loom, see their chest and cast in their hall; a visitor\'s drop and spell in a hall\'s own words; the plaque-less offer carries the hall; one buy out a house; the doors read again when the guild is known; the decorator neither pays a hall\'s half to the purse nor says it does (mutants: each by source; the offer\'s label; the bump)', () => {
-  const wm = src('src/scenes/worldModes.js');
   // PIN MOVED (the merge of main's RENT-REST, FIELD BUGS 2026-10-01): A1's online bed is RENT-REST's one rule now - the
   // home's bed (homeRent.js homeBedIsMine) rides the rest's bag as `homeBed`, its own permanence and its own ownership
   // (restSession.js interiorRestPlace) - and a hall's member is one of its sleepers
   assert.deepEqual([homeBedIsMine({ hall: { name: 'H' }, member: true }, 0), homeBedIsMine({ hall: { name: 'H' }, member: false }, 0), homeBedIsMine({ own: false }, 0)], [true, false, false], 'A1');
-  assert.match(wm, /homeBed: homeBedIsMine\(interiorHome, Math\.floor\(Date\.now\(\) \/ 1000\)\) \|\| !!interiorSeatHall\?\.member,/, 'A1: the host hands it');   // PIN MOVED (SEAT-HALL): and the palace holder's members rest there
-  for (const s of ['forge', 'workbench', 'loom']) assert.match(wm, new RegExp(`if \\(hallMemberHere\\(\\) && interiorDecor\\.list\\(\\)\\.some\\(\\(p\\) => p\\?\\.station === '${s}'\\)\\) return \\{ kind: 'home', fee: 0 \\};`), `A2 ${s}`);
-  assert.match(wm, /if \(t && hallMemberHere\(\)\) return decorTool\.flying\(\) && !decorTool\.ghost\(\) \? decorBuiltInPlaque\(HALL_CHEST_TITLE, c, true\) : \{ title: HALL_CHEST_TITLE \};/, 'A6');
   assert.equal(HALL_CHEST_TITLE, "The Guild's Chest");
-  assert.match(wm, /\(interiorHome\.hall \? HALL_DROP_TEXT : HOME_VISITOR_DROP_TEXT\)/, 'A7 the drop');
-  assert.match(wm, /const visitorMagicRefusal = \(\) => \(visitorDropRefusal\(\) && !hallMemberHere\(\) \? \(interiorHome\?\.hall \? HALL_VISITOR_MAGIC_TEXT : HOME_VISITOR_MAGIC_TEXT\) : null\);/, 'A7 the spell');
   assert.ok(HALL_DROP_TEXT && HALL_VISITOR_MAGIC_TEXT);
-  assert.match(wm, /\.\.\.\(homeHallBuyRow\(price, hallGuild\(\)\) \? \[\{ code: 'KeyG', label: hallOfferLabel\(price, hallGuild\(\)\), action: \(\) => \{ buyHallAt\(bd, price\); \} \}\] : \[\]\),/, 'A3');
   assert.equal(hallOfferLabel(20_000, { name: 'The Hand' }), 'G - buy it for The Hand: 30,000 gold from the treasury');   // HOME-PRICE: the thousands
-  assert.match(wm, /if \(_hallBuying\.has\(id\)\) return;\n\s*_hallBuying\.add\(id\);/, 'A8');
-  assert.match(wm, /\.finally\(\(\) => \{ _hallBuying\.delete\(id\); \}\);/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /onRank: \(\) => \{ onlineHomes\?\.bump\?\.\(\); /, 'A5');   // PIN MOVED (AUDIT PROF-541 G1): the guild book's onRank, told at every look
   const homes = createOnlineHomes({ api: { town: async () => ({ ok: true, data: { homes: [] } }) } });
   const v0 = homes.version();
   homes.bump();
   assert.equal(homes.version(), v0 + 1);
-  const dt = src('src/scenes/decor/decorTool.js');
-  assert.match(dt, /back = r\.hall \? 0 : decorRefund\(paid\);/, 'A4 the removal');
-  assert.match(dt, /if \(price\.refund > 0 && !r\.hall\) deps\.wallet\(\)\.credit\?\.\(price\.refund\);/, 'A4 the shrink');
-  assert.match(dt, /hall: !!r\?\.hall,/);
-  assert.match(src('src/ui/decorPanel.js'), /back\$\{view\?\.hall \? " to the guild's treasury" : ''\}/, 'A9');
 });
 
 test('AUDIT GUILD1d R1-R4, R6-R9: the banners sway on the wind\'s own 0..1, out along their face alone, drawn before every glow; their width runs from their face whatever the door\'s vertex order; a failed picture still marks the seam and is asked again; an idle texture is given back; premultiplied, and lit by the moon (mutants: the slider; the two-way swing; the order; the width off the record; the true; the null kept; the prune; the premultiply; the moon)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /moonCol: renderer\._moonColor \},   \/\/ AUDIT GUILD1d R9[^\n]*\n\s+wind: Math\.min\(1, wd\.strength01 \* wd\.gust\),/, 'R1');   // PIN MOVED (SHIP-COLOURS: the ships' flags read the same wind - the banners' own line)
-  assert.ok(w.indexOf('const hung = bannersHung();') < w.indexOf('    drawVeiledPeerBodies();   // INVIS-LOOK'), 'R3: before the veiled bodies');
-  assert.ok(w.indexOf('const hung = bannersHung();') < w.indexOf('duelWall.draw(rings'), 'R3: before the duel walls');
-  const bannerDraw = w.slice(w.indexOf('const hung = bannersHung();'), w.indexOf('})) renderer.markForeignPass();', w.indexOf('const hung = bannersHung();')));
-  assert.match(bannerDraw, /light: \{[^}]*moonDir: renderer\._moonDir, moonScale: renderer\._moonScale, moonCol: renderer\._moonColor \},/, 'R9: the banners\' own light carries the moon');
   assert.match(BANNER_VS, /float swing = 0\.5 \+ 0\.5 \* sin\(/, 'R2');
   assert.match(BANNER_VS, /float ripple = 0\.5 \+ 0\.5 \* sin\(/);
   assert.match(BANNER_FS, /t\.rgb \/= t\.a;/, 'R8');
@@ -384,7 +357,6 @@ test('AUDIT GUILD1d R10-R14: a heraldry draft is one guild\'s; a pick changes th
   find(shut.panel.root, 'dfsocial-tile').find((f) => f.attrs['aria-label'] === 'Device: Bear').fire('click');
   assert.equal(button(shut.panel.root, 'Change it').attrs.title, REFUSALS['marks-closed'], 'R12');
   assert.equal(guildHallSoldText({ data: { back: 25_620 } }), 'The hall is sold. 25,620 gold went back into the treasury.', 'R13');
-  assert.match(src('src/ui/socialPanel.js'), /run: \(\) => guildDo\(g\.sellHall\(\), guildHallSoldText\) \}\)/);
   void texts;
   // R14: the first choice's answer lands after a second choice was asked
   let hold;

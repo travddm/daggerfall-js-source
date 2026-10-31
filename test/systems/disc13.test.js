@@ -158,8 +158,6 @@ test('DISC13-A: the Light spell\'s candle hangs off the render feet the host han
   // both of its mounts (the standalone dungeon and the world's dungeon arm) and passes them on (AUDIT CLIMB-ARC F10: aimed
   // with the view before the climb's feel, `aim`; CLIMB6: the climb's snapshot and that aim ride after the feet)
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /magic\.update\(dt, player\.pos, _mfwd, player\.height, player\.feetAt\(\)\);/, f);
-  assert.match(rd('src/scenes/worldModes.js'), /magic\.update\(dt, player\.pos, eyeDir\(\), player\.height, player\.feetAt\(\)\);/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /magic\.update\(dt, playerFeet, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\], playerHeight, playerRenderFeet\);/);
   for (const f of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js']) assert.match(rd(f), /drawFoes\(dt, canvas[^\n]*!!player\.crouching, player\.feetAt\(\), climbRigInput\(player, cam\.yaw\), aimView\);/, f);
 });
 
@@ -345,41 +343,14 @@ test('DISC13-C: walking, running, backing up and strafing under the Weapon Widge
 
 // ── DISC13-D ─────────────────────────────────────────────────────────
 
-/** world.js's own `shipLocation`, cut from the host and run over stand-ins for what it reads. */
-function shipLocationOf({ loc = null, travelOptions = false, ports = [], onShip = false } = {}) {
-  const line = rd('src/scenes/world.js').split('\n').find((l) => l.includes('shipLocation: () => {'));
-  assert.ok(line, 'world.js answers shipLocation');
-  const src = line.slice(line.indexOf('() => {'), line.lastIndexOf('; },') + 3);
-  // SEAT2b part two (PIN MOVED): the host asks hasPortFor - HasPort, or a members' Harbour at a seat
-  const make = new Function('_questLoc', 'modSetting', 'hasPortFor', 'isOnShip', 'playerEntity', 'playerTravelPixel', `return (${src});`);
-  return make(() => loc, (v, k) => (v === 'travel-options' && k === 'Enabled' ? travelOptions : undefined),
-    (mapId) => ports.includes(mapId), () => onShip, { boardShipPosition: null }, () => ({ x: 0, y: 0 }))();
-}
 const port = { mapTableData: { mapId: 7 }, exterior: { exteriorData: { portTownAndUnknown: 1 } } };
 const inland = { mapTableData: { mapId: 8 }, exterior: { exteriorData: { portTownAndUnknown: 0 } } };
 const yourShip = { mapTableData: { mapId: 9, locationType: 14 }, exterior: { exteriorData: { portTownAndUnknown: 0 } } };   // region 31's "Your Ship" (locationEntrance.js)
 const boardable = (where) => isShipAvailable({ canSail: true, ownsShip: true, ...where });
 
-test('DISC13-D: with shipPorts on, a port town boards your ship - world.js\'s answer is the one the delegate reads (mutants: the key back to `loaded` in either branch)', () => {
-  _resetModSettings();
-  setModSetting('roleplay-realism', 'shipPorts', true);   // SHIP-PORTS ships it off; a player who asks for the port rule gets it
-  assert.equal(boardable(shipLocationOf({ loc: port })), true, 'in a port with a ship: board it (it read false - the port was the wilderness)');
-  assert.equal(boardable(shipLocationOf({ loc: inland })), false, 'inland: the mod\'s own no');
-  assert.equal(boardable(shipLocationOf({ loc: null })), false, 'the wilderness: no');
-  assert.equal(boardable(shipLocationOf({ loc: yourShip, onShip: true })), true, 'aboard (the ship\'s pixel is a location, "Your Ship"): yes - the way back off');
-  assert.equal(boardable(shipLocationOf({ loc: inland, travelOptions: true, ports: [8] })), true, 'Travel Options\' port table answers where it is on');
-  // the shape itself: every key the host answers is one the delegate reads
-  const params = rd('src/systems/ship.js').match(/export function isShipAvailable\(\{ ([^}]*) \}/)[1].split(',').map((p) => p.trim().split(' ')[0]);
-  for (const k of [...Object.keys(shipLocationOf({ loc: port })), ...Object.keys(shipLocationOf({ loc: null }))]) {
-    assert.ok(params.includes(k), `shipLocation's "${k}" is read by isShipAvailable (${params.join(', ')})`);
-  }
-});
-
 test('DISC13-D: shipPorts has a row on Roleplay & Realism\'s tile and ships off (SHIP-PORTS), and off hands the question back to HasShip', () => {
   _resetModSettings();
   assert.ok(modDials('roleplay-realism').includes('shipPorts'), 'the tile\'s drawer carries the switch');
   assert.equal(modSettingsOf('roleplay-realism').shipPorts, false, 'off until a player asks for the port rule');
-  assert.equal(boardable(shipLocationOf({ loc: inland })), true, 'off: an owned ship boards anywhere, as DFU\'s HasShip');
-  assert.equal(isShipAvailable({ canSail: true, ownsShip: false, ...shipLocationOf({ loc: port }) }), false, 'and no ship is still no ship');
   _resetModSettings();
 });

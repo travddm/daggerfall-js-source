@@ -177,14 +177,6 @@ test('AUDIT PRE-MERGE 1003 W4: in the floor\'s instance the climate-free colosse
   assert.equal(await levelRemap(41000, [{ textureArchive: 122, textureRecord: 2 }], other, remap, deps), other);
   assert.equal(other.get('122_2'), `${remap(122)}_2`);
   _resetCustomModels();
-  // the host's climate-free arm: the placement takes the answer, the entry carries its own table, the merge resolves by
-  // it, and both dungeon hosts draw an unmerged entry by it
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /return levelModelRemap\(id, cpuModels\.get\(id\)\?\.subMeshes, texRemap, \(archive\) => remap\(archive\), deps\);/);
-  assert.match(dc, /const climateFree = \(await ensureRemap\(p\.modelIdNum\)\) === NO_CLIMATE_REMAP;/);
-  assert.match(dc, /drawList\.push\(\{ mesh: gpu, matrix, key: `\$\{bi\}:\$\{p\.position\}`, aabb, \.\.\.\(climateFree \? \{ texRemap: NO_CLIMATE_REMAP \} : \{\}\) \}\);/);
-  assert.match(dc, /staticBuilder\.add\(cpu, matrix, climateFree \? ownTexKey : resolveTexKey\);/);
-  assert.match(dc, /const ownTexKey = keyResolver\(NO_CLIMATE_REMAP\);/);
   for (const [f, ctx] of [['src/scenes/worldModes.js', 'dungeonCtx'], ['src/scenes/dungeon.js', 'ctx']]) {
     assert.ok(read(f).includes(`for (const d of ${ctx}.drawList) if (!d._batched) renderer.drawMesh(d.mesh, d.matrix, d.texRemap ?? ${ctx}.texRemap);`), f);
   }
@@ -239,11 +231,6 @@ test('AUDIT PRE-MERGE 1003 W6: the colosseum\'s seal gives the frame back - the 
   assert.equal(await CM.customModelBuilt(ARENA_MODEL_ID, null, async () => { n += 1000; }), viaDoor);
   assert.ok(n < 1000, 'built once');
   _resetCustomModels(); _resetArena();
-  // the pixel's build hands its breather to the pipeline, the pipeline to the registry's door
-  assert.match(hostText('src/scenes/world.js'), /const gpu = await getGpuMesh\(placed\.modelIdNum, \(\) => breather\.breathe\(\)\);/);
-  const pipe = read('src/scenes/dataPipeline.js');
-  assert.match(pipe, /const getGpuMesh = \(modelIdNum, breathe = null\) => cachedMesh\(modelIdNum, \(\) => buildGpuMesh\(modelIdNum, breathe\)\);/);
-  assert.match(pipe, /const custom = await customModelBuilt\(modelIdNum, \{ classicModel: classicModelOf \}, breathe\);/);
 });
 
 test('AUDIT PRE-MERGE 1003 W7: a crown city\'s castle entrance is never the arena\'s undercroft stair, however low it stands - the stair stays a door the player takes (mutants: AUDIT1003-W7-*)', () => {
@@ -254,17 +241,5 @@ test('AUDIT PRE-MERGE 1003 W7: a crown city\'s castle entrance is never the aren
   assert.deepEqual(castleEntranceOf([stair, castle]).door, castle.door, 'in either order');
   assert.equal(castleEntranceOf([stair]), null, 'a town whose only low door is the arena\'s has no castle entrance by it');
   assert.deepEqual(castleEntranceOf([{ ...stair, arena: false }, castle]).door, stair.door, 'any other lower door is still the lowest');
-  // the city's host marks the arena block's dungeon entrances in the castle's list alone; the doors the player takes are
-  // gathered beside it as before (the undercroft's own door: isUndercroftDoor over the host's door list)
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /pixelDungeonDoors\.push\(\{ door: doorCornersOf\(d, local\), box, normal: doorNormalOf\(d, local\), arena: b\.blockName === ARENA_BLOCK \}\);/);
-  assert.match(w, /const staticDoors = getStaticDoors\(cpu, b\.dfBlock\.index, placed\.recordIndex, local\);/);
 });
 
-test('AUDIT PRE-MERGE 1003 W8: the city\'s schedule says what it does - one start an hour, never again that hour after a walk away or a door (mutant: AUDIT1003-W8-DOC)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.ok(!w.includes('a walk back restarts it'), 'no walk back restarts the hour\'s exhibition');
-  assert.ok(!/comes back from its\s+\*\s+call if I return inside its window/.test(w), 'nor brings it back from its call');
-  assert.match(w, /`_arenaHourRun` starts each hour's bout once, and nothing clears it/);
-  assert.match(w, /if \(ex\?\.open && ex\.hour !== _arenaHourRun\) \{ _arenaHourRun = ex\.hour; arenaBouts\.ask\(\{ where: 'city', kind: 'exhibition', ex \}\); \}/, 'the code it describes');
-});

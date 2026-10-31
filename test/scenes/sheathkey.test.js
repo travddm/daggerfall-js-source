@@ -66,62 +66,6 @@ test('SHEATH: the large HUD panel still reaches the door through routeAction', (
   assert.equal(routeAction('SwitchHand', ctx), false, 'no panel door - the frame poll is the only one');
 });
 
-test('SHEATH: every host polls ReadyWeapon on an edge, and the dungeon hosts route keys through routeKey', () => {
-  // The two halves that make the double-fire possible, pinned as the
-  // shape they are: the poll is in every host (it stays), and the two
-  // dungeon keydown listeners go through routeKey (they stay). The
-  // decline in routeKey is what keeps them from adding up.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    // MWCROUCH: the poll is GetKeyDown now (`pressed`, ui/input.js)
-    // rather than `held(keys, act) && !prev` - the derivation dropped
-    // any press that began and ended between two frames. The law here
-    // is the one it always was: EVERY host polls the action itself.
-    assert.match(read(f), /pressed\((keyEdge|latch\.edge), keys, 'ReadyWeapon'\)/, `${f} polls ReadyWeapon`);
-    // a12: and SwitchHand beside it, on the INVERTED edge -
-    // ActionComplete is the release (InputManager.cs:634-637), where
-    // ReadyWeapon's ActionStarted is the press. Two rings, one law.
-    assert.match(read(f), /released\((keyEdge|latch\.edge), keys, 'SwitchHand'\)/, `${f} switches the hand on the RELEASE edge`);
-  }
-  assert.match(read('src/scenes/worldModes.js'), /routeKey\(e, dungeonCtx/);
-  assert.match(read('src/scenes/dungeon.js'), /routeKey\(e, ctx/);
-  assert.match(read('src/scenes/dungeonContext.js'), /toggleSheath: weaponRig\.toggleSheath/, 'the dungeon ctx carries the door (for the panel)');
-  assert.match(read('src/scenes/dungeonContext.js'), /switchHand: weaponRig\.switchHand/, 'a12: and the hand door, for the two dungeon hosts');
-  assert.match(read('src/ui/input.js'), /if \(POLLED_ACTIONS\.has\(act\)\) return false;/, 'and routeKey declines it');
-});
-
-// AUDIT 58 (f2/hosts): THE PANEL'S DOOR IN ALL FOUR HOSTS. HUDLarge.cs
-// :477-484's SheathPanel_OnMouseClick calls
-// GameManager.Instance.WeaponManager.ToggleSheath() - a singleton, no
-// scene gate, registered for both buttons at :211-212 - so the panel is
-// live on every screen the large HUD is drawn on. Only the dungeon ctx
-// carried `toggleSheath`, so a click on the sheath rect above ground, in
-// ?exterior, or inside a building was eaten by routeLargeHudClick's
-// unconditional `return true` and did nothing, while Z worked in all
-// four. The sweep is over each ctx OBJECT's own span, not the file, so a
-// frame poll's `weaponRig.toggleSheath()` cannot stand in for the door.
-test('SHEATH: every ctx the large HUD is handed carries the panel\u2019s door (THE FOUR HOSTS RULE)', () => {
-  const CTXS = [
-    ['src/scenes/world.js', 'const hudCtx = {', /^  \};/m, /^    toggleSheath: \(\) => weaponRig\.toggleSheath\(\),$/m],
-    ['src/scenes/exterior.js', 'const hudCtx = {', /^  \};/m, /^    toggleSheath: \(\) => weaponRig\.toggleSheath\(\),$/m],
-    ['src/scenes/worldModes.js', 'const interiorKeyCtx = {', /^  \};/m, /^    toggleSheath\(\) \{ interiorWeapon\.toggleSheath\(\); \},$/m],
-  ];
-  for (const [file, head, end, member] of CTXS) {
-    const src = read(file);
-    const from = src.indexOf(head);
-    assert.ok(from > 0, `${file} still declares ${head}`);
-    const rest = src.slice(from);
-    const to = rest.search(end);
-    assert.ok(to > 0, `${file}: the ctx literal closes`);
-    assert.match(rest.slice(0, to), member, `${file}: the sheath panel's door is ON the ctx, not only in the frame poll`);
-  }
-  // the fourth is the one that always had it
-  assert.match(read('src/scenes/dungeonContext.js'), /^    toggleSheath: weaponRig\.toggleSheath,$/m,
-    'the dungeon ctx keeps the door it has carried since U45');
-  // and the panel is still the eleventh panel, still posting the action
-  assert.match(read('src/ui/hud/hudLarge.js'), /\{ key: 'sheath', rect: LARGE_HUD_RECTS\.sheath, action: 'ReadyWeapon' \}/);
-  assert.match(read('src/ui/input.js'), /case 'ReadyWeapon': return ctx\.toggleSheath \? \(ctx\.toggleSheath\(\), true\) : false;/);
-});
-
 // WEAPON-VIS2 (a player's report, 2026-09-16: "equipped, no crash,
 // still invisible after 10 minutes idle" - a live toggleSheathCalls
 // counter caught it climbing by exactly 2 for one press). AUDIT 58

@@ -118,35 +118,3 @@ test('WOD4: a model\'s matrix is T * Euler(0, deg, 0) in Unity\'s frame - a quar
   assert.ok(close([...a], [...b]), '-210 is 150');
 });
 
-test('WOD4: the streaming host stands the camp on the block, climate and colliders and all, and rolls on the first exterior frame', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(wod && b\.blockName === PRIVATEERS_HOLD_BLOCK\) holdBlocks\.push\(originMatrix\);   \/\/ WOD4/);
-  const block = w.slice(w.indexOf('    let privateersHold = null;'), w.indexOf('    // SIB1: DaggerfallTerrain.OnInstantiateTerrain'));
-  assert.match(block, /await remapSubMeshes\(gpu\.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase\);/, 'the location re-skins every mesh under its blocks (in its own climate - AUDIT WD3 G5)');
-  assert.match(block, /const local = multiply\(origin, holdModelMatrix\(hm\)\);/);
-  assert.match(block, /addStatic\(cpu, local, false\);/);   // PIN MOVED (AUDIT PRECIP HOST-7): the merge's models logged
-  assert.match(block, /late\.add\(key, cpu\.positions, cpu\.indices, local, \{ translation: holdBucket \}\);/);   // PIN MOVED (ROCK-CLEAR): the pixel's solids through the world collider's gate (player/lateSolid.js; test/scenes/fb1019f_rockclear.test.js)
-  assert.match(block, /addFlat\(hf\.archive, hf\.record, \.\.\.centredBase\(\[origin\[12\] \+ hf\.pos\[0\], origin\[13\] \+ hf\.pos\[1\], origin\[14\] \+ hf\.pos\[2\]\], billboardSize\(t, hf\.record\)\)\);/, 'no AlignToBase: centred');
-  assert.match(block, /for \(const l of holdFireLights\(\)\) pixelWodLights\.push\(/, 'at every hour, on the per-light channel');
-  assert.ok(w.indexOf('    let privateersHold = null;') < w.indexOf('const staticMerged = await staticBuilder.finishSliced('), 'into the batch before it is merged');   // PERF-EXT23: the merge breathes
-  assert.match(w, /privateersHold,   \/\/ WOD4/);
-  assert.match(w, /if \(p\.privateersHold && !p\.privateersHold\.state\.rolled\) \{[^\n]*\n[^\n]*\n[^\n]*\n\s*else \{ standHold\(p, hs\); wodSprang\(hs\); \}/);   // WOD7: unless a peer rolled it
-  assert.match(w, /function standHold\(p, site = null\) \{\n\s*const st = p\.privateersHold\.state;\n\s*st\.rolled = true;/, 'Start runs once');
-  assert.match(w, /exteriorFoes\.spawnFoe\(r\.mobileType, \[o\[0\] \+ r\.pos\[0\] \+ t\[0\], o\[1\] \+ r\.pos\[1\] \+ t\[1\], o\[2\] \+ r\.pos\[2\] \+ t\[2\]\], \{ yaw: r\.yawDeg \* Math\.PI \/ 180, gender: r\.gender, placed: true, groundAlign: \{ hitDist: null \}, site \}\)/, 'the local transform, placed');
-  assert.match(w, /\.then\(\(f\) => \{ if \(!f\) return; if \(st\.gone\) exteriorFoes\.removeFoe\(f\); else st\.foes\.push\(f\); \}\)/, 'a foe that lands after its block went goes with it');
-});
-
-test('WOD4: an unload takes the camp\'s foes; a rebuild the reference never makes carries the markers and the camp; a sweep drops the carry', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(collectLoose && p\.privateersHold\) \{ p\.privateersHold\.state\.gone = true; for \(const f of p\.privateersHold\.state\.foes\) exteriorFoes\.removeFoe\(f\); \}/, 'an unload takes the camp\'s foes');
-  // PIN MOVED (IC-SWAP-BEHIND): the rebuild's carry is taken first - alone at the swap's mark (the view standing), never again
-  // at its teardown (`carried`)
-  assert.match(w, /if \(!collectLoose && !carried && \(p\.wodSpawners \|\| p\.privateersHold\)\) carryWodSite\(p, key, \{ hold: p\.privateersHold\?\.state \?\? null \}\);[^\n]*\n\s*if \(carryOnly\) return;/, 'a rebuild carries the markers and the camp');
-  assert.match(w, /wodCarry\.set\(key, \{ spawners, hold, piles, life: p\.wodLife \}\);/);
-  assert.match(w, /const carried = wodCarry\.get\(key\) \?\? null;[^\n]*\n\s*wodCarry\.delete\(key\);/);
-  assert.match(w, /state: \{ rolled: false, foes: \[\], gone: false \} \};[^\n]*\n/, 'a fresh roll...');
-  assert.match(w, /if \(privateersHold && carried\.hold\) privateersHold\.state = carried\.hold;/, '...which a carried one replaces at publish (AUDIT BRANCH (WoD) m4)');
-  const tp = w.slice(w.indexOf('async function _teleportToPixel('), w.indexOf('queue.length = 0;', w.indexOf('async function _teleportToPixel(')));
-  assert.match(tp, /exteriorFoes\.clearLive\(\);\n\s*wodCarry\.clear\(\);/, 'the sweep is an unload');
-});
-

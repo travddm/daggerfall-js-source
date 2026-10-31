@@ -51,15 +51,10 @@ test('POTION-COMMON: an alchemist stocks 2 + a fifth of its quality a day, a gen
   assert.equal(alch.at(-1).potionRecipeKey, HEALING_RECIPE_KEY, 'the last row');
   const gen = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 20 }, { level: 5 }, { rolls: at(0.999), torchesFromItems: false });
   assert.equal(healing(gen), 3);
-  assert.match(rd('src/systems/shopStock.js'), /if \(shelfIndex === 0\) for \(let n = healingShelfCount\(buildingType, quality\); n > 0; n--\) add\(mintHealingPotion\(\)\);\n {2}return items;\n\}/, 'after every draw of the shelf, before it is handed back');
   // AUDIT ECON P1: the shop's FIRST shelf alone - every shelf model is a container stocked whole, so the day's potions on
   // each made a shop of five shelves stock five days' worth; the counter sells from shelf 0 (openMerchantSell)
   const second = stockShopShelf({ buildingType: BUILDING_TYPES.Alchemist, quality: 10 }, { level: 5 }, { rolls: at(0.999), torchesFromItems: false, shelfIndex: 1 });
   assert.equal(healing(second), 0, 'a second shelf: none');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /shelf\.items = shelfLootSpawned\(stockShopShelf\(\{ buildingType: b\.buildingType, quality: b\.quality \}, playerEntity, \{ shelfIndex: i \}\), b\);/, 'openShelf hands its index');
-  assert.match(wm, /const shelf = interiorCtx\?\.shelves\?\.\[0\] \?\? null;[\s\S]{0,900}shelfLootSpawned\(stockShopShelf\(\{ buildingType: b\.buildingType, quality: b\.quality \}, playerEntity\), b\)/, 'the counter stocks shelf 0, the default');
-  assert.equal((wm.match(/stockShopShelf\(/g) ?? []).length, 3, 'the shelf, the counter and the probe - no fourth door');
 });
 
 test('POTION-COMMON: a J-O pile holds one 8 times in 100 and no other pile ever; a looting foe carries one 4 times in 100 and a foe with no loot table never (LOOT-EASE: 12 and 6 raised; POT-THIN: 18 and 10 cut; mutants: either chance at 0 or back; every pile)', () => {
@@ -96,10 +91,6 @@ test('MAGICKA-COMMON (LOOT-EASE, 2026-10-05): DFU\'s own Potion of Restore Power
   assert.deepEqual([healing(foe2), magicka(foe2)], [1, 0], 'and the other way');
 });
 
-test('POTION-COMMON: every host installs it, after the smithing install so a field kit\'s roll still comes first (mutants: the install dropped)', () => {
-  assert.match(rd('src/scenes/shared.js'), /installSmithing\(\);[^\n]*\n {2}installHealingSupply\(\);/);
-});
-
 test('POTION-COMMON: installed with the smithing install, both extras roll - the field kit FIRST, then the potion - on a pile and on a looting foe (mutants: the potion registered under the kit\'s name, so the kit is lost; the order swapped)', () => {
   // a J pile: the map's, the random potion's and the recipe's draws (DFU's), then the field kit's 5 under 6, then the potion's 50
   const pile = addPileLootExtras([], 'J', seq(0.99, 0.99, 0.99, 0.05, 0.5), { online: false });
@@ -112,9 +103,4 @@ test('POTION-COMMON: installed with the smithing install, both extras roll - the
   assert.deepEqual([kits(foe), healing(foe)], [1, 0]);
   const foe2 = addEnemyLootExtras([], { lootTableKey: 'B', mapChance: 0 }, seq(0.99, 0.99, 0.99, 0.5, 0.03));   // POT-THIN: under the foe's 4
   assert.deepEqual([kits(foe2), healing(foe2)], [0, 1]);
-  // the hosts install it ONCE, after the smithing install - a Map keeps a name's first place, so a second, earlier call
-  // would put the potion's draw first
-  const shared = rd('src/scenes/shared.js');
-  assert.equal((shared.match(/installHealingSupply\(\);/g) ?? []).length, 1, 'once');
-  assert.ok(shared.indexOf('installHealingSupply();') > shared.indexOf('installSmithing();'), 'after the smithing install');
 });

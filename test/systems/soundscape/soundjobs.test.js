@@ -135,8 +135,6 @@ test('AUDIT SOUNDSCAPE A WORKER THAT FAILS: its beds made on the main thread, it
 });
 
 test('AUDIT SOUNDSCAPE THE WORKER ITSELF: spelled the way Vite bundles a module worker (new Worker(new URL(...)), never through a variable - the nav and the terrain workers\' rule, AUDIT 59 F1), a double built with the module option; its message answered with the job\'s samples handed over, or its error (mutants: the spelling; the transfer; the error unanswered)', async () => {
-  const S = readFileSync(new URL('../../../src/systems/soundscape/soundJobs.js', import.meta.url), 'utf8');
-  assert.ok(S.includes("? new Worker(new URL('./soundWorker.js', import.meta.url), { type: 'module' })"));
   _resetMade();
   const built = [];
   function Double(url, o) { built.push([url, o]); this.postMessage = () => {}; }

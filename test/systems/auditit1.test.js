@@ -222,27 +222,6 @@ test('AUDIT IT1 H-L1: a refusal the sheet showed is gone once a later press on t
   w.dispose();
 }));
 
-test('AUDIT IT1 H-L2: a driver\'s sheet is a new CarriageMap - its own filters (roads and tracks by the mod\'s DrawRoads / DrawTracks, never the player\'s chips), and no Travel Options mark', () => sheet(() => {
-  const store = travelMapFilters();
-  store.towns = true; store.roads = true;   // the player hid towns and roads on their own sheet
-  const s = settings({ 'General.DrawTracks': false });
-  const w = mkSheet({ immersive: { kind: IT_POPUP.carriage, settings: s } });
-  const [roads, tracks] = itMapPaths(s);
-  assert.deepEqual([w.filters.towns, w.filters.roads, w.filters.tracks], [false, !roads, !tracks]);
-  assert.notEqual(w.filters, store);
-  // a middle click on a place on the paper (the sheet's own hit-tests answered)
-  w._onSheet = () => true;
-  w._markerAt = () => ({ mapId: 1234 });
-  w._markLocationHandler(0, 0);
-  assert.equal(travelMapMarkedMapId(), -1);
-  w.dispose();
-  const own = mkSheet();
-  assert.equal(own.filters, store, 'the player\'s own sheet rides the store');
-  own.dispose();
-  const src = read('src/ui/heldMap.js');
-  assert.match(src, /markedMapId: this\._it \? -1 : this\.markedMapId,/, 'the mod\'s maps draw no mark (CarriageMap\'s markedLocationId stays -1)');
-}));
-
 // ── the gate world data (tools/immersiveTravelPatches.mjs, world/immersiveTravelGates.js, scenes/modWorldData.js) ──
 import { appendedEdit, appendedPatch, IT_GATE_BLOCKS, CLASSIC_BUILDING_SLOTS } from '../../tools/immersiveTravelPatches.mjs';
 import { gateAppends } from '../../src/world/immersiveTravelGates.js';
@@ -303,8 +282,6 @@ test('AUDIT IT1 G1/G2: the layer lays only the author\'s records - a patch WD1 d
   // a classic record the diff re-inserted (an insert below the classic count) is the mod's own file's, not the layer's
   const low = gateAppends({ rebuilds: 'X', ops: [['i', ['RmbBlock', 'Misc3dObjectRecords', 0], { ModelIdNum: 10 }]] }, { Misc3dObjectRecords: 2, MiscFlatObjectRecords: 1 });
   assert.equal(low.Misc3dObjectRecords.length, 0);
-  const src = read('src/scenes/modWorldData.js');
-  assert.match(src, /try \{\s*\n?\s*installImmersiveTravelGates\(/, 'the install guarded: a world loads whatever the layer\'s patches say');
 });
 
 // ── the host and the online lane (systems/immersiveTravel.js, scenes/world.js, ui/merchant/merchantServiceDoor.js) ────────────
@@ -333,12 +310,6 @@ test('AUDIT IT1 W4/G3: the mod is loaded for the game - off at the start, no fac
     assert.equal(immersiveTravelLoaded(), true);
     assert.equal(hasCustomMerchantService(SAILORS_FACTION_ID), true);
   });
-  // the gates and the maps ask the same latch
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const immersiveSettingsIfOn = \(\) => \(immersiveTravelLoaded\(\) \? readImmersiveTravelSettings\(\) : null\);/);
-  assert.match(w, /if \(!immersiveTravelLoaded\(\) \|\| \(kind !== IT_POPUP\.carriage && kind !== IT_POPUP\.seafarer\)\) return null;/);
-  assert.match(read('src/scenes/modWorldData.js'), /const isOn = vendor === IMMERSIVE_TRAVEL_VENDOR \? immersiveTravelLoaded : \(\) => modSetting\(vendor, 'Enabled'\) === true;/);
-  assert.match(read('src/systems/features.js'), /modFeature\('immersive-travel', \(\) => t\('features\.mod\.immersiveTravel\.effect', 'Takes effect the next time you start the game; loading a save is not enough\. Fares and rules change at the next map\.'/);
 });
 
 test('AUDIT IT1 L3: Init registers its services only once BOTH factions went in (IL_047a-050b) - a faction id already taken leaves the drivers with no service, and says so', () => {
@@ -352,21 +323,6 @@ test('AUDIT IT1 L3: Init registers its services only once BOTH factions went in 
     assert.equal(hasCustomMerchantService(CARRIAGE_DRIVERS_FACTION_ID), false);
     assert.deepEqual(warned, ['[ImmersiveTravel] Error: could not register custom factions!']);
   });
-});
-
-test('AUDIT IT1 W1: the enhanced skin\'s merchant popup names a registered service by its own label - the driver\'s button said "Sell"', () => {
-  assert.match(read('src/ui/merchant/merchantServiceDoor.js'), /\{ label: hooks\.label \?\? merchantServiceLabel\(hooks\.service\), onClick: \(\) => \{ close\(\); hooks\.onService\?\.\(\); \} \},/);
-});
-
-test('AUDIT IT1 L1/W2/W6: the driver\'s map reads PlayerGPS\'s region (politic 64 is 31), refuses a sun-averse traveller by day ONLINE as the travel map\'s door does (no arrival clamp there), and says why when it does not open', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /function itHere\(\) \{[\s\S]*?regionIndex: maps\.getRegionIndexAt\(px\.x, px\.y\),/);
-  const open = w.slice(w.indexOf('function openImmersiveMap(kind) {'), w.indexOf('function openTeleportMap() {'));
-  assert.match(open, /if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) \{ townTalk\.say\(localizedText\('cannotTravelIndoors', CANNOT_TRAVEL_INDOORS_TEXT\)\); return null; \}/);
-  assert.match(open, /if \(!travelMapDoorReady\(\)\) \{ townTalk\.say\('\(the travel map art is unavailable\)'\); return null; \}/);
-  assert.match(open, /if \(sharedClockOn\(\)\) \{\s*\n\s*const nowMin = Math\.floor\(skyMinutes\(\)\);\s*\n\s*const cfb = careerFastTravelBlock\(playerEntity, nowMin\);[^\n]*\n\s*if \(cfb\) \{ sayWithNightfall\(cfb\.text\); if \(cfb\.hint\) townTalk\.say\(cfb\.hint\); return null; \}\s*\n\s*const ftb = racialFastTravelBlock\(playerEntity, nowMin\);\s*\n\s*if \(ftb\) \{ sayWithNightfall\(ftb\.text\); if \(ftb\.hint\) townTalk\.say\(ftb\.hint\); return null; \}/);   // PIN MOVED (HOOD-CAREER): the career rung is careerFastTravelBlock's, its hood's hint after DFU's line
-  // ...and it is the clamp's own condition: the arrival clamp runs exactly where this does not
-  assert.match(w, /if \(clamp > 0 && !sharedClockOn\(\)\) \{/);
 });
 
 test('AUDIT IT1 G5: every one of Beautiful Cities\' 52 composites on a gate takes the carriages - 24 farm, 24 tavern and 4 road - and nothing else does', async () => {

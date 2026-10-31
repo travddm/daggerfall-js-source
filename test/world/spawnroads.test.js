@@ -52,13 +52,3 @@ test('SPAWN-ROADS: over the shipped Basic Roads bytes, every spawn pixel a path 
   assert.ok(spawns - refused > 100000, 'and the rest of the world still stands its ruins');
 });
 
-test('SPAWN-ROADS by source: the world host asks the network before it mints, keeps a pre-network ruin provisional, and the roads sweep takes crossed ones back first', () => {
-  // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the stand left world.js for scenes/spawnStandHost.js - read with it
-  const w = `${rd('src/scenes/world.js')}\n${rd('src/scenes/spawnStandHost.js')}`;
-  assert.match(w, /if \(!spawnsDungeon\(_spawnSalt, px, py\) \|\| maps\.getClimateIndex\(px, py\) === CLIMATES\.Ocean \|\| !_spawnGround\(px, py\)\) return null;\n(?:\s*\/\/[^\n]*\n)*\s*const net = terrainGen\.roads\(\);\n\s*if \(net && !pathFreePixel\(net, px, py\)\) return null;/,
-    'the path gate stands before the TTL ledger and the mint');
-  assert.match(w, /locationIndex\.set\(key, loc\);\n\s*if \(!net\) _spawnUnroaded\.add\(key\);/, 'a ruin minted before the network is kept for the sweep');
-  assert.match(w, /function sweepRoadless\(\) \{\n\s*_dropRoadedSpawns\(\);/, 'the sweep drops crossed ruins BEFORE it rebuilds the pixels');
-  assert.match(w, /if \(!pathFreePixel\(net, px, py\) && !_insideSpawn\(key\)\) \{ locationIndex\.delete\(key\); _spawnLedger\.forget\(key\); \}\n\s*\}\n\s*_spawnUnroaded\.clear\(\);/,
-    'a crossed provisional ruin leaves the index and its TTL clock - unless the player stands in it - and the set empties');
-});

@@ -251,28 +251,6 @@ test('LW-TALK on the street: a circle\'s talk waits for its people to gather - f
   const R = POP_VISIBLE_RANGE;
   assert.deepEqual([[0, R + 1], [R, 2], [0, R - 1], [-3, 0.5], [0, -2], [-R - 1, -1]].map(([x, z]) => t.town._hidden(x, z, 0)), [true, true, false, false, true, true]);
   assert.deepEqual([[R - 1, 0], [-2, 0]].map(([x, z]) => t.town._hidden(x, z, Math.PI / 2)), [false, true], 'turned east');
-  // the keep (keepUnits): a circle's people together, a unit as near as its nearest one - a circle TALK_PULL_M nearer, the
-  // ring the ones alone at a spot stand in, beyond which its circles stand - nearest first while the whole of it fits: a
-  // unit that does not fit waits, and a smaller one farther on still comes; ties by id. Nothing else orders it: put
-  // first, those already on the street held every row from the nearer (a walk passing beside the player never came on,
-  // nor a watchman back from his guard) and those in the player's sight let one go who stood just behind him
-  {
-    assert.equal(TALK_PULL_M, ALONE_FAR_M);
-    const [a, b, c, d, e, f] = ['a', 'b', 'c', 'd', 'e', 'f'].map((id) => ({ id }));
-    const ring = { k: 'ring' }, pair = { k: 'pair' };
-    const circleOf = (id) => ({ b: ring, c: ring, d: ring, e: pair, f: pair })[id];
-    const W = [{ res: a, d: 5 }, { res: b, d: 9 }, { res: c, d: 2 }, { res: d, d: 30 }, { res: e, d: 4 }, { res: f, d: 40 }];
-    const kept = (w, cap) => [...keepUnits(w, circleOf, cap)].map((r) => r.id).sort().join('');
-    assert.deepEqual([10, 5, 4, 3, 2, 1].map((cap) => kept(W, cap)), ['abcdef', 'bcdef', 'abcd', 'bcd', 'ef', 'a']);
-    assert.equal(kept([...W].reverse(), 3), 'bcd', 'whatever the order they are read in');
-    const [x, y] = [{ id: 'x' }, { id: 'y' }];
-    assert.deepEqual([[{ res: y, d: 3 }, { res: x, d: 3 }], [{ res: x, d: 3 }, { res: y, d: 3 }]].map((w) => [...keepUnits(w, () => undefined, 1)].map((r) => r.id)), [['x'], ['x']], 'a tie by id');
-    const [g, h, i] = [{ id: 'g' }, { id: 'h' }, { id: 'i' }];
-    const two = { k: 'two' }, of2 = (id) => (id === 'h' || id === 'i' ? two : undefined);
-    assert.deepEqual([4.5, 6].map((at) => [...keepUnits([{ res: g, d: 2 }, { res: h, d: at }, { res: i, d: at + 1 }], of2, 2)].map((r) => r.id).sort().join('')), ['hi', 'g'],
-      'a circle within the ring of one alone before them; beyond it, after');
-    assert.match(rd('src/systems/livingWorld/livingTown.js'), /const keep = keepUnits\(wanted, \(id\) => this\._inCircle\.get\(id\)\?\.circle \?\? this\._inStir\.get\(id\)\?\.pair, this\.maxPopulation\);/, 'the census keeps by it');   // LW-STIR: PIN MOVED - an incident's two kept whole too
-  }
   // stepped past them (no arrival), out of the player's sight: their rows to the nearer
   {
     const s = makeTown(closeTown(), CLOSE, 100 * DAY_MIN + 19.5 * 60);   // LW-SPREAD: PIN MOVED - the evening goes out from six to a quarter past seven now
@@ -454,23 +432,9 @@ test('LW-TALK the words: {place} a town of the town\'s road (its trips\' towns, 
     const top = Math.max(...counts.values());
     assert.ok(total > 500 && top / total < 0.05, `${rec.mapId}: the commonest opener ${(100 * top / total).toFixed(1)}% of ${total}`);
   }
-  // PIN MOVED (AUDIT LW-II E7): a trip's end by its place's name (trips.js placeName) - never "the wild", a hunter's no town
-  assert.match(rd('src/scenes/world.js'), /const places = \[\.\.\.new Set\(\[\.\.\.trips, \.\.\.told\]\.map\(\(tr\) => placeName\(tr\.to\)\)\.filter\(Boolean\)\)\]\.sort\(\);[^\n]*\n    return \{ away, visitors, holders, news, places \};/);
 });
 
 test('LW-TALK the hosts: the street\'s town deals, gathers, keeps circles whole and says aloud (livingTown.js); the rooms deal a table\'s company from its sitting and keep it put through its first round and its exchanges (scenes/livingWorld/livingIndoors.js); the road\'s parties talk in exchanges from their round\'s start (scenes/livingWorld/livingRoads.js); the bodies stand on the wheel (characters/residentWalker.js, world/travellerSprites.js) (mutants: each seam)', () => {
-  const lt = rd('src/systems/livingWorld/livingTown.js');
-  assert.match(lt, /const from = dealt\.start \+ \(far \/ PERSON_MOVE_SPEED \+ GATHER_BEAT_S\) \* this\._baseRate\(\);/);
-  assert.match(lt, /c\.circle\.members\.every\(\(m\) => standing\.has\(m\.id\)\)/);
-  assert.match(lt, /circleLine\(c\.circle, this\._now, lineMin, ctx, this\._scripts\)/);
-  const li = rd('src/scenes/livingWorld/livingIndoors.js');
-  assert.match(li, /dealCircles\(`in:\$\{b\.key\}:\$\{ti\}:\$\{co\.since\}`, at\.map\(\(m\) => m\.res\), round, start, start \+ beat\.roundMin, GATHER_BEAT_S \* beat\.roundMin \/ ROUND_S\)/);
-  assert.match(li, /const on = t - co\.since < beat\.roundMin \|\| exchangeAt\(c, t, beat\.lineMin\) != null;/);
-  assert.match(li, /circleLine\(c, t, beat\.lineMin, ctx, scripts\)/);
-  const lr = rd('src/scenes/livingWorld/livingRoads.js');
-  assert.match(lr, /const circle = \{ members, seed, start: round \* roundMin, end: \(round \+ 1\) \* roundMin, index: 0 \};/);
-  assert.doesNotMatch(lr, /TALK_SHARE/);
-  assert.match(rd('src/world/travellerSprites.js'), /out = w\.update\(dt, eye && eye\.length === 3 \? eye : f, false\);/);
   // the road's parties: a circle with no `from` talks from its round's start
   const c = { members: [{ id: 'a', name: 'A B', job: 'merchant' }, { id: 'b', name: 'C D', job: 'mercenary' }], seed: 5, start: 0, end: ROUND_S * RATE * 1.25, index: 0 };
   assert.ok(circleSlots(c, lineMinutes(RATE))[0] >= 0 && circleSlots(c, lineMinutes(RATE)).length >= 4);

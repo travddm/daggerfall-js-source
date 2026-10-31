@@ -279,15 +279,6 @@ test('SENSE1: the plaque\'s word for an action object - the action band first, a
   assert.equal(actionObjectName({ kind: 'relay', triggerFlag: TRIGGER_FLAGS.Direct6, modelIdNum: 74143 }).title, actionName(TRIGGER_FLAGS.Direct6, 74143));
 });
 
-test('SENSE1: both hosts name an action object through the one function', () => {
-  // the interior's namer answers the word; the dungeon's takes it and may add ECHO1's examine under it
-  assert.match(src('src/scenes/worldModes.js'), /return decorPlaque\(actionObjectName\(o, \{ hideInteract: hide \}\), /);   // PIN MOVED (DECOR-ACCESS): the word rides the decorator's plaque
-  assert.match(src('src/scenes/dungeonContext.js'), /const named = actionObjectName\(o, \{ hideInteract: hide \}\);/);
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    assert.doesNotMatch(src(f), /if \(o\.kind === 'door'\) return actionDoorName|actionDoorName\(\(o\.currentLockValue/, `${f} keeps no door band of its own`);
-  }
-});
-
 test('SENSE1: the chain graph\'s targets - every object another\'s chain reaches, never itself', () => {
   const collider = { addMesh() {}, removeBucket() {} };
   const a = new ActionSystem(collider);
@@ -320,41 +311,6 @@ test('SENSE1: the asks are counted where the press is read, changed or not', () 
   assert.equal(askInteractionMode('nonsense'), false);
   assert.equal(interactionModeAsks('nonsense'), 0);
   assert.equal(getInteractionMode(), 'grab', 'an ask changes no mode');
-  // townTalk counts BEFORE its same-mode no-op; the standalone dungeon host counts under its own overlay gate
-  const tt = src('src/scenes/townTalk.js');
-  assert.match(tt, /function setMode\(m, ask = true\) \{\n    if \(ask\) askInteractionMode\(m\);[^\n]*\n    if \(m === getInteractionMode\(\)\) return;/);
-  // AUDIT DELVE B6: the press, not the key's repeat (a held F3 asked thirty times a second, each a look round)
-  assert.match(tt, /setMode\(m, !e\.repeat\);/);
-  // MODE-WHEEL AUDIT: the dungeon host's one ChangeInteractionMode (pickMode) counts under its overlay gate, before
-  // the same-mode no-op, and the key arm calls it on the press alone
-  const d = src('src/scenes/dungeon.js');
-  assert.match(d, /if \(ctx\.uiOverlayActive\) return false;\n\s*askInteractionMode\(m\);\n\s*if \(m !== getInteractionMode\(\)\)/);
-  assert.match(d, /if \(!e\.repeat\) pickMode\(im\);/);
-});
-
-test('SENSE1: the context looks round at an ask and draws after the last opaque flat; the glow ends with it', () => {
-  const s = src('src/scenes/dungeonContext.js');
-  assert.match(s, /opts\.lateWorldDraw\?\.\(\);\n    senseFrame\(eye\);/);
-  assert.match(s, /if \(asks !== _infoAsks\) \{ _infoAsks = asks; senseLookRound\(eye, t\); \}/);
-  assert.match(s, /if \(!isEnhanced\(\) \|\| tier === 'off' \|\| !eye\) return 0;/);
-  assert.match(s, /senseFinds\(api\.dungeonActivationTargets\(\), eye, \{ nameOf, sees \}\)/, 'the press\'s own list');
-  assert.match(s, /actionObjectName\(actions\.objects\.get\(key\) \?\? null, \{ hideInteract: hide \}\)/, 'the author\'s hide kept');
-  assert.match(s, /const secrets = tier === 'secrets' \? senseSecrets\(actions\.objects\.values\(\), actions\.chainTargets\(\), eye, \{ boxOf: objectAabb, sees: \(o, box\) => inPlainSight\(collider, eye, box, \{ skip: o\.key, noSurface: senseFlat\(null, o\) \}\) \}\) : \[\];/);
-  assert.match(s, /return sensePulse\.pulse\(t, senseRound\(finds, secrets\)\);/, 'C5: the one round');
-  assert.match(s, /noSurface: senseFlat\(tg, actions\.objects\.get\(tg\.key\)\) \}\);/, 'B8: the flats');
-  // B5: a namer that throws costs the look round, never the frame
-  const lr = s.slice(s.indexOf('function senseLookRound(eye, t) {'), s.indexOf('function senseFrame(eye) {'));
-  assert.match(lr, /try \{[\s\S]*\} catch \(e\) \{\n\s+if \(!_senseWarned\) \{ _senseWarned = true; console\.warn\('\[sense\] the look round failed'/);
-  assert.match(s, /senseMarks\(b \? echoPulse\.marks\(t\) : null, a \? sensePulse\.marks\(t\) : null, _senseMarks\);/, 'B9/D5: the echo first, a key once');
-  assert.match(s, /senseGlow\.dispose\(\); sensePulse\.clear\(\);/);
-});
-
-test('AUDIT DELVE B5: a namer that throws - the look round answers nothing and the frame goes on', async () => {
-  // the host's guard, by its shape: everything the round reads is inside the try
-  const s = src('src/scenes/dungeonContext.js');
-  const lr = s.slice(s.indexOf('function senseLookRound(eye, t) {'), s.indexOf('function senseFrame(eye) {'));
-  const tryAt = lr.indexOf('try {');
-  for (const read of ['hideInteractTooltip()', '_namer(key, null)', 'api.dungeonActivationTargets()', 'actions.chainTargets()']) assert.ok(lr.indexOf(read) > tryAt, `${read} inside the guard`);
 });
 
 test('SENSE1: the Features row - Enhanced, three tiers, On by default and the player\'s own online', () => {

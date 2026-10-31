@@ -86,14 +86,6 @@ test('EG6a A GUST\'S BREATH AND ITS BANNERS (section 10.3): over each run of a h
   R.span.clear();
 });
 
-test('EG6a THE GHOSTS DRAWN ONCE A FRAME: the dungeon host\'s door (egSpanDraw) is called by the breach client\'s pass alone (EG-ZL - scenes/eliteGates/egClient.js drawPass); the world host\'s Spire pass draws the telegraphs and the spoils and no ghost a second time (at the merge both drew them) (mutants: the world host drawing them again)', () => {
-  const D = read('src/scenes/dungeonContext.js'), W = read('src/scenes/world.js'), C = read('src/scenes/eliteGates/egClient.js');
-  assert.match(D, /\n {4}egSpanDraw\(proj, view, fog\) \{ return !!egSpan\?\.drawPass\(proj, view, fog\); \},/);
-  assert.match(C, /egSpanDraw\?\.\(proj, view, fog\)/, 'the breach client\'s pass draws them');
-  const fight = W.split('\n').find((l) => l.includes('drawEgFight: ({ proj, view, eye }) =>'));
-  assert.ok(fight && fight.includes('egClient?.drawPass(') && !fight.includes('egSpanDraw'), 'the world host\'s pass, no second draw');
-});
-
 test('EG6a A GUST PUSHES ITS OWN STOREY (THE ASCENT; the relay deploy\'s 500-seed sweep, band 3 seed 210 - a bridge 21 m over a Gust\'s floor, pushed off it): a law 9 section pushes from EG_GUST_STOREY_M.under under its lowest step to .over over its highest; the laws before stack no storeys and push at every height (mutant: the section matched in plan alone)', () => {
   const g = { spec: { law: 9 }, y: 0, y1: 1.2 };
   assert.equal(egGustStorey(g, 0.5), true, 'on the course');

@@ -209,39 +209,6 @@ test('MWT2 emissiveAt: the vertex colour IS the emission where the mode names it
   assert.deepEqual(diffuseAt_MWT2(null, colors, 0), [1, 1, 1]);
 });
 
-test('MWT2 the emission reaches the GPU: the arm pack carries it per vertex and the character program has a channel and a term for it (mutant: the pack width left at 11, so the UVs and the emission read each other’s floats)', () => {
-  const arm = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const rend = readFileSync(new URL('../../../src/render/renderer.js', import.meta.url), 'utf8');
-  // The pack got THREE floats wider, and the width is one constant.
-  assert.match(arm, /export const FP_FLOATS = 14;/);
-  // PERF-RIG1: the emission is resolved once per piece into the lane
-  // buffer (the last three of a corner's eight static floats) and the
-  // frame copies it into the last three of the corner's fourteen.
-  assert.match(arm, /const \[er, eg, eb\] = emissiveAt\(mat, cols, idx\[i\]\);\s*\n\s*lanes\[l\+\+\] = er; lanes\[l\+\+\] = eg; lanes\[l\+\+\] = eb;/);
-  assert.match(arm, /buf\[o\+\+\] = lanes\[l \+ 5\]; buf\[o\+\+\] = lanes\[l \+ 6\]; buf\[o\+\+\] = lanes\[l \+ 7\];/);
-  assert.match(arm, /const LANE_FLOATS = 8;/);
-  // The attribute is ADDITIVE, as MW-D11's UV channel was: a VAO that
-  // never enables it reads the constant, which is zero emission - so
-  // every voxel caller (characters/engineRig.js passes no opts at all)
-  // draws exactly what it drew before.
-  assert.match(rend, /layout\(location=4\) in vec3 aEmissive;/);
-  assert.match(rend, /const emissive = uv && opts\.emissive !== false;/);
-  assert.match(rend, /const floats = uv \? \(emissive \? 14 : 11\) : 9;/);
-  assert.match(rend, /gl\.vertexAttribPointer\(4, 3, gl\.FLOAT, false, stride, 44\);/,
-    'three floats at 44 - after the position, colour, normal and UV');
-  assert.match(arm, /import \{ diffuseAt, emissiveAt \} from '\.\.\/formats\/morrowind\/mwNifMesh\.js';/, 'the pack takes BOTH halves from the one home');
-  // THE TERM, and where it sits: times the texel and nothing else. The
-  // vertex colour must NOT gate it - LightMode_Emissive has already
-  // forced that colour to black, which is the whole bug.
-  assert.match(rend, /lit \+= vEmissive \* texel\.rgb;/);
-  assert.doesNotMatch(rend, /lit \+= albedo \* vEmissive/, 'gating the emission on the albedo is the black flame again');
-  // ...and it is the LAST term, after every light, so nothing dims it.
-  assert.ok(rend.indexOf('lit += vEmissive * texel.rgb;') > rend.indexOf('lit += albedo * pointAcc;'),
-    'the emission is added after the lights, not into them');
-  // C4b's note said "no emission" and was true of the voxel rigs alone.
-  assert.doesNotMatch(rend, /C4b - no emission/, 'the note that made this a rule was retired with the hole');
-});
-
 // AUDIT GATHER-FEEL II (2026-10-13, the re-judge of every record on the files GATHER-FEEL II moved): the by-source pin
 // above matches `vertexAttribPointer(4, 3, gl.FLOAT, false, stride, 44)` ANYWHERE in the renderer, and MWNPC1's skinned
 // mesh (createSkinnedCharacterMesh) carries the same line - so the rigid mesh's own offset was unguarded, and

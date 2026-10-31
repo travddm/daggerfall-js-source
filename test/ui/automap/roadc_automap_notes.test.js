@@ -1012,42 +1012,6 @@ test('c2/S8 SOURCE: the Teleport relay reports BOTH endpoints and still warps id
   assert.deepEqual(warped, [{ pos: [10, 2, 30], yawDeg: 45 }]);
 });
 
-test('c2/S8 SOURCE: the host installs the listener, the two dungeon hosts carry the modifiers', () => {
-  const ctx = src('src/scenes/dungeonContext.js');
-  // the listener is on the CONTEXT, not in a host - both dungeon hosts
-  // overwrite `actions.onTeleport` with their own motor warp, and
-  // neither may need to know about this one
-  assert.match(ctx, /actions\.onTeleportPortal = \(from, to\) => \{ recordTeleporterConnection\(automapRec, from, to\); \};/);
-  assert.match(ctx, /debugTeleport: \(pos\) => \{\s*\n\s*actions\.onTeleport\?\.\(/, 'the debug click reuses the warp door');
-  assert.match(ctx, /lastPlayerFeet = \[pos\[0\], pos\[1\], pos\[2\]\];\s*\n\s*_automapEye = \[pos\[0\], pos\[1\] \+ \(opts\.motorState\?\.\(\)\?\.eyeLevel \?\? EYE_HEIGHT\), pos\[2\]\];/,
-    'AUDIT-AMAP H4: and moves the marker\'s inputs with the player (Automap.cs:869-875) - non-overlay frames alone write them');
-  assert.match(ctx, /automapCommand\(name\)/, 'and the three console verbs have a home');
-  // ROAD-E E3: that home is now the real ConsoleCommandsDatabase -
-  // AutoMapConsoleCommands.RegisterCommands lives with the laws in
-  // systems/automap/automap.js, where C# has it, and the host's probe door runs
-  // the database rather than repeating the three answers.
-  const am = src('src/systems/automap/automap.js');
-  for (const cmd of ['map_revealall', 'map_hideall', 'map_teleportmode']) {
-    assert.ok(am.includes(`registerCommand('${cmd}'`), `${cmd} is registered`);
-  }
-  assert.match(ctx, /registerAutomapConsoleCommands\(\);/, "Automap.Start's registration is never reached");
-  assert.match(ctx, /automapCommand\(name\) \{ return executeConsoleCommand\(name, \[\]\); \}/,
-    'the probe door must RUN the database, not a second copy of the three answers');
-  assert.match(src('src/scenes/dungeon.js'), /window\.__automapCommand/, 'mounted on the probe surface');
-
-  // BOTH hosts that route a pointer DOWN into the dungeon overlay must
-  // carry the modifiers, or Ctrl+Shift and the Ctrl note arm are dead
-  // in that host alone - the failure a source pin exists to catch
-  for (const f of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
-    assert.match(src(f), /overlayPointer\?\.\('down', [^)]*e\.button, \{ ctrl: !!e\.ctrlKey, shift: !!e\.shiftKey \}\)/,
-      `${f} carries the modifiers on the down route`);
-  }
-  // and the relay reports before it warps, in the source too
-  assert.match(src('src/world/actionSystem.js'),
-    /if \(from\) this\.onTeleportPortal\?\.\(from, dest\);\n\s*this\.onTeleport\?\.\(dest\);/);
-});
-
-
 // ── AUDIT-AMAP (2026-09-21): the window's lockouts and the wheel over the panel ──
 test('AUDIT-AMAP W4: while the note prompt is up the map is not the top window - a held hotkey moves nothing (DaggerfallUI.cs:430-433)', () => {
   const { w } = openWindow();

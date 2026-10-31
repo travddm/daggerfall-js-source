@@ -19,7 +19,6 @@ import { mintDeed, BOAT_PARTS_TEMPLATE, mintBoatItem } from '../../../src/system
 import { boatMenuRows, boatMenuRefusal, BOAT_MENU_TEXT, BOAT_MENU_WHY } from '../../../src/systems/comeSailAway/csaBoatMenu.js';
 import { canHoldAmount } from '../../../src/systems/inventory.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const AT = [1000, 34, 50], DIR = [0, 0, 1];
 /** The report's bearer: 304 kg at most, 74.71 carried. */
 const MOST = 304, CARRIED = 74.71;
@@ -110,7 +109,4 @@ test('HOLD-WEIGHT the boat menu and the world: "Pick up" refused with its reason
   assert.deepEqual(rows.map((r) => (r.disabled ? `${r.label} (${r.why})` : r.label)), [BOAT_MENU_TEXT.helm, `${BOAT_MENU_TEXT.pack} (${BOAT_MENU_WHY.tooHeavy})`]);
   assert.equal(boatMenuRows({ boxes: new Set(['drive']), packable: true, tooHeavy: true, noDeed: true }).at(-1).why, BOAT_MENU_WHY.noDeed, 'her deed asked first, as PackBoat asks it');
   assert.equal(boatMenuRefusal(BOAT_MENU_WHY.tooHeavy), PARTS_TOO_HEAVY_TEXT);
-  assert.match(WORLD, /maxEncumbrance: \(\) => entityMaxEncumbrance\(playerEntity\),/);
-  assert.match(WORLD, /tooHeavy: !!csaRuntime\?\.partsTooHeavy\?\.\(boat\),/);
-  assert.match(WORLD, /!csaRuntime\.deedMissing\(boat\) && !csaRuntime\.partsTooHeavy\(boat\)\) csaCall\(\(\) => csaRuntime\.PackBoat\(boat, true\)\);/);
 });

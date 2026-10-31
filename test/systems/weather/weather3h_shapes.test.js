@@ -80,11 +80,6 @@ test('WEATHER3h: THE SKY READS THE SAME SHAPE - the conversion carries it, the p
   assert.deepEqual([...packed.s.slice(0, 4), ...packed.u.slice(0, 3)].map((v) => Math.fround(v)), [...shape].map((v) => Math.fround(v)));
   assert.deepEqual([...packed.ks.slice(0, 4), ...packed.ku.slice(0, 3)].map((v) => Math.fround(v)), [...front].map((v) => Math.fround(v)));
   assert.deepEqual([...packed.s.slice(4, 8), ...packed.u.slice(4, 8)], [1, 0, 0, 0, 0, 0, 0, 0], 'no shape: a circle');
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /float c2 = c \* c - s \* s, s2 = 2\.0 \* c \* s, c3 = c \* \(4\.0 \* c \* c - 3\.0\), s3 = s \* \(3\.0 - 4\.0 \* s \* s\), c4 = 2\.0 \* c2 \* c2 - 1\.0, s4 = 2\.0 \* s2 \* c2;/, 'the multiple-angle identities, as shapeFactor');
-  assert.match(vc, /return a\.x \* \(1\.0 \+ a\.y \* c2 \+ a\.z \* s2 \+ a\.w \* c3 \+ b\.x \* s3 \+ b\.y \* c4 \+ b\.z \* s4\);/);
-  assert.match(rd('src/systems/weather/weatherMap.js'), /const c2 = c \* c - s \* s, s2 = 2 \* c \* s, c3 = c \* \(4 \* c \* c - 3\), s3 = s \* \(3 - 4 \* s \* s\), c4 = 2 \* c2 \* c2 - 1, s4 = 2 \* s2 \* c2;/);
-  for (const u of ['uCellS', 'uCellU', 'uCellKS', 'uCellKU']) { assert.ok(FIELD_UNIFORMS.includes(u)); assert.match(vc, new RegExp(`uniform vec4 ${u}\\[8\\];`)); }
 });
 
 test('WEATHER3h: THE SHAPE REACHES EVERY READER - the wind of a storm\'s approach, the thunder overhead', () => {

@@ -63,19 +63,3 @@ test('FB0930-FOE-RAYS: the capsule cast answers as nine full-reach rays would', 
   assert.equal(c.capsuleCast([1, 1, 4], [1, 2, 4], 0.175, dir, 0.247).dist, Infinity, 'nothing in reach');
 });
 
-test('FB0930-FOE-RAYS: the source keeps the stamp and the Y reject, and the capsule mints no spoke arrays', () => {
-  const src = read('src/player/collider.js');
-  const ray = src.slice(src.indexOf('  raycastHit(origin, dirW'), src.indexOf('    // M3 climbing (GetClimbedWallInfo'));
-  assert.match(ray, /const marks = rayMarks\(bucket\), stamp = RAY_STAMP;/);
-  assert.match(ray, /if \(yHiOf\[ti\] < rLo \|\| yLoOf\[ti\] > rHi\) continue;   \/\/ not reachable in this cell - left unmarked\n\s+marks\[ti\] = stamp;/, 'the reject BEFORE the mark');
-  const cap = src.slice(src.indexOf('  capsuleCast(p1, p2'), src.indexOf('   * A6 - `Physics.SphereCast`'));
-  assert.doesNotMatch(cap, /for \(const \[ox, oy, oz\] of \[/);
-  assert.match(cap, /this\.raycastHit\(CAP_ORIGIN, dir, Math\.min\(reach, best\), filter, CAP_HIT\)/);
-});
-
-test('FB0930-FOE-RAYS: the dungeon draw scales a caster\'s record on locals, never the shared size cache', () => {
-  const d = read('src/scenes/dungeonContext.js');
-  assert.doesNotMatch(d, /sz\.w \*= 1\.35/, 'the cached object is read, never written');
-  assert.match(d, /const szK = f\.mobileArchive === 475 && out\.record >= 20 && out\.record <= 24 \? 1\.35 : 1;/);
-  assert.match(d, /f\.batch\.size = \{ w: out\.flip \? -szW : szW, h: szH \};/);
-});

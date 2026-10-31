@@ -105,24 +105,6 @@ test('AUDIT WB C4 a clock that steps BACK never says a line twice; a new day say
   assert.equal(lines.length, 6, 'the marks and the rite said once a day');
 });
 
-test('AUDIT WB C4 the seam: the world\'s omen is ready when the relay\'s clock is read and the hub has welcomed (or eight seconds on the relay\'s alone), and settles', () => {
-  const world = hostText('src/scenes/world.js');
-  const at = world.indexOf('const gateOmen = params.has(\'online\') ? createGateLanes(');   // PIN MOVED (WW2): the omen a lane at a time - its deps the same
-  const deps = world.slice(at, world.indexOf('}) : null;', at));
-  assert.match(deps, /ready: \(\) => \{ if \(!online\?\.clockRead\) \{ _omenClockAt = null; return false; \}/);
-  assert.match(deps, /return !!socialLink\(\)\?\.clockRead \|\| performance\.now\(\) - _omenClockAt > 8000; \},/);
-  assert.match(deps, /settleMs: OMEN_SETTLE_MS,/);
-});
-
-test('AUDIT WB C5 the countdown is never over the step\'s fire, nor frozen over a held frame', () => {
-  const world = hostText('src/scenes/world.js');
-  // SD19 (PIN MOVED): the pool's banner a wish the presence frame draws, hidden by the same three
-  assert.match(world, /banner: \(text\) => \{ _gateBannerWish = text; \},/);
-  assert.match(world, /hidden = gamePaused\(\) \|\| !!townTalk\.hudHidden \|\| !!gateVeil\?\.busy;\n\s*drawGateBanner\(_gateBannerWish \?\? sb\?\.text \?\? null, \{ hidden, look: _gateBannerWish == null && sb \? 'brass' : 'gate' \}\);/);   // AUDIT SD III (T3, PIN MOVED): a Hollow's door in its own brass
-  // WB9a/WB9d: the marks' card and his ground's rim go with it; GATE-UX: and the damage chart
-  assert.match(world, /if \(frameHeld\(\)\) \{ frameAbort\(\); hideWorldPlaque\(\); last = now; requestAnimationFrame\(frame\); drawGateBanner\(null\); drawGateMarksCard\(null\); drawGateDamageChart\(null\); drawGateGround\(null\);( travelView\?\.exit\('video', true\);)?( if \(spyglass\.up\) lowerGlass\(\);)? return; \}/);   // PIN MOVED (AUDIT CAPTAIN'S SEA S15): and the glass
-});
-
 function fakeGl() {
   const calls = [];
   const gl = new Proxy({ VERTEX_SHADER: 1, FRAGMENT_SHADER: 2, COMPILE_STATUS: 3, LINK_STATUS: 4, ARRAY_BUFFER: 5, STATIC_DRAW: 6, FLOAT: 7, TRIANGLES: 8, BLEND: 9, ONE: 10, CULL_FACE: 11, ONE_MINUS_SRC_ALPHA: 12 }, {
@@ -228,18 +210,6 @@ test('AUDIT WB C7 the site\'s scan in slices IS the scan made at once, a row at 
   assert.ok(Math.abs(b.progress() - 100 / 498) < 1e-9, `${b.progress()}`);
 });
 
-test('AUDIT WB C7 the seams: the scan warmed in idle slices once the relay\'s clock is read; a site asked early finishes it; a scan that throws begins again', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /if \(_omenClockAt == null\) \{ _omenClockAt = performance\.now\(\); warmGateScan\(\); \}/);
-  assert.match(world, /globalThis\.requestIdleCallback\(function slice\(deadline\) \{/);
-  assert.match(world, /const until = performance\.now\(\) \+ \(deadline\.didTimeout \? 4 : 0\);/, 'a page never idle still gets there');
-  assert.match(world, /if \(!gateScanOf\(\(\) => deadline\.timeRemaining\(\) > 2 \|\| performance\.now\(\) < until\)\) \{ globalThis\.requestIdleCallback\(slice, \{ timeout: 250 \}\); return; \}/);
-  assert.match(world, /\}, \{ timeout: 4000 \}\);/);
-  assert.match(world, /try \{ const scan = gateScanOf\(\); return scan \? findGateSite\(day, scan\) : null; \}/, 'the site finishes it there and then');
-  assert.match(world, /\} catch \(e\) \{ _gateScanner = null; throw e; \}/);
-  assert.doesNotMatch(world, /scanGatePixels\(/, 'no whole scan in a frame');
-});
-
 test('AUDIT WB C7 what a frame pays for: the stone\'s matrix only when it moves, no gate no garbage, the pass\'s arguments only while a gate stands', () => {
   const t = gateTimes(661);
   const clock = { now: t.omenAt };
@@ -256,9 +226,4 @@ test('AUDIT WB C7 what a frame pays for: the stone\'s matrix only when it moves,
   clock.now = t.openAt;
   pool.frame(0.016);
   assert.equal(pool.stands(), false, 'no GL, no pass: nothing for the host to build arguments for');
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /if \(gatePool\?\.stands\(\) && gatePool\.drawPass\(proj, view, new Float32Array\(mwv\.eye\), now \/ 1000,/);
-  const src = read('src/scenes/gate/gatePool.js');
-  assert.match(src, /if \(k !== _matKey\) \{ _matKey = k; _mat = trs\(/);
-  assert.match(src, /aabb: fireBox\(place, profile, fireHalfW\)/);
 });

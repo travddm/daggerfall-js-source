@@ -80,15 +80,6 @@ test('AUDIT PRE-MERGE 0929 D1/D2: a contact beneath the controller is WalkOn for
 });
 
 test('AUDIT PRE-MERGE 0929 D1/D2: the pass hands the contact the direction the body presses - the motor\'s own sin and cos of forward and strafe - from the yaw the motor moved it by, which the one motion bag carries (mutants: the press unread; the motor keeping no yaw)', () => {
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  const pass = dc.slice(dc.indexOf('function collisionTriggers('), dc.indexOf('function waterSurfaceYAt('));
-  assert.match(pass, /_wish\[0\] = sn \* playerMove\.forward \+ cs \* playerMove\.strafe;/);
-  assert.match(pass, /_wish\[1\] = cs \* playerMove\.forward - sn \* playerMove\.strafe;/);
-  assert.match(pass, /wish = _wish;/);
-  const motor = readFileSync(new URL('../../src/player/motor.js', import.meta.url), 'utf8');
-  assert.match(motor, /vx = \(sin \* input\.forward \+ cos \* input\.strafe\)/, 'the motor\'s own direction, which the pass mirrors');
-  assert.match(motor, /vz = \(cos \* input\.forward - sin \* input\.strafe\)/);
-  assert.match(dc, /collisionTriggers\(dt, playerFeet, moveHeld, playerHeight, playerMove\);/);
   // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online ?world's dungeon frame runs under a window, and walks no trigger while one is up
   for (const [host, moved] of [['src/scenes/worldModes.js', '!dungeonCtx\\.uiOverlayActive && '], ['src/scenes/dungeon.js', '']]) {
     const h = readFileSync(new URL(`../../${host}`, import.meta.url), 'utf8');

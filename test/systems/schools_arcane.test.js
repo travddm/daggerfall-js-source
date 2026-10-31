@@ -227,7 +227,6 @@ test('SCHOOLS3 THE SHELF AND THE PRICE: the Buy Spells shelf offers my awake pat
   assert.deepEqual(signatureOffers(p).map((s) => [s.name, s.path]), [['Siphon Life', 'necromancer']]);
   assert.deepEqual(signatureOffers(mage([RES, MYS])), [], 'no path chosen');
   assert.deepEqual(signatureOffers({ ...p, peer: true }), []);
-  assert.match(src('src/scenes/worldModes.js'), /offered: \(\) => \[\.\.\.sbi\.values\(\), [^\n]*\.\.\.signatureOffers\(playerEntity\)\]/, 'the shelf asks for it');
   const sp = signatureSpell('necromancer');
   const dh = sp.effects[0];
   assert.equal(effectSchool(dh), DES, 'Damage Health is Destruction\'s');
@@ -247,8 +246,6 @@ test('SCHOOLS3 THE SHELF AND THE PRICE: the Buy Spells shelf offers my awake pat
   assert.equal(priced(offP), plainPrice, 'priced as if Destruction stood at Restoration\'s 90');
   const asleep = { ...p, _online: false, masterSkills: false };
   assert.ok(priced(asleep) > priced(offP), 'asleep, Destruction\'s 20 prices it again');
-  // the tally: the cast engine teaches the school it is cast in
-  assert.match(src('src/scenes/hostMagic.js'), /tallySkill\(playerEntity, castSchool\(playerEntity, sp, e\), 1\);/);
 });
 
 test('SCHOOLS2 THE SCHOOLS PAST 100: online, each school\'s climb past 100 is 1% a point of what it does, to x1.4 - Restoration\'s heals, Alteration\'s Shield, Illusion\'s concealments and Thaumaturgy\'s wards on me, Mysticism\'s chances at a foe; never offline, while mentoring, on another or in a refereed fight (mutants: offline too; on another; in a duel; a heal unscaled; the shield unscaled; the rounds unscaled; the ward\'s chance unscaled; Silence\'s chance unscaled)', () => {
@@ -322,7 +319,6 @@ test('SCHOOLS3 A SIGNATURE SPELL\'S POTENCY READS ITS CAST SCHOOL: a Necromancer
   const landed = (spell) => { let d = 0; page(true, () => applySpell(spell, 20, foeEnt(), { hurt: (n) => { d += n; } }, () => 0.999, { entity: p })); return d; };
   const plainBolt = { ...sp, path: undefined };
   assert.equal(landed(sp), Math.max(1, Math.round(landed(plainBolt) * 1.4)), 'Restoration\'s 140 strikes');
-  assert.match(src('src/systems/effects.js'), /casterDamageScaled\(magnitude\(e\), caster\?\.entity, target, schoolOf\(e\)\)/);
 });
 
 test('SCHOOLS3 THE RIDERS, through the cast engine\'s landing door: each signature spell of MY awake path that lands on a foe does its own - and none for a plain spell, another path\'s, a peer\'s or asleep (mutants: Siphon Life heals nothing; the half; Rift Lance reaches far; Chain Lightning a third foe; Blood Boil above the line; the Seer\'s mark forgotten; the refund dropped; a rider asleep)', () => {

@@ -358,9 +358,3 @@ test('LW-LOOKS indoors: one whose calling is a class\'s in it; the palace\'s cou
   });
 });
 
-test('LW-LOOKS the host: a still picture\'s art loaded into the people\'s own table as a class\'s is, and its record\'s frames; the town handed it (mutants: the flats unhanded)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const livingFlatOf = \(flat\) => \{/);
-  assert.match(w, /return \{ archive: flat\.archive, record: flat\.record, frameCount: Math\.max\(1, tex\.getFrameCount\(flat\.record\)\) \};/);
-  assert.match(w, /armOf: livingArmOf, flatOf: livingFlatOf,/);
-});

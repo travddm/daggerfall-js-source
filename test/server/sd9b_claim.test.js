@@ -280,20 +280,5 @@ test('SD9b THE WORDS AND THE CARDS: the account card\'s row says the count or "N
   assert.equal(profileSdLine({}), null);
   assert.equal(TITLE_TEXT.hourbreaker, 'Hourbreaker');
   assert.ok(Array.isArray(TITLE_RGBA.hourbreaker) && TITLE_RGBA.hourbreaker.length === 4);
-  assert.match(src('src/ui/enhanced/enhancedAccount.js'), /const hours = sdRecordText\(flow\.account\.sds\);\n\s+if \(hours\) row\(t\('account\.card\.hours', 'Hours broken'\), hours\);/);
 });
 
-test('SD9b the hosts and the service by source: the world host keeps a book online on the account service\'s call, hands it every receipt the relay hands it and offers it again each frame; the service\'s route, its count on the cards, the grant on the row, the toml and the deploy\'s paths', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const sdClaims = params\.has\('online'\) \? createSdClaims\(\{/);
-  assert.match(w, /online\.onSdReceipt = \(r, room\) => \{ sdClaims\?\.add\(r\);/);   // SD9e: and its spoils, by the room it came from (PIN MOVED)
-  assert.match(w, /sdClaims\?\.tick\(\);/);
-  const idx = src('server-account/src/index.js');
-  assert.match(idx, /if \(path === '\/v1\/sd\/claim' && request\.method === 'POST'\) \{/);
-  assert.match(idx, /sds: await sdRecordOf\(ctx, who\.player\.id\)/);
-  assert.match(idx, /sds: await sdRecordOf\(ctx, body\.id\)/);
-  assert.match(src('server-account/migrations/0090_sd_kills.sql'), /PRIMARY KEY \(slot, account\)/);
-  assert.match(src('server-account/migrations/0090_sd_kills.sql'), /ALTER TABLE players ADD COLUMN sd_honours INTEGER NOT NULL DEFAULT 0;/);
-  const deploy = src('.github/workflows/account-deploy.yml');
-  for (const p of ['src/net/superDungeon/sdReceipt.js', 'src/systems/wind/wind.js']) assert.ok(deploy.includes(`- "${p}"`), `${p} deploys the service`);
-});

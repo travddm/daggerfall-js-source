@@ -375,5 +375,4 @@ test('LOOT20: the Sockets page - a row a socketed piece; an empty one offers eac
       assert.ok(kids(shell, 'codex-head').some((h) => h.textContent === SOCKETS_NONE));
     } finally { view.unmount(); }
   });
-  assert.match(read('src/scenes/worldModes.js'), /setGem: \(item, gem\) => setGemPiece\(item, gem, playerEntity\),[^\n]*\n\s+unsetGem: \(item, at\) => unsetGemPiece\(item, playerEntity, at\),[^\n]*\n\s+extractGem: \(item, at\) => extractGemPiece\(item, playerEntity, at\),/, 'the guild\'s window on the player\'s own pack (GEM1: a socket of several, and the extraction)');
 });

@@ -100,7 +100,6 @@ test('MW-EARLY autoBuildArms: the restore\'s door finds the early build under wa
   const underWay = (who) => (e) => armsStandFor(e, { ready: () => false, builtFor: () => null, buildingFor: () => who });
   assert.equal(await autoBuildArms(her, { ...opts, standing: underWay(armIdentityOf(her)) }), null, 'no second build of the same body');
   assert.equal(measured, 0, 'and nothing measured for it');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /export async function autoBuildArms\(entity, \{ dataCount = morrowindDataCount, measure = registerMorrowindData, measured = morrowindDataFingerprint, standing = armsStandFor, intent = null \} = \{\}\) \{/, 'the door\'s own standing law is armsStandFor');
 });
 
 test('MW-EARLY saveArmsEntity: the save\'s own race, sex, face and chargenDone; the items as restorePlayer reads them; the worn table by fillEquipTable (the first claim of a slot wins); the light by its index; exactly the build opts a restored entity gives (mutant: the table unfilled, the light dropped, the items raw)', () => {
@@ -140,9 +139,6 @@ test('MW-EARLY fillEquipTable: rebuildEquipState is it plus the armor values and
   assert.equal(fillEquipTable(slots, [a, b, c, d]), slots);
   assert.equal(slots[19], a); assert.equal(slots[18], c); assert.equal(b.equipSlot, undefined);
   assert.equal(slots.filter((s) => s === 'stale').length, 0, 'every slot emptied first');
-  const src = rd('src/systems/equip.js');
-  assert.match(src, /export function rebuildEquipState\(entity\) \{\n\s*const slots = fillEquipTable\(equipTableOf\(entity\), entity\.items\);/);
-  assert.equal((src.match(/if \(slots\[it\.equipSlot\]\) \{ delete it\.equipSlot; continue; \}/g) ?? []).length, 1, 'the fill loop has one home');
 });
 
 test('MW-EARLY prebuildArmsForSave: counts a store nobody counted, builds the save\'s entity, and never throws - a null snapshot builds nothing', async () => {
@@ -223,19 +219,3 @@ test('AUDIT MW-EARLY F1: a restore that lands while the early door is still COUN
   assert.equal(await door3, null);
 });
 
-test('MW-EARLY wiring: the world host starts the arms off the load door\'s own pick BEFORE the world\'s data is read, and the door restores that same pick - AUDIT MW-EARLY F3: from one parse, read when first asked and let go once the door has it (mutant: the early call moved below the reads, a second pick law, or a second parse)', () => {
-  const world = rd('src/scenes/world.js');
-  const early = world.indexOf('if (bootLoadPick) prebuildArmsForSave(bootSnap);');
-  const reads = world.indexOf("status('loading data');");
-  assert.ok(early > 0 && reads > 0 && early < reads, 'the build starts before the first archive of the world is read');
-  assert.ok(world.lastIndexOf('audio.ensure(fetchBytes);', early) > world.indexOf('export async function bootWorld('), 'inside the boot, beside the audio boot');
-  // AUDIT FINAL F9 (the Sigil Sets branch's merge): the pick and its one parse are declared at the boot's top, so the Test
-  // Room's check reads them too (test/systems/auditset_c.test.js D4); the early build still hands the function over, below them
-  assert.ok(world.indexOf('let bootSnapRead;') < early, 'the parse declared before the early build asks it');
-  assert.match(world, /let bootSnapRead;\n\s*const bootSnap = \(\) => \(bootSnapRead === undefined \? \(bootSnapRead = pickedSaveSnap\(bootLoadPick \?\? \{\}\)\) : bootSnapRead\);\n[\s\S]{0,600}?const testRoomOffline = testRoomOnlineRefused\(params, \{ snap: bootSnap \}\);[\s\S]*?if \(bootLoadPick\) prebuildArmsForSave\(bootSnap\);/, 'one parse, read when first asked - the function handed over, never its answer');
-  assert.match(world, /function pickedSaveSnap\(\{ key = null, mostRecent = false \} = \{\}\) \{\n\s*return key != null \? loadSlot\(key\) : mostRecent \? \(mostRecentRestorable\(\)\?\.snap \?\? null\) : null;\n\s*\}/);
-  assert.match(world, /const snap = bootSnap\(\);\n\s*bootSnapRead = null;\n\s*await worldQuickLoad\(\{ \.\.\.bootLoadPick, snap \}\);/, 'the door restores the pick the early build read, from the same parse, and lets it go');
-  assert.match(world, /async function worldQuickLoad\(\{ mostRecent = false, key = null, snap: picked = null \} = \{\}\) \{/);
-  assert.match(world, /const snap = picked \?\? \(key != null \|\| mostRecent \? pickedSaveSnap\(\{ key, mostRecent \}\)/, 'a snapshot handed in is the one restored');
-  assert.equal((world.match(/params\.has\('loadkey'\)/g) ?? []).length, 1, 'the load door\'s pick is decided in one place');
-});

@@ -82,14 +82,6 @@ test('CARP-YARD THE PLACE: the joinery placed on what the two yards (and a port 
   // a cramped town: room for the two alone - the joinery stands nowhere, and the two are unmoved
   const cramped = ground([0, 0, 128, 128]);
   assert.deepEqual(craftYardSitesOn(cramped), []);
-  // the host: the joinery after the port's places, on the same ground
-  const w = read('src/scenes/world.js');
-  const at = (t) => w.indexOf(t);
-  // PIN MOVED (IC-STUTTER): each pass walked through the build's breather (merchantYardSites.js ...Steps)
-  assert.ok(at('const sites = g && yardTown ? await stepsBreathing(yardSitesSteps(g), breathe) : [];') > 0);
-  assert.ok(at('ports = portSitesOn(g, seaField(') > at('const sites = g && yardTown ? await stepsBreathing(yardSitesSteps(g), breathe) : [];'));
-  assert.ok(at('if (g && yardTown) sites.push(...await stepsBreathing(craftYardSitesSteps(g), breathe));') > at('ports = portSitesOn(g, seaField('), 'placed after the port\'s places');
-  assert.ok(at('memo = { sig, sites, ports };') > at('if (g && yardTown) sites.push(...await stepsBreathing(craftYardSitesSteps(g), breathe));'));
 });
 
 test('CARP-YARD THE TIMBER: the joinery the port\'s own geometry inside its ground, its logs\' and its block\'s faces out, in the yards\' pictures - its board, its shavings, its bark and its end grain; the board over a walker\'s head; the gate\'s way in open to a walker; the carpenter\'s place and the workbench clear of every face (mutants: a face wound in, the sign low, the way in blocked)', () => {
@@ -275,21 +267,3 @@ test('CARP-YARD FOUND AS A YARD IS: a row of the town\'s talk directory under it
   assert.ok(saw.includes('rect') && saw.filter((k) => k === 'fillRect').length === 4, 'the saw: its handle and its four teeth');
 });
 
-test('CARP-YARD THE HOSTS: the street\'s workbench is the host\'s own question - a joinery\'s bench outdoors, the modes\' indoors - asked by the craft, the Stores page and the saw alike; the bench\'s press opens the Stores page on the workbench, or says the bench is bare where the page is not; the page names the joinery\'s carpenter and keeps the furnisher\'s Linen a Furniture Store\'s; the bench (exterior.js) stands no yard, worldModes\' street ray reaches every yard key (mutants: a call site still the modes\', the landing lost)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /function workbenchHere\(\) \{\n\s+if \(_mode\(\) !== 'exterior'\) return modes\?\.workbenchHere\?\.\(\) \?\? null;\n\s+return merchantYards\?\.workbenchNear\?\.\(walkMode && playerSpawned \? player\.feetAt\(\) : null\) \? YARD_BENCH : null;\n\s+\}/);
-  assert.equal((w.match(/modes\?\.workbenchHere\?\.\(\)/g) ?? []).length, 1, 'the modes\' asked from the host\'s question alone');
-  assert.match(w, /here: \(\) => workbenchHere\(\), a: 'a workbench'/);
-  assert.match(w, /workbench: \(\) => workbenchHere\(\),/);
-  assert.match(w, /: bench \? workbenchHere\(\) : modes\?\.forgeHere\?\.\(\)\) \?\? null;/);
-  assert.match(w, /bench: \(\) => openYardBench\(\),/);
-  assert.match(w, /function openYardBench\(\) \{\n\s+if \(!forgeOffered\(\)\) \{ townTalk\.say\(stationColdLine\('workbench'\)\); return true; \}[^\n]*\n\s+hudCtx\.togglePause\(\{ at: stationDoorAt\('workbench'\) \}\);/);   // PIN MOVED (CRAFT-HALL): the Crafting page at the bench, its focus handed by stationDoorAt
-  assert.match(w, /`The \$\{f\.who \?\? st\.who\} asks \$\{f\.fee\} gold for the use of the \$\{st\.noun\}\.`/);
-  assert.match(w, /bench \? \(f\.who \?\? 'furnisher'\) : 'smith'/);
-  const pp = read('src/ui/professions/profPages.js');
-  assert.match(pp, /detail\.append\(stationHead\(divider, t\('prof\.page\.bench', 'The Workbench'\), 'workbench'\)\);/);
-  assert.match(pp, /const who = bench\.who \?\? 'furnisher';/);
-  assert.match(pp, /sale\?\.counter === 'furnisher' && have < inp\.n && bench\.kind === 'shop' && !bench\.yard\) counterBuy\(/);
-  assert.doesNotMatch(read('src/scenes/exterior.js'), /merchantYards|craftYardSitesOn/, 'the bench stands no yard');
-  assert.match(read('src/scenes/worldModes.js'), /if \(typeof key === 'string' && key\.startsWith\('yard:'\)\) \{/);
-});

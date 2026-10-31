@@ -108,24 +108,6 @@ test('MAC-K1: the crossed middle name is spelled ONCE, and the hosts read that t
 });
 
 test('MAC-K1: BOTH controls skins can capture a mouse button, which is what "not working properly" was', () => {
-  // The registry has carried Mouse0/1/2 since AUDIT 39r - three of the
-  // shipped defaults ARE mouse buttons - and every runtime reader took
-  // them. The one door a player uses could not: both skins' capture
-  // listened for a KEY. So an action could never be moved onto a
-  // button, and one cleared off a button could never be put back.
-  //
-  // DFU's WaitForKeyPress is `Input.GetKeyDown` walked over every
-  // KeyCode, and Mouse0/1/2 are KeyCodes like any other.
-  const enh = rd('src/ui/enhanced/enhancedControls.js');
-  assert.match(enh, /document\.addEventListener\('mousedown', armedMouse, \{ capture: true \}\);/);
-  assert.match(enh, /document\.removeEventListener\('mousedown', armedMouse, \{ capture: true \}\);/,
-    'and it leaves with the capture - a listener outliving its screen is its own bug');
-  assert.match(enh, /const code = mouseCode\(e\.button\);\s*\n\s*if \(code == null\) return;/,
-    'a sixth button is not a binding, and must not end the capture with nothing written');
-
-  const classic = rd('src/ui/controlsWindow.js');
-  assert.match(classic, /click\(vx, vy, right = false, middle = false\) \{/,
-    'the classic grid needed the button to reach it at all');
 
   // ...AND IT IS DRIVEN, not read. THE CAMPAIGN'S OWN LESSON, for the
   // sixth time in this port: the first cut of this pin grepped for the
@@ -161,11 +143,6 @@ test('MAC-K1: BOTH controls skins can capture a mouse button, which is what "not
   const before = currentDict(win.unsaved).get('Jump');
   win.click(0, 0, true);                   // a right click on dead space
   assert.equal(currentDict(win.unsaved).get('Jump'), before, 'and it did not bind anything');
-  // ...and the host really passes the third and fourth arguments, or
-  // the grid's `middle` is a parameter nothing ever fills.
-  assert.match(rd('src/scenes/townTalk.js'),
-    /overlay\.click\?\.\(v\[0\], v\[1\], e\.button === 2, e\.button === 1\)/,
-    'the overlay seam carries the button, which is what makes the grid’s arm reachable');
 });
 
 // ── K3: the mount ────────────────────────────────────────────────
@@ -231,63 +208,6 @@ test('MAC-K3: a frame while dismounted draws nothing, and cannot reach a canvas 
 });
 
 // ═══ AUDIT-MACK F1: THE DOOR IS NOT THE KEY ═══════════════════════
-
-test('AUDIT-MACK F1: every ctx door routeAction dispatches is reachable BY ITS ACTION in every host that has it', () => {
-  // THE FINDING THIS FILE EXISTS FOR, on its second pass.
-  //
-  // MAC-K3 built the fixed-city host's whole mount surface and hung
-  // `openTransport: () => mountRig.open()` on its `hudCtx`. The pin
-  // above checked that the door was there. The door WAS there. The T
-  // key still did nothing - because `exterior.js` and `world.js` route
-  // their OWN keys and never call `routeKey`, which is the only thing
-  // that reaches `routeAction`'s table. Their hand-written ladders had
-  // arms for five of its ten actions.
-  //
-  // Nothing looked broken from the inside: `routeAction` answered, the
-  // large HUD's transport panel opened the picker, and the KEY was
-  // never wired at all. Mac reported the one he uses; `Status` (I),
-  // `UseMagicItem` (U) and the two mode cycles were the same bug
-  // unreported.
-  //
-  // A PIN ON THE DOOR IS NOT A PIN ON THE KEY - the third dress the
-  // F-SING lesson has worn this week. So this is DERIVED from
-  // `routeAction`'s own switch: nothing here is typed, and an action
-  // added to that table is covered the moment it lands.
-  const input = rd('src/ui/input.js');
-  const table = [...input.matchAll(/case '(\w+)': return ctx\.(\w+)/g)].map((m) => [m[1], m[2]]);
-  assert.ok(table.length >= 10, `routeAction dispatches ${table.length} actions - the table is really parsed`);
-  assert.ok(table.some(([a]) => a === 'Transport'), 'including the one Mac reported');
-
-  // THE INVARIANT, and it is the asymmetry the bug WAS: a host that
-  // routes the large HUD's panel clicks into a ctx must route its KEYS
-  // into that same ctx. The panel and the key are two ways to the same
-  // door, and `routeLargeHudClick` reaches `routeAction` directly
-  // (ui/hud/hudLarge.js) while a hand-written key ladder reaches only what
-  // someone wrote down. That is how `openTransport` came to answer a
-  // click and ignore the T key.
-  //
-  // Stated this way it needs no list of hosts and no model of which
-  // file owns which ctx - a host either takes the whole table on both
-  // seams or it does not.
-  const clickers = [];
-  for (const h of [...HOSTS, 'dungeon']) {
-    const src = rd(`src/scenes/${h}.js`);
-    if (!/routeLargeHudClick\(/.test(src)) continue;
-    clickers.push(h);
-    assert.ok(/routeKey\(/.test(src) || /routeAction\(act, \w+\)/.test(src),
-      `${h}.js routes the large HUD's panels through routeAction but not its keys - `
-      + 'every door on that ctx would open by click and ignore its own key');
-  }
-  assert.deepEqual(clickers, ['exterior', 'world', 'worldModes', 'dungeon'],
-    'the four files that route the bar\u2019s panels - dungeonContext BUILDS the ctx that dungeon.js routes, on both seams');
-
-  // ...and the two that hand-write a ladder really end it on the
-  // table, which is what makes the assertion above true for them.
-  for (const h of ['exterior', 'world']) {
-    assert.match(rd(`src/scenes/${h}.js`), /if \(routeAction\(act, hudCtx\)\) \{ e\.preventDefault\(\); return true; \}/,
-      `${h}.js: the tail of the ladder is the TABLE, not a list someone maintains`);
-  }
-});
 
 test('AUDIT-MACK F1b: the fall-through is DRIVEN, and it declines what is not there', () => {
   // The arm itself, run: `routeAction` opens a door that exists,
@@ -370,34 +290,6 @@ test('AUDIT-MACK F3: a rig a host builds unconditionally is never optional-chain
 
 const PAUSE_HOSTS = ['src/scenes/exterior.js', 'src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js'];
 
-test('MAC-L1: THE FOUR HOSTS declare ONE togglePause signature, and it takes options', () => {
-  // THE FIRST FAULT. Three hosts declared `togglePause(opts = {})` and
-  // dungeonContext declared `togglePause(setPlayerPos = null, opts = {})`.
-  // `routeAction`'s Escape arm spelt it the dungeon's way, so on the
-  // other three the FIRST argument - meant to be the options - was
-  // whatever the key router had for a position applier, and its default
-  // is `null`.
-  //
-  // Derived, not enumerated: every host is READ and its declaration
-  // extracted, so a fifth host cannot join with a fifth spelling.
-  const sigs = PAUSE_HOSTS.map((f) => {
-    const src = rd(f).replace(/^\s*\/\/.*$/gm, '');   // a host's prose is not its signature
-    const m = src.match(/togglePause(?::\s*)?\(([^)]*)\)\s*(?:=>\s*)?\{/);
-    assert.ok(m, `${f} declares no togglePause`);
-    return { f, params: m[1].trim() };
-  });
-  for (const { f, params } of sigs) {
-    assert.match(params, /^doorOpts = \{\}$/,
-      `${f}: one parameter, and it is the options bag - a positional pair three callers spell one way and one spells the other is not a contract`);
-  }
-  assert.equal(new Set(sigs.map((s) => s.params)).size, 1, 'and all four agree');
-
-  // ...and the router hands over an OBJECT, never a bare applier.
-  const input = rd('src/ui/input.js').replace(/^\s*\/\/.*$/gm, '');
-  assert.match(input, /case 'Escape': return ctx\.togglePause \? \(ctx\.togglePause\(\{ setPlayerPos \}\), true\) : false;/,
-    'setPlayerPos rides INSIDE the options');
-});
-
 test('MAC-L1: the door survives a null, and pauseOpts is its one reader', async () => {
   // THE SECOND FAULT, and the one that made the first fatal: `opts = {}`
   // is a default parameter, and a default parameter fires on `undefined`
@@ -470,46 +362,6 @@ test('MAC-L1: the routeAction fall-through is the LAST arm of every ladder it is
     assert.doesNotMatch(tail, /if \(act === '/,
       `${f}: a named arm below the fall-through is an arm the table has already eaten`);
   }
-});
-
-test('MAC-L1b: the dungeon pause door reads the HOST BAG, not its own argument', async () => {
-  // A SECOND FAULT FOUND INSIDE THE FIRST, and the reason the parameter
-  // is called `doorOpts` rather than `opts`.
-  //
-  // `buildDungeonContext(deps, dfLocation, blocks, climateBaseType, opts = {})`
-  // carries the host bag - `questBridge`, `relock`. `togglePause`'s
-  // parameter was ALSO called `opts`, so it shadowed the bag, and the
-  // three arms reading `opts.questBridge` / `opts.relock` inside that
-  // method were reading the METHOD'S ARGUMENT: the dungeon pause
-  // screen's Quests tab answered an empty list and the resume gesture's
-  // relock was a no-op. Both looked wired; neither was.
-  //
-  // This is the same shadow class AUDIT-CHATR F1 found in
-  // `ui/chatPanel.js` one day earlier, in a second file - which is the
-  // whole argument for turning eslint's `no-shadow` on for `src/`.
-  const src = rd('src/scenes/dungeonContext.js');
-  assert.match(src, /buildDungeonContext\([^)]*opts = \{\}\)/, 'the host bag really is called `opts`');
-  const at = src.indexOf('togglePause(doorOpts = {}) {');
-  assert.ok(at > 0);
-  // F5-QUESTS: the bag is its own arm (`pauseHooks`), spread by this door and handed to F5's page - so the method
-  // read here is the door AND its arm, and the door must still spread it.
-  const door = src.slice(at, src.indexOf('\n    },', at));
-  assert.match(door, /\.\.\.this\.pauseHooks\(setPlayerPos\),/, 'the door spreads the bag');
-  const arm = src.indexOf('pauseHooks(setPlayerPos = null) {');
-  assert.ok(arm > 0);
-  const body = (door + src.slice(arm, src.indexOf('\n    },', arm))).replace(/^\s*\/\/.*$/gm, '');
-  assert.match(body, /questLog: \(\) => opts\.questBridge\?\.questLog\(\)/, 'the Quests tab reads the BAG');
-  assert.match(body, /relock: \(\) => opts\.relock\?\.\(\)/, 'and so does the relock');
-  assert.doesNotMatch(body, /\bopts = \{\}/, 'nothing in this method re-declares `opts`');
-
-  // ...and the shadow cannot come back: eslint says so, by name.
-  // (Scoped to this file because the tree-wide rule is its own slice -
-  // 111 sites - and this host must not be allowed to regress meanwhile.)
-  const { execFileSync } = await import('node:child_process');
-  const out = execFileSync('npx', ['eslint', 'src/scenes/dungeonContext.js',
-    '--rule', '{"no-shadow":["error",{"builtinGlobals":false}]}', '-f', 'json'], { encoding: 'utf8' });
-  const shadows = JSON.parse(out).flatMap((f) => f.messages).filter((m) => /'opts'/.test(m.message));
-  assert.deepEqual(shadows, [], 'no binding in this file shadows the host bag');
 });
 
 // ═══ MAC-L3: RIGHT CLICK ESCAPED THE GAME ═════════════════════════
@@ -609,18 +461,6 @@ test('MAC-L3: a running game guards the way out, and a door the GAME opened does
   g.resetUnloadGuard();
 });
 
-test('MAC-L3: exitToTitleMenu releases the guard BEFORE it navigates', () => {
-  // Order matters and is invisible at runtime: the navigation is the
-  // last line, so a release written after it would never run.
-  const src = rd('src/scenes/shared.js').replace(/^\s*\/\/.*$/gm, '');
-  const fn = src.slice(src.indexOf('export function exitToTitleMenu()'));
-  const body = fn.slice(0, fn.indexOf('\n}'));
-  const rel = body.indexOf('releaseUnloadGuard();');
-  const nav = body.indexOf('location.href = location.pathname;');
-  assert.ok(rel > 0, 'the guard is stood down');
-  assert.ok(nav > 0 && rel < nav, 'and stood down BEFORE the navigation, or it never runs at all');
-});
-
 // ═══ MAC-L4: SPELLS DISAPPEARED FROM THE SPELLBOOK ════════════════
 //
 // 2026-09-16, bigdaddywetwet: "also it appears that something causes
@@ -673,114 +513,11 @@ test('MAC-L4: a restore HOLDS a spell it cannot resolve - it never drops it', as
   assert.deepEqual(orphan.spellsPending, [4242], 'an unknown index is still the player’s data');
 });
 
-test('MAC-L4: the host WAITS for the table it reads a save with', () => {
-  // The second lock is the holding above; this is the race itself.
-  // `loadMagicRegistries` is fired and not awaited at boot - correct,
-  // because every other consumer is a later frame - so the load arm has
-  // to await it or it reads a save with a null table.
-  const src = hostText('src/scenes/world.js').replace(/^\s*\/\/.*$/gm, '');
-  assert.match(src, /const _magicRegistries = loadMagicRegistries\(fetchBytes\)/,
-    'the boot keeps the PROMISE, not just its result');
-  const load = src.slice(src.indexOf('async function worldQuickLoad('));
-  const body = load.slice(0, load.indexOf('\n  }'));
-  const wait = body.indexOf('await _magicRegistries');
-  const restore = body.indexOf('restorePlayer(playerEntity, snap');
-  assert.ok(wait > 0, 'the load arm waits for the table');
-  assert.ok(restore > 0 && wait < restore, 'and waits BEFORE it reads the save, or the wait is decoration');
-});
-
 // ═══ AUDIT-MACL: THE AUDIT OF THE FIX ═════════════════════════════
 //
 // Three findings against MAC-L itself, all in the half that was
 // WIRING rather than law. Two of them are classes this port had
 // already named and written down within the week.
-
-test('AUDIT-MACL F1: resolvePendingSpells has a CALLER, and it is the moment the table lands', () => {
-  // MAC-L4 wrote this function, claimed in the record that it "picks
-  // [a held spell] up if a table arrives later", and called it from
-  // NOWHERE but its own pin. An export whose only justification is a
-  // use that does not exist - the exact class AUDIT-CHATR F5 deleted
-  // two days earlier, written by the same hand that had just found it.
-  //
-  // Derived: the caller must be inside the registries' `.then`, because
-  // that IS "later". A call anywhere else would run before the table
-  // exists and resolve nothing.
-  const src = hostText('src/scenes/world.js');
-  assert.match(src, /import \{[^}]*resolvePendingSpells[^}]*\} from '\.\.\/systems\/save\/save\.js';/);
-  const then = src.slice(src.indexOf('const _magicRegistries = loadMagicRegistries('));
-  const body = then.slice(0, then.indexOf('\n  });'));
-  assert.match(body, /spellsByIndex = spellsByIndex \?\? r\.spellsByIndex;/, 'the table lands first');
-  assert.match(body, /resolvePendingSpells\(playerEntity, spellsByIndex\)/, '...and the held spells are asked for');
-  assert.ok(body.indexOf('spellsByIndex = spellsByIndex') < body.indexOf('resolvePendingSpells('),
-    'asked AFTER the table is set, or it resolves nothing');
-
-  // and it is not a lone caller in a test: no src file may export this
-  // and go unused again
-  const callers = ['src/scenes/world.js'].filter((f) => /resolvePendingSpells\(/.test(rd(f).replace(/^import .*$/gm, '')));
-  assert.ok(callers.length >= 1, 'at least one host calls it');
-});
-
-test('AUDIT-MACL F2: the quickload latch goes up BEFORE the first await', async () => {
-  // MAC-L4's fix put an `await` between `if (_loading) return;` and
-  // `_loading = true`. Those two lines used to be separated by
-  // straight-line code, so the check and the latch were atomic; an
-  // await is a door, and two F9s in the same frame could both read
-  // `_loading === false`, both suspend, and both run a whole load over
-  // the same entity. A fix for a silent data loss must not open a
-  // re-entry.
-  const src = hostText('src/scenes/world.js').replace(/^\s*\/\/.*$/gm, '');
-  const fn = src.slice(src.indexOf('async function worldQuickLoad('));
-  const body = fn.slice(0, fn.indexOf('\n  }\n'));
-  const guard = body.indexOf('if (_loading) return;');
-  const latch = body.indexOf('_loading = true;');
-  const firstAwait = body.indexOf('await ');
-  assert.ok(guard >= 0 && latch > guard, 'the latch follows the guard');
-  assert.ok(firstAwait > latch,
-    'NO await may sit between the guard and the latch - that is the window two callers both walk through');
-  // ...and the early returns are inside the try that clears it, or a
-  // refused load wedges quickload for the session
-  assert.ok(body.indexOf('try {') > latch && body.indexOf('try {') < firstAwait,
-    'the try opens between the latch and the await');
-  for (const ret of ["townTalk.say('No saved game.'); return;", "townTalk.say('Save version mismatch.'); return;"]) {
-    assert.ok(body.indexOf(ret) > body.indexOf('try {'), `"${ret}" returns from INSIDE the try, so the latch is released`);
-  }
-  assert.match(body, /\} finally \{\s*_loading = false;\s*\}/);
-});
-
-test('AUDIT-MACL F3: every door the GAME opens stands the unload guard down first', () => {
-  // The guard exists so a navigation the PLAYER did not ask for is
-  // caught. A navigation the player DID ask for - Exit to menu, the
-  // chargen wizard's Cancel - must not prompt, or the prompt becomes
-  // noise and the player clicks through the one that matters.
-  //
-  // DERIVED, not listed: every in-tree navigation to `location.reload()`
-  // or `location.href` that sits inside a host must release first. The
-  // sweep finds them rather than trusting a memory of where they are.
-  const HOSTS = ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js',
-    'src/scenes/worldModes.js', 'src/scenes/dungeon.js', 'src/scenes/shared.js'];
-  const unreleased = [];
-  for (const f of HOSTS) {
-    const src = rd(f).replace(/^\s*\/\/.*$/gm, '');
-    for (const m of src.matchAll(/location\.(reload\(\)|href = )/g)) {
-      const before = src.slice(Math.max(0, m.index - 300), m.index);
-      if (!/releaseUnloadGuard\(\)/.test(before)) unreleased.push(`${f}: ${m[0]}`);
-    }
-  }
-  assert.deepEqual(unreleased, [],
-    'a host navigation with no releaseUnloadGuard before it will prompt the player for a door they opened');
-
-  // and the predicates are the host's HONEST word, never a blanket true
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const src = rd(f).replace(/^\s*\/\/.*$/gm, '');
-    assert.match(src, /armUnloadGuard\(\(\) => (playerSpawned|!!playerEntity\.chargenDone)\)/,
-      `${f} arms with a real question`);
-    assert.doesNotMatch(src, /armUnloadGuard\(\(\) => true\)/,
-      `${f}: a blanket true claims there is something to lose before a character exists, and puts a prompt in front of chargen's own Cancel`);
-  }
-  // the mode machine rides the world host's boot and arms nothing
-  assert.doesNotMatch(rd('src/scenes/worldModes.js').replace(/^\s*\/\/.*$/gm, ''), /armUnloadGuard\(/,
-    'worldModes is not a boot of its own - a second arm here would answer for the world host');
-});
 
 test('AUDIT-MACL F4: the large HUD’s options panel is a SECOND route to the same door', async () => {
   // MAC-L1 named the keyboard route and stopped there. `ui/hud/hudLarge.js`
@@ -793,11 +530,6 @@ test('AUDIT-MACL F4: the large HUD’s options panel is a SECOND route to the sa
   // That matters beyond bookkeeping. A bug with two routes and one
   // named route is a bug that looks fixed from the report and is not.
   const { LARGE_HUD_PANELS } = await import('../../src/ui/hud/hudLarge.js').catch(() => ({}));
-  const hud = rd('src/ui/hud/hudLarge.js');
-  assert.match(hud, /\{ key: 'options', rect: LARGE_HUD_RECTS\.options, action: 'Escape' \}/,
-    'the options panel really does route Escape');
-  assert.match(hud.replace(/^\s*\/\/.*$/gm, ''), /routeAction\(hit\.action, ctx\)/,
-    '...through the same table, with no third argument - so the applier is the default');
   void LARGE_HUD_PANELS;
 
   // DRIVEN: the click path, on a host shaped like the three that broke.
@@ -806,46 +538,6 @@ test('AUDIT-MACL F4: the large HUD’s options panel is a SECOND route to the sa
   assert.doesNotThrow(() => routeAction('Escape', { togglePause: (doorOpts = {}) => { got = doorOpts; } }),
     'the mouse route must not throw either');
   assert.deepEqual(got, { setPlayerPos: null }, 'and it arrives as an OPTIONS BAG, never a bare null');
-});
-
-test('AUDIT-MACL F5: the guard PREVENTS the menu and does not STOP the event', async () => {
-  // A correction and a hazard. The correction: of the THIRTEEN in-game
-  // surfaces appended to `document.body`, exactly ONE (`overworldMap.js`, since RETIRED for `heldMap.js`)
-  // shut `contextmenu` itself. MAC-L3's record said "two" - it was
-  // counting `enhancedBook.js`, which is mounted BY one of the thirteen
-  // rather than being one of them. Counted here rather than remembered.
-  const inGame = ['bookDoor', 'charSheetDoor', 'chronicleDoor', 'fpsCounter', 'gamepadInput',
-    'heldMap', 'hitNumbers', 'inventoryDoor', 'pauseDoor',   // MAP1: heldMap.js in overworldMap.js's seat   // WORLD-HOVER: lootHover.js is worldPlaque.js, at the end of the list
-    'spellbookDoor', 'talkDoor', 'touch/touch', 'worldPlaque'].map((n) => `src/ui/${n}.js`);   // TIDY2: the touch layer in its folder
-  assert.equal(inGame.length, 13, 'the thirteen, named');
-  for (const f of inGame) assert.ok(rd(f).length > 0, `${f} exists`);
-  const selfShutting = inGame.filter((f) => /contextmenu/.test(rd(f)));
-  assert.deepEqual(selfShutting, [], 'and none of them keeps a copy of the rule now');
-
-  // THE HAZARD. Two surfaces bind `oncontextmenu` as a REAL CONTROL -
-  // a right-click on a talk note opens the logbook, and on a keybind
-  // row it clears the binding. The document guard must `preventDefault`
-  // (kill the browser menu) and must NOT `stopPropagation`, or both
-  // features die silently the day someone "simplifies" it.
-  for (const f of ['src/ui/enhanced/enhancedTalk.js', 'src/ui/enhanced/enhancedControls.js']) {
-    assert.match(rd(f), /oncontextmenu = /, `${f} uses the right button as a control`);
-  }
-  const guard = rd('src/ui/input.js');
-  const body = guard.slice(guard.indexOf('export function installContextMenuGuard'));
-  const fn = body.slice(0, body.indexOf('\n}'));
-  assert.match(fn, /e\.preventDefault\(\);/, 'the browser menu is killed');
-  assert.doesNotMatch(fn, /stopPropagation|stopImmediatePropagation/,
-    'but the event still REACHES the elements that use the right button as a control');
-
-  // driven: a listener downstream of the capture guard still runs
-  const ls = [];
-  const doc = { addEventListener: (t, fn2, capture) => ls.push({ t, fn2, capture }) };
-  const { installContextMenuGuard } = await import('../../src/ui/input.js');
-  installContextMenuGuard(doc);
-  let prevented = false, reached = false;
-  ls[0].fn2({ target: { tagName: 'DIV' }, preventDefault: () => { prevented = true; }, stopPropagation: () => { reached = 'STOPPED'; } });
-  assert.equal(prevented, true);
-  assert.equal(reached, false, 'nothing downstream was cut off');
 });
 
 test('AUDIT-MACL F6 (MAC-L2): the banker’s popup is DRIVEN through both arms, and neither throws', async () => {

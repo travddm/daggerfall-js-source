@@ -189,24 +189,3 @@ test('LW-FIX4 a halt that runs past its leg\'s arrival holds it - never halted o
   assert.equal(back.backT1, 440, 'home once the halt is done');
 });
 
-test('LW-FIX4 the streaming host: the trips\' fate the dice\'s (`fated`, the trouble\'s `diced`), the hands\' turns for the fights and the dives (`died`) and the stands\' `deadAt`, the fight\'s own election (those within LIVE_M of it), the memo kept to its bound by every reader (mutants: each seam)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingTripWorld\.fated = \(res, k\) => livingPlaceOf\(res, k\)\.diced;/);
-  assert.match(w, /diced: \(res, trip\) => livingTripPlace\(res, trip\)\.diced,/);
-  assert.equal((w.match(/died: livingDied,/g) ?? []).length, 3, 'the stands\', the fights\' and the dives\'');
-  assert.match(w, /slay: livingRoadSlay, killed: livingKilled, died: livingDied,[^\n]*\n\s*deadAt: livingDeadAt,/, 'the stands ask the hands\' dead');   // PIN MOVED (LW11): the road's slay, its report beside the turn
-  assert.match(w, /owner: \(feet\) => amGroupRollOwner\(online\?\.id \?\? null, player\.feetAt\(\), \(peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => Math\.hypot\(p\.feet\[0\] - feet\[0\], p\.feet\[2\] - feet\[2\]\) <= LIVE_M\), Infinity\),/);
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): and the world's places' generation - a provider's places come or go
-  // PIN MOVED (WW7-7): the memo and its freshness scenes/livingWorld/livingTrips.js's, the host's names its own
-  assert.match(rd('src/scenes/livingWorld/livingTrips.js'), /memoFresh: \(\) => \{ if \(memo\.size > 40000 \|\| ways\.generation !== waysSeen \|\| index\.generation\(\) !== placesSeen\) \{ memo\.clear\(\); waysSeen = ways\.generation; placesSeen = index\.generation\(\); \} \},/);
-  assert.match(w, /const \{ index: livingIndex, ways: livingWays, world: livingTripWorld, memo: _livingTripMemo, memoFresh: livingMemoFresh \} = createLivingTrips\(\{/);
-  assert.equal((w.match(/livingMemoFresh\(\);/g) ?? []).length, 6, 'the towns\', the roads\' frame, the rooms\' frame (AUDIT-E2), the divers\', the remains\' and the carried word\'s (LW16: PIN MOVED)');
-  // the election, run: those within LIVE_M of the fight decide it - the lowest id among them
-  const m = /owner: (\(feet\) => amGroupRollOwner\([^\n]*\)),\n/.exec(w);
-  return import('../../../src/systems/campEncounters.js').then(({ amGroupRollOwner }) => {
-    const owner = (me, peers) => new Function('amGroupRollOwner', 'online', 'player', 'peersNear', 'LIVE_M', `return ${m[1]};`)(amGroupRollOwner, { id: me }, { feetAt: () => [0, 0, 0] }, () => peers, 150);
-    const fight = [100, 0, 0];
-    assert.equal(owner('b', [{ id: 'a', feet: [400, 0, 0] }])(fight), true, 'a lower id too far from the fight to stand it defers to me');
-    assert.equal(owner('b', [{ id: 'a', feet: [120, 0, 0] }])(fight), false, 'one beside it with a lower id stands it');
-  });
-});

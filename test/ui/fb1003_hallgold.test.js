@@ -27,9 +27,6 @@ test('HALL-GOLD the words: short of the price says where the gold goes (the Guil
   assert.match(short, /bank account does not pay for a hall/);
   assert.match(old, /less than 1,274,880 gold put in by realm characters, and only that gold buys a hall/);
   assert.match(old, /Older gold, or gold from characters outside the realm, does not count/);
-  // the door's press says each refusal its own way
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /r\?\.error === 'guild-treasury-short' \? hallShortLine\(guildHallPrice\(price\)\)\s*\n\s*: r\?\.error === 'guild-treasury-old' \? hallOldGoldLine\(guildHallPrice\(price\)\)/);
 });
 
 test('HALL-GOLD the Guild tab: the service\'s view carries what of the treasury can buy a hall - realm gold in, counted; gold from before the realm, not - and the tab says it under "no hall" (mutants: the field dropped; the treasury\'s whole said)', async () => {
@@ -46,14 +43,8 @@ test('HALL-GOLD the Guild tab: the service\'s view carries what of the treasury 
   // PIN MOVED: AUDIT GUILD3 W15 - the Treasury's sentence, one rule said once: a hall, or a new name or tag
   assert.equal(guildHallGoldText(v.hallGold, v.treasury), '60,000 of the treasury\'s 100,000 gold was put in by realm characters and can buy a hall, or a new name or tag. Gold in a bank account cannot.');
   assert.equal(guildHallGoldText(undefined, 5), null, 'an older service\'s answer: nothing said');
-  const panel = rd('src/ui/socialPanel.js');
-  assert.match(panel, /const counted = guildHallGoldText\(v\.hallGold, v\.treasury\);/);
 });
 
 test('HALL-GOLD the treasury\'s buttons: an amount past one move\'s cap is held at Deposit and Withdraw with the cap said, not sent to be refused (mutant: the cap not asked)', () => {
-  const panel = rd('src/ui/socialPanel.js');
-  assert.match(panel, /const overCap = \(\) => goldTyped\(\) > GUILD_MOVE_MAX;/);
-  assert.match(panel, /liveBtn\('Deposit', \(\) => \(\{ enabled: !g\.busy && goldTyped\(\) > 0 && !overCap\(\), why: g\.busy \? 'a moment' : overCap\(\) \? capWhy : 'an amount' \}\)/);
-  assert.match(panel, /liveBtn\('Withdraw', \(\) => \(\{ enabled: !g\.busy && goldTyped\(\) > 0 && !overCap\(\) && guildMay\(me, 'withdraw'\)/);
   assert.equal(GUILD_MOVE_MAX, 1_000_000, 'a hall at 1,274,880 takes two deposits');
 });

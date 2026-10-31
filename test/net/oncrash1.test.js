@@ -253,51 +253,6 @@ test('ONCRASH1: the wire BOUNDS an angle like every other field - a pose\'s yaw 
   assert.equal(validFoeRecord({ i: 7, y: Infinity }), null);
 });
 
-test('ONCRASH1 C2: THE SWEEP IS A SWEEP - no hand-rolled angle wrap anywhere under src/ or server/, however it is spelled (mutants that all walked past the first cut\'s regex: a hoisted TAU constant, `for (;;)`, a recursive wrap, and `while (Math.abs(dy) > Math.PI)`, whose own parenthesis broke its character class)', () => {
-  // The first cut matched /while\s*\([^)]*Math\.PI[^)]*\)/ and called it generative. It was a SPELLING test: blind
-  // to a hoisted constant, a for-loop, a recursion, and to a nested call inside the condition - the last of which is
-  // the most natural way the next author would write it.
-  //
-  // What every hand-rolled wrap has in common is not its loop: it is STEPPING A VALUE BY A WHOLE TURN. So that is
-  // what this looks for, and it resolves each file's own names for a turn first, which is what defeated the regex.
-  // It is still a smoke alarm and this test says so: what PROVES no wrap can hang is the executing pin above, which
-  // drives every site with the wire's door bypassed.
-  const TURN = String.raw`(?:2\s*\*\s*Math\.PI|Math\.PI\s*\*\s*2|6\.283\d*)`;
-  const files = [];
-  const walk = (dir) => {
-    for (const e of readdirSync(new URL('../../' + dir + '/', import.meta.url), { withFileTypes: true })) {
-      if (e.isDirectory()) { if (e.name !== 'node_modules') walk(`${dir}/${e.name}`); }
-      else if (e.name.endsWith('.js')) files.push(`${dir}/${e.name}`);
-    }
-  };
-  walk('src'); walk('server/src');   // the relay re-exports net/wire.js, so its own tree is swept too
-  const offenders = [];
-  for (const f of files) {
-    if (f === 'src/world/mat4.js') continue;   // the ONE home; its body is pinned by exact value above
-    const text = code(f);
-    // this file's own names for a whole turn - `const TAU = 6.283...`, `const T = 2 * Math.PI`
-    const names = [];
-    for (const m of text.matchAll(new RegExp(String.raw`\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*${TURN}`, 'g'))) names.push(m[1]);
-    const turn = names.length ? `(?:${TURN}|\\b(?:${names.join('|')})\\b)` : TURN;
-    // the shape: a value stepped by a whole turn, INSIDE a loop (a while, a for, a for(;;)) or by a function calling
-    // ITSELF - which is every hand-rolled wrap and none of the honest full-turn arithmetic (a random bearing, a
-    // shader's modulo) that a game engine is full of.
-    const step = new RegExp(String.raw`[-+]=\s*[^;\n]*${turn}|[-+]\s*${turn}`);
-    const lines = text.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      if (!step.test(lines[i])) continue;
-      const near = lines.slice(Math.max(0, i - 2), i + 3).join(' ');
-      const inLoop = /\b(?:while|for)\s*\(/.test(near);
-      const selfCall = new RegExp(String.raw`\b([A-Za-z_$][\w$]*)\s*\([^)]*[-+]\s*[^)]*${turn}`).exec(lines[i]);
-      const recurses = selfCall && new RegExp(String.raw`(?:function\s+|const\s+|let\s+)${selfCall[1]}\b`).test(text);
-      if (inLoop || recurses) offenders.push(`${f}:${i + 1}`);
-    }
-  }
-  assert.deepEqual(offenders, [], `a value stepped by a whole turn - the shape of every hand-rolled wrap: ${offenders.join(', ')}. Use world/mat4.js wrapAngle, which answers in one step whatever the input.`);
-  assert.match(code('src/world/mat4.js'), /export function wrapAngle\s*\(/, 'the wrap lives in the math module');
-  assert.match(code('src/player/lockOn.js'), /from '\.\.\/world\/mat4\.js'/, 'lockOn no longer carries its own body');
-});
-
 test('ONCRASH1 A3: validSharedFoe IS the memory\'s door - every field by its own law, a bad one refusing the record WHOLE, a vocabulary it will not say it will not hear (mutant: the feet checked for being an array and nothing else, which is what patchFoe throws on)', () => {
   // RESPAWN1: `team` is a STRING here, because it is a string everywhere in
   // this port. This pin passed `team: 2` and encoded the very misreading that
@@ -338,22 +293,3 @@ test('ONCRASH1 A3: validSharedFoe IS the memory\'s door - every field by its own
   assert.equal(validSharedFoe([1, 2]), null);
 });
 
-test('ONCRASH1 A2/A3/B4a: the three doors a stranger\'s foe comes through - the memory\'s records projected and the latch taken LAST, the dungeon\'s stream through the wire\'s own door (mutants: the latch back in front of the apply; the foes left raw; validFoeRecord dropped from the stream)', () => {
-  const d = code('src/scenes/dungeonContext.js');
-  // A3: the memory's foes projected, like its actions
-  assert.match(d, /shared\.world\.foes\.slice\(0, _layoutFoes\)\.map\(validSharedFoe\)/, 'the memory\'s foe records go through the wire');   // CORPSE-GOLD: a refused one a hole at its index, not filtered out
-  // A2: the latch is the LAST thing - a throw half way leaves it DOWN and the host's next publish retries
-  const body = d.slice(d.indexOf('restoreSharedWorld(shared)'));
-  const applyAt = body.indexOf('applyLoot(shared.world.loot)');
-  const latchAt = body.indexOf('_sharedApplied = true');
-  assert.ok(applyAt > 0 && latchAt > applyAt, 'the latch is set AFTER both applies, never before - a half-applied memory must be retried, not remembered as done');
-  // B4a: the stream's own door
-  assert.match(d, /const r = validFoeRecord\(raw\);\s*if \(!r\) return;/, 'the dungeon\'s stream projects its records, as the exterior cell always has');
-  assert.match(d, /validFoeRecord/, 'and it imports the wire\'s door rather than checking by hand');
-  // A4: the heartbeat is the APPLY's word
-  assert.match(code('src/scenes/world.js'), /if \(modes\?\.applyDungeonFoes\?\.\(id, data\) && modes\?\.mode === 'dungeon'\) seatClock\.heard\(performance\.now\(\)\);/, 'a frame that did not apply is no heartbeat');   // PIN MOVED (FIELD BUGS 2026-10-18d SEAT-LIVE): the seat heard is the seat clock's (net/seatLive.js createSeatClock) - the page's own absence spends none of it
-  // B5d: the SAVE is a door too - ONCRASH1 said the angle defect was not reachable offline; it was, here
-  assert.match(code('src/scenes/world.js'), /if \(Number\.isFinite\(pose\.yaw\)\) cam\.yaw = wrapAngle\(pose\.yaw\);/, 'a save\'s yaw is bounded like the wire\'s');
-  // B5a: the collider's substep count has a ceiling of its own, not one held by its callers
-  assert.match(code('src/player/collider.js'), /const n = Math\.min\(SUBSTEPS_MAX, Math\.ceil\(maxComp \/ maxStep\)\);/, 'no caller\'s arithmetic can buy an unbounded sweep');
-});

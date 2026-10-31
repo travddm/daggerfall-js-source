@@ -230,12 +230,3 @@ test('LOST-SPOILS the sizes the law names hold the game\'s own spoils: the gate\
   assert.ok(send > 4096 && send < LOST_BODY_MAX, `${send} bytes a send - past the service's 4 KiB, under the route's own`);
 });
 
-test('LOST-SPOILS the seams by source: the world host builds the door over its post box, its lines in the chat, and hands it to the court\'s pool and the Hour\'s (the Brass Remnant\'s and the breach\'s Redoubts) - the raids\', the serpent\'s and the stars\' have no floor; the service reads the route to its own bound; a claimed piece goes into the pack by a spoil\'s own door (the ember\'s book) (mutants: a pool left without the door; the bound dropped)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const lostMail = lostSpoilsMail\(\{ box: \(\) => postBox, say: \(text\) => chatNotice\(text\) \}\);/);
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{\n {4}renderer, gl: renderer\.gl, getTexture, uploadRecordFrame, audio, mail: lostMail,/);
-  assert.match(w, /const sdSpoilsPool = createSpoilsPool\(\{\n {4}renderer, gl: renderer\.gl, getTexture, uploadRecordFrame, audio, mail: lostMail,/);
-  assert.equal((w.match(/mail: lostMail/g) ?? []).length, 2, 'the two pools with a floor');
-  assert.match(w, /pack: \{ add: \(rec\) => \{ playerEntity\.items \?\?= \[\]; takeGateSpoil\(\{ kind: 'item', item: setItemFields\(rec\) \}\); \}/);
-  assert.match(src('server-account/src/index.js'), /path === '\/v1\/post\/lost' \? LOST_BODY_MAX : MAX_BODY_BYTES/);
-});

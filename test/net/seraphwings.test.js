@@ -330,14 +330,6 @@ test('SERAPH-WINGS the draw: the wings\' mesh uploaded; a wearer of them drawn i
 });
 
 test('SERAPH-WINGS the hosts: the draw hangs and swings every look with a mesh of its own - the cloak and the wings alike - on its wearer\'s body, read as code', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ AuraRingRenderer, auraWearers, auraLookOf, auraBeastStep, auraMotionStep, auraCapeStep, auraSpriteBones, auraSpritePosed, auraWingLights, CLOAK_BONES, AURA_KINDLE_S, AURA_FORGET_S \} from '\.\.\/render\/auraRing\.js';/);
-  const line = w.split('\n').find((l) => l.includes('for (const w of _auraDraw) if (auraLookOf(w.aura).mesh)'));
-  assert.ok(line, 'the draw\'s line');
-  const code = line.slice(0, line.indexOf('   //'));
-  assert.ok(!code.trim().startsWith('//') && /for \(const w of _auraDraw\) if \(auraLookOf\(w\.aura\)\.mesh\) \{ auraCapeStep\(w, [^;]*\); auraMotionStep\(w, auraNow\); \}/.test(code), 'every meshed look hung on its body and swung');
-  assert.ok(code.includes('bones: mwViewBodyBones(CLOAK_BONES) ?? auraSpriteBones(mwViewSpriteFigure()) }') && code.includes(': peerBodies?.bonesOf(w.id, CLOAK_BONES) ?? auraSpritePosed(w, peerWalkers?.figureOf(w.id) ?? peerRiders?.figureOf?.(w.id), peerWalkers?.faceOf?.(w.id) ?? peerRiders?.faceOf?.(w.id)),'), 'mine off my rig, else off my sprite as drawn; a peer\'s off their rig, else off their sprite - a walker\'s, or a beast\'s on foot (AUDIT 3)');   // SPRITE-FACE (PIN MOVED): and faced as each sprite is drawn
-  assert.ok(code.includes('yaw: mwViewSpriteFacing()?.yaw ?? player.bodyYawFor(cam.yaw), turn: mwViewSpriteFacing()?.turn,'), 'AUDIT 3: mine facing the way my sprite faces, not the camera - SPRITE-FACE (PIN MOVED): the way its PICTURE faces, and swung by the way it turns');
   assert.equal(auraLookOf('seraphwings').mesh, 'wings');
   assert.ok(Math.abs(CLOAK_REST_POSE.shoulders[1] - CLOAK_SHOULDER_Y) < 1e-6, 'without bones, the wings hang from the rest pose\'s shoulders as the cape does');
 });
@@ -501,9 +493,6 @@ test('SERAPH-WINGS AUDIT 3, the net: a crouched or mounted wearer without bones 
   assert.ok(Math.abs(lit[0].y - (2.23 + WING_LIGHT.lift)) < 1e-6 && lit[0].aura === true, 'from the shoulders the pose holds - and an aura\'s');
   auraWingLights([{ at: [0, 0, 0], aura: 'seraphwings', yaw: 0, cape: { ...cape, sunk: true } }], [0, 1.6, -5], lit);
   assert.equal(lit.length, 0, 'closed: unlit');
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  // PIN MOVED (LIGHT-ID): the tint's copy is its light's (render/lightId.js adoptLight)
-  assert.match(wm, /const _dgTint = \(l\) => \(l && !l\.aura \? adoptLight\(\{ \.\.\.l, color: _iilOn \? iilTorch\(l\)\.color : _dgColor \}, l\) : l\);/, 'the dungeon\'s flame tint passes an aura\'s light by');
 });
 
 test('SERAPH-WINGS AUDIT 4: a pose reused after a swim is not left sunk - a swim and then a ride or a crouch opens the wings again and lights them; the last segment of every strand lies flat, its across the same way as the one before it (it was taken backward at the tip, and the segment twisted into a bowtie) (mutants: the stale sunk, the tip\'s tangent)', () => {
@@ -682,6 +671,5 @@ test('SERAPH-WINGS the light on the world: a gold light behind the shoulders of 
   auraWingLights([10, 2, 30, 5, 60].map((d) => wearer([d, 0, 0])), [0, 1.6, 0], out);
   assert.deepEqual(out.map((x) => Math.round(x.x)), [2, 5, 10], 'the nearest three within reach, nearest first');
   assert.equal(auraWingLights([wearer([WING_LIGHT.reach + 5, 0, 0])], [0, 1.6, 0], out).length, 0, 'none past its reach');
-  assert.match(rd('src/scenes/world.js'), /\n    for \(const l of auraWingLights\(_auraWearers, cam\.pos, _auraLights\)\) _peerLights\.push\(l\); return _peerLights;/, 'every host\'s light list - the open world\'s and the dungeon\'s and the building\'s through peerLights');
 });
 

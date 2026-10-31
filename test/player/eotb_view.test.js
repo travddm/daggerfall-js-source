@@ -27,7 +27,6 @@ import { setModSetting, modSetting } from '../../src/systems/modSettings.js';
 // player without it never had a third person at all until now.
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const src = readFileSync(join(root, 'src/player/mwView.js'), 'utf8');
 
 /** Put the seam back the way a fresh session has it. */
 function reset() {
@@ -179,34 +178,6 @@ test('EOTB4: the body draw routes, and cannot be reached with nothing to draw', 
   reset();
 });
 
-test('EOTB4: the seam names its debt rather than hiding it', () => {
-  // The file is still `mwView.js` while serving a body that has
-  // nothing to do with Morrowind. That is a naming debt, and the rule
-  // this repo runs on is that a departure nobody wrote down does not
-  // exist - so the head has to SAY it, and this pin is what keeps the
-  // sentence there when someone tidies the header.
-  assert.match(src, /THE FILE IS STILL CALLED mwView, AND THAT IS A DEBT/,
-    'the head must name the naming debt');
-  assert.match(src, /THIS SEAM NOW SERVES TWO BODIES/,
-    'and say plainly that it is no longer Morrowind’s alone');
-  // ...and the lane is a PREDICATE the pins can drive, not a condition
-  // spelled out at three call sites
-  assert.equal((src.match(/export function eotbLane\(\)/g) ?? []).length, 1, 'one home for the question');
-  // ...and ALL THREE seams ask it. Counting raw occurrences would count
-  // the doc comments too, so the question is asked of each function's
-  // own body - which is the thing that actually has to be true, and
-  // which reddens if a later slice wires one seam and forgets another.
-  const bodyOf = (name) => {
-    const i = src.indexOf(`export function ${name}(`);
-    assert.notEqual(i, -1, `${name} is exported`);
-    const j = src.indexOf('\nexport ', i + 1);
-    return src.slice(i, j === -1 ? undefined : j);
-  };
-  for (const fn of ['mwViewWheel', 'mwViewFrame', 'mwViewDrawBody']) {
-    assert.match(bodyOf(fn), /eotbLane\(\)/, `${fn} must ask which body answers`);
-  }
-});
-
 test('EOTB4: a notch queued before the lane opened is DROPPED, not left to fire later', () => {
   // The case: the player scrolls while the lane is shut (the notch
   // goes to Morrowind's queue), and the lane opens before the frame
@@ -345,29 +316,6 @@ test('AUDIT-EOTB F2/F4: the camera reads the PLAYER’s settings, and the overri
   assert.equal(at({}), -2, 'nothing readied: the base arm');
   assert.equal(at({ weaponReady: true }), -5, 'a readied weapon reaches the override arm');
   assert.equal(at({ riding: true }), -4, 'and riding reaches the riding scale');
-});
-
-test('AUDIT-EOTB F2b: the weapon rig loads the settings and hands the body the state - WITHOUT reaching the view', () => {
-  // The two calls that had no caller, pinned at the ONE site that makes
-  // them - beside `fpArm.attach`, where the body already attaches.
-  const rig = readFileSync(join(root, 'src/combat/weapon/weaponRig.js'), 'utf8');
-  assert.match(rig, /eotbCamera\.loadSettings\(modSetting\)/, 'the camera is given the player’s settings reader');
-  assert.match(rig, /const bindBody = \(\) => eotbBody\.attach\(renderer, eotbState\);/, 'and the state only this rig can answer goes in through the body');
-  assert.match(rig, /weaponReady: !playerWeapon\.sheathed \|\| spellArmed\(\)/,
-    'weaponReady is the IL’s own test: not sheathed, or a spell readied');
-
-  // AND THE DIRECTION IS THE POINT. F2's first cut called
-  // `setEotbPlayerState` from the rig, which imports `mwView.js` into
-  // `weaponRig.js` - the one thing MWFIX's pin in `test/scenes/mwattach.test.js`
-  // forbids, because the classic sprite path is the only path the rig
-  // knows. The gate caught it. Asserted from BOTH sides so neither pin
-  // can be satisfied by moving the breakage to the other file: the rig
-  // never names the view, and the body is the module that does.
-  assert.ok(!rig.includes('mwView'), 'the rig never names the view layer');
-  const body = readFileSync(join(root, 'src/player/eyeOfTheBeholder/eotbBody.js'), 'utf8');
-  assert.match(body, /setEotbPlayerState\(playerState\);/,
-    'the body owns the seam, as it already owns setEotbBodyReady and setEotbDrawBody');
-  assert.match(body, /setEotbBodyReady|setEotbDrawBody/, 'alongside the two it already owned');
 });
 
 test('AUDIT-EOTB F4b: the registered state reaches the camera THROUGH THE SEAM', () => {

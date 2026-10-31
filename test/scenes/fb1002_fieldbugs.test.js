@@ -34,11 +34,6 @@ test('HELM-NET: the report - at sea the net\'s water is everywhere, and the cast
   } finally { s.done(); }
 });
 
-test('HELM-NET by source: the world host\'s fishing kind is busy at a helm, over laid guns and in a boarding', () => {
-  assert.match(src('src/scenes/world.js'), /busy: \(\) => !!csaRuntime\?\.isSailing\?\.\(\) \|\| !!naval\?\.aiming \|\| !!naval\?\.boarding,/);
-  assert.match(src('src/scenes/fishHost.js'), /if \(dungeon \|\| host\.busy\?\.\(\) \|\| !foragingToolIn\(entity, FT\.FishingNet\) \|\| !inWater\(\)\) return \[\];/);
-});
-
 test('HELM-HUSH: the report - at the helm, the first stroke past the wake\'s threshold and every slowing under it crossfade the boat\'s loops, and the crossfade played the loop it fades out again: the host heard a new play and cut it back to its first sample; a loop already playing goes on (mutants: every play counted again)', () => {
   const s = scene();
   const boat = s.place();

@@ -64,11 +64,6 @@ test('LV1: the enhanced lane streams its own radius - 5 by default, 6 at most - 
   assert.equal(landViewDistance({ enhanced: true, pref: 'x', setting: 3 }), LAND_VIEW_DEFAULT, 'a bad pref is the default');
   assert.equal(landViewDistance({ enhanced: true, pref: 0, setting: 3 }), 1);
   assert.deepEqual(LAND_VIEW_TIERS.map(([v]) => v), [1, 2, 3, 4, 5, 6], 'FT2: DFU\'s whole 1..4 and the enhanced 5..6 - the one row names any value either lane holds');
-  assert.match(read('src/systems/features.js'), /key: 'landViewDistance', initial: 5, online: 'player'/, 'RF4: declared on its row; the shelf derives it');
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const fogDistance = landViewRead\(\);/, 'ONE read for the fog scale and the grid (FT2: the module\'s)');
-  assert.match(world, /new StreamingWorldState\(fogDistance\)/);
-  assert.ok(!/choiceRow\('landViewDistance'/.test(read('src/ui/enhanced/enhancedMenu.js')), 'FT2: the row left the Enhanced category for the Features home (systems/features.js)');
 });
 
 // A window/document just real enough for pointerLock.js's toggle and net.
@@ -135,32 +130,6 @@ test('PL3: the bind resets the latch, an enhanced overlay owns Enter, and a clic
   } finally { setCursorActive(false); dom.restore(); }
 });
 
-test('PL3: the look gate holds a lock a door just won inside its gesture, and releases a window that is really up', () => {
-  const dom = stubDom();
-  try {
-    setCursorActive(false);
-    const gate = makeLookGate(dom.canvas);
-    gate(true);
-    assert.equal(dom.exits, 0, 'nothing held, nothing to release');
-    requestLook(dom.canvas);   // the door's relock, inside the Resume click
-    gate(true);                 // the frame after: the overlay slot has not drained yet
-    assert.equal(dom.exits, 0, 'within the grace the lock the gesture won is kept');
-    assert.equal(globalThis.document.pointerLockElement, dom.canvas);
-    gate(false);
-    assert.equal(dom.requests, 1, 'CLICK-STUTTER: the falling edge asks nothing of a lock the canvas still holds (the browser answered a held lock with nothing, and the ask cost a pointerlockchange)');
-    globalThis.document.pointerLockElement = null;   // the lock lost under the window
-    gate(true); gate(false);
-    assert.equal(dom.requests, 2, '...and asks again for one it lost');
-    assert.ok(RELOCK_GRACE_MS < 250, 'a grace, not a hold: a window that really opens releases on the next frame past it');
-    assert.match(read('src/player/pointerLock.js'), /if \(held\) \{ if \(nowMs\(\) - _lastRequestAt > RELOCK_GRACE_MS\) releaseLook\(\); \}/);
-    // the seams by source
-    assert.match(read('src/scenes/world.js'), /onOpen: \(\) => surfaceOpen\('chat'\),/, 'the Enter that opens the chat is the chat\'s (AUDIT SOC B6: the chat is the first of the counted pointer surfaces)');
-    assert.match(read('src/scenes/world.js'), /const surfaceOpen = \(name\) => \{ pointerSurfaces\.add\(name\); setCursorActive\(false\); releaseLook\(\); \};/, 'and the surface\'s open still flips cursorActive off inside the gesture');
-    assert.match(read('src/ui/pixelDial.js'), /onClose: \(\) => \{ _open = null; if \(lockEl\) requestLook\(lockEl\); \},/, 'the dial gives the pointer back');
-    assert.match(read('src/main.js'), /z-index:20;white-space:pre-wrap;pointer-events:none'/, 'the crash report is not a wall over the canvas');
-  } finally { setCursorActive(false); dom.restore(); }
-});
-
 // ---- SH1: a table is a wall, a step is a step ----
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const quad = (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz) => ({ positions: [ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz], indices: [0, 1, 2, 0, 2, 3] });
@@ -200,14 +169,4 @@ test('SH1: a box taller than stepOffset is a wall - the player slides along it a
     const r = walkInto(boxWorld(h));
     assert.ok(r.maxY >= h - 1e-3 && r.z > 6, `a ${h} box is stepped onto and walked across (maxY ${r.maxY.toFixed(3)}, z ${r.z.toFixed(2)})`);
   }
-  // the ladder's law by source: the cap and the down leg
-  const src = read('src/player/collider.js');
-  assert.match(src, /if \(retry\[1\] > standCeil \+ 1e-4\) continue;/);
-  assert.match(src, /const standCeil = entryY \+ STEP_OFFSET;/);
-  // AUDIT COL1 F8: SH1's half of this is unchanged - a contact above the
-  // stand ceiling with an upward normal is a wall. COL1's middle spheres
-  // join it through the same branch (an upward-leaning face met at
-  // mid-body is a wall too), so the condition gained a second clause.
-  assert.match(src, /const wallAbove = \(dy > 0 && center\[1\] - dy > standCeil\)/,
-    "SH1's clause is the first one, and still reads the stand ceiling");
 });

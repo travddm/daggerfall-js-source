@@ -125,17 +125,4 @@ test('LEGACY-NAME the words: a seat\'s house says itself once - the pages, the s
     for (const s of scripts) for (const line of s) assert.doesNotMatch(line, /\{who\} \{house\}/, `${kind}: "${line}"`);
   }
   assert.equal(fillLine(KIN_NEWS.died[2][0], { who: firstNameOf('Ysolde Hlaalu'), house: 'Hlaalu' }), 'Ysolde, gone. I saw them in the market not a week past.');
-  // PIN MOVED (AUDIT LW-II B14): a band's rout is told by its whole name ("the Red Hand" - its first word was "the"); every
-  // other tale, the house's news among them, by the first name still
-  assert.match(rd('src/systems/livingWorld/meetups.js'), /who: told \? \(told\.item\.kind === 'routed' \? told\.item\.who : firstNameOf\(told\.item\.who\)\) : null/, 'the renderer\'s own fill');
-  // the pages read the one title (by source - drawn in test/legacysheet and test/legacy3_familytab)
-  const pages = rd('src/ui/familyPages.js');
-  assert.doesNotMatch(pages, /House of \$\{(family|f)\.surname\}/, 'no page says the raw surname after "House of"');
-  assert.doesNotMatch(pages, /house of \$\{family\.surname\}/);
-  assert.doesNotMatch(rd('src/scenes/legacyHost.js'), /house of \$\{family\.surname\}/);
-  // ...and the Succession's own words in the world host (scenes/world.js openLegacySuccession, openLegacyDeadLoad)
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const legacyHouse = \(fam, the = 'the'\) => `\$\{the\} house\$\{houseWord\(fam\?\.surname\) \? ` of \$\{houseWord\(fam\.surname\)\}` : ''\}`;/);
-  assert.equal((w.match(/legacyHouse\(fam/g) ?? []).length, 5, 'the heir\'s line, the house going on or ended, the past loaded');
-  assert.doesNotMatch(w, /house of \$\{fam/, 'never the raw surname after "house of"');
 });

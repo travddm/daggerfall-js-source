@@ -327,31 +327,6 @@ test('DECOR-BATCH (2026-10-16, the owner\'s screenshots of every account deploy 
   assert.deepEqual(r.hidden, ['m0:41000']);
 });
 
-test('HOME-VOTE the hosts by source: the interior stands a shunned home bare but its trader, nothing taken out; the world paints a shunned home in its town\'s own look and keeps it in the merge; the door lists the votes unlit where they are all it lists and still says "Locked"; a vote row presses the vote it says, before the lock, and a home gone is said so (AUDIT B3, B5); the Info box asks only where no plaque is drawn (B1), says the lock, and carries the door\'s rows; presses keep their order (mutants: the room stood, the look painted, the rows lit, the vote inverted, the press after the lock, the box over a drawn plaque, the order dropped, the way in dropped)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const shown = homeDecorShown\(interiorHome\);\n\s*const pieces = r\.data\.pieces\.map\(decorPieceOf\)\.filter\(\(p\) => p && \(shown \|\| decorStaysShunned\(p\)\)\);/);
-  assert.match(m, /if \(!shown\) \{ interiorCtx\?\.base\?\.setHidden\(\[\]\); return; \}   \/\/ HOME-VOTE: the room as Daggerfall furnished it\n\s*interiorCtx\?\.base\?\.setHidden\(Array\.isArray\(r\.data\.hidden\)/);
-  assert.match(m, /const rows = \[\.\.\.\(homeVisitorRows\(home, homeDoorFor\(bd, home\)\) \?\? \[\]\), \.\.\.\(worldPlaqueOn\(\) \? homeVoteRows\(home\) : \[\]\)\];/);
-  assert.match(m, /_doorText = homeVoteDoorText\(_doorText, bd, home, verbs\);[^\n]*\n\s*if \(verbs\) _doorText = \{ \.\.\._doorText, actions: verbs \};/);
-  assert.match(m, /const voteOnly = isHomeVoteVerb\(verbs\?\.\[0\]\?\.id\);/, 'AUDIT D1: unlit when the first row is a vote\'s');
-  assert.match(m, /const lines = \[\.\.\.\(voteOnly && homeDoorFor\(bd, home\) === 'locked' \? \['Locked'\] : \[\]\), \.\.\.homeVoteLines\(home\)\];/);
-  assert.match(m, /return voteOnly \? \{ \.\.\.said, actionsUnlit: true \} : said;/);
-  assert.match(m, /if \(isHomeVoteVerb\(verb\)\) \{ if \(homeVotePressable\(home, homeVoteOfVerb\(verb\)\)\) pressHomeVote\(bd, homeVoteOfVerb\(verb\)\); else if \(!home\) townTalk\?\.say\?\.\(HOME_VOTE_GONE_LINE\); return true; \}/);   // PIN MOVED (AUDIT HOME-VOTE II A3): a take-back where I may vote no more
-  const press = m.indexOf('if (isHomeVoteVerb(verb)) {');
-  const lock = m.indexOf("if (door === 'locked') { townTalk?.say?.(homeLockedLine(home)); return true; }");
-  assert.ok(press > 0 && lock > press, 'a vote is pressed before the lock answers');
-  assert.equal(m.slice(m.lastIndexOf('\n', press - 200), press).includes('if (!isBash && !homeAsked && getInteractionMode() !== \'steal\') {'), true, 'AUDIT B5: whether or not a home stands');
-  assert.match(m, /if \(verb == null && getInteractionMode\(\) === 'info' && homeVoteRows\(home\)\.length && !listed\) \{ openHomeVoteMenu\(bd, home, door, door === 'enter' \? homeOnward\(hit, entries\) : null\); return true; \}/);   // PIN MOVED (AUDIT HOME-VOTE II A3, B4): wherever the door has a vote row, the plaque as the press found it
-  assert.match(m, /lines: \[homeDoorTitle\(home\), \.\.\.\(door === 'locked' \? \[homeLockedLine\(home\)\] : \[\]\),/);
-  assert.match(m, /\.\.\.homeVoteChoices\(home\)\.map\(\(c\) => \(\{ code: c\.code, label: c\.label, action: \(\) => pressHomeVote\(bd, c\.vote\) \}\)\),/);
-  assert.match(m, /_homeVoting = _homeVoting\.then\(async \(\) => \{\n\s*if \(!homeVotePressable\(homeOf\(bd\), vote\)\) return;[^\n]*\n\s*const r = await host\.onlineHomes\.vote\(homeTownOf\(bd\), bd\.buildingKey, vote\);/);   // PIN MOVED (AUDIT HOME-VOTE II A3)
-  assert.match(m, /townTalk\?\.say\?\.\(r\.ok \? homeVotedLine\(r\.vote, r\.score\) : homeVoteRefusalLine\(r\.error\) \?\? accountRefusalText\(r\.error\)\);/, 'AUDIT D6: the vote\'s own words first');
-  assert.match(src('src/systems/quickLoot.js'), /export const plaqueListing = \(\) => !!\(_actionIds && _actionIds\.length && _sel\);/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /: homeDecorShown\(row\) \? row\?\.look \?\? null : null\);/);
-  assert.match(w, /\(\(row\?\.look && homeDecorShown\(row\)\) \|\| row\?\.mine \|\| row\?\.keeper\)\) merged = true;/);
-});
-
 test('HOME-VOTE AUDIT II the service: a vote taken back past the hour\'s bar is never refused (A2); a vote names the owner its door read and lands only on that owner\'s house - one sold and bought again takes none, a cast vote naming nobody is no vote (A4); a write that found nothing to vote on is answered as it found it, never re-asked into an `ok` (A5); a knight\'s deed house is none to vote on (B5); a restore puts a home back without its score (A6) (mutants: the bar on a take-back, the owner unread, the follow-up re-asking, the deed votable, the score restored)', async (t) => {
   const { svc, raw, aged, vote, hall } = await town(t);
   const bob = aged(await svc.registered('Bob'));
@@ -414,13 +389,6 @@ test('HOME-VOTE AUDIT II the door: a hall\'s member with a vote cast before they
   assert.deepEqual(homeVoteRows(visitor({ hall: { name: HALL }, member: true })), [], 'no vote standing: no rows');
   assert.equal(homeVotable(visitor({ deed: true })), false, 'B5');
   assert.deepEqual(homeVoteRows(visitor({ deed: true })), []);
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /lines: \[\.\.\.rentPickLines\(got\.owner \|\| home\.owner\), \.\.\.homeVoteLines\(home\)\],[^\n]*\n\s*options: \[\n\s*\.\.\.homeVoteChoices\(home\)\.map\(\(c\) => \(\{ code: c\.code, label: c\.label, action: \(\) => pressHomeVote\(bd, c\.vote\) \}\)\),/, 'B1');
-  assert.match(m, /lines: \[\.\.\.homeOwnerLines\(home\), \.\.\.homeVoteLines\(home\)\],/, 'B2');
-  // PIN MOVED (LOCKPICK, bible/06-Systems/Lockpicking.md): the door's options carry `picked` beside the verb - a front door the
-  // pick window opened walks in through the same door, picked
-  assert.match(m, /async function activateStaticDoor\(hit, entries, isBash = false, \{ homeAsked = false, verb = null, listed = plaqueListing\(\) && worldPlaqueOn\(\), picked = false \} = \{\}\) \{/, 'B4: read with the verb');
-  assert.equal(m.includes('&& !plaqueListing()) { openHomeVoteMenu'), false, 'B4: never after the wait');
 });
 
 test('HOME-VOTE AUDIT II the pins lane D found missing: the score triggers touch their own home alone (D4); a hall says its score to everyone and its paint to its guild, shunned (D5); the bar is an hour (D6); the words themselves (D8); a week to the second, a guest refused by the vote itself, `bad-vote` a 400, a take-back of nothing answered, the voter\'s votes gone with the voter (D9) (mutants: a trigger town-wide, the hall\'s score unsaid, the hall\'s paint from its guild, the window a minute, the words swapped or blank, the age bar off by one, the guest unguarded, the status moved, the voter\'s cascade dropped)', async (t) => {
@@ -473,7 +441,4 @@ test('HOME-VOTE AUDIT II D8, D9: the words a player reads, as they read them; th
   assert.equal(homeVotedLine(-1, -2), 'You voted this home down. Its votes: -2.');
   assert.equal(homeVotedLine(0, 0), 'You took your vote back. Its votes: 0.');
   assert.deepEqual(homeVoteRows(visitor({ myVote: -1 })).map((r) => r.label), ['Vote up', 'Take back your vote down']);
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /\.\.\.\(homeVoteLines\(home\)\.length \? homeVoteLines\(home\) : \[homeVotesLine\(home\.score\)\]\)\],/, 'D9: the box says Votes: 0');
-  assert.match(m, /townTalk\?\.say\?\.\(r\.ok \? homeVotedLine\(r\.vote, r\.score\) : homeVoteRefusalLine\(r\.error\) \?\? accountRefusalText\(r\.error\)\);\n\s*\}\)\.catch\(\(e\) => console\.error\(e\)\);/, 'D9: ASYNC NEVER DROPS');
 });

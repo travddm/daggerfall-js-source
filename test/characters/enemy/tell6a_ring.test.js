@@ -60,10 +60,6 @@ test('TELL6a: the ground reads the verdict\'s own law for every shape - blowFiel
   assert.ok(quadHalf('ring') < quadHalf('lunge'), 'each its own size');
   assert.ok(BLOW_QUAD_HALF >= Math.max(...['lunge', 'sweep', 'slam', 'ring'].map((k) => quadHalf(k) - 0.3)), 'the whole quad still holds every shape');
   assert.equal(BLOW_KIND.ring, 3);
-  const fs = rd('src/render/foeTelegraph.js');
-  assert.match(fs, /float d = length\(vec2\(across, along\)\);\n\s*inside = d >= uP\.x && d <= uP\.y;/, 'the shader\'s annulus is the law\'s');
-  assert.match(fs, /else if \(b\.kind === 'ring'\) gl\.uniform4f\(U\.uP, P\.rIn, P\.rOut, 0, 0\);/);
-  assert.match(fs, /gl\.uniform1f\(U\.uHalf, quadHalf\(b\.kind, b\.ahead\)\);/);   // PIN MOVED (TELL6c: a leap's quad by its own point)
 });
 
 test('TELL6a: who throws it - the whole set of the massive brute, the atronachs and the Daedra Lord; never an ordinary one; iron on their weight; it chains into a slam; its miss a second\'s window (mutants: the ring for every brute)', () => {

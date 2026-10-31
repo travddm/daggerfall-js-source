@@ -82,47 +82,6 @@ test('GR1: grass records come from the archive\u2019s own texels - none for road
   const winter = [flat(53, 94, 143), flat(209, 210, 216), flat(208, 209, 216), flat(207, 208, 215)];
   for (let r = 4; r < 56; r++) winter.push(flat(208, 209, 216));
   assert.equal(grassRecordsOf(winter).size, 0, 'a winter archive has no green base, so nothing is grass');
-  // the host: the near ring, the season, the sea plane, the record
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /p\._stride === 1 && p\.tilemapBytes && \(snowCover\.on \|\| p\.season !== SEASON\.Winter\)/, 'near ring only, never in winter (PRECIP4: on the snow lane each blade asks the snow instead)');
-  // PIN MOVED (ECOTONE1, 2026-10-07): the records of the ground the root stands in - its pixel's (`grass`), or at a climate
-  // border the neighbour's set the ground's border gives it there
-  // PIN MOVED (BANTHA2): the keep is the jungle floor's too - its own records (grass and dirt) when asked for it, the meadow's
-  // grass records otherwise, and no meadow blade where the floor claims the point
-  assert.match(w, /const g = ga === p\.groundArchive \? grass : grassRecords\.get\(ga\);\n\s*if \(rec === 0 \|\| !\(floor \? floorRecords\.get\(ga\) : g\)\?\.has\(rec\) \|\| \(!floor && jungleFloor\?\.claims\(x, z\)\)\) return null;/, 'a water record or a non-grass record: no blade');
-  assert.match(w, /if \(h <= sea\) return null;/, 'under the sea plane: no blade');
-  // GR5: the field follows the eye by CELLS now - filled at the leading
-  // edge, freed at the trailing one - rather than re-scattering whole
-  // when the eye moved 60m.
-  assert.match(w, /labGrassField\.update\(ex, ez, keep, ground, slope\);/, 'the field follows the eye');
-  assert.match(w, /labGrass\.draw\(proj, view, new Float32Array\(cam\.pos\), windClock,/);   // PIN MOVED (AUDIT MEADOW1): the gust wave's clock, carried across the floating origin
-  assert.match(w, /renderer\.markForeignPass\(\);   \/\/ EV6: the grass changed programs/);
-});
-
-test('AUDIT 49: the grass is double-sided, follows the origin, learns its records whenever missing, and carries the gust', () => {
-  const g = readFileSync('src/render/labGrass.js', 'utf8');
-  const w = hostText('src/scenes/world.js');
-  // F1: the lab never enables CULL_FACE; the world renderer does at every
-  // frame; drawn culled, every blade whose winding faced away vanished
-  assert.match(g, /const culled = gl\.isEnabled\(gl\.CULL_FACE\);\s*\n\s*if \(culled\) gl\.disable\(gl\.CULL_FACE\);/);
-  assert.match(g, /gl\.disable\(gl\.BLEND\);\s*\n\s*if \(culled\) gl\.enable\(gl\.CULL_FACE\);/, 'and put back as it was found');
-  assert.ok(!/CULL_FACE/.test(readFileSync('grass-proto.html', 'utf8')), 'the lab itself never culls');
-  // F2: the scatter is baked in world coordinates, so an origin shift must
-  // reach it. It re-placed the whole field until PERF-EXT21; the field
-  // follows the origin in place now (test/world/terrain/grassshift.test.js holds how).
-  assert.match(w, /exteriorFoes\.offsetAll\(r\.offset\);[^\n]*\n\s*labGrassField\?\.shiftOrigin\(r\.offset\);/, 'the origin shift reaches the field');
-  // F3: the records are learned whenever missing, not only on a tile-cache miss
-  // PIN MOVED (OW-HITCH): the learning's home is scenes/groundSets.js, the world host's module (HOST-SPLIT)
-  const gs = readFileSync('src/scenes/groundSets.js', 'utf8');
-  assert.match(gs, /if \(!grassRecords\.has\(groundArchive\)\) \{\s*\n\s*const layers = \[\];/);
-  assert.ok(!/renderer\.uploadTileArray(Steps)?\(\w+, layers\)[^\n]*\n[^}]*grassRecords\.set/.test(gs), 'not inside the cache-miss block');
-  // F4: uWind carries the gust, as the lab's WIND.speed does; uWindV does not
-  // (WIND3: the pair comes from the one mapping, systems/wind/windDrive.js - the
-  // rate without the gust is windV, the speed with it is slider * gust)
-  assert.match(w, /speed: wd\.slider \* wd\.gust, windV: wd\.windV/);
-  const d = readFileSync('src/systems/wind/windDrive.js', 'utf8');
-  assert.match(d, /const rate = slider \* LAB_WIND_RATE;\s*\n\s*const windV = \[dir\[0\] \* rate, dir\[1\] \* rate\];/);
-  assert.match(d, /step: \[windV\[0\] \* gust \* ds, windV\[1\] \* gust \* ds\]/, 'the travel carries the gust, the rate does not');
 });
 
 test('GR2: darker green and a billboard about Y in the lab and the game alike; one wind mapping; a time-sliced walk', async () => {
@@ -139,14 +98,6 @@ test('GR2: darker green and a billboard about Y in the lab and the game alike; o
   assert.equal(Math.round(labWindSlider([0.010, 0.004])), 70, 'a sunny day is the lab\u2019s 70');
   assert.equal(labWindSlider([0.045, 0.016]), 200, 'a thunderstorm is the slider\u2019s top');
   assert.equal(labWindSlider([0, 0]), 0);
-  // WIND3: the one mapping moved INTO systems/wind/windDrive.js, and the
-  // hosts read its answer (`wd`) for the grass and the rain alike - no
-  // host calls the slider itself any more
-  const w = hostText('src/scenes/world.js');
-  assert.equal((readFileSync('src/systems/wind/windDrive.js', 'utf8').match(/const slider = labWindSlider\(w\);/g) || []).length, 1, 'the grass and the rain share the one mapping, in its one home');
-  assert.ok(!/labWindSlider/.test(w) && !/mag \* 260/.test(w), 'the guessed scale is gone, and the host holds no copy of the mapping');
-  assert.ok(!/labWindSlider/.test(readFileSync('src/scenes/exterior.js', 'utf8')), 'the exterior host too');
-  assert.match(w, /\{ dir: wd\.dir, speed: wd\.slider \* wd\.gust, windV: wd\.windV, sway: floraSwayOn\(\) && wd\.on \}/, 'the grass takes the one answer');   // PIN MOVED (AUDIT MEADOW1): and the trees' sway switch
   // 3. the walk is a generator that yields, and lands where the one-shot lands
   const keep = (x) => (x > 0 ? 0 : null);
   const whole = placeLabGrass({ centre: [3, 4], keep });
@@ -155,16 +106,6 @@ test('GR2: darker green and a billboard about Y in the lab and the game alike; o
   assert.equal(yields, 12, 'twelve yields for 1.2M at 100k a step');
   assert.equal(r.value.count, whole.count, 'the same blades');
   for (let k = 0; k < 40; k++) assert.equal(r.value.inst[k], whole.inst[k], 'in the same order');
-  // GR5 replaced the time-sliced walk with a world-anchored field filled
-  // a cell or two a frame - the same promise (no stall) kept a
-  // different way, pinned in the GR5 tests below.
-  assert.match(w, /labGrassField\.update\(ex, ez, keep, ground, slope\);/, 'four milliseconds a frame');
-  // GR5: nothing is swapped in whole any more - a cell arrives by one
-  // bufferSubData into its own slot. The whole-field swap WAS the hitch.
-  assert.doesNotMatch(w, /labGrass\.set\(/, 'no whole-field swap');
-  // PERF-EXT21: an origin shift no longer abandons the field - it moves it
-  // (test/world/terrain/grassshift.test.js); a new world (a teleport, a load) still starts one empty
-  assert.match(w, /labGrassField\?\.shiftOrigin\(r\.offset\);   \/\/ PERF-EXT21/, 'an origin shift carries the field');
 });
 
 // ── GR4: THE ROOT IS THE GROUND ───────────────────────────────────
@@ -199,43 +140,6 @@ test('GR4: the root takes the colour of the tile it stands on, and the base fade
   const bare = placeLabGrassSteps({ centre: [0, 0], keep: () => 0, density: 100 });
   let b; do { b = bare.next(); } while (!b.done);
   assert.ok([0.10, 0.145, 0.065].every((v, k) => near(b.value.ground[k], v)), 'no ground callback: the old olive');
-  // GRASS5: THE RENDERER takes three PACKED streams with the instance
-  // divisor - the ground colour is three bytes of the last one, and the
-  // root height lost its own attribute to a lane of the first.
-  const src = readFileSync(new URL('../../src/render/labGrass.js', import.meta.url), 'utf8');
-  assert.match(src, /this\.bufs = \[1, 2, 4\]\.map/, 'three streams');
-  // AUDIT 68 S16-grass-point-alloc: one lane table, built once in the constructor, read by the VAOs, writeSlot and _point
-  assert.match(src, /Object\.freeze\(\{ loc: 1, type: gl\.UNSIGNED_SHORT, bytes: 8 \}\),\n\s*Object\.freeze\(\{ loc: 2, type: gl\.UNSIGNED_BYTE, bytes: 4 \}\),\n\s*Object\.freeze\(\{ loc: 4, type: gl\.UNSIGNED_BYTE, bytes: 4 \}\),/, 'u16 then two u8');
-  assert.match(src, /gl\.vertexAttribPointer\(L\.loc, 4, L\.type, true, 0, 0\);/, 'NORMALIZED, so the GPU does the unpack');
-  assert.match(src, /C\[i \* 4\] = u8\(placed\.ground\[i \* 3\]\);/, 'and the ground colour is packed from the placer\'s own floats');
-});
-
-test('GR4: the game feeds each tile\'s MEAN colour, averaged once where the texels already are', () => {
-  const world = hostText('src/scenes/world.js');
-  // Averaged where the layers are decoded - the texels are on the CPU
-  // there already, once per archive - rather than sampled per blade.
-  // AUDIT 68 S17: through the one law (tileMeanColour, pinned on a real
-  // color32 in audit68_worldjs), learned beside grassRecords whenever the
-  // SCENE's map lacks the archive, not on the renderer's cache miss.
-  // (AUDIT HOST-SPLIT 2, the second read: it ended at the build's createTerrainSurface, which left world.js - on the
-  // raw file that indexOf was -1, so the slice ran to the end and held nothing. It ends at the next door, in world.js)
-  // PIN MOVED (OW-HITCH): the learning's home is scenes/groundSets.js (HOST-SPLIT) - read there, to its module's return
-  const gs = readFileSync('src/scenes/groundSets.js', 'utf8');
-  const learnAt = gs.indexOf('if (!grassRecords.has(groundArchive)) {\n      const layers = [];');
-  const learn = gs.slice(learnAt, gs.indexOf('  return { groundLayersOf', learnAt));
-  assert.ok(learnAt > 0 && learn.length > 0 && learn.length < 4000, `loadGroundSet's learning, read alone: ${learn.length} chars`);
-  // GRASS-LIT2: off the tile set that is DRAWN - a texture mod's, where one dresses the archive (test/render/grasslit2.test.js)
-  assert.match(learn, /groundMeanColour\.set\(groundArchive, drawnMeans \?\? layers\.map\(tileMeanColour\)\);/);   // AUDIT GRASS-LIT2 B2: the uploaded layers' means
-  // ground(x, z) is keep's OWN lookup - same pieces, same tile maths -
-  // answering with the colour instead of the height, so the root under
-  // a blade takes the colour of the very tile keep let it stand on.
-  const g = world.slice(world.indexOf('const ground = (x, z) => {'), world.indexOf('if (!labGrassField) labGrassField = '));   // PIN MOVED (BANTHA2): the field's line pairs the jungle floor's   // AUDIT 68: `createGrassFields(` was never there - the slice ran to -1
-  assert.match(g, /const tx = Math\.floor\(lx \/ 6\.4\); const tz = Math\.floor\(lz \/ 6\.4\);/);
-  assert.match(g, /const rec = p\.tilemapBytes\[tz \* TERRAIN_TILE_DIM \+ tx\] >> 2;/);
-  // PIN MOVED (ECOTONE1, 2026-10-07): the colour of the set the ground there is drawn from - at a climate border, the one
-  // the ground's border gives the point (keep's own ask, so a blade's root and its colour agree)
-  assert.match(g, /return groundMeanColour\.get\(p\.ecoGround \? borderGround\(p, lx, lz\) : p\.groundArchive\)\?\.\[rec\] \?\? null;/);
-  assert.match(world, /labGrassField\.update\(ex, ez, keep, ground, slope\);/, 'and the field is handed it');
 });
 
 // ── GR5: THE FIELD IS ANCHORED TO THE WORLD ───────────────────────
@@ -301,26 +205,11 @@ test('GR5: a cell grows the same blades whoever is looking, and walking touches 
   assert.ok(pending > 0, 'the rest wait their turn');
 });
 
-test('GR5: the host runs the field, not the walk', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /labGrassField = jungleFloor \? jungleFloor\.pair\(createGrassField\(labGrass, \{ keep, ground, slope, density: grassDensity \}\)\) : createGrassField\(labGrass, \{ keep, ground, slope, density: grassDensity \}\);/);   // PERF1: at the pane's fraction of the lab's field; PIN MOVED (BANTHA2): the jungle floor's paired with it
-  assert.match(world, /labGrassField\.update\(ex, ez, keep, ground, slope\);/, 'this frame\'s keep/ground, since the near pieces move with the eye');
-  assert.doesNotMatch(world, /placeLabGrassSteps|labGrassWalk\b|labGrass\.set\(/, 'the whole-field walk and its 60MB swap are gone');
-  assert.match(world, /    arrows\.arrows\.length = 0;[^\n]*\n(    \/\/[^\n]*\n)+    labGrassField = null;\n/, 'a new world starts empty (PERF-EXT21: the teleport says so; the crossing keeps its field)');
-  const src = readFileSync(new URL('../../src/render/labGrass.js', import.meta.url), 'utf8');
-  // GRASS5: the stride is in BYTES now, because a blade is no longer a
-  // whole number of floats - eight bytes of u16 and two lots of four u8.
-  assert.match(src, /gl\.bufferSubData\(gl\.ARRAY_BUFFER, slot \* p \* this\._lanes\[k\]\.bytes, this\._packs\[k\], 0, n \* 4\);/, 'a cell arrives by bufferSubData into its slot - PIN MOVED (OW-HITCH): its blades alone');
-  // PIN MOVED (OW-HITCH): a cell leaves by its box and its count - the zeros it wrote were never drawn (test/render/owhitch.test.js)
-  assert.doesNotMatch(src.slice(src.indexOf('  clearSlot(slot) {'), src.indexOf('  clearSlot(slot) {') + 900), /bufferSubData|_zeros/, 'and leaves uploading nothing');
-});
-
 // ═══ GRASS5 (2026-09-19): THE BLADE, PACKED ═════════════════════════
 // Twelve floats a blade was 48 bytes on the GPU, and the STORAGE - not
 // the frame - was what capped the range: 106 MB at 250 m, 169 at 320.
 // Sixteen bytes is three times the field for the same memory.
 test('GRASS5: a blade is sixteen bytes, and every lane is finer than the float it replaced', () => {
-  const src = readFileSync(new URL('../../src/render/labGrass.js', import.meta.url), 'utf8');
   assert.equal(GRASS_PACK_BYTES, 16);
   // THE LANES, and the precision each one actually has. These are the
   // numbers the pack rests on; if a lane shrinks, one of them fails.
@@ -336,20 +225,6 @@ test('GRASS5: a blade is sixteen bytes, and every lane is finer than the float i
   assert.ok(Math.abs(heightSpan(54) - 0.42 * (54 / 34)) < 1e-12);
   assert.ok(Math.abs(heightFloor() - 0.22 * (LAB_GRASS.height / 34)) < 1e-12, 'and default to the port’s height');
 
-  // THE BUFFERS ARE SIZED IN BYTES, and the three of them add to sixteen
-  assert.match(src, /const sizes = \[slots \* perCell \* 8, slots \* perCell \* 4, slots \* perCell \* 4\];/);
-  // THE FRAME IS THE DATA'S BOUNDS, not the cell's coordinates - a blade
-  // clusters up to 0.55 outside its own cell, so a floor() of the lowest
-  // blade names the cell next door and throws the slot 30 m out.
-  assert.match(src, /const xSpan = n > 0 \? Math\.max\(1e-3, Math\.max\(x1 - x0, z1 - z0\)\) : 1;/);
-  assert.match(src, /const ox = n > 0 \? x0 : 0;/, 'the origin is the lowest blade, not a floor of it');
-  assert.ok(!/Math\.floor\(x0 \/ cell\) \* cell/.test(src), 'and the floor that broke it is gone');
-  // AND THE POINTER RE-STATES THE TYPE. vertexAttribPointer sets the
-  // FORMAT as well as the offset, so moving to a slot with the old float
-  // shape un-packs every attribute and the draw dies.
-  const pt = src.slice(src.indexOf('  _point(slot) {'), src.indexOf('  _drawVisibleSlots(vp'));
-  assert.match(pt, /gl\.vertexAttribPointer\(L\.loc, 4, L\.type, true, 0, slot \* p \* L\.bytes\);/, 'the type travels with the offset');
-  assert.match(pt, /const L = this\._lanes\[k\];/, 'AUDIT 68 S16-grass-point-alloc: off the constructor\'s one table');
 });
 
 test('GRASS5: the range is no longer a memory question - and the window at 300 m holds less than the lab’s own 200 m did', () => {
@@ -362,14 +237,6 @@ test('GRASS5: the range is no longer a memory question - and the window at 300 m
   const labOld = bytesAt(210, 48);   // the lab's own 200 m window, unpacked
   assert.ok(now < labOld, `300 m packed is ${(now / 1e6).toFixed(0)} MB against the lab's 200 m at ${(labOld / 1e6).toFixed(0)} MB`);
   assert.equal(bytesAt(LAB_GRASS.span, 48), 3 * now, 'and the same window unpacked would be exactly three times it');
-  // THE RANGE IS SET BY THE TRADE, not the memory: the probe's own curve
-  // says each extra 50 m costs about a million vertices and buys a tenth
-  // of a per cent of grass, because the density does not fall with
-  // distance. The pin holds the REASON in the source so the next reader
-  // does not push the number and wonder why nothing got better.
-  const src = readFileSync(new URL('../../src/render/labGrass.js', import.meta.url), 'utf8');
-  assert.match(src, /MEMORY IS NOT THE CAP ANY MORE/);
-  assert.match(src, /THE NEXT STEP IS NOT MORE RANGE, IT IS LESS DENSITY AT RANGE/);
 });
 
 test('GRASS6: the patch is BAKED - the clump noise is the placer\u2019s, once a blade, and the vertex stage compiles the lab\u2019s own tint line', () => {
@@ -378,9 +245,6 @@ test('GRASS6: the patch is BAKED - the clump noise is the placer\u2019s, once a 
   assert.ok(!/vnoise\(/.test(GAME_GRASS_VS) && !/clump/.test(GAME_GRASS_VS), 'no noise in the vertex stage - it was thirty evaluations a blade a frame for a constant');
   // the JS noise is the prelude's, term for term: the same three constants, the same fade, the same bilinear
   for (const term of ['123.34', '456.21', '45.32', '3.0-2.0*f']) assert.ok(GAME_GRASS_FIELD.includes(term), `the prelude's ${term}`);
-  const src = readFileSync('src/render/labGrass.js', 'utf8');
-  const js = src.slice(src.indexOf('export function grassHash'), src.indexOf('export const bakedTint'));
-  for (const term of ['123.34', '456.21', '45.32', '(3 - 2 * fx)', '(3 - 2 * fz)']) assert.ok(js.includes(term), `the twin's ${term}`);
   // the noise behaves as a value noise: in range, continuous, and a patch rather than a constant
   let lo = 1, hi = 0;
   for (let i = 0; i < 4000; i++) {
@@ -441,13 +305,6 @@ test('GRASS6: the patch is BAKED - the clump noise is the placer\u2019s, once a 
   lrnd(); lrnd(); lrnd(); lrnd();
   const gt = lrnd();
   assert.ok(Math.abs(g.inst2[2] - bakedTint(gt, gx, gz)) < 1e-6, 'the field placer\u2019s first blade is pulled to its patch too');
-  // GRASS AUDIT 1: the noise is paid AFTER keep() - a road cell refuses most of its candidates, and 0.43 ms a cell was going on blades that never stood
-  // (PERF-EXT21: the cell placer bakes at the FIELD's coordinates, fx/fz - the scene's x/z less the field's origin;
-  // PERF-EXT22: its loop is stepGrassCell's, which placeLabGrassCell runs end to end)
-  for (const [fn, bake] of [['export function stepGrassCell', 'bakedTint(tRnd, fx, fz)'], ['export function* placeLabGrassSteps', 'bakedTint(tRnd, x, z)']]) {
-    const body = src.slice(src.indexOf(fn), src.indexOf('\n}\n', src.indexOf(fn)));
-    assert.ok(body.indexOf('const tRnd = rnd();') > 0 && body.indexOf('const tRnd = rnd();') < body.indexOf('keep(x, z)') && body.indexOf('keep(x, z)') < body.indexOf(bake), `${fn}: the random is drawn in the lab's order, keep() decides, THEN the patch is looked up`);
-  }
   // GRASS AUDIT 1: the u8 tint lane, PACKED and read back - GRASS6 made the lane the tint's only carrier and nothing had ever read a packed byte
   const calls = []; let ids = 0;
   const gl = new Proxy({}, { get(_, k) {

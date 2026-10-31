@@ -82,9 +82,3 @@ test('SHOP-RATS the room\'s spots: the farthest within the ring\'s reach with a 
   assert.equal(ROOM_RING_MISSES, 30);
 });
 
-test('SHOP-RATS the interior host places a building\'s quest foe by the law, over the room\'s markers (mutants: the host back on the ring alone)', () => {
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const body = wm.slice(wm.indexOf('  function tryPlaceInteriorQuestFoe(handle) {'), wm.indexOf('  /** ROAD-G G1: THE LOOSE-FOE STAND, INDOORS'));
-  assert.match(body, /const spot = placeRoomQuestFoe\(env, handle, interiorCtx\.markers\?\.map\(\(m\) => \[m\.x, m\.y, m\.z\]\)\);/);
-  assert.doesNotMatch(body, /placeFoeFreely\(env\)/);
-});

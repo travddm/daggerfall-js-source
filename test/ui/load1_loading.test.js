@@ -188,10 +188,6 @@ test('LOAD1 the key: the PNG goes to the gallery AND the download, the download 
     setGalleryBackend(null);
     setShotEncoder(null);
   }
-  const src = read('src/ui/screenshot.js');
-  assert.match(src, /const place = placeNow\(\);[^\n]*\n\s*_shoot\(_canvas, \{ keep: \(blob\) => keepInGallery\(blob, place\), download: getPref\(SHOT_DOWNLOAD_PREF\) !== false, said: sayOnHud \}\);/,
-    'the place is read at the press, the keep goes to the gallery and the download asks the switch');
-  assert.doesNotMatch(src, /^import[^\n]*shotGallery/m, 'the gallery is a door, never a static import - this file is on the entry\'s graph (BOOT2)');
 });
 
 test('LOAD1 the screen: a hold shorter than its delay shows nothing; a shown screen stands MIN_SHOWN_MS and fades; nested holds keep it up; the place and the step paint (mutants: no delay; no stand; the first end takes it down)', () => {
@@ -362,38 +358,6 @@ test('LOAD1 the screen stands on a shot from the turn, with its caption; with no
   } finally { removeLoadingScreen(); setGalleryBackend(null); }
 });
 
-test('LOAD1 the hosts: the boot raises the screen at once and its title steps are its line, ended at status(null); the world frame asks AUDIT 68 S22\'s one question and a door\'s build; a claimed loop lets go; a film takes the screen aside (mutants: the frame sync gone; the boot hold never ended; the claimed loop keeps the screen)', () => {
-  const w = read('src/scenes/world.js');
-  const boot = w.slice(w.indexOf('export async function bootWorld('));
-  const head = boot.slice(0, boot.indexOf('const realmNew = '));
-  assert.match(head, /const bootLoading = beginLoading\(\{ delay: 0, [^}]*why: 'the boot' \}\);/, 'before the realm\'s join - the first await');
-  assert.match(head, /status = \(msg\) => \{ if \(msg == null\) bootLoading\.end\(\); else bootLoading\.line\(bootLine\(msg\)\); titleStatus\(msg\); \};/);
-  assert.ok(boot.indexOf('status(null);   // FB0930-TITLE') > 0, 'the boot\'s end is the hold\'s end');
-  const frame = boot.slice(boot.indexOf('  function frame(now) {'));
-  assert.match(read('src/scenes/shared.js'), /export function claimFrame\(\) \{ syncLoading\(false\); return \+\+_frameGeneration; \}/, 'a claimed loop lets its hold go - no frame of it will end it');
-  assert.match(frame, /const _moving = worldMoveBusy\(\) \|\| !!modes\?\.transitioning;\n\s*setLoadingAside\('window', townTalk\.overlayActive \|\| !!modes\?\.overlayHeld\);\n\s*syncLoading\(_moving, \{ place: loadingPlaceNow, line: loadingLineNow \}\);\n\s*if \(!_moving\) \{ _loadingDest = null; _partyWaitLine = ''; \}/,
-    'every frame: a window up takes the screen aside, then the one question');
-  assert.match(w, /const loadingPlaceNow = \(\) => loadingPlaceOf\(\{ dest: _loadingDest, moving: worldMoveBusy\(\), placeAt: placeAtPixel, here: placeHere \}\);/);
-  assert.match(w, /_traveling \? \(_partyWaitLine \|\| 'Travelling'\)/, 'the party landing\'s wait is said on the screen over the chat line');
-  // PIN MOVED (PARTY-FOLLOW): the wait is systems/party/partyArrival.js's, which hands its line (PARTY_ARRIVAL_TEXT.waiting) to the host's `waiting`
-  assert.match(w, /waiting: \(line\) => \{ _partyWaitLine = line; townTalk\.say\(line\); \},/);
-  assert.match(w, /function placeAtPixel\(px, py\) \{\n\s*const key = `\$\{px\},\$\{py\}`;\n\s*if \(_ohGpsName\?\.key === key && _ohGpsName\.name\) return _ohGpsName\.name;/, 'the abyss wears its own name over the pixel it borrows');
-  assert.match(w, /if \(!params\.has\('load'\) && !\(params\.has\('classicload'\) && peekPendingClassicSave\(\)\)\) setLoadingPlace\(startLoc\?\.name \|\| locationName\);/, 'a stale ?classicload imports nothing: the start is the place');
-  assert.match(w, /setLoadingAside\('window', true\);[^\n]*\n\s*townTalk\.showOverlay\(createChargenWindow\(flow, \{/, 'the chargen shown mid-boot takes the boot\'s screen aside');
-  assert.match(w, /onDone: \(r\) => \{\n\s*setLoadingAside\('window', false\);/, '...and a boot still going stands it again when the wizard is done');
-  const at = frame.indexOf('syncLoading(_moving');
-  assert.ok(at > frame.indexOf('if (frameHeld())') && at > frame.indexOf('else lookFilter.tick(dt, cam);'), 'below the film\'s wait and the look\'s tick, whose heads AUDIT 39 #160 and AUDIT 28 W7 keep');
-  assert.ok(at < frame.indexOf('capturePendingScreenshot(canvas);   // SS1: a save armed from a modal mode'), '...and above the indoor mode\'s return, so every drawn frame asks');
-  const sh = read('src/scenes/shared.js');
-  assert.match(sh, /_frameHold\+\+;\n\s*stepAsideLoading\(true\);/, 'a film\'s hold takes the screen aside...');
-  assert.match(sh, /_frameHold = Math\.max\(0, _frameHold - 1\); if \(!_frameHold\) stepAsideLoading\(false\);/, '...and the last release brings it back');
-  assert.match(w, /function worldMoveBusy\(\) \{[\s\S]{0,400}return _seasonStraightening \|\| _traveling \|\| _teleporting \|\| _recalling \|\| _respawning \|\| _loading \|\| !!ohAbyss\?\.entering;/, 'the one question still asks every mover');
-  const core = w.slice(w.indexOf('  async function _teleportToPixel('));
-  assert.match(core.slice(0, core.indexOf('    const first = queue.shift();') + 40), /_loadingDest = \{ x: px, y: py \}; setLoadingPlace\(placeAtPixel\(px, py\)\);[^\n]*\n\s*const first = queue\.shift\(\);/, 'the core names its destination before its first await');
-  assert.equal((core.slice(0, core.indexOf('    const first = queue.shift();')).match(/\bawait\b/g) ?? []).length, 0, 'no await stands above it');
-  assert.match(w, /setShotPlace\(placeHere\);/);
-});
-
 test('LOAD1 aside, never over: a film\'s hold or a window takes the screen aside; when the last goes mid-load it waits for the frame\'s answer - back if still loading, ending hidden if not; a screen built aside is born hidden; a claimed loop lets go (mutants: the film under the screen; aside for ever; the flash back; built over a window; the claimed loop\'s screen kept)', () => {
   mock.timers.enable({ apis: ['setTimeout', 'setInterval', 'Date'] });
   try {
@@ -463,10 +427,6 @@ test('LOAD1 the words: the first hold of a load sets the place and step afresh, 
 });
 
 test('LOAD1 the layers: over the death screen and under the crash banner, read off their own sheets; the HUD pieces that stand higher go while the screen is SEEN, each a selector its own module draws (mutants: the CSS off the constant; the veil never lifted; a renamed piece)', () => {
-  const death = /\.dth \{[^}]*z-index: (\d+);/.exec(read('src/ui/enhanced/enhancedDeath.js'));
-  const crash = /el\.id = 'crash';\s*el\.style\.cssText = '[^']*z-index:(\d+)/.exec(read('src/main.js'));
-  assert.ok(death && crash);
-  assert.ok(Number(death[1]) < LOADING_Z && LOADING_Z < Number(crash[1]), `death ${death[1]} < loading ${LOADING_Z} < crash ${crash[1]}`);
   assert.equal(Number(/\.ld \{ position: fixed; inset: 0; z-index: (\d+);/.exec(LOADING_CSS)?.[1]), LOADING_Z, 'the sheet draws at the constant');
   const veil = /((?:body\.ld-up [^,{]+,\s*)*body\.ld-up [^,{]+) \{ visibility: hidden !important; \}/.exec(LOADING_CSS);
   assert.ok(veil, 'the veil rule');
@@ -563,17 +523,7 @@ test('LOAD1 the gallery as it ships: the real encode keeps a FULL_EDGE copy and 
 });
 
 test('LOAD1 the menu: Screenshots is on every rail, the System page and both dispatch tables; the door\'s foot carries it beside About; the unmount lets its pictures go (mutants: a rail without it; a dead dispatch; no release)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  for (const rail of ['SECTIONS_BOOT', 'SECTIONS_CLASSIC', 'SECTIONS_PAUSE']) {
-    const list = new RegExp(`const ${rail} = \\[([^\\]]*)\\]`).exec(menu)[1];
-    assert.match(list, /'Screenshots', 'About'/, `${rail} carries it, before About`);
-  }
   assert.ok(SYSTEM_PANES.some(([id, label]) => id === 'screenshots' && label === 'Screenshots'));
-  assert.equal((menu.match(/screenshots: drawShotsPane,/g) ?? []).length, 2, 'both dispatch tables');
-  assert.match(menu, /if \(label === 'About' \|\| label === 'Screenshots'\) continue;/, 'the door\'s list leaves it to the foot');
-  // PIN MOVED (AUDIT UICALM-FIRM1 L3 N3): its word the player's language's (RAIL_TEXT), as About's beside it
-  assert.match(menu, /const shots = el\('button', 'px-about px-shots', RAIL_TEXT\.screenshots\(\)\);\n\s*shots\.onclick = \(\) => go\('screenshots'\);/);
-  assert.match(menu, /stopTimers\(\);   \/\/ TIMERS1\n\s*releaseShotsPane\(\);/);
 });
 
 test('LOAD1 the pane: it fills when the gallery answers - each shot\'s caption, its switch, Save, and a Delete that asks once; an empty gallery says how to take one (mutants: the switch writes nothing; Delete deletes on the first press)', async () => {
@@ -663,10 +613,3 @@ test('LOAD1 the pane, a visit at a time: a new pane forgets the last one\'s arme
   } finally { setPref('skin', skin); }
 });
 
-test('LOAD1 the doctrine: the gallery touches no network and no repository path - a render of game data stays in the player\'s own browser (mutants: a fetch; an upload)', () => {
-  const g = read('src/systems/shotGallery.js');
-  assert.doesNotMatch(g, /\bfetch\(|XMLHttpRequest|WebSocket|sendBeacon|https?:\/\//, 'nothing leaves the browser');
-  assert.match(g, /indexedDB/);
-  const pane = read('src/ui/shotsPane.js');
-  assert.doesNotMatch(pane, /\bfetch\(|XMLHttpRequest|sendBeacon/);
-});

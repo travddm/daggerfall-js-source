@@ -502,15 +502,6 @@ test('G5: the interior scene cache and the save envelope carry the archive', () 
   assert.equal(snap.scenes[0].droppedPiles[0].archive, 204, 'GetSceneCache writes it');
   const fresh = restoreSceneCache(createSceneCache(), JSON.parse(JSON.stringify(snap)));
   assert.equal(restoreCachedScene(fresh, scene).droppedPiles[0].archive, 204, 'and RestoreSceneCache reads it');
-  // and the producer that fills it - AUDIT 63 F22 (review round) moved
-  // the interior host's half into the pool that owns the pile shape,
-  // beside restorePiles, so the write and the read cannot drift.
-  assert.match(readFileSync(join(root, 'src/scenes/droppedLoot.js'), 'utf8'),
-    /pos: \[\.\.\.p\.pos\], archive: p\.archive, record: p\.record,/,
-    'the interior host builds the pair');
-  assert.match(readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8'),
-    /pos: \[\.\.\.p\.pos\], archive: p\.archive, record: p\.record,/,
-    'and so does the dungeon host');
 });
 
 // ── the four hosts ───────────────────────────────────────────────

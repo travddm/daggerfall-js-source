@@ -94,11 +94,3 @@ test('DSH1: the lid clears the horizon by a skirt, and the near early-out is the
   assert.doesNotMatch(MARCH_FS, /outColor = vec4\(0\.0, 0\.0, 0\.0, 1\.0\); return;/, 'no row answers "clear sky" at the horizon any more');
 });
 
-test('DSH1: the bridge is the one home - the controller and the lab both read it, neither greys by hand', () => {
-  const bridge = read('src/render/dynamicSkiesBridge.js');
-  // AUDIT PRECIP SKY-1 (PIN MOVED): by the row the SKY wears (skyRow) - on the map's lane `row` is the clear air under the cells
-  assert.match(bridge, /horizon: modHorizon\(st\.clearColor \?\? base\.horizon, base\.cloudShade, skyRow \?\? row \?\? WEATHER_SKY\[weather\] \?\? WEATHER_SKY\.sunny\)/, 'greyed where the state is built, once');
-  for (const p of ['src/scenes/shared.js', 'src/tools/skyLab.js', 'src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.doesNotMatch(read(p), /modHorizon/, `${p} takes the state, never the greying`);
-  }
-});

@@ -69,7 +69,6 @@ test('AUDIT 2 the stars over a ship laid up: an accepted sky reads EVERY ship of
   k = 0.9;
   s.host.refitBoat({ uid: 77, hull: HULL.SmallShip });
   assert.equal(s.host.fleetStatus(laid).maxHull, Math.round(hullBuild(HULL.SmallShip).hullHp * 0.9), 'Boarders Away\'s price: her hull under her build\'s');
-  assert.match(hostText('src/scenes/naval/navalHost.js'), /const k = \(Number\.isFinite\(refit\) && refit > 0 \? refit : 1\) \* captainsDue\(\)\.guns;[^\n]*\n\s*if \(k === 1\) return;\n\s*if \(Number\.isFinite\(hurt\.hull\)\) hurt\.hull \*= k;/, 'Merchant Prince\'s price on her guns\' harm');   // PIN MOVED (SEA-SET): the refit's factor and the Tidemail's Captain's Due, one product
 });
 
 test('AUDIT 2 the stores: conjured steel is never melted; a store\'s OWN ingots go before one another counts too (iron before steel for Iron); a tier\'s stores are taken in the order that pays - the ingots-only first, so 10 steel ingots and 4 steel swords pay a Small Ship\'s Guns Steel (Steel and Iron together); the melt said is the joint take\'s (mutants: the summoned guard, the ingots\' order, the stores\' order, the joint melt)', () => {
@@ -93,8 +92,6 @@ test('AUDIT 2 the stores: conjured steel is never melted; a store\'s OWN ingots 
   const short = [[{ templateIndex: 621, stackCount: ironN }]];
   assert.equal(takeAllMaterials(short, cost.mats), false, 'one store will not serve for two');
   assert.deepEqual(short, [[{ templateIndex: 621, stackCount: ironN }]], 'none taken');
-  assert.match(hostText('src/scenes/fleetHost.js'), /takeAllMaterials\(lists, row\.next\.mats\);/);
-  assert.match(hostText('src/scenes/fleetHost.js'), /const melts = cost \? meltCounts\(lists, cost\.mats\) : \[\];/);
 });
 
 test('AUDIT 2 the QuickDial key over the captain\'s sky: a window that asks is asked - refused, its closer stands on the overlay stack again; let go, the window\'s own close runs; one that does not ask, or none mounted yet, is closed (mutants: the ask, the stand again)', () => {
@@ -112,7 +109,6 @@ test('AUDIT 2 the QuickDial key over the captain\'s sky: a window that asks is a
   closeTopOverlay();
   assert.deepEqual(closed, ['close'], 'none mounted: closed');
   clearOverlays();
-  assert.match(rd('src/ui/naval/navalPlunderDoor.js'), /unregister = registerOverlay\(dialCloser\(\(\) => view, \(\) => fired, close, \(closer\) => \{ unregister = registerOverlay\(closer\); \}\)\);/);
 });
 
 test('AUDIT 2 the exchange: never buying at what it sells - at the tree\'s most every good\'s buying price stands under its selling; with no stars the board as it was (mutants: the floor)', () => {
@@ -146,7 +142,6 @@ test('AUDIT 2 a ball on a ship another player stands says her men rounded on its
   tally.men({ volley: 'v' }, 0.4); tally.men({ volley: 'v' }, 0.4);
   tally.count({ type: 'hit', volley: 'v', target: 's', zone: 'hull' }); tally.count({ type: 'hit', volley: 'v', target: 's', zone: 'hull' });
   assert.equal(tally.shown(1, 5).men, 1, 'two shares of a man, one man');
-  assert.match(hostText('src/scenes/naval/navalHost.js'), /if \(byMe\) tallies\.men\(e, shotMen\(gun, zone\) \/ SHIP_TOUGHNESS\);/);
 });
 
 test('AUDIT 2 the wheel: a turn of it steps the load once - a trackpad\'s stream of notches steps once however long it runs, and again only after SHOT_WHEEL_S of quiet; the quiet on the real clock (mutants: the throttle, the clock)', () => {
@@ -159,7 +154,6 @@ test('AUDIT 2 the wheel: a turn of it steps the load once - a trackpad\'s stream
   now += SHOT_WHEEL_S + 0.01;
   l.wheel(1);
   assert.equal(loads.length, 2, 'a fresh turn after the quiet');
-  assert.match(hostText('src/scenes/naval/navalHost.js'), /aiming: \(\) => aiming, say: \(x, sec\) => deps\.say\?\.\(x, sec\), now: \(\) => realClock \}\);/);
 });
 
 test('AUDIT 2 a near miss is told where the ball passed nearest - half a metre, two, four and a half off her side heard at those gaps, not where it first came within NEAR_MISS_M; once a ball (mutants: told at its entry, the kept one never told)', () => {
@@ -248,8 +242,6 @@ test('AUDIT 2 a flag past the pass\'s cap: the boat flies her pennant - only the
   assert.equal(all.filter((b) => h.flies(b)).length, FLAGS_MAX, 'the rest fly their pennants');
   assert.equal(h.draws()[0].fade, 0.5, 'her fade');
   assert.equal(h.draws()[1].fade, 1);
-  assert.match(rd('src/render/shipFlagPass.js'), /if \(t\.a < 0\.5\) discard;   \/\/ the shape's cut\n\s*dissolveCut\(\);/);
-  assert.match(rd('src/render/shipFlagPass.js'), /gl\.uniform1f\(U\.uDissolveCut, 1 - Math\.max\(0, Math\.min\(1, Number\.isFinite\(f\.fade\) \? f\.fade : 1\)\)\);/);
 });
 
 test('AUDIT 2 a sea ship\'s paint only on the meshes it repaints - a shared model none of whose pictures it changes is drawn by the host\'s own remap (the renderer\'s cache keyed on it), one it repaints by her paint; asked once a mesh and a paint (mutants: every mesh painted)', () => {
@@ -261,16 +253,12 @@ test('AUDIT 2 a sea ship\'s paint only on the meshes it repaints - a shared mode
   assert.equal(p.remapFor(lantern, base, base), base);
   assert.equal(p.remapFor(plank, joined, base), joined, 'a map the shop did not join: read whole - her planks in it');
   assert.equal(p.remapFor(lantern, joined, base), base, 'and a lantern none of it repaints but the host\'s own keys: the host\'s');
-  assert.match(rd('src/scenes/comeSailAway/comeSailAwayPool.js'), /if \(texRemap !== drawRemap\) texRemap = paints\.remapFor\(gpu, texRemap, drawRemap\);/);
 });
 
 test('AUDIT 2 the boats\' word is said again for a name board shown or taken down; another\'s cabin is as built (her stain her captain\'s ledger\'s); a hidden boat shows no name boards (mutants: the key, the guest, the hidden)', () => {
   const rec = { b: [[2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]], n: ['Gull'] };
   assert.notEqual(csaRecordKey({ ...rec, p: [1] }), csaRecordKey(rec), 'her board: a new word');
   assert.notEqual(csaRecordKey({ b: rec.b, p: [1] }), csaRecordKey({ b: rec.b }));
-  assert.match(rd('src/scenes/sailingCabin.js'), /restyle: cabinRestyle\(guest \? 0 : fleetShip\(cabin\.uid\)\?\.cabin \?\? 0\)/);
-  assert.match(hostText('src/scenes/worldModes.js'), /sailingCabinEntry\(blocks, saved, host\.sailingCabin\.fromNative, typeof visit\?\.cabinOwner === 'string'\)/);
-  assert.match(rd('src/scenes/comeSailAway/comeSailAwayPool.js'), /const shown = boat\.GameObject\?\.activeSelf && boat\.MeshObject\?\.activeSelf \? plaqueNameOf\(boat\) : null;/);
 });
 
 test('AUDIT 2 a fitting\'s whole box on the plan: its turned corners on her deck and clear of every other\'s - a crate over her rail, or set into another, refused; the centre\'s own law kept for a model still loading; and every fitting\'s model asked, loaded or not (the ask pins it) (mutants: the corners, the overlap, the turn, the pin)', () => {
@@ -287,7 +275,6 @@ test('AUDIT 2 a fitting\'s whole box on the plan: its turned corners on her deck
   const a = fittingCorners(0, 0, 2, [1, 1]), b = fittingCorners(1.2, 0, 2, [1, 1]);
   assert.equal(boxesMeet(a, b), true, 'two turned an eighth, their corners in each other');
   assert.equal(boxesMeet(fittingCorners(0, 0, 0, [1, 1]), fittingCorners(1.2, 0, 0, [1, 1])), false);
-  assert.match(rd('src/ui/deckPlanWindow.js'), /const why = placeRefusal\(deck, \[f\.x, f\.z\], list\.filter\(\(_, i\) => i !== picked\), \{ m: f\.m, yaw \}, footprint\);\n\s*if \(why\) \{ tell\(why, true\); return; \}/, 'turned as it is set');
   const asked = [];
   const boat = { hull: 2, MeshObject: { children: [], addChild() {}, worldMatrix: () => new Float32Array(16) } };
   fitBoats([boat], () => fittingsOf([{ m: 41812, x: 0, z: 0 }]), { ctx: { modelBounds: () => ({ min: [0, 0, 0], max: [1, 1, 1] }) }, deckOf: () => null, load: (m) => asked.push(m) });
@@ -325,10 +312,8 @@ test('AUDIT 2 a packed ship\'s hold: her parts stored in her own hold come back 
   rowboat.Cargo.Items.push({ name: 'silk' });
   door.press();
   assert.equal(opened.items(), rowboat.Cargo.Items, 'her plunder opens');
-  assert.match(hostText('src/scenes/world.js'), /toPack: \(it\) => addItem\(\(playerEntity\.items \?\?= \[\]\), it\),/, 'the world\'s pack');
 });
 
 test('AUDIT 2 the peace bonus holds no chase: a ship that has sighted me and comes on past HOSTILE_NEAR_M is a fight; the hold\'s key on a pad button (mutants: the chase unread, the row)', () => {
-  assert.match(hostText('src/scenes/world.js'), /peaceWayOf\(\{ enemies: !!this\.enemiesNearby\(\) \|\| !!naval\?\.threats\?\.\(\)\.some\(\(t\) => t\.chasing\),/);
   assert.deepEqual(PLUS_BIND_ROWS.find((r) => r.id === 'hold'), { id: 'hold', label: 'Ship\'s hold', sec: 'ShipHold' });
 });

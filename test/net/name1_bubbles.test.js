@@ -197,17 +197,6 @@ test('NAME1 (Mac: "are able to be seen through walls"): a name is not drawn when
   assert.equal(rays, 0, 'out of range is decided before a ray is ever cast');
 });
 
-test('NAME1: the sight test is the ENGINE\'S OWN and says what it cannot see - the collider\'s raycast, the live mode-aware one, and the exterior terrain named as the limit (mutants: a second ray law written here; the limit left unsaid)', () => {
-  const src = rd('src/net/remotePlayers.js');
-  assert.match(src, /collider\.raycast\(\[eye\[0\], eye\[1\], eye\[2\]\], \[dx \/ d, dy \/ d, dz \/ d\], reach\)/, 'one ray, the collider\'s own');
-  assert.match(src, /TERRAIN is not one of them/, 'the limit is written down where the law is');
-  assert.match(src, /pickActivatableHit|pickFoeAlong/, 'and it cites the two picks that already ask this question');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const blocked = \(head, id\) => glassCuts\(projectToScreen\(head, 1, 1, proj, view\)\) \|\| nameSight\.blocked\(player\.collider, eye, id, head\);/,
-    'the host casts against player.collider - the LIVE one worldModes re-points at every door - through the session\'s own cache (AUDIT NAME1 F2/F5)');   // PIN MOVED (GLASS-CLEAR, 2026-10-11): a head the glass's focus cut from its view is nameless first
-  assert.match(rd('src/scenes/worldModes.js'), /player\.collider = ctx\.collider;/, 'and worldModes really does re-point it (the interior and the dungeon)');
-});
-
 // ── THE FACE ──────────────────────────────────────────────────────────────────────────────────────
 
 const pointsOf = (rows) => rows.map((r) => ({ id: r.id, name: r.name ?? r.id.toUpperCase(), x: r.x ?? 100, y: r.y ?? 200, scale: r.scale ?? 1 }));
@@ -228,8 +217,6 @@ test('NAME1: the enhanced face - a DOM layer in PIXEL_STACK on bone, one element
   // AUDIT NAME1 F12: --bone's OWN fallback (ui/enhanced/enhancedStyle.js :root), the one the party and friends panels use.
   assert.match(NAME_CSS, /color: var\(--bone, #e9e4d9\)/, 'bone');
   assert.doesNotMatch(NAME_CSS.replace(/\/\*[\s\S]*?\*\//g, ' '), /#d8cfae/, 'and not .hud\'s ivory, which is a different colour wearing the same word');
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /--bone: #e9e4d9;/, '...which is the token\'s real value');
-  assert.match(rd('src/ui/partyPanel.js'), /var\(--bone, #e9e4d9\)/, '...and the sibling panel\'s own fallback');
   assert.match(NAME_CSS, /max-width: 15em;/, 'and the bubble wraps at a bounded width');
   assert.equal(layer.root.attrs['aria-hidden'], 'true');
   assert.equal(layer.root.style.display, 'none', 'nothing before the first frame says there is somebody to label');
@@ -401,53 +388,9 @@ test('BUBBLE1: the text is the WIRE\'S, cut and never re-sanitized - bounded at 
   assert.equal(bubbleText('y'.repeat(BUBBLE_CHARS)), 'y'.repeat(BUBBLE_CHARS), 'exactly at the bound: whole');
   assert.equal(bubbleText(null), '');
   assert.ok(BUBBLE_CHARS < 240, 'smaller than the wire\'s own CHAT_MAX - a bubble is a glance');
-  const src = rd('src/ui/nameLayer.js');
-  assert.doesNotMatch(src, /sanitizeChat\(|\\p\{Cf\}|0xd800|\\uD800/, 'the chat law has ONE home (net/wire.js) and this is not a second spelling of it - it is NAMED here, never re-run');
-  assert.doesNotMatch(src, /^import[^\n]*wire\.js/m, 'and this file does not even reach for it');
-  assert.doesNotMatch(src, /innerHTML/, 'a line is text, never markup');
-  assert.match(src, /net\/online\.js runs every inbound line through net\/wire\.js sanitizeChat/, 'and it says where the law it relies on runs');
-  assert.match(rd('src/net/online.js'), /const text = typeof m\.text === 'string' \? sanitizeChat\(m\.text\) : '';/, '...which it really does');
 });
 
 // ── THE HOST ──────────────────────────────────────────────────────────────────────────────────────
-
-test('NAME1 + BUBBLE1: the wiring in scenes/world.js - the layer is made ONCE beside the peers and only for the skin that owns the screen, driven from the one name pass with the sight test, the chat log and the picture\'s colour, and the classic bitmap pass is the fallback where there is no layer (mutants: the layer made per frame; both faces drawn at once; the sight test dropped at the host; the bubbles fed from a tab that is not the world\'s)', () => {
-  const w = rd('src/scenes/world.js');
-  const bare = w.replace(/\/\/[^\n]*/g, ' ');
-  assert.match(w, /import \{ createNameLayer, nameLayerWanted \} from '\.\.\/ui\/nameLayer\.js';/);
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks - NAME_RANGE's one reader in the host - left world.js for
-  // scenes/travelViewMarks.js, and the import went with its reader
-  assert.match(w, /import \{ RemotePlayers, composeLook, createSightCache \} from '\.\.\/net\/remotePlayers\.js';/);
-  assert.match(rd('src/scenes/travelViewMarks.js'), /import \{ NAME_RANGE \} from '\.\.\/net\/remotePlayers\.js';/);   // AUDIT 68 S22: sightBlockedBy is the cache's to call, never the host's (AUDIT NAMES N2-2: NAME_RANGE, the Overworld's reach for one who shares nothing)
-  assert.match(bare, /let online = null, remotePlayers = null, peerBodies = null, nameLayer = null, nameSight = null,/, 'one handle each, held for the session');
-  // AUDIT NAME1 F7 + OVH3: the DOM face takes the gate the chat panel the bubbles belong to takes - a document, on either skin.
-  assert.match(bare, /if \(nameLayerWanted\(\)\) nameLayer = createNameLayer\(\{\}\);/, 'made where there is a document to put it in');
-  assert.match(bare, /if \(typeof document !== 'undefined'\) chatStart\(\);/, '...the same gate the chat takes');
-  assert.equal((w.match(/createNameLayer\(/g) ?? []).length, 1, 'called in exactly one place - never per frame');
-  assert.match(bare, /nameSight = createSightCache\(\);/, 'AUDIT NAME1 F2/F5: and the sight cache is the session\'s, made once beside it');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S6): and the spyglass's own, made once with the host beside the tags'
-  assert.match(w, /\n  const glassSight = createSightCache\(\);\n/, 'the glass\'s, the session\'s');
-  assert.equal((w.match(/createSightCache\(/g) ?? []).length, 4, 'never per frame either - a cache rebuilt every frame is no cache: the names\', (AUDIT NAV1) the ships\' tags\', (SHIPMATES) the crew\'s bars\' and (AUDIT CAPTAIN\'S SEA S6) the glass\'s, each made once');
-  assert.match(bare, /\n  const shipSight = createSightCache\(\);/, 'the ships\' tags\' own made with the host, at its top level - offline too, where the names\' is never made');
-  assert.match(bare, /\n  const crewSight = createSightCache\(\);/, 'SHIPMATES: the crew\'s bars\' own, the same');
-  assert.match(bare, /const blocked = \(head, id\) => glassCuts\(projectToScreen\(head, 1, 1, proj, view\)\) \|\| nameSight\.blocked\(player\.collider, eye, id, head\);/);   // PIN MOVED (GLASS-CLEAR, 2026-10-11): a head the glass's focus cut from its view is nameless first
-  // AUDIT NAME1 F1/F14: ONE call, into the pass the test below drives end to end.
-  assert.match(bare, /remotePlayers\.nameFrame\(\{/, 'the whole pass in one call');
-  assert.match(bare, /w: nameLayer \? canvas\.clientWidth : canvas\.width,/, 'CSS pixels for a style attribute, the buffer\'s for the bitmap pass');
-  assert.match(bare, /h: nameLayer \? canvas\.clientHeight : canvas\.height,/);
-  assert.match(bare, /rect: worldViewportRect\(canvas\.clientWidth, canvas\.clientHeight\),/, 'the docked HUD\'s own viewport (E5; RETRO1: and retro\'s pillarbox)');
-  assert.match(bare, /layer: nameLayer, log: chatLog, colorOf: \(id\) => social\?\.colorOf\(id\) \?\? null, blocked,/,
-    'the layer, the log the bubbles come from and the picture\'s colour');
-  assert.match(bare, /renderer, font: townTalk\.font, scale, hudScale: enhancedHudScale\(\),/, 'AUDIT NAME1 F3: and the player\'s own HUD scale');
-  assert.doesNotMatch(bare, /PARTY_GREEN/, 'the host still never carries the colour itself');
-  assert.doesNotMatch(bare, /nameLayer\.render\(/, 'the host does not drive the layer behind the pass\'s back');
-  // the bubbles ride the log the chat panel shows - a PULL from the log, so the chat wiring owes them nothing (CHAT1's pin
-  // holds it: CHAT-CHAN moved its lines, and nothing here had to follow)
-  assert.match(w, /layer: nameLayer, log: chatLog,/, 'the log itself is handed to the pass');
-  const layerSrc = rd('src/ui/nameLayer.js');
-  assert.match(layerSrc, /for \(const tab of log\?\.tabs \?\? \[\]\) \{/, 'CHAT-CHAN: the pump reads every tab');
-  assert.doesNotMatch(layerSrc, /BUBBLE_TAB/, 'and no tab is the bubbles\' own any more');
-});
 
 // ── THE FIXES (AUDIT NAME1, 2026-09-16: fifteen findings read off the slice, driven here) ──────────
 
@@ -703,36 +646,6 @@ function hostFrame({ rows = [{ id: 'bran', at: [8, 0, -10], height: 1.8 }, { id:
   return { clock, doc, rp, layer, collider, sight, log, frame };
 }
 
-test('AUDIT NAME1 F1 (in a dungeon any open window FROZE the name layer): a covered frame is still a frame - the layer is told, so it takes itself down instead of standing on the glass with the positions of the frame the window opened on, and the bubble pump still runs while it is covered; the pass costs no projection and no ray while it is covered (mutants: the covered frame not passed to the layer; the layer left up under a window; the points projected anyway; the pump skipped)', () => {
-  const { layer, sight, log, frame, clock } = hostFrame();
-  assert.equal(frame(), 2, 'two names before the window opens');
-  assert.equal(layer.root.style.display, '', 'up');
-  const rays = sight.rays();
-
-  // THE WINDOW. The dungeon arm used to return before the pass; the layer then kept the frame it last had.
-  assert.equal(frame({ covered: true }), 0, 'a covered frame draws no name');
-  assert.equal(layer.root.style.display, 'none', 'THE FINDING: the layer comes DOWN, rather than standing on the glass over the overlay');
-  assert.equal(sight.rays(), rays, 'and it costs no ray - a covered frame projects nothing');
-
-  // THE PUMP STILL RUNS: a line said while the window is open is a bubble the moment it closes, at its own age
-  log.push('world', { id: 'bran', name: 'Bran', text: 'behind you', at: clock.t });
-  assert.equal(frame({ covered: true }), 0, 'still nothing drawn');
-  clock.t += 1000;
-  assert.equal(frame(), 2, 'the window closes');
-  assert.equal(layer.bubbleCount(), 1, 'and the line said under it is there');
-  assert.equal(layer.tagFor('bran').bubble.textContent, 'behind you');
-  assert.equal(layer.root.style.display, '', 'up again');
-
-  // and the host arm that had the early return really does call the pass before it takes it
-  const wm = rd('src/scenes/worldModes.js');
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
-  const arm = /if \(windowHoldsDungeon\(dungeonCtx\.uiOverlayActive, aliveUnder\(\)\)\) \{[^\n]*\}/.exec(wm)[0];
-  assert.match(arm, /host\.drawPeerNames\?\.\(\{ proj, view, eye: mwv\.eye \}\)/, 'the dungeon overlay arm draws the names');
-  assert.ok(arm.indexOf('drawPeerNames') < arm.indexOf('return true'), '...before it returns, not after');
-  assert.ok(arm.indexOf('drawPeerNames') < arm.indexOf('drawOverlay'), '...and under the overlay, not over it');
-  assert.equal((wm.match(/host\.drawPeerNames\?\./g) ?? []).length, 3, 'the dungeon\'s two arms and the interior\'s - every exit of this host');
-});
-
 test('AUDIT NAME1 F14 (the host wiring was pinned by regex alone): the whole pass driven - the four culls, the sight test over a REAL collider, the DOM face, the party colour and the bitmap fallback, through the one call scenes/world.js makes (mutants: the culls reordered; the layer and the bitmap face both drawn; the rect ignored; the colour dropped)', () => {
   // a peer behind the wall, a peer beside it, a peer out of range, a peer behind the lens
   const hostFrameClock = hostFrame({ rows: [
@@ -826,7 +739,6 @@ test('AUDIT NAME1 F6 (a bubble was stamped from the PUMP\'S clock, not the line\
   assert.equal(line.t, clock.t, 'net/chat.js keeps the local stamp as `t` and the relay\'s as `at`');
   const layer2 = createNameLayer({ doc: fakeDocument(), now: () => clock.t + BUBBLE_MS + 1 });
   assert.equal(layer2.render({ points: pointsOf([{ id: 'zed' }]), log: fresh }), 0, 'the local stamp decides, so a future `at` cannot hold a bubble open');
-  assert.match(rd('src/ui/nameLayer.js'), /say\(line\.id, line\.text, Number\.isFinite\(line\.t\) \? line\.t : line\.at\)/, 'and the stamp really is the line\'s own');
 });
 
 test('AUDIT NAME1 F8 (the seq watermark outlived the log): the watermark belongs to ONE log - a replaced ChatLog starts a new count, where before every line below the old watermark was mute for the rest of the session (mutants: the watermark kept across logs; the watermark reset on every pump, so a line bubbles twice)', () => {

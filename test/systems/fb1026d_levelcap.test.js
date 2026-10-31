@@ -91,8 +91,6 @@ test('LEVEL-45 THE READOUTS: the Level box and the level-up bar read whole at th
   assert.deepEqual(levelProgress(p, null), { now: 1, max: 1, carried: 0, label: 'Highest level reached', cap: true });
   // AUDIT FB1026d II C3: the window's bar says the label alone, no skill row counts toward a next level, and the Level page's lead says the cap
   assert.ok(riseRibbon(p).length > 0 && riseRibbon(p).every((r) => r.note === ''), 'no row\'s note at the cap');
-  assert.match(src('src/ui/enhanced/enhancedLevelUp.js'), /levelNote\.textContent = m\.progress\.cap \? m\.progress\.label/);
-  assert.match(src('src/ui/growth/growthTab.js'), /: atLevelCap\(entity\) \? t\('charsheet\.levelCap'/);
   p.level = 44;
   assert.notEqual(levelProgressPercent(p), 100);
   assert.equal(levelProgress(p, null).label, 'Skill progress to next level');

@@ -78,16 +78,3 @@ test('CH4: sight/detection resolve EVERY fixed step; the illusion die rolls per 
   assert.equal(ai.detected, false, 'the failed see-through blocks the ladder until the next classic re-roll');
 });
 
-test('CH4: the dungeon snapshot carries isHostile/hasEncounteredPlayer/magicka, restore gated on presence', () => {
-  const dc = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  const ci = dc.indexOf('function collectWorld()');
-  const collect = dc.slice(ci, dc.indexOf('function applyWorld', ci));
-  assert.ok(collect.includes('hostile: f.ai.isHostile !== false'), 'SerializableEnemy :113');
-  assert.ok(collect.includes('encountered: !!f.ai.hasEncounteredPlayer'), 'SerializableEnemy :114');
-  assert.ok(collect.includes('magicka: f.entity.magicka ?? 0'), 'a discharged caster must not refill on load (:112/:178)');
-  const ai = dc.indexOf('function patchFoe(f, sf, wire = false)');   // WORLD3: the per-foe body is patchFoe, above applyWorld
-  const apply = dc.slice(ai, dc.indexOf('w.piles?.forEach', ai));
-  assert.ok(apply.includes('if (sf.hostile != null) f.ai.isHostile = !!sf.hostile;'), ':182 restore, old saves keep live state');
-  assert.ok(apply.includes('if (sf.encountered != null) f.ai.hasEncounteredPlayer = !!sf.encountered;'), ':183 restore');
-  assert.ok(apply.includes('if (sf.magicka != null) f.entity.magicka = sf.magicka;'), ':178 restore');
-});

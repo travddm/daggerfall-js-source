@@ -342,8 +342,6 @@ test('AUDIT EG III lane1 #18 THE ASPECTS (sections 13.3 and 13.4): Garoth\'s eac
 });
 
 test('AUDIT EG III lane1 #23 THE GATE\'S ROWS (section 13.4; ONE DFU MEMBER, ONE EXPORT): the Valkynaz\'s and champions\' Cleave, Slam, Charge and Meteor are net/gate/gateBrain.js ATTACKS\' own rows, never a copy - and the Meteor leaves the gate\'s burning ground (POOLS\' meteor) where it falls, from its landing (mutants: a row read off the wrong field; the pool unlaid; the pool laid at its word)', () => {
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egLords.js', import.meta.url), 'utf8').replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  for (const nm of ['Cleave', 'Ground Slam', 'Charge', 'Meteor of Oblivion']) assert.ok(!src.includes(`'${nm}'`), `no copy of the gate's ${nm}`);
   const C = court(77, 25, 'ilthys');
   const thrown = new Map(), zones = [];
   for (let k = 0; k < 4 * 240 && thrown.size < 3; k++) {

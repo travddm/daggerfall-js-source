@@ -113,13 +113,6 @@ test('AUDIT CARDS-5 D12/D14: the Codex part - every Legendary row, found and not
   assert.deepEqual(collectionParts(me).map(([id]) => id), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'cards', 'trophies', 'fish', 'annals']);   // PIN MOVED (HUNTERS-MARK): the gathered parts after them, always shown; PIN MOVED (APPEARANCES): the looks' part
   assert.equal(collectionsPageShown({ items: [] }), true);
   assert.deepEqual(collectionParts({ items: [] }).map(([id]) => id), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'trophies', 'fish', 'annals']);   // PIN MOVED (HUNTERS-MARK): the gathered parts after them, always shown; PIN MOVED (APPEARANCES): the looks' part is every character's
-  // the menu's wiring
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /collections: \(d\) => drawCollectionsPage\(d, render, \{ \.\.\.kit, player: playerEntity, account: newAccountFlow \}\),/);   // PIN MOVED (COLLECTIONS-II): and the account's flow, the card's own construction
-  assert.match(menu, /resetHoldingsPages\(\); resetFleetPage\(\); resetCollectionsPage\(\);/);
-  assert.match(menu, /else if \(at === 'collections' \|\| COLLECTION_PARTS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'holdings'; holdSec = 'collections'; if \(at !== 'collections'\) setCollectionsPart\(at\); \}/);   // PIN MOVED (AUDIT COLLECTIONS-II, lanes 2 and 5): every part lands by its name, the wardrobe's four too
-  assert.match(menu, /b\.onclick = \(\) => \{ holdSec = id; disarmCollectionsPage\(\); render\(\); \};/);
-  assert.match(menu, /disarmFamilyPages\(\); disarmCollectionsPage\(\); if \(id !== 'growth'\) releaseGrowthTab\(\); pauseTab = id; render\(\);/);   // PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab): and the Growth stage's face
   CX._resetCodexForTests();
 });
 

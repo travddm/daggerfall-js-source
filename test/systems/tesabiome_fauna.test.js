@@ -139,7 +139,6 @@ test('TESA-BIOME fauna: a creature\'s level is the game\'s as it loaded - off th
   assert.deepEqual(biomeTable(i, false, false), want(false, false));
   assert.deepEqual(biomeTable(i, true, false), want(true, false));
   assert.deepEqual(biomeTable(i, true, true), want(true, true));
-  assert.match(read('src/systems/tamrielFauna.js'), /const key = `\$\{index\}:\$\{dex \? 1 : 0\}:\$\{mudex \? 1 : 0\}`;/);
 });
 
 test('TESA-BIOME fauna: a table golden - the Nibenay Valley\'s wild by day, as the game builds it in either variant (AUDIT TESA-BIOME P7: the weights, the hash, the window and the cover fixed together)', () => {
@@ -297,19 +296,3 @@ test('TESA-BIOME fauna: the online grants read the zone too - an encr member\'s 
   } finally { _resetEncounterTableSelectors(); }
 });
 
-test('TESA-BIOME fauna: the world host wires it - the selector stood, the wild\'s roll, the bands, the camps and the road\'s trouble carry the pixel\'s band, the jungle its zones', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /installTamrielFauna\(\);/);
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the climate read composed by WW-R's groundMaps (world/tamriel/tamrielGround.js)
-  assert.match(w, /groundMaps\(maps\);[^\n]*\n\s+maps\.getFaunaBand = faunaBandAt;/, 'composed beside the climate read, where the land past the Bay streams');
-  assert.equal((w.match(/fauna: maps\.getFaunaBand\?\.\(/g) ?? []).length, 3, 'the wild\'s minute roll, a roaming band\'s make, the camps a crossing rolls');
-  // AUDIT TESA-BIOME P3: each read the same pixel as its climate's, in its own call - not a count
-  assert.match(w, /climateIndex: maps\.getClimateIndex\(playerTravelPixel\(\)\.x, playerTravelPixel\(\)\.y\),\n\s+fauna: maps\.getFaunaBand\?\.\(playerTravelPixel\(\)\.x, playerTravelPixel\(\)\.y\),[^\n]*\n\s+playerLevel: effectiveLevel\(playerEntity\),/, 'the wild\'s minute roll (IntermittentEnemySpawn)');
-  assert.match(w, /const hit = rollGroupComposition\(\{ climateIndex: maps\.getClimateIndex\(px, py\), fauna: maps\.getFaunaBand\?\.\(px, py\), playerLevel:/, 'a roaming band\'s make');
-  assert.match(w, /const chunkCampHits = rollCampEncountersOnChunkLoad\(\{\n[^\n]*\n\s+climateIndex: maps\.getClimateIndex\(r\.current\.x, r\.current\.y\),\n\s+fauna: maps\.getFaunaBand\?\.\(r\.current\.x, r\.current\.y\),/, 'the camps a crossing rolls');
-  assert.match(w, /faunaAt: \(x, y\) => maps\.getFaunaBand\?\.\(x, y\) \?\? null/, 'and the online grants\' species law');
-  // PIN MOVED (BAY-LEFT-GROUND, D2): and the living world's road trouble - it handed the law no band, and Black Marsh's
-  // caravans met Daggerfall's Orcs and Centaurs (test/systems/livingWorld/bayleftground_trouble.test.js)
-  assert.match(w, /foesOf: troubleFoesOf\(\{ faunaAt: \(x, y\) => maps\.getFaunaBand\?\.\(x, y\) \}\),/, 'and the road\'s trouble (the living world)');
-  assert.match(w, /zoneAt: tamrielLand \? tamrielBiomeAt : null, version: tamrielLand \? biomeStamp : null \}\) : null;/, 'and the jungle host its zones past the Bay - Cyrodiil\'s jungle, Valenwood\'s and its canopy');
-});

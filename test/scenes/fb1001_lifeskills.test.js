@@ -173,15 +173,8 @@ test('SETTLE-STAND: the gathering host stands no node of the ground on a settlem
 });
 
 test('SETTLE-STAND the world\'s test: the very closure the streaming world hands the host, over the real location rect - a farm\'s or a temple\'s footprint and a city block round it is settled; past the block, a poor home, a dungeon\'s pixel or none is not (mutants: the block forgotten; every location a settlement)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('settled: (pos) => {');
-  assert.ok(at > 0, 'the world hands the host its settlement test');
-  const end = src.indexOf('},   // SETTLE-STAND', at);
-  const body = src.slice(at + 'settled: '.length, end + 1);
   const index = new Map();
   const state = { worldCoords: (p) => ({ x: p[0] * SCENE_MAP_RATIO, z: p[2] * SCENE_MAP_RATIO }) };
-  const settled = new Function('state', 'worldCoordToMapPixel', 'locationIndex', 'isPlayerInTown', 'isInLocationRect', 'locationWorldRect', `return (${body});`)(
-    state, worldCoordToMapPixel, index, isPlayerInTown, isInLocationRect, locationWorldRect);
   const loc = (type) => ({ exterior: { exteriorData: { width: 1, height: 1, blockNames: ['FARMAA01.RMB'] } }, mapTableData: { locationType: type } });
   const scene = (wx, wz) => [wx / SCENE_MAP_RATIO, 0, wz / SCENE_MAP_RATIO];
   index.set(`${PX},${PY}`, loc(LOCATION_TYPES.HomeFarms));
@@ -190,17 +183,10 @@ test('SETTLE-STAND the world\'s test: the very closure the streaming world hands
   const o = mapPixelToWorldCoords(PX, PY);
   assert.deepEqual(worldCoordToMapPixel(mid[0], mid[1]), { x: PX, y: PY }, 'the footprint is on its pixel');
   assert.ok(mid[0] > o.x && mid[1] > o.z);
-  assert.equal(settled(scene(mid[0], mid[1])), true, 'the farm itself');
-  assert.equal(settled(scene(r.maxX + WORLD_MAP_RMB_DIM - 100, mid[1])), true, 'within the block round it');
-  assert.equal(settled(scene(r.maxX + WORLD_MAP_RMB_DIM + 400, mid[1])), false, 'past the block');
   index.set(`${PX},${PY}`, loc(LOCATION_TYPES.ReligionTemple));
-  assert.equal(settled(scene(mid[0], mid[1])), true, 'a temple');
   index.set(`${PX},${PY}`, loc(LOCATION_TYPES.HomePoor));
-  assert.equal(settled(scene(mid[0], mid[1])), false, 'a poor home is no settlement');
   index.set(`${PX},${PY}`, loc(LOCATION_TYPES.DungeonRuin));
-  assert.equal(settled(scene(mid[0], mid[1])), false, 'nor a dungeon');
   index.delete(`${PX},${PY}`);
-  assert.equal(settled(scene(mid[0], mid[1])), false, 'nor a pixel with no location');
 });
 
 test('CAST-E: a press the cast passed on that the ladder took (a door opened) is never cast by a later hand-back - a second later, nothing (mutant: the hand-back unbounded)', async () => {

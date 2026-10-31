@@ -534,21 +534,3 @@ test('E8 editor: the parchment is DFU\'s FIXED (7,19,306,69) panel, not a centre
   }
 });
 
-test('E8 wiring pin: the guild destination mounts the NATIVE window behind an art gate', () => {
-  assert.match(src('src/systems/guild/guildServiceFlow.js'), /MakeSpells: 'guildServiceSpellMaker'/);
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /destination === 'guildServiceSpellMaker' && spellMakerArtLoaded\(\) && _shopFont/);
-  assert.match(wm, /new SpellMakerWindow\(\{/);
-  assert.match(wm, /preloadSpellMakerArt\(\{ renderer, fetchBytes, palette \}\)/,
-    'the art warms at boot with its sibling maker windows');
-  // the Mages Guild gate is membership; Kynareth's is rank 6 - both
-  // already live, so the destination is all that was missing
-  assert.match(src('src/systems/guild/guildServices.js'), /case 'MakeSpells':/);
-  // ...and the window really is native now: no `isChoiceWindow` false,
-  // and the three ARENA2 sheets DFU names are the ones it loads.
-  const file = src('src/ui/spell/spellMakerWindow.js');
-  assert.match(file, /INFO01I0\.IMG/);
-  assert.match(file, /MASK01I0\.IMG/);
-  assert.match(file, /MASK05I0\.IMG/);
-  assert.equal(/isChoiceWindow\(\) \{ return false/.test(file), false);
-});

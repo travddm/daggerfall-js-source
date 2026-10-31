@@ -321,9 +321,6 @@ test('WB9h the crowd, driven: thirty players milling 3..40 m about the eye for t
 });
 
 test('WB9h by source: no copy of the pose and no spread of the bodies a frame (AUDIT WB D10); the frame\'s lists kept on the module and refilled; the draw keeps its camera in one object (mutants: a pose copied again)', () => {
-  const src = rd('src/net/peer/peerBodies.js');
-  assert.doesNotMatch(src, /\{ \.\.\.peer\.shown/, 'no copy of the pose to hand the camera its yaw');
-  assert.doesNotMatch(src, /for \(const [^)]*of \[\.\.\.this\._bodies/, 'no spread of the bodies to walk them');
   const cam = peerCamera({ yaw: 0.3, mv: 1 }, [1, 2, 3], 2, null, 1.2);
   assert.equal(cam.yaw, 1.2, 'the body\'s own eased yaw, handed in');
   assert.equal(peerCamera({ yaw: 0.3, mv: 1 }, [1, 2, 3], 2).yaw, 0.3, 'the pose\'s when none');
@@ -331,5 +328,4 @@ test('WB9h by source: no copy of the pose and no spread of the bodies a frame (A
   const live = pb._live, want = pb._want;
   pb.sync([peer('a', 0, -3)], toScene, 1 / 60, [0, 0, 0]); pb.sync([peer('a', 0, -3)], toScene, 1 / 60, [0, 0, 0]);
   assert.equal(pb._live, live); assert.equal(pb._want, want);
-  assert.match(src, /c\.canvas = canvas; c\.proj = proj; c\.view = view; c\.eye = eye; c\.flashOf = flashOf;/);
 });

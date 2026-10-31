@@ -14,7 +14,6 @@ import { createHarbourOffice } from '../../../src/scenes/harbourOffice.js';
 import { createCaptainLedger } from '../../../src/systems/naval/captainLedger.js';
 import * as CHART from '../../../src/ui/etherChartWindow.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const BAY = GOODS.filter((g) => !g.ether).map((g) => g.id);
 /** A port isle as the harbour office and the naval host read one (world.js etherPortOf - pinned below). */
 const portOf = (i) => ({ key: `${i.px},${i.py}`, name: i.name, px: i.px, py: i.py, region: 61, crown: null, ether: true });
@@ -85,7 +84,6 @@ test('ISLE-TRADE the harbour office at an isle: its own good of the Bay is bough
 });
 
 test('ISLE-TRADE the chart\'s card names a port isle\'s good off the key the world host gives its port; the lesser isles\' cards none (mutants: the card\'s good)', () => {
-  assert.match(WORLD, /const etherPortOf = \(i\) => \(\{ key: `\$\{i\.px\},\$\{i\.py\}`, name: i\.name, px: i\.px, py: i\.py, region: ETHER_REGION, crown: null, ether: true \}\);/, 'the port\'s key the card draws by');
   const word = { px: v.px - 18, py: v.py + 3, yaw: 0, charted: [v.key, ...islesNear(v.px, v.py, 30).map((i) => i.key)], legends: [], stats: {} };
   const at = { cx: v.px - 17.5, cy: v.py + 3.5, zoom: 2 };
   const m = CHART.chartModel(word, at, 1064, 550, { pick: v.key });

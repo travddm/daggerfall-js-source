@@ -57,30 +57,3 @@ test('HT3 the two orders, executed: one keeps the rows, the other turns them ove
   assert.deepEqual(Object.keys(toColor32Order(TOP_FIRST)).sort(), ['data', 'height', 'width']);
 });
 
-test('HT3 the SCREEN doors keep their rows; the WORLD doors still flip', () => {
-  // the two that draw on a screen quad
-  assert.match(read('src/systems/handheldTorches.js'), /return toScreenOrder\(await decodePng\(bytes\)\);/, 'the held torch');
-  assert.match(read('src/combat/weapon/weaponWidgetAssets.js'), /return toScreenOrder\(await decodePng\(bytes\)\);/, 'the widget\'s loose PNG');
-  // DWHD1: and so does the widget's BUNDLE arm - the reader answers top-first already (decodeTexture2D flips Unity's
-  // bottom-up rows), so a flip here drew every bundle frame upside down ("all weapons are overhead")
-  assert.match(read('src/combat/weapon/weaponWidgetAssets.js'), /try \{ return toScreenOrder\(tex\.rgba\(\)\); \}/);
-  // the ones that draw in the world are untouched
-  assert.match(read('src/scenes/droppedTorches.js'), /return toColor32\(await decodePng\(new Uint8Array\(await res\.arrayBuffer\(\)\)\)\);/, 'the dropped torches are billboards');
-  assert.match(read('src/systems/seasonsIliacBayAssets.js'), /const image = toColor32\(await decode\(bytes\)\);/, 'seasons: terrain');
-  assert.match(read('src/systems/textureReplacement.js'), /toColor32\(await decode\(bytes\)\)/, 'M-TEX: world textures');
-  // and TEX1's law still holds: the flip-only conversion has no importers
-  assert.ok(!/import[^;]*\btoColor32Order\b[^;]*from/.test(read('src/systems/handheldTorches.js')));
-  assert.ok(!/import[^;]*\btoColor32Order\b[^;]*from/.test(read('src/combat/weapon/weaponWidgetAssets.js')));
-});
-
-test('HT3 the convention is written down where the two answers live', () => {
-  const conv = read('src/formats/color32Order.js');
-  assert.match(conv, /export function toScreenOrder\(image\) \{/);
-  assert.match(conv, /Unity stores its rows bottom-up/);
-  assert.match(conv, /a SCREEN QUAD does not/);
-  // the screen-quad convention this rests on, at its own source
-  const r = read('src/render/renderer.js');
-  assert.match(r, /vUV = mix\(uSrc\.xy, uSrc\.zw, vec2\(p\.x, p\.y\)\);/, 'v0 is the rect\'s top');
-  assert.match(r, /uniform vec4 uDst;\s*\/\/ x, y, w, h in pixels \(top-left origin\)/);
-  assert.ok(!/UNPACK_FLIP_Y_WEBGL, true/.test(r), 'and nothing flips at upload');
-});

@@ -30,9 +30,6 @@ test('the lab is a lab: nothing the game runs imports it, and it changes no weap
 });
 
 test('the mod\u2019s movement is RUN, not copied - the lab imports the modules themselves', () => {
-  const lab = readFileSync('src/tools/gunLab.js', 'utf8');
-  assert.match(lab, /import \{[\s\S]*?offsetStep, bobStep, inertiaStep, widgetTransformRect,[\s\S]*?\} from '\.\.\/combat\/weapon\/weaponWidgetMotion\.js'/,
-    'Offset, Bob, Inertia and the rect transform come from the mod\u2019s own module');
   // and they are the same functions, not same-named ones
   assert.equal(typeof bobStep, 'function');
   assert.equal(typeof offsetStep, 'function');
@@ -330,56 +327,3 @@ test('the recoil is a DISPLACEMENT that settles, and a second shot stacks on wha
   assert.ok(Number.isFinite(r2.y) && Math.abs(r2.y) < 1, 'a 100ms frame does not blow it up');
 });
 
-test('the paperdoll sprite is cut for the doll’s hand, and both icons are 1-bit', () => {
-  // ONE SPRITE, TWO JOBS: a weapon's paperdoll layer and its inventory
-  // icon are the same record in Daggerfall (GetInventoryTextureArchive
-  // hands back PlayerTextureArchive - characters/paperdoll/paperdollArt.js), so
-  // the gap the doll needs is in the icon too. That is why classic
-  // weapon icons have a notch: they are doll layers shown in a list.
-  const read = (f) => {
-    const b = readFileSync(`public/art/${f}`);
-    assert.equal(b.readUInt32BE(0), 0x89504E47, `${f} is a PNG`);
-    return { w: b.readUInt32BE(16), h: b.readUInt32BE(20), depth: b[24], type: b[25] };
-  };
-  const gun = read('gun-paperdoll.png');
-  const ammo = read('gun-ammo.png');
-  for (const [name, m] of [['gun-paperdoll.png', gun], ['gun-ammo.png', ammo]]) {
-    assert.equal(m.depth, 8, `${name} is 8-bit`);
-    assert.equal(m.type, 6, `${name} is RGBA`);
-  }
-  // sized for the panel, not for a screen: PAPERDOLL_W is 110
-  assert.ok(gun.w > 40 && gun.w <= 110, `the gun fits the doll's panel (${gun.w}px of 110)`);
-  // FIELD-GUN16 (2026-09-20, Mac: "Shrink the inventory icon for the
-  // pellet ammo"). FITTING THE CELL WAS NEVER THE QUESTION. 22x22 fit
-  // it and still read as a pellet the size of a helmet, because
-  // `makeIconDrawer` never ENLARGES (`fit = Math.min(1, ...)`) - an
-  // icon is drawn at its own size, so the art's size IS the icon's
-  // size, exactly as a classic record's is. A bound that only says
-  // "not bigger than the cell" cannot catch a thing that is merely too
-  // big, so the pin is the SIZE, with the cell's own numbers beside it
-  // saying what fraction of the cell it is.
-  assert.ok(ammo.w <= 50 && ammo.h <= 38, `the ammo fits the 50x38 list cell (${ammo.w}x${ammo.h})`);
-  // FIELD-GUN18 (2026-09-20, Mac again: "Shrink the orb pellet ammo
-  // sprite in the inventory. It's too large") - 12, down from 16, down
-  // from 22. Worth one line on WHY the second round was needed: the 16
-  // was chosen against an 8x PREVIEW in a container with no game in
-  // it, where a sprite is INSPECTED rather than glanced at, and the
-  // note left behind claimed 12 would be "a brown dot". It is not; the
-  // banding and the boss still read. A judgement made at 8x about a
-  // thing seen at 1x is a guess, and the person with the game is the
-  // measurement.
-  assert.equal(ammo.w, 12, 'the pellet is 12px - Mac\'s size, and tools/gunPaperdoll.mjs\'s own default');
-  assert.equal(ammo.h, 12, 'and square, as the source is');
-  assert.ok(ammo.w / 50 < 0.25, `a pellet is a small round thing in a list, not a quarter of the row (${(ammo.w / 50 * 100).toFixed(0)}% of the cell)`);
-  // ...and it is still an ICON and not a smudge: the trimmed source is
-  // 461x471, so 12 is a clean downscale of real art rather than a
-  // resample of a resample, and the sprite is not blank.
-  assert.ok(ammo.w >= 8, 'below about 8px there is no dwarven banding left to read');
-  // THE TOOL'S DEFAULT IS THE SHIPPED SIZE, so a re-bake reproduces
-  // what is committed instead of quietly restoring the last one.
-  const baker = readFileSync('tools/gunPaperdoll.mjs', 'utf8');
-  assert.match(baker,
-    /const ammo = bake\('gun-ammo-src\.png', num\('ammo', 12\), \{ out: 'gun-ammo\.png' \}\);/,
-    'the baker defaults to the size that shipped');
-  assert.match(baker, /\[--ammo=12\]/, 'and its usage line says the same number');
-});

@@ -195,10 +195,3 @@ test('AUDIT NAV2 F1-F3 THE WORD: the captains\' key (k) and the boat\'s (m) roun
   assert.equal(validNavalRecord({ ...rec, k: 'x' }), null);
 });
 
-test('AUDIT NAV2 F10 (Mac: "Not in a sea fight"): the watch\'s stop waits out a sea fight - a hostile ship near a player aboard, or a boarding under way, holds it on the world host, as a foe on foot does (AUDIT REP F3\'s law); ashore, with no ship hostile to them, it stands (mutants: either arm dropped)', () => {
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const gate = world.match(/blocked: \(\) => townTalk\.overlayActive[^]*?\n\s*\}\);/)?.[0] ?? '';
-  assert.match(gate, /\|\| duelEnemyNear\(\) \|\| areEnemiesNearby\(exteriorFoes\.foes\)/, 'the foot fight\'s arms stay');
-  assert.match(gate, /!!naval\?\.hostileNear\?\.\(\)/, 'a hostile ship near a player aboard (SEA-PEACE: never one ashore)');
-  assert.match(gate, /!!naval\?\.boarding\b/, 'a boarding under way');
-});

@@ -91,18 +91,3 @@ test('LAIR-WALK the end a walk reaches: the farthest candidate the walk reaches,
   assert.equal(LAIR_WALK_WAIT_MS, 20000);
 });
 
-test('LAIR-WALK the host: the bake anchored where I came in and said landed or failed; the lair asked once that has happened - or at once with no bake coming, or past LAIR_WALK_WAIT_MS; its end the farthest on the walk\'s floor - SD-REACH\'s candidates, then every layout marker - else SD-REACH\'s; the spot it stands on on that floor, else the marker itself; the Rift\'s end never the walk\'s (mutants: the lair not waiting; no bound; never landed; no anchor; the walk unasked; the spot unasked; the Rift on a client\'s own walk)', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /enhancedNav\.requested = true;\n\s*enhancedNav\.anchor = \[playerFeet\[0\], playerFeet\[1\], playerFeet\[2\]\];/);
-  assert.match(D, /\.catch\(\(e\) => console\.warn\('\[enhanced-ai\] navmesh bake failed - classic motor stands:', e\?\.message \?\? e\)\)\n\s*\.finally\(\(\) => \{ enhancedNav\.settled = true; \}\);/);
-  const bakeAt = D.indexOf('enhancedNav.requested = true;'), askAt = D.indexOf('{ _lairAsked = true; standLairRevenant().catch(() => null); }');
-  assert.ok(bakeAt > 0 && askAt > bakeAt, 'the lair asked after the bake is asked for, in the frame');
-  assert.match(D, /if \(playerFeet && !_lairAsked && \(!enhancedNav\.requested \|\| enhancedNav\.settled \|\| Date\.now\(\) - \(_lairWaitFrom \?\?= Date\.now\(\)\) > LAIR_WALK_WAIT_MS\)\) \{ _lairAsked = true; standLairRevenant\(\)\.catch\(\(\) => null\); \}/);
-  assert.equal(D.match(/standLairRevenant\(\)\.catch/g)?.length, 1, 'asked in one place');
-  const lair = D.slice(D.indexOf('async function standLairRevenant() {'), D.indexOf('function standDungeonBand('));
-  assert.match(lair, /const walk = enhancedNav\.chf \? reachableFrom\(enhancedNav\.chf, enhancedNav\.anchor\) : null;\n\s*const reaches = walk && \(\(m\) => walk\(floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\)\);\n\s*const far = \(reaches && dungeonEnd\(reaches\)\) \|\| dungeonEnd\(\);/);
-  assert.match(lair, /const about = spotAbout\(\[far\.x, far\.y, far\.z\], 4\);\n\s*const sp = about && \(!reaches \|\| reaches\(about\)\) \? about : \{ x: far\.x, y: far\.y, z: far\.z \};/, 'its spot on the walk\'s floor, else the marker');
-  assert.match(D, /function dungeonEnd\(reaches = null\) \{\n\s*const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\) \?\? \(reaches \? reachableEndOf\(from, _layoutEnemies\.filter\(\(m\) => !m\.eliteCopy\), reaches\) : null\);/);
-  const rift = D.slice(D.indexOf('function standSdEnd() {'), D.indexOf('const probe = sdProbeOf(collider);', D.indexOf('function standSdEnd() {')));   // SD-THROUGH (PIN MOVED): the end's one probe (scenes/superDungeon/sdEnd.js sdProbeOf)
-  assert.match(rift, /const end = dungeonEnd\(\);/, 'the Rift: the same on every client, never one client\'s walk');
-});

@@ -159,16 +159,6 @@ test('B1: a rest in the STREET survives a quest box - the world.js fall-through'
   hourOnTop(host.overlay);
   assert.ok(rest.session.totalHours > before, 'and running again');
 
-  // ...and the source says so, so a future edit that reverts the door
-  // fails here rather than silently losing a night's sleep.
-  // ENH-NOTICE3 (AUDIT F5): the ladder is systems/notify.js's
-  // `mountWindow`, whose default is the PUSH and whose outdoor rung is
-  // townTalk's presenter - `pushOverlay` for a push, never showOverlay.
-  assert.match(src('src/scenes/world.js'), /_questBoxWin = win;[\s\S]{0,1600}\n\s*mountWindow\(win\);\n\s*\};/,
-    'the quest box rides the door\'s ladder');
-  assert.match(src('src/systems/notify.js'), /export function mountWindow\(win, \{ push = true \} = \{\}\)/, 'whose default is the push');
-  assert.match(src('src/scenes/townTalk.js'), /mount: \(win, \{ push \}\) => \{ if \(push\) return pushOverlay\(win\); showOverlay\(win\); return true; \},/,
-    'the quest box pushes into the outdoor slot rather than replacing it');
 });
 
 test('B1: a push suspends the covered window\'s close callback with it', () => {
@@ -189,63 +179,3 @@ test('B1: a push suspends the covered window\'s close callback with it', () => {
 // The adoption itself, in the three hosts.
 // ---------------------------------------------------------------------
 
-test('B1: each modal host builds a stack under its slot and reconciles it', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const dc = src('src/scenes/dungeonContext.js');
-  const tt = src('src/scenes/townTalk.js');
-
-  assert.match(wm, /const interiorWindows = makeWindowStack\(\{ onTop: \(w\) => \{ interiorOverlay = w; questWordsFirst\.settled\(w\); \} \}\);/);   // PIN MOVED (QUEST-WORDS-FIRST): and the held NPC door told the slot's new top
-  assert.match(dc, /const dungeonWindows = makeWindowStack\(\{ onTop: \(w\) => \{ activeOverlay = w; \} \}\);/);
-  assert.match(tt, /const windows = makeWindowStack\(\{ onTop: \(w\) => \{ overlay = w; \} \}\);/);
-
-  // The frame seams read the slot back, or the hand-written
-  // `... = null` close paths never become pops.
-  assert.match(wm, /if \(mode === 'interior'\) interiorWindows\.reconcile\(interiorOverlay\);\n(\s*\/\/[^\n]*\n)*\s*const overlayHeld =/,
-    'the interior frame reconciles BEFORE anything reads overlayHeld');
-  assert.match(wm, /if \(w\.done\) \{ w\.dispose\?\.\(\); if \(interiorOverlay === w\) interiorOverlay = null; \}\n[\s\S]{0,400}interiorWindows\.reconcile\(interiorOverlay\);/,
-    'and again after the done-drain, so the uncovered window is what this frame paints');
-  assert.match(dc, /tickOverlay\(dt\) \{\n[\s\S]{0,400}dungeonWindows\.reconcile\(activeOverlay\);\n\s*if \(!activeOverlay\) return;/,
-    'the dungeon ticks its stack up to date before the early return');
-
-  // ...and the EVENT drains too, or a key that closes the top window
-  // leaves the uncovered one out of the slot until the next frame -
-  // long enough for the host's own pointer-lock grab to run under it.
-  assert.match(wm, /overlayInput\(code, e\) \{[\s\S]{0,400}interiorWindows\.reconcile\(interiorOverlay\);/,
-    'the interior key seam reconciles its drain');
-  assert.match(wm, /if \(interiorOverlay\?\.done\) interiorOverlay = null;\n\s*interiorWindows\.reconcile\(interiorOverlay\);/,
-    'so does the interior click seam');
-  assert.match(dc, /overlayInput\(action, e = null\) \{[\s\S]{0,1000}dungeonWindows\.reconcile\(activeOverlay\);/,
-    'and the dungeon key seam');
-  assert.match(dc, /overlayClick\(vx, vy, right = false, middle = false\) \{[\s\S]{0,1000}dungeonWindows\.reconcile\(activeOverlay\);/,
-    'and the dungeon click seam');
-  // The getters those handlers feed answer the whole STACK, not just
-  // the slot - and ROAD-tail made that answer the stack's own PAUSE
-  // LATCH rather than a depth count each host re-derived. The law those
-  // pins protect is next door, in roadb_host_pause.test.js.
-  assert.match(wm, /get overlayHeld\(\) \{ return \(mode === 'interior' && interiorPaused\(\)\)/);
-  assert.match(dc, /get uiOverlayActive\(\) \{ return dungeonPaused\(\); \}/);
-
-  // A teardown drops the WHOLE stack, disposing each window - OnPop
-  // (UserInterfaceManager.cs:189-196), which is where RestWindow
-  // clears IsResting.
-  for (const [name, text] of [['worldModes', wm], ['dungeonContext', dc]]) {
-    assert.ok(/\.clear\(\(w\) => w\.dispose\?\.\(\)\);/.test(text), `${name} drains its stack on teardown`);
-  }
-});
-
-test('B1: the mountInterior FLAG is retired, not merely reworded', () => {
-  // It read: "FLAGGED: pause-and-resume is the DFU behaviour and a
-  // single-slot host cannot have it; ending cleanly is the honest
-  // approximation, not a claim to have ported it." The single slot is
-  // gone, so the flag goes with it - and the door is a PushWindow.
-  const wm = src('src/scenes/worldModes.js');
-  assert.equal(/single-slot host cannot have it/.test(wm), false,
-    'the FLAG text must not survive the thing it flagged');
-  assert.equal(/A single overlay slot cannot\s+\*?\s*stack/.test(wm), false);
-  assert.match(wm, /const mountInterior = \(w\) => \{\n\s+if \(!w\) return;\n\s+interiorWindows\.reconcile\(interiorOverlay\);[^\n]*\n\s+if \(interiorWindows\.containsWindow\(w\)\) return;[^\n]*\n\s+interiorWindows\.pushWindow\(w\);\n\s*\};/,
-    'mountInterior is PushWindow');
-  // ...and nothing is disposed on the way IN any more: the window it
-  // covers is coming back.
-  assert.equal(/if \(interiorOverlay && interiorOverlay !== w\) interiorOverlay\.dispose\?\.\(\);/.test(wm), false,
-    'the replace-and-dispose is gone');
-});

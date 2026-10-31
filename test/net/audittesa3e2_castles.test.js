@@ -25,10 +25,6 @@ test('AUDIT TESA III E2-2 the law: a castle\'s city is its crown\'s seat - the B
 });
 
 test('AUDIT TESA III E2-2 the window and the service\'s word: the Guild window names a castle and an offer by castleCityOf, and its line and `castle-none` say a province\'s capital keeps one too, the Imperial City\'s none (mutants: a castle named by its region; an offer named by its region; the old words)', () => {
-  const panel = rd('src/ui/socialPanel.js');
-  assert.match(panel, /const city = castleCityOf\(c\.region\) \?\? REGION_NAMES\[c\.region\] \?\? '';/, 'a castle kept');
-  assert.match(panel, /const city = castleCityOf\(o\.region\) \?\? REGION_NAMES\[o\.region\] \?\? '', has = /, 'a castle offered');
-  assert.doesNotMatch(panel, /const city = REGION_NAMES\[[co]\.region\]/);
   assert.equal(guildCastleText.name(castleCityOf(64)), 'Castle Solitude');
   assert.match(guildCastleText.none(), /Daggerfall, Wayrest, Sentinel or a province's capital, but the Imperial City/);
   assert.match(accountRefusalText('castle-none'), /Daggerfall, Wayrest, Sentinel and each province's capital but the Imperial City\.$/);

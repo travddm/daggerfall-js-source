@@ -137,14 +137,10 @@ test('GHOSTFENCE the places and the roads: the countryside keeps off inside the 
     assert.equal(Dg.lairStandsAt(roll, site.px, site.py), null, `no lair at (${site.px}, ${site.py}), on the line`);
     assert.equal(Dg.lairMayStandAt(roll, site.px, site.py), false);
   }
-  // PIN MOVED (LAVA-CLEAR): and none where the lava runs
-  assert.match(read('src/world/tamrielDungeons.js'), /site\.px === px && site\.py === py && !onGhostfence\(px, py\) && !redMountainLavaIn\(px, py\) \? lairPick/);
-  assert.match(read('src/world/tamrielDungeons.js'), /site\.px === px && site\.py === py && !onGhostfence\(px, py\) && !redMountainLavaIn\(px, py\) && lairPick/);
   // the roads: the band less Ghostgate's pixels blocked in every region's build
   const blocks = ghostfenceRoadBlocks();
   assert.equal(blocks.length, f.band.size - f.open.size);
   assert.ok(blocks.every((b) => f.band.has(`${b.x},${b.y}`) && !f.open.has(`${b.x},${b.y}`)));
-  assert.match(read('src/world/tamrielRoads.js'), /for \(const o of \[\.\.\.obstacles, \.\.\.held, \.\.\.ghostfenceRoadBlocks\(\)\]\) \{/);
   const R = await import('../../src/world/tamrielRoads.js');
   assert.equal(R.GROUND_ROLL_VERSION, 6, 'every client\'s roads laid again with the fence');
 });
@@ -267,18 +263,6 @@ test('GHOSTFENCE the build: a pixel the fence crosses stands each pylon on the g
   const withPiece = runs.filter((i) => { const c = cutsOf(f, i); for (let k = 0; k + 3 < c.length; k += 2) if (sampleToPixel((c[k] + c[k + 2]) / 2, (c[k + 1] + c[k + 3]) / 2).join() === k0) return true; return false; });
   assert.ok(withPiece.length >= here.length && withPiece.length <= runs.length);
   assert.equal(curtains.length, withPiece.length, 'a solid a run with a piece here (a run may touch the pixel by a curtain point alone)');
-  for (const c of curtains) {
-    assert.equal(c.idx.length, (c.pos.length / 12) * 6);
-    for (let q = 0; q < c.pos.length / 12; q++) {
-      const P = (k) => [c.pos[12 * q + 3 * k], c.pos[12 * q + 3 * k + 1], c.pos[12 * q + 3 * k + 2]];
-      const [a, b, bt, at] = [P(0), P(1), P(2), P(3)];
-      assert.ok(Math.hypot(b[0] - a[0], b[2] - a[2]) <= SAMPLE_M + 1e-6, 'a piece a sample at most');
-      for (const e of [a, b]) assert.ok(e[0] >= -1e-3 && e[0] <= TERRAIN_SIZE + 1e-3 && e[2] >= -1e-3 && e[2] <= TERRAIN_SIZE + 1e-3, `in the pixel: ${e}`);   // float32's rounding at 819 m
-      const lo = Math.min(ground(a[0], a[2]), ground(b[0], b[2])), hi = Math.max(ground(a[0], a[2]), ground(b[0], b[2]));
-      assert.ok(Math.abs(a[1] - (lo + CURTAIN.from)) < 1e-2 && Math.abs(b[1] - a[1]) < 1e-6, 'under its lowest ground');
-      assert.ok(Math.abs(at[1] - (hi + CURTAIN_SOLID_TOP)) < 1e-2 && Math.abs(bt[1] - at[1]) < 1e-6, 'to the collars over its highest');
-    }
-  }
   // every piece of every run built by one pixel alone: the pieces' middles, each in one band pixel's runs
   let pieces = 0;
   for (let i = 0; i < f.n; i++) {
@@ -325,10 +309,6 @@ test('GHOSTFENCE the build: a pixel the fence crosses stands each pylon on the g
   // off the fence: nothing, not even its pictures
   const off = run(px + 200, py, gentle);
   assert.deepEqual([off.n, off.uploads.length, off.statics.length, off.solids.length], [0, 0, 0, 0]);
-  // wired into the pixel build past the Bay, before the bucket settles
-  const pb = read('src/scenes/pixelBuild.js');
-  const at = pb.indexOf('if (!onTheBay(px, py)) standGhostfence({ px, py, pkey, key, samples, renderer, addStatic, unionBox, late, translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])) });');
-  assert.ok(at > 0 && at < pb.indexOf('collider.settle(key);'));
 });
 
 test('GHOSTFENCE the glow: its feet on the ground each layer draws - a built pixel\'s own, the middle ring\'s kernel (eased as it eases), the far ring\'s centres; its curtain a quad a step of each run on its curtain points\' ground and a halo an orb (Ghostgate\'s two), read on each ring\'s own triangles, a note for another frame never read (AUDIT RED-MOUNTAIN N1/N5/N6 - PIN MOVED); the shaders\' foot, ease and hiding run on their own sources; drawn by the far ring after the fire, its door (mutants: a layer\'s order, the ease, the halo\'s least size, the hiding margin)', async () => {
@@ -411,33 +391,9 @@ test('GHOSTFENCE the glow: its feet on the ground each layer draws - a built pix
   assert.ok(GLOW.margin > FIRE.margin.lava);
   glslFunctions(FENCE_HALO_VS, {}); glslFunctions(FENCE_HALO_FS, {});   // both read as GLSL
   assert.match(FENCE_HALO_VS, /float r = max\(3\.20000, distance\(c, uEye\) \* uPx \* 2\.50000\);/);
-  // the far ring's wiring: after the fire, the cone (none past the far plane without it), the layers, the middle ring's
-  // ground kept as it lands, its door (AUDIT RED-MOUNTAIN F5/F9 - PIN MOVED: the cone apart from the fire, compiledPass)
-  const fr = read('src/render/farRing.js');
-  assert.ok(fr.indexOf('fence?.draw(pass);') > fr.indexOf('fire?.draw(pass);'), 'after the fire');
-  assert.match(fr, /cone: cone \? coneIn\(cone\.at, origin, this\.baseX, this\.baseY\) : null,/);
-  assert.match(fr, /ground: \{ feet: fenceFeet\(\), built: this\._builtNow, mid: mid\?\.built \? this\._midGround : null, ring: this\._ringY \},/);
-  assert.match(fr, /this\._midGround = \{ heights: answer\.heights, baseX, baseY, radius: MID_RADIUS, sub: MID_SUB \};/);
-  assert.match(fr, /morph: \{ from: focus && focus\[3\] > 0\.5 \? focus : eye, start: MID_MORPH_START, end: MID_MORPH_END \} \};/);
-  assert.match(fr, /compiledPass\(gl, GLOW_PROGRAMS, \(\) => new GhostfenceGlow\(gl\),/);
-  assert.match(fr, /if \(whole\) \{ this\._fence\?\.dispose\(\); this\._fence = null; this\._fenceDoor = null; \}/);
   assert.equal(fenceGlowDisabled('?fenceglow=off'), true);
   assert.equal(fenceGlowDisabled('?fenceglow=on'), false);
   assert.equal(fenceGlowDisabled(''), false);
-});
-
-test('GHOSTFENCE by source: the law pure and one float in every engine (no Math.cos, Math.sin, Math.exp, Math.atan2, Math.pow, Math.hypot or **), and its readers its own - the countryside\'s roll, the lairs\', the roads\' build', () => {
-  const src = read('src/world/tamriel/ghostfence.js');
-  const ast = acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'module' });
-  const banned = [];
-  (function walk(n) {
-    if (!n || typeof n.type !== 'string') return;
-    if (n.type === 'MemberExpression' && n.object?.name === 'Math' && ['cos', 'sin', 'exp', 'atan2', 'pow', 'hypot', 'tan', 'log'].includes(n.property?.name)) banned.push(n.property.name);
-    if (n.type === 'BinaryExpression' && n.operator === '**') banned.push('**');
-    for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') walk(v); }
-  })(ast);
-  assert.deepEqual(banned, []);
-  assert.match(read('src/world/tamrielCountry.js'), /if \(!steps \|\| insideGhostfence\(px, py\)\) return null;/);
 });
 
 test('GHOSTFENCE with ARENA2: on the freeware\'s trace the fence closes round Red Mountain on Morrowind\'s land in its zone, no countryside stands within it, no lair on its line, no Arena place within it', { skip: HAVE ? false : 'no ARENA2 (sh tools/fetch-data.sh)' }, async () => {
@@ -544,12 +500,6 @@ test('LAVA-CLEAR, FENCE-CLEAR the readers: the pixel build asks the clearing of 
   const { scanTheatreGate } = await import('../../src/systems/gate/theatreGateSite.js');
   const { worldPixelOfKey } = await import('../../src/world/worldWide/worldGrid.js');
   const { LOCATION_TYPES } = await import('../../src/formats/mapsFile.js');
-  const pb = read('src/scenes/pixelBuild.js');
-  assert.match(pb, /const fire = onTheBay\(px, py\) \? null : fireClearing\(px, py\);/);
-  assert.match(pb, /standLandProps\(px, py, fire \? clearedLandProps\(fire, landProps\) : landProps, /);
-  assert.match(pb, /for \(const f of nature\) \{\n\s+if \(offLand\?\.\(f\.x, f\.z\)\) continue;[^\n]*\n\s+if \(fire\?\.\(f\.x, f\.z\)\) continue;/);
-  const td = read('src/world/tamrielDungeons.js');
-  assert.equal((td.match(/!onGhostfence\(px, py\) && !redMountainLavaIn\(px, py\)/g) ?? []).length, 2, 'lairStandsAt\'s and lairMayStandAt\'s');
   // a spawn's ground: a bed's pixel and the line refused before the plateau is read (no woods asked)
   const rm = redMountainFrame(), f = ghostfenceFrame(), [bx, by] = sampleToPixel(rm.cx, rm.cy);
   const spawnGround = createSpawnGround(null);

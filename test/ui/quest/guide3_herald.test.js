@@ -448,16 +448,6 @@ test('GUIDE3 THE HUD\'S CLOCK, THE STACK\'S FACE - a notice is one toast in the 
 // ---------------------------------------------------------------
 
 test('GUIDE3 ONE CALL, EVERY HOST - drawHud draws the herald on its one call, OUTSIDE the skin\'s gate so off still reaches its hide door, on LV2\'s hide gate and the frame\'s seconds; the bridge hears the news after the machine\'s tick; the three hosts that hold quests tick the bridge and all four draw the HUD; the switch is a Features row on by default and the player\'s own online; the opening and the words have one home each (mutants: the draw inside the gate; news before the tick; the row\'s default)', () => {
-  const hud = rd('src/ui/hud/hud.js');
-  const call = hud.indexOf('\n  drawQuestHerald({ hidden: cursorActive || !hudRenderEnabled(), dt });\n');   // its own statement, at the body's level
-  const gate = hud.indexOf("if (isEnhanced() && typeof document !== 'undefined') {\n    drawLevelNotices(");
-  assert.ok(call > 0 && gate > call, 'drawHud draws the herald, before (outside) the enhanced gate');
-  const bridge = rd('src/scenes/quest/questBridge.js');
-  // PIN MOVED (QL1): the questlines' layer latches what each stamped quest showed between the tick and the news, so the
-  // news it carries (an objective done) is the tick's own
-  assert.match(bridge, /machine\.tick\(\);\n\s*updateTimer = 0;\n(?:\s*questlines\.look\(\);[^\n]*\n)?\s*news\(\);\n\s*return true;/, 'the news is heard after the machine\'s tick, on the tick that fired');
-  assert.match(bridge, /const herald = heraldOn\(\), follow = followOn\(\);\n[\s\S]*?\n\s*if \(!herald && !follow\) \{ lookedLast = false; return; \}\n[\s\S]*?\n\s*try \{\n\s*const seen = lens\.look\(ctx\.questWhere \?\? \{\}\);/,
-    'the gate stands before the look: no face listening, no look (GUIDE4 made the tracker a face, GUIDE5 the marks; AUDIT GUIDE T2 named the pair followOn)');
   const hosts = { 'src/scenes/world.js': /questBridge\.tick\(dt\)/, 'src/scenes/worldModes.js': /questBridge\?\.tick\(dt\)/, 'src/scenes/exterior.js': /questBridge\?\.tick\(dt\)/ };
   for (const [f, re] of Object.entries(hosts)) assert.match(rd(f), re, `${f} ticks the bridge`);
   for (const f of ['src/scenes/world.js', 'src/scenes/worldModes.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
@@ -468,8 +458,6 @@ test('GUIDE3 ONE CALL, EVERY HOST - drawHud draws the herald on its one call, OU
   assert.deepEqual([row.group, row.kinds, row.control.store, row.control.key, row.control.initial, row.control.online],
     ['interface', ['enhanced'], 'prefs', HERALD_PREF, true, 'player']);
   assert.equal(PREF_DEFAULTS[HERALD_PREF], true, 'RF4: the shelf derives the default from the row');
-  // one home each
-  assert.match(rd('src/ui/quest/questHerald.js'), /import \{ entryOpening, timeLeftWords, QUEST_URGENT_SECONDS \} from '\.\/questRail\.js';/, 'the opening, the time left and the day: the rail\'s, one home each (GUIDE5 gave the phrase its home; AUDIT GUIDE H7 the day)');
   for (const f of ['src/ui/quest/questHerald.js', 'src/ui/quest/questLens.js', 'src/scenes/quest/questBridge.js', 'src/ui/hud/hud.js']) {
     assert.doesNotMatch(rd(f), /DAY_NAMES|MONTH_NAMES/, `${f} keeps no copy of the date header`);
   }

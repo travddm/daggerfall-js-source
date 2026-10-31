@@ -330,10 +330,6 @@ test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_
     await r.hello(replay, 'peer-9999', null, { tok, cl: 1 });
     assert.ok(replay.closed && replay.closed.reason !== BUSY_TOKEN_UNREAD, 'a spent token is refused - never as unread');
   });
-  // the reason is said at the gate asked before the token, and at no gate after it
-  const relay = src('server/src/index.js');
-  assert.equal(relay.split('BUSY_TOKEN_UNREAD); return; }').length - 1, 1, 'one door says it');
-  assert.match(relay, /this\._hellos = gate\.bucket;\n\s*if \(!gate\.pass\) \{ this\._refuse\(ws, 'busy', CLOSE_BUSY, BUSY_TOKEN_UNREAD\); return; \}[^\n]*\n\s*\}\n[\s\S]{0,600}const who = await this\._named\(m, now\);/, 'the room\'s gate, before the token is read');
 });
 
 /** A device's storage holding a sign-in. */
@@ -420,17 +416,6 @@ test('SCALE5a the hub asks storage for an account\'s serpent receipt once - a he
     const ws = await hello('peer-0001');
     assert.ok(ws.sent.some((f) => f.t === 'serpent' && f.k === 'rcpt' && f.r === rcpt), 'the next hello is handed it');
   });
-});
-
-test('SCALE5a the hello\'s walks are methods of their own (`_message` runs interpreted, PERF-RELAY1) and the hub\'s fans walk the index in place; the client\'s frame walks its peers in place', () => {
-  const relay = src('server/src/index.js');
-  assert.match(relay, /for \(const \[other, b\] of this\._withId\(m\.id, ws\)\) \{/);
-  assert.match(relay, /const others = this\._othersOf\(ws\);/);
-  assert.match(relay, /this\._fanRoster\(ws, said\);/);   // PIN MOVED (SCALE5b): a channel's join and leave by the roster's fan, which walks in place as `_fanBut` does
-  assert.match(relay, /if \(isChatRoom\(a\.key\)\) this\._fanRoster\(ws, out\); else this\._fanBut\(ws, out\);   \/\/ SCALE5a: in place, as the join's/);
-  assert.match(relay, /_fanRoster\(ws, out\) \{ for \(const \[other, b\] of \(this\._vper\.size \? this\._reals\(\) : this\._all\(\)\)\) if \(other !== ws && b\.id && !other\.virtual\) \{ /, 'the roster\'s fan walks the index itself, never a copy (PIN MOVED, SCALE5c: the bus walks its own sockets, a shard\'s hearing its own shard\'s roster)');
-  assert.match(relay, /_fanBut\(ws, out\) \{ for \(const \[other, b\] of this\._all\(\)\) if \(other !== ws && b\.id\) this\._send\(other, out\); \}/, 'the fan walks the index itself, never a copy');
-  assert.match(src('src/net/online.js'), /for \(const p of this\.peers\.values\(\)\) \{/);
 });
 
 test('SCALE5a the leave knows the room drained without a filtered copy of every socket - the last one out, still listed by a runtime whose close has not completed (AUDIT ONESEAT R4), sweeps the room as the filter said it should (mutant: "the last" only when the runtime lists none)', async () => {

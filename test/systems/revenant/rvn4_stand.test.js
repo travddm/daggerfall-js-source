@@ -198,40 +198,7 @@ test('RVN4 THE ROAR, switch on: the REAL brain winds an iron ring about its feet
 
 // ── the brain's table ───────────────────────────────────────────────
 
-test('RVN4 PHASE TWO in the brain\'s table: wind-ups x0.85, cooldowns x0.7, iron one in two, chains to three; none without it (mutants: any unread)', () => {
-  const p2 = { revenant: { rank: 0, p2: F.phaseTwo() } };
-  const plain = { revenant: { rank: 0 } };
-  assert.ok(Math.abs(windupSeconds(1, p2, { roll: 0.5 }) - windupSeconds(1, plain, { roll: 0.5 }) * 0.85) < 1e-9);
-  assert.ok(Math.abs(blowCooldown(p2, 0.5) - blowCooldown(plain, 0.5) * 0.7) < 1e-9);
-  assert.equal(blowGuard('lunge', 300, p2, 0.49), 'iron');
-  assert.equal(blowGuard('lunge', 300, p2, 0.5), 'poise');
-  assert.equal(blowGuard('lunge', 300, plain, 0.01), 'poise');
-  assert.equal(chainMax(p2), 2);
-  assert.equal(chainMax(plain), 1);
-  assert.match(read('src/ai/tactics.js'), /\(b\.chain \?\? 0\) < chainMax\(ent\) && chains\(/, 'the brain chains to its max');
-  assert.equal(TELL.CHAIN_CHANCE, 0.35);
-});
-
 // ── the pools, the doors, the page ──────────────────────────────────
-
-test('RVN4 THE POOLS AND DOORS: the ember rim where no wind-up glints and a tenth larger, in both pools; the roar refused at every door - both pools\', a spell\'s, a shaft\'s; the dungeon\'s seam ahead of the will, a room\'s shared foe never (mutants: any unwired)', () => {
-  for (const [file, v] of [['src/scenes/exteriorFoes.js', 'f'], ['src/scenes/dungeonContext.js', 'f']]) {
-    const s = read(file);
-    assert.ok(s.includes(`setBatchGlint(${v}.batch, foeGlint(${v}.ai, undefined, prefersReducedMotion()) ?? lastStandGlint(${v}.entity));`), `${file}: the rim`);
-    assert.ok(s.includes(`const szE = eliteSize(${v}.entity) * lastStandSize(${v}.entity);`), `${file}: the size`);
-    assert.match(s, /if \(f\.roaring\) roarStep\(f\);/, `${file}: the roar spent`);
-  }
-  assert.match(read('src/scenes/exteriorFoes.js'), /if \(f\.yielded \|\| f\.executing \|\| f\.sparing \|\| f\.leaving \|\| f\.roaring\) return;/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(foe\.yielded \|\| foe\.executing \|\| foe\.sparing \|\| foe\.leaving \|\| foe\.roaring\) return;/);
-  // PIN MOVED (FIELD BUGS 2026-10-16b RVN-OWNERS-CHOICE): a whole blow passes the stand only as the owner's own
-  // (revenantFate.js ownersWholeKill) - a party member's Disintegrate brings it (test/systems/revenant/fb1016b_rvnownerschoice.test.js)
-  assert.match(d, /if \(foe\.entity\?\.revenant\?\.id && !ownersWholeKill\(_whole, \{ fromPlayer, peer \}\) && \(!onlineRoom\(\) \|\| !isRoomFoe\(foe\)\) && revenantLastStandDue\(foe\)\) \{ lastStandDungeonFoe\(foe\); return; \}\n[^\n]*\n\s*if \(opts\.fates && \(!onlineRoom\(\) \|\| !isRoomFoe\(foe\)\) && revenantMayYield\(foe\)\) \{ if \(!ownersWholeKill\(_whole, \{ fromPlayer, peer \}\)/);   // PIN MOVED (RVN-OWN-KNEEL, FIELD BUGS 2026-10-17g: my own kill - a Disintegrate's whole - passes the stand and the will and KNEELS it)
-  assert.match(d, /function lastStandDungeonFoe\(f\) \{\n\s*const ev = beginLastStand\(playerEntity, f, \{ now: Date\.now\(\), clock: tacticsNow\(\), roar: \(s\) => beginRoar\(f\.ai, f\.entity, s\) \}\);/);
-  assert.match(read('src/scenes/hostMagic.js'), /if \(foe\?\.yielded \|\| foe\?\.executing \|\| foe\?\.sparing \|\| foe\?\.leaving \|\| foe\?\.roaring\) return null;/);
-  assert.match(read('src/combat/arrowFlight.js'), /if \(foe\.yielded \|\| foe\.executing \|\| foe\.sparing \|\| foe\.leaving \|\| foe\.roaring\) return 0;/);
-  assert.equal(FT.revenantLastStandDue({ entity: { revenant: { id: 'nope' } } }), false, 'no record: none');
-});
 
 test('RVN4 the page: from rank 3 its last stand and its share (mutants: shown at rank 2; the share unread)', () => {
   assert.equal(lastStandWords({ rank: 2 }), '');

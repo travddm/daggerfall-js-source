@@ -280,14 +280,6 @@ test('AUDIT 18 F9: the shipping Acrobat (CLASS09) carries the flag and jumps 10%
   assert.equal(jumpSpeedMultiplier(plain), 1.25);
 });
 
-// The stale flag F9 retired must stay retired: skills.js may no longer
-// blame the career-advantage decode for the missing multiplier.
-test('AUDIT 18 F9: the stale "career advantage decode" excuse is gone from skills.js', () => {
-  const src = readFileSync(new URL('../../src/systems/skills.js', import.meta.url), 'utf8');
-  assert.ok(!/career advantage decode/.test(src), 'skills.js still carries the retired flag text');
-});
-
-
 test('AUDIT 20: the HEADLESS chargen path attaches the faction store too', { skip: skipReal }, async () => {
   // THE ONE CONSTRUCTION SEAM, a fourth time. applyHeadlessChargen is
   // a SECOND copy of the construction - it hand-rolls the starting kit

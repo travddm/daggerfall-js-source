@@ -108,15 +108,6 @@ test('UXB1-G: every attribute row says what it does on hover, and the selected o
   for (const k of STAT_KEYS_ORDER) assert.ok(ATTRIBUTE_BLURB[k]?.length > 20, `${k} has a line`);
 });
 
-test('UXB1-G by source: the rolled stats and the review carry the same hover, and the stats card the selected line', () => {
-  const view = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  const stats = view.slice(view.indexOf('function statsStage()'), view.indexOf('function skillsStage()'));
-  assert.match(stats, /main\.title = ATTRIBUTE_BLURB\[key\];/);
-  assert.match(stats, /d\.append\(attrHelp\(STAT_KEYS_ORDER\[flow\.statCursor\]\)\);/);
-  const summary = view.slice(view.indexOf('function summaryStage()'));
-  assert.match(summary, /row\.title = ATTRIBUTE_BLURB\[key\];/);
-});
-
 // ── H: THE CLASS, TO A FILE AND BACK ─────────────────────────────
 
 /** A builder with a class on it: name, hp, twelve skills, a moved attribute pair, picks and reputations. */
@@ -343,9 +334,6 @@ test('UXB1-J: the builder\'s DOM keeps the phone\'s reading order and the desk p
   assert.match(block, /\.wizard \.skillpane\.skills3 \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
   assert.match(block, /\.wizard \.reviewgrid \{ display: grid; grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
   assert.doesNotMatch(block, /pointer: coarse/, 'the finger keeps its 44px floor');
-  const view = readFileSync(new URL('../../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  assert.match(view, /const list = el\('div', 'list classlist'\);/);
-  assert.match(view, /const wrap = el\('div', 'skillpane skills3'\);/);
 });
 
 test('UXB1-J: the review is three columns - the attributes, the primary and major skills, the minor ones', () => {

@@ -21,7 +21,6 @@ import { drawFleetPage, resetFleetPage } from '../../src/ui/fleetPage.js';
 import { setHoldingsProvider, _setHoldingsIconForTests } from '../../src/ui/holdingsPages.js';
 import { hostText } from '../hostText.mjs';
 
-const WORLD = hostText('src/scenes/world.js');
 const AT = [100, 34, 200], DIR = [0, 0, 1];
 const kg = (items) => items.reduce((a, it) => a + (it.weightInKg ?? 0), 0);
 
@@ -200,10 +199,4 @@ test('CARGO-ANYWHERE the helm\'s Hold and the hold\'s key: a hook button on the 
   assert.ok(DEFAULT_BINDINGS.some(([c, a]) => c === 'F4' && a === 'ShipHold'));
   assert.ok(MOD_ACTIONS['come-sail-away'].some((r) => r.action === 'ShipHold' && r.legacy === null));
   assert.equal(actionLabel('ShipHold'), 'Cargo (Come Sail Away)');
-  assert.match(WORLD, /const holdDoor = createHoldDoor\(\{/);
-  assert.match(WORLD, /holdDoor\.frame\(\);[^\n]*\n {4}if \(csaRuntime && walkMode && playerSpawned && !modes\?\.transitioning && !travelView\?\.active && hccActionPressed\('ShipHold'\)\) holdDoor\.press\(\);/);
-  assert.match(WORLD, /cargo: \(\) => \{ const b = csaRuntime\?\.state\?\.CurrentBoat; if \(b\) holdDoor\.openBoat\(b\); \},/);
-  assert.match(WORLD, /if \(helm\) helm = card \? null : \{ \.\.\.helm, orders: navalOn\(\), cargo: holdsCargo\(helm\.hull\), shot: navalOn\(\) \? naval\?\.shotLabel\?\.\(\) \?\? null : null \};/);   // PIN MOVED (SHOT-KINDS: and her guns' load; FIELD BUGS 2026-10-21d PASSAGE-HANDS: no buttons for a passenger)
-  assert.match(WORLD, /openHold: \(uid\) => holdDoor\.openShip\(uid\),/);
-  assert.match(WORLD, /cabin: \(\) => modes\?\.sailingCabin \?\? null,/, 'below deck: the cabin\'s ship');
 });

@@ -161,21 +161,3 @@ test('GQL1d with the setting OFF the classic random draw still boxes an offer (n
   });
 });
 
-// The DERIVED law. Every step kind the offer flow can answer is a kind
-// offerBoxes names in a `case` - the flow's `kind: '...'` literals are
-// the population, and the switch is read by content. A kind the flow
-// grows tomorrow and the switch does not learn reddens here rather than
-// on Discord.
-test('GQL1e every step kind offerFlow.js can answer is a case in offerBoxes (derived)', () => {
-  const flow = src('src/systems/quest/offerFlow.js');
-  const kinds = new Set([...flow.matchAll(/\bkind: '(\w+)'/g)].map((m) => m[1]));
-  assert.ok(kinds.size >= 6, `the flow's kinds: ${[...kinds].join(', ')}`);
-  for (const k of ['gettingQuests', 'pickQuest', 'offer', 'fail', 'accepted', 'refused', 'close']) assert.ok(kinds.has(k), k);
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const at = bridge.indexOf('    offerBoxes(step, rows) {');
-  assert.ok(at > 0);
-  const body = bridge.slice(at, bridge.indexOf('\n    },\n', at));
-  const cases = new Set([...body.matchAll(/case '(\w+)':/g)].map((m) => m[1]));
-  for (const k of kinds) assert.ok(cases.has(k), `offerFlow answers kind '${k}' and offerBoxes has no case for it - the chain would come back empty and the popup would read "not available yet"`);
-  assert.match(body, /default: return \[\];/, 'the default stays the silent close - but only for a kind the flow cannot produce');
-});

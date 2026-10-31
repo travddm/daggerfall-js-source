@@ -248,15 +248,3 @@ test('a12 rig: bindWorn:false rigs flip the hand without losing their scripted w
   assert.equal(r.playerWeapon.weapon, LONG_BOW, 'the scripted weapon survives the switch');
 });
 
-test('a12: the mirrored FPSWeapon draw was ALREADY ported - the handedness pin, not a second one', () => {
-  // AUDIT 28 W13 landed FlipHorizontal (Controls/Handedness == 1,
-  // StartGameBehaviour.cs:269) and it is NOT the hand toggle: DFU's
-  // only writer of that field is the SETTING, and FPSWeapon mirrors
-  // just the three symmetric states either way. This pin holds the
-  // two apart so nobody wires the flip to usingRightHand.
-  const fps = readFileSync(join(ROOT, 'src', 'combat', 'fpsWeapon.js'), 'utf8');
-  assert.match(fps, /flipHorizontal = getInt\('Controls', 'Handedness', 0, 3\) === 1/);
-  assert.match(fps, /FLIP_STATES = Object\.freeze\(\['Idle', 'StrikeDown', 'StrikeUp'\]\)/);
-  const pw = readFileSync(join(ROOT, 'src', 'combat', 'playerWeapon.js'), 'utf8');
-  assert.ok(!/flipHorizontal/i.test(pw), 'the hand law never touches the draw mirror');
-});

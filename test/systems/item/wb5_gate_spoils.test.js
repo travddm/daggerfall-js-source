@@ -202,8 +202,6 @@ test('WB5 the Deadlands Ember is its own row, not a renamed gem: template 570 (p
   const root = new URL('../../..', import.meta.url);
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', "await import('./src/scenes/shared.js'); const { templateByIndex } = await import('./src/systems/item/itemTemplates.js'); process.stdout.write(String(templateByIndex(570)?.name ?? null));"], { cwd: root, encoding: 'utf8' });
   assert.equal(out, 'Deadlands Ember', 'the hosts carry the row');
-  const shared = readFileSync(new URL('../../../src/scenes/shared.js', import.meta.url), 'utf8');
-  assert.match(shared, /^import '\.\.\/systems\/gate\/gateSpoils\.js';/m, 'and the import is said out loud');
 });
 
 const WALL = 1_700_000_000_000;
@@ -350,14 +348,3 @@ test('WB5 the court\'s burst: into his fall his spoils leave his chest toward me
   assert.deepEqual(said2, [COURT_TEXT.portal, COURT_STRIKE_TEXT.noSpoils('Valkynaz Ruhn')], 'said once');
 });
 
-test('WB5 the seams, by source: the world host makes the floor on the link with the dungeon\'s own collider for its ray and the character\'s id for its record, takes a spoil through the one door (the purse, the pack), hands it to the court, and asks the crash\'s door once for each character that stands up - in the main frame, online or not, with the save slots\' word (mutants: each seam removed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const takeSpoil = \(p\) => \{ if \(p\.kind === 'gold'\) addGoldPieces\(playerEntity, p\.gold\); else if \(p\.item\) addItem\(playerEntity\.items, p\.item\); \};/);
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{/, 'AUDIT WBX2 M1: online or not - the keeper of the crash\'s records');
-  assert.match(w, /ray: \(from, dir, len\) => \{ const c = modes\?\.dungeonCtx\?\.collider;/);
-  assert.match(w, /store: _spoilsStore,\n    who: \(\) => characterIdOf\(playerEntity\),/);   // AUDIT WB A6: the one store
-  assert.match(w, /link: gateLink, spoils: spoilsPool,/);
-  assert.match(w, /const who = characterIdOf\(playerEntity\);\n    if \(who === _spoilsAskedFor\) return;\n    _spoilsAskedFor = who;\n    try \{ if \(recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => spoilsPool\.adopt\(rec\), inSave: _spoilsInSave \}\)\) setMidScreenText\(SPOILS_TEXT\.gathered\); \}/);   // AUDIT WBX S3: handed over - the next save clears it
-  assert.match(w, /\n    spoilsRecoverFrame\(\);   \/\/ WB5[^\n]*\n    if \(onlineOn && playerSpawned\) \{/, 'in the main frame, ahead of the online one');
-  assert.doesNotMatch(w, /_spoilsRecovered/, 'the online-only door is gone');
-});

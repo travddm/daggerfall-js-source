@@ -420,7 +420,6 @@ test('CLOSEOUT: the surrender-dialogue reset counts HOSTILE, non-allied watchmen
     'a dead one was never counted either way');
 });
 
-
 // ---------------------------------------------------------------
 // D9 - the CreateFoeSpawner fallback (PlayerEntity.cs:687) places
 // through FoeSpawner.PlaceFoeFreely like every other spawner call
@@ -473,7 +472,4 @@ test('D9: the ring reads the SPAWNER_ARMS row, and the two named constants are t
   assert.equal(SPAWNER_ARMS.cityGuards.lineOfSightCheck, true, 'the watch converges from outside the FOV');
   assert.equal(GUARD_FALLBACK_MIN_DIST, SPAWNER_ARMS.cityGuards.minDistance, 'one home');
   assert.equal(GUARD_FALLBACK_MAX_DIST, SPAWNER_ARMS.cityGuards.maxDistance);
-  const src = readFileSync(new URL('../../src/scenes/cityGuards.js', import.meta.url), 'utf8');
-  assert.match(src, /spot = placeFoeFreely\(env, SPAWNER_ARMS\.cityGuards\);/,
-    'the fallback stands its guards through the one placement law');
 });

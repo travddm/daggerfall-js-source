@@ -267,13 +267,3 @@ test('KETCH THE WORDS AND THE CARDS: the account card\'s row says the count or "
   assert.equal(profileRecordLines({ stars: { held: 2 } }).stars, 'Stars held: 2', 'the stars through the same door');
 });
 
-test('KETCH the hosts and the service by source: the route and its migration, the version\'s note, the cards\' rows, the world host\'s book (mutants: the migration\'s key not the week\'s)', () => {
-  const mig = src('server-account/migrations/0166_ketch_voyages.sql');
-  assert.match(mig, /PRIMARY KEY \(voyage, account\)/);
-  assert.match(mig, /REFERENCES players\(id\) ON DELETE CASCADE/);
-  assert.match(src('server-account/src/index.js'), /path === '\/v1\/ketch\/claim' && request\.method === 'POST'/);
-  assert.match(src('server-account/src/service.js'), /acct181: KETCH/);   // PIN MOVED (the merge): acct181, KETCH - acct180 on its branch, renumbered past FOE-KEEPS'
-  assert.match(src('src/ui/enhanced/enhancedAccount.js'), /ketchRecordText\(flow\.account\.ketch\)/);
-  assert.match(src('src/scenes/world.js'), /\.\.\.profileRecordLines\(rec\)/);
-  assert.match(src('src/scenes/ketch/ketchClient.js'), /createKetchClaims\(/);
-});

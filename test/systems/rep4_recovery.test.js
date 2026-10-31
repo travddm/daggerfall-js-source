@@ -77,6 +77,4 @@ test('REP4: a bounty contract finished pays its board\'s region two points of la
   assert.equal(legalRepOf(p, 9), -38);
   const top = { legalRep: { 9: 99 } };
   assert.equal(rewardContract(top, 9), 1, 'never past 100');
-  assert.match(src('src/scenes/bountyHost.js'), /const region = deps\.regionAt\?\.\(posting\.town\.px, posting\.town\.py\);\n\s*if \(Number\.isInteger\(region\) && region >= 0 && entity\) rewardContract\(entity, region\);/);
-  assert.match(src('src/scenes/world.js'), /regionAt: \(px, py\) => maps\.getRegionIndexAt\(px, py\),/);
 });

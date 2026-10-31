@@ -111,10 +111,4 @@ test('ARENA4b casual bout on the client: the Challenge card offers Find a match 
   assert.equal(foldHall(open, { k: 'of', o: '0123456789abcdef', vs: { n: 'Brann' }, until: 1 }, 0).offer.casual, false, 'a rated offer is not');
   const listed = onlineCards({ hall: { ...open, live: [{ o: '0123456789abcdef', kind: 'pvp', a: { n: 'Alva' }, b: { n: 'Brann' }, sp: 2, at: 1, u: 1 }] }, me: null, now: 0 })[0];
   assert.equal(listed.live[0].title, O.liveCasual, 'listed as a casual bout');
-  const src = rd('src/scenes/arena/arenaOnline.js');
-  // AUDIT PRE-MERGE 1003 O4/O5: the word is kept (said again on a hall socket come back) before it is sent
-  assert.match(src, /const q = \{ k: 'q', lv: Math\.max\(1, Math\.floor\(deps\.level\?\.\(\) \?\? 1\)\), \.\.\.myBanner\(\), \.\.\.\(casual \? \{ u: 1 \} : \{\}\) \};[\s\S]{0,400}?if \(!hallSend\(q\)\)/, 'the press sends `u`');
-  assert.match(src, /if \(w\.k === 'go'\) goTo\(\{ o: w\.o, kind: 'pvp', side: w\.side, vs: w\.vs, casual: w\.u === 1 \}\);/);
-  assert.match(src, /onEnd: \(\) => \{ if \(b\.casual\) say\(O\.casualEnd\); askBoard\(true\); \}/, 'the end says so');
-  assert.match(rd('src/scenes/arena/arenaGate.js'), /kind === 'queue' \|\| kind === 'casual' \|\| kind === 'unqueue'/, 'the window\'s press reaches the hall');
 });

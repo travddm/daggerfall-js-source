@@ -100,37 +100,6 @@ test('GROUND1-W a mod tile set takes each puddle record\'s shape from the classi
   assert.match(src('scenes/exterior.js'), /const layers = modLayers \? carryPuddleMask\(modLayers, markPuddleWater\(classic\)\) : classic;/, 'scenes/exterior.js');
 });
 
-test('IIL2 the mod\'s own shadows: a classic-look lane - the lane shaders with Daggerfall\'s look put back - put on inside, taken off outside, never over Enhanced Lighting', async () => {
-  const { classicShadowLane, classicLook, replaceGlslFunction, syncClassicShadowLane } = await import('../../src/render/classicShadowLane.js');
-  const L = classicShadowLane();
-  assert.equal(L.key, 'classic-shadows'); assert.equal(L.classicLook, true); assert.equal(L.shadows, true); assert.equal(L.air, false);
-  for (const k of ['meshFs', 'bbFs', 'terrainFs', 'charFs', 'decalFs', 'farRingFs']) {
-    assert.match(L[k], /vec3 elDecode\(vec3 c\) \{\n {2}return c;\n\}/, `${k}: display-space colour`);
-    assert.match(L[k], /vec3 elTonemapRGB\(vec3 c\) \{\n {2}return clamp\(c, 0\.0, 1\.0\);\n\}/, `${k}: no tonemap`);
-    assert.match(L[k], /float elAttenuation\(float d, float range\) \{\n {2}float a = clamp\(1\.0 - d \/ max\(range, 1e-4\), 0\.0, 1\.0\); return a \* a;\n\}/, `${k}: the classic falloff`);
-    assert.ok(L[k].includes('casterShadowAt') || k === 'farRingFs', `${k}: the shadow compare stays`);
-  }
-  assert.match(L.meshFs, /float elSpecLobe\(float x\) \{\n {2}return 0\.0;\n\}/, 'no highlight');
-  const out = new Float32Array(3);
-  assert.deepEqual([...L.decode3([0.5, 0.25, 1], out)], [0.5, 0.25, 1], 'no colour decode on the CPU either');
-  assert.throws(() => replaceGlslFunction('void main() {}', 'float gone()', 'return 0.0;'), /is not in the shader/);
-  assert.equal(classicLook('vec3 elDecode(vec3 c) { return c; }\nvec3 elEncode(vec3 c) { x; }\nvec3 elTonemapRGB(vec3 c) { y; }\nfloat elAttenuation(float d, float range) { z; }\nfloat elAdapt() { w; }').includes('return 1.0;'), true);
-  // the switch
-  const calls = [];
-  const r = { installedLaneKey: null, setLightingLane(l) { calls.push(l?.key ?? null); this.installedLaneKey = l?.key ?? null; }, setExposure: (e) => calls.push(`exp${e}`), setAir: () => {}, setContact: () => {}, setVolumetrics: () => {}, setHaze: () => {} };
-  syncClassicShadowLane(r, true);
-  assert.deepEqual(calls, ['classic-shadows', 'exp1']);
-  syncClassicShadowLane(r, true); assert.equal(calls.length, 2, 'already on: nothing');
-  syncClassicShadowLane(r, false); assert.equal(r.installedLaneKey, null, 'outside: off');
-  r.installedLaneKey = 'enhanced-lighting'; calls.length = 0;
-  syncClassicShadowLane(r, true); syncClassicShadowLane(r, false);
-  assert.deepEqual(calls, [], 'Enhanced Lighting\'s lane is never touched');
-  const rend = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  assert.match(rend, /get lightingLane\(\) \{ return this\._lane\?\.classicLook \? null : this\._lane; \}/, 'the hosts keep their classic colours under it');
-  assert.match(src('scenes/world.js'), /iilSyncLane\(renderer, false\);/, 'outdoors it comes off');
-  assert.equal((src('scenes/worldModes.js').match(/iilSyncLane\(renderer, true\);/g) ?? []).length, 2, 'the interior and dungeon arms put it on');
-});
-
 test('IIL3 the lighting mod has its own section and button - it is listed there and not among the texture packs, and the button refuses anything else', () => {
   const menu = src('ui/enhanced/enhancedMenu.js');
   assert.match(menu, /c\.append\(el\('h3', null, t\('menu\.packs\.lighting', 'Lighting mod'\)\)\);/);

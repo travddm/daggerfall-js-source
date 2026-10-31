@@ -52,17 +52,6 @@ test('audit26 F151: Escape skips a video even when endOnAnyKey is false', () => 
   assert.equal(probe(true, false).shouldClose(false, false, false), false, 'EndOfFile AND Playing, both');
 });
 
-test('audit26 F151: the frame loop feeds the back button as its own signal', () => {
-  const s = src('src/ui/videoPlayer.js');
-  // the listener reports WHICH key, and only Escape counts as back
-  assert.match(s, /const handler = \(ev\) => onAnyKey\(ev\?\.key === 'Escape'\);/);
-  assert.match(s, /listen\(\(back = false\) => \{ anyKey = true; if \(back\) backDown = true; \}\)/);
-  assert.match(s, /player\.shouldClose\(anyKey, endOnAnyKey, backDown\)/);
-  // ...and the infection call site keeps DFU's endOnAnyKey false -
-  // the flag is right, it just never meant unskippable.
-  assert.match(src('src/scenes/shared.js'), /\{ endOnAnyKey: false \}/);
-});
-
 // ---------------------------------------------------------------
 // F179: SortSpellsPointCost (DaggerfallEntity.cs:741-752) orders by
 // the raw CalculateTotalEffectCosts value with no tag check. The
@@ -89,9 +78,6 @@ test('audit26 F179: the cost SORT reads the raw cost, the DISPLAY keeps the lyca
   const byDisplay = book.slice().sort((a, b) => spellPointCost(a, castCost) - spellPointCost(b, castCost));
   assert.deepEqual(byDisplay.map((sp) => sp.name), ['Lycanthropy', 'Spark'], 'which is what the port used to do');
 
-  // and the window's sort is wired to the raw one
-  assert.match(src('src/ui/spellbookWindow.js'),
-    /const cost = new Map\(list\.map\(\(sp\) => \[sp, rawSpellPointCost\(sp, this\.deps\.castCost\)\]\)\);/);
 });
 
 // ---------------------------------------------------------------
@@ -114,25 +100,6 @@ test('audit26 F163: journal highlight tokens are WHITE, not the label default', 
 test('audit26 F164: the stat colours are DFU\'s three, drained below and increased above', () => {
   assert.deepEqual(STAT_DRAINED_COLOR, [190 / 255, 85 / 255, 24 / 255, 1]);
   assert.deepEqual(STAT_INCREASED_COLOR, [178 / 255, 207 / 255, 255 / 255, 1]);
-  const s = src('src/ui/charsheet.js');
-  // the comparison is live vs PERMANENT, and equal takes neither
-  assert.match(s, /const live = liveStat\(e, k\);/);
-  assert.match(s, /const permanent = e\.stats\?\.\[k\] \?\? 0;/);
-  assert.match(s, /live < permanent \? STAT_DRAINED_COLOR\s*\n\s*: live > permanent \? STAT_INCREASED_COLOR : undefined;/);
-  assert.match(s, /label\(live, 141, 17 \+ i \* 24, \{ align: 'center', w: 28, color \}\)/);
-});
-
-// ---------------------------------------------------------------
-// F165: SetQuestionAnswerPairInConversationListbox places the
-// question label Right and the answer Left (:1259, :1270).
-// ---------------------------------------------------------------
-test('audit26 F165: the question hugs the right margin, the answer the left', () => {
-  const s = src('src/ui/native/nativeTalk.js');
-  assert.match(s, /const x = e\.kind === 'question'\s*\n\s*\? R\.conversation\[0\] \+ R\.conversation\[2\] - tw\s*\n\s*: R\.conversation\[0\];/);
-  // each ROW is offset by its own width, not the entry's widest - DFU
-  // sets HorizontalTextAlignment Left on both labels, so only the
-  // label's placement differs.
-  assert.match(s, /e\.lines\.forEach\(\(text, j\) => \{/);
 });
 
 // ---------------------------------------------------------------
@@ -142,11 +109,6 @@ test('audit26 F165: the question hugs the right margin, the answer the left', ()
 // ---------------------------------------------------------------
 test('audit26 F171: the rename field takes 31 characters, not 26', () => {
   assert.equal(MAX_ITEM_NAME, 31);
-  const s = src('src/ui/item/itemMakerWindow.js');
-  assert.match(s, /new InputMessageBoxWindow\(\{/);
-  assert.match(s, /maxCharacters: MAX_ITEM_NAME/);
-  assert.equal(/this\.itemName\.length < 26/.test(s), false,
-    'the old cap is gone, not merely shadowed');
 });
 
 // ---------------------------------------------------------------

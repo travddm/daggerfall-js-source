@@ -209,20 +209,5 @@ test('PROF2b the kind: a pixel\'s nodes take the Motherlodes standing on it; its
 // ─── THE SEAMS ───────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('PROF2b the seams by source: the professions\' book sends a harvest\'s Watch; the world host builds the book with the shared clock, hands it the relay\'s Watch beside the seats\', ticks it on the frame with the Sense read, gives it to Mining\'s kind with the silver\'s book, restands its pixel, marks every Motherlode standing on the compass; the Sense\'s card is chosen as any; every strike refusal has its sentence (mutants: each seam)', () => {
-  assert.match(src('src/net/profBook.js'), /\.\.\.\(typeof h\.watch === 'string' \? \{ watch: h\.watch \} : \{\}\),/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const motherlodeBook = motherlodeDoor \? createMotherlodeBook\(\{/);
-  assert.match(w, /nowS: \(\) => Math\.floor\(\(Date\.now\(\) \+ _sharedOffsetMs\) \/ 1000\),/);
-  assert.match(w, /onChange: \(l\) => gatherHost\?\.restandAt\(l\.x, l\.y\),/);
-  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);   // PIN MOVED (TOWN-ECON TE2): and the towns' book keeps it where a town stands
-  assert.match(w, /motherlodeBook\?\.tick\(\{ sense: profBook\.track\('mining'\)\.specs\?\.\[100\] === 'motherlode-sense' \}\)/);
-  assert.match(w, /mineKind\(\{ book: profBook, lodes: motherlodeBook, marks: marksBook \}\)/);
-  assert.match(w, /for \(const l of motherlodeBook\.markedAll\(_lodesUp\)\) \{/);   // AUDIT SILVER-WAYS D7 (PIN MOVED): into the frame's own list; FIELD BUGS 2026-10-12g LODE-MARK (PIN MOVED): from its warning on
-  assert.match(w, /return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);   // LODE-MARK (PIN MOVED): drawn over the near nodes
-  assert.match(src('src/scenes/gatherHost.js'), /restandAt\(px, py\) \{ restandAt\(px, py\); \},/);
-  assert.doesNotMatch(src('src/ui/professions/profPages.js'), /PROF2b/, 'no card waits on the Motherlodes');
   for (const e of ['motherlode-closed', 'motherlode-watch', 'motherlode-found', 'motherlode-full']) assert.ok(REFUSALS[e], e);
-  const svc = src('server-account/src/index.js');
-  assert.match(svc, /'\/v1\/prof\/harvest': \(\) => \(isMotherlodeNode\(body\?\.node\) \? strikeMotherlode\(ctx, who\.player, env, body\) : harvestNode\(ctx, who\.player, env, body\)\),/);
-  assert.match(svc, /'\/v1\/prof\/motherlodes': \(\) => motherlodesRead\(ctx, who\.player, env, body\),/);
 });

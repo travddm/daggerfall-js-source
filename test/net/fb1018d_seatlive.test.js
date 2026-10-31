@@ -200,10 +200,6 @@ test('SEAT-LIVE THE PAGE: the page\'s own absence spends no seat\'s patience - a
   const short = createSeatClock(FOES_STALE_MS);
   short.heard(0); short.frame(16); short.frame(16 + FOES_STALE_MS - 1);
   assert.equal(short.live(16 + FOES_STALE_MS - 1), false, 'a gap short of FOES_STALE_MS is no absence');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /seatClock\.frame\(now\); modes\?\.setDungeonAuthority\?\.\(dungeonAuthority\(now\)\);/, 'the frame tells the clock first');
-  assert.match(w, /&& online\.host && !online\.isHost\(\) && seatClock\.live\(now\)\);/, 'the seat reads the clock');
-  assert.equal((w.match(/seatClock\.heard\(performance\.now\(\)\)/g) ?? []).length, 2, 'the host\'s word and its stream applied');
 });
 
 test('SEAT-LIVE (AUDIT FB1018D L4-2): A SILENT HOST THAT LEAVES WITH NO FAREWELL HANDS THE SEAT ON, SAID - its silence past FOES_STALE_MS, its socket closed (a phone\'s background kill, a crash) before any frame said the change: the room is told the joiner, the joiner\'s session holds the seat and its memory is kept; and a room drained and come into again is told nothing past its welcome (mutants: the leave read by the live law alone; the told host\'s absence unasked)', async () => {

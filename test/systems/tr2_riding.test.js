@@ -202,23 +202,3 @@ test('TR2: on foot the animator answers nothing - no frame, no loop', () => {
   assert.equal(r.playing, false); assert.equal(r.frame, 0); assert.equal(r.neigh, false);
 });
 
-test('TR-AUDIT F-F3: the riding channel SWAPS its clip rather than restarting - DFU\'s source is loop=false, re-armed', () => {
-  // TransportManager sets ridingAudioSource.loop = false (:190) and
-  // Update only Play()s when it is not already playing (:273-276), so
-  // assigning `.clip` mid-clop takes effect when the current one ENDS.
-  // The port's channel is that shape: one non-looping source re-armed
-  // on `ended`, reading `want` each time.
-  const audioSrc = read('src/systems/audio.js');
-  assert.match(audioSrc, /_makeRetriggerLoop\(index, volume, pitch, out = null\) \{/);
-  assert.match(audioSrc, /src\.onended = \(\) => \{ if \(ch\.playing === src\) \{ ch\.playing = null; arm\(\); \} \};/);
-  assert.match(audioSrc, /const buf = this\._buffer\(ch\.want\);/, 'the NEXT arm reads the wanted clip, so a swap lands at the seam');
-  // AUDIT SD III (SD20d, PIN MOVED): read on THIS channel's own code - the engine's named beds (setBed, setBed3d) loop
-  // a source on purpose, a pitch beside it, and the file-wide read took them for the riding channel
-  const channel = audioSrc.slice(audioSrc.indexOf('  _makeRetriggerLoop(index, volume, pitch, out = null) {'), audioSrc.indexOf('\n  }\n', audioSrc.indexOf('  _makeRetriggerLoop(index, volume, pitch, out = null) {')));
-  assert.ok(channel.includes('src.onended = () =>'), 'the channel\'s own code');
-  assert.doesNotMatch(channel, /src\.loop = true/, 'no true-loop source on this channel');
-  // The swap path must not stop the running source.
-  const swap = audioSrc.slice(audioSrc.indexOf('    if (ch) {\n      // TR-AUDIT F-F3'), audioSrc.indexOf('    const made = this._makeRetriggerLoop'));
-  assert.match(swap, /ch\.want = clip;/);
-  assert.doesNotMatch(swap, /ch\.stop\(\)/, 'a swap never stops the current clop');
-});

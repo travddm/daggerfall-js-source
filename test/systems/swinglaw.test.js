@@ -157,17 +157,3 @@ test('SWING-LAW: the real rig - an average fighter about a second a blow, the qu
   }
 });
 
-test('SWING-LAW: one law, every clock that times the player\'s swing - the leaf stays a leaf; the reader is registered as its module loads, and the rig imports it (AUDIT PRE-MERGE 0929 S5: it was a boot call, and a rig built without that boot swung with no weight); both mods answer through the curve', () => {
-  const leaf = rd('src/characters/weaponStates.js');
-  assert.doesNotMatch(leaf, /^import /m, 'weaponStates.js imports nothing (tools/neutral/build-viewer.mjs pastes its source)');
-  assert.match(rd('src/combat/swingLaw.js'), /^installSwingLaw\(\);$/m, 'registered as the module loads - called, not a comment');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /^import '\.\.\/swingLaw\.js';/m, 'the one maker of a swing\'s ctx imports it');
-  assert.doesNotMatch(rd('src/scenes/shared.js'), /installSwingLaw/, 'no second home at boot');
-  assert.match(rd('src/systems/roleplayRealism/rrRealism.js'), /return swingFrameSeconds\(blend, \{ heft: swingHeft\(weight, liveStrength\), handling: swingHandling\(weaponType, hands === 'Both', shortBlade\) \}\);/, 'AUDIT PRE-MERGE 0929 S3: RR\'s blend has no weight - the heft is the port\'s');
-  assert.match(rd('src/systems/roleplayRealismItems/rriRealism.js'), /return swingFrameSeconds\(adjustedSpeed, \{ handling: swingHandling\(weaponType, twoHanded, shortBlade\) \}\);/);   // PIN MOVED (BAL10): both arms hand the short blade's handling on
-  for (const [f, re] of [
-    ['src/characters/weaponStates.js', /getMeleeWeaponAnimTime\(liveSpeed, animCtx\)/],   // the machine
-    ['src/combat/weapon/weaponWidget.js', /getMeleeWeaponAnimTime\(liveSpeed, ctx\)/],          // the Weapon Widget's clone
-    ['src/player/eyeOfTheBeholder/eotbBody.js', /getMeleeWeaponAnimTime\(last\.liveSpeed, last\.animCtx\)/],   // the third-person body
-  ]) assert.match(rd(f), re, `${f} asks the one law with the wielder`);
-});

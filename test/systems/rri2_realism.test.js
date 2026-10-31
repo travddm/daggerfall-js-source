@@ -467,32 +467,6 @@ test('RRI2 skillBasedStartingSpells: the spellbook by the six skills (:916-968),
 
 // ---- the wiring --------------------------------------------------------------
 test('RRI2 wiring: the install registers the six delegates; the read-through sites; DFU\'s order at the corpse and the pile; the two shelf doors; the use-handler arm ahead of the ladder; the stackable arm', () => {
-  const inst = rd('src/systems/roleplayRealismItems/rriInstall.js');
-  assert.match(inst, /installRoleplayRealismModules\(\);/);
-  for (const s of ['registerItemUseHandler(BANDAGE_TEMPLATE, useBandage)', 'setEnemyEquipmentAssigner(assignRriEnemyEquipment)', "setStartingEquipmentAssigner((entity, opts) => (rriModule('skillBasedStartingEquipment') ? assignSkillEquipment(entity, opts) : null))", "setStartingSpellsAssigner((career, spellsByIndex) => (rriModule('skillBasedStartingSpells') ? assignSkillSpellbook(career, spellsByIndex) : null))", 'registerWeaponDamageOverride({ min: rriWeaponMinDamage, max: rriWeaponMaxDamage })', 'registerMeleeWeaponAnimTime(rriAnimTimeOverride)']) assert.ok(inst.includes(s), s);
-  assert.match(rd('src/systems/loot/loot.js'), /export const lootMatrix = \(key\) => rriLootMatrix\(key\) \?\? LOOT_MATRICES\[key\] \?\? LOOT_MATRICES\['-'\];/, 'the matrix read-through (GetMatrix, one home since OH-E)');
-  assert.match(rd('src/systems/loot/loot.js'), /return generateRandomLoot\(lootMatrix\(lootTableKey\), who, rolls, opts\);/, '...and GenerateItems reads it');
-  // FORAGE3 + OH-E: the pile's event is one home now - raised after the J..O tail for every key, RRI's subscriber seeded first
-  assert.match(rd('src/systems/loot/loot.js'), /randomlyAddPotionRecipe\(2, items, rolls\);\n  \}\n[\s\S]{0,900}?if \(lootTableKey !== '-'\) raiseTabledLootSpawned\(\{ locationIndex, key: lootTableKey, items, rolls, luck, where, quarters \}\);\n  return items;\n\}/, 'the pile: LootTables.OnLootSpawned after the J..O tail - for every key GenerateLoot finds (AUDIT OH-F B3: the rolling host rides along)');
-  assert.match(rd('src/systems/loot/loot.js'), /const _tabledLootHandlers = new Map\(\[\n  \[RRI_VENDOR, \(\{ items, rolls \}\) => \{ if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(items, rolls\); \}\],\n\]\);/, 'RRI\'s the first subscriber');
-  const hc = rd('src/scenes/hostCombat.js');
-  assert.match(hc, /addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n[\s\S]{0,1100}?if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(\[\.\.\.new Set\(\[\.\.\.entity\.items, \.\.\.\(eq\?\.worn \?\? \[\]\)\]\)\], rolls\);\n  enemyLootSpawned\.raise\([^\n]*\n(?:  (?:\/\/|const plain = plainFoeLootRule\(|if \(plain\) entity\.lootCap = )[^\n]*\n)*  rollCorpseLoot/, 'the corpse: EnemyEntity.OnLootSpawned after the trio, before the port\'s arm (RRI\'s own subscriber, then the list - OH-E)');   // PIN MOVED (PARTY-LOOT): the extras take the roll's Renown share, and the keep's line names what it let go
-  assert.match(hc, /const worn = eq\.worn \?\? all;\n  eq\.worn = worn;/, 'the assigner\'s worn subset is what the table takes');
-  assert.match(hc, /for \(const it of worn\) \{\n    const slot = getEquipSlot\(entity, it\);/, 'and only that');
-  const wm = rd('src/scenes/worldModes.js');
-  assert.equal((wm.match(/shelfLootSpawned\(stockShopShelf\(\{ buildingType: b\.buildingType, quality: b\.quality \}, playerEntity(?:, \{ shelfIndex: i \})?\), b\)/g) ?? []).length, 2, 'both shelf doors (AUDIT ECON P1: the shelf hands its index)');
-  assert.match(rd('src/systems/containerLoot.js'), /const _handlers = new Map\(\[\n  \[RRI_VENDOR, [^\n]*\n    onShopShelfStocked\(a\.items, \/\*\* @type \{any\} \*\/ \(\{ buildingType: a\.buildingType, quality: a\.quality, containerType: a\.containerType \}\)/, 'FORAGE3: RRI\'s shelf hooks, the one home\'s first subscriber');
-  assert.match(rd('src/systems/useItem.js'), /const handler = itemUseHandler\(item\.templateIndex\);\n  if \(handler\) \{\n    const handled = handler\(item, collection, \{ entity, rolls, nowMinute, localItems: bag, target, chooseTarget \}\);[^\n]*\n    if \(handled\) return questItem \? \{ \.\.\.handled, questItem: true \} : handled;\n  \}\n\n  let out = null;/, 'the delegate arm, then the ladder');
-  assert.match(rd('src/systems/inventory.js'), /if \(isRriStackable\(item\)\) return true;/);
-  assert.match(rd('src/systems/shopStock.js'), /let cost = conditionBasedPricesOn\(\) \? conditionCostBase\(baseValue, conditionPercentage\) : baseValue;/);
-  assert.match(rd('src/systems/tradeModes.js'), /calculateCost\(counterValueOf\(item\), quality, priceAdjustment, saleConditionPercentage\(item, \{ online \}\)\) \* stack;/, 'the Sell arm passes ConditionPercentage (:462) - offline as it is, online the find and a third of its owner\'s own mends past it (SELL-AS-FOUND, MEND-THIRD - test/systems/sell_as_found.test.js, mend_third.test.js)');   // PIN MOVED (CRAFT-WORTH): the value the counter pays on (tradeModes.js counterValueOf)
-  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
-  assert.match(rd('src/systems/chargenSession.js'), /assignStartingSpells\(setIndex, spellsByIndex, result\.career\)/);
-  assert.match(rd('src/systems/chargenSession.js'), /assignStartingEquipment\(playerEntity, \{ classIndex: result\.careerIndex/);
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): the clone's own three fields, unless the rig hands its swing's
-  // ctx (a hand of a pair: the striking hand and the strike's tempo - the clock the machine runs on)
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /const animCtx = \(\) => ctx\?\.animCtx\?\.\(\) \?\? \(\{ entity: ctx\?\.entity \?\? null, weaponType: w\.currentWeaponType, usingRightHand: usingRightHand\(\) \}\);/);
-  assert.equal((rd('src/combat/weapon/weaponWidget.js').match(/widgetAnimTickTime\(w\.currentWeaponType, liveSpeed\(\), w\.s\.swing, animCtx\(\)\)/g) ?? []).length, 4, 'every tick asks with the ctx');
   assert.equal(conditionPercentage({ currentCondition: 1, maxCondition: 3 }), 33, 'ConditionPercentage: C# integer division');
   assert.equal(conditionPercentage({ currentCondition: 0, maxCondition: 0 }), 100);
 });

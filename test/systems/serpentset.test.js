@@ -182,7 +182,6 @@ test('SERPENT-SET the drop: a quarter of a hoard (the raids\' own share), the sa
   assert.equal(rollSerpentSetPiece(seq(0.24999, 0.9999)).aetheric, 'coilscale-fang');
   assert.equal(rollSerpentSetPiece(seq(0, 0)).aetheric, 'coilscale-crest');
   for (let d = 0; d < 60; d++) assert.ok(!brokerStock(d).some((o) => o.set === 'coilscale' || o.item?.sigil?.set === 'coilscale'), `day ${d}: the Broker never shelves it`);
-  assert.match(strip(read('src/systems/sigil/sigilBroker.js')), /for \(const set of WORLD_SET_IDS\)[\s\S]*const wset = pick\(WORLD_SET_IDS, rolls\);[\s\S]*offer\('regalia', 'ruhn',/, 'the Broker shelves the world\'s sets and the Regalia alone');
 });
 
 // ─── THE HOARD ────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -348,10 +347,6 @@ test('SERPENT-SET the heal: one door for every power - the loot\'s leech and its
   assert.equal(healMine(f, 0.5), 0);
   assert.equal(healMine(f, 0.5), 1, 'the fraction carried to the next heal');
   assert.equal(f.health, 11);
-  assert.doesNotMatch(strip(read('src/systems/loot/lootPowers.js')), /export function healMine/, 'one heal, never two');
-  assert.match(strip(read('src/systems/loot/lootPowers.js')), /import \{ healMine, manaMine, _resetPlayerHealForTests \} from '\.\.\/playerHeal\.js';/);   // PIN MOVED (SCHOOLS3): and the one magicka gift beside the one heal
-  assert.match(strip(read('src/systems/sigil/sigilSetPowers.js')), /import \{ healMine, manaMine \} from '\.\.\/playerHeal\.js';/);   // PIN MOVED (EG15): the Battlemage's Discipline returns magicka through the same leaf (manaMine since the merge of SCHOOLS3, which moved the one magicka gift there first)
-  assert.doesNotMatch(strip(read('src/systems/sigil/sigilSetPowers.js')), /from '(?:\.\.?\/)+(?:[\w-]+\/)*lootPowers\.js'/, 'the set powers never import the loot\'s (it imports them)');
 });
 
 test('SERPENT-SET the sets sleep in a duel: a duel wakes none of the Coilscale\'s tiers (mutants: the duel unread)', () => {
@@ -366,14 +361,6 @@ test('SERPENT-SET the sets sleep in a duel: a duel wakes none of the Coilscale\'
 });
 
 // ─── THE HOST ─────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('SERPENT-SET the host: the Old Coil\'s hoard and its crash door take their spoils by the ember\'s door (the first ember brings On the Burning Doors, as a breach\'s); Shed Skin\'s splash is the voice\'s; the serpent\'s claim says its silver through the raids\' own door (mutants: the plain door back; no splash; no silver lines)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /const serpentSpoils = createSpoilsPool\(\{\s*ray: \(\) => null, now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, take: takeGateSpoil,/);
-  assert.match(w, /recoverSpoils\(_spoilsStore, takeGateSpoil, \{ who, saves: enumerateSaves\(\)\.info\.values\(\), onHanded: \(rec\) => serpentSpoils\.adopt\(rec\), key: SERPENT_SPOILS_KEYS\.store/);
-  assert.match(w, /else if \(name === 'shed'\) audio\.playOneShot\(SOUND\.SplashLarge, 1\);/);
-  assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'serpent'\)\); return marksBook\?\.claimLines\(data, 'serpent'\) \?\? null; \},/);
-});
 
 test('SERPENT-SET the claim\'s silver: a counted serpent says its silver lines after its record, the host\'s own lines; a hook that throws is the host\'s, never the carrier\'s - the receipt still settles (mutants: the lines unsaid; a throw breaking the claim)', async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);

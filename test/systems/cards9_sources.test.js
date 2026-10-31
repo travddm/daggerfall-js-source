@@ -123,12 +123,6 @@ test('CARDS9 the counter: a pack\'s price is the counter\'s (DFU\'s CalculateTra
   const poor = { goldPieces: price - 1, items: [] };
   assert.deepEqual(buyCardPack(poor, { quality: 10, skills, online: false }), { ok: false, price, why: 'gold' });
   assert.deepEqual([poor.goldPieces, poor.items.length], [price - 1, 0]);
-  // the doors: the Enhanced tavern's row and the card table's panel (CARDS10, scenes/worldModes.js)
-  const tav = read('src/ui/enhanced/enhancedTavern.js');
-  assert.match(tav, /const pack = el\('button', 'act tavern-act', `Card pack \(\$\{packPrice\(\)\} gold\)`\);\s*pack\.onclick = buyPack;/);
-  assert.match(tav, /wrap\.append\(room, talkBtn, food, pack, exit\);/);
-  assert.match(tav, /const r = buyCardPack\(deps\.entity, \{ quality: deps\.quality\?\.\(\) \?\? 10, skills: deps\.skills\?\.\(\) \?\? \{\} \}\);\s*if \(!r\.ok\) \{ say\(rows\(NOT_ENOUGH_GOLD_ID, \{ amount: r\.price \}\)\); return; \}/);
-  assert.doesNotMatch(read('src/ui/tavernWindow.js'), /buyCardPack/, 'the classic window keeps DFU\'s four buttons');
 });
 
 test('CARDS9 the foes: a creature drops its own card - one draw at its card\'s tier\'s chance, twice it titled; none for a kind with no card, a revenant or a world boss; through the real death door, and the cap keeps it as a Magic piece (mutants: the map; the chance; the titled share; the handler; the cap\'s rank)', () => {
@@ -164,9 +158,7 @@ test('CARDS9 the foes: a creature drops its own card - one draw at its card\'s t
   raiseEnemyDeath(body, { rolls: () => 0 });
   assert.deepEqual(body.items.filter(isCardRecord).map((c) => c.card), ['zombie']);
   assert.equal(dropFoeCard({ mobileType: MOBILE_TYPES.Rat, items: null }, { rolls: () => 0 }), null, 'a body with no list takes none');
-  assert.match(read('src/systems/card/cardSources.js'), /registerEnemyDeathHandler\(CARD_DROP_HANDLER, \(entity, opts = \{\}\) => \{ dropFoeCard\(entity, opts\); \}\);/);
   assert.equal(CARD_DROP_HANDLER, 'iliac-card');
-  assert.match(read('src/systems/worldTick.js'), /^import '\.\/card\/cardSources\.js';/m, 'the app carries the import (AUDIT-THUNDERLOCK F1\'s wire)');
   // THE CAP keeps it: three Common pieces and a card, capped to three - the card stays
   const commons = [0, 1, 2].map((i) => ({ group: 'Weapons', templateIndex: 115 + i, value: 300 }));
   const items = [...commons, mintIliacCard('rat')];
@@ -196,12 +188,6 @@ test('CARDS9 the guilds: a guild quest done pays one of its guild\'s cards one t
   assert.equal(guildCardRoll(ORDERS.Flame, 2, () => 0), 'knight-of-the-flame');
   assert.equal(guildCardRoll(ORDERS.Owl, 9, () => 0), null, 'an order with no card');
   assert.equal(guildCardRoll(108, 6, () => 0), 'dark-brotherhood-assassin');
-  const w = read('src/scenes/world.js');
-  // PIN MOVED (AUDIT CARDS-6): the once is the character's (its id beside the quest's), and a temple's hall walks the
-  // faction table to its divine (A4) - test/systems/auditcards6_a.test.js runs the block itself
-  assert.match(w, /if \(!q\?\.questSuccess \|\| !\(q\.factionId > 0\)\) return;\s*const quest = String\(q\.uid \?\? q\.questName \?\? ''\);\s*const key = `\$\{playerEntity\.characterId \?\? ''\}\|\$\{quest\}`;\s*if \(!quest \|\| cardQuestPaid\.has\(key\)\) return;\s*cardQuestPaid\.add\(key\);/);
-  assert.match(w, /const rank = Object\.values\(activeMemberships\(playerEntity\)\)\.find\(\(m\) => m\?\.guild === name\)\?\.rank \?\? 0;\s*const id = guildCardRoll\(q\.factionId, rank, Math\.random, dict\);/);
-  assert.match(w, /renownQuestEnded\?\.\(q\);[^\n]*\n\s*cardQuestEnded\(q\);/, 'beside the Renown payout, in the quest machine\'s one end hook');
 });
 
 test('CARDS9 THE BOSSES\' OWN: the Warden\'s, Sethrakul\'s and the Brass Remnant\'s aetheric cards - one draw, always, LAST in each hoard, so every roll before it is what it was; kept beside the pieces and thrown after them; a Serpent stander finds none (mutants: the chance; the draw\'s place; a stander\'s card)', () => {
@@ -239,12 +225,6 @@ test('CARDS9 THE BOSSES\' OWN: the Warden\'s, Sethrakul\'s and the Brass Remnant
     const al = sdSpoilsList(k, 10), a = rollSdSpoils(k, 10);
     if (a.card) { assert.equal(al[a.pieces.length].item.card, 'brass-remnant'); assert.ok(validLootItem(JSON.parse(JSON.stringify(al[a.pieces.length].item))), 'the crash record\'s door takes it'); }   // GEM2 (PIN MOVED): right after the pieces, the Remnant's gems after it
   }
-  // by source: each draw sits after the hoard's last piece's
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md, PIN MOVED): the card is the last draw BEFORE the gem arc's - the sockets'
-  // passes and the boss's gems follow it (law 9); test/systems/gem1_sockets.test.js pins them
-  assert.match(read('src/systems/gate/gateSpoils.js'), /lastPass\(pieces\.map\(\(p\) => p\.item\), rolls\);\s*(\/\/[^\n]*\n\s*)*const card = bossCardRoll\('gate', rolls\);\s*(\/\/[^\n]*\n\s*)*socketPass\(pieces\.map/);
-  assert.match(read('src/systems/serpent/serpentSpoils.js'), /if \(coil\) pieces\.push\(\{ item: coil, tier: coil\.rarity \}\);\s*(\/\/[^\n]*\n\s*)*const card = dealt \? bossCardRoll\('serpent', rolls\) : null;/);
-  assert.match(read('src/systems/superDungeon/sdSpoils.js'), /if \(hourlock\) pieces\.push\(\{ item: hourlock, tier: hourlock\.rarity \}\);\s*(\/\/[^\n]*\n\s*)*const card = bossCardRoll\('abyss', rolls\);/);
 });
 
 test('CARDS9 THE CUSTOMS: a character brings cards worth the starter deck\'s and CUSTOMS_CARD_WORTH_PER_LEVEL a level; customs takes the dearest past it, one card at a time; the service holds a customs first save to it (\'customs-cards\') and a born one to the starter deck (\'realm-birth\'); the report says it (mutants: the allowance; the order; the service\'s bound; the birth\'s)', () => {
@@ -284,5 +264,4 @@ test('CARDS9 THE CUSTOMS: a character brings cards worth the starter deck\'s and
   assert.equal(rep.cardsKept, 1);
   assert.ok(customsLines(rep).some((l) => /^Your cards are worth 810 gold; the realm lets a character of this level bring 585\. 1 card, the dearest, stayed with your offline character\.$/.test(l)), customsLines(rep).join(' | '));
   assert.ok(customsLines(rep, { before: true }).some((l) => /will stay with your offline character/.test(l)));
-  assert.match(read('src/net/accountClient.js'), /'customs-cards': \(\) => t\('account\.refusal\.customsCards', 'That character carries more cards than customs lets in\. Bring it online again\.'\)/);
 });

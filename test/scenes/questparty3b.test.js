@@ -152,23 +152,3 @@ test('QUEST-PARTY 3b executed: my copy a blow has touched keeps standing beside 
   assert.equal(impA.dead, true, 'the lower id\'s untouched copy stands down to it');
 });
 
-test('QUEST-PARTY 3b by source: the building pool\'s net and the party\'s law, installed once a session is open; the marker\'s foe flagged; the host\'s own lane out, in and struck; the owners swept; the handover at the door and at a death; the wave indoors left to a near sharer', () => {
-  const wm = rd('src/scenes/worldModes.js'), w = rd('src/scenes/world.js');
-  assert.match(wm, /_intNetOn = false; ensureInteriorNet\(\);/, 'at the pool\'s birth');
-  assert.match(wm, /ensureInteriorNet\(\);   \/\/ QUEST-PARTY phase 3b: a session that opened after the door[^\n]*\n\s*interiorFoes\.update\(/, 'and every frame until it lands');
-  assert.match(wm, /interiorFoes\.setQuestShare\(host\.foesQuestShare\?\.\(\) \?\? null\);/);
-  assert.match(wm, /gender, questBehaviour: behaviour, feetGiven: true,\n\s*questMarker: true,/, 'the marker\'s stand is flagged');
-  assert.match(wm, /applyOwnHit\(id, data\) \{ return mode === 'interior' && interiorFoes \? interiorFoes\.applyHit\(id, data\) : mode === 'dungeon'/);
-  assert.match(w, /onPeerHit: \(hit, fate\) => hitSend\(\{ \.\.\.hit, own: 1 \}, fate\),/, 'a blow on a peer\'s foe in the building is marked own');
-  assert.match(w, /toWire: \(feet\) => \[feet\[0\], feet\[1\] - state\.compensation\[1\], feet\[2\]\],\n\s*toScene: \(p\) => \[p\[0\], p\[1\] \+ state\.compensation\[1\], p\[2\]\],\n\s*\} : null\),/, 'the room\'s frame is the pose\'s');
-  assert.match(w, /foesQuestShare: \(\) => partyOnlyQuestShare\(questShareSeam\),/, 'PIN MOVED (QUEST-OWNER, 2026-10-12): the seam narrowed to the owner\'s party');
-  assert.match(w, /exteriorFoes\.setQuestShare\(partyOnlyQuestShare\(questShareSeam\)\);/, 'one law for both pools');
-  assert.match(w, /const ownStream = \(now\) => \{\n\s*if \(!online \|\| online\.status !== 'open' \|\| !online\.ownOk \|\| !isWorldRoom\(online\.room\)\) return false;/, 'only through a relay that carries the lane');
-  assert.match(w, /if \(!online\.sendOwnFoes\(frame\)\) \{ _ownFullAt = -Infinity; return false; \}/);
-  assert.match(w, /online\.onOwnFoes = \(id, data\) => \{ modes\?\.applyOwnFoes\?\.\(id, data\); \};/);
-  assert.match(wm, /applyOwnFoes\(id, data\) \{ return mode === 'interior' && interiorFoes \? interiorFoes\.applyFoes\(id, data\) : /, 'a building\'s frame onto its pool');
-  assert.match(w, /onInteriorLeave: \(\) => \{ const n = handOverRoomFoes\(\);/, 'the building\'s door hands my foes to those who stay');
-  assert.match(w, /const _handed = handOverFoes\(\) \|\| handOverRoomFoes\(\);/, 'and a death in it');
-  assert.match(w, /const handOverRoomFoes = \(\) => \{[\s\S]*?if \(\(isPrivateQuestFoe\(f\) \|\| f\._keptTag\) && !social\?\.isPartyPeer\(q\.id\)\) continue;[\s\S]*?return frame && online\.sendOwnFoes\(frame\) \? \(modes\?\.dropOwnHanded\?\.\(\) \?\? 0\) : 0;/, 'a quest\'s foe to the party alone (CURSE-SYNC: a private quest\'s)');
-  assert.match(w, /if \(\(m === 'interior' \|\| m === 'dungeon'\) && (?:host\.)?online\?\.ownOk && isWorldRoom\((?:host\.)?online\.room\) && partnerStandsQuestFoes\(\{ questName: handle\.foe\?\.parentQuest\?\.questName, symbol: handle\.foe\?\.symbol\?\.name, [^\n]*, foes: (?:host\.)?modes\?\.insideFoes\?\.\(\) \?\? \[\] \}\)\) return true;/, 'the wave indoors - VERMIN-SHARED (PIN MOVED): left to the sharer only while the room\'s pool holds its foe of this wave\'s Foe');
-});

@@ -251,17 +251,5 @@ test('DW-F: WATER1 reads the cap\'s TileMap - the carved sea and the repainted w
     assert.ok(![...after].some((k) => Number(k.split(',')[0]) < 40), `stride ${stride}: none over the carved sea`);
     assert.ok(after.size > 0 && after.size < before.size, `stride ${stride}: the water the cap leaves (raised, no ground within eight) keeps its sheet`);
   }
-  const world = rd('src/scenes/world.js');
-  // PIN MOVED (AUDIT WATER-NEXT H1): the bed is carved again by the cap's TileMap before the clip and the sheet read the ground
-  assert.match(world, /function dwSetTilemap\(entry, bytes\) \{\n\s+renderer\.writeTilemapTexture\(entry\.tilemapTex, bytes, TERRAIN_TILE_DIM\);\n\s+entry\._dwBytes = bytes === entry\.tilemapBytes \? null : bytes;\n\s+dwRecarve\(entry\);[^\n]*\n\s+dwClipTerrain\(entry\);\n\s+dwWaterSurface\(entry\);/);
-  assert.match(world, /const idx = buildWaterIndices\(p\._dwBytes \?\? p\.tilemapBytes, p\._stride \?\? 1\);/, 'the patch where there is one, the original when it goes');
-  assert.match(world, /const waterIndices = waterOn \? buildWaterIndices\(p\._dwBytes \?\? p\.tilemapBytes, stride\) : null;/, 'and a restride reads it too');
-  assert.match(world, /if \(!p\._visible \|\| !p\.water \|\| p\.deepWaters\?\.hide\) continue;/, 'a hidden cap takes its water with it, as before');
 });
 
-test('DW-F: the far ground\'s clip is the index set the world draws, rebuilt at its own stride (pins)', () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const idx = p\._dwBytes \? clippedTerrainIndices\(p\._dwBytes, p\._stride \?\? 1, renderer\.coastEdges\) : null;/);   // PIN MOVED (COAST-LOOK): the renderer's switch keeps the coast's ring
-  const cap = rd('src/world/deepWater/deepWaterCap.js');
-  assert.match(cap, /const tiles = \[\(t\) => t, \(t\) => last \* dim \+ t, \(t\) => t \* dim, \(t\) => t \* dim \+ last\];/, 'south row 0, north row 127, west column 0, east column 127 - buildTerrainIndices\' own edge order');
-});

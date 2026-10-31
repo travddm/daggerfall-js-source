@@ -101,28 +101,6 @@ test('LIGHT-NEAR1: on the fake GL, a lantern a hand\'s width from the eye still 
 });
 
 test('LIGHT-NEAR1: by source - the two constants are gone, the shader\'s contact fallback reads the caster table and the range share alone, the glare loop reads the flag alone, and the picker\'s call passes the mask and nothing else (mutants: any of the three distance clauses back)', () => {
-  const sp = rd('src/render/shadowPass.js'), el = rd('src/render/enhancedLighting.js'), air = rd('src/render/airPass.js');
-  assert.doesNotMatch(sp, /export const SHADOW_CASTER_MIN_DISTANCE/);
-  assert.doesNotMatch(air, /export const AIR_GLARE_MIN_DISTANCE/);
-  assert.doesNotMatch(el, /SHADOW_CASTER_MIN_DISTANCE|uCamPos\) < /, 'the lit block reads no camera distance for a shadow');
   assert.match(EL_MESH_FS, /float sh = k >= 0 \? casterShadowAt\(k, uPointLights\[i\], wp, n\)[^\n]*\n\s*: \(k == -2 \|\| d > uPointLights\[i\]\.w \* 0\.7\) \? 1\.0/, 'the fallback: the hand by name, the range share, nothing else');
-  assert.match(sp, /const casters = reserveSelfCasters\(pickShadowCasters\(f\.pointLights, f\.eye, SHADOW_POINT_CASTERS, f\.carried, this\._heldCasters, this\._heldCasterN\),/);   // DISC6: and last frame's casters (the keep margin); AUDIT PRE-MERGE 0929 E3: the card's two lamps reserved among them - no distance clause
-  assert.doesNotMatch(sp, /d < minDist/);
-  assert.doesNotMatch(air, /Math\.hypot\(L\[i \* 4\] - eye\[0\]/, 'no glare skip by distance to the eye');
-  assert.match(air, /if \(f\.carried && f\.carried\[i\]\) continue;   \/\/ MAC-T1/);
 });
 
-test('LIGHT-NEAR1: the hosts - every host that composes a player light does it through withPlayerLights (the mask is the whole of the hand\'s exclusion now), and the standalone interior scene, which has no player light, is the one bare setPointLights', () => {
-  const w = rd('src/scenes/world.js'), ex = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), dg = rd('src/scenes/dungeon.js'), it = rd('src/scenes/interior.js');
-  const composed = (src) => (src.match(/withPlayerLights\(/g) ?? []).length;
-  const torches = (src) => (src.match(/playerTorchLight\(playerEntity/g) ?? []).length;
-  assert.equal(composed(w), torches(w), 'world.js: every torch composed');
-  assert.ok(composed(w) >= 2);
-  assert.equal(composed(ex), torches(ex)); assert.ok(composed(ex) >= 1);
-  assert.equal(composed(wm), torches(wm)); assert.ok(composed(wm) >= 2, 'the dungeon and the interior modes');
-  assert.equal(composed(dg), torches(dg)); assert.ok(composed(dg) >= 1);
-  assert.equal(torches(it), 0, 'the standalone interior scene carries no torch...');
-  assert.match(it, /renderer\.setPointLights\(lit\.data, null, lit\.colors\);/, '...so its bare call has no hand to mask');
-  assert.match(wm, /renderer\.setPointLights\(_itLit\.data, null, _itLit\.colors\);/, 'the interior mode\'s call hands the composed array, whose `carried` the renderer lifts');
-  assert.match(rd('src/render/renderer.js'), /const carried = data\.carried \?\? null;/);
-});

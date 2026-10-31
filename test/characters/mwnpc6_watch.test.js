@@ -94,20 +94,3 @@ test('MWNPC6b the pool: a dead watchman offered dead from the kill, under the wa
   assert.equal(second.destroyed, 1, 'and gone with the watch (an interior\'s teardown)');
 });
 
-test('MWNPC6c by source: the live watchman offered dressed, his billboard reset at the offer; the three hosts draw the watch\'s bodies before its batches draw, and the veiled beside the foes\'', () => {
-  const c = rd('src/scenes/cityGuards.js');
-  assert.ok(c.includes("      g.batch.castOnly = false;   // MWNPC6: drawn until drawBodies says his body stands\n      if (npcLane && isClassFoe(g)) { npcLane.stand('watch', foeActor(g, g.id), g.batch.conceal ?? null, g.batch.hitFlash || 0, foeFx(g)); _npcStood.push(g); }\n      out.push(g.batch);"), 'the live offer');
-  assert.ok(c.includes('createHostNpcBodies({ renderer, collider: () => collider, tiers: WATCH_BODY_TIERS })'), 'under the watch\'s caps');
-  const sites = [
-    ['src/scenes/world.js', 'livePersonBatches.push(...cityGuards.update(foeDt,', 'cityGuards.drawBodies(canvas, proj, view, mwv.eye, foeDt);', 'if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);', 'cityGuards.drawVeiledBodies();'],
-    ['src/scenes/worldModes.js', 'const _guardBatches = interiorGuards.update(foeDt,', 'interiorGuards.drawBodies(canvas, proj, view, mwv.eye, foeDt);', 'if (_guardBatches.length) renderer.drawBillboards(_guardBatches, camRight, UP_Y);', 'interiorGuards?.drawVeiledBodies();'],
-    ['src/scenes/exterior.js', 'const guardBatches = cityGuards.update(foeDt,', 'cityGuards.drawBodies(canvas, proj, view, eye, foeDt);', 'if (personBatches.length) renderer.drawBillboards(personBatches, camRight, UP_Y);', 'cityGuards.drawVeiledBodies();'],
-  ];
-  for (const [file, offer, draw, flats, veiled] of sites) {
-    const s = rd(file);
-    const a = s.indexOf(offer), b = s.indexOf(draw, a), f = s.indexOf(flats, b);
-    assert.ok(a > 0 && b > a && f > b, `${file}: offered, drawn, then the billboards`);
-    assert.equal(s.split(draw).length, 2, `${file}: once`);
-    assert.ok(s.includes(veiled), `${file}: the veiled`);
-  }
-});

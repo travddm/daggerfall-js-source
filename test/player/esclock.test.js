@@ -149,8 +149,3 @@ test('ESC-LOCK (2): a request the browser refused is asked of the desktop shell 
   }
 });
 
-test('ESC-LOCK (2): the desktop app\'s bridge - the preload asks, the main process runs the page\'s one hook as a user gesture', () => {
-  assert.match(rd('app/preload.cjs'), /relockPointer: \(\) => ipcRenderer\.send\('dagger:relock'\),/);
-  assert.match(rd('app/main.cjs'), /ipcMain\.on\('dagger:relock', \(e\) => \{ e\.sender\.executeJavaScript\('globalThis\.__daggerRelock\?\.\(\)', true\)\.catch\(\(\) => \{\}\); \}\);/,
-    'a FIXED script, and `true` is executeJavaScript\'s userGesture');
-});

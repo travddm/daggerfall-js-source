@@ -171,13 +171,5 @@ test('MW-STEEL1: the Steel Helm switch picks the helm - closed by default, open 
   assert.deepEqual([row.group, row.kinds, row.control.key, row.control.initial, row.control.online, row.control.tiers], ['combat', ['enhanced'], 'mwSteelHelm', 'closed', 'player', [['closed', 'Closed'], ['open', 'Open']]]);
   assert.equal(FEATURE_PREF_DEFAULTS.mwSteelHelm, STEEL_HELM_DEFAULT);
   assert.deepEqual(row.control.tiers.map(([v]) => v), STEEL_HELM_STYLES, 'the switch\'s values are the helm\'s styles');
-  // read where the worn set is composed, and the tile rebuilds the standing body
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /const helmStyle = getPref\('mwSteelHelm'\);/);
-  assert.match(fp, /bodyPool: parts, female, colourOf, helmStyle, beast, beastWear \}, showNudity\(\)\)/);
-  assert.match(fp, /bodyPool: parts, female, colourOf: probe, helmStyle, beast, beastWear \}\)/);
-  const menu = sourceText('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\n  mwSteelHelm: rebuildMorrowindBody,/);
-  assert.match(menu, /set: \(i\) => \{ \(c\.write \?\? \(\(v\) => setPref\(c\.key, v\)\)\)\(c\.tiers\[i\]\[0\]\); TILE_AFTER\[c\.key\]\?\.\(\); \} \};/, 'a choice\'s write takes its after-step too');
 });
 

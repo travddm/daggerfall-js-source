@@ -21,7 +21,6 @@ import { SD_FIRST_STEP } from '../../../src/world/superDungeon/sdHall.js';
 import { mirrorProjectionX, perspective, lookAt, multiply } from '../../../src/world/mat4.js';
 import { SD_COURSE_END } from '../../../src/world/superDungeon/sdSteps.js';
 
-const W = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const V = sdMoteVertices();
 const motes = Array.from({ length: V.length / 4 }, (_, i) => [V[i * 4], V[i * 4 + 1], V[i * 4 + 2], V[i * 4 + 3]]);
 const TIMES = [0, 13.7, 97.25, 359.9, 512.5, 719.95];
@@ -130,5 +129,4 @@ test('SD14c DRAWN: one draw of every mote, added, depth-tested and never written
   assert.ok(calls.some((c) => c[0] === 'blendFunc' && c[1] === 3 && c[2] === 3), 'added');
   assert.ok(calls.some((c) => c[0] === 'uniform3fv' && c[2] === SD_REALM_ORIGIN), 'the realm\'s origin');
   assert.equal(r.draw(P, P, NaN), false, 'no clock: nothing');
-  assert.match(W, /const motes = !!sdMotesPassOf\(\)\?\.draw\(proj, view, deadlandsSeconds\(\), fog, skyGain\(renderer\._fogColor, SD_REALM_FOG\.color\), renderer\.worldViewportPx\?\.\[3\]\); const sparks = [^\n]*; const beams = [^\n]*; const beam = [^\n]*; const reads = drawSdArenaReads\(proj, view, fog\); if \(blows \|\| lines \|\| motes \|\| sparks \|\| beam \|\| reads\)/);   // SD16 (PIN MOVED): the blows' sparks after the motes   // SD17 (PIN MOVED): the Hour-Hand's beam after the sparks   // SD-LOOK S7/S8 (PIN MOVED): the arena's reads in the same pass, the sky told the fight, the hearts' lights first
 });

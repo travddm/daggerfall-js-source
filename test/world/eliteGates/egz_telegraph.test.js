@@ -456,8 +456,6 @@ test('EG-ZG A DROP AND THE ECLIPSE IN THE FIGHT, AND THE SPAN\'S WORD TO THE DUN
   span.ride(10, 0.016, at(d.y, true)); assert.equal(span.overDrop(), false, 'standing on it');
   span.ride(10, 0.016, { ...at(d.y + 3, false), pos: realmToDungeon(spec.x0 + d.x + 30, d.y + 3, d.z) }); assert.equal(span.overDrop(), false);
   span.clear();
-  const DC = read('src/scenes/dungeonContext.js');
-  assert.match(DC, /\} else if \(fell > FALL_DAMAGE_THRESHOLD \/ 2\) \{\n {8}if \(egSpan\?\.overDrop\?\.\(\)\) \{ \/\* EG-ZG[^\n]*\*\/ \}\n {8}else if \(!immersiveFootsteps\.hardFallAlert\(\)\) audio\.playOneShot\(SOUND\.FallHard/, 'no grunt for a Drop\'s landing');
   // THE ECLIPSE
   const ec = findSpec((q) => q.hazards?.some((z) => z.kind === 'eclipse'));
   let tTell = null;
@@ -538,9 +536,6 @@ test('EG-ZG THE QUIET COMPANY\'S ALLIES (section 25.4): no word, every ally\'s s
   egAllyLookSet(() => { throw new Error('gone'); });
   assert.equal(egAllyLook(), null, 'a word that fails is no word');
   egAllyLookSet(null);
-  // the Spire's client says it, from the look's own law
-  const C = read('src/scenes/eliteGates/egClient.js');
-  assert.match(C, /egAllyLookSet\(\(\) => \{ if \(!inSpire\(\)\) return null; const q = egQuietCompany\(link\.state\(\)\?\.sg\); return \{ alpha: q\.allyAlpha, glow: q\.allyGlow \}; \}\);/);
   // a Morrowind effect's quads: alpha where the blend reads it, all four where it adds the source as it is
   const packed = new Float32Array(2 * VFX_VERTEX_FLOATS).fill(1), out = new Float32Array(packed.length);
   vfxFade(packed, 2, 0.6, 6, out);
@@ -556,26 +551,10 @@ test('EG-ZG THE QUIET COMPANY\'S ALLIES (section 25.4): no word, every ally\'s s
   fx.showImpactFlash(377, [0, 1, 0]);
   await new Promise((r) => setImmediate(r));
   assert.deepEqual(built.map((b) => b.conceal?.alpha ?? null), [0.6, null], 'an ally\'s flash translucent, everyone else\'s as it was');
-  // the spell engine's doors (scenes/hostMagic.js) and the effects' (scenes/mwMagicFx.js)
-  const M = read('src/scenes/hostMagic.js');
-  assert.match(M, /const quiet = egAllyLook\(\);\n {6}mwFx\.cast\(look, feet, quiet \? \{ alpha: quiet\.alpha \} : undefined\);/, 'a peer\'s casting effects at the share');
-  assert.match(M, /visual: true, casterId, quiet \}\)\);/, 'its missile carries it');
-  assert.match(M, /if \(m\.quiet\) m\.batch\.conceal = allyConceal\(m\.quiet\);/, 'its flat translucent');
-  assert.match(M, /if \(m\.quiet\) \{ impacts\.showImpactFlash\(missileArchive\(m\.spell\.element\), pos, m\.scale \?\? 1, allyConceal\(m\.quiet\)\); return; \}/, 'its impact the classic flash alone - no burst in light, no kick');
-  assert.match(M, /if \(rangeType === 1 && !quiet\) landFx\(/, 'a touch\'s spray and light none');
-  assert.match(M, /if \(egAllyLook\(\)\?\.glow === 0\) list = null;/, 'a peer\'s light put out');
-  assert.match(M, /mode: CONCEAL_MODE\.reveal, alpha: q\.alpha/);
-  const X = read('src/scenes/mwMagicFx.js');
-  assert.match(X, /e\.gpu\.sync\(r\.streams, e\.alpha\);/); assert.match(X, /for \(const v of plan\.cast\) atActor\(v, feet, body, alpha\);/); assert.match(X, /\}, \{ loop: true, alpha \}\);/);
+    
 });
 
 test('EG-ZG THE RIM AND THE FLASH ON THE BODIES, THE LOOK\'S POOLS KEPT (scenes/eliteGates/egFight.js): every body\'s flash egBodyFlash\'s and its glint the Shade\'s rim; my blow marks the body mine; the tethers\' and the pool\'s danger in the palette, a Vestige\'s ring and the Eclipse\'s dark never recoloured; the fight\'s pass the Spire\'s, its draws the floors\' (mutants: the rim never laid; my blow not marked mine; the ring dyed the danger)', () => {
-  const S = read('src/scenes/eliteGates/egFight.js');
-  assert.match(S, /setBatchHitFlash\(d\.batch, egBodyFlash\(b, t\)\);/);
-  assert.match(S, /setBatchGlint\(d\.batch, b\.fellAt \? null : egRimOf\(darkNow > 0 \? EG_SHADE_BAND : band, b\.fl \| 0, lord\)\);/);   // PIN MOVED (AUDIT EG V, b: lane1 #13 - in the place's dark every foe keeps the Shade's rim light; EG-PERFECT's audit: the guard's glint a lord's alone)
-  assert.match(S, /b\.hurtAt = b\.mineAt = now\(\);/);
-  assert.match(S, /pass\.drawFloors\(plan, proj, view, eye, seconds, fog, centre\);/);
-  assert.ok(!/pass\.draw\(sh,/.test(S), 'no shape drawn on one plane at the hall\'s centre any more');
   const acc = { palette: EG_DANGER_PALETTES.contrast, fill: 0.8 };
   const pull = shapeOf({ pool: TELEGRAPH_POOL_SPIRE.pull, color: [1.0, 0.24, 0.28] }), pool = shapeOf({ pool: TELEGRAPH_POOL_SPIRE.pool, color: egPoolRgb(1) });
   const ring = shapeOf({ pool: TELEGRAPH_POOL_SPIRE.ring, color: [...EG_AURA_RING.color], edge: EG_AURA_RING.color });

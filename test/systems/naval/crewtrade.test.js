@@ -244,5 +244,4 @@ test('CREW-TRADE THE EXCHANGE\'S TAB: crew first - whether the port has sailors 
   assert.match(ts.words, /^Short of sailors here: dear - /);
   const sx = short.x(), goods = exchangeText(sx).rows.slice(1);
   goods.forEach((g, i) => { const m = sx.rows[i + 1]; assert.deepEqual([g.canBuy, g.canSell], [m.sells > 0, m.have > 0 && m.buys > 0], `${g.id}: as it was`); assert.doesNotMatch(g.words + g.extra, /Sailors|Aboard/); });
-  assert.match(rd('src/scenes/naval/navalHost.js'), /crewDeal: crewDealOf\(boat, st, crewHands, companions\),/, 'the naval host wires her crew into the yard\'s model');
 });

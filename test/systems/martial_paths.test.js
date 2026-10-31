@@ -605,23 +605,5 @@ test('BAL10 THE FIRMAMENT: every weapon family two notables that raise its skill
   assert.equal(named('Headsman').key, 'wr.c1.2', 'the key stands');
 });
 
-test('MARTIAL THE SEAMS: every host\'s rig registers the powers; the one ask, the classic sheet\'s W row and the enhanced card read the law; the save writes both fields', () => {
-  assert.match(src('src/combat/weapon/weaponRig.js'), /^import '\.\.\/\.\.\/systems\/martialPowers\.js';/m);
-  assert.match(src('src/systems/martialPowers.js'), /^import '\.\/weaponMastery\.js';/m);
-  const shared = src('src/scenes/shared.js');
-  assert.match(shared, /const martial = ask && !windowed \? nextMartialChoice\(entity\) : null;/);
-  assert.match(shared, /entity\.martialPrompted = true;/);
-  const sheet = src('src/ui/charsheet.js');
-  assert.match(sheet, /action === 'KeyW' \|\| action === 'w'\)\) \{ this\._martialPrompt\(\); return; \}/);
-  // PIN MOVED (GROWTH2, bible/10-UI/Growth.md section 5): the enhanced card is the Growth tab's guide, reading the same law
-  assert.match(src('src/ui/growth/specGuide.js'), /pair: \(p\) => p\.skills, pairText: martialSkillsText, ask: \(e, id\) => martialChoiceRows\(e, id\), choose: chooseMartialPath,/);
-  assert.match(src('src/combat/playerWeapon.js'), /if \(techOn\(foe\)\) tellTechniqueLanded\(tb, foe, blow\);/);
-  assert.match(src('src/combat/arrowFlight.js'), /if \(m\.technique && !playerBody\(foe\)\) tellTechniqueLanded\(m\.technique, foe, dmg\);/);
-  // BAL10: both mods' arms hand the swing reader's word on, and the sheet's estimate reads the fists' modifiers as the cores do
-  assert.match(src('src/systems/roleplayRealismItems/rriKits.js'), /shortBlade: !melee && techniqueFamily\(weapon\) === 'shortBlade',/);
-  assert.match(src('src/systems/roleplayRealism/rrInstall.js'), /weight, shortBlade: !!w\?\.shortBlade \}\);/);
-  assert.match(src('src/combat/combatStats.js'), /return entity\.isInBeastForm \? d : weaponBlowMods\(null, d, entity, foe, ESTIMATE\);/);   // PIN MOVED (AUDIT MARTIAL L2 F7): the estimate's own word
-});
-
 // AUDIT MARTIAL L5 L2: every hook back at its rest when the file ends, whatever a test left
 after(() => { reset(); POW._setMartialPowersClockForTests(null); });

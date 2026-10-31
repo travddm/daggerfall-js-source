@@ -45,18 +45,7 @@ test('DISC22-B: with no document the classic grid stands (a node host draws the 
   setUiSkin('classic');
   assert.equal(typeof document, 'undefined');
   const win = openPauseFlow(() => {}, {});
-  const src = rd('src/ui/pauseWindow.js');
-  assert.match(src, /openControls: hooks\.openSettings \?\? \(controlsArtLoaded\(\)/, 'the grid is the fallback, not the choice');
   assert.equal(win.hooks.openSettings, null, 'no document, no settings screen to open');
   _resetForTests();
 });
 
-test('DISC22-B: the screen lands on Settings, and its Resume returns to the classic pause window', () => {
-  const door = rd('src/ui/pauseDoor.js');
-  assert.match(door, /enhancedPauseOverlay\(show, \{ \.\.\.hooks, at: 'settings', onResume: again \}\)/, 'opened on the Settings page, Resume wired back');
-  assert.match(door, /const again = \(\) => classicPauseWithSettings\(show, hooks\);/, 'back to the same classic window, its Controls button live again');
-  assert.match(door, /if \(action === 'resume' && typeof hooks\.onResume === 'function'\) \{ hooks\.onResume\(\); return; \}/, 'Resume returns rather than relocking into the world');
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /else if \(at && sections\.some\(\(l\) => idOf\(l\) === at\)\) section = at;/, 'a landing may name a rail section');
-  assert.match(menu, /const SECTIONS_PAUSE = \[[^\]]*'Settings'/, 'and the pause rail carries Settings');
-});

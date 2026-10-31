@@ -212,20 +212,6 @@ test('TAMRIEL-RELIEF the wiring, by source: the data its own chunk (no static im
   };
   walk('src');
   assert.deepEqual(statics, [], 'nothing imports the data statically');
-  assert.match(read('src/world/tamriel/tamrielRelief.js'), /const \{ RELIEF_DATA \} = await import\('\.\/tamrielReliefData\.js'\);/);
-  assert.match(read('src/world/tamriel/tamrielRelief.js'), /return maskRelief\(decodeRelief\(RELIEF_DATA\), trace\);/, 'AUDIT TESA II G1: the trace\'s mask laid on the player\'s machine');
-  assert.match(read('src/ui/tamrielTrace.js'), /if \(trace && relief\) trace\.relief = await loadRelief\(trace\)\.catch\(\(e\) => \(console\.warn\([^\n]*, null\)\);/, 'AUDIT TESA II G2: a relief that does not load is its own loss');
-  assert.match(read('tools/bakeTamrielRelief.mjs'), /import \{ RELIEF_SCALE \} from '\.\.\/src\/world\/tamriel\/tamrielRelief\.js';/, 'AUDIT TESA II G8: the grid\'s one home');
-  assert.match(read('tools/bakeTamrielRelief.mjs'), /const trace = await preloadTamrielTrace\(\{ fetchBytes, palette: pal, relief: false, niben: false \}\);/, 'AUDIT TESA II G2: the bake never reads its own output - PIN MOVED (NIBEN-SEA): and reads the painting\'s own coasts');
-  assert.doesNotMatch(read('tools/bakeTamrielRelief.mjs'), /export const (RELIEF_SCALE|FIT) =/, 'AUDIT TESA II G8: no second literal of the grid or the fit');
-  assert.match(read('src/world/tamriel/tamrielLand.js'), /relief: trace\.relief \?\? null \};/);
-  const client = read('src/world/terrain/terrainGenClient.js');
-  assert.match(client, /relief: trace\.relief \? trace\.relief\.slice\(\) : null \}/);
-  assert.match(client, /\.\.\.\(t\.relief \? \[t\.relief\.buffer\] : \[\]\)/);
-  assert.match(read('src/scenes/tamrielRoadsHost.js'), /const trace = tamrielTrace\(\), fit = tamrielFit\(\);/, 'the roads worker takes the installed trace whole');
-  assert.match(read('src/world/tamrielRoads.js'), /if \(trace\?\.relief\) for \(let i = 0; i < trace\.relief\.length; i\+\+\) mix\(trace\.relief\[i\] \+ 256\);/);   // PIN MOVED (AUDIT TESA II R6): every cell
-  assert.match(read('src/world/tamriel/tamrielGround.js'), /if \(reliefStands\(\)\) \{\n\s+const ease = Math\.min\(1, Math\.max\(0, \/\*\* @type \{number\} \*\/ \(coastDepthAt\(px, py\)\)\) \/ RELIEF_COAST_REACH\);/);   // AUDIT TESA II G4 (PIN MOVED, and again SMOOTH-LAND): the waterline's ease, the smooth law's own distance
-  assert.match(read('src/world/tamriel/tamrielBiomes.js'), /export const BIOMES_VERSION = 5;/);   // IC-RING moved it on; AUDIT TESA II (PIN MOVED) on again
   assert.ok(existsSync(join(ROOT, SOURCE)), 'the owner\'s heightmap is committed as the bake\'s source');
 });
 

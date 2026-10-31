@@ -73,17 +73,3 @@ test('WORLD7: the machine - a scheduled quest\'s clock runs under the played ste
   assert.equal(c.clockFinished, true, 'half an hour played: the hour ran out'); assert.equal(task.triggered, true, 'and the task started');
 });
 
-test('WORLD7: the chain by source - the hosts hand the played step under the shared clock and no bound offline, the bridge and the machine\'s three doors and the parser carry it, the Quest keeps it, the Clock and CreateFoe read it; the stand-down word is gone', () => {
-  for (const p of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(p);
-    assert.match(s, /questClockStepMax: \(\) => \(sharedClockOn\(\) \? PLAYED_STEP_MAX_SECONDS : Infinity\),/, p);
-    assert.match(s, /import \{ PLAYED_STEP_MAX_SECONDS \} from '(?:\.\.\/)+systems\/quest\/clock\.js';/, `${p}: one home for the step`);   // TIDY2: a host or the quest bridge in its folder
-  }
-  assert.match(rd('src/scenes/quest/questBridge.js'), /questClockStepMax: \(\) => ctx\.questClockStepMax\?\.\(\) \?\? Infinity,/);
-  assert.equal((rd('src/systems/quest/machine.js').match(/questClockStepMax: \(\) => this\.deps\.questClockStepMax\?\.\(\) \?\? Infinity/g) ?? []).length, 5);   // QUEST1: receiveSharedQuest is the fourth door; PIN MOVED (QUEST-AUDIT III START-HELD): a save's scheduled children the fifth
-  assert.match(rd('src/systems/quest/parser.js'), /const quest = new Quest\(\{ rolls, actionFactory, nowSeconds, skySeconds, worldSeconds, raisedSeconds, hooks, questClockStepMax \}\);/);
-  assert.match(rd('src/systems/quest/quest.js'), /this\.questClockStepMax = questClockStepMax;/);
-  assert.match(rd('src/systems/quest/clock.js'), /const step = caller\.questClockStepMax\?\.\(\) \?\? Infinity;\s*\n\s*const raw = now - this\._lastWorldTimeSample;\s*\n\s*if \(!Number\.isFinite\(step\)\) return Math\.trunc\(raw\);\s*\n\s*const raised = raisedSince\(caller\.raisedSeconds\?\.\(\), this\._lastRaisedSample\);\s*\n\s*return Math\.trunc\(Math\.min\(Math\.max\(raw - raised, 0\), step\)\);/);
-  assert.match(rd('src/systems/quest/actions.js'), /const step = this\.parentQuest\.questClockStepMax\?\.\(\) \?\? Infinity;/);
-  for (const p of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/quest/questBridge.js', 'src/systems/quest/machine.js', 'src/systems/quest/parser.js', 'src/systems/quest/quest.js', 'src/systems/quest/clock.js', 'src/systems/quest/actions.js']) assert.equal(rd(p).includes('questClocksStoodDown'), false, `${p}: the stand-down word is gone`);
-});

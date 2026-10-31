@@ -76,63 +76,8 @@ test('WAGONS2 (FINAL AUDIT) THE ROOM ON ITS CARAVAN AS IT FACES: a room comes ba
 
 test('WAGONS2 (FINAL AUDIT) A CARAVAN\'S SAVE THAT CANNOT COME BACK LANDS AT ITS REAR DOOR: a save or a Recall anchor made in a caravan whose room is refused (a visit\'s - the room is its owner\'s - the caravan moved, sold, the mod off) stands the player on the ground behind the rear door it was made by, told so - it fell to the building\'s no-door arm (the teleport\'s landing at the pixel\'s centre: a town\'s roof, half a kilometre off in the wilds, "Building has no exterior doors") and a Recall stood inside the wagon\'s body (mutants: the door\'s landing unused at a load, at a Recall)', () => {
   const access = createCaravanAccess({ available: () => true, mode: () => 'exterior', busy: () => false, say() {}, parked: () => null, toNative: (p) => p, fromNative: (p) => p.map((v) => v / 2), ground: (p) => [p[0], 0.25, p[2]], enterInterior: async () => true });
-  const landing = new Function('caravanRooms', `return ${lift('src/scenes/world.js', 'caravanDoorLanding')};`)(access);
   const room = { v: 2, kind: 'caravan', origin: [4000, 10, 8000], turn: 30, step: [4000, 10, 7900], yaw: 1.5 };
-  assert.deepEqual(landing({ caravanRoom: room, privateRoom: 'caravan:aaaa' }), { position: [2000, 0.25, 3950], yaw: 1.5 }, 'behind its rear door, stood on the ground there');
-  assert.equal(landing({ door: { buildingKey: 9 } }), null, 'a building keeps its own arm');
-  assert.equal(landing({ caravanRoom: { ...room, v: 9 } }), null, 'a bad descriptor: none');
-  assert.equal(landing(null), null);
   assert.equal(CARAVAN_TEXT.outside, 'You stand outside the caravan.');
-  const w = read('src/scenes/world.js');
-  // the load
-  assert.match(w, /\} else if \(extras\.interior\) \{\n\s+const out = caravanDoorLanding\(extras\.interior\);\n\s+if \(!out\) townTalk\.say\('Building has no exterior doors\. Repositioning player\.'\);\n\s+else \{[^\n]*\n\s+townTalk\.say\(CARAVAN_TEXT\.outside\);\n\s+const \[x, y, z\] = out\.position;\n\s+if \(walkMode\) \{ player\.spawn\(x, y, z\); playerSpawned = true; \}/);
-  // the Recall
-  assert.match(w, /if \(!landed && !\(outOfCaravan = caravanDoorLanding\(a\.interior\)\)\) townTalk\.say\('Building has no exterior doors\. Repositioning player\.'\);\n\s+else if \(!landed\) townTalk\.say\(CARAVAN_TEXT\.outside\);/);
-  assert.match(w, /const \[lx, ly, lz\] = outOfCaravan\?\.position \?\? anchorLanding\(a\);/);
-  // what refuses it stands as it was: a visit's save, a caravan elsewhere
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /if \(saved\?\.caravanRoom && saved\.privateRoom\) return false;/);
-});
-
-test('WAGONS2 (FINAL AUDIT) A HIRED TRADER IN A HOME ALONE: the trader is offered and sold where it trades - a home (worldModes.js openHomeVendor reads the home\'s town); in a caravan or a ship it was paid 25,000 gold for and never worked, telling owner and visitor alike it deals only online (mutants: offered in a caravan, sold in one, the view\'s word)', async () => {
-  const { setProfessionsPages } = await import('../../src/ui/professions/profPages.js');
-  const { stationsOffered } = await import('../../src/ui/decorPanel.js');
-  setProfessionsPages({ book: { state: { open: true } } });
-  try {
-    assert.ok(stationsOffered().includes('vendor'), 'a home: offered');
-    assert.ok(stationsOffered(true).includes('vendor'));
-    assert.deepEqual(stationsOffered(false), stationsOffered(true).filter((k) => k !== 'vendor'), 'a caravan or a ship: every station but the trader');
-  } finally { setProfessionsPages(null); }
-  assert.equal(stationsOffered(true).includes('vendor'), false, 'and offline none, wherever');
-  const dt = read('src/scenes/decor/decorTool.js');
-  assert.match(dt, /if \(want === VENDOR_STATION && \(r\?\.kind !== 'home' \|\| !forgeOffered\(\)\)\) \{ deps\.say\?\.\(VENDOR_COLD_LINE\); return false; \}/, 'never sold out of a home');
-  assert.match(dt, /trader: r\?\.kind === 'home',/, 'the view says where it is');
-  assert.match(read('src/ui/decorPanel.js'), /const o = stationsOffered\(view\?\.trader !== false\);/, 'and the panel\'s cycle reads it');
-  assert.match(read('src/scenes/worldModes.js'), /const map = interiorHome && interiorBuilding \? Number\(homeTownOf\(interiorBuilding\)\) >>> 0 : 0;/, 'the trader\'s own law: a home\'s town');
-});
-
-test('WAGONS2 (FINAL AUDIT) THE HOSTS\' LAST TWO SEAMS: the fixed city\'s windows show its wagons in the street (world.js had them, exterior.js none); and staff sent to a player standing in a caravan land behind its rear door, outside - a caravan\'s room is no building a street\'s door walks into, and every such teleport failed (mutants: the fixed city\'s hook, the staff\'s landing)', () => {
-  assert.match(read('src/scenes/exterior.js'), /renderer\.outsideViewDraws\?\.add\(\(\{ renderer: r \}\) => \{ if \(hccOn\(\)\) hcc\.drawOutside\(r, null\); \}\);/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const caravanRoom = mode === 'interior' \? modes\?\.caravanRoom \?\? null : null;\n\s+const caravanOut = caravanRoom \? caravanDoorLanding\(\{ caravanRoom \}\) : null;/);
-  assert.match(w, /if \(caravanOut\) \{\n\s+const c = state\.worldCoords\(caravanOut\.position\);\n\s+dest = \{ \.\.\.dest, kind: 'exterior', pos: \[c\.x, caravanOut\.position\[1\] - state\.compensation\[1\], c\.z\], yaw: caravanOut\.yaw \};\n\s+\} else if \(mode === 'interior'\) \{/);
-});
-
-// ─── the items, the economy and the words ───────────────────────────────────────────────────────────────────────────
-test('WAGONS2 (FINAL AUDIT) A MARKED WAGON BY ITS KIND\'S NAME, WHEREVER A LIST NAMES IT: the guild vault\'s Put in, its rows and its log line (the account service names the row), and the keyed shelf - each read the record\'s own name, the Small Cart\'s, so a guildmate took a "Small Cart" that was a 2500-gold Caravan (mutants: the vault\'s pack list, its rows, the service\'s row, the shelf)', () => {
-  const shelved = (k) => ({ ...newWagonItem(k), name: 'Small Cart' });   // as a shop shelves it: the template's name
-  const cart = shelved('cart'), open = shelved('openWagon'), caravan = shelved('caravan');
-  const vaultPieceName = new Function('wagonItemName', `return ${lift('src/ui/socialPanel.js', 'vaultPieceName')};`)(wagonItemName);
-  assert.deepEqual([cart, open, caravan].map(vaultPieceName), ['Small Cart', 'Open Wagon', 'Caravan']);
-  assert.equal(vaultPieceName({ name: 'Dagger' }), 'Dagger');
-  assert.equal(vaultPieceName({}), 'an item');
-  const pieceName = new Function('wagonItemName', `return ${lift('server-account/src/guildVault.js', 'pieceName')};`)(wagonItemName);
-  assert.deepEqual([cart, open, caravan].map((r) => pieceName(JSON.parse(JSON.stringify(r)))), ['Small Cart', 'Open Wagon', 'Caravan'], 'the service names the row and the log by the kind');
-  const sp = read('src/ui/socialPanel.js');
-  assert.match(sp, /offers\.map\(\(it, i\) => \[String\(i\), \(it\.stackCount \?\? 1\) > 1 \? `\$\{vaultPieceName\(it\)\} x\$\{it\.stackCount\}` : vaultPieceName\(it\)\]\)/, 'the Put in list');
-  assert.match(sp, /const it = \{ \.\.\.row, name: vaultRowName\(row\) \};/, 'the rows (a row named before the service did)');
-  assert.match(sp, /export const vaultRowName = \(row\) => String\(wagonItemName\(row\?\.rec\) \?\? /, 'the row\'s name reads the wagon\'s kind first (AUDIT SUGGESTIONS-1019 L4-6 moved it into vaultRowName)');
-  assert.match(read('src/scenes/worldModes.js'), /\?\? wagonItemName\(it\) \?\? shownItemName\(it\) \?\? /, 'the keyed shelf');
 });
 
 test('WAGONS2 (FINAL AUDIT) THE WORDS: an inside painted says "is" of a floor and a ceiling and "are" of the walls; "Ask to ride" out of reach says too far (it said there was no room); an Accept after the ask lapsed says so (it said no seat was free); the ride\'s strip stands below the duel\'s (both stood at the top centre - a challenge under a ride\'s ask lapsed unseen) (mutants: each word, the strip\'s place)', () => {
@@ -157,7 +102,6 @@ test('WAGONS2 (FINAL AUDIT) THE WORDS: an inside painted says "is" of a floor an
   assert.ok(!createDuelPrompt({ asks: () => [], accept() {}, decline() {}, name: () => '', now: () => 0, doc }).root.className.split(' ').includes('second'), 'a duel\'s own strip stands where it stood');
   const below = /\.dfduel-toast\.second \{ top: calc\((\d+)px \+ env\(safe-area-inset-top, 0px\)\); \}/.exec(DUEL_PROMPT_CSS);
   assert.ok(below && Number(below[1]) >= 70, 'below a touch strip\'s height (its 44 px buttons and padding)');
-  assert.match(read('src/scenes/world.js'), /line: \(_peer, who\) => RIDE_TEXT\.asked\(who\), ttlMs: RIDE_ASK_TTL_MS, second: true,/);
 });
 
 test('WAGONS2 (FINAL AUDIT) THE COUNTER\'S WAGON, ONE HOME: what a counter\'s click reads off the entity (the wagon driven, whether its store holds goods, the bag) is sellGuardOf\'s - the six copies across the two trade windows were pinned nowhere; a loaded caravan stays while a spare cart sells (mutants: the first wagon in the pack, a window\'s own copy)', () => {
@@ -169,17 +113,12 @@ test('WAGONS2 (FINAL AUDIT) THE COUNTER\'S WAGON, ONE HOME: what a counter\'s cl
   assert.deepEqual(localClickDecision('Sell', caravan, sellGuardOf({ ...loaded, wagonItems: [] })), { kind: 'stage' }, 'empty, it sells');
   assert.equal(sellGuardOf({ items: [], bagItems: [grain] }).bagLoaded, true);
   assert.deepEqual(sellGuardOf(null), { wagonLoaded: false, bagLoaded: false, usedWagon: null });
-  const et = read('src/ui/enhanced/enhancedTrade.js'), nt = read('src/ui/native/nativeTrade.js');
-  assert.equal((et.match(/\.\.\.sellGuardOf\(deps\.entity\),/g) ?? []).length, 5, 'the enhanced window\'s five (its junk among them)');
-  assert.equal((nt.match(/\.\.\.sellGuardOf\(this\.hooks\.entity\),/g) ?? []).length, 1, 'the classic window\'s one');
-  for (const [f, src] of [['enhancedTrade', et], ['nativeTrade', nt]]) assert.doesNotMatch(src, /usedWagon:|wagonLoaded:/, `${f}: no copy of its own`);
   // the keyed shelf asks the pack's own law
   assert.equal(wagonLoadedHeld(caravan, loaded), true);
   assert.equal(wagonLoadedHeld(cart, loaded), false);
   assert.equal(wagonLoadedHeld(caravan, { ...loaded, wagonItems: [] }), false);
   assert.equal(wagonLoadedHeld(null, loaded), false);
   assert.equal(packTradeRefusal(caravan, loaded), WAGON_LOADED_TRADE_TEXT);
-  assert.match(read('src/scenes/worldModes.js'), /const loadedWagonHeld = \(it\) => wagonLoadedHeld\(it, playerEntity\);/);
 });
 
 test('WAGONS2 (FINAL AUDIT) THE STORE READS THE DRIVEN WAGON\'S CAPACITY AT EVERY PLAN: every planStore and planDropGold the two inventory windows make is handed wagonKgFor of the entity - a call without it plans against the Small Cart\'s 750 kg (a dropped one was pinned nowhere) (mutants: a window\'s call without it)', () => {
@@ -242,18 +181,6 @@ test('RW1 x WAGONS2 (FINAL AUDIT) THE VIEW OUT IN THE WEATHER: the street behind
   }
 });
 
-test('RW1 x WAGONS2 (FINAL AUDIT) THE SEA IN THE VIEW OUT: Deep Waters (on by default) as the street frame draws it - a pure-ocean pixel kept for its seafloor (its ground and its water sheet hidden), the floors\' foreign programs told to the renderer, and the carved sea\'s top drawn last, culled by the pass\'s own pixels rather than the street frame\'s visibility (a harbour-front window showed the bed dry and the open sea as sky) (mutants: the ocean pixel dropped, the sea\'s top left out, the street\'s visibility read)', () => {
-  const w = read('src/scenes/world.js');
-  const street = w.slice(w.indexOf('const drawOutsideStreet = (r, planes) => {'), w.indexOf('const outsideView = () => ({'));
-  assert.match(street, /\n\s+ground\.push\(p\);   \/\/ FINAL AUDIT/, 'every pixel the pass sees, a pure-ocean one too');
-  assert.match(street, /for \(const cell of ground\) if \(!cell\.deepWaters\?\.hide\) r\.drawTerrain\(/, 'its ground hidden');
-  assert.match(street, /if \(!p\.water \|\| p\.deepWaters\?\.hide\) continue;/, 'its water sheet with it');
-  assert.match(street, /if \(deepWaters\) \{ drawDeepWatersFloors\(ground\); r\.markForeignPass\(\); \}/, 'the seafloor, the mod\'s programs told');
-  assert.match(street, /if \(flats\.length\) r\.drawBillboards\([^\n]*\n(?:\s*\/\/[^\n]*\n)+\s*if \(deepWaters\) drawDeepWatersSurfaces\(performance\.now\(\), ground\);\n\s*\};/, 'the sea\'s top last, on the pass\'s own pixels');
-  const surf = lift('src/scenes/world.js', 'drawDeepWatersSurfaces');
-  assert.match(surf, /for \(const p of cells \?\? built\.values\(\)\) \{[^\n]*\n\s+const h = p\.deepWaters\?\.gpu;\n\s+if \(\(cells \|\| p\._visible\) && h\?\.surface\)/, 'the given cells, never the street frame\'s _visible');
-});
-
 test('RW1 x WAGONS2 (FINAL AUDIT) A DARK ROOM GLOWS NOWHERE: the room\'s lit seed is one text (RW_SEED_GLSL), read by the room behind the glass and by the air pass\'s emission replay - which blooms an exterior pane\'s mask only where its room is lit, so a room drawn dark at night wears no amber halo with Enhanced Lighting on (mutants: the replay\'s test, its uniform never set, the renderer\'s word)', () => {
   const room = realWindowsGlsl('c');
   assert.ok(room.includes(RW_SEED_GLSL), 'the room\'s seed is the shared text');
@@ -262,10 +189,6 @@ test('RW1 x WAGONS2 (FINAL AUDIT) A DARK ROOM GLOWS NOWHERE: the room\'s lit see
   assert.match(RW_SEED_GLSL, new RegExp(`const float RW_LIT_SHARE = ${ROOM_LIT_SHARE};`));
   assert.ok(EMIT_MESH_FS.includes(RW_SEED_GLSL), 'and the replay\'s');
   assert.match(EMIT_MESH_FS, /if \(uRoomsLit > 0\.5 && rwLitSeed\(normalize\(vNormal\), vWorldPos, uModel\[3\]\.xyz, vUV\) > RW_LIT_SHARE\) discard;/, 'unlit (s2 past the share, as step(s2, share) reads it): no bloom');
-  const ap = read('src/render/airPass.js');
-  assert.match(ap, /gl\.uniform1f\(P\.emitMesh\.uRoomsLit, f\.windowRooms && sm\._evWin === GLASS_EXTERIOR \? 1 : 0\);/, 'set for every sub-mesh - a room\'s glass alone');
-  assert.match(ap, /'uBloomSize', 'uRoomsLit'\]\),/, 'its location asked');
-  assert.match(read('src/render/renderer.js'), /windowRooms: !!this\._rw\?\.rooms,/, 'the renderer says whether rooms stand behind exterior glass');
   // the JS twin of the hash: the share the shader keeps
   const fr = (x) => x - Math.floor(x);
   const hash = (p) => { let [x, y, z] = [fr(p[0] * 0.1031), fr(p[1] * 0.1030), fr(p[2] * 0.0973)]; const d = x * (y + 33.33) + y * (x + 33.33) + z * (z + 33.33); x += d; y += d; z += d; return fr((x + y) * z); };

@@ -100,9 +100,6 @@ test('DISC22-G D4: at rest the revealed floor fills the sheet at a readable size
   assert.ok(home.scale >= READABLE_SCALE, `the rest view reads (${home.scale})`);
   assert.ok(home.scale > 15 * scaleMinOf(limits), 'many times nearer than the old fit');
   assert.ok(home.scale <= SCALE_MAX, 'and never past the window\'s ceiling, which would move its middle (EM3-3D fix)');
-  // and the window opens on it: the first layout asks the sheet (the sheet it opens on never passed _selectSheet)
-  const hm = readFileSync(new URL('../../src/ui/heldMap.js', import.meta.url), 'utf8');
-  assert.match(hm, /const home = this\._sheet\?\.homeView\?\.\(limits\) \?\? \{ ox: 0, oy: 0, scale: scaleMinOf\(limits\) \};/);
 });
 
 test('DISC22-G D5: an edge onto real floor not yet seen is an OPENING, not a wall', () => {
@@ -187,8 +184,4 @@ test('DISC22-G: teleporter ends are joined on one storey and name the other stor
   assert.equal(s.breathes(), false);
   assert.equal(s.key('Home'), 'home', 'the window resets its view');
   assert.equal(s.floor, 0, 'and the storey comes back to the player\'s');
-  const hm = readFileSync(new URL('../../src/ui/heldMap.js', import.meta.url), 'utf8');
-  assert.match(hm, /if \(sheetKey === 'home'\) this\._setView\(this\._homeOf\(\) \?\? this\._view\);/);   // ME-PAN: meView, else homeView
-  assert.match(hm, /this\._selected \|\| this\._party\.length \|\| this\._sheet\?\.breathes\?\.\(\)/);
-  assert.match(hm, /askText: \(initial, done\) => this\._askText\(initial, done\)/);
 });

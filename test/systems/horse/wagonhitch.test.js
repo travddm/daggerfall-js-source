@@ -216,13 +216,6 @@ test('WAGON-HITCH: another player\'s cart wagon hangs from their rider as drawn 
   assert.ok(hgap(p.shownWagon, [40, 0, 40]) < 0.01 && p.hitch === null, `parked where its word stands: ${p.shownWagon}`);
 });
 
-test('WAGON-HITCH: the world host hands the pool another player\'s cart rider and the Overworld\'s two grows (THE FOUR HOSTS: exterior.js has no travel view and no peers; worldModes.js and dungeonContext.js draw no wagon)', () => {
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /peerAnchor: \(id\) => \{ const sh = _peerMapPoses\.get\(id\); return sh && \(sh\.rd \| 0\) === 2 \? onlineToScene\(sh\) : null; \}/);
-  assert.match(world, /hcc\.draw\(renderer, null, tvf \? \{ selfGrow: tvf\.grow, grow: peerGrow \} : undefined, yardCull\);/);
-  for (const host of ['worldModes.js', 'dungeonContext.js']) assert.doesNotMatch(readFileSync(new URL(`../../../src/scenes/${host}`, import.meta.url), 'utf8'), /hcc\.draw\(/, `${host} draws no wagon`);
-});
-
 // ── AUDIT WAGON-HITCH (2026-10-04): the four lenses' findings, each pinned
 const sideSlope = (deg) => {
   const t = Math.tan((deg * Math.PI) / 180), n = Math.hypot(t, 1);

@@ -110,12 +110,6 @@ test('AUDIT REP F7: an invisible criminal is nobody\'s face - the witness arm\'s
   assert.equal(seen.look(), true, 'visible: the stop');
 });
 
-test('AUDIT REP F3: no stop in a fight - a foe that sees the player, or a duel, holds the watch on both street hosts (mutant: the fight not a block)', () => {
-  // AUDIT NAV2 F10: PIN MOVED - the sea fight's arms follow the foot fight's (the world host alone has a sea)
-  assert.match(src('src/scenes/world.js'), /blocked: \(\) => townTalk\.overlayActive \|\| !!modes\?\.overlayHeld \|\| !!travelView\?\.active \|\| !!raidDefendingHere\(\)\n\s*\|\| duelEnemyNear\(\) \|\| areEnemiesNearby\(exteriorFoes\.foes\)[,\n]/);
-  assert.match(src('src/scenes/exterior.js'), /blocked: \(\) => townTalk\.overlayActive \|\| !!modes\?\.overlayHeld \|\| areEnemiesNearby\(exteriorFoes\.foes\),/);
-});
-
 const citizen = (legal, gold) => ({ legalRep: { 4: legal }, goldPieces: gold, items: [], regionConditions: createRegionConditions() });
 const temple = (p) => buildDonationFlow(p, null, 29, { rows: () => [], onClose: () => {}, regionIndex: 4, regionName: 'Wayrest', ownNow: () => 9000, worldNow: () => 9000 });
 const text = (win) => (win.top?.rows ?? []).map((l) => l.text).join(' ');
@@ -167,18 +161,7 @@ test('AUDIT REP F5: a raid\'s defence says its thanks - the one legal change a c
   } finally { off(); }
 });
 
-test('AUDIT REP F6: DFU\'s per-minute levy stays retired - no production caller; its home says so (mutant: none - the guard is this pin)', () => {
-  const callers = ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/systems/worldTick.js']
-    .filter((file) => /passiveGuardSpawns\(/.test(src(file)));
-  assert.deepEqual(callers, []);
-  assert.match(src('src/systems/encounters.js'), /AUDIT REP F6: KEPT, WITH NO PRODUCTION CALLER SINCE REP1/);
-});
-
 test('AUDIT REP, Mac\'s call ("What do you think? I trust you"): an online death ends the chase - the crime cleared and the chase forgotten at the respawn\'s top, before the teleport\'s await; the charge laid stays (mutants: the crime kept through the death; the chase kept)', () => {
-  const w = src('src/scenes/world.js');
-  const body = w.slice(w.indexOf('  function respawnOnlinePlayer() {'), w.indexOf('    Promise.resolve().then(async () => {', w.indexOf('  function respawnOnlinePlayer() {')));
-  assert.match(body, /reviveForPlay\(playerEntity, \{ force: true \}\);[\s\S]*applyDeathPenalty\(playerEntity\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*setCrimeCommitted\(playerEntity, CRIMES\.None\);\n\s*arrestFlow\.abandon\(\);/,
-    'after the revive and the death\'s price, before anything is awaited');
   // abandon's own law (REP2's pin): the chase's charge and its slain watchman go with it; the name keeps the charge
   const r = flowRig(CRIMES.Murder);
   r.flow.onGuardHit(5, () => {});

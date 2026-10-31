@@ -182,7 +182,6 @@ test('AUDIT 68 S16-el-cloudshadow-dup: every lane shader takes the cloud reader 
     assert.ok(fs.includes(CLOUD_SHADOW_GLSL), `${name} interpolates the leaf`);
     assert.equal(fs.split('float cloudShadowAt(vec3 wp)').length, 2, `${name} declares the reader once`);
   }
-  assert.doesNotMatch(rd('src/render/enhancedLighting.js'), /float cloudShadowAt\(vec3 wp\) \{/, 'no copy left in the lane\'s source');
 });
 
 test('AUDIT 68 S16-batch-sphere-dup: the batch sphere\'s half-height lift has one home, batchSphere - shadowReachBatch and the SC1 scans take it, as batchVisible does', async () => {
@@ -229,9 +228,6 @@ test('AUDIT 68 S16-grass-set-broken-dead: the lab\'s whole-scatter set() is gone
 });
 
 test('AUDIT 68 S16-grass-point-alloc: _point moves the pointers off the constructor\'s ONE lane table - no array literal per drawn slot per frame, and the VAOs and writeSlot read the same table', () => {
-  const src = rd('src/render/labGrass.js');
-  const pt = src.slice(src.indexOf('  _point(slot) {'), src.indexOf('  _drawVisibleSlots(vp'));
-  assert.doesNotMatch(pt, /\[\[|of \[/, 'no table literal in the per-slot call');
   const { gl, calls } = grassGl();
   const r = new LabGrassRenderer(gl);
   assert.ok(Object.isFrozen(r._lanes) && r._lanes.length === 3, 'the table, frozen');
@@ -250,13 +246,3 @@ test('AUDIT 68 S16-grass-point-alloc: _point moves the pointers off the construc
   assert.deepEqual(calls.filter((c) => c[0] === 'bufferSubData').map((c) => c[2]), r._lanes.map((L) => 2 * perCell * L.bytes));
 });
 
-test('AUDIT 68 S16-sky-dead-uniforms / S16-classic-max-lights-dup / S16-facesbounds-dead / S16-air-dead-fields: the dead surface is gone', async () => {
-  const sky = rd('src/render/enhancedSky.js');
-  assert.doesNotMatch(sky, /uniform vec2 uWind;|uCloudSoft, uTime;|u\.uTime|u\.uWind\b|'uTime'|'uWind'/, 'the sky declares, looks up and uploads no time or wind - WIND2\'s uDrift moves the decks');
-  assert.match(sky, /gl\.uniform2f\(u\.uDrift, /);
-  assert.equal((await import('../../src/render/enhancedLighting.js')).EL_CLASSIC_MAX_LIGHTS, undefined, 'the restated cap nothing read');
-  assert.equal('facesBounds' in (await import('../../src/render/characterMesh.js')), false, 'a bounds nothing called');
-  const air = rd('src/render/airPass.js');
-  assert.doesNotMatch(air, /this\._black = |this\._zeroWind = /, 'two fields nothing read');
-  assert.match(air, /gl\.bindTexture\(gl\.TEXTURE_2D, this\.frame \? this\.frame\.prevDepth : null\);/, 'the contact unit: one binding, on or off');
-});

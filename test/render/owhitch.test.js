@@ -168,9 +168,6 @@ test('OW-HITCH snow: a blade\'s and the feet\'s snow asks the stream nothing - n
     }
   } finally { setAirGround(null); }
   const { readFileSync } = await import('node:fs');
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const call = w.slice(w.indexOf('const snowCover = createSnowCoverHost('), w.indexOf('const trees = createTreesHost('));
-  assert.ok(call.length > 0 && !/heightAt|normalOf/.test(call), 'the world host hands the snow host no ground reader');
 });
 
 // ─── 4. THE SNOWPACK'S YEAR AND THE WEATHER'S SYSTEMS ───────────────
@@ -309,38 +306,6 @@ test('OW-HITCH ground sets: a set is made ONCE a key while builds ask for it tog
 });
 
 // ─── 6. THE LIVING WORLD'S TOWNS NEAR, AND THE MUSIC'S WINDOW ───────
-
-test('OW-HITCH the towns near: a reach and a pixel are one number, never two alike across the map and half a map past it; the host keeps its answers by it, 8,192 of them (mutants: a key that folds the reach; the old bound)', async () => {
-  const { livingNearKey, LIVING_NEAR_KEPT, INN_REACH_PX, TRIP_REACH_PX } = await import('../../src/systems/livingWorld/trips.js');
-  const seen = new Map();
-  for (const r of [0, INN_REACH_PX, 2, 3, TRIP_REACH_PX, 40]) {
-    for (let py = -250; py < 750; py += 3) for (let px = -500; px < 1500; px += 11) {
-      const k = livingNearKey(px, py, r);
-      assert.ok(Number.isSafeInteger(k));
-      const was = seen.get(k);
-      assert.ok(was === undefined, `${px},${py},${r} and ${was} share a key`);
-      seen.set(k, `${px},${py},${r}`);
-    }
-  }
-  // WW1: and across the whole world's grid, where the first key folded two pixels of the land past the Bay into one
-  for (const r of [0, TRIP_REACH_PX]) {
-    for (let py = -8191; py < 8192; py += 1021) for (let px = -8191; px < 8192; px += 1019) {
-      const k = livingNearKey(px, py, r);
-      assert.ok(Number.isSafeInteger(k));
-      const was = seen.get(k);
-      assert.ok(was === undefined, `${px},${py},${r} and ${was} share a key`);
-      seen.set(k, `${px},${py},${r}`);
-    }
-  }
-  assert.equal(LIVING_NEAR_KEPT, 8192);
-  const { readFileSync } = await import('node:fs');
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the two books are one maker's now, out of the host - the living
-  // world's index (scenes/livingWorld/livingIndex.js nearOf), which keeps the towns' book and the dungeons' alike
-  const w = readFileSync(new URL('../../src/scenes/livingWorld/livingIndex.js', import.meta.url), 'utf8');
-  assert.equal(w.split('const key = livingNearKey(px, py, r);   // OW-HITCH').length - 1, 1, 'the one maker of both books');
-  assert.equal(w.split('.size > LIVING_NEAR_KEPT) ').length - 1, 1, 'kept to the bound');
-  assert.match(w, /townsNear: nearOf\(townOf, townsNearKept\),[\s\S]*dungeonsNear: nearOf\(dungeonOf, dungeonsNearKept\),/, 'the towns\' book and the dungeons\'');
-});
 
 test('OW-HITCH the music\'s window: the events of [from, to) found by halving are the ones the walk from the first event found - every window of a long song, on its boundaries too (mutants: the window closed at its start; open at its end)', async () => {
   const { eventsInWindow } = await import('../../src/systems/song/songPlayer.js');

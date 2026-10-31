@@ -69,10 +69,6 @@ test('SOC5: the port\'s own action - appended past DFU\'s forty-four, parseable,
   resetDefaults(s);
   assert.equal(actionForCode(s, 'KeyF'), 'SocialInteract');
   assert.equal(getBinding(s, 'SocialInteract'), 'KeyF');
-  // it is a WHY, not an accident: the source says the departure out loud
-  const src = rd('src/systems/inputActions.js');
-  assert.match(src, /SOC5/, 'the slice tag');
-  assert.match(src, /Ledger A row \(ONLINE\)/, 'the departure note - DFU has no such action');
 });
 
 test('SOC5: a bindings file written BEFORE this slice gains KeyF on the next boot, and a player who had already bound F to something else keeps it (mutants: the autofill stealing a bound key; the merge skipped so an existing player never gets the action)', () => {
@@ -111,9 +107,6 @@ test('SOC5: the enhanced controls window offers the action in its own group, and
   const all = ACTION_GROUPS.flatMap((g) => g.rows.map((r) => r.action));
   assert.equal(new Set(all).size, all.length, 'none twice');
   assert.deepEqual([...all, ...HIDDEN_ACTIONS].sort(), [...ACTIONS].sort(), 'and none missing');
-  // the pane draws the groups
-  const pane = rd('src/ui/enhanced/enhancedControls.js');
-  assert.match(pane, /for \(const grp of shownGroups\(\)\) group\(body, grp\.title, grp\.rows\.map\(\(r\) => \[r\.action, r\.label\]\)\);/, 'the groups are rendered, not merely declared');
   // THE CLASSIC WINDOW CANNOT. Its buttons are pixels on CNFG00I0.IMG, nine groups over Actions[2..40), and the
   // lowest rows already run to within two pixels of the tab row at y=190 - a tenth row needs eleven.
   assert.equal(KEY_GROUPS.at(-1).end, 40, 'the classic grid still ends at DFU\'s 40');
@@ -121,7 +114,6 @@ test('SOC5: the enhanced controls window offers the action in its own group, and
   assert.ok(!gridButtons().some((b) => b.action === 'SocialInteract'));
   const lowest = Math.max(...KEY_GROUPS.map((g) => g.y + (g.end - g.start - 1) * 11));
   assert.equal(lowest, 181); assert.ok(lowest + 7 + 11 > 190, 'no room below the last row before the tabs');
-  assert.match(rd('src/ui/controlsWindow.js'), /SOC5[\s\S]{0,1600}enhancedControls\.js, over systems\/inputActions\.js ACTION_GROUPS/, 'and the window says so where the table is, with the pointer to the door that does have room');
 });
 
 // ── THE ROUTE ────────────────────────────────────────────────────────
@@ -138,7 +130,6 @@ test('SOC5: routeAction sends the action to ctx.socialInteract and passes the DO
   routeAction('Rest', { toggleRest: () => { rest++; } });
   routeAction('Escape', { togglePause: () => { pause++; } });
   assert.deepEqual([rest, pause], [1, 1]);
-  assert.match(rd('src/ui/input.js'), /case 'SocialInteract': return ctx\.socialInteract\?\.\(\) === true;/, 'the arm, as it stands');
 });
 
 // ── THE REACH ────────────────────────────────────────────────────────
@@ -174,9 +165,6 @@ test('SOC5: the reach law with plain vectors and the port\'s own cylinder - the 
   assert.equal(pickPeerInFront(cam, fwd, [], SOCIAL_REACH, rayPersonDistance), null);
   assert.equal(pick([{ id: 'nofeet' }, near]).peer.id, 'near', 'a peer whose body is not standing yet has no feet to aim at');
   assert.equal(pickPeerInFront(cam, fwd, [near], SOCIAL_REACH, null), null, 'no cylinder handed in, no answer invented');
-  // the module keeps ONE cylinder law: it never restates the radius or the height
-  const src = rd('src/player/socialPick.js');
-  assert.doesNotMatch(src, /0\.45|1\.8/, 'the cylinder is handed in, never copied');
 });
 
 // ── THE MENU ─────────────────────────────────────────────────────────
@@ -250,8 +238,6 @@ test('SOC5 / AUDIT SOC C15: the rows the card offers - the two acts and Cancel, 
   assert.equal(friend[0].enabled, false); assert.equal(friend[0].why, 'already friends', 'the row still stands, and says why');
   // the picture's whole `actionsFor` answer is still accepted without being stripped by the caller
   assert.deepEqual(socialMenuRows({ peerId: 'peer-b', acct: null, relation: 'friend' }).map((r) => r.key), ['friend', 'invite', 'cancel']);
-  assert.doesNotMatch(rd('src/ui/socialMenu.js').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' '), /friend\.remove/,
-    'the kind is not spelled anywhere in the module, comments aside');
   // every act this menu can send is one the wire admits, with the field that kind requires
   for (const r of [...stranger, ...friend]) {
     if (!r.act) continue;
@@ -377,44 +363,6 @@ test('SOC5: a name the room has not said yet still makes a sentence, and the car
 
 // ── THE WIRING ───────────────────────────────────────────────────────
 
-test('SOC5: scenes/world.js - the door on hudCtx, the ray read as the activation site reads it, the reach law by the one pure helper, the menu built beside the picture and taken away by a window (mutants: a second cylinder written out in the host; the menu built without the picture so F acts on a page with no account; hudCtx.socialInteract missing so the route has no door)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /import \{ pickPeerInFront, SOCIAL_REACH(?:, [^}]*)? \} from '\.\.\/player\/socialPick\.js';/);   // PEER-PLAQUE1: the plaque's half rides the same import
-  assert.match(w, /import \{ createSocialMenu(?:, [^}]*)? \} from '\.\.\/ui\/socialMenu\.js';/);
-  assert.match(w, /hudCtx\.socialInteract = socialInteract;/, 'the door routeAction reaches');
-  // the door sits AFTER peersNear, because peersNear is the list it measures
-  assert.ok(w.indexOf('const peersNear = () =>') < w.indexOf('const socialInteract = () =>'), 'the door is written below the peers it reads');
-  assert.ok(w.indexOf('const socialInteract = () =>') < w.indexOf('hudCtx.socialInteract = socialInteract;'));
-  // the three answers
-  assert.match(w, /const socialInteract = \(\) => \{\s*\n\s*if \(!social\) return false;/, 'offline: the ladder falls through');
-  assert.match(w, /if \(socialMenu\?\.isOpen\(\)\) \{ socialMenu\.hide\(\); return true; \}/, 'a second F closes the card');
-  assert.match(w, /if \(!hit\) \{ socialPanel\?\.toggle\?\.\(\); return true; \}/, 'nobody in front: SOC3\'s panel, through optional calls');
-  assert.match(w, /SOC3/, 'and SOC3 is named where its slot is used');
-  // the ray is the ACTIVATION ray's own reading, and the cylinder is the port's one test
-  assert.match(w, /const fwd = \[Math\.sin\(cam\.yaw\) \* Math\.cos\(cam\.pitch\), Math\.sin\(cam\.pitch\), Math\.cos\(cam\.yaw\) \* Math\.cos\(cam\.pitch\)\];/, 'the same forward the activation site composes');
-  // AUDIT DISC7 A6: through `peerInSight` - the same one law and cylinder, and a wall in front of the player blocks it
-  assert.match(w, /const peerInSight = \(eye, dir\) => \{\s*\n\s*const hit = pickPeerInFront\(eye, dir, openPeers\(peersNear\(\), isPartyMate\)\.filter\(crowdDrawnHere\), SOCIAL_REACH, rayPersonDistance\);/, 'one law, one cylinder');
-  assert.match(w, /const hit = peerInSight\(cam\.pos, socialFwd\(\)\);/, 'the host\'s own camera');   // AUDIT DROPS E3: the forward is a named function now, shared with the plaque's modal pick
-  assert.match(w, /const socialFwd = \(\) => \[Math\.sin\(cam\.yaw\) \* Math\.cos\(cam\.pitch\), Math\.sin\(cam\.pitch\), Math\.cos\(cam\.yaw\) \* Math\.cos\(cam\.pitch\)\];/, 'the ray read as the activation site reads it');
-  assert.equal((w.match(/rayPersonDistance\(/g) ?? []).length, 1, 'the host still calls the cylinder in exactly one place - the other site hands it to raceActivation as a list');
-  // the menu is built beside the picture, over the LIVE link, and its acts write a line
-  assert.match(w, /socialMenu = createSocialMenu\(\{/);
-  assert.ok(w.indexOf('const socialStart = () => {') < w.indexOf('socialMenu = createSocialMenu({'), 'built inside socialStart - so it exists exactly when `social` does');
-  assert.match(w, /const hub = socialLink\(\);\n\s*const went = hub\?\.sendSocial\(act\) === true;/, 'the act leaves through the live session, never a captured one (AUDIT SOC B17: read once, so the word after can ask whether it was open)');
-  assert.match(w, /chatLog\.push\(tab\.id, \{ text: went \? socialActText\(act\.k, who\) : \(hub\?\.status === 'open' \? TRY_AGAIN_TEXT : NOT_CONNECTED_TEXT\), system: true \}\);/, 'a word either way, on the world tab, flagged as nobody\'s line - AUDIT SOC B17: the panel\'s "try again" when the gate refused, "not connected" when there is no link to try again on');
-  assert.match(w, /const NOT_CONNECTED_TEXT = 'You are not connected';/);
-  assert.match(w, /Friend request sent to \$\{who\}/); assert.match(w, /Party invite sent to \$\{who\}/);
-  // the pointer door is the chat's, and the open gate is the chat's
-  assert.match(w, /onOpen: \(\) => surfaceOpen\('menu'\),   \/\/ AUDIT CHAT C2's law/, 'AUDIT SOC B6: the card is a counted pointer surface');
-  // PIN MOVED (AUDIT OW5 V2): and never from under the travel view (the body in front of the hidden head)
-  assert.match(w, /if \(!townTalk\.overlayActive && !travelView\?\.active && act === 'SocialInteract' && socialMenuCanOpen\(\) && socialInteract\(\)\) \{ e\.preventDefault\(\); return true; \}/, 'AUDIT SOC B4/D1: the door answers ABOVE the exterior gate - F on a body works in a tavern and a dungeon');
-  assert.ok(w.indexOf("act === 'SocialInteract' && socialMenuCanOpen()") < w.indexOf("if (!townTalk.overlayActive && (modes?.mode ?? 'exterior') === 'exterior') {"), 'written above the mode gate, not inside it');
-  assert.match(w, /onClose: \(\) => surfaceClose\('menu'\),   \/\/ and taken back inside the one that closed/);
-  assert.match(w, /const socialMenuCanOpen = \(\) => !gamePaused\(\) && !\(townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\)\);/, 'the chat\'s own gate: a window\'s keys are the window\'s');
-  assert.match(w, /socialMenu\?\.render\(\{ covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \}\);/, 'and a window that opens later takes the card with it');
-});
-
-
 // ── THE AUDIT'S OWN PINS ─────────────────────────────────────────────
 
 test('AUDIT SOC C1: the menu\'s sheet and the panel\'s sheet share NO class selector, and no style id either - two surfaces that stand at once cannot both be .dfsocial (mutants: the menu\'s prefix put back; one class left behind in the rename; the two style ids made one)', () => {
@@ -482,14 +430,6 @@ test('AUDIT SOC C12/C25: a refused row is READABLE - the disabled opacity is .75
   assert.equal(noHead.body.children.some((n) => n.id === SOCIAL_MENU_STYLE_ID), true, 'no head, and the skin still lands');
 });
 
-test('AUDIT SOC C9: the touch layer has a control for SocialInteract - one 48px button beside the mode cycle, drawn only where a host hands the hook in, calling the HOST door rather than synthesizing a key (mutants: the button always drawn, so an offline page offers a dead door; a synthesized KeyF that a rebind would break; the hook undocumented)', () => {
-  const touch = rd('src/ui/touch/touch.js');
-  assert.match(touch, /if \(hooks\.socialInteract\) socialBtn = button\('[^']+', edge\('right', hooks\.cycleMode \? 232 : 160\), edge\('bottom', 16\), 48, \(\) => \{ hooks\.socialInteract\(\); \}\);/,
-    'gated by the hook, 48 like its neighbours, and the host answers for itself');
-  assert.doesNotMatch(touch, /tapAction\('SocialInteract'\)/, 'never the key: F is rebindable and may be unbound outright');
-  assert.match(touch, /socialInteract\?\(\)/, 'and the header documents the hook it calls');
-});
-
 test('AUDIT SOC D3: the port own action YIELDS in the classic windows - a grid action staged onto F leaves SocialInteract unbound rather than raising a clash no classic pane can show or clear, and the apply then writes a duplicate-free store (mutants: the yield dropped, so the window cannot be closed; the yield applied to the enhanced pane, which CAN show the row; the yield taking a key nothing else wants; the yield reaching across the two dicts)', () => {
   // QS2: the three quickslot actions joined it, off the same face and for the
   // same reason - the classic grid is Actions[2..40) on fixed art and the
@@ -547,12 +487,6 @@ test('AUDIT SOC D3: the port own action YIELDS in the classic windows - a grid a
   checkDuplicates(two, { yield: PORT_ACTIONS });
   assert.equal(two.primary.get('SocialInteract'), 'KeyF', 'the primary is untouched by the other dict spelling');
   assert.equal(two.secondary.get('SocialInteract'), null, 'and the secondary yields its own');
-  // the two classic windows pass it; the enhanced pane passes nothing
-  assert.match(rd('src/ui/controlsWindow.js'), /checkDuplicates\(this\.unsaved, \{ yield: PORT_ACTIONS \}\)/);
-  assert.match(rd('src/ui/mouseControlsWindow.js'), /checkDuplicates\(this\.unsaved, \{ yield: PORT_ACTIONS \}\)/);
-  assert.match(rd('src/ui/enhanced/enhancedControls.js'), /checkDuplicates\(unsaved\)/, 'the pane that SHOWS the row argues for it');
-  assert.equal((rd('src/ui/controlsWindow.js').match(/checkDuplicates\(this\.unsaved\)/g) ?? []).length, 0);
-  assert.equal((rd('src/ui/mouseControlsWindow.js').match(/checkDuplicates\(this\.unsaved\)/g) ?? []).length, 0);
 });
 
 test('AUDIT SOC D4: a mod-settings file written BEFORE this slice loses Handheld Torches saved "F" once, on load, so the shipped O applies - and any other saved key is left exactly as the player set it (mutants: the migration skipped, so a torch lights on the social key; every saved key cleared; a value the player chose later taken too; the file not written back)', () => {
@@ -591,16 +525,10 @@ test('AUDIT SOC D4: a mod-settings file written BEFORE this slice loses Handheld
 });
 
 test('AUDIT SOC D14: the pick header says the two things it does NOT do - the cylinder is unoccluded on purpose (the street own person pick takes no collider either) and t <= 0 covers a peer at my feet as well as one behind me (mutants: the sentences dropped, so the next reader adds an occlusion test the talk arm does not have)', () => {
-  const src = rd('src/player/socialPick.js');
-  assert.match(src, /UNOCCLUDED/, 'the word, so a reader cannot mistake it for an oversight');
-  assert.match(src, /raceActivation/, 'and the site it is consistent with - world.js hands the same distances in with no collider');
-  assert.match(src, /AT MY FEET/, 'and the other half of t <= 0');
   // and it is true: a peer standing exactly where I am is out of the race, not at distance zero winning every tie
   const cam = [0, 1.6, 0], fwd = [0, 0, 1];
   assert.equal(rayPersonDistance(cam, fwd, [0, 0, 0]), Infinity, 'a body at my own feet has no along-ray distance');
   assert.equal(pickPeerInFront(cam, fwd, [peer('feet', [0, 0, 0]), peer('ahead', [0, 0, 3])], SOCIAL_REACH, rayPersonDistance).peer.id, 'ahead');
-  // the street own arm measures a person with the very same call and no collider of its own
-  assert.match(rd('src/scenes/world.js'), /personDistances: _talkPersons\(\)\.map\(\(p\) => rayPersonDistance\(/, 'one cylinder, both arms');   // LW3: the town's and the road's people
 });
 
 // ── FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our

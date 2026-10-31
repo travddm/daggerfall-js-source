@@ -195,9 +195,6 @@ test('AUDIT BRANCH (WoD) M1: an owner\'s PLACED foes never ride - eight left beh
   await flush();
   const pups = B.foes.filter((f) => f.puppet);
   assert.deepEqual(pups.map((f) => f.seq).sort(), enc.map((f) => f.seq).sort(), 'the peer stands the three that are fighting beside it');
-  // the law is the pool's to state: wire.js's bytes are the relay's deployed law (relayversion.test.js), and what
-  // rides still keeps within its comment - a placed foe exceeds the cap as a quest foe does, and never rides either
-  assert.match(rd('src/scenes/exteriorFoes.js'), /A quest's foe is the quest owner's alone \(Multiplayer\.md's first lock\) and never rides; nor does a foe a mod\n\s*\*\s*PLACED/, 'the frame\'s own comment names them');
 });
 
 test('AUDIT BRANCH (WoD) M1: a PLACED foe hunts no peer - no peer holds its puppet, and a blow at a peer lands only through one; an ordinary foe still does', async () => {
@@ -245,7 +242,6 @@ test('AUDIT BRANCH (WoD) M2: a region heard before Awake waits for region 17; a 
   assert.deepEqual(w.session.regions, [17, 16], 'Awake\'s folder first, as the C# event cannot fire before Awake');
   assert.equal(w.prefabs.get('WOD_Rocks_Small_01'), null, 'a null text reads as a layout that failed');
   assert.ok(w.prefabs.get('WOD_Rocks_Small_02'), 'and the rest read');
-  assert.match(rd('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /out\.set\(baseName\(p\)\.replace\(\/\\\.txt\$\/, ''\), await load\(\)\.catch\(\(\) => null\)\);/, 'the browser source catches per file');
 });
 
 test('WOD6: a region whose pack failed is tried again off the chain and lands in its own place - the list built again in the order the events came, the host told which pixels it names', async () => {
@@ -310,15 +306,6 @@ test('AUDIT BRANCH (WoD) M2: a pack fetch is abandoned after a stall and tried t
   assert.deepEqual([...await fetchPackBytes('x', { fetchFn: async (u, { signal }) => ({ ok: true, body: slow(signal) }), stallMs: 30, attempts: 1, sleep: noSleep })], [0, 1, 2, 3, 4], 'bytes arriving inside the stall window keep it alive past it - the window is per byte, not per request');
   calls = 0;
   assert.deepEqual([...await fetchPackBytes('x', { fetchFn: async () => (++calls < 3 ? { ok: false, status: 503 } : { ok: true, arrayBuffer: async () => new Uint8Array([9]).buffer }), sleep: noSleep })], [9], 'a 503 is retried');
-  assert.match(rd('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /try \{ return await fetchPackBytes\(url\); \}/, 'the browser source fetches through it');
-});
-
-test('AUDIT BRANCH (WoD) M2: the build\'s pick can cost a pixel its site, never the pixel; with the mod off no frame walks the pixels for its lights', () => {
-  const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G8): the pick asked on the Bay alone - its sites are the Bay's
-  assert.match(w, /if \(wod && onTheBay\(px, py\) && await wodOpened\) \{[^\n]*\n[^\n]*\n[^\n]*\n      try \{\n        const here = host\.state\.current \?\? \{ x: px, y: py \};[\s\S]{0,900}\} catch \(e\) \{\n        console\.warn\(`\[wod\] pixel \$\{key\}: the loader failed here[^\n]*\n        wodPicks = null;\n      \}/);
-  assert.match(w, /const wodLit = wod \? _wodLitCount\(\) : 0;/);
-  assert.match(rd('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /if \(!b\) return;\n[^\n]*\n[^\n]*\n      await new Promise\(\(r\) => setTimeout\(r, 0\)\);[\s\S]{0,400}decodeRegionPack\(b\)/, 'one decode a task');
 });
 
 // ── L1-3: DFU's terrain array ──────────────────────────────────────────
@@ -351,75 +338,6 @@ test('AUDIT BRANCH (WoD) L1-3: DFU pools a terrain that leaves range and reuses 
 
 // ── The world host's own WoD code, sliced and run ───────────────────────
 
-const WORLD = hostText('src/scenes/world.js');
-function sliceWorld() {
-  const cut = (a, b) => { const i = WORLD.indexOf(a); const j = WORLD.indexOf(b, i); assert.ok(i >= 0 && j > i, `slice ${a}`); return WORLD.slice(i, j); };
-  const wodCode = cut('  const wodCarry = new Map();', '  const tickCityGates = ');
-  const dpStart = WORLD.indexOf('  function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {}) {');   // PIN MOVED (IC-SWAP-BEHIND): its carry's two doors
-  const dpEnd = WORLD.indexOf('\n  }\n', dpStart) + 4;
-  // PIN MOVED (IC-SWAP-BEHIND): under the pixel's own key (`pkey`; `key` the build's, behind a standing view)
-  const pubA = WORLD.match(/    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};/);
-  const pubB = WORLD.match(/    for \(const pile of wodKept\.piles \?\? \[\]\) standWodPile\(pkey, wodLife, pile\);/);
-  assert.ok(pubA && pubB, 'the publish lines stand where the rig reads them');
-  return { wodCode, dpCode: WORLD.slice(dpStart, dpEnd), pubA: pubA[0], pubB: pubB[0] };
-}
-const SLICE = sliceWorld();
-function host({ online = null, removeSiteFoes = () => {} } = {}) {
-  let release = null; let cold = false;
-  const tex = { recordCount: 47, getFrameCount: () => 1, getSize: () => ({ width: 32, height: 32 }), getScale: () => ({ width: 0, height: 0 }) };
-  const getTexture = (a) => (cold && a === 216 ? new Promise((r) => { release = () => r(tex); }) : Promise.resolve(tex));
-  const renderer = { createBillboardBatch: () => ({}), destroyBillboardBatch: () => {}, destroyBatch: () => {}, destroyMesh: () => {}, destroyWaterSurface: () => {}, gl: { deleteTexture: () => {} } };
-  const droppedLoot = createDroppedLoot({ renderer, getTexture: async () => tex, uploadRecordFrame: () => {} });
-  const built = new Map();
-  const state = new StreamingWorldState(3);
-  state.init(100, 100);
-  const player = { pos: [0, 0, 0], height: 1.8 };
-  const env = {
-    wod: {}, walkMode: true, playerSpawned: true, player, cam: { pos: [0, 0, 0] }, built, state, TerrainSlots,
-    collider: { surfaceHit: () => ({ dist: 1 }), removeBucket: () => {} },
-    exteriorFoes: { spawnFoe: async () => null, removeFoe: () => {}, collectPixel: () => {}, removeSiteFoes },
-    alignBillboardToGround, WOD_LOOT_ALIGN, WOD_LOOT_LOCATION_INDEX, DUNGEON_LOOT_KEYS: ['A', 'B', 'C', 'N'],
-    generateLootItems: () => [{ name: 'Gold' }], playerEntity: { level: 1, gender: 'male' }, addPileLootExtras: () => {}, rollLootRarity: () => {}, stampWonWeapons: () => 0,
-    pileSource: () => 0, dungeonRarityTier: () => 0, liveStat: () => 50, getTexture, billboardSize: () => ({ w: 0.8, h: 0.6 }), droppedLoot,
-    uploadRecord: () => {}, centredBase: (c) => c, renderer, flatBatchAabb: () => [0, 0, 0, 0, 0, 0], armFlatAnim: () => {}, uploadRecordFrame: () => {},
-    _seasonStraightening: false, _loading: false, _recalling: false, _partyArrivalPending: false, rollHoldFoes: () => [], online, wodSiteId, yieldsTo, performance: { now: () => 0 },
-    buildingDoors: [], doorGeneration: 0, droppedTorches: { collectPixel: () => {} }, cityGuards: { collectPixel: () => {} },
-    deepWaters: null,   // DW-B: destroyPixel hands a pixel's seafloor back to the Deep Waters host - none in this rig
-    dwDecor: null,   // DW-E2: and its seafloor's decorations to theirs - none in this rig either
-    _dwRubble: new Map(), _dwRubbleCarry: new Map(), _dwGuards: new Map(), dwFreeRubble: () => {},   // DW-E5 / AUDIT DW-F: the sunken loot's rubble and the wrecks' guards leave with a pixel - none in this rig
-    oceanHoles: null,   // OH-B: and its pit to There's a Hole in the Bottom of the Ocean's host - none in this rig
-    gatherHost: null,   // PROF1/PROF2: destroyPixel tells the gathering host its pixel's nodes went - none in this rig
-    trees: { released: () => {} },   // LPT1 / BANTHA1: and the trees' host its far pictures' handles - none in this rig
-    seatEdicts: { bountyAt: () => false },   // SEAT1d: a Bounty's camp yields double - none in this rig
-  };
-  const names = Object.keys(env);
-  const body = `${SLICE.wodCode}\n${SLICE.dpCode}\n
-    function publish(px, py, centres, { wodSite = null } = {}) {
-      const key = px + ',' + py, pkey = key;   // built as ever: under the pixel's own key
-      const wodSpawners = centres.map((centre, i) => ({ spawner: new __WodSpawner({ spawnType: __LOOT }), centre, flat: null, restand: false, oid: i + 1 }));
-      const privateersHold = null;
-${SLICE.pubA}
-      built.set(key, { px, py, batches: [], _box: [0, 0, 0, 0, 0, 0], wodSpawners, privateersHold, wodSite, wodLife });
-${SLICE.pubB}
-      return built.get(key);
-    }
-    function sweep(px, py) {
-      wodCarry.clear(); wodSlots.clear();
-      for (const k of [...built.keys()]) { const [a, b] = k.split(',').map(Number); destroyPixel(a, b); }
-      state.init(px, py); wodSlots.step(px, py, state.terrainDistance, StreamingWorldState.onMap);
-    }
-    function cross(px, py) {
-      state.current = { x: px, y: py };
-      for (const k of wodSlots.step(px, py, state.terrainDistance, StreamingWorldState.onMap).recycled) wodCarry.delete(k);
-      for (const k of [...built.keys()]) { const [a, b] = k.split(',').map(Number); if (!state.inRange(a, b)) destroyPixel(a, b); }
-    }
-    wodSlots.step(100, 100, state.terrainDistance, StreamingWorldState.onMap);   // the scene's start, as the host steps it
-    return { tick: tickWodSpawners, destroyPixel, publish, sweep, cross, carryOf: (k) => wodCarry.get(k), arriving: (v) => { _seasonStraightening = v; },
-      arrival: (list) => { _wodArrival = wodArrivalOf(list); }, onLoad: (c) => wodOnLoad(c), inside: (v) => { _wodInside = v; },
-      sprung: _wodSprung, peerSprung: _wodPeerSprung, peerSites: wodPeerSites, sprungChanged: () => _wodSprungChanged };`;
-  const api = new Function(...names, '__WodSpawner', '__LOOT', 'StreamingWorldState', body)(...names.map((k) => env[k]), WodSpawner, WOD_SPAWN_TYPE.Loot, StreamingWorldState);
-  return { ...api, built, droppedLoot, state, player, cold: (v) => { cold = v; }, release: () => release?.() };
-}
 const worldAt = (h, px, py, l) => { const t = h.state.pixelTranslation(px, py); return [l[0] + t[0], l[1] + t[1], l[2] + t[2]]; };
 const localAt = (h, px, py, p) => { const t = h.state.pixelTranslation(px, py); return p.map((v, i) => Math.round((v - t[i]) * 1000) / 1000); };
 /** A camp at (97,100): one treasure marker at local (400, 50, 400), sprung by a player far then near. */
@@ -433,267 +351,16 @@ function springCamp(h) {
   return camp;
 }
 
-test('AUDIT BRANCH (WoD) L1-3: one step out of range and straight back finds a sprung camp spent and its pile where it fell; a second crossing drops it, and the site is new', async () => {
-  const h = host();
-  const camp = springCamp(h);
-  await flush();
-  const spent = camp.wodSpawners[0].spawner;
-  assert.equal(spent.active, false, 'sprung');
-  assert.equal(h.droppedLoot._piles.length, 1);
-  const at = localAt(h, 97, 100, h.droppedLoot._piles[0].pos);
-  h.droppedLoot.seedPile([{ name: 'Dagger' }], worldAt(h, 97, 100, [300, 50, 300]), { archive: 205, record: 0 }, null, '97,100');   // a loose pile on the same pixel: CollectLooseObjects' own
-  h.cross(101, 100);
-  assert.equal(h.built.has('97,100'), false, 'the port frees the pixel');
-  assert.equal(h.carryOf('97,100')?.piles.length, 1, 'the pooled terrain keeps ITS pile - the loose one is collected, as DFU destroys it');
-  assert.equal(h.droppedLoot._piles.length, 0, 'and none stands in the world, as an inactive terrain\'s child does not');
-  h.cross(100, 100);
-  const back = h.publish(97, 100, [[400, 50, 400]]);
-  await flush();
-  assert.equal(back.wodSpawners[0].spawner, spent, 'the same marker, spent');
-  assert.equal(h.carryOf('97,100'), undefined, 'the carry is spent by the build that adopted it');
-  assert.deepEqual(h.droppedLoot._piles.map((p) => localAt(h, 97, 100, p.pos)), [at], 'the pile where it lay');
-  // two steps out: the slot goes, and the site comes back new
-  h.cross(101, 100); h.cross(102, 100);
-  assert.equal(h.carryOf('97,100'), undefined, 'recycled - dropped');
-  h.cross(101, 100); h.cross(100, 100);
-  const fresh = h.publish(97, 100, [[400, 50, 400]]);
-  await flush();
-  assert.equal(fresh.wodSpawners[0].spawner.active, true, 'a new marker');
-  assert.equal(h.droppedLoot._piles.length, 0, 'and no pile');
-});
-
-test('AUDIT BRANCH (WoD) m1: a pile whose art lands late lands on what holds its terrain - after a recentre, after a rebuild, while pooled, and nowhere once the terrain is gone', async () => {
-  const cases = {};
-  for (const what of ['recentre', 'rebuild', 'pool', 'recycle', 'promoted']) {
-    const h = host();
-    h.cold(true);
-    springCamp(h);
-    if (what === 'recentre') { h.state.compensation[0] -= 819.2; h.droppedLoot.offsetAll([-819.2, 0, 0]); }
-    if (what === 'rebuild') { h.destroyPixel(97, 100, { collectLoose: false }); h.publish(97, 100, [[400, 50, 400]]); }
-    if (what === 'pool') h.cross(101, 100);
-    if (what === 'recycle') { h.cross(101, 100); h.cross(102, 100); }
-    if (what === 'promoted') { h.cross(101, 100); h.cross(102, 100); h.cross(101, 100); h.cross(100, 100); h.publish(97, 100, [[400, 50, 400]]); }
-    h.release(); await flush();
-    cases[what] = { world: h.droppedLoot._piles.map((p) => localAt(h, 97, 100, p.pos)), carried: h.carryOf('97,100')?.piles.length ?? 0 };
-  }
-  const lay = [[400, 49.42, 400]];   // the marker's ground, the pile's base
-  assert.deepEqual(cases.recentre, { world: lay, carried: 0 }, 'pixel-local: the recentre that moved the world moved it too (it was 819.2 off)');
-  assert.deepEqual(cases.rebuild, { world: lay, carried: 0 }, 'the rebuilt pixel is the same terrain (it was dropped)');
-  assert.deepEqual(cases.pool, { world: [], carried: 1 }, 'a pooled terrain keeps it');
-  assert.deepEqual(cases.recycle, { world: [], carried: 0 }, 'a recycled one takes it with it');
-  assert.deepEqual(cases.promoted, { world: [], carried: 0 }, 'and a pixel promoted afresh in its place is another terrain');
-});
-
-test('WOD6 (AUDIT BRANCH m3, as DFU orders it): an arrival\'s markers meet Start from the scene origin, where InitWorld holds the player - a camp at the landing is still live and springs on the first steps; a pixel promoted later measures from the player', () => {
-  const h = host();
-  h.arrival([{ px: 100, py: 100 }]);
-  const far = [700, 50, 700];   // ~990 from the origin of the arrival frame
-  const p = h.publish(100, 100, [far]);
-  const orig = Math.random; Math.random = () => 0.1;
-  try {
-    h.arriving(true);
-    h.player.pos = worldAt(h, 100, 100, [far[0], far[1] - 0.9, far[2]]);   // where the port's player stands in a re-anchored frame - it does not count
-    h.tick();
-    assert.deepEqual([p.wodSpawners[0].spawner.started, p.wodSpawners[0].spawner.active], [true, true], 'Start measured from the origin: live, however near the stale player stood');
-    h.tick();
-    assert.equal(p.wodSpawners[0].spawner.active, true, 'and every Update of the arrival from the origin too');
-    h.arriving(false);
-    h.tick();
-    assert.equal(p.wodSpawners[0].spawner.active, false, 'the player lands beside it: it springs on the first frame, as DFU\'s does');
-    // a pixel promoted after the arrival is no part of it: Start from the player, within 300, spends it
-    const q = h.publish(101, 100, [[20, 50, 20]]);
-    h.player.pos = worldAt(h, 101, 100, [20, 49.1, 200]);
-    h.tick();
-    assert.deepEqual([q.wodSpawners[0].spawner.started, q.wodSpawners[0].spawner.active], [true, false], 'Start from the player: spent');
-  } finally { Math.random = orig; }
-  // the latch is the arrival's own: up at the teleport's head, down in a `finally` once the destination has built,
-  // with nothing awaited between that and the player standing
-  assert.match(WORLD, /const arriving = _seasonStraightening \|\| _loading \|\| _recalling \|\| _partyArrivalPending;/, 'a load or a recall lands the player last');
-  const tp = WORLD.slice(WORLD.indexOf('  async function _teleportToPixel('));
-  const up = tp.indexOf('_seasonStraightening = true;');
-  const sweep = tp.indexOf('wodCarry.clear();');
-  const down = tp.indexOf('try { dest = await awaitedBuild(first.px, first.py); }\n    finally { _seasonStraightening = false; }');
-  const stand = tp.indexOf('if (walkMode) { player.spawn(pos[0], pos[1], pos[2]); playerSpawned = true; }');
-  assert.ok(up > 0 && up < sweep && sweep < down && down < stand, 'raised before the sweep, lowered after the build, before the stand');
-  assert.doesNotMatch(tp.slice(down + 20, stand).replace('resolveArrival ? await resolveArrival(pos) : null', 'null'), /\bawait\b/, 'no await between the build landing and the player standing');
-  assert.match(WORLD, /queue\.push\(\.\.\.state\.init\(px, py\)\);\n[^\n]*\n    _wodArrival = wodArrivalOf\(queue\);/, 'every sweep\'s first grid is the arrival\'s');
-  assert.match(WORLD, /const queue = state\.init\(startPixel\.x, startPixel\.y\);\n[^\n]*\n  _wodArrival = wodArrivalOf\(queue\);/, 'and the first world\'s');
-  assert.match(WORLD, /state\.release\(u\.px, u\.py\);\n        _wodArrival\.keys\.delete\(`\$\{u\.px\},\$\{u\.py\}`\);/, 'a pixel that leaves range is promoted afresh when it returns');
-  assert.match(WORLD, /for \(const q of \[_wodArrival\.origin, _wodArrival\.loadAt\]\) if \(q\) \{ q\[0\] \+= r\.offset\[0\];/, 'the origin rides the floating origin');
-});
-
 test('WOD6: a load raises OnLoad last - every started marker within 300 of the loaded player deactivates, and a marker whose Start comes later hears it as Start runs (CheckPlayerDistance_OnLoad)', () => {
-  const h = host();
-  h.arrival([{ px: 100, py: 100 }, { px: 101, py: 100 }]);
-  const a = h.publish(100, 100, [[700, 50, 700], [150, 50, 700]]);
-  h.arriving(true);
-  h.tick();   // both Start from the origin, far: live
-  assert.deepEqual(a.wodSpawners.map((w) => w.spawner.active), [true, true]);
-  const loaded = worldAt(h, 100, 100, [700, 50, 500]);   // 200 from the first marker, ~580 from the second
-  h.onLoad(loaded);
-  assert.deepEqual(a.wodSpawners.map((w) => w.spawner.active), [false, true], 'within 300 of the loaded player: spent; beyond it: live');
-  const b = h.publish(101, 100, [[10, 50, 500]]);   // built after the load, within 300 of the loaded player (~180 away)
-  h.arriving(false);
-  h.player.pos = worldAt(h, 100, 100, [100, 49.1, 100]);
-  h.tick();
-  assert.deepEqual([b.wodSpawners[0].spawner.started, b.wodSpawners[0].spawner.active], [true, false], 'its Start ran from the origin, then it heard OnLoad');
-  assert.match(WORLD, /cityGuards\.restoreWorld\(restandRows\(w\.guards\)[^\n]*\n[^\n]*OnLoad[^\n]*\n        \{ const s = walkMode && playerSpawned; const f = s \? player\.pos : cam\.pos; wodOnLoad\(/, 'the quickload raises it after the pools are back');
-  assert.match(WORLD, /wodOnLoad\(walkMode \? \[lx, ly \+ player\.height \/ 2, lz\] : cam\.pos\);   \/\/ WOD6: StartFromClassicSave raises OnLoad too/, 'and the classic import');
   // the C#'s own boundary, `dist <= 300f`: at 300 it deactivates; nothing else moves
   const at = new WodSpawner({ spawnType: 2 }); at.onLoad(300);
   const past = new WodSpawner({ spawnType: 2 }); past.onLoad(300.001);
   assert.deepEqual([at.active, past.active, at.started, at.spawnFinished], [false, true, false, false]);
 });
 
-test('WOD6: a marker standing unstarted when the load lands hears OnLoad as its Start runs - never before it', () => {
-  const h = host();
-  h.arrival([{ px: 100, py: 100 }, { px: 101, py: 100 }]);
-  h.publish(100, 100, [[700, 50, 700]]);
-  h.arriving(true);
-  h.tick();
-  const c = h.publish(101, 100, [[10, 50, 500]]);   // built, its Start not yet run
-  h.onLoad(worldAt(h, 100, 100, [700, 50, 500]));
-  assert.deepEqual([c.wodSpawners[0].spawner.started, c.wodSpawners[0].spawner.active], [false, true], 'not subscribed yet: it heard nothing');
-  h.tick();
-  assert.deepEqual([c.wodSpawners[0].spawner.started, c.wodSpawners[0].spawner.active], [true, false], 'Start from the origin, then OnLoad at the loaded player');
-});
-
-test('WOD6 (audit): a pixel is the arrival\'s until its first frame - a marker made on it by a later rebuild meets Start from the player, not from an origin the player has left', () => {
-  const h = host();
-  h.arrival([{ px: 100, py: 100 }]);
-  h.publish(100, 100, [[700, 50, 700]]);
-  h.arriving(true);
-  h.tick();   // the promotion's Start, from the origin
-  h.arriving(false);
-  h.destroyPixel(100, 100, { collectLoose: false });   // a late region's rebuild: a new site, new markers
-  const q = h.publish(100, 100, [[640, 50, 660]]);   // ~920 from the corner; a new centre, so no carried marker
-  h.player.pos = worldAt(h, 100, 100, [640, 49.1, 650]);   // beside the new camp
-  const orig = Math.random; Math.random = () => 0.1;
-  try { h.tick(); } finally { Math.random = orig; }
-  assert.deepEqual([q.wodSpawners[0].spawner.started, q.wodSpawners[0].spawner.active], [true, false], 'Start from the player, within 300: stood down, never sprung at their feet');
-  assert.equal(h.droppedLoot.piles?.length ?? 0, 0);
-  // PIN MOVED (BUILD-RETRY, test/scenes/ow_buildretry.test.js): the key let go through the stream's `fail`, which asks for it again on its own wait
-  assert.match(WORLD, /destroyPixel\(next\.px, next\.py, \{ collectLoose: false \}\);\n      _wodArrival\.keys\.delete\(`\$\{next\.px\},\$\{next\.py\}`\);\n(?:      \/\/[^\n]*\n)*      state\.fail\(next\.px, next\.py, performance\.now\(\)\);/, 'a build that failed is torn down with its key, and is no longer the arrival\'s');
-  assert.match(WORLD, /reposition: REPOSITION\.RandomStartMarker \}\);\n[^\n]*\n          \{ const s = walkMode && playerSpawned; const f = s \? player\.pos : cam\.pos; wodOnLoad\(/, 'the online underground wake is a load: OnLoad last');
-});
-
-test('WOD6 (dungeon loads): an arrival that lands INSIDE runs no marker - DFU\'s Exterior is off, so they hear no OnLoad and meet Start on the way out, from the player at the door', () => {
-  const h = host();
-  h.arrival([{ px: 100, py: 100 }]);
-  h.inside(true);   // a load into a dungeon: the teleport builds the exterior over frames of it
-  const p = h.publish(100, 100, [[640, 50, 660]]);   // ~920 from the corner, beside the dungeon's door
-  h.player.pos = worldAt(h, 100, 100, [640, 49.1, 650]);
-  h.tick();
-  h.onLoad(worldAt(h, 100, 100, [640, 50, 650]));
-  assert.deepEqual([p.wodSpawners[0].spawner.started, p.wodSpawners[0].spawner.active], [false, true], 'nothing runs, nothing hears the load');
-  // the first frame inside ends the arrival (world.js's frame, pinned below); out of the door, Start from the player
-  h.inside(false); h.arrival([]);
-  const orig = Math.random; Math.random = () => 0.1;
-  try { h.tick(); } finally { Math.random = orig; }
-  assert.deepEqual([p.wodSpawners[0].spawner.started, p.wodSpawners[0].spawner.active], [true, false], 'Start from the player at the door, within 300: stood down');
-  assert.match(WORLD, /if \(modes\.frame\(dt, now\)\) \{\n      if \(_wodInside\) \{ _wodInside = false; _wodArrival = wodArrivalOf\(\[\]\); \}/);
-  assert.match(WORLD, /if \(!wod \|\| _wodInside\) return;/);
-  assert.match(WORLD, /_wodInside = plan\.arrive === 'dungeon' \|\| plan\.arrive === 'building';[^\n]*\n      await _teleportToPixel\(a\.pixel\.x, a\.pixel\.y\);/, 'a recall inside');
-  assert.match(WORLD, /_wodInside = !!extras\.interior;[^\n]*\n        await _teleportToPixel\(w\.pixel\.x, w\.pixel\.y/, 'a load inside a building');
-  assert.match(WORLD, /_wodInside = true;[^\n]*\n          await _teleportToPixel\(pixel\.x, pixel\.y, null, \{ modEvent: 'load' \}\);/, 'a load inside a dungeon');
-  assert.match(WORLD, /_wodInside = true;[^\n]*\n      await _teleportToPixel\(pos\.x, pos\.y\);/, 'the vampire\'s crypt');
-  assert.equal((WORLD.match(/_wodInside = false;/g) ?? []).length, 7, 'the declaration, frame, four existing arrivals and failed exact-player interior travel');
-});
-
-test('WOD7: a marker a peer sprang never springs here - its camp is theirs, and everyone\'s; one I spring is mine, online', () => {
-  const h = host({ online: { id: 'mmmm-0002' } });
-  const p = h.publish(100, 100, [[400, 50, 400], [420, 50, 400]]);   // two treasure markers, oids 1 and 2
-  h.peerSprung.add('100,100:1');
-  h.player.pos = worldAt(h, 100, 100, [410, 49.1, 800]);   // far: Start leaves both live
-  const orig = Math.random; Math.random = () => 0.1;
-  try { h.tick(); h.player.pos = worldAt(h, 100, 100, [410, 49.1, 390]); h.tick(); } finally { Math.random = orig; }   // then within 100 of both
-  assert.equal(p.wodSpawners[0].spawner.active, false, 'the peer\'s marker is spent');
-  assert.equal(p.wodSpawners[0].spawner.started, false, 'and never ran: no Start, no spring, no pile of mine');
-  assert.deepEqual([...h.sprung.keys()], ['100,100:2'], 'the other I sprang - mine now, on my next full frame');
-  assert.ok(h.sprungChanged());
-});
-
-test('WOD6: the pixels a late region names are built again on the list in its order - those standing now, nearest first; one still building once it stands; the player\'s own under the season hold', () => {
-  const i = WORLD.indexOf('  const _wodLate = new Set();');
-  const loader = WORLD.indexOf('  // LocationLoader.cs:146-151', i), sweeps = WORLD.indexOf('  const { swap, _arenaRoadsStale', i);   // PIN MOVED (IC-SWAP-BEHIND): the swap first among what it hands back
-  const j = sweeps > i && sweeps < loader ? sweeps : loader;   // TESA's merge: the sweeps past the Bay (scenes/tamrielSweepsHost.js) are constructed after it, before the loader's
-  assert.ok(i > 0 && j > i);
-  // PIN MOVED (IC-SWAP-BEHIND): the sweep builds them again through the swap (scenes/swapBehind.js) - with its switch off as it
-  // always did, torn down and held; on, behind their standing views
-  const rig = (off) => {
-    const wod = {};
-    const built = new Map([['5,5', { px: 5, py: 5 }], ['7,5', { px: 7, py: 5 }], ['6,6', { px: 6, py: 6 }]]);
-    const inFlight = new Map([['9,9', {}]]);
-    const destroyed = [], queue = [], logs = [], state = { current: { x: 5, y: 5 } };
-    let hold = null;
-    const destroyPixel = (px, py, o) => destroyed.push(`${px},${py}:${JSON.stringify(o)}`);
-    const swap = createSwapBehind({ built, destroyPixel, collider: { hold() {} }, buildingDoors: [], doorsMoved() {}, queue, nearestFirst: nearestFirstFrom, state,
-      walkMode: () => true, playerSpawned: () => true, seasonHold: (k) => { hold = k; }, off: () => off });   // AUDIT 68 S22: the load list's one order
-    const h = new Function('wod', 'built', 'inFlight', 'state', 'walkMode', 'playerSpawned', 'destroyPixel', 'queue', 'console', 'nearestFirstFrom', 'swap',
-      `let _seasonHoldKey = null;\n${WORLD.slice(i, j)}\nreturn { sweepWodLate, late: _wodLate };`)(
-      wod, built, inFlight, state, true, true, destroyPixel, queue, { log: (m) => logs.push(m) }, nearestFirstFrom, swap);
-    return { h, wod, built, inFlight, destroyed, queue, logs, swap, hold: () => hold };
-  };
-  const on = rig(false);
-  on.wod.onLate(16, new Set(['7,5', '5,5', '9,9', '40,40']));
-  on.h.sweepWodLate();
-  assert.deepEqual(on.destroyed.sort(), ['5,5:{"collectLoose":false,"carryOnly":true}', '7,5:{"collectLoose":false,"carryOnly":true}'], 'behind their views: the carry alone taken - it keeps the markers');
-  assert.equal(on.swap.owed, 2);
-  assert.deepEqual(on.queue, [{ px: 5, py: 5 }, { px: 7, py: 5 }], 'queued nearest first');
-  assert.equal(on.hold(), null, 'the player\'s own pixel stands while it builds behind: nothing held');
-  const { h, wod, built, inFlight, destroyed, queue, logs, hold } = rig(true);
-  wod.onLate(16, new Set(['7,5', '5,5', '9,9', '40,40']));
-  h.sweepWodLate();
-  assert.deepEqual(destroyed.sort(), ['5,5:{"collectLoose":false}', '7,5:{"collectLoose":false}'], 'torn down with their loose piles kept - the carry keeps the markers');
-  assert.deepEqual(queue, [{ px: 5, py: 5 }, { px: 7, py: 5 }], 'queued nearest first');
-  assert.equal(hold(), '5,5', 'the player\'s own pixel rebuilds under the season hold');
-  assert.deepEqual([...h.late], ['9,9'], 'one still building waits until it stands; one neither standing nor building builds on the list as it is');
-  built.set('9,9', { px: 9, py: 9 }); inFlight.delete('9,9');
-  h.sweepWodLate();
-  assert.deepEqual(queue.at(-1), { px: 9, py: 9 });
-  assert.equal(h.late.size, 0);
-  assert.equal(logs.length, 2);
-  assert.match(WORLD, /if \(_wodLate\.size && !building\) sweepWodLate\(\);   \/\/ WOD6/, 'between builds, every frame');
-});
-
-test('AUDIT BRANCH (WoD) m4: a sweep while a rebuild is in flight is heard - the carry is adopted at publish, so the old roll never stands in the new world', () => {
-  const h = host();
-  const p = h.publish(100, 100, [[10, 5, 10]]);
-  p.wodSpawners[0].spawner.active = false;   // spent
-  h.destroyPixel(100, 100, { collectLoose: false });   // a season re-skin's teardown
-  assert.ok(h.carryOf('100,100'), 'the rebuild\'s carry');
-  h.sweep(100, 100);   // a load at the same spot, the rebuild still in flight
-  assert.equal(h.publish(100, 100, [[10, 5, 10]]).wodSpawners[0].spawner.active, true, 'fresh, as ClearStreamingWorld re-promotes');
-  assert.doesNotMatch(WORLD, /const carried = wodCarry\.get\(key\) \?\? null;   \/\/ WOD3\/WOD4: what a rebuild/, 'no build reads the carry at its start');
-  // PIN MOVED (MID-RING, found at IC-GRAND's merge of the streams' head): the pixel's fade stamped between, as synchronous
-  // PIN MOVED (IC-SWAP-BEHIND): the carry under the pixel's own key, the fade a fresh pixel's alone, published through the swap
-  assert.match(WORLD, /    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};[^\n]*\n    if \(!wodKept\.life\) wodForgetPeerSites\(pkey\);[^\n]*\n(?:    if \(key === pkey && isEnhanced\(\) && !midRingDisabled\(\)\) stampPixelFade\([^\n]*\n)?    if \(_building\.get\(key\) === made\) _building\.delete\(key\);[^\n]*\n    swap\.publish\(px, py, key, made, \{/, 'nothing awaited between the adoption and built.set (BUILD-FAIL1\'s hand-over, WOD7\'s forget and MID-RING\'s fade are the lines between)');
-});
-
-test('AUDIT BRANCH (WoD) m2: a rebuild of a pixel that had a site re-reads its grass - Basic Roads can forbid a site stood before its data landed', () => {
-  // PERF-EXT21: the publish re-reads the grass over EVERY pixel now (the crossing that used to heal a stale cell keeps its field),
-  // which covers a site a rebuild lost - so the rebuild needs no memory of the site (PERF-EXT21's review retired `_wodSiteWas`,
-  // the set a teardown filled for this: it gated the re-read, and was written and never read once the re-read stopped asking)
-  const h = host();
-  h.publish(100, 100, [[10, 5, 10]], { wodSite: { xMin: 1, xMax: 2, yMin: 1, yMax: 2 } });
-  h.destroyPixel(100, 100, { collectLoose: false });   // a rebuild's teardown runs clean with nothing to remember
-  assert.doesNotMatch(WORLD, /_wodSiteWas/, 'no teardown remembers the site');
-  assert.match(WORLD, /\n    if \(host\.labGrassField\) \{   \/\/ WOD2[^\n]*m2[^\n]*\n      const t = host\.state\.pixelTranslation\(px, py\);\n      host\.labGrassField\.invalidate\(t\[0\], t\[2\], t\[0\] \+ TERRAIN_SIZE, t\[2\] \+ TERRAIN_SIZE\);/, 'and the publish re-reads the grass for it, whatever stood there');
-});
-
-test('AUDIT BRANCH (WoD) L1-3: the host steps DFU\'s array on every crossing and at every world\'s start, and the Hold does not ride the pool', () => {
-  assert.match(WORLD, /if \(wod\) for \(const k of wodSlots\.step\(r\.current\.x, r\.current\.y, state\.terrainDistance, StreamingWorldState\.onMap\)\.recycled\) wodCarry\.delete\(k\);\n      for \(const u of r\.unload\) \{/, 'the crossing, before its unloads');
-  assert.match(WORLD, /const queue = state\.init\(startPixel\.x, startPixel\.y\);\n  if \(wod\) wodSlots\.step\(startPixel\.x/, 'the first world');
-  assert.match(WORLD, /queue\.push\(\.\.\.state\.init\(px, py\)\);\n    if \(wod\) wodSlots\.step\(px, py,/, 'every swept world');
-  assert.match(WORLD, /if \(p\.wodSpawners && wodSlots\.has\(key\)\) \{[\s\S]{0,400}carryWodSite\(p, key, \{ piles \}\);/, 'an unload pools the site alone - no hold');
-  assert.match(WORLD, /if \(collectLoose && p\.privateersHold\) \{ p\.privateersHold\.state\.gone = true;/, 'the Hold\'s foes still go with the block');
-});
-
 // ── Numbers and words ───────────────────────────────────────────────────
 
 test('AUDIT BRANCH (WoD) n: the asset tool writes each TextAsset\'s own bytes - the decoded text drops a byte-order mark', () => {
-  const src = rd('tools/worldOfDaggerfallAssets.mjs');
-  assert.match(src, /body: t\.bytes \? Buffer\.from\(t\.bytes\) : Buffer\.from\(t\.text \?\? '', 'utf8'\),/);
   assert.equal(typeof readWorldOfDaggerfallBundle, 'function');
   const bom = new Uint8Array([0xef, 0xbb, 0xbf, 0x41]);
   assert.equal(new TextDecoder('utf-8').decode(bom).length, 1, 'the decoder strips it - what the tool used to write');

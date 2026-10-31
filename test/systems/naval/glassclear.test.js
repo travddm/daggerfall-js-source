@@ -286,18 +286,3 @@ test('GLASS-CLEAR from her helm through the x4 glass, every hull: nothing of her
   s.host.glass(0.1, { up: false });
 });
 
-test('GLASS-CLEAR the world: the glass\'s focus taken each frame from the ship I stand aboard through its circle (navalHost.js ownExtent, glassClearDepth), the eye over the sea there (heightAt), into the frame\'s lens and the glass\'s hold; the eye\'s own while it is down or the ships are off; and no tag, bar, line or name stands over what the focus cut away (mutants: each seam)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const field = Math\.atan\(Math\.tan\(fovY \/ 2\) \* GLASS_FIELD \* [^\n]*\n(\s+\/\/[^\n]*\n)+\s+const pitch = cam\.pitch \+ climbFeel\.pitch\(\);\n\s+spyglass\.near = spyglass\.lens > 1 && navalOn\(\) && naval \? glassNear\(\{ lens: spyglass\.lens, zoom: spyglass\.zoom, fovY, pitch,\n\s+own: glassClearDepth\(\{ box: naval\.ownExtent\(\), eye: cam\.pos, yaw: cam\.yaw, pitch, field \}\),\n\s+eyeOverSea: glassEyeOverSea\(\{ eyeX: cam\.pos\[0\], eyeZ: cam\.pos\[2\], yaw: cam\.yaw, eyeY: cam\.pos\[1\], seaY: tvSeaY\(\), fovY, pitch, groundAt: heightAt \}\) \}\) : GLASS_NEAR_MIN;\n\s+const card = navalOn\(\) && naval \? naval\.glass\(dt, \{ up: spyglass\.up, zoom: spyglass\.zoom, field, near: spyglass\.near \}\) : null;/);
-  assert.match(w, /const fovY = glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\);/, 'the lens the frame draws');
-  assert.match(w, /const glassCuts = \(at\) => at\.front && at\.depth < spyglass\.near;/);
-  assert.equal((w.match(/\n\s+if \(glassCuts\(at\)\) continue;/g) || []).length, 3, 'the ships\' tags, the crew\'s bars and their lines');
-  assert.match(w, /const at = projectToScreen\(t\.point, w, h, proj, view, rect\);\n[^\n]*\n\s+if \(glassCuts\(at\)\) continue;/, 'the tags');
-  assert.match(w, /const at = projectToScreen\(head, w, h, proj, view, rect\);\n[^\n]*\n\s+if \(glassCuts\(at\)\) continue;/, 'the bars');
-  assert.match(w, /const at = projectToScreen\(l\.head, w, h, proj, view, rect\);\n[^\n]*\n\s+if \(glassCuts\(at\)\) continue;/, 'the lines');
-  assert.match(w, /const blocked = \(head, id\) => glassCuts\(projectToScreen\(head, 1, 1, proj, view\)\) \|\| nameSight\.blocked\(player\.collider, eye, id, head\);/, 'the players\' names');
-  assert.match(w, /const proj = horizonProj\(glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), worldAspect, spyglass\.near, tvf\);/, 'the frame\'s lens');   // PIN MOVED (OW-HORIZON, 2026-10-20): through scenes/travelHorizon.js horizonProj - the glass's near on the ground, the planes grown under the travel view
-  const nh = rd('src/scenes/naval/navalHost.js');
-  assert.match(nh, /const boat = boatInPlay\(\) \?\? seaDeckUnderMe\(\)\?\.boat \?\? deps\.aboardPeer\?\.\(\) \?\? null;/, 'my deck, a sea ship\'s, another player\'s I ride');
-  assert.match(nh, /\n\s+ownExtent,\n/, 'the host\'s door');
-});

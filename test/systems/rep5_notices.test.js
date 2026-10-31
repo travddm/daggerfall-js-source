@@ -19,7 +19,6 @@ test('REP5: the fourteen bands have one home - the status box\'s %ltn reads it (
   assert.deepEqual(at.map(legalStandingWord), ['revered', 'revered', 'esteemed', 'esteemed', 'honored', 'admired', 'respected',
     'dependable', 'dependable', 'a common citizen', 'undependable', 'undependable', 'a scoundrel', 'a scoundrel', 'a criminal',
     'a criminal', 'a villain', 'a villain', 'pond scum', 'pond scum', 'hated']);
-  assert.match(src('src/systems/quest/questMacros.js'), /'%ltn': \(mcp, hooks\) => \{\n\s*const rep = hooks\?\.world\?\.legalRepNow\?\.\(\);\n\s*if \(rep == null\) return null;\n\s*return legalStandingWord\(rep\);/);
 });
 
 test('REP5: every cause says its own words and the band it leaves the player in', () => {
@@ -59,6 +58,4 @@ test('REP5: the Standing page\'s law - every region with a name, worst first, it
     { region: 'Daggerfall Bluffs', rep: 15, word: 'respected', note: '' },
   ]);
   assert.equal(lawRows({ legalRep: { 2: 0 } }, 0).length, 0);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\n {2}statsLaw\(detail, playerEntity\);\n {2}statsGuilds\(detail, playerEntity\);/, 'drawn between the groups and the guilds');
 });

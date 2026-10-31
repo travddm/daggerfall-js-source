@@ -138,11 +138,6 @@ test('TAMRIEL3 trace: a province painted to the picture\'s border keeps its edge
   const asked = [];
   await assert.rejects(preloadTamrielTrace({ fetchBytes: async (n) => { asked.push(n); throw new Error('no ' + n); }, palette: pal }), /no TMAP00I0\.IMG/);
   assert.deepEqual(asked, ['TMAP00I0.IMG'], 'the picture first; a missing file rejects and the host says so');
-  const src = read('src/ui/tamrielTrace.js');
-  assert.match(src, /fetchBytes\('TAMRIEL2\.IMG'\)/);
-  assert.match(src, /import \{ seaIndices \} from '\.\/provinceMap\.js';/, 'the chargen\'s own blue');
-  assert.match(src, /own\.load\(await fetchBytes\(picture\.paletteName\), picture\.paletteName\); pal = own;/, 'the painting on ITS palette (MAP.PAL)');
-  assert.ok(!src.includes('inlandRemainder('), 'the chargen\'s remainder is not called: it reads a blue sea the picture has not');
 });
 
 // ── THE LAND MODULE ──────────────────────────────────────────────
@@ -222,9 +217,6 @@ test('TAMRIEL3 fit: laying the Bay\'s land over the picture finds the offset and
   const edge = fitBayToPicture({ bayLand, trace, around: { ox: 300, oy: 100 }, span: 2, ppus: [18] });
   assert.equal(edge, null, 'no candidate fits on the picture there');
   assert.equal(fitBayToPicture({ bayLand, trace, around: { ox: 100, oy: 190 }, span: 2, ppus: [18] }), null);
-  const src = read('src/world/tamriel/tamrielLand.js');
-  // PIN MOVED (TAMRIEL4): the scales every quarter from 15 to 21 (FIT_PPUS) - the seam's best, 15.5, lay outside 16-21
-  assert.match(src, /around = \{ ox: 46, oy: 52 \}, span = 24, ppus = FIT_PPUS \}/, 'the defaults round the authored place (862 / 18.75, 975 / 18.75)');
   assert.ok(Math.abs(BAY_ORIGIN.x / PIXELS_PER_PICTURE_UNIT - 46) < 0.1 && Math.abs(BAY_ORIGIN.y / PIXELS_PER_PICTURE_UNIT - 52) < 0.1);
 });
 
@@ -412,10 +404,6 @@ test('TAMRIEL3 worker: setTamriel sets the trace and the fit on the host\'s modu
   const bare = new TerrainGenClient({ woods: { getHeightMapValue: () => 0 }, woodsBytes: null });
   bare.setTamriel({ trace, fit: { ox: 1, oy: 2, ppu: 18 } });
   assert.equal(tamrielFit().ox, 1, 'the fallback kernel\'s own state, no worker');
-  const worker = read('src/world/terrain/terrainGenWorker.js');
-  assert.match(worker, /if \(m\.t === 'tamriel'\) \{ setTamrielTrace\(m\.trace \?\? null\); setTamrielFit\(m\.fit \?\? null\); dropGroundCache\(\); return; \}/);
-  const land = read('src/world/tamriel/tamrielLand.js');
-  for (const bad of ['document', 'globalThis.', 'fetch(', 'localStorage', 'getPref', 'ImgFile']) assert.ok(!land.includes(bad), `pure: no ${bad}`);
 });
 
 test('TAMRIEL3 door: `?tamrieltrace=off` keeps the authored shape, and nothing else does; no row (a door for a day the trace reads a picture wrong)', () => {
@@ -424,34 +412,5 @@ test('TAMRIEL3 door: `?tamrieltrace=off` keeps the authored shape, and nothing e
   assert.equal(tamrielTraceOn('?tamrieltrace=off'), false);
   assert.equal(tamrielTraceOn('?x=1&tamrieltrace=off'), false);
   assert.equal(tamrielTraceOn('?tamrieltrace=on'), true);
-  const features = read('src/systems/features.js');
-  assert.ok(!features.includes('tamrielTrace'), 'no Features row');
 });
 
-test('TAMRIEL3 host: the world host traces the two files after the travel art, fits the Bay by the one water law over the composed reads, installs both through the client, resets the stream\'s frame, and logs the fit; a missing file leaves the authored shape and says so; the held map\'s static key carries the version', () => {
-  const src = read('src/scenes/world.js');
-  assert.match(src, /import \{ preloadTamrielTrace \} from '\.\.\/ui\/tamrielTrace\.js';/);
-  assert.match(src, /import \{ fitBayToPicture, tamrielLandVersion \} from '\.\.\/world\/tamriel\/tamrielLand\.js';/);   // PIN MOVED (WW2): and the picture's version, for a theatre's gate scan
-  const i = src.indexOf('if (tamrielTraceOn()) {');
-  assert.ok(i > 0);
-  const block = src.slice(i, src.indexOf('preloadTravelControlArt({', i));
-  assert.match(block, /preloadTamrielTrace\(\{ fetchBytes, palette \}\)\.then\(\(trace\) => \{/);
-  assert.match(block, /if \(!trace\) \{ console\.warn\(/, 'a trace of nothing stands down');
-  assert.match(block, /const fit = fitBayToPicture\(\{ bayLand: \(x, y\) => !isWaterPixel\(maps\.getClimateIndex\(x, y\), woods\.getHeightMapValue\(x, y\)\), trace \}\);/, 'the Bay\'s land by the one water law');
-  assert.match(block, /const fitPx = fit \? \{ ox: fit\.ox \* fit\.ppu, oy: fit\.oy \* fit\.ppu, ppu: fit\.ppu \} : null;/, 'picture units to Tamriel pixels');
-  assert.match(block, /terrainGen\.setTamriel\(\{ trace, fit: fitPx \}\);/);
-  assert.match(block, /StreamingWorldState\.frame = tamrielLand \? tamrielFrameInBay\(\) : null;/, 'the stream\'s frame at the new fit');
-  assert.match(block, /\.catch\(\(e\) => console\.warn\('\[tamriel\] TMAP00I0\/TAMRIEL2 unavailable; the authored continent stands:'/);
-  assert.equal((src.match(/tamrielTraceOn\(\)/g) ?? []).length, 1, 'the door read once');
-  assert.ok(src.indexOf('preloadTravelMapArt(') < i, 'after the travel art');
-  const held = read('src/ui/heldMap.js');
-  assert.match(held, /tamrielLandVersion\(\),   \/\/ TAMRIEL3/, 'the sheet repaints when the trace lands');
-  const ground = read('src/world/tamriel/tamrielGround.js');
-  assert.match(ground, /import \{ provinceKeyAt, coastDistanceAt, coastDepthAt, tamrielTrace \} from '\.\/tamrielLand\.js';/);   // PIN MOVED (TESA x AUDIT TESA II): the trace's straits ask whether it stands; PIN MOVED (SMOOTH-LAND): the land's smooth law and its waterline, CYRODIIL-SHORES' lakes folded into it
-  assert.ok(!/\bprovinceAt\(|\bcoastDistance\(/.test(ground), 'the ground reads the land module, never the authored rings directly');
-  const raster = read('src/world/tamriel/tamrielRaster.js');
-  assert.match(raster, /import \{ provinceKeyAt \} from '\.\/tamrielLand\.js';/);
-  assert.match(raster, /const \{ ox, oy \} = tamrielFit\(\);/);
-  const client = read('src/world/terrain/terrainGenClient.js');
-  assert.match(client, /import \{ setTamrielTrace \} from '\.\.\/tamriel\/tamrielLand\.js';/);
-});

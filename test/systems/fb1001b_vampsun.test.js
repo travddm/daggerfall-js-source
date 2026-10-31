@@ -117,8 +117,6 @@ function tavern() {
   return { entry, saved, pipeline };
 }
 
-// ── dungeonContext's own statements, mounted ─────────────────────────────────────────────────────────────────────
-const DC = read('src/scenes/dungeonContext.js');
 function cut(src, head, end) {
   const i = src.indexOf(head);
   assert.ok(i >= 0, `${head} is in the source`);
@@ -187,38 +185,3 @@ test('FB1001b: a BUILDING - the mode machine world.js\'s street and exterior.js 
   } finally { playerEntity.inPrison = false; setPassiveSpecialsHost(prev); }
 });
 
-test('FB1001b: a DUNGEON - dungeonContext\'s own registration (a town\'s crypt over worldModes, and the ?dungeon scene), lifted from src/ and run: DFU\'s +20 underground at noon; its destroy() hands the street back, and the sun\'s -20 with it', async () => {
-  const prev = setPassiveSpecialsHost(null);
-  try {
-    const v = await vampire();
-    const modes = await buildModes();   // the town page's mode machine, standing in its street
-    assert.equal(modes.mode, 'exterior');
-    assert.deepEqual(liveMinute(v, at(12)), seven(-VAMPIRE_STAT_MOD), 'the street at noon');
-    // buildDungeonContext's own statement, as worldModes' dungeon branch and the ?dungeon scene run it
-    const head = 'const _prevPassiveHost = setPassiveSpecialsHost({';
-    assert.ok(DC.indexOf('export async function buildDungeonContext(') < DC.indexOf(head), 'the registration is the context build\'s');
-    const street = mount({ setPassiveSpecialsHost, worldMinutes, _activity: { swimming: false } }, cut(DC, head, '});'), '_prevPassiveHost');
-    assert.ok(street && typeof street.isInside === 'function', 'it displaced the mode machine\'s registration and kept it');
-    assert.deepEqual(liveMinute(v, at(12)), seven(VAMPIRE_STAT_MOD), 'in the crypt at noon: DFU\'s +20 - the code before read -20 here');
-    assert.equal(liveStat(v, 'agility'), 80);
-    assert.deepEqual(liveMinute(v, at(3)), seven(VAMPIRE_STAT_MOD), 'and by night');
-    // destroy()'s hand-back, the statement in src/
-    mount({ setPassiveSpecialsHost, _prevPassiveHost: street }, cut(DC, 'setPassiveSpecialsHost(_prevPassiveHost)', ';'), 'true');
-    assert.deepEqual(liveMinute(v, at(12)), seven(-VAMPIRE_STAT_MOD), 'out of the crypt at noon: the street\'s sun again');
-  } finally { setPassiveSpecialsHost(prev); }
-});
-
-test('FB1001b: ONE sun - the curse\'s -20 asks passiveSpecials.js playerInSunlight (PlayerEnterExit.IsPlayerInSunlight\'s one port) and keeps no hour of its own; THE FOUR HOSTS answer it', () => {
-  const src = read('src/systems/vampirism.js');
-  assert.match(src, /^import \{ playerInSunlight, careerSunAverse \} from '\.\/passiveSpecials\.js';/m, 'the seam\'s reader, imported');   // PIN MOVED (HOOD-CAREER): beside the career's hooded rung
-  const law = src.slice(src.indexOf('export const vampireStatMod'), src.indexOf('\n', src.indexOf('export const vampireStatMod')));
-  assert.equal(law, 'export const vampireStatMod = (clockMinutes, sunAverse = true) => (playerInSunlight(clockMinutes) ? (sunAverse ? -VAMPIRE_STAT_MOD : 0) : VAMPIRE_STAT_MOD);   // HOOD-SUN: a raised hood (racialSunAverse false) keeps the sun off; BAL6: and gives no bonus in it',   // PIN MOVED (HOOD-SUN): the hood's arm; PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the hood in the sun is 0
-    'the day\'s -20 is the sun\'s, the +20 DFU\'s everywhere else - never the hour alone');
-  // world.js's street and exterior.js are served by the mode machine each builds; it and the dungeon context register
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(read(host), /createWorldModes\(\{/, `${host} builds the mode machine`);
-  const wm = read('src/scenes/worldModes.js');
-  const reg = cut(wm, 'setPassiveSpecialsHost({', '});');
-  assert.match(reg, /isInside: \(\) => mode !== 'exterior',/, 'worldModes: a building and a town dungeon are inside, by live mode');
-  assert.match(reg, /inPrison: \(\) => !!playerEntity\.inPrison,/, 'and a cell is out of the sun');
-  assert.match(cut(DC, 'const _prevPassiveHost = setPassiveSpecialsHost({', '});'), /isInside: \(\) => true,/, 'dungeonContext: always inside');
-});

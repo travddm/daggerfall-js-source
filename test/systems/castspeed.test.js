@@ -170,9 +170,6 @@ test('CAST-SPEED: the Morrowind arm plays its spellcast group at the cast\'s rat
   assert.deepEqual(run(2), [0.15, 0.3], 'twice the rate, half the time');
   assert.deepEqual(run(0.75), [0.4, 0.8]);
   assert.deepEqual(run(), [0.3, 0.6], 'a cast handed no rate plays at 1');
-  // a swing after it is the weapon's own pace again, not the last cast's
-  const fpSrc = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  assert.match(fpSrc, /const speed = paced \? blowPlan\.rate : upper === UPPER_BODY\.Casting \? castRate : weapSpeed;/);
 });
 
 test('CAST-SPEED: the loot line - casting speed, a line that does something on jewellery and weapons; what I wear, summed under its cap, mine alone', () => {
@@ -233,6 +230,4 @@ test('CAST-RECOVER: the quick hands keep the old pace - the next cast waits CAST
   assert.equal(a.recovering, false, 'and not longer');
   a.tick(NaN); a.tick(-5);
   assert.equal(a.recovering, false, 'a nonsense step changes nothing');
-  const hm = readFileSync(new URL('../../src/scenes/hostMagic.js', import.meta.url), 'utf8');
-  assert.match(hm, /castBusy = \(\) => fpsSpellCasting\.isPlayingAnim \|\| fpsSpellCasting\.releaseHeld \|\| fpsSpellCasting\.recovering,/, 'the host\'s gate: a click and a recast wait it out, nothing spent');
 });

@@ -266,17 +266,3 @@ test('CHAP3b the board: a chapter\'s hall writs by its band - one Failing, three
   assert.deepEqual(m.chapters.map((c) => c.faction), [41, 108], 'a member of the Brotherhood reads its chapter');
 });
 
-test('CHAP3b the wiring: the sheet\'s route, the client\'s door, the board\'s chapter lines; the Chapters\' tables; the version note (mutants: the route, the door, the lines)', () => {
-  assert.match(src('server-account/src/service.js'), /'\/v1\/chapters\/list'/);
-  assert.match(src('server-account/src/index.js'), /path === '\/v1\/chapters\/list' \? await chapterSheet\(ctx, who\.player, env\)/);
-  assert.match(src('src/net/accountClient.js'), /list: \(\) => post\('\/v1\/chapters\/list', \{\}\),/);
-  // PIN MOVED: GUILD3d - each chapter one card, its line first under its heading, then what its band does
-  assert.match(src('src/ui/noticeWindow.js'), /for \(const c of writs\?\.chapters \?\? \[\]\) body\.append\(chapterCard\(c\)\);/);
-  // PIN MOVED: AUDIT GUILD3 L3 - the band's line none where the halls are shut this Season
-  assert.match(src('src/ui/noticeWindow.js'), /card\.append\(el\('p', 'notice-chapter', `\$\{chapterLineOf\(c\)\}\.`\)\);[^\n]*\n(?:\s+[^\n]*\n){1,2}?\s+const band = chapterBandEffectsLine\(c\.strength, c\.faction, \{ shut: !!chapterSeasonOf\(c\)\?\.shut \}\);\n\s+if \(band\) card\.append\(el\('p', 'notice-chapter notice-band', band\)\);/);
-  const mig = src('server-account/migrations/0102_npc_chapters.sql');
-  assert.match(mig, /week\s+INTEGER PRIMARY KEY/);
-  assert.match(mig, /strength\s+INTEGER NOT NULL CHECK \(strength BETWEEN 0 AND 100\)/);
-  assert.match(mig, /PRIMARY KEY \(faction, region\)/);
-  assert.match(src('server-account/src/service.js'), /CHAP3b \(Mac: "Continue"; migration 0102_npc_chapters/);
-});

@@ -182,11 +182,6 @@ test('SC1: STICKY SLOTS - a light keeps its slot, matched by position, when the 
   assert.deepEqual([...sp.shadowIndex.slice(0, 3)], [0, -1, 1]);
   assert.equal(st.staticFaces, 0);
   assert.equal(SHADOW_NEAR_CASTERS, 2);
-  // DISC24-C: the rank is read once (the player's own card rides it too) and the cadence off it
-  // DISC29-E: the cadence is the EYE's rank still; the lamps nearest the player's own card join it (they draw it
-  // every frame - DISC24-C's law, ranked from the card now so an orbiting camera does not move its shadow)
-  assert.match(rd('src/render/shadowPass.js'), /const near = nearestRank\(casters, L, f\.eye, rank\) < SHADOW_NEAR_CASTERS;/, 'the cadence by rank');
-  assert.match(rd('src/render/shadowPass.js'), /const selfNear = selfAt \? \(nearestRank\(casters, L, selfAt, rank, this\._selfHeld, this\._selfHeldN\) < selfLamps\) : near;[^\n]*\n[^\n]*\n[^\n]*\n[^\n]*\n\s*const due = SHADOW_TUNING\.steady \|\| near \|\| selfNear \|\| \(this\.frameNo \+ k\) % SHADOW_FAR_CASTER_EVERY === 0;/, 'and the card\'s own two, every frame');
 });
 
 test('SC1: a flat whose origin moves is a dynamic (per batch, on the batch), a still one is in the cache; the door restores the old path whole - every caster in range at the cadence into the live layers, no cache, no blit (mutants: the batch\'s word ignored; the door ignored)', () => {
@@ -217,7 +212,6 @@ test('SC1: a flat whose origin moves is a dynamic (per batch, on the batch), a s
   r.setShadowCache(true);
   assert.equal(sp.cacheOn, true);
   assert.equal(shadowCacheOn(''), true); assert.equal(shadowCacheOn('?shadowcache=off'), false);   // CACHE-COPY: on unless asked off, as SC1 built it
-  assert.match(rd('src/render/enhancedLighting.js'), /renderer\.setShadowCache\?\.\(shadowCacheOn\(search\)\);/, 'read at the lane\'s install, like the air\'s');
 });
 
 test('SC1: a rig is always dynamic, and a dead mesh is neither in the signature nor drawn (mutants: the rig cached; the dead mesh kept in the signature, so its removal redraws nothing)', () => {

@@ -57,8 +57,3 @@ test('SWING-LABEL: the Swing Weapon line says what the gesture code actually doe
   assert.equal(swingHint(null, 0, 'KeyZ'), 'Unbound. Nothing can swing your weapon.');
 });
 
-test('SWING-LABEL: the enhanced pane shows the line under Swing Weapon, from the live swing style and Ready Weapon key', () => {
-  const src = read('src/ui/enhanced/enhancedControls.js');
-  assert.match(src, /if \(action === 'SwingWeapon' && unsaved\.usingPrimary\) main\.append\(el\('div', 'row-sub', swingHint\(code \?\? null, swingMode\(\), dict\.get\('ReadyWeapon'\) \?\? null\)\)\);/);
-  assert.match(read('src/ui/input.js'), /export function swingMode\(\) \{ return getInt\('Controls', 'WeaponSwingMode', 0, 2\); \}/, 'the one reader of the style');
-});

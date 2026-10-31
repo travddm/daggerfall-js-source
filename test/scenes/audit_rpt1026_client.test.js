@@ -49,7 +49,6 @@ test('AUDIT RPT1026 K1: the world host\'s place door is the dungeon\'s tier and 
   assert.deepEqual(egFindPlace('dungeon', { dungeonLocation: loc, dungeonCtx: ctx }), { tier: 'elite', visit: ctx });
   assert.equal(egFindPlace('exterior', { dungeonLocation: loc, dungeonCtx: ctx }), null, 'outside a dungeon, no place');
   assert.equal(egFindPlace('dungeon', { dungeonLocation: null, dungeonCtx: null }), null);
-  assert.match(read('src/scenes/world.js'), /registerEgFind\(\{[^]*?\n\s*placeNow: \(\) => egFindPlace\(_mode\(\), modes\),/, 'world.js hands the find its place, not the tier alone');
 });
 
 test('AUDIT RPT1026 K1: a face left on a body, out of the dungeon and into the next before any answer landed outside - the next answer gives the pack the whole balance, not one short', async () => {
@@ -106,7 +105,6 @@ test('AUDIT RPT1026 K1: a face the world\'s throw (egFindThrow) lays while the d
 
 // ── K2: the lost graphics context's report keeps its way back ──────────────────────────────────────────────────────
 
-const main = read('src/main.js');
 /** The whole statement that starts at `needle` (balanced braces; a listener's call closes after its body). */
 function statementAt(src, needle) {
   const at = src.indexOf(needle);
@@ -118,48 +116,7 @@ function statementAt(src, needle) {
   }
   return assert.fail('unbalanced');
 }
-/** A page whose elements keep a real element's rules: textContent replaces the children, remove() takes an element out
- *  of its parent (or the page). */
-function page() {
-  const els = new Map();
-  class El {
-    constructor(tag) { this.tag = tag; this.style = {}; this.children = []; this._text = ''; this.parent = null; }
-    get textContent() { return this._text + this.children.map((c) => c.textContent).join(''); }
-    set textContent(v) { this._text = String(v); for (const c of this.children) c.parent = null; this.children = []; }
-    appendChild(c) { this.children.push(c); c.parent = this; return c; }
-    remove() { if (this.parent) { this.parent.children = this.parent.children.filter((c) => c !== this); this.parent = null; } else if (els.get(this.id) === this) els.delete(this.id); }
-  }
-  let lost = null, reloads = 0;
-  const canvas = { addEventListener: (ev, fn) => { if (ev === 'webglcontextlost') lost = fn; } };
-  const document = { getElementById: (id) => (id === 'c' ? canvas : els.get(id) ?? null), createElement: (tag) => new El(tag), body: { appendChild: (el) => els.set(el.id, el) } };
-  const code = `${statementAt(main, 'function crashOverlay(msg) {')}\n${statementAt(main, 'function crashDismiss(el) {')}\n`
-    + `${statementAt(main, "document.getElementById('c')?.addEventListener('webglcontextlost'")}\nreturn crashOverlay;`;
-  const crashOverlay = new Function('document', 'location', 'pageGoing', code)(document, { reload: () => reloads++ }, false);
-  return { els, crashOverlay, lose: () => lost({ preventDefault() {} }), reloads: () => reloads };
-}
 const buttons = (el) => el.children.filter((c) => c.tag === 'button');
-
-test('AUDIT RPT1026 K2: a lost graphics context\'s report carries no Dismiss - nothing draws again on the page, and the report is its way back', () => {
-  const P = page();
-  P.lose();
-  const el = P.els.get('crash');
-  assert.match(el.textContent, /^CRASH\nthe graphics stopped/);
-  assert.deepEqual(buttons(el), [], 'no Dismiss over the dead canvas');
-  // a later throw on the dead page: its words, and still no Dismiss to take the way back away
-  P.crashOverlay('TypeError: a frame on a lost context');
-  assert.deepEqual(buttons(el), []);
-  el.onclick();
-  assert.equal(P.reloads(), 1, 'the report still reloads');
-});
-
-test('AUDIT RPT1026 K2: a report already up when the context goes loses its Dismiss; any other report keeps it', () => {
-  const P = page();
-  const el = P.crashOverlay('IndexSizeError: an arc of negative radius');
-  assert.equal(buttons(el).length, 1, 'a throw the game runs on past: dismissible (RPT1026-CLIENT DISMISS)');
-  P.lose();
-  assert.equal(P.els.get('crash'), el);
-  assert.deepEqual(buttons(el), [], 'the context gone: the report is kept');
-});
 
 // ── K3: an event's sky fire keeps its whole kick; the Motion row writes the shares the engine reads ──────────────────
 

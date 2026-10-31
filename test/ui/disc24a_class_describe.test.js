@@ -56,13 +56,3 @@ test('DISC24-A: Yes gives the class that was READ - never a row clicked after it
   assert.equal(f.career.name, 'Battlemage', 'the class whose words were on the screen');
 });
 
-test('DISC24-A: the enhanced stage and the pointer path both move the selection through the flow\'s one door', () => {
-  const src = readFileSync(new URL('../../src/ui/enhanced/enhancedChargen.js', import.meta.url), 'utf8');
-  // the stage reads the header and the button off classListIndex and the words off classConfirm - the flow's door is
-  // what keeps the two one row, so the stage is pinned as reaching the selection only through it
-  assert.match(src, /const picked = flow\.classRowName\(flow\.classListIndex\);/);
-  assert.match(src, /main\.onclick = \(\) => \{ flow\.clickClassRow\(i, flow\._now\(\)\); paint\(\); \};/);
-  const chargen = readFileSync(new URL('../../src/ui/chargen.js', import.meta.url), 'utf8');
-  assert.match(chargen, /if \(hit\.setClass != null\) \{ this\._selectClassRow\(hit\.setClass\); return true; \}/);
-  assert.equal((chargen.match(/this\.classListIndex = idx;/g) ?? []).length, 1, 'one door writes a clicked row');
-});

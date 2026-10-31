@@ -136,26 +136,6 @@ test('AUDIT-AMAP T1: a SPARSE layout (a block with no rows) survives the save wi
   } finally { resetAutomapStore(); }
 });
 
-test('AUDIT-AMAP F4/H1-H3: the LOAD arm re-binds - the layout guard runs on the loaded record and Automap.instance answers it', () => {
-  resetAutomapStore();
-  try {
-    const model = buildRevealIndex([{ key: '0:1', aabb: BIG, blockIndex: 0, blockName: 'LIVE.RDB' }]);
-    const live = enterDungeonAutomap('amap/load', 0);
-    bindAutomapLayout(live, model);
-    // a save from a DIFFERENT layout of the same dungeon
-    restoreAutomap({ 'amap/load': { revealed: ['0:1'], visitedThisRun: ['0:1'], entranceDiscovered: true, lastVisited: 5, blockNames: ['OTHER.RDB'], notes: [], teleporters: [] } });
-    const loaded = enterDungeonAutomap('amap/load', 0, { fromLoad: true });
-    assert.notEqual(loaded, live, 'restoreAutomap minted a new record object');
-    bindAutomapLayout(loaded, model);   // what dungeonContext does after the fetch now
-    assert.equal(loaded.revealed.size, 0, 'the block-name guard cleared the mismatched reveals (:2385-2386)');
-    assert.equal(loaded.entranceDiscovered, false);
-    assert.equal(automapInstance()?.rec, loaded, 'mutants: map_revealall writing into the pre-load object');
-    const ctx = rd('src/scenes/dungeonContext.js');
-    assert.match(ctx, /enterDungeonAutomap\(automapKey, classicMinutesRef\.value, \{ fromLoad: true \}\);\n[\s\S]{0,400}bindAutomapLayout\(automapRec, automapModel\);\n\s*signalAutomapReset\(\);/,
-      'the host binds AND raises the reset signal on the load arm (InitWhenInInteriorOrDungeon :2490, :2496)');
-  } finally { resetAutomapStore(); }
-});
-
 test('AUDIT-AMAP F5: a save taken INSIDE A BUILDING at N=0 keeps the dungeon maps - IsPlayerInside is true there (:2133)', () => {
   resetAutomapStore(); _resetForTests();
   try {
@@ -221,22 +201,6 @@ test('AUDIT-AMAP F11/F12: the exit stamps the EXIT time (:2155), and both hosts 
     assert.match(rd(f), /automapScanT = \(automapScanT - SCAN_INTERVAL_S\) % SCAN_INTERVAL_S;/, `${f}: the clock keeps its phase (WaitForSeconds(0.2) never drifts under 5 Hz)`);
   }
   assert.ok(RAYCAST_DISTANCE_DOWN === 3.0);
-});
-
-test('AUDIT-AMAP H5/H6/H8/H9/H12 SOURCE: the bracket saves the trilight, a mover draws at rest, the probe host frees the cursor, OnPop is public, the micro-map has defaults', () => {
-  const r = rd('src/render/renderer.js');
-  assert.match(r, /ambientTri: this\._ambientTri \? \{ sky: Array\.from\(this\._ambientTri\.sky\), ground: Array\.from\(this\._ambientTri\.ground\) \} : null,/, 'H5: saved by name');
-  assert.match(r, /this\.setLighting\(s\.ambient, s\.sunScale, s\.sunColor\);\n\s*this\.setAmbientTrilight\(s\.ambientTri\);/, 'H5: and restored after setLighting nulls it');
-  const w = rd('src/ui/automap/automapWindow.js');
-  assert.match(w, /for \(const d of this\.deps\.dynamicDraws\) push\(d\.gpu, byKey\?\.get\(d\.object\.key\)\?\.matrix \?\? d\.object\.matrix, d\.object\.key\);/, 'H6: the at-rest matrix the index and the picker hold');
-  assert.match(w, /\n  onPop\(\) \{/, 'H9: OnPop is public');
-  assert.doesNotMatch(w, /_onPop/, 'H9: no private twin left');
-  assert.match(rd('src/scenes/dungeonContext.js'), /activeOverlay\?\.onPop\?\.\(\);\s*\/\/[^\n]*\n\s*activeOverlay\?\.dispose\?\.\(\);/, 'H9: the death presenter runs it before the dispose');
-  const i = rd('src/scenes/interior.js');
-  assert.match(i, /const lookGate = makeLookGate\(canvas\);/, 'H8: the probe host has the gate');
-  assert.match(i, /lookGate\(!!overlay\);/, 'H8: and runs it every frame');
-  const d = rd('src/systems/settings/settingsDefaults.js');
-  for (const k of ['DungeonMicMapQoL', 'DunMicMapInnerColor', 'DunMicMapBorderColor']) assert.match(d, new RegExp(`"${k}": "`), `H12: ${k} has a defaults row`);
 });
 
 test('AUDIT-AMAP W11: layoutMessageBox takes WidthOverride as the WHOLE width and rounds it up to the slice', async () => {

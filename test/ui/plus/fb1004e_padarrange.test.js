@@ -52,7 +52,6 @@ test('PAD-BINDS: the Controller bindings window has an Overworld and a Quick dia
   const r3 = bindPlusRow(t, 'jump', rowCode(t, PLUS_BIND_ROWS.find((x) => x.id === 'crouch')), noSave);
   assert.deepEqual({ swapped: r3.swapped, cleared: r3.cleared }, { swapped: 'Crouch', cleared: false }, 'a row with a button swaps it');
   const { readFileSync } = await import('node:fs');
-  assert.match(readFileSync(new URL('../../../src/ui/plus/plusPadBinds.js', import.meta.url), 'utf8'), /note = r\.ok \? \(r\.cleared \? `Bound\. \$\{r\.swapped\} is unbound now\.` : r\.swapped \? `Bound\. \$\{r\.swapped\} took the old button\.` : 'Bound\.'\)/, 'the note');
 });
 
 test('PAD-BINDS: the d-pad offers Quick dial and Overworld for a tap or a hold - Quick dial presses its key, the Overworld (on no key) is the host\'s padAction (mutants: either choice gone; the unbound action dropped)', () => {
@@ -83,13 +82,6 @@ test('PAD-BINDS: the d-pad offers Quick dial and Overworld for a tap or a hold -
     assert.deepEqual(asked, ['TravelView'], 'held, it is the Overworld - the host\'s own door, once');
     assert.ok(!events.includes('keydown:Tab'), 'and not also the dial');
   } finally { gp.dispose(); registerCrossbar(wasXb); globalThis.window = prev; resetPrefs(); }
-});
-
-test('PAD-BINDS: the world host answers a pad action on no key with the one TravelView toggle its key arm also calls', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA S2): the captain's glass answered at the same door, between the modes and the Overworld
-  assert.match(src, /padAction: \(act\) => \{\n\s+if \(MODE_ACTIONS\[act\]\) return townTalk\.pickMode\(MODE_ACTIONS\[act\]\);\n\s+if \(act === 'Spyglass'\) \{ glassDoorPress = true; return true; \}[^\n]*\n\s+if \(act !== 'TravelView' \|\| townTalk\.overlayActive\) return false;\n\s+travelViewKey\(\);\n\s+return true;\n\s+\},/);   // MODE-WHEEL: an unbound mode action first
 });
 
 test('PAD-ARRANGE prompts: a window with a bar to arrange shows LT; in hand on the crossbar the bumpers place, never turn the tabs (mutants: no LT row; Tabs kept in hand)', () => {

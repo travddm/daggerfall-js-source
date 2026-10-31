@@ -187,9 +187,6 @@ test('COURT-DEEDS THE REGARD AS IT STANDS, AND THE TONE COUNTED (AUDIT FB1026d B
   const U = world();
   U.rel.note(RES.id, 'talk', 0, FRIEND_AT + 1);
   assert.match(U.deed('compliment', -1, insulted(U)), /Is that meant to be a compliment\?.*\(Regard -6, now \+35\.\)$/, 'the tone\'s cost said with the flat compliment');
-  // the talk window hands a deed row its tone (and every other row hears it first, as LW7 laid down)
-  const talk = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(talk, /if \(row\.legacy\?\.hearsTone\) return row\.legacy\.answer\(tone, _toneTaste\(\), _toneHeard\);\n\s*_toneHeard\(\);   \/\/ LW7/);
   assert.ok(rows.filter((r) => r.topic.startsWith('deed:')).every((r) => r.legacy.hearsTone === true));
 });
 

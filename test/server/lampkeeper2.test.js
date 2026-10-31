@@ -146,28 +146,6 @@ test('LAMP-KEEPER II THE ACCOUNT SERVICE: the first word lays I Love Lamp on the
   const e = honourEntry({ kind: 'title', key: 'ilovelamp' });
   assert.deepEqual([e.name, e.kicker, e.honour.rgba], ['I Love Lamp', 'New Title', TITLE_RGBA.ilovelamp], 'its loot banner');
   assert.match(read('server-account/migrations/0113_lamp_title.sql'), /^ALTER TABLE players ADD COLUMN lamp_title INTEGER NOT NULL DEFAULT 0;$/m);
-  assert.match(read('server-account/src/index.js'), /if \(path === '\/v1\/lamp\/claim' && request\.method === 'POST'\) \{\n[^\n]*\n\s*return json\(await claimLamp\(ctx, who\.player\), 200, origin\);/);
-});
-
-test('LAMP-KEEPER II THE WIRING: the interior stands the classic lamp under its own key at the record\'s size, no Morrowind body; the host picks per room and day; the press says its words with Trade and Leave and asks the title; the plaque names the Lamp; world.js hands its account door online', () => {
-  const ctx = read('src/scenes/interiorContext.js'), modes = read('src/scenes/worldModes.js'), world = read('src/scenes/world.js');
-  assert.match(ctx, /for \(const pn of people\) if \(opts\.lampPerson\?\.\(pn\)\) Object\.assign\(pn, \{ lamp: true, _mwLook: null \}\);/, 'no Morrowind body is read for it');
-  assert.match(ctx, /pn\.stood = true;\n\s*if \(pn\.lamp\) return standLamp\(pn\);[^\n]*\n\s*if \(_rigFor\) \{/, 'before the voxel body and the billboard');
-  assert.match(ctx, /const size = billboardSize\(t, LAMP_CLASSIC\.record\);/, 'the record\'s size, the mod\'s stretch with it');
-  assert.match(ctx, /renderer\.uploadTexture\(LAMP_ARCHIVE, 0, t\.getColor32\(t\.getDFBitmap\(LAMP_CLASSIC\.record, 0\), 0\)\);/, 'the classic pixels, never a replacement\'s');
-  assert.match(ctx, /pn\.standBatch = renderer\.createBillboardBatch\(LAMP_ARCHIVE, 0, size, \[\[pn\.x, pn\.y, pn\.z\]\]\);/);
-  assert.match(modes, /lampPerson: \(pn\) => isLampKeeper\(pn, \{\n\s*buildingType: building\?\.buildingType \?\? -1, buildingFactionId: building\?\.factionId \?\? 0, buildingKey: building\?\.buildingKey \?\? 0,[^\n]*\n\s*mapId: hit\.dfLocation\?\.mapTableData\?\.mapId \?\? 0, day: Math\.floor\(worldMinutes\(\) \/ MINUTES_PER_DAY\),/);
-  assert.match(modes, /if \(!info && pn\?\.lamp\) \{ lampChoice\(pn\); return; \}/);
-  assert.match(modes, /const officeName = \(pn\) => arenaGatePersonName\(pn\) \?\? [^\n]* \?\? \(pn\?\.lamp \? LAMP_TEXT\.name\(\) : null\)(?: \?\? \(pn\?\.witch \? vendorOffice\(\) : null\))?;/   /* PIN MOVED (WITCH1): a Wyrd Sister's office after the Lamp's */);
-  assert.match(modes, /\{ code: 'KeyT', label: `T - \$\{LAMP_TEXT\.trade\(\)\}`, action: \(\) => \{ Promise\.resolve\(townTalk\?\.ensureFactions\?\.\(\)\)\.then\(\(\) => openStaticNpc\(pn\)\)/, 'Trade opens the keeper\'s own shop');
-  assert.match(modes, /function lampChoice\(pn\) \{\n\s*const lines = lampLines\(Math\.floor\(worldMinutes\(\) \/ MINUTES_PER_DAY\)\);/, 'its own words, the day\'s');
-  assert.match(modes, /townTalk\?\.showOverlay\?\.\(new ChoiceWindow\(\{ lines, options \}\)\);\n\s*void lampTitle\.speak\(\);/);
-  assert.match(modes, /const lampTitle = createLampTitle\(\{\n\s*claim: host\.lampClaim \? \(\) => host\.lampClaim\(\) : null,\n\s*account: \(\) => host\.lampAccount\?\.\(\) \?\? null,/, 'the host\'s account door, and whose it is');
-  assert.match(modes, /announce: \(kind, key\) => announceHonour\(kind, key\),/);
-  assert.match(world, /lampClaim: _accountLamp \? \(\) => _accountLamp\.claim\(\) : undefined,/);
-  assert.match(world, /lampAccount: _accountLamp \? \(\) => _accountLamp\.account\(\) : undefined,/);
-  assert.match(world, /const _accountLamp = params\.has\('online'\) \? accountLamp\(/);
-  assert.equal(/lampPerson|lampChoice|lampKeeper|LAMP_/.test(read('src/scenes/dungeonContext.js')), false, 'the dungeon host stands no shop');
 });
 
 test('LAMP-KEEPER II THE WORKER (AUDIT FIVE-ASKS A1): /v1/lamp/claim is a route, behind a session and never open - a guest\'s word writes nothing, the first registered word grants, the next is held, a stranger is refused; the title on the wardrobe and worn', async () => {

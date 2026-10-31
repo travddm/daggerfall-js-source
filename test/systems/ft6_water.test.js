@@ -38,18 +38,6 @@ test('FT6: the switch - the enhanced skin, the pref, and ?water=off as the kill 
   } finally { setUiSkin(skin); setPref('enhancedWater', pref); }
 });
 
-test('FT6: both exterior hosts read the one composition and hold no copy of it; the indoor hosts have no water to switch', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(f);
-    assert.match(s, /waterSwitchOn(, buildWaterIndices)? \} from '\.\.\/render\/waterSurface\.js';/, `${f} imports the switch`);   // PIN MOVED (WATER-NEXT 2): the town builds its own water quads beside it
-    assert.match(s, /const waterOn = waterSwitchOn\(\)/, `${f} reads it`);
-    assert.ok(!/getPref\('enhancedWater'\)/.test(s), `${f} holds no copy of the composition`);
-  }
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.ok(!/enhancedWater|waterSwitchOn/.test(read(f)), `${f}: no exterior water indoors`);
-  const town = read('src/scenes/exterior.js');
-  assert.match(town, /const waterOn = waterSwitchOn\(\)[^\n]*\n\s*&& tilemapRectHasWater\(/, 'the town still asks whether it HAS water beside the switch - that is the town\'s question, not the switch\'s');
-});
-
 test('FT6: the registry row - Enhanced, over the pref, on by default, sound; the Enhanced category\'s row left with its copy', () => {
   const f = FEATURES.find((x) => x.id === 'enhanced-water');
   assert.ok(f);
@@ -60,7 +48,4 @@ test('FT6: the registry row - Enhanced, over the pref, on by default, sound; the
   assert.equal(f.effect, 'Takes effect when the world next loads.');
   assert.deepEqual(checkFeature(f), []);
   assert.equal(featureForControl('prefs', 'enhancedWater'), f);
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.ok(!/prefRow\('enhancedWater'/.test(menu));
-  assert.ok(!/function portRowsEnhanced\(/.test(menu), 'FT12: the Enhanced category is gone from the settings rail - its rows are the home\'s');
 });

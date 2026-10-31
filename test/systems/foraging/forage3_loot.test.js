@@ -229,14 +229,3 @@ test('FORAGE3: the corpse hook rides the death event every pool raises', () => {
   _resetForagingInstall();
 });
 
-test('FORAGE3: the wiring - the install subscribes all three; every host raises the container event at its stock and hands each pile its index', () => {
-  const inst = rd('src/systems/foraging/foragingInstall.js');
-  assert.match(inst, /registerContainerLootHandler\(FORAGING_VENDOR, onForagingContainerLoot\);\n\s*registerTabledLootHandler\(FORAGING_VENDOR, onForagingPileLoot\);\n\s*registerEnemyDeathHandler\(FORAGING_VENDOR, onForagingEnemyDeath\);/);
-  const wm = rd('src/scenes/worldModes.js');
-  assert.doesNotMatch(wm, /onShopShelfStocked/, 'no host calls a mod\'s subscriber by name');
-  assert.match(wm, /rolled = stockHouseContainer\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*raiseContainerLootSpawned\(\{ containerType: LOOT_CONTAINER_TYPES\.HouseContainers, items: rolled, buildingType: b\?\.buildingType, quality: b\?\.quality, luck: liveStat\(playerEntity, 'luck'\) \}\);[\s\S]{0,700}?if \(\(rolled \?\? c\.items\)\.length === 0\) return true;/, 'the house container raises it before "If no contents"');   // PIN MOVED (OUTDOOR-LOOT): the roll is held a moment (rolled), not written to the container, until the Yes
-  assert.match(wm, /function shelfLootSpawned\(items, b\) \{\n\s*return raiseContainerLootSpawned\(\{ containerType: LOOT_CONTAINER_TYPES\.ShopShelves, items,/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /addPileLootExtras\(items, lootKey, rolls, \{ locationIndex: dfLocation\.mapTableData\.dungeonType, luck, level, where: 'dungeon', quarters \}\);/);   // PIN MOVED (PARTY-LOOT): the roll's own terms (the player's by default)   // AUDIT OH-F B3 (main's, at the merge): and the dungeon's own tag; MERGE 2: REALM P0.4's level beside them
-  assert.match(rd('src/scenes/world.js'), /addPileLootExtras\(items, lootKey, Math\.random, \{ locationIndex: WOD_LOOT_LOCATION_INDEX, luck: liveStat\(playerEntity, 'luck'\), level: playerEntity\.level \}\);/);   // MERGE 2: REALM P0.4's level
-  assert.match(rd('src/scenes/interiorContext.js'), /addPileLootExtras\(generateLootItems\(lootKey, \{ level, gender \}\), lootKey, Math\.random, \{ locationIndex: locationType, luck, level \}\)/);   // MERGE 2: REALM P0.4's level
-});

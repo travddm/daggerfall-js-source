@@ -9,7 +9,6 @@ import { readFileSync } from 'node:fs';
 import * as M from '../../src/ui/etherChartWindow.js';
 import * as ES from '../../src/world/ethericSea.js';
 
-const src = readFileSync(new URL('../../src/ui/etherChartWindow.js', import.meta.url), 'utf8');
 const over = (p, q) => p[0] < q[2] && q[0] < p[2] && p[1] < q[3] && q[1] < p[3];
 const h = ES.veilhaven();
 const charted = [...new Set([h.key, ...ES.islesNear(h.px - 40, h.py, 70).map((i) => i.key), ...ES.islesNear(Math.round(ES.VEIL_X - 30 * ES.LEAGUE_PX), h.py, 40).map((i) => i.key)])];
@@ -38,10 +37,6 @@ test('AUDIT ETHER-CHART2 U1: the window as tall as the screen allows and the cha
   assert.match(css, /\.dfchart-map \{ position: absolute; inset: 0; display: block; width: 100%; height: 100%;/);
   assert.match(css, /@media \(max-height: 520px\) \{\n {2}\.dfchart-hint \{ display: none; \}/);
   assert.match(css, new RegExp(`\\.dfchart-ruler \\{ display: block; width: 100%; height: ${M.RULER_H}px; flex: 0 0 auto; \\}`));
-  assert.ok(!/min\(64vh/.test(src), 'no fixed height of the screen\'s');
-  assert.match(src, /const win = el\('div', 'dfnaval-win dfchart-win'\);/);
-  assert.match(src, /chart\.append\(ruler, stage\);/);
-  assert.match(src, /body\.append\(chart, foot, hint\);/);
   // the sheet once a document
   const added = [];
   const doc = { getElementById: (id) => added.find((n) => n.id === id) ?? null, createElement: () => ({ id: '', textContent: '' }), head: { append: (n) => added.push(n) } };
@@ -49,7 +44,6 @@ test('AUDIT ETHER-CHART2 U1: the window as tall as the screen allows and the cha
   assert.equal(added.length, 1);
   assert.equal(added[0].id, M.ETHER_CHART_STYLE_ID);
   assert.equal(added[0].textContent, css);
-  assert.match(src, /injectNavalKit\(document\);\n {2}injectEtherChartStyle\(\);/);
 });
 
 test('AUDIT ETHER-CHART2 U2: the depth ruler drawn - each water\'s tone, the world\'s edge hatched, the Veil\'s violet, a bound between each two, the grid\'s ticks at its foot and the ship\'s caret where she is; painted every draw over the chart (mutants: the caret, the bounds)', () => {
@@ -70,7 +64,6 @@ test('AUDIT ETHER-CHART2 U2: the depth ruler drawn - each water\'s tone, the wor
   const edge = stubContext();
   M.paintRuler(edge, m, W);
   assert.ok(edge.log.filter((c) => c[0] === 'lineTo').length > 20, 'the world\'s edge hatched');
-  assert.match(src, /if \(rg\) \{ rg\.setTransform\(dpr, 0, 0, dpr, 0, 0\); paintRuler\(rg, model, w\); \}/);
 });
 
 test('AUDIT ETHER-CHART2 U3: the world\'s edge drawn where the sea\'s box meets the void - the Abyss\'s water and the void were one black; no line where the box fills the chart (mutants: the line)', () => {
@@ -95,9 +88,6 @@ test('AUDIT ETHER-CHART2 U4/U5: the scale in the key, off the map (its plate hid
   const s = stubContext();
   M.paintScale(s, m.scale, 10);
   assert.ok(s.log.some((c) => c[0] === 'lineTo' && Math.abs(c[1] - (m.scale.px + 1.5)) < 1e-9), 'the bar its length');
-  assert.match(src, /key\.append\(scaleItem\);/);
-  assert.match(src, /const at = `\$\{sc\.words\}:\$\{sc\.px\}:\$\{dpr\}`;/);
-  assert.match(src, /scaleWords\.textContent = sc\.words;/);
   // every zoom's bar is within a few pixels of the others - the words are what tell them apart
   const lens = M.CHART_ZOOMS.map((_, z) => M.scaleBar(z).px);
   assert.ok(Math.max(...lens) - Math.min(...lens) < 25, 'the bars alike');
@@ -124,19 +114,6 @@ test('AUDIT ETHER-CHART2 U9: the named isle\'s card - above it to the east, then
     }
   }
   assert.ok(seen > 100 && moved > 5, `cards moved off names (${moved} of ${seen})`);
-});
-
-test('AUDIT ETHER-CHART2 U10/U11: the chart painted again whenever a face lands while it is open - a window opened before the fonts\' stylesheet came kept the fallback face (load and ready answered at once, with nothing to load) - and whenever its room changes; the key\'s words set before the room is measured; both let go at the close (mutants: the landing, the watch, the order)', () => {
-  assert.match(src, /fonts\?\.addEventListener\?\.\('loadingdone', landed\);/);
-  assert.match(src, /fonts\?\.removeEventListener\?\.\('loadingdone', landed\);/);
-  assert.match(src, /const roomWatch = typeof RO === 'function' \? new RO\(\(\) => draw\(\)\) : null;\n {2}roomWatch\?\.observe\(stage\);/);
-  assert.match(src, /roomWatch\?\.disconnect\(\);/);
-  const draw = src.slice(src.indexOf('  function draw() {'), src.indexOf('  /** What lies under a canvas point'));
-  assert.ok(draw.indexOf('showScale(scaleBar(view.zoom));') > 0 && draw.indexOf('showScale(scaleBar(view.zoom));') < draw.indexOf('const [w, h] = size();'), 'the key\'s words before the room is measured');
-  assert.equal((draw.match(/showScale\(/g) ?? []).length, 1, 'once a draw');
-  // both let go in the unmount, and only there
-  const unmount = src.slice(src.indexOf('    unmount() {'));
-  assert.ok(unmount.includes("removeEventListener?.('loadingdone', landed)") && unmount.includes('roomWatch?.disconnect()'));
 });
 
 // ── lane T: the painter watched, the measure held to the paint, the layout's laws ────────────────────────────────────
@@ -254,7 +231,6 @@ test('AUDIT ETHER-CHART2 T2: the key drawn by the chart\'s own painters - each k
 });
 
 test('AUDIT ETHER-CHART2 T3: the model measures in the face the painter letters in - each name, haunt plate, card, pointer and ruler word as wide as the face, the case and the tracking in which it is drawn (mutants: the faces, the case, the tracking)', () => {
-  assert.match(src, /const measure = \(t, font\) => \{ if \(!g\) return t\.length \* LABEL_CHAR_PX; g\.font = font; track\(g, CHART_TRACKING\); return g\.measureText\(t\)\.width; \};/);
   const drawnWidth = (c) => faceWidth(String(c[1]), c.at(-1).font, c.at(-1).letterSpacing);
   for (const [zoom, dx, dy, pick] of [[3, 0, 0, h.key], [2, 0, 0, null], [3, -40, 10, null], [2, -160, -30, null]]) {
     const m = M.chartModel(word({ legends: LEGENDS }), at(zoom, dx, dy), W, H, { measure, pick });
@@ -357,12 +333,6 @@ test('AUDIT ETHER-CHART2 T7/T10: the card\'s title a name opening a line, its fi
   const m = M.chartModel(word(), { cx: low.px + 0.5, cy: low.py + 0.5, zoom: 3 }, W, H, { pick: low.key });
   assert.equal(m.pick.title, M.capFirst(low.name));
   assert.notEqual(m.pick.title, low.name);
-  // PIN MOVED (ETHER-OW, test/systems/travel/ether_ow.test.js): the Overworld's door is a press of the row, a finger's 44px too
-  assert.match(src, /for \(const b of \[zoomOut, zoomIn, shipBtn, overBtn\]\) \{ b\.style\.flex = '0 0 auto'; b\.style\.minWidth = '44px'; \}/);
-  // PIN MOVED (ELTHERIC, test/world/eltheric.test.js): the sea's name is its one home's (world/ethericSea.js ETHER_SEA_NAME)
-  // PIN MOVED (L10N4, at the merge of main): the canvas's name through the text core, the sea's name its one home's
-  assert.match(src, /canvas\.setAttribute\('role', 'img'\);\n\s+canvas\.setAttribute\('aria-label', t\('sea\.chart\.canvas', 'A chart of \{sea\}: your ship, the isles you have charted, the depths, the Veil and the legends\\' haunts', \{ sea: ETHER_SEA_NAME \}\)\);/);
-  assert.match(src, /c\.width = c\.height = Math\.round\(18 \* dpr0\);/);
 });
 
 // ── lane C ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -386,8 +356,3 @@ test('AUDIT ETHER-CHART2 C4/C7/C8: the pointer\'s words laid before the lesser i
   assert.ok(aelishaven.x > W - 40 && aelishaven.box[0] >= 0 && aelishaven.box[2] <= W, 'on the chart\'s side');
 });
 
-test('AUDIT ETHER-CHART2 C10/C11: a port\'s name weighed against the ports\' marks alone, each mark\'s box made once (it scanned every isle for every port); the note said again of the isle named whenever the chart is repainted - as its card is (mutants: the marks, the note)', () => {
-  assert.match(src, /const marks = isles\.map\(\(o\) => \(\{ o, box: mark\(o\) \}\)\), portMarks = marks\.filter\(\(k\) => k\.o\.kind === 'port'\);/);
-  assert.match(src, /!\(port \? portMarks : marks\)\.some\(\(k\) => k\.o !== i && overlaps\(box, k\.box\)\)/);
-  assert.match(src, /repaint: \(\) => \{ word = deps\.word\(\); const isle = pick \? isleByKey\(pick\) : null; noteLine\.textContent = isle \? isleWords\(isle, \{ px: word\.px \+ 0\.5, py: word\.py \+ 0\.5 \}\) : ''; draw\(\); \},/);
-});

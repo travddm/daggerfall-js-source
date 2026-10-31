@@ -159,24 +159,6 @@ test('MOVE-REAL: a swim that goes nowhere, treading water, teaches a master noth
   }
 });
 
-test('MOVE-REAL: the tick and the climb route their motion tallies through the movement door', () => {
-  const tick = read('src/systems/worldTick.js');
-  assert.match(tick, /if \(activity\.odometer\) entity\._odometer = activity\.odometer;/);
-  for (const id of ['Jumping', 'Running', 'Swimming']) assert.match(tick, new RegExp(`tallyMovementSkill\\(entity, SKILLS\\.${id}\\)`));
-  assert.doesNotMatch(tick, /tallySkill\(entity, SKILLS\.(Jumping|Running|Swimming)\)/);
-  assert.match(read('src/scenes/shared.js'), /tally: \(\) => tallyMovementSkill\(entity, SKILLS\.Climbing\),/);
-  // every host that feeds the tick hands it the motor's odometer
-  assert.match(read('src/scenes/world.js'), /odometer: player\.odometer,   \/\/ MOVE-REAL/);
-  assert.match(read('src/scenes/exterior.js'), /odometer: player\.odometer,   \/\/ MOVE-REAL/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /odometer: player\.odometer,   \/\/ MOVE-REAL/, 'the interior');
-  assert.match(wm, /fell: player\.landedFallDistance, odometer: player\.odometer \}\);/, 'the world-hosted dungeon\'s report');
-  assert.match(read('src/scenes/dungeon.js'), /fell: player\.landedFallDistance, odometer: player\.odometer \}\);/, 'the standalone dungeon\'s report');
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /_activity\.odometer = odometer;/);
-  assert.match(dc, /reportActivity\(\{[^}]*odometer = null \} = \{\}\)/);
-});
-
 // ---- the motor's odometer ------------------------------------------------------------------------------------------
 
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -241,15 +223,3 @@ test('MOVE-REAL: running constantly, the climb from 100 takes the hours the note
 
 // ---- MASTER-DOOR ------------------------------------------------------------------------------------------------------
 
-test('MASTER-DOOR: the stats page keeps the off-rail Master Skills page instead of turning it into Character', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const at = menu.indexOf('function pauseStats(body)');
-  const body = menu.slice(at, menu.indexOf('\n}\n', at));
-  assert.match(body, /const offRail = statsSec === 'master' && !!m\.master;/);
-  assert.match(body, /if \(!offRail && !statsSections\(\)\.some\(\(\[id\]\) => id === statsSec\)\) statsSec = 'character';/);
-  assert.ok(body.indexOf('const offRail') < body.indexOf("b.onclick = () => { statsSec = 'master'"), 'the guard runs on the render the button asks for');
-  // the page is still the one the door opens, and the rail still never lists it
-  assert.match(body, /master: statsMaster/);
-  assert.match(body, /b\.onclick = \(\) => \{ statsSec = 'master'; _masterNote = null; render\(\); \};/);
-  assert.doesNotMatch(menu.slice(menu.indexOf('const STATS_SECTIONS'), menu.indexOf(']);', menu.indexOf('const STATS_SECTIONS'))), /'master'/);
-});

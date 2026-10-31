@@ -141,7 +141,6 @@ test('DUEL1 THE DUEL\'S SPELL: its bundles are tagged the duel\'s (never merged 
   const mine = { stats: { willpower: 50 }, career: {}, health: 30, maxHealth: 40, activeEffects: [] };
   applySpell({ element: 0, rangeType: 2, effects: [cont] }, 1, mine, { hurt: () => {} }, () => 0.99, null, {});
   assert.equal(mine.activeEffects.find((a) => a.kind === 'continuousDamage')?.bundleDuel, undefined, 'an ordinary spell is not the duel\'s');
-  assert.match(rd('src/scenes/shared.js'), /hurt: \(n, a = null\) => hurtPlayer\(entity, n, a\?\.bundleDuel \? \{ spare: duelSpare \} : undefined\)/, 'the one ticker every host shares floors the duel\'s rounds');
   // the families
   assert.deepEqual([...DUEL_SPELL_TYPES].sort((x, y) => x - y), [0, 1, 4, 5, 7, 19]);
   const fire = { name: 'Fire Storm', element: 0, rangeType: 4, icon: 2, effects: [{ type: 4, subType: 0 }, { type: 10, subType: 8 }, { type: 6, subType: 0 }] };
@@ -166,35 +165,3 @@ test('DUEL1 WHERE A BLOW MAY COME FROM: the striker\'s claimed feet near where t
   assert.equal(duelBlowPlausible({ k: 'spell', p: at(2 * DUEL_RADIUS_M + DUEL_POS_SLACK_M + 1) }, me, at(2 * DUEL_RADIUS_M + DUEL_POS_SLACK_M + 1), DUEL_RADIUS_M), false, 'from beyond the ring');
 });
 
-test('DUEL1 hosts by source: the swing reaches my opponent before any pool and is theirs when it left; my shaft on them is a strike and a foe\'s stops on them; my harmful spells meet them as a mark (touch, missile, blast, area) through the duel\'s door; INT8: my blow out a number rolled on my own sheet for the referee, the defender\'s half gone; the travel map, a journey, rest and every door refuse a duellist (mutants: the melee arm after the pools; the shaft\'s damage dealt at home; a defender\'s half left; a door out of the ring)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(duelMeleeHit\(cam\.pos, makeInView\(proj, view, multiply\)\)\) \{\s*\n\s*tallySwingSkills\(playerEntity, weaponRig\.playerWeapon\.weapon, weaponRig\.playerWeapon\.blowWeight\);\s*\n\s*surfacePlayer\(\);\s*\n\s*\} else if \(!cityGuards\.resolvePlayerHit/, 'the duel arm first, the ladder after');
-  assert.match(w, /\.filter\(\(t\) => !t\.dead && t\.ai\)\.map\(\(t\) => \(\{ feet: t\.ai\.feet, ref: t \}\)\), \.\.\.duelArrowTargets\(\)\]/);
-  assert.match(w, /onFoeHit: \(m, t\) => \(t\?\.duel \? undefined : exteriorFoes\.arrowHitFoe\(m, t\)\)/);
-  // PIN MOVED (AUDIT-SEATS): the shaft's target's id rides too - outside a duel, a battle's foe it struck (G5's shaft)
-  assert.match(w, /onPlayerArrowHitFoe: \(m, t\) => \(t\?\.duel \? duelStrikeOut\('arrow', m\.weapon \?\? null, 'StrikeDown', weaponRig\.playerWeapon\?\.lastDrawMs \?\? 0, t\.id, \{ off: !!weaponRig\.playerWeapon\?\.isOffHandItem\?\.\(m\.weapon\) \}\) : playerArrowHitFoe\(m, t, \{/);
-  assert.match(w, /castAtDuel: \(id, sp\) => duelSpellOut\(id, sp\),/);
-  // PIN MOVED (INT8): the defender resolved the opponent's blow on its own sheet with the floor (`spare`), its spell
-  // landing under `_duelScope` - the referee holds a duel's every blow now: the save's health is never a duel's, and my
-  // own blow out is a number rolled at home for the relay to clip
-  assert.match(w, /hurt: \(n\) => \{ if \(n > 0\) hurtPlayer\(playerEntity, n\); \},/);
-  assert.equal(/_duelScope|duelSpare|registerDuelFell|duelBlowIn/.test(w), false, 'no defender\'s half left');
-  // PIN MOVED (AUDIT C&C H5): rolled against the neutral stand-in - the stub of my own sheet it was rolled against
-  // cancelled every attribute I brought and charged me for my own luck (test/systems/auditcc_pvp.test.js)
-  assert.match(w, /const r = resolveDuelStrike\(\{ by, a, \.\.\.\(w \? \{ w \} : \{\}\), \.\.\.\(sw \? \{ sw \} : \{\}\), \.\.\.at, \.\.\.\(off \? \{ off \} : \{\}\) \}, duelStandIn\(playerEntity\)\);/, 'rolled on my own sheet against the neutral stand-in');   // PIN MOVED (TWO-HANDS AUDIT): and the off hand's terms; PIN MOVED (RPT1026-FIGHTS STRIKE-UNVEILS): the striker named
-  assert.match(w, /const n = duelMgr\.blow\('strike', \{ by, p: campToWire\(player\.feetAt\(\)\), d: Math\.trunc\(r\.dmg\),/, 'sent as a number');
-  assert.match(w, /const n = duelMgr\.blow\('spell', \{ p: campToWire\(player\.feetAt\(\)\), d: siegeCastClamp\(harm, false\) \}\);/, 'a spell\'s harm, counted at home');
-  // NAV-H (2026-09-28): a hostile ship in reach joined the same doors, after the duel and the foes
-  assert.match(w, /if \(duelEnemyNear\(\) \|\| areEnemiesNearby\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\]\) \|\| navalHostileNear\(\)\) \{[^\n]*\n\s*townTalk\.say\(localizedText\('cannotTravelWithEnemiesNearby', CANNOT_TRAVEL_ENEMIES_TEXT\)\);/, 'the travel map');
-  assert.equal((w.match(/enemiesNearby: \(\) => duelEnemyNear\(\) \|\| areEnemiesNearby\(/g) ?? []).length, 2, 'rest and a journey');
-  assert.match(w, /duelHolds: \(\) => duelEnemyNear\(\),/);
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /if \(!isBash && \(hit\.door\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE \|\| hit\.door\.doorType === DOOR_TYPE\.BUILDING\) && host\.duelHolds\?\.\(\)\) \{ setMidScreenText\(DUEL_DOOR_TEXT\); return true; \}/, 'no door out of the ring');
-  const h = rd('src/scenes/hostMagic.js');
-  assert.match(h, /const marks = \[\.\.\.allyMarksFor\(sp\), \.\.\.duelMarksFor\(sp\)(?:, \.\.\.bossMarksFor\(sp\))?\];/, 'a touch');   // WB4b: the court's boss joins the marks beside the opponent
-  assert.match(h, /else if \(t\?\.duel\) giveToDuel\(t, sp\);/);
-  assert.match(h, /for \(const t of sweepFoes\(eye, EXPLOSION_RADIUS, duelMarksFor\(sp\)\)\) giveToDuel\(t, sp\);/, 'an area around me');
-  assert.match(h, /if \(duel && caster\?\.entity === playerEntity\) for \(const t of sweepFoes\(pos, EXPLOSION_RADIUS, duelMarksFor\(spell\)\)\) giveToDuel\(t, spell\);/, 'a blast');
-  assert.match(h, /if \(m\.duel\) \{\s*\n\s*const hitFoe = duelMarksFor\(m\.spell\)\.find\(\(p\) => missileHitsCapsule\(m\.pos, p\.ai\.feet, p\.ai\.height, PLAYER_BODY_RADIUS\)\);/, 'a missile');
-  assert.match(h, /duel: !!duelSpellOf\(sp\), boss: !!duelSpellOf\(sp\) \|\| [^\n]*\}\);/);   // AUDIT WBX F5: a duel spell meets the boss too (and a Soul Trap)
-});

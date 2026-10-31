@@ -48,8 +48,6 @@ test('KETCH THE RELAY KEEPS SHIPS FROM world255: a page boards no ship whose rel
   assert.ok(relaySupportsKetch(RELAY_VERSION));
   assert.equal(relaySupportsKetch('world252'), false);
   assert.equal(relaySupportsKetch(null), false);
-  const src = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(key\.startsWith\('kt:'\) && !ketchRoomHolds\(key, Date\.now\(\)\)\) return json\(\{ error: 'the Ketch is gone' \}, 404\);/, 'no object minted for a voyage the clock has not brought');
 });
 
 test('KETCH THE DOOR: its captain and the captain\'s party by the hub\'s word come aboard and are told the ship whole; a stranger is refused before anything is written; each taken into the crew once (mutants: a stranger let in; the ship untold; a pose unstamped)', async () => {

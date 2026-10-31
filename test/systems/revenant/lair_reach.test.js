@@ -18,7 +18,6 @@ const S = RDB_SIDE;
 /** A block of the layout at grid (gx, gz) - its name, its origin, its water (the layout's dungeon.blocks shape). */
 const block = (name, gx, gz, waterLevel = 10000) => ({ name, originX: gx * S, originZ: gz * S, layout: { startMarkers: [], waterLevel } });
 const at = (gx, gz, lx, lz, y = 0) => ({ x: gx * S + lx, y, z: gz * S + lz, mobileType: 0 });
-const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
 
 test('LAIR-REACH the law the lair now reads: the farthest marker a walk reaches - never a border cap\'s, though the caps ring the layout and hold the farthest point; with every marker in a cap, the farthest of them (mutant: the raw markers)', () => {
   // the way in at the start block; an interior block beyond it; a cap closing the layout past both
@@ -36,15 +35,3 @@ test('LAIR-REACH the law the lair now reads: the farthest marker a walk reaches 
   assert.deepEqual([dryEnd.x, dryEnd.z], [near.x, near.z], 'the deep block flooded: the dry one');
 });
 
-test('LAIR-REACH the host: the lair\'s stand and the Rift ask ONE end - dungeonEnd, over SD-REACH\'s candidates from the way in - and nothing in the host hands dungeonEndOf the raw markers; a lair with no end frees its claim (mutants: the lair off the law; the Rift off it; the candidates unasked)', () => {
-  // LAIR-WALK (test/systems/revenant/lair_walk.test.js): `reaches`, the walk's test - the Rift asks none (dungeonEndOf)
-  assert.match(D, /function dungeonEnd\(reaches = null\) \{\n\s*const from = dungeon\.enterMarker \?\? dungeon\.startMarker \?\? null;\n\s*return reachableEndOf\(from, sdEndMarks\(_layoutEnemies, dungeon\.blocks, \(m\) => floorLanding\(collider, \[m\.x, m\.y \+ 0\.2, m\.z\]\)\[1\]\), reaches\)/);
-  const ends = D.slice(D.indexOf('function dungeonEnd(reaches = null) {'), D.indexOf('/** ITS LAIR STAND'));
-  assert.equal((D.match(/reachableEndOf\(|dungeonEndOf\(/g)?.length ?? 0) - (ends.match(/reachableEndOf\(|dungeonEndOf\(/g)?.length ?? 0), 0, 'the end\'s law asked in dungeonEnd alone');
-  const lair = D.slice(D.indexOf('async function standLairRevenant() {'), D.indexOf('function standDungeonBand('));
-  assert.match(lair, /const far = \(reaches && dungeonEnd\(reaches\)\) \|\| dungeonEnd\(\);/, 'the lair\'s stand - the walk\'s end, else SD-REACH\'s');
-  assert.match(lair, /if \(!far\) \{ releaseRevenantStand\(r\); return null; \}/, 'no end: the claim freed');
-  assert.doesNotMatch(lair, /_layoutEnemies/, 'never the raw markers');
-  const rift = D.slice(D.indexOf('function standSdEnd() {'), D.indexOf('const probe = sdProbeOf(collider);', D.indexOf('function standSdEnd() {')));   // SD-THROUGH (PIN MOVED): the end's one probe (scenes/superDungeon/sdEnd.js sdProbeOf)
-  assert.match(rift, /const end = dungeonEnd\(\);/, 'the Rift');
-});

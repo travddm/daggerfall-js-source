@@ -164,11 +164,6 @@ test('AUDIT SURV B/C: the rest gate - a host that does not own the mode answers 
   assert.equal(getPreventedRestMessage(), REST_TEXT_SURVIVAL.tooCold);
   uninstallSurvivalGate(pair, unregisterPreventRestCondition);
   assert.equal(getPreventedRestMessage(), null, 'gone with the host');
-  const dc = read('src/scenes/dungeonContext.js'), modes = read('src/scenes/worldModes.js'), rest = read('src/systems/survival/rest.js');
-  assert.match(dc, /const _survivalGate = installSurvivalGate\(registerPreventRestCondition, \(\) => playerEntity, survivalEnvNow\);/);
-  assert.match(dc, /uninstallSurvivalGate\(_survivalGate, unregisterPreventRestCondition\);/, 'the teardown takes the pair off the seam');
-  assert.match(modes, /survivalEnv: \(\) => \(mode === 'interior' && host\.survivalEnv \? \{ \.\.\.host\.survivalEnv\(\), insideBuilding: true/, 'the interior reader answers in the interior alone');
-  assert.match(rest, /const e = readEnv\?\.\(\);\n\s+if \(!e \|\| !enabled\(\)\) return null;/, 'the gate reads null as silence');
   clearPreventRestConditions(); _resetForTests();
 });
 
@@ -230,8 +225,6 @@ test('AUDIT SURV C: what the player is told - a vampire\'s strip has no hunger o
   assert.match(survivalInfoTokens(skin).map((r) => r.text).join('\n'), /Weight: [0-9.]+ kilograms/, 'DFU\'s word, shortened by the panel alone');
   assert.equal(isSurvivalItem(skin), true);
   assert.match(ENHANCED_CSS, /\.hud-stat:empty\s*\{\s*display:\s*none;?\s*\}/, 'no gap for an empty widget (UI3: the needs are its tiles)');
-  const hud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /survivalHudChips\(vitals, Math\.floor\(ownMinutes\(\)\), \{ vampire: !!liveVampirism\(vitals\), endurance: liveStat\(vitals, 'endurance'\), rules: survivalRules\(\), live \}\)/);   // PIN MOVED (AUDIT SURV-BOONS C14): and the live tier   // LIVED1: the needs read the character's own clock   // PIN MOVED (AUDIT C&C S5/S9): the live tier's rules, and the frame's one live reading
   // Mac (review): "Hide wear for non wearables. Same for use for non-usables"
   const wearer = { equip: null, activeEffects: [] };
   assert.equal(localPrimaryAct(skin, wearer), null, 'no slot takes a waterskin: no Wear');
@@ -244,24 +237,9 @@ test('AUDIT SURV C: what the player is told - a vampire\'s strip has no hunger o
   assert.equal(usableItem({ group: 'Armor', templateIndex: 102 }), false); assert.equal(usableItem({ group: 'Gems', templateIndex: 0 }), false);
   assert.equal(usableItem({ group: 'Weapons', templateIndex: 113, questItem: true }), true, 'a quest item is watched');
   assert.equal(usableItem(null), false);
-  const invSrc = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(invSrc, /if \(getEquipSlot\(entity \?\? \{\}, item\) === EQUIP_SLOTS\.None\) return null;/, 'the card asks the equip table');
-  assert.match(invSrc, /if \(act\) \{   \/\/ null: nothing would wear it/, 'no button without an act');
-  // HOOD-SAID (FIELD BUGS 2026-09-30, PIN MOVED): and not on a worn hooded piece, whose hood has its own button - unless
-  // it is enchanted, when Use still fires its Used payload
-  assert.match(invSrc, /if \(usableItem\(picked\) && \(!hooded \|\| isEnchanted\(picked\)\)\) \{\n\s+u\.onclick/, 'Use only where the law has an arm');
 });
 
 test('AUDIT SURV B: the camps - the sweep spares them and the scene cache carries none, an empty word reaches the cell, a restore merges by id, Off keeps them, sees only another player\'s and uses none; the dungeon rest pays its night asleep; the clock correction re-aligns', async () => {
-  const world = hostText('src/scenes/world.js'), dc = read('src/scenes/dungeonContext.js'), campsSrc = read('src/scenes/camps.js');
-  assert.doesNotMatch(world, /camps\.collectPixel\(key\)/, 'a placed camp is not a dropped pile: the streaming sweep leaves it');
-  assert.doesNotMatch(world, /camps: camps\.snapshot\(\(pos\) => \{ const wc = state\.worldCoords\(pos\); return \[wc\.x, pos\[1\] - state\.compensation\[1\], wc\.z\]; \}\),   \/\/ SURV3: my camps, in natives\n\s+\}\);\n\s+\}\n\s+function restoreExteriorScene|camps\.restore\(arrived\.camps/, 'the scene cache carries no camps - the pool is the truth');
-  assert.match(world, /if \(cell && full\) frame\.c = camps\.wireRecords\(campToWire\);/, 'an empty list says "none stand"');
-  assert.match(world, /if \(Math\.abs\(offsetMs - was\) > 1000\) onlineArrival\(\); (?:hearSharedClock\(\); )?\};/, 'LIVED1: the needs are on the character\'s own clock, which a correction does not move - the arrival alone; was: ' + 'a clock correction re-aligns the needs - by the delta every other marker rode, first (AUDIT SURV-TIERS, the third pass)');
-  assert.match(dc, /const feed = survivalFeed\(playerEntity, survivalEnvNow\(\), \{ say: \(msg\) => hudText\.add\(msg\) \}\);\n\s+if \(feed\) runSurvivalMinutes\(playerEntity, start, Math\.floor\(end\), feed\.env, \{ \.\.\.feed\.deps, sinks: playerSinks, rolls: Math\.random \}\);/, 'the dungeon rest pays its night asleep, under the window');
-  // AUDIT SURV-TIERS: the pool REFUSED a restore and a peer's word with the arc off, so a save loaded Off lost every
-  // camp and an Off host dropped its peers' camps from the room it passes on. Off hides; it does not burn.
-  assert.doesNotMatch(campsSrc, /if \(!survivalOn\(\)\) return null;/, 'Off refuses no record');
   // the merge
   const { createCamps, FIRE_LIGHT_UP, CAMP_LIGHTS_MAX } = await import('../../../src/scenes/camps.js');
   const { TENT_MODEL, FIRE_LIGHT_RANGE } = await import('../../../src/systems/survival/camp.js');

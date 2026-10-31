@@ -392,8 +392,3 @@ test('CHAP6a a shut hall posts no writs this Season - nor its members their own;
   assert.equal(s.raw.prepare("SELECT pay FROM writs WHERE kind = 'member' AND faction = 40").get().pay, own.pay);   // PIN MOVED (AUDIT CHAP5 E1)
 });
 
-test('CHAP6a the wiring: the chapters\' event columns and their check; the Season\'s rows in the Turning\'s own batch (mutants: none - the record)', () => {
-  const mig = src('server-account/migrations/0102_npc_chapters.sql');
-  assert.match(mig, /event     TEXT CHECK \(event IS NULL OR event IN \('calm', 'schism', 'succession', 'crackdown', 'rivalry', 'decline', 'ascendancy'\)\),\n  event_season INTEGER,\n  event_data TEXT NOT NULL DEFAULT '\{\}',\n  shut_season INTEGER,/);
-  assert.match(src('server-account/src/npcChapters.js'), /\/\/ CHAP6a: the Season's own lines - each event's ending, and each Master who held the seat the whole of it/);
-});

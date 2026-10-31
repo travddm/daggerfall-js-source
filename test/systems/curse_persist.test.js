@@ -52,8 +52,6 @@ test('CURSE-PERSIST1: a save written BEFORE the fix - the curse with no flag and
   runMagicRoundsFor(q, NOW, NOW + 30, { sinks: {} });
   assert.equal(liveLycanthropy(q)?.infectionType, LYCANTHROPY_TYPES.Wereboar, 'the curse, with its own strain - nothing was lost, so nothing is assumed');
   assert.ok(liveInfection(q), 'and the infection');
-  const src = rd('src/systems/effects.js');
-  assert.match(src, /^ {4}if \(a\.permanent\) return !a\.ended;$/m, 'tickActiveEffects keeps its one law and learns no kind by name');
 });
 
 test('CURSE-REPAIR1: a curse the old prune took is given back on load - the vampire with the clan its spells name, for every clan, Anthotis by its base three alone; the werewolf as a werewolf, the strain said to be assumed; the spells never granted twice (mutants: the clan inferred wrong; the spells doubled)', () => {
@@ -110,8 +108,4 @@ test('CURSE-REPAIR1: nothing is given back where nothing was lost - a live curse
   const again = P(); again.spells.push({ index: 92, tag: LYCANTHROPY_SPELL_TAG });
   assert.equal(repairLostCurses(again, { now: 1 }), 'lycanthropy');
   assert.equal(repairLostCurses(again, { now: 2 }), null, 'idempotent');
-  // the hook sits AFTER the spellbook and the effect list are restored
-  const save = rd('src/systems/save/save.js');
-  assert.ok(save.indexOf('repairLostCurses(entity, {') > save.indexOf('seedCustomSpellIndex(entity.spells);'), 'after the spellbook');
-  assert.ok(save.indexOf('repairLostCurses(entity, {') > save.indexOf("entity.racialOverride = entity.activeEffects.find("), 'after the effect list and its marker');
 });

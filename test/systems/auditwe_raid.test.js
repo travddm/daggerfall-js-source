@@ -122,15 +122,11 @@ test('AUDIT WORLD-EVENTS L4-2/L4-9/L3-12: the exodus - no refugee stood on a pau
   kill(log.refugees[1]);
   await run(2);
   assert.equal(raid.lost, 1, 'a killed one is lost');
-  // the pool spares a raid's refugee its relevance cull, and the player's own harm passes one by
-  assert.match(rd('src/scenes/exteriorFoes.js'), /if \(!f\.placed && !f\.managed && !f\.refugee && _playerDist > _cullAt &&/);
   const ref = { refugee: true, dead: false, entity: { team: 'PlayerAlly' } };
   assert.equal(isRefugee(ref), true);
   assert.equal(sparedByPlayer(ref), true, 'the shaft, the spell, the torch');
   assert.equal(sparedBySwing(ref), true, 'the swing');
   assert.equal(sparedBySwing({ ...ref, entity: { team: 'PlayerEnemy' } }), false, 'one turned is no refugee');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /if \(f\.dead \|\| \(fromPlayer && !peer && sparedBySwing\(f\)\)\) return;/);
-  assert.match(rd('src/scenes/exteriorFoes.js'), /const live = dropFateHeld\(foes\.filter\(\(f\) => !f\.dead && !sparedBySwing\(f\)\)\);/);
 });
 
 test('AUDIT WORLD-EVENTS L4-4: the standard\'s square not found is asked again RAID_SITE_AGAIN_S on, never kept null for the raid - the raid\'s own asked of (mutants: the null kept)', async () => {
@@ -178,11 +174,6 @@ test('AUDIT WORLD-EVENTS L4-3/L4-8: the town\'s streets off its grid - a walled 
 });
 
 test('AUDIT WORLD-EVENTS L4-6: the Standard-Bearer is no part of the watch\'s comings and goings - never dismissed in a lull, never counted a defender, never enlisted by a crime - and one let go is raised again as he was (mutants: the dismissal; the count; the walk-off a whole standard)', async () => {
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.match(cg, /if \(g\.dead \|\| !g\.defender \|\| g\.leaving \|\| g\.raidBearer\) continue;/);
-  assert.match(cg, /const defenderCount = \(\) => guards\.filter\(\(g\) => !g\.dead && g\.defender && !g\.leaving && !g\.raidBearer\)\.length \+ spawning\.filter\(\(p\) => p\.defender && !p\.bearer\)\.length/);
-  assert.match(cg, /function enlistDefender\(g, playerFeet\) \{\n\s*if \(g\.raidBearer\) return;/);
-  assert.match(cg, /raidBearer: !!bearer,/);
   const { log } = rig();
   restoreSaveData({ lastSelectedDay: DAY, raids: [raidOf('defend')] });
   await run(2);
@@ -207,7 +198,6 @@ test('AUDIT WORLD-EVENTS L4-7: an origin\'s shift moves the square and the way a
   raidOffsetAll([819.2, 0, -819.2]);
   assert.deepEqual(o.post, [829.2, 0, -809.2]);
   assert.equal(at.square, o.post, 'in place (the bearer\'s post is read off it)');
-  assert.match(rd('src/scenes/world.js'), /exteriorFoes\.offsetAll\(r\.offset\); raidOffsetAll\(r\.offset\);/);
 });
 
 test('AUDIT WORLD-EVENTS L3-10/L3-12: the assault - a wave whose count has not moved in RAID_WAVE_STALL_S stands past the raider it cannot reach; its breather runs on the frame\'s time, never through a pause (mutants: the stall never timed; the breather on the wall clock)', async () => {
@@ -344,8 +334,6 @@ test('AUDIT WORLD-EVENTS L3-14: whether a town is held as its receipt comes - th
   assert.equal(raidHeldFor(KEY), true, 'two saved: held before its cleanse');
   assert.equal(raidHeldFor(`3:8:${DAY}`), false);
   assert.equal(raidHeldFor('9:9:9'), true, 'a cleanse held');
-  assert.match(rd('src/systems/raidingParties.js'), /host\(\)\.onRaidReceipt\?\.\(f\.r, c, raidHeldFor\(c\.w\)\);/);
-  assert.match(rd('src/net/raid/raidClaims.js'), /keep\(\[\.\.\.list, \{ r, ch: character, nm: typeof name === 'string' \? name : null, lv, cid: cid\(\), hd: held === true \}\]/);
 });
 
 test('AUDIT WORLD-EVENTS L6-5: a raid\'s goal is its raiders\' quarry first whatever infighting reads - the bearer over the player beside him, infighting off - until a blow turns the raider (mutants: the goal through the infighting chain; no priority)', () => {

@@ -144,14 +144,3 @@ test('REP1: the guard\'s eye - a GUARD, in range, facing, the line CLEAR; a civi
   assert.equal(g.guardSeesPlayer({ playerFeet: [0, 0, 0], pool: [guard] }), null, 'a wall between');
 });
 
-test('REP1: the hosts - the per-minute levy is gone from both, the stop is built beside the arrest flow and looked for in the exterior frame (mutant: the levy put back)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(host);
-    assert.doesNotMatch(s, /passiveGuardSpawns\(/, `${host}: no passive levy`);
-    assert.match(s, /const standingWatch = createStandingWatch\(\{/);
-    assert.match(s, /\n\s*standingWatch\.frame\(\);/);
-    assert.match(s, /installLegalNotices\(\{ playerEntity, say: /);
-  }
-  assert.match(hostText('src/scenes/world.js'), /blocked: \(\) => townTalk\.overlayActive \|\| !!modes\?\.overlayHeld \|\| !!travelView\?\.active \|\| !!raidDefendingHere\(\)/,
-    'a raid on the town holds the stop');
-});

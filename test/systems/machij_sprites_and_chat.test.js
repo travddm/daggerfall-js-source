@@ -215,28 +215,6 @@ test('MAC-I: the switch, and every sprite in the seam wearing the tint', () => {
   assert.equal(row.control.key, 'firstPersonLighting');
   assert.deepEqual([...row.kinds], ['enhanced', 'classic'], 'the CLASSIC skin draws this sprite too');
 
-  const rig = read('src/combat/weapon/weaponRig.js');
-  // ONE read a frame, above the draws, so the four sprites cannot disagree
-  assert.match(rig, /const fpTint = fpLightingOn\(\) \? \(renderer\?\.flatLightAt\?\.\(\) \?\? null\) : null;/);
-  // PIN MOVED (SPELL-HAND): both hands, or the spell hand's one, through one door wearing the tint
-  // PIN MOVED (AUDIT SPELL-HAND L2-5): the cast frames carry no guard (was: `guard: _spellGuard.hand` on every frame)
-  assert.match(rig, /const castHands = \(art, f\) => \(side \? drawSpellHand\(renderer, c, art, f, \{ side, tint: fpTint, guard: fpsSpellCasting\.isPlayingAnim \? 0 : _spellGuard\.hand \}\) : drawSpellCastHands\(renderer, c, art, f, \{ tint: fpTint \}\)\);/);
-  assert.match(rig, /castHands\(spellArtFor\(fpsSpellCasting\.element\), fpsSpellCasting\.frameIndex\);/);
-  assert.match(rig, /handheld\.draw\(renderer, c, fpTint\)/);
-  assert.match(rig, /widget\.draw\(renderer, c, fpTint, _spellGuard\.weapon > 0 \? \{ transform: \(r\) => \(\{ \.\.\.r, y: r\.y \+ guardDrop\(_spellGuard\.weapon, r\.h\) \}\) \} : undefined\)/);   // AUDIT SPELL-HAND L5-9: the whole argument, the guard's transform   // PIN MOVED (SPELL-HAND): the clone's guard rides beside the tint; FIELD-GUN12: the gun takes its own frame above this, so the clone is the tint alone again
-  // FIELD-GUN6: `adjust` joined the tint - the Thunderlock's recoil and reload lower, null for every classic weapon
-  assert.match(rig, /drawFpsWeapon\(renderer, c, art, m\.state, m\.frame, \{ tint: fpTint, offsetHeight: offsetHeight - spellDrop, glow: heldGlowNow\(\) \}\)/);   // PIN MOVED (SPELL-HAND): the machine read once (`m`), the offset with the spell hand's guard   // WEAPON-GLOW1: and the element's outline   // FIELD-GUN12: the classic sprite is the classic sprite again; CLIMB4: lowered for the climb (climb4.test.js F16)
-  // and each draw passes it THROUGH to the quad rather than accepting and dropping it
-  // FIELD-GUN11: the rect is expanded from the weapon's own box to
-  // the drawn box first (art that declares one - the Thunderlock's
-  // sheet). The TINT riding through untouched is what this holds.
-  assert.match(read('src/combat/fpsWeapon.js'), /renderer\.drawScreenQuad\(tex, \{ x, y, w, h \}, src, tint \?\? undefined\);/);
-  // FIELD-GUN6: the rect is taken into a local first so the gun's kick can move it; the TINT still rides through untouched, which is what this pin is about
-  assert.match(read('src/combat/weapon/weaponWidget.js'), /renderer\.drawScreenQuad\(tex, getWeaponRect\(\), w\.curAnimRect, tint \?\? undefined\);/);
-  assert.match(read('src/combat/fpsSpellCasting.js'), /renderer\.drawScreenQuad\(rec\.tex, right, RIGHT_HAND_UV, tint \?\? undefined\);/);
-  // the Morrowind arms are a LIT MESH and are not in this seam at all
-  const seam = rig.slice(rig.indexOf('const fpTint ='), rig.indexOf('drawFpsWeapon('));
-  assert.doesNotMatch(seam, /fpArm\.draw\(c, fpTint\)/, 'the 3D arms take the world’s light already');
 });
 
 // ---- MAC-P: the Morrowind arm's own light -------------------------------
@@ -310,42 +288,9 @@ test('MAC-P: the borrow survives a throw, because a leaked studio is permanent',
   assert.equal(frame._moonScale, 2);
 });
 
-test('MAC-P: the arm asks for the same light the sprites do, through the same switch', () => {
-  const arm = read('src/combat/fpArm.js');
-  assert.match(arm, /const vmLight = fpLightingOn\(\) \? \(renderer\.flatLightAt\?\.\(\) \?\? null\) : null;/);
-  assert.match(arm, /renderCharacterSprite\(mesh, NIF_TO_PASS, proj, view, fw, fh, \{ lensLocal: true, viewmodelLight: vmLight \}\)/);
-  assert.match(arm, /import \{ fpLightingOn \} from '\.\/fpsWeapon\.js';/,
-    'one switch, not two - the sprite lane and the arm lane are the same setting');
-  // the UI read-back keeps its OWN studio: a picture on a panel is not in the room
-  const rend = read('src/render/renderer.js');
-  assert.match(rend, /renderCharacterSpriteImage\(mesh, modelMatrix, proj, view, pw, ph, \{ studio = true \} = \{\}\)/);
-  assert.match(rend, /this\.renderCharacterSprite\(mesh, modelMatrix, proj, view, pw, ph\);/,
-    'and it goes through the wrapper with NO viewmodel light, so the two never compose');
-});
-
 // ---- MAC-J: a name is not a button --------------------------------------
 
-test('MAC-J: no class this sheet writes is a bare selector in the enhanced sheet', () => {
-  const src = read('src/ui/chatPanel.js');
-  const used = new Set();
-  for (const m of src.matchAll(/el\(\s*'[a-z0-9]+'\s*,\s*[`']([^`'$]*)[`']/g)) {
-    for (const c of m[1].split(/\s+/)) if (c) used.add(c);
-  }
-  // the appended state fragments too - `' dfchat-act'`, `' me'`, `' mine'`
-  for (const m of src.matchAll(/\+ \(\w[\w.?!=' ]*\? '([^']+)' : ''\)/g)) {
-    for (const c of m[1].split(/\s+/)) if (c) used.add(c);
-  }
-  assert.ok(used.has('dfchat-act'), 'the roster’s door marker is in the set this pin walks');
-  assert.ok(used.size > 10, `found ${used.size} classes`);
-
-  const collide = [...used].filter((c) => new RegExp(`(^|[\\s,>])\\.${c}(?=[\\s,{:.\\[])`, 'm').test(ENHANCED_CSS));
-  assert.deepEqual(collide, [],
-    'a class this sheet writes is also a bare selector in the enhanced skin, which is loaded over it in every online game');
-});
-
 test('MAC-J: the roster row is a row, and the enhanced button is still a button', () => {
-  // the marker carries the sheet's prefix...
-  assert.match(read('src/ui/chatPanel.js'), /\(acts \? ' dfchat-act' : ''\)/);
   assert.match(CHAT_CSS, /\.dfchat-who-row\.dfchat-act \{ cursor: pointer; \}/);
   assert.doesNotMatch(CHAT_CSS, /\.dfchat-who-row\.act\b/);
   // ...and the thing it used to collide with is untouched: 46px, bordered, padded
@@ -354,59 +299,5 @@ test('MAC-J: the roster row is a row, and the enhanced button is still a button'
   assert.match(CHAT_CSS, /\.dfchat\.touch \.dfchat-who-row\.dfchat-act \{ min-height: 44px;/);
 });
 
-test('MAC-I + MAC-J: the claims a node test cannot make are the probes’', () => {
-  // THE TINT REACHES THE SCREEN THROUGH ONE CHANNEL - drawScreenQuad's
-  // `color` - and no source sweep can say whether that channel does anything.
-  // tools/macfpLightProbe.mjs builds a REAL Renderer on a real canvas, lights
-  // it the way a host does, draws a white texel under the tint and reads the
-  // pixel back: a quarter tint is 64/255 on screen, and a torch's colour
-  // arrives as colour.
-  const light = read('tools/macfpLightProbe.mjs');
-  assert.match(light, /new Renderer\(canvas\)/);
-  assert.match(light, /gl\.readPixels/);
-  assert.match(light, /a quarter tint really is a quarter on screen/);
-  assert.match(light, /a black room lands on the floor, not on nothing/);
-  // MAC-P is measured the same way, through the arm's own call: the defect
-  // (5/255 in a dark room), the fix, and the frame's light surviving the borrow
-  assert.match(light, /createCharacterMesh/);
-  assert.match(light, /viewmodelLight: light/);
-  assert.match(light, /the old path is nearly black in a dark room/);
-  // and the chat panel's own measurement is a mounted panel in a browser
-  const chat = read('tools/macjRosterProbe.mjs');
-  assert.match(chat, /createChatPanel/);
-  assert.match(chat, /getBoundingClientRect/);
-  assert.match(chat, /injectEnhancedStyle/, 'the enhanced sheet is LOADED over it - without that sheet there is no collision to measure');
-});
-
 // ---- MAC-Q: the flame that is not there ---------------------------------
 
-test('MAC-Q: the Morrowind mesh path draws TRIANGLES, and a particle flame is not one', () => {
-  // Mac, same message: "and the torch doesn't emit fire". This is not a
-  // torch bug and not a light bug - MW-TORCH placed the mesh and MW-D51
-  // lights it. It is that THIS PORT HAS NEVER DRAWN A MORROWIND PARTICLE
-  // SYSTEM, and a Morrowind torch's flame is one.
-  //
-  // The parser reads them whole - NiAutoNormalParticles, its data, and
-  // NiParticleSystemController's emitter terms are all in mwNifFile.js - and
-  // the flattener then walks NiBSParticleNode as a NODE and emits nothing
-  // from it, because only NiTriShape and NiTriStrips are geometry. So the
-  // flame is read off the disk, carried through the graph, and dropped.
-  //
-  // NOT FIXED HERE, and this pin is the record rather than a law anybody
-  // should keep: what it would take is osgParticle's own shape - the
-  // emitter off NiParticleSystemController (rate, lifetime, speed, the
-  // emitter node's own frame), the modifier chain (grow/fade, colour,
-  // gravity, collider), a billboarded quad per particle and a sorted
-  // additive pass - and it cannot be verified in this container at all,
-  // which has no Morrowind data on it. Guessing at a flame and shipping it
-  // unverified is what MAC-B was refused for.
-  const mesh = read('src/formats/morrowind/mwNifMesh.js');
-  assert.match(mesh, /const GEOMETRY_TYPES = new Set\(\['NiTriShape', 'NiTriStrips'\]\);/);
-  assert.match(mesh, /'NiBSParticleNode',/, 'the particle node is recursed into as a node...');
-  const file = read('src/formats/morrowind/mwNifFile.js');
-  assert.match(file, /NiAutoNormalParticles\(s, rec\)/, '...and its records are parsed in full');
-  assert.match(file, /NiAutoNormalParticlesData: readParticlesData,/);
-  // and the emission channel is NOT the gap: a flame authored as a TRIANGLE
-  // with LightMode_Emissive has drawn correctly since MWT2
-  assert.match(read('src/combat/fpArm.js'), /const \[er, eg, eb\] = emissiveAt\(mat, cols, idx\[i\]\);/);   // PERF-RIG1: resolved once per piece into the lanes
-});

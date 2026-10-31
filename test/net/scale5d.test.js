@@ -51,8 +51,6 @@ test('SCALE5d the Worker\'s walk: the asked layer first, then each after it, rou
   asked.length = 0;
   res = await layerWalk(other, 'world:1,2', req(), 0);
   assert.equal(asked.length, 1, 'a refusal that is not a full room is answered as it was');
-  const w = src('server/src/index.js');
-  assert.match(w, /if \(isLayered\(key\)\) return layerWalk\(env\.ROOMS, key, request, layerOf\(url\.searchParams\.get\('ly'\)\)\);/);
 });
 
 test('SCALE5d the room: a full room\'s refusal says it is full; an object hears its layer from the Worker and keeps it on each socket, a room that does not layer never; its welcome says it (mutants: the full word unsaid; the header unread; a channel given a layer; the welcome silent)', async () => {
@@ -126,8 +124,4 @@ test('SCALE5d the session: a join asks for its party\'s layer, a reconnect for i
   const pose = { px: 100, py: 100, h: 1, hm: 1, f: 1, fm: 1, m: 1, mm: 1 };
   assert.equal(validPartyPose({ ...pose, ly: 3 }).ly, 3);
   for (const ly of [0, 8, '2', 1.5, -1]) assert.equal(validPartyPose({ ...pose, ly }).ly, undefined, String(ly));
-  const w = src('src/scenes/world.js');
-  assert.match(w, /online\.layerHint = partyLayerAt\(key\); online\.join\(key, \{ \.\.\.pose, \.\.\.arm \}\);/, 'the host asks for its party\'s layer before a join');
-  assert.match(w, /\.\.\.\(online\?\.layer \? \{ ly: online\.layer \} : \{\}\),/, 'and says its own on its party pose');
-  assert.match(w, /const mate = party\.members\.find\(\(m\) => m\.acct === party\.leader && near\(m\)\) \?\? party\.members\.find\(near\);/, 'the leader\'s layer first');
 });

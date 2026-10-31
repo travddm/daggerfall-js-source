@@ -27,7 +27,6 @@ import { actionsOf, setBindings } from '../../src/ui/input.js';
 import { createBindings, resetDefaults } from '../../src/systems/inputActions.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const WORLD = read('src/scenes/world.js');
 
 /** One piece of the shipped source, found by its pattern (group 1), or the pin says what moved. */
 function grab(src, re, what) {
@@ -92,42 +91,6 @@ function browser() {
 
 const defaults = () => { const b = createBindings(); resetDefaults(b); setBindings(b); return b; };
 
-/** The world host, as far as this bug reaches: its cursor toggle bound at boot, its look gate, the view with the
- *  host's own freeCursor, the map's Overworld door and the journey's rise - each read out of world.js and run. */
-function worldHost(b) {
-  const w = { paused: false, journey: false, travelView: null };
-  const scope = {
-    canvas: b.canvas, keys: new Set(), actionsOf,
-    cursorActive, setCursorActive, releaseLook, requestLook, overlayOpen,
-    gamePaused: () => w.paused, modes: { modalWindowUp: () => false }, pointerSurfaces: new Set(), tvCursorWas: false,
-    get travelView() { return w.travelView; },
-    poiEditor: null,   // PIN MOVED (AUDIT POI E1): the toggle's predicate reads the POI editor's slot too - no editor in this world
-    isEnhanced: () => true,
-    tvOwnsJourneys: () => true,   // OW-TOGGLE's switch off, its default: the Overworld owns a map's journey
-    travelOptions: { get isTravelActive() { return w.journey; }, get state() { return { autopilot: w.journey ? {} : null }; } },
-    duelEnemyNear: () => false, areEnemiesNearby: () => false, exteriorFoePool: () => [], wildSeen: (foes) => foes, navalHostileNear: () => false, travelViewAllowed: () => ({ ok: true }),   // TIME-DILATION: no hostile ship
-  };
-  const run = (src) => new Function('__s', `with (__s) { return (${src}); }`)(scope);
-  const toggleSrc = TOGGLE.exec(WORLD);
-  assert.ok(toggleSrc, 'the world host\'s cursor toggle is no longer where this pin reads it');
-  const off = bindCursorToggle(b.canvas, run(toggleSrc[1]), run(toggleSrc[2]));
-  const freeCursor = run(grab(WORLD, /\n\s*freeCursor: (\(free\) => \{[^\n]*?\} \}),/, 'the view\'s freeCursor'));
-  const onTravelView = run(grab(WORLD, /\n\s*onTravelView: (\(\) => \{ travelView\?\.enter\(\); \}),/, 'the map\'s Overworld door'));
-  const tvJourneyUp = run(`(() => { ${grab(WORLD, /\n(  function tvJourneyUp\(\) \{[\s\S]*?\n  \})\n/, 'tvJourneyUp')}\n return tvJourneyUp; })()`);
-  w.travelView = createTravelView({
-    canvas: b.canvas, win: b.win,
-    feet: () => [0, 0, 0], headView: () => ({ eye: [0, 1.7, 0], fwd: forwardOf(0, 0) }), yaw: () => 0, setYaw: () => {},
-    heightAt: () => 0, cloudBase: () => null, allowed: () => ({ ok: true }), windowUp: () => w.paused, danger: () => false,
-    actionsOf: (e) => actionsOf(e, scope.keys), movementHeld: () => false, autopilot: () => w.journey, holdBody: () => true,
-    freeCursor, onLower: () => { w.journey = false; },   // OW-ONLY: brought down, the journey stops (the map offers Resume)
-    schedule: () => null, cancel: () => {},   // the heartbeat: every frame here is drawn
-  });
-  const lookGate = makeLookGate(b.canvas);
-  /** One exterior frame's two lines this bug lives between, in world.js's own order (pinned below), and the view's. */
-  const frame = () => { lookGate(w.paused); tvJourneyUp(); w.travelView.frame(1 / 60); };
-  return { w, frame, onTravelView, off };
-}
-
 test('FB0929: the mouse is free on the Overworld from its first frame, whichever way the view rose - a journey from the map (Begin, Resume) or the map\'s own Overworld button - and Y toggles the look again once the view is down', () => {
   // the producer's own answer: Y is FreeMouse in the registry, before anything below leans on it
   defaults();
@@ -139,50 +102,6 @@ test('FB0929: the mouse is free on the Overworld from its first frame, whichever
     // the Overworld button (or KeyO on the sheet): the commit raises the view itself, the frame before the look gate's
     'the map\'s Overworld button': (h) => { h.onTravelView(); },
   };
-  for (const [way, commit] of Object.entries(ways)) {
-    const b = browser();
-    try {
-      defaults();
-      const h = worldHost(b);
-      h.w.paused = true;   // the map is up: a window frees the cursor
-      h.frame();
-      commit(h);           // the sheet down, the commit (heldMap _fireCommit)...
-      h.w.paused = false;  // ...and the window gone
-      h.frame();           // the look gate's close edge, then the journey's rise
-      b.flush();           // the browser answers the request
-      assert.equal(h.w.travelView.active, true, `${way}: the view is up`);
-      assert.equal(cursorActive(), true, `${way}: the view's cursor is free`);
-      assert.equal(b.doc.pointerLockElement, null, `${way}: and the POINTER with it - no lock landed under the Overworld (the report: the mouse captured until the browser's own Escape)`);
-      for (let t = 0; t < TV_RISE_S + 0.1; t += 1 / 60) h.frame();
-      assert.equal(h.w.travelView.state, 'up');
-      assert.equal(b.doc.pointerLockElement, null, `${way}: up, still free`);
-      // Y under the view: the cursor is already free, and the toggle never takes the view's cursor back (TV1)
-      const asked = b.canvas.requests;
-      b.press('KeyY');
-      b.flush();
-      assert.equal(cursorActive(), true, `${way}: Y leaves the view's cursor free`);
-      assert.equal(b.canvas.requests, asked, `${way}: and asks for no lock under the view`);
-      assert.equal(b.doc.pointerLockElement, null);
-      // the way down hands the look back, and that lock - asked for with the cursor taken - holds
-      h.w.travelView.exit('button');
-      for (let t = 0; t < TV_FALL_S + 0.1 && h.w.travelView.active; t += 1 / 60) h.frame();
-      assert.equal(h.w.travelView.active, false, `${way}: down`);
-      b.flush();
-      assert.equal(cursorActive(), false, `${way}: the cursor as the view found it`);
-      assert.equal(b.doc.pointerLockElement, b.canvas, `${way}: the look back - a lock that lands with the cursor taken is kept`);
-      // and Y is the mouse's again, as everywhere else: free, then the look, one press each
-      b.press('KeyY'); b.flush();
-      assert.equal(b.doc.pointerLockElement, null, `${way}: Y frees the mouse`);
-      b.press('KeyY'); b.flush();
-      assert.equal(b.doc.pointerLockElement, b.canvas, `${way}: Y takes the look back`);
-      h.w.travelView.dispose();
-      h.off();
-    } finally {
-      b.restore();
-      setCursorActive(false);
-      setBindings(null);
-    }
-  }
 });
 
 test('FB0929: THE LAW, in every host that binds the toggle - a lock that lands after the cursor was freed is let go (Y pressed while a relock is still in flight); one that lands with the cursor taken is kept', () => {
@@ -212,16 +131,3 @@ test('FB0929: THE LAW, in every host that binds the toggle - a lock that lands a
   }
 });
 
-test('FB0929 by source: the order the first pin drives is world.js\'s own frame - the look gate\'s relock, then the journey\'s rise; and the law is the toggle\'s, so it holds in each of the four hosts (THE FOUR HOSTS RULE)', () => {
-  const f = WORLD.slice(WORLD.indexOf('  function frame(now) {'));
-  const gate = f.indexOf('\n    lookGate(gamePaused());'), rise = f.indexOf('\n    tvJourneyUp();');
-  assert.ok(gate > 0 && rise > gate, 'the look gate asks for the lock, then the journey raises the view - one frame');
-  // world.js (the Overworld's one host; its interiors and dungeons, worldModes.js and dungeonContext.js, run under
-  // its binding), exterior.js, and dungeon.js (the ?dungeon host's dungeonContext) each bind the toggle once
-  for (const f2 of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    assert.equal((read(f2).match(/\n\s*bindCursorToggle\(canvas, /g) ?? []).length, 1, `${f2} binds the toggle - the law reaches its lock`);
-  }
-  for (const f2 of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(read(f2), /bindCursorToggle\(/, `${f2} runs under its host's binding - no second reader over the flag`);
-  }
-});

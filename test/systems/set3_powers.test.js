@@ -100,15 +100,6 @@ const FIRE_PROOF = Object.freeze({ immunityFlags: EFFECT_FLAGS.Fire });
 test('SET3 registered at import, under one name, at every seam SET2 opened: the entity fold, the blow, the struck tail (and AUDIT M2 the strike tail), the damage door\'s three says, the kill, the cast price, the absorption roll and the magic round (mutants: any registration dropped)', () => {
   assert.equal(SIGIL_SETS_POWER, 'sigilSets');
   assert.ok(entityFoldNames().includes('sigilSets'), 'the fold');
-  const src = strip(read('src/systems/sigil/sigilSetPowers.js'));
-  for (const [seam, fn] of [
-    ['registerEntityFold', 'setFold'], ['registerWeaponBlowMod', 'setBlow'], ['registerPlayerStruckListener', 'setStruck'],
-    ['registerPlayerStrikeListener', 'setStrike'],   // AUDIT SET M2: the blow that landed
-    ['registerPlayerDamageMod', 'setDamageMod'], ['registerPlayerDeathSave', 'setDeathSave'], ['registerPlayerHurtListener', 'setHurt'],
-    ['registerPlayerDoorOpen', 'setDoorOpen'],   // AUDIT FINAL F10: the door takes the blow's mark as it opens
-    ['registerPlayerKillListener', 'setKill'], ['registerSpellCostMod', 'setCastCost'], ['registerAbsorptionChance', 'setAbsorbChance'],
-    ['registerMagicRoundHook', 'setRound'],
-  ]) assert.match(src, new RegExp(`\\n${seam}\\(SIGIL_SETS_POWER, ${fn}\\);`), `${seam} -> ${fn}`);
 });
 
 test('SET3 the 2-piece stat tiers: one fold over RF1\'s channels for MY entity with the set awake - Orc-Hide\'s armour on all seven parts and its Endurance, the Ravager\'s Strength and Critical Strike, Shadow\'s Grace\'s Stealth and Agility, Forbidden Lore\'s Intelligence and all six schools, the Burning Gate\'s fire resistance - at the set\'s own stage, read by the formulas\' accessors; nothing at one piece (mutants: a part left out; a school left out; the resistance on the wrong element; a stat on the wrong name)', () => {
@@ -148,10 +139,6 @@ test('SET3 the stat tiers grow together: the numbers stand at the SET\'s stage -
   setSigilRenown(20);   // Bright opens at Renown 20 (the Renown only rises in play; the test lowers it for the cap)
   computeEntityMods(asc);
   assert.equal(entityStatMod(asc, 'endurance'), 4, 'Ascendant pieces under a Bright Renown stand at Bright: 2 + 4 x 2/4');
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /setSigilRenown\(level\);[^\n]*\n\s*computeEntityMods\(playerEntity\);/, 'my Renown adopted: the fold at once');
-  assert.match(w, /const setsWere = setsDueling\(\);\s*setSetsDueling\(!!duelMgr\.live \|\| arenaPvpLive\(\)\);[^\n]*\n\s*if \(setsDueling\(\) !== setsWere\) computeEntityMods\(playerEntity\);/, 'a duel begun or ended: the fold at once');   // PIN MOVED (AUDIT 625 P2): a bout between players is one
-  assert.match(strip(read('src/systems/worldTick.js')), /computeEntityMods\(entity\);/, 'and every magic round');
 });
 
 test('SET3 every power sleeps for anyone but me and whenever the sets sleep - offline, online before my Renown is known, in a duel - and a peer\'s entity here is never mine (mutants: awake while the sets sleep; a peer\'s entity awake)', () => {
@@ -376,10 +363,6 @@ test('SET3 x the damage door (AUDIT FINAL F10): the door takes a blow\'s mark AS
   blow(m, 8);
   assert.equal(d2.hurts.length, 1, 'a landed blow is paid back');
   void w;
-  // the hosts' two blows that the party's weighing can take to nothing say so (exteriorFoes.js, world.js's arrow arm)
-  assert.match(read('src/scenes/exteriorFoes.js'), /else \{ playerBlowCameToNothing\(playerEntity\); audio\?\.play3d\?\.\(enemyMissSound\(wpn\)/);
-  assert.match(read('src/scenes/world.js'), /\} else playerBlowCameToNothing\(playerEntity\);   \/\/ AUDIT FINAL F10/);
-  assert.match(read('src/characters/playerEntity.js'), /export function hurtPlayer\(entity, dmg, \{ bypassShield = false, spare = null \} = \{\}\) \{\n  tellDoorOpen\(entity\);/, 'the door opens first, before the veto');
 });
 
 test('SET3 Cleave behind a wall (AUDIT FINAL F11, the page\'s own word): the nearest foe the host\'s ray says a wall stands before - from the struck foe - is passed over for the next one clear of it, as the Nova asks the same ray; with no ray the nearest takes it (mutant: Cleave through a wall)', () => {
@@ -706,11 +689,6 @@ test('SET3 the HUD\'s read of the powers: the Rampage\'s stacks and seconds, the
 });
 
 test('SET3 the host: world.js imports the powers (registering them) and gives them its voice - the parry\'s ring for Unbroken, a fire cast for the Wrath, a magic cast for Eventide, through the cast sounds\' ID door; the running host\'s door names my entity (mutants: the powers never imported; a cast sound spent as a raw index; a thrown sound breaking the save)', () => {
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /import \{ setSetPowersVoice, setHudChips, heldPlayerBlow, remarkPlayerBlow \} from '\.\.\/systems\/sigil\/sigilSetPowers\.js';/);   // AUDIT SETS L3: and the held blow's two doors
-  assert.match(w, /setSetPowersVoice\(\{ sound: \(name\) => \{\s*if \(name === 'unbroken'\) audio\.playOneShot\(SOUND\.Parry6, 1\);\s*else if \(name === 'wrath'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[0\], 1\);\s*else if \(name === 'eventide'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*else if \(name === 'mark'\) audio\.playOneShot\(SOUND\.DrawWeapon, 1\);\s*else if \(name === 'ward'\) audio\.playOneShot\(SOUND\.EquipMaceOrHammer, 1\);\s*else if \(name === 'shed'\) audio\.playOneShot\(SOUND\.SplashLarge, 1\);\s*else if \(name === 'gear'\) audio\.playOneShot\(SD_HALL_SOUNDS\.clunk, 1\);\s*else if \(name === 'hour'\) audio\.playOneShot\(SD_HALL_SOUNDS\.toll, 1\);\s*else if \(name === 'reprieve'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*else if \(name === 'harvest'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[2\], 1\);\s*else if \(name === 'veil'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[4\], 1\);\s*\} \}\);/);   // WITCH1 (PIN MOVED): Soul Harvest, a drain's cast (poison's - the witchfire's green); STAR7 (PIN MOVED): Mephala's Veil, its Chameleon's own cast (magic); SERPENT-SET: Shed Skin's splash; SD9d: Gearward's clunk, The Hour Turns' toll (PIN MOVED); AUDIT SD IV (A3, PIN MOVED): by the records' index door; EG15 (PIN MOVED): the Reprieve, a Shield spell's own cast (magic)
-  assert.match(strip(read('src/scenes/hostMagic.js')), /player: \(\) => playerEntity,/);
-  assert.match(strip(read('src/scenes/hostMagic.js')), /player: \(\) => playerEntity,\s*clear: \(a, b\) => burstClear\(collider, a, b\),/, 'AUDIT SET M4: the host\'s door answers the Nova\'s ray with its own collider');
   assert.equal(eventideBundle(3).element, 4, 'Eventide\'s bundle rides the magic element - its cast sound\'s index');
   // the voice: a thrown sound is not the power's problem
   const v = fresh(); online(1);

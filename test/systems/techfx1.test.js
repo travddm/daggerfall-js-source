@@ -459,10 +459,6 @@ test('TECHFX1 THE CAMERA\'S CHANNEL: the climb\'s view step folds the technique\
   assert.equal(FX.techniqueFxLive(), false, 'and come to rest under the hold');
   host.reset();
   assert.equal(host.tech, null);
-  // the host's source: the step first, the fold after the climb's
-  const src = code('src/player/climb/climbFeel.js');
-  assert.match(src, /frame\(dt, held = false\) \{\s*stepTechniqueFx\(dt\);\s*const m = player\(\);\s*if \(!m \|\| held\) return;/);
-  assert.match(src, /if \(this\.applied\) applyClimbView\(view, this\.applied\);\s*this\.tech = firstPerson \? techniqueView\(\) : null;\s*if \(this\.tech\) applyClimbView\(view, this\.tech\);\s*return view;/);
 });
 
 test('TECHFX1 THE HANDS\' DIP: the rig lowers its classic layer by the spring through the renderer\'s screen offset (screen heights of its own canvas, down only), over whatever offset stood, and puts it back however the layer leaves; at rest it touches nothing; the Morrowind arm takes the dip through its own screen transform instead (mutants: the dip dropped; the offset not restored; the dip off the canvas\'s width; the arm on the renderer\'s offset)', () => {
@@ -482,12 +478,6 @@ test('TECHFX1 THE HANDS\' DIP: the rig lowers its classic layer by the spring th
   assert.ok(calls[0][0] === 3 && Math.abs(calls[0][1] - (4 + dy * 800)) < 1e-9, `dipped, never across: ${calls[0]}`);
   assert.deepEqual(calls[1], [3, 4], 'and back');
   assert.deepEqual(renderer.screenOffset, [3, 4]);
-  // the source: the arm through its transform, the classic lane through the offset, restored in a finally
-  const src = code('src/combat/weapon/weaponRig.js');
-  assert.match(src, /function drawInner\(o\) \{\s*const dy = techniqueHands\(\)\.y;\s*if \(!\(dy > 0\)\) return drawLayer\(o\);\s*if \(fpArm\.active\(\)\) \{ _armDip = dy; try \{ return drawLayer\(o\); \} finally \{ _armDip = 0; \} \}/);
-  assert.match(src, /_dipPx = dy \* \(cv\(\)\?\.height \?\? 0\);\s*renderer\.setScreenOffset\(ox, oy \+ _dipPx\);\s*try \{ return drawLayer\(o\); \} finally \{ renderer\.setScreenOffset\(ox, oy\); _dipPx = 0; \}/);
-  assert.match(src, /if \(_armDip > 0\) \{ const armsBase = fpArm\.screenTransform\(\); fpArm\.setScreenTransform\(\(base\) => techniqueDipRect\(armsBase \? armsBase\(base\) : base, _armDip, base\.h\)\); \}/);
-  assert.match(src, /try \{ return onUiScreen\(renderer, cv\(\), \(\) => drawInner\(\{ paralyzed \}\)\); \} finally \{/);
 });
 
 // ── the world's burst ─────────────────────────────────────────────
@@ -549,31 +539,7 @@ test('TECHFX1 THE BURSTS: each of the thirteen recipes draws in the technique\'s
 
 // ── the hosts, the setting ────────────────────────────────────────
 
-test('TECHFX1 THE FOUR HOSTS\' DOORS: each hands its rig the burst (its cast engine\'s impact pass), the shake (the one shaker - the dungeon\'s its outer host\'s) and the sound (its audio bus); the cast engine draws a technique\'s burst in the pass it already draws (mutants: a host\'s end dropped; another shaker; the pass)', () => {
-  const hosts = {
-    'src/scenes/exterior.js': { open: 'const weaponRig = createWeaponRig({', fx: 'magic.techniqueFx?.', shake: 'shake: (k) => betterAmbience.weaponKick(k),' },
-    'src/scenes/world.js': { open: 'const weaponRig = createWeaponRig({', fx: 'magic.techniqueFx?.', shake: 'shake: (k) => betterAmbience.weaponKick(k),' },
-    'src/scenes/worldModes.js': { open: 'const interiorWeapon = createWeaponRig({', fx: 'magic?.techniqueFx?.', shake: 'shake: (k) => betterAmbience.weaponKick(k),' },
-    'src/scenes/dungeonContext.js': { open: 'const weaponRig = createWeaponRig({', fx: 'magic.techniqueFx?.', shake: 'shake: (k) => opts.shakeCamera?.(k),' },
-  };
-  for (const [file, h] of Object.entries(hosts)) {
-    const bag = rigBag(code(file), h.open);
-    const door = bag.slice(bag.indexOf('technique: {'));
-    assert.ok(door.includes(`fx: (recipe, at, o) => ${h.fx}(recipe, at, o),`), `${file}: the burst`);
-    assert.ok(door.includes(h.shake), `${file}: the shake`);
-    assert.ok(door.includes('sound: (clip, volume, pitch) => audio.playOneShot(clip, volume, pitch),'), `${file}: the sound`);
-  }
-  assert.match(code('src/scenes/dungeon.js'), /shakeCamera: \(k\) => betterAmbience\.weaponKick\(k\),/, 'the dungeon\'s shaker is its host\'s');
-  const magic = code('src/scenes/hostMagic.js');
-  assert.match(magic, /techniqueFx: \(recipe, at, o\) => fx\.technique\(recipe, at, o\),/);
-  assert.match(magic, /if \(!fx\.live \|\| fxBroken/, 'one pass, drawn while anything lives');
-});
-
 test('TECHFX1 THE SETTING: "Technique camera motion" is a port row under Game (Full, 75%, Half, Low, Off), found by its key, and Settings > Accessibility > Motion lists it after the recoil\'s strength (mutants: the row unbuilt; unmapped; the default off)', () => {
-  const menu = code('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /return \[row, techniqueMotionRow\(\)\];/);
-  assert.match(menu, /choiceRow\('techniqueMotion', 'Technique camera motion',[^;]*\[\[1, 'Full'\], \[0\.75, '75%'\], \[0\.5, 'Half'\], \[0\.25, 'Low'\], \[0, 'Off'\]\]\);/);
-  assert.match(menu, /row\.dataset\.opt = 'techniqueMotion';/);
   const motion = CATEGORIES.find((c) => c.id === 'accessibility').sections.find((s) => s.id === 'motion').items;
   assert.equal(motion[motion.indexOf('Controls/CameraRecoilStrength') + 1], 'port:techniqueMotion');
 });

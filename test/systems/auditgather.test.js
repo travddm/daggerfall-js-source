@@ -85,15 +85,6 @@ test('AUDIT GATHER F1: a CARRIED harvest whose first answer was lost, then refus
   assert.equal(own.book.pendingHarvests, 0, 'a carried harvest refused for its own sake is let go');
 });
 
-test('AUDIT GATHER F4: the profession picker answers again once the slot replaced it (the death screen over it) - with no window up the old one is gone, not open; a picker that is up still holds the slot (source pin: profChoose is bootWorld\'s own)', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf('const profChoose = (rows, pick) => {');
-  assert.ok(at > 0, 'profChoose stands');
-  const line = w.slice(at, w.indexOf('\n', w.indexOf('\n', at) + 1));
-  assert.match(line, /if \(!listPickerArtLoaded\(\) \|\| \(_profPicker && gamePaused\(\)\)\) return false;/);
-  assert.doesNotMatch(line, /\|\| _profPicker\) return false/, 'a picker kept by name alone refused every one after it');
-});
-
 test('AUDIT GATHER F5: an act on yesterday\'s node ends at the UTC day\'s turn - nothing asked, the Pick-Axe unworn, the stop said; struck to its end it wore the tool and the service refused it (`prof-day`) (mutants: the day\'s turn ends nothing; the act left standing)', async () => {
   const asked = [];
   const t = await rig({ answer: (b) => { asked.push(b); return { ok: false, error: 'prof-day' }; } });

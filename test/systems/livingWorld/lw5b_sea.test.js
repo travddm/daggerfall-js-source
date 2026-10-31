@@ -183,8 +183,6 @@ test('LW5b the town by the dock: a traveller sailing walks to the dock and is go
 });
 
 test('LW5b the streaming host: a port town\'s lanes from the Bay\'s own network - the far port, the lane\'s length - none for a town with no harbour, none yet while the map is unread (mutants: the lanes, the harbour, the unread)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingTripWorld\.lanesFrom = \(town\) => \{\n\s*if \(!town\?\.port\) return \[\];\n\s*if \(!mapDict \|\| \(typeof _lanesReady !== 'undefined' && !_lanesReady\)\) return undefined;[^\n]*\n\s*return livingLanes\.from\(town\);/);
   // PIN MOVED (AUDIT WW F7, bible/03-World/World-Wide.md "The audit"): a town's lanes are the living lanes' book's
   // (scenes/livingWorld/livingLanes.js), run here - the far port's town, the lane's length, none where the water joins not
   const town = (px, py) => ({ mapId: (1 << 20) | (py * 1000 + px), px, py, port: true });

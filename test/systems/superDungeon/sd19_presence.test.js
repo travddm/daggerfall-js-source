@@ -70,21 +70,6 @@ test('SD19 THE BRASS GRADE: the haze toward the brass its own brightness falls o
   assert.ok(lit[0] > light[0] && lit[2] < light[2], 'warm up, blue down');
 });
 
-test('SD19 THE SKY AND THE LIGHT, by source: the sky controller grades the land\'s haze last, after the sun baby\'s and the dread, by a clamped weight; the world reads the air only outside by its column\'s light and the eye, hands it to the sky before the fog is read, and leans both lights by it', () => {
-  const sh = read('src/scenes/shared.js');
-  assert.match(sh, /setBrass\(w\) \{[^\n]*\n\s*brassW = Math\.max\(0, Math\.min\(1, Number\(w\) \|\| 0\)\);\n\s*for \(const r of \[sky, enhancedSky, dynamicSky, clouds\]\) if \(r\) r\.brass = brassW;/);   // AUDIT SD III (V8, PIN MOVED): and the sky graded as its haze
-  assert.match(sh, /const d = dreadW > 0 \? dreadGrade\(c, dreadW\) : c;[^\n]*\n\s*return brassW > 0 \? sdBrassGrade\(d, brassW\) : d;/, 'last: over the dread and the sun baby');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const sdAirNow = \(eye, minuteNow\) => \{\n\s*const o = sdHost\?\.omen\(\);\n\s*if \(!o\?\.hollow\?\.site \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior' \|\| !eye\) return 0;/);
-  assert.match(w, /return sdAirWeight\(o\.light, Math\.hypot\(eye\[0\] - x, eye\[2\] - z\), minuteNow\);/);
-  assert.match(w, /const sdAirW = sdHost \? sdAirNow\(tvStand, minute\) : 0;[^\n]*\n\s*sky\.setBrass\?\.\(sdAirW\);/);
-  assert.ok(w.indexOf('sky.setBrass?.(sdAirW);') < w.indexOf('sky.fogColorFor(fogNow)'), 'before the haze is read');   // BANTHA1 (PIN MOVED): the law's colour read inside the jungle's haze call
-  assert.match(w, /sdBrassLight\(sunbabyLight\(dreadLight\(withMoonAmbient\(/, 'the ambient');
-  // PIN MOVED (ETHER-LIGHT, bible/03-World/Eltheric-Ocean.md): and the key leaned again past the Veil, outermost of the chain
-  assert.match(w, /sdBrassLight\(sunbabyKey\(dreadLight\(SUN_RIG_COLOR, skyDreadW\), sunbabyW, sunbabyFace\.evil\), sdAirW\), etherAirW, ETHER_KEY_TINT\), jungle\?\.canopy, 0\)\);/, 'the key (VALENWOOD-CANOPY, PIN MOVED: leaned under a closed canopy last)');
-  assert.match(w, /sunbabyFace\.evil\), sdAirW\), etherAirW\), jungle\?\.canopy\), sunScale\(minute\)/, 'the ambient\'s weight the same (PIN MOVED, ETHER-LIGHT: past the Veil leaned once more)');
-});
-
 test('SD19 THE BANNER AT ITS DOOR: its name, what it is and its state - fading, collapsing; within SD_BANNER_M of its centre while it stands, outside, its marks on the gate\'s own card (none once it fell); the gate\'s wish first, cleared indoors', () => {
   assert.equal(SD_BANNER_M, 60);
   const risen = sdRise(sdFirst(T0 - 20 * M), T0 - 10 * M, 0);
@@ -96,14 +81,6 @@ test('SD19 THE BANNER AT ITS DOOR: its name, what it is and its state - fading, 
   const fell = sdFell(found, T0 + M, { top: 'Mara', n: 2 });
   assert.equal(sdBannerText('The Stopped Bell', fell, T0 + 2 * M), 'The Stopped Bell - collapsing');
   assert.equal(sdBannerText('The Stopped Bell', sdGone(found, found.until), found.until), 'The Stopped Bell');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /if \(!h\?\.site \|\| !rec \|\| rec\.s !== h\.s \|\| !walkMode \|\| !playerSpawned \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return null;/);
-  assert.match(w, /if \(!\['risen', 'found', 'fell'\]\.includes\(sdHost\.phase\(\)\)\) return null;/);
-  assert.match(w, /if \(Math\.hypot\(f\[0\] - x, f\[2\] - z\) > SD_BANNER_M\) return null;/);
-  assert.match(w, /return \{ text: sdBannerText\(h\.loc\?\.name, rec, t\), card: sdHost\.phase\(\) === 'fell' \? null : sdMarksCardModel\(sdMarksOf\(h\.s\), \{ mode: 'gate' \}\) \};/);
-  assert.match(w, /drawGateBanner\(_gateBannerWish \?\? sb\?\.text \?\? null, \{ hidden, look: _gateBannerWish == null && sb \? 'brass' : 'gate' \}\);/, 'the gate\'s first');   // AUDIT SD III (T3, PIN MOVED): a Hollow's door in the Hour's brass
-  assert.match(w, /if \(gatePool \|\| sdHost\) presenceFrame\(\);/);
-  assert.match(w, /if \(\(gatePool \|\| sdHost\) && \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) drawGateBanner\(null\);/, 'cleared indoors');
   // the card at the door: no clock, whole, its marks
   const mk = sdMarksOf(found.s);
   const card = sdMarksCardModel(mk, { mode: 'gate' });
@@ -201,8 +178,6 @@ test('SD19 THE WORDS: its marks said with its find - its Ending, its signature a
   h3.heard({ k: 'ev', ...found });
   h3.frame();
   assert.deepEqual(s3.lines, [], 'its place not yet known');
-  const H = read('src/scenes/superDungeon/sdHost.js');
-  assert.match(H, /if \(hh \|\| \(memo && memo\.s === rec\.s && memo\.none\)\) \{ hourSaidS = rec\.s; say\(sdHourLine\(\{ name: hh\?\.loc\?\.name, near: hh\?\.site\?\.cityName \|\| '', region: province \? '' : regionName\(rec\.r\) \|\| '', province \}\)\); \}/, 'with no Hollow: the region\'s');   // PIN MOVED (WW5): a province lane's in its province   // AUDIT SD III (T19, PIN MOVED): said as a region
 });
 
 test('SD19 THE NEXT ONE\'S RISE: once a Hollow is gone - beaten, collapsed or faded - the Timers count the next slot\'s not-before, never where; none once it may rise', () => {

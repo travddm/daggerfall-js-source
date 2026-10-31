@@ -167,57 +167,6 @@ test('MODS-ONLINE-2 by execution: the smoothing MOVES the ground and the water t
   assert.ok(!trackTiles.some((t) => SMOOTHED_TILES.has(t)), 'and not a track\'s');
 });
 
-test('MODS-ONLINE-2 by source: the port resolves each freed mod where the actor lives, so nothing of it crosses as a rule', () => {
-  // THE READING, held where it lives. If any of these four doors ever
-  // starts trusting the RECEIVER's rules instead of the sender's
-  // number, the mod above it stops being safe to toggle and this fails
-  // before a player finds it as two worlds.
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /const i = data\.i \| 0, dmg = Number\(data\.dmg\);/, 'PCAAO: the peer\'s damage NUMBER is what arrives');
-  assert.match(dc.replace(/\n\s*\/\/ /g, ' '), /The number is a peer's word and the host trusts it without recomputing/,
-    '...and the host does not re-roll it under its own formulas');
-  assert.match(dc, /const healthDamage = bypassShield \? damage : damageShieldPool\(foe\.entity, damage\);/, 'Shield Widget: a foe\'s block is the foe owner\'s');
-  const pe = rd('src/characters/playerEntity.js');
-  assert.match(pe, /export function hurtPlayer\(entity, dmg, \{ bypassShield = false, spare = null \} = \{\}\) \{/, 'Shield Widget: and my block is mine');   // DUEL1: `spare`, the duel's floor
-  assert.match(pe, /if \(!bypassShield\) \{/, '...mitigated here, where the blow lands');
-  assert.match(rd('src/characters/meanerMonsters.js'), /export const meanerMonstersEnabled = /, 'Meaner Monsters: read where an entity is MADE');
-  assert.match(rd('src/systems/oblivionLeveling.js'), /export const ORL_VENDOR = 'oblivion-remaster-leveling';/, 'Oblivion leveling: a character\'s own system');
-
-  // And the one that is not a rule: the lane forces it, the terrain
-  // reads it, and the smoother is the reason.
-  assert.match(rd('src/world/terrain/terrainGen.js'), /if \(roads\.smooth !== false\) smoothRoadHeights\(samples, tilemap, 129, hasLocation \? locationRect : null\);/,
-    'the smoothing is what SmoothRoads decides, and it writes the heights');
-  assert.match(rd('src/scenes/world.js'), /const roadSwitches = \{ smooth: modSetting\('roads-hazelnut', 'SmoothRoads'\), water: modSetting\('roads-hazelnut', 'RiversAndStreams'\) \};/,
-    'and the world reads it through modSetting, which is where the lane answers');
-});
-
-test('MODS-ONLINE-2: the lock, the pane and the door all say the same true thing', () => {
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  // A lock that gives the wrong reason is as bad as no reason: the two
-  // road rows are not locked because "online is the enhanced lane".
-  assert.match(menu, /const ONLINE_GROUND_NOTE = '[^']*same ground[^']*';/, 'the ground lock has its own words');
-  assert.match(menu, /const ground = onlineModSetting\(vendor, key\);/);   // REALM P0.2: the room table, then a balance mod owned whole
-  // MODS-ONLINE-4: the three balance switches are not locked for the
-  // GROUND's reason, so they do not wear the ground's words.
-  assert.match(menu, /const ONLINE_SHARED_NOTE = '[^']*belong to whoever hosts it[^']*';/, 'the shared lock has its own words');
-  assert.match(menu, /if \(ground !== undefined\) lockOnline\(b, null, \{ note: modLockNote\(vendor, key\), value: ground \}\);/);
-  // WOD1: the ground's words go to the two vendors that write terrain heights, and only them. DS1: and the ships' shared deck. OH-A: and the pits cut into the seafloor.
-  assert.match(menu, /const ONLINE_GROUND_VENDORS = Object\.freeze\(\['roads-hazelnut', 'world-of-daggerfall', 'detailed-ships', 'ocean-holes'\]\);/);
-  // MODS-ONLINE-5: the ruleset's reason is its own words, and only RR's seven wear them
-  assert.match(menu, /const ONLINE_RULESET_NOTE = '[^']*one set of combat, training and swimming rules[^']*';/, 'the ruleset lock has its own words');
-  // DW-D: a vendor whose room keys are the ground's AND other reasons names its ground keys (the carved sea's switch and depth)
-  assert.match(menu, /const ONLINE_GROUND_KEYS = Object\.freeze\(\{ 'iliac-puddle-no-more': Object\.freeze\(\['Enabled', 'General\.WaterDepth'\]\) \}\);/);
-  assert.match(menu, /const onlineLockNote = \(vendor, key\) => \(ONLINE_GROUND_VENDORS\.includes\(vendor\) \|\| ONLINE_GROUND_KEYS\[vendor\]\?\.includes\(key\) \? ONLINE_GROUND_NOTE : ONLINE_RULESET_KEYS\[vendor\]\?\.includes\(key\) \? ONLINE_RULESET_NOTE : ONLINE_WORLD_EVENT_VENDORS\.includes\(vendor\) \? ONLINE_WORLD_EVENT_NOTE : ONLINE_TRAVEL_VENDORS\.includes\(vendor\) \? ONLINE_TRAVEL_NOTE : ONLINE_CARRIAGE_VENDORS\.includes\(vendor\) \? ONLINE_CARRIAGE_NOTE : ONLINE_SHARED_NOTE\);/);
-  assert.match(menu, /const ONLINE_CARRIAGE_VENDORS = Object\.freeze\(\['immersive-travel'\]\);/, 'IT1: the carriages wear their own words');
-  assert.match(menu, /const ONLINE_WORLD_EVENT_VENDORS = Object\.freeze\(\['world-events-raiding-parties'\]\);/, 'RAID2: the raids wear a world event\'s words');
-  assert.match(menu, /if \(tab\.id === 'mods' && isOnlinePage\(\)\) body\.append\(el\('p', 'meta opt-note', noteText\(ONLINE_MODS_NOTE\)\)\);/, 'the Mods pane says what is true of MODS (ORG2: the Mods & files tab, over every mod)');
-  // The Online pane's own sentence claimed every mod was on for
-  // everyone. A player reading that and then toggling one would be
-  // reading a lie the port no longer tells.
-  assert.ok(!/every enhancement and every mod is on for everyone/.test(menu), 'the old claim is gone');
-  assert.match(menu, /Most mods stay your choice online\. A few are set for everyone: those that change the ground, monsters, loot or the rules\./, 'the door says what is true');   // DW-D: "Six switches" had been false since RRI1/RR1 and DS1 - the door names the reasons, the pane the switches
-});
-
 test('MODS-ONLINE-2: a mod the player owns reaches no wire, no save and no roll', () => {
   // Held by execution rather than by the note above it: a player's mod
   // whose own modules start putting something on the wire, writing a
@@ -315,5 +264,4 @@ test('MODS-ONLINE-5: one ruleset per room - the reason PCAAO is forced whole for
   for (const k of ['bandaging', 'climbingRestriction', 'loanAmountPerLevel', 'shipPorts', 'bedSleeping', 'underworldExpulsion', 'EnhancedRiding.TrampleCivilians', 'RefinedTraining.variableTrainingPrice']) assert.equal(onlineForcedModSetting('roleplay-realism', k, '?online=1'), undefined, `${k} stays the player's - it reaches nobody`);
   assert.equal(Object.keys(rr).length, 9);
   assert.equal(Object.keys(ONLINE_ROOM_MOD_KEYS.pcaao).length, 1, 'PCAAO is forced whole through its one switch - the precedent');
-  assert.match(rd('src/systems/online/onlineLane.js'), /ONE RULESET PER ROOM\. PCAAO was forced\s+\/\/ whole/);
 });

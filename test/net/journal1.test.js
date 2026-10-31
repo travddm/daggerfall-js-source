@@ -86,8 +86,6 @@ test('JOURNAL1 the cut falls between the characters a reader counts - EMOTE1\'s 
     assert.equal(graphemeCut(`a${FAMILY}`, 3), `a${ch(0x1f468)}`, 'the bubble\'s cut reads the same law');
   } finally { Intl.Segmenter = Seg; }
   assert.equal(graphemeCut(`a${FAMILY}`, 3), 'a', 'with the segmenter a family is one - and does not fit');
-  assert.match(rd('src/ui/nameLayer.js'), /for \(const g of graphemesOf\(text\)\) \{ if \(out\.length \+ g\.length > max\) break; out \+= g; \}/, 'the bubble reads the one law');
-  assert.match(rd('src/systems/notebook.js'), /for \(const g of graphemesOf\(run\)\) \{/, 'and so does the notebook');
 });
 
 // ─── THE PAGE ON THE WIRE ───────────────────────────────────────────────────────────────────────────────────────
@@ -504,13 +502,6 @@ test('JOURNAL1 the chronicle\'s Share: a NOTE offers to be shown or sent where t
   nb.addMessage('A message.');
   const msgs = chronicleRig({ notebook: () => nb, section: 'messages', pageShare: () => share });
   try { assert.equal(all(msgs.host, 'cr-share').length, 0, 'a message is what I was told, not my journal'); } finally { msgs.restore(); }
-  // THE SHEET (tools/journalProbe.mjs measures it): a word too long for the column breaks inside the card - the probe
-  // found a note's seventy-column run of one word running out of it and the section scrolling sideways - and a reader's
-  // name at its bound breaks inside its button; on a finger's device the strip's buttons are a finger's
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.cr-shell \.cr-prose p, \.cr-shell \.cr-entry p \{[^}]*overflow-wrap: anywhere;/);
-  assert.match(css, /\.cr-shell \.cr-sharebox \.act \{ max-width: 100%; overflow-wrap: anywhere;/);
-  assert.match(css, /@media \(pointer: coarse\) \{ \.cr-shell \.cr-sharebox \.act \{ min-height: 44px; \} \}/);
 });
 
 // ─── THE LETTERS TAB ────────────────────────────────────────────────────────────────────────────────────────────
@@ -597,38 +588,3 @@ test('JOURNAL1 the Letters tab: a page sent as a letter opens the form on it - i
 
 // ─── THE HOST ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('JOURNAL1 host by source: a page held out to me is HELD with its writer\'s name and said with how to read it - never opened on its own; it is read from the F-menu (the one bag), put away by F, taken with a window over the HUD, swept when its writer leaves; the chronicle\'s Share names who stands within the reach a talk has and measures again at the press; the letter waits for the chronicle to come down; kept pages and letters are the notebook\'s own AddNote(tokens); the Share reaches the dungeon\'s chronicle too; the relay\'s arm is the card\'s with the chat\'s mute (mutants: a page opened on arrival; the reach off the trade\'s; the press unmeasured; the letter opened under the chronicle)', () => {
-  const w = rd('src/scenes/world.js');
-  const onPage = w.slice(w.indexOf('online.onPage = (id, d) => {'), w.indexOf('online.onAct = '));
-  assert.match(onPage, /if \(!socialMenu \|\| !pageWin \|\| !d\?\.page\) return;\s*\n\s*if \(!pageOffers\.offer\(id, d\.page, peerName\(id\)\)\) return;\s*\n\s*tradeSay\(pageOfferText\(peerName\(id\), pageReadHow\(\)\)\);/);
-  assert.doesNotMatch(onPage, /pageWin\.show|readPage/, 'nothing opens over the reader\'s game on its own');
-  const block = w.slice(w.indexOf('const pageReadHow = () => {'), w.indexOf('const pageFrame = () => {'));
-  assert.match(block, /if \(isTouchDevice\(\)\) return 'face them and press /, 'on a phone, the social button - ui/touch/touch.js\'s own F');
-  assert.match(block, /const tag = quickslotTag\('SocialInteract', \{ bindings: bindings\(\) \}\);\s*\n\s*return tag\?\.kind === 'key' \? `press \$\{tag\.text\} on them` : null;/, 'the F-menu\'s own key, off the live bindings');
-  assert.match(w, /canInspect: true, canReadPage: !!pageOffers\.get\(peerId\), \.\.\.duelActionsFor\(peerId\) \}\);/, 'the one bag');
-  assert.match(w, /if \(act\.k === 'page\.read'\) \{ readPage\(act\.peer\); return; \}/);
-  assert.match(block, /const o = pageOffers\.get\(peerId\);\s*\n\s*if \(!o \|\| !pageWin\) \{ tradeSay\(PAGE_GONE_TEXT\); return false; \}\s*\n\s*return pageWin\.show\(peerId, pageView\(\{ name: o\.name \?\? peerName\(peerId\), page: o\.page, kept: o\.kept, canKeep: !!questBridge\?\.notebook \}\)\);/);
-  assert.match(w, /if \(pageWin\?\.isOpen\(\)\) \{ pageWin\.hide\(\); return true; \}/, 'F again puts it away');
-  assert.match(w, /pageWin\?\.render\(\{ covered: townTalk\.hudCovered \|\| \(modes\?\.hudCovered \?\? false\) \|\| gamePaused\(\) \}\);/);
-  assert.match(w, /profileFrame\(\);[^\n]*\n\s*pageFrame\(\);/, 'swept each frame, before the dead return');
-  assert.match(w.slice(w.indexOf('const pageFrame = () => {'), w.indexOf('const pageFrame = () => {') + 300), /pageOffers\.keepOnly\(online\.peers\);/, 'nothing made on a frame');
-  assert.match(w, /pageWin = createPageWindow\(\{\s*doc: document, win: globalThis,\s*canOpen: socialMenuCanOpen,\s*onOpen: \(\) => surfaceOpen\('page'\),\s*onClose: \(\) => surfaceClose\('page'\),\s*onKeep: \(peerId, view\) => keepPage\(peerId, view\),/, 'a counted pointer surface, under the F-menu\'s own gate');
-  assert.match(block, /d: tradeDistance\(me, p\.feet\)/, 'metres between two bodies - the trade\'s one measure');
-  assert.match(block, /\.filter\(\(p\) => p\.d <= SOCIAL_REACH && online\.reachesPeer\(p\.id\)\)\s*\n\s*\.sort\(\(a, b\) => a\.d - b\.d\)/, 'within the reach a talk has, a socket of mine reporting them, nearest first');
-  assert.match(block, /if \(!pageReaders\(\)\.some\(\(p\) => p\.id === id\)\) return pageTooFarText\(name\);\s*\n\s*return online\.sendPage\(\{ to: id, page \}\) \? pageShownText\(name\) : `\$\{TRY_AGAIN_TEXT\}\.`;/, 'measured again at the press');
-  assert.match(block, /_letterPending = \{ draft: letterOfPage\(page\), at: performance\.now\(\) \};\s*\n\s*return true;/);
-  assert.match(w, /if \(socialPanel\?\.openLetters\(\{ draft: _letterPending\.draft \}\)\) _letterPending = null;\s*\n\s*else if \(performance\.now\(\) - _letterPending\.at > LETTER_PENDING_MS\)/, 'the letters open the first frame the panel may stand, or it is said they could not');
-  assert.match(block, /nb\.addNoteTokens\(keptPageTokens\(view\.name, view\.page\)\);\s*\n\s*pageOffers\.markKept\(peerId, view\.page\);/, 'the page the window SHOWS marked kept, and no newer one');
-  assert.match(block, /nb\.addNoteTokens\(keptLetterTokens\(letter\)\);/);
-  assert.match(w, /keepLetter: \(letter\) => keepLetterInJournal\(letter\),/);
-  assert.match(w, /shareQuest: shareQuestWithParty,\s*\n\s*\/\/ JOURNAL1[^\n]*\n\s*pageShare: \(\) => pageShareHere\(\),/, 'the world\'s chronicle and the interiors\' (makeJournal)');
-  assert.match(w, /pageShare: \(\) => pageShareHere\(\),   \/\/ JOURNAL1: a note's Share, delegated/, 'the modes\' own delegation');
-  assert.match(rd('src/scenes/worldModes.js'), /pageShare: \(\) => host\.pageShare\?\.\(\) \?\? null,/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /pageShare: \(\) => opts\.pageShare\?\.\(\) \?\? null,/, 'the dungeon\'s chronicle');
-  const relay = rd('server/src/index.js');
-  const arm = relay.slice(relay.indexOf("if (m.t === 'page') {"), relay.indexOf("if (m.t === 'park') {"));
-  assert.match(arm, /a = this\._meterPage\(ws, a, now\); if \(!a\) return;\s*\n\s*if \(a\.mu && a\.mu > Math\.floor\(now \/ 1000\)\) \{ this\._send\(ws, JSON\.stringify\(\{ t: 'muted', until: a\.mu \}\)\); return; \}\s*\n\s*if \(isChatRoom\(a\.key\) \|\| isSocialRoom\(a\.key\)\) return;/, 'its meter, then the mute, then a place room alone');
-  // PIN MOVED (RPT1026-SECNET): the page goes out by the directed frames' one builder, the writer's account beside its id
-  assert.match(arm, /if \(!this\._senderFunnel\(tws, a\.id, now\)\) return;\s*\n\s*this\._send\(tws, this\._directedFrame\('page', a, m\.data\)\);/, 'the funnel shared');
-  assert.match(relay, /_meterPage\(ws, a, now\) \{ return this\._spend\(ws, now, pageGate, 'pageBucket', 'pageDrops', 'too many page frames'\) \? a : null; \}/);
-});

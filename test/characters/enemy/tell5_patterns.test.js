@@ -248,10 +248,6 @@ test('TELL5: a break ends a chain; an ordinary giant never chains (mutants: the 
 // ── the ground and the ear ──────────────────────────────────────────
 
 test('TELL5: the ground fades a cut feint out dashed; the ear plays no WIND for a feint and lands its plain blow at the strike (mutants: the fade unset; the feint\'s WIND)', async () => {
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uCut;/);
-  assert.match(P, /if \(uCut > 0\.0\) oColor \*= uCut \* step\(0\.5, fract\(\(across \+ along\) \* 2\.5\)\);/);
-  assert.match(P, /gl\.uniform1f\(U\.uCut, phase\.cut > 0 \? phase\.cut : 0\);/);
   const R = ENEMY_BASICS[M.Orc];
   const f = { mobileType: M.Orc, mobile: { meleeSeq: 0 }, ai: { feet: [0, 0, 0], _blowHold: true } };
   const blow = { start: 10, land: 10.8, feint: true };

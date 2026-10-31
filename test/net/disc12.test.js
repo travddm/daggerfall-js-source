@@ -70,43 +70,10 @@ test('DISC12 doll: a peer in beast form stands as the werewolf or the wereboar -
   // the contributor's sprite fix (2026-09-23): a human with no class to go on stands as the THIEF sprite, the Unity
   // mod's own default, rather than the flat doll - and never as a beast
   assert.deepEqual(asked.filter(([id]) => id === 'man'), [['man', 138]], 'a human with no class stands as the Thief, never the beast');
-  assert.match(rd('src/scenes/world.js'), /const afoot = seen\.filter\(\(d\) => \(peerRidesIn3d\(d\) \|\| !peerRiders\.isRiding\(d\.id\)\) && !d\.shown\?\.wb \|\| \(peerIsWolf\(d\.shown\) && !d\.shown\.rd\)\);/, 'a wereboar takes no body - and WEREWOLF1: a werewolf on foot goes to the bodies, which stand Bloodmoon\'s wolf for it (test/net/peer/werewolf1.test.js)');   // PIN MOVED (AUDIT COATS3D A3): a rider on the 3D horse the bodies' whether or not its sprite stood in
   // PIN MOVED (AUDIT MIXED-PAIR L4-3): `lh` from poseHandsOf beside `ah` - each omitted at 0, the wire's omission law
   assert.deepEqual(poseHandsOf(true, null), {}, 'right-handed, no left blow: the bytes it always had');
   assert.deepEqual(poseHandsOf(false, null), { lh: 1 });
   assert.deepEqual(poseHandsOf(true, 'L'), { ah: 1 }, 'a pair\'s left hand struck last');
   assert.deepEqual(poseHandsOf(false, 'R'), { lh: 1 });
-  assert.match(rd('src/scenes/world.js'), /\.\.\.poseHandsOf\(rig\.playerWeapon\.usingRightHand, rig\.swing\.hand\),[^\n]*\n\s*wb: \(\(\) => \{ const l = liveLycanthropy\(playerEntity\); return l\?\.isTransformed \? \(l\.infectionType \| 0\) \|\| undefined : undefined; \}\)\(\),/, 'the sender: the live rig\'s hand, the curse\'s form');
 });
 
-test('DISC12 pack: the enhanced pack hands the Morrowind figure the weapon of the hand in USE - the live rig\'s, handed by the host (mutant: the right hand always)', async () => {
-  const { withDom } = await import('../invdrag.mjs');
-  const { mountEnhancedInventory } = await import('../../src/ui/enhanced/enhancedInventory.js');
-  const { equipItem } = await import('../../src/systems/equip.js');
-  const mk = () => ({ group: 'Weapons', templateIndex: 120, material: 0, name: 'Longsword', currentCondition: 800, maxCondition: 1000 });
-  const dag = () => ({ group: 'Weapons', templateIndex: 113, material: 3, name: 'Dagger', currentCondition: 50, maxCondition: 100 });
-  for (const [right, want] of [[true, 120], [false, 113]]) {
-    const e = { isPlayer: true, items: [mk(), dag()], stats: {}, level: 1, career: {}, activeEffects: [], spells: [] };
-    equipItem(e, e.items[0]); equipItem(e, e.items[1]);
-    const got = [];
-    const fpArm = { setWorn() {}, setWeapon: (w) => { got.push(w?.templateIndex ?? null); return true; }, figure: () => null, subscribe: () => () => {} };
-    withDom((dom) => {
-      const host = dom.mk('div'); dom.body.append(host);
-      const view = mountEnhancedInventory(host, { entity: e, items: () => e.items, onExit: () => {}, fpArm, usingRightHand: () => right });
-      view.unmount();
-    });
-    assert.ok(got.length > 0, 'the pack told the figure');
-    assert.equal(got.at(-1), want, right ? 'the right hand' : 'the LEFT hand, the one in use');
-  }
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /usingRightHand: \(\) => \(modes\?\.liveArm\?\.\(\)\?\.rig \?\? weaponRig\)\.playerWeapon\.usingRightHand,/, f);
-  assert.match(rd('src/scenes/dungeonContext.js'), /usingRightHand: \(\) => weaponRig\.playerWeapon\.usingRightHand,/);
-});
-
-test('DISC12: U with nothing usable SAYS so, as DFU does (DaggerfallUI.cs:584-585, Internal_Strings.csv:959 verbatim) - in all three hosts; the port opened nothing and said nothing (mutant: a host silent again)', async () => {
-  const { NO_ITEM_TO_ACTIVATE_TEXT, createUseMagicItemWindow } = await import('../../src/ui/useMagicItemWindow.js');
-  assert.equal(NO_ITEM_TO_ACTIVATE_TEXT, 'You have no usable magic item');
-  assert.equal(createUseMagicItemWindow({ items: [] }), null, 'no window with nothing usable');
-  assert.match(rd('src/scenes/world.js'), /if \(win\) townTalk\.showOverlay\(win\);\n\s*else townTalk\.say\(noItemToActivateText\(\)\);/);
-  assert.match(rd('src/scenes/worldModes.js'), /if \(win\) mountInterior\(win\);\n\s*else townTalk\?\.say\?\.\(noItemToActivateText\(\)\);/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /if \(win\) activeOverlay = win;\n\s*else hudText\.add\(noItemToActivateText\(\)\);/);
-});

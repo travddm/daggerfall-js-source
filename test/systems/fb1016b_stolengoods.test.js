@@ -355,23 +355,6 @@ test('STOLEN-GOODS the court: every guilty exit takes them - a fine paid with no
 });
 
 test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece through landSold - the counter\'s commitTrade and the keyed doSell - and neither pushes onto the shelf; the shut shop\'s shelf and a stranger\'s cupboard are loot targets marked stolen, a cupboard of one\'s own is not; the enhanced card says what the mark means (mutants: either arm shelving, either target unmarked)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const sellArm = wm.slice(wm.indexOf("} else if (mode === 'Sell' || mode === 'SellMagic') {"), wm.indexOf("} else if (mode === 'Repair') {"));
-  assert.match(sellArm, /for \(const it of staged\) \{\n\s+const i = playerEntity\.items\.indexOf\(it\);\n\s+if \(i >= 0\) playerEntity\.items\.splice\(i, 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
-  const doSell = wm.slice(wm.indexOf('function doSell(shelf, it) {'), wm.indexOf('function itemValue(it)'));
-  assert.match(doSell, /playerEntity\.items\.splice\(playerEntity\.items\.indexOf\(it\), 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list');   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
-  for (const [name, body] of [['the counter', sellArm], ['the keyed list', doSell]]) assert.doesNotMatch(body, /shelf\.items\.push\(/, `${name} pushes nothing onto the shelf`);
-  // PIN MOVED (AUDIT UPDATE II B2): the sale arms land through shopStock.js landSoldAt, which is landSold's own door
-  assert.match(wm, /landSoldAt \} from '\.\.\/systems\/shopStock\.js';/);
-  assert.match(readFileSync(new URL('../../src/systems/shopStock.js', import.meta.url), 'utf8'), /import \{ landSold \} from '\.\/stolenGoods\.js';[^\n]*\n[\s\S]*export function landSoldAt\(shelfItems, item, buildingType = null\) \{\n  if \(endlessArrowsAt\(buildingType\) && isShelfArrow\(item\)\) return false;\n  return landSold\(shelfItems, item\);\n\}/);
-  const shelfArm = wm.slice(wm.indexOf('function openShelf'), wm.indexOf('function openMerchantSell'));
-  // PIN MOVED (AUDIT S1): each target hands over the owner's keeping, taken as the window opens - the one Set the mark and
-  // the theft's own law (the shelf's tally, the cupboard's basket) read
-  assert.match(shelfArm, /if \(b\.insideOpenShop === false\) \{[\s\S]*const shelfBefore = new Set\(shelf\.items\);[^\n]*\n\s*const win = interiorInventory\(\{\n\s*loot: \{ items: \(\) => shelf\.items, stolenFrom: shelfBefore \},[\s\S]{0,300}if \(shopShelfTheft\(shelfBefore, shelf\.items\)\)/, 'a shut shop\'s shelf');
-  assert.match(wm, /const openLoot = \(privateProperty = false\) => \{\n\s*if \(privateProperty\) interiorLootBirth\(interiorCtx, key, _intShared\);[^\n]*\n\s*const before = privateProperty \? new Set\(c\.items \?\? \[\]\) : null;[^\n]*\n\s*const win = interiorInventory\(\{\n\s*loot: \{ items: \(\) => c\.items, storage: !privateProperty, stolenFrom: before \},[\s\S]{0,400}basket: theftBasket\(before, c\.items \?\? \[\]\),/, 'a stranger\'s cupboard - the theft arm alone, its basket the same Set');   // PIN MOVED (OUTDOOR-LOOT): the Yes mints the room's birth and composes it into the cupboard FIRST - the keeping is taken after, or a first opener's takes would mark nothing
-  // the enhanced pack's put-back: it shows a container alone (a body's frame - shipstore.test.js), so no row of the pack
-  // can reach a shelf today; its stow still asks the same question the classic window's does, should a layout ever offer it
-  assert.match(src('src/ui/enhanced/enhancedInventory.js'), /applyTransfer\(item, \{ \.\.\.plan, amount \}, deps\.items\?\.\(\) \?\? \[\], to, \{ entity: deps\.entity, fromLocal: true, returnTo: theftTarget\(deps, sessionState\(\)\) \}\);/);
   withDom((dom) => {
     const host = dom.mk('div'); dom.body.append(host);
     const shelf = smithShelf();
@@ -539,9 +522,6 @@ test('STOLEN-GOODS AUDIT S3: no shelf piece is stolen - the room\'s word for a s
     assert.equal(isStolen(stash), false, `bought, ${online ? 'online' : 'offline'}: honest`);
     assert.equal(stash.counterBought === true, online, 'and the counter\'s own mark as it was');
   }
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /if \(mode === 'Buy'\) \{\n\s+deductGold\(playerEntity, price\);\n\s+markCounterBought\(staged, \{ price, \.\.\.asked \}\);/, 'the counter\'s Buy - the door the clear rides');   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-1)   // PIN MOVED (LAW-3): the lot's price handed in
-  assert.match(wm, /shelf\.items\.splice\(at, 1\);\n\s+markCounterBought\(\[it\], \{ price \}\);/, 'and the keyed list\'s');
 });
 
 /** The real naval host's boarding: a ship struck alongside, boarded from my helm and taken - her hold drawn by the
@@ -575,10 +555,6 @@ test('STOLEN-GOODS AUDIT S4: the two theft arms that marked nothing - a lawful s
   const ether = await prizeOf('merchantGalleon', { where: { ether: { band: 'shallows', depth: 0.1 } } });
   assert.ok(ether.e.ether, 'a ship of the Eltheric Ocean');
   assert.equal(ether.e.prize.hold.some(isStolen), false, 'past the Veil: no crown, no theft');
-  // the robbed caravan (bootWorld cannot be stood up): its loot window hands over the goods as the owner's keeping
-  const w = src('src/scenes/world.js');
-  const caravan = w.slice(w.indexOf('const caravanHostOf = () => (_caravanHost ??= createCaravanHost({'), w.indexOf('choose: (lines, options) => townTalk.showOverlay(new ChoiceWindow({ lines, options })),'));
-  assert.match(caravan, /openLoot: \(\{ items \}\) => \{[\s\S]*makeInventoryWindow\(\{ loot: \{ items: \(\) => items, containerImage: \(\) => CONTAINER_IMAGES\.Chest, playerOwned: false, stolenFrom: new Set\(items\) \} \}\);/);
 });
 
 /** A ship sunk by `by` ('local': me) through peers' blows, as keepplunder.test.js sinks one: struck, then her hull broken

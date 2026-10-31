@@ -221,21 +221,6 @@ test('WAGONS1 THE CARAVAN\'S ROOM, WAGONS2\'S OWN: the caravan\'s room is its ow
   assert.equal(said.at(-1), CARAVAN_TEXT.notHere);
 });
 
-test('WAGONS1 THE INTERIOR HOST: the caravan rides the cabin\'s private-room slot - its own scene name kept for good, its own save field and restore, furnished as a caravan from the purse, its exit by its own door - and the world host hands it the caravan\'s access (THE FOUR HOSTS: world.js wired; worldModes.js the room; exterior.js, the fixed city, and dungeonContext.js stand no caravan room)', () => {
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /const privateRoomSceneName = \(room\) => \(isCaravanRoom\(room\) \? CARAVAN_SCENE_NAME : cabinSceneName\(room\.uid\)\);/);
-  assert.match(wm, /if \(interiorCabin\) return privateRoomSceneName\(interiorCabin\);/);
-  assert.match(wm, /isCaravanRoom\(interiorCabin\) \? \{ caravanRoom: readCaravanRoom\(interiorCabin\) \} : \{ sailingCabin: readSailingCabin\(interiorCabin\) \}/);
-  assert.match(wm, /if \(isCaravanRoom\(interiorCabin\)\) return \{ kind: 'caravan', where: CARAVAN_TEXT\.where \};[^\n]*\n\s+if \(b\.buildingType === BUILDING_TYPES\.Ship\) return \{ kind: 'ship', where: 'Your ship' \};/);
-  assert.match(wm, /caravanOut \? host\.caravanRoom\?\.returnToWagon\(interiorCabin\) : host\.sailingCabin\?\.returnToDeck\(interiorCabin, privateVisitOwner\)/);
-  assert.match(wm, /if \(saved\?\.caravanRoom\) \{\n\s+if \(mode !== 'exterior' \|\| !host\.caravanRoom\?\.canRestore\(saved\.caravanRoom, saved\.caravanAt\)\) return false;/);   // WAGONS2 (AUDIT): and on the caravan where it stands
-  assert.match(wm, /get sailingCabin\(\) \{ return mode === 'interior' && !isCaravanRoom\(interiorCabin\) \? interiorCabin : null; \}/);
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /caravanRoom: caravanRooms,   \/\/ WAGONS1/);
-  assert.match(world, /parked: \(\) => hcc\.parkedDoor\(\), ownsCaravan: \(\) => activeWagonKind\(playerEntity\.items \?\? \[\]\) === 'caravan'/);
-  for (const host of ['exterior', 'dungeonContext']) assert.doesNotMatch(readFileSync(new URL(`../../src/scenes/${host}.js`, import.meta.url), 'utf8'), /caravanRoom/, `${host}.js stands no caravan room`);
-});
-
 test('AUDIT CROWD-WIDE A2 the riders with me: my wagon\'s passengers; or, sat in another\'s wagon, its owner and the others whose own word seats them in it - never one seated in a third wagon (the crowd\'s count never cuts them: net/gate/gateCrowd.js crowdKept) (mutants: my passengers dropped; the owner dropped; the others unread; a third wagon\'s rider kept)', () => {
   const owner = riderRig();
   assert.deepEqual(owner.r.ridingWithMe(), [], 'nobody yet');

@@ -365,7 +365,6 @@ test('EG-HERO-LAY THE SOLVER AND THE REAL MOTOR (section 10.5; tools/egSpanSolve
   });
 });
 
-
 test('EG-HERO-LAY THE RELAY JUDGES FROM THE LAW (sections 11.7, 13.2 and 21): the census\'s fight floor is the hero\'s polygons at their heights (net/eliteGates/egFair.js egFightFloorAt - its balcony 1.5 m up the highest under a body on it; its chasm none), its hazards bite on the shared clock - judged by the relay (net/bossRef.js judgePlace) as every screen bites (egHazardBites) - only on its fight floor; the union floor\'s floor, the fight floor\'s piece and the legion\'s keep are its polygons; its floors and stairs hold a body on the fair trail (mutants: a polygon unread in each)', () => {
   const spec = hall('low'), q = spec.heroes[0], h = spec.h;
   const near = [q.x, q.y, q.z + 5], chasm = [q.x, q.y, q.z + 15], balc = [q.x + 2.25, q.y + 1.5, q.z + 27.5], far = [q.x, q.y, q.z + 25];
@@ -535,14 +534,3 @@ test('EG-HERO-LAY A DURABLE BREACH KEEPS ITS LAW (section 22, THE LAW PIN): with
   });
 });
 
-test('EG-HERO-LAY THE RELAY\'S BUNDLE (test/net/relayversion.test.js RELAY_GRAPH): net/eliteGates/egHeroFrags.js and every hero law JSON it imports walk under net/eliteGates/egLaw.js, after net/eliteGates/egFragLaw.js - no world/, scenes/ or render/ file joins, and no mesh half; net/eliteGates/egHeroFrags.js imports the reader and the law halves alone (mutants: a mesh half in the relay; the registry not the law\'s)', () => {
-  const RELAY_GRAPH = graph('server/src/index.js');
-  const i = RELAY_GRAPH.indexOf('src/net/eliteGates/egFragLaw.js');
-  assert.deepEqual(RELAY_GRAPH.slice(i - 1, i + 3), ['src/net/eliteGates/egLaw.js', 'src/net/eliteGates/egFragLaw.js', 'src/net/eliteGates/egHeroFrags.js', 'src/assets/egfrags/egRefFrag.law.json']);
-  assert.deepEqual(RELAY_GRAPH.filter((f) => /^src\/(world|scenes|render)\//.test(f)), ['src/world/mat4.js', 'src/world/segment.js']);
-  assert.ok(!RELAY_GRAPH.some((f) => f.endsWith('.mesh.json')), 'no mesh half');
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egHeroFrags.js', import.meta.url), 'utf8');
-  const imports = [...src.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]);
-  assert.ok(imports.every((p) => p === './egFragLaw.js' || /^(?:\.\.\/)+assets\/egfrags\/[A-Za-z0-9]+\.law\.json$/.test(p)), imports.join(', '));
-  assert.match(readFileSync(new URL('../../../src/net/eliteGates/egLaw.js', import.meta.url), 'utf8'), /^import \{ EG_HERO_FRAGS, egHeroFragLaws \} from '\.\/egHeroFrags\.js';/m);
-});

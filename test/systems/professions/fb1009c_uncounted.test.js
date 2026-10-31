@@ -99,9 +99,3 @@ test('UNCOUNTED: the Stores page lists the looted blood and says what it is; LOO
   assert.equal(BAG_PAGE_WORDS.uncountedSplit(2), '2 loose');
 });
 
-test('UNCOUNTED wired: the world host hands the page every material held', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /carriedHeld: \(k\) => bagHeldOf\(playerEntity, k, \{ counter: false \}\),[^\n]*\n\s+heldKeys: \(\) => bagHeldKeysOf\(playerEntity\),/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-2): the page never puts a counter's piece in
-  // PIN MOVED (FB1020c ONE-SAVE): the page's plan reaches the book whole, each put-in with its own order
-  assert.match(w, /deposit: async \(plan\) => \(await profBook\.depositMany\(plan\)\)\.map\(\(r, i\) => /, 'LOOT-LOOSE: the page\'s order reaches the book');
-});

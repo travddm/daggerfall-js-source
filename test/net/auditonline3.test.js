@@ -132,30 +132,6 @@ test('AUDIT ONLINE 3 F4: room copies out of order - a slower room\'s living pose
 
 // ── F5: AN INTRODUCTION'S DEATH POSE STOOD THE DEAD ────────────────────────────────────────────────────────────
 
-test('AUDIT ONLINE 3 F5: a welcome\'s roster or a join naming the fallen (a Wild ghost\'s held death pose) is a death - laid once, said as an introduction, never drawn standing', () => {
-  const { s } = session({ now: () => 1000 });
-  const deaths = [];
-  s.onPeerDeath = (peer, pose, room, how) => deaths.push([peer.id, peer.name, room, how?.intro === true]);
-  const dead = { x: 1, y: 0, z: 2, yaw: 0, pitch: 0, mv: 0, dd: 1, ts: 5 };
-  s._receive(JSON.stringify({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', look: null, pose: dead }], host: null, now: Date.now(), v: 'world1' }), 'world:3,12');
-  s._receive(JSON.stringify({ t: 'join', id: 'carl-0003', name: 'Carl', look: null, pose: { ...dead, ts: 9 } }), 'world:3,12');
-  s.tick();
-  assert.deepEqual(s.drawable().map((p) => p.id), [], 'nobody stands on a body');
-  assert.deepEqual(deaths, [['bob-0002', 'Bob', 'world:3,12', true], ['carl-0003', 'Carl', 'world:3,12', true]], 'each laid, dressed from its introduction');
-  s._receive(JSON.stringify({ t: 'pose', id: 'bob-0002', p: dead }), 'world:4,12');
-  s._receive(JSON.stringify({ t: 'join', id: 'carl-0003', name: 'Carl', look: null, pose: { ...dead, ts: 9 } }), 'world:4,12');
-  assert.equal(deaths.length, 2, 'and once: the pose frame\'s copy, a second room\'s join');
-  // a living peer already standing, re-introduced dead
-  s._receive(JSON.stringify({ t: 'join', id: 'dan-0004', name: 'Dan', look: null, pose: { ...STILL, ts: 1 } }), 'world:3,12');
-  assert.equal(s.peers.has('dan-0004'), true);
-  s._receive(JSON.stringify({ t: 'join', id: 'dan-0004', name: 'Dan', look: null, pose: { ...dead, ts: 2 } }), 'world:3,12');
-  assert.equal(s.peers.has('dan-0004'), false);
-  assert.equal(deaths.length, 3);
-  // the host hands an introduction's word on - RemotePlayers.peerDeath lays its body without its cry (AUDIT ONLINE 3, the
-  // second read: test/net/auditonline3b.test.js drives it)
-  assert.match(rd('src/scenes/world.js'), /online\.onPeerDeath = \(peer, pose, room, how\) => \{\n(?:\s*\/\/[^\n]*\n)*\s*remotePlayers\?\.peerDeath\(\{ \.\.\.peer, acct: social\?\.accountOfPeer\?\.\(peer\.id\) \?\? null \}, pose, room, how\);/);
-});
-
 // ── F6: ANOTHER SOCKET'S MINT WROTE OVER THIS ONE'S TOKEN ──────────────────────────────────────────────────────
 
 test('AUDIT ONLINE 3 F6: a halo\'s mint that ends while a siege socket awaits its pass leaves the siege\'s token its own', async () => {

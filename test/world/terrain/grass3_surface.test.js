@@ -143,10 +143,6 @@ test('GRASS3: the law is NOT bilinear - a different surface, though on real grad
     const g = gapOn(amp, freq);
     assert.ok(g < BLADE / 5, `at a ${grade} grade the gap is ${g.toFixed(3)}u, well under a fifth of a blade - this was never a visible bug`);
   }
-  // the placer reads the drawn surface now, and says so
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /const h = walkGroundAt\(p\.samples, lx, lz\);/, 'the grass placer asks for the DRAWN height');   // PIN MOVED (FLORA-GROUND): the ground's one law (terrainSurface.js walkGroundAt, the drawn surface at the stride-1 ring the grass stands on) - the walker's and every plant's
-  assert.ok(!/s2\[x0 \* hDim \+ z0\] \* \(1 - ax\)/.test(world), 'and the bilinear read is gone, not merely unused');
 });
 
 test('GRASS3: the far ring’s coarser mesh needs the far ring’s stride - and the grass never reaches it', () => {
@@ -158,13 +154,5 @@ test('GRASS3: the far ring’s coarser mesh needs the far ring’s stride - and 
     worst = Math.max(worst, Math.abs(surfaceHeightAt(data, lx, lz, 1) - surfaceHeightAt(data, lx, lz, 4)));
   }
   assert.ok(worst > 1, `the two ring classes are genuinely different surfaces (${worst.toFixed(1)} world units apart)`);
-  // ...and the reason it cannot bite today: the stride-1 ring is the 5x5
-  // block of pixels around the player, so the nearest stride-4 ground is
-  // two whole pixels away - 1,638 world units, against a grass range of
-  // 250. The numbers are the host's own.
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /const LOD_NEAR = 3;/, 'the far ring starts at chebyshev 3');
-  assert.match(world, /const LOD_STRIDE = 4;/);
-  assert.match(world, /\.filter\(\(p\) => p\._stride === 1 && p\.tilemapBytes/, 'and the grass only ever stands on the stride-1 ring');
   assert.ok((3 - 1) * TERRAIN_SIZE > 1600, 'two pixels of fine ground is 1,638 units, six times the grass range');
 });

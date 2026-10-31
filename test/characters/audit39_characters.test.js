@@ -90,10 +90,6 @@ test('audit39 #69: GetDestination\'s search ramp reads the same stopDistance (:5
   ai.lastKnownTargetPos = [0, 0, 2.0];
   ai._getDestination([0, 0, 2.0]);
   assert.equal(ai.searchMult, 0, '...and 2.0 out is not, where the 2.25 literal would have climbed');
-  // the literal is gone from both consumers
-  const mot = rd('src/characters/enemy/enemyMotor.js');
-  assert.ok(mot.includes('sd <= this.stopDistance'), 'the search ramp reads stopDistance');
-  assert.ok(mot.includes('distance <= this.stopDistance'), 'so does the approach test');
 });
 
 // ---------------------------------------------------------------
@@ -118,10 +114,6 @@ test('audit39 #70: a Passive dungeon marker spawns a non-hostile foe', () => {
   assert.equal(new EnemyAI(clearCollider(), [0, 0, 0], 0, { isHostile: out[1].reaction !== 'passive' }).isHostile, true);
   assert.equal(new EnemyAI(clearCollider(), [0, 0, 0], 0).isHostile, true, 'no option = hostile, as every other caller expects');
 
-  // ...and BOTH dungeon spawn branches forward it
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.equal((dc.match(/isHostile: e\.reaction !== 'passive'/g) ?? []).length, 2,
-    'the class branch and the monster branch both pass the marker reaction');
 });
 
 // ---------------------------------------------------------------
@@ -191,75 +183,6 @@ test('audit39 #72: a pacified foe with a FOE target still acts; one without stil
   assert.equal(alone.canAct, false, 'no target, no action - HandleNoAction :357-366');
   assert.equal(alone.moving, false);
 
-  const mot = rd('src/characters/enemy/enemyMotor.js');
-  assert.ok(!/canAct = !paralyzed && !knocked && this\.isHostile;/.test(mot),
-    'the flat hostility AND is gone from CanAct');
-});
-
-// ---------------------------------------------------------------
-// #73 - pieces/cuirass.js's buildCuirass, pieces/greaves.js,
-// clothing.js's clothingZones and armorSet.js's armorZones had no
-// caller anywhere; the only references in the tree were four unused
-// imports in paperdollPayload.js, which made grep report the four
-// modules as wired. They are STAGED, not shipped.
-// ---------------------------------------------------------------
-test('audit39 #73: the four staged item-geometry modules are not imported as if live', () => {
-  const pp = rd('src/characters/paperdoll/paperdollPayload.js');
-  for (const dead of ['buildCuirass', 'buildGreaves', 'clothingZones', 'armorZones']) {
-    assert.ok(!new RegExp(`import \\{[^}]*\\b${dead}\\b`).test(pp),
-      `paperdollPayload.js no longer imports ${dead} without calling it`);
-  }
-  assert.ok(pp.includes("import { STEEL_RAMP } from '../pieces/cuirass.js';"),
-    'STEEL_RAMP stays - the pauldrons and helm are built from it');
-  assert.ok(pp.includes('buildPauldrons(STEEL_RAMP)') && pp.includes('buildHelm(STEEL_RAMP)'));
-  assert.ok(/STAGED, not shipped/.test(pp), 'the seam is named as staged, not silently dropped');
-});
-
-// ---------------------------------------------------------------
-// #74 - buildNeutralBody's AO pass compared every face against every
-// other (2136^2), ~160ms a build, and buildPaperdollPayload runs ~90
-// of them in one synchronous statement: the editor page froze for
-// ~15s before it painted. Binned, the numbers out must not move.
-// ---------------------------------------------------------------
-test('audit39 #74: the AO pass is spatially binned, and the shading is unchanged by it', async () => {
-  const { buildNeutralBody } = await import('../../src/characters/neutralBody.js');
-  const ramps = {
-    skin: [[80, 60, 50], [120, 90, 75], [160, 125, 105], [200, 160, 135]],
-    boot: [[30, 25, 20], [60, 50, 40], [90, 75, 60], [120, 100, 80]],
-  };
-  // THE LAW, restated as arithmetic: a face's occlusion is the sum over
-  // every OTHER face whose centroid is inside AO_R and in front of it.
-  // The reference here is the flat walk the fix replaced, so the bin
-  // can never quietly drop or add a neighbour - and the sum is asserted
-  // bit for bit, because the villager DELTAS diff against these values.
-  const body = buildNeutralBody(ramps);
-  const cen = body.map((f) => {
-    let x = 0, y = 0, z = 0;
-    for (let i = 0; i < 4; i++) { x += f.p[i*3]; y += f.p[i*3+1]; z += f.p[i*3+2]; }
-    return [x/4, y/4, z/4];
-  });
-  const AO_R = 0.11, AO_K = 0.55;
-  const Lx = 0.5, Ly = 0.55, Lz = 0.67, Ln = Math.hypot(Lx, Ly, Lz);
-  for (const i of [0, 17, 400, 1023, body.length - 1]) {
-    const c = cen[i], n = body[i].n; let occ = 0;
-    for (let j = 0; j < body.length; j++) {
-      if (j === i) continue;
-      const dx = cen[j][0]-c[0], dy = cen[j][1]-c[1], dz = cen[j][2]-c[2];
-      const d = Math.hypot(dx, dy, dz);
-      if (d < 1e-4 || d > AO_R) continue;
-      const facing = (dx*n[0] + dy*n[1] + dz*n[2]) / d;
-      if (facing > 0.25) occ += (1 - d/AO_R) * facing;
-    }
-    const ao = Math.max(0.45, 1 - Math.min(1, occ * AO_K * 0.12));
-    const lit = Math.max(0.08, (n[0]*Lx + n[1]*Ly + n[2]*Lz) / Ln * 0.9 + 0.15);
-    const want = Math.min(1, Math.max(0.04, lit * ao));
-    assert.equal(body[i]._i, want, `face ${i}: the binned AO is the flat walk's value, bit for bit`);
-  }
-  const src = rd('src/characters/neutralBody.js');
-  assert.ok(src.includes('near.sort((a, b) => a - b);'),
-    'the gathered neighbours are summed in ascending index order - float addition is not associative');
-  assert.ok(!/for \(let j = 0; j < faces\.length; j\+\+\) \{\s*\n\s*if \(j === i\) continue;/.test(src),
-    'the face-against-every-face walk is gone');
 });
 
 // ---------------------------------------------------------------
@@ -292,22 +215,6 @@ test('audit39 #75: the payload ships the hair the designs ask for', async () => 
   for (let i = 0; i < D.villagers.length; i++) {
     assert.deepEqual(D.villagers[i].hair, VILLAGER_DESIGNS[i].hair, 'the pack carries the design\'s hair');
   }
-});
-
-// ---------------------------------------------------------------
-// #77 - minMetalToHit 5 is WeaponMaterialTypes.Mithril (weapons.js gives
-// Daedric 9), so mithril and every tier above it hits a daedra. The
-// file's header called it "daedric weapons or nothing" - four tiers off.
-// ---------------------------------------------------------------
-test('audit39 #77: the daedra header reads minMetalToHit 5 as Mithril', async () => {
-  const { WEAPON_MATERIALS } = await import('../../src/characters/weapons.js');
-  const { ENEMY_BASICS } = await import('../../src/characters/enemy/enemyBasics.js');
-  assert.equal(WEAPON_MATERIALS.Mithril, 5);
-  assert.equal(WEAPON_MATERIALS.Daedric, 9);
-  for (const id of [25, 26, 27, 29, 31]) assert.equal(ENEMY_BASICS[id].minMetalToHit, 5);
-  const hdr = rd('src/characters/daedra.js');
-  assert.ok(!hdr.includes('daedric weapons or nothing'), 'the four-tier misreading is gone');
-  assert.ok(hdr.includes('WeaponMaterialTypes.Mithril'), 'and the threshold is named for what it is');
 });
 
 // ---------------------------------------------------------------

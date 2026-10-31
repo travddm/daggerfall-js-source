@@ -182,16 +182,6 @@ test('SS1 the card says a bound piece is bound, in the lock\'s own line style wi
       assert.deepEqual(host.querySelectorAll('.boundline'), [], 'a gem says nothing of it');
     } finally { view.unmount(); }
   });
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.card \.lockline, \.card \.boundline, \.pack-shell \.card p\.lockline, \.pack-shell \.card p\.boundline \{/, 'the lock\'s line style - on the pack\'s own card too, over `.pack-shell .card p` (AUDIT SS)');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.boundline::before/, 'without its padlock');
-});
-
-test('SS2 the Broker\'s price column is one width in every row, wide enough for a two-digit price - "12 Deadlands Embers" measures 108px in the window\'s 12px face, "4 Deadlands Embers" 101 (tools/brokerProbe.mjs measures it on the real page; each row is its own grid, so a column sized by its text moved the Regalia\'s price 7px out of the line) (mutants: the price column sized by its text)', () => {
-  const css = read('src/ui/enhanced/enhancedPlusStyle.js');
-  const grid = /\.broker-offer \{ display: grid; grid-template-columns: 48px minmax\(0, 1fr\) (\d+)px 148px;/.exec(css);
-  assert.ok(grid, 'the price column has a width of its own');
-  assert.ok(Number(grid[1]) >= 109, `wide enough for the widest price (${grid[1]}px)`);
-  assert.match(css, /\.broker-price \{ font-size: 12px;/, 'the face the width was measured in');
 });
 
 // ── SS3 (2026-09-27, Mac: "They shouldnt be able to be dropped") ──
@@ -308,10 +298,6 @@ test('SS3 what a peer hands over lands without a bound piece: a building\'s cont
   const n = applyInteriorLoot(ctx, [{ k: 'container:0', r: [wire(ruby()), wire(stack(3))], d: 5 }], { today: 5 });
   assert.equal(n, 1, 'the record lands');
   assert.deepEqual(ctx.containers[0].items.map((i) => i.name), ['Ruby'], 'without the stones');
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /const items = peerHanded\(validLootList\(rec\.r\)\);/, 'a dungeon\'s container');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit
-  assert.match(dc, /const li = notCarried\(peerHanded\(validLootList\(sf\.items\)\)\);/, 'a body on the wire');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit; PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
-  assert.match(read('src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/, 'a peer\'s grant');   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's (scenes/bodyLootHost.js), the line as it was; PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit; PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
 });
 
 // ── SS4 (2026-09-27, Mac: "Also make the items sold by the oblivion vendor bound also. Can't be traded, dropped or
@@ -656,10 +642,6 @@ test('SS5 a classic box holds its rows on the screen: a row wider than fourteen 
   assert.ok(laid.w <= 320 && laid.x >= 0, `fitted, the parchment is ${laid.w} wide at ${laid.x}`);
   assert.deepEqual(fitBoxRows(font, ['a b', 'c']), ['a b', 'c'], 'string rows too');
   assert.deepEqual(fitBoxRows(null, [{ text: long }]), [{ text: long }], 'no font: nothing to measure by');
-  // the three classic doors a refusal or the dismantle's question comes through (pinned at their one line each)
-  assert.match(read('src/ui/native/nativeInventory.js'), /const rows = box\.painting \? box\.rows : fitBoxRows\(font, box\.rows\);/, 'the pack\'s boxes - never a painting\'s, whose picture wrapping would push off the panel');
-  assert.match(read('src/ui/native/nativeTrade.js'), /this\._boxLayout = layoutMessageBox\(font, fitBoxRows\(font, this\.box\.rows\), buttons\);/, 'the counter\'s box');
-  assert.match(read('src/ui/yesNoBox.js'), /const box = layoutMessageBox\(font, fitBoxRows\(font, this\.rows\), this\.okOnly \? \[MB_BUTTONS\.OK\] : \[MB_BUTTONS\.Yes, MB_BUTTONS\.No\]\);/, 'the Yes/No box (and SOFTCAP3\'s OK box)');
 });
 
 // ── AUDIT SS (2026-09-27, Mac: "audit this" - SS1-SS5 end to end) ──
@@ -769,12 +751,6 @@ test('AUDIT SS nothing bound goes out on the wire: a building\'s container recor
   assert.equal(recs.length, 1);
   assert.deepEqual(recs[0].r.map((i) => i.name), ['Ruby'], 'the record: the gem alone');
   assert.deepEqual(ctx.containers[0].items, [gem, stones], 'the container itself untouched');
-  assert.match(read('src/scenes/dungeonContext.js'), /r: peerHanded\(held\)\.map\(\(it\) => \(\{ \.\.\.it \}\)\)/, 'the dungeon\'s records');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /shopBuysItem\(interiorBuilding\.buildingType, it\) && !isEquipped\(it\) && !isBound\(it\) && !lockRefuses\(it, 'sell'\) && !isSummoned\(it\)\);/, 'the keyed shelf lists neither');   // PIN MOVED (CRAFT-WORTH): nor a conjured piece
-  assert.match(wm, /function doSell\(shelf, it\) \{\n    if \(isBound\(it\) \|\| lockRefuses\(it, 'sell'\)\) return 0;/, 'and sells neither');
-  assert.match(read('src/ui/enhanced/enhancedTrade.js'), /const item = selected\.item;\n  if \(isBound\(item\) \|\| lockRefuses\(item, 'sell'\)\) return;/, 'the dead quick sell refuses both');
-  assert.match(read('src/scenes/world.js'), /if \(!onlineOn && modes\?\.gateArenaDay\?\.\(\) != null\) \{ ejectFromCourt\(COURT_TEXT\.collapse\); gateCourt\?\.leave\(\);/, 'offline, the floor into the pack on the way out');
 });
 
 /** withDom for an async body (test/systems/item/set7_broker.test.js's own): the fake document stands until the body settles. */

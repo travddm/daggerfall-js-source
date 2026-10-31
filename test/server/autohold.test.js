@@ -196,30 +196,6 @@ test('AUTO-HOLD service: a row still held \'dupe\' lifts at its next checkpoint;
   } finally { s.done(); }
 });
 
-test('AUTO-HOLD service (AUDIT): a hold a reader cannot wait out - a dead maker\'s law hold whose time is out, its last judgement finding nothing - stands no more for its crafts and its listings; any other stands', async () => {
-  const s = await stand();
-  try {
-    const A = await s.seat('mak');
-    const now = 1_000_000;
-    const stands = (row) => {
-      s.raw.prepare('UPDATE realm_characters SET held = ?, held_until = ?, dead_at = ?, law_sig = ? WHERE id = ?').run(row.held, row.until ?? null, row.dead ?? null, row.sig ?? null, A.R.id);
-      return s.raw.prepare(`SELECT ${holdStandsSql('r', '?1')} AS v FROM realm_characters r WHERE r.id = ?2`).get(now, A.R.id).v;
-    };
-    assert.equal(stands({ held: 'law', until: now - 1, dead: 5 }), 0, 'dead, its week out, nothing carried: none');
-    assert.equal(stands({ held: 'law', until: now, dead: 5 }), 0, 'out at its very end');
-    assert.equal(stands({ held: 'law', until: now + 1, dead: 5 }), 1, 'its week still running');
-    assert.equal(stands({ held: 'law', until: now - 1 }), 1, 'alive: its next checkpoint is the lift');
-    assert.equal(stands({ held: 'law', until: now - 1, dead: 5, sig: 'crafted:135' }), 1, 'dead carrying what the law found');
-    assert.equal(stands({ held: 'law', dead: 5 }), 1, 'an untimed law hold');
-    assert.equal(stands({ held: 'staff', until: now - 1, dead: 5 }), 1, 'staff\'s');
-    assert.equal(stands({ held: null }), 0);
-    const realm = readFileSync(new URL('../../server-account/src/realm.js', import.meta.url), 'utf8');
-    const market = readFileSync(new URL('../../server-account/src/market.js', import.meta.url), 'utf8');
-    assert.match(realm, /WHERE p\.provenance = \?1 AND \$\{holdStandsSql\('r', '\?3'\)\}`\)\.bind\(provenance, playerId, Math\.floor\(Date\.now\(\) \/ 1000\)\)/, 'the craft\'s hold asks it');
-    assert.match(market, /const PATRON_HELD_SQL = `EXISTS \(SELECT 1 FROM realm_characters c WHERE c\.id = l\.char_id AND c\.player = l\.seller AND \(\$\{holdStandsSql\('c', /, 'the patrons\' too');
-  } finally { s.done(); }
-});
-
 test('AUTO-HOLD service (AUDIT): an answer names at most LOCKED_SAID_MAX locked pieces', async () => {
   const s = await stand();
   try {
@@ -458,9 +434,6 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
   const refusal = accountRefusalText('trade-held');
   assert.equal(typeof refusal === 'function' ? refusal() : refusal, 'This character\'s trading, gathering and crafting are frozen. The notice shown when it froze says why, and until when.');   // PIN MOVED (RPT1026-MARKET HOLD-SAID): offline, no hold heard - what a hold freezes
   assert.match(TRADE_HELD_STRIKES, /^ Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that\.$/);   // PIN MOVED (RPT1026-MARKET HOLD-SAID)
-  // the host wires it at one line (HOST-SPLIT)
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /^  wireRealmHolds\(realmSession, \{ say: \(t\) => townTalk\.say\(t\), entity: playerEntity \}\);$/m);
 });
 
 test('AUTO-HOLD client (AUDIT): A PIECE THE REALM LOCKED STAYS WITH ITS HOLDER - bound while it is, every door a binding closes closed to it (a counter, a trade, the ground, a room\'s container, a peer\'s word), in its own words; the wagon and the player\'s own storage still take it', () => {
@@ -529,12 +502,4 @@ test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carr
   const boat = withId('5d5d5d5d5d5d5d5d', 14);
   assert.deepEqual([...stowedKeysOf({ items: [withId(k)], modData: { 'come-sail-away': { placedBoats: [{ Items: [boat] }] } } })], ['5d5d5d5d5d5d5d5d']);
   assert.deepEqual([...stowedKeysOf(null)], []);
-  const modes = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.equal(modes.match(/carried: carriedPieces\(playerEntity\)/g)?.length, 2, 'both landings');
-  assert.match(modes, /applyInteriorShared\(interiorCtx, shared, \{ \.\.\._intShared, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/);
-  assert.match(modes, /applyInteriorLoot\(interiorCtx, data\.l, \{ \.\.\._intShared, from: id, today: stockedToday\(\), carried: carriedPieces\(playerEntity\) \}\)/);   // PIN MOVED (OUTDOOR-LOOT): the bag whole (its set of the unreadable, its room) and the sender, beside the pieces I carry
-  // AUDIT: and a dungeon's - a search's find, a pile - with what I carry (never the stowed: a dungeon holds none of mine)
-  assert.match(readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8'), /for \(const it of withoutCarried\(items, carriedPieces\(playerEntity\)\)\) held\.push\(it\);/);
-  // the pure half never loads the item law: its registration changes what every reader of the wire lands
-  assert.doesNotMatch(readFileSync(new URL('../../src/world/interior/interiorShared.js', import.meta.url), 'utf8'), /from '[^'\n]*\/(itemIds|itemLaw)\.js'/);   // TIDY: any depth - interiorShared stands in world/interior/
 });

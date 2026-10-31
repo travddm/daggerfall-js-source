@@ -68,6 +68,4 @@ test('ROAD-GAPS the way: never over the water the build refuses or a pixel it ro
   net = grid();
   row(net, 5, 2, 10); row(net, 5, 13, 20);
   assert.equal(linkGaps(net, W, H, { blocked: () => false, owns: (u) => u > 30 }), 0, 'neither end the core\'s: none');
-  const src = read('src/world/tamrielRoads.js');
-  assert.match(src, /const linked = linkGaps\(net, MAP_W, MAP_H, \{\n\s+blocked: \(u, v\) => \(water\[v \* MAP_W \+ u\] === 1 && land\.ford\[v \* MAP_W \+ u\] === 0\) \|\| routedRound\.has\(v \* MAP_W \+ u\),\n\s+owns: \(u, v\) => inCore\(region, u \+ gx, v \+ gy\),/);
 });

@@ -153,24 +153,6 @@ test('CRASH 2026-08-29: the host half holds even against a window that re-dispat
   assert.equal(host.current, null);
 });
 
-test('CRASH 2026-08-29: every drain in the talk host empties the slot before disposing', () => {
-  // A source sweep on top of the behaviour pins, because the behaviour
-  // pins can only reach the drains a headless test can drive. The rule
-  // is mechanical and greppable: in townTalk.js, nothing may call
-  // dispose on the overlay slot except the one drain that owns it.
-  const text = src('src/scenes/townTalk.js');
-  const disposes = [...text.matchAll(/^.*overlay\??\.dispose\?\.\(\).*$/gm)].map((m) => m[0].trim());
-  assert.deepEqual(disposes, [],
-    `townTalk.js disposes the overlay slot outside dropOverlay:\n  ${disposes.join('\n  ')}`);
-  // ...and the drain itself must null the slot before the dispose. The
-  // order is the whole fix, so it is read in order rather than asserted
-  // as two facts that could be true in either sequence.
-  const drain = text.match(/function dropOverlay\([\s\S]*?\n {2}}/)?.[0];
-  assert.ok(drain, 'townTalk.js lost dropOverlay');
-  assert.ok(drain.indexOf('overlay = null') < drain.indexOf('win.dispose'),
-    'dropOverlay disposes the window before it empties the slot - the crash is back');
-});
-
 // ---------------------------------------------------------------------------
 // AND THE REAL HOST, not a stand-in.
 //

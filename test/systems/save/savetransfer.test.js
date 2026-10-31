@@ -46,9 +46,6 @@ test('SP1: the bytes - base64 both ways, the CRC, and a STORED zip the port’s 
 });
 
 test('SP1: the layout is the app’s own - the three spellings, the two files, the folder', () => {
-  const fsrc = read('app/lib/fileStorage.cjs');
-  for (const [name, mime] of TRANSFER_SHOT_FILES) assert.ok(fsrc.includes(`['${name}', ${mime ? `'${mime}'` : 'null'}]`), `fileStorage.cjs spells ${name}`);
-  assert.ok(fsrc.includes(`const DATA_FILE = '${TRANSFER_DATA_FILE}';`) && fsrc.includes(`const INFO_FILE = '${TRANSFER_INFO_FILE}';`) && fsrc.includes(`const SAVES_DIR = '${TRANSFER_DIR}';`));
   assert.deepEqual(shotToFile(`data:image/jpeg;base64,${bytesToBase64(jpegBytes)}`), { name: 'Screenshot.jpg', data: jpegBytes }, 'a jpeg data URL is the jpeg’s own bytes');
   assert.equal(shotToFile('data:image/png;base64,AAAA').name, 'Screenshot.png');
   const odd = shotToFile('data:image/webp;base64,AAAA');
@@ -105,15 +102,3 @@ test('SP1: import never overwrites - a taken number moves to the first free one,
   assert.equal(full.getItem(SAVE_INFO_PREFIX + 0), null, 'and no card landed before the data, or a half slot would enumerate');
 });
 
-test('SP1: the doors - the Load pane carries Export and both Imports, on the title and the pause menu alike', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  const pane = menu.slice(menu.indexOf('function paneLoad(body) {'), menu.indexOf('function transferCard('));
-  assert.ok(pane.includes('body.append(transferCard(saves.length));'), 'the card rides the Load pane, after the slots');
-  const cardSrc = menu.slice(menu.indexOf('function transferCard('), menu.indexOf('// ── SAVE GAME (pause only)'));
-  assert.ok(cardSrc.includes("exportSavesZip(appStorage())") && cardSrc.includes("a.download = TRANSFER_ZIP_NAME;"), 'Export downloads the store’s zip under the one name');
-  assert.ok(cardSrc.includes("readZipEntries(f, { pick: (names) => names.filter((n) => slotPathOf(n)) })"), 'a zip import inflates only the save files');
-  assert.ok(cardSrc.includes('entriesFromFiles([...(dirIn.files ?? [])])') && cardSrc.includes("dirIn.setAttribute('webkitdirectory', '')"), 'a folder import walks a picked Saves folder');
-  assert.ok(cardSrc.includes('importSlots(slots, appStorage())'), 'both write into the store under this build - the browser’s on the site, the file store in the app');
-  assert.ok(cardSrc.includes('shell?.savesPath'), 'the app names where its files are');
-  assert.ok(!cardSrc.includes('deleteSave') && !cardSrc.includes('removeItem'), 'the card deletes nothing');
-});

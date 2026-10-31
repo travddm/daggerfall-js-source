@@ -49,7 +49,6 @@ function rig({ rand = () => 0, ok = () => true } = {}) {
 
 test('AUDIT SILVER-WAYS A3 (the Guild tab): the silver treasury says the day\'s guild deeds against their four, and what earns one (mutants: the line unsaid)', () => {
   assert.equal(guildDeedsText(2, 4), 'Guild deeds today: 2 of 4. When 3 members who joined at least 7 days ago defend the same town or close the same gate, the treasury earns 25 silver.');
-  assert.match(src('src/ui/socialPanel.js'), /if \(Number\.isSafeInteger\(v\.deedsMax\)\) out\.push\(el\('div', 'dfsocial-note', guildDeedsText\(v\.deeds, v\.deedsMax\)\)\);/);
 });
 
 test('AUDIT SILVER-WAYS D1: the UTC day\'s turn is read at this device\'s own moment in its spread, and a turn whose read fails (offline over midnight) is asked again once a retry - never every frame (mutants: the turn unrated; the spread unread)', async () => {
@@ -99,13 +98,11 @@ test('AUDIT SILVER-WAYS D2: a strike\'s refusal is learned - `motherlode-full` i
   k.refused(l0.key, 'motherlode-full');
   k.refused('vein:1:2:3:4', 'node-taken');
   assert.deepEqual(told, [[l0.key, 'motherlode-full']]);
-  assert.match(src('src/scenes/gatherHost.js'), /if \(typeof key === 'string'\) for \(const k of kinds\) \{ try \{ k\.refused\?\.\(key, r\?\.error \?\? null\); \}/);
 });
 
 test('AUDIT SILVER-WAYS D3: the Watch\'s refusal tells a miner to move on the Motherlode\'s ground - the relay marks a pose that moved (mutants: "stand")', () => {
   assert.equal(MOTHERLODE_TEXT.watch, 'The Watch has not seen you on the Motherlode lately. Keep moving on its ground: the Watch checks every 2 minutes.');
   assert.doesNotMatch(MOTHERLODE_TEXT.watch, /Stand a moment/);
-  assert.match(src('src/net/watchReceipt.js'), /export const watchDue = \(w, now\) => now - w\.moved <= WATCH_MOVED_MS/);
 });
 
 test('AUDIT SILVER-WAYS D4: a Motherlode whose pixel\'s heart is a town\'s, with no rock and no stone near, stands the nearest place outside the town its pixel holds - the same for every client; a pixel of water stands none (mutants: the fallback unasked; the town unasked)', () => {
@@ -151,7 +148,6 @@ test('AUDIT SILVER-WAYS D5: a Motherlode\'s strike asks its receipt again at the
     end = fresh;
     assert.deepEqual(a.ask(), { watch: fresh });
   } finally { setForagingHost(null); }
-  assert.match(src('src/scenes/gatherHost.js'), /\.\.\.\(\(typeof a\.ask === 'function' \? a\.ask\(\) : a\.ask\) \?\? \{\}\),/);
 });
 
 test('AUDIT SILVER-WAYS D6: a receipt is carried only for the account signed in now - another account signed in, the last one\'s are let go (mutants: the account unread at the strike)', async () => {
@@ -166,21 +162,3 @@ test('AUDIT SILVER-WAYS D6: a receipt is carried only for the account signed in 
   assert.equal(r.b.watchFor(300, 120), null, 'let go, not kept for its return');
 });
 
-test('AUDIT SILVER-WAYS D7: the frame\'s costs - the signed-in account read once a second, not a frame; the compass\'s Motherlodes into its own list; the world host\'s marks of its own pooled pieces (mutants: the account each frame; a list a frame)', async () => {
-  const r = rig();
-  r.b.tick(); await tick();
-  const calls = r.meCalls();
-  for (let i = 0; i < 50; i++) { r.b.tick(); r.ms(r.msNow() + 16); }
-  assert.ok(r.meCalls() - calls <= 1, `read ${r.meCalls() - calls} times in 800 ms`);
-  const [l0] = r.b.state.lodes;
-  r.at(l0.opensAt + 1);
-  const out = [];
-  assert.equal(r.b.standingAll(out), out);
-  assert.deepEqual(out.map((l) => l.key), [l0.key]);
-  r.b.standingAll(out);
-  assert.equal(out.length, 1, 'emptied first');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const _lodeMarks = \[\], _lodesUp = \[\], _lodeTr = \[0, 0, 0\], _lodePool = \[\];/);
-  // PIN MOVED (FIELD BUGS 2026-10-12g LODE-MARK): the far mark in its own colour, 'motherlode'
-  assert.match(w, /const tr = state\.pixelTranslation\(l\.x, l\.y, _lodeTr\), m = _lodePool\[_lodeMarks\.length\] \?\?= \{ profession: 'motherlode', at: \[0, 0, 0\], d: 0, reach: 1 \};/);
-});

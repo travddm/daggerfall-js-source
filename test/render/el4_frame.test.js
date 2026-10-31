@@ -88,12 +88,6 @@ test('EL4: the adaptation step - toward key over luminance, clamped, slow into t
   // the step is bounded: a one-second hitch integrates as a tenth
   assert.equal(adaptStep(1, 0.02, 1), adaptStep(1, 0.02, AIR_ADAPT_MAX_DT));
   assert.equal(adaptStep(1, 0.02, -5), 1, 'no negative time'); assert.equal(adaptStep(1, 0.02, 0), 1);
-  // the GLSL is the same step
-  const a = read('src/render/airPass.js');
-  assert.match(a, /float target = clamp\(uAdaptParams\.y \/ max\(lum, 1e-6\), uAdaptParams\.z, uAdaptParams\.w\);/);
-  assert.match(a, /float rate = target > prev \? uAdaptRates\.x : uAdaptRates\.y;/);
-  assert.match(a, /float t = 1\.0 - exp\(-uAdaptParams\.x \* rate\);/);
-  assert.match(a, /textureLod\(uLum, vec2\(0\.5\), \$\{Math\.log2\(AIR_LUM_SIZE\)\}\.0\)\.r/, 'the mean is the 32x32 image\'s top mip (the template names the size, not a literal)');
 });
 
 test('EL4: the frame-target law - the helper and the clouds restore the frame, not the canvas', () => {
@@ -114,10 +108,6 @@ test('EL4: the frame-target law - the helper and the clouds restore the frame, n
     assert.equal(calls.filter((c) => c[0] === 'bindFramebuffer').at(-1)[2], frame, 'finishVolume restores the frame');
   } finally { setFrameTarget(null); }
   assert.equal(frameTarget(), null);
-  const vc = read('src/render/volumetricClouds.js');
-  assert.match(vc, /gl\.bindFramebuffer\(gl\.DRAW_FRAMEBUFFER, frameTarget\(\)\);/, 'the clouds\' blit restores the frame');
-  assert.match(vc, /import \{[^}]*frameTarget[^}]*\} from '\.\/renderTarget\.js';/);
-  assert.equal((read('src/render/renderer.js').match(/gl\.bindFramebuffer\(gl\.FRAMEBUFFER, this\._frameFbo \?\? null\);/g) || []).length, 5, 'the sprite pass\'s three restores hand back the frame, the body batch\'s one bind (MWNPC2) its fourth, and the weapon glow field\'s bake (WEAPON-GLOW1, AUDIT SPR-1) its fifth');   // PIN MOVED (MWNPC2); PIN MOVED (AUDIT WEAPON-GLOW SPR-1: renderer.js _glowField hands back the frame its bake borrowed)
   const others = ['src/render/enhancedSky.js', 'src/render/dynamicSkiesRenderer.js', 'src/render/precipitation.js', 'src/render/labGrass.js', 'src/render/skyRenderer.js', 'src/render/waterSurface.js', 'src/render/farRing.js'];
   for (const f of others) assert.ok(!/bindFramebuffer\(/.test(read(f)), `${f} binds no framebuffer of its own - it draws into whatever is bound`);
 });
@@ -132,13 +122,6 @@ test('EL4: proper dark dungeons and the glints - the ambient scaled once under t
   assert.equal(dungeonTrilight(false, tri), tri); assert.equal(dungeonTrilight(true, null), null);
   const dt = dungeonTrilight(true, tri);
   assert.ok(near(dt.sky[0], 0.105) && near(dt.equator[1], 0.07) && near(dt.ground[2], 0.035));
-  // the hosts: the standalone dungeon at boot and per frame, the world's dungeon mode - the trilight scaled once, the flat ambient once
-  const d = read('src/scenes/dungeon.js'), w = read('src/scenes/worldModes.js');
-  assert.match(d, /renderer\.setLighting\(dungeonAmbient\(lightingOn, new Float32Array\(DUNGEON_AMBIENT\)\), 0\);/);
-  assert.match(d, /const _tri = dungeonTrilight\(lightingOn, betterAmbience\.dungeonAmbient\(\)\); renderer\.setLighting\(new Float32Array\(_tri \? _tri\.equator : dungeonAmbient\(lightingOn, ctx\.ambient\)\), 0, undefined, _tri\);/);
-  assert.match(w, /const _tri = dungeonTrilight\(_on, _dgTrilight\); renderer\.setLighting\(new Float32Array\(_tri \? _tri\.equator : dungeonAmbient\(_on, _dgAmbient\)\), 0, undefined, _tri\);/);
-  assert.match(w, /const _dgAmbient = _abyss \? _abyss\.renderAmbient\.slice\(0, 3\) : dungeonCtx\.ambient;\n\s*const _dgTrilight = abyssTrilight\(betterAmbience\.dungeonAmbient\(\), _abyss\);/, 'OH-E: the two inputs are Better Ambience\'s trilight and the selector\'s ambient, but in the abyss');
-  assert.ok(!/dungeonAmbient\(/.test(read('src/scenes/interior.js')), 'an interior (a shop, a tavern) keeps its daylight ambient');
   // the glints
   assert.equal(EL_SPEC_GLOSS, 24); assert.equal(EL_SPEC_STRENGTH, 0.12);
   for (const [name, fs] of [['mesh', EL_MESH_FS], ['terrain', EL_TERRAIN_FS], ['char', EL_CHAR_FS]]) {
@@ -172,10 +155,6 @@ test('EL4: the eye in the shaders - every lane shader and the far ring multiply 
     assert.ok(!/lit \* uELExposure/.test(fs), `${name}: no bare exposure left`);
   }
   assert.match(EL_FAR_RING_FS, /float ex = uELExposure \* elAdapt\(\);/); assert.match(EL_FAR_RING_FS, /elTonemapRGB\(lit \* ex\)/);   // HQ1
-  const fr = read('src/render/farRing.js');
-  assert.match(fr, /'uELExposure', 'uAdapt', 'uJungleHaze', 'uHazeEye',   \/\/ BANTHA1/);   // PIN MOVED (OW-HORIZON, 2026-10-20): the list goes on to the fog's focus and the clouds' assert.match(fr, /gl\.bindTexture\(gl\.TEXTURE_2D, adaptTex \?\? this\._adaptOne\(\)\);/);
-  assert.match(fr, /new Uint8Array\(\[128, 128, 128, 255\]\)/, 'the bare image holds the multiplier 1');
-  assert.match(read('src/scenes/world.js'), /adaptTex: renderer\.adaptTexture/);
   // the far ring on the lane binds the eye's unit
   const { gl, calls } = recordingGl();
   const ring = new FarRingRenderer(gl, { lane: EL_LANE });

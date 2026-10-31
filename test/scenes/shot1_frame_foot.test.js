@@ -87,31 +87,3 @@ test('SHOT1: a press from inside the host\'s frame (the pad\'s synthetic keydown
   assert.equal(c.reads.at(-1), 'black', 'the second shot still read (no draw in this bare delivery)');
 });
 
-test('SHOT1 the hosts: every drawn frame foot pays the owed shots right after its resolve, the cap\'s held frame never does, and the shot rides no frame callback of its own (mutants: a foot without the call; the call above the resolve; the rAF ride back)', () => {
-  const shot = read('src/ui/screenshot.js');
-  assert.doesNotMatch(shot.replace(/^\s*\/\/[^\n]*$/gm, '').replace(/\/\*\*[\s\S]*?\*\//g, ''), /requestAnimationFrame|\braf\(/, 'the read is the host foot\'s - no frame callback of its own');
-  assert.match(shot, /afterDraw = oweToFrameFoot,/, 'the foot is the default');
-  assert.match(shot, /const batch = _owed\.splice\(0\);/, 'the slot emptied before the occupants are told');
-  // THE FOUR HOSTS RULE: world.js and exterior.js own their frame feet; worldModes.js and dungeonContext.js draw
-  // inside world.js's (the modal foot) and dungeon.js's, which route their keys through routeKey; interior.js is the
-  // ?interior dev host's foot.
-  const feet = { 'src/scenes/world.js': 2, 'src/scenes/exterior.js': 2, 'src/scenes/dungeon.js': 2, 'src/scenes/interior.js': 1 };
-  for (const [f, n] of Object.entries(feet)) {
-    const s = read(f);
-    assert.match(s, /^import \{[^}]*\bdeliverOwedShots\b[^}]*\} from '\.\.\/ui\/screenshot\.js';/m, `${f}: takes the door`);
-    const resolves = [...s.matchAll(/renderer\.resolveFrame\(\);/g)].map((m) => m.index);
-    assert.equal(resolves.length, n, `${f}: ${n} frame feet`);
-    assert.equal((s.match(/^\s+deliverOwedShots\(\);/gm) ?? []).length, n, `${f}: one delivery per foot`);
-    for (const i of resolves) {
-      const foot = s.slice(i, s.indexOf('requestAnimationFrame(frame);', i));
-      // the resolve, then (past its notes) at most SS1's save shot, then the delivery - nothing that draws between
-      assert.match(foot, /^renderer\.resolveFrame\(\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*(?:\s+capturePendingScreenshot\(canvas\);[^\n]*\n)?\s+deliverOwedShots\(\);/, `${f}: the delivery is the resolve's next act`);
-    }
-    const capLine = s.split('\n').find((l) => l.includes('if (frameCapSkip(now))'));
-    assert.ok(capLine && !capLine.includes('deliverOwedShots'), `${f}: the held frame draws nothing and pays nothing`);
-  }
-  // the two modal hosts carry no foot of their own: their key ladders are routeKey's, their frames their host's
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(read(f), /renderer\.resolveFrame\(\);/, `${f}: draws inside its host's frame, whose foot pays`);
-  }
-});

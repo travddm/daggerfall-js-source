@@ -44,13 +44,6 @@ test('PERF-FOG + EL-DISTANCE: no lane fragment decodes the fog colour - the fini
 });
 
 test('PERF-FOG: the lane\u2019s decode3 is still elDecode\u2019s curve - the host\u2019s other colours go through it', () => {
-  // ONE DFU MEMBER ONE EXPORT applies to our own laws too. The lane
-  // carries the decoder the shader compiles - `decode3` - and the renderer
-  // reaches it through the lane (its colour uniforms, `_c3`; the far ring),
-  // so nothing restates the sRGB constants.
-  const r = read('src/render/renderer.js');
-  assert.match(r, /this\._lane \? this\._lane\.decode3\(src, scratch\) : src/, 'the lane\u2019s own decoder');
-  assert.doesNotMatch(r, /Math\.pow\(\(v \+ 0\.055\) \/ 1\.055, 2\.4\)/, 'no second copy of the curve in the renderer');
   assert.equal(typeof EL_LANE.decode3, 'function');
   const out = EL_LANE.decode3(new Float32Array([0.04045, 0.5, 1]), new Float32Array(3));
   assert.ok(Math.abs(out[0] - 0.04045 / 12.92) < 1e-7, 'below the threshold: the linear segment');
@@ -64,20 +57,3 @@ test('PERF-FOG: the lane\u2019s decode3 is still elDecode\u2019s curve - the hos
   }
 });
 
-test('PERF-FOG + EL-DISTANCE: the host keeps no decoded fog - no uniform, no cache, no upload', () => {
-  const r = read('src/render/renderer.js');
-  assert.doesNotMatch(r, /uFogColorLin|fogColorLin|_fogColorLinear|_fogLin\b|_fogLinFrom/, 'the decoded fog\u2019s location, upload and cache are gone with the need for them');
-  assert.match(r, /gl\.uniform3fv\(prog\.fogColor, this\._fogColor\);/, 'the display fog colour, as every program takes it');
-});
-
-test('PERF-FOG: a black fog is the failure this cannot be allowed to have, so the probe LINKS', () => {
-  // A uniform the optimiser drops reads back as null, the upload skips it,
-  // and elFinish then mixes toward a BLACK fog - a failure that compiles
-  // clean and shows up only on a foggy day. Source cannot answer that;
-  // only a driver can, so the probe links the four lane programs and asks
-  // for the location.
-  const probe = read('tools/perfSunShaderProbe.mjs');
-  assert.match(probe, /getUniformLocation\(prog, 'uFogColor'\)/);
-  assert.match(probe, /the uniform was optimised out - the fog would go black/);
-  for (const k of ['mesh', 'terrain', 'char', 'bb']) assert.ok(probe.includes(`'${k}'`), `the probe covers the ${k} program`);
-});

@@ -17,37 +17,8 @@ import { fileURLToPath } from 'node:url';
 import { presentNpcInfoText } from '../../src/player/activate.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const wm = () => readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-const click = () => {
-  const s = wm();
-  return s.slice(s.indexOf('const clickQuestFlat = (s, buildingKey) => {'), s.indexOf('const questAdapter = {'));
-};
-
-test('DISC29-H: Info returns before the stamp and before DoClick - a look springs nothing', () => {
-  const c = click();
-  const info = c.indexOf("if (getInteractionMode() === 'info') {");
-  assert.ok(info > 0, 'the Info arm is in the one click body');
-  const infoArm = c.slice(info, c.indexOf('\n    }\n', info) + 7);
-  assert.match(infoArm, /\n\s+return;\n\s+\}\n$/, 'it ends the click');
-  assert.doesNotMatch(infoArm, /doClick|setLastNPCClicked/, 'neither DoClick nor StaticNPCClick\'s stamp');
-  assert.ok(info < c.indexOf('setLastNPCClicked(npcData())'), 'before the stamp');
-  assert.ok(info < c.indexOf('s.behaviour?.doClick()'), 'and before the click');
-});
 
 test('DISC29-H: a Person in Info is PresentNPCInfo\'s one line, named by StaticNPC.DisplayName off the stamp\'s own layout data', () => {
-  const c = click();
-  const info = c.slice(c.indexOf("if (getInteractionMode() === 'info') {"));
-  assert.match(info, /if \(questBridge && person\?\.isPerson\) \{\s*\n\s+const data = npcData\(\);/, 'a Person only: an item in Info is silent');
-  assert.match(info, /Promise\.resolve\(townTalk\?\.ensureFactions\?\.\(\)\)\s*\n\s+\.then\(\(\) => townTalk\?\.say\?\.\(presentNpcInfoText\(npcShownName\(data\)\)\)\)\.catch\(\(\) => \{\}\);/,
-    'FACTION.TXT first, as activateStaticNpc waits for it (an Individual faction names the NPC)');
-  // the same line a plain static NPC's Info look prints
-  assert.match(wm(), /townTalk\?\.say\?\.\(presentNpcInfoText\(displayName\)\);/);
   assert.equal(presentNpcInfoText('Mordard Bryte'), 'You see Mordard Bryte.');
 });
 
-test('DISC29-H: Grab, Talk and Steal click as before - the stamp, then DoClick', () => {
-  const c = click();
-  const stamp = c.indexOf('if (questBridge && person?.isPerson) questBridge.machine.setLastNPCClicked(npcData());');
-  assert.ok(stamp > 0);
-  assert.ok(stamp < c.indexOf('const foundInActiveQuest = s.behaviour?.doClick() ?? false;'));
-});

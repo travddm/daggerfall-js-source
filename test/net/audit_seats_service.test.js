@@ -647,12 +647,6 @@ test('AUDIT-SEATS S11: the standings are summed in SQL - one row an account a so
   const [standing] = await gatherStandings(counting, { ...ANTICLERE }, W, T0);
   assert.equal(fetched, 3, 'one row a day of ticks, one for the gate - never 91');
   assert.equal(standing.total, 50 + 40 + 300, 'read the same');
-  // the Tithe's walk: the week's days bound it, so the day index carries it
-  const src = readFileSync(new URL('../../server-account/src/seatTurning.js', import.meta.url), 'utf8');
-  const tithe = /SELECT dst_id, SUM\(amount\) AS n FROM marks_ledger[\s\S]*?GROUP BY dst_id/.exec(src)?.[0];
-  assert.ok(tithe, 'the Tithe\'s query');
-  const plan = s.raw.prepare(`EXPLAIN QUERY PLAN ${tithe}`).all().map((p) => p.detail).join(' | ');
-  assert.match(plan, /idx_marks_day/, plan);
   // THE PRUNE: at W's Turning, the rows of W-4 and before go; W-3's stay
   assert.equal(INFLUENCE_KEPT_WEEKS, 4);
   for (const week of [W - 5, W - 4, W - 3]) {

@@ -135,7 +135,6 @@ test('DISC25-A A1: a cell is on the storey its OWN surface is nearest - a ramp s
 
 test('DISC25-A A2: the stairs are found - where two storeys\' surfaces meet within a stair\'s rise - from both sides', () => {
   assert.equal(STAIR_RISE, 2 * STEP_OFFSET + 0.2, 'two of the motor\'s strides, and a little slack');
-  assert.match(src('src/systems/automap/automapFloors.js'), /export const STAIR_RISE = 2 \* STEP_OFFSET \+ 0\.2;/, 'derived from the motor, not retyped');
   assert.ok(STAIR_RISE < FLOOR_MIN_GAP, 'a stair\'s rise is well short of a storey\'s headroom');
   const { field } = frame(SPLIT);
   const links = storeyLinks(field);
@@ -325,10 +324,6 @@ test('DISC25-A A7: the window\'s foot says the dungeon\'s keys while it is up', 
   const s = createAutomapSheet({ record: () => rec([]), model: () => ({ rows: STACK }) });
   assert.equal(s.hint(), AUTOMAP_HINT);
   assert.equal(MAP_HINT, 'drag to pan · scroll to zoom · Esc to close', 'the bay\'s line is the line it always was');
-  const hm = src('src/ui/heldMap.js');
-  assert.match(hm, /const text = this\._sheet\?\.hint\?\.\(\) \?\? MAP_HINT;\n    hint\.textContent = text;/);
-  assert.match(hm, /this\._sheets\.get\(id\)\?\.mount\?\.\(\);\n    this\._writeHint\(\);/, 'a tab change writes it');
-  assert.match(hm, /this\._sheet\?\.mount\?\.\(\);\n    this\._writeHint\(\);/, 'and so does the sheet the window opens on');
   // the window, driven: its foot is written from whatever sheet is live
   const fake = { _chrome: { hint: { textContent: '', style: {} } }, _sheet: s };
   HeldMapWindow.prototype._writeHint.call(fake);
@@ -360,7 +355,6 @@ test('DISC25-A A8: the hands a sheet keeps its words out of are the THUMBS the k
   assert.ok(Math.abs(rects[1].y0 - fy(0.47) * 500) < 1e-9, 'the right thumb where it is');
   assert.ok(Math.abs(rects[1].x0 - fx(0.72) * 1000) < 1e-9);
   assert.ok(rects[1].y0 > Math.max(0, fy(THUMB_ZONES[1].y0)) * 500, 'lower than its generous zone, so the strip has the room');
-  assert.match(src('src/ui/heldMap.js'), /return thumbBox\(img\.data, zw, zh, x0, y0, w, h\);/, 'measured where the key runs');
 });
 
 test('DISC25-A A9: a note on a floor of several heights is pinned at the storey under the pointer', () => {

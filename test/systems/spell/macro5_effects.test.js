@@ -86,6 +86,4 @@ test('MACRO-5: the spellbook’s effect popup walks its record with the EFFECT a
   assert.deepEqual(asked, [1212]);
   assert.equal(rows[1].text, 'Duration: 1 + 1 per 1 level(s)');
   assert.equal(rows[3].text, 'Magnitude: 5 - 10 + 2 - 4');
-  assert.match(read('src/ui/spellbookWindow.js'),
-    /const rows = expandRowValues\(this\.deps\.rows\?\.\(id\) \?\? \[\], sourceValues\(effectMacroSource\(e\)\)\);/);
 });

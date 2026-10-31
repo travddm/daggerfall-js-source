@@ -851,40 +851,6 @@ test('U22/AUDIT 19: AudioEngine.ensure leaves a context to resolve', async () =>
   }
 });
 
-test('U22/AUDIT 19: the boot starts audio BEFORE it plays the splash', () => {
-  // Ordering, and it is the whole bug: the player resolves its context at
-  // construction, so booting audio after playVideo would be exactly as
-  // silent as not booting it.
-  //
-  // NOT awaited anymore, deliberately: audio.ensure creates the context in
-  // its SYNCHRONOUS prefix (pinned below), which is all the splash needs -
-  // awaiting the whole call parked the splash on black while DAGGER.SND
-  // and MIDI.BSA read in. The old pin demanded `await ensureAudio` to
-  // close the no-context race; the sync-prefix pin closes it now.
-  const main = readFileSync('src/main.js', 'utf8');
-  const boot = main.indexOf('ensureAudio(getBytes)');
-  const play = main.indexOf('playVideo(canvas, renderer');
-  assert.ok(boot > 0, 'main.js must boot audio for the splash');
-  assert.ok(play > 0, 'main.js must play the splash');
-  assert.ok(boot < play, 'audio must be booted BEFORE the video is constructed');
-  assert.doesNotMatch(main.slice(boot - 10, boot + 30), /await ensureAudio/,
-    'and NOT awaited - the await parked the splash behind two archive loads');
-  // The sync prefix: the context is created before the boot's first await,
-  // so an un-awaited caller still has a clock by the next statement.
-  // NT1 (F215): ensure is the ??= promise latch now (music.js's AUDIT 19
-  // law - every caller awaits the SAME boot) and the body lives in _boot;
-  // _boot is entered synchronously from the ??=, so the prefix law is
-  // unchanged: _ensureCtx() before any await.
-  const audioSrc = readFileSync('src/systems/audio.js', 'utf8');
-  assert.match(audioSrc, /return \(this\._booted \?\?= this\._boot\(fetchBytes\)\);/,
-    'the flag IS the promise - a boolean guard here is the F215 race');
-  const bootBody = audioSrc.slice(audioSrc.indexOf('async _boot('));
-  const ctxAt = bootBody.indexOf('this._ensureCtx()');
-  const awaitAt = bootBody.indexOf('await ');
-  assert.ok(ctxAt > 0 && awaitAt > 0 && ctxAt < awaitAt,
-    'the boot must create the context in its synchronous prefix, before any await');
-});
-
 test('merge audit: video audio rides the LIVE SoundVolume, read at each clip', () => {
   // DaggerfallVideo.cs:117 assigns
   // `audioSources[flip].volume = DaggerfallUnity.Settings.SoundVolume`

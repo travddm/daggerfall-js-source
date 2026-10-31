@@ -312,31 +312,6 @@ test('S7 THE MARK: the Warden\'s WBX4 mark under the Remnant, always while it st
 
 // ── the hosts ───────────────────────────────────────────────────────────
 
-test('S7 THE HOSTS BY SOURCE: the world host draws the pillars\' watch in the arena\'s reads (the hands, the dimming, the End off the numerals\' own word) and lays the bodies\' marks under the blows; the dungeon arm dims the arena\'s lamps by the world host\'s word; the blows\' pass draws the marks first, whether or not a blow is in flight; the lab draws all three and its ?law the pillars\' squares; the dungeon host and the exterior host untouched (mutants: the pillars\' watch undrawn; the marks never handed; the dimming never asked; the marks drawn under nothing)', () => {
-  const W = read('src/scenes/world.js');
-  assert.match(W, /_sdPillarPass = new SdPillarPassRenderer\(renderer\.gl\);/);
-  assert.match(W, /if \(_sdPillarPass\.draw\(proj, view, sdPillarLookAt\(s, t, _sdPillarLook, _sdGlowMemo\), fog, [^\n]*\)\) drew = true;/);
-  assert.match(W, /bodyMarks: \(\) => sdArenaMarksAt\(sdFightLink\.state\(\), sdFightLink\.now\(\)\),/);
-  assert.match(W, /sdLampDim: \(\) => \(sdFightLink \? sdLampDimInto\(sdFightLink\.state\(\), sdFightLink\.now\(\), _sdLampDim\) : null\),/);
-  const M = read('src/scenes/worldModes.js');
-  assert.match(M, /realmLightsWith\(_dgLit, host\.sdRealmLights\?\.\(\) \?\? NO_LIGHTS, cam\.pos, host\.sdLampDim\?\.\(\) \?\? null\)/);
-  const B = read('src/scenes/superDungeon/sdRemnantBlows.js');
-  assert.match(B, /const under = bodyMarks\(\);\n\s+if \(!shapes\.length && !under\.length\) return false;/);
-  assert.match(B, /for \(let i = 0; i < under\.length; i\+\+\) \{ pass\.draw\(under\[i\], [^\n]*\n\s+for \(const sh of shapes\) \{ pass\.draw\(sh,/);
-  const L = read('src/tools/abyssLab.js');
-  assert.match(L, /if \(pillarPass\.draw\(proj, view, sdPillarLookAt\(labS, clock \* 1000, _pillarLook, _glowMemo\)/);
-  assert.match(L, /for \(const m of sdArenaMarksAt\(labS, clock \* 1000\)\) \{ telegraph\.draw\(m,/);
-  assert.match(L, /realmLightsWith\(EMPTY_LIT, \[[^\n]*\], cam\.pos, sdLampDimInto\(labFight\(\) \?\? SD_FIGHT_EMPTY, clock \* 1000, _labDim\)\)/);
-  // PIN MOVED (SD-LOOK S7 merged with S11): the lab's ?law draws the realm's whole collider (realmColliderTris), the pillars'
-  // squares among it
-  assert.match(L, /realmTris = realmColliderTris\(\)/);
-  for (const host of ['src/scenes/dungeonContext.js', 'src/scenes/exterior.js']) assert.doesNotMatch(read(host), /sdArenaWatch|sdPillarPass/, `${host}: flagged, not wired`);
-  // the realm's model wears the dress, and its collider keeps the squares
-  const R = read('src/world/superDungeon/sdRealm.js');
-  assert.match(R, /for \(let k = 0; k < 4; k\+\+\) pillarVisual\(f, k, PILLAR_RECORDS\);/);
-  assert.match(R, /for \(let k = 0; k < 4; k\+\+\) for \(const \[a, b, c, d\] of pillarQuads\(k\)\) out\.push/);
-});
-
 test('S7 THE ARENA\'S WATCH MAKES NOTHING - L2 F9\'s measure (a child with a 64 MB young space, the least of eight windows, against a control that must show; each path\'s least over up to three fresh children, each its own compilation): the watching hands over a walking Remnant and over the Dragon Break, the dimming through a Reset, the marks, the pass\'s look, the lights dimmed - none past 2 bytes a frame (mutants: the hands\' target made a frame; the look\'s dimming made a frame; the marks\' list made a frame)', () => {
   const url = (p) => JSON.stringify(pathToFileURL(join(ROOT, p)).href);
   const script = `

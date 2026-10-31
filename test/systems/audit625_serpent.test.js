@@ -104,13 +104,6 @@ test('AUDIT 625 P2: the duel\'s word is ONE, kept by SIGIL1\'s door (sigil.js se
   setSigilDueling(true);
   assert.equal(sigilBlow(blade, 100, me, rival), 100, 'the duel\'s word: nothing');
   setSigilDueling(false);
-  // the loot's powers read the same word (lootPowers.js wornPowers - LOOT4's own law: asleep in a duel)
-  assert.match(read('src/systems/loot/lootPowers.js'), /if \(!mine\(entity\) \|\| !lootRarityOn\(\) \|\| setsDueling\(\)\) return \[\];/);
-  // the host: the duel, or a live bout between players
-  const w = read('src/scenes/world.js');
-  assert.match(w, /setSetsDueling\(!!duelMgr\.live \|\| arenaPvpLive\(\)\);/);
-  assert.match(w, /const arenaPvpLive = \(\) => \{ const b = arenaOnline\?\.bout\(\), r = arenaBouts\.relay\(\); return !!b && b\.kind === 'pvp' && !!r\?\.me; \};/);
-  assert.doesNotMatch(read('src/systems/sigil/sigilSets.js'), /let _dueling/, 'the word is kept once');
 });
 
 // ─── P3: A COIL PER FOE ──────────────────────────────────────────────

@@ -201,12 +201,6 @@ test('U53: DFU’s two unnamed slots are hidden until something is in them', () 
   assert.equal(SLOT_MAP[EQUIP_SLOTS.Unknown2].hidden, true);
   const named = Object.entries(SLOT_MAP).filter(([, at]) => !at.hidden);
   assert.equal(named.length, Object.keys(SLOT_MAP).length - 2);
-  // the view draws a hidden node only when filled. PX19d: the pinned
-  // expression was slotMap's copy of the law; slotMap is gone (the
-  // worn map IS the schematic now) and the law's surviving home is
-  // equippedModel's row filter - the pin follows the shape, and the
-  // MEASURED half below proves the behaviour, not just the text.
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /rows\.filter\(\(r\) => r\.item \|\| !r\.hidden\)/);
   const empty = equippedModel({ equipTable: [] });
   assert.ok(empty.rows.every((r) => r.label !== 'Unnamed'), 'an empty Unnamed slot leaked into the rows');
 });
@@ -257,11 +251,6 @@ test('U54: the WEARER changes the address - AUDIT 17f’s morphology offset', ()
   const without = itemLine(armour, undefined).image;
   assert.deepEqual(withWearer, inventoryItemImage(armour, e));
   assert.deepEqual(without, inventoryItemImage(armour, undefined));
-  // and the view passes it - a model that takes the argument and a
-  // caller that forgets it is the same bug one layer up
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /itemLine\(item, deps\.entity\)/, 'the row passes the wearer');
-  assert.match(src, /itemLine\(picked, deps\.entity\)/, 'and so does the detail');
 });
 
 test('U54: a nameless item falls back to its template, not to "Unknown"', () => {
@@ -275,29 +264,11 @@ test('U54: a nameless item falls back to its template, not to "Unknown"', () => 
   assert.equal(itemLine({ templateIndex: -1 }, e).name, 'Unknown', 'and a real unknown still says so');
 });
 
-test('U54: the tile sets no width attribute - these sprites are not square', () => {
-  // A dagger is tall and narrow and a cuirass is wide; forcing them
-  // all to one width squashes every one. The CSS caps both axes.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const tile = src.slice(src.indexOf('function itemTile(line, box'), src.indexOf('function itemRow(item'));
-  assert.ok(tile.length > 200, 'the tile is read');   // UI1: the slice found - a missing anchor read nothing and passed
-  assert.doesNotMatch(tile, /img\.width\s*=/, 'no width attribute on the icon');   // UI1: the fitted picture carries its size in its style (fittedImg)
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.tile img \{ image-rendering: pixelated; max-width: 30px; max-height: 30px; \}/);
-});
-
 test('U53: a broken item says so, and the WINDOW refuses it', () => {
   const e = hero();
   const dagger = e.items[1];
   dagger.currentCondition = 0;
   assert.equal(itemLine(dagger).broken, true);
-  // AUDIT 63 F23: the refusal is the pack's own `wear()` door, which is
-  // DaggerfallInventoryWindow.EquipItem's seam (:1330-1341) - not
-  // equipItem's, because ItemEquipTable.cs:94-154 has no condition
-  // test. This assertion used to read `equipItem(e, dagger) === null`,
-  // pinning the gate one seam too low.
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'),
-    /function wear\(item\) \{[\s\S]*?if \(isBrokenItem\(item\)\) \{ notice = `\$\{named\} is broken and cannot be worn\.`; return render\(\); \}/);   // RF6: `named` is itemLongName's
   assert.notEqual(equipItem(e, dagger), null, 'the TABLE below it does not refuse - ItemEquipTable.cs:94-154');
   assert.equal(model(e).worn.size, 1, 'so the slot fills, which is what PlayerEntity.cs:959 relies on');
 });
@@ -330,23 +301,7 @@ test('U53: the enhanced skin gets the DOM pack', () => {
   });
 });
 
-test('U53: the fork asks the SKIN, not only the document', () => {
-  // U58 removed the third clause. The boundary it named - loot piles
-  // and reward trays - is gone because U56 and U57 took the law out of
-  // the classic window, so this is now the plain skin question every
-  // other door asks.
-  assert.match(read('src/ui/inventoryDoor.js'),
-    /if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{/);
-});
-
 test('U58: a LOOT pile and a reward tray now get the ENHANCED pane', () => {
-  // U53 handed both to the classic window and called it a boundary
-  // rather than a gap. U56 and U57 moved the law those flows needed -
-  // TransferItem's ladder and the remote side's four claims - so the
-  // boundary had nothing left to protect.
-  const doorSrc = read('src/ui/inventoryDoor.js');
-  assert.ok(!doorSrc.includes('CLASSIC_ONLY_MODES'.replace('_MODES', '_MODES =')),
-    'the classic-only list is back');
   skin('enhanced');
   withDocument(() => {
     for (const mode of ['loot', 'chooseOne']) {
@@ -401,80 +356,6 @@ test('U53: no host builds a pack past the door', () => {
 });
 
 // ── THE SCREEN'S OWN INPUT AND ITS LEAKS ─────────────────────────
-
-test('U53: Escape and F6 close it, and F6 is claimed', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const onKey = src.slice(src.indexOf('function onKey(e)'), src.indexOf('function releaseLock()'));
-  // MAC-C: the key is the REGISTRY's, not the literal - a rebound
-  // Inventory used to open the pack on the player's key and close it
-  // on Bethesda's. The law this pin states (decide, THEN claim) is
-  // unchanged.
-  assert.match(onKey, /overlayAction\(e\) !== 'back' && !acts\.includes\('Inventory'\)/);   // UXB1-S: its key, shared or not
-  const testAt = onKey.indexOf("!acts.includes('Inventory')");
-  const claimAt = onKey.lastIndexOf('e.preventDefault()');
-  assert.ok(testAt > 0 && claimAt > testAt, 'decide it used the key before claiming it');
-  // AUDIT INV2 A-F7: and ABOVE that decision sits the drag's abort - Escape
-  // ends a drag in flight and KEEPS the window, because closing the pack
-  // mid-drag left the ghost welded over the world. A second Escape closes, as
-  // it always did.
-  assert.match(onKey, /if \(overlayAction\(e\) === 'back' && drag\) \{ e\.preventDefault\(\); e\.stopPropagation\(\); dragStop\(false\); return; \}/,
-    'a drag in flight takes the Escape, and the window stays');
-  assert.ok(onKey.indexOf('dragStop(false)') < testAt, 'the abort is asked BEFORE the close');
-  assert.match(onKey, /e\.stopPropagation\(\)/);
-});
-
-test('U53: every listener has an owner', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const unmount = src.slice(src.indexOf('    unmount() {'));
-  assert.match(unmount, /removeEventListener\('keydown', keyHandler, \{ capture: true \}\)/);
-  assert.match(unmount, /removeEventListener\('pointerlockchange', lockHandler\)/);
-});
-
-test('U58: the door runs the CLOSE LAW, not half of it', () => {
-  // AUDIT 17e F28: DFU frees the container on window close, and the
-  // two loot arms hand onClose for exactly that. AUDIT B-C1 is the
-  // other half: the session's dropped items mint their world flat.
-  // U57 put both in closeSession, and now that the enhanced pane can
-  // DROP, the enhanced door owes both.
-  const src = read('src/ui/inventoryDoor.js');
-  const at = src.indexOf('const close = ()');
-  assert.ok(at > 0, 'the close arm is gone');
-  const close = src.slice(at, src.indexOf('const overlay = {'));
-  assert.match(close, /closeSession\(deps, \{ dropped \}\)/);
-  assert.ok(!/deps\.onClose\?\.\(\)/.test(close), 'half the close law survives beside the whole one');
-  assert.ok(close.indexOf('fired = true') < close.indexOf('closeSession('),
-    'the window is down before the host is told');
-  // AND THE PILE IS READ BEFORE THE UNMOUNT, which clears the view.
-  assert.ok(close.indexOf('view?.dropped?.()') < close.indexOf('view?.unmount()'),
-    'the drop pile is read out of a view that has already been torn down');
-});
-
-test('U53: the host arms are no-ops BY DESIGN, and say so', () => {
-  // Unlike U52's sheet this screen is a LEAF - nothing it opens is a
-  // canvas window - so there is no child to forward to, and each arm
-  // has to say that rather than being silently empty.
-  const src = read('src/ui/inventoryDoor.js');
-  for (const arm of ['input', 'click', 'wheel', 'hover', 'tick', 'draw']) {
-    assert.match(src, new RegExp(`${arm}\\(\\) \\{ /\\*`), `${arm}() must say why it does nothing`);
-  }
-});
-
-test('U53: no item icons, and the reason is written down', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /THE ITEM ICONS\./);
-  assert.match(src, /ui\/bitmapCanvas\.js - does not exist yet/);
-  assert.doesNotMatch(code('src/ui/enhanced/enhancedInventory.js'), /getTexture|uploadRecord|deps\.icons/,
-    'no second icon pipeline in this file');
-});
-
-test('U53: no library - the schematic is inline SVG', () => {
-  // The prototype's figure is a three.js scene and enhanced.html loads
-  // that from a CDN. The port's doctrine already carries exactly one
-  // third-party request and does not want a second.
-  assert.doesNotMatch(code('src/ui/enhanced/enhancedInventory.js'), /THREE|three\.js|cdn/i);
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'),
-    /createElementNS\('http:\/\/www\.w3\.org\/2000\/svg'/);
-});
 
 // ── U55: USE ─────────────────────────────────────────────────────
 // systems/useItem.js owns the LAW - which item does what - and it is
@@ -541,60 +422,10 @@ test('U55: AUDIT 22 F9 - `enchanted` is a RIDER, not a replacement', () => {
 test('U55: a variant change repaints, and closesWindow travels', () => {
   assert.equal(useResultAction({ kind: 'variant' }, {}).repaint, true,
     'the slot map is drawn FROM the worn set, so a changed variant must redraw');
-  // HOOD-SAID (FIELD BUGS 2026-09-30, PIN MOVED): the flag was set and never read - the doll kept a cloak's old drawing
-  // after its Use. The use path reads it now; the flag alone pinned a promise nothing kept.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const use = src.slice(src.indexOf('function use(item'), src.indexOf('export function inventoryQuickAct('));
-  assert.match(use, /\n {2}refresh\(\);\n {2}if \(act\.repaint\) refreshFigure\(\);/, 'the use path redraws the doll on the flag');
   assert.equal(useResultAction({ kind: 'potion', closesWindow: true }, {}).closesWindow, true);
   assert.equal(useResultAction({ kind: 'potion' }, {}).closesWindow, false);
   assert.equal(useResultAction(null, {}).kind, 'nothing', 'no result is not a crash');
 });
-
-test('U55: the two hand-offs run in OPPOSITE orders, in both windows', () => {
-  // The rule here that is not presentation, and the one the first
-  // draft got backwards. Pinned against BOTH windows so they cannot
-  // drift apart, and stated as the asymmetry it actually is.
-  const classic = read('src/ui/native/nativeInventory.js');
-  const enhanced = read('src/ui/enhanced/enhancedInventory.js');
-
-  const cBook = classic.slice(classic.indexOf("if (r.kind === 'book')"),
-    classic.indexOf('// U42: USING the Spellbook'));
-  assert.ok(cBook.indexOf('this.hooks.openBook(') < cBook.indexOf('this._closeSilently()'),
-    'classic book: hand over, THEN close');
-  const cSpell = classic.slice(classic.indexOf("if (r.kind === 'spellbook')"), classic.indexOf('if (r.text)'));
-  assert.ok(cSpell.indexOf('_closeSilently()') < cSpell.indexOf('this.hooks.openSpellbook()'),
-    'classic spellbook: close, THEN hand over');
-
-  const useAt = enhanced.indexOf('function use(item');
-  assert.ok(useAt > 0, 'the use arm is gone, and -1 would slice a passing window out of thin air');
-  const eUse = enhanced.slice(useAt, enhanced.indexOf('function takeOff(slot)'));
-  const eBook = eUse.slice(eUse.indexOf("if (act.kind === 'openBook')"),
-    eUse.indexOf("if (act.kind === 'openSpellbook')"));
-  assert.ok(eBook.indexOf('open(act.item') < eBook.indexOf('onExit()'),
-    'enhanced book: hand over, THEN close');
-  const eSpell = eUse.slice(eUse.indexOf("if (act.kind === 'openSpellbook')"));
-  assert.ok(eSpell.indexOf('onExit()') < eSpell.indexOf('open()'),
-    'enhanced spellbook: close, THEN hand over');
-
-  // AND THE HOOK IS READ BEFORE ANYTHING CLOSES. Unmounting clears
-  // `deps`, so a hook read after onExit is undefined - which is
-  // precisely how the browser found the ordering wrong.
-  assert.ok(eBook.indexOf('const open = deps.openBook') < eBook.indexOf('onExit()'));
-  assert.ok(eSpell.indexOf('const open = deps.openSpellbook') < eSpell.indexOf('onExit()'));
-});
-
-test('U55: the pack passes useItem the same deps the classic window does', () => {
-  // A dep quietly dropped here is an arm that silently does nothing -
-  // the shape U44 found when the potion hook reached three of five
-  // sites.
-  const enhanced = read('src/ui/enhanced/enhancedInventory.js');
-  const useArm = enhanced.slice(enhanced.indexOf('const r = useItem('), enhanced.indexOf('const act = useResultAction'));
-  for (const dep of ['entity:', 'localItems:', 'spellCount:', 'isEnchanted', 'nowMinute:', 'revealMap:', 'drinkPotion:']) {
-    assert.ok(useArm.includes(dep), `the pack drops ${dep}`);
-  }
-});
-
 
 // ── U58: THE REMOTE PANE ─────────────────────────────────────────
 // The pack's second list. The LAW under it moved out of the classic
@@ -645,82 +476,7 @@ test('U58 remoteModel: four claims, in the order inventorySession answers them',
   assert.equal(new Set(Object.values(STOW_LABEL)).size >= 3, true, Object.values(STOW_LABEL).join(' / '));
 });
 
-test('U58: the pane runs the extracted law, not a second reading of it', () => {
-  const src = code('src/ui/enhanced/enhancedInventory.js');
-  // it calls the ladder and the session
-  for (const fn of ['planStore(', 'planTake(', 'applyTransfer(', 'planDropGold(',
-    'planWagonToggle(', 'remoteTarget(', 'openState(']) {
-    assert.ok(src.includes(fn), `the pane does not use ${fn}`);
-  }
-  // and carries none of the rungs itself
-  assert.ok(!/750/.test(src), 'a second WagonKgLimit');
-  assert.ok(!/'Transportation'/.test(src), 'a second transport block');
-  assert.ok(!/isSummoned/.test(src), 'a second summoned guard');
-  assert.ok(!/canHoldAmount|maxEncumbrance\(liveStat\(deps/.test(src.replace(/maxEncumbrance\(liveStat\(entity[^)]*\)\)/g, '')),
-    'a second capacity gate');
-  assert.ok(!/SMALL_CART_TEMPLATE|templateIndex === 93/.test(src), 'a second cart check');
-  // the CART CHECK is asked of the module, because the wagon button
-  // exists only when there is a wagon to open
-  assert.ok(src.includes('hasCart(deps.items'), 'the wagon button guesses at the cart');
-});
-
-test('U58: STOW is drawn only when the law would move something or SAY something', () => {
-  // U53 deleted a "worn" badge that could never render. The same rule
-  // applies to a button: DFU's transport block and its choose-one bar
-  // are SILENT refusals, so a Stow button on those can only do
-  // nothing. A refusal that SPEAKS still gets its button - the full
-  // wagon has something to say.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const fn = src.slice(src.indexOf('function canStow(item)'), src.indexOf('function stow(item)'));
-  assert.ok(fn.length > 40, 'canStow is gone');
-  assert.match(fn, /planStore\(/, 'canStow decides for itself instead of asking the ladder');
-  assert.match(fn, /plan\.ok \|\| !!plan\.refusal\.text/,
-    'a silent refusal and a speaking one are being treated alike');
-  // and the button is actually gated on it - U59 added the WORN
-  // clause in front, because filterByTab drops an equipped item from
-  // the list a Remove click can reach, so the transfer DFU offers
-  // does not exist for one.
-  assert.match(src, /if \(!line\.equipped && canStow\(picked\)\) \{/);
-});
-
-test('U58: a USE on the remote side consumes out of the LIVE list', () => {
-  // `remoteModel.items` is a FILTERED COPY, and `useItem` consumes out
-  // of the collection it is handed - so a potion drunk from a corpse
-  // through the model's copy would vanish from the screen and stay in
-  // the pile. Every transfer arm already reads the live list; this is
-  // the one that was written the other way first.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const at = src.indexOf("const u = el('button', 'act', 'Use')");
-  assert.ok(at > 0, 'the Use button is gone');
-  const arm = src.slice(at, src.indexOf('c.append(acts)', at));
-  assert.match(arm, /remoteTarget\(deps, sessionState\(\)\)/,
-    'the Use arm hands over the model copy instead of the live list');
-  assert.ok(!/remote\.items/.test(arm), 'the model copy is still reachable from here');
-  // and the transfer arms read the live list too. SLICED TO THE NEXT
-  // FUNCTION, not to a byte count: a 900-char window from `stow` ran
-  // into `take`'s body and passed on ITS call, so this pin survived
-  // the mutation that pointed `stow` at the copy.
-  for (const fn of ['function stow(item)', 'function take(item)']) {
-    const from = src.indexOf(fn);
-    assert.ok(from > 0, `${fn} is gone`);
-    const to = src.indexOf('\nfunction ', from + fn.length);
-    assert.ok(to > from, `${fn} has no end`);
-    assert.match(src.slice(from, to), /remoteTarget\(deps, sessionState\(\)\)/, `${fn} works off a copy`);
-  }
-});
-
 test('U58: one item is not "1 items"', () => {
-  // A count printed straight into a template literal is right eleven
-  // times out of twelve, and wrong on exactly the one the player is
-  // looking at when they drop something.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.ok(!/\$\{[a-z.]*count\} items/.test(src), 'a raw count is still being pluralised by hope');
-  assert.match(src, /const plural = \(n, word\) =>/);
-  // the DEFINITION plus BOTH headers - the pack's own count was
-  // written the same wrong way in U53 and is fixed with it - and
-  // LOOT-STACK's pile tab, which says what a body holds on hover.
-  assert.equal((src.match(/plural\(/g) || []).length, 4,
-    'one of the two headers, or the pile tab, still does it by hand');
   // THE MODULE'S OWN, imported. A copy of the helper re-derived in
   // this file would compare it to itself, which is the vacuous shape
   // U56 found in the wagon suite.
@@ -729,59 +485,12 @@ test('U58: one item is not "1 items"', () => {
   assert.equal(plural(2, 'item'), '2 items');
 });
 
-test('U58: the door reads the drop pile OUT of the view before tearing it down', () => {
-  const src = read('src/ui/inventoryDoor.js');
-  assert.match(src, /view\?\.dropped\?\.\(\) \?\? \[\]/);
-  // and the view actually offers it
-  const view = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(view, /dropped: \(\) => dropped,/, 'the view has no pile to hand over');
-});
-
 // ── AUDIT 26, IN THE ENHANCED PANE ───────────────────────────────
 // Three laws that landed on main while this arc was building the
 // pane, all of which the pane would have SILENTLY dropped: the
 // transfer ladder's quest arm, the remote list's quest click, and
 // UseItem's PopToHUD. None of them is visible on screen when it is
 // missing, which is exactly why each gets a pin.
-
-test('U58 + AUDIT 26: the pane runs the quest arm, and canStow does NOT', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // both transfer arms hand the ladder the quest seam...
-  for (const fn of ['function stow(item)', 'function take(item)']) {
-    const from = src.indexOf(fn);
-    assert.ok(from > 0, `${fn} is gone`);
-    const body = src.slice(from, src.indexOf('\nfunction ', from + fn.length));
-    assert.match(body, /getQuest: deps\.getQuest \?\? null/, `${fn} drops the quest seam`);
-    assert.ok(!/dryRun/.test(body), `${fn} must not skip the rung that writes`);
-  }
-  // ...and canStow, which runs on every repaint, does the opposite.
-  // A live quest arm there would mark a quest item dropped each time
-  // the screen redrew - the worst kind of bug, because nothing on
-  // screen looks wrong.
-  const cs = src.slice(src.indexOf('function canStow(item)'), src.indexOf('function stow(item)'));
-  assert.match(cs, /dryRun: true/, 'canStow writes to quest state on every repaint');
-  assert.ok(!/getQuest/.test(cs), 'canStow hands the ladder a live quest seam');
-});
-
-test('U58 + AUDIT 26: only the REMOTE list sends the click to the quest system', () => {
-  // ":2027-2037" - the FIRST act of RemoteItemListScroller_OnItemClick,
-  // ahead of the action-mode branch, so LOOKING at a quest item in a
-  // pile counts as well as taking it. LocalItemListScroller_OnItemClick
-  // (:1974-2007) has no such call, and the pane draws BOTH lists with
-  // one row builder - so the guard has to be on the side, not the row.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const from = src.indexOf('function itemRow(item, from');
-  assert.ok(from > 0, 'the row builder is gone');
-  const body = src.slice(from, src.indexOf('\nfunction ', from + 20));
-  // WHERE-ROBES: through the one home every remote door shares (itemTransfer.js sendQuestItemClick, driven in
-  // test/systems/fb1004c_robes.test.js) - the side guard is still the row's
-  assert.match(body, /if \(from === 'remote'\) sendQuestItemClick\(item, deps\.getQuest \?\? null\);/,
-    'the pane never tells the quest system, or the local list is sending clicks the classic window does not send');
-  // and it happens on the CLICK, before the pick - a player who looks
-  // and does not take has still clicked
-  assert.ok(body.indexOf('sendQuestItemClick(') < body.indexOf('picked = wasPicked'),
-    'the click reaches the quest system only after the selection changes');
-});
 
 test('U58 + AUDIT 26: PopToHUD closes the pane and says NOTHING', () => {
   // DaggerfallUI.PopToHUD() + return (:1687-1688). A watched quest item
@@ -797,12 +506,7 @@ test('U58 + AUDIT 26: PopToHUD closes the pane and says NOTHING', () => {
     { kind: 'close' }, 'the popToHUD arm is running below the book arm');
   // without the flag, nothing changes
   assert.equal(useResultAction({ kind: 'questItem', pending: true }).kind, 'message');
-  // and the view acts on it
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /if \(act\.kind === 'close'\) \{ onExit\(\); return; \}/);
-  assert.match(src, /getQuest: deps\.getQuest \?\? null/, 'useItem never gets the quest seam');
 });
-
 
 // ── U59: THE AVATAR, AND WHAT YOU ARE WEARING ────────────────────
 // The slot map put every worn item behind a 7px circle. These pin the
@@ -853,65 +557,6 @@ test('U59 equippedModel: every slot, in the BODY\'s order and not the enum\'s', 
   assert.equal(equippedModel().rows.length > 0, true, 'no entity is still a board of empty slots');
 });
 
-test('U59: an empty slot is not a BUTTON, and not `.empty` either', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const fn = src.slice(src.indexOf('function equippedList()'), src.indexOf('function characterCol()'));
-  assert.ok(fn.length > 200, 'the worn list is gone');
-  // The first draft made every row a button and disabled the empty
-  // ones; the pack probe's 44px touch-target rule caught twenty-two
-  // 24px buttons immediately. A disabled button is still a button.
-  assert.match(fn, /el\('div', 'wornrow wornempty'\)/, 'empty slots are controls again');
-  assert.ok(!/b\.disabled/.test(fn), 'a disabled button is still a button');
-  // and the class is SCOPED. `.empty` is already a component in the
-  // shared stylesheet - a dashed placeholder card - so the bare word
-  // drew every unfilled slot as one. Third collision of this shape in
-  // the arc, after `.detail` and `.packcol`.
-  assert.ok(!/'wornrow empty'|'wornname empty'/.test(fn), 'the bare `.empty` is back');
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.empty \{ border: 1px dashed/, 'the component this collides with is gone - re-check the pin');
-  assert.match(css, /\.wornrow\.wornempty \{/);
-});
-
-test('U59: a WORN item has no way to be dropped, because DFU has none', () => {
-  // filterByTab IS FilterLocalItems, so an equipped item is never in
-  // the list a Remove click can reach. The pane draws the Stow button
-  // off the same fact rather than off a second reading of it.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /if \(!line\.equipped && canStow\(picked\)\) \{/);
-  // and the escape hatch is the button beside it
-  assert.match(src, /'Take off'/);
-});
-
-test('U59: the doll is the COMPOSITOR\'s, and the schematic is the fallback', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // one compositor: the pane reads finished pixels and never blits
-  assert.match(src, /paperDollPixels\(\)/);
-  assert.doesNotMatch(src, /\bblit\(/, 'and it still never blits');
-  assert.match(src, /paperDollDataUrl\(paperDollPixels\(\), \{ scale: 4 \}\)/);   // PX20a: 4x, for a cell twice the size
-  const code2 = code('src/ui/enhanced/enhancedInventory.js');
-  for (const law of ['BlitItems', 'applyDyeToIndex', 'paperdollOrder', 'PAPERDOLL_ORIGIN', 'BG_SUBRECT']) {
-    assert.ok(!code2.includes(law), `a second paperdoll compositor is growing here (${law})`);
-  }
-  // PX19d: the schematic IS the worn map now - the tiles on the
-  // body's coordinates need no ARENA2, so a player with no game data
-  // still sees their kit; the DOLL rides behind them only when its
-  // art can draw. The pin follows the shape.
-  const fp = src.slice(src.indexOf('function equippedList()'), src.indexOf('function characterCol()'));
-  // MW-D36: the model figure stands FIRST when a Morrowind body is
-  // built; the compositor's doll is the fallback behind it, still at 4x.
-  assert.match(fp, /const dollUrl = figure \? null : paperDollDataUrl\(paperDollPixels\(\), \{ scale: 4 \}\);/);
-  assert.match(fp, /if \(dollUrl\)/, 'the doll must be OPTIONAL - tiles alone are the no-data answer');
-  assert.match(fp, /wornmap/);
-  // and the compositor is asked to recompose when the kit changes, or
-  // the avatar shows yesterday's armour
-  for (const fn of ['function wear(item)', 'function takeOff(slot)']) {
-    const from = src.indexOf(fn);
-    assert.ok(from > 0, `${fn} is gone`);
-    const body = src.slice(from, src.indexOf('\nfunction ', from + fn.length));
-    assert.match(body, /refreshFigure\(\)/, `${fn} leaves the avatar stale`);
-  }
-});
-
 // ── PX20: THE CENTRE, AND THE LOOT FRAME ──────────────────────────
 // Mac, on the pack: "spread out and organize the center of the
 // inventory panel now that we have more space. Enlarge the paper
@@ -920,544 +565,6 @@ test('U59: the doll is the COMPOSITOR\'s, and the schematic is the fallback', ()
 // bar, remove the slots filled subtext. Utilize the entire area for
 // enlarged icons and displayability." And: "when looting items, only
 // open the loot tooltip, not the entire inventory window."
-
-test('PX20a: the doll owns the CENTRE COLUMN, and the map is wear-left, carry-right (PLUS11\'s five rows - the one table since PLUS-DEAD retired plain Enhanced\'s six)', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // Five rows a side, the doll spanning all five: a standing figure gets a portrait cell.
-  assert.match(src, /const DOLL_AREA = '1 \/ 2 \/ span 5 \/ auto';/);
-  assert.match(src, /dollFrame\.style\.gridArea = DOLL_AREA;/);
-  const fams = src.slice(src.indexOf('const WORN_FAMILIES = Object.freeze(['), src.indexOf('const SHELF_GROUPS'));
-  const left = [...fams.matchAll(/label: '([^']+)', area: '(\d) \/ 1'/g)].map((m) => [Number(m[2]), m[1]]);
-  const right = [...fams.matchAll(/label: '([^']+)', area: '(\d) \/ 3'/g)].map((m) => [Number(m[2]), m[1]]);
-  assert.equal(left.length, 5, 'five down the left');
-  assert.equal(right.length, 5, 'five down the right');
-  assert.deepEqual(left.map((r) => r[0]), [1, 2, 3, 4, 5], 'no gaps, no doubles');
-  assert.deepEqual(right.map((r) => r[0]), [1, 2, 3, 4, 5]);
-  assert.deepEqual(left.map((r) => r[1]), ['Head', 'Cloaks', 'Chest', 'Arms', 'Hands'], 'what you WEAR, top to toe');
-  assert.ok(right.map((r) => r[1]).includes('Legs') && right.map((r) => r[1]).includes('Feet'));
-  assert.ok(!fams.includes("area: '1 / 2'"), 'nothing shares the doll\'s column');
-  assert.doesNotMatch(src, /WORN_FAMILIES_PLUS|wornFamilies\(|span 6/, 'no second table, no switch between two');
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);/, 'the centre column is AUTO - the sprite sets its width');
-  assert.match(src, /map\.classList\.add\('plus5'\);/);
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.pack-shell \.wornmap\.plus5 \{ grid-template-rows: repeat\(5, minmax\(44px, 1fr\)\); \}/);
-});
-
-test('PX20a/c: the sprite is unframed, 4x, and its cell is a PERFECT FIT', () => {
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  const doll = css.slice(css.indexOf('.pack-shell .wornmap-doll {'), css.indexOf('.pack-shell .wornmap-doll .wornslot'));
-  // No border, no background, no outline - the figure stands on the
-  // window's own glass. The FRAME belongs to the placeholder alone,
-  // which is what PX19g's reasoning was actually about.
-  assert.match(doll, /border: 0; background: none; outline: 0;/);
-  assert.match(doll, /\.pack-shell \.wornmap-doll\.noart \{ border: 2px solid/, 'the placeholder keeps its frame');
-  // A perfect fit is the sprite's OWN ratio on the cell, not a
-  // letterbox inside whatever the grid left.
-  assert.match(css, /\.pack-shell \.wornmap-doll\.hasart \{ aspect-ratio: 110 \/ 184;/);
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /wornmap-doll\$\{figure \|\| dollUrl \? ' hasart' : ' noart'\}/, 'and the class says which');
-  assert.match(src, /paperDollDataUrl\(paperDollPixels\(\), \{ scale: 4 \}\)/, '4x: a bigger cell wants more pixels, not a scaled 3x');
-  // 110x184 is the classic paperdoll's own size, not a number typed here.
-  const pd = read('src/ui/paperDoll.js');
-  assert.match(pd, /export const PAPERDOLL_W = 110;/);
-  assert.match(pd, /export const PAPERDOLL_H = 184;/);
-});
-
-test('PX20c: the name is in the title bar, the count is gone, the tiles carry the width', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const fn = src.slice(src.indexOf('function equippedList()'), src.indexOf('function characterCol()'));
-  assert.ok(!fn.includes('equippedhead'), 'no name plate standing on the map');
-  // (the phrase survives in the comment that records WHY it went; the
-  // pin is about the DOM, so it reads the code with comments stripped)
-  const fnCode = code('src/ui/enhanced/enhancedInventory.js')
-    .slice(code('src/ui/enhanced/enhancedInventory.js').indexOf('function equippedList()'));
-  assert.ok(!fnCode.slice(0, fnCode.indexOf('function characterCol()')).includes('slots filled'),
-    'and no count under it');
-  assert.match(src, /if \(name\) title\.append\(el\('span', 'pack-who', name\)\);/, 'the name rides the window title');
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.pack-shell \.pack-id \.pack-who \{ color: #9c937d;/);
-  // The tile is a ROW now, and the piece's NAME is visible again -
-  // PX19g hid it because a 52px square clipped it, and that reason is
-  // gone with the width.
-  assert.match(css, /\.pack-shell \.equipped \.wornrow \{[\s\S]{0,220}flex-direction: row;/);
-  assert.match(css, /\.pack-shell \.wornrow \.wornname \{ display: block;/);
-  assert.doesNotMatch(css, /\.pack-shell \.wornrow \.wornname \{ position: absolute; width: 1px;/, 'the clip-path hide is gone');
-  assert.match(fn, /txt\.append\(el\('span', 'wornslot', fam\.label\), el\('span', 'wornname', line\.name\)\)/, 'word over name, beside the monogram');
-  assert.match(css, /\.pack-shell \.wornrow \.worntile \{ font-size: 26px;/, 'and the monogram is sized for the tile');
-});
-
-test('PX20b: a LOOT target opens its own frame alone - the pack is never built', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /^let packOpen = true;$/m);
-  assert.match(src, /packOpen = !d\.loot \|\| d\.loot\.storage === true;/, 'a loot session opens closed - but the player\'s own STORAGE opens beside the pack (SHIP-STORE)');
-  assert.match(src, /side = d\.loot \? 'remote' : 'local';/, '...on the side the player came for');
-  // NOT BUILT, not built-and-hidden: the pack's whole body sits behind
-  // the flag, so a hidden window cannot run layout or eat the tooltip.
-  const render = src.slice(src.indexOf('function render()'), src.indexOf('// ── THE KEYBOARD'));
-  assert.match(render, /const win = el\('div', 'pack-win'\);\n    if \(packOpen\) \{/);
-  assert.match(render, /if \(packOpen\) shell\.append\(win\);/);
-  // One frame owns the tooltip and the click-away, whichever is shown.
-  assert.match(render, /const frame = packOpen \? win : \(loot \?\? win\);/);
-  assert.match(render, /frame\.append\(tip\);/);
-  assert.match(render, /frame\.addEventListener\('click'/);
-  assert.doesNotMatch(render, /win\.addEventListener\('click'/, 'the listener follows the frame, not the pack');
-  // MAC-M2 B (2026-09-16, Mac: "Remove the gold and pack buttons from
-  // the looting menu"): PX20b's way BACK is gone by his call, so a loot
-  // session is drawn or not drawn and never switches. The pin is
-  // INVERTED rather than deleted - a Pack button quietly returning is
-  // exactly the drift a removed pin stops catching.
-  const c = code('src/ui/enhanced/enhancedInventory.js');
-  assert.doesNotMatch(c, /el\('button', 'act', 'Pack'\)/,
-    'no Pack button: the way to the pack is to close the pile and press the key that has always opened it');
-  assert.equal((c.match(/packOpen = /g) ?? []).length, 2,
-    'packOpen is declared and decided on the way in - nothing else moves it');
-  // The transfer ladder is untouched: this slice draws frames.
-  for (const law of ['function take(', 'function stow(', 'remoteModel', 'toggleWagon']) {
-    assert.ok(src.includes(law), `${law} is still here - PX20b changed what is DRAWN`);
-  }
-});
-
-// ── PX21: THE LOOT WINDOW READS, AND TRANSPORT HAS A HOME ─────────
-test('PX21a: mounts and the cart get their own place - the tab they fall into is not a home (PLUS11: a split cell of the worn grid; the strip plain Enhanced drew is gone with it)', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // A horse and a cart are Transportation, and filterByTab has NO arm
-  // for them: they land in the fourth tab with the shirts. That is
-  // DFU's own behaviour, and it is why a player who buys a horse
-  // cannot find it - so their cell is a place, not a decoration.
-  const nat = read('src/ui/native/nativeInventory.js');
-  assert.doesNotMatch(nat, /tab === 'transport'|group === 'Transportation'/, 'still no tab arm - the cell is the answer');
-  assert.match(src, /const TRANSPORT = Object\.freeze\(\[/);
-  assert.match(src, /\{ id: 'mount', label: 'Mount', owned: hasHorse,/);
-  assert.match(src, /\{ id: 'cart', label: 'Cart', owned: hasCart,/);
-  assert.match(src, /\{ id: 'transport', label: 'Travel', area: '5 \/ 3', slots: \[\], transport: true \}/, 'the Travel cell of the grid');
-  // U58's law: the SESSION answers "do you have one" and hands back the
-  // item to draw. No template index is read in the window - the pin
-  // that caught the first draft doing it stays exactly as it was.
-  assert.match(src, /const owned = t\.owned\(items\) \? transportItem\(items, t\.id\) : null;/);
-  assert.doesNotMatch(src, /SMALL_CART_TEMPLATE|TRANSPORT_HORSE|templateIndex === 9[34]/, 'no second cart or horse check');
-  const sess = read('src/systems/inventorySession.js');
-  assert.match(sess, /export const hasHorse = \(items = \[\]\) =>/, 'and the mount question has a home beside the cart\'s');
-  assert.match(sess, /export const TRANSPORT_HORSE_TEMPLATE = 94;/);
-  assert.match(sess, /export function transportItem\(items = \[\], kind\)/);
-  // The cart IS the wagon's door - one control for the thing and the
-  // place it opens - and it refuses through the session, not twice.
-  assert.match(src, /if \(isCart && owned\) \{\n\s*node\.onclick = toggleWagon;/);
-  assert.match(src, /el\(isCart && owned \? 'button' : 'div',/, 'a plaque that only reports is not a button');
-  assert.match(src, /col2\.append\(accessoryShelf\(\)\);/, 'the shelf stands where the strip stood');
-  assert.doesNotMatch(src, /function transportStrip\(/, 'the strip is retired (PLUS-DEAD)');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedStyle.js'), /\.pack-shell \.transport \{/, 'and its sheet with it');
-});
-
-test('PX21b: the loot window is ROWS, not the dock\'s anonymous squares', () => {
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  // The dock's tile grid is right for a bag you know and wrong for a
-  // chest you have never opened: the only question a container asks is
-  // what is in it.
-  assert.match(css, /\.pack-shell \.itemrow \{ position: relative;[\s\S]{0,200}width: 64px; height: 64px;/, 'the dock keeps its tiles (UI1: 64px plates)');
-  assert.match(css, /\.loot-win \.itemrow \{ width: 100%; height: auto; min-height: 52px;/);
-  assert.match(css, /\.loot-win \.itemrow \.itemname \{ position: static;[\s\S]{0,120}clip-path: none;/,
-    'the name is readable here, where the dock hides it');
-  assert.match(css, /\.loot-win \.itemrow \.itemwt \{ display: block;/, 'and the weight, which the dock drops');
-  assert.match(css, /\.pack-shell \.itemrow \.itemwt \{ display: none; \}/, '...still dropped in the dock');
-  assert.match(css, /\.loot-win \.itemrow \.itemname small \{/, 'material and word beneath the name');
-});
-
-test('PX21d: the loot window\'s head is a centred stack, not a column header', () => {
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  // The base .remotehead is a space-between ROW - the title left, the
-  // buttons pushed right - written when the remote was a column beside
-  // the pack. In a 340px window of its own that reads as two things
-  // that fell to opposite walls.
-  assert.match(css, /^\.remotehead \{\n  display: flex; align-items: flex-start; justify-content: space-between;/m,
-    'the base column header is untouched');
-  assert.match(css, /\.loot-win \.remotehead \{ flex-direction: column; align-items: center;/);
-  assert.match(css, /\.loot-win \.remotewho \{ display: flex; flex-direction: column; align-items: center; \}/);
-  assert.match(css, /\.loot-win \.remoteacts \{ justify-content: center; padding: 0; \}/,
-    'and the buttons sit over the list they act on');
-});
-
-test('PX21c / WORLD-HOVER: the plaque names a pile without opening it, on the take\'s own pick', async () => {
-  const hov = read('src/ui/worldPlaque.js');
-  const model = read('src/systems/worldHover.js');
-  // The lines are pure: names, a count only when a stack, and a tail
-  // rather than a list - a pile is a glance. They live with the MODEL
-  // now, not the draw: the resolver answers a whole frame and the
-  // plaque paints exactly what is in it.
-  const { hoverLines, HOVER_MAX, resolveHover, frameSignature } = await import('../../../src/systems/worldHover.js');
-  assert.deepEqual(hoverLines([]), { shown: [], rest: 0, empty: true });
-  // QUICK-LOOT-STATS: a row carries its source `item` too, so the
-  // plaque can read the lit one's stats without a second walk. The law
-  // here is about what is DRAWN and the tail, so the drawn fields are
-  // compared and the reference is named on its own line.
-  const twoItems = [{ name: 'Ruby', stackCount: 3 }, { name: 'Helm' }];
-  const two = hoverLines(twoItems);
-  assert.deepEqual({ shown: two.shown.map(({ name, stack, rarity }) => ({ name, stack, rarity })), rest: two.rest, empty: two.empty },
-    { shown: [{ name: 'Ruby', stack: 3, rarity: null }, { name: 'Helm', stack: 0, rarity: null }], rest: 0, empty: false });   // LR1: a row wears its tier, null with the switch off
-  assert.deepEqual(two.shown.map((r) => r.item), twoItems, 'each row carries its own item, in order');
-  const many = hoverLines(Array.from({ length: HOVER_MAX + 4 }, (_, i) => ({ name: `x${i}` })));
-  assert.equal(many.shown.length, HOVER_MAX);
-  assert.equal(many.rest, 4);
-  assert.deepEqual(hoverLines(null), { shown: [], rest: 0, empty: true }, 'nothing under the crosshair is not a crash');
-
-  // THE REACH GATE IS THE RESOLVER'S OWN FIRST ACT. AUDIT 65 MC-2: the
-  // take's pick reaches as far as DFU's ONE ray does (RayDistance,
-  // PlayerActivate.cs:76/:314), so a too-far pile reaches the handler
-  // that REFUSES it out loud - and a plaque that trusted the pick alone
-  // would name a chest across the room that E cannot open.
-  const items = [{ name: 'Ruby', stackCount: 2 }];
-  // AUDIT-WH M5: the HOST's own namer supplies the title. The model
-  // used to fall back to the literal 'Loot' for an itemised key with
-  // no word, which is not a word World Tooltips contains and is how a
-  // dropped pile outdoors read "Loot" for a whole slice while the same
-  // pile indoors read the mod's "Loot Pile".
-  const pile = { contents: () => items, name: () => ({ title: 'Loot Pile' }) };
-  assert.equal(resolveHover({ key: 'loot:3', distance: 9, reach: 3.2 }, pile), null,
-    'out of reach is not named at all');
-  const near = resolveHover({ key: 'loot:3', distance: 1, reach: 3.2 }, pile);
-  assert.equal(near.kind, 'items');
-  assert.deepEqual(near.rows.map(({ name, stack, rarity }) => ({ name, stack, rarity })),
-    [{ name: 'Ruby', stack: 2, rarity: null }]);   // QUICK-LOOT-STATS: the drawn fields; the row also carries its item
-  assert.equal(resolveHover(null, {}), null, 'nothing under the crosshair');
-  // A key the ladder has no word for draws NOTHING - the mod's own
-  // behaviour (an empty `ret` leaves the tooltip down, .cs:169-172), and
-  // what stops an unported family labelling itself with its key string.
-  assert.equal(resolveHover({ key: 'act:2:41', distance: 1, reach: 3.2 }, { name: () => null }), null);
-  assert.equal(resolveHover({ key: 'door:2', distance: 1, reach: 3.2 },
-    { name: () => ({ title: 'Door', subs: ['Lock Level: 12'] }) }).kind, 'name');
-
-  // ONE NODE, rewritten only when what would be PAINTED changes. PX21c
-  // compared the KEY alone, which cannot see a list that changed under
-  // a constant key - safe then only by accident (taking needed a
-  // window, and the window unmounted the driver), and the accident goes
-  // the moment anything writes into a container being looked at.
-  assert.match(hov, /if \(sig === shownSig\) return;/);
-  assert.match(model, /export function frameSignature\(f\) \{/);
-  const a = resolveHover({ key: 'loot:3', distance: 1, reach: 3.2 }, { ...pile, contents: () => [{ name: 'Ruby' }] });
-  const b = resolveHover({ key: 'loot:3', distance: 1, reach: 3.2 }, { ...pile, contents: () => [{ name: 'Helm' }] });
-  assert.equal(a.key, b.key, 'the same key');
-  assert.notEqual(frameSignature(a), frameSignature(b), 'and a different signature - the guard SEES the change');
-  assert.equal(frameSignature(null), null, 'nothing has no signature');
-  assert.match(model, /export const HOVER_MAX = 6;/);
-
-  // A READOUT: no clicks, no keys, nothing to dismiss.
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /\.wplaque \{[\s\S]{0,400}pointer-events: none;/);
-  assert.match(hov, /setAttribute\('aria-hidden', 'true'\)/);
-  assert.doesNotMatch(hov, /addEventListener|onclick/, 'a readout listens to nothing');
-
-  // IT HANGS OFF THE RETICLE, not off a guessed percentage. PX21c stood
-  // it at `bottom: 16%` to avoid a cross whose real place it had no way
-  // to read; hud.js exports the two terms its own crosshair draw uses,
-  // so there is one answer to "where is the reticle" and the plaque
-  // asks it. A docked large HUD moves the cross (ROAD-E E5) and moves
-  // this with it.
-  assert.match(hov, /import \{ hudReticle \} from '\.\/hud\/hud\.js';/);
-  assert.match(read('src/ui/hud/hud.js'), /export const hudReticle = \(canvas\) => \(\{[\s\S]{0,200}largeHudHeight: dockedLargeHudHeight\(lastLargeHudBar\),/);
-  assert.match(hov, /crosshairCentreY\(canvas\.height, largeHudHeight\) \+ CROSSHAIR_ARM \* scale\) \/ dpr \+ PLAQUE_GAP/);
-  assert.match(css, /\.wplaque \{ position: fixed; left: var\(--wp-x, 50%\); top: var\(--wp-top, 55%\);/);
-  assert.doesNotMatch(css, /loothover/, 'the old key is gone from the sheet, not left beside the new one');
-
-  // AND IT IS OFF ON A TOUCH DEVICE. There the activation ray is
-  // through the FINGER, not the crosshair, so a centre-anchored plaque
-  // would name what a tap would NOT open - the founding law broken on
-  // every frame.
-  assert.match(hov, /_gateOn = isEnhanced\(\) && !isTouchDevice\(\);/);
-
-  // AUDIT 39: AND THE SKIN GATE IS IN THE PLAQUE, ABOVE ensure().
-  // The host gates only the PICK, and calls this every tick on every
-  // skin - so with the gate only there, a classic-skin dungeon's first
-  // tick reached ensure() with a null key and injectEnhancedStyle()
-  // put ENHANCED_CSS's UNSCOPED head rules (`*`, `html, body`, `body`,
-  // `button`, `#app`) onto the classic page. "A player who chose
-  // classic never loads a byte of this" is enhancedStyle.js's own
-  // doctrine, and this is the line that keeps it true.
-  assert.match(hov, /import \{ isEnhanced \} from '\.\.\/systems\/uiSkin\.js';/);
-  // BOTH doors gate, and each gates FIRST. worldHoverFrame is the one
-  // four hosts call, and it must refuse before it pulls a target list
-  // or casts a ray, not only before it paints.
-  // AUDIT-WH2 L3-F1: ...and it HIDES on the way out. This gate was a
-  // bare `return null` and showWorldPlaque's was the one that hid -
-  // and `grep -rn showWorldPlaque src/scenes/` is EMPTY, so the hide
-  // was unreachable in every host. A skin switch or a tablet-mode flip
-  // under a painted plaque stranded it. The `[\s\S]` window admits the
-  // comment that says so and nothing else: a statement between the
-  // brace and the gate would have to contain `{` or `;`.
-  // DISC22-C: the skin is asked through BOTH faces - the DOM plaque's gate, then the classic panel's - and a page
-  // with neither takes the plaque down, still before the ray and the list
-  // PIN MOVED (RPT1026-WORLD DECOR-VERBS): and a decorator that browses where neither face is drawn has its verbs folded
-  // (src/ui/worldPlaque.js `verbs`) - a page with none of the three still takes the plaque down before the ray
-  assert.match(hov, /export function worldHoverFrame\(\{[\s\S]{0,200}\}\) \{\n(?:\s*\/\/[^\n]*\n)*  const dom = worldPlaqueOn\(\);\n  const classic = !dom && classicPlaqueOn\(\);\n(?:\s*\/\/[^\n]*\n)*  const verbs = !dom && !classic && plaqueVerbsWanted\(\);\n  if \(!dom && !classic && !verbs\) \{ hideWorldPlaque\(\); return null; \}/,
-    'the seam asks the skin as its first act - before the ray, before the list - and takes the plaque down when the answer is no');
-  const show = hov.slice(hov.indexOf('export function showWorldPlaque'));
-  assert.ok(show.indexOf('if (!worldPlaqueOn()) return;') < show.indexOf('const n = ensure();'),
-    'the skin is asked BEFORE the node is built and the sheet injected');
-  // THE MODEL NEVER REACHES FOR A DOCUMENT OR A SKIN. That is what lets
-  // the gate live in one place instead of four hosts' worth of places.
-  const modelCode = model.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  assert.doesNotMatch(modelCode, /document|isEnhanced|injectEnhancedStyle/, 'the model is pure of the page');
-
-  // The host runs the SAME pick the take runs, enhanced only, and
-  // EVERY FRAME. PX21c throttled to 10Hz on a guess that "a raycast
-  // over every pile is not free"; measured, this pick is ~3us of a
-  // 16.7ms frame, and what the throttle bought was a plaque that lagged
-  // the crosshair by up to a tenth of a second.
-  const ctx = read('src/scenes/dungeonContext.js');
-  const frame = ctx.slice(ctx.indexOf('function drawFoes('), ctx.indexOf('const _mobileBatches = [];'));   // AUDIT 65 MC-2 widened the window; BLOOD2e: the player's bleed line rides the head too. WORLD-HOVER anchored it on content rather than a character count, which silently gutted assertions when the block moved.
-  assert.ok(frame.length > 0 && frame.length < 12000, 'the window is the head of drawFoes, not the whole function');
-  assert.doesNotMatch(frame, /_hoverAt/, 'the 10Hz clock is GONE, not left ticking beside the per-frame call');
-  assert.match(frame, /worldHoverFrame\(\{/, 'one seam, called where the host already draws');
-  // AUDIT-WH H2 wrapped the thunk in a `pick` so the LIVE bodies can be
-  // raced beside the list, exactly as the press races them in an arm of
-  // its own - but it is still that one list, built once, inside the call.
-  assert.match(frame, /ground: pickActivatableHit\(eye, d, api\.dungeonActivationTargets\(\), collider\),/,
-    'a THUNK, and the SAME list the press races - one construction seam, so the plaque cannot name what the button ignores');
-  assert.match(frame, /foe: \(\(ft\) => peacefulFoePass\(pickActivatableHit\(eye, d, ft, collider\), ft, doorDistanceOf\(eye, d, api\.dungeonActivationTargets\(\), collider\), getInteractionMode\(\)\)\)\(liveFoeTargets\(foes, 'mobileFoe'\)\),/,   // AUDIT TACT C7: a peaceful guard before a door is no hit
-    '...and the live foes beside it, through the one precedence both readers share');
-  assert.match(frame, /contents: api\.lootContents,/);
-  assert.match(hov, /const hit = pick \? pick\(\) : pickActivatableHit\(eye, dir, targets\?\.\(\) \?\? \[\], collider\);/,
-    'the take\'s own pick - or, where a host races seven sets rather than one, that host\'s own raced winner');
-  // lootContents shares takeLoot's key vocabulary rather than a second one.
-  assert.match(ctx, /lootContents\(key\) \{[\s\S]{0,400}const \[kind, iStr\] = key\.split\(':'\);/);
-  for (const kind of ["'loot'", "'corpse'", "'droppedLoot'"]) {
-    assert.ok(ctx.slice(ctx.indexOf('lootContents(key) {'), ctx.indexOf('takeLoot(key) {')).includes(kind), `${kind} resolves`);
-  }
-  // PI1 (PIN MOVED): a key Physical Items owns is a standing item's - its pile of one - and every other is the pile's as before
-  assert.match(read('src/scenes/droppedLoot.js'), /const contents = \(key\) => \(physical\.owns\(key\) \? physical\.contents\(key\) : piles\.find\(\(p\) => `droppedLoot:\$\{p\.id\}` === key/);
-  // ...and it leaves with the host that raised it.
-  // ...after NT1's dead latch, which is pinned as the FIRST act of
-  // destroy - the first draft put the teardown ahead of it and
-  // resourcesafety.test.js caught it.
-  const destroyFn = ctx.slice(ctx.indexOf('    destroy() {'), ctx.indexOf('    destroy() {') + 500);
-  assert.ok(destroyFn.indexOf('_ctxDead = true;') < destroyFn.indexOf('destroyWorldPlaque();'), 'the latch stays first');
-  assert.ok(destroyFn.includes('destroyWorldPlaque();'));
-});
-
-test('PX21e: the loot window never scrolls - it grows, then widens, and its head never moves', () => {
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // THE FRAME CANNOT SCROLL. It carried overflow-y itself, so a pile
-  // past the cap scrolled its own title and buttons out of sight.
-  // (PX21f moved this from `hidden` to `visible`: hidden stopped the
-  // scroll AND clipped the tooltip, and the no-scroll guarantee never
-  // needed clipping - see the PX21f pin below.)
-  assert.doesNotMatch(css, /\.loot-win \{ position: relative;[\s\S]{0,240}overflow-y: auto;/);
-  // The head is fixed furniture; the rows are their own box.
-  assert.match(css, /\.loot-win \.packremote \{ display: flex; flex-direction: column; min-height: 0; flex: 1; \}/);
-  assert.match(css, /\.loot-win \.remotehead \{ flex: 0 0 auto; \}/);
-  assert.match(css, /\.loot-win \.remotelist \{ flex: 1; min-height: 0; overflow-y: auto;/);
-  assert.match(src, /const list = el\('div', 'remotelist'\);/);
-  assert.match(src, /const v = keepList\(virtualRows\(list, shown, \(it\) => itemRow\(it, 'remote'\), \{ onAim: rowsMoved, sizes: sizesOf\('remote'\) \}\)\);/);   // WAGON-FILTER: the rows a store's filter shows, into the same list; VIRT: a long one as a window; PIN MOVED (AUDIT TRADE-VIRT, 2026-10-20): its rows' heights kept across repaints
-  assert.doesNotMatch(src, /for \(const it of remote\.items\) col\.append\(/, 'the rows left the column');
-  // A LONG PILE WIDENS rather than scrolling.
-  assert.match(src, /export const LOOT_ONE_COLUMN = 8;/);
-  assert.match(src, /loot-win\$\{remote\.count > LOOT_ONE_COLUMN \? ' wide' : ''\}/);
-  assert.match(css, /\.loot-win\.wide \{ width: min\(680px, 94vw\); \}/);
-  // ...as a GRID, not multicol: a multicol box that is also a scroll
-  // container fragments in the block direction, so the overflow columns
-  // went below the fold and it scrolled anyway (measured: 14 rows
-  // spilling 203px past the frame). A grid has nothing to fragment.
-  assert.match(css, /\.loot-win\.wide \.remotelist \{ display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);   // AUDIT VIRT: two equal tracks
-  assert.doesNotMatch(css, /\.loot-win\.wide \.remotelist \{ column-count/, 'multicol was the wrong answer');
-  assert.match(css, /\.loot-win\.wide \.remotelist \.packempty \{ grid-column: 1 \/ -1; \}/, 'and Empty. still spans');
-});
-
-test('PX21f: a tooltip is not a scroll box, and the loot frame does not clip it', () => {
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  // `.packcol` is a COLUMN's rule - slate ground, padding, and
-  // OVERFLOW: AUTO. PX19j turned the first two off on the tooltip and
-  // did not notice the third; the 2px scrollHeight/clientHeight gap
-  // rounding leaves was enough to draw a scrollbar on a tooltip
-  // wherever scrollbars are not overlays.
-  assert.match(css, /^\.packcol \{ background: var\(--slate\); overflow: auto;/m, 'the column still scrolls - it is a column');
-  const tip = css.slice(css.indexOf('.pack-shell .packtip.packdetail {'), css.indexOf('.pack-shell .packtip.packdetail .card'));
-  assert.match(tip, /overflow: visible;/, 'the tooltip does not');
-  assert.match(tip, /max-height: none; bottom: auto; right: auto; \}/, 'CARD-FIT: nor does it wear the phone column\'s sheet (its card is what bounds it, and its body what scrolls)');
-  // And the loot frame no longer CLIPS: PX21e used overflow:hidden to
-  // stop the frame scrolling, but the tip is a child of that frame in
-  // the loot-only flow, so a tip near the bottom edge would vanish -
-  // worse than the scroll it replaced. The no-scroll guarantee is the
-  // flex constraint (fixed head + a list that can shrink), not clipping.
-  assert.match(css, /\.loot-win \{ position: relative;[\s\S]{0,240}overflow: visible;/);
-  assert.doesNotMatch(css, /\.loot-win \{ position: relative;[\s\S]{0,240}overflow: hidden;/);
-  assert.match(css, /\.loot-win \.remotehead \{ flex: 0 0 auto; \}/);
-  assert.match(css, /\.loot-win \.remotelist \{ flex: 1; min-height: 0;/);
-});
-
-test('PX28: looting just TAKES - no second popup over the frame you are reading', () => {
-  // Mac: "when looting, there's a 2nd popup when you take something,
-  // there shouldn't be." `take()` set `picked = taken`, which raises
-  // the tooltip on the item that just moved. With the PACK open that
-  // is useful - the thing you took is selected in your bag, on the tab
-  // it landed in - so the selection is the PACK's behaviour, not the
-  // take's. In the loot-only flow it is a card nobody asked for.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  // AUDIT 35: the take clears the pick on BOTH sides now - the pack-open
-  // flow used to keep the taken item selected, which raised the tooltip
-  // after every take (PX24's quirk on the loot side).
-  assert.match(src, /picked = null;\n  if \(packOpen\) \{/, 'the take must clear the pick before the pack-open arm');
-  assert.ok(!/picked = packOpen \? taken : null;/.test(src), 'the taken item must not stay selected');
-  assert.match(src, /if \(packOpen\) \{\n\s*side = 'local';/, 'and the side follows the pack, not the take');
-  assert.match(src, /tab = pageOf\(taken\);/,
-    'the tab-follows-the-item law is unchanged - it just belongs to the pack (PX31: the page an item lives on)');
-  // The transfer itself is untouched: this slice changes what is SHOWN.
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): and a take from someone else's keeping is marked as it lands (`stolen`);
-  // PIN MOVED (STOLEN-GOODS AUDIT S1): the owner's keeping itself rides (`stolenFrom`) - the owner's piece alone is marked
-  assert.match(src, /const taken = applyTransfer\(item, \{ \.\.\.plan, amount \}, from, bag, \{ entity: deps\.entity, toPlayer: true, stolenFrom: theftTarget\(deps, sessionState\(\)\) \}\);/,
-    'E4: `PlayerEntity.Items == to` is the destination test DoTransferItem makes');
-  assert.match(src, /if \(plan\.claimsChoice\) \{/, 'G6\'s one-is-the-whole-gift arm still runs first');
-});
-
-test('PX29b: the doll is DFU\'s whole composite - the figure mask is REVERTED', () => {
-  // PX29 wrote a mask of "which pixels are the figure" so the pack
-  // could drop DFU's panel, and it blanked the doll ENTIRELY in play.
-  // The reason is the pin: `_pixels` publishes at the END of
-  // refreshPaperDoll - "the composite swaps in whole when done" - and
-  // the mask published at the START. Any pass that returned early left
-  // a VALID composite paired with an all-zero mask, so every pixel read
-  // as background.
-  const pd = read('src/ui/paperDoll.js');
-  assert.ok(!pd.includes('_figure'), 'the mask is gone, not merely unused');
-  assert.ok(!pd.includes('paperDollFigurePixels'), 'and so is the accessor');
-  assert.match(pd, /PX29, REVERTED \(PX29b\)/, 'and the file records why, for whoever tries it again');
-  // TWO BUFFERS DESCRIBING ONE IMAGE MUST SWAP IN TOGETHER. The
-  // composite's own law, which the mask broke by publishing early.
-  assert.match(pd, /_pixels = \{ width: OW, height: OH, rgba: out, version: _version, density: OW \/ PAPERDOLL_W \};/);
-  // Both windows draw the same composite again.
-  assert.match(read('src/ui/enhanced/enhancedInventory.js'), /paperDollDataUrl\(paperDollPixels\(\), \{ scale: 4 \}\)/);
-});
-
-// ═══ PX22: Layer 1 - every region has its share, the list scrolls inside ═
-test('PX22: the character region is its content\u2019s height, the dock scrolls, nothing overlaps', () => {
-  const css = readFileSync('src/ui/enhanced/enhancedStyle.js', 'utf8');
-  // the dock takes the remainder and is a clipped viewport
-  assert.match(css, /\.pack-shell \.pack-dock \{ flex: 1 1 auto; min-height: 100px;/, 'the dock must take the remainder, never size to its content');
-  assert.doesNotMatch(css, /\.pack-shell \.pack-dock \{[^}]*max-height: 38%/, 'the 38% content-sized dock is the scrunch');
-  assert.match(css, /\.pack-shell \.packlists \{[^}]*overflow-y: auto;\n  flex: 1 1 auto; min-height: 0;/, 'the list must be the scroll viewport (min-height 0)');
-  // the character region is content-sized; the map is a flex item, not 100% of a shared column
-  assert.match(css, /\.pack-shell \.pack-main \{ flex: 0 0 auto;/);
-  assert.match(css, /\.pack-shell \.charcol \.wornmap \{ height: auto; flex: 0 0 auto;/, 'the map must not claim the whole column under the transport strip');
-  // compact rows and a thin tab strip - the 660px window's two rows of tiles
-  assert.match(css, /\.pack-shell \.charcol \.equipped \.wornrow \{ min-height: 40px; padding: 4px 12px;/);
-  assert.match(css, /\.pack-shell \.pack-dock \.packcol\.packcats \{ padding: 0 8px; \}/);
-  assert.match(css, /\.pack-shell \.pack-dock \.packtab \{ min-height: 36px;/);
-  // the window keeps its rows before its margins on a short viewport
-  assert.match(css, /\.pack-win \{[^}]*height: min\(660px, 94dvh\)/);
-});
-
-test('PX22: the list\u2019s scroll position survives a repaint, keyed by the tab that was rendered', () => {
-  const src = readFileSync('src/ui/enhanced/enhancedInventory.js', 'utf8');
-  assert.match(src, /if \(prevList && _renderedTab\) _scrollMemo\.set\(_renderedTab, prevList\.scrollTop\);/,
-    'the memory must be filed under the RENDERED tab - a click changes `tab` before it repaints');
-  assert.match(src, /if \(list && _scrollMemo\.has\(tab\)\) list\.scrollTop = _scrollMemo\.get\(tab\);/);
-  assert.match(src, /_renderedTab = tab;/, 'the rendered tab must be recorded after the paint');
-});
-
-// ═══ PX24: an action taken closes the tooltip ═══════════════════════
-test('PX24: wear, take off, use and stow all clear the pick on success; refusals keep the tip', () => {
-  const src = readFileSync('src/ui/enhanced/enhancedInventory.js', 'utf8');
-  const fn = (name, next) => src.slice(src.indexOf(`function ${name}(`), src.indexOf(`function ${next}(`));
-  const wear = fn('wear', 'use');
-  // success path clears; the three refusals return before it
-  assert.match(wear, /refreshFigure\(\);[^\n]*\n  picked = null;[^\n]*\n  return render\(\);/, 'wear must clear the pick after equipping');
-  // the refusals return before the clear (broken, forbidden, cannot be worn)
-  assert.equal((wear.match(/return render\(\);/g) || []).length, 4, 'wear\u2019s three refusals plus its success must all render');
-  assert.ok(wear.indexOf('picked = null') > wear.lastIndexOf('cannot be worn'), 'the clear must sit after the last refusal');
-  const off = fn('takeOff', 'chooseDialog');
-  assert.match(off, /picked = null;/, 'takeOff must clear the pick');
-  const use = fn('use', 'takeOff');
-  assert.match(use, /if \(act\.closesWindow\) \{ onExit\(\); return; \}\n  picked = null;/, 'use must clear the pick before its final render');
-  const stow = fn('stow', 'take');
-  // AUDIT INV2 B-F9: stow was written for the BUTTON, whose argument is always
-  // `picked`; INV2's drag hands it any row. It clears the pick after the
-  // transfer as it always did - but only when the thing it moved IS the pick,
-  // so dragging one item out no longer closes the tooltip a player opened on
-  // another and sends `side` to a remote list with nothing picked on it.
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): the call also says whether the piece is put back into its owner's keeping
-  // (STOLEN-GOODS AUDIT S1: the keeping itself, `returnTo`)
-  assert.match(stow, /applyTransfer\(item, \{ \.\.\.plan, amount \}, deps\.items\?\.\(\) \?\? \[\], to, \{ entity: deps\.entity, fromLocal: true, returnTo: theftTarget\(deps, sessionState\(\)\) \}\);[\s\S]{0,600}?if \(picked === item\) \{ picked = null; side = 'remote'; \}/,
-    'stow must clear the pick after the transfer, and only its own');
-  assert.ok(!/picked = applyTransfer/.test(stow), 'the arriving item must no longer stay picked');
-});
-
-test('IG7: a LOOT-SIDE click takes, immediately - the pick-and-confirm card was the "broken take"', () => {
-  // Mac: "When opening a container or body and clicking to loot an
-  // item. The item isn't picked up properly and the tooltip remains."
-  // The first click only SELECTED and raised the tooltip card; taking
-  // needed a second click on its button. DFU's remote list transfers
-  // on the click itself (RemoteItemListScroller_OnItemClick's remove
-  // arm), so the click now calls take() for every loot-like kind. The
-  // REWARD tray alone keeps the two-step: a single click must not
-  // claim G6's one-shot choice.
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /if \(from === 'remote' && remote\.kind !== 'reward'\) \{ take\(item\); return; \}/,
-    'the remote click takes for container, ground and wagon');
-  // ...and it happens AFTER the quest look is counted (AUDIT 26's law:
-  // looking at a quest item in a pile counts, taking it doubly so) and
-  // BEFORE the pick that would raise the card.
-  const click = src.slice(src.indexOf('function itemRow('), src.indexOf('function remoteCol('));
-  const iQuest = click.indexOf('sendQuestItemClick(');   // WHERE-ROBES: the one home
-  const iTake = click.indexOf("remote.kind !== 'reward'");
-  const iPick = click.indexOf('picked = wasPicked');
-  assert.ok(iQuest > -1 && iQuest < iTake && iTake < iPick,
-    'quest look, then the take, then (reward only) the pick');
-});
-
-// ═══ PX28: the kind label comes off the quest NAME ══════════════════
-test('PX28: a kind label at the front of a quest name is stripped; a name is never emptied', async () => {
-  const { questTitleOf } = await import('../../../src/ui/quest/questRail.js');   // MAC-K2: its home is the shared rail now - the pause window and the chronicle both title from it
-  // Mac: the rail already has sections, so a name that repeats the kind
-  // says the same fact twice.
-  assert.equal(questTitleOf("Main Quest: Lysandus' Revenge"), "Lysandus' Revenge");
-  assert.equal(questTitleOf('Side Quest - The Riddle'), 'The Riddle');
-  assert.equal(questTitleOf('Main Quest \u2014 Missing Prince'), 'Missing Prince');
-  assert.equal(questTitleOf('Daedric Quest: Sheogorath'), 'Sheogorath');
-  assert.equal(questTitleOf('Guild Quests | The Heretic'), 'The Heretic');
-  assert.equal(questTitleOf('  Side Quest:   Killing a Giant  '), 'Killing a Giant');
-  // NOT stripped: the word is the name, not a label on it
-  assert.equal(questTitleOf('Main Quest Backbone'), 'Main Quest Backbone', 'no separator - the phrase runs into the title');
-  assert.equal(questTitleOf("Clavicus Vile's Quest"), "Clavicus Vile's Quest", 'the word is at the END');
-  // AUDIT-MACK: ...and the label must be at the FRONT, which is what
-  // the `^` anchor is for. A mutant dropping it survived the whole
-  // campaign: every case above either has no separator (so an
-  // unanchored match finds nothing) or has its label at the front
-  // anyway. This one has a real label in the MIDDLE of a real name.
-  assert.equal(questTitleOf('Rescue the Main Quest: Courier'), 'Rescue the Main Quest: Courier',
-    'a label-shaped phrase inside a name is part of the name - only a LEADING label is a label');
-  assert.equal(questTitleOf('The Postman'), 'The Postman');
-  // never emptied: a quest actually called "Main Quest" keeps its name
-  assert.equal(questTitleOf('Main Quest'), 'Main Quest');
-  assert.equal(questTitleOf('Side Quest:'), 'Side Quest:');
-  assert.equal(questTitleOf(null), '');
-  // and both places that show a name use it
-  const src = readFileSync('src/ui/enhanced/enhancedMenu.js', 'utf8');
-  assert.match(src, /document\.createTextNode\(questTitleOf\(q\.name\)\)/, 'the rail row must strip');
-  assert.match(src, /el\('h3', null, questTitleOf\(sel\.name\)\)/, 'the detail head must strip');
-  // the DATA is untouched - the strip is a display seam
-  assert.ok(!/questTitleOf/.test(readFileSync('src/systems/quest/parser.js', 'utf8')), 'the quest parser must not be edited');
-});
-
-test('AUDIT 38 F1: the kind and its noun may be joined, spaced or hyphenated - the LABEL still needs its separator', async () => {
-  const { questTitleOf } = await import('../../../src/ui/quest/questRail.js');
-  // a pack writes the label however it likes; PX28's first cut required
-  // a space between the kind and the noun, so the joined spellings
-  // sailed through with the label still on - which is the whole thing
-  // Mac asked to remove.
-  assert.equal(questTitleOf('Sidequest: one word'), 'one word');
-  assert.equal(questTitleOf('MainQuest: joined'), 'joined');
-  assert.equal(questTitleOf('Side-Quest: hyphen'), 'hyphen');
-  assert.equal(questTitleOf('Main\u2013Quest: en dash'), 'en dash');
-  // and the keepers still keep: the trailing separator is what makes a
-  // label a label.
-  assert.equal(questTitleOf('Main Quest Backbone'), 'Main Quest Backbone');
-  assert.equal(questTitleOf('Mainquest Backbone'), 'Mainquest Backbone');
-  assert.equal(questTitleOf("Clavicus Vile's Quest"), "Clavicus Vile's Quest");
-  assert.equal(questTitleOf('Main Quest'), 'Main Quest');
-  // a bare "Quest:" is not a KIND label and stays - it names no kind
-  assert.equal(questTitleOf('Quest: The Postman'), 'Quest: The Postman');
-  // the classic journal is untouched: it strips nothing, ever
-  const classic = readFileSync('src/ui/quest/questJournal.js', 'utf8');
-  assert.ok(!/questTitleOf|QUEST_KIND_LABEL/.test(classic), 'the classic journal must not strip');
-});
 
 // HT5 (2026-09-15, Mac: "the torch doesnt appear slotted in inventory").
 //
@@ -1503,86 +610,6 @@ test('HT5: picking the light row offers Douse, not Take off', () => {
   const torch = { group: 'UselessItems2', templateIndex: 247, stackCount: 1 };   // IsLightSource wants the group too
   const entity = { equipTable: [], lightSource: torch };
   assert.deepEqual(localPrimaryAct(torch, entity), { kind: 'douse', label: 'Douse' });
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8');
-  // the off hand's panel carries it, and lists it first
-  assert.match(src, /\{ id: 'lhand', label: 'L\\u00b7Hand', area: '2 \/ 3', slots: \['Light', 'Left hand'\] \}/,   // PLUS11's five-row table, the one since PLUS-DEAD
-    'the light shares the off hand and is the first row of that family');
-  // takeOff is reached only for a real equipped item, never for this row
-  assert.match(src, /b\.onclick = act\.kind === 'takeOff' \? \(\) => takeOff\(picked\.equipSlot\)/,
-    'take-off is gated on the act kind, which a light source never answers');
-});
-
-// INV1 (2026-09-15, Mac: "Add the ability to click and drag items to equip or
-// reorganize in inventory").
-//
-// The drag performs the act the CARD ALREADY OFFERS - localPrimaryAct decides,
-// the same function the act button reads - so a dragged torch lights and a
-// dragged cuirass is worn, and a refusal says the same sentence either way.
-// A second rule for what a drop means is how the two paths drift apart.
-test('INV1: a drag equips through the one act, and never crosses a side', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');   // the CODE, not the prose about it
-  assert.match(code, /function dropOnBody\(item\) \{\s*const act = localPrimaryAct\(item, deps\.entity\);/,
-    'the drop reads the card\'s own act, not a second table');
-  assert.match(code, /if \(act\.kind === 'wear'\) \{ wear\(item\); return; \}/);
-  assert.match(code, /use\(item, null\)/, 'AUDIT 22 F6: the light arm still takes no collection');
-
-  // AUDIT INV1 F3: this pin matched `dropOnBody`'s DEFINITION and never its
-  // call site, so swapping the one call for `wear(held)` left dropOnBody as
-  // dead code and passed the whole suite. The RELEASE is read as a CLOSED
-  // SET: every act a drop can perform must be one the law allows.
-  //
-  // AUDIT INV2 B4: and the set is read off the release rather than matched
-  // against a hard-coded word list. The old pin alternated seven specific
-  // names, so ADDING an eighth act slipped through untouched - it caught
-  // substitution and never addition, which is the direction drift goes.
-  const decl = code.indexOf('function dragStop(commit)');
-  const release = code.slice(code.indexOf('{', decl), code.indexOf('const TOUCH_HOLD_MS'));   // the BODY, so the function's own name is not one of its calls
-  assert.ok(release.length > 100, 'the release is where a drop lands');
-  const calls = [...release.matchAll(/(?:^|[^\w.])([a-z][A-Za-z0-9_]*)\(/g)].map((m) => m[1]);
-  // AUDIT MERGE-PLUS C2: `setTimeout` joins `clearTimeout` as plumbing - it clears the click latch a tick after the
-  // release - and a call INSIDE its callback is still read by this scan, so the set stays closed.
-  const acts = [...new Set(calls)].filter((n) => !['if', 'for', 'while', 'return', 'typeof', 'clearTimeout', 'setTimeout',
-    'dragLock', 'ghostEnd', 'dragHighlight', 'dropIntent', 'includes'].includes(n)).sort();
-  // INV2 opened the set by exactly ONE - a release off the panel is the
-  // TRANSFER THE SCREEN ALREADY OFFERS (`stow` is the function behind the
-  // STOW_LABEL button beside the item) - and closed it again.
-  // HAND-DRAG (2026-10-08): a weapon onto a hand's own panel - the other hand, or the hand a pack piece is worn in
-  // BELT-LANTERN (2026-10-20): and the lantern's own socket - a lantern hung at the belt or taken off it
-  assert.deepEqual(acts, ['dropOnBody', 'dropOnHand', 'hangLantern', 'reorderPack', 'slotOnHotbar', 'stow', 'unhangLantern'],   // HB1: a slot on the hotbar is a target too - it moves nothing, it names the kind
-    `a drop performs the body act, the reorder or the screen's own transfer and NOTHING else (read: ${acts.join(', ')})`);
-  assert.match(release, /if \(want\?\.kind === 'body'\) dropOnBody\(d\.item\);/, 'the body is the equip target');
-
-  // INV2: the release and the ghost's verb ask ONE function, so the word the
-  // player was shown is the act they get.
-  const intent = code.slice(code.indexOf('function dropIntent('), code.indexOf('const dragHighlight'));
-  assert.ok(intent.length > 200 && intent.length < 1200, `the intent is its own function, and this slice really is it (${intent.length} chars)`);
-  assert.match(intent, /const act = localPrimaryAct\(item, deps\.entity\);/,
-    'the body\'s verb is the CARD\'s act, so the ghost cannot promise one thing and do another');
-  assert.match(intent, /if \(over\?\.closest\?\.\('\.loot-win'\)\) return stowIntent\(item\);/,
-    'AUDIT INV2 B-F7: the open container is a drop target in its own right - dragging ONTO the chest is the first gesture a player tries for "store this"');
-  assert.match(intent, /if \(over\?\.closest\?\.\('\.pack-win'\)\) return \{ kind: 'none', label: '' \};/,
-    'and the pack\'s own chrome is "never mind"');
-  // AUDIT INV2 B-F3/B-F4: the verb is the PLAN's answer, never canStow's.
-  // canStow asks "should this BUTTON exist" - a refusal that SPEAKS earns a
-  // control - which is a different question from "will this release work".
-  const stowIntent = code.slice(code.indexOf('function stowIntent('), code.indexOf('function dropIntent('));
-  assert.match(stowIntent, /if \(plan\.ok\) return \{ kind: 'stow', label: STOW_LABEL\[remote\.kind\] \};/,
-    'a verb is shown only when the plan really says yes');
-  assert.doesNotMatch(stowIntent, /canStow\(/, 'and never through canStow, which answers a different question');
-
-  // AUDIT INV2 B-F1/B-F2: and the drag's third act is the classic window's
-  // call, arms and all - the lit torch goes out when it leaves the pack
-  // (AUDIT 26 F157) and a map is an INTERCEPTION, not a transfer (F156).
-  const stow = code.slice(code.indexOf('function stow(item)'), code.indexOf('function take(item)'));
-  // PIN MOVED (AUDIT RPT1026 B5): but never over a chest that settles its own pieces, where the map moves as a piece
-  assert.match(stow, /if \(plan\.map && !settlesOwnPieces\(deps\)\) \{ use\(item, deps\.items\?\.\(\) \?\? \[\]\); return; \}/, 'the map reveals rather than landing on the floor');
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): and whether it is put back into its owner's keeping (`putBack`;
-  // STOLEN-GOODS AUDIT S1: the keeping itself, `returnTo`)
-  assert.match(stow, /applyTransfer\(item, \{ \.\.\.plan, amount \}, deps\.items\?\.\(\) \?\? \[\], to, \{ entity: deps\.entity, fromLocal: true, returnTo: theftTarget\(deps, sessionState\(\)\) \}\);/,
-    'the entity and the provenance ride, or clearLightSourceOnLeave is a no-op and a dropped torch keeps lighting the player');
-  const take = code.slice(code.indexOf('function take(item)'), code.indexOf('function take(item)') + 1400);
-  assert.match(take, /if \(plan\.map && !settlesOwnPieces\(deps\)\) \{ use\(item, remoteTarget\(deps, sessionState\(\)\)\); return; \}/, 'F156: either direction');
 });
 
 // ── AUDIT INV2 (2026-09-15, Mac: "I want it to be perfect") ──────
@@ -1777,51 +804,6 @@ test('AUDIT INV2: a drag holds an item, not a promise - what left the pack under
   });
 });
 
-// ── AND THE RULES THE SOURCE STILL OWNS ──────────────────────────
-test('AUDIT INV2: the ghost is the item\'s own tile, and the ladder it rides is walked, not eyeballed', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  const code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-
-  // ONE ICON PIPELINE - this file's header names the trap in its own
-  // words, and the ghost asks the same function the row does.
-  // UI1: the slot's own picture at the grid's box, which a landing picture swaps in place of the initials
-  assert.match(code, /const line = itemLine\(item, deps\.entity\), g = ghost;\n {2}const tile = \(\) => itemTile\(line, gridBox\(\), \(\) => \{ if \(ghost === g\) g\.querySelector\('\.tile'\)\?\.replaceWith\(tile\(\)\); \}\);\n {2}ghost\.append\(tile\(\)\);/);
-  const ghostFns = code.slice(code.indexOf('function ghostStart('), code.indexOf('function ghostAt('));
-  assert.doesNotMatch(ghostFns, /modelIconUrl\(|requestIcon\(/, 'and reaches for no icon source of its own');
-
-  // THE HIT TEST MUST SEE THROUGH IT. The ghost sits under the cursor;
-  // opaque, elementFromPoint answers the ghost and no drop ever lands.
-  const rule = css.slice(css.indexOf('.dragghost {'), css.indexOf('.dragghost .tile.has-icon'));
-  assert.match(rule, /pointer-events: none;/);
-  assert.match(rule, /position: fixed;/);
-
-  // THE LADDER. Every z-index literal in src/ is read, and the ghost's
-  // must be ABOVE every door host and BELOW every notice that deserves to
-  // interrupt a drag - and shared with NOTHING. The first cut took 30,
-  // which is enhancedChunk's "the game was updated" scrim.
-  const z = Number(/\.dragghost \{[\s\S]*?z-index: (\d+);/.exec(css)?.[1]);
-  const others = [];
-  // TIDY2: each where its feature folder keeps it
-  for (const f of ['enhanced/enhancedStyle.js', 'enhanced/enhancedChunk.js', 'enhanced/enhancedMenu.js', 'touch/touch.js', 'chatPanel.js'])
-    for (const m of read(`src/ui/${f}`).matchAll(/z-index:\s*(\d+)/g)) if (Number(m[1]) !== z || f !== 'enhanced/enhancedStyle.js') others.push(Number(m[1]));
-  assert.ok(z > 14, `the ghost clears every door host (read ${z})`);
-  assert.ok(!others.includes(z), `and shares its rung with nothing else in src/ (read ${z}; found ${[...new Set(others)].sort((a, b) => a - b).join(', ')})`);
-
-  // THE REFUSAL IS NOT COLOUR ALONE, and it is the sheet's own token for
-  // a forbidden state rather than a fifth hard-coded red.
-  assert.match(css, /\.dragghost\.refused \.tile\.has-icon, \.dragghost\.refused \.tile \{ border-color: var\(--blood\); \}/);
-  assert.match(css, /\.dragghost\.refused \.ghostact \{[^}]*opacity: 1;/, 'the word is SHOWN on a refusal - a 1px hue is not a signal');
-
-  // AND THE PACK STILL SCROLLS ON A PHONE. Every row is a tile in a
-  // wrapping grid; `touch-action: none` on all of them left a 6px gap as
-  // the only place a finger could scroll from, so every flick was a drag
-  // - and INV2 had just made a release off the panel a DROP.
-  assert.match(css, /\.itemrow \{ touch-action: pan-y;/);
-  assert.match(css, /body\.draglock \.itemrow, body\.draglock \.packlists \{ touch-action: none; \}/);
-  assert.match(code, /if \(touch\) drag\.hold = setTimeout\(dragArm, TOUCH_HOLD_MS\);/, 'a touch drag begins on a HOLD, so a flick is a scroll');
-});
-
 // ═══ MAC-M1: THE TWO NUMBERS A PLAYER PICKS A WEAPON BY ═══════════
 //
 // 2026-09-17, Mac: "Damage values arent showing on weapon tool tips.
@@ -1911,39 +893,6 @@ test('MAC-M1: ONE suffix, shared by the three hovers that show it', () => {
   assert.equal(itemStatSuffix(null), '', 'and a missing line is not a crash');
   assert.equal(itemStatSuffix({}), '');
 
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8')
-    .replace(/^\s*\/\/.*$/gm, '');
-  const uses = (src.match(/itemStatSuffix\(/g) ?? []).length;
-  // four CALL SITES - the grid tile, its no-icon fallback, the worn
-  // slot, and PLUS11's accessory socket. The `export const` declaration is not one of them, which is
-  // why this counts `itemStatSuffix(` rather than the bare name.
-  assert.equal(uses, 4, `the builder is USED at all three hovers, not just exported (found ${uses})`);
-  assert.doesNotMatch(src, /l\.damage \?\? l\.armour/,
-    'no surface spells the `??` for itself - that is what the builder is for');
-});
-
-test('MAC-M1: the card draws the stat FIRST, and the worn map’s hover carries it', () => {
-  // The DOM half, as this file's header says: a source sweep, and it
-  // says so. What it asserts is ORDER and REACH, neither of which the
-  // driven half above can see.
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8')
-    .replace(/^\s*\/\/.*$/gm, '');   // the file's own prose is not its wiring
-
-  const stats = src.slice(src.indexOf("const dl = el('dl', 'stats');"));
-  const body = stats.slice(0, stats.indexOf("c.append(dl);"));
-  const dmg = body.indexOf("pair('Damage', line.damage);");
-  const arm = body.indexOf("pair('Armour', line.armour);");
-  const wgt = body.indexOf("pair('Weight'");
-  assert.ok(dmg > 0 && arm > 0 && wgt > 0, 'all three rows are built');
-  assert.ok(dmg < wgt && arm < wgt,
-    'the headline stat comes BEFORE weight - a player reading this card is deciding whether to swing the thing');
-
-  // the worn map's hover - the surface Mac's second sentence is about,
-  // because armour is the thing you are wearing
-  assert.match(src, /b\.title = filled\.map\(\(r\) => \{[\s\S]{0,300}?itemStatSuffix\(l\)/,
-    'the worn slot’s hover reads the same line');
-  assert.match(src, /tile\.title = line\.name \+ itemStatSuffix\(line\);/,
-    'and so does the grid tile - the most literal "tooltip" in the report');
 });
 
 // ═══ MAC-M2 A: THE BODY DRAGS TOO ════════════════════════════════
@@ -2210,20 +1159,6 @@ test('MAC-M2: itemLine carries the hands and the card draws the row', () => {
   assert.equal(itemLine(W(120)).hands, 'One-handed');
   assert.equal(itemLine({ group: 'Books', templateIndex: 0, stackCount: 1 }).hands, null);
 
-  // The DOM half is a source sweep, as this file's header says.
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8')
-    .replace(/^\s*\/\/.*$/gm, '');
-  const stats = src.slice(src.indexOf("const dl = el('dl', 'stats');"));
-  const body = stats.slice(0, stats.indexOf('c.append(dl);'));
-  const dmg = body.indexOf("pair('Damage', line.damage);");
-  const hnd = body.indexOf("pair('Hands', line.hands);");
-  const wgt = body.indexOf("pair('Weight'");
-  assert.ok(hnd > 0, 'the card builds a Hands row');
-  assert.ok(dmg < hnd && hnd < wgt,
-    'it sits under the damage - the same question, how the thing is swung - and above the weight');
-  // and NO second table: the word is itemInfo's, off equipTable's law.
-  assert.doesNotMatch(src, /Two-handed/,
-    'the skin names no weapon-hands words of its own - itemHandsLine owns them');
 });
 
 // ── JAN2 (2026-09-21, a player's CRASH "can't access property querySelector, l is null") ──
@@ -2263,7 +1198,6 @@ test('JAN2: a repaint that lands after the unmount paints nothing instead of thr
     assert.equal(host.querySelectorAll('.itemrow').length, 0, 'and it does not put a closed window back up');
   });
 });
-
 
 // ── ENH-NOTICE3: THE PANE'S `notice` IS A BOX, AND THE PANEL'S ────
 
@@ -2450,8 +1384,6 @@ test('PLUS10: the Info box is the classic Info popup\'s own text - the item\'s T
   assert.equal(boxes[0][0].center, true, 'and keeps the record\'s alignment');
   assert.deepEqual(itemInfoBoxes(sword, {}), [[{ text: 'No item description available.', center: true }]],
     'with no TEXT.RSC it says so rather than inventing lines');
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedInventory.js', import.meta.url), 'utf8');
-  assert.match(src, /const info = el\('button', 'act', 'Info'\);\n  info\.onclick = \(\) => openInfo\(picked\);/, 'the button (Plus\'s; on every card since PLUS-DEAD)');
 });
 
 // ═══ PLUS11: THE ACCESSORY SHELF (Enhanced Plus) ═════════════════

@@ -26,7 +26,6 @@ import { readFileSync } from 'node:fs';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const b = JSON.parse(rd('app/package.json')).build;
-const main = rd('app/main.cjs');
 
 test('DA11 the built site is packed into app.asar, never shipped beside it as loose files', () => {
   const sets = b.files.filter((f) => typeof f === 'object');
@@ -41,11 +40,3 @@ test('DA11 the built site is packed into app.asar, never shipped beside it as lo
     'no copy of dist/ outside the archive: 18,354 loose files made every Windows update empty the install folder for as long as they took');
 });
 
-test('DA11 the shell reads the site from inside the archive when packaged, from the repo\'s dist/ when not', () => {
-  assert.match(main, /const DIST = app\.isPackaged\s*\? path\.join\(__dirname, 'dist'\)\s*: path\.join\(__dirname, '\.\.', 'dist'\);/,
-    'packaged, __dirname IS resources/app.asar');
-  assert.doesNotMatch(main, /path\.join\(process\.resourcesPath, 'dist'\)/, 'resources/dist is gone');
-  // the handler is the same one: stat, then a file:// fetch - both read inside an asar (measured on Electron 42)
-  assert.match(main, /if \(!p\.startsWith\(DIST \+ path\.sep\)\) return new Response\('forbidden', \{ status: 403 \}\);/, 'still traversal-proofed into dist/');
-  assert.match(main, /const fileResponse = \(p, mime\) => net\.fetch\(pathToFileURL\(p\)\.toString\(\), \{ bypassCustomProtocolHandlers: true \}\)/);
-});

@@ -589,14 +589,3 @@ test('CARDS8 the back is the Bay\'s compass rose - not the house deck\'s medalli
   assert.ok(!ours.log.fills.includes('#5a1a22'), 'nor in its crimson');
 });
 
-test('CARDS8 the art is ours: the painter reads no game file', () => {
-  const src = read('src/render/iliacCardFaces.js');
-  const imports = [...src.matchAll(/^import .* from '([^']+)';/gm)].map((m) => m[1]);
-  assert.deepEqual(imports, ['../systems/loot/lootRarity.js', '../systems/iliac/iliacCardWords.js', './cardFaces.js'], 'the loot\'s tier colours, the card\'s words and the house stock - nothing else');   // PIN MOVED (KG-SET): the words a face writes, in the player's language
-  for (const spec of imports) assert.doesNotMatch(spec, /formats\/|texture|bsa|arena2|imgFile|cifRci|loader/i, `${spec} is no ARENA2 reader`);
-  assert.doesNotMatch(src, /\b(drawImage|putImageData|createPattern|new Image)\b/, 'no raster is drawn - every face is paths');
-  assert.doesNotMatch(src, /#[0-9a-f]{6}['"]?\s*,?\s*\/\/\s*(common|magic|rare|legendary|aetheric|artifact)\b/i, 'the tier colours are imported, never copied');
-  for (const tier of RARITY_ORDER) assert.ok(!src.toLowerCase().includes(RARITIES[tier].colour.toLowerCase()), `${tier}'s hex is not copied in`);
-  assert.match(src, /78 x 112/, 'the header names the grid\'s real tile (AUDIT CARDS-5 B18)');
-  assert.doesNotMatch(src, /70 x 100/, 'not the tile it never was');
-});

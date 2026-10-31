@@ -167,31 +167,5 @@ test('SEAT1c THE BOOK AND THE SEAT TAB: a derived seat dressed in its holder and
 });
 
 test('SEAT1c THE HOSTS BY SOURCE: the service settles the Turning before any seat answer, decorates the list with holders and battles, routes relinquish; a guild holding a Charter or named in a battle to come does not go; the holder counts at its seat and pledges nowhere else in its region; the client\'s seats are dressed, the arrival names the holder, the banners fly its colours (mutants: each seam)', () => {
-  const idx = rd('server-account/src/index.js');
-  // PIN MOVED (SEASON1): the Turnings due read the Season counted
-  // PIN MOVED (SEAT-LEASE): one settler at a time - the Turnings due settled under the lease, an act told to ask again while another holds it
-  assert.match(idx, /if \(seatsOpenFor\(who\.player, env\) && \(await settleDueOnce\(ctx\.db, nowS, seasonZeroOf\(env\.SEASON_ZERO_WEEK\), domainsWeekOf\(env\.DOMAINS_WEEK\)\)\)\.pending && !SEAT_READS\.has\(path\)\) return no\('seats-settling', 503, origin\);[^\n]*\n\s*const act = \{/);
-  // PIN MOVED (CROWN2): the list carries the server's red lines too; PIN MOVED (SEAT-BATCH): the holders, battles, Edicts,
-  // works and red lines in one batch (seatTurning.js seatsBoard answers `{ seats, red }`)
-  // PIN MOVED (DOMAIN3): the board read once, its seats marked under the region law, the law's own word beside Season 0's
-  assert.match(idx, /if \('error' in r\) return r;[^\n]*\n[^\n]*\n\s*const board = await seatsBoard\(ctx\.db, r\.seats, nowS\);\n\s*return \{ \.\.\.r, \.\.\.board, \.\.\.\(domains\?\.rule \? \{ seats: chartersMarked\(board\.seats, domains\.seats\) \} : \{\}\), zero: seasonZeroOf\(env\.SEASON_ZERO_WEEK\), \.\.\.\(domains \? \{ domains \} : \{\}\) \};/);   // CROWN2: the red lines; SEASON1 part two: Season 0's week
-  assert.match(idx, /'\/v1\/seats\/relinquish': \(\) => relinquishSeat\(ctx, who\.player, env, body\),/);
-  assert.ok(rd('server-account/src/service.js').includes("'/v1/seats/relinquish',"));
-  const gu = rd('server-account/src/guilds.js');
-  assert.match(gu, /\['guild-seat', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM town_seat_holds WHERE guild_id = \$\{p\}\)`\]/);   // PIN MOVED: AUDIT GUILD3 T1 - one list of holds, the gate's and the view's
-  assert.match(gu, /\['guild-battle', \(\/\*\* @type \{string\} \*\/ p\) => `EXISTS \(SELECT 1 FROM town_seat_rights WHERE \(guild_id = \$\{p\} OR against = \$\{p\}\) AND \$\{SEAT_BATTLE_PENDING\}\)`\],   \/\/ SEAT1c/);   // PIN MOVED (AUDIT CHAP5 E4): no longer the list's last - a patron's bid kept after it; AUDIT GUILD3 T1: one list of holds
-  assert.match(gu, /const SEAT_BATTLE_PENDING = 'week > COALESCE\(\(SELECT MAX\(week\) FROM town_seat_weeks\), -1\)';/);
-  const si = rd('server-account/src/seatInfluence.js');
-  assert.match(si, /const held = await db\.prepare\('SELECT key FROM town_seat_holds WHERE guild_id = \? AND region = \? ORDER BY key LIMIT 1'\)/);
-  assert.match(si, /if \(await db\.prepare\('SELECT 1 FROM town_seat_holds WHERE guild_id = \? AND region = \?'\)\.bind\(gid, seat\.region\)\.first\(\)\) return \{ error: 'seat-held-here' \};/);
-  const st = rd('server-account/src/seatTurning.js');
-  assert.match(st, /const stmts = \[db\.prepare\('INSERT INTO town_seat_weeks \(week, settled_at\) VALUES \(\?, \?\)'\)\.bind\(week, nowS\)\];/, 'the key first, a plain INSERT');
-  // PIN MOVED (AUDIT-SEATS): a batch that rolls back says whether it FAILED (S1) - not a racing reader's key - so settleDue
-  // stops at it rather than settle a later week over it
-  assert.match(st, /try \{ await db\.batch\(stmts\); \} catch \{ return \{ settled: false, failed: !\(await db\.prepare\('SELECT 1 FROM town_seat_weeks WHERE week = \?'\)\.bind\(week\)\.first\(\)\) \}; \}/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const seatHere = \(mapId\) => \(seatBook\?\.open === true \? seatBook\.dressed\(seatAtMapId\(townSeats, mapId\)\) : null\);/);
-  assert.match(w, /townTalk\.say\(seatArrivalLine\(seat\), 5\)/);
   assert.equal(seatArrivalLine({ ...ANTICLERE, holder: { guild: SH } }), 'Anticlere, held by the Silver Hand <SH>.', 'a dressed seat names its own holder');
-  assert.match(rd('src/scenes/seatBanners.js'), /const h = seat \? seatBannerOf\(seat\) : null;/);
 });

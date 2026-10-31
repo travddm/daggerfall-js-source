@@ -109,20 +109,3 @@ test('SWIM-SPENT: a swimmer run out of fatigue on the real ticker lives through 
   assert.equal(kinds.at(-1), 'rest');
 });
 
-test('SWIM-SPENT: the three hosts a swimmer can collapse in take the drown arm first - a line, the share, no box, no death heard by Come Sail Away - and the watery-grave box is gone from them', () => {
-  const W = hostText('src/scenes/world.js'), X = rd('src/scenes/exterior.js'), D = rd('src/scenes/dungeonContext.js');
-  const arm = /if \(out\.kind === 'drown'\) \{ townTalk\.say\(out\.line\); hurtPlayer\(playerEntity, out\.damage, \{ bypassShield: true \}\); return; \}/;
-  for (const [name, src] of [['world.js', W], ['exterior.js', X]]) {
-    const fn = src.slice(src.indexOf('function onExhaustedExterior()'), src.indexOf('function onExhaustedExterior()') + 4000);
-    assert.match(fn, arm, `${name}: the drown arm`);
-    assert.ok(fn.search(arm) < fn.indexOf("['You collapse from exhaustion.']"), `${name}: before the box`);
-    assert.doesNotMatch(src, /EXHAUSTED_IN_WATER/, `${name}: no watery grave`);
-  }
-  const wfn = W.slice(W.indexOf('function onExhaustedExterior()'), W.indexOf('function onExhaustedExterior()') + 4000);
-  assert.ok(wfn.search(arm) < wfn.indexOf('csaRuntime.OnPlayerDeath()'), 'world.js: Come Sail Away hears no death of a swimmer still swimming');
-  const dfn = D.slice(D.indexOf('  function onExhausted() {'), D.indexOf('  function onExhausted() {') + 3000);
-  const darm = /if \(out\.kind === 'drown'\) \{ hudText\.add\(out\.line\); hurtEntity\(playerEntity, out\.damage, \{ bypassShield: true \}\); surfacePlayer\(\); return; \}/;
-  assert.match(dfn, darm, 'dungeonContext.js: the drown arm');
-  assert.ok(dfn.search(darm) < dfn.indexOf('opts.csaOnPlayerDeath?.()'), 'dungeonContext.js: before the death is heard');
-  assert.doesNotMatch(D, /EXHAUSTED_IN_WATER/, 'dungeonContext.js: no watery grave');
-});

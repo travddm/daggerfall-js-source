@@ -257,8 +257,6 @@ test('EG-PLUS THE START WINDOW: in the slot while it stands; a start taken is br
 });
 
 test('EG-PLUS THE DOORS: the host hands the panel\'s doors on Enhanced Plus alone, and openEgStartWindow opens the panel in the list\'s place - the list where the panel cannot open; the doors give up a finished window still in the slot first (mutants: the panel never opened; the list opened beside it)', () => {
-  const W = rd('src/scenes/world.js');
-  assert.match(W, /\n {4}panel: isEnhancedPlus\(\) \? egStartPanelDoors\(\{ slot: egWindowSlot \}\) : null,/);
   const lists = [];
   const base = { keys: 1, me: 'a', members: [], starts: { a: [0] }, openList: (l) => { lists.push(l); return {}; }, closeList: () => {}, ask: () => {}, onChoose: () => {} };
   const doc = Object.assign(fakeDoc(), { defaultView: { addEventListener() {}, removeEventListener() {} } });

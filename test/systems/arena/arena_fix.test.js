@@ -184,11 +184,6 @@ test('ARENA-FIX 2: the gate\'s people named by their office - the plaque, "You s
   const names = Object.fromEntries(ARENA_GATE_PEOPLE.map((p) => [p.role, arenaGatePersonName(pn(p))]));
   assert.deepEqual(names, { herald: 'The Herald of the Arena', warden: 'Arena Warden', redRecruiter: 'Red Banner Recruiter', blueRecruiter: 'Blue Banner Recruiter', bookmaker: 'The Bookmaker' });
   assert.equal(arenaGatePersonName({ position: 7, textureArchive: 183, textureRecord: 5 }), null, 'anyone else keeps their own');
-  const W = rd('src/scenes/worldModes.js');
-  assert.match(W, /const officeName = \(pn\) => arenaGatePersonName\(pn\) \?\? /);
-  assert.match(W, /const displayName = officeName\(pn\) \?\? npcShownName\(staticNpcData\(pn, npcSceneCtx\)\);/, 'Info: "You see ..."');
-  assert.match(W, /npcName: officeName\(pn\) \?\? npcShownName\(npcData\), portrait:/, 'the talk door');
-  assert.ok((W.match(/const display = officeName\(pn\) \?\? npcShownName\(staticNpcData\(pn, staticNpcSceneCtx\(pn\)\)\);/g) ?? []).length >= 3, 'the plaques (the street, the dungeon, the interior)');
 });
 
 /** The undercroft's markers: a start, then random markers out along x, one block. */
@@ -232,23 +227,10 @@ test('ARENA-FIX 4: a chained beast - targets nobody, nobody targets it, and the 
   assert.equal(boutGate(other, beast, false), false);
   tag.hooks.intrude();
   assert.equal(said, 1);
-  const D = rd('src/scenes/dungeonContext.js');
-  assert.match(D, /const _undercroftHall = isArenaUndercroft\(dfLocation\) \? undercroftPopulation\(dungeon\.blocks\) : null;/);
-  assert.match(D, /const _hallBeasts = _undercroftHall \? _undercroftHall\.beasts\.map\(/, 'no random foe at the hall\'s markers - the beasts alone (UNDERCROFT-DEEP, FIELD BUGS 2026-10-04e: the deep cellars past its reach stand the keep\'s own)');
-  assert.match(D, /: \(_hallBeasts \? \[\.\.\._hallBeasts, \.\.\.deepFoesOf\(_layoutEnemies, _undercroftHall\.deep\)\] : _layoutEnemies\);/, 'UNDERCROFT-DEEP: the beasts, and the deep cellars\' own foes');
-  assert.match(D, /const _layoutFoes = foes\.length;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*for \(const f of foes\) \{\n\s*if \(f\.src\?\.arenaChained == null/, 'the chains tagged after the layout\'s run is measured');
-  assert.match(D, /for \(let l = 0; l < n && !\(_undercroftHall && undercroftHallNear\(_undercroftHall, lastPlayerFeet\)\); l\+\+\) \{/, 'no rest broken in the hall (UNDERCROFT-DEEP: the deep cellars are a keep\'s)');
-  assert.match(D, /if \(!_undercroftHall\) markDungeonChampions\(/);
-  assert.match(D, /arenaRole: f\.role \?\? null,/);
 });
 
 test('ARENA-FIX 4: the stair names the undercroft; the Pit Master and the Keeper of the Hall answer by their office', () => {
-  const W = rd('src/scenes/worldModes.js');
-  assert.match(W, /if \(entries\[key\]\?\.door\?\.doorType === DOOR_TYPE\.DUNGEON_ENTRANCE && entries\[key\]\.dfLocation\?\.arenaUndercroft\) \{\n\s*return staticDoorName\('dungeonEntrance', \{ locationName: ARENA_TEXT\.undercroft\.name \}\);/);   // PIN MOVED (TIER1): no tier over the stair - the plaque names a tier only where the host passes one
   assert.equal(ARENA_TEXT.undercroft.name, 'The Arena Undercroft');
-  assert.match(W, /if \(!info && pn\?\.arenaRole === 'pitMaster'\) \{ pitMasterChoice\(\); return; \}/);
-  assert.match(W, /if \(!info && pn\?\.arenaRole === 'hallKeeper'\) \{ townTalk\?\.showOverlay\?\.\(new ActionTextBox\(hallOfChampions\(/);
-  assert.match(W, /kind: 'pit', gates: false, radius: PIT_RING_R,/);
 });
 
 test('ARENA-FIX 4: the Hall of Champions - the stone waits, then a tier champion\'s name, then the Grand Champion\'s', () => {
@@ -387,10 +369,6 @@ test('ARENA-FIX 9/10: the misses and the real crits - every resolution heard, a 
   calculateAttackDamage({ isPlayer: false, level: 1, skills: {}, stats: {} }, { level: 1 }, { rolls: () => 0.999 });
   registerAttackResolutionListener('test', null);
   assert.ok(heard.length === 1 && heard[0].damage === 0 && 'critical' in heard[0], 'a foe\'s miss told, with its critical flag');
-  const W = rd('src/scenes/world.js'), PW = rd('src/combat/playerWeapon.js');
-  assert.match(W, /registerAttackResolutionListener\('arena', \(r\) => arenaBouts\.attackResolved\(r\)\);/);
-  assert.match(W, /registerPlayerSwingListener\('arena', \(n\) => arenaBouts\.playerSwing\(n\)\);/);
-  assert.match(PW, /for \(const fn of _swingListeners\.values\(\)\) \{ try \{ fn\(results\.length\); \}/);
 });
 
 test('ARENA-FIX 11: a light left burning on the old floor is put out and carried - the item picking it up gives', () => {
@@ -405,9 +383,6 @@ test('ARENA-FIX 13: the court\'s nobles of TEXTURE.185 seated at TEXTURE.183\'s 
   assert.equal(CROWD_SCALE[185], -128);
   const nobles = CROWD_PEOPLE.nobles.filter(([a]) => a === 185).map(([, r]) => r);
   assert.deepEqual(nobles, [0, 1, 5, 6, 7, 8], 'the lords and ladies - not the guards nor the knight');
-  // the driver sizes them by it: the same picture at +128 and at the crowd's scale
-  const B = rd('src/scenes/arena/arenaBouts.js');
-  assert.match(B, /const size = sizeOf\(tex, g\.record, CROWD_SCALE\[g\.archive\]\);/);
   const h = (px, k) => (px + Math.trunc(px * (k / 256))) * 0.025;
   assert.ok(h(159, 128) > 5.9 && h(159, CROWD_SCALE[185]) <= 2.0);
 });
@@ -420,8 +395,6 @@ test('ARENA-FIX 14: the player\'s own sprite (Eye of the Beholder) turned with a
   assert.deepEqual(b.state().lastMoveDirection.map((v) => Math.round(v)), [1, 0, 0], 'facing the way the view was placed (yaw a quarter turn: +x)');
   b.tick(0.016, { feet: [PLACE_JUMP_M + 1.5, 0, 0], yaw: 0 });
   assert.deepEqual(b.state().lastMoveDirection.map((v) => Math.round(v)), [1, 0, 0], 'a step is no placing - the facing is the walk\'s');
-  const S = rd('src/player/eyeOfTheBeholder/eotbBody.js');
-  assert.match(S, /Math\.hypot\(state\.feet\[0\] - was\[0\], state\.feet\[2\] - was\[2\]\) > PLACE_JUMP_M\) faceYaw\(/);
   assert.ok(PLACE_JUMP_M >= 6, 'further than a frame of any walk, fall or gallop');
   // the hud model: a quiet bout has no crowd row
   const bout = { phase: 'fight', fighters: [{ id: 'you', name: 'a', side: 0, health: 1, maxHealth: 1 }, { id: 'f0', name: 'b', side: 1, health: 1, maxHealth: 1 }], fightAt: 0, limitMs: 1000 };

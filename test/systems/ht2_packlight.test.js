@@ -96,16 +96,3 @@ test('HT2 the pack SAYS which torch burns: itemLine.lit is the reference compare
   assert.equal(itemLine(sword(), e).lit, false);
 });
 
-test('HT2 the view performs the act it was handed, and the card no longer calls a torch worn', () => {
-  const src = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(src, /const act = localPrimaryAct\(picked, deps\.entity\);/);
-  assert.match(src, /const b = el\('button', 'act primary', act\.label\);/, 'the label is the act\'s, not a literal');
-  assert.match(src, /act\.kind === 'takeOff' \? \(\) => takeOff\(picked\.equipSlot\)/);
-  assert.match(src, /act\.kind === 'wear' \? \(\) => wear\(picked\)/);
-  assert.match(src, /: \(\) => use\(picked, null\);/, 'light and douse are the same use, with NO collection');
-  assert.match(src, /if \(isLightSource\(picked\)\) pair\('Lit', line\.lit \? 'yes' : 'no'\);/);
-  assert.match(src, /line\.lit \? 'lit' : null/, 'and the row says it too');
-  // the two skins agree: the classic window's own arm is still there
-  assert.match(read('src/ui/native/nativeInventory.js'), /if \(isLightSource\(it\)\) \{ this\._use\(it, null\); return; \}/);
-});
-

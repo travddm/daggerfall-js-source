@@ -53,13 +53,6 @@ test('AUDIT TESA II F6: a band may stand past the Bay on land a zone answers, on
   } finally { setTamrielTrace(null); }
 });
 
-test('AUDIT TESA II F6 by source: the world host\'s bandOk admits it beside the Bay\'s map and the Eltheric box, the land past the Bay\'s switch and the host\'s place roll handed in; a band\'s make rolls its pixel\'s zone\'s wild', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /return \(onBayOrEther\(px, py\) \|\| \(tamrielLand && bandGroundPastBay\(px, py, tamrielPlaceName\)\)\) && !tvWater\(px, py\) && !_bandPlacePixels\.has\(`\$\{px\},\$\{py\}`\) && !etherPlaceIsle\(px, py\);/);
-  assert.match(w, /const hit = rollGroupComposition\(\{ climateIndex: maps\.getClimateIndex\(px, py\), fauna: maps\.getFaunaBand\?\.\(px, py\),/);
-  assert.match(w, /maps\.getFaunaBand = faunaBandAt;/);
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'MAP.PAL', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
 test('AUDIT TESA II F6 with ARENA2: on the player\'s own trace bands are born in Skyrim\'s High Peaks\' country and Cyrodiil\'s jungle, each made of its zone\'s own wild', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

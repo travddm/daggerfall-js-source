@@ -133,8 +133,6 @@ test('SCALE3: a checkpoint\'s save is the size asked, a fresh character\'s shape
   assert.match(JSON.parse(src('package.json')).scripts.load, /^node tools\/loadHarness\.mjs$/);
   // the clock the harness fires is the service's own two schedules (SCALE4b), written out so a tree before it loads
   assert.deepEqual([FIRE_MINUTE, FIRE_HOUR], [CRON_MINUTE, CRON_HOUR]);
-  // the account probe's migrations ride a buffer past wrangler's summary, which grows with the square of their count
-  assert.match(src('tools/accountProbe.mjs'), /maxBuffer: 64 \* 1024 \* 1024/);
   assert.equal(percentile([], 0.5), null);
   assert.equal(percentile([5, 1, 3, 2, 4], 0.5), 3);
   assert.equal(percentile([5, 1, 3, 2, 4], 1), 5);

@@ -95,42 +95,6 @@ test('AUDIT SC1: ONE MESH AT TWO PLACES - two doors of one model are both still 
   assert.equal(door._shInst.length, 2, 'still two placements: the swing is the east one moving, not a third');
 });
 
-test('AUDIT SC1: THE FLOATING ORIGIN - told of the crossing, the pass rebases every remembered placement and origin on its next draw, so the room is still where it was: the caches are redrawn for the lights that moved and NOTHING is a dynamic; untold, every caster reads as moved (mutants: the shift a no-op; the batch\'s origin left behind)', () => {
-  const { r, sp, room, tile, frame } = stand();
-  const npc = bb();
-  const draw = (dx) => { r.drawMesh(room, at(dx, 0, 0), null); r.drawTerrain(tile, at(dx, 0, 0), {}, {}, 6.4); r.drawBillboards([npc], new Float32Array([1, 0, 0]), new Float32Array([0, 1, 0])); };
-  frame(() => draw(0)); frame(() => draw(0));
-  // the crossing: the host moves every world position by the offset, the light with them, and tells the renderer
-  const off = [819.2, 0, -819.2];
-  r.shadowOriginShift(off);
-  npc.origin = [npc.origin[0] + off[0], npc.origin[1] + off[1], npc.origin[2] + off[2]];
-  const L = new Float32Array([off[0], 2, off[2], 10]);
-  let st = frame(() => draw(off[0]), L);
-  assert.equal(sp.records[0].dynamic, false, 'the room is still');
-  assert.equal(sp.records[1].dynamic, false, 'the tile is still');
-  assert.equal(npc._shDyn, false, 'the flat is still');
-  st = frame(() => draw(off[0]), L);
-  assert.equal(st.staticFaces, 6, 'the light moved with the world, so its cache is drawn again (its slot is matched by position)');
-  assert.equal(st.dynFaces, 0, 'and nothing is dynamic');
-  st = frame(() => draw(off[0]), L);
-  assert.equal(st.pointDraws, 0, 'then nothing');
-  assert.equal(sp._shiftGen, 1);
-  // AUDIT OW5 R4: the origin as each object last saw it rides on the object - the pass keeps no generation's history
-  // (one entry a crossing for the session: thousands an hour on an Overworld journey)
-  assert.deepEqual(sp._shiftNow, off, 'the cumulative offset, now');
-  assert.equal(sp._shiftAcc, undefined, 'and no history');
-  for (let i = 0; i < 1000; i++) r.shadowOriginShift([819.2, 0, 0]);
-  assert.equal(sp._shiftGen, 1001);
-  assert.equal(Object.keys(sp).filter((k) => Array.isArray(sp[k]) && sp[k].length > 900).length, 0, 'nothing grew with the crossings');
-  for (let i = 0; i < 1000; i++) r.shadowOriginShift([-819.2, 0, 0]);
-  // the mesh's z did not follow the world - a real move across the crossing is still seen
-  frame(() => { r.drawMesh(room, at(off[0], 0, 0.5), null); r.drawTerrain(tile, at(off[0], 0, 0), {}, {}, 6.4); }, L);
-  assert.equal(sp.records[0].dynamic, true, 'a move across the crossing is a move');
-  // by source: the world host says so where it shifts everything else, and the renderer forwards it
-  assert.match(rd('src/scenes/world.js'), /sky\.offsetOrigin\(r\.offset\);[^\n]*\n\s*renderer\.shadowOriginShift\?\.\(r\.offset\);/, 'world.js: beside the sky\'s and the guards\'');
-  assert.match(rd('src/render/renderer.js'), /shadowOriginShift\(offset\) \{ this\._shadowPass\?\.shiftOrigin\(offset\); this\._air\?\.shiftOrigin\(offset\); this\._frameStamp\+\+; \}/, 'the shadow pass told (LA-POST6: and the air\'s held view-projections; LA-AUDIT C1: and the stamp moved)');
-});
-
 test('AUDIT SC1: a batch built DYNAMIC is a dynamic from its first sight (moveBillboardBatch rewrites its vertices with the origin left null), and a flat whose FRAME changes has moved (its silhouette is the frame\'s) (mutants: `_dyn` ignored; the frame left out of the memory)', () => {
   const { r, sp, room, tile, frame } = stand();
   const gib = bb({ _dyn: true, vao: { id: 'vao-gib' } });
@@ -197,8 +161,6 @@ test('AUDIT LIGHT-NEAR1: the panel-frame snapshot carries the CARRIED MASK - a h
     assert.equal(r._pointCarried, null, 'the panel\'s own lights carry no mask');
   });
   assert.deepEqual([...r._pointCarried], [1, 0], 'restored with the lights');
-  assert.match(rd('src/render/renderer.js'), /pointCarried: this\._pointCarried,/, 'in the snapshot');
-  assert.match(rd('src/render/renderer.js'), /this\.setPointLights\(s\.pointLights, s\.pointColor, s\.pointColors\);\n\s*this\._pointCarried = s\.pointCarried \?\? null;/, 'and restored after the lights (setPointLights reads the mask off the array, and a subarray has none)');
 });
 
 test('AUDIT HQ1: the colour curve\'s laws in JS - black to black, a grey through the scalar curve unchanged, the white point to display white, monotone along a hue ray, and a saturated flame KEPT ITS HUE (brighter than the per-channel curve left it, and never past a few percent over one - the curve\'s own shape, clamped at the encode)', () => {

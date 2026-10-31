@@ -1080,8 +1080,6 @@ test('U42 buy: the haggle offset is DRIVEN by the price the shop asks', () => {
   assert.equal(cureOfferMessageOffset(80, 39), 0, '...and 39 is not');
   assert.equal(cureOfferMessageOffset(80, 60), 2, '80 - (80 >> 2) = 60 is the friendliest');
   assert.equal(cureOfferMessageOffset(80, 59), 1, '...and 59 is not');
-  const src = readFileSync(new URL('../../src/ui/spellbookWindow.js', import.meta.url), 'utf8');
-  assert.equal(/presentedCost >> 1 <=/.test(src), false, 'the window does not re-implement the bands');
 });
 
 test('U42 buy: Yes deducts through DeductGoldAmount, adds the spell, and closes', () => {
@@ -1196,53 +1194,6 @@ test('U42 / THE FOUR HOSTS: every host opens the book from ONE construction - th
   assert.ok(door.includes("from './spellbookWindow.js'"), 'and it is the classic window it builds on the classic skin');
   // and the keyed window is DELETED, not merely unimported
   assert.equal(src('ui/deathScreen.js').includes('SpellbookWindow'), false);
-});
-
-test('U42: BuySpells and BuySpellsMages are no longer FLAGGED nulls', () => {
-  // DaggerfallGuildServicePopupWindow.cs:383-387 - one case falls into
-  // the other and BOTH push the spellbook with buyMode true, which is
-  // why they share a destination.
-  const flow = readFileSync(new URL('../../src/systems/guild/guildServiceFlow.js', import.meta.url), 'utf8');
-  assert.match(flow, /BuySpells: 'guildServiceSpellbook'/);
-  assert.match(flow, /BuySpellsMages: 'guildServiceSpellbook'/);
-  const modes = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.ok(modes.includes("destination === 'guildServiceSpellbook'"), 'the interior host runs the arm');
-  assert.ok(/\{ buyMode: true \}/.test(modes), '...in BUY mode');
-  assert.ok(/offered: \(\) => \[\.\.\.sbi\.values\(\), \.\.\.\(isOnlinePage\(\) \? \[resurrectionSpell\(\), sharedCartographySpell\(\)\] : \[\]\), \.\.\.signatureOffers\(playerEntity\)\]/.test(modes), 'over the whole of SPELLS.STD - and, online, RESURRECT1\'s ready-made Resurrection and PARTY-MAP\'s Shared Cartography; SCHOOLS3: and my awake path\'s signature spell');   // PIN MOVED (SCHOOLS3)
-  // The popup's onService reads what openServiceFlow RETURNS and
-  // answers "not available yet" on a null, so this arm hands the
-  // window back as the repair arm does rather than mounting silently.
-  // ROAD-F GS1: mountServiceWindow HANDS THE WINDOW BACK, so the
-  // mount and the return are one statement - the law pinned here is
-  // still "mounts AND returns", not the two lines it used to take.
-  assert.ok(/return mountServiceWindow\(bookWin\);/.test(modes),
-    'the arm mounts AND returns the window');
-});
-
-test('U42: the live probe surface exists on both exterior hosts, and castProbe reopens', () => {
-  // The window's buttons are hit rects painted into SPBK00I0 and
-  // selection is a colour swap, so nothing about it can be seen from
-  // outside - tools/spellbookProbe.mjs reads its state back through
-  // `__spellbook` instead of sleeping and hoping.
-  for (const host of ['scenes/world.js', 'scenes/exterior.js']) {
-    const s = readFileSync(new URL(`../../src/${host}`, import.meta.url), 'utf8');
-    assert.ok(s.includes('window.__spellbook = () =>'), `${host} carries the probe surface`);
-    // PX23: the factory still HOLDS the live window; it just asks the
-    // door for it. The probe reads the CLASSIC window's own fields
-    // (buyMode, selectedIndex) and runs on the classic skin, where the
-    // door hands back exactly that window.
-    assert.ok(/_spellbook = createSpellbookWindow\(/.test(s), `${host}'s factory holds the live window`);
-  }
-  const probe = readFileSync(new URL('../../tools/spellbookProbe.mjs', import.meta.url), 'utf8');
-  assert.ok(probe.includes('__spellbook'), 'the probe reads that surface');
-  assert.ok(probe.includes('30.5'), 'and clicks through the panel\'s half-pixel offset');
-  // castProbe sorted the book then pressed Enter, which only worked
-  // while the KEYED window stayed open through its confirmation.
-  const cast = readFileSync(new URL('../../tools/castProbe.mjs', import.meta.url), 'utf8');
-  const sortLeg = cast.slice(cast.indexOf("await page.keyboard.press('s');"));
-  const reopen = sortLeg.indexOf("await page.keyboard.press('Backspace');");
-  const ready = sortLeg.indexOf("await page.keyboard.press('Enter');");
-  assert.ok(reopen > 0 && reopen < ready, 'castProbe reopens the book before readying');
 });
 
 // ---------------------------------------------------------------

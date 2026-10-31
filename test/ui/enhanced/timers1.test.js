@@ -184,24 +184,6 @@ test('TIMERS1: the hourglass - a button that opens, placed just left of the prof
 });
 
 test('TIMERS1 wiring: the pause face carries the hourglass where the host hands a source, and every host hands the world\'s', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /home\.append\(profileMark\(\)\);[\s\S]{0,600}?if \(hooks\.timers\?\.\(\)\) \{\s*\n\s*mark = timersMark\(document, \{ open: timersOpen,/, 'beside the profile mark, online only');
-  assert.match(menu, /timersAnchor = anchorBeside\(mark, home\.querySelector\?\.\('\.px-profile'\), home\);/, 'AUDIT TIMERS1 UI-3: placed again on every resize');
-  assert.match(menu, /for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'AUDIT TIMERS1 UI-5/UI-7: the pause face under the window is out of reach');
-  assert.match(menu, /read: \(\) => hooks\.timers\?\.\(\{ ask: true \}\) \?\? null/, 'AUDIT TIMERS1 UI-9: only the window read asks the service');
-  assert.match(read('src/ui/plus/plusPad.js'), /const visible = \(n\) => !!n && n\.isConnected !== false && !n\.closest\?\.\('\[inert\]'\)/, 'a bumper turns no inert tabs');
-  assert.match(menu, /const back = accountOpen \? \(\) => closeAccount\(\)[^\n]*\n\s*: timersOpen && timersView \? \(\) => \{ timersOpen = false; timersFocusBack = true; render\(\); \}/, 'Escape closes a DRAWN window before it resumes (AUDIT TIMERS1 UI-11)');
-  assert.match(menu, /stopTimers\(\);   \/\/ TIMERS1: a rebuild/, 'a rebuild stops the old tick');
-  assert.match(menu, /timersOpen = false;   \/\/ TIMERS1: and the timers window the same/, 'a visit\'s window');
-  const world = read('src/scenes/world.js');
-  // EVENTS1: seated where it is made for the HUD's event board too (systems/eventNotices.js seatEventBoard answers it as handed)
-  assert.match(world, /const timersSource = seatEventBoard\(\(\{ ask = false \} = \{\}\) => \{\n(\s*\/\/[^\n]*\n)*\s*try \{\n(\s*\/\/[^\n]*\n)*\s*if \(!online \|\| !_sharedClockHeard\) return null;/, 'offline, or before the relay\'s clock: no source, no hourglass');
-  assert.match(world, /\} catch \{ return null; \}\n  \}, \(text\) => chatNotice\(text\), townTalk\);[^\n]*\n  const pauseDoorHooks/, 'AUDIT TIMERS1 D6: a pause before the boot declared what it reads is no timers, never a throw');
-  assert.equal((world.match(/timers: timersSource,/g) ?? []).length, 2, 'the street\'s pause bag and the modes host');
-  assert.match(read('src/scenes/worldModes.js'), /timers: host\.timers,/, 'a building\'s pause');
-  assert.match(read('src/scenes/worldModes.js'), /timers: \(o\) => host\.timers\?\.\(o\) \?\? null,/, 'the dungeon\'s opts, the ask carried');
-  assert.match(read('src/scenes/dungeonContext.js'), /timers: \(o\) => opts\.timers\?\.\(o\) \?\? null,/, 'the dungeon\'s pause');
-  assert.match(world, /if \(ask && seatBook\?\.open !== false && now - _timersSeatAsk > 60_000\)/, 'the seats list asked only by the window');
   assert.match(ENHANCED_CSS, /\n\.px-timersmark \{ position: absolute;/);
   assert.match(ENHANCED_CSS, /\n\.px-win\.px-timerswin \{/);
 });

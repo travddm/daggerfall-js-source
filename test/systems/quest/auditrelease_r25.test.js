@@ -130,9 +130,6 @@ test('R2-5b the Imperial City is a destination slice by slice: each of its 625 s
   // the plan's fills (its isle, lake and shore - imperialSliceName's last arm, read here so a rename there fails here)
   const fills = [...capitalSpanPixels(0)].filter(({ x, y }) => PLAN_FILL_NAMES.includes(capitalSliceName(CAPITALS[0], capitalOnPixel(x, y).s)));
   assert.equal(fills.length > 300 && fills.every(({ x, y }) => isUnsitedSlice(x, y)), true, `${fills.length} fill slices left out`);
-  const IC_SRC = readFileSync(new URL('../../../src/world/imperialCity.js', import.meta.url), 'utf8');
-  assert.match(IC_SRC, /for \(const d of \['City Isle', 'Lake Rumare', SHORE\]\)/);
-  assert.match(IC_SRC, /const SHORE = 'Rumare Shore'/);
   assert.equal([...capitalSpanPixels(0)].filter(({ x, y }) => !isUnsitedSlice(x, y)).length, 257, 'the slices a site may stand in');
   assert.equal(sliceQuestName(sol.px, sol.py), null);
   const q = sliceQuestName(ic.px - 3, ic.py + 2);
@@ -222,9 +219,6 @@ test('R2-5d a province\'s places made ready in idle time: each tick stands at mo
   assert.equal(ticks.length, 2);
   ticks.shift()();
   assert.equal(ticks.length, 1, 'the first warmer\'s loop ended when the second started');
-  // the quest layer starts one over its provinces, on the browser's idle door
-  const QW = codeOnly(readFileSync(new URL('../../../src/scenes/questWorld.js', import.meta.url), 'utf8'));
-  assert.match(QW, /createProvinceWarm\(\{ provinces, regionNow: \(\) => _questRegionIndex\(\), origin: \(\) => playerTravelOrigin\?\.\(\) \?\? null, schedule: provinces \? idleSchedule\(\) : null \}\)\.start\(\);/);
 });
 const whiterunAt = (() => { const w = townAt({ name: 'Whiterun', mapId: 0xa7000001, px: 1700, py: -420 }); return () => w; })();
 

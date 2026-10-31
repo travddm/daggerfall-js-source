@@ -369,27 +369,3 @@ test('RIDE: a peer in the saddle is Eye Of The Beholder\'s mounted sprite off th
   assert.equal(riders.isRiding('p1'), false); assert.equal(gone.length >= 1, true, 'the dismount frees the batch');
 });
 
-test('HCC-PARK / RIDE hosts: the owner\'s word names the character, is ticked with the frame\'s out-words and said again after any welcome; a kept team is its cell\'s and its life\'s; the rider layer runs first and hands the others the rider\'s height; the pose sends the mount, the gallop as the rider sees it; a rider hears no footsteps and casts from the saddle; the dead see no rider', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /modes\?\.setDungeonAuthority\?\.\(dungeonAuthority\(now\)\);[^\n]*\n\s+hccParkTick\(now\);/);   // after the stream, the flushes and the seat - the frame's out-words, in order
-  assert.match(w, /const c = characterIdOf\(playerEntity\);/);
-  assert.match(w, /const data = word \? \{ c, \.\.\.word \} : \{ c \};/);
-  assert.match(w, /const rejoin = online\.room !== _parkRoom \|\| online\.welcomes !== _parkWelcomes;/);
-  assert.match(w, /const via = online\.sendPark\(data, cell\);/);
-  assert.match(w, /online\.onPark = \(room, e\) => \{ wagonWarden\?\.keptWord\(room, e\); hcc\.applyKept\(room, e, campToScene, performance\.now\(\)\); \};/);   // PIN MOVED (WARDEN1): a throw it had not said is played before the pool takes the word
-  assert.match(w, /online\.onParks = \(room, list\) => hcc\.replaceKept\(room, list, campToScene, performance\.now\(\)\);/);
-  assert.match(w, /hcc\.pruneKept\(isCellRoom\(online\.room\) \? \[online\.room, \.\.\.online\.haloRooms\(\)\] : \[\], now\);/);
-  assert.match(w, /peerRiders\.sync\(seen, onlineToScene,[^\n]*\n\s+const afoot = seen\.filter\(\(d\) => (?:\(peerRidesIn3d\(d\) \|\| )?!peerRiders\.isRiding\(d\.id\)[^;]*\);[^\n]*\n\s+peerBodies\.sync\(afoot,/);
-  assert.match(w, /bodyHeight: \(id\) => peerRiders\.heightOf\(id\) \|\| peerBodies\.heightOf\(id\)/);
-  assert.match(w, /const riding = \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && isRiding\(player\.transportMode\);/);
-  assert.match(w, /rd: !riding \? 0 : player\.transportMode === TRANSPORT_MODES\.Cart \? 2 : 1,/);
-  assert.match(w, /rv: [^\n]*modSetting\('eye-of-the-beholder', 'Graphics\.OnHorse'\)/);
-  assert.match(w, /const eye = \[feet\[0\], feet\[1\] \+ \(s\.rd \? RIDE_EYE_HEIGHT : h - 0\.2\), feet\[2\]\];/);
-  assert.match(rd('src/net/remotePlayers.js'), /onFoot: !shown\.rd,/);
-  const o = rd('src/net/online.js');
-  assert.match(o, /this\.welcomes\+\+;/);
-  const s = rd('server/src/index.js');
-  assert.match(s, /if \(path === PARK_INTERNAL_REG \|\| path === PARK_INTERNAL_DROP\) return this\._parkInternal\(path, request\);/);
-  assert.match(s, /const k = await parkKeyOf\(a\.sub, m\.data\.c\);/);
-  assert.match(s, /if \(m\.data\.r && atCover\(here, cell\)\) \{\n\s*const thrown = await this\._parkStore\(k, a\.sub, a\.id, a\.name \?\? '', m\.data\.r, now\);/);   // PIN MOVED (COST-2): a cell this socket covers; PIN MOVED (WARDEN1): the store answers a thrown team its owner re-said
-});

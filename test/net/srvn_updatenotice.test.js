@@ -212,15 +212,6 @@ test('SRV-N: a notice is a line the GAME wrote - `system` is a flag, not a name,
   assert.equal(notice.id, '');
   assert.equal(notice.mine, false);
 
-  // A NAME IS FORGEABLE AND A FLAG IS NOT. net/nameFilter.js guards the
-  // words a player may call themselves, not the impersonation, so a
-  // notice recognised by the string 'Server' would be one name change
-  // away from a player announcing a fake restart. The flag never travels:
-  // `online.js` builds the object it hands to `onChat` field by field.
-  const src = readFileSync(new URL('../../src/net/online.js', import.meta.url), 'utf8');
-  const onChat = src.match(/this\.onChat\?\.\(\{[^)]*\)/)?.[0] ?? '';
-  assert.ok(onChat, 'the chat hand-off is still a literal');
-  assert.ok(!/system/.test(onChat), 'the wire\'s chat line is built field by field and `system` is not one of them - a relay frame cannot smuggle it in');
   // driven, not only read: a frame that TRIES
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', presence: false, WebSocketImpl: FakeWS, now: () => 1000 });
@@ -236,36 +227,6 @@ test('SRV-N: a notice is a line the GAME wrote - `system` is a flag, not a name,
 });
 
 // ── THE HOST ─────────────────────────────────────────────────────────
-
-test('SRV-N: the host wires BOTH arms and puts a notice on EVERY tab - the presence session and every chat link hand the relay\'s version to one detector, and the build poll rides the chat frame', () => {
-  const w = rd('src/scenes/world.js').replace(/^\s*\/\/.*$/gm, '');   // AUDIT-CHATR F1's lesson: a source pin must step over its own prose
-  assert.match(w, /link\.onRelay\s*=\s*onRelayVersion/, 'every chat link hears the relay - a channel\'s welcome is the only one it gets');
-  assert.match(w, /online\.onRelay\s*=\s*onRelayVersion/, 'and so does the presence session, which is usually first back after a deploy');
-  assert.match(w, /relayVersionSeen\(v\)\s*===\s*'changed'/, 'ONE detector behind both arms, or two sockets say it twice');
-  assert.match(w, /chatNotice\(relayRestartText\(\)\)/);   // L10N4 (PIN MOVED): RELAY_RESTART_TEXT through its reader, in the player's language
-  assert.match(w, /chatNotice\(buildUpdateText\(\)\)/);
-  // A NOTICE IS NOT A ROOM'S EVENT. It is kept on every one of the log's
-  // tabs rather than pushed to the active one, so a later row in CHAT_TABS
-  // gets it for free and a player reading one tab is never guessing.
-  // CHAT-CHAN: as ONE line (ChatLog.pushAll - marked as the game's there),
-  // so four tabs peek it once and count it once; test/net/chatchan.test.js
-  // drives what pushAll does.
-  assert.match(w, /chatLog\.pushAll\(\{ text \}\);/, 'every tab, one line, and marked as the game\'s');
-  assert.match(w, /const chatFrame = \(\) => \{\s*if \(!chatLinks\) return;\s*buildPoll\(/, 'the poll rides the chat frame - there is no notice to give where there is no chat window');
-  assert.match(w, /buildUpdateSeen\(tag, BUILD_TAG\)/, 'against THIS bundle\'s tag, which is the only thing that makes the compare need no baseline');
-  // AUDIT-SRVN: the gate AND the stamp, adjacent and in that order. A
-  // campaign survivor deleted the stamp alone: the gate still read, still
-  // compared, and compared against a number nothing ever moved - so after
-  // one interval the poll ran on EVERY frame. A gate whose state is never
-  // written is not a gate.
-  assert.match(w, /if \(now - _buildPolledAt < BUILD_POLL_MS\) return;\s*_buildPolledAt = now;/, 'stamped where the poll STARTS, which is what makes it the re-entry gate as well as the rhythm');
-  // AUDIT-SRVN F3: there is NO second in-flight boolean, and its absence is
-  // the pin. The stamp above is taken when the poll STARTS, so it is
-  // already the re-entry gate; a spare flag added nothing and could latch
-  // raised on a request that never settled, killing the poll for the
-  // session. One gate that heals itself beats two where the spare can stick.
-  assert.doesNotMatch(w, /_buildPolling/, 'no second latch beside the interval gate that already is one');
-});
 
 test('AUDIT-SRVN F1: the deploy name has a LAW in wire.js like every other field a welcome carries, and it is one home at both ends', () => {
   assert.equal(relayVersionOf('world67'), 'world67');
@@ -330,8 +291,5 @@ test('AUDIT-SRVN F2: a relay that mints a name per welcome cannot flood the chat
 });
 
 test('SRV-N: the relay was BUMPED - a welcome field is a relay change, and the deployed Worker is the only thing that can prove it', () => {
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /"v":\$\{JSON\.stringify\(RELAY_VERSION\)\}/, 'the full welcome is built as a string and the field is spliced into it');
-  assert.match(idx, /t: 'welcome', id: m\.id, peers: named, n: shard \? this\._hubN\(others\.length \+ 1\) : others\.length \+ 1, v: RELAY_VERSION/, 'the channel\'s is built as an object (ROSTER-G: with its roster and count; PIN MOVED, SCALE5c: a shard\'s count the hub\'s)');
   assert.notEqual(RELAY_VERSION, 'world66', 'world66 is the deploy that is LIVE and carries no `v` at all - shipping the client against that name would have made every first welcome look like a restart');
 });

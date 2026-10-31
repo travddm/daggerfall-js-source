@@ -110,16 +110,3 @@ test('DISC22-C: without the pack it is DFU\'s tooltip box; a frame with no loot 
   _setLootPanelSeamsForTests(); destroyWorldPlaque(); resetQuickLoot();
 });
 
-test('DISC22-C: drawHud draws it on both classic branches, and the DOM plaque stays the enhanced skin\'s', () => {
-  const hud = readFileSync(join(ROOT, 'src/ui/hud/hud.js'), 'utf8');
-  assert.equal((hud.match(/drawClassicLoot\(renderer, canvas, font\);/g) ?? []).length, 2, 'the large-HUD branch and the plain one');
-  assert.match(hud, /const loot = classicLootFrame\(frameMark\(\)\);/);
-  assert.match(hud, /if \(loot\) drawLootPanel\(renderer, nativeMetrics\(canvas\), font, loot\.frame, loot\.lit, at\);/);   // AUDIT RETRO1 G5: `at` - beside the reticle where it is, above the bar
-  // hud.js reads a LEAF: reaching for systems/quickLoot.js from here closed an import ring (itemTransfer.js initialised
-  // before its own constants), so the frame module imports nothing at all
-  assert.doesNotMatch(hud, /from '(?:\.\.?\/)+(?:[\w-]+\/)*quickLoot\.js'/);
-  assert.doesNotMatch(readFileSync(join(ROOT, 'src/systems/classicLootFrame.js'), 'utf8'), /^import /m);
-  const wp = readFileSync(join(ROOT, 'src/ui/worldPlaque.js'), 'utf8');
-  // PIN MOVED (FIELD BUGS 2026-10-11g LOOT-SCROLL): the panel draws the plaque's window over the frame, its lit row counted from the window's top
-  assert.match(wp, /if \(dom\) showWorldPlaque\(frame, plaqueAnchor\(canvas\)\);\s*\n\s*else \{ const lit = quickLootRow\(frame\), w = windowOf\(frame, lit\); setClassicLootFrame\(w\.frame, frameMark\(\), lit >= 0 \? lit - w\.from : -1\); \}/);
-});

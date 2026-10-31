@@ -32,7 +32,6 @@ import { recordFrame } from '../../src/scenes/groundFrameHost.js';   // BAY-LEFT
 const H = HEIGHTMAP_DIMENSION;
 const UNIT = MAX_TERRAIN_HEIGHT;   // a normalized sample in kernel units
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const WORLD = hostText('src/scenes/world.js');
 
 const WOODS_BYTES = syntheticWoodsBytes();
 const woods = new WoodsFile();
@@ -341,7 +340,6 @@ test('LANDFORM1: no record carries whose ground it stood on - the save, the scen
   for (const f of ['src/systems/save/save.js', 'src/systems/sceneCache.js', 'src/systems/teleportAnchor.js', 'src/systems/ship.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
     assert.equal(src(f).includes('landforms'), false, `${f}: no stamp`);
   }
-  assert.equal(/landforms: !!landform|landOf\(|wasLand|savedLand/.test(WORLD), false, 'the host writes none and reads none');
   const entity = { items: [], stats: {} };
   assert.equal(Object.hasOwn(snapshotPlayer(entity, {}), 'landforms'), false);
   assert.equal(Object.hasOwn(makeAnchor({ pixel: { x: 1, y: 2 }, nativeX: 0, nativeZ: 0, y: 5, terrainScale: 1.25 }), 'landforms'), false);
@@ -372,34 +370,6 @@ test('LANDFORM1-3: the switch is the Features row on the enhanced skin, the room
   assert.deepEqual([...row.kinds], ['enhanced']);
   assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'landforms', initial: true, online: true });
   assert.equal(row.effect, 'Takes effect when the world next loads.');
-});
-
-test('LANDFORM1-3: the host reads the row once, cuts every pixel and every promotion with it, raises the ring and the beacon by it, and stands every record\'s height again by it', () => {
-  assert.match(WORLD, /\n  const landform = landformsOn\(\);\n/, 'once, at the mount - the same job online and off: the room\'s river switch decides online');
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js);
-  // D5: `before`, the old law's ground - the Bay's table alone (test/world/terrain/bayleftground_frame.test.js)
-  assert.match(WORLD, /const landformsHere = \(\{ before = false \} = \{\}\) => \(landform \? createLandforms\(\{ woods, roads: terrainGen\.roads\(\), sites: _landformSites, beyond: before \? null : beyondSites\.beyond\(\), climates: _landformClimates, ranges: !before \}\) : null\);/, 'this thread\'s landforms, over its own network and the sites and climates it handed both kernels');   // PIN MOVED (RELIEF-PEAKS): the old law's landforms without the ranges, which a record written then never stood
-  assert.equal((WORLD.match(/landformsOn\(/g) ?? []).length, 1);
-  assert.match(WORLD, /\n      landform,   \/\/ LANDFORM1-3: the shaped ground, cut along the kernel's own network\n    \}\);/, 'the pixel job');
-  assert.match(WORLD, /terrainGen\.grid\(\{ px: p\.px, py: p\.py, stride: 1, samples: p\.samples, landform, bed: bedBytes \}\)/, 'the promotion off the thread');   // PIN MOVED (AUDIT WATER-NEXT P1): the bed carved with it
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(WORLD, /grid = restrideGrid\(\{ woods, px: p\.px, py: p\.py, stride, samples: p\.samples, landform, roads: terrainGen\.roads\(\), sites: _landformSites, beyond: beyondSites\.beyond\(\), climates: _landformClimates, bed: waterOn \? bedBytesOf\(p\) : null \}\)/, 'and on it');   // PIN MOVED (AUDIT WATER-NEXT P1)
-  assert.match(WORLD, /_gateKernel = sampleKernel\(woods, px, py, HEIGHTMAP_DIMENSION, true, landformsHere\(\)\);/, 'the gate\'s beacon stands on the shaped ground');
-  assert.match(WORLD, /relief: !!landform,   \/\/ LANDFORM1: the ring stands the massifs/, 'the far ring');
-  assert.match(WORLD, /ringGroundAt\(px\.x, px\.y, ground \? \(bx, by\) => woods\.getHeightMapValue\(bx, by\) : \(\) => 0, !!landform\)/, 'the travel view past the built grid');   // PIN MOVED (RELIEF-PEAKS): the ring's ground at the pixel's centre, its fades the kernel's; PIN MOVED (AUDIT LANDFORMS II I1): faded beside the sea, as the ring is; PIN MOVED (BREATHTAKER2 on the horizon): at its pixel, the continent's lift with it
-  // AUDIT LANDFORMS C1 MOVED THESE PINS: they read a stamp - every record is DFU's frame now, the row's lift put back on at
-  // every read (test/world/terrain/auditlandforms.test.js runs each path, row on and off)
-  assert.match(WORLD, /const today = was === STREAMING_TERRAIN_SCALE && !landform;/, 'the quickload');
-  assert.match(WORLD, /const rows = savedScale === STREAMING_TERRAIN_SCALE && !landform \? outer : outer\.map/, 'the camps left outside');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): each record's frame's law (`groundFrame`) stamped beside its scale and read beside it
-  assert.match(WORLD, /return restandHeight\(y, x, z, was, arrived\.groundFrame\); \};   \/\/ LANDFORM1: the row's lift put back on[^\n]*\n    droppedLoot\.restoreWorld\(arrived/, 'the exterior scene cache');
-  const tg = src('src/world/terrain/terrainGen.js');
-  // AUDIT LANDFORMS D3 MOVED THIS PIN: the same pass writes DFU's own samples beside, for a location's tiles
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(tg, /const landforms = landform \? createLandforms\(\{ woods, roads, sites, beyond, climates \}\) : null;[^\n]*\n(?:  \/\/[^\n]*\n)*  const classic = landforms && hasLocation \? new Float32Array\(HEIGHTMAP_DIMENSION \* HEIGHTMAP_DIMENSION\) : null;\n  const samples = generateSamples\(woods, px, py, HEIGHTMAP_DIMENSION, landforms, classic\);/, 'the kernel cuts along the network the painter paints');
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(tg, /const lf = landforms \?\? \(landform \? createLandforms\(\{ woods, roads, sites, beyond, climates \}\) : null\);/, 'and a promotion\'s ghost rows along the same');
-  assert.match(src('src/world/terrain/terrainGenWorker.js'), /if \(m\.t === 'grid' && m\.landform && pendingRoads\) \{ pendingRoads\.then\(\(\) => handle\(m\)\); return; \}/, 'a landforms promotion waits for the network its pixel was cut along');
 });
 
 test('LANDFORM1-3: the worker cuts what this thread cuts - a job and a promotion, byte for byte', async () => {

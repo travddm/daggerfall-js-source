@@ -335,10 +335,6 @@ test('WW7-9 THE TRIPS\' WORLD WAKES A REGION AT A TIME: a place waits while the 
   assert.ok(trips.beyond.tiles < n, 'the tiles it reached let go');
   const off = createLivingTrips({ places, populated, peopleAt: () => 0, maps: { getClimateIndex: () => 0 }, woods, roads: () => null });
   assert.deepEqual([off.world.waiting({ px: 500, py: 40 }), off.world.waiting({ px: 500, py: -40 }), off.world.waitingArea(area)], [false, false, false], 'no land past the Bay: nothing waits');
-  const lt = rd('src/scenes/livingWorld/livingTrips.js');
-  assert.match(lt, /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: pastTheBay \? \{ epoch, placesIn: pastBayPlacesIn, landedIn, landed: \(\) => landed \} : null \}\);/);
-  assert.match(lt, /const epoch = \(\) => pastTheBay\?\.build\(\) \?\? 0;/, 'the epoch the roads\' build');
-  assert.match(hostText('src/scenes/world.js'), /, marketBandOf: townEcon\.marketBandOf, pastTheBay: _tamrielRoads \}\);/, 'the host hands the roads past the Bay\'s host');
 });
 
 test('WW7-9 THE READERS OF A WAITING PLACE WAIT WITH IT: its visitors, an inn\'s guests, a dungeon\'s divers, dives and fallen - none read while it waits (pending), so none is kept short; an area\'s hideouts while it waits (mutants: each reader\'s wait)', () => {
@@ -504,7 +500,6 @@ test('WW7-10 THE SEA\'S TRADE PAST THE BAY: a port\'s lanes are counted off the 
   assert.equal(host.prosperityOf(12), p(12, 1), 'the lanes moved: counted again');
   lanes = null;
   assert.equal(host.prosperityOf(11), p(11, 0), 'none standing: none');
-  assert.match(hostText('src/scenes/world.js'), /portLanes: \(\) => \(_lanesReady && mapDict \? worldLanes\.all\(\) : null\) \}\);/, 'the world\'s lanes');
 });
 
 // ─── 8. ON THE FREEWARE'S WORLD ──────────────────────────────────

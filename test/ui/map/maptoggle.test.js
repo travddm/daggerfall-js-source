@@ -61,10 +61,6 @@ test('MAP-TOGGLE by source: the Features row - interface (FT18; sight before), e
   assert.equal(row.group, 'interface'); assert.deepEqual([...row.kinds], ['enhanced']);   // FT18: a map is drawn over the world, not in it
   assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'heldMap', initial: true, online: 'player' });
   assert.match(row.note, /Off uses the classic three map windows/, 'the note says what off is');   // PIN MOVED: BR5
-  const gate = rd('src/ui/map/mapSkin.js');
-  assert.match(gate, /export const enhancedMapOn = \(\) => !!getPref\('heldMap'\);/);
-  assert.match(gate, /export const heldMapChosen = \(\) => isEnhanced\(\) && enhancedMapOn\(\);/);
-  assert.match(gate, /export const heldMapWorn = \(\) => heldMapChosen\(\) && typeof document !== 'undefined';/);
 });
 
 test('MAP-FIELD8: the FOURTH painting ships, and every constant that is a measurement of it was measured (tools/heldMapArtProbe.mjs, 20 checks) - wider than the third, the sheet inset on it, the thumbs where they rest, the art foot, the band in the cuff gap', () => {

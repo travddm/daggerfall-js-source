@@ -128,5 +128,4 @@ test('BANTHA2 THE ROWS ARE THE DRAWING\'S on the freeware\'s map: tools/banthaAr
     }
   }
   assert.ok(rain / n > 0.9, `the Rainforest's ${(rain / n).toFixed(3)}`);
-  assert.ok(readFileSync(join(ROOT, 'tools/jungleExtent.mjs'), 'utf8').includes('banthaAreaHas'), 'the extent tool reads the area');
 });

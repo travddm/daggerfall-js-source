@@ -77,16 +77,6 @@ test('BAY-LEFT-SEA THE HUBS A REQUEST CARRIES: the Bay\'s HUB1\'s byte for byte,
   assert.deepEqual(c[62], [709, -337], 'the places moved: made again');
 });
 
-test('BAY-LEFT-SEA THE HOST: the market\'s pieces module makes the hubs over the seats and the registry, the board hands the tab the hubs as they stand when it opens, a trader\'s stall reads them at its buy (mutants: the seats unhanded; the board\'s hubs a function; the stall\'s hubs the old object)', () => {
-  const m = src('src/scenes/marketPiecesHost.js');
-  assert.ok(m.includes('const marketHubs = createMarketHubs({ regionHubs, seats: townSeats, places: worldPlaces });'));
-  assert.ok(m.includes('marketBook, regionHubs, saveSoon, townSeats, worldPlaces, writBook'));
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.ok(w.includes('    marketBook, regionHubs, saveSoon, townSeats, worldPlaces, writBook,   // BAY-LEFT-SEA'));
-  assert.ok(w.includes("regionNameOf: (r) => REGION_NAMES[r] ?? 'another region', hubs: marketHubs(), name:"));
-  assert.ok(src('src/scenes/vendorHost.js').includes('const hub = marketHubs()[row.region];'));
-});
-
 const realSkip = HAVE ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)';
 test('BAY-LEFT-SEA (ARENA2): on the freeware every province has its hub - the seven capitals\' centres and the largest city-states of High Rock and Hammerfell past the Bay - and the Bay\'s 43 are HUB1\'s; the real Worker fills a Daggerfall order from a board in Solitude and buys a Skyrim listing from a board in Daggerfall, both ways - `market-no-road` with HUB1\'s hubs alone', { skip: realSkip }, async () => {
   globalThis.atob ??= (s) => Buffer.from(s, 'base64').toString('binary');

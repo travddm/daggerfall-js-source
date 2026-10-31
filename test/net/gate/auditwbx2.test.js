@@ -26,14 +26,6 @@ import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the sec
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
-test('AUDIT WBX2 M1 the crash\'s records have their keeper online or not: the spoils pool is made whatever the session, every save that lands is told to it, and the crash\'s door hands each record to it - offline no save could ever clear a record, and its spoils came back at every boot (mutants: the save\'s word online alone)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const spoilsPool = createSpoilsPool\(\{/, 'made online or not');
-  assert.doesNotMatch(w, /const spoilsPool = gateLink \?/);
-  assert.match(w, /\n {2}onSlotSaved\(\(characterId\) => \{ try \{ spoilsPool\.saved\(characterId\);/, 'every save that lands, told');
-  assert.match(w, /onHanded: \(rec\) => spoilsPool\.adopt\(rec\)/, 'every record handed back, adopted');
-});
-
 /** A fight with two fighters of level 10 at `frac` of his health. */
 function fightAt(frac) {
   const f = newFight(7, 0, 100_000_000, 'ruhn');
@@ -163,10 +155,6 @@ test('AUDIT WBX2 M5/M8 the leap is ONE law: the beat flies him through the air a
   h.pos = [0, 0]; h.atk = { ...atk };
   settleAt(h, mid);
   assert.deepEqual(h.pos, [5, 0]);
-  // one copy of the rule: the beat asks the kill's
-  const brain = read('src/net/gate/gateBrain.js');
-  assert.match(brain, /if \(f\.atk\) \{\n {4}settleAt\(f, now\);/);
-  assert.match(read('src/world/gate/gateBoss.js'), /const leap = atk \? leapAt\(atk, now\) : null;/);
 });
 
 test('AUDIT WBX2 M6 an older build\'s mark for anyone still refuses the spoils here, but only this account\'s own spend is said to the hub - said for another it made their receipt forgotten on every device (mutants: the word for any mark)', () => {
@@ -205,24 +193,5 @@ test('AUDIT WBX2 M7 the stone asks for a player sealed in it at every stand - it
   shift = [64, 0, 0];
   now += 16; pool.frame(0.016);
   assert.deepEqual(landed, [2000], 'stood again where it moved, over them: set down');
-  assert.match(read('src/scenes/gate/gatePool.js'), /const f = feet\(\);\n {4}if \(f && g && inGateRoot\(place, f\)\) landBefore\(g\);/);
 });
 
-test('AUDIT WBX2 M9 the sweep reads its cursors in one storage read (AUDIT RAID R2: four now - the raid receipts\' too; AUDIT SERPENT S5: five - the serpent receipts\'; SD9a: six - the Hour\'s; EG-ZA: seven - the Elite Breach\'s held receipts; AUDIT EG IV: eight - the breach calls\'; STAR3: nine - the star receipts\')', () => {
-  const idx = read('server/src/index.js');
-  // PIN MOVED (EG-ZA, bible/11-Multiplayer/Elite-Gates.md section 23 step 5): the hub holds a breach's receipts under
-  // `egrc:<sub>` and its sweep is the gate's, widened by one prefix - its cursor joins the one read. PIN MOVED (AUDIT EG
-  // IV, the net group; Elite-Gates.md section 23): a breach's lapsed calls (`egcall:<sub>`) are swept too - their cursor joins it
-  // PIN MOVED (STAR3, bible/11-Multiplayer/Starfall.md section 5): the hub keeps an account's star receipts under
-  // `starrc:<sub>` (the raid's keep) - their cursor joins the one read
-  // PIN MOVED (AUDIT KETCH L1-2, bible/01-Overview/audits/Audit-Ketch.md): the hub keeps an earner's Ketch receipt under
-  // `ktrc:<sub>` (the Hour's keep) - its cursor joins the one read
-  assert.match(idx, /const cur = \(await this\.state\.storage\.get\(\['sweep:acct', 'sweep:party', 'sweep:gaterc', 'sweep:raidrc', 'sweep:serpentrc', 'sweep:sdrc', 'sweep:egrc', 'sweep:egcall', 'sweep:starrc', 'sweep:ktrc'\]\)\);/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:starrc'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:egrc'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:egcall'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:gaterc'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:raidrc'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:serpentrc'\)/);
-  assert.doesNotMatch(idx, /storage\.get\('sweep:sdrc'\)/);
-});

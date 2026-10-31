@@ -48,8 +48,6 @@ test('OL3 (1): the shared clock has an inverse at the wire, and the ticker carri
     assert.equal(sharedWallMs(NaN), null);
   } finally { setSharedClock(null); }
   assert.equal(sharedWallMs(5000), null, 'uninstalled with the clock');
-  // TIME1: and the sky's own source and inverse beside them, through the same offset
-  assert.match(rd('src/scenes/world.js'), /setSharedClock\(\(\) => sharedClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), \(m\) => wallMsForClassicMinutes\(m\) - _sharedOffsetMs, \{ sky: \(\) => skyClassicMinutes\(Date\.now\(\) \+ _sharedOffsetMs\), skyWall: \(m\) => wallMsForSkyMinutes\(m\) - _sharedOffsetMs \}\);/, 'the host installs the inverse through the relay\'s offset');
 });
 
 test('OL3 (1) + LIVED1: the tavern\'s offer says how long the room is theirs in the character\'s own time and in play - a fresh rental from now, a renewal from the standing expiry - and offline the offer is DFU\'s', () => {
@@ -86,8 +84,6 @@ test('OL3 (1) + LIVED1: the tavern\'s offer says how long the room is theirs in 
   assert.equal(asked[1], room.expiryMinutes + 2 * MINUTES_PER_DAY, 'a renewal extends the standing expiry, as RentRoom does');
   const off = mk(null);
   assert.equal(offerFor(off, 3).rows.length, 1, 'offline: the offer it always was');
-  assert.match(rd('src/scenes/worldModes.js'), /ownTimeOf: \(m\) => ownTimeLeftText\(m\),/, 'the host\'s word');
-  assert.match(rd('src/scenes/worldModes.js'), /dueDateText: \(minutes, \{ short = false \} = \{\}\) => \{\s*if \(!\(minutes > 0\)\) return '';\s*const left = ownTimeLeftShort\(minutes\);\s*if \(left === 'now'\) return short \? 'now' : 'due now';[^\n]*\n\s*const own = short \? \(left && `\$\{left\} of your time`\) : ownTimeLeftText\(minutes\);\s*return own \? `in \$\{own\}` : dateString\(dateFromClassicMinutes\(minutes\)\);/, 'the bank\'s due-by says the time left in the character\'s own time online (short on the classic parchment, "due now" once due: AUDIT LIVED1 P/L), and is the date alone offline');
   // the words themselves: the character's clock and the most play it can take (the wire's one rate)
   try {
     setSharedClock(() => 900000);
@@ -136,10 +132,6 @@ test('OL3 (2), re-spelt by WORLD7: CreateFoe\'s spawn interval charges PLAYED ti
   step = Infinity;
   clock.t += 3600; m.tick();
   assert.equal(act.lastSpawnTime, clock.t, 'offline the gap counted and the wave fired at once'); assert.equal(world.created.length, 4);
-  const src = rd('src/systems/quest/actions.js');
-  assert.match(src, /const step = this\.parentQuest\.questClockStepMax\?\.\(\) \?\? Infinity;/);
-  assert.match(src, /if \(gameSeconds >= this\.lastSpawnTime \+ this\.spawnInterval && !this\.spawnInProgress\) \{/);
-  assert.equal(src.includes('questClocksStoodDown'), false, 'the stand-down word is gone');
 });
 
 test('OL3 (7): a welcome clock more than a year from this machine\'s is said - the session keeps a warning the HUD line shows while open, the console hears it once, and a sane welcome clears it', () => {

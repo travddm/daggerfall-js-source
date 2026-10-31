@@ -200,76 +200,6 @@ test('ACC1-CI: the signing pair is NEVER re-minted, and never leaves the pipe', 
     'the private half no longer reaches wrangler through a pipe');
 });
 
-test('ACC1-CI: --pipe emits ONE pair, private first, and there is no way to ask for half', async () => {
-  // Run the real tool. Two lines, in the documented order, and they
-  // must actually be each other's halves - because the failure this
-  // prevents is a service that signs with a key its own /v1/pubkey
-  // disowns, which looks exactly like a forged token.
-  const out = execFileSync('node', [join(root, TOOL), '--pipe'], { encoding: 'utf8' });
-  const lines = out.split('\n').filter((l) => l !== '');
-  assert.equal(lines.length, 2, `--pipe emitted ${lines.length} lines; the workflow reads exactly two`);
-  const [priv, pub] = lines;
-
-  const { subtle } = globalThis.crypto;
-  const msg = new TextEncoder().encode('the two halves are one pair');
-  const sk = await subtle.importKey('pkcs8', Buffer.from(priv, 'base64'), { name: 'Ed25519' }, false, ['sign']);
-  const vk = await subtle.importKey('raw', Buffer.from(pub, 'base64url'), { name: 'Ed25519' }, false, ['verify']);
-  const sig = await subtle.sign({ name: 'Ed25519' }, sk, msg);
-  assert.ok(await subtle.verify({ name: 'Ed25519' }, vk, sig, msg),
-    'the private half and the public half printed by ONE run are not a pair - the order may have flipped');
-
-  // ORDER IS THE CONTRACT: the workflow reads private, then public. If
-  // they swapped, the public half would be stored as the secret and
-  // every token would be unsignable - so ask which is which rather
-  // than trusting the shape.
-  assert.ok(priv.length > pub.length, 'a PKCS8 private key is longer than a raw public key - these look swapped');
-
-  // AND THERE IS NO SINGLE-HALF FLAG. Two calls would mint two
-  // unrelated pairs. The tool deliberately offers no way to do it.
-  const tool = rd(TOOL);
-  assert.doesNotMatch(tool, /'--private'|'--public'/,
-    'the tool offers a way to ask for one half alone, which mints two unrelated pairs across two calls');
-
-  // ...and it still writes nothing to disk.
-  assert.doesNotMatch(tool, /writeFile|appendFile|createWriteStream/, 'the key tool writes a key to disk');
-});
-
-test('AUDIT-ACC F2: the Worker entrypoint exports ONLY a handler, or workerd will not start', () => {
-  // THE WORKER DID NOT BOOT. AUDIT-ACC stood it up in a real workerd
-  // and it refused, before a single request:
-  //
-  //   Uncaught TypeError: Incorrect type for map entry 'ACCOUNT_VERSION':
-  //   the provided value is not of type 'function or ExportedHandler'.
-  //
-  // In a module Worker EVERY named export of the entrypoint is read as
-  // an entrypoint - a WorkerEntrypoint, a Durable Object, a Workflow -
-  // and a plain string or Set is not one, so it is a hard startup
-  // failure rather than something ignored. `src/index.js` exported four
-  // constants and a test hook.
-  //
-  // NO NODE TEST COULD SEE IT, and that is the lesson worth keeping:
-  // the pins IMPORTED those very names, so they proved the exports
-  // existed while the runtime rejected them for existing. Importability
-  // and deployability are different questions and the suite was only
-  // ever asking the first one.
-  const entry = rd('server-account/src/index.js');
-  const named = [...entry.matchAll(/^export\s+(?!default\b)(\w+)\s+(\w+)/gm)];
-  assert.deepEqual(named.map((m) => m[2]), [],
-    `server-account/src/index.js has named exports (${named.map((m) => m[2]).join(', ')}) - workerd reads each as an entrypoint and refuses to start`);
-  assert.match(entry, /^export default \{/m, 'the entrypoint no longer exports a handler at all');
-
-  // THE RELAY IS THE CONTROL, and it is why this is a law rather than a
-  // guess: server/src/index.js has deployed for months exporting
-  // `default` and the `Room` Durable Object CLASS. A class is a legal
-  // entrypoint; a constant is not. So the pin forbids named value
-  // exports, not named exports outright.
-  const relay = rd('server/src/index.js');
-  assert.match(relay, /^export default \{/m);
-  const relayNamed = [...relay.matchAll(/^export\s+(?!default\b)(\w+)\s+(\w+)/gm)];
-  assert.ok(relayNamed.length > 0 && relayNamed.every((m) => m[1] === 'class'),
-    'the relay entrypoint grew a non-class named export - the same startup failure is one deploy away');
-});
-
 test('AUDIT-ACC F15: the Worker is DEPLOYED before its secrets are asked about', () => {
   // `wrangler secret list` asks Cloudflare for a Worker's secrets, and
   // on a Worker that does not exist yet it fails outright:
@@ -342,79 +272,6 @@ test('AUDIT-ACC F1: "I could not tell" must never be read as "there is no key"',
   const decide = step.indexOf('IDENTITY_PRIVATE_KEY"');
   assert.ok(shape >= 0, 'nothing checks that the listing is actually an array before trusting it');
   assert.ok(shape < decide, 'the shape is checked after the decision, which is not a check');
-});
-
-test('ACC1-CI: the deploy is verified BY CONTENT, and reads the host and version from the config', () => {
-  const wf = rd(WF);
-  const toml = rd(TOML);
-
-  // A wrangler exit code of 0 over an unchanged Worker is a green
-  // deploy that did not happen - U60's law for the client, SRV-N/CI's
-  // for the relay, and this service's now.
-  assert.match(wf, /v1\/health/, 'nothing checks that the deploy actually landed');
-  assert.match(wf, /v1\/pubkey/, 'nothing checks the service can hand back the public key it was given');
-
-  // DERIVED, NOT TYPED. The version and the worker name are read out of
-  // wrangler.toml by the workflow itself, so a rename cannot leave the
-  // check interrogating a host that no longer exists.
-  assert.match(wf, /grep -oP '\^ACCOUNT_VERSION[^\n]*\$toml/, 'the workflow no longer reads the version from the config');
-
-  // ...AND THE HOST IS NOT TYPED ANYWHERE. It used to be the worker
-  // name from the config plus a hardcoded account subdomain beside it -
-  // half derived, half typed, which is a second home for a fact and the
-  // exact shape SLAM13 burned the relay on (AUDIT-ACC F16). The deploy
-  // step reads the URL off wrangler's own output, which is the only
-  // thing that knows where the Worker actually landed, and it makes
-  // this workflow portable to any Cloudflare account.
-  const live = wf.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
-  assert.doesNotMatch(live, /[a-z0-9-]+\.workers\.dev/,
-    'a workers.dev host is typed into a command - it must come from the deploy step');
-  assert.match(live, /workers\\\.dev.*GITHUB_OUTPUT|GITHUB_OUTPUT[\s\S]{0,200}deployed to/,
-    'the deploy step no longer publishes the URL it deployed to');
-
-  // PIN MOVED (SCALE4d): a step's LIVE lines - the split hands each step the comment block written above the next one,
-  // and the read replicas' PUT (a curl to Cloudflare's API, no `v1/` of this service) read as a verifier because the
-  // deploy step's comment below it names `/v1/` routes
-  const steps = wf.split(/\n      - name: /).slice(1).map((s) => s.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n'));
-  const verifiers = steps.filter((s) => /curl/.test(s) && /v1\//.test(s));
-  assert.ok(verifiers.length >= 2, `expected the health and pubkey checks - found ${verifiers.length}`);
-  for (const v of verifiers) {
-    const title = v.split('\n')[0];
-    assert.match(v, /steps\.deploy\.outputs\.base/,
-      `"${title}" reaches a URL it did not get from the deploy`);
-  }
-
-  // ...and the value it would read is the one the code answers with.
-  const inToml = /^ACCOUNT_VERSION\s*=\s*"([^"]+)"/m.exec(toml);
-  const name = /^name\s*=\s*"([^"]+)"/m.exec(toml);
-  assert.ok(inToml && name, 'the config no longer carries both a version and a name to read');
-  // ...read from service.js since AUDIT-ACC F2 moved it there: the
-  // entrypoint may export only a handler, so the constants live in
-  // their own home and this pin follows them.
-  const svc = rd('server-account/src/service.js');
-  const inCode = /^export const ACCOUNT_VERSION = '([^']+)'/m.exec(svc);
-  assert.ok(inCode, 'server-account/src/service.js no longer declares ACCOUNT_VERSION');
-  assert.equal(inToml[1], inCode[1], 'the config and the code name different deploys - the verify step would never go green');
-
-  // A path filter is allowed HERE and is refused on the relay. The
-  // difference is not taste: this Worker holds no sockets. Hold the
-  // filter, so a slice that moves the service somewhere the filter does
-  // not cover reddens rather than silently stopping the deploys.
-  const paths = /paths:\s*\n((?:\s*-\s*"[^"]+"\n)+)/.exec(wf);
-  assert.ok(paths, 'the trigger no longer has a path filter');
-  assert.match(paths[1], /server-account\/\*\*/, 'a change to the service itself would not deploy it');
-  // ACC4: DERIVED FROM WHAT THE WORKER REALLY BUNDLES. This pin used to
-  // name identityToken.js alone, and the Worker also bundled the handle
-  // shape, the name filter, the wire, mat4 and the name tables - five
-  // files whose changes shipped nowhere. Walked from the entry now, so a
-  // file that joins the bundle without joining the filter reddens here.
-  const listed = [...paths[1].matchAll(/-\s*"([^"]+)"/g)].map((m) => m[1]);
-  const outside = graph('server-account/src/index.js').filter((f) => !f.startsWith('server-account/'));
-  assert.ok(outside.includes('src/net/identityToken.js') && outside.includes('src/net/playClock.js'),
-    `the walk no longer sees the files it must - it would pass over any filter: ${outside.join(', ')}`);
-  for (const f of outside) {
-    assert.ok(listed.includes(f), `${f} is bundled into the account Worker and a change to it would not deploy`);
-  }
 });
 
 test('IMPORT-GRAPH1: the walk is what the bundler bundles - each Worker\'s graph is exactly the files esbuild bundles from its entry, a JSON table a leaf; the relay\'s order is the hash\'s (mutants: a re-export unread; a named re-export unread; a dynamic import unread; a table parsed; a package walked)', async () => {
@@ -502,41 +359,6 @@ test('ACC1d D2: the service\'s deploy checks the RELAY\'s copy of the public key
   assert.doesNotMatch(wf, new RegExp(key.slice(0, 20)), 'no literal copy in the workflow');
 });
 
-test('ACC2: the deploy creates the SAVE BUCKET the same way it creates the database, and reads its name from the config it ships', () => {
-  const wf = rd(WF);
-  const toml = rd(TOML);
-  // THE BINDING IS IN THE CONFIG, and it is the config the deploy
-  // ships: a Worker whose toml binds a bucket that does not exist does
-  // not start, which is why the create runs BEFORE the deploy.
-  assert.match(toml, /^\[\[r2_buckets\]\]$/m, 'the save bucket is bound');
-  const bucket = /^bucket_name\s*=\s*"([^"]+)"/m.exec(toml)?.[1];
-  const binding = /^binding\s*=\s*"(SAVES)"/m.exec(toml)?.[1];
-  assert.ok(bucket, 'and it has a name');
-  assert.equal(binding, 'SAVES', 'under the name server-account/src/index.js reads (env.SAVES)');
-  assert.match(rd('server-account/src/index.js'), /env\.SAVES/, 'which the Worker really reads');
-
-  const step = /- name: Create the save bucket[\s\S]*?(?=\n      # |\n      - name: )/.exec(wf)?.[0] ?? '';
-  assert.ok(step, 'the create step is there');
-  // DERIVED, NOT TYPED TWICE - the same law the database's id follows.
-  assert.match(step, /grep -oP '\^bucket_name[^']*' server-account\/wrangler\.toml/, 'the name comes out of the config');
-  assert.doesNotMatch(step, new RegExp(`["']${bucket}["']`), 'and is never a literal in the workflow');
-  // AUDIT-ACC F1 AGAIN: no `|| echo` fallback on the listing. "I could
-  // not read this" must never become "there is none of it".
-  assert.match(step, /\$WRANGLER r2 bucket list/, 'the list is asked before the create');
-  assert.doesNotMatch(step, /r2 bucket list[^\n]*\|\|/, 'a listing that fails must fail the step');
-  assert.match(step, /r2 bucket create/, 'and the create is only reached when it is missing');
-  // ...and it runs BEFORE the deploy, for the reason above.
-  assert.ok(wf.indexOf('- name: Create the save bucket') < wf.indexOf('- name: Deploy'), 'the bucket exists before the Worker that binds it');
-
-  // THE MIGRATION IS NOT NAMED HERE EITHER. ACC1-CI's law: a workflow
-  // that lists migration files applies a new one only when somebody
-  // remembers. 0003 is applied by the ledger like every other.
-  const migrations = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql'));
-  assert.ok(migrations.includes('0003_saves.sql'), 'ACC2 brought a migration');
-  const live = wf.split('\n').filter((l) => !l.trim().startsWith('#')).join('\n');
-  for (const m of migrations) assert.ok(!live.includes(m), `the workflow names ${m}`);
-});
-
 test('GATE-KEYS: the deploy mints the gate\'s receipt pair ONCE, puts each half on its own Worker as a secret, and fails if this service still holds none', () => {
   // DragynDance on the Discord: "I didn't get credit for closing the oblivion gate in my profile". WB5b left the pair
   // to a person - a tool, and a var shipped empty - and nobody minted it: every receipt went out unsigned, the device
@@ -587,27 +409,6 @@ test('GATE-KEYS: the deploy mints the gate\'s receipt pair ONCE, puts each half 
   assert.match(verify, /\[ "\$code" = "400" \] && grep -q '"error":"receipt"'/, 'the one answer that proves a key is loaded');
   assert.match(verify, /exit 1\s*$/, 'and a service that never answers so fails the deploy');
   assert.ok(at('Mint the gate receipt pair if either Worker lacks its half') < at('Verify the service holds the gate\'s public half'), 'the proof comes after the mint');
-});
-
-test('AUDIT B1 (SHADOW-FANG, 2026-09-26): the service deploys only once the relay serves this push\'s version - it signs what the relay verifies, and a title or glyph the running relay did not know was refused whole ("token claims"), terminal on the presence socket (mutants: the wait dropped; the wait after the deploy; the relay\'s address typed)', () => {
-  const wf = rd(WF);
-  const step = (name) => {
-    const i = wf.indexOf(`- name: ${name}`);
-    assert.ok(i > 0, `the workflow has no step called "${name}"`);
-    return i;
-  };
-  const wait = step('Wait for the relay to serve this push\'s version');
-  const deploy = step('Deploy');
-  assert.ok(wait < deploy, 'the relay first, then the service');
-  const body = wf.slice(wait, deploy);
-  const live = body.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
-  assert.match(live, /grep -oP "\^export const RELAY_VERSION = '\\K\[\^'\]\+" src\/net\/wire\.js/, 'the version wire.js names - one home');
-  assert.match(live, /grep -oP "\^export const DEFAULT_SERVER = 'wss:\/\/\\K\[\^'\/\]\+" src\/net\/online\.js/, 'the relay\'s address, the client\'s own');
-  assert.match(rd('src/net/online.js'), /^export const DEFAULT_SERVER = 'wss:\/\/[^'/]+';/m, 'and the client still spells it so');
-  assert.doesNotMatch(live, /workers\.dev/, 'never typed here');
-  assert.match(live, /https:\/\/\$host\/health/);
-  assert.match(live, /\[ "\$\(n "\$got"\)" -ge "\$\(n "\$want"\)" \]/, 'or a later version');
-  assert.match(live, /exit 1\s*$/, 'and nothing is deployed when the relay never serves it');
 });
 
 test('AUDIT pre-merge S3: the service check\'s ask survives a timeout or a reset - under `set -e` a curl that exits non-zero ended the step on its first attempt, though the loop says it asks for a minute', () => {

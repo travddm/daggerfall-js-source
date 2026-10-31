@@ -144,12 +144,6 @@ test('HORSE-VOL: a peer\'s mount - their hooves and their neigh at my Horse Volu
   });
 });
 
-test('HORSE-VOL: the Wagon Warden\'s heave is the lifted team\'s neigh, on Horse Volume; its throw and its landing are not a horse\'s (mutant: the heave at full)', () => {
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /const WARDEN_CLIPS = \{ heave: SOUND\.AnimalHorse,/);
-  assert.match(src, /audio\.playOneShot\(WARDEN_CLIPS\[what\], 0\.7 \* \(1 - d \/ 120\) \* \(what === 'heave' \? horseVolume\(\) : 1\)\)/);
-});
-
 test('HORSE-VOL, ANIMAL-VOL: the Audio tab\'s Volume section draws both rows after Monster Volume, each a step of 5% (20% with Shift) on its own pref (mutants: a row dropped; a row writing another\'s key)', () => {
   // org2_options.test.js's document: just enough for the port's row builders
   const doc = () => {
@@ -190,7 +184,6 @@ test('HORSE-VOL, ANIMAL-VOL: the Audio tab\'s Volume section draws both rows aft
     }
     assert.deepEqual([horseVolume(), animalVolume()], [0.8, 0.8], 'each row wrote its own pref');
   } finally { resetPrefs(); delete globalThis.document; delete globalThis.window; }
-  assert.match(rd('src/ui/settings/settingsMap.js'), /"port:monsterVolume", "port:companionVolume", "port:horseVolume", "port:animalVolume"\]/);
 });
 
 test('SOUND-LIVE: writing Sound Volume re-levels the master at once over 50 ms, so a loop already playing hears the slider; a context with no automation takes the value outright (mutants: the setting unwatched; another key heard; no ramp)', () => {

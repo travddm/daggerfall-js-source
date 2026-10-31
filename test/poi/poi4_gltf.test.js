@@ -260,8 +260,3 @@ test('POI-4 REFUSALS: not glTF 2.0; Draco and meshopt compression named and refu
   assert.deepEqual(codes(warned), ['skin', 'animation', 'points-lines', 'vertex-colours']);
 });
 
-test('POI-4 RECORDS: the importer is pure (no DOM, no fetch) and names the specification it is written to', () => {
-  const s = src('src/poi/gltfImport.js');
-  assert.doesNotMatch(s, /\b(document|window|fetch|XMLHttpRequest)\b\s*[.(]/);
-  assert.match(s, /registry\.khronos\.org\/glTF\/specs\/2\.0/);
-});

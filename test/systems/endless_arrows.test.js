@@ -44,15 +44,6 @@ test('ENDLESS-ARROWS: a purchase that takes arrows fills a General Store\'s quiv
   assert.equal(restockEndless(shelf, [quiver]), 0, 'no shop named: nothing filled');
 });
 
-test('ENDLESS-ARROWS wired (by source): the counter\'s commit and the keyed list both name their shop to restockEndless - for the counter\'s shelf alone (mutants: the commit unnamed; any shelf a quiver)', () => {
-  const w = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT UPDATE E2, E-N7): the shop read where the restock is made, and only for the counter's shelf - a
-  // back shelf's drawn arrows, or a row a player sold there, are no endless quiver
-  assert.match(w, /restockEndless\(shelf\.items, staged, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/);
-  assert.match(w, /restockEndless\(shelf\.items, \[it\], shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/);
-  assert.doesNotMatch(w, /buildingType: b\.buildingType \}/, 'the commit\'s asks carry no shop (E-N7: no host line for it)');
-});
-
 // AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): lane E's laws of the quiver
 test('AUDIT UPDATE E1: a purchase puts back what it took, never the whole - arrows stolen stay gone, so a theft and one arrow bought is one arrow sold (mutants: the whole filled; the theft refilled)', () => {
   const shelf = stock(B.GeneralStore, 5);

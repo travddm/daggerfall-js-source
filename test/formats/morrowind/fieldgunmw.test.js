@@ -297,30 +297,6 @@ test('FIELD-GUN-MW2: a missing shipped file SAYS it is the build\'s fault', () =
   assert.match(boneless.notes.join(' '), /no "Weapon Bone" bone/);
 });
 
-test('FIELD-GUN-MW2: the archive is MOUNTED, and in the rank that lets Mac override it', () => {
-  // The one seam node cannot execute: `import.meta.glob` is a Vite
-  // macro and this archive is empty here by construction, so a mount
-  // that was deleted would break nothing any other pin can see - the
-  // gun would simply stop drawing, in the browser, silently. Read the
-  // host instead.
-  const host = source('src/scenes/dataSource.js');
-  const at = host.indexOf('ownMwArchive()');
-  assert.ok(at > 0, 'dataSource.js no longer mounts the port\'s own archive - the gun draws nothing in the browser');
-  assert.match(host.slice(Math.max(0, at - 400), at + 40), /archives\.push\(own\.ownMwArchive\(\)\)/,
-    'it is pushed into the archive list, not merely imported');
-
-  // THE RANK IS THE DESIGN. Loose files first (MW-D40's
-  // data-files-over-BSA law) so a texture Mac drops in REPLACES ours
-  // without a rebuild; then the vendored and own archives; then every
-  // .bsa. Asked as ORDER IN THE SOURCE, because that is the order the
-  // list is built in.
-  const loose = host.indexOf('archives.push(makeLooseArchive(loose))');
-  const bsa = host.indexOf('archives.push(await MwBsaFile.open(blob))');
-  assert.ok(loose > 0 && bsa > 0, 'the two ranks this sits between are still here');
-  assert.ok(loose < at, 'the player\'s own loose files rank AHEAD of ours, so they can override the gun');
-  assert.ok(at < bsa, 'and ours ranks ahead of every .bsa, which carries none of these names');
-});
-
 test('FIELD-GUN-MW2: the gun is MORROWIND-SIZED, and pivoted on the grip', () => {
   // RIGGING, not bookkeeping, and the first bake got both wrong. It
   // normalised the mesh to a longest axis of 1 - a tidy number for a

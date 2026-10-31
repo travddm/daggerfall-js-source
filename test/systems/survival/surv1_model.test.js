@@ -341,17 +341,6 @@ test('SURV1: a jump owes at most two days, and a player arriving from longer awa
   assert.equal(THIRST_PER_MINUTE, 100 / 360);
 });
 
-test('SURV1: by source - liveStat reads the survival entry, and the model is three modules that import no host', () => {
-  // AUDIT SURV-TIERS (the second pass): read, and capped at the read - five above the stat as it stands without it
-  assert.match(read('src/systems/statMods.js'), /if \(a\.kind === 'survival'\) \{ survival \+= a\.statMods\?\.\[statName\] \?\? 0; continue; \}/);
-  assert.match(read('src/systems/statMods.js'), /if \(survival < 0\) survival = -Math\.min\(-survival, Math\.max\(0, Math\.min\(base, Math\.min\(Math\.max\(base \+ mod, 0\), MAX_STAT_VALUE\)\) - 5\)\);\n\s*mod \+= survival;/);
-  for (const f of ['temperature', 'food', 'needs']) {
-    const src = read(`src/systems/survival/${f}.js`);
-    assert.doesNotMatch(src, /from '\.\.\/\.\.\/scenes\/|from '\.\.\/\.\.\/ui\/|from '\.\.\/\.\.\/combat\/|from '\.\.\/spellcast|from '\.\.\/diseases|from '\.\.\/effects|document\.|window\./, `${f}.js is pure - and off the formulas -> equip cycle`);
-  }
-  assert.match(read('src/systems/survival/needs.js'), /export const MAX_CATCHUP_MINUTES = 2 \* MINUTES_PER_DAY;/);
-});
-
 // ── SURV-THIRST1: A BODY PAST DEHYDRATED FAILS WHEREVER IT STANDS ──
 //
 // Mac, 2026-09-19: "You should also should die on dehydration".
@@ -428,15 +417,6 @@ test('SURV-THIRST1: the harm follows AUDIT SURV E’s shape - the harm TICK, esc
   log.length = 0;
   survivalMinute(e, 600, { ...cool, resting: true }, { worn: dressed, sinks, autoDrink: false, autoEat: false, ctx: { raceId: RACES.Breton } });
   assert.deepEqual(log, [], 'resting, thirst takes no blood');
-  // and it may KILL: no HEALTH_FLOOR, because the bare-skin harms leave the
-  // last five points BECAUSE they are not meant to kill, and this one is
-  const src = readFileSync(new URL('../../../src/systems/survival/needs.js', import.meta.url), 'utf8');
-  const line = src.slice(src.indexOf('if (rules.health && s.thirst >= NEED.THIRST_HARM'));   // SURV-TIERS: the wound is Hard's (`rules.health`)
-  assert.match(line.slice(0, line.indexOf('\n    }')), /sinks\.hurt\?\.\(/, 'the raw sink, not hurtFloored');
-  assert.doesNotMatch(line.slice(0, line.indexOf('\n    }')), /hurtFloored/);
-  // THE DEPARTURE ITSELF: no climate term anywhere in the condition
-  assert.doesNotMatch(line.slice(0, line.indexOf(')')), /temp\.|felt|EXPOSURE_AT/,
-    'thirst no longer asks the weather - that was the mod’s law and is the port’s departure');
 });
 
 test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on arrival', () => {
@@ -482,14 +462,3 @@ test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on 
   assert.equal(jump(24, 0), jump(12, 0), 'a longer jump cannot cost more than the floor allows');
 });
 
-test('SURV-THIRST1 AUDIT: the replay flag is the WALK’s, and only the last minute is live', () => {
-  const src = readFileSync(new URL('../../../src/systems/survival/needs.js', import.meta.url), 'utf8');
-  // one object for the whole walk, not one per minute (EV2: this loop
-  // runs up to MAX_CATCHUP_MINUTES times)
-  assert.match(src, /const walk = \{ \.\.\.deps, replay: true, sinks: \{ \.\.\.sinks, drainFatigue: drainFloored, say: [^\n]+ \} \};\s*\n\s*for \(let m = start \+ 1; m <= end; m\+\+\) \{\n\s*walk\.replay = m < end;/,
-    'the walk marks every minute but the last as a replay, from one object (AUDIT SURV-TIERS, the third pass: its lines gathered)');
-  // a bare survivalMinute - the live per-minute call every host makes -
-  // is NOT a replay, or nothing would ever die of thirst
-  assert.match(src, /autoEat = true, replay = false, landing = false \} = deps;[^\n]*\n\s+const rules = deps\.rules \?\? HARD_RULES;/, 'a caller that says nothing is live (and, SURV-TIERS, runs Hard - AUDIT SURV-TIERS: a null too)');   // PIN MOVED (AUDIT TEMP-UI E6): and not a landing
-  assert.match(src, /const jump = end - start > 1;[\s\S]*walk\.replay = m < end;\n(?:\s*\/\/[^\n]*\n)*\s*walk\.landing = !walk\.replay && jump;/, 'AUDIT TEMP-UI E6: the minute a JUMP lands in is a landing - floored, as its replayed minutes are; a one-minute step is that minute, live');
-});

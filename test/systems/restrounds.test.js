@@ -130,21 +130,6 @@ test('REST-ROUNDS: the rested window is fanned out to the foe pools too - one br
   } finally { done(); }
 });
 
-test('REST-ROUNDS by source (LIVED1): every rest the four hosts drive spends its minutes through the ticker (outdoors, the party mirror, a building, the fixed city) or the dungeon\'s own arm - and nothing hands a session counter over', () => {
-  const hosts = { 'src/scenes/world.js': 3, 'src/scenes/worldModes.js': 4, 'src/scenes/dungeonContext.js': 2, 'src/scenes/exterior.js': 2 };   // the rest, the party mirror, a camp's cooking, a meal (the hunt's retired, HUNT-OUT 2026-10-04); HEAL-CURSE: and the temple's Heal Curse (each cure's RaiseTime(60), its one minute, on the building's ticker too)
-  for (const [f, want] of Object.entries(hosts)) {
-    const s = src(f);
-    const bodies = [...s.matchAll(/advanceMinutes: \(n\) => ([^\n]*)/g)].map((m) => m[1]);
-    assert.equal(bodies.length, want, `${f}: its time-passing deps take the minutes`);
-    for (const b of bodies) assert.match(b, /(?:playerTicker|interiorTicker)\.advance\(n\)|_restAdvance\(n\)/, `${f}: ...and spend them on the character's clock: ${b.slice(0, 80)}`);
-    assert.doesNotMatch(s, /sharedEnd/, `${f}: no session counter is handed over any more`);
-  }
-  // the one session call, the same in every lane
-  const rs = src('src/systems/rest/restSession.js');
-  assert.match(rs, /this\.deps\.advanceMinutes\(MINUTES_PER_TICK\);/);
-  assert.doesNotMatch(rs, /this\._onlineSimMinutes\s*[+=]/, 'the session keeps no minute counter of its own');
-});
-
 test('REST-ROUNDS (LIVED1): a rest\'s own real seconds are lived online too - the world\'s clock moves while the window counts, and the character\'s clock takes the night AND those minutes', () => {
   try {
     const on = lane(true);

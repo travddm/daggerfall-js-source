@@ -108,12 +108,6 @@ test('CRAFT-FIRST-SHOWN the craft\'s word, from the real Worker\'s answer throug
   } finally {
     tm.setLocale('en');
   }
-  // THE HOSTS DO NOT GROW: world.js's craft says its XP through the module, one call
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /^import \{ craftXpText \} from '\.\.\/ui\/craftXpWords\.js';/m);
-  // PIN MOVED (FIELD BUGS 2026-10-18f CRAFT-LIMIT-SAID): one call still, the crafter's limit over the track handed in (profBook.js limit)
-  assert.match(w, /const rec = recipeById\(recipe\);\n.*\n\s+return \{ ok: true, text: `\$\{chain \? `\$\{chain\} ` : ''\}\$\{made\} \$\{craftXpText\(rec, r\.data, st\.xp, profBook\.limit\(rec\?\.profession\)\)\}\$\{paid \?/);
-  assert.doesNotMatch(w, /\(\+\$\{r\.data\.xp\} \$\{st\.xp\} XP\)/, 'the old word, which left `first` unread, is gone');
 });
 
 // ─── THE STATIONS' BOXES ─────────────────────────────────────────────

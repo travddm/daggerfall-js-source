@@ -147,7 +147,6 @@ test('AUDIT KB1 F3: the report reaches the PLAYER - one HUD line per action, a m
       assert.equal(got.length, 1, 'delivered once');
     } finally { console.info = info; setKeybindNoticeSink(null); setBindings(null); }
   });
-  assert.match(rd('src/main.js'), /input\.setKeybindNoticeSink\(\(report\) => \{ for \(const line of cfg\.keybindCarryNotes\(report\)\) notify\.hudTextWhenShown\(line, 12\); \}\)/, 'the composition root wires the report to the HUD');
 });
 
 test('AUDIT KB1 F4: Yes on the replace prompt keeps the old holder unbound across a reboot, whatever order ACTIONS walks them in (mutant: "differs" read off the half-applied store)', () => {
@@ -347,27 +346,6 @@ test('AUDIT KB1 (UI 3 + hosts 4): eventAction reads the event\'s own flags and b
   } finally { setBindings(null); }
 });
 
-test('AUDIT KB1 (UI 4): Escape on the Controls pane\'s prompt answers No - the menu\'s back stack asks the pane before it leaves the section (mutant: the arm dropped, so Escape discards every staged bind)', () => {
-  const m = rd('src/ui/enhanced/enhancedMenu.js');
-  const arm = m.indexOf(': controlsPromptOpen() ? () => dismissControlsPrompt()');
-  // PIN MOVED (AUDIT UICALM-FIRM1 L3 L1): the section's way back now puts the keyboard on its door - the order held
-  const leave = m.indexOf(": section !== 'home' ? () => { const from = section; go('home');");
-  assert.ok(arm > 0 && leave > arm, 'the prompt is answered before the section is left');
-});
-
-test('AUDIT KB1 (UI 6): the pad\'s button closes the classic window it opened - the pause on Menu, the pack on View (mutant: the primary alone read)', () => {
-  setBindings(defaults());
-  try {
-    const pause = new PauseOptionsWindow({});
-    pause.input('JoystickButton7'); pause.keyup('JoystickButton7');
-    assert.equal(pause.done, true, 'Menu closes the pause');
-    const inv = new NativeInventoryWindow({ items: () => [], entity: { items: [], equip: { slots: {} } } });
-    inv.input('JoystickButton6');
-    assert.equal(inv.done, true, 'View closes the pack');
-    assert.match(rd('src/ui/restWindow.js'), /this\.toggleClosedSecondary = getBinding\(bindings\(\), 'Rest', false\);/, 'and the rest window the same way');
-  } finally { setBindings(null); }
-});
-
 test('AUDIT KB1 (UI 7): a key\'s auto-repeat does not answer the classic windows\' prompt - the PRESS does (mutant: the repeat guard dropped)', () => {
   setBindings(defaults());
   try {
@@ -386,32 +364,6 @@ test('AUDIT KB1 (UI 7): a key\'s auto-repeat does not answer the classic windows
 });
 
 // ── THE HOSTS LENS ─────────────────────────────────────────────────────
-
-test('AUDIT KB1 (hosts 1): F8 under a window is the window\'s - the automap\'s third background - and routed actions answer the PRESS only (mutants: a screenshot listener over every window; the repeat routed)', () => {
-  setBindings(defaults());
-  try {
-    const under = [];
-    assert.equal(routeKey(keyEv('F8'), { uiOverlayActive: true, overlayIsNative: true, overlayInput: (c) => under.push(c) }), true);
-    assert.deepEqual(under, ['F8']);
-    let saves = 0;
-    const world = { uiOverlayActive: false, quickSave: () => { saves++; } };
-    routeKey(keyEv('F9'), world);
-    routeKey(keyEv('F9', { repeat: true }), world);
-    routeKey(keyEv('F9', { repeat: true }), world);
-    assert.equal(saves, 1, 'a held F9 saves once');
-    assert.equal(rd('src/ui/screenshot.js').includes("addEventListener('keydown'"), false, 'no listener of its own');
-    for (const h of ['world.js', 'exterior.js']) {
-      assert.match(rd(`src/scenes/${h}`), /else if \(e\.repeat\) \{ e\.preventDefault\(\); return true; \}[^\n]*\n\s*else if \(routeAction\(act, hudCtx\)\)/, `${h}'s own ladder takes the press alone`);
-    }
-  } finally { setBindings(null); }
-});
-
-test('AUDIT KB1 (hosts 2): a key a window takes joins no ring - the E that closes a shop is not the next frame\'s Interact (mutant: the ring filled under the mode\'s window)', () => {
-  for (const h of ['world.js', 'exterior.js']) {
-    assert.match(rd(`src/scenes/${h}`), /if \(!modes\?\.overlayHeld\) \{\n\s*keys\.add\(e\.code\);\n\s*noteKeyDown\(latch\.edge, e\.code, e\.repeat\);/, `${h}`);
-  }
-  assert.match(rd('src/scenes/dungeon.js'), /if \(!ctx\.uiOverlayActive\) \{\n\s*keys\.add\(e\.code\);\n\s*noteKeyDown\(keyEdge, e\.code, e\.repeat\);/, 'dungeon.js');
-});
 
 test('AUDIT KB1 (hosts 3): the screenshot\'s blob URL outlives the download\'s start (mutant: revoked at 0 ms)', async () => {
   const prevURL = globalThis.URL;

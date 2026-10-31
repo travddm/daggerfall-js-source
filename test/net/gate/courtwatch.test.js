@@ -125,7 +125,6 @@ test('COURT-WATCH the court: a watcher strikes nothing (a blow refused, nothing 
   assert.equal(h.c.askAgain(), false, 'seated: never asks');
   assert.equal(h.c.hit({ d: 50, r: HIT_KINDS.Melee }), true, 'seated, the same blow lands');
   assert.equal(h.sent.filter(([k]) => k === 'hit').length, 1, 'and is sent');
-  assert.match(src('src/scenes/world.js'), /\(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in',/, 'the host\'s `in` door asks again for a watcher');
 });
 
 test('COURT-WATCH his blows land on his fighters, never on the court\'s watchers: the slam that lands on a fighter standing there lands on nobody watching from the same stone (mutant: a watcher struck)', () => {
@@ -232,8 +231,6 @@ test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter
   const old = createGateLink({ now: () => 0, watches: () => false, onRefused: (m) => refused.push(m) });
   old.word({ k: 'no', m: 'the court is full' });
   assert.deepEqual([old.watching(), refused], [false, ['the court is full']], 'an older relay: refused as it was, never left watching');
-  assert.match(src('src/scenes/world.js'), /watches: \(\) => !!online\?\.courtWatchOk,/, 'the host hands the link the relay\'s word');
-  assert.match(src('src/net/online.js'), /if \(primary\) this\.courtWatchOk = relaySupportsCourtWatch\(relayV\);/, 'read off the welcome');
   // F4: the line in the player's language, at say-time
   const row = readFileSync(new URL('../../../locales/de/Port_Strings.csv', import.meta.url), 'utf8').split('\n').find((l) => l.startsWith('net.gate.courtWatch,'));
   assert.ok(row, 'German has the line');

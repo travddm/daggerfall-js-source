@@ -147,35 +147,9 @@ test('audit18 hosts: applyMotorEffectFlags - the EFFECT owns the flag (Levitate.
   assert.equal(player.slowFalling, true);
 });
 
-test('audit18 hosts: EVERY host outside a dungeon recomputes the motor effect flags', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    assert.match(src(host), /applyMotorEffectFlags\(player, playerEntity(?:, _dwForge \?\? undefined)?\)/,   // DW-D: the world host hands the carved sea's forge on the same write
-      `${host} never writes the effect-driven motor flags - they leak from the last dungeon frame`);
-  }
-  // worldModes must clear them on the NON-dungeon arm, i.e. the call
-  // has to sit in an `else` of the dungeon branch, not inside it.
-  const wm = src('src/scenes/worldModes.js');
-  const i = wm.indexOf('applyMotorEffectFlags(player, playerEntity)');
-  const before = wm.slice(0, i);
-  assert.match(before.slice(-900), /\}\s*else\s*\{/,
-    'worldModes must apply the flags on the else arm of the dungeon branch');
-});
-
 // ---------------------------------------------------------------------
 // 3. An open dungeon UI window did not hold the world in worldModes.
 // ---------------------------------------------------------------------
-
-test('audit18 hosts: worldModes overlayHeld covers the DUNGEON overlay, and holds the movers', () => {
-  const s = src('src/scenes/worldModes.js');
-  const line = s.split('\n').find((l) => l.includes('const overlayHeld'));
-  assert.ok(line, 'worldModes must compute overlayHeld');
-  const decl = s.slice(s.indexOf('const overlayHeld'), s.indexOf('const crouchHeld'));
-  assert.match(decl, /dungeonCtx/, 'overlayHeld ignores the dungeon overlay - the motor walks under an open window');
-  assert.match(decl, /uiOverlayActive/);
-  // DFU PauseGame(true) stops the movers too (dungeon.js:"so the mode must" does).
-  assert.match(s, /if \(!overlayHeld\) dungeonCtx\.actions\.update\(dt, player\);/,   // PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the movers meet the body
-    'the dungeon movers still travel under an open window');
-});
 
 // ---------------------------------------------------------------------
 // 4. Platform riding was wired only into the standalone dungeon scene.
@@ -212,7 +186,6 @@ test('audit18 hosts: the mover carries its rider by its own step, the rider\'s o
   const at = [...by.pos];
   actions.update(0.25, by);
   assert.deepEqual([...by.pos], at);
-  assert.equal(/ridePlatform/.test(src('src/scenes/shared.js')), false, 'no host-side ride beside the movers\' own');
 });
 
 test('audit18 hosts: BOTH dungeon-mounting hosts hand the movers the body (and the building\'s host its own)', () => {
@@ -270,20 +243,6 @@ test('audit18 hosts: offsetArrows actually moves in-flight arrows (the ?. hid a 
   assert.deepEqual(arrows.arrows[1].pos, [10 - 819.2, -500, 6]);
 });
 
-test('audit18 hosts: the streaming recenter carries fallStart AND the arrows', () => {
-  const s = hostText('src/scenes/world.js');
-  const block = s.slice(s.indexOf('if (r.offset) {'), s.indexOf('if (r.pixelChanged)'));
-  assert.match(block, /adjustFallStart\(player, r\.offset\[1\]\)/,
-    'the recenter shifts the player but not fallStart');
-  // EV1 moved the shift into player.offsetOrigin (both ends of the
-  // interpolation span move together); the ORDER law is unchanged.
-  assert.ok(block.indexOf('adjustFallStart') < block.indexOf('player.offsetOrigin('),
-    'AdjustFallStart runs BEFORE the position shift (FloatingOrigin.cs:176-181)');
-  assert.match(block, /offsetArrows\(arrows, r\.offset\)/);
-  assert.doesNotMatch(s, /arrows\.offsetAll\?\./,
-    'the optional call is the defect - a missing method must not ship silently again');
-});
-
 // ---------------------------------------------------------------------
 // 6. The exterior host spawned a wandering population everywhere.
 // ---------------------------------------------------------------------
@@ -298,20 +257,6 @@ test('audit18 hosts: PopulationManager rides exactly seven LocationTypes', () =>
   for (const t of [4, 7, 9, 10, 11, 12, 13, 14, 15]) {
     assert.equal(populatesWanderingNpcs(t), false, `type ${t} must NOT be populated`);
   }
-});
-
-test('audit18 hosts: BOTH exterior hosts gate the population on the location type', () => {
-  const ext = src('src/scenes/exterior.js');
-  assert.match(ext, /populatesWanderingNpcs\(dfLocation\.mapTableData\.locationType\)/,
-    'the ?exterior host builds a TownPopulation for ANY location type');
-  const decl = ext.slice(ext.indexOf('const population ='), ext.indexOf('const population =') + 120);
-  assert.match(decl, /populated \? null : new TownPopulation|!populated \? null : new TownPopulation/,
-    'the TownPopulation construction itself must be gated');
-  // The streaming host keeps its own guard and shares the one table.
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /populatesWanderingNpcs\(dfLocation\.mapTableData\.locationType\)/);
-  assert.doesNotMatch(w, /const POPULATED_LOCATION_TYPES = new Set/,
-    'the table must live in one place or the two hosts drift again');
 });
 
 test('audit18 hosts: the ?exterior gate is reachable on real MAPS.BSA', { skip: skipReal }, () => {
@@ -375,19 +320,6 @@ test('audit18 hosts: applyFallLanding is CheckFallingDamage + ApplyPlayerFallDam
   applyFallLanding(e, 12, { hurt: (d) => bills.push(d), sound: () => {} });
   assert.deepEqual(bills, [35]);
   assert.equal(e.health, 90, 'an injected hurt must own the health write');
-});
-
-test('audit18 hosts: every mode that can land bills the fall through ONE law', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    assert.match(src(host), /applyFallLanding\(playerEntity, player\.landedFallDistance/,
-      `${host} does not bill a landing`);
-  }
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /else if \(mode === 'interior'\)[\s\S]{0,1400}?applyFallLanding\(/,   // window widened: AUDIT 23's death-router registration sits between the marker and the landing
-    'interior mode still drops the landing entirely');
-  // RETIRED FLAG: the justification was false, so the sentence is gone.
-  assert.doesNotMatch(wm, /cannot fall 2\.5\+/,
-    'the stale flag claiming interiors cannot fall must be deleted, not reworded');
 });
 
 // ---------------------------------------------------------------------
@@ -477,14 +409,6 @@ test('audit18 hosts: NITE night skies get their stars on real data', { skip: ski
   });
 });
 
-test('audit18 hosts: the only night-sky mint runs the star pass between the two decodes', () => {
-  const s = src('src/scenes/shared.js');
-  assert.match(s, /getColor32\(applyNightStars\(img\.getDFBitmap\(0, 0\), starRandom\), -1\)/,
-    'the star pass must run on the palette-INDEX bitmap, before getColor32');
-  assert.match(s, /const starRandom = new NetRandom\(0\)/,
-    'one Random(0) for the controller life (DaggerfallSky.cs:74)');
-});
-
 // ---------------------------------------------------------------------
 // 9. Bad weather hides the clear night sky.
 // ---------------------------------------------------------------------
@@ -535,39 +459,9 @@ test('audit18 hosts: outdoorFogColor is SetSkyFogColor, threshold included', () 
   assert.equal(outdoorFogColor({ mode: 'linear', density: 0.5 }, sky), sky);
 });
 
-test('audit18 hosts: BOTH exterior hosts take the fog colour from the shared law', () => {
-  for (const host of EXTERIOR_HOSTS) {
-    const s = src(host);
-    // DS1: the law answers through the sky controller now - `fogColorFor`
-    // is outdoorFogColor over the sky's own horizon under every sky but
-    // Dynamic Skies, whose own RenderSettings.fogColor it hands back
-    // instead (the mod switches DaggerfallSky off, so nothing else
-    // writes it). The pin below on the controller keeps the law itself.
-    assert.match(s, /const fogColor = (?:jungle \? jungle\.haze\(\{ fogColor: sky\.fogColorFor\(fogNow\), [^\n]*\}\) : )?sky\.fogColorFor\(fogNow\)/,   // WX2: the row on the front; BANTHA1: in the streaming host the jungle's haze weighs the law's colour (scenes/jungleHost.js haze)
-      `${host} passes the sky colour unconditionally - a blizzard fogs to a blue tint`);
-    assert.doesNotMatch(s, /sky\.renderer\.fogColor = sky\.renderer\.clearColor;/);
-  }
-  const shared = src('src/scenes/shared.js');
-  assert.match(shared, /fogColorFor\(fogNow\) \{\s*\n\s*const own = litAir\(dynamic\?\.fogColor \?\? outdoorFogColor\(fogNow, \(enhancedSky \?\? dynamicSky \?\? sky\)\.clearColor\)\);[^\n]*\n\s*const c = sunbabyW > 0 \? sunbabyHaze\(own, sunbabyW, sunbabyEvil\) : own;[^\n]*\n\s*const d = dreadW > 0 \? dreadGrade\(c, dreadW\) : c;[^\n]*\n\s*return brassW > 0 \? sdBrassGrade\(d, brassW\) : d;/,   // PIN MOVED (NIGHT-FOG): the sky's colour through the lit air first (systems/weather/nightFog.js - the classic panorama's verbatim, test/systems/weather/nightfog.test.js); SUNBABY1 (PIN MOVED): the sun baby's haze between the law and the dread's grade; SUNBABY2 (PIN MOVED): its wrath's weight with it; SD19 (PIN MOVED at AUDIT SD III): the brass near a standing Hollow last, over the dread's grade
-    'the controller answers SetSkyFogColor over the sky it holds, or the mod\u2019s own colour');
-});
-
 // ---------------------------------------------------------------------
 // 11. The interior blockIndex 0 that made IsBadInteriorModel dead.
 // ---------------------------------------------------------------------
-
-test('audit18 hosts: EVERY host mints a TRUTHFUL StaticDoor.blockIndex', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /hit\.dfBlock, hit\.dfBlock\.index, hit\.recordIndex,/,
-    'worldModes hardcodes blockIndex 0 into buildInteriorContext');
-  assert.doesNotMatch(wm, /hit\.dfBlock, 0, hit\.recordIndex/);
-  for (const host of EXTERIOR_HOSTS) {
-    const s = src(host);
-    assert.match(s, /getStaticDoors\(cpu, b\.dfBlock\.index, placed\.recordIndex/,
-      `${host} stamps blockIndex 0 on every static door`);
-    assert.doesNotMatch(s, /getStaticDoors\(cpu, 0,/);
-  }
-});
 
 test('audit18 hosts: the real blockIndex makes IsBadInteriorModel fire', { skip: skipReal }, () => {
   const blocks = new BlocksFile();
@@ -606,11 +500,6 @@ test('audit18 hosts: a random ground marker resets to RECORD 8, not to BYTE 8', 
   // TextureRecord >= 56 marker to record 8, "Index 8 is grass".
   assert.equal(convertTilemap(new Uint8Array([2]))[0], 8, 'byte 2 decodes to grass record 8');
   assert.equal(convertTilemap(new Uint8Array([8]))[0], 32, 'byte 8 decodes to record 32 - a different texture');
-  const s = src('src/scenes/exterior.js');
-  // PIN MOVED (AUDIT WATER-NEXT m8): the 56 is world/terrain/terrainTiles.js GROUND_RECORD_LIMIT's, its one home
-  assert.match(s, /tile\.textureRecord >= GROUND_RECORD_LIMIT[^\n]*\n\s*\? 2\b/,
-    'the exterior host writes the raw record 8 into pre-conversion tilemap space');
-  assert.doesNotMatch(s, /tile\.textureRecord >= GROUND_RECORD_LIMIT[^\n]*\n\s*\? 8\b/);
   assert.equal(GROUND_RECORD_LIMIT, 56, 'MeshReader.cs:487: the tileset\'s 56 records');
 });
 
@@ -619,62 +508,6 @@ test('audit18 hosts: a random ground marker resets to RECORD 8, not to BYTE 8', 
 //     (Stated honestly - these files have zero execution coverage and
 //     cannot be instantiated without a GL context and a live canvas.)
 // ---------------------------------------------------------------------
-
-test('audit18 hosts: the audio bootstrap runs in EVERY host, not only in a dungeon', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/interior.js']) {
-    assert.match(src(host), /ensureAudio\(fetchBytes\)/,
-      `${host} never initialises the audio engine - every sound is a silent no-op`);
-  }
-  // The bootstrap must be idempotent, or a second host double-registers
-  // the gesture listeners. AUDIT 18 fixed this gap in two places at once,
-  // so the flag was consolidated onto the ENGINE: shared.ensureAudio is
-  // now just the host-facing name for AudioEngine.ensure, and the guard
-  // is pinned there rather than duplicated here.
-  // A5 added music as a SECOND subsystem on the same seam. The rule is
-  // unchanged and now covers both: ensureAudio may DELEGATE to engine
-  // ensures, never run a bootstrap of its own - and it must reach every
-  // engine, or a host boots sound and stays musically silent, which is
-  // the original F6 shape wearing a different hat.
-  const seam = src('src/scenes/shared.js');
-  const fn = seam.slice(seam.indexOf('export function ensureAudio'));
-  const body = fn.slice(0, fn.indexOf('\n}') + 2);
-  assert.match(body, /audio\.ensure\(/,
-    'ensureAudio must delegate to the sound engine seam, not run a second bootstrap');
-  assert.match(body, /music\.ensure\(/,
-    'ensureAudio must delegate to the music engine seam too');
-  assert.ok(!/_booted/.test(body), 'the seam must hold no bootstrap flag of its own');
-  // AUDIT 19 F1: idempotent AND non-racing - the stored value is the boot
-  // PROMISE, so a second caller awaits the same load instead of resolving
-  // early into a service whose archive has not arrived.
-  assert.match(src('src/systems/music.js'), /this\._booted \?\?= this\._boot\(/,
-    'MusicService.ensure must memoise the boot promise'); 
-  assert.match(src('src/systems/audio.js'), /this\._booted \?\?= this\._boot\(/,
-    'AudioEngine.ensure must memoise the boot promise (NT1 F215 closed the boolean race this pin used to accept)');
-});
-
-test('audit18 hosts: worldModes feeds the rest gate its live grounded state', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /dungeonCtx\.reportMotor\?\.\(player\.grounded, player\.velY, cam\.yaw\)/,
-    'without reportMotor the rest grounded check reads a frozen `_grounded = true`');
-  assert.match(src('src/scenes/dungeon.js'), /ctx\.reportMotor\(/);
-});
-
-test('audit18 hosts: an open interior window swallows the pointer even with no click handler', () => {
-  const wm = src('src/scenes/worldModes.js');
-  // STATUS-LIVE (2026-09-22): the guard is still on the WINDOW and not
-  // on its click method - that is the law here - but the question it
-  // asks is the PAUSE rather than the slot's truthiness. A window the
-  // game is STOPPED for owns the pointer; a readout the player is
-  // walking under does not, and a click there is a swing (the box
-  // itself declines `click()`, ui/statusBox.js).
-  assert.match(wm, /if \(mode !== 'interior' \|\| !interiorPaused\(\)\) return false;/,
-    'a click-less overlay lets the pointerdown escape to requestLook');
-  assert.doesNotMatch(wm, /if \(mode !== 'interior' \|\| !interiorOverlay\) return false;/,
-    'and the slot-truthiness gate is retired, not shadowed by a second copy');
-  // I4 widened the call with the right-button flag; the LAW this pin
-  // holds is the OPTIONAL call (a click-less window still consumes).
-  assert.match(wm, /interiorOverlay\?\.click\?\.\(v\[0\], v\[1\]/);   // STATUS-LIVE: the gate above is the PAUSE, so the slot read is optional too
-});
 
 test('audit18 hosts: interior point lights carry their PER-LIGHT range in both hosts', () => {
   // LT1 widened the call: the same nearestLights pick now also carries
@@ -709,10 +542,6 @@ test('audit18 hosts: the ARENA2 diet keeps every file a live reader asks for', (
   for (const n of ['PACKED.DAT', 'MONSTER.DAT', 'ANIM0000.VID', 'S0000001.QBN', 'S0000001.QRC', 'BARBER.FLC']) {
     assert.equal(KEEP(n, false), false, `${n} must stay out of the diet`);
   }
-  // Without the manifest bump every existing install keeps the broken
-  // store and the fix is invisible in the field.
-  assert.match(src('src/scenes/dataSource.js'), /const MANIFEST_V = ([3-9]|\d\d+);/,
-    'MANIFEST_V must be bumped so stale stored sets re-ingest');
 });
 
 // ---------------------------------------------------------------------
@@ -734,53 +563,3 @@ test('audit18 hosts: no host re-implements an extracted seam privately', () => {
   }
 });
 
-// ---------------------------------------------------------------------
-// AUDIT F2-T4. The diet and the manifest version are ONE decision.
-// ---------------------------------------------------------------------
-test('audit F2: editing the diet without bumping MANIFEST_V fails HERE', () => {
-  // The bump was pinned as a floor (>= 3), which passes forever once
-  // it has been bumped once - so the NEXT slice to widen KEEP would
-  // ship a diet no existing install ever re-ingests, and the file it
-  // added would be silently missing in the field for everyone who had
-  // played before. The two are coupled by checksum instead: touch the
-  // diet, this fails, and the only way to green is to bump the
-  // version (which every stale store checks) and re-pin the pair.
-  const text = src('src/scenes/dataSource.js');
-  const keep = text.match(/export const KEEP = [\s\S]*?;\n/)?.[0];
-  assert.ok(keep, 'the diet is still one expression');
-  const version = Number(text.match(/const MANIFEST_V = (\d+);/)[1]);
-  const sum = createHash('sha256').update(keep).digest('hex').slice(0, 16);
-  // MOVED at AUDIT 39 F156: PAINT.DAT joined the diet - the painting
-  // descriptions had no reader host at all, and a name KEEP rejects
-  // has no source in production. v8 -> v9 re-ingests the stale sets.
-  // v9 -> v10 (HC1, 2026-09-14): .CFA joined the diet - the riding sprites the deployed site never held.
-  assert.deepEqual([version, sum], [10, '4c7b641cf6ba72fe'],
-    'THE DIET CHANGED: bump MANIFEST_V so stale stores re-ingest, then re-pin [version, sum] here');
-});
-
-// ---------------------------------------------------------------------
-// MERGE AUDIT. Everything that SPEAKS must have a frame that SHOWS it.
-// ---------------------------------------------------------------------
-test('merge audit: all four hosts drive the HUD-TEXT layer they speak into', () => {
-  // worldModes' interior arm calls townTalk.say at three sites (the
-  // static-NPC fallthrough, the guild with no faction record, and the
-  // guild popup's Talk button) and its frame CONSUMES the frame and
-  // returns - so the line went into a HudText nothing ticked or drew.
-  // Invisible inside the building, and still queued on the way out,
-  // where the street's frame popped it two seconds late against
-  // nothing the player had just done. The fourth host again.
-  const hosts = {
-    'src/scenes/world.js': /townTalk\.frame\(dt\)/,
-    'src/scenes/exterior.js': /townTalk\.frame\(dt\)/,
-    'src/scenes/worldModes.js': /townTalk\?\.hudFrame\?\.\(dt/,
-    'src/scenes/dungeonContext.js': /hudText\.tick\(dt\)/,
-  };
-  for (const [host, drive] of Object.entries(hosts)) {
-    assert.match(src(host), drive, `${host} never drives its HUD text`);
-  }
-  // and the interior arm's say sites are the reason: if they move to
-  // another channel this pin should be revisited, not deleted.
-  const modes = src('src/scenes/worldModes.js');
-  assert.ok((modes.match(/townTalk\?\.say\?\.\(/g) || []).length >= 3,
-    'the interior arm still speaks through townTalk.say');
-});

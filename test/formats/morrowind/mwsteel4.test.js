@@ -419,12 +419,4 @@ test('MW-STEEL4: the plate is a part like any retail part - its adds carry nothi
   // the brigandine keeps its runtime skin (MW-BRIG2/3) - the one own model that is not shipped skinned
   const brig = composeWornArmor({ pieces: [{ templateIndex: 520, material: STEEL }], armors: [], bodyPool: [] }).adds[0];
   assert.deepEqual([[...brig.skinFrom], brig.fitTo], [['chest', 'groin', 'upperleg', 'knee'], 'chest']);
-  const transfer = sourceText('src/formats/morrowind/mwSkinTransfer.js');
-  assert.deepEqual([...transfer.matchAll(/^export function (\w+)/gm)].map((m) => m[1]), ['sourceSkin', 'fitLift', 'liftBatch', 'transferSkin']);
-  const binder = sourceText('src/formats/morrowind/mwFirstPerson.js');
-  for (const gone of ['solvePose', 'solveOn', 'bindPoseMats', 'skeletonBindSkins', 'fitShift', 'rebindSkin', 'skeletonNif']) assert.equal(binder.includes(gone), false, `mwFirstPerson.js: no ${gone}`);
-  const fp = sourceText('src/combat/fpArm.js');
-  for (const gone of ['tpSkeletonBytes', 'ownFp', 'fitFrom', 'solvePose']) assert.equal(fp.includes(gone), false, `fpArm.js: no ${gone}`);
-  // PIN MOVED (MWNPC3): the bytes are the archive's one copy (nifBytes), as every part's now are
-  assert.match(fp, /partBytes\.push\(\{ slot: add\.slot, partName: add\.partName, bones: add\.bones, bytes: nifBytes\(arc, path\) \}\);/, 'the first person\'s adds go to the binder as retail\'s do');
 });

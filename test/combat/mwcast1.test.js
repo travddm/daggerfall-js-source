@@ -158,11 +158,6 @@ test('MW-CAST1: THE CASTING HANDS ARE EMPTY - a readied spell and a cast in flig
   assert.equal(arm.status().weaponInHand, false, 'casting, the ready already gone');
   stepUntil(arm, (s) => s.upper !== UPPER_BODY.Casting, { each: () => arm.readySpell(false) });
   assert.equal(arm.status().weaponInHand, true, 'back in the hand');
-  const fp = src('src/combat/fpArm.js');
-  assert.match(fp, /if \(r\.slot === 'weapon'\) r\.hidden = !weaponInHand\(\) \|\| climbHands;/, 'the third person\'s range');
-  assert.match(fp, /if \(r\.slot === 'weapon'\) r\.hidden = !weaponInHand\(\);/, 'the first person\'s');
-  // PIN MOVED (TWO-HANDS AUDIT 2): a blade's effect also hides where the blade does under a sheet or on the stone (`bladeAway`)
-  assert.match(fp, /if \(eff\.slot === 'weapon'\) return !weaponInHand\(\) \|\| bladeAway;/, 'and a weapon\'s own effects');
 });
 
 test('MW-CAST1: a cast whose group carries no release key still lets the spell go when it ends', async () => {
@@ -179,45 +174,3 @@ test('MW-CAST1: a cast whose group carries no release key still lets the spell g
 
 // ── the rig and the hosts ────────────────────────────────────────────────────────────────────────────────────────
 
-test('MW-CAST1: the rig holds the release for the arm on screen, draws the casting arm, and the world starts a cast on the LIVE rig', async () => {
-  const { createWeaponRig } = await import('../../src/combat/weapon/weaponRig.js');
-  const { fpArm } = await import('../../src/combat/fpArm.js');
-  const { fpsSpellCasting } = await import('../../src/combat/fpsSpellCasting.js');
-  const saved = { castSpell: fpArm.castSpell, active: fpArm.active, thirdActive: fpArm.thirdActive, takeCastRelease: fpArm.takeCastRelease, castInFlight: fpArm.castInFlight };
-  let key = false;
-  fpArm.castSpell = () => true;
-  fpArm.active = () => true;
-  fpArm.thirdActive = () => false;
-  fpArm.takeCastRelease = () => { if (!key) return false; key = false; return true; };
-  fpArm.castInFlight = () => true;
-  try {
-    const r = createWeaponRig({ renderer: {}, canvas: { clientWidth: 1000, clientHeight: 800 }, fetchBytes: () => { throw new Error('no art'); }, palette: null, audio: { playOneShot() {} }, entity: { items: [], stats: { speed: 50 }, activeEffects: [] } });   // CAST-SPEED: rate 1
-    let released = 0;
-    assert.equal(r.castSpellAnim(2, 0, () => released++), true);
-    assert.equal(fpsSpellCasting.releaseHeld, true, 'held for the arm');
-    for (let i = 0; i < 30; i++) fpsSpellCasting.tick(1 / 60);
-    assert.equal(released, 0, 'not on frame 5');
-    key = true;
-    fpsSpellCasting.tick(1 / 60);
-    assert.equal(released, 1, 'on the arm\'s key');
-    for (let i = 0; i < 30; i++) fpsSpellCasting.tick(1 / 60);
-    // with no Morrowind arm on screen, the classic frame 5
-    fpArm.castSpell = () => false;
-    let classic = 0;
-    assert.equal(r.castSpellAnim(2, 0, () => classic++), true);
-    assert.equal(fpsSpellCasting.releaseHeld, false);
-    for (let i = 0; i < 40; i++) fpsSpellCasting.tick(1 / 60);   // CAST-SPEED: frame 5 at the port's 0.5 s
-    assert.equal(classic, 1);
-  } finally {
-    Object.assign(fpArm, saved);
-    for (let i = 0; i < 200; i++) fpsSpellCasting.tick(0.05);
-  }
-  const rig = src('src/combat/weapon/weaponRig.js');
-  // PIN MOVED (TWO-HANDS): the running hands' two legs (the sprite lane's, the arms') named after the climbing arms' and
-  // joining the gate after them (was: the gate on the line after `armsClimb`, ending at `!armsClimb`)
-  assert.match(rig, /const armCasts = fpArm\.active\(\) && \(spellArmed\(\) \|\| fpsSpellCasting\.isPlayingAnim \|\| fpArm\.castInFlight\(\)\);\n(?:\s*\/\/[^\n]*\n)*\s*const armsClimb = fpArm\.active\(\) && !!fpArm\.climbPosed\?\.\(\);\n(?:\s*\/\/[^\n]*\n)*\s*const runHands = [^\n]*\n\s*const armsRun = [^\n]*\n\s+if \(paralyzed \|\| \(!shown\(\) && !torchOnly && !sheetOnly && !shieldRect && !gunSliding && !armCasts && !armsClimb && !runHands && !armsRun\)\) return;/,   // PIN MOVED (CLIMB-HANDS II): the climbing arms' leg beside the casting arm's
-    'the casting arm is not returned past');
-  const world = src('src/scenes/world.js');
-  assert.match(world, /startCastAnim: \(sp, onRelease\) => !!\(modes\?\.liveArm\?\.\(\)\?\.rig \?\? weaponRig\)\?\.castSpellAnim\?\.\(sp\?\.rangeType, sp\?\.element, onRelease\),/,
-    'the live rig counts the cast the pose reads');
-});

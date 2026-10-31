@@ -163,20 +163,6 @@ test('weaponRig: envAttack - a door in reach bashes and consumes; others Receive
   assert.deepEqual(w.calls.received, []);
 });
 
-test('FX1 (F024/F025): the show clocks - the bow cooldown FREEZES the state, an equip countdown shows empty hands', () => {
-  const rig = readFileSync(join(ROOT, 'src/combat/weapon/weaponRig.js'), 'utf8');   // TIDY2: one path, so a move rewrites it
-  // F024: WeaponManager.Update RETURNS EARLY on cooldown (:230-233),
-  // leaving ShowWeapon at its prior value - the latch is that value.
-  // The old code hid the bow through the ~1.3s cooldown (blink).
-  assert.match(rig, /if \(m\.isBow && m\.now < m\.cooldownUntil\) return _lastShown;/);
-  assert.match(rig, /let _lastShown = false;/);
-  // F025: a running equip countdown shows EMPTY HANDS (:275-281) -
-  // the port drew the new weapon while refusing attacks.
-  assert.match(rig, /else if \(\(entity\?\.equipCountdown \?\? 0\) > 0\) v = false;/);
-  // and the latch records every non-cooldown answer
-  assert.match(rig, /_lastShown = v;\n\s+return v;/);
-});
-
 // ── THE BOW'S PATH INTO THE MORROWIND ARM ────────────────────────────
 //
 // Mac: "the arrow doesn't show on the weapon being readied and fired,

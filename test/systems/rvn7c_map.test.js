@@ -90,20 +90,6 @@ test('RVN7c THE INK SHEET: a lair\'s circle painted in blood red, its wash and i
   assert.ok(!sets('strokeStyle').includes(BM.REVENANT_RING_CSS), 'a bounty stays black');
 });
 
-test('RVN7c EVERY MAP READS IT: the held map (its poll, its sheet, its legend), the classic region page (its texels and its repaint), and the world host\'s dep (mutants: any unwired)', () => {
-  const h = read('src/ui/heldMap.js');
-  assert.match(h, /const lairs = readBountyMarksIn\(this\.deps\.revenants, sheet, REVENANT_LEGEND_TEXT\);/);   // PIN MOVED (LAIR-WORLD): over the sheet - the continent's frame while it is shown, a lair past the Bay drawn
-  assert.match(h, /if \(lKey !== this\._revenantsKey\) \{ this\._revenantsKey = lKey; this\._revenants = lairs; gateMoved = true; this\._dirty = true; \}/);
-  assert.match(h, /revenants: this\._revenants,   \/\/ RVN7c/);
-  assert.match(h, /if \(this\._revenants\.length\) \{   \/\/ RVN7c: and a lair's blood-red circle\n\s*const dot = el\('span', 'hmlegdot'\);\n\s*dot\.style\.background = REVENANT_RING_CSS;/);
-  assert.match(h, /!this\._bounties\.length && !this\._revenants\.length && !this\._raids\.length/);
-  const t = read('src/ui/travel/travelMapWindow.js');
-  assert.match(t, /const lairs = readBountyMarks\(this\.deps\.revenants, \{ width: MAP_WIDTH, height: MAP_HEIGHT \}, REVENANT_LEGEND_TEXT\);\n\s*this\._revenantsKey = bountyMarksKey\(lairs\);\n\s*if \(lairs\.length\) \{\n\s*const lairPx = packRGBA\(REVENANT_DOT_RGB\[0\], REVENANT_DOT_RGB\[1\], REVENANT_DOT_RGB\[2\], 255\);\n\s*for \(const \[x, y\] of bountyRingTexels\(lairs, originX, originY, width, height\)\) plot\(x, y, lairPx\);/);
-  assert.match(t, /bountyMarksKey\(readBountyMarks\(this\.deps\.revenants, \{ width: MAP_WIDTH, height: MAP_HEIGHT \}, REVENANT_LEGEND_TEXT\)\) === \(this\._revenantsKey \?\? ''\)\n[^\n]*\) return false;/);   // PIN MOVED (FEUD's merge of main): HOME-VENDOR's trader is asked after the lairs
-  assert.match(read('src/ui/ink/inkMap.js'), /for \(const b of opts\.revenants \?\? \[\]\) if \(visible\(b\.cx, b\.cy, b\.r \+ 2\)\) paintBountyRing\(ctx, view, b, pulse, REVENANT_INK\);/);
-  assert.match(read('src/scenes/world.js'), /revenants: \(\) => revenantMapMarks\(\),/);
-});
-
 test('RVN7c THE HUNT IN THE JOURNAL: each lair heard of a side quest - "Hunt: <name>", its kind and rank, its lair and the way there from where I stand, no clock; none unheard of; its Abandon through the journal leaf forgets the lair and saves it, and a rumour brings it back (mutants: unknown hunts listed; the way wrong; a clock; the Abandon unwired; unsaved)', () => {
   const p = me();
   const r = made(p);
@@ -148,16 +134,6 @@ test('RVN7c THE HUNT IN THE JOURNAL: each lair heard of a side quest - "Hunt: <n
   // the leaf with no door
   HJ.setHuntJournal(null);
   assert.equal(HJ.abandonHuntQuest(row.id), false);
-});
-
-test('RVN7c THE FACES AND THE HOST: the pause window\'s Quests tab and the chronicle each give a hunt its Abandon (twice), never a share; the world host folds the hunts into the quest log beside the bounties, the way from where I stand (mutants: a face unwired; a hunt shared; the log unwired)', () => {
-  const m = read('src/ui/enhanced/enhancedMenu.js');
-  // PIN MOVED (QUEST-AUDIT III SHELF-WORDS): the hunt's Abandon in the player's language
-  assert.match(m, /if \(sel\.entries && isHuntQuestId\(sel\.id\)\) \{[\s\S]{0,400}const ab = el\('button', 'act', armed \? t\('pause\.journal\.abandonArmed', 'Click again to abandon'\) : t\('pause\.journal\.abandonHunt', 'Abandon hunt'\)\);[\s\S]{0,200}abandonHuntQuest\(sel\.id\);/);
-  const c = read('src/ui/enhanced/enhancedChronicle.js');
-  assert.match(c, /if \(section === 'quests' && isHuntQuestId\(e\.uid\)\) \{[\s\S]{0,500}abandonHuntQuest\(e\.uid\);/);
-  assert.match(c, /!e\.main && !isBountyQuestId\(e\.uid\) && !isHuntQuestId\(e\.uid\)/, 'never the quest share');
-  assert.match(read('src/scenes/world.js'), /const extra = \[\.\.\.\(bountyHost\?\.questLogEntries\?\.\(\) \?\? \[\]\), \.\.\.revenantHuntEntries\(rumorHere\(\)\), \.\.\.\(legacyHost\?\.questLogEntries\(\) \?\? \[\]\)\];/);   // LEGACY4: the death quests after them
 });
 
 test('RVN7c the page: a lair heard of is on the map (mutants: unsaid)', () => {

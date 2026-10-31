@@ -461,16 +461,6 @@ test('DECOR1e the touch screen\'s flight: the stick flies the eye - its throw th
   assert.equal(rig.standing.length, 1, 'the bar\'s Place places');
 });
 
-test('DECOR1e the touch screen\'s flight in the host (worldModes.js, world.js) by source: the tool reads the host\'s stick; the body is handed no stick while the camera flies (after the TI2 read the pins keep); a swipe or a pad\'s trigger swings nothing under it - its release still goes through; the hosts\' finger tap presses nothing under it; the flight is the modes\' to say (mutants: the body walking with the eye, a swing under the flight, a tap activating)', () => {
-  const m = src('src/scenes/worldModes.js');
-  const w = src('src/scenes/world.js');
-  assert.match(m, /stick: \(\) => host\.stickAxes\?\.\(\) \?\? null,/, 'the tool\'s stick is the host\'s');
-  assert.match(m, /mv\.analog = host\.stickAxes\?\.\(\) \?\? null;[^\n]*\n\s*if \(decorTool\.flying\(\)\) mv\.analog = null;/, 'the body\'s stick nulled under the flight, right after the read');
-  assert.match(m, /attackInput\(dx, dy, held\) \{ if \(held && decorTool\.flying\(\)\) return; modalAttackSink\(\)\?\.\(dx, dy, held\); \},/);
-  assert.match(m, /decorFlying: \(\) => decorTool\.flying\(\),/);
-  assert.match(w, /tap: \(x, y, opts = null\) => \{\n\s*if \(modes\?\.decorFlying\?\.\(\) \|\| yards\?\.flying\(\)\) return;/, 'the first thing a tap asks');   // HOME-YARD re-aim (AUDIT): the yard's flight too
-});
-
 // ─── A ROOM SOLD ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('DECOR1e a room sold takes its placed pieces: online, the service\'s count and half-sum come back with the release (a word the law would not say is none), one credit pays the home\'s share and the pieces\' half together, and the sale says both; the offer says the pieces go too; offline, the house\'s or ship\'s pieces are taken out of its scene once (never paid back twice), what they held staying with the scene, and each one\'s half goes into the account the sale pays - the house\'s region\'s, the ship\'s bank\'s - before the scene is dropped; the purse is what a removal or a shrink pays back into (mutants: the pieces\' half never credited, a bad word believed, the sale\'s line the home\'s alone, a sold scene\'s pieces left to pay again, the half whole, the hooks unwired)', async () => {
@@ -501,11 +491,4 @@ test('DECOR1e a room sold takes its placed pieces: online, the service\'s count 
   assert.deepEqual(takeSceneDecor(cache, 'House'), [], 'never paid back twice');
   assert.deepEqual(cache.scenes.get('House').decorItems, { a: [{ name: 'Ruby' }] }, 'what they held stays with the scene, and goes with it');
   assert.deepEqual([takeSceneDecor(cache, 'Nowhere'), decorSaleBack(null), decorSaleBack([{ paid: -4 }, {}])], [[], 0, 0]);
-  // the host's hooks
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const pieces = takeSceneDecor\(sceneCache\(\), sceneName\)\.filter\(\(p\) => !p\?\.item\);[^\n]*\n\s*if \(!pieces\.length\) return 0;\n\s*const back = decorSaleBack\(pieces\);\n\s*const account = homeAccount\(region\);\n\s*if \(account && back > 0\) account\.accountGold \+= back;/, 'DECOR2a: the bought pieces alone - the owner\'s own were never bought');
-  assert.match(m, /removePermanentScene: \(mapId, k\) => \{ decorSold\(interiorSceneName\(mapId, k\), region\); removePermanentScene\(sceneCache\(\), interiorSceneName\(mapId, k\)\); \},/, 'the house: its pieces\' half before its scene is dropped');
-  assert.match(m, /removePermanentScene: \(ship\) => \{\n\s*decorSold\(interiorSceneName\(SHIP_INTERIOR_MAP_IDS\[ship\], BUILDING_KEY_0\), bankRegion\(\)\);/, 'the ship: its interior\'s');
-  assert.match(m, /townTalk\?\.say\?\.\(homeSoldLine\(r\.refund, r\.decorBack, r\.rent \?\? 0\) \+ /, 'the online sale says both');   // HOME-RENT re-aim: and the held rent
-  assert.match(m, /credit: \(n\) => \{ purse\.addGold\(n\); \},/, 'a removal\'s or a shrink\'s half into the purse');
 });

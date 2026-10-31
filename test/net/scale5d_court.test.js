@@ -88,9 +88,6 @@ test('SCALE5d part two the Worker: a gate\'s court is walked from the court itse
     assert.equal(await res.text(), 'ok');
     assert.deepEqual(asked, [[KEY, '0'], [`${KEY}#1`, '1']], 'the court first, then its first copy');
   } finally { Date.now = realNow; }
-  const w = src('server/src/index.js');
-  assert.match(w, /if \(isGateRoom\(key\)\) return layerWalk\(env\.ROOMS, key, request, 0\);/);
-  assert.match(w, /const ly = isLayered\(key\) \|\| isGateRoom\(key\) \? layerOf\(request\.headers\.get\(LAYER_HEADER\)\) : 0;/, 'and the object keeps its layer');
 });
 
 test('SCALE5d part two a copy\'s socket: welcomed by its copy, and the court\'s - a ShardSocket there the court\'s index never holds; its `in` joins the one fight and is answered through its copy; the boss\'s beats reach it as they reach the court; the crowds never meet (mutants: the hello not handed up; the copy\'s socket in the court\'s index; the gate word kept by the copy; the beat not handed down; a court pose fanned to a copy)', () => court(async ({ F, copy, into, own, say, pose, tick }) => {

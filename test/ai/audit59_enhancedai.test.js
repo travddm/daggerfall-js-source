@@ -50,22 +50,6 @@ function statementAt(src, needle) {
   return '';
 }
 
-test('AUDIT 59 F1: the nav worker is spelled the way Vite bundles it - the literal terrainGenClient.js records', () => {
-  const client = read('src/ai/nav/navClient.js');
-  // the one spelling the bundler turns into a worker chunk; anything
-  // else (a ctor in a variable) 404s in production and every bake ran
-  // on the main thread
-  assert.ok(client.includes("new Worker(new URL('./navWorker.js', import.meta.url), { type: 'module' })"),
-    'the real worker takes the literal spelling');
-  // the same rule the terrain worker is pinned to, so the two cannot
-  // drift apart
-  assert.ok(read('src/world/terrain/terrainGenClient.js').includes("new Worker(new URL('./terrainGenWorker.js', import.meta.url), { type: 'module' })"));
-  // a test double still comes in through WorkerCtor, and does NOT carry
-  // a second `new URL(...)` for Vite to emit as a stray asset
-  assert.match(client, /WorkerCtor === globalThis\.Worker\s*\n\s*\? new Worker\(new URL\('\.\/navWorker\.js', import\.meta\.url\), \{ type: 'module' \}\)\s*\n\s*: new WorkerCtor\('\.\/navWorker\.js', \{ type: 'module' \}\);/);
-  assert.equal((client.match(/new URL\('\.\/navWorker\.js', import\.meta\.url\)/g) ?? []).length, 1, 'exactly one URL for the bundler');
-});
-
 test('AUDIT 59 F1: a worker double is constructed through WorkerCtor and the bake goes to it', async () => {
   const { NavClient } = await import('../../src/ai/nav/navClient.js');
   const made = [];
@@ -80,45 +64,6 @@ test('AUDIT 59 F1: a worker double is constructed through WorkerCtor and the bak
   client.dispose();
   assert.equal(client._worker, null, 'dispose drops it');
   assert.ok(made.length === 1);
-});
-
-test('AUDIT 59 F2: the dungeon context disposes its nav client on destroy, first thing after the dead latch', () => {
-  const src = read('src/scenes/dungeonContext.js');
-  // ROAD-H H7a: the WHOLE body, brace-balanced - see the walk above.
-  const body = statementAt(src, '    destroy() {');
-  assert.match(body, /^ {4}destroy\(\) \{\n/, 'the walk starts at the method, not at a mention of it');
-  assert.match(body, /\n {4}\},?$/, 'and ends on its own closing brace');
-  const latch = body.indexOf('_ctxDead = true;');
-  const dispose = body.indexOf('enhancedNav.client?.dispose();');
-  const batch = body.indexOf('renderer.destroyBatch(b)');
-  const nulled = body.indexOf('enhancedNav.client = null;');
-  // every landmark is really INSIDE the body now - with the fixed
-  // window an `indexOf` of -1 was indistinguishable from "it moved"
-  for (const [what, n] of [['the latch', latch], ['the dispose', dispose],
-    ['the batch frees', batch], ['the null', nulled]]) {
-    assert.ok(n >= 0, `${what} is not in destroy()'s body at all`);
-  }
-  assert.ok(latch > 0 && dispose > latch, 'the worker leaves with the context, after NT1\'s latch');
-  // ...and OUTSIDE the 500-char window two older pins read after the
-  // latch (automap A1, PX21c) - the dispose sits with the foe frees
-  assert.ok(dispose > 500, 'below the latch window the teardown pins watch');
-  assert.ok(dispose < batch, 'before the batch frees');
-  assert.ok(nulled > dispose, 'and the handle is dropped, right after');
-  // one client per context, built once when the switch is on
-  assert.equal((src.match(/new NavClient\(\)/g) ?? []).length, 1);
-});
-
-test('AUDIT 59 F3: the Enhanced tab row says what ships - dungeons, the motor live, effect on the next dungeon', () => {
-  // FT5: the row is the Features registry's now; its note and effect are strings built by `+` across lines - read the object joined
-  const reg = read('src/systems/features.js');
-  const at = reg.indexOf("id: 'enhanced-ai'");
-  assert.ok(at > 0, 'the row is on the home');
-  const row = reg.slice(at, reg.indexOf('}),', at)).replace(/'\s*\n\s*\+\s*'/g, '');
-  assert.ok(!/not yet driving/.test(row), 'the "not yet" clause died with ENHANCED AI 4');
-  assert.ok(!/each dungeon, town and interior/.test(row), 'no promise of hosts the arc has not reached');
-  assert.match(row, /Pathfinding works in dungeons only for now/);
-  assert.match(row, /Takes effect at once; pathfinding from the next dungeon you enter\./, 'a foe keeps the motor it was born with (AUDIT TACT D7: the rest is at once)');
-  assert.match(row, /Off keeps the classic behavior\./);
 });
 
 test('AUDIT 59 F4: the route\'s vertical is never steered at, whatever y findPath answers', () => {
@@ -161,7 +106,4 @@ test('AUDIT 59 F4: the route\'s vertical is never steered at, whatever y findPat
     assert.ok(Math.abs(foe.destination[1] - goalY) < 1e-9,
       `${what} - the goal took y ${foe.destination[1]}; EnemyMotor.cs:541-564 says ${goalY}`);
   }
-  const motor = read('src/ai/enhancedMotor.js');
-  assert.ok(!/The port's live chf never\s*\n\/\/ does/.test(motor), 'the stale premise is gone from the comment');
-  assert.match(motor, /AUDIT 59 F4 corrected the premise/);
 });

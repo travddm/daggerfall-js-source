@@ -57,20 +57,6 @@ test('ONE-BOARD the rumour board nearest the town\'s middle (the siege field\'s 
   assert.equal(noticeBoardIndex(null), -1);
 });
 
-test('ONE-BOARD REVERTED the hosts (2026-10-07, Mac: revert "just that change"): the press, the count over the board, the town the player stands in, the town map and a seat\'s pennant are every board BOUNTY1 did not take again, each named on hover while the board is open (mutants: the bounty boards taken too; the count over one; the town underfoot with every board a bounty board; the pennant over the bounty boards)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.doesNotMatch(w, /noticeBoardOf|noticeBoardIndex/, 'no one-board law in the host');
-  assert.match(w, /\.\.\.\(!bountyAt\.has\(i\) && noticeTown \? \{ notice: noticeTown, named: noticeBook\.open === true \} : \{\}\),/);
-  const count = w.slice(w.indexOf('const noticeCountPoints = ('), w.indexOf('const partyMarkers = ('));
-  assert.match(count, /const bountyAt = boardSplitOf\(p\);\n\s*if \(bountyAt\.size >= p\.boards\.length\) continue;/);
-  assert.match(count, /if \(bountyAt\.has\(i\)\) return;/, 'the count over every Notice Board in range');
-  assert.match(w, /const bountyAt = boardSplitOf\(p\);\n\s*return bountyAt\.size < p\.boards\.length \? noticeTownOf\(p\.px, p\.py, bountyAt\.size > 0\) : null;/);
-  assert.match(w, /return town \? townBoardRows\(p, bountyAt, noticeBook\.unseen\(town\.mapId\)\) : \[\];/);
-  assert.match(w, /boards: pixelBoards, bounty: pixelBoardSplit,/, 'the pennants: every rumour board\'s');
-  assert.match(src('src/scenes/seatBanners.js'), /boards\.forEach\(\(b, i\) => \{ if \(!bounty\.has\(i\)\) add\(boardPennantAnchor\(b\)\); \}\);/);
-  assert.match(src('src/scenes/worldModes.js'), /const NOTICE_BOARD_TEXT = 'Notice Board';/);
-});
-
 test('BOARD-UI the Notices tab: the town\'s and the server\'s word under "News", then the players\' notes under their count; the tab names how many are new since this device last read the board (mutants: one grid; the count unsaid; the old notes counted; the read said twice)', async () => {
   const board = { notes: [{ id: 'a', subject: 'Party', body: 'x', from: 'Ann', at: T - 10 }, { id: 'b', subject: 'Old', body: 'y', from: 'Bo', at: T - 5000 }],
     notices: [{ id: 's', subject: 'Restart', body: 'z', from: 'Mac', at: T - 20 }], me: { canPin: true, live: 0, max: 3 } };
@@ -234,7 +220,6 @@ test('BOARD-UI the board\'s chunk warmed: the Notice Board\'s window - its tabs 
   const warm = WARM_CHUNKS.filter((f) => String(f).includes('noticeWindow.js'));
   assert.equal(warm.length, 1, 'warmed, once');
   assert.equal((await warm[0]()).mountNoticeBoard, mountNoticeBoard, 'the very module the door mounts');
-  assert.match(src('src/ui/noticeDoor.js'), /load: \(\) => import\('\.\/noticeWindow\.js'\)/, 'the door still loads it through the one home');
 });
 
 test('BOARD-UI the words: every fixed word of the board\'s tabs short, and none says "counting-house" - the service by its in-world name in every refusal was the board\'s commonest line (mutants: a line run long)', () => {

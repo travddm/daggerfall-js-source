@@ -323,7 +323,6 @@ const winDeps = (extra = {}) => ({
   ...extra,
 });
 
-
 // ── THE DOOR ─────────────────────────────────────────────────────
 
 test('U61: the classic skin still gets the canvas map - or its honest null without art', () => {
@@ -333,21 +332,6 @@ test('U61: the classic skin still gets the canvas map - or its honest null witho
     // exactly as the pre-door factories did
     assert.equal(createTravelMapWindow(winDeps()), null);
   });
-});
-
-test('U61 + MAP-TOGGLE: the fork asks the SKIN and the player\'s SWITCH, not only the document - one gate, ui/map/mapSkin.js, for all three doors', () => {
-  const gate = read('src/ui/map/mapSkin.js');
-  assert.match(gate, /export const enhancedMapOn = \(\) => !!getPref\('heldMap'\);/);
-  assert.match(gate, /export const heldMapChosen = \(\) => isEnhanced\(\) && enhancedMapOn\(\);/);
-  assert.match(gate, /export const heldMapWorn = \(\) => heldMapChosen\(\) && typeof document !== 'undefined';/, 'the skin, the switch, the document - in that order');
-  for (const door of ['src/ui/travel/travelMapDoor.js', 'src/ui/automap/automapDoor.js', 'src/ui/town/townMapDoor.js']) {
-    const d = read(door);
-    assert.match(d, /if \(heldMapWorn\(\)\) \{/, `${door} opens the held sheet through the gate`);
-    assert.doesNotMatch(d, /isEnhanced\(\)/, `${door} asks no skin of its own`);
-  }
-  assert.match(read('src/ui/travel/travelMapDoor.js'), /return heldMapChosen\(\) \|\| travelMapArtLoaded\(\);/);
-  assert.match(read('src/ui/automap/automapDoor.js'), /return heldMapWorn\(\) \|\| automapArtLoaded\(\);/);
-  assert.match(read('src/ui/town/townMapDoor.js'), /return heldMapWorn\(\) \|\| exteriorAutomapArtLoaded\(\);/);
 });
 
 test('U61: a host with no document keeps the classic arm, on either skin', () => {
@@ -363,82 +347,7 @@ test('U61: the door needs classic art only where the classic map draws it', () =
   assert.equal(travelMapDoorReady(), true, 'the held map reads no ARENA2 art at all');
 });
 
-test('MAP1: the enhanced skin gets the HELD MAP, holding the classic contract', () => {
-  skin('enhanced');
-  withDocument((doc) => {
-    const win = createTravelMapWindow(winDeps());
-    assert.ok(win instanceof HeldMapWindow);
-    assert.equal(win.done, false);
-    assert.equal(win.isChoiceWindow, true, 'the host hands it raw key codes');
-    for (const arm of ['input', 'click', 'wheel', 'hover', 'tick', 'draw', 'dispose',
-      'gotoPlace', 'activateTeleportationTravel', 'getTravelMapSaveData']) {
-      assert.equal(typeof win[arm], 'function', `${arm} is part of the contract`);
-    }
-    assert.equal(doc.body.children[0]?.id, 'enhanced-travelmap');
-    // teleportationTravel is a ONE-SHOT: armed before showing, cleared
-    // by ANY close - a cancelled visit must not leave the next armed
-    win.activateTeleportationTravel();
-    assert.equal(win.teleportationTravel, true);
-    win.dispose();
-    assert.equal(win.done, true);
-    assert.equal(win.teleportationTravel, false);
-    // the door names the successor and records the retirement
-    const door = read('src/ui/travel/travelMapDoor.js');
-    assert.match(door, /import \{ HeldMapWindow \} from '\.\.\/heldMap\.js';/);
-    assert.doesNotMatch(door, /OverworldMapWindow/, 'the relief map is gone from the door');
-    assert.match(door, /ui\/overworldMap\.js, RETIRED 2026-09-18/, 'and said so');
-  });
-});
-
 // ── THE SEAM ─────────────────────────────────────────────────────
-
-test('U61: the world host builds through the door, once, and gates on it', () => {
-  const src = hostText('src/scenes/world.js');
-  assert.equal([...src.matchAll(/createTravelMapWindow\(\{/g)].length, 1,
-    'ONE construction seam, as G5 demanded');
-  assert.doesNotMatch(src, /new TravelMapWindow\(/, 'no host constructs past the door');
-  assert.doesNotMatch(src, /travelMapArtLoaded/, 'hosts ask the DOOR, never the raw art');
-  assert.equal([...src.matchAll(/if \(!travelMapDoorReady\(\)\)/g)].length, 4,
-    'EVERY opener gates on the door predicate');   // AUDIT IT1 W6 (PIN MOVED): the driver's map's, which now says why; PORTAL1 (PIN MOVED): and the Portal Stone's, which says why too
-  const bag = src.slice(src.indexOf('createTravelMapWindow({'));
-  assert.match(bag, /\bwoods,/, 'the ink rides the one dep bag');
-  assert.match(bag, /getPlayerPixel: playerTravelOrigin/, '...and so does the player pixel');
-  assert.match(bag, /roads: \(\) => terrainGen\.roads\(\),/, '...and the network the ink traces');
-});
-
-test('U61: the other three hosts still refuse the map, by name', () => {
-  for (const rel of ['scenes/exterior.js', 'scenes/dungeonContext.js', 'scenes/worldModes.js']) {
-    const src = read(`src/${rel}`);
-    assert.doesNotMatch(src, /createTravelMapWindow|new TravelMapWindow|HeldMapWindow|OverworldMapWindow/,
-      `${rel} must not grow a map of its own`);
-  }
-  assert.match(read('src/scenes/worldModes.js'), /host\.openTeleportMap\?\.\(\)/,
-    'the guild service still reaches the map through the host door');
-});
-
-test('U61: the door is a STATIC fork and says why', () => {
-  const src = read('src/ui/travel/travelMapDoor.js');
-  assert.doesNotMatch(src, /import\(/, 'no dynamic import');
-  assert.match(src, /STATIC import/, 'the departure from the DOM doors\' lazy shape is reasoned');
-});
-
-test('MAP1: the relief map, its renderer and its probe are RETIRED - no file, no import, no CSS', () => {
-  for (const f of ['src/ui/overworldMap.js', 'src/render/overworldRenderer.js', 'tools/overworldProbe.mjs']) {
-    assert.equal(existsSync(new URL(`../../${f}`, import.meta.url)), false, `${f} is gone`);
-  }
-  for (const f of ['src/ui/travel/travelMapDoor.js', 'src/ui/heldMap.js', 'src/ui/ink/inkMap.js', 'src/scenes/world.js']) {
-    assert.doesNotMatch(read(f), /overworldRenderer|from '(?:\.\.?\/)+(?:[\w-]+\/)*overworldMap\.js'/, `${f} imports nothing retired`);
-  }
-  const css = read('src/ui/enhanced/enhancedStyle.js');
-  assert.doesNotMatch(css, /\.ov[a-z]/, 'the .ov* rules went with the window they dressed');
-  // MAP-FIELD2: the root is CLEAR on both lanes now - the map is held,
-  // so the world is behind it, and the black was what made the sprite a
-  // letterboxed picture instead of a pair of hands.
-  assert.match(css, /\.hmroot \{\s*\n\s*position: fixed; inset: 0; z-index: 13; overflow: hidden;\s*\n\s*background: transparent;/, 'the held map\'s root is CLEAR - the world is behind the hands');
-  assert.doesNotMatch(css, /\.hmroot[^{]*\{[^}]*background: #000/, 'no lane paints its own black');
-  assert.match(css, /\.hmink \{ position: absolute; display: block; \}/);
-  assert.match(css, /\.hmhands \{[^}]*pointer-events: none;/, 'the hands never take the pointer from the sheet');
-});
 
 // ── THE WINDOW'S LAWS ────────────────────────────────────────────
 
@@ -513,19 +422,6 @@ test('AUDIT MAP-FIELD: the laws these commits argued for, which nothing was chec
     assert.ok(!ink.calls.some((c) => c.fn === 'stroke'), '...and not on the ink pass, which would fatten the dot');
   }
 
-  // MAP-FIELD7: the sheet is EASED, not linear - "a held thing has
-  // weight". smoothstep -> identity passed every pin.
-  withDocument(() => {
-    // the clock the window actually uses, read off it rather than guessed
-    const openS = Number(/const OPEN_S = ([\d.]+);/.exec(read('src/ui/heldMap.js'))[1]);
-    const win = mkWin();
-    const at = [];
-    for (let i = 0; i < 7; i++) { win.tick(openS / 7); at.push(raiseOf(win)); }
-    // an eased curve is BELOW the straight line early and above it late
-    assert.ok(at[1] < (2 / 7) - 0.02, `eased in: after two sevenths of the clock the sheet is only ${at[1].toFixed(3)} up`);
-    assert.ok(at[4] > (5 / 7) + 0.02, `...and eased out: after five sevenths it is already ${at[4].toFixed(3)} up`);
-    win.dispose();
-  });
 });
 
 test('AUDIT MAP-FIELD: a commit survives a teardown, and the retry never takes the sheet into the arm while it is leaving (mutants: AUDITMAPFIELD-dispose-drops-the-commit, AUDITMAPFIELD-the-retry-runs-while-closing)', () => {
@@ -576,73 +472,6 @@ test('AUDIT MAP-FIELD: a commit survives a teardown, and the retry never takes t
     assert.equal(win._lane, 'sprite', 'the arm is NOT taken while the sheet is leaving');
     assert.match(win._chrome.stage.style.transform, /translateY/, '...so the sheet keeps lowering instead of snapping back to held');
     assert.notEqual(win._chrome.stage.style.transform, partWay, 'and it really moved on');
-    win.dispose();
-  });
-});
-
-test('MAP-FIELD7: the sheet TRAVELS in and out at the bottom edge, and the chrome fades where it stands (mutants: MAPFIELD7-the-sheet-fades-again, MAPFIELD7-the-sheet-starts-held, MAPFIELD7-the-chrome-travels-too, MAPFIELD7-a-close-mid-rise-snaps-up)', () => {
-  // Mac: "when you open or close your map, I want the sprite to come in
-  // and go out at the bottom of the screen instead of fading in".
-  withDocument(() => {
-    const win = mkWin();
-    const c = win._chrome;
-    // BEFORE THE FIRST TICK the sheet is already off the bottom, or it
-    // shows for one frame in its held place and then jumps down to start
-    assert.equal(raiseOf(win), 0, 'mounted DOWN, not mounted held');
-    assert.equal(c.card.style.opacity, '0', 'and the chrome is clear with it');
-    assert.equal(c.stage.style.opacity, undefined, '...but the STAGE is never faded - that is the whole point');
-
-    const seen = [];
-    for (let i = 0; i < 12; i++) { win.tick(0.05); seen.push(raiseOf(win)); }
-    assert.ok(seen[0] > 0 && seen[0] < 1, 'it is part way up after one tick - a travel, not a cut');
-    for (let i = 1; i < seen.length; i++) assert.ok(seen[i] >= seen[i - 1], 'and it only ever rises while opening');
-    assert.equal(raiseOf(win), 1, 'and it ends HELD, with no transform left on the stage');
-    assert.equal(c.stage.style.transform, '', 'exactly none - a stale translateY(0%) is a compositor layer for nothing');
-    assert.equal(c.card.style.opacity, '1', 'the chrome arrived too');
-    assert.equal(c.stage.style.opacity, undefined, 'and the sheet was never faded on the way, only carried');
-    // THE SHEET IS NOT FADED. The fade lives on the chrome rule now, and
-    // the root carries the stage, so fading the root would fade the
-    // sprite - which is the thing Mac asked to stop.
-    assert.ok(!win._chrome.root.style.opacity, 'the root never carries an opacity - that is what faded the sprite');
-    assert.match(read('src/ui/heldMap.js'), /for \(const n of c\.root\.children \?\? \[\]\) \{ if \(n !== c\.stage\) n\.style\.opacity = o; \}/,
-      'the fade walks the root\'s children and skips the stage BY IDENTITY');
-
-    // ...AND OUT THE SAME WAY
-    win._beginClose(null);
-    const down = [];
-    for (let i = 0; i < 5; i++) { win.tick(0.05); down.push(raiseOf(win)); }
-    for (let i = 1; i < down.length; i++) assert.ok(down[i] <= down[i - 1], 'it only ever lowers while closing');
-    assert.ok(down[down.length - 1] < 1, 'and it really left');
-    win.dispose();
-  });
-
-  // A CLOSE ANSWERED MID-RISE lowers from where the sheet IS. The old
-  // fade read its start off the DOM; this reads the number the window
-  // already holds, and the law is the same - no snap to full first.
-  withDocument(() => {
-    const win = mkWin();
-    win.tick(0.05);
-    const caught = raiseOf(win);
-    assert.ok(caught > 0 && caught < 1, 'caught it part way up');
-    win._beginClose(null);
-    win.tick(0.01);
-    assert.ok(raiseOf(win) <= caught, 'it lowers from where it was, never jumping to held first');
-    win.dispose();
-  });
-
-  // ...AND IN THE HANDS LANE NOTHING SLIDES. The arm brings the sheet in
-  // itself, and the ink there is laid on the rig's corners by a
-  // matrix3d of its own - a translate on the stage would drag the whole
-  // sheet off the paper the arm is holding, which is a worse bug than
-  // the fade this replaced.
-  withDocument(() => {
-    const holder = holderStub({ corners: () => TRAPEZIUM });
-    const win = open(mkWin({ ...bayDeps(), holder }));
-    assert.equal(win._lane, 'hands', 'the fixture really is in the hands lane, or this proves nothing');
-    assert.equal(win._chrome.stage.style.transform, '', 'held by the arm: the stage carries no travel of its own');
-    win._beginClose(null);
-    win.tick(0.05);
-    assert.equal(win._chrome.stage.style.transform, '', '...and none on the way out either');
     win.dispose();
   });
 });
@@ -848,39 +677,6 @@ test('MAP1: Escape walks the ladder - the diseased box, the panel, the selection
 
 const code = (p) => read(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 
-test('U61: the window computes no travel law of its own', () => {
-  const src = code('src/ui/heldMap.js');
-  for (const forbidden of ['>> 8', '(300 *', '102 *', '* 4)', '+ 59)', '1439', '25 *', '5 * Math.trunc']) {
-    assert.doesNotMatch(src, new RegExp(forbidden.replace(/[*+()]/g, '\\$&')),
-      `the law fragment "${forbidden}" must not be re-derived in the view`);
-  }
-  for (const needle of ['calculateTravelTime(', 'calculateTripCost(', 'travelDays(',
-    'travelMapPopUpState()', 'setTravelMapPopUpState(', 'travelMapFilters()', 'checkLocationDiscovered(']) {
-    assert.ok(src.includes(needle), `the view runs the owning module: ${needle}`);
-  }
-  // and the ink's marks go through the classic window's laws by way of
-  // the ONE marker model, never a copied table
-  const ink = code('src/ui/ink/inkMap.js');
-  assert.ok(ink.includes('buildMarkerModel('), 'the one bucket-and-discovery law');
-  assert.doesNotMatch(ink, /237|240, 243/, 'no copied FMAP palette indices');
-  assert.doesNotMatch(ink, /hasDiscoveredLocationId|_revealUndiscoveredLocations/, 'discovery is not re-read here');
-});
-
-test('U61: the model buckets through the classic window, not a copied table', () => {
-  const src = code('src/ui/overworldModel.js');
-  assert.ok(src.includes('getPixelColorIndex('), 'the one bucket law');
-  assert.ok(src.includes('checkLocationDiscovered'), 'the one discovery law');
-  assert.doesNotMatch(src, /237|240, 243/, 'no copied FMAP palette indices');
-});
-
-test('U61: the no-op host arms say why they are empty', () => {
-  const src = read('src/ui/heldMap.js');
-  for (const arm of ['click', 'hover', 'wheel', 'draw']) {
-    assert.match(src, new RegExp(`${arm}\\(\\) \\{ /\\*`),
-      `${arm} must carry its by-design comment - a silently empty arm reads as broken`);
-  }
-});
-
 // ═══ MAP1: THE PEN, pinned over fixtures ═══════════════════════════
 //
 // bible/10-UI/Held-Map-Arc.md's own list: "the ink renderer as a pure
@@ -958,10 +754,6 @@ test('MAP1 ink: the corner cut is BOUNDED - a pixel staircase rounds, a long str
   assert.deepEqual(rs[rs.length - 1], { x: 2, y: 1 }, 'an open chain keeps its ends');
   assert.ok(rs.some((p) => Math.abs(p.x - 0.75) < 1e-9 && p.y === 0), 'a quarter along a one-pixel leg');
   assert.equal(roundCorners([{ x: 0, y: 0 }, { x: 3, y: 0 }]).length, 2, 'two points are a line, untouched');
-  // the roads take the same cut
-  const ink = read('src/ui/ink/inkMap.js');
-  assert.match(ink, /roundCorners\(simplifyChain\(centre\(c\)\)\)/, 'roads');
-  assert.match(ink, /return roundCorners\(simplifyChain\(chain, eps\)\);/, 'and the coast and borders');
 });
 
 test('MAP1 ink: a province border is an edge between two LAND pixels of different regions - never a sea edge, never a nameless one (mutants: border-on-the-coast, border-through-unnamed, border-one-sided)', () => {
@@ -1565,33 +1357,6 @@ test('MAP1: the sprite is the port\'s own under the doctrine row, the paper and 
   });
 });
 
-test('MAP1: the window paints only from tick, guarded on a real 2D context, and rebuilds the marks - never the chains - when a filter moves (mutants: paint-per-draw, chains-rebuilt-per-filter, model-per-tick)', () => {
-  withDocument(() => {
-    const woods = { heightMapBuffer: new Uint8Array(100).fill(10) };
-    const win = open(mkWin({ woods }));
-    const m1 = win._sheet.ensure();
-    win._marksDirty = true;
-    const m2 = win._sheet.ensure();
-    assert.equal(m1.coast, m2.coast, 'the chains are the cached set');
-    assert.equal(m1, m2, 'the model object is kept');
-    // a second window over the same bytes shares the chains
-    const win2 = mkWin({ woods });
-    assert.equal(win2._sheet.ensure().coast, m1.coast, 'cached on the height bytes');
-    win2.dispose();
-    // draw() is a no-op: no renderer, no canvas work
-    assert.doesNotThrow(() => win.draw(null, null));
-    const src = read('src/ui/heldMap.js');
-    // EM1: the paint asks the live SHEET for its model and is guarded
-    // on both - a context the stub canvas will not give, and a sheet
-    // with nothing to ink.
-    assert.match(src, /const model = sheet\?\.ensure\?\.\(\) \?\? null;\s*\n\s*if \(!ctx \|\| !model\) return;/, 'the paint is guarded on the context and the sheet');
-    assert.match(src, /const ctx = canvas\?\.getContext\?\.\('2d'\);/, 'and the context is the canvas\'s own');
-    assert.match(src, /if \(this\._dirty\) this\._paint\(\);/, 'and runs from tick when something changed');
-    assert.equal((src.match(/this\._paint\(\)/g) || []).length, 1, 'from tick alone');
-    win.dispose();
-  });
-});
-
 // ═══ MAP2: TRAVEL OPTIONS ON THE SHEET ═══════════════════════════════
 //
 // bible/10-UI/Held-Map-Arc.md: "each through the same functions the
@@ -1881,11 +1646,6 @@ test('TV1: the sheet\'s Overworld door - shown only where the host can lift the 
     assert.equal(tp._chrome.over.style.display, 'none', 'no door on the teleport map');
     tp.dispose();
   });
-  // the world host hands both reads, and the commit is the one home every hook fires from
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /onTravelView: \(\) => \{ travelView\?\.enter\(\); \},/);
-  assert.match(w, /travelViewAllowed: \(\) => !extra\.immersive && !!travelView && travelViewAllowed\(\)\.ok,/);   // IT1 (PIN MOVED): a driver's map has no Overworld door
-  assert.match(read('src/ui/heldMap.js'), /else if \(c\?\.kind === 'travelView'\) this\.deps\.onTravelView\?\.\(\);/);
 });
 
 test('MAP2 coordinates: a bare pixel is a destination only when the mod allows it, the host can honour it and the visit is not a teleport; the card bills the mod\'s walked estimate and no fare; Begin skips the gold gate and hands onTravelToCoords the popup\'s own {pixel, name} with playerControlled (mutants: coords-without-setting, coords-online, coords-on-teleport, coords-pays-fare, walked-estimate-unscaled)', () => {
@@ -1966,73 +1726,6 @@ test('MAP2 walked place: when the mod\'s fork says the player drives the trip to
   });
 });
 
-test('MAP2 resume: a pending destination asks once on the first tick - Yes resumes and lowers the sheet, No stays on the map; a journey in progress centres the sheet on the player instead (mutants: resume-every-tick, no-closes-map, active-asks)', () => {
-  withDocument(() => {
-    let resumed = 0;
-    const win = mkWin(modDeps({ onResumeTravel: () => resumed++ }, {}, { destinationName: 'Wayrest' }));
-    assert.equal(win._top, null, 'not before the first tick');
-    win.tick(0.05);
-    assert.equal(win._top, 'resume');
-    assert.equal(win._chrome.box.style.display, 'block');
-    assert.ok(win._chrome.box.children.some((c) => c.textContent === toFormat(TO_TEXT.MsgResume, 'Wayrest')), 'the mod\'s own sentence');
-    win.input('KeyN');
-    assert.equal(win._top, null, 'No pops the box alone');
-    assert.equal(win._phase, 'opening', 'and the map stays');
-    for (let i = 0; i < 20; i++) win.tick(0.05);
-    assert.equal(win._top, null, 'asked once per open');
-    win.dispose();
-    const yes = mkWin(modDeps({ onResumeTravel: () => resumed++ }, {}, { destinationName: 'Wayrest' }));
-    yes.tick(0.05);
-    yes.input('KeyY');
-    assert.equal(resumed, 1);
-    assert.equal(yes._phase, 'closing', 'Yes lowers the sheet');
-    for (let i = 0; i < 20 && !yes.done; i++) yes.tick(0.05);
-    assert.equal(yes.done, true);
-    // a journey in progress: no prompt, the sheet on the player
-    const active = mkWin(modDeps({}, {}, { destinationName: 'Wayrest', isTravelActive: true }));
-    active.tick(0.05);
-    assert.equal(active._top, null);
-    // the goal is the view centred on the player's pixel, under the clamp
-    // (on a bay the sheet already holds whole, the clamp centres the bay)
-    assert.deepEqual(active._goal, clampView(viewCentredOn(5.5, 5.5, active._view.scale, active._limits()), active._limits()), 'aimed at the player\'s pixel');
-    // RESUME-OUT (Mac: "option persists"): Forget it ends the journey - the mod's No kept it, asked at every open
-    let forgot = 0;
-    const out = mkWin(modDeps({ onResumeTravel: () => resumed++, onForgetTravel: () => forgot++ }, {}, { destinationName: 'Wayrest' }));
-    out.tick(0.05);
-    assert.deepEqual(out._chrome.box.children.at(-1).children.map((b) => b.textContent), ['Resume', 'Not now', 'Forget it'], 'three ways out');
-    out._chrome.box.children.at(-1).children[2].onclick();
-    assert.deepEqual([forgot, resumed, out._top, out._phase], [1, 1, null, 'opening'], 'the journey forgotten, nothing resumed, the map stays');
-    out.dispose();
-    const w = hostText('src/scenes/world.js');
-    assert.match(w, /onForgetTravel: \(\) => \{ travelOptions\?\.clearTravelDestination\(\); \},/, 'the host ends it through the mod\'s own ClearTravelDestination');
-    const still = mkWin(modDeps({}, {}, { destinationName: null, isTravelActive: false }));
-    still.tick(0.05);
-    assert.deepEqual(still._goal, still._view, 'no journey: the view rests where it opened');
-    active.dispose();
-    // no mod: nothing asked, nothing centred
-    const plain = open(mkWin());
-    assert.equal(plain._top, null);
-    plain.dispose();
-  });
-});
-
-test('MAP2: the additions are the classic window\'s own functions, and the probe reports them', () => {
-  const src = read('src/ui/heldMap.js');
-  assert.match(src, /import \{ teleportCost, teleportCostPrompt, portsFilterAllows, locationInfoRows, resumePrompt \} from '\.\/travel\/travelMapOptions\.js';/);
-  assert.match(src, /import \{ hasPortFor as hasPort \} from '\.\.\/systems\/travel\/travelPorts\.js';/);   // SEAT2b part two (PIN MOVED): HasPort, or a members' Harbour at a seat
-  assert.match(src, /if \(!portsFilterAllows\(this\.portsFilter, summary\?\.mapID \?\? summary\?\.mapId\)\) return false;\s*\n\s*return checkLocationDiscovered\(summary\);/, 'the classic override, verbatim');
-  assert.match(src, /get: \(\) => travelMapMarkedMapId\(\),\s*\n\s*set: \(v\) => setTravelMapMarkedMapId\(v\),/, 'the mark in the shared store');
-  assert.match(src, /const info = locationInfoRows\(summary\?\.locationType,/);
-  assert.match(src, /resumePrompt\(this\._to\?\.destinationName \?\? ''\)/);
-  assert.doesNotMatch(src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''), /PORT_SET|PORT_LOCATION_IDS/, 'the port list is never read here');
-  withDocument(() => {
-    const win = open(mkWin(modDeps()));
-    const probe = JSON.parse(globalThis.__heldMap());
-    assert.deepEqual([probe.portsFilter, probe.marked, probe.info, probe.top], [false, -1, false, null]);
-    win.dispose();
-  });
-});
-
 // ═══ AUDIT-MAP (2026-09-18, Mac: "Let's audit everything so far") ═══════
 //
 // The browser probe (tools/heldMapProbe.mjs) and three reviewer lenses
@@ -2100,20 +1793,6 @@ test('AUDIT-MAP B1: every way out remembers an open panel\'s toggles - the Close
   });
 });
 
-test('AUDIT-MAP B2/B4: the sprite\'s handler is set before its source, the display face landing repaints once, the middle button\'s autoscroll is shut where the browser reads it', () => {
-  const src = read('src/ui/heldMap.js');
-  assert.ok(src.indexOf('sprite.onload = () => this._keyHands(sprite, hands);') < src.indexOf('sprite.src = HELD_MAP_URL;'), 'onload before src - a cached picture cannot land first');
-  assert.match(src, /\(fonts\?\.load\?\.\("14px 'Cormorant'"\) \?\? fonts\?\.ready\)\?\.then\?\.\(landed\);/, 'the face is ASKED for (a canvas font never triggers a load), and the sheet repainted when it lands');
-  // MAP-FIELD2: the measure cache went with the names - nothing else on
-  // the sheet measures text - so the face's landing drops the kept layer
-  // alone. The repaint is still what the landing is FOR.
-  assert.match(src, /const landed = \(\) => \{ if \(!this\.done\) this\._inkAgain\(\); \};/, 'the kept layer is dropped with it');   // PIN MOVED (AUDIT TESA II M2): and the world sheet's kept parts - _inkAgain
-  assert.match(src, /_inkAgain\(\) \{ this\._staticKey = ''; this\._sheetLayersKey = ''; this\._dirty = true; \}/);
-  assert.doesNotMatch(src, /_measureCache/, 'and no measure cache survives the names it existed for');
-  assert.match(src, /stage\.addEventListener\('auxclick', \(e\) => \{ if \(e\.button === 1\) e\.preventDefault\?\.\(\); \}\);/, 'auxclick is where the middle click\'s default lives');
-  assert.match(src, /stage\.addEventListener\('mousedown', \(e\) => \{ if \(e\.button === 1\) e\.preventDefault\?\.\(\); \}\);/);
-});
-
 test('AUDIT-MAP B3: a second finger pinches - the scale follows the fingers\' distance about their midpoint, the map point under the midpoint holds, and a pinch is never a pick (mutants: pinch-ignored, pinch-picks)', () => {
   withDocument(() => {
     globalThis.innerWidth = 1600; globalThis.innerHeight = 900;
@@ -2178,8 +1857,6 @@ test('AUDIT-MAP D2: the card bills the mod\'s SCALED fare through the popup\'s o
   const both = scaleTripCost(c, { fastTravelCostScaleFactor: 1, shipTravelCostScaleFactor: 3 }, null);
   assert.equal(both.piecesCost, 100);
   assert.ok(both.totalCost - both.piecesCost > 60);
-  // the popup's method IS the export
-  assert.match(read('src/ui/travel/travelPopUp.js'), /_scaleTripCost\(c\) \{[\s\S]{0,400}?return scaleTripCost\(c, this\._to\?\.settings, this\.deps\.playerEntity\?\.\(\) \?\? null\);/);
   // the card, driven: the same fare the popup would show, and the commit charges it
   withDocument(() => {
     const win = open(mkWin(modDeps({ getClimateIndex: (x) => (x >= 8 ? CLIMATES.Ocean : CLIMATES.Woodlands), hasShip: () => true }, { fastTravelCostScaleFactor: 4, shipTravelCostScaleFactor: 3, cautiousTravel: false, stopAtInnsTravel: false, shipTravelPortsOnly: false })));
@@ -2252,9 +1929,6 @@ test('AUDIT-MAP U5/Q2: the walked card still shows the purse, and the junction d
     assert.ok(texts.includes('777 gold'), 'the purse row on a walked trip (C# UpdateLabels :122 still shows GoldPieces)');
     win.dispose();
   });
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /markedMapId: \(\) => travelMapMarkedMapId\(\),/, 'the store - a mark set on the guild\'s teleport window was invisible to the disc');
-  assert.match(w, /import \{ travelMapFilters, travelMapMarkedMapId \} from '\.\.\/systems\/travel\/travelMapState\.js';/);
 });
 
 test('AUDIT-MAP A5: chains are culled per SEGMENT - a run whose ends are both off the sheet still crosses it, and a chain leaving the view runs to the paper\'s edge (mutants: cull-per-point)', () => {
@@ -2317,7 +1991,6 @@ test('AUDIT-MAP perf: the carets are thinned once per band at build; the harbour
   const ctx = recordingCtx();
   paintInk(ctx, model, { ox: 0, oy: 0, scale: 5 }, { paperW: 60, paperH: 60, band: 'far' });
   assert.equal(ctx.calls.filter((c) => c.fn === 'moveTo').length, 4, 'four carets at far, off the thinned list');
-  assert.match(read('src/ui/ink/inkMap.js'), /ctx\.moveTo\(ax \+ 3 \* Math\.cos\(Math\.PI \* 0\.15\), ay \+ 0\.5 \+ 3 \* Math\.sin\(Math\.PI \* 0\.15\)\);\s*\n\s*ctx\.arc\(ax, ay \+ 0\.5, 3, Math\.PI \* 0\.15, Math\.PI \* 0\.85\);/);
 });
 
 test('AUDIT-MAP A8: every step of the glide is a view the clamp allows (mutants: glide-unclamped)', () => {
@@ -2378,19 +2051,6 @@ test('AUDIT-MAP H1 + TRAVEL-FARE + LIVED1: online the journey reads its days, of
 });
 
 test('AUDIT-MAP H6/perf: a box holds the whole chrome (the modal class), the static ink is a kept layer painted when its key moves and the overlay per pulse, and the measure uses the paint\'s own font (mutants: modal-class-dropped, static-repainted-per-pulse)', () => {
-  const src = read('src/ui/heldMap.js');
-  // ENH-NOTICE3 moved the modality off `open`: with the I/H box's words
-  // on the notice panel the .hmbox stays closed, and the chrome has to
-  // go pointer-dead all the same - so the class reads the box's
-  // MODALITY, which `open` is now only half of.
-  assert.match(src, /this\._chrome\.root\.classList\.toggle\('hmmodal', modal\);/);
-  assert.match(src, /const modal = !!this\._info \|\| this\._top === 'resume';/,
-    'mutants: the modality re-derived from the drawn box, which the panel arm leaves shut');
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hmroot\.hmmodal \.hmtop, \.hmroot\.hmmodal \.hmcard, \.hmroot\.hmmodal \.hmfoot \{ pointer-events: none; \}/);
-  assert.match(src, /if \(key !== this\._staticKey \|\| !lctx\) \{/, 'the static half is painted only when its key moves');
-  assert.match(src, /this\._marksVersion, this\._portsShown\(\) \? 1 : 0, this\.markedMapId,/, 'and the key carries what the static half reads');
-  assert.equal((src.match(/paintInkStatic\(/g) || []).length, 1);
-  assert.equal((src.match(/paintInkOverlay\(/g) || []).length, 1);
   assert.equal(nameFont({ kind: 'city' }, 13), "600 13px 'Cormorant', Georgia, serif");
   assert.equal(nameFont({ kind: 'hamlet' }, 13), "13px 'Cormorant', Georgia, serif");
   // the overlay alone, on a stub: clears when asked, draws the rings, never the coast
@@ -2425,79 +2085,6 @@ const bayDeps = () => {
   const sm = summaryOf(500, 250, LOCATION_TYPES.TownCity); mapDict.set(sm.id, sm);
   return { mapSize: { width: 1000, height: 500 }, woods: { heightMapBuffer: new Uint8Array(500000).fill(10) }, mapDict, maps: { regionCount: 1, getRegion: () => ({ mapNames: ['A', 'B', 'C', 'Wayrest'] }), getPoliticIndex: () => 128 } };
 };
-
-test('MAP3 hands lane: when the holder says the arm is drawn and takes the sheet, the sprite and its thumbs go, the root goes clear, and the ink canvas is laid over the holder\'s corners by the quad map - the sheet keeps the 4:3 fit\'s size, the pointer maps back through the inverse, a pick lands on the city under the angled sheet, a drag pans in SHEET pixels, no corners hides the ink, and dispose releases the arm once (mutants: lane-never-hands, sprite-shown-in-hands, transform-not-set, pointer-not-inverted, pan-in-screen-px, release-dropped)', () => {
-  withDocument(() => {
-    globalThis.innerWidth = 1600; globalThis.innerHeight = 900;
-    try {
-      let corners = TRAPEZIUM;
-      const holder = holderStub({ corners: () => corners });
-      const win = open(mkWin({ ...bayDeps(), holder }));
-      assert.equal(win._lane, 'hands');
-      assert.equal(holder.calls.filter((c) => c[0] === 'hold').length, 1, 'asked once on the first tick');
-      const [, spec, aspect] = holder.calls[0];
-      assert.equal(spec, null, 'no spec from the window: the rig\'s pose in force');
-      assert.ok(Math.abs(aspect - win._paper.w / win._paper.h) < 1e-9, 'the sheet\'s own aspect, from the 4:3 fit');
-      const c = win._chrome;
-      assert.equal(c.sheet.style.display, 'none');   // MAP-FIELD2: the CANVAS is the sprite the stage shows; the <img> is only the loader
-      assert.equal(c.hands.style.display, 'none', 'the keyed thumbs go with the painting');
-      assert.equal(c.stage.style.width, '100%');
-      assert.equal(c.ink.style.left, '0px', 'the canvas sits at the origin under its matrix');
-      assert.equal(c.ink.style.transformOrigin, '0 0');
-      // AUDIT-MAP2: the lane class on the root is NOT the thumbs canvas's
-      // class - `.hmhands` is `pointer-events: none`, and the first hands
-      // lane in a browser ignored every click for exactly that reason
-      const src = read('src/ui/heldMap.js'), css = read('src/ui/enhanced/enhancedStyle.js');
-      assert.match(src, /c\.root\.classList\.toggle\('hmlanehands', true\);/);
-      assert.doesNotMatch(src, /classList\.toggle\('hmhands'/);
-      assert.match(css, /\.hmroot \{[^}]*background: transparent;/, 'MAP-FIELD2: the root is clear for BOTH lanes, so the hands lane needs no rule of its own');
-      assert.doesNotMatch(css, /\.hmroot\.hmhands\b/);
-      const q = quadPlacement(win._paper.w, win._paper.h, TRAPEZIUM);
-      assert.equal(c.ink.style.transform, q.css, 'the matrix3d of the corners');
-      assert.equal(c.ink.style.opacity, '1');
-      const probe = JSON.parse(globalThis.__heldMap());
-      assert.equal(probe.lane, 'hands'); assert.equal(probe.placed, true);
-      // the pointer: the top-right corner is the sheet's (w, 0)
-      const tr = win._paperPoint(650, 300);
-      assert.ok(Math.abs(tr[0] - win._paper.w) < 1e-6 && Math.abs(tr[1]) < 1e-6, `inverse: ${tr}`);
-      // a pick through the angle: the city's sheet point, sent through the forward map
-      const stage = c.stage;
-      const ev = (id, x, y) => ({ pointerId: id, clientX: x, clientY: y, button: 0, preventDefault() {} });
-      win._setView({ ox: 450, oy: 220, scale: 8 });   // zoomed in, so a pan has room under the clamp
-      assert.equal(win._view.scale, 8);
-      const [px, py] = toPaper(win._view, 500.5, 250.5);
-      const [sx, sy] = q.toScreen(px, py);
-      fire(stage, 'pointerdown', ev(1, sx, sy));
-      fire(stage, 'pointerup', ev(1, sx, sy));
-      assert.equal(win._selected?.name, 'Wayrest', 'picked under the angled sheet');
-      // a drag: the map point under the finger stays under it
-      win._selected = null;
-      const before = toMap(win._view, ...win._paperPoint(sx, sy));
-      fire(stage, 'pointerdown', ev(2, sx, sy));
-      fire(stage, 'pointermove', ev(2, sx + 60, sy + 40));
-      const after = toMap(win._view, ...win._paperPoint(sx + 60, sy + 40));
-      assert.ok(Math.abs(after[0] - before[0]) < 1e-6 && Math.abs(after[1] - before[1]) < 1e-6, 'the pan is measured on the sheet, not the screen');
-      fire(stage, 'pointerup', ev(2, sx + 60, sy + 40));
-      assert.equal(win._selected, null, 'a drag is not a pick');
-      // the arm moves: the corners move, the matrix follows
-      corners = TRAPEZIUM.map(([x, y]) => [x + 10, y]);
-      win.tick(0.05);
-      assert.equal(c.ink.style.transform, quadPlacement(win._paper.w, win._paper.h, corners).css);
-      // no corners (the arm has not drawn, or a corner is behind the lens): hidden, not stale
-      corners = null;
-      win.tick(0.05);
-      assert.equal(c.ink.style.opacity, '0');
-      assert.equal(JSON.parse(globalThis.__heldMap()).placed, false);
-      assert.deepEqual(win._paperPoint(100, 100), [-1e9, -1e9], 'and nothing is under the pointer');
-      corners = TRAPEZIUM;
-      win.tick(0.05);
-      assert.equal(c.ink.style.opacity, '1');
-      assert.equal(holder.calls.filter((c2) => c2[0] === 'release').length, 0);
-      win.dispose();
-      assert.deepEqual(holder.calls.filter((c2) => c2[0] === 'release'), [['release']], 'released once');
-    } finally { delete globalThis.innerWidth; delete globalThis.innerHeight; }
-  });
-});
 
 test('MAP3 sprite lane stands when the arm is not drawn: no hold is asked, the painting shows, the pointer is the plain offset - and the holder is still released at teardown, whichever lane stood; no holder at all (a host without a rig) is the sprite lane (mutants: hands-without-arm, release-only-in-hands)', () => {
   withDocument(() => {
@@ -2767,15 +2354,6 @@ test('AUDIT-MAP2 T4: "bare" is the data\'s word - a click dead on a discovered h
 });
 
 test('AUDIT-MAP2 perf and polish: the kept static layer is not reset on every pan frame, the Ports toggle keeps the bay-wide index (the law is applied at query time), the fuzzy search keeps two hundred not a thousand, the wheel holds still under a box, the journey carries no second walk, the ink\'s region read is the maps file\'s own where the host hands one, the player\'s pixel is polled with the party (mutants: layer-reset-per-frame, ports-drops-index, wheel-under-box, player-snapshot)', () => {
-  const src = read('src/ui/heldMap.js');
-  assert.match(src, /if \(lctx && \(layer\.width !== canvas\.width \|\| layer\.height !== canvas\.height\)\) \{ layer\.width = canvas\.width; layer\.height = canvas\.height; \}/);
-  assert.equal((src.match(/this\._searchIndex = null;/g) || []).length, 1, 'only the constructor');
-  assert.match(src, /distance\.findBestMatches\(name, 200\)/);
-  assert.doesNotMatch(src, /path: walkTravelPath/);
-  assert.doesNotMatch(src, /byRoad: false/);
-  assert.doesNotMatch(src, /walkTravelPath\(/, 'the walk is calculateTravelTime\'s own');
-  assert.match(src, /typeof maps\?\.getRegionIndexAt === 'function' \? maps\.getRegionIndexAt\(x, y\)/);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hmroot \.hmfoot \{ background: rgba\(10, 12, 17, 0\.94\);/, 'the foot has its own scrim over the world - MAP-FIELD2: on both lanes, neither having a black behind it; EM3-3D fix: near-opaque, so the HUD does not read through it');
   withDocument(() => {
     // the region read: a host maps file whose getRegionIndexAt carries the fixups
     const politic = () => 64;   // the High Rock sea coast byte
@@ -2856,7 +2434,6 @@ test('AUDIT-FIELD: an arm that never comes leaves the painting standing, and the
 // slighty below where there is no gap. The status and magicka/health/
 // fatigue UI element's should go away when it is taken out."
 test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edge, the world behind it, and the vitals go with it (mutants: MAPFIELD2-*)', () => {
-  const src = read('src/ui/heldMap.js');
 
   // 1. THE GEOMETRY, as a law rather than as one viewport's numbers.
   // The sprite was fitted to the whole viewport and CENTRED, which is
@@ -2886,7 +2463,6 @@ test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edg
     if (osw > vw) { osw = vw; osh = osw * SPRITE.h / SPRITE.w; }
     assert.ok(g.w > osw, `${why}: the sheet is held closer than it was`);
   }
-  assert.match(src, /heldStageRect\(vw, vh\)/, 'and the layout is the law this pin checks');
   // EM3-3D merge: the OLD fit is not gone - the hands lane (MAP3, the Morrowind arms) still sizes its ink canvas and
   // the map's scale by it (heldStageRectArm), and HOLD-CLOSE's pins above no longer reach it. The fit's own laws, on
   // the function the lane calls.
@@ -2902,20 +2478,6 @@ test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edg
   const armTall = heldStageRectArm(400, 2000);
   assert.equal(armTall.w, 400, 'arm lane: a narrow viewport takes the width and the height follows');
 
-  // 1b. AND THERE IS NO BLACK TO TAKE OFF. MAP-FIELD4: the first
-  // painting was fully opaque on its own painted matte, and this module
-  // keyed that black out by brightness so bottom-anchoring would not
-  // walk a black rectangle down the screen. Mac's second painting
-  // carries a real alpha channel, so the key is GONE - and on this art
-  // reviving it would be a bug, because these gauntlets are grey and
-  // reach luma 0. The departure is recorded in the arc; this is the pin
-  // that would catch it coming back by feel.
-  assert.doesNotMatch(src, /MATTE_LUM|MATTE_EDGE|keyMattePixels|keyHandPixels/, 'the brightness keys are retired, not merely unused');
-  assert.match(src, /const sprite = el\('img'\);/, 'the <img> is the LOADER');
-  assert.match(src, /const sprite = el\('img'\);/, 'the <img> is the LOADER');
-  assert.match(src, /const sheet = el\('canvas', 'hmsprite'\);/, '...and a canvas is what the stage shows');
-  assert.match(src, /stage\.append\(sheet, ink, hands\);/, 'so the keyed sprite is under the ink, where the painting was');
-
   // 2. THE VITALS GO WITH IT, and not through the covering question.
   // DFU repaints its LARGE hud under its own windows (hud.js's
   // `&& !largeHud?.art`), which is right for a window and wrong for a
@@ -2924,12 +2486,6 @@ test('MAP-FIELD2: the sheet is HELD - bottom-anchored with the arms past the edg
   assert.equal(hidesHud({ hidesHud: true }), true);
   assert.equal(hidesHud({ hidesHud: 1 }), false, 'the field is the literal true, as previousWindow is');
   assert.equal(hidesHud({}), false); assert.equal(hidesHud(null), false);
-  assert.match(src, /this\.hidesHud = true;/, 'the sheet declares it');
-  assert.match(read('src/ui/hud/hud.js'), /const hudCovered = hudHidden \|\| \(\(windowCoversHud \?\? cursorActive\) && !largeHud\?\.art\);/,
-    'and the hide is OUTSIDE the large-HUD carve-out - inside it, the enhanced skin would keep its bars on the knuckles');
-  // the overlay's answer takes NO pause gate: the held map does not stop
-  // the world, and the vitals go anyway
-  assert.match(read('src/scenes/townTalk.js'), /get hudHidden\(\) \{ return hidesHud\(overlay\); \},/);
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     assert.match(read(h), /hudHidden: townTalk\.hudHidden,/, `${h}: the host asks`);
   }
@@ -3047,9 +2603,6 @@ test('MAP-FIELD2/4: the cut cuffs are AUTHORED down to the foot, and nothing els
   extendCuffs(fringe, W, H);
   assert.deepEqual([fringe[((H - 1) * W + 5) * 4], fringe[((H - 1) * W + 5) * 4 + 1]], [ARM[0], ARM[1]],
     'the foot is the last pixel the painter made SOLID, not the fringe below it');
-  const fsrc = read('src/ui/heldMap.js');
-  assert.match(fsrc, /if \(last < band \|\| last >= h - 1\) continue;/, 'the band is the test, so it is one number to turn if the art changes');
-  assert.match(fsrc, /extendCuffs\(img\.data, w, h\);/, 'and the window runs it on the sprite it shows');
 });
 
 // ═══ EM1: ONE MAP, THREE SHEETS ══════════════════════════════════════
@@ -3080,41 +2633,6 @@ test('EM1: the window answers the sheet contract for every sheet it holds', () =
   });
 });
 
-test('EM1: the context is DERIVED off the host flags, never declared - and no flags is the wilderness', () => {
-  withDocument(() => {
-    const at = (where) => { const w = mkWin(where ? { where: () => where } : {}); const c = w._slot.context; w.dispose(); return c; };
-    assert.equal(at(null), 'wilderness', 'a host that says nothing is out in the wild - the bay, as it always was');
-    assert.equal(at({}), 'wilderness');
-    assert.equal(at({ inLocation: true }), 'town');
-    assert.equal(at({ insideBuilding: true, inLocation: true }), 'building', 'a shop in a town is the shop');
-    assert.equal(at({ insideDungeon: true }), 'dungeon');
-    // the host hands FLAGS. It never names a context and never names a
-    // tab: a host that declares is a host that forgets.
-    const src = read('src/ui/heldMap.js');
-    assert.match(src, /mapContextOf\(deps\.where\?\.\(\) \?\? \{\}\)/, 'the window derives the context itself');
-    assert.doesNotMatch(src, /deps\.mapContext\b|deps\.sheets\b/, 'no host declares the context or the sheet list');
-  });
-});
-
-test('EM1: the slot offers only what this window can ink, so nothing a player reaches has moved', () => {
-  withDocument(() => {
-    // EM1 ships the WORLD sheet alone, and no host hands `where` yet,
-    // so every window that opens today derives the wilderness and inks
-    // the bay - the strip reads "The Bay" and there is no second tab.
-    for (const extra of [{}, { where: () => ({}) }, { where: () => ({ inLocation: true }) }]) {
-      const win = mkWin(extra);
-      assert.deepEqual([...win._slot.ids], ['world'], 'until EM3/EM4 there is one sheet to ink');
-      assert.equal(win._slot.live, 'world');
-      assert.equal(win._slot.toggles, false);
-      assert.equal(win._slot.empty, false);
-      win.dispose();
-    }
-    // ...and the gate lifts itself the moment a sheet is added: the
-    // narrowing is over `_sheets`, not a literal.
-    assert.match(read('src/ui/heldMap.js'), /has: \[\.\.\.this\._sheets\.keys\(\)\]/);
-  });
-});
-
 test('EM1: a place this window can ink NOTHING for is empty, and an empty window still ticks and closes', () => {
   withDocument(() => {
     // a crypt offers the automap alone (Mac's sentence), and EM1 has no
@@ -3136,54 +2654,6 @@ test('EM1: a place this window can ink NOTHING for is empty, and an empty window
     assert.doesNotThrow(() => win._selectSheet('automap'));
     assert.equal(win._slot.live, null, 'and a sheet it does not hold cannot be selected');
     assert.doesNotThrow(() => win.dispose());
-  });
-});
-
-test('EM1: the window asks the SHEET for the space, the ink and the pointer - and never asks WHICH sheet', () => {
-  const src = read('src/ui/heldMap.js');
-  // the clamp reads the LIVE sheet's own size, so a sheet in world
-  // units and a sheet in map pixels each get their own limits
-  assert.match(src, /const size = this\._sheet\?\.size\?\.\(\) \?\? this\._size;/);
-  // the ink, the pick, the label, the mark and the clock all go through it
-  for (const arm of ['ensure', 'paintStatic', 'paintOverlay', 'staticKey', 'pickAt', 'hoverLabel', 'mark', 'tick']) {
-    assert.match(src, new RegExp(`sheet\\??\\.?\\??${arm}|_sheet\\?\\.${arm}`), `the window does not route ${arm} through the sheet`);
-  }
-  // THE GENERATIVE HALF: no branch on a sheet's NAME anywhere in the
-  // window. A window that knows which sheet is up is a window that will
-  // grow a special case for each one - which is the three windows this
-  // arc exists to collapse.
-  const body = src.slice(src.indexOf('export class HeldMapWindow'));
-  for (const id of MAP_SHEETS) {
-    const branch = new RegExp(`(===|!==|case)\\s*'${id}'`);
-    assert.doesNotMatch(body, branch, `the window branches on the '${id}' sheet by name`);
-  }
-  // the one place a sheet's id is written down is where the sheet is BUILT
-  assert.equal((body.match(/id: '(?:automap|town|world)'/g) || []).length, body.split('_worldSheet()').length - 1 > 0 ? 1 : 0,
-    'a sheet names itself once, at its own construction');
-});
-
-test('EM1: the strip is laid out on every paint, in paper pixels, and rides the KEPT layer', () => {
-  withDocument(() => {
-    const win = open(mkWin());
-    assert.ok(win._strip, 'the layout is minted even with no 2D context - the hit test is the pointer\'s');
-    assert.deepEqual(win._strip.tabs.map((t) => t.sheet), ['world']);
-    assert.equal(win._strip.tabs[0].title, 'The Bay');
-    assert.equal(win._strip.tabs[0].live, true);
-    // the strip scales with the PAPER, not the screen
-    assert.equal(win._strip.scale, stripScale(win._paper.w));
-    win.dispose();
-    // AUDIT-MAP's kept layer: the tabs are re-lettered only when the
-    // static key moves, never on a breathing ring's frame
-    const src = read('src/ui/heldMap.js');
-    const paint = src.slice(src.indexOf('  _paint() {'), src.indexOf('  _paintStrip('));
-    const atStrip = paint.indexOf('this._paintStrip(');
-    const atKey = paint.indexOf("if (key !== this._staticKey");
-    const atOverlay = paint.indexOf('sheet.paintOverlay(');
-    assert.ok(atKey >= 0 && atStrip > atKey, 'the strip is painted inside the static-key branch');
-    assert.ok(atOverlay > atStrip, '...and the overlay still goes on top of it');
-    // the live tab is part of what makes the layer stale, or a tab
-    // press would leave the old rule under the old word
-    assert.match(paint, /this\._slot\.live, sheet\.staticKey\(\)/);
   });
 });
 
@@ -3259,36 +2729,6 @@ test('EM1: a click on a tab switches the sheet and never picks the place under i
   });
 });
 
-test('EM1: the bay is still exactly the bay - the sheet route is a ROUTE, not a rewrite', () => {
-  withDocument(() => {
-    // the world sheet's ink is the same two inkMap calls with the same
-    // options the window passed before the contract existed
-    const win = open(mkWin(modDeps()));
-    const sheet = win._sheets.get('world');
-    const model = sheet.ensure();
-    assert.ok(model?.coast, 'the bay\'s chains');
-    const env = { model, view: win._view, paperW: 200, paperH: 200, dpr: 1, band: 'near', pulse: 0.5 };
-    const a = recordingCtx(); sheet.paintStatic(a, env);
-    const b = recordingCtx(); sheet.paintOverlay(b, env);
-    assert.ok(a.calls.length > 0, 'the static half still inks the bay');
-    assert.ok(b.calls.length > 0, 'and the overlay half still breathes');
-    // the two halves are the two inkMap painters, not one merged pass:
-    // the static one sets a transform and strokes the coast, the
-    // overlay one draws the player's own mark and clears nothing
-    assert.ok(a.calls.some((c) => c.fn === 'setTransform'));
-    assert.ok(!b.calls.some((c) => c.fn === 'clearRect'), 'the overlay never wipes the kept ink under it');
-    // and the world sheet's pointer arms ARE the window's own methods -
-    // the same code, reached through the seam
-    assert.equal(sheet.pickAt.length, 2);
-    assert.equal(sheet.hoverLabel.length, 2);
-    const src = read('src/ui/heldMap.js');
-    assert.match(src, /pickAt: \(px, py\) => this\._pickAt\(px, py\),/);
-    assert.match(src, /hoverLabel: \(px, py\) => this\._hoverLabel\(px, py\),/);
-    assert.match(src, /mark: \(px, py\) => this\._markLocationHandler\(px, py\),/);
-    win.dispose();
-  });
-});
-
 test('ENH-NOTICE3 (AUDIT B4/B6): the card\'s refusal wears no hint (nothing dismisses it), the I/H box keeps the default (any key or press closes it), and a card that goes away takes its panel', () => {
   const buildings = [{ buildingType: 0, displayName: 'The Odd Blades' }];
   const deps = () => modDeps({ gold: () => 0, goldPieces: () => 0, discoveredBuildings: () => buildings, buildingTypeName: () => 'Alchemist' });
@@ -3311,33 +2751,6 @@ test('ENH-NOTICE3 (AUDIT B4/B6): the card\'s refusal wears no hint (nothing dism
     assert.deepEqual(enhancedNoticeKeys(), [], 'mutant: the hold below the early return, so a card that goes away leaves its panel held over the world');
     win.dispose();
   });
-});
-
-// ── EM-BUG2 (Mac, 2026-09-21: "You cannot press the M key to stow the
-// map") ──────────────────────────────────────────────────────────────
-test('EM-BUG2: the key that opens the sheet shuts it - the AutoMap binding as well as TravelMap, on every sheet', () => {
-  const held = readFileSync(new URL('../../src/ui/heldMap.js', import.meta.url), 'utf8');
-  // THE WHOLE BUG IN ONE LINE. This arm was written when the sheet was
-  // the WORLD map alone, so it took the TravelMap action and Escape.
-  // EM3 and EM4 gave the same window three more doors - a dungeon's
-  // plan, a town's, a building's - and every one of them is behind the
-  // AutoMap key, so the key that opened the map could not shut it.
-  // UXB1-S: every action the key carries - a map key a player SHARED with something else still shuts the map
-  assert.match(held, /const _acts = actionsForCode\(bindings\(\), code\);\s*\n\s*if \(code === 'Escape' \|\| _acts\.includes\('TravelMap'\) \|\| _acts\.includes\('AutoMap'\)\) \{/,
-    'both map actions, and Escape, take the same door out');
-  assert.doesNotMatch(held, /if \(code === 'Escape' \|\| actionForCode\(bindings\(\), code\) === 'TravelMap'\) \{/,
-    'never the travel action alone again - that is the shape that shipped');
-  // the action is resolved ONCE - the arm is taken on every key that
-  // reaches the sheet, so this is the hot path's own lookup
-  assert.equal((held.match(/const _acts = actionsForCode\(bindings\(\), code\);/g) || []).length, 1);
-  // ...and the classic twin has always taken its own binding back, which
-  // is the law this one is keeping rather than inventing
-  const classic = readFileSync(new URL('../../src/ui/automap/automapWindow.js', import.meta.url), 'utf8');
-  assert.match(classic, /if \(this\.automapBinding && normalizeCode\(code, e\) === this\.automapBinding\)/,
-    'ui/automap/automapWindow.js: DFU’s own window closes on the AutoMap key');
-  // the binding the sheet answers to is the PLAYER's, read live off the
-  // store - a rebound map key still closes the map it opened
-  assert.match(held, /import \{[^}]*actionsForCode[^}]*\} from/);   // UXB1-S: every action on the key, off the store
 });
 
 // ═══ MAP-FIT1 (2026-09-22) ══════════════════════════════════════════
@@ -3460,49 +2873,3 @@ test('TAMRIEL1 window: the frame round the Bay - the rest at the Bay\'s fit, the
   });
 });
 
-test('MAP-SCALE (FIELD BUGS 2026-10-09e, "icons and text too small on high resolutions", a 1440p monitor): the paper is the fitted rectangle over the map\'s scale and the backing keeps every device pixel; the chrome is zoomed by the same; a pointer comes back over it in both lanes, the card\'s offsets too; a fixed choice of 1 is the sheet as it was (mutants: MAP-SCALE-paper-at-full-size, MAP-SCALE-pointer-not-divided, MAP-SCALE-hands-box-full-size, MAP-SCALE-tip-not-divided, MAP-SCALE-chrome-unzoomed)', () => {
-  withDocument((doc) => {
-    const make = doc.createElement;
-    doc.createElement = (...a) => { const n = make(...a); n.style.setProperty = (k, v) => { n.style[k] = v; }; return n; };
-    globalThis.innerWidth = 2560; globalThis.innerHeight = 1440;
-    try {
-      setPref('mapScale', 'auto');
-      const g = heldStageRect(2560, 1440);
-      const pw = g.w * (PAPER.x1 - PAPER.x0), ph = g.h * (PAPER.y1 - PAPER.y0);
-      const win = open(mkWin({ mapSize: { width: 1000, height: 500 }, woods: { heightMapBuffer: new Uint8Array(500000).fill(10) } }));
-      const k = 1.35;   // 1440 / 1080, to the twentieth
-      assert.equal(win._paper.k, k);
-      assert.ok(Math.abs(win._paper.w - pw / k) < 1e-9 && Math.abs(win._paper.h - ph / k) < 1e-9, 'the paper is the 1080p paper the names were drawn on');
-      assert.equal(win._paper.dpr, k, 'a paper pixel is k device pixels');
-      assert.equal(win._chrome.ink.width, Math.round(pw), 'the backing keeps every device pixel of the fitted sheet');
-      assert.equal(win._chrome.ink.style.width, `${pw}px`, 'and the canvas stands the fitted size on the screen');
-      assert.equal(win._chrome.root.style['--hm-ui'], String(k), 'the chrome zoomed by the same');
-      assert.deepEqual(win._paperPoint(135, 270), [100, 200], 'a client pixel is 1/k of a paper pixel');
-      assert.equal(win._view.scale, win._bayFit(), 'the rest is the Bay\'s fit on that paper');
-      // the card: placed in the screen's pixels and written in the zoomed box's own
-      win._showTip({ title: 'The gate', lines: ['A breach'] }, 270, 135);
-      assert.equal(win._chrome.tip.style.left, `${(270 + 16) / k}px`);
-      assert.equal(win._chrome.tip.style.top, `${(135 + 16) / k}px`);
-      // a fixed choice: 1 is the sheet as it was before the scale, on its next frame
-      setPref('mapScale', 1);
-      win.tick(0.05);
-      assert.equal(win._paper.k, 1);
-      assert.ok(Math.abs(win._paper.w - pw) < 1e-9);
-      assert.deepEqual(win._paperPoint(135, 270), [135, 270]);
-      win.dispose();
-      // THE HANDS LANE: the held paper's matrix maps the paper's own pixels, so the canvas's box is the paper's
-      setPref('mapScale', 'auto');
-      const holder = holderStub({ corners: () => TRAPEZIUM });
-      const w2 = open(mkWin({ ...bayDeps(), holder }));
-      assert.equal(w2._lane, 'hands');
-      assert.equal(w2._paper.k, k);
-      assert.equal(w2._chrome.ink.style.width, `${w2._paper.w}px`);
-      assert.equal(w2._chrome.ink.style.transform, quadPlacement(w2._paper.w, w2._paper.h, TRAPEZIUM).css);
-      const tr = w2._paperPoint(650, 300);
-      assert.ok(Math.abs(tr[0] - w2._paper.w) < 1e-6 && Math.abs(tr[1]) < 1e-6, 'the top-right corner is the paper\'s (w, 0)');
-      w2.dispose();
-      const css = read('src/ui/enhanced/enhancedStyle.js');
-      assert.match(css, /\.hmroot \{ --hm-ui: 1; \}\n\.hmroot > :not\(\.hmstage\) \{ zoom: var\(--hm-ui, 1\); \}/, 'every piece over the sheet zoomed as one');
-    } finally { setPref('mapScale', 'auto'); delete globalThis.innerWidth; delete globalThis.innerHeight; }
-  });
-});

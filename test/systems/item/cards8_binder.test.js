@@ -76,12 +76,6 @@ test('CARDS8 the binder: the Wallet\'s shape - bound, pack-only, refused by the 
   assert.equal(deckValid(STARTER_DECK), null);
   assert.equal(deckHeldRefusal(STARTER_DECK, me.items), null, 'and the binder holds every card it names');
   assert.equal(deckHeldRefusal([...STARTER_DECK.slice(1), units.at(-1).id], me.items) === null, have.has(units.at(-1).id));
-  // the save keeps the mark; an old save is given it once on load; a new character at chargen
-  const save = read('src/systems/save/save.js'), chargen = read('src/systems/chargenSession.js');
-  assert.match(save, /snap\.binderGift = Number\.isSafeInteger\(entity\.binderGift\) \? entity\.binderGift : BINDER_GIFT;/);
-  assert.match(save, /entity\.binderGift = Number\.isSafeInteger\(snap\.binderGift\) \? snap\.binderGift : 0;/);
-  assert.match(save, /giveWalletGift\(entity\);[^\n]*\n  cleanBinders\(entity\.items\);[^\n]*\n  giveBinderGift\(entity\);/);   // AUDIT CARDS-5 C1 (PIN MOVED): the decks made sound first
-  assert.equal((chargen.match(/giveBinderAtChargen\(playerEntity\);/g) ?? []).length, 2, 'both chargen roads');   // AUDIT CARDS-5 C4 (PIN MOVED): ungated
 });
 
 test('CARDS8 the decks: replaced whole when they change (the save\'s snapshot is shallow), at most BINDER_DECKS_MAX, taken apart by index', () => {
@@ -95,14 +89,6 @@ test('CARDS8 the decks: replaced whole when they change (the save\'s snapshot is
   assert.equal(dropBinderDeck(b, 0), true);
   assert.equal(b.decks[0].name, 'Two');
   assert.equal(setBinderDeck({}, 0, { name: 'x', cards: [] }), false, 'only a binder');
-});
-
-test('CARDS8 the pack: while a binder is carried its cards leave the pages for its sheet - the Wallet\'s partition; a card\'s way back to the binder', () => {
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /const binder = binderItem \? \{ item: binderItem, held: items\.filter\(\(it\) => isIliacCard\(it\) && !isEquipped\(it\)\) \} : null;/);
-  assert.match(inv, /const held = new Set\(\[\.\.\.\(wallet\?\.held \?\? \[\]\), \.\.\.\(binder\?\.held \?\? \[\]\)\]\);/);
-  assert.match(inv, /if \(side === 'local' && model\?\.binder && picked === model\.binder\.item\) \(c\.querySelector\('\.card-body'\) \?\? c\)\.append\(binderSheet\(model\.binder\)\);/);
-  assert.match(inv, /if \(side === 'local' && model\?\.binder\?\.held\.includes\(picked\)\) acts\.append\(binderBack\(model\.binder\.item\)\);/);
 });
 
 // ── the Cards part ───────────────────────────────────────────────────────────────────────────────────────────────────

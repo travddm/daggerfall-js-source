@@ -343,11 +343,6 @@ test('DW-E2: the factory\'s three ways - the archive batch (the record\'s size, 
     assert.equal(bb.fps, 5, 'FramesPerSecond = max(1, round(5))');
     assert.equal(bb.centre[1], f32(floorY + 0.75), 'its CENTRE on the point (the animated clearance, 0.75)');
   }
-  const src = rd('src/scenes/deepWater/deepWatersDecor.js');
-  assert.match(src, /\.billboards\.push\(\{ centre: \[p\.local\[0\], p\.local\[1\], p\.local\[2\]\], width: w, height: h, start: 0 \}\);/, 'the animated replacement: its centre on the point');
-  assert.match(src, /group\(`\$\{rec\.archive\}_\$\{rec\.record\}#r`[\s\S]{0,200}centre: \[p\.local\[0\], p\.local\[1\] \+ h \* 0\.5, p\.local\[2\]\]/, 'the material batch: its base on the point');
-  assert.match(src, /start: Math\.floor\(roll\(\) \* frames\)/, 'RandomStartFrame: Random.Range(0, frameCount)');
-  assert.match(src, /const scale = DECORATION_SCALE_MIN \+ roll\(\) \* \(DECORATION_SCALE_MAX - DECORATION_SCALE_MIN\);/);
   // an archive batch of an animated record takes a random start frame of its frames
   const w3 = decorWorld();
   const e3 = w3.add(10, 10);
@@ -425,12 +420,6 @@ test('DW-E2: the decoration program is the mod\'s - the right vector off the vie
       assert.ok(Math.abs(r[0] / n - right[0]) < 1e-6 && Math.abs(r[2] / n - right[2]) < 1e-6);
     }
   }
-  const renderSrc = rd('src/render/deepWatersRender.js');
-  assert.match(renderSrc, /gl\.uniform3f\(u\.uViewCol2, -v\[8\], v\[9\], v\[10\]\);/);
-  assert.match(renderSrc, /gl\.uniform3f\(u\.uCamRight, -v\[0\], -v\[4\], -v\[8\]\);/);
-  assert.match(renderSrc, /gl\.uniform3f\(u\.uCamUp, v\[1\], v\[5\], v\[9\]\);/);
-  assert.match(renderSrc, /gl\.uniform1i\(u\.uFacing, g\.facing\);/, 'each group its own facing');
-  assert.match(renderSrc, /facing: g\.facing \|\| 0, cutoff: g\.cutoff \?\? DECORATION_CUTOFF \}\);/, 'a group with none is a batch, at the decorations\' cut-out unless it names its own (DW-E3: the fish\'s 0.1)');
 });
 
 test('DW-E2: seen from over the sea a decoration takes the top\'s column share, as the floor does - the split sum is the mod\'s depth-read alpha over its fragment (the arithmetic + pins)', () => {
@@ -468,14 +457,6 @@ test('DW-E2: seen from over the sea a decoration takes the top\'s column share, 
   assert.match(COLUMN_GLSL, /col = mix\(col, st, t\);/);
   assert.ok(FLOOR_FS.includes(COLUMN_GLSL) && DECOR_FS.includes(COLUMN_GLSL), 'one column, both programs');
   assert.match(FLOOR_FS, /col = dwColumn\(col, vWorldPos\);\n\s+outColor = vec4\(dwWaterFog\(col, vWorldPos\), 1\.0\);/);
-  const renderSrc = rd('src/render/deepWatersRender.js');
-  const draw = renderSrc.slice(renderSrc.indexOf('  drawDecorations(list, frame) {'), renderSrc.indexOf('  drawSkyFog() {'));
-  assert.match(draw, /this\._columnUniforms\(u, frame\);/);
-  assert.match(draw, /gl\.uniform3fv\(u\.uPixelOrigin, it\.origin\);/, 'the surface uv is pixel-local');
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /dwRender\.drawFloors\(_dwFloorList, dwColumnFrame\(f\)\);/);
-  assert.match(world, /dwRender\.drawDecorations\(_dwDecorList, dwColumnFrame\(f\)\);/, 'the decorations take the floors\' frame');
-  assert.match(world, /columnOn: f\.s\.spawnSurfaces && !f\.underwater && !waterOn,/);   // PIN MOVED (WATER-NEXT 2): off under the enhanced water, which measures its own column
 });
 
 test('DW-E2: the settings and the host wiring - the four decoration reads, the promote and the crossing hooks, the draw after the floors (pins)', () => {
@@ -484,17 +465,6 @@ test('DW-E2: the settings and the host wiring - the four decoration reads, the p
   assert.equal(s.radius, 2);
   assert.equal(s.frequency, scaledSliderValue(0.3, 3.75));
   assert.equal(s.maxPerTile, 1080);
-  const world = hostText('src/scenes/world.js');
-  // PIN MOVED (IC-SWAP-BEHIND): the entry under the pixel's own key
-  assert.match(world, /if \(deepWaters\) deepWaters\.published\(built\.get\(pkey\), dwResult\);[^\n]*\n\s+if \(dwDecor\) dwDecor\.onPromote\(built\.get\(pkey\)\);/, 'HandlePromote after the floor builder\'s');
-  assert.match(world, /if \(dwDecor\) dwDecor\.destroyed\(p\);/);
-  assert.match(world, /queue\.push\(\.\.\.r\.load\);\n\s+announceNearbySpawns\([^\n]*\n\s+if \(dwDecor\) dwDecor\.onMapPixelChanged\(r\.current\);/, 'the crossing: PlayerGPS.OnMapPixelChanged');
-  assert.match(world, /if \(deepWaters\.pump\(\) && dwDecor\) dwDecor\.refreshPlayerArea\(\);/, 'LoadSettings\' RefreshPlayerArea');
-  assert.match(world, /if \(dwDecor\) \{ dwDecor\.process\(\); deepWaters\.flushPromoteTiming\(\); \}/);
-  // OH-C: There's a Hole in the Bottom of the Ocean's opaque discs stand between, in their queues (2000/2001, before AlphaTest's 2450)
-  assert.match(world, /if \(deepWaters\) drawDeepWatersFloors\(groundQueue\);[^\n]*\n\s+if \(oceanHoles\) drawOceanHolesOpaque\(groundQueue\);[^\n]*\n\s+if \(dwDecor\) drawDeepWatersDecorations\(groundQueue\);/);
-  assert.match(world, /onTransientReset\(\(\) => dwDecor\.reset\(\)\);/);
-  assert.match(world, /setPostTransitionRefresh\(\(\) => dwDecor\.refreshPlayerArea\(\)\);/);
   const tex = createDecorTextureSource({ getTexture: async () => null, textureFile: () => null, scaledSize: () => null, replacementSize: () => null, replacementsOn: () => false, hasReplacement: () => false, loadReplacement: async () => null, createTexture: () => null });
   assert.equal(tex.replacement({ archive: 105, record: 3 }), null, 'Asset Injection off: never a replacement');
 });

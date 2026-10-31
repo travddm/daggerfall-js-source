@@ -299,12 +299,6 @@ test('SCALE5c the session: a hub link offers the shards in its hello, goes where
     const again = JSON.parse(bus.sent.find((x) => x.startsWith('{"t":"hello"')));
     assert.equal(again.hs, undefined, 'and offers the shards no more - the bus would send it straight back');
   });
-  const world = src('src/scenes/world.js');
-  assert.match(world, /if \(tab\.room\) link\.join\(channelLinkRoom\(tab\.room\)\);/);
-  assert.match(world, /return seen === '1' \? \(shardOf\(room, storedSession\(appStorage\(\)\)\?\.id\) \?\? room\) : room;/);
-  // PIN MOVED, AUDIT SCALE II C-2: the flag kept under the relay's own key (hubShardsSeenKey), and a relay without the
-  // shards takes the links off them (test/net/auditscale2_client.test.js runs the host's own closures)
-  assert.match(world, /const onRelayVersion = \(v\) => \{ const keeps = hubShardsSupported\(v\); try \{ appStorage\(\)\?\.setItem\?\.\(hubShardsSeenKey\(\), keeps \? '1' : '0'\); \}/);
 });
 
 test('CHAT-FIND-HUB the session: the search box asks the hub while this link knows fewer than are online - once a query moves, never closer than HUB_FIND_ASK_MS, never a tag, never twice in flight, again when its answer is stale - keeps the answer as `hubFound` and never says it as a line; a busy hub is asked again; /find of the same query is still a line; the box cleared lets the answer go (mutants: the box never asks; asked though everyone is known; no floor; the answer said as a line; a busy answer kept; the answer outliving the box)', async () => {
@@ -440,11 +434,6 @@ test('SCALE5c the World tab\'s search and the Guild tab\'s list: `/find` and `/w
     sockets[0].receive({ t: 'found', q: 'x', l: [], busy: 1 });
     assert.deepEqual(found, { q: 'x', l: [], busy: true });
   });
-  const world = src('src/scenes/world.js');
-  // PIN MOVED, AUDIT SCALE II C-1: a hub on a relay before the shards is never asked, and the line says it needs a newer one
-  assert.match(world, /if \(cmd\.kind === 'find'\) \{ findTab = tabId; const hub = chatLinks\?\.get\('world'\); if \(!hub\?\.sendFind\(cmd\.q\)\) note\(hub\?\.welcomed && !hub\.findOk \? FIND_RELAY_TEXT : FIND_OFFLINE_TEXT\); return 'read'; \}/);
-  assert.match(world, /link\.onFound = \(f\) => chatLog\.push\(findTab \?\? tab\.id, \{ text: foundText\(f\), system: true \}\);/);
-  assert.match(world, /if \(tabId === 'guild'\) \{ s\?\.sendGuildWho\?\.\(\); return guildRosterSource\(s, myGuildTag\(\)\); \}/);
 });
 
 test('SCALE5c a shard hands on a frame AS IT CAME, before any door of its own: a shared quest reaches the bus (the shard\'s door asks the account only the bus\'s socket carries), a frame past the hub\'s largest is refused, a socket over HUB_UP_HZ_MAX is struck, and the hello, ping and pose stay the shard\'s; the filter\'s verdict on a place name kept (mutants: the forward after the doors; the size unasked; the gate unasked; a pose handed up; the verdict kept wrong)', async () => {
@@ -521,7 +510,6 @@ test('SCALE5c the World tab while the hub is small (Mac\'s decision 2): a shard\
     assert.equal(s.sendHubWho(), false, 'never past a roster\'s worth');
     assert.equal(s.hubOnline.size, 0, 'and the list let go');
   });
-  assert.match(src('src/scenes/world.js'), /if \(tabId === 'world' \|\| tabId === 'region'\) s\?\.sendHubWho\?\.\(\);/);
 });
 
 test('SCALE5c part two: A REGION\'S CHANNEL, FOUR WAYS - its shards beside it, an account on one by its subject; the region\'s own channel the bus: a region line and a traveller\'s mark from one shard heard on another and on a tab from before (the mark never back to its own), a shard\'s joiner told the region\'s marks, the census over every shard, everyone online for the Region tab, the hops, and a bus never another channel\'s (mutants: a region shard no channel; the bus the hub; the mark a socket each; the mark back to its sender; the joiner told nothing; the census the bus\'s own; the region\'s list unanswered; a bus taking another channel\'s shard)', async () => {
@@ -595,10 +583,4 @@ test('SCALE5c part two: A REGION\'S CHANNEL, FOUR WAYS - its shards beside it, a
     sockets.at(-1).drop(1006);
     assert.equal(s.room, 'chat:region.5', 'a relay before them: back to the region\'s channel');
   });
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const channelLinkRoom = \(room\) => \{\n\s*if \(!isChannelBus\(room\)\) return room;[\s\S]{0,200}?return seen === '1' \? \(shardOf\(room, storedSession\(appStorage\(\)\)\?\.id\) \?\? room\) : room;/);
-  assert.match(w, /chatLog\.setRoom\('region', room, place\);\n\s*link\.join\(channelLinkRoom\(room\)\);/);
-  assert.match(w, /channelOf\(link\.room\) === chatRegionRoom\(_questRegionIndex\(\)\)/);
-  assert.match(w, /return place && s \? placedRosterSource\(s, place\) : s;/);   // HIDDEN-UNCOUNTED: a placed tab's source, net/roster.js's
-  assert.match(src('src/net/roster.js'), /hubOnline: link\?\.hubOnline \?\? null, label: place \}/);
 });

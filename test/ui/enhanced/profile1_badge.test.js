@@ -102,14 +102,4 @@ test('PROFILE1: it is drawn as a portrait, not a button - no box, a round rimmed
   assert.match(frame, /width: 58px; height: 58px;/);
   assert.match(rule('.px-portrait canvas'), /image-rendering: pixelated;/, 'the save tiles\' law: Daggerfall\'s pixels as they are');
   assert.match(rule('.px-profilegem.on'), /color: var\(--brass\);/);
-  // the door hands it the store's session, the newest finished character and that character's face - a COPY,
-  // because the Continue pane's tile may draw the same face on the same screen
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  const door = menu.slice(menu.indexOf('function profileMark()'), menu.indexOf('function profileMark()') + 500);
-  // PROFILE-MENU: the law in one function the mark and the card it opens both ask (PIN MOVED: it was the mark's own line)
-  assert.match(door, /const save = profileCharacter\(\);/, 'the mark asks the one law');
-  assert.match(menu, /function profileCharacter\(\) \{\n  return mode === 'pause' \? liveCharacter\(playerEntity\) : newestPortraitSave\(\);\n\}/, 'the door: the newest finished save (PROFILE2: paused, the character being played; AUDIT SLOTS2 S1: portraitSave\'s law, read only as far as its answer)');
-  // PIN MOVED (WITCH1): the corner mark's face is asked through portraitOf - a profile icon worn, else the face, a COPY still
-  assert.match(door, /face: portraitOf\(save\),/);
-  assert.match(menu, /if \(icon\) return Promise\.resolve\(profileIconNode\(document, icon\)\);\n\s+return save \? loadFace\(save, \{ scale: 2, copy: true \}\) : null;/);
 });

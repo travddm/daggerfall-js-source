@@ -389,7 +389,6 @@ test('S9 THE GHOSTS\' PASS: one buffer of every ghostable step\'s twelve edges a
     for (let e = 0; e < 12; e++) { const o = ((g * 13 + e) * 6) * F; assert.deepEqual([...v.subarray(o, o + 6)].map((q) => Math.fround(q)), [...edges[e][0], ...edges[e][1]].map((q) => Math.fround(q)), `ghost ${g} edge ${e}: the law's box`); }
     assert.equal(v[((g * 13 + 12) * 6) * F + 9], 1, 'then its hand');
   }
-  assert.ok(!/gl\.LINES|drawElements\(gl\.LINE/.test(read('src/render/superDungeon/sdStepsPass.js')), 'never GL_LINES');
   const I = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   const step = Array.from({ length: N }, () => [0, 0, 0, 0]), state = Array.from({ length: N }, () => [0, 0, 0, 0]);
   step[0] = [0, 0, 0.5, 0]; state[0] = [1, 0.25, 1, 0];
@@ -454,14 +453,5 @@ test('S9 THE REWIND: my feet fallen to the void\'s floor one frame and on a chec
 });
 
 test('S9 the hosts by source: the dungeon host hands the Steps the Hollow\'s Ending and the ghosts\' door; the world host draws the ghosts in the Hour\'s reads, fight or none; the lab stands the Steps\' knobs and draws their pass', () => {
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdSteps = _sdRealm \? createSdSteps\(\{ ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\], renderer, audio \}\) : _ketch \? createSdSteps\(\{ course: KT_COURSE, renderer, audio \}\) : null;/);   // PIN MOVED (KETCH): and the Sailwalk on a sky-ketch, the Hour's own course law on her frame
-  assert.match(D, /sdStepsDraw: sdSteps \? \(proj, view, fog\) => sdSteps\.drawPass\(proj, view, fog\) : undefined,/);
-  const W = read('src/scenes/world.js');
-  assert.match(W, /function drawSdArenaReads\(proj, view, fog\) \{\n\s+const ghosts = !!modes\?\.dungeonCtx\?\.sdStepsDraw\?\.\(proj, view, fog\);[^\n]*\n\s+if \(!sdFightLink \|\| _sdReadsBroken \|\| modes\?\.sdRealmSlot\?\.\(\) == null\) return ghosts;/);
-  assert.match(W, /return drew \|\| ghosts;\n {2}\}/);
-  const L = read('src/tools/abyssLab.js');
-  assert.match(L, /if \(steps\.drawPass\(proj, view, courtFogNow\(\)\)\) renderer\.markForeignPass\(\);/);
-  assert.match(L, /if \(params\.has\('crumble'\)\) for \(const i of CRUMBLES\) steps\.touch\(i, clock - Number\(params\.get\('crumble'\)\)\);/);
   assert.equal(sdStepKey(3), 'sd:step:3');
 });

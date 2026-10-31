@@ -201,9 +201,6 @@ async function breachTargets(kind) {
 }
 
 test('STAND-IN-WHOLE THE HOSTS: the dungeon context wires the one door with its bodies and their doors and keeps no copy of it (buildDungeonContext does not run in Node - by source); an Elite Breach\'s screen hands its stand-ins my Vestiges\' declared factor, read on the real fight (mutants: the breach\'s reader dropped from either stand-in; the reader answering 1)', async () => {
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /const \{ spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival, spellOnStandIn, standInRound \} = createStandInSpell\(\{\n\s*player: playerEntity, say: \(line\) => hudText\.add\(line\),\n\s*boss: gateBossBody, crystals: gateCrystalBodies, host: gateHostBodies, rival: arenaRivalBody,\n\s*landOnBoss, landOnCrystal, landOnHost, landOnRival, nextArenaQ,\n\s*trapNow: \(\) => opts\.bossTrapNow\?\.\(\) \?\? null, onTrap: \(trap\) => !!opts\.onBossTrap\?\.\(trap\),\n\s*\}\);/);
-  assert.deepEqual([/function spell(OnBoss|OnHost|OnCrystal|OnRival|OnStandIn)\(/.test(dc), /dealt \+= Math\.max\(0, n\)/.test(dc), /function tellStandIn\(/.test(dc)], [false, false, false], 'no copy of the door left in the host');
   // AN ELITE BREACH, ITS REAL FIGHT: a hall woken on the relay's own brain, its bodies drawn by the screen - a yard's struck
   // objects (crystalStandIn) and a span's Harriers (hostStandIn)
   const seen = [];

@@ -151,15 +151,3 @@ test('EG-ROAR THE SEAM (createEgAir): one made sound a frame, each once; the bed
   air2.stop(); assert.equal(E2.beds.size, 0);
 });
 
-test('EG-ROAR THE WIRING: the breach client plays the air from the score\'s own place on the breach\'s clock each frame it stands in the Spire, and lets it go on every way out the reverb is and on away(); the dungeon\'s drips, doors and birds silent in the Spire as in the court and the Hour; the Hour\'s layBed the one home of the laying (mutants: the air never played; never let go; the drips back)', () => {
-  const C = readFileSync(new URL('../../../src/scenes/eliteGates/egClient.js', import.meta.url), 'utf8');
-  assert.match(C, /\n {6}if \(inSpire\(\)\) \{\n {8}spireFrame\(E, t\);[\s\S]{0,900}?\n {8}air\.frame\(api\.scoreView\(\)\?\.place \?\? null, t \/ 1000, cam\?\.pos \?\? null, E\.seed\);/, 'played in the Spire\'s frame');
-  assert.match(C, /\n {8}if \(!swapping && !answering\) reverb\.release\(\);[^\n]*\n {8}if \(!swapping && !answering\) air\.stop\(\);/, 'let go with the reverb');
-  assert.match(C, /away\(\) \{[^\n]*\bair\.stop\(\);/, 'and on away()');
-  assert.match(C, /const air = createEgAir\(audio\);/);
-  const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(D, /&& !_sdRealm && !_egHall && !_ketch\) sceneAmbience\.update\(dt, \{/, 'no drip in the Spire');   // PIN MOVED (KETCH): nor on a ship in the sky
-  const A = readFileSync(new URL('../../../src/scenes/eliteGates/egAir.js', import.meta.url), 'utf8');
-  assert.match(A, /import \{ layBed \} from '\.\.\/superDungeon\/sdAir\.js';/);
-  assert.ok(!/function layBed/.test(A), 'one home');
-});

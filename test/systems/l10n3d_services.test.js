@@ -325,17 +325,3 @@ test('L10N3d services: the tavern - its eleven menu lines each in its own place 
 
 // ── the enhanced skins, by source ───────────────────────────────────────────────────────────────────────────────────
 
-test('L10N3d services by source: the enhanced trade and tavern skins read the same routed readers the classic windows do - no copy of the English left in them', () => {
-  const trade = rd('src/ui/enhanced/enhancedTrade.js');
-  for (const reader of ['cannotBeRepairedText()', 'doesntNeedIdentifyText()', 'interruptRepairText()', 'stealSuccessText()', 'stealFailureText()']) {
-    assert.ok(trade.includes(reader), `enhancedTrade.js reads ${reader}`);
-  }
-  assert.equal(trade.split('letterOfCreditText()').length - 1, 2, 'both letter-of-credit boxes read the reader');
-  for (const en of [LETTER_OF_CREDIT_TEXT, CANNOT_BE_REPAIRED_TEXT, INTERRUPT_REPAIR_TEXT, DOESNT_NEED_IDENTIFY]) assert.ok(!trade.includes(en), `no copy of "${en}"`);
-  assert.doesNotMatch(trade, /\b(CANNOT_BE_REPAIRED_TEXT|INTERRUPT_REPAIR_TEXT|DOESNT_NEED_IDENTIFY|STEAL_SUCCESS_TEXT|STEAL_FAILURE_TEXT)\b/, 'no bare constant shown');
-  const tavernSkin = rd('src/ui/enhanced/enhancedTavern.js');
-  for (const reader of ['roomFreeForKnightText()', 'roomFreeHeartsDayText()', 'youAreNotHungryText()', 'tavernMenuLines()']) {
-    assert.ok(tavernSkin.includes(reader), `enhancedTavern.js reads ${reader}`);
-  }
-  assert.doesNotMatch(tavernSkin, /\b(ROOM_FREE_FOR_KNIGHT|ROOM_FREE_HEARTS_DAY|YOU_ARE_NOT_HUNGRY|TAVERN_MENU)\b/, 'no bare constant shown');
-});

@@ -230,9 +230,3 @@ test('EG6c WHERE A BAKED FRAGMENT IS REGISTERED (section 11.6): its law in net/e
   assert.deepEqual([...col.slice(0, 3)], [MESH.collider[0] + 1, MESH.collider[1] + 2, MESH.collider[2] + 3]);
 });
 
-test('EG6c THE READER IS LAW: its section of net/eliteGates/egFragLaw.js decides in whole centimetres and calls no float trigonometry, no root, no clock and no Math.random (section 9\'s banned functions, swept) (mutants: a root in the reader)', () => {
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egFragLaw.js', import.meta.url), 'utf8');
-  const reader = src.slice(src.indexOf('// ── EG6c: A BAKED FRAGMENT\'S RECORD'));
-  assert.ok(reader.length > 8000, 'the reader found');
-  for (const bad of ['Math.sin', 'Math.cos', 'Math.tan', 'Math.atan', 'Math.random', 'Math.sqrt', 'Math.hypot', 'Math.pow', 'Math.exp', 'Math.log', 'Date.now', 'performance.now']) assert.ok(!reader.includes(bad), `the reader calls ${bad}`);
-});

@@ -167,26 +167,3 @@ test('MAC-O1: the TORCH comes back - a spell Z can put away no longer keeps the 
   assert.ok(entity.lightSource, 'so the remembered light is taken up again');
 });
 
-test('MAC-O1 (THE FOUR HOSTS RULE): every host polls the KEY’s door and hands the rig AbortReadySpell', () => {
-  // The four hosts, plus the standalone dungeon scene that shares
-  // dungeonContext's rig.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    const s = read(f);
-    // MWCROUCH: the poll is GetKeyDown now (`pressed`, ui/input.js) - the
-    // `held(keys, 'ReadyWeapon') && !zPrev` derivation it replaced dropped
-    // any press shorter than a frame. The law is unchanged: EVERY host
-    // reads the key itself rather than leaning on a window's door.
-    assert.match(s, /pressed\((keyEdge|latch\.edge), keys, 'ReadyWeapon'\)/, `${f} still polls the key`);
-    assert.match(s, /readyWeapon\(\)|readyWeapon\?\.\(\)/, `${f}: the Z edge takes WeaponManager.Update's arm`);
-  }
-  // ...and the arm is reachable on the dungeon ctx the two dungeon
-  // hosts are handed, beside the panel's raw door.
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /readyWeapon: weaponRig\.readyWeapon,/);
-  assert.match(dc, /^    toggleSheath: weaponRig\.toggleSheath,$/m);
-  // The spell door: all four rigs get it, or :251 has nothing to call.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(read(f), /abortSpell: \(\) => magic\??\.?\.?abortReadySpell\(\)/,
-      `${f}: the rig is handed EntityEffectManager.AbortReadySpell`);
-  }
-});

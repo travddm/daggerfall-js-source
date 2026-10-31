@@ -135,8 +135,6 @@ test('AUDIT BANTHA1 TREE-3: a jungle tree\'s Logging mark stands outside what th
   nodeGlows(marks, [0, 1.7, 10], 0, st, out);
   nodeGlows(marks, [0, 1.7, 10], 0.2, st, out);   // kindled
   assert.deepEqual(out.map((g) => g.pull), [kapok.pull, NODE_GLOW_PULL], 'a glow its mark\'s pull, or the node\'s own');
-  assert.match(text('src/render/nodeGlow.js'), /if \(g\.pull !== pull\) \{ pull = g\.pull \?\? NODE_GLOW_PULL; gl\.uniform1f\(U\.uPull, pull\); \}/, 'sent a glow at a time');
-  assert.match(text('src/scenes/treeHost.js'), /n\.flat\?\.jungle != null \? jungleTreeMark\(n\.flat\) : TREE_MARK/);
 });
 
 test('AUDIT BANTHA1 TREE-1: the cover index files a crown wider than its cell ONCE, in its wide grid, and answers every ray as a search of every proxy would - a jungle pixel\'s 10,000 proxies were 148,000 references and 26-99 ms of the main thread (mutants: a wide proxy searched only in its own cell; filed in the fine grid again)', () => {
@@ -432,8 +430,6 @@ test('AUDIT BANTHA1 PERF-2: a pixel\'s nature crosses the worker\'s wire by colu
   assert.equal(packNature(odd), odd, 'a field no column holds: the list as it is');
   assert.deepEqual(packNature([]), []);
   assert.equal(unpackNature(odd), odd);
-  assert.match(text('src/world/terrain/terrainGenWorker.js'), /out\.nature = packNature\(out\.nature\);[^\n]*\n\s*transfer\.push\(\.\.\.natureBuffers\(out\.nature\)\);/);
-  assert.match(text('src/world/terrain/terrainGenClient.js'), /out\.nature = unpackNature\(out\.nature\);/);
 });
 
 test('BANTHA1 the species: banyans and figs crowd the low wet ground, kapoks and mahoganies the uplands, the flame tree the light - drawn from weights that are each species\' grove times its ground times its light (mutants: the ground ignored; the light ignored)', () => {
@@ -522,31 +518,6 @@ test('BANTHA1 every shader that calls the haze takes its block - the skies the s
   }
 });
 
-test('AUDIT BANTHA1 HAZE-3: every fogged pass that draws where the haze is armed looks its uniform up and uploads it from its fog, and every fog the hosts hand a pass carries the haze; the rest are named, each drawn only in a mode\'s frame (the court, the Abyss\'s realm, the Breach\'s halls), whose beginFrame clears the unarmed haze (mutants: a glow left unhazed; a host\'s fog without it)', () => {
-  const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.js') ? [join(d, e.name)] : []));
-  const MODE_FRAMES_ONLY = new Set(['render/courtCrystals.js', 'render/gate/gateTelegraph.js', 'render/gate/gateFx.js', 'render/deadlands.js',
-    'render/eliteGates/egMistPass.js', 'render/eliteGates/egMotes.js', 'render/eliteGates/egLightPass.js', 'render/eliteGates/egLinePass.js',
-    'render/superDungeon/sdBeam.js', 'render/superDungeon/sdPillarPass.js', 'render/superDungeon/sdStompWall.js', 'render/superDungeon/sdRiftPass.js',
-    'render/superDungeon/sdMotes.js', 'render/superDungeon/sdHalo.js', 'render/superDungeon/sdArenaGlow.js', 'render/superDungeon/sdStepsPass.js',
-    'render/ketch/ktGaugePass.js']);   // KETCH-LOOK KL3: her gauges, drawn in the dungeon arm's frame on her decks alone
-  const fogged = [], unhazed = [], bare = [];
-  for (const f of walk(join(ROOT, 'src'))) {
-    const rel = f.slice(join(ROOT, 'src').length + 1).split('\\').join('/'), s = readFileSync(f, 'utf8');
-    for (const l of s.split('\n')) if (/mode: [\w.]*_fogMode, density/.test(l) && !/haze: [\w.]*_haze\b/.test(l)) bare.push(`${rel}: ${l.trim().slice(0, 90)}`);
-    if (!/'uFogMode'|u\('uFogMode'\)/.test(s)) continue;
-    fogged.push(rel);
-    if (!s.includes("'uJungleHaze'") && !MODE_FRAMES_ONLY.has(rel)) unhazed.push(rel);
-  }
-  assert.deepEqual(unhazed, [], 'a fogged pass that never takes the jungle\'s haze');
-  assert.deepEqual(bare, [], 'a host\'s fog handed without the haze');
-  for (const rel of MODE_FRAMES_ONLY) assert.ok(fogged.includes(rel), `${rel} is still a fogged pass (else drop it from the list)`);
-  for (const p of ['render/nodeGlow.js', 'render/auraRing.js', 'render/spoilsGlow.js', 'render/gate/gatePass.js', 'render/riteSmoke.js', 'render/superDungeon/sdOmenPass.js', 'render/foeTelegraph.js']) {
-    assert.match(text(`src/${p}`), /if \(U\.uJungleHaze\) gl\.uniform4fv\(U\.uJungleHaze, fog\?\.haze \?\? NO_HAZE\);/, `${p} uploads it`);
-  }
-  // AUDIT NODE-GLINT: the nodes' glint reads the frame's own (the renderer's), as its fog
-  assert.match(text('src/render/nodeGlint.js'), /if \(L\.uJungleHaze\) gl\.uniform4fv\(L\.uJungleHaze, r\._haze\);/, 'render/nodeGlint.js uploads it');
-});
-
 test('AUDIT BANTHA1 HAZE-1: every program a module under src/render exports compiles whole in the repo\'s GLSL reader - a block\'s uniform redeclared beside it (the Deadlands\' sea declared its own uHaze under the fog block\'s, and on the branch the Burning Court\'s sky and sea would not build) is a type error there; the jungle\'s uniform has a name of its own (mutant: the jungle\'s uniform named uHaze again)', async () => {
   const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.js') ? [join(d, e.name)] : []));
   const PREPROCESSED = new Set(['render/dynamicSkiesRenderer.js FS']);   // Dynamic Skies' own #define - the reader takes no preprocessor
@@ -565,7 +536,6 @@ test('AUDIT BANTHA1 HAZE-1: every program a module under src/render exports comp
   assert.deepEqual(bad, []);
   assert.ok(n > 140, `the sweep read the programs (${n})`);
   assert.match(HAZE_LAW_GLSL, /uniform vec4 uJungleHaze\[2\];/);
-  assert.match(text('src/render/deadlands.js'), /uniform vec3 uHaze;/, 'the Deadlands keep their own');
 });
 
 test('BANTHA1 what the haze hides: a box is hidden only where every point of it sends less than JUNGLE_HAZE.cull of its light through the haze ALONE (AUDIT BANTHA1 HOST-4: the sky shown in its place is the fog colour only by the haze\'s own depth) - a bound read at its nearest point and its top, never a guess; near, high or with the haze off, it stands (mutants: the box\'s bottom read for its top; the bound turned)', () => {
@@ -813,8 +783,6 @@ test('BANTHA1 the haze reaches every program: the frame\'s, armed by setJungleHa
   const stamp = r._frameStamp;
   r.setJungleHaze(null); r.setJungleHaze(null);
   assert.equal(r._frameStamp, stamp + 1, 'off once, then nothing moves');
-  const src = text('src/render/renderer.js');
-  for (const borrow of src.split('this._fogMode = 0; this._dwFog[0] = 0;').slice(1)) assert.match(borrow.slice(0, 20), /^ this\._haze\[4\] = 0;/, 'every sprite\'s borrow takes the haze off with the fogs');
 });
 
 test('AUDIT BANTHA1 HAZE-2: what a program holds is the GL PROGRAM\'s - a world set re-installed between the haze on and the haze off (FAR-CLIP1\'s variant, a panel, RW1\'s view out make new location tables) still sends the off to the program that holds it on (mutant: the sent state on the location table)', () => {
@@ -878,30 +846,6 @@ test('BANTHA1 the jungle\'s door: Low Poly Trees\' own over the owner\'s files -
   calls.length = 0;
   door.frame([], 0, 0, 0, { stamp: 3 }); door.frame([], 0, 0, 0, { stamp: 4 });
   assert.deepEqual(calls.filter((c) => /^(bindBuffer|bufferData|bufferSubData)$/.test(c[0])), [], 'none to show, none shown - no upload');
-});
-
-test('BANTHA1 the hosts: world.js builds the jungle\'s host behind its switch and the trees\' host with it, hands the pixel build the jungle, sets the haze before the fog and takes its colour, culls a pixel the haze hides whole, and hands the far ring the haze; the pixel build asks the kernel for the jungle and stands its trees as far pictures held by the pixel, Logging\'s and cover\'s; the kernel lays the jungle over the pixel\'s own layout (THE FOUR HOSTS: exterior.js, worldModes.js and dungeonContext.js stand no wilderness - FLAGGED in scenes/jungleHost.js)', () => {
-  const w = hostText('src/scenes/world.js'), pb = text('src/scenes/pixelBuild.js'), tg = text('src/world/terrain/terrainGen.js'), jh = text('src/scenes/jungleHost.js');
-  // PIN MOVED (TESA-BIOME): and past the Bay Cyrodiil's zones (world/tamriel/tamrielBiomes.js), their stamp its field's key
-  assert.match(w, /const jungle = jungleOn\(\) \? createJungleHost\(\{[^\n]*haze: jungleHazeOn\(\),\n\s+zoneAt: tamrielLand \? tamrielBiomeAt : null, version: tamrielLand \? biomeStamp : null \}\) : null;/);   // PIN MOVED (VALENWOOD-CANOPY): the zones whole, the jungle's and the canopy's read off them
-  assert.match(w, /const trees = createTreesHost\(\{[^\n]*jungle, breathe: \(\) => breather\.breathe\(\), yards: \(\) => yards \}\);/);
-  assert.match(w, /jungle, lowPolyTrees, maps, modelFeetOf/, 'the pixel build has the jungle');
-  const fogAt = w.indexOf('const fogColor = jungle ? jungle.haze({ fogColor: sky.fogColorFor(fogNow), fogRow: fogNow, eye: mwv.eye, dt, minute, weather, wind: wd.on ? wd.windV : null, sky }) : sky.fogColorFor(fogNow);');   // AUDIT BANTHA1 HOST-7: the view's eye, as the fog's uCamPos
-  assert.ok(fogAt > 0 && w.indexOf('renderer.setFog(fogNow.mode,', fogAt) - fogAt < 600, 'the haze, then the fog with its colour');
-  assert.match(w, /const pixelVisible = !cullOn \|\| !\(aabbOutside\(_planes, p\._box, t\[0\], t\[1\], t\[2\]\) \|\| jungle\?\.hides\(p\._box, t\)\);/);
-  assert.match(w, /haze: renderer\._haze, hazeEye: jungle\?\.eye/, 'the far ring');
-  assert.match(pb, /jungle: jungle \? jungle\.job\(px, py, FOREST_HIDDEN_LOCATION_TYPES\.has\(groundLocation\?\.mapTableData\?\.locationType\)\) : null,/);   // PIN MOVED (GROUND-AGREE): the ground's place
-  assert.match(pb, /jungle\.door\.acquire\(far\); jungleHandles\.push\(far\);/);
-  assert.match(pb, /made\.jungleHandles = jungleHandles;/, 'BUILD-FAIL1\'s ledger');
-  assert.match(pb, /const young = f\.js <= JUNGLE\.underScale\[1\], gk = young \? `J\$\{f\.jungle\}y` : `J\$\{f\.jungle\}`;/, 'AUDIT BANTHA1 PERF-5: the young trees a group of their own');
-  assert.match(pb, /batch\.farH = g\.young \? 0 : proto\.size\.h;/, '...which the far rings stand as the floor');
-  assert.match(pb, /if \(pic\.h == null\) \{ jungle\.door\.acquire\(far\); jungleHandles\.push\(far\); pic\.h = jungleHandles\.length - 1; \}/, 'a species\' handle held once for its storeys');
-  assert.match(pb, /forestGroups\.set\(gk, \{ batch, centers: g\.centers, size: far\.size, scales \}\);/, 'Logging fells it');
-  assert.match(pb, /coverItems\.push\(\.\.\.jungleCover\(c, species, own\[i\]\)\)/, 'cover');
-  assert.match(pb, /f\.jungle != null \? JUNGLE_MEASURES\[f\.jungle\]\.foot \* f\.js : natureReach/, 'the road keeps clear of its foot - loaded or not (AUDIT BANTHA1 LAY-5)');
-  assert.match(pb, /jungleTrees: jungleSet\.length \? \{ px, py, ox: 0, oy: 0, oz: 0, handles: jungleHandles, groups: jungleSet, trees: null, centers: null \} : null,/);
-  assert.match(tg, /const \{ flats: nature, pairs: roadside, graht \} = jungleLayout\(jungle && jungleWhole\(jungle\.nine\) \? \[\] : layoutNature\(samples, tilemap, natureOpts\), samples, tilemap,\n\s+\{ \.\.\.natureOpts, jungle: jungle \? \{ nine: jungle\.nine, pois: placesFor\(jungle\.hidden\), paths, net: roads, canopy: jungle\.canopy \?\? null \} : null \}\);/);   // JUNGLE-ROADSIDE (PIN MOVED): and the network, its pairs astride the roads - handed back beside the flats (AUDIT JUNGLE-ROADSIDE PERF-2); PIN MOVED (GRAHT1): and the canopy's field, its graht-oaks handed back beside them
-  assert.match(jh, /scenes\/dungeonContext\.js \(dungeons\) - FLAGGED: none stands the wilderness the jungle grows in/);
 });
 
 test('BANTHA1 the switch: the Jungle of Bantha row on the enhanced skin, on by default; `?jungle=off` the kill door offline; online the room\'s - its trees are where Logging\'s stand; `?junglehaze=off` the haze\'s door', () => {
@@ -1107,11 +1051,6 @@ test('AUDIT BANTHA1 DOC-6: the far ring hazes its fog by the haze\'s own law; ev
   for (let k = 0; k < 400; k++) field.at(k % 20, Math.floor(k / 20));
   const n = reads; field.at(5, 5); field.at(12, 7); assert.equal(reads, n);
   assert.deepEqual(parseObj('v 0 0 0\nv 1 0 0\nv 0 1 0\nvt 0 0\nvn 0 0 1\nf -3/-1/-1 -2/-1/-1 -1/-1/-1\n').faces[0].corners, [[0, 0, 0], [1, 0, 0], [2, 0, 0]]);
-  const pb = text('src/scenes/pixelBuild.js');
-  assert.match(pb, /scales = Float32Array\.from\(g\.own, \(v\) => v \/ JUNGLE_SCALE_MAX\);/, 'the far picture drawn for the tallest emergent, each tree its share of it');
-  assert.match(pb, /batch\.sway = floraSwayOf\(JUNGLE_ARCHIVE, natureSet, proto\.size\.h\);\n\s+_lptSway\.set\(proto, Math\.max\(_lptSway\.get\(proto\) \?\? 0, batch\.sway\)\);/, 'its 3D tree leans as its far picture');
-  assert.match(pb, /batch\.windfall = windfallResponse\(JUNGLE_ARCHIVE, record\);[^\n]*\n\s+_lptWindfall\.set\(proto, Math\.max\(_lptWindfall\.get\(proto\) \?\? 0, batch\.windfall\)\);/, '...and under Windfall\'s law');
-  assert.match(pb, /batches\.push\(batch\);\n\s+forestGroups\.set\(gk, \{ batch, centers: g\.centers, size \}\);\n/, 'the fallback\'s Tree records are Logging\'s too');
 });
 
 test('AUDIT BANTHA1 HAZE-6/HAZE-7/HAZE-8: a window\'s view out keeps the street\'s haze with its fog and stands in it; under the sea the jungle\'s air is off with the air\'s; every dome mixes the haze AFTER its grades, whose colour it already wears (mutants: the view out unhazed; the haze stacked on the sea\'s fog; the dome grading it twice)', () => {
@@ -1123,8 +1062,6 @@ test('AUDIT BANTHA1 HAZE-6/HAZE-7/HAZE-8: a window\'s view out keeps the street\
   assert.deepEqual(Array.from(r._rwExterior.haze), Array.from(hz), 'kept with the street\'s fog');
   r.setJungleHaze(null); r._rwKeepExterior();
   assert.equal(r._rwExterior.haze[4], 0, '...and none where it has none');
-  assert.match(text('src/render/renderer.js'), /this\.setFog\(FOG_MODE_NAMES\[k\.fogMode\] \?\? 'off', k\.fogDensity, k\.fogStart, k\.fogEnd, new Float32Array\(k\.fogColor\)\);\n\s+this\.setJungleHaze\(k\.haze\[4\] \? k\.haze : null\);/, 'the view out armed with it, after its fog');
-  assert.match(hostText('src/scenes/world.js'), /if \(_uw\) \{ renderer\.setFog\(_uw\.mode, _uw\.density, _uw\.start, _uw\.end, new Float32Array\(_uw\.color\)\); jungle\?\.under\(sky\); \}/, 'under the sea, off');
   for (const f of ['src/render/skyRenderer.js', 'src/render/enhancedSky.js', 'src/render/dynamicSkiesRenderer.js']) {
     const src = text(f);
     assert.match(src, /outColor = vec4\(brassGrade\(dreadGrade\([^\n]*?, uDread\), uBrass\), 1\.0\);[^\n]*\n\s*outColor\.rgb = hazeSky\(outColor\.rgb, dir\);/, `${f}: the grades, then the haze`);

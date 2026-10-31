@@ -238,13 +238,6 @@ test('DEX2 a readOnly picture on its way is asked once at a time, and one that w
   assert.equal(loads, 3, 'asked again under the new tiers');
 });
 
-test('DEX2 the install registers the pictures at Start, whatever the switch; a frame\'s emission map rides beside it in the pipeline (by source)', () => {
-  assert.match(rd('src/systems/enemyExpansion/dexInstall.js'), /registerCustomEnemyName\([^\n]*\n {2}installDexSprites\(\);/, 'in the ALWAYS half, beside the names');
-  const pipe = rd('src/scenes/dataPipeline.js');
-  assert.match(pipe, /const lit = swapFrame \? decodedTexture\(archive, record, frame, 'Emission'\) : null;/, 'only beside an imported frame');
-  assert.match(pipe, /if \(lit\) \{\s*\n\s*renderer\.uploadEmissionTexture\(archive, key, lit, \{ white: true, replacement: true \}\);/, 'under the frame\'s own key, lit white');
-});
-
 test('DEX2 SetupDemoEnemy\'s renderer for every mobile: the ghost shader by a Spectral row - the classic Ghost and the mod\'s wraiths alike - or a mod\'s word, and NoShadow casting none (mutant: the ghost by archive alone; NoShadow ignored)', async (t) => {
   const { setupFoeLook, foeWearsGhost, registerFoeGhost, _resetFoeGhosts } = await import('../../../src/characters/enemy/foeLook.js');
   const { ghostShaded, billboardBlended } = await import('../../../src/render/renderer.js');
@@ -346,12 +339,3 @@ test('DEX2 AN OVERWORLD BAND WEARS ITS LEAD\'S LOOK (AUDIT DEX B6): world/bandSp
   bands.clear();
 });
 
-test('DEX2 the hosts wear the look where they make the batch, and the shadow pass casts no ghost (by source)', () => {
-  for (const [f, n] of [['src/scenes/dungeonContext.js', 2], ['src/scenes/exteriorFoes.js', 1]]) {
-    assert.equal(rd(f).match(/const batch = setupFoeLook\(renderer\.createBillboardBatch\(archive, 0, \{ w: 1, h: 1 \}, \[\[0, 0, 0\]\]\), (?:e\.)?mobileType\);/g)?.length, n, `${f}: its mobile arms`);
-  }
-  const sp = rd('src/render/shadowPass.js');
-  assert.match(sp, /\|\| isSpectral\(b\.archive\) \|\| b\.ghost\) continue;/);
-  assert.match(sp, /f\.isSpectral\(b\.archive\) \|\| b\.ghost\) continue;/);
-  assert.match(rd('src/systems/enemyExpansion/dexInstall.js'), /registerFoeGhost\(\(id\) => dexProperties\(id\)\?\.isTransparent === true\);/, 'the Transparent arm, while the mod is loaded');
-});

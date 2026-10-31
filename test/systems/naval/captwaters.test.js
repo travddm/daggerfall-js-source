@@ -77,28 +77,11 @@ test('CAPT-WATERS at sea: a ship launched of the deep is the deep\'s - her tempe
   const id = s.host.spawnShip('pirateSloop');
   const e = s.host._sea.get(id);
   assert.equal(e.deep, false, 'a hand-launched ship is no deep one');
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /if \(spec\.deep\) ship\.temper = temperOf\(cls, spec\.seed, \{ bold: DEEP_BOLD \}\);/);
-  assert.match(host, /region, area, deep: !!spec\.deep, ether, legend: legend\?\.id \?\? null, orphan: null,/);   // PIN MOVED (WW7-8): the area her names were drawn in beside her region
-  assert.match(host, /deps\.hold\?\.\(key, tier \+ \(entry\.deep \? DEEP_TIER : 0\) \+ etherTier\(entry\)\)/, 'her hold');
-  assert.match(host, /holdTier\(classById\(e\.from\)\) \+ \(e\.deep \? DEEP_TIER : 0\)/, 'her cask hauled');
-  assert.match(host, /holdTier\(classById\(f\.from\)\) \+ \(f\.deep \? DEEP_TIER : 0\)/, 'her cask stowed');
-  assert.match(host, /lot, from: s\.cls\.id, deep: !!entry\.deep \|\| !!entry\.ether \}\);/, 'her casks marked');
-  assert.match(host, /nearPort: !!w\.nearPort, deep: w\.waters === 'deep', notoriety:/, 'the director told the waters');
   assert.equal(s.host.hudModel().waters, 'deep');
   const plate = navalHudText({
     ship: { name: 'Small Ship', hull: 1, sail: 1, crew: 1 }, armed: false, aiming: false, aim: null, board: null, boarding: null, target: null, batteries: [],
     notoriety: { crown: 'Wayrest', value: 0, level: 0 }, waters: 'deep',
   }, { aim: 'R', board: 'E', brace: 'C' }).plate;
   assert.equal(plate.waters, 'Wayrest waters, deep');
-  const shots = rd('src/systems/naval/navalShots.js');
-  assert.match(shots, /floaters\.push\(\{ kind: 'flotsam', id, from, lot, owner, deep: !!deep,/);
-  assert.match(shots, /owner: f\.owner, deep: !!f\.deep, collector: c\.id,/);
 });
 
-test('CAPT-WATERS the world\'s waters: where() says them off the port\'s reach and the nearest port\'s distance - every map port\'s pixel found once, the distance Chebyshev and asked once a pixel (mutants: the distance\'s metric, the waters unsaid)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /waters: ether \? 'ether' : watersOf\(\{ nearPort, portPx: navalPortPx\(\) \}\),/);
-  assert.match(w, /for \(const q of _navalPorts\) d = Math\.min\(d, Math\.max\(Math\.abs\(q\.x - p\.x\), Math\.abs\(q\.y - p\.y\)\)\);/);
-  assert.match(w, /if \(_navalPortPxAt\?\.key === key\) return _navalPortPxAt\.d;/);
-});

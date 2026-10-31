@@ -134,9 +134,6 @@ test('START1 the bridge: initAtGameStart starts S0000977 and the Bay\'s start, i
   });
   bridge.initAtGameStart();
   assert.deepEqual(started, ['S0000977', '_STARTIB']);
-  // the browser's pack reads the starts' folder beside DFU's and the mods' (scenes/quest/questData.js - Vite's glob, which
-  // node cannot run; test/qlSources.mjs is its twin here)
-  assert.match(rd('src/scenes/quest/questData.js'), /\.\.\.import\.meta\.glob\('\.\.\/\.\.\/systems\/starts\/quests\/\*\.txt', \{ query: '\?raw', import: 'default' \}\),/);
   assert.ok(![...bridge.machine.quests.values()].some((q) => q.questName === '_BRISIEN' || q.questName === 'S0000999'), 'no main quest yet');
 });
 

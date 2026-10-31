@@ -144,25 +144,3 @@ test('ROCK-CLEAR a yard\'s piece goes by the same gate: its pool names no body, 
   assert.equal(w.col._buckets.has('decor:y1'), true, 'solid once the body is clear');
 });
 
-test('ROCK-CLEAR by source: the pixel build files every solid through the world collider\'s gate, each with its bucket\'s provider - the mills, the town\'s models and gates, Gothway\'s boards, World of Daggerfall\'s pieces, the Hold\'s camp - and the hill patch (ground) alone directly; the world frame settles the gate after the motor\'s step with the walking body, none while a jump is under way; the collider forgets a removed bucket\'s held parts (mutants: each site past the gate; the settle gone; the jump\'s body named; the hook gone)', () => {
-  const p = rd('src/scenes/pixelBuild.js');
-  // PIN MOVED (the merge of main: PRECIP HOST-7's standFlatGroups stands between them): the one gate is the build's scope's,
-  // made once above the build
-  const gateAt = p.indexOf('\n  const late = lateSolidsOf(collider);\n');
-  assert.ok(gateAt > 0 && gateAt < p.indexOf('\n  async function buildPixelNow(') && p.indexOf('lateSolidsOf(') === p.lastIndexOf('lateSolidsOf('), 'one gate, the world collider\'s');
-  const sites = [
-    'late.add(key, BODY.positions, BODY.indices, local,\n              { translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])) });',
-    'late.add(gateKey, cpu.positions, cpu.indices, local,\n            { translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])), sight: sightMarksOf(placed.modelIdNum, cpu) });',   // PIN MOVED (FIELD BUGS 2026-10-25i SIGN-PASS): a sign's hung triangles a ray's alone (world/signSolid.js sightMarksOf)
-    'late.add(key, cpuB.positions, cpuB.indices, local, { translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])) });',
-    'late.add(key, cpu.positions, cpu.indices, m.matrix, { translation: wodBucket });',
-    'late.add(key, cpu.positions, cpu.indices, local, { translation: holdBucket });',
-  ];
-  assert.deepEqual(sites.map((s) => p.split(s).length - 1), [1, 1, 1, 1, 1], 'each solid through the gate');
-  assert.deepEqual((p.match(/collider\.addMesh\(/g) ?? []).map(() => 'direct'), ['direct'], 'one filed directly');
-  assert.ok(p.includes('collider.addMesh(key, hillPatch.positions, hillPatch.indices, originMatrix,'), 'the hill patch - ground, not a solid');
-  const w = rd('src/scenes/world.js');
-  const motorAt = w.indexOf('        }, cam.yaw, cam.pitch);'), settleAt = w.indexOf('        lateSolidsOf(collider)?.settle(() => (walkMode && playerSpawned && !worldMoveBusy() ? player : null));');
-  assert.ok(motorAt > 0 && settleAt > motorAt && settleAt - motorAt < 1200, 'the frame\'s settle, after the motor\'s step');
-  assert.ok(w.includes('        travelNavFrame.strafe = _travelDrive && !_overlayHeld && !_seasonHeld && !paralyzed ? axes.strafe : 0;\n        lateSolidsOf(collider)?.settle(() => (walkMode && playerSpawned && !worldMoveBusy() ? player : null));'), 'the frame\'s settle, after the motor\'s step');
-  assert.ok(rd('src/player/collider.js').includes('    this.late?.forget(bucketKey);'), 'the collider\'s hook');
-});

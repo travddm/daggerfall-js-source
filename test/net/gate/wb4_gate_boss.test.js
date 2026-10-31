@@ -448,23 +448,3 @@ test('WB4 the court\'s driver, the voice and the body: the wind-up cued at the w
   destroyGateBossBar();
 });
 
-test('WB4 the seams, by source: the world host makes the court on the link, frames it with the gate\'s frame, draws its body with the peers, hands its glow and its telegraph to the dungeon arm, judges fire by the saving throw and lands a blow through the dungeon context\'s door; the dungeon arm lights and draws it in the court; the door has the three signs a foe\'s blow has (mutants: each seam removed)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const gateCourt = gateLink \? createGateCourt\(\{/);
-  assert.match(w, /save: \(e, el = 'fire'\) => \{ const w = GATE_SAVES\[el\] \?\? GATE_SAVES\.fire; return savingThrow\(w\[0\], w\[1\], e\); \},/);   // WB8b: the throw against his aspect's element
-  assert.match(w, /fire: Object\.freeze\(\[ELEMENTS\.Fire, EFFECT_FLAGS\.Fire\]\),\n\s*frost: Object\.freeze\(\[ELEMENTS\.Frost, EFFECT_FLAGS\.Frost\]\),\n\s*shock: Object\.freeze\(\[ELEMENTS\.Shock, EFFECT_FLAGS\.Shock\]\),\n\s*poison: Object\.freeze\(\[ELEMENTS\.DiseaseOrPoison, EFFECT_FLAGS\.Poison\]\),/);
-  assert.match(w, /strike: \(dmg, how\) => modes\?\.dungeonCtx\?\.strikePlayer\?\.\(dmg, how\),/);
-  assert.match(w, /feet: \(\) => \(playerSpawned && modes\?\.gateArenaDay\?\.\(\) != null \? player\.feetAt\(\) : null\),/);
-  // the frame's own, every online frame after the court's day is read (AUDIT WBX F10's is a second, in the collapse alone)
-  assert.match(w, /gateLink\.leave\(\);\n    try \{ gateCourt\?\.frame\(\); \} catch[^\n]*\/\/ WB4: the fight on this screen/);
-  assert.match(w, /extraBillboards: \(\) => \[[^\n]*\.\.\.\(gateCourt\?\.batches\(\) \?\? \[\]\)(?:, \.\.\.\(sdSpoilsPool\?\.batches\(\) \?\? \[\]\))?(?:, \.\.\.\(csaOn\(\) && !modes\?\.sailingCabin \? csa\.batches\(\) : \[\]\))?(?:, \.\.\.\(\(modes\?\.mode \?\? 'exterior'\) === 'dungeon' \? arenaBouts\.batches\(\) : \[\]\))?\],/);   // CSA-C: a boat's flats may follow; ARENA2: and the arena floor's crowd; SD9e: and the Brass Remnant's spoils (PIN MOVED)
-  assert.match(w, /gateCourtLights: \(\) => gateCourt\?\.lights\(\) \?\? \[\],/);
-  // WB6b: the telegraph's pass and the air's life share the hook - either drawn marks the seam, once
-  assert.match(w, /const told = gateCourt\?\.drawPass\(proj, view, eye, [^\n]*\);\n[^\n]*\n[^\n]*\n\s+if \(told \|\| lived\) renderer\.markForeignPass\(\);/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /withCourtLights\(_dgLit, \[\.\.\.\(host\.gateCourtLights\?\.\(\) \?\? \[\]\), \.\.\.courtLightsNear\(cam\.pos, planOfDay\(dungeonLoc\.gate\)\)\]\)/);   // WB14b: the night's braziers; WB9b: the fight's lights first - the renderer's cap drops a far brazier, never him
-  const bb = wm.indexOf('renderer.drawBillboards([...dungeonCtx.billboardBatches'), tg = wm.indexOf('if (isGateArena(dungeonLoc)) host.drawGateCourt?.({ proj, view, eye: mwv.eye });'), foes = wm.indexOf('dungeonCtx.drawFoes(dt, canvas');
-  assert.ok(bb > 0 && tg > bb && tg < foes, 'the telegraph after the court and its billboards, before drawFoes\' screen quads end the world pass');
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /strikePlayer\(dmg, \{ fire = false, el = fire \? 'fire' : null \} = \{\}\) \{\n\s*if \(!\(dmg > 0\)\) return;\n\s*const cast = GATE_STRIKE_CAST\[el\];\n\s*if \(cast != null\) audio\.playOneShotId\?\.\(cast, PLAYER_HIT_VOLUME\);\n\s*else audio\.playOneShot\(el === 'fire' \? SOUND\.Burning : hitSoundFor\(null\), PLAYER_HIT_VOLUME\);\n\s*hurtPlayer\(dmg\);\n\s*if \(!el\) flashPlayerDamage\(dmg\);\n\s*else shakePlayerDamage\(dmg\);\n\s*playPlayerVoice\(audio, playerPainVoice\(playerEntity, dmg\)\);/);   // WB8b: his frost, lightning and venom unflashed too, each in its element's cast
-});

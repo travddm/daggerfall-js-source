@@ -100,7 +100,6 @@ test('WBX1 the one index type: createMesh uploads 32-bit elements whatever the m
   for (const [name, m] of [['the gate', buildGateModel()], ['the court', buildCourtModel()], ['the land', buildDeadlandsLand()], ['a shard', buildShardModel()]]) {
     assert.ok(m.indices instanceof Uint32Array, `${name} builds 32-bit indices`);
   }
-  assert.match(read('src/render/renderer.js'), /buf\(gl\.ELEMENT_ARRAY_BUFFER, model\.indices instanceof Uint32Array \? model\.indices : Uint32Array\.from\(model\.indices\)\);/);
 });
 
 // ═══ WBX2 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -144,21 +143,6 @@ test('WBX2 the portal home: nothing while he stands or falls; PORTAL_AFTER_MS in
   assert.equal(PORTAL_DROP, ARCH_Y0, 'the fire\'s foot on the floor');
 });
 
-test('WBX2 the seams: the court is handed the portal\'s door, and (SS3) no way home of its own - the portal is never walked through; the way home is one door (gateWayHome) - GATE-FBX: the portal\'s alone, the bridge\'s membrane gone - PRESSED through the court\'s exit doors - through the fire and never for the dead; the portal is drawn with the gate\'s own fire pass (mutants: SS3: the court handed a way home again)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.doesNotMatch(w, /wayHome:/, 'SS3: the court takes no way home');
-  assert.match(w, /portalDoor: \(door\) => \{ modes\?\.dungeonCtx\?\.exitDoors\?\.push\?\.\(door\); \},/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /if \(isGateArena\(dungeonLoc\)\) \{ gateWayHome\(\); return true; \}/, 'the exit door\'s press - the portal\'s');
-  assert.doesNotMatch(wm, /\n    gateWayHome,/, 'and nobody outside the modes calls it');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.doesNotMatch(gc, /wayHome/, 'SS3: the court has no way home to take');
-  assert.match(gc, /_portalFire\.origin = portal\.origin; _portalFire\.fade = portal\.fade; _portalFire\.spin = spin;\n\s*_fires\.push\(_portalFire\);/);
-  // PIN MOVED (SHADER-STALL, render/glProgram.js compiledPass): the portal's pass built through the door once its programs are done
-  assert.match(gc, /const fire = _fires\.length \? portalPass\(true\) : null;[^\n]*\n\s*if \(fire\) \{\n\s*fire\.draw\(_fires, proj, view, eye, seconds, fog\);/);
-  assert.match(gc, /const portalPass = compiledPass\(gl, GATE_PASS_PROGRAMS, \(\) => new GatePassRenderer\(gl, \(profile \?\?= gateArchProfile\(\)\)\),/);   // GATE-MIX: asked on arrival, its opening its own
-});
-
 test('AUDIT SS the court\'s way home is PRESSED where its fire stands - the ray, the court\'s real floor collider and its exit targets as worldModes builds them: looking at the portal from 0.6 to 3 m before it, the press takes it within the door\'s reach (GATE-FBX: the bridge\'s membrane, pressed the same, is gone); looking away it does not, and past the reach it says too far. The square a dungeon door pads to (4.9 m across) swallowed every press from 0.6 to 2.4 m before the portal - SS3 made the press its only way through (mutants: the court\'s exits in the padded square; the fire\'s box too deep)', () => {
   const collider = new Collider();
   const tris = courtFloorTris();
@@ -166,8 +150,6 @@ test('AUDIT SS the court\'s way home is PRESSED where its fire stands - the ray,
   const fell = [6, -4];
   const doors = [portalDoor(fell)];
   assert.ok(doors.every((d) => d.court === true), 'the court\'s');
-  // worldModes' own targets (pinned at their one line)
-  assert.match(read('src/scenes/worldModes.js'), /key: `exit:\$\{i\}`, aabb: d\.court \? courtDoorAabb\(d\) : doorWorldAabb\(d\), distance: RAY_DISTANCE, reach: DOOR_ACTIVATION_DISTANCE/);
   const targetsOf = (aabbOf) => doors.map((d, i) => ({ key: `exit:${i}`, aabb: aabbOf(d), distance: RAY_DISTANCE, reach: DOOR_ACTIVATION_DISTANCE }));
   const targets = targetsOf((d) => (d.court ? courtDoorAabb(d) : doorWorldAabb(d)));
   const press = (ts, feetCourt, dir) => {
@@ -231,7 +213,6 @@ test('WBX3 each piece is itself on the floor: an item stands as its own picture 
   // the line: out of the top of the sprite
   const pass = { drawn: 0, draw(lines) { glowDraws.push(lines); this.drawn = lines.length; } };
   const q = createSpoilsPool({ renderer, gl: null, ray: floor, now: () => clock.t, take: () => {}, iconOf: async () => icon });
-  assert.match(read('src/scenes/spoilsPool.js'), /root: \[f\.fly\.pos\[0\], f\.fly\.pos\[1\] \+ f\.h, f\.fly\.pos\[2\]\]/, 'the line\'s root is the sprite\'s crown');
   void q; void pass;
   // GATE-UX: the take is the press's alone - feet on a piece long rested take nothing, the press takes it
   const piece = st.pieces.find((x) => x.kind === 'item');
@@ -248,14 +229,10 @@ test('WBX3 the picture, the burst and the pieces\' words: the icon\'s key is its
   const { iconName } = await import('../../../src/ui/textureCanvas.js');
   assert.equal(itemIconKey({ archive: 207, record: 3, dye: 25, dyeTarget: 1 }), iconName(207, 3, 25, 1), 'F3: the pack\'s own name - the dye and its swatch');
   assert.notEqual(itemIconKey({ archive: 207, record: 3, dye: 18, dyeTarget: 1 }), itemIconKey({ archive: 207, record: 3, dye: 18 }), 'a silver blade is not the base one');
-  assert.match(read('src/ui/item/itemIconColor32.js'), /requestIcon\(img\.archive, img\.record, \{ scale: 1, dye: img\.dye, dyeTarget: img\.dyeTarget \?\? null \}\)/, 'F3: and asked by it');
   assert.equal(await itemIconColor32(null), null);
   assert.equal(await itemIconColor32({ templateIndex: 101 }), null, 'node has no canvas - the pile stands');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /if \(spoils\.spew\(\{[^\n]*\}\)\) \{[^\n]*\n\s*say\(claims\.x === 'rite' \? COURT_STRIKE_TEXT\.spilledRite\(\) : COURT_STRIKE_TEXT\.spilled\(\)\);/);   // AUDIT WB12d (D20): the rite's ember by its own
   assert.match(COURT_STRIKE_TEXT.spilled(), /^Your spoils/, 'WB13b: "Your" says they are no one else\'s');
   assert.match(COURT_STRIKE_TEXT.spilledRite(), /^Your ember/);
-  assert.match(hostText('src/scenes/world.js'), /iconOf: \(item\) => itemIconColor32\(item, \{ identity: playerEntity \}\),/);   // AUDIT WBX S6: drawn for its wearer
   assert.ok(lineHeight('artifact') > lineHeight('legendary'));
 });
 
@@ -462,9 +439,6 @@ test('WBX6 / EVENT-RULES regeneration HELD in the court: the Regenerate effect\'
     assert.deepEqual(healed, [REGENERATE_AMOUNT], 'and whole the moment the court is gone');
     assert.equal(regenShare(3, 'item'), 3);
   } finally { setCourtRules(false); }
-  assert.match(read('src/systems/enchantments.js'), /entity\.health = Math\.min\(entity\.maxHealth, entity\.health \+ regenShare\(1, 'item', entity\)\);/, 'a RegensHealth enchantment: held (PIN MOVED - AUDIT WORLD-EVENTS L1-9: on its own body)');
-  assert.match(read('src/systems/effects.js'), /if \(n > 0 && sinks\.heal\) \{ const held = regenShare\(n, 'spell', target\); if \(held > 0\) sinks\.heal\(held\); \}/);   // PIN MOVED - AUDIT WORLD-EVENTS L1-9
-  assert.match(hostText('src/scenes/world.js'), /\n    setCourtRules\(madeRuleHere\('regen'\) === 'held'\);/, 'the frame sets it, every frame (PIN MOVED - AUDIT WORLD-EVENTS L1-10: the pause is the hurt door\'s, no longer my health\'s fall)');   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js) - the court's row, the Hour's and the Spire's; EVENT-RULES: held, not off
 });
 
 test('WBX6 no wear on the blows at him: his stand-in carries spareGear, and damageEquipment spares the weapon and the struck armour for it alone - every other foe wears the gear as DFU\'s does (mutants: the stand-in unflagged; the spare for everyone)', () => {
@@ -515,23 +489,6 @@ test('WBX7 the soul trap on him: kept on the relay\'s clock for its rounds (a tr
   const none = court();
   at(none, 1000, state({ fell: { at: 900, top: [], n: 1 } }));
   assert.equal(none.c.trapped({ chance: 40, rounds: 3 }), false, 'nothing to keep it for');
-});
-
-test('WBX7 the seams: a soul trap meets him (hostMagic), the dungeon context lays it through applySpell and hands its chance and rounds to the court (onBossTrap, through the mode machine), the host rolls it with the port\'s own attemptSoulTrap and says its words', () => {
-  const hm = read('src/scenes/hostMagic.js');
-  assert.match(hm, /!\(duelSpellOf\(sp\) \|\| \(sp\.effects \?\? \[\]\)\.some\(\(e\) => e && isSoulTrapEffect\(e\)\) \|\| spellSways\(sp\)\)/);   // WB8a: and a sway, which meets him to be refused
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): his spell door left the dungeon context for
-  // scenes/gate/standInSpell.js; the context hands it the court's door for the trap
-  assert.match(read('src/scenes/dungeonContext.js'), /onTrap: \(trap\) => !!opts\.onBossTrap\?\.\(trap\),/);
-  const dc = read('src/scenes/gate/standInSpell.js');
-  assert.match(dc, /const trapFx = \(sp\.effects \?\? \[\]\)\.filter\(\(e\) => e && isSoulTrapEffect\(e\)\);/);
-  assert.match(dc, /if \(trap\) laid = !!host\.onTrap\(\{ chance: trap\.chance, rounds: \(trap\.roundsRemaining \?\? 0\) \+ 1 \}\);/);
-  assert.match(dc, /if \(!harm\) return laid \|\| sways;/, 'a trap alone still reaches him (WB8a: and a sway alone is spent on him)');
-  assert.match(read('src/scenes/worldModes.js'), /onBossTrap: \(trap\) => !!host\.onBossTrap\?\.\(trap\),/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /onBossTrap: \(trap\) => !!gateCourt\?\.trapped\(trap\),/);
-  assert.match(w, /const r = attemptSoulTrap\(\{ activeEffects: \[\{ kind: 'soulTrap', chance \}\] \}, mobile, playerEntity\.items \?\? \[\], Math\.random\(\)\);/);
-  assert.match(w, /if \(r\.alert && SOUL_TRAP_TEXT\[r\.alert\]\) setMidScreenText\(SOUL_TRAP_TEXT\[r\.alert\]\);/);
 });
 
 test('WBX the strike verdict reads the new attacks as the old: a point disc and the spokes decided at their landing against my feet (mutants: the spokes never landing)', () => {

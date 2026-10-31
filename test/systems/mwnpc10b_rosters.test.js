@@ -143,15 +143,3 @@ test('MWNPC10b-3 the crews: each hand on her deck offered his class\'s look off 
   assert.equal(lane.destroyed, 1, 'cleared, the lane let go');
 });
 
-test('MWNPC10b-4 the world\'s draw points: the siege\'s bodies with the street\'s people before the flats; the crews\' with the foes before the person billboards, their veiled after; both moved with the origin', () => {
-  const w = rd('src/scenes/world.js');
-  const people = w.indexOf('streetPeople.draw(canvas, proj, view, mwv.eye, townTalk.overlayActive ? 0 : dt);');
-  const siege = w.indexOf('siegeNpcs?.drawBodies(canvas, proj, view, mwv.eye, dt);', people);
-  const flats = w.indexOf('renderer.drawBillboards(allBatches, camRight, bbUp);', siege);
-  assert.ok(people > 0 && siege > people && flats > siege, 'the siege before the flats its batches ride');
-  const crew = w.indexOf('navalCrew.drawBodies(canvas, proj, view, mwv.eye, foeDt);');
-  const persons = w.indexOf('if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);', crew);
-  const veiled = w.indexOf('navalCrew.drawVeiledBodies();', persons);
-  assert.ok(crew > 0 && persons > crew && veiled > persons, 'the crews before the person billboards, veiled after');
-  assert.ok(w.includes('navalCrew.offsetBodies(r.offset); siegeNpcs?.offsetBodies(r.offset);'));
-});

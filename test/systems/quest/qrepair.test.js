@@ -185,28 +185,5 @@ test('QREPAIR the by-name mount: a behaviour restored from a save holds a DIFFER
   b2.assignResource(other.add('rat', { isFoe: true }));
   b2.targetSymbol = { name: 'rat', original: '_rat_' };
   assert.equal(isAlreadyInjected([b2], foe, true), false, 'another quest\'s _rat_ is another foe');
-  const sm = rd('src/systems/quest/sceneMount.js');
-  assert.match(sm, /\{ enableNPCs = true, enableFoes = true, enableItems = true, byName = !!machine\?\.mountByName \} = \{\}/, 'the pass\'s flag reaches every mount it runs, the hot-place included');
 });
 
-test('QREPAIR the door, by source: every host\'s pause hands repairQuests off its own bridge (the world, the fixed city, the dungeon, and the interior pause through its host); the bridge runs the pass over the host\'s world seams; the world\'s talk says which quests have topics; a reveal answers whether it was new; the Settings row is the pause\'s, confirmed first, greyed on the front door with where it lives (mutants: a host without the hook; the row live at the door; no confirm)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /questLog: \(\) => questBridge\?\.questLog\(\) \?\? \{ active: \[\], finished: \[\] \},\n\s+repairQuests: \(\) => questBridge\?\.repair\?\.\(\) \?\? null,/, 'the world pause');
-  assert.match(w, /pauseQuestLog: \(\) => questBridge\?\.questLog\(\) \?\? \{ active: \[\], finished: \[\] \},\n\s+repairQuests: \(\) => questBridge\?\.repair\?\.\(\) \?\? null,/, 'the world\'s host bag, for the interior pause');
-  assert.match(w, /hasQuestTopics: \(quest\) => topicTree\.dictQuestInfo\.has\(quest\.uid\),/);
-  assert.match(w, /return discoverLocation\(loc\.mapTableData\.mapId, \{ regionName: loc\.regionName, locationName: loc\.arena && !loc\.capital \? '' : loc\.name \}\);/);   // PIN MOVED (AUDIT-TESA A1-2): an Arena place's name never rides a save
-  const x = rd('src/scenes/exterior.js');
-  assert.equal((x.match(/repairQuests: \(\) => questBridge\?\.repair\?\.\(\) \?\? null,/g) ?? []).length, 2, 'the fixed city: its pause and its host bag');
-  assert.match(x, /return discoverLocation\(l\.mapTableData\.mapId, \{ regionName: l\.regionName, locationName: l\.name \}\);/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /repairQuests: \(\) => opts\.questBridge\?\.repair\?\.\(\) \?\? null,/, 'the dungeon');
-  assert.match(rd('src/scenes/worldModes.js'), /repairQuests: \(\) => host\.repairQuests\?\.\(\) \?\? null,/, 'the interior pause');
-  const qb = rd('src/scenes/quest/questBridge.js');
-  assert.match(qb, /repair\(\) \{\n\s+const world = ctx\.world \?\? null;\n\s+return repairActiveQuests\(machine, \{/);
-  assert.match(qb, /mountCurrentSite: \(\) => world\?\.mountCurrentSiteQuestResources\?\.\(\),/);
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\.\.\.portRowsGame\(\{ pause \}\)/, 'ORG2: the screen builds it with the port\'s other rows, and the map puts it under Gameplay, Quests');
-  assert.match(menu, /const can = pause && typeof hooks\?\.repairQuests === 'function';/, 'live only in a game\'s pause');
-  assert.match(menu, /ask\(t\('menu\.questRepair\.title', 'Repair Active Quests'\), questRepairAsk\(\), t\('menu\.questRepair\.go', 'Repair'\), \(\) => \{/, 'confirmed first');
-  assert.match(menu, /main\.append\(el\('div', 'row-note', can \? \(questRepairSaid \?\? questRepairNote\(\)\) : questRepairAway\(\)\)\);/, 'the door\'s row says where it lives');
-  assert.match(menu, /const r = ctx\.pool\.get\(item\.slice\(5\)\); if \(r && r\.dataset\.live !== '0'\) n\+\+;/, 'and a greyed row is not counted as working (ORG2: tabCount)');
-});

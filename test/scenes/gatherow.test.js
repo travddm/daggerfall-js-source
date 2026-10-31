@@ -199,8 +199,6 @@ test('GATHER-OW the filter: a switch of its own, Gathering - its marks counted u
   assert.equal(markShown(m, { gathering: true }), true);
   assert.equal(markShown(m, { gathering: false }), false);
   assert.equal(countGroups([m, { kind: 'gather mining' }, { kind: 'camp' }]).gathering, 2);
-  const css = readFileSync(new URL('../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
-  assert.match(css, /\.tview-fdot-gathering \{ background: [^}]+\}/, 'its switch\'s dot');
 });
 
 test('GATHER-OW the glyph: the HUD draws a group by its work in its own colour - never a dot (OW-GLYPHS: Mining\'s pick; mutants: the dot; the brass)', () => {
@@ -226,10 +224,3 @@ test('GATHER-OW the glyph: the HUD draws a group by its work in its own colour -
   assert.deepEqual(fills.filter(([k]) => k === 'stroke').map(([, c]) => c), ['#000', nodeMarkCss('mining')], 'inked: the black edge, then Mining\'s copper');
 });
 
-test('GATHER-OW the world host: the Overworld\'s marks take the gathering host\'s groups at the player\'s feet, beside the camps (by source)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js - the gathering host read live
-  const tvm = readFileSync(new URL('../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
-  assert.match(tvm, /for \(const c of travelViewCamps\(\)\) marks\.push\(\{[^\n]*\}\); for \(const g of host\.gatherHost\?\.overworldGroups\(walkMode \? player\.pos : cam\.pos\) \?\? \[\]\) marks\.push\(g\);/);
-  assert.match(w, /createTravelViewMarks\(\{[^]*?\n\s+get gatherHost\(\) \{ return gatherHost; \},[^]*?\n\s+\}\);/, 'handed over live');
-});

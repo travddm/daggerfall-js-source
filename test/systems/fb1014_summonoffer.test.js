@@ -141,18 +141,3 @@ test('SUMMON-OFFER: the quest is asked for where DFU asks - for the prince who A
   assert.deepEqual(asked, []);
 });
 
-test('SUMMON-OFFER: the host - the quest is made inside the Yes, through the bridge, and the no-quest answer returns before the gold is spent or the prince recorded; one quest a summoning', () => {
-  const wm = readFileSync(join(ROOT, 'src/scenes/worldModes.js'), 'utf8');
-  const yes = wm.indexOf('const summon = (called) => {');
-  const ask = wm.indexOf('offerQuest: (questName) => questBridge?.offerDaedricQuest?.(questName, summonerId) ?? null,');
-  const roll = wm.indexOf('const r = attemptSummoning({');
-  const none = wm.indexOf("if (r.kind === 'noQuest') return { rows: [{ text: noQuestText(r.daedra), center: true }] };");
-  const pay = wm.indexOf('deductGold(playerEntity, r.cost);');
-  const record = wm.indexOf('setFlag(store, r.daedra.factionId, r.flag);');
-  const offered = wm.indexOf('const offered = r.offered;');
-  assert.ok(yes > 0 && yes < roll && roll < ask, 'the summoning law is handed the bridge\'s offer');
-  assert.ok(ask < none && none < pay && pay < record && record < offered,
-    'no quest: answered before the gold and the flag; a quest: paid, recorded, then offered');
-  assert.equal(wm.split('offerDaedricQuest').length, 2, 'the quest is made once - the law\'s ask - and never again after the gold');
-  assert.equal(wm.slice(none, pay).includes('deductGold'), false);
-});

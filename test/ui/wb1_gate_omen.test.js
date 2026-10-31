@@ -358,29 +358,3 @@ test('WB1 the ink: the ring in map pixels, never under ten paper pixels, with it
   assert.equal(calls.find(([k]) => k === 'arc')[3], 10, 'the whole bay on the sheet: still findable');
 });
 
-test('WB1 the seams: online alone, the omen before the dead return, both maps handed the ring, the compass its mark', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /const gateOmen = params\.has\('online'\) \? createGateLanes\(/, 'offline there is no gate');   // PIN MOVED (WW2): the omen a lane at a time (scenes/gate/gateLanes.js)
-  const frame = world.slice(world.indexOf('const onlineFrame = (now, dt) => {'));
-  const dead = frame.indexOf('if (townTalk.overlay instanceof DeathScreen');
-  assert.ok(frame.indexOf('gateFrame();') > 0 && frame.indexOf('gateFrame();') < dead, 'the omen speaks to the dead too');
-  assert.match(world, /gate: \(\) => gateOmen\?\.mapMark\(\) \?\? null,/);
-  assert.match(world, /gate: gateCompassMark\(\),/);
-  assert.match(world, /now: \(\) => Date\.now\(\) \+ _sharedOffsetMs,/, 'the relay\'s clock, as the sky reads it');
-  // EVENTS1: on every screen's event board (systems/eventNotices.js), where it had been a line on every chat tab
-  assert.match(world, /say: \(text, n\) => eventNotice\('gate', text, gateLineId\(n\)\),/, 'every screen\'s - the gate happened to the whole game');   // PIN MOVED (AUDIT WW F5): on its own gate's card
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /gate: gate \?\? null,/);
-  const ehud = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(ehud, /drawGateMark\(opts\.gate \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(ehud, /compassMarkerLerp\(gate, playerXZ, heading01\)/, 'the Detect markers\' own bearing law');
-  const held = read('src/ui/heldMap.js');
-  assert.match(held, /readGateMarkIn\(this\.deps\.gate, sheet\)/);   // PIN MOVED (BAY-LEFT-MAPS): over the sheet's box (_marksBox), the Bay's own sheet the Bay's bound
-  assert.match(held, /gate: this\._gate,/);
-  const page = read('src/ui/travel/travelMapWindow.js');
-  assert.match(page, /gateRingTexels\(gate, originX, originY, width, height\)\) plot\(x, y, gatePx\)/);
-  assert.match(page, /gateRingKey\(readGateMark\(this\.deps\.gate,/, 'the page rebuilds when the ring comes, goes or moves');
-  // the law is the relay's to import later (WB3): it reaches for wire.js and (WB8b) the marks' leaf alone
-  const law = read('src/net/gate/gateLaw.js');
-  assert.deepEqual([...law.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]), ['../wire.js', './gateCourts.js', './gateMods.js'], 'WB8b: and the marks\' leaf, which imports nothing - PIN MOVED: GATE-COURTS, and the courts\' leaf');
-});

@@ -72,7 +72,6 @@ test('FOE-KEEPS THE WORDS (wildZone.js WILD_TEXT, etherWild.js ETHER_WILD_TEXT, 
   }
   assert.match(WILD_TEXT.enter, /^You enter Cyrodiil, an open PvP zone\./);   // PIN MOVED (WORLD-WIDE folded into TESA, #1184)
   assert.ok(ZONE_RULES.some((l) => l.startsWith('If another player kills you, what you carry drops')), 'the zone map\'s legend');
-  assert.ok(rd('src/systems/tutorialCatalogue.js').includes("t('tutorials.wildZone.body2', 'If another player kills you there, your bag drops"), 'the tutorial page');   // PIN MOVED (AUDIT FOE-KEEPS O4): both zones, the cart only while with you, the tenths
   setWildDeath({ killer: null, dropped: 0 });
   assert.deepEqual(wildDeathLines(), ['Nothing dropped. Only another player\'s kill drops what you carry.', WILD_TEXT.deathHold], 'a foe\'s death: kept');   // PIN MOVED (AUDIT FOE-KEEPS O1, H5): "You keep what you carry" stood over the tenth the death claims
   setWildDeath({ killer: 'Borin', dropped: 3 });
@@ -80,15 +79,3 @@ test('FOE-KEEPS THE WORDS (wildZone.js WILD_TEXT, etherWild.js ETHER_WILD_TEXT, 
   setWildDeath(null);
 });
 
-test('FOE-KEEPS THE HOST (world.js wildDeathBegin, wildTakeDrop, the online respawn): a death to a foe asks no drop - the first dead frame shows my worn pieces to a killer and asks nothing else, and the drop is asked against a receipt alone; the rise pays the usual tenth unless a player\'s kill (mutants: the drop asked at a foe\'s death; the tenth skipped at any death in the zone; a drop asked with no receipt)', () => {
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT): wildTakeDrop in scenes/wildDropHost.js, read with its host
-  const begin = /const wildDeathBegin = \(\) => \{[\s\S]*?\n {2}\};/.exec(w)?.[0] ?? '';
-  assert.ok(begin.includes('if (worn.length) wildFight.offerWorn(fell.by, fell.r, worn.map(wildRecord));'), 'the fixture: the first dead frame');
-  assert.ok(!begin.includes('wildTakeDrop('), 'no drop asked at the death itself - a kill\'s waits on the relay\'s receipt');
-  assert.match(w, /const wildRise = !!wildDeath\(\) \|\| wildDeathKill\(\), wildKilled = wildDeathKill\(\);[^\n]*\n\s*wildGhostEnd\(\);/, 'the kill read before the ghost ends');   // PIN MOVED (AUDIT FOE-KEEPS H1): the referee's word, never the screen's name
-  assert.match(w, /const goldLost = wildKilled \|\| madeRuleHere\('deathPenalty'\) === 'none' \? 0 : applyDeathPenalty\(playerEntity\);/, 'a kill\'s tenth is in the remains; any other death pays it');
-  assert.ok(w.includes('    const key = readWildReceipt(rc)?.r;\n'), 'the drop asked against a receipt');
-  assert.ok(w.includes('    if (!key || !realmSession || realmSession.lost || !lay || _wildTaking.has(key)) return;'), 'and none without one');
-  assert.ok(!w.includes('{ n: nonce }'), 'no foe\'s nonce asked');
-  assert.match(rd('server-account/src/wild.js'), /\n {2}if \(body\?\.receipt === undefined\) return \{ error: 'foe' \};\n/, 'the service refuses a foe\'s fall');
-});

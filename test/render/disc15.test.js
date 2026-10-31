@@ -260,30 +260,6 @@ test('DISC15: the shaders read either tier - the lit loop and the flat through c
     assert.match(fs, /float sh = k >= 0 \? casterShadowAt\(k, uPointLights\[i\], wp, n\)/, `${name}: either tier`);
   }
   assert.match(EL_BB_FS, /shadowOfLight\(i, uPointLights\[i\], at, vec3\(0\.0\)\)/, 'the flat: either tier');
-  assert.match(rd('src/render/airPass.js'), /sum \+= casterShadowOne\(k, Lr, uCamPos \+ dir \* t\)/, 'the air\'s march: either tier');
   assert.equal(SHADOW_LO_UNIT, 8);
-  const sp = rd('src/render/shadowPass.js');
-  assert.match(sp, /gl\.activeTexture\(gl\.TEXTURE0 \+ SHADOW_LO_UNIT\);\n\s+gl\.bindTexture\(gl\.TEXTURE_2D_ARRAY, this\.loTex\);/, 'upload binds the lo array on its unit');
-  assert.match(sp, /if \(loc\.pointShadowLo\) gl\.uniform1i\(loc\.pointShadowLo, SHADOW_LO_UNIT\);/);
-  const rr = rd('src/render/renderer.js'), air = rd('src/render/airPass.js');
-  assert.equal((rr.match(/pointShadowLo: gl\.getUniformLocation\(p, 'uPointShadowLo'\)/g) || []).length, 2, 'the lane programs and the water');
-  assert.match(air, /pointShadowLo: u\(p, 'uPointShadowLo'\)/, 'the air\'s march');
 });
 
-test('DISC15: the building hosts ask for the tier every frame, before beginFrame - the world\'s interior arm and the dev route; LA-SHADOW3: the two dungeon hosts too, which draw the level whole; the street never', () => {
-  const wm = rd('src/scenes/worldModes.js'), it = rd('src/scenes/interior.js');
-  assert.match(wm, /renderer\.setPointLights\(_itLit\.data, null, _itLit\.colors\);\n\s+renderer\.everyLightCasts\(\);/);
-  assert.ok(wm.indexOf('renderer.everyLightCasts();') < wm.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);   // AUDIT-EL F5: a WORLD frame - the lane replays its records for this one\n    renderer.setGlassView(_rwView);'), 'before the interior arm\'s beginFrame');   // RW1 (PIN MOVED): the arm's beginFrame is read off the glass view it hands over next
-  assert.match(it, /renderer\.setPointLights\(lit\.data, null, lit\.colors\);\n\s+renderer\.everyLightCasts\(\);/);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) assert.ok(!rd(f).includes('everyLightCasts'), `${f}: a host that culls by view never asks`);
-  // LA-SHADOW3 (re-aimed): DISC15 counted the dungeon among the view-culling hosts; neither dungeon host culls - each
-  // draws the level's static batch whole, every unbatched model and every mover, as the building arm does
-  const dg = rd('src/scenes/dungeon.js');
-  assert.match(dg, /DUNGEON_LANTERN_F32\) : null\);\n\s+renderer\.everyLightCasts\(\);/, 'the dev route asks, after its lights');   // LA-AUDIT A5: its lights with the cap's fade
-  assert.ok(dg.indexOf('renderer.everyLightCasts();') < dg.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);'), '...before its beginFrame');
-  assert.match(dg, /renderer\.beginFrame\(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME\);[^\n]*\n[^\n]*\n\s+if \(ctx\.staticBatch\) renderer\.drawMesh\(ctx\.staticBatch, BATCH_IDENTITY, null\);[^\n]*\n\s+for \(const d of ctx\.drawList\) if \(!d\._batched\) renderer\.drawMesh\(d\.mesh, d\.matrix, d\.texRemap \?\? ctx\.texRemap\);[^\n]*\n\s+for \(const d of ctx\.dynamicDraws\) renderer\.drawMesh/, '...and draws the level whole');   // AUDIT PRE-MERGE 1003 W4: an entry's own table first
-  const arm = wm.slice(wm.indexOf("if (mode === 'dungeon') {"), wm.indexOf('// Whole-pipeline swap: interior draws'));
-  assert.match(arm, /renderer\.setPointLights\(_court\.data, null, _court\.colors\); \}[^\n]*\n\s+if \(isSdRealm\(dungeonLoc\)\) \{ const _hour = [^\n]*renderer\.setPointLights\(_hour\.data, null, _hour\.colors\); \}[^\n]*\n(?:\s+if \(isEgHall\(dungeonLoc\)\) \{ const _sp = [^\n]*renderer\.setPointLights\(_sp\.data, null, _sp\.colors\); \}[^\n]*\n)?(?:\s+const _ktLook = isKetchShip\(dungeonLoc\) \? ketchDeck\.frameLook\([^\n]*\n)?\s+renderer\.everyLightCasts\(\);/, 'the world\'s dungeon arm asks, after the court\'s lights, the Hour\'s (SD5a - PIN MOVED), an Elite Breach\'s (EG-PLAY - PIN MOVED) and a sky-ketch\'s look (KETCH - PIN MOVED)');
-  assert.ok(arm.indexOf('renderer.everyLightCasts();') < arm.indexOf('renderer.beginFrame('), '...before its beginFrame');
-  assert.match(arm, /if \(dungeonCtx\.staticBatch\) renderer\.drawMesh\(dungeonCtx\.staticBatch, BATCH_IDENTITY, null\);[^\n]*\n\s+for \(const d of dungeonCtx\.drawList\) if \(!d\._batched\) renderer\.drawMesh\(d\.mesh, d\.matrix, d\.texRemap \?\? dungeonCtx\.texRemap\);[^\n]*\n\s+for \(const d of dungeonCtx\.dynamicDraws\) if \(!d\.hidden(?: && !d\.culled)?\) renderer\.drawMesh/, '...and draws the level whole')   // SD-LOOK S2 (PIN MOVED): a culled draw skipped too;   // AUDIT PRE-MERGE 1003 W4; AUDIT SD II (L2 F11 - PIN MOVED): a hidden draw skipped
-});

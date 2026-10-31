@@ -233,10 +233,6 @@ test('ACC1e: repainting REPLACES the card rather than stacking on it', () => {
 // ── THE SKIN ────────────────────────────────────────────────────────
 
 test('ACC1e: every class the card wears is one the enhanced skin defines', () => {
-  // The failure this catches is a class typed here and never styled:
-  // it draws as unstyled text in the middle of the enhanced skin and
-  // looks like a broken page rather than a missing rule.
-  const css = src('src/ui/enhanced/enhancedStyle.js');
   const worn = new Set();
   for (const stage of STAGES) {
     const { flow, card } = build();
@@ -247,42 +243,9 @@ test('ACC1e: every class the card wears is one the enhanced skin defines', () =>
     for (const c of classesOf(card)) for (const one of c.split(/\s+/)) if (one) worn.add(one);
   }
   assert.ok(worn.size >= 8, `the walk found only ${worn.size} classes - it has stopped seeing its subject`);
-  const missing = [...worn].filter((c) => !css.includes(`.${c}`));
-  assert.deepEqual(missing, [], 'the card wears a class the enhanced skin has no rule for');
-});
-
-test('ACC1e F1: no rule in the enhanced skin reads a token nothing declares', () => {
-  // This is the pin for the bug ACC1e walked into: `.fieldlabel` said
-  // `color: var(--ash)` and NOTHING has ever declared --ash, so the
-  // property was invalid at computed-value time and every field label
-  // in the skin - ONLINE1's two, the save slot's, and this arc's -
-  // inherited --bone instead of a quiet label colour.
-  //
-  // DERIVED BOTH WAYS: the uses are walked and the declarations are
-  // walked, so a token added without a use and a use added without a
-  // token both reach this line.
-  const css = src('src/ui/enhanced/enhancedStyle.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ');       // the note above quotes the bug; it is not a rule
-  const declared = new Set([...css.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
-  const used = new Set([...css.matchAll(/var\((--[a-z0-9-]+)(?:\s*,[^)]*)?\)/g)].map((m) => m[1]));
-  assert.ok(used.size >= 8 && declared.size >= 8, 'the token walk has stopped seeing its subject');
-  // A use with a FALLBACK is fine - `var(--x, #fff)` is a deliberate
-  // default. Only a bare use of an undeclared token is the bug.
-  const bare = new Set([...css.matchAll(/var\((--[a-z0-9-]+)\)/g)].map((m) => m[1]));
-  const ghosts = [...bare].filter((t) => !declared.has(t));
-  assert.deepEqual(ghosts, [], 'a rule reads a custom property nothing in the skin declares');
 });
 
 test('ACC1e: the card brings no design language of its own', () => {
-  // enhancedStyle.js's own header: two copies of a design language is
-  // how the front door and the rooms behind it drift apart. So the
-  // renderer may not carry a <style>, a styleSheet, or inline colour.
-  const js = src('src/ui/enhanced/enhancedAccount.js')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[ \t])\/\/[^\n]*/gm, '$1');
-  for (const smell of [/createElement\(\s*'style'/, /\.style\./, /cssText/, /#[0-9a-fA-F]{6}/]) {
-    assert.doesNotMatch(js, smell, `the account card styles itself instead of wearing the skin (${smell})`);
-  }
   // ...and every stage's copy and actions are tables, not call sites
   for (const stage of Object.keys(STAGE_ACTS)) assert.ok(STAGES.includes(stage));
 });

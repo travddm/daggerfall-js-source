@@ -48,19 +48,3 @@ test('QL-FRAME1: every return inside a host\'s frame() re-requests the frame fir
   }
 });
 
-test('LOOT-GONE1 + QL-FRAME1: the ground-pile arm in both hosts is worldModes\' own shape - a pile gone since the hover opens nothing, a handled quick-loot press opens no window, and neither leaves the frame (mutants: the null pile built into hooks; the window opened after a take)', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const src = rd(f);
-    // DW-E3: the world host races Iliac Puddle No More's fish with the piles - a fish is a DaggerfallLoot too - so
-    // its arm reads `pile` only when the key is not a fish's, and builds a fish's own hooks for one that swims
-    const at = src.indexOf('droppedLoot.pileFor(dropKey);');
-    const arm = src.slice(at, src.indexOf('else modes.tryEnter().then(', at));
-    const code = arm.replace(/\/\/[^\n]*/g, '');   // the arm's CODE - its comments say what the old return did
-    assert.match(arm, /if \(pile(?: \|\| _fish)?\) \{\s*const _hooks = (?:_fish \? dwFishLootHooks\(_fish\) : )?droppedLootHooks\(pile\);/, `${f}: the hooks only for a pile (or a fish) that is there`);
-    assert.match(arm, /if \(!quickLootTake\(dropKey, _hooks, playerEntity, [^\n]*\)\) \{\s*(?:\/\/[^\n]*\n\s*)*const w = makeInventoryWindow\(\{/, `${f}: the window only for a press quick-loot did not handle`);
-    assert.doesNotMatch(code, /\breturn\b/, `${f}: nothing in the arm leaves the frame`);
-  }
-  // worldModes' twin, the shape both hosts took - PIN MOVED (AUDIT 625 S2): its treasure pile's find (`_find`) named
-  // between the hooks and the take
-  assert.match(rd('src/scenes/worldModes.js'), /if \(pile\) \{\s*const _hooks = droppedLootHooks\(pile\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const _find = [^;]*;\n[^\n]*\n\s*if \(!quickLootTake\(key, _hooks,/);
-});

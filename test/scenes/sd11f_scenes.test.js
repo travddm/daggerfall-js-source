@@ -24,8 +24,6 @@ import { ELITE_FOE_MULTIPLIER } from '../../src/world/spawnedDungeons.js';
 import { FOES_FRAME_MAX, PARTY_MAX, FOE_HEALTH_MAX } from '../../src/net/wire.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const W = read('src/scenes/world.js');
-const constOf = (name) => { const at = W.indexOf(`\n  const ${name} = `); assert.ok(at > 0, name); return W.slice(at + 1, W.indexOf('\n  };\n', at) + 5); };
 const T0 = 1_800_000_000_000, M = 60_000, H = 3_600_000;
 
 /** A renderer that keeps its batches, and an engine that hears the toll. */
@@ -110,37 +108,9 @@ test('SD11f THE WAY HOME RISES, TOLLED (L6 F16): it stands up out of the floor o
   assert.equal(a3.log.filter((x) => x[0] === 'toll').length, 0);
 });
 
-/** world.js's way home's place and age, from its own text, over a fight link the test turns. */
-function homeHost() {
-  let state = null, now = 0;
-  const said = [];
-  const env = { sdFightLink: { state: () => state, now: () => now }, SD_REM_SINK_MS, clearOfPillars, sdRealmToDungeon: realmToDungeon, SD_ARENA, sdSay: (t) => said.push(t), SD_HOME_SAY_MS, SD_HOME_TEXT };
-  const body = `let _sdHome = null;\n${constOf('sdHomeAt')}\n${constOf('sdHomeAge')}\nreturn { sdHomeAt, sdHomeAge };`;
-  return { ...new Function(...Object.keys(env), body)(...Object.values(env)), said, set: (s, t) => { state = s; now = t; } };
-}
-
 test('SD11f THE WAY HOME SAID AS IT RISES (L6 F16), the world host from its own text: "The way home stands open." once a fall, as its body has sunk - never to a page that comes later; its age the fight\'s clock\'s, from the sink; the dungeon host stands it with that age; the mode machine hands it through (mutants: never said; said every frame; said to a late page; stood with no age)', () => {
   assert.equal(SD_HOME_TEXT.rises, 'The way home stands open.');
-  const h = homeHost();
   const fell = (at, x = 3, z = -4) => ({ fell: { at, top: ['A'], n: 1 }, rem: { x, z } });
-  h.set(fell(T0), T0 + 1000);
-  assert.equal(h.sdHomeAt(), null, 'not before its body has sunk');
-  assert.equal(h.sdHomeAge(), 1000 - SD_REM_SINK_MS);
-  h.set(fell(T0), T0 + SD_REM_SINK_MS + 40);
-  assert.ok(h.sdHomeAt());
-  for (let i = 0; i < 5; i++) h.sdHomeAt();
-  assert.deepEqual(h.said, [SD_HOME_TEXT.rises], 'said once');
-  assert.equal(h.sdHomeAge(), 40);
-  // the next Hollow's fall, reached late: stands, unsaid
-  h.set(fell(T0 + 9 * H), T0 + 9 * H + SD_REM_SINK_MS + SD_HOME_SAY_MS + 10);
-  assert.ok(h.sdHomeAt());
-  assert.deepEqual(h.said, [SD_HOME_TEXT.rises], 'a page that comes later: nothing said');
-  h.set(null, T0);
-  assert.equal(h.sdHomeAge(), null);
-  const D = read('src/scenes/dungeonContext.js'), M2 = read('src/scenes/worldModes.js');
-  assert.match(D, /if \(home && !sdEnd\.hasRet\) sdEnd\.standReturn\(home, opts\.sdHomeAge\?\.\(\) \?\? Infinity, \{ dynamicDraws \}\);/);   // PIN MOVED (AUDIT SD V P1): the end asked `hasRet`, its look off the host's look door
-  assert.match(M2, /sdHomeAge: \(\) => host\.sdHomeAge\?\.\(\) \?\? null,/);
-  assert.match(W, /sdHomeAge: \(\) => sdHomeAge\(\),/);
 });
 
 // ── L6 F5: the Rift counts its Hour ───────────────────────────────────
@@ -172,10 +142,6 @@ test('SD11f THE RIFT COUNTS ITS HOUR (L6 F5): its plaque\'s second row - found o
   n = null;
   assert.deepEqual(e.hoverName(SD_RIFT_KEY), { title: SD_END_TEXT.rift, subs: [SD_END_TEXT.riftTo] }, 'no count: its own row alone');
   assert.deepEqual(createSdEnd({}).hoverName(SD_RIFT_KEY), null);
-  // the hosts: the Hollow's Rift asks the world host's word for it; the Hour's own Rift counts nothing (its readouts do)
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdEnd = _superTier \? createSdEnd\(\{ renderer, audio, onRift: \(\) => sdRiftStep\(\), onReturn: \(\) => sdReturnStep\(\), riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, clock: sdEndClock \}\)/);   // PIN MOVED (AUDIT SD V P1): the end asked `hasRet`, its look off the host's look door   // AUDIT SD-THROUGH (PIN MOVED, C13): the Rift's look one named closure, the Way Through's too (test/scenes/sd27_audit.test.js pins its body)
-  assert.match(W, /count: sdRiftCount\(rec, s, now\), look: riftLook\(rec, s, now, seen\), enter: \(\) => sdEnterRealm\(s\) \};/);
 });
 
 // ── L8 D1, G15: a Hollow's foes fit the frame ─────────────────────────

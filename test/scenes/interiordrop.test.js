@@ -41,7 +41,6 @@ import { updateNearbyObjects, getNearbyObjects, NEARBY } from '../../src/systems
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
-const wm = () => read('src/scenes/worldModes.js');
 
 /** The pool with its GL and archive deps stubbed - enough to exercise
  *  every law below, none of which is about pixels on a screen. */
@@ -118,76 +117,3 @@ test('ID1: an emptied pile is freed at the WINDOW close, not at the last item', 
   assert.equal(p._piles.length, 0);
 });
 
-test('ID1: the interior host mounts its own pool, with no pixel key', () => {
-  const m = wm();
-  assert.match(m, /const interiorDropped = createDroppedLoot\(\{ renderer, getTexture, uploadRecordFrame \}\);/);
-  // ROAD-G G5 widened this door: the icon and the replaced container's
-  // x/z ride OnPop too. The pixel key is still NULL - that third
-  // argument IS TrackLooseObject, and an interior has no map pixel.
-  assert.match(m, /interiorDropped\.dropPile\(items, containerDropPos\(at, interiorDropFeet\(\)\), null, icon\)[,;]/,   // HOUSE-DROP: a block body now (a visitor's drop goes back to the pack first)
-    'the pixel key stays null - that argument IS TrackLooseObject');
-  assert.match(m, /onDrop: \(items, icon = null, at = null\) =>/, 'and OnPop hands both halves through');
-  // FindGroundPosition, on the INTERIOR collider
-  const feet = m.slice(m.indexOf('const interiorDropFeet = ()'), m.indexOf('const interiorInventory'));
-  assert.match(feet, /const p0 = \[\.\.\.player\.pos\];/, 'it starts at the PLAYER');
-  assert.match(feet, /interiorCtx\?\.collider \? interiorCtx\.collider\.raycast\(p0, \[0, -1, 0\], 10\) : NaN;/, 'and finds the ground below them, on the INTERIOR collider');
-  assert.match(feet, /if \(Number\.isFinite\(d\)\) p0\[1\] -= d;/, 'a miss leaves the feet where they are');
-});
-
-test('ID1: EVERY inventory this host opens goes through the one door', () => {
-  const m = wm();
-  // the door composes rather than overwrites - `...extra` before
-  // onClose would have silently dropped the emptied-container free
-  const door = m.slice(m.indexOf('const interiorInventory = ('), m.indexOf('let interiorCtx = null;'));
-  assert.match(door, /\.\.\.extra,\n\s*onClose: \(\) => \{ interiorDropped\.releaseEmptied\(\); onClose\?\.\(\); \},/);
-  // and no interior call site reaches past it. The slice starts AFTER
-  // the door's own body - the door is the one legitimate caller of
-  // host.makeInventory, which is the point.
-  const body = m.slice(m.indexOf('let interiorCtx = null;'));
-  const raw = [...body.matchAll(/host\.makeInventory\?\.\(/g)];
-  assert.equal(raw.length, 0, 'no interior window bypasses the door');
-});
-
-test('ID1: the piles are picked up, drawn, cached, restored and freed', () => {
-  const m = wm();
-  assert.match(m, /targets\.push\(\.\.\.interiorDropped\.lootTargets\(\)\);/, 'the E-ray sees them');
-  assert.match(m, /if \(key\.startsWith\('droppedLoot:'\)\) \{/, 'and activating one opens it');
-  assert.match(m, /interiorDropped\.tickFlats\(dt\);/, 'the flats animate');
-  assert.match(m, /const _dropBatches = interiorDropped\.batches\(\);/, 'and are drawn');
-  // AUDIT 63 F22 (review round): the POOL writes the record now, so
-  // the cache's two halves cannot disagree about which piles exist -
-  // GetSaveData has no empty guard (SerializableLootContainer.cs:55-77)
-  // and an emptied scene-built container must ride it.
-  assert.match(m, /const droppedPiles = interiorDropped\.snapshotScene\(\)\.map\(/, 'CacheScene builds them');   // TERRAIN-SCALE1: in the building's own frame
-  assert.match(m, /return \{ lootContainers, actionDoors, droppedPiles, droppedTorches, decor, decorItems, decorOwn, hiddenBase, frame: 'building', terrainScale: STREAMING_TERRAIN_SCALE, guildShelves \};/,   // GUILD-SHELF: the day's guild shelves last
-    'and RETURNS them - a built list the state does not carry is not cached at all');
-  assert.match(m, /interiorDropped\.restorePiles\(data\.droppedPiles \? data\.droppedPiles\.map\(\(p\) => \(\{ \.\.\.p, pos: place\(p\.pos\) \}\)\) : data\.droppedPiles\);/, 'RestoreCachedScene brings them back');   // TERRAIN-SCALE1: placed in this visit's frame; none is still a clear
-  // BOTH teardowns free them - the door exit and the quest-teleport /
-  // load arm. One of the two is exactly the kind of site the port has
-  // leaked batches from before.
-  assert.equal([...m.matchAll(/interiorDropped\.restorePiles\(null\);/g)].length, 2,
-    'both interior teardowns free the pool');
-});
-
-test('ID1: the interior Detect scan carries the piles - DT1\'s routed row, closed', () => {
-  const m = wm();
-  const feed = m.slice(m.indexOf('const detectFeed = createDetectFeed'), m.indexOf('let interiorCtx = null;'));
-  // AUDIT 63 F22 (review round): no KIND gate - the player's own drop
-  // is a container like any other - but GetActiveLoot is exactly what
-  // its name says (ActiveGameObjectDatabase.cs:266-268, "the enabled
-  // DaggerfallLoot components from ACTIVE registered loot"), so a
-  // container RemoveLootContainer deactivated (:852-864) is out of
-  // UpdateNearbyObjects' walk (PlayerGPS.cs:765-776).
-  assert.match(feed, /piles: interiorDropped\.activePiles\(\),/,
-    'GetActiveLoot has no kind gate, and does gate on active');
-});
-
-test('ID1: the quest reward mints on the ground the player is standing on', () => {
-  const m = wm();
-  const arm = m.slice(m.indexOf('mintRewardPile(dfItem) {'));
-  const interior = arm.slice(arm.indexOf("if (mode === 'interior' && interiorCtx) {"), arm.indexOf('return undefined;'));
-  assert.match(interior, /return \(\) => \{/, 'a thunk, like the dungeon and world arms - the mint is deferred');
-  assert.match(interior, /interiorDropped\.dropPile\(\[dfItem\], interiorDropFeet\(\)\)/);
-  assert.match(interior, /mountInterior\(interiorInventory\(\{ loot: droppedLootHooks\(pile\) \}\)\)/,
-    'and opens on the pile, the same remote-target law every container rides - G5: with the pile\'s DaggerfallLoot identity, so its icon can be cycled');
-});

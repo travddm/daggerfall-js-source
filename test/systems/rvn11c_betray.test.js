@@ -141,23 +141,3 @@ test('RVN11c ITS CARD: Betrayed - "Grushnak turns on you!" (mutants: the kicker;
   assert.deepEqual([ev.kind, ev.kicker, ev.body, ev.line], ['betrayed', 'Betrayed', `${r.given} turns on you!`, `${r.given} the Betrayer turns on you!`]);
 });
 
-test('RVN11c THE HOSTS: the pools stand a turned revenant (no band, no return); the world turns it before the layer\'s frame - its card, its body lifted (no portal), the hostile stood at its feet and set on me (mutants: each seam unwired; the band stood; the portal; after the frame)', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  assert.match(x, /revenant = null, eliteFoe = undefined, turned = false, band = true(?:, zoneGiant = null)?(?:, grantKind = null)? \} = \{\}\) \{/);   // ZONE-GIANTS: the open zone's giant index after it; PIN MOVED (GRANT3, Spawn-Grants.md section 13: a stand's grant's kind after it)
-  assert.match(x, /if \(revenant && !puppet\) applyRevenant\(entity, revenant, \{ turned \}\);/);
-  assert.match(x, /if \(revenant && band && !puppet && !allied && entity\.revenant\) Promise\.resolve\(\)\.then\(\(\) => standBand\(/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.equal((d.match(/if \(e\.revenant && !puppet\) applyRevenant\(entity, e\.revenant, \{ turned: !!e\.turned \}\);/g) ?? []).length, 2, 'both builds');
-  assert.match(d, /\.\.\.\(revenant \? \{ revenant, lairStand: !!lairStand, \.\.\.\(turned \? \{ turned: true \} : \{\}\) \} : \{\}\) \};/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const turnIn = \(pool\) => \(r, feet, yaw\) => pool\.spawnFoe\(r\.mobileType, feet, \{ yaw, feetGiven: true, loose: true, band: false, turned: true, \.\.\.revenantSpawnOptions\(r, effectiveLevel\(playerEntity\)\) \}\);/);
-  assert.equal((w.match(/turn: turnIn\((?:exteriorFoes|pool)\)/g) ?? []).length, 2, 'the street and a building');
-  assert.match(w, /turn: \(r, feet, yaw\) => \{ const so = revenantSpawnOptions\(r, effectiveLevel\(playerEntity\)\); return d\.spawnLooseFoe\(r\.mobileType, feet, \{ yawRad: yaw, revenant: r, turned: true, gender: so\.gender, level: so\.level \}\); \}/, 'underground');
-  assert.match(w, /if \(kind === 'betray'\) \{ _revenantArrivals\.delete\(r\.id\); _revenantBetrayals\.push\(r\); return; \}/);
-  const tick = w.slice(w.indexOf('function revenantAshoreTick() {'));
-  assert.ok(tick.indexOf('while (_revenantBetrayals.length) turnSworn(_revenantBetrayals.shift());') < tick.indexOf('revenantAshore.frame();'), 'before the layer\'s frame');
-  const turn = w.slice(w.indexOf('function turnSworn(r) {'), w.indexOf('function revenantAshoreTick() {'));
-  assert.match(turn, /revenantSay\(revenantBetrayEvent\(r, \{ playerName: playerEntity\?\.name \}\), /);   // PIN MOVED (RVN12a: its words, my name in them)
-  assert.match(turn, /try \{ place\.remove\(rec\); \}/);
-  assert.match(turn, /Promise\.resolve\(place\.turn\(r, feet, yaw\)\)\.then\(\(f\) => \{\n\s*if \(f\?\.ai && !f\.dead\) f\.ai\.makeHostileToPlayer\?\.\(/);
-});

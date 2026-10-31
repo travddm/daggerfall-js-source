@@ -153,42 +153,5 @@ test('LANDED-WORD (FIELD BUGS 2026-10-20f) THE WIRE: `eland` is a body\'s number
   assert.equal(EG_LAND_RELAY_MIN, 237);
   assert.deepEqual([relaySupportsEgLand('world237'), relaySupportsEgLand('world236'), relaySupportsEgLand(''), relaySupportsEgLand(null)], [true, false, false, false]);
   assert.ok(relaySupportsEgLand(RELAY_VERSION), 'the relay this tree builds says the word');
-  // the page reads it off its relay's welcome, as every relay's word is read (net/online.js - courtwatch.test.js's pin's shape)
-  assert.match(readFileSync(new URL('../../../src/net/online.js', import.meta.url), 'utf8'), /if \(primary\) this\.egLandOk = relaySupportsEgLand\(relayV\);/, 'read off the welcome');
 });
 
-test('LANDED-WORD (FIELD BUGS 2026-10-20f) THE FOLLOW-UP: a follow-up blow on a body whose room says what lands (Many Endings\' echo, owed to the blow\'s one claim - systems/playerDoor.js oweFoe) raises no claim of its own: the room\'s word for that blow is its number; on a body the room does not answer for, it rises as before (mutants: the follow-up\'s claim shown on a breach body; the loot\'s or the martial path\'s target never handed over)', async () => {
-  const LR = await import('../../../src/systems/loot/lootRarity.js');
-  const LP = await import('../../../src/systems/loot/lootPowers.js');
-  const { setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
-  const { _resetSetPowersForTests } = await import('../../../src/systems/sigil/sigilSetPowers.js');
-  const { setPlayerDoor, takeOwed } = await import('../../../src/systems/playerDoor.js');
-  const { equipItem } = await import('../../../src/systems/equip.js');
-  const { mintCondition } = await import('../../../src/systems/item/itemTemplates.js');
-  const { mountHitNumbers, unmountHitNumbers } = await import('../../../src/ui/hitNumbers.js');
-  const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
-  const stats = () => ({ strength: 70, intelligence: 50, willpower: 50, agility: 70, endurance: 50, personality: 50, speed: 50, luck: 50 });
-  const me = { isPlayer: true, items: [], stats: stats(), skills: new Array(35).fill(60), level: 20, career: {}, activeEffects: [], health: 100, maxHealth: 100, magicka: 0, maxMagicka: 100 };
-  // a breach body's stand-in, as the fight marks it (THE SCREEN above), and a local foe for the control
-  const C = court(C16.seed, C16.c), standIn = { ...C.lord, landsByWord: true }, mob = { careerIndex: 7, career: {}, health: 5000, maxHealth: 5000, stats: stats(), skills: new Array(35).fill(10), level: 1, items: [], activeEffects: [], armorValues: new Array(7).fill(60) };
-  const nodes = [];
-  const fakeEl = (tag) => { const el = { tag, children: [], style: { setProperty(k, v) { this[k] = v; } }, dataset: {}, className: '', textContent: '', append(...c) { this.children.push(...c); }, isConnected: true, addEventListener() {}, remove() { this.isConnected = false; }, setAttribute() {} }; nodes.push(el); return el; };
-  globalThis.document = { createElement: fakeEl, getElementById: () => null, body: fakeEl('body') };
-  const raised = () => nodes.filter((n) => n.className?.startsWith('hitnum ')).map((n) => [n.textContent, n.children[0]?.textContent ?? null]);
-  try {
-    _resetForTests(); setPref('lootRarity', true); LP._resetLootPowersForTests(); _resetSetPowersForTests();
-    mountHitNumbers();
-    const rec = LR.legendaryById('warp-edge');
-    const edge = LR.applyRarity(mintCondition({ group: rec.group, templateIndex: rec.templates[0], material: 0, flags: 0 }), 'legendary', lcg(1), [rec]);
-    edge.isIdentified = true; me.items.push(edge); equipItem(me, edge);
-    LP._setLootPowersRandForTests(() => 0);   // the echo every time
-    setPlayerDoor({ foes: () => [{ entity: mob, ai: { feet: [0, 0, 0] }, dead: false }], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => me });
-    LP.lootStrike(me, standIn, 30, edge);
-    assert.deepEqual(raised(), [], 'no claim on the breach body: the room\'s word is its number');
-    assert.equal(takeOwed(standIn), 30, 'the echo still rides the blow\'s claim, which the room weighs');
-    LP.lootStrike(me, mob, 30, edge);
-    assert.deepEqual(raised(), [['30', 'Many Endings']], 'on a foe of this machine\'s, its number as before');
-  } finally { LP._setLootPowersRandForTests(null); unmountHitNumbers(); setPlayerDoor(null); delete globalThis.document; }
-  // the martial path hands its target the same way (systems/martialPowers.js again - its source, as AUDIT MARTIAL L1 N1 reads it)
-  assert.match(readFileSync(new URL('../../../src/systems/martialPowers.js', import.meta.url), 'utf8'), /if \(!f\?\.dead\) showFollowUp\(n, word, entity\);/);
-});

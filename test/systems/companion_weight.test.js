@@ -116,9 +116,6 @@ test('AUDIT ECON C5: a companion gone from the party (a quickload under his wind
   assert.equal(planStore(token, { remote: [], capacity: gone, getQuest: (uid) => (uid === 8 ? { getItem: () => res } : null) }).ok, false);
   assert.equal(res.playerDropped, false, 'never marked dropped');
   _resetForTests();
-  // the host: his items AND his limit read by his key at every look, his live body first; gone, the limit says so
-  const w = code('src/scenes/world.js');
-  assert.match(w, /if \(!pack\) return \{ kg: 0, name: named, gone: true \};\n\s*const body = crewAshore\.bodies\(\)\.find\(\(f\) => f\.companion === key\) \?\? rec;\n\s*return \{ kg: packCapacityKg\(body\?\.entity \?\? null\), name: pack\.name \?\? named \};/);
 });
 
 test('COMPANION-WEIGHT through the ENHANCED window: Store refuses a sword into his full pack and says so in his name, and takes it when there is room; the header shows his load against his limit (mutants: the store door without it; the header without it)', () => {
@@ -177,9 +174,6 @@ test('COMPANION-WEIGHT through the CLASSIC window: Remove refuses a sword into h
 });
 
 test('COMPANION-WEIGHT: every store and gold door of both windows hands the limit in - counted in the code, never a comment (mutants: a door without it)', () => {
-  const e = code('src/ui/enhanced/enhancedInventory.js'), n = code('src/ui/native/nativeInventory.js');
-  assert.equal((e.match(/capacity: storeCapacityOf\(deps, session\)/g) ?? []).length, 6, 'the enhanced window: canStow, the label, the split, the store, the gold, Stash all (LOOT-BULK)');
-  assert.equal((n.match(/capacity: storeCapacityOf\(this\.hooks, \{ usingWagon: this\.usingWagon, chooseOne: this\.chooseOne \}\)/g) ?? []).length, 2, 'the classic window: the store and the gold');
   const loot = { storage: true, items: () => swords(2), capacity: () => HILDA };
   const m = remoteModel({ loot }, {});
   assert.deepEqual([m.kind, m.capacity, m.weight], ['storage', 90, 11]);

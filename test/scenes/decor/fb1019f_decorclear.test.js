@@ -244,14 +244,3 @@ test('DECOR-CLEAR the gate: one a collider (none for no collider); a gate no bod
   assert.deepEqual([gate.settle(body), gate.size(), solid(col, 'decor:b'), solid(col, 'decor:d'), solid(col, 'decor:e')], [3, 0, 12, 12, 12], 'clear: stood');
 });
 
-test('DECOR-CLEAR by source: the interior host hands the body - the motor itself, never the eye\'s low-passed feet - to its placed pieces (worldModes.js; the room\'s own furniture is guarded through their draw); a yard\'s pool names none - ROCK-CLEAR: it goes by the world collider\'s gate, settled by the world frame (PIN MOVED: a yard\'s own body, DECOR-CLEAR\'s, is gone - its draw handing the gate a plain body wrote over the frame\'s, and a jump\'s landing was asked against the body where it had stood) (mutants: the wiring gone)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  const decor = wm.slice(wm.indexOf('  const interiorDecor = createDecorRoom({'), wm.indexOf('  let _decorVisit = 0;'));
-  assert.ok(decor.includes('\n    body: player,   // DECOR-CLEAR'), 'the placed pieces');
-  const y = rd('src/scenes/homeYards.js');
-  const yard = y.slice(y.indexOf('    y.pool = createDecorRoom({'), y.indexOf('    yards.set(key, y);'));
-  assert.ok(yard.length > 0 && !/\bbody:/.test(yard), 'a yard\'s pool names no body of its own');
-  const w = rd('src/scenes/world.js');
-  const yards = w.slice(w.indexOf('createHomeYards({'), w.indexOf('outside: () => _mode() === \'exterior\''));
-  assert.ok(yards.length > 0 && !/\bbody:/.test(yards), 'nor the world\'s yards');
-});

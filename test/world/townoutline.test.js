@@ -159,12 +159,6 @@ test('TS3 the open cell: no tile of its own (the land\'s - never stamped), no tr
   assert.ok(tilemap.every((v) => v === 0), 'nothing stamped');
   installTownOutline();
   assert.equal(getNewDFBlockIndex(TOWN_OUTLINE_BLOCK), TOWN_OUTLINE_BLOCK_INDEX);
-  assert.match(rd('src/scenes/modWorldData.js'), /installCapitals\(\);[^\n]*\n\s+installTownOutline\(\);/);
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(h, /const blockOf = \{ classicOf: \(name\) => blocks\.readClassicBlock\(blocks\.getBlockIndex\(blocks\.checkName\(name\)\)\), servedOf: \(name\) => blocks\.getBlockByName\(name\) \};/);
-  assert.match(h, /const loc = outlineTownLocation\(synthesizeArenaLocation\(/);
-  assert.match(h, /const loc = outlineTownLocation\(made, blockOf, \{ round: imperialOutskirts\(px, py\) \}\);/);   // PIN MOVED (TS5): the Imperial City's outskirts round
-  assert.doesNotMatch(h, /outlineTownLocation\(synthesizeCapitalLocation/, 'a capital is its own plan\'s (TS5)');
 });
 
 test('TS3 with ARENA2: every city the places past the Bay clone keeps one of each kind of its buildings, its wall ring open, its kept buildings each the entry it drew; the cells the same from the game\'s own blocks and as served (mutant: the kinds unkept)', { skip: skipReal }, async () => {

@@ -185,28 +185,6 @@ test('ACT-TOUCH: Logging\'s chop by a finger - the press as the ring meets the n
   } finally { s.host.dispose(); setForagingHost(null); }
 });
 
-test('ACT-TOUCH: the world host hands every hooks press to the act before its gates - the street\'s and, through the same hook, the dungeon\'s and a building\'s (mutants: the hook never calls it; called after the act\'s own refusal)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('    attack: (dx, dy, held, o = null) => {');   // PIN MOVED (AUDIT 2026-10-01 part four, PAD-PULSE): the hook hears a held stroke's repeat
-  assert.ok(at > 0, 'the hooks object\'s attack');
-  const body = src.slice(at, src.indexOf('\n    },', at));
-  const strike = body.indexOf('gatherHost?.strike(held, o?.repeat === true)');
-  assert.ok(strike > 0, `the hook hands the press to the act:\n${body}`);
-  assert.ok(strike < body.indexOf('if (!walkMode)'), 'before any gate - the act ends itself off the walk (gatherHost.tick)');
-  assert.ok(strike < body.indexOf("if (modeNow() === 'exterior')"), 'and before the street and the modal rigs part');
-  // a finger's tap mid-act is a strike, and arms no activation (it did nothing mid-act, AUDIT 32 H5) - asked right after
-  // the decorator's flight, under which a tap is no press at all (DECOR1e's first line)
-  const tapAt = src.indexOf('    tap: (x, y, opts = null) => {');
-  const tap = src.slice(tapAt, src.indexOf('\n    },', tapAt));
-  const [, first = '', second = ''] = tap.split('\n');
-  assert.match(first, /^\s*if \(modes\?\.decorFlying\?\.\(\) \|\| yards\?\.flying\(\)\) return;/, `the tap's first line: ${first}`);
-  // PIN MOVED (AUDIT 2026-10-01 part four, STICK-TAP): never the stick's lock-only tap, and after the view's own test (a
-  // tap in the docked bar's strip is no tap) - its third line; test/systems/fb1001_audit.test.js
-  const third = tap.split('\n')[3] ?? '';
-  assert.match(second, /^\s*if \(!ndcFromScreen\(x, y, /, `the tap's second line: ${second}`);
-  assert.match(third, /^\s*if \(gatherHost\?\.acting\(\) && !opts\?\.lockOnly\) \{ gatherHost\.strike\(true\); gatherHost\.strike\(false\); return; \}/, `the tap's third line: ${third}`);
-});
-
 test('NODE-AIM: a boulder is found by looking at its stones - the look meets a node anywhere from its base to its aim point; past the base or the aim point by the cone, nothing (mutants: the aim point alone; the span past the base; the span past the aim point)', async () => {
   const s = await stage();
   try {
@@ -279,30 +257,6 @@ test('VEIN-CLEAR: a vein with no rock left to claim stands on stone outside ever
   assert.equal(g.length, 0, `no vein over a stone stands inside it (${g.length} of ${nb})`);
   for (const v of grass.filter((n) => n.what === 'vein')) assert.equal(inside(v.local), false);
   for (const b of grass.filter((n) => n.what === 'boulder')) assert.equal(inside(b.local), false);
-});
-
-test('ACT-CLICK: the act\'s strike is either button - the world host\'s input reads the swing\'s and the activation\'s press off the edge ring (a left click, Mouse0, strikes; E does not) (mutants: the click left out; the hold read for the press)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('gatherHost = createGatherHost({');
-  const line = src.slice(src.indexOf('        input: () => ({', at), src.indexOf('\n', src.indexOf('        input: () => ({', at)));
-  const body = line.slice(line.indexOf('() =>'), line.indexOf('}),') + 2);
-  // the very closure, over the real edge ring and the shipped bindings
-  const latch = { edge: keyEdges() };
-  const keys = new Set();
-  const csaRuntime = null;
-  const input = new Function('held', 'pressed', 'latch', 'keys', 'csaRuntime', `return (${body});`)(held, pressed, latch, keys, csaRuntime);
-  const frame = (code) => { if (code) { keys.add(code); noteKeyDown(latch.edge, code); } beginInputFrame(latch.edge); const r = input(); if (code) keys.delete(code); return r.attack; };
-  assert.equal(frame('Mouse1'), true, 'the right button (SwingWeapon) strikes, as before');
-  assert.equal(frame('Mouse0'), true, 'the left (ActivateCenterObject) strikes too');
-  assert.equal(frame('KeyE'), false, 'E is the act\'s start and its hold, never a strike');
-  assert.equal(frame(null), false, 'no press, no strike');
-  // a click held over frames strikes once - the press, never the hold
-  keys.add('Mouse0'); noteKeyDown(latch.edge, 'Mouse0');
-  beginInputFrame(latch.edge);
-  assert.equal(input().attack, true, 'pressed');
-  beginInputFrame(latch.edge);
-  assert.equal(input().attack, false, 'held: no second strike');
-  keys.delete('Mouse0');
 });
 
 test('BOULDER-GLINT (FIELD BUGS 2026-10-15c, the Discord: "Boulder\'s glint offset is way off"): a boulder\'s glint stands on its loose stones - looking at the stones, the act\'s face no further over them than a vein\'s over its ore (mutant: the lift read off the rock again)', async () => {

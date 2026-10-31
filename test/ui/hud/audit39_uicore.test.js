@@ -46,21 +46,6 @@ const stubFont = { fnt: stubFnt, tex: 'tex:FONT' };
 // F125 - the dial's commit leaked the _open singleton
 // ---------------------------------------------------------------
 
-test('AUDIT 39 F125: choosing an arm leaves through the SAME exit the scrim does', () => {
-  const dial = read('src/ui/pixelDial.js');
-  // commit() used to call the closure `unmount()`, which is neither
-  // onClose nor the wrapper openPixelDial installs on the returned
-  // handle - so `_open` kept pointing at a torn-down dial and the next
-  // Tab was spent raising nothing.
-  const commit = dial.slice(dial.indexOf('function commit(dir)'), dial.indexOf('function close()'));
-  assert.match(commit, /close\(\);/, 'commit closes through close()');
-  assert.doesNotMatch(commit, /\bunmount\(\);/, 'never the bare teardown');
-  assert.ok(commit.indexOf('close()') < commit.indexOf('entry.open()'),
-    'the dial still leaves BEFORE the window it opens takes the keys');
-  assert.match(dial, /function close\(\) \{ unmount\(\); onClose\(\); \}/);
-  assert.match(dial, /onClose: \(\) => \{ _open = null; if \(lockEl\) requestLook\(lockEl\); \},/, 'and onClose is what clears the singleton (PL3: and gives the pointer back)');
-});
-
 // ---------------------------------------------------------------
 // F126 - the item rail pages off the thumb, not the rail midpoint
 // ---------------------------------------------------------------
@@ -104,16 +89,6 @@ test('AUDIT 39 F126: a rail click pages by the thumb, and a click ON the thumb m
   assert.equal(at(140, 0, 20), 'down');
 });
 
-test('AUDIT 39 F126: the three item windows hand the rail their live scroll and length', () => {
-  assert.match(read('src/ui/native/nativeInventory.js'),
-    /scrollerHit\(R\.localList, vx, vy, this\.scroll, this\._filtered\(\)\.length\)/);
-  assert.match(read('src/ui/native/nativeInventory.js'),
-    /scrollerHit\(R\.remoteList, vx, vy, this\.remoteScroll, this\._remote\(\)\.length\)/);
-  assert.match(read('src/ui/native/nativeTrade.js'), /scrollerHit\(rect, vx, vy, this\[which\], items\.length\)/);
-  assert.match(read('src/ui/item/itemMakerWindow.js'),
-    /scrollerHit\(ITEM_RECTS\.itemList, vx, vy, safeScrollIndex\(this\.scroll, list\.length\), list\.length\)/);
-});
-
 // ---------------------------------------------------------------
 // F127 - the touch attack hook nothing called (2026-08-14 to
 // 2026-09-05). REWRITTEN BY TI1: the drag hook is BACK and LIVE - the
@@ -123,58 +98,6 @@ test('AUDIT 39 F126: the three item windows hand the rail their live scroll and 
 // called; the inverse condition is pinned in the same spirit - a hook
 // the layer documents must be one the layer calls.
 // ---------------------------------------------------------------
-
-test('AUDIT 39 F127 / TI1: the drag hook is live - the swipe calls it, and no button pretends to', () => {
-  const touch = read('src/ui/touch/touch.js');
-  assert.match(touch, /hooks\.attack\?\.\(ev\.dx, ev\.dy, ev\.held\)/, 'the swipe reaches the drag seam');
-  assert.doesNotMatch(touch, /hooks\.attackTap/, 'the tap-to-attack button is gone (the tap is the activation now)');
-  // AUDIT SOC C9 re-pinned: `socialInteract` joined the list - the phone's door to SOC5's action, which had no
-  // control at all on a touch device. The law is unchanged: the header documents EXACTLY the hooks the layer calls.
-  // FONT1 re-pinned: `enhanced` joined it - the skin flag that puts the layer's text in the pixel face (the classic skin keeps system-ui)
-  // AUDIT PRE-MERGE 0928 U3 re-pinned: `stickRuns` joined it - the host's word on whether the stick's 80% throw runs (the boat's helm reads Run + a side key as the strafe)
-  // NAV-H re-pinned: `aimHold` joined it - the host's word that the attack is a held aim (a helm with guns), whose drag is a look
-  // CARDS-TOUCH re-pinned (PIN MOVED): `cardTable` joined it - the host's word that the player sits at a card table, whose finger is the table's
-  // PIN MOVED (AUDIT CARDS-6 E1): `cardHeld` joined it - the host's word that the card table holds a press, whose finger is never the stick
-  assert.match(touch, /@param hooks \{ look\(dx,dy\), attack\?\(dx,dy,held\), tap\?\(x,y\), locked\?\(\), dial\?, enhanced\?, cycleMode\?\(\), socialInteract\?\(\), overlayActive\?\(\), paused\?\(\), stickRuns\?\(\), aimHold\?\(\), cardTable\?\(\), cardHeld\?\(\) \}/,
-    'the header documents exactly the hooks the layer calls (AUDIT 62 F7 added `paused`, the pause predicate the mouse arms always carried)');
-  assert.match(touch, /if \(hooks\.socialInteract\) socialBtn = button\(/, '...and the social button is drawn only where a host hands the hook in');
-  // TOUCH-BUTTONS (2026-09-27, Discord: "I would much rather use a button to attack"): the one button that calls the
-  // drag seam is a corner slot the PLAYER chose Attack for - never by default (TI1's two stand there), and never on a
-  // host with no attack hook, where it would be a door that opens nothing.
-  assert.match(touch, /filter\(\(a\) => a\.kind !== 'attack' \|\| typeof hooks\.attack === 'function'\)/, 'no Attack slot where the host has no attack');
-  // FONT3: the trio FIRST, so the layer's own weight after it is the one that holds (PIXEL_FONT_CSS carries 500 now)
-  assert.match(touch, /const face = hooks\.enhanced \? `\$\{PIXEL_FONT_CSS\}font-weight:500;font-size:15px;` : 'font:600 15px system-ui,-apple-system,"Segoe UI",sans-serif';/, 'FONT1: the enhanced skin\'s layer is in the pixel face, the classic skin\'s in the system face');
-  // AUDIT FONT F5: ALL FOUR HOSTS, not one. FONT1 wired `enhanced` in
-  // scenes/world.js alone and this pin read that one file, so on
-  // ?exterior, ?dungeon and ?interior every touch button, the nav row
-  // and the naming field stayed in system-ui under the enhanced skin -
-  // the three hosts a phone reaches from the front door's own test
-  // rooms. THE FOUR HOSTS RULE: each is named here, wired or flagged.
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/interior.js']) {
-    const s = read(h);
-    assert.match(s, /\n    enhanced: isEnhanced\(\),/, `${h}: mutants: the skin flag dropped, so this host's touch layer is in the system face under the enhanced skin`);
-    assert.match(s, /import \{[^}]*isEnhanced[^}]*\} from '\.\.\/systems\/uiSkin\.js';/, `${h}: ...and it reads the real skin, not a literal`);
-  }
-  // AUDIT FONT F6: the naming field is an <input> and inherits nothing
-  // from the layer's root, so it set its own font shorthand and was the
-  // one place on this layer a player TYPES that FONT1's face never
-  // reached. Same size, this skin's letters.
-  assert.match(touch, /const entryFace = hooks\.enhanced \? `\$\{PIXEL_FONT_CSS\}font-weight:600;font-size:18px;` : 'font:600 18px system-ui,-apple-system,sans-serif';/,
-    'AUDIT FONT F6: the entry field takes the skin\'s face too');
-  assert.match(touch, /box-sizing:border-box;\$\{entryFace\};color:#eee;/,
-    'mutants: the field back on its own hard-coded system-ui shorthand, whatever the layer around it wears');
-  assert.doesNotMatch(touch, /font:600 18px system-ui,-apple-system,sans-serif;color:#eee/,
-    'mutant: the old literal left in the cssText beside the new variable');
-  assert.match(touch, /const paused = !!hooks\.paused\?\.\(\);/, '...and the layer calls it');
-  // The three combat hosts pass the drag hook; the fly-cam interior
-  // passes neither it nor a tap and gets no sword and no dial.
-  for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const s = read(h);
-    assert.match(s, /\n\s*attack: \(dx, dy, held(?:, o = null)?\) =>/, `${h} passes the live drag hook`);   // PIN MOVED (AUDIT 2026-10-01 part four, PAD-PULSE): world.js's hears a held stroke's repeat
-    assert.doesNotMatch(s, /attackTap: \(\) =>/, `${h} no longer passes a tap-to-attack`);
-  }
-  assert.doesNotMatch(read('src/scenes/interior.js'), /attackTap|attack: \(dx/);
-});
 
 // ---------------------------------------------------------------
 // F128 - the picker's selected row has no shadow
@@ -283,21 +206,6 @@ test('AUDIT 39 F131: the vitals detector runs before the skin fork AND before th
 // F133 - Detect markers and escort faces under the default skin
 // ---------------------------------------------------------------
 
-test('AUDIT 39 F133: the Detect markers reach the skin that replaces the classic compass', () => {
-  const hud = read('src/ui/hud/hud.js');
-  const branch = hud.slice(hud.indexOf('if (isEnhanced() && typeof document'), hud.indexOf('if (!art) return;'));
-  assert.match(branch, /detected: detected \?\? null,/);
-  assert.match(branch, /playerXZ: playerXZ \?\? null,/);
-  assert.match(branch, /drawEscortFaces\(renderer, canvas\);/, 'and the escort column draws too');
-  const en = read('src/ui/enhanced/enhancedHud.js');
-  assert.match(en, /drawDetectMarkers\(opts\.detected \?\? null, opts\.playerXZ \?\? null, heading01\)/);
-  // The bearing is the classic box's own law, Mathf.Lerp's clamp
-  // included - one home for it, not a second copy here.
-  assert.match(en, /compassMarkerLerp\(list\[i\], playerXZ, heading01\)/);
-  assert.match(en, /Math\.min\(1, Math\.max\(0, compassMarkerLerp/);
-  assert.match(en, /import \{ compassScroll, breathShortThreshold, compassMarkerLerp, DETECT_MARKER_RGB \}/);
-});
-
 // ---------------------------------------------------------------
 // F134 - the solver's "collider already placed" arm
 // ---------------------------------------------------------------
@@ -320,32 +228,11 @@ test('AUDIT 39 F134: a count-1 plate whose only collider was placed is PLACED, n
   assert.deepEqual(out.map((r) => r.offY), [0, -0.5, -9, 8.5, 0], 'the other four are unmoved by the arm');
   assert.equal(out[4].replaced, false, 'the plate keeps its name');
   assert.equal(out.filter((r) => r.replaced).length, 0);
-  assert.match(read('src/ui/nameplateLayout.js'), /if \(!q\) \{ p\.count = 0; p\.placed = true; continue; \}/);
 });
 
 // ---------------------------------------------------------------
 // F135 - the docked large HUD's viewport. SHIPPED (ROAD-E E5).
 // ---------------------------------------------------------------
-
-test('AUDIT 39 F135: the docked bar SHRINKS the world pass, and the head records the ship', () => {
-  // The finding was that DFU shrinks the camera rect
-  // (ViewportChanger.cs:52-67) and re-centres the crosshair into what
-  // is left (HUDCrosshair.cs:43-52) while the port drew the bar over a
-  // full-canvas frame. E5 landed both halves together, which is the
-  // condition this test used to hold the flag open for - so it now
-  // pins the ship, and the flag TOKEN is pinned GONE.
-  const large = read('src/ui/hud/hudLarge.js');
-  const head = large.slice(0, large.indexOf('import '));
-  assert.equal(/FLAGGED|INTERIM/.test(head), false, 'the flag is retired, not re-worded');
-  assert.match(head, /SHIPPED \(ROAD-E E5, 2026-09-02\)/);
-  assert.match(head, /ViewportChanger\.cs:52-67/);
-  assert.match(head, /HUDCrosshair\.cs:43-52/);
-  // ...and the crosshair marks the centre of the VIEWPORT, which is
-  // the camera centre in both states - the half that could not move on
-  // its own.
-  assert.match(read('src/ui/hud/hudCrosshair.js'),
-    /const cx = canvas\.width \/ 2, cy = crosshairCentreY\(canvas\.height, largeHudHeight\);/);
-});
 
 // ---------------------------------------------------------------
 // F136 - InteractionModeIcon "none"

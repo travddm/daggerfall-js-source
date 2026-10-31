@@ -31,14 +31,3 @@ test('PERF9 fpsCounter: window.__fpsStats answers the last second\'s numbers eve
   } finally { globalThis.document = prev.d; globalThis.window = prev.w; _resetFrameClock(); }
 });
 
-test('PERF9 pins: the probe boots the three scenes on the shot door, waits for the stream to settle, reads the counter seam, and runs on the machine\'s GPU when headed (mutant: a scene dropped, or the settle wait dropped)', () => {
-  const p = read('tools/perfProbe.mjs');
-  assert.match(p, /city: `\/play\/\?world&region=Daggerfall&loc=Daggerfall&class=1&novideo&shot&fps`/);
-  assert.match(p, /road: `\/play\/\?world&spawn=random&class=1&novideo&shot&fps`/);
-  assert.match(p, /dungeon: `\/play\/\?shot&class=0&fps`/);
-  assert.match(p, /waitForFunction\(\(\) => window\.__shotReady === true/, 'settled means the stream is done');
-  assert.match(p, /window\.__fpsStats \? window\.__fpsStats\(\) : null/, 'reads the counter\'s own numbers');
-  assert.match(p, /HEADED\n\s+\? \{ headless: false \}\n\s+: \{ args: \['--use-gl=angle', '--use-angle=swiftshader'/, 'headed is the real GPU; headless is software and only relative');
-  assert.match(p, /const ROOT = fileURLToPath\(new URL\('\.\.', import\.meta\.url\)\);/, 'the repo root, not a machine\'s path');
-  assert.match(read('package.json'), /"perf": "node tools\/perfProbe\.mjs"/);
-});

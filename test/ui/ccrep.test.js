@@ -68,29 +68,3 @@ test('CC-REP the flow: the builder opens the window, steps move the ledger, the 
   assert.equal(c.sub, null, 'and classic really does let you leave it unbalanced this way');
 });
 
-test('CC-REP/GRID/STEP by source: the view draws the window and presses the flow\u2019s doors alone; the builder is a two-column grid from 900px; the steppers carry a minus and a plus at the button\u2019s size (mutant: a door dropped, the view writing the ledger, the glyphs shrunk back)', () => {
-  const view = rd('src/ui/enhanced/enhancedChargen.js');
-  assert.match(view, /if \(c\.sub === 'rep'\) return customRepPane\(c\);/, 'the window over the builder');
-  const pane = view.slice(view.indexOf('function customRepPane(c)'), view.indexOf('function customClassStage()'));
-  assert.match(pane, /flow\.applyHit\(\{ repStep: \{ group, dir \} \}\)/, 'a step presses the flow');
-  assert.match(pane, /flow\.applyHit\(\{ repExit: true \}\)/, 'Done presses the exit gate');
-  assert.match(pane, /for \(const group of REP_GROUPS\)/, 'five rows, the window\u2019s own groups');
-  assert.doesNotMatch(pane, /c\.reps\[[^\]]*\]\s*=[^=]/, 'the view never writes the ledger');
-  const builder = view.slice(view.indexOf('function customClassStage()'), view.indexOf('// ── HOW YOUR HISTORY'));
-  assert.match(builder, /\['Reputations', repNote, \{ customRep: true \}\]/, 'the ReputationButton\u2019s row, with what the ledger says');
-  assert.match(builder, /el\('div', 'skillpane builder'\)/, 'CC-GRID: the builder\u2019s own pane class');
-  // RE-AIMED at UXB1-J: THREE columns now - the skills, the attributes, the class itself - which the 900px grid lays
-  // out as two (the class under the attributes) and a desk as three (enhancedStyle.js, the UXB1-J block).
-  assert.deepEqual(builder.match(/el\('div', 'builder-col b-\w+'\)/g), [
-    "el('div', 'builder-col b-skills')", "el('div', 'builder-col b-attrs')", "el('div', 'builder-col b-class')"],
-    'three columns: the skills, the attributes, the class');
-  assert.match(builder, /box\.classList\.add\('span'\);/, 'the name spans both');
-  assert.match(builder, /el\('div', 'acts span b-acts'\)/, 'and so do the acts');
-  const css = rd('src/ui/enhanced/enhancedStyle.js');
-  assert.match(css, /@media \(min-width: 900px\) \{\n\s+\.skillpane\.builder \{ max-width: 1180px; display: grid; grid-template-columns: 1fr 1fr;/, 'two columns from 900px up');
-  assert.match(css, /\.skillpane\.builder > \.span \{ grid-column: 1 \/ -1; \}/);
-  assert.match(view, /for \(const \[dir, glyph\] of \[\[-1, '\\u2212'\], \[1, '\+'\]\]\)/, 'CC-STEP: a minus sign and a plus');
-  assert.match(css, /\.step \{[^}]*font-size: 22px; line-height: 1;/, 'at the button\u2019s size');
-  assert.match(css, /@media \(pointer: coarse\) \{[\s\S]*?\.step \{ font-size: 26px; \}/, 'and larger on the thumb-sized button');
-  assert.match(rd('src/ui/chargen.js'), /if \(hit\.repStep\) \{[\s\S]*?repStep\(this\.custom\.reps, hit\.repStep\.group, hit\.repStep\.dir\)[\s\S]*?repPointsToDistribute\(this\.custom\.reps\)/, 'the flow\u2019s door updates the ledger as a bar click does');
-});

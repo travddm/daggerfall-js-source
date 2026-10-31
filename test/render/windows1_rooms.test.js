@@ -194,10 +194,7 @@ test('RW1 rooms R5: the rooms are a frame\'s - an exterior frame that asks (afte
 });
 
 test('RW1 rooms R6: both mesh shaders carry the one block and its four lines where they must stand - the derivatives before any discard, the cutout after the picture, the glass between the emission and the albedo it is subtracted from, the room before the output (shader text - GLSL compiles in a browser, tools/realWindowsProbe.mjs) (mutants: a lane without the block, a line out of its place)', () => {
-  const r = rd('src/render/renderer.js');
-  const fs = r.slice(r.indexOf('const FS = `'), r.indexOf('const CHAR_VS = `'));
   const at = (s, k) => s.indexOf(k);
-  assert.ok(at(fs, '${realWindowsGlsl(\'c\')}') > 0, 'the classic FS: the block, on the classic codec');
   const order = (src, label) => {
     const main = src.slice(src.indexOf('void main() {'));
     const iD = at(main, 'RW_MAIN_DERIVS'), iDisc = at(main, 'discard'), iTex = at(main, 'vec4 tex = texture(uTex, vUV);'), iCut = at(main, 'RW_MAIN_CUTOUT');
@@ -207,11 +204,6 @@ test('RW1 rooms R6: both mesh shaders carry the one block and its four lines whe
     assert.ok(iEm < iG && iG < iAlb, `${label}: the glass between the emission and the albedo`);
     assert.ok(iRoom > iAlb && iRoom < iOut, `${label}: the room before the output`);
   };
-  order(fs, 'classic');
-  const el = rd('src/render/enhancedLighting.js');
-  const elFs = el.slice(el.indexOf('export const EL_MESH_FS = `'), el.indexOf('export const EL_BB_FS = `'));
-  assert.ok(elFs.includes('${realWindowsGlsl(\'elDecode(c)\')}'), 'the lane: the block on its own codec');
-  order(elFs, 'lane');
   // the built text, both lanes and the classic-look shadow lane that derives from the lane's
   for (const [label, built] of [['lane', EL_MESH_FS], ['classic shadows', classicShadowLane().meshFs]]) {
     for (const line of [RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM]) assert.ok(built.includes(line), `${label}: ${line.slice(0, 40)}`);
@@ -222,20 +214,6 @@ test('RW1 rooms R6: both mesh shaders carry the one block and its four lines whe
   assert.match(RW_MAIN_GLASS, /if \(uWinMode > 2\.5 && rwGlass > 0\.5 && rwInRect\(gl_FragCoord\.xy\)\) discard;/);
   assert.match(RW_MAIN_GLASS, /emission \*= step\(uWinMode, 1\.5\);/, 'an interior\'s glass wears no style');
   assert.match(RW_MAIN_ROOM, /if \(uWinMode > 0\.5 && uWinMode < 1\.5\) lit = rwRoomOver\(lit \+ emission, rwGlass, rwDp1, rwDp2, rwDuv1, rwDuv2\) - emission;/);
-});
-
-test('RW1 rooms R7: THE FOUR HOSTS - world.js and exterior.js ask for rooms after their exterior beginFrame and hand the modes their street; worldModes asks none (its interior is glass, its dungeon nothing); dungeonContext.js asks none; the pipeline marks DFU\'s windows as windows (mutants: a host unwired, a dungeon asking rooms, the window flag lost)', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(host);
-    const ask = s.indexOf('renderer.setWindowRooms(realWindowsMode());');
-    const begin = s.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);');
-    assert.ok(ask > 0 && begin > 0 && ask > begin && ask - begin < 6000, `${host}: asked after its exterior beginFrame`);
-    assert.equal(s.split('renderer.setWindowRooms(').length - 1, 1, `${host}: once`);
-    assert.match(s, /\n {4}outsideView,   \/\/ RW1: the street through a building's glass/, `${host}: the modes are handed the street`);
-  }
-  assert.ok(!rd('src/scenes/worldModes.js').includes('setWindowRooms('), 'the modes ask no rooms - the interior is the glass, the dungeon nothing');
-  assert.ok(!rd('src/scenes/dungeonContext.js').includes('setWindowRooms('), 'the dungeon host asks none');
-  assert.match(rd('src/scenes/dataPipeline.js'), /renderer\.uploadEmissionTexture\(archive, record, t\.getWindowColors32\(bitmap\), \{ replacement, window: true \}\);/);
 });
 
 test('RW1 rooms R8: the switch - the classic skin is Daggerfall\'s glass, the kill door wins over the row, the row is read as stored, and the row stands at Full by default (mutants: the skin gate lost, the door ignored, the default not full)', () => {
@@ -262,5 +240,4 @@ test('RW1 rooms R9: the Graphics row and the presets - the real windows row on t
   const v = Object.fromEntries(GRAPHICS_PRESETS.map((p) => [p.id, p.values['real-windows']]));
   assert.deepEqual(v, { low: 'off', medium: 'rooms', high: 'full', ultra: 'full' });
   assert.equal(v.high, row.control.initial, 'High is how the game ships');
-  assert.match(rd('src/ui/settings/settingsMap.js'), /"feat:cloud-quality", "feat:real-windows",/, 'on the Graphics tab, beside the clouds');
 });

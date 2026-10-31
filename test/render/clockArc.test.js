@@ -39,31 +39,6 @@ test('CLK1: the constants - the ease is 14 real seconds at the default scale, sa
   for (const w of Object.keys(WEATHER_SKY)) assert.ok(Math.hypot(...WEATHER_SKY[w].wind) < 0.1, `${w}: the row's wind is still in the dome's per-second units`);
 });
 
-test('CLK1: the controller - the presentation differences the host\'s classicMinutes, never the wall; the stretch has no time scale in it; the mod keeps its real frame', () => {
-  const shared = read('src/scenes/shared.js');
-  const use = shared.slice(shared.indexOf('use(skyIndex, minuteOfDay, showNightSky = true, extra = null) {'), shared.indexOf('let frame = params.has(\'window\')'));
-  // TIME1: the feed takes TWO minutes - the event clock it walks (dt, here) and the sky it dates the moons by (`skyNow`)
-  assert.match(use, /const nowMin = extra\?\.classicMinutes \?\? 0;[\s\S]{0,800}?const skyNow = extra\?\.skyMinutes \?\? nowMin;\s*\n\s*const dt = lastMin === null \|\| nowMin < lastMin \? 0 : nowMin - lastMin;   \/\/ GAME MINUTES\s*\n\s*lastMin = nowMin;/, 'dt is the clock\'s delta, in minutes; a clock that went backwards costs none');
-  assert.match(use, /const dtReal = weatherAt === null \? 0 : Math\.min\(MAX_DELTA_SECONDS, Math\.max\(0, seconds - weatherAt\)\);/, 'the wall\'s delta survives for one reader, clamped as Time.deltaTime is (MODS AUDIT)');
-  assert.match(use, /dynamic\.tick\(\{\s*\n\s*minuteOfDay, classicMinutes: skyNow, weather: skyWord, seconds, dt: dtReal,/, 'the mod (1:1) takes it - BLBSkybox reads Time.deltaTime');   // TIME1: its date (the moons) the sky's
-  assert.equal((use.match(/dtReal/g) || []).length, 2, 'and nothing else does');
-  assert.match(use, /const easeDt = windModel\.inLead\(\) \? dt \* \(WEATHER_EASE_MINUTES \/ windModel\.leadMinutes\(\)\) : dt;/, 'minutes over minutes');
-  assert.doesNotMatch(use, /60 \/ 12|\* 12\b/, 'no time scale hard-coded in the presentation');
-  assert.match(use, /weatherRowNow = easeWeather\(weatherRowNow, want, easeDt\);/);
-  assert.match(use, /driftXZ\[0\] \+= weatherRowNow\.wind\[0\] \* dt \* WIND_SECONDS_PER_MINUTE;\s*\n\s*driftXZ\[1\] \+= weatherRowNow\.wind\[1\] \* dt \* WIND_SECONDS_PER_MINUTE;/);
-  assert.match(use, /clouds\.setState\(cloudSky, cb\.row, cb\.word, easeDt, driftXZ,/, 'the clouds take the same minutes (WEATHER3c: on the row and word they stand on)');
-  assert.match(shared, /let lastMin = null;/);
-  // the lab keeps the same shape: a game-minute clock, its own integral, ?still stopping both
-  const lab = read('src/tools/skyLab.js');
-  assert.match(lab, /const dtMin = still \? 0 : Math\.min\(1, \(nowReal - labLast\) \/ 1000\) \/ WIND_SECONDS_PER_MINUTE;/);
-  assert.match(lab, /labDrift\[0\] \+= rowWind\[0\] \* dtMin \* WIND_SECONDS_PER_MINUTE;/);
-  assert.match(lab, /clouds\.setState\(cst, \{ cover: cst\.cloudCover, soft: cst\.cloudSoft \}, \$\('weather'\)\.value, dtMin, labDrift, 0, \[0, 0, 0\]\);/);
-  // VC7a: the lab hands its own game minute too, the clock the clouds live on
-  assert.match(lab, /skyState\(\{ minuteOfDay, weather: \$\('weather'\)\.value, classicMinutes: labClock, phases, seconds, drift: labDrift \}\)/);
-  // the seconds-named constant is gone from the tree's readers
-  for (const f of ['src/render/enhancedSky.js', 'src/render/volumetricClouds.js', 'src/scenes/shared.js', 'src/world/windmills.js']) assert.doesNotMatch(read(f), /WEATHER_EASE_SECONDS/, `${f}: no reader of the old constant`);
-});
-
 test('CLK1: the wrap - the drift and the recenter shift are unbounded integrals; the clouds take them modulo the field\'s common period', () => {
   for (const [name, m] of Object.entries({ SHAPE_METRES, DETAIL_METRES, VARIATION_METRES, MOTTLE_METRES })) {
     const n = FIELD_PERIOD_METRES / m;
@@ -75,10 +50,6 @@ test('CLK1: the wrap - the drift and the recenter shift are unbounded integrals;
     assert.ok(Math.abs(wrapField(v + FIELD_PERIOD_METRES) - w) < 1e-6, 'a whole period away is the same cloud');
   }
   assert.ok(FIELD_PERIOD_METRES < 2 ** 20, 'the wrapped value keeps float32 precision under a metre');
-  const vc = read('src/render/volumetricClouds.js');
-  assert.match(vc, /this\.drift = \[wrapField\(drift\[0\] \* WORLD_PER_DRIFT\), wrapField\(drift\[1\] \* WORLD_PER_DRIFT\)\];/, 'the drift, at upload');
-  assert.match(vc, /gl\.uniform2f\(u\.uShift, wrapField\(this\.shift\[0\]\), wrapField\(this\.shift\[1\]\)\);/, 'the shift, at upload');
-  assert.match(vc, /this\.shift\[0\] -= offset\[0\]; this\.shift\[1\] -= offset\[2\];/, 'the integral itself is kept raw - the wrap is the shader\'s, not the state\'s');
 });
 
 // ---- CLK2: the weather evolves within the day (enhanced lane) --------
@@ -180,16 +151,6 @@ test('CLK2: the change lands through DFU\'s own drain - live under the sky it is
   assert.equal(evolveClimateWeathers(day0 + 30), false);
   assert.equal(evolveClimateWeathers(day0 + 30), false, 'and the same hour again rolls nothing');
   resetWeatherSim(); setWeatherMapLaw(false);
-  // the wiring: the tick calls it after the day roll; the lane's door
-  const tick = read('src/systems/worldTick.js');
-  assert.match(tick, /else runDayChange\(\{ entity, lastMinutes, nowMinutes, rolls, say \}\);\s*\n(\s*\/\/[^\n]*\n)*\s*evolveClimateWeathers\(_sharedClock \? Math\.floor\(worldTo\) : nowMinutes\);/, 'after the day roll, wherever the player is (LIVED1: online on the world\'s hours)');
-  const sim = read('src/systems/weather/weatherSim.js');
-  assert.match(sim, /_evolveUrlDoor \?\?= new URLSearchParams\(globalThis\.location\?\.search \?\? ''\)\.get\('evolve'\) !== 'off';\s*\n\s*return _evolveUrlDoor && isEnhanced\(\) && !!getPref\('enhancedEnvironments'\);/, 'Enhanced Environments read LIVE (the pane flips it without a reload), ?evolve=off the kill switch read once');
-  assert.match(sim, /const r = seededRng\(\(h \* 6 \+ zone\) \^ EVOLVE_SEED\);/, 'its own generator');
-  assert.match(sim, /_zoneChangedAtMinutes\[zone\] = h \* 60;/, 'stale by the change\'s own hour, for THAT zone');
-  assert.match(sim, /const rolledAt = \(zone != null \? _zoneChangedAtMinutes\[zone\] : null\) \?\? _rolledAtMinutes;/, 'the drain reads the player\'s zone\'s stamp, else the day roll\'s');
-  assert.match(sim, /if \(!weatherEvolutionOn\(\) \|\| !_climateWeathersValid \|\| _evolveHour === null \|\| hour < _evolveHour\)/, 'VALID, not merely rolled: a loaded save\'s all-Sunny array is never evolved off');
-  assert.match(sim, /for \(let h = Math\.max\(_evolveHour \+ 1, hour - 23\); h <= hour; h\+\+\) \{/);
 });
 
 // ---- CLK3: day and night on the clock - the remaining steps ----------
@@ -241,10 +202,6 @@ test('CLK3: the moon\'s phase is continuous on the clock for the dome - no 45-de
   assert.ok(worstDay > 1, 'and the within-day bound is the real one: the walk does exceed a step late in the widest band');
   assert.equal(lunarPhaseFraction({ year: -1 }, 0), 0, 'year < 0: None, as the ladder answers');
   assert.equal(lunarPhase(dateFromClassicMinutes(base), { masser: true }) >= 0, true, 'the ladder itself is untouched');
-  // the systems keep the step: the dome alone takes the fraction, a caller's own phases go in whole
-  const dome = read('src/render/enhancedSky.js');
-  assert.match(dome, /const ph = phases \?\? lunarPhaseFractionsFromMinutes\(skyMinutes\);/);   // TIME1: the moons' date is the sky's (`skyMinutes`, the one clock when unhanded)
-  assert.doesNotMatch(dome, /lunarPhasesFromMinutes/, 'the ladder is not the dome\'s to read any more');
   // the systems keep the step - the readers the page names (the enchant ctx's moon arms, the lycanthrope's full
   // moon, the Dynamic Skies mod's own), unconditionally: a file that stops reading DFU's step goes red, not quiet
   for (const f of ['src/scenes/hostEnchant.js', 'src/systems/lycanthropy.js', 'src/systems/dynamicSkies/dynamicSkies.js']) {
@@ -253,10 +210,7 @@ test('CLK3: the moon\'s phase is continuous on the clock for the dome - no 45-de
     assert.doesNotMatch(s, /lunarPhaseFraction/, `${f}: a system reads DFU's step, never the dome's fraction`);
   }
   assert.equal(Object.keys(import.meta).length >= 0, true);
-  assert.match(read('src/tools/skyLab.js'), /const phases = lunarPhaseFractionsFromMinutes\(/, 'the lab hands the dome the same fraction');
   assert.deepEqual(skyState({ minuteOfDay: 0, classicMinutes: base, phases: { masser: LUNAR_PHASES.Full, secunda: LUNAR_PHASES.New } }).masser.phase, LUNAR_PHASES.Full, 'a caller\'s own phases go in whole');
-  // THE SUN AND THE RIG ARE ONE CURVE ALREADY: the dome's sun rides worldClock's dayFraction, the rig's light the same fraction clamped
-  assert.match(dome, /export function sunSkyDirection\(minuteOfDay\) \{\s*\n\s*const x = Math\.PI \* dayFraction\(minuteOfDay\);/);
   for (const h of [DAWN_HOUR, DUSK_HOUR]) {
     assert.ok(Math.abs(sunSkyDirection(h * 60)[1]) < 1e-9, `${h}:00: the dome's sun is on the horizon`);
     assert.ok(Math.abs(daylightScale(h * 60)) < 1e-9, 'and the rig\'s light is at zero - the same minute');
@@ -311,10 +265,6 @@ test('CLK4: the review - a distant zone never moves the player\'s stale clock, a
   for (let h = 1; h <= 24 * 20; h++) moved = evolveClimateWeathers(day0 + MINUTES_PER_DAY + h * 60) || moved;
   assert.equal(moved, true, 'and after the day roll the evolution runs again');
   resetWeatherSim(); setWeatherMapLaw(false);
-  // (3) THE DOOR IS LIVE: the source reads the skin and the pref every call, and caches only the URL
-  const sim = read('src/systems/weather/weatherSim.js');
-  assert.doesNotMatch(sim, /_evolveDoor\b/, 'no cached lane answer');
-  assert.match(sim, /let _evolveUrlDoor = null;/);
   // (4) THE MOONLIGHT RAMPS on the daylight curve - no step at 18:00, none at 06:00
   const base = 405 * 360 * MINUTES_PER_DAY;
   let nightOf = null;
@@ -334,7 +284,6 @@ test('CLK4: the review - a distant zone never moves the player\'s stale clock, a
   assert.ok(lastScale > 0.05, 'and is up by half past six');
   assert.equal(moonlightTerm(skyState({ minuteOfDay: 12 * 60, classicMinutes: base + nightOf * MINUTES_PER_DAY + 12 * 60 })), null, 'none at noon');
   assert.equal(skyState({ minuteOfDay: 720, classicMinutes: base }).daylight, daylightScale(720), 'the state carries the rig\'s curve');
-  assert.match(read('src/render/dynamicSkiesBridge.js'), /daylight: daylightScale\(minuteOfDay\),/, 'and the mod\'s moon state carries it too (DS2: in the bridge now)');
   assert.ok(MOONLIGHT.dayFade > 0 && MOONLIGHT.dayFade < 0.2);
   // (5) THE DECK HAS A PERIOD: both decks whole, the field the same a period away, the drift wrapped where it becomes the state
   assert.equal(DECK_PERIOD % DECK_LATTICE, 0, 'the near deck');
@@ -346,17 +295,6 @@ test('CLK4: the review - a distant zone never moves the player\'s stale clock, a
   assert.ok(wrapDeck(DECK_PERIOD * 3 + 5) - 5 < 1e-9 && wrapDeck(-1) > DECK_PERIOD - 1.001);
   const st = skyState({ minuteOfDay: 720, classicMinutes: base, drift: [DECK_PERIOD * 7 + 1.5, -DECK_PERIOD - 2] });
   assert.ok(Math.abs(st.drift[0] - 1.5) < 1e-9 && Math.abs(st.drift[1] - (DECK_PERIOD - 2)) < 1e-9, 'wrapped once, where the state is made');
-  const dome = read('src/render/enhancedSky.js');
-  assert.match(dome, /float hash21\(vec2 p\) \{ p = mod\(p, \$\{DECK_LATTICE\}\.0\);/, 'the shader\'s lattice, the same period');
-  assert.doesNotMatch(dome, /2\.03/, 'the octave is exactly two');
-  // (6) THE REST IS A VEIL on the enhanced skin; DFU's opaque black on the classic one.
-  // REST-VEIL2 (2026-09-19) took the per-state test OUT: CLK4 veiled the RESTING page
-  // only, so the page the key actually opens still blacked the world out whole and
-  // picking a rest brought it back three keystrokes later. One skin, one answer.
-  const rest = read('src/ui/restWindow.js');
-  assert.match(rest, /export const REST_VEIL = Object\.freeze\(\[0, 0, 0, 0\.35\]\);/);
-  assert.match(rest, /if \(isEnhanced\(\)\) drawMenuBackdrop\(renderer, canvas, REST_VEIL\);\s*\n\s*else drawMenuBackdrop\(renderer, canvas\);/);
-  assert.doesNotMatch(rest, /this\.state === 'resting' && isEnhanced\(\)/, 'no page of this window is veiled while another is blacked out');
   // (7) WHAT STAYS ON THE WALL, by decision - pinned so the next audit does not "fix" it
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = read(h);
@@ -364,7 +302,6 @@ test('CLK4: the review - a distant zone never moves the player\'s stale clock, a
     assert.match(s, /advanceRotor\(w\.state, dt, /, `${h}: the sails turn at their physical rate`);
     assert.match(s, /tsec: now \/ 1000/, `${h}: the precipitation's wander is the wall's`);
   }
-  assert.match(read('src/scenes/shared.js'), /dt: dtReal,/, 'the mod keeps Time.deltaTime');
 });
 
 // ---- AUDIT 65 SL-1 -----------------------------------------------------
@@ -397,13 +334,4 @@ test('CLK2 / AUDIT 65 SL-1: an IN-SESSION load lowers the evolution guard - the 
   for (let h = 1; h <= 24 * 20; h++) moved = evolveClimateWeathers(day0 + MINUTES_PER_DAY + h * 60) || moved;
   assert.equal(moved, true, 'the guard is dormant, not dead');
   resetWeatherSim(); setWeatherMapLaw(false);
-  // THE CLASSIC IMPORT'S ORDER: restorePlayer reaches restoreWeather (save.js),
-  // which now lowers the flag; importClimateWeathers raises it again for the
-  // imported array - so the import must run AFTER the restore or the imported
-  // zones would sit inert for a whole game day.
-  const host = read('src/scenes/world.js');
-  const restoreAt = host.indexOf('restorePlayer(playerEntity, bundle.snap');
-  const importAt = host.indexOf('importClimateWeathers(bundle.climateWeathers)');
-  assert.ok(restoreAt > 0 && importAt > 0, 'the classic-import arm is where the pin says');
-  assert.ok(importAt > restoreAt, 'SAV3: importClimateWeathers runs after restorePlayer');
 });

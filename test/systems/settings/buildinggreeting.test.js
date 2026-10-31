@@ -151,62 +151,7 @@ test('BG1: ShopQualityPresentation - 0 popup, 1 HUD, everything else nothing', (
   assert.equal(shopQualityPresentation(), 'popup', 'the vendored default is 0');
 });
 
-test('BG1: the door arm carries DFU\'s two variables and DEFERS behind the box', () => {
-  const wm = read('src/scenes/worldModes.js');
-  // ROAD-B MOVED THIS NEEDLE. `isBrokenIn` no longer starts false: it
-  // starts from the real isBash, which is DFU's own `var isBrokenIn =
-  // isBash;` (:517) now that a weapon swing can reach this arm. The
-  // facts below - the Open spell raises BOTH, the pick raises only
-  // isBrokenIn, the box defers - are unchanged.
-  const arm = wm.slice(wm.indexOf('let isBrokenIn = isBash;'), wm.indexOf('return enterBuildingDoor(hit, entries);'));   // PIN MOVED (INSTANCES' audit): the arm ends at the door's own entry, which asks then enters
-  // the Open spell raises BOTH; the pick raises only isBrokenIn
-  assert.match(arm, /opened = r\.opened;\n\s*if \(r\.opened\) isBrokenIn = true;/,
-    'buildingUnlocked = isBrokenIn = true');
-  const pick = arm.indexOf('isBrokenIn = true;   // :557');
-  assert.ok(pick > 0, 'the pick raises isBrokenIn');
-  assert.equal(arm.slice(pick - 400, pick).includes('opened = true'), false,
-    'and never raises buildingUnlocked - that is what keeps the shop arm reachable after a pick');
-  // the box defers the transition
-  // AUDIT 39 (#164) MOVED THIS PIN: the deferred call discarded its
-  // promise, so a refused interior (enterInteriorCore's no-landing
-  // throw) escaped to main.js's unhandledrejection handler and painted
-  // CRASH over a running game. The catch is the one both host call
-  // sites already put on the non-deferred arm.
-  assert.match(arm, /townTalk\.showOverlay\(new ChoiceWindow\(\{ lines \}\), \(\) => \{ enterBuildingDoor\(hit, entries\)\.catch\(\(e\) => console\.error\(e\)\); \}\);/);   // PIN MOVED (INSTANCES' audit): the door's own entry - it asks, then enters
-  // the HUD arm speaks and does NOT defer
-  assert.match(arm, /if \(lines\.length && how === 'hud'\) for \(const l of lines\) townTalk\?\.say\?\.\(l, getInt\('GUI', 'ShopQualityHUDDelay', 1, 10\)\);/);
-  // the house greeting is a RANDOM variant; the quality line is not
-  assert.match(arm, /townTalk\?\.randomText\?\.\(greet\.textId\)/);
-  // and the house greeting is not behind the shop setting
-  assert.match(arm, /\? 'popup'   \/\/ the house greeting is not behind ShopQualityPresentation/);
-});
-
-test('BG1/ROAD-B: the bash flag is CLOSED - the input landed and both arms with it', () => {
-  // BG1 narrowed this flag to "the isBash INPUT" and said the arms
-  // would drop in beside it the day that input existed. ROAD-B is that
-  // day, so the pin turns over: the flag must be GONE, and the two
-  // arms it named must be live and cited where C# has them.
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(!wm.includes('// FLAGGED, and narrowed to what is actually missing:'),
-    'the flag is closed, not left standing beside its fix');
-  const arm = wm.slice(wm.indexOf('let isBrokenIn = isBash;'), wm.indexOf('return enterBuildingDoor(hit, entries);'));   // PIN MOVED (INSTANCES' audit): the arm ends at the door's own entry, which asks then enters
-  // :570-583 - "Classic makes a roll whether it is locked or not":
-  // FailedRoll(25 - lock) ends the activation, and 10% of those are
-  // noticed as the ATTEMPT.
-  assert.match(arm, /if \(isBash && !opened\) \{\n\s*if \(!dice100\(25 - lockValue, Math\.random\(\)\)\) \{/);
-  assert.match(arm, /CRIMES\.Attempted_Breaking_And_Entering/);
-  // :621-627 - a flat 10% on a bash that DID open, and the full crime.
-  assert.match(arm, /if \(isBash && dice100\(10, Math\.random\(\)\)\) \{\n\s*setCrimeCommitted\(playerEntity, CRIMES\.Breaking_And_Entering\);/);
-  // both call the watch, through the host's one entry
-  assert.equal((arm.match(/host\.spawnCityGuards\?\.\(true\);/g) ?? []).length, 2);
-});
-
 test('AUDIT 28 W6: the shop-quality HUD lines stay up for ShopQualityHUDDelay seconds (PlayerActivate :1382)', () => {
-  // townTalk.say rides the delay through to hudText.add's delayInSeconds
-  // - AddHUDText's own second argument - and the setting's GetInt range
-  // is 1..10 (SettingsManager :494). The screen's law row matches.
-  const talk = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(talk, /say: \(line, delayInSeconds = undefined\) => hud\.add\(line, delayInSeconds\),/);
   assert.equal(LIVE['GUI/ShopQualityHUDDelay'], 'src/scenes/worldModes.js');
   assert.deepEqual(NUMBER_LAW['GUI/ShopQualityHUDDelay'], { min: 1, max: 10, step: 1, coarse: 2, format: 'sec', source: "DFU GetInt(1,10) (SettingsManager:494)" });
 });

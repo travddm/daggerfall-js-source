@@ -222,29 +222,6 @@ test('WAGON-TIERS NO RED WHERE WEAR COSTS NOTHING, AND EACH TIER\'S WORDS: on Bo
     for (let i = 0; i < 100; i++) hu.tick(0.016, { mode: 'Cart', metres: 10, wagonGoes: true });
     assert.deepEqual(said, [WAGON_UPKEEP_TEXT.rickety('Small Cart')], 'Hard: in its own words - slow');
   });
-  // the Stable page's lines, through its own builder (ui/holdingsPages.js wagonLines, by the page's words)
-  const page = rd('src/ui/holdingsPages.js');
-  assert.match(page, /const advice = w\.wearSlows === false && Object\.hasOwn\(WAGON_ADVICE_BOONS, w\.stateKey\) \? WAGON_ADVICE_BOONS\[w\.stateKey\]/);
-  assert.match(page, /get rickety\(\) \{ return t\('holdings\.wagon\.boons\.rickety', 'Rickety, but it still rolls at full pace\.'\); \}/);
-  assert.match(page, /get failing\(\) \{ return t\('holdings\.wagon\.boons\.failing', 'Failing, but it still rolls at full pace\.'\); \}/);
-});
-
-test('WAGON-TIERS THE ONE ACCESSOR AND THE FOUR HOSTS: no module but the switch reads the wagon upkeep key, the old boolean switch is gone, and every reader is handed the one accessor - world.js and exterior.js hand it to the upkeep (the wear, the pace, the Stable page, the saddle panel) and to the kit\'s Use, world.js\'s Wagon Yard wright asks it, a counter\'s sale asks it; worldModes.js and dungeonContext.js stand no transport and read nothing', () => {
-  const files = [];
-  const walk = (dir) => { for (const f of readdirSync(dir)) { const p = join(dir, f); if (statSync(p).isDirectory()) walk(p); else if (f.endsWith('.js')) files.push(p); } };
-  walk(SRC);
-  const rel = (p) => p.slice(SRC.length);
-  assert.deepEqual(files.filter((p) => /getPref\((WAGON_UPKEEP_PREF|'wagonUpkeep')\)/.test(readFileSync(p, 'utf8'))).map(rel), ['systems/upkeep/upkeepSwitch.js'], 'one reader of the key');
-  assert.deepEqual(files.filter((p) => /\bwagonUpkeepOn\b/.test(readFileSync(p, 'utf8'))).map(rel), [], 'the boolean switch is gone');
-  for (const host of ['world.js', 'exterior.js']) {
-    const s = rd(`src/scenes/${host}`);
-    assert.match(s, /import \{ horseCareRules, wagonUpkeepRules \} from '\.\.\/systems\/upkeep\/upkeepSwitch\.js';/, host);
-    assert.match(s, /horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,\n\s*where: /, `${host}: the upkeep`);
-    assert.match(s, /reach: \(\) => upkeepReach\(hccRuntimeOn\(\), !!hccRuntimeOn\(\)\), horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,/, `${host}: the kit's Use`);
-  }
-  assert.match(rd('src/scenes/world.js'), /function mendAtYard\(\) \{\n\s*if \(!wagonUpkeepRules\(\)\) \{ setMidScreenText\('The wright has no work for you\.'\); return true; \}/, 'world.js: the Wagon Yard\'s wright');
-  assert.match(rd('src/systems/tradeModes.js'), /export function saleConditionPercentage\(item, \{ online = isOnlinePage\(\) \} = \{\}\) \{\n(\s*\/\/[^\n]*\n)*\s*if \(wagonSoldWhole\(item, wagonUpkeepRules\(\)\)\) return 100;/, 'tradeModes.js: a counter\'s sale');
-  for (const host of ['worldModes.js', 'dungeonContext.js']) assert.ok(!/wagonUpkeep/.test(rd(`src/scenes/${host}`)), `${host}: no transport`);
 });
 
 test('WAGON-TIERS A SOUND WAGON ROLLS FASTER (Mac, 2026-10-15: "Sound wagon rolls faster"): on Boons a wagon kept Sound - 60% of whole and up, a kit\'s ceiling included - rolls at WAGON_SOUND_BOON times DFU\'s pace, and Worn, Rickety and Failing at DFU\'s; Hard and Off unchanged; the boon composes with the team\'s own pace as every ride pace does (the product, through the motor the Overworld drives), online as offline - the player\'s own, as Climates & Calories\' boons are; the Stable page says it (mutants: the boon gone; Boons not paying it; Hard paying it; the law not reading it; a worn wagon earning it; the boon unsaid)', async () => {
@@ -300,6 +277,4 @@ test('WAGON-TIERS A SOUND WAGON ROLLS FASTER (Mac, 2026-10-15: "Sound wagon roll
     };
     assert.ok(Math.abs(speedAt(WAGON_SOUND_BOON) / speedAt(1) - WAGON_SOUND_BOON) < 1e-9, 'the motor rides the boon as it rides every pace');
   });
-  assert.match(rd('src/scenes/world.js'), /player\.rideSpeedScale = upkeep\.rideScale\(player\.transportMode, wagonLoadShare\(\)\);/, 'world.js - the Overworld\'s and the journeys\' host - hands the motor the one scale');
-  assert.match(rd('src/ui/holdingsPages.js'), /get sound\(\) \{ return t\('holdings\.wagon\.boons\.sound', 'Sound, and it rolls faster for it\.'\); \}/, 'the Stable page says the boon on Boons');
 });

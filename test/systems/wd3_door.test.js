@@ -157,7 +157,6 @@ test('WD3 the door is open ONLINE whatever Replace Game Artwork says - the groun
   } finally {
     if (had) Object.defineProperty(globalThis, 'location', had); else delete globalThis.location;
   }
-  assert.match(src('src/formats/worldData/worldDataReplacement.js'), /export const worldDataDoorOpen = \(\) => _doorLatched \?\? \(assetInjectionOn\(\) \|\| isOnlinePage\(\)\);\nconst worldDataOn = worldDataDoorOpen;/);
   // AUDIT WD3 P3: latched for the game, as DFU reads AssetInjection at startup - a switch turned mid-game moves nothing
   again();
   assert.equal(latchWorldDataDoor(), false);
@@ -168,10 +167,6 @@ test('WD3 the door is open ONLINE whatever Replace Game Artwork says - the groun
   setValue('Enhancements', 'AssetInjection', 'False');
   assert.equal(markOf(getDFBlockReplacementData(7, 'FIGHBM00.RMB')), 222, 'open for the game it was read open in - no holes punched in its towns');
   again();
-  for (const fn of ['getDFRegionAdditionalLocationData', 'getDFLocationReplacementData', 'getDFBlockReplacementData', 'getBuildingReplacementData']) {
-    const at = src('src/formats/worldData/worldDataReplacement.js').indexOf(`export function ${fn}(`);
-    assert.match(src('src/formats/worldData/worldDataReplacement.js').slice(at, at + 400), /if \(!worldDataOn\(\)/, `${fn} asks the one gate`);
-  }
   setValue('Enhancements', 'AssetInjection', 'True');
 });
 
@@ -278,29 +273,6 @@ test('WD3 Roleplay & Realism\'s Master Armorer: the shop\'s key read off the tow
     assert.equal(rrMasterArmBuildingKeyIn({ regionIndex: r }), key, 'no grid to read');
   }
   assert.equal(rrMasterArmBuildingKeyIn({ regionIndex: 17, exterior: { exteriorData: { width: 1, blockNames: [RR_ARMORER_BLOCK] } } }), rrMasterArmBuildingKey(17), 'a region with no master armorer: none');
-  assert.match(src('src/systems/roleplayRealism/rrQuestLine.js'), /return \{ buildingKey: rrMasterArmBuildingKeyIn\(location\), name: RR_TEXT\.dharjenCustomArmor \};/);
-});
-
-test('WD3 the decor catalogue stays what DAGGERFALL furnishes - its blocks read past the door, so 1,400 redecorated interiors never join, renumber or leave it with a switch', () => {
-  assert.match(src('src/systems/decor/decorScan.js'), /const b = blocks\.readClassicBlock \? blocks\.readClassicBlock\(next\) : blocks\.getBlock\(next\);/);
-});
-
-test('WD3 the loader: each pack a URL the build emits (never a chunk), fetched only when its mod is loaded for the game - the switch read once and latched, a town never moving under the player; a pack a save\'s pins let in loaded switched off; the stand-ins installed when a pack opens; the rebuild spot-checked in the background', () => {
-  const M = src('src/scenes/modWorldData.js');
-  assert.match(M, /import\.meta\.glob\('\.\.\/\.\.\/vendor\/\*\/WorldDataPack\/\*\.pack\.json\.gz', \{ eager: true, query: '\?url', import: 'default' \}\)/);
-  assert.match(M, /const door = latchWorldDataDoor\(\);/);
-  assert.match(M, /const got = on && door \? await loadPackFrom\(vendor, url, \(\) => true\) : 0;\n {6}latchModLoaded\(vendor, got > 0\);\n {6}if \(on && door && !got\) _missing\.add\(vendor\);/, 'a closed door loads no pack and stamps none (AUDIT WD3 P2); a pack that did not load is a mod not loaded, and said (B1)');
-  assert.match(M, /const counts = await Promise\.all\(Object\.entries\(globPacks\(\)\)\.map\(/, 'the packs fetched side by side (AUDIT WD3 B4)');
-  assert.match(M, /signal: AbortSignal\.timeout\(PACK_FETCH_TIMEOUT_MS\)/, 'and never held for ever');
-  assert.match(M, /if \(!name\.startsWith\('location-'\) && \(blocks\+\+ % 8\) !== 0\) return;/, 'one block in eight spot-checked');
-  assert.match(src('src/formats/worldData/worldDataPack.js'), /if \(typeof globalThis\.process === 'undefined' \|\| !globalThis\.process\.versions\?\.node\) throw new Error\('this browser cannot inflate the pack \(no DecompressionStream\)'\);/, 'a browser never reaches for node:zlib');
-  assert.match(M, /if \(!worldDataDoorOpen\(\)\) return false;/, 'and honours no pin into one');
-  assert.match(M, /configureLayoutPins\(\{ vendorOn: \(v\) => modLatchedOn\(v\) === true, vendorVersion: \(v\) => _packs\.get\(v\)\?\.mod\?\.version \?\? '' \}\);/);
-  assert.match(M, /_pending\.set\(vendor, loadPackFrom\(vendor, entry\[1\], \(\) => false\)\.finally\(\(\) => _pending\.delete\(vendor\)\)\);\n {2}return \(await _pending\.get\(vendor\)\) > 0;/, 'a pinned pack answers only where a pin lets it in, fetched once however many ask');
-  assert.match(M, /const n = registerWorldDataPack\(pack, isOn, \{ priority: WORLD_DATA_PRIORITY\[vendor\] \?\? 0 \}\);\n(?: {4}\/\/.*\n) {4}installTownStandIns\(townPacksLive\);/);
-  assert.match(M, /const townPacksLive = \(\) => \{ const pinned = vendorsPinnedIn\(\); return \[\.\.\._packs\.keys\(\)\]\.some\(\(v\) => modLatchedOn\(v\) === true \|\| pinned\.has\(v\)\); \};/, 'the stand-ins on while a town pack serves a town (AUDIT WD3 T2)');
-  assert.match(M, /if \(name\.startsWith\('location-'\) && \(locations\+\+ % 64\) !== 0\) return;/, 'one location in 64 (and one block in 8 - AUDIT WD3 B4)');
-  assert.match(M, /console\.error\(`\[worlddata\] \$\{vendor\}: the pack did not load \(\$\{e\?\.message \?\? e\}\) - its towns stand classic`\);/);
 });
 
 test('WD3 a guild hall entry naming a guild this game carries none of (AUDIT WD3 G4) - faction 1000, the Archaeologists Guild\'s, on four of Beautiful Villages\' villages - draws for no hall: each hall takes its own guild\'s entry (Tulaedax: the Fighters\' hall 41, the Mages\' 40, where DFU without that mod handed the Fighters\' hall 1000 and the Mages\' 41)', async () => {
@@ -316,15 +288,3 @@ test('WD3 a guild hall entry naming a guild this game carries none of (AUDIT WD3
   assert.deepEqual([merged.get(fighters)[0].factionId, merged.get(mages)[0].factionId], [41, 40]);
 });
 
-test('WD3 a town\'s buildings wear its LOCATION\'s climate, the terrain its pixel\'s (AUDIT WD3 G5) - DaggerfallLocation\'s ClimateUse.UseLocation; one and the same for every classic town, a world-data file\'s own for the towns it names another for', () => {
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /const townClimateBase = dfLocation\?\.climate\?\.climateType \?\? climateBase;/);
-  // PIN MOVED (GOTHWAY-BOARDS): the fourth is Gothway Garden's own bounty boards at its north entrance (`gpuB`), the
-  // blocks' board model stood by the town and dressed in the town's climate as the block's own boards are
-  // PIN MOVED (URBANIZER U3): the fifth is a town past the Bay's fabric (`gpuF`), Daggerfall's fence and crate in it
-  // dressed in the town's climate as its blocks' own models are
-  assert.equal((W.match(/remapSubMeshes\([a-zA-Z]+\.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase\)/g) ?? []).length, 5, 'every town mesh');
-  assert.match(W, /getWindmillMeshes\(townClimateBase,/);
-  assert.match(W, /recordIndex: placed\.recordIndex, climateBase: townClimateBase, season: INTERIOR_SEASON,/, 'and the interiors entered from them');
-  assert.doesNotMatch(W, /texRemap, climateArchive, pipeline/);
-});

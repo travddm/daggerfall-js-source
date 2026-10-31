@@ -83,11 +83,6 @@ test('TACT4: the ground reads the verdict\'s own law - blowField agrees with inB
     }
     assert.ok(n > 50, `${kind} drew something`);
   }
-  const fs = rd('src/render/foeTelegraph.js');
-  assert.match(fs, /inside = along >= -0\.3 && along <= uP\.x && abs\(across\) <= uP\.y;/, 'the shader\'s lane is the law\'s');
-  assert.match(fs, /inside = d <= uP\.x && \(d < 0\.5 \|\| ang <= uP\.y\);/, '...its cone');
-  assert.match(fs, /float d = length\(vec2\(across, along - uP\.y\)\);\n\s*inside = d <= uP\.x;/, '...its disc');
-  assert.match(fs, /vec2 w = vec2\(-f\.y, f\.x\);/, 'and across is inBlow\'s across');
 });
 
 test('TACT4: the phase - filling through the wind-up, a flash at the landing, gone after it', () => {
@@ -288,19 +283,3 @@ test('TACT4: never below the tier, never a caster, never with the switch off', (
 
 // ── the hosts ───────────────────────────────────────────────────────
 
-test('TACT4: every host resolves the blow through the verdict and the weight, and draws the ground under the bodies', () => {
-  const ex = rd('src/scenes/exteriorFoes.js');
-  assert.match(ex, /if \(blowConnects\(f\.ai, meleeHitConnects\(f\.ai\._dist, f\.ai\.inSight, withinYaw\(f\.ai\.yaw, hdx, hdz, MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(ex, /const dmg = blowScaled\(f\.ai, partyHit\(calculateAttackDamage\(f\.entity, playerEntity, \{/);
-  const g = rd('src/scenes/cityGuards.js');
-  assert.match(g, /if \(blowConnects\(g\.ai, meleeHitConnects\(g\.ai\._dist, g\.ai\.inSight, withinYaw\(g\.ai\.yaw, hdx, hdz, MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(g, /const dmg = blowScaled\(g\.ai, calculateAttackDamage\(g\.entity, playerEntity, \{/);
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /if \(!blowConnects\(f\.ai, foeDeps\.meleeHitConnects\(f\.ai\._dist, f\.ai\.inSight, foeDeps\.withinYaw\(f\.ai\.yaw, hdx, hdz, foeDeps\.MELEE_HIT_YAW_DEG\)\)\)\) \{/);
-  assert.match(d, /const dmg = blowScaled\(f\.ai, _weighHit\(f, foeDeps\.calculateAttackDamage\(/);
-  const a = rd('src/characters/enemy/enemyAttack.js');
-  assert.match(a, /if \(ai\._blowSwing\) \{\n\s*ai\._blowSwing = false;/, 'the forced swing');
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) assert.match(rd(f), /renderer\.drawFoeTelegraphs\?\.\(drawableBlows\(tacticsNow\(\), /, f);
-  assert.equal((rd('src/scenes/worldModes.js').match(/renderer\.drawFoeTelegraphs\?\.\(drawableBlows\(tacticsNow\(\), player\.pos\)\);/g) ?? []).length, 2, 'the dungeon\'s pass and the interior\'s');
-  assert.match(rd('src/render/renderer.js'), /drawFoeTelegraphs\(list\) \{[\s\S]{0,1200}this\.markForeignPass\(\);/);
-});

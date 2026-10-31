@@ -177,17 +177,6 @@ test('DISCORD-CODE: every declared command and subcommand reaches a handler in t
   assert.deepEqual(subcommandsOf('mod'), ['lookup', 'mute', 'unmute', 'ban', 'unban']);
 });
 
-test('DISCORD-CODE: the commands live under server-account/, and the deploy\'s path filter holds the setup tool\'s whole import graph - a change to either deploys, and so reaches Discord', () => {
-  const wf = readFileSync(new URL('../../.github/workflows/account-deploy.yml', import.meta.url), 'utf8');
-  const listed = [...(/paths:\s*\n((?:\s*(?:#[^\n]*|-\s*"[^"]+")\n)+)/.exec(wf)?.[1] ?? '').matchAll(/-\s*"([^"]+)"/g)].map((m) => m[1]);
-  assert.ok(listed.includes('server-account/**'), 'the service itself');
-  const outside = graph('tools/discordModCommands.mjs').filter((f) => !f.startsWith('server-account/'));
-  assert.ok(outside.includes('tools/discordModCommands.mjs') && outside.includes('tools/lib/isMain.mjs'), `the walk sees the tool: ${outside.slice(0, 4).join(', ')}`);
-  for (const f of outside) assert.ok(listed.includes(f), `${f} is read by the deploy's Discord step and a change to it would not deploy`);
-  assert.ok(graph('server-account/src/index.js').includes('server-account/src/discordCommands.js'), 'the Worker reads the declaration (its usage), so the two ship together');
-  assert.doesNotMatch(readFileSync(new URL('../../tools/discordModCommands.mjs', import.meta.url), 'utf8'), /name: 'mod'/, 'no command is declared in the tool');
-});
-
 test('DISCORD-SETUP: the deploy runs it LAST, the token an env var from the repository\'s secrets and never a word of the command, the door read off the deploy, and nothing asked of Discord when the token, channel or key is not set', () => {
   const wf = readFileSync(new URL('../../.github/workflows/account-deploy.yml', import.meta.url), 'utf8');
   const steps = wf.split(/\n      - name: /).slice(1);

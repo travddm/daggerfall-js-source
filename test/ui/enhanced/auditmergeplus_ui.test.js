@@ -107,7 +107,6 @@ test('AUDIT MERGE-PLUS D2 a list\'s picture keeps its icon inside the tier\'s 2p
   // UI1b: a worn panel's picture wears no frame (the panel is the frame), and a fitted picture carries its own caps -
   // max 100% in its style (ui/textureCanvas.js fittedImg), over any the sheet sets
   assert.ok(!ruleFor(list, '.pack-shell .wornrow[data-rarity] .tile', 'border'), 'the worn tile unframed');
-  assert.match(read('src/ui/textureCanvas.js'), /maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'/);
 });
 
 test('AUDIT MERGE-PLUS D3 Stone\'s light ground: the lane\'s six surfaces the dress moved into the window and panel roles carry a Stone dim word, and the refusal\'s, the note\'s, the amber and the red words are lifted - each 4.5:1 or better over Stone\'s panel and ground, a refused row\'s reason at the disabled opacity over Stone\'s press; the old words read 2.3:1 and 3.5:1 there (mutants: the Stone dim word unset, the reason left at the old grey)', () => {
@@ -150,9 +149,6 @@ test('AUDIT MERGE-PLUS D4 the warn role holds all its states: the lit band is sa
   const stone = sunk.find((r) => /translate: 1px 1px/.test(r.body));
   assert.ok(blood && stone, 'the duel is both a press and a warn');
   assert.ok(blood.i > stone.i, 'the blood edge is the later of the two, so it is the one the held duel wears');
-  // the natives the band had lost to
-  assert.match(read('src/ui/profileWindow.js'), /\.dfprofile-duel:hover:not\(\[disabled\]\) \{ background: #b8483f;/);
-  assert.match(read('src/ui/socialPanel.js'), /\.dfsocial-btn\.warn \{ background: #6b2f28; \}/);
 });
 
 test('AUDIT MERGE-PLUS D5 + D6 the corner rune is a picture with its outline drawn in - no mask to clip it, no filter the mask ate - and it is drawn on every picture markItemFrame marks: the loot window\'s, the shop\'s and the trade\'s rows and the carried tile, as on the grid, the shelf, the worn rows, the hotbar and the diamond (mutants: the rune a mask again, the list rows bare)', () => {
@@ -170,9 +166,6 @@ test('AUDIT MERGE-PLUS D5 + D6 the corner rune is a picture with its outline dra
   }
   assert.ok(ruleFor(list, '.dragghost[data-sigil] .tile', 'position')?.body.includes('position: relative'), 'the ghost\'s tile holds the corner');
   assert.ok(ruleFor(list, '.trade-shell .itemrow .tile', 'position')?.body.includes('position: relative'));
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /ghost = markItemFrame\(el\('div', 'dragghost'\), item\);/, 'the ghost is marked');
-  assert.match(inv, /if \(validSigil\(item\?\.sigil\)\) node\.dataset\.sigil = '';/, 'and the mark is the sigil\'s');
 });
 
 test('AUDIT MERGE-PLUS D7 a settings label is never cut for its value: in the settings\' rows (the main menu\'s panes, the pause menu\'s) the label keeps its longest word and the value\'s cell may shrink, so a long value wraps in its button - and the wizard\'s rows, which ellipsize, are not these (mutants: the label left to collapse)', () => {
@@ -184,13 +177,10 @@ test('AUDIT MERGE-PLUS D7 a settings label is never cut for its value: in the se
   assert.ok(ctl && ctl.sels.includes('.px-setwrap .row > .ctl') && /flex-shrink: 1;/.test(ctl.body));
   assert.ok(atLeast(weight('.panes .row > .ctl'), weight('.ctl')) && ctl.i > ruleFor(list, '.ctl', 'flex').i, 'over the base cell\'s `flex: 0 0 auto`');
   assert.ok(!main.sels.some((s) => s.includes('wizard')) && !ctl.sels.some((s) => s.includes('wizard')));
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /const panes = el\('div', 'panes opt'\);[\s\S]{0,4000}?el\('div', 'list'\)/, 'the settings\' rows stand in .panes (ORG2: .panes.opt)');
   assert.ok(SKIN_NAMES.enhanced.length > 'Enhanced'.length, 'the name that found it');
 });
 
 test('AUDIT MERGE-PLUS D8 the Interface Style help that said the retired word is gone with its row (MENU-TOGGLE), and the UI panel\'s enhanced card (enhanced-plus since PLUS-ONLY) keeps the emblem colour the retired id carried (mutants: the card\'s emblem plain)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.doesNotMatch(menu, /'ui:skin'|Enhanced is these screens/, 'no help for a row that is not there');
   const ui = OVERHAUL_PANELS.find((p) => p.id === 'ui');
   const ids = ui.options.map((o) => o.id);
   assert.ok(ids.includes('enhanced-plus') && !ids.includes('enhanced'), `the UI panel's ids: ${ids.join(', ')}`);

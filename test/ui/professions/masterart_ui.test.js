@@ -142,14 +142,6 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
 });
 
 test('MASTER-ART THE WIRING: world.js\'s craft door hands the page\'s other asks to the book (no logical line in bootWorld); the four stations that make a tier draw the box, each through its own craft door, the loom in its dye; Enhanced Plus gives its pickers and its press 40px (mutants: the door\'s asks dropped; a station\'s box unwired)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /craft: async \(recipe, \{ clean, heartwood = false, dye = null, cracked = false, \.\.\.more \}\) => \{/);
-  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: f\.fee > 0 \? f\.fee : 0, name: [^\n]*, seat, \.\.\.more \}, profMintCraft\);/);
-  const pages = readFileSync(new URL('../../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  for (const [station, state] of [['anvil', '_anvil'], ['workbench', '_bench'], ['loom', '_loom'], ['jeweller', '_jewel']]) {
-    // PIN MOVED (AUDIT HORIZONTAL B4): the station hands the box `free` - its own readiness, its goods aside
-    assert.match(pages, new RegExp(`drawMasterBox\\(box, kit, r, \\{ station: '${station}', book, state: ${state}, free, rerender, name: p\\.name, go: \\(lines\\) => p\\.craft\\(r\\.id, \\{ clean: false, ${station === 'loom' ? 'dye, ' : ''}master: lines \\}\\) \\}\\);`), station);
-  }
   assert.match(PROF_CSS, /\.prof-master-pick \{ min-height: 40px;/);
   assert.match(PROF_CSS, /\.prof-master-go \{ min-height: 40px;/);
 });

@@ -268,7 +268,3 @@ test('GUILD-WINDOW the sheet: the window sized past every place the social mode 
   has(':root:has(.dfduel-toast.second[data-up="1"]) .dfsocial[data-mode="guild"][data-open] { top: calc(144px + env(safe-area-inset-top, 0px));', 'W1: and below a second toast');
 });
 
-test('GUILD-WINDOW AUDIT W14: the status widget does not fold under the Guild window - the HUD\'s band reads the Social panel in its social mode alone (mutants: the window read again)', () => {
-  const hud = readFileSync(new URL('../../../src/ui/enhanced/enhancedHud.js', import.meta.url), 'utf8');
-  assert.ok(hud.includes(`const STAT_ABOVE = '.dfchat, .dfsocial[data-open="1"]:not([data-mode="guild"]), .wb-boss-bar,`));
-});

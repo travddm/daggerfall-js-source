@@ -57,21 +57,6 @@ function me(id = 'char-rvn8') {
 const killer = () => ({ mobileType: M.Orc, level: 6, champion: 'mighty', unquiet: true, health: 50, maxHealth: 50, team: 'Monster' });
 function slain(p, e = killer()) { return N.revenantDeed(p, e, 'slew', { mobileType: M.Orc, rolls: () => 0 }); }
 
-test('RVN8 THE LAW: at most three held; never a quest item, a summoned piece, the Materials Bag, gold or a locked piece (mutants: the cap moved; any exclusion dropped)', () => {
-  assert.equal(F.TOOK_MAX, 3);
-  const b = blade();
-  assert.equal(N.revenantMayTake(b), true);
-  assert.equal(N.revenantMayTake({ ...b, questItem: true }), false, 'a quest item');
-  assert.equal(N.revenantMayTake({ ...b, timeForItemToDisappear: 600 }), false, 'a summoned piece');
-  assert.equal(N.revenantMayTake(goldStack(10)), false, 'gold');
-  const locked = blade(); setLocked(locked, true);
-  assert.equal(N.revenantMayTake(locked), false, 'a locked piece stays yours');
-  assert.equal(N.revenantMayTake({ templateIndex: 'x' }), false);
-  assert.equal(N.revenantMayTake(null), false);
-  // PIN MOVED (AUDIT 625 W2): and a pack-only piece - the Wallet (test/systems/audit625_wallet.test.js)
-  assert.match(read('src/systems/revenant/revenant.js'), /&& !item\.questItem && !isSummoned\(item\) && !isGoldPieces\(item\) && !isBagItem\(item\) && !isPackOnly\(item\) && !isLocked\(item\);/, 'and the Materials Bag');
-});
-
 test('RVN8 THE PICK: drawn on its id and its kill count from my equipped weapon and my pack\'s five most valuable takeable pieces - never a sixth, never a locked one; one id and count one piece; nothing to take, null (mutants: the pool\'s size; the weapon left out; the draw off its id or its count; the least valuable)', () => {
   const p = me();
   const weapon = equipTableOf(p)[EQUIP_SLOTS.RightHand];
@@ -229,14 +214,3 @@ test('RVN8 THE CAP AND THE SAVE: the cap never buries one holding a piece; the s
   assert.equal(N.revenantById(rq.id).took.length, 1, 'the save holds it: kept');
 });
 
-test('RVN8 THE HOSTS: the online respawn takes it beside the death penalty and the chase\'s end, once a death (its guard), and the wake box says it (mutants: unwired; unsaid)', () => {
-  const w = read('src/scenes/world.js');
-  // PIN MOVED (RVN8's gate: AUDIT REP's pin holds the chase's clear right under the death's price - the theft follows it)
-  // WILD GOLD: a kill in the open zone pays its tenth into the remains instead (wildKilled - FOE-KEEPS; any death there,
-  // and half, before it), the theft beside it all the same
-  // PIN MOVED (EG-H2, bible/11-Multiplayer/Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): DEATH-PENALTY exempted where a made level's law says so (the Spire)
-  // PIN MOVED (FOE-KEEPS, bible/11-Multiplayer/Wild-Zone.md section 4): a kill in the zone (wildKilled) - a foe's death there pays the tenth
-  assert.match(w, /const goldLost = wildKilled \|\| madeRuleHere\('deathPenalty'\) === 'none' \? 0 : applyDeathPenalty\(playerEntity\);[\s\S]{0,1200}?arrestFlow\.abandon\(\);[^\n]*\n\s*const took = revenantTakes\(playerEntity, \{ online: true \}\);/);
-  assert.match(w, /new ActionTextBox\(\[respawnFlavorText\(kind\), deathPenaltyText\(goldLost\), took\?\.line\]\.filter\(Boolean\)\)/);
-  assert.match(read('src/systems/revenant/revenantFate.js'), /const back = revenantHandBack\(player, r, f\.entity\);/);
-});

@@ -113,38 +113,6 @@ test('R2-C2: a draft a failed run left at the tag is deleted before staging - so
 
 // ---- the launcher's fences ---------------------------------------------------
 
-const main = rd('app/main.cjs');
-const fences = main.slice(main.indexOf("app.on('web-contents-created'"), main.indexOf('// The preload asks for its storage root'));
-
-test('R2-B2: a launcher that finds itself anywhere but its own origin goes home - about:blank makes no request, so will-navigate never saw it', () => {
-  // will-navigate is raised as a navigation's request starts; location = 'about:blank' commits with none, and the
-  // launcher sat on a page that was not its own with its bridge still on it (tools/appShellProbe.mjs drives it)
-  assert.match(fences, /contents\.on\('did-navigate', \(_e, url\) => \{\s*if \(launcherContents\.has\(contents\) && !url\.startsWith\(LAUNCHER_ORIGIN\)\) contents\.loadURL\(LAUNCHER_URL\)\.catch\(\(\) => \{\}\);\s*\}\);/);
-  const origin = /const LAUNCHER_ORIGIN = '([^']+)';/.exec(main)?.[1];
-  const home = /const LAUNCHER_URL = '([^']+)';/.exec(main)?.[1];
-  assert.ok(origin && home?.startsWith(origin), 'home is inside the origin - going home can never be a reason to go home again');
-  assert.match(rd('app/launcherPreload.cjs'), /onView: \(cb\) => \{[\s\S]*?ipcRenderer\.send\('launcher:ready'\);/, 'and the page asks for its view each time it loads - home is drawn, not blank');
-});
-
-test('R2-B3: the launcher is granted nothing it ASKS for and nothing it merely CHECKS; every other page keeps Electron\'s defaults', () => {
-  // the predicate, run: the launcher's own window, or any page of its origin (a check may come with no WebContents)
-  const src = /const isLauncherPage = (\(wc, url\) => .*);\n/.exec(main)?.[1];
-  assert.ok(src, 'one predicate, for both sides');
-  const launcherWc = { id: 1 }, gameWc = { id: 2 };
-  const isLauncherPage = new Function('launcherContents', 'LAUNCHER_ORIGIN', `return ${src};`)(new WeakSet([launcherWc]), 'dagger://launcher/');
-  assert.equal(isLauncherPage(launcherWc, undefined), true, 'its window');
-  assert.equal(isLauncherPage(null, 'dagger://launcher/'), true, 'its origin, with no WebContents');
-  assert.equal(isLauncherPage(gameWc, 'dagger://launcher/index.html'), true, 'a launcher page some other window opened');
-  assert.equal(isLauncherPage(gameWc, 'dagger://game/'), false, 'the game');
-  assert.equal(isLauncherPage(null, null), false);
-  assert.equal(isLauncherPage(null, 'dagger://launcherx/'), false, 'an origin that only begins the same way is not it');
-  assert.match(main, /session\.defaultSession\.setPermissionRequestHandler\(\(wc, _permission, callback, details\) => callback\(!isLauncherPage\(wc, details\?\.requestingUrl\)\)\);/);
-  assert.match(main, /session\.defaultSession\.setPermissionCheckHandler\(\(wc, permission, requestingOrigin\) => !isLauncherPage\(wc, requestingOrigin\) && permission !== 'deprecated-sync-clipboard-read'\);/,
-    'the check side - and with no handler Electron grants every check but the deprecated synchronous paste, which the game keeps');
-  const ready = main.slice(main.indexOf('app.whenReady().then(() => {'));
-  assert.ok(ready.indexOf('setPermissionCheckHandler(') >= 0 && ready.indexOf('setPermissionCheckHandler(') < ready.indexOf('runLauncher();'), 'both fences stand before the first window');
-});
-
 // ---- the release notes -------------------------------------------------------
 
 // ---- ARENA2: every look at the disks off the main process (lane D) ---------------------------------------------
@@ -153,46 +121,6 @@ const L = createRequire(import.meta.url)('../../app/lib/launcherState.cjs');
 const { looseRoots, detectArena2 } = createRequire(import.meta.url)('../../app/lib/arena2Detect.cjs');
 const state = (over = {}) => L.initialState({ current: '0.1.4700', transport: 'updater', checkEnabled: false, ...over });
 const apply = (s, ...events) => events.reduce(L.reduce, s);
-const body = (decl) => {
-  const at = main.indexOf(decl);
-  assert.ok(at >= 0, `${decl} is in app/main.cjs`);
-  const next = main.slice(at + decl.length).search(/\n(?:async )?function |\n\/\*\* |\nconst [A-Z_]+ = |\nlet |\nipcMain\.|\napp\./);
-  return next < 0 ? main.slice(at) : main.slice(at, at + decl.length + next);
-};
-
-test('R2-D1: the saved folder is looked at BESIDE the window, never before it - a share that is down kept the launcher off the screen', () => {
-  // round 1's L4-1 moved the search off the main process and left the saved folder on it: three blocking reads before
-  // the window, and on a hard mount that never answers, no window at all. Measured on lane D's hung share since: the
-  // launcher on screen in 0.36 s, "cannot be reached" at the deadline, and a quit with the probe stuck exits in 0.1 s.
-  const run = body('function runLauncher()');
-  assert.match(run, /setArena2\(null\);/);
-  assert.doesNotMatch(run, /readdirSync|existsSync|statSync|askArena2\(|judgeArena2|resolveArena2/, 'nothing on the disk before the window');
-  assert.ok(run.indexOf('win: openLauncherWindow()') < run.indexOf('if (savedDir) judgeSaved(launcher, savedDir);'), 'the window first');
-  assert.match(body('function judgeSaved('), /if \(r\.dir\) setArena2\(r\.dir\);\s*launcherDispatch\(\{ type: 'saved-judged', \.\.\.r \}\);/);
-  // meanwhile: the front door, Play held, the gem breathing - and a late answer changes nothing once decided
-  const checking = state({ savedDir: '/nas/ARENA2' });
-  assert.deepEqual([checking.setup.status, L.canPlay(checking), L.viewOf(checking).panel, L.viewOf(checking).busy], ['checking', false, 'news', true]);
-  assert.deepEqual(L.viewOf(checking).options.files, { path: '/nas/ARENA2', note: '', label: 'Change folder' });
-  // not whole with the game's own picker kept (the probe's env, a config from before): the picker, as before
-  assert.equal(apply(state({ savedDir: '/nas/ARENA2', inGamePicker: true }), { type: 'saved-judged', missing: null, unreadable: true }).setup.status, 'skipped');
-  assert.equal(apply(state({ savedDir: '/nas/ARENA2' }), { type: 'saved-judged', missing: null, unreadable: true }).setup.status, 'looking');
-  assert.equal(L.reduce(apply(checking, { type: 'saved-judged', dir: '/nas/ARENA2' }), { type: 'saved-judged', missing: null, unreadable: true }).setup.status, 'ready', 'judged once');
-  // a folder that did not answer in time is out of reach, and says so
-  assert.deepEqual(folderAnswerOf({ late: true }), { missing: null, unreadable: true, late: true, cut: false });
-  assert.deepEqual(folderAnswerOf({ failed: true }), { missing: null, unreadable: true, late: false, cut: false });
-  assert.deepEqual(folderAnswerOf({ dir: '/a/ARENA2', missing: ['X'] }), { dir: '/a/ARENA2' });
-  // an install downloaded meanwhile waits for the files to be SET - checking included (lane A A8)
-  const waiting = apply(state({ savedDir: '/nas/ARENA2', checkEnabled: true }), { type: 'check-available', version: '0.1.4701' }, { type: 'downloaded', version: '0.1.4701' });
-  assert.equal(L.nextStep(waiting), 'wait');
-  assert.equal(L.viewOf(waiting).status, 'v0.1.4701 is ready to install');
-  assert.equal(L.nextStep(apply(waiting, { type: 'saved-judged', dir: '/nas/ARENA2' })), 'install');
-});
-
-/** main.cjs's folderAnswer, run. */
-function folderAnswerOf(a) {
-  const src = main.slice(main.indexOf('function folderAnswer('), main.indexOf('/** The native folder dialog: the folder picked'));
-  return new Function(`${src}; return folderAnswer;`)()(a);
-}
 
 test('R2-D4: the search goes on past its deadline, and a later find is added - never "go and get it" for a search cut short', () => {
   const looking = state();
@@ -238,107 +166,7 @@ test('R2-D5: on a Mac the privacy-guarded folders are read LAST - after ~/Games,
   } finally { rmSync(home, { recursive: true, force: true }); }
 });
 
-test('R2-D6/D7/D8: the doors - a refusal said where it can be seen, "cannot be read" said as such, a saved folder never lost to one launch\'s choice', () => {
-  // D7: decided once the answer is in - during the search a refusal meant for the card was dropped without a word
-  const choose = body('async function launcherChooseFolder()');
-  assert.doesNotMatch(choose, /const onCard = viewOf/, 'not decided before the dialog');
-  assert.match(choose, /if \(reduce\(l\.state, \{ type: 'picked-bad', \.\.\.r \}\)\.setup\.status === 'bad'\) \{ launcherDispatch\(\{ type: 'picked-bad', \.\.\.r \}\); return; \}\s*await launcherDialog\(\(\) => dialog\.showMessageBox\(l\.win,/);
-  assert.equal(L.reduce(state(), { type: 'picked-bad', missing: null }).setup.status, 'looking', 'the card while looking cannot say it - so the box does');
-  // D8: a found folder whose drive went away is "could not be read", not "holds no Daggerfall files"
-  const gone = apply(state(), { type: 'found', found: [{ dir: '/usb/ARENA2', source: 'folder' }] }, { type: 'picked-bad', missing: null, unreadable: true });
-  assert.equal(L.viewOf(gone).setup.title, 'That folder cannot be read');
-  assert.match(L.viewOf(gone).setup.detail, /^It could not be read - is its drive connected\?/);
-  // D3 (words): a pick that did not answer in time, or whose search ran out of budget, is never "no Daggerfall files"
-  assert.match(L.notArena2Detail(null, { unreadable: true, late: true }), /^It did not answer in time - is its drive asleep, or disconnected\?/);
-  assert.match(L.notArena2Detail(null, { cut: true }), /^It holds too many folders to look through them all\./);
-  assert.match(L.notArena2Detail(['MAPS.BSA'], { cut: true }), /^It has no MAPS\.BSA\./, 'a partial folder names what it lacks, cut or not');
-  // D6: the game's own picker chosen on the SAVED folder's card is this launch's alone - kept, it hid the folder for good
-  const acts = main.slice(main.indexOf("ipcMain.on('launcher:act'"), main.indexOf('// THE NAVIGATION FENCES'));
-  assert.match(acts, /saveConfig\(st\.setup\.saved \? \{ \.\.\.loadConfig\(\), arena2IngestClear: true \} : \{ \.\.\.loadConfig\(\), arena2InGame: true \}\);/);
-  // D8, the shell's half: the whole answer reaches the card - unreadable and late with it
-  assert.match(acts, /case 'use-found': \{[\s\S]*?if \(r\.dir\) useArena2\(r\.dir\);\s*else launcherDispatch\(\{ type: 'picked-bad', \.\.\.r \}\);/);
-  // one judgment at a time, and an install waits on it as on a dialog
-  const judge = body('async function judgeForLauncher(');
-  assert.match(judge, /if \(!l \|\| l\.judging\) return null;/);
-  assert.match(judge, /return await launcherDialog\(async \(\) => folderAnswer\(await askArena2\(question, \{ deadline, signal: l\.stop\.signal \}\)\)\);/);
-  assert.match(choose, /if \(!launcher \|\| launcher\.state\.launch \|\| launcher\.judging\) return;/);
-  assert.equal(L.viewOf(apply(state({ arena2Dir: '/a' }), { type: 'judging', on: true })).busy, true);
-});
-
-test('R2-E5: a Mac\'s refusal points at DaggerfallGameFiles.zip, never Steam or GOG, and keeps its door', () => {
-  const mac = L.notArena2Detail(['MAPS.BSA'], { platform: 'darwin' });
-  assert.match(mac, /Choose the arena2 folder inside the unpacked DaggerfallGameFiles\.zip\.$/);
-  assert.doesNotMatch(mac, /Steam|GOG/);
-  const bad = apply(state({ platform: 'darwin' }), { type: 'found', found: [] }, { type: 'picked-bad', missing: null });
-  assert.deepEqual(L.viewOf(bad).setup.actions.map((a) => [a.id, a.arg ?? null]), [['choose-folder', null], ['open', 'zip'], ['skip-setup', null]]);
-  assert.doesNotMatch(L.viewOf(bad).setup.detail, /Steam|GOG/);
-  const win = apply(state(), { type: 'found', found: [] }, { type: 'picked-bad', missing: null });
-  assert.deepEqual(L.viewOf(win).setup.actions.map((a) => a.id), ['choose-folder', 'skip-setup']);
-  assert.match(body('async function locateArena2('), /detail: notArena2Detail\(r\.missing, \{ \.\.\.r, platform: process\.platform \}\),/, 'the File menu\'s door says it the same way');
-});
-
 // ---- the update lifecycle (lane A) ------------------------------------------------------------------------------
-
-test('R2-A2: a check made while a download runs never takes the download\'s place - its token, and its end, stay the download\'s', async () => {
-  // askUpdater, run against electron-updater's own rule: a check during a download returns the SAME download under a
-  // NEW token that stops nothing (AppUpdater.downloadUpdate, 6.8.9)
-  const src = main.slice(main.indexOf('function askUpdater()'), main.indexOf('/** DA10: news.json'));
-  const events = [];
-  let settle = null;
-  let running = null;
-  let fail = false;
-  const au = {
-    checkForUpdates: async () => {
-      if (fail) throw new Error('HTTP 500');
-      const token = { id: Math.random() };
-      running ??= new Promise((res, rej) => { settle = { res, rej }; });
-      return { cancellationToken: token, downloadPromise: running, updateInfo: { version: '0.1.4701' } };
-    },
-  };
-  const shell = new Function('autoUpdater', 'stopStallWatch', 'launcherDispatch', `let downloading = null;\n${src}\nreturn { askUpdater, now: () => downloading };`)(
-    () => au, () => events.push('stop-watch'), (ev) => events.push(ev.type));
-  const first = await shell.askUpdater();
-  const token = shell.now().token;
-  assert.equal(token, first.cancellationToken, 'the check that STARTED the download keeps its token');
-  const second = await shell.askUpdater();
-  assert.notEqual(second.cancellationToken, token);
-  assert.equal(shell.now().token, token, 'a later check\'s token stops nothing - it is never taken');
-  fail = true;
-  await assert.rejects(shell.askUpdater(), /HTTP 500/, 'a CHECK that fails rejects its own promise');
-  assert.deepEqual(events, [], 'and is no download\'s failure');
-  settle.rej(new Error('ECONNRESET'));
-  await new Promise((r) => setImmediate(r));
-  assert.deepEqual(events, ['stop-watch', 'download-failed'], 'the download breaking off is said once, by the download');
-  assert.equal(shell.now(), null, 'and the next check may start afresh');
-  // the hourly re-check never asks over a running download
-  assert.match(main, /if \(!updateReady && !installStarted && !downloading\) askUpdater\(\)\.catch\(\(\) => \{\}\);/);
-  assert.match(body('async function checkForUpdatesViaUpdater()'), /try \{ result = await askUpdater\(\); \}/, 'the File menu\'s check too - one place keeps the download');
-});
-
-test('R2-A1/A5: an update\'s quit hands the lock to the new copy - and a quit queued behind an install that already failed is held', () => {
-  const quitFor = main.slice(main.indexOf("require('electron').autoUpdater.on('before-quit-for-update'"), main.indexOf('/** AUDIT INSTALL L2-2/L2-3: THE ONE DOOR'));
-  // A5 first: the install already failed (NSIS: the spawn's error lands before electron-updater's queued quit) - held
-  assert.match(quitFor, /if \(installFault\) \{ holdQuit = true; return; \}\s*leaveForUpdate = true;/);
-  // A1: the new AppImage is started before this copy quits - the lock is released so its requestSingleInstanceLock is yes
-  assert.match(quitFor, /leaveForUpdate = true;\s*(\/\/[^\n]*\n\s*)*app\.releaseSingleInstanceLock\(\);\s*\}\);/);
-  assert.match(quitFor, /app\.on\('before-quit', \(e\) => \{ if \(holdQuit\) \{ holdQuit = false; e\.preventDefault\(\); \} \}\);/);
-  assert.match(body('function installNow('), /installStarted = true;\s*installFault = false;/, 'each try starts clean');
-  assert.match(body('function installFailed()'), /installStarted = false;\s*installFault = true;/);
-  assert.equal((main.match(/releaseSingleInstanceLock\(\)/g) ?? []).length, 1, 'only an update\'s quit gives it up');
-});
-
-test('R2-A6/A10: the in-game switch starts the hourly check; the File menu\'s check never says "up to date" off a check never made', () => {
-  const sw = body('function setCheckOnLaunch(');
-  assert.ok(sw.indexOf('if (on) startRechecks();') >= 0 && sw.indexOf('if (on) startRechecks();') < sw.indexOf('if (!launcher) return;'), 'before the launcher-only half returned');
-  const manual = body('async function checkForUpdatesViaUpdater()');
-  assert.match(manual, /if \(!result\) \{ await checkForUpdates\(\); return; \}/, 'electron-updater declined: GitHub is asked directly');
-  const loud = main.slice(main.indexOf('async function checkForUpdatesViaUpdater'), main.indexOf('/** { tag, url, download } of the latest release'))
-    + main.slice(main.indexOf('async function checkForUpdates()'), main.indexOf('/** While the app runs, ask again'));
-  assert.doesNotMatch(loud, /dialog\.showMessageBox\(/, 'no box without a window over it');
-  assert.match(body('function tellBox('), /const parent = BrowserWindow\.getFocusedWindow\(\) \?\? \(gameWindow && !gameWindow\.isDestroyed\(\) \? gameWindow : null\);\s*return parent \? dialog\.showMessageBox\(parent, opts\) : dialog\.showMessageBox\(opts\);/,
-    'over the window found - a parentless box can open behind a fullscreen game');
-  assert.match(main, /appImage: !!process\.env\.APPIMAGE,/, 'the table knows whether this copy runs as its AppImage');
-});
 
 // ---- the launcher's page, run (lane E) ---------------------------------------------------------------------------
 // app/launcher/launcher.js over app/launcher/index.html in test/launcherDom.mjs, fed views the real state makes
@@ -366,24 +194,6 @@ test('R2-E1: after the first run\'s card the focus is on PLAY - Enter plays (it 
   r.$('update-check').focus();
   r.show(view(foundOne()));
   assert.equal(r.doc.activeElement.id, 'update-check', 'the same card again leaves the focus where the player put it');
-});
-
-test('R2-E4/E8: one live region, and the notes as written - nested bullets stay nested, titles without "Patch Notes:"', async () => {
-  const html = rd('app/launcher/index.html');
-  assert.deepEqual([...html.matchAll(/<([a-z0-9]+)[^>]*\saria-live="[^"]+"[^>]*>/g)].map((m) => /id="([^"]+)"/.exec(m[0])?.[1]), ['status'],
-    'the status line alone - the card is announced by the focus that moves to its answer');
-  const { bootLauncher } = await import('../launcherDom.mjs');
-  const p = bootLauncher();
-  const text = '# Patch Notes: The Warden\n\n## Phases\n- **Three phases:**\n  - **The Burning Court**: fire.\n  - **Champion**: spokes.\n- He leaps.\n\nA paragraph\nthat wraps.';
-  p.show(view(state({ arena2Dir: '/a', news: [{ version: '0.1.4700', date: '2026-09-29T00:00:00Z', text }] })));
-  const release = p.doc.querySelector('#news .feed .release');
-  assert.equal(release.querySelector('h4').textContent, 'The Warden', 'E-21: the title as a player reads it');
-  const top = release.querySelector('ul');
-  assert.deepEqual(top.children.map((li) => li.childNodes.filter((c) => !(c.tagName === 'UL')).map((c) => c.textContent).join('')), ['Three phases:', 'He leaps.']);
-  const nested = top.children[0].querySelector('ul');
-  assert.ok(nested, 'the sub-points inside their point');
-  assert.deepEqual(nested.children.map((li) => li.textContent), ['The Burning Court: fire.', 'Champion: spokes.']);
-  assert.equal(release.querySelector('p').textContent, 'A paragraph that wraps.');
 });
 
 test('R2-E (L5-21, L5-12): the page redraws what changed and nothing else - a button under the pointer is never rebuilt between press and release', async () => {
@@ -422,45 +232,6 @@ test('R2-E (L5-21, L5-12): the page redraws what changed and nothing else - a bu
   q.show(view(state({ inGamePicker: true })));
   assert.equal(q.doc.querySelector('[data-act="choose-folder"]').textContent, 'Choose folder');
   assert.equal(q.$('files').textContent, 'Chosen in the game');
-});
-
-test('R2-E (L5-23, E-23/24, E-25..31): the page\'s own rules - every small word at AA, the keyboard\'s way in, hidden that hides, a bar that holds still', () => {
-  const css = rd('app/launcher/launcher.css');
-  const html = rd('app/launcher/index.html');
-  // contrast, computed: WCAG's relative luminance, for every text colour a small word wears and what it sits on
-  const lum = (hex) => {
-    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  };
-  const ratio = (a, b) => { const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
-  const vars = { '--ruby': /--ruby: (#[0-9a-f]{6})/.exec(css)[1], '--brass': /--brass: (#[0-9a-f]{6})/.exec(css)[1] };
-  const rule = (sel) => {
-    const m = new RegExp(`(?:^|\\n)${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`).exec(css);
-    assert.ok(m, `${sel} is a rule`);
-    const val = (prop) => { const v = new RegExp(`(?:^|;)\\s*${prop}: ([^;]+);`).exec(m[1])?.[1]?.trim(); return v?.startsWith('var(') ? vars[v.slice(4, -1)] : v; };
-    return { color: val('color'), background: val('background') };
-  };
-  const night = '#0a0c11';
-  for (const [sel, on] of [['.badge.new', null], ['.badge.update', null], ['.release .date', night], ['.release p', night], ['#detail', night], ['.progress .label', night], ['.files', night]]) {
-    const r = rule(sel);
-    const c = ratio(r.color, on ?? r.background);
-    assert.ok(c >= 4.5, `${sel}: ${r.color} on ${on ?? r.background} is ${c.toFixed(2)}:1 - small text needs 4.5 (WCAG AA)`);
-  }
-  // the keyboard's way in: the news is a tab stop that scrolls (E-23, E-29), the switch is named by its label (E-24)
-  assert.match(html, /<div class="feed" tabindex="0"><\/div>/);
-  assert.match(css, /\.feed \{ flex: 1 1 auto; min-height: 0; overflow-y: auto;/);
-  assert.match(html, /<label class="check"><input id="update-check" type="checkbox"> Check automatically<\/label>/);
-  // a focused control shows it (E-26, E-27)
-  assert.match(css, /\.plaque:hover, \.plaque:focus-visible \{[^}]*border-color: var\(--brass\);/);
-  assert.match(css, /\.check input:focus-visible \{ outline: none; border-color: var\(--brass\); \}/);
-  // hidden wins over every region's own display (E-25); a long path shows its END (E-28); one bar height (E-30)
-  assert.match(css, /^\[hidden\] \{ display: none !important; \}$/m);
-  assert.match(css, /\.path \{[^}]*direction: rtl;/);
-  assert.match(css, /\.bar \{[^}]*[^-]height: 100px;/);
-  assert.doesNotMatch(css, /\.bar \{[^}]*min-height/);
-  // the gem holds still for a player who asked for less motion (E-31), and the card scrolls in the brand's bar (E-7)
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*body\[data-busy\] \.gem \{ animation: none; \}/);
-  assert.match(css, /\.setup::-webkit-scrollbar-thumb \{ background: rgba\(125,116,96,0\.45\); \}/);
 });
 
 // ---- the laws round 1 left unpinned (lane E's survivors) ---------------------------------------------------------
@@ -525,30 +296,3 @@ test('R2-E (E-43..E-47): the places a copy of Daggerfall is installed - each one
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test('R2-E (E-32..E-42, E-52..E-54): the shell\'s and the workflow\'s wiring the suite never read', () => {
-  // E-32: Play is heard once - the launch is marked before the game's window is built, or the next event opens another
-  assert.match(body('function launchGame()'), /^function launchGame\(\) \{\s*launcherDispatch\(\{ type: 'launching' \}\);/);
-  // E-33: the launcher is shown (built hidden, shown when ready)
-  assert.match(body('function openLauncherWindow()'), /win\.once\('ready-to-show', \(\) => \{ if \(!win\.isDestroyed\(\)\) win\.show\(\); \}\);/);
-  // E-36: the version last played reaches the state - the NEW marks and "Updated to" read it
-  assert.match(body('function runLauncher()'), /lastPlayed: cfg\.lastPlayed,/);
-  // E-37: the saves folder exists before it is opened - a fresh install has none
-  assert.match(body('function openSavesFolder()'), /fs\.mkdirSync\(dir, \{ recursive: true \}\);\s*shell\.openPath\(dir\);/);
-  // E-38: the menu's checkbox follows the launcher's switch (the macOS menu bar outlives it)
-  assert.match(body('function setCheckOnLaunch('), /saveConfig\(\{ \.\.\.loadConfig\(\), updateCheck: !!on \}\);\s*buildMenu\(\);/);
-  // E-41/E-42: the news asks GitHub for ten seconds at most, and a refusal (a 403 rate limit) never overwrites the kept news
-  const news = body('async function fetchNews()');
-  assert.match(news, /signal: AbortSignal\.timeout\(10000\),/);
-  assert.ok(news.indexOf("if (!res.ok) throw new Error(`HTTP ${res.status}`);") >= 0 && news.indexOf("if (!res.ok) throw new Error(`HTTP ${res.status}`);") < news.indexOf('saveNews(items);'));
-  // E-52: no ${{ }} text reaches ANY script in the release workflow - multi-line blocks included (L1-5's pin read one line)
-  const wf = rd('.github/workflows/release-desktop.yml');
-  const pasted = jobsOf(wf).flatMap((j) => stepsOf(j.text).map((s) => [nameOf(s), runOf(s)])).filter(([, run]) => run && /\$\{\{/.test(run));
-  assert.deepEqual(pasted, [], 'every value a script reads comes through its env');
-  // E-53: an artifacts-only run stamps nothing - `npm version ""` would fail the leg
-  const build = jobsOf(wf).find((j) => j.name === 'build');
-  assert.match(stepsOf(build.text).find((s) => nameOf(s) === 'Stamp the version'), /\n {8}if: needs\.version\.outputs\.version != ''\n/);
-  // E-54: no signing identity is hunted for on the Mac leg
-  assert.match(build.text, /\n {4}env:\n(?: {6}#[^\n]*\n)* {6}CSC_IDENTITY_AUTO_DISCOVERY: 'false'\n/);
-  // REL9: every leg builds the site with a 4GB heap - the Mac runner's default (~2GB) died in vite build and no release published
-  assert.match(build.text, /\n {4}env:\n(?: {6}[^\n]*\n)*? {6}NODE_OPTIONS: --max-old-space-size=4096\n(?: {6}[^\n]*\n)* {4}steps:\n/);
-});

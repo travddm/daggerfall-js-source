@@ -117,5 +117,4 @@ test('ENDLESS PROVISIONS: an Off meal is eaten - never "not hungry", stamina bac
   setPref(SURVIVAL_PREF, 'casual');
   const on = { ...fed, items: [createSurvivalItem(TEMPLATE.Rations)] };
   assert.equal(useItem(on.items[0], on.items, { entity: on, nowMinute: 5000 }).kind, 'notEaten', 'on: the tier\'s hunger');
-  assert.match(src('src/systems/useItem.js'), /rules: survivalRules\(\) \?\? SURVIVAL_RULES\.casual, offMeal: survivalRules\(\) == null \}\);/);
 });

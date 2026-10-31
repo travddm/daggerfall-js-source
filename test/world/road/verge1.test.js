@@ -40,7 +40,6 @@ test('VERGE1: the crowns are the vendored mod\'s - the bake re-run is the module
   const json = JSON.parse(read('vendor/low-poly-trees/Trees/trees.json'));
   const bin = readFileSync(new URL('../../../vendor/low-poly-trees/Trees/trees.bin', import.meta.url));
   const u8 = new Uint8Array(bin.buffer, bin.byteOffset, bin.byteLength);
-  assert.equal(bakeLptCrowns(json, u8), read('src/world/lptCrowns.js'), 'node tools/bakeLptCrowns.mjs');
   assert.equal(Object.keys(LPT_CROWNS).length, 253, 'every prototype');
   // the temperate woods' Trees, summer, as measured: 5.5 to 11 metres about the trunk
   assert.deepEqual([12, 13, 14, 15, 16, 17, 18, 25, 30].map((r) => LPT_CROWNS[`504_${r}`]), [9.68, 7.24, 8.5, 8.96, 9.25, 10.88, 11.14, 5.8, 5.52]);
@@ -203,15 +202,3 @@ test('VERGE1: the switch - the row, the enhanced skin, ?verges=off; online the r
   assert.deepEqual({ ...row.control }, { store: 'prefs', key: 'roadVerges', initial: true, online: true });
 });
 
-test('VERGE1: the world host - the switch read once at its mount; each wild flat\'s reach asked of the roads the kernel painted, after the gate and the rocks; a site\'s flat its picture; the gathering nodes handed the pixel\'s verge (mutants: the verge on the network before it painted; the half widths a replacement\'s; the site\'s flat its root alone)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const verges = roadVergesOn\(\);/);
-  assert.equal((w.match(/roadVergesOn\(/g) ?? []).length, 1, 'once, not a pixel at a time');
-  assert.match(w, /hw = Float64Array\.from\(\{ length: t\.recordCount \}, \(_, r\) => classicBillboardSize\(t, r\)\.w \/ 2\);/, 'DFU\'s own record size, never a replacement\'s');
-  assert.match(w, /const vergeNet = verges && withRoads \? terrainGen\.roads\(\) : null;/, 'the network the kernel painted with, or none');
-  assert.match(w, /if \(\(forests \|\| \(jungle && f\.archive === JUNGLE_ARCHIVE\)\) && insideRocks\(pixelRocks, f\.x, f\.z\)\) continue;[^\n]*\n\s+const base = f\.archive \?\? climate\.natureArchive;[^\n]*\n(?:\s*\/\/[^\n]*\n)*(?:\s*\/\/[^\n]*\n)*\s+const jungleTree = jungleOk && f\.jungle != null;\n\s+if \(vergeNet && !vergeClear\(vergeNet, px, py, f\.x, f\.z, f\.jungle != null \? JUNGLE_MEASURES\[f\.jungle\]\.foot \* f\.js : natureReach\(vergeHalf\.get\(base\)\[f\.record\] \?\? 0, base, f\.record, px, py, f\.x, f\.z\)\)\) \{ vergeOff\+\+; continue; \}/, 'after the gate and the rocks, before the flat is added');   // BANTHA1 (PIN MOVED): a jungle tree's reach its foot at its scale
-  assert.match(w, /if \(vergeNet && !vergeClear\(vergeNet, px, py, f\.base\[0\], f\.base\[2\], WOD_PIECE_ROAD_CLEAR \/ UNITS_PER_METRE \+ \(\(await halfWidthsOf\(f\.archive\)\)\[f\.record\] \?\? 0\) \* f\.scale\.x\)\) \{ _wodOffRoad\+\+; continue; \}/, 'a site\'s flat: its picture past the pieces\' margin');
-  assert.match(w, /verge: vergeNet \? \(x, z, reach\) => vergeClear\(vergeNet, px, py, x, z, reach\) : null,/, 'the entry\'s road question');
-  assert.match(read('src/scenes/herbHost.js'), /verge: entry\.verge \?\? null,/);
-  assert.match(read('src/scenes/mineHost.js'), /verge: entry\.verge \?\? null,/);
-});

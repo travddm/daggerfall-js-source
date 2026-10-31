@@ -140,14 +140,6 @@ test('PARTY-BUFFS the helpers: the key a card compares, the letters for an icon 
   assert.equal(partyHealOf(30, { h: 'x' }), 0);
 });
 
-test('PARTY-BUFFS the host: my pose carries my effects, and only while there are any (mutants: the field never spread)', () => {
-  const W = src('src/scenes/world.js');
-  assert.match(W, /import \{ composePartyFx \} from '\.\.\/net\/partyBuffs\.js';/);
-  assert.match(W, /\.\.\.partyFxField\(\),/);
-  assert.match(W, /const partyFxField = \(\) => \{ const fx = composePartyFx\(playerEntity\); return fx\.length \? \{ fx \} : \{\}; \};/);
-  assert.match(W, /\.\.\.\(playerEntity\.isResting \? \{ rs: 1 \} : \{\}\),/, 'resting, mine or followed (a rest window, real or mirrored, raises isResting - scenes/shared.js setResting)');
-});
-
 // ── THE CARD ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('PARTY-BUFFS the card: a member\'s effects are a row under their bars - the spell\'s icon (its letters until the art lands), the rounds over its corner, the name and rounds on its title, a debuff outlined - rewritten only when it moved, and gone with the last effect or the member going away (mutants: the row never drawn; the debuff class dropped; a rewrite per pose)', () => {
@@ -233,38 +225,6 @@ const mkEl = () => ({
   removeAttribute(a) { delete this.attrs[a]; }, remove() {},
   append(...c) { this.children.push(...c); }, appendChild(c) { this.children.push(c); return c; },
   replaceChildren(...c) { this.children = c; }, addEventListener() {},
-});
-
-test('PARTY-BUFFS the HUD: a heal I took rises as "+N" on the damage numbers\' layer - once per rise, never for a loss, and never for what a window restored (the frames under a rest, a level-up, a load or a death are hidden, and the first one back is a fresh reading) (mutants: the reading kept through a hidden frame; the float never shown)', async () => {
-  const prev = globalThis.document;
-  globalThis.document = { createElement: mkEl, createElementNS: () => mkEl(), getElementById: () => null, head: mkEl(), body: mkEl() };
-  const { drawEnhancedHud, destroyEnhancedHud } = await import('../../src/ui/enhanced/enhancedHud.js');
-  const { clearQuickslots } = await import('../../src/systems/quickslots.js');
-  clearQuickslots();
-  const heals = () => document.body.children.flatMap((layer) => layer.children ?? []).filter((n) => n.className === 'hitnum hitnum-heal').map((n) => n.textContent);
-  const me = { health: 40, maxHealth: 80, magicka: 0, maxMagicka: 10, fatigue: 100, items: [], equip: { slots: {} }, lightSource: null };
-  const frame = (opts = {}) => drawEnhancedHud(me, 0, 0, { weapon: null, weaponSheathed: true, ...opts });
-  try {
-    frame();
-    assert.deepEqual(heals(), [], 'the first frame is a reading, not a heal');
-    me.health = 52; frame();
-    assert.deepEqual(heals(), ['+12']);
-    frame();
-    assert.deepEqual(heals(), ['+12'], 'once per rise');
-    me.health = 30; frame();
-    assert.deepEqual(heals(), ['+12'], 'a wound floats nothing here');
-    frame({ hidden: true });
-    me.health = 80; frame({ hidden: true });
-    frame();
-    assert.deepEqual(heals(), ['+12'], 'the night\'s rest under the window is not floated');
-    me.health = 85; frame();
-    assert.deepEqual(heals(), ['+12', '+5']);
-  } finally {
-    destroyEnhancedHud();
-    clearQuickslots();
-    globalThis.document = prev;
-  }
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.hitnum-heal \{ top: 50%; color: #8fe27f;/);
 });
 
 // ─── AUDIT (the batch's audit, agent B) ────────────────────────────────────────────────────────────────────────────

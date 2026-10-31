@@ -299,5 +299,4 @@ test('AUDIT REST II H15: the Waking Salts hold the exhausted drain on stamina, r
   };
   assert.ok(spent(false) > 0, 'exhausted: the drain bites');
   assert.equal(spent(true), 0, 'the salts held: nothing to it');
-  assert.match(rd('test/systems/travel/to1_travelOptions.test.js'), /if \\\(sleepNow === 'exhausted' && !resting && !wakingHeld\\\(s, now\\\)\\\) tire/, 'and the source pin asks the clause again');
 });

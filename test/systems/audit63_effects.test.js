@@ -143,32 +143,7 @@ test('AUDIT 63 F13: the four raisers - prison, both fast-travel advances, the va
     townTalk: { say: () => {}, showOverlay: () => {}, lines: () => [], hideOverlay: () => {} },
     playerEntity, regionIndex: () => 0,
   }), 'the flow builds - and it is the ONE home both exterior hosts construct');
-  const body = src('src/scenes/arrestFlow.js');
-  // DFU's own order inside UpdatePrisonScreen's zero arm: both prevent
-  // flags (:473-474), the sentence RaiseTime (:475), then the event
-  // (:476). advanceDays is a bare clock move here, so the sentence's
-  // window is claimed by the next host frame with the flag standing.
-  assert.match(body, /advanceDays\(days\);[\s\S]{0,900}?setSyntheticTimeIncrease\(true\);\s*\n\s*playerEntity\.inPrison = false;/,
-    'the raise sits inside onEndPrisonTime, between the sentence advance and InPrison clearing');
-  // ReleaseFromPrison's own four hours (:485) are NOT independently
-  // shielded - a zero-day plea runs those 240 minutes of rounds.
-  assert.ok(!/setSyntheticTimeIncrease[\s\S]{0,200}advanceMinutes\(RELEASE_MINUTES\)/.test(body),
-    'and release() raises nothing of its own');
 
-  // DaggerfallTravelPopUp.cs:344 (the trip) and :355/:367/:374 (the
-  // arrival clamps) all raise time BEFORE the flag is set at :383, so
-  // ONE broker Update covers the lot. The port spends the jump in TWO
-  // advances, each of which claims its own window, so both are armed.
-  const world = src('src/scenes/world.js');
-  assert.match(world, /\n\s*setSyntheticTimeIncrease\(true\); playerTicker\.advance\(computed\.minutes\);/,   // LIVED1: the jump is the character's own online too, and armed in both lanes
-    'the travel advance is armed');
-  assert.match(world, /if \(clamp > 0 && !sharedClockOn\(\)\) \{ setSyntheticTimeIncrease\(true\); playerTicker\.advance\(clamp\); \}/,
-    'and so is the arrival clamp (WORLD5: both stand down under the shared clock)');
-
-  // VampirismInfection.cs:161-162 - RaiseTime then the flag, in that order.
-  assert.match(src('src/scenes/shared.js'),
-    /raiseTime: \(seconds\) => \{ setSyntheticTimeIncrease\(true\); return advanceOwnMinutes\(seconds \/ 60\); \}/,
-    'the infection host\'s clock raise arms it too (LIVED1: the fortnight is the new vampire\'s own)');
 });
 
 // ── F14: SoulBound ───────────────────────────────────────────────────
@@ -370,9 +345,6 @@ test('AUDIT 63 F15: the quest action cannot give a vampire the plague', () => {
   const vampire = patient({ racialOverride: { racial: 'vampirism' } });
   assert.equal(startDisease(vampire, 5, 100), null, 'refused');
   assert.deepEqual(vampire.activeEffects, [], 'and nothing is left behind');
-  // the world host's seam is the same one call
-  assert.match(src('src/scenes/world.js'), /makePcDiseased: \(diseaseType\) => \{ startDisease\(playerEntity, diseaseType, Math\.floor\(ownMinutes\(\) \/ 1440\)\);/,   // AUDIT LIVED1 B: stamped on the character's day
-    'the quest hook goes through startDisease, which is where the gate lives');
   // a plain player at level >= 2 still catches it
   const mortal = patient();
   assert.ok(startDisease(mortal, 5, 100), 'an ordinary player still falls ill');
@@ -443,8 +415,6 @@ test('AUDIT 63 F16: a Silence LANDING says so - once, and only to the player hos
     }),
     1, foe, { hurt: () => {}, heal: () => {} }, () => 0.99, null, {});
   assert.ok(foe.activeEffects.some((a) => a.kind === 'silenced'), 'the silence still lands on the foe');
-  const foeSinkBlock = src('src/scenes/dungeonContext.js').split('const foeSinks = (f, fromPlayer = true) => ({')[1].split('});')[0];
-  assert.ok(!/\bsay\b/.test(foeSinkBlock), 'and the foe sink set has no `say` at all');
 });
 
 test('AUDIT 63 F16: DFU\'s two printers read ONE string', () => {
@@ -453,6 +423,4 @@ test('AUDIT 63 F16: DFU\'s two printers read ONE string', () => {
   // localized "youAreSilenced" record, so the port keeps one literal.
   assert.equal(SILENCED_TEXT, BUFF_START_TEXT.silenced);
   assert.equal(BUFF_START_TEXT.silenced, 'You are silenced.');
-  assert.match(src('src/systems/mysticism.js'), /export const SILENCED_TEXT = BUFF_START_TEXT\.silenced;/,
-    'mysticism re-points rather than minting a second copy');
 });

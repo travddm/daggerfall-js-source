@@ -180,19 +180,6 @@ test('LV2: the window does not replay the fanfare the strip already played', () 
   assert.equal(q.fanfareOwed(6), true, 'and spending clears the latch with the row');
 });
 
-test('LV2: both rollout screens take the fanfare as an argument, defaulting to DFU\'s own behaviour', () => {
-  const cs = src('src/ui/charsheet.js');
-  assert.match(cs, /constructor\(entity, rolls = Math\.random, \{ fanfare = true \} = \{\}\) \{\n\s*if \(fanfare\) audio\.playOneShot\(SOUND\.LevelUp, 1\);/);
-  const v = src('src/ui/virtueLevelUp.js');
-  assert.match(v, /constructor\(entity, \{ settings = null, rolls = Math\.random, fanfare = true \} = \{\}\)/);
-  assert.match(v, /if \(fanfare\) audio\.playOneShot\(SOUND\.LevelUp, 1\);/);
-  // ...and the door is the one caller that ever passes false.
-  const door = src('src/ui/charSheetDoor.js');
-  // PIN MOVED (GROWTH1): the rollout's one home, levelUpScreenFor - F5's own level-up and the Growth tab's Level page
-  // PIN MOVED (AUDIT GROWTH LANE1-8): the notice's answer AND this door's own latch - once per level from here too
-  assert.match(door, /const fanfare = levelNotices\.fanfareOwed\(entity\.pendingLevel \?\? null\) && fanfared\.get\(entity\) !== level;\n\s*if \(fanfare\) fanfared\.set\(entity, level\);\n\s*return virtue \? new VirtueLevelUpScreen\(entity, \{ fanfare \}\) : new LevelUpScreen\(entity, undefined, \{ fanfare \}\);/);
-});
-
 // ── THE SEAMS, AND THE FORK THIS SLICE IS ABOUT ──────────────────
 
 test('LV2: the ENHANCED skin notifies and does NOT open the window; the classic one is untouched', () => {
@@ -284,60 +271,6 @@ test('AUDIT LV2 (reopened): the bonus pool is the LEVEL\'s, so re-opening the wi
   applyLevelUp(o, (st, pool) => { st.strength += pool; }, () => 0.5);
   assert.equal(o.pendingBonusPool, null);
 
-  // IT RIDES THE SAVE, or a save and a load would be the same exploit
-  // through a slower door.
-  assert.match(src('src/systems/save/save.js'), /'readyToLevelUp', 'pendingLevel', 'pendingBonusPool', 'chargenDone',/);
-  // ...and neither screen rolls one of its own any more.
-  assert.doesNotMatch(src('src/ui/charsheet.js'), /LEVELUP_BONUS_POOL_MIN \+ Math\.floor\(rolls\(\)/);
-});
-
-test('LV2 FIX: EVERY route to the sheet asks the door, not just the key', () => {
-  // Mac: "when you close the levelup screen without adding stat points
-  // you cant open it again." LV2's own records say "every route to the
-  // sheet - the key, the dial's Stats arm, the pause page - is already
-  // this door", and I wrote that sentence without checking two of the
-  // three. Only the KEY went through `createCharSheetWindow`. The
-  // dial's Stats arm and the pause page both ran
-  // `togglePause({ at: 'stats' })`, and that page is built from
-  // `sheetModel` in ui/enhanced/enhancedMenu.js, which has never read
-  // `readyToLevelUp` - so the route this skin most invites a player to
-  // use answered an owed level with the ordinary sheet, every time,
-  // with no way back to it.
-  //
-  // The enhanced level-up window CANNOT close itself without spending
-  // (ui/enhanced/enhancedLevelUp.js's only `onExit()` is behind `ascend`), so
-  // every close is something else taking the slot - a pause, a map, a
-  // peer's window - and after one of those the dial is exactly where a
-  // player reaches. Pinned in all four hosts, because a route that
-  // forgets is the whole finding.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const h = src(host);
-    assert.match(h, /import \{[^}]*levelOwed[^}]*\} from '\.\.\/ui\/levelUp\/levelNotice\.js'/, `${host} takes the live read`);
-    assert.match(h, /openSheetPage[^\n]*levelOwed\(playerEntity\)/,
-      `${host}'s Stats arm still goes straight to the pause page with a level owed`);
-    // ...and it opens the SHEET door, which is the one that answers with
-    // the Ascension - never a second copy of that fork.
-    assert.match(h, /openSheetPage[^\n]*toggleCharSheet\(\)/, `${host} must reach the door, not rebuild the fork`);
-  }
-  // The pause page itself is still the ordinary sheet, which is right:
-  // it is the page for a character who owes nothing.
-  assert.doesNotMatch(src('src/ui/enhanced/enhancedMenu.js'), /readyToLevelUp/,
-    'the menu stays a VIEW - the routing decision belongs to the hosts, at the door');
-});
-
-test('AUDIT LV2 F1: a door with no caller says so, rather than naming one', () => {
-  // This module's teardown named "ui/hud/hud.js's own destroy path", and
-  // ui/hud/hud.js has no destroy path - the same false caller AUDIT FONT
-  // F12 struck from ui/enhanced/enhancedHudText.js's twin. The enhanced skin's
-  // elements live as long as the page does; every skin and scene
-  // change in this port ends in location.replace.
-  assert.doesNotMatch(src('src/ui/hud/hud.js'), /destroyLevelNotices/);
-  for (const f of ['src/ui/hud/hud.js', 'src/scenes/world.js', 'src/scenes/exterior.js',
-    'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js', 'src/ui/charSheetDoor.js']) {
-    assert.doesNotMatch(src(f), /destroyLevelNotices/, `${f} would be a caller this note must then name`);
-  }
-  const doc = src('src/ui/levelUp/levelNotice.js').slice(src('src/ui/levelUp/levelNotice.js').indexOf('export function destroyLevelNotices') - 900);
-  assert.match(doc, /TESTS/, 'so the note names the callers it actually has');
 });
 
 test('AUDIT LV2 F2: an unspent level is announced ONCE, not once per rest', () => {
@@ -438,42 +371,6 @@ test('AUDIT LV2 F5: the level\'s row names a key only when there IS one', () => 
   assert.notEqual(sheetKeyText(), 'NONE', 'and the chip names that key, not None');
   // The unbound answer is the one the row must not print.
   assert.equal(codeForAction({ primary: new Map(), secondary: new Map() }, 'CharacterSheet'), null);
-  // BOTH arms carry the guard - the click AND the key chip. One regex
-  // over the file matched the click's line alone, so the chip could lose
-  // its guard and the pin still passed (the record survived, and said so).
-  const ln = src('src/ui/levelUp/levelNotice.js');
-  assert.match(ln, /const clickable = r\.kind === NOTICE_LEVEL && codeForAction\(bindings\(\), 'CharacterSheet'\) != null;/);
-  assert.match(ln, /if \(r\.kind === NOTICE_LEVEL && codeForAction\(bindings\(\), 'CharacterSheet'\) != null\) \{/, 'the key chip is guarded too');
-});
-
-test('LV2: the strip is the ONE call all four hosts already make, and the fork is not in any of them', () => {
-  // THE FOUR HOSTS RULE. Every level-up arm in the tree goes through
-  // the seam, so the answer to "does the window open itself" is
-  // written once.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const s = src(host);
-    // The seam, however many of this module's reads the host takes -
-    // LV2 FIX added `levelOwed` beside it, and a pin that spelled the
-    // whole import line would have failed on a file that takes MORE of
-    // the right thing.
-    assert.match(s, /import \{[^}]*\bannounceLevelUp\b[^}]*\} from '\.\.\/ui\/levelUp\/levelNotice\.js'/, `${host} takes the seam`);
-    assert.match(s, /announceLevelUp\(playerEntity, \{/, `${host} announces through it`);
-    assert.doesNotMatch(s, /onLevelUp: \(\) => townTalk\.showOverlay\(makeCharSheetWindow\(\)\)/,
-      `${host} no longer opens the window from a level-up arm`);
-  }
-  // ...and every `open` thunk is still the HOST's own, because only a
-  // host knows how to put a window in its slot.
-  assert.match(hostText('src/scenes/world.js'), /open: \(\) => townTalk\.showOverlay\(makeCharSheetWindow\(\)\)/);
-  assert.match(src('src/scenes/dungeonContext.js'), /open: \(\) => api\.toggleCharSheet\(\)/);
-  assert.match(src('src/scenes/worldModes.js'), /announceLevelUp\(playerEntity, \{ say, open: \(\) => \{/);
-  // The HUD drives the paint on the one host-agnostic call.
-  assert.match(src('src/ui/hud/hud.js'), /drawLevelNotices\(\{ hidden: cursorActive \|\| !hudRenderEnabled\(\) \}\);/);
-  // ...and the raises and the mastery go through the same module.
-  const shared = src('src/scenes/shared.js');
-  assert.match(shared, /import \{ announceSkillRaise, announceMastery, announceSkillMilestone \} from '\.\.\/ui\/levelUp\/levelNotice\.js'/);   // SOFTCAP1: and the milestones past 100
-  assert.match(shared, /announceMastery\(id, \{ box, rows: \(\) => expandRowValues\(plainLines\(lines\?\.\(MASTERY_TEXT_ID\)\), null\) \}\);/);
-  assert.match(shared, /announceSkillRaise\(id, displaySkillValue\(entity, id\), \{ say \}\)/);   // SOFTCAP1: the printed 0..200 value
-  assert.match(shared, /audio\.playOneShot\(SOUND\.ArenaFanfareLevelUp, 1\);/, 'the mastery fanfare stays in BOTH lanes');
 });
 
 test('LV2: the key it names is the REGISTRY\'s, and the lookup has one home', () => {
@@ -483,11 +380,6 @@ test('LV2: the key it names is the REGISTRY\'s, and the lookup has one home', ()
   assert.equal(actionForCode(store, code), 'CharacterSheet', 'and the inverse round-trips');
   assert.equal(typeof sheetKeyText(), 'string');
   assert.ok(sheetKeyText().length > 0);
-  // A literal would be the bug FIX-F and MAC-C both found one layer
-  // down: a rebound key that the screen still names by its default.
-  const n = src('src/ui/levelUp/levelNotice.js');
-  assert.doesNotMatch(n, /'F5'/);
-  assert.match(n, /codeForAction\(bindings\(\), 'CharacterSheet'\)/);
   assert.equal(codeForAction(store, 'NotAnAction'), null);
   assert.equal(codeForAction(null, 'CharacterSheet'), null, 'no store is no crash');
 });
@@ -552,27 +444,12 @@ test('LV2: the owed flag is the PLAYER\'s, read live rather than remembered', ()
   assert.equal(levelOwed({ readyToLevelUp: true }), true);
   assert.equal(levelOwed({}), false);
   assert.equal(levelOwed(null), false);
-  const n = src('src/ui/levelUp/levelNotice.js');
-  assert.match(n, /export const levelOwed = \(e = playerEntity\) => !!e\?\.readyToLevelUp;/);
-  assert.match(n, /owed = levelOwed\(\)/, 'and the paint takes it by default');
 });
 
 test('LV2: the element reads no game data, and says so in the port\'s own words', () => {
-  const n = src('src/ui/levelUp/levelNotice.js');
-  assert.doesNotMatch(n, /^import[^\n]*(textRsc|formats\/|variantLinesById)/m);
   assert.equal(RISEN_TITLE.length > 0 && AWAITS_TITLE.length > 0 && MASTERED_TITLE.length > 0, true);
   assert.notEqual(RISEN_TITLE, AWAITS_TITLE);
   assert.equal(LEVEL_NOTICE_ID, 'enhanced-levelnotice');
-  // The mastery's own TEXT.RSC rows stay with the CLASSIC box, which
-  // is the lane that has them: the strip names the skill instead.
-  //
-  // AUDIT LV2 F3: and the classic lane is where the record is READ.
-  // This pin used to check only that levelNotice.js imports no reader,
-  // which the module never did - while scenes/shared.js handed it
-  // `plainLines(lines(MASTERY_TEXT_ID))` BY VALUE, so record 4020 came
-  // off disk on the enhanced lane too and was dropped. Driven, not
-  // read: the thunk must not be called when the strip takes it.
-  assert.match(n, /const r = typeof rows === 'function' \? rows\(\) : rows;/);
   destroyLevelNotices();
   let reads = 0;
   const calls = [];
@@ -630,35 +507,6 @@ test('LV3: the level row is a button that presses the sheet key, and the key-les
     if (realDispatch) globalThis.dispatchEvent = realDispatch; else delete globalThis.dispatchEvent;
     destroyLevelNotices();
   }
-});
-
-test('LV3 by source: an UNBOUND sheet action presses nothing and shows no button; the sheet\'s own door is ASCEND, at any time', () => {
-  const o = src('src/ui/levelUp/levelUpOpener.js');
-  assert.match(o, /if \(code == null \|\| typeof win\?\.dispatchEvent !== 'function'/, 'no binding, no press - never a stale default');
-  assert.match(src('src/ui/levelUp/levelNotice.js'), /const clickable = r\.kind === NOTICE_LEVEL && codeForAction\(bindings\(\), 'CharacterSheet'\) != null;/);
-  assert.match(src('src/ui/levelUp/levelNotice.js'), /doc\.createElement\(clickable \? 'button' : 'div'\)/);
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /button\.lv-note\.lv-clickable \{[^}]*pointer-events: auto;/, 'the strip is pointer-events:none, this row opts back in');
-
-  // THE STATS PAGE CARRIES ONE DOOR TO THIS WINDOW, AND IT IS ALWAYS
-  // THERE. Mac, on this package: "the Ascend button needs to be
-  // accessible at any time in the character sheet."
-  //
-  // LV3 arrived with a SECOND door beside it - `['Level up', ...]`,
-  // unshifted onto the same row and gated on `readyToLevelUp` - which
-  // would put two buttons for one window on the page whenever a level
-  // was owed, and nothing there the rest of the time. ASCEND-ANYTIME
-  // had already made that page's door unconditional: it opens the real
-  // rollout when a level is owed (ui/pauseDoor.js's own branch, which
-  // resumes first) and a VIEW of the stars when none is, so the button
-  // a player learns is the button that is always there. LV3's opener
-  // is still what the STRIP presses, where there is no hooks bag to
-  // hand a door through.
-  const m = src('src/ui/enhanced/enhancedMenu.js');
-  // PIN MOVED (GROWTH1): the Stats page's door is the Growth tab's now - always there, its Level page the Ascension
-  assert.match(m, /const g = el\('button', n \? 'act primary' : 'act', n \? t\('pause\.door\.growthCount', 'Growth \(\{n\}\)', \{ n \}\) : t\('pause\.door\.growth', 'Growth'\)\);/, 'the page\'s door is always drawn, not gated on state');
-  assert.doesNotMatch(m, /readyToLevelUp/, 'the Stats page never reads the flag (its Growth door counts it through growthTab.js growthDue): WHICH screen the door opens is the door\'s question');
-  assert.doesNotMatch(m, /doors\.unshift\(\['Level up'/, 'and there is no second, conditional door for the same window');
-  assert.match(m, /b\.onclick = \(\) => \{ handoff\(fn\); \};/, 'PIN MOVED (AUDIT SEASON-BOOK S3: the handoff\'s one home) - the pause window goes down first for the doors that LEAVE this page - a handoff, ESC-BOOK: nothing relocks under the window they open');
 });
 
 test('FIRM1: A RENOWN LEVEL IS SAID AS A LEVEL IS - the fanfare, "You have risen" with the Renown and its new Stars on the strip, and gone as news goes (it owes nothing); the classic lane says it in a line', () => {

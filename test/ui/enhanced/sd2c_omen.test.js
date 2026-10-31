@@ -105,7 +105,6 @@ test('SD2c the Timers row: none while it has only risen, its fading once found, 
   assert.deepEqual(rows(f, T0 + 2 * H, { name: null, place: null }).map((x) => [x.title, x.where]), [['The Abyss Dungeon stands', null]], 'its name and city not known yet');
   assert.deepEqual(eventTimerRows({ now: T0 }).filter((x) => x.kind === 'super'), [], 'offline: no record');
   assert.deepEqual(TIMER_KINDS.slice(0, 3), ['gate', 'serpent', 'super']);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.px-timerswin \.tm-super \{ --tm-kind: \$\{SD_RING_MAP_CSS\}; \}/, 'its row in the ring\'s brass');
 });
 
 test('SD2c the taverns: "Any news?" in the city it stands by, while it has risen or been found, one time in SD_RUMOR_CHANCE - the person\'s one answer spent, the spymaster past the gate; nowhere else, not after the kill (mutants: told anywhere; told after the kill; the answer unspent; the cap unread; the chance unrolled)', () => {

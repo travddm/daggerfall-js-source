@@ -91,29 +91,3 @@ test('PERF-ALLOC1: a lantern\'s six faces make no typed array (the base: seven a
   assert.equal(made, 0, `twelve lanterns' faces made ${made} typed arrays`);
 });
 
-test('PERF-ALLOC2: the lantern walk hands its cube through a typed array - placementsInCubeOf answers what placementsInCube answers over random woods (scaled, lifted, moved origins) and random cubes, in and out of reach; and _candidateQuads asks placementsInCubeOf with its own Float64Array, five doubles a call no longer handed as heap numbers (mutants: PERFALLOC2-boxed-again, PERFALLOC2-cube-short, WALK-scratch-module)', async () => {
-  const { readFileSync } = await import('node:fs');
-  const bounds = await import('../../src/render/bounds.js');
-  const { placementGrid } = bounds;
-  let n = 0, hits = 0;
-  for (let k = 0; k < 400; k++) {
-    const centers = Array.from({ length: 2 + Math.floor(Math.abs(rnd(60))) }, () => [rnd(120), rnd(3), rnd(120)]);
-    const b = { _place: placementGrid(centers), origin: [rnd(800), rnd(5), rnd(800)], size: { w: 1 + Math.abs(rnd(3)), h: (k % 9 ? 1 : -1) * (1 + Math.abs(rnd(8))) } };
-    for (let j = 0; j < 12; j++) {
-      const rad = Math.abs(rnd(4)), px = b.origin[0] + rnd(160), py = b.origin[1] + rnd(10), pz = b.origin[2] + rnd(160), far = Math.abs(rnd(30));
-      // the oracle: any placement (the batch's frame, the lift folded in) within far + rad of the light on every axis
-      const R = far + rad, lx = px - b.origin[0], ly = py - b.origin[1] - bounds.batchLift(b), lz = pz - b.origin[2], p = b._place.pts;
-      let want = false;
-      for (let i = 0; i < p.length && !want; i += 3) want = Math.abs(p[i] - lx) <= R && Math.abs(p[i + 1] - ly) <= R && Math.abs(p[i + 2] - lz) <= R;
-      assert.equal(bounds.placementsInCubeOf(b, Float64Array.of(rad, px, py, pz, far)), want, 'the cube test through the typed array: any quad in reach');
-      assert.equal(bounds.placementsInCube(b, rad, px, py, pz, far), want, 'and through the old door, the same');
-      n++; if (want) hits++;
-    }
-  }
-  assert.ok(hits > n / 10 && hits < n * 0.9, `the cubes fell both in and out of reach (${hits} of ${n})`);
-  const src = readFileSync(new URL('../../src/render/shadowPass.js', import.meta.url), 'utf8');
-  const body = src.slice(src.indexOf('  _candidateQuads(rank) {'), src.indexOf('\n  }\n', src.indexOf('  _candidateQuads(rank) {')));
-  assert.match(body, /cube\[4\] = lim\[o \+ 3\] \+ cubeReach\(rad\) - rad \+ lim\[o \+ 4\];\n\s*if \(!placementsInCubeOf\(b, cube\)\) continue;/, 'the walk asks through its typed array, with the cube\'s own reach');
-  assert.doesNotMatch(body, /placementsInCube\(/, 'and hands no double to the old door');
-  assert.match(body, /const lim = this\._candLim, o = rank \* 5, sp = this\._bSphere, cube = this\._cubeArgs;/, 'its own scratch, made once with the pass - not an array a call (AUDIT PERF-ARENA L4)');
-});

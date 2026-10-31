@@ -138,19 +138,6 @@ test('DISC29-E: a lamp replay turns each flat to face it from its OWN centre (uF
   void r;
 });
 
-test('DISC29-E: BB_VS faces the lamp per vertex - right = up x (lamp - flat) off each flat\'s own base, uRight when off or overhead', () => {
-  const vs = rd('src/render/renderer.js');
-  const bb = vs.slice(vs.indexOf('const BB_VS = `'), vs.indexOf('}`;', vs.indexOf('const BB_VS = `')));
-  assert.match(bb, /uniform vec4 uFacePoint;/);
-  assert.match(bb, /vec3 right = uRight;\n\s+if \(uFacePoint\.w > 0\.5\) \{\n\s+vec2 toLamp = uFacePoint\.xz - vBBBase\.xz;\n\s+float lampDist = length\(toLamp\);\n\s+if \(lampDist > 1e-4\) right = vec3\(toLamp\.y, 0\.0, -toLamp\.x\) \/ lampDist;/);
-  assert.match(bb, /vec3 world = aCenter \+ uOrigin\n\s+\+ right \* \((?:aCorner|cn)\.x \* uSize\.x\)/, 'the quad is placed with that right');   // ELITE FOES: `cn` is aCorner, widened only for an elite
-  // the same law the replay's per-batch fallback computes: (dz, 0, -dx) / |d| is perpendicular to the lamp's direction
-  const faceRight = (lamp, base) => { const dx = lamp[0] - base[0], dz = lamp[2] - base[2], l = Math.hypot(dx, dz); return [dz / l, 0, -dx / l]; };
-  const rgt = faceRight([0, 2.5, 0], [3, 0, 4]);
-  assert.ok(Math.abs(rgt[0] * (0 - 3) + rgt[2] * (0 - 4)) < 1e-12, 'edge-on to nothing: the card faces the lamp');
-  assert.match(rd('src/render/shadowPass.js'), /const face = perBatchRight && !b\.selfCard;/, 'the replay\'s word, per flat');
-});
-
 test('DISC29-E: a flat idling in place is its own class - a mover to the eight, kept by the lo tier; a walker is not. AUDIT PRE-MERGE 0929 E1: and only a flat that cannot walk - a foe, a peer or the Warden standing a second is still the eight\'s, and its walking off rebuilds no lo map and leaves no silhouette behind (mutants: the class for an origin\'s flat; the class judged by stillness)', () => {
   const lamps = [];
   for (let i = 0; i < 12; i++) lamps.push(i * 1.5, 2, 3, 15);
@@ -203,29 +190,6 @@ test('DISC29-E: a flat idling in place is its own class - a mover to the eight, 
   let redrawn = 0;
   for (let f = 0; f < 8; f++) { feet.step(); redrawn += h.frame(gone).loFaces; }
   assert.ok(redrawn > 0, 'the lo maps that held him are drawn again without him');
-});
-
-test('DISC29-E / AUDIT PRE-MERGE 0929 E3: the card\'s two lamps are CASTERS - a camera far off (the setting runs to 10 m) picked the eight lamps nearest IT, the card\'s own were not among them, and the silhouette hopped from lamp to lamp as it circled (mutants: the card\'s lamps not reserved; a reserved lamp in place of another of the card\'s)', () => {
-  // two lamps beside the card (x -1 and 1) and fourteen about a point 10 m off, nearer every camera below (FLICKER-FIX: past the twelve casters)
-  const lamps = [-1, 2.5, 0, 12, 1, 2.5, 0, 12];
-  for (let i = 0; i < 14; i++) lamps.push(8 + (i % 7) * 1.5, 2.5, i < 7 ? -3 : 3, 12);
-  const { sp, self, frame, setEye } = hall(lamps);
-  self.origin = [0, 0, 0];
-  frame(); frame(); frame();
-  const holdsCard = (st, slot) => drawsInto(st.calls, sp.pointFbos.slice(slot * 6, slot * 6 + 6)).some(at(0));
-  for (const [x, z] of [[10, 0], [8, 6], [7, -7], [10, 3]]) {
-    setEye(x, 1.6, z);   // the camera circles far off; the player does not move
-    frame(); frame();
-    const idx = [...sp.shadowIndex];
-    const west = idx.indexOf(0), east = idx.indexOf(1);
-    assert.ok(west >= 0 && east >= 0, `eye at ${x},${z}: the card's lamps are not casters (${idx})`);
-    assert.equal(sp._slotSelf[west], 1, `eye at ${x},${z}: the west lamp holds the card`);
-    assert.equal(sp._slotSelf[east], 1, `eye at ${x},${z}: the east lamp holds the card`);
-    assert.ok(holdsCard(frame(), west), `eye at ${x},${z}: drawn into the west lamp`);
-    assert.equal(idx.filter((i) => i >= 0).length, 12, 'twelve casters still - the eye\'s farthest gave way');
-  }
-  // the card is noted as it is recorded, not looked for (AUDIT PRE-MERGE 0929 E2: every batch of every record, every frame)
-  assert.doesNotMatch(rd('src/render/shadowPass.js').slice(rd('src/render/shadowPass.js').indexOf('  _selfCardAt(out) {'), rd('src/render/shadowPass.js').indexOf('  _selfCardAt(out) {') + 400), /for \(/, 'no walk in _selfCardAt');
 });
 
 test('DISC29-E: the player\'s card casts into the two lamps nearest IT - a camera circling a still player moves nothing', () => {

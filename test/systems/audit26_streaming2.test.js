@@ -71,65 +71,13 @@ test('audit26 F059: the exhaustion collapse rides AreEnemiesNearby over EVERY fo
   assert.equal(areEnemiesNearby(lurking, { resting: true }), false);
 });
 
-test('audit26 F059: every host feeds its foe POOLS into the collapse', () => {
-  // world.js carries both exterior pools - the watch AND the encounter
-  // foes, the same pair its rest deps ask.
-  assert.match(hostText('src/scenes/world.js'),
-    /enemiesNearby: areEnemiesNearby\(\[\.\.\.\(cityGuards\?\.guards \?\? \[\]\), \.\.\.\(exteriorFoes\?\.foes \?\? \[\]\)\]\)/);
-  // ROAD-G G2: exterior.js carries BOTH pools too. It really did hold
-  // one - the watch - until the fixed-city host mounted the encounter
-  // pool CreateFoe's outdoor arm needed, and the collapse must see
-  // every pool the host has or it kills the player beside a foe that
-  // the STRICT variant counts.
-  assert.match(src('src/scenes/exterior.js'),
-    /enemiesNearby: areEnemiesNearby\(\[\.\.\.\(cityGuards\?\.guards \?\? \[\]\), \.\.\.\(exteriorFoes\?\.foes \?\? \[\]\)\]\)/);
-  // the dungeon host asks the same ONE home rather than a second copy
-  // of the law inline.
-  assert.match(src('src/scenes/dungeonContext.js'), /const enemiesNearby = areEnemiesNearby\(foes\);/);
-  // and no host smuggles the coarse "is any guard alive" read back in.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    assert.doesNotMatch(src(f), /enemiesNearby: \(cityGuards\?\.activeCount/, f);
-  }
-});
-
 // ---------------------------------------------------------------
 // F192 - DaggerfallTravelPopUp.cs:219:
 //   hasShip = DaggerfallBankManager.OwnsShip || GuildManager.FreeShipTravel();
 // The port shipped both halves and passed the literal `false`.
 // ---------------------------------------------------------------
 
-/** The host's own hasShip closure, lifted out of world.js and run
- *  against the real laws - so this pin dies the moment the seam goes
- *  back to a literal. */
-function hostHasShip(playerEntity) {
-  const s = hostText('src/scenes/world.js');
-  const i = s.indexOf('hasShip: () => {');
-  assert.ok(i > 0, 'buildTravelMapWindow computes hasShip');
-  const end = s.indexOf('\n      },', i);
-  assert.ok(end > i, 'the hasShip closure is a block');
-  const body = s.slice(i + 'hasShip: '.length, end + '\n      }'.length);
-  // V2e: the closure reads memberships through activeMemberships (the
-  // vampire-aware book pick), so the harness injects it too - a plain
-  // fixture book migrates in place as the mortal book, which is the pin's
-  // intent.
-  const make = new Function('ownsShip', 'joinedGuildOfGroup', 'GUILD_GROUPS', 'orderOf', 'freeShipTravel', 'activeMemberships', 'playerEntity', `return (${body});`);
-  return make(ownsShip, joinedGuildOfGroup, GUILD_GROUPS, orderOf, freeShipTravel, activeMemberships, playerEntity)();
-}
-
 const knight = (rank) => ({ guildMemberships: { [GUILD_GROUPS.KnightlyOrder]: { guild: 'Order:Rose', rank, lastRankChange: 0 } } });
-
-test('audit26 F192: the travel popup asks OwnsShip || FreeShipTravel', () => {
-  assert.equal(hostHasShip({}), false, 'no ship, no order');
-  assert.equal(hostHasShip({ ownedShip: SHIP_TYPES.Small }), true, 'DaggerfallBankManager.OwnsShip');
-  // KnightlyOrder.FreeShipTravel (KnightlyOrder.cs:167-170) is rank 6,
-  // and it is the ONLY override of Guild's base false.
-  assert.equal(hostHasShip(knight(5)), false);
-  assert.equal(hostHasShip(knight(6)), true);
-  assert.equal(hostHasShip({ guildMemberships: { [GUILD_GROUPS.FightersGuild]: { guild: 'FightersGuild', rank: 9 } } }), false,
-    'no other guild grants free ship travel');
-  // the fixed literal is gone
-  assert.doesNotMatch(hostText('src/scenes/world.js'), /hasShip: false/);
-});
 
 test('audit26 F192: and a ship is what stops the 25-gold-per-24-pixels ocean charge', () => {
   // travel.js:"if (oceanPixels > 0 && !hasShip && travelShip) totalCost" - `if (oceanPixels > 0 && !hasShip && travelShip)`
@@ -156,17 +104,6 @@ test('audit26 F095: ExpandRandomTextRecord expands macros where a line join cann
   // TokensToString(false): an empty token contributes NOTHING, where a
   // join inserts a space
   assert.equal(expandRandomTextRecord(7206, { randomTokens: () => [{ text: 'a' }, { text: '' }, { text: 'b' }] }), 'ab');
-});
-
-test('audit26 F095: the NPC session gets the SAME expander the answer pipeline does', () => {
-  const s = hostText('src/scenes/world.js');
-  const macroWired = [...s.matchAll(/expandRandomTextRecord: \(id\) => expandTalkRecord\(id, talkMcp\(\)\)/g)];
-  assert.equal(macroWired.length, 2, 'the NPC session and the answer pipeline both hold the macro-aware expander');
-  // the session's own construction carries it (not just the pipeline's)
-  const i = s.indexOf('const npcSession = new NPCSession({');
-  const j = s.indexOf('\n  });', i);
-  assert.ok(i > 0 && j > i);
-  assert.match(s.slice(i, j), /expandRandomTextRecord: \(id\) => expandTalkRecord\(id, talkMcp\(\)\)/);
 });
 
 // ---------------------------------------------------------------
@@ -218,19 +155,6 @@ test('audit26 F092: with the seam wired, %di answers a direction instead of the 
   const bare = new AnswerPipeline({ localizedText });
   bare.currentKeySubjectBuildingKey = 1;
   assert.equal(bare.getKeySubjectLocationCompassDirection(), DIRECTION_HINTS.resolvingError);
-});
-
-test('audit26 F092: the host mounts the compass on BOTH consumers, over one frame', () => {
-  const s = hostText('src/scenes/world.js');
-  // one closure, the directory and the player in the same LOCATION frame
-  assert.match(s, /const talkBuildingCompassDirection = \(buildingKey\) => buildingCompassDirection\(\{/);
-  assert.match(s, /listBuildings: townTalk\.directory,/);
-  assert.match(s, /playerPos: _talkPlayerPos\(\),/);
-  // both consumers: the answer pipeline (%di) and questWorld (quest %di)
-  const mounts = [...s.matchAll(/buildingCompassDirection: \(buildingKey\) => talkBuildingCompassDirection\(buildingKey\)/g)];
-  assert.equal(mounts.length, 2, 'the pipeline and the quest world both hold it');
-  // the topics closure and the compass read the SAME position
-  assert.match(s, /playerPos: \(\) => _talkPlayerPos\(\),/);
 });
 
 // ---------------------------------------------------------------

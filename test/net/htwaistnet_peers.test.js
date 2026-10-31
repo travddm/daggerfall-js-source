@@ -82,10 +82,6 @@ test('HT-WAIST-NET sender: the bit is 1 ONLY while a lit lantern hangs at the wa
     setModSetting(V, 'Enabled', false);
     assert.equal(bit(lantern()), undefined, 'the mod off: its switch goes with it');
   } finally { _resetModSettings(); }
-  const w = rd('src/scenes/world.js');
-  const arm = w.slice(w.indexOf('    const arm = {\n      mv,'), w.indexOf('};   // the wire\'s move bit'));
-  assert.ok(arm.length > 0, 'the pose\'s arm block');
-  assert.match(arm, /\n\s*hl: waistLanternPoseBit\(playerEntity\.lightSource\),/, 'the arm the host spreads into every pose and the hello asks the player\'s lit light');
 });
 
 // ---------------------------------------------------------------

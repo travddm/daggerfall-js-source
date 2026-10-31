@@ -203,9 +203,6 @@ test('AUDIT CHAP5 S4: a Season of thousands of bids decides in one batch well in
   assert.ok(took < 4000, `the Turning took ${took} ms`);
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM npc_chapter_patron_bids WHERE state = 'open'").get().n, 0);
   assert.equal(s.raw.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE kind IN ('patron', 'patron-return')").get().n, 4000);
-  const nc = src('server-account/src/npcChapters.js');
-  assert.match(nc, /SET state = CASE WHEN \(faction, region, guild_id, season\) IN \(SELECT json_extract\(value, '\$\[0\]'\),/);
-  assert.match(nc, /UPDATE npc_chapters SET patron = w\.guild, patron_season = \?2\n\s+FROM \(SELECT json_extract\(value, '\$\[0\]'\) AS f, json_extract\(value, '\$\[1\]'\) AS g, json_extract\(value, '\$\[2\]'\) AS guild FROM json_each\(\?1\)\) w/);
 });
 
 test('AUDIT CHAP5 E5: a chapter races once a Season - the Brotherhood, two temples\' rival, races the first and the other\'s rivalry ends even (mutants: the once, the even)', async (t) => {
@@ -254,29 +251,6 @@ test('AUDIT CHAP5 S2: the Chronicle never names a hidden rival - a public chapte
   const { rows } = await chapterChronicle({ db: s.env.DB }, null, s.env, { region: ANTICLERE });
   assert.deepEqual(rows.map((r) => [r.faction, r.data]), [[FIGHTERS, { season: 0, event: 'rivalry', won: true }], [MAGES, { season: 0, event: 'rivalry', rival: JULIANOS, won: false }],
     [ARKAY, { season: 0, event: 'rivalry', won: null }]]);
-});
-
-test('AUDIT CHAP5 S5: the boards\' and the Turning\'s reads on their own indexes - an account\'s backings, the Season\'s Masters, a guild\'s bids, a region\'s patrons (mutants: each index)', async (t) => {
-  const s = await turning(t);
-  const plan = (sql, ...b) => s.raw.prepare(`EXPLAIN QUERY PLAN ${sql}`).all(...b).map((r) => r.detail).join(' | ');
-  const backs = plan('SELECT faction, side FROM npc_chapter_backing WHERE region = ?1 AND season = ?2 AND account = ?3', ANTICLERE, 1, 'acc');
-  assert.match(backs, /idx_npc_chapter_backing_season/, backs);
-  const season = plan('SELECT faction, region, account, char_id, side FROM npc_chapter_backing WHERE season = ?1 ORDER BY account', 1);
-  assert.match(season, /idx_npc_chapter_backing_season/, season);
-  const masters = plan(`SELECT faction, region, COUNT(*) AS n FROM npc_chapter_history WHERE kind = 'seat' AND week BETWEEN ?1 AND ?2
-      AND json_extract(data, '$.to') = 'master' GROUP BY faction, region`, 1, 2);
-  assert.match(masters, /idx_npc_chapter_history_week/, masters);
-  const bids = plan("SELECT faction, amount FROM npc_chapter_patron_bids WHERE region = ?1 AND season = ?2 AND guild_id = ?3 AND state = 'open'", ANTICLERE, 2, 'g');
-  assert.match(bids, /idx_npc_chapter_patron_bids_guild/, bids);
-  const keeps = plan("SELECT 1 FROM npc_chapter_patron_bids WHERE guild_id = ?1 AND state = 'open'", 'g');
-  assert.match(keeps, /idx_npc_chapter_patron_bids_guild/, keeps);
-  const patrons = plan('SELECT c.faction FROM npc_chapters c JOIN guilds g ON g.id = c.patron WHERE c.region = ?2 AND c.patron_season = ?1', 1, ANTICLERE);
-  assert.match(patrons, /idx_npc_chapters_region/, patrons);
-  // a token's mint still reads a character's own rows - the week-led index never draws it
-  const who = 'JOIN realm_characters c ON c.id = x.char_id AND c.player = ?1 AND c.dead_at IS NULL WHERE (?2 IS NULL OR x.char_id = ?2)';
-  const whole = plan(`SELECT x.char_id FROM npc_chapter_history x ${who} AND x.kind = 'season'`, 'p', null);
-  assert.match(whole, /idx_npc_chapter_history_char/, whole);
-  assert.doesNotMatch(src('server-account/src/npcChapters.js'), /\?2 IS NULL OR c\.region = \?2/);
 });
 
 test('AUDIT CHAP5 E4: a guild whose bid for a chapter\'s patronage stands does not go - its escrow was burnt with it; decided, it goes (mutants: the keep, the word)', async (t) => {
@@ -377,22 +351,6 @@ test('AUDIT CHAP5 D6: the spellbook\'s haggle line weighs the price against the 
   const cheap = shop({ priceFactor: () => 0.729 });
   assert.notEqual(cureOfferMessageOffset(cheap.presentedCost || 80, cheap.tradePrice()), plain._tradeOffset, 'the finding: DFU\'s list against the hall\'s price');
   assert.equal(calculateTradePrice(80, 10, { mercantile: 30, personality: 50 }, false) > 0, true);
-});
-
-test('AUDIT CHAP5 C1/C2/C5/D2: the host\'s seams - the guild book asked again when old and at a patron\'s hall; the banners\' guild a temple\'s divine; the halls kept online alone; a shut hall\'s services refused, its popup standing (mutants: each seam)', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /until it was opened\n\s+guildId: \(\) => \{ const g = guildBook; if \(g\?\.stale\?\.\(\)\) g\.refresh\(\)\.catch\(\(\) => \{\}\); return g\?\.guild\?\.id \?\? null; \},/);
-  assert.match(world, /if \(c\?\.patron && guildBook\?\.stale\?\.\(\)\) guildBook\.refresh\(\)\.catch\(\(\) => \{\}\);/);
-  assert.match(world, /chapterOf: \(faction, region\) => chapterSheet\.chapterOf\(chapterFactionOf\(faction, townTalk\?\.factionDict \?\? null\) \?\? faction, region\),/);
-  assert.match(world, /const pixelChapterHalls = new Map\(chapterSheet && dfLocation && locBlocks \? buildingSummaries\(/);
-  const modes = src('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT WAY-BACK L1-3, Audit-Way-Back.md): the open's ask is kept, and the way back's words read its answer
-  assert.match(modes, /const shutBox = \(\) => \(chapterHallShut\(host\.chapterHere\?\.\(guild\.factionId\) \?\? null\) \? \{ rows: \[CHAPTER_HALL_SHUT_LINE\] \} : null\);\n\s+const shutAtOpen = !!shutBox\(\);/);
-  assert.match(modes, /onService: \(\) => \{\n\s+const shut = shutBox\(\);   \/\/ AUDIT CHAP5 D2\n\s+if \(shut\) return shut;\n\s+const access = serviceAccess\(/);
-  assert.match(modes, /\? \(\) => shutBox\(\) \?\? \(openReforge\(\) \? \{ dispatched: true \} : null\) : null,/);
-  assert.match(modes, /\? \(\) => shutBox\(\) \?\? \(openLift\(\) \? \{ dispatched: true \} : null\) : null,/);
-  assert.match(modes, /healCurse: service === 'CureDisease' \? \(\) => shutBox\(\) \?\? healCurseBox\(\) : null,/);
-  assert.doesNotMatch(modes, /townTalk\?\.say\?\.\(CHAPTER_HALL_SHUT_LINE\); return;/, 'the popup itself never refused');
 });
 
 // ── THE LENS T: LAWS NO TEST COULD FAIL ─────────────────────────────

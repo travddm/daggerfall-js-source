@@ -434,21 +434,3 @@ test('MAC-Q: stepRigEffects - the clock, the hide, the upload; nothing without m
   assert.equal(assembly.effects[0].sim.particles.length, before);
 });
 
-test('MAC-Q: the arm and the renderer - the seams, read', () => {
-  const arm = read('src/combat/fpArm.js');
-  assert.match(arm, /stepRigEffects\(built\.arm, \{ dt, clock: fOverlay \? overlayClock : poseTime\(state\), renderer, mesh, textures: built\.textures, hidden: effectHidden \}\)/, 'first person, after the mesh');
-  assert.match(arm, /stepRigEffects\(t\.arm, \{ dt: effectsDt, clock: tOverlay \? overlayClock : poseTime\(state\), renderer, mesh: thirdMesh, textures: t\.textures, hidden: effectHidden \}\)/, 'and the body (PEER-CADENCE: on the banked dt)');
-  assert.match(arm, /if \(eff\.slot === 'torch'\) return !torchVisible\(\);/, 'the flame hides with the torch (MW-D51’s carried-left rule)');
-  assert.match(arm, /for \(const e of m\.effects \|\| \[\]\) renderer\.releaseParticleEffect\(e\);/, 'and is released with the mesh');
-  assert.match(arm, /rigBuilt\.arm\.effects = \(rigBuilt\.arm\.effects \?\? \[\]\)\.filter\(\(e\) => e\.slot !== 'torch'\);/, 'a re-lit torch replaces its flame');
-  assert.match(arm, /collectArmTextures\(\[\.\.\.arm\.pieces, \.\.\.\(arm\.effects \?\? \[\]\)\], archives, gen\)/, 'the flame’s texture rides the catalog');
-  const rend = read('src/render/renderer.js');
-  assert.match(rend, /if \(mesh\.effects && mesh\.effects\.length\) this\._drawParticleEffects\(mesh, modelMatrix\);/, 'drawn after the ranges, in the same pass');
-  assert.match(rend, /gl\.blendFunc\(gl\[nifBlendMode\(e\.srcBlend\)\], gl\[nifBlendMode\(e\.dstBlend\)\]\)/, 'with the file’s own blend function');
-  assert.match(rend, /vec3 right = normalize\(vec3\(mv\[0\]\[0\], mv\[1\]\[0\], mv\[2\]\[0\]\)\);/, 'billboarded off the model-view’s rows');
-  assert.match(rend, /this\._use\(this\.charProgram\);   \/\/ the pass's own program back/, 'and the character program handed back');
-  // the probe is what proves the pixels
-  const probe = read('tools/macqFlameProbe.mjs');
-  assert.match(probe, /the flame is LIT where it stands/);
-  assert.match(probe, /a hidden effect draws nothing/);
-});

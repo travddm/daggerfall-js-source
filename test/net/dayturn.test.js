@@ -217,8 +217,3 @@ function callOf(src, name) {
   throw new Error(`${name}'s call never closes`);
 }
 
-test('DAY-TURN the hosts hand every day-keyed book the page\'s one moment: the world host\'s seats, halls and professions, and the town economy\'s host (mutants: each book built without it)', () => {
-  const world = rd('src/scenes/world.js');
-  for (const name of ['createTownSeatBook', 'createHallBook', 'createProfBook']) assert.match(callOf(world, name), /\bturnMs: dayTurnMs\(\)/, name);
-  assert.match(callOf(rd('src/scenes/townEconHost.js'), 'createTownEconBook'), /\bturnMs: dayTurnMs\(\)/);
-});

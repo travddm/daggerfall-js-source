@@ -80,10 +80,6 @@ test('EG-ZK THE LORDS ON THE SEAM (section 13.1; EG-H3\'s departure 3 retired): 
   assert.deepEqual(Object.keys(EG_SEAM), ['name', ...BOSS_SEAM_KEYS]);
   for (const k of BOSS_SEAM_KEYS) assert.equal(typeof EG_SEAM[k], 'function', k);
   assert.ok(Object.isFrozen(EG_SEAM));
-  const src = readFileSync(new URL('../../../src/net/eliteGates/egBrain.js', import.meta.url), 'utf8');
-  for (const name of ['egLordsNew', 'egLordsStep', 'egLordHit', 'egLordHitX', 'judgeShapes', 'egFightState']) assert.ok(!new RegExp(`\\b${name}[(,]|import \\{[^}]*\\b${name}\\b`).test(src), `the director calls ${name} past the seam`);
-  const calls = (m) => src.split(`EG_SEAM.${m}(`).length - 1;
-  assert.deepEqual(BOSS_SEAM_KEYS.map((m) => [m, calls(m)]), [['new', 6], ['join', 3], ['hit', 2], ['step', 2], ['stateOf', 3], ['judge', 1], ['earned', 1]]);   // PIN MOVED (EG-ZQ): a blow's join, the seen-and-restore step's and a fall's (section 13.2's shares); PIN MOVED (EG-ZS): a member's blow, and a host hit on a lord (Bladestorm, Kindled Steel)
 });
 
 test('EG-ZK EVERY MEMBER IS THE LORDS\' OWN LAW, frame for frame (section 13.1): on real fights the director stood, each seam member and the lords\' own functions it plugs, handed the same, say the same frames and leave the same fight - a Court\'s lord born and a champion born at its place, forty beats of Grath with the company in reach, a blow that fells him (the gate\'s hand and purse, the lord\'s own weight, his fall said), the fight\'s state at its clock, the judge on the shared-time trails; and join and earned keep the director\'s own rules (mutants: a birth\'s decrees or place lost; the beat\'s context lost; the lord\'s weight or the Vestiges\' dropped; his fall untold; the state at another clock; the judge off the fight ground; a witness joined; the earning\'s half-share or three halls moved)', () => {

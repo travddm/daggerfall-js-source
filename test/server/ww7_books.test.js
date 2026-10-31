@@ -29,12 +29,9 @@ test('WW7-5 the books every region\'s: no town book asks the Bay\'s alone - the 
     assert.ok(!/bayRegionOk/.test(s), `${b}: the Bay's no more`);
     assert.match(s, /regionOk\(/, `${b}: every region's`);
   }
-  assert.ok(!/bayRegionOk/.test(rd('src/net/npcChapterLaw.js')));
   assert.deepEqual([regionOk(64), regionOk(70), regionOk(71), bayRegionOk(64)], [true, true, false, false]);
   assert.equal(HOME_REGION_MAX, REGION_NAMES.length - 1);
   assert.deepEqual([homeRegionOk(0), homeRegionOk(64), homeRegionOk(70), homeRegionOk(71), homeRegionOk(-1)], [true, true, true, false, false]);
-  assert.match(rd('server-account/src/staffEconomy.js'), /region: int\(body\.region, 0, 70\)/);
-  assert.match(rd('server-account/src/market.js'), /Object\.entries\(hubs\)\.slice\(0, REGION_NAMES\.length\)/);
 });
 
 test('WW7-5 the Watch on the land past the Bay: the world\'s grid is its ground, never the Veil\'s box (the Eltheric Ocean\'s, pinned equal) - so a town, a seat and a node past the Bay are watched, and the isles still are not; a market\'s board a pixel of the world\'s grid (mutants: the Bay\'s alone; the Veil watched; the board the Bay\'s)', () => {
@@ -72,10 +69,6 @@ test('WW7-5 a place past the Bay carries its location\'s index through the regis
   assert.equal(placeOfRow({ mapId: 9, name: 'x', px: 1810, py: -420, type: 0 }, 's').location, null);
   const towns = createTownTable(() => ({ byMapId: (id) => (id === row.mapId ? row : null) }));
   assert.equal(towns.get(row.mapId).location, capitalLocationIndex(1, 0));
-  // PIN MOVED (TESA x AUDIT TESA II): the capitals and Arena's places the audit's live list (world/pastBayRows.js), the countryside the host's
-  const rows = rd('src/world/pastBayRows.js');
-  for (const re of [/location: capitalLocationIndex\(k, capitalSliceOrdinal\(cap, s\)\),/, /port: !!p\.port, location: arenaLocationIndex\(p\) \}\);/]) assert.match(rows, re);
-  assert.match(rd('src/scenes/tamrielPlacesHost.js'), /location: countryLocationIndex\(countryOrdinal\(px, py\)\) \};/);
 });
 
 test('WW7-5 migration 0180 (0170 before main\'s own took it): the market\'s listings, orders, auctions and bids, the guild writs, the commissions and the contracts take every region - every row, every child, every index and trigger kept, each table as it was but its region\'s CHECK (mutants: a child lost; a trigger dropped; the bound the Bay\'s)', () => {

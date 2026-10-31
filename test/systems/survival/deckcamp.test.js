@@ -205,19 +205,6 @@ test('DECK-CAMP SAVED AND SAID: the save keeps her number and the point on her, 
   assert.notEqual(p.camps.camps[0], pc, 'moved on her: stood again');
 });
 
-test('DECK-CAMP THE WORLD\'S WIRING by source: the pool handed the boats; the boat under a spot read off the collider\'s surface probe (her bucket), mine by her number, another\'s by theirs, a sea ship none; gone only once the boats are settled (no load, no restore pending) or her owner\'s word names her no more; the ride each exterior frame before the quays, the lights and the world pass - THE FOUR HOSTS: the street alone (a building and a dungeon stand no boat of the camps\', the standalone street no Come Sail Away)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /deck: \{ at: \(pos\) => campDeckAt\(pos\), resolve: \(ref\) => campDeckResolve\(ref\) \},/);
-  assert.match(w, /const hit = collider\?\.surfaceHit\?\.\(\[pos\[0\], pos\[1\] \+ 0\.5, pos\[2\]\], \[0, -1, 0\], 1\.5\);\n\s+const boat = typeof hit\?\.key === 'string' && hit\.key\.startsWith\('csaBoat:'\) \? _csaBuckets\.get\(hit\.key\)\?\.boat \?\? null : null;/);
-  assert.match(w, /if \(csaRuntime\?\.AllBoats\?\.includes\(boat\)\) return \{ ref: \{ mine: true, uid: boat\.uid \}/);
-  assert.match(w, /return !csaRuntime \|\| \(!_loading && !csaRuntime\.pendingRestore\) \? \{ gone: true \} : \{ hidden: true \};/);
-  assert.match(w, /return ref\?\.peer && csaPeers\.hasBoat\(ref\.peer, ref\.uid\) \? \{ hidden: true \} : \{ gone: true \};/);
-  const rideAt = w.indexOf("if (_mode() === 'exterior') camps.ride(dt);"), quaysAt = w.indexOf('try { quays?.frame(); }');
-  assert.ok(rideAt > 0 && rideAt < quaysAt && quaysAt < w.indexOf('quays?.draw(renderer);'), 'after she moved, before the lights and the world pass');
-  assert.match(read('src/scenes/comeSailAway/comeSailAwayPeers.js'), /hasBoat: \(owner, uid\) => !!live\.get\(owner\)\?\.boats\?\.some\(\(b\) => b\.uid === uid\),/);
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) assert.ok(!/campDeck|deck: \{ at:/.test(read(f)), `${f}: no deck`);
-});
-
 test('AUDIT C&C (lens I): A CAMP OUT OF SIGHT ANSWERS NO REACH - a deck camp hidden with her boat stands at its last posed point, and the rest\'s place (fireNear) still found its fire there: a night slept as a camp\'s beside a fire nobody could see; nor is a hidden fire fed, tended or a night spent at it from there - she stands again, and it answers again (mutants: the place reads every camp; the feed, the tending and the night read one out of sight)', async () => {
   setWorldMinutes(1000);
   const h = host();

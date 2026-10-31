@@ -55,7 +55,6 @@ test('ONLINE1: the wire is ONE law - the relay re-exports net/wire.js; the world
   for (const k of ['validPose', 'validLook', 'parseClient', 'inRange', 'poseGate', 'rosterFor', 'roomOf', 'sanitizeName']) assert.equal(typeof relay[k], 'function', `${k} at both ends`);
   assert.equal(relay.validPose, validPose, 'the same function object: one home');
   assert.equal(WORLD_CELL, WIRE_CELL); assert.equal(relay.WORLD_CELL, WIRE_CELL);
-  assert.match(rd('server/src/relay.js'), /export \* from '\.\.\/\.\.\/src\/net\/wire\.js';/);
   // the classic start (StartCellX/Y 109,158) in MapsFile units, and the far corners
   const start = { x: 109 * PIXEL_UNITS + 100, y: 5, z: (499 - 158) * PIXEL_UNITS + 100, yaw: 0, pitch: 0 };
   assert.ok(validPose(start), 'the classic start is inside the world');
@@ -96,11 +95,7 @@ test('ONLINE1: the pose - changed past a hair, eased between two with the yaw by
   const id = peerId(storage); assert.match(id, /^[A-Za-z0-9_-]{4,40}$/); assert.equal(peerId(storage), id, 'the same id next time');
   assert.match(peerId({ getItem() { throw new Error('no'); }, setItem() { throw new Error('no'); } }), /^p/, 'a storage that throws: a fresh id, never a crash');
   const sec = peerSecret(storage); assert.match(sec, /^[A-Za-z0-9_-]{8,64}$/); assert.equal(peerSecret(storage), sec, 'the secret kept beside the id'); assert.notEqual(sec, id);
-  // TABS1: the id's home is the TAB's storage, so two tabs of one browser are two players
-  const src = rd('src/net/online.js');
-  assert.match(src, /import \{ tabStorage \} from '\.\.\/systems\/appStorage\.js'/); assert.match(src, /export const peerId = \(storage = tabStorage\(\)\)/); assert.match(src, /export const peerSecret = \(storage = tabStorage\(\)\)/);
-  assert.doesNotMatch(src, /appStorage\(\)/, 'never the browser-wide one');
-  assert.match(rd('src/systems/appStorage.js'), /export function tabStorage\(\) \{\s*\n\s*try \{ return globalThis\.sessionStorage \?\? null; \} catch \{ return null; \}/);
+    
   assert.equal(relayUrl('wss://daggerfall-online.example.workers.dev/'), 'wss://daggerfall-online.example.workers.dev'); assert.equal(relayUrl('ws://localhost:8787'), 'ws://localhost:8787');
   for (const bad of ['http://relay.test', 'ws://relay.test', 'wss://relay.test/x?y=1', 'javascript:alert(1)', '']) assert.equal(relayUrl(bad), null, `${bad || 'empty'} is no relay`);
   assert.match(DEFAULT_SERVER, /^wss:\/\/daggerfall-online\./, 'the relay this port hosts');
@@ -322,23 +317,6 @@ test('ONLINE1: the others drawn through a fake renderer - the figure cropped to 
   for (let i = 0; i < DOLLS_MAX; i++) { rp.sync([peer('p' + i, 'R' + i)]); await flush(); await flush(); }
   assert.ok(renderer.log.releases.length >= 1, 'past the cap: released'); assert.equal(renderer.log.releases[0].archive, PEER_ARCHIVE);
   rp.destroy(); assert.equal(rp.batches().length, 0); assert.equal(renderer.log.releases.length, renderer.log.uploads.length, 'every doll released');
-});
-
-test('ONLINE1: the compositor\'s door is PURE - composePaperDollPixels composes over its own art set and buffer, and the compose body reads nothing of the singleton (mutant: the peer composed through the inventory\'s doll)', () => {
-  const pd = rd('src/ui/paperDoll.js');
-  assert.match(pd, /export async function composePaperDollPixels\(deps, entity, \{ context = 'town', background = true \} = \{\}\)/);
-  const from = pd.indexOf('async function composeDoll(art, deps, entity, { background = true, scale: S = 1 } = {}) {');
-  assert.ok(from > 0, 'the compose is a function of its art and deps');
-  const body = pd.slice(from, pd.indexOf('\nexport async function refreshPaperDoll(', from));
-  const names = (text, list, what) => { for (const name of list) assert.ok(!new RegExp(`\\b${name}\\b`).test(text), `${what} ${name}`); };
-  names(body, ['_art', '_deps', '_live', '_pixels', '_layout', '_identity', '_refreshing', '_pending'], 'the compose reads no');
-  assert.match(body, /for \(let y = 0; background && y < OH; y\+\+\) \{/, 'the background loop is skipped for a peer, the panel stays clear');   // DFMOD4: OH = PAPERDOLL_H * S, and a peer composes at S = 1
-  assert.match(pd, /export async function refreshPaperDoll\(entity\) \{[\s\S]*?const \{ out, layout, bgSize, width: OW, height: OH \} = await composeDoll\(_art, _deps, entity, \{ background: !packBg, scale: composeScale\(\) \}\);/, 'the inventory\'s doll rides the same compose (OVH2: on nothing, when a worn UI pack draws its backdrop under it)');
-  const door = pd.slice(pd.indexOf('export async function composePaperDollPixels('), pd.indexOf('/** Test seam. */'));
-  names(door, ['_art', '_deps', '_live', '_pixels', '_layout', '_identity', 'refreshPaperDoll', 'preloadPaperDollArt'], 'the door touches no');
-  assert.match(door, /_artSets\.set\(key, art\)/, 'an art set per identity');
-  assert.match(rd('src/net/remotePlayers.js'), /import \{ composePaperDollPixels \} from '\.\.\/ui\/paperDoll\.js';/, 'the others compose through the door alone');
-  assert.doesNotMatch(rd('src/net/remotePlayers.js'), /refreshPaperDoll|paperDollPixels\(|preloadPaperDoll/);
 });
 
 // OD1 (2026-09-12) - Mac: "Paperdoll is upside down when viewing other

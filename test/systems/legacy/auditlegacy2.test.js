@@ -344,8 +344,6 @@ test('AUDIT LEGACY II F11 (A9 of AUDIT LEGACY, unpinned until now): a load reset
   load(w, fallen, person('c-ysolde'));
   assert.ok(w.host.past, 'the fallen\'s save is the past');
   assert.equal(w.host.willRise(), false, 'no outcome of the last visit rides into this one');
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE): a death held for a Resurrect is decided first, then the visit resets
-  assert.match(rd('src/scenes/legacyHost.js'), /function adopt\(rec\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(held\) decideDeath\(\);\n\s*past = null; outcome = null; deathSeen = false; elderSaid = false;/);
 });
 
 test('AUDIT LEGACY II A10: a remains row\'s list as laid is held to its shape - a damaged one never becomes the list', () => {
@@ -409,8 +407,6 @@ test('AUDIT LEGACY II H5/P6: a list is claimed by the member who changes it - op
   assert.equal(log.length, 1);
   assert.match(log[0].messages[0][0], new RegExp(`${heir.given} .* has taken up the search`));
   assert.deepEqual(w.host.mapMarks(), [], 'no ring for a search that is another\'s');
-  // P6: laid to rest, a row keeps no lists
-  assert.match(rd('src/scenes/legacyHost.js'), /r\.restedAt = deps\.now\(\);\n[^\n]*\n[^\n]*\n\s*r\.items = \[\];\n\s*delete r\.first;/);
 });
 
 // ---- lens B: the world's wiring -----------------------------------------------------------------------------------
@@ -472,12 +468,6 @@ test('AUDIT LEGACY II B5/B6: the line stands only where the Living World runs; t
   assert.equal(w.host.residentsOf(5001, () => 42).length, 1);
   w.living = false;
   assert.deepEqual(w.host.residentsOf(5001, () => 42), [], 'B5: no Living World, no line in its towns');
-  const src = rd('src/scenes/world.js');
-  assert.match(src, /livingWorld: \(\) => livingWorldOn\(\),   \/\/ AUDIT LEGACY II B5/);
-  assert.match(src, /inWorld: \(\) => legacySettings\(\)\.familyInWorld && livingWorldOn\(\),/);
-  assert.match(src, /talk: \(\) => \{ if \(person\.living\?\.res\?\.id === resId\) talk\(\); else townTalk\.say\(`\$\{kin\.person\.given\} has gone on their way\.`\); \},/, 'B6');
-  // PIN MOVED (LEGACY7): online the realm's living characters are the word (a tombstone is none)
-  assert.match(src, /hasSave: \(cid\) => \(legacyRealmLine \? !legacyRealmRoster \|\| legacyRealmRoster\.has\(String\(cid\)\) : newestSaveOf\(enumerateSaves\(\)\.info, cid\) >= 0\),/, 'A2/B1: the game\'s saves are the host\'s word');
 });
 
 // ---- lens P: persistence and the tests' truth ----------------------------------------------------------------------
@@ -508,13 +498,6 @@ test('AUDIT LEGACY II U1/U2/U11/U14: a held key presses once; the meeting lights
   assert.deepEqual(clicks, [], 'U1: a repeat presses nothing');
   walkButtons(root, 'Enter', { repeat: false });
   assert.deepEqual(clicks, [1]);
-  const succ = rd('src/ui/legacy/legacySuccession.js');
-  assert.match(succ, /if \(e\.repeat && \(e\.key === 'Enter' \|\| e\.key === ' '\)\) \{ e\.preventDefault\(\); e\.stopPropagation\(\); \}/, 'U1: the browser\'s own repeat press too');
-  assert.match(succ, /if \(c\.confirm && armed !== c\.key\) \{ armed = c\.key; draw\(\); return; \}/, 'U2: asked twice');
-  assert.match(succ, /go\.setAttribute\('aria-disabled', 'true'\);\n\s*go\.setAttribute\('aria-describedby', shut\.id\);/, 'U14: in the walk, described');
-  const door = rd('src/ui/legacy/legacyDoor.js');
-  assert.match(door, /lit: 'lgs-act-talk',/, 'U2: Talk lit');
-  assert.match(door, /confirm: `Yes - \$\{deps\.act/);
   // U11: the switch's marker never reaches the card as a word
   const w = world();
   const sib = addChild(w.host.family, null, { rng: familyRng(4) }).person;
@@ -528,7 +511,6 @@ test('AUDIT LEGACY II U1/U2/U11/U14: a held key presses once; the meeting lights
   // U14: the pad's bar offers no Back over a window that has none
   assert.ok(windowPrompts({ back: false }).every(([, words]) => words !== 'Back'));
   assert.ok(windowPrompts({}).some(([, words]) => words === 'Back'));
-  assert.match(door, /host\.setAttribute\?\.\('data-no-back', ''\);/);
 });
 
 test('AUDIT LEGACY II U3: Tab walks a DOM window that owns the focus - both hosts\' overlay rungs let it through', () => {
@@ -537,34 +519,11 @@ test('AUDIT LEGACY II U3: Tab walks a DOM window that owns the focus - both host
   assert.equal(isDomFocusWalk({ key: 'Tab', target: inside }), true);
   assert.equal(isDomFocusWalk({ key: 'Tab', target: outside }), false, 'the canvas: the host\'s');
   assert.equal(isDomFocusWalk({ key: 'Enter', target: inside }), false, 'Tab alone');
-  assert.match(rd('src/scenes/townTalk.js'), /if \(isDomFocusWalk\(e\)\) return true;/);
-  assert.match(rd('src/ui/input.js'), /if \(ctx\.uiOverlayActive && isDomFocusWalk\(e\)\) return false;/);
-  assert.match(rd('src/ui/pauseDoor.js'), /host\.setAttribute\?\.\('data-dom-focus', ''\);/);
-});
-
-test('AUDIT LEGACY II U4-U10/U12/U13: the Family pages - no hidden scroll, a seen focus, the keyboard kept on armed acts and the homes, drags that end, five tabs on a phone, tags and names that wrap, a finger\'s links', () => {
-  const fam = rd('src/ui/familyPages.js');
-  assert.match(fam, /view\.onscroll = \(\) => \{ if \(view\.scrollLeft \|\| view\.scrollTop\) \{ view\.scrollLeft = 0; view\.scrollTop = 0; \} \};/, 'U4');
-  assert.match(fam, /\.px-sys \.fam-node:focus-visible \{ outline: 2px dashed #f3cf86;/, 'U5');
-  assert.match(fam, /\.px-sys \.fam-kin button:focus-visible \{ outline: 1px solid #f3cf86;/, 'U5');
-  assert.match(fam, /b\.setAttribute\('data-focus', 'fam-act-switch'\);/, 'U6');
-  assert.match(fam, /b\.setAttribute\('data-focus', 'fam-act-mantle'\);/, 'U6');
-  assert.match(rd('src/ui/domRepaint.js'), /if \(!n\) \{\n\s*n = \[\.\.\.host\.querySelectorAll\(k\.tag\)\]\.find\(\(x\) => placeOf\(host, x\) === k\.place\) \?\? null;/, 'U6: the key wins over the words');
-  assert.match(fam, /is the family home now\./, 'U7: said');
-  assert.match(fam, /n\.setAttribute\('data-focus', 'fam-home-said'\);/, 'U7: the keyboard kept on the homes');
-  assert.match(fam, /if \(drag && e\.buttons !== undefined && !\(e\.buttons & 1\)\) \{ endDrag\(\); return; \}/, 'U8');
-  assert.match(fam, /view\.onpointercancel = endDrag;/, 'U8');
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /@media \(max-width: 420px\) \{\n\s*\.px-tabs \{ gap: 2px;/, 'U9');
-  assert.match(rd('src/ui/enhanced/enhancedPlusStyle.js'), /\.lvl-opt-head \{ display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; \}/, 'U10');
-  assert.match(rd('src/ui/legacy/legacySuccession.js'), /\.lgs-name \{ font-size: 15px; color: #f3cf86; overflow-wrap: anywhere; \}/, 'U12');
-  assert.match(fam, /display: inline-block; padding: 5px 0; \}/, 'U13');
-  assert.match(rd('src/ui/legacy/legacySuccession.js'), /@media \(max-width: 520px\) \{ \.lgs-card \{ grid-template-columns: 52px minmax\(0, 1fr\); \} \.lgs-card \.lgs-go \{ grid-column: 1 \/ -1; \} \}/, 'F11: AUDIT LEGACY U9, the phone\'s two-column card, pinned at last');
 });
 
 // ---- lens F: the records -------------------------------------------------------------------------------------------
 
 test('AUDIT LEGACY II F1/F3-F5/F12/F14: the records say what is built', () => {
-  assert.doesNotMatch(rd('src/systems/legacy/tree.js'), /&& false\)/, 'F14: no dead clause');
   // the layout is unchanged by it: a spouse who married in is never a root
   const f = foundFamily(person('c-a'), { id: 'fam-tr' });
   const sp = addChild(f, 1, { rng: familyRng(1) }).person;

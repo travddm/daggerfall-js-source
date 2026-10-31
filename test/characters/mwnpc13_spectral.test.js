@@ -69,8 +69,4 @@ test('MWNPC13-3 a ghost besetting a party on the road is veiled: the road\'s spr
   sp.drawBodies({}, null, null, [0, 0, 0], 0);
   sp.drawVeiledBodies();
   assert.equal(L.veiled, 1);
-  assert.ok(rd('src/scenes/livingWorld/livingRoads.js').includes('drawVeiledBodies() { deps.sprites.drawVeiledBodies?.(); },'));
-  const w = rd('src/scenes/world.js');
-  const i = w.indexOf('livingRoads?.drawVeiledBodies();'), j = w.indexOf('drawVeiledPeerBodies();   // INVIS-LOOK: the concealed peers\' bodies, translucent - after the opaque world');
-  assert.ok(i > 0 && j > i && w.lastIndexOf('exteriorFoes.drawVeiledBodies();', i) > 0 && i - w.lastIndexOf('exteriorFoes.drawVeiledBodies();', i) < 400, 'in the veiled block, beside the foes\'');
 });

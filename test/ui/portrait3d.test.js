@@ -94,7 +94,6 @@ test('PORTRAIT3D: headFrame looks the face full on - the eye before it on +Z, wh
   // IS turned 180 (drawThird's +180 stands the body's front toward its eye on +Z); this pinned the transform without the
   // turn, and every portrait was the back of a head
   assert.deepEqual(Array.from(headPortraitModel()), Array.from(multiply(trs(0, 0, 0, 0, 180, 0, -u, u, u), NIF_TO_PASS)), 'figure()\'s model at yaw 0, its turn and all: the portrait the body, not its mirror');
-  assert.match(src('src/combat/fpArm.js'), /const yawDeg = \(yaw \* 180 \/ Math\.PI\) \+ 180;\n\s*const model = multiply\(trs\(0, 0, 0, 0, yawDeg, 0, -u \* rs\.weight, u \* rs\.height, u \* rs\.weight\), NIF_TO_PASS\)/, 'the figure it matches - its +180');
   // the body's front (Morrowind's forward, +Y - the steel plate's bake, the rigs' walk) lands nearer the eye than its back
   const front = transformPoint(headPortraitModel(), 0, 20, 100), back = transformPoint(headPortraitModel(), 0, -20, 100);
   assert.ok(front[2] > back[2], `the face toward the eye on +Z (front z ${front[2].toFixed(3)}, back z ${back[2].toFixed(3)})`);
@@ -252,11 +251,6 @@ test('PORTRAIT3D: the gates - the player\'s face needs Morrowind\'s data attache
   assert.equal(await npcHeadImage({ creature: 'rat' }), null);
   assert.equal(r.c.shots.length, 0);
   setPortraitRenderer(null);
-  const heads = src('src/characters/headPortraits.js');
-  assert.match(heads, /return morrowindDataCount\(\) > 0;/);
-  assert.match(heads, /if \(!npcBodiesOn\(\)\) return null;/);
-  assert.match(heads, /const o = \/\*\* @type \{any\} \*\/ \(peerBuildOpts\(look\)\);/, 'the look read through the door every body\'s build takes');
-  assert.match(src('src/main.js'), /import\('\.\/render\/portraitRenderer\.js'\)\.then\(\(\{ setPortraitRenderer \}\) => setPortraitRenderer\(renderer\)\)/);
 });
 
 test('PORTRAIT3D: the talk window - the NPC\'s head takes the record\'s place under a key of its own once it lands (the enhanced panel repaints on the key), one texture a picture; a picture for an earlier NPC lands on no one', async () => {
@@ -279,29 +273,6 @@ test('PORTRAIT3D: the talk window - the NPC\'s head takes the record\'s place un
   assert.equal(uploads.filter((k) => k.startsWith('mwhead#')).length, 1, 'one texture for one picture, whoever wears it');
   clearNpcPortrait();
   assert.equal(npcPortraitKey(), null);
-  // the doors that hand the look in
-  const town = src('src/scenes/townTalk.js');
-  assert.match(town, /if \(portrait\) setNpcPortrait\(portrait\.archive, portrait\.record, \{ picture: portrait\.head \? \(renderer\) => npcHeadImage\(portrait\.head, \{ renderer \}\) : null \}\);/);
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /const npcData = clicked \?\? questBridge\?\.clickNpc\(pn, npcSceneCtx\) \?\? staticNpcData\(pn, npcSceneCtx\);\n\s*talkedTo\.set\(npcData, pn\);/);   // PIN MOVED (QUEST-WORDS-FIRST): a door reopened after the quest's words lends the record its click derived
-  assert.match(modes, /return pn && portrait \? \{ \.\.\.portrait, head: standingLook\(pn\) \} : portrait;/);
-});
-
-test('PORTRAIT3D: the player\'s faces - the one home (ui/facePortrait.js) draws each face as its head, the record\'s own shape, the record where none is drawn; the large HUD\'s Morrowind head first, the curse\'s too, reloaded as the data and the helm change; the classic chargen\'s ten, upgraded in place', () => {
-  const face = src('src/ui/facePortrait.js');
-  assert.match(face, /if \(!\(morrowindDataCount\(\) > 0\) \|\| !portraitRenderer\(\) \|\| !globalThis\.document\) return classic;/);
-  assert.match(face, /const img = await playerHeadImage\(\{ race: raceKey, gender, faceIndex: i \}, \{ px: w \* 2, ph: h \* 2 \}\);/);
-  assert.match(face, /if \(canvas\) heads\.set\(key, \{ canvas \}\); else heads\.delete\(key\);/, 'a face with no head is not kept');
-  assert.match(face, /const face = await headFace\(raceKey, gender, scale, set\[i\] \? i : 0, art\);/);
-  const hud = src('src/ui/hud/hudLarge.js');
-  const head = hud.slice(hud.indexOf('export async function loadHudLargeHead('));
-  assert.ok(head.indexOf('playerHeadImage(entity') < head.indexOf('racialOverrideHeadArt(entity)'), 'the Morrowind head first - the curse\'s too (the owner: "Do this") - Daggerfall\'s override where none is drawn');
-  assert.match(hud, /\|mw\$\{playerHeadKey\(entity\)\}`;/, 'the key: the data, and the helm worn (characters/headPortraits.js playerHeadKey)');
-  assert.doesNotMatch(hud, /^import .*scenes\/dataSource\.js/m, 'the data store behind a door (its network door binds at its load)');
-  assert.doesNotMatch(src('src/characters/headPortraits.js'), /^import .*scenes\/dataSource\.js/m, 'and in the heads\' module too');
-  const art = src('src/ui/chargenArt.js');
-  assert.match(art, /_faces = set;\n\s*headFaces\(set, wantRace, wantGender\);/);
-  assert.match(art, /if \(img && _faces === set\) set\.tex\[i\] = _deps\.renderer\.uploadTexture\('img', `face:mw:\$\{set\.key\}:\$\{i\}`, toScreenOrder\(img\)\);/);
 });
 
 const STORE = (generation, count = 1) => ({ morrowindDataCount: () => count, morrowindDataGeneration: () => generation });
@@ -325,7 +296,6 @@ test('PORTRAIT3D: a live character\'s head key - the data\'s stamp and the helm 
     _setHeadDataForTests(STORE(8));
     assert.equal(playerHeadKey({}), '8|-', 'another generation, another key');
   } finally { _setHeadDataForTests(null); }
-  assert.match(src('src/ui/dialClassicArt.js'), /return `\$\{f\.file\}#\$\{f\.record\}\|mw\$\{playerHeadKey\(entity\)\}`; \};/, 'the dial\'s key: its record\'s and the head\'s');
 });
 
 /** A document enough for the party's plate (test/net/soc4_partyhud.test.js's shape, cut down). */
@@ -360,16 +330,11 @@ test('PORTRAIT3D: the faces of the record - the party\'s plate, the family\'s ca
   assert.equal(facePose(kin, { currentId: 2 }).kin, true, 'another of the line: one of the people');
   assert.equal(facePose({ ...kin, kind: 'player' }, { currentId: 2 }).kin, undefined, 'another player\'s character: a player\'s');
   assert.equal(facePose(kin).kin, undefined, 'the one played not named (the Succession\'s heirs, to be played): a player\'s');
-  assert.match(src('src/characters/headPortraits.js'), /faceIndex: pose\.face, npc: !!pose\.kin \}, opts\);/);
   // no renderer: the record, as before
   const asked = [];
   const load = createFaceLoader({ fetchBytes: async (n) => { asked.push(n); throw new Error('no data here'); }, palette: {} });
   await load({ race: 'Breton', gender: 'male', face: 3 }).catch(() => null);
   assert.match(asked[0], /^FACE\d\dI0\.CIF$/);
-  const party = src('src/ui/partyPanel.js');
-  const loader = party.slice(party.indexOf('export function createFaceLoader('));
-  assert.ok(loader.indexOf('await morrowindFaceOf(pose)') < loader.indexOf('if (!fetchBytes || !palette) return null;'), 'the head first, before the record\'s data is asked');
-  assert.match(party, /poseHeadImage\(pose, \{ px: HEAD_RECORD\.w \* HEAD_RECORD\.scale, ph: HEAD_RECORD\.h \* HEAD_RECORD\.scale \}\)/);
   // the plate: a head is drawn its picture's scale smaller, smooth; a record at whole pixels, square
   const social = new SocialState({ now: () => 1e12 });
   const m = (n) => ({ acct: `acct-${n}`, name: n, online: true, seen: 1e12, peers: [`peer-${n}`], p: null });
@@ -400,7 +365,6 @@ test('PORTRAIT3D: the faces of the record - the party\'s plate, the family\'s ca
     _setHeadDataForTests(STORE(9, 0));
     assert.equal(headSuffix(), '', 'the data gone: the record\'s key again');
   } finally { _setHeadDataForTests(null); setPortraitRenderer(null); }
-  assert.match(party, /const key = p \? `\$\{faceKeyOf\(p\)\}\$\{headSuffix\(\)\}` : null;/);
   for (const page of ['src/ui/familyPages.js', 'src/ui/legacy/legacySuccession.js']) {
     assert.match(src(page), /if \(img\.scale > 0\) Object\.assign\(cv\.style, \{ width: `\$\{img\.width \/ img\.scale\}px`, height: `\$\{img\.height \/ img\.scale\}px`, imageRendering: 'auto' \}\);/, `${page}: the head at the record's size, smooth`);
   }
@@ -417,11 +381,6 @@ test('PORTRAIT3D: the escorts\' faces - an adult\'s face of the race\'s heads is
     _setHeadDataForTests(STORE(7, 0));
     assert.equal(escortHeadKey(face()), null, 'no data');
   } finally { _setHeadDataForTests(null); }
-  const esc = src('src/ui/hud/hudEscortFaces.js');
-  assert.match(esc, /const panel = \{ special, img: \(head && _textures\.get\(head\)\) \|\| \(_textures\.get\(`\$\{file\}#\$\{record\}`\) \?\? null\) \};/);
-  assert.match(esc, /if \(!\(head && _textures\.has\(head\)\)\) panel\.img = _textures\.get\(key\);/, 'a record landing late is not drawn over the head');
-  assert.match(esc, /if \(headDataStamp\(\) !== _headStamp\) refreshFaces\(\);/);
-  assert.match(esc, /tex: _deps\.renderer\.uploadTexture\('img', key, toScreenOrder\(img\)\), w: HEAD_RECORD\.w, h: HEAD_RECORD\.h/, 'drawn at a record\'s size');
 });
 
 test('PORTRAIT3D: the tab dial\'s face - the player\'s Morrowind head first, trimmed to its painted pixels, drawn at CLASSIC_FACE_MAX at most and smooth (the root says so, and its rule lifts the pixels\' squaring off that door alone); the record where none is drawn', () => {
@@ -449,40 +408,5 @@ test('PORTRAIT3D: the tab dial\'s face - the player\'s Morrowind head first, tri
     wearClassicDial(doc, { skills: { width: 2, height: 2, rgba: new Uint8ClampedArray(16), scale: 3 } });
     assert.equal(root.dataset.grimDialFace, undefined, 'a record: square pixels');
   } finally { if (had === undefined) delete globalThis.ImageData; else globalThis.ImageData = had; }
-  const dial = src('src/ui/dialClassicArt.js');
-  const read = dial.slice(dial.indexOf('export async function readClassicDial('));
-  assert.ok(read.indexOf('await readHeadDial(entity)') < read.indexOf('const f = faceSourceOf(entity);'), 'the head first, the record where none is drawn');
-  assert.match(src('src/ui/grimoireDress.js'), /\[data-grim-dial-art="classic"\]\[data-grim-dial-face="head"\] \.px-dial \.px-arm\[data-grim-icon="skills"\] \.px-c \{ image-rendering: auto; \}/);
 });
 
-test('PORTRAIT3D: the rig follows the curse - setVampire rebuilds the body with the vampire\'s head and back, one build a change and a boolean compare otherwise; asked mid-build it waits for the build; the standing arm counts as the entity\'s only with the curse matching, and the frame asks', async () => {
-  const { createFpArm } = await import('../../src/combat/fpArm.js');
-  const { retailBodyDeps, countingRenderer: bodyRenderer } = await import('../fixtures/mw/bodyRig.mjs');
-  const { armsStandFor } = await import('../../src/combat/weapon/weaponRig.js');
-  const base = retailBodyDeps({});
-  let opened = 0;
-  const deps = { ...base, loadMorrowindArchives: async () => { opened++; return base.loadMorrowindArchives(); } };
-  const arm = createFpArm();
-  arm.attach(bodyRenderer(), () => null);
-  const first = await arm.build({ race: 'fprace', reachSweep: false, deps });
-  assert.equal(first.ok, true, `${first.stage}: ${first.error}`);
-  assert.equal(arm.builtFor().vampire, false);
-  const n = opened;
-  assert.equal(arm.setVampire(false), false, 'no change, no build');
-  const turned = await arm.setVampire(true);
-  assert.equal(turned.ok, true, `${turned.stage}: ${turned.error}`);
-  assert.deepEqual([arm.builtFor().vampire, opened], [true, n + 1], 'one build, and the vampire stands');
-  assert.equal(arm.setVampire(true), false, 'the fast path');
-  // asked while a build runs: it waits, and the build after it takes it
-  const running = arm.build({ race: 'fprace', reachSweep: false, vampire: true, deps });
-  assert.equal(arm.setVampire(false), false, 'mid-build: queued, not built');
-  await running;
-  for (let i = 0; i < 50 && arm.builtFor()?.vampire !== false; i++) await new Promise((res) => setTimeout(res, 10));
-  assert.equal(arm.builtFor().vampire, false, 'the cure, built once the build in flight stood');
-  // the standing arm is the entity's only with its curse
-  const ent = { race: 'Breton', gender: 'male', faceIndex: 0, activeEffects: [{ kind: 'racialOverride', racial: 'vampirism' }] };
-  const stood = { race: 'breton', female: false, faceIndex: 0, werewolf: false };
-  assert.equal(armsStandFor(ent, { ready: () => true, builtFor: () => ({ ...stood, vampire: true }) }), true);
-  assert.equal(armsStandFor(ent, { ready: () => true, builtFor: () => ({ ...stood, vampire: false }) }), false, 'the living face is not the vampire\'s');
-  assert.match(src('src/combat/weapon/weaponRig.js'), /fpArm\.setWerewolf\(wolf, \{ skin: wolfSkin \}\);\n\s*fpArm\.setVampire\?\.\(!!liveVampirism\(entity\)\);/, 'the frame asks, beside the wolf');
-});

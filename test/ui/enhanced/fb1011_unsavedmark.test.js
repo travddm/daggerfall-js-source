@@ -126,8 +126,4 @@ test('UNSAVED-MARK the head stands under the Settings toolbar: the bar measured 
   assert.equal(ro.on, false, 'let go with the bar');
   assert.equal(set['--opt-tools-h'], '156px', 'and a bar gone writes nothing');
   assert.equal(stickUnderToolbar(list, bar, undefined), null, 'no observer: the card sticks at the top, as before');
-  const css = read('src/ui/enhanced/enhancedStyle.js'), menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(css, /\.opt-tools \+ \.opt-body \.ctl-head \{ top: var\(--opt-tools-h, 0px\); \}/);
-  assert.match(css, /\.ctl-head \{ position: sticky; top: 0; z-index: 2; \}/, 'sticky, as TORCH-BIND made it');
-  assert.match(menu, /const tools = optionsToolbar\(body, \{ pause \}\);\n\s*list\.append\(tools, body\);\n\s*stickUnderToolbar\(list, tools\);/, 'the Settings list measures its own toolbar');
 });

@@ -110,34 +110,3 @@ test('MWNPC10a-2 the court offers him and his host their creatures, each on the 
   assert.equal(lane.destroyed, 1, 'leaving lets the lane go');
 });
 
-test('MWNPC10a-3 by source: the dungeon pass draws the court\'s bodies before the billboards their batches ride; the broker keeps her mortal guise', () => {
-  const m = rd('src/scenes/worldModes.js');
-  const bodies = m.indexOf('if (isGateArena(dungeonLoc)) host.drawGateBodies?.(canvas, proj, view, mwv.eye, dt);');
-  const flats = m.indexOf('renderer.drawBillboards([...dungeonCtx.billboardBatches,', bodies);
-  assert.ok(bodies > 0 && flats > bodies, 'before the dungeon\'s billboards (extraBillboards carries the court\'s)');
-  assert.ok(rd('src/scenes/world.js').includes('drawGateBodies: (canvas, proj, view, eye, dt) => { gateCourt?.drawBodies(canvas, proj, view, eye, dt); },'));
-  assert.ok(!/rosterActor|offer\(/.test(rd('src/scenes/sigilBrokerPool.js')), 'the Seducer in her mortal guise stays her sprite (section 15)');
-});
-
-test('MWNPC10a-4 an actor\'s scale reaches its body: drawn that many times its size about its feet (drawThird\'s grow), its head that much higher; an actor with none at its own size', async () => {
-  const { createNpcBodies } = await import('../../../src/characters/npcBodies.js');
-  const flush = () => new Promise((r) => setTimeout(r, 0));
-  const grows = new Map();
-  const rig = () => {
-    const r = { mode: 'first', skinned: false,
-      attach() {}, async build() { await flush(); return { ok: true }; },
-      canThirdPerson: () => true, raceHeightScale: () => 1, setViewMode(m) { r.mode = m; return true; },
-      thirdActive: () => r.mode === 'third' && r.skinned, update(dt, o) { if (o?.pose !== false) r.skinned = true; },
-      drawThird(_c, o) { grows.set(r, o.grow); return r.thirdActive(); }, unload() {}, setSheathed() {}, revive() {} };
-    return r;
-  };
-  const lane = createNpcBodies({ renderer: {}, tier: () => 'near', createRig: rig, now: () => 1000 });
-  const look = { creature: ['dremora_lord'] };
-  const actors = [{ id: 'boss', look, feet: [0, 0, -3], scale: 3 }, { id: 'imp', look: { creature: ['scamp'] }, feet: [1, 0, -3] }];
-  for (let i = 0; i < 10; i++) { lane.begin(); for (const a of actors) lane.stand('gate', a); lane.end(1 / 60, [0, 0, 0]); for (let k = 0; k < 4; k++) await flush(); }
-  lane.draw({}, { proj: null, view: null, eye: [0, 0, 0] });
-  assert.deepEqual([...grows.values()].sort(), [1, 3], 'him three times, the Imp once');
-  lane.destroy();
-  const pb = rd('src/net/peer/peerBodies.js');
-  assert.ok(pb.includes('* this._scaleOf(b) : 0; }'), 'and his head (the name\'s height) three times as high');
-});

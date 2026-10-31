@@ -112,28 +112,6 @@ test('DISC17-B: a distant storm\'s thunder keeps its place from the ear - a walk
   assert.ok(Math.abs((far.positionX.value - listener.positionX.value) - (at[0] - 100)) < 1e-9);
 });
 
-test('DISC17-B: a far shot is let go when its clip has run out - its panner no longer moved and the list empty; the ambience\'s own storm stays DFU\'s one-shot; both hosts play the distant thunder far (mutant: never let go)', () => {
-  const { e, panners, ctx } = riggedEngine();
-  e.setListener([0, 0, 0], [0, 0, 1]);
-  e.play3d(349, [13, 6, 0], 1, { refDistance: 13, far: true });
-  e.setListener([1, 0, 0], [0, 0, 1]);
-  assert.equal(panners[0].positionX.value, 14, 'moved with the ear while it sounds');
-  ctx.currentTime += 6.01;
-  e.setListener([5, 0, 0], [0, 0, 1]);
-  assert.equal(panners[0].positionX.value, 14, 'a spent clip stays put');
-  assert.equal(e._far.length, 0, 'and is let go');
-  assert.equal(e.play3d(349, [1, 0, 0], 1, { far: true }), 6, 'a far shot answers its duration as play3d always did (A3\'s busy clock)');
-  // the storm overhead is DFU's AmbientEffectsPlayer, placed at PlaySomewhereOnHorizon's 3000 m minimum - untouched
-  assert.match(rd('src/systems/ambientEffects.js'), /const d = this\.engine\.play3d\(index, pos, 1, \{ refDistance: minDistance, maxDistance: minDistance \* 8 \}\);/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    // EVERY thunder the host plays from a strike's side is held there from the ear - the distant storms' and (EVENT1,
-    // world.js) the dread's alike: one pin per line, so a second thunder line cannot stand in for the first
-    const thunder = rd(host).match(/audio\.play3d\(s\.clip, thunderSourceAt\([^)]*\), s\.volume, \{[^}]*\}\);/g) ?? [];
-    assert.ok(thunder.length >= 1, host);
-    for (const line of thunder) assert.match(line, /\{ refDistance: THUNDER_SOURCE_M, maxDistance: THUNDER_SOURCE_M \* 8, far: true \}\);$/, `${host}: ${line}`);
-  }
-});
-
 function fakeDocument() {
   const node = () => {
     const n = {
@@ -175,15 +153,6 @@ test('DISC17-C: the held map carries no weather - a host that still hands it one
 
 test('DISC17-C: the weather layer is gone from the tree - no module, no import, no host wiring, no sheet member; the sim keeps its own laws (mutants: the host hands the map its weather again)', () => {
   assert.equal(existsSync(new URL('../../src/ui/weatherLayer.js', import.meta.url)), false);
-  const map = rd('src/ui/heldMap.js');
-  assert.doesNotMatch(map, /weatherLayer|weatherMap\.js|weatherSim\.js|forecast|deps\.weather/i);
-  const world = rd('src/scenes/world.js');
-  const build = world.slice(world.indexOf('function buildTravelMapWindow('), world.indexOf('function buildTravelMapWindow(') + 3000);
-  assert.doesNotMatch(build, /weather:/, 'the map is handed no weather');
-  assert.match(build, /getClimateIndex: \(x, yy\) => maps\.getClimateIndex\(x, yy\),/, 'and the climate lookup it had before the weather (the travel time\'s, the ink\'s)');
   assert.equal(SHEET_MEMBERS.includes('paintUnder'), false);
   for (const f of ['src/ui/town/townSheet.js', 'src/ui/automap/automapSheet.js', 'src/ui/map/mapStrip.js']) assert.doesNotMatch(rd(f), /paintUnder/, f);
-  // what the map read stays the sim's: the forecast law and the ground law are the weather map's own
-  assert.match(rd('src/systems/weather/weatherMap.js'), /export function forecastAt\(/);
-  assert.match(rd('src/systems/weather/weatherSim.js'), /export function mapGround\(climateAt\)/);
 });

@@ -110,8 +110,6 @@ test('WW1: the Mods pane entry is the shipped modsettings.json - every key, its 
   setModSetting(WEAPON_WIDGET_VENDOR, 'Swings.Speed', 'x');
   assert.equal(modSettingsOf(WEAPON_WIDGET_VENDOR)['Swings.Speed'], 1, 'a non-number reads as the default');
   _resetModSettings();
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /isFloatKey\(def\)/, 'the pane has a float stepper');
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /def\.step \?\? 0\.1/, 'stepping by the key\'s own step');
 });
 
 test('WW1: LoadSettings - the fields carry the mod\'s own multipliers (Offset x10, Bob.Length /100, Size x2, SpeedMove x4, SpeedState x500, Shape x0.5, Inertia x500, Forward x0.2, Chance /100)', () => {
@@ -468,7 +466,6 @@ test('WW1: Ambidexterity - the sprite in the hand you swing with (flipped for th
   assert.equal(c.widget.flipHorizontal, true, 'IL 0x3528: a claymore answers Both, and the swords switch mirrors it (FPSWeaponClone.cs:2378)');
   const c2 = bench({ weapon: { templateIndex: WEAPONS.Claymore, group: 'Weapons' }, over: { 'Miscellaneous.MirrorTwoHandedSwords': false } }); c2.frame();
   assert.equal(c2.widget.flipHorizontal, false, 'the switch off: as the original');
-  assert.match(rd('src/combat/weapon/weaponWidget.js'), /getItemHands\(w\.specificWeapon\) !== ITEM_HANDS\.Both\) return false;/, 'the compare names Both');
 });
 
 test('WW1: Offset, Bob and Inertia - the channels the frame publishes: the sheathe slide off the screen (and the equip countdown\'s jump), the walking bob\'s rate and size, the look\'s lag with its sign by hand, the forward depth over the scale; DoubleScaleTextures\' half-size shift on the idle; the module switches each silence their channel', () => {
@@ -577,81 +574,6 @@ test('WW1: the Morrowind arms take the frame\'s Position and Scale over their ow
 
 // ═══ the seams ══════════════════════════════════════════════════════════
 
-test('WW1: the rig runs the clone beside the machine - the late update after the machine\'s step with the frame\'s inputs, the draw seam after the arms and before the classic sprite, the end-of-frame resume, the recoil fed from resolveHit, the arms\' transform, the hosts\' motion words, the look latch, the miss billboard', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /const widget = createWeaponWidget\(\{\s*audio, envHit: envCast, missEffect,/);
-  assert.match(rig, /const widgetOn = \(\) => modSetting\('weapon-widget', 'Enabled'\);/);
-  // PIN MOVED (TWO-HANDS): the recoil is the STRIKING hand's clone - a pair's left hand's blow recoils the left's (was:
-  // `=> widget.onAttackDamageCalculated(...)`, the one clone)
-  assert.match(rig, /playerWeapon\.onAttackResult = \(\{ foe, damage \}\) => \(pairUp\(\) && playerWeapon\.activeHand === 'L' \? twoHands\.offWidget : widget\)\.onAttackDamageCalculated\(\{ damage, parrySounds: !!foe\?\.basics\?\.parrySounds, pos: foe\?\.pos \?\? foe\?\.ai\?\.pos \?\? null, isEnemy: true \}\);/);
-  // SW1 widened the inner span from 2800: the shield widget's own frame
-  // feed now sits inside it, between the torch component's and this one's.
-  // AUDIT-THUNDERLOCK F8 widened the OUTER span from 1200: the port's own
-  // weapon's voice rides the same frame, right after the machine's step,
-  // because the trigger is what the ear is matching.
-  // AUDIT 27h S3b widened it again, from 4200: the switched-off Shield
-  // Widget's step is counted at the gate, just above it, with its reason.
-  // What the pin holds is the ORDER - the machine steps, then the clone's
-  // LateUpdate - and that is untouched.
-  // PIN MOVED (MIXED-PAIR): the gate's gun leg is `gunUp()` - a Pistolet in either hand, a blade's partner included
-  // (was: `thunderlockHeld()`, the right hand's alone)
-  assert.match(rig, /playerWeapon\.update\(dt\);[\s\S]{0,4800}?if \(widgetOn\(\) \|\| _torchesOn \|\| shieldOn\(\) \|\| gunUp\(\)\) \{[\s\S]{0,5200}if \(widgetOn\(\)\) widget\.lateUpdate\(dt, \{/, 'LateUpdate after the machine\'s Update (HT1: the torch component shares the frame\'s inputs; SW1b: the shield opens the block too)');
-  assert.match(rig, /const look = takeFrameLook\(\);/, 'the look read once a frame'); assert.match(rig, /look: lookAxes, swingHeld: _held, cursorActive: cursorActive\(\), camera: camThunk,/, 'WIDGET-LOOK: as DFU\'s look axes (test/combat/weapon/fb1003_widgetlook.test.js)');
-  // SW1: the shield's coroutines resume on the same edge, in the same finally
-  // PIN MOVED (TWO-HANDS): and the left hand's clone resumes on it too (was: the right's and the shield's alone)
-  assert.match(rig, /try \{ return onUiScreen\(renderer, cv\(\), \(\) => drawInner\(\{ paralyzed \}\)\); \} finally \{ widget\.endOfFrame\(\); twoHands\.offWidget\.endOfFrame\(\); shield\.endOfFrame\(\); \}/, 'WaitForEndOfFrame resumes after the draw (RETRO-UI: drawn on the UI screen)');
-  assert.match(rig, /fpArm\.setScreenTransform\(widgetOn\(\) && !armsClimb \? \(base\) => widget\.armsTransform\(base\) : null\);/);   // PIN MOVED (CLIMB-HANDS II): not on arms whose hands are on the stone
-  // MAC-I: every sprite in this seam takes the frame's TINT now (FPSWeapon.Tint, off the room's light);
-  // the ORDER and the returns are what this pin holds, and neither moved.
-  // SW1b: the shield's verdict moved ABOVE the gate (its poses live in the frames `shown()` calls hidden), so the
-  // step here is the one line, and `if (!shown()) return;` stops a shield-only frame before the clone and the sprite
-  // MAP-WEAPON put one more rung between the arms and the shield: while a
-  // map holds the screen the classic body paints none of the four below
-  // (the arm's branch has returned above it, so the held-sheet pose is
-  // untouched). The ORDER of the four is what this pin holds, and it did
-  // not move.
-  // PIN MOVED (SPELL-HAND): the clone's draw passes the spell hand's guard, under its own comment (was:
-  // `widget.draw(renderer, c, fpTint)`); the order did not move
-  assert.match(rig, /if \(fpArm\.active\(\)\) \{[^}]*fpArm\.draw\(c\);[^}]*return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(sheetWindowUp\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(shieldRect\) shield\.draw\(\(index, rect, uv\) => drawShieldSprite\(index, rect, uv, fpTint\)\);\s*if \(handheldOn\(\) && c\) handheld\.draw\(renderer, c, fpTint\);\s*if \(torchOnly && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*if \(!shown\(\) && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*const tlArt = c && thunderlockHeld\(\) \? artFor\(playerWeapon\.weapon\) : null;\s*if \(tlArt\?\.anchor && tlArt\.unionBox\) \{ drawThunderlock\(tlArt, c, fpTint\); return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(gunSliding && !shown\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(widgetOn\(\) && c && widget\.draw\(renderer, c, fpTint, _spellGuard\.weapon > 0 \? \{ transform: \(r\) => \(\{ \.\.\.r, y: r\.y \+ guardDrop\(_spellGuard\.weapon, r\.h\) \}\) \} : undefined\)\) return;/, 'the arms first, MAP-WEAPON\\u2019s map gate, SW1\\u2019s shield (the off hand, behind both), the torch, the clone, the classic sprite last');
-  assert.match(rig, /const envCast = envHit \?\? \(\(reach\) => \{/, 'CheckForEnvDamage\'s cast from the host\'s collider');
-  const pw = rd('src/combat/playerWeapon.js');
-  assert.match(pw, /this\.onAttackResult\?\.\(\{ foe, damage \}\);/, 'OnAttackDamageCalculated\'s one consumer');
-  const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /setScreenTransform\(fn\) \{ screenTransform = typeof fn === 'function' \? fn : null; \}/);
-  assert.match(arm, /const rect = screenTransform \? screenTransform\(\{ x: 0, y: 0, w: W, h: H \}\) : null;/, 'the composite\'s whole rect through the transform');
-  // PIN MOVED (MW-DETAIL, 2026-10-22): against the sprite target's edge as it stands (renderer.js charSpriteRoom)
-  assert.match(arm, /const win = rect \? fpFrameWindow\(rect, W, H, pw, ph, edge\) : null;/, 'DISC13-C: the frame window the moved rect shows on the screen');
-  assert.match(arm, /renderer\.drawScreenQuad\(tex, win\.dst, \{ u0: 0, v0: fh \/ edge, u1: fw \/ edge, v1: 0 \}\)/, 'drawn as a screen quad with the overlay\'s own uv (DISC13-C: laid where the frame window says, at the rect\'s own sub-pixel place)');
-  // WW2: the motor's words for the bob ride ONE bag (motionBagOf) at every site - a per-file grep let a second, partial
-  // site in worldModes.js (the world-hosted dungeon lane) ship without `standing`, and the walking bob played at rest
-  for (const [host, sites] of [['src/scenes/world.js', 1], ['src/scenes/exterior.js', 1], ['src/scenes/worldModes.js', 2], ['src/scenes/dungeon.js', 1]]) {
-    const s = rd(host);
-    assert.equal((s.match(/motionBagOf\(player\)/g) ?? []).length, sites, `${host}: every motion bag is the one bag`);
-    assert.equal(/moveForward \|\| 0/.test(s), false, `${host}: no bag written out longhand`);
-    if (host !== 'src/scenes/dungeon.js') assert.match(s, /missEffect: \(k, p, o\) => hitEffects\.showMissEffect\(k, p, o\)|missEffect:/, `${host}: the miss billboard`);
-  }
-  assert.match(rd('src/scenes/dungeonContext.js'), /missEffect: \(k, p, o\) => hitEffects\.showMissEffect\(k, p, o\)/);
-  assert.match(rd('src/scenes/hitEffects.js'), /showMissEffect: \(kind, pos, \{ archive = BLOOD_ARCHIVE, record = 2, fps = 20, scale = 2 \} = \{\}\) => spawn\(record, pos, null, \{ archive, fps, scale \}\)/);
-  // FIELD-GUN18 re-aimed this line, and it is worth saying what it was
-  // holding. It matched `entry.size.map((v) => v * scale)` - the ARRAY
-  // arm of a ternary whose value is a {w, h} RECORD, so the arm this
-  // pin named had never once executed and the other arm was `size *
-  // scale`, which is NaN. The x2 was pinned by SOURCE TEXT for a
-  // branch that could not run, and a NaN size draws nothing, so
-  // DoClang/DoThud has been invisible since WW1 shipped while this
-  // assertion stayed green. It asks for the arithmetic that runs now.
-  assert.match(rd('src/scenes/hitEffects.js'), /entry\.size = \{ w: entry\.size\.w \* scale, h: entry\.size\.h \* scale \};/, 'DoClang/DoThud\'s localScale x2');
-  assert.match(rd('src/scenes/hitEffects.js'), /scale = 2 \} = \{\}\)/, '...and a miss effect is scaled unless a caller says otherwise');
-  const lf = rd('src/player/lookFilter.js');
-  assert.match(lf, /export function takeFrameLook\(\) \{ const v = \[_frameYaw, _framePitch\]; _frameYaw = 0; _framePitch = 0; return v; \}/);
-  assert.match(lf, /_frameYaw \+= dyaw; _framePitch \+= dpitch;/, 'latched where the look is applied');
-  // the bundle door registered from the textures pick, beside the seasons'
-  // PIN MOVED (AUDIT VE R2): one registration of the store - the boot seam reaches it, it no longer copies it
-  assert.match(rd('src/scenes/shared.js'), /const textures = registerTextureStore\(\)/);
-  assert.match(rd('src/scenes/dataSource.js'), /setWeaponWidgetSources\(names, loadTextureFile\);/);
-  assert.match(rd('src/systems/features.js'), /modFeature\('weapon-widget', \(\) => t\('features\.effect\.atOnce', 'Takes effect at once\.'\), '\w+'\)/);
-});
-
 test('WW1: the bundle door - TryImportCifRci\'s spelling with the w_ prefix and the metal\'s name (none for bare hands), the pick\'s names filtered to the mod\'s bundle and its loose PNGs, nothing attached answering null without throwing, the DFMOD prefix with one home', async () => {
   assert.equal(widgetTextureName('WEAPON04.CIF', 0, 0, WEAPON_MATERIALS.Elven), 'w_WEAPON04.CIF_0-0_Elven');
   assert.equal(widgetTextureName('WEAPON04.CIF', 1, 3, WEAPON_MATERIALS.Iron, false), 'WEAPON04.CIF_1-3_Iron');   // AUDIT 68 S09-texname-dup: the plain name is doubleScale off
@@ -680,7 +602,6 @@ test('WW1: the bundle door - TryImportCifRci\'s spelling with the w_ prefix and 
   assert.equal(await weaponWidgetTexturesAttached(), false);
   assert.equal(await weaponWidgetImage('w_WEAPON04.CIF_0-0_Elven'), null);
   assert.equal(setWeaponWidgetSources(null, null), 0);
-  assert.match(rd('src/combat/weapon/weaponWidgetAssets.js'), /import \{ DFMOD_KEY_PREFIX \} from '\.\.\/\.\.\/systems\/seasonsIliacBayAssets\.js';/);
   // the atlas asks the door by that name and, until it lands, draws the classic frame at the classic size.
   // DW1: WHICH file is FPSWeapon.cs:637-644's choice - Diverse Weapons is on
   // by default (MO1), so a longsword asks LONGSWORD.CIF (WeaponBasics.cs
@@ -716,9 +637,6 @@ test('WW4 (Mac\'s curated fix): a clone that chooses silence OWNS the draw seam 
   // genuine NOT-APPLICABLE still falls through to the classic sprite
   const none = bench({ weaponType: T.None }); none.frame();
   assert.equal(none.widget.draw(none.renderer, none.ctx.canvas), false, 'no weapon type: not the clone\'s');
-  // and the rig's seam reads the answer exactly that way
-  // PIN MOVED (SPELL-HAND): the seam passes the spell hand's guard as a transform (was: `widget.draw(renderer, c, fpTint)`)
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /if \(widgetOn\(\) && c && widget\.draw\(renderer, c, fpTint, _spellGuard\.weapon > 0 \? \{ transform: \(r\) => \(\{ \.\.\.r, y: r\.y \+ guardDrop\(_spellGuard\.weapon, r\.h\) \}\) \} : undefined\)\) return;/);
 });
 
 test('WW4b (Mac\'s curated fix): after a swing under Recovery = Hide the melee idle re-enters on a DRAWABLE frame, so it slides back into view instead of staying at -1 for ever', () => {

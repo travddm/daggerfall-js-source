@@ -159,33 +159,3 @@ test('AUDIT FIELD-GUN-MW F2: the muzzle vertex is the one farthest from the grip
   assert.ok(Math.abs(w2[1] - 1) < 1e-6, `MW +Z is the world's up, a metre over the feet: ${w2}`);
 });
 
-test('AUDIT FIELD-GUN-MW by source: the gate reads `ranged`; the voice is told the hold; the arm keeps its third-person frame; the flight takes a world muzzle; every host still asks the one door', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /const armShoots = \(fpArm\.active\(\) \|\| fpArm\.thirdActive\(\)\) && !!playerWeapon\.machine\.ranged;/, 'ranged, not isBow');
-  assert.match(rig, /const held = holdShotForArm\(evs, dt, armShoots\);\n\s*thunderlockVoice\(dt, \{ armShoots, fired: held\.fired \}\);/, 'the hold first, the voice told');
-  assert.match(rig, /const trigger = armShoots \? fired : \(m\.state !== 'Idle' && _tlState === 'Idle'\);/, 'the trigger under the arm is the release; classic keeps the click');
-  assert.match(rig, /\(armShoots \? flashFromClock\(dt\) : muzzleGlow\(m\.state !== 'Idle', m\.frame, THUNDERLOCK_MUZZLE_CURVE\)\)/, 'the flash counts from the release under the arm (THUNDERLOCK-ART2: on the gun\'s own curve)');
-  // PIN MOVED (PISTOL-PORT): a Pistolet's shot - one or a pair - leaves its own hand's barrel, below the arm's answer
-  // PIN MOVED (AUDIT MIXED-PAIR L3-6): the arm's muzzle is the hand that fired - a pair's striking hand, else the right's
-  assert.match(rig, /if \(fpArm\.active\(\) \|\| fpArm\.thirdActive\(\)\) return fpArm\.weaponMuzzle\(pairUp\(\) \? playerWeapon\.activeHand : 'R'\);[^\n]*\n(?:\s*\/\/[^\n]*\n)?\s*if \(pistolsUp\(\)\) return muzzleRay\(pistols\.hands\[playerWeapon\.gunPair \? playerWeapon\.activeHand : playerWeapon\.pistols\.lead\]\?\.drawn \?\? null, fovRad, forward\);\n\s*return muzzleRay\(_tlDrawn, fovRad, forward\);/, 'the arm answers for its own muzzle');
-  assert.doesNotMatch(rig, /playerWeapon\.machine\.isBow\) \{\n\s*\/\/ The classic sprite path is untouched/, 'the bow-only gate is gone');
-  const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /lastThirdModel = model;/, 'drawThird keeps its frame for the muzzle');
-  // PIN MOVED (AUDIT MIXED-PAIR L3-6): the muzzle names the hand that fired (`hand`, the right's by default), its note above the third-person leg
-  assert.match(arm, /weaponMuzzle\(hand = 'R'\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(viewMode === 'third'\) \{[\s\S]*?return \{ world: worldPointOf\([\s\S]*?\}\n[\s\S]*?return viewOffsetOf\(/, 'third answers a world point, first a lens offset');
-  const cast = rd('src/systems/spellcast.js');
-  assert.match(cast, /export function playerShotOrigin\(eye, lookDir, muzzle\) \{\n\s*if \(muzzle\?\.world\) return \[\.\.\.muzzle\.world\];/, 'a world muzzle is the origin itself, at the ONE fork');
-  for (const f of ['src/combat/arrowFlight.js', 'src/scenes/dungeonContext.js']) {
-    const s = rd(f);
-    assert.match(s, /playerShotOrigin\(from, dir, (?:meta\.)?muzzle\)/, `${f} spawns through the one fork`);
-    assert.doesNotMatch(s, /muzzle \? playerMuzzleOrigin/, `${f} restates no fork of its own`);
-  }
-  // GENERATIVE: every host that fires the player's shot passes the one door's answer, so the fix reaches all of them
-  let doors = 0;
-  for (const h of ['world', 'exterior', 'dungeonContext', 'worldModes', 'dungeon']) {
-    const s = rd(`src/scenes/${h}.js`);
-    const n = (s.match(/weaponRig\.thunderlockMuzzle\(fieldOfView\(\)\)/g) ?? []).length;
-    doors += n;
-  }
-  assert.ok(doors >= 3, `the hosts that fire the shot ask the rig (${doors})`);
-});

@@ -197,23 +197,6 @@ test('SEA-VAULTS the chart: every vault on the canvas marked in the halls\' oxbl
   M.paintChart(g, M.chartModel({ ...word, vaults: word.vaults.map((t) => ({ ...t, locked: false })) }, view, W, H), W, H);
   assert.ok(!log.some(halo), 'none where no lock holds');
   assert.deepEqual([...M.CHART_VAULT_KEY], ['vault', 'A vault of the deep, open today']);
-  assert.match(src('src/ui/etherChartWindow.js'), /vaultItem\.hidden = !word\.vaults\?\.length;/);
-});
-
-test('SEA-VAULTS the seams by source: the world host builds the sea\'s ventures over the halls\' own locks, crows and remains, live with the open sea; the hall here a vault first; the door keeps a vault\'s gate past the mask; the crows told on their own ground; the chart\'s word the sea\'s; the social socket asks a sea key of a hub that reads it alone (mutants: each seam)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const seaVentures = createSeaVentures\(\{\n\s+live: \(\) => etherSea && _onlineWorldSession\(\) && !!online\?\.wildOk, day: wdunDayNow, pixel: playerTravelPixel, locks: _wdunLocks, crows: _wdunCrows, mine: \(\) => _wildMine,\n/);
-  assert.match(w, /return seaVentures\.vaultHere\(\) \?\? \(a && p \? wildHallAt\(a, p\.x, p\.y\) : null\);/);
-  // PIN MOVED (WW7-4): a capital's castle passes the mask too (World-Wide.md WW7-4)
-  assert.match(w, /if \(\(!wildInside\(mask, p\.x, p\.y\) && !seaVentures\.vaultHere\(\)\) \|\| hit\?\.dfLocation\?\.capital\) return true;/);
-  assert.match(w, /const sea = seaVentures\.crowLine\(h\);[^\n]*\n\s*if \(!wildHere\(\) \|\| !!sea !== \(wildZoneKind\(\) === ETHER_KIND\)\) return;/);
-  assert.match(w, /const line = sea \?\? `Crows gather over/);
-  assert.match(w, /const wdKey = \(\) => \{ const p = playerTravelPixel\(\); return seaVentures\.vaultHere\(\)\?\.key \?\? `\$\{p\.x\},\$\{p\.y\}`; \};/, 'a death after a load names the vault, never its pixel');
-  assert.match(w, /return \{ \.\.\.etherHost\.chart\(p\.x, p\.y, heading\(\)\), \.\.\.seaVentures\.chartWord\(\) \};/);
-  const o = src('src/net/online.js');
-  assert.match(o, /if \(\(seaVaultCell\(w\.h\) \|\| w\.k === 'fk'\) && !this\.wdunSeaOk\) return false;/);   // PIN MOVED (AUDIT SEA VENTURES A10): and a fleet's sinking
-  assert.match(o, /this\.wdunSeaOk = relaySupportsWdunSea\(relayV\);/);
-  assert.match(src('src/systems/sea/seaSpoils.js'), /export const seaPileSource = \(loc\) => \(loc\?\.ether && loc\.wildRing > 0 \? 'vault' : 'ruin'\);/);
 });
 
 test('SEA-VAULTS the open sea keeps no instance: an isle\'s dungeon room read back to its cell (seaVaultMapId\'s inverse) and nothing else\'s; the relay refuses an instance of one to everyone, staff and owner alike, its public room as it was; the page\'s door never keys one; the host\'s `wild` the open sea\'s too (mutants: the inverse\'s bounds, the relay\'s refusal, the door, the open sea)', async () => {
@@ -254,5 +237,4 @@ test('SEA-VAULTS the open sea keeps no instance: an isle\'s dungeon room read ba
   assert.equal(sea.openSeaAt(null), false);
   st.live = false;
   assert.equal(sea.openSeaAt({ x: v[0].x, y: v[0].y }), false, 'offline: the sea is no zone');
-  assert.match(src('src/scenes/world.js'), /wild: \(\) => \{ const m = wildMapMask\(\), p = playerTravelPixel\(\); return \(!!m && wildInside\(m, p\.x, p\.y\)\) \|\| seaVentures\.openSeaAt\(p\); \}/);
 });

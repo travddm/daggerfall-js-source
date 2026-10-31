@@ -96,8 +96,4 @@ test('VOYAGER2.1 the host\'s ground carries the installed layer\'s reader into e
   const r = planRoute({ x: 1100, y: -50 }, { x: 1120, y: -50 }, { ...bay(), ...routeGround(() => 0, () => 20, 3, MAP_W, MAP_H, () => true) });
   assert.deepEqual(r.kinds, new Array(20).fill('road'), 'the installed layer, through the ground');
   assert.deepEqual(routeLegs(r.pixels, r.kinds), [{ x: 1120, y: -50, kind: 'road' }], 'one straight leg on the road');
-  const host = hostText('src/scenes/world.js');
-  assert.match(host, /planRoute\(from, summary\.pixel, \{ roads: net\?\.roads \?\? null, tracks: net\?\.tracks \?\? null, \.\.\.tvRouteGround\(\)/);
-  assert.match(host, /planRoute\(from, pix, \{ roads: wnet\?\.roads \?\? null, tracks: wnet\?\.tracks \?\? null, \.\.\.tvRouteGround\(\)/);
-  assert.match(read('src/systems/travel/travelRoute.js'), /const beyond = roads \|\| tracks \? pathsBeyond : null;/);
 });

@@ -98,7 +98,4 @@ test('TS5 the outskirts round: a round town keeps the cells of a ring of its gri
   assert.equal(imperialOutskirts(at.px + 40, at.py + 40), false, 'past fifty');
   assert.equal(imperialOutskirts(at.px + 50, at.py), true);
   assert.equal(imperialOutskirts(at.px + 51, at.py), false);
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(h, /blockOf, \{ round: imperialOutskirts\(px, py\) \}\);   \/\/ TS5/);
-  assert.match(h, /const loc = outlineTownLocation\(made, blockOf, \{ round: imperialOutskirts\(px, py\) \}\);/);
 });

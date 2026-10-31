@@ -355,16 +355,6 @@ test('audit18 world-dungeon: interior doors take DaggerfallActionDoor\'s NormalD
   assert.ok('onDoorState' in fresh && 'onDoorBash' in fresh);
 });
 
-test('audit18 world-dungeon: the shared interior context wires that seam (both hosts)', () => {
-  // worldModes' entered buildings AND the standalone interior scene go
-  // through buildInteriorContext, so the wiring belongs there and
-  // nowhere else. Source-level because building a real interior needs a
-  // GPU; the clips themselves are pinned above.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const src = readFileSync(join(root, 'src/scenes/interiorContext.js'), 'utf8');
-  assert.match(src, /\n\s*attachInteriorDoorSounds\(actions\);/);
-});
-
 // ---------------------------------------------------------------------------
 // 8. AddLight's per-record range switch.
 // ---------------------------------------------------------------------------

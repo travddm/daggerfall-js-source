@@ -259,8 +259,6 @@ test('L10N3f books: a -LOC label\'s colour and scale - placed at MaxWidth / scal
     assert.equal(big.fnt.font, base.fnt.font.replace('20px', '30px'), 'the same cut, scale times the size');
     assert.equal(scaledFace(base, 1.5), big, 'made once');
   } finally { delete globalThis.document; }
-  assert.match(read('src/ui/enhanced/enhancedBook.js'), /paintRow\(pctx, scaledFace\(row\.face \?\? faces\[0\], row\.scale\), row\.text, [^\n]*color: rowInk\(row\.color\) \}\);/,
-    'each leaf row is painted at its scale, in its colour');
 });
 
 test('L10N3f books: GetBookTitle - the -LOC title wherever a title is shown (the item\'s name, the list\'s tooltip, the bookshelf, %bt), the item keyed by its id; English is the mapping\'s', () => {

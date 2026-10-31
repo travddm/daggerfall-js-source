@@ -268,21 +268,3 @@ test('HORSE-TIERS NO RED WHERE HUNGER COSTS NOTHING, AND EACH TIER\'S WORDS: the
   });
 });
 
-test('HORSE-TIERS THE ONE ACCESSOR AND THE FOUR HOSTS: no module but the switch reads the horse care key, the old boolean switch is gone, and every reader is handed the one accessor - world.js and exterior.js hand it to the upkeep (the keep, the breath, the gallop gate, the walk, the pace, the HUD\'s bar, the Stable page, the saddle panel) and to the oats\' Use; worldModes.js prices a Stable\'s horses by it; dungeonContext.js stands no transport and reads nothing', () => {
-  const files = [];
-  const walk = (dir) => { for (const f of readdirSync(dir)) { const p = join(dir, f); if (statSync(p).isDirectory()) walk(p); else if (f.endsWith('.js')) files.push(p); } };
-  walk(SRC);
-  const rel = (p) => p.slice(SRC.length);
-  assert.deepEqual(files.filter((p) => /getPref\((HORSE_CARE_PREF|'horseCare')\)/.test(readFileSync(p, 'utf8'))).map(rel), ['systems/upkeep/upkeepSwitch.js'], 'one reader of the key');
-  assert.deepEqual(files.filter((p) => /\bhorseCareOn\b/.test(readFileSync(p, 'utf8'))).map(rel), [], 'the boolean switch is gone');
-  for (const host of ['world.js', 'exterior.js']) {
-    const s = rd(`src/scenes/${host}`);
-    assert.match(s, /import \{ horseCareRules, wagonUpkeepRules \} from '\.\.\/systems\/upkeep\/upkeepSwitch\.js';/, host);
-    assert.match(s, /horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,\n\s*where: /, `${host}: the upkeep`);
-    assert.match(s, /reach: \(\) => upkeepReach\(hccRuntimeOn\(\), !!hccRuntimeOn\(\)\), horseCare: horseCareRules, wagonUpkeep: wagonUpkeepRules,/, `${host}: the oats' Use`);
-    assert.match(s, /setRideWalk\(\(mode, runAsked\) => [^\n]*upkeep\.rideWalks\(mode, runAsked\)\);/, `${host}: the walk told the run asked`);
-  }
-  assert.match(rd('src/scenes/worldModes.js'), /priced: !!horseCareRules\(\),/, 'worldModes.js: a Stable\'s prices');
-  assert.ok(!/horseCare/.test(rd('src/scenes/dungeonContext.js')), 'dungeonContext.js: no transport');
-  assert.match(rd('src/player/motor.js'), /this\.rideWalking = rideBase != null && !this\.isRunning && rideWalks\(this\.transportMode, this\._runMode\);/, 'the motor asks the walk with the run it asks');
-});

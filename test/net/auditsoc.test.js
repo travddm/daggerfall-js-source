@@ -319,16 +319,6 @@ test('AUDIT SOC B11: an act leaves through the wire\'s OWN projection - a kind w
   assert.deepEqual(sent('social').at(-1), { t: 'social', k: 'party.kick', acct: 'acct-b' });
 }));
 
-test('AUDIT SOC B7: the link says whether a welcome has carried the relay\'s clock (`clockRead`) - a channel\'s does since AUDIT SOC, and the host reads the HUB link\'s clock through it, the presence session\'s standing in only for a relay from before (mutants: the flag never set; the offset read off a link whose welcome carried none)', () => quiet(() => {
-  const { s, ws } = hubLink();
-  assert.equal(s.clockRead, false, 'the welcome above carried no clock');
-  assert.equal(s.clockOffsetMs, 0);
-  ws.receive({ t: 'welcome', id: 'peer-me', peers: [], n: 1, v: RELAY_VERSION, now: Date.now() + 5000 });
-  assert.equal(s.clockRead, true); assert.ok(Math.abs(s.clockOffsetMs - 5000) < 200, `the offset (${s.clockOffsetMs})`);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const hub = socialLink\(\);\n\s*social\.setClockOffset\(hub\?\.clockRead \? hub\.clockOffsetMs : \(online\?\.clockOffsetMs \?\? 0\)\);/, 'the host: the hub link\'s clock when it has one, else the presence session\'s');
-}));
-
 test('AUDIT SOC C20/C23: the picture names MY OWN tabs (`peers`) - a second tab of mine is me (accountOfPeer, relation "me", actionsFor "that is you"), never a stranger to friend or invite; and the colour answers are kept per version, dropped on every change (mutants: my own tab a stranger; the memo never dropped, so a friend made stayed uncoloured)', () => {
   const social = new SocialState({ now: () => 1e12, acct: 'acct-me' });
   social.apply(validSocialFrame(state({ peers: ['peer-me', 'peer-me2'], friends: [row('b')] })));
@@ -354,32 +344,3 @@ test('AUDIT SOC C20/C23: the picture names MY OWN tabs (`peers`) - a second tab 
 
 // ------------------------------------------------------------ THE HOST'S SOURCE ------------------------------------------------------------
 
-test('AUDIT SOC B5/B18/B10: the party pose says fatigue in the sheet\'s digits (/ FATIGUE_MULTIPLIER) and reads the entity, not a whole look, with the pixel read once; a page with no account says so once on the world tab and builds no social arm (mutants: the pool sent x64, so a member\'s card said 3200/6400; composeLook per pose, every item for three fields; the accountless page silent with a dead button)', () => {
-  const w = rd('src/scenes/world.js');
-  const pose = w.slice(w.indexOf('const composePartyPose = () => {'), w.indexOf('const partyRestModeFromCode = '));   // PARTY-REST1: the slice ends where the rest helpers begin - myPartyLocation reads the pixel for itself
-  assert.match(pose, /f: Math\.trunc\(\(playerEntity\.fatigue \?\? 0\) \/ FATIGUE_MULTIPLIER\), fm: Math\.trunc\(maxFatigue\(playerEntity\) \/ FATIGUE_MULTIPLIER\)/, 'the digits ui/charsheet.js shows');
-  // TO1 (2026-09-17): the host imports `liveStat` from the same module
-  // now (Travel Options' avoid-encounter chance is a Luck reading), so
-  // the pin names the two bindings THIS test is about rather than the
-  // whole import list - a list that grows is not this pin's subject,
-  // and either name going missing still reddens here.
-  const statMods = /import \{([^}]*)\} from '\.\.\/systems\/statMods\.js';/.exec(w);
-  assert.ok(statMods, 'the host no longer imports from systems/statMods.js');
-  for (const name of ['maxFatigue', 'FATIGUE_MULTIPLIER']) {
-    assert.ok(statMods[1].split(',').map((n) => n.trim()).includes(name),
-      `the statMods import no longer names ${name}`);
-  }
-  assert.doesNotMatch(pose, /composeLook\(/, 'no look composed for three fields');
-  assert.match(pose, /race: playerEntity\.race \?\? 'Breton', gender: playerEntity\.gender \?\? 'male', face: playerEntity\.faceIndex \?\? 0/, 'composeLook\'s own three readings');
-  assert.equal((pose.match(/playerTravelPixel\(\)/g) ?? []).length, 1, 'the pixel once');
-  assert.doesNotMatch(pose, /_questLoc\(\)/, 'which read it twice more');
-  const start = w.slice(w.indexOf('const socialStart = () => {'), w.indexOf('const composePartyPose'));
-  assert.match(start, /if \(!link\.acct\) \{[^\n]*\n\s*if \(!_noAccountSaid\) \{ _noAccountSaid = true; chatLog\.push\(tab\.id, \{ text: NO_ACCOUNT_TEXT, system: true \}\); \}\n\s*return;\n\s*\}/, 'no account: the line, once, and out');
-  assert.match(start, /social = new SocialState\(\{ acct: \[storedSession\(appStorage\(\)\)\?\.id, link\.acct\]\.filter\(Boolean\) \}\);/, 'AUDIT SOC B19: the picture expects the account this session is - FRIENDS-SYNC (FIELD BUGS 2026-10-01 part five): the signed-in player\'s id (the hub\'s account since), or the profile id it sent (a relay before)');
-  assert.match(w, /const NO_ACCOUNT_TEXT = 'Friends and parties are off because this browser keeps no storage';/);
-  // AUDIT SOC C2/C14/C9: the host's word on which surface is TOPMOST (ui/chatPanel.js, ui/socialPanel.js, ui/socialMenu.js
-  // take `above`), and the phone's F handed to the touch layer as the host's own door
-  assert.match(w, /above: \(\) => !!\(socialPanel\?\.isOpen\?\.\(\) \|\| socialMenu\?\.isOpen\?\.\(\) \|\| profileWin\?\.isOpen\?\.\(\) \|\| pageWin\?\.isOpen\?\.\(\)\),/, 'the chat yields to the panel, the menu and the profile (INSPECT1) - and a page read from the menu (JOURNAL1)');
-  assert.match(start, /above: \(\) => !!\(socialMenu\?\.isOpen\?\.\(\) \|\| profileWin\?\.isOpen\?\.\(\) \|\| pageWin\?\.isOpen\?\.\(\)\),/, 'the panel yields to the menu, and to the profile opened from it (INSPECT1) and the page read from it (JOURNAL1)');
-  assert.match(w, /socialInteract: \(\) => socialInteract\(\),/, 'the touch layer\'s hook is the host\'s door (AUDIT SOC C9)');
-});

@@ -578,11 +578,4 @@ test('PEER-ACTS P12 one law, pinned: the stand-in tools are the classic hand\'s 
   assert.equal(peerGatherSwing(seen, { ga: code('chop'), gb: beat(6, 'clean') }), 'blow');
   assert.equal(peerGatherSwing(seen, { ga: code('fly'), gb: beat(6, 'clean') }), 'throw');
   assert.equal(peerGatherSwing(seen, { ga: code('fly'), gb: beat(6, 'clean') }), null, 'once');
-  // the hosts
-  const w = src('src/scenes/world.js');
-  const arm = w.slice(w.indexOf('    const arm = {\n      mv,'), w.indexOf('};   // the wire\'s move bit'));
-  assert.ok(arm.length > 0, 'the pose\'s arm block');
-  assert.match(arm, /\n\s*\.\.\.\(gatherHost\?\.poseAct\(\) \?\? \{\}\),/, 'every pose and the hello carry the gathering host\'s fields');
-  const rp = src('src/net/remotePlayers.js');
-  assert.match(rp, /this\._syncAttackSound\(peer, toScene, eye\);\s*\n\s*this\._syncGatherSound\(peer, toScene, eye\);/, 'heard beside the swing, for every peer the sync meets');
 });

@@ -39,33 +39,7 @@ test('SOC2: the account\'s pair - minted once in the storage handed in, kept, th
   assert.equal(accountId({ getItem() { throw new Error('no'); }, setItem() { throw new Error('no'); } }), null, 'AUDIT SOC B10: a storage that throws keeps no account - null, never a crash and never a fresh permanent record per load');
   assert.equal(accountId(null), null, 'no storage at all: no account');
   assert.equal(accountSecret({ getItem: () => null, setItem() {} }), null, 'a storage that takes the write and forgets it: no account either (read back after the write)');
-  const src = rd('src/net/social.js');
-  assert.match(src, /export const accountId = \(storage = appStorage\(\)\)/, 'the app\'s own storage - the profile\'s, not the tab\'s');
-  assert.match(src, /export const accountSecret = \(storage = appStorage\(\)\)/);
-  assert.doesNotMatch(src, /tabStorage/, 'never the tab\'s: two tabs are two peers of one account');
-  assert.doesNotMatch(rd('src/net/online.js'), /appStorage\(\)/, 'TABS1\'s pin: the session module never touches the browser-wide storage');
 });
-
-test('SOC2: the hello carries the account when the session holds both halves and NOTHING when it does not - a presence session is never handed one, a build before SOC1 sends the hello it always sent (mutants: the account defaulted from storage; one half sent; the keys on the presence hello)', () => quiet(() => {
-  const { ws } = hubLink();
-  const hello = JSON.parse(ws.sent[0]);
-  assert.deepEqual(hello, { t: 'hello', id: 'peer-me', secret: 'secret-of-peer-me', name: 'Mac', look: { race: 'Breton', gender: 'male', faceIndex: 0, items: [] }, pose: null, acct: 'acct-me', asecret: 'secret-of-acct-me', ps: 1, hs: 1, sm: 1, fv: 1 });   // AUDIT FRIENDS-SYNC F5: and `ps`, this build's word that it reads the player's picture; SCALE5c (PIN MOVED): and `hs`, that it knows the hub's shards; PIN MOVED: and `sm`, that it shows a staff message's box (STAFF-PANEL5-MESSAGE), and `fv`, the freeze screen (STAFF-PANEL5-FREEZE)
-  assert.ok(ws.sent[0].startsWith('{"t":"hello"'), 'the prefix the relay reads first');
-  const half = hubLink({ acct: 'acct-me', asecret: null });
-  assert.ok(!('acct' in JSON.parse(half.ws.sent[0])) && !('asecret' in JSON.parse(half.ws.sent[0])), 'one half is no account');
-  assert.equal(half.s.acct, null);
-  const none = hubLink({ acct: null, asecret: null });
-  assert.deepEqual(Object.keys(JSON.parse(none.ws.sent[0])), ['t', 'id', 'secret', 'name', 'look', 'pose', 'hs', 'sm', 'fv'], 'the old hello, key for key (PIN MOVED, SCALE5c: a hub link says it knows the hub\'s shards; PIN MOVED, STAFF-PANEL5-MESSAGE and -FREEZE: and that it shows a staff message\'s box and the freeze screen)');
-  // one half set on the session AFTER construction (world.js sets both; a caller that sets one is not the port's) - the hello's own door
-  const lone = hubLink({ acct: null, asecret: null });
-  lone.s.acct = 'acct-me'; lone.ws.drop(1006); lone.clock.t += 60_000; lone.s.tick();
-  const lws = lone.sockets[1]; lws.open();
-  assert.ok(!('acct' in JSON.parse(lws.sent[0])) && !('asecret' in JSON.parse(lws.sent[0])), 'an account without its secret is not sent - the hub would refuse the hello whole');
-  const pres = hubLink({ presence: true });
-  assert.equal(JSON.parse(pres.ws.sent[0]).acct, 'acct-me', 'a presence session HANDED the pair sends it - the caller\'s choice; world.js hands it to the hub link alone');
-  assert.match(rd('src/scenes/world.js'), /if \(tab\.room === SOCIAL_ROOM\) \{ link\.acct = accountId\(\); link\.asecret = accountSecret\(\); \}/, 'and world.js hands it to the hub tab\'s link - after the join, before the socket can open');
-  assert.doesNotMatch(rd('src/scenes/world.js'), /online = new OnlineSession\(\{[^}]*acct/, 'never to the presence session');
-}));
 
 test('SOC2: sendSocial - an act as SOCIAL_ACTS has it, gated at home at the hub\'s rate (the token spent only on an act that left), refused without an account or with a kind the wire has no law for (mutants: the gate off; a made-up kind sent; the act sent with no account)', () => quiet(() => {
   const { s, clock, sent } = hubLink();

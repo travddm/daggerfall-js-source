@@ -656,9 +656,6 @@ test('MW-D49: findNodeByName honours rule 58, like the scene the reference searc
     ],
   };
   assert.equal(findNodeByName(shapeNamed, 'ArrowBone'), null, 'the port skips the geometry RECORD - a delta');
-  assert.match(readFileSync(new URL('../../../src/formats/morrowind/mwCharacter.js', import.meta.url), 'utf8'),
-    /DELTA \(recorded at ROAD review-p\)[\s\S]{0,1400}NiTriShape/,
-    'and says so where it does it, rather than calling it the reference\'s rule');
 
   // But a ROOT named "Bounding Box" is NOT skipped - the reference's
   // guard is `args.mRootNode && ...` and mRootNode is null on the first

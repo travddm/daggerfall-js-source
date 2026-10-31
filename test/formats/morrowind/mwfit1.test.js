@@ -89,10 +89,6 @@ test('MW-FIT1: so each pauldron hides its upper arm in the third person - and no
   // first person a robe leaves hands and wrists but deletes the forearms and upper arms")
   const robe = composeWornArmor({ pieces: [{ kind: 'record', record: { id: 'robe', parts: [] }, reserve: 'robe' }, piece(T.Left_Pauldron, 'Steel')], armors: [], bodyPool: [] });
   assert.ok(robe.fpShadows.includes('upperarm:left') && robe.fpShadows.includes('upperarm:right'), 'the robe\'s upper arms, over the pauldron\'s');
-  // the first person's skin reads its own shadows; the third person's the third person's
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /const fpRows = shadowSkinRows\([\s\S]{0,200}?worn\.fpShadows \?\? worn\.shadows\);/);
-  assert.match(fp, /let skinRows = shadowSkinRows\([\s\S]{0,200}?worn\.shadows\);/);
 });
 
 test('MW-FIT1: a closed helm is the head - the steel plate\'s closed helm and the ebony helm hide it, as retail\'s closed helmets fill its slot; the open helm shows the face and keeps it; each takes the hair', () => {

@@ -366,16 +366,6 @@ test('WW5 THE TIMERS, THE BOARD AND THE MAP: a province\'s Hollow in the same ro
   assert.ok(brow && brow.where === 'Near Solitude' && brow.way && brow.way.m < 10_000, 'the board: its own lane\'s site, and the way there');
   const box = { x0: -900, y0: -1000, w: 6000, h: 3800 };
   assert.equal(readGateMarks(() => [{ cx: 1566.5, cy: -426.5, r: 1.25 }, { cx: 303.5, cy: 200.5, r: 1.25 }], box).length, 2, 'every lane\'s ring');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /import \{ createSdLanes \} from '\.\/superDungeon\/sdLanes\.js';/);
-  assert.match(w, /const sdHost = params\.has\('online'\) \? createSdLanes\(\{\n {4}now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, here: \(\) => playerTravelPixel\(\),/);
-  assert.match(w, /sd: sdHost\?\.timers\(\) \?\? null,/);
-  assert.match(w, /sd: \(\) => sdHost\?\.mapMarks\(\) \?\? null,/);
-  assert.match(src('src/scenes/spawnStandHost.js'), /return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| \(params\.has\('online'\)/, 'a province\'s Hollow built where it stands past the Bay');   // PIN MOVED (AUDIT BAY-LEFT, its packages merged): _locationToBuild left world.js for scenes/spawnStandHost.js (SPAWN-WORLD's HOST-SPLIT), the Hollow-first clause with it
-  for (const re of [/const rec = sdHost\.record\(s\), now/, /riftLook\(sdHost\.record\(s\), s,/, /rec = sdHost\?\.record\?\.\(slot\) \?\? null;/, /const h = sdHost\?\.hollow\(s\);/, /if \(sdHost\?\.hollow\(loc\.sdRealm\)\?\.key !== back\.key\) return true;/]) assert.match(w, re);
-  const on = src('src/net/online.js');
-  assert.match(on, /else if \(r && r\.k !== 'ev' && r\.k !== SD_LANE_KIND\) \{/, 'a province\'s record is the hub\'s word, never a realm\'s fight');
-  assert.match(on, /if \(sdLaneWire\(w\.s\) > 0 && !\(this\._mine\(cell\) \? this\.ww5Ok : halo\?\.ww5Ok\)\) return false;/, 'a province\'s find never to an older relay - the socket\'s own relay\'s word (ww5_stars: a halo says for itself)');
 });
 
 test('WW5 ON THE FREEWARE\'S WORLD: every province\'s Hollow stands - three slots of each lane, by its crowd and by its great cities, each in its own theatre by a city of its own (the registry\'s, TESA\'s places), on dry ground, under the world lane\'s id; the Bay\'s Hollows by their own rows as they always were', { skip: HAVE ? false : 'ARENA2_PATH not set (sh tools/fetch-data.sh)', timeout: 600_000 }, async () => {

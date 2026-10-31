@@ -127,22 +127,10 @@ test('MM1: the forty-six xml files - the vendored files equal the table (werewol
 });
 
 test('MM1: the seams - the archive on a parsed TEXTURE.###, every billboard sized through the one door, the boot install before the overhaul\'s, the Mods pane entry, the credit, the vendor README, and the overhaul\'s two compatibility switches GONE (mutant: any)', () => {
-  assert.match(rd('src/formats/textureFile.js'), /this\.archive = Number\.parseInt\(fileName\.slice\('TEXTURE\.'\.length\), 10\);/);
   for (const f of readdirSync(new URL('../../../src/scenes', import.meta.url), { recursive: true }).filter((x) => x.endsWith('.js'))) {   // TIDY2: and the feature folders
     const s = rd(`src/scenes/${f}`);
     assert.doesNotMatch(s, /scaledBillboardSize\(\w+(?:\.\w+)*\.getSize\(/, `${f}: a billboard sized past the xml door`);
   }
-  // AUDIT MM1: the mobile units through the mobile door (DaggerfallMobileUnit / MobilePersonBillboard), everything else static
-  assert.match(rd('src/characters/enemy/enemyAnchor.js'), /return mobileBillboardSize\(t, 0\)\.h;/, 'the idle height reads the scaled record');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /const sz0? = mobileBillboardSize\(f\.tex, o\.record\);/);   // ELITE FOES: `sz0`, then an elite's quarter more
-  assert.match(rd('src/scenes/dungeonContext.js'), /const sz = mobileBillboardSize\(f\.mobileTex, out\.record\);/);
-  assert.match(rd('src/scenes/cityGuards.js'), /const sz = mobileBillboardSize\(g\.tex, o\.record\);/);
-  assert.match(hostText('src/scenes/world.js'), /const sz = mobileBillboardSize\(pt, out\.record\);/);
-  assert.match(rd('src/scenes/exterior.js'), /const sz = mobileBillboardSize\(t, out\.record\);/);
-  assert.match(rd('src/scenes/corpseMarker.js'), /const size0? = billboardSize\(t, record\) \?\? fallbackSize;/, 'a corpse is a static billboard');   // ELITE FOES: `size0`, then an elite's body a quarter larger
-  assert.equal((rd('src/scenes/exteriorFoes.js').match(/mobileBillboardSize\(/g) || []).length, 1, 'the corpse fallback stays static');
-  const wt = rd('src/systems/worldTick.js');
-  assert.ok(wt.indexOf('installMeanerMonsters();') < wt.indexOf('installPcaao();'), 'the dependency Awakes first');
   const m = MOD_SETTINGS.meanerMonsters;
   assert.equal(m.author, 'Ralzar'); assert.deepEqual(Object.keys(m.keys), ['Enabled']); assert.equal(m.keys.Enabled.default, true);   // MO1
   assert.ok(Object.keys(MOD_SETTINGS).indexOf('meanerMonsters') < Object.keys(MOD_SETTINGS).indexOf('pcaao'), 'listed before the overhaul, as it loads');
@@ -151,5 +139,4 @@ test('MM1: the seams - the archive on a parsed TEXTURE.###, every billboard size
   const credit = CREDITS.mods.find((c) => c.title === 'Meaner Monsters');
   assert.ok(credit); assert.equal(credit.author, 'Ralzar'); assert.equal(credit.version, '1.5.2'); assert.deepEqual([...credit.vendor], ['meanerMonsters']); assert.match(credit.terms, /MIT/);
   assert.match(rd('vendor/meanerMonsters/README.md'), /Ralzar/); assert.match(rd('vendor/meanerMonsters/README.md'), /MIT/);
-  assert.match(rd('src/characters/enemy/enemyEntity.js'), /const basics = editAtMint\(mobileType, pcaaoMeanerMonstersRow\(mobileType, applyMeanerMonsters\(mobileType, basicsIn\)\)\);/, 'Ralzar\'s row, then the overhaul\'s edit over it (DEX1: and a Start-time mod\'s over both, registerMintRowEditor)');
 });

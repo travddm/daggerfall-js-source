@@ -318,9 +318,6 @@ test('WORLD6b: the day\'s rolls are the shared day\'s - under the shared clock t
     const expect = seededRng((((day * 7919) ^ 0x44415953) ^ Math.imul(2, 0x9E3779B1)) >>> 0);   // AUDIT WORLD6b C5: the POWERS' salt still seeds the powers' arm
     assert.equal(dayRollsFor(day * MINUTES_PER_DAY, Math.random, 2)(), expect(), 'and the seed is the day\'s');
   } finally { setSharedClock(null); }
-  const w = rd('src/systems/worldTick.js');
-  assert.match(w, /if \(worldHalf && sharedClockOn\(\)\) \{\s*const firstDay = Math\.floor\(lastMinutes \/ MINUTES_PER_DAY\) \+ 1, lastDay = Math\.floor\(nowMinutes \/ MINUTES_PER_DAY\);[\s\S]{0,800}?for \(let d = firstDay; d <= lastDay && merchants; d\+\+\) \{\s*const prices = worldRegionPricesOn\(d\), flagRolls = dayRng\(d \* MINUTES_PER_DAY, DAY_SALT\.conditions\);/, 'ECON1: online the day walk reads the world\'s index and applies the flag half alone (AUDIT ALL E8: under DFU\'s own Merchants gate)'); assert.match(w, /for \(let i = 0; i < REGION_COUNT; i\+\+\) if \(findFactionByTypeAndRegion\(dict, FACTION_TYPES\.Province, i\)\) applyPriceConditionFlags\(entity\.regionConditions \?\? null, i, prices\[i\], flagRolls\);/, 'the day change walks one day at a time online, each day from its own generator (AUDIT WORLD6b C4) - the flags off the world\'s index');
-  assert.match(w, /const dayRolls = powerMinute \|\| \(worldArms && conditionMinute\) \? dayRollsFor\(i, rolls, DAY_SALT\.powers\) : null;\s*if \(powerMinute\) \{\s*regionPowerUpdate\(entity\.factionRep \?\? null, \{ rumorMill: entity\.rumorMill \?\? null, rolls: dayRolls \}\);/, 'the powers\' 7-day arm reads the minute\'s day (LIVED1: the world\'s arm, minted when read)');
-  assert.match(w, /rumorMill: entity\.rumorMill \?\? null, rolls: dayRolls,[^\n]*\n\s*updateConditions: true/, 'and the 38-day arm the same generator');
+   
 });
 

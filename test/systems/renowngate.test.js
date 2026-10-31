@@ -307,21 +307,3 @@ test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" -
   assert.match(note(), /No foe has earned your name yet\. An elite or champion marked Unquiet that escapes you/);
 });
 
-test('RENOWN-GATE THE HOSTS: the gate lives in the laws - the open world\'s call and a save\'s word in the pool, both searches\' one roll, the dungeon\'s pick never asked; the page\'s door set by the streaming world alone, the bench offline, the interiors\' one elite the arena\'s bout; no host reads the gate itself', () => {
-  const pool = read('src/scenes/exteriorFoes.js');
-  assert.match(pool, /\(revenant \? revenant\.elite : rollOverworldElite\(Math\.random\)\)\) promoteEliteFoe\(entity\);/, 'the open world: the roll the gate lives in; a revenant as what it was');
-  assert.match(pool, /if \(eliteFoe === true && !allied\) promoteEliteFoe\(entity\);/, 'a save\'s word: never re-rolled');
-  const world = hostText('src/scenes/world.js'), dc = read('src/scenes/dungeonContext.js'), grave = read('src/scenes/searchPartyHost.js');   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js's bootWorld for scenes/searchPartyHost.js
-  for (const [name, src] of [['searchPartyHost.js', grave], ['dungeonContext.js', dc]]) assert.match(src, /const elite = rollSearchElite\(\);/, `${name}: a search's one roll`);
-  const pick = dc.split('\n').find((l) => l.includes('pickDungeonElites(enemies'));
-  assert.ok(pick && /elitesAllowed\(\{ onlinePage: isOnlinePage\(\), inRoom: opts\.selfId\?\.\(\) != null \}\)\) pickDungeonElites\(/.test(pick), 'the dungeon\'s pick, the room\'s');
-  assert.match(world, /setSigilOnline\(params\.has\('online'\)\);/, 'the door: online from the page\'s word');
-  assert.match(world, /setSigilRenown\(level\);/, 'and the Renown as it is adopted');
-  assert.doesNotMatch(read('src/scenes/exterior.js'), /setSigilOnline\(/, 'the bench never goes online: open, as offline is');
-  const modes = read('src/scenes/worldModes.js');
-  assert.doesNotMatch(modes, /rollOverworldElite|rollSearchElite|pickDungeonElites/, 'the interiors roll no elite of their own');
-  assert.equal((modes.match(/eliteFoe: !!o\.elite \}\) \?\? null,   \/\/ AUDIT ARENA-LADDER: a tier champion stands as an elite/g) ?? []).length, 2, 'the arena\'s bout: its tier champion, the sand\'s and the pit\'s');
-  for (const f of readdirSync(new URL('../../src/scenes/', import.meta.url), { recursive: true }).filter((x) => x.endsWith('.js'))) {
-    assert.doesNotMatch(read(`src/scenes/${f}`), /\b(renownOpens|eliteRenownOpen|revenantHeld)\(/, `${f} reads the gate only through the laws`);
-  }
-});

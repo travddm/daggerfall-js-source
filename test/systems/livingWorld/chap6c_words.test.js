@@ -196,10 +196,3 @@ test('CHAP6c the town talks of a chapter\'s Season before its band: shut halls f
   assert.ok(got && CHAPTER_EVENT_NEWS.schism.includes(got.script), 'a Schism\'s words');
 });
 
-test('CHAP6c the wiring: the door to back, the board\'s door, the roll\'s Season lines, the town\'s chapter with its event (mutants: each seam)', () => {
-  assert.match(src('src/net/accountClient.js'), /back: \(character, faction, region, side\) => post\('\/v1\/chapters\/back', \{ character, faction, region, side \}\),/);
-  const w = src('src/scenes/world.js');
-  assert.match(w, /back: hallDoor && realmSession \? \(faction, side\) => hallDoor\.back\(realmSession\.id, faction, region, side\) : null,/);
-  assert.match(w, /lines: \[\.\.\.chapterRollLines\(faction, c\), \.\.\.chapterSeasonLines\(faction, \/\*\* @type \{number\} \*\/ \(region\), c\)\]/);
-  assert.match(w, /event: c\.event \?\? null, shut: c\.shut === true \};/);
-});

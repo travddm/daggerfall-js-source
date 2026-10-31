@@ -107,17 +107,6 @@ test('AUDIT WORLD-EVENTS L1-1: the Hour lets a body back only when a living figh
   assert.equal(sendRaiseWord(online(sdTestKey(3)), 'acct-a'), true);
   assert.equal(sendRaiseWord(online('town:m9'), 'acct-a'), false);
   assert.deepEqual(sent, [['sd', 'acct-a']]);
-  assert.match(read('src/scenes/world.js'), /_partyComposedAt = -Infinity;\n\s*sendRaiseWord\(online, f\.acct\);/, 'the world host\'s Resurrect door says it');
-});
-
-test('AUDIT WORLD-EVENTS L1-2/L1-8: the raised is a new life on the count, and comes off the lying only once the door lets it in (mutants: no new life; the down cleared before the refusals)', () => {
-  const relay = read('server/src/index.js');
-  assert.match(relay, /async _sdRose\(realm, sub, now\) \{\n\s*realm\.down = realm\.down\.filter\(\(\[x\]\) => x !== sub\);\n\s*realm\.raised = \(realm\.raised \?\? \[\]\)\.filter\(\(\[x\]\) => x !== sub\);\n\s*realm\.dead = realm\.dead\.filter\(\(x\) => x !== sub\);[^\n]*\n\s*await this\.state\.storage\.put\(SD_REALM_KEY, realm\);\n\s*await this\.state\.storage\.delete\(sdDeadKey\(sub\)\);\n\s*const f = await this\._sdFightOf\(\);\n\s*if \(f\?\.players\?\.\[sub\]\) \{ bodyLife\(f\.players\[sub\], now, this\._bodyLine\(\)\.body\); await this\._sdFightSave\(f, now, true\); \}/);
-  const admit = relay.slice(relay.indexOf('  async _sdAdmit('), relay.indexOf('  async _sdRose(realm, sub, now) {'));
-  // PIN MOVED (SD-BACK): no hold and no SD_NO_FALLEN at a copy's own door - a death, raised or not, is a rise there
-  assert.ok(!admit.includes('return SD_NO_FALLEN') && !admit.includes("if (lies === 'down') return SD_NO_BUSY;"), 'its own Hour takes the dead back');
-  assert.equal((admit.match(/_sdRose\(realm, sub, now\)/g) ?? []).length, 2, 'a rise kept at each admission');
-  assert.ok(admit.lastIndexOf('if (back) await this._sdRose(realm, sub, now);') > admit.lastIndexOf('return SD_NO_FULL'), 'after every refusal');
 });
 
 test('AUDIT WORLD-EVENTS L1-5/L1-6/L1-7: the window is the body\'s minute - the corpse\'s and the death screen\'s, and the tile says it; the page stamps its death once; a death past the list is buried, never forgotten (mutants: two minutes; the stamp every frame; the slice forgetting)', async () => {

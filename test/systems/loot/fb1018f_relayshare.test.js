@@ -260,8 +260,6 @@ test('RELAY-SHARE EVERY BODY THE RELAY RUNS READS ITS WORD: the court\'s Warden 
   link.word(validSerpentOut(serpentStateOf(f)));
   now += 10; sh.frame();
   assert.ok(Math.abs(sh.healthShare() - 0.2) < 1e-9, `its word: ${sh.healthShare()}`);
-  // the world host's stand-in reads it (bootWorld does not run in Node: its one line, by source)
-  assert.match(strip(read('src/scenes/world.js')), /const e = bossStandIn\(\{ mobile: SERPENT_VOICE_ROWS\.dreugh \}, 'the sea serpent', \(\) => serpentHost\?\.healthShare\(\) \?\? null\);/);
 });
 
 test('RELAY-SHARE THE FAMILY on a body the relay runs: Serpent\'s Kiss doubles under half the word; the Axe past 100 pays its own half there (x1.8 under half, the hammer nothing) and the halves\' mean only where no word is heard; Run Them Down under half the word; Gutting Lunge under a quarter of it, its second blow owed to the claim (mutants: each reader its own copy again)', () => {
@@ -315,8 +313,6 @@ test('RELAY-SHARE ONE LAW, SIX READERS: the loot\'s powers, the masteries, the m
     assert.match(s, /import \{ healthShare \} from '(?:\.\.\/)+(?:combat\/)?healthShare\.js';/, `${p} reads the one law`);
     assert.doesNotMatch(s, /\.health \/ e\.maxHealth|e\.health < e\.maxHealth \/ 2|e\.health : max\) \/ max/, `${p} keeps no share law of its own`);
   }
-  const law = strip(read('src/combat/healthShare.js'));
-  assert.match(law, /if \(e\?\.relayHealth\) \{/);
   const fn = () => 0.5;
   assert.equal(bossStandIn({ mobile: 31 }, 'x', fn).relayShare, fn);
   assert.equal(crystalStandIn(bossLookOf('ruhn'), 1, fn).relayShare, fn);

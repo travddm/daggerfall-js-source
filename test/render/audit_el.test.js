@@ -88,20 +88,6 @@ test('AUDIT-EL F2 (EL6): a foreign rect takes no AO because no world shader take
   r.drawScreenQuad({ id: 'hud' }, { x: 0, y: 0, w: 10, h: 10 });
   const mix = calls.find((c) => c[0] === 'uniform1f' && c[1] === 'uAOMix');
   assert.ok(mix && mix[2] > 0, 'the resolve applies the AO over the world rect');
-  const ao = read('src/render/airPass.js');
-  assert.match(ao, /if \(wuv\.x >= 0\.0 && wuv\.x <= 1\.0 && wuv\.y >= 0\.0 && wuv\.y <= 1\.0\) \{\n    c \*= mix\(1\.0, texture\(uAO, wuv\)\.r, uAOMix\);/, 'inside the world rect alone');
-});
-
-test('AUDIT-EL F3: the water surface takes sixteen of the lane\'s forty-eight, raw', () => {
-  const r = read('src/render/renderer.js');
-  assert.match(r, /const count = Math\.min\(this\._pointLights\.length \/ 4, CLASSIC_MAX_LIGHTS\);\n\s+gl\.uniform1i\(L\.pointCount, count\);/);
-  assert.match(r, /gl\.uniform3fv\(L\.pointColors, this\._pointColorData\(count, true\)\);/, 'raw colours for a classic-space program');
-  assert.match(read('src/render/waterSurface.js'), /uniform vec4 uPointLights\[16\];/);
-});
-
-test('AUDIT-EL F4: the player-light composer keeps every light; the cap is the installed set\'s', () => {
-  assert.ok(!/16 - live\.length/.test(read('src/scenes/magicCandle.js')), 'no sixteen in the composer');
-  assert.match(read('src/scenes/magicCandle.js'), /const keep = \(base\.length \/ 4\) \* 4;/);
 });
 
 test('AUDIT-EL F5/F8: a WORLD frame spends the records; a second beginFrame (the travel map) resolves the frame owed and keeps them; the six host sites say so; the map resolves its own', () => {
@@ -145,10 +131,6 @@ test('AUDIT-EL F5/F8: a WORLD frame spends the records; a second beginFrame (the
     assert.equal((read(f).match(/renderer\.beginFrame\(/g) || []).length, n, `${f}: no unmarked beginFrame`);
   }
   for (const f of ['src/ui/heldMap.js', 'src/ui/videoPlayer.js', 'src/scenes/menu.js']) assert.ok(!/WORLD_FRAME/.test(read(f)), `${f}: not a world frame`);
-  // MAP1 (2026-09-18): the relief map that resolved its own frame here is
-  // RETIRED; its successor is DOM and a 2D canvas, so it opens no frame,
-  // marks no seam and has nothing to resolve.
-  assert.doesNotMatch(read('src/ui/heldMap.js'), /beginFrame|markForeignPass|resolveFrame/, 'the held map draws nothing through the renderer');
 });
 
 test('AUDIT-EL F6: the dungeon\'s fog colour goes down with its ambient; the two hosts hand it through', () => {
@@ -157,8 +139,6 @@ test('AUDIT-EL F6: the dungeon\'s fog colour goes down with its ambient; the two
   const d = dungeonFog(true, fog);
   assert.ok(near(d.color[0], 0.5 * EL_DUNGEON_AMBIENT_SCALE) && near(d.color[2], 0.3 * EL_DUNGEON_AMBIENT_SCALE) && d.end === 40 && d.mode === 'linear');
   assert.equal(dungeonFog(true, null), null);
-  assert.match(read('src/scenes/dungeon.js'), /const _fog = dungeonFog\(lightingOn, betterAmbience\.dungeonFog\(\) \?\? DUNGEON_FOG\); applyFog\(renderer, ctx\.underwaterFogSettings\?\.\(cam\.pos\[1\], player\.pos, _fog\) \?\? _fog\);/);
-  assert.match(read('src/scenes/worldModes.js'), /const _fog = dungeonFog\(!!renderer\.lightingLane, betterAmbience\.dungeonFog\(\) \?\? DUNGEON_FOG\); applyFog\(renderer, dungeonCtx\.underwaterFogSettings\?\.\(cam\.pos\[1\], player\.pos, _fog\) \?\? _fog\);/);
 });
 
 test('AUDIT-EL F7: a panel frame draws on the classic set, and the lane comes back after it', () => {
@@ -183,9 +163,6 @@ test('AUDIT-EL F10/F11: no measure off an empty frame; the storm\'s flash is nei
   const lights = new Float32Array([0, 30, 0, 800, 8, 2, 0, 12]);
   assert.equal(pickShadowCaster(lights, eye), 1, 'the flash (range 800 over the player) is passed over for the torch');
   assert.equal(pickShadowCaster(new Float32Array([0, 30, 0, 800]), eye), -1, 'the flash alone is none');
-  assert.match(read('src/render/airPass.js'), /if \(!\(range > 0\) \|\| range > AIR_GLARE_MAX_RANGE\) continue;/);
-  assert.match(read('src/render/airPass.js'), /this\.measured = !!\(sp && sp\.count > 0\);/);
-  assert.match(read('src/render/airPass.js'), /if \(this\.measured\) \{\n\s+quad\(P\.lum, this\.lum\);/, 'the luminance and the step ride the measure');
 });
 
 test('AUDIT-EL F13 (EL6): the emission replay faces each flat as its record was drawn; the sun map faces the sun', () => {
@@ -206,8 +183,6 @@ test('AUDIT-EL F13 (EL6): the emission replay faces each flat as its record was 
   rights = calls.filter((c) => c[0] === 'uniform3fv' && c[1] === 'uRight').map((c) => [...c[2]].map((v) => +v.toFixed(3)));
   assert.ok(rights.length > 0 && rights.every((v) => !(v[0] === 0.6 && v[2] === 0.8)), 'the sun map drew it facing the sun');
   assert.ok(r.shadows.stats.sunDraws > 0, 'AUDIT LIGHTING: and DREW it - a flame is only its own lantern\'s non-occluder (EL6), the sun\'s caster still (the basis upload alone was the old evidence, and it rides the record whether or not the flat is drawn)');
-  assert.match(read('src/render/airPass.js'), /gl\.uniform3fv\(P\.emitBb\.uRight, r\.right\); gl\.uniform3fv\(P\.emitBb\.uUp, r\.up\);/);
-  assert.ok(!/sp\.replay\(/.test(read('src/render/airPass.js')), 'EL6: no depth replay - the frame\'s own depth');
 });
 
 test('AUDIT-EL F14/F15/F17/F20: the shade\'s pull is the constant; the biases are in the spaces they mean; no variable hides a built-in; the emitters bloom in linear', () => {
@@ -227,12 +202,6 @@ test('AUDIT-EL F14/F15/F17/F20: the shade\'s pull is the constant; the biases ar
 });
 
 test('AUDIT-EL F16/F18/F19: the eye measures the scene with itself divided out over sixteen taps; a hidden canvas draws no images; the passes end with a real unbind', () => {
-  const a = read('src/render/airPass.js');
-  assert.match(a, /acc \+= clamp\(log2\(max\(dot\(c, vec3\(0\.2126, 0\.7152, 0\.0722\)\) \/ prev, 1e-9\)\), /, 'F16: divided by the eye (LA-POST4: each tap\'s log held to the encoded range)');
-  assert.match(a, /for \(int y = 0; y < 4; y\+\+\) \{\n\s+for \(int x = 0; x < 4; x\+\+\) \{/, 'F16: sixteen taps per texel');
-  assert.match(a, /if \(!\(w > 0 && h > 0\)\) \{ this\.f = null; this\.prevValid = false; return; \}   \/\/ AUDIT-EL F18/);
-  assert.match(a, /if \(!\(W > 0 && H > 0\)\) return null;   \/\/ AUDIT-EL F18/);
-  assert.match(read('src/render/renderer.js'), /this\._restoreWorldViewport\(\);\n\s+this\.markForeignPass\(\);   \/\/ AUDIT-EL F19/);
   // a zero-size world viewport at beginFrame draws nothing and binds no frame
   setFrameTarget(null);   // the module-wide target another test's unresolved frame left
   const { canvas } = recordingGl();

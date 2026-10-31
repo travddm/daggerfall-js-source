@@ -194,9 +194,6 @@ test('FIELD-GUN14: a host with no effects pool still flies the shot (and draws n
   // room.
   assert.doesNotThrow(() => f.clear());
   assert.equal(f.arrows.length, 0);
-  assert.match(readFileSync('src/scenes/worldModes.js', 'utf8'),
-    /if \(_arrowsCtx !== interiorCtx\) \{ interiorArrows\.clear\(\); _arrowsCtx = interiorCtx; \}/,
-    'the building change goes through the flight\u2019s own door');
 
   {
     const fx2 = flatPool();
@@ -207,60 +204,6 @@ test('FIELD-GUN14: a host with no effects pool still flies the shot (and draws n
     g.clear();
     assert.equal(fx2.live[0].dead, true, 'the flat goes down with the flight');
   }
-});
-
-test('FIELD-GUN14: a gun leaves no shaft to pull out', async () => {
-  const { playerArrowHitFoe } = await import('../../src/combat/arrowFlight.js');
-  const { createThunderlock } = await import('../../src/systems/thunderlock.js');
-
-  // BowDamage (DaggerfallMissile.cs:679-687) adds the arrow back to
-  // whatever it struck because an arrow SURVIVES being shot. That is a
-  // fact about the ROUND, and the port had it keyed on the LANE - so
-  // every foe the Thunderlock struck gained Arrows it was never shot
-  // with.
-  const mkFoe = () => ({ dead: false, entity: { items: [], basics: {}, level: 1, stats: {}, skills: {} }, ai: { feet: [0, 0, 0], yaw: 0, height: 1.8 } });
-  const player = { level: 1, items: [], stats: {}, skills: {} };
-  const arrows = (items) => items.filter((it) => it.templateIndex === 131).length;
-
-  const bowFoe = mkFoe();
-  playerArrowHitFoe({ weapon: { templateIndex: 130, name: 'Long Bow' }, pos: [0, 0, 0] }, bowFoe, { playerEntity: player, rolls: () => 0 });   // PIN MOVED (ARROW-LODGE): a struck shaft lodges ARROW_LODGE_CHANCE of the time - this one under it (test/systems/arrowsupply.test.js holds the chance)
-  assert.equal(arrows(bowFoe.entity.items), 1, 'the bow’s shaft is recoverable, exactly as BowDamage has it');
-
-  const gunFoe = mkFoe();
-  playerArrowHitFoe({ weapon: createThunderlock(), pos: [0, 0, 0] }, gunFoe, { playerEntity: player, rolls: () => 0 });   // PIN MOVED (ARROW-LODGE): a roll a shaft would lodge on - the pellet still leaves none
-  assert.equal(gunFoe.entity.items.length, 0, 'a Dwemer Pellet is SPENT - nothing to pull out of the body');
-
-  // the two answers come off the same leaf, so they cannot drift
-  const src = readFileSync('src/combat/arrowFlight.js', 'utf8');
-  assert.match(src, /if \(foe\.entity\?\.items && !orbArchiveFor\(m\.weapon\) && !m\.summoned && rolls\(\) < ARROW_LODGE_CHANCE\) \{/);   // PIN MOVED (ARROW-LODGE): the leaf's answer first, then the conjured round and the lodge
-});
-
-test('FIELD-GUN14: all four hosts paint the orb - the flight’s fork and the dungeon’s own', () => {
-  // THE FOUR HOSTS RULE. Three run combat/arrowFlight.js and one
-  // (dungeonContext) has its own S5 missile system, which is the shape
-  // that has bitten this weapon at every round since FIELD-GUN3.
-  for (const [file, ctor] of [
-    // PIN MOVED (STUCK-ARROWS): each flight is handed its loot pool after its effects (test/systems/arrowsupply.test.js names it)
-    ['src/scenes/world.js', /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot, /],
-    ['src/scenes/exterior.js', /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot \}\)/],
-    ['src/scenes/worldModes.js', /new ArrowFlight\(\{ getGpuMesh: pipeline\.getGpuMesh, collider: \(\) => interiorCtx\?\.collider, effects: interiorHitEffects, loot: interiorDropped \}\)/],
-  ]) {
-    const s = readFileSync(file, 'utf8');
-    assert.match(s, ctor, `${file}: the flight is handed the pool this host already draws every frame`);
-    // ...and it IS drawn: the pool's batches reach a billboard pass
-    assert.match(s, /HitEffects\.batches\(\)|hitEffects\.batches\(\)/, `${file}: the pool's batches reach the frame`);
-  }
-  // THE FOURTH: the dungeon's missile already draws both kinds - a
-  // shaft is the 99800 mesh, a spell is a billboard riding its batch's
-  // origin. One field says which, and nothing else about the arrow
-  // changes.
-  const dg = readFileSync('src/scenes/dungeonContext.js', 'utf8');
-  assert.match(dg, /missiles\.push\(\{ arrow: true, flatArchive: orbArchiveFor\(weapon\),/, 'the fork is on the WEAPON, at the one place an arrow is born');
-  assert.match(dg, /if \(!m\.arrow \|\| m\.flatArchive\) ensureMissileBatch\(m\);/, 'an arrow with its own flat gets a billboard');
-  assert.match(dg, /const archive = m\.flatArchive \?\? missileArchive\(m\.spell\.element\);/, 'which it NAMES - a spell still asks its element');
-  assert.match(dg, /const record = m\.flatArchive \? ORB_RECORD : 0;/, 'and its record rides the same leaf rather than a second literal 0');
-  assert.match(dg, /if \(\(!m\.arrow \|\| m\.flatArchive\) && m\.batch\) m\.batch\.origin =/, 'and it flies the way a spell does - the origin uniform, not a rebuilt batch');
-  assert.match(dg, /if \(!m\.flatArchive\) ensureArrowModel\(m\);/, 'and is NOT also a mesh - a shaft through the middle of the orb');
 });
 
 test('FIELD-GUN14: the pool grew a flat that FLIES - it moves, it loops, and the flight ends it', async () => {

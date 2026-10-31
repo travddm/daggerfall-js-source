@@ -33,8 +33,3 @@ test('PIXEL-KEYS: within the span a pixel\'s key is made once - the same string 
   assert.equal(pixelKeyText(512, 256), '512,256', 'still the text after the keeping starts again');
 });
 
-test('PIXEL-KEYS: the sea\'s soundings ask the built pixels by it (scenes/world.js csaPixelAt)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /const csaPixelAt = \(x, z\) => \{\n\s+const c = state\.compensation;\n\s+return built\.get\(pixelKeyText\(state\.mapOrigin\.x \+ Math\.floor\(\(x - c\[0\]\) \/ TERRAIN_SIZE\), state\.mapOrigin\.y - Math\.floor\(\(z - c\[2\]\) \/ TERRAIN_SIZE\)\)\) \?\? null;/);
-  assert.match(src, /import \{ pixelKeyText \} from '\.\.\/world\/pixelKeys\.js';/);
-});

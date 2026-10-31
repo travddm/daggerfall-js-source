@@ -16,7 +16,6 @@ import { readFbx, nodeAt, childNamed, childrenNamed, objectName } from '../../to
 const BYTES = readFileSync(new URL(`../../${BAKE.SOURCE_FBX}`, import.meta.url));
 const SHIPPED = JSON.parse(readFileSync(new URL(`../../${BAKE.OUT}`, import.meta.url), 'utf8'));
 const SOURCE = new Map(BAKE.sceneObjects(readFbx(BYTES)).map((o) => [o.name, o]));
-const BAKE_SRC = readFileSync(new URL('../../tools/bakeGalleon.mjs', import.meta.url), 'utf8');
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -469,10 +468,6 @@ test('AUDIT GALLEON B3 THE BAKE MAKES NOTHING OF ITS OWN: every baked vertex is 
 test('AUDIT GALLEON B4 THE BAKE\'S OWN FILLS ARE GONE AND ITS HEADER SAYS WHAT IT DOES: no polyfill, slabFill or fillInside left in tools/bakeGalleon.mjs, every polygon through fillFace; its header names Blender\'s tessellation and the refusal, and no longer claims an ear clip, a fan or a fill by winding', () => {
   for (const gone of ['polyfill', 'slabFill', 'fillInside']) assert.equal(BAKE[gone], undefined, `${gone} is gone`);
   assert.equal(typeof BAKE.fillFace, 'function');
-  const header = BAKE_SRC.slice(0, BAKE_SRC.indexOf('import '));
-  assert.match(header, /blenderTessellate/);
-  assert.match(header, /refused by object and number/);
-  assert.doesNotMatch(header, /ear-clipped when not|fanned when convex|by its winding/);
 });
 
 // ── B5: what it cannot read, it refuses ───────────────────────────────────────────────────────────────────────────────

@@ -142,12 +142,6 @@ test('AUDIT 68 S05-seducer-rewind-incomplete: a transform in PROGRESS predates t
   assert.equal(m.state, 'idle');
 });
 
-test('AUDIT 68 S05-seducer-rewind-incomplete: the dungeon\'s in-place restore rewinds every Seducer, flag up or not', () => {
-  const DC = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  const pf = DC.slice(DC.indexOf('function patchFoe(f, sf, wire = false)'), DC.indexOf('if (sf.dead && !f.dead) setFoeDead(f, true);'));
-  assert.match(pf, /else if \(sf\.specialTransformationCompleted === false && f\.seducer\) \{[^}]*f\.seducer\.rewind\(\);/);
-});
-
 test('AUDIT 68 S05-mobileunit-stale-record: the tick a one-shot ends returns the NEXT state\'s record', () => {
   const F = [0, 0, 0], C = [0, 0, 10];
   // Orc: hurt -> idle, and attack -> idle

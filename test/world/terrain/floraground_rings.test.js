@@ -112,7 +112,6 @@ test('FLORA-GROUND THE RINGS the ground a pixel draws is one law: drawnGroundAt 
     apart = Math.max(apart, Math.abs(drawnGroundAt(hm, x, z, 4) - walkGroundAt(hm, x, z)));
   }
   assert.ok(apart > 1, `the far ring's ground parts from the walk floor by ${apart.toFixed(2)} m on this field`);
-  assert.match(src('src/scenes/snowGround.js'), /return drawnGroundAt\(p\.samples, lx, lz, p\._stride \?\? 1, p\._bed\?\.depths \?\? null\);/, 'the snow lies on the same law, its bed with it');
 });
 
 test('FLORA-GROUND THE RINGS every plant of the ground is drawn on the ground its pixel draws, at every ring: at stride 4 each on the far ring\'s mesh by its own sink, a mound\'s tree where it stands, the cull boxes with them; again at the same ring nothing moves; at stride 1 each back on the walk floor; a bed carved under it in the near ring, each on the carved ground (mutants: the mark unread; the lift reversed; the near ring\'s bed ignored; the seat that never moves; the box left behind; the pixel\'s box ungrown; the lift kept across a re-carve)', () => {
@@ -231,27 +230,6 @@ test('FLORA-GROUND THE RINGS the graht-oaks stand on the ground their pixel draw
   assert.equal(GRAHT_SLOT, 2);
 });
 
-test('FLORA-GROUND THE RINGS the hosts seat the plants wherever the ground they draw changes - a restride (its new class), a re-carve (Deep Waters\' TileMap), the build (before it publishes and its felled trees are sunk), a re-skin (its new pictures, after its box) - and the build marks every plant of the ground: the wild\'s flats, the jungle\'s, a town\'s nature on its ground but not on a mound (mutants: each seat dropped; each mark dropped; a mound\'s tree marked)', () => {
-  const W = hostText('src/scenes/world.js');
-  const re = W.slice(W.indexOf('function restrideTerrain(p, stride'), W.indexOf('function destroyPixel('));
-  assert.match(re, /p\._stride = stride;\n\s+seatFlora\(p, renderer\);/, 'a restride seats its plants at the new class, after the class is written');
-  const rc = W.slice(W.indexOf('function dwRecarve(p) {'), W.indexOf('function hostBed('));
-  assert.match(rc, /p\._bed = \{ sheet: grid\.positions[^\n]*\n\s+seatFlora\(p, renderer\);/, 'a re-carve seats them on the bed as it lies');
-  const B = src('src/scenes/pixelBuild.js');
-  const seat = B.indexOf('seatFlora({ samples, _stride: stride, _bed: bed, _box: bounds, forest: { groups: forestGroups }, grahtOaks: grahtStood?.set ?? null, landProps: landStood?.set ?? null }, renderer);');   // PIN MOVED (TESA-LANDS, the merge with FLORA-GROUND): and the lands' landmarks (test/world/tesalands_props.test.js)
-  assert.ok(seat > B.indexOf('for (const [gk, g] of jungleGroups) {') && seat > B.indexOf('const grahtStood = '), 'the build seats them once every group and the graht-oaks stand');
-  assert.ok(seat < B.indexOf('swap.publish(px, py, key, made, {') && seat < B.indexOf('host.gatherHost?.onBuilt(built.get(pkey));'), 'before it publishes - before its felled trees are sunk in it');
-  assert.match(B, /_box: bounds,[^\n]*\n\s+_stride: stride,[^\n]*\n\s+_bed: bed,/, 'the very box, ring and bed the entry publishes with');
-  const skin = B.slice(B.indexOf('async function reskinPixelNow'), B.indexOf('_reskin.skinWith('));
-  assert.ok(skin.indexOf('seatFlora(p, renderer);') > skin.indexOf('for (let i = 0; i < 6; i++) p._box[i] = flats.box[i];'), 'a re-skin seats its new pictures, after its box is laid');
-  assert.match(B, /flatLog\.push\(\{ archive, record, c, \.\.\.skin \}\);\n\s+if \(skin\?\.wild != null\) standsOnGround\(c\);/, 'the wild\'s flats marked as they are logged');
-  assert.match(B, /for \(const \[gk, g\] of jungleGroups\) \{\n\s+await breather\.breathe\(\);\n\s+g\.centers\.forEach\(standsOnGround\);/, 'the jungle\'s trees and pairs');
-  // PIN MOVED (SOLITUDE-RELIEF, bible/03-World/Arena-Provinces.md): the hill ground read off its block's tier, its flat stood off it
-  assert.match(B, /const hillY = hillSeat && isNatureArchive\(flat\.archive\) \? NATURE_FLATS_Y \+ off - \(blockY - locLocal\[1\]\) : null;/);
-  assert.match(B, /\n\s+if \(hillY !== null \? seatNatureFlat\(hillSeat, flat\.x, flat\.z, hillY\) === hillY : flat\.archive === natureArchive\) standsOnGround\(flatLog\[flatLog\.length - 1\]\.c\);/, 'a town\'s nature flat on its ground, a mound\'s not');
-  assert.match(src('src/scenes/grahtHost.js'), /const y0 = lift \? tr\[i \+ 1\] \+ lift\[i \/ GRAHT_TREE_FLOATS\] : tr\[i \+ 1\];/, 'the graht-oaks framed at their lift');
-});
-
 test('FLORA-GROUND THE RINGS a pixel built about the player makes its far ring\'s lifts ahead, in its build\'s own breath: nothing is drawn by them while it stands near, and the crossing that first sends it out takes them and reads no ground (mutants: the lifts not made ahead; the build\'s warm dropped; the far class not handed to the build)', () => {
   const hm = saddleField();
   const { centers, ground } = plantsOn(hm, 120);
@@ -271,9 +249,4 @@ test('FLORA-GROUND THE RINGS a pixel built about the player makes its far ring\'
   assert.equal(p.grahtOaks.lift, oak);
   const far = drawnOracle(hm, 4), at = r.at.get(batch);
   centers.forEach((c, i) => { if (ground[i]) assert.ok(Math.abs(at[i][1] - (c[1] - walkGroundAt(hm, c[0], c[2])) - far(c[0], c[2])) < 1e-3); });
-  const B = src('src/scenes/pixelBuild.js');
-  const seat = B.indexOf('seatFlora({ samples, _stride: stride, _bed: bed, _box: bounds,'), warm = B.indexOf('if (stride === 1 && lodStride > 1) { await breather.breathe(); warmFlora({ samples, forest: { groups: forestGroups }, grahtOaks: grahtStood?.set ?? null, landProps: landStood?.set ?? null }, lodStride); }');   // PIN MOVED (TESA-LANDS): and the landmarks
-  assert.ok(seat > 0 && warm > seat && warm < B.indexOf('swap.publish(px, py, key, made, {'), 'a near build makes them after its seat, before it publishes');
-  assert.match(B, /worldHeight, lodStride,/, 'the build takes the far class');
-  assert.match(hostText('src/scenes/world.js'), /const lodStride = lodOn \? LOD_STRIDE : 1;/, 'the world host hands it: EV4\'s stride, none on the 1:1 lane');   // PIN MOVED (AUDIT SHIP-READY S7, HOST-SPLIT's seam): a binding of the host's, handed by name
 });

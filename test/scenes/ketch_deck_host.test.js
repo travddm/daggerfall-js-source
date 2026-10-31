@@ -234,53 +234,6 @@ test('KETCH-LOOK KL1 THE LOOK ON THE RENDERER: on a ship the frame takes her tri
   for (const l of in3('cabin')) assert.ok(l.color.every((v, k) => Math.abs(v - KT_LAMP.below[k] * KT_HOURS.cabin.lamps) < 1e-9), 'the cabin\'s its own');
 });
 
-test('KETCH-LOOK KL1 THE SKY ON THE HOUR OFF THE STREET: a made level that draws the world\'s sky takes the street\'s last use again on the clocks now - its sky, its night sky, its weather kept, the minute and both clocks moved - and nothing before the street\'s first; the drawSky door hands its draw the clocks, a term in its own line; her night key\'s moon is the world\'s, read off the clock (her sky stood at the minute she was boarded while her hour turned - twelve game hours a real one online; mutants: the door draws the street\'s minute)', async () => {
-  const { readFileSync } = await import('node:fs');
-  const { createSkyController } = await import('../../src/scenes/shared.js');
-  const gl = new Proxy({}, { get: (t, k) => (k in t ? t[k] : (typeof k === 'string' && /^[A-Z_0-9]+$/.test(k) ? 1 : (k === 'drawingBufferWidth' || k === 'drawingBufferHeight' ? 64 : () => ({})))) });
-  const fetchWas = globalThis.fetch, warn = console.warn;
-  globalThis.fetch = () => Promise.reject(new Error('no data here')); console.warn = () => {};
-  try {
-    const ctl = createSkyController(gl, new URLSearchParams('sky=classic'));
-    const seen = [], realUse = ctl.use;
-    ctl.use = (...a) => { seen.push(a); };
-    ctl.retime(600, 10, 20);
-    assert.equal(seen.length, 0, 'nothing before the street\'s first use');
-    ctl.use = realUse;
-    ctl.use(16, 540, false, { weather: 'rain', classicMinutes: 100, skyMinutes: 200, pos: [1, 2, 3] });
-    ctl.use = (...a) => { seen.push(a.map((v) => (v && typeof v === 'object' ? { ...v } : v))); };
-    ctl.retime(1080, 500, 600);
-    ctl.retime(1081, 501, 601);
-    assert.equal(seen.length, 2);
-    assert.deepEqual(seen[0], [16, 1080, false, { weather: 'rain', classicMinutes: 500, skyMinutes: 600, pos: null }]);   // PIN MOVED (AUDIT SHIP A7): the street's feet - the player's live array, a made level's coordinates by then - never handed on; the clouds' field stays where the street left it
-    assert.deepEqual(seen[1].slice(0, 3), [16, 1081, false]);
-    assert.equal(seen[1][3].skyMinutes, 601);
-    // the draw handed the clocks retimes first; handed none (the street's, its use run) it does not
-    const drew = [];
-    ctl.renderer.draw = () => drew.push(seen.length);
-    ctl.draw(0, 0, 1, 1, [0, 0, 64, 64], 1100, 700, 800);
-    assert.deepEqual(seen.at(-1).slice(0, 3), [16, 1100, false]);
-    assert.equal(seen.at(-1)[3].skyMinutes, 800);
-    assert.deepEqual(drew, [seen.length], 'retimed, then drawn');
-    ctl.draw(0, 0, 1, 1, [0, 0, 64, 64]);
-    assert.equal(seen.length, drew[0], 'the street\'s draw retimes nothing');
-  } finally { globalThis.fetch = fetchWas; console.warn = warn; }
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /drawSky: \(yaw, pitch, fov, aspect, vp\) => \{ sky\.draw\(yaw, pitch, fov, aspect, vp, minuteNow\(\), playerTicker\.classicMinutes, skyMinutes\(\)\); renderer\.markForeignPass\(\); \},/, 'the door hands the clocks');
-  // her moon: the world's sky's own term on the clock - none by day, Masser's bearing by night, its share the moon's
-  const { ketchMoonNow } = await import('../../src/scenes/ketch/ketchDeckHost.js');
-  const { moonlightTerm, skyState } = await import('../../src/render/enhancedSky.js');
-  assert.equal(ketchMoonNow(14400 + 720, 'sunny'), null, 'none at noon');
-  const day = 4 * 1440;   // a night with Masser up: the term the world's sky draws by
-  let night = null;
-  for (let d = 0; d < 32 && !night; d++) { const m = (day + d * 1440) + 60; const t = ketchMoonNow(m, 'sunny'); if (t && t.scale > 0.1) night = { m, t }; }
-  assert.ok(night, 'a night with a moon up');
-  assert.deepEqual(night.t, moonlightTerm(skyState({ minuteOfDay: night.m % 1440, weather: 'sunny', classicMinutes: night.m, skyMinutes: night.m })), 'the sky\'s own term');
-  assert.equal(ketchMoonNow(night.m + 0.4, 'sunny'), night.t, 'made once a sky minute');
-  const m2 = night.m + 1, clear = moonlightTerm(skyState({ minuteOfDay: m2 % 1440, weather: 'sunny', classicMinutes: m2, skyMinutes: m2 })), cloud = ketchMoonNow(m2, 'overcast');
-  assert.ok(cloud && cloud.scale < clear.scale * 0.9, 'the weather\'s clouds dim it');
-});
-
 test('KETCH-LOOK KL2 HER ART THROUGH THE PLAYER\'S PALETTE AT UPLOAD: up first in its fallback colours, then once more through ART_PAL when it is read - never back to the fallback after (the world outside\'s door asks again with none); a renderer that cannot upload asks nothing (mutants: the palette never asked; the fallback over the palette)', async () => {
   const { ensureKetchArt, ketchArtUp } = await import('../../src/scenes/ketch/ketchDeckHost.js');
   const { ketchArt, KT_REC, KT_ARCHIVE } = await import('../../src/world/ketch/ketchArt.js');

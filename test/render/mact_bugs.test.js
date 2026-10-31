@@ -97,9 +97,6 @@ test('MAC-T2: an H typed into the chat line switches no hand - the field stops t
   assert.equal(released(edge, keys, 'SwitchHand'), true, 'the player\'s own H still switches hands on its release');
   panel.destroy();
 
-  // by source: the gate, and the host feeding the ring from BOTH events with no field check of its own (the field's
-  // key is stopped before it - the panel's law, not the host's)
-  assert.match(rd('src/ui/input.js'), /export function noteKeyUp\(edges, code\) \{ if \(!edges\) return; if \(edges\.own && !edges\.own\.delete\(code\)\) return; edges\.up\.add\(code\); \}/);
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const h = rd(host);
     assert.match(h, /addEventListener\('keyup', \(e\) => \{ keys\.delete\(e\.code\); noteKeyUp\(latch\.edge, e\.code\);/, `${host}: the ungated keyup feeds the ring`);
@@ -230,13 +227,7 @@ test('MAC-T1 (d): the caster pick skips a carried light in any camera; by source
   assert.deepEqual(pickShadowCasters(lights, eye, 6), [0, 2, 1], 'the old law: the torch 2.9 from the camera is a caster, and the nearest (then the lanterns by distance)');
   assert.deepEqual(pickShadowCasters(lights, eye, 6, new Uint8Array([1, 0, 0])), [2, 1], 'masked: never');
   assert.equal(pickShadowCaster(lights, eye, new Uint8Array([1, 0, 0])), 2);
-  assert.match(rd('src/systems/playerTorch.js'), /range: st\.range,\n(?:\s*\/\/[^\n]*\n)*\s*carried: true,\n\s*\};/, 'the torch record');
-  assert.match(rd('src/scenes/magicCandle.js'), /range: CANDLE\.range, carried: true \}/, 'the candle record');
-  assert.match(rd('src/render/airPass.js'), /if \(f\.carried && f\.carried\[i\]\) continue;/, 'the glare');
-  assert.match(rd('src/render/shadowPass.js'), /if \(carried && carried\[i\]\) continue;/, 'the caster pick');
-  assert.match(rd('src/render/shadowPass.js'), /if \(f\.carried\[i\]\) this\.casterOf\[i\] = -2;/, 'the table');
   for (const fs of [EL_MESH_FS, EL_TERRAIN_FS, EL_CHAR_FS]) assert.match(fs, /\(k == -2 \|\| d > uPointLights\[i\]\.w \* 0\.7/, 'the march reads the table');
-  assert.match(rd('src/render/renderer.js'), /const carried = data\.carried \?\? null;\n\s*this\._pointCarried = carried \? carried\.subarray\(0, n\) : null;\n\s*this\._pointLights = data\.subarray/, 'lifted BEFORE the cut');
   // the FOUR HOSTS: minted in one home, composed in one home - every host's light call goes through the composer
   let sites = 0;
   for (const h of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {

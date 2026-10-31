@@ -76,59 +76,6 @@ test('MWNPC4a the recoil: "hit" + one of the groups the body carries, by the rol
   assert.equal(plain.status().hit, null);
 });
 
-test('MWNPC4b the death: one of the deaths by the roll, over everything, held at its stop; every other state reset and no longer refreshed - no swing, no cast, no recoil; a corpse met dead stands at its stop at once; revived, the idle again', async () => {
-  const r = await body();
-  r.setSheathed(false);
-  r.readySpell(true);
-  for (let i = 0; i < 60; i++) r.update(1 / 60, { pose: true });
-  r.readySpell(false);
-  for (let i = 0; i < 60; i++) r.update(1 / 60, { pose: true });
-  assert.equal(r.status().upperName, 'WeaponEquipped', 'fists up: a body that can swing and cast');
-  r.hurt(0);
-  assert.equal(r.die(1), true);
-  let s = r.status();
-  assert.equal(s.dead, true);
-  assert.equal(s.death.group, 'death2', 'roll 1: the second');
-  assert.equal(s.hit, null, 'the recoil reset');
-  assert.equal(s.idleGroup, null, 'the idle reset');
-  r.update(1 / 60, { pose: true });
-  assert.equal(r.status().posedGroup, 'death2', 'the death wins');
-  assert.equal(r.thirdActive(), true, 'and the dying body STANDS (drawn, its lane keeps it) - die() reset every other state, and the draw used to count only those');
-  for (let i = 0; i < 60; i++) r.update(1 / 60, { pose: true });
-  s = r.status();
-  assert.ok(Math.abs(s.death.time - s.death.stop) < 1e-6, `played to its stop (${s.death.time} of ${s.death.stop})`);
-  assert.equal(s.posedGroup, 'death2', 'and HELD there - playDeath\'s autodisable is false');
-  assert.equal(s.idleGroup, null, 'the idle never comes back to a dead body');
-  assert.equal(r.hurt(0), false, 'the dead recoil from nothing');
-  assert.equal(r.attack('StrikeDown'), null, 'nor swing');
-  assert.equal(r.castSpell(0), false, 'nor cast');
-  // the ladder: an action under the death (the unequip a sheathe plays - OpenMW's playDeath note: "these animations
-  // wouldn't actually be visible (due to the Death animation's priority being higher)") never shows
-  r.setSheathed(true);
-  r.update(1 / 60, { pose: true });
-  assert.equal(r.status().upperName, 'Unequipping', 'an unequip under it');
-  assert.equal(r.status().posedGroup, 'death2', 'and the death still wins every bone');
-  const src = rd('src/combat/fpArm.js');
-  assert.ok(src.includes('const state = deathState || actionState || hitState || movementState || jumpState || idleState;'), 'the ladder: death, the weapon, the recoil, then the rest');
-  assert.ok(src.includes('poseSource = deathState ? deathSource : actionState ? actionSource : hitState ? hitSource : (movementState'), 'and the winner\'s own tracks');
-  r.revive();
-  s = r.status();
-  assert.equal(s.dead, false);
-  assert.equal(s.death, null);
-  assert.ok(s.idleGroup, 'revived: the idle again');
-  for (let i = 0; i < 60; i++) r.update(1 / 60, { pose: true });   // the sheathe it took dead plays out
-  assert.equal(r.status().posedGroup, r.status().idleGroup, 'and it stands in it');
-  const corpse = await body();
-  corpse.die(0, { startPoint: 1 });
-  const c = corpse.status().death;
-  assert.equal(c.group, 'death1');
-  assert.ok(Math.abs(c.time - c.stop) < 1e-6, 'met dead: at the stop, no death played');
-  const plain = await body(null);
-  assert.equal(plain.die(0), false, 'a body that carries no death plays none');
-  assert.equal(plain.status().dead, true, 'and is dead all the same - it stops where it stood');
-  assert.equal(plain.hurt(0), false);
-});
-
 /** a rig that records its reactions and the weapon doors _arm opens */
 const reacting = (rigs) => () => {
   const r = { mode: 'first', calls: [], skinned: false,

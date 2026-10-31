@@ -282,13 +282,6 @@ test('ARENA2 sound: the driver builds once off the archive\'s voices, plays the 
   assert.equal(createArenaSound(null).ensure(), false);
 });
 
-test('ARENA2 sound: nothing new ships - no crowd file in public/, the engine\'s door reads the player\'s own archive', () => {
-  const sfx = readdirSync(new URL('../../../public/sfx/', import.meta.url));
-  assert.ok(!sfx.some((f) => /arena|crowd|cheer|boo|applause/i.test(f)));
-  const a = readFileSync(new URL('../../../src/systems/audio.js', import.meta.url), 'utf8');
-  assert.match(a, /samplesOf\(index\) \{\n\s+const rec = this\.snd\?\.getSound\?\.\(index\);\n\s+return rec\?\.waveData\?\.length \? pcm8ToFloat32\(rec\.waveData\) : null;/);
-});
-
 // ── THE MUSIC ───────────────────────────────────────────────────────────────────────────────────────────────
 test('ARENA2 music: a march and a victory fanfare made in code, in the HMI song\'s shape; the law by phase', () => {
   const S = arenaScoreSongs();

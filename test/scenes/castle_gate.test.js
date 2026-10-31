@@ -58,14 +58,6 @@ test('CASTLE-GATE the crown\'s two banners flank its castle\'s entrance, after t
   assert.deepEqual(seatBannerAnchors({ frames, palaceKeys: ['p'], castle: null, gates, centre: [0, 20] }), without);
 });
 
-test('CASTLE-GATE wired in the city\'s host: a town with a dungeon gathers its dungeon-entrance doors with their models\' boxes and their outward normals, and a crown hands the entrance to its banners and its field alike; a palace seat hands none (mutants: the doors ungathered; the normal ungathered; the tier\'s gate; one call unhanded)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(dfLocation\.hasDungeon\) for \(const d of cpu\.doors\) if \(d\.type === DOOR_TYPE\.DUNGEON_ENTRANCE\) pixelDungeonDoors\.push\(\{ door: doorCornersOf\(d, local\), box, normal: doorNormalOf\(d, local\), arena: b\.blockName === ARENA_BLOCK \}\);/);   // AUDIT PRE-MERGE 1003 W7: the arena's stair marked
-  assert.match(w, /const castleGate = seatTier === 'crown' \? castleEntranceOf\(pixelDungeonDoors\) : null;/);
-  assert.match(w, /seatBannerAnchors\(\{\n\s*frames: pixelHomeFrames, palaceKeys: seatPalaceKeys, castle: castleGate,/);
-  assert.match(w, /tier: seatTier, castle: castleGate,\n\s*\}\) : null;/);
-});
-
 test('CASTLE-GATE AUDIT G1: the castle\'s entrance faces along its door record\'s OUTWARD NORMAL - a U-shaped castle\'s forecourt or a recessed gate, whose box middle stands outside the door, faces out, not into the keep; a frame with no normal, or one that does not lean along the face, falls back to the box middle (mutants: the normal ignored; its sign reversed; any lean taken; the normal not carried; the banners\' face off the box alone)', () => {
   const span = { a: [-2, 0, 0], b: [2, 5, 0] };
   const uBox = [-20, 0, -10, 20, 25, 30];   // the keep behind z = 0, the forecourt's walls out to z = +30

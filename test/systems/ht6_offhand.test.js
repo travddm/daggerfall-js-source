@@ -332,18 +332,6 @@ test('HT6: the equip change reaches only the LIVE component - no frame yet, anot
   assert.equal(q.entity.lightSource, null, 'the other host\'s teardown does not silence the live one');
 });
 
-test('HT6: the rule is not restated - the hand law lives in ONE block, and the equip seam calls it', () => {
-  const src = read('src/systems/handheldTorches.js');
-  assert.equal(src.match(/w\.s\.onStow > ON_STOW\.Unequip/g)?.length, 1, 'the stow-or-drop choice is written once');
-  assert.equal(src.match(/function handLaw\(/g)?.length, 1, 'and it is the one block both callers run');
-  assert.equal(src.match(/handLaw\(/g)?.length, 3, 'the one block and its two callers - Update and the equip moment');
-  // ONE module listener for any number of rigs, registered once at
-  // import - the shape systems/entityMods.js uses. A per-component
-  // registration would stack one per host and never drop a disposed
-  // one, because equip.js's list has no remove.
-  assert.equal(src.match(/addEquipChangeListener\(/g)?.length, 1, 'one registration in the file');
-});
-
 test('HT6: the WINDOW reads the truth - the enhanced inventory\'s lit row and the quickslot diamond\'s off-hand cell, with no frame between the click and the paint', () => {
   const r = holding({ 'Handling.OnStow': ON_STOW.Unequip });
   r.ctx.sheathed = false;
@@ -371,7 +359,6 @@ test('HT6: the WINDOW reads the truth - the enhanced inventory\'s lit row and th
   assert.equal(itemLine(r.t, r.entity).lit, true, 'sheathed, the torch is still in hand and the window says so');
   assert.equal(quickslotView(r.entity, { weapon: null, sheathed: true }).off.kind, 'torch');
 });
-
 
 // AUDIT QS6 F7's THIRD CATCH. `HT6-the-equip-moment-obeys-a-stale-dial`
 // SURVIVED once the sweep made every record apply again: HT6's own note

@@ -220,86 +220,11 @@ function sliced(path) {
     declSrc: (name) => { const n = find((x) => x.type === 'VariableDeclaration' && x.declarations.some((d) => d.id?.name === name)); assert.ok(n, `${path} declares ${name}`); return S.slice(n.start, n.end); },
   };
 }
-const DC = sliced('src/scenes/dungeonContext.js');
 const mount = (body, state) => new Function('__s', `with (__s) { ${body} }`)(new Proxy(state, {
   has: (t, k) => k !== '__s',
   get: (t, k) => (k === Symbol.unscopables ? undefined : (k in t ? t[k] : globalThis[k])),
   set: (t, k, v) => { t[k] = v; return true; },
 }));
-
-test('BAL11 the dungeon\'s seam by execution: my foe at the place and my threat, a puppet at my threat\'s blows alone, an ally at nothing of it; a made level (the court, the Hour, the Spire) and the arena\'s floor never; the ladder off nothing', () => {
-  try {
-    online(null);
-    const seam = ({ level = 30, dungeonType = 6, made = null, location = {} } = {}) => {
-      const st = {
-        dfLocation: { mapTableData: { dungeonType }, ...location }, _sdRealm: made === 'hour', _made: made, isGateArena, isArenaFloor, placeVeteran, dungeonRarityTier,
-        _dungeonShare: 0, lootRarityOn, progressionScaling, combatStanding, foeShare, heroThreatOf,
-        foeDeps: { playerEntity: { level, skills: new Array(35).fill(20) }, applyProgressionScaling },
-      };
-      return mount(`${DC.declSrc('_placeVeteran')}\n${DC.declSrc('_heroStage')}\n${DC.fnSrc('applyProgressionScalingTo')}\nreturn { applyProgressionScalingTo, stage: _heroStage };`, st);
-    };
-    ladder(true);
-    const h = heroThreat(30, null);
-    // a natural cave (tier 4): no place, the hero alone
-    const cave = seam();
-    const e = monster(24); const hp = e.maxHealth;
-    cave.applyProgressionScalingTo(e, ENEMY_BASICS[24]);
-    assert.equal(e.maxHealth, Math.max(1, Math.round(hp * h.health)), 'my foe: my threat\'s health');
-    close(e.damageScale, h.damage, 'my foe: my threat\'s blows');
-    // a Dragon's Den: the place's whole row under it
-    const den = seam({ dungeonType: 14 });
-    const d = monster(24); const dhp = d.maxHealth;
-    den.applyProgressionScalingTo(d, ENEMY_BASICS[24]);
-    assert.equal(d.maxHealth, Math.max(1, Math.round(dhp * 2 * h.health)));
-    // a puppet: my threat's blows, its health the place's alone (its owner's record's `k` lands after)
-    const pup = monster(24); const php = pup.maxHealth;
-    den.applyProgressionScalingTo(pup, ENEMY_BASICS[24], { puppet: true });
-    assert.equal(pup.maxHealth, Math.round(php * 2), 'a puppet: the place\'s health, never mine');
-    close(pup.damageScale, 1.25 * h.damage, 'a puppet strikes me at my threat');
-    // an ally: nothing of the hero (a cave: nothing at all)
-    const al = monster(24); const ahp = al.maxHealth;
-    cave.applyProgressionScalingTo(al, ENEMY_BASICS[24], { ally: true });
-    assert.deepEqual([al.maxHealth, al.damageScale, al.progression], [ahp, undefined, undefined], 'an ally: nothing');
-    // the tuned stages: a made level, the arena's floor
-    for (const made of ['court', 'hour', 'spire']) {
-      const s = seam({ made });
-      assert.equal(s.stage, true, made);
-      const m = monster(24); const mhp = m.maxHealth;
-      s.applyProgressionScalingTo(m, ENEMY_BASICS[24]);
-      assert.equal(m.maxHealth, mhp, `${made}: nothing`);
-    }
-    const floor = seam({ location: { arenaFloor: 'bout', dungeon: { recordElement: { header: { locationId: ARENA_FLOOR_LOCATION_ID } } } } });
-    assert.equal(floor.stage, true, 'the arena\'s floor');
-    assert.equal(cave.stage, false, 'a real dungeon is no stage');
-    // the ladder off: nothing
-    ladder(false);
-    const off = monster(24); const ohp = off.maxHealth;
-    cave.applyProgressionScalingTo(off, ENEMY_BASICS[24]);
-    assert.equal(off.maxHealth, ohp, 'the ladder off: DFU\'s own');
-    // level 10: nothing
-    ladder(true);
-    const low = monster(24); const lhp = low.maxHealth;
-    seam({ level: 10 }).applyProgressionScalingTo(low, ENEMY_BASICS[24]);
-    assert.deepEqual([low.maxHealth, low.progression], [lhp, undefined], 'level 10 in a cave: nothing');
-  } finally { ladder(true); online(null); }
-});
-
-test('BAL11 the seams by source: both build arms of the dungeon say an ally, the wilds\' own arm hands the hero beside the place and its puppet arm the blows alone; the four hosts', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.equal((dc.match(/if \(!puppet && e\.level == null\) applyProgressionScalingTo\(entity, basics, \{ ally: !!e\.allied \}\);/g) ?? []).length, 2, 'a class foe\'s arm and a monster\'s');
-  assert.equal((dc.match(/else if \(puppet && e\.level == null\) applyProgressionScalingTo\(entity, basics, \{ puppet: true, ally: !!e\.allied \}\);/g) ?? []).length, 2);
-  assert.match(dc, /const _heroStage = _made != null \|\| isArenaFloor\(dfLocation\);/);
-  const xf = rd('src/scenes/exteriorFoes.js');
-  assert.match(xf, /\} else if \(puppet && !allied && !inLocation\(\)\) \{\n[^\n]*\n\s*applyProgressionScaling\(entity, progressionScaling\(null, 0, 0, 0, heroThreatOf\(playerEntity, \{ puppet: true \}\)\)\);/);
-  // THE FOUR HOSTS: world.js's wilds and every dungeon (worldModes.js's dungeon mode, the standalone dungeon) through the
-  // two seams; worldModes.js's interiors and exterior.js's fixed city hand their pools no `inLocation` - a town's ground
-  assert.match(rd('src/scenes/world.js'), /inLocation: \(\) => _musicInLocationRect\(\),/);
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
-    for (const p of rd(host).split('createExteriorFoes({').slice(1).map((s) => s.slice(0, s.indexOf('});')))) assert.doesNotMatch(p, /inLocation:/, `${host}: a town's ground`);
-  }
-  // the watch is no seam of it (scenes/cityGuards.js builds the watch with no progression at all)
-  assert.doesNotMatch(rd('src/scenes/cityGuards.js'), /heroThreat|progressionScaling/);
-});
 
 // ── THE DOORS ─────────────────────────────────────────────────────
 

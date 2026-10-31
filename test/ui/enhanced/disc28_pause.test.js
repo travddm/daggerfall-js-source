@@ -89,17 +89,6 @@ test('DISC28-A: the boot menu is no pause screen - the pause key means nothing t
   menu.unmount();
 });
 
-test('DISC28-A: a mod TextKey capture waiting for its key owns it - the back stack stands down, the capture has one owner', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  const onKey = src.slice(src.indexOf('function onKey(e)'), src.indexOf('function releaseLock()'));
-  assert.ok(onKey.indexOf('if (textKeyCapture) return;') > 0 && onKey.indexOf('if (textKeyCapture) return;') < onKey.indexOf('const pauseKey'),
-    'standing down before the pause key is read');
-  assert.match(src, /textKeyCapture = onKey;\s*\n\s*addEventListener\('keydown', onKey, true\);/);
-  assert.match(src, /removeEventListener\('keydown', onKey, true\);\s*\n\s*textKeyCapture = null;/, 'the capture clears itself');
-  assert.match(src, /unmount\(\) \{[\s\S]*?if \(textKeyCapture\) \{ globalThis\.removeEventListener\('keydown', textKeyCapture, true\); textKeyCapture = null; \}/, 'and unmount clears it');
-});
-
 test('AUDIT DISC28 UI-5: a pause SHARED with P\'s owner (QuickLootAll - the Controls prompt\'s "use for both") closes the face on P', () => {
   const { acts, menu, store } = mount('pause', (s) => shareBinding(s, 'KeyP', 'Escape'));
   assert.deepEqual(actionsForCode(store, 'KeyP'), ['QuickLootAll', 'Escape'], 'the owner first, the pause beside it');

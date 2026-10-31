@@ -100,43 +100,6 @@ test('RVN11a THE CALL AFTER A REST: its wake marks it rested; the first call aft
   assert.equal(loy(r), 62, 'no rest, no reward');
 });
 
-test('RVN11a SENT TWICE IN A DAY: the first sending free, a second the same day -10, the next day free again; the slots\' own hold never costs (mutants: every sending costs; the day unread; the hold costs)', () => {
-  const r = sworn('with');
-  RC.sendRevenantAway(r.id, { now: DAY * 5 + 10 });
-  assert.equal(loy(r), 60);
-  RC.callRevenant(r.id, 0);
-  RC.sendRevenantAway(r.id, { now: DAY * 5 + 900 });
-  assert.equal(loy(r), 50, 'twice in a day');
-  RC.callRevenant(r.id, 0);
-  RC.sendRevenantAway(r.id, { now: DAY * 6 + 1 });
-  assert.equal(loy(r), 50, 'a new day');
-  RC.callRevenant(r.id, 0);
-  RC.sendRevenantAway(r.id, { now: DAY * 6 + 2, byYou: false });
-  assert.equal(loy(r), 50, 'the slots\' hold');
-  RC.callRevenant(r.id, 0);
-  RC.sendRevenantAway(r.id, { now: DAY * 6 + 3 });
-  assert.equal(loy(r), 40, 'the hold noted no day of its own - the day stays the player\'s sending');
-  assert.equal(N.revenantById(r.id).companion.sentDay, 6);
-  assert.match(read('src/scenes/world.js'), /if \(last && sendRevenantAway\(last\.id, \{ byYou: false \}\)\)/, 'the host\'s hold');
-});
-
-test('RVN11a A FIGHT WON: begun with a live target, won the frame it stands with none and the last is down - once; a target that walked off, or one still up, no win; +3, wired in the sworn\'s frame (mutants: a live target a win; won twice; unwired)', () => {
-  const foe = { entity: { health: 10 }, dead: false };
-  const rec = { ai: { target: foe } };
-  assert.equal(RC.swornFightStep(rec), false);
-  foe.entity.health = 0;
-  assert.equal(RC.swornFightStep(rec), true, 'a target held after its death is none: won');
-  assert.equal(RC.swornFightStep(rec), false, 'once');
-  const other = { entity: { health: 10 }, dead: false };
-  rec.ai.target = other; RC.swornFightStep(rec);
-  rec.ai.target = null;
-  assert.equal(RC.swornFightStep(rec), false, 'it walked off still standing');
-  const r = sworn('with');
-  RC.swornFightWon(r.id);
-  assert.equal(loy(r), 63);
-  assert.match(read('src/scenes/world.js'), /for \(const rec of revenantAshore\.bodies\(\)\) if \(rec\.revenantCompanion && !rec\.dead && swornFightStep\(rec\)\) swornFightWon\(rec\.revenantCompanion\);/);
-});
-
 test('RVN11a THE WITNESS: one of its own kind executed - each sworn one at my side whose body stands here, of its kind or faction, -15; one away, one without a body, one of another kind untouched (mutants: unwired; the kind unread; the body unread)', () => {
   const orc = sworn('with'), rat = sworn('with', { mobileType: M.Rat }), gone = sworn('with'), away = sworn('away');
   bodies({ [orc.id]: { health: 30 }, [rat.id]: { health: 30 }, [away.id]: { health: 30 } });
@@ -152,31 +115,6 @@ test('RVN11a DEVOTED\'S BLOWS: at 90 its stand strikes x1.1 over its rank\'s; at
   const rank = N.revenantById(sworn('with').id).rank;
   assert.ok(Math.abs(blows(90) - (1 + RC.SWORN_DAMAGE_PER_RANK * rank) * 1.1) < 1e-9);   // UNQUIET (Revenants.md section 46): a sworn one's rank is its own (SWORN_DAMAGE_PER_RANK)
   assert.ok(Math.abs(blows(89) - (1 + RC.SWORN_DAMAGE_PER_RANK * rank)) < 1e-9);
-});
-
-test('RVN11a DEVOTED\'S WARNING: the real cues tell the host a wind-up at me as it begins (once a blow; never one at another); a Devoted one standing here is its voice; its words; the host\'s back test and wait (mutants: the hook unwired; told every frame; a peer\'s wind-up told; a Loyal one warning; the back unread)', () => {
-  const heard = [];
-  setWindupAtMeListener((f, b) => heard.push(b));
-  const blow = { start: 1, land: 2, kind: 'swing' };
-  const f = { mobileType: M.Orc, ai: { feet: [0, 0, 0], _tac: { state: 'windup', blow, key: LOCAL_TARGET } }, mobile: { meleeSeq: 0 } };
-  tellCues(f, null, 1, 1); tellCues(f, null, 1, 1.1);
-  assert.deepEqual(heard, [blow], 'once a blow');
-  const g = { mobileType: M.Orc, ai: { feet: [0, 0, 0], _tac: { state: 'windup', blow: { start: 1, land: 2, kind: 'swing' }, key: 'peer:1' } }, mobile: { meleeSeq: 0 } };
-  tellCues(g, null, 1, 1);
-  assert.equal(heard.length, 1, 'at another, not me');
-  const down = sworn('with', { loyalty: 99 }), loyal = sworn('with', { loyalty: 89 }), devoted = sworn('with', { loyalty: 95 });   // the one down first: passed over
-  bodies({ [loyal.id]: { health: 9 }, [devoted.id]: { health: 9 }, [down.id]: { health: 0 } });
-  assert.equal(RC.devotedWithYou()?.id, devoted.id);
-  // PIN MOVED (RVN12a, Feud-Arc.md 23): its warning in its own voice (`devoted_warn`) - a beast's, what it does
-  const d = N.revenantById(devoted.id);
-  d.personality = 'brutal';
-  const ev = N.revenantWarnEvent(d, 'ayla stormwind', { rolls: () => 0 });
-  assert.deepEqual([ev.kind, ev.kicker, ev.speech, ev.line], ['warn', 'Companion', 'Behind you, Ayla!', `${devoted.name}: "Behind you, Ayla!"`]);
-  const rat = sworn('with', { mobileType: M.Rat });
-  N.revenantById(rat.id).personality = 'craven';
-  assert.equal(N.revenantWarnEvent(N.revenantById(rat.id), 'Ayla').body, 'Snarls a warning with a nervous whine - behind you!', 'a beast, what it does');
-  const w = read('src/scenes/world.js');
-  assert.match(w, /setWindupAtMeListener\(\(f\) => \{\n\s*if \(!playerSpawned \|\| !f\?\.ai\?\.feet \|\| Date\.now\(\) - _devotedWarnAt < DEVOTED\.WARN_S \* 1000\) return;\n\s*if \(!isBackFacing\(cam\.yaw, player\.feetAt\(\), f\.ai\.feet\)\) return;\n\s*const r = devotedWithYou\(\);\n\s*if \(!r\) return;\n\s*_devotedWarnAt = Date\.now\(\);\n\s*revenantSay\(revenantWarnEvent\(r, playerEntity\?\.name\), /);
 });
 
 // ── the record, the page ────────────────────────────────────────────

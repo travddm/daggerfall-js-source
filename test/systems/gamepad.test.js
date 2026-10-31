@@ -341,8 +341,5 @@ test('GP1 the hosts and the tiers: all four hosts attach the pad on the touch la
   _resetForTests();
   const cs = controllerSettings();
   assert.deepEqual(cs, { enabled: true, deadzone: 0.1, threshold: 0.9, lookSensitivity: 1, cursorSensitivity: 1 }, 'the shipped defaults');
-  assert.match(rd('src/systems/inputActions.js'), /GP3 \(the same day\) BUILT THE CONTROLLER CURSOR/, 'GP3 retired the flag');
-  assert.doesNotMatch(rd('src/systems/inputActions.js'), /STILL FLAGGED/, 'nothing of the joystick law is flagged');
-  assert.match(rd('src/ui/controlsWindow.js'), /this\.joystick \?\?= new JoystickControlsWindow\(this\.unsaved\.joystick\);/);
   assert.ok(JOYSTICK_UI_ACTIONS.length === 4 && AXIS_ACTIONS.length === 4);
 });

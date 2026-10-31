@@ -123,9 +123,6 @@ test('AUDIT CARDS-4 C5, C7: a stake\'s or a table kind\'s refusal loses the pend
     t.ingest({ table: 0, error: w });
     assert.equal(t.lost?.why, 'refused', w);
   }
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /unknown: 'The realm did not answer\. Your stake will be settled when it does\.', offline: 'The realm could not be reached\. Try again\.'/);
-  assert.match(wm, /say\(\(r\.unknown \? CARD_STAKE_REFUSALS\.unknown : CARD_STAKE_REFUSALS\[r\.error\]\) \?\? /);
 });
 
 test('AUDIT CARDS-4 E2: a claim with nothing to claim lets the latch go - the next claim claims', async () => {

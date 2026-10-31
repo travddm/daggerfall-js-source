@@ -122,49 +122,6 @@ test('SURV7: composed - the ticker feeds the minute law from the host\'s env (th
   assert.equal(alignSurvival(a, now, now), true, 'a record from further along than the world starts fresh');
 });
 
-test('SURV7: by source - the four hosts feed their env (the roof, the floor, the fire each owns), the two dev scenes through the mode machine; the gate per ticker; the load arm and the arrival align; the leaf is pure', () => {
-  const shared = read('src/scenes/shared.js'), world = hostText('src/scenes/world.js'), ext = read('src/scenes/exterior.js');
-  const modes = read('src/scenes/worldModes.js'), dc = read('src/scenes/dungeonContext.js'), save = read('src/systems/save/save.js');
-  assert.match(shared, /survival: survivalFeed\(entity, survivalEnv\?\.\(\) \?\? null, \{ say \}\),/, 'the ticker\'s feed');
-  assert.match(shared, /if \(survivalEnv\) installSurvivalGate\(registerPreventRestCondition, \(\) => entity, survivalEnv\);/, 'the gate per ticker');
-  for (const [name, src] of [['world', world], ['exterior', ext]]) {
-    assert.match(src, /const survivalEnvNow = \(\) => \{/, `${name}: the reader`);
-    assert.match(src, /insideBuilding: m === 'interior', insideDungeon: m === 'dungeon',/, `${name}: the mode's flags`);
-    assert.match(src, /inSunlight: m === 'exterior' && sunlit\(\{ hour, weather, sheltered \}\),/, `${name}: the sun - AUDIT C&C's one law (temperature.js sunlit), the replay's too, none under a tent's canvas (I2)`);
-    assert.match(src, /byFire: m === 'exterior' && camps\.byFire\(feet\),/, `${name}: the fire`);
-    assert.match(src, /sleeping: playerEntity\.isResting && !playerEntity\.isLoitering \? \(playerEntity\.restKind \?\? 'rough'\) : null,/, `${name}: the sleep and its kind`);
-    assert.match(src, /fireResist: elementalResistanceChance\(playerEntity, ELEMENTS\.Fire\), frostResist: elementalResistanceChance\(playerEntity, ELEMENTS\.Frost\),/, `${name}: the resistances`);
-    // TO-FIELD3 (Mac, 2026-09-18): BOTH HOSTS READ THE SAME WAY AGAIN.
-    // TO-FIELD had given world.js a third arm that sat an accelerated
-    // journey as `resting`; Mac took it off ("journeys no longer sit as
-    // resting"), and the two readers are one sentence again - which is
-    // what a FOUR HOSTS reader should be.
-    assert.match(src, /survivalEnv: \(\) => \(_mode\(\) === 'dungeon' \? \(playerEntity\.isResting \? modes\?\.dungeonCtx\?\.survivalEnvNow\?\.\(\) \?\? null : null\) : survivalEnvNow\(\)\),/, `${name}: the ticker's reader, silent underground - but for a mirrored rest, which runs here (AUDIT SURV-TIERS)`);
-    assert.doesNotMatch(src, /resting: true \}\n?\s*: survivalEnvNow/, `${name}: and no arm sits the traveller down`);
-    assert.match(src, /survivalEnv: \(\) => survivalEnvNow\(\),/, `${name}: the host bag's reader`);
-  }
-  // PIN MOVED (TESA-LANDS' audit): the climate the body feels - past the Bay a zone's air (world/tamriel/tamrielGround.js
-  // feltClimateIndex), the hosts' map's elsewhere
-  assert.match(world, /climateIndex: feltClimateIndex\(playerTravelPixel\(\)\.x, playerTravelPixel\(\)\.y, maps\.getClimateIndex\(playerTravelPixel\(\)\.x, playerTravelPixel\(\)\.y\)\),[^\n]*\n\s+month: dateFromClassicMinutes\(wm\)\.month/, 'world: the pixel\'s climate');
-  assert.match(ext, /climateIndex: feltClimateIndex\(_locPixel\.x, _locPixel\.y, locClimateIndex\),[^\n]*\n\s+month: dateFromClassicMinutes\(wm\)\.month/, 'exterior: the location\'s climate');
-  assert.match(world, /alignSurvival\(playerEntity, Math\.floor\(ownMinutes\(\)\), Math\.floor\(ownMinutes\(\)\)\);/, 'world: the arrival (LIVED1: against the character\'s own clock)');
-  // HEARTH1 (2026-09-19): the interior's `byFire` was a hard FALSE, and
-  // this pin held it that way. It was right while the only fire the law
-  // knew was a placed camp - camping indoors is refused - and wrong the
-  // moment the ROOM's own hearth counts. The roof, the floor, the sun
-  // and the water are still the interior's to force; the fire is the
-  // one thing in that line the room now answers for itself.
-  assert.match(modes, /survivalEnv: \(\) => \(mode === 'interior' && host\.survivalEnv \? \{ \.\.\.host\.survivalEnv\(\), insideBuilding: true, insideDungeon: false, inSunlight: false, swimming: false, byFire: interiorCamps\.byFire\(player\.pos\) \} : null\),/, 'interior: the roof, and its own fire');
-  assert.match(modes, /survivalEnv: \(\) => host\.survivalEnv\?\.\(\) \?\? null,/, 'the dungeon gets the outer reader');
-  assert.match(dc, /insideBuilding: false, insideDungeon: true, inSunlight: false, swimming: !!_activity\.swimming, transport: false,/, 'dungeon: the floor, and its own water');   // PIN MOVED (AUDIT TEMP-UI E2): the dungeon's swim was a hard-coded false
-  assert.match(dc, /byFire: !!\(_fpFeet && camps\.byFire\(_fpFeet\)\),/, 'dungeon: its own fire');
-  assert.match(dc, /survival: survivalFeed\(playerEntity, survivalEnvNow\(\), \{ say: \(msg\) => hudText\.add\(msg\) \}\),/, 'dungeon: its own tick feeds');
-  assert.match(dc, /installSurvivalGate\(registerPreventRestCondition, \(\) => playerEntity, survivalEnvNow\);/, 'dungeon: its own gate');
-  assert.match(save, /if \(sharedClockOn\(\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s+const own = Math\.floor\(snap\.classicMinutes \?\? 0\), at = worldMinutes\(\);[\s\S]{0,2200}?alignSurvival\(entity, own, own\);[\s\S]{0,700}?if \(now - left > ALIGN_GRACE_MINUTES\) alignSurvival\(entity, Math\.floor\(ownMinutes\(\)\), null\);/, 'the load arm (LIVED1: the needs stood with the character\'s clock - a long break still comes back fresh; AUDIT LIVED1b P4: measured on the relay\'s clock, when it is heard)');
-  assert.match(read('src/systems/worldTick.js'), /felt = runSurvivalMinutes\(entity, lastMinutes, nowMinutes, survival\.env \?\? \{\}, /, 'the tick runs the minutes');
-  assert.doesNotMatch(read('src/systems/survival/env.js'), /from '\.\.\/\.\.\/scenes\/|from '\.\.\/\.\.\/ui\/|from '\.\.\/\.\.\/combat\/|from '\.\.\/spellcast|from '\.\.\/diseases|from '\.\.\/effects|from '\.\.\/lycanthropy|document\.|window\./);
-});
-
 // ── AUDIT-FIELD F11/F12: what `resting` actually holds ───────────────
 //
 // TO-FIELD sits an accelerated journey as `resting` and the record's

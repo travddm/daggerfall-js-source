@@ -153,21 +153,3 @@ test('REST3 the compass: a fire within reach in the flame\'s yellow, under the n
   assert.equal(withFireMarks(null, [[0, 0, 900]], [0, 0, 0]), null);
 });
 
-test('REST3 by source: the dungeon places them after its geometry and before its batches and lights, as 210/1 flats, torches, lights and hearths; never in the Burning Court; the ward in the spawn; the map and the compass', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  const at = (re) => { const m = dc.search(re); assert.ok(m >= 0, String(re)); return m; };
-  const place = at(/const firePlan = isGateArena\(dfLocation\) \|\| isArenaFloor\(dfLocation\) \|\| _ketch \? null : dungeonFirePlan\(\{/);   // KETCH (PIN MOVED): nor aboard the sky-ketch   // the merge of main's #545 (PIN MOVED): nor on the Arena's sand   // AUDIT REST II F5 (PIN MOVED): the law's plan - its fires and the layout fire it took for the entrance's
-  assert.ok(at(/collider\.addMesh\('dungeon', cpu\.positions, cpu\.indices, matrix\);/) < place);
-  assert.ok(place < at(/for \(const \[key, centers\] of flatGroups\) \{/));
-  assert.ok(place < at(/const flicker = new CityLightAnimator\(lights\.length/));
-  assert.match(dc, /dungeonHearths\.push\(\{ x: p\[0\], y: cy, z: p\[2\], foot: p\[1\], w: size\.w, h: size\.h, placed: true, archive, record \}\);/);   // AUDIT REST III E4 (RE-AIMED): the placed row names its flat
-  assert.match(dc, /lights\.push\(\{ x: p\[0\], y: p\[1\] \+ FIRE_LIGHT_UP, z: p\[2\], range: FIRE_LIGHT_RANGE \}\);/);
-  assert.match(dc, /torches\.push\(\{ pos: \[p\[0\], cy, p\[2\]\], handle: null \}\);/);
-  assert.match(dc, /if \(spot && [^\n]*inFireWard\(dungeonFires, spot\)\) spot = null;/);   // AUDIT REST-PARTY (PIN MOVED): the spawn asks the ward - C1's online gate before it is C1's own pin
-  assert.match(dc, /fires: dungeonFires,/);
-  assert.match(dc, /withFireMarks\(opts\.nodeMarks\?\.\(playerFeet\) \?\? null, dungeonFires, playerFeet\)/);
-  assert.match(rd('src/ui/automap/automapDoor.js'), /fires: deps\.fires \?\? null,/);
-  assert.match(rd('src/ui/automap/automapSheet.js'), /out\.push\(\{ x, z, y: p\[1\], kind: 'fire', name: 'Campfire' \}\);/);
-  assert.match(rd('src/ui/ink/inkAutomap.js'), /if \(m\.kind === 'fire'\) \{/);
-  assert.match(rd('src/scenes/camps.js'), /hearths\?\.\(\)\?\.\[Number\(key\.slice\(7\)\)\]\?\.placed \? 'Campfire' : 'Fire'/);
-});

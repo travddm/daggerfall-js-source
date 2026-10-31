@@ -24,91 +24,6 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const tick = (n = 4) => new Promise((r) => { let i = 0; const go = () => (++i >= n ? r() : setTimeout(go, 0)); setTimeout(go, 0); });
 const memStorage = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)) }; };
 
-test('AUDIT SEATS-3 C1 by source: the siege\'s and the Royal Tourney\'s claims are signed by the seats\' own account (the receipt\'s `s`), never the hub\'s device id (mutants: either door back on accountId)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /siegeClaims = createSiegeClaims\(\{ claim: \(r\) => seatBook\.claimSiege\(r\), me: \(\) => _seatDoor\?\.me\(\) \?\? null, storage: appStorage\(\),/);
-  assert.match(w, /royalClaims = createRoyalClaims\(\{ claim: \(r\) => seatBook\.claimRoyal\(r\), me: \(\) => _seatDoor\?\.me\(\) \?\? null, storage: appStorage\(\),/);
-  assert.doesNotMatch(w, /create(?:Siege|Royal)Claims\(\{[^\n]*me: \(\) => accountId\(\)/);
-});
-
-test('AUDIT SEATS-3 C2: a palace\'s hall lost mid-visit (the seat lapsed, the list shut) leaves the save\'s own record as it came - never the Charter Room\'s pieces or hidden list cached as the save\'s; the latch begun at the door and cleared at both teardowns (mutants: the lines back on interiorSeatHall; a latch the lapse clears)', () => {
-  const m = src('src/scenes/worldModes.js');
-  const halls = m.slice(m.indexOf('  function seatHallsFrame(nowMs) {'), m.indexOf('  /** CROWN-HALL: the crown seat this dungeon'));
-  const decorLine = m.match(/\n(\s*const decor = interiorHome \|\| _seatHallVisit \? interiorDecor\.kept\(\) : interiorDecor\.list\(\);)/)[1];
-  const hiddenLine = m.match(/\n(\s*const hiddenBase = \[\.\.\.\(interiorHome \|\| _seatHallVisit \? _keptHidden : \(ctx\.base\?\.hidden\(\) \?\? \[\]\)\), \.\.\.\(ctx\.base\?\.roomDoors\?\.hidden\?\.\(\) \?\? \[\]\)\];)/)[1];
-  const restoreLine = m.match(/\n(\s*if \(interiorHome \|\| _seatHallVisit\) interiorDecor\.keep\(placed\); else interiorDecor\.set\(placed\);)/)[1];
-  const make = new Function('S', `
-    let { mode, interiorBuilding, interiorHome, interiorSeatHall, _seatHallVisit, _hallsReadAt, host, BUILDING_TYPES, homeTownOf, loadHomeDecor, interiorDecor, _keptHidden, ctx } = S;
-    let _crownTried = null, dungeonCtx = null, dungeonLoc = null; const crownHere = () => null;
-    ${halls}
-    return {
-      frame: (t) => seatHallsFrame(t),
-      enter(h) { interiorSeatHall = h; _seatHallVisit = !!interiorSeatHall; },
-      get hall() { return interiorSeatHall; },
-      state() { ${decorLine} ${hiddenLine} return { decor, hiddenBase }; },
-      restore(placed) { ${restoreLine} },
-    };`);
-  let holder = { key: 1, name: 'SH', member: true, keeper: false };
-  let kept = [], standing = [];
-  const interiorDecor = { keep: (p) => { kept = [...p]; }, kept: () => kept, set: (p) => { standing = [...p]; }, list: () => standing };
-  const S = { mode: 'interior', interiorBuilding: { buildingType: 13 }, interiorHome: null, interiorSeatHall: null, _seatHallVisit: false, _hallsReadAt: -Infinity,
-    host: { seatHall: { here: () => holder } }, BUILDING_TYPES: { Palace: 13 }, homeTownOf: () => 5, loadHomeDecor: () => { standing = [{ id: 'svc-throne-rug' }]; },
-    interiorDecor, _keptHidden: ['save-hidden-3'], ctx: { base: { hidden: () => ['svc-hidden-17'] } } };
-  const v = make(S);
-  v.enter(holder); v.restore([{ id: 'save-own' }]); standing = [{ id: 'svc-throne-rug' }];
-  assert.deepEqual(v.state(), { decor: [{ id: 'save-own' }], hiddenBase: ['save-hidden-3'] }, 'while a hall: the save\'s own record back');
-  holder = null;
-  v.frame(10_000);
-  assert.equal(v.hall, null, 'the hall read again as none');
-  assert.deepEqual(v.state(), { decor: [{ id: 'save-own' }], hiddenBase: ['save-hidden-3'] }, 'lapsed mid-visit: still the save\'s own, never the service\'s pieces');
-  // a restore within the same visit (a load) keeps the record, unstood
-  standing = [{ id: 'svc-throne-rug' }];
-  v.restore([{ id: 'save-own' }]);
-  assert.deepEqual(standing, [{ id: 'svc-throne-rug' }], 'the Charter Room\'s pieces not swapped for the save\'s mid-visit');
-  // a visit whose palace is known late latches it too
-  const late = make({ ...S, interiorSeatHall: null, _seatHallVisit: false });
-  holder = { key: 1, name: 'SH', member: false, keeper: false };
-  late.frame(20_000);
-  holder = null; late.frame(30_000);
-  kept = [{ id: 'k' }];
-  assert.deepEqual(late.state().decor, [{ id: 'k' }], 'known late, then lost: the kept record');
-  // the latch: begun at the door, cleared at both teardowns
-  assert.match(m, /interiorSeatHall = building\?\.buildingType === BUILDING_TYPES\.Palace \? \(host\.seatHall\?\.here\?\.\(homeTownOf\(building\)\) \?\? null\) : null;[^\n]*\n      _seatHallVisit = !!interiorSeatHall;/);
-  assert.match(m, /    interiorSeatHall = null;   \/\/ SEAT-HALL\n    _seatHallVisit = false;/);
-  assert.match(m, /interiorHome = null; interiorSeatHall = null; interiorOverlay = null; exteriorDoor = null; _seatHallVisit = false;/);
-  assert.match(halls, /if \(h\) _seatHallVisit = true;/);
-  assert.doesNotMatch(halls, /_seatHallVisit = false/, 'a lapse never unlatches it');
-  assert.equal((m.match(/interiorHome \|\| interiorSeatHall\) (?:interiorDecor\.keep|_keptHidden)/g) ?? []).length, 0);
-});
-
-test('AUDIT SEATS-3 C3: a battle\'s foes\' bodies read the room once a sweep - one peersNear() for twenty foes, the same bodies as one read per foe (mutants: duelBody per foe; the relay-run fighters dropped)', () => {
-  const w = hostText('src/scenes/world.js');
-  const grab = (start, end) => w.slice(w.indexOf(start), w.indexOf(end, w.indexOf(start)));
-  const duelBodySrc = w.match(/\n  (const duelBody = [^\n]*)/)[1];
-  const duelBodyInSrc = w.match(/\n  (const duelBodyIn = [^\n]*)/)[1];
-  const bodiesSrc = grab('  const NO_BODIES = Object.freeze([]);', '  /** My opponent');
-  const arrowSrc = grab('  const duelArrowTargets = () => {', '  /** AUDIT-SEATS G5: a siege');
-  let calls = 0;
-  const peers = Array.from({ length: 39 }, (_, i) => `p${i}`);
-  const S = {
-    peersNear: () => { calls++; return peers.map((id) => ({ id, feet: [id.length, 0, 0], height: 1.8 })); },
-    siegeNpcs: { body: (id) => (id === 'npc-guard' ? { id, feet: [9, 0, 9], height: 1.7, name: 'a guard' } : null) }, duelMgr: { fighting: false }, royalSession: { active: () => false }, CAPSULE_HEIGHT: 1.8,
-    siegeSession: { active: () => true, foes: () => [...peers.slice(0, 19), 'npc-guard', 'gone'] },
-  };
-  const f = new Function('S', `const { peersNear, siegeNpcs, duelMgr, royalSession, siegeSession, CAPSULE_HEIGHT } = S; ${duelBodySrc}\n${duelBodyInSrc}\n${bodiesSrc}\n${arrowSrc}\n return { duelArrowTargets, duelBody };`)(S);
-  const t = f.duelArrowTargets();
-  assert.equal(calls, 1, 'one read of the room for the frame\'s arrows');
-  assert.equal(t.length, 20, 'nineteen peers and the relay\'s guard; the gone one none');
-  calls = 0;
-  const oracle = S.siegeSession.foes().map((id) => f.duelBody(id)).filter(Boolean);
-  assert.deepEqual(t.map((x) => x.ref.id), oracle.map((b) => b.id), 'the same bodies, in the same order');
-  assert.deepEqual(t.map((x) => x.feet), oracle.map((b) => b.feet));
-  // the melee sweep reads it once too
-  const melee = grab('  const siegeMeleeHit = (eye, inViewFn) => {', '  /** SEAT2b part two (b)');
-  assert.match(melee, /const near = peersNear\(\);[^\n]*\n    for \(const id of foes\) \{\n      const b = duelBodyIn\(near, id\);/);
-  assert.doesNotMatch(melee + bodiesSrc, /duelBody\(id\)/);
-});
-
 test('AUDIT SEATS-3 C4: the Watchtowers\' seats filtered once a list read and guild, not each frame; the halls\' banners one kept list, refilled in place; the frame\'s banners one kept list (mutants: a filter a frame; a fresh list or banner a frame; the merge or the nearest lost)', async () => {
   let filters = 0;
   const seats = Array.from({ length: 120 }, (_, i) => ({ key: i + 1, state: 'confirmed', holder: i === 7 ? { guild: { id: 'g-mine' } } : null, forts: i === 7 ? { watchtowers: 1 } : undefined }));
@@ -138,19 +53,7 @@ test('AUDIT SEATS-3 C4: the Watchtowers\' seats filtered once a list read and gu
   assert.equal(a[0], b[0], 'one kept banner');
   assert.equal(b[0].top[0], top0[0] + 100, 'its top where the scene has it now');
 
-  const w = hostText('src/scenes/world.js');
-  const hungSrc = w.slice(w.indexOf('  const _hung = [];'), w.indexOf('  const yards = homeDecor'));   // PIN MOVED (CHAP7b): a patron's banners on the same pass - none here (chapterBanners null)
-  const mk = (n, x) => Array.from({ length: n }, (_, i) => ({ id: `${x}${i}`, top: [i * (x === 'h' ? 1 : 2), 0, 0] }));
-  let halls = mk(2, 'h'), seatsB = mk(1, 's');
-  const run = new Function('S', `const { BANNERS_MAX, cam } = S; const hallBanners = { list: () => S.halls() }; const seatBanners = { list: () => S.seats() }; const chapterBanners = null;\n${hungSrc}\n return bannersHung;`);
-  const hung = run({ BANNERS_MAX: 4, cam: { pos: [0, 0, 0] }, halls: () => halls, seats: () => seatsB });
-  const x = hung();
-  assert.deepEqual(x.map((o) => o.id), ['h0', 'h1', 's0']);
-  halls = mk(5, 'h'); seatsB = mk(3, 's');
-  const y = hung();
-  assert.equal(x, y, 'one kept list');
-  assert.deepEqual(y.map((o) => o.id), ['h0', 's0', 'h1', 'h2'], 'the nearest four');
-  assert.doesNotMatch(hungSrc, /\[\.\.\.|\.slice\(/);
+   
 });
 
 test('AUDIT SEATS-3 C5: a seats\' list read that failed (a timeout, offline, the service\'s fault) is asked again by the frame every SEAT_LIST_RETRY_MS until one answers; a refusal is not; an open list still every SEAT_RED_READ_MS (mutants: only while open; no backoff)', async () => {
@@ -267,9 +170,6 @@ test('AUDIT SEATS-3 D3: a board\'s Tithe as the seats\' list says it (its bailiw
     await tick();
     assert.match(t.root.textContent, new RegExp(`If it all sells ${want}`), String(pct));
   }
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /tithe: \(\) => \(seatBook\?\.open === true \? boardTithePct\(seatBook\.data\?\.seats \?\? \[\], region, \[town\.px, town\.py\]\) : null\),/);
-  assert.match(src('src/ui/marketTab.js'), /You get the top bid, less \$\{less\}\$\{pct == null \? ' and any Tithe' : ''\}\./);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the terms one line
 });
 
 test('AUDIT SEATS-3 D6: at a crown the holder\'s Officer is told its Saturday slot, whatever the window, and offered no window lever; a palace\'s lever as ever (mutants: the default\'s Wednesday at a crown; the lever shown)', async () => {

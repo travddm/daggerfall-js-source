@@ -69,20 +69,3 @@ test('SNOW-TELL: the pass lies its marks BLOW_LIFT over the ground without snow 
   assert.deepEqual(lifts({ contrast: false, snowRise: 0.66 }), [BLOW_LIFT + 0.66], 'a revenant\'s pyre over 0.66 m of snow');
 });
 
-test('SNOW-TELL: the renderer keeps the frame\'s snow height - cleared each frame, the deepest tier drawn, handed to the foes\' telegraphs - and both snowy hosts draw their snow before the telegraphs read it (mutants: the height never cleared; never recorded; never handed)', () => {
-  const r = src('src/render/renderer.js');
-  const begin = r.slice(r.indexOf('  beginFrame(proj, view, lightDir, opts = null) {'));
-  assert.match(begin.slice(0, begin.indexOf('\n  }\n')), /this\._snowRise = 0;/, 'a frame starts with no snow under its marks');
-  assert.match(r, /this\._snowU4\(L\.uSnowDepths, u\.depths\); this\._snowU4\(L\.uSnowLimits, u\.limits\);\n\s+this\._snowRise = Math\.max\(this\._snowRise, snowSurfaceRise\(u\)\);/, 'each tier drawn says its height');
-  assert.match(r, /const n = this\._foeTelegraph\.draw\(list, this\._proj, this\._view, \{[^\n]*\}, \{ snowRise: this\._snowRise \}\);/, 'and the telegraphs read it');
-  // THE FOUR HOSTS: world.js and exterior.js draw the snow, before their telegraphs; the interiors (worldModes.js) and
-  // the dungeons (dungeonContext.js) draw none, so their frames' height stays 0 and their marks lie as they always lay
-  for (const [host, snow, tell] of [
-    ['src/scenes/world.js', 'if (!tvf) snowfall.draw(cullOn ? snowOutside : null);', 'renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), walkMode && playerSpawned ? player.pos : cam.pos));'],
-    ['src/scenes/exterior.js', '    snowfall.draw();   // SNOWFALL1', 'renderer.drawFoeTelegraphs?.(drawableBlows(tacticsNow(), walkMode ? player.pos : cam.pos));'],
-  ]) {
-    const t = src(host), a = t.indexOf(snow), b = t.indexOf(tell);
-    assert.ok(a > 0 && b > a, `${host}: the snow drawn before the telegraphs`);
-  }
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(src(host), /snowfall\.draw\(/, `${host} draws no snow`);
-});

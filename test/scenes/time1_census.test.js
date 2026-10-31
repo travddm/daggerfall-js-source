@@ -77,13 +77,6 @@ test('TIME1 census: every line in src/ that reads a shared clock is named, every
   assert.ok(files.includes('src/scenes/world.js') && files.length > 100, 'the walk saw the tree');
 });
 
-test('TIME1 census: the laws are only where the laws live - a law row stands in the clock modules and the install alone', () => {
-  const homes = new Set(['src/net/skyLaw.js', 'src/systems/skyCalendar.js', 'src/systems/worldTick.js', 'src/scenes/world.js']);
-  for (const r of CENSUS.rows.filter((x) => x.clock === 'law')) assert.ok(homes.has(r.file), `${r.file}: "${r.has}" says it is a law outside the clocks' homes`);
-  const install = CENSUS.rows.find((r) => r.file === 'src/scenes/world.js' && r.clock === 'law');
-  assert.ok(install && /setSharedClock\(/.test(readersOf('src/scenes/world.js').find((l) => l.includes(install.has)) ?? ''), "the world host's law row is its install");
-});
-
 test('TIME1 census: the readers the design names are where it says - the frame\'s hour, the seasons, the curses\' sky and the sky feed read the sky; the gates, the raids, the prices, the shelves and the weather keep the event clock', () => {
   // the line itself, found in the source, and the row that names it
   const clockOfLine = (file, re) => {

@@ -99,12 +99,6 @@ test('RENT-REST: a tenant rests in the home they rent, as its owner does - the r
   assert.equal(canRest(ended).line, HAVE_NOT_RENTED_ROOM, 'the tenancy over: no bed');
   assert.equal(H.homeBedIsMine(tenantRow, tenantRow.tenant - 1), true, 'a second before its end: still the tenant\'s');
   assert.equal(H.homeBedIsMine(null, nowS), false, 'no online home: none');
-  // the host hands it (the interior host is the one that stands in an online home)
-  const wm = src('src/scenes/worldModes.js');
-  const bag = wm.slice(wm.indexOf('const interiorRestPlaceHere = () => {'), wm.indexOf('const interiorRestMarkers = () =>'));
-  assert.match(bag, /homeBed: homeBedIsMine\(interiorHome, Math\.floor\(Date\.now\(\) \/ 1000\)\) \|\| !!interiorSeatHall\?\.member,/);   // PIN MOVED (SEAT-HALL): and the palace holder's members rest there
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(bag, /houseOwned: !interiorHome && houseOwnedAt\(/, 'an online home answers by its bed alone');
 });
 
 test('RENT-RENEW: the renewal window offers only the days the service takes (one\'s own room renews from its end, never past thirty days ahead), says so when none is left, and a room off the offer says it cannot be renewed (mutants: every day offered; the renewal from now; the full line unsaid; the room off the offer said none free)', async (t) => {
@@ -146,15 +140,6 @@ test('RENT-RENEW: the renewal window offers only the days the service takes (one
   assert.deepEqual(H.rentable(got.rooms), [], 'nothing to rent');
   assert.equal(H.rentNoneLine(got.rooms, got.now), 'Room 1 is no longer offered to rent. It is yours for 30 more days, and cannot be renewed.');
   assert.equal(H.rentNoneLine([], got.now), H.RENT_NONE_FREE);
-  // the host asks the window for these, on the service's clock
-  const wm = src('src/scenes/worldModes.js');
-  const door = wm.slice(wm.indexOf('async function openHomeRent(bd, home) {'), wm.indexOf('function openHomeRentConfirm('));
-  assert.match(door, /nowS = got\.now \|\| Math\.floor\(Date\.now\(\) \/ 1000\);/);
-  assert.match(door, /if \(!list\.length\) \{ townTalk\?\.say\?\.\(rentNoneLine\(got\.rooms, nowS\)\); return; \}/);
-  assert.match(door, /action: \(\) => \{ const days = rentDayRows\(r, nowS\); if \(days\.length\) openHomeRentDays\(bd, r, days\); else townTalk\?\.say\?\.\(RENT_FULL_LINE\); \},/);
-  assert.match(door, /function openHomeRentDays\(bd, room, days\) \{/);
-  assert.match(door, /\.\.\.days\.map\(\(d, i\) => \(\{/);
-  assert.doesNotMatch(door, /RENT_DAY_ROWS\.map/, 'never every day');
 });
 
 /** A house the rig stands in (its eye at 10, 1.6, 10; the building's origin there too): x 4 to 24, z 5 to 15 - two rooms

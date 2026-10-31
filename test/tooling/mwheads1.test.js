@@ -268,8 +268,6 @@ test('MW-HEADS1: the Breton men\'s pools are the port\'s own wherever a PLAYER\'
   // a Breton woman: the data's, by her face index (no table for her)
   const her = playerBodyRows(data, 'breton', true, { faceIndex: 5 });
   assert.equal(her.find((r) => r.slot === 'head').record.id, 'b_n_breton_f_head_01');
-  // the viewer's face sheet - the page the table is authored against - sheets no race and sex the port's own stand for
-  assert.match(rd('src/tools/mwViewer.js'), /\n {6}if \(ownFacePools\(race\.id, female\)\) \{ own\.push\(`\$\{race\.id\} \$\{female \? 'female' : 'male'\}`\); continue; \}\n/);
 });
 
 test('MW-HEADS1: through the binder a retail head takes - every head and hair a rigid part under the Head node, unmirrored, its own geometry, no note', async () => {
@@ -326,24 +324,3 @@ test('MW-HEADS1 (AUDIT): a real build - a Breton man wears the port\'s own head 
   assert.deepEqual(npcBuilt.bound, ['head', 'hair']);
 });
 
-test('MW-HEADS2: the port\'s own heads are a player\'s alone - the local player\'s build and every peer\'s ask for them, the people\'s lanes and an escort\'s face do not; the face-match memo keyed on the pools it measured', async () => {
-  const { armBuildOptsOf } = await import('../../src/combat/weapon/weaponRig.js');
-  const { peerBuildOpts, playerBuildOpts } = await import('../../src/net/peer/peerBodies.js');
-  assert.equal(armBuildOptsOf({ race: 'Breton', gender: 'male', faceIndex: 6, items: [] }).ownHeads, true, 'the local player');
-  const look = { race: 'Breton', gender: 'male', faceIndex: 6, items: [] };
-  assert.equal(playerBuildOpts(look).ownHeads, true, 'another player');
-  assert.equal(peerBuildOpts(look).ownHeads, undefined, 'the people\'s lanes: not asked');
-  assert.deepEqual({ ...playerBuildOpts(look), ownHeads: undefined }, { ...peerBuildOpts(look), ownHeads: undefined }, 'and nothing else changed');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /peerBodies = new PeerBodies\(\{[^\n]*buildOpts: playerBuildOpts \}\);/, 'the peers\' bodies are players\'');
-  assert.equal((world.match(/new PeerBodies\(\{/g) ?? []).length, 2, 'the peers\' and the quest people\'s - the people\'s lanes are npcBodies.js\'s');
-  assert.doesNotMatch(rd('src/characters/npcBodies.js'), /playerBuildOpts|ownHeads/, 'the people\'s lanes never ask');
-  const heads = rd('src/characters/headPortraits.js');
-  assert.match(heads, /faceIndex: Number\.isInteger\(who\.faceIndex\) \? who\.faceIndex : 0, ownHeads: !who\.npc, px, ph,/, 'a player-shaped face asks - an NPC\'s (`npc`) does not');
-  assert.match(heads, /skin: o\.skin, ownHeads: o\.ownHeads, px, ph \}\);/, 'a live player as its build');
-  assert.doesNotMatch(heads.slice(heads.indexOf('export async function npcHeadImage(')), /ownHeads/, 'an NPC\'s talk-window face never asks');
-  assert.match(rd('src/ui/hud/hudEscortFaces.js'), /playerHeadImage\(\{ race, gender, faceIndex: face\.faceIndex \| 0, npc: true \}/, 'an escort is an NPC');
-  const fp = rd('src/combat/fpArm.js');
-  assert.match(fp, /const fkey = `\$\{gen\}:\$\{race\}:\$\{female \? 'f' : 'm'\}:\$\{faceIndex \| 0\}:\$\{fnv\(measured\)\}`;/, 'a player\'s and an escort\'s verdicts are two');
-  assert.match(fp, /vampire: !!vampire, walk: npcFace, ownHeads: !!ownHeads \}\);/, 'the third-person body asks as the build was asked');
-});

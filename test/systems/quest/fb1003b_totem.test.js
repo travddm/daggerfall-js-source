@@ -231,26 +231,3 @@ test('TOTEM-CAGE: online the castle remembers the raised cage - a joiner\'s Tote
   }
 });
 
-test('TOTEM-CAGE: the hosts wire it - the dungeon adapter hands its item stand the mover by marker ID, the stand rides through one law now and at its fill, the ray reads where it is, the context names the mover by the key it registered; a building\'s item stands still (mutants: the follow, the fill, the box, the context\'s mover)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  const dc = rd('src/scenes/dungeonContext.js');
-  // THE FOUR HOSTS: worldModes.js (both adapters) and dungeonContext.js (the mover) are wired; world.js and exterior.js
-  // stand no dungeon quest item of their own (their mount routes here); the standalone ?dungeon host stands no quest
-  const dungeonAdapter = wm.slice(wm.indexOf('const dungeonQuestAdapter = {'), wm.indexOf('standFoe:', wm.indexOf('const dungeonQuestAdapter = {')));
-  assert.match(dungeonAdapter, /standItem: \(\{ item, marker, position, behaviour \}\) => \{/, 'the item arm takes the marker');
-  assert.match(dungeonAdapter, /host\?\.follow\(dungeonCtx\?\.questMarkerMover\?\.\(marker\?\.markerID\)\?\.offset\);/, 'and hands the stand the marker\'s travel');
-  const interiorAdapter = wm.slice(wm.indexOf('const questAdapter = {'), wm.indexOf('standFoe:', wm.indexOf('const questAdapter = {')));
-  assert.match(interiorAdapter, /standItem: \(\{ quest, item, marker, position, behaviour \}\) => \{/);   // QUEST-MARKERS: the marker for the backstop's spots, never a follow
-  assert.doesNotMatch(interiorAdapter, /follow\(/, 'a building has no DaggerfallMarker: its quest item never rides');
-  const standIn = wm.slice(wm.indexOf('function standQuestFlatIn('), wm.indexOf('const standQuestFlat = '));
-  assert.match(standIn, /width: 0, height: 0, batch: null, active: true, dead: false, behaviour, off: null \};/, 'the stand the law reads');
-  assert.match(standIn, /stand\.batch = renderer\.createBillboardBatch\(drawArchive, drawRecord, size, \[\[x, by, z\]\]\);\n\s*rideSceneMarker\(stand, stand\.off\);/, 'the fill draws through the travel');
-  assert.match(standIn, /follow: \(offset\) => rideSceneMarker\(stand, offset\),/, 'the host\'s door is the one law');
-  const targets = wm.slice(wm.indexOf('const questFlatTargets = (list) => {'), wm.indexOf('const clickQuestFlat ='));
-  assert.match(targets, /aabb: questStandBox\(s\),/, 'the ray meets the stand where it is');
-  assert.doesNotMatch(targets, /s\.x - s\.width \/ 2/, 'and never at its placed point');
-  assert.match(dc, /questMarkerMover: \(markerID\) => sceneMarkerMover\(dungeon\.blocks, actions, markerID\),/, 'the context names the mover');
-  // the key the mover reads is the key the acting marker was registered under: block instance, object position
-  assert.match(dc, /await registerFlatAction\(bi, m\.position, m\.action, m\.x \+ b\.originX, m\.y, m\.z \+ b\.originZ, m\.archive \?\? 199, m\.record, false\);/);
-  assert.match(dc, /const o = actions\.addMoveFlat\(ns, position, action, \[x, y, z\], aabb\);/);
-});

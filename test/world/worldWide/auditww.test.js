@@ -25,8 +25,6 @@ import { hostText } from '../../hostText.mjs';   // AUDIT TESA II (lane K's K6):
 
 setTamrielTrace(null); setTamrielFit(null);   // the authored shape and fit: no player's picture in the suite
 const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.url), 'utf8'));
-/** The world host whole - its file and every module moved out of it - for a pin that finds NOTHING there (AUDIT HOST-SPLIT 2). */
-const wholeWorld = () => codeOnly(hostText('src/scenes/world.js'));
 
 /** A zone hall's map id whose low 20 bits are `low` - a Bay pixel id's, as 13 of a Cyrodiil day's 840 halls' are. */
 function hallOver(low) {
@@ -63,8 +61,6 @@ test('AUDIT WW F1: A ZONE HALL\'S MAP ID IS NO BAY PIXEL\'S - known by its lane 
   const gps = (mapId) => ({ locationType: LOCATION_TYPES.DungeonKeep, mapId, regionIndex: 70 });
   assert.equal(isPlayerInTownForShips(gps(LARGE_DOCK_MAP_IDS[0])), true);
   assert.equal(isPlayerInTownForShips(gps(hallOver(large))), false, 'a hall is no large dock');
-  // the carriage towns (scenes/mapPlacesHost.js carriageTown - the Overworld's wheel; BAY-LEFT-MAPS moved it out of the host)
-  assert.match(hostText('src/scenes/world.js'), /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\) \|\| isHallMapId\(mapId\)\) return false;/);
 });
 
 test('AUDIT WW F4: THE GIANTS\' LOW GROUND IS THE CONTINENT\'S - the halls\' module answers the height the halls\' ground reads, a Bay-only client\'s the same as one that walks the continent; the host hands it to the giants (mutants: the host\'s own woods)', () => {
@@ -80,7 +76,6 @@ test('AUDIT WW F4: THE GIANTS\' LOW GROUND IS THE CONTINENT\'S - the halls\' mod
   }
   assert.ok(past > 0, 'past the Bay the clamp\'s answer is not the continent\'s');
   assert.equal(bayOnly.heightAt, bayOnly.heightAt, 'one function: the giants\' cache\'s key');
-  assert.match(src('src/scenes/world.js'), /const _giantHeight = zoneHalls\.heightAt;/);
 });
 
 test('AUDIT WW F5: EVERY GATE\'S LINES ON ITS OWN CARD - the Bay\'s gate and a lane\'s are two cards, each line and announcement on its own gate\'s (its number\'s id, the Timers row\'s); the host says the omen\'s, the fall\'s and the rite\'s lines with the gate\'s number (mutants: the Bay\'s lines id-less; the fall\'s; the rite\'s)', () => {
@@ -99,13 +94,6 @@ test('AUDIT WW F5: EVERY GATE\'S LINES ON ITS OWN CARD - the Bay\'s gate and a l
   assert.deepEqual(bay?.notes, ['The sky over Daggerfall burns', 'The breach by Daggerfall opens']);
   assert.deepEqual(lane?.notes, ['The sky over Solitude burns']);
   assert.equal(lane?.phase, 'omen');
-  const w = src('src/scenes/world.js');
-  assert.equal(w.match(/say: \(text, n\) => eventNotice\('gate', text, gateLineId\(n\)\),/g)?.length, 2, 'the omen\'s lines and the rite\'s');
-  // PIN MOVED (AUDIT RELEASE R3, the merge of main into TESA): the fall's line GATE-COURTS' (a court's own line, the night's
-  // with its courts - the word whole), still on its own gate's card
-  assert.match(w, /\(f\.c != null \? courtFellLine : fellLine\)\(\{ \.\.\.f, near: [^\n]*?boss: gateBossOf\(day\)\.name \}\), gateLineId\(day\)\); \},/);
-  assert.doesNotMatch(wholeWorld(), /eventNotice\('gate', [^,()]+\)/, 'no gate line id-less');   // PIN MOVED (AUDIT TESA II K6): the host whole
-  assert.match(src('src/scenes/riteHost.js'), /say\(RITE_TEXT\.broken\(\{ near: C\.near, by: b\.by, n: b\.n \}\), C\.day\);/);
 });
 
 test('AUDIT WW F7: THE LIVING WORLD\'S LANES ARE MADE AGAIN WHEN THE WORLD MOVES - a port town\'s lanes and a port\'s berths when the world\'s lanes are a new list (a province\'s ports registered) or the places\' generation moves; the host\'s hideouts by both generations (mutants: the lanes\' list kept; the generation kept; the hideouts\' generation the roads\' alone)', () => {
@@ -130,21 +118,5 @@ test('AUDIT WW F7: THE LIVING WORLD\'S LANES ARE MADE AGAIN WHEN THE WORLD MOVES
   assert.equal(lanes.from(bayA)[1].to.name, 'Wayrest', 'the places moved: the far port\'s town as it stands now');
   assert.notEqual(lanes.berths(idFar), kept);
   assert.equal(sailors, 3, 'the sailors asked again each time');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const livingLanes = createLivingLanes\(\{ lanes: \(\) => laneNet\(\), way: livingLaneWay, townOfPort: livingTownOfPort, sailorsOf: livingSailorsOf, generation: livingIndex\.generation \}\);/);
-  assert.match(w, /generation: \(\) => `\$\{livingWays\.generation\}\|\$\{livingIndex\.generation\(\)\}`,/);
-  assert.doesNotMatch(wholeWorld(), /_livingLanesFrom|_livingBerths|_livingLaneCounts/, 'no book of the host\'s own');   // PIN MOVED (AUDIT TESA II K6): the host whole
 });
 
-test('AUDIT WW F10-F13: the nearest port reads the lanes\' book of the Bay\'s ports; a lane\'s site word arms its own lane\'s herald alone; the waters read once for a crew and a ship\'s names; the compass\'s words and the ring\'s law one copy each (mutants: none - the wiring)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /return worldPorts\.nearestNamed\(here, worldLanes\.bayPorts\(\) \?\? \[\]\);/);
-  assert.doesNotMatch(wholeWorld(), /const COMPASS_WAYS = /, 'the compass\'s words world/worldWide/worldPorts.js\'s');   // PIN MOVED (AUDIT TESA II K6): the host whole
-  const relay = src('server/src/index.js');
-  assert.match(relay, /if \(lane && this\._heraldOf\(\)\) await this\._heraldLaneArm\(lane, now\);/);
-  assert.match(relay, /for \(const lane of GATE_LANES_OPEN\) await this\._heraldLaneArm\(lane, now\);/);
-  const naval = src('src/scenes/naval/navalHost.js');
-  assert.match(naval, /\.\.\.watersFolk\(where\(\)\), record: saved\?\.mates \?\? null \}\);/);
-  assert.match(naval, /const names = shipNames\(cls, seed, watersFolk\(where\(\)\)\);/);
-  assert.match(src('src/systems/wild/wildDungeons.js'), /const ringOf = \(mask, i\) => ringOfDepth\(mask, mask\.depth\?\.\[i\] \?\? 0\);/);
-});

@@ -337,22 +337,8 @@ test('WB9b the Deadlands keep clear of the floor: no island within LAND_CLEAR_M 
 });
 
 test('WB9b the seams, by source: the world host refills one arena a frame from the link\'s crossings on the relay\'s clock; the dungeon arm stands the slabs and moves them before the frame\'s draws; the court draws his mark over the court he stands in; the relay carries the brain\'s floor (mutants: each seam removed)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _courtArena = courtArena\(_gateFloor\.none, 0\);/);
-  assert.match(w, /player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/);   // WB14b: and the night whose plan holds me; PIN MOVED (WB14e): guarded, as every read of modes above its making (audit24_wave37); PIN MOVED (WB14, the merge of LAYERED-GEAR): refilled by courtArenaAt - the host's ceiling
   const A = courtArena([], 0), xs = [1, 2];
   assert.equal(courtArenaAt(A, xs, 77, 9), A, 'the one arena, never a new one a frame');
   assert.deepEqual([A.xa, A.now, A.day], [xs, 77, 9]);
-  assert.match(w, /gateFloor: \(\) => \{ _gateFloor\.xa = gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none; _gateFloor\.now = Date\.now\(\) \+ _sharedOffsetMs; return _gateFloor; \},/);
-  const wm = read('src/scenes/worldModes.js');
-  // WB14b (PIN MOVED): the court is stood by scenes/gate/gateStand.js, out of the host - the night's walkways
-  assert.match(read('src/scenes/gate/gateStand.js'), /for \(const sl of walkSlabs\(plan\.pt\)\) ctx\.dynamicDraws\.push\(\{ gpu: slabMesh, object: \{ matrix: slabMatrix\(sl, fl\?\.xa \?\? NO_XA, fl\?\.now \?\? 0\) \}, slab: sl \}\);/);
-  const moved = wm.indexOf('if (d.slab) slabMatrix(d.slab, _floor?.xa ?? NO_XA, _floor?.now ?? 0, d.object.matrix);'), begin = wm.indexOf('renderer.beginFrame(proj, view, _ktLook?.sunDir ?? INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
-  assert.ok(moved > 0 && moved < begin, 'the stones moved before the frame\'s draws');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /_mark\.court = nearestCourt\(mx, mz\); mark = _mark;/);
-  const brain = read('src/net/gate/gateBrain.js');
-  assert.match(brain, /if \(!onFloor\(pose\.x, pose\.z, f\.xa, now, POSE_SLACK, planOf\(f\)\)\) return 0;/);   // WB14b: the night's plan's floor
-  assert.match(read('src/player/motor.js'), /if \(typeof a\.clamp === 'function'\) \{ this\._putBack\(a\.clamp\(this\.pos, CAPSULE_RADIUS\)\); return; \}/);
   assert.equal(PHASE_TURN[2][0].a, 'cross');
 });

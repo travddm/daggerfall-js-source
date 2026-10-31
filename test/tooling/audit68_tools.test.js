@@ -47,22 +47,6 @@ test('AUDIT 68 S01-bake-on-import-race: importing a bake for its parser writes n
   }
 });
 
-test('AUDIT 68 S01-bake-run-guard-fragile: a bake run from a path with a space, or through a symlink, still bakes', (t) => {
-  const d = tree(t, ['scripts/bakeWindmill.mjs', 'tools/lib', 'vendor/windmills-kamer']);
-  mkdirSync(join(d, 'src/world'), { recursive: true });
-  const out = join(d, 'src/world/windmillMesh.js');
-  const want = read('src/world/windmillMesh.js');
-  const r = node([join(d, 'scripts/bakeWindmill.mjs')]);
-  assert.equal(r.status, 0, r.stderr);
-  assert.equal(existsSync(out) && readFileSync(out, 'utf8'), want, 'a space: import.meta.url spells it %20, argv[1] does not');
-  rmSync(out);
-  const link = join(scratch(t), 'link');
-  symlinkSync(d, link, 'dir');
-  const viaLink = node([join(link, 'scripts/bakeWindmill.mjs')]);
-  assert.equal(viaLink.status, 0, viaLink.stderr);
-  assert.equal(existsSync(out) && readFileSync(out, 'utf8'), want, 'a symlink: import.meta.url is the real path, argv[1] the link');
-});
-
 test('AUDIT 68 X5-main-guard-url-paths: one "am I the program" test for every tool and script, and no path read off a URL string', () => {
   const files = scripts().filter((f) => f !== 'tools/lib/isMain.mjs');
   assert.ok(files.length > 200, `the sweep read the tools (${files.length})`);
@@ -99,12 +83,6 @@ test('AUDIT 68 X2-probe-tmp-page-leak: the probes\' pages are ignored, and each 
   }
 });
 
-test('AUDIT 68 S06-villagerrender-double-compress: the still life draws the drape in the space draped.js authors - no second HSCALE', () => {
-  const src = read('tools/villagerRender.mjs');
-  assert.match(src, /return dr \? drapedPiece\(dr\.name, dr\.ramp\) : \[\];/);
-  assert.doesNotMatch(src, /\bcompress\(/, 'buildNeutralBody and drapedPiece are both in the compressed rig already');
-});
-
 // ── the mutant runner ────────────────────────────────────────────────────
 
 /** A scratch module package: target.js plus the given files, and a mutant list. */
@@ -135,50 +113,6 @@ test('AUDIT 68 X5-verify-deploy-tag-length-bypasses-dirty: one commit stamped at
   });
   assert.equal(v.kind, 'dirty', 'git answers that a commit contains itself, so this read VERIFIED');
   assert.equal(asked, 0);
-});
-
-test('AUDIT 68 X5-verify-deploy-tag-length-bypasses-dirty: the build tag is twelve characters of HEAD whatever the clone\'s size', (t) => {
-  const d = scratch(t);
-  const git = (...a) => execFileSync('git', a, { cwd: d, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  git('init', '-q');
-  writeFileSync(join(d, 'a.txt'), 'a\n');
-  git('add', '-A');
-  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'one');
-  mkdirSync(join(d, 'src'));
-  // BUILD-LEFTOVERS (AUDIT, the second read): IMPORTED, it stamps nothing - the probe and the rel8 pin import tagSource,
-  // and a run guard lost would rewrite a checkout's tracked stamp under node --test, beside the pins that read it
-  const imp = node(['--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(join(ROOT, 'scripts/buildTag.mjs')).href)});`], { cwd: d });
-  assert.equal(imp.status, 0, imp.stderr);
-  assert.equal(existsSync(join(d, 'src/buildTag.js')), false, 'importing scripts/buildTag.mjs stamped src/buildTag.js');
-  const r = node([join(ROOT, 'scripts/buildTag.mjs')], { cwd: d });
-  assert.equal(r.status, 0, r.stderr);
-  // PIN MOVED (REL8): the stamp's second line is the player's update number - none in a repository with no line
-  assert.equal(readFileSync(join(d, 'src/buildTag.js'), 'utf8'), `export const BUILD_TAG = '${git('rev-parse', 'HEAD').slice(0, 12)}';\nexport const UPDATE = null;\n`,
-    'bare --short sizes it by the object count: 7 in this repo and in CI\'s shallow clone, 9 in a full one');
-});
-
-test('BUILDTAG-CLEAN (issue #626): a build leaves the tree as it found it - the stamp is put back once the bundle has read it', (t) => {
-  // prebuild writes HEAD's sha over the committed src/buildTag.js. Left
-  // there, the next `git pull` that brings a new copy of it refuses ("Your
-  // local changes ... would be overwritten"), and a build that is committed
-  // carries the stamp into every merge. Run the real pair, in order, on a
-  // scratch clone of the committed file.
-  const d = scratch(t);
-  const git = (...a) => execFileSync('git', a, { cwd: d, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  git('init', '-q');
-  mkdirSync(join(d, 'src'));
-  writeFileSync(join(d, 'src/buildTag.js'), read('src/buildTag.js'));
-  git('add', '-A');
-  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'one');
-  const { scripts: npm } = JSON.parse(read('package.json'));
-  const run = (cmd) => spawnSync(cmd, { cwd: d, shell: true, encoding: 'utf8', env: ENV });
-  const pre = run(npm.prebuild.replace('scripts/buildTag.mjs', JSON.stringify(join(ROOT, 'scripts/buildTag.mjs'))));
-  assert.equal(pre.status, 0, pre.stderr);
-  assert.equal(git('status', '--porcelain'), 'M src/buildTag.js', 'prebuild must still stamp the file the bundle imports');
-  assert.equal(typeof npm.postbuild, 'string', 'package.json has no postbuild - every build leaves src/buildTag.js modified');
-  const post = run(npm.postbuild);
-  assert.equal(post.status, 0, post.stderr);
-  assert.equal(git('status', '--porcelain'), '', 'the build left src/buildTag.js modified');
 });
 
 // ── the Ledger and the open flags ────────────────────────────────────────

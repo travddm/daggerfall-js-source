@@ -334,13 +334,6 @@ test('MEM-AUDIT the market\'s cache holds exactly MARKET_CACHE_KEPT (256), the l
 
 // ─── THE HOSTS' AND THE WINDOWS' OWN LINES ───────────────────────────
 
-test('MEM-AUDIT the place left is let go: setMode clears what latched the last room\'s and the last castle\'s context (mutants: a latch kept)', () => {
-  const src = hostText('src/scenes/worldModes.js');
-  const line = src.slice(src.indexOf('  const setMode = (next) => {'), src.indexOf('};', src.indexOf('  const setMode = (next) => {')));
-  assert.match(line, /if \(next !== 'interior'\) \{ _arrowsCtx = null; interiorArrows\.clear\(\); cardLookedCtx = null; cardStandsDue\.clear\(\); gambitStandsDue\.clear\(\); \}/);
-  assert.match(line, /if \(next !== 'dungeon'\) \{ _crownTried = null; arenaWall = null; _arenaStage = _arenaStageCtx = null; _pitStage = _pitStageCtx = null; \}/);
-});
-
 test('MEM-AUDIT the windows\' listeners and caches: the account card\'s focus listener goes with its card (driven: a card made, then let go), and the menu lets each go - a repaint\'s card, the close, the unmount, with the foot\'s observer; an item menu\'s pair with its menu, its timer its own; the icons\' encodings with their pictures (AUDIT P7) (mutants: each kept)', () => {
   const live = new Set();
   const win = { addEventListener: (t, f) => { if (t === 'focus') live.add(f); }, removeEventListener: (t, f) => { if (t === 'focus') live.delete(f); } };

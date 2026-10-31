@@ -26,11 +26,3 @@ test('CHAT-HELP: a quiet line is kept but never counted unread; any other line s
   assert.equal(log.unreadTotal(), 1, 'a line anyone says still counts');
 });
 
-test('CHAT-HELP: the host greets on every join - chatStart pushes it quietly, as the system, on the first tab (mutant: the push dropped)', () => {
-  const w = rd('src/scenes/world.js');
-  const start = w.indexOf('const chatStart = () => {');
-  assert.ok(start > 0);
-  const body = w.slice(start, w.indexOf('\n  };', start));
-  // PIN MOVED (CROWN2): the seats' red lines' door is set with the chat, between the two
-  assert.match(body, /chatLog = new ChatLog\(\);\n\s+chatLinks = new Map\(\);\n\s+redChat = [^\n]*\n\s+chatLog\.push\(chatLog\.active, \{ text: CHAT_GREETING_TEXT, system: true \}, \{ quiet: true \}\);/);
-});

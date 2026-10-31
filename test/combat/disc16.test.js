@@ -75,9 +75,6 @@ test('DISC16-A: the rest is the floor\'s own - the snap onto it and the clamp un
   const edge = new Collider((x, z) => (x < 0 ? -Infinity : 0.5 * z));
   assert.equal(edge.restFloor(0.1, 2), 1, 'no ground to the west: the ground beneath the centre');
   assert.ok(edge.restFloor(3, 2) > 1, 'inside the pixel, the capsule\'s rest');
-  const src = rd('src/player/collider.js');
-  assert.match(src, /const floor = this\.restFloor\(feet\[0\], feet\[2\]\);/, 'the snap and the clamp read the rest');
-  assert.equal((src.match(/this\.heightAt\(feet\[0\], feet\[2\]\)/g) || []).length, 0, 'and nothing in move() reads the point floor');
 });
 
 test('DISC16-B: the weapons move as they did before Diverse Weapons - the mod on (MO1) with its preset off (DW1), Weapon Widget at its shipped defaults, and what draws is Weapon Widget\'s own store (mutants: the preset left on; either store value at DISC14-B\'s)', () => {
@@ -98,7 +95,6 @@ test('DISC16-B: the weapons move as they did before Diverse Weapons - the mod on
   assert.equal(s.bobLength, Number(shipped['Bob.Length']) / 100, 'the mod\'s bob, not the preset\'s 142');
   // the Thunderlock's own departure stands: its inertia on, at the player's scale (the shipped 1.0, x500)
   assert.deepEqual([gunWidgetSettings().inertia, gunWidgetSettings().inertiaScale], [true, 500]);
-  assert.doesNotMatch(rd('src/combat/gun/gunViewmodel.js'), /GUN_INERTIA_SCALE/);
   // the mod decides WHICH sprite, never how it moves: with it off, the same motion
   setModSetting('diverse-weapons', 'Enabled', false);
   const without = readWidgetSettings();

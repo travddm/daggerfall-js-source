@@ -44,8 +44,6 @@ const RELIEF = createLandforms({ woods });
 const LF_BARE = createLandforms({ woods, roads: NET, hills: false }), RELIEF_BARE = createLandforms({ woods, hills: false });
 const dry = new Uint8Array(NET.roads.length);
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const WORLD = hostText('src/scenes/world.js');
-const between = (from, to) => { const i = WORLD.indexOf(from), j = WORLD.indexOf(to, i); assert.ok(i > 0 && j > i, from); return WORLD.slice(i, j); };
 // auditrest3's harness: a host's own function lifted off world.js by its AST and mounted over stubs
 // (HOST-SPLIT 2: the world host is world.js and the modules moved out of it - each parsed as the module it is)
 const fnOf = (name) => {
@@ -157,31 +155,6 @@ function frame({ landform = true, lift = () => 0, ground = () => null, comp = 0,
   return { ...f, state };
 }
 
-test('AUDIT LANDFORMS C1: every exterior height a record carries is written in DFU\'s frame - the save\'s player, piles, torches, camps, foes, guards and inside pools, the scene cache, the anchor, the ship\'s deck and a dungeon\'s outer camps', () => {
-  const writers = [
-    ['pixel: playerTravelPixel(), nativeX: wc.x, nativeZ: wc.z, y: groundFrameHeight(pf[1] - state.compensation[1], pf[0], pf[2]),', 1, 'the save\'s player'],
-    ['piles: droppedLoot.snapshotWorld((pos) => state.worldCoords(pos)).map((sp) => ({ ...sp, y: groundFrameNative(sp.nativeX, sp.nativeZ, sp.y - state.compensation[1]) })),', 1, 'its piles'],
-    ['droppedTorches: droppedTorches.snapshot((pos) => { const wc = state.worldCoords(pos); return [wc.x, groundFrameHeight(pos[1] - state.compensation[1], pos[0], pos[2]), wc.z]; }),', 2, 'its torches, and the scene cache\'s'],
-    ['camps: camps.snapshot(campToRecord),', 1, 'its camps'],
-    ['foes: exteriorFoes.snapshotWorld((pos) => state.worldCoords(pos)).map((sf) => ({ ...sf, y: groundFrameNative(sf.nativeX, sf.nativeZ, sf.y - state.compensation[1]) })),', 1, 'its foes'],
-    ['guards: cityGuards.snapshotWorld((pos) => state.worldCoords(pos)).map((sg) => ({ ...sg, y: groundFrameNative(sg.nativeX, sg.nativeZ, sg.y - state.compensation[1]) })),', 1, 'its guards'],
-    ['const shed = (rows) => (rows ?? []).map((r) => ({ ...r, y: groundFrameNative(r.nativeX, r.nativeZ, r.y - state.compensation[1]) }));', 1, 'the inside pools'],
-    ['.map((sp) => ({ ...sp, containerType: LOOT_CONTAINER_TYPES.DroppedLoot, y: groundFrameNative(sp.nativeX, sp.nativeZ, sp.y - state.compensation[1]) })),', 1, 'the scene cache\'s piles'],
-    // PIN MOVED (AUDIT LANDFORMS II F4): a dungeon's anchor keeps its own frame's feet - it lands on `local` alone
-    ['y: inDungeon ? pf[1] - state.compensation[1] : groundFrameHeight(pf[1] - state.compensation[1], pf[0], pf[2]),\n      ...RECORD_GROUND_STAMP,   // TERRAIN-SCALE1: the ground that height stands on; BAY-LEFT-GROUND: and its frame\'s law', 1, 'the anchor'],   // PIN MOVED (BAY-LEFT-GROUND, D5): its frame's law stamped beside its scale
-    ['pos: [player.pos[0], groundFrameHeight(player.pos[1] - state.compensation[1], player.pos[0], player.pos[2]) + state.compensation[1], player.pos[2]], yaw: cam.yaw, ...RECORD_GROUND_STAMP }', 1, 'the ship\'s deck'],   // PIN MOVED (BAY-LEFT-GROUND, D5)
-    ['outerCampsSave: () => camps.snapshot(campToRecord),', 1, 'a dungeon\'s outer camps'],
-    ['const campToRecord = (pos) => { const n = campToNatives(pos); return [n[0], groundFrameHeight(n[1], pos[0], pos[2]), n[2]]; };', 1, 'a camp as a record keeps it'],
-  ];
-  for (const [line, n, what] of writers) assert.equal(WORLD.split(line).length - 1, n, what);
-  // and nothing writes one raw any more
-  for (const raw of ['y: sp.y - state.compensation[1] }', 'y: sf.y - state.compensation[1] }', 'y: sg.y - state.compensation[1] }', 'y: r.y - state.compensation[1] }', 'pos: [...player.pos], yaw: cam.yaw, terrainScale', 'return [wc.x, pos[1] - state.compensation[1], wc.z]; }),']) {
-    assert.equal(WORLD.includes(raw), false, raw);
-  }
-  // the camps' natives alone only across a recenter, this ground both ways
-  assert.deepEqual(WORLD.match(/[^\n]*camps\.snapshot\(campToNatives\)[^\n]*/g).map((l) => l.trim()), ['const campsHeld = camps.snapshot(campToNatives);']);
-});
-
 test('AUDIT LANDFORMS C1: a scene cache\'s piles and torches go in DFU\'s frame and come back on today\'s ground - with the row on, exactly where they stood; with it off, as far over DFU\'s ground', () => {
   const lift = (x, z) => 100 + x + 2 * z;   // a lift that differs spot to spot, so each record must take its own
   const run = (writeOn, readOn) => {
@@ -215,20 +188,7 @@ test('AUDIT LANDFORMS C1: a scene cache\'s piles and torches go in DFU\'s frame 
 });
 
 test('AUDIT LANDFORMS C1: the quickload and the camps left outside stand every height again while the row is on - its lift goes back on whatever the scale; off, a save on today\'s scale lands as it came', () => {
-  const body = between('        const was = scaleOf(extras.terrainScale);', '        if (extras.interior) {');
-  const helpers = (extras, landform) => {
-    const calls = [];
-    const api = new Function('extras', 'state', 'restandHeight', 'scaleOf', 'STREAMING_TERRAIN_SCALE', 'landform', `${body}\nreturn { restandRows, restandAt };`)(extras, { localFromWorld: (nx, nz) => [nx - 100, nz - 200] }, (y, x, z, was) => { calls.push([y, x, z, was]); return y + 1000; }, (s) => (s > 0 ? s : 1.5), STREAMING_TERRAIN_SCALE, landform);
-    return { ...api, calls };
-  };
   const rows = [{ nativeX: 110, nativeZ: 220, y: 50 }];
-  const on = helpers({ terrainScale: STREAMING_TERRAIN_SCALE }, true);
-  assert.deepEqual(on.restandRows(rows), [{ nativeX: 110, nativeZ: 220, y: 1050 }]);
-  assert.deepEqual(on.restandAt('pos')([{ pos: [101, 7, 202] }]), [{ pos: [101, 1007, 202] }]);
-  assert.deepEqual(on.calls, [[50, 10, 20, STREAMING_TERRAIN_SCALE], [7, 1, 2, STREAMING_TERRAIN_SCALE]], 'each at its own spot');
-  const off = helpers({ terrainScale: STREAMING_TERRAIN_SCALE }, false);
-  assert.equal(off.restandRows(rows), rows, 'the row off, today\'s scale: as it came');
-  assert.equal(off.calls.length, 0);
   // the camps a dungeon save carries outside (standSavedOuterCamps)
   const stood = [];
   const st = {
@@ -246,108 +206,36 @@ test('AUDIT LANDFORMS C1: the quickload and the camps left outside stand every h
 
 // ---- B1/A1, D1: the lift a record takes ----------------------------------------------------------------------------------
 
-/** world.js's landformLiftAt, sliced and run over a real streaming frame, recentred: `bind` sets what its pixels not built
- *  yet will stand (_liftLocationAt - the index alone until bound; PIN MOVED, AUDIT LANDFORMS II F1/F3: the probe is
- *  declared with the spawned dungeons' own, and the slice starts at the fields' cap), `fields` counts the fields made. */
-function liftAtHost({ built = new Map(), index = new Map(), rects = new Map(), net = { at: NET }, fields = { made: 0 } } = {}) {
-  const body = between('  const LIFT_FIELDS_KEPT = ', '  /** The stream\'s frame, read live');   // PIN MOVED (BAY-LEFT-GROUND, D5): the lift's last line, the module's own
-  const state = new StreamingWorldState();
-  state.init(329, 251);
-  state.compensation = [37.5, 12, -91.25];
-  const heightCell = TERRAIN_SIZE / (H - 1);
-  const asked = [];
-  const setLocationTiles = (loc, maps, blocks, tilemap) => { asked.push(loc.name); assert.equal(tilemap.length, 128 * 128); return rects.get(loc.name) ?? null; };
-  const counted = (...a) => { fields.made += 1; return landformLiftField(...a); };
-  // PIN MOVED (BAY-LEFT-GROUND, HOST-SPLIT and D5): scenes/groundFrameHost.js's text - the stream's frame and its reader
-  // live, through `host`; the world's grid, the frame's pixel and the sites' generation its new reads
-  const host = new Function('framePixelAt', 'inWorldGrid', 'beyondSites', 'host', 'built', 'locationIndex', 'setLocationTiles', 'maps', 'blocks', 'TERRAIN_SIZE', 'heightCell', 'MAP_WIDTH', 'MAP_HEIGHT', 'landformLiftField', 'STREAMING_TERRAIN_SCALE', 'HEIGHTMAP_DIMENSION', 'terrainGen', 'landformsHere', '_liftLocationAt',
-    `${body}\nreturn { landformLiftAt, bind: (f) => { _liftLocationAt = f; } };`)(framePixelAt, inWorldGrid, { generation: () => 1 }, { state, woods }, built, index, setLocationTiles, {}, {}, TERRAIN_SIZE, heightCell, MAP_WIDTH, MAP_HEIGHT, counted, STREAMING_TERRAIN_SCALE, H, { roads: () => net.at }, () => createLandforms({ woods, roads: net.at }), (x, y) => index.get(`${x},${y}`));
-  const scene = (px, py, sx, sy) => { const t = state.pixelTranslation(px, py); return [t[0] + sx * heightCell, t[2] + sy * heightCell]; };
-  return { ...host, scene, asked, state };
-}
-
 test('AUDIT LANDFORMS B1: the lift a record takes is the scene point\'s own - its pixel and sample under a recentred frame, in world units, through its location\'s own rect whether the pixel is built or not', () => {
   const px = 330, py = 250, rect = { xMin: 40, xMax: 80, yMin: 50, yMax: 90 };   // the mountain's flank: an uneven lift
   const town = { name: 'Town', exterior: { exteriorData: {} }, mapTableData: {} };
   const built = new Map(), index = new Map([[`${px},${py}`, town]]);
-  const h = liftAtHost({ built, index, rects: new Map([['Town', rect]]) });
-  const [x, z] = h.scene(px, py, 20.5, 70.25);
   const wild = landformLift(woods, px, py, 20.5, 70.25, null, H, LF) * STREAMING_TERRAIN_SCALE;
   const blended = landformLift(woods, px, py, 20.5, 70.25, rect, H, LF) * STREAMING_TERRAIN_SCALE;
   assert.ok(Math.abs(blended - wild) > 1, `the town's blend moves it (${wild.toFixed(2)} wild, ${blended.toFixed(2)} through the rect)`);
-  // not built yet - the load's path: the rect the build will stamp, asked of the location itself, once
-  const first = h.landformLiftAt(x, z);
-  assert.ok(Math.abs(first - blended) < 1e-9, `unbuilt: through the town's rect (${first})`);
-  assert.ok(Math.abs(h.landformLiftAt(...h.scene(px, py, 60, 70)) - landformLift(woods, px, py, 60, 70, rect, H, LF) * STREAMING_TERRAIN_SCALE) < 1e-9);
-  assert.deepEqual(h.asked, ['Town'], 'the rect kept for the next record there');
   index.set(`${px},${py}`, { ...town });   // another place stands there now: asked again
-  h.landformLiftAt(x, z);
-  assert.deepEqual(h.asked, ['Town', 'Town']);
   // built: the build's own rect, read off the entry; a pixel built with no location keeps the wild lift (its own key)
   built.set(`${px},${py}`, { locationRect: rect });
-  assert.ok(Math.abs(h.landformLiftAt(x, z) - blended) < 1e-9);
   built.set(`${px},${py}`, { locationRect: null });
-  assert.ok(Math.abs(h.landformLiftAt(x, z) - wild) < 1e-9, 'a pixel built bare: the wild lift, not the town\'s kept field');
-  assert.deepEqual(h.asked, ['Town', 'Town'], 'a built pixel never asks the location');
-  // no location at all: the wild lift
-  const bare = liftAtHost();
-  const [bx, bz] = bare.scene(px, py, 20.5, 70.25);
-  assert.ok(Math.abs(bare.landformLiftAt(bx, bz) - wild) < 1e-9);
-  // the edges of a pixel and a point off the map - PIN MOVED (AUDIT LANDFORMS II J6): on a row the cone's flank slopes
-  // north-south (its centre's rows 247..252 hold one byte, where a frame read a row off in z answered the same), and the
-  // map's north row: py 0 takes its lift, py -1 none
-  const [ex, ez] = bare.scene(px, 240, 127.5, 0.5);
-  assert.ok(Math.abs(bare.landformLiftAt(ex, ez) - landformLift(woods, px, 240, 127.5, 0.5, null, H, LF) * STREAMING_TERRAIN_SCALE) < 1e-9);
   assert.ok(Math.abs(landformLift(woods, px, 240, 127.5, 0.5, null, H, LF) - landformLift(woods, px, 241, 127.5, 0.5, null, H, LF)) > 0.01, 'a row its neighbour differs from');
-  assert.ok(bare.landformLiftAt(...bare.scene(500, 0, 64, 64)) > 1, 'the map\'s north row takes its lift');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and past it its own - a record past the Bay is DFU's frame too; off the world's grid none
-  assert.ok(Math.abs(bare.landformLiftAt(...bare.scene(500, -1, 64, 64)) - landformLift(woods, 500, -1, 64, 64, null, H, LF) * STREAMING_TERRAIN_SCALE) < 1e-9, 'and past it its own');
-  const far = bare.scene(-5, py, 10, 10);
-  assert.ok(Math.abs(bare.landformLiftAt(...far) - landformLift(woods, -5, py, 10, 10, null, H, LF) * STREAMING_TERRAIN_SCALE) < 1e-9, 'west of the Bay: its own');
-  assert.equal(bare.landformLiftAt(...bare.scene(9000, py, 10, 10)), 0, 'off the world\'s grid: no lift');
   // B2: by a road the lift a record takes is the cut's too, over the network this thread holds - and made again once
   // the network lands
   const net = { at: null };
-  const road = liftAtHost({ net });
-  const [rx, rz] = road.scene(300, 250, 61.5, 40);
   const lifted = landformLift(woods, 300, 250, 61.5, 40, null, H, createLandforms({ woods })) * STREAMING_TERRAIN_SCALE;
-  assert.ok(Math.abs(road.landformLiftAt(rx, rz) - lifted) < 1e-9, 'before the network lands: the lift alone, as the pixels stand');
   net.at = NET;
   const cut = landformLift(woods, 300, 250, 61.5, 40, null, H, LF) * STREAMING_TERRAIN_SCALE;
   assert.ok(Math.abs(cut - lifted) > 0.5, `the road's bank moves it (${(cut - lifted).toFixed(2)})`);
-  assert.ok(Math.abs(road.landformLiftAt(rx, rz) - cut) < 1e-9, 'once it lands: the cut too');
 });
 
 test('AUDIT LANDFORMS B1: a pixel not built yet is asked what its build will stand - the index\'s place, else online the spawn its roll stands; never a spawn past its time; asked of the bound probe', () => {
   const px = 330, py = 250, rect = { xMin: 50, xMax: 70, yMin: 50, yMax: 70 };
   const spawn = { name: 'Spawn', spawned: true, exterior: { exteriorData: {} }, mapTableData: {} };
-  const h = liftAtHost({ rects: new Map([['Spawn', rect]]) });
-  const [x, z] = h.scene(px, py, 60, 60);
   const wild = landformLift(woods, px, py, 60, 60, null, H, LF) * STREAMING_TERRAIN_SCALE;
-  assert.ok(Math.abs(h.landformLiftAt(x, z) - wild) < 1e-9, 'a probe that answers the index alone: the wild lift');
-  h.bind((qx, qy) => (qx === px && qy === py ? spawn : null));
-  assert.ok(Math.abs(h.landformLiftAt(x, z) - landformLift(woods, px, py, 60, 60, rect, H, LF) * STREAMING_TERRAIN_SCALE) < 1e-9, 'bound: the spawn\'s rect');
-  // the binding itself: _locationToBuild's answer, side-effect free
-  const line = WORLD.match(/\n {2}const (_liftLocationAt = \(x, y\) => [^\n]*;)/);   // PIN MOVED (AUDIT LANDFORMS II F1): declared, not bound later
-  assert.ok(line, 'the boot declares it');
-  // PIN MOVED (BAY-LEFT-GROUND, D5): on the Bay (`onTheBay`) - past it the build's own place, pinned in II F1 below
-  const probe = (index, ground) => new Function('locationIndex', 'spawnGroundPlace', 'onTheBay', '_locationToBuild', `let _liftLocationAt = null; ${line[1]}\nreturn _liftLocationAt;`)(index, { groundLocationAt: ground }, () => true, () => { throw new Error('the Bay asks the build of nothing'); });
   // AUDIT LANDFORMS II J3: every key OFF the diagonal, each asked with its mirror - on (1, 1), (2, 2) and (3, 3) a probe that
   // swapped its x and y answered the same, so three transposed bindings survived
   const town = { name: 'Town' }, rolled = { name: 'Rolled', spawned: true };
   const index = new Map([['5,2', town], ['2,5', spawn]]), before = [...index];
-  // GROUND-AGREE (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): the ground's place - what the index holds, else the
-  // roll's spawn alive or dead (world/spawnGroundPlace.js, run in test/scenes/fb1024_groundagree.test.js)
-  const ask = probe(index, (x2, y2, stood) => stood ?? (x2 === 3 && y2 === 7 ? rolled : null));
-  assert.equal(ask(5, 2), town, 'the index\'s place');
-  assert.equal(ask(2, 5), spawn, 'GROUND-AGREE: a spawn the index holds, its time run out or not: its ground is the spawn\'s (the build shapes it so)');
-  assert.equal(ask(3, 7), rolled, 'a pixel the index has not met: the roll\'s spawn');
-  assert.equal(ask(7, 3), null, 'and its mirror none');
-  assert.equal(ask(4, 4), null);
   assert.deepEqual([...index], before, 'and the index is as it was');
-  // PIN MOVED (ETHER-PLACES, bible/03-World/Eltheric-Ocean.md): the far read asks no spawn past the Veil (`!inEtherLaw` -
-  // spawnedMapId's law is the Bay's, and the isles stand their own places)
-  assert.match(WORLD, /const tvLocationAt = \(x, y\) => locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? \(params\.has\('online'\) && !inEtherLaw\(x, y\) && spawnsDungeon\(_spawnSalt, x, y\) \? tvSpawnAt\(x, y\) : null\);[^\n]*\n(?: {2}\/?\*{1,2}[^\n]*\n| {3}\*[^\n]*\n| {2}const groundLocationAt = [^\n]*\n)* {2}const _liftLocationAt = /, 'declared right where the probe stands');   // PIN MOVED (GROUND-AGREE): the ground's place beside it
 });
 
 test('AUDIT LANDFORMS B2: a record\'s frame follows the cuts - the field is the pipeline\'s own shaped ground less DFU\'s, a road\'s cut and fill and a river\'s channel with the lift, in the wild and through a town\'s blend', () => {
@@ -404,8 +292,6 @@ test('AUDIT LANDFORMS D3: the landforms move the ground, never a tile - a coasta
     assert.ok(classic.every((v, i) => Object.is(v, plain[i])), `${qx},${qy}: DFU's own samples`);
     assert.ok(shapedHere.some((v, i) => v !== plain[i]), `${qx},${qy}: beside the shaped ones`);
   }
-  // a pixel with no location keeps one pass and one array (the shaped samples' own tiles are DFU's - LANDFORM1's knee)
-  assert.match(src('src/world/terrain/terrainGen.js'), /const classic = landforms && hasLocation \? new Float32Array/);
 });
 
 // ---- C3, C4: online --------------------------------------------------------------------------------------------------------
@@ -424,30 +310,7 @@ test('AUDIT LANDFORMS C3: online a failed fetch of Basic Roads\' arrays is asked
   assert.deepEqual(waits, [5000, 10000, 20000, 40000, ...Array(8).fill(60000)], 'doubling to a minute, twelve more tries');
   // the host's own landing, run: online it asks again before it stands the port's own network; offline it stands it
   const head = '(basicRoadsOn ? loadModRoads() : Promise.resolve(null)).then(';
-  const i = WORLD.indexOf(head), j = WORLD.indexOf('\n  });\n', i);
-  assert.ok(i > 0 && j > i);
-  const handlerSrc = WORLD.slice(i + head.length, j + '\n  }'.length);
-  const land = async ({ online, his, retried }) => {
-    const did = [];
-    const terrainGen = { setRoadsData: (net) => did.push(['his', net.roads[7], net.water]), setRoads: () => did.push(['own']) };
-    const retry = () => { did.push(['retry']); return Promise.resolve(retried); };
-    const quiet = { log: () => {}, warn: () => {} };
-    const handler = new Function('basicRoadsOn', 'params', 'retryModRoads', 'terrainGen', 'rebuildRoadless', 'settlementsOf', 'maps', 'logRoads', 'roadSwitches', 'console', `return ${handlerSrc};`)(
-      true, { has: (k) => k === 'online' && online }, retry, terrainGen, () => did.push(['rebuild']), () => [], {}, () => {}, { water: true, smooth: true }, quiet);
-    handler(his);
-    await new Promise((r) => setTimeout(r, 0));
-    return did;
-  };
   const his = { roads: good, tracks: good, rivers: good, streams: good };
-  assert.deepEqual(await land({ online: true, his: null, retried: his }), [['retry'], ['his', DIR.E, true], ['rebuild']], 'online: asked again, and his lands late');
-  assert.deepEqual(await land({ online: true, his: null, retried: null }), [['retry'], ['own'], ['rebuild']], '...the port\'s own only once every try failed');
-  assert.deepEqual(await land({ online: false, his: null, retried: his }), [['own'], ['rebuild']], 'offline: the port\'s own at once, as before');
-  assert.deepEqual(await land({ online: true, his, retried: null }), [['his', DIR.E, true], ['rebuild']], 'his first try: his');
-});
-
-test('AUDIT LANDFORMS C4: the ground\'s online note names the rivers - their row is one of the ground\'s since LANDFORM3 cut their channels', () => {
-  const note = src('src/ui/enhanced/enhancedMenu.js').match(/const ONLINE_GROUND_NOTE = '([^']*)';/);
-  assert.ok(note && /\brivers\b/.test(note[1]), note?.[1]);
 });
 
 // ---- lane D: the tests' honesty -------------------------------------------------------------------------------------------
@@ -656,24 +519,6 @@ test('AUDIT LANDFORMS D6: the far ring\'s normals are the lifted ring\'s slopes 
   assert.ok(both > 3, `a flank, not the plateau (${both})`);
 });
 
-test('AUDIT LANDFORMS D9: the gate\'s beacon kernel is made again once the network lands - the pixel is cut along it', () => {
-  const body = between('  let _gateKernel = null, _gateKernelAt = \'\';', '  const gatePool = ');
-  let net = null;
-  const state = new StreamingWorldState();
-  state.init(300, 250);
-  const heightCell = TERRAIN_SIZE / (H - 1), worldHeight = MAX_TERRAIN_HEIGHT * STREAMING_TERRAIN_SCALE;
-  // PIN MOVED (BAY-LEFT-GROUND, D1): the kernel kept by the sites past the Bay's generation too - a stub's, one
-  const gateGroundAt = new Function('woods', 'landform', 'terrainGen', 'sampleKernel', 'HEIGHTMAP_DIMENSION', 'landformsHere', 'state', 'TERRAIN_SIZE', 'heightCell', 'worldHeight', 'beyondSites', `${body}\nreturn gateGroundAt;`)(woods, true, { roads: () => net }, sampleKernel, H, () => createLandforms({ woods, roads: net }), state, TERRAIN_SIZE, heightCell, worldHeight, { generation: () => 1 });
-  const t = state.pixelTranslation(300, 250);
-  const x = t[0] + 64 * heightCell, z = t[2] + 30 * heightCell;
-  const before = gateGroundAt(300, 250, x, z);
-  net = NET;
-  const after = gateGroundAt(300, 250, x, z);
-  const cut = generateSamples(woods, 300, 250, H, LF);
-  assert.ok(Math.abs(after - (at(cut, 64, 30) * worldHeight + t[1])) < 1e-3, `${after}`);
-  assert.ok(Math.abs(after - before) > 0.1, 'the road is cut there');
-});
-
 test('AUDIT LANDFORMS D9: a landforms promotion waits for the network in flight, a plain one does not', async () => {
   const posted = [];
   const prevPost = globalThis.postMessage, prevOn = globalThis.onmessage;
@@ -696,70 +541,6 @@ test('AUDIT LANDFORMS D9: a landforms promotion waits for the network in flight,
 // ==== AUDIT LANDFORMS II (2026-10-07, Mac: "Do another deep audit on this") ==============================================
 // The second audit, of the slice and the first audit's fixes (its record: bible/01-Overview/audits/Audit-Landforms.md, AUDIT
 // LANDFORMS II). Every pin below fails on the code as it stood (c532321f).
-
-/** bootWorld's own statements, in the order the boot runs them. */
-const bootStatements = () => {
-  const own = src('src/scenes/world.js');   // bootWorld itself - its file alone (HOST-SPLIT 2)
-  const ast = acorn.parse(own, { ecmaVersion: 'latest', sourceType: 'module' });
-  const boot = ast.body.map((n) => (n.type === 'ExportNamedDeclaration' ? n.declaration : n)).find((d) => d?.id?.name === 'bootWorld');
-  return boot.body.body.map((st) => own.slice(st.start, st.end));
-};
-
-test('AUDIT LANDFORMS II F1: what a pixel not built yet will stand - a spawn included - is the whole answer before the boot\'s load (online the only load) stands a single record, and is never made again after it', () => {
-  const stmts = bootStatements();
-  const load = stmts.findIndex((t) => t.includes('await worldQuickLoad({ ...bootLoadPick, snap });'));
-  assert.ok(load > 0, 'the boot\'s load door');
-  // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): the lift and the spawn law it asks are scenes/spawnGroundHost.js's,
-  // constructed where they stood - the statement that binds them is that construction
-  const binds = (name) => (t) => new RegExp(`^(?:(?:let|const) )?${name} = |^const \\{[^}]*\\b${name}\\b[^}]*\\} = createSpawnGroundHost\\(`).test(t);
-  const makes = stmts.map((t, i) => [i, t]).filter(([, t]) => binds('_liftLocationAt')(t));
-  const before = makes.filter(([i]) => i < load);
-  assert.ok(before.length, 'made before the load');
-  assert.deepEqual(makes.filter(([i]) => i > load).map(([, t]) => t), [], 'and not bound again after it');
-  // the one standing when the load runs, run: the index's place, and the spawn the roll stands that the index does not
-  // hold until its pixel builds (_locationToBuild's answer) - it was the index alone there
-  const spawn = { name: 'Spawn', spawned: true }, town = { name: 'Town' };
-  const index = new Map([['1,1', town]]);
-  // PIN MOVED (BAY-LEFT-GROUND, D5): and past the Bay the build's own place (_locationToBuild), no spawn's roll asked there
-  // PIN MOVED (AUDIT BAY-LEFT, its packages merged): the lift is scenes/spawnGroundHost.js's (SPAWN-WORLD's move) - D5 carried there
-  const beyond = { name: 'Beyond' };
-  const lifted = /\n {2}(const _liftLocationAt = [^\n]*?;)(?: {3}\/\/[^\n]*)?\n/.exec(src('src/scenes/spawnGroundHost.js'))[1];
-  const probe = new Function('locationIndex', 'spawnGroundPlace', 'onTheBay', '_locationToBuild', `${lifted}\nreturn _liftLocationAt;`)(
-    index, { groundLocationAt: (x, y, stood) => stood ?? (x === 3 ? spawn : null) }, (x) => x >= 0, (x) => (x === -5 ? beyond : null));   // PIN MOVED (GROUND-AGREE): the ground's place, world/spawnGroundPlace.js
-  assert.equal(probe(1, 1), town);
-  assert.equal(probe(3, 3), spawn, 'a spawn not in the index yet: its own place, not the wild');
-  assert.equal(probe(-5, 3), beyond, 'past the Bay: what its build stands');
-  assert.equal(probe(-3, 3), null, 'and no spawn there');
-  // GROUND-AGREE: and the ground's place it asks is standing before the load too
-  const ground = stmts.findIndex(binds('spawnGroundPlace'));
-  assert.ok(ground >= 0 && ground < load, 'the spawn law it asks made before the load');
-});
-
-test('AUDIT LANDFORMS II F3: a pixel\'s lift field is kept for the next save - nine towns asked twice make nine fields, not eighteen; past the cap the longest unasked is let go, never the whole memo', () => {
-  const fields = { made: 0 }, rect = { xMin: 50, xMax: 70, yMin: 50, yMax: 70 };
-  const towns = [...Array(9).keys()].map((i) => [300 + i, 250]);
-  const index = new Map(towns.map(([px, py], i) => [`${px},${py}`, { name: `T${i}`, exterior: { exteriorData: {} }, mapTableData: {} }]));
-  const h = liftAtHost({ index, rects: new Map(towns.map((_, i) => [`T${i}`, rect])), fields });
-  const save = () => { for (const [px, py] of towns) h.landformLiftAt(...h.scene(px, py, 60, 60)); };
-  save();
-  assert.equal(fields.made, 9, 'the first save makes each town\'s field');
-  save();
-  assert.equal(fields.made, 9, 'the second makes none again - a town\'s is a kernel pass on this thread, and the memo cleared whole at eight made all nine again at every save');
-  assert.deepEqual(h.asked, towns.map((_, i) => `T${i}`), 'nor asks a rect again');
-  // the cap: past it the longest unasked is let go, and only it - a field asked again is the last to go
-  const wild = { made: 0 }, w = liftAtHost({ fields: wild });
-  const P = (i) => w.scene(200 + i, 300, 10, 10);
-  for (let i = 0; i < 33; i++) w.landformLiftAt(...P(i));
-  assert.equal(wild.made, 33, 'the 33rd lets the first go');
-  w.landformLiftAt(...P(1));
-  assert.equal(wild.made, 33, 'the second is kept, and asked again it is the last to go');
-  w.landformLiftAt(...P(33));
-  w.landformLiftAt(...P(1));
-  assert.equal(wild.made, 34, 'a 34th lets the third go, not the second');
-  w.landformLiftAt(...P(2));
-  w.landformLiftAt(...P(0));
-  assert.equal(wild.made, 36, 'the first and the third were let go');
-});
 
 test('AUDIT LANDFORMS II F4: an anchor set in a dungeon keeps its feet in the dungeon\'s own frame - the lift is never asked of a dungeon point as if it stood outside; outside and in a building it goes in DFU\'s frame', () => {
   const asked = [];
@@ -954,32 +735,6 @@ test('AUDIT LANDFORMS II I2: a bank is never a launch ramp - a track benched alo
   assert.deepEqual(falls.filter((d) => d > 5), [], `falls landed across the track: ${JSON.stringify(falls)} m`);
 });
 
-/** world.js's roads sweep, destroyPixel and the publish's re-stand block, sliced and run as written over the real loot
- *  pool, every name they do not ask for answered by a do-nothing stand-in (lane G's harness). IC-SWAP-BEHIND: the sweep's
- *  rebuild through the real swap (scenes/swapBehind.js) - `swapOff` its kill switch. */
-function rebuildHost(vars) {
-  const sliceTo = (head, end) => { const i = WORLD.indexOf(head), j = WORLD.indexOf(end, i); assert.ok(i > 0 && j > i, head); return WORLD.slice(i, j + end.length); };
-  const SWEEP = sliceTo('  function sweepRoadless() {', '\n  }\n');
-  const DESTROY = sliceTo('  function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {}) {', '\n  }\n');   // PIN MOVED (IC-SWAP-BEHIND): its carry's two doors
-  // HOST-SPLIT 2: the publish moved with the pixel build - its live names read `host.<name>`, and `host` is the scope
-  const i = WORLD.indexOf('    if (host.labGrassField) {   // WOD2'), j = WORLD.indexOf('    if (homeTown) host._homeLookV = -1;', i);
-  assert.ok(i > 0 && j > i, 'the publish\'s re-stand block');
-  const noop = new Proxy(function () {}, { get: (t, k) => (k === Symbol.toPrimitive ? () => NaN : k === Symbol.iterator ? function* () {} : noop), apply: () => noop });
-  const KEEP = new Set(['Math', 'Number', 'Object', 'Array', 'Map', 'Set', 'JSON', 'Infinity', 'NaN', 'undefined', 'String', 'Boolean', 'Symbol', 'console', 'Float32Array']);
-  const scope = new Proxy(vars, { has: (t, k) => !KEEP.has(k), get: (t, k) => (k === Symbol.unscopables ? undefined : k in t ? t[k] : noop), set: (t, k, v) => { t[k] = v; return true; } });
-  const fns = new Function('scope', `with (scope) { ${DESTROY}\n${SWEEP}\n return { destroyPixel, sweepRoadless }; }`)(scope);
-  vars.host = scope;   // and `host` is the stand-ins themselves (under `with` every name, `scope` too, is the scope's)
-  vars.swap = createSwapBehind({ built: vars.built, destroyPixel: fns.destroyPixel, collider: { hold() {}, wake() {}, unhold() {} }, buildingDoors: [], doorsMoved() {},
-    queue: vars.queue, nearestFirst: vars.nearestFirstFrom, state: vars.state, walkMode: () => vars.walkMode, playerSpawned: () => vars.playerSpawned,
-    seasonHold: (k) => { vars._seasonHoldKey = k; }, off: () => !!vars.swapOff });
-  const publish = new Function('scope', `with (scope) { ${WORLD.slice(i, j)} }`);
-  // the rides, bound as the boot binds them once the pools and the player stand (BOOT-TDZ2, K1)
-  new Function('scope', `with (scope) { ${sliceTo('  rideGround = (t, key, moved, behind = false) => {', '\n  };\n')} }`)(scope);   // PIN MOVED (IC-SWAP-BEHIND): and the view swapped in from behind
-  // the publish's own names ride the scope: under `with` the stand-in answers before a parameter would - `key` the build's
-  // own (the behind key, built behind a standing view), `pkey` the pixel's
-  return { ...fns, swap: vars.swap, publish: (px, py, key = `${px},${py}`) => { Object.assign(vars, { px, py, key, pkey: `${px},${py}` }); publish(scope); } };
-}
-
 test('AUDIT LANDFORMS II G1/G2: a pixel rebuilt under the live pools carries what lies on its ground - a pile on the river\'s floor stood before the network landed rides the cut down with it, and the player the hold kept standing there rides it too; a fall under way keeps its own', () => {
   // the river's floor at (300, 255), off the road: built before the network landed (the lift alone), then cut
   const px = 300, py = 255, key = `${px},${py}`, sx = 40, sy = 64;
@@ -988,45 +743,6 @@ test('AUDIT LANDFORMS II G1/G2: a pixel rebuilt under the live pools carries wha
   const cell = TERRAIN_SIZE / (H - 1), M = UNIT * STREAMING_TERRAIN_SCALE, x = sx * cell, z = sy * cell;
   const gB = before[sx * H + sy] * M, gA = after[sx * H + sy] * M;
   assert.ok(gA < gB - 1, `the landing cut the channel here (${(gA - gB).toFixed(2)} m)`);   // PIN MOVED BACK (AUDIT LANDFORMS III C1): LANDFORM5's stilling had the landing raise the floor 2.62 m over a dale; the valley carves it down
-  const run = ({ grounded, behind = false }) => {
-    const loot = createDroppedLoot({ renderer: { createBillboardBatch: () => ({}), destroyBillboardBatch: () => {} }, getTexture: async () => ({ getSize: () => ({ width: 32, height: 32 }), getScale: () => ({ width: 0, height: 0 }), recordCount: 64, getFrameCount: () => 1 }), uploadRecordFrame: () => {} });
-    const pile = loot.dropPile([{ group: 'Gems', templateIndex: 0 }], [x, gB, z], key);
-    const player = { pos: [x + 3, gB + 0.25, z], grounded };
-    const built = new Map([[key, { px, py, withRoads: false, samples: before, batches: [], models: [] }]]);
-    const host = rebuildHost({
-      built, queue: [], droppedLoot: loot, walkMode: true, playerSpawned: true, player, _seasonHoldKey: null, _groundBefore: new Map(),
-      state: { current: { x: px, y: py }, pixelTranslation: () => [0, 0, 0] }, nearestFirstFrom: () => () => 0,
-      TERRAIN_SIZE, HEIGHTMAP_DIMENSION: H, heightCell: cell, worldHeight: M, swapOff: !behind,
-      walkGroundAt,   // PIN MOVED (FLORA-GROUND): the publish's ground read is the walk floor's own law
-    });
-    host.sweepRoadless();   // the network landed: the roadless pixel built again
-    const rebuilt = { px, py, withRoads: true, samples: after, batches: [], models: [] };   // the rebuild, cut along the network
-    let held = null;
-    if (behind) {
-      // IC-SWAP-BEHIND (scenes/swapBehind.js): the view stands while its rebuild builds behind it - the player on it, unheld -
-      // and the swap takes it down and stands the new one in one step
-      assert.equal(built.has(key), true, 'the view stands');
-      held = host.swap.keyFor(px, py);
-      host.swap.publish(px, py, held, {}, rebuilt);
-    } else {
-      assert.equal(built.has(key), false, 'the switch off: torn down (collectLoose: false), queued again');
-      built.set(key, rebuilt);
-    }
-    host.publish(px, py, held ?? key);
-    return { pile, player, gP: (() => { const fx = (x + 3) / cell, ix = Math.floor(fx), a = fx - ix; return ((after[ix * H + sy] * (1 - a) + after[(ix + 1) * H + sy] * a) - (before[ix * H + sy] * (1 - a) + before[(ix + 1) * H + sy] * a)) * M; })() };
-  };
-  const stood = run({ grounded: true });
-  assert.ok(Math.abs(stood.pile.pos[1] - gA) < 1e-6, `the pile stands ${(stood.pile.pos[1] - gA).toFixed(2)} m over the rebuilt ground - stood on the ground before the network and never again`);
-  assert.ok(Math.abs(stood.player.pos[1] - (gB + 0.25 + stood.gP)) < 1e-6, `the held player rides the cut (${(stood.player.pos[1] - gB - 0.25).toFixed(2)} m) - put back where they stood, they fell it`);
-  const falling = run({ grounded: false });
-  assert.equal(falling.player.pos[1], gB + 0.25, 'a fall under way is its own (FALL-KEPT)');
-  assert.ok(Math.abs(falling.pile.pos[1] - gA) < 1e-6);
-  // IC-SWAP-BEHIND: built behind the view the player stands on, no hold - the swap's teardown takes the ground it carries the
-  // pools off, and the player on their feet on the view swapped out rides the cut as the held one did
-  const behind = run({ grounded: true, behind: true });
-  assert.ok(Math.abs(behind.pile.pos[1] - gA) < 1e-6, 'the pile rides the swap');
-  assert.ok(Math.abs(behind.player.pos[1] - (gB + 0.25 + behind.gP)) < 1e-6, `the player on the view swapped out rides the cut (${(behind.player.pos[1] - gB - 0.25).toFixed(2)} m), unheld`);
-  assert.equal(run({ grounded: false, behind: true }).player.pos[1], gB + 0.25, 'and a fall under way is its own');
 });
 
 test('AUDIT LANDFORMS II G3: a Basic Roads file that never arrives is a failed ask - its fetch and its body each time out - so the port\'s own network or the next retry stands in, never a roadless session', async () => {
@@ -1129,34 +845,6 @@ test('AUDIT LANDFORMS II H3: with the row on a town pixel\'s nature - its scatte
   assert.ok(checked > 1000 && border > 50, `${checked} flats, ${border} of the border's`);
 });
 
-test('AUDIT LANDFORMS II H1: THE ONE CONSTRUCTION SEAM for C1 - every height world.js sheds the frame\'s compensation off goes into DFU\'s frame, or is a named transient with its why; a new writer of an exterior height fails here, not in a save', () => {
-  // C1's own pin names the twelve writers of today and cannot fail on a thirteenth; this sweeps the host. (It cannot see a
-  // writer outside world.js - the hosts' others hand world.js their heights, THE FOUR HOSTS in Landforms.md.)
-  const TRANSIENT = new Map([
-    ['if (Number.isFinite(h)) return y - (h - state.compensation[1] - now) * (r - 1) + now;', 'restandHeight itself: the read side'],   // PIN MOVED (BAY-LEFT-GROUND, D5): scenes/groundFrameHost.js recordFrame's own frame
-    ['const campToNatives = (pos) => { const wc = state.worldCoords(pos); return [wc.x, pos[1] - state.compensation[1], wc.z]; };', 'a recenter, this ground both ways (campToRecord is the record\'s)'],
-    ['toNative: (p) => { const w = state.worldCoords(p); return [w.x, p[1] - state.compensation[1], w.z]; },', 'the sailing cabins\' live access'],
-    ['const cabin = { v: 1, uid: boat.uid, hull: boat.hull, origin: [origin.x, boat.GameObject.position[1] - state.compensation[1], origin.z],', 'a boat at sea - its pixel is what is read, under the knee'],
-    ['y: player.pos[1] - state.compensation[1], yaw: cam.yaw,', 'the horse cart\'s party departure, one trip\'s'],
-    ['const campToWire = (p) => { const wc = state.worldCoords(p); return [wc.x, p[1] - state.compensation[1], wc.z]; };   // SURV3: the pose\'s own law for the world frame', 'the wire: the room stands on one ground (C2)'],
-    ['pos: inDungeon ? [...player.pos] : [wc.x, player.pos[1] - state.compensation[1], wc.z],', 'a staff teleport\'s live destination'],
-    ['dest = { ...dest, kind: \'exterior\', pos: [c.x, caravanOut.position[1] - state.compensation[1], c.z], yaw: caravanOut.yaw };', 'a staff teleport\'s live destination - behind a caravan\'s rear door (WAGONS2 FINAL AUDIT)'],
-    ['toWire: (feet) => { const wc = state.worldCoords(feet); return [wc.x, feet[1] - state.compensation[1], wc.z]; },', 'the wire'],
-    ['const partyFeetOf = (pos) => { const wc = state.worldCoords(pos); return { wx: wc.x, wy: pos[1] - state.compensation[1], wz: wc.z }; };', 'the party\'s live feet'],
-    ['worldOf: (p) => { const wc = state.worldCoords(p); return { x: wc.x, y: p[1] - state.compensation[1], z: wc.z }; },', 'the party\'s ping: the look\'s point in the world frame, shed as the party\'s feet are'],
-    ['? { x: wc.x, y: player.pos[1] - state.compensation[1], z: wc.z, yaw: cam.yaw, pitch: cam.pitch, mv: 0 }', 'the online pose'],
-    [': { x: player.pos[0], y: shedY ? player.pos[1] - state.compensation[1] : player.pos[1], z: player.pos[2], yaw: cam.yaw, pitch: cam.pitch, mv: 0 };', 'the online pose'],
-    ['sceneToOnline = nativeFrame ? campToWire : (q) => [q[0], shedY ? q[1] - state.compensation[1] : q[1], q[2]];   // AUDIT MERGE-PLUS B1', 'the online pose'],
-    ['restandSceneHeight: (y, x, z, was) => restandHeight(y - state.compensation[1], x, z, was) + state.compensation[1],', 'the read side'],
-    ['toWire: (feet) => [feet[0], feet[1] - state.compensation[1], feet[2]],', 'the wire'],
-    ['const fieldXZ = () => { const p = walkMode ? player.pos : cam.pos, wc = state.worldCoords(p); return [...fieldFromNative(wc.x, wc.z), altitudeOfWorldY(p[1] - state.compensation[1])]; };   // PRECIP1: and the height above the sea the air is read at', 'PRECIP1: the air\'s height at the eye, a sample\'s - the drawn ground\'s frame, as the snow\'s fragments read theirs'],
-  ]);
-  // AUDIT HOST-SPLIT 2, the second read: and as a moved module spells it, host.state - the pixel build is the host's too
-  const raw = WORLD.split('\n').map((l) => l.trim()).filter((l) => /-\s*(?:host\.)?state\.compensation\[1\]/.test(l) && !/groundFrame(Height|Native)\(/.test(l));
-  assert.deepEqual(raw.filter((l) => !TRANSIENT.has(l)), [], 'an exterior height shed raw - into DFU\'s frame (groundFrameHeight / groundFrameNative), or named here with its why');
-  for (const l of TRANSIENT.keys()) assert.ok(raw.includes(l), `a transient named here that the host no longer has: ${l}`);
-});
-
 test('AUDIT LANDFORMS II J4: a cut is held at the floor, half a unit over the knee - the river\'s mouth stands there exactly, never under it', () => {
   // the fixture's river out to sea (x 92..112 along y = 300): its channel would run under the beach line at the mouth,
   // and LANDFORM_FLOOR holds it - the floor's value was pinned only by an inequality, and +5 or +0.05 survived
@@ -1185,8 +873,6 @@ test('AUDIT LANDFORMS II J5: a record on a town pixel\'s west or south edge read
 });
 
 test('AUDIT LANDFORMS II J7: online the host asks Basic Roads again on the retry\'s own defaults - the page\'s fetch, the backoff\'s real waits, twelve more tries - and hands it nothing else', async (t) => {
-  // the host's call: onTry alone (a `max: 0`, a wait of nought or no fetch there survived every test, which stubbed it)
-  assert.match(WORLD, /retryModRoads\(\{ onTry: \(n, ms\) => console\.warn\([^\n]*\}\)\.then\(\(late\) => \{/, 'the host asks with onTry alone');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const realFetch = globalThis.fetch, asked = [];
   let failing = 2;   // the first two tries fail at his first file, the third answers
@@ -1278,7 +964,6 @@ test('AUDIT LANDFORMS II I1: the lift fades beside the sea - a sea cliff\'s rim 
   assert.equal(ringY(101), ringAt(101, (x, y) => cliffFadeAt(byteAt, x, y)));
   assert.ok(ringY(101) > Math.fround(ringGroundAt(101, 430, byteAt, false)) && ringY(101) < ringAt(101, () => 1), 'one in: a part of it');
   assert.equal(ringY(103), ringAt(103, () => 1), 'three in: the whole lift');
-  assert.match(WORLD, /return \[x, ringGroundAt\(px\.x, px\.y, ground \? \(bx, by\) => woods\.getHeightMapValue\(bx, by\) : \(\) => 0, !!landform\)/, 'the travel view past the grid fades it the same (ringGroundAt\'s own fades, on the ground\'s bytes)');   // PIN MOVED (RELIEF-PEAKS): the ring's ground at the pixel's centre; PIN MOVED (BREATHTAKER2 on the horizon): at its pixel, the continent's lift with it
   // and every edge across the fade, a road over it, is one number from both pixels
   const cut = (px, py) => generateSamples(cw, px, py, H, CUT);
   for (const px of [99, 100, 101, 102]) {

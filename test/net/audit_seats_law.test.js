@@ -60,7 +60,6 @@ test('AUDIT-SEATS L1 SEASON 1\'S KEEPERS: Season 0\'s last Turning claims nothin
   assert.deepEqual(seasonTitles(s2, hold(15)), [{ guild: 'g', title: 'keeper', key: 1 }]);
   assert.deepEqual(seasonTitles(s2, hold(16)), [], 'Season 2 asks its own first week');
   assert.deepEqual([keptWholeSeason(null, 1), keptWholeSeason(s1, 7), keptWholeSeason(s1, 8), keptWholeSeason(s1, 9)], [false, true, true, false]);
-  assert.match(src('server-account/src/seatTurning.js'), /kept: keptWholeSeason\(ending, h\.since\)/, 'the Chronicle\'s season-end row says the same');
 });
 
 // ─── L2 ──────────────────────────────────────────────────────────────

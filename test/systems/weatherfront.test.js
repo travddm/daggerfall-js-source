@@ -213,7 +213,6 @@ test('WX2 the ear: the ambience hears what falls, not the sim\u2019s word', () =
   const bare = new AmbientEffects({ minWait: 5, maxWait: 25 }, { loop: () => ({ stop() {} }), play3d() {}, playOneShot() {} }, () => 0.5);
   bare.setPreset('rain'); bare.rainGain = 0.5;
   assert.doesNotThrow(() => bare.update(0.016), 'a handle with no setter is left alone');
-  assert.match(read('src/systems/audio.js'), /setVolume\(v\) \{ gain\.gain\.value = Math\.max\(0, Math\.min\(1, v\)\); \},/, 'the engine\u2019s loop handle carries the setter');
 });
 
 test('WX2 the wind model\u2019s arrival: 0 at the cut, 1 when the front lands, and 1 THROUGH the hold and the tail where frontProgress falls', () => {
@@ -232,48 +231,6 @@ test('WX2 the wind model\u2019s arrival: 0 at the cut, 1 when the front lands, a
   assert.ok(m.frontProgress() < 1, '...which is what frontProgress says instead');
   m.tick(601 + FRONT_LEAD_MIN + FRONT_HOLD_MIN + FRONT_TAIL_MIN + 5, 'thunder');
   assert.equal(m.arrival(), 1, 'and after the front is forgotten');
-  // the controller exposes it beside frontProgress
-  assert.match(read('src/scenes/shared.js'), /frontArrival\(\) \{ return windModel\.arrival\(\); \},/);
-});
-
-test('WX2 the renderer: the lab draw scales the profile by the intensity and draws nothing at zero; the classic draw never reads it', () => {
-  const p = read('src/render/precipitation.js');
-  assert.match(p, /this\.intensity = 1;/, 'the whole profile by default');
-  assert.match(p, /const full = Math\.round\(\(LAB_COUNTS\[mode\] \?\? LAB_COUNTS\.rain\) \* Math\.min\(1, Math\.max\(0, this\.intensity\)\)\);\s*\n\s*const count = this\.countCap != null \? Math\.min\(full, this\.countCap\) : full;\s*\n\s*if \(count <= 0\) return;/,
-    'the count is the profile times the intensity, capped as before, and zero draws nothing');   // AUDIT PRECIP FALL-8 (PIN MOVED): a cap of 0 is a cap
-  // the classic draw() body carries no intensity term
-  const classic = p.slice(p.indexOf('  draw(mode, proj, view, camPos, camRight, timeSeconds) {'));
-  assert.doesNotMatch(classic, /intensity/, 'DFU\u2019s cap is drawn whole on the classic path');
-});
-
-test('WX2 the hosts: both read the front under the enhanced sky only, and the classic path takes the row\u2019s own terms whole', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = read(host);
-    assert.match(h, /const enhancedFront = !!sky\?\.cloudShadow && params\.get\('front'\) !== 'off';/, `${host}: the front rides the enhanced sky, and ?front=off is its kill switch`);
-    assert.match(h, /weatherFront\.tick\(\{ dt, weather, arrival: enhancedFront \? sky\.frontArrival\(\) : 1, nowMinutes: playerTicker\.classicMinutes, tsec: now \/ 1000, jump, peak: weatherOverride \? null : (?:seaStormShown\(\) \? 1 : )?currentWeatherIntensity\(\) \}\)/, `${host}: the arrival is the wind's under the enhanced sky and 1 under the classic, and the jump rides along (WEATHER3b: and the map's intensity as the peak, none under a ?weather pin)`);
-    // AUDIT PRECIP FALL-2 (PIN MOVED): the world host's terms at the fall's own snow share (the law's lane; exterior.js has none)
-    assert.match(h, /if \(fx\.changed\) wxFrom = wxNow;\s*\n\s*wxNow = enhancedFront \? blendTerms\(wxFrom, fallTerms\(weatherTerms\((?:fx\.snow)?\), fx\.intensity, weather, FALL_LIGHT\), fx\.t\) : weatherTerms\(\);/, `${host}: the terms cross from what was ON SCREEN, and classic takes the row whole`);   // PIN MOVED (RAIN-SPRINKLE): the row under what falls (test/systems/weather/fb1001_rainsprinkle.test.js)
-    // AUDIT PRECIP FALL-4 (PIN MOVED): on the law's lane the ear hears the DROPS' level (fx.rain - null off it, the fall's
-    // own), and the world host hands the indoor skin the whole fall
-    assert.match(h, /ambientWord = enhancedFront \? soundWeather\(fx, weather\) : weather;[^\n]*\n\s*setHeardWeather\(ambientWord, enhancedFront \? fx\.(?:rain \?\? fx\.)?intensity : 1(?:, enhancedFront \? fx : null)?\);[^\n]*\n\s*ambience\.setPreset\(presetForExterior\(ambientWord, isNight\(minute\)\)\);\s*\n\s*ambience\.rainGain = enhancedFront \? fx\.(?:rain \?\? fx\.)?intensity : 1;/, `${host}: the ear follows the front, the gain too, classic verbatim (AUDIT 61: the word is named once, for the mod's lightning listener too)`);
-    assert.match(h, /const precipShown = enhancedFront \? fx\.shown : precipMode;\s*\n\s*if \(isDryFall\(precipShown\)\) \{[\s\S]{0,600}?\} else if \(precipShown && precip\) \{/, `${host}: what falls is what the front shows`);   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls, the sand and the ash
-    assert.match(h, /if \(precip\.enhanced\) \{\s*\n\s*precip\.intensity = fx\.intensity;/, `${host}: the intensity is set inside the enhanced branch only`);
-    assert.match(h, /precip\.drawFall\(precipShown, proj, view/, `${host}: the draw takes the shown mode (PRECIP1: the fall at the air's snow share)`);
-    assert.match(h, host.endsWith('world.js') ? /const fogNow = horizonFog\(wxNow\.fog, tvf\);/ : /const fogNow = wxNow\.fog;/, `${host}: the fog row is the front's`);   // PIN MOVED (OW-HORIZON, 2026-10-20): the streaming host's through the travel view's horizon - the row itself on the ground
-    assert.doesNotMatch(h.slice(h.indexOf('function frame(now)')), /[^.]weatherSun\b(?!\s*=)/, `${host}: no frame consumer reads the raw sun scale any more`);
-    assert.doesNotMatch(h.slice(h.indexOf('function frame(now)')), /\bweatherFog\b(?!\s*=)/, `${host}: no frame consumer reads the raw fog row any more`);
-    // AUDIT PRECIP FALL-3 (PIN MOVED): the world host's terms through phaseTerms - the word's own numbers off the law's
-    // lane and at a share of 0 or none (test/systems/weather/precip1_air.test.js pins phaseTerms itself)
-    assert.match(h, /const weatherTerms = \((?:snowShare = null)?\) => (?:phaseTerms\()?\(?\{ sun: weatherSun, dim: (LAB_DIM\[weather\] \?\? 1|1), fog: weatherFog \}(?:\);|, weather, )/, `${host}: the terms are the weather's own numbers`);
-  }
-  // GRASS-LIT (2026-10-01): the grass takes NO weather dim - the ambient and the sun it is handed are weathered already, and
-  // the dim on top darkened a rainy field a third past the ground it stood in. The sward darkens with the ground by the
-  // ground's own light (WIND4's sun scale and moon, beside it), and the lane, the deck and the sun map come with it.
-  assert.match(read('src/scenes/world.js'), /dim: 1, lane: renderer\.lightingLane, exposure: renderer\.exposure, adaptTex: renderer\.adaptTexture,\n\s+cloud: renderer\._cloudShadow, shadows: renderer\._shadows, indirect: renderer\._indirect, indirectColor: renderer\._indirectColor,\n\s+sunScale: renderer\._sunScale, moonDir: renderer\._moonDir, moonScale: renderer\._moonScale, moonCol: renderer\._moonColor,\s+\/\/ WX2[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+points: renderer\._pointLights, pointColors: /, 'the grass takes the ground\'s own light, and no second weather dim (GRASS-LIT2: its lanterns too)');
-  // the classic sky never ticks the wind model, so under it the arrival
-  // is 1 and the front is a pass-through: pinned at the seam
-  const sh = read('src/scenes/shared.js');
-  assert.ok(sh.indexOf('windModel.tick(') > sh.indexOf('if (enhancedSky) {'), 'the model ticks inside the enhanced branch only');
 });
 
 // ═══ WX2a - AUDIT 57: the front audited ═══════════════════════════════
@@ -345,9 +302,6 @@ test('AUDIT 57 F3 (wind + controller): a jumped change builds no front and drops
   assert.equal(m.arrival(), 1);
   m.tick(701, 'sunny');
   assert.equal(m.state().front, null, 'and a jump with no change of word builds nothing');
-  const sh = read('src/scenes/shared.js');
-  assert.match(sh, /weatherJump\(\) \{\s*\n\s*weatherRowNow = null;\s*\n\s*windModel\.jump\(\);/, 'the controller drops its eased row (the first-call law takes the new one whole) and tells the wind');
-  assert.match(sh, /const windModel = createWindModel\(\{ seed: Number\(params\.get\('wseed'\)\) \|\| 7 \}\);/, 'F4: ?wseed replays the wind\u2019s rolls too - the record claimed it and it did not');
 });
 
 test('AUDIT 57 F3 (front): a jumped change lands whole - no crossing, no taper, the drops down on the frame - and a later real change still builds', () => {

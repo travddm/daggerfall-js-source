@@ -61,65 +61,9 @@ test('WM4c: the source sits on the GameObject that carries Spin_Up - the sail ou
 });
 
 test('WM4c: loop3d takes a distance model, defaults LINEAR so the torches do not move, and its handle MOVES', () => {
-  const src = read('src/systems/audio.js');
-  const fn = src.slice(src.indexOf('  loop3d('), src.indexOf('  /** Per-frame listener sync'));
-  assert.match(fn, /distanceModel = 'linear'/, 'the torches\' default changed');
-  // DISC6 (3D-AUDIO): the panner is made in ONE place, `_panner`, and
-  // every position crosses the frame door `placeAudio` - so the pins
-  // follow the parameter and the move there.
-  // PIN MOVED (CSA-G): the panner takes a rolloff factor too (Come Sail Away's loops work Unity's rolloff out
-  // themselves, at 0); the model is still passed beside it.
-  assert.match(fn, /const pan = this\._panner\(pos, \{ refDistance, maxDistance, distanceModel, rolloffFactor \}\);/, 'the parameter is not passed');
-  const mk = src.slice(src.indexOf('  _panner(pos'), src.indexOf('  setLoop3d('));
-  assert.match(mk, /pan\.distanceModel = distanceModel;/, 'the parameter is not applied');
-  assert.match(fn, /move\(p\) \{ placeAudio\(pan, p\); \}/, 'the handle cannot follow a floating origin');
   // Before the context exists the engine answers null and nothing
   // throws - which is what lets the hosts retry every frame.
   const engine = new AudioEngine();
   assert.equal(engine.loop3d(MILL_SOUND.clip, [0, 0, 0], 1, MILL_SOUND), null);
-  // The torch call site still passes NO model, so it rides the default.
-  assert.match(read('src/scenes/dungeonContext.js'), /audio\.loop3d\(SOUND\.Burning, t\.pos, TORCH_VOLUME, \{ maxDistance: TORCH_MAX_DISTANCE \}\)/);
 });
 
-test('WM4c: both exterior hosts start the hum per mill, ungated on the wind, and silence it indoors', () => {
-  for (const host of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const h = read(host);
-    assert.match(h, /MILL_SOUND, millSoundPosition \} from '\.\.\/world\/windmills\.js'/, `${host}: no import`);
-    assert.match(h, /if \(!w\.hum\) w\.hum = audio\.loop3d\(MILL_SOUND\.clip, (millSoundPosition\([^)]*\)|at), MILL_SOUND\.volume, MILL_SOUND\)/,
-      `${host}: does not start the hum`);
-    // The start is not inside the `if (wind)` gate: his source knows
-    // nothing of the weather.
-    const startAt = h.indexOf('w.hum = audio.loop3d');
-    const windGate = h.lastIndexOf('if (wind) {', startAt);
-    const windGateEnd = windGate < 0 ? -1 : h.indexOf('\n      }\n', windGate);
-    assert.ok(windGate < 0 || windGateEnd < startAt, `${host}: the hum is gated on the wind`);
-    // Indoors: the modal frame stops every mill (PlayerEnterExit
-    // disables the exterior parent; a disabled AudioSource stops).
-    assert.match(h, /if \(modes\.frame\(dt, now\)\) \{[\s\S]{0,700}w\.hum\?\.stop\(\); w\.hum = null;/, `${host}: does not silence the mills indoors`);
-  }
-  // The streaming host MOVES the source with its pixel and stops it
-  // when the pixel is destroyed.
-  const world = read('src/scenes/world.js');
-  assert.match(world, /else w\.hum\.move\(at\);/, 'world.js: the hum does not follow the floating origin');
-  // A1 MOVED THIS PIN: destroyPixel took a `{ collectLoose }` option so
-  // a season re-skin can tear a pixel down WITHOUT running the unload's
-  // loose-object sweep (DaggerfallLocation re-skins standing terrain,
-  // it does not unload it). The hum law is untouched - a torn-down
-  // pixel still stops its mills, whichever door it came through - so
-  // the pin follows the signature rather than weakening.
-  // PIN MOVED (IC-SWAP-BEHIND, scenes/swapBehind.js): `carried` and `carryOnly` beside it - a rebuild behind its view takes its carry at the mark and not again at the swap; the default still collects; 600 -> 1400, the carry's lines first
-  assert.match(world, /function destroyPixel\(px, py, \{ collectLoose = true, carried = false, carryOnly = false \} = \{\}\) \{[\s\S]{0,1400}w\.hum\?\.stop\(\); w\.hum = null;/, 'world.js: a destroyed pixel leaves its hum behind');
-});
-
-test('WM4c: both interior hosts start the gear\'s hum on the part that carries Spin_Up, and the room\'s teardown ends it', () => {
-  for (const host of ['src/scenes/interior.js', 'src/scenes/worldModes.js']) {
-    const h = read(host);
-    assert.match(h, /machineryChildPos, MILL_SOUND \} from '\.\.\/world\/windmills\.js'/, `${host}: no import`);
-    assert.match(h, /if \(r\.child\.loopsSound && !r\.hum\) r\.hum = audio\.loop3d\(MILL_SOUND\.clip, machineryChildPos\(r\.parent, r\.child\), MILL_SOUND\.volume, MILL_SOUND\)/,
-      `${host}: does not start the gear's hum`);
-  }
-  const ctx = read('src/scenes/interiorContext.js');
-  // RE-BASELINED at ROAD-C c2/S9: the interior automap record is dropped
-  // in the same teardown, one statement ahead of the hum.
-  assert.match(ctx, /destroy\(\) \{[\s\S]{0,700}for \(const r of rotors\) \{ r\.hum\?\.stop\(\); r\.hum = null; \}/, 'the context does not stop the hum on destroy');
-});

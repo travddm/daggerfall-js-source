@@ -64,22 +64,3 @@ test('B2: the walk stands a dungeon marker foe through standFoe, spanning RDB bl
   assert.equal(foe.rearmed, true);                                // the injured trigger REARMS at placement
 });
 
-test('B2 seam gate: the dungeon adapter, mount, teardown and PcAt arm are wired', () => {
-  const modes = read('src/scenes/worldModes.js');
-  const world = hostText('src/scenes/world.js');
-  // the mount runs on the dungeon transition and on the hot-place callback
-  assert.match(modes, /questBridge\.mountScene\(dungeonQuestAdapter, SITE_TYPES\.Dungeon, 0\)/);
-  assert.match(modes, /mountQuestResources\(\);\s+\/\/ B2: AddQuestResourceObjects\(SiteTypes\.Dungeon\) on the transition/);
-  // the walk's three stands exist on the dungeon adapter
-  for (const seam of ['standNPC:', 'standItem:', 'standFoe:']) {
-    const i = modes.indexOf('const dungeonQuestAdapter');
-    assert.ok(i > 0 && modes.indexOf(seam, i) > i, `dungeon adapter carries ${seam}`);
-  }
-  // teardown runs on BOTH dungeon exits, before the batch teardown
-  assert.equal((modes.match(/teardownDungeonQuestFlats\(\);/g) || []).length >= 2, true,
-    'both dungeon exits tear the quest stands down');
-  // the dungeon flat behaviours drive per frame (foes drive in drawFoes)
-  assert.match(modes, /for \(const s of \[\.\.\.dungeonQuestFlats\]\) s\.behaviour\?\.update\(\)/);
-  // PcAt's dungeon arm: playerInside answers { dungeon } in dungeon mode
-  assert.match(world, /return \{ dungeon: \{ name: (?:host\.)?modes\?\.dungeonLocation\?\.name \?\? '' \} \};/);
-});

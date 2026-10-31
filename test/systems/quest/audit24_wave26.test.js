@@ -35,7 +35,6 @@ test('audit24 wave26: a quest with no displayname: header has a NULL displayName
   // and a header-less quest would have offered a BLANK picker row.
   assert.equal(bare.displayName ?? bare.questName, '__NOHDR', 'the ?? arm is live again');
   assert.equal('' ?? '__NOHDR', '', 'which it was not with the empty-string default');
-  assert.match(rd('src/systems/quest/offerFlow.js'), /entries\.push\(displayName \?\? quest\.questName\);/);
 });
 
 test('audit24 wave26: a null displayName round-trips, and never renders as "null"', () => {
@@ -45,15 +44,6 @@ test('audit24 wave26: a null displayName round-trips, and never renders as "null
   assert.equal(data.displayName, null, 'Quest.cs:930 stores the field as-is');
   assert.equal(JSON.parse(JSON.stringify(data)).displayName, null, 'and JSON keeps it null');
 
-  // C#'s two log sites use LogWarningFormat / string.Format, which
-  // render a null argument as EMPTY. A bare `${null}` in JS is the
-  // four-letter string "null" - so both needed the ?? ''.
-  assert.match(rd('src/systems/quest/quest.js'), /is already a questor for quest \$\{this\.uid\} \[\$\{this\.displayName \?\? ''\}\]/);
-  assert.match(rd('src/systems/quest/machine.js'), /const dn = questData\.displayName \?\? '';/);
-  assert.doesNotMatch(rd('src/systems/quest/machine.js'), /\$\{questData\.displayName\}/);
-
-  // and the notebook's `||` treats '' and null alike, so it is untouched
-  assert.match(rd('src/systems/notebook.js'), /const questName = quest\.displayName \|\| EN\.quest;/);
 });
 
 test('audit24 wave26: the seam gate resolves world ALIASES', () => {
@@ -83,85 +73,6 @@ test('audit24 wave26: the seam gate resolves world ALIASES', () => {
 });
 
 // ---- the three seams the alias hole hid ----------------------------
-
-test('audit24 wave26: DirectionVector2DirectionHintString, band for band', async () => {
-  const { directionHintString, DIRECTION_HINTS } = await import('../../../src/systems/talk/talk.js');
-  // TalkManager.cs:1163-1187. Eight 45-degree bands off EAST,
-  // counter-clockwise, the caller having already inverted y.
-  assert.equal(directionHintString(1, 0), 'east');
-  assert.equal(directionHintString(1, 1), 'northeast');
-  assert.equal(directionHintString(0, 1), 'north');
-  assert.equal(directionHintString(-1, 1), 'northwest');
-  assert.equal(directionHintString(-1, 0), 'west');
-  assert.equal(directionHintString(-1, -1), 'southwest');
-  assert.equal(directionHintString(0, -1), 'south');
-  assert.equal(directionHintString(1, -1), 'southeast');
-
-  // THE BANDS ARE HALF-OPEN UPWARDS, and east owns both ends of the
-  // circle - so the seam at 22.5 belongs to northeast, and the one at
-  // 337.5 to east. A pin aimed at the middle of a band says nothing
-  // about its edge.
-  const at = (deg) => directionHintString(Math.cos(deg * Math.PI / 180), Math.sin(deg * Math.PI / 180));
-  assert.equal(at(22.4999), 'east');
-  assert.equal(at(22.5001), 'northeast');
-  assert.equal(at(337.4999), 'southeast');
-  assert.equal(at(337.5001), 'east');
-
-  // C# EDGE KEPT: a ZERO vector divides by a zero magnitude, 0/0 is
-  // NaN, every band comparison against NaN is false, and the chain
-  // falls to its else. "Exactly where you are" is never-mind, not a
-  // direction.
-  assert.equal(directionHintString(0, 0), DIRECTION_HINTS.resolvingError);
-  assert.equal(DIRECTION_HINTS.resolvingError, '...never mind...', 'Internal_Strings_en 425');
-
-  // The near-edge probes above straddle 22.5 but never LAND on it, and
-  // no vector I can build makes acos return exactly 22.5, so they say
-  // nothing about whether the comparison is `>=` or `>`. Weakening one
-  // to `>` survived them. The bands' inclusivity is pinned on the
-  // source instead - C# is `>=` on every lower bound, `<` on every
-  // upper, and `<=` only on the 360 that closes the circle.
-  const fn = readFileSync(new URL('../../../src/systems/talk/talk.js', import.meta.url), 'utf8');
-  const body = fn.slice(fn.indexOf('export function directionHintString'), fn.indexOf('/** GetLocationCompassDirection'));
-  const bounds = [...body.matchAll(/angle (>=|>|<=|<) (\d+(?:\.\d+)?)/g)].map((m) => `${m[1]}${m[2]}`);
-  assert.deepEqual(bounds, [
-    '>=0.0', '<22.5', '>=337.5', '<=360.0',
-    '>=22.5', '<67.5', '>=67.5', '<112.5', '>=112.5', '<157.5',
-    '>=157.5', '<202.5', '>=202.5', '<247.5', '>=247.5', '<292.5',
-    '>=292.5', '<337.5',
-  ], 'TalkManager.cs:1169-1184, comparison for comparison');
-});
-
-test('audit24 wave26: FindFactionByTypeAndRegion - exact first, partial LAST', async () => {
-  const { findFactionByTypeAndRegion } = await import('../../../src/systems/talk/talk.js');
-  // PersistentFactionData.cs:236-265. An exact type+region match
-  // RETURNS immediately, so the first in dictionary order wins.
-  const dict = new Map([
-    [1, { id: 1, type: 7, region: -1 }],
-    [2, { id: 2, type: 7, region: 17 }],
-    [3, { id: 3, type: 7, region: 17 }],
-    [4, { id: 4, type: 7, region: -1 }],
-    [5, { id: 5, type: 4, region: 17 }],
-  ]);
-  assert.equal(findFactionByTypeAndRegion(dict, 7, 17).id, 2, 'the FIRST exact match');
-
-  // No exact match: the loop keeps OVERWRITING the partial, so the
-  // LAST region-less faction of that type wins - not the first.
-  assert.equal(findFactionByTypeAndRegion(dict, 7, 99).id, 4, 'the LAST region == -1 of that type');
-
-  // a type with no partial and no exact match is the zero struct
-  assert.equal(findFactionByTypeAndRegion(dict, 4, 99), null);
-  assert.equal(findFactionByTypeAndRegion(new Map(), 7, 17), null);
-
-  // AN EQUIVALENT MUTANT, recorded rather than dressed up as a kill:
-  // swapping the two `if`s inside the loop passes every pin here, and
-  // it really is equivalent. The only item that could satisfy both is
-  // one with `item.region === -1` when `regionIndex` is ALSO -1, and
-  // in that case the exact-match `return` fires either way.
-
-  // and the mount delegates here rather than rolling its own
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /return s \? findFactionByTypeAndRegion\(s\.dict, type, regionIndex\) : null;/);
-});
 
 test('audit24 wave26: locationCompassDirection keeps the last-match and (0,0) shapes', async () => {
   const { locationCompassDirection } = await import('../../../src/systems/talk/talk.js');

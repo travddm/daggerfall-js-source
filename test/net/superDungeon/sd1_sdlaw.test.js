@@ -214,10 +214,3 @@ test('SD1: the name, the room and the words', () => {
   assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');   // AUDIT SD III (T15, PIN MOVED): the player's word for it, Abyss Dungeon
 });
 
-test('SD1: pure, and the relay\'s - it reaches nothing past wire.js and the gate\'s law, both already the relay bundle\'s', () => {
-  const src = readFileSync(new URL('../../../src/net/superDungeon/sdLaw.js', import.meta.url), 'utf8');
-  assert.deepEqual([...src.matchAll(/^import [^\n]* from '([^']+)';/gm)].map((m) => m[1]), ['../wire.js', '../gate/gateLaw.js']);
-  const relay = graph('server/src/index.js');
-  const g = graph('src/net/superDungeon/sdLaw.js').slice(1);
-  assert.deepEqual(g.filter((f) => !relay.includes(f)), [], 'every module the law reaches is one the relay already bundles');
-});

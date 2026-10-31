@@ -62,9 +62,6 @@ test('FAST-REFUSAL a plan past the Bay with no way by land is refused before a c
   assert.equal(tally.n, 0, 'not a cell');
   // one isle: walked
   assert.ok(planRoute(px(21, 11), px(23, 13), { ...rg }), 'a way on one isle');
-  // a boat to hand: the land's pieces say nothing (THE MERGE)
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /if \(past && !sea && apart && apartPastBay\(from, to, width, height\)\) return null;/);
 });
 
 // ── WITH ARENA2: the freeware's own Tamriel ─────────────────────

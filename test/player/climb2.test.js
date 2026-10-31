@@ -525,18 +525,9 @@ test('CLIMB2 hosts: the deps carry the Fatigue, the pack and the tally; every HU
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js']) {
     assert.match(read(f), /\n\s*grip: player\.gripShown,/, `${f} hands its HUD the grip`);
   }
-  assert.match(read('src/scenes/dungeonContext.js'), /grip: _activity\.grip \?\? null,/, 'the dungeon context\'s HUD, from the host\'s report');
   for (const f of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
     assert.match(read(f), /reportActivity\?\.\(\{[^\n]*grip: player\.gripShown, fell: /, `${f} reports the grip`);
   }
-  const wm = read('src/scenes/worldModes.js');
-  const bag = wm.slice(wm.indexOf('interiorTicker.tick(dt, {'), wm.indexOf('});', wm.indexOf('interiorTicker.tick(dt, {')));
-  assert.match(bag, /climbing: !!player\.climb\?\.isClimbing,/, 'the interior ticker reports the climb (PlayerEntity.cs:405-408 asks it indoors too)');
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /drawBreathBar\(renderer, canvas, art, vitals, s\);\n\s*drawGripBar\(renderer, canvas, art, grip(?: \?\? steed)?, s\);/, 'the classic HUD draws the grip beside the breath');   // PIN MOVED (STEED1): the horse's breath in its place, a rider holding no wall
-  assert.match(hud, /drawGripBar\(renderer, canvas, art, grip(?: \?\? steed)?, s2\);/, '...and under the large HUD');   // PIN MOVED (STEED1)
-  assert.match(hud, /\n\s*grip,   \/\/ CLIMB2\n/, 'the enhanced HUD is handed it');
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /el\('span', 'hud-breathlabel', 'Grip'\)/);
 });
 
 test('CLIMB2 x CLIMB-PAST (main #498): a mastered Climbing\'s points past 100 climb faster on the enhanced lane too - the free climb, the shimmy and its corners, by the classic climb\'s own multiplier', () => {

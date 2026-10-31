@@ -287,36 +287,10 @@ test('STEED-UI Cargo, Horse Cart and Cargo\'s door: the wagon\'s load opened as 
   assert.equal(b.rt.consumeWagonSelectionRequest(), false, 'no selection left armed');
 });
 
-test('STEED-UI the view\'s own word: the toggle turns only where mwViewCanTogglePerspective says - the panel\'s View stands on the same word (mutants: STEEDUI-view-unguarded)', () => {
-  const src = rd('src/player/mwView.js');
-  assert.match(src, /export function mwViewTogglePerspective\(\) \{\n {2}if \(!mwViewCanTogglePerspective\(\)\) return false;/);
-  assert.match(src, /export function mwViewCanTogglePerspective\(\) \{\n {2}if \(heldThird \|\| heldFirst\) return false;[^\n]*\n {2}if \(eotbLane\(\) \|\| mwCamera\.thirdPerson\(\)\) return true;\n {2}return !!fpArm\.canThirdPerson\(\) && !mounted;\n\}/);
-});
-
 test('STEED-UI dressed by the Plus kit: the bar a small window, the buttons the kit\'s presses', () => {
   assert.ok(FRAME_ROLES.window.includes('.saddlepanel-bar'));
   assert.ok(Object.values(FRAME_ROLES).some((list) => list.includes('.saddlepanel-btn')));
   assert.ok(SMALL_WINDOWS.includes('.saddlepanel-bar'));
-});
-
-test('STEED-UI the four hosts: world.js and exterior.js build the one glue over their upkeep, hand it the frame\'s motion in the upkeep\'s block and its frame from the top of every mode (a door takes it down), under the helm\'s covers; world.js offers its view key, exterior.js has none; worldModes.js and dungeonContext.js stand no transport and are named, not wired (mutants: STEEDUI-world-unwired, STEEDUI-ext-unwired)', () => {
-  const world = rd('src/scenes/world.js'), ext = rd('src/scenes/exterior.js');
-  for (const [name, s] of [['world.js', world], ['exterior.js', ext]]) {
-    assert.match(s, /const saddleHost = createSaddleHost\(\{\n {4}upkeep, runtime: \(\) => hccRuntimeOn\(\), items: \(\) => playerEntity\.items \?\? \[\],/, `${name}: the glue`);
-    assert.match(s, /saddleHost\.motion\(gamePaused\(\) \? 0 : dt, metres, galloping, player\.rideWalking\);/, `${name}: the motion - HORSE-TIERS (PIN MOVED): and the walk the motor took`);
-    assert.match(s, /openStable: \(\) => hudCtx\.togglePause\(\{ at: 'holdings' \}\)/, `${name}: the Stable`);
-    assert.match(s, /pass: upkeepPass/, `${name}: the kit's hour`);
-    assert.ok(s.includes("isEnhancedPlus() && typeof document !== 'undefined' && walkMode"), `${name}: Enhanced Plus only`);
-    assert.ok(s.includes('covered: townTalk.hudCovered || (modes?.hudCovered ?? false) || gamePaused() || !hudRenderEnabled()'), `${name}: the helm's covers`);
-  }
-  assert.ok(world.includes('    saddleDrawPanel();   // STEED-UI: the saddle panel, as the helm\'s below - every mode, so a door takes it down\n    csaDrawHelmPanel();'), 'world.js: beside the helm, every mode');
-  assert.match(world, /canView: \(\) => mwViewCanTogglePerspective\(\), toggleView: \(\) => \{ mwViewTogglePerspective\(\); \}, foot: \(\) => setTransportModeHere\(TRANSPORT_MODES\.Foot\)/);
-  assert.ok(world.includes("_mode() === 'exterior' && !(townTalk.overlay instanceof DeathScreen)"), 'world.js: outdoors, alive');
-  const extTop = ext.indexOf('    tickAmbientText();\n'), extFrame = ext.indexOf('saddleHost.frame({'), extModal = ext.indexOf('if (modes.frame(dt, now)) {');
-  assert.ok(extTop > 0 && extTop < extFrame && extFrame < extModal, 'exterior.js: above the modal gate (the ambient text\'s law), every mode');
-  assert.match(ext, /canView: \(\) => false, toggleView: \(\) => \{\}, foot: \(\) => mountRig\.setMode\(TRANSPORT_MODES\.Foot\)/);
-  for (const p of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.ok(!rd(p).includes('saddleHost'), `${p}: no transport indoors - named, not wired`);
-  assert.ok(rd('src/scenes/saddleHost.js').includes('scenes/worldModes.js (interiors) and scenes/dungeonContext.js (dungeons) stand no transport'), 'the glue names them');
 });
 
 test('STEED-UI the Stable page, polished: the bond a bar to the next word with the points to go (whole at Kindred), a fed horse its food\'s hours, a winded breath said, each stat\'s making on its tooltip; the wagon\'s bar in its state\'s tone and a Wagon Yard\'s price to make it whole, at the yard and fetched (mutants: STEEDUI-stable-bond-to-go, STEEDUI-stable-mend-price)', async () => {

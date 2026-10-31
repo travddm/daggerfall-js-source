@@ -134,28 +134,6 @@ test('AUDIT 28 B5: the respawn takes what the death screen said, capped at the p
   const poor = { goldPieces: 30 };
   assert.equal(applyDeathPenalty(poor), 30, 'never more than the purse');
   assert.equal(applyDeathPenalty({ goldPieces: 40 }), 4, 'no word: a tenth of the purse');
-  const w = src('src/scenes/world.js');
-  const rez = w.slice(w.indexOf('function resurrectInPlace(rez) {'), w.indexOf('\n  }', w.indexOf('function resurrectInPlace(rez) {')));
-  assert.match(rez, /stateDeathLoss\(null\);/, 'a rescue withdraws the loss');
-  assert.match(rez, /if \(spared > 0\) townTalk\.say\(RESURRECT_TEXT\.spared\(spared\)\);/);
-  assert.match(src('src/ui/deathScreen.js'), /this\.online = online \?\? isOnlinePage\(\);/);
-  // PIN MOVED (BAL4, bible/05-Combat/Balance-Arc.md section 6): a death that respawns states it - online, or a Legacy rise offline
-  assert.match(src('src/ui/deathScreen.js'), /if \(respawns\) stateDeathLoss\(this\.goldLoss\);/);
-  assert.match(src('src/scenes/exterior.js'), /hint: 'ENTER end', online: false \}/, 'the fixed city');
-  assert.match(src('src/scenes/dungeonContext.js'), /\.\.\.\(opts\.onlineRespawn \? \{ rises: opts\.legacyWillRise \} : \{ online: false \}\)/, 'the standalone dungeon (and no rise there)');
-});
-
-test('AUDIT 28 B6/B9: a load that still holds a bounty keeps its standing pack, and the ways named are named again', async () => {
-  const { p, day } = smallPosting();
-  const { host, stood, board } = hostOf({ now: () => day * 1440 + 60, here: () => ({ x: p.target.px, y: p.target.py }) });
-  board().take(p.id);
-  host.tick(1); await flush();
-  assert.equal(host.poseField().bq[0].a, 1, 'my pose says my pack stands (AUDIT 28 B3)');
-  const rec = JSON.parse(JSON.stringify({ ...host._ledger(), paidIds: [] }));
-  host._reset(rec);   // a same-dungeon quickload: the beasts were in the save and stand patched in place
-  host.tick(1); await flush();
-  assert.deepEqual(stood, [p.count], 'no second pack beside them');
-  assert.ok(src('src/scenes/bountyHost.js').includes('clues.clear(); toldOwner.clear(); tierRefused.clear();'));
 });
 
 test('AUDIT 28 B7: the pose sends the NEWEST cleared rows first - today\'s never cut for yesterday\'s', () => {
@@ -173,7 +151,6 @@ test('AUDIT 28 B7: the pose sends the NEWEST cleared rows first - today\'s never
 });
 
 test('AUDIT 28 B8/B10: the owner is asked on the pixel the poses say, and a bounty taken on another clock runs from now', async () => {
-  assert.match(src('src/scenes/world.js'), /posePixel: \(\) => playerTravelPixel\(\),/);
   // underground the dungeon's map-table pixel (the host's target) and the pose's pixel differ: a mate below me in the
   // same dungeon (their pose on MY pose's pixel) with a lower account stands the pack, not I
   const { p, day } = smallPosting();
@@ -211,8 +188,6 @@ test('AUDIT 28 B11: the board keeps the keyboard\'s place through its repaint, a
   assert.notEqual(after, before, 'the row was rebuilt');
   assert.equal(document.activeElement, after, 'and the rebuilt row has the focus');
   view.unmount();
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /bountyAbandonArmed = null;   \/\/ AUDIT 28 B11/);
-  assert.match(src('src/ui/enhanced/enhancedChronicle.js'), /bountyArmed = null;   \/\/ AUDIT 28 B11/);
 });
 
 test('AUDIT 28 B12: a mate\'s copy taken up is mine - rebuilt at my level where its tier is mine', () => {

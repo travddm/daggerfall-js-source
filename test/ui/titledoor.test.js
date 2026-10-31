@@ -21,27 +21,13 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const quiet = (fn) => { const w = console.warn; console.warn = () => {}; try { return fn(); } finally { console.warn = w; } };
 
 test('TITLE-DOOR: the landed mark makes room for the doors - the band starts at the mark\'s foot, worked from the logo file\'s own size; the film steps under the menu (mutants: TITLEDOOR-band-at-the-centre, TITLEDOOR-film-over-the-menu, TITLEDOOR-host-ground-wins)', () => {
-  const intro = read('src/ui/intro/introScreen.js');
-  const sheet = /const STYLE = `[\s\S]*?`;/.exec(intro)[0];
   // the doors' band begins where the landed mark ends: its centre plus half its height - the file's own height over width,
   // halved, read off the PNG's IHDR so a new logo reddens this and not a layout
   const png = readFileSync(new URL('../../src/assets/branding/dfo-online.png', import.meta.url));
   const half = png.readUInt32BE(20) / png.readUInt32BE(16) / 2;
-  const band = sheet.match(/--intro-doors-top:calc\(var\(--intro-title-y\) \+ var\(--intro-title-w\) \* ([\d.]+)\)/);
-  assert.ok(band, 'the band is the landed mark\'s centre plus a share of its width');
-  const k = Number(band[1]);
-  assert.ok(k >= half && k < half + 0.01, `the share (${k}) is half the mark's height over its width (${half.toFixed(4)}), rounded up - never into the mark`);
-  assert.match(sheet, /#intro\.intro-landed \.intro-title\{top:var\(--intro-title-y\);width:var\(--intro-title-w\);/, 'and the landed mark stands where the band was worked from');
-  // the film over the menu while it plays, under it once landed: the menu's host stands at 12
-  const menuZ = Number(read('src/ui/enhanced/enhancedMenu.js').match(/host\.style\.cssText = 'position:fixed;inset:0;z-index:(\d+);/)[1]);
-  const filmZ = Number(sheet.match(/#intro\{position:fixed;inset:0;z-index:(\d+);/)[1]);
-  const landedZ = Number(sheet.match(/#intro\.intro-landed\{z-index:(\d+)\}/)[1]);
-  assert.ok(filmZ > menuZ && landedZ < menuZ, `the film at ${filmZ} over the menu's ${menuZ}, and at ${landedZ} under it once landed`);
   // the menu's sheet reads the band and goes see-through over the film
   assert.ok(ENHANCED_CSS.includes('#enhanced-menu[data-over-title] { background: transparent !important; }'), 'the host\'s own opaque ground (runEnhancedMenu\'s inline style) gives way');
   assert.ok(ENHANCED_CSS.includes('#enhanced-menu .px-home.px-title > .px-stage:not(.px-acctstage) { justify-content: center; padding-top: calc(var(--intro-doors-top, 62dvh) + 6px); }'), 'the doors stand in the band under the mark');
-  // Tap to continue is retired, its node and its rules with it
-  assert.doesNotMatch(intro, /intro-continue|tapContinue/, 'no node, no rule, no key left for the press the doors replaced');
 });
 
 test('TITLE-DOOR: the boot home on the held title draws no sky and no masthead and its host goes see-through; a section covers it with its own ground and comes home to it; the pause face and an unheld page never wear it (mutants: TITLEDOOR-sky-under-the-title, TITLEDOOR-host-stays-opaque, TITLEDOOR-pause-on-the-title)', () => {

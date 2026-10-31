@@ -316,17 +316,5 @@ test('RAID-ROLL client: this world\'s table is handed only when it hashes to the
     assert.deepEqual(said.filter((l) => l.startsWith('[raid] this world')), [`[raid] this world's towns table: ${sha(text)}`], 'its hash said once');
   } finally { console.info = info; }
   _resetRaidingParties();
-  const rp = rd('src/systems/raidingParties.js');
-  assert.match(rp, /return _townsHash && _townsHash === h \? _townsText : null;/, 'handed only when it hashes to the pin');
-  assert.match(rp, /console\.info\(`\[raid\] this world's towns table: \$\{hash\}`\)/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /link\.onRaid = \(f, room\) => \(f\.k === 'tw' \? offerRaidTowns\(link, f\.h\) : raidRelayWord\(f, room\)\);/);
-  assert.match(w, /if \(text\) \{ if \(link\.sendRaidTowns\(h, text\)\) _raidTownsSent = true; return; \}\n\s*if \(tries > 1\) setTimeout\(\(\) => offerRaidTowns\(link, h, tries - 1\), 10_000\);/);
-  const tool = rd('tools/raidTowns.mjs');
-  assert.match(tool, /const regions = raidRegions\(maps, picker\.getDFBitmap\(\)\.data\) \?\? \[\];\n\s*const text = raidTownsCanon\(regions\);/, 'the game\'s own reading of the same files');
   assert.match(rd('server/wrangler.toml'), /^RAID_TOWNS_SHA256 = "(?:[0-9a-f]{64})?"$/m, 'the relay\'s pin - empty a legal state');
-  const idx = rd('server/src/index.js');
-  // PIN MOVED (WW6): the slots are the word's LANE's (a raid past the Bay its province's own), and the hub's whole roll -
-  // the operator's pinned towns table, MAPS.BSA's - the Bay's lane's alone
-  assert.match(idx, /if \(!raidWordFits\(m, sharedClassicMinutes\(now\)\)\) return;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const day = raidDayOfKey\(m\.key\), lane = raidLaneOfKey\(m\.key\);\n\s*if \(!raidOnSlot\(m, this\._raidSlotsOf\(day, lane\)\)\) return;\n\s*const rolled = lane === 0 \? await this\._raidDayIdsOf\(day, now\) : null;\n\s*if \(rolled && !rolled\.has\(raidLedgerId\(m\)\)\) return;\n\s*const id = raidLedgerId\(m\);/, 'read before the ledger - and before any storage read');
 });

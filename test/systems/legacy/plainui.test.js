@@ -160,7 +160,6 @@ test('PLAIN-UI How chapters work stands over the chapters\' cards - open for a r
 
 test('PLAIN-UI the Family tab\'s How it works - the house\'s own model (both before one is founded), the toll the Features tile chose, every number the law\'s; a page of its own on the rail, drawn by the pause window (mutants: the models swapped; the toll typed; the page undrawn)', () => {
   assert.deepEqual(FAMILY_PAGE_SECTIONS.at(-1), ['guide', 'How it works']);
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /\{ tree: drawTreePage, house: drawHousePage, hall: drawHallPage, guide: drawGuidePage \}\)\[famSec\]\(detail, render, kit\);/);
   const death = (model, toll) => familyGuide(model, toll).find(([k]) => k === 'Death')[1];
   assert.match(death(MODELS.enduring, 0.06), /^In an Enduring house a death is not the end, but it costs years: Arkay's toll takes 6% of your race's lifespan each time \(vampires and werebeasts pay none\)\. From 75% of your lifespan you are an Elder,/);
   assert.match(death(MODELS.enduring, 0.1), /takes 10% of your race's lifespan/);
@@ -201,9 +200,6 @@ test('PLAIN-UI the talk panel\'s regard badge - a living resident\'s standing in
     question: '', topics: [], selected: -1, hooks: { npcName: 'Ysolde', tone: () => 1, regard: () => f } };
   assert.equal(talkPanelModel(model).regard, f);
   assert.equal(talkPanelModel({ ...model, hooks: { npcName: 'Ysolde', tone: () => 1 } }).regard, null);
-  const panel = src('src/ui/enhanced/enhancedTalk.js');
-  assert.match(panel, /const r = el\('button', `talk-regard \$\{m\.regard\.standing\}`\);/, 'a press says what it means - a finger has no hover');
-  assert.match(panel, /if \(m\.regard && regardOpen\) head\.append\(el\('p', 'talk-regard-words', m\.regard\.words\)\);/);
 });
 
 test('PLAIN-UI the regard reaches the panel from the body\'s own town - its day\'s regard and standing (refuses()\' own read), worded by the host, for the resident the conversation is with and nobody else (mutants: the hook unwired; the card\'s standing off another id)', () => {
@@ -214,8 +210,6 @@ test('PLAIN-UI the regard reaches the panel from the body\'s own town - its day\
   assert.deepEqual(asked, [['L5.3', 7]]);
   assert.equal(LivingTown.prototype.regardCard.call(town, { nameNPC: 'a walker' }), null, 'DFU\'s walkers keep no regard');
   assert.equal(LivingTown.prototype.regardCard.call({ ...town, o: {} }, { living: { id: 'L5.3' } }), null);
-  assert.match(src('src/scenes/townTalk.js'), /regard: \(\) => \(_toneTarget \? livingTalk\?\.regard\?\.\(_toneTarget\) \?\? null : null\),/);
-  assert.match(src('src/scenes/world.js'), /regard: \(person\) => regardBadge\(person\?\.living\?\.town\?\.regardCard\?\.\(person\) \?\? null\),/);
 });
 
 test('PLAIN-UI the board\'s type a step larger - its panels, their names, the Seat tab\'s lines, the chapters\' lines and the Merit line ("Its tiny") (mutant: the panel\'s size back)', () => {

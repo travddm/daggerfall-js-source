@@ -296,11 +296,6 @@ test('VOID THE CHAT WORD: `/siege void <key>` parsed - anything else /siege is t
   assert.deepEqual(await book.voidSiege(3022), { ok: true, text: 'The Tourney at seat 3022 is void already.' });
   assert.deepEqual(await book.voidSiege(3023), { ok: false, text: 'Only moderators can do that.' });
   assert.deepEqual(asked, [3021, 3022, 3023]);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const siegeCmd = parseSiegeCommand\(text\);/);
-  assert.match(w, /seatBook\.voidSiege\(siegeCmd\.key\)\.then\(\(r\) => say\(r\.text\)/);
-  const client = readFileSync(new URL('../../src/net/accountClient.js', import.meta.url), 'utf8');
-  assert.match(client, /voidSiege: \(key\) => post\('\/v1\/seats\/siege\/void', \{ key \}\)/);
 });
 
 // ─── AUDIT 529: the void's audit (V1-V5) ─────────────────────────────

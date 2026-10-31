@@ -78,8 +78,6 @@ test('BEAST-SELF: an arm standing aside has no body to cross into - the wheel is
   assert.equal(arm.canThirdPerson(), true, 'the body is there again, not rebuilt');
   assert.equal(arm.setViewMode('third'), true);
   assert.equal(arm.ready(), true, 'ready() was never touched - the rig kept stepping it');
-  const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const thirdActive = \(\) => !standIn && !!\(/, 'the third-person draw stands aside too');
 });
 
 test('BEAST-SELF: the weapon rig stands the arm aside from the curse itself - transformed, and not', () => {

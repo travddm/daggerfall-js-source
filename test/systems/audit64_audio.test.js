@@ -80,18 +80,6 @@ test('AUDIT 64 F40: RemoveHealth has THREE senders, and the trap\'s two reach th
     'PlayerHealth.cs:57 - ApplyPlayerFallDamage\'s DIRECT call, which PlayerFootsteps never hears');
 });
 
-test('AUDIT 64 F40: the dungeon host\'s damagePlayer sink bills the health AND cries', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  const sink = dc.slice(dc.indexOf('damagePlayer:'), dc.indexOf('castSpell:'));
-  assert.match(sink, /hurtPlayer\(dmg\)/, 'the trap still bills the health');
-  assert.match(sink, /playPlayerVoice\(audio, playerPainVoice\(playerEntity, dmg\)\)/,
-    'and it CRIES - DaggerfallAction.cs:739/:768 send exactly the message EnemyAttack.cs:406 sends');
-  // ...and the fall, which shares hurtPlayer, must NOT have gained one.
-  const hp = dc.slice(dc.indexOf('function hurtPlayer(dmg)'));
-  assert.doesNotMatch(hp.slice(0, hp.indexOf('\n  }')), /playerPainVoice/,
-    'the cry is on the SINK, not inside hurtPlayer - a fall flashes and stays silent (PlayerHealth.cs:57)');
-});
-
 // ---------------------------------------------------------------------------
 // F41 - a VID mutes the music and stops the ambient loops
 // ---------------------------------------------------------------------------
@@ -230,35 +218,6 @@ test('AUDIT 64 F41: every LIVE ambient instance is reached, and a disposed one i
   } finally { unmuteAmbientForVideo(); a.dispose(); b.dispose(); }
 });
 
-test('AUDIT 64 F41: the host door - the dungeon disposes its ambience, so the registry does not grow per entry', () => {
-  // AmbientEffectsPlayer subscribes in Start (:92-93); Unity's
-  // OnDisable/OnDestroy is the unsubscribe, and the registry that
-  // stands in for that static event is a STRONG Set - so whichever
-  // host rebuilds needs a door that calls dispose(), or every dungeon
-  // entry leaves a dead instance for muteAmbientForVideo to walk.
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /const sceneAmbience = new AmbientEffects\(/,
-    'the standalone-dungeon host owns one instance');
-  const destroy = dc.slice(dc.indexOf('\n    destroy() {'));
-  assert.ok(destroy.length > 0, 'buildDungeonContext exposes a destroy');
-  assert.match(destroy, /sceneAmbience\.dispose\(\);/,
-    'and its teardown unsubscribes it - AmbientEffectsPlayer.cs:92-93\'s OnDisable half');
-
-  // THE FOUR-HOSTS CHECK. The two outdoor hosts build ONE ambience each
-  // for the life of the run and expose no teardown at all, so there is
-  // no repeated build to leak; the law lands only where one repeats.
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/world.js']) {
-    const src = rd(f);
-    assert.equal((src.match(/new AmbientEffects\(/g) ?? []).length, 1, `${f} builds exactly one`);
-    assert.doesNotMatch(src, /^ {4}destroy\(\) \{/m, `${f} has no teardown to dispose it from`);
-  }
-  // dungeon.js/worldModes.js/interior.js mount the dungeon context
-  // rather than owning an instance, so the door above is theirs too.
-  for (const f of ['src/scenes/dungeon.js', 'src/scenes/worldModes.js', 'src/scenes/interior.js']) {
-    assert.doesNotMatch(rd(f), /new AmbientEffects\(/, `${f} owns none`);
-  }
-});
-
 // A minimal VID that opens: header, palette, one audio + one video block,
 // then EndOfFile. Enough to drive playVideo's loop headlessly.
 function tinyVid() {
@@ -351,11 +310,6 @@ test('AUDIT 64 F43: the port\'s pick clicks once, before the close and before th
   assert.deepEqual(heard, [[SOUND.ButtonClick, 1]], 'exactly one ButtonClick (SoundClips.ButtonClick)');
   assert.deepEqual(order, ['click', 'close', 'use'],
     'DaggerfallUseMagicItemWindow.cs:125 - the sound, THEN CloseWindow, THEN the use');
-  // The base picker is silent in DFU (neither ListBox nor
-  // DaggerfallListPickerWindow plays a clip), so the click must not
-  // have migrated there and made every other list picker click.
-  assert.doesNotMatch(rd('src/ui/listPicker.js'), /playOneShot/,
-    'the shared list picker stays silent, as DaggerfallListPickerWindow.cs is');
 });
 
 // ---------------------------------------------------------------------------

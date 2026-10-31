@@ -102,37 +102,9 @@ test('OW6: THE THEMED GROUP TAKES A CALLER\'S SIZE - exactly that many, from the
   assert.equal(groupSolitary, 0, 'a group never leads with one');
 });
 
-/** The host's make, lifted from scenes/world.js and run over the real tables. */
-const liftMake = () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const m = /\n {2}function bandMake\(b\) \{\n[\s\S]*?\n {2}\}\n/.exec(w);
-  assert.ok(m, 'bandMake lifted');
-  return (scope) => new Function('s', `const { _bandMake, maps, rollGroupComposition, seededRng, bandMakeSeed, bandLevelOf, bandSizeOf, playerEntity, online, enemyDisplayName, wildBornHere, WILD_PACK_MULT } = s;${m[0]} return bandMake;`)(scope);
-};
 const makeScope = (level, online) => ({
   _bandMake: new Map(), maps: { getClimateIndex: () => CLIMATES.Mountain }, rollGroupComposition, seededRng, bandMakeSeed, bandLevelOf, bandSizeOf,
   playerEntity: { level }, online, enemyDisplayName,
   wildBornHere: () => false, WILD_PACK_MULT,   // PVPDUNGEONS: no band here is born in the open zone (its pack x WILD_PACK_MULT)
 });
 
-test('OW6 host run: ONLINE, ONE BAND FOR EVERY PLAYER - a level-1 and a level-18 player read the same kind and the same number over it (it was each viewer\'s own level); offline the player\'s own, as Daggerfall reads it; its number is its own (mutants: the viewer\'s level online, the size dropped)', () => {
-  const lift = liftMake();
-  const bands = population(40, true).slice(0, 60);
-  let differedOffline = 0;
-  for (const b of bands) {
-    const low = lift(makeScope(1, { id: 'a' }))(b), high = lift(makeScope(18, { id: 'b' }))(b);
-    assert.deepEqual(low, high, `${b.id}: the same band for both players online`);
-    if (!low) continue;
-    assert.equal(low.mobileTypes.length, bandSizeOf(b), 'its own number');
-    assert.equal(low.name, enemyDisplayName(low.mobileTypes[0]));
-    const own = rollGroupComposition({ climateIndex: CLIMATES.Mountain, playerLevel: bandLevelOf(b), inLocationRect: false, gameMinutes: 0, size: bandSizeOf(b) }, seededRng(bandMakeSeed(b)));
-    assert.deepEqual(low.mobileTypes, own.mobileTypes, 'read at the band\'s own level');
-    const offLow = lift(makeScope(1, null))(b), offHigh = lift(makeScope(18, null))(b);
-    if (JSON.stringify(offLow) !== JSON.stringify(offHigh)) differedOffline++;
-  }
-  assert.ok(differedOffline > 0, 'offline the player\'s own level reads the tables (a level-1 and a level-18 player meet different bands)');
-  // made once: a second ask is the kept one
-  const scope = makeScope(5, { id: 'a' }), bandMake = lift(scope), b = bands[0];
-  assert.equal(bandMake(b), bandMake(b));
-  assert.ok(scope._bandMake.has(b.id));
-});

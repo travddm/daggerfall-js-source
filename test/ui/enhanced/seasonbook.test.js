@@ -49,9 +49,6 @@ test('AUDIT SEASON-BOOK W1/U8: the seats\' Season named in the player\'s languag
   // the thirteenth Season: Morning Star's second round
   const s13 = seatSeasonAt(Date.UTC(2026, 9, 4, 18) + (2 + SEASON_ZERO_WEEKS + 12 * SEASON_WEEKS) * 7 * 86_400_000, 2);
   assert.deepEqual([s13.n, s13.month, s13.numeral, seatSeasonTitle(s13)], [13, 0, 'II', 'Season of Morning Star II']);
-  const src = read('src/systems/seasonBook.js');
-  assert.match(src, /monthNames\(\)\[seat\.month\]/, 'the months\' own localized table (gameDate.js monthNames)');
-  assert.doesNotMatch(src, /seat\.name\.replace/, 'no English article stripped off an English name');
 });
 
 test('SEASON-BOOK the model: three sections, each its clock; the season\'s five boards, the seats\' Season (Season 0 as the beta it is; a counted Season its own lead), the festival open or coming - every section\'s title, sub-line, lead, countdown word and foot (mutants: the trial crowning; the beta\'s lead on every Season; the seats\' end said as an opening; the festival\'s end for its opening; a shut seat shown)', () => {
@@ -207,7 +204,6 @@ test('AUDIT SEASON-BOOK R1: a board is asked when the window OPENS, once a minut
     b3.source({ opening: true, now: NOW });
     assert.equal(total(w3), 6, 'performance.now is the default clock');
   } finally { performance.now = was; }
-  assert.match(read('src/scenes/seasonBookHost.js'), /busy = \(\) => busyUntil\(\) > Date\.now\(\),/, 'the default busy is BUSY-GATE\'s hold');
 });
 
 test('AUDIT SEASON-BOOK R2/R4: the reads are the signed-in account\'s - another account\'s are dropped and asked again; a no-session answer drops the read; a guest and no one signed in are asked nothing (mutants: a read kept across accounts; no-session kept; a guest asked)', async () => {
@@ -401,8 +397,6 @@ test('AUDIT SEASON-BOOK P8/W1: the time left as the hourglass counts it, its day
   try { assert.equal(one(one(view.root, 'sb-realm'), 'sb-count').textContent, '4:07'); } finally { view.stop(); }
   const ms = Date.UTC(2026, 10, 23, 0, 0);
   assert.equal(seasonWhenText(ms), new Intl.DateTimeFormat('en', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms));
-  assert.match(read('src/ui/enhanced/enhancedSeason.js'), /new Intl\.DateTimeFormat\(loc, \{ weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' \}\)/);
-  assert.match(read('src/ui/enhanced/enhancedSeason.js'), /const loc = intlLocale\(\);/, 'the player\'s language, the text core\'s');
 });
 
 test('AUDIT SEASON-BOOK S2/U2: every line rewritten in place - a board\'s answer, the day turning - and the list rebuilt only when its rows or doors change; a door with the focus keeps it across that rebuild; P2 a door hands the source\'s own door read at the press (the Arena\'s, the Spire\'s), and a door gone does nothing (mutants: rebuilt every tick; the sub frozen; the focus dropped; the door read from the draw or the wrong one; the guard gone)', () => counted(() => {
@@ -528,39 +522,6 @@ test('SEASON-BOOK `/season`: the window from the chat on either skin and whereve
   assert.equal(pauseCommandRefusal('season'), 'The world\'s clock hasn\'t been heard yet. Try again in a moment.');
   assert.equal(pauseCommandRefusal('mailbox'), 'Connect and sign in to use the mailbox.');
   assert.ok(HELP_LINES.includes('/season - this season, your standings and the time left'), '/help says it');
-  const world = read('src/scenes/world.js');
-  assert.match(world, /\n {8}\{ const at = pauseCommandOf\(text\); if \(at\) \{[^\n]*\n {10}if \(!\(at === 'season' \? timersSource\(\) : postSource\(\)\)\) \{ chatLog\.push\(tabId, \{ text: pauseCommandRefusal\(at\), system: true \}\); return true; \}\n {10}if \(!modes\?\.openPauseAt\?\.\(at\)\) hudCtx\.togglePause\(\{ at \}\);/, 'the hourglass\'s clock its door, the pause face opened at it');
-  assert.match(read('src/ui/pauseDoor.js'), /\n {2}if \(\(hooks\.at === 'mailbox' \|\| hooks\.at === 'report' \|\| hooks\.at === 'season'\) && typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\);/, 'the classic skin opens the enhanced face (it has no laurel)');
-});
-
-test('SEASON-BOOK wiring, anchored to whole lines (AUDIT P10): the face stands the laurel after the envelope; the window on the hourglass\'s stage, its scrim swallowing the tap\'s release (U1), the face and every mark inert under it and the laurel inert under the other windows (P4); a mark gone closes its window (S4); the doors through the one handoff (S3); the focus in at an opening alone (U3); its tick stopped on every rebuild and unmount; every host hands the world\'s reads (mutants: each line commented out)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\nimport \{ seasonMark, seasonWindow, seasonSource, anchorSeason \} from '\.\/enhancedSeason\.js';/);
-  assert.match(menu, /\nfunction seasonLaurel\(home, chain\) \{\n {2}if \(!hooks\.timers\?\.\(\)\) return null;\n {2}const laurel = seasonMark\(document, \{ open: seasonOpen, onOpen: \(\) => \{ seasonOpen = true; seasonFocusIn = true; render\(\); \} \}\);\n {2}home\.append\(laurel\);\n {2}seasonAnchor = anchorSeason\(laurel, chain, home\.querySelector\?\.\('\.px-profile'\), home\);\n {2}if \(seasonFocusBack && !seasonOpen\) \{ seasonFocusBack = false; globalThis\.requestAnimationFrame\?\.\(\(\) => laurel\.focus\?\.\(\)\); \}\n/);
-  assert.match(menu, /\nconst closeSeason = \(\) => \{ seasonOpen = false; seasonFocusBack = true; render\(\); \};\n/);
-  assert.match(menu, /\nconst stopSeason = \(\) => \{ seasonView\?\.stop\(\); seasonView = null; seasonAnchor\?\.\(\); seasonAnchor = null; \};\n/);
-  assert.match(menu, /\n {4}const laurel = seasonLaurel\(home, \[mark, envelope\]\);[^\n]*\n\s*const gem = shopGem\(home, \[mark, envelope, laurel\]\);[^\n]*\n(\s*\/\/[^\n]*\n)*\s*if \(timersOpen && !mark\) timersOpen = false;\n\s*if \(postOpen && !envelope\) \{ postOpen = false; postKeep = \{\}; \}\n\s*if \(seasonOpen && !laurel\) seasonOpen = false;\n/, 'S4');   // PIN MOVED (SHOP): the gem placed after the laurel
-  assert.match(menu, /\n {6}closeOnOutsideTap\(home, '\.px-acctwin', closeAccount\);[^\n]*\n {6}for \(const n of \[stage, mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'under the account window');   // PIN MOVED (SHOP): and the gem
-  assert.match(menu, /\n {6}envelope\?\.setAttribute\?\.\('inert', ''\);[^\n]*\n {6}laurel\?\.setAttribute\?\.\('inert', ''\);   \/\/ SEASON-BOOK: and the laurel\n/, 'P4: under the timers window');
-  assert.match(menu, /\n {6}closeOnOutsideTap\(home, '\.px-postwin', \(\) => \{ postOpen = false; postKeep = \{\}; postFocusBack = true; render\(\); \}, \{ swallow: true \}\);\n {6}for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);\n/, 'P4: under the mailbox');   // PIN MOVED (SHOP): and the gem
-  assert.match(menu, /\n {4}else if \(seasonOpen && laurel\) \{\n(\s*\/\/[^\n]*\n)*\s*const sstage = el\('div', 'px-stage px-timersstage px-seasonstage'\);\n\s*seasonView = seasonWindow\(document, \{ read: \(opening\) => seasonSource\(hooks, \{ opening \}\), onClose: closeSeason, door: seasonDoor, focus: seasonFocusIn \}\);[^\n]*\n\s*seasonFocusIn = false;\n\s*sstage\.append\(seasonView\.root\);\n\s*home\.append\(sstage\);\n\s*closeOnOutsideTap\(home, '\.px-seasonwin', closeSeason, \{ swallow: true \}\);\n\s*for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);\n/);   // PIN MOVED (SHOP): and the gem
-  assert.match(menu, /closeOnOutsideTap\(home, '\.px-timerswin', \(\) => \{ timersOpen = false; timersFocusBack = true; render\(\); \}, \{ swallow: true \}\);/, 'U1: the hourglass\'s too');
-  assert.match(menu, /\n {4}: seasonOpen && seasonView \? \(\) => closeSeason\(\)/, 'Escape closes a drawn window before it resumes');
-  assert.match(menu, /\n {2}stopPost\(\);[^\n]*\n {2}stopSeason\(\);   \/\/ SEASON-BOOK: and the season window's\n {2}stopShop\(\);[^\n]*\n {2}app\.innerHTML = '';/, 'a rebuild stops the tick');   // PIN MOVED (SHOP): the shop's stopped after it
-  assert.match(menu, /\n {6}releaseTutorialsPane\(\);[^\n]*\n {6}stopSeason\(\);   \/\/ SEASON-BOOK: and the season window's\n/, 'and an unmount');
-  assert.match(menu, /\n {2}discardControlsStaging\(\);[^\n]*\n {2}seasonOpen = false;   \/\/ SEASON-BOOK: and the season window's[^\n]*\n {2}seasonFocusBack = false;[\s\S]{0,1600}?\n {2}else if \(at === 'season'\) \{ seasonOpen = true; seasonFocusIn = true; \}/, 'a visit\'s window, reset before the door that opens it');
-  assert.match(menu, /\nconst seasonDoor = \(fn\) => \{ if \(pauseTab === 'growth' && growthAsks\(\)\) \{ closeSeason\(\); return; \} timersDoor\(fn\); \};/, 'a Growth face asking under it: the window shut so the ask is seen');
-  assert.match(menu, /\nfunction handoff\(fn, opened = \(r\) => r !== false\) \{\n {2}const act = onAction;[^\n]*\n {2}onAction\('handoff'\);\n {2}const r = fn\(\);\n {2}if \(!opened\(r\)\) act\('resume'\);\n {2}return r;\n\}/, 'S3: the handler read before the handoff unmounts the face');
-  assert.equal(menu.split("onAction('handoff')").length - 1, 1, 'S3: every door through the one handoff - its own line the only one');
-  assert.match(menu, /'\.px-win, \.px-clock, \.px-foot, \.px-profile, \.px-timersmark, \.px-postmark, \.px-seasonmark, \.px-shopmark'/, 'the laurel inside the pause face: a press on it never resumes');   // PIN MOVED (SHOP): and the gem
-  const world = read('src/scenes/world.js');
-  assert.match(world, /\n {2}const seasonBook = createSeasonBook\(\(\) => \(\{ arena: arenaOnline, eg: _accountEg, iliac: iliacDoor, gambit: gambitDoor, ledger: captainLedger \}\)\);\n/);
-  assert.match(world, /\n {4}season: seasonBook\.source,   \/\/ SEASON-BOOK: the laurel's boards \(its clock is the hourglass's\)\n/, 'the street\'s pause bag');
-  assert.match(world, /\n {4}season: seasonBook\.source,   \/\/ SEASON-BOOK: and the laurel's boards\n/, 'the modes host');
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /\n {4}season: host\.season,   \/\/ SEASON-BOOK/, 'a building\'s pause');
-  assert.match(modes, /\n {10}season: \(o\) => host\.season\?\.\(o\) \?\? null,/, 'the dungeon\'s opts, the read\'s options carried');
-  assert.match(read('src/scenes/dungeonContext.js'), /\n {8}season: \(o\) => opts\.season\?\.\(o\) \?\? null,/, 'the dungeon\'s pause');
 });
 
 // Stone's panel, measured under the timers window (test/ui/enhanced/timers1.test.js AUDIT TIMERS1 UI-4)

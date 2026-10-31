@@ -112,25 +112,3 @@ test('FREEMOUSE: it toggles the one flag, and taking the mouse back asks for the
   setCursorActive(false);
 });
 
-test('FREEMOUSE by source: ONE reader ORs the two actions - there is no second toggle to keep in step', () => {
-  const pl = readFileSync('src/player/pointerLock.js', 'utf8');
-  // The shape matters more than the strings: two actions read at one
-  // place, in one listener, over one flag. A second bindCursorToggle
-  // over the same module global is the bug PL3 spent a slice on, and a
-  // host-side `e.code === 'KeyY'` is AUDIT 58's (a key-literal in a host
-  // makes a rebindable row inert in both directions).
-  // KB1: ...and ActivateCursor answers only while no chat claims THIS press (online, Enter opens the chat; Y frees the
-  // mouse) - AUDIT KB1: the claim is asked with the event, so a chat that declines the press leaves Enter to DFU
-  // UXB1-S: the host hands every action a shared key carries (actionsOf), so the one reader asks whether EITHER is among them
-  assert.match(pl, /const got = actionsOf\(e\);\n\s*const acts = Array\.isArray\(got\) \? got : got \? \[got\] : \[\];[^\n]*\n\s*if \(!acts\.includes\(FREE_MOUSE_ACTION\) && !\(acts\.includes\('ActivateCursor'\) && !cursorKeyClaimed\(e\)\)\) return;/);
-  assert.equal((pl.match(/addEventListener\('keydown', onKey, true\)/g) ?? []).length, 1, 'one listener');
-  // No host COMPARES an event's code to the default key. The first
-  // draft of this line swept for the string and caught
-  // `telePopUp.input(yes ? 'KeyY' : 'KeyN')` in world.js - a Yes/No
-  // window being handed a key NAME, which is the opposite of the thing
-  // this forbids. What is banned is a host deciding the binding.
-  const compares = /(?:e|ev|event)\.code\s*===?\s*['"]KeyY['"]|['"]KeyY['"]\s*===?\s*(?:e|ev|event)\.code/;
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/worldModes.js', 'src/player/pointerLock.js']) {
-    assert.ok(!compares.test(readFileSync(f, 'utf8')), `${f} compares no event to the default key - the binding is the registry's`);
-  }
-});

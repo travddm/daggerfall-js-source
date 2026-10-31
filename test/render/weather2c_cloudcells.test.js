@@ -230,9 +230,6 @@ test('WEATHER2c the field: the cells and the slab declared once for both marches
 });
 
 test('WEATHER2c the class and the controller: setState takes the cells (the controller\'s, joined by the door\'s) capped by the tier, uploads the packed arrays with the dark (SLAB-SPAN: no slab - each ray finds its own), shifts the test cell on a recenter; both controller paths hand the field\'s cells', () => {
-  const vc = rd('src/render/volumetricClouds.js');
-  assert.match(vc, /setState\(state, row, weather, easeDt, drift, flash = 0, pos = null, cells = null\) \{/);
-  assert.match(vc, /if \(this\.testCellSpec && !this\.testCell && pos\) this\.testCell = parseCloudCellDoor\(this\.testCellSpec, pos\);/);
   // AUDIT-VC7: the door's cell JOINS the host's - the game hosts always hand a list (the map's, empty in clear air), and
   // a cell taken only in its place never stood in the game; capped by the tier (WEATHER3c's pickCells), convected (VC7a)
   const c = Object.create(VolumetricClouds.prototype);
@@ -246,13 +243,5 @@ test('WEATHER2c the class and the controller: setState takes the cells (the cont
   c.testCellSpec = null; c.testCell = null;
   c.setState(st, WEATHER_SKY.sunny, 'sunny', 1, [0, 0], 0, [100, 0, 200], null);
   assert.deepEqual(c.cells, [], 'no list and no door: no cells');
-  assert.match(vc, /gl\.uniform1f\(u\.uDark, p\.dark\); gl\.uniform1f\(u\.uVary, p\.vary \?\? 0\);[^\n]*\n\s*\/\/ WEATHER2c: the cells \(SLAB-SPAN: each ray finds its own slab among them\)\s*\n\s*const k = packCells/, 'uploaded with the field, for both marches (VC6a: the zone\'s type variation beside the dark)');
-  assert.match(vc, /const k = packCells\(this\.cells, this\.q\.cells \?\? MAX_CELLS, this\._packed\);\s*\n\s*gl\.uniform1i\(u\.uCellCount, k\.count\);\s*\n\s*if \(k\.count > 0\) \{ gl\.uniform4fv\(u\.uCell, k\.c\); gl\.uniform4fv\(u\.uCellA, k\.a\); gl\.uniform4fv\(u\.uCellB, k\.b\); gl\.uniform4fv\(u\.uCellC, k\.t\); gl\.uniform4fv\(u\.uCellK, k\.k\); gl\.uniform4fv\(u\.uCellS, k\.s\); gl\.uniform4fv\(u\.uCellU, k\.u\); gl\.uniform4fv\(u\.uCellKS, k\.ks\); gl\.uniform4fv\(u\.uCellKU, k\.ku\); \}/, 'the arrays only when there are cells');
-  assert.match(vc, /if \(this\.testCell\) \{ this\.testCell\.x \+= offset\[0\]; this\.testCell\.z \+= offset\[2\]; \}/, 'the recenter');
-  assert.equal((vc.match(/gl\.uniform1f\(u\.uDark, p\.dark\);/g) || []).length, 1, 'the dark is uploaded once, by the field');
-  assert.equal((vc.match(/gl\.uniform1f\(u\.uVary, p\.vary \?\? 0\);/g) || []).length, 1, 'VC6a: and the variation once, beside it');
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /if \(clouds\) clouds\.testCellSpec = params\.get\('cloudcell'\);/);
-  assert.equal((shared.match(/extra\?\.cells \?\? null\);/g) || []).length, 2, 'the dome path and the mod path both hand the cells');
 });
 

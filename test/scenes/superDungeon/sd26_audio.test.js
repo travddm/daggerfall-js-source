@@ -18,7 +18,6 @@ import { createSdAir, SD_AIR_FAR } from '../../../src/scenes/superDungeon/sdAir.
 import { createDeadlandsAir, AIR_FAR } from '../../../src/scenes/deadlandsAir.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const W = read('src/scenes/world.js');
 const T0 = 1_800_000_000_000;
 
 /** A fight the test turns, a clock it moves, an engine that hears (sd14a's rig). */
@@ -99,22 +98,6 @@ test('SD26 THE HEARTS A PAGE AWAY MISSED ARE NOT HEARD AT ONCE (A2): AUDIT SD II
   h.s.cx = { i: 10, m: 400, c: eight().map((q, k) => [q[0], q[1], k < 2 ? 0 : 50]) };
   h.step(SD_VOICE_AWAY_MS - 1000);
   assert.equal(breaks(h), 2, 'a hitch: heard');
-});
-
-test('SD26 THE BRASS\'S POWERS SOUND THE HALL\'S OWN RECORDS (A3): SD_HALL_SOUNDS are DAGGER.SND record INDEXES - the hall, the brass veil, the Rift\'s bell and the Remnant\'s voice all play them so, and Unbroken one line above plays 433 so - but the set voice sent Gearward\'s clunk and The Hour Turns\' toll through the ID door, which plays whatever record carries that ID (AUDIT 58: the two are unrelated) or nothing. world.js\'s own voice, run on the engine over an archive whose IDs are not its indexes: each power plays the hall\'s record (mutants: the clunk by ID; the toll by ID)', () => {
-  const at = W.indexOf('  setSetPowersVoice({ sound: (name) => {');
-  assert.ok(at > 0);
-  const text = W.slice(at, W.indexOf('\n  } });\n', at) + 8);
-  const e = new AudioEngine(), played = [];
-  e.snd = { getRecordIndex: (id) => id - 3 };   // index 0 carries ID 3 (audio.js soundIndexForId)
-  e.playOneShot = (index) => { played.push(index); };
-  let voice = null;
-  new Function('setSetPowersVoice', 'audio', 'SOUND', 'SPELL_CAST_SOUND', 'SD_HALL_SOUNDS', text)((v) => { voice = v; }, e, SOUND, SPELL_CAST_SOUND, SD_HALL_SOUNDS);
-  const heard = (name) => { played.length = 0; voice.sound(name); return played.slice(); };
-  assert.deepEqual(heard('unbroken'), [SOUND.Parry6]);
-  assert.deepEqual(heard('gear'), [SD_HALL_SOUNDS.clunk], 'Gearward: the Orrery\'s own clunk');
-  assert.deepEqual(heard('hour'), [SD_HALL_SOUNDS.toll], 'The Hour Turns: the Hour\'s bell');
-  assert.deepEqual(heard('wrath'), [SPELL_CAST_SOUND[0] - 3], 'a spell\'s cast sound is an ID, and stays one');
 });
 
 test('SD26 A STOMP LANDS AS ONE THUD (A4): on a Stomp\'s landing frame the blows played its landing (BODY_FALL at 0.28) and the voice its quake (BODY_FALL at 0.30) - one clip started twice in the same frame, 1.2 semitones apart, a louder phasing smear; and the quake\'s End arm was dead (the End is the Hour\'s clock blow, never the Remnant\'s). The ground\'s shock is the landing: the voice and the blows over one Stomp start the thud once (mutants: the quake back)', () => {

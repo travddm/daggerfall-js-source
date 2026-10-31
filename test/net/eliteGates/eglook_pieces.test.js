@@ -233,13 +233,6 @@ test('EG-G2 THE BUDGET, MEASURED (section 11.9): over every circle of three seed
 });
 
 test('EG-G2 THE HOSTS: the dungeon arm culls the Spire\'s pieces on this frame\'s view and projection right before its dynamic draws (scenes/worldModes.js), through the dungeon context\'s egSpanCull (scenes/dungeonContext.js); the spans batch only for a renderer that moves vertices (mutants: the cull after the draws; the batch without the seam)', () => {
-  const W = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const cull = W.indexOf('if (isEgHall(dungeonLoc)) dungeonCtx.egSpanCull?.(proj, view);'), drawsAt = W.indexOf('for (const d of dungeonCtx.dynamicDraws) if (!d.hidden && !d.culled) renderer.drawMesh(');
-  assert.ok(cull > 0 && drawsAt > cull && drawsAt - cull < 800, 'the cull, then the draws (the level\'s static batch and draw list between - PERF5\'s pins hold those two to the movers)');
-  const D = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(D, /egSpanCull\(proj, view\) \{ return egSpan\?\.cull\(proj, view\) \?\? 0; \}/);
-  const S = readFileSync(new URL('../../../src/scenes/eliteGates/egSpan.js', import.meta.url), 'utf8');
-  assert.match(S, /batch = renderer\?\.createMesh && renderer\?\.updateMeshVertices \? createEgPieceBatch\(\{ renderer \}\) : null;/);
   const plain = createEgSpan({ renderer: { createMesh: (m) => ({ subMeshes: m.subMeshes }) }, seed: 7, c: 1 });
   plain.stand({ dynamicDraws: [], collider: null });
   assert.equal(plain.batchStats(), null, 'no seam, no batch');

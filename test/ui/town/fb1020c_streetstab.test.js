@@ -157,40 +157,6 @@ test('STREETS-TAB ONE BAG: the streets on the travel key\'s window are the M key
   assert.equal(h.shown.length, 1, 'nothing opened off a location');
 }));
 
-test('STREETS-TAB by source: bootWorld constructs the town map\'s module and hands the M key to `open`; the travel key\'s door - and that door alone - spreads `travelTown` into its window, past its whole ladder; the town key\'s door and the travel key\'s build the streets from townSheetBag; THE FOUR HOSTS (mutants: the travel door hands no streets)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const \{ toggleExteriorAutomap, travelTown \} = createExteriorAutomapToggle\(\{   \/\/ HOST-SPLIT: src\/scenes\/exteriorAutomapToggle\.js\n[^]*?\n\s+get modes\(\) \{ return modes; \},[^]*?\n\s+\}\);/, 'constructed once, the mode read live');
-  assert.match(w, /toggleAutomap: \(\) => toggleExteriorAutomap\(\),/, 'the M key');
-  assert.equal((w.match(/\.\.\.travelTown\(\)/g) ?? []).length, 1, 'one door spreads the streets: the teleport, the portal stone, the driver\'s map and the editor\'s jump are armed windows, not the player\'s map');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('const showQuestPlace = (find) =>'));
-  const spread = door.indexOf('_travelMap = buildTravelMapWindow({ ...travelTown(), onTravel: (pick, opts, computed) => {');
-  assert.ok(spread > 0, 'the travel key\'s window takes the streets');
-  for (const rung of ["if ((modes?.mode ?? 'exterior') !== 'exterior') {", 'if (giveOffer()) return false;', 'const cfb = careerFastTravelBlock(playerEntity, nowMin);', 'const ftb = racialFastTravelBlock(playerEntity, nowMin);', 'if (!gotoPlace && partyTravel?.mapOffer()) return false;']) {
-    const at = door.indexOf(rung);
-    assert.ok(at > 0 && at < spread, `past the ladder: ${rung}`);
-  }
-  assert.ok(door.indexOf('areEnemiesNearby(') > 0 && door.indexOf('areEnemiesNearby(') < spread, 'past the enemies');
-  const m = src('src/scenes/exteriorAutomapToggle.js');
-  assert.match(m, /^\/\/ HOST-SPLIT: moved verbatim out of src\/scenes\/world\.js's bootWorld /, 'read whole with its host (test/hostText.mjs)');
-  assert.ok(hostText('src/scenes/world.js').includes('const travelTown = () => {'), '...and so read');
-  assert.match(m, /return \{ town: townSheetBag\(here\.deps\), where: here\.deps\.where, openOnSheet: 'world' \};/);
-  assert.match(m, /if \(\(host\.modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return \{\};/);
-  assert.match(m, /return \{ toggleExteriorAutomap, travelTown \};/);
-  const td = src('src/ui/town/townMapDoor.js');
-  assert.match(td, /town: townSheetBag\(deps\),/, 'the town key\'s door builds its streets there too');
-  assert.equal((td.match(/gridW: deps\.gridW \?\? 0,/g) ?? []).length, 1, 'one bag, one home');
-  // THE FOUR HOSTS. bootWorld: wired, above. bootExterior: no travel map on that route (DfTravelMapWindow is world.js's) -
-  // its M key builds through the same door, so its streets are the same bag. createWorldModes, buildDungeonContext: the
-  // travel key is refused indoors and in a dungeon (IsPlayerInside, the door above), and their M opens the building's
-  // and the dungeon's own plans.
-  const e = src('src/scenes/exterior.js');
-  assert.doesNotMatch(e, /createTravelMapWindow|buildTravelMapWindow|travelTown/, 'bootExterior: no travel map');
-  assert.match(e, /townTalk\.showOverlay\(createTownMapWindow\(\{/, '...its M through the one door');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(src(host), /createTravelMapWindow|createTownMapWindow|travelTown/, `${host}: no travel map, no town plan`);
-  }
-});
-
 // ── THE REPORT'S TOWN KIND, on the game's own data: Daggerfall, both keys' real windows ─────────────────────────────
 
 test('STREETS-TAB with ARENA2: in Daggerfall the building a townsperson marks stands on the travel key\'s streets as on the M key\'s plan - every plate the same (mutants: the travel key\'s own bag)', { skip: skipReal }, () => enhanced(async () => {

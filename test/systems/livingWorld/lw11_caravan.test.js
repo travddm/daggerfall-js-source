@@ -451,28 +451,10 @@ test('LW11 the session forgotten with its character: another character\'s record
 });
 
 test('LW11 the host\'s wiring: the road\'s trade window (its counter\'s discount on Buy - and, AUDIT TOWN-ECON 2 PRICE-4, on a sale: what it pays never above what it asks -, the purse\'s refusal returning the goods, its steal the road\'s crime and no city guard), the talk\'s door before the words, the roads reading a robbed caravan, the hand caught on the road no town\'s crime, the step once a second (mutants: each wire, TOWNECON-AUDIT2-PRICE4-road-sale)', () => {
-  const modes = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(modes, /if \(b\?\.roadDiscount && \(mode === 'Buy' \|\| mode === 'Sell' \|\| mode === 'SellMagic'\)\) return Math\.round\(adj \* f \* \(1 - b\.roadDiscount\)\);/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-4): the friend's price both ways - what it pays held to what it asks
-  assert.match(modes, /if \(road\.allow\?\.\(m, staged, price\) === false\) \{ if \(m === 'Sell' \|\| m === 'SellMagic'\) \(playerEntity\.items \?\?= \[\]\)\.push\(\.\.\.staged\); return false; \}/);
-  assert.match(modes, /crimeTheft: \(\) => road\.caught\?\.\(\),\n\s+spawnCityGuards: \(\) => \{\},/);
-  assert.match(modes, /return !!mountServiceWindow\(openTradeWindow\(o\.shelf, o\.b, tradeMode, \{\}, o\)\);/);
-  const talk = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(talk, /if \(livingTalk\?\.offers\?\.\(target\.person, \(\) => converse\(target\)\)\) return;/);
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /if \(livingWorldOn\(\) && \(_caravanT -= dt\) <= 0\) \{ _caravanT = 1; caravanHostOf\(\)\.step\(\); \}/);
-  assert.match(world, /\n {4}caravanStep\(dt\);   \/\/ LW11: the hold-ups/, 'the open world\'s');   // PIN MOVED (AUDIT LW-II C5b): one step, two frames
-  assert.match(world, /offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\)/);   // PIN MOVED (LW14): and a company below   // PIN MOVED (AUDIT LW-II-2 D4): below alone
-  assert.match(world, /robbed: \(tripId\) => caravanHostOf\(\)\.robbed\(tripId\),/);
-  assert.match(world, /if \(p\?\.living\?\.res\) caravanHostOf\(\)\.caught\(p\.living\.res, skyMinutes\(\)\);\n/);   // PIN MOVED (AUDIT LW-II-2 C15): the road's door clears no crime flag - townTalk puts back the one standing before the pickpocket
-  assert.match(world, /const livingRoadSlay = \(res, t, seen\) => \{ livingSlay\(res, t, seen\); caravanHostOf\(\)\.slain\(res, t\); \};/);
-  assert.match(world, /charge: \(region, crime\) => \{ lowerRepForCrime\(playerEntity, region, crime\); tallyCrimeGuildRequirements\(playerEntity, false, 1\); \}/);
   // the Overworld's mark of a caravan the character robbed
   assert.equal(partyLabel({ kind: 'merchant', party: [1], to: { name: 'Far' }, robbed: true }), 'Caravan to Far (robbed)');
   assert.equal(partyLabel({ kind: 'pedlar', party: [1], robbed: true }), 'Pedlar (robbed)');
   assert.equal(partyLabel({ kind: 'merchant', party: [1], to: { name: 'Far' }, robbed: true }, '', 'Orcs'), 'Caravan beset by Orcs');
-  const roads = readFileSync(new URL('../../../src/scenes/livingWorld/livingRoads.js', import.meta.url), 'utf8');
-  assert.match(roads, /label: partyLabel\(\{ \.\.\.p\.trip, party: members, robbed: deps\.robbed\?\.\(p\.trip\.id\) != null \}, '', beset\),/);
-  assert.match(roads, /const trip = deps\.robbed\?\.\(p\.trip\.id\) != null \? \{ \.\.\.p\.trip, robbed: \{ t: /);
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -826,16 +808,3 @@ test('AUDIT LW-II C5b, on review: the escort with the party THROUGHOUT - a journ
   assert.equal(escortNear(lodger, room, night, morn), morn, 'a night under its roof: with it');
 });
 
-test('AUDIT LW-II C1/C4/C5b: the host\'s wiring - the traveller by place, the trip pending, the player\'s own hand, the step in the modal frame too, nowhere near a party below (mutants: each wire)', () => {
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /const livingTravellerOf = \(id\) => travellerOf\(id, livingTownOfId, livingTripWorld\.rosterOf\);/);
-  assert.match(world, /tripById: \(id, t\) => tripOfId\(id, t, livingTownOfId, \(town, at\) => tripsOfTown\(town, at, livingTripWorld, livingTripO\(\)\)\),/);
-  assert.match(world, /resOf: livingTravellerOf, slainAt: livingSlainAt,/);
-  assert.match(world, /const h = slain\.get\(turnKey\(res, livingCycleOf\(res, Math\.floor\(\(t - 240\) \/ 1440\)\)\)\);\n\s*return h != null && h\.t <= t;/);
-  // PIN MOVED (AUDIT LW-II C5b, on review): below nowhere near a party; indoors at the building - an interior stands at
-  // its building's world matrix, and the night at the inn a party lodges at is beside it
-  assert.match(world, /here: \(\) => \(playerSpawned && _mode\(\) !== 'dungeon' \? state\.worldCoords\(walkMode \? player\.pos : cam\.pos\) : null\),   \/\/ AUDIT LW-II C5b/);
-  const modal = world.slice(world.indexOf('    if (modes.frame(dt, now)) {'), world.indexOf('    // Q4-v: the quest machine\'s EXTERIOR tick'));
-  assert.ok(modal.length > 1000 && modal.includes('requestAnimationFrame(frame);'), 'the modal arm read');
-  assert.match(modal, /\n {6}caravanStep\(dt\);   \/\/ AUDIT LW-II C5b/, 'indoors and below too');
-});

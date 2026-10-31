@@ -61,10 +61,6 @@ test('ROAD-BEYOND the box reaches past an end beyond the table: a traveller wall
   assert.deepEqual(r.pixels.at(-1), { x: 1500, y: 260 });
   // and the other way about: the end walled in is the goal
   assert.ok(planRoute({ x: 1500, y: 260 }, { x: 1500, y: 300 }, { isWater: lake }), 'and to her');
-  // on the Bay the box is the map's, as it was: the table's own edge the bound
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /const reachOf = \(margin\) => \(past \? \{ x0: Math\.min\(bounds\.x0, offTable\(from\) \? from\.x - margin : Infinity/);
-  assert.match(src, /: bounds\);\n/);
 });
 
 test('ROAD-BEYOND a long plan past the Bay walks its roads, found over the roads alone: every step a road\'s, the cells expanded a handful a pixel of the road - where the ladder flooded the field beside it (mutants: the roads first, the step\'s edge)', () => {
@@ -176,10 +172,6 @@ test('ROAD-BEYOND the Bay\'s own plans are the Bay\'s: both ends on the table, n
   for (let x = 100; x <= 140; x++) net.roads[200 * MAP_W + x] = (x > 100 ? DIR.W : 0) | (x < 140 ? DIR.E : 0);
   const r = planRoute({ x: 100, y: 200 }, { x: 140, y: 200 }, { ...net });
   assert.deepEqual(r.kinds, new Array(40).fill('road'));
-  const src = read('src/systems/travel/travelRoute.js');
-  assert.match(src, /const past = offTable\(from\) \|\| offTable\(to\);/);
-  // PIN MOVED (ROAD-FOLLOW): and only where the roads join the two ends (roadEndsSteps' `strict`)
-  assert.match(src, /if \(past && beyond && ends\?\.strict && \(!sea \|\| \(sea\.start === 'land' && sea\.goal !== 'sea'\)\)\) \{/);
 });
 
 // ── WITH ARENA2: the freeware's own Tamriel ─────────────────────

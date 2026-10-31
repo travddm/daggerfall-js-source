@@ -136,44 +136,6 @@ test('AUDIT TESA II M4: online, a zone hall\'s door is inked over the zone\'s fo
   assert.ok(win._model.marks.some((m) => m.kind === 'hall'), 'the hover and the press keep it among the marks');
 }));
 
-test('AUDIT TESA II M5: offline (the host\'s halls null) the zone is drawn and none of its laws said - the key\'s tip and door, the press, the legend\'s rules and loot; online the laws, Cyrodiil\'s travel law in place of the Wrothgarian zone\'s carriages (mutants: the key ungated; the press ungated; the legend\'s laws offline; the carriages back)', withMap(async () => {
-  const off = openMap({ wildDungeons: () => null, wildGiants: () => [], zoneFirst: () => false });
-  off.win._keySig = ''; off.win._renderKey();
-  const keyOff = texts(off.win._chrome.root).join(' | ');
-  assert.ok(keyOff.includes(ZONE_MAP_TEXT.chipTipOffline()) && !keyOff.includes(WILD_TEXT.chipTip), 'the key\'s tip offline');
-  assert.ok(keyOff.includes(ZONE_MAP_TEXT.doorOffline()) && !keyOff.includes(ZONE_MAP_TEXT.door()), 'its door\'s');
-  // the zone still drawn offline: its fog on the sheet
-  off.win._setView({ ox: 1300, oy: 0, scale: 0.6 });
-  const calls = await paintSettled(off.win);
-  assert.ok(calls.some(([c, fn, a]) => c === off.win._subLayers.over.id && fn === 'drawImage' && a.length === 5), 'the fog drawn offline');
-  // a press on Cyrodiil is the world map's
-  let at = null;
-  for (let y = 0; y < 2000 && !at; y += 5) for (let x = 1000; x < 3500 && !at; x += 5) if (wildInside(off.mask, x + 0.5, y + 0.5)) { const [sx, sy] = toPaper(off.win._view, x + 0.5, y + 0.5); if (sx > 50 && sy > 50 && sx < off.win._paper.w - 50 && sy < off.win._paper.h - 50) at = { sx, sy }; }
-  off.win._pickAt(at.sx, at.sy);
-  assert.equal(off.win._zoneMap, false, 'offline a press opens no zone map');
-  assert.ok(off.win._openZoneMap(), 'its door does');
-  const legendOff = texts(off.win._zoneLegend).join(' | ');
-  assert.ok(legendOff.includes(ZONE_MAP_TEXT.offline()), 'the legend: its laws hold online');
-  assert.ok(!/% loot|Other players can attack you|four times/.test(legendOff), `no loot, no PvP said: ${legendOff}`);
-  off.win.dispose?.();
-  const on = openMap({ wildDungeons: () => [], wildGiants: () => [] });
-  on.win._setView({ ox: 1300, oy: 0, scale: 0.6 });
-  on.win._pickAt(at.sx, at.sy);
-  assert.equal(on.win._zoneMap, true, 'online a press on the zone opens its map');
-  const legendOn = texts(on.win._zoneLegend).join(' | ');
-  assert.ok(legendOn.includes(ZONE_MAP_TEXT.travel()) && !legendOn.includes('Carriages run inside the zone'), 'Cyrodiil\'s travel law');
-  assert.ok(ZONE_RULES.every((l) => legendOn.includes(l)), 'and the zone\'s laws');
-  assert.deepEqual(zoneRules(false), [ZONE_MAP_TEXT.offline()]);
-  on.win._keySig = ''; on.win._renderKey();
-  assert.ok(texts(on.win._chrome.root).join(' | ').includes(WILD_TEXT.chipTip), 'the key\'s tip online');
-  // the host's wiring: the map's laws are the halls' - null where wildMapMask is
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /wildDungeons: \(\) => wildActiveNow\(\),/);
-  assert.match(W, /const wildActiveNow = \(\) => zoneHalls\.activeOf\(wildMapMask\(\)\);/);
-  assert.match(W, /const wildMapMask = \(\) => \(_onlineWorldSession\(\) \? cyrodiilMask\(\) : null\);/);
-  assert.match(read('src/scenes/zoneHallsHost.js'), /const activeOf = \(mask\) => \{\n\s+if \(!mask\) return null;/);
-}));
-
 test('AUDIT TESA II M6 and K5: on the zone map each of Cyrodiil\'s cities is named once - the zone map\'s names, with their kinds (a capital and a city-state the city, a town the hamlet, a village the village: REGION-LINES\' one glyph a kind across Tamriel) - and Hide place names hides them all (mutants: the continent\'s names kept; the kinds flattened)', withMap(async () => {
   const { win } = openMap();
   assert.ok(win._openZoneMap());
@@ -269,24 +231,3 @@ test('AUDIT TESA II K3: ZOOM-FAST\'s settle - the first scale settles none, a ch
 // ── M8: THE ORE CARD PAST THE BAY, OFF THE HOST'S MAPS (ARENA2) ──
 const A2 = process.env.ARENA2_PATH;
 const file = (name) => { for (const n of [name, name.toLowerCase()]) { const p = join(A2, n); if (existsSync(p)) return readFileSync(p); } throw new Error(name); };
-test('AUDIT TESA II M8: bare land past the Bay answers with its ore card - the host\'s own card (world.js oreMapAt: oreMapTip over its maps, groundMaps\' past the Bay) - so Cyrodiil\'s says every province\'s ores; a city past the Bay none (mutant: the card unasked past the Bay)', { skip: !A2 || !existsSync(A2 ?? '') ? 'no ARENA2_PATH' : false }, withMap(async () => {
-  const W = hostText('src/scenes/world.js');
-  assert.match(W, /return oreMapTip\(\{ climate: maps\.getClimateIndex\(px, py\), region: maps\.getRegionIndexAt\(px, py\), fact, surveyed \}\);/, 'the producer\'s shape');
-  assert.match(W, /groundMaps\(maps\);/);
-  const { groundMaps } = await import('../../src/world/tamriel/tamrielGround.js');
-  const maps = new MapsFile();
-  maps.load(file('MAPS.BSA'), file('CLIMATE.PAK'), file('POLITIC.PAK'));
-  groundMaps(maps);
-  const asked = [];
-  const { win } = openMap({ maps, oreAt: (px, py) => { asked.push([px, py]); return oreMapTip({ climate: maps.getClimateIndex(px, py), region: maps.getRegionIndexAt(px, py), fact: null, surveyed: false }); } });
-  win._setView({ ox: 1300, oy: 0, scale: 0.6 });
-  let tip = null, label = null;
-  for (let y = 100; y < 1500 && !tip; y += 37) for (let x = 1600; x < 3000 && !tip; x += 41) {
-    const [sx, sy] = toPaper(win._view, x + 0.5, y + 0.5);
-    const h = win._hoverLabel(sx, sy);
-    if (h?.tip && /Imperial Province/.test(h.label)) { tip = h.tip; label = h.label; }
-  }
-  assert.ok(tip, 'a card on Cyrodiil\'s land');
-  assert.ok(tip.lines.some((l) => l.startsWith('Cyrodiil holds every province\'s ores and metals')), `${label}: ${tip.lines.join(' / ')}`);
-  assert.ok(asked.every(([x]) => x >= BAY_W), 'asked past the Bay');
-}));

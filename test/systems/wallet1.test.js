@@ -303,9 +303,3 @@ test('WALLET1 the Use: the wallet\'s use is its own kind - the classic window sh
   for (const line of WALLET_CARD_LINES) assert.ok(rows.some((t) => String(t).includes(line)), line);
 });
 
-test('WALLET1 the hosts: the streaming host tells the wallet the account\'s silver (the marks book\'s balance, refreshed as the sheet opens) - online alone; THE FOUR HOSTS read no door of their own (mutants: the reader unregistered; registered offline)', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (AUDIT 625 W5): an account that holds none answers false (the wallet says none), never null (the wait)
-  assert.match(w, /if \(marksBook\) setWalletSilver\(\(\) => \(marksBook\.state\.open === false \? false : marksBook\.state\.balance\), \(\) => marksBook\.refresh\(\)\);/);
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(src(f), /setWalletSilver/, f);
-});

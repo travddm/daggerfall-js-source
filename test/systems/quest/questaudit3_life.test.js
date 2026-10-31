@@ -222,27 +222,6 @@ test('PROMPT-HELD, PromptMulti: the 2-4 button box is held the same way - asked 
   assert.equal(promptOf(qn).isComplete, true, 'no showPromptMulti: spent at once');
 });
 
-test('PROMPT-HELD: a party\'s resync, which rebuilds every action, finds the box held at its place (its task, its index) and does not ask again; the answer spends the action standing there now; the bridge hands the host\'s box through by the same law (mutants: the resync\'s complete; source pin: the bridge\'s doors)', () => {
-  const m = rig();
-  const q = m.startQuestByName('__ASK');
-  ticks(m);
-  const asked = promptOf(q);
-  q.restoreSaveData(envelope(m).quests.find((d) => d.uid === q.uid), m._saveResolvers());   // updateSharedQuest's own restore, in place
-  const rebuilt = promptOf(q);
-  assert.notEqual(rebuilt, asked, 'the fixture: a new action at the place');
-  ticks(m);
-  assert.equal(m.seen.boxes.length, 1, 'the box is up: not asked again');
-  m.seen.boxes[0].respond(true);
-  assert.equal(rebuilt.isComplete, true, 'the answer spends the action at its place now');
-  ticks(m);
-  assert.equal(m.seen.boxes.length, 1, 'and nothing asks again');
-  assert.equal(task(q, 'yes').getTriggerValue(), true);
-
-  const bridge = src('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /showPrompt: \(q, message, respond\) => \(ctx\.showPrompt \? ctx\.showPrompt\(q, message, respond\) \?\? true : false\),/);
-  assert.match(bridge, /showPromptMulti: \(q, message, buttons, respond\) => \(ctx\.showPromptMulti \? ctx\.showPromptMulti\(q, message, buttons, respond\) \?\? true : false\),/);
-});
-
 // PIN MOVED (AUDIT QA3 A2/B3): "paid" is narrowed to what a restart cannot take back and would pay again - a trainer's
 // lesson, or an item handed over (a `give pc` that is no `give pc nothing`, a `get item`) that is not gold and is the
 // player's for good (made permanent, or released: its item no quest item). Gold is not (restartQuest carries the old
@@ -354,10 +333,6 @@ test('SHELF-TWIN: keepsQuestItem - the reclaim\'s "is it kept" - reads every kee
   }
   assert.equal(keepsQuestItem({}, res), false);
   assert.equal(keepsQuestItem(null, res), false);
-  const world = src('src/scenes/world.js');
-  assert.equal((world.match(/carriesQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/g) ?? []).length, 1, 'the share\'s relay: every keeping');
-  assert.equal((world.match(/keepsQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/g) ?? []).length, 1, 'the machine\'s reclaim: every keeping');
-  assert.match(world, /carriesQuestItem: \(res\) => \(playerEntity\.items \?\? \[\]\)\.some\(\(it\) =>\n\s*it\.questItem && it\.questUID === res\.parentQuest\?\.uid && it\.questSymbol\?\.name === res\.symbol\?\.name\),\n\s*keepsQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/, 'the machine\'s `toting` and `have`: the pack');
 });
 
 test('RESTART-WORDS: a questline step the journal restarted is no stall - its end lets the drop\'s "could not begin" go, and the runner\'s next look, the step running again, lets go its day of waiting; a step that truly could not begin is still said, and tried again a day later, never every look (mutants: the end\'s clear, the look\'s clear, its wait, its running test)', () => {

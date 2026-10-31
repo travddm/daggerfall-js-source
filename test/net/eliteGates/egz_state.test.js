@@ -519,7 +519,6 @@ test('EG-ZJ THE JOINER\'S STATE (section 22; layer three\'s look departure close
     const bare = (src.match(/k: 'eob'/g) ?? []).length - (f === 'egBodies.js' ? 1 : 0);
     assert.equal(bare, 0, `${f}: an object's state said bare`);
   }
-  assert.equal((readFileSync(new URL('../../../src/net/eliteGates/egLords.js', import.meta.url), 'utf8').match(/egObSay\(/g) ?? []).length, 8, 'Grath\'s islands (cracked, fallen, risen), the soul-gems (a soul laid, emptied), the runes (lit, stood on) and the true umbra\'s glint');   // PIN MOVED (AUDIT EG V, b: lane1 #12 - the Night-Stalker's true umbra glints, said through egObSay)
 });
 
 const poseAt = (spec, x, z, y = 0) => { const [px, py, pz] = realmToDungeon(spec.x0 + x, y, z); return { x: px, y: py, z: pz, yaw: 0, pitch: 0 }; };

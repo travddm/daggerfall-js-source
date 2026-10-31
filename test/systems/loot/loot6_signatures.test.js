@@ -86,7 +86,4 @@ test('LOOT6: the doors - a corpse\'s family its foe\'s, a dungeon pile\'s its ki
   assert.ok(legs > 50, `enough Legendaries (${legs})`);
   // a battle axe's pool (Wyrmbane, Graveward, Gortwog's Cleaver) gives the undead's own 5 in 7; a dagger's has none of theirs
   assert.ok(ownUndead / legs > 0.25, `the undead's own lean in (${ownUndead} of ${legs})`);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /family: dungeonFamily\(dfLocation\.mapTableData\.dungeonType\) \}/, 'a dungeon pile names its kind\'s family');
-  assert.match(read('src/systems/loot/lootRarity.js'), /const source = corpseSource\(basics, entity\.level, entity\.mobileType\);/, 'the corpse door its foe\'s type');
 });

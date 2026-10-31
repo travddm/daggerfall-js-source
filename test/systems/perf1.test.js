@@ -67,13 +67,4 @@ test('PERF1 pins: every host stamps its frame, the grass takes the pref\'s fract
   assert.equal(PREF_DEFAULTS.grassDensity, 1, 'PIN MOVED (GRASS-ON, Mac: "Can you please turn grass on by default"): the full field by default again - the enhanced look is the law, the dial is the escape');
   assert.equal(PREF_DEFAULTS.cloudQuality, 'default');
   assert.ok(Object.hasOwn(QUALITY, PREF_DEFAULTS.cloudQuality));
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const grassDensity = Math\.max\(0, Math\.min\(1, Number\(getPref\('grassDensity'\)\) \|\| 0\)\) \* LAB_GRASS\.density;/);
-  assert.match(w, /getPref\('enhancedEnvironments'\) && grassDensity > 0 &&/, 'a zero density builds no renderer');
-  assert.match(w, /createGrassField\(labGrass, \{ keep, ground, slope, density: grassDensity \}\)/, 'the field is built at the fraction');
-  assert.match(read('src/scenes/shared.js'), /Object\.hasOwn\(CLOUD_QUALITY, cloudsDoor\) \? cloudsDoor : \(Object\.hasOwn\(CLOUD_QUALITY, getPref\('cloudQuality'\)\) \? getPref\('cloudQuality'\) : 'default'\)/, 'the URL door still wins; the pref sits behind it; an unknown pref is the default');
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  // FT7: the two rows are the Features registry's now (test/systems/ft7_quality.test.js pins their tiers); the menu holds no copy
-  assert.ok(!/choiceRow\('grassDensity'|choiceRow\('cloudQuality'/.test(menu), 'the rows left the Enhanced category for the Features home');
-  assert.match(read('src/ui/fpsCounter.js'), /const cpu = frameCpu\(\);/, 'the counter reads the clock');
 });

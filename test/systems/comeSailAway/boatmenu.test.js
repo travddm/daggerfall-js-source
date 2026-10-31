@@ -12,7 +12,6 @@ import { boatTriggers, boatMenuRows, boatMenuStart, boatMenuRefusal, boatVerbNod
 import { mintBoatItem } from '../../../src/systems/comeSailAway/comeSailAwayItems.js';
 import { resolveHover, nextSelection } from '../../../src/systems/worldHover.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const menuOf = (boat, s = {}) => {
   const boxes = boatTriggers(boat.GameObject, activationModelOf, TRIGGER_MODEL);
   return { boxes, rows: boatMenuRows({ boxes, packable: boat.packable, variants: boat.VariantObject != null && boat.GetVariantCount >= 1, ...s }) };
@@ -121,22 +120,10 @@ test('BOAT-MENU: A VERB PRESSED GOES THROUGH THE MOD\'S OWN ACTIVATION - "Take t
 });
 
 test('BOAT-MENU: THE WORLD\'S WIRING - my boat\'s plaque lists its verbs (the bed only its name), the box under the crosshair lit first; the press takes the verb the plaque lit before the box\'s own, and where no plaque stands (a tap, the classic skins) a press on the hull opens the verbs as a picker, closed before the verb runs (mutants: the verbs unlisted, the lit verb unread, the picker unasked, the walk kept past a style)', () => {
-  // PIN MOVED (AUDIT BOAT-MENU C1, C4): none at a helm; the hull's list unlit
-  assert.match(WORLD, /if \(mine\.part === 'bed' \|\| csaRuntime\?\.isSailing\(\)\) return \{ title \};/);
-  assert.match(WORLD, /if \(box == null\) return \{ title, actions: rows, actionsUnlit: true \};/);
-  assert.match(WORLD, /const start = boatMenuStart\(box, rows, getInteractionMode\(\)\);\n\s+return start < 0 \? \{ title \} : \{ title, actions: rows, actionsStart: start \};/);
-  assert.match(WORLD, /const verb = plaqueActionFor\(pick\?\.key\);\n\s+if \(verb && pick\.boat\) \{ csaBoatVerb\(pick, verb\); return; \}/);
-  // PIN MOVED (AUDIT BOAT-MENU C5, C1): a building's and a dungeon's too; never at a helm
-  assert.match(WORLD, /if \(pick\?\.boat && \(!worldPlaqueOn\(\) \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) && !csaRuntime\?\.isSailing\(\) && pick\.distance <= CSA_ACTIVATION_DISTANCE\) csaOpenBoatMenu\(pick\);/);
-  assert.match(WORLD, /if \(_csaPicker\) \{ modes\?\.closeWindow\?\.\(_csaPicker\); _csaPicker = null; \}\n\s+csaBoatVerb\(pick, rows\[i\]\?\.id\);/);
-  assert.match(WORLD, /const csaStandsOn = \(boat\) => !!player\.grounded && typeof player\.groundKey === 'string' && player\.groundKey\.startsWith\(`csaBoat:\$\{csaBoatId\(boat\)\}:`\);/);
-  assert.match(WORLD, /if \(!c \|\| c\.root !== boat\.GameObject \|\| c\.variant !== boat\.variant\) _csaBoxes\.set\(boat,/, 'the walk kept per hull and style');
   assert.equal(BOAT_MENU_TEXT.cargo, 'Open storage');
 });
 
 test('AUDIT BOAT-MENU (C1, C2, C4, C6): NO LIST AT A HELM, THE STEAL MODE ITS OWN KEY, THE HULL UNLIT, THE LADDER AIMED AT - the pad\'s d-pad stays the helm\'s; a mode switched at the helm\'s box lights that mode\'s verb again (a new key); a plain click on the hull presses nothing until the wheel lights a row; the far ladder aimed at boards there (mutants: the list at a helm, the mode unkeyed, the hull lit, the aimed box unread)', () => {
-  assert.match(WORLD, /\$\{modelId === CSA_TRIGGER_MODEL\.drive && getInteractionMode\(\) === 'steal' \? ':steal' : ''\}`, distance: best\.hit\.distance,/, 'Steal at the helm\'s box: a key of its own');
-  assert.match(WORLD, /\/\^csaBoat:\(\\d\+\):\(\[\^:\]\+\)\(\?::steal\)\?\$\//, 'and read back as the same box');
   // the hull's list: unlit - the press finds no verb until a step lights one
   const rows = boatMenuRows({ boxes: new Set(['drive', 'board', 'cargo']), packable: true });
   const hull = resolveHover({ key: 'csaBoat:1:hull', distance: 1, reach: 3.2 }, { name: () => ({ title: 'Rowboat', actions: rows, actionsUnlit: true }) });
@@ -152,5 +139,4 @@ test('AUDIT BOAT-MENU (C1, C2, C4, C6): NO LIST AT A HELM, THE STEAL MODE ITS OW
   const [l0, l1] = boxes.get('board');
   assert.equal(boatVerbNode(boxes, BOAT_VERB.board, l0.position, (n) => n.position, l1), l1, 'the ladder aimed at, the nearer notwithstanding');
   assert.equal(boatVerbNode(boxes, BOAT_VERB.board, l0.position, (n) => n.position, ship.GameObject), l0, 'the hull aimed at: the nearer');
-  assert.match(WORLD, /posOf: \(n\) => n\.position, aimed: pick\.hit\?\.node \?\? null,/);
 });

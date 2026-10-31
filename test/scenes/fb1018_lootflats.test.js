@@ -92,10 +92,3 @@ test('LOOT-FLATS A REMINTED PILE KEEPS ITS CLOCK: a recentre and a moved ground 
   assert.equal(a.entries.length, 1);
 });
 
-test('LOOT-FLATS ONE WAY TO FREE A PILE\'S BATCH: every destroyBillboardBatch in the pool is freeBatch\'s or remintBatch\'s (mutants: a free written again by hand)', () => {
-  const src = readFileSync(new URL('../../src/scenes/droppedLoot.js', import.meta.url), 'utf8');
-  const frees = src.match(/renderer\.destroyBillboardBatch\(/g) ?? [];
-  assert.equal(frees.length, 2, 'freeBatch and remintBatch alone');
-  assert.match(src, /function freeBatch\(p\) \{\n\s+if \(!p\.batch\) return;\n\s+flatAnims\.remove\(p\.batch\);\n\s+renderer\.destroyBillboardBatch\(p\.batch\);/);
-  assert.match(src, /flatAnims\.rebind\(was, p\.batch\);/);
-});

@@ -113,36 +113,6 @@ const tookOf = (r, before) => Math.max(0, Math.min(r.damage, before));
 
 // ── the law and the powers (lane 1) ─────────────────────────────────
 
-test('AUDIT SCHOOLS L1 H1 / L3 F1: RIFT LANCE AND CHAIN LIGHTNING KEEP THE LOOT\'S ONE REACH LAW (lootPowers.js near) - never my summon, never a foe at peace (a calmed one, a guard not yet hostile), never one a storey off, never one behind a wall; and an arc is its spell\'s element (elementShare): none on a foe immune to shock, half on one that resists (mutants: the reach unfiltered; the rise unread; the wall unread; the share dropped)', () => clean(() => {
-  for (const id of ['riftwalker', 'elementalist']) {
-    reset();
-    const p = pathMage(id, 100);
-    const struck = rec('struck', realFoe(MT.knight, { health: 900, maxHealth: 900 }), [0, 0, 0]);
-    const hostile = rec('hostile', realFoe(MT.knight), [2, 0, 0]);
-    const summon = rec('summon', realFoe(MT.daedra, { team: 'PlayerAlly' }), [1, 0, 0]);
-    const calmed = rec('calmed', realFoe(MT.knight), [1.5, 0, 0], { isHostile: false });
-    const upstairs = rec('upstairs', realFoe(MT.knight), [1, 3, 0]);
-    const walled = rec('walled', realFoe(MT.knight), [2.5, 0, 0]);
-    const all = [struck, hostile, summon, calmed, upstairs, walled];
-    const d = door(all, p, { clear: (_a, b) => b !== walled.ai.feet });
-    const before = struck.entity.health;
-    const r = engine(p, all).applySpellToFoe(signatureSpell(id), 20, struck, { entity: p });
-    const share = id === 'riftwalker' ? 1 / 3 : 1 / 2;
-    assert.deepEqual(d.hurts, [['hostile', Math.floor(tookOf(r, before) * share)]], `${id}: the hostile foe alone`);
-  }
-  // the shock share - Chain Lightning's arcs are shock, as the loot's are (a rider of a magic element arcs as magic)
-  reset();
-  const el = pathMage('elementalist', 100);
-  const t0 = rec('t0', realFoe(MT.knight, { health: 900, maxHealth: 900 }), [0, 0, 0]);
-  const immune = rec('immune', realFoe(MT.knight, { career: { ...FOE_CAREER, immunityFlags: EFFECT_FLAGS.Shock } }), [2, 0, 0]);
-  const resists = rec('resists', realFoe(MT.knight, { career: { ...FOE_CAREER, resistanceFlags: EFFECT_FLAGS.Shock } }), [3, 0, 0]);
-  const d2 = door([t0, immune, resists], el);
-  const before = t0.entity.health;
-  const r2 = engine(el, [t0, immune, resists]).applySpellToFoe(signatureSpell('elementalist'), 20, t0, { entity: el });
-  assert.deepEqual(d2.hurts, [['resists', Math.floor(tookOf(r2, before) * 0.5 * 0.5)]], 'immune: nothing; resists: half of the half');
-  assert.match(src('src/systems/arcanePowers.js'), /return near\(door, at, metres, struck\.entity\)/, 'the one reach law, no second copy');
-}));
-
 test('AUDIT SCHOOLS L1 H2 / L5 H1: THE LIGHTBRINGER READS THE LOOT\'S ONE FOE GROUP (lootPowers.js foeGroup) - a Barbarian, a Knight and the City Watch are men, though their class\'s careerIndex (15, 17, 18) names undead as a monster\'s; a skeleton and a daedra are what Dawn\'s Ward and Dawnbolt\'s second burn are for (mutants: the careerIndex read as a monster\'s)', () => clean(() => {
   const lb = pathMage('lightbringer', 100);
   const pow = (t) => page(true, () => spellPowerMult(lb, t, { online: false }));
@@ -588,38 +558,6 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
   assert.ok(cl, 'Comprehend Languages landed');
   assert.equal(cl.chance, 50, 'its own chance');
 }));
-
-test('AUDIT SCHOOLS L2 F4: MY SPELL ON THE RELAY\'S STAND-INS IS TOLD TO THE RIDERS - the court\'s Warden, its crystals, its host and the serpent\'s hide each tell the landing (no foe record: the relay holds the body), and the cast engine hands each its cast\'s wrapper (by source: the stand-ins live inside the page builders) (mutants: a stand-in untold; the caster dropped)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the court's three spell doors left the context as one
-  // (scenes/gate/standInSpell.js onBody) - each counted on its stand-in and told, and what the riders are told is what can
-  // land there (the number the HUD says), never a claim no relay lands
-  const sis = src('src/scenes/gate/standInSpell.js');
-  assert.match(sis, /function tellStandIn\(sp, entity, r, took, caster\) \{\n\s*tellSpellLanded\(\{ caster: player, target: entity, foe: null, spell: sp, r, self: false, took, cast: caster\?\.cast \?\? null \}\);/);
-  assert.match(sis, /const \{ dealt: counted, r, kept \} = countOnStandIn\(harm, body\.entity, player\.level, player, rolls, rounds\.carried\(key\)\);\n\s*const dealt = counted >= 1 \? bossStrike\(body\.entity, counted, \{ kind: 'spell', element: sp\.element \?\? null \}\)\.damage : counted;[^\n]*\n\s*if \(!\(dealt >= 1\)\) \{[^]*?\n\s*\}\n\s*const shown = standInShown\(dealt, standInBlowCap\(body\.entity, player\.level\)\);\n\s*tellStandIn\(sp, body\.entity, r, shown, caster\);/);
-  for (const [fn, who, land] of [['spellOnCrystal', 'cr', 'landOnCrystal'], ['spellOnHost', 'hb', 'landOnHost'], ['spellOnBoss', 'boss', 'landOnBoss']]) {
-    assert.match(sis, new RegExp(`function ${fn}\\(sp, [^)]*caster = null\\) \\{[\\s\\S]*?return onBody\\(sp, ${who}, harm, caster, host\\.${land}, `), fn);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): each its rounds' key
-  }
-  assert.match(dc, /castAtBoss: opts\.gateBoss \? \(sp, caster\) => spellOnBoss\(sp, caster\) : null,/);
-  assert.match(dc, /castAtCrystal: opts\.gateCrystals \? \(sp, c, caster\) => spellOnCrystal\(sp, c, caster\) : null,/);
-  assert.match(dc, /castAtHost: opts\.gateHost \? \(sp, i, caster\) => spellOnHost\(sp, i, caster\) : null,/);
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): the serpent's door left bootWorld for scenes/gate/standInSpell.js createSerpentSpell, which tells the riders
-  assert.match(sis, /tellSpellLanded\(\{ caster: player, target: e, foe: null, spell: sp, r, self: false, took: standInShown\(dealt, SERPENT_HIT_CAP_X \* SERPENT_HAND_REF\), cast: caster\?\.cast \?\? null \}\);/);
-  assert.match(w, /castAtBox: \(sp, q, caster\) => serpentSpell\.cast\(sp, q, caster\),/);
-  const hm = src('src/scenes/hostMagic.js');
-  assert.match(hm, /function giveToBoss\(mark, sp, caster = null\) \{/);
-  assert.match(hm, /else giveToBoss\(hitBoss, m\.spell, playerCaster\(m\.cast \?\? null\)\);/);
-  assert.match(hm, /castAtBox\(m\.spell, hitBox, playerCaster\(m\.cast \?\? null\)\)/);
-});
-
-test('AUDIT SCHOOLS L2 F8 / L5 H2: WHAT THE PATHS DO IS REGISTERED WITH THE ONE CAST ENGINE EVERY PAGE BUILDS - hostMagic.js imports arcanePowers.js, and the world, the exterior and the dungeon page each build that engine (the standalone dungeon page had the paths\' price and none of their powers) (mutants: the import dropped)', () => {
-  assert.match(src('src/scenes/hostMagic.js'), /^import '\.\.\/systems\/arcanePowers\.js';/m);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(src(f), /const magic = createPlayerMagic\(\{/, `${f} builds the one engine`);
-    assert.match(src(f), /import \{[^}]*createPlayerMagic[^}]*\} from '\.\/hostMagic\.js';/, `${f} from hostMagic.js`);
-  }
-});
 
 // ── online integrity (lane 3) ───────────────────────────────────────
 

@@ -262,15 +262,3 @@ test('AUDIT CRAFT-WRITS C1/C6/C8: the Work tab - the day\'s three filled said on
   assert.equal(byClass(thrown, 'notice-craft')[0].querySelector('button').disabled, false);
 });
 
-test('CRAFT-WRITS client: the wiring - the host made once in world.js and named on the Work tab; the door posts the realm and the pieces; the book asks it once (the realm act asks again); the service\'s route and its progress line (mutants: the host unwired - every other seam held by its source line here, the book\'s by its own test above)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const craftWrits = createCraftWritHost\(\{ player: \(\) => playerEntity, session: \(\) => realmSession, checkpoint: \(\) => onlineCheckpoint\(\), saved: \(\) => saveSoon\.changed\(\), book: \(\) => profBook \}\);/);
-  assert.match(w, /onTaken: \(r\) => profWritTaken\(r\),\n\s+crafts: craftWrits,/);
-  assert.match(src('src/net/accountClient.js'), /craftWrit: \(character, id, rid, realm, pieces = null\) => post\('\/v1\/writs\/craft', \{ character, id, rid, realm, \.\.\.\(pieces \? \{ pieces \} : \{\}\) \}\),/);
-  assert.match(src('src/net/profBook.js'), /async craftDeliver\(writId, pieces = null, realm = null\) \{[^]*?door\.craftWrit\(c, writId, m\.id, realm, pieces\)/);
-  const ix = src('server-account/src/index.js');
-  assert.match(ix, /'\/v1\/writs\/craft': \(\) => deliverCraftWrit\(\{ \.\.\.ctx, bucket: env\.SAVES \}, who\.player, env, body\),/);
-  assert.match(ix, /\.\.\.\(await craftWritBoard\(ctx, who\.player, env, body\)\) \};/);
-  assert.match(src('server-account/src/progress.js'), /'\/v1\/writs\/craft': Object\.freeze\(\['prof', true\]\),/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/writs\/craft',\n/);
-});

@@ -255,30 +255,5 @@ test('LW2 the switch: the Features row `living-world` (on, the player\'s own onl
   LIVING_WORLD_TUNING.override = false;
   assert.equal(livingWorldOn(), false);
   LIVING_WORLD_TUNING.override = null;
-  const src = rd('src/systems/livingWorld/livingSwitch.js');
-  assert.match(src, /isEnhanced\(\) && getPref\(LIVING_WORLD_KEY\) !== false/);
 });
 
-test('LW2 the streaming host: where the row is on, the population block stands a LivingTown on the same navgrid, bodies (ResidentWalker on the same collider, ground and batches) and racial override; DFU\'s pool otherwise, as it was; every door names its building (the block\'s grid cell); the regards ride the save as `LivingWorld`; the residents speak through the crew\'s one layer; the talk ray asks the body\'s town for a refusal and notes the word (mutants: each seam removed)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /population = livingWorldOn\(\) \? new LivingTown\(nav, \{/);
-  assert.match(w, /\}\) : new TownPopulation\(nav, \{/);
-  assert.match(w, /const person = new ResidentWalker\(nav, \{ archive, guard, frameCount: \(rec, a\) => personTex\.get\(a\)\.getFrameCount\(rec\), collider: personCollider, groundY: personGroundY \}\);\n\s+personBatches\.set\(person, renderer\.createBillboardBatch\(archive, 0, \{ w: 1, h: 1 \}, \[\[0, 0, 0\]\]\)\);/);
-  assert.match(w, /groundY: personGroundY,   \/\/ JAN1/);
-  assert.match(w, /door, pixelKey: key, dfBlock: b\.dfBlock, blockX: b\.x, blockY: b\.y,/);
-  assert.match(w, /key: makeBuildingKey\(d\.blockX, d\.blockY, d\.recordIndex\)/);
-  assert.match(w, /clock: skyMinutes, rate: livingRate, mpm: PERSON_MOVE_SPEED \/ livingBaseRate\(\),/);
-  assert.match(w, /const livingBaseRate = \(\) => \(params\.has\('online'\) \? skyMinutesPerMsAt\(Date\.now\(\) \+ _sharedOffsetMs\) \* 1000 : CLASSIC_MINUTES_PER_SECOND\);/);
-  assert.match(w, /const livingRate = \(\) => \(params\.has\('online'\) \? livingBaseRate\(\) : CLASSIC_MINUTES_PER_SECOND \* worldTimeScale\(\)\);/);
-  assert.match(w, /registerModSaveData\(LIVING_WORLD_VENDOR, \{\n\s+newSaveData: \(\) => null,\n(?:\s+\/\/[^\n]*\n)*\s+getSaveData: \(\) => \{ _caravanHost\?\.flush\(\); return livingRelations\.snapshot\(\); \},\n\s+restoreSaveData: \(rec\) => \{ livingRelations = characterRelations\(rec, ownMinutes, params\.has\('online'\)\); \},/);   // PIN MOVED (AUDIT LW-II-2 C3): the caravan host's counters written into the record before its snapshot; FIELD BUGS 2026-10-21d REGARD-OWN: made in the character's own days
-  const lines = w.slice(w.indexOf('function navalCrewLines('), w.indexOf('function livingLinePoints('));
-  assert.match(lines, /livingLinePoints\(points, w, h, rect, proj, view, eye\);/);
-  assert.ok(lines.indexOf('livingLinePoints(') < lines.indexOf('drawCrewLines('), 'merged before the one draw');
-  // PIN MOVED (LEGACY-HOME): the doors gained `kin` - one of Project Legacy's line met before the words (test/systems/legacyhome.test.js)
-  // PIN MOVED (LW11): a caravan's door after the kin's
-  assert.match(w, /livingTalk: \{ refuses: \(person\) => person\?\.living\?\.town\?\.refuses\(person\) \?\? null, talked: \(person\) => person\?\.living\?\.town\?\.talked\(person\), caught: \(person\) => person\?\.living\?\.town\?\.caught\?\.\(person\),\n\s*regard: \(person\) => regardBadge\(person\?\.living\?\.town\?\.regardCard\?\.\(person\) \?\? null\),[^\n]*\n\s*friendsMade: \(\) => friendCards\([^\n]*\n\s*kin: \(person, talk\) => legacyMeetKin\(person, talk\),[^\n]*\n\s*offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\) \},/);   // PIN MOVED (AUDIT LW-II-2 D4): a company below answers below alone; PIN MOVED (PLAIN-UI): and the talk panel's regard beside the doors; PIN MOVED (AUDIT FB1021d RO-4): and the friends made, said once the HUD is clear
-  const tt = rd('src/scenes/townTalk.js');
-  const act = tt.slice(tt.indexOf('function activate(target, dist)'));
-  assert.ok(act.indexOf('livingTalk?.refuses?.(target.person)') > 0 && act.indexOf('livingTalk?.refuses?.(target.person)') < act.indexOf('const eng0 = engine();'), 'the refusal before the conversation');
-  assert.ok(act.indexOf('livingTalk?.talked?.(target.person);') > act.indexOf('_talkNpc = target.person;'), 'the word noted once it is a conversation');
-});

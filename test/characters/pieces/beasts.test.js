@@ -57,8 +57,6 @@ test('beasts: a design collapses exactly what it does not use', () => {
       `${d.name} collapses ${JSON.stringify(groups)} but replaces ${replacesBody ? 'its whole body' : replacesHead ? 'its head' : 'nothing'}`,
     );
   }
-  const src = readFileSync(new URL('../../../src/characters/paperdoll/paperdollPayload.js', import.meta.url), 'utf8');
-  assert.ok(/collapseGroups\(bf, d\.collapse \|\| ALL_GROUPS/.test(src), 'the payload ignores a design\'s collapse list');
 });
 
 test('beasts: they stand on the ground, and not through it', () => {
@@ -94,18 +92,6 @@ test('beasts: one builder, three animals that are not each other', () => {
   assert.ok(rat.h < bear.h * 0.5, 'the rat is not markedly lower than the bear');
   assert.ok(bear.w > tiger.w, 'the bear is not broader than the cat');
   assert.ok(tiger.len > bear.len, 'the cat is not longer than the bear');
-});
-
-test('beasts: the piece is what the player sees, so it must exist', () => {
-  // The whole animal IS the piece. Adding `beast` to PIECE_KINDS without
-  // building a table for the line left three animals rendering as
-  // NOTHING — the rig under them is collapsed, so there was not even a
-  // man left to see. The tables are keyed by line now.
-  const src = readFileSync(new URL('../../../src/tools/paperdoll/paperdollViewer.js', import.meta.url), 'utf8');
-  assert.ok(/pieceTables = \{/.test(src), 'piece tables are not keyed by line');
-  for (const line of ['orc', 'undead', 'class', 'atronach', 'beast']) {
-    assert.ok(new RegExp(`${line}: buildPieces\\(`).test(src), `the ${line} line has no piece table`);
-  }
 });
 
 test('beasts: legal ramps, and a pelt each', () => {

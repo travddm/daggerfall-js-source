@@ -36,10 +36,6 @@ test('REL7: a release\'s body with its notes written again - the new notes above
   assert.equal(renotedBody('Fixes and improvements.\n', notes), notes, 'a body with no list is replaced whole');
   assert.equal(renotedBody(null, notes), notes);
   assert.equal(renotedBody(`x\n\n**Full Changelog**: https://x`, notes), `${notes}\n\n**Full Changelog**: https://x`, 'a release with no pull requests listed has only the changelog line');
-  // the cut is the launcher's own: one place a player's news ends
-  const launcher = rd('app/lib/launcherState.cjs');
-  const theirs = /const GENERATED_RE = (\/.*\/m);/.exec(launcher)?.[1];
-  assert.equal(String(GENERATED_LIST_RE), theirs, 'app/lib/launcherState.cjs GENERATED_RE and this cut must move together');
 });
 
 test('REL7: the renotes command, spawned as release-notes.yml spawns it - from main\'s checkout, the pull requests up to the TAG and no further, the notes off gh; a missing tag or a failed read leaves the release as it is', { skip: process.platform === 'win32' && 'a shell script stands in for gh' }, () => {

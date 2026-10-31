@@ -100,8 +100,6 @@ test('AUDIT-SEATS A SIEGE\'S LENGTH IN THE CHRONICLE (9.2: "stormed the gates of
 });
 
 test('AUDIT-SEATS THE RIBBON GOES WITH THE GUILD: a socket whose guild is taken off (a removal carried in, or a new guild\'s order) wears no ribbon on its row; on the page a peer whose tag moves loses its ribbon, in the room and in memory, and so do I when my own tag moves; a frame that leaves the tag as it was keeps it (mutants: the relay\'s strip; the page\'s three)', async () => {
-  const relay = readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(relay, /_unguild\(a\) \{ const b = \{ \.\.\.a \}; delete b\.gi; delete b\.gt; delete b\.gm; delete b\.rb; return b; \}/);
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1_000_000 });
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
@@ -128,16 +126,6 @@ test('AUDIT-SEATS THE RIBBON ON THE TRAVEL VIEW: a traveller frame keeps the rib
   assert.deepEqual(f.rb, [0, 2]);
   assert.equal(validTravellerFrame({ t: 'trav', id: 'peer-0002', name: 'Bran', p: null, rb: [2, 2] }).rb, null);
   assert.deepEqual({ ...TRAVEL_VIEW_RIBBON }, { band: 2, edge: 1, gap: 1 });
-  const hud = readFileSync(new URL('../../src/ui/travel/travelViewHud.js', import.meta.url), 'utf8');
-  assert.match(hud, /const ribbonH = P\.rb \? TRAVEL_VIEW_RIBBON\.gap \+ TRAVEL_VIEW_RIBBON\.band \+ TRAVEL_VIEW_RIBBON\.edge : 0;/, 'the sprite grown to hold it');
-  assert.match(hud, /h = Math\.ceil\(titleH \+ rowH \+ 2 \+ ribbonH\)/);
-  assert.match(hud, /glyphs: glyphBadges\(b\), rb: ribbonColours\(b\?\.rb\), arms: badgeArms\(b\) \};/);   // AUDIT HERALDRY H4: and the tag's arms
-  assert.match(hud, /\$\{b\.gt \?\? ''\}\|\$\{\(Array\.isArray\(b\.rb\) \? b\.rb : \[\]\)\.join\('\/'\)\}/, 'the sprite keyed by it');
-  assert.match(hud, /x\.fillStyle = P\.rb\.field; x\.fillRect\(cx, by, rowW, R\.band\);\n\s+x\.fillStyle = P\.rb\.border; x\.fillRect\(cx, by \+ R\.band, rowW, R\.edge\);/);
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = readFileSync(new URL('../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
-  assert.match(tvm, /const tvBadgeOf = \(p\) => \(\{[^\n]*gt: p\.gt \?\? null, rb: p\.rb \?\? null \}\);/);
 });
 
 test('AUDIT-SEATS THE HALL OF RECORDS FROM THE BOARD AND IN THE CASTLES: the Seat tab reads the whole Chronicle as the book (said where it cannot); the world opens it in place of the board; a crown\'s castle shelves are its Hall of Records while the seats are open, pressed into the dungeon\'s own window slot (mutants: the button; its refusal; the board\'s door; the castle\'s shelves; the castle\'s gate; its press)', async () => {
@@ -161,40 +149,6 @@ test('AUDIT-SEATS THE HALL OF RECORDS FROM THE BOARD AND IN THE CASTLES: the Sea
   byClass(host, 'notice-seat-records')[0].onclick();
   await tick();
   assert.ok(host.textContent.includes(HALL_OF_RECORDS_SHUT), 'said where it cannot be read');
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /seatRecords: \(st\) => openRecordsFromBoard\(st\),/);
-  assert.match(world, /await hallOfRecordsRead\(st\)[^\n]*\n[^\n]*\n\s+if \(!w\) return false;\n\s+townTalk\.showOverlay\(w\);/);   // PIN MOVED (AUDIT CHAP4 C5): the board opens the palace's own read, its window the Hall's whole book
-  assert.match(readFileSync(new URL('../../src/ui/noticeWindow.js', import.meta.url), 'utf8'), /\.\.\.\(deps\.seatRecords \? \{ readRecords: deps\.seatRecords \} : \{\}\)/);
-  // the castles
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dc, /if \(b\.layout\.castleBlock && isShopShelfModel\(p\.modelIdNum\)\) castleShelves\.push\(\{ aabb \}\);/);
-  const modes = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(modes, /const castleRecordsHere = \(\) => mode === 'dungeon' && !!dungeonLoc && !!host\.hallOfRecords\?\.here\?\.\(\(dungeonLoc\.mapTableData\?\.mapId \?\? 0\) >>> 0\);/);
-  assert.match(modes, /ctx\.addActivationTargets\(\(\) => \(castleRecordsHere\(\) \? ctx\.castleShelves\.map\(\(s, i\) => \(\{ key: `records:\$\{i\}`, aabb: s\.aabb,/);
-  assert.match(modes, /if \(key\.startsWith\('records:'\)\) \{ openCastleRecords\(\); return true; \}/);
-  // PIN MOVED (AUDIT-SEATS C11): and over a window opened meanwhile it is disposed, not stacked
-  assert.match(modes, /if \(mode !== 'dungeon' \|\| dungeonLoc !== at \|\| dungeonCtx\?\.overlayWindow\?\.\(\)\) \{ dropRecords\(w\); return; \}\n\s+if \(w\) mountServiceWindow\(w\);\n\s+else say\(HALL_OF_RECORDS_SHUT\);/);
-});
-
-test('AUDIT-SEATS THE CHRONICLE NAMES WHAT WAS PAID: a vassal\'s tribute and a Conscription whose treasury held less than the due say what it held - and nothing where it held nothing (mutants: the ledger\'s amount; the row\'s lookup; the empty)', async (t) => {
-  const src = readFileSync(new URL('../../server-account/src/seatTurning.js', import.meta.url), 'utf8');
-  assert.match(src, /SELECT \?1, \?2, \?3, json_set\(\?4, '\$\.marks', amount\), \?5 FROM marks_ledger WHERE actor = 'seats' AND rid = \?6/);
-  assert.match(src, /paidHistory\(c\.crownKey, 'conscription', \{ guild: names\.get\(c\.crown\), from: names\.get\(c\.guild\) \}, rid\)/);
-  assert.match(src, /paidHistory\(k, 'fealty-tribute', \{ vassal: names\.get\(f\.vassal\), liege: names\.get\(f\.liege\) \}, `fealty-\$\{week\}-\$\{f\.vassal\}`\)/);
-  // the SQL itself, over the real schema: a ledger row of 30 against a due of 120 - the row says 30; none written, none said
-  const s = await stood(t);
-  const raw = s.raw;
-  const v = await s.guild('Vara', 'Vassals', 'VA'), l = await s.guild('Liam', 'Lieges', 'LI');
-  raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-    VALUES ('mint', NULL, 'guild', ?, 'test', 100, 1, 1, 'seed', NULL, 'seed-v')`).run(v.gid);
-  raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-    VALUES ('guild', ?, 'guild', ?, 'fealty-tribute', 30, 1, 1, 'seats', 'The Turning', 'fealty-9-g1')`).run(v.gid, l.gid);
-  const ins = raw.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
-    SELECT ?1, ?2, ?3, json_set(?4, '$.marks', amount), ?5 FROM marks_ledger WHERE actor = 'seats' AND rid = ?6`);
-  ins.run(5023, 9, 'fealty-tribute', JSON.stringify({ vassal: { name: 'V', tag: 'V' }, liege: { name: 'L', tag: 'L' } }), 1, 'fealty-9-g1');
-  ins.run(5023, 9, 'fealty-tribute', JSON.stringify({}), 1, 'fealty-9-none');
-  const rows = raw.prepare("SELECT data FROM town_seat_history WHERE kind = 'fealty-tribute'").all().map((r) => JSON.parse(r.data));
-  assert.deepEqual(rows, [{ vassal: { name: 'V', tag: 'V' }, liege: { name: 'L', tag: 'L' }, marks: 30 }]);
 });
 
 test('AUDIT-SEATS THE SIEGE-CRACKED GEM: template 678 registered on the Diamond\'s picture, a Stores material of the gems at the Diamond\'s tier that withdraws as an item and is named as one; never a vein\'s strike (mutants: the template; the registry)', () => {

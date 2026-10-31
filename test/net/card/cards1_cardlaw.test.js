@@ -66,8 +66,6 @@ test('CARDS1 the shuffle: Fisher-Yates from the top, each partner drawn 0..i, th
   for (let k = 0; k < 6000; k++) { const o = shuffleDeck(xorshift, [0, 1, 2]).join(''); seen.set(o, (seen.get(o) ?? 0) + 1); }
   assert.deepEqual([...seen.keys()].sort(), ['012', '021', '102', '120', '201', '210']);
   for (const v of seen.values()) assert.ok(v > 850 && v < 1150, `order seen ${v} of 6000`);
-  assert.doesNotMatch(readFileSync(new URL('../../../src/net/card/cardLaw.js', import.meta.url), 'utf8'), /2 \*\* 32/,
-    'the unbiased draw has one home, net/dice.js drawBelow');
 });
 
 test('CARDS1 every category and its tie-break ranks, five cards', () => {

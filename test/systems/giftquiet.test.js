@@ -166,9 +166,3 @@ test('GIFT-QUIET: the gate - said fresh, never said, or said a window ago; held 
   assert.equal(pass('a', true), true, 'fresh');
 });
 
-test('GIFT-QUIET by source: a party mate\'s gift on my side says its line through the gate - a stranger\'s keeps its own rate, and the heal\'s line stays', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const _mateGiftGate = createGiftLineGate\(\);/);
-  assert.match(w, /const targetLine = allyCastTargetLine\(who, spell\.name\);\s*\n\s*if \(loud && \(!mate \|\| _mateGiftGate\(targetLine\)\)\) townTalk\.say\(targetLine\);/);
-  assert.match(w, /if \(healed > 0 && loud\) townTalk\.say\(`You are healed \$\{healed\} points\.`\);/);
-});

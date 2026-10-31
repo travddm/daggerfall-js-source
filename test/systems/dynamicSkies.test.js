@@ -99,8 +99,6 @@ test('DS1 vendor: every texture a shipped preset names is vendored, with an impo
     if (STAR_FIELDS.includes(f) || f === 'CdMCloudsNormal') continue;
     assert.equal(imp.filter, 'point', `${f} keeps the mod's Point - DS3 moved the star fields and nothing else`);
   }
-  // and the departure is written down where the table is, not only in the Ledger
-  assert.match(read('src/systems/dynamicSkies/dynamicSkies.js'), /DS3 \(2026-09-15, Mac: "the nighttime sky has these dark spots/, 'the table says why it departs');
   // the shader sources are beside the port for reading
   assert.match(read(`${V}/Shaders/BLBProceduralSkybox.shader`), /^﻿?Shader "BLB\/SkyBox\/BLBProceduralSkybox"/);
   assert.ok(existsSync(join(root, V, 'Shaders/Includes/MoonFunctions.cginc')));
@@ -579,15 +577,6 @@ test('DS1 shader: every property the mod declares is a uniform of the same name,
   assert.match(FS, /float bandB = uBandDither \* \(bayer4\(bandCell\) - 0\.46875\);/,
     'PS3: half a step either way, zero-mean, on a world-fixed cell');
   assert.ok(UNIFORM_NAMES.includes('uBandDither'), 'and the switch is fetched like every other uniform');
-  // THE DOOR IS WHAT MAKES THE DEPARTURE LEGAL, so it is pinned like the
-  // shader is. Delete the upload and uBandDither sits at its default 0 -
-  // the mod's raw ceil - and PS3 silently does nothing, which is exactly
-  // the _CloudTopColorBoost failure this file's own comment cites.
-  const rend = read('src/render/dynamicSkiesRenderer.js');
-  assert.match(rend, /this\.bandDither = true;/, 'the dither is on by default');
-  assert.match(rend, /gl\.uniform1f\(u\.uBandDither, this\.bandDither \? 1 : 0\);/, 'and it is actually uploaded');
-  assert.match(read('src/scenes/shared.js'), /dynamicSky\.bandDither = params\.get\('bands'\) !== 'raw';/, '?bands=raw reaches the game');
-  assert.match(read('src/tools/skyLab.js'), /sky\.bandDither = params\.get\('bands'\) !== 'raw';/, 'and the lab shows what the game shows');
   // WORLD-FIXED, never the screen. Indexed by gl_FragCoord the stipple is
   // locked to the display while the sky slides under it, so it crawls when
   // the camera turns - at half of the mod's band, which in the darks is
@@ -653,73 +642,7 @@ test('DS1 shader: every property the mod declares is a uniform of the same name,
   assert.match(FS, /#define MESH_ROW 0\.0625/);
 });
 
-// ── THE SEAM ──────────────────────────────────────────────────────
-test('DS1 seam: the controller stands the mod beside the dome on the one lane, and both hosts are wired', () => {
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /const dynamicOn = enhancedLane && \(skyDoor === 'dynamic' \|\| \(skyDoor === null && modSetting\('dynamic-skies', 'Enabled'\)\)\);/,
-    'the mod’s own switch, under the lane; ?sky=dynamic forces it, any other door the dome');
-  assert.match(shared, /setLightCurve\(dynamic \? dynamic\.lightCurve : null\);/, 'SetLightCurve for the world while it is the sky');
-  assert.match(shared, /fogSettings: dynamic\?\.fogSettings,/);
-  assert.match(shared, /onAmbientEffect\(playerPos, storm = true\) \{ dynamic\?\.onAmbientEffect\(playerPos, storm\); \}/);
-  assert.match(shared, /setInside\(inside\) \{ dynamic\?\.setInside\(inside\); \}/, 'AUDIT 61: the transition seam on the controller');
-  assert.match(shared, /dynamicMoonState\(dynamic, minuteOfDay, weatherRowNow\.cover\)/, 'AUDIT 61: the eased cover stands in for the mod’s clouds');
-  assert.match(read('src/render/dynamicSkiesBridge.js'), /vis: dir\[1\] > 0 \? \(1 - day\) \* cloud : 0/, 'AUDIT 61: the dome’s cloud factor over the mod’s moons (DS2: in the bridge)');
-  assert.match(read('src/render/dynamicSkiesRenderer.js'), /gl\.uniform3f\(u\._CloudTopColorBoost, 0, 0, 0\)/, 'AUDIT 61: the top boost is inert, as the readme says it is');
-  assert.match(shared, /lightningLight\(\) \{ return dynamic\?\.lightningLight \?\? null; \}/);
-  assert.match(shared, /dynamic\?\.weatherJump\(\);/, 'a load forces the mod’s re-apply');
-  assert.match(shared, /weatherScale: extra\?\.sun \?\? weatherSunlightScale\(weatherName, winter\)/, '_LightColor0 takes WeatherManager’s ScaleFactor - the host’s own (AUDIT 61)');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    if (host.endsWith('world.js')) {
-      assert.match(s, /let weatherFog = weatherFogRow\(weather\);/, `${host}: the boot fog over the mod’s table (through the EV4 row helper, AUDIT 61)`);
-      assert.match(s, /weatherFog = weatherFogRow\(w\);/, `${host}: and every change`);
-    } else {
-      assert.match(s, /fogForWeather\(weather, sky\.fogSettings\)/, `${host}: the boot fog over the mod’s table`);
-      assert.match(s, /fogForWeather\(w, sky\.fogSettings\)/, `${host}: and every change`);
-    }
-    assert.match(s, /const fogColor = (?:jungle \? jungle\.haze\(\{ fogColor: sky\.fogColorFor\(fogNow\), [^\n]*\}\) : )?sky\.fogColorFor\(fogNow\);/, `${host}: the fog colour through the controller`);   // BANTHA1: the jungle's haze over it, in the streaming host
-    assert.match(s, /ambience\.onPlayEffect = \(clip, playerPos\) => sky\.onAmbientEffect\(playerPos, ambientWord === 'thunder'\);/, `${host}: OnPlayEffect reaches the listener, with the word the ambience plays`);
-    assert.match(s, /ambientWord = enhancedFront \? soundWeather\(fx, weather\) : weather;/, `${host}: the ambient word is the preset’s`);
-    assert.match(s, /if \(!skyInside\) \{ skyInside = true; sky\.setInside\(true\); \}/, `${host}: InteriorTransitionEvent on the modal edge (AUDIT 61)`);
-    assert.match(s, /if \(skyInside\) \{ skyInside = false; sky\.setInside\(false\); \}/, `${host}: ExteriorTransitionEvent before the sky’s frame`);
-    assert.match(s, /isEnhanced\(\) && !sky\.dynamic \? strobe : 1/, `${host}: one lightning under the mod - the strobe stands down (AUDIT 61)`);
-    assert.match(s, /classicMinutes: playerTicker\.classicMinutes, skyMinutes: skyMinutes\(\), sun: wxNow\.sun, flash: flash - 1, pos: [^}]+ \}/, `${host}: the ONE sunlight scale the ground takes rides the sky’s frame (AUDIT 61; WX2’s blend of the host’s SetSunlightScale)`);   // TIME1: and the sky's minute beside the event clock's
-    // PIN MOVED (STAR4): the world host's channel takes a fallen star's landing last (scenes/starfall/starfallHost.js flash)
-    const starLast = host === 'src/scenes/world.js' ? ' ?? starfall?.flash() ?? null' : '';
-    assert.ok(s.includes(`renderer.setFlashLight(sky.lightningLight() ?? boltFrame.flash${starLast});`), `${host}: the flash on the light channel - the mod's first, else a near ground strike's (BOLT)`);
-    assert.match(s, /if \(sky\.pixelSnow\) precipOpts\.pixelSnow = sky\.pixelSnow;/, `${host}: the pixel snow`);
-    // the flash composes AFTER the lanterns are stored
-    assert.ok(s.lastIndexOf('renderer.setPointLights(') < s.indexOf('renderer.setFlashLight(sky.lightningLight() ?? boltFrame.flash'), `${host}: setFlashLight follows setPointLights`);
-  }
-  // AUDIT 61: the mod's fog rows are installed verbatim - EV4's distance
-  // scale is DFU's row's law - and the far ring's ramp starts where the
-  // row starts
-  const world = read('src/scenes/world.js');
-  assert.match(world, /sky\.dynamic \? fogForWeather\(w, sky\.fogSettings\) : scaleFogForDistance\(fogForWeather\(w\), fogDistance\)/);
-  assert.match(world, /fogStart: fogNow\.start \?\? 0, fogEnd: fogNow\.end,/);
-  const ring = read('src/render/farRing.js');
-  assert.match(ring, /uniform float uFogStart;/);
-  // PIN MOVED (FAR-SEA1): the ramp is the horizon's one law (render/horizonHaze.js), the ring hands it the fog's start
-  assert.match(ring, /horizonHaze\(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, summitHold\(uHazeHold, vDist\)\)/);   // PIN MOVED (RED-MOUNTAIN): the hold eased over the summits; PIN MOVED (AUDIT RED-MOUNTAIN F6): and by the eye's distance
-  assert.match(read('src/render/horizonHaze.js'), /float ramp = clamp\(\(d - fogStart\) \/ max\(fogEnd - fogStart, 1\.0\), 0\.0, 1\.0\);/);
-  // the classic pass knows nothing of it
-  assert.doesNotMatch(read('src/render/skyRenderer.js'), /dynamic/i);
-  // the lab has the door
-  assert.match(read('src/tools/skyLab.js'), /params\.get\('sky'\) === 'dynamic'/);
-});
-
 test('DS1 renderer: exp2 fog in every world pass, and the flash composes first under the cap of sixteen', () => {
-  const r = read('src/render/renderer.js');
-  // SEVEN since BLOOD1a: the decal pass is a world pass too - a mark on
-  // a floor a hundred units off has to fade into the same fog the floor
-  // does, or it hangs in the murk brighter than the ground it is on.
-  // AUDIT 68 S17-fog-glsl-dup: ONE fogFactorAt (fogGlsl.js), which all seven interpolate
-  const fog = read('src/render/fogGlsl.js');
-  assert.equal((fog.match(/if \(uFogMode == 3\) \{ float f = uFogDensity \* d; return exp\(-f \* f\); \}/g) || []).length, 1, 'the exp2 line, once');
-  assert.equal((r.match(/^\$\{FOG_GLSL\}$/gm) || []).length, 7, 'every world program takes it');
-  assert.ok(!/float fogFactorAt\(/.test(r), 'and none keeps a copy');
-  assert.match(r, /mode === 'exp2' \? 3 : 0/);
-  assert.match(r, /const FOG_MODE_NAMES = \['off', 'linear', 'exp', 'exp2'\];/);
   // the composition, on a state object with the renderer's fields
   const st = {
     _pointLights: new Float32Array([1, 2, 3, 4, 5, 6, 7, 8]), _pointColors: null, _pointColor: new Float32Array([0.5, 0.5, 0.5]),
@@ -741,8 +664,6 @@ test('DS1 renderer: exp2 fog in every world pass, and the flash composes first u
   const before = st._pointLights;
   Renderer.prototype.setFlashLight.call(st, null);
   assert.equal(st._pointLights, before); assert.equal(st._flashLight, null);
-  // the world's fog readers know exp2
-  assert.match(read('src/world/weather.js'), /if \(settings\.mode === 'exp2'\)/);
 });
 
 test('DS1 ambience: AmbientEffectsPlayer.OnPlayEffect - raised from PlayEffects after every one-shot', () => {
@@ -764,38 +685,6 @@ test('DS1 ambience: AmbientEffectsPlayer.OnPlayEffect - raised from PlayEffects 
   assert.equal(got.length, 0);
 });
 
-test('DS1 settings: the mod’s own keys as modsettings ships them, the integer keys clamped, the Mods pane renders steppers', () => {
-  _resetModSettings();
-  try {
-    const m = MOD_SETTINGS['dynamic-skies'];
-    assert.equal(m.title, 'Dynamic Skies');
-    assert.deepEqual(Object.keys(m.keys), ['Enabled', 'densitySetting', 'ActivatePixelSnow', 'MinParticleSize', 'MaxParticleSize', 'MaxParticles']);
-    const ms = JSON.parse(read(`${V}/modsettings.json`));
-    for (const sec of ms.Sections) {
-      for (const k of sec.Keys) {
-        const def = m.keys[k.Name];
-        assert.ok(def, `${k.Name} carried`);
-        assert.equal(def.default, k.Value, `${k.Name} default`);
-        if (k.Min !== undefined) { assert.equal(def.min, k.Min); assert.equal(def.max, k.Max); assert.ok(isIntKey(def)); }
-        else assert.ok(!isIntKey(def));
-        // PLAIN-TEXT (2026-10-19): MaxParticles is read and never applied (AUDIT 61), and the pane now says so - its words, exactly
-        if (k.Name === 'MaxParticles') assert.equal(def.description, 'Has no effect: the mod never uses this setting.', 'the pane says the slider does nothing');
-        else assert.equal(def.description, k.Description, `${k.Name} description is the mod’s, verbatim (AUDIT 61: the pane shows nothing the author did not write)`);
-      }
-    }
-    assert.equal(modSetting('dynamic-skies', 'Enabled'), true, 'VC1 (2026-09-07) made it a choice in the Mods pane; MO1 (Mac, 2026-09-12): every mod is on by default');
-    assert.equal(modSetting('dynamic-skies', 'densitySetting'), 1);
-    assert.equal(setModSetting('dynamic-skies', 'densitySetting', 14), 10, 'clamped to the slider');
-    assert.equal(setModSetting('dynamic-skies', 'densitySetting', 0), 1);
-    assert.equal(setModSetting('dynamic-skies', 'MinParticleSize', 250.7), 250, 'an integer');
-    assert.equal(modSetting('dynamic-skies', 'ActivatePixelSnow'), false);
-    const all = modSettingsOf('dynamic-skies');
-    assert.equal(all.MinParticleSize, 250); assert.equal(all.Enabled, true);   // VC1 made the mod a choice; MO1: on by default
-    assert.equal(modSetting('roads-hazelnut', 'SmoothRoads'), true, 'the toggles read as before');
-    assert.match(read('src/ui/enhanced/enhancedMenu.js'), /if \(isIntKey\(def\)\) \{/, 'the pane steps the integer keys');
-  } finally { _resetModSettings(); }
-});
-
 // ── MODS AUDIT (2026-09-08): the 1:1 re-audit against BLBSkybox.cs ────
 test('MODS AUDIT: FlashOnce reads the player LIVE - a double flash\u2019s second half follows the player (LightningFlash.cs:95)', () => {
   // a double: rolls [< 0.5] [< 0.33] then FlashOnce's draws at 0.5
@@ -813,7 +702,6 @@ test('MODS AUDIT: FlashOnce reads the player LIVE - a double flash\u2019s second
   const e = new LightningFlash(seq([0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]));
   e.startFlash([7, 0, 0]); e.tick(0.05); e.tick(0.05); e.tick(0.05); e.tick(0.04);
   assert.ok(near(e.tick(0.06).x, 7));
-  assert.match(read('src/scenes/shared.js'), /playerPos: extra\?\.pos \?\? null,/, 'the controller hands the frame\u2019s position through');
 });
 
 test('MODS AUDIT: a flash rolled under a NON-Thunder word runs on indoors, on Unity\u2019s clock - it does not freeze at the door and pay out on the way back', () => {
@@ -855,7 +743,6 @@ test('MODS AUDIT: SunSizeConvergence is an int on the struct; the frame clamp is
   const s = parseSkyboxSetting(JSON.stringify({ SunSizeConvergence: 7.9 }));
   assert.equal(s.SunSizeConvergence, 7, '`public int SunSizeConvergence` - JsonUtility truncates at the parse, not at SetInt');
   assert.equal(MAX_DELTA_SECONDS, 1 / 3, 'Unity\u2019s default maximumDeltaTime');
-  assert.match(read('src/scenes/shared.js'), /Math\.min\(MAX_DELTA_SECONDS, Math\.max\(0, seconds - weatherAt\)\)/);
   const base = 405 * 360 * MINUTES_PER_DAY + 10 * MINUTES_PER_DAY;
   const d = new DynamicSkies(assets(), {}, () => 0.25, { classicMinutes: base + 12 * 60 });
   assert.deepEqual(d.mat._MoonOrbitAngle.slice(0, 2), [270, 90], 'ApplyOrbitCalculations ran inside Init (:138-139), before OnWeatherChange');

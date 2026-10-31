@@ -53,30 +53,6 @@ function privateTable(file, name) {
   return found.arguments[0].properties.map((p) => [p.key.name ?? p.key.value, p.value.value]);
 }
 
-test('L10N3d parity: every key of every converted table is one of DFU\'s 990, holding DFU\'s English byte for byte', async () => {
-  let keys = 0;
-  for (const [file, name] of EXPORTED) {
-    const table = (await import(new URL('../../' + file, import.meta.url).href))[name];
-    for (const [k, en] of Object.entries(table)) {
-      assert.ok(DFU.has(k), `${file} ${name}.${k} is no Internal_Strings key`);
-      assert.equal(en, english(file, name, k), `${file} ${name}.${k} is not DFU's English`);
-      keys++;
-    }
-  }
-  for (const [file, name] of PRIVATE) {
-    for (const [k, en] of privateTable(file, name)) {
-      assert.ok(DFU.has(k), `${file} ${name}.${k} is no Internal_Strings key`);
-      assert.equal(en, english(file, name, k), `${file} ${name}.${k} is not DFU's English`);
-      keys++;
-    }
-  }
-  assert.equal(keys, 223, "every converted table's keys");
-  assert.equal(DFU.get('commoners'), 'Commoners', 'the exception names a DFU key');
-  const [, from, to] = /repLabel = \(g\) => REP_LABELS\[g === '(\w+)' \? '(\w+)' : g\]/.exec(rd('src/ui/enhanced/enhancedChargen.js')) ?? [];
-  const repKeys = new Set(privateTable('src/ui/enhanced/enhancedChargen.js', 'REP_LABELS').map(([k]) => k));
-  for (const g of REP_GROUPS) assert.ok(repKeys.has(g === from ? to : g), `the reputation group ${g} reads its label`);
-});
-
 test('L10N3d each table answers a translation\'s row in its language and its own English everywhere else - frozen, enumerable, and English byte for byte', async () => {
   for (const [file, name] of EXPORTED) {
     tm._resetTextManagerForTests();

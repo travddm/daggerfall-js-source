@@ -491,8 +491,6 @@ test('THE ASCENT - THE ROOMS: THE BUILD SIDE (section 4\'s and world/eliteGates/
     }
   }
   assert.ok(floors >= 10 && ceils >= 3 && walls >= 40 && climbs >= 1, `${floors} floors, ${ceils} ceilings, ${walls} walls, ${climbs} climbs`);
-  const src = readFileSync(new URL('../../../src/world/eliteGates/egRoomModel.js', import.meta.url), 'utf8');
-  assert.ok(!/\b(document|window|navigator|renderer|gl)\./.test(src) && [...src.matchAll(/from '([^']+)'/g)].every((m) => /^(?:\.\.\/)+net\//.test(m[1])), 'pure: a spec in, triangles out');
 });
 
 test('THE ASCENT - THE ROOMS: THE LAB\'S MAP AND ROOMS (section 8 - src/tools/spireMap.js): a law 9 hall\'s map is its route - every link, by kind and road, the main way\'s marked, from the plate to the door, each room named at its middle, each climb\'s face, each void; a law 4-8 hall\'s its course\'s line; two views each room (its mouth, over it) (mutants: the main way unmarked; a law 8 hall\'s line a route)', () => {

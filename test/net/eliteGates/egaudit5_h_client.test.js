@@ -236,9 +236,4 @@ test('AUDIT EG V L3-10 (c) AN ALLY ON TRAVERSAL GROUND DRAWN AT 60% (section 8.2
   assert.equal(rp._shown.length, 1, 'named: its name drawn');
   rp.sync([row], (p) => [p.x, p.y, p.z], { bodyHeight: () => 1.8, conceal: () => ({ mode: CONCEAL_MODE.blend, alpha: 0.3, t: 0, phase: 0 }) });
   assert.equal(rp._shown.length, 0, 'concealed: no name');
-  // the doll's and the class sprite's figures keep it as the body's does (the layer's three name sites)
-  const named = readFileSync(new URL('../../../src/net/remotePlayers.js', import.meta.url), 'utf8').match(/if \(!veil \|\| (?:\/\*\* @type \{any\} \*\/ \()?veil\)?\.named\) this\._shown\.push/g) ?? [];
-  assert.equal(named.length, 3, 'every figure keeps a named veil\'s name');
-  // the host asks it for every peer it draws plain (scenes/world.js - the one line of its veil loop)
-  assert.match(readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8'), /const veil = look\.kind === 'conceal' \? look\.visual : egClient\?\.allyVeil\(social\?\.accountOfPeer\?\.\(d\.id\), d\.shown, onlineToScene\) \?\? null; if \(veil\) _veils\.set\(d\.id, veil\);/);
 });

@@ -195,9 +195,5 @@ test('MEDIUM-DISTINCT the quests: at every load a running quest at a medium size
   q.questComplete = true;
   assert.equal(relayMovedLayouts(m, {}, true), 0);
   q.questComplete = false;
-  // wired at the bridge's load, after the online re-lay, online and off
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const restore = bridge.slice(bridge.indexOf('restore(data) {'));
-  assert.match(restore, /if \(isOnlinePage\(\)\) relayOnlineDungeons\(machine, [^\n]*\n(?:\s*\/\/[^\n]*\n)+\s*relayMovedLayouts\(machine, \{ carriesQuestItem: \(item\) => ctx\.carriesQuestItem\?\.\(item\) \?\? false \}\);\n/);
   // and a shared copy on arrival (systems/quest/questShare.js) - pinned by test/systems/quest/sd20g_delve.test.js
 });

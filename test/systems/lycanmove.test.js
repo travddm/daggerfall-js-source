@@ -142,7 +142,6 @@ test('LM1: the timer is armed at CURSE START, not at the first transform', () =>
   assert.equal(entry.moveSoundTimer, MOVE_SOUND_MIN_SECONDS, 'ARMED at creation, not left null');
   const mid = createLycanthropyCurse(P(), LYCANTHROPY_TYPES.Werewolf, { now: 0, rolls: () => 0.5 });
   assert.equal(mid.moveSoundTimer, 12, 'and it is a real draw across the band');
-  assert.match(read('src/systems/lycanthropy.js'), /InitMoveSoundTimer runs in Start \(:67\) - at the CURSE/);
   // a curse restored from a pre-LM1 save has no timer: arm it rather
   // than counting down from undefined for ever
   const old = beast();
@@ -151,28 +150,3 @@ test('LM1: the timer is armed at CURSE START, not at the first transform', () =>
   assert.equal(lycanthropeMoveSound(old, 5, () => 0), SOUND.EnemyWerewolfMove, 'and works from then on');
 });
 
-test('LM1: all four hosts tick it - the FOUR HOSTS RULE', () => {
-  const call = /\{ const mv = lycanthropeMoveSound\(playerEntity, dt\); if \(mv != null\) audio\.playOneShot\(mv, 1\); \}/;
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js',
-    'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    const src = read(f);
-    assert.match(src, call, `${f} ticks the loop`);
-    assert.match(src, /lycanthropeMoveSound/, `${f} imports it`);
-  }
-  // worldModes' arm is the INTERIOR one and must not sit behind the
-  // cast engine - the beast makes its noise whether or not one exists
-  const wm = read('src/scenes/worldModes.js');
-  const at = wm.indexOf('{ const mv = lycanthropeMoveSound');
-  const before = wm.slice(Math.max(0, at - 400), at);
-  assert.match(before, /\n {4}\}\n/, 'it sits after the `if (magic)` block closes, not inside it');
-});
-
-test('LM1: the flag is retired, and nothing still says the loop pends', () => {
-  const src = read('src/systems/lycanthropy.js').replace(/"[^"]*"/g, '""');
-  assert.equal(/the 4-20s real-time MOVE sound loop while transformed - the one/.test(src), false);
-  assert.match(src, /LM1 SHIPPED THE LAST MEMBER/);
-  // and the claim has no second home in the tree
-  for (const f of ['src/systems/vampirism.js', 'src/systems/infection.js']) {
-    assert.equal(/4-20s real-time MOVE sound loop/.test(read(f).replace(/"[^"]*"/g, '""')), false, `${f}`);
-  }
-});

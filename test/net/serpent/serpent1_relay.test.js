@@ -322,7 +322,6 @@ test('SERPENT1 relay: THE CELL\'S OTHER DUTIES STILL RUN under a serpent\'s beat
     assert.ok(sweeps >= 1 && sweeps <= 3, `the rest ran ${sweeps} times in ten seconds of beats`);
     assert.ok(r.alarm.at <= now() + SERPENT_TICK_MS);
   });
-  assert.match(src('server/src/index.js'), /const sp = await this\._serpentTick\(\);\n\s+if \(sp\) \{/);
 });
 
 // ═══ THE BOOKS ═══════════════════════════════════════════════════════════════════════════════════

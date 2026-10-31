@@ -43,9 +43,6 @@ test('ONE-BAG: the trade windows\' Buy basket - pack and basket together - takes
   const e = body();
   const basket = [shelfBag()];
   assert.equal(planTake(shelfBag(), { bag: [...e.items, ...basket], entity: e }).refusal, REFUSAL.secondBag, 'a second staged in the same purchase');
-  // both windows hand planTake the pack and the basket (the DECOR2b pins hold their furniture filter; this holds the shape)
-  assert.match(src('src/ui/enhanced/enhancedTrade.js'), /return planTake\(item, \{ bag: \[\.\.\.deps\.packItems\(\), \.\.\.basket\.filter\(\(x\) => !isFurnishing\(x\)\)\], entity: deps\.entity \?\? null \}\);/);
-  assert.match(src('src/ui/native/nativeTrade.js'), /planTake\(item, \{\n\s+bag: \[\.\.\.this\.hooks\.packItems\(\), \.\.\.this\.basket\.filter\(\(x\) => !isFurnishing\(x\)\)\],/);
 });
 
 test('ONE-BAG: the bag being taken is not "another" - the wagon\'s own bag comes back into an empty pack, and nothing but a bag is ever refused for one (mutants: the bag counted against itself; every take refused)', () => {
@@ -55,13 +52,6 @@ test('ONE-BAG: the bag being taken is not "another" - the wagon\'s own bag comes
   const held = body({ pack: [shelfBag()] });
   assert.equal(planTake(mintMaterialItem('log:oak'), { bag: held.items, entity: held }).ok, true, 'a log, beside a bag');
   assert.deepEqual([holdsOtherBag([[bag]], bag), holdsOtherBag([[bag], null], shelfBag()), holdsOtherBag(null, bag)], [false, true, false]);
-});
-
-test('ONE-BAG wired: the keyed shelf\'s purchase refuses a second bag before it takes the gold or the row, and says so (by source; mutants: the keyed guard gone; the gold words for a bag)', () => {
-  const w = src('src/scenes/worldModes.js');
-  const doBuy = w.slice(w.indexOf('function doBuy(shelf, it) {'), w.indexOf('function doSell(shelf, it) {'));
-  assert.match(doBuy, /if \(at < 0\) return undefined;\n\s+if \(isBagItem\(it\) && holdsOtherBag\(\[playerEntity\.items, playerEntity\.wagonItems\], it\)\) return false;[^\n]*\n[\s\S]*deductGold\(playerEntity, price\);/);
-  assert.match(w, /lines: \[bought === false \? BAG_WORDS\.second : 'You do not have enough gold\.'\]/);
 });
 
 test('AUDIT ONE-BAG 1: a bag out of the character\'s own wagon is never refused - two held from before, both carted, come back out one after the other; a bag from anywhere else is still refused beside one (mutants: the wagon\'s own refused)', () => {

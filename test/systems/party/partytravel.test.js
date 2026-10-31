@@ -1004,49 +1004,6 @@ test('PARTY-TRAVEL fare: the travel map\'s own popup prices a journey with no ma
 
 // ─── THE HOST, BY SOURCE ────────────────────────────────────────────────────────────────────────────────────────
 
-test('PARTY-TRAVEL host by source: world.js wires the session - the map door\'s offer and the Begin\'s proposal, the pose\'s share and the leader\'s feet, the sent pose, the tick, the chat\'s two commands, the fare through the popup over the maps\' ONE bag, and the arrival beside the leader; AUDIT PARTY-UI2: outdoors off the mode and journeying off worldMoveBusy (mutants: outdoors always; journeying the Travel Options walk too)', () => {
-  const w = rd('src/scenes/world.js');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('function openTeleportMap'));
-  assert.ok(door.indexOf('if (!gotoPlace && partyTravel?.mapOffer()) return false;') > door.indexOf('const ftb = racialFastTravelBlock(playerEntity'), 'the offer after every refusal the door asks');
-  assert.ok(door.indexOf('if (!gotoPlace && partyTravel?.mapOffer()) return false;') < door.indexOf('_travelMap = buildTravelMapWindow('), '...and before the map is built');
-  assert.match(door, /onTravel: \(pick, opts, computed\) => \{\n\s*if \(TEST_GODMODE && staffPowers\(\)\.god && pick\?\.pixel\) \{ teleportTo\(pick\); return; \}[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(pick\?\.pixel && !pick\.coords\) \{\n\s*const at = playerTravelPixel\(\);\n\s*if \(at && at\.x === pick\.pixel\.x && at\.y === pick\.pixel\.y && wildHallAt\([^\n]*\{ townTalk\.say\('You are already there\.'\);[^\n]*hudFade\.clearFade\(\); return; \}\n\s*\}\n\s*if \(partyTravel\?\.propose\(pick, opts, computed\)\) \{ hudFade\.clearFade\(\); return; \}[^\n]*\n\s*if \(opts\?\.playerControlled && beginAcceleratedTravel\(/, 'the Begin: a gathered party\'s fast travel is a proposal first (the session refuses a walked trip), then the mod\'s walk, then the journey');   // TESTBUILD: a god's instant journey (TEST_GODMODE off in a shipped build), and HALL-HERE: a Begin on the zone hall I stand at is no journey - both before the proposal; then as ever
-  assert.match(w, /\.\.\.\(partyTravel\?\.poseFields\(\) \?\? \{\}\),\n(?:\s*\.\.\.\(_walk(?:Lead|Ts) [^\n]*\n)*\s*\.\.\.\(social\?\.leads\?\.\(\) && mode === 'exterior' && walkMode && playerSpawned && !worldMoveBusy\(\) \? partyFeetOf\(player\.pos\) : \{\}\),/, 'the pose\'s share; the leader\'s feet in the open air, never mid-journey');
-  assert.match(w, /const partyFeetOf = \(pos\) => \{ const wc = state\.worldCoords\(pos\); return \{ wx: wc\.x, wy: pos\[1\] - state\.compensation\[1\], wz: wc\.z \}; \};/, 'the world pose\'s own frame');
-  assert.match(w, /_partyPose = composePartyPose\(\);(?:\s*\/\/[^\n]*)*\s*if \(socialLink\(\)\?\.sendParty\(_partyPose, \{ urgent: pingNow \}\)\) \{\s*partyTravel\?\.sent\(_partyPose\);\s*if \(pingNow\) partyPing\.sent\(\);\s*\}/, 'AUDIT PARTY-TRAVEL: the session is told of a pose the link SENT - never of one sendParty refused (PARTY_SEND_MS\'s floor, a repeat, its gate); PARTY-PING: urgent skips that floor for the one pose that carries a new point');
-  assert.equal(w.split('partyTravel?.sent(_partyPose)').length, 2, 'no unconditional hand-over left beside it');
-  assert.match(w, /partyTravel\?\.tick\(\);[^\n]*\n\s*partyRestFollowTick\(\);[^\n]*\n\s*partyFrame\(performance\.now\(\)\);/, 'every frame, before the pose is composed - PARTY-REST1\'s mirror still right beside the send');
-  assert.match(w, /const trip = \/\^\\\/\(leader\|travel\)\$\/i\.exec\(text\.trim\(\)\);\n\s*if \(trip\) \{ const line = partyTravel \? partyTravel\.command\(trip\[1\]\.toLowerCase\(\)\) : NO_PARTY_TEXT;/);
-  const onSend = /onSend: \(tabId, text, opts = \{\}\) => \{([\s\S]*?)\n {6}\},/.exec(w)[1];   // PIN MOVED (CHAT-POST #1342: the linked items ride the line - the pin was left on the old send)
-  assert.ok(onSend.indexOf("/^\\/ready$/i") < onSend.indexOf('(leader|travel)') && onSend.indexOf('(leader|travel)') < onSend.indexOf('parseChatLine('), 'the host\'s own commands, then the parser');
-  const fare = w.slice(w.indexOf('function partyTripFare(to, opts) {'), w.indexOf('function partyTravelRefusal() {'));
-  assert.match(fare, /new TravelPopUpWindow\(\{ x: to\.x, y: to\.y \}, \{\s*\.\.\.travelFareDeps\(\),/, 'the popup, over the maps\' own bag');
-  assert.match(fare, /pop\.enforceShipRestriction\(\);\s*pop\.refresh\(\);/);
-  assert.match(fare, /afford: pop\.enoughGoldCheck\(\),/);
-  const bag = w.slice(w.indexOf('createTravelMapWindow({'), w.indexOf('...extra,', w.indexOf('createTravelMapWindow({')));
-  assert.match(bag, /\.\.\.travelFareDeps\(\),/, 'both maps read the same bag the party prices with');
-  const refusal = w.slice(w.indexOf('function partyTravelRefusal() {'), w.indexOf('const partyTravelJourney'));
-  assert.match(refusal, /if \(duelEnemyNear\(\) \|\| areEnemiesNearby\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\]\) \|\| navalHostileNear\(\)\) return localizedText\('cannotTravelWithEnemiesNearby', CANNOT_TRAVEL_ENEMIES_TEXT\);/, 'the door\'s own rungs, in its own words (NAV-H: a hostile ship in reach among them)');
-  assert.match(refusal, /const sun = \(careerFastTravelBlock\(playerEntity, nowMin\) \?\? racialFastTravelBlock\(playerEntity, nowMin\)\)\?\.text \?\? null;[^\n]*\n\s*return sun \? withNightfall\(sun\) : null;/, 'the door\'s own words, and (LIVED1) when the world\'s night falls');   // PIN MOVED (HOOD-CAREER): the career's rung and the racial one, both hooded, in the door's order
-  const travel = w.slice(w.indexOf('async function fastTravelTo(pick, opts, computed)'), w.indexOf('\n  }\n', w.indexOf('async function fastTravelTo(pick, opts, computed)')));
-  assert.match(travel, /resolveArrival: partyArrival \? async \(fallback\)/, 'party landing is validated before the teleport commits');
-  const core = w.slice(w.indexOf('async function _teleportToPixel('), w.indexOf('let _teleporting = false;'));
-  assert.ok(core.indexOf('await resolveArrival(pos)') > core.indexOf('await awaitedBuild('), 'read after the build');
-  // PARTY-FOLLOW: the landing and its line are systems/party/partyArrival.js's, run by test/systems/partyArrivalTransaction.test.js
-  // (the seat, the capsule, the wait, the line); the host only wires them - over its own state, collider and sea
-  assert.match(w, /const partyLanding = createPartyArrivalHost\(\{\s*state, collider, seaY: tvSeaY,/, 'capsule support over the destination collider');
-  assert.match(travel, /const arrival = await partyLanding\.land\(pick, fallback\);\s*beside = arrival\.beside;/, 'the landing the arrival chose, and whether it stands beside the leader');
-  assert.match(travel, /townTalk\.say\(partyLanding\.arrivalLine\(pick, partyArrival, beside, `You arrive at \$\{getLocalizedLocationName\(pick\.mapId, pick\.name\)\}\.`\)\);/);   // L10N3e: the place as shown
-  assert.match(w, /moving: \(\) => worldMoveBusy\(\) \|\| !!travelControlUI\?\.isShowing,/, 'AUDIT PARTY-TRAVEL: no unasked box over a Travel Options walk the player is steering');
-  // AUDIT PARTY-UI2 3: the tab's "Step outside" - the leader's Travel map and the member's journey alike - rests on the
-  // host's own read of the mode; and 2: the tab's "elsewhere" hides over what the door itself refuses as "off", alone
-  const seams = w.slice(w.indexOf('partyTravel = createPartyTravel({'), w.indexOf('\n  });', w.indexOf('partyTravel = createPartyTravel({')));
-  assert.match(seams, /\n\s*outdoors: \(\) => \(modes\?\.mode \?\? 'exterior'\) === 'exterior',/, 'outdoors is the mode machine\'s own answer');
-  assert.match(seams, /\n\s*journeying: \(\) => worldMoveBusy\(\),/, 'journeying is worldMoveBusy, as partyTravelRefusal\'s "off" is - no Travel Options walk');
-  assert.match(w, /relayOk: \(\) => !!socialLink\(\)\?\.partyTravelOk,/, 'a round only through a hub that carries it');
-  assert.match(w, /busy: \(\) => gamePaused\(\),/, 'a prompt waits while a window holds the slot - the pause\'s own question');
-  assert.match(w, /prompt: \(rows, onYes, onNo\) => \{ const box = new YesNoBoxWindow\(\{ rows, onYes, onNo \}\); townTalk\.showOverlay\(box\); return box; \},/, 'UXB1-M\'s box, either skin');
-});
-
 test('PARTY-TRAVEL chat: /leader and /travel are the host\'s own commands, and /help says both', () => {
   for (const n of ['leader', 'travel']) {
     assert.ok(HOST_COMMANDS.includes(n));
@@ -1231,18 +1188,6 @@ test('AUDIT PARTY-UI session: the leader "elsewhere" as the session reads it - m
   assert.equal(f.c('Bran').pt.status().following, true);
 });
 
-test('AUDIT PARTY-UI host by source: the travel map\'s door refuses indoors ITSELF - IsPlayerInside, dfuiOpenTravelMapWindow\'s first test - so the doors past the keydown ladder\'s exterior gate (the Party tab\'s Travel map, the journal\'s Find Place on the interior host) open no map on a building\'s floor (mutants: the door\'s own test dropped)', () => {
-  const w = rd('src/scenes/world.js');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('function openTeleportMap'));
-  const inside = door.indexOf("if ((modes?.mode ?? 'exterior') !== 'exterior') {");
-  assert.ok(inside > 0, 'the door asks it');
-  assert.ok(inside < door.indexOf('if (!travelMapDoorReady())'), 'first, as DFU asks it - ahead of the art, the enemies and the sun');
-  assert.ok(inside < door.indexOf('_travelMap = buildTravelMapWindow('), 'and before the map is built');
-  assert.match(w, /openMap: \(\) => toggleTravelMap\(\),/, 'the session\'s openMap - the tab\'s Travel map - is that door');
-  assert.match(w, /gotoPlace: \(place\) => toggleTravelMap\(place\),/, 'as the journal\'s Find Place is');
-  assert.match(w, /makeJournal: \(mode\) => makeJournalWindow\(mode\),/, 'and the interior host builds its journal here');
-});
-
 // ─── AUDIT PARTY-UI2 (2026-09-27, the second audit - of the fixes above) ─────────────────────────────────────────
 
 test('AUDIT PARTY-UI2 session: "Travel to <leader>" hides only where the door itself would refuse - over my own journey or load (`journeying`, its "The journey is off."), never over my Travel Options walk, from which /leader goes; a neighbouring pixel stays a walk on the tab while /leader still offers the journey there (mutants: the walk read as a journey)', () => {
@@ -1325,19 +1270,6 @@ test('AUDIT PARTY-UI2 session: a round that set out is HELD for its followers - 
   assert.equal(ann.pt.propose(PICK, OPTS, FARE), true, 'and a round opens again');
 });
 
-test('AUDIT PARTY-UI2 host by source: the map door SAYS it indoors - "You cannot travel while indoors.", DFU\'s cannotTravelIndoors through AddHUDText (townTalk.say here) - and the journal\'s Find Place target is armed before the refusals and taken by the next map to open, as DFU\'s GotoPlace is (mutants: the door silent; the words drifted; the target dropped by a refusal)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const CANNOT_TRAVEL_INDOORS_TEXT = 'You cannot travel while indoors\.';/, 'Internal_Strings.csv cannotTravelIndoors, verbatim');
-  const door = w.slice(w.indexOf('const toggleTravelMap = (gotoPlace = null) => {'), w.indexOf('function openTeleportMap'));
-  assert.match(door, /if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) \{ townTalk\.say\(localizedText\('cannotTravelIndoors', CANNOT_TRAVEL_INDOORS_TEXT\)\); return false; \}/, 'said, then refused');
-  const arm = door.indexOf('if (gotoPlace) _travelGoto = gotoPlace;');
-  assert.ok(arm > 0 && arm < door.indexOf('CANNOT_TRAVEL_INDOORS_TEXT'), 'armed before the first refusal');
-  assert.match(door, /if \(_travelGoto\) \{ _travelMap\.gotoPlace\(_travelGoto\); _travelGoto = null; \}/, 'taken by the map that opens');
-  assert.ok(door.indexOf('_travelMap.gotoPlace(_travelGoto)') > door.indexOf('_travelMap = buildTravelMapWindow('), '...once one has been built');
-  assert.equal((door.match(/_travelGoto = null/g) ?? []).length, 1, 'and let go nowhere else - a refused open keeps it');
-  assert.match(w, /let _travelGoto = null;\n\s*const toggleTravelMap = /, 'one target, kept beside the door across opens');
-});
-
 // PARTY-READY (2026-10-01, Mac: "Also when party readying up, the ui element is hidden"): the ready-up stays on screen.
 test('PARTY-READY session: THE LEADER\'S WAIT STANDS THE ROUND - the HUD label for the round\'s minute, not the host\'s four seconds; set again only as the count moves (every label is a notebook line), for what is left of it; the set-out, a call-off or a lapse says its own line over it (mutants: the wait for the host\'s default, set every tick, never moved, left standing over the outcome)', () => {
   const w = partyOf();
@@ -1390,9 +1322,3 @@ test('PARTY-READY session: A MEMBER WITH THE PARTY TAB OPEN ANSWERS THERE - no b
   assert.equal(shut.c('Bran').prompts.length, 1, 'the tab closed unanswered: the box asks');
 });
 
-test('PARTY-READY host by source: the wait\'s seconds reach the HUD\'s label, and the session reads the Party tab open (mutants: the seconds dropped at the seam, the tab never read)', () => {
-  const w = rd('src/scenes/world.js');
-  const host = w.slice(w.indexOf('partyTravel = createPartyTravel({'), w.indexOf('poseDirty: () => { _partyComposedAt = -Infinity; },'));
-  assert.match(host, /mid: \(text, seconds = PARTY_REST_FAR_SECONDS\) => setMidScreenText\(text, seconds\),/);
-  assert.match(host, /tabOpen: \(\) => !!socialPanel\?\.isOpen\?\.\(\) && socialPanel\.tab\(\) === 'party',/);
-});

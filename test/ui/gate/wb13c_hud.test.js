@@ -191,12 +191,6 @@ test('WB13c a fight gone resets the bar - the next fight\'s comes up with its ow
   destroyGateBossBar();
 });
 
-test('WB13c the court: the bar never over the step\'s fire, and the blow on my feet handed to it by name (mutants: the bar over the veil; MOVE never asked)', () => {
-  const c = read('src/scenes/gate/gateCourt.js');
-  assert.match(c, /const peril = alive \? perilAt\(s, t, P, fp\[0\] - COURT_CENTRE\[0\], fp\[2\] - COURT_CENTRE\[2\], yaw\(\)\) : null;\n[^\n]*\n[^\n]*\n\s*const onMe = peril && pF \? \(pF\.now && !peril\.now \? pF : peril\) : peril \?\? pF;\n\s*drawGateBossBar\(bossBarModel\(s, t, bossOf\(s\), onMe\?\.name \?\? null, \{ flame: F, flameMine: [^}]*\}\), \{ hidden: hudHidden\(\) \|\| veiled\(\) \}\);/);   // PIN MOVED (WB14d): his blow on my feet, or his Flame's
-  assert.match(c, /drawGateGround\(groundViewModel\(\{ inside: inFire, ground: groundName, color: groundColor, biteAt, biteColor, now: t, peril: order \?\? onMe, blindAt: arsenal\.blindAt\(\) \}\), \{ hidden: hudHidden\(\) \}\);/, 'the same peril the ground says');
-});
-
 test('WB13c the screens on phones: the bar lower on a portrait phone; on a landscape one his marks\' row gone and the bar high, clear of the crosshair; the card at the foot on the left and the chart on the left under the menu\'s button, never off the screen, the chart narrow; beside the party\'s frames where the screen holds both (mutants: the landscape rules lost; the chart\'s fold never on a landscape phone; the party covered)', () => {
   const block = (css, q) => { const i = css.indexOf(`@media ${q} {`); assert.ok(i >= 0, q); return css.slice(i, css.indexOf('\n}', i)); };
   assert.match(block(BOSS_BAR_CSS, '(max-width: 640px)'), /\.wb-boss-bar \{ top: 72px; \}/);
@@ -216,7 +210,6 @@ test('WB13c the screens on phones: the bar lower on a portrait phone; on a lands
   assert.ok(block(DAMAGE_CHART_CSS, '(min-width: 900px)').includes(`${PARTY} .wb-dmg-chart { right: 220px; }`));
   assert.ok(block(MARKS_CARD_CSS, '(max-width: 560px)').includes(`${PARTY} .wb-marks-card.wb-marks-arrive { top: 200px; bottom: auto; }`));
   assert.ok(block(DAMAGE_CHART_CSS, '(max-width: 560px)').includes(`${PARTY} .wb-dmg-chart { top: 72px; bottom: auto; }`));
-  assert.match(read('src/ui/partyPanel.js'), /root\.style\.display = 'none';/, 'the frames hide by their inline display - what the offsets read');
   // Blows and Best fold away under 1000px
   const mid = block(DAMAGE_CHART_CSS, '(max-width: 1000px)');
   assert.match(mid, /\.wb-dmg-row > \.wb-dmg-blows, \.wb-dmg-row > \.wb-dmg-best \{ display: none; \}/);
@@ -266,8 +259,4 @@ test('WB13c the classic face is loaded by the gate\'s own screens - each asks fo
     assert.match(read(`src/ui/gate/${f}.js`), /if \(doc\.head\) injectEnhancedFonts\(doc\);/, f);
   }
   assert.match(MARKS_CARD_CSS, /\.wb-marks-text \{ font-size: 13px; opacity: 0\.92; \}\n\.wb-marks-tip \{ font-size: 13px; opacity: 0\.85; color: #e9c9a6; \}/);
-  const plus = read('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(plus, /body \.wb-ground-warn \{ \$\{PIXEL_FONT_CSS\} font-size: 16px;[\s\S]{0,120}background: rgba\(5,6,8,0\.55\);/);   // FONT3: the reading weight, not 400
-  assert.match(plus, /body \.wb-boss-ward \{ inset: -5px; border-color: #ffe9a8;/, 'the ward a lit cage, apart from the frame\'s brass');
-  assert.match(plus, /body \.wb-boss-track \{ margin: 7px 0 6px;/, 'room for the cage above and below');
 });

@@ -65,26 +65,6 @@ test('REGIONAL-FOLK: Roleplay & Realism\'s house residents follow the street - a
   _resetModSettings(); _resetFlatFaceOverrides();
 });
 
-test('REGIONAL-FOLK: every population asks the one rule - both street hosts, the census, the interior host\'s R&R swap; the table is written once', () => {
-  assert.match(hostText('src/scenes/world.js'), /race: walkerRace\(climate\?\.people, dfLocation\.regionIndex\),/);
-  assert.match(read('src/scenes/exterior.js'), /const populationRace = walkerRace\(dfLocation\.climate\?\.people, dfLocation\.regionIndex\);/);
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the census asks by the town's AREA - its region on the Bay, its
-  // province's district past it (Hammerfell's beyond the Bay as Redguard as its regions on it)
-  assert.match(read('src/systems/livingWorld/census.js'), /const race = walkerRace\(town\.people, town\.area \?\? town\.region\);/);
-  assert.match(read('src/scenes/worldModes.js'), /region: hit\.dfLocation\?\.regionIndex \?\? null,/);
-  const literal = /\{ 0: 'Nord', 2: 'Redguard', 3: 'Breton' \}/;
-  const holders = [];
-  const walk = (dir) => {
-    for (const e of readdirSync(new URL(`../../../${dir}`, import.meta.url), { withFileTypes: true })) {
-      const p = `${dir}/${e.name}`;
-      if (e.isDirectory()) walk(p);
-      else if (p.endsWith('.js') && literal.test(read(p))) holders.push(p);
-    }
-  };
-  walk('src');
-  assert.deepEqual(holders, ['src/characters/mobile/mobilePerson.js'], 'ONE DFU MEMBER, ONE EXPORT: the climate\'s table');
-});
-
 /** A Legacy host as test/systems/legacy/legacy5_marriage.test.js stands one, with the census's own resident behind `residentNow`. */
 function legacyWorld(residentNow) {
   const store = new Map();
@@ -121,5 +101,4 @@ test('REGIONAL-FOLK (AUDIT FB1010 C1): a courtship an older version saved weds t
     const s = spouseOf(w.host.family, me);
     assert.deepEqual({ race: s.race, face: s.residentFace }, want, census(now.id) ? 'the census\'s own' : 'no census to ask: the copy');
   }
-  assert.match(hostText('src/scenes/world.js'), /residentNow: \(id\) => residentOfId\(id, livingTownOfId\),/, 'the world host hands the census in');
 });

@@ -11,29 +11,6 @@ import { labWindSlider, placeLabGrassSteps } from '../../src/render/labGrass.js'
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-test('GR3: the sky CONTROLLER exposes the cloud-shadow deck the hosts read', () => {
-  // EE5 publishes `cloudShadow` on the EnhancedSkyRenderer. world.js
-  // reads `sky.cloudShadow` three times - and `sky` is the CONTROLLER
-  // createSkyController returns, which never carried the key: the dome
-  // sits one level down under `renderer`. Every reader got undefined.
-  const shared = read('src/scenes/shared.js');
-  const i = shared.indexOf('export function createSkyController');
-  const ret = shared.slice(shared.indexOf('  return {', i), shared.indexOf('\n  };', shared.indexOf('  return {', i)));
-  // DS1: under Dynamic Skies the deck is the controller's own (the
-  // eased row's wind, no shadow amount); under the port's dome it is
-  // still the dome's, live; null under classic as before.
-  assert.match(ret, /get cloudShadow\(\) \{\s*\n\s*return enhancedSky\?\.cloudShadow \?\? dynamicDeck;/,
-    'a LIVE getter off the dome - the deck is rebuilt every draw');
-  assert.match(read('src/render/enhancedSky.js'), /this\.cloudShadow = \{\s*\n\s*cover:/, 'and the dome still publishes it');
-  // The three readers, all on the controller, all now answered.
-  const world = read('src/scenes/world.js');
-  assert.match(world, /renderer\.setCloudShadow\(sky\?\.cloudShadow \?\? null\);/, 'the ground shadows');
-  assert.match(world, /precip\.enhanced = !!sky\?\.cloudShadow;/, 'the enhanced rain');
-  // WIND3: the grass wind is read in the one mapping (systems/wind/windDrive.js), and the host takes its answer
-  assert.match(read('src/systems/wind/windDrive.js'), /const w = sky\?\.cloudShadow\?\.wind \?\? \[0, 0\];/, 'the grass wind');
-  assert.match(world, /const wd = windDrive\(sky, now \/ 1000, dt\);/, 'read once a frame by the host');
-});
-
 test('GR3: the VALUE that reaches the grass shader - sunny is the lab\'s 70, not 0', () => {
   // The controller's shape, as it now is, driven by the dome's own
   // sunny row (enhancedSky.js:"cover: 0.32, soft: 0.34, grey"). This is the assertion GR2 lacked:

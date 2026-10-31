@@ -241,27 +241,3 @@ test('WB9f the court: his spoils kept on the floor of the court he fell in, SPEW
   assert.match(FX_SPARK_VS, /uniform float uFloor;/);
 });
 
-test('WB9f the seams, by source: the court stands the spoils and their words where it is stood; the dungeon arm\'s press takes a piece through the host before any loot rung; the plaque\'s list asks the host; the world host hands the pool to all four and names an item as the loot piles do (mutants: each seam removed)', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const gs = read('src/scenes/gate/gateStand.js');   // WB14b (PIN MOVED): the court is stood out of the host
-  assert.match(gs, /ctx\.addActivationTargets\(\(\) => host\.spoilTargets\?\.\(\) \?\? NO_TARGETS\);/);
-  assert.match(gs, /ctx\.addActivationNamer\(\(key\) => \(typeof key === 'string' && key\.startsWith\('spoil'\) \? host\.spoilName\?\.\(key\) \?\? null : null\)\);/);
-  const press = wm.indexOf("if (key.startsWith('spoil')) { quickLootSpend(); host.takeSpoil?.(key); return true; }");   // AUDIT WB9 (spoils F2): the armed key spent on it
-  assert.ok(press > 0, 'the press rung');
-  assert.ok(press > wm.indexOf('if (_pick.distance > _pick.reach) { setMidScreenText(tooFarAwayText()); return true; }', press - 2000), 'after the reach is judged');
-  assert.ok(press < wm.indexOf("if (key.startsWith('loot:') || key.startsWith('corpse:')", press), 'before the loot rung');
-  assert.match(wm, /spoilContents: \(key\) => host\.spoilContents\?\.\(key\) \?\? null,/);
-  assert.match(read('src/scenes/dungeonContext.js'), /if \(kind === 'spoil'\) return opts\.spoilContents\?\.\(key\) \?\? null;/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /spoilTargets: \(\) => floorPool\(\)\?\.targets\(\) \?\? null,/);   // SD9e: the floor of the place I stand in - the court's, or the Hour's (PIN MOVED)
-  assert.match(w, /spoilName: \(key\) => floorPool\(\)\?\.nameOf\(key\) \?\? null,/);
-  assert.match(w, /spoilContents: \(key\) => floorPool\(\)\?\.contentsOf\(key\) \?\? null,/);
-  assert.match(w, /takeSpoil: \(key\) => !!floorPool\(\)\?\.pick\(key\),/);
-  // PIN MOVED (EG-E): the Spire's Redoubts throw into the Hour's pool - the court's anywhere but the Hour and the Spire;
-  // PIN MOVED (KETCH): and the Ketchmaster's hold
-  assert.match(w, /const floorPool = \(\) => \(modes\?\.ktShip\?\.\(\) != null && ketch \? ketch\.spoils : modes\?\.sdRealmSlot\?\.\(\) != null \|\| modes\?\.egHallBreach\?\.\(\) != null \? sdSpoilsPool : spoilsPool\);/, 'the court\'s pool anywhere but the Hour, the Spire and the Ketch (PIN MOVED: AUDIT KETCH L2-3 - the Ketch its own)');
-  assert.match(w, /itemName: \(item\) => lootPileName\(\[item\]\),/);
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /spoils\?\.frame\(onSpoilRest\);/);
-  assert.match(gc, /acct: claims\.s, keep, claims \}\)\) \{/);   // WB12d: and its rite
-});

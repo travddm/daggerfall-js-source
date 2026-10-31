@@ -147,15 +147,3 @@ test('LAIR-HOME never home while I fight its road body - my blows on it (its feu
   assert.equal(N.revenantForLair(p, HERE, { now: NOW, dueOnly: true, foes: [] }), null, 'its lair\'s claim still standing up: no second ask');
 });
 
-test('LAIR-HOME the hosts: the open world\'s pool withdraws a stale body and its band as the cull takes a foe, before its fate, after a puppet; the dungeon\'s pool withdraws one too, and asks with its own pool, both of its asks (mutants: never withdrawn; the band left; a corpse left; the dungeon never withdrawing; the pool unasked)', () => {
-  const X = read('src/scenes/exteriorFoes.js');
-  assert.match(X, /\n {8}continue;\n {6}\}\n {6}\/\/ LAIR-HOME[^\n]*\n[^\n]*\n {6}if \(revenantStale\(f\.entity\)\) \{ withdrawStale\(f\); continue; \}\n {6}\/\/ REVENANT-FATE/, 'after the puppet\'s branch, before the fate');
-  const w = X.slice(X.indexOf('function withdrawStale(f) {'), X.indexOf('function withdrawStale(f) {') + 420);
-  assert.match(w, /for \(const g of foes\) if \(g !== f && !g\.dead && !g\.puppet && g\.retinueOf === id\) \{ releaseFoeBatch\(g\); g\.dead = true; \}/);
-  assert.match(w, /releaseFoeBatch\(f\);\n\s*f\.dead = true;\n\s*if \(f\.ai\?\.detected\) setEnemyAlert\(playerEntity, false\);/, 'its alert let go with it');
-  assert.doesNotMatch(w, /corpse|revenantDeed|revenantRouted/, 'no corpse, no deed');
-  const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /\n {6}if \(f\.dead\) continue;\n {6}if \(revenantStale\(f\.entity\)\) \{ for \(const g of foes\) if \(g\.retinueOf === f\.entity\.revenant\.id\) questPoolOps\.removeFoe\(g\); questPoolOps\.removeFoe\(f\); continue; \}/, 'the dungeon\'s pool too: one body, whichever stand came last');
-  assert.match(D, /const r = revenantForLair\(playerEntity, lairPixel\(\), \{ foes \}\);/);
-  assert.match(D, /const r = revenantForLair\(playerEntity, lairPixel\(\), \{ dueOnly: true, foes \}\);/);
-});

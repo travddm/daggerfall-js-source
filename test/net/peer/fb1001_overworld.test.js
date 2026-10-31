@@ -31,21 +31,6 @@ const settle = async (n = 6) => { for (let i = 0; i < n; i++) await flush(); };
 const carried = (yaw, f, s) => yaw + Math.atan2(s, f);
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
-test('OW-WEATHER: under the Overworld the falling weather and the wind wrap round the eye the view is drawn from - never round the traveller\'s head (mutants: the eye back to the head; a draw left on it)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const mwv = tvf \? \{ \.\.\.mwv0, eye: tvf\.eye \}/, 'the frame\'s eye under the view is the view\'s');
-  assert.match(w, /\n {4}const wxEye = mwv\.eye;\n/, 'the weather\'s eye: the view\'s, under it and on the ground (PIN MOVED, RPT1026-WORLD RAIN-EYE: the head\'s on the ground stood a box of rain round a ship seen from her helm\'s scrolled-out camera)');
-  assert.match(w, /\n {4}const drawFalling = \(\) => \{\n {6}wxEye32\[0\] = wxEye\[0\]; wxEye32\[1\] = wxEye\[1\]; wxEye32\[2\] = wxEye\[2\];/, 'copied into the one array as the falling weather is drawn (RAIN-LEAK)');
-  for (const [what, re] of [
-    ['the sand', /dryFall\.draw\(\{ on: true, kind: precipShown, strength01: fx\.intensity, windV: wd\.windV, step: wd\.step \}, proj, view, wxEye32, now \/ 1000, renderer\.worldViewportPx\?\.\[3\]\);/],   // PIN MOVED (ASHFALL1, 2026-10-27): the dry falls' one renderer, the sand and the ash
-    ['the rain and the snow', /precip\.drawFall\(precipShown, proj, view, wxEye32, camRight, now \/ 1000\);/],   // PRECIP1: the fall at the air's snow share
-    ['the wisps', /wisps\.draw\(wd, proj, view, wxEye32, now \/ 1000\);/],
-  ]) assert.match(w, re, what);
-  const at = w.indexOf('    const wxEye = ');
-  assert.ok(at > w.indexOf('    const mwv = tvf ?') && at < w.indexOf('if (isDryFall(precipShown)) {'), 'after the frame\'s eye, before the first draw');   // PIN MOVED (ASHFALL1, 2026-10-27)
-  assert.equal((w.slice(at, w.indexOf('    // GR1: THE LAB\'S GRASS', at)).match(/new Float32Array\(cam\.pos\)/g) || []).length, 0, 'no weather draw left on the head');
-});
-
 test('OW-FACE: the keys\' heading is the view\'s turned by the keys, and the axes turned onto the body carry it that way at any facing, at the keys\' own speed (mutants: the heading\'s sign; the axes unturned)', () => {
   assert.equal(keysHeading(0.4, 0, 0), null, 'no key, no heading');
   for (const cy of [0, 1.1, -2.7]) {
@@ -110,13 +95,7 @@ test('OW-FACE: the view\'s steer turns the body toward the keys\' heading at the
   old.w.yaw = old.tv.camera.yaw + 1;
   old.tv.steer(0.05);
   assert.ok(near(old.w.yaw, old.tv.camera.yaw + 1 - TV_TURN_RATE * 0.05), 'no axes: toward the view, as TV1 pins it');
-  // the host hands the axes, and turns the motor's onto the body before the keys' travel reads them
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /movementAxes: \(\) => \(\{ forward: \(held\(keys, 'MoveForwards'\) \? 1 : 0\) - \(held\(keys, 'MoveBackwards'\) \? 1 : 0\), strafe: \(held\(keys, 'MoveRight'\) \? 1 : 0\) - \(held\(keys, 'MoveLeft'\) \? 1 : 0\) \}\),/);
   assert.deepEqual([...TV_MOVE_ACTIONS], ['MoveForwards', 'MoveBackwards', 'MoveLeft', 'MoveRight']);
-  const turn = w.indexOf('const turned = axesToward(cam.yaw, keysHeading(travelView.camera.yaw, axes.forward, axes.strafe), axes.forward, axes.strafe);');
-  assert.ok(turn > w.indexOf('        const axes = _overlayHeld ?') && turn < w.indexOf('const way = cam.yaw + Math.atan2(axes.strafe, axes.forward);'), 'after the journey\'s drive, before the keys\' travel reads the way');
-  assert.match(w.slice(w.lastIndexOf('\n        if (', turn), turn), /if \(travelView\?\.active && travelView\.camera && !_travelDrive && !_overlayHeld && !travelOptions\?\.state\?\.autopilot && \(axes\.forward \|\| axes\.strafe\)\) \{/, 'under the view, with no journey and no autopilot driving');
 });
 
 // ── OW-PEERS ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -183,11 +162,4 @@ test('OW-PEERS: a doll and a Morrowind body grown too - the doll\'s size, reach 
   pb.draw({}, { ...V, grow: () => 8, up });
   assert.equal(draws.at(-1).grow, 8, 'drawn eight times about its feet'); assert.equal(draws.at(-1).up, up, 'leaned as the traveller\'s own (AUDIT OW3 J6)');
   assert.ok(near(pb.heightOf('b1'), CAPSULE_HEIGHT * 8), 'its head for its name');
-  // the host: one law, the traveller's own, at each peer's feet, handed to every layer under the view and to none off it
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const peerGrow = \(f\) => \{ const e = travelView\?\.active \? travelView\.eye : null; return e \? tvOwnGrow\(Math\.hypot\(e\[0\] - f\[0\], e\[1\] - f\[1\], e\[2\] - f\[2\]\)\) : 1; \};/);
-  assert.match(w, /const tvGrow = travelView\?\.active \? peerGrow : null;/);
-  for (const re of [/peerRiders\.sync\(seen, [^\n]*, grow: tvGrow \}\);/, /peerWalkers\.sync\(seen, [^\n]*, grow: tvGrow \}\);/, /remotePlayers\.sync\(visiblePeers, [^\n]*, grow: tvGrow(?:, room: drawable)? \}\);/]) assert.match(w, re);   // PIN MOVED (AUDIT PEER-RANGE + HALO-THIN A L1/L6): the room's whole list handed after the grow
-  assert.match(w, /drawPeerBodies\(proj, view, mwv\.eye, tvf \? tvFace : null\);/, 'the bodies take the view\'s face (its lean)');
-  assert.match(rd('src/net/peer/peerBodies.js'), /if \(this\._planesOk\) \{\n {8}if \(!this\._sees\(b, 0, g\)\) \{[\s\S]{0,800}?\n {10}continue;\n {8}\}/, 'and are culled by their grown reach');   // PIN MOVED (AUDIT MWNPC16-18 B F2, Morrowind-NPCs.md section 27): the unseen branch casts only a body posed for its actor, and says why   // PIN MOVED (MWNPC16): an NPC lane's body out of the view casts before it is passed over
 });

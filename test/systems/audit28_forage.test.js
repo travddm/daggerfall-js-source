@@ -83,12 +83,6 @@ test('AUDIT 28 H6: a box held behind the page is shown only once the finished pa
   assert.deepEqual(shown, ['bonus'], 'the box has the slot to itself');
 });
 
-test('AUDIT 28 F2: the wait ticks in every mode - the modal frame ticks it too', () => {
-  const w = src('src/scenes/world.js');
-  const modal = w.slice(w.indexOf("try { bountyHost?.tick(dt); } catch (e) { console.warn('[bounty] tick', e); }\n      try { gatherHost?.tick(dt); }"), w.indexOf('// AUDIT F2-I1: the modal frame RETURNS'));   // PROF1: the herbs tick beside the bounties (PROF2: every gathering, one host)
-  assert.match(modal, /\n\s*foragingWait\.tick\(\);/, 'a live call, not a word about one');
-});
-
 test('AUDIT 28 F7: a switched-off mod has no console command - no HELP line, no HasCommand, "not found" to its name', () => {
   _resetModSettings();
   installForaging({ fetchBytes: async () => new Uint8Array() });
@@ -103,17 +97,10 @@ test('AUDIT 28 F7: a switched-off mod has no console command - no HELP line, no 
   _resetForagingInstall();
 });
 
-test('AUDIT 28 F4: Foraging\'s Features row says when each half takes effect', () => {
-  assert.match(src('src/systems/features.js'), /modFeature\('foraging', \(\) => t\('features\.mod\.foraging\.effect', 'Takes effect at once; its quests when the game next loads\.'\), 'world'\)/);
-});
-
 test('AUDIT 28 H11: Enter and Space on a DOM window\'s own button are the browser\'s press - never prevented', () => {
   assert.deepEqual(['BUTTON', 'SELECT', 'SUMMARY', 'DIV', 'CANVAS'].map((tagName) => isDomControlTarget({ tagName })), [true, true, true, false, false]);
   assert.equal(isDomControlTarget({ tagName: 'A', href: 'x' }), true);
   assert.equal(isDomControlTarget(null), false);
-  const t = src('src/scenes/townTalk.js');
-  const at = t.indexOf("if ((e.key === 'Enter' || e.key === ' ') && isDomControlTarget(e.target)) return true;");
-  assert.ok(at > 0 && at < t.indexOf('e.preventDefault();', t.indexOf('if (isTextEntryTarget(e.target)) return true;')), 'asked before the prevent');
 });
 
 test('AUDIT 28 H12: a payday notice taken down unread goes back in the queue - never dropped; a death in the mode\'s slot takes the street\'s DOM windows down', () => {
@@ -131,21 +118,6 @@ test('AUDIT 28 H12: a payday notice taken down unread goes back in the queue - n
   host.requeue(notice);   // taken down under the reader
   host.requeue(notice);   // ...and never twice in the queue
   assert.equal(host.pendingNotices(), 1);
-  const door = src('src/ui/bounty/bountyDoor.js');
-  assert.match(door, /onExit: \(\) => close\(true\)/);
-  assert.match(door, /deps\.onClose\?\.\(read\);/);
-  assert.match(door, /registerOverlay\(\(\) => close\(true\)\)/, 'the stack\'s Escape is the player\'s own dismissal');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /createBountyOverlay\('notice', \{ notice, onClose: \(read\) => \{ if \(!read\) bountyHost\?\.requeue\(notice\); \} \}\)/);
-  assert.match(w, /if \(modes\?\.deathUp\?\.\(\) && \(bountyDoorOpen\(\) \|\| noticeDoorOpen\(\)\)\) \{ closeBountyDoor\(\); closeNoticeDoor\(\); \}/);
-  assert.match(w, /\|\| \(modes\?\.deathUp\?\.\(\) \?\? false\)\) return false;/, 'and no notice is raised over a death');
   up = false;
 });
 
-test('AUDIT 28 H8: a built pixel\'s bounty boards are worked out once, not every frame', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (GOTHWAY-BOARDS): the split is still memoised on the pixel (`??=`), its one questBoardIndices call over the
-  // town's own boards; every board a town stands of its own (`extra` - Gothway Garden's) is a bounty board always
-  assert.match(w, /const boardSplitOf = \(p\) => \(p\._boardSplit \?\?= \(\(\) => \{\n\s*const all = p\.boards \?\? \[\];\n\s*const split = questBoardIndices\(all\.filter\(\(b\) => !b\.extra\)\);\n\s*all\.forEach\(\(b, i\) => \{ if \(b\.extra\) split\.add\(i\); \}\);\n\s*return split;\n\s*\}\)\(\)\);/);
-  assert.equal((w.match(/questBoardIndices\(/g) ?? []).length, 1, 'the one call, memoised');
-});

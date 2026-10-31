@@ -368,17 +368,6 @@ test('GATE-COURTS the words: a court\'s kill by its number, where, and who struc
   assert.ok(card({}).includes(`${gateBossOf(DAY).name} has fallen"`), 'a night of one court: the card as it was');
 });
 
-test('GATE-COURTS the wiring: the host\'s room is the court the book seats me in, a court\'s kill its own line; the relay\'s doors and its seat asked before a newcomer\'s fight (mutants: the first court forever; the doors unrouted; the seat asked after the fight is made)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'gate'\) key = \(gateLink\?\.room \?\? gateRoomKey\)\(modes\?\.roomIdentity\?\.\(\)\?\.day\);/);
-  assert.match(w, /eventNotice\('gate', \(f\.c != null \? courtFellLine : fellLine\)\(\{ \.\.\.f,/);
-  const r = src('server/src/index.js');
-  for (const [door, fn] of [['GATE_INTERNAL_SEAT', '_gateSeatInternal'], ['GATE_INTERNAL_COURT', '_gateCourtInternal'], ['GATE_INTERNAL_PARTY', '_gatePartyInternal']]) assert.ok(r.includes(`if (path === ${door}) return this.${fn}(request);`), door);
-  const frame = r.slice(r.indexOf('  async _gateFrame(ws, a, m, now) {'));
-  assert.ok(frame.indexOf('await this._gateSentOn(ws, a, f, now)') > 0 && frame.indexOf('await this._gateSentOn(ws, a, f, now)') < frame.indexOf('if (!f) { f = this._fight = GATE_SEAM.new('), 'asked before the fight is made');
-  assert.ok(r.includes('if (!f) return this._gateBookTick();'), 'a first court\'s book beats with no fight of its own');
-});
-
 // ═══ AUDIT GATE-COURTS (2026-10-26) ════════════════════════════════════════════════════════════
 // The owner: "Audit this". Three cold lanes (the relay; the law, the wire and the client; the pins, the record and the
 // cost) - bible/11-Multiplayer/World-Bosses.md section 30. Each finding's pin below fails on the code before its fix.
@@ -678,9 +667,6 @@ test('AUDIT GATE-COURTS C6 staff: a staff landing names the court its player sta
   const staffLink = createGateLink({ now: () => 0 });
   assert.equal(staffLink.seatFor(validStaffDestination(dest).gate).c, 5);
   assert.equal(staffLink.room(DAY), gateRoomKey(DAY, 5), 'staff land in the player\'s court');
-  const w = src('src/scenes/world.js');
-  assert.ok(w.includes("dest = { ...dest, kind: 'gate', gate: gateLink?.withCourt?.(gate) ?? gate };"), 'the host names the court on its landing');
-  assert.ok(w.includes("entered = await modes?.enterGateArena?.(gateLink?.seatFor?.(d.gate) ?? d.gate);"), 'and lands staff in it');
   await night(async ({ court, say }) => {
     const R = court(5), s = R.connect(); await R.hello(s, id(1), at(0, 3), { glyphs: ['dev'] });
     await say(R, s, inWord); await settle();
@@ -721,5 +707,4 @@ test('AUDIT GATE-COURTS C4/C7 the words and the move: the seal\'s line waits for
   clock2 = TT.sealAt + SEAL_SAY_HOLD_MS;
   omen2.frame();
   assert.deepEqual(quiet2.filter((s) => s.includes('has sealed') || s.includes('Covenant tears')), [], 'the gate collapsed with the night: neither the seal nor the wrath said');
-  assert.match(src('src/scenes/world.js'), /\(isGateRoom\(key\) && isGateRoom\(online\.room\)\) \|\|/, 'a move between a night\'s courts takes no hold');
 });

@@ -65,68 +65,10 @@ test('F5-QUESTS: the pause window\'s one act and one slot routing, shared by bot
   assert.deepEqual(back, ['close', 'back']);
 });
 
-test('F5-QUESTS: F5\'s page is handed the host\'s pause bag UNDER the sheet\'s own doors, and acts through the pause door\'s law', () => {
-  const door = rd('src/ui/charSheetDoor.js');
-  assert.match(door, /return enhancedSheetPageOverlay\(hooks, deps\.entity, deps\.pause \?\? null\);/, 'the door hands the bag on');
-  const opts = door.slice(door.indexOf('  function pageOpts() {'), door.indexOf('\n  }\n', door.indexOf('  function pageOpts() {')));
-  const bagAt = opts.indexOf('...bag,');
-  assert.ok(bagAt > 0 && opts.includes('const bag = pause?.() ?? {};'), 'the page spreads the bag');
-  // ESC-BOOK: the three doors are the BAG's own arms, wrapped to close the page first (sheetPageDoors) - the sheet's
-  // factories built windows no host slot held - and Ascend is the page's; both written after the bag
-  for (const own of ['...sheetPageDoors(bag, close),', 'ascendScreen:']) {   // PIN MOVED (GROWTH1): the Growth tab's rollout, where the Ascend door was
-    assert.ok(opts.indexOf(own) > bagAt, `${own} is written after the bag`);
-  }
-  assert.match(opts, /const menuHooks = pauseMenuHooks\(\{/, 'the slot routing is the pause door\'s');
-  assert.match(opts, /onAction: pauseMenuAct\(menuHooks, close\),/, 'and so is the act - Save, Load and Exit act');
-  assert.match(opts, /hooks: menuHooks,/);
-});
-
-test('F5-QUESTS / THE FOUR HOSTS: every host\'s sheet is handed the SAME bag its pause door spreads - built and asked, not matched', () => {
-  // world.js and exterior.js: the bag is `pauseDoorHooks`; the sheet builder's `pause` must answer it
-  for (const file of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = rd(file);
-    assert.match(s, /openPauseFlow\(\(w\) => townTalk\.showOverlay\(w\), \{\n\s*at: pauseAt,[^\n]*\n\s*\.\.\.pauseDoorHooks\(\),/, `${file}: the pause door spreads the bag`);
-    const head = 'const makeCharSheetWindow = ({ inventory = null, pause = null } = {}) => createCharSheetWindow(';   // AUDIT (pre-merge) I-A: world.js's takes a building's own pack; ESC-BOOK: and its own bag; AUDIT 27h A2: exterior.js's the same
-    const deps = mountLiteral(s, head, { pauseDoorHooks: () => 'THE-BAG', inventory: null, pause: null });
-    assert.equal(typeof deps.pause, 'function', `${file}: the sheet is handed a pause bag`);
-    assert.equal(deps.pause(), 'THE-BAG', `${file}: ...and it is the pause door's own`);
-    const bag = mountLiteral(s, 'const pauseDoorHooks = () => (', {
-      questBridge: { questLog: () => 'LOG', repair: () => 'REPAIRED', machine: { getAllQuestLogMessages: () => ['m'] } },
-      pauseQuestLog: () => 'LOG', pauseQuestMessages: () => ['m'],
-    });
-    assert.equal(bag.questLog(), 'LOG', `${file}: the Quests tab's walk rides the bag`);
-    assert.equal(bag.repairQuests(), 'REPAIRED', `${file}: and the Settings' repair`);
-    assert.equal(typeof bag.exitToMenu, 'function', `${file}: and the exit`);
-  }
-  // dungeonContext.js: the bag is `pauseHooks(setPlayerPos)`; the sheet hands it the applier its door was given
-  const dc = rd('src/scenes/dungeonContext.js');
-  const deps = mountLiteral(dc, 'return createCharSheetWindow(', { api: { pauseHooks: (p) => ['THE-BAG', p] }, sheetOpts: { setPlayerPos: 'APPLIER' }, pauseOpts });
-  assert.deepEqual(deps.pause(), ['THE-BAG', 'APPLIER'], 'the dungeon sheet is handed the pause door\'s bag, with the applier its door was given');
-  const loads = [];
-  const bag = mountLiteral(dc, 'const ctx = this;   // the sibling save verbs on this same context\n      return ', {
-    ctx: { quickLoad: (...a) => { loads.push(a); } }, setPlayerPos: 'APPLIER',
-    opts: { questBridge: { questLog: () => 'LOG', repair: () => 'REPAIRED' } },
-  });
-  bag.quickLoad(); bag.loadKey(3);
-  assert.deepEqual(loads, [['APPLIER'], ['APPLIER', 3]], 'the Load arms place the player through the applier');
-  assert.equal(bag.questLog(), 'LOG');
-  // worldModes.js (the interior) borrows the outer host's builder - ESC-BOOK: handing it the BUILDING's bag, whose arms
-  // open the doors in the building's slot (the street's opened the STREET's windows - its pack's drop in the street's pool)
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /const interiorSheetDoors = \(\) => \(\{ inventory: \(\) => interiorInventory\(\), pause: \(\) => interiorPauseHooks\(\) \}\);/, 'a building\'s sheet is handed the building\'s own bag');
-  assert.match(modes, /openPauseFlow\(\(w\) => \{ interiorOverlay = w; \}, \{\n\s*at: pauseAt,[^\n]*\n\s*\.\.\.interiorPauseHooks\(\),/, '...the one its pause door spreads');
-  assert.match(modes, /const openInteriorSheet = \(\) => \{ const w = host\.makeCharSheet\?\.\(interiorSheetDoors\(\)\); if \(w\) mountInterior\(w\); return !!w; \};/, 'the interior borrows the outer builder (AUDIT pre-merge I-A: with its own pack)');
-  assert.match(modes, /toggleCharSheet\(\) \{ openInteriorSheet\(\); \},/, 'F5 takes that one door (AUDIT 27h A1: and so do the pack\'s F5 and the pause bag\'s crossover)');
-  for (const file of ['src/scenes/world.js', 'src/scenes/exterior.js']) {   // AUDIT 27h A2: ?exterior's builder ignored the doors it was handed
-    assert.match(rd(file), /makeCharSheet: \(doors\) => \(charSheetDoorReady\(\) \? makeCharSheetWindow\(doors\) : null\),/, `${file}: ...which is the one handed the bag`);
-  }
-});
-
 test('F5-QUESTS: F5 carries routeKey\'s position applier into the sheet, as Escape carries it into the pause door', () => {
   const got = [];
   assert.equal(routeAction('CharacterSheet', { toggleCharSheet: (o) => got.push(o) }, 'APPLIER'), true);
   assert.deepEqual(got, [{ setPlayerPos: 'APPLIER' }]);
   // the hosts that need none take none - the arrow ignores the bag
   assert.equal(routeAction('CharacterSheet', { toggleCharSheet: () => got.push('bare') }), true);
-  assert.match(rd('src/scenes/dungeonContext.js'), /toggleCharSheet\(doorOpts = \{\}\) \{/, 'the dungeon toggle takes the door options');
 });

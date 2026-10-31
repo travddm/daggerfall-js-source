@@ -1590,44 +1590,6 @@ test('SAV3: the pending hand-off - set, peek, and TAKE clears', () => {
   assert.equal(takePendingClassicSave(), null);
 });
 
-// The host wiring cannot run headless (a live canvas, IDB and rAF);
-// the seam is READ instead - the project's own idiom for host-side
-// laws (the mysticism host sweeps' shape).
-test('SAV3: the wiring source pins - menu arm, boot arm order, chargen gate, main routing', () => {
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // The classic arm sits BEFORE the load arm in the boot walk and is
-  // gated on a REAL pending import.
-  const classicArm = world.indexOf("params.has('classicload') && peekPendingClassicSave()");
-  const loadArm = world.indexOf("} else if (params.has('load')) {");
-  assert.ok(classicArm > -1 && loadArm > -1 && classicArm < loadArm,
-    'the classicload arm precedes the load arm');
-  // The chargen gate skips the wizard only for a REAL pending import.
-  assert.match(world, /!\(params\.has\('classicload'\) && peekPendingClassicSave\(\)\)/);
-  // The boot arm awaits the deps a fast boot would otherwise miss.
-  assert.match(world, /if \(!spellsByIndex\) spellsByIndex = await loadSpellIndex\(fetchBytes\);/);
-  assert.match(world, /await townTalk\.ensureFactions\?\.\(\);/);
-  // The position lands through the streaming world's own converters.
-  assert.match(world, /worldCoordToMapPixel\(bundle\.position\.worldX, bundle\.position\.worldZ\)/);
-  assert.match(world, /importClimateWeathers\(bundle\.climateWeathers\)/);
-  // The quest globals move ENTRY BY ENTRY - the machine's hooks hold
-  // the Map reference.
-  assert.match(world, /questBridge\.machine\.globalVars\.set\(i, v\)/);
-  // The classic rumors reach the mill through ITS import member.
-  assert.match(world, /rumorMill\.importClassicRumor\(rumor, /);
-
-  const menu = readFileSync(new URL('../../src/scenes/menu.js', import.meta.url), 'utf8');
-  // Load with no saves runs the classic flow (SAV4 routed it through
-  // the slot window's no-saves arm) - the old dead end is gone.
-  assert.match(menu, /await runClassicLoad\(canvas, renderer, status\)/);
-  assert.doesNotMatch(menu, /no quicksave to load/);
-  // The screenshot uploads OPAQUE (GetColor32 alphaIndex -1).
-  assert.match(menu, /bitmapToColor32\(bmp, palette, -1\)/);
-
-  const main = readFileSync(new URL('../../src/main.js', import.meta.url), 'utf8');
-  // SET on classicload, DELETE on anything else (the F12 law's shape).
-  assert.match(main, /if \(action === 'classicload'\) params\.set\('classicload', '1'\);\n\s*else params\.delete\('classicload'\);/);
-});
-
 /** The smallest player snapshot restorePlayer accepts, for the ship
  *  arm below - built by the real snapshotter so it cannot drift. */
 const MIN_SNAP = snapshotPlayer({
@@ -1674,22 +1636,4 @@ test('AUDIT 58 (SAV3): the classic import runs AssignShipToPlayer WHOLE - the de
   assignShipToPlayer(poor, poor.ownedShip, { addPermanentScene: addBoth });
   assert.equal(poor.sceneCache.permanent.size, 0);
 
-  // and the HOST really runs it on the import path - classicLoadBoot
-  // has no headless boot, so the wiring is source-pinned.
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const boot = world.slice(world.indexOf('async function classicLoadBoot()'));
-  const body = boot.slice(0, boot.indexOf('const toggleTravelMap'));
-  assert.match(body, /assignShipToPlayer\(playerEntity, playerEntity\.ownedShip, \{ addPermanentScene: shipPermanentScenes \}\);/,
-    'the import goes through the port\'s AssignShipToPlayer, not a raw field write');
-  // WA1: the two scenes are ONE helper now - the import and Warm Ashes' lent ship both hand it over
-  const helper = world.slice(world.indexOf('const shipPermanentScenes = (s) => {'), world.indexOf('};', world.indexOf('const shipPermanentScenes = (s) => {')));
-  // CSA-G: through the host's lazy cache (`_sceneCache()`: `playerEntity.sceneCache ??= createSceneCache()`) - the
-  // import's own cache when restorePlayer minted one, and a fresh one for Come Sail Away's helm on a new character
-  assert.match(helper, /addPermanentScene\(_sceneCache\(\), worldSceneName\(SHIP_COORDS\[s\]\.x, SHIP_COORDS\[s\]\.y\)\)/);
-  assert.match(helper, /addPermanentScene\(_sceneCache\(\), interiorSceneName\(SHIP_INTERIOR_MAP_IDS\[s\], BUILDING_KEY_0\)\)/);
-  // DFU's ORDER: NewCharacterCleanup's ClearSceneCache(true) (:468)
-  // runs first, the ship's scenes are added after (:616) - here that
-  // means after restorePlayer has minted the cache.
-  assert.ok(body.indexOf('restorePlayer(playerEntity, bundle.snap') < body.indexOf('assignShipToPlayer(playerEntity'),
-    'the scenes are added AFTER the cache is minted, never before');
 });

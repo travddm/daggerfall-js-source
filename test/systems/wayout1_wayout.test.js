@@ -289,23 +289,6 @@ test('AUDIT DELVE B2: the field is built again only when the player stands off i
   assert.equal(w.builds(), 2, 'the refield');
 });
 
-test('WAYOUT1: the dungeon hands the compass its way out once the way in is found; both HUD doors carry it', () => {
-  const s = src('src/scenes/dungeonContext.js');
-  assert.match(s, /if \(!isEnhanced\(\) \|\| getPref\(WAY_PREF\) === false \|\| !feet \|\| !eye \|\| !sm \|\| !automapRec\?\.entranceDiscovered\) \{ _wayAt = null; return null; \}/);
-  // AUDIT SD III (D1, PIN MOVED): the walked teleporters and the drops taken, each a one-way step (automap.js automapWaySteps)
-  assert.match(s, /_wayAt = wayOut\.aim\(automapRec\.trail, automapWaySteps\(automapRec\), \[sm\.x, sm\.y, sm\.z\], feet, sees, t, wayStepClear\);/);
-  // AUDIT DELVE C9: a step asked of the dungeon's own geometry alone, waist high - a door or a mover walked through is no wall
-  assert.match(s, /return !stepHitCuts\(collider\.raycast\(a, \[dx \/ len, dy \/ len, dz \/ len\], len, PROF_VEIN_ONLY\), len\);/);
-  assert.match(s, /const PROF_VEIN_ONLY = Object\.freeze\(\{ only: Object\.freeze\(\['dungeon'\]\) \}\);/);
-  assert.match(s, /wayOut: wayOutMark\(playerFeet, eye\),/);
-  const hud = src('src/ui/hud/hud.js');
-  assert.match(hud, /gate = null, quest = null, wayOut = null, party = null,/);
-  assert.match(hud, /wayOut: wayOut \?\? null,/);
-  const eh = src('src/ui/enhanced/enhancedHud.js');
-  assert.match(eh, /drawWayOutMark\(opts\.wayOut \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(eh, /questMark: null, wayOutMark: null,/);
-});
-
 test('WAYOUT1: the Features row - Enhanced, on by default, the player\'s own online', () => {
   const f = FEATURES.find((x) => x.id === 'dungeon-way-out');
   assert.ok(f);

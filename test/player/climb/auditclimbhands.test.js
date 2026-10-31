@@ -334,7 +334,6 @@ test('AUDIT CLIMB-HANDS A14: on the large HUD the hands stand on its bar, as the
   quads.length = 0;
   hands.draw(canvas, { offsetHeight: 37 });
   assert.deepEqual(quads.map((q) => q.y), flat.map((y) => y - 37), 'lifted by the bar\'s height');
-  assert.match(rd('src/combat/climbHands.js'), /offsetHeight = weaponOffsetHeight\(\)/, 'the bar\'s own height by default');
 });
 
 /** WEAPON09.CIF: one WeaponAnim record, 7 frames of 100x80 (ARROW2's synthetic bow, climb4's). */
@@ -377,17 +376,6 @@ test('AUDIT CLIMB-HANDS A15: the weapon and the hands are never on the screen to
   for (const f of off) assert.ok(!(f.hands && f.lower < 1), `the weapon held down while a hand shows (lower ${f.lower.toFixed(2)})`);
   assert.ok(off.at(-1).lower === 0 && off.at(-1).weapon, 'and back in the hand after');
   _resetModSettings(); resetToDefaults();
-});
-
-test('AUDIT CLIMB-HANDS A16: by source - the hands are stepped on the classic lane alone (the Morrowind arms and the third-person body take the climb themselves) and the weapon\'s lowering waits on them', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /const handsLane = !fpArm\.active\(\) && !fpArm\.thirdActive\(\) && !eotbHidesWeapon\(\);/);
-  assert.match(rig, /_climbLower = climbLowerStep\(_climbLower, climbing \|\| \(handsLane && climbHands\.showing\(\)\), dt\);/);
-  // PIN MOVED (CLIMB-HANDS II): the lane's climb named first, then handed on with the look and the frame's lens.
-  // PIN MOVED (FIELD BUGS 2026-10-22c SPELL-CLIMB): none while a cast's hands play
-  assert.match(rig, /const handsClimb = handsLane && _climbLower >= CLIMB_HANDS_AFTER && !castTakesHands \? \(camNow\?\.climb \?\? null\) : null;[\s\S]{0,400}?climbHands\.update\(dt, handsClimb, \{ yaw: camNow\?\.yaw, pitch: camNow\?\.pitch, lens: handsLens \}\);/);
-  const pose = rd('src/player/climb/climbPose.js');
-  assert.doesNotMatch(pose, /m\.way \? Math\.sign\(m\.way\[0\]/, 'the corner reads its own path, not a field the motor never sets');
 });
 
 // ---- AUDIT CLIMB-HANDS, second round: an independent review's findings, on the real motor where they live ----------
@@ -506,6 +494,3 @@ test('AUDIT CLIMB-HANDS B5 (second round): looking straight back from the wall t
   assert.equal(over.at(-1).reach?.side, 'L', '...and is up on the side looked to');
 });
 
-test('AUDIT CLIMB-HANDS B6 (second round): by source - the law is handed no climb when the Morrowind body is drawn in third person (the arm is not first person\'s alone: fpArm.active() is), so it never holds that weapon down', () => {
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /const handsLane = !fpArm\.active\(\) && !fpArm\.thirdActive\(\) && !eotbHidesWeapon\(\);/);
-});

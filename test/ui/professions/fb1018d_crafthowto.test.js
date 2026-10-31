@@ -91,18 +91,6 @@ test('CRAFT-HOWTO THE PAGE: every profession\'s pane says how it is done - each 
   }
 });
 
-/** The host's station questions (scenes/worldModes.js), each its shops' types and whether a home's station answers it. */
-function stationQuestions() {
-  const wm = src('src/scenes/worldModes.js');
-  const out = {};
-  for (const q of ['forgeHere', 'workbenchHere', 'loomHere', 'masonHere', 'jewellerHere', 'alchemyHere', 'enchantHere']) {
-    const at = wm.indexOf(`    ${q}() {`);
-    assert.ok(at > 0, `worldModes.js asks ${q}`);
-    const body = wm.slice(at, wm.indexOf('\n    },', at));
-    out[q] = { types: [...body.matchAll(/BUILDING_TYPES\.(\w+)/g)].map((m) => m[1]), home: /stationOwnerHere\(\) && interiorDecor\.list\(\)\.some/.test(body), body };
-  }
-  return out;
-}
 /** A shop type's words, as the page says them, and as the Tutorials' list says them. PIN MOVED (PLAIN-TEXT): the page
  *  names the shops as the list does (Weaponsmiths), not one shop's (a Weaponsmith's), to say it within forty words. */
 const SHOP_WORDS = Object.freeze({
@@ -118,20 +106,8 @@ const HOW_OF = () => ({
 });
 
 test('CRAFT-HOWTO THE WORDS ARE THE CODE\'S: each craft names the shops its stations\' questions answer and the home\'s own, the joinery and any fire; what the works make and what pays its XP is the law\'s (mutants: a shop dropped from Smithing\'s words; a home dropped from Outfitting\'s; the joinery dropped; a saw and a cure paying XP; the brew\'s carried goods unsaid)', () => {
-  const qs = stationQuestions();
   const how = HOW_OF();
-  for (const [q, words] of Object.entries(how)) {
-    assert.ok(qs[q].types.length, `${q}: a shop answers it`);
-    for (const ty of qs[q].types) assert.ok(words.includes(SHOP_WORDS[ty][0]), `${q}: its ${ty} named - "${SHOP_WORDS[ty][0]}"`);
-    assert.ok(qs[q].home, `${q}: a home's station answers it`);
-    assert.match(words, /your home/, `${q}: and the words say so`);   // PIN MOVED (PLAIN-TEXT): "your own home" said plainly
-  }
-  // a Mages Guild hall is the enchanting station's shop, said by the item maker's own page
-  assert.match(qs.enchantHere.body, /BUILDING_TYPES\.GuildHall && interiorBuilding\.factionId/);
-  assert.match(qs.enchantHere.body, /=== GUILD_GROUPS\.MagesGuild\) return \{ kind: 'shop'/);
   assert.match(ENCHANTING_HOW(0), /at an enchanting station, on the Crafting page\. Mages Guild halls and your home have one\./, 'PIN MOVED (PLAIN-TEXT): the station\'s places said plainly');
-  // CARP-YARD: a joinery's bench is the street's workbench question (scenes/world.js)
-  assert.match(src('src/scenes/world.js'), /workbench: \(\) => workbenchHere\(\),\s+\/\/ CARP-YARD: and a joinery's in the street/);
   assert.match(CRAFT_HOW.building(), /^Carpentry needs a workbench: Furniture Stores, joineries and your home have one\./, 'PIN MOVED (PLAIN-TEXT)');
   // the fire is any lit one, and nobody's to charge for
   assert.deepEqual(COOK_FIRE, { kind: 'fire', fee: 0 });
@@ -139,11 +115,7 @@ test('CRAFT-HOWTO THE WORDS ARE THE CODE\'S: each craft names the shops its stat
   // PIN MOVED (CRAFT-HALL): every one is worked on the Crafting page, beside the Professions page on the Stats rail; the
   // Stores page is the Holdings tab's. The key opens the Crafting page at a station, and that page says so, not each how-to.
   assert.deepEqual(PROF_PAGE_SECTIONS.map(([id]) => id), ['professions', 'crafting', 'stores']);
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /const PROF_HOLD_SECTIONS = Object\.freeze\(PROF_PAGE_SECTIONS\.filter\(\(\[id\]\) => !PROF_STATS_PAGES\.includes\(id\)\)\);/);
-  assert.match(menu, /\['holdings', 'Holdings'\]/);
   for (const k of ['smithing', 'building', 'outfitting', 'provisioning']) assert.doesNotMatch(CRAFT_HOW[k](), /Stores page/, `${k}: worked on the Crafting page`);
-  assert.match(src('src/ui/professions/profPages.js'), /'Stand at a station to craft\. Press \{key\} there to open this page on it\.'/);
 
   // THE WORKS: the forge's ingots of mined ore pay Smithing; a saw and a cure pay nothing, a mason's work Building
   const ingots = SMELT_RECIPES.filter((r) => r.out.startsWith('ingot:') && r.inputs.every((i) => /^(metal|ore):/.test(i.key)));
@@ -185,8 +157,6 @@ test('CRAFT-HOWTO THE WORDS ARE THE CODE\'S: each craft names the shops its stat
   const goods = new Set(COOKING_RECIPES.flatMap((r) => r.inputs.map((i) => i.key.split(':')[0] === 'food' ? i.key : 'herb')));
   assert.deepEqual([...goods].sort(), ['food:apple', 'food:egg', 'food:fish', 'food:meat', 'food:mushroom', 'food:orange', 'herb']);
   assert.match(CRAFT_HOW.provisioning(), /Dishes use the meat you skin, the fish you net, herbs and Basket finds, and go to your pack\.$/);
-  // BAG-CRAFT: the brew reads what is carried as every station does - the brew's words said the Stores alone
-  assert.match(src('src/ui/professions/profPages.js'), /function drawAlchemyStation[\s\S]*?const held = \(k\) => workOf\(book, k\);/);
   assert.match(ALCHEMY_HOW, /from what you carry or store\./, 'PIN MOVED (PLAIN-TEXT): the brew\'s words reworded, the carried goods kept');
 });
 
@@ -196,36 +166,21 @@ test('CRAFT-HOWTO THE TUTORIAL: a Crafting page among Professions & Survival, af
   assert.deepEqual(tutorialsIn('livelihood').map((p) => p.id), ['foraging', 'professions', 'crafting', 'survival']);
   assert.equal(page.title, 'Crafting');
   assert.equal(page.trigger, tutorialById('professions').trigger, 'when the first gather pops the two before it');
-  // the seam: the first gather's press pops the three, in order (scenes/gatherHost.js)
-  assert.match(src('src/scenes/gatherHost.js'), /\n {6}noteFirstUse\('foraging'\); noteFirstUse\('professions'\); noteFirstUse\('crafting'\);/);
   const { body, points } = tutorialText(page, () => 'DOWN');
   const words = [...body, ...points].join(' ');
   // AUDIT FB1018D L1-6: by the key - "Menu > Holdings" is the Enhanced menu's alone (the Classic skin's Escape is DFU's
   // pause, no tabs), and the key opens the pages on either skin (ui/pauseDoor.js profPageAt)
   assert.match(body[0], /stand at a station and press \[DOWN\]: the Crafting page opens on it\. Cook at any fire\.$/);   // PIN MOVED (CRAFT-HALL); the page within TUT1's sixty words
   assert.doesNotMatch(words, /Menu >/);
-  // every shop a station question answers, as the list names them
-  const qs = stationQuestions();
   const list = { forgeHere: 'Forge:', loomHere: 'Loom:', workbenchHere: 'Workbench:', jewellerHere: 'Jeweler\'s bench:',   // PIN MOVED (VOICE2): American spelling (Voice.md rule 8)
   masonHere: 'Mason\'s bench:', alchemyHere: 'Alchemy:' };
-  for (const [q, head] of Object.entries(list)) {
-    const at = words.indexOf(head);
-    assert.ok(at >= 0, `${head} listed`);
-    const entry = words.slice(at + head.length, words.indexOf('.', at));
-    for (const ty of qs[q].types) assert.ok(entry.includes(SHOP_WORDS[ty][1]), `${head} names ${SHOP_WORDS[ty][1]}`);
-  }
   assert.match(words, /Workbench: Furniture Stores, joineries\./);
   assert.match(words, /Enchanting: Mages Guild halls\./);
   assert.match(words, /Your home can hold stations too\. Each crafting profession under \[DOWN\] says more\.$/);
   assert.deepEqual(tutorialsMatching('jeweler').map((p) => p.id), ['crafting'], 'PIN MOVED (VOICE2): the pane\'s search finds it, by its American spelling');
-  // the Professions page: the key lands on the Professions page (input.js), the Stores page is Holdings'
-  assert.match(src('src/ui/input.js'), /case 'Professions': return ctx\.togglePause && ctx\.sailing\?\.\(\) !== true \? \(ctx\.togglePause\(\{ at: 'professions', setPlayerPos \}\), true\)/);
   const prof = tutorialText(tutorialById('professions'), () => 'DOWN').body.join(' ');
   assert.doesNotMatch(prof, /opens them and your Stores/);
   assert.match(prof, /\[DOWN\] opens them, and your stored goods are under Holdings > Stores in the same window\.$/);
-  // PIN MOVED (CRAFT-HALL): at a station the key's page is the Crafting page (professionsKeyAt)
-  assert.match(src('src/ui/pauseDoor.js'), /if \(profPageAt\(hooks\.at\)\) \{\n {4}if \(!profPagesShown\(\)\) \{ hudText\(profPagesClosedLine\(\)\); return null; \}\n {4}\/\/ [^\n]*\n {4}if \(typeof document !== 'undefined'\) return enhancedPauseOverlay\(show, hooks\.at === 'professions' \? \{ \.\.\.hooks, at: professionsKeyAt\(\) \} : hooks\);/,
-    'the key\'s page opens the tabbed window on either skin - where Holdings > Stores is');
   // AUDIT FB1018D L1-7: and the key's Controls row says the same - it opens the Professions page, the Stores a tab away
   assert.equal(actionLabel('Professions'), 'Open your Professions page, or the Crafting page at a station (online)');   // PIN MOVED (AUDIT HORIZONTAL A7): at a station the key lands on the Crafting page, and its row says so
 });

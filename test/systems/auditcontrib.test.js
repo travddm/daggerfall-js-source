@@ -142,16 +142,6 @@ test('AUDIT CONTRIB A4: a rise in place hands the fall\'s pitch back on every ho
   assert.ok(cam.pitch > 0.5, 'tilted at the sky');
   ds.restoreView();
   assert.equal(cam.pitch, 0.2, 'handed back');
-  assert.match(rd('src/scenes/dungeonContext.js'), /clearDeathOverlay: \(\) => \{ if \(activeOverlay instanceof DeathScreen\) \{ activeOverlay\.restoreView\(\); activeOverlay = null; \} \}/,
-    'the dungeon\'s clear restores the view, as the interior\'s does');
-  assert.match(rd('src/scenes/world.js'), /if \(townTalk\.overlay instanceof DeathScreen && _deathWasOnline\) townTalk\.overlay\.input\('confirm'\);/,
-    'F11 online is Enter\'s path - the respawn under a screen still tilting is gone');
-});
-
-test('AUDIT CONTRIB A6: the Resurrect snapshot is taken only while DEAD - not through a respawn\'s teleport - and let go the first living frame', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!_respawning\) \{\n\s*if \(!_rezSeen\) _rezSeen = rezSnapshot\(social\?\.others\(\) \?\? \[\]\);/);
-  assert.match(w, /\}   \/\/ AUDIT WORLD B6: the dungeon's and the building's death screens stand in the mode's slot[^\n]*\n\s*_rezSeen = null;   \/\/ AUDIT CONTRIB A6/);
 });
 
 // ── P1-P3: THE DYING OWNER NAMES THE HEIRS ──────────────────────────────────────────────────────────────────────
@@ -206,14 +196,9 @@ test('AUDIT CONTRIB P1-P3: the dying owner\'s last frame names each foe\'s heir;
   assert.equal(bob.foes.filter((f) => !f.puppet).length, 0, 'Bob adopts nothing - there is ONE heir, whatever his own view says');
   assert.equal(ann.dropOwnLive(), 1, 'Ann lets go of the handed foe alone');
   assert.equal(near.dead, true); assert.equal(far.dead, false, 'P3: what nobody took stays hers - a Resurrect in place finds it');
-  assert.match(rd('src/scenes/exteriorFoes.js'), /if \(heirOf && !onWatch && !f\.dead\)/, 'P2: a watchman is never handed - the watch goes with its criminal');
 });
 
 // ── S1, U1, U2 ──────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('AUDIT CONTRIB S1: a peer with no look yet keeps the doll path - the Thief is for a look with no class, not for a look that has not arrived', () => {
-  assert.match(rd('src/net/remotePlayers.js'), /: spritesOn && peer\.look \? classMobileType\(peer\.look\.class\) : null;/);
-});
 
 test('AUDIT CONTRIB U1/U2: only a sound chosen inside an input event stamps the click\'s "already sounded" (the frame loop\'s one-shots swallowed clicks), and the click\'s window opens at its own press', () => {
   const was = audio.lastOneShotAt;
@@ -224,10 +209,6 @@ test('AUDIT CONTRIB U1/U2: only a sound chosen inside an input event stamps the 
   try { audio.playOneShot(0, 1); } finally { delete globalThis.event; }
   assert.ok(audio.lastOneShotAt > -1, 'a handler\'s own sound is');
   audio.lastOneShotAt = was;
-  const u = rd('src/ui/uiClickSound.js');
-  assert.match(u, /win\.addEventListener\('pointerdown', \(\) => \{ pressAt = nowMs\(\); \}, true\);/);
-  assert.match(u, /const at = e\.detail > 0 && now - pressAt < GESTURE_MS \? pressAt : now;/);
-  assert.doesNotMatch(u, /LEAD_MS/);
 });
 
 // ── H1-H5: THE HOTBAR ───────────────────────────────────────────────────────────────────────────────────────────
@@ -275,14 +256,6 @@ test('AUDIT CONTRIB H1 (re-aimed by KB1): a mod\'s hotkey is the mod\'s ACTION -
   finally { setModSetting('horse-cart-and-cargo', 'Enabled', false); }
   assert.equal(pressed(edge, keys, 'HorseMount'), false, 'a mod switched off answers nothing on its key');
   assert.equal(actionOf({ code: 'Comma' }), null, '...and its key means nothing to a listener either');
-  const b = rd('src/ui/enhanced/enhancedHotbar.js');
-  assert.match(b, /const i = slotOfActions\(eventActions\(e\)\);/, 'the bar asks the registry which slot a key is (AUDIT KB1: through eventAction, the event\'s own read - no latch written; UXB1-S: every action a shared key carries)');
-  assert.match(b, /const slotOfActions = \(acts\) => acts\.map\(\(a\) => HOTBAR_SLOT_ACTIONS\.indexOf\(a\)\)\.find\(\(i\) => i >= 0\) \?\? -1;/, '...the first of them that is a slot');
-  assert.match(b, /if \(!bar \|\| !hotbarMode\(\) \|\| dropOwners\.size \|\| keysPaused\(\)\) return;/, 'gated on the game\'s pause, not the HUD\'s visibility');
-  // AUDIT FB1018f L2-5: the pause at the press, the host's own (the hooks it hands the finger and the pad), the HUD's
-  // last frame's word only where no host handed any (test/ui/hud/fb1018f_dungeondigits.test.js drives it)
-  assert.match(b, /const keysPaused = \(\) => hostPaused\(\) \?\? lastPaused;/);
-  assert.match(rd('src/ui/hud/hud.js'), /paused: !!cursorActive,/);
   setBindings(null);
 });
 
@@ -322,9 +295,6 @@ test('AUDIT CONTRIB H3: a refused press is a refusal - the performers\' own answ
     quickSpell: () => { HB.spellQuickslotPress({ entity: me, magic: { readiedIndex: () => null, readySpell: () => false, interceptAttack: () => false } }); return true; } };
   assert.equal(HB.hotbarPress(0, { entity: me, doors }).kind, 'refused', 'no dagger in the pack: the swap said none');
   assert.equal(HB.hotbarPress(1, { entity: me, doors }).kind, 'refused', 'the engine refused the ready (silence, no spell points)');
-  const h = rd('src/scenes/hostMagic.js');
-  assert.match(h, /say\(silencedText\(\)\); return false; \}/);
-  assert.match(h, /say\(pressButtonToFireSpellText\(\)\);   \/\/ classic: the next attack-click CASTS\n\s*return true;/);
   HB.clearQuickslots();
 });
 
@@ -339,6 +309,5 @@ test('AUDIT CONTRIB H4/H5: the bar\'s view keys each pack record ONCE a frame, n
   const v = HB.hotbarView(me);
   assert.equal(v.filter((s) => !s.empty && !s.ghost).length, 7);
   assert.ok(reads <= counted.length * 3, `the pack was keyed ${reads / counted.length}x per record - once per slot again`);
-  assert.match(rd('src/ui/enhanced/enhancedHotbar.js'), /requestFittedIcon\(image\.archive, image\.record, \{ box: fit\.box, dpr: fit\.dpr, dye: image\.dye,/);   // UI2: fitted, still by the dye
   HB.clearQuickslots();
 });

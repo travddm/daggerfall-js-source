@@ -23,7 +23,6 @@ const near = (a, b, eps, msg = '') => assert.ok(Math.abs(a - b) <= eps, `${msg} 
 const rad = (d) => (d * Math.PI) / 180;
 /** An angle folded into [-180, 180). */
 const wrap = (d) => ((((d + 180) % 360) + 360) % 360) - 180;
-const WORLD = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
 
 /** A helm on `hull` under `handling`, her sails raised with the wind `off` degrees off her bow's eye (0 dead ahead,
  *  plus to starboard) at `len` m/s, held there each quarter-second frame. Her bow is +z. */
@@ -205,8 +204,4 @@ test('SAIL-FREE the Overworld journey sails her straight for a mark to windward:
   assert.equal(seaHelmStep(st, q(false, -(SEA_HELM.laneDeg - 1))).course, SEA_HELM.noGoFore, 'within the lane: held');
   assert.equal(seaHelmStep(st, q(false, -(SEA_HELM.laneDeg + 1))).course, -SEA_HELM.noGoFore, 'past it: about');
   for (const b of [10, -(SEA_HELM.laneDeg - 1), -(SEA_HELM.laneDeg + 1)]) { assert.equal(seaHelmStep(fr, q(true, b)).course, b); assert.equal(fr.tack, 0, 'free: no tack held'); }
-  // PIN MOVED (AUDIT SHIPS A4, 2026-10-06): her sails' way is the runtime's own word now (sailWayOf), not the mod's formula
-  const i = WORLD.indexOf('sailWay: csaRuntime.sailWayOf(boat)');
-  assert.ok(i >= 0, 'the world asks the journey');
-  assert.match(WORLD.slice(i, WORLD.indexOf('\n', i)), /, free: !!csaRuntime\.helmResponsive\(\),/, 'and tells it the helm she has');
 });

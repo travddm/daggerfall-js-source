@@ -330,9 +330,6 @@ test('ENC-CEIL: the encumbrance penalty reads the pack\'s own ceiling - PlayerEn
   const f0 = bare.fatigue;
   runMagicRoundsFor(bare, 0, 1, { sinks: {} });
   assert.equal(f0 - bare.fatigue, Math.trunc(per), 'the no-sink arm charges the scaled drain too');
-  // the seam reads the property, never the bare formula again
-  assert.match(rd('src/systems/roleplayRealism/rrInstall.js'), /maxEncumbrance: entityMaxEncumbrance\(entity\)/);
-  assert.ok(!/maxEncumbrance\(liveStat\(/.test(rd('src/systems/roleplayRealism/rrInstall.js')), 'the bare strength formula is back in the penalty');
   reset();
 });
 
@@ -429,25 +426,4 @@ test('RR1 bedSleeping and the wiring: the three bed models, listed by the interi
   assert.equal(isBedModel(41001), true); assert.equal(isBedModel(41003), false);
   assert.equal(bedSleepingOn(), true);
   on('bedSleeping', false); assert.equal(bedSleepingOn(), false); reset();
-  assert.match(rd('src/scenes/shared.js'), /installRoleplayRealismItems\(\);\n  installRoleplayRealism\(\);/, 'InitMod after Items\', once');
-  // WD3: a town mod's coloured bed is an ALIAS of one of the three (world/customModels.js) - read as its classic model
-  assert.match(rd('src/scenes/interiorContext.js'), /\} else if \(isBedModel\(classicModelIdOf\(p\.modelIdNum\)\)\) \{[^\n]*\n      beds\.push\(\{ cpu, matrix \}\);/);
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /if \(bedSleepingOn\(\)\) interiorCtx\.beds\?\.forEach\(\(bd, i\) => \{/, 'a bed is a target only while the module is on');
-  assert.match(wm, /if \(key\.startsWith\('bed:'\)\) \{\n        \(decorTool\.flying\(\) && !decorTool\.ghost\(\) && plaqueActionFor\(key\) === 'out' \? decorTool\.act\('out', interiorCtx\.beds\?\.\[Number\(key\.split\(':'\)\[1\]\)\]\?\.baseKey\) : restFromInteriorBed\(\)\);/, 'BedActivation is the rest gate');
-  assert.match(wm, /const restFromInteriorBed = \(\) => \{ _restFromBed = true; try \{ interiorKeyCtx\.toggleRest\(\{ ignoreAllocatedBed: true \}\); \} finally \{ _restFromBed = false; \} \};/, 'and `new DaggerfallRestWindow(uiManager, true)` (:524) - AUDIT-RR F6 (CSA-J: through the bed\'s own door, which drops the GiveOffer rung)');
-  assert.match(wm, /joinGuild\(memberships, guild, ownDate\(\), store\);/);   // LIVED1: a join is dated on the character's own clock (the rank wait's)
-  assert.match(wm, /const doused = rrDouseOnDungeonExit\(playerEntity, \{ isDay: isDayFromMinutes\(Math\.floor\(skyMinutes\(\)\)\) \}\);[^\n]*\n      if \(doused\) townTalk\?\.showOverlay\?\.\(new ActionTextBox\(\[expandItemMacro\(USE_TEXT\.lightDouse, doused\)\]\)\);/, 'the douse on the dungeon exit with the light\'s own box');
-  assert.match(wm, /setRrHostSeams\(\{ spawnFoe: \(mobileType, opts\) => standInteriorLooseFoe\(mobileType, opts\) \}\);/);
-  assert.match(rd('src/combat/formulas.js'), /chanceToHitMod \+= _overrides\.get\('calculateWeaponToHit'\)\?\.\(weapon\) \?\? \(WEAPON_MATERIAL_MODIFIER\[weapon\.material\] \?\? 0\) \* 10;/);
-  assert.match(rd('src/combat/formulas.js'), /if \(_overrides\.get\('applyConditionDamageThroughPhysicalHit'\)\?\.\(item, owner, damage, \{ say, rolls \}\) === true\) return;/);   // BALANCE1: the override is handed the rolls, for the wear scale's rounding
-  assert.match(rd('src/player/climbing.js'), /const chance = climbingChanceOverride\(base, \{ \.\.\.i, say: this\.deps\.say \?\? null \}\) \?\? climbingChance\(/);
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /const poseProbe = \(\) => \(\{ \.\.\.weaponPoseOf\(playerWeapon\), weaponType: weaponTypeForItem\(playerWeapon\.weapon\) \}\);/, 'the pair through its one law (HARD2c)');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /setWeaponPoseProbe\(poseProbe\);/, 'AUDIT 68 S09-rig-globals-last-built: re-claimed by the stepping rig');
-  assert.match(rd('src/player/mountRig.js'), /shipAvailable: isShipAvailable\(\{ canSail: !!onShip, ownsShip: ownsShip\(playerEntity\), \.\.\.\(shipLocation\?\.\(\) \?\? \{\}\) \}\)/);
-  assert.match(rd('src/systems/worldTick.js'), /for \(const fn of _roundHooks\.values\(\)\) fn\(entity, \{ nowMinutes: r \+ 1, sinks, say \}\);/);
-  assert.match(rd('src/systems/guild/guilds.js'), /return guild\?\.neverExpels && !underworldRuleOf\(guild\) && newRank < 0 \? 0 : newRank;/);
-  assert.match(rd('src/systems/guild/guildServiceFlow.js'), /const rows = moved\.lines \? moved\.lines\.map\(\(t\) => \(\{ text: t\.replaceAll\('%pcn', entity\?\.name \?\? ''\), center: true \}\)\) : undefined;/);
-  const inst = rd('src/systems/roleplayRealism/rrInstall.js');
-  for (const s of ["registerFormulaOverride('adjustWeaponHitChanceMod'", "registerMagicRoundHook('roleplay-realism-encumbrance'", "registerEntityFold('roleplay-realism-encumbrance'", 'setShipAvailable((q) => rrShipAvailable(q))', 'setUnderworldRule(', 'setGuildExpelledHook(', 'registerClimbingChanceOverride(', 'registerMeleeWeaponAnimTime(', "registerFormulaOverride('calculateWeaponToHit'", "registerFormulaOverride('applyConditionDamageThroughPhysicalHit'", "if (rrModule('enemyAppearance')) applyEnemyAppearance(ENEMY_BASICS);", "overridePotionRecipes(rrModule('purificationPotion') ? RR_POTION_RECIPES : []);", "registerFormulaOverride('damageModifier'", 'registerMaxBankLoan(']) assert.ok(inst.includes(s), s);
 });

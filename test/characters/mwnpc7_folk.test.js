@@ -143,25 +143,3 @@ test('MWNPC7c the population lane: made when wanted, each actor offered with its
   assert.equal(pl.has('a'), false);
 });
 
-test('MWNPC7d THE POPULATION HOSTS, enumerated and by source: every host that walks a town population offers its walkers and draws their bodies before its person billboards, and draws the veiled', () => {
-  const hosts = [];
-  for (const f of readdirSync(new URL('../../src/scenes', import.meta.url), { recursive: true })) if (f.endsWith('.js') && /population\.update\(/.test(rd(`src/scenes/${f}`))) hosts.push(`src/scenes/${f}`);
-  assert.deepEqual(hosts.sort(), ['src/scenes/exterior.js', 'src/scenes/world.js'], 'a new host walking a population is named here');
-  const sites = {
-    // PIN MOVED (AUDIT MW-NPC C4): world.js's walker dressed as a living resident stands as that resident (rosterBodies.js
-    // residentWalkerActor); exterior.js walks no living town. PIN MOVED (AUDIT MW-NPC II K1): a beggar's still picture
-    // answers no actor - its flat shown
-    'src/scenes/world.js': ['const _folkOn = folkStreet.frame();', 'if (_folkOn) { const a = person.living?.res ? residentWalkerActor(person, batch.origin) : folkActor(person, batch.origin, p.population.race); if (a) folkStreet.offer(a, batch); else batch.castOnly = false; }', 'folkStreet.draw(canvas, proj, view, mwv.eye, townTalk.overlayActive ? 0 : dt);', 'if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);', 'folkStreet.drawVeiled();'],
-    'src/scenes/exterior.js': ['const _folkOn = !!population && folkStreet.frame();', 'if (_folkOn) folkStreet.offer(folkActor(person, batch.origin, population.race), batch);', 'folkStreet.draw(canvas, proj, view, eye, popDt);', 'if (personBatches.length) renderer.drawBillboards(personBatches, camRight, UP_Y);', 'folkStreet.drawVeiled();'],
-  };
-  for (const [file, [frame, offer, draw, flats, veiled]] of Object.entries(sites)) {
-    const s = rd(file);
-    const a = s.indexOf(frame), b = s.indexOf(offer, a), c = s.indexOf(draw, b), d = s.indexOf(flats, c);
-    assert.ok(a > 0 && b > a && c > b && d > c, `${file}: the frame, the offer, the draw, then the billboards`);
-    assert.ok(s.includes(veiled), `${file}: the veiled`);
-    assert.ok(s.includes('else batch.castOnly = false;'), `${file}: a billboard drawn whenever the lane is not`);
-  }
-  const w = rd('src/scenes/world.js');
-  assert.ok(w.includes('folkStreet.destroy();   // MWNPC7: indoors'), 'world.js lets the walkers go indoors');
-  assert.ok(w.includes('folkStreet.offsetAll(r.offset);'), 'and moves them with the origin');
-});

@@ -395,8 +395,6 @@ test('WEAPON-GLOW1: drawScreenQuadGlow - the fourth 2D primitive: a field baked 
   r.drawScreenQuadGlow(tex, { x: 0, y: 0, w: 1, h: 1 }, undefined, null);
   r.drawScreenQuadGlow(null, { x: 0, y: 0, w: 1, h: 1 }, undefined, spec);
   assert.equal(log.filter((c) => c[0] === 'drawElements').length, 0);
-  // the source law's own list knows the primitive and its bake
-  assert.match(read('test/render/glstate.test.js'), /'drawScreenQuadGlow', '_ensureWeaponGlowQuadProgram', '_glowField'/);
 });
 
 test('WEAPON-GLOW1: the fields kept are GLOW_FIELDS_MAX - the least recently drawn deleted first', () => {

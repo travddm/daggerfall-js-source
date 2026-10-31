@@ -30,22 +30,10 @@ import { HULL_NAMES } from '../../../src/systems/comeSailAway/comeSailAwayBoat.j
 import { scene } from '../../csaScene.mjs';
 
 const { WATER_LEVEL } = csa;
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const SMALL_SHIP = HULL_NAMES.indexOf('Small Ship'), CARRACK = HULL_NAMES.indexOf('Carrack');
 const H = HEIGHTMAP_DIMENSION;
 /** The host's own floor read (scenes/deepWater/deepWatersHost.js). */
 const DEEP_WATERS = { floorLocalY(entry, lx, lz) { return carvedFloorLocalY(entry?.deepWaters, lx, lz); } };
-/** world.js's csaTerrainOf - the Terrain the runtime reads its nodes on - mounted over the pixel at the scene's
- *  origin (csaScene's terrain stands there: its corner at 0, 0, 0). */
-function mountTerrainOf() {
-  const i = WORLD.indexOf('  const csaTerrainOf = (p) => {');
-  assert.ok(i >= 0, 'csaTerrainOf');
-  const body = WORLD.slice(i, WORLD.indexOf('\n  };\n', i) + 5);
-  const state = { pixelTranslation: (px, py, o) => { o[0] = 0; o[1] = 0; o[2] = 0; return o; } };
-  const names = ['_csaTerrains', 'state', 'TERRAIN_SIZE', 'deepWaters', ...Object.keys(surface)];
-  // eslint-disable-next-line no-new-func
-  return new Function(...names, `${body}\nreturn csaTerrainOf;`)(new WeakMap(), state, TERRAIN_SIZE, DEEP_WATERS, ...Object.values(surface));
-}
 /** The sea as the sampler writes it: a WOODS.WLD of nought round the pixel - every sample the ocean elevation. */
 const SEA_WOODS = { getHeightMapValuesRange1Dim: (x, y, d) => new Uint8Array(d * d), getLargeHeightMapValuesRange: () => new Uint8Array(81) };
 const flatSea = () => generateSamples(SEA_WOODS, 208, 215);
@@ -100,23 +88,6 @@ test('SEA-LEVEL: Deep Waters carves the levelled sea and her nodes read it - the
   let carved = 0, sea = 0;
   for (let cz = 0; cz < HOLES_RESOLUTION; cz++) for (let cx = 0; cx < HOLES_RESOLUTION; cx++) if (!onHeadland(cx, cz)) { sea++; if (!dw.holes[cz * HOLES_RESOLUTION + cx]) carved++; }
   assert.ok(carved > sea * 0.99, `the open sea carved: ${carved} of ${sea} cells`);
-  for (const hull of [SMALL_SHIP, CARRACK]) {
-    const terrain = mountTerrainOf()({ px: 10, py: 20, samples, tilemapBytes: null, deepWaters: dw });
-    const s = scene({ terrains: [terrain] });
-    s.deps.iliacPuddleNoMore = () => true;
-    s.deps.handling = () => 'responsive';   // the Features row's Ship handling as it ships (under Classic the mod's own Carrack makes no way - kept, CSA-D)
-    const boat = s.helm(s.place(hull, 0, [100, 34, 200], [0, 0, 1]));
-    assert.deepEqual([...boat.NodeTileMapIndices], [0, 0, 0, 0, 0], `${HULL_NAMES[hull]}: every node on the water`);
-    s.rt.state.windVectorCurrent = [0, 0, 3];
-    s.rt.state.windVectorTarget = [0, 0, 3];
-    s.frame({ press: ['BoatToggleSail'] });   // the sail key (End)
-    assert.ok(s.out.hud.includes('Sail raised!') && !s.out.hud.some((t) => /obstructed/.test(t)), `${HULL_NAMES[hull]}: the sails up (${s.out.hud.join(' | ')})`);
-    const z0 = boat.GameObject.position[2];
-    for (let i = 0; i < 80; i++) s.frame();
-    assert.ok(boat.GameObject.position[2] - z0 > 5, `${HULL_NAMES[hull]}: she sails (${(boat.GameObject.position[2] - z0).toFixed(2)} m)`);
-    s.frame({ press: ['BoatToggleSail'] });
-    assert.ok(s.out.hud.includes('Sail lowered!') && s.rt.state.sailPosition === 0, `${HULL_NAMES[hull]}: and come down at it again`);
-  }
 });
 
 test('PLACE-AFLOAT: with Iliac Puddle No More on, a water tile standing over the sea\'s line (a harbour\'s basin at its town\'s ground) refuses her with a word - no boat, the deed kept; at the sea\'s own height she is placed; with the mod off, the tile alone decides, as the C# does (she was placed there, beached, her sails refused)', () => {

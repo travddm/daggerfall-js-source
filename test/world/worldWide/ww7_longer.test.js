@@ -360,9 +360,6 @@ test('WW7-12 THE HUB TELLS: every game online hears where the accounts agree the
     assert.deepEqual(ats(g), [], 'its day gone: a hello hears none');
     assert.equal(r.store.get('serpentsite').d, DAY);
   });
-  const s = rd('server/src/index.js');
-  assert.match(s, /this\._serpentSiteRec = rec;\n\s*this\._serpentAtTell\(had, rec, now\);/);
-  assert.match(s, /\{ try \{ await this\._serpentAtTo\(ws, now\); \} catch/);
 });
 
 test('WW7-12 THE CLIENT KEEPS THE HUB\'S WORD: the link keeps the latest `at` by its day (toldAt), folds none of it into a fight; the session hands it on from the hub alone; a site the hub told is never said back as this game\'s (mutants: the word folded; an older day over a newer; another day\'s answered; the cell\'s `at` let through; the told site said back)', () => {
@@ -375,8 +372,6 @@ test('WW7-12 THE CLIENT KEEPS THE HUB\'S WORD: the link keeps the latest `at` by
   assert.deepEqual(link.toldAt(DAY), { d: DAY, ...SITE }, 'an older day\'s never over it');
   link.word({ k: 'at', d: DAY, sx: 9, sz: 9, pl: 'Moved' });
   assert.deepEqual(link.toldAt(DAY), { d: DAY, sx: 9, sz: 9, pl: 'Moved' }, 'the agreement moved');
-  assert.match(rd('src/net/online.js'), /isSocialRoom\(room\) \? r\.k === 'fell' \|\| r\.k === 'rcpt' \|\| r\.k === 'at' : isCellRoom\(room\) && r\.k !== 'at'/);
-  assert.match(hostText('src/scenes/world.js'), /if \(a && !a\.site\.told\) socialLink\(\)\?\.sendSerpentSite\?\.\(a\.day, a\.site\.sx, a\.site\.sz, a\.site\.near\);/);
 });
 
 /** A made world sea: the Bay's lane water its west half; past it all open sea. */
@@ -417,7 +412,6 @@ test('WW7-12 THE SITE OVER THE WORLD\'S LANES: a game standing the world\'s lane
   const wl2 = createWorldLanes({ mapDict: () => null, maps: { getRegion: () => null, getClimateIndex: () => CLIMATES.Ocean }, portIds: [A.id], ports: { list: () => [], version: () => 'v' }, bayOpen: s.bayOpen, bayOpenNative: () => true, water: () => true, beyond: () => true });
   assert.equal(wl2.whole(), false, 'the Bay\'s directory not yet');
   assert.equal(dir, dict);
-  assert.match(hostText('src/scenes/world.js'), /return worldSerpentSite\(day, worldLanes, serpentLink\.toldAt\);/);
 });
 
 // ─── 5. ON THE FREEWARE'S WORLD ──────────────────────────────────

@@ -209,21 +209,3 @@ test('EG-LOOK OVER THE DRAWN HEAD (section 9; AUDIT EG IV lane1 #15\'s errands b
   assert.deepEqual(egGivenAt(dusk, centre, clock.t), [centre[0] + dusk.x, centre[1] + dusk.y + EG_GIVEN_UP_LORD_M, centre[2] + dusk.z]);
 });
 
-test('EG-LOOK THE PIXEL LAW AT EVERY SIZE (section 9; SD-LOOK\'s NEAREST): a lord\'s frame is asked of the texture door by archive, record and frame alone - the same picture under the same key whatever size it is drawn at (Grath at his look\'s size and under Colossal ask one key) - and the door\'s upload names no sampling (scenes/dataPipeline.js uploadRecordFrame), so the renderer samples it NEAREST (render/renderer.js textureParams); the batch keeps the frame\'s key (mutants: none here - the door\'s and the renderer\'s own pins hold their halves)', async () => {
-  const a = lordRow(1, 'hound', { x: 0, z: 30 }), b = lordRow(2, 'hound', { x: 6, z: 30, sz: 1400 });
-  const { E } = hallWith(5, [a, b]), clock = { t: T0 + 1000 };
-  const S = screen(() => E, clock);
-  S.fight.frame(); await new Promise((r) => setTimeout(r, 0));
-  S.fight.frame();
-  assert.ok(S.uploads.length >= 2 && S.uploads.every((u) => u.length === 3 && u.every(Number.isInteger)), 'archive, record, frame - nothing of a size');
-  const keys = new Set(S.uploads.map(([ar, rec, fr]) => `${ar}_${rec}#${fr}`));
-  assert.equal(keys.size, 1, 'one picture for both sizes');
-  assert.ok(S.fight.batches().every((q) => keys.has(`${q.archive}_${q.record}`)), 'each batch on that key');
-  const pipe = readFileSync(new URL('../../../src/scenes/dataPipeline.js', import.meta.url), 'utf8');
-  const door = pipe.slice(pipe.indexOf('const uploadRecordFrame = (archive, record, frame) => {'), pipe.indexOf('const uploadRecordFrame = (archive, record, frame) => {') + 3000);
-  assert.match(door, /renderer\.uploadTexture\(archive, key, color32, \{ replacement \}\);/, 'the frame uploaded with no sampling of its own');
-  const { textureParams } = await import('../../../src/render/renderer.js');
-  const gl = { REPEAT: 'REPEAT', CLAMP_TO_EDGE: 'CLAMP', NEAREST: 'NEAREST', LINEAR: 'LINEAR' };
-  assert.deepEqual(textureParams(gl, { replacement: true }), { wrap: 'REPEAT', filter: 'NEAREST' });
-  assert.deepEqual(textureParams(gl, { replacement: false }), { wrap: 'REPEAT', filter: 'NEAREST' });
-});

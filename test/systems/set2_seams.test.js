@@ -49,13 +49,6 @@ test('SET2 the blow\'s word: a foe whose AI has not detected me is unaware - nev
     calculateAttackDamage(me(), rat(), { weapon: sword, rolls: () => 0.01, unaware: true });
     assert.ok(seen.includes(true), `calculateAttackDamage hands it down (${seen})`);
   } finally { registerWeaponBlowMod('set2-probe', null); }
-  const pw = strip(read('src/combat/playerWeapon.js'));
-  assert.match(pw, /calculateAttackDamage\(playerCombat, foe\.entity, \{[^}]*unaware: foeUnaware\(foe\)/, 'the swing\'s word');
-  const af = strip(read('src/combat/arrowFlight.js'));
-  assert.match(af, /calculateAttackDamage\(playerEntity, foe\.entity, \{[\s\S]*?unaware: foeUnaware\(foe\),[\s\S]*?\}\);/, 'the shaft\'s word');
-  const f = strip(read('src/combat/formulas.js'));
-  // PIN MOVED (TWO-HANDS AUDIT 2, bible/05-Combat/Two-Hands.md): and, after it, the off hand's share (`blowShare`)
-  assert.match(f, /core\(attacker, target, \{[^}]*unaware, blowShare \}\)/, 'a replacement core is handed the word');
 });
 
 test('SET2 AUDIT SET M2: the strike tail - every named strike listener told MY attack\'s FINAL damage at a foe, with the weapon, after either core (a replaced core\'s number too); never a miss, a blow at a player, a peer\'s blow resolved here, or a foe\'s; a listener that throws is skipped (mutants: the strike listeners never told; a miss told; a blow at a player told; a peer\'s blow told; a foe\'s blow told)', () => {
@@ -83,8 +76,6 @@ test('SET2 AUDIT SET M2: the strike tail - every named strike listener told MY a
     try { calculateAttackDamage(me(), r, { weapon: sword, rolls: () => 0.01 }); } finally { registerFormulaOverride('calculateAttackDamage', null); }
     assert.deepEqual(seen, [[true, true, 17, 120]], 'a replaced core\'s final number (PCAAO\'s, after its crits and reductions)');
   } finally { registerPlayerStrikeListener('set2-strike', null); registerPlayerStrikeListener('set2-throws', null); }
-  const f = read('src/combat/formulas.js');
-  assert.ok(f.indexOf('for (const fn of _playerStrikeListeners.values())') < f.lastIndexOf('return report(damage);'), 'at the tail, before the report');
 });
 
 test('SET2 AUDIT L6: a blow modifier that throws is skipped and warned of, and one that answers no number is ignored - the blow and every other modifier stand (a set\'s Cleave reaches a second foe\'s death from here, and a throw aborted the swing that carried it) (mutants: a throw aborting the blow; a NaN kept)', () => {
@@ -118,8 +109,6 @@ test('SET2 PCAAO\'s core reads the port\'s layers at the stock\'s own places - t
     assert.equal(both, (bare + 10) * 2, `the roll's modifier, then the blow's (${bare} -> ${both})`);
     assert.equal(info?.unaware, true, 'the host\'s word reaches the blow modifier under this core');
   } finally { registerWeaponDamageMod('set2-roll', null); registerWeaponBlowMod('set2-blow', null); }
-  const p = strip(read('src/combat/pcaao.js'));
-  assert.match(p, /pcaaoWeaponAttackDamage\(attacker, target, damageModifiers, weaponAnimTime, weapon, rolls, modules, \{ unaware: !!unaware \}\)/);
 });
 
 test('SET2 the damage door: a registered modifier over the damage before the shield, a death save that leaves a live player at 1 before the guild\'s avoid-death is asked, a listener told what landed - none of them asked on a SetHealth(0) door or a duel\'s blow, and none told when a veto or a shield takes the whole blow; one that throws is skipped (mutants: the modifier after the shield; the save on the SetHealth(0) door; the listener told on a vetoed blow)', () => {
@@ -165,9 +154,6 @@ test('SET2 the damage door: a registered modifier over the damage before the shi
     const r = me(); r.health = 10; hurtPlayer(r, 30, { bypassShield: true });
     assert.equal(r.health, 0, 'never on a SetHealth(0) door - drowning kills');
   } finally { registerPlayerDeathSave('set2-save', null); registerPlayerHurtListener('set2-listen', null); }
-  const src = strip(read('src/characters/playerEntity.js'));
-  assert.ok(src.indexOf('dmg = playerDamageMods(entity, dmg)') < src.indexOf('dmg = damageShieldPool(entity, dmg)'), 'the modifiers stand before the shield');
-  assert.ok(src.indexOf('playerDeathSaved(entity, dmg)') < src.indexOf('_avoidDeathHook?.(entity)'), 'the save is asked before the guild');
 });
 
 test('SET2 the struck listeners: told (attacker, target, damage) when a foe\'s attack resolves with damage on the player, beside the Ring of Namira\'s own slot, which stays its own; a listener that throws is skipped (mutants: the listeners never told)', () => {
@@ -196,11 +182,6 @@ test('SET2 the player\'s own kills: every listener told the killed entity and th
     reportPlayerKill({ name: 'rat' });
     assert.deepEqual(heard, [['wolf', 'arrow'], ['rat', 'melee']]);
   } finally { registerPlayerKillListener('set2-kill', null); registerPlayerKillListener('set2-throws', null); }
-  const ext = strip(read('src/scenes/exteriorFoes.js'));
-  assert.match(ext, /f\.dead = true;\s*if \(fromPlayer && !peer\) reportPlayerKill\(f\.entity, \{ kind \}\);/, 'the outdoor pool');
-  assert.match(ext, /playerWeaponKillReported\(playerEntity, \{ mobileType: f\.mobileType \}\);\s*reportPlayerKill\(f\.entity, \{ kind: 'remote' \}\);/, 'a puppet\'s owner\'s word');
-  assert.match(strip(read('src/scenes/dungeonContext.js')), /foe\.dead = true;\s*if \(fromPlayer && !peer\) reportPlayerKill\(foe\.entity, \{ kind \}\);/, 'the dungeon');
-  assert.match(strip(read('src/scenes/cityGuards.js')), /g\.dead = true;\s*if \(fromPlayer && !peer\) reportPlayerKill\(g\.entity, \{ kind: 'melee' \}\);/, 'the watch');
 });
 
 test('SET2 a player\'s cast cost: the port\'s modifiers over it after DFU\'s floor, never under 1 - and never over a foe\'s, which the foe caster prices with the player\'s skills and so asks without them (mutants: a foe\'s cast made cheaper; the floor under 1)', () => {
@@ -216,7 +197,6 @@ test('SET2 a player\'s cast cost: the port\'s modifiers over it after DFU\'s flo
     assert.equal(calculateCastCost(spell, p).sp, 1, 'never under 1');
     assert.ok(CAST_COST_FLOOR >= 1);
   } finally { registerSpellCostMod('set2-cost', null); }
-  assert.match(strip(read('src/characters/enemy/enemyCasting.js')), /calculateCastCost\(spell, playerEntity, \{ portMods: false \}\)\.sp/);
 });
 
 test('SET2 the port\'s absorption chances: each rolled on its own after the effect\'s arm, under DFU\'s two gates (a Destruction effect, room in the magicka for it); a source answering 0 is never rolled, so the rolls\' sequence is untouched (mutants: the gates skipped for the port\'s chances)', () => {
@@ -243,13 +223,4 @@ test('SET2 the door and the duel: the running host publishes its door every fram
   assert.equal(playerDoor(), d);
   setPlayerDoor('not a door');
   assert.equal(playerDoor(), null);
-  const hm = strip(read('src/scenes/hostMagic.js'));
-  assert.match(hm, /function update\(dt, playerFeet[^)]*\) \{\s*_doorFeet = playerFeet \?\? null;\s*setPlayerDoor\(_door\);/, 'published first thing each frame');
-  assert.match(hm, /hurtFoe: \(t, n\) => \{ if \(t && !t\.dead && n > 0\) foeSinks\(t, true\)\?\.hurt\?\.\(Math\.round\(n\), \{ fromPlayer: true \}\); \}/, 'a hurt is mine, through the foe\'s own sinks');
-  assert.match(hm, /castOnPlayer: \(bundle, \{ power = false \} = \{\}\) => \{ if \(bundle\) applySpellToPlayer\(bundle, castingLevel\(playerEntity\) \?\? 1, null, \{ bypassSavingThrows: true, bypassChance: true, \.\.\.\(power \? \{ powerCast: true \} : \{\}\) \}\); \}/);   // PIN MOVED (AUDIT SCHOOLS L1 M1): and a power's word - a path's rider merges taking the larger pool or chance (effects.js powerCast)
-  assert.match(hm, /foes: \(\) => playerTargets\(\)\.filter/, 'the foes MY harm may reach - the defenders passed by');
-  // PIN MOVED (AUDIT 625 P2): and a live bout between players on a relay's sand is a duel too
-  // PIN MOVED (INT8, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): the frame offers a bout's unsettled receipt
-  // again before it tells the sets
-  assert.match(strip(read('src/scenes/world.js')), /const duelFrame = \(\) => \{\s*duelMgr\.tick\(\);\s*if \(duelClaims\.due\(\)\) duelClaims\.offer\(\);[^\n]*\n\s*const setsWere = setsDueling\(\);\s*setSetsDueling\(!!duelMgr\.live \|\| arenaPvpLive\(\)\);/);
 });

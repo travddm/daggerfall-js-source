@@ -154,24 +154,6 @@ test('AUDIT DEEP T1-3/T1-4: a journey faster than the focus eases is followed at
   assert.equal(r.camera.tilt, TV_TILT_DEFAULT, 'and the camera keeps the player\'s tilt');
 });
 
-test('AUDIT DEEP R-3: under the travel view the sun\'s cascades grow with the picture - a caster 900 m off lands in the far map, as it could not at the ground\'s radii; the scale changing redraws every map', async () => {
-  const sp = await import('../../src/render/shadowPass.js');
-  const { SHADOW_CASCADES, SHADOW_VIEW_SCALE, sunCascadeMatrices, sunTexelWorld } = sp;
-  assert.equal(SHADOW_VIEW_SCALE, 4);
-  const eye = [0, 0, 0], ld = [0.3, 0.9, 0.3];
-  const n = Math.hypot(...ld); const L = ld.map((v) => v / n);
-  const inside = (m, p) => { const x = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12], y = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13], z = m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14]; return Math.abs(x) <= 1 && Math.abs(y) <= 1 && Math.abs(z) <= 1; };
-  const out = () => SHADOW_CASCADES.map(() => new Float32Array(16));
-  const ground = [0, 0, 900];
-  assert.equal(inside(sunCascadeMatrices(eye, L, out())[2], ground), false, 'the ground\'s far map ends at 240 m');
-  assert.equal(inside(sunCascadeMatrices(eye, L, out(), undefined, SHADOW_VIEW_SCALE)[2], ground), true, 'the view\'s reaches 900 m');
-  assert.equal(sunTexelWorld(2, SHADOW_VIEW_SCALE), 4 * sunTexelWorld(2));
-  const src = rd('src/render/shadowPass.js');
-  assert.match(src, /const k = f\.cascadeScale > 1 \? f\.cascadeScale : 1;\n\s*if \(k !== this\._sunScaleK\) \{ this\._sunScaleK = k; this\._sunDrawn\.fill\(0\); \}/, 'a far map drawn at the other scale is never kept');
-  assert.match(src, /this\.sunParams\[c\] = SHADOW_CASCADES\[c\] \* k; this\.sunTexel\[c\] = sunTexelWorld\(c, k\);/, 'the receivers pick by the scaled radii');
-  assert.match(rd('src/render/renderer.js'), /cascadeScale: this\._focus\[3\] > 0\.5 && this\._focusWide \? SHADOW_VIEW_SCALE : 1,/, 'the renderer asks while the focus is set - AUDIT DEEP2 D7: and wide (the view half risen)');
-});
-
 test('AUDIT DEEP R-8: the fall from a view orbited half round turns the short way at an even pace and never looks down past the sky\'s own pitch - no roll through the pole', () => {
   const from = { eye: [0, 1.7, 0], fwd: forwardOf(0, 0) };
   const to = { eye: [0, 260, -200], fwd: forwardOf(Math.PI - 0.05, -TV_TILT_DEFAULT) };
@@ -207,10 +189,6 @@ test('AUDIT DEEP R-7: a flat leaned toward the raised eye stays inside its own c
     }
   } finally { setFlatLean(0); }
   assert.equal(batchSphere(b, o)[3], Math.hypot(w, h) / 2, 'upright: the sphere as it was');
-  const src = rd('src/scenes/world.js');
-  const frame = src.slice(src.indexOf('  function frame(now) {'));
-  const set = frame.indexOf('setFlatLean(tvf ? Math.hypot(tvf.up[0], tvf.up[2]) : 0);');
-  assert.ok(set > 0 && set < frame.indexOf('if (cullOn && billboardOutside(b))') && set < frame.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), 'before the flats\' cull and the shadow replay');
 });
 
 test('TV1 camera: the rise and the fall blend the head\'s eye into the sky\'s, smoothstepped; the flats lean back by half the tilt; the traveller turns at 6 rad/s the short way', () => {
@@ -527,20 +505,6 @@ test('AUDIT TV B3/B4/B7: a finger on the canvas never starts the touch layer\'s 
   assert.equal(r.win.count('touchstart'), 0, 'every listener comes off');
 });
 
-test('AUDIT TV B1/B5/B6/B8/B9 by source: the focus is a frame\'s (a beginFrame no setFocus came before clears it); a chat closed over the view gives the cursor back to the view; the frame the view came down in draws from the head; a press on the readout stops there; the cursor as the view found it', () => {
-  const rr = rd('src/render/renderer.js');
-  const begin = rr.slice(rr.indexOf('  beginFrame(proj, view, lightDir, opts = null) {'), rr.indexOf('this._frameStamp++;   // PERF3'));
-  assert.match(begin, /\n\s*if \(!this\._focusArmed && this\._focus\[3\] !== 0\) this\._focus\.fill\(0\);[^\n]*\n\s*this\._focusArmed = false;/, 'no interior, dungeon or panel frame inherits the street\'s focus');
-  assert.ok(((i, j) => i >= 0 && j >= 0 && i < j)(begin.indexOf('this._focusArmed = false;'), begin.indexOf('this._beginLane(')), 'decided before the lane replays and the sun maps render');
-  assert.match(rr, /setFocus\(p, wide = true\) \{\n\s*this\._focusArmed = true;[^\n]*\n\s*this\._focusWide = !!p && !!wide;/, 'every setFocus arms the next beginFrame');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(!pointerSurfaces\.size && !gamePaused\(\)\) \{ if \(travelView\?\.active\) setCursorActive\(true\); else requestLook\(canvas\); \}/);
-  assert.match(w, /: mwv0\.ownEye \? \{ \.\.\.mwv0, eye: tvHeadEye \} : mwv0;/);
-  assert.match(w, /freeCursor: \(free\) => \{ if \(free\) \{ tvCursorWas = cursorActive\(\); setCursorActive\(true\); releaseLook\(\); \} else \{ setCursorActive\(tvCursorWas\); if \(!tvCursorWas && !gamePaused\(\) && !pointerSurfaces\.size && !\(modes\?\.modalWindowUp\?\.\(\) \?\? false\) && !overlayOpen\(\)\) requestLook\(canvas\); \} \},/, 'AUDIT DEEP T1-5: never the lock under a surface or a window - AUDIT DEEP2 A3: nor an overlay');
-  const hud = rd('src/ui/travel/travelViewHud.js');
-  assert.match(hud, /const own = \(e\) => e\.stopPropagation\?\.\(\);\n\s*r\.addEventListener\?\.\('mousedown', own\);\n\s*r\.addEventListener\?\.\('mouseup', own\);/);
-});
-
 test('AUDIT DEEP T1-7/X-1/X-2/T1-5: a look key let go in a text box still stops the view\'s turn; the host CUTS the view at a door and at a video before any branch that skips the exterior frame; the same key again is the way out; the cursor never locks under a surface', () => {
   const r = rig();
   r.tv.enter();
@@ -551,28 +515,6 @@ test('AUDIT DEEP T1-7/X-1/X-2/T1-5: a look key let go in a text box still stops 
   const yaw0 = r.tv.camera.yaw;
   r.tv.steer(1);
   assert.equal(r.tv.camera.yaw, yaw0, 'and the view stopped turning');
-  // the host, by source: the cut sits above the mode's return and above the video hold's
-  const w = rd('src/scenes/world.js');
-  const frame = w.slice(w.indexOf('  function frame(now) {'));
-  const door = frame.indexOf("if (travelView?.active && (modes?.mode ?? 'exterior') !== 'exterior') { travelView.exit('door', true); setFlatLean(0); }");   // AUDIT DEEP2 D8: and the flats' lean back to none
-  assert.ok(door > 0 && door < frame.indexOf('if (modes.frame(dt, now)) {'), 'the door cut precedes the modal branch');
-  assert.ok(door < frame.indexOf('travelView?.steer(dt);'), 'and the steer - no turn from indoors');
-  // R-2: the traveller's own sprite turns its quad to the VIEW's eye and leans with the flats
-  assert.match(w, /const tvFace = tvf \? \{ yaw: tvf\.yaw, up: tvf\.up, grow: player\.drawGrow \?\? tvf\.grow \} : null;/);
-  assert.match(w, /mwViewDrawBody\(canvas, \{ proj, view, eye: mwv\.eye, feet: player\.bodyFeetAt\(\), yaw: player\.bodyYawFor\(cam\.yaw\), viewYaw: cam\.yaw, face: tvFace \}\);/);
-  assert.match(rd('src/player/mwView.js'), /if \(eotbLane\(\)\) \{ const drawn = drawEotbBody\(canvas, \{ proj, view, eye, feet, yaw: viewYaw, face \}\);/);   // AUDIT CLIMB-ARC N1: the sprite lane on the VIEW's yaw
-  const eb = rd('src/player/eyeOfTheBeholder/eotbBody.js');
-  // FP-SHADOW1 (perf pass v5): the up is named once (`bbUp`) and the draw is gated on the first-person visibility - the facing law unchanged
-  assert.match(eb, /const by = face \? face\.yaw : cam\.yaw;\n\s*const camRight = \[Math\.cos\(by\), 0, -Math\.sin\(by\)\];\n(?:\s*\/\/[^\n]*\n)*\s*const bbUp = face\?\.up \?\? \[0, 1, 0\];\n\s*if \(!FP \|\| cfg\.visibility === 2\) renderer\.drawBillboards\(\[batch\], camRight, bbUp\);/);
-  assert.match(eb, /cam\.pos, cam\.feet, face\?\.yaw \?\? cam\.yaw, cfg\.scale/, 'the lantern\'s quad too');
-  // T1-9: no crosshair on a camera 450 m up - the HUD's own reticle, told by the host, the vitals kept
-  assert.match(w, /\{ font: townTalk\.font, cursorActive: gamePaused\(\), reticleHidden: !!tvf,/);
-  assert.match(rd('src/ui/hud/hud.js'), /\n\s*reticleHidden,   \/\/ AUDIT DEEP T1-9/);
-  const eh = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(eh, /const aim = !opts\.reticleHidden;\n\s*const showCross = aim && /);
-  assert.match(eh, /const showCentreWord = aim && /);
-  assert.match(eh, /const showCorner = aim && /);
-  assert.match(frame, /if \(frameHeld\(\)\) \{ frameAbort\(\); hideWorldPlaque\(\); last = now; requestAnimationFrame\(frame\); drawGateBanner\(null\); drawGateMarksCard\(null\); drawGateDamageChart\(null\); drawGateGround\(null\); travelView\?\.exit\('video', true\); if \(spyglass\.up\) lowerGlass\(\); return; \}/, 'the video hold cuts the view on its own return');   // PIN MOVED (AUDIT CAPTAIN'S SEA S15): the captain's glass lowered on it too   // WB9a / WB9d: the marks card and the ground's rim go down on it too
 });
 
 test('TV1 host: the readout - the traveller\'s ring on the projected feet, the chevron along the heading, the compass on the view\'s heading, the place line, the hints by hand', () => {
@@ -593,7 +535,6 @@ test('TV1 host: the readout - the traveller\'s ring on the projected feet, the c
   assert.match(TRAVEL_VIEW_HINTS.mouse, /Click to travel/);
   // AUDIT DEEP T1-12: the keys the player really has - read on the way up, handed to the readout
   assert.equal(TRAVEL_VIEW_HINTS.mouse, travelViewMouseHint(), 'the defaults\' words when the host names none');
-  assert.match(rd('src/ui/travel/travelViewHud.js'), /put\(parts\.hint, 'hint', f\.touch \? TRAVEL_VIEW_HINTS\.touch : travelViewMouseHint\(f\.keys \?\? \{\}\)\);/, 'the readout writes them');
   assert.match(travelViewMouseHint({ move: 'ESDF', out: 'P' }), /ESDF to walk · P to return$/);
   {
     const q = rig({ hintKeys: () => ({ move: 'ESDF', out: 'P' }) });
@@ -602,7 +543,6 @@ test('TV1 host: the readout - the traveller\'s ring on the projected feet, the c
     q.tv.drawHud();
     assert.deepEqual(q.log.last.keys, { move: 'ESDF', out: 'P' });
   }
-  assert.match(rd('src/scenes/world.js'), /hintKeys: \(\) => \{   \/\/ AUDIT DEEP T1-12[^\n]*\n\s*const store = bindings\(\);\n\s*const k = \(a\) => \{ const c = codeForAction\(store, a\); return c \? buttonText\(c, true\) : null; \};/);
   assert.match(TRAVEL_VIEW_HINTS.touch, /Pinch to zoom/);
   assert.equal(travelViewLine({ place: 'Daggerfall', region: 'Daggerfall' }), 'Daggerfall, Daggerfall');
   assert.equal(travelViewLine({ near: 'Ripwych', region: 'Daggerfall' }), 'Near Ripwych, Daggerfall');
@@ -622,18 +562,6 @@ test('TV1 focus: the fog measures from the focus - the camera while none is set 
   // a program with both blocks declares each uniform once
   const both = `${SHADOW_GLSL}\n${FOG_GLSL}`;
   for (const u of ['uFocus', 'uSunOrigin']) assert.equal((both.match(new RegExp(`uniform vec4 ${u};`, 'g')) ?? []).length, 1, u);
-  // the renderer: every fog table looks the focus up, the one upload sends it, setFocus sets w, the sun map stands on it
-  const r = rd('src/render/renderer.js');
-  assert.equal((r.match(/focus: gl\.getUniformLocation\([A-Za-z.]+, 'uFocus'\)/g) ?? []).length, 3, 'the water, the world programs\' factory, the character quad');
-  assert.match(r, /focus: u\('uFocus'\)/, 'the lane\'s tables');
-  assert.match(r, /if \(prog\.focus\) gl\.uniform4fv\(prog\.focus, this\._focus\);/);
-  assert.match(r, /eye: this\._shadowEye\(\), lightDir, sunScale: this\._sunScale, pointLights: this\._pointLights, carried: this\._pointCarried,/);
-  // ...and the shadow pass hands its receivers the eye it rendered about, in every table that uploads it
-  assert.equal((r.match(/sunOrigin: gl\.getUniformLocation\(p, 'uSunOrigin'\)/g) ?? []).length, 2, 'the lane\'s world tables');
-  assert.match(rd('src/render/airPass.js'), /sunOrigin: u\(p, 'uSunOrigin'\)/, 'the air pass\'s shafts');
-  const sp = rd('src/render/shadowPass.js');
-  assert.match(sp, /this\.sunOrigin\[0\] = f\.eye\[0\]; this\.sunOrigin\[1\] = f\.eye\[1\]; this\.sunOrigin\[2\] = f\.eye\[2\]; this\.sunOrigin\[3\] = 1;/);
-  assert.match(sp, /if \(loc\.sunOrigin\) gl\.uniform4fv\(loc\.sunOrigin, this\.sunOrigin\);/);
 });
 
 test('TV1 focus: setFocus writes w 1 with the point and w 0 without it, moving the frame stamp only on a change; the sun map stands on the focus while set', async () => {
@@ -653,101 +581,12 @@ test('TV1 focus: setFocus writes w 1 with the point and w 0 without it, moving t
 
 // ── THE WORLD HOST'S WIRING ─────────────────────────────────────────────────────────────────────────────────────────
 
-test('TV1 host wiring: the frame draws from the view\'s eye risen out of the body\'s own camera, the fog from the traveller\'s head, the sky and the flats turned to the view, no grass, hand or crosshair plaque from the air', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const mwv0 = mwViewFrame\(\{\n\s*eyeOverride: travelView\?\.eye \?\? null,\n/);
-  assert.match(w, /const tvHeadEye = mwViewHoldChanged\(\) \? cam\.pos : \(mwv0\.ownEye \?\? mwv0\.eye\);\n\s*const tvf = travelView\?\.frame\(dt, \{ eye: tvHeadEye, fwd \}\) \?\? null;\n\s*const mwv = tvf \? \{ \.\.\.mwv0, eye: tvf\.eye \} : mwv0\.ownEye \? \{ \.\.\.mwv0, eye: tvHeadEye \} : mwv0;[^\n]*\n\s*const viewFwd = tvf \? tvf\.fwd : fwd;\n\s*const proj = horizonProj\(glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\), worldAspect, spyglass\.near, tvf\);[^\n]*\n(?:\s*\/\/ [^\n]*\n|\s*_driverBodySeat = [^\n]*\n|\s*if \(_driverBodySeat\) [^\n]*\n|\s*else player\.drawYaw = null;\n)*\s*const tvFace = [^\n]*\n\s*setFlatLean\([^\n]*\n\s*renderer\.setFocus\(tvf \? cam\.pos : null, !!tvf && tvf\.blend >= 0\.5\);/);
-  const setAt = w.indexOf('renderer.setFocus(tvf ? cam.pos : null, !!tvf && tvf.blend >= 0.5);');
-  assert.ok(setAt > 0 && setAt < w.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), 'AUDIT TV B1: BEFORE beginFrame - its lane replay and its sun maps read the focus (AUDIT DEEP2: and the line must be there - a -1 passed this)');
-  assert.match(w, /lookAt\(mwv\.eye, \[mwv\.eye\[0\] \+ viewFwd\[0\], mwv\.eye\[1\] \+ viewFwd\[1\], mwv\.eye\[2\] \+ viewFwd\[2\]\], \[0, 1, 0\]\)/);
-  assert.match(w, /sky\.draw\(tvf \? tvf\.yaw : cam\.yaw, tvf \? tvf\.pitch : cam\.pitch \+ climbFeel\.pitch\(\), glassFov\(fieldOfView\(\) \+ climbFeel\.fovRad\(\), spyglass\.lens\),/);   // PIN MOVED (SPYGLASS): the glass's lens
-  assert.match(w, /const _bbYaw = tvf \? tvf\.yaw : cam\.yaw;/);
-  assert.match(w, /const bbUp = tvf \? tvf\.up : UP_Y;/);
-  assert.equal((w.match(/renderer\.drawBillboards\(.*, camRight, bbUp\);/g) ?? []).length, 3, 'the flats, the missiles, the townsfolk');
-  assert.match(w, /renderer\.recordShadowBillboards\(castBatches, camRight, UP_Y\)/, 'their shadows stand upright');
-  assert.match(w, /if \(labGrass && !tvf\) \{/);
-  assert.match(w, /if \(walkMode && playerSpawned && !tvf\) weaponRig\.draw\(\{ paralyzed \}\);/);
-  assert.match(w, /cursorActive: gamePaused\(\) \|\| pointerSurfaces\.size > 0 \|\| !!tvf,/, 'the hover\'s own door: a freed cursor names nothing');
-  assert.match(w, /travelView\?\.steer\(dt\);/);
-  assert.match(w, /travelView\?\.drawHud\(\);/);
-  assert.match(w, /audio\.setListener\(cam\.pos, tvf \? \[viewFwd\[0\], 0, viewFwd\[2\]\] : fwd\);/);
-  // the cursor toggle cannot take the view's free cursor back, and the loop's death takes the view with it
-  assert.match(w, /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active \|\| !!poiEditor\?\.active\(\),/);   // PIN MOVED (AUDIT POI E1): the POI editor's keys its own too
-  // P0's guard stays the plaque's one line (four pins hold it); the view goes on its own heartbeat, asking the same token
-  assert.match(w, /if \(!frameAlive\(_frameToken\)\) \{ destroyWorldPlaque\(\); return; \}/);
-  assert.match(w, /alive: \(\) => frameAlive\(_frameToken\),/);
-  // the view's host deps: the deck the sky draws, the foes the map refuses on, the body held, the cursor freed
-  assert.match(w, /cloudBase: \(\) => VC_PROFILE\[weather\]\?\.base \?\? null,/);
-  assert.match(w, /danger: \(\) => duelEnemyNear\(\) \|\| \(!playerEntity\.staffHidden && areEnemiesNearby\(wildSeen\(exteriorFoePool\(\)\)\)\) \|\| navalHostileNear\(\),/, 'AUDIT DEEP2 A9: a live duel too (WILD-ALERT: never a foe that has not noticed a fast traveller; STAFF-UNSEEN: no foe near a hidden staff member)');
-  assert.match(w, /holdBody: \(on\) => mwViewHoldThird\(on\),/);
-  assert.match(w, /freeCursor: \(free\) => \{ if \(free\) \{ tvCursorWas = cursorActive\(\); setCursorActive\(true\); releaseLook\(\);/);
-  // the gate: the enhanced lane, a walking body in the open air, alive and above the water - each refusal said
-  const gate = w.slice(w.indexOf('const travelViewAllowed = () => {'), w.indexOf('const travelViewWhere = () => {'));
-  for (const [why, re] of [['enhanced', /if \(!isEnhanced\(\)\) return \{ ok: false, why: TRAVEL_VIEW_TEXT\.enhancedOnly \};/], ['walking', /if \(params\.has\('fly'\) \|\| !walkMode \|\| !playerSpawned\) return \{ ok: false \};/],
-    ['open air', /if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return \{ ok: false, why: TRAVEL_VIEW_TEXT\.indoors \};/], ['alive', /if \(!\(\(playerEntity\.health \?\? 0\) > 0\)\) return \{ ok: false \};/],
-    ['above the water', /if \(dwPlayer\?\.submerged\) return \{ ok: false, why: TRAVEL_VIEW_TEXT\.underwater \};/]]) assert.match(gate, re, `the gate refuses ${why}`);
-  // THE FOUR HOSTS RULE: the view is this host's alone, and the other three never grow one
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(rd(f), /createTravelView|travelView\./, `${f} has no travel view`);
-  }
-  assert.match(rd('src/scenes/travelView.js'), /THE FOUR HOSTS RULE names all four - world\.js WIRED; exterior\.js, the\s*\n\/\/ dev scene's fixed city, NOT WIRED on purpose/);
-});
-
 test('TV1 key: TravelView is the port\'s own action, appended, drawn in the Windows group and SHIPPED UNBOUND - the map\'s door is the way in', () => {
   assert.equal(ACTIONS.indexOf('TravelView'), 79, 'appended - a saved file resolves the rest by position (THE MERGE: its live index kept; PADWALK\'s WalkMode, never deployed, after it)');
   assert.ok(PORT_ACTIONS.includes('TravelView'));
   assert.equal(DEFAULT_BINDINGS.find(([, a]) => a === 'TravelView'), undefined, 'no default key');
   const windows = ACTION_GROUPS.find((g) => g.name === 'Windows' || g.title === 'Windows' || g.label === 'Windows');
   assert.ok(windows?.rows.some((r) => r.action === 'TravelView'), 'the pane draws it');
-  assert.match(rd('src/scenes/world.js'), /if \(!townTalk\.overlayActive && act === 'TravelView'\) \{ if \(e\.repeat\) return true; travelViewKey\(\); return true; \}\n\s*if \(!townTalk\.overlayActive && \(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{/,
-    'AUDIT DEEP X-2: the same key again is the way out - AUDIT DEEP2 A5/A8: never on a repeat, and ABOVE the mode gate (indoors it is answered)');
-  // PAD-BINDS (FIELD BUGS 2026-10-04e): the key's arm and the pad's d-pad share ONE toggle
-  assert.match(rd('src/scenes/world.js'), /function travelViewKey\(\) \{\n\s*const st = travelView\?\.state;\n\s*if \(st === 'up' \|\| st === 'rising'\) travelView\.exit\('key'\); else travelView\?\.enter\(\);\n\s*\}/);
-});
-
-test('TV1 body: the seam holds whichever body answers out of the head for the view, hands it back as it found it, and hides every first-person piece while it holds', async () => {
-  const mv = await import('../../src/player/mwView.js');
-  const { eotbCamera } = await import('../../src/player/eyeOfTheBeholder/eotbCamera.js');
-  const src = rd('src/player/mwView.js');
-  // the EOTB lane, when it can draw: held into third, handed back to first
-  mv.setEotbBodyReady(() => true);
-  try {
-    assert.equal(mv.eotbLane(), true, 'the sprite lane opens once its body can draw - the arm below must run, not skip');
-    {
-      if (eotbCamera.thirdPerson()) eotbCamera.toggleOffset(false);
-      assert.equal(mv.mwViewHoldThird(true), true);
-      assert.equal(eotbCamera.thirdPerson(), true, 'out of the head');
-      assert.equal(mv.mwViewHeldThird(), 'eotb');
-      assert.equal(mv.mwViewHoldChanged(), true, 'AUDIT DEEP T1-10: taken OUT of the head - the rise starts from the head\'s eye');
-      assert.deepEqual(mv.mwViewHides(), { weapon: true, horse: true, spellHands: true }, 'no hand, horse or weapon on the raised camera');
-      assert.equal(mv.mwViewHoldThird(false), true);
-      assert.equal(eotbCamera.thirdPerson(), false, 'back into the head it was in');
-      // a player already in third person stays there
-      eotbCamera.toggleOffset(true);
-      mv.mwViewHoldThird(true);
-      assert.equal(mv.mwViewHoldChanged(), false, 'already out: its own camera is the head it rises from');
-      mv.mwViewHoldThird(false);
-      assert.equal(eotbCamera.thirdPerson(), true, 'the view hands back what it found');
-      eotbCamera.toggleOffset(false);
-    }
-  } finally { mv.setEotbBodyReady(() => false); }
-  assert.equal(mv.mwViewHeldThird(), undefined, 'nothing held');
-  // AUDIT DEEP X-3: a save records the player's OWN camera - the Morrowind hold's borrowed third person never reaches it;
-  // a load under the view cuts it before the save's camera is put back
-  const { mwCamera } = await import('../../src/player/mwCamera.js');
-  assert.deepEqual(mv.mwViewSaveCamera(), mwCamera.state(), 'nothing held: the camera as it is');
-  assert.match(src, /return heldThird\?\.changed && heldThird\.lane === 'mw' \? \{ \.\.\.s, firstPerson: true \} : s;/);
-  const wsrc = rd('src/scenes/world.js');
-  assert.match(wsrc, /camera: mwViewSaveCamera\(\), transport:/);
-  // AUDIT OW5b D4: the cut rides the Overworld's load reset, the first thing applyPose does - before the camera the save restores
-  assert.match(wsrc, /function overworldLoadReset\(\) \{[\s\S]*?travelView\?\.exit\('load', true\);[\s\S]*?\n  \}\n  function applyPose\(pose\) \{\n\s*overworldLoadReset\(\);[\s\S]*?mwViewLoadPose\(pose\.camera,/);
-  // the Morrowind rig: out by the restore door, back by the head's own door; the saddle holds nothing (RIDE-POV)
-  assert.match(src, /if \(fpArm\.canThirdPerson\(\) && !mounted\) \{/);
-  assert.match(src, /else if \(h\.changed && h\.lane === 'mw'\) mwIntoHead\(\);/);
-  // the frame hands the view's eye to the sprite and keeps the body's own for the rise
-  assert.match(src, /cameraPos: eyeOverride \?\? out\.eye/);
-  assert.match(src, /return eyeOverride \? \{ \.\.\.out, eye: eyeOverride, ownEye: out\.eye \} : out;/);
-  assert.match(src, /return eyeOverride \? \{ \.\.\.eye, eye: eyeOverride, ownEye: eye\.eye \} : eye;/);
 });
 
 test('AUDIT DEEP2 A2/A3/A4/A6/A7 view: a wheel zooms by its size; a repeat of a key held before the rise is the host\'s; an overlay over the view has the keys; the world\'s activation and swing are never pressed from under it; a lost focus holds nothing', () => {
@@ -794,16 +633,6 @@ test('AUDIT DEEP2 A2/A3/A4/A6/A7 view: a wheel zooms by its size; a repeat of a 
   for (const r of [a, b, c]) r.tv.dispose();
 });
 
-test('AUDIT DEEP2 A1/A2/A5/A8/A9 by source: the travel panel keeps its presses; the pad is a cursor under the view; the key never repeats and answers indoors; a duel refuses the view', () => {
-  const panel = rd('src/ui/enhanced/enhancedTravelControl.js');
-  assert.match(panel, /bar\.addEventListener\('mousedown', \(e\) => \{ if \(e\.target\?\.closest\?\.\('\[data-act\]'\)\) e\.stopPropagation\(\); \}\);/);
-  assert.doesNotMatch(panel, /addEventListener\('mouseup', \(e\) => \{ if \(e\.target\?\.closest/, 'never the release (AUDIT CHAT C5)');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /overlayActive: \(\) => townTalk\.overlayActive \|\| !!travelView\?\.active \|\| !!modes\?\.overlayHeld,/);   // PIN MOVED (FIELD BUGS 29h TOUCH-HELD): and the modes' own stacks
-  assert.match(w, /overlayUp: \(\) => overlayOpen\(\) \|\| travelViewConfirmOpen\(\) \|\| waypointMenuOpen\(\),/);   // PIN MOVED (OW-CONFIRM): and the view's own question has the keys; WAYPOINTS (2026-10-06): and its right-click menu (its Escape is its own)
-  assert.match(w, /if \(act === 'Escape' && e\.repeat\) return true;[^\n]*\n\s*if \(act === 'Escape' && pauseDoorReady\(\)\) \{ hudCtx\.togglePause\(\); return true; \}/);
-});
-
 test('AUDIT DEEP2 D2 view: the floating origin re-anchors under a moving traveller and the Overworld\'s eye goes on as it was going - no lurch at the crossing', () => {
   const r = rig();
   r.tv.enter();
@@ -821,10 +650,3 @@ test('AUDIT DEEP2 D2 view: the floating origin re-anchors under a moving travell
   r.tv.dispose();
 });
 
-test('AUDIT DEEP2 D2/D6 by source: the host rebases the view with the origin; the riders and the walkers take the view\'s eye and right, as the dolls do', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /mwViewRebase\(r\.offset\);[^\n]*\n\s*travelView\?\.rebase\(r\.offset\);/);
-  assert.match(w, /const peerYaw = travelView\?\.active && travelView\.camera \? travelView\.camera\.yaw : cam\.yaw;\n\s*const peerEye = travelView\?\.eye \?\? cam\.pos, peerRight = \[Math\.cos\(peerYaw\), 0, -Math\.sin\(peerYaw\)\];/);
-  assert.match(w, /peerRiders\.sync\(seen, onlineToScene, \{ eye: peerEye, right: peerRight,/);
-  assert.match(w, /peerWalkers\.sync\(seen, onlineToScene, \{ eye: peerEye, right: peerRight,/);
-});

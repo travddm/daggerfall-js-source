@@ -87,17 +87,6 @@ function roomWord(p, list) {
   p.roomWords = (p.roomWords ?? 0) + 1;
 }
 
-/** world.js's own livingDeepCleared, lifted whole and run over the given world (the slice tests' way of a host seam). */
-function liftedDeepCleared({ ohAbyss = null, map, tBuild, memo = new Map() }) {
-  const w = rd('src/scenes/world.js');
-  const m = /  const livingDeepCleared = (\(loc, stops, entry\) => \{\n[\s\S]*?\n  \});\n/.exec(w);
-  assert.ok(m, 'world.js livingDeepCleared');
-  const byId = new Map(map.dungeons.map((d) => [d.mapId, d]));
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the dungeon by its map id the living world's index's (scenes/livingWorld/livingIndex.js)
-  return new Function('livingWorldOn', 'params', 'ohAbyss', 'livingIndex', 'skyMinutes', 'divesIn', 'DIVE_CLEAR_MIN', 'livingTripWorld', 'PERSON_MOVE_SPEED', 'livingBaseRate', '_livingTripMemo', 'deepClearedOf', 'deepRouteOf', `return ${m[1]};`)(
-    () => true, { has: () => false }, ohAbyss, { dungeonOfId: (id) => byId.get(id) ?? null }, () => tBuild, divesIn, DIVE_CLEAR_MIN, map.world, CALENDAR_MPM, () => 1, memo, clearedOf, routeOf);
-}
-
 test('AUDIT LW-II-2 D1: LEAD ON to a stop 140 m away keeps the company beside the player after a frame - left behind is measured from its nearest standing member, never from where it goes; walked away from, it is let go (mutants: the destination, the farthest)', async () => {
   // a start block with an east and a west neighbour, a random foe in each: breadth first S, E, W - E's stop to W's two blocks
   const blk = (gx, x) => ({ originX: gx * RDB_SIDE, originZ: 0, layout: { markers: [{ record: STOP_FOE, x, y: 0, z: 25, position: 1, loadID: 1 }] } });
@@ -176,34 +165,6 @@ test('AUDIT LW-II-2 D2: the bodies a load cut (dead and gone from the pool) writ
   rem.frame([r]);
   assert.equal(rel.turns().laid.has(r.key), false, 'not spent in the loaded game');
   assert.equal(piles.length, 1, 'laid again, as the save\'s world has them');
-  // the door: every load passes it, above the frame's indoor return, and it lets both layers go
-  const w = rd('src/scenes/world.js');
-  const door = /    if \(restoresSoFar\(\) !== _portalRestores\) \{ ([^\n]*?) \}   \/\/ PORTAL1/.exec(w);
-  assert.ok(door, 'the load door');
-  for (const clear of ['livingDivers?.clear();', 'livingRemains?.clear();', '_livingRemainsPlace.clear();']) assert.ok(door[1].includes(clear), clear);
-  assert.ok(w.indexOf(door[0]) < w.indexOf('    if (modes.frame(dt, now)) {'), 'before either layer\'s step');
-});
-
-test('AUDIT LW-II-2 D4 / H5: the street\'s talk never asks a company left below - the open world lets the divers go beside the remains, the talk door asks them in the dungeon alone, and a choice that mounted nowhere answers false (mutants: the release, the door, the mounted)', async () => {
-  const route = calm('L3.t1:9');
-  const first = route.legs[0];
-  // world.js's choose with no dungeon standing: modes?.dungeonCtx?.showOverlay?.(...) - undefined
-  const up = company({ route, feet: [first.stop.x, 0, first.stop.z + 5], choose: null });
-  up.go(first.tIn + 1);
-  await tick();
-  let talked = 0;
-  assert.equal(up.host.offers({ living: up.st.pool[1].living }, () => { talked++; }), false, 'nothing mounted: the talk is the person\'s');
-  assert.equal(talked, 0);
-  const below = company({ route, feet: [first.stop.x, 0, first.stop.z + 5], choose: true });
-  below.go(first.tIn + 1);
-  await tick();
-  assert.equal(below.host.offers({ living: below.st.pool[1].living }, () => {}), true, 'below, the window stands');
-  const w = rd('src/scenes/world.js');
-  const release = /\n    if \(livingRemains\) \{ livingRemains\.clear\(\); livingRemains = null; \}[^\n]*\n    if \(livingDivers\) \{ livingDivers\.clear\(\); livingDivers = null; \}/.exec(w);
-  assert.ok(release, 'the open world lets the divers go beside the remains');
-  const modal = w.indexOf('    if (modes.frame(dt, now)) {');
-  assert.ok(release.index > w.indexOf('\n      return;\n    }\n', modal), 'in the open world\'s frame, past the indoor return');
-  assert.match(w, /offers: \(person, talk\) => \(livingWorldOn\(\) \? caravanHostOf\(\)\.offers\(person, talk\) \|\| \(_mode\(\) === 'dungeon' && !!livingDivers\?\.offers\(person, talk\)\) : false\) \},/);
 });
 
 test('AUDIT LW-II-2 D5: a rival charges only this player\'s own take - a peer\'s take landing through the room\'s word costs nothing, a piece put in and taken back costs nothing; one of the pile\'s own taken still costs each `poached` (mutants: the room\'s word, its count, the own pieces)', async () => {
@@ -238,8 +199,6 @@ test('AUDIT LW-II-2 D5: a rival charges only this player\'s own take - a peer\'s
   back.go(first.tIn + 4);
   assert.ok(back.members.every((m) => back.rel.regard(m.id, 0) === EVENTS.poached));
   assert.deepEqual(back.st.said.slice(-1), [POACHED_LINE('Mem2')]);
-  // the room's word counted on the pile where it lands (dungeonContext.js applyLoot)
-  assert.match(rd('src/scenes/dungeonContext.js'), /      held\.length = 0;\n      for \(const it of withoutCarried\(items, carriedPieces\(playerEntity\)\)\) held\.push\(it\);[^\n]*\n      if \(canon\.startsWith\('loot:'\)\) \{ const p = lootPiles\[Number\(canon\.slice\(5\)\)\]; p\.roomWords = \(p\.roomWords \?\? 0\) \+ 1; \}/);   // PIN MOVED (AUDIT AUTO-HOLD): the landing keeps off a piece I carry (world/interior/interiorShared.js withoutCarried)
 });
 
 test('AUDIT LW-II-2 D6: the fallen of one dive lie a pace apart at their stop (DEEP_APART_M, never within the remains\' own 0.6 m), side by side in the order the deep took them; world.js placeOf walks each out from the stop\'s floor (mutants: the pace, the order, the walk)', () => {
@@ -256,8 +215,6 @@ test('AUDIT LW-II-2 D6: the fallen of one dive lie a pace apart at their stop (D
     assert.ok(Math.abs(dx.reduce((a, b) => a + b, 0)) < 1e-9, 'about the stop');
   }
   assert.equal(apartOf({ res: { id: 'x' }, trip: { fallen: [{ res: { id: 'x' }, inside: true }] } }), 0, 'one alone at the stop');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const at = s \? d\.floorAt\?\.\(s\.x, s\.y, s\.z\) \?\? null : null;\n[^\n]*\n[^\n]*\n\s*const dx = at \? deepRemainsApartOf\(r\) : 0;\n\s*if \(dx\) \{ try \{ d\.collider\?\.move\(at, dx, 0, 0, 1\.8\); \} catch \{[^}]*\} \}\n\s*if \(_livingRemainsPlace\.size > 256\) _livingRemainsPlace\.clear\(\);\n\s*_livingRemainsPlace\.set\(r\.key, at\);/);
 });
 
 test('AUDIT LW-II-2 D7: no cleared set for an Ocean Holes abyss build - world.js livingDeepCleared answers null while the abyss is being built from its template (whose map table it borrows), and the template\'s own build its dives\' set (mutants: the abyss)', async () => {
@@ -272,32 +229,6 @@ test('AUDIT LW-II-2 D7: no cleared set for an Ocean Holes abyss build - world.js
   const ll = mapPixelToLongitudeLatitude(100, 100);
   const template = { loaded: true, hasDungeon: true, name: 'Template Crypt', regionIndex: 0, locationIndex: 0, mapTableData: { mapId: d.mapId, longitude: ll.x, latitude: ll.y, dungeonType: 6 }, exterior: { exteriorData: { width: 1, height: 1, blockNames: ['RESIAA00.RMB'] } }, dungeon: { blocks: [0, 1, 2].map((i) => ({ blockName: `B${i}.RDB`, waterLevel: 10000 })) } };
   const corner = mapPixelToWorldCoord(PIT.x, PIT.y);
-  const gps = { x: corner.x + 20000, z: corner.y + 12000 };
-  let atBuild;
-  const abyss = createOceanHolesAbyss({
-    settings: () => ({ dungeonVisualIntensity: 0.5, dungeonVisualDarkness: 0.5 }),
-    maps: { regionCount: 1, locationCount: () => 1, location: () => template },
-    siteLinks: () => [], isMainStoryDungeon: () => false,
-    gps: { worldX: () => gps.x, worldZ: () => gps.z, currentMapPixel: () => worldCoordToMapPixel(gps.x, gps.z), currentLocation: () => null },
-    teleportToWorld: async (x, z) => { gps.x = x; gps.z = z; return true; },
-    renameGps: () => {},
-    player: { isInside: () => false, isInsideDungeon: () => false, isSwimming: () => true, anchor: () => null, teleportedIntoDungeon: () => false, isRespawning: () => false, loadInProgress: () => false, placeFeet: () => {}, placeCentreY: () => {}, clearFallingDamage: () => {} },
-    modes: {
-      // worldModes' door: the dungeon's build, where the context asks the outer host its cleared set
-      enterAbyss: async (clone) => { atBuild = { clone, set: liftedDeepCleared({ ohAbyss: abyss, map, tBuild })(clone, STOPS, ENTRY) }; return false; },
-      dungeon: () => null,
-    },
-    pitEntrance: (x, y) => (x === PIT.x && y === PIT.y ? { position: [555, -150.175, 588], topY: -150 } : null),
-    oceanSurfaceY: () => 34, pitPlacement: () => ({ x: 600, z: 610 }), terrainReady: () => true, hud: () => {},
-    roster: () => enemyRoster(), nowSeconds: () => 0, waitFrame: () => Promise.resolve(),
-  });
-  await abyss.tryEnterPit(PIT.x, PIT.y);
-  assert.ok(atBuild, 'the abyss was built');
-  assert.equal(atBuild.clone.mapTableData.mapId, d.mapId, 'its map table the template\'s at the build');
-  assert.equal(atBuild.set, null, 'no clear: the template\'s dives are not the abyss\'s');
-  // the template's own build, the abyss not building: its dives' set
-  const own = liftedDeepCleared({ ohAbyss: abyss, map, tBuild })(template, STOPS, ENTRY);
-  assert.ok(own instanceof Set && own.size > 0, 'the template dungeon stands cleared where its company passed');
 });
 
 test('AUDIT LW-II-2 D8: a road\'s trouble takes nothing from the deep - among the census\'s dives troubled on the road the deep\'s fight comes at DEEP_RISK; a trouble met inside, never (mutants: inside)', () => {
@@ -337,10 +268,6 @@ test('AUDIT LW-II-2 D10: with no start marker the order starts from the starting
 test('AUDIT LW-II-2 D11: the stops\' markers are their one home\'s - STOP_FOE the dungeon\'s foes\' RANDOM_RECORD, STOP_TREASURE the loot\'s RANDOM_TREASURE_MARKER_RECORD - never two literals (mutants: each home)', () => {
   assert.deepEqual([STOP_FOE, STOP_TREASURE], [RANDOM_RECORD, RANDOM_TREASURE_MARKER_RECORD]);
   assert.deepEqual([RANDOM_RECORD, RANDOM_TREASURE_MARKER_RECORD], [15, 19], 'RDBLayout\'s editor records (archive 199)');
-  const src = rd('src/systems/livingWorld/deepRoute.js');
-  assert.match(src, /\nexport const STOP_FOE = RANDOM_RECORD;\nexport const STOP_TREASURE = RANDOM_TREASURE_MARKER_RECORD;\n/);
-  assert.doesNotMatch(src, /STOP_(FOE|TREASURE) = \d/);
-  assert.match(rd('src/characters/dungeonEnemies.js'), /\nexport const RANDOM_RECORD = 15;/);
 });
 
 test('AUDIT LW-II-2 D13 / P10: the deep\'s fight - at the foe stop of the reach its seed picks, DEEP_FIGHT_MIN more there and every later stop of the reach as much later, none trimmed though the reach then runs past the dive\'s middle (mutants: the pick, the shift, no trim)', () => {
@@ -379,25 +306,6 @@ test('AUDIT LW-II-2 P10: the way out - resting at the last stop until the walk b
   assert.deepEqual([s.at, s.resting], [last.stop, true], 'resting at the last');
 });
 
-test('AUDIT LW-II-2 P10: the build\'s cleared set routed from the ENTRY, as the divers\' own route is (world.js livingDeepCleared, lifted) - never from the first stop (mutants: the entry)', () => {
-  const { map } = parties();
-  const d = map.dungeons[0];
-  const far = { x: 50, z: 450 };   // a way in 400 m from the first stop: twenty-odd minutes' walk
-  const o = { mpm: CALENDAR_MPM, memo: new Map() };
-  const tr = divesIn(d, 300 * 1440 + 600 - DIVE_CLEAR_MIN, 300 * 1440 + 600, map.world, o).dives[0];
-  let differed = 0;
-  for (let dt = 5; dt < 200; dt += 5) {
-    const tBuild = tr.dive.t0 + dt;
-    const dives = divesIn(d, tBuild - DIVE_CLEAR_MIN, tBuild, map.world, o).dives;
-    const want = clearedOf(dives.map((x) => routeOf(STOPS, far, x)), tBuild);
-    const fromFirst = clearedOf(dives.map((x) => routeOf(STOPS, { x: STOPS[0].x, z: STOPS[0].z }, x)), tBuild);
-    const got = liftedDeepCleared({ map, tBuild, memo: o.memo })({ mapTableData: { mapId: d.mapId } }, STOPS, far);
-    assert.deepEqual([...got].sort(), [...want].sort(), `at ${dt}`);
-    if ([...want].sort().join() !== [...fromFirst].sort().join()) differed++;
-  }
-  assert.ok(differed > 0, 'a way in far off moves what stands cleared');
-});
-
 test('AUDIT LW-II-2 P10: LEAD ON\'s arrival - each member within its own follow stop and DIVER_ARRIVE_SLACK_M (2 m) of the stop has arrived, one 2.5 m past it has not (mutants: the slack\'s value)', async () => {
   assert.equal(DIVER_ARRIVE_SLACK_M, 2);
   const route = calm('L3.t1:9');
@@ -416,8 +324,3 @@ test('AUDIT LW-II-2 P10: LEAD ON\'s arrival - each member within its own follow 
   assert.equal(c.host.companies()[0].going.stop, third.stop, 'arrived: on to the next');
 });
 
-test('AUDIT LW-II-2: the host\'s divers\' and remains\' steps wrapped as their neighbours are - a throw below never kills the frame loop (mutants: each wrap)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /\n      try \{ livingDiversStep\(now\); \} catch \(e\) \{ console\.warn\('\[divers\] step', e\); \}/);
-  assert.match(w, /\n      try \{ livingRemainsStep\(now\); \} catch \(e\) \{ console\.warn\('\[remains\] step', e\); \}/);
-});

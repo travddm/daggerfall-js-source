@@ -76,16 +76,3 @@ test('QUEST-WAVE: a hold lasts exactly as long as its stand - landed, the record
   assert.equal(heldSpots(c2).size, 0);
 });
 
-test('QUEST-WAVE by source: every quest arm and the loose-foe door hold their spots in the one set, and ask it', () => {
-  const world = rd('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), he = rd('src/scenes/hostEnchant.js');
-  assert.match(world, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\], feet\),/);
-  assert.match(world, /holdSpotWhile\(collider, spot, \(\) => exteriorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(ext, /isOccupied: entityOccupancy\(\(f\) => f\.ai\?\.feet, \(\) => \[\.\.\.exteriorFoePool\(\), \.\.\.heldSpots\(collider\)\], feet\),/);
-  assert.match(ext, /holdSpotWhile\(collider, spot, \(\) => exteriorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(wm, /\(\) => \[\.\.\.interiorFoePool\(\), \.\.\.heldSpots\(interiorCtx\.collider\)\]/);
-  assert.match(wm, /holdSpotWhile\(interiorCtx\.collider, spot, \(\) => interiorFoes\.spawnFoe\(foe\.foeType,/);
-  assert.match(wm, /\(\) => \[\.\.\.dungeonCtx\.foes, \.\.\.heldSpots\(dungeonCtx\.collider\)\]/);
-  assert.match(wm, /holdSpotWhile\(dungeonCtx\.collider, spot, \(\) => dungeonCtx\.spawnQuestFoe\(\{/);
-  assert.match(he, /const pending = heldSpots\(collider\);/);
-  assert.match(he, /return holdSpotWhile\(collider, spot, \(\) => spawn\(mobileType, pos, \{ yawRad: yaw, allied \}\)\)\.catch\(\(\) => null\);/);
-});

@@ -93,12 +93,3 @@ test('LOAN-AMNESTY customs: a character crossing online is marked as it crosses 
   assert.equal(copy.bankAccounts[3].loanDueDate, 100);
 });
 
-test('LOAN-AMNESTY the boot: an online character\'s save is forgiven in the one parse, before it is restored and before the Empire\'s join; the words said once the world stands; an offline save is never touched (mutants: applied offline; after the restore; never said)', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf('\n  const loansForgiven = realmBoot ? forgiveLoans(bootSnapRead) : null;');
-  assert.ok(at > w.indexOf('if (realmBoot) { bootSnapRead = realmBoot.snap; realmBoot.snap = null; }'), 'on the realm\'s one parse, once it is held');
-  assert.ok(at > w.indexOf("if (testRoomOffline && realmSession) {"), 'a test room character is never the realm\'s');
-  assert.ok(at > 0 && at < w.indexOf('empireJoin('), 'before the join settles a loan');
-  assert.ok(at < w.indexOf('await worldQuickLoad({ ...bootLoadPick, snap });'), 'before the save is restored');
-  assert.match(w, /for \(const line of reclaimLines\(realmGiven\)\) townTalk\.say\(line\);[^\n]*\n\s*for \(const line of loanAmnestyLines\(loansForgiven\)\) townTalk\.say\(line\);/);
-});

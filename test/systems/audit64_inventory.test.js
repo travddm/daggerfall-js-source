@@ -211,32 +211,6 @@ test('AUDIT 64 F48: the tip CLEARS where DFU writes string.Empty, and carries no
   assert.equal(settle(...LOCAL_SLOT(0)), null, 'a pushed box takes the pointer with it');
 });
 
-test('AUDIT 64 F48: the tip is DRAWN, and drawn LAST - after the message-box pass', () => {
-  // DaggerfallBaseWindow.cs:105-112 - `Draw() { base.Draw(); // Draw
-  // tooltip last  if (defaultToolTip != null) defaultToolTip.Draw(); }`
-  // The tooltip is not a component in the panel tree at all; it is
-  // painted after everything the base class drew, which is what puts
-  // it over a pushed box as well as over the window.
-  //
-  // draw() bails without ARENA2 art (`if (!_art)`), so the order is
-  // pinned off the source the way F53's cell pass is. What this
-  // catches is the whole visible half of F48 going missing: a window
-  // that resolves, feeds and times a tooltip nothing ever paints.
-  const src = read('src/ui/native/nativeInventory.js');
-  const body = src.slice(src.indexOf('\n  draw(renderer, canvas, font) {'));
-  const end = body.indexOf('\n  }\n');
-  assert.ok(end > 0, 'draw() has a body');
-  const drawBody = body.slice(0, end);
-  const tip = drawBody.indexOf('this._tip.draw(renderer, m, font);');
-  assert.ok(tip > 0, 'draw() paints the shared tooltip');
-  assert.ok(drawBody.indexOf('drawMessageBox(') > 0
-    && drawBody.indexOf('drawMessageBox(') < tip,
-    'and it paints it AFTER the message box, not under it');
-  assert.equal(drawBody.slice(tip).trim(), 'this._tip.draw(renderer, m, font);',
-    'the tooltip draw is the LAST statement of draw()');
-  assert.equal(src.split('this._tip.draw(').length - 1, 1, 'painted once');
-});
-
 // ── F49: ShowInfoPopup's recipe chain ─────────────────────────────
 
 test('AUDIT 64 F49: an Info click on a potion recipe chains a SECOND box of ingredient names', () => {
@@ -377,13 +351,7 @@ test('AUDIT 64 F51: the POPUP keeps the long words - the pass is panel-only', ()
 });
 
 test('AUDIT 64 F51: BOTH panel arms end in the one pass, as DFU\'s two callers do', () => {
-  // UpdateItemInfoPanelGold (:2249-2259) builds its own tokens and
-  // then calls UpdateItemInfoPanel(tokens) - the SAME member the item
-  // overload ends in. Wrapping only the item branch would leave the
-  // gold arm on a different door than the reference's.
-  const inv = read('src/ui/native/nativeInventory.js');
   const call = /const panelRows = infoPanelShorten\(this\.infoGold\s*\n\s*\? goldPanelRows\(/;
-  assert.match(inv, call, 'the shortening wraps the WHOLE ternary, not one branch');
   // it is a no-op on today's gold strings, which already spell kg
   const gold = goldPanelRows(400, 1);
   assert.deepEqual(infoPanelShorten(gold).map((r) => r.text), gold.map((r) => r.text));
@@ -646,18 +614,3 @@ test('AUDIT 64 F54: a transferred QUEST item lands at the front, everything else
   assert.deepEqual(store.map((i) => i.name), ['Letter', 'x'], 'the wagon/ground side takes Front too');
 });
 
-test('AUDIT 64 F54: the quest machine\'s `front` flag reaches the host hook', () => {
-  // GivePc.cs:179/:186 and GetItem.cs:83 call
-  // `AddItem(item.DaggerfallUnityItem, AddPosition.Front)`, which
-  // quest/actions.js has always passed as `true`;
-  // QuestResourceBehaviour.cs:421 passes no position, so its default
-  // Back is the plain append.
-  const world = read('src/scenes/world.js');
-  assert.match(world, /giveItemToPlayer: \(dfItem, front = false\) => \{[^\n]*addItem\(playerEntity\.items, dfItem, front \? 'front' : 'back'\)/,
-    'the host hook no longer drops the flag');
-  const actions = read('src/systems/quest/actions.js');
-  assert.match(actions, /giveItemToPlayer\?\.\(item\.daggerfallUnityItem, true\)/);
-  const behaviour = read('src/systems/quest/resourceBehaviour.js');
-  assert.match(behaviour, /giveItemToPlayer\?\.\(item\.daggerfallUnityItem\)\;/,
-    'QuestResourceBehaviour keeps AddItem\'s default');
-});

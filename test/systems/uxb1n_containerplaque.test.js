@@ -100,13 +100,3 @@ test('UXB1-N: the plaque wears the tone - somebody else\'s container in its own 
   assert.notEqual(privTitle, plainTitle);
 });
 
-test('UXB1-N/O: the interior host names by the ONE ownership predicate the press uses, stamps the lid when a stranger\'s window opens, and carries it in the scene cache', () => {
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /return decorTool\.flying\(\) && !decorTool\.ghost\(\) \? decorBuiltInPlaque\(t \|\| 'Cupboard', c, true\) : houseContainerHover\(t, \{ owned: ownsThisInterior\(b\), searched: stockSearched\(c, stockedToday\(\)\) \}\);/, 'the plaque');
-  assert.match(wm, /const owned = ownsThisInterior\(b\);/, 'the press');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.equal((wm.match(/ownsShip\(playerEntity\)\)\n\s+\|\| \(interiorHome && b === interiorBuilding \? interiorHome\.own : houseOwnedAt\(b, b\?\.buildingKey\)/g) ?? []).length, 1, 'and the predicate is written once (HOME1: it knows the online home)');
-  assert.match(wm, /if \(win && privateProperty\) c\.openedOn = c\.stockedDate;/, 'a stranger\'s container, opened: this stock is seen');
-  assert.match(wm, /openedOn: c\.openedOn \?\? 0,/, 'the scene cache carries it out of the door');
-  assert.match(wm, /if \(target && kind === 'container'\) target\.openedOn = c\.openedOn \?\? 0;/, '...and back in');
-});

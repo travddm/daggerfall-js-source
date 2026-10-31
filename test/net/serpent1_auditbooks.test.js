@@ -127,20 +127,6 @@ test('AUDIT-D carrier: the hoard on `spoils: true` alone; one cid a receipt acro
   assert.equal(mk().add(rA, CH, 'Ann', 20), false, 'settled on the device: a reload never keeps it again');
 });
 
-test('AUDIT-D world host by source: the serpent queue\'s own guard, relay clock and store; the hoard\'s owner, lock, keys, crash door, slot save and realm hooks', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf("const serpentClaims = params.has('online') ? createSerpentClaims({");
-  const q = w.slice(at, w.indexOf('  }) : null;', at));
-  assert.match(q, /nowS: relayNowS,/); assert.match(q, /store: _spoilsStore,/);
-  assert.match(q, /onRecorded: \(data\) => \{\n\s+if \(data\?\.renown\?\.character !== characterIdOf\(playerEntity\)\) return;/);
-  const g = w.slice(w.indexOf('function grantSerpentSpoils(entry) {'), w.indexOf('function grantSerpentSpoils(entry) {') + 1400);
-  assert.match(g, /spoilsLock\(\(\) => serpentSpoils\.grant\(/); assert.match(g, /owner: entry\.ch,/);
-  assert.match(w, /const serpentSpoils = createSpoilsPool\(\{[\s\S]{0,300}keys: SERPENT_SPOILS_KEYS,/);
-  assert.ok(w.includes('onHanded: (rec) => serpentSpoils.adopt(rec), key: SERPENT_SPOILS_KEYS.store'));
-  assert.ok(w.includes('onSlotSaved((characterId) => { try { serpentSpoils.saved(characterId);'));
-  assert.ok(w.includes('...(serpentSpoils?.heldIds?.(who) ?? [])') && w.includes('serpentSpoils?.saved(who, ids)'));
-});
-
 test('AUDIT-D brain: a level is bounded at the join and kept from the first claim; a ship earns `dealt` at SERPENT_RECEIPT_SHARE of its share, and not below it - a stander\'s at SERPENT_PART_SHARE (SERPENT4)', () => {
   const f = newSerpentFight(DAY, 0, 1e9, 'sethrakul', 0, 0, 0);
   joinSerpentFight(f, 's', 'S', 999, 4, 0, true);

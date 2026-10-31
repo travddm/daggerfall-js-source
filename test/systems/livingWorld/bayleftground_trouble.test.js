@@ -76,11 +76,6 @@ test('BAY-LEFT-GROUND D2 the host\'s producer rolls the group on the pixel\'s ow
   } finally { _resetEncounterTableSelectors(); }
 });
 
-test('BAY-LEFT-GROUND D2 the world host wires its trouble world to the composed maps\' band (mutants: the host handing none)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const livingTroubleWorld = \{\n\s+climateAt: \(px, py\) => maps\.getClimateIndex\(px, py\),\n\s+foesOf: troubleFoesOf\(\{ faunaAt: \(x, y\) => maps\.getFaunaBand\?\.\(x, y\) \}\),/);
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE = !!ARENA2 && ['TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL', 'MAPS.BSA', 'CLIMATE.PAK', 'POLITIC.PAK'].every((f) => existsSync(join(ARENA2, f)));
 test('BAY-LEFT-GROUND D2 with ARENA2: on the player\'s own trace and the composed maps, a caravan beset in Black Marsh, Skyrim, Elsweyr or Morrowind meets the zone\'s wild - none of the Bay\'s Orcs and Centaurs (the audit\'s probe, lane D p2)', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {

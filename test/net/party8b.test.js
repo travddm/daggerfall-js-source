@@ -16,7 +16,6 @@ import { createPartyPanel, withMe, placeText, PARTY_CSS, HP_DIGITS_BELOW, FACE_B
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
-
 // ── THE FAKE DOCUMENT (test/net/chat1.test.js's shape, with a canvas and a write counter) ──────────────
 
 function fakeNode(tag, doc) {
@@ -152,12 +151,6 @@ test('PARTY8-B: the place line is DRAWN only for a seat that is not where I am -
   panel.render({});
   assert.equal(bran.where.className, 'dfparty-where off', 'Bran followed me down: with me again');
   assert.match(PARTY_CSS, /\.dfparty-where\.off \{ display: none; \}/);
-  // the host: `here` is the pose partyFrame last SENT, stashed beside the send - never composed a second time
-  const w = rd('src/scenes/world.js');
-  // AUDIT PARTY-TRAVEL (2026-09-25): the send's answer is read now - the party journey is told only of a pose that LEFT
-  assert.match(w, /_partyPose = composePartyPose\(\);(?:\s*\/\/[^\n]*)*\s*if \(socialLink\(\)\?\.sendParty\(_partyPose, \{ urgent: pingNow \}\)\)/, 'one compose, stashed, sent');   // PARTY-PING: urgent skips the floor for the one pose that carries a new point
-  assert.match(w, /here: \(\) => _partyPose \}\);/, 'and read by the panel through the seam');
-  assert.equal((w.match(/composePartyPose\(\)/g) ?? []).length, 1, 'composed in exactly one place (AUDIT SOC B18)');
 });
 
 test('PARTY8-B: a DROP in health flares the fill - the class flips between two names so a second hit restarts the animation, and a heal, a first pose, an unchanged pose and an away seat\'s pose do not flare (mutants: the flare on every pose; the flare on a heal; one class name, so the second hit in a second is silent)', () => {

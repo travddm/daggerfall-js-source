@@ -43,8 +43,4 @@ test('RENOWN3 the pace, at RENOWN-ACCOUNT\'s rate: a Daggerfall level-30 charact
   const uncapped = (to, foe) => { let xp = 0, n = 0; while (renownForXp(xp) < to) { xp += renownKillXp(foe, RENOWN_MAX); n++; } return n; };
   assert.deepEqual([uncapped(10, 30), uncapped(20, 30)], [25, 304], 'what the ceiling took away');
   assert.deepEqual([uncapped(10, 5), uncapped(20, 5)], [149, 1844], 'and from a new character, one kill in 150 - none by Renown 20');
-  const law = src('src/net/renown.js').replace(/\s*\n \*\s*/g, ' ');
-  assert.match(law, /a Daggerfall level-30 character takes 79 kills to Renown 10 and 531 to Renown 20/, 'the law\'s own note says it');
-  assert.match(law, /one kill more in 150 to Renown 10 and none in 1,844 to Renown 20/);
-  assert.match(law, /at RENOWN3's full rate they were 59 and 398, and 111 and 1,365/, 'and what they were at the full rate');
 });

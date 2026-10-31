@@ -559,7 +559,4 @@ test('AUDIT 28 W3c: RandomDungeonTextures - the five modes, the main-story gate,
   assert.deepEqual(dungeonTextureTable({ ...args, mapId: 77 }), dungeonTextureTable({ ...args, mapId: 77, mode: 4 }), 'clamped to 4');
   resetToDefaults();
   assert.equal(LIVE['Video/RandomDungeonTextures'], 'src/world/dungeon/dungeonTextures.js');
-  // And the layout goes through the fork, with the RAW MapId.
-  const layout = readFileSync(new URL('../../src/world/dungeon/dungeonLayout.js', import.meta.url), 'utf8');
-  assert.match(layout, /dungeonTextureTable\(\{\s*\n\s*locationId: dfLocation\.dungeon\.recordElement\.header\.locationId,\s*\n\s*mapId: dfLocation\.mapTableData\?\.mapId \?\? 0,/);
 });

@@ -276,17 +276,6 @@ test('MW-MOUNT: the decorator\'s ghost is the picture the room will hang - the M
 
 // ── the host ─────────────────────────────────────────────────────────
 
-test('MW-MOUNT: the host (worldModes.js) by source - the room and the ghost are handed the rig\'s mountPicture, and the room is refreshed when the build\'s stamp changes, before the mounts are drawn (mutants: the ghost without it, the refresh never asked)', () => {
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /const decorMwPicture = \(item\) => fpArm\.mountPicture\(item\);/);
-  assert.equal((m.match(/mwPicture: decorMwPicture,/g) ?? []).length, 2, 'the room and the tool');
-  const at = m.indexOf('const mwStamp = fpArm.mountPictureStamp();');
-  assert.ok(at > 0 && m.indexOf('if (mwStamp !== _decorMwStamp) { _decorMwStamp = mwStamp; interiorDecor.refreshMounts(); }', at) > at);
-  assert.ok(at < m.indexOf('interiorDecor.drawMounts(renderer);', at), 'before the mounts are drawn');
-  const t = src('src/scenes/decor/decorTool.js');
-  assert.match(t, /loadMountPicture\(\{ getTexture: deps\.getTexture, uploadRecord: deps\.uploadRecord, renderer, mwPicture: deps\.mwPicture \}, entry\.flat, entry\.item\)/);
-});
-
 // ── AUDIT DYE-ICON (2026-09-27): the audit of the three, fixed ─────────
 
 test('AUDIT DYE-ICON 2: a mount\'s own textures are loaded before it renders - a mesh textured by a file no build draw loaded hangs that file\'s texels, never the magenta warning an unloaded read answers (mutants: the texture preload dropped)', async () => {

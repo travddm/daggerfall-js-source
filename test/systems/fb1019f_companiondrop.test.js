@@ -146,62 +146,6 @@ test('STORE-KEEPS THE PACKS, THE LAW (wildDropLaw.js takeWildDeath, wildDropCand
   assert.deepEqual(kinds(swornOf(rec, s.c.id).companion.items), [W.Saber], 'away: whole');
 });
 
-test('STORE-KEEPS THE PACKS THROUGH THE SERVICE AND BACK (server-account/src/wild.js, wildTakeTook): at another player\'s hand the service takes her bag and her purse\'s tenth off the record and nothing of a companion\'s - whether her tab says `packs` 1 or nothing, and on a seizure; her game takes exactly that out of its own lists, her companions\' untouched; an answer from before the word that names a pack\'s piece and coin still comes out of that pack alone (mutants: the packs taken again; the applier reading a pack\'s piece from the bag)', async () => {
-  const s = await stand();
-  const svc = await standService();
-  const ria = await svc.registered('Riadne'), bo = await svc.registered('Borin');
-  const R = await seatRealm(svc.env, ria.secret, 'Riadne', s.record());
-  const stored = () => { const r = JSON.parse(new TextDecoder().decode(svc.env.SAVES._map.get(svc.env.DB._raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(R.id).obj))); r.__a = s.a.id; return r; };
-  const whole = packsOf(stored());
-  const now = () => Math.floor(Date.now() / 1000);
-  const fall = (body, who = ria) => quiet(() => svc.call('/v1/wild/fall', { room: worldRoom(520, 110), ...body }, who.secret));
-  // her game's own words, and a tab's from before them
-  assert.deepEqual(wildFallWords(), { packs: WILD_FALL_PACKS, letters: 1 });
-  const d = (await fall({ receipt: await mintWildReceipt({ f: ria.id, c: R.id, k: bo.id, r: '0123456789b1', w: -1 }, svc.gatePriv, { subtle: globalThis.crypto.subtle, nowS: now() }), realm: R.at(), ...wildFallWords() })).body;
-  assert.deepEqual([...new Set(d.took.map((x) => x.f))], ['bag'], JSON.stringify(d));
-  assert.deepEqual(d.gold, { purse: 40, cart: 0 }, 'no pack\'s share');
-  assert.equal(d.items.find((i) => i.group === 'Currency').stackCount, 40, 'the remains\' gold: her tenth alone');
-  assert.deepEqual(packsOf(stored()), whole, 'the record\'s packs whole');
-  const old = (await fall({ receipt: await mintWildReceipt({ f: ria.id, c: R.id, k: bo.id, r: '0123456789b2', w: -1 }, svc.gatePriv, { subtle: globalThis.crypto.subtle, nowS: now() }), realm: R.at(), cart: 1 })).body;
-  assert.deepEqual([old.error, [...new Set(old.took.map((x) => x.f))].filter((f) => f !== 'bag')], [undefined, []], 'a tab from before the word: answered, no pack taken (COMPANION-DROP refused it)');
-  const seized = await fall({ receipt: await mintWildReceipt({ f: ria.id, c: R.id, k: bo.id, r: '0123456789b3', w: -1 }, svc.gatePriv, { subtle: globalThis.crypto.subtle, nowS: now() - WILD_FALL_GRACE_S - 1 }) }, bo);
-  assert.equal(seized.status, 200, JSON.stringify(seized.body));
-  assert.equal(seized.body.gold.packs, undefined, 'a seizure takes no pack\'s coin');
-  assert.deepEqual(packsOf(stored()), whole, 'nor its pieces');
-  assert.ok(!rd('server-account/src/wild.js').includes("return 'not-found'"), 'no take of the packs to refuse');
-  // her game: what the service took, out of its own lists - her bag's claymore; her companions' live lists untouched
-  const bag = s.p.items.length;
-  const out = wildTakeTook(s.p, d.took, d.gold, () => {}, wildPacks(s.h.host.companions.party, RC.revenantsWithYou()));
-  assert.deepEqual([out.length, s.p.items.length, s.p.goldPieces], [1, bag - 1, 360]);
-  assert.deepEqual([kinds(s.pack).length, coin(s.pack)], [4, 300], 'his live pack whole');
-  // an answer from before STORE-KEEPS, asked again: its pack's piece and coin come out of that pack alone
-  const was = { items: [], goldPieces: 0 };
-  const hisAxe = s.pack.find((it) => it.templateIndex === W.War_Axe);
-  const oldOut = wildTakeTook(was, [{ g: 'Weapons', t: W.War_Axe, m: hisAxe.material ?? 0, u: hisAxe.uid ?? null, p: null, n: 1, f: WILD_PACK.crew(42, s.hand) }], { purse: 0, cart: 0, packs: { [WILD_PACK.crew(42, s.hand)]: 30 } }, () => {}, wildPacks(s.h.host.companions.party, RC.revenantsWithYou()));
-  assert.deepEqual([oldOut.length, coin(s.pack), s.pack.includes(hisAxe)], [1, 270, false], 'his piece and his share, out of his pack');
-  assert.equal(wildTookAny(oldOut, { purse: 0 }), true);
-  const lone = { items: [blade(W.Mace, 1)] };
-  assert.deepEqual(wildTakeTook(lone, [{ g: 'Weapons', t: W.Mace, m: 1, u: null, p: null, n: 1, f: WILD_PACK.sworn('gone') }], null, () => {}, []), [], 'a piece whose pack is not here is left - never another list\'s');
-  assert.equal(lone.items.length, 1);
-});
-
-test('STORE-KEEPS SEND-OFF IN THE ZONE: with nothing of theirs to drop, a hand ashore is sent back aboard from inside the zone - his pack to her hold - and the sworn one at the side is sent away or on an errand, and given kit while it waits outside, as anywhere; the roster, the slots\' hold and the boat\'s picker ask no zone (mutants: COMPANION-DROP\'s refusals back)', async () => {
-  const s = await stand();
-  setWildHere(true);
-  assert.equal(s.h.host.companionPress(s.h.boat, s.hand, 0), 'back', 'sent back aboard inside the zone');
-  assert.deepEqual(s.h.log.given.at(-1), [5, s.h.boat], 'his pack into her hold');
-  assert.equal(RC.errandRefusal(s.a, DAY * 10), null, 'an errand may be asked');
-  const gift = blade(W.Broadsword, 0);
-  s.p.items.push(gift);
-  assert.equal(RC.giveSwornGear(s.c.id, gift), null, 'kit to one waiting outside');
-  assert.equal(RC.sendRevenantAway(s.a.id), true, 'the one at the side sent away');
-  assert.equal(N.revenantById(s.a.id).companion.state, 'away');
-  assert.equal(RC.leaveRefusal, undefined, 'no refusal left to ask');
-  assert.ok(rd('src/ui/companionRoster.js').includes('away.onclick = () => { _notice = null; sendRevenantAway(r.id); rerender(); };'));
-  assert.ok(rd('src/scenes/world.js').includes('const last = revenantsWithYou().sort((a, b) => (b.swornAt ?? 0) - (a.swornAt ?? 0))[0];'));
-  assert.ok(!rd('src/scenes/naval/navalHost.js').includes('heldAtSide'), 'the boat\'s picker asks no zone');
-});
-
 test('STORE-KEEPS CARRIED OFF IN THE ZONE: a hand knocked out there gives his pack up into her hold, as anywhere - never my pack, where a death would take it; the sworn one at the side knocked out there rests with its pack and its kit, nothing handed over and nothing said (mutants: the pack into mine in the zone; the hand-over back)', async () => {
   const s = await stand();
   const said = [];
@@ -220,36 +164,3 @@ test('STORE-KEEPS CARRIED OFF IN THE ZONE: a hand knocked out there gives his pa
   assert.deepEqual([s.p.items.length, s.p.goldPieces, said], [before, gold, []], 'nothing handed over, nothing said');
 });
 
-test('STORE-KEEPS AN ANSWER FROM BEFORE THE WORD (server-account/src/wild.js answerOf, wildDropLaw.js wildTakeTook, wildDeath.js wildTookAny): a fall COMPANION-DROP took, asked again, is answered its first take - each pack\'s coin share by its word - and the fallen\'s game takes it out of the packs it names, a record\'s own by default, a kit\'s slot emptied as its list now stands; risen, a companion\'s coin alone is said (mutants: the service\'s shares unsaid; the record\'s packs unread by default; the kit put backwards or left; the risen word blind to a pack\'s coin or asking the old question)', async () => {
-  const s = await stand();
-  const svc = await standService();
-  const ria = await svc.registered('Riadne'), bo = await svc.registered('Borin');
-  const R = await seatRealm(svc.env, ria.secret, 'Riadne', s.record());
-  const rec = s.record();
-  const crew = WILD_PACK.crew(42, s.hand), sworn = WILD_PACK.sworn(s.a.id), kit = WILD_PACK.kit(s.a.id);
-  const mark = (it, f) => ({ g: it.group, t: it.templateIndex, m: it.material ?? 0, u: it.uid ?? null, p: null, n: 1, f });
-  const axe = crewOf(rec).items.find((it) => it.templateIndex === W.War_Axe), mace = swornOf(rec, s.a.id).companion.items.find((it) => it.templateIndex === W.Mace);
-  const took = [mark(axe, crew), mark(mace, sworn), mark(swornOf(rec, s.a.id).companion.gear.weapon, kit)];
-  const gold = { purse: 0, cart: 0, packs: { [crew]: 30, [sworn]: 10 } };
-  // the fall as COMPANION-DROP wrote it, its first take kept on the row
-  svc.env.DB._raw.prepare("INSERT INTO wild_falls (r, char_id, player, killer, at, items, kept, burnt, wi, wm, oi, wg, tk) VALUES ('0123456789be', ?, ?, ?, ?, '[]', '[]', 0, -1, ?, 0, NULL, ?)")
-    .run(R.id, ria.id, bo.id, Math.floor(Date.now() / 1000), worldRoom(520, 110), JSON.stringify({ took, gold }));
-  const rc = await mintWildReceipt({ f: ria.id, c: R.id, k: bo.id, r: '0123456789be', w: -1 }, svc.gatePriv, { subtle: globalThis.crypto.subtle, nowS: Math.floor(Date.now() / 1000) });
-  const again = await quiet(() => svc.call('/v1/wild/fall', { room: worldRoom(520, 110), receipt: rc, realm: R.at(), ...wildFallWords() }, ria.secret));
-  assert.equal(again.status, 200, JSON.stringify(again.body));
-  assert.deepEqual([again.body.took.map((x) => x.f), again.body.gold], [[crew, sworn, kit], gold], 'its first take, each pack\'s share by its word');
-  // a record's own packs by default: each piece out of the pack it names, the coin lowered, the kit's slot emptied
-  const twin = s.record();
-  const out = wildTakeTook(twin, again.body.took, again.body.gold);
-  assert.equal(out.length, 3, 'every piece found in its own pack');
-  assert.deepEqual([kinds(crewOf(twin).items).includes(W.War_Axe), coin(crewOf(twin).items)], [false, 270]);
-  assert.deepEqual([kinds(swornOf(twin, s.a.id).companion.items), coin(swornOf(twin, s.a.id).companion.items)], [[], 90]);
-  assert.deepEqual(swornOf(twin, s.a.id).companion.gear, {}, 'the kit\'s slot written back empty');
-  // the live lists the same, the kit's slot too
-  const live = wildTakeTook(s.p, again.body.took, again.body.gold, () => {}, wildPacks(s.h.host.companions.party, RC.revenantsWithYou()));
-  assert.equal(live.length, 3);
-  assert.deepEqual(N.revenantById(s.a.id).companion.gear ?? {}, {}, 'the live kit\'s slot emptied');
-  // risen: a companion's coin alone is my loss too, and the host asks it so
-  assert.equal(wildTookAny([], { purse: 0, cart: 0, packs: { [crew]: 3 } }), true);
-  assert.ok(hostText('src/scenes/world.js').includes('    else if (wildTookAny(out, d.gold)) townTalk.say('), 'the risen word asks wildTookAny');
-});

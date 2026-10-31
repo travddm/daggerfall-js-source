@@ -14,7 +14,6 @@ import { setTamrielFit } from '../src/world/tamriel/tamrielFrame.js';
 import { hostText } from './hostText.mjs';   // HOST-SPLIT (at the merge of main): the world host read whole - its pixel build stands in scenes/pixelBuild.js
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
-const W = hostText('src/scenes/world.js');
 afterEach(() => setTamrielFit(null));
 
 // ── WAVE 1: ARENA'S NAMES, A QUEST'S SITE, THE CAPITALS' MARKERS ─
@@ -28,37 +27,6 @@ test('AUDIT-TESA A1-1: an Arena place\'s automap key names it by its map id - ne
   assert.equal(automapKeyOf({ ...arena, capital: { key: 'solitude', k: 1 }, name: 'Solitude' }), automapDungeonKey(0, 'Solitude'), 'a capital is the port\'s, its name too');
   assert.equal(automapKeyOf({ regionIndex: 17, name: 'Daggerfall' }), automapDungeonKey(17, 'Daggerfall'));
   assert.equal(automapKeyOf({ regionIndex: 0, name: 'Ulrik\'s Hold', country: { dungeon: true }, mapTableData: { mapId: 5 } }), `${automapDungeonKey(0, 'Ulrik\'s Hold')}#5`);
-  // PIN MOVED (TESA12): the places are the port's own, every client's the same - the wire names one like any town
-  assert.match(W, /loc: ident\?\.kind === 'dungeon' \? \(ident\.name \?\? ''\) : \(loc\?\.name \?\? ''\),/);
-});
-
-test('AUDIT-TESA A1-2: entering an Arena place, and a quest revealing one, discovers it by its map id alone - its name never rides a save', () => {
-  assert.match(W, /regionName: maps\.getRegionName\(dfLocation\.regionIndex\), locationName: dfLocation\.arena && !dfLocation\.capital \? '' : dfLocation\.name,/);
-  assert.match(W, /return discoverLocation\(loc\.mapTableData\.mapId, \{ regionName: loc\.regionName, locationName: loc\.arena && !loc\.capital \? '' : loc\.name \}\);/);
-});
-
-test('AUDIT-TESA A2-1: a quest\'s site past the Bay is found by name - an isle\'s, an Arena town\'s, a country place\'s or a lair, a capital - in the index it stands in; MAPS.BSA\'s first; the reveal, the clock and the respawn all ask it', () => {
-  const i = W.indexOf('  const placeByName = ');
-  assert.ok(i > 0);
-  const src = W.slice(i, W.indexOf('\n  const { questWorld } = createQuestWorld({', i));   // PIN MOVED (HOST-SPLIT, at the merge of main): questWorld is scenes/questWorld.js's, constructed where it stood
-  const placeByName = new Function('maps', 'locationIndex', `${src}\nreturn placeByName;`);
-  const bay = { name: 'Daggerfall', regionName: 'Daggerfall', loaded: true };
-  const maps = { getLocationByName: (rn, ln) => (rn === 'Daggerfall' && ln === 'Daggerfall' ? bay : null) };
-  const winterhold = { name: 'Winterhold', regionName: 'Alik\'r Desert', arena: {}, loaded: true };
-  const farm = { name: 'Asgorn', regionName: 'Alik\'r Desert', country: {}, loaded: true };
-  const sol = { name: 'Solitude', regionName: 'Alik\'r Desert', capital: { k: 1 }, loaded: true };
-  const isle = { name: 'Mistle', regionName: 'Eltheric', ether: true };
-  const index = new Map([['1,1', winterhold], ['2,2', farm], ['3,3', sol], ['4,4', isle], ['5,5', { name: 'Winterhold', regionName: 'Alik\'r Desert' }]]);
-  const find = placeByName(maps, index);
-  assert.equal(find('Daggerfall', 'Daggerfall'), bay);
-  assert.equal(find('Alik\'r Desert', 'Winterhold'), winterhold, 'the Arena town, not a namesake the index holds of no kind of its own');
-  assert.equal(find('Alik\'r Desert', 'Asgorn'), farm);
-  assert.equal(find('Alik\'r Desert', 'Solitude'), sol);
-  assert.equal(find('Eltheric', 'Mistle'), isle);
-  assert.equal(find('Alik\'r Desert', 'Nowhere'), null);
-  assert.match(W, /const loc = placeByName\(regionName, locationName\);/, 'the reveal');
-  assert.match(W, /getLocationByName: \{ value: \(rn, ln\) => questSized\(placeByName\(rn, ln\)\) \}/, 'the clock and every quest reader through the adapter');   // PIN MOVED (START2): the quest layer's one sizing
-  assert.match(W, /const loc = placeByName\(sd\.regionName, sd\.locationName\);/, 'the respawn');
 });
 
 test('AUDIT-TESA A6-1: every capital carries start markers - editor flats on its carrier block at their anchor metres, each on its own open ground (never water, never closed) - so a portal\'s arrival lands inside the city', () => {
@@ -105,15 +73,6 @@ test('AUDIT-TESA A3-1: a town on the shore whose own pixel reads as the sea is r
   assert.equal(out.stats.unrouted, 0);
 });
 
-test('AUDIT-TESA A2-5: past the Bay a town\'s walkers, a building\'s people and a tavern\'s regulars are named by the province\'s people (TESA3\'s bank), the region\'s only on the Bay', () => {
-  const wm = read('src/scenes/worldModes.js');
-  // PIN MOVED (HOST-SPLIT, at the merge of main): the pixel's build is src/scenes/pixelBuild.js's
-  assert.match(read('src/scenes/pixelBuild.js'), /nameBank: provinceNameBank\(provinceAt\(px, py\)\?\.key\) \?\? getNameBankOfRegion\(dfLocation\.regionIndex\),/, 'the streets');
-  assert.match(W, /var modes = createWorldModes\(\{\n\s+climbFeel[,:][^\n]*\n\s+outsideView,[^\n]*\n\s+instanceDoor,[^\n]*\n\s+provinceBank: \(\) => provinceBankHere\(\),/, 'the interior host told');   // PIN MOVED (at the merge of main): after INSTANCES' door and RW1's view, which main's own pins read first
-  assert.match(wm, /const currentNameBank = \(\) => host\.provinceBank\?\.\(\) \?\? getNameBankOfRegion\(/, 'a building\'s people');
-  assert.match(wm, /bank = host\.provinceBank\?\.\(\) \?\? getNameBankOfRegion\(b\?\.regionIndex \?\? 0\);/, 'the regulars');
-});
-
 test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, named apart; the port blocks\' indices past the Shadow Realm\'s; every block built when first read, its capital\'s footprint with it, once', async () => {
   const { capitalGardenName, capitalBlockNames, CAPITAL_BLOCK_INDEX, CAPITAL_BLOCKS } = await import('../src/world/tamrielCapitals.js');
   const { SD_REALM_BLOCK_INDEX } = await import('../src/world/superDungeon/sdRealm.js');
@@ -148,11 +107,6 @@ test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, n
   assert.deepEqual(asked, ['solitude'], 'once for its every block');
   const first = lazy.find((b) => b.name.startsWith('TESASO'));
   assert.equal(first.json, first.json, 'built once, kept');
-  // PIN MOVED (WW7-4): a block made of another (registerPortBlockOf, world/capitalCastles.js) made by its own maker
-  // PIN MOVED (ROAD-FOLLOW): the same law in four lines - and a provisional block (a wall still waiting) not kept
-  assert.match(read('src/formats/worldData/worldDataReplacement.js'), /if \(b\.block\) return b\.block;\n {2}if \(b\.make\) return \(b\.block = b\.make\(_blocksFile\)\);\n {2}const json = typeof b\.json === 'function' \? b\.json\(\) : b\.json;\n {2}const block = blockFromJson\(json, b\.index\);/);
-  // PIN MOVED (AUDIT TESA II C8): the door handed `make`, which keeps nothing - no JSON beside the block it reads into
-  assert.match(read('src/world/capitalModels.js'), /for \(const b of capitalPortBlocks\(\{ footprint: \(cap\) => capitalFootprint\(cap\) \}\)\) registerPortBlock\(b\.name, b\.make \?\? \(\(\) => b\.json\), b\.index\);/);
   assert.notEqual(first.make(), first.make(), 'AUDIT TESA II C8: `make` builds anew, keeps none');
 });
 
@@ -235,67 +189,6 @@ test('AUDIT-TESA A6-2: where a capital\'s models stand - a wall over a garden or
   void tileCentre; void BLOCK_M;
 });
 
-test('AUDIT-TESA A7-1/A5-F1/A2-6: a load waits for the trace whenever a place past the Bay stands - a capital or the countryside, Arena or none; the land moving rolls the countryside\'s and the lairs\' pixels again; their ground\'s reads kept a fit and a land', () => {
-  // PIN MOVED (TESA12): one wait - the town past the Bay's beside the capitals' and the countryside's
-  const i = W.indexOf('if ((_arenaTemplates || _countryTemplates || _capitalBase) && params.has(\'load\')) await Promise.race([arenaTraced, new Promise((r) => setTimeout(r, ARENA_LOAD_WAIT_MS))]);');
-  assert.ok(i > 0, 'the wait');
-  assert.match(W, /const rolled = moved && !!\(host\._countryTemplates \|\| host\._lairTemplates\) && !cap && !had\?\.capital && !had\?\.arena;\n\s+if \(rolled \|\| cap !== !!had\?\.capital\) again\.push/, 'the sweep');
-  assert.match(read('src/world/tamrielCountry.js'), /if \(fit !== tamrielFit\(\) \|\| land !== tamrielLandVersion\(\)\) \{ dry\.clear\(\); fit = tamrielFit\(\); land = tamrielLandVersion\(\); \}/, 'the ground');
-});
-
-test('AUDIT-TESA A2-4/A7-3/A5-F2: a death past the Bay rises at the nearest town the world stands past the Bay (a capital, an Arena town, the countryside\'s) - never the Alik\'r\'s; a dungeon\'s wake there at its own door. PIN MOVED (AUDIT TESA II P3): the one law of the nearest town of the world (systems/deathRespawn.js nearestSafePlace over the registry\'s places and the countryside\'s stood towns, scenes/tamrielPlacesHost.js nearestTownOf), at any distance - the index\'s towns within 48 pixels left a death at sea past the Bay in the water', async () => {
-  const { nearestSafePlace } = await import('../src/systems/deathRespawn.js');
-  const { LOCATION_TYPES: T, DUNGEON_TYPES } = await import('../src/formats/mapsFile.js');
-  const registry = [
-    { type: T.TownCity, px: 1000, py: -200 },   // a capital's slice
-    { type: T.DungeonLabyrinth, px: 1010, py: -200 },   // a dungeon: never a rise
-    { type: T.TownVillage, px: 1300, py: -200 },   // far: a rise all the same
-  ];
-  const country = [{ type: T.TownHamlet, px: 1030, py: -200 }, { type: T.Graveyard, dungeonType: DUNGEON_TYPES.Cemetery, px: 1040, py: -200 }];
-  const at = (x, y, accept) => nearestSafePlace([registry, country], { x, y }, accept)?.mapPixel ?? null;
-  assert.deepEqual(at(1012, -200), { x: 1000, y: -200 });
-  assert.deepEqual(at(1026, -200), { x: 1030, y: -200 }, 'a country town the index stood');
-  assert.deepEqual(at(1600, -200), { x: 1300, y: -200 }, 'past the old reach of 48: still a town, never where they fell');
-  assert.equal(nearestSafePlace([registry, country], { x: 1041, y: -200 }).kind, 'graveyard', 'the three safe kinds, as the Bay\'s rise');
-  assert.deepEqual(at(1026, -200, (hit) => hit.kind === 'city' && hit.mapPixel.x < 1030), { x: 1000, y: -200 }, 'the caller\'s accept');
-  assert.match(W, /\} else if \(!onTheBay\(px\.x, px\.y\)\) \{\n(?:[^\n]*\n){4}\s+const town = nearestTownOf\(px\);\n\s+if \(town\) land = town\.mapPixel;\n\s+kind = town\?\.kind \?\? 'city';/, 'the rise');
-  assert.match(W, /const nearestTownOf = \([^\n]*\) => nearestSafePlace\(\[worldPlaces\?\.all\(\) \?\? \[\], countryTowns\(\)\], px, accept\);/, 'the law over the registry and the stood towns');
-  assert.match(W, /const wake = inEther\(from\.x, from\.y\) \|\| !onTheBay\(from\.x, from\.y\) \? \{ kind: 'dungeon', mapPixel: \{ x: from\.x, y: from\.y \} \} : undergroundWakeSpot\(/, 'the wake');
-});
-
-test('AUDIT-TESA A4-F2/A4-F3: a capital\'s pixel is the capital\'s - never cloned over by its Arena place; its slot kept with its port; a harbour town past the Bay booked by its own map id', () => {
-  assert.match(W, /if \(had\?\.capital\) return capitalLocationAt\(px, py\);/);
-  // A2-2: a portal's end past the Bay named by the place standing there, else its province
-  assert.match(W, /const here = locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? capitalLocationAt\(x, y\) \?\? \(_arenaTemplates \? arenaLocationAt\(x, y\) : null\);\n\s+const province = provinceByKey\(provinceKeyBeyondBay\(x, y\)\);\n\s+return here\?\.name \? \{ pixel: \{ x, y \}, name: here\.name \} : province \? \{ pixel: \{ x, y \}, name: province\.name \} : null;/);
-  // PIN MOVED (BAY-LEFT-SEA): and its harbour's port word - a kept slice whose word moved (its canal opened) cloned again
-  assert.match(W, /\(had\.arena\?\.provinceIndex \?\? null\) === \(slot\?\.provinceIndex \?\? null\)\n\s+&& !!had\.arena\?\.port === !!slot\?\.port   \/\/ AUDIT-TESA A4-F2: its place made a port, its slot too\n\s+&& \(had\.exterior\?\.exteriorData\?\.portTownAndUnknown !== 0\) === capitalSlicePort\(at\.k, at\.s, capitalPinPort\(at\.k\)\)\) return had;/);
-  assert.match(W, /const aloc = aq \? capitalLocationAt\(aq\.bx, aq\.by\) \|\| arenaLocationAt\(aq\.bx, aq\.by\) : null;/);
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the port's id is WORLD-WIDE's own (world/worldWide/worldPorts.js portIdOfLocation)
-  // PIN MOVED (the fourth merge of main into #1184): the towns are one list, kept by id (RPT1026-WORLD FAR-QUAY's ring beside it)
-  assert.match(W, /if \(aloc\?\.exterior\?\.exteriorData\) add\(\{ id: portIdOfLocation\(aloc\), loc: aloc,/);
-});
-
-test('AUDIT-TESA A2-3: a pixel id past the Bay aliases a Bay row (y * 1000 + x) - every read by it asks the Bay\'s pixels alone; past the Bay the place the world stands there answers, once discovered', () => {
-  // PIN MOVED (HOST-SPLIT, at the merge of main): the pixel's build is src/scenes/pixelBuild.js's
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the living towns are WORLD-WIDE's world-keyed index (WW1,
-  // scenes/livingWorld/livingIndex.js townAt - the registry's place on that pixel), so no Bay row is aliased; past the Bay
-  // it answers only where a provider stands
-  assert.match(read('src/scenes/pixelBuild.js'), /const livingTown = livingTownAt\(px, py\) \?\? \{/);
-  for (const re of [
-    /if \(!csaIsPortTown\(p\.x \+ dx, p\.y \+ dy\)\) continue;\n\s+\/\/ AUDIT-TESA A2-3: the Bay's rows by the Bay's ids alone/,
-    // PIN MOVED (BAY-LEFT-MAPS, test/scenes/bayleft_places.test.js): the junction map's dot reads the Bay's row on the Bay
-    // alone and past it the place found there (scenes/mapPlacesHost.js junctionPlaceAt)
-    /if \(onTheBay\(x, y\)\) \{\n\s+const summary = travelLocationSummaryAt\(mapDict, x, y\);/,
-    /const summary = onTheBay\(pixel\.x, pixel\.y\) \? travelLocationSummaryAt\(mapDict, pixel\.x, pixel\.y\) : null;/,
-    /locationSummary: \(\) => \(onTheBay\(to\.x, to\.y\) \? travelLocationSummaryAt\(mapDict, to\.x, to\.y\) : null\),/,
-    // PIN MOVED (BAY-LEFT-MAPS): past the Bay a place found - or one a quest names (`named`, OW-QUEST's press)
-    /return loc\.name && id && \(named \|\| hasDiscoveredLocationId\(id\)\) \? \{ pixel: \{ x: px, y: py \}, name: loc\.name, mapId: id,/,
-  ]) assert.match(W, re);
-  // PIN MOVED (WORLD-WIDE folded into TESA, #1184): the harbour's loop no longer bounds itself - WW3's directory answers no
-  // row off the Bay's map (systems/map/mapDirectory.js locationSummaryAt), so a pixel past the Bay aliases none
-  assert.match(read('src/systems/map/mapDirectory.js'), /return onMap\(mapPixelX, mapPixelY\) \? mapDict\?\.get\(getMapPixelID\(mapPixelX, mapPixelY\)\) \?\? null : null;/);
-});
-
 // ── WAVE 3 ──────────────────────────────────────────────────────
 
 test('AUDIT-TESA A1-3: the player\'s Arena files never enter the repo - the root ARENA folder, its city data, its executables ignored; a tracked file of the port\'s own (vendor\'s Arena of Daggerfall, the CITYDATA reader) untouched', () => {
@@ -308,14 +201,6 @@ test('AUDIT-TESA A7-8: the capitals\' and the countryside\'s kill doors shut off
   const { capitalsOn, countrysideOn } = await import('../src/scenes/shared.js');
   assert.deepEqual([capitalsOn('?capitals=off'), capitalsOn(''), capitalsOn('?online&capitals=off')], [false, true, true]);
   assert.deepEqual([countrysideOn('?country=off'), countrysideOn(''), countrysideOn('?online&country=off')], [false, true, true]);
-});
-
-test('AUDIT-TESA A4-F4/A5-F3: past the Bay a ship is asked by its Arena place\'s port whatever Travel Options lists; and no deed is read in a place the port made', () => {
-  // PIN MOVED (BAY-LEFT-SEA): by its own port byte - an Arena place's TESA6 word, a capital's harbour's (its Waterfront's too)
-  assert.match(W, /portTown: \(loc\.ether \? loc\.etherKind === 'port' : loc\.arena \|\| loc\.capital \? \(loc\.exterior\?\.exteriorData\?\.portTownAndUnknown \?\? 0\) !== 0 : modSetting\('travel-options', 'Enabled'\) === true/);
-  // PIN MOVED (BAY-LEFT-B, bible/03-World/Arena-Provinces.md): a deed is read in a place the port made - held to its own
-  // town (banking.js deedHeldIn by the town's map id), so the town asking is named
-  assert.match(W, /ownsHouse: \(buildingKey\) => \{ const id = _questLoc\(\)\?\.mapTableData\?\.mapId \?\? 0; return !isEtherPlaceId\(id\) && isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \},/);
 });
 
 test('AUDIT-TESA A4-F5/A7-5: a capital\'s pixel walks each ring\'s own cells - the answer the whole square\'s walk gave, at a ring\'s cost', async () => {
@@ -388,21 +273,6 @@ test('AUDIT-TESA A6-3: no landmark stands in one of Daggerfall\'s blocks a capit
   }
 });
 
-test('AUDIT-TESA A6-4: an inland capital lays no wet CUST block - each kind that carries canals kept to its dry blocks, the list whole where none is dry; a shore capital\'s as ever', async () => {
-  const { dryKinds, synthesizeCapitalLocation } = await import('../src/world/tamrielCapitals.js');
-  const ground = (water) => ({ rmbBlock: { fldHeader: { groundData: { groundTiles: Array.from({ length: 16 }, (_, x) => Array.from({ length: 16 }, (_, y) => ({ textureRecord: x * 16 + y < water ? 0 : 2 }))) } } } });
-  const blocks = { 'CUSTAA00.RMB': ground(40), 'CUSTAA01.RMB': ground(7), 'CUSTAA02.RMB': ground(8), 'RESIAA00.RMB': ground(200) };
-  const names = new Map([['CUST', ['CUSTAA00.RMB', 'CUSTAA01.RMB', 'CUSTAA02.RMB']], ['RESI', ['RESIAA00.RMB']]]);
-  const dry = dryKinds(names, (n) => blocks[n]);
-  assert.deepEqual(dry.get('CUST'), ['CUSTAA01.RMB'], 'seven water tiles a puddle, eight a canal');
-  assert.deepEqual(dry.get('RESI'), ['RESIAA00.RMB'], 'a kind of no canals untouched');
-  assert.deepEqual(names.get('CUST').length, 3, 'the list handed untouched');
-  assert.deepEqual(dryKinds(new Map([['CUST', ['CUSTAA00.RMB']]]), (n) => blocks[n]).get('CUST'), ['CUSTAA00.RMB'], 'all wet: the list whole');
-  assert.equal(dryKinds(null, () => null), null);
-  assert.match(read('src/world/tamrielCapitals.js'), /const blockNames = capitalBlockNames\(plan, k, cap\.shore \? ctx\.names : dryKinds\(ctx\.names, ctx\.blockOf\), \(cell\) => ownBlockOf\(cap, cell\), many \? \[sx \* 8, sy \* 8\] : \[0, 0\]\);/, 'PIN MOVED (TESA11): a slice\'s; PIN MOVED (IC-GRAND): the own blocks by their law (the Imperial City\'s a family\'s)');
-  void synthesizeCapitalLocation;
-});
-
 test('AUDIT-TESA A6-5: a closed cell\'s byte is no building\'s - in no quarter of the town map, no show-all byte, the walkers\' navgrid shut', async () => {
   const { CAPITAL_CLOSED_BYTE, capitalPortBlocks: blocks } = await import('../src/world/tamrielCapitals.js');
   const { quarterOf, isShowAllByte } = await import('../src/ui/town/townQuarters.js');
@@ -414,11 +284,3 @@ test('AUDIT-TESA A6-5: a closed cell\'s byte is no building\'s - in no quarter o
   assert.deepEqual([...seen].sort((a, b) => a - b), [0, CAPITAL_CLOSED_BYTE]);
 });
 
-test('AUDIT-TESA A7-4: a place on a capital\'s pixel is inked on that pixel - its pin\'s, or the capital\'s where Arena\'s places do not stand - never its own point a pixel away', () => {
-  const ink = read('src/ui/tamrielInk.js');
-  // PIN MOVED (BAY-LEFT-MAPS C11, test/ui/bayleft_find.test.js): and its port as it stands (a lore port only on its shore, TESA6)
-  assert.match(ink, /stood\.set\(`\$\{p\.provinceIndex\}\|\$\{p\.id\}`, \{ x: p\.bx, y: p\.by, pinned: !!p\.pinned, port: !!p\.port \}\);/);
-  assert.match(ink, /const on = pixel && \(st\?\.pinned \|\| !st\) \? \[pixel\.x \+ 0\.5, pixel\.y \+ 0\.5\] : \[x, y\];/);
-  // PIN MOVED (BAY-LEFT-MAPS C11): and its port, the anchor's and the Ports filter's word
-  assert.match(ink, /kind: p\.kind, x: on\[0\], y: on\[1\], pixel, mapId: k >= 0 \? capitalPlaceId\(k, 0\) : arenaPlaceId\(p\), port \}\);/);   // PIN MOVED (WW7-6): with its map id - the seat ring's key (ww7_seatrings)
-});

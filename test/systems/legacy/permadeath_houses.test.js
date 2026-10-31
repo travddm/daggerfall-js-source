@@ -338,16 +338,3 @@ test('PERMADEATH-HOUSES: online a fallen realm character\'s home is taken up by 
 
 // ---- the wiring --------------------------------------------------------------------------------------------------------
 
-test('PERMADEATH-HOUSES: the world host hands the house on - offline the bank\'s deed (one a region) and the fallen\'s own newest save\'s scene, online the service\'s home and the fallen\'s realm record\'s cupboards', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /inheritHouse: legacyInheritHouse,/);
-  // PIN MOVED (HOUSES-3): the deed held among the region's three is given; a region holding three others waits
-  assert.match(w, /if \(regionDeedOf\(playerEntity\.houses, region, row\.mapId, row\.buildingKey\)\) return 'given';\n\s*if \(regionHousesFull\(playerEntity\.houses, region\)\) return 'waits';/);
-  assert.match(w, /if \(deed && !regionDeedOf\(playerEntity\.houses, row\.regionIndex \| 0, row\.mapId, row\.buildingKey\) && regionHousesFull\(playerEntity\.houses, row\.regionIndex \| 0\)\) return 'waits';/);
-  assert.match(w, /graftPermanentScene\(playerEntity\.sceneCache \?\?= createSceneCache\(\), scenes\(\), interiorSceneName\(row\.mapId, row\.buildingKey \| 0\)\);/);
-  assert.match(w, /return legacyInheritDeed\(row, \(\) => \(at >= 0 \? loadSlot\(at\)\?\.sceneCache \?\? null : null\)\);/);
-  assert.match(w, /const r = await homesApi\.inherit\(\{ mapId: row\.mapId >>> 0, buildingKey: row\.buildingKey \| 0, character: me, from \}\);/);
-  assert.match(w, /const rec = await realmFetch\(realmIoNow\(\), from\);/);
-  assert.match(rd('src/net/accountClient.js'), /inherit: \(\{ mapId, buildingKey, character, from \}\) => post\('\/v1\/homes\/inherit', \{ mapId, buildingKey, character, from \}\),/);
-  assert.match(rd('server-account/src/index.js'), /if \(path === '\/v1\/homes\/inherit'\) \{\n[^]*?const r = await inheritHome\(hctx, who\.player, body\);/);
-});

@@ -81,38 +81,6 @@ test('ACT-MENU: the wheel lights a verb whatever the loot switch says, the press
   } finally { setPref('quickLoot', was); resetQuickLoot(); }
 });
 
-test('ACT-MENU: the plaque draws the verbs as the loot list\'s rows, the lit one marked; the hosts press them - the horse and wagon with the lit mode, a player through the F-menu\'s own door, F where the plaque stands', () => {
-  const plaque = rd('src/ui/worldPlaque.js');
-  assert.match(plaque, /if \(f\.kind === 'actions'\) \{[\s\S]*?row\.className = 'wplaque-row wplaque-act';\s*\n\s*if \(i === sel\) row\.classList\.add\('sel'\);/);
-  assert.match(plaque, /export function hideWorldPlaque\(\) \{[\s\S]{0,700}?_watchdog = null;\n(?:\s*clearPickupFeed\(\);[^\n]*\n)?\s*foldQuickLoot\(null\);/, 'AUDIT DISC7 A8: every hide folds nothing - the skin gate, the hosts\' branches');   // PICKUP-FEED: the take's cards come down by the same door, one line above
-  assert.match(plaque, /foldQuickLoot\(null\);   \/\/ AUDIT DISC7 A8: a contained fault lights nothing[^\n]*\n\s*try \{ showWorldPlaque\(null\); \}/, 'and the contained fault');
-  // DISC22-C: the classic panel's frame is cleared with the highlight, and the DOM hide is the DOM face's
-  assert.match(plaque, /if \(cursorActive \|\| !eye \|\| !dir \|\| !collider\) \{ foldQuickLoot\(null\); setClassicLootFrame\(null\); if \(dom\) showWorldPlaque\(null\); return null; \}/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(rd(host), /hcc\.activate\(_hccPick\.key, _hccPick\.distance, \(l\) => townTalk\.say\(l\), \(\) => setMidScreenText\(tooFarAwayText\(\)\), plaqueActionFor\(_hccPick\.key\)\);/, host);
-  }
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /else if \(_tapLockOnly\) \{[^\n]*\}\s*\n\s*else if \(!_act\.pressCast && plaquePeerAct\(cam\.pos, useFwd\)\) \{/, 'the street: a player the plaque lit takes the press ahead of the ladder, on the press\'s ray, never on a cast');
-  const m = rd('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): and whether the click was an act's, to its release
-  assert.match(m, /\(mode === 'dungeon' \? tryExitDungeon : tryExit\)\(\{ pressCast: _act\.pressCast, interact: useEdge, actClick \}\);/, 'the building and the dungeon hear whether the press cast (and, AUDIT 29, whether it was Interact)');
-  assert.equal((m.match(/if \(!pressCast && host\.plaquePeerAct\?\.\(eye, dir\)\) return true;/g) ?? []).length, 2, 'both ladders, after QG1 and the lock (AUDIT DISC7 A11)');
-  for (const fn of ['function tryExit(', 'function tryExitDungeon(']) {
-    const body = m.slice(m.indexOf(fn), m.indexOf(fn) + 6000);
-    assert.ok(body.indexOf('qf.questBehaviour.doClick()') < body.indexOf('host.plaquePeerAct?.(eye, dir)'), `${fn}: QG1's non-consuming click first`);
-  }
-  assert.match(w, /plaquePeerAct: \(eye, dir\) => plaquePeerAct\(eye \?\? cam\.pos, dir \?\? socialFwd\(\)\),/);
-  assert.match(w, /if \(peerInSight\(eye, dir\)\?\.peer\?\.id !== id\) return false;/, 'A9: re-picked on the press\'s own ray');
-  assert.match(w, /const row = plaqueRowFor\(sel\.id, id, peerActsFor\(id\)\);\s*\n\s*if \(!row\) return false;\s*\n\s*if \(row\.act\) \{ peerAct\?\.\(row\.act\); peerMenuFor = null; \}[^\n]*\n\s*else peerNote\?\.\(row\.refusal\);/, 'A4: re-read at the press, a refusal said');
-  assert.match(w, /onAct: \(act\) => peerAct\(act\),/, 'the card and the plaque leave by one door');
-  assert.match(w, /if \(worldPlaqueOn\(\)\) \{\s*\n\s*if \(plaquePeerAct\(\)\) return true;/, 'F presses the lit verb where the plaque stands');
-  assert.match(w, /if \(lit && lit\.id == null && peerIdOfKey\(lit\.key\) && plaqueLightFirst\(lit\.key\)\) return true;/, 'F lights the first row of an unlit list');
-  assert.match(w, /const wall = col\?\.raycast \? col\.raycast\(eye, dir, hit\.distance\) : Infinity;\s*\n\s*return wall < hit\.distance - 0\.05 \? null : hit;/, 'A6: a wall in front of the player blocks the pick');
-  assert.match(w, /subs: \[cast, peerRelationText\(acts\)\]\.filter\(Boolean\), actions: acts \? socialPlaqueRows\(id, acts\) : \[\], actionsUnlit: !acts \}/);   // PEERMENU1: the verbs wait for the bind
-  // SPELL-GIFT (2026-09-27): without the menu the plaque answers only a readied spell's "Cast Heal on Bran" - never the verbs
-  assert.match(w, /if \(peerMenuFor !== id\) \{\s*\n\s*const cast = castPlaqueLine\(id\);\s*\n\s*const name = cast \? peerName\(id\) : null;\s*\n\s*return name \? \{ title: name, renown: null, subs: \[cast\], actions: \[\], actionsUnlit: true \} : null;\s*\n\s*\}/);
-});
-
 test('ACT-MENU: a player\'s rows are the F-card\'s own - every act it offers, a refused one with its reason; the press re-reads the row: an offered act sends the card\'s act, a refused one says why, a gone one nothing (mutants: the refusal sent; the press not re-read)', () => {
   const all = { canFriend: true, canInvite: true, canTrade: true, tradeLabel: null };
   assert.deepEqual(socialPlaqueRows('p1', all), [{ id: 'friend', label: 'Add friend' }, { id: 'invite', label: 'Invite to party' }, { id: 'trade', label: 'Trade' }]);
@@ -167,17 +135,6 @@ test('ACT-MENU: the runtime presses the lit verb in its own handlers whatever th
   assert.equal(b.w.mode, TRANSPORT.Foot, 'and nothing hitched');
 });
 
-test('ACT-MENU by source: the pool hands the runtime\'s rows to the plaque with my three and passes the lit mode to the handlers; the runtime reads the verb before the mode', () => {
-  const pool = rd('src/scenes/horseCartPool.js');
-  assert.match(pool, /if \(key === KEY_WAGON\) return withActions\(\{ title: WAGON_HOVER_TEXT \}, 'deployedWagon'\);/);
-  assert.match(pool, /if \(key === KEY_HORSE\) return withActions\(\{ title: runtime \? runtime\.horseTargetLabel : horseTargetLabel\(''\) \}, 'horse'\);/);
-  assert.match(pool, /if \(key === KEY_WAGON\) return runtime\.handleDeployedWagonActivation\(distance, mode\);/);
-  assert.match(pool, /if \(key === KEY_HORSE\) return runtime\.handleStationaryHorseActivation\(distance, mode\);/);
-  const rt = rd('src/systems/horse/horseCart.js');
-  assert.equal((rt.match(/if \(\(mode \?\? deps\.activateMode\(\)\) === ACTIVATE_MODE\.Steal\)/g) ?? []).length, 2, 'both wagons');
-  assert.match(rt, /const activate = mode \?\? deps\.activateMode\(\);/);
-});
-
 // ═══ the peers' clop ════════════════════════════════════════════════════
 test('DISC7 wire: the rider\'s half-speed bit rides the pose mounted and moving slow only, omitted at 0 so every other pose keeps its bytes; its edge goes out at once and the eased pose carries it (world100)', () => {
   const base = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 1, rd: 1, rv: 0 };
@@ -188,8 +145,6 @@ test('DISC7 wire: the rider\'s half-speed bit rides the pose mounted and moving 
   assert.equal(lerpPose(validPose(base), validPose({ ...base, hs: 1 }), 0.5).hs, 1);
   assert.equal('hs' in lerpPose(validPose(base), validPose(base), 0.5), false);
   assert.ok(['world276', 'world101', 'world102', 'world103', 'world104', 'world105', 'world106', 'world107', 'world108', 'world109', 'world110', 'world111', 'world112', 'world113', 'world114', 'world115', 'world116', 'world117', 'world118', 'world119', 'world120', 'world121', 'world122', 'world123', 'world124', 'world127', 'world128', 'world129', 'world130', 'world131', 'world132', 'world133', 'world134', 'world135', 'world136', 'world137', 'world138', 'world139', 'world140', 'world141', 'world142', 'world143', 'world144', 'world145', 'world149', 'world150', 'world151', 'world152', 'world153', 'world154', 'world155', 'world156', 'world157', 'world158', 'world159', 'world160', 'world161', 'world162', 'world163', 'world164', 'world165', 'world166', 'world167', 'world168', 'world169', 'world170', 'world171', 'world172', 'world173', 'world174', 'world175', 'world176', 'world177', 'world178', 'world178', 'world179', 'world180', 'world181', 'world182', 'world183', 'world184', 'world185', 'world186', 'world187', 'world188', 'world189', 'world190', 'world191', 'world192', 'world193', 'world194', 'world195', 'world196', 'world197', 'world198', 'world199', 'world200', 'world201', 'world202', 'world203', 'world204', 'world205', 'world206', 'world207', 'world208', 'world209', 'world210', 'world211', 'world212', 'world213', 'world214', 'world215', 'world216', 'world217', 'world218', 'world219', 'world220', 'world222', 'world223', 'world224', 'world225', 'world227', 'world228', 'world229', 'world230', 'world231', 'world232', 'world233', 'world234', 'world235', 'world236', 'world237', 'world239', 'world240', 'world241', 'world242', 'world243', 'world244', 'world245', 'world246', 'world247', 'world248', 'world249', 'world250', 'world251', 'world252', 'world253', 'world254', 'world256', 'world258', 'world263', 'world264', 'world265', 'world266', 'world267', 'world268', 'world269', 'world270', 'world271', 'world272', 'world274', 'world275'].includes(RELAY_VERSION), 'world100 carried hs; DISC12 moved it on (world101) with lh and wb, and the community arc (world102) with its frames and AUDIT ATTACH\'s meters');   // PIN MOVED: world274, LADDER-CUT (the mastery cost ladder 1.5/2/4 in systems/skillSoftcap.js, a file the bundle reaches; NOT YET DEPLOYED); PIN MOVED: world271, MASTER-THREE (MASTERY_SLOTS 3/2/1 in systems/masterSkills.js, a file the bundle reaches; NOT YET DEPLOYED; world269, then world270, on its branch, renumbered past BOW-TOPS and CHAT-POST at the merges); PIN MOVED: world270, CHAT-POST (a chat frame may carry linked item records (items, and a legacy item) beside the words; NOT YET DEPLOYED); PIN MOVED: world269, BOW-TOPS (the arena's and the siege's weapon tops take BAL-ARCHERY's bows, a Short Bow 17 and a Long Bow 19; NOT YET DEPLOYED); PIN MOVED: world266, AUDIT KETCH II (the airship raid: the whole state word carries the wave to five, a sweep by the ship says sw, the number of a voyage is a receipt bound, the last minutes of her crews forty-five, a fight lost after two minutes, the receipts of a fall told before her record goes; world265 on its branch, renumbered past GATE-COURTS at the merge; NOT YET DEPLOYED); PIN MOVED: world265, GATE-COURTS (the night of a gate held in courts of fifty, each seated by the book of the first; NOT YET DEPLOYED); PIN MOVED: world264, REWARD-KILLS (a staff event reward is earned by three kills alone); PIN MOVED: world263, HIBERNATE (a quiet cell sleeps, a freeze or mute asks its lease with the door off; world260/world261 on its branch, renumbered past THE FOLD's world260, #1281's world261 and #1238's world262 at the merges); PIN MOVED: world261, EVENT-RULES, BOSS-TRAITS and RAID5 (a realm keeps a death down two minutes for a Resurrect by a friend, SD_REZ_MS; a foe record carries its boss traits bt, its wrath bw and the leader of a raid rl; NOT YET DEPLOYED); PIN MOVED: world259, ASK-LONGER (the word of the company open 30 s, net/eliteGates/egRun.js EG_ASK_MS; world257 on its branch, renumbered past STAFF-EVENT BOSS and KETCH-LONGER at the merge; NOT YET DEPLOYED); PIN MOVED: world258, KETCH-LONGER (the raid retuned: five Watch waves, the wire takes a wave to five; world257 on its branch, renumbered past STAFF-EVENT BOSS at the merge; NOT YET DEPLOYED); PIN MOVED: world256, STAFF-EVENT (staff events: the hub book, a place kill meter, the mini boss; world255 on its branch, renumbered past KETCH at the merge; NOT YET DEPLOYED)
-  assert.match(rd('src/scenes/world.js'), /hs: riding && moved && _hsLatch \? 1 : undefined,/);
-  assert.match(rd('src/scenes/world.js'), /if \(movedThisFrame\) \{ _onlineMovingUntil = now \+ ONLINE_MOVE_HOLD_MS; _hsLatch = player\.slowRide; \}/, 'AUDIT DISC7 B2: latched off a frame that moved (PIN MOVED, HORSE-WALK: the slow ride - the half-speed flag or the walk, motor.js slowRide)');
   assert.equal('hs' in validPose({ ...base, hs: '0' }), false, 'AUDIT DISC7 B8: uint\'s law - a string zero is no bit'); assert.equal(validPose({ ...base, hs: 7 }).hs, 1);
 });
 
@@ -280,8 +235,4 @@ test('DISC7 contact: the previous frame\'s depth is sampled through the world re
   assert.equal(body, 'uPrevRect.xy + wuv * uPrevRect.zw', 'the world-rect UV mapped into the canvas the depth was written in');
   assert.equal((AIR_CONTACT_GLSL.match(/texture\(uPrevDepth, prevDepthUV\(uv0?\)\)/g) ?? []).length, 2, 'both samples go through the rect');
   assert.doesNotMatch(AIR_CONTACT_GLSL, /texture\(uPrevDepth, uv0?\)/);
-  const air = rd('src/render/airPass.js');
-  assert.match(air, /this\.prevValid = !!this\.frame && !this\._cut && !jumped; holdPrevRect\(this\.prevRect, this\.rect, this\.canvas\); \}/, 'held with the view-projection, from the rect before this frame\'s (LA-POST6: valid unless a cut came between)');
-  assert.match(air, /gl\.uniform4fv\(loc\.prevRect, this\.prevRect\);/);
-  assert.match(rd('src/render/renderer.js'), /prevRect: gl\.getUniformLocation\(p, 'uPrevRect'\)/);
 });

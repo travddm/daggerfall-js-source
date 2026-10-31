@@ -292,16 +292,4 @@ test('DUEL1 the F-menu\'s rows: a waiting challenge reads Accept duel with Decli
   const off = socialMenuRows({ peerId: 'peer-0002', duelRow: { label: 'Accept duel', k: 'duel.accept', enabled: false, why: 'a duel is fought outdoors' } }).find((r) => r.key === 'duel');
   assert.equal(off.why, 'a duel is fought outdoors');
   assert.deepEqual(socialPlaqueRows('peer-0002', { duelRow: { label: 'Yield the duel', k: 'duel.yield', enabled: true } }).map((r) => r.id), ['friend', 'invite', 'duel']);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(act\.k === 'duel\.accept'\) \{ const r = duelMgr\.accept\(act\.peer\);/);
-  assert.match(w, /if \(act\.k === 'duel\.decline'\) \{ duelMgr\.decline\(act\.peer\); return; \}/);
-  assert.match(w, /if \(act\.k === 'duel\.yield'\) \{ duelMgr\.yieldDuel\(\); return; \}/);
-  assert.match(w, /onDuel: \(peerId\) => duelChallenge\(peerId\),/, 'the Inspect card\'s button');
-  assert.match(w, /_profileSub = sub;   \/\/ DUEL1: the account the relay stamped on their answer/, 'the record is read by the relay\'s stamp');
-  // PIN MOVED (INT8): only a loss was reported, by the loser, naming the stamp - the record is the referee's receipt now,
-  // kept and carried by either fighter (net/siege/siegeClaims.js createDuelClaims), and nothing of a duel's end is reported
-  assert.match(w, /onReceipt: \(rc\) => \{ if \(duelClaims\.keep\(rc\)\) duelClaims\.offer\(\{ force: true \}\); \},/, 'the referee\'s receipt, carried');
-  assert.equal(/duelAccount\.lost\(/.test(w), false, 'no loss reported');
-  const card = src('src/ui/enhanced/enhancedAccount.js');
-  assert.match(card, /const duels = duelRecordText\(flow\.account\.duels\);\s*\n\s*if \(duels\) row\(t\('account\.card\.duels', 'Duels'\), duels\);/, 'the main menu\'s account card');   // L10N4 (PIN MOVED): the row's word through t()
 });

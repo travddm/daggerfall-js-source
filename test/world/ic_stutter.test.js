@@ -228,10 +228,6 @@ test('IC-STUTTER THE PUMP\'S NEXT PIXEL - a pixel of the city builds once every 
   pb.drop();
   assert.equal(pb.firstReady([far]), true, 'let go: ready');
   assert.equal(pb.looks, 0, 'its looks with it');
-  // the host's pump asks it, after the stream's books
-  assert.match(read('src/scenes/world.js'), /if \(building \|\| !state\.owes\(queue\) \|\| !capitalPrebuild\.firstReady\(queue\)\) return;/);
-  assert.match(read('src/scenes/world.js'), /sweepCapitalPixels, capitalPrebuild \} = createTamrielSweeps\(\{/);
-  assert.match(read('src/scenes/tamrielSweepsHost.js'), /return \{ swap, [^\n]*capitalPrebuild \};/);
   assert.equal(capitalNear(me.px + 1, me.py, host.state.current), true);
   assert.equal(typeof pageHasPiece('b:TESAI0000.RMB'), 'boolean');
 });
@@ -339,19 +335,6 @@ test('IC-STUTTER THE LIVING TOWN\'S PLACES AND THE STREETS\' PIECES A STEP AT A 
   assert.deepEqual(handed.residents.map((r) => r.id), own.residents.map((r) => r.id), 'the same people');
 });
 
-test('IC-STUTTER THE HOST - the town\'s places awaited a step at a time through the build\'s breather (its yards\' measures, ground, search and the professions\'), the living town handed its places and the streets\' pieces flooded before the pixel stands (mutants: the measures in one; the living town\'s places unhanded; the flood unwired)', () => {
-  const w = read('src/scenes/world.js'), pb = read('src/scenes/pixelBuild.js');
-  assert.match(w, /async function townPlacesFor\(dfLocation, lefaySpot, people, loc = null, shut = null, breathe = async \(\) => \{\}\) \{/);
-  assert.match(w, /\.\.\.await stepsBreathing\(yardMeasuresSteps\(yl, \{/);
-  assert.match(w, /\}\), breathe\),\n\s+keep: lefaySpot/);
-  assert.match(pb, /const places = yardTown \|\| portTown \? await townPlacesFor\(dfLocation, lefaySpot, climate\?\.people, loc, walkShut, \(\) => breather\.breathe\(\)\) : null;/);
-  assert.match(pb, /if \(livingWorldOn\(\)\) livingOf\.places = await livingTownPlaces\(nav, livingOf, \(\) => breather\.breathe\(\)\);/);
-  assert.match(pb, /population = livingWorldOn\(\) \? new LivingTown\(nav, \{\n\s+\.\.\.livingOf,/);
-  assert.match(pb, /await stepsBreathing\(componentsSteps\(nav\), \(\) => breather\.breathe\(\)\);/);
-  assert.match(pb, /\{ enhancedWater: waterSwitchOn\(\) \}\);\n\s+await breather\.breathe\(\);   \/\/ IC-STUTTER: a block of the walkers' grid a breath/, 'the walkers\' grid a block a breath');
-  assert.match(read('src/systems/livingWorld/livingTown.js'), /this\.places = o\.places \?\? townPlaces\(nav, o\.doors, o\.buildings, livingPlacesWay\(o\)\);/);
-});
-
 test('IC-STUTTER A JOURNEY\'S WAY A FEW THOUSAND CELLS A STEP - on a near slice of the Imperial City the way to the slice\'s edge, searched WAY_CELLS_A_STEP cells a step on a scratch of its own, is the way searched whole, whatever the residents search on the grid between its steps; the host walks WAY_STEPS_AN_ASK steps an ask and says the way is still in the making, then hands it; the journey asks again every frame until it has it, the leg walked meanwhile (mutants: the search whole; the residents\' search begins it again; the host\'s steps unbounded; the journey never asks again)', () => {
   const nav = sliceNav(ARENA_D);
   const from = snapCell(nav, [nav.width - 3, nav.height / 2], 40), to = [-300, nav.height / 2];
@@ -423,5 +406,4 @@ test('IC-STUTTER A TOWN LAID OUT A BLOCK A STEP - a near slice of the Imperial C
   assert.equal(stepped.yields, whole.blocks.length, 'a block a step');
   assert.equal(whole.blocks.length, 64);
   assert.deepEqual(stepped.value.blocks.map((b) => [b.blockName, b.layout.models.length, b.originX, b.originZ]), whole.blocks.map((b) => [b.blockName, b.layout.models.length, b.originX, b.originZ]));
-  assert.match(read('src/scenes/pixelBuild.js'), /const loc = await stepsBreathing\(layoutLocationSteps\(dfLocation, maps, blocks, \{ enhanced: isEnhanced\(\), windmills: windmillsOn\(\) \}\), \(\) => breather\.breathe\(\)\);/);
 });

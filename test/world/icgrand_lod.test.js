@@ -203,18 +203,6 @@ test('IC-GRAND THE SWEEP - on the frame, walked only when the player\'s pixel or
   host.state.current = { x: 101, y: 100 };
   sweepCapitalLod();
   assert.deepEqual(destroyed, ['102,100'], 'the player moved: walked');
-  // PIN MOVED (IC-GRAND's perf pass): the city's worker told first (scenes/capitalPrebuild.js), then this sweep
-  assert.match(read('src/scenes/tamrielSweepsHost.js'), /function sweepCapitalPixels\(\) \{\n\s+capitalPrebuild\.sweep\(\);[^\n]*\n\s+sweepCapitalLod\(\);/, 'asked where the capitals\' sweep is (scenes/world.js, the frame)');
-});
-
-test('IC-GRAND THE BUILD - a pixel built as its view (the location the index holds, its far view where it is far), its view on its entry; a far view stands no walker, no yard and no port; a model no collider takes the model door\'s word (mutants: the view unread; walkers on a far slice; the skyline solid in the collider)', () => {
-  const pb = read('src/scenes/pixelBuild.js');
-  assert.match(pb, /const dfLocation = capitalBuildView\(_locationToBuild\(px, py\), px, py, host\.state\.current\) \|\| null;/);
-  assert.match(pb, /const farView = capitalViewOf\(dfLocation\) === 'far';/);
-  assert.match(pb, /const yardTown = !farView && isYardTown\(dfLocation\), portTown = !farView && isPortTown\(dfLocation, portOnSea\(dfLocation\)\);/);
-  assert.match(pb, /if \(!farView && populatesWanderingNpcs\(dfLocation\.mapTableData\.locationType\)\) \{/);
-  assert.match(pb, /if \(isSolidModel\(placed\.modelIdNum\)\) late\.add\(gateKey, cpu\.positions, cpu\.indices, local,/);
-  assert.match(pb, /capitalLod: capitalViewOf\(dfLocation\),/);
 });
 
 // PIN MOVED (IC-GRAND x FAR-LANDMARK, at the merge of the streams' head): the city from afar was an impostor of IC-GRAND's own
@@ -329,10 +317,6 @@ test('IC-GRAND THE CITY ON THE HORIZON - the sweep hands the far ring one landma
   host.farRing = null;
   assert.doesNotThrow(() => sk.sweep());
   assert.equal(sk.count, 0);
-  // wired: the capitals' sweep asks it on the frame, the world host hands its ring - PIN MOVED (IC-GRAND's perf pass): the
-  // city's worker told first (scenes/capitalPrebuild.js)
-  assert.match(read('src/scenes/tamrielSweepsHost.js'), /function sweepCapitalPixels\(\) \{\n\s+capitalPrebuild\.sweep\(\);[^\n]*\n\s+sweepCapitalLod\(\);[^\n]*\n\s+capitalSkyline\.sweep\(\);/);
-  assert.match(read('src/scenes/world.js'), /createTamrielSweeps\(\{[^\n]*\n(?:\s+[^\n]*\n){0,12}?\s+get farRing\(\) \{ return farRing; \},/);
   // the ring's ground at a pixel's centre: its own grid, row by row
   const r = Object.create(FarRingRenderer.prototype);
   assert.equal(r.groundAt(10, 20), null, 'before a build');

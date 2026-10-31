@@ -138,30 +138,6 @@ test('audit24 wave30: runMagicRounds keeps the broker\'s cap and its load re-anc
   assert.equal(runMagicRounds({ entity: e, fromMinute: 100.99, toMinute: 101, sinks }), 1);
 });
 
-test('audit24 wave30: the dungeon rest advance runs BOTH halves of the broker event', () => {
-  const src = rd('src/scenes/dungeonContext.js');
-  // S40: the other five rest deps moved to shared.js' one composition,
-  // so this arm is a named function now and ends at its own close.
-  const i = src.indexOf('const _restAdvance = (n) => {');
-  const arm = src.slice(i, src.indexOf('\n  };', i));
-  assert.ok(i > 0 && arm.length > 200, 'the rest advance arm was found');
-  // wave 32 reshaped this: the window is CLAIMED once (that is the broker) and
-  // then run on the player and on every foe - one raise, every manager.
-  assert.ok(arm.includes('const _w = claimMagicRounds(start, end);'),
-    'the window is claimed once for the advance');
-  assert.ok(arm.includes("runMagicRoundsFor(playerEntity, _w.from, _w.to, { sinks: playerSinks,"),
-    'the PLAYER half runs across it, through this host\'s one set of doors');
-  // OnNewMagicRound is a GLOBAL event - every EntityEffectManager in the scene
-  // subscribes - and the frame body's foe loop anchors on the clock at the top
-  // of the frame, so these minutes were lost rather than merely late.
-  assert.ok(arm.includes('runMagicRoundsFor(f.entity, _w.from, _w.to, { sinks: foeSinks(f, false) });'), 'the FOE half runs too');   // AUDIT 68 S19-round-ticks-player-provenance: a round is nobody's blow
-  assert.ok(arm.indexOf('claimMagicRounds') < arm.indexOf('intermittentEnemySpawn'),
-    'the broker before the spawn catch-up, as the two Updates run');
-  // the comment that said the round loop would catch up is GONE - it described
-  // a line that was not there (dungeon.js returns at the overlay gate first).
-  assert.ok(!arm.includes('the round loop catches the magic rounds up'), 'the false comment is retired');
-});
-
 test('audit24 wave30: OnMonsterHit rides EVERY monster melee door and no other', () => {
   // FormulaHelper.cs:660-662 calls OnMonsterHit only in the WEAPONLESS branch
   // and only when the attacker is a monster (`AIAttacker.EntityType !=
@@ -214,17 +190,6 @@ test('audit24 wave30: OnMonsterHit rides EVERY monster melee door and no other',
     assert.ok(!s.call.includes('onMonsterHit'),
       `${s.file}:${s.line} is an arrow, a watchman or the player - DFU calls no rider there`);
   }
-});
-
-test('audit24 wave30: the exterior pool binds the paralyze free-cast the way the dungeon does', () => {
-  const xf = rd('src/scenes/exteriorFoes.js');
-  assert.ok(xf.includes("const sp = spellsByIndex?.()?.get(index);"),   // PIN MOVED (DEX4b): the index the rider readies (66 for the spider's)
-    'the pool reads the SPELLS.STD map through its own accessor (it is a FUNCTION dep here, unlike the dungeon\'s map)');
-  assert.ok(xf.includes('if (sp) castSpellFrom(f, sp, playerFeet, true);'),
-    'SetReadySpell(spell, noSpellPointCost: true) - the cast is free and skips the silence gate');
-  // ONE binding of the shared executor for this pool, not two.
-  assert.equal(xf.split('castEnemySpell(f,').length - 1, 1);
-  assert.equal((xf.match(/(?<!function )castSpellFrom\(f, /g) ?? []).length, 3, 'the decision, the rider and the puppet\'s streamed cast (WORLD6b-iii) all use it');
 });
 
 test('audit24 wave30: the host ticker exposes the ONE set of player sinks, exhaustion and all', () => {

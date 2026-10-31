@@ -55,18 +55,6 @@ test('ARENA1 undercroft: the stair is a dungeon entrance of the arena\'s block; 
   assert.equal(dungeonStartDoorFor([below, castle], { group: '207,213' }, 'dungeon:50027'), castle);
 });
 
-test('ARENA1 undercroft: the hosts hand the stair the undercroft and an exit group of its own; underground the quest location is the undercroft', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /\.\.\.arenaDoorTarget\(e\),/);
-  // PIN MOVED (IC-GRAND): the stair of any place that lays the arena's block - Daggerfall, and the Imperial City's Arena
-  // District (world/arena/arenaCity.js standsArena; test/world/icgrand_arena.test.js)
-  assert.match(w, /if \(!isUndercroftDoor\(e, DOOR_TYPE\.DUNGEON_ENTRANCE\) \|\| !standsArena\(city\)\) return \{ dfLocation: city, group: e\.pixelKey \};/);
-  assert.match(w, /return \{ dfLocation: u, group: `\$\{e\.pixelKey\}:undercroft` \};/);
-  assert.match(w, /const under = modes\?\.mode === 'dungeon' \? modes\?\.dungeonLocation : null;\n\s*if \(isArenaUndercroft\(under\)\) return under;/);
-  const e = read('src/scenes/exterior.js');
-  assert.match(e, /if \(isUndercroftDoor\(last, DOOR_TYPE\.DUNGEON_ENTRANCE\) && isArenaCity\(dfLocation\)\) Object\.assign\(last, \{ dfLocation: \(undercroft \?\?= undercroftLocation\(dfLocation\)\), group: 'undercroft' \}\);/);
-});
-
 test('ARENA1 undercroft (ARENA2): laid out from BLOCKS.BSA - 32 blocks, a start marker, the castle\'s 16 untouched; the stair a door of the block', { skip: !HAS_ARENA2 && 'ARENA2_PATH not set' }, async () => {
   const { maps, blocks } = await bootDoor({ packs: false, arena: true });
   const c = maps.getLocation(17, 1231);

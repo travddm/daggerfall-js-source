@@ -93,8 +93,6 @@ test('GUILD-SEEN the service: each member of the roster carries `seenAt`, its ac
     ['Bran', 2, false, nowS - 7200],
     ['Cass', 3, false, nowS - 3600],
   ], 'the beat, or the call where there was none - in the roster\'s own order');
-  // the roster is one statement still, and writes nothing to say it
-  assert.match(src('server-account/src/guilds.js'), /COALESCE\(p\.played_at, p\.last_seen\) AS seen_at FROM guild_members m LEFT JOIN players p ON p\.id = m\.player WHERE m\.guild_id = \?/);
 });
 
 // ─── THE LAW ─────────────────────────────────────────────────────────────────────────

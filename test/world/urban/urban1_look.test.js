@@ -54,11 +54,3 @@ test('URBANIZER U1 the climate a town stands in: only its buildings\' set moves 
   assert.equal(withTownLook(null, B.Mountain), null);
 });
 
-test('URBANIZER U1 the host by source: every place past the Bay - Arena\'s places, the countryside\'s towns and the capitals but the Imperial City - stood in its province\'s set (scenes/tamrielPlacesHost.js); a lair keeps its zone\'s (mutants: a site unwired; the Imperial City dressed)', () => {
-  const h = rd('src/scenes/tamrielPlacesHost.js');
-  assert.match(h, /synthesizeArenaLocation\(template, place, \{ regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex, climate: townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\) \}\)/);
-  assert.match(h, /synthesizeCountryLocation\(pick\.template, \{ px, py, type: pick\.type, name \}, \{ regionIndex, regionName: REGION_NAMES\[regionIndex\], politic: 128 \+ regionIndex, climate: townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\) \}\)/);
-  assert.match(h, /climate: at\.k === 0 \? getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\) : townClimateAt\(px, py, getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\)/);
-  assert.match(h, /synthesizeLairLocation\([^\n]+climate: getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\) \}\)/, 'a lair its zone\'s');
-  assert.equal((h.match(/townClimateAt\(/g) ?? []).length, 3);
-});

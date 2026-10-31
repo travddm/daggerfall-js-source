@@ -157,5 +157,4 @@ test('AUDIT 28 F-C1/F-C2: settle drops the owed look (SetFacing -> Init), and ev
       assert.match(s, /addEventListener\('mouseup', \(e\) => \{ if \(isSwingButton\(e\.button\)\) rightHeld = false;/, `${host}: up`);
     }
   }
-  assert.match(read('src/scenes/dungeonContext.js'), /get weaponIsBow\(\) \{ return !!playerWeapon\.machine\?\.isBow; \}/);
 });

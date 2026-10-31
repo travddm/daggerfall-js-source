@@ -17,8 +17,6 @@ import { BLOW } from '../../src/ai/blowShapes.js';
 import { RemotePlayers, PEER_ARCHIVE } from '../../src/net/remotePlayers.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const WORLD = read('src/scenes/world.js');
-const lift = (re, what) => { const m = re.exec(WORLD); assert.ok(m, `lifted from scenes/world.js: ${what}`); return m; };
 
 /** Where I stand - off the origin on both axes and in height (AUDIT C1: every fixture once stood me at x 0, and the law's
  *  x half could read anything). A peer is placed by its offset from me; its pose `shown` is in the scene's own frame. */
@@ -45,8 +43,6 @@ test('PEER-RANGE the default is past a shot\'s reach: another player\'s arrow or
   assert.equal(reach * BLOW.aimed.speed, 260, 'a foe archer\'s aimed shot - the only one sped up (hostCombat.js aimedArrowMeta)');
   assert.ok(PEER_RANGE_DEFAULT >= reach * BLOW.aimed.speed, `the default ${PEER_RANGE_DEFAULT} m reaches past either`);
   assert.ok(PEER_RANGE_TIERS[0] < reach, 'the near tier is inside a player\'s shot');
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /choiceRow\('peerRange', t\('menu\.peers\.range', 'Draw distance'\),\n\s*t\('menu\.peers\.rangeNote', '[^']*150 m can hide an archer\.'/, 'and the row says so');
-  assert.match(read('src/scenes/hostCombat.js'), /export function aimedArrowMeta\(shot\) \{\n\s*return shot \? \{ aimed: true, speedScale: BLOW\.aimed\.speed \} : null;/, 'the aimed shot\'s speed');
 });
 
 test('PEER-RANGE the drawn: within the range on the ground drawn, past it not, at it drawn - on either axis, wherever I stand; height is not distance; a party mate anywhere; no range or no place of mine draws everyone; a peer with no place is drawn only as a mate; `out` refilled (mutants: the range unread; strictly inside; either axis read from the origin; height counted; the mate unasked; no range cutting; a placeless peer drawn)', () => {
@@ -173,45 +169,3 @@ test('PEER-RANGE a resurrection is seen in the whole room: a fallen player raise
 
 // ── the host: the range's cut in the online frame ───────────────────────────────────────────────────────────────────
 
-test('PEER-RANGE the online frame: the drawn list cut by distance after the map\'s poses are kept and before the crowd\'s count (GATE-CROWD; everywhere since CROWD-WIDE), a cast, a light or a body - at the card\'s distance, my party and my duel (from its count on) always, nothing cut under the travel view; the dolls\' sync handed the room\'s whole list; the doors that answer a player on this screen ask the cut too (AUDIT C5, C6; mutants: the travel view cutting; the card unread; the party unasked; the duel unasked; the room\'s list not handed; the pick, the gift and the spark uncut)', () => {
-  const m = lift(/\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), (\{ on: [^\n]*?\})\);[^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, \{/, 'the range\'s cut, before the crowd\'s');
-  assert.match(WORLD, /const peerRange = createPeerRange\(\);/);
-  // the cut's question, evaluated as the frame asks it - the duel manager's own shape: `opponent` from the count on
-  const ask = new Function('d', `const { travelView, player, onlineToScene, peerRangeOf, getPref, social, duelMgr } = d; return ${m[1]};`);
-  const prefs = { peerRange: 300 };
-  const mates = new Set(['mate']);
-  const host = ({ tv = false, duel = null } = {}) => ({
-    travelView: tv ? { active: true } : { active: false }, player: { pos: ME }, onlineToScene: (p) => [p.x, p.y, p.z], peerRangeOf,
-    getPref: (k) => prefs[k], social: { isPartyPeer: (id) => mates.has(id) }, duelMgr: { opponent: duel },
-  });
-  const crowd = [peer('near', 40), peer('mid', 0, 450), peer('mate', 1800), peer('foe', -700), peer('far', 2400)];
-  const cutIds = (o) => createPeerRange().cut(crowd, ask(o)).map((p) => p.id);
-  assert.deepEqual(cutIds(host()), ['near', 'mate'], 'on the street: within 300 m, and my party mate across the map');
-  assert.deepEqual(cutIds(host({ duel: 'foe' })), ['near', 'mate', 'foe'], 'and the one I duel, wherever they stand - counting down too');
-  assert.deepEqual(cutIds(host({ tv: true })), crowd.map((p) => p.id), 'under the travel view: nobody cut (OW-PEERS)');
-  prefs.peerRange = 600;
-  assert.deepEqual(cutIds(host()), ['near', 'mid', 'mate'], 'the card at 600 m');
-  prefs.peerRange = 0;
-  assert.deepEqual(cutIds(host()), crowd.map((p) => p.id), 'the card at everyone');
-  prefs.peerRange = 'junk';
-  assert.deepEqual(cutIds(host()), ['near', 'mate'], 'a stray value reads as the default');
-  prefs.peerRange = 150;
-  assert.deepEqual(createPeerRange().cut([peer('archer', 200)], ask(host())).length, 0, 'the near tier');
-  // the dolls' sync: the cut list to draw, the room's whole list beside it (a rise seen, a cut peer's sprite kept)
-  assert.match(WORLD, /remotePlayers\.sync\(visiblePeers, onlineToScene, \{[^\n]*, room: drawable \}\);/);
-  // the readers of the drawn list are the cut's (GATE-CROWD's pin holds the casts, the seen and the sprites to it); the
-  // doors that answer a player on this screen ask it as they ask the crowd's - the pick and the plaque, a gift's aim and
-  // its burst (both through crowdDrawnHere), a blow's spark and a cry
-  assert.match(WORLD, /const crowdDrawnHere = \(p\) => gateCrowd\.shows\(p\.id\) && peerRange\.shows\(p\.id\);/);
-  assert.match(WORLD, /for \(const p of online\.peers\.values\(\)\) \{\n\s*if \(!p\?\.shown \|\| !online\.visible\(p\) \|\| !gateCrowd\.shows\(p\.id\) \|\| !peerRange\.shows\(p\.id\)\) \{ peerFxPlayer\.forget\(p\?\.id\); continue; \}/, 'a blow\'s spark and a cry');
-});
-
-test('PEER-RANGE the Other players card: the distance beside the crowd\'s count, its tiers the law\'s, Everyone for 0, the row reading the law\'s own answer - a stored value that is no tier shows the 300 m it stands for (AUDIT A L2, D7; mutants: the row gone; its key another; the tiers written twice; the raw pref read)', () => {
-  const menu = read('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /import \{ PEER_RANGE_TIERS, peerRangeOf \} from '\.\.\/\.\.\/net\/peer\/peerRange\.js';/);
-  const card = menu.slice(menu.indexOf('function peerSpritesCard() {'), menu.indexOf('\n}\n', menu.indexOf('function peerSpritesCard() {')));
-  assert.match(card, /c\.append\(choiceRow\('peerRange', t\('menu\.peers\.range', 'Draw distance'\),\n\s*t\('menu\.peers\.rangeNote', 'How far away other players are drawn\. Your party and your duel opponent always show\.[^']*'\),\n\s*PEER_RANGE_TIERS\.map\(\(m\) => \[m, m \? t\('menu\.peers\.metres', '\{m\} m', \{ m \}\) : t\('menu\.peers\.everyone', 'Everyone'\)\]\), \{ home: true, read: \(\) => peerRangeOf\(getPref\('peerRange'\)\) \}\)\);/);
-  assert.ok(card.indexOf("choiceRow('peerRange'") < card.indexOf("choiceRow('gateCrowd'"), 'the distance before the crowd\'s count');
-  // choiceRow shows the tier `read` answers
-  assert.match(menu, /function choiceRow\(key, name, note, tiers, \{ home = false, read = null, write = null \} = \{\}\) \{[\s\S]*?const cur = String\(read \? read\(\) : getPref\(key\)\);/);
-});

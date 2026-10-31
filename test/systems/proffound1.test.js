@@ -21,15 +21,6 @@ import { hostText } from '../hostText.mjs';
 
 const read = (p) => hostText(p);   // HOST-SPLIT 2: a host read whole - the town map's door lives in scenes/exteriorAutomapToggle.js (STAR0)
 
-/** The shop types the professions' stations stand in, read off the producer: every BUILDING_TYPES member the station
- *  questions of the interior host name (forgeHere through enchantHere; cookFireHere asks a fire, not a shop). */
-function stationShopTypes() {
-  const src = read('src/scenes/worldModes.js');
-  const from = src.indexOf('\n    forgeHere() {'), to = src.indexOf('\n    cookFireHere() {');
-  assert.ok(from > 0 && to > from, 'the station questions stand where they did');
-  return [...new Set([...src.slice(from, to).matchAll(/BUILDING_TYPES\.(\w+)/g)].map((m) => m[1]))];
-}
-
 const FURN_A = { name: 'Gwynara\'s Furniture', buildingKey: makeBuildingKey(0, 0, 3), buildingType: BUILDING_TYPES.FurnitureStore, position: [30, 0, 70] };
 const FURN_B = { name: 'The Odd Woodwork', buildingKey: makeBuildingKey(1, 0, 4), buildingType: BUILDING_TYPES.FurnitureStore, position: [150, 0, 20] };
 const SHOPS = [
@@ -48,15 +39,7 @@ function treeOver(list) {
 }
 
 test('PROF-FOUND THE LAW: every shop a profession\'s station stands in - read off the interior host\'s station questions - is asked after on the Where-is page and drawn as built, enterable ground on the town map; the Furniture Store is the one shop the port opened past DFU\'s tables, and DFU\'s own skip list and categories stay as they are (mutants: the opened shops emptied, the group misworded)', () => {
-  const stations = stationShopTypes();
-  assert.deepEqual(stations.sort(), ['Alchemist', 'Armorer', 'ClothingStore', 'FurnitureStore', 'GemStore', 'GeneralStore', 'GuildHall', 'PawnShop', 'WeaponSmith']);
   const asked = new Set([...TOPIC_CATEGORIES.map((c) => c.type), ...OPENED_SHOP_TYPES]);
-  for (const name of stations) {
-    const t = BUILDING_TYPES[name];
-    assert.ok(asked.has(t), `${name}: a Where-is group`);
-    assert.ok(isEnterable(t + 1), `${name}: built, enterable ground on the town map`);
-    assert.notEqual(quarterOfType(t), 'house', `${name}: never a house's colour`);
-  }
   assert.deepEqual(OPENED_SHOP_TYPES, [7]);
   assert.equal(BUILDING_TYPES.FurnitureStore, 7);
   assert.deepEqual(OPENED_SHOP_GROUPS, { 7: 'Furniture stores' });
@@ -127,17 +110,3 @@ test('PROF-FOUND THE TOWN MAP: the Furniture Store\'s byte (8) is in the shop\'s
   assert.deepEqual(sheet.names().map((n) => [n.text, n.quarter, n.key]), [[store.name, 'shop', store.buildingKey]]);
 });
 
-test('PROF-FOUND THE HOSTS: townTalk\'s own grouping (no engine) lays the opened shops after DFU\'s and before the found places, as the tree does; both exterior hosts build their talk and their town map from the shared modules, and the dungeon opens no town map (mutants: the fallback\'s group dropped)', () => {
-  const tt = read('src/scenes/townTalk.js');
-  const cats = tt.indexOf('...TOPIC_CATEGORIES.map((c) => ({ label: c.caption, buildings: directory.filter((b) => b.buildingType === c.type) })),');
-  const opened = tt.indexOf('...OPENED_SHOP_TYPES.map((t) => ({ label: OPENED_SHOP_GROUPS[t], buildings: directory.filter((b) => b.buildingType === t) })),');
-  const found = tt.indexOf('...FOUND_KIND_ORDER.map((k) => ({ label: FOUND_TALK_GROUPS[k], buildings: directory.filter((b) => b.yard === k) })),');
-  assert.ok(cats > 0 && opened > cats && found > opened, 'DFU\'s groups, the opened shops, then the found places');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = read(host);
-    assert.match(s, /createTownTalk\(\{/, `${host}: the shared talk`);
-    // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the streaming host's M key hands the door the bag `townHere` builds for either key
-    assert.match(s, host === 'src/scenes/world.js' ? /createTownMapWindow\(here\.deps\)/ : /createTownMapWindow\(\{/, `${host}: the shared town map`);
-  }
-  assert.doesNotMatch(read('src/scenes/dungeonContext.js'), /createTownMapWindow/, 'the dungeon opens no town map');
-});

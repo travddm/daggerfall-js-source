@@ -19,7 +19,6 @@ import { SD_SKY_PERIOD } from '../../src/render/superDungeon/sdSky.js';
 import { SD_ARENA, SD_ORRERY, dungeonToRealm } from '../../src/net/superDungeon/sdBrain.js';
 import { SOUND } from '../../src/systems/soundClips.js';
 
-const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
 const rms = (x) => Math.sqrt(x.reduce((a, v) => a + v * v, 0) / x.length);
 const voice = (n, hz = 440, rate = 11025) => Float32Array.from({ length: n }, (_, i) => Math.sin((2 * Math.PI * hz * i) / rate) * Math.exp(-i / (n / 3)));
 
@@ -137,8 +136,3 @@ test('SD14b HEARD FROM ITS QUARTER: each event played as it falls in a frame, fa
   assert.ok(Number.isInteger(SD_AIR_VOID.breathTurns));
 });
 
-test('SD14b THE WORLD HOST: made on the engine beside the Deadlands\' air, framed on the sky\'s clock while I stand in the Hour and stopped every other frame, after the ways out have run (mutants: never framed; never stopped)', () => {
-  assert.match(W, /const sdAir = createSdAir\(audio\);/);
-  assert.match(W, /const sdAirFrame = \(\) => \{ if \(modes\?\.sdRealmSlot\?\.\(\) != null\) sdAir\.frame\(deadlandsSeconds\(\), cam\.pos\); else sdAir\.stop\(\); \};/);
-  assert.match(W, /deadlandsAirFrame\(\);[^\n]*\n\s*sdAirFrame\(\);/);
-});

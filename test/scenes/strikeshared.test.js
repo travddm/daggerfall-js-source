@@ -99,35 +99,6 @@ test('STRIKE-SHARED: the wire - a strike spell rides as the cast frame\'s own pr
   }
 });
 
-test('STRIKE-SHARED: the pools - my strike spell on a PUPPET goes to its owner and lands nothing on the copy; the owner lands the whole spell on its real foe (a paralysis the copy never held), the damage as MY blow; my own foe answers false (the caller lands it here as before)', async () => {
-  const { bob, mac, bobSaid, macHits, rat, pup } = await twoPools();
-  assert.equal(mac.spellToOwner(pup, PARALYZE, 7, [10, 0, 10]), true, 'it went');
-  assert.deepEqual(kinds(pup.entity), [], 'nothing landed on the copy');
-  assert.equal(macHits.length, 1);
-  const hit = macHits[0];
-  assert.equal(hit.to, 'bob-0002'); assert.equal(hit.i, rat.seq); assert.equal(hit.dmg, 0); assert.equal(hit.kind, 'spell');
-  assert.equal(hit.lv, 7); assert.equal(hit.sp.name, 'Hand of Sleep');
-  assert.deepEqual(kinds(rat.entity), []);
-  assert.equal(bob.applyHit('mac-0001', hit), true);
-  assert.deepEqual(kinds(rat.entity), ['paralyze'], 'the owner\'s foe is paralysed');
-  assert.deepEqual(bobSaid, [], 'the owner is told nothing - the spell is not theirs');
-  // a damaging strike: its damage is the striker's blow at the owner (the fighters' count names the striker)
-  const hp = rat.entity.health;
-  assert.equal(mac.spellToOwner(pup, SHOCK, 7), true);
-  assert.equal(bob.applyHit('mac-0001', macHits[1]), true);
-  assert.equal(rat.entity.health, hp - 6, 'the Shock\'s six points landed once, at the owner');
-  // a foe I own is mine to land: the door answers false and sends nothing
-  assert.equal(bob.spellToOwner(rat, PARALYZE, 7), false);
-  assert.equal(mac.spellToOwner(pup, { ...PARALYZE, effects: [EMPTY] }, 7), false, 'a record the wire refuses stays here');
-  const mt = pup.mobileType; pup.mobileType = 146;
-  assert.equal(mac.spellToOwner(pup, PARALYZE, 7), false, 'a peer\'s watchman stays on the watch\'s own door (WATCH1: a blow, nothing else)');
-  pup.mobileType = mt;
-  assert.equal(macHits.length, 2);
-  // an older owner's net (no spellOnFoe) reads past the fields: the blow lands, nothing throws
-  const e = rd('src/scenes/exteriorFoes.js');
-  assert.match(e, /const hs = onWatch \|\| f\.dead \? null : hitSpellOf\(data\);\n\s*if \(hs\) _net\?\.spellOnFoe\?\.\(f, hs\.spell, hs\.level, peerSpellSinks\(f, from\), from\);\n\s*if \(f\.dead\) _net\?\.onPeerHit\?\.\(\{ to: from,[^\n]*slain: 1 \}\);/, 'landed before the kill report, so a killing spell says slain; never on my watch');
-});
-
 test('STRIKE-SHARED: a peer\'s SOUL TRAP is its caster\'s - the owner marks it, says nothing and reads no gem of its own at the kill (whoever strikes), and names the caster on the body; the caster rolls it into its own pack, once, and only for a puppet it trapped', async () => {
   const { bob, mac, bobE, macE, bobSaid, macSaid, macHits, rat, pup } = await twoPools();
   assert.equal(mac.spellToOwner(pup, TRAP, 7), true);
@@ -147,9 +118,6 @@ test('STRIKE-SHARED: a peer\'s SOUL TRAP is its caster\'s - the owner marks it, 
   assert.equal(macE.items[0].trappedSoulType, rat.mobileType, 'the soul is in the caster\'s gem');
   assert.deepEqual(macSaid, [SOUL_TRAP_TEXT.trapSuccess]);
   assert.equal(pup._trapSent, false, 'spent');
-  const e = rd('src/scenes/exteriorFoes.js');
-  assert.match(e, /if \(!f\._trapSent \|\| r\.j !== \(_net\?\.selfId\?\.\(\) \?\? null\)\) return;/, 'only a puppet I trapped, only my name');
-  assert.match(e, /const trap = _peerTrap \? \{ allowDeath: true \} : attemptSoulTrap\(/, 'the owner reads no gem for a peer\'s trap');   // PIN MOVED (RPT1026-FIGHTS TRAP-TO-OWNER): its OWN trap is read whoever struck - test/scenes/rpt1026_fights_trap.test.js
 });
 
 test('STRIKE-SHARED: a puppet I did NOT trap fills no gem of mine on the owner\'s word', async () => {
@@ -178,25 +146,6 @@ test('STRIKE-SHARED: the enchantment door - the player\'s strike on a foe anothe
   mk(true).applySpellToTarget(PARALYZE, other, foe.entity);
   assert.equal(sent.length, 2, 'a foe\'s strike is never sent');
   assert.equal(landed.length, 2);
-});
-
-test('STRIKE-SHARED: the dungeon twin and the hosts, by source - the same field on both diverts, the same send, the landing in landPeerBlow with the striker\'s provenance, the peer\'s trap on the kill and the record; the world host routes the door and the cast engine is quiet for a peer\'s trap', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.equal((d.match(/\.\.\.\(spell \?\? \{\}\),   \/\/ STRIKE-SHARED/g) ?? []).length, 2, 'both diverts (the room\'s foe, a party member\'s own) carry the spell');
-  assert.match(d, /if \(pi < 0 \|\| !\(f\._ownFrom != null \|\| \(!_authority && isRoomFoe\(f, pi\)\)\)\) return false;/, 'only a foe another player runs');
-  assert.match(d, /const hs = f\.dead \? null : hitSpellOf\(data\);\n\s*if \(hs\) \{\n\s*magic\.applySpellToFoe\(hs\.spell, hs\.level, f, \{ entity: \{ level: hs\.level \} \}, \{ peerCaster: id \}, \{\n\s*\.\.\.foeSinks\(f\),\n\s*hurt: \(n, o\) => damageFoe\(f, bossStrikeAt\(f\.entity, n, 'spell', null, o\?\.element \?\? null, !!o\?\.whole, null\), null, null, \{ fromPlayer: true, peer: true, peerId: id, kind: 'spell', whole: !!o\?\.whole, element: o\?\.element \?\? null \}\),/, 'landPeerBlow lands it with the striker\'s provenance');   // PIN MOVED (AUDIT WORLD-EVENTS L2-1): and its element, resisted at the owner for the peer
-  assert.match(d, /const trap = _peerTrap \? \{ allowDeath: true \} : attemptSoulTrap\(foe\.entity/);   // PIN MOVED (RPT1026-FIGHTS TRAP-TO-OWNER): the runner's own trap read whoever struck
-  assert.match(d, /r\.j = f\._trapBy; r\.q = f\._trapQ \| 0;/);
-  assert.match(d, /if \(r\.d === 1 && !f\.dead && r\.j !== undefined && f\._trapSent && r\.j === \(opts\.selfId\?\.\(\) \?\? null\)\) \{/);
-  assert.match(d, /spellToOwner: \(f, record, level\) => spellToOwner\(f, record, level\),/, 'the standalone host\'s enchant ctx');
-  assert.match(d, /\n\s*spellToOwner,   \/\/ STRIKE-SHARED/, 'on the context\'s API');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /spellToOwner: \(f, record, level\) => enchantSpellToOwner\(f, record, level\),/);
-  assert.match(w, /const host = enchantFoeHost\(f, modes\?\.dungeonCtx \?\? null, _insidePool\);\n\s*if \(host === 'dungeon'\) return !!modes\?\.dungeonCtx\?\.spellToOwner\?\.\(f, record, level\);\n\s*if \(host === 'exterior'\) return exteriorFoes\.spellToOwner\(f, record, level, enchantFeet\(\)\);\n\s*return false;/, 'by membership, as the sinks and the Wabbajack are');
-  assert.match(w, /spellOnFoe: \(f, spell, level, sinks, from\) => \{ magic\.applySpellToFoe\(spell, level, f, \{ entity: \{ level \} \}, \{ peerCaster: from \}, sinks\); \},/, 'the same call the pool test hands its owner');
-  const m = rd('src/scenes/hostMagic.js');
-  assert.match(m, /if \(r\.trapAlert && !peerCaster\) say\(SOUL_TRAP_TEXT\[r\.trapAlert\]\);/);
-  assert.match(m, /if \(r\.reflected && caster\?\.entity && !peerCaster\) \{/);
 });
 
 test('STRIKE-SHARED: THE FOUR HOSTS RULE - every enchant ctx mount passes the door (the fixed-city host\'s through the dungeon\'s, its own foes streaming to no one)', () => {

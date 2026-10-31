@@ -59,14 +59,6 @@ test('MACRO-ONE: the world never trades a raw token for an error shape, and a mi
   } finally { setMacroWorld(null); }
 });
 
-test('MACRO-ONE: the bridge registers its machine as the world, in every host that builds one', () => {
-  assert.match(read('src/scenes/quest/questBridge.js'), /setMacroWorld\(\(\) => machine\.macroContext\(\)\);/);
-  // both hosts that build a bridge hand it %ra's source
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(f), /playerRaceName: \(\) => \(playerEntity\.race \? raceDisplayName\(playerEntity\.race\) : null\)/, `${f} wires %ra`);
-  }
-});
-
 test('MACRO-2: a NULL in a caller’s map is "I do not know" - the world answers it; an EMPTY name or city is unknown, not a blank', async () => {
   const { expandGuildMacros } = await import('../../../src/systems/guild/guildServiceActions.js');
   const { expandMacros } = await import('../../../src/systems/talk/talkSession.js');
@@ -85,9 +77,3 @@ test('MACRO-2: a NULL in a caller’s map is "I do not know" - the world answers
   assert.equal(expandGuildMacros('A %ra.', {}), 'A %ra.');
 });
 
-test('MACRO-2: the coven and the summoning walk off the WORLD, not a quest-posed machine context that throws', () => {
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /const rows = \(id\) => expandRowValues\(rawRows\(id\), null, null\);/);
-  assert.match(modes, /const say = \(id, d = daedra, part = \(record\) => record\) => expandRowValues\(part\(rows\?\.\(id\) \?\? \[\]\), summonMacroValues\(d\), null\);/);
-  assert.doesNotMatch(modes, /expandRowValues\([^\n]*machine\.macroContext\(\)/, 'no row walk poses the machine as a quest');
-});

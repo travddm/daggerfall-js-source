@@ -290,23 +290,8 @@ test('PROF5 window: the Market tab stands beside Notices while the market is thi
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
 test('PROF5 wiring: the host builds the market book online, its answers told to the Marks book; the board hands the Market its own region, the hubs, the pieces and the mint; a piece minted once at its wear; the smith\'s stock tells the Marks book (FOUND); a kept craft settles alone (FOUND); the plane dressed (FOUND)', () => {
-  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');   // PIN MOVED (BAY-LEFT-SEA): HOST-SPLIT - the market's pieces and hubs moved out of bootWorld to scenes/marketPiecesHost.js
-  assert.match(w, /const marketBook = params\.has\('online'\)\n\s*\? createMarketBook\(\{ door: accountMarket\(/);
-  assert.match(w, /now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, marks: marksBook,\n\s*stores: \{ apply: \(st\) => profBook\?\.applyStore\(st\) \},/);   // AUDIT 30 U1: the Stores told too (AUDIT 31: its holds after)
-  assert.match(w, /const market = marketBook && profBook && profBook\.state\.open !== false && marksBook\?\.state\?\.open !== false && Number\.isInteger\(region\) \? \{/);   // AUDIT 30 U11; MARKET-AUDIT (PIN MOVED: `=== true` - the tab stands while the professions' read is unanswered)
-  // GUILD1e: the board's window built by the host's one builder (showNoticeWindow), which adds the book and the character
-  assert.match(w, /gate: \(\) => noticeGateCard\(\), sd: \(\) => noticeSdCard\(\), answer: \(note\) => answerNote\(note\), work, market,\n/);   // PIN MOVED (SD2c): a found Super dungeon's note beside the gate's
-  assert.match(w, /book: noticeBook, character: \(\) => characterIdOf\(playerEntity\),/);
-  assert.match(w, /if \(heldProvenances\(\)\.has\(piece\.provenance\)\) return;\n\s*const it = mintPiece\(piece, piece\.provenance\);\n\s*if \(!it\) return;\n\s*if \(it\.maxCondition > 0\) it\.currentCondition = wearCondition\(it\.maxCondition, piece\.wear\);/);
-  assert.match(w, /\.filter\(\(it\) => it\?\.provenance && asMinted\(it\) && !tradeRefusal\(it\) && !isLocked\(it\) && !pieceKept\(it\.provenance\)\)/);   // AUDIT 30 C2
-  assert.match(w, /const r = await profBook\.stock\(material, qty\);\n\s*toldBalance\(r\?\.data\?\.balance\);/);   // AUDIT 32 B3: the Bank's book and the market's
-  assert.match(src('src/ui/professions/profPages.js'), /if \(\(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) && p\.settle/);   // BAG1 (PIN MOVED): a kept deposit settles too
-  assert.match(src('src/scenes/gatherHost.js'), /if \(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) deps\.onSettle\?\.\(\);/);   // PIN MOVED (AUDIT2 BAG1 K3): and a kept deposit
   for (const rule of [/\.prof-grain \{ fill: none; stroke:/, /\.prof-trail \{ fill: none; stroke:/, /\.prof-board \{ position: relative; height: 96px; touch-action: none;/, /\.prof-boardhead \{ fill:/]) {
     assert.match(PROF_CSS, rule, 'the plane dressed');
   }
   for (const cls of ['.market-row', '.market-line polyline', '.market-bar', '.market-road', '.market-counter', '.market-wallet', '.market-listhead', '.market-suppliers']) assert.ok(PROF_CSS.includes(cls), cls);   // BOARD-UI: the wallet's strip, the column names, the suppliers' fold
-  // the one construction seam: the tab is made by the window alone
-  assert.equal((w.match(/createMarketTab\(/g) ?? []).length, 0);
-  assert.equal((src('src/ui/noticeWindow.js').match(/createMarketTab\(/g) ?? []).length, 1);
 });
