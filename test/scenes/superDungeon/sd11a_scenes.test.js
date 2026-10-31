@@ -592,6 +592,9 @@ test('AUDIT SD II L2 F14: A LAMP UNDER EVERY LIGHT - each of the Hour\'s twenty 
 // ── L2 F17: the hall's word forgotten ───────────────────────────────────
 
 test('AUDIT SD II L2 F17: THE HALL\'S WORD FORGOTTEN OUT OF THE REALM, run from the world host\'s own text - the realm\'s last word on the Orrery is the hall\'s while I stand in its slot\'s Hour; out of the realm the fight\'s frame forgets it, so back in the same slot\'s Hour the hall waits for the realm\'s own word (it turned its stones from the stale one, and chimed and said a Concord reached meanwhile again), and no Concord widens the edge from the last visit (mutants: the word kept)', () => {
+  const w = read('src/scenes/world.js');
+  const grab = (head, end) => { const i = w.indexOf(head); assert.ok(i > 0, head); return w.slice(i + 1, w.indexOf(end, i + 1) + end.length); };
+  const text = [grab('\n  function sdHallHeard(w) {', '\n  }\n'), grab('\n  const sdFightFrame = () => {', '\n  };\n'), grab('\n  const sdHallWord = () =>', '\n'), grab('\n  const sdConcordHere = () =>', '\n')].join('');
   let slot = 3;
   const env = {
     modes: { sdRealmSlot: () => slot }, sdFightLink: { leave() {}, state: () => ({}), now: () => 0 }, _sdReceipts: new Map(), sdReceiptsLeft() {},
@@ -606,12 +609,23 @@ test('AUDIT SD II L2 F17: THE HALL\'S WORD FORGOTTEN OUT OF THE REALM, run from 
     gateVeil: null,   // AUDIT SD III (T18, PIN MOVED): the veil the Hour's readouts wait under - none here
     sdFx: null,   // AUDIT SD V (L5, PIN MOVED): the fight's frame tells the blows' sparks every frame out of the Hour
   };
+  const h = new Function(...Object.keys(env), `let _sdHall = null, _sdFightHeld = false, _sdBarUp = false, _sdGroundUp = false, _sdCardUp = false, _sdMarksSince = null, _sdMarksUp = false, _sdPassesWarm = true;\n${text}\nreturn { sdHallHeard, sdFightFrame, sdHallWord, sdConcordHere };`)(...Object.values(env));   // AUDIT SD III (V13, PIN MOVED): the passes already warm
   const word = { k: 'pz', s: 3, st: [1, 2, 3, 4, 5, 6], f: 0, lit: 6, ok: true };
+  h.sdHallHeard(word);
+  h.sdFightFrame();
+  assert.deepEqual(h.sdHallWord(), word, 'in its Hour: the hall\'s');
+  assert.equal(h.sdConcordHere(), true);
   slot = null;
+  h.sdFightFrame();
   slot = 3;
+  assert.equal(h.sdHallWord(), null, 'back in the same slot\'s Hour: forgotten, until the realm says it again');
+  assert.equal(h.sdConcordHere(), false, 'and no Concord held over');
+  h.sdHallHeard(word);
+  assert.deepEqual(h.sdHallWord(), word, 'the realm\'s own word, heard');
   // the hall's set hears a first word as where the stones ARE - no turn, no chime, no line (SD6c)
   const said = [], hall = createSdHall({ renderer: fakeRenderer(), s: 3, say: (x) => said.push(x) });
   hall.stand({ dynamicDraws: [], collider: null });
+  hall.frame(0.016, null, h.sdHallWord());
   assert.deepEqual([hall.shown, hall.concord, said], [word.st, true, []]);
 });
 
