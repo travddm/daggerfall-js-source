@@ -872,20 +872,25 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   // Tithe, a filler the pay, an orderer the price
   // GOLD-MARKET: each trade in its own currency - a gold seller's the price less the tax and the fee its sale paid
   // MARKET-ANY: a piece from a pack named by its listing's record (`good`)
+  // MARKET-COMPOUND (bible/06-Systems/Professions-Arc.md section 59): the trades in two compounds of three, the newest of both kept (newestTrades) - D1 refuses
+  // a compound SELECT past five terms, and the six as one answered every History read with a 500
   const goodSql = "CASE WHEN kind = 'item' THEN (SELECT item FROM market_listings l WHERE l.id = market_sales.listing) END";
-  const { rows: [top, sales], base } = await read([
+  const tradesSince = nowS - MARKET_KEEP_DAYS * DAY_S;
+  const { rows: [top, salesAndFills, ordersAndAuctions], base } = await read([
     db.prepare(`SELECT material, SUM(units) AS units FROM ${currency === 'gold' ? 'market_gold_prices' : 'market_prices'} WHERE day > ?1 GROUP BY material
     ORDER BY units DESC, material LIMIT ${MARKET_HISTORY_SHOWN}`).bind(today - MARKET_MEDIAN_DAYS),
     db.prepare(`SELECT 'bought' AS side, kind, material, provenance, units, price, total + courier AS total, at, currency, ${goodSql} AS good FROM market_sales WHERE buyer = ?1 AND at > ?2
     UNION ALL SELECT 'sold', kind, material, provenance, units, price, MAX(0, total - tax - tithe - fee), at, currency, ${goodSql} FROM market_sales WHERE seller = ?1 AND at > ?2
     UNION ALL SELECT 'filled', 'material', material, NULL, units, price, pay, at, 'marks', NULL FROM market_fills WHERE filler = ?1 AND at > ?2
-    UNION ALL SELECT 'ordered', 'material', material, NULL, units, price, units * price, at, 'marks', NULL FROM market_fills WHERE poster = ?1 AND at > ?2
+    ORDER BY at DESC LIMIT ${MARKET_TRADES_SHOWN}`).bind(me, tradesSince),
+    db.prepare(`SELECT 'ordered' AS side, 'material' AS kind, material, NULL AS provenance, units, price, units * price AS total, at, 'marks' AS currency, NULL AS good FROM market_fills WHERE poster = ?1 AND at > ?2
     UNION ALL SELECT 'won', 'piece', NULL, a.provenance, 1, a.high, a.high + b.courier, a.closed_at, 'marks', NULL FROM market_auctions a JOIN market_bids b ON b.id = a.high_bid
       WHERE a.state = 'sold' AND b.bidder = ?1 AND a.closed_at > ?2
     UNION ALL SELECT 'auctioned', 'piece', NULL, provenance, 1, high, ${netSql('high')} - tithe, closed_at, 'marks', NULL FROM market_auctions
       WHERE state = 'sold' AND seller = ?1 AND closed_at > ?2
-    ORDER BY at DESC LIMIT ${MARKET_TRADES_SHOWN}`).bind(me, nowS - MARKET_KEEP_DAYS * DAY_S),
+    ORDER BY at DESC LIMIT ${MARKET_TRADES_SHOWN}`).bind(me, tradesSince),
   ]);
+  const sales = newestTrades(salesAndFills, ordersAndAuctions);
   const { medians } = await after({ medianKeys: top.map((t) => t.material), cur: currency });
   return {
     ...base,
@@ -894,6 +899,12 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
       price: Number(s.price), total: Number(s.total), at: Number(s.at), currency: s.currency === 'gold' ? 'gold' : 'marks',
       ...(s.kind === 'item' ? { item: goodOf(s.good) } : {}) })),
   };
+}
+
+/** MARKET-COMPOUND: the newest MARKET_TRADES_SHOWN of two reads, each newest first and limited alike - as one compound
+ *  ordered `at DESC` answered them. A sort that keeps equals in place leaves a tie in the six terms' order. */
+export function newestTrades(/** @type {any[]} */ first, /** @type {any[]} */ second) {
+  return [...first, ...second].sort((a, b) => Number(b.at) - Number(a.at)).slice(0, MARKET_TRADES_SHOWN);
 }
 
 /**

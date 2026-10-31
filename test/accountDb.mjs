@@ -29,6 +29,25 @@ const MIGRATIONS = readdirSync(new URL('../server-account/migrations', import.me
  *  whole passed every test here and threw on the live database once it grew past 100 (the seats' Turning, 2026-10-11). */
 export const D1_MAX_BOUND = 100;
 
+/** D1's bound on one compound SELECT's terms (SQLITE_LIMIT_COMPOUND_SELECT) - node:sqlite's is 500, so the market
+ *  History read's six-term UNION ALL passed here and answered every read with a 500 on D1 (MARKET-COMPOUND, 2026-10-29).
+ *  Counted, not set: Node 22 (CI) has no `limits` option. `d1()` holds it for every statement, as D1 does. */
+export const D1_MAX_COMPOUND = 5;
+
+/** The most terms of any one compound SELECT in `sql`: its UNION, INTERSECT and EXCEPT at one parenthesis depth, quoted
+ *  text and line comments left out, plus one. */
+export function compoundTermsOf(sql) {
+  const open = [0];
+  let most = 0;
+  const text = sql.replace(/'(?:[^']|'')*'|--[^\n]*/g, "''");
+  for (const [token] of text.matchAll(/[()]|\b(?:UNION|INTERSECT|EXCEPT)\b/gi)) {
+    if (token === '(') open.push(0);
+    else if (token === ')') most = Math.max(most, open.pop() ?? 0);
+    else open[open.length - 1] += 1;
+  }
+  return Math.max(most, ...open) + 1;
+}
+
 /** A fresh database, every migration applied. */
 export function d1() {
   const db = new DatabaseSync(':memory:');
@@ -37,6 +56,8 @@ export function d1() {
   return {
     _raw: db,
     prepare(sql) {
+      const terms = compoundTermsOf(sql);
+      if (terms > D1_MAX_COMPOUND) throw new Error(`D1_ERROR: too many terms in compound SELECT (${terms}, D1 takes ${D1_MAX_COMPOUND})`);   // MARKET-COMPOUND: as D1 refuses it
       const stmt = db.prepare(sql);
       const writes = /^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql);
       let args = [];
