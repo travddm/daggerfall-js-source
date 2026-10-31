@@ -24,7 +24,7 @@
 import { generateSamples, ghostSampler, HEIGHTMAP_DIMENSION } from './terrainSampler.js';
 import { CAPITAL_SEA_FLAT, capitalSeaGround } from './capitalSea.js';   // RUMARE-WATER: a capital at the sea, its water the sea's
 import { reliefFlat, capitalReliefGround } from './capitalRelief.js';   // SOLITUDE-RELIEF: a capital on a relief of its own
-import { buildTerrainGrid, convertTilemap } from './terrainSurface.js';
+import { buildTerrainGrid, buildTerrainIndices, convertTilemap } from './terrainSurface.js';
 import { assignTiles, blendLocationTerrain, calcAvgMaxHeight, generateTileData, townGroundMask, unstampOffShape, townRoadRing } from './terrainTiles.js';
 import { layoutNature, layoutLandProps } from './terrainNature.js';
 import { jungleLayout, jungleWhole } from './jungleNature.js';   // BANTHA1: the jungle over the pixel's own layout
@@ -88,7 +88,7 @@ import { layGateRoads } from '../road/gateRoads.js';   // GATE-ROADS: a walled t
  *   too, where its canal stands; `seaEdges` its sides shared with its sea slice; `relief` (SOLITUDE-RELIEF) capitalRelief.js's key.
  * @param {?{blend?: boolean, archive?: number, hidden?: boolean}} [job.lands] - TESA-LANDS: the lands' row (null off) - a zone's flats past the Bay, `blend` the Blended climates row, `archive` the climate's nature archive, `hidden` a place the woods close round
  * @returns {{samples: Float32Array, tilemap: Uint8Array,
- *   positions: Float32Array, normals: Float32Array,
+ *   positions: Float32Array, normals: Float32Array, indices: Uint32Array,
  *   tilemapBytes: Uint8Array, avg: number, paths: ?Uint8Array,
  *   nature: Array<{record:number,x:number,y:number,z:number}>, beach: ?Float32Array,
  *   roadside: Array<any>, graht: ?Float32Array, landProps: Float32Array}} `roadside` JUNGLE-ROADSIDE's pairs (world/jungle/jungleRoadside.js standPairs);
@@ -256,7 +256,7 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
   // TESA-LANDS: past the Bay the zones' landmarks (world/lands/landProps.js) - the pixel's build keeps its flats off the
   // feet of those it stands (scenes/pixelBuild.js: a landmark the gate's clearing or a rock drops leaves its ground's own)
   const landProps = natureOpts.lands ? layoutLandProps(samples, tilemap, natureOpts) : new Float32Array(0);
-  return { samples, tilemap, positions: grid.positions, normals: grid.normals, bed: grid.bed, tilemapBytes, avg, nature,
+  return { samples, tilemap, positions: grid.positions, normals: grid.normals, indices: grid.indices, bed: grid.bed, tilemapBytes, avg, nature,
     paths,   // GRASS-PATH1: null when no network was present, as `withRoads` says, and no jungle trail ran (JUNGLE-TRAILS)
     roadside,   // JUNGLE-ROADSIDE: the jungle's roadside pairs (jungleLayout's), beside the flats - [] where none stands
     graht,   // GRAHT1: Valenwood's graht-oaks (jungleLayout's), beside the flats - empty where none stands
@@ -291,7 +291,9 @@ export function generatePixelTerrain({ woods, px, py, stride = 1, tilemap, locat
  * every build and restride, 0.3 ms for a pixel with no water at all and a millisecond or two for a coast's; here it rides
  * the worker with the grid it carves, the build's, the promotion's and the restride's alike.
  * @param {{ woods: object, px: number, py: number, stride?: number, samples: Float32Array, landform?: boolean, roads?: ?object, sites?: ?Uint8Array, beyond?: ?Map<number, number>, climates?: ?Uint8Array, landforms?: ?object, bed?: ?Uint8Array }} job
- * @returns {{ positions: Float32Array, normals: Float32Array, bed: ?{depths: Float32Array, sheetDepths: Float32Array, positions: Float32Array, normals: Float32Array} }}
+ * The answer's `indices` are the grid's triangles, each quad cut as the samples decide (terrainQuadCut.js): built here, on
+ * the worker with the grid, because a near pixel's cost a millisecond.
+ * @returns {{ positions: Float32Array, normals: Float32Array, indices: Uint32Array, bed: ?{depths: Float32Array, sheetDepths: Float32Array, positions: Float32Array, normals: Float32Array} }}
  */
 export function restrideGrid({ woods, px, py, stride = 1, samples, landform = false, roads = null, sites = null, beyond = null, climates = null, landforms = null, bed = null }) {   // AUDIT WATER-NEXT P1: `bed` the TileMap to carve by
   const lf = landforms ?? (landform ? createLandforms({ woods, roads, sites, beyond, climates }) : null);   // BAY-LEFT-GROUND: and the sites past the Bay
@@ -300,7 +302,8 @@ export function restrideGrid({ woods, px, py, stride = 1, samples, landform = fa
   // AUDIT WATER-NEXT F2: a near grid's bed reads its neighbours' tiles across the seams (the ghost is their own kernel),
   // where its water comes near an edge
   const halo = bed && stride === 1 && bedNearEdge(bed) ? bedHalo(ghost, px, py) : null;
-  return { positions: grid.positions, normals: grid.normals, bed: bed ? gridBed(grid, bed, stride, halo) : null };
+  const indices = buildTerrainIndices(stride, samples);
+  return { positions: grid.positions, normals: grid.normals, indices, bed: bed ? gridBed(grid, bed, stride, halo) : null };
 }
 
 /** AUDIT WATER-NEXT P1: a grid's bed as the kernel answers it - the depths, the sheet's depths and the carved ground, the

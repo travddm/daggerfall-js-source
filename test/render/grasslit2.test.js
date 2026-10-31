@@ -248,10 +248,9 @@ test('GRASS-LIT2: the draw hands the shader the frame\'s lanterns - the list the
 });
 
 /** the drawn mesh's normal at a point: the triangle that holds it, off the real index buffer, its three vertex normals
- *  interpolated as the rasteriser does, normalised as TERRAIN_FS does */
-function meshNormalAt(normals, lx, lz) {
+ *  interpolated as the rasteriser does, normalised as TERRAIN_FS does; the triangles the pixel's `samples` cut */
+function meshNormalAt(normals, lx, lz, samples, idx = buildTerrainIndices(1, samples)) {
   const g = HEIGHTMAP_DIMENSION, q = g - 1, cell = TERRAIN_SIZE / q;
-  const idx = buildTerrainIndices(1);
   const P = (i) => [(i % g) * cell, Math.floor(i / g) * cell];
   const cx = Math.max(0, Math.min(q - 1, Math.floor(lx / cell))), cz = Math.max(0, Math.min(q - 1, Math.floor(lz / cell)));
   const base = (cz * q + cx) * 6;
@@ -280,25 +279,26 @@ test('GRASS-LIT2: the ground\'s normal under a blade IS the drawn mesh\'s - the 
   let s = 0x2f6b1d3 >>> 0;
   const rnd = () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
   let worst = 0;
+  const idx = buildTerrainIndices(1, data);
   for (let k = 0; k < 3000; k++) {
     const lx = rnd() * (TERRAIN_SIZE - 0.01), lz = rnd() * (TERRAIN_SIZE - 0.01);
-    const m = meshNormalAt(normals, lx, lz), got = surfaceNormalAt(normals, lx, lz);
+    const m = meshNormalAt(normals, lx, lz, data, idx), got = surfaceNormalAt(normals, data, lx, lz);
     worst = Math.max(worst, ...m.map((v, i) => Math.abs(v - got[i])));
   }
   assert.ok(worst < 1e-6, `the law is the mesh to ${worst}`);
   // at a vertex, the vertex's own normal; on the pixel's edge, the ghost row's (it is in the grid's normals)
   for (const [xi, zi] of [[0, 0], [5, 7], [g - 1, g - 1], [0, 64]]) {
-    const at = surfaceNormalAt(normals, xi * TERRAIN_SIZE / (g - 1), zi * TERRAIN_SIZE / (g - 1));
+    const at = surfaceNormalAt(normals, data, xi * TERRAIN_SIZE / (g - 1), zi * TERRAIN_SIZE / (g - 1));
     assert.ok(close(at, [0, 1, 2].map((c) => normals[(zi * g + xi) * 3 + c]), 1e-6), `vertex ${xi}, ${zi}`);
   }
   // a plane is its own normal everywhere
   for (let x = 0; x < g; x++) for (let z = 0; z < g; z++) data[x * g + z] = 0.4 + 0.002 * x - 0.001 * z;
   const plane = buildTerrainGrid(data, 1, (x, z) => 0.4 + 0.002 * x - 0.001 * z).normals;
-  const want = surfaceNormalAt(plane, 400, 400);
-  for (const [lx, lz] of [[3.3, 700.1], [511.7, 12.9], [818, 818]]) assert.ok(close(surfaceNormalAt(plane, lx, lz), want, 1e-5), 'to the float32 samples\' grain');
+  const want = surfaceNormalAt(plane, data, 400, 400);
+  for (const [lx, lz] of [[3.3, 700.1], [511.7, 12.9], [818, 818]]) assert.ok(close(surfaceNormalAt(plane, data, lx, lz), want, 1e-5), 'to the float32 samples\' grain');
   // the out array is written and handed back - the host's one scratch
   const out = [9, 9, 9];
-  assert.equal(surfaceNormalAt(plane, 1, 1, out), out);
+  assert.equal(surfaceNormalAt(plane, data, 1, 1, out), out);
 });
 
 test('GRASS-LIT2: the placer asks the slope of every blade that stands, sliced or whole the same bytes, and writeSlot packs it into the height lane', () => {
@@ -353,7 +353,7 @@ test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps
   const w = hostText('src/scenes/world.js');
   assert.ok(w.includes('groundNormals: labGrass && stride === 1 ? normals : null,'), 'a near pixel keeps its grid\'s normals - AUDIT B1: only where there is grass');
   assert.ok(w.includes('p.groundNormals = labGrass && stride === 1 ? grid.normals : null;'), 'and a promotion or a demotion moves them with the surface');
-  assert.ok(w.includes('return surfaceNormalAt(p.groundNormals, x - t[0], z - t[2], grassNormalScratch);'));
+  assert.ok(w.includes('return surfaceNormalAt(p.groundNormals, p.samples, x - t[0], z - t[2], grassNormalScratch);'));
   // the mod's tile set, asked before the three are learned so they land in one step
   // (AUDIT HOST-SPLIT 2, the second read: it ended at the build's createTerrainSurface, which now stands in the module the
   // join appends - so the slice ran to the end of world.js and any line below passed. It ends at the next door, in world.js)
@@ -632,8 +632,8 @@ test('AUDIT GRASS-LIT2 C7: a root a hair off the pixel\'s low edge reads the edg
   for (let x = 0; x < g; x++) for (let z = 0; z < g; z++) data[x * g + z] = 0.5 + 0.03 * Math.sin(x * 0.2) * Math.cos(z * 0.15);
   const { normals } = buildTerrainGrid(data, 1, (x, z) => 0.5 + 0.03 * Math.sin(x * 0.2) * Math.cos(z * 0.15));
   for (const [lx, lz] of [[-0.01, 3], [3, -0.02], [-0.03, -0.01]]) {
-    const n = surfaceNormalAt(normals, lx, lz);
-    assert.ok(n.every(Number.isFinite) && close(n, surfaceNormalAt(normals, Math.max(lx, 0), Math.max(lz, 0)), 1e-3), `${lx}, ${lz}: ${n}`);
+    const n = surfaceNormalAt(normals, data, lx, lz);
+    assert.ok(n.every(Number.isFinite) && close(n, surfaceNormalAt(normals, data, Math.max(lx, 0), Math.max(lz, 0)), 1e-3), `${lx}, ${lz}: ${n}`);
   }
 });
 
@@ -652,7 +652,8 @@ test('AUDIT GRASS-LIT2 C8: the host\'s slope asks the drawn surface only where t
   assert.equal(run(null), null, 'off the built pixels');
   assert.equal(run({ p: { groundNormals: null }, t: [0, 0, 0] }), null, 'a pixel drawn at a stride keeps no normals: level');
   const flat = new Float32Array(HEIGHTMAP_DIMENSION * HEIGHTMAP_DIMENSION * 3).map((_, i) => (i % 3 === 1 ? 1 : 0));
-  assert.equal(run({ p: { groundNormals: flat }, t: [0, 0, 0] }), scratch, 'and one that keeps them is read into the one scratch');
+  const level = new Float32Array(HEIGHTMAP_DIMENSION * HEIGHTMAP_DIMENSION);
+  assert.equal(run({ p: { groundNormals: flat, samples: level }, t: [0, 0, 0] }), scratch, 'and one that keeps them is read into the one scratch');
 });
 
 test('AUDIT GRASS-LIT2 C9: the shot hooks run - the hillside hook keeps to a slope steep enough, the wood hook to the most forest on grass', () => {
@@ -664,7 +665,7 @@ test('AUDIT GRASS-LIT2 C9: the shot hooks run - the hillside hook keeps to a slo
   const pixel = (px, py, normals, holes = []) => {
     const tilemapBytes = new Uint8Array(128 * 128).fill(2 << 2);   // record 2: grass
     for (const [tx, tz] of holes) tilemapBytes[tz * 128 + tx] = 5 << 2;
-    return { px, py, groundArchive: 302, tilemapBytes, groundNormals: normals };
+    return { px, py, groundArchive: 302, tilemapBytes, groundNormals: normals, samples: new Float32Array(g * g) };
   };
   const flatP = pixel(3, 2, normalsOf([0, 1, 0])), hillP = pixel(4, 2, normalsOf(lean));
   const built = new Map([['3,2', flatP], ['4,2', hillP]]);

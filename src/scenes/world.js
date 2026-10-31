@@ -70,8 +70,8 @@ import { settlementsOf, loadModRoads, retryModRoads, basicRoadsPathsPoint, WATER
 import { modSetting, modSettingsOf, modSettingsGeneration, MOD_SETTINGS, latchModLoaded } from '../systems/modSettings.js';   // ROADS 24; HCC: the mod's eight switches; CSA-D: a mod's title for the load's failure line; AUDIT PRE-MERGE 0928 S4: the next-load mods latched at mount
 import { hasPortFor, hasPort, setSeatHarbours, PORT_LOCATION_IDS } from '../systems/travel/travelPorts.js';   // AUDIT-RR2 G22: Travel Options' port list for RR's ship gate; SEAT2b part two: a members' Harbour among them (hasPortFor)
 import { WoodsFile, MAP_WIDTH, MAP_HEIGHT } from '../formats/woodsFile.js';
-import { buildTerrainIndices, isOutdoorWaterTile, TERRAIN_TILE_DIM, surfaceHeightAt, surfaceNormalAt, terrainSampleHeightAt, walkGroundAt } from '../world/terrain/terrainSurface.js';   // GRASS-LIT2: the ground's normal under a blade; SNOWFALL1: and a pixel's that keeps none; FLORA-GROUND: the ground's one law
-import { waterUniforms, buildWaterIndices, waterSwitchOn } from '../render/waterSurface.js';   // WATER1: the enhanced water surface over the pixel's own grid; WATER-AUDIT: its own index set
+import { isOutdoorWaterTile, TERRAIN_TILE_DIM, surfaceHeightAt, surfaceNormalAt, terrainSampleHeightAt, walkGroundAt } from '../world/terrain/terrainSurface.js';   // GRASS-LIT2: the ground's normal under a blade; SNOWFALL1: and a pixel's that keeps none; FLORA-GROUND: the ground's one law
+import { waterUniforms, buildPixelWaterIndices, waterSwitchOn } from '../render/waterSurface.js';   // WATER1: the enhanced water surface over the pixel's own grid; WATER-AUDIT: its own index set
 import { bedFields, sheetDepthsOf } from '../world/water/waterBed.js';   // WATER-NEXT 2: the bed under the water, carved for the eye alone (AUDIT WATER-NEXT H1: the cap's re-carve asks its depths)
 import { createRipples, createRippleStir, RIPPLE_SPAN, RIPPLE_CELLS, BOAT_STIR, BOAT_WAKE_SPEED } from '../world/water/waterRipples.js';   // WATER-NEXT 4: the rings and wakes
 import { waterCorners, WATER_DRAW_MASK_TABLE } from '../world/water/waterCorners.js';   // GRASS-WET1: the one table that says which of a tile's corners stand in water - the DRAW's, because a blade in a puddle is a picture, not a physics
@@ -4971,8 +4971,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const grid = { positions: p._bed.sheet, normals: p._bed.normals };
     const bed = fields ? gridBed(grid, bedBytesOf(p), stride, halo) : null;
     renderer.destroyMesh(p.terrain);
-    p.terrain = renderer.createTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
+    p.terrain = renderer.createTerrainSurface(bed?.positions ?? grid.positions, bed?.normals ?? grid.normals, p.terrainIndices);
     p._bed = { sheet: grid.positions, normals: grid.normals, depths: bed?.depths ?? null, sheetDepths: bed?.sheetDepths ?? null, halo };   // the grid kept: a cap lifted carves it back
     seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: its plants on the ground as carved now (scenes/floraSeat.js)
   }
@@ -4988,7 +4987,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   function dwWaterSurface(p) {
     if (!waterOn || !p.terrain) return;
     if (p.water) { renderer.destroyWaterSurface(p.water); p.water = null; }
-    const idx = buildWaterIndices(p._dwBytes ?? p.tilemapBytes, p._stride ?? 1);
+    const idx = buildPixelWaterIndices(p._dwBytes ?? p.tilemapBytes, p._stride ?? 1, p.samples);
     p.water = idx ? renderer.createWaterSheet(idx, waterSheetOf(p._bed, p.terrain)) : null;   // WATER-NEXT 2: the bed the build carved
   }
   /** WATER-NEXT 2: a water sheet's source - the bed's grid and depths, or (no vertex under water) the terrain's own
@@ -5000,7 +4999,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // (render/renderer.js terrainClipFs), which draws the pixel's ground while the cap's TileMap stands on it (the drain below).
   function dwClipTerrain(p) {
     if (p.dwTerrain) { renderer.destroyWaterSurface(p.dwTerrain); p.dwTerrain._dead = true; p.dwTerrain = null; }
-    const idx = p._dwBytes ? clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges) : null;   // COAST-LOOK: the coast's ring of clipped tiles the program's to cut
+    const idx = p._dwBytes ? clippedTerrainIndices(p._dwBytes, p._stride ?? 1, renderer.coastEdges, p.samples) : null;   // COAST-LOOK: the coast's ring of clipped tiles the program's to cut
     if (idx) { p.dwTerrain = renderer.createWaterSurface(p.terrain, idx); p.dwTerrain.bounds = p.terrain.bounds; }
   }
   /** FAR-CLIP1: the ground queue's order - the cap's pixels after the rest (a stable sort: near first within each),
@@ -5297,16 +5296,14 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // three discrete events, no polling. Everything else in the world
   // can move without touching a static door.
   let doorGeneration = 0;
-  const TERRAIN_INDICES = buildTerrainIndices();
-  // EV4: the far ring's strided twin - 33x33 plus its crack skirt, a
-  // 16x triangle cut per pixel. Enhanced only: the 1:1 lane keeps full
+  // EV4: the far ring's strided grid - 33x33 plus its crack skirt, a
+  // 16x triangle cut per pixel (each pixel's indices its own: restrideGrid). Enhanced only: the 1:1 lane keeps full
   // resolution at every distance, exactly as DFU draws it. The ring
   // test reads the LIVE player pixel, so a pixel's class follows the
   // walk (restrideTerrain below swaps a built pixel's surface).
   const LOD_STRIDE = 4;
   const LOD_NEAR = 3;   // chebyshev distance where the far ring starts
   const lodOn = isEnhanced();
-  const TERRAIN_INDICES_LOD = lodOn ? buildTerrainIndices(LOD_STRIDE) : null;   // AUDIT EV: the 1:1 lane never pays for the strided twin
   const lodStride = lodOn ? LOD_STRIDE : 1;   // FLORA-GROUND, THE RINGS: the far ring's class, its plants' lifts made ahead in a near pixel's build
   const strideFor = (px, py) => ((lodOn
     && Math.max(Math.abs(px - state.current.x), Math.abs(py - state.current.y)) >= LOD_NEAR)
@@ -5459,7 +5456,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     frames: framesBegun,   // PERF-EXT24 (the review): a slice a frame ran inside held a wait, and is not lent
   });
   const { buildPixelNow } = createPixelBuild({   // HOST-SPLIT: src/scenes/pixelBuild.js
-    MILL_SAIL_PAD, TERRAIN_INDICES, TERRAIN_INDICES_LOD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
+    MILL_SAIL_PAD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
     _livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway, _lptWindfall, _reskin, adoptWodCarry, archAabb, blocks, boardSplitOf,
     breather, buildingDoors, built, chapterSheet, climates3x3, collider, cpuModels, deepWaters, destroyPixel,
     dfMeshSize, dwDecor, ecotones, ensurePersonTex, forests, gateClearSweep, getTexture, getWindmillMeshes,
@@ -5653,9 +5650,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     renderer.destroyMesh(p.terrain);
     const bed = waterOn ? hostBed(grid, grid.bed) : null;   // WATER-NEXT 2: the bed at the new ring class - AUDIT WATER-NEXT P1/H1: the kernel's, by the TileMap the water draws from
     p._bed = bed;
-    p.terrain = renderer.createTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
-    const waterIndices = waterOn ? buildWaterIndices(p._dwBytes ?? p.tilemapBytes, stride) : null;   // DW-F: the cap's TileMap, where it patched one
+    p.terrain = renderer.createTerrainSurface(grid.bed?.positions ?? grid.positions, grid.bed?.normals ?? grid.normals, grid.indices);
+    p.terrainIndices = grid.indices;
+    const waterIndices = waterOn ? buildPixelWaterIndices(p._dwBytes ?? p.tilemapBytes, stride, p.samples) : null;   // DW-F: the cap's TileMap, where it patched one
     p.water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, p.terrain)) : null;
     p._stride = stride;
     seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: its plants drawn on the ground it draws at the new ring class (scenes/floraSeat.js)
@@ -17645,7 +17642,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           for (let dz = -r; dz <= r * 3 && all; dz++) for (let dx = -r; dx <= r && all; dx++) all = grass.has(p.tilemapBytes[(tz + dz) * TERRAIN_TILE_DIM + tx + dx] >> 2);
           if (!all) continue;
           const x = t[0] + (tx + 0.5) * 6.4, z = t[2] + (tz + 0.5) * 6.4;
-          const n = steep > 0 && p.groundNormals ? surfaceNormalAt(p.groundNormals, (tx + 0.5) * 6.4, (tz + r * 2 + 0.5) * 6.4, [0, 1, 0]) : null;   // AUDIT B5: the far half's middle
+          const n = steep > 0 && p.groundNormals ? surfaceNormalAt(p.groundNormals, p.samples, (tx + 0.5) * 6.4, (tz + r * 2 + 0.5) * 6.4, [0, 1, 0]) : null;   // AUDIT B5: the far half's middle
           if (steep > 0 && !(n && Math.hypot(n[0], n[2]) >= steep)) continue;
           if (skip-- > 0) continue;
           return { feet: [x, heightAt(x, z), z], yaw: n ? Math.atan2(n[0], n[2]) : 0, pixel: [p.px, p.py], archive: p.groundArchive, normal: n };   // AUDIT B5: a hillside's yaw looks down it
@@ -33940,7 +33937,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
         const hit = pieceAt(x, z);   // PERF8
         if (!hit?.p.groundNormals) return null;
         const { p, t } = hit;
-        return surfaceNormalAt(p.groundNormals, x - t[0], z - t[2], grassNormalScratch);
+        return surfaceNormalAt(p.groundNormals, p.samples, x - t[0], z - t[2], grassNormalScratch);
       };
       if (!labGrassField) labGrassField = jungleFloor ? jungleFloor.pair(createGrassField(labGrass, { keep, ground, slope, density: grassDensity })) : createGrassField(labGrass, { keep, ground, slope, density: grassDensity });   // PERF1: the pref's fraction of the lab's field; BANTHA2: the floor's paired with it
       labGrassField.update(ex, ez, keep, ground, slope);

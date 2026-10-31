@@ -21,6 +21,7 @@ import {
   HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE,
 } from './terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from './terrainTiles.js';
+import { quadCutsSeNw, quadValueAt, writeQuadTriangles } from './terrainQuadCut.js';
 
 /** Verbatim UpdateTileMapDataJob byte conversion, for ONE tile - the
  *  one home, because FD1 needed the same conversion per-tile off the
@@ -143,10 +144,7 @@ export function surfaceHeightAt(heightmapData, lx, lz, stride = 1) {
   const ax = lx / quad - qx, az = lz / quad - qz;
   const x0 = qx * stride, z0 = qz * stride, x1 = x0 + stride, z1 = z0 + stride;
   const h00 = at(x0, z0), h10 = at(x1, z0), h01 = at(x0, z1), h11 = at(x1, z1);
-  // the diagonal runs (x,z)-(x+1,z+1): az >= ax is the i0,i2,i3 half
-  const h = az >= ax
-    ? h00 + az * (h01 - h00) + ax * (h11 - h01)
-    : h00 + ax * (h10 - h00) + az * (h11 - h10);
+  const h = quadValueAt(h00, h10, h01, h11, ax, az, quadCutsSeNw(heightmapData, qx, qz, stride));
   return h * worldHeight;
 }
 
@@ -193,7 +191,7 @@ export function drawnGroundAt(heightmapData, lx, lz, stride = 1, carve = null) {
   const h = surfaceHeightAt(heightmapData, lx, lz, stride);
   if (!carve) return h;
   const g = (HEIGHTMAP_DIMENSION - 1) / stride + 1;
-  return h - gridValueAt(carve, g, g, (TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)) * stride, lx, lz);
+  return h - gridValueAt(carve, g, g, (TERRAIN_SIZE / (HEIGHTMAP_DIMENSION - 1)) * stride, lx, lz, heightmapData, stride);
 }
 
 /**
@@ -204,12 +202,13 @@ export function drawnGroundAt(heightmapData, lx, lz, stride = 1, carve = null) {
  * surfaceHeightAt's diagonal, then normalised as TERRAIN_FS normalises
  * vNormal. Written into `out` - the placer asks it once a blade.
  * @param {Float32Array} normals the pixel's stride-1 grid normals, vertex (xi, zi) at (zi * 129 + xi) * 3
+ * @param {ArrayLike<number>} heightmapData the pixel's samples, which decide each quad's cut (terrainQuadCut.js)
  * @param {number} lx pixel-local x, 0..TERRAIN_SIZE
  * @param {number} lz pixel-local z, 0..TERRAIN_SIZE
  * @param {number[]|Float32Array} [out]
  * @returns {number[]|Float32Array} the unit normal [x, y, z]
  */
-export function surfaceNormalAt(normals, lx, lz, out = [0, 0, 0]) {
+export function surfaceNormalAt(normals, heightmapData, lx, lz, out = [0, 0, 0]) {
   const g = HEIGHTMAP_DIMENSION;
   const quad = TERRAIN_SIZE / (g - 1);
   const last = g - 2;
@@ -217,11 +216,11 @@ export function surfaceNormalAt(normals, lx, lz, out = [0, 0, 0]) {
   const qz = Math.max(0, Math.min(last, Math.floor(lz / quad)));
   const ax = lx / quad - qx, az = lz / quad - qz;
   const i00 = (qz * g + qx) * 3, i10 = i00 + 3, i01 = i00 + g * 3, i11 = i01 + 3;
+  const seNw = quadCutsSeNw(heightmapData, qx, qz, 1);
   let l2 = 0;
   for (let c = 0; c < 3; c++) {
     const n00 = normals[i00 + c], n10 = normals[i10 + c], n01 = normals[i01 + c], n11 = normals[i11 + c];
-    // the diagonal runs (x,z)-(x+1,z+1): az >= ax is the i0,i2,i3 half (surfaceHeightAt's)
-    const v = az >= ax ? n00 + az * (n01 - n00) + ax * (n11 - n01) : n00 + ax * (n10 - n00) + az * (n11 - n10);
+    const v = quadValueAt(n00, n10, n01, n11, ax, az, seNw);   // on surfaceHeightAt's triangle
     out[c] = v; l2 += v * v;
   }
   const l = Math.sqrt(l2) || 1;
@@ -258,10 +257,11 @@ export function surfaceNormalFromSamples(heightmapData, lx, lz, stride = 1, out 
     const l = Math.hypot(nx, ny, nz);
     vn[c * 3] = nx / l; vn[c * 3 + 1] = ny / l; vn[c * 3 + 2] = nz / l;
   }
+  const seNw = quadCutsSeNw(heightmapData, qx, qz, stride);
   let l2 = 0;
   for (let c = 0; c < 3; c++) {
     const sw = vn[c], se = vn[3 + c], nw = vn[6 + c], ne = vn[9 + c];   // the quad's corners, surfaceHeightAt's cut
-    const v = az >= ax ? sw + az * (nw - sw) + ax * (ne - nw) : sw + ax * (se - sw) + az * (ne - se);
+    const v = quadValueAt(sw, se, nw, ne, ax, az, seNw);
     out[c] = v; l2 += v * v;
   }
   const l = Math.sqrt(l2) || 1;
@@ -274,15 +274,20 @@ export function surfaceNormalFromSamples(heightmapData, lx, lz, stride = 1, out 
  * order (x fastest, `gx` vertices a row, `cell` world units apart: buildTerrainIndices' and flatGrid's) read on the
  * triangle under (lx, lz), cut on surfaceHeightAt's diagonal. WATER-NEXT's bed depths through it are what the carve
  * took off the drawn ground there - for what is laid ON that ground (the snow).
+ * A streamed pixel's grid is cut as its samples decide (terrainQuadCut.js): pass them and its stride. A grid with no
+ * samples (the town's flatGrid) keeps the south-west to north-east cut its own indices are built on.
  * @param {ArrayLike<number>} values gx * gz, x fastest
+ * @param {?ArrayLike<number>} [samples] the pixel's heightmap samples, whose quads this grid's quads are
+ * @param {number} [stride] the pixel's ring class
  * @returns {number}
  */
-export function gridValueAt(values, gx, gz, cell, lx, lz) {
+export function gridValueAt(values, gx, gz, cell, lx, lz, samples = null, stride = 1) {
   const qx = Math.max(0, Math.min(gx - 2, Math.floor(lx / cell))), qz = Math.max(0, Math.min(gz - 2, Math.floor(lz / cell)));
   const ax = lx / cell - qx, az = lz / cell - qz;
   const i = qz * gx + qx;
   const v00 = values[i], v10 = values[i + 1], v01 = values[i + gx], v11 = values[i + gx + 1];
-  return az >= ax ? v00 + az * (v01 - v00) + ax * (v11 - v01) : v00 + ax * (v10 - v00) + az * (v11 - v10);
+  const seNw = samples !== null && quadCutsSeNw(samples, qx, qz, stride);
+  return quadValueAt(v00, v10, v01, v11, ax, az, seNw);
 }
 
 /** Unity's heightmap: kMaxHeight steps to a terrain's full height (terrainSampleHeightAt, below). */
@@ -342,6 +347,11 @@ export function terrainSampleHeightAt(heightmapData, lx, lz, stride = 1) {
   const x0 = qx * stride, z0 = qz * stride, x1 = x0 + stride, z1 = z0 + stride;
   const z00 = at(x0, z0), z11 = at(x1, z1);
   let h;
+  if (quadCutsSeNw(heightmapData, qx, qz, stride)) {
+    // The port's own cut (terrainQuadCut.js), which Unity's fixed diagonal below never takes. Flat sea keeps Unity's
+    // cut and its float steps exactly: a quad on one plane is never cut this way.
+    return f(quadValueAt(z00, at(x1, z0), at(x0, z1), z11, u, v, true) * UNITY_HEIGHT_PER_STEP);
+  }
   if (u > v) {
     const z10 = at(x1, z0);   // Unity's z01: one quad along x
     h = f(f(z00 + f((z10 - z00) * u)) + f((z11 - z10) * v));
@@ -486,11 +496,16 @@ export function buildTerrainGrid(heightmapData, stride = 1, ghost = null) {
   return { positions, normals };
 }
 
-/** Shared triangle indices for the 129x129 grid (row-major x-fastest).
+/** Triangle indices for the 129x129 grid (row-major x-fastest).
  *  EV4: `stride` > 1 indexes the matching strided grid and stitches
  *  its skirt - both windings on the skirt quads, so the curtain shows
- *  whichever way the crack is looked through. */
-export function buildTerrainIndices(stride = 1) {
+ *  whichever way the crack is looked through.
+ *  Each quad is cut as terrainQuadCut.js decides from the pixel's own
+ *  samples, so a pixel's indices are its own. Without samples every quad
+ *  takes the south-west to north-east cut: flat ground's indices.
+ *  @param {number} [stride]
+ *  @param {?ArrayLike<number>} [heightmapData] the pixel's samples */
+export function buildTerrainIndices(stride = 1, heightmapData = null) {
   const hDim = HEIGHTMAP_DIMENSION;
   const g = (hDim - 1) / stride + 1;
   const q = g - 1;
@@ -499,14 +514,8 @@ export function buildTerrainIndices(stride = 1) {
   let o = 0;
   for (let z = 0; z < q; z++) {
     for (let x = 0; x < q; x++) {
-      const i0 = z * g + x;
-      const i1 = i0 + 1;
-      const i2 = i0 + g;
-      const i3 = i2 + 1;
-      // Diagonal from (x, z) to (x+1, z+1), matching the retired quad
-      // tessellation exactly (same triangles, same winding).
-      indices[o++] = i0; indices[o++] = i2; indices[o++] = i3;
-      indices[o++] = i0; indices[o++] = i3; indices[o++] = i1;
+      const seNw = heightmapData !== null && quadCutsSeNw(heightmapData, x, z, stride);
+      o = writeQuadTriangles(indices, o, z * g + x, g, seNw);
     }
   }
   if (skirtQuads) {

@@ -146,7 +146,7 @@ export function frameClosures(world, state, counter) {
   const slope = (x, z) => {
     const hit = pieceAt(x, z);
     if (!hit) return null;
-    return surfaceNormalAt(hit.p.groundNormals, x - hit.t[0], z - hit.t[2], scratch);
+    return surfaceNormalAt(hit.p.groundNormals, hit.p.samples, x - hit.t[0], z - hit.t[2], scratch);
   };
   return { keep, ground, slope };
 }

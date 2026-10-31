@@ -42,7 +42,7 @@ function saddleField() {
 /** THE DRAWN GROUND, read off the mesh itself: the near grid's vertices (buildTerrainGrid) and its triangles
  *  (buildTerrainIndices), a vertical line met with the triangle under it - no law of the code under test. */
 function drawnOracle(hm) {
-  const { positions } = buildTerrainGrid(hm, 1), idx = buildTerrainIndices(1);
+  const { positions } = buildTerrainGrid(hm, 1), idx = buildTerrainIndices(1, hm);
   return (x, z) => {
     const qx = Math.min(127, Math.floor(x / CELL)), qz = Math.min(127, Math.floor(z / CELL)), o = (qz * 128 + qx) * 6;
     for (let t = 0; t < 2; t++) {

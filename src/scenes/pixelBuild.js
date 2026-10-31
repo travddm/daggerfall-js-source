@@ -15,7 +15,7 @@ import { boxNearGate, gateSiteTest, pointNearGate, WOD_FLAT_GATE_CLEAR_M } from 
 import { boxNearPath, pointNearPath, UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR, wodPiecewise, wodSiteClear, wodSiteFootprint } from '../world/road/roadClearance.js';
 import { buildingKeysOfType, castleEntranceOf, siegeFieldOf } from '../systems/siegeField.js';
 import { buildingSummaries } from '../world/buildingSummaries.js';
-import { buildWaterIndices, waterSwitchOn } from '../render/waterSurface.js';
+import { buildPixelWaterIndices, waterSwitchOn } from '../render/waterSurface.js';
 import { BULLETIN_BOARD_MODEL_ID, CITY_GATE_CLOSED_MODEL_ID, CITY_GATE_OPEN_MODEL_ID, isBulletinBoard, isCityGate } from '../world/rmbLayout.js';
 import { carveLefay, isLefayTown, lefayExitOf, lefaySpotOf } from '../world/lefayMonument.js';
 import { carveYards } from '../world/merchantYards/merchantYardSites.js';
@@ -123,7 +123,7 @@ import { sightMarksOf } from '../world/signSolid.js';   // FIELD BUGS 2026-10-25
 /** @param {any} host */
 export function createPixelBuild(host) {
   const {
-    MILL_SAIL_PAD, TERRAIN_INDICES, TERRAIN_INDICES_LOD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
+    MILL_SAIL_PAD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
     _livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway, _lptWindfall, _reskin, adoptWodCarry, archAabb, blocks, boardSplitOf,
     breather, buildingDoors, built, chapterSheet, climates3x3, collider, cpuModels, deepWaters, destroyPixel,
     dfMeshSize, dwDecor, ecotones, ensurePersonTex, forests, gateClearSweep, getTexture, getWindmillMeshes,
@@ -323,7 +323,7 @@ export function createPixelBuild(host) {
     // ghost rows keep edge normals central differences either way.
     const stride = strideFor(px, py);
     const arenaRoadsAt = terrainGen.arenaRoadsEpoch;   // TESA4: the Arena roads' layer this job is built with
-    const { samples, tilemap, positions, normals, bed: carved, tilemapBytes, avg, nature, withRoads, paths, landProps, wodAverages, graht, beach, roadside, townGround, arenaRoads, bridges } = await terrainGen.generate({
+    const { samples, tilemap, positions, normals, indices: terrainIndices, bed: carved, tilemapBytes, avg, nature, withRoads, paths, landProps, wodAverages, graht, beach, roadside, townGround, arenaRoads, bridges } = await terrainGen.generate({
       px, py, stride, tilemap: seedTilemap, locationRect, hasLocation: !!groundLocation, climateType: climateBase,
       flattenAt: dfLocation?.capital?.flattenAt ?? null,   // TESA11: a capital over several pixels flattened to its centre's ground
       bed: waterOn,   // AUDIT WATER-NEXT P1: the bed under the water, carved on the worker with the grid
@@ -403,10 +403,9 @@ export function createPixelBuild(host) {
     // (heightAt, the samples) never moves - and the water's own sheet, the grid as it stood with the bed's depth.
     // AUDIT WATER-NEXT P1: carved by the kernel on the worker (terrainGen.js restrideGrid), not on this thread
     const bed = hostBed({ positions, normals }, carved);
-    const terrain = renderer.createTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
+    const terrain = renderer.createTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals, terrainIndices);
     // WATER1 / WATER-AUDIT (M4): the water's own quads - null for a pixel without water, which never enters the pass
-    const waterIndices = waterOn ? buildWaterIndices(tilemapBytes, stride) : null;
+    const waterIndices = waterOn ? buildPixelWaterIndices(tilemapBytes, stride, samples) : null;
     const water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, terrain)) : null;
     made.terrain = terrain; made.water = water;   // BUILD-FAIL1
     // EV3: the pixel's presentation bounds, pixel-local - seeded by the
@@ -1493,6 +1492,7 @@ export function createPixelBuild(host) {
       chapterHalls: pixelChapterHalls,   // CHAP7b (above)
       beach: beach ?? null,   // AUDIT LANDFORMS II H2: DFU's own blend in a location's pixel with the row on - where a gathering node asks the beach line
       px, py, terrain, water, tilemapTex, tilemap, groundArchive, models, windmills, batches, flatAnims, texRemap, lights: pixelLights, hearths: pixelHearths, animals: pixelAnimals, springs: pixelSprings, skyBase: climate.skyBase, samples, natureCount: nature.length,
+      terrainIndices,   // its ground's triangles, cut by its samples (terrainQuadCut.js): a re-carve draws the same ones
       tilemapBytes, season: pixelSeason,   // GR1: the placer reads the tiles and the season (PRECIP4: the pixel's)
       _snow: snowSeen,   // PRECIP4: the snow it was built under, every season it took (the sweep's - AUDIT PRECIP HOST-6)
       // AUDIT PRECIP HOST-7: what a re-skin reads (reskinPixelNow), on the snow lane alone - its flats as logged, its blocks'

@@ -375,12 +375,14 @@ test('JUNGLE-ROADSIDE THE DRAWN GROUND\'S LOWEST AND HIGHEST, exactly: lowestDra
     const hi = highestDrawn(hm, [at(-1, -1), at(1, -1), at(1, 1), at(-1, 1)]);
     assert.ok(hi >= fine - 1e-9 && hi <= fine + 0.01, `the highest over (${x}, ${z}): ${hi} against the walk's ${fine}`);
   }
-  // a saddle: two corners of a cell raised across the diagonal its ground is cut on - the drawn ground at the cell's
-  // middle is the diagonal's, 2 m under the bilinear's
+  // a saddle: two corners of a cell raised - the cell is cut along them (terrainQuadCut.js: a ridge's crest joined, never
+  // a pit between two peaks), so the drawn ground at its middle is the raised diagonal's, 2 m over the bilinear's
   const saddle = new Float32Array(H * H).fill(100 / yScale);
   saddle[10 * H + 11] += 4 / yScale; saddle[11 * H + 10] += 4 / yScale;
   const mx = 10.5 * CELL, mz = 10.5 * CELL;
-  assert.ok(near(groundAt(saddle, mx, mz), 102, 1e-3) && near(lowestDrawn(saddle, mx, mz, 0.5), 100, 1e-3), 'the drawn ground\'s, not the bilinear\'s');
+  let saddleFine = Infinity;
+  for (let t = 0; t < 2 * Math.PI; t += 0.0002) saddleFine = Math.min(saddleFine, surfaceHeightAt(saddle, mx + 0.5 * Math.cos(t), mz + 0.5 * Math.sin(t)));
+  assert.ok(near(groundAt(saddle, mx, mz), 102, 1e-3) && near(surfaceHeightAt(saddle, mx, mz), 104, 1e-3) && near(lowestDrawn(saddle, mx, mz, 0.5), saddleFine, 1e-6), 'the drawn ground\'s, not the bilinear\'s');
   assert.match(text('src/world/jungle/jungleRoadside.js'), /const y = Math\.min\(\.\.\.trees\.map\(\(t\) => lowestDrawn\(heightmapData, t\.x, t\.z, t\.foot\)\)\) - R\.sink;/);
 });
 

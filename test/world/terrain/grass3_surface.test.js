@@ -1,9 +1,9 @@
 // GRASS3 (2026-09-18): A BLADE STANDS ON THE SURFACE THAT IS DRAWN.
 //
-// The terrain is TRIANGLES. `buildTerrainIndices` cuts every quad on the
-// diagonal (x, z)-(x+1, z+1), so inside a quad the drawn ground is two
-// PLANES - and a bilinear patch over the same four samples is a
-// different surface, agreeing only on that diagonal and at the corners.
+// The terrain is TRIANGLES. `buildTerrainIndices` cuts every quad on one
+// of its diagonals (terrainQuadCut.js decides which from the samples), so
+// inside a quad the drawn ground is two PLANES - and a bilinear patch over the same four samples is a
+// different surface, agreeing only at the corners.
 // The grass placer read bilinear, so every blade off the diagonal stood
 // slightly above or below the hill it was planted in.
 //
@@ -17,6 +17,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildTerrainGrid, buildTerrainIndices, surfaceHeightAt } from '../../../src/world/terrain/terrainSurface.js';
+import { quadCutsSeNw } from '../../../src/world/terrain/terrainQuadCut.js';
 import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE } from '../../../src/world/terrain/terrainSampler.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
@@ -36,11 +37,13 @@ function terrain(amp = 0.031, freq = 0.11) {
   return d;
 }
 
+/** The pixel's drawn mesh: its grid and its own triangles. */
+const meshOf = (data, stride) => ({ positions: buildTerrainGrid(data, stride, null).positions, idx: buildTerrainIndices(stride, data) });
+
 /** The height of the MESH at a point: the triangle that contains it,
  *  read off the real position and index buffers. */
-function meshHeightAt(data, lx, lz, stride = 1) {
-  const { positions } = buildTerrainGrid(data, stride, null);
-  const idx = buildTerrainIndices(stride);
+function meshHeightAt(data, lx, lz, stride = 1, mesh = meshOf(data, stride)) {
+  const { positions, idx } = mesh;
   const g = (hDim - 1) / stride + 1, q = g - 1, quad = CELL * stride;
   const P = (i) => [positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]];
   const cx = Math.max(0, Math.min(q - 1, Math.floor(lx / quad)));
@@ -66,10 +69,11 @@ const points = (n, seed, span) => {
 test('GRASS3: the height law IS the drawn mesh - every point, on its own triangle, at stride 1 and at the far ring’s stride 4', () => {
   for (const stride of [1, 4]) {
     const data = terrain();
-    const { positions } = buildTerrainGrid(data, stride, null);
+    const built = meshOf(data, stride);
+    const { positions } = built;
     let worst = 0, unlocated = 0;
     for (const [lx, lz] of points(4000, 0x51ed270b + stride, TERRAIN_SIZE - CELL * stride)) {
-      const mesh = meshHeightAt(data, lx, lz, stride);
+      const mesh = meshHeightAt(data, lx, lz, stride, built);
       if (mesh === null) { unlocated++; continue; }
       worst = Math.max(worst, Math.abs(mesh - surfaceHeightAt(data, lx, lz, stride)));
     }
@@ -97,7 +101,7 @@ test('GRASS3: the law is NOT bilinear - a different surface, though on real grad
           + (S(x0, z0 + 1) * (1 - ax) + S(x0 + 1, z0 + 1) * ax) * az) * WORLD_H;
   };
   // WHERE THE TWO AGREE IS THE FOUR CORNERS, and nowhere else in the
-  // quad. Along the diagonal itself the difference works out at
+  // quad. Along the quad's cut the difference works out at
   // t(1-t) x (h10 + h01 - h00 - h11) - the quad's SADDLE term - so the
   // surfaces part everywhere the ground is not a plane, and part most at
   // the quad's middle. (A first draft of this pin asserted they shared
@@ -109,8 +113,9 @@ test('GRASS3: the law is NOT bilinear - a different surface, though on real grad
     assert.ok(Math.abs(bilinear(lx, lz) - surfaceHeightAt(data, lx, lz)) < 1e-3, `corner (${i}, ${j}) is shared`);
   }
   const saddle = Math.abs(S(q + 1, q) + S(q, q + 1) - S(q, q) - S(q + 1, q + 1)) * WORLD_H;
+  const seNw = quadCutsSeNw(data, q, q);   // the cut's own diagonal: (q+1, q)-(q, q+1) or (q, q)-(q+1, q+1)
   for (const t of [0.25, 0.5, 0.75]) {
-    const lx = (q + t) * CELL, lz = (q + t) * CELL;
+    const lx = (q + (seNw ? 1 - t : t)) * CELL, lz = (q + t) * CELL;
     const got = Math.abs(bilinear(lx, lz) - surfaceHeightAt(data, lx, lz));
     assert.ok(Math.abs(got - t * (1 - t) * saddle) < 1e-3, `on the diagonal at t=${t} the gap is t(1-t) x the saddle`);
   }

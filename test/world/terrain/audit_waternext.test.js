@@ -86,7 +86,7 @@ test('AUDIT WATER-NEXT P1: the bed is the kernel\'s - carved with the grid by re
   }
   // the kernel's one grid law carries it; the answer's shape is the host's
   const k = rd('src/world/terrain/terrainGen.js');
-  assert.match(k, /const halo = bed && stride === 1 && bedNearEdge\(bed\) \? bedHalo\(ghost, px, py\) : null;\n\s*return \{ positions: grid\.positions, normals: grid\.normals, bed: bed \? gridBed\(grid, bed, stride, halo\) : null \};/);
+  assert.match(k, /const halo = bed && stride === 1 && bedNearEdge\(bed\) \? bedHalo\(ghost, px, py\) : null;\n\s*const indices = buildTerrainIndices\(stride, samples\);\n\s*return \{ positions: grid\.positions, normals: grid\.normals, indices, bed: bed \? gridBed\(grid, bed, stride, halo\) : null \};/);   // PIN MOVED (TERRAIN-CUT): and the grid's own triangles
   assert.match(k, /const grid = restrideGrid\(\{ woods, px, py, stride, samples, landforms, bed: bed \? tilemapBytes : null \}\);/, 'the build\'s grid carves by its own TileMap');
   const g = flatGrid(128, 128, 0);
   const sea = new Uint8Array(128 * 128), kb = gridBed(g, sea, 1);
@@ -96,7 +96,7 @@ test('AUDIT WATER-NEXT P1: the bed is the kernel\'s - carved with the grid by re
   assert.equal(gridBed(g, new Uint8Array(128 * 128).fill(DRY), 1), null, 'no water, no bed');
   const wk = rd('src/world/terrain/terrainGenWorker.js');
   assert.equal((wk.match(/bed\.depths\.buffer, (?:out\.)?bed\.sheetDepths\.buffer, (?:out\.)?bed\.positions\.buffer, (?:out\.)?bed\.normals\.buffer/g) || []).length, 2, 'both replies transfer the bed - none copied across the wire');
-  assert.match(rd('src/world/terrain/terrainGenClient.js'), /g\.resolve\(\{ positions: m\.positions, normals: m\.normals, bed: m\.bed \?\? null \}\);/, 'the promotion\'s answer keeps it');
+  assert.match(rd('src/world/terrain/terrainGenClient.js'), /g\.resolve\(\{ positions: m\.positions, normals: m\.normals, indices: m\.indices, bed: m\.bed \?\? null \}\);/, 'the promotion\'s answer keeps it');
   const w = hostText('src/scenes/world.js');
   assert.doesNotMatch(w, /waterBedOf\(/, 'the streaming host carves nothing on its own thread');
   assert.match(w, /bed: waterOn,   \/\/ AUDIT WATER-NEXT P1/, 'the build asks the kernel');

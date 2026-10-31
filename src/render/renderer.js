@@ -1974,13 +1974,6 @@ export class Renderer {
      *  classic skin and every interior. */
     this._cloudShadow = null;
     this._deckOwed = null;   // VC6c: the deck a frame still owed an image is kept across beginFrame's clear
-    // EV4: one shared index buffer PER INDEX SET, keyed by the array's
-    // identity - the world host shares one full-grid array across every
-    // pixel and one strided far-ring array across the LOD ring. The old
-    // single-buffer cache silently drew every later surface with the
-    // FIRST set ever uploaded, which was invisibly correct only while
-    // exactly one set existed.
-    this._terrainIndexSets = new Map(); // indices array -> { buffer, count }
 
     this.waterProgram = this._buildProgram(WATER_VS, WATER_FS);
     // WATER1: the exterior water surface - the terrain grid drawn again,
@@ -7234,28 +7227,12 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     batch.buffers = [];
   }
 
-  /** Lazily create the shared 129x129 terrain index buffer. */
-  _terrainIndices(indices) {
-    let entry = this._terrainIndexSets.get(indices);
-    if (entry) return entry;
-    const gl = this.gl;
-    // EV6: this element bind happens OUTSIDE any VAO of its own, and a
-    // drawn VAO may still be bound (drawMesh no longer unbinds) - an
-    // unguarded bind here would capture this buffer into that VAO.
-    this._bindVao(null);
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    entry = { buffer, count: indices.length };
-    this._terrainIndexSets.set(indices, entry);
-    return entry;
-  }
-
-  /** Create one pixel's terrain surface (positions + normals grid). */
+  /** Create one pixel's terrain surface (positions + normals grid). The
+   *  indices are the pixel's own (each quad cut by its samples,
+   *  terrainQuadCut.js), so the index buffer is the surface's and dies
+   *  with it in destroyMesh. */
   createTerrainSurface(positions, normals, indices) {
     const gl = this.gl;
-    const indexSet = this._terrainIndices(indices);
     const vao = gl.createVertexArray();
     this._bindVao(vao);
     const buffers = [];
@@ -7270,9 +7247,12 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     };
     buf(positions, 0);
     buf(normals, 1);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexSet.buffer);
+    const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+    buffers.push(indexBuffer);
     this._bindVao(null);
-    return { vao, buffers, indexCount: indexSet.count, bounds: boundsOf(positions) };   // EL5: the replays cull by it
+    return { vao, buffers, indexCount: indices.length, bounds: boundsOf(positions) };   // EL5: the replays cull by it
   }
 
   /** WATER-AUDIT (M4): a second surface over a terrain surface's OWN

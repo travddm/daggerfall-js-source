@@ -32,6 +32,7 @@
 import { HEIGHTMAP_DIMENSION } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';
 import { heightSample, mapDataHasWater, mapDataFullySubmerged, DW_WATER_THRESHOLD } from './deepWaterClassification.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../terrain/terrainQuadCut.js';
 import { CLIP_SENTINEL } from '../terrain/terrainSurface.js';   // FAR-CLIP1: the byte's one home, the TileMap format's module - the renderer reads it there too
 
 const f32 = Math.fround;
@@ -149,9 +150,11 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
  * chord, over the sea: "geometry just being hard squares".)
  * @param {Uint8Array} bytes - the pixel's patched TileMap (z * 128 + x)
  * @param {number} [stride]
+ * @param {boolean} [ring]
+ * @param {?ArrayLike<number>} [samples] the pixel's heightmap: a quad that stands is cut as its ground is (terrainQuadCut.js)
  * @returns {?Uint32Array} null when no quad or skirt segment is clipped
  */
-export function clippedTerrainIndices(bytes, stride = 1, ring = false) {
+export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples = null) {
   const dim = WORLD_MAP_TILE_DIM;
   const g = (HEIGHTMAP_DIMENSION - 1) / stride + 1;
   const q = g - 1;
@@ -168,8 +171,9 @@ export function clippedTerrainIndices(bytes, stride = 1, ring = false) {
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (!cut(tz * dim + tx)) { clipped = false; break; }
       }
       if (clipped) { dropped++; continue; }
-      const i0 = z * g + x, i1 = i0 + 1, i2 = i0 + g, i3 = i2 + 1;
-      out.push(i0, i2, i3, i0, i3, i1);
+      const quad = [0, 0, 0, 0, 0, 0];
+      writeQuadTriangles(quad, 0, z * g + x, g, samples !== null && quadCutsSeNw(samples, x, z, stride));
+      out.push(...quad);
     }
   }
   if (stride > 1) {

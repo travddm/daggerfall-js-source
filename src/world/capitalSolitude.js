@@ -18,6 +18,7 @@ import {
   SOLITUDE_CRAG, SOLITUDE_LANE, SOLITUDE_TERRACES,
 } from './solitudeRelief.js';   // SOLITUDE-RELIEF: its ground
 import { perlinNoise } from './perlin.js';
+import { quadCutsSeNw, quadValueAt } from './terrain/terrainQuadCut.js';
 
 const MARBLE = art(CAPITAL_ART.marble), GOLD = art(CAPITAL_ART.gold), ROOF = art(CAPITAL_ART.roof), BRIDGE = art(CAPITAL_ART.bridgeStone);
 const DARK = art(CAPITAL_ART.dark), ROCK = art(CAPITAL_ART.rock), BLUE = art(CAPITAL_ART.blueSlate), TIMBER = art(CAPITAL_ART.timber), NORD = art(CAPITAL_ART.nordStone);
@@ -271,7 +272,8 @@ export function solitudeDrawn() {
   const at = (ax, az) => {
     const fx = (ax - P.x0) / cell, fy = N - (az - P.z0) / cell, qx = Math.max(0, Math.min(N - 1, Math.floor(fx))), qy = Math.max(0, Math.min(N - 1, Math.floor(fy)));
     const u = fx - qx, v = fy - qy, h00 = H(qx, qy), h10 = H(qx + 1, qy), h01 = H(qx, qy + 1), h11 = H(qx + 1, qy + 1);
-    return v >= u ? h00 + v * (h01 - h00) + u * (h11 - h01) : h00 + u * (h10 - h00) + v * (h11 - h10);
+    // the relief is the pixel's samples (capitalRelief.js, x * 129 + y, y north), so its cut is theirs
+    return quadValueAt(h00, h10, h01, h11, u, v, quadCutsSeNw(h, qx, qy));
   };
   return (_drawn = { h, H, at, N, Hd, cell });
 }
@@ -460,7 +462,7 @@ export const CLIFF_SKIN = Object.freeze({ least: 0.15, bulge: 1.5, masonry: 0.25
  * under the sea; inside the docks' square it is the Docks Way's battered masonry.
  */
 export function buildSolitudeCliffs() {
-  const mb = new MeshBuilder(), P = SOLITUDE_PIXEL, band = SOLITUDE_EDGE_BAND, K = CLIFF_SKIN.sub, { N, Hd, cell, H } = solitudeDrawn();
+  const mb = new MeshBuilder(), P = SOLITUDE_PIXEL, band = SOLITUDE_EDGE_BAND, K = CLIFF_SKIN.sub, { N, Hd, cell, H, h } = solitudeDrawn();
   const ax = (x) => P.x0 + x * cell, az = (y) => P.z0 + (N - y) * cell;   // a vertex (x east, y north) in the anchor's metres
   const G = SOLITUDE_GATE_ROAD, onRoad = (x, z) => gateRoadAt(x, z).d < G.half + G.shoulder + cell;   // the Gate Road's banks earth, not a cliff - a cell past their foot
   const steep = new Uint8Array(N * N), Wl = SOLITUDE.wall, inCity = (x, z) => x > Wl.west && x < Wl.east && z > Wl.north && z < Wl.south;
@@ -498,10 +500,11 @@ export function buildSolitudeCliffs() {
       if (!steep[qx * N + qy]) continue;
       const masonry = inDocks(ax(qx + 0.5), az(qy + 0.5)), tex = masonry ? NORD : ROCK;
       const h00 = H(qx, qy), h10 = H(qx + 1, qy), h01 = H(qx, qy + 1), h11 = H(qx + 1, qy + 1);
+      const seNw = quadCutsSeNw(h, qx, qy);
       const corner = (A, k) => [A[(qx * Hd + qy) * k], A[((qx + 1) * Hd + qy) * k], A[(qx * Hd + qy + 1) * k], A[((qx + 1) * Hd + qy + 1) * k]];
       // a point of the cell (u east, v north, 0..1): its place on the drawn ground, stood off along the eased normal
       const at = (u, v) => {
-        const base = v >= u ? h00 + v * (h01 - h00) + u * (h11 - h01) : h00 + u * (h10 - h00) + v * (h11 - h10);
+        const base = quadValueAt(h00, h10, h01, h11, u, v, seNw);
         const bl = (c) => c[0] * (1 - u) * (1 - v) + c[1] * u * (1 - v) + c[2] * (1 - u) * v + c[3] * u * v;
         const w = bl(corner(W, 1));
         const n = [0, 1, 2].map((k) => bl([nrm[(qx * Hd + qy) * 3 + k], nrm[((qx + 1) * Hd + qy) * 3 + k], nrm[(qx * Hd + qy + 1) * 3 + k], nrm[((qx + 1) * Hd + qy + 1) * 3 + k]]));
@@ -516,9 +519,9 @@ export function buildSolitudeCliffs() {
       for (let i = 0; i <= K; i++) { pts.push([]); for (let j = 0; j <= K; j++) pts[i].push(at(i / K, j / K)); }
       for (let i = 0; i < K; i++) {
         for (let j = 0; j < K; j++) {
-          // the drawn ground's own diagonal, south-west (i, j) to north-east (i + 1, j + 1)
+          // the drawn ground's own cut (terrainQuadCut.js), so the skin's folds lie on the ground's
           const sw = pts[i][j], se = pts[i + 1][j], nw = pts[i][j + 1], ne = pts[i + 1][j + 1];
-          for (const [a, b, c] of [[sw, nw, ne], [sw, ne, se]]) {
+          for (const [a, b, c] of seNw ? [[sw, nw, se], [se, nw, ne]] : [[sw, nw, ne], [sw, ne, se]]) {
             const n = faceUp(a, b, c);
             if (n) mb.tri(tex, a, b, c, n);
           }

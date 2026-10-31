@@ -395,7 +395,7 @@ test('SNOWFALL1 the ground the snow reads: a pixel\'s normal from its samples al
   const grid = buildTerrainGrid(samples, 1);
   for (let k = 0; k < 200; k++) {
     const lx = 6.4 + rnd() * 800, lz = 6.4 + rnd() * 800;
-    const a = surfaceNormalFromSamples(samples, lx, lz, 1, [0, 0, 0]), b = surfaceNormalAt(grid.normals, lx, lz, [0, 0, 0]);
+    const a = surfaceNormalFromSamples(samples, lx, lz, 1, [0, 0, 0]), b = surfaceNormalAt(grid.normals, samples, lx, lz, [0, 0, 0]);
     for (let c = 0; c < 3; c++) assert.ok(Math.abs(a[c] - b[c]) < 1e-6, `${lx},${lz}: ${a} vs ${b}`);
   }
   const g4 = buildTerrainGrid(samples, 4), gx = 128 / 4 + 1;

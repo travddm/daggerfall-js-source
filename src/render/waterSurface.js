@@ -41,7 +41,8 @@ import { isEnhanced } from '../systems/uiSkin.js';
 import { FOG_GLSL } from './fogGlsl.js';   // AUDIT 68 S17-fog-glsl-dup: the fog every world pass takes, one home
 import { SEA_LOOK_GLSL, SEA_HAZE_BAND } from './horizonHaze.js';   // FAR-SEA1: the sea takes the far ring's haze; AUDIT FAR-SEA1 C12: and the open sea's light is one text with the ring's sea
 import { pageParam } from '../systems/pageQuery.js';
-import { EDGE_NOISE_GLSL } from './roadEdgeGlsl.js';   // COAST-LOOK: the edges' lattice noise, its one text
+import { EDGE_NOISE_GLSL } from './roadEdgeGlsl.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../world/terrain/terrainQuadCut.js';   // COAST-LOOK: the edges' lattice noise, its one text
 import { groundWanderGlsl, groundKindsGlsl } from './groundEdgeGlsl.js';   // COAST-LOOK: the shore's wander and the transitions' table, the ground's own (the sheet, the sand and the silt on one line)
 import { RIPPLE_CELLS, RIPPLE_SCALE } from '../world/water/waterRipples.js';
 import { NO_BED_DEPTH, SHELF_SHEET_DEPTH } from '../world/water/waterCorners.js';   // AUDIT WATER-NEXT H2: its one home, the water's leaf (the kernel's worker writes it)   // WATER-NEXT 4: the ripple field the shader reads   // PERF-URL: the page's query, parsed once a search
@@ -138,8 +139,10 @@ export function tilemapRectHasWater(bytes, dim, width, height, table = WATER_DRA
  * A quad (x, z) of the stride-`stride` grid covers the stride x stride
  * tiles at (x * stride.., z * stride..) - the grid's cell IS the tile at
  * stride 1 (6.4 units), which is the frame the shader samples in.
+ * `samples` are a streamed pixel's heightmap: each quad is cut as its ground is (terrainQuadCut.js), so the water's
+ * triangles are the ground's. The town's flat grid passes none and keeps its own fixed cut.
  */
-export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TABLE, tileDim = 128, width = tileDim, height = tileDim) {
+export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TABLE, tileDim = 128, width = tileDim, height = tileDim, samples = null) {
   const g = width / stride + 1;   // WATER-NEXT 2: a grid `width` x `height` tiles (the fixed town's), `tileDim` a row
   const qx = g - 1, qz = height / stride;
   const out = [];
@@ -151,11 +154,18 @@ export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TAB
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (table[bytes[row + tx]]) { wet = true; break; }
       }
       if (!wet) continue;
-      const i0 = z * g + x, i1 = i0 + 1, i2 = i0 + g, i3 = i2 + 1;
-      out.push(i0, i2, i3, i0, i3, i1);
+      out.push(x, z);
     }
   }
-  return out.length ? Uint32Array.from(out) : null;
+  if (!out.length) return null;
+  const indices = new Uint32Array(out.length * 3);
+  for (let k = 0, o = 0; k < out.length; k += 2) {
+    const x = out[k];
+    const z = out[k + 1];
+    const seNw = samples !== null && quadCutsSeNw(samples, x, z, stride);
+    o = writeQuadTriangles(indices, o, z * g + x, g, seNw);
+  }
+  return indices;
 }
 
 

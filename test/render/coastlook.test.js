@@ -408,7 +408,7 @@ test('COAST-LOOK both terrain programs draw a transition as its two kinds right 
   const world = read('src/scenes/world.js');
   assert.doesNotMatch(world, /coastEdgesOn/);
   assert.deepEqual(world.match(/renderer\.coastEdges/g), ['renderer.coastEdges'], 'the host\'s one read: the cull\'s ring');
-  assert.match(world, /clippedTerrainIndices\(p\._dwBytes, p\._stride \?\? 1, renderer\.coastEdges\)/);
+  assert.match(world, /clippedTerrainIndices\(p\._dwBytes, p\._stride \?\? 1, renderer\.coastEdges, p\.samples\)/);
   assert.doesNotMatch(read('src/scenes/exterior.js'), /coastEdges|coastEdgesOn/, 'src/scenes/exterior.js: no host\'s own line');
   assert.deepEqual([coastEdgesOn('?skin=enhanced'), coastEdgesOn('?skin=enhanced&coastedges=off'), coastEdgesOn('?skin=classic'), coastEdgesOn('?skin=classic&coastedges=on')], [true, false, false, false], 'the enhanced skin\'s, the kill door its own');
 });

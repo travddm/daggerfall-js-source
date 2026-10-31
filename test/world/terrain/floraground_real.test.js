@@ -79,9 +79,9 @@ test('FLORA-GROUND on the game\'s own ground (ARENA2): the Bay\'s wilderness, a 
 });
 
 /** The drawn mesh under (x, z): a grid's own vertices (`positions`, its bed carved where it has one) and its triangles at
- *  `stride` - no law of the code under test. */
-function meshUnder(positions, stride) {
-  const idx = buildTerrainIndices(stride), q = 128 / stride, cell = (819.2 / 128) * stride;
+ *  `stride`, cut by its `samples` - no law of the code under test. */
+function meshUnder(positions, stride, samples) {
+  const idx = buildTerrainIndices(stride, samples), q = 128 / stride, cell = (819.2 / 128) * stride;
   return (x, z) => {
     const qx = Math.min(q - 1, Math.floor(x / cell)), qz = Math.min(q - 1, Math.floor(z / cell)), o = (qz * q + qx) * 6;
     for (let t = 0; t < 2; t++) {
@@ -107,7 +107,7 @@ test('FLORA-GROUND THE RINGS on the game\'s own ground (ARENA2): the five cells 
     const tilemap = new Uint8Array(128 * 128);
     const rect = c.loc ? setLocationTiles(c.loc, maps, blocks, tilemap) : null;
     const out = generatePixelTerrain({ woods, px: c.px, py: c.py, stride: 4, bed: true, tilemap, locationRect: rect, hasLocation: !!c.loc, climateType: cl.climateType, roads, climates, landform: true, forests: { archive: cl.natureArchive, hidden: false } });
-    const mesh = meshUnder(out.bed?.positions ?? out.positions, 4);
+    const mesh = meshUnder(out.bed?.positions ?? out.positions, 4, out.samples);
     const centers = out.nature.map((f) => { const k = [f.x, f.y, f.z]; standsOnGround(k); return k; });
     const batch = {};
     let drawn = null;

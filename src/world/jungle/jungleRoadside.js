@@ -233,11 +233,11 @@ const PIXEL = TERRAIN_SIZE, HALF = PIXEL / 2;
 
 /**
  * THE LOWEST DRAWN GROUND under a disc of `r` about (x, z) - the ground as it is drawn (terrainSurface.js
- * surfaceHeightAt: two planes a heightmap cell, cut on its diagonal - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
+ * surfaceHeightAt: two planes a heightmap cell, cut on one of its diagonals (terrainQuadCut.js) - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
  * groundAt, which stands up to half a metre over it). The drawn ground is flat on each triangle, so its lowest under the
  * disc is at a sample inside the disc or on its rim; and on the rim, between two of the rim's crossings of the triangles'
  * edges, it is the one plane's - lowest at a crossing or where the rim faces straight down that plane. Every such point
- * is asked: the answer is the drawn ground's lowest, exactly.
+ * of either cut is asked, and every point is read off the drawn ground: the answer is its lowest, exactly.
  * @param {Float32Array} heightmapData @param {number} x @param {number} z @param {number} r
  */
 export function lowestDrawn(heightmapData, x, z, r) {
@@ -249,7 +249,7 @@ export function lowestDrawn(heightmapData, x, z, r) {
   for (let i = Math.max(0, i0); i <= Math.min(hDim - 1, i1); i++) {
     for (let j = Math.max(0, j0); j <= Math.min(hDim - 1, j1); j++) if (Math.hypot(i * cell - x, j * cell - z) <= r) lo = Math.min(lo, heightmapData[i * hDim + j] * yScale);
   }
-  // the rim's crossings of the grid's lines (x, then z) and of the cells' diagonals (x - z constant)
+  // the rim's crossings of the grid's lines (x, then z) and of the cells' diagonals (x - z constant, then x + z)
   for (let i = i0; i <= i1; i++) { const e = i * cell - x; if (Math.abs(e) <= r) { const h = Math.sqrt(r * r - e * e); ask(i * cell, z + h); ask(i * cell, z - h); } }
   for (let j = j0; j <= j1; j++) { const e = j * cell - z; if (Math.abs(e) <= r) { const h = Math.sqrt(r * r - e * e); ask(x + h, j * cell); ask(x - h, j * cell); } }
   for (let k = i0 - j1; k <= i1 - j0; k++) {
@@ -258,11 +258,17 @@ export function lowestDrawn(heightmapData, x, z, r) {
     const w = Math.acos(v);
     for (const t of [w - Math.PI / 4, -w - Math.PI / 4]) ask(x + r * Math.cos(t), z + r * Math.sin(t));
   }
-  // where the rim faces straight down each triangle's plane
+  for (let k = i0 + j0; k <= i1 + j1; k++) {
+    const v = (k * cell - x - z) / (r * Math.SQRT2);   // cos(t - pi/4) on the rim
+    if (Math.abs(v) > 1) continue;
+    const w = Math.acos(v);
+    for (const t of [w + Math.PI / 4, -w + Math.PI / 4]) ask(x + r * Math.cos(t), z + r * Math.sin(t));
+  }
+  // where the rim faces straight down each triangle's plane, the south-west to north-east cut's two and the other's two
   for (let i = i0; i < i1; i++) {
     for (let j = j0; j < j1; j++) {
       const h00 = at(i, j), h10 = at(i + 1, j), h01 = at(i, j + 1), h11 = at(i + 1, j + 1);
-      for (const [gx, gz] of [[h11 - h01, h01 - h00], [h10 - h00, h11 - h10]]) {
+      for (const [gx, gz] of [[h11 - h01, h01 - h00], [h10 - h00, h11 - h10], [h10 - h00, h01 - h00], [h11 - h01, h11 - h10]]) {
         const g = Math.hypot(gx, gz);
         if (g > 0) ask(x - (r * gx) / g, z - (r * gz) / g);
       }
@@ -274,7 +280,7 @@ export function lowestDrawn(heightmapData, x, z, r) {
 /**
  * THE HIGHEST DRAWN GROUND over a convex polygon (`corners`, [x, z] each, in order round it) - the drawn ground is flat
  * on each triangle (lowestDrawn), so its highest over the polygon is at a corner, where an edge crosses a triangle's
- * edge (a grid line or a cell's diagonal), or at a grid point inside: every one is asked.
+ * edge (a grid line or either of a cell's diagonals), or at a grid point inside: every one is asked.
  * @param {Float32Array} heightmapData @param {ReadonlyArray<ReadonlyArray<number>>} corners
  */
 export function highestDrawn(heightmapData, corners) {
@@ -285,8 +291,8 @@ export function highestDrawn(heightmapData, corners) {
   for (let k = 0; k < n; k++) {
     const [x0, z0] = corners[k], [x1, z1] = corners[(k + 1) % n];
     ask(x0, z0);
-    // the edge's crossings of the lines x, z and x - z a whole number of cells
-    for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1]]) {
+    // the edge's crossings of the lines x, z, x - z and x + z a whole number of cells
+    for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1], [x0 + z0, x1 + z1]]) {
       if (f0 === f1) continue;
       for (let c = Math.ceil(Math.min(f0, f1) / cell); c * cell <= Math.max(f0, f1); c++) {
         const t = (c * cell - f0) / (f1 - f0);
