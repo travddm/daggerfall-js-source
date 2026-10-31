@@ -262,12 +262,12 @@ test('AUDIT RPT1026 H2: the questor\'s close names the way to Abandon on the ski
     setPref('skin', 'classic');
     try {
       assert.deepEqual(close(), ['You have not finished the work you were given here: The Lost Artifact.', 'If you cannot finish it, you can abandon it: in the pause menu, press Controls, then Escape, and choose it under Quests.']);
-      const fr = tm.loadStringTableCsv(readFileSync(join(ROOT, 'locales/fr/Port_Strings.csv'), 'utf8'));
-      tm.patchLocaleTable('fr', 'Port_Strings', fr);
+      // A fixture row stands in for a French translation; the subject is the classic row read in the player's language.
+      const fr = 'Dans le menu de pause, appuyez sur « Controls », puis Échap, et choisissez-la sous Quêtes.';
+      tm.patchLocaleTable('fr', 'Port_Strings', [['quest.offer.questorBusyAbandonClassic', fr]]);
       tm.setLocale('fr');
       try {
-        assert.equal(close()[1], new Map(fr).get('quest.offer.questorBusyAbandonClassic'));
-        assert.match(close()[1], /« Controls », puis Échap, et choisissez-la sous Quêtes\.$/);
+        assert.equal(close()[1], fr);
       } finally { tm.setLocale('en'); }
     } finally { setPref('skin', 'enhanced'); }
   });

@@ -6,7 +6,6 @@
 // removal that leaves the drafts standing; and the Settings row, by source.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import * as tm from '../../src/systems/textManager.js';
 import { classifyPackFile, packContents, isTranslationPack, packNameOf, PACK_KIND } from '../../src/systems/translationPacks.js';
 import * as store from '../../src/scenes/translationStore.js';
@@ -15,14 +14,15 @@ import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 
 import { memoryIdb } from '../memoryIdb.mjs';   // an IndexedDB in memory (L10N6 shares it)
 
-const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
+// A fixture machine draft for French: the subject is a pack laid over a draft, not a shipped language.
+const FR_DRAFT = 'Key,Value\nmenu.rail.new,"Nouvelle partie"\nmenu.rail.load,"Charger une partie"\n';
 
 beforeEach(() => {
   tm._resetTextManagerForTests();
   resetPrefs();
   store._resetTranslationStoreForTests();
   globalThis.indexedDB = memoryIdb();
-  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv') });
+  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => FR_DRAFT });
 });
 
 /** A pack as a folder pick hands it: each path, and its bytes. */
@@ -88,7 +88,7 @@ test('L10N3b the store: only the files the game reads are kept, text decoded and
 });
 
 test('L10N3b the pack at work: its tables over the machine drafts (a person\'s word outranks a machine\'s), its other text for the readers that ask, pt-BR reading pt\'s pack, the language told the pack is there; removed, the drafts stand again; no FontFace, no font - the language\'s own face stands', async () => {
-  const draft = tm.parseStringTableCsv(rd('locales/fr/Port_Strings.csv'));
+  const draft = tm.parseStringTableCsv(FR_DRAFT);
   const draftWord = new Map(draft).get('menu.rail.new');
   await data.initLocale(new URLSearchParams('lang=fr'), { languages: [] });
   assert.equal(tm.currentLocale(), 'fr');

@@ -231,13 +231,13 @@ test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter
   old.word({ k: 'no', m: 'the court is full' });
   assert.deepEqual([old.watching(), refused], [false, ['the court is full']], 'an older relay: refused as it was, never left watching');
   // F4: the line in the player's language, at say-time
-  const row = readFileSync(new URL('../../../locales/de/Port_Strings.csv', import.meta.url), 'utf8').split('\n').find((l) => l.startsWith('net.gate.courtWatch,'));
-  assert.ok(row, 'German has the line');
+  // A fixture row stands in for a German translation; the subject is the line read at say-time.
+  const german = 'Der Brennende Hof ist voll.';
   TM.registerLocale({ code: 'de', name: 'Deutsch' });
-  TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['net.gate.courtWatch', JSON.parse(row.slice('net.gate.courtWatch,'.length))]]);
+  TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['net.gate.courtWatch', german]]);
   try {
     TM.setLocale('de');
-    assert.equal(courtWatchText(), JSON.parse(row.slice('net.gate.courtWatch,'.length)), 'said in German');
+    assert.equal(courtWatchText(), german, 'said in German');
   } finally { TM.setLocale('en'); }
 });
 

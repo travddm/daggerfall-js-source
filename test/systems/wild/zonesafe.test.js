@@ -251,8 +251,8 @@ test('ZONE-SAFE THE WORDS (zoneSafe.js zoneSafeFrame, ZONE_SAFE_TEXT; the frame,
   assert.deepEqual(laws.filter((l) => l !== ZONE_SAFE_TEXT.rule && ZONE_RULES.includes(l)), [...ZONE_RULES], 'every other law, in its order');
   assert.equal(laws.length, ZONE_RULES.length + 2, 'the zone\'s laws, the peace and the travel law');
   assert.match(rd('src/ui/heldMap.js'), /item\.title = this\._zoneLaws\(\) \? `\$\{WILD_TEXT\.chipTip\} \$\{ZONE_SAFE_TEXT\.rule\}` : ZONE_MAP_TEXT\.chipTipOffline\(\);/);
-  // in the player's language
-  tm.patchLocaleTable('de', 'Port_Strings', tm.loadStringTableCsv(rd('locales/de/Port_Strings.csv')));
+  // in the player's language: fixture rows stand in for a German translation
+  tm.patchLocaleTable('de', 'Port_Strings', [['wild.safe.chip', 'Sichere Zone'], ['wild.safe.leave', 'Du verlässt die sicheren Straßen.']]);
   try {
     tm.setLocale('de');
     assert.equal(ZONE_SAFE_TEXT.chip, 'Sichere Zone');

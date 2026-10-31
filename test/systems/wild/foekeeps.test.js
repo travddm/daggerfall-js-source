@@ -7,7 +7,6 @@ import '../../modsOff.js';
 import '../../../src/systems/item/itemLaw.js';   // the item law registers itself with the wire, as the game's boot does
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { takeWildDeath, takeWildGold, wildCanLose, WILD_GOLD_LOSS, WILD_GOLD_DIVISOR } from '../../../src/systems/wild/wildDropLaw.js';
 import { DEATH_GOLD_FRACTION, DEATH_GOLD_DIVISOR, deathGoldLoss } from '../../../src/systems/deathPenalty.js';
 import { TEMPLATES } from '../../../src/systems/item/itemKinds.js';
@@ -18,7 +17,6 @@ import { ZONE_RULES } from '../../../src/ui/wild/wildZoneMap.js';
 import * as tm from '../../../src/systems/textManager.js';
 import { hostText } from '../../hostText.mjs';
 
-const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const mk = (o) => mintCondition(setItemFields({ material: 0, flags: 0, variant: 0, message: 0, stackCount: 1, ...o }));
 const book = () => mk({ group: 'MiscItems', templateIndex: TEMPLATES.Spellbook });
 const gem = () => mk({ group: 'Gems', templateIndex: 0 });
@@ -50,11 +48,16 @@ test('FOE-KEEPS THE SPELLBOOK (wildDropLaw.js wildCanLose): no death in the zone
 });
 
 test('AUDIT FOE-KEEPS P4 THE WORDS READ WHEN SAID: the mountains\' entry and chip are the text core\'s at the moment they are read, so a language chosen after the module loaded speaks them (mutants: either read once, at import)', () => {
-  tm.patchLocaleTable('de', 'Port_Strings', tm.loadStringTableCsv(rd('locales/de/Port_Strings.csv')));
+  // Fixture rows stand in for a German translation; the subject is the words read at the moment they are said.
+  tm.patchLocaleTable('de', 'Port_Strings', [
+    ['wild.zone.enter', 'Du betrittst {zone}, eine offene PvP-Zone.'],
+    ['wild.zone.chipTip', '{zone}: Andere Spieler dürfen dich angreifen.'],
+    ['wild.death.kept', 'Nichts fällt zu Boden. Was du trägst, fällt nur, wenn dich ein Spieler tötet.'],
+  ]);
   try {
     tm.setLocale('de');
-    assert.equal(WILD_TEXT.enter, 'Du betrittst Cyrodiil, eine offene PvP-Zone. Gegner sind hier viermal so stark. Tötet dich ein anderer Spieler, lässt du fallen, was du trägst.');
-    assert.match(WILD_TEXT.chipTip, /^Cyrodiil: Andere Spieler dürfen dich angreifen\..*Tötet dich ein anderer Spieler, lässt du fallen, was du trägst\.$/);
+    assert.equal(WILD_TEXT.enter, 'Du betrittst Cyrodiil, eine offene PvP-Zone.');
+    assert.equal(WILD_TEXT.chipTip, 'Cyrodiil: Andere Spieler dürfen dich angreifen.');
     assert.equal(WILD_TEXT.deathKept(), 'Nichts fällt zu Boden. Was du trägst, fällt nur, wenn dich ein Spieler tötet.');
   } finally { tm.setLocale(tm.BASE_LOCALE); }
   assert.match(WILD_TEXT.enter, /^You enter Cyrodiil/, 'English again');

@@ -22,7 +22,7 @@ import { getPeopleOfCurrentRegion, getCourtOfCurrentRegion, findFactions, findFa
 import { RULER_TITLES, rulerTitle, BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { VAMPIRE_CLANS, startInfection, deployInfection, setInfectionHost, INFECTION } from '../../../src/systems/infection.js';
 import { srand, getSeed } from '../../../src/formats/dfRandom.js';
-import { getLocalizedFactionName, patchLocaleTable, setLocale, parseStringTableCsv, clearLocaleTables } from '../../../src/systems/textManager.js';
+import { getLocalizedFactionName, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
 import { lowerRepForCrime, REPUTATION_LOSS_PER_CRIME } from '../../../src/systems/court.js';
 import { worldPriceTiltOf, updateRegionalPrices } from '../../../src/systems/shopStock.js';
 import { REGION_COUNT, REGION_FLAGS, createRegionConditions, conditionFlag, turnOnConditionFlag } from '../../../src/systems/region/regionConditions.js';
@@ -140,7 +140,8 @@ test('PROVINCE-COURTS the shown names: a province\'s court and people in the pla
   assert.equal(getLocalizedFactionName(6164, 'x'), 'Haran Jurgarnesen');
   assert.equal(getLocalizedFactionName(595, 'Court of Daggerfall'), 'Court of Daggerfall', 'FACTION.TXT\'s keep their own fallback');
   assert.equal(provinceFactionShownName(595), null);
-  const rows = parseStringTableCsv(rd('locales/de/Port_Strings.csv'));
+  // Fixture rows stand in for a German translation; the subject is the names read through the faction door.
+  const rows = [['faction.province.court', 'Hof von {province}'], ['faction.province.people', 'Volk von {province}'], ['faction.ruler.highKing', 'Hochkönig']];
   patchLocaleTable('de', 'Port_Strings', rows);
   patchLocaleTable('de', 'Internal_Strings', [['regionNames', [...REGION_NAMES.slice(0, 64), 'Himmelsrand', ...REGION_NAMES.slice(65)].join('\n')]]);
   setLocale('de');

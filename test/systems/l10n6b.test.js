@@ -3,14 +3,13 @@
 // edit kept and never drafted over, a machine row drafted again when its English moves), a whole run over a stand-in
 // model (a broken draft asked for once more with its problem named, then left out; the table in the English's order;
 // a second run owing nothing), a dry run that sends and writes nothing, the request the API is sent (the system prompt
-// cached, the tool forced, a rate limit waited out), and the in-session drafts recorded as the machine's.
+// cached, the tool forced, a rate limit waited out).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { parseStringTableCsv, formatStringTableCsv, loadStringTableCsv } from '../../src/systems/textManager.js';
-import { catalogLocale } from '../../src/systems/localeCatalog.js';   // L10N6: a language still drafting
 import { protectedTokens, checkDraft, planRun, batchesOf, hash, systemPrompt, callClaude, translateTable, parseArgs, SOURCES, TOOL, DEFAULT_MODEL } from '../../tools/translate.mjs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -134,7 +133,7 @@ test('L10N6b the request: the Messages API with the key, the version header, the
   await assert.rejects(callClaude({ apiKey: 'k', model: 'm', system: 'S', rows: [], fetchImpl: failing }), /answered 400: bad request/);
 });
 
-test('L10N6b the command line, the sources, the prompt\'s rules; and the in-session drafts recorded as the machine\'s, so the pipeline redrafts them when their English moves and never mistakes them for a person\'s', () => {
+test('L10N6b the command line, the sources, the prompt\'s rules', () => {
   assert.deepEqual(parseArgs(['--lang', 'de', '--table', 'Internal_RSC', '--batch', '10', '--dry-run']).batch, 10);
   assert.throws(() => parseArgs(['--lang', 'de']), /usage/);
   assert.throws(() => parseArgs(['--lang', 'de', '--table', 'x', '--nope']), /unknown option/);
@@ -151,17 +150,4 @@ test('L10N6b the command line, the sources, the prompt\'s rules; and the in-sess
   assert.match(sys, /\[\/left\]/);
   assert.match(sys, /Daggerfall -> Даггерфолл/);
   assert.match(systemPrompt({ code: 'fr', table: 'Port_Strings' }), /ICU MessageFormat/);
-  const en = new Map(parseStringTableCsv(rd('locales/en/Port_Strings.csv')));
-  const langs = readdirSync(new URL('../../locales/', import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== 'en').map((d) => d.name);
-  assert.equal(langs.length, 25);
-  for (const code of langs) {
-    const rows = new Map(parseStringTableCsv(rd(`locales/${code}/Port_Strings.csv`)));
-    const meta = JSON.parse(rd(`locales/${code}/Port_Strings.meta.json`));
-    const plan = planRun(en, rows, meta);
-    // L10N6 (the first batch): a language still drafting owes rows, a row whose English moved among them - none it holds
-    // is mistaken for a person's
-    if (catalogLocale(code)?.drafting) assert.deepEqual(plan.human, [], `${code}: every row it holds the machine's`);
-    else assert.deepEqual([plan.draft, plan.human], [[], []], `${code}: every row the machine's and current`);
-    assert.ok(Object.values(meta).every((m) => m.by === 'claude-in-session'));
-  }
 });

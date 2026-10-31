@@ -3,11 +3,8 @@
 // The machine's ladder is QUEST-SHELF's, unchanged. Its words are the text core's (L10N4, `chronicle.quests.*`).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { isMainQuestName } from '../../../src/systems/quest/questLists.js';
 import { mountEnhancedChronicle } from '../../../src/ui/enhanced/enhancedChronicle.js';
-
-const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
 test('QUEST-SHELF-MAIN leaves the ladder as it was: the machine still sets a main-story quest aside (the pause tab\'s door) and refuses only the world\'s own (protected) - the chronicle\'s button alone leaves the main story out', async () => {
   const { QuestMachine } = await import('../../../src/systems/quest/machine.js');
@@ -75,7 +72,14 @@ test('QUEST-SHELF-MAIN the chronicle: Abandon on each running quest the bridge a
 
 test('QUEST-SHELF-MAIN the chronicle\'s Abandon in the player\'s language (L10N4): its label, its armed label, its title and its two aria-labels are the text core\'s (`chronicle.quests.*`) - in French they read French, read when they are drawn; in English byte for byte as before (mutants: a word left English)', async () => {
   const tm = await import('../../../src/systems/textManager.js');
-  const rows = tm.loadStringTableCsv(src('locales/fr/Port_Strings.csv'));
+  // Fixture rows stand in for a French translation; the subject is the button's words read when they are drawn.
+  const rows = [
+    ['chronicle.quests.abandon', 'Renoncer'],
+    ['chronicle.quests.abandonArmed', 'Cliquez encore'],
+    ['chronicle.quests.abandonArmedLabel', 'Cliquez encore pour renoncer à cette quête'],
+    ['chronicle.quests.abandonLabel', 'Renoncer à cette quête'],
+    ['chronicle.quests.abandonTitle', 'Laisser cette quête pour l’instant'],
+  ];
   tm.patchLocaleTable('fr', 'Port_Strings', rows);
   const fr = new Map(rows);
   const log = { active: [{ id: '5', name: 'The Rat', questName: 'M0B00Y00', clockSeconds: null, messages: [[{ formatting: 'text', text: 'a step' }]] }], finished: [] };

@@ -26,7 +26,7 @@ import { loadQuestTables, foesTable, addIntoQuestTables, _resetExtraQuestRows } 
 import { adaptBlowClass } from '../../../src/systems/revenant/revenantFeud.js';   // AUDIT DEX A2
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { DEX_ENEMY_NAME_TEXT } from '../../../src/systems/enemyExpansion/dexNames.js';   // AUDIT DEX A6
-import { getLocalizedEnemyName, parseStringTableCsv, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
+import { getLocalizedEnemyName, patchLocaleTable, setLocale, clearLocaleTables } from '../../../src/systems/textManager.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const ARENA2 = process.env.ARENA2_PATH;
@@ -194,7 +194,8 @@ test('AUDIT DEX A6 the fifty names in the player\'s language: each is the mod\'s
     assert.equal(DEX_ENEMY_NAME_TEXT[id](), enemyDisplayName(id), `${id}: the catalog's English is the mod's Name column`);
     assert.equal(getLocalizedEnemyName(id, 'fallback'), enemyDisplayName(id), `${id}: under English the HUD reads the mod's own`);
   }
-  patchLocaleTable('de', 'Port_Strings', parseStringTableCsv(readFileSync(join(ROOT, 'locales/de/Port_Strings.csv'), 'utf8')));
+  // Fixture rows stand in for a German translation; the subject is the name door reading the player's language.
+  patchLocaleTable('de', 'Port_Strings', [['dex.enemy.lizardMan', 'Echsenmensch'], ['dex.enemy.vengefulKingLysandus', 'Rachsüchtiger König Lysandus']]);
   setLocale('de');
   assert.equal(getLocalizedEnemyName(258, 'fallback'), 'Echsenmensch', 'the Lizard Man in German');
   assert.equal(getLocalizedEnemyName(275, 'fallback'), 'Rachsüchtiger König Lysandus');

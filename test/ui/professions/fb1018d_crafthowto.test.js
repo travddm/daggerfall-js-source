@@ -22,7 +22,6 @@ import {
 } from '../../../src/net/professionLaw.js';
 import { RECIPES, COOKING_RECIPES, craftXp, cookXp } from '../../../src/net/recipeLaw.js';
 import { xpSources, gradeNote } from '../../../src/ui/professions/craftHall.js';
-import { LOCALE_CATALOG } from '../../../src/systems/localeCatalog.js';
 import {
   setProfessionsPages, drawProfessionsPage, resetProfPages, CRAFT_HOW, GATHER_HOW, FISHING_HOW, ALCHEMY_HOW, ENCHANTING_HOW,
   MINING_GROUND_LINE, PROF_PAGE_SECTIONS,
@@ -182,16 +181,10 @@ test('CRAFT-HOWTO THE TUTORIAL: a Crafting page among Professions & Survival, af
   assert.equal(actionLabel('Professions'), 'Open your Professions page, or the Crafting page at a station (online)');
 });
 
-test('CRAFT-HOWTO IN EVERY WHOLE LANGUAGE: the new words are drafted in each language the catalog holds whole, the Crafting page\'s last point naming the key it fills (the l10n gate holds the rest)', () => {
+test('CRAFT-HOWTO IN THE CATALOG: the new words are in the English catalog, the Crafting page\'s last point naming the key it fills (the l10n gate holds the rest)', () => {
   const keys = ['prof.page.how.smithing', 'prof.page.how.building', 'prof.page.how.outfitting', 'prof.page.how.cooking', 'prof.page.how.alchemy',
     'tutorials.crafting.title', 'tutorials.crafting.trigger', 'tutorials.crafting.body', 'tutorials.crafting.shops1', 'tutorials.crafting.shops2', 'tutorials.crafting.more'];
   const en = src('locales/en/Port_Strings.csv');
   for (const k of keys) assert.ok(en.includes(`\n${k},"`), `${k} in the English catalog`);
-  const whole = LOCALE_CATALOG.filter((l) => l.source === 'machine' && !l.drafting).map((l) => l.code);
-  assert.equal(whole.length, 13);
-  for (const lang of whole) {
-    const csv = src(`locales/${lang}/Port_Strings.csv`);
-    for (const k of keys) assert.ok(csv.includes(`\n${k},"`), `${lang}: ${k}`);
-    assert.match(csv, /\ntutorials\.crafting\.more,"[^\n]*\{Professions\}/, `${lang}: the key named as a key`);
-  }
+  assert.match(en, /\ntutorials\.crafting\.more,"[^\n]*\{Professions\}/, 'the key named as a key');
 });

@@ -5,7 +5,6 @@
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { BAY, ISLE, portStanding, quay } from './crewQuay.mjs';
 import { crewStandOf, exchangeOf, DAY_STOCK, TRADE_MOST } from '../../../src/systems/naval/tradeGoods.js';
 import { crewRowOf, crewPayMost, crewSpare, CREW_TRADE_TEXT, signOffOrder, handsNamed } from '../../../src/systems/naval/crewTrade.js';
@@ -19,7 +18,6 @@ import { restoreFleetSaveData, _resetFleetForTests } from '../../../src/systems/
 import { charterRecord } from '../../../src/systems/naval/passage.js';
 import * as tm from '../../../src/systems/textManager.js';
 
-const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const SMALL_SHIP = 2;
 
 test('AUDIT CREW-TRADE H1 - A PAID-FOR VETERAN IS NOT ONE MAN\'S PRICE: the order a headcount sale signs named hands off - never one in the shore party, a plain Deckhand before a post\'s holder, her First Mate last of all, the deck\'s own before a hall\'s recruit, the less service before the more, of the rest the last to join; over the real sea, a Veteran First Mate signed on at the crew hall in a hand\'s place keeps his post through a Sell 1 (mutants: each rung of the order)', async () => {
@@ -74,7 +72,21 @@ test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a ship come through customs,
 test('AUDIT CREW-TRADE O2/O3 - IN THE PLAYER\'S LANGUAGE: the crew row\'s title, its stand, its two prices and its counts, the note of a sale and the refusals are the language\'s own, the gold a number in its own figures - no English left in German (mutants: the title, the prices\' words, the gold a string)', async () => {
   const q = await quay(SMALL_SHIP, 24, { port: portStanding('wants') });
   const en = exchangeText(q.x()).rows[0];
-  const de = Object.fromEntries(tm.parseStringTableCsv(rd('locales/de/Port_Strings.csv')));
+  // Fixture rows stand in for a German translation of the crew exchange; the subject is that every word it says is
+  // read through the text core in the player's language.
+  const de = {
+    'sea.crew.title': 'Besatzung',
+    'sea.crew.standWants': 'Seeleute knapp: teuer',
+    'sea.crew.buyAt': 'anheuern für {gold, number} Gold pro Mann (heute noch {left})',
+    'sea.crew.sellAt': 'abmustern für {gold, number} Gold ({wanted} gesucht)',
+    'sea.crew.aboard': 'An Bord: {have} von {whole} Mann Besatzung',
+    'sea.crew.noneTaken': 'heute niemand gesucht',
+    'sea.crew.noneToBuy': 'heute niemand anzuheuern',
+    'sea.crew.sold': 'Heuerverträge von {n} Mann Besatzung für {gold, number} Gold verkauft.',
+    'sea.crew.paidOff': 'Abgemustert: {names}.',
+    'sea.crew.lastMan': 'Das ist dein letztes Besatzungsmitglied. Niemand wäre mehr an Bord.',
+    'sea.crew.fighting': 'Nicht, solange das Schiff im Kampf ist.',
+  };
   try {
     tm.patchLocaleTable('de', 'Port_Strings', Object.entries(de));
     tm.setLocale('de');

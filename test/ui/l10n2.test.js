@@ -7,7 +7,6 @@
 // Chinese and Japanese need (ui/talkWindow.js wrapText) with every English line where it was.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import * as tm from '../../src/systems/textManager.js';
 import { createGlyphFace, isControlCode, FACE_POINT_SIZE } from '../../src/ui/glyphFace.js';
 import { measureText, drawText, sdfOf, makeFont, SDF_SHADOW_SCALE } from '../../src/ui/text.js';
@@ -17,7 +16,6 @@ import { getBool, setValue, _resetForTests as resetSettings } from '../../src/sy
 import * as data from '../../src/scenes/localeData.js';
 import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 
-const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 beforeEach(() => { tm._resetTextManagerForTests(); _resetLocaleFacesForTests(); resetSettings(); resetPrefs(); });
 
 /** A canvas the face can draw on under node. A code from U+2E80 up is a full em wide, anything else half of one;
@@ -179,7 +177,8 @@ test('L10N2 the boot installs them: a switch to a language gives its fonts their
   const was = globalThis.OffscreenCanvas;
   globalThis.OffscreenCanvas = function OffscreenCanvas(w, h) { return make(w, h); };
   try {
-    data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv') });
+    // A one-row fixture table gives French text to switch to; the subject is the face the switch installs.
+    data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => 'Key,Value\nmenu.rail.new,"Nouvelle partie"\n' });
     assert.equal(await data.switchLocale('fr'), 'fr');
     const face = tm.getLocalizedFont('FONT0003');
     assert.ok(face?.add, 'French\'s face');

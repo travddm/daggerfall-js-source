@@ -185,9 +185,9 @@ test('WW5 THE PROVINCES\' COVENS: the port\'s own, one a province theatre (Cyrod
     ['The Daughters of Mafala', 'Daughter of Mafala', 'Clan Mother Ri\'shazra'], ['The Fen Witches', 'Fen Witch', 'Mother Neeta-Hei'],
   ]);
   for (const c of STAR_PROVINCE_COVENS) assert.equal(covenWitches(c), c.name(), 'its own words, never a faction\'s');
-  // in the player's language: its own row (a faction's name read for it would answer the English)
-  const row = readFileSync(new URL('../../../locales/de/Port_Strings.csv', import.meta.url), 'utf8').split('\n').find((l) => l.startsWith('starfall.coven.moor,'));
-  const de = JSON.parse(row.slice('starfall.coven.moor,'.length));
+  // in the player's language: its own row (a faction's name read for it would answer the English); a fixture row
+  // stands in for a German translation
+  const de = 'Die Schwestern des Moors';
   TM.registerLocale({ code: 'de', name: 'Deutsch' });
   TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['starfall.coven.moor', de]]);
   try {
