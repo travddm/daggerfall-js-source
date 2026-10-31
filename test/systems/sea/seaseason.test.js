@@ -1,5 +1,4 @@
-// SEA-SEASON (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Eltheric
-// Ocean's seasonal boards for the deepest voyage and the legends ended; bible/03-World/Eltheric-Ocean.md SEA-SEASON): the
+// SEA-SEASON: the
 // season's law (net/sea/seaSeasonLaw.js), the captain's ledger's season figures (systems/naval/captainLedger.js, the
 // ether host's day), the copy doors that drop them (systems/offlineCopy.js), the service's figures off a clean checkpoint
 // and its boards over the real routes (server-account/src/seaSeason.js, realm.js checkpointRealm), the page's half
@@ -230,7 +229,7 @@ test('SEA-SEASON the page\'s half (seaSeasonHost.js) and its door: no section of
   const no = page({ answer: { ok: false, error: 'bad-json' } });
   no.s.office(); await settle();
   const n = no.s.office();
-  assert.equal(n.asking, true);   // PIN MOVED (AUDIT SEA VENTURES E7): boards never read are still asked for, never an empty season
+  assert.equal(n.asking, true);
   assert.equal(n.line.warn, true);
   assert.ok(n.line.text.length > 0);
   const sent = [];

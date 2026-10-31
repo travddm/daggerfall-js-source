@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-HIDDEN (2026-10-22, mob: "no tag no faint outline nothing just nothing", "true invis not lattys invis", "we
-// want the player to have no idea we are wathcing them"; design doc "DFO Staff Panel: design", Invisible follow and Weak
-// spots "Invisible follow and the in-game view") - THE RELAY'S HALF OF A HIDDEN STAFF MEMBER.
+// STAFF-PANEL5-HIDDEN - THE RELAY'S HALF OF A HIDDEN STAFF MEMBER.
 //
 // NOT THE GAME'S INVISIBILITY (INVIS-NET, INVIS-LOOK, src/net/remotePlayers.js), which still sends the player's place to
 // every game. A socket whose VERIFIED token says `hd: 1` (identityToken.js; minted by the account service for an Admin or
@@ -46,8 +44,7 @@ import { isChatRoom } from './relay.js';
 export const HIDDEN_RESERVE = 8;
 /** The frame types a hidden socket is heard in (with a staff-channel line and a staff teleport's ask, `hiddenMay`).
  *  Message on screen's frame type joins this list when its builder names it; a follow's the same.
- *  STAFF-CHAT-RED (2026-10-23, mob: "give me a option next to chat to chat as /red or myself at all times" - the chat
- *  box's Me / Red switch, which a hidden Admin keeps on Red): and /red's ask, `say` (net/online.js sendRed), which the
+ *  STAFF-CHAT-RED: and /red's ask, `say` (net/online.js sendRed), which the
  *  room says as `{t:'red', text, at}` - a line nobody speaks, no id and no name (index.js RED1), so the server's line
  *  shows no one. Whether the socket may speak it is still the dev glyph's, read in the room's own arm after the line's
  *  bucket is spent (a hidden token keeps the glyph - server-account/src/staffHidden.js HIDDEN_GLYPHS); a hidden socket

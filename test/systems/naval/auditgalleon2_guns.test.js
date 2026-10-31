@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03, the second read of Mac's galleon) - HER GUN DECK AND ITS ONLINE SIDE. Each fix's pin
+// AUDIT GALLEON-2 - HER GUN DECK AND ITS ONLINE SIDE. Each fix's pin
 // failed on the code as it stood (57baee705); each test pin failed on the mutant it was written for
 // (tools/mutants/auditgalleon2_guns.json):
 //   PF1 a shutter snapped open as its ball leaves stands open on that frame in world.js's own order (the boat's Animators

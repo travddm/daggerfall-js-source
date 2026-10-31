@@ -1,5 +1,4 @@
-// RVN10 - NEW DEEDS (bible/12-Enhanced-AI/Feud-Arc.md section 21; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). FELLED: a special foe whose blow knocked out my companion (a sworn
+// RVN10 - NEW DEEDS (;, then "Go"). FELLED: a special foe whose blow knocked out my companion (a sworn
 // revenant, a crew hand ashore) - the knock-out arm of both damage doors notes the striker, the companion layer hands it
 // on, the world host makes the deed on it with the companion's name ("Bane of Borgakh"), and it stands out. ROUTED: a
 // special foe on me, its harm within 30 s, when I get 70 m from it (the street pool, before its cull) or a jump (a

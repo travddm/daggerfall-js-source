@@ -1,6 +1,5 @@
 // @ts-nocheck
-// CHAP7b (2026-10-09, Mac: "continue", the Chapters arc's last slice - bible/11-Multiplayer/Chapters-Arc.md section 8,
-// CALL 6): THE PATRONS ON THE CLIENT. A patron's members pay the Thriving band's prices in its chapter's halls whatever
+// CHAP7b: THE PATRONS ON THE CLIENT. A patron's members pay the Thriving band's prices in its chapter's halls whatever
 // the chapter's Strength, the Season's tenths on it as on anyone's; the sheet keeps each chapter's patron and its arms;
 // its banners hang beside the doors of the chapter's halls; the board names the patron and offers its own guild's
 // guildmaster the bid for the Season after (the door, the word, the list read again, a late answer in the chat).
@@ -41,7 +40,6 @@ test('CHAP7b a patron\'s members pay the Thriving band\'s price whatever the cha
   assert.equal(chapterHallFactor(c(10), 'training', IW), chapterPriceFactor(10), 'another guild: the band\'s');
   assert.equal(chapterHallFactor(c(10), 'spells'), chapterPriceFactor(10), 'no guild: the band\'s');
   assert.equal(chapterHallFactor(c(50), 'spells', GL), 0.9, 'a Steady chapter too');
-  // PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Ascendancy's tenth is the Ascendant band's own: a
   // retired Ascendancy on a sheet adds nothing, and an Ascendant chapter's patron pays its fifth, never Thriving's dearer tenth
   assert.equal(chapterHallFactor(c(10, { event: 'ascendancy' }), 'spells', GL), 0.9);
   assert.deepEqual([chapterHallFactor(c(95), 'spells', GL), chapterHallFactor(c(95), 'spells', IW)], [0.8, 0.8], 'the better of the two');
@@ -52,7 +50,6 @@ test('CHAP7b a patron\'s members pay the Thriving band\'s price whatever the cha
 
 test('CHAP7b the board\'s words: the patron\'s line, a guildmaster\'s bid and what a bid made says; what it may bid - none standing the least, twice and five times it, else 500, 1,000 and 5,000 more, under the cap (mutants: the words, the offers, the guards)', () => {
   const season = seatSeasonName(2);
-  // PIN MOVED: AUDIT GUILD3 W12 - its tag as every guild's is written, <GLN>; L6 - and what its patronage buys where the hall sells training
   assert.equal(chapterPatronSheetLine({ id: GL, name: 'Grey Lanterns', tag: 'GLN' }), 'Its patron this Season: Grey Lanterns <GLN>.');
   assert.equal(chapterPatronSheetLine({ id: GL, name: 'Grey Lanterns', tag: 'GLN' }, 41), 'Its patron this Season: Grey Lanterns <GLN> - its members pay Thriving\'s prices here, or the band\'s where better.');
   assert.equal(chapterPatronSheetLine({ id: GL, name: 'Grey Lanterns', tag: 'GLN' }, 368), 'Its patron this Season: Grey Lanterns <GLN>.', 'an order sells nothing priced');
@@ -145,7 +142,7 @@ test('CHAP7b the board names each chapter\'s patron, and offers its own guild\'s
   const calls = [];
   const s = await board(chapters, { patron: async (f, m) => { calls.push([f, m]); return { ok: true, data: { season: 2, marks: m } }; } });
   assert.deepEqual(byClass(s.host, 'notice-patron').map((p) => p.textContent), [
-    'Its patron this Season: Grey Lanterns <GLN> - its members pay Thriving\'s prices here, or the band\'s where better.', `Your guild bids 1,500 silver for its patronage in ${season}.`, `Your guild has not bid for its patronage in ${season}.`,   // PIN MOVED: AUDIT GUILD3 W12, L6
+    'Its patron this Season: Grey Lanterns <GLN> - its members pay Thriving\'s prices here, or the band\'s where better.', `Your guild bids 1,500 silver for its patronage in ${season}.`, `Your guild has not bid for its patronage in ${season}.`,
   ]);
   const picks = byClass(s.host, 'notice-patron-pick');
   assert.deepEqual(picks.map((p) => [p.textContent.split(':')[0], [...p.querySelectorAll('button')].map((x) => x.textContent)]), [

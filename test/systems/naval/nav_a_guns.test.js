@@ -1,6 +1,5 @@
-// NAV-A (2026-09-28, Mac: "proper naval combat with a huge reference to assassins creed black flag. Being able to aim
-// and fire when viewing from the side") - THE GUNS: the closed-form flight, the aim a look lays, the volley, the
-// reload, and what a ball does to a ship (bible/03-World/Naval-Combat.md). Pure modules, driven directly.
+// NAV-A - THE GUNS: the closed-form flight, the aim a look lays, the volley, the
+// reload, and what a ball does to a ship. Pure modules, driven directly.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -136,7 +135,7 @@ test('NAV-A the aim: a look that meets the sea lays the side\'s guns to fall the
   const d = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]], dl = Math.hypot(...d);
   const aim = aimSolution(ship, 'starboard', { origin: eye, dir: d.map((v) => v / dl) }, seaY);
   assert.equal(aim.side, 'starboard'); assert.equal(aim.gun, 'long'); assert.equal(aim.barrel, false);
-  assert.equal(aim.launches.length, 5, 'five long guns a side on a Small Ship');   // PIN MOVED (GALLEON, 2026-10-01): Mac's galleon's five ports a side
+  assert.equal(aim.launches.length, 5, 'five long guns a side on a Small Ship');
   assert.deepEqual(aim.dir.map((v) => +v.toFixed(9) + 0), [1, 0, 0], 'fired square to starboard');
   near(aim.range, 60, 1.5, 'the zone where the look meets the sea');
   near(aim.lookPoint[0], target[0], 1e-9, 'the look\'s own point on the sea');
@@ -163,7 +162,7 @@ test('NAV-A the volley: a launch a muzzle, a gun every RIPPLE_S from the first a
   const ship = { position: [0, 0, 0], rotation: ID, velocity: [0, 0, 0], hull: 4 };
   const aim = aimSolution(ship, 'port', null, 0, { range: 100 });
   const a = volleyLaunches(aim, 42, { skill: 0.5 }), b = volleyLaunches(aim, 42, { skill: 0.5 });
-  assert.equal(a.length, 5, 'five long guns a side on the Carrack');   // PIN MOVED (SHIPS-2, 2026-10-07): Mac's carrack, a gun a port
+  assert.equal(a.length, 5, 'five long guns a side on the Carrack');
   assert.deepEqual(a, b);
   assert.notDeepEqual(volleyLaunches(aim, 43, { skill: 0.5 }), a);
   a.forEach((l, i) => near(l.delay, i * RIPPLE_S, 1e-12));
@@ -254,7 +253,6 @@ test('NAV-A a ship\'s life: she strikes her colours at STRUCK_AT, sinks at nough
   near(f.fire, FIRE_SECONDS, 0);
   f.step(100);
   near(f.hull, 100 - FIRE_HP * FIRE_SECONDS * 2, 1e-9, 'each out after its own seconds');
-  // PIN MOVED (TOUGHER-SHIPS): a man's worth each FIRE_CREW_S of burning, a toughened crew losing 1/SHIP_TOUGHNESS of a man for it
   assert.equal(f.crew, 5 - Math.floor(Math.floor(FIRE_SECONDS * 2 / FIRE_CREW_S) / SHIP_TOUGHNESS), 'a man\'s worth each FIRE_CREW_S of burning');
   assert.equal(f.fires, 0);
   assert.ok(FIRE_STACK >= 2);
@@ -308,9 +306,9 @@ test('NAV-A the hulls\' batteries as HULL_BUILDS measures them: a rowboat none, 
   const kinds = (h) => Object.fromEntries(batteriesOf(h).map((b) => [b.side, `${b.gun}x${b.muzzles.length}`]));
   assert.deepEqual(kinds(0), {});
   assert.deepEqual(kinds(1), { starboard: 'swivelx3', port: 'swivelx3', bow: 'swivelx1' });
-  assert.deepEqual(kinds(2), { starboard: 'longx5', port: 'longx5', bow: 'chainx2', stern: 'barrelx1' });   // PIN MOVED (GALLEON, 2026-10-01): a gun a port
+  assert.deepEqual(kinds(2), { starboard: 'longx5', port: 'longx5', bow: 'chainx2', stern: 'barrelx1' });
   assert.deepEqual(kinds(3), { starboard: 'longx4', port: 'longx4', bow: 'heavyx3' });
-  assert.deepEqual(kinds(4), { starboard: 'longx5', port: 'longx5', bow: 'chainx2', stern: 'barrelx1' });   // PIN MOVED (SHIPS-2, 2026-10-07): Mac's carrack, a gun a port
+  assert.deepEqual(kinds(4), { starboard: 'longx5', port: 'longx5', bow: 'chainx2', stern: 'barrelx1' });
   for (let h = 1; h < HULL_BUILDS.length; h++) {
     for (const m of batteryOf(h, 'starboard').muzzles) assert.ok(m[0] > 0, `hull ${h}: a starboard muzzle on the starboard side`);
     for (const m of batteryOf(h, 'port').muzzles) assert.ok(m[0] < 0, `hull ${h}: a port muzzle on the port side`);
@@ -334,7 +332,7 @@ test('NAV-A the ball in flight: each gun\'s ball waits its ripple and appears at
   f.fireVolley({ id: 7, shooter: 'own', launches: [ball(), ball({ index: 1, delay: 0.5, p0: [0, 2, 2] })], side: 'starboard', owner: 'me' });
   f.step(0.1);
   assert.equal(of('muzzle').length, 1, 'the first gun at once');
-  assert.deepEqual(of('muzzle')[0], { type: 'muzzle', volley: 7, shooter: 'own', owner: 'me', side: 'starboard', gun: 'long', shot: null, index: 0, count: 2, pos: [0, 2, 0], dir: [60, 1.5, 0], resolve: true });   // AUDIT NAV1: the volley's size - the mix's; PIN MOVED (SHOT-KINDS): its load - a launch that says none its bore's own
+  assert.deepEqual(of('muzzle')[0], { type: 'muzzle', volley: 7, shooter: 'own', owner: 'me', side: 'starboard', gun: 'long', shot: null, index: 0, count: 2, pos: [0, 2, 0], dir: [60, 1.5, 0], resolve: true });     // AUDIT NAV1: the volley's size - the mix's
   assert.equal(f.balls().length, 1, 'the second waits its ripple, unseen');
   assert.equal(f.inFlight, 2);
   for (let i = 0; i < 20; i++) f.step(0.1);

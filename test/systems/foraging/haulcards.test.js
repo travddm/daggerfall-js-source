@@ -1,10 +1,9 @@
-// HAUL-CARDS (2026-10-03, Mac: "Im wondering with popups for obtaining silver and harvest items. We need a better
-// enhanced plus UI element for when people gather these items"; the mockup: "Dude this is sick") - A GATHER'S, A
+// HAUL-CARDS - A GATHER'S, A
 // STRIKE'S AND A CLAIM'S CARDS (ui/haulCards.js, through ui/pickupFeed.js showHaul): the cards' data from each answer
 // (the goods, their tier and Stores, the XP and its rank's bar; a Motherlode's one card; a claim's silver, deed and
 // contracts; the cap's muted card), the feed's law (a bump sums and keeps the newest), the face drawn on the enhanced
 // skin and nothing on the classic, the gathering host saying its lines only where no card stood, and the seams.
-// bible/06-Systems/Professions-Arc.md 8 (HAUL-CARDS).
+// 8 (HAUL-CARDS).
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -48,7 +47,7 @@ test('HAUL-CARDS the law: a material\'s tier wears the loot\'s colours - 1 and 2
   assert.equal(rankProgress(xpForRank(100) + 5000), 1, 'the top rank');
   assert.ok(HAUL_HOLD_MS > 2500 && LODE_HOLD_MS > HAUL_HOLD_MS);
   assert.deepEqual([HAUL_ICON_BOX, LODE_ICON_BOX], [32, 38]);
-  assert.equal(haulCappedText(), 'Daily silver cap reached');   // SERPENT-SET: the serpents strike under the same cap; PIN MOVED (EG-E1): and the Spire's Redoubts; PIN MOVED (STAR7): and the held stars; PIN MOVED (VOICE2, in PLAIN-SWEEP's words): no dash aside (Voice.md rule 5); PIN MOVED (AUDIT STAR W2): a label through the text core, the chat's line names the cap
+  assert.equal(haulCappedText(), 'Daily silver cap reached');     // SERPENT-SET: the serpents strike under the same cap
 });
 
 test('HAUL-CARDS a harvest\'s cards: the goods one card - "+3", its material\'s name and tier, its picture the pack\'s own item, "Stores 41" (own, bought and gold\'s), the XP on it and the rank\'s bar, a clean act\'s words its head - and a gem and a second find each their own; nothing for an answer it cannot read (mutants: the Stores\' count; the XP off the card; the gem dropped; the head unsaid)', () => {
@@ -79,7 +78,7 @@ test('HAUL-CARDS a Motherlode\'s one card (PROF2b): its ore, its silver and its 
   const [c] = cards;
   assert.deepEqual([c.key, c.lode, c.head, c.silver, c.miners, c.hold], ['lode\u0002mlode:20833:0', true, 'Motherlode - every strike on the glint', 10, '4 / 20 miners', LODE_HOLD_MS]);
   const w = haulWords(c);
-  assert.deepEqual([w.plus, w.name, w.tag, w.row.text, w.lode], ['+9', 'Ebony Ore', 'Stores 9', '+1,380 Mining XP', { silver: '+10 silver', held: 'you hold 60', miners: '4 / 20 miners' }]);   // AUDIT HAUL-CARDS B4 (PIN MOVED): the purse
+  assert.deepEqual([w.plus, w.name, w.tag, w.row.text, w.lode], ['+9', 'Ebony Ore', 'Stores 9', '+1,380 Mining XP', { silver: '+10 silver', held: 'you hold 60', miners: '4 / 20 miners' }]);     // AUDIT HAUL-CARDS B4 (
   assert.equal(haulWords(harvestHauls({ ...d, marks: { struck: 0, balance: 10_000_000, why: 'full' } })[0]).lode.silver, '', 'a full purse: no silver said');
   assert.equal(harvestHauls({ ...d, motherlode: false })[0].key, 'stores\u0002ore:ebony');
 });
@@ -90,8 +89,8 @@ test('HAUL-CARDS a claim\'s cards: a raid\'s 30 with the day\'s combat bar and t
   const [raid, deed, pay, ...rest] = claimHauls(data, 'raid');
   assert.deepEqual(rest, [], 'a contract that paid nothing has no card');
   assert.deepEqual(haulWords(raid), { head: '', plus: '+30', name: 'silver', sub: 'Town defended', tag: '', end: '90', row: { text: 'Combat today', fill: 0.8, end: '120 / 150' }, lode: null });
-  assert.deepEqual([deed.tone, haulWords(deed).sub, haulWords(deed).plus], ['treasury', 'Guild deed: to The HND Guild', '+25']);   // PIN MOVED (VOICE2): no dash aside (Voice.md rule 5)
-  assert.deepEqual([pay.tone, haulWords(pay).sub, haulWords(pay).plus], [undefined, 'Contract (2 tax) - [HND]', '+38']);   // AUDIT HAUL-CARDS C3 (PIN MOVED): the tax before the guild
+  assert.deepEqual([deed.tone, haulWords(deed).sub, haulWords(deed).plus], ['treasury', 'Guild deed: to The HND Guild', '+25']);
+  assert.deepEqual([pay.tone, haulWords(pay).sub, haulWords(pay).plus], [undefined, 'Contract (2 tax) - [HND]', '+38']);     // AUDIT HAUL-CARDS C3 (
   assert.equal(haulWords(claimHauls({ marks: { struck: 50, balance: 50 } }, 'gate')[0]).sub, 'Breach closed');
   const capped = claimHauls({ marks: { struck: 0, balance: 150, why: 'cap', combat: { earned: 150, max: 150 } } }, 'gate');
   assert.deepEqual(capped.map((c) => [c.haul, haulWords(c).note]), [['note', haulCappedText()]]);
@@ -362,8 +361,8 @@ test('HAUL-CARDS the seams by source: the world host hands the gathering host th
   assert.match(w, /onMarks: \(data\) => \{ showHaul\(claimHauls\(data, 'raid'\)\); return marksBook\?\.claimLines\(data, 'raid'\) \?\? null; \},/);
   assert.match(w, /onMarks: \(marks, data\) => \{ showHaul\(claimHauls\(data \?\? \{ marks \}, 'gate'\)\); return marksBook\?\.claimLines\(data \?\? \{ marks \}, 'gate'\) \?\? null; \},/);
   const g = rd('src/scenes/gatherHost.js');
-  assert.match(g, /hauled = live && deps\.haul\?\.\(harvestHauls\(d, \{ name: k\?\.haulName\?\.\(d\) \?\? null, note \}\)\) === true;/);   // AUDIT HAUL-CARDS A3 (PIN MOVED): on a live world
-  assert.match(g, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);   // PIN MOVED (HUNTERS-MARK): and the gather host's entity, a Trophy Hunter's trophy's pack
+  assert.match(g, /hauled = live && deps\.haul\?\.\(harvestHauls\(d, \{ name: k\?\.haulName\?\.\(d\) \?\? null, note \}\)\) === true;/);     // AUDIT HAUL-CARDS A3 (
+  assert.match(g, /try \{ k\?\.answered\?\.\(d, \(t\) => hud\.toast\(t\), \{ hauled, entity: deps\.entity\?\.\(\) \?\? null \}\); \}/);
   assert.match(rd('src/ui/pickupFeed.js'), /const box = line\.lode \? LODE_ICON_BOX : line\.haul \? HAUL_ICON_BOX : PICKUP_ICON_BOX;/);
   assert.ok(materialImage('metal:iron') === null || Number.isInteger(materialImage('metal:iron').archive), 'an address or none');
 });
@@ -406,7 +405,7 @@ test('AUDIT HAUL-CARDS B4, the face: a Motherlode\'s card draws its silver, the 
   } finally { globalThis.requestAnimationFrame = raf0; }
 });
 
-// ─── AUDIT HAUL-CARDS (2026-10-03, Mac: "Audit this") ───────────────────────────────────────────────────────────────
+// ─── AUDIT HAUL-CARDS ───────────────────────────────────────────────────────────────
 
 test('AUDIT HAUL-CARDS A1: a card the band puts out keeps its own last height - a tall harvest card under three pickups in a band too short for all four stays out, frame after frame, where it stood and went every frame (mutants: the hidden card read as the first\'s height)', () => {
   const raf0 = globalThis.requestAnimationFrame;

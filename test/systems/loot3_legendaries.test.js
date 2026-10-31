@@ -1,6 +1,4 @@
-// LOOT3 - THIRTY LEGENDARIES (2026-10-01; bible/06-Systems/Loot-Arc.md section 5, Mac: "Do you wanna turn this into an
-// arc and do all of the above?" - "More Legendaries. There are 10 today ... About 30 would mean roughly one per weapon
-// family and armour slot"). The laws pinned here (LR2's own law over every record is lr1's pin, which reads them all):
+// LOOT3 - THIRTY LEGENDARIES. The laws pinned here (LR2's own law over every record is lr1's pin, which reads them all):
 //   - THIRTY: ten over twenty more, ids and names unique, no artifact's name.
 //   - EVERY PLACE HAS ONE: every weapon family (by the skill that swings it) two or more, and every weapon, every
 //     armour place and every kind of jewellery but the wand (which takes the three that name no template) a record

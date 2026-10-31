@@ -1,5 +1,4 @@
-// MWNPC17 (2026-10-11, Mac: "We also need to hone in on what NPCs get what type of clothing/armor. General NPCs should
-// have a procedural system where barely any 2 NPCs look alike" - bible/04-Characters/Morrowind-NPCs.md section 25): THE
+// MWNPC17: THE
 // WARDROBE. A person is dressed from a ROLE off their own seed (characters/wardrobe.js dressPerson): the cut, the
 // garments, the dyes, the cloak, the armour and its metal, the rung of Morrowind's clothing ladder; and the look's `npc`
 // hint has the build pick each garment's record among the dye's nearest of that rung (mwItemMap.js mwClothingRecord) and
@@ -202,7 +201,7 @@ test('MWNPC17d the build reads the hint: each garment its rung and pick, the hea
     assert.deepEqual(knightOf(race), knightOf('Nord'), `a ${race} knight: his helm and boots to the composer`);
     assert.deepEqual(womanOf(race), womanOf('Nord'), `a ${race} woman: her footwear to the composer`);
   }
-  // the walk: each slot its own step, over the race's pools. PIN MOVED (MW-HEADS1): a Nord's - the data's pools of a
+  // the walk: each slot its own step, over the race's pools.
   // race the port carries no heads for; a Breton man walks the port's own (test/tooling/mwheads1.test.js)
   const parts = [];
   for (let i = 0; i < 8; i++) parts.push({ id: `b_n_nord_m_head_0${i}`, race: 'nord', slot: 'head', skin: true, playable: true, firstPerson: false, female: false });
@@ -217,13 +216,10 @@ test('MWNPC17d the build reads the hint: each garment its rung and pick, the hea
 
 test('MWNPC17e BARELY ANY TWO ALIKE: two hundred of one street - one race, one sex, one sprite - resolved as the build resolves them, garment records, head and hair; the same two hundred without the hint (the resolution before MWNPC17: a garment by its type and dye, a face by its index) are far fewer (mutants: the pick off; the walk off)', () => {
   const C = clothes();
-  // PIN MOVED (MW-HEADS1): a Nord street - the data's 8 heads and 6 hairs of a race the port carries none for; a Breton
   // man's face is the port's own three and three (test/tooling/mwheads1.test.js)
-  // PIN MOVED (AUDIT MW-FOLK1 L3-F2): the street a walker's picture still has the wardrobe dress, through the producer
   // that mints it (folkLookOf) - Nord women of picture 392. The commoner-in-trousers men this read were pictures 381,
   // 385 and 387, and every man of those wears his picture's own outfit now: one picture's walkers differ by their face
   // alone (a 387 street shows 48 people, the data's heads times its hairs; a 385 street the port's own 9 -
-  // bible/04-Characters/Townsfolk-Outfits.md)
   const parts = [];
   for (let i = 0; i < 8; i++) parts.push({ id: `h${i}`, race: 'nord', slot: 'head', skin: true, playable: true, firstPerson: false, female: true });
   for (let i = 0; i < 6; i++) parts.push({ id: `r${i}`, race: 'nord', slot: 'hair', skin: true, playable: true, firstPerson: false, female: true });

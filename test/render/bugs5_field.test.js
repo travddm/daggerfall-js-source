@@ -1,4 +1,4 @@
-// THE FIELD'S FIVE (2026-09-17, Mac's bug list): F2 things on the ground
+// THE FIELD'S FIVE: F2 things on the ground
 // cast no standing card, F3 the light in the hand casts nothing and a
 // surface the previous frame did not see is not marched, F4 the glare's
 // band is a quarter unit, F5 the far cascade skips its small casters and
@@ -115,7 +115,7 @@ test('F5: on the fake GL - the far cascade skips a caster under two of its texel
     assert.equal(sp.stats.cascadesDrawn, 3);
     return sp.stats.sunDraws;
   };
-  // WEEDS1 (2026-09-19) TOOK THIS CASE OVER, and the record says so rather
+  // WEEDS1 TOOK THIS CASE OVER, and the record says so rather
   // than leaving a pin that passes for a reason it no longer holds. F5's
   // sphere test used to cull this flat from the far cascade; the SPRITE
   // test culls it now, and it culls strictly more (a flat's radius is

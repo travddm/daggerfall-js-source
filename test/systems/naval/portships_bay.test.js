@@ -1,4 +1,4 @@
-// PORT-SHIPS (2026-10-27; bible/03-World/Holdings.md section 7, PORT-SHIPS) - EVERY PORT OF THE BAY ON THE FREEWARE: the port
+// PORT-SHIPS - EVERY PORT OF THE BAY ON THE FREEWARE: the port
 // law's 106 towns sounded through the harbour book as the world host hands it (their walled cities' keep - TS7 - and the
 // ground over the sea's top) on the ground the game builds (test/portShipsWorld.mjs), measured as portships_real.test.js
 // measures the ports past the Bay. Sounded off the water alone, four ships at three of them stood a side on a bank.

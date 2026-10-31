@@ -1,4 +1,4 @@
-// AUDIT MEND-THIRD (2026-10-19, Mac: "Audit this"; bible/01-Overview/audits/Audit-Mend-Third.md): what the four cold
+// AUDIT MEND-THIRD: what the four cold
 // lanes found of the found-condition law beyond the sale's own arithmetic (mend_third.test.js) - each pinned on the code
 // as fixed, red on the code it replaced. L3-1: an enchanted found piece fenced whole online. L3-2: PARTY-LOOT's personal
 // bonus and a foe's worn kit handed pieces over worn and unmarked. L3-3 / L1-5: a found book's stack merge and split
@@ -56,7 +56,7 @@ test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted
   assert.ok(isEnchanted(plate) && plate.foundCondition === 15564 && plate.currentCondition === 15564);
   online(() => {
     assert.equal(quote('SellMagic', plate), quote('Sell', plate), 'fenced as it sells');
-    assert.equal(quote('SellMagic', plate), 11175);   // PIN MOVED (DAEDRIC-SALE): 22,350 - a counter pays half for Daedric now
+    assert.equal(quote('SellMagic', plate), 11175);
     assert.equal(quote('SellMagic', { ...plate, foundCondition: undefined }), 23776, 'unmarked: DFU\'s whole fence');   // PIN MOVED (DAEDRIC-SALE): 47,553
   });
   assert.equal(quote('SellMagic', plate), quote('SellMagic', { ...plate, foundCondition: undefined }), 'offline: the mark unread');

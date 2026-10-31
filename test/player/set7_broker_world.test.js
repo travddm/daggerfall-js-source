@@ -1,7 +1,5 @@
-// SET7 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 7; Mac: "Sigil stones become a currency to
-// trade for daily reset sigil items at a new NPC vendor that stands outside the oblivion gate"): THE SIGIL BROKER IN THE
-// WORLD (scenes/sigilBrokerPool.js) - BROKER-CAGE (2026-10-02, Mac: "she should be present at the site in a jailed gate,
-// and the gate opens after all the enemies are cleared"): where she stands, caged at the faithful's circle from the omen
+// SET7: THE SIGIL BROKER IN THE
+// WORLD (scenes/sigilBrokerPool.js) - BROKER-CAGE: where she stands, caged at the faithful's circle from the omen
 // to midnight; her turn to a player near her, her body (the Seducer's idle, on the flats' axis), her post and her cage
 // in the collider, her eye's box (her cage's whole while she is in it), her plaque and her press, caged and free; the
 // race she runs in (player/activationRace.js); and the host's seams (scenes/world.js).

@@ -1,5 +1,4 @@
-// SCALE4f (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE4f): THE ACCOUNT'S HALF - THE MINT FOLDED, AND THE
+// SCALE4f: THE ACCOUNT'S HALF - THE MINT FOLDED, AND THE
 // METRICS THAT SAY HOW BUSY THE ONE PRIMARY IS. The mint asked four statements of one realm_characters row (whether it is
 // the account's realm character in play, its level, its arms, its house); one answers all four now
 // (realm.js realmMintFacts), held here to the four over every state a row can be in. Every statement a request awaits is
@@ -169,7 +168,7 @@ test('SCALE4f the request\'s point carries D1\'s rows written, its wait, its row
     const serve = async (req, env) => { await env.DB.prepare('SELECT replica FROM t').all(); await env.DB.prepare('UPDATE t SET a = 1').run(); clock.t += 2; return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } }); };
     await measured(new Request('https://accounts.invalid/v1/heartbeat', { method: 'POST' }), { DB: fakeD1(clock), METRICS: { writeDataPoint: (p) => points.push(p) } }, serve);
     assert.equal(points.length, 1);
-    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');   // SCALE4h (PIN MOVED): the hot rows' four follow - test/server/scale4h.test.js
+    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');     // SCALE4h (
     assert.deepEqual(points[0].indexes, ['/v1/heartbeat']);
   } finally { Date.now = () => T0 * 1000; }
 });
@@ -188,7 +187,7 @@ test('SCALE4f an overloaded D1 is answered `server` still - every book asks that
     S.env.DB = { ...keep, prepare: () => { throw new Error('D1 DB is overloaded. Requests queued for too long.'); }, batch: keep.batch.bind(keep) };
     const over = await S.call('/v1/heartbeat', { parts: {} }, g.secret);
     assert.deepEqual([over.status, over.body], [503, { error: 'server' }]);
-    _resetBusyShed();   // PIN MOVED (BUSY-HEART, 2026-10-16): the overload sheds the heartbeat a moment - the fault asked after it
+    _resetBusyShed();
     S.env.DB = { ...keep, prepare: () => { throw new Error('no such column: nope'); }, batch: keep.batch.bind(keep) };
     const fault = await S.call('/v1/heartbeat', { parts: {} }, g.secret);
     assert.deepEqual([fault.status, fault.body], [500, { error: 'server' }]);

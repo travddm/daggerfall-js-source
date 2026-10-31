@@ -1,8 +1,4 @@
 // WATER-D1 - THE DUNGEON WATER WAS DRAWN AFTER THE FRAME HAD BEEN RESOLVED
-// (2026-09-21, LostMyLeg on Discord: "Everytime you go into a dungeon you
-// can see 2 Watertiles/textures floating around ... the console says 2
-// Water in every dungeon"; Mac's AIWATER report before it: "shown well
-// below the floor, in patches, reading like a no-clip glitch").
 //
 // THE LEVEL WAS NEVER WRONG. `-8 * soundIndex` off the first start marker,
 // `10000` for none, a plane the size of the block at `-level * GlobalScale`
@@ -19,7 +15,7 @@
 // passed the depth test everywhere: a plane through every wall and floor.
 // On the classic set there is no lane and no resolve, the default depth
 // buffer IS the world's, and the same order was right - which is why the
-// plane was correct for months and wrong from EL3 (2026-09-17) on, in
+// plane was correct for months and wrong from EL3 on, in
 // exactly the dungeons that HAVE water, which are the ones that logged
 // "N water".
 //

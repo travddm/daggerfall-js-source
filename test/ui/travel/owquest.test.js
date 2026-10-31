@@ -1,4 +1,4 @@
-// OW-QUEST (2026-10-19, the owner, of the Overworld's gaps: "1. Do it"; bible/06-Systems/Travel-View.md OW-QUEST): WHERE
+// OW-QUEST: WHERE
 // THE QUESTS POINT, ON THE OVERWORLD. The held map's own marks (ui/quest/questMarks.js questMapMarks) - every active quest
 // whose place is on the player's map - stand in the Overworld's marks (scenes/travelViewMarks.js) at their pixel's middle,
 // a diamond in the journal's gold (ui/travel/travelViewHud.js questGlyph), the followed quest's filled and held at the edge;
@@ -71,7 +71,6 @@ test('OW-QUEST the marks: each quest place on the player\'s map a mark at its pi
     const { travelViewMarks, kept } = marksHost();
     const quests = travelViewMarks().filter((m) => m.key.startsWith('quest:'));
     assert.deepEqual(quests.map((m) => [m.key, m.kind, m.edge, m.pick]), [['quest:200,210', 'quest', false, true], ['quest:205,212', 'quest tracked', true, true]]);
-    // PIN MOVED (AUDIT OW-REVISITED L5-1): a known place's mark stands at the PLACE's middle (its rect's, as its plate and
     // the journey's end stand); a place the law does not answer at its pixel's middle
     const o = mapPixelToWorldCoords(200, 210);
     assert.ok(kept.some(([x, z, lift]) => x === SMALL.cx && z === SMALL.cz && lift === 12), 'the place\'s own middle, a place\'s lift');

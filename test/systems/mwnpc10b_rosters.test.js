@@ -1,4 +1,4 @@
-// MWNPC10b (2026-10-09, the MW-NPC arc's tenth slice - bible/04-Characters/Morrowind-NPCs.md section 15b): THE SIEGE'S
+// MWNPC10b: THE SIEGE'S
 // FIGHTERS AND THE SHIPS' CREWS IN THEIR MORROWIND BODIES. Neither keeps an entity, so a class one is dressed by its
 // class (characters/foeBodies.js rosterLook: a race and face off its seed, a foe's clothes in their dyes, steel for the
 // knight, the warrior, the spellsword and the watch - the watch helmed) and a creature one is its creature; each driver
@@ -33,12 +33,11 @@ test('MWNPC10b-1 rosterLook: a class one dressed by its class off its seed - ste
   for (const t of [M.Knight, M.Warrior, M.Spellsword]) assert.deepEqual(plate(rosterLook({}, { mobileType: t, seed: 4 })), steel, `${t}: in steel`);
   const watch = rosterLook({}, { mobileType: M.Knight_CityWatch, seed: 4 });
   assert.deepEqual(plate(watch), [...steel, ARMOR_ENUM.Helm].sort((a, b) => a - b), 'the watch helmed');
-  assert.ok(watch.items.filter((it) => it.group === 'Armor').every((it) => it.material === ARMOR_MATERIAL.Steel));   // PIN MOVED (MWNPC12, section 17): steel is ARMOR_MATERIAL.Steel
+  assert.ok(watch.items.filter((it) => it.group === 'Armor').every((it) => it.material === ARMOR_MATERIAL.Steel));
   assert.equal(watch.items.filter((it) => it.equipSlot === EQUIP_SLOTS.Feet).length, 1, 'his boots, no shoes beside');
   const rogue = rosterLook({}, { mobileType: M.Rogue, gender: 'female', seed: 9 });
   assert.equal(plate(rogue).length, 0, 'a rogue in her clothes');
   assert.equal(rogue.gender, 'female');
-  // PIN MOVED (MWNPC10c, section 15c): a roster's class one carries its class's blade now - the rest of her is her clothes
   const clothes = rogue.items.filter((it) => it.group !== 'Weapons');
   assert.deepEqual(clothes.map((it) => it.equipSlot), [EQUIP_SLOTS.ChestClothes, EQUIP_SLOTS.LegsClothes, EQUIP_SLOTS.Feet]);
   assert.ok(clothes.every((it) => it.group === 'WomensClothing'));

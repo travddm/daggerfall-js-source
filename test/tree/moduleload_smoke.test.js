@@ -4,7 +4,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// THE MODULE-BODY SMOKE (2026-08-31, after the boot failure). Every
+// THE MODULE-BODY SMOKE. Every
 // pin in this suite that covers a host is a TEXT pin, because nothing
 // EXECUTED those module bodies - which is how `const useHooks = {
 // ...useHooks }` shipped and killed the site. This test does the one
@@ -73,12 +73,12 @@ test('the blind spot is exactly fourteen modules, each with a reason', () => {
   for (const f of Object.keys(NOT_IMPORTABLE)) {
     assert.ok(files.includes(f), `${f} is on the exclusion list and no longer exists`);
   }
-  assert.equal(Object.keys(NOT_IMPORTABLE).length, 14);   // Elite Gates removed: the Spire's lab gone (PIN MOVED); WATER1: the water lab joined the sky lab; LV1: the level-up lab joined both; SD-LAB: the Abyss Dungeon's; EG-G2: the Spire's (PIN MOVED); FIRM1: the Firmament's (PIN MOVED); GROWTH: the Growth tab's (PIN MOVED)
+  assert.equal(Object.keys(NOT_IMPORTABLE).length, 14);     // Elite Gates removed: the Spire's lab gone (
   // The three that matter are the hosts: they carry the most edits and
   // the least coverage, which is exactly the combination that produced
   // the boot failure. Recorded here so the next reader sees the cost.
   const globbed = Object.entries(NOT_IMPORTABLE).filter(([, why]) => why === 'import.meta.glob');
-  // BOOT1 (2026-09-20): two, not three. main.js was the third only by
+  // BOOT1: two, not three. main.js was the third only by
   // inheritance - it statically imported world.js, so world.js's glob
   // rejected the entry at link time before a line of it ran. With the
   // hosts behind dynamic doors the entry's body runs in node, and what

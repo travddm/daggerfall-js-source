@@ -1,5 +1,4 @@
-// RVN7d - THE LAIR STAND (bible/12-Enhanced-AI/Feud-Arc.md section 18.4; Mac, 2026-10-04: "more complex, less easy
-// to accomplish and more detailed", then "Go"). Entering its lair while it is living, unsworn and not out, and due or
+// RVN7d - THE LAIR STAND (;, then "Go"). Entering its lair while it is living, unsworn and not out, and due or
 // known, a revenant stands at the layout marker farthest from the entrance once the layout has stood - found resting
 // (unaware until it sees or hears the player, so a first blow may be a backstab), its drop's gold x1.25, its band about
 // it. A loose foe of the player's (online, on the room's SUMMON-SYNC lane - never a room's layout foe). In its own lair

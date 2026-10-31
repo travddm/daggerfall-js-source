@@ -130,7 +130,7 @@ test('ENHANCED AI 3: the bake reads the Collider\u2019s own triangles, needs an 
   assert.equal(bake.stats.cs, 0.25);
 });
 
-// AUDIT 62 F38 (2026-09-07) left the ARENA2 pin a TODO that asserted nothing: the bake through the
+// AUDIT 62 F38 left the ARENA2 pin a TODO that asserted nothing: the bake through the
 // dungeon loader was unwritten. It is written below (DEGENERATE-BAKE ROOT (ARENA2)) - Privateer's Hold and
 // the field dungeon m1204685, laid out as buildDungeonContext lays them, baked through the host's own call.
 const ARENA2 = process.env.ARENA2_PATH;
@@ -361,7 +361,7 @@ test('DEGENERATE-BAKE ROOT: a worker that dies on a large soup leaves the classi
   } finally { console.warn = warn; }
 });
 
-// DEGENERATE-BAKE GUARD (2026-09-20, Mac's patch): a report of foes
+// DEGENERATE-BAKE GUARD: a report of foes
 // standing idle across most of a dungeon traced to a navmesh bake that
 // had culled almost the whole level. `buildRegions` keeps only the
 // anchor's connected component, so a real bug - the voxelizer missing a

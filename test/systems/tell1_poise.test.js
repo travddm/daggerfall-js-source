@@ -1,5 +1,4 @@
-// TELL1 - POISE AND THE STAGGER (bible/12-Enhanced-AI/Feud-Arc.md section 3; Mac, 2026-10-04: "player's can easily stun
-// these enemies and breath more depth into it", then "Go" on every call). Before it, any landed blow broke any
+// TELL1 - POISE AND THE STAGGER (;, then "Go" on every call). Before it, any landed blow broke any
 // telegraphed wind-up for free (the knock it wrote broke it). Now a foe winding up HOLDS through a blow - no shove, no
 // Hurt - and the blow's weight fills its poise meter; past its poise the wind-up breaks and the foe is STAGGERED.
 // The law (the table, the classes, the weights); every health multiplier writing what it stood (`healthMult`); the brain
@@ -38,7 +37,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 test('TELL1: the table is the arc\'s section 27 (mutants: any number moved)', () => {
   assert.deepEqual({ ...TELL, POISE_W: { ...TELL.POISE_W }, STAGGER_S: { ...TELL.STAGGER_S }, PUNISH_S: { ...TELL.PUNISH_S }, CHAIN_NEXT: { ...TELL.CHAIN_NEXT }, COOLDOWN: { ...TELL.COOLDOWN } }, {
     POISE_W: { light: 0.2, medium: 0.3, heavy: 0.4, massive: 0.5 },
-    WEIGHT_MEDIUM: 200, WEIGHT_HEAVY: 700, WEIGHT_MASSIVE: 1500, POISE_FLOOR_MASSIVE: 60,   // PIN MOVED (AUDIT TELL: the duel harness's floor)
+    WEIGHT_MEDIUM: 200, WEIGHT_HEAVY: 700, WEIGHT_MASSIVE: 1500, POISE_FLOOR_MASSIVE: 60,
     POISE_ELITE: 1.5, POISE_ELITE_DUNGEON: 1.25, POISE_CHAMPION: 1.25, POISE_STALWART: 1.5, POISE_REVENANT_RANK: 0.1,
     K_BLUNT: 1.5, K_AXE: 1.25, K_LONG_BLADE: 1.0, K_SHORT_BLADE: 0.7, K_HANDS: 0.6, K_CLAWS: 1.0, K_TWO_HANDED: 1.15,
     K_ARROW: 0.5, K_SPELL: 0.75, K_PEER: 1, POISE_BACK: 1.5, BACK_DEG: 110, POISE_WEAK: 2,
@@ -75,7 +74,7 @@ test('TELL1: the weight classes, by DFU\'s own weight - a rat light, an orc and 
 
 test('TELL1: poise - the kind\'s own health by its weight, by what it is (an elite, an Elite Dungeon\'s, a champion, a Stalwart, a revenant by rank)', () => {
   assert.equal(poiseOf({ maxHealth: 100 }, 600), 30);
-  assert.equal(poiseOf({ maxHealth: 200 }, 3000), 100);   // PIN MOVED (AUDIT TELL, the duel harness): a massive one's at least POISE_FLOOR_MASSIVE
+  assert.equal(poiseOf({ maxHealth: 200 }, 3000), 100);
   assert.equal(poiseOf({ maxHealth: 100 }, 3000), 60, 'a massive one of 100: 50 under the floor, 60');
   assert.equal(poiseOf({ maxHealth: 100, eliteFoe: true, healthMult: 1 }, 3000), 90, 'the floor, then what it is');
   assert.equal(poiseOf({ maxHealth: 100 }, 2), 20);
@@ -110,7 +109,7 @@ test('TELL1: every multiplier of a foe\'s health writes what it stood - an elite
   const r = { id: 'x', name: 'Grushnak the Butcher', rank: 2, returns: 0, history: [] };
   const re = { maxHealth: 40, health: 40 };
   rv.applyRevenant(re, r, { now: 0 });
-  assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);   // PIN MOVED (UNQUIET, Revenants.md section 46): +40% health a rank (it was 25%)
+  assert.equal(re.healthMult, 1.8); assert.equal(kindHealth(re), 40);
 });
 
 test('TELL1: a blow\'s class - blunt, axe, long blade, short blade, hands, claws, two-handed on top, an arrow, a spell\'s landing (its round nothing), a peer\'s, nothing else', () => {
@@ -254,18 +253,17 @@ test('TELL1: no stunlock - a wind-up broken inside STAGGER_IMMUNE of a stagger\'
 test('TELL1: the weight class sets the length - a giant is staggered 0.8 s (its poise the massive floor since AUDIT TELL; the light 1.4 s is staggerSeconds\' own pin); an elite\'s poise is half again', () => {   // NAME MOVED (AUDIT TELL: it named a light foe it never staggers)
   const g = foe({ mobileType: M.Giant });
   assert.ok(untilWindup([g], g, [0, 0, 0]));
-  // PIN MOVED (TELL3, bible/12-Enhanced-AI/Feud-Arc.md 5: a giant's slam is iron, one elite blow in three too - no poise
   // to weigh): the blow this pins is one with a poise (test/characters/enemy/tell3_iron.test.js pins the iron)
   g.ai._tac.blow.guard = 'poise';
   const t0 = T;
-  assert.equal(windupStruck(g.ai, g.ent, 3000, 59.9), 'hold', 'a giant of 100: poise 50, the massive floor 60');   // PIN MOVED (AUDIT TELL: POISE_FLOOR_MASSIVE)
+  assert.equal(windupStruck(g.ai, g.ent, 3000, 59.9), 'hold', 'a giant of 100: poise 50, the massive floor 60');
   assert.equal(windupStruck(g.ai, g.ent, 3000, 0.2), 'stagger');
   assert.ok(Math.abs(g.ai.staggerUntil - (t0 + 0.8)) < 1e-9);
   resetTactics(); resetBlows();
   const e = foe();
   e.ent.eliteFoe = true;
   assert.ok(untilWindup([e], e, [0, 0, 0]));
-  e.ai._tac.blow.guard = 'poise';   // PIN MOVED (TELL3): as above
+  e.ai._tac.blow.guard = 'poise';
   assert.equal(windupStruck(e.ai, e.ent, ORC_W, 44.9), 'hold', 'an elite orc: 45');
   assert.equal(windupStruck(e.ai, e.ent, ORC_W, 0.2), 'stagger');
 });

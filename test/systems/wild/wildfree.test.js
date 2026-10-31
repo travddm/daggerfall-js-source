@@ -1,5 +1,4 @@
-// WILD-FREE (2026-10-11, a player's load captured from the live client: 8.1 s of a 14.5 s frozen frame; bible/
-// 11-Multiplayer/Wild-Zone.md section 12, THE COST) - THE DAY'S HALLS, ASKING `free` ONLY WHERE AN ANSWER IS READ.
+// WILD-FREE - THE DAY'S HALLS, ASKING `free` ONLY WHERE AN ANSWER IS READ.
 // wildHallPicks asked the host's dearest question (world.js wildHallFree: the spawns' plateau, a heightmap kernel summed)
 // of every pixel of every ring before it cut the band; it asks now where the picks read the answer, once a pixel. Every
 // client must stand the same halls, so the old law is restated here whole and the two compared - over zones of several
@@ -72,7 +71,6 @@ test('WILD-FREE the day\'s halls are the halls they were - every zone shape, eve
     for (const [fn, f] of FREES) {
       const free = (x, y) => f(x, y, mask, bd);
       for (let day = 20360; day < 20372; day++) {
-        // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the law with its thinning off (a province's pool, below) is
         // the law as it was - each hall now carries its cell beside its pixel (a cell a pixel here)
         const now = wildHallPicks(mask, free, day, { poolMax: Infinity }).map(({ cx, cy, ...h }) => (assert.deepEqual([cx, cy], [h.x, h.y]), h)), was = picksAsTheyWere(mask, free, day);
         assert.deepEqual(now, was, `${zn}, ${fn}, day ${day}`);

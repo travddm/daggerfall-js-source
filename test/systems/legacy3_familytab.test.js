@@ -1,6 +1,6 @@
-// LEGACY3 (2026-10-05, Mac: "I say implement it into the pause menu as a new tab"): THE FAMILY TAB - drawn in the
+// LEGACY3: THE FAMILY TAB - drawn in the
 // pause window between Holdings and System while the game is played with Project Legacy, and never otherwise: a landing
-// on it then lands on System (bible/06-Systems/Legacy-Arc.md section 11). Driven through the mounted screen.
+// on it then lands on System. Driven through the mounted screen.
 // FAMILY-TAB (2026-10-06, asked: "When a player is playing without project legacy, the family tab shouldn't show (pause
 // menu)"): "with Project Legacy" is the mod on AND a house for the game played (ui/familyPages.js familyTabShown) - a
 // character who answered no lineage, one made online before the question or copied in, and a scene that keeps no family
@@ -41,7 +41,7 @@ const provider = ({ family = null, past = null, choice = null, online = false } 
   on: () => legacyOn(), family: () => family, past: () => past, lived: () => 0, switchRefusal: () => null, switchTo: () => ({ ok: false }),
   hall: () => (family ? [family] : []), choice: () => choice, online: () => online,
 });
-// TUT1: the Tutorials tab before System - PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab)
+// TUT1: the Tutorials tab before System
 const FULL = ['Quests', 'Stats', 'Growth', 'Holdings', 'Family', 'Tutorials', 'System'];
 const WITHOUT = ['Quests', 'Stats', 'Growth', 'Holdings', 'Tutorials', 'System'];
 

@@ -1,13 +1,9 @@
-// ARENA6 (2026-10-03, the owner: "I also want to add a way to simply host private matches. In this case, a streamer is
-// hosting a tournement later today and I want them to be able to open a session where people can join, watch,
-// participate, and allow the host of the session to choose who is fighting and who is in the crowd"; decided: every
-// fighter of a session's bout equally whole, registered accounts fight and guests only watch, the host a registered
-// account): A PRIVATE SESSION, `arena:p<code>`. The relay over fake sockets and fake objects (test/fakeRoom.mjs) - the
+// ARENA6: A PRIVATE SESSION, `arena:p<code>`. The relay over fake sockets and fake objects (test/fakeRoom.mjs) - the
 // Worker's door, the session opened, joined, picked, its casual bout refereed with equal health and kept in its results,
 // voided, a member removed, the host's absence and the session's ends, the seat cap, the hall's list; the wire both ways;
 // the client over the real modules (scenes/arena/arenaOnline.js driving scenes/arena/arenaBouts.js's relay mirror on a real Room);
 // the window's model (systems/arena/arenaBoard.js sessionCard and arenaBoard - the window itself is mounted in
-// test/ui/enhanced/audit1003b_ui.test.js); and the hosts' seams. Design: bible/11-Multiplayer/Arena.md,
+// test/ui/enhanced/audit1003b_ui.test.js); and the hosts' seams. Design:,
 // the ARENA6 record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -327,7 +323,7 @@ test('ARENA6 the seats: a session holds ARENA_PRIVATE_MEMBERS_MAX (the stands\' 
   await R.hello(stranger, 'peer-str', null, { name: 'Stranger', kind: 'linked', tokenSub: 'acct-str' });
   await word(R, stranger, { k: 'in', r: 'f', tier: 0, bout: 0, lv: 5 });
   assert.equal(last(stranger, 'no').m, 'not member');
-  // AUDIT ARENA-LADDER 2 (PIN MOVED): with a ticket - a ticketless ladder `in` is told 'no bout' by the ladder's own door, so
+  // AUDIT ARENA-LADDER 2 (
   // only a ticketed one shows the session room refusing to open a ladder bout
   await word(R, socks[0], { k: 'in', r: 'f', tier: 0, bout: 0, lv: 5, z: 'feedc0de000000e1' });
   assert.equal(last(socks[0], 'no').m, 'no bout', 'a member\'s `in` with no bout standing - and an `in` here opens no ladder bout');

@@ -1,5 +1,4 @@
-// LW8 (2026-10-05, bible/06-Systems/Living-World.md "LW8", Mac: NPCs "dynamically all have tasks ... perform
-// activities"): THE DOORS OPEN - the residents whose day has them inside a building stood in its room when the player is
+// LW8: THE DOORS OPEN - the residents whose day has them inside a building stood in its room when the player is
 // in it: who (the town's own word), where (the room sounded through its collider), coming and going unseen, talked to
 // through the street's own ray. The town is the synthetic one (test/lwTown.mjs); the room a mock collider.
 import test from 'node:test';
@@ -139,7 +138,7 @@ test('LW8 the residents stood: on the way in all the day has inside stand at onc
   assert.equal(rig.layer.size, 3, 'all at once on the way in');
   const stood = rig.layer.stood();
   assert.equal(new Set(stood.map((s) => JSON.stringify(s.at))).size, 3, 'each its own spot');
-  // LW-LOOKS: PIN MOVED - in their own clothes, but one whose calling is a class's in it (the road's gear never indoors)
+  // LW-LOOKS:
   assert.deepEqual(stood.map((s) => [s.id, s.res.cls]).sort(), [['L9.1', 140], ['L9.2', townClassOf(RES(2))], ['L9.3', 140]]);
   assert.equal(townClassOf(RES(2)), 132, 'a priest in the healer\'s robes');
   assert.equal(rig.synced.length, 3);

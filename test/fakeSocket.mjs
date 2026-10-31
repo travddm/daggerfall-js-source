@@ -2,7 +2,7 @@
 // the session is handed as WebSocketImpl; every instance is kept, `sent` holds the raw strings the session wrote (the
 // wire's own shape - t first, the prefix the relay reads), `open()` and `receive()` drive it from the test's side.
 //
-// RPT1026-SECNET (LINE-STALL, bible/06-Systems/Online-Arc.md): AND THE RUNTIME'S PING IS ANSWERED, as the relay's runtime
+// RPT1026-SECNET (LINE-STALL): AND THE RUNTIME'S PING IS ANSWERED, as the relay's runtime
 // answers it in front of every room (server/src/index.js setWebSocketAutoResponse) - a session that hears no answer to
 // its ping reads its line as stalled and holds its poses, so a fake that never answered was a dead line in every pin.
 // `pong: false` is that dead line, for the pins of the stall itself.

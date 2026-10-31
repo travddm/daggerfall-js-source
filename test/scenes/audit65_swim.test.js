@@ -1,4 +1,4 @@
-// AUDIT 65 XL-1 (2026-09-11) - DFU HAS TWO SWIM MEMBERS, AND THE PORT
+// AUDIT 65 XL-1 - DFU HAS TWO SWIM MEMBERS, AND THE PORT
 // HAD ONE.
 //
 // PlayerEnterExit carries `isPlayerSwimming` (:44, :177-178) and

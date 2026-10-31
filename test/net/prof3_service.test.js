@@ -1,9 +1,9 @@
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - SMITHING AS THE SERVICE KEEPS IT: a craft at the anvil (the recipe law's
+// PROF3 - SMITHING AS THE SERVICE KEEPS IT: a craft at the anvil (the recipe law's
 // inputs held and spent bought first, the rank the recipe asks, the quality the service rolls and the steps it lays on,
 // the pieces written each with its provenance id and its signed record, the Smithing XP and the first craft's 500, asked
 // twice one); the smith's stock (the fittings no profession yields yet, bought into the Stores for Marks); a
 // Quartermaster's smelt. Driven through the real Worker over node:sqlite with every migration applied (test/
-// accountDb.mjs). bible/06-Systems/Professions-Arc.md 24.
+// accountDb.mjs). 24.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';
@@ -55,7 +55,7 @@ test('PROF3 service: a Mithril Longsword made - the inputs spent, the piece writ
   assert.equal(r.body.pieces.length, 1);
   const [{ provenance, record }] = r.body.pieces;
   assert.match(provenance, PROVENANCE_RE);
-  assert.deepEqual([r.body.xp, r.body.first, r.body.maker], [20 * 5 + 500, true, 'Silverthorn']);   // PIN MOVED (FIRST-BUDGET): Smithing's first-make share, the 500 it always paid (recipeLaw firstCraftXp)
+  assert.deepEqual([r.body.xp, r.body.first, r.body.maker], [20 * 5 + 500, true, 'Silverthorn']);
   assert.equal(s.xpOf(mac), xpForRank(55) + 600);
   for (const m of ['ingot:mithril', 'metal:copper', 'leather:cured']) assert.deepEqual(s.stores(mac, m), [], `${m} spent`);
   const v = await verifyProductRecord(record, s.identityPublic, { subtle: webcrypto.subtle });
@@ -118,7 +118,6 @@ test('PROF3 service: a craft refused - the rank, the inputs (naming the short on
   s.give(mac, 'ingot:iron', 'own', 2);
   s.give(mac, 'leather:cured', 'own', 2);
   const kit = await s.call('/v1/prof/craft', craft(mac, 'kit:iron'), mac.secret);
-  // PIN MOVED (CRAFT5, Professions-Arc 41.8): a kit's craft rolls a quality - its reach (a Superior's nine tenths)
   assert.deepEqual([Number.isInteger(kit.body.quality) && kit.body.quality >= 0 && kit.body.quality <= 4, kit.body.pieces.length], [true, 1]);
   s.setXp(mac, xpForRank(100), 'smithing', { spec100: 'quartermaster' });
   const two = await s.call('/v1/prof/craft', craft(mac, 'kit:iron'), mac.secret);
@@ -127,7 +126,6 @@ test('PROF3 service: a craft refused - the rank, the inputs (naming the short on
   assert.deepEqual(s.stores(mac, 'ingot:iron'), [], 'two kits, one ingot');
   assert.equal(readProductRecord(two.body.pieces[1].record).q, two.body.quality, 'PIN MOVED (CRAFT5): signed at its quality');
   // the crafter's limit: two crafts past Journeyman hold Smithing at 50
-  // PIN MOVED (CRAFT3): Alchemy and Cooking are one track (Provisioning) - the two crafts past Journeyman are Provisioning and Building, seeded under the craft's id
   s.setXp(mac, xpForRank(60), 'provisioning');
   s.setXp(mac, xpForRank(60), 'building');
   s.setXp(mac, xpForRank(51) - 50);

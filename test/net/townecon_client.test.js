@@ -11,7 +11,7 @@ import { createTownEconHost, MARKET_BANDS_MAX } from '../../src/scenes/townEconH
 import { accountTowns, SESSION_KEY } from '../../src/net/accountClient.js';
 import { TOWN_WATCH_CLAIM_MAX, TOWN_ECON_KEPT_S, townProsperity, townKeyOf, townDayOf, TOWN_DAY_MS, TOWN_SEA_TICK_S } from '../../src/net/townEconLaw.js';
 
-// TOWN-ECON TE2 (2026-10-18, bible/06-Systems/Town-Economy-Arc.md section 4): this device's half of the players' share -
+// TOWN-ECON TE2: this device's half of the players' share -
 // the shares read and held, the Watch's ticks kept at a town's pixel and claimed, a town witnessed once a day; the host
 // module the world host wires, and the door.
 
@@ -294,7 +294,7 @@ test('AUDIT TOWN-ECON 2 the client\'s fixes: a pixel the service says is full to
   assert.deepEqual(parseTownCommand('/town audit'), { op: 'audit' });
   assert.deepEqual(parseTownCommand('/town strike 3358447'), { op: 'strike', key: 3358447 });
   for (const bad of ['/town', '/town strike', '/town strike x', '/town strike 0', '/town strike 1 2', '/town audit x']) assert.deepEqual(parseTownCommand(bad), { error: TOWN_USAGE }, bad);
-  assert.deepEqual(parseTownCommand('/town audit 5'), { op: 'audit', page: 4 });   // PIN MOVED (BAY-LEFT-SEA, the audit's E4): a page of the region's confirmed towns, 400 a page
+  assert.deepEqual(parseTownCommand('/town audit 5'), { op: 'audit', page: 4 });
   assert.deepEqual(townAuditLines({ towns: [] }, () => null), ['No town of this region is confirmed in the registry.']);
   const lines = townAuditLines({ towns: [{ map: RIP, px: 212, py: 151, location: 5, by: ['Ada', 'Bel', 'Cyr'] }, { map: 77, px: 10, py: 10, location: 6, by: [] }] }, (x) => (x === 212 ? RIP : x === 10 ? 999 : null));
   assert.match(lines[0], /^Town \d+ at 212,151 \(location 5\): the town here; confirmed by Ada, Bel, Cyr$/);
@@ -302,7 +302,7 @@ test('AUDIT TOWN-ECON 2 the client\'s fixes: a pixel the service says is full to
   const said = [];
   const sent = [];
   const dh = createTownEconHost({ online: () => true, townOf: (id) => towns.get(id), seatAt: () => null, seats: () => null, raidedAt: () => false, nowMs: () => T * 1000,
-    door: { ...d.door, me: () => ME, strike: async (map) => { sent.push(['strike', map]); return { ok: true, data: { reports: 3 } }; }, audit: async (region, page) => { sent.push(['audit', region, page]); return { ok: true, data: { towns: [] } }; } },   // PIN MOVED (BAY-LEFT-SEA): and its page
+    door: { ...d.door, me: () => ME, strike: async (map) => { sent.push(['strike', map]); return { ok: true, data: { reports: 3 } }; }, audit: async (region, page) => { sent.push(['audit', region, page]); return { ok: true, data: { towns: [] } }; } },
     storage: memory(), regionHere: () => 17 });
   assert.equal(dh.command('/hall audit', (l) => said.push(l)), false, 'not its word');
   assert.equal(dh.command('/town strike 42', (l) => said.push(l)), true);

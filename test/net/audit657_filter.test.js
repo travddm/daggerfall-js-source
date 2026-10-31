@@ -1,7 +1,6 @@
-// AUDIT 657 (2026-10-07, Mac: "Lets do an audit on everything so far"): THE WORD FILTER'S FINDINGS, PINNED - lens T of
+// AUDIT 657: THE WORD FILTER'S FINDINGS, PINNED - lens T of
 // PR #657's audit (TEXT-F1, net/nameFilter.js's sentence reader) and lens D's D1 and D9. No word a list holds is written
 // here: each is read off the lists themselves. Each fix carries an `AUDIT 657 <ID>` comment where it stands. The record:
-// bible/01-Overview/audits/Audit-657.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';

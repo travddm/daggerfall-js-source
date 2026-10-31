@@ -1,4 +1,4 @@
-// GATE-SEEN (2026-09-26, Mac: "Somepeople cant see the gate spawn not sure but got reports of this" - "No oblivion
+// GATE-SEEN (2026-09-26, - "No oblivion
 // portal to enter :("): two ways a player saw no gate. (1) It stood on built ground alone, and the streamed grid is
 // the Land View Distance's: the omen's town is 2 to 4 pixels off, so on a short view nothing stood - the beacon
 // "found by looking up" included. A gate on a pixel not built yet stands its BEACON now, on the ground the pixel

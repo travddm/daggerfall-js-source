@@ -312,7 +312,7 @@ test('c2/S4 releaseAll clears every latch, and the compass reads the MAP camera 
   assert.equal(w.wheel(CHROME_RECTS.grid.x + 2, 175, -1), null);
 });
 
-// ── AUDIT-AMAP (2026-09-21): the press-hold machine against BaseScreenComponent ──
+// ── AUDIT-AMAP: the press-hold machine against BaseScreenComponent ──
 test('AUDIT-AMAP W6/W9: the panel double click is TIME alone, and the panel press honours alreadyIn* like every button', () => {
   const c = new AutomapChrome(DUNGEON_ACTIONS);
   const P = CHROME_RECTS.panel;

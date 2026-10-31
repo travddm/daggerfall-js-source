@@ -1,4 +1,4 @@
-// URBANIZER U3 (2026-10-26; bible/03-World/Urban-Fabric.md section 6): a town's fabric stood - which towns are dressed,
+// URBANIZER U3: a town's fabric stood - which towns are dressed,
 // where their main streets run, the plan and the model kept while near and let go after, the walkers shut by it, and the
 // pixel build's wiring.
 import { test } from 'node:test';
@@ -39,7 +39,7 @@ test('URBANIZER U3 where the main streets run: a walled city from each gate\'s o
   const e = fabricEnds(loc({ extra: { capital: { k: so } } }), S, S);
   assert.deepEqual(e.ends, [[S / 2, 0]]);
   assert.deepEqual(e.centre, [(2 * BLOCK_M) / 1.6, ((8 - 3) * BLOCK_M) / 1.6]);
-  // a walled city: its wall's gates as it registered them - each its opening's middle (GATE-ROADS: PIN MOVED, the model's
+  // a walled city: its wall's gates as it registered them - each its opening's middle (GATE-ROADS:
   // way through stands GATE_OPENING.along on its +x, (out[1], -out[0]), from the piece's middle)
   const walled = loc({ mapId: 0xa7012345, extra: { outline: { walled: true } } });
   registerTownWall(walled, walled.exterior.exteriorData.blockNames, () => null, () => ({ RmbBlock: {} }), { pieces: [{ model: WALL_MODELS.gate, at: [100, 10], out: [0, -1] }, { model: WALL_MODELS.wall, at: [50, 10], out: [0, -1] }, { model: WALL_MODELS.gate, at: [10, 60], out: [-1, 0] }], markers: [] });

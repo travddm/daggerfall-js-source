@@ -1,5 +1,4 @@
-// LOOT-BANNER + ACQUIRE1 (2026-10-09, Mac: "a popup for when you obtain something of rarity including weapons, armor, the
-// new cards, etc - something akin to a destiny loot popup notification"; bible/10-UI/Loot-Banner.md). The laws pinned here:
+// LOOT-BANNER + ACQUIRE1. The laws pinned here:
 //   - THE WATCHER (systems/acquireWatch.js): what arrived in the player's keeping - the pack, the wagon, the Materials Bag -
 //     read once a frame; a piece marked the first frame it stands there; a new baseline for a new
 //     entity, a load, and the creation; only Rare and up announces; the mark is the receiver's (stripped off the wire).
@@ -293,8 +292,7 @@ test('LOOT-BANNER THE WIRING: drawHud reads the player entity it is handed on ev
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 380, bottom: 700 }, lower: 790, heights: [60, 60, 60] }), { top: 710, shown: 1 }, 'a short band shows the newest');
 });
 
-// ── HONOUR-BANNER (2026-10-14, Mac: "The title/aura in the abyss dungeon should also have a loot popup"; the lamp's "ensure
-// there is a loot popup for obtaining the title") ──
+// ── HONOUR-BANNER ──
 test('HONOUR-BANNER THE ENTRY: a title or an aura granted is a banner of its own - its word, "New Title"/"New Aura", the top tier\'s place and fanfare, the title\'s own colour; a word nobody names is none', async () => {
   const PB = await import('../../src/ui/playerBadge.js');
   const t = B.honourEntry({ kind: 'title', key: 'hourbreaker' });

@@ -1,4 +1,4 @@
-// TWO (2026-10-18): the enhanced skin's 2 and Z are our own glyphs, served as a second face of 'Pixelify Five' over
+// TWO: the enhanced skin's 2 and Z are our own glyphs, served as a second face of 'Pixelify Five' over
 // U+0032 and U+005A, so the two no longer read alike.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

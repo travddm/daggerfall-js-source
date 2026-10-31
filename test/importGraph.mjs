@@ -4,7 +4,7 @@
 // relay's hash reads the order this returns, so the walk is unchanged
 // byte for byte in what it visits and when.
 //
-// IMPORT-GRAPH1 (2026-10-10, the owner: "Make your own decisions and take care of any issues"; found by AUDIT TECH1):
+// IMPORT-GRAPH1:
 // THE WALK READS EACH FILE AS THE BUNDLER DOES - parsed (acorn, a devDependency), never a regex over the text. The
 // regex stripped block comments before line comments, so a line comment carrying a stray `/*` opened a "block" that ran
 // to the next `*/` and swallowed the imports between: the account Worker bundled nine files the walk never saw

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-20e OFFERING-RAY (bible/01-Overview/bugs/Field-Bugs-2026-10-20e.md; the Discord's #bug-reports,
+// FIELD BUGS 2026-10-20e OFFERING-RAY (; the Discord's #bug-reports,
 // 2026-10-20 - Temegast: "crash on interact", twice, and Boar the same): A HEARTH OFFERING'S BOX IS THE RAY'S. A stood
 // offering's target (src/scenes/witchesHost.js `targets`) handed the street's one ray its batch's culling box - the
 // 6-array `flatBatchAabb` mints - where every ray in player/activate.js reads `{ min, max }`. The pick tests every

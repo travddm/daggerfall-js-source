@@ -1,4 +1,4 @@
-// PERF-EXT20-22 (2026-09-25) - THE STREAMING HITCHES, the grass's share.
+// PERF-EXT20-22 - THE STREAMING HITCHES, the grass's share.
 //
 // The players: "fps issues in the exterior but fine in the interior",
 // "me too my friend.. don't know why. I got a RX6600". Outdoors the
@@ -161,7 +161,6 @@ test('PERF-EXT21: a field that crossed grows the same world as one that never di
   const RA = new G.LabGrassRenderer(A.gl), RB = new G.LabGrassRenderer(B.gl);
   let compA = [0, 0, 0];
   const compB = [0, 0, 0];
-  // PIN MOVED (FB1021B): on one clock that stands still - the field's frame is measured in time now, and two fields
   // on the real clock fill as fast as the machine let each one that frame
   const still = { clock: () => 0 };
   const fa = G.createGrassField(RA, { ...closures(compA), ...still }), fb = G.createGrassField(RB, { ...closures(compB), ...still });
@@ -175,7 +174,6 @@ test('PERF-EXT21: a field that crossed grows the same world as one that never di
     fb.update(e[0], e[2], cb.keep, cb.ground);
   }
   assert.ok(crossed);
-  // PIN MOVED (FB1021B): the cell under the eye re-read after the crossing (an invalidate) comes back whole on the next
   // frame - the path's own cells now come by slices on the eye's pace, and the whole placer must stand at the field's
   // origin as they do
   {
@@ -220,7 +218,7 @@ test('PERF-EXT21: a field that crossed grows the same world as one that never di
 test('PERF-EXT21: invalidate after a shift drops exactly the cells whose squares, where they stand in the scene now, meet the rect', () => {
   const { closures } = ring(2);
   const r = { allocSlots() {}, writeSlot() {}, clearSlot() {}, shiftSlots() {} };
-  const field = G.createGrassField(r, { ...closures([0, 0, 0]), perFrame: 1e9, clock: () => 0 });   // PIN MOVED (FB1021B): the whole disc in the one update
+  const field = G.createGrassField(r, { ...closures([0, 0, 0]), perFrame: 1e9, clock: () => 0 });
   const off = [-TERRAIN_SIZE, 0, 0];   // 819.2 is 27 cells and 9.2 m: the grids no longer line up
   field.update(609.6, 309.6);
   field.shiftOrigin(off);
@@ -332,7 +330,6 @@ test('PERF-EXT22: inside the fade a cell still comes whole, a boot fills two who
   let calls = 0;
   const keep = (x, z) => { calls++; return cl.keep(x, z); };
   const R = laneRecorder();
-  // PIN MOVED (FB1021B): on a clock that stands still - a machine that does the work in no time, so the frame's time
   // (GRASS_FRAME_MS, test/render/fb1021b_grass.test.js) never runs out and perFrame alone bounds the frame
   const field = G.createGrassField(R, { keep, ground: cl.ground, clock: () => 0 });
   // a boot: two whole cells on the first frame

@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS9 (2026-10-26, the owner: "Roads around the city arent properly blended when they are angled";
-// bible/03-World/Town-Shapes.md TS9): a town's road ring (the mod's "Paint roads around locations", round its outline
+// TOWN-SHAPES TS9: a town's road ring (the mod's "Paint roads around locations", round its outline
 // since TS2) is painted whole - the painter's skip guard passed by every ring tile off the location rect and off the
 // pixel's centre cross and diagonals, so a town's ring stood as bars across its roads and stubs on its diagonals - and its
 // angled edges are blended with the road's own diagonal edge (47 over dirt, 55 over grass), as a diagonal road's flanks
@@ -138,7 +137,7 @@ test('TS9 with ARENA2: a town of the Bay and a walled city past it - every ring 
   const io = { classicOf: (n) => blocks.readClassicBlock(blocks.getBlockIndex(blocks.checkName(n))), servedOf: (n) => blocks.getBlockByName(n) };
   const city = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500009) >>> 0, longitude: bay.mapTableData.longitude, latitude: bay.mapTableData.latitude } }, io);
   if (city.outline?.walled) standTownWall(city, t.exterior.exteriorData.blockNames, io, townOutlineBlockJson);
-  // AUDIT BAY-LEFT F2 (PIN MOVED): and the walled city built on a pixel truly past the Bay, its road the roads' layer's -
+  // AUDIT BAY-LEFT F2 (
   // the curved painter's (VOYAGER2), which the city on the Bay's own pixel never reached
   const P = { x: 1500, y: 300 };
   const far = outlineTownLocation({ ...t, mapTableData: { ...t.mapTableData, mapId: ((0xa7 << 20) | 500010) >>> 0 } }, io);

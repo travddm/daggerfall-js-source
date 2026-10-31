@@ -114,7 +114,6 @@ test('FB1020c CROWD-CLEAR: a Person whose marker shares the guild questor\'s pic
 test('FB1020c CROWD-CLEAR: the nearest clear spawn marker of the site, a crowded one passed over and an item\'s marker never taken; none clear - beside its own (RPT1026-QUESTS QUEST-CROWD), never the room\'s door (mutants: the reach; the item markers taken; the enter markers taken)', async () => {
   near((await standAt([A, C, B], [QUESTOR()])).npc, [106, 0, 51], 'C crowded too: B');
   near((await standAt([A, mark(ITEM, 120, 0, 40), B], [QUESTOR()])).npc, [106, 0, 51], 'an item\'s marker 2 m off and clear is no place for her: the spawn marker');
-  // PIN MOVED (RPT1026-QUESTS QUEST-CROWD, sceneMount.js besideSpot): no clear marker - beside her own, out of the
   // questor's box (north: east and north-east are still in it), never the door at (93, 0, 50)
   near((await standAt([A, C], [QUESTOR()])).npc, [101, 0, 51 + 1.1 * 0.95], 'no clear marker: beside its own, not the door');
 });

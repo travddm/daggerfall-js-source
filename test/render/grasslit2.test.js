@@ -1,4 +1,4 @@
-// GRASS-LIT2 (2026-10-02, Mac: "Tackle the not done" - the five things GRASS-LIT's report left unpaid): the lanterns
+// GRASS-LIT2: the lanterns
 // light the grass as they light the ground under it; a blade is lit about the ground's own normal, so a hillside's
 // field darkens with the hillside; the grass's colour is taken off the tile set that is DRAWN, a texture mod's
 // included; and the classic lane paints the field in its own tones, as the default lane shows it at noon. The vertex
@@ -357,7 +357,6 @@ test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps
   // the mod's tile set, asked before the three are learned so they land in one step
   // (AUDIT HOST-SPLIT 2, the second read: it ended at the build's createTerrainSurface, which now stands in the module the
   // join appends - so the slice ran to the end of world.js and any line below passed. It ends at the next door, in world.js)
-  // PIN MOVED (OW-HITCH): the ground sets' home is scenes/groundSets.js (HOST-SPLIT) - read there, to its module's return
   const gs = readFileSync(new URL('../../src/scenes/groundSets.js', import.meta.url), 'utf8');
   const learnAt = gs.indexOf('const drawnMeans = ');
   const learn = gs.slice(learnAt, gs.indexOf('  return { groundLayersOf', learnAt));
@@ -365,7 +364,7 @@ test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps
   assert.ok(learn.startsWith('const drawnMeans = grassRecords.has(groundArchive) ? null\n      : groundDrawnMeans.has(groundArchive) ? groundDrawnMeans.get(groundArchive)\n      : (await dfmodGroundLayers(groundArchive, groundTex))?.map(tileMeanColour) ?? null;'));
   assert.ok(learn.indexOf('await') < learn.indexOf('grassRecords.set(') && learn.includes('groundMeanColour.set(groundArchive, drawnMeans ?? layers.map(tileMeanColour));'));
   // AUDIT GRASS-LIT2 B2: the means are the UPLOADED layers' - taken beside the upload, not asked of the door again
-  // AUDIT PRECIP GROUND-2 (PIN MOVED): the set's OWN layers' means - never its twin's winter half
+  // AUDIT PRECIP GROUND-2 (
   assert.ok(gs.includes('if (labGrass) groundDrawnMeans.set(groundArchive, own.modLayers ? own.modLayers.map(tileMeanColour) : null);'));
   assert.ok(gs.indexOf('const layers = winter == null ? own.layers : twinLayers(') < gs.indexOf('await stepsBreathing(renderer.uploadTileArraySteps(key, layers), breathe);')
     && gs.indexOf('await stepsBreathing(renderer.uploadTileArraySteps(key, layers), breathe);') < gs.indexOf('if (labGrass) groundDrawnMeans.set('), 'PIN MOVED (OW-HITCH): uploaded a few layers a breath, then the means');
@@ -389,7 +388,7 @@ test('GRASS-LIT2: the host reads the slope off the near grid\'s normals it keeps
 
 test('GRASS-LIT2: the shot hooks - the classic lane\'s tones by hand, and the heart of the deepest wood to look down on', () => {
   const w = hostText('src/scenes/world.js');
-  assert.ok(w.includes("labGrass.setTones(tones ?? (classic ? GRASS_TONES_CLASSIC : GRASS_TONES), classic)"));   // PIN MOVED (AUDIT MEADOW1): through the renderer, which moves the meadow's art ground with the tones
+  assert.ok(w.includes("labGrass.setTones(tones ?? (classic ? GRASS_TONES_CLASSIC : GRASS_TONES), classic)"));
   const hook = w.slice(w.indexOf('window.__forestSpot = (r = 10, here = false) => {'), w.indexOf('/** CSA-C probe: a land tile 3 tiles off a water tile'));
   assert.ok(hook.includes('forestAt(p.px * 128 + tx + dx, -p.py * 128 + tz + dz)'), 'FOREST1\'s field at the world tile');
   assert.ok(hook.includes('for (const p of here ? [cur] : built.values())') && hook.includes('origin: [t[0], t[2]]'), 'the player\'s own pixel on asking, and its origin - a pose off it stays in it');
@@ -402,7 +401,7 @@ test('GRASS-LIT2: the shot hooks - the classic lane\'s tones by hand, and the he
   assert.ok(block.lastIndexOf('window.__grassSpot') > block.lastIndexOf('  if (shotMode) {'));
 });
 
-// ═══ AUDIT GRASS-LIT2 (2026-10-02, Mac: "Audit this") ═══════════════════
+// ═══ AUDIT GRASS-LIT2 ═══════════════════
 /** a GL that records, names every uniform location by its name, and hands out ids */
 function recGl() {
   const calls = []; let ids = 0;

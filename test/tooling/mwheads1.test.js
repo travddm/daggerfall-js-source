@@ -1,13 +1,11 @@
-// MW-HEADS1 (2026-10-13, the owner: "Everything we are doing is for the morrowwind model. This batch is for breton";
-// asked, every Breton man wears them): THE PORT'S OWN HEADS - THE BRETON MEN'S THREE HEADS AND THREE HAIRS.
+// MW-HEADS1: THE PORT'S OWN HEADS - THE BRETON MEN'S THREE HEADS AND THREE HAIRS.
 //
 // One export of three objects, each a face and a hair in two paintings; baked into six rigid parts in the head's own
 // frame (the source head's, which all three share), each painting held to the name the export gives its material; every
 // hair over every head's scalp; the Breton men's pools wherever a face is chosen - the NPC walk, the curated table (the
 // ten portraits, portrait 6 the eyepatch), the measured match - and every other race and sex the data's; and (AUDIT
 // MW-HEADS1) only where the archives carry them: a page whose own archive did not load draws the data's, never none.
-// MW-HEADS2 (2026-10-15, the owner: "some of the ingame heads are backwards on the body and omly the player Britons
-// should recieve the new heads, not npcs"): baked turned half round about the crown (the face on -Y), and the port's
+// MW-HEADS2: baked turned half round about the crown (the face on -Y), and the port's
 // own a player's alone - asked for (`own`, `ownHeads`); an NPC's walk, and every body not a player's, the data's.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -60,7 +58,6 @@ test('MW-HEADS1: every head and hair re-made from the committed export and its s
   assert.equal(sha(SOURCES.breton), '657dfa95cb607b00f9fb786fad389e0aae7390e8ccf6934ecbc7a47ada009b18', 'daggerwind.fbx as it came');
   assert.deepEqual(meshModelNames(raw(SOURCES.breton)), ['b_n_breton_m_hair_widow', 'b_n_breton_m_head_05.002', 'b_n_breton_m_head_05.003']);
   // each painting as sent, under the part its export names it for (matched by what it is drawn for - Own-Heads.md)
-  // PIN MOVED (MW-HEADS3 - the export's author: "its using the eyepatch on the wrong head"): the eyepatch's painting is
   // h0411's, the plain brown beard h0423's - the two files' names swapped, their bytes as sent
   assert.deepEqual(Object.fromEntries(Object.entries(PAINTINGS).map(([id, p]) => [id, sha(p).slice(0, 16)])), {
     breton_m_head_h04: '0dce24bce8854284', breton_m_head_h0411: '942fc18546e33b15', breton_m_head_h0423: '2761ddc06d78ec16',
@@ -71,7 +68,6 @@ test('MW-HEADS1: every head and hair re-made from the committed export and its s
   ]);
   for (const p of HEAD_PARTS) assert.equal(objectMaterials(tree, p.object)[p.material], p.texture, `${p.id}: the material the export paints ${p.texture}`);
   assert.throws(() => partMesh(tree, { ...HEAD_PARTS[0], material: 0 }), /wears "tx_b_n_breton_m_hair_widow\.png" in material 0, not tx_b_n_breton_m_h04\.png/, 'a material read as another picture is refused');
-  // PIN MOVED (MW-HEADS2): the boxes the turned frame reads
   assert.throws(() => partMesh(tree, { ...HEAD_PARTS[0], box: [[-4.78, -8.28, -7.89], [4.78, 6.95, 7.66]] }), /not where it was read/, 'a part off its box is refused');
   assert.throws(() => partMesh(tree, { ...HEAD_PARTS[0], box: [HEAD_PARTS[0].box[0], [4.78, 6.95, 8.66]] }), /not where it was read/, 'on either side of it - a crown a unit higher');
   assert.deepEqual(ownHeadModelPaths(), [...HEADS, ...HAIRS].map((id) => `meshes/${id}.nif`), 'every part the pools hold, and no other');
@@ -83,7 +79,6 @@ test('MW-HEADS1: each part one rigid shape of its own material, in the head\'s o
     const [b, ...more] = nifOf(p.id);
     assert.equal(more.length, 0, `${p.id}: one shape`);
     assert.equal(b.skinned, false, `${p.id}: a rigid part, hung under the Head node as a retail head is`);
-    // PIN MOVED (MW-HEADS2): the scene turned half round about its crown, and its translation with it
     assert.deepEqual([HEAD_FORWARD, HEAD_UP], ['-y', '+z']);
     const scene = bakeMesh(objectTree(tree, p.object), { name: p.id, placement: 'scene', forward: HEAD_FORWARD, up: HEAD_UP, material: p.material });
     const t = basisMap(HEAD_FORWARD, HEAD_UP)(scene.bake.sceneTranslation);
@@ -102,7 +97,7 @@ test('MW-HEADS1: each part one rigid shape of its own material, in the head\'s o
     assert.equal(p.box[1][1], 6.95, `${p.id}: the back - behind the face, on +Y (MW-HEADS2)`);
   }
   assert.deepEqual(faces.map((p) => nifOf(p.id)[0].positions.length / 3), [616, 296, 290], 'three meshes');
-  // UPRIGHT, FACING -Y, ABOUT THE SOURCE HEAD'S ORIGIN (AUDIT MW-HEADS1 L1-F8; PIN MOVED, MW-HEADS2): in each face's
+  // UPRIGHT, FACING -Y, ABOUT THE SOURCE HEAD'S ORIGIN (AUDIT MW-HEADS1 L1-F8
   // frame the crown is its topmost point on the middle line, the nose its farthest forward under it, the chin its lowest,
   // ahead of the crown - the frame the export's source head carries, turned half round about the crown. The game's "Head"
   // node is not in the tree (test/fixtures/mw/retailRig.mjs hangs every part node at zero); the first bake faced +Y, and
@@ -146,14 +141,12 @@ test('MW-HEADS1: one eyepatch - the one painting whose eyes differ side to side 
   };
   // which half of the painting each side of the face reads: the share of one side's vertices left of the middle, and
   // of the other's right of it (a mirrored layout reads both sides from one half) - the sides the source head named
-  // (PIN MOVED, MW-HEADS2: the half turn negated x, so its +x side is the frame's -x)
   const halves = (id) => {
     const { positions: P, uvs: UV } = nifOf(id)[0];
     const side = (sgn, left) => { let n = 0, k = 0; for (let v = 0; v < P.length / 3; v++) if (sgn * -P[v * 3] > 1) { n++; if ((UV[v * 2] < 0.5) === left) k++; } return k / n; };
     return [side(1, true), side(-1, false)];
   };
   const band = Object.fromEntries(HEADS.map((id) => [id, eyeBand(id)]));
-  // PIN MOVED (MW-HEADS3): the eyepatch is h0411's
   assert.ok(band.breton_m_head_h0411 > 30, `the eyepatch's eyes differ side to side (${band.breton_m_head_h0411.toFixed(1)})`);
   assert.ok(band.breton_m_head_h04 < 12 && band.breton_m_head_h0423 < 12, `the plain faces' eyes match (${band.breton_m_head_h04.toFixed(1)}, ${band.breton_m_head_h0423.toFixed(1)})`);
   for (const id of ['breton_m_head_h0411', 'breton_m_head_h0423']) {
@@ -218,7 +211,6 @@ test('MW-HEADS1: the Breton men\'s pools are the port\'s own wherever a PLAYER\'
   }
   recs.push(bodyRec('b_v_breton_m_head_01', 'b\\b_v_breton_m_head_01.nif', 'breton', 0, { vampire: true, notPlayable: true }));
   const data = bodyParts(cat(...recs));
-  // PIN MOVED (MW-HEADS2, the owner: "only the player Britons should recieve the new heads, not npcs"): asked for
   assert.deepEqual(facePools(data, 'breton', false, { own: true }), { heads: own.heads, hairs: own.hairs }, 'a Breton man who is a player: the port\'s own, the data\'s ignored');
   // AUDIT MW-HEADS1 (L2-F5): ONLY WHERE THE ARCHIVES CARRY THEM - every one of their meshes in the archives' directory,
   // or the data's pools whole, as before them (a page whose own archive did not load)
@@ -242,8 +234,7 @@ test('MW-HEADS1: the Breton men\'s pools are the port\'s own wherever a PLAYER\'
   assert.deepEqual(facePools(data, 'breton', true).heads.map((r) => r.id), ['b_n_breton_f_head_00', 'b_n_breton_f_head_01', 'b_n_breton_f_head_02', 'b_n_breton_f_head_03']);
   assert.deepEqual(facePools(data, 'nord', false).hairs.map((r) => r.id), ['b_n_nord_m_hair_00', 'b_n_nord_m_hair_01', 'b_n_nord_m_hair_02', 'b_n_nord_m_hair_03']);
   const face = (opts) => { const rows = playerBodyRows(data, 'breton', false, opts); return ['head', 'hair'].map((s) => rows.find((r) => r.slot === s)); };
-  // the player's ten portraits, curated by eye (bible/04-Characters/Own-Heads.md): each its table's pair, portrait 6 the eyepatch
-  // PIN MOVED (MW-HEADS3): the brown beard's portraits on h0423, which wears it now; portrait 6 the eyepatch on h0411 in
+  // the player's ten portraits, curated by eye: each its table's pair, portrait 6 the eyepatch
   // its own object's hair, the 01 - never the headband ("it gave me the rambo hair")
   const want = { 0: ['h0423', '0111'], 1: ['h0423', 'widow'], 2: ['h04', '01'], 3: ['h04', 'widow'], 4: ['h0423', '0111'],
     5: ['h04', '0111'], 6: ['h0411', '01'], 7: ['h0423', '01'], 8: ['h0423', 'widow'], 9: ['h04', 'widow'] };
@@ -254,7 +245,6 @@ test('MW-HEADS1: the Breton men\'s pools are the port\'s own wherever a PLAYER\'
   }
   assert.deepEqual(Object.keys(FACE_TABLE), ['breton']);
   assert.deepEqual(Object.keys(FACE_TABLE.breton.male), ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
-  // PIN MOVED (MW-HEADS2): an NPC's face walked off its seed over the DATA's pools - every one of their sixteen pairs
   // reached, and never the port's own (not even were they asked: an NPC is no player)
   const pairs = new Set(Array.from({ length: 300 }, (_, s) => face({ faceIndex: s % 10, walk: npcFaceOf(npcHint(s * 2654435761 >>> 0, 0)) }).map((r) => r.record.id).join()));
   assert.equal(pairs.size, 16, 'four heads times four hairs');

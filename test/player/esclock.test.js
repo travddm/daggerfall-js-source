@@ -1,5 +1,4 @@
-// ESC-LOCK (2026-09-27, Mac: "when you hit esc to leave a menu, your cursor remains on the screen instead of returning
-// to the game"; a tester: "U have to hit escape 2 times to get pause menu up now").
+// ESC-LOCK.
 //
 // Two browser rules player/pointerLock.js had assumed away. (1) While the pointer is locked the Escape press is the
 // BROWSER's - it ends the lock and the page never sees the key - so the first Escape only freed the cursor and the

@@ -1,11 +1,8 @@
-// CHAT-FIT (2026-09-22, Mac: "names sometimes take up 2 rows, the list
-// isnt scrollable and continues to grow, enlarging the chat. Glyphs
-// should also show on chat names in the chat itself"): THE ROSTER
+// CHAT-FIT: THE ROSTER
 // COLUMN IS AS TALL AS THE CONVERSATION and scrolls inside that, a row
 // is ONE LINE with the name giving way, and a chat line wears its
 // author's badge - the glyphs after the name - asked of the host on the
-// colour pass's law. TITLE-C (2026-10-12, Mac: "remove titles from
-// appearing in the chat"): CHAT-FIT laid the title before the name too;
+// colour pass's law. TITLE-C: CHAT-FIT laid the title before the name too;
 // a line wears none now, as the roster has worn none since TITLE-R.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

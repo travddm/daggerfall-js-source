@@ -1,4 +1,4 @@
-// TELL6a - THE RING (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into it", then
+// TELL6a - THE RING (;, then
 // "Go" on every call). The first of TELL6's new shapes: an annulus 1.6-4.0 m about the foe's feet, a second's wind-up,
 // x1.5 - the answer to the player who backs off, whose safe ground is the foe's own feet (the hug answers it). Thrown
 // by the whole set of the massive brute, the atronachs and the Daedra Lord (TELL7) - heavy bodies all, so iron

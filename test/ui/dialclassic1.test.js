@@ -1,5 +1,4 @@
-// DIAL-CLASSIC (2026-10-12, Mac: "the arena2 files look for those symbols green should be the skills based on the face of
-// your character youve choosen, blue magic, yellow inventory and red map, make the icons fit to each other sizewise"):
+// DIAL-CLASSIC:
 // under DFO Grimoire the Tab dial's doors wear Daggerfall's own art, read off the player's ARENA2 when the dial rises -
 // the face the player wears, and the HUD bar's star, sack and scroll cut off their stone (ui/dialClassicArt.js).
 // Photographed at the change over a real ARENA2: every door 76-80 px tall, for each of three Breton faces.
@@ -42,8 +41,7 @@ test('DIAL-CLASSIC a cut keeps the icon\'s pixels and clears the stone\'s; the s
   const inMask = (x, y) => spansOf(CLASSIC_DIAL.map.rows[y]).some(([a, b]) => x >= a && x < b);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) assert.equal(cut.rgba[(y * w + x) * 4 + 3], inMask(x, y) ? 255 : 0, `(${x}, ${y})`);
   for (const k of Object.keys(CLASSIC_DIAL)) { const hh = CLASSIC_DIAL[k].box[3] * CLASSIC_ICON_SCALE; assert.ok(hh >= 76 && hh <= 80, `${k} ${hh}px tall`); }
-  // every face at three to one (Mac: "the head with the blue hair looks too small ... check all heads if they match like
-  // the red haired") - the red-haired Breton 30x29 at 90x87, the blue-haired 26x35 at 78x105 - and only a head past
+  // every face at three to one - the red-haired Breton 30x29 at 90x87, the blue-haired 26x35 at 78x105 - and only a head past
   // 36 pixels a side fitted to CLASSIC_FACE_MAX
   assert.equal(CLASSIC_FACE_SCALE, 3);
   assert.equal(faceScale(30, 29), 3);

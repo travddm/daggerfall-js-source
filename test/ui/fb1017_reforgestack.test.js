@@ -1,4 +1,4 @@
-// REFORGE-STACK (FIELD BUGS 2026-10-17, bible/01-Overview/bugs/Field-Bugs-2026-10-17.md; the Discord, "Interface of
+// REFORGE-STACK (FIELD BUGS 2026-10-17,; the Discord, "Interface of
 // enchanting workbench": "As you can see, buttons are on on another"). The enchanting station's Reforge with Essence drew
 // a press a reforgeable line, every one of them a child of the piece's `.prof-smelt` row - and PROF_CSS places a row's
 // `.act` in one cell (`grid-column: 3; grid-row: 1`, AUDIT 32 P7), so the presses drew on one another and the button

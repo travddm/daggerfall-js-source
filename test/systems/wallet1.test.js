@@ -1,9 +1,8 @@
-// WALLET1 (2026-10-05, Mac: "We need to develop a wallet item that holds forms of currency and sits in the inventory"):
+// WALLET1:
 // THE WALLET - a bound, weightless, pack-only piece every character carries, holding its currencies: the letters of
 // credit, the Deadlands Embers and the Welkynd Shards out of the enhanced pack's pages and into its own sheet, beside the
 // purse's gold and the account's silver; on the classic skin, DFU's four tabs as they were and the wallet's Use its box.
 // An organizer, never a second list: every piece stays in `entity.items`, where every spender reads it.
-// bible/06-Systems/Wallet.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -149,7 +148,6 @@ test('WALLET1 what it holds: DFU\'s letters of credit, the Deadlands Embers and 
   const worn = Object.assign(sigilStone(), { stackCount: 3, equipSlot: 6 });
   e.items.push(worn);
   const c = walletContents(e.items, e, { silver: 35 });
-  // PIN MOVED (AUDIT 625 W5): and why no figure is counted - none to say for a counted one. PIN MOVED (WALLET-WEIGHT): and
   // what each holding weighs, and all of them (test/systems/wallet_weight.test.js pins the weights)
   assert.deepEqual({ ...c, held: undefined }, { gold: 1240, silver: 35, silverWhy: null, letters: { count: 2, gold: 12000 }, embers: 12, shards: 40,
     weights: { letters: 0.5, embers: 3, shards: 4 }, weight: 7.5, held: undefined });
@@ -204,7 +202,6 @@ test('WALLET1 the sheet: the wallet picked says its currencies, and each piece i
     press(/Wallet/);
     const sheet = host.querySelector('.walletsheet');
     assert.ok(sheet, 'the sheet');
-    // PIN MOVED (WALLET-UI): the sheet is the ledger - each part under its name, a row a currency with its label and its
     // figure apart, a letter's worth under its count (it read the classic box's lines, one paragraph each)
     assert.deepEqual(sheet.querySelectorAll('.wallet-head').map((h) => h.textContent), ['Coin', 'In the wallet']);
     assert.deepEqual(sheet.querySelectorAll('.wallet-row').map((r) => [r.dataset.key, ...r.children.map((c) => c.textContent)]),
@@ -250,8 +247,6 @@ test('WALLET1 the sheet\'s silver: asked afresh of the host once a mount, as the
         return { host, view, press, sheet: () => host.querySelector('.walletsheet') };
       };
       const first = open();
-      // PIN MOVED (AUDIT 625 W5): online and not known yet, the page is ASKING - the offline words were the wrong ones
-      // PIN MOVED (WALLET-UI): the silver is the ledger's own row - its figure, or why there is none
       assert.equal(silverOf(first.sheet()), 'checking your account', 'not known yet');
       assert.equal(asked, 1, 'asked as the sheet first shows');
       answer(); await flush();

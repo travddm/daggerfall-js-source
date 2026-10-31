@@ -1,5 +1,4 @@
-// CARGO-ANYWHERE (2026-10-17, the owner: "Cargo should be able to be accessed at any time. Currently it cannot be";
-// bible/03-World/Naval-Refit.md CARGO-ANYWHERE) - THE HOLD'S DOOR over Come Sail Away's real runtime and the Fleet's
+// CARGO-ANYWHERE - THE HOLD'S DOOR over Come Sail Away's real runtime and the Fleet's
 // real ledger and host: the ship at hand (her helm, her deck, her cabin); any ship of mine by her number wherever she lies
 // (afloat here or far, laid up, packed - her parts her timbers' weight alone, PARTS-WEIGHT); the hold's key falling back to my
 // last helm, then my fleet's first; a Rowboat refused; the hold opened TWO-WAY on the Enhanced skins under its own name;
@@ -194,7 +193,7 @@ test('CARGO-ANYWHERE the helm\'s Hold and the hold\'s key: a hook button on the 
   const base = { hasSails: true, sailsUp: true, light: false };
   assert.ok(helmButtons({ ...base, cargo: true }).some((b) => b.act === 'cargo' && b.label === 'Hold' && b.kind === 'hook'));
   assert.ok(!helmButtons({ ...base, cargo: false }).some((b) => b.act === 'cargo'));
-  assert.equal(ACTIONS.at(-4), 'ShipHold');   // PIN MOVED (SHOT-KINDS: ShotCycle appended after; PARTY-PING: PartyPing after that; Decorate after that)
+  assert.equal(ACTIONS.at(-4), 'ShipHold');
   assert.ok(PORT_ACTIONS.includes('ShipHold'));
   assert.ok(DEFAULT_BINDINGS.some(([c, a]) => c === 'F4' && a === 'ShipHold'));
   assert.ok(MOD_ACTIONS['come-sail-away'].some((r) => r.action === 'ShipHold' && r.legacy === null));

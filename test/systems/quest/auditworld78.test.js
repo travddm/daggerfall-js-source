@@ -1,4 +1,4 @@
-// AUDIT WORLD7/8 (Mac, 2026-09-14: "Continue" after WORLD8): three opus lenses over the quest clocks' played time and
+// AUDIT WORLD7/8 (after WORLD8): three opus lenses over the quest clocks' played time and
 // the hour's respawn - A the Clock and the spawn interval, B the dungeon memory's foes (the stamp, the rebuild, the
 // sweep, the stream), C the loot's stamps, the wire and the records. Paid here, executed where a rig reaches:
 //  A1/A2/A5: a BACKWARD sample online added its whole span to every running clock - an offline save is game-weeks

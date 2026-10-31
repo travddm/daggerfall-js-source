@@ -1,5 +1,4 @@
-// SUMMON-NAME (2026-10-07, bible/06-Systems/Online-Waits.md WAIT3; Mac: "Take care of this", over the sweep of the waits
-// still long online): ONLINE THE SUMMONER CALLS THE PRINCE YOU NAME. DFU's temple and Mages Guild answer one prince on
+// SUMMON-NAME: ONLINE THE SUMMONER CALLS THE PRINCE YOU NAME. DFU's temple and Mages Guild answer one prince on
 // his own day of the year; online the day is the sky's (TIME1), a sky year is fifteen real days (SKY-SLOW), and no rest
 // moves the sky - a prince answered one real hour in fifteen days, and from Vaernima's day to Nocturnal's no temple and
 // no Mages Guild answered for 57 real hours. For OL4's reason (a schedule nobody can rest through is a real-time

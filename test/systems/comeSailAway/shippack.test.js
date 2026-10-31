@@ -1,6 +1,6 @@
-// SHIP-PACK (2026-10-01, the review before the merge: "Allow larger ships to be picked up, just like smaller vessels")
+// SHIP-PACK
 // - EVERY HULL PACKS, AND HER PARTS ARE HER (systems/comeSailAway/comeSailAway.js PackBoat, takePlaceItem; systems/comeSailAway/comeSailAwayBoat.js
-// packedHullWeight; systems/comeSailAway/csaBoatMenu.js; bible/03-World/Come-Sail-Away.md SHIP-PACK). The Small Ship, the Large Galley
+// packedHullWeight; systems/comeSailAway/csaBoatMenu.js; SHIP-PACK). The Small Ship, the Large Galley
 // and the Carrack are picked up as the Rowboat and the Large Boat are: a deed ship with her deed in the pack, which goes
 // with her into her parts; placed again, her parts are spent and her deed is given back in their place. Her parts keep
 // her number (her naval state, her crew and her hands ashore are found by it), her worth (what placed her - a claimed

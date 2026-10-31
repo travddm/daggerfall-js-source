@@ -1,5 +1,4 @@
-// OWN1 (2026-09-26, Mac: "Dungeons and buildings" - a shared quest's foes in a dungeon and a building, and a building's
-// foes at all). A WORLD room (a dungeon, a building) streamed its host's foes alone: a joiner's foes frame was junk and,
+// OWN1. A WORLD room (a dungeon, a building) streamed its host's foes alone: a joiner's foes frame was junk and,
 // past DROP_STRIKES_MAX of them, closed the socket for good, and every hit went to the host whatever `to` said. The
 // `own` frame is the room's second lane: any hello'd socket streams its OWN foes beside the host's, fanned as a cell's
 // are, and a hit marked `own` goes to the owner its `to` names. A client uses either only through a relay at

@@ -1,4 +1,4 @@
-// FIX-D (2026-09-22, Discord): "Fire detected behind a door" - and The
+// FIX-D: "Fire detected behind a door" - and The
 // Frog's read of it: "Issue seems to be the torch beside the door,
 // moreso than one behind the door itself".
 //

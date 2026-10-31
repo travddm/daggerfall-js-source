@@ -1,4 +1,4 @@
-// WB8c (2026-09-28, Mac: "continue to refine and add detail to his encounters") - THE WARDEN'S MARKS, ON EVERY SCREEN.
+// WB8c - THE WARDEN'S MARKS, ON EVERY SCREEN.
 //
 // The relay says a fight's marks (`md`, WB8b) and every screen fights and draws them: a struck player's machine judges
 // his blows at their marked reach and takes them through the saving throw of his aspect's element; the ground his
@@ -271,15 +271,15 @@ test('WB8c the fold: a state says his marks; a feeding moves his health and name
 
 test('WB8c the seams, by source: the relay births each fight on the day\'s marks; the world host asks the court\'s throw for any element; the dungeon context lands his frost, lightning and venom unflashed in each element\'s cast; the court judges, burns, cues, draws and bars under the fight\'s profile (mutants: each seam removed)', () => {
   const relay = read('server/src/index.js');
-  assert.match(relay, /GATE_SEAM\.new\(\{ day, now, wrathAt: gateTimes\(day\)\.wrathAt, boss: gateBossOf\(day\)\.id, md: gateModsOf\(day\), pt: gatePortentsOf\(day\), ti: gateTitheOf\(day\) \}\)/);   // WB14b: and the night's portents; PIN MOVED (EG-H3, EG3): through THE BOSS SEAM (net/bossSeam.js - the brain's own law, its frames byte for byte: test/net/eliteGates/egseam_law.test.js)
+  assert.match(relay, /GATE_SEAM\.new\(\{ day, now, wrathAt: gateTimes\(day\)\.wrathAt, boss: gateBossOf\(day\)\.id, md: gateModsOf\(day\), pt: gatePortentsOf\(day\), ti: gateTitheOf\(day\) \}\)/);     // WB14b: and the night's portents
   const w = read('src/scenes/world.js');
   assert.match(w, /save: \(e, el = 'fire'\) => \{ const w = GATE_SAVES\[el\] \?\? GATE_SAVES\.fire; return savingThrow\(w\[0\], w\[1\], e\); \},/);
   const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /const GATE_STRIKE_CAST = Object\.freeze\(\{ frost: SPELL_CAST_SOUND\[1\], poison: SPELL_CAST_SOUND\[2\], shock: SPELL_CAST_SOUND\[3\], magic: SPELL_CAST_SOUND\[4\] \}\);/);   // SD18b (PIN MOVED): the Underking's magic beside them
+  assert.match(dc, /const GATE_STRIKE_CAST = Object\.freeze\(\{ frost: SPELL_CAST_SOUND\[1\], poison: SPELL_CAST_SOUND\[2\], shock: SPELL_CAST_SOUND\[3\], magic: SPELL_CAST_SOUND\[4\] \}\);/);     // SD18b (
   const gc = read('src/scenes/gate/gateCourt.js');
   assert.match(gc, /const P = profileOf\(s\);   \/\/ WB8b: the fight's marks, as law/);
   assert.match(gc, /judge\(s, t, P\);/); assert.match(gc, /burn\(s, t, P\);/); assert.match(gc, /cue\(s, t, P\);/); assert.match(gc, /drawBody\(s, t, P\);/);
-  assert.match(gc, /shape = s\.fell \? null : captive\.dress\(telegraphShape\(s\.atk, s\.phase, t, P, \(k\) => arsenal\.at\(s\.atk, k, mine\)\), s\);/);   // PIN MOVED (WB14f): the telegraph dressed in the ward's gold for the Reckoning it takes (scenes/gate/gateCaptive.js dress)
+  assert.match(gc, /shape = s\.fell \? null : captive\.dress\(telegraphShape\(s\.atk, s\.phase, t, P, \(k\) => arsenal\.at\(s\.atk, k, mine\)\), s\);/);
   assert.match(gc, /poolDraw = pools\.length \? poolShapes\(pools, t, poolColor\(P\), TELEGRAPH_STYLE\[P\.el\] \?\? TELEGRAPH_STYLE\.fire\) : NONE;/);   // WB9e: in his ground's own grain
   assert.match(gc, /const w = sz\.w \* body\.scale \* P\.size, h = sz\.h \* body\.scale \* P\.size;/);
   assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /body \.wb-boss-marks \{/);   // WB9a: the marks' row under his health, dressed where the trials' line was

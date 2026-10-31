@@ -1,5 +1,5 @@
-// AUDIT ONLINE 3, THE SECOND READ (2026-10-17, the owner: "Pick it up and do your own audit over it") - AUDIT ONLINE 3's
-// seven fixes read cold by four lanes against main (bible/06-Systems/Online-Arc.md, AUDIT ONLINE 3, the second read).
+// AUDIT ONLINE 3, THE SECOND READ - AUDIT ONLINE 3's
+// seven fixes read cold by four lanes against main (, AUDIT ONLINE 3, the second read).
 // Each finding below was driven through the real OnlineSession over the fake socket, or the real RemotePlayers, before
 // it was believed; and the pins AUDIT ONLINE 3's own mutants showed loose are made to fail.
 import '../modsOff.js';

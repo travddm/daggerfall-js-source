@@ -1,4 +1,4 @@
-// L10N4 (2026-09-28): THE DOOR IN-SESSION DRAFTS COME IN BY (tools/l10nInSession.mjs). Every machine-made language
+// L10N4: THE DOOR IN-SESSION DRAFTS COME IN BY (tools/l10nInSession.mjs). Every machine-made language
 // covers the English Port_Strings catalog exactly (test/systems/l10n1b.test.js) and records each row as the machine's
 // (test/systems/l10n6b.test.js); the port's own strings grow a batch at a time, and each batch's drafts are merged through this
 // tool. Pinned over a fixture tree: a good draft written in the catalog's order and recorded as `claude-in-session`; a

@@ -48,7 +48,7 @@ test('GR1/GRASS2/GRASS5/GRASS6: the shaders are the lab\u2019s own but for five 
   assert.ok(LAB_GRASS.span > LAB_GRASS.range, 'the window holds the range - a window shorter than the range has a wall at its edge');
   assert.equal(labBladeCorners().length / 2, 30, 'five stacked quads, the lab\u2019s blade');
   assert.equal(labBladeCorners(GRASS_FAR_SEGMENTS).length / 2, 6, 'and one quad for the far blade, a fifth of the vertices');
-  assert.deepEqual({ ...LAB_DIM }, { sunny: 1.00, cloudy: 0.90, overcast: 0.72, fog: 0.66, rain: 0.60, thunder: 0.46, snow: 0.80, sandstorm: 0.55, ashfall: 0.58 });   // WEATHER2d: the port's own row appended; the lab's seven verbatim   // PIN MOVED (ASHFALL1, 2026-10-27): the ashfall's row appended
+  assert.deepEqual({ ...LAB_DIM }, { sunny: 1.00, cloudy: 0.90, overcast: 0.72, fog: 0.66, rain: 0.60, thunder: 0.46, snow: 0.80, sandstorm: 0.55, ashfall: 0.58 });     // WEATHER2d: the port's own row appended; the lab's seven verbatim   //
 });
 
 test('GR1: the placer is the lab\u2019s law - same seed, span, clustering, height, lean, tint, width', () => {
@@ -109,9 +109,7 @@ test('GR2: darker green and a billboard about Y in the lab and the game alike; o
 });
 
 // ── GR4: THE ROOT IS THE GROUND ───────────────────────────────────
-// RedRoryOTheGlen, via Mac: "the base of the grass blending into the
-// ground and all you can make out are the tips through a gradient -
-// reminds me of how the older Novalogic games handled grass."
+// RedRoryOTheGlen, via
 test('GR4: the root takes the colour of the tile it stands on, and the base fades in', async () => {
   const { LAB_GRASS_VS, LAB_GRASS_FS, placeLabGrassSteps } = await import('../../src/render/labGrass.js');
   // THE SHADER, still the lab's byte for byte (the GR1 pin above holds):
@@ -143,8 +141,6 @@ test('GR4: the root takes the colour of the tile it stands on, and the base fade
 });
 
 // ── GR5: THE FIELD IS ANCHORED TO THE WORLD ───────────────────────
-// Mac: "it sometimes hitches and switches while walking. There's also a
-// slight pop in/pop out issue."
 test('GR5: a cell grows the same blades whoever is looking, and walking touches only the edges', async () => {
   const { placeLabGrassCell, grassPerCell, createGrassField, GRASS_CELL } = await import('../../src/render/labGrass.js');
   const perCell = grassPerCell();
@@ -168,7 +164,6 @@ test('GR5: a cell grows the same blades whoever is looking, and walking touches 
   // GRASS5: the budget has to exceed the WINDOW, which grew with the
   // range - at 400 the first update left 84 cells unfilled and the next
   // one finished them, which reads exactly like a step that moved cells.
-  // PIN MOVED (FB1021B): and its clock stands still - a machine that does the work in no time, whose frame's time
   // (GRASS_FRAME_MS) never runs out, so perFrame alone bounds the frame, as it did
   const f = createGrassField(r, { keep: () => 0, perFrame: 1e9, clock: () => 0 });
   assert.equal(w[0][0], 'a', 'the buffers are sized once, up front');
@@ -205,7 +200,7 @@ test('GR5: a cell grows the same blades whoever is looking, and walking touches 
   assert.ok(pending > 0, 'the rest wait their turn');
 });
 
-// ═══ GRASS5 (2026-09-19): THE BLADE, PACKED ═════════════════════════
+// ═══ GRASS5: THE BLADE, PACKED ═════════════════════════
 // Twelve floats a blade was 48 bytes on the GPU, and the STORAGE - not
 // the frame - was what capped the range: 106 MB at 250 m, 169 at 320.
 // Sixteen bytes is three times the field for the same memory.
@@ -275,7 +270,6 @@ test('GRASS6: the patch is BAKED - the clump noise is the placer\u2019s, once a 
     assert.ok(moved > 100, `the 59 m octave shows in ${moved} of 200 samples`);
     // the sample is OFF the lattice corner at the origin: hash(0,0) is 0 and the scene origin is a corner of the player's map pixel
     assert.ok(grassClump(0, 0) > 0.15 && grassClump(0, 0) < 0.85, `no dead patch at the origin (${grassClump(0, 0).toFixed(3)})`);
-    // PIN MOVED (OW-HITCH): the clump writes the two octaves' noise out in itself (no number made a call) - held to the
     // composition it was, to the bit, rather than to its spelling
     for (let i = 0; i < 2000; i++) { const x = i * 7.31 - 4000, z = i * -3.77 + 2500; assert.ok(Object.is(grassClump(x, z), grassVnoise(x * 0.055 + 0.317, z * 0.055 + 0.713) * 0.66 + grassVnoise(x * 0.017 + 0.531, z * 0.017 + 0.279) * 0.34), `the clump at (${x}, ${z})`); }
   }

@@ -1,4 +1,4 @@
-// FAST-REFUSAL (2026-10-26, the owner: "Take care of exclusions and gaps"; bible/06-Systems/Travel-View.md FAST-REFUSAL) -
+// FAST-REFUSAL -
 // A PLAN PAST THE BAY WITH NO WAY BY LAND SAID AT ONCE. ROAD-BEYOND bounded a plan past the Bay by a count of cells, and a
 // refusal spent all of it (300,000 cells, one to four seconds) before it said so. The land past the Bay is the trace's
 // smooth law, land only in a square of the picture's centres with a land centre at a corner; the land centres joined to

@@ -11,8 +11,7 @@ import { UI_PACKS } from '../../src/systems/uiPack.js';
 import { ENVIRONMENT_PACK_MODS } from '../../src/systems/vanillaEnhanced/vanillaEnhancedPack.js';   // ALIKR1 / SNOWFALL1: the shipped environment packs
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
-// CR1 - THE CREDITS (Mac, 2026-08-30: "as we integrate these I really
-// want to give credit to the mod developer who created it").
+// CR1 - THE CREDITS.
 //
 // The rule these pins enforce: nothing is vendored without a credit ON
 // THE SCREEN, and no credit names a folder that is not there. A README
@@ -63,8 +62,6 @@ test('CR1: a mod row carries what a modder is owed - title, author, what it is, 
 
 // ═══ WM3: A CREDITED MOD IS A MOD THE PLAYER CAN FIND ═════════════
 //
-// (2026-09-15, Mac: "the windmills of daggerfall is missing from
-// credits and the feature menu.")
 //
 // The credit was there and the gate above proves it. The FEATURES
 // screen was not, and the reason is worth keeping: `features.js`
@@ -130,7 +127,7 @@ test('WM3: the Windmills row is a real switch the mill draw reads', () => {
   assert.equal(row.control.key, WINDMILLS_KEY);
   assert.equal(row.control.initial, true, 'on by default - the mills were standing before the switch existed');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(read(host), /layoutLocation(?:Steps)?\(dfLocation, maps, blocks, \{ enhanced: isEnhanced\(\), windmills: windmillsOn\(\) \}\)/,   // PIN MOVED (IC-STUTTER): the streaming host's a block a step
+    assert.match(read(host), /layoutLocation(?:Steps)?\(dfLocation, maps, blocks, \{ enhanced: isEnhanced\(\), windmills: windmillsOn\(\) \}\)/,
       `${host}: the host passes the switch (THE FOUR HOSTS - both exterior hosts lay out a location)`);
   }
 });

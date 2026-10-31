@@ -1,5 +1,4 @@
-// SOC2 (2026-09-16, Mac: "friend other users, see if they are online/last online ... the players name who are in a
-// party together should turn green"): THE CLIENT'S HALF - the session's account and social arms (net/online.js) and
+// SOC2: THE CLIENT'S HALF - the session's account and social arms (net/online.js) and
 // the picture it holds (net/social.js), driven over a fake socket and plain frames, no browser.
 //
 // TWO IDENTITIES. The peer id is the tab's (TABS1) and stays exactly where its pin holds it; the ACCOUNT is the

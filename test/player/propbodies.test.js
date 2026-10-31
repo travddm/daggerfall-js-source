@@ -1,8 +1,8 @@
-// PROP-BODIES (2026-10-19, the owner: "Implement collision for all props"): a solid flat stands a BODY - an upright
+// PROP-BODIES: a solid flat stands a BODY - an upright
 // cylinder at its foot, riding the cover index beside its cover (ai/cover.js, a proxy marked `body`) - and the player,
 // on foot or mounted, is kept out of it after the collider's move (player/bodyClamp.js, motor.js's step). Which flats:
 // a tree its trunk, a still nature record and every prop that is not nature its foot measured off its own picture,
-// never the flora that sways (world/propBodies.js). bible/03-World/Player-Arc.md PROP-BODIES.
+// never the flora that sways (world/propBodies.js). PROP-BODIES.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

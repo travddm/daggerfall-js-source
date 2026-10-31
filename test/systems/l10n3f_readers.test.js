@@ -1,4 +1,4 @@
-// L10N3f (2026-09-28): A PACK'S BOOKS AND NAME BANKS, READ AS DFU READS THEM. A DFU translation pack ships a book in
+// L10N3f: A PACK'S BOOKS AND NAME BANKS, READ AS DFU READS THEM. A DFU translation pack ships a book in
 // the language beside each classic one (Text/Books/BOKnnnnn-LOC.txt, LocalizedBook.cs) and its own name banks
 // (Text/NameGen.txt, NameHelper.cs). Pinned through the port's real functions, over made-up French text written in the
 // pack's formats (no pack's text is committed):
@@ -280,7 +280,6 @@ test('L10N3f books: GetBookTitle - the -LOC title wherever a title is shown (the
   assert.equal(item.name, createBook(42).name, 'and keeps the template\'s name - the title is read where it is shown');
   assert.equal(getBookFileName(42), 'BOK00042.TXT');
   // the shelf's Start filter keeps a titled book in any language
-  // PIN MOVED (GUN-LORE): the roll aimed at the shelf's own draw (the classic books and the port's - another port book moved
   // the classic list's index off the shelf's)
   const onto42 = () => (SHELF_BOOK_IDS.indexOf(42) + 0.5) / SHELF_BOOK_IDS.length;
   assert.deepEqual(populateBookshelf(onto42), Array(10).fill(42));

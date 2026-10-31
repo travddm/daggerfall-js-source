@@ -1,4 +1,4 @@
-// TACT1 - COVER (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Proper line of sight with billboard props";
+// TACT1 - COVER (;;
 // his call: billboards block "Sight and missiles"). With the Enhanced AI switch on, every solid flat - a tree, a rock,
 // a crate, a statue - stands an upright cylinder of cover beside the collider: a foe's sight ray, its clear shot, a
 // witness's eye and every missile stop at it. Walking is unchanged (the cover is never in the collider), and with the

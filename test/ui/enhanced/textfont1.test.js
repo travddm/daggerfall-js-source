@@ -1,4 +1,4 @@
-// TEXT-FONT (2026-10-11): the enhanced skin's words in a face the player picks - Game, Sans, Monospace, Dyslexic or one
+// TEXT-FONT: the enhanced skin's words in a face the player picks - Game, Sans, Monospace, Dyslexic or one
 // of their own installed fonts (ui/textFont.js). (A name stands apart from its words by colour - test/chatcolours1.)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,5 +1,4 @@
-// VC7d - THE ICE LAYER (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive" - the high
-// cirrus, the last of the four chosen; "Let's do the not done yet before we merge").
+// VC7d - THE ICE LAYER.
 //   - a thin shell of ice cloud at CIRRUS_ALT_M, read once where each ray meets it over a round earth, so it runs
 //     out to its own horizon instead of to infinity;
 //   - streaked down the westerly jet and carried east on the game's clock at five times a fair day's surface drift -
@@ -169,7 +168,7 @@ test('VC7d: THE ICE\'S OWN SUN - three degrees past the ground\'s horizon, in th
 
 test('VC7d: BEHIND THE SLAB - the march lays it under what it found, and uploads what it reads', () => {
   const main = MARCH_FS.slice(MARCH_FS.indexOf('void main() {', MARCH_FS.indexOf('vec4 cirrus(')));
-  const fade = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');   // SLAB-SPAN: the slab's last word; SKY-ARC; AUDIT PRECIP SKY-5 (PIN MOVED): already in its own perspective
+  const fade = main.indexOf('  if (!veiled) { col += T * back.rgb; T *= back.a; }');     // SLAB-SPAN: the slab's last word; SKY-ARC; AUDIT PRECIP SKY-5 (
   const rest = main.indexOf('  { float a = farA(rest); col += T * uHorizonColor * a; T *= 1.0 - a; }');   // AUDIT PRECIP SKY-1: the slab past the walk, behind all the walk found
   assert.ok(rest > fade && rest < main.indexOf('vec4 ice = cirrus(cam, dir);'), 'the slab the walk left, laid behind what it found and in front of the cirrus');
   const ice = main.indexOf('vec4 ice = cirrus(cam, dir);'), add = main.indexOf('col += T * ice.rgb;'), thru = main.indexOf('T *= ice.a;');

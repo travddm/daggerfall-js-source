@@ -1,4 +1,4 @@
-// WORLD6b-iii(a) (Mac, 2026-09-14: "Continue" after AUDIT WORLD6b-ii): THE CAST AT A PEER - WORLD3's cast law for the
+// WORLD6b-iii(a) (after AUDIT WORLD6b-ii): THE CAST AT A PEER - WORLD3's cast law for the
 // dungeon host's foes, per owner, with the audit's bounds. The owner's foe casts at the peer it hunts (the decision
 // runs as at me, reading no effects of mine; the missile leaves toward the peer's transform; nothing of mine is in
 // the blast's sphere here - AUDIT WORLD6b-iii(a) A1 struck that: my capsule is in every sphere), the record carries the cast (c the count, s the spell, u whom at), and the PUPPET at me casts the

@@ -256,9 +256,8 @@ test('AUDIT 64 F34: every SetMidScreenText caller speaks to the label, and the t
   assert.match(src('player/mobileEnemyActivate.js'), /midScreen\?\.\(tooFarAwayText\(\)\)/);   // :834
   // :996-1007 - LookAtInteriorLock, in both hosts that carry a lock.
   assert.match(src('scenes/dungeonContext.js'), /setMidScreenText\(lookAtLockText\(/);
-  assert.equal((src('scenes/worldModes.js').match(/setMidScreenText\(lookAtLockText\(/g) ?? []).length, 1);   // PIN MOVED (LOCKPICK): the refusal's - the anti-grind record's second line retired with its gate (a snapped pick is a retry's cost); the lock's window says the line at its head (scenes/lockpickHost.js)
+  assert.equal((src('scenes/worldModes.js').match(/setMidScreenText\(lookAtLockText\(/g) ?? []).length, 1);
   // FPSWeapon.cs:365
-  // PIN MOVED (guns removed): the bow's line is the guard's only line again - the Pellets' arm went with the guns
   assert.match(src('combat/weapon/weaponRig.js'), /setMidScreenText\([^)]*'You have no arrows\.'/);
   // ...and the siblings that are PopupMessage in the reference stay on
   // the popup queue: PlayerActivate.cs:527 (lockedExteriorDoor, one
@@ -553,8 +552,7 @@ test('AUDIT 64 F37: the popup column is a HUD component too, so its DRAW is gate
   for (const host of ['scenes/townTalk.js', 'scenes/dungeonContext.js']) {
     const s = src(host);
     assert.match(s, /hudRenderEnabled\(\)\) hud(Text)?\.draw\(/, `${host} gates the popup draw`);
-    // FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our
-    // enhanced version"): AND THE REFUSED FRAME IS SAID OUT LOUD. The
+    // FONT1: AND THE REFUSED FRAME IS SAID OUT LOUD. The
     // enhanced skin draws this column in the DOM (ui/enhanced/enhancedHudText.js),
     // and a DOM column is not repainted - it stays until it is told
     // otherwise, which is THIS finding's own law. A gate that merely

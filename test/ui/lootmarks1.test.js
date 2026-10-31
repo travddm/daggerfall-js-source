@@ -1,8 +1,6 @@
-// LOOT-MARKS (2026-10-12, a player's video: "seeing rarity in the quickloot is quite hard can you make em more visible"):
+// LOOT-MARKS:
 // each rolled row of the quick loot's plaque carries its tier as a gem of the tier's own colour before its name and a
-// wash of it under the row, on Plus's stone and on Grimoire's page (ui/lootTierMarks.js). TAB-WHEEL (Mac: "if there are
-// too many you cant click em aynmore and they get cut off hovering over the bars and scrolling would help, dont add a
-// scrollbar up there"): the chat's tab strip turns under the mouse wheel, no bar, its cut edges faded. Both looked at in
+// wash of it under the row, on Plus's stone and on Grimoire's page (ui/lootTierMarks.js). TAB-WHEEL: the chat's tab strip turns under the mouse wheel, no bar, its cut edges faded. Both looked at in
 // Chromium at the change (the plaque with all six tiers under both looks; the strip at rest, turned and at its end).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -23,7 +21,7 @@ test('LOOT-MARKS the gem is each tier\'s own colour - the rarity table\'s, every
     assert.ok(css.includes(`.wplaque-row[data-rarity="${k}"] > span:first-child::before { background: ${c}; }`), `${k}: its gem`);
     assert.match(css, new RegExp(`\\.wplaque-row\\[data-rarity="${k}"\\] \\{ background: linear-gradient\\(90deg, rgba\\(`), `${k}: its wash`);
   }
-  assert.match(css, /\.wplaque-row\[data-rarity="gilded"\] > span:first-child::before \{ box-shadow: inset 0 0 0 2px #f6c945/, 'the Gilded\'s gem is set - its crimson in the crown\'s gold');   // PIN MOVED (GILDED-RED): the leaf's pale rim was there so the gold gem never read as the Rare's; the crimson stone is set in the crown's gold - test/ui/gildedred.test.js
+  assert.match(css, /\.wplaque-row\[data-rarity="gilded"\] > span:first-child::before \{ box-shadow: inset 0 0 0 2px #f6c945/, 'the Gilded\'s gem is set - its crimson in the crown\'s gold');
   assert.doesNotMatch(css, /data-rarity="common"/);
 });
 

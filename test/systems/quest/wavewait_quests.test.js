@@ -1,5 +1,4 @@
-// WAVE-WAIT (2026-10-07, bible/06-Systems/Online-Waits.md WAIT2; Mac: "Take care of this", over the sweep of the waits
-// still long online): A WAVE THE QUEST WAITS ON COMES ON THE SHORT WAIT ONLINE. A wave's interval runs on played time
+// WAVE-WAIT: A WAVE THE QUEST WAITS ON COMES ON THE SHORT WAIT ONLINE. A wave's interval runs on played time
 // online (WORLD7's step, QCLOCK-WORLD's lived charge) and REST8 kept it whole as pacing - right for a wave that harasses,
 // wrong for a wave that IS the quest's next page: the King of Worms (S0000021) makes his offer only once his zombie
 // messenger is killed, and it is sent `every 1410 minutes` - up to 117.5 real minutes of play before a main-quest giver

@@ -1,6 +1,4 @@
-// AUDIT QUESTS (2026-09-22, Mac: "I want you to do a deep conprehensive
-// audit and ensure everything is linked up properly with quests and
-// such").
+// AUDIT QUESTS.
 //
 // THE AUDIT CAME BACK CLEAN, AND THAT IS THE PROBLEM THIS FILE SOLVES.
 // A sweep that finds nothing is worth nothing tomorrow: the same holes

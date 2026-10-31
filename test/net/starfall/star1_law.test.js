@@ -1,4 +1,4 @@
-// STAR1 (bible/11-Multiplayer/Starfall.md sections 1, 4, 5 and 6): THE STARFALL'S LAW - the night and its stars on the
+// STAR1 (4, 5 and 6): THE STARFALL'S LAW - the night and its stars on the
 // sky's own dark, the spot, the waves, the light, the owner, the encounter clock, the ledger's machine and the receipt.
 // Every number below is the law's own; each pin is held to fail under a one-character change of the law it names
 // (tools/mutants/star1.json).
@@ -68,7 +68,6 @@ test('STAR1 THE WINDOW: stars fall on the Witches\' Festival\'s own days - its f
   assert.ok(starInWindow(N0, 1));
   assert.ok(!starInWindow(Math.ceil(TO_MS / STAR_HOUR_MS) + 2, 1));
   assert.ok(!starInWindow(Math.floor(FROM_MS / STAR_HOUR_MS) - 2, 1), 'a star that fell before the festival opened');
-  // PIN MOVED (WW5): a star's number names its lane - the 3 that was "no fourth star" is High Rock's first now; Cyrodiil's
   // lane (9, the open zone) and past the theatres stand none
   assert.ok(!starOk(N0, 27) && !starOk(N0, 30) && !starOk(N0, -1) && !starOk(0, 0) && starOk(N0, 0) && starOk(N0, 3) && starOk(N0, 26));
   const t = starTimes(N0, 1);

@@ -1,6 +1,4 @@
-// SHORT-TOUCH (2026-09-27, Discord - players on an AYN Thor and an Android phone: "I can login, get to the main
-// screen but I'm unable to select online, load game, anything"; "I luckily have a tiny, tiny space under the title I
-// can use to scroll"). The coarse-pointer layout stacked the section screen's brand, pane and rail in one column;
+// SHORT-TOUCH. The coarse-pointer layout stacked the section screen's brand, pane and rail in one column;
 // on a landscape handheld 411 px tall the pane - every Continue, Load, Begin and Play online - came to 5 px (0 on a
 // 393 px screen). A short landscape touch screen keeps the desk's two columns now, and the first visit's sign-in
 // window takes the short screen's height. MEASURED by tools/shortTouchProbe.mjs (24 failures before, none after, on

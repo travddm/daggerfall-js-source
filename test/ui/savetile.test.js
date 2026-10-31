@@ -1,9 +1,5 @@
 // TILE1/TILE2 — THE SAVE TILE, PINNED WHERE IT THINKS.
 //
-// Mac: "I want [the Online pane] reserved for a detailed tile based
-// design for your saves which will translate to the load character
-// pane also. Basically showing your portrait and character
-// information."
 //
 // node cannot draw a tile, and test/ui/enhanced/enhancedChargen.test.js settled
 // what that means here: pin the part that does arithmetic and MEASURE
@@ -216,7 +212,6 @@ test('TILE2: a disabled action is not wired, and the actions are the PANE\'S - t
 
 // ── ACC2c: THE SAVE THAT IS ONLY IN THE CLOUD ─────────────────────────────────────────────────────
 //
-// Mac, asked whether to build it: "And yes".
 //
 // ACC2 built the backup and nothing could read one back. `pullSlot` was
 // written, pinned end to end against the real service, and had ZERO

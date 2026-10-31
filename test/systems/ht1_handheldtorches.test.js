@@ -1,5 +1,4 @@
-// HT1 - HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), THE MOD, 1:1 (2026-09-14,
-// Mac: "Next mod to integrate 1:1 is this").
+// HT1 - HANDHELD TORCHES 1.4.1 (RedRoryOTheGlen), THE MOD, 1:1.
 //
 // The mod's script is a compiled DLL (four MonoBehaviours) read off the
 // IL and restated in systems/handheldTorches.js (the component: the
@@ -118,14 +117,13 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   for (let f = 0; f < 4; f++) assert.ok(rd(`vendor/handheld-torches/Textures/${DROPPED_ARCHIVE}_0-${f}_Emission.png`).length > 0, `the dropped torch's emission twin ${f}`);
   assert.ok(rd(`vendor/handheld-torches/Textures/${DROPPED_ARCHIVE}_10-0.png`).length > 0, 'the doused torch');
   const shipped = JSON.parse(rd('vendor/handheld-torches/modsettings.json'));
-  // MODS-ON (2026-09-14, Mac: "all mods should be on by default"): the
+  // MODS-ON: the
   // keys whose default the port sets against the bundle's, listed here
   // rather than by loosening the compare - so this pin still holds
   // every OTHER key to the shipped value, and a departure that arrives
   // without a decision behind it fails right here.
   //
-  // HT4 (2026-09-15, Mac: "Pressing tab drops torches, tab is reserved
-  // for the menu"): the second one. The mod ships Tab for the manual
+  // HT4: the second one. The mod ships Tab for the manual
   // drop and in Daggerfall Unity that is free; PX15 spent Tab on the
   // port's own pixel dial, so the shipped default landed on a key this
   // port had already answered and one press did both things. G is free
@@ -133,8 +131,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // pinned below ("no vendored mod ships a key the port has already
   // spent") so the next mod folded in cannot repeat it quietly.
   //
-  // SOC5 (2026-09-16, Mac: "Players should be able to interact with others
-  // in the world upon encountering them by pressing F on their body"): the
+  // SOC5: the
   // THIRD one, and the same class as HT4 exactly one key over. The mod ships
   // F for the ignite/douse toggle and DFU leaves F free; SOC5 spends it on
   // the port's own SocialInteract, so the shipped default would light a
@@ -144,7 +141,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // in every other vendored mod. The class pin below is what caught it.
   // HT5: and Bob - the widget ships its Bob on, so the torch hand's follows (the third departure, stated in the table).
   //
-  // HT7 (2026-09-17, Mac: "Take care of both"): the FOURTH, and the first
+  // HT7: the FOURTH, and the first
   // that is not about a key. The mod ships `OnStow = Drop` and HT6
   // recorded what that means now that the hand law runs at the equip
   // moment: equipping a shield with your weapon drawn puts the lit torch
@@ -154,7 +151,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
   // and the mod's own value is one click away on the dial, which is
   // pinned below with both options in the shipped order.
   const PORT_DEFAULT = Object.freeze({ 'Modules.Sprite': true, 'Modules.Bob': true, 'Handling.ManualDropInput': 'G', 'Handling.ToggleLightInput': 'O', 'Handling.OnStow': 0, 'Handling.RelaxedTwoHandedWeapons': false });   // 3ARMS: the relaxed switch ships off - a held two-hander takes both hands, HT7's own reasoning
-  // PLAIN-TEXT (2026-10-19): three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
+  // PLAIN-TEXT: three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
   const PLAIN = {
     'Presentation.PlayerTorchAudio': 'Plays a burning sound while you hold a torch',
     'Bob.BobWhileIdle': 'Whether the light will slightly bob while stationary',
@@ -186,7 +183,7 @@ test('HT1: the Mods pane entry is the shipped modsettings.json - every key, its 
     }
   }
   assert.equal(n, 52, 'the eight sections carry 52 keys');
-  // HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at the waist"): the port's OWN key on
+  // HT-WAIST: the port's OWN key on
   // this pane, beside the port's Enabled - named here, as ORL1 names primarySkillsImpact, so a third arrives
   // only with a decision behind it (test/systems/htwaist_setting.test.js holds its default and its words).
   const shippedNames = new Set(shipped.Sections.flatMap((sec) => sec.Keys.map((k) => `${sec.Name}.${k.Name}`)));
@@ -315,7 +312,7 @@ test('HT1: UpdateFreeHand - the table over the two slots: a bare hand in use, a 
   // HT7: sheathed, a bow in the left slot now takes BOTH hands, as it does
   // drawn - the mod's sheathed arm cleared the left alone and is gone.
   r.ctx.sheathed = true; r.frame(); assert.deepEqual(hands(), [false, false], 'HT7: sheathed, the bow takes both hands, as drawn');
-  // HT7 (2026-09-17, Mac: "Take care of both") - THE ONE DEPARTURE FROM
+  // HT7 - THE ONE DEPARTURE FROM
   // THIS ARM. The mod clears a hand while sheathed only for a BOW, so a
   // shield or a dagger in the left slot took nothing and a lit torch
   // stayed in that hand with the weapon on your back. HT6 recorded that
@@ -789,7 +786,7 @@ test('HT1: a foe struck - hostile, the to-hit roll with Accuracy, ContinuousDama
   assert.deepEqual(fire, { kind: ENEMY_FIRE_KIND, key: ENEMY_LIGHT_EFFECT_KEY, roundsRemaining: 3 }); assert.equal(ENEMY_LIGHT_EFFECT_KEY, 'HandheldTorchesEnemyLight');
   assert.equal(q.p.foeBurning(foe), true);
   assert.deepEqual(q.shots.at(-1)[0], CLIPS.ignite, 'the ignite clip at the point');
-  fire.roundsRemaining = 1; q.p.igniteFoe(foe); assert.equal(fire.roundsRemaining, 3, 'a re-hit renews its rounds, never stacks them');   // PIN MOVED (STACK-CAP): AddState stacked them (6)
+  fire.roundsRemaining = 1; q.p.igniteFoe(foe); assert.equal(fire.roundsRemaining, 3, 'a re-hit renews its rounds, never stacks them');
   await settle(); q.p.tick(0.016);
   assert.deepEqual(uploads.slice(0, 6).map((u) => u.join(':')), ['375:0:0', '375:0:1', '375:0:2', '375:0:3', '375:0:4', '375:0:5']);
   const flame = q.p.batches().find((b) => b.archive === PUFF.archive);
@@ -814,7 +811,7 @@ test('HT1: a foe struck - hostile, the to-hit roll with Accuracy, ContinuousDama
 
 // ═══ the seams ══════════════════════════════════════════════════════════
 
-// HT4 (2026-09-15, Mac: "Pressing tab drops torches, tab is reserved for the menu"):
+// HT4:
 // A VENDORED MOD'S KEY MAY NOT LAND ON A KEY THE PORT HAS ALREADY SPENT.
 //
 // Handheld Torches ships Handling.ManualDropInput = "Tab". In Daggerfall Unity
@@ -855,8 +852,7 @@ test('HT4 (re-aimed by KB1): no action ships on a key another action, DFU\'s wor
   assert.equal(def.get('QuickDial'), 'Tab', 'the dial holds Tab, in the same table');
 });
 
-// HT5 (2026-09-16, Mac: "the torch when being held isn't affected by the
-// weapon bob like everything else"). The mod ships its motion modules off
+// HT5. The mod ships its motion modules off
 // and leaves matching them to the weapon's to the player; the port ships
 // Weapon Widget's Bob ON, so the torch hand stood still beside a swaying
 // weapon. The three modules the two mods share ship with the SAME answer
@@ -882,8 +878,7 @@ test('HT5: the torch hand moves as the weapon does - every motion module the two
 
 // ── TORCH-VIS: A SHEATHED STANCE IS NOT A STOWED LIGHT ──────────────
 //
-// Mac, 2026-09-18: "If you only have the torch equipped and no weapon, it doesn't show you holding it in first
-// person (morrowind)." Pre-existing, and the cause was one clause too wide. The weapon rig's draw ladder opens on
+// Pre-existing, and the cause was one clause too wide. The weapon rig's draw ladder opens on
 // `shown()`, which is the WEAPON's visibility - the file says so itself where the classic spellcasting hands were
 // hoisted above it, "NOT under shown() - the weapon is the thing shown() hides" - and one leg of it is
 // `playerWeapon.sheathed`. A player walking around with a torch and nothing drawn IS sheathed, so the ladder

@@ -1,5 +1,4 @@
-// SCALE4g (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE4g): THE READS A TAB KEEPS ASKING, ON READ REPLICAS,
+// SCALE4g: THE READS A TAB KEEPS ASKING, ON READ REPLICAS,
 // WITH THE TAB'S OWN BOOKMARK. The heartbeat, the account view, the realm's list, the professions' state and the day's
 // motherlodes run on a D1 session started from the bookmark the request carries (`x-d1-bookmark`) - every read at
 // least as new as everything the tab saw and wrote - or at the primary when it carries none, and the answer carries the
@@ -22,11 +21,10 @@ const MARK = (n) => `${n.toString(16).padStart(8, '0')}-00000000-00000000-${'0'.
 
 test('SCALE4g the routes a replica may serve, by route AND method: the mint and the reads a tab keeps asking; each on a session started from the request\'s bookmark, or at the primary for none or one D1 will not take; every other route on the binding (mutants: a route\'s method unread; the bookmark unread; a refused bookmark thrown; a malformed bookmark taken)', () => {
   assert.deepEqual([...REPLICA_ROUTES], [['/v1/auth/token', 'POST'], ['/v1/heartbeat', 'POST'], ['/v1/account', 'GET'], ['/v1/realm', 'GET'], ['/v1/prof/state', 'POST'], ['/v1/prof/motherlodes', 'POST'],
-    // PIN MOVED (DISPLAY-REPLICA, 2026-10-13): and the display reads and the arena's board (test/server/display_replica.test.js)
     ['/v1/homes/town', 'POST'], ['/v1/homes/mine', 'POST'], ['/v1/homes/rooms', 'POST'], ['/v1/homes/decor', 'POST'], ['/v1/prof/pixels', 'POST'],
     ['/v1/market/vendors', 'POST'], ['/v1/marks/balance', 'POST'], ['/v1/guilds/invites', 'POST'], ['/v1/realm/lineages', 'POST'], ['/v1/realm/unions', 'POST'],
     ['/v1/saves', 'GET'], ['/v1/arena/board', 'POST'],
-    ['/v1/festival/town', 'POST']]);   // PIN MOVED (WITCH1): and a town's Hearth Offerings (test/server/display_replica.test.js)
+    ['/v1/festival/town', 'POST']]);
   const opened = [];
   const raw = { prepare: () => ({}), withSession(c) { if (c === 'refused') throw new Error('D1_ERROR: bad bookmark'); opened.push(c); return { prepare: () => ({}), getBookmark: () => 'b' }; } };
   assert.equal(routeDb(raw, '/v1/renown/xp', 'POST', MARK(3)), raw, 'a write route: the binding');
@@ -109,7 +107,6 @@ test('SCALE4g the client sends the newest bookmark its session has been answered
   assert.equal(d1BookmarkFor('secret-b'), MARK(1));
   noteD1Bookmark(null, MARK(99));
   assert.equal(d1BookmarkFor('secret-b'), MARK(1), 'nothing kept without a session');
-  // PIN MOVED (AUDIT SCALE II A-2): asked before the call below, which is no bookmark read and forgets the page's
   // bookmark now (test/server/auditscale2_acct.test.js)
   await call({ fetch }, '/v1/health');
   assert.equal(seen.at(-1), null, 'no secret: no bookmark');

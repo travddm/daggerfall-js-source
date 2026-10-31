@@ -1,5 +1,4 @@
-// HOLDINGS - CREW ROLES (2026-10-03, Mac: "Named crew companions should be able to be assigned to certain roles, and be
-// positioned accordingly to their role" - bible/03-World/Holdings.md 8). A hand given a post (systems/naval/shipCrew.js
+// HOLDINGS - CREW ROLES. A hand given a post (systems/naval/shipCrew.js
 // assign - CREW_ROLES, a Bard's calling his own, one First Mate); each keeps his role's post on her main deck
 // (systems/naval/crewLife.js ROLE_POSTS - her First Mate aft by her helm, her Bosun before her mainmast, her Carpenter by
 // her hatch, her Cook forward, her Gunners at her guns along her waist, under fire at a run); the hand made First Mate
@@ -91,7 +90,6 @@ test('CREW-ROLES each keeps to his post: over five calm minutes her First Mate, 
       assert.ok(at[j] / N > 0.3, `seed ${seed}: her ${roles[i]} at his post ${(at[j] / N).toFixed(2)}`);
       assert.ok(ctl[j] / N < 0.1, `seed ${seed}: with no roles, at that place ${(ctl[j] / N).toFixed(2)}`);
     });
-    // PIN MOVED (AUDIT HOLDINGS T4): the bar was POST_SHARE * 0.6 - a share mutated lowered its own bar; measured 0.73-0.78
     assert.ok(at.reduce((a, b) => a + b, 0) / (N * kept.length) > 0.6, 'her posts kept, most of the time');
     assert.equal(life.postOf(1), null, 'a Deckhand\'s own place - never a post');
   }
@@ -163,7 +161,6 @@ test('CREW-ROLES the Fleet page\'s Crew panel: her hands and their posts, a post
   d = draw();
   const picks = all(d, (c) => c.tag === 'select');
   assert.equal(picks.length, ROSTER.length);
-  // PIN MOVED (AUDIT HOLDINGS C3): a Bard's list has his calling and never the Lookout - her bow is never a Bard's
   assert.deepEqual(picks.map((p) => p.children.length), crew.hands.map(() => CREW_ROLES.length), 'every list CREW_ROLES long - a Bard\'s his calling in the Lookout\'s place');
   const bardPick = picks[crew.hands.findIndex((h) => h.mobile === MOBILE.Bard)];
   assert.ok(bardPick.children.some((o) => o.value === 'Bard') && !bardPick.children.some((o) => o.value === 'Lookout'), 'his calling, no lookout');

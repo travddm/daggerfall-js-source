@@ -1,4 +1,4 @@
-// PERF-SHADOW1 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
+// PERF-SHADOW1:
 // A LANTERN'S SIX FACES SHARE ONE WALK. Measured in the real game (Knightstale, 15:00, the world host): the shadow pass
 // was 7.2 ms of the frame's 16.1 ms of JavaScript, nearly all of it its replays walking every record and every flat -
 // under Steady shadows (on by default) every lantern with a mover or a swaying tree by it redraws its six dynamic faces
@@ -271,7 +271,6 @@ test('PERF-SHADOW1: A WOOD IS ASKED OF ITS QUADS ONCE A LANTERN, NOT ONCE A FACE
     } finally { SHADOW_TUNING.override = false; SHADOW_TUNING.facePrepass = undefined; }
     return { walks, binds, draws, faces };
   };
-  // PIN MOVED (PERF-VOL; AUDIT PERF-ARENA O2): BOTH arms ask every face afresh, as before the planes were named - with
   // the answers kept (bounds.js placementsInVolumeOf) a still lantern's faces walk the wood once, on the frame they
   // are named, so the kept answers would hide a dead pre-pass on every frame after; this pin holds the pre-pass, perfvol the memo
   SHADOW_TUNING.volumeMemo = false;

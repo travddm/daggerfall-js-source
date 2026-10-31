@@ -10,7 +10,7 @@ import { sayEnemyDied } from '../../src/scenes/corpseMarker.js';
 import { dungeonAmbientFor, DUNGEON_AMBIENT, CASTLE_AMBIENT, SPECIAL_AREA_AMBIENT } from '../../src/world/dungeon/dungeonLights.js';
 
 // AUDIT 28 - WAVE 1: SETTINGS DFU READS THAT THE PORT ANSWERED WITH THE
-// DEFAULT (2026-08-30).
+// DEFAULT.
 //
 // The sweep: every key in settings.js tiered `stored` has, in DFU, a
 // consumer; for each, does the port's consumer READ it? Four modules

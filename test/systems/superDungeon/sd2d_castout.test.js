@@ -1,5 +1,4 @@
-// SD2d (2026-10-06, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11's collapse and the
-// Hollow's end): A HOLLOW'S END CASTS OUT WHOEVER IS INSIDE IT, AND A SAVE TAKEN INSIDE ONE WAKES OUTSIDE. The ground
+// SD2d: A HOLLOW'S END CASTS OUT WHOEVER IS INSIDE IT, AND A SAVE TAKEN INSIDE ONE WAKES OUTSIDE. The ground
 // is never pulled from under a player (SD2b) - and they do not stay in a Hollow that has ended: its end casts them out
 // before its door once, by the dungeon's own way out, with the closing line, and the next frame finds them outside and
 // takes it down. The host frames in every mode now, so the end reaches them underground. A save inside a Hollow is
@@ -114,10 +113,10 @@ test('SD2d a Hollow that fades unbeaten casts out too, and the next slot\'s rise
 
 test('SD2d the world host: the cast-out is the dungeon\'s own way out (the mode machine\'s exit, drained at its safe point: PositionPlayerToDungeonExit\'s landing) with the closing line, the dead left to their death\'s door; the host frames above the modal return, in every mode; the find is the street\'s (mutants: the line unsaid; the dead cast out; the host framed outdoors alone)', () => {
   const w = read('src/scenes/world.js');
-  // AUDIT SD II (L1 F2, F9, PIN MOVED): it answers whether it acted (the host asks again until it does), and out of the
-  // Hour under its veil - (SD11d, PIN MOVED) the Hour's own brass, the line through the Hour's voice
+  // AUDIT SD II (L1 F2, F9
+  // Hour under its veil - (SD11d
   assert.match(w, /castOut: \(\) => \{\n {6}if \(!\(playerEntity\.health > 0\) \|\| modes\?\.deathUp\?\.\(\)\) return false;\n {6}const hour = modes\?\.sdRealmSlot\?\.\(\) != null;\n {6}if \(!modes\?\.unstuck\?\.\(\)\) return false;\n {6}if \(hour\) gateVeil\?\.flash\('hourCast'\);[^\n]*\n {6}sdSay\(SD_CAST_OUT_LINE\);\n {6}return true;\n {4}\},/);
-  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');   // AUDIT SD III (T15, PIN MOVED): the player's word for it, Abyss Dungeon
+  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');     // AUDIT SD III (T15
   const online = w.indexOf('  const onlineFrame = (now, dt) => {');
   const frameAt = w.indexOf('    sdFrame();   // SD2b');
   const serpent = w.indexOf('    serpentFrame();   // SERPENT1');
@@ -143,10 +142,8 @@ test('SD2d a save taken inside a Hollow: its clone names its own pixel - the sav
   assert.notDeepEqual({ x: p.x, y: p.y }, { x: 450, y: 400 }, 'not the template\'s');
   const w = read('src/scenes/world.js');
   assert.match(w, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\) && !starts\.resumesAt\(pixel\)\) \{/, 'online: every dungeon save but the tutorial\'s wakes outside');   // PIN MOVED (AUDIT STARTS W3): and a province start's own dungeon, its commission still in it
-  // PIN MOVED (ETHER-PLACES): past the Veil an isle's ruin wakes the sleeper at its own door - the region's search would
   // read the Alik'r's past the map; the Bay's pixels as before
-  // PIN MOVED (AUDIT-TESA A2-4): and past the Bay - the clamp's region there is the Alik'r's too
   assert.match(w, /const wake = inEther\(from\.x, from\.y\) \|\| !onTheBay\(from\.x, from\.y\) \? \{ kind: 'dungeon', mapPixel: \{ x: from\.x, y: from\.y \} \} : undergroundWakeSpot\(maps\.getRegion\(maps\.getRegionIndexAt\(from\.x, from\.y\)\)\?\.mapTable \?\? \[\], from\);/, 'by the nearest temple, town or graveyard to its pixel');
   assert.match(w, /else \{ _wodInside = false; townTalk\.say\('\(the dungeon could not be entered\. Your character is restored at its door\)'\); \}/, 'offline, no Hollow stands: at its door');
-  assert.match(read('src/scenes/dungeonContext.js'), /const p = longitudeLatitudeToMapPixel\(mt\.longitude, mt\.latitude\);\n {4}return \{ pixel: \{ x: p\.x, y: p\.y \}, mapId: mt\.mapId \?\? null, \.\.\.\(opts\.placeRecord\?\.\(\) \?\? \{\}\) \};/);   // PIN MOVED (INSTANCES' audit): and the instance it was entered as
+  assert.match(read('src/scenes/dungeonContext.js'), /const p = longitudeLatitudeToMapPixel\(mt\.longitude, mt\.latitude\);\n {4}return \{ pixel: \{ x: p\.x, y: p\.y \}, mapId: mt\.mapId \?\? null, \.\.\.\(opts\.placeRecord\?\.\(\) \?\? \{\}\) \};/);
 });

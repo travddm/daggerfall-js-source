@@ -160,7 +160,6 @@ test('FACE-RECT (issue #639): a replaced face takes the <rect> its xml gives - P
 });
 
 test('DFMOD1 wiring: the boot, the pick, the doll, the portraits and the packs card', () => {
-  // PIN MOVED (AUDIT VE R2): the boot seam calls the store's one registration, which registers the bundles (warmed at a boot)
   assert.match(src('scenes/shared.js'), /const textures = registerTextureStore\(\)/);
   const ds = src('scenes/dataSource.js');
   assert.match(ds, /setDfmodSources\(names, loadTextureFile, \{ saveIndex: saveTextureJson, loadBlob: loadTextureBlob, warm \}\)/);
@@ -218,12 +217,10 @@ test('DFMOD2 sources: a Uint8Array or a ranged source reads the same; a Blob is 
 
 test('DFMOD2 wiring: the boot never indexes on its way in, opens by range and warms, asks wait a bounded time, detail is the player\'s', () => {
   const door = src('systems/dfmodTextures.js');
-  // PIN MOVED (AUDIT VE R6): what is indexed in the background is the missing AND the version before's rebuild
   assert.match(door, /if \(todo\.length\) \{ if \(background\) indexMissing\(\); else await indexMissing\(\); \}/);
   assert.match(door, /if \(blob\?\.size\) return _opener\(blob, \{ maxTextureSize: maxSize\(\), knownTextures: knownOf\(key\) \}\);/);
   assert.match(door, /const b = await Promise\.race\(\[bundleFor\(key\), waited\]\);/);
   assert.match(src('scenes/dataSource.js'), /const index = await indexDfmodBytes\(f\);/, 'an attach reads the picked File by range, not whole');
-  // PIN MOVED (AUDIT VE R11): the escape hatch is the door's own rule, wherever a registration comes from
   assert.match(door, /const names = noMods \? \[\] : stored;/, 'the ?nomods escape hatch');
   assert.match(src('ui/enhanced/enhancedMenu.js'), /label: t\('menu\.packs\.detail', 'Texture detail: \{detail\}', \{ detail: detailLabel \}\)/);
 });
@@ -390,9 +387,8 @@ test('GROUND1 door: `<archive>-TexArray` is that ground archive\'s tile set - wh
   assert.equal(await dfmodGroundLayers(302, tex(3)), null, 'the gate shut: classic');
   setValue('Enhancements', 'AssetInjection', 'True');
   clearDfmodSources();
-  // AUDIT PRECIP GROUND-2 (PIN MOVED): world.js reads a set's layers through one helper, for its own set and the winter
+  // AUDIT PRECIP GROUND-2 (
   // its twin carries (scenes/snowCoverHost.js twinLayers) - the mod's tiles first, the classic set's puddles carried
-  // PIN MOVED (OW-HITCH): the helper's home is scenes/groundSets.js (HOST-SPLIT) - the mod's tiles first, the classic marked
   // a record a breath, a mod's set carried from it; the set or its twin uploaded a few layers a breath
   assert.match(src('scenes/groundSets.js'), /const groundLayersOf = async \(archive, tex\) => \{\n\s+const modLayers = await dfmodGroundLayers\(archive, tex\), classic = \[\];\n[^\n]*\n\s+const marked = await stepsBreathing\(markPuddleWaterSteps\(classic\), breathe\);\n[^\n]*\n\s+return \{ modLayers, layers: modLayers \? await stepsBreathing\(carryPuddleMaskSteps\(modLayers, marked\), breathe\) : marked \};/);
   assert.match(src('scenes/groundSets.js'), /const layers = winter == null \? own\.layers : twinLayers\(own\.layers, \(await groundLayersOf\(winter, await getTexture\(winter\)\)\)\.layers\);\n\s+await stepsBreathing\(renderer\.uploadTileArraySteps\(key, layers\), breathe\);/);

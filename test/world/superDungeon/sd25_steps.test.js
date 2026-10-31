@@ -1,4 +1,4 @@
-// SD25 S9 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 8): THE UNMOORED
+// SD25 S9: THE UNMOORED
 // STEPS, every step showing what it will do next - a draw atlas a kind (world/superDungeon/sdStepsArt.js), the Beat's clock-plate
 // frames, its falter and its dissolve, the Drift's pendulums, the risers' racks, the Crumble's crack stages and its chunks
 // that rewind (world/superDungeon/sdStepsModel.js, scenes/superDungeon/sdSteps.js), the waystones and the vane, the ghosts' pass
@@ -213,7 +213,6 @@ test('S9 THE DRIFT\'S PENDULUMS: each step hangs from its own - a gear SD_PENDUL
       const deck = realmToDungeon(...at), box = stepBox('drift');
       for (const f of feet) {
         const w = [M[0] * f[0] + M[4] * f[1] + M[8] * f[2] + M[12], M[1] * f[0] + M[5] * f[1] + M[9] * f[2] + M[13], M[2] * f[0] + M[6] * f[1] + M[10] * f[2] + M[14]];
-        // PIN MOVED (AUDIT SD V L3): the rods hang beside the deck on brackets - every foot at the deck's own height, under
         // its top, at its middle along z; the brackets reach into its side
         assert.ok(Math.abs(w[0] - deck[0]) <= SD_PENDULUM.foot + 0.1 && w[1] <= deck[1] && w[1] >= deck[1] - box.h && Math.abs(w[2] - deck[2]) <= box.d / 2, `step ${s.i}: a rod's foot at its deck's side`);
       }
@@ -222,7 +221,7 @@ test('S9 THE DRIFT\'S PENDULUMS: each step hangs from its own - a gear SD_PENDUL
   // the widest swing, sideways in full: the feet still in the deck (the law's 2 m either way)
   for (const dx of [2, -2]) {
     const a = pendulumAngle(dx), c = Math.cos(a), sn = Math.sin(a);
-    for (const f of feet) { const x = c * f[0] - sn * f[1], y = sn * f[0] + c * f[1] + SD_PENDULUM.len; assert.ok(Math.abs(x - dx) <= SD_PENDULUM.foot + 0.1 && y <= 0 && y >= -SD_STEP_THICK, `full swing ${dx}: foot (${x.toFixed(2)}, ${y.toFixed(2)})`); }   // PIN MOVED (AUDIT SD V L3)
+    for (const f of feet) { const x = c * f[0] - sn * f[1], y = sn * f[0] + c * f[1] + SD_PENDULUM.len; assert.ok(Math.abs(x - dx) <= SD_PENDULUM.foot + 0.1 && y <= 0 && y >= -SD_STEP_THICK, `full swing ${dx}: foot (${x.toFixed(2)}, ${y.toFixed(2)})`); }
     // AUDIT SD V (L3): nothing of it over the deck where a body stands - no vertex from its top up a body's height within
     // the deck's half-width and a capsule's reach of its middle (the rods stood 0.3 m in from its edges, through anyone there)
     for (let k = 0; k < P.positions.length; k += 3) {
@@ -455,7 +454,7 @@ test('S9 THE REWIND: my feet fallen to the void\'s floor one frame and on a chec
 
 test('S9 the hosts by source: the dungeon host hands the Steps the Hollow\'s Ending and the ghosts\' door; the world host draws the ghosts in the Hour\'s reads, fight or none; the lab stands the Steps\' knobs and draws their pass', () => {
   const D = read('src/scenes/dungeonContext.js');
-  assert.match(D, /const sdSteps = _sdRealm \? createSdSteps\(\{ ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\], renderer, audio \}\) : null;/);   // PIN MOVED (KETCH): and the Sailwalk on a sky-ketch, the Hour's own course law on her frame
+  assert.match(D, /const sdSteps = _sdRealm \? createSdSteps\(\{ ending: sdMarksOf\(dfLocation\.sdRealm\)\[0\], renderer, audio \}\) : null;/);
   assert.match(D, /sdStepsDraw: sdSteps \? \(proj, view, fog\) => sdSteps\.drawPass\(proj, view, fog\) : undefined,/);
   const W = read('src/scenes/world.js');
   assert.match(W, /function drawSdArenaReads\(proj, view, fog\) \{\n\s+const ghosts = !!modes\?\.dungeonCtx\?\.sdStepsDraw\?\.\(proj, view, fog\);[^\n]*\n\s+if \(!sdFightLink \|\| _sdReadsBroken \|\| modes\?\.sdRealmSlot\?\.\(\) == null\) return ghosts;/);

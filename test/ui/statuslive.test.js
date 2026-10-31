@@ -1,4 +1,4 @@
-// STATUS-LIVE + NOTICE-FIT (2026-09-22, kurkku via Mac).
+// STATUS-LIVE + NOTICE-FIT.
 //
 //   "minor thing: would be nice if the info panel that comes up when
 //    you press i didn't pause the game, that way you could quickly

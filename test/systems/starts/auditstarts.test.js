@@ -1,4 +1,4 @@
-// AUDIT STARTS (2026-10-25, bible/01-Overview/audits/Audit-Starts.md; the owner: "Audit this and ensure its perfect"):
+// AUDIT STARTS:
 // THE PINS OF THE STARTS' AUDIT - START1 to START3 read against the code that runs them, in five lanes (the quests, the
 // world host, the voyages, the page and the map, the pins themselves), and every fix here held to the shape its
 // producer mints: the held map's past-Bay picks (U1, U2, U4), the lens past the Bay (U5), the start page's press and
@@ -524,7 +524,7 @@ test('AUDIT STARTS P11/W5 the quest layer\'s start seam: a start\'s site id name
   let latchedDuring = null;
   const host = {
     params: new URLSearchParams(), maps: { getLocation: () => null }, blocks: { getBlockByName: () => null },
-    provinceQuestPlaces: { startLairAt: (start, usable) => { asked.push([start.key, typeof usable]); return lair; } },   // PIN MOVED (AUDIT RELEASE R2-5, hostseam): the start lair rides the places past the Bay
+    provinceQuestPlaces: { startLairAt: (start, usable) => { asked.push([start.key, typeof usable]); return lair; } },
     _respawnAtSite: async () => { latchedDuring = host._respawning; },
   };
   const { questWorld: qw } = createQuestWorld(host);
@@ -543,7 +543,6 @@ test('AUDIT STARTS P11/W5 the quest layer\'s start seam: a start\'s site id name
 // ── the sea lanes ────────────────────────────────────────────────
 
 const VOYAGE = { start: 'sea', goal: 'land', voyage: true, again: false };
-/** PIN MOVED (PLAN-SLICES): the most cells a voyage's plan spends (its floods, its lanes and its landfall - travelRoute.js `tally`). */
 const VOYAGE_CELLS_MAX = 450000;   // measured 392,822 and 393,363 (the two floods and the lanes): some twenty frames at PLAN_FRAME_CELLS
 /** A ladder that says it was climbed. */
 const ladder = (rungs = [6, 20, 60]) => { const seen = { climbed: false }; return { seen, margins: { [Symbol.iterator]: () => { seen.climbed = true; return rungs[Symbol.iterator](); } } }; };
@@ -690,7 +689,7 @@ test('AUDIT STARTS V4/V7 on the freeware\'s Tamriel: from the nearest open water
     assert.equal(ports.length, 28);
     const home = openWaterNear(t.dp, t.rg.isWater);
     assert.ok(home, 'Daggerfall\'s harbor');
-    let most = 0;   // PIN MOVED (PLAN-SLICES): a plan's cells, an op count - the journey's plan is made a slice of PLAN_FRAME_CELLS a frame, and a clock on a shared runner is a flake
+    let most = 0;
     const timed = (f, to) => { const tally = { n: 0 }; const plan = planRoute(f, to, { ...t.rg, sea: VOYAGE, tally }); most = Math.max(most, tally.n); return plan; };
     const ashoreOnce = (plan, name) => {
       const fall = plan.kinds.indexOf('landfall');

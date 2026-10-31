@@ -247,7 +247,7 @@ test('U42/AUDIT-39r delete: the prompt arms, and either answer dismisses the BOX
   // DeleteButton_OnMouseClick (:811-838) + DeleteSpellConfirm
   // (:840-852).
   //
-  // THIS PIN MOVED, DELIBERATELY. It used to read the trailing
+  // THIS
   // CloseWindow() (:851) as "either answer closes the book" and
   // asserted `done === true` on both arms. That was a misreading:
   // CloseWindow() there is UserInterfaceWindow.CloseWindow (:127-132)

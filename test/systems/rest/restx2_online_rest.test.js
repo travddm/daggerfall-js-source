@@ -26,7 +26,7 @@ import { CLASSIC_GAME_START_TIME } from '../../../src/systems/gameDate.js';
 // the Medical tally (AUDIT RESTX F1) is retired with the lane; and the
 // shared clock is never read for pacing again.
 //
-// LIVED1 (2026-09-29) re-aims the session's span: the host is handed
+// LIVED1 re-aims the session's span: the host is handed
 // the sub-tick's minutes ALONE - its advance moves the character's own
 // clock online, as the one clock offline - so the session keeps no
 // minute counter and hands no end; the rest window's line says the

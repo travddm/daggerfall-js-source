@@ -1,5 +1,4 @@
-// PORTRAIT3D (2026-10-15, the owner: "can we do the other races with 3d portraits also?", then "#2 is exactly I wanted.
-// Which also affects the talk window for npcs", and of what the first cut left out: "Stop half assing this"): THE FACE
+// PORTRAIT3D: THE FACE
 // AS A PICTURE OF THE MORROWIND HEAD, AS THE BODY WEARS IT. With Morrowind's data attached, a face Daggerfall paints is
 // the head, the hair and what is worn on them, assembled on the body's own skeleton through the body's own doors
 // (combat/fpArm.js headPortrait): the face (faceMatchOf - the build's face door; an NPC's walked off its seed), the
@@ -90,7 +89,6 @@ test('PORTRAIT3D: headFrame looks the face full on - the eye before it on +Z, wh
   const wide = headFrame(b, { aspect: 33 / 30 });
   assert.ok(Math.abs((1 / wide.proj[0]) / (1 / wide.proj[5]) - 33 / 30) < 1e-6, 'the HUD\'s 33 x 30');
   const u = 1 / MW_UNITS_PER_METER;
-  // PIN MOVED (PORTRAIT3D-FACE - a player's screenshot: a Nord's card showing only his hair): figure()'s model at yaw 0
   // IS turned 180 (drawThird's +180 stands the body's front toward its eye on +Z); this pinned the transform without the
   // turn, and every portrait was the back of a head
   assert.deepEqual(Array.from(headPortraitModel()), Array.from(multiply(trs(0, 0, 0, 0, 180, 0, -u, u, u), NIF_TO_PASS)), 'figure()\'s model at yaw 0, its turn and all: the portrait the body, not its mirror');

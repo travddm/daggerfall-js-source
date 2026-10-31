@@ -1,5 +1,4 @@
-// LOOT18 - SEEN: THE LINE COMPARE, THE JUNK AND THE FILTER (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 10; Mac:
-// "what could we do to make it even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT18 - SEEN: THE LINE COMPARE, THE JUNK AND THE FILTER.
 //
 // Four things that let a player see and sort what the ladder hands them, none a new rule of the ladder's:
 //   - THE CARD COMPARES LINES - beside AC-COMPARE's numbers, each line of a picked piece against the same line on what a

@@ -1,4 +1,4 @@
-// TESA4 (2026-10-12, the owner: "Continue"; bible/03-World/Arena-Provinces.md TESA4) - THE ROADS PAST THE BAY'S LAYER,
+// TESA4 - THE ROADS PAST THE BAY'S LAYER,
 // pinned: the grade is the clone's (world/arenaLocations.js arenaRoadTowns), the layer a pixel's byte by its key
 // (world/arenaRoads.js), the painter and the verge read it off the Bay (terrainGen.js, roadVerge.js roadRoom), and the
 // world host paints a built pixel again when a layer lands. RETIRED by TESA14 (test/tesa14_roads.test.js): TESA4's window

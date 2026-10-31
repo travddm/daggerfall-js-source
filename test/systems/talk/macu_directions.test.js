@@ -1,5 +1,4 @@
-// MAC-U (2026-09-18, Mac, with the screenshot): "any directions I get look like two messages at once, like it
-// changes mid-sentence" - "It's really easy. You'll want to go The Greensley Residence is south of where we're
+// MAC-U (2026-09-18, - "It's really easy. You'll want to go The Greensley Residence is south of where we're
 // standing." / "You'll find it The Greensley Residence is a ways south of here."
 //
 // THE DATA, NOT THE CODE. The answer frames (TEXT.RSC 7270-7274, 7285-7289) each carry their own subject and end

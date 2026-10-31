@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): THE UNDERCROFT - Kamer's 32-block dungeon as the arena's own location record, under the city's
+// ARENA1: THE UNDERCROFT - Kamer's 32-block dungeon as the arena's own location record, under the city's
 // pixel and kept off the travel map, entered by the 43600 stair in ARENADAG.RMB (Mac: Kamer's dungeon "becomes the
 // arena's undercroft"). The city's castle dungeon (50027) is untouched; a save made below re-enters it by its own id;
 // the castle's quest sites are never found to be here.

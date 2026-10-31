@@ -1,4 +1,4 @@
-// SD5b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7): THE SHATTERED HOUR'S SKY
+// SD5b: THE SHATTERED HOUR'S SKY
 // (render/superDungeon/sdSky.js) - painted as the Deadlands' is: a void of brass light and stars, slow aurorae, three of the Bay's
 // skylines hanging upside down and drifting round, and a clock-face of stars over the arena whose hands run backwards;
 // every rate whole cycles over its period on the realm's anchored clock, so every screen shows one moment and the sky
@@ -16,7 +16,7 @@ test('SD5b the clock: wrapped to its period, every rate a whole number of cycles
   assert.equal(sdSkyClock(SD_SKY_PERIOD + 5), 5);
   assert.equal(sdSkyClock(-5), SD_SKY_PERIOD - 5);
   for (const k of [SD_CLOCK_FACE.hourTurns, SD_CLOCK_FACE.minuteTurns, SD_AURORA.turns, ...SD_SKY_SHARDS.map((s) => s.turns)]) assert.ok(Number.isInteger(k) && k !== 0, `${k} whole turns`);
-  // SD-LOOK (PIN MOVED): the paint carries the aurorae's drift and each city's, the fetch the hands - one period each
+  // SD-LOOK (
   assert.match(SD_SKY_PAINT_FS, new RegExp(`const float PERIOD = ${SD_SKY_PERIOD.toFixed(1)};`));
   assert.equal((SD_SKY_PAINT_FS.match(/uTime \/ PERIOD/g) ?? []).length, 1 + SD_SKY_SHARDS.length, 'the aurorae\'s drift and each city\'s, over the one period');
   assert.match(SD_SKY_FS, new RegExp(`const float SKY_PERIOD = ${SD_SKY_PERIOD.toFixed(1)};`));
@@ -26,14 +26,14 @@ test('SD5b the clock: wrapped to its period, every rate a whole number of cycles
 test('SD5b the clock-face hangs over the arena (+z, the realm\'s forward), its hands turning BACKWARDS - the Hour unwinding; the minute hand twelve times the hour\'s (mutants: the hands run forwards)', () => {
   assert.equal(SD_CLOCK_FACE.az, 0, 'toward the arena');
   assert.ok(SD_CLOCK_FACE.elev > 0 && SD_CLOCK_FACE.elev + SD_CLOCK_FACE.r < Math.PI / 2, 'above the horizon, under the zenith');
-  assert.match(SD_SKY_FS, /float hourA = -SKY_TAU \* [\d.]+ \* tk \/ SKY_PERIOD, minA = -SKY_TAU \* [\d.]+ \* tk \/ SKY_PERIOD;/, 'backwards');   // SD-LOOK (PIN MOVED): on the escapement
+  assert.match(SD_SKY_FS, /float hourA = -SKY_TAU \* [\d.]+ \* tk \/ SKY_PERIOD, minA = -SKY_TAU \* [\d.]+ \* tk \/ SKY_PERIOD;/, 'backwards');     // SD-LOOK (
   assert.match(SD_SKY_FS, /float secA = -floor\(uTime\) \* SKY_TAU \/ 60\.0;/, 'the second hand a tick back each second');
   assert.equal(SD_CLOCK_FACE.minuteTurns, 12 * SD_CLOCK_FACE.hourTurns);
   assert.match(SD_SKY_PAINT_FS, /float az = atan\(d\.x, d\.z\);/, 'azimuth from +z');
 });
 
 test('SD5b the shards: Daggerfall\'s towers, Sentinel\'s domes and Wayrest\'s bridge, hanging from the upper sky, round the sides and behind - never over the arena\'s clock - drifting their own ways (mutants: a shard over the clock-face)', () => {
-  assert.deepEqual(SD_SKY_SHARDS.map((s) => s.name), ['daggerfall', 'sentinel', 'wayrest', 'orsinium', 'underking', 'blades']);   // SD-LOOK (PIN MOVED): six cities
+  assert.deepEqual(SD_SKY_SHARDS.map((s) => s.name), ['daggerfall', 'sentinel', 'wayrest', 'orsinium', 'underking', 'blades']);     // SD-LOOK (
   for (const s of SD_SKY_SHARDS) {
     assert.ok(Math.abs(Math.atan2(Math.sin(s.az - SD_CLOCK_FACE.az), Math.cos(s.az - SD_CLOCK_FACE.az))) > SD_CLOCK_FACE.r + s.halfW, `${s.name} clear of the clock at the clock's zero`);
     assert.ok(SD_SHARD_TOP - s.depth > 0.4, `${s.name} hangs in the upper sky`);

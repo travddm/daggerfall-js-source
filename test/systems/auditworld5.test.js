@@ -1,4 +1,4 @@
-// AUDIT WORLD5 (Mac, 2026-09-13: "Lets do an audit on this") - four opus
+// AUDIT WORLD5 - four opus
 // lenses over WORLD5 (the wire, the relay and what the player is told; the
 // weather and the boot; the clock and the ticker; the rest, the travel and
 // the quests), each told the live report and made to find it. Fourteen
@@ -19,7 +19,7 @@
 // the pane's copy (C12), the install at the top of the boot (C13), the
 // cautious heal offline only (C14).
 //
-// LIVED1 (2026-09-29, Mac: "We need a better system for time online instead of a band aid fix") re-aims the pins
+// LIVED1 re-aims the pins
 // whose laws it retired, each in its own place: the claim is the character's and moves no world reading (C1), an
 // arrival moves nothing of the character's (C3, C4), the collapse pays its hour in full (C6), the session hands its
 // minutes alone (C7, C8), the sentence refills in both lanes (C9), the pane says the character's own time (C12), the
@@ -203,14 +203,13 @@ test('AUDIT WORLD5 C6 (LIVED1): every collapse costs its hour and pays it in ful
   } finally { offline(); }
   const o = P();
   assert.ok(exhaustionOutcome({ entity: o }).health > 0 && exhaustionOutcome({ entity: o }).health > 0, 'offline: every collapse, in full');
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): the foes-about arm is no longer DFU's death but a tenth of the
   // health - still no hour paid there, which is what this line holds
   assert.deepEqual(exhaustionOutcome({ entity: P(), enemiesNearby: true }).kind, 'spent', 'the foes-about arm untouched by the hour');
   assert.doesNotMatch(rd('src/systems/rest/rest.js'), /lastExhaustionHour/, 'no once-a-world-hour gate');
 });
 test('AUDIT WORLD5 C7 (RESTX2: on the timer, every mode): a session COVERED loses the real time it covers, keeping less than one sub-tick, and a leap of the shared clock (a hidden tab) is NOT a leap of the session - the timer alone paces it, so every hourly check reads a frame of its own by construction', () => {
   // C7 was written on the shared clock (one sub-tick a FRAME across a
-  // leap); RESTX1 narrowed it to loiter; RESTX2 (2026-09-17) retired
+  // leap); RESTX1 narrowed it to loiter; RESTX2 retired
   // the shared-clock pacing whole - test/systems/rest/restx2_online_rest.test.js.
   // What C7 held and still holds: a covered frame banks nothing, the
   // remainder under one sub-tick is kept, and a foe wandering in is

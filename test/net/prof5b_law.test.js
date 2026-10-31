@@ -1,7 +1,7 @@
-// PROF5b (2026-09-29, Mac: "Go") - THE AUCTIONS' LAW (src/net/marketLaw.js, marksLaw.js): 24 hours; the next bid the
+// PROF5b - THE AUCTIONS' LAW (src/net/marketLaw.js, marksLaw.js): 24 hours; the next bid the
 // opening while none stands, else the standing bid and its 5% rounded up, at least a Mark; a bid in the last two
 // minutes adds two; a Masterwork of a listable family alone; a bid a balance's worth at most; the ledger's three new
-// kinds, each a move. bible/06-Systems/Professions-Arc.md 10.2, 27.
+// kinds, each a move. 10.2, 27.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

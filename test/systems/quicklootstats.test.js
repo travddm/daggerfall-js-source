@@ -1,7 +1,4 @@
-// QUICK-LOOT-STATS (2026-09-22, a player relayed by Mac: "i love the
-// quick loot but can it show the stats of the items next to the
-// quickloot window? So i dont have to pick up everything to check in my
-// inventory if its worth keeping").
+// QUICK-LOOT-STATS.
 //
 // THE ARC WAS ONLY HALF MOVED. Arc A said what a pile HELD, Arc B let
 // you take it - so "is this worth stopping for" could be answered under
@@ -144,7 +141,6 @@ test('QUICK-LOOT-STATS: the row carries its ITEM, and the tail row carries none'
   assert.equal(rest, 0);
   for (let i = 0; i < shown.length; i++) assert.equal(shown[i].item, items[i], `row ${i} carries its own item`);
 
-  // PIN MOVED (FIELD BUGS 2026-10-11g LOOT-SCROLL): the rows past HOVER_MAX are rows now - the plaque scrolls to them -
   // so the wheel walks the whole pile, every row describes itself, and the last one clamps
   resetQuickLoot();
   const f = frameOf('loot:2', items);

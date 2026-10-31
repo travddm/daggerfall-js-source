@@ -1,8 +1,7 @@
-// QUAYS (2026-10-03, Mac: "Completely revamp port towns with actual piers and docking ports. I want these places to feel
-// alive and connected with the oceans of daggerfall, along with having them appear when sailing and close to a port") -
+// QUAYS -
 // the port's quays off a harbour's berths (systems/naval/quays.js), their model (world/quayModel.js), the pool that
 // stands them (scenes/quayPool.js), the docking and the gangways (scenes/naval/navalHost.js), Come Sail Away's warp seam and
-// the world's wiring. bible/03-World/Holdings.md section 7.
+// the world's wiring.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -99,7 +98,7 @@ test('QUAYS THE SHORE WALKED: from the quay\'s back to the land at her waist - a
   // no land within JETTY_MAX: the quay alone
   p = plan0({ groundAt: (x, z) => { const [lx] = sceneToQuay(f, x, z); return lx > plan0().quay.x1 + JETTY_MAX + 5 ? SEA + 3 : SEA - 8; } });
   assert.ok(p && p.jetty === null && p.ramp === null, 'no jetty to nowhere');
-  // the jetty's piles over the water, none on the land - PIN MOVED (AUDIT HOLDINGS, the mutants' run): read over the bank
+  // the jetty's piles over the water, none on the land
   // the jetty runs JETTY_LAND onto (2 m up); the 3 m one is met at its face now (Q9), and no jetty stood over its land
   p = plan0({ groundAt: groundOf(() => 2) });
   const jp = p.piles.filter(([x]) => x > p.quay.x1 + 0.1);
@@ -141,7 +140,6 @@ test('QUAYS THE MODEL: the plan built in classic textures - the ship\'s own plan
   const p = plan0();
   const m = buildQuayModel(p);
   assert.ok(m.indices.length / 3 > 200, `triangles: ${m.indices.length / 3}`);
-  // PIN MOVED (SHIPYARDS, 2026-10-11 - THE PIER'S DRESS): and the rigging's own rope (0_77) - the coils by the bollards and
   // the crane's fall
   assert.deepEqual(new Set(m.subMeshes.map((s) => `${s.textureArchive}_${s.textureRecord}`)), new Set(['67_0', '67_8', '0_79', '0_10', '0_77']));
   let maxX = -Infinity, minX = Infinity, deckTop = -Infinity;
@@ -177,13 +175,11 @@ test('QUAYS ALONGSIDE: every hull lies with her side QUAY_GAP off the quay\'s fa
     const toFace = (b.pos[0] - b.normal[0] * face - at[0]) * -b.normal[0] + (b.pos[1] - b.normal[1] * face - at[1]) * -b.normal[1];
     assert.ok(Math.abs(toFace - (hullSize(hull).halfWidth + QUAY_GAP)) < 1e-9, `hull ${hull}: her side the gap off the face`);
   }
-  // PIN MOVED (SHIPS-2, 2026-10-07): the berth sounded for the mod's Carrack (berthSize's template, 8.43 m a side) - it
   // lies at its point where it stands in; Mac's carrack, 6.7 m a side, 1.73 m in toward the quay from it
   const at4 = alongside(b, 4, HARBOUR.hull);
   assert.ok(Math.abs(Math.hypot(at4[0] - b.pos[0], at4[1] - b.pos[1]) - (berthSize(4).halfWidth - hullSize(4).halfWidth)) < 1e-9 && Math.abs(berthSize(4).halfWidth - hullSize(4).halfWidth - 1.73) < 1e-9, 'Mac\'s carrack 1.73 m in');
   setShipStanding(4, false);
   try { assert.deepEqual(alongside(b, 4, HARBOUR.hull), b.pos, 'the mod\'s Carrack at the berth\'s point'); } finally { setShipStanding(4, true); }
-  // PIN MOVED (GALLEON-HOLDINGS): the Small Ship is Mac's galleon, 5.86 m a side to the Carrack's 8.43 - she lies 2.57 m in
   // toward the quay from the berth's point; the mod's galleon, as wide as the Carrack, lies at it where she stands in
   const at2 = alongside(b, 2);
   assert.ok(Math.abs(Math.hypot(at2[0] - b.pos[0], at2[1] - b.pos[1]) - 2.57) < 1e-9, 'Mac\'s galleon 2.57 m in');
@@ -470,12 +466,10 @@ test('QUAYS THE GANGWAY, by the real host: run out square to her side at her wai
   const g = ways[0];
   assert.ok(Math.abs(g.foot[1] - QUAY_DECK_UP) < 1e-9, 'its foot on the quay\'s deck');
   const b = h.harbour.berths[0], f = quayFrame(b, h.harbour.hull);
-  // PIN MOVED (AUDIT HOLDINGS Q1): its foot was on the quay's face, the plank climbing 2 m into her side under her deck
   const [fx, fz] = sceneToQuay(f, g.foot[0], g.foot[2]);
   const [hx, hz] = sceneToQuay(f, g.head[0], g.head[2]);
   assert.ok(hx < fx && hx > 0, 'its head on her side toward the quay');
   assert.ok(Math.abs(hz - fz) < 1e-9, 'square to her');
-  // PIN MOVED (GALLEON-HOLDINGS): her head stands too high for GANGWAY_SLOPE on the quay (Mac's galleon's main deck, 6.2 m
   // up: 8.8 m of run on a 4.5 m quay) - it stops GANGWAY_BACK short of its back, steeper
   const back = f.halfWidth + QUAY_GAP + QUAY_WIDTH - GANGWAY_BACK;
   assert.ok(Math.abs(fx - back) < 1e-9 && Math.atan2(g.head[1] - g.foot[1], fx - hx) / DEG > GANGWAY_SLOPE, 'up from GANGWAY_BACK, steeper than GANGWAY_SLOPE');

@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): YOUR LADDER REPLAY, DRIVEN (bible/11-Multiplayer/Arena.md 2, the Spectate row - offline: "exhibitions,
+// ARENA5: YOUR LADDER REPLAY, DRIVEN (2, the Spectate row - offline: "exhibitions,
 // your ladder replay"). The recording's law (systems/arena/arenaReplay.js - ten ticks a second of each fighter's feet, facing
 // and health as closed-loop byte deltas with standing runs folded, the law's events and the strikes; bounded and
 // measured); the record through the save's arena record (systems/save/save.js - versioned, an older save none, a broken one

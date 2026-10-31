@@ -1,4 +1,4 @@
-// THE CRASH LINE (2026-08-21). A player's crash report arrived with
+// THE CRASH LINE. A player's crash report arrived with
 // frames and NO message - "drawMesh@https://.../main.js:404:11594" -
 // because the overlay printed `err.stack` alone and SpiderMonkey's
 // stack is frames ONLY, while V8's begins with "Name: message". The

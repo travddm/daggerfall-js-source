@@ -1,4 +1,4 @@
-// OH-B / OH-C (2026-09-26) - THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN THE
+// OH-B / OH-C - THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN THE
 // STREAMED WORLD (src/scenes/oceanHolesHost.js) against the assembly's
 // OceanHoles tile work: the gates in ProcessTerrain's order and their
 // diagnostics, the wait for Iliac Puddle No More's floor (RequestSeafloorRefresh
@@ -97,7 +97,6 @@ test('OH-B ProcessTerrain: a pixel the hash does not pick is rejected at once, b
   assert.deepEqual(r.deepWaters.log, [], 'no floor asked for');
 });
 
-// PIN MOVED (PITS-WORLD, 2026-10-27, bible/03-World/World-Wide.md WORLD-LANES): ETHER-DEEP held the pits to the Bay's map
 // because an abyss was named by its pit pixel's id's low twenty bits, the Bay's alone apart; past the Bay an abyss is named
 // in the world's abyss lane now (world/oceanHoles.js getAbyssMapId), so a pixel past the Veil and one west of the Bay are cut
 // as the Bay's are, and off the world's grid is still off the map
@@ -322,7 +321,7 @@ test('OH-B ApplySettings off the declared keys: the midpoint\'s values, as the C
   assert.deepEqual(Object.keys(MOD_SETTINGS['ocean-holes'].keys), ['Enabled', 'General.PitSpawnRate', 'General.SurfaceHoleSize', 'General.SeafloorHoleSize',
     'General.MiasmaParticleCount', 'General.MiasmaHeight', 'General.DungeonVisualIntensity', 'General.DungeonVisualDarkness'], 'the shipped order');
   const shipped = JSON.parse(readFileSync(new URL('../../vendor/ocean-holes/modsettings.json', import.meta.url), 'utf8'));
-  // PLAIN-TEXT (2026-10-19): four of the mod's lines said plainly for a player - their words, exactly
+  // PLAIN-TEXT: four of the mod's lines said plainly for a player - their words, exactly
   const PLAIN = {
     PitSpawnRate: 'How many blue holes there are: none at 0, 1 square in 48 at the middle, 1 in 24 at most',
     MiasmaParticleCount: 'Amount of mist over a hole',
@@ -374,7 +373,7 @@ test('OH-B RefreshLoadedTile through the sea\'s own host: nothing while the terr
   assert.deepEqual(asked, ['14,10', '12,10'], 'the refresh first (the mod builds it in the call), then the nearest');
 });
 
-// AUDIT OH-F A1/A3 (2026-09-26): LoadSettings is a callback DFU raises in any mode, and indoors every terrain is
+// AUDIT OH-F A1/A3: LoadSettings is a callback DFU raises in any mode, and indoors every terrain is
 // inactive (DisableAllParents) - so FindObjectsOfType finds none and ProcessTerrain waits toward its timeout.
 test('AUDIT OH-F A1/A3 indoors: a settings change applies at once (the abyss\'s dials live) and re-cuts nothing; it is not replayed on the way out', async () => {
   let s = { surfaceHoleRadius: 20, seafloorHoleScale: 1, pitSpawnRate: 0.5, miasmaParticleCount: 72, miasmaHeight: 300, dungeonVisualIntensity: 0.5, dungeonVisualDarkness: 0.5 };

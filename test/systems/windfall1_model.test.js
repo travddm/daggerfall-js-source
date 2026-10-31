@@ -1,9 +1,8 @@
-// WINDFALL1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be
-// on by default and integrate into our enhanced environments seamlessly") - WINDFALL 1.0.0 (demifiend000), ported off
+// WINDFALL1 - WINDFALL 1.0.0 (demifiend000), ported off
 // its assembly (vendor/windfall/). THE MODEL: WindNaturalPlanner, WindRecordWeights and WindMod's state machine, pinned
 // against a C# reference that runs the decompiled method bodies themselves (the session's harness: WindCore.cs, the
 // planner's and the weights' own sources, System.Random) - two trace hashes and a table hash, float bits and all.
-// bible/07-Rendering/Windfall.md is the record.
+// is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -127,7 +126,7 @@ test('WINDFALL1 the settings: the mod\'s keys as LoadSettings reads them - perce
   // every key the mod ships, under its section, with the mod's default, range and words (the heading's offset says it has
   // no effect here - one wind); the mod's own General.Enabled is the port's switch
   const ms = JSON.parse(readFileSync(new URL('../../vendor/windfall/modsettings.json', import.meta.url), 'utf8').replace(/^\uFEFF/, ''));
-  // PLAIN-TEXT (2026-10-19): the mod's lines spoke of crown displacement, billboard height and windy-period frequencies; each is said plainly for a player - their words, exactly
+  // PLAIN-TEXT: the mod's lines spoke of crown displacement, billboard height and windy-period frequencies; each is said plainly for a player - their words, exactly
   const PLAIN = {
     'General.WindDirectionDegrees': 'Has no effect here. The enhanced outdoors set the wind’s direction.',
     'General.OverallWindyPeriodFrequency': 'How often windy spells come overall. 100% is the mod’s normal rate.',

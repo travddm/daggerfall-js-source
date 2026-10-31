@@ -1,4 +1,4 @@
-// LW-FIX2 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX2"): THE SEAMS' THREE - an audit of every seam the living
+// LW-FIX2: THE SEAMS' THREE - an audit of every seam the living
 // world's host reads found a struck watchman's guard ended by a method no town has (a crash the moment he fell), his
 // guard never found on a swing (looked for among the watch standing after it was stood), and a room's doors reading the
 // street's stopped minute (a word noted on the day the player went in - or on day -1 after a load made indoors). Each
@@ -75,7 +75,7 @@ test('LW-FIX2 a room\'s doors read the clock\'s own minute: a word, a tone, a re
   town.talked(person);
   assert.equal(rel.regard(r.id, day), EVENTS.talk, 'the word counts, today');
   assert.equal(rel.entries().find((e) => e.id === r.id).seen, day, 'seen today');
-  town.toned(person, 1);   // PIN MOVED: TONE-TASTE - a tone taken kindly (talkTopics.js toneTaste)
+  town.toned(person, 1);
   assert.equal(rel.regard(r.id, day), EVENTS.talk + EVENTS.polite, 'the tone, today');
   const foe = town.residents[1];
   rel.note(foe.id, 'slain', day);

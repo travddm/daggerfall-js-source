@@ -119,7 +119,6 @@ test('F98: the EXECUTION is the one exit DFU does not refill', () => {
   // ...and the refill is therefore NOT inside release(), which every
   // arm including the execution funnels through.
   const a = src('scenes/arrestFlow.js');
-  // PIN MOVED (Road to 1:1, a3): release() took ReleaseFromPrison's
   // last two lines and with them a parameter - `repositionPlayer` is
   // set by every arm EXCEPT the guild rescue (:191-194), so the door is
   // `release({ reposition = true })`. The finding this pins is
@@ -132,10 +131,10 @@ test('F98: the EXECUTION is the one exit DFU does not refill', () => {
 
 test('F99: banishment sets bit 1 and execution bit 2, on the COURT\'S region', () => {
   const banished = finishArm("if (result.outcome === 'banished')");
-  // REP3 (the reputation overhaul, "Timed or pardoned"): PIN MOVED - the banished arm sets the bit through
+  // REP3 (the reputation overhaul, "Timed or pardoned"):
   // systems/standing.js banish(), which ORs the same bit 1 into the same field of the court's live region and stamps its
   // thirty days (test/systems/rep3_banishment.test.js); the execution arm is DFU's own write, as before
-  // AUDIT REP F2: PIN MOVED - the term reads the TRUSTED calendar (worldTick.js trustedWorldMinutes: online, nothing
+  // AUDIT REP F2:
   // stamped until the relay's clock is heard; test/systems/auditrep.test.js)
   assert.match(banished, /banish\(playerEntity, region\(\), trustedWorldMinutes\(\)\);/);
   assert.match(finishArm("if (result.outcome === 'executed')"), /severePunishment\(SEVERE_PUNISHMENT_EXECUTED\);/);
@@ -143,7 +142,6 @@ test('F99: banishment sets bit 1 and execution bit 2, on the COURT\'S region', (
   assert.equal(SEVERE_PUNISHMENT_EXECUTED, 2);
   const a = src('scenes/arrestFlow.js');
   const fn = a.slice(a.indexOf('  function severePunishment(bit) {'));
-  // PIN MOVED DELIBERATELY, AUDIT-39r (R0): this used to demand the RAW
   // `regionConditions?.[regionIndex]`, which cemented a merge collision.
   // #21 (world-legal-talk) landed the region() thunk in the same wave and
   // converted every other consumer; this one write, landed here, kept the

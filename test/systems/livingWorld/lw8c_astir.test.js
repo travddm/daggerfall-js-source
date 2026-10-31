@@ -1,7 +1,7 @@
-// LW8c (2026-10-05, bible/06-Systems/Living-World.md "LW8c", Mac: NPCs "perform activities"): THE ROOM ASTIR - one in
+// LW8c: THE ROOM ASTIR - one in
 // no talking circle now and then gets up and crosses the room, to company where one stands alone, along a line the
 // room's collider lets them walk, at a stroll, facing the way they go; a talking circle stays put; a wall, nobody
-// through it. On mock rooms and a mock town's doors (test/systems/livingWorld/lw8b_talk.test.js's shape). LW-TALK: PIN MOVED - a table's
+// through it. On mock rooms and a mock town's doors (test/systems/livingWorld/lw8b_talk.test.js's shape). LW-TALK:
 // company meets whatever their stays (scenes/livingWorld/livingIndoors.js), so the rig's rooms of no talk have no talk's beat.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -40,7 +40,7 @@ function rig({ inside = [], stays = false, wall = null, clock = 100 * DAY_MIN + 
   };
   const town = {
     insideAt: () => st.inside.map((res) => ({ res, e: stays ? { kind: 'tavern', t0: 0, t1: 1e12 } : { kind: 'tavern' } })),
-    dayOf: (t) => Math.floor((t - 240) / DAY_MIN), talkBeat: () => (stays ? BEAT : null),   // LW-TALK: PIN MOVED - no talk, no beat
+    dayOf: (t) => Math.floor((t - 240) / DAY_MIN), talkBeat: () => (stays ? BEAT : null),     // LW-TALK:
     lineCtx: () => ({ weather: null, hour: 20, news: null }), typeOf: () => BUILDING_TYPES.Tavern, greetingFor: () => null,
     o: { relations: () => createRelations() },
   };
@@ -91,7 +91,7 @@ test('LW8c the room astir: one in no circle stays put a while (INDOOR_STIR_S, th
   while (!two.layer.stood()[0].walking && steps++ < 400) run(two, 0.5);
   const claimed = two.layer.stood()[0].at;
   two.st.inside = [RES(1), RES(2), RES(3), RES(4), RES(5), RES(6), RES(7), RES(8)];
-  two.layer.frame(1, [0, 0, -4.65], Math.PI, [0, 1.6, -4.65]);   // AUDIT LW-ROOMS: PIN MOVED - a step behind the door's row,
+  two.layer.frame(1, [0, 0, -4.65], Math.PI, [0, 1.6, -4.65]);     // AUDIT LW-ROOMS:
   // looking out of it (the room's walk deals a place of that row first now, square to the look, where the eye's own
   // rounding saw it and none came in)
   const others = two.layer.stood().filter((s) => s.id !== 'L9.1');
@@ -111,7 +111,7 @@ test('LW8c company and the room\'s walls: one alone makes for a table where one 
   const lone = [...new Set(snapshot.map((s) => s.table))].filter((tb) => tb !== was.table && count(snapshot.filter((s) => s.id !== mover.id), tb) === 1);
   const near = lone.some((tb) => r.layer.spots().some((p, i) => i >= 0 && Math.hypot(p[0] - was.at[0], p[2] - was.at[2]) <= INDOOR_WALK_M));
   if (lone.length && near) assert.ok(lone.includes(mover.table), `to the company of one alone (table ${mover.table}, lone ${lone})`);
-  // a talking circle stays put - LW-TALK: PIN MOVED - a table's company through its first round together and while an
+  // a talking circle stays put - LW-TALK:
   // exchange is on; one gets up only between two, the clock running as the host's does
   const talk = rig({ inside: [RES(1), RES(2)], stays: true });
   talk.layer.frame(0.016, [0, 0, -4.6], 0, [0, 1.6, -4.6]);
@@ -173,7 +173,7 @@ test('LW8c company and the room\'s walls: one alone makes for a table where one 
   // walls: a partition at x = 0 - every walk keeps to its own side
   const walled = rig({ inside: [RES(1), RES(2), RES(3)], wall: 0 });
   walled.layer.frame(0.016, [0, 0, -4.6], 0, [0, 1.6, -4.6]);
-  // (AUDIT LW-ROOMS: PIN MOVED - each side by the mock's own law, x < 0 the far one: the door's line x = 0 is the near
+  // (AUDIT LW-ROOMS:
   // side's, where the room's walk now walks some)
   const side = new Map(walled.layer.stood().map((s) => [s.id, s.at[0] < 0]));
   for (let s = 0; s < 400; s += 0.5) {
@@ -241,7 +241,7 @@ test('LW8c where they make for (stirPlace): a table where one stands alone, the 
   const walking = over([S('me', 0), S('a', 7), S('b', 8), S('c', 3, true)]);
   assert.ok(new Set(walking).size >= 3, 'the dice spread');
   for (const i of walking) assert.ok(i >= 0 && spots[i][0] <= INDOOR_WALK_M && ![0, 7, 8, 3].includes(i), 'a free place within reach');
-  // their own table: one alone at mine is no company to go to - LW-ROOMS: PIN MOVED, the dice make for a place of their
+  // their own table: one alone at mine is no company to go to - LW-ROOMS:
   // own, TABLE_GAP_M from everyone's (the first cut's were free to land anywhere, at their own table too)
   const mine = over([S('me', 0), S('d', 1)]);
   assert.deepEqual([...new Set(mine)], [5], 'not drawn to my own table: a place of my own');

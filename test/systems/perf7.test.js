@@ -1,4 +1,4 @@
-// PERF7 (2026-09-11). The stream build breathes: a warm pixel build -
+// PERF7. The stream build breathes: a warm pixel build -
 // every await settled from cache - ran as one task and stalled the
 // frame for the whole of a city pixel. The breather yields to the next
 // animation frame once a slice's budget is spent. EXECUTES with an

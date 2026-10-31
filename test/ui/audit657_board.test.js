@@ -1,7 +1,6 @@
-// AUDIT 657 (2026-10-07, Mac: "Lets do an audit on everything so far"): THE BOARD'S FINDINGS, PINNED - lens B of PR
+// AUDIT 657: THE BOARD'S FINDINGS, PINNED - lens B of PR
 // #657's audit (BOARD-UI: the tabs' sheet, the market's early read, the stall's form, the words) and lens D's D4 (the
 // Seat guide's fold). Each fix carries an `AUDIT 657 <ID>` comment where it stands. The record:
-// bible/01-Overview/audits/Audit-657.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -64,7 +63,6 @@ test('AUDIT 657 B3 a stall\'s "Put up a piece" form: its fields under their name
     goods: () => [{ item: 'Leather Cuirass' }], put: async (it, p) => { did.push([it, p]); return { ok: true }; } },
   { busy: () => false, run: async (start) => start(), rerender: () => {}, nowS: () => 0, alive: () => true });
   await tab.open();
-  // PIN MOVED (PACK-PICK): the piece is the pack picker's, over the fields (ui/packPicker.js) - the row of fields its price
   // under its name and the press beside it; the press waits for a tile pressed, then puts that piece up
   const formOf = () => byClass(tab.body(), 'market-listform')[0];
   let form = formOf();
@@ -160,7 +158,7 @@ test('AUDIT 657 B9 + D6 the words true to the law: a gold listing pays a 1% fee 
 
 test('AUDIT 657 D4 the Seat guide kept open across the window\'s redraws, as the suppliers\' fold is - unpinned, a guide that shut on every redraw survived every pin (mutant: the guide\'s open state forgotten)', async () => {
   const ANT = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
-  // PLAIN-UI (PIN MOVED, bible/10-UI/Plain-Words.md): a reader whose guild is pledged in the region - the guide stands
+  // PLAIN-UI (
   // open for one who is not in the war yet, folded for one who is
   const data = { seat: ANT, week: 6, phase: 'muster', reckoningAt: T + 3600, turningAt: T + 86400, defence: 0, holder: null, battle: null,
     standings: [], mine: { guild: 'g1', rank: 2, seasoned: true, bound: 'g1', pledges: [{ region: 21, key: 3021 }], influence: 0 }, chronicle: [] };
@@ -172,7 +170,7 @@ test('AUDIT 657 D4 the Seat guide kept open across the window\'s redraws, as the
   await tick();
   const guide = byClass(host, 'seat-guide')[0];
   assert.equal(guide.open, false, 'folded until opened');
-  guide.children[0].onclick();   // PIN MOVED (AUDIT PLAIN-UI C1): the reader's press on the line records it - never a toggle
+  guide.children[0].onclick();
   guide.open = true;
   v.repaint();
   assert.equal(byClass(host, 'seat-guide')[0].open, true, 'kept open across the redraw');

@@ -38,7 +38,7 @@ test('AUDIT 51: our painter matches the mod\u2019s PaintPath byte for byte over 
   assert.deepEqual(diffs.slice(0, 12), [], `${diffs.length} of 907 cases differ from the mod`);
 });
 
-// MODS AUDIT (2026-09-08): THE RECT'S EDGE. His skip is
+// MODS AUDIT: THE RECT'S EDGE. His skip is
 // `locationRect.Contains(new Vector2(x, y))` - Unity's Rect.Contains,
 // min-inclusive and MAX-EXCLUSIVE - and the port's was max-inclusive:
 // the column x == xMax and the row y == yMax were smoothed by the mod

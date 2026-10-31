@@ -1,4 +1,4 @@
-// LW7 (2026-10-05, bible/06-Systems/Living-World.md "LW7"): THE DEEDS - a resident struck down by the player is dead
+// LW7: THE DEEDS - a resident struck down by the player is dead
 // for good (a hand's death: the lives take the place from its minute, the road keeps its day), their own turn hostile and
 // every one who saw it counts it a crime; one of the watch struck remembers the blow; a word's tone moves a regard once a
 // day; the town talks of its dead and of the fights the player turned. The town is the synthetic one (test/lwTown.mjs),
@@ -15,7 +15,7 @@ import { createRelations, EVENTS, HOSTILE_AT, HAND_KINDS, HAND_NAME_MAX, TURNS_M
 import { placeAt, handDeath, roadHits, fateHits, deathCounted, turnKey, HAZARD } from '../../../src/systems/livingWorld/lives.js';
 import { handsOn, membersAt, newsOf, remainsNear, awayOf, partyAt, placeCycle, CALENDAR_MPM, NEWS_DAYS } from '../../../src/systems/livingWorld/trips.js';
 import { newsScript, SLAIN_NEWS, DIED_NEWS, HELPED_NEWS, ROAD_NEWS, fillLine } from '../../../src/systems/livingWorld/lines.js';
-import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - the news told in an exchange
+import { circleLine, circleSlots, slotSpoken, exchangeScript } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
 import { createLivingRoads } from '../../../src/scenes/livingWorld/livingRoads.js';
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
@@ -50,7 +50,7 @@ function run(t, seconds) {
 }
 
 test('LW7 the regards keep the deeds: a hand\'s death (HAND_KINDS - `slain` by the player, `died` at their side) a turn with its minute, whether it was seen and the name (to HAND_NAME_MAX), once, kept to TURNS_MAX and through the save as [key, t, seen, who] - a record of the old kinds alone written as LW4 wrote it; one of their own slain turns a stranger HOSTILE; each tone of word counts once a day (mutants: the minute unasked, a turn twice, the name, the seen, the record, the cap, the tone\'s day)', () => {
-  assert.deepEqual([...HAND_KINDS], ['slain', 'died', 'killed']);   // WATCH-FIX: PIN MOVED - and one of the watch another hand cut down (test/systems/livingWorld/watchfix_watch.test.js)
+  assert.deepEqual([...HAND_KINDS], ['slain', 'died', 'killed']);     // WATCH-FIX:
   assert.equal(EVENTS.slain, -75);
   assert.ok(EVENTS.slain <= HOSTILE_AT, 'one of their own slain: hostile from nothing');
   const rel = createRelations();
@@ -237,7 +237,6 @@ test('LW7 the town\'s deeds: a resident struck down (`slain`) is dead for good f
   assert.equal(c.relations.regard(v.living.id, cday), EVENTS.crime, 'the purse\'s own');
   for (const id of cNear) assert.equal(c.relations.regard(id, cday), EVENTS.crime, `${id} saw the hand`);
   const w = cseats.find((x) => x.person !== v && !cNear.includes(x.person.living.id)).person;   // one who did not see the hand
-  // PIN MOVED: TONE-TASTE (2026-10-15) - the door hears how the tone was TAKEN (talkTopics.js toneTaste: 1 kindly, -1
   // ill, 0 the Normal tone), never the tone's index (test/systems/livingWorld/tonetaste.test.js)
   assert.equal(c.town.toned(w, 0), null, 'a plain word: nothing');
   c.town.toned(w, 1);
@@ -298,7 +297,7 @@ test('LW7 the town talks of the deeds (`deedNews`): each of its own the player s
   assert.ok(pick({ kind: 'won', who: 'A' }, ROAD_NEWS.won), 'not turned: the road\'s');
   assert.ok(SLAIN_NEWS.seen.every((sc) => sc.some((l) => l.includes('{player}'))), 'seen, the player named');
   assert.ok(SLAIN_NEWS.unseen.every((sc) => !sc.some((l) => l.includes('{player}'))), 'unseen, not');
-  // the circle fills the player's name - LW-TALK: PIN MOVED - told in an exchange, on the exchange's own draw
+  // the circle fills the player's name - LW-TALK:
   const slain = [{ kind: 'slain', who: 'Ada Reed', seen: true, foe: '', place: '' }];
   let filled = null;
   for (let seed = 1; seed < 20000 && !filled; seed++) {
@@ -334,7 +333,7 @@ test('LW7 the road\'s deeds: a traveller struck down (`slain`) - the hand\'s tur
   roads.frame(0.001, [0, 0, 0]);
   assert.notEqual(roads.parties(), before, 'read again at once');
   assert.equal(roads.slain({ living: null }), null);
-  roads.toned({ living: { id: T.party[0].id } }, 1);   // PIN MOVED: TONE-TASTE - a tone taken kindly
+  roads.toned({ living: { id: T.party[0].id } }, 1);
   assert.equal(rel.regard(T.party[0].id, day), EVENTS.slain + EVENTS.polite, 'a word taken kindly on the road');
   // a lone traveller struck down: no mark walks on for them
   const solo = trips.find((tr) => tr.party.length === 1 && !tr.dive && !tr.enc);

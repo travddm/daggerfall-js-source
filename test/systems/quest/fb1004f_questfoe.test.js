@@ -1,6 +1,6 @@
 // QUEST-FOE-LINE (FIELD BUGS 2026-10-04f, the Discord's #bug-reports "Bugged Quests": "The quest The Assassin ... has
 // you track down and kill Rodyn Buckingston. I am at his location, he doesn't spawn. I double checked with multiple
-// NPCs on his location as well"; the owner, of a line naming the foe as the quest's: "Do it").
+// NPCs on his location as well").
 //
 // The trace first, over the real parser and machine (test/fb1004dTowns.mjs's region): A0C00Y08 stands the named man at
 // `_place_`, and walking in hides him and hot-places ONE restrained class foe on his marker - here, every draw at 0.55,

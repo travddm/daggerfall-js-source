@@ -1,6 +1,4 @@
-// LANDFORM1-3 (2026-10-06, Mac, with a picture of the Iliac Bay's heightmap: "Can we adjust the heightmap to be more of
-// this? and allow roads to carve through terrian and caverns without breaking anything and rivers to actually have
-// depth, not just lying flat on land") - THE PORT'S OWN TERRAIN (world/landforms.js), inside the sampler's kernel,
+// LANDFORM1-3 - THE PORT'S OWN TERRAIN (world/landforms.js), inside the sampler's kernel,
 // behind the Features row `landforms`. Pinned with no game data: a synthetic WOODS.WLD the real reader loads (a coast,
 // a rising land and one mountain) and a synthetic network in Basic Roads' own layout.
 
@@ -45,7 +43,7 @@ const at = (s, x, y) => s[x * H + y];
 
 test('LANDFORM1: at or under the knee a height is DFU\'s to the bit, and over it it stays over it - the sea, the beach and every tile class stand where they stood, a road run down to the shore included', () => {
   assert.equal(LANDFORM_KNEE, 40 + BEACH_JITTER, 'the beach line with its jitter (terrainTiles.js generateTileData)');
-  assert.equal(LANDFORM_FLOOR - LANDFORM_KNEE, 0.5, 'half a unit over the knee');   // PIN MOVED (AUDIT LANDFORMS II J4): it was `>`, which +5 and +0.05 both passed
+  assert.equal(LANDFORM_FLOOR - LANDFORM_KNEE, 0.5, 'half a unit over the knee');
   let under = 0, over = 0;
   for (const [px, py] of [[99, 200], [100, 200], [101, 200], [102, 200], [103, 200], [100, 199], [100, 300], [101, 300], [102, 300], [103, 300], [105, 300]]) {
     const dfu = generateSamples(woods, px, py);
@@ -101,7 +99,6 @@ test('LANDFORM1: the small heightmap is lifted - nothing under the median land, 
   let last = 0;
   for (let low = 0; low <= 1100; low += 0.5) { const l = reliefLift(low); assert.ok(l >= last - 1e-12, `never falls (${low})`); assert.ok(l - last < 2, `never jumps (${low})`); last = l; }
   // the ring: a byte's macro height with the same lift; untouched with the row off; the lowlands the same either way.
-  // PIN MOVED (RELIEF-PEAKS): the byte's node's ground (world/landforms.js nodeGround) - the large map by its law with the
   // byte's term, where reliefByteHeight left it out (test/world/reliefpeaks.test.js)
   assert.equal(ringHeight(100), nodeGround(100, 1, 0, false) * STREAMING_TERRAIN_SCALE);
   assert.equal(nodeGround(100, 1, 0, false), 800 + largeOfByte(100) * 4);
@@ -119,7 +116,6 @@ test('LANDFORM1: the small heightmap is lifted - nothing under the median land, 
   assert.ok(Math.max(...shaped) > 1, 'a raised mountain stands over the reference\'s normalising height, not flattened against it');
   const low = generateSamples(woods, 150, 100), lowFlat = generateSamples(woods, 150, 100, H, FLAT);
   assert.ok(low.every((v, i) => Object.is(v, lowFlat[i])), 'the lift leaves a lowland pixel with no path near it DFU\'s to the bit');
-  // PIN MOVED (LANDFORM5, 2026-10-07, Mac: "I dont care about DFU. I want detailed generation, rolling hills, varied
   // terrian"): it said the lowland was DFU's to the bit with the row on. Now it rolls - by exactly the hills at each
   // sample, never more than their top, and the sea and the beach stay DFU's (the knee pin above)
   const lowShaped = generateSamples(woods, 150, 100, H, RELIEF);
@@ -135,8 +131,8 @@ test('LANDFORM1: the small heightmap is lifted - nothing under the median land, 
 test('LANDFORM1: nothing stands over the ceiling - the shaper takes DFU\'s height as DFU clamps it and the lift is level past the 7-bit top, so WOODS.WLD\'s one glitch byte stands at the landforms\' ceiling as DFU stands it at its own', () => {
   // the shipped file carries one byte over 127: a 255 at map pixel (470, 355), in the sea off Tigonus - DFU's
   // kernel stands it at its ceiling, a 1.9 km pillar; unclamped and lifted it was 5 km
-  assert.equal(LANDFORM_CEILING, MAX_TERRAIN_HEIGHT + reliefLift(127 * 8) + HILLS_TOP);   // PIN MOVED (LANDFORM5): and the tallest hill
-  assert.ok(Math.abs(LANDFORM_CEILING * STREAMING_TERRAIN_SCALE - 3644.06) < 0.01, 'about 3.6 km');   // PIN MOVED (LANDFORM6): the mountains' hills are the tallest; PIN MOVED (LANDFORM8): and their peaks stand on them; PIN MOVED (MOUNTAINS-SHARP): both taller
+  assert.equal(LANDFORM_CEILING, MAX_TERRAIN_HEIGHT + reliefLift(127 * 8) + HILLS_TOP);
+  assert.ok(Math.abs(LANDFORM_CEILING * STREAMING_TERRAIN_SCALE - 3644.06) < 0.01, 'about 3.6 km');
   const LIFT_CEILING = MAX_TERRAIN_HEIGHT + reliefLift(127 * 8);   // the glitch's top with the hills left out (LANDFORM5)
   assert.equal(reliefLift(255 * 8), reliefLift(127 * 8), 'the lift is level past the top');
   assert.ok(reliefLift(126 * 8) < reliefLift(127 * 8), '...and rising up to it');
@@ -199,14 +195,14 @@ test('LANDFORM1-3: a seam is one number from both pixels - every shared edge and
 });
 
 test('LANDFORM2: a road is graded level across to the kernel\'s own macro height - the ground noise cut away, the land untouched past its verge', () => {
-  const px = 300, py = 250;   // PIN MOVED (LANDFORM7): on the land without its hills, as the paths' laws are read - beside a road the hills are eased (test/world/terrain/landform7.test.js)
+  const px = 300, py = 250;
   const cut = generateSamples(woods, px, py, H, createLandforms({ woods, roads: NET, hills: false }));
   const lifted = generateSamples(woods, px, py, H, FLAT);
   const macro = sampleKernel(woods, px, py, H, false, FLAT);   // the lift on the two bicubic terms, no ground noise
   const { flat, bank, verge } = LANDFORM_DIALS.road;
   assert.deepEqual([flat, bank, verge, LANDFORM_DIALS.road.drop], [1.25, 2.5, 6, 0]);
   let cutAway = 0;
-  for (let y = 0; y <= 128; y++) {   // PIN MOVED (AUDIT LANDFORMS D5): it ran 4..124, and the hand-over between two pixels' arms is in the rows it skipped
+  for (let y = 0; y <= 128; y++) {
     const bed = at(cut, 64, y);
     assert.ok(Math.abs(bed - macro(64, y)) * UNIT < 1e-3, `y=${y}: the bed is the macro height on the centre line - the arm alongside grades it, at the centre and the pixel edge too`);
     for (const x of [63, 65]) assert.ok(Math.abs(at(cut, x, y) - bed) * UNIT < 0.05, `y=${y}: level across (x=${x})`);
@@ -243,11 +239,11 @@ test('LANDFORM3: a river\'s water lies level across its whole painted width, und
   for (let y = 64 - flat; y <= 64 + flat; y++) assert.ok(Math.abs(at(cut, x, y) - at(cut, x, 64)) * UNIT < 1e-6, `y=${y}: the shipped floor, level across`);
   for (const y of [61, 67]) assert.ok(at(cut, x, y) > at(cut, x, 64) + 0.2 / UNIT, `y=${y}: the shipped bank over the water`);
   // rivers off (RiversAndStreams): painted nowhere, cut nowhere - so the switch MOVES THE GROUND, and online, where a
-  // room stands on one ground, it is the room's: on (2026-10-06, Mac: "Yes rivers should be online")
+  // room stands on one ground, it is the room's: on
   const dry = network({ water: false });
   const off = generateSamples(woods, px, py, H, createLandforms({ woods, roads: dry }));
   for (let y = 54; y <= 74; y++) assert.ok(Object.is(at(off, x, y), at(lifted, x, y)), `y=${y}: no painted river, no channel`);
-  assert.ok(at(off, x, 64) - at(cut, x, 64) > 0.5 / UNIT, 'the river switch moves the ground under the river - its valley and its channel cut down');   // PIN MOVED BACK (AUDIT LANDFORMS III C1): LANDFORM5 had loosened it to a move either way, which hid the stilled river standing over its dales
+  assert.ok(at(off, x, 64) - at(cut, x, 64) > 0.5 / UNIT, 'the river switch moves the ground under the river - its valley and its channel cut down');
   assert.ok(!Object.is(at(off, 64, 30), at(lifted, 64, 30)), 'and the road is cut either way');
   assert.equal(createLandforms({ woods, roads: dry }).rivers, false);
   assert.equal(LF.rivers, true);
@@ -293,7 +289,6 @@ test('LANDFORM1: a point\'s lift is the lift field taken through the location\'s
 
 /** The world host's groundFrameHeight, groundFrameNative and restandHeight against a stub ground and a stub lift
  *  (terrainscale1.test.js's harness, with the landforms' two reads; test/world/terrain/auditlandforms.test.js runs the real lift).
- *  PIN MOVED (BAY-LEFT-GROUND, D5): the law is scenes/groundFrameHost.js recordFrame, run whole - never sliced; the Bay's
  *  pixel (`bay`), as these pins were written for. */
 function restander({ ground, comp = 0, landform = false, lift = () => 0, bay = true }) {
   const state = { compensation: [0, comp, 0], localFromWorld: (nx, nz) => [nx - 100, nz - 200] };

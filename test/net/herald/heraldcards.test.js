@@ -1,5 +1,4 @@
-// HERALD-CARDS (2026-10-22, the owner: "I want to overhaul our discord world event notification system to be more
-// organized"): THE HERALDS' ONE CARD. The law (net/herald/heraldCard.js: the card's shape, its bounds, the families'
+// HERALD-CARDS: THE HERALDS' ONE CARD. The law (net/herald/heraldCard.js: the card's shape, its bounds, the families'
 // colours, the door's thread), every herald's every post read as a card of its family, and the hub routing each family
 // to its own thread (server/src/index.js `_heraldOf`, `_heraldSend`; the relay settings gateThread, serpentThread
 // and sdThread - net/relayCfg.js).
@@ -90,7 +89,7 @@ function everyPost() {
 
 test('HERALD-CARDS every herald\'s every post is a card of its family: the gate\'s omen, kill and rite; the serpent\'s bells and kill; the Abyss Dungeon\'s rise, find, fall and fade - each its family\'s name and colour and its moment\'s footer, a title, within Discord\'s bounds at its widest, pinging the role where it pings and nobody elsewhere, and no player\'s name carrying a mention, a link or markdown (mutants: a post left as text; a family miscoloured; a ping on a quiet post; a name taken raw)', () => {
   const posts = everyPost();
-  assert.equal(posts.length, 24);   // PIN MOVED (EG removal): the Battlespire's six posts left
+  assert.equal(posts.length, 24);
   const moments = new Set();
   for (const [family, moment, pings, p] of posts) {
     const c = cardOf(p), F = HERALD_FAMILIES[family];
@@ -111,7 +110,7 @@ test('HERALD-CARDS every herald\'s every post is a card of its family: the gate\
     assert.ok(!/[@<>*`~|[\]]|https?:/.test(words), `${why}: ${words}`);
     moments.add(`${family}/${moment}`);
   }
-  assert.equal(moments.size, 9, 'nine moments, each its own footer');   // PIN MOVED (EG removal): the Battlespire's five moments left
+  assert.equal(moments.size, 9, 'nine moments, each its own footer');
 });
 
 test('HERALD-CARDS the colours: each family\'s is its marker in the Timers - the gate\'s red the timers sheet reads from this table, the others their rings on the map (mutants: a colour drifted from its ring)', () => {
@@ -146,7 +145,7 @@ async function withHub(fn, env) {
   const r = fakeRoom(SOCIAL_ROOM);
   Object.assign(r.env, { GATE_DISCORD_WEBHOOK: HOOK, ...env });
   r.store.set(SD_KEY, { s: 0, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });   // PIN MOVED (WW5): and every province lane's Hollow resting with it
+  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
   const posts = [];
   globalThis.fetch = async (url, init) => { posts.push({ url, body: JSON.parse(init.body) }); return { ok: true, status: 204 }; };
   try { await quiet(() => fn({ r, posts, tick: (ms) => { clock += ms; }, set: (t) => { clock = t; } })); } finally { Date.now = realNow; globalThis.fetch = realFetch; }
@@ -191,7 +190,7 @@ test('HERALD-CARDS relay: a thread is a setting a developer changes at run time 
 });
 
 test('HERALD-CARDS the client says a thread setting only to a relay that knows it - an older one finds no such name and closes the hub link on the frame; the roles and every older setting as before (mutants: a thread said to world242; the floor read for every setting)', async () => {
-  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });   // PIN MOVED (SD-PARTY, world275): sdCollapse; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor, world272's - re-hashed in place); PIN MOVED (THE FOLD: world260, one release; COST-2 part two, world262): cellSeed
+  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });
   assert.ok(relayCfgSupported(RELAY_VERSION, 'gateThread'), 'this relay knows them');
   assert.deepEqual([relayCfgSupported('world242'), relayCfgSupported('world242', 'gateThread'), relayCfgSupported('world250', 'sdThread'), relayCfgSupported('world242', 'gateRole'), relayCfgSupported('world191', 'gateRole')], [true, false, true, true, false]);
   await quiet(() => {
@@ -284,7 +283,7 @@ test('AUDIT HERALD-CARDS S1: the threads\' floor is the relay that made them - t
   const law = readFileSync(new URL('../relayversion.test.js', import.meta.url), 'utf8');
   for (const [k, min] of Object.entries(RELAY_CFG_KEY_MIN)) {
     const row = law.split('\n').find((l) => l.startsWith(`  world${min}: '`)) ?? '';
-    const own = k === 'cellSeed' ? /COST-2 part two/ : k === 'lootDoor' ? /LOOT-DOOR/ : k === 'sdCollapse' ? /SD-PARTY/ : /HERALD-CARDS/;   // PIN MOVED (SD-PARTY): sdCollapse is world275's; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): lootDoor is world273's; PIN MOVED (COST-2 part two): cellSeed is world260's (the fold's one release; world262 on its branch)
+    const own = k === 'cellSeed' ? /COST-2 part two/ : k === 'lootDoor' ? /LOOT-DOOR/ : k === 'sdCollapse' ? /SD-PARTY/ : /HERALD-CARDS/;
     assert.match(row, own, `${k}: world${min}'s row is the row of the relay that made it`);
   }
 });

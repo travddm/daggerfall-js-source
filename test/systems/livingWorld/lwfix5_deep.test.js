@@ -1,4 +1,4 @@
-// LW-FIX5 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX5"): THE DEEP'S FOUR - a keepsake of the deep's dead was
+// LW-FIX5: THE DEEP'S FOUR - a keepsake of the deep's dead was
 // never carried home (they are travellers, minted off the town's row with no house), the remains lay one visit (marked
 // on laying - a dungeon keeps nothing past its leaving) with goods rolled afresh and unminted, and a turned watchman was
 // followed by the body the town's pool dressed again. Each pinned here, on the synthetic town and mock decks.

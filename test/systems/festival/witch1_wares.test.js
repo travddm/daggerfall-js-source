@@ -1,5 +1,4 @@
-// WITCH1 (2026-10-20, the owner: "A new armor set, a new weapon, a new title and aura, a brand new item (profile icon),
-// new cards"; bible/06-Systems/Witches-Festival.md): THE WYRD SISTER'S WARES - the Wyrd's Raiment and its three tiers
+// WITCH1: THE WYRD SISTER'S WARES - the Wyrd's Raiment and its three tiers
 // driven through the real set seam, the Witchmoon Athame, the Witchfire aura's look, the profile icons drawn in code, the festival's painted pictures, and the window's rows and
 // presses (src/ui/wyrdWindow.js).
 import '../../modsOff.js';
@@ -155,7 +154,7 @@ test('WITCH1 THE WINDOW\'S ROWS AND PRESSES: the wares in their parts, the two t
     (w) => ({ name: `piece ${w.key}` }), (it) => it.name);
   assert.deepEqual(rows.filter((r) => r.part === 'insignia').map((r) => r.id), [
     'title:witchwarden', 'aura:witchfire', 'icon:tallowskull', 'icon:twinmoons', 'icon:wyrdcauldron', 'earned:hearthkeeper', 'earned:starwarden', 'earned:soulcake',
-  ]);   // PIN MOVED (AUDIT STAR8 T3): the Starwarden beside Hearthkeeper
+  ]);
   assert.deepEqual([...new Set(rows.map((r) => r.part))], ['insignia', 'offering', 'raiment']);
   const by = (id) => rows.find((r) => r.id === id);
   assert.deepEqual([by('title:witchwarden').owned, by('title:witchwarden').worn], [true, true]);

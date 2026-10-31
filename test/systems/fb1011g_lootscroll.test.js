@@ -2,10 +2,10 @@
 // 2 or 3 days ago. I can't scroll the item list with mouse wheel for some reason. I can still take items from list one by
 // one to get to the bottom of it", a screenshot of an Elite Daedra Seducer's body - six rows and "and 3 more"). The wheel
 // was never broken: the plaque showed six rows (systems/worldHover.js HOVER_MAX, "a pile is a glance") and the rest were
-// a count the wheel and the take could not reach - and BAL4 (2026-10-10) brought an elite's grant, appended past the
+// a count the wheel and the take could not reach - and BAL4 brought an elite's grant, appended past the
 // sixth row, to every game with the rarity tiers on. The frame carries every row now; the plaque draws a window of six
 // about the lit one (plaqueWindow), and the classic panel the same window. Driven through the real plaque in
-// test/systems/worldhover.test.js; here, the window's law and the classic panel's words. bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
+// test/systems/worldhover.test.js; here, the window's law and the classic panel's words..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

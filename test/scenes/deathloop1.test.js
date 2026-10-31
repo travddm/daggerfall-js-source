@@ -1,4 +1,4 @@
-// DEATHLOOP1 (2026-09-22). Two Discord reports, one law:
+// DEATHLOOP1. Two Discord reports, one law:
 //
 //   SquidKamer: "Respawn after poison and likely disease and other
 //   things can cause a deathloop. Probably should do something about
@@ -115,7 +115,7 @@ test('DEATHLOOP1: endLethalDrains reports only what it actually removed', () => 
 
 // ── DEATHLOOP2: THE WAILING IS THE DEATH SOUND, ONE PER LOOP ─────
 //
-// DragynDance on Discord (2026-09-22): "do you know why my game keeps
+// DragynDance on Discord: "do you know why my game keeps
 // spamming a wailing sound at me?", alongside "I almost died in
 // privateers hold due to freezing to death" and "as soon as I stepped
 // outside my health bar started draaaaining".

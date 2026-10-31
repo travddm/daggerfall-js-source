@@ -1,4 +1,4 @@
-// SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE TITLES AND GLYPHS A CHARTER GIVES - the token's
+// SEAT1c: THE TITLES AND GLYPHS A CHARTER GIVES - the token's
 // vocabulary (five generic title ids with a bounded `ts` claim, four glyphs) reaching the relay first; the relay carrying
 // the claim from the signature to every row; the client wording it off its own seats; and the service deriving both at
 // a mint and offering the titles in the wardrobe - a palace seat's guildmaster a Warden, a crown's a Protector, every

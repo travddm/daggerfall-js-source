@@ -1,6 +1,4 @@
-// WERE-FRIGHT (2026-09-29, Mac: "Can you make it where being a werewolf has a different interaction with guards?
-// Where you cannot surrender, but instead a chance to frighten?" - and, asked: frightened, the guards "flee, crime
-// dropped"; the chance "your level vs theirs"; "werewolves and wereboars").
+// WERE-FRIGHT.
 //
 // The port's own law - neither classic nor DFU has it. A transformed lycanthrope with a crime on record (one it
 // carried into the change, or the passive levy on a hated name, WERE-LEVY) used to be asked "Halt! You are under

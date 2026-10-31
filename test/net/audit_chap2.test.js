@@ -1,5 +1,5 @@
-// AUDIT CHAP2 (2026-10-08, Mac: "Lets do a deep comprehensive audit on everything so far") - CHAP0's record, CHAP1's
-// Roll and CHAP2a's halls read again by six lenses at 915043c5 (bible/01-Overview/audits/Audit-Chapters.md, AUDIT CHAP2): a pin
+// AUDIT CHAP2 - CHAP0's record, CHAP1's
+// Roll and CHAP2a's halls read again by six lenses at 915043c5 (, AUDIT CHAP2): a pin
 // a fix, and the pins the lens of the pins wrote for every law the arc's three files could not fail.
 //
 // The law against literals; the tab and the hall book against fakes shaped as the service answers; the service over the
@@ -442,7 +442,7 @@ test('AUDIT CHAP2 E1/S4: the halls\' moderation - a developer reads a region\'s 
   const again = await s.witness({ key: 4242, region: ANTICLERE, factions: [40] });
   assert.deepEqual([again.r.status, again.r.body.error], [409, 'hall-struck']);
   assert.deepEqual(await strikeHall({ db: s.env.DB, nowS: _now }, { handle: 'Mac' }, { DEVELOPER_HANDLES: 'Devra' }, { key: 1 }), { error: 'not-developer' });
-  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra' }, { DEVELOPER_HANDLES: 'Devra' }, { region: 71 }), { error: 'bad-region' });   // PIN MOVED (WW7-5): past the world's regions
+  assert.deepEqual(await listHalls({ db: s.env.DB, nowS: _now }, { handle: 'Devra' }, { DEVELOPER_HANDLES: 'Devra' }, { region: 71 }), { error: 'bad-region' });
 });
 
 test('AUDIT CHAP2 E1: an account whose answers three times in a week stand alone against confirmed towns is ignored - its reports count for nothing, and its own report is answered so (mutants: the ignored set unread)', async () => {
@@ -518,7 +518,6 @@ test('AUDIT CHAP2 T13/S5: a hall writ\'s credit never touches another account\'s
   assert.deepEqual(roll41(), [10, 0], 'refused: nothing');
   const b = await s.seated('Mallory');
   s.give(b, R.id, h1.material, h1.qty);
-  // PIN MOVED (INT16, Integrity-Arc section 7): another account naming the character is refused at the seat, before the
   // route's own law - a delivery is asked of the deliverer's own seated character
   const across = await s.call('/v1/writs/deliver', { character: R.id, id: h1.id, rid: rid() }, b.secret);
   assert.deepEqual([across.status, across.body], [403, { error: 'progress-seat' }]);
@@ -633,7 +632,7 @@ test('AUDIT CHAP2 T23/C5: a hall writ\'s card under the guild\'s seal, named, it
   for (let i = 0; i < 3; i++) await tick();
   const [card] = byClass(host, 'notice-writ');
   assert.ok(card.className.includes('seal-guild') && !card.className.includes('seal-court'), card.className);
-  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Chapter writ');   // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - "hall" is a guild's hall, never a card's kind
+  assert.equal(byClass(card, 'writ-kind')[0].textContent, 'Chapter writ');
   assert.equal(byClass(card, 'writ-need')[0].textContent, 'Wanted: 30 Red Roses, for the Mages Guild in Anticlere');
   assert.equal(byClass(card, 'writ-pay')[0].textContent, 'Pays 72 silver, 150 Renown and standing with the Mages Guild');
   assert.equal(byClass(host, 'notice-worktoday')[0].textContent, 'Writs today: 0 of 3');

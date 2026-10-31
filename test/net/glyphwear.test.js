@@ -1,4 +1,4 @@
-// GLYPH-WEAR (2026-10-02, Mac: "can we make it where players can also equip/unequip their glyphs"): A PLAYER TAKES A
+// GLYPH-WEAR: A PLAYER TAKES A
 // GLYPH OFF, AND PUTS IT BACK. The glyph stays TRUE of them - the token's `g`, which the rights read (/red, /dm, the
 // staff commands) - and the ones taken off ride beside it as `gx`, which every face that draws a badge leaves out: the
 // relay's `badged`, the board's and the letters' badge, my own stored session (the werewolf's skin).

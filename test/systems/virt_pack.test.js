@@ -1,4 +1,4 @@
-// VIRT (2026-10-16) - THE LONG PACK: a long list draws the rows on screen, a landed picture goes into its own tile, an
+// VIRT - THE LONG PACK: a long list draws the rows on screen, a landed picture goes into its own tile, an
 // ask keeps a fitted picture, and an item's line is read once a pass.
 //
 // The windowing is DRIVEN over a document that lays its rows out (a wrapping grid of fixed rows and a gap, the dock's

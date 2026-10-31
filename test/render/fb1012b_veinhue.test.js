@@ -3,7 +3,7 @@
 // VEIN-WASH (10-11d) gave the ores on a shared picture washes of their own, multiplied into a lump near grey - so a
 // wash's colour is its own spread, and they spread a fifth to a half (a grey a shade off grey); Lodestone kept DFU's own
 // colours, and a boulder's loose stone IS Lodestone's lump. Every wash is its hue at full spread now, and Lodestone wears
-// its own. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// its own..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

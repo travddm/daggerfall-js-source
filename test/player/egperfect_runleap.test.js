@@ -1,6 +1,4 @@
-// EG-PERFECT (2026-10-18, Mac: "I want to ensure the boss attacks, the design of the halls, and everything is absolutely
-// perfect. Traversing between sections should present a challenge, platforming should be detailed"; bible/11-Multiplayer/
-// Elite-Gates.md section 10.5, THE TIMED SOLVER): THE RUNNING LEAP REFUSED ON THE PROVEN WAYS. The enhanced climb is forced on
+// EG-PERFECT: THE RUNNING LEAP REFUSED ON THE PROVEN WAYS. The enhanced climb is forced on
 // online (systems/features.js `enhanced-climbing`, scenes/shared.js parkourSwitchOn), and a running Jump with the floor ending
 // within PARKOUR_RUNLEAP_EDGE became CLIMB3's running leap (player/motor.js _pkRunLeapSpeeds) - at Jumping 100 it flew over
 // the platform the solver proved the plain jump lands on. The made level's law (systems/madeLevel.js `runLeap`) refuses it

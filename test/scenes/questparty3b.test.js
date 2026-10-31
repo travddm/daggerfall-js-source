@@ -1,4 +1,4 @@
-// QUEST-PARTY phase 3b (2026-09-26, Mac: "Dungeons and buildings"). A building streamed no foes (WORLD6b-iii(d)'s
+// QUEST-PARTY phase 3b. A building streamed no foes (WORLD6b-iii(d)'s
 // lock, and a world room was the host's alone), so a partner in the same shop saw me fight air, and a party's shared
 // quest foe in a building - the palace's imp - stood a copy each. The relay's own lane (OWN1) carries a world room's
 // foes as a cell carries them: each player streams the foes it owns there, everyone else stands them as puppets and

@@ -1,5 +1,5 @@
 // @ts-nocheck
-// CHAP6c (2026-10-09, Mac: "continue", the Chapters arc's sixth slice - bible/11-Multiplayer/Chapters-Arc.md 7 and 9):
+// CHAP6c:
 // A CHAPTER'S SEASON ON THE CLIENT. The law: a chapter's Season as the sheet or the board says it, each field checked.
 // The words: the candidates named by the event's roll (DFU's FullName on the region's bank, DFU's stream put back), the
 // Season's lines for every event, the doctrine and shut halls, the choices a member may back and what a backing says.
@@ -67,7 +67,6 @@ test('CHAP6c the Season\'s lines: a Schism\'s two and their doctrines, a Success
   assert.deepEqual(L({ event: 'rivalry', rival: JULIANOS }, MAGES), ['The chapter races the Temple of Julianos for Merit this Season.']);
   assert.deepEqual(L({ event: 'rivalry', rival: THIEVES }), ['The chapter races a rival in the shadows for Merit this Season.']);
   assert.deepEqual(L({ event: 'rivalry' }), ['The chapter races a rival chapter for Merit this Season.']);
-  // PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Decline and the Ascendancy are the Failing and
   // Ascendant bands' now, said on the chapter's band line (chapterBandEffectsLine); a sheet still carrying one says nothing
   assert.deepEqual([L({ event: 'decline' }), L({ event: 'ascendancy' })], [[], []]);
   assert.deepEqual(L({ event: 'calm', doctrine: 'writs', shut: true }), ['The chapter holds to more writs this Season.', 'The chapter\'s halls are shut this Season, by the watch\'s order.']);
@@ -96,7 +95,7 @@ test('CHAP6c the sheet keeps each chapter\'s Season beside its Strength and seat
   sheet.refresh();
   await tick(); await tick();
   const c = sheet.chapterOf(FIGHTERS, ANTICLERE);
-  assert.deepEqual(c, { strength: 60, seats: [], event: 'schism', season: 1, rival: null, shut: false, doctrine: 'shelf', sides: ['training', 'writs'], heir: null, patron: null });   // PIN MOVED (CHAP7b): and its patron
+  assert.deepEqual(c, { strength: 60, seats: [], event: 'schism', season: 1, rival: null, shut: false, doctrine: 'shelf', sides: ['training', 'writs'], heir: null, patron: null });
   c.sides[0] = 'gold';
   assert.deepEqual(sheet.chapterOf(FIGHTERS, ANTICLERE).sides, ['training', 'writs'], 'a copy');
   assert.deepEqual([sheet.chapterOf(MAGES, ANTICLERE).event, sheet.chapterOf(MAGES, ANTICLERE).shut], [null, true]);
@@ -170,7 +169,7 @@ test('CHAP6c a Succession\'s names offered as "Name who follows"; a refusal said
 });
 
 test('CHAP6c the town talks of a chapter\'s Season before its band: shut halls first, then its event (Calm none), else its band; every Season\'s pool its own, worded with the chapter first (mutants: the order, the pools)', () => {
-  assert.deepEqual(Object.keys(CHAPTER_EVENT_NEWS), ['schism', 'succession', 'crackdown', 'rivalry', 'shut']);   // PIN MOVED: GUILD3e - the Decline's and the Ascendancy's talk the bands' now
+  assert.deepEqual(Object.keys(CHAPTER_EVENT_NEWS), ['schism', 'succession', 'crackdown', 'rivalry', 'shut']);
   for (const pool of Object.values(CHAPTER_EVENT_NEWS)) for (const [a, b] of pool) { assert.ok(!a.startsWith('{guild}') && a.includes('{guild}')); assert.ok(typeof b === 'string' && b.length); }
   let chapter = null;
   // a town of one Fighters Guild hall, as LivingTown reads it (places.types and places.factions)

@@ -15,7 +15,7 @@ import { ARROW_ARM_LENGTH } from '../../../src/characters/weaponStates.js';
 import { setPref } from '../../../src/systems/uiPrefs.js';   // BAL4: the switch this file's pins assumed
 import { tickTactics, resetTactics } from '../../../src/ai/tactics.js';   // AUDIT BAL: the brain's clock, ticked as the hosts tick it
 
-// BAL4 (bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI ships On now; this file's pins are the classic motor's
+// BAL4: the Enhanced AI ships On now; this file's pins are the classic motor's
 // own laws, so it says Off outright where it used to read the default (LR5's trap: a pin that leaned on a default moves
 // with it) - and AUDIT BAL's P17 pin runs the fixed stepping again with the brain ON, its clock (ai/tacticsClock.js, the
 // foes' own time, never the wall) ticked with each frame's step as every host ticks it

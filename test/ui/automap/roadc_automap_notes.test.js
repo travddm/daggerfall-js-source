@@ -1012,7 +1012,7 @@ test('c2/S8 SOURCE: the Teleport relay reports BOTH endpoints and still warps id
   assert.deepEqual(warped, [{ pos: [10, 2, 30], yawDeg: 45 }]);
 });
 
-// ── AUDIT-AMAP (2026-09-21): the window's lockouts and the wheel over the panel ──
+// ── AUDIT-AMAP: the window's lockouts and the wheel over the panel ──
 test('AUDIT-AMAP W4: while the note prompt is up the map is not the top window - a held hotkey moves nothing (DaggerfallUI.cs:430-433)', () => {
   const { w } = openWindow();
   try {

@@ -1,4 +1,4 @@
-// WAGON-TIERS (2026-10-15, Mac: "Yes, same tiers") - WAGON UPKEEP ON HORSE CARE'S MODEL (bible/06-Systems/Wagon-Upkeep.md,
+// WAGON-TIERS - WAGON UPKEEP ON HORSE CARE'S MODEL (,
 // systems/upkeep/upkeepTiers.js): one key, `wagonUpkeep`, three tiers - Off (DFU's plain wagon), Boons (the default: it wears
 // and is mended, and wear costs nothing - never worse than DFU's plain wagon) and Hard (the system as it stood) - each
 // player's own online (MODS-ONLINE-3's reading), every reader asking the tier through one accessor

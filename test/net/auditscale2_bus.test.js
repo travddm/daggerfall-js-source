@@ -1,4 +1,4 @@
-// AUDIT SCALE II (2026-10-11, Mac: "Lets do an audit on everything. Ensure perfection"; bible/01-Overview/audits/Audit-Scale-II.md):
+// AUDIT SCALE II:
 // THE BUS AND ITS SHARDS, AND A COURT AND ITS COPIES - the machinery SCALE5c and SCALE5d part two share
 // (server/src/index.js ShardSocket, `_hub*`, `_v*`, `_down*`, `_court*`; net/hubShards.js), hardened. Every finding of the
 // audit's relay lanes on it, each reproduced on the frozen head (e729cea7) before it was fixed and each pin red there: a
@@ -240,7 +240,7 @@ test('AUDIT SCALE II R2-7: every hand-up and delivery is numbered - one that did
   await world(async ({ W, bus, link, say, settle, tick }) => {
     const [a, c] = namesOnShards(2);
     const ka = H.hubOfSubject(`acct-${a}`);
-    const wa = await link(a, undefined, { kind: 'linked' }), wc = await link(c);   // PIN MOVED (AUDIT SAFE RELAY-11): a registered speaker - a guest's channel lines are paced now
+    const wa = await link(a, undefined, { kind: 'linked' }), wc = await link(c);
     const get = W.ROOMS.get;
     let failed = 0;
     W.ROOMS.get = (id) => (id === SOCIAL_ROOM && !failed ? { fetch: async (req) => { if (new URL(req.url).pathname === H.HUB_INTERNAL_UP) { failed++; throw new Error('timeout'); } return get(id).fetch(req); } } : get(id));
@@ -455,8 +455,8 @@ test('AUDIT SCALE II D-7 D-8: the bus greets a ShardSocket once (a hello said ag
   assert.equal(H.HUB_WHO_MS, 15_000);
   assert.equal(H.HUB_FRAME_MAX, 64 * 1024);
   assert.equal(H.HUB_POLL_MS, 20_000);   // HUB-PULL
-  assert.equal(H.HUB_OUTBOX_MAX, 1024);   // HUB-PULL audit: PIN MOVED from 256 - a poll's whole deadline of deliveries
-  assert.equal(H.HUB_OUTBOX_BYTES, 2 * 1024 * 1024);   // HUB-PULL audit: PIN MOVED from 4 MiB - every shard's at once a quarter of an object's memory
+  assert.equal(H.HUB_OUTBOX_MAX, 1024);     // HUB-PULL audit:
+  assert.equal(H.HUB_OUTBOX_BYTES, 2 * 1024 * 1024);     // HUB-PULL audit:
   assert.ok(H.HUB_OUTBOX_MAX * H.HUB_BATCH_MS >= H.HUB_POLL_MS + ROOM_CALL_MS, 'a delivery every batch, kept as long as a poll may be out');
   assert.ok(H.HUB_SHARDS * H.HUB_OUTBOX_BYTES <= 32 * 1024 * 1024, 'the bus\'s outboxes, every shard stalled, a quarter of 128 MB at most');
   await world(async ({ bus, link, settle }) => {

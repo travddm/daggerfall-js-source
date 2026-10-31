@@ -1,10 +1,10 @@
-// SEAT1d (2026-10-01, Mac: "Finish the seats"; "Continue"): HOLDING A SEAT, AS THE SERVICE KEEPS IT - the Turning pays
+// SEAT1d: HOLDING A SEAT, AS THE SERVICE KEEPS IT - the Turning pays
 // each Charter's upkeep (Overreach's share, the crown's scale), puts a short treasury in Neglect and lapses a Charter
 // neglected twice, and reckons every row of Standing; a challenger's influence at a seat in Unrest risen a quarter; the
 // Tithe set once a week and taken across its bailiwick from a sale and a courier's share; the Edicts proclaimed for the
 // coming week and made law (or let fall) at the Turning - Open Gates' homes, the Levy's stockpile, the Bounty's camps.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/11-Multiplayer/Seats-Arc.md 7.1-7.3, 7.6; `06-Systems/Online-Arc.md` SEAT1d.
+// 7.1-7.3, 7.6; `06-Systems/Online-Arc.md` SEAT1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
@@ -222,7 +222,7 @@ test('SEAT1d THE TITHE: an Officer sets it, once a week, within its tier\'s cap;
   // AN AUCTION posted at Anticlere's board pays its Tithe at the close, out of the winning bid's escrow
   raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
     VALUES ('00000000000000a1', ?, ?, 'Silverthorn', 'longsword:mithril', 120, 5, 4, 4242, 'p1.x', ?)`).run(seller.id, seller.character, now);
-  holdPieces(svc.env, seller.character, [{ provenance: '00000000000000a1', quality: 4, wear: 900 }]);   // PIN MOVED (INT19): the auction takes it out of the seller's record
+  holdPieces(svc.env, seller.character, [{ provenance: '00000000000000a1', quality: 4, wear: 900 }]);
   const a = (await svc.call('/v1/market/auction', { character: seller.character, region: 21, provenance: '00000000000000a1', wear: 900, opening: 1000, hubs: HUBS, board: [405, 150], rid: rid() }, seller.secret)).body.auction;
   assert.equal((await svc.call('/v1/market/bid', { character: buyer.character, region: 21, auction: a.id, amount: 1000, hubs: HUBS, rid: rid() }, buyer.secret)).status, 200);
   now += AUCTION_S + 1;

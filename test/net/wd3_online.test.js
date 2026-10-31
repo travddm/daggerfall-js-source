@@ -1,4 +1,4 @@
-// WD3 (2026-10-01, Mac: "ensure this doesn't conflict or regress anything (For example housing customization)") -
+// WD3 -
 // ONLINE, THE TOWNS ARE THE ROOM'S. Beautiful Villages and Beautiful Cities are the room's switches
 // (systems/online/onlineLane.js), and a home is a building KEY, which names a building only in one layout of its town: the
 // account service keeps the layout each home's town was bought in (migration 0073 - 0046 on its branch, 0069 at the first merge onto main, 0071 past PROF9's and PROF12's 0069_cooking and 0070_alchemy at the second, 0073 past SILVER-WAYS' 0071_silver_ways and PROF2b's 0072_motherlodes at the third - homes.js), a town's later homes
@@ -83,7 +83,6 @@ test('WD3 online, the service: a claim keeps the layout its client\'s town stand
   const guest = (await call('/v1/auth/guest', { ...(await import('../../src/net/legalLaw.js')).ACCEPTED })).body.secret;
   const read = await call('/v1/homes/layouts', {}, guest);
   assert.equal(read.status, 200);
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and every town's homes by building
   assert.deepEqual(read.body, { towns: [[TOWN, BV], [CLASSIC_TOWN, null]], homes: [[TOWN, [0x10203, 0x10305]], [CLASSIC_TOWN, [0x101, 0x202]]] });
   assert.equal((await call('/v1/homes/layouts', {})).status, 401, 'a stranger reads nothing');
   // the first home sold: the town keeps the layout its homes stand in (the next oldest took it)

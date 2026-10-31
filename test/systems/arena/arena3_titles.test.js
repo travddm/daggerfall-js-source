@@ -1,5 +1,4 @@
-// ARENA3 (2026-10-02, Mac: "Being a top rank PvE fighter comes with it's own title"; bible/11-Multiplayer/Arena.md "6.
-// Titles and the laurel"): THE TITLES OFFLINE AND THE HALL. Pinned here: the Hall of Champions reads this save's
+// ARENA3: THE TITLES OFFLINE AND THE HALL. Pinned here: the Hall of Champions reads this save's
 // Grand Champions - mine first, then the banners' fighters who took the title, season by season, the newest first, each
 // with the banner they fought for - and with none handed in reads as it always did; the character sheet's Arena lines
 // carry the banner worn (and show for a fighter of a banner who has not fought yet); the Herald cries me by my title on

@@ -1,4 +1,4 @@
-// LEGACY1-LEGACY3 (2026-10-05, bible/06-Systems/Legacy-Arc.md): PROJECT LEGACY - Mac's own mod, read off its IL with
+// LEGACY1-LEGACY3: PROJECT LEGACY - Mac's own mod, read off its IL with
 // every bug fixed. Each pin below is aimed at one of the mod's bugs (the arc's section 2 table) or one of the port's own
 // laws, and is built from the producer's own output (family.js's records, legacyHost's answers) - never a hand-built
 // literal the running game would not mint.
@@ -174,7 +174,7 @@ test('LEGACY1 B13/D4: every death is written, ids never collide, a damaged copy 
   assert.equal(readFamily({ v: 1, id: 'x', people: [] }), null);
   assert.equal(readFamily(null), null);
   assert.equal(readFamily({ v: 2, id: 'x', people: [{ id: 1 }] }), null);
-  // AUDIT LEGACY II (PIN MOVED): `newerFamily` was dead - the store's copy and a save's meet in legacyHost.js
+  // AUDIT LEGACY II (
   // mergeFamily, pinned in test/systems/legacy/auditlegacy2.test.js
 });
 
@@ -230,7 +230,6 @@ test('LEGACY1: the store keeps the newer copy, and a birth waits across the relo
   const s = memStore(), tab = memStore();
   const f = foundFamily(entity(), { id: 'fam-st' });
   assert.equal(storeFamily(s, f), true);
-  // PIN MOVED (AUDIT LEGACY II A4): an older copy never LOSES the store's facts - it takes them in, and is written past it
   const stored = loadFamily(s, 'fam-st');
   recordDeath(stored, 1, { at: 3 });
   stored.rev = 9;
@@ -327,10 +326,7 @@ test('LEGACY2: the model question offers Enduring first - Enter without reading 
   assert.match(o[0].lines[1], /Arkay takes 6% of a lifespan/);
   assert.match(legacyModelOptions({ online: false, tollShare: 0.1 })[0].lines[1], /Arkay takes 10% of a lifespan/, 'AUDIT LEGACY U7: the toll a death will charge, not the Standard\'s');
   const on = legacyModelOptions({ online: true, tollShare: 0.06 });
-  // PIN MOVED (LEGACY7): AUDIT LEGACY B4 shut Bloodline online until the realm kept lineages - it does now (the tombstone)
-  // PIN MOVED (LEGACY-CHOICE): and online a third answer after the two - no lineage, Enduring still first
   assert.deepEqual(on.map((x) => [x.id, x.locked]), [[MODELS.enduring, false], [MODELS.bloodline, false], [NO_LINEAGE, false]], 'LEGACY7: online Bloodline is open - the realm holds the line');
-  // PIN MOVED (AUDIT LEGACY III U8): beside the line's end, never instead of it - the end holds online as off
   assert.deepEqual([on[1].lines[3], o[1].lines[3]], ['With no one left, the line ends.', 'With no one left, the line ends.']);
   assert.match(on[1].lines[4], /^Online, a death is final on every device\.$/);
   assert.equal(o[1].lines.length, 4, 'offline, the four lines as before');
@@ -379,7 +375,6 @@ test('LEGACY1: a Bloodline death falls - written dead, the estate set aside, the
   assert.equal(w.host.deathOutcome().kind, 'fall', 'a second reset presents the waiting Succession again - never the classic end over a line that goes on');
   // a newborn heir of the fallen: a child, the estate on them, the boot asked with their birth
   assert.equal(w.host.succeed({ newborn: true }), true);
-  // PIN MOVED (AUDIT LEGACY II B1): the fall is answered when the heir LANDS (their birth, onBorn), never at the choice
   assert.equal(fam.pending.estate, 250, 'the estate waits on the record until the heir is born');
   const heir = w.host.current();
   assert.deepEqual(heir.parents, [1]);

@@ -1,8 +1,8 @@
-// CHAP3b (2026-10-08, Mac: "Continue", on "Keep going with the arc/slices") - STRENGTH AND THE CHAPTER SHEET: each
+// CHAP3b - STRENGTH AND THE CHAPTER SHEET: each
 // chapter's Strength, 0 to 100 from 50, moved at the week's Turning toward its members' Merit (+ min(10, merit /
 // target), -3 a week with none), halfway back toward 50 at a Season's end; its band (Failing, Steady, Thriving,
 // Ascendant) halves or adds half again to its hall writs; every chapter's state on the sheet, and the region's on the
-// board. bible/11-Multiplayer/Chapters-Arc.md sections 5.2 and 5.3 (CHAP3b).
+// board. (CHAP3b).
 //
 // The law against literals; the Turning over the real migrations (its key, its race, the weeks due, a Season's end);
 // the sheet through the real route; the board's writs and lines; the wiring.
@@ -46,14 +46,14 @@ test('CHAP3b a week\'s Strength: + min(10, merit / target) rounded down, -3 for 
 test('CHAP3b the bands: Failing 0-19, Steady 20-69, Thriving 70-89, Ascendant 90-100 - their prices and their writs; half the writs (never none) Failing, half again Thriving (mutants: each floor, each number)', () => {
   assert.deepEqual(CHAPTER_BANDS.map((b) => [b.band, b.name, b.from, b.price, b.writs]), [
     ['failing', 'Failing', 0, 1.25, 0.5], ['steady', 'Steady', 20, 1, 1], ['thriving', 'Thriving', 70, 0.9, 1.5], ['ascendant', 'Ascendant', 90, 0.8, 1.5],
-  ]);   // PIN MOVED: GUILD3e (bible/11-Multiplayer/Guilds-Made-Plain.md) - Ascendant its own, a fifth off: the Ascendancy event folded into it
+  ]);
   assert.deepEqual([0, 19, 20, 69, 70, 89, 90, 100, null, NaN, '80'].map((s) => chapterBandOf(s).band),
     ['failing', 'failing', 'steady', 'steady', 'thriving', 'thriving', 'ascendant', 'ascendant', 'steady', 'steady', 'steady']);
   assert.deepEqual([[0, 10], [0, 50], [0, 75], [0, 95], [150, 10], [150, 50], [150, 75], [450, 10], [450, 75]].map(([a, s]) => hallWritCountIn(a, s)),
     [1, 2, 3, 3, 2, 4, 6, 5, 15]);
   assert.equal(hallWritCount(450), 10);
-  assert.equal(chapterLineOf({ faction: 41, strength: 74 }), 'The chapter of the Fighters Guild here is Thriving (Strength 74)');   // PIN MOVED (AUDIT CHAP4 C4): the chapter the subject
-  assert.equal(chapterLineOf({ faction: 368, strength: 12 }), 'The chapter of the Knights of the Dragon here is Failing (Strength 12)');   // PIN MOVED (AUDIT CHAP4 C4)
+  assert.equal(chapterLineOf({ faction: 41, strength: 74 }), 'The chapter of the Fighters Guild here is Thriving (Strength 74)');
+  assert.equal(chapterLineOf({ faction: 368, strength: 12 }), 'The chapter of the Knights of the Dragon here is Failing (Strength 12)');
 });
 
 // ── THE TURNING ─────────────────────────────────────────────────────
@@ -205,7 +205,6 @@ test('CHAP3b a Season\'s end: its last week\'s Turning moves every chapter halfw
   s.raw.prepare("INSERT INTO npc_chapters (faction, region, strength, week, merit, at) VALUES (41, 21, 90, 0, 0, 0), (368, 21, 10, 0, 0, 0)").run();
   s.merit(week, 41, ANTICLERE, 600);
   await settleChapterWeek(s.env.DB, week, _now, zero);
-  // PIN MOVED: AUDIT GUILD3 R1 - a chapter that begins its week Failing falls 2 more (the Decline's, the band's now): 10 - 3 - 2 = 5
   assert.deepEqual(s.strengths().filter((r) => r.faction !== 108).map((r) => [r.faction, r.strength]), [[41, 75], [368, 28]], '100 to 75; 5 to 28');
   assert.equal(s.strengths().find((r) => r.faction === 108).strength, 49, 'a new chapter: 47, then halfway back');
   await settleChapterWeek(s.env.DB, week + 1, _now, zero);
@@ -223,12 +222,12 @@ test('CHAP3b the sheet: every chapter confirmed now, its Strength and band, afte
   assert.deepEqual(r.body, { week: week + 1, chapters: [
     { f: 40, region: 17, strength: 47, band: 'steady', seats: [] },
     { f: 41, region: 21, strength: 60, band: 'steady', seats: [] }, { f: 368, region: 21, strength: 47, band: 'steady', seats: [] },
-  ] });   // PIN MOVED (CHAP5a): and each chapter's seats' holders - none here
+  ] });
   s.raw.prepare('UPDATE npc_chapters SET strength = 91 WHERE faction = 41').run();
   s.raw.prepare('DELETE FROM npc_chapters WHERE faction = 368').run();   // a chapter no Turning has settled yet
   assert.deepEqual((await s.call('/v1/chapters/list', {}, s.who.secret)).body.chapters.slice(1), [
     { f: 41, region: 21, strength: 91, band: 'ascendant', seats: [] }, { f: 368, region: 21, strength: 50, band: 'steady', seats: [] },
-  ]);   // PIN MOVED (CHAP5a): the seats
+  ]);
   assert.deepEqual(await chapterSheet({ db: s.env.DB, nowS: _now }, { id: s.who.id }, { CHAPTERS_OPEN: 'off' }), { error: 'chapters-closed' }, 'the module\'s own door');
   const shut = await stand({ open: 'dev' });
   const r2 = await shut.call('/v1/chapters/list', {}, shut.who.secret);
@@ -246,7 +245,7 @@ test('CHAP3b the board: a chapter\'s hall writs by its band - one Failing, three
   assert.deepEqual(l.chapters, [{ faction: 41, strength: 75, band: 'thriving', focus: null }, { faction: 368, strength: 50, band: 'steady', focus: null }], 'the Brotherhood\'s to its members alone');   // PIN MOVED (CHAP4d): and each chapter's Focus this week
   // a Turning passed after the day's writs were written down: the lines read it
   const turning = seatWeekStartMs(meritWeekOf(_now) + 1) / 1000;
-  const past = turning + CHAPTER_TURNING_GRACE_S + 60;   // PIN MOVED (AUDIT CHAP3 S1): a week settles its grace after its boundary
+  const past = turning + CHAPTER_TURNING_GRACE_S + 60;
   assert.equal(utcDay(turning - 60), utcDay(past), 'the Turning falls inside a UTC day');
   clock(turning - 60);
   await s.call('/v1/writs/list', { character: s.R.id, region: ANTICLERE }, s.who.secret);

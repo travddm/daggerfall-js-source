@@ -1,12 +1,11 @@
-// WB10a (2026-09-30, Mac: "improve the boss music, make it more loud, just feel like its too quite, and I feel like the
-// music is too jolly"): THE WARDEN'S SCORE, PRESSED AND DARKENED. Louder: a song may carry its own PRESS
+// WB10a: THE WARDEN'S SCORE, PRESSED AND DARKENED. Louder: a song may carry its own PRESS
 // (systems/song/songPlayer.js songPress - a compressor, its drive, a soft ceiling a decibel under the clip at the highest
 // MusicVolume), and the court's four do (systems/gate/gateScore.js SCORE_PRESS); every song MIDI.BSA holds carries none and
 // plays through the graph it always did. Less jolly: the pizzicato, the high bell, the hi-hat and the tambourine gone; the
 // villain's harmony (D minor to B-flat MINOR, no C major); a pedal ostinato on low brass, never an arpeggio; stabs and
 // pads in open fifths; the brass never climbing to a fanfare. What it SOUNDS like - the loudness, the peaks under the
 // ceiling, one player through the whole fight - is measured through the real player by tools/gateScoreProbe.mjs.
-// Design: bible/11-Multiplayer/World-Bosses.md section 15.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { gateScoreSongs, SCORE_PRESS, SCORE_PROGRAMS, SCORE_CHANNELS, SCORE_TPQ, midiNote } from '../../../src/systems/gate/gateScore.js';

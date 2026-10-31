@@ -1,6 +1,6 @@
 // WOVEN-PAYS (FIELD BUGS 2026-10-26b; fogs, #feature-feedback, "First time XP bonus from the Loom still isn't working":
 // "We now have the ability to weave our own linen bolts (finally!) but I'm still not receiving the first time XP bonus";
-// the owner, asked: "Woven cloth pays"). REPRODUCED on main before the fix, through the real book and the real Worker:
+// ). REPRODUCED on main before the fix, through the real book and the real Worker:
 // Root Tendrils the service never counted (looted, or bought at a shop for gold) wove into LOOSE Linen, which the loom
 // carried out to the bag; the Straps' box (it read the Stores and the carried count, which held none of it) said "and
 // 511 more ... from cloth you wove or spun yourself", and the craft put a bolt back in loose and paid +20, "Your first,
@@ -12,7 +12,6 @@
 // bolt its stations use: while the count stands, a piece made wholly of cloth lays no first on (`prof_silver_cloth`,
 // migration 0177; server-account/src/professions.js craftAtAnvil `pays`); the box reads the count (net/profBook.js
 // silver, ui/professions/profPages.js silverOf); and a pattern is made by the craft that laid its first on (`first_paid`).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26b.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -297,7 +296,7 @@ test('WOVEN-PAYS rows from before the column, as the service before it wrote the
   raw.prepare('UPDATE prof_crafts SET first_paid = NULL WHERE player = ? AND rid IN (?, ?)').run(mac.id, paid, unpaid);
   const [p, u] = [await ask('garment-151:linen', paid), await ask('garment-152:linen', unpaid)];
   assert.deepEqual([p.body.repeat, p.body.firstPaid, u.body.repeat, u.body.firstPaid], [true, true, true, false]);
-  // A4: a Weavers' craft of the days between AUDIT 32 S1 (2026-09-30) and AUDIT PROF-541 B7 (2026-10-03), whose piece
+  // A4: a Weavers' craft of the days between AUDIT 32 S1 and AUDIT PROF-541 B7, whose piece
   // the service wrote with no `bought_with` - its XP says no share was laid on, as the decision reads it; its piece would
   // have said one was
   await buy('cloth:linen', 1);

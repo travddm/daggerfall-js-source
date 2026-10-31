@@ -1,5 +1,5 @@
-// AUDIT POI, lane D (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-3b, POI-4b, POI-5, POI-6) - THE PANELS, THEIR
-// ASYNC FLOWS AND THEIR WORDS. Mac: "Audit everything. Ensure perfection."
+// AUDIT POI, lane D - THE PANELS, THEIR
+// ASYNC FLOWS AND THEIR WORDS.
 //   - the editor's panel (src/ui/poi/poiEditorPanel.js): a dock drawn again after a press (a pressed control keeps the focus
 //     in a browser - here a press is focus() then click(), as Chromium and Electron press); each act bound to what it was
 //     drawn for; the store's acts one at a time a POI, a send and a take-back marking saved only what the store holds, a
@@ -745,7 +745,6 @@ test('AUDIT POI U13 THE WORDS: counts in their plurals; glTF\'s object names sai
   assert.equal(gltfErrorText('missing', { what: 'accessor', index: 3 }), 'This model refers to an accessor that is not there.');
   assert.equal(gltfErrorText('missing', { what: 'bufferView', index: 0 }), 'This model refers to a buffer view that is not there.');
   assert.equal(gltfErrorText('past-end', { what: 'accessor' }), 'This model\'s data is cut short: an accessor runs past its end.');
-  // PIN MOVED (AUDIT POI, the lead's join): poiDiff hands the tags themselves (`tags`), never an English-joined `to`
   assert.equal(diffText({ code: 'tags', tags: [] }), 'Its tags were all taken off.');
   assert.equal(diffText({ code: 'tags', tags: ['stone', 'old'] }), 'Its tags are now: stone, old.');
   assert.equal(diffText({ code: 'tags', tags: ['stone', 'old', 'small'] }), 'Its tags are now: stone, old, small.');

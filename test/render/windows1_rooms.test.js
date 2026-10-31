@@ -1,5 +1,4 @@
-// RW1 (2026-10-09, Mac: "The implementation of the real window overhaul, allowing players to see inside/outside of
-// house windows"): THE ROOMS BEHIND THE GLASS - from the street, every exterior window (DFU's own table, its 0xff
+// RW1: THE ROOMS BEHIND THE GLASS - from the street, every exterior window (DFU's own table, its 0xff
 // mask) shows a room behind it, painted from numbers (world/windowRoomArt.js), lit by the day dim and by the night
 // warm, some rooms dark; the rooms are a FRAME's, asked by the two exterior hosts after their beginFrame, never by an
 // interior, a dungeon or a panel. render/realWindows.js carries the law; this file pins it by execution wherever node

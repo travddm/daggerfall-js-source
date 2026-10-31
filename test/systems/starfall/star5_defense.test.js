@@ -1,4 +1,4 @@
-// STAR5 (bible/11-Multiplayer/Starfall.md section 4): THE DEFENSE'S LAW ON THE CLIENT - what the coven sends by band
+// STAR5: THE DEFENSE'S LAW ON THE CLIENT - what the coven sends by band
 // (only foes a band's players can hurt), its masters and their circles, where they stand, the word a defender says; the
 // star as a body only its own coven's monsters hunt; the circle's ward on the master, through the foe pool's one door;
 // and the star's sites on the camps' law. tools/mutants/star5.json.

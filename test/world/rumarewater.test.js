@@ -1,5 +1,4 @@
-// RUMARE-WATER (2026-10-26, the owner: "City lake needs to be apart of the overall water structure. Not just a flattened
-// land. Make this work and be detailed about it"; bible/03-World/Tamriel.md RUMARE-WATER): the Imperial City's lake is the
+// RUMARE-WATER: the Imperial City's lake is the
 // sea's where its canal stands - the plan's mouth through its far shore to the canal (world/imperialCity.js
 // IMPERIAL.mouth), the city's water law (world/rumareWaters.js), a capital at the sea's ground - its water the sea's own
 // height, its land a freeboard over it (world/terrain/capitalSea.js, world/terrain/terrainGen.js) - the land let down about
@@ -80,7 +79,7 @@ test('RUMARE-WATER the city\'s law: its sea the plan\'s no-land on its span wher
 });
 
 test('RUMARE-WATER the ground about it: the mouth\'s pixels the sea\'s bytes; the land let down to the shore on the span and eased back over the basin\'s ramp, the large map\'s detail with it; the sea never lifted; no canal, none of it (mutants: the mouth\'s pixels land; the basin unread; its ramp unbounded; the large map\'s detail whole)', () => {
-  assert.ok(GROUND_ROLL_VERSION >= 5, 'the roads laid again on the basin');   // PIN MOVED (GHOSTFENCE): 6 - a later law's own move
+  assert.ok(GROUND_ROLL_VERSION >= 5, 'the roads laid again on the basin');
   lakeBelow();
   for (const x of [2068, 2069, 2070]) assert.ok(rumareMouthPixel(x, 670) && tamrielHeightByte(x, 670) === 0, `(${x}, 670) the mouth's`);
   for (const [x, y] of [[2067, 670], [2071, 670], [2069, 669]]) assert.equal(rumareMouthPixel(x, y), false, `(${x}, ${y})`);

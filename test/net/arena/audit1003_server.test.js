@@ -1,4 +1,4 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03) - lens S of the pre-merge audit of PR 545 (the Arena arc's online half): the relay,
+// AUDIT PRE-MERGE 1003 - lens S of the pre-merge audit of PR 545 (the Arena arc's online half): the relay,
 // the account service and the trust boundary between them. Each finding pinned against the real Room over fake sockets
 // and fake objects (test/fakeRoom.mjs), the real Worker over node:sqlite with every migration (test/accountDb.mjs), or
 // the client's arena online over a fake session - and each failing on the unfixed tree for its finding's reason:
@@ -12,7 +12,7 @@
 //   S6 two players' claims of one account at once both rated off the same "before" - a loss erased by a win;
 //   S7 a pair member who stood a ladder bout in `arena:b<offer id>` sent both back `busy`, re-paired, for ever;
 //   S8 a Grand Champion's letter and notice wore no title (and the season's #1 no laurel).
-// The record: bible/11-Multiplayer/Arena.md (the ARENA4b record, its trust).
+// The record: (the ARENA4b record, its trust).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

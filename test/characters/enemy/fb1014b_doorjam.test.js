@@ -6,7 +6,7 @@
 // was never ported. The obstacle probe stops under DOOR_CROUCHING_HEIGHT by design, so it saw no lintel and bought no
 // detour; the capsule's head met the lintel every step; and every foe that followed stood in the same doorway beside
 // it, the port's foes pushing apart only softly. Driven on the real motor over the real collider, the foes minted as
-// the dungeon host mints them and stepped in its frame order. bible/01-Overview/bugs/Field-Bugs-2026-10-14b.md.
+// the dungeon host mints them and stepped in its frame order..
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

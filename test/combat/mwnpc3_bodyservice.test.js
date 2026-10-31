@@ -1,4 +1,4 @@
-// MWNPC3 (2026-10-09, the MW-NPC arc's third slice - bible/04-Characters/Morrowind-NPCs.md section 8): WHAT A BODY
+// MWNPC3: WHAT A BODY
 // COSTS TO BUILD AND HOLD, SHARED. Every build copied each mesh's bytes out of its archive and parsed the copy - a
 // fresh copy a build, so the parse memo never met a mesh twice; every mesh uploaded its own GL copy of every texture it
 // wore; every peer's body swept its first-person reach over every clip it would never be looked out of; and every

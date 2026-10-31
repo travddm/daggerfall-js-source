@@ -1,5 +1,4 @@
-// BROKER-CAGE (2026-10-02, Mac: "she should be present at the site in a jailed gate, and the gate opens after all the
-// enemies are cleared"; asked, "The rite's faithful", "Stays caged", "Until midnight"): THE SIGIL BROKER CAGED AT THE
+// BROKER-CAGE: THE SIGIL BROKER CAGED AT THE
 // FAITHFUL'S CIRCLE. The law (net/gate/gateRite.js riteRosterFell, cageStands), the wire (net/wire.js validRiteIn `c`,
 // validRiteOut `cl`), the rite's host (scenes/riteHost.js - its word's `c`, the hub's cleared word, no faithful stood
 // once it is said, isCleared), the omen's cage site (systems/gate/gateOmen.js cageSite - a Warden fallen early never takes her),
@@ -62,7 +61,7 @@ test('BROKER-CAGE the wire: the rite word\'s `c` 0 or 1, a word from before it 0
   assert.deepEqual(validRiteOut({ k: 'cl', d: DAY, px: PX, py: PY, at: 5, by: ['Ann'], n: 3, x: 1 }), { k: 'cl', d: DAY, px: PX, py: PY, at: 5 });
   for (const bad of [{ d: -1 }, { px: 1000 }, { py: 500 }, { at: 0 }, { at: 1.5 }]) assert.equal(validRiteOut({ k: 'cl', d: DAY, px: PX, py: PY, at: 5, ...bad }), null, JSON.stringify(bad));
   assert.equal(validRiteOut({ k: 'br', d: DAY, px: PX, py: PY, at: 5, by: ['Ann'] }).k, 'br', 'the broken word as it was');
-  // THE MERGE (2026-10-02): world153 is main's REVENANT-WIRE, a relay that never says `cl` - read as the cage's, its every
+  // THE MERGE: world153 is main's REVENANT-WIRE, a relay that never says `cl` - read as the cage's, its every
   // screen would wait on a word it never hears and keep her caged; the cage's own relay is world154
   assert.equal(CAGE_RELAY_MIN, 154);
   assert.deepEqual(['world152', 'world153', 'world154', 'world157', 'acct62', null, 154].map(relaySupportsCage), [false, false, true, true, false, false, false]);

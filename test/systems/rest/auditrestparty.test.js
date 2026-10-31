@@ -1,5 +1,4 @@
-// AUDIT REST-PARTY (2026-10-03, bible/06-Systems/Rest-Arc.md "AUDIT REST-PARTY"; the party rest adapted to REST5's
-// night). REST5 shipped the party's night as a closure in world.js pinned by regexes alone, and three of its laws were
+// AUDIT REST-PARTY. REST5 shipped the party's night as a closure in world.js pinned by regexes alone, and three of its laws were
 // wrong in ways no regex fails: it carried members in a tavern, temple or guild hall (TAVERN-REST1/GUILD-REST1 took the
 // party's rest out of all three), it slept a member standing 4-15 m from the rester's fire on the bare ground (rough:
 // "You slept poorly" in Casual, half the night's healing and stiff in Hard - PARTY-REST4's per-request "party member

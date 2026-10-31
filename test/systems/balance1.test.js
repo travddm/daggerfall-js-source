@@ -1,5 +1,4 @@
-// BALANCE1 (2026-09-27, Mac: "I want to adjust fatigue drain and durability drain. Just needs some balancing. Currently
-// things drain a little too fast"). Measured first: the port's own fatigue losses are DFU's to the unit (a full bar at
+// BALANCE1. Measured first: the port's own fatigue losses are DFU's to the unit (a full bar at
 // STR/END 50 walks 48.5 real minutes and runs 6.1), while the default game's WEAR runs through the combat overhaul
 // (PCAAO, on by default and online) at ~2.8x DFU's on a weapon per landed hit and ~15x on armour. Two scales, each
 // applied where the cost is charged and nowhere else: exertion costs a quarter less, a blow wears gear 40% less.

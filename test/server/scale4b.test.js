@@ -1,5 +1,4 @@
-// SCALE4b (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's D1 discipline; bible/11-Multiplayer/Scale-Arc.md
-// SCALE4b): THE ACCOUNT SERVICE'S OWN CLOCK. Until this the service had no scheduled job, so the sweeps that keep its
+// SCALE4b: THE ACCOUNT SERVICE'S OWN CLOCK. Until this the service had no scheduled job, so the sweeps that keep its
 // database small ran inside reads - the Notice Board's on every look, a guild board's, the professions' state's on a
 // gatherer's every ask, the market History's nine deletes - and the tables nothing swept grew for ever. Now a
 // scheduled() of two crons (server-account/src/cron.js): every minute the settlements nobody's read should wait on
@@ -201,7 +200,6 @@ test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothin
   const market = () => s.call('/v1/market/read', { character: a.character, region: DF, view: 'materials', hubs: HUBS }, a.secret);
   const work = () => s.call('/v1/writs/list', { character: a.character, region: DF }, a.secret);
   const mine = () => s.call('/v1/guilds/mine', { character: a.character }, a.secret);
-  // PIN MOVED (CRAFT-WRITS, Professions-Arc.md section 49): the Work tab's first read of a UTC day writes the character's
   // crafting writs down - due, as the Court's posting is on a region's first read - and the read after writes nothing
   w.asked.length = 0;
   assert.equal((await work()).status, 200);
@@ -275,7 +273,6 @@ test('SCALE4b D: every minute the clock settles what no read has asked for - an 
   // the #1 kept younger than ARENA_CHAMPION_CLOCK_S is read, not counted
   const champ = () => ['changed', 'statements'].map((k) => ran.find((j) => j.name === 'arena-champion')[k]);
   assert.deepEqual(champ(), [0, 1]);
-  // PIN MOVED (AUDIT SCALE A4): past it with no bout since, the kept word is stamped again rather than counted - a bout
   // is all that moves the board, and the count walks the season's every bout - before a reader would count it
   ran = await runCron(s.env, { cron: CRON_MINUTE, nowS: T0 + ARENA_CHAMPION_CLOCK_S, rand });
   assert.deepEqual(champ(), [0, 3], 'the kept word read, the newest bout read, the word stamped');
@@ -338,7 +335,6 @@ test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a 
   assert.ok(calls > 40, `every overRate call read (${calls})`);
   assert.ok(windows.get('LOGIN_WINDOW_S') * 2 <= RATE_ROW_KEEP_S);
 
-  // PIN MOVED (AUDIT SCALE A6): the sessions' sweep WALKS the table, by no index of its own - one on last_seen cost a
   // written row at every stale touch (D1 bills a write at a thousand times a read) to spare this hourly walk
   const plan = new DatabaseSync(':memory:');
   for (const m of readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((x) => x.endsWith('.sql')).sort()) plan.exec(src(`server-account/migrations/${m}`));

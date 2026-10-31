@@ -1,6 +1,4 @@
-// MENU-ORDER (2026-10-12; the owner: "I want to really organize and enhance the decoration menu/buttons. Making it for
-// palatable, readable and easy to understand. I want to do the same for stores, crafting menus, etc", then "I just feel
-// like text lists are too much. Why cant you try something else"): bible/10-UI/Menu-Order.md. Pictures before words -
+// MENU-ORDER:. Pictures before words -
 // the decorator's catalogue and its rooms as tiles, every kind and press its glyph, the bar's keys folded; the shop
 // counter's prices on its rows and its lists as pictures on a press; the Stores page's stations as tiles, its works and
 // patterns as cards.

@@ -1,4 +1,4 @@
-// HARD2 - THE ACTIVATION RACE, ONE HOME (2026-09-14).
+// HARD2 - THE ACTIVATION RACE, ONE HOME.
 //
 // The second slice of `01-Overview/Hardening.md`, and the first that
 // moves code rather than adding a gate.
@@ -104,7 +104,7 @@ test('HARD2 / AUDIT-WH H1: the law MOVED once, on purpose - and ONLY where the b
   // rather than its flags, and the two answers disagreed on 9.3% of
   // pick sets (AUDIT-WH H1).
   //
-  // Mac's call (2026-09-21, "b") was to fix the PRESS rather than teach
+  // Mac's call was to fix the PRESS rather than teach
   // the plaque the press's quirk, so `raceActivation` now DERIVES from
   // `raceWinner` and there is one ordering law for both readers. This
   // pin therefore no longer says "they agree". It says the disagreement
@@ -189,7 +189,6 @@ test('HARD2: both exterior hosts ask the ONE race and hand-roll none of it, and 
     // WB2: and the world host one more, the Oblivion Gate (online alone - the ?exterior host stands none)
     // SET7: ...and the Sigil Broker who stands beside it; CSA-D: and Come Sail Away's boats
     const gateRow = host === 'src/scenes/world.js' ? String.raw`\s*gate: _gatePick,[^\n]*\n\s*broker: _brokerPick,[^\n]*\n\s*boat: _csaBoatPick,[^\n]*\n` : '';
-    // PIN MOVED (ALLY-YIELDS, bible/01-Overview/bugs/Field-Bugs-2026-10-12d.md): the door set comes in as its PICK (`door:`,
     // worldModes exteriorActivationHit), its reach with it, where it was its distance alone - the race's `next` asks
     // whether it answers before a companion in front of it may take the press; `doorDistance` is the pick's distance
     assert.match(src, new RegExp(String.raw`const _race = raceActivation\(\{\s*\n\s*corpse: _corpsePick,\s*\n\s*pile: _pilePick,\s*\n\s*torch: _torchPick,\s*\n\s*wagon: _wagonPick,\s*\n\s*horseCart: _hccPick,[^\n]*\n\s*camp: _campPick,[^\n]*\n\s*water: _springPick,[^\n]*\n` + gateRow + String.raw`\s*door: modes\.exteriorActivationHit\(cam\.pos, useFwd\),[^\n]*\n\s*personDistances: (?:_livePersons|_talkPersons\(\))\.map\(\(p\) => rayPersonDistance\(cam\.pos, useFwd, p\.pos\)\),\s*\n\s*\}\);`), `${host}: and feeds it every family the ray can strike`);   // LW3: the streaming host's persons are the town's and the road's (`_talkPersons()`)

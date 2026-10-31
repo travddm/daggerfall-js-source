@@ -1,4 +1,4 @@
-// STAFF-PANEL3-ECON (2026-10-22; design doc "DFO Staff Panel: design", build step 3) - THE PANEL'S ECONOMY SCREENS
+// STAFF-PANEL3-ECON - THE PANEL'S ECONOMY SCREENS
 // (server-account/src/staffEconomy.js), driven through the real Worker on the node:sqlite database every account pin
 // stands on (test/accountDb.mjs): the market and trades stream with its flags, node activity, the economy and the guilds -
 // an Admin's alone - the Home watch, and the indexes every statement stands on (migration 0153).

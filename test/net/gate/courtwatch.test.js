@@ -1,5 +1,4 @@
-// COURT-WATCH (2026-10-18; bible/11-Multiplayer/World-Bosses.md section 24, Scale-Arc.md THE PLAN PAST 1,000 decision 5 -
-// the owner: "Make the best call for future proofing"): A FULL COURT KEEPS ITS WATCHERS. A court's fight seats
+// COURT-WATCH: A FULL COURT KEEPS ITS WATCHERS. A court's fight seats
 // GATE_FIGHTERS_MAX accounts (net/gate/gateBrain.js), and the next one asking was told `the court is full` and cast out
 // before the gate. It stays now, as the court's watcher - the fight heard and drawn (every beat is the room's), no blow of
 // its own sent and none of his landed on it - and asks for a seat again every COURT_WATCH_ASK_MS; the relay's answer to an

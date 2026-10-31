@@ -1,4 +1,4 @@
-// L10N6b (2026-09-27, Mac: "Both"): THE TRANSLATION PIPELINE, tools/translate.mjs. The placeholders a draft must
+// L10N6b: THE TRANSLATION PIPELINE, tools/translate.mjs. The placeholders a draft must
 // keep (the port's ICU arguments; Daggerfall's %macros, [/markup], {n} and quest symbols), whose row is whose (a person's
 // edit kept and never drafted over, a machine row drafted again when its English moves), a whole run over a stand-in
 // model (a broken draft asked for once more with its problem named, then left out; the table in the English's order;

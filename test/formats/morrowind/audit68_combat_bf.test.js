@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster combat_bf: the
+// AUDIT 68, the whole-tree sweep - cluster combat_bf: the
 // Morrowind rig (fpArm), the bow's draw, the overhaul's archery arm and the
 // MW/classic format readers (mwFirstPerson, mwNpc, mwTexture, mwParticles).
 // One pin per behavioural fix, each proven to fail on the base source; the

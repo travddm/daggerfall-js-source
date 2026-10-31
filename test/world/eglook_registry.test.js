@@ -44,17 +44,17 @@ test('EG-G2 THE REGISTRY (section 11.6): no two numbered pseudo-archives overlap
   assert.equal(pseudoArchiveOwner(38151).name, 'SD_REALM_ARCHIVE');
   assert.equal(pseudoArchiveOwner(112370).name, 'ARCHIVE_FOOT', 'a block holds its middle');
   assert.equal(pseudoArchiveOwner('hcc').owner, 'scenes/horseCartPool.js');
-  assert.equal(pseudoArchiveOwner(38194), null, 'a free number has no owner');   // PIN MOVED (NAVAL-REFIT: a ship's paint took 38191, her cabin's 38192, her name boards 38193)
+  assert.equal(pseudoArchiveOwner(38194), null, 'a free number has no owner');
   assert.equal(pseudoArchiveFree(38150), 38150, 'a free number is its own pick');
   assert.equal(pseudoArchiveFree(38151), 38152, 'past the Hour\'s');
-  assert.equal(pseudoArchiveFree(38231, 8), 38233, 'eight free after the harbour\'s and the lamp\'s');   // PIN MOVED (AUDIT EG V, the merge of main): LAMP-KEEPER II's lamp took 38232 - nine were free after the harbour's
+  assert.equal(pseudoArchiveFree(38231, 8), 38233, 'eight free after the harbour\'s and the lamp\'s');
   assert.equal(pseudoArchiveFree(38281, 18), 38303, "past the Witches' Festival's pictures (38291) and the Starfall's crater and Starglass (38301, 38302)");
   assert.equal(pseudoArchiveOwner(pseudoArchiveFree(1)), null);
 });
 
 test('EG-G2 THE REGISTRY, SWEPT BOTH WAYS: every `*ARCHIVE*` number past TEXTURE.511 in src/ is registered at its own value under its own owner, and every string archive key; every registered constant stands in its owner at the registry\'s value (mutants: a constant moved and the registry not; an entry naming a constant its owner lost)', () => {
   const { nums, keys } = sweep();
-  assert.ok(nums.length >= 25 && keys.length >= 5, `${nums.length} numbers and ${keys.length} keys swept`);   // PIN MOVED (the tavern card games removed): their four string keys went with them
+  assert.ok(nums.length >= 25 && keys.length >= 5, `${nums.length} numbers and ${keys.length} keys swept`);
   for (const n of nums) {
     const e = PSEUDO_ARCHIVES.find((q) => q.owner === n.owner && q.name === n.name);
     assert.ok(e, `${n.owner} ${n.name} = ${n.value} is registered`);

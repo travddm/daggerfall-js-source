@@ -1,11 +1,10 @@
-// CRAFT4 (2026-10-07, Mac: "How could we enhance the profession element of the game while reducing complexity and
-// making crafting more viable"; then "Lets do it") - TEMPERING AND REFORGING: the crafter improves what loot gives, never
+// CRAFT4 - TEMPERING AND REFORGING: the crafter improves what loot gives, never
 // past law 7. A TEMPER (Smithing's weapons and metal armour, Outfitting's leather and cloth) takes a piece of Rare or below
 // a quality step better, up to Superior, for half its recipe's main input from the Stores and the craft's XP; a made
 // piece's record is re-signed. A REFORGE WITH ESSENCE (Enchanting 50) replaces one line of a Magic or Rare piece for 2
-// or 5 Arcane Essence, the seed the service's - REFORGE-REPLACE (2026-10-25, the owner: "Replace, price rises"): by a
+// or 5 Arcane Essence, the seed the service's - REFORGE-REPLACE: by a
 // line of another kind, any line, the Essence doubled for every reforge the piece has taken. The done-when: a found Steel Longsword tempered twice through the real
-// Worker; a made one's record re-signed and the piece what it mints. bible/06-Systems/Professions-Arc.md 41.7.
+// Worker; a made one's record re-signed and the piece what it mints. 41.7.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

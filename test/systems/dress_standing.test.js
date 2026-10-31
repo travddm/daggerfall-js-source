@@ -1,7 +1,4 @@
-// DRESS1 (2026-09-30, Discord: "Add positive and negative reputation
-// buffs for clothing items... common clothes ... Commoner +, Noble -
-// ... temple-specific robes with a positive buff for that temple
-// faction"): the clothing reaction - classification, sums and caps,
+// DRESS1: the clothing reaction - classification, sums and caps,
 // the magic-round hook (live even with nothing enchanted worn), the
 // temple term in getReactionToPlayer, and the Standing page's line.
 import { test } from 'node:test';

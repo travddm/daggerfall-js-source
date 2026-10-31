@@ -36,9 +36,9 @@ test('F035/F041: every damage door takes a provenance flag, defaulting TRUE', ()
   // AUDIT 58: the three doors also take bypassShield now, the same
   // idiom for the same reason - Shield mitigates DAMAGE, and the
   // SetHealth(0) door is not damage (DaggerfallEntity.cs:313-328).
-  assert.ok(src('scenes/cityGuards.js').includes('function damageGuard(g, damage, playerFeet, knockDir, { fromPlayer = true, bypassShield = false, peer = false, kind = \'melee\', weapon = null, round = false, striker = null, wc = null } = {})'));   // TELL8: and a peer's blow's class   // PIN MOVED (TELL1: the blow's kind, weapon, round and striker)
-  assert.ok(src('scenes/exteriorFoes.js').includes("function damageFoe(f, damage, playerFeet, knockDir = null, { fromPlayer = true, bypassShield = false, kind = 'melee', peer = false, peerId = null, whole = false, spell = null, striker = null, weapon = null, round = false, wc = null, element = null } = {})"));   // TELL8: and a peer's blow's class   // PIN MOVED (TELL1: the striking weapon and a spell's round)   // PIN MOVED (AUDIT CC-E1: and the striking foe, hurtFromFoe's)   // WORLD6b-ii: and the striker's id, as the dungeon's   // WORLD6b: the kind and the peer flag, as the dungeon's
-  assert.ok(src('scenes/dungeonContext.js').includes('function damageFoe(foe, damage, playerFeet = null, knockDir = null, { fromPlayer = true, bypassShield = false, kind = \'melee\', peer = false, peerId = null, whole = false, spell = null, striker = null, weapon = null, round = false, wc = null, element = null } = {})'));   // TELL8: and a peer's blow's class   // PIN MOVED (TELL1: the striking weapon and a spell's round)   // PIN MOVED (AUDIT CC-E1: and the striking foe)   // AUDIT PSCALE1 DOORS-1: and whether it is a kill   // WORLD3: and the striker's id (the aggro turns on the peer); WORLD2: and the blow's kind, for the hit that goes to the host; AUDIT WORLD2 C4: and whether it is a peer's
+  assert.ok(src('scenes/cityGuards.js').includes('function damageGuard(g, damage, playerFeet, knockDir, { fromPlayer = true, bypassShield = false, peer = false, kind = \'melee\', weapon = null, round = false, striker = null, wc = null } = {})'));     // TELL8: and a peer's blow's class   //
+  assert.ok(src('scenes/exteriorFoes.js').includes("function damageFoe(f, damage, playerFeet, knockDir = null, { fromPlayer = true, bypassShield = false, kind = 'melee', peer = false, peerId = null, whole = false, spell = null, striker = null, weapon = null, round = false, wc = null, element = null } = {})"));     // TELL8: and a peer's blow's class   //
+  assert.ok(src('scenes/dungeonContext.js').includes('function damageFoe(foe, damage, playerFeet = null, knockDir = null, { fromPlayer = true, bypassShield = false, kind = \'melee\', peer = false, peerId = null, whole = false, spell = null, striker = null, weapon = null, round = false, wc = null, element = null } = {})'));     // TELL8: and a peer's blow's class   //
 });
 
 test('F035: the Murder crime is gated on the player being the source', () => {
@@ -119,7 +119,6 @@ test('F035/F041: the FALL arms - and MT-ii\'s foe-source door - pass fromPlayer 
   let falseCalls = 0;
   for (const f of files) {
     const s = src(f);
-    // PIN MOVED (AUDIT CC-E1): the foe-source door now names the striking foe, `{ fromPlayer: false, striker }` - still sourceless
     const hits = [...s.matchAll(/\{ fromPlayer: false(?:, striker)? \}/g)];
     // MT-ii gave the two EXTERIOR pools a SECOND sourceless caller:
     // `hurtFromFoe`, the cross-pool door another enemy's blow lands

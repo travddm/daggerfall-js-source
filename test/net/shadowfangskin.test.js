@@ -1,7 +1,6 @@
-// SHADOW-FANG — THE WEREWOLF'S OWN SKIN (2026-09-26).
+// SHADOW-FANG — THE WEREWOLF'S OWN SKIN.
 //
-// Mac, for SirMcMobdon: "Wants a custom morrowind werewolf skin (skin base but blacker amd like crimson red thru out
-// the edging in the fur, red eyes)". The werewolf is Bloodmoon's (WEREWOLF1, test/net/peer/werewolf1.test.js), built from the
+// . The werewolf is Bloodmoon's (WEREWOLF1, test/net/peer/werewolf1.test.js), built from the
 // player's own data, so the skin is a LAW over its textures' pixels (characters/werewolfSkin.js), painted on a copy on
 // the way to the GPU - and worn by whoever holds the Shadow Fang glyph: a peer by the glyphs their signed token
 // carries, the player by the account service's last word on this device.
@@ -239,7 +238,6 @@ test('SHADOW-FANG on the rig: the wolf built with a skin hangs skinned copies on
   assert.equal(wolf.painted, true, 'every range\'s skin painted by the build, none left to the frame (AUDIT D2)');
   const entries = new Map([...wolf.res.textures, ...wolf.res.third.textures]);
   assert.equal(entries.size, 3, 'the body\'s texture, the head\'s own and the first-person hand\'s own');
-  // PIN MOVED (MWNPC3): a picture is uploaded ONCE a renderer (acquireCharacterTexture) - the body's fur both views wear
   // hangs one copy, where each range hung its own. Three uploads of three pictures is both views hung: the head's is the
   // third person's alone, the hand's the first's alone.
   assert.equal(wolf.uploads.length, 3, `both views hung, each picture once (${wolf.uploads.length})`);

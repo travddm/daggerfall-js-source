@@ -610,7 +610,7 @@ test('AUDIT 64 F54: a transferred QUEST item lands at the front, everything else
   const store = [];
   applyTransfer(bag[0], { amount: 1 }, bag, store);
   const x = dagger({ name: 'x' });
-  applyTransfer(x, { amount: 1 }, [x], store);   // PIN MOVED (OUTDOOR-LOOT): the piece is in its source - a move of a piece its source no longer holds moves nothing (itemTransfer.js applyTransfer), so the throwaway source holds it
+  applyTransfer(x, { amount: 1 }, [x], store);
   assert.deepEqual(store.map((i) => i.name), ['Letter', 'x'], 'the wagon/ground side takes Front too');
 });
 

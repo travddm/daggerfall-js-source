@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03, Arena.md 2: "Purses in gold ... Online, renown too, within the renown law's own hourly cap"): A
+// ARENA4b: A
 // WON BOUT'S RENOWN - the account service over node:sqlite with every migration (test/accountDb.mjs), the relay's
 // receipts signed with the relay's own key; the claim's carrier on the client (net/arena/arenaClaims.js) and the host's
 // wiring by source. server-account/src/arena.js arenaRenownXp / arenaRenownFor.

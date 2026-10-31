@@ -1,4 +1,4 @@
-// MAC-BUGS X (2026-09-20, three from Discord). Each pinned where the fault was, by execution where the seam lets a
+// MAC-BUGS X. Each pinned where the fault was, by execution where the seam lets a
 // test drive it and by source where the seam is a screen.
 //
 // X1 MENU-EXIT1 (rabid.rivas: "Crash when exiting..." - TypeError reading innerHTML of null in enhancedMenu's

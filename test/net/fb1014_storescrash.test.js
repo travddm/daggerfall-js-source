@@ -5,7 +5,6 @@
 // `.some`. The fake document's children are arrays, so the suite was green and the live page threw "(...).some is not
 // a function" at the first away station, before the Workbench drew and spent the press: every later Stores page threw
 // too. Drawn here through the page's own draw on nodes whose children are shaped as the browser mints them.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

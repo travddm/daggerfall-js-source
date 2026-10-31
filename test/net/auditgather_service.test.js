@@ -1,4 +1,4 @@
-// AUDIT GATHER (2026-10-26; bible/06-Systems/Professions-Arc.md section 55): THE AUDIT'S SERVICE PINS, driven through the
+// AUDIT GATHER: THE AUDIT'S SERVICE PINS, driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), each failing on the code before its fix.
 //   F2 - a Motherlode is struck only once it has risen on the SERVICE's clock: the act's end is the client's word, allowed
 //        HARVEST_EARLY_S past the service's now, and a strike sent early took a slot before any honest client saw it.

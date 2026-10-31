@@ -1,4 +1,4 @@
-// AUDIT 63, the RDB ACTION SYSTEM lane (2026-09-08).
+// AUDIT 63, the RDB ACTION SYSTEM lane.
 //
 // F37 - a moved action model keeps its AT-REST activation box, so the
 //       activate ray and the swing ray both test a ghost.
@@ -8,7 +8,7 @@
 // F39 - DoorText HUD lines took the 1.0 s popDelay where
 //       DaggerfallAction.cs:875 passes 2.0.
 //
-// The review round (2026-09-08):
+// The review round:
 // F42 - F36's interior deferral was wrong: DaggerfallInterior.cs:1277
 //       takes GetComponent<DaggerfallActionDoor>() off the building
 //       door prefab, so the interior mount owes ObstacleCheck's arm -

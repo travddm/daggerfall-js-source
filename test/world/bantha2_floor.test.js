@@ -1,8 +1,7 @@
-// BANTHA2 (2026-10-19, the owner, with their "Jungle Preview": "At the ground level, the image shows the flora abundence
-// that should be present in the jungle"): THE JUNGLE'S FLOOR - a second field of the grass system wearing the rainforest's
+// BANTHA2: THE JUNGLE'S FLOOR - a second field of the grass system wearing the rainforest's
 // own low cover and the owner's tall tuft on the meadow's crossed cards (src/render/jungleFloorArt.js,
 // src/scenes/jungleFloorHost.js), where the jungle's floor claims the ground (src/scenes/jungleHost.js floorClaims).
-// bible/03-World/Bantha-Jungle.md "The floor" is the record.
+// "The floor" is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -245,7 +244,6 @@ test('BANTHA2 THE FLOOR\'S HOST: made once, the first time the jungle comes with
   assert.deepEqual(drawn, [['P', 'V', 'E', 1, 'L', 'W', 300, 'meadow']], 'beside the meadow\'s draw, under its frame');
   assert.equal(floor.field.perCell, Math.round(floorDensity(0.5) * 900 / (420 * 420)), 'the pref\'s share of its density');
   assert.ok(Math.abs(floorDensity(1) - JUNGLE_FLOOR.plants * 3 * 420 * 420) < 1e-6, 'plants a square metre, three blades a tuft, over the lab\'s measuring span');
-  // PIN MOVED (JUNGLE-GRASS, test/world/junglegrass.test.js): the owner's judged 1.8 is the floor's FLORA's rate now; its
   // plants are the meadow's grass and that flora
   assert.equal(JUNGLE_FLOOR.plants, JUNGLE_FLOOR_PLANTS_M2, 'the meadow\'s grass and the flora the owner judged ("Its a little too much" at 2.5)');
   assert.notEqual(JUNGLE_FLOOR.seed, LAB_GRASS.seed, 'never the meadow\'s spots');

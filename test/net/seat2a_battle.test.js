@@ -1,6 +1,6 @@
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE BATTLE'S LAW -
+// SEAT2a: THE BATTLE'S LAW -
 // net/siege/siegeRef.js's battlefield (the banners, the Throne, the clock, the no-shows, Honours), the service's pass
-// (net/identityToken.js's `siege` order) and the relay's receipt (net/siege/siegeReceipt.js). bible/11-Multiplayer/Seats-Arc.md
+// (net/identityToken.js's `siege` order) and the relay's receipt (net/siege/siegeReceipt.js).
 // 6.2-6.8; `06-Systems/Online-Arc.md` SEAT2a (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -109,7 +109,7 @@ test('SEAT2a THE THRONE AND THE CLOCK: open to the attackers at 2 of 3 banners (
   run(k, [fighter('attack', 0, -40)], T, T + 5000);
   assert.equal(k.throne, 0, 'two of four: shut');
   k.banners[2].side = 'attack';
-  // SEAT2b part two (b) (PIN MOVED - 6.2: a crown's Throne "opens while the attackers hold 3 of 4 banners AND the
+  // SEAT2b part two (b) (
   // Gatehouse is breached"; SEAT2a opened it on the banners alone until the Gatehouse was raised): three of four, its
   // Gatehouse standing - shut; breached, its 180 s
   run(k, [fighter('attack', 0, -40)], T + 6000, T + 9000);
@@ -225,7 +225,7 @@ test('SEAT2a THE PASS: the service\'s `siege` order - the account, the seat and 
   assert.deepEqual(parseClient(JSON.stringify({ ...hello, sp: 'not a pass' }), { hasHello: false }), { error: 'bad pass' });
   assert.deepEqual(parseClient(JSON.stringify({ ...hello, sp: 7 }), { hasHello: false }), { error: 'bad pass' });
   assert.equal('sp' in parseClient(JSON.stringify(hello), { hasHello: false }), false);
-  assert.equal(SIEGE_BATTLE_RELAY_MIN, 147);   // PIN MOVED (main's FRIENDS-SYNC took world142): world145 until that merge   // PIN MOVED (MERGE #519-#523): main's ELITE FOES took world143 - world146 until that merge
+  assert.equal(SIEGE_BATTLE_RELAY_MIN, 147);
   assert.deepEqual(['world146', 'world148', 'world148', 'x141', null].map(relayFightsBattles), [false, true, true, false, false]);
 });
 
@@ -236,14 +236,14 @@ test('SEAT2a THE RECEIPT: `s1` - the account, the seat and week, its side, the r
   const rc = await mintSiegeReceipt(what, kp.privateKey, { subtle, nowS });
   assert.ok(rc.startsWith('s1.'));
   const v = await verifySiegeReceipt(rc, kp.publicKey, { subtle, nowS });
-  assert.deepEqual(v, { ok: true, claims: { ...what, th: 0, i: nowS, e: nowS + SIEGE_RECEIPT_TTL_S } });   // PIN MOVED (AUDIT-SEATS): T1 - every receipt carries `th`, 0 where the Throne was not reached
+  assert.deepEqual(v, { ok: true, claims: { ...what, th: 0, i: nowS, e: nowS + SIEGE_RECEIPT_TTL_S } });
   assert.equal(SIEGE_RECEIPT_TTL_S, 7 * 24 * 3600);
   assert.deepEqual([...SIEGE_RESULTS], ['attack', 'defend', 'tie', 'forfeit', 'absent']);
   assert.deepEqual((await verifySiegeReceipt(rc, kp.publicKey, { subtle, nowS: nowS + SIEGE_RECEIPT_TTL_S })), { ok: false, why: 'expired' });
   assert.deepEqual((await verifySiegeReceipt(rc, kp.publicKey, { subtle, nowS: nowS - 60 })), { ok: false, why: 'future' });
   const unsigned = await mintSiegeReceipt(what, null, { subtle, nowS });
   assert.deepEqual(await verifySiegeReceipt(unsigned, kp.publicKey, { subtle, nowS }), { ok: false, why: 'unsigned' });
-  assert.deepEqual(readSiegeReceipt(unsigned), { ...what, th: 0, i: nowS, e: nowS + SIEGE_RECEIPT_TTL_S, signed: false });   // PIN MOVED (AUDIT-SEATS): T1 - and `th`
+  assert.deepEqual(readSiegeReceipt(unsigned), { ...what, th: 0, i: nowS, e: nowS + SIEGE_RECEIPT_TTL_S, signed: false });
   assert.equal(readSiegeReceipt(rc).signed, true);
   const [, body, sig] = rc.split('.');
   // a signature changed in its first character - never the same signature (CROWN1's fix: replacing the last two with

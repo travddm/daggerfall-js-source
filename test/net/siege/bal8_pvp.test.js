@@ -1,4 +1,4 @@
-// BAL8 - THE PVP REFEREE, ONE RULE FOR EVERY STRIKER (2026-10-12; bible/05-Combat/Balance-Arc.md section 14).
+// BAL8 - THE PVP REFEREE, ONE RULE FOR EVERY STRIKER.
 //   - INT10 bounded a caster at 3 casts of 60 in 5 s (180, 36 a second); a blade or a bare hand was bounded at nothing
 //     past 4 blows a second and one blow's bucket, which no measured blow came near: a kitted monk felled a fighter in
 //     8.3 s where the mage's ceiling takes 10.6. Every harm a fighter deals in a duel, a siege or the Wild Zone - blows

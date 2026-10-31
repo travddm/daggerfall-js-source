@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): THE EXTRACTION, RE-RUN ON THE BUNDLE (tools/daggerfallArenaExtract.mjs). Gated on the player's
+// ARENA1: THE EXTRACTION, RE-RUN ON THE BUNDLE (tools/daggerfallArenaExtract.mjs). Gated on the player's
 // ARENA2 (ARENA2_PATH) and on Kamer's bundle (DAGGERFALL_ARENA_DFMOD - "daggerfall arena.dfmod" out of
 // daggerfall_arena.rar; it is not committed). The tool is a function of the two: run twice it writes the same bytes,
 // and they are the vendored files' bytes. Rebuilt, the model is the bundle's mesh again - every triangle's corners

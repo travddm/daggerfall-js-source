@@ -1,6 +1,4 @@
-// DISC24-C (2026-09-24, icebreyker on Discord, "Lights/shadows are still bugged": "Sorry for being annoying, but i am
-// still getting this problem with Enhanced Lighting" - DISC13-A's flicker, in a lit interior, with the player's whole
-// silhouette thrown up the wall by a ceiling lamp).
+// DISC24-C.
 //
 // THE CAUSE: the player's own sprite body (player/eyeOfTheBeholder/eotbBody.js - "Shadows Only" in first person, the body in third) is
 // the one caster that moves with the view, and the lamps' shadow laws handled it as any flat:

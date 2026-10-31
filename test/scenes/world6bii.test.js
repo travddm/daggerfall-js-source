@@ -1,4 +1,4 @@
-// WORLD6b-ii (Mac, 2026-09-14: "Continue" after AUDIT WORLD6b): THE FOE HUNTS EVERY PLAYER IN THE CELL - WORLD3's
+// WORLD6b-ii (after AUDIT WORLD6b): THE FOE HUNTS EVERY PLAYER IN THE CELL - WORLD3's
 // law for the dungeon host's foes, per owner. The peers ride MY foes' target machine as candidates minted off the
 // pose stream; my frame's record carries the target (`g`: '.' me, an id a peer, '' none); a PUPPET whose streamed
 // target is ME resolves its owner's foe's melee frame and shaft here, with my own reach and my own stats, and at

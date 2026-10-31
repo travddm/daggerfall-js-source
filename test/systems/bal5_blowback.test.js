@@ -1,7 +1,6 @@
-// BAL5 - THE BLOW PAID BACK (2026-10-11; bible/05-Combat/Balance-Arc.md section 11). A player's report from the
+// BAL5 - THE BLOW PAID BACK. A player's report from the
 // feature-feedback channel: "the Ancient Lich is an endgame mob in OG Daggerfall and I can just give it the light skin
-// stare and let it attack me until thorns damage kills him" - and Troll's Blood, held, on a random Rare. Mac: "Make the
-// best balancing decisions".
+// stare and let it attack me until thorns damage kills him" - and Troll's Blood, held, on a random Rare..
 //
 // The arc's measurement (section 2) stood a level-20 player in seven pieces of plain ebony - no loot line, no set. The
 // two causes it could not see:

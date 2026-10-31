@@ -1,4 +1,4 @@
-// CHAT-POST (2026-09-27, Discord - Tabitha: "Link in chat / Post in chat"; "random magic items' details in chat").
+// CHAT-POST.
 //
 // AN ITEM IN CHAT: Post sends its own line; Link inserts `[Label]` into the chat field so a typed message can carry
 // one or more pieces (wire.js validChatItems). A hearing client draws coloured [Name]s whose hover is the pack's tip.

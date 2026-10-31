@@ -1,4 +1,4 @@
-// AUDIT WORLD-EVENTS L6-9 (bible/01-Overview/audits/Audit-World-Events.md): THE RAID'S PEOPLE ON THE WIRE, between two real
+// AUDIT WORLD-EVENTS L6-9: THE RAID'S PEOPLE ON THE WIRE, between two real
 // pools (scenes/exteriorFoes.js - fb1012d_allyrace's rig). A raid's refugees and its leader were pinned at one end alone: the
 // frame's `rf` was read by a regex and its emitter and the reader's two doors (the stand's `allied`, the stats judge's `ally`)
 // by nothing, so a reader standing a raid's refugees as foes survived the suite; and a puppet raid leader - its owner's

@@ -100,9 +100,8 @@ test('HC1: a shelf-set model in an OWNED house is MakeHouseContainer, not a shop
 
 test('HC1: the host answers houseOwned at BUILD, off the bank registry (:816)', () => {
   const wm = src('scenes/worldModes.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): through houseOwnedAt - the registry's (region, key) law, an isle town's buildings no deed's
   assert.ok(wm.includes('const houseOwned = !!restore?.privateRoom || !!hit.sailingCabin || (!!building && (home ? home.own : houseOwnedAt(building, building.buildingKey)));')
-    && wm.includes('const houseOwnedAt = (b, key) => !isEtherPlaceId(homeTownOf(b)) && isHouseOwned(playerEntity.houses ?? [], b?.regionIndex ?? 0, key, homeTownOf(b));'),   // PIN MOVED (AUDIT RELEASE R2-9): the town asking named; PIN MOVED (TESA2): nor an Arena town's; PIN MOVED (TESA7): nor a country place's; PIN MOVED (BAY-LEFT-B): both again, each held to its own town (banking.js deedHeldIn)   // AUDIT 68 S23-failed-entry-stale-building: the door's record, before the host commits it. HOME1 re-aim: online, the service's list decides where it names the building (home1.test.js)
+    && wm.includes('const houseOwnedAt = (b, key) => !isEtherPlaceId(homeTownOf(b)) && isHouseOwned(playerEntity.houses ?? [], b?.regionIndex ?? 0, key, homeTownOf(b));'),
     'the host owns the registry and evaluates at BUILD');
   assert.ok(wm.includes('setupStaticNpc, houseOwned, peopleVisible,'),
     'the answer rides the opts into buildInteriorContext - the peopleVisible idiom');
@@ -127,16 +126,15 @@ test('HC1: owner access - house OR ship - opens loot-target storage, never stock
   // calls it before either branch, and the predicate is the same OR of the ship and the house.
   const pred = wm.slice(wm.indexOf('const ownsThisInterior = (b = interiorBuilding) =>'), wm.indexOf('const interiorHoverName = composeNamer(['));
   const guard = pred.indexOf("(b?.buildingType === BUILDING_TYPES.Ship && ownsShip(playerEntity))");
-  const houseGuard = pred.indexOf('|| (interiorHome && b === interiorBuilding ? interiorHome.own : houseOwnedAt(b, b?.buildingKey)');   // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the registry through houseOwnedAt   // HOME1: and my online home's cupboards are my storage
+  const houseGuard = pred.indexOf('|| (interiorHome && b === interiorBuilding ? interiorHome.own : houseOwnedAt(b, b?.buildingKey)');
   assert.ok(guard >= 0 && houseGuard > guard, 'the ship arm (:905-906) rides the same OR as the house');
   assert.ok(arm.indexOf('const owned = ownsThisInterior(b);') >= 0, 'and the activation arm asks it');
   const ownedLatch = arm.indexOf('c.items ??= [];');
-  // PIN MOVED at A2, deliberately: the stranger arm's `??=` became the
   // stockedDate day comparison PlayerActivate actually makes (:911-915).
   // The claim is unchanged - owned latches empty, and it does so before
   // the stranger arm can stock - and the "(stockedDate = 1)" the old
   // message parenthesised is now a real write on the line above.
-  const stock = arm.indexOf('rolled = stockHouseContainer(');   // PIN MOVED (OUTDOOR-LOOT): the roll is held a moment (`rolled`) and written to the container, offline, by the line below it
+  const stock = arm.indexOf('rolled = stockHouseContainer(');
   assert.ok(ownedLatch >= 0 && stock >= 0 && ownedLatch < stock,
     'owned latches empty (stockedDate = 1) BEFORE the stranger arm ever stocks');
   assert.ok(arm.indexOf('c.stockedDate = 1;') >= 0 && arm.indexOf('c.stockedDate = 1;') < stock,
@@ -150,8 +148,6 @@ test('HC1: owner access - house OR ship - opens loot-target storage, never stock
   // fixed +200 character reach was always a bet on that. The claim is
   // the same: BOTH arms open through the one openLoot, whose remote
   // side IS the container collection.
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): and a stranger's is someone else's goods (`stolen: privateProperty`).
-  // PIN MOVED (STOLEN-GOODS AUDIT S1): the owner's keeping, taken as the window opens (`stolenFrom: before` - null in an
   // owned house or ship, a Set of the stranger's own records in theirs)
   assert.ok(arm.slice(0, ownedLatch).includes('loot: { items: () => c.items, storage: !privateProperty, stolenFrom: before },'),
     'the remote side IS the container collection - two-way, live (SHIP-STORE: and the owner\'s is STORAGE, the pack beside it)');

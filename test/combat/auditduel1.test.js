@@ -1,4 +1,4 @@
-// AUDIT DUEL1 (2026-09-24, Mac: "Do an audit on everyrhing" - before DUEL1 and DISC21 merge). Four independent reviews
+// AUDIT DUEL1. Four independent reviews
 // (the duel's trust boundaries; its rules and combat; regressions outside it; DISC21, the tests and the records) found
 // what this file pins, each against the code path that carried it:
 //   A1 a record minted by guests          -> server-account (test/server/duel_record.test.js pins it over the real SQL)
@@ -88,7 +88,7 @@ test('AUDIT DUEL1 A3 + A5 + B5 + D5 the duel law: a stranger\'s frames at a duel
   assert.equal(r.st.prompts, 1, 'no second prompt over my game');
   assert.equal(r.m.asks().length, 0);
   assert.deepEqual(r.to('peer-zzzz').at(-1), { k: 'no', to: 'peer-zzzz', s: 'zzzz7001' });
-  // B5 - PIN MOVED (INT8, bible/06-Systems/Integrity-Arc.md lane 2): a double knockout was two falls, each its own
+  // B5
   // client's, said a draw when the second landed in the first's hold. The referee takes one blow at a time
   // (net/duel/duelRef.js) - two cannot both fall - and a peer's own word of a fall names nobody: the duel is off, no winner
   r = solo();

@@ -1,6 +1,4 @@
-// SERVER-POST (2026-10-08, Mac: "Let's develop an ingame server mailbox that goes next to the hourglass in the pause
-// menu. It should show notifications whenever players have a message. First use is to utilize it for players being
-// granted items."): THE SERVICE'S SIDE - migration 0093 (server_post), server-account/src/post.js and its four routes,
+// SERVER-POST: THE SERVICE'S SIDE - migration 0093 (server_post), server-account/src/post.js and its four routes,
 // the heartbeat's `post` part. A piece is the developers' to one registered account; its item is claimed into the
 // realm character being played, written into the record by the service in the claim's own batch.
 import { test } from 'node:test';

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
-// MW-SPELLFX1 - A MORROWIND EFFECT MESH, RUNNING (2026-10-07).
+// MW-SPELLFX1 - A MORROWIND EFFECT MESH, RUNNING.
 //
-// Mac: "We need to implement morrowind spell casting effects and animations." The casting ANIMATIONS were MW-CAST1's;
+// The casting ANIMATIONS were MW-CAST1's;
 // this is the other half - the meshes Morrowind's magic is drawn with (an MGEF's casting, bolt, hit and area visuals,
 // VFX_Hands), run as OpenMW runs them: every controller on the effect's own clock from zero, the effect over at its
 // longest controller's stop. formats/morrowind/mwVfx.js is the runtime, pure; these pins hold it to the reference's laws on

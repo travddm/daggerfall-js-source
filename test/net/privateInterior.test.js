@@ -100,7 +100,7 @@ test('private interiors: visiting never reads or overwrites personal caches; sav
   assert.equal(fn('decorOwnerHere', { privateVisitRoom: room })(), false, 'visiting grants no furnishing/storage rights');
   const identity = fn('interiorIdentity', { privateVisitRoom: room, exteriorDoor: { blockIndex: 1, recordIndex: 2, doorIndex: 0 }, interiorBuilding: { buildingKey: -2 } })();
   assert.equal(identity.privateRoom, room);
-  // INSTANCES: `placeInstance` - the mode's own word for what the building was entered as: none here (PIN MOVED, the audit)
+  // INSTANCES: `placeInstance` - the mode's own word for what the building was entered as: none here (
   const roomIdentity = Function('mode', '_intShared', 'privateVisitRoom', 'interiorBuilding', 'interiorCabin', '_visitLayout', 'placeInstance', `return ({${properties.get('roomIdentity')}}).roomIdentity();`)('interior', { owned: true }, room, { buildingKey: -2 }, null, 'classic', null);
   assert.deepEqual(roomIdentity, { kind: 'interior', buildingKey: -2, layout: 'classic', instance: null, private: true, privateRoom: room });
   const onlineHome = Function('mode', '_intShared', 'privateVisitRoom', 'interiorBuilding', 'interiorCabin', '_visitLayout', 'placeInstance', `return ({${properties.get('roomIdentity')}}).roomIdentity();`)('interior', { owned: false, home: true }, null, { buildingKey: 8 }, null, 'classic', null);

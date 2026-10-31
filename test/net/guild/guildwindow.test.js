@@ -1,6 +1,5 @@
-// GUILD-WINDOW (2026-10-23, the owner: "overhaul the guild tab to be more of a full fledged detailed window with easy
-// navigation and readabity instead of being stuffed as a small window in the social tab") - THE GUILD TAB IS A WINDOW
-// OF ITS OWN (bible/11-Multiplayer/Guild-Overhaul.md GUILD-WINDOW): the panel in its guild mode while the Guild tab is
+// GUILD-WINDOW - THE GUILD TAB IS A WINDOW
+// OF ITS OWN (GUILD-WINDOW): the panel in its guild mode while the Guild tab is
 // up, its Social button back to the tab last up (the social tabs' badges summed on it), the social door never the
 // window's, the pages a column with their names, counts and what each holds (the arrow keys walk it, and no arrow in
 // the window is the world's), each page's sections in cards, the last act's words in the window's foot, the focus kept

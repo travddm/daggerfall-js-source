@@ -1,5 +1,4 @@
-// DISC22-G (2026-09-24, Mac: "enhanced dungeon automap is broken and doesn't work properly. This needs to be a
-// better enhancement compared to the 3d automap").
+// DISC22-G.
 //
 // WHAT WAS BROKEN, each reproduced here with closed rooms (EM2's pins were all bare floor quads - no ceiling, no
 // stair - which is why they passed over all of it):

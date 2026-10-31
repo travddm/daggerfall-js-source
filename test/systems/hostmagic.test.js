@@ -283,7 +283,7 @@ test('hostMagic magic-5 end to end: a self-cast refund never exceeds what it cos
   const { magic } = rig({ player });
   const sp = spellOf(0, [damageEffect(30), damageEffect(30)]);
   magic.readySpell(sp);   // instant CasterOnly
-  // ABSORB-NERF (2026-09-30): the capped refund is then HALVED (absorption.js absorbRefund) - 500 - 180 + 90
+  // ABSORB-NERF: the capped refund is then HALVED (absorption.js absorbRefund) - 500 - 180 + 90
   assert.equal(player.magicka, 410, 'spent cost, refunded half the cost - never more');
   assert.equal(player.health, 50, 'the absorbed spell dealt nothing');
 });

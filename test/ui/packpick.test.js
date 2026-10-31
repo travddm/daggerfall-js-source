@@ -1,6 +1,4 @@
-// PACK-PICK (2026-10-26, #feature-feedback "SELLING ITEMS ON THE MARKET IS A PAIN!": "When selling items from backpack for
-// GOLD, you get a dropdown with just the name of the item.. no description or icon"; the owner: "This needs a comprehensive
-// detailed overhaul"): THE PACK, PICTURED, WHERE A PIECE IS CHOSEN TO SELL - ui/packPicker.js, the Market's List form
+// PACK-PICK: THE PACK, PICTURED, WHERE A PIECE IS CHOSEN TO SELL - ui/packPicker.js, the Market's List form
 // (ui/marketTab.js) and a trader's stall (ui/vendor/vendorTab.js) over it, and the look it shows (systems/item/itemLook.js).
 // The pieces are the producers' (systems/loot/loot.js generateRandomLoot, lootRarity.js applyRarity) and the pack side the
 // host builds (systems/tradePack.js createMarketGoods). Mutants: tools/mutants/packpick.json.
@@ -313,7 +311,7 @@ test('AUDIT PACK-PICK the dress\'s own rules: the card\'s name in its tier\'s co
   assert.match(PROF_CSS, /@media \(pointer: coarse\) \{ \.packpick-tile, \.market-kinds \.market-kind, \.market-filters \.market-sellpack \{ min-height: 44px; \}/);
 });
 
-// ─── AUDIT PACK-PICK (2026-10-27): the pins the cold lanes found missing ───────────────────────────────────────────────
+// ─── AUDIT PACK-PICK: the pins the cold lanes found missing ───────────────────────────────────────────────
 
 /** A bare picker over `entries` on `sift`. */
 const pickerOf = (entries, sift, extra = {}) => packPickerNode({ entries, chosen: null, sift, pick: () => {}, label: 'x', focus: 'f', empty: 'none', refusedWhat: 'Not for the market', redraw: () => {}, ...extra });

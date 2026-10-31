@@ -1,4 +1,4 @@
-// CSA-B (2026-09-27) - COME SAIL AWAY'S BOATS DRAWN (scenes/comeSailAway/comeSailAwayPool.js):
+// CSA-B - COME SAIL AWAY'S BOATS DRAWN (scenes/comeSailAway/comeSailAwayPool.js):
 // the pool over a recording renderer and a stand-in pipeline - what a built
 // hull hands the world pass (every active, switched-on renderer that wears a
 // Daggerfall texture, never the water mask), the sails' FixDeformations bakes

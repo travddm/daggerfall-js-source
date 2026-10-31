@@ -1,5 +1,4 @@
-// LOAD1 (2026-10-05, Mac: "add loading screens where needed for the game in an enhanced UI type fashion, maybe make it
-// where people can also use screenshots for the loading screen and a way to access them in the menu").
+// LOAD1.
 //
 // Three pieces, each held here against the shape that ships:
 //   THE GALLERY (systems/shotGallery.js) - the PrintScreen key's shots kept in this browser, the turn the loading
@@ -149,7 +148,7 @@ test('LOAD1 the key: the PNG goes to the gallery AND the download, the download 
     const said = [];
     const name = await takeScreenshot({ toBlob: (cb) => cb(png) }, { afterDraw: null, doc, later() {}, keep: async (b) => { kept.push(b); return 7; }, said: (l) => said.push(l) });
     await flush();
-    assert.match(name, /^dfo-\d{8}-\d{6}\.png$/);   // PIN MOVED: BR5, the product's name
+    assert.match(name, /^dfo-\d{8}-\d{6}\.png$/);
     assert.equal(clicks.length, 1);
     assert.deepEqual(kept, [png], 'the very PNG the download saved');
     assert.deepEqual(said, ['Screenshot added to Screenshots in the menu.']);
@@ -375,7 +374,6 @@ test('LOAD1 the hosts: the boot raises the screen at once and its title steps ar
     'every frame: a window up takes the screen aside, then the one question');
   assert.match(w, /const loadingPlaceNow = \(\) => loadingPlaceOf\(\{ dest: _loadingDest, moving: worldMoveBusy\(\), placeAt: placeAtPixel, here: placeHere \}\);/);
   assert.match(w, /_traveling \? \(_partyWaitLine \|\| 'Travelling'\)/, 'the party landing\'s wait is said on the screen over the chat line');
-  // PIN MOVED (PARTY-FOLLOW): the wait is systems/party/partyArrival.js's, which hands its line (PARTY_ARRIVAL_TEXT.waiting) to the host's `waiting`
   assert.match(w, /waiting: \(line\) => \{ _partyWaitLine = line; townTalk\.say\(line\); \},/);
   assert.match(w, /function placeAtPixel\(px, py\) \{\n\s*const key = `\$\{px\},\$\{py\}`;\n\s*if \(_ohGpsName\?\.key === key && _ohGpsName\.name\) return _ohGpsName\.name;/, 'the abyss wears its own name over the pixel it borrows');
   assert.match(w, /if \(!params\.has\('load'\) && !\(params\.has\('classicload'\) && peekPendingClassicSave\(\)\)\) setLoadingPlace\(startLoc\?\.name \|\| locationName\);/, 'a stale ?classicload imports nothing: the start is the place');
@@ -571,7 +569,6 @@ test('LOAD1 the menu: Screenshots is on every rail, the System page and both dis
   assert.ok(SYSTEM_PANES.some(([id, label]) => id === 'screenshots' && label === 'Screenshots'));
   assert.equal((menu.match(/screenshots: drawShotsPane,/g) ?? []).length, 2, 'both dispatch tables');
   assert.match(menu, /if \(label === 'About' \|\| label === 'Screenshots'\) continue;/, 'the door\'s list leaves it to the foot');
-  // PIN MOVED (AUDIT UICALM-FIRM1 L3 N3): its word the player's language's (RAIL_TEXT), as About's beside it
   assert.match(menu, /const shots = el\('button', 'px-about px-shots', RAIL_TEXT\.screenshots\(\)\);\n\s*shots\.onclick = \(\) => go\('screenshots'\);/);
   assert.match(menu, /stopTimers\(\);   \/\/ TIMERS1\n\s*releaseShotsPane\(\);/);
 });

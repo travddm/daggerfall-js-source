@@ -1,7 +1,7 @@
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS IN BATTLE ON THE CLIENT -
+// SEAT2b part two (b): THE WORKS IN BATTLE ON THE CLIENT -
 // the field's frame folded with its Gatehouse, Ram and Walls; the HUD's works line and the Throne's rule; a defender's
 // wave the Walls' quicker; the session's work to strike (an attacker the Gatehouse, a defender the Ram), its point and
-// its blow; the breach and a Ram's end said once; the host's swing at a work (bible/11-Multiplayer/Seats-Arc.md 6.2,
+// its blow; the breach and a Ram's end said once; the host's swing at a work (6.2,
 // 19; src/net/siege/siegeLink.js, src/net/siege/siegeSession.js, src/ui/siegeHud.js, src/scenes/world.js). `06-Systems/
 // Online-Arc.md` SEAT2b part two (b).
 import { test } from 'node:test';

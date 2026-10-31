@@ -1,5 +1,4 @@
-// ARENA2 (2026-10-02, Mac: "climb esclating tiers of opponents"; "Being a top rank PvE fighter comes with it's own
-// title"): THE LADDER (systems/arena/arenaLadder.js) - the ten tiers exactly as the design table has them, the purses on
+// ARENA2: THE LADDER (systems/arena/arenaLadder.js) - the ten tiers exactly as the design table has them, the purses on
 // Daggerfall's scale, a climb from the Pit to the Grand Champion, a loss that costs only the purse, the save's shape
 // (versioned, every older or broken shape read back to a whole ladder, the round trip through systems/save/save.js), the
 // exhibitions on the hour of the game's clock (one hour, one bout, everywhere), and the fighters' names from

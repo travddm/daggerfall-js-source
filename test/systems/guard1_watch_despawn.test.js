@@ -1,6 +1,4 @@
-// GUARD1 - THE WATCH THAT VANISHED (2026-09-15, relayed by Mac from a
-// player: "after a while of chasing me around the villages they
-// disappeared. And then i was free to go on a killing spree").
+// GUARD1 - THE WATCH THAT VANISHED.
 //
 // THE DEFECT WAS A DROPPED CLAUSE. EnemyEntity.Update (:184-191)
 // despawns the city watch on FOUR terms:

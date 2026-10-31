@@ -1,6 +1,4 @@
-// WW-C2 (2026-10-24, bible/03-World/World-Wide.md WW-C, bible/11-Multiplayer/Wild-Zone.md section 25; the owner:
-// "Cyrodil becomes the new open PvP area with the wrothgarian mountain area being retired in favor of this. Cryodil will
-// be home to all abundent resources and everything else from the wrothgarian zone") - THE OPEN ZONE IS CYRODIIL: its
+// WW-C2 - THE OPEN ZONE IS CYRODIIL: its
 // mask the province whole on a grid of cells laid on the world (systems/wild/cyrodiilZone.js), its halls and its
 // giants on it, a hall's key and room a world pixel's (net/wire.js), its ground the continent's own whatever the land
 // switch (scenes/zoneHallsHost.js), a pose's pixel floored past the Bay, the maps over the continent, no gate in it.
@@ -84,7 +82,6 @@ test('WW-C2 THE ZONE IS CYRODIIL, WHOLE: every cell whose middle is the Imperial
   assert.equal(wildRingAt(heart.x, heart.y, mask), WILD_RINGS);
   assert.ok(inCyrodiil(heart.x, heart.y));
   const [edge] = wildEdgeChains(mask);
-  // PIN MOVED (ZONE-LINE): the edge on the world's own pixel corners, the province's - the cells' staircase gone; a ring's line
   // (the zone's own) still on the cells' corners, on the world
   assert.ok(edge.every((p) => Number.isInteger(p.x) && Number.isInteger(p.y)) && edge.some((p) => (p.x - mask.ox) % CYRODIIL_CELL_PX !== 0), 'the edge on the pixels\' corners, on the world');
   const [inner] = wildRingChains(mask, 2);
@@ -193,7 +190,7 @@ test('WW-C2 NO WORLD EVENT IN THE ZONE, AND THE WIRE: a theatre\'s gate never op
   const scan = { byArea: new Map([[area(2400, 900), new Int32Array(GATE_REGION_MIN_PIXELS)], [area(2000, -200), new Int32Array(GATE_REGION_MIN_PIXELS)]]) };
   assert.equal(theatreAt(2000, -200), 3, 'Skyrim\'s');
   assert.deepEqual(theatreGateAreas(/** @type {any} */ (scan)), [area(2000, -200)], 'Skyrim\'s area, never Cyrodiil\'s');
-  assert.equal(WDUN_WORLD_RELAY_MIN, WORLD_WIDE_RELAY_MIN);   // PIN MOVED (AUDIT TESA II Z2): 256 (world255 on its branch), then 260 at the merge with main - one number now, the world-wide relay's
+  assert.equal(WDUN_WORLD_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
   assert.ok(relaySupportsWdunWorld(RELAY_VERSION) && relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN}`) && !relaySupportsWdunWorld(`world${WORLD_WIDE_RELAY_MIN - 1}`), 'the relay before the world-wide one reads no hall of Cyrodiil\'s');
   assert.equal(wdunHall('8192,0'), null, 'past the world\'s grid: no hall');
 });

@@ -1,6 +1,6 @@
-// AUDIT of FIELD BUGS 2026-10-02 (Mac: "Audit this"): four lenses over the batch - the climb's mechanics, the climb on
+// AUDIT of FIELD BUGS 2026-10-02: four lenses over the batch - the climb's mechanics, the climb on
 // real geometry in the modes the probe never ran, the three non-climb fixes, and the records and their pins - each
-// finding reproduced first and pinned red here. The record: bible/01-Overview/bugs/Field-Bugs-2026-10-02.md, "The audit".
+// finding reproduced first and pinned red here. The record:, "The audit".
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// SHADOW-FANG-MOD (2026-10-19, Mac: "Give the shadow fang title mod perms including ban"): THE SHADOW FANG TITLE
+// SHADOW-FANG-MOD: THE SHADOW FANG TITLE
 // MODERATES. Its holder may do all canModerate opens - mute, ban, unban, the strikes - and is protected as a moderator
 // is; the grant is the title's own list (SHADOW_FANG_HANDLES), so off the list is off the rights. The shield stays the
 // moderator list's: Shadow Fang's glyph is its own.

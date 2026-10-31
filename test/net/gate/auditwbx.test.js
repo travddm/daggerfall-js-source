@@ -1,11 +1,10 @@
-// AUDIT WBX (2026-09-26, Mac: "Do a comprehensive audit on everything so far"): THE OBLIVION GATE, AUDITED AGAIN - the
+// AUDIT WBX: THE OBLIVION GATE, AUDITED AGAIN - the
 // relay's fight (R: shares left behind, seats held by nothing, a dead band at the court's edge, "half the fight" read
 // off the wall, the bar frozen through the Wrath's wind-up, a blow after midnight, a client that did not know the new
 // attacks, receipts kept for ever), the spoils (S: a receipt spent on one device given again on another, the level a
 // receipt was earned at, a crash record cleared by two clocks, two tabs, a full store, the pack's own pictures), and
 // the court (F: a weapon destroyed on him, where he fell, a charge that froze him, a Soul Trap at range and recast, the
 // charge's width, the burning ground's dance, steps in the air, the Wrath slept through). Design:
-// bible/11-Multiplayer/World-Bosses.md section 12.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -176,7 +175,6 @@ test('AUDIT WBX S2 the receipt says the level the fight admitted its account at,
 test('AUDIT WBX F1/F2 no weapon is worn or destroyed on him: the Razor\'s whole-health blow passes his stand-in by, and no Strikes payload bills its weapon for a blow on him - every other foe as DFU has it (mutants: the Razor on the stand-in; the payload\'s bill on him)', () => {
   const razor = SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.MehrunesRazor);
   const item = { currentCondition: 100, maxCondition: 100 };
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE): his stand-in as its producer mints it - its whole a count the wire
   // carries now, not 1e9 - and passed by even on a failed save: no wear pays for its kill on him (F2), so it STAYS
   const him = bossStandIn(bossLookOf('ruhn'), 'Valkynaz Ruhn');
   assert.equal(him.health, STAND_IN_WHOLE);

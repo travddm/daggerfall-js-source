@@ -1,5 +1,4 @@
-// SP1 (2026-09-21, a player: "my saves its all gone"; Mac: "we need
-// parity between browser and the install"): SAVES MOVE BETWEEN THE
+// SP1: SAVES MOVE BETWEEN THE
 // WEBSITE AND THE APP. The carrier is pure over a storage-shaped object
 // and a list of entries, so the round trip runs here: export to the
 // app's own on-disk layout as one STORED zip, read it back with the
@@ -59,7 +58,7 @@ test('SP1: the layout is the app’s own - the three spellings, the two files, t
   assert.deepEqual(slotPathOf('Roaming/DFO Online/Saves/SAVE0/SaveInfo.txt'), { n: 0, file: 'SaveInfo.txt' }, 'a whole userData folder can be picked, however deep the save sits in it');
   assert.equal(slotPathOf('Saves/SAVE03/SaveData.txt'), null, 'a hand-spelt slot number is not a slot (the app’s own law)');
   assert.equal(slotPathOf('Saves/README.txt'), null);
-  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');   // BR4; PIN MOVED: BR5's name
+  assert.equal(TRANSFER_ZIP_NAME, 'DFO-Online-Saves.zip');     // BR4
 });
 
 test('SP1: the round trip - export a store, read the zip back, import into an empty store, every slot where it was', async () => {

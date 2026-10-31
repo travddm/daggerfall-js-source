@@ -1,5 +1,4 @@
-// PUDDLE-DRY (2026-10-07, Mac: "removing the water puddles entirely from town layouts"; asked, "Puddles only" and
-// "Both skins"): a town's puddles are dry ground (world/puddleDry.js), served so through the block's one door
+// PUDDLE-DRY: a town's puddles are dry ground (world/puddleDry.js), served so through the block's one door
 // (formats/blocksFile.js getBlock). The fixtures are the producer's: a block's 256 ground bytes read by BlocksFile's own
 // ground reader, so every tile is the shape every reader of the ground is handed. The record: bible/07-Rendering/
 // Water-Arc.md PUDDLE-DRY.
@@ -127,7 +126,6 @@ test('PUDDLE-DRY on BLOCKS.BSA: every town block served with no lone water tile 
   }
   assert.equal(rmb, 920);
   assert.equal(puddles, 0, 'no puddle served');
-  // PIN MOVED (WATER-DRAW2, test/world/water/waterdraw2.test.js): 700 and 611 when the draw's table knew no island - the islands,
   // corners and half-turned saddles joined their ponds (fewer, whole), six lone islands dried and twenty tiles of ponds
   // the islands had cut apart stopped drying as slivers
   assert.equal(dried, 686, 'the census: 686 puddles dried');

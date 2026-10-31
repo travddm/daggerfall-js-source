@@ -1,7 +1,4 @@
-// AUDIT ARENA-LADDER (2026-10-05, the owner: "Before we merge this. Can you do a comprehensive audit on the new arena?
-// Ensure AI enemies sometimes recieve telegraphed attacks, ensure climbing the PvE ladder isnt an easy feat, and look at
-// where we can make improvements"; asked, "Lose the tier's run", "No cheese spells or potions", "Elite champions",
-// "Relay and service"). Every finding of bible/01-Overview/audits/Audit-Arena-Ladder.md pinned here: the telegraphs between
+// AUDIT ARENA-LADDER. Every finding of pinned here: the telegraphs between
 // fighters (the brain's and the relay's), the climb's cost (the run, the elites, the judges' floor, the kit law, the
 // ticket), and the bout's holes (the sand's collapse, a dispelled champion, the player's live tag, a blow from the side).
 import '../modsOff.js';
@@ -82,7 +79,7 @@ function fighter({ feet, side, bout = 'b1', level = 12, type = M.Orc, out = fals
   return { ai, entity: body };
 }
 const targetOf = (f) => ({ isPlayer: false, entity: f.entity, ai: f.ai, dead: false });
-/** PIN MOVED (FEUD's merge of main): AUDIT TELL B1 - a wind-up the brain was not asked about for BLOW_STALE breaks
+/**
  *  untold, so a fight is STEPPED at the brain's 16 Hz to `until` (its landing), never jumped there in one step. */
 function stepTo(ai, until, at) {
   while (T < until) { T = Math.min(until, T + 1 / 16); tacticsStep(ai, at[0] - ai.feet[0], at[2] - ai.feet[2]); }
@@ -101,7 +98,7 @@ test('AUDIT ARENA-LADDER T2: ON THE SAND A FIGHTER WINDS UP AT ITS BOUT-MATE - a
   const a = fighter({ feet: [0, 0, 0], side: 0 }), b = fighter({ feet: [0, 0, 1.6], side: 1 });
   const s = windUp(a, b);
   assert.equal(s.state, 'windup', 'a wind-up at the other fighter');
-  assert.equal(s.blow.key, a.ai.target, 'marked for the one it was wound up at');   // PIN MOVED (FEUD's merge of main): `tg` is AUDIT TELL B8's `key`, the one record of whom it was wound up at
+  assert.equal(s.blow.key, a.ai.target, 'marked for the one it was wound up at');
   assert.equal(s.blow.sand, true);
   // and none where the mark is no bout-mate
   for (const [why, other] of [
@@ -204,7 +201,6 @@ test('AUDIT ARENA-LADDER T5: THE RELAY\'S FIGHTERS TELEGRAPH TOO - of the tier (
   assert.equal(ARENA_BLOW_TIER_LEVEL, BLOW_TIER_LEVEL, 'the brain\'s tier');
   assert.deepEqual([ARENA_BLOW_COOLDOWN_MIN_MS, ARENA_BLOW_COOLDOWN_MAX_MS], [BLOW_COOLDOWN_MIN * 1000, BLOW_COOLDOWN_MAX * 1000], 'the brain\'s cooldown');
   assert.ok(ARENA_BLOW_CHANCE > BLOW_CHANCE && ARENA_BLOW_CHANCE < 1, 'rolled once a blow, not a tick: more often a roll, sometimes');
-  // PIN MOVED (FEUD's merge of main): BLOW holds TELL6's and RVN5's shapes too, which no family throws - the wire takes
   // every shape a family throws, and the relay's ladder brain asks the family alone
   assert.deepEqual([...ARENA_BLOW_SHAPES].sort(), [...new Set([...BLOW_FAMILY.values()].flat())].sort());
   for (const k of ARENA_BLOW_SHAPES) assert.ok(k in BLOW, `${k} is a shape`);

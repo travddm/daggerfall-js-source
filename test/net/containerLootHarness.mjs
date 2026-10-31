@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, AC8 (2026-10-17): THE SHARED HARNESS of test/net/containerloot.test.js (phase 1: what a building's cupboard must be
+// OUTDOOR-LOOT, AC8: THE SHARED HARNESS of test/net/containerloot.test.js (phase 1: what a building's cupboard must be
 // for everyone in it, read as where the pieces ARE) and test/net/containerloot_protocol.test.js (slice 2: the claims one seat
 // judges, the first-open tie-break, the seat's handover, the protections and the older builds - pinned BLACK-BOX, before the fix
 // exists). Not a .test.js on purpose: the manifest counts suites, and this is a precondition, not one.

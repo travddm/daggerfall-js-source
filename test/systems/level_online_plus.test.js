@@ -1,7 +1,4 @@
-// LEVEL-ONLINE + LEVEL-PLUS (2026-09-30, Mac: "Overhaul the oblivion/daggerfall selector for leveling mode. Give it
-// the enhanced ui plus theme." and "Do not allow people to use daggerfall leveling in online. Characters currently
-// using it online can keep it."), REVERSED BY LEVEL-ONLINE-2 (2026-10-06, Mac: "Oblivion should be locked. Currently
-// players are forced into oblivion").
+// LEVEL-ONLINE + LEVEL-PLUS, REVERSED BY LEVEL-ONLINE-2.
 //
 // THE LAW: newCharacterLevelingSystem is the one door a NEW character's system goes through - finishChargen, the
 // `?class=` skip and the classic-save import - and online it answers Daggerfall's whatever was asked. It is never on a
@@ -234,7 +231,7 @@ test('LEVEL-ONLINE-3: an Oblivion character already online is switched at its re
   assert.ok(at > world.indexOf('if (realmBoot) { bootSnapRead = realmBoot.snap; realmBoot.snap = null; }'), 'on the one parse');
   assert.ok(at < world.indexOf('const empireFolded = realmBoot ? foldEmpireAccounts(bootSnapRead) : null;'), 'beside the boot\'s other realm laws, before the restore');
   assert.match(world, /if \(releveled\) townTalk\.say\(LEVELING_CROSS_LINE\.switched\);/, 'and says it once the world stands');
-  assert.ok(LEVELING_CROSS_LINE.switched.includes('the classic way'));   // PIN MOVED: BR5, the classic, not the game's name
+  assert.ok(LEVELING_CROSS_LINE.switched.includes('the classic way'));
   // a second boot of the switched save changes nothing
   const snap = { levelingSystem: LEVELING_VIRTUE, level: 6, startingLevelUpSkillSum: 50, currentLevelUpSkillSum: 300, levelProgress: 70 };
   assert.equal(crossLeveling(snap), true);

@@ -1,5 +1,4 @@
-// START1 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md; Mac: "allow for the main quest to be started on the
-// player's watch", "Keep privateers hold, give it a new quest", "A letter they open"): THE BAY'S START AND ITS
+// START1: THE BAY'S START AND ITS
 // COMMISSION, on the machine whole. A new character starts the Bay's start quest in _BRISIEN's place; nothing of the main
 // quest runs until the commission the tide carried into Privateer's Hold is found and opened; opened, it sends the
 // player to the city of Daggerfall, and there _BRISIEN begins as DFU wrote it - its start-up's waking popup taken out
@@ -166,7 +165,7 @@ for (const name of START_QUESTS) {
     const starters = [...quest.tasks.values()].flatMap((t) => t.actions.filter((a) => a.typeName === 'StartQuest' || a.typeName === 'RunQuest').map(() => t.symbol?.name));
     assert.deepEqual(starters, ['reported']);
     assert.deepEqual([...quest.resources.values()].filter((r) => r.isClock).map((r) => r.symbol.name), [], 'no clock: the player\'s watch');
-    // its words fit the classic skin's box, and are written in American spelling (bible/10-UI/Voice.md rule 8) - a
+    // its words fit the classic skin's box, and are written in American spelling (rule 8) - a
     // rumor is a talk line the window wraps, never a box's row
     const qrc = lines.slice(0, lines.findIndex((l) => /^\s*QBN:/i.test(l))).filter((l) => !l.trimStart().startsWith('--'));
     let rumor = false;
@@ -287,7 +286,7 @@ test('START1 the sheet: what the Quests page shows at each step - the find marke
   assert.equal(outcomeNow(q, sheet), null, 'no outcome before Daggerfall');
   // _BRISIEN's sheet tells the days between: the wait for her letter
   const bs = sheetFor('_BRISIEN');
-  assert.deepEqual(bs.objectives.map((o) => o.id), ['wait', 'meet']);   // PIN MOVED (AUDIT STARTS Q2): no cave's escape - the start's own; _BRISIEN begins in Daggerfall's streets, where it read as done at once
+  assert.deepEqual(bs.objectives.map((o) => o.id), ['wait', 'meet']);
   assert.equal(bs.objectives.find((o) => o.id === 'wait').text, 'Wait for the Emperor\'s agent in Daggerfall to send for you');
 });
 

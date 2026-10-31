@@ -4,7 +4,7 @@
 // said either: a stranger may ask a hall's quest-giver for work, each quest done pays the guild DFU's +5, and a standing
 // below 0 recovers a point every 7 days of the character's own time. The hall (the enhanced skin), the join's refusal
 // (the classic skin) and the Standing page now say so, with the numbers the law moves by. AUDIT WAY-BACK
-// (bible/01-Overview/audits/Audit-Way-Back.md) read it cold: the guild skills the join also asks, a shut hall, time logged
+//  read it cold: the guild skills the join also asks, a shut hall, time logged
 // off, and the chapter writs the Roll's pace does not bound are said too.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';

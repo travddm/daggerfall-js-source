@@ -1,6 +1,4 @@
-// LOOT4 - FIVE AFFIX KINDS THAT DO THINGS (2026-10-01; bible/06-Systems/Loot-Arc.md section 6, Mac: "Do you wanna turn
-// this into an arc and do all of the above?" - "Proc affixes. Add on-hit fire or frost damage, life leech, thorns,
-// spell-cost reduction ... Most of these already have a set-ability hook they can reuse"). The laws pinned here:
+// LOOT4 - FIVE AFFIX KINDS THAT DO THINGS. The laws pinned here:
 //   - THE KINDS: elemental (fire, frost, shock) and slayer (undead, daedra, humanoid, animal) and leech on a weapon,
 //     thorns on armour, focus on jewellery - each banded by tier, each a word, never naming a piece.
 //   - THE ROLL: never the ladder's own draw; a door's LAST PASS gives a Magic one in five and a Rare a bit over one in
@@ -49,7 +47,7 @@ function door(foes = [], me = null) {
   setPlayerDoor({ foes: () => foes.filter((f) => !f.dead), feet: () => [0, 0, 0], hurtFoe: (f, n) => d.hurts.push([f.name, n]), castOnPlayer: () => {}, player: () => me });
   return d;
 }
-const PROCS = ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring'];   // CAST-SPEED: appended; PIN MOVED (BAL9c): the caster's two after it
+const PROCS = ['elemental', 'leech', 'thorns', 'focus', 'slayer', 'castSpeed', 'potency', 'wellspring'];     // CAST-SPEED: appended
 
 test('LOOT4: the kinds - five that do things, banded, worded, valid; never in the ladder\'s own draw, never a name', () => {
   on();
@@ -150,12 +148,10 @@ test('LOOT4: the roll - a door\'s last pass, a Magic one in five, a Rare a bit o
 
 test('LOOT4: the seeded doors keep their earlier draws - the gate\'s and a town\'s pieces their seed\'s, the lines that do something appended', () => {
   on();
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw - where a
   // proc or an Exalted drew before it the two runs' techniques differ, so it is set aside on both sides (an Exalted's line
   // is the last line before it)
   const noTech = (it) => (it.affixes ?? []).filter((a) => !LR.isTechniqueAffix(a));
   const strip2 = (it) => { const own = noTech(it); return own.filter((a) => !LR.isProcAffix(a) && !(it.exalted && own.indexOf(a) === own.length - 1)); };
-  // PIN MOVED (GILDED2, bible/06-Systems/Gilded.md section 7): the Dragonfire Oath is the gate's very last draw, after the
   // technique's - set aside on both sides, as the technique is
   const unGilded = (spoils) => ({ ...spoils, pieces: spoils.pieces.filter((x) => x.tier !== 'gilded') });
   let procs = 0;

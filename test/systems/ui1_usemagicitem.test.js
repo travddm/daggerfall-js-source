@@ -52,8 +52,7 @@ test('UI1: nothing usable, NO WINDOW (DaggerfallUI :581-583) - not an empty list
   assert.deepEqual(win.items, ['Potion of Healing'], 'the row is the item\'s LongName (UMI-NAMES)');
 });
 
-// UMI-NAMES (2026-10-07, the field: "Use Magic Item Menu is crowded" - "Kit of
-// Venom Spitting", and MANY rows reading just "Glass Bottle"). Refresh (:50-57)
+// UMI-NAMES. Refresh (:50-57)
 // lists each item's LongName - ItemHelper.ResolveItemLongName - and the factory
 // listed the raw `name` field: a potion's template "Glass Bottle" (setItemFields
 // names it so; createPotion's own mint carries no name at all, so a blank row),

@@ -1,5 +1,4 @@
-// QUEST-CAPS (2026-10-14, Dudey: "almost every quest has problems to spawn enemies inside dungeons ... Quest enemies
-// being placed outside of the rooms and halls"): a re-laid dungeon (small, medium) enumerates its quest markers from
+// QUEST-CAPS: a re-laid dungeon (small, medium) enumerates its quest markers from
 // its interior blocks alone while they hold any - its border blocks are caps drawn at random, their pockets sealed.
 // The whole dungeon keeps DFU's enumeration. A quest already standing a target in a cap is laid again at the mount.
 import { test } from 'node:test';

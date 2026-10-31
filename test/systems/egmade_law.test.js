@@ -1,4 +1,4 @@
-// EG-H2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 24, slice EG7): THE
+// EG-H2: THE
 // MADE LEVEL'S RULES - one law (systems/madeLevel.js) for the Burning Court and the Shattered Hour: `madeLevelOf` over
 // each made location's own producer, MADE_LEVEL_RULES and their words as data; the Burning Court and the Hour re-plugged
 // UNCHANGED (every door's old decision and words, rule by rule), with the one Levitate ward; and THE SWEEP - every rule's
@@ -24,9 +24,7 @@ test('EG-H2 THE LAW (section 24): madeLevelOf names each made location by its ow
   for (const loc of [null, undefined, {}, { name: 'Old Maze', dungeon: { recordElement: { header: { locationId: 99 } } } }, { ...sdRealmLocation({ s: 3 }), sdRealm: null }]) assert.equal(madeLevelOf(loc), null);
   assert.deepEqual([...MADE_LEVELS], ['court', 'hour']);
   const none = Object.fromEntries(MADE_LEVEL_RULE_KEYS.map((k) => [k, k === 'jumpBuffer' || k === 'latePress' ? 0 : null]));
-  // PIN MOVED (EG-PERFECT, 2026-10-18): the running leap refused on the Hour's Steps (`runLeap` -
   // test/player/egperfect_runleap.test.js runs it on the real motor)
-  // PIN MOVED (EVENT-RULES, 2026-10-25, the owner: "Back, held in a fight" and "Resurrect allowed"): every row's regeneration
   // held, not off (systems/courtRules.js); no row refuses Resurrect (the Hour's one life kept by its realm's window - SD-REZ)
   assert.deepEqual(MADE_LEVEL_RULES, {
     court: { ...none, save: 'refused', rest: 'refused', automap: 'off', mark: 'refused', portalStone: 'refused', companions: 'out', regen: 'held', death: 'castOut', unstuck: 'refused', says: 'mid' },
@@ -56,9 +54,9 @@ test('EG-H2 THE BURNING COURT AND THE HOUR, UNCHANGED (section 24): rule by rule
   // `isGateArena(dfLocation)`, `_sdRealm` arm), and what the law decides now
   const before = {
     court: { save: [true, COURT_TEXT.noSave], rest: [true, COURT_TEXT.noRest], automap: [true, COURT_TEXT.noMap], mark: [true, COURT_TEXT.noMark, 'mid'], recall: [false], companions: true, regen: true,
-      levitate: false, resurrect: false, death: 'castOut', unstuck: ['refused', COURT_TEXT.noUnstuck], portalStone: true },   // EVENT-RULES (PIN MOVED): `regen` the hold, held now, not off
+      levitate: false, resurrect: false, death: 'castOut', unstuck: ['refused', COURT_TEXT.noUnstuck], portalStone: true },     // EVENT-RULES (
     hour: { save: [true, SD_REALM_TEXT.noSave], rest: [true, SD_REALM_TEXT.noRest], automap: [true, SD_REALM_TEXT.noMap], mark: [true, SD_REALM_TEXT.noMark, 'hour'], recall: [true, SD_REALM_TEXT.noRecall, 'hour'], companions: true, regen: true,
-      levitate: true, resurrect: false, death: 'final', unstuck: ['wayHome'], portalStone: true },   // EVENT-RULES (PIN MOVED): the Hour's Resurrect allowed (SD-REZ - its realm's window)
+      levitate: true, resurrect: false, death: 'final', unstuck: ['wayHome'], portalStone: true },     // EVENT-RULES (
   };
   for (const [lv, d] of Object.entries(before)) {
     for (const r of ['save', 'rest']) assert.deepEqual([madeLevelRule(lv, r) === 'refused', madeLevelSays(lv, r)], d[r], `${lv} ${r}`);
@@ -85,7 +83,7 @@ test('EG-H2 THE BURNING COURT AND THE HOUR, UNCHANGED (section 24): rule by rule
 
 test('EG-H2 THE SWEEP (section 24, THE ONE CONSTRUCTION SEAM): every rule\'s door in the hosts and the systems reads the made level\'s law for its rule and asks no made level itself; no line anywhere pairs a level\'s own predicate with a rule\'s act; every rule the law names is read at a door (mutants: a door asking the level again; a rule no door reads)', () => {
   const PRED = /gateArenaDay|sdRealmSlot|isGateArena\(|isSdRealm\(|\b_sdRealm\b|diedHere\(/;
-  const FILES = { W: 'src/scenes/world.js', D: 'src/scenes/dungeonContext.js', M: 'src/scenes/worldModes.js', S: 'src/scenes/shared.js', P: 'src/scenes/portalStoneHost.js' };   // PIN MOVED (PORTAL-BAY): the Portal Stone's door, out of world.js's bootWorld (HOST-SPLIT)
+  const FILES = { W: 'src/scenes/world.js', D: 'src/scenes/dungeonContext.js', M: 'src/scenes/worldModes.js', S: 'src/scenes/shared.js', P: 'src/scenes/portalStoneHost.js' };
   const src = Object.fromEntries(Object.entries(FILES).map(([k, p]) => [k, read(p)]));
   /** [file, where the door begins, where it ends, the rules it must read] */
   const DOORS = [
@@ -95,20 +93,20 @@ test('EG-H2 THE SWEEP (section 24, THE ONE CONSTRUCTION SEAM): every rule\'s doo
     ['D', 'let automapRec =', 'enterDungeonAutomap(', ['automap']],
     ['D', 'toggleRest() {', '// S40:', ['rest']],
     ['D', 'get playerSlowFalling()', '\n', ['slowfall']],
-    ['D', 'const _prevAvoidDeath = setAvoidDeathHook(', 'hudText.add(avoidDeathText())', ['avoidDeath']],   // PIN MOVED (the merge of main's L10N arc): the line said through the text core
+    ['D', 'const _prevAvoidDeath = setAvoidDeathHook(', 'hudText.add(avoidDeathText())', ['avoidDeath']],
     ['D', 'activeOverlay = new DeathScreen(', '\n', ['deathPenalty']],
     ['W', 'function companionPlace(', 'const spotOf =', ['companions']],
     ['W', 'function partyCompanions() {', 'const party =', ['companions']],
     ['W', 'function madeSay(rule) {', '\n', ['says']],
     ['W', 'function setRecallAnchor() {', 'const inside =', ['mark']],
     ['W', 'async function recallToAnchor() {', 'const anchor = playerEntity.anchorPosition;', ['recall']],
-    ['W', 'const goldLost = wildKilled', '\n', ['deathPenalty']],   // PIN MOVED (FOE-KEEPS): a kill in the zone, no longer any death there
+    ['W', 'const goldLost = wildKilled', '\n', ['deathPenalty']],
     ['W', 'const diedInHour =', '\n', ['death']],
     ['W', 'if (/^\\/unstuck(\\s+cancel)?$/i.test(text.trim())) {', 'const inZone =', ['unstuck']],
     ['W', 'registerLevitateWard(() =>', '\n', ['levitate']],
     ['W', 'registerJumpForgiveness(', '\n', ['jumpBuffer', 'latePress']],
     ['W', 'arenaFrame(dt);   // ARENA2', "'held');", ['regen']],
-    ['W', 'if (!_rezSeen) _rezSeen =', 'if (rez && legacyHost', ['resurrect']],   // PIN MOVED (REZ-BLOODLINE, at the seventh merge of main): the rise asks Project Legacy first
+    ['W', 'if (!_rezSeen) _rezSeen =', 'if (rez && legacyHost', ['resurrect']],
     ['P', 'const portalDoorRefusal = () => {', 'const hold = portalHoldNow();', ['portalStone']],
     ['S', 'export function parkourDeps(', '\n}\n', ['runLeap']],   // EG-PERFECT: the running leap's door, the four hosts' one parkour deps
   ];

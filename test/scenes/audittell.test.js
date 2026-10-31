@@ -1,5 +1,4 @@
-// AUDIT TELL (bible/12-Enhanced-AI/Feud-Arc.md, the AUDIT TELL record; Mac, 2026-10-04: "Let's do a comprehensive audit
-// over everything ensuring perfection"). TELL1-TELL9 read whole, every finding verified and fixed; this file pins each
+// AUDIT TELL (, the AUDIT TELL record). TELL1-TELL9 read whole, every finding verified and fixed; this file pins each
 // fix (the online ones - O2, O4, O6, B8's wire - stand in test/ai/tell8_online.test.js, beside the wire they keep):
 //   the brain (B1-B11), the landing on the player (L1-L9), the hosts (H1, H5/L6, H6, P1), the screen (U1-U10), the arc's
 //   own promises built at last (the shatter, 3.2; the bleed's drips, 8.2; the dungeon stream's gap FLAGGED, 10.1/32),

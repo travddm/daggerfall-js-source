@@ -1,4 +1,4 @@
-// SS1 (2026-09-27, Mac: "make sigil stones bound items and stackable, raise the prices on the new boss vendor"): the
+// SS1: the
 // Deadlands Ember BOUND (systems/item/itemBound.js - never handed to another player: the trade will not hold one out, and a
 // peer's lot carrying one is refused whole) and STACKING with its own kind alone (systems/gate/gateSpoils.js), the stones a
 // save holds from before folded into their stacks on load (systems/save/save.js, below its index-keyed relinks), and the
@@ -184,7 +184,7 @@ test('SS1 the card says a bound piece is bound, in the lock\'s own line style wi
   });
 });
 
-// ── SS3 (2026-09-27, Mac: "They shouldnt be able to be dropped") ──
+// ── SS3 ──
 
 test('SS3 the law: a bound piece may be put in the player\'s wagon and the player\'s own storage alone - never the ground, a container or a reward tray; a list a peer hands over lands without one, and a refused list stays refused (mutants: the wagon closed to a bound piece; the owner\'s storage closed; a peer\'s list keeps a bound piece)', () => {
   const stone = sigilStone(), gem = ruby();
@@ -300,8 +300,7 @@ test('SS3 what a peer hands over lands without a bound piece: a building\'s cont
   assert.deepEqual(ctx.containers[0].items.map((i) => i.name), ['Ruby'], 'without the stones');
 });
 
-// ── SS4 (2026-09-27, Mac: "Also make the items sold by the oblivion vendor bound also. Can't be traded, dropped or
-// sold. Sigil stones shouldnt be able to be sold") ──
+// ── SS4 ──
 
 const DAY = brokerDay(Date.parse('2026-09-27T12:00:00Z'));
 
@@ -428,8 +427,7 @@ test('SS4 the enhanced counter: a Deadlands Ember and a Broker ware pressed for 
   });
 });
 
-// ── SS5 (2026-09-27, Mac: "The ability to dismantle in the inventory and recieve back sigil stones", the Broker's wares
-// alone for now) ──
+// ── SS5 ──
 
 /** A ware of the day's stock at `slot` - the piece a sale hands over (a fresh mint, bound and priced). */
 const ware = (slot = 0) => brokerSale(brokerStock(DAY)[slot], { items: [stack(20)], bought: [], day: DAY }).give;
@@ -540,7 +538,7 @@ test('SS5 the enhanced pack: a ware\'s card offers Dismantle, which asks first -
     press(actOf('Dismantle'));
     assert.ok(dialog(), 'and asks first');
     assert.equal(dialog().attrs.role, 'alertdialog');
-    assert.ok(dismantleAsk(wareName(name, w), 6).every((line) => said().includes(line)), 'the question, and what it gives back');   // PIN MOVED (AUDIT FB1025i A8): the ware named with its set
+    assert.ok(dismantleAsk(wareName(name, w), 6).every((line) => said().includes(line)), 'the question, and what it gives back');
     press(dialogAct('Keep'));
     assert.equal(dialog(), null, 'Keep puts the question away');
     assert.ok(e.items.includes(w), 'and the ware stays');
@@ -566,13 +564,13 @@ test('SS5 the enhanced pack: a ware\'s card offers Dismantle, which asks first -
     open(itemLongName(lockedWare));
     press(actOf('Dismantle'));
     assert.equal(dialog(), null, 'a locked ware asks nothing');
-    assert.ok(said().includes(lockedText(wareName(itemLongName(lockedWare), lockedWare))), 'and says why');   // PIN MOVED (AUDIT FB1025i A8)
+    assert.ok(said().includes(lockedText(wareName(itemLongName(lockedWare), lockedWare))), 'and says why');
     assert.ok(e.items.includes(lockedWare));
   });
   const worn = ware(5);
   withWarePack([worn], ({ panelOf, actOf, press }) => {
     assert.equal(isEquipped(worn), true, 'worn');
-    press(panelOf('Hands'));   // PIN MOVED (ARMOR-LEAN): the day's stock rolls on - slot 5 is Ruhn's Brand-Gauntlets now, its Right Pauldron before
+    press(panelOf('Hands'));
     assert.ok(actOf('Take off'), 'its card is up, and takes it off');
     assert.equal(actOf('Dismantle'), null, 'a worn ware: taken off first');
   }, (e) => { equipItem(e, worn); });
@@ -589,7 +587,7 @@ test('SS5 the classic pack: Remove over the ground offers a ware\'s dismantle in
   const w = ware(2), name = itemLongName(w), n = dismantleStones(w);
   const yes = at(w);
   assert.ok(yes.win.inputBox instanceof YesNoBoxWindow, 'the question');
-  assert.deepEqual(yes.win.inputBox.rows.map((r) => r.text), [boundText(wareName(name, w)), DISMANTLE_INSTEAD(n)]);   // PIN MOVED (AUDIT FB1025i A8)
+  assert.deepEqual(yes.win.inputBox.rows.map((r) => r.text), [boundText(wareName(name, w)), DISMANTLE_INSTEAD(n)]);
   assert.ok(yes.bag.includes(w), 'nothing moves before the answer');
   yes.win.input('KeyY');
   assert.equal(yes.win.inputBox, null);
@@ -644,7 +642,7 @@ test('SS5 a classic box holds its rows on the screen: a row wider than fourteen 
   assert.deepEqual(fitBoxRows(null, [{ text: long }]), [{ text: long }], 'no font: nothing to measure by');
 });
 
-// ── AUDIT SS (2026-09-27, Mac: "audit this" - SS1-SS5 end to end) ──
+// ── AUDIT SS ──
 
 test('AUDIT SS the classic question answers the LEFT button alone - a right click (this pack\'s Remove) or a middle one never presses its Yes; the piece\'s tooltip is put away when it is asked; the player\'s own pile on the ground is the ground (the offer stands there too, never for a locked ware); a reward tray refuses in DFU\'s silence (mutants: a right click answers the question; the tooltip over the question; the own pile never offered; a locked ware offered over its own pile; the reward tray speaks)', () => {
   const ask = (loot = null, w2 = ware(2)) => {
@@ -833,7 +831,7 @@ test('AUDIT SS the enhanced question at the keyboard and the mouse: it holds the
       press(dialog().querySelectorAll('.act').find((x) => x.textContent === 'Dismantle'));
       assert.equal(dialog(), null);
       assert.ok(e.items.includes(a), 'the ware stays');
-      assert.ok(textOf(dom.body).includes(lockedText(wareName(itemLongName(a), a))), 'and the pack says why');   // PIN MOVED (AUDIT FB1025i A8)
+      assert.ok(textOf(dom.body).includes(lockedText(wareName(itemLongName(a), a))), 'and the pack says why');
       setLocked(a, false);
       // Y dismantles
       open();

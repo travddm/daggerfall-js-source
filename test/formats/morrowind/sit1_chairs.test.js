@@ -1,5 +1,4 @@
-// SIT1 (2026-10-14, Mac: "Implement the ability to interact and sit on chairs. Morrowind model should use the sitting
-// animation we use for the card game"). Pinned here: which models are sat on; the seat on one (its seat surface, its
+// SIT1. Pinned here: which models are sat on; the seat on one (its seat surface, its
 // back, the way the sitter faces, the feet, the hands on the knees, the eye) off the room's probe; the card seat's pose
 // SOLVED on retail's biped at a chair's lap; and the wiring - the room lists its chairs, the host's target, press, name,
 // seat, eye, body, third-person pivot and every road up, the pose on the wire.

@@ -1,4 +1,4 @@
-// COST-2 part two (2026-10-25; bible/11-Multiplayer/Scale-Arc.md COST-2 part two): THE TREE MOVES, at the relay
+// COST-2 part two: THE TREE MOVES, at the relay
 // (server/src/cellMoves.js, cellNodes.js, cellHandover.js). The directory seeds its tree while `cellSeed` is on, hears its
 // nodes' counts, plans a move when the law says one is due, and makes it in its alarm - each departing layer's rows sent
 // and kept, the tree committed, then every socket closed CLOSE_REPARTITION and the rows sent again and let go - resuming

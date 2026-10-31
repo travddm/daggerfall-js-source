@@ -1,4 +1,4 @@
-// SLAM7 (2026-09-16, AUDIT SLAM, before Mac's 30th-anniversary server slam): THE PAPERDOLL CACHE EVICTED THE SCENE.
+// SLAM7: THE PAPERDOLL CACHE EVICTED THE SCENE.
 //
 // `_evict` kept DOLLS_MAX (64) READY dolls and released the rest. It counted every ready doll - including the ones
 // billboards were standing in at that moment - and `_release` destroys the batches wearing a released look. So past

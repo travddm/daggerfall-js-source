@@ -1,10 +1,10 @@
-// ARENA4b (2026-10-03): THE GATE AND THE CLIMB ONLINE, DRIVEN - the account is the law while the arena online is live:
+// ARENA4b: THE GATE AND THE CLIMB ONLINE, DRIVEN - the account is the law while the arena online is live:
 // the recruiters read and write the ACCOUNT's banner (scenes/arena/arenaGate.js recruiterChoiceOnline / recruiter, scenes/
 // arenaOnline.js team - the service's own words when it refuses, the save's league untouched), the Herald's choice reads
 // the account's climb and banner (arenaGate.heraldChoice, both hosts' Herald), Fight waits for the account's climb and a
 // ladder purse is paid only for the bout the account was owed (arenaOnline.fightLadder / climb / owe, the claims'
 // answers), the pause window's banner and the Keeper of the Hall read the account's and the realm's (arenaGate.joined /
-// hall); offline all of it ARENA3's. Mac, 2026-10-02: "join a team (red and blue) and climb esclating tiers of opponents".
+// hall); offline all of it ARENA3's..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

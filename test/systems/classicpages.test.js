@@ -1,4 +1,4 @@
-// CLASSIC-PAGES (2026-09-30, Mac: "Enhanced pages + key"; found tracing GATHER-SAID, `06-Systems/Online-Arc.md`). The
+// CLASSIC-PAGES. The
 // Professions and Stores pages stood on the Enhanced pause menu's Stats rail alone - the classic pause has no pages
 // (AUDIT 29 B2's FLAGGED) - so an online classic player could neither read a rank nor withdraw a gathered good, and a
 // home's Forge, Workbench or Loom was not offered them. A door pressed for a professions page - THE PROFESSIONS KEY (the
@@ -41,7 +41,7 @@ test('CLASSIC-PAGES: on the classic skin a door pressed for the Professions or t
   setUiSkin('classic');
   online();
   try {
-    for (const at of ['professions', 'crafting', 'stores']) {   // PIN MOVED (CRAFT-HALL): the Crafting page a professions page too
+    for (const at of ['professions', 'crafting', 'stores']) {
       withDocument((node) => {
         const shown = [];
         const win = openPauseFlow((w) => shown.push(w), { at, exitToMenu() {} });
@@ -85,14 +85,12 @@ test('CLASSIC-PAGES: with no pages to show (offline, the switch shut) the door s
   }
   _resetNotifyForTests();
   _resetForTests();
-  assert.deepEqual(PROF_PAGE_SECTIONS.map(([id]) => profPageAt(id)), [true, true, true]);   // PIN MOVED (CRAFT-HALL): three pages
+  assert.deepEqual(PROF_PAGE_SECTIONS.map(([id]) => profPageAt(id)), [true, true, true]);
   assert.deepEqual(['quests', 'stats', 'system', 'settings', undefined].map(profPageAt), [false, false, false, false, false]);
 });
 
 test('CLASSIC-PAGES: THE PROFESSIONS KEY - appended, a default share on the down arrow beside less sail (as more sail shares the act choice\'s up arrow), in the Professions group, a port row; the router opens the pause on the Professions page, and nothing while sailing', () => {
-  // PIN MOVED (SPYGLASS, 2026-10-11): the captain's glass appended after them, last
-  assert.deepEqual(ACTIONS.slice(-10, -4), ['Professions', 'LegacyFamily', 'ModeWheel', 'WeaponTechnique', 'Spyglass', 'SaddlePanel'],   // PIN MOVED (Decorate appended)   // PIN MOVED (PARTY-PING: PartyPing after ShotCycle)   // PIN MOVED (SHOT-KINDS: ShotCycle after ShipHold)   // PIN MOVED (CARGO-ANYWHERE: ShipHold appended after)
-      // PIN MOVED (UI-CALM)
+  assert.deepEqual(ACTIONS.slice(-10, -4), ['Professions', 'LegacyFamily', 'ModeWheel', 'WeaponTechnique', 'Spyglass', 'SaddlePanel'],
     'appended after HELM-KEYS\' two: the classic grid and a saved file resolve by position (LEGACY1\'s family tree after it, MODE-WHEEL\'s wheel, TECH1\'s technique, SPYGLASS\'s glass last)');
   assert.ok(DEFAULT_SHARES.some(([c, a, partner]) => c === 'ArrowDown' && a === 'Professions' && partner === 'BoatSailDown'), 'shared onto less sail\'s own key');
   assert.ok(!DEFAULT_BINDINGS.some(([, a]) => a === 'Professions'), 'it owns no key - KB1 law 3 keeps every owner once');
@@ -123,7 +121,6 @@ test('CLASSIC-PAGES: a Forge, Workbench or Loom works on either skin while the p
   setProfessionsPages(null);
   _resetForTests();
   for (const st of ['forge', 'workbench', 'loom']) assert.doesNotMatch(stationColdLine(st), /Enhanced/, `${st}: no skin named`);
-  // PIN MOVED (AUDIT HOLDINGS C7): the Stores page is on the Holdings tab; the key opens the Professions
   assert.equal(storesWhereLine('DOWN'), 'Gathered goods go straight to your Stores, under Holdings in the pause menu. DOWN opens your Professions.');
   assert.equal(storesWhereLine(''), 'Gathered goods go straight to your Stores, under Holdings in the pause menu.', 'the key unbound');
 });

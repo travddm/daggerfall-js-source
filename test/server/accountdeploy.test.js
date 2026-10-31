@@ -1,7 +1,5 @@
-// ACC1-CI (2026-09-21): THE ACCOUNT SERVICE'S DEPLOY, PINNED.
+// ACC1-CI: THE ACCOUNT SERVICE'S DEPLOY, PINNED.
 //
-// Mac: "The token provided allows you to take this on yourself. I am
-// not needed at all."
 //
 // ACC1b shipped `server-account/` with a four-step list headed "WHAT A
 // PERSON HAS TO DO ONCE, BY HAND", and the reason given was that CI
@@ -362,7 +360,7 @@ test('ACC1d D2: the service\'s deploy checks the RELAY\'s copy of the public key
 test('GATE-KEYS: the deploy mints the gate\'s receipt pair ONCE, puts each half on its own Worker as a secret, and fails if this service still holds none', () => {
   // DragynDance on the Discord: "I didn't get credit for closing the oblivion gate in my profile". WB5b left the pair
   // to a person - a tool, and a var shipped empty - and nobody minted it: every receipt went out unsigned, the device
-  // drops an unsigned one, and no gate was ever counted. Mac, asked: "Yes, add it". The identity pair's laws, for a
+  // drops an unsigned one, and no gate was ever counted.. The identity pair's laws, for a
   // pair that spans TWO Workers: the relay signs (GATE_SIGNING_KEY on it), this service verifies (GATE_PUBLIC_KEY here).
   const wf = rd(WF);
   const toml = rd(TOML);

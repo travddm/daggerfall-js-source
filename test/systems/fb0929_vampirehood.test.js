@@ -1,5 +1,4 @@
-// VAMP-HOOD (2026-09-29, Discord #suggestions "PLEASE allow vampires...", Starempire42: "adds the ability to travel
-// during the day if you a wearing a cloak or robe with a hood up"; Sir McMobdon: "nice, good idea"; sent in by Mac): THE PORT'S DEPARTURE from
+// VAMP-HOOD: THE PORT'S DEPARTURE from
 // VampirismEffect.CheckFastTravel (:195-208) and DaggerfallTravelPopUp's arrival clamp (:350-357). Every rule the
 // curse's SunDamage flag still keys asks vampirism.js racialSunAverse - the flag, UNLESS the wearer's hood is up, which
 // is survival/temperature.js cloakState: the one hood law, the felt temperature's own. Online this is the whole
@@ -62,7 +61,7 @@ test('VAMP-HOOD: a cloak worn hood down keeps the day\'s refusal and says how to
     'worn, on a cloak slot');
   assert.deepEqual(racialFastTravelBlock(v, at(12)), { text: SUNLIGHT_TRAVEL_TEXT, hint: VAMPIRE_HOOD_TEXT },
     'hood down at noon: DFU\'s refusal, and the way out after it');
-  // HOOD-SAID (FIELD BUGS 2026-09-30, PIN MOVED): the line names the button that raises the hood - the pack card's
+  // HOOD-SAID (FIELD BUGS 2026-09-30
   // Raise hood (this suite runs on the enhanced skin; test/systems/fb0930_hoodsaid.test.js holds the classic's line)
   assert.equal(VAMPIRE_HOOD_TEXT, 'Raise the hood of a cloak or robe to travel by day. Use Raise hood on its card in your pack.');
   // NextVariant cycles the casual cloak's six drawings (the template's `variants`), and the door follows the hood

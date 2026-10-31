@@ -1,4 +1,4 @@
-// INT3/INT6 (2026-10-09, the INTEGRITY arc's audit - bible/06-Systems/Integrity-Arc.md): THE ROUTES AND THE REVIEW, over
+// INT3/INT6: THE ROUTES AND THE REVIEW, over
 // HTTP against the real Worker and the real migrations - what the audit found no test held:
 //   - a held character's piece refused at the market's own route, with its status (409, index.js JUDGE_STATUS), and a
 //     record no judge has read refused the same ('record-unjudged');

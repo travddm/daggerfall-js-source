@@ -1,4 +1,4 @@
-// DISC29-A (2026-09-28, Skibbster on Discord: the throne puzzle's switch never activates when walked on) - A COLLISION01
+// DISC29-A - A COLLISION01
 // OBJECT IS STOOD ON WHEREVER ITS OWN SURFACE IS.
 //
 // N0000037's two thrones are CastSpell effects with the Collision01 trigger (WalkOn only), chained to a tapestry that

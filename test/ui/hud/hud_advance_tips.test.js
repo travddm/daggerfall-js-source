@@ -1,4 +1,4 @@
-// SKILL-READY / FIRM-STARS / STATUS-TIPS / BELT-LANTERN / MONSTER-VOL / HOOD-GAP (2026-10-20, Dudey): the tiles beside
+// SKILL-READY / FIRM-STARS / STATUS-TIPS / BELT-LANTERN / MONSTER-VOL / HOOD-GAP: the tiles beside
 // the Renown bar, the status tiles' hover words, the lantern's own slot, the monsters' quieter calls and their volume,
 // and the hood that sits on the body.
 import { test } from 'node:test';

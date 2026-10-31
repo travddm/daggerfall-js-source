@@ -1,4 +1,4 @@
-// BANK-FLUSH (2026-10-12) - THE WATER'S EDGE MEETS THE GROUND, PINNED. The bed lowered every wet grid vertex, and the
+// BANK-FLUSH - THE WATER'S EDGE MEETS THE GROUND, PINNED. The bed lowered every wet grid vertex, and the
 // sheet stops mid-tile (its corner table's coverage, a puddle's art), so at a shore the sheet's edge hung over a carved
 // slope and the eye at the bank looked under it ("the whole water texture is flying"). The ground is now carved only
 // past a cell from the bank and round no puddle tile; the sheet keeps the bed's own depths.

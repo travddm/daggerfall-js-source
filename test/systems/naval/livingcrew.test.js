@@ -1,6 +1,4 @@
-// LIVING CREW (2026-09-29, Mac: "Crew members shouldnt be the static sprites and instead the enemy type sprites with
-// multiple animations, they should navigate the deck, talk with each other, blurb, sing chantys, etc" and "Boarding
-// scenarios should be seamless, with crew naturally getting into position and fighting enemies"):
+// LIVING CREW:
 //
 //   THE CREW (systems/naval/crewLife.js) - who stands on a deck (a ship's muster, a player's hands' mix), where (her own
 //   flats' places: a walker on her deck, a station off it), and their work: walking her deck, two men at their talk, a
@@ -134,7 +132,6 @@ test('LIVING CREW THE GUNS AND THE GRAPPLE: her guns out - no song, the battle\'
   for (const [n, m] of life.members.entries()) if (!m.station) { m.pos = [-1 + (n % 3), 2, 5 + n * 0.2]; m.path = null; m.state = 'idle'; }   // a knot of them amidships
   const shouts = new Set();
   let into = 0;
-  // PIN MOVED (CREW-MUSTER, FIELD BUGS 2026-10-14): a grapple thrown names her side of it - here she is boarded
   run(life, 25, { muster: -1, way: 'repel' }, (l) => { into += 0.05; if (into > CREW_LINE_S) for (const x of l.speech()) shouts.add(x.text); });   // a word already said fades on
   const ext = deckExtentZ(deck);
   const walkers = life.members.filter((m) => !m.station);
@@ -196,7 +193,7 @@ test('LIVING CREW THE HOST: a ship in range stands her crew as mobile units - th
   const boat = smallShip();
   const flats = peopleFlatsOf(boat);
   const main = mainLevel(deck);
-  assert.ok(Math.abs(main - 6.2) < 0.1, `her main deck: ${main}`);   // PIN MOVED (GALLEON, 2026-10-01): the new galleon's
+  assert.ok(Math.abs(main - 6.2) < 0.1, `her main deck: ${main}`);
   const below = flats.filter((f) => f.feet[1] < main - DECK_STEP), onDeck = flats.filter((f) => f.feet[1] >= main - DECK_STEP);
   assert.ok(below.length >= 1 && onDeck.length >= 4, `flats: ${onDeck.length} on or above her deck, ${below.length} below`);
   const h = host();
@@ -240,7 +237,7 @@ test('LIVING CREW TAKEN, HELD, THINNED: a fight takes her men off her deck as th
   const first = ship.life.members[0];
   const taken = h.crew.takeByBoat(boat, 2);
   assert.equal(taken.length, 2);
-  // AUDIT NAV2 F35 PIN MOVED: her captain at the wheel on the poop is off her deck - taken at the deck point nearest him
+  // AUDIT NAV2 F35
   const at = deck.clamp(first.pos[0], first.pos[2]);
   assert.ok(Math.abs(taken[0].feet[0] - (at[0] + 100)) < 1e-6 && Math.abs(taken[0].feet[2] - (at[2] + 50)) < 1e-6, 'where he stands in the world');
   assert.equal(taken[0].mobile, first.mobile);
@@ -290,7 +287,7 @@ test('LIVING CREW SEAMLESS BOARDING: her muster fights where her crew stands - e
   assert.deepEqual(enemies.slice(0, 4).map((f) => f.pos), [0, 1, 2, 3].map((i) => [20, 7, i]), 'where they stood');
   assert.ok(enemies.length > 4 && enemies.slice(4).every((f) => f.pos[0] !== 20), 'the rest up from below');
   const muster = musterOf(e.ship.cls, e.ship.damage.crewShare());
-  // AUDIT NAV2 F44: PIN MOVED - each man stands as HIMSELF where he stood (the stand-in crew's own classes), and only
+  // AUDIT NAV2 F44:
   // the men up from below take the muster's next classes (the muster's order was pinned over the man's own)
   assert.deepEqual(enemies.map((f) => f.mobile), [MOBILE.Rogue, MOBILE.Barbarian, MOBILE.Bard, MOBILE.Archer, ...[muster.captain, ...muster.men].slice(4)], 'each man his own class, the rest her muster\'s');
   assert.ok(hands.length > 0);
@@ -333,7 +330,7 @@ test('LIVING CREW THE SEA\'S CREWS: every ship with her boat built, afloat, stru
   e.ship.damage.takePrize();
   assert.equal(h.host.crewShips().find((x) => x.key === id).hold, true, 'a prize\'s crew held');
   e.ship.damage.scuttle();
-  // AUDIT NAV2 F45 PIN MOVED: a ship going down keeps her living crew aboard to the end, her colours down (the decision)
+  // AUDIT NAV2 F45
   const going = h.host.crewShips().find((x) => x.key === id);
   assert.ok(!!going && going.struck === true && going.battle === false, 'a ship going down, her colours down');
   assert.equal(h.host.boatOf(id), e.boat);
@@ -347,8 +344,7 @@ test('LIVING CREW THE LANDING AND THE RAIL, lifted from the world host over the 
   const boat = smallShip();
   const line = (start) => { const i = WORLD.indexOf(start); assert.ok(i >= 0, start); return WORLD.slice(i, WORLD.indexOf('\n', i) + 1); };
   const fn = (name) => { const m = new RegExp(`\\n  function ${name}\\([^)]*\\) \\{\\n[\\s\\S]*?\\n  \\}\\n`).exec(WORLD); assert.ok(m, name); return m[0]; };
-  // PIN MOVED (AUDIT NAV2 F33): the deck point's ray starts under her deck's headroom - DECK_HEADROOM in the lifted scope;
-  // AUDIT GALLEON D2 (2026-10-02): her rail asked at her main level - mainLevel in it too
+  // AUDIT GALLEON D2: her rail asked at her main level - mainLevel in it too
   const body = `const { intoDeck, outOfDeck, DECK_HEADROOM, csa, raycastColliders, csaColliderMesh, mainLevel } = s;
     ${line('  const navalDeckToWorld = (boat, p, out) =>')}${line('  const navalWorldToDeck = (boat, p, out) =>')}${line('  const NAVAL_RAIL_GAP =')}
     ${fn('navalDeckPoint')}${fn('navalDeckLanding')}${fn('navalRailSpots')}
@@ -371,7 +367,7 @@ test('LIVING CREW THE LANDING AND THE RAIL, lifted from the world host over the 
 
 test('LIVING CREW THE WORDS: a bubble a line over his head at the HUD\'s scale - the nearest CREW_SAY_MAX, a song\'s in the song\'s own look, a shout\'s in its own - fading with the distance to CREW_SAY_RANGE; one node a slot, moved and re-worded, never rebuilt; a window over the world hides them all (mutants: every line drawn, rebuilt each frame, never hidden, the fade unread)', () => {
   destroyNavalHud();
-  // FIELD BUGS 2026-10-02b PIN MOVED: the heads 500 px down, the stack's room over them - a lifted bubble over the screen's top is not drawn
+  // FIELD BUGS 2026-10-02b
   const pts = Array.from({ length: 8 }, (_, i) => ({ x: 100 + i * 10, y: 500, text: `line ${i}`, kind: i === 0 ? 'sing' : i === 1 ? 'shout' : 'talk', distance: 5 + i * 3 }));
   drawCrewLines(pts, { scale: 1.5 });
   const [layer] = byClass(globalThis.document.body, 'dfnaval-tags');
@@ -393,9 +389,9 @@ test('LIVING CREW THE WORDS: a bubble a line over his head at the HUD\'s scale -
 });
 
 test('LIVING CREW THE WORLD by source: the crews stepped before the people are drawn, their sprites among them; the words after the bars; every clear stands them down; the fight\'s end brings my hands home; a grapple\'s side each crew\'s own, her other ship by the host\'s door; me never walked through; a room\'s boat seeded by whose and which; the boarding\'s doors (mutants: each unwired)', () => {
-  assert.match(WORLD, /navalCrewFrame\(gamePaused\(\) \? 0 : foeDt\);[^\n]*\n\s+livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\), \.\.\.navalCrew\.batches\(\)\);/);   // AUDIT NAV2 F53 PIN MOVED: held by a pause
-  assert.match(WORLD, /navalCrewBars\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewLines\(proj, view, mwv\.eye, dt\);/);   // FIELD BUGS 2026-10-02b PIN MOVED: the frame's dt, the lifts' ease
-  assert.match(WORLD, /navalFlames\.clear\(\); navalCrew\.clear\(\);[^\n]*drawCrewLines\(\[\]\); lowerGlass\(\); \};/);   // AUDIT CAPTAIN'S SEA S1 PIN MOVED: and the glass lowered after the crews
+  assert.match(WORLD, /navalCrewFrame\(gamePaused\(\) \? 0 : foeDt\);[^\n]*\n\s+livePersonBatches\.push\(\.\.\.exteriorFoes\.batches\(\), \.\.\.navalCrew\.batches\(\)\);/);     // AUDIT NAV2 F53
+  assert.match(WORLD, /navalCrewBars\(proj, view, mwv\.eye\);[^\n]*\n\s+navalCrewLines\(proj, view, mwv\.eye, dt\);/);     // FIELD BUGS 2026-10-02b
+  assert.match(WORLD, /navalFlames\.clear\(\); navalCrew\.clear\(\);[^\n]*drawCrewLines\(\[\]\); lowerGlass\(\); \};/);     // AUDIT CAPTAIN'S SEA S1
   assert.match(WORLD, /if \(_crewBoarding && !b\) for \(const boat of csa\.boats\) navalCrew\.reset\(boat\);/);
   assert.match(WORLD, /const other = grapple \? \(key === grapple\.shipId \? grapple\.boat : key === grapple\.boat \? naval\.boatOf\(grapple\.shipId\) : null\) : null;/);
   assert.match(WORLD, /_crewCtx\.muster = _crewThem\[0\] >= 0 \? 1 : -1;/);

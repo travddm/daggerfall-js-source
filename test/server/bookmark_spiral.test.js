@@ -1,7 +1,6 @@
-// BOOKMARK-SPIRAL (2026-10-16, the account database's primary "overloaded. Requests queued for too long." from 13:50 UTC,
-// every route 5 to 60 s; bible/11-Multiplayer/Scale-Arc.md BOOKMARK-SPIRAL): six polled display reads, asked with no
+// BOOKMARK-SPIRAL: six polled display reads, asked with no
 // bookmark, had started their D1 session at any instance (server-account/src/service.js ANY_REPLICA_ROUTES, REPLICA_ANY).
-// SHED-LONG (2026-10-16, acct145; Scale-Arc.md SHED-LONG) rolled that back - the replica's sessions waited 31 s on the
+// SHED-LONG rolled that back - the replica's sessions waited 31 s on the
 // database for every 5.6 s the primary's did, and the six had moved some 40 lookups a second onto it - so the set is
 // empty and every replica route with no bookmark starts at the primary again. Kept: a session lookup that misses on a
 // session at any instance asks the primary (accounts.js resolveSession), so a session minted a moment ago is never refused

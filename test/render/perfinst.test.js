@@ -1,5 +1,4 @@
-// PERF-INST (2026-10-10, the owner: "performance must be highest priority now ... prob caused by placed objects by
-// players"): A MESH'S PLACEMENTS ARE FILED BY PLACE (render/shadowPass.js SHADOW_INSTANCE_LINEAR; bible/07-Rendering/
+// PERF-INST: A MESH'S PLACEMENTS ARE FILED BY PLACE (render/shadowPass.js SHADOW_INSTANCE_LINEAR; bible/07-Rendering/
 // Performance-Priority.md PERF-INST).
 //
 // The shadow pass remembers every placement of a mesh (AUDIT SC1, AUDIT REACH) to tell a still copy from a moved one.
@@ -15,7 +14,7 @@
 // only the placements filed round it - a copy across the town is never measured. THREE: a thousand still copies are
 // still - none dynamic past the old 128.
 //
-// AUDIT PERF-INST (2026-10-10, the owner: "Lets do an audit on this"): the first cut's grid was XZ columns re-filed
+// AUDIT PERF-INST: the first cut's grid was XZ columns re-filed
 // whole at every floating-origin shift, its loop ran by cell coordinate (`gx <= cx + 1` - for ever past 2^53 cells),
 // and a full memory walked every placement at every miss. FOUR: ties and exact matches across a cube's face, a
 // placement re-filed into a cube already holding a later one, and a draw past any cube a number can step - each the

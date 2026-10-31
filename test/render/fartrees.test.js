@@ -1,5 +1,4 @@
-// FAR-TREES (2026-10-26, the owner: "no flora/trees show ... No band aids for any of this"; the coordinator: the billboard
-// band, the tree line at the grid's edge gone; bible/06-Systems/Travel-View.md FAR-TREES) - THE BAND: the near trees
+// FAR-TREES - THE BAND: the near trees
 // carried a ring past the streamed grid (and into every pixel of it the stream has not built), each pixel's own layout on
 // the terrain worker (world/terrain/floraCover.js bandTreesPixel), drawn in the far ring's pass as points of the trees'
 // own art, dithered out onto the canopy over the band ring as the canopy comes in under it (render/farTrees.js,
@@ -148,7 +147,6 @@ test('FAR-TREES the band\'s book: the pixels it lacks asked of the worker with e
   band.frame({ curX: 100, curY: 100, radius: 0, built, climateOf, forests: true, landform: false, work });
   assert.equal(work.length, 0, 'not laid while its art is being read');
   await new Promise((r) => setTimeout(r, 10));
-  // PIN MOVED (TESA-LANDS, AUDIT - the atlas's layers lent): a Tree's picture read where a wanted pixel's tree is of it,
   // not every Tree of its archive (60 of the Bay's eight overran the atlas's 48 on a journey)
   assert.deepEqual(pics.map(String).sort(), ['503,12', '503,5', '504,12'], 'the Trees the pixels\' trees are - 504:5 no Tree of the woodlands\'');
   assert.equal(log.layers.length, pics.length, 'a layer each');
@@ -371,8 +369,7 @@ test('FAR-TREES in the far ring: the band made with the woods and a worker, its 
   assert.equal(new FarRingRenderer(fakeGl().gl, { flora: book })._band, null, 'no worker: no band');
 });
 
-// HORIZON-TREES (2026-10-27; KPbICA through the owner: "Strange projections above the horizon line"; bible/03-World/Tamriel.md
-// RELIEF-PEAKS Cause 7): the band is drawn last in a pass with no depth among its layers, so a band tree behind a nearer
+// HORIZON-TREES: the band is drawn last in a pass with no depth among its layers, so a band tree behind a nearer
 // hill of the middle ring stood over the hill's skyline. Its sight line is marched over the middle ring's own heights.
 const ridge = (side, cell, x0, z0, at, h) => {   // a flat ground at 100 m and a ridge `h` high along the row z = at
   const heights = new Float32Array(side * side).fill(100);

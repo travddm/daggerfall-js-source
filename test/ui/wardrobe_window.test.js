@@ -1,4 +1,4 @@
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): THE WARDROBE AT THE COUNTER - its row on a Clothing Store's,
+// APPEARANCES: THE WARDROBE AT THE COUNTER - its row on a Clothing Store's,
 // an Armorer's and a Weaponsmith's popup on both skins (the port's own row under DFU's art, the Portal Stone's law), the
 // counter the interior host builds once, and the window: the worn pieces, a piece's collected looks with their fees, a
 // Wear, a refusal that says why, and its own look back.

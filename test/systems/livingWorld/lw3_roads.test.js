@@ -1,4 +1,4 @@
-// LW3 (2026-10-04, bible/06-Systems/Living-World.md): THE ROADS - the trips (pure), the caravans, the town's away
+// LW3: THE ROADS - the trips (pure), the caravans, the town's away
 // windows and visitors, the armed walk, the road's bodies and the roads' layer, and their wiring in the streaming host.
 // The map is synthetic (test/lwRoads.mjs: towns on a grid, the straight run of pixels between two as the planner's way);
 // the town is the synthetic one (test/lwTown.mjs).
@@ -65,7 +65,7 @@ test('LW3 a traveller\'s trip: each cycle (its length the job\'s, scaled by the 
   let made = 0, none = 0;
   for (const home of towns.slice(20, 50)) {
     for (const res of world.rosterOf(home)) {
-      if (ROAD_JOBS.includes(res.job)) continue;   // LW9: PIN MOVED - the road's new traffic keeps its own tables (lw9_traffic.test.js)
+      if (ROAD_JOBS.includes(res.job)) continue;     // LW9:
       if (!(TRIP_CHANCE[res.job] > 0)) { assert.equal(ownTrip(res, home, 5, world, O()), null, `${res.job} travels with a merchant, never alone`); continue; }
       for (let k = 40; k < 46; k++) {
         const trip = ownTrip(res, home, k, world, O());
@@ -291,7 +291,7 @@ test('LW3 the town and the roads: a traveller away is geared at home, walks out 
   assert.equal(body.archive, classLookOf(adventurer).archive);
   assert.ok(armed.includes(adventurer.id));
   body.moving = false;
-  assert.ok(body.update(0.1, [0, 1.6, 0], false).record > 4, 'the class sprite\'s own idle, not the outfit\'s');   // LW-TALK: PIN MOVED - the outfit standing is on its walk wheel (records 0-4), no longer its idle record 5
+  assert.ok(body.update(0.1, [0, 1.6, 0], false).record > 4, 'the class sprite\'s own idle, not the outfit\'s');     // LW-TALK:
 });
 
 test('LW3 the road\'s bodies: an armed traveller in their class\'s sprite (its archive by their sex), the rest in their own outfit; each a talk target in the street\'s shape; a body gone from the list is freed, and clear() frees them all; under the Overworld faded by distance to the bands\' own far edge (mutants: the sex, the free, the fade)', () => {
@@ -408,7 +408,7 @@ test('LW3 the Overworld knows a party on the road: the `wayfarer` kind is the tr
   assert.equal(TRAVEL_VIEW_MARK_COLORS.wayfarer, '#c9a96e');
   const hud = rd('src/ui/travel/travelViewHud.js');
   assert.match(hud, /if \(k === 'wayfarer'\) return k;/);
-  // LW10: PIN MOVED - a caravan's mark is its wagon now (lw10_wagons.test.js); the rest keep the square
+  // LW10:
   // AUDIT LW-II F6: the square tied to the wayfarer's own branch again (its caravan's wagon between) - loose, any square drew it
   assert.match(hud, /\} else if \(look === 'wayfarer'\) \{[^\n]*\n\s*const r = \/\\bcaravan\\b\/\.test\(m\.kind \?\? ''\) \? 5 : 3\.5;\n\s*if \(\/\\bcaravan\\b\/\.test\(m\.kind \?\? ''\)\) \{[^\n]*\n[^\n]*\n[^\n]*\n\s*\} else packGlyph\(g, x, y\);[^\n]*\n/);   // OW-GLYPHS: a pack, the square's place
 });
@@ -416,7 +416,7 @@ test('LW3 the Overworld knows a party on the road: the `wayfarer` kind is the tr
 test('LW3 the ways: the living world\'s own book - a pair of towns asked once, the lower map id first and the other way its reverse; a few new pairs a frame; nothing while the roads are not built; the drawn network, whichever it is, and a new network clears the book (mutants: the direction, the budget, the network)', () => {
   const asked = [];
   let net = null, clock = 0;
-  // PERF-WAYS1 (PIN MOVED): a way taking as long as a frame's asking may (WAYS_MS_PER_FRAME) - LW3's floor alone a frame
+  // PERF-WAYS1 (
   const plan = (a, b, o) => { clock += WAYS_MS_PER_FRAME; asked.push([a.x, b.x, o.roads, o.flat]); return { pixels: [{ x: a.x, y: a.y }, { x: b.x, y: b.y }], kinds: ['road'] }; };
   const book = createWayBook({ roads: () => net, ground: () => ({ flat: 'ground' }), plan, now: () => clock });
   const A = { mapId: 5, px: 10, py: 1 }, B = { mapId: 3, px: 20, py: 2 }, C = { mapId: 9, px: 30, py: 3 };
@@ -442,33 +442,28 @@ test('LW3 the ways: the living world\'s own book - a pair of towns asked once, t
 
 test('LW3 the streaming host: the trips\' world is the game\'s own populated rows (blocks, people, region, port) and Hazelnut\'s roads asked one way a pair, a few a frame; a town\'s LivingTown takes its trips and the armed walk\'s sprite; the roads\' layer runs in the open world after the town\'s people and is freed indoors; the road\'s people beside the town\'s for the talk ray and the hover alone; their words through the one layer; the Overworld\'s marks; a caught hand on the road calls no watch (mutants: each seam)', () => {
   const w = hostText('src/scenes/world.js');
-  // PIN MOVED (WW1, bible/03-World/World-Wide.md): the towns are the living world's index's, off the world's registry -
   // the game's own rows its first provider (world/worldWide/bayPlaces.js) - and a town a place of a populated type
   assert.match(w, /worldPlaces\.register\(BAY_SOURCE, bayPlaceRows\(_hubRows, \{ hasPort \}\)\);/);
-  // PIN MOVED (WW7-7): the index, its ways and the trips' world scenes/livingWorld/livingTrips.js's, the host handing them in
   assert.match(w, /createLivingTrips\(\{ places: worldPlaces, populated: populatesWanderingNpcs,\n\s*peopleAt: \(px, py\) => getWorldClimateSettings\(maps\.getClimateIndex\(px, py\)\)\?\.people, maps, woods, roads: \(\) => terrainGen\.roads\(\), /);
   const lt = readFileSync(new URL('../../../src/scenes/livingWorld/livingTrips.js', import.meta.url), 'utf8');
   assert.match(lt, /const index = createLivingIndex\(\{ places, populated, peopleAt, beyond: /);
   assert.match(readFileSync(new URL('../../../src/scenes/livingWorld/livingIndex.js', import.meta.url), 'utf8'), /const townOf = [^\n]*\n\s*if \(!p \|\| !populated\(p\.type\)\) return null;/);
-  // PIN MOVED (WW7-7, bible/03-World/World-Wide.md): the Bay's pairs on the Bay's table, a pair past the Bay the window
-  // planner's (WW7-2's walk past the table retired with it). PIN MOVED (WW7-9): the table made once for both - the way
+  // planner's (WW7-2's walk past the table retired with it).
   // book's ground and a pair's across the edge (its Bay pixels the table's)
   assert.match(lt, /const groundOf = \(\) => \(ground \?\?= routeGround\(\(px, py\) => maps\.getClimateIndex\(px, py\), \(px, py\) => woods\.getHeightMapValue\(px, py\), WATER_BYTE, 1000, 500\)\);[\s\S]*?const ways = createWayBook\(\{\n\s*roads,\n\s*ground: groundOf,\n\s*beyond: /, 'the ways: the living world\'s own book, on the drawn roads and the game\'s own ground (no player\'s massifs)');
   assert.match(lt, /routeOf: \(\/\*\* @type \{any\} \*\/ a, \/\*\* @type \{any\} \*\/ b\) => ways\.wayOf\(a, b\),/);
   assert.match(w, /tripsOf: \(day\) => livingTripsOf\(livingTown, day\), armOf: livingArmOf,/);
-  assert.match(w, /livingWays\.frame\(\); livingMemoFresh\(\);[^\n]*\n(?:\s*livingTurnsFresh\(\);[^\n]*\n)?\s*if \(livingWorldOn\(\) && _mode\(\) === 'exterior'\) \{\n\s*livingRoadsOf\(\)\.frame\(townTalk\.overlayActive \? 0 : dt, cam\.pos, \{ overworld: tvf \? \{ grow: tvf\.grow, blend: tvf\.blend \} : null \}\);\n\s*livePersonBatches\.push\(\.\.\.livingRoads\.batches\(\)\);\n(?:\s*livingRoads\.drawBodies\([^\n]*\n)?\s*\} else if \(livingRoads\) livingRoads\.clear\(\);/);   // PIN MOVED (MWNPC10c, Morrowind-NPCs.md section 15c): the road's bodies drawn after their batches join the flats
+  assert.match(w, /livingWays\.frame\(\); livingMemoFresh\(\);[^\n]*\n(?:\s*livingTurnsFresh\(\);[^\n]*\n)?\s*if \(livingWorldOn\(\) && _mode\(\) === 'exterior'\) \{\n\s*livingRoadsOf\(\)\.frame\(townTalk\.overlayActive \? 0 : dt, cam\.pos, \{ overworld: tvf \? \{ grow: tvf\.grow, blend: tvf\.blend \} : null \}\);\n\s*livePersonBatches\.push\(\.\.\.livingRoads\.batches\(\)\);\n(?:\s*livingRoads\.drawBodies\([^\n]*\n)?\s*\} else if \(livingRoads\) livingRoads\.clear\(\);/);
   assert.match(w, /indoorRainSource: betterAmbience\.rainPlaying\(\) \}\);\n\s*if \(livingRoads\) livingRoads\.clear\(\);/, 'indoors, underground: the road\'s bodies freed (the modal arm)');
   assert.match(w, /personDistances: _talkPersons\(\)\.map\(\(p\) => rayPersonDistance\(cam\.pos, useFwd, p\.pos\)\),/);
   assert.match(w, /townTalk\.tryActivate\(cam\.pos, useFwd, _talkPersons\(\), _nonPersonRival\)/);
   assert.match(w, /const n = nearestPerson\(eye, dir, _talkPersons\(\)\);/);
   assert.match(w, /const _guardPool = \(\) => \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior' \? \[\] : _livePersons\.map\(/, 'the watch\'s conversion: the town\'s alone');
   assert.match(w, /for \(const l of livingRoads\.speech\(eye\)\) \{/);
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js - the road's parties read live
   assert.match(rd('src/scenes/travelViewMarks.js'), /for \(const m of host\.livingRoads\.marks\(\)\) if \(markShown\(\{ kind: m\.kind \}\)\) marks\.push\(/);
   assert.match(w, /createTravelViewMarks\(\{[^]*?\n\s+get livingRoads\(\) \{ return livingRoads; \},[^]*?\n\s+\}\);/, 'handed over live');
   const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /if \(!r\.success\) \{ livingTalk\?\.caught\?\.\(target\.person\); if \(!target\.person\?\.living\?\.town\?\.roadside\) onCrime\?\.\(\); else playerEntity\.crimeCommitted = crimeWas; \}/);   // PIN MOVED (AUDIT LW-II-2 C15): on the road the crime flag that stood before the pickpocket is put back (the road's door cleared every crime)
-  // PIN MOVED (LW11): the road's caught hand goes through the caravan's door too (its report), the roads' layer first
+  assert.match(tt, /if \(!r\.success\) \{ livingTalk\?\.caught\?\.\(target\.person\); if \(!target\.person\?\.living\?\.town\?\.roadside\) onCrime\?\.\(\); else playerEntity\.crimeCommitted = crimeWas; \}/);
   assert.match(w, /caught: \(p\) => livingRoadCaught\(p\), roadside: true \};/);
   assert.match(w, /const livingRoadCaught = \(p\) => \{\n\s*const id = livingRoads\?\.caught\(p\) \?\? null;/);
   assert.equal(travellerCounts({ mapId: 1, blocks: 1 }).pedlar, 1, 'every town its pedlar');

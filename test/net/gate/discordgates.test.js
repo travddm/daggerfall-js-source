@@ -1,5 +1,5 @@
 // DISCORD-GATES (2026-09-28, the field's player: "add a discord channel that tells the gates in real time itll create
-// hype and make more join"; Mac: "Discord live gates?", then "Omen (15 min before), Boss slain", "Ping an opt-in role"
+// hype and make more join";, then "Omen (15 min before), Boss slain", "Ping an opt-in role"
 // and, for the place, "What do you need for discord"): THE GATE'S HERALD, DRIVEN. The law (net/gate/gateHerald.js: the
 // door, the words, when each is owed, where the gate stands as accounts said it), the wire's `site` word (net/wire.js),
 // the hub over the real Room with Discord stubbed (server/src/index.js: the alarm at the omen, the posts, the kill,
@@ -174,7 +174,7 @@ async function withHerald(fn, { env = { GATE_DISCORD_WEBHOOK: HOOK, GATE_DISCORD
   // with a rise ten years off, so this harness's alarms are the sweep's and the heralds' alone (the director's own are
   // sd3_relay.test.js's)
   r.store.set(SD_KEY, { s: 0, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
-  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });   // PIN MOVED (WW5): and every province lane's Hollow resting with it
+  for (let lane = 1; lane <= 8; lane++) r.store.set(`${SD_KEY}:${lane}`, { s: lane * 10_000_000, ph: 'gone', r: -1, at: clock, until: clock, next: clock + 10 * 365 * 86_400_000 });
   const posts = [];
   const discord = { answer: () => ({ ok: true, status: 204 }), during: null };
   Date.now = () => clock;
@@ -289,7 +289,7 @@ test('DISCORD-GATES relay: NO WEBHOOK, NO HERALD - nothing posted, no owe, the s
       const a = await join('a');
       assert.equal(r.alarm.at, now() - 10 + ACCOUNT_SWEEP_MS, 'the sweep\'s, untouched');
       await site(a, DAY, 100, 200, 'Copperham');
-      assert.deepEqual(r.store.get('gatesite'), { d: DAY, c: [[100, 200, 'Copperham', ['acct-a']]] }, 'kept for the rite');   // PIN MOVED (the merge with main's FRIENDS-SYNC): the hub's account is the signed-in player's, never the browser profile's
+      assert.deepEqual(r.store.get('gatesite'), { d: DAY, c: [[100, 200, 'Copperham', ['acct-a']]] }, 'kept for the rite');
       set(TT.omenAt); await r.fire();
       set(TT.openAt + 1000); await fell(DAY, ['Ann'], 1); await r.fire();
       assert.equal(r.store.has('herald'), false);

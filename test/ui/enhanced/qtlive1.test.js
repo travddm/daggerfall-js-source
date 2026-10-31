@@ -1,4 +1,4 @@
-// QT-LIVE1 (Mac, 2026-09-21: "The time doesn't print out live?" - "Do it").
+// QT-LIVE1 (- "Do it").
 // The enhanced journal's "Time remains" line rendered once when the
 // panel opened and again on a click. Every host holds the quest
 // machine's tick under the pause gate (DFU's PauseGame -> timeScale 0),

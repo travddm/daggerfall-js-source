@@ -1,4 +1,4 @@
-// WATCH1 (Mac, 2026-09-17: "Guards first" - the paused online arc's first stop, "guards on a shared crime"): THE
+// WATCH1 (- the paused online arc's first stop, "guards on a shared crime"): THE
 // CRIMINAL'S WATCH RIDES THE CELL. A crime is its criminal's alone (Multiplayer.md's lock: every player runs their
 // own world), and until now so was the city watch it summoned - a peer standing beside a murderer saw the killer
 // swing at nothing while five watchmen chased them. The smaller reading lands: the watch stays the criminal's (its
@@ -40,7 +40,7 @@ import { createWeapon } from '../../../src/combat/enemyEquipment.js';
 const PUPPET_LAG_SLACK = 2 + 12 * (FOES_MS / 1000);   // the pose slack plus the fastest watchman's stride in one foes interval - past this no blow can be honest
 
 const rd = (p) => readFileSync(new URL('../../../' + p, import.meta.url), 'utf8');
-/** A watchman's kit as the producers mint one (PIN MOVED, OUTDOOR-LOOT: the body's `o` counts the PLACES a peer may take - pieces the wire can carry - so a stub `{ name }` is no pile either way and pinned nothing). */
+/** A watchman's kit as the producers mint one ( */
 const kit = () => [{ group: 'Currency', templateIndex: 276, name: 'Gold Pieces', stackCount: 7, value: 7 }, createWeapon(113, 1, () => 0.5)];
 
 // ---- the crafted data: a rat's career and the watch's class ----------------------------------------------------

@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FOLLOW (2026-10-22, design doc "DFO Staff Panel: design", Invisible follow; the law both ends run is
-// src/net/staffFollow.js) - THE RELAY'S HALF OF THE WHERE NOTE AND OF FOLLOWING A PLAYER. A module of its own, so the
+// STAFF-PANEL5-FOLLOW - THE RELAY'S HALF OF THE WHERE NOTE AND OF FOLLOWING A PLAYER. A module of its own, so the
 // hot paths in index.js carry one call each (COMMON: "the fewest lines possible in index.js").
 //
 // THE BUS (`chat:world`) keeps every account's where note on its hub socket (`pm`, the party pose - SOC1) and now its

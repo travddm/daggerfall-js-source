@@ -1,5 +1,4 @@
-// HOME-VOTE (2026-10-10, the owner: "I want to implement a house voting system within vicinity of player houses. If the
-// house votes run negative, the exterior decorations/interior decorations should not be shown to other players"). A
+// HOME-VOTE. A
 // registered account a week old votes a home up or down - one vote a home, changed or taken back at will, never on its
 // own home or a hall of its own guild (server-account/src/homeVotes.js, migration 0108; the law net/homeVoteLaw.js) -
 // standing at the house: its door's plaque lists the votes, unlit where they are all it lists, and an Info press asks
@@ -90,7 +89,7 @@ test('HOME-VOTE the law: a vote is -1, +1 or 0 (taken back); a home is shunned a
   // AUDIT D6: the words themselves
   assert.equal(REFUSALS['vote-own'], 'You cannot vote on your own home, or on the hall of your own guild.');
   assert.equal(REFUSALS['vote-rate'], 'You have voted on too many homes this hour. Try again later.');
-  assert.equal(REFUSALS['vote-young'], 'An account must have had its username and password for a week to vote on homes.');   // PIN MOVED (AUDIT HOME-VOTE II A7): a week REGISTERED
+  assert.equal(REFUSALS['vote-young'], 'An account must have had its username and password for a week to vote on homes.');
   assert.match(REFUSALS['bad-vote'], /could not read that vote/);
   assert.equal(homeVoteRefusalLine('homes-need-account'), 'Voting on homes needs a username and password. Add them to this account to vote.', 'a guest is not told about owning a home');
   assert.equal(homeVoteRefusalLine('no-home'), HOME_VOTE_GONE_LINE, 'nor that it is not theirs any more');

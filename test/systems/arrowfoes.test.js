@@ -1,4 +1,4 @@
-// AR1 - THE ARROW'S IMPACT LEARNS THE FOES (2026-08-28). MT-ii gave
+// AR1 - THE ARROW'S IMPACT LEARNS THE FOES. MT-ii gave
 // enemy archers infighting TARGET SELECTION and admitted, FLAGGED,
 // that the impact still only knew the player - an arrow loosed at
 // another foe flew true and landed nothing. The flight module tests
@@ -16,7 +16,7 @@ import { MISSILE_COLLIDER_RADIUS, ARROW_FLIGHT_SPEED } from '../../src/systems/s
 const read = (p) => readFileSync(p, 'utf8');
 
 const flight = () => new ArrowFlight({ getGpuMesh: () => null, collider: null });
-/** One step of a shaft's flight that is 1.25 units long. PIN MOVED (BAL-ARCHERY, bible/05-Combat/Balance-Arc.md
+/** One step of a shaft's flight that is 1.25 units long.
  *  section 18): a shaft flies at ARROW_FLIGHT_SPEED, so the fixtures' 0.05 s step (MISSILE_SPEED's 1.25) is read
  *  off the shaft's own speed - the geometry below stays as it was written. */
 const STEP = 1.25 / ARROW_FLIGHT_SPEED;

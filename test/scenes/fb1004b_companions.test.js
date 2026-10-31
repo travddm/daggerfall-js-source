@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-04b (Mac, from play): "Companion pathing is really rough. They're also walking towards to the wall,
-// next to the exit that leads to outside" (COMPANION-TRAIL); "Reduce companion noises, they are way too persistant"
+// FIELD BUGS 2026-10-04b ((COMPANION-TRAIL); "Reduce companion noises, they are way too persistant"
 // (QUIET-COMPANIONS); "Reduce Lysandus VENGENANCE audio" (QUIET-VENGEANCE). `01-Overview/bugs/Field-Bugs-2026-10-04.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -197,7 +196,7 @@ test('QUIET-COMPANIONS the bark: a companion waits COMPANION_ATTRACT_SCALE times
   };
   const foe = barks(false), mate = barks(true);
   const near = (t, w) => t > w - 1e-9 && t <= w + 0.1 + 1e-9;   // the first tick past the wait (0.1 s ticks)
-  // MONSTER-QUIET (2026-10-20, Dudey: "decrease the monster scream frequenzy by 60%"): a monster foe at 2.5 times its roll
+  // MONSTER-QUIET: a monster foe at 2.5 times its roll
   // (the seam's attractStep), eight in a minute where it was twenty; the companion's own six times stays as it was
   assert.ok(near(foe.at[0], MIN_ATTRACT_DELAY * FOE_ATTRACT_SCALE), `a foe at 2.5 times its roll (${foe.at[0]})`);
   assert.equal(foe.at.length, 8, 'eight in a minute');

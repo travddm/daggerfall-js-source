@@ -1,4 +1,4 @@
-// PR-WW1 (2026-09-24, player report: "Werewolf morrowind sprite not showing online"): THE BEAST THE OTHERS SEE IS THE
+// PR-WW1: THE BEAST THE OTHERS SEE IS THE
 // BEAST I SEE. A transformed player with no Morrowind body sees themselves as Eye Of The Beholder's lycanthrope
 // (archives 112380 the werewolf, 112381 the wereboar - the Bloodmoon-style render, eotbBody's lycan tables), and every
 // other player drew DISC12's classic enemy sprite (archive 264 / 269, remotePlayers' mobile): net/peer/peerRiders.js, the one
@@ -185,7 +185,6 @@ test('PR-WW1 hand-off, in world.js\'s order: once the lycanthrope is up the enem
   const LOOK = { race: 'Breton', gender: 'male', faceIndex: 0, items: [], class: 'Warrior' };
   const tex = (archive) => ({ archive, getFrameCount: () => 5, getSize: () => ({ w: 60, h: 100 }), getScale: () => ({ x: 0, y: 0 }) });
   const run = async (urlFor, shown, n = 6) => {
-    // PIN MOVED (FIELD BUGS 2026-10-22d PEER-ART): the cache records what is uploaded, as the renderer's does - the art
     // store asks it whether its texture still stands (another store may have let it go under the same key)
     const base = fakeRenderer(), textures = new Map();
     const renderer = { ...base, textures, uploadTexture: (a, rec, img) => { base.uploadTexture(a, rec, img); textures.set(`${a}_${rec}`, {}); } };

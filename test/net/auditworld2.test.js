@@ -1,4 +1,4 @@
-// AUDIT WORLD2 (Mac, 2026-09-12: "Lets do an audit on slice 2") - four
+// AUDIT WORLD2 - four
 // opus lenses over WORLD2 (the relay and the wire; the puppets; the
 // world host's lifecycle; the pins and the record), every finding
 // refuted twice and fixed on the branch. THE FIXES EXECUTE: the relay

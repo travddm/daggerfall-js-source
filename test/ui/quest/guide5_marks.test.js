@@ -1,6 +1,5 @@
-// GUIDE5 (2026-09-29, Mac: "How can we set the foundation and improve the quest system substantially? Like really
-// modernize it, make it more accessible", then, of the Quest Guide arc: "This is your baby. Take your time") - THE
-// MARKS (ui/quest/questMarks.js, bible/06-Systems/Quest-Guide-Arc.md): where a quest points, on the held map and the enhanced
+// GUIDE5 - THE
+// MARKS (ui/quest/questMarks.js): where a quest points, on the held map and the enhanced
 // compass. Its laws, each over the real producers:
 //
 //   ONLY WHAT THE MAP HOLDS - a mark stands only for a target with `find` (DFU's own find-place gate: on the player's

@@ -1,6 +1,6 @@
-// TAMRIEL3 (2026-10-08, bible/03-World/Tamriel.md) - THE MAP FROM THE PLAYER'S OWN PICTURE, pinned.
+// TAMRIEL3 - THE MAP FROM THE PLAYER'S OWN PICTURE, pinned.
 //
-// Mac: "Can we fix the map? It doesnt look like the map thats in daggerfall." The continent is TRACED from
+// The continent is TRACED from
 // TMAP00I0.IMG and TAMRIEL2.IMG when the world boots (ui/tamrielTrace.js), the Bay's place on the picture FOUND by
 // laying its own land over the picture's (world/tamriel/tamrielLand.js fitBayToPicture), and every conversion, the ink, the
 // ground and the raster follow the trace and the fit through two live homes (world/tamriel/tamrielLand.js,
@@ -262,7 +262,6 @@ test('TAMRIEL3 ground: with a trace set the height law and the climate read the 
   const [px, py] = bayToPicture(-2 + 0.5, 100 + 0.5);
   assert.ok(px < 50 && px > 40, 'west of the Bay, on Breton land');
   assert.ok(tamrielHeightByte(-2, 100) >= SHORE_BYTE);
-  // PIN MOVED (TESA-BIOME, bible/03-World/Tamriel-Biomes.md): the climate is the picture's province's ZONE's - its land the
   // trace's, its zone the nearest seed of that province (world/tamriel/tamrielBiomes.js)
   // AUDIT TESA-BIOME P6: named - the fixture's west of the Bay is Northpoint's coast, its south Hammerfell's Abecean coast,
   // its Imperial remainder the Jerall's highlands (the seeds stood on the fixture's land)
@@ -299,7 +298,6 @@ test('TAMRIEL3 ink: tracedChains links the land mask\'s pixel edges into coast c
   setTamrielTrace(trace);
   setTamrielFit({ ox: 50 * 18, oy: 40 * 18, ppu: 18 });
   const ch = tracedChains(trace);
-  // PIN MOVED (ZONE-LINE, bible/11-Multiplayer/Wild-Zone.md section 27): the Imperial Province's own coast is the open zone's
   // line - the continent's coast (Breton, the Imperial Province, Nord and Redguard joined) in two pieces ending on the
   // province's corners, the line's two coast runs (its north and south shores), two lakes, the pond
   assert.equal(ch.coast.length, 7, `${ch.coast.length} coast chains: the continent's two pieces, the Imperial Province's two shores, two lakes, the pond`);
@@ -319,7 +317,6 @@ test('TAMRIEL3 ink: tracedChains links the land mask\'s pixel edges into coast c
   assert.deepEqual(ch.labels.map((l) => l.key).sort(), ['Hammerfell', 'HighRock', 'Imperial', 'Skyrim']);
   const hr = ch.labels.find((l) => l.key === 'HighRock');
   assert.ok(hr.px > 60 && hr.px < 120 && hr.py > 40 && hr.py < 80, 'the label deep in its land');
-  // PIN MOVED (SMOOTH-LAND, test/world/smoothland.test.js): the coast the land's smooth law's own line at the map's pixel -
   // a straight run thinned to its ends, a corner a curve of its points (the zone's own runs whole)
   const pts = ch.coast.reduce((n, c) => n + c.length, 0);
   assert.ok(pts > 200 && pts < 2500, `${pts} points: the rectangles' runs thinned, their corners curves`);
@@ -388,7 +385,6 @@ test('TAMRIEL3 worker: setTamriel sets the trace and the fit on the host\'s modu
   assert.equal(groundCacheSize(), 0, 'the ground\'s cache dropped: every byte it held was the authored shape\'s');
   assert.equal(tamrielTrace().land, trace.land, 'set here');
   assert.deepEqual(tamrielFit(), { ox: 900, oy: 720, ppu: 18 });
-  // PIN MOVED (MAP-WATERS): the trace's message is no longer the last - the waters' ask follows it, the map's copy of
   // the law compiled on the far side once the trace stands there (answered 'watersInk')
   assert.deepEqual(posted[posted.length - 1], { m: { t: 'waters' }, t: undefined }, 'the waters asked after the trace');
   const last = posted[posted.length - 2];

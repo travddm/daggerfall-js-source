@@ -1,6 +1,4 @@
-// RENOWN-GATE (2026-10-12, bible/06-Systems/Revenants.md section 39; the owner: "I want to gate elite/revenant spawns
-// behind renown level and also slighty reduce the spawn rate of revnants"; asked: "Elites 5, revenants 10", offline
-// "Unchanged offline", a shared dungeon "Room's pick stands", the rate "Return chance 50% → 40%").
+// RENOWN-GATE.
 //
 // Pinned: the numbers; the one door (systems/sigil/sigil.js renownOpens - offline open, online from the Renown, never before
 // the page knows it); the elites a player stands as its own - the open world's roll, through the real spawn pool, and a

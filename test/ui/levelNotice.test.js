@@ -1,7 +1,6 @@
 // LV2 — THE RISING: the enhanced skin's level-up notification.
 //
-// Mac, 2026-09-19: "Next up, I want to implement a new element. The
-// enhanced level up notification" - and, on what it should do about
+// and, on what it should do about
 // the window that used to open itself: "Notify, then you choose",
 // over all three events.
 //
@@ -239,7 +238,7 @@ test('LV2: the ENHANCED skin ANNOUNCES, and the window does not open itself', ()
   destroyLevelNotices();
 });
 
-// ── AUDIT LV2 (2026-09-19), the pre-merge sweep ───────────────────
+// ── AUDIT LV2, the pre-merge sweep ───────────────────
 
 test('AUDIT LV2 (reopened): the bonus pool is the LEVEL\'s, so re-opening the window cannot re-roll it', () => {
   // AUDIT LV2 recorded this rather than fixing it - FormulaHelper's
@@ -465,8 +464,7 @@ test('LV2: the element reads no game data, and says so in the port\'s own words'
   destroyLevelNotices();
 });
 
-// LV3 (Dudey, 2026-09-19: "a button to open the levelup screen again once closed - you can't open it again when
-// you level up"). The enhanced skin only. The level's row on the strip is a BUTTON when the sheet action has a key,
+// LV3. The enhanced skin only. The level's row on the strip is a BUTTON when the sheet action has a key,
 // pressing that key through ui/levelUp/levelUpOpener.js - which is what opens the window in all four hosts - never a host's
 // slot.
 test('LV3: the level row is a button that presses the sheet key, and the key-less row stays a plain line', async () => {

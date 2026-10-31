@@ -1,4 +1,4 @@
-// GPU-TRAIL (2026-10-24, src/render/gpuTrail.js): the page's half of the GPU's last samples, kept beside a crash. The
+// GPU-TRAIL: the page's half of the GPU's last samples, kept beside a crash. The
 // count, the ring, the sample and the running trail are executed - the count against the real Renderer's constructor,
 // so it is the renderer's own first object it must see; the entry's wiring is pinned by source (it needs a browser and
 // the shell). The shell's half is test/tooling/gputrail_crashlog.test.js.
@@ -88,11 +88,10 @@ test('GPU-TRAIL a sample: the counts, the fps counter\'s second rounded, the hea
   assert.deepEqual(gpuSample({ at: 1_000, upMs: 1_234_567, live, frame, heap: 512 * 1048576 + 1, hidden: false, lost: true }), {
     at: 1_000, upS: 1235, textures: 812, buffers: 2300, vaos: 1100, framebuffers: 24, programs: 140,
     fps: 59, frameMs: 16.9, worstMs: 33, hitchMs: 122, draws: 431, binds: 900, viewDraws: 0, shadowDraws: 120, heapMB: 512, hidden: false, lost: true,
-    restored: false,   // PIN MOVED (GPU-TRAIL-LOST, 2026-10-25): the sample taken as the context comes back says so
+    restored: false,
   });
   const none = gpuSample({ at: 2_000, upMs: 0, live, frame: null, heap: null, hidden: true, lost: false });
   assert.deepEqual([none.fps, none.frameMs, none.worstMs, none.hitchMs, none.draws, none.heapMB, none.hidden], [null, null, null, null, null, null, true]);
-  // PIN MOVED (GPU-TRAIL-LOST): a minute with no hitch is a number the counter has - 0, not '-' in crash.log
   assert.equal(gpuSample({ at: 0, upMs: 0, live, frame: { fps: 60, hitch: null }, heap: null, hidden: false, lost: false }).hitchMs, 0, 'no hitch in the minute');
 });
 
@@ -119,7 +118,7 @@ test('GPU-TRAIL running: the first sample soon, then one every GPU_TRAIL_MS and 
   live.textures = 9; lost = true;
   canvas.dispatchEvent(new Event('webglcontextlost'));
   assert.deepEqual(sent[2].samples.map((s) => [s.textures, s.lost]), [[3, false], [3, false], [9, true]], 'the loss sampled at once, with the trail before it');
-  // GPU-TRAIL-LOST (2026-10-25): the context given back is sampled at once and says so; no other sample does
+  // GPU-TRAIL-LOST: the context given back is sampled at once and says so; no other sample does
   lost = false;
   canvas.dispatchEvent(new Event('webglcontextrestored'));
   assert.deepEqual(sent[3].samples.map((s) => [s.lost, s.restored]), [[false, false], [false, false], [true, false], [false, true]], 'the restore sampled at once, marked restored');

@@ -1,5 +1,4 @@
-// WW-R (2026-10-24, bible/03-World/World-Wide.md WW-R): THE PROVINCES AS REGIONS - the owner: "Separate regions make
-// sense". Each province past the Iliac Bay a region of its own after the Bay's 62; Daggerfall stays High Rock's.
+// WW-R: THE PROVINCES AS REGIONS. Each province past the Iliac Bay a region of its own after the Bay's 62; Daggerfall stays High Rock's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -140,7 +139,6 @@ test('WW-R the stores a region keeps: the law\'s, the banks\' and the houses\' t
 test('WW-R the account service: a node\'s region any of the world\'s (a province\'s ground gathered); the books a town keeps the Bay\'s 62, their tables\' CHECKs\' - by name in every one (mutants: the node\'s region the Bay\'s, a town book the world\'s)', () => {
   assert.deepEqual([regionOk(0), regionOk(61), regionOk(64), regionOk(70), regionOk(71), regionOk(-1)], [true, true, true, true, false, false]);
   assert.deepEqual([bayRegionOk(0), bayRegionOk(61), bayRegionOk(62), bayRegionOk(70)], [true, true, false, false]);
-  // PIN MOVED (WW7-5, World-Wide.md WW7-5): the town books every region's - the world's towns past the Bay stand (ww7_books.test.js)
   for (const f of ['market', 'writs', 'contracts', 'npcReceipts', 'npcHalls', 'npcChapters', 'seaBounty']) {
     const s = src(`server-account/src/${f}.js`);
     assert.match(s, /regionOk\b[^\n]*\} from '\.\.\/\.\.\/src\/net\/nodeLaw\.js'/, `${f}: the world's regions`);
@@ -152,13 +150,13 @@ test('WW-R the relay: a province\'s channel opens (PROVINCE-SLEEP: unsplit) wher
   assert.equal(CHAT_REGION_COUNT, REGION_NAMES.length, 'pinned equal (not imported: the relay\'s graph)');
   assert.equal(REGION_CHANNELS, CHAT_REGION_COUNT);
   assert.equal(CHAT_BAY_REGIONS, BAY_REGION_COUNT);
-  assert.equal(SD_REGION_COUNT, CHAT_REGION_COUNT);   // PIN MOVED (WW5, bible/03-World/World-Wide.md WW5): the census counts every region's channel - each lane its own regions (net/superDungeon/sdLaw.js sdLaneRegions), a crowd in Skyrim drawing Skyrim's Hollow
+  assert.equal(SD_REGION_COUNT, CHAT_REGION_COUNT);
   for (let r = 0; r < 71; r++) {
     assert.equal(isChatRoom(chatRegionRoom(r)), true, `region ${r}`);
-    for (let k = 0; k < 4; k++) assert.equal(isRegionShard(regionShardRoom(r, k)), r < 62);   // PIN MOVED (PROVINCE-SLEEP): a province's channel is one, unsplit (test/net/sleepcost.test.js)
+    for (let k = 0; k < 4; k++) assert.equal(isRegionShard(regionShardRoom(r, k)), r < 62);
   }
   assert.deepEqual([chatRegionRoom(64), chatRegionRoom(64, false), chatRegionRoom(17, false), chatRegionRoom(71)], ['chat:region.64', null, 'chat:region.17', null]);
-  assert.equal(PROVINCE_REGIONS_RELAY_MIN, WORLD_WIDE_RELAY_MIN);   // PIN MOVED (AUDIT TESA II Z2): 256 (world255 on its branch), then 260 at the merge with main - one number now, the world-wide relay's
+  assert.equal(PROVINCE_REGIONS_RELAY_MIN, WORLD_WIDE_RELAY_MIN);
   assert.deepEqual([relaySupportsProvinceRegions(`world${WORLD_WIDE_RELAY_MIN - 1}`), relaySupportsProvinceRegions(`world${WORLD_WIDE_RELAY_MIN}`), relaySupportsProvinceRegions(RELAY_VERSION)], [false, true, true], 'the relay before the world-wide one opens no province\'s channel');
   const ship = (region) => ({ n: 1, classId: 'merchantGalleon', variant: 0, pos: [0, 0, 0], yaw: 0, speed: 0, sails: 0, hull: 1, sail: 1, crew: 1, state: 'afloat', heel: 0, seed: 5, gen: 0, region });
   const word = navalWireRecord({ ships: [ship(64), ship(17)] });

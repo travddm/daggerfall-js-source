@@ -1,7 +1,7 @@
-// NAV-C (2026-09-28, Mac: "introduce actual sailing ships to the world that players can encounter and pillage") -
+// NAV-C -
 // THE SHIPS OF THE ILIAC BAY: the classes and what they sail, their names and captains, the crowns whose waters
 // these are; the captains' seamanship and gunnery; the traffic that brings them over the horizon
-// (bible/03-World/Naval-Combat.md NAV-C). Pure modules, driven directly.
+// (NAV-C). Pure modules, driven directly.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -32,9 +32,7 @@ const player = (pos, o = {}) => ({ id: 'me', kind: 'player', pos, vel: [0, 0, 0]
 // ── the classes ─────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('NAV-C the classes: nine in three trades, each a hull with guns scaled off its build, one pirate flagship, the galleys fighting over the stem; classFor draws among the classes a level has reached by weight, the draw\'s edges exact (mutants: the level gate off, a weight ignored, the edge off by one)', () => {
-  // PIN MOVED (ETHER-LEGENDS, bible/03-World/Eltheric-Ocean.md): the nine the sea draws, and the Eltheric Ocean's six legends
   // after them - each her own class, never drawn (LEGEND_LEVEL), launched by name in her haunt
-  // PIN MOVED (FISH-BOATS, Naval-Combat.md): and a port's two fishing boats last - never drawn (FISHER_LEVEL), a port's fleet
   assert.equal(SHIP_CLASSES.filter((c) => !c.legend && !c.fisher).length, 9);
   assert.equal(SHIP_CLASSES.length, 17);
   assert.deepEqual(SHIP_CLASSES.slice(15).map((c) => [c.id, c.faction, c.hull, c.minLevel, c.weight, c.fisher]), [['fishingSkiff', 'merchant', HULL.Rowboat, LEGEND_LEVEL, 0, true], ['fishingSmack', 'merchant', HULL.LargeBoat, LEGEND_LEVEL, 0, true]]);
@@ -88,7 +86,7 @@ test('NAV-C names off the seed: the same seed names the same ship and captain on
   const b = shipNames(classById('navyCutter'), 0xabc123, { regionIndex: 23, crown: wayrest });
   assert.deepEqual(a, b, 'deterministic');
   assert.equal(a.crown, 'Wayrest');
-  // SHIP-NAMES (2026-10-02) PIN MOVED: a navy ship's name is of her crown's forms - never another crown's words
+  // SHIP-NAMES
   const others = CROWNS.filter((c) => c !== wayrest).flatMap((c) => [...c.ships, ...CROWN_LORE[c.name].royals.filter((r) => !CROWN_LORE.Wayrest.royals.includes(r)), ...CROWN_LORE[c.name].places.filter((q) => q !== 'Sentinel')]);   // "Wayrest Sentinel" is Wayrest's own
   for (let i = 0; i < 300; i++) {
     const n = shipNames(classById('navyCutter'), i * 104729 + 3, { regionIndex: 23, crown: wayrest }).name;
@@ -190,7 +188,7 @@ test('NAV-C a captain at sea: with no enemy she cruises for a waypoint on open w
   near(s.speed, ACCEL * 1, 1e-12, 'a heavy hull gathers way at half; a brigantine at ACCEL');
   assert.deepEqual(out, { volleys: [], barrels: [], grapple: null, runOuts: [] });
   // the player abeam to starboard, within her reach
-  // SEA-EASE (PIN MOVED): a bold pirate named - seed 6's own draw is wary under BOLD_SHARE's quarter, and a wary one
+  // SEA-EASE (
   // never takes a boat she cannot size up; the engagement is this pin's, the temper seapeace's
   const b = createSeaShip({ id: 'b', seed: 6, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });
   assert.ok(broadsideReach(b, 0) > 150, `her long guns reach ${broadsideReach(b, 0)} m`);
@@ -210,13 +208,13 @@ test('NAV-C a captain at sea: with no enemy she cruises for a waypoint on open w
   assert.equal(b.guns.ready('starboard'), false, 'reloading');
   assert.equal(b.guns.ready('port'), true);
   // the same player far out of reach: no volley, she closes
-  const f = createSeaShip({ id: 'f', seed: 7, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });   // SEA-EASE (PIN MOVED): bold, as b
+  const f = createSeaShip({ id: 'f', seed: 7, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });     // SEA-EASE (
   const fo = stepCaptain(f, world({ contacts: [player([600, 0, 0])] }));
   assert.equal(f.mode, 'engage');
   assert.equal(fo.volleys.length, 0);
   assert.ok(600 < ENGAGE_RANGE && 600 > broadsideReach(f, 0));
   // past ENGAGE_RANGE she does not see a fight
-  const g = createSeaShip({ id: 'g', seed: 8, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });   // SEA-EASE (PIN MOVED): bold, or her cruise says nothing of the reach
+  const g = createSeaShip({ id: 'g', seed: 8, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });     // SEA-EASE (
   stepCaptain(g, world({ contacts: [player([ENGAGE_RANGE + 10, 0, 0])] }));
   assert.equal(g.mode, 'cruise');
   assert.ok(BEAR_DEG > 0 && batteryReach(g, 'stern', 0) === 0, 'a barrel battery has no reach of its own');
@@ -224,7 +222,7 @@ test('NAV-C a captain at sea: with no enemy she cruises for a waypoint on open w
 
 test('NAV-C how she fights: a broadside ship turns her side to an enemy off the bow, a galley her stem - her great guns laid on the lead (mutants: the tactic ignored, the side\'s sign)', () => {
   const at = [100 * Math.sin(20 * NAVAL_DEG), 0, 100 * Math.cos(20 * NAVAL_DEG)];   // 100 m, 20 degrees to starboard
-  // SEA-EASE (PIN MOVED): both bold - seeds 1 and 2 draw wary, and a wary pirate never takes a boat she cannot size up:
+  // SEA-EASE (
   // both CRUISED, and the turns read here were their waypoints'
   const brig = createSeaShip({ id: 'b', seed: 1, classId: 'pirateBrig', pos: [0, 0, 0], yaw: 0, temper: 'bold' });
   stepCaptain(brig, world({ contacts: [player(at)] }));
@@ -364,7 +362,7 @@ test('NAV-C the director keeps the density and lets ships go: none rolled while 
 
 test('NAV-C who sails: the open bay\'s weights, a port adding merchants and the navy, a notorious captain drawing HUNTERS - a navy ship laid straight at the player; one pirate flagship at a time (mutants: the port weights dropped, the hunter not aimed, two flagships)', () => {
   assert.deepEqual(factionWeights(), { ...FACTION_WEIGHTS });
-  // SEA-EASE (PIN MOVED): a port's waters cut the pirates' weight to PORT_PIRATE_K - the crown's own waters
+  // SEA-EASE (
   assert.deepEqual(factionWeights({ nearPort: true }), { pirate: FACTION_WEIGHTS.pirate * PORT_PIRATE_K, merchant: FACTION_WEIGHTS.merchant + PORT_WEIGHTS.merchant, navy: FACTION_WEIGHTS.navy + PORT_WEIGHTS.navy });
   assert.equal(factionWeights({ notoriety: HUNTER_AT }).navy, FACTION_WEIGHTS.navy + HUNTER_WEIGHT);
   assert.equal(factionWeights({ notoriety: HUNTER_AT - 1 }).navy, FACTION_WEIGHTS.navy);

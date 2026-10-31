@@ -1,5 +1,4 @@
-// DISC24-D (2026-09-24, Lynk on Discord, "Stuck in death loop": "After leveling up to 5 online and putting stats in my
-// character had low health so I rested then when I woke up it was stuck in a constant death loop").
+// DISC24-D.
 //
 // THE LOOP: a live stat at 0 kills every 0.2 real seconds whatever the health (systems/statMods.js
 // killIfAnyLiveStatZero - DFU's UpdateEntityMods tail). A disease's daily roll accumulates UNBOUNDED negative statMods

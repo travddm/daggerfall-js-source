@@ -1,6 +1,6 @@
-// WEREWOLF1 — BLOODMOON'S WEREWOLF, IMPORTED (2026-09-26).
+// WEREWOLF1 — BLOODMOON'S WEREWOLF, IMPORTED.
 //
-// Mac, of SirMcMobdon's werewolf skin: "it's the 3d model", "Might need to grab OpenMW for this", "Well it needs to
+// "Might need to grab OpenMW for this", "Well it needs to
 // be imported if its not. It shouldnt be skipped". The Morrowind rig had scoped the werewolf out (fpArm.js, rule 6);
 // this is the werewolf OpenMW draws, read off its source (apps/openmw/mwrender/npcanimation.cpp, actorutil.cpp,
 // mwmechanics/mechanicsmanagerimp.cpp):
@@ -167,7 +167,7 @@ test('WEREWOLF1 (AUDIT C2) a robe with no MODL: Clothing::load reads MODL as opt
   assert.equal(robe?.model, '', 'kept, with no ground mesh');
   assert.equal(robe.parts.length, 5);
   assert.deepEqual(extractArmRecords(fx.esm).clothes.map((c) => c.id), clothingRecords(fx.esm).map((c) => c.id), 'the derived set reads the same');
-  assert.ok(ARM_RECORDS_VERSION > 2, 'a set extracted before is refused and extracted again');   // PIN MOVED (MW-SPELLFX1): C2 moved the version to 3 and the magic effects on to 4 - the law is C2's, past 2
+  assert.ok(ARM_RECORDS_VERSION > 2, 'a set extracted before is refused and extracted again');
   const res = await buildFpArm({ race: 'fprace', werewolf: true, deps: fx.deps });
   assert.equal(res.ok, true, `${res.stage}: ${res.error}`);
   assert.equal(res.third?.ok, true);
@@ -343,7 +343,6 @@ test('WEREWOLF1 a peer: the pose\'s `wb` 1 builds the wolf (holding nothing), ke
   assert.equal(o.werewolf, true); assert.equal(o.weapon, null, 'the sword in the look is not the wolf\'s');
   assert.equal(peerBuildOpts(LOOK, { wb: 0 }).weapon?.templateIndex, 120, 'the person holds it');
   assert.equal('werewolf' in peerBuildOpts(LOOK, { wb: 2 }), false, 'the wereboar: the person\'s opts, unchanged');
-  // PIN MOVED (MW-CROWD, FIELD BUGS 2026-10-01 #8): a person's key is the look's own LESS ITS WEAPONS - the hand is the
   // arm's live door (setWeapon), so a sword drawn is no new body (test/net/peer/fb1001_mwcrowd.test.js)
   const unarmed = lookKey({ ...LOOK, items: LOOK.items.filter((it) => it.group !== 'Weapons') });
   assert.equal(peerBodyKey(LOOK, { wb: 0 }), unarmed, 'a person\'s key is the look\'s own, less its weapons');

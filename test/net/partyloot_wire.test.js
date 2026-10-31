@@ -1,4 +1,4 @@
-// PARTY-LOOT OVER THE WIRE - the room's shared base and the host's arbitration (bible/06-Systems/Online-Arc.md
+// PARTY-LOOT OVER THE WIRE - the room's shared base and the host's arbitration (
 // PARTY-LOOT), driven through the network path the game runs instead of a queue. test/systems/partyloot.test.js holds the law
 // between two mounted peers whose frames a queue hands across; here nothing between the two players stands in:
 //   - each player is the dungeon's REAL loot doors and the PARTY-LOOT block (createRoomLoot, sliced from
@@ -34,7 +34,7 @@ import * as acorn from 'acorn';
 import { OnlineSession, FOES_MS, FOES_FULL_MS } from '../../src/net/online.js';
 import { isWorldRoom, isCellRoom, actFrameFits, ACT_HZ_MAX, respawnDue, sharedClassicMinutes, validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, FOES_FRAME_MAX, FOES_STALE_MS } from '../../src/net/wire.js';
 import { quietFoesGate } from '../../src/net/foesQuiet.js';
-import { createSeatClock } from '../../src/net/seatLive.js';   // PIN MOVED: FIELD BUGS 2026-10-18d SEAT-LIVE - onFoes tells the seat clock it heard the seat (world.js `seatClock`), where it stamped `_foesInAt`
+import { createSeatClock } from '../../src/net/seatLive.js';
 import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';
 import { generateItems, addPileLootExtras, validLootList, LOOT_LIST_MAX, DUNGEON_LOOT_KEYS, LOOT_NEWER_TEXT } from '../../src/systems/loot/loot.js';
@@ -46,7 +46,7 @@ import { planTake, applyTransfer } from '../../src/systems/item/itemTransfer.js'
 import { spawnEnemyLoot, wildLootAfter, rollRoomBonus } from '../../src/scenes/hostCombat.js';
 import { raiseEnemyDeath, corpseTextureOf } from '../../src/scenes/corpseMarker.js';
 import { rollCorpseKit, capFoeLoot } from '../../src/systems/foeLootCap.js';
-import { championTraitFor } from '../../src/systems/champions.js';   // PIN MOVED (CHAMP-BASE): the room block's import - a body's mark at the room's level
+import { championTraitFor } from '../../src/systems/champions.js';
 import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { effectiveLevel } from '../../src/systems/mentorMode.js';
@@ -62,8 +62,8 @@ import { installRestItemLoot, isDeepPileKey } from '../../src/systems/rest/restI
 import { installSurvivalLoot } from '../../src/systems/survival/loot.js';
 import { grantEliteLoot } from '../../src/systems/eliteFoes.js';
 import { wildPileMore } from '../../src/systems/wild/wildZone.js';
-import { seaPileMore } from '../../src/systems/sea/seaSpoils.js';   // PIN MOVED (SEA-SET): the room's base rolls the deep's Tidemail last (roomLootHost.js)
-import { markRoomCarried } from '../../src/systems/loot/roomCarriedList.js';   // PIN MOVED (GOLD-WIRE): the room block marks the list it composes (roomLootHost.js)
+import { seaPileMore } from '../../src/systems/sea/seaSpoils.js';
+import { markRoomCarried } from '../../src/systems/loot/roomCarriedList.js';
 import { asTheRoom } from '../../src/systems/online/onlineLane.js';
 import { withRollerLevel } from '../../src/systems/loot/lootLevelGate.js';   // AUDIT UPDATE L1: the room's base at the room's level (roomLootHost.js rollRoomBase)
 import { CLAIM_KEEP_MS, CLAIMS_KEPT_MAX } from '../../src/systems/loot/claimLedger.js';
@@ -73,7 +73,7 @@ const { ROOM_PUT_RESAY_MS } = RL;
 import { fakeRoom } from '../fakeRoom.mjs';
 import '../../src/scenes/physicalItemsLayer.js';   // PI1's
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
-import { appliedOwnerTm } from '../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount
+import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
 
@@ -183,7 +183,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     try { return fn(); } finally { Math.random = realRandom; }
   };
   const state = {
-    appliedOwnerTm,   // PIN MOVED (OWNER-CLOCK): the stream door's frame clock (net/ownerClock.js) - null outside a frame
+    appliedOwnerTm,
     foes: [], _layoutFoes: nFoes, _sharedById: new Map(), lootPiles: [], searchables: [], _locationKey: ROOM,
     _lootSeen: new Set(), _lootUnreadable: new Set(), _lootAt: new Map(), _lootOpenKey: null, _lootTooBig: new Set(),
     _authority: authority, playerEntity: player, dfLocation: { mapTableData: { dungeonType: DUNGEON_TYPE } }, lootKey: DUNGEON_LOOT_KEYS[DUNGEON_TYPE],

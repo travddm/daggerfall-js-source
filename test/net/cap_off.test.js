@@ -1,5 +1,4 @@
-// CAP-OFF (2026-10-07, Mac: "Remove the cap on life skills"; asked which - the daily harvest cap - and whether the two
-// bounds a modified client's claim needs go with it - "Keep both"). A gathering profession gave a character 60 harvests a
+// CAP-OFF. A gathering profession gave a character 60 harvests a
 // UTC day (the Basket's among Herbalism's) and an account 120 in a craft (AUDIT 29 A3); Fishing 40 hauls an account;
 // Hunting 30 hides. Past them the service refused (`prof-cap`, `prof-account-cap`, `prof-fish-cap`, `prof-hunt-cap`), the
 // node's prompt said "60 of 60 today", the book closed the craft for the day, and the chip under the compass read
@@ -112,7 +111,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
     assert.equal((await skin(MOB.Rat)).status, 200, 'a hide below the rare');
 
     // KEPT: the veins in dungeons nobody has vouched for - four, the fifth refused, past every old day of Mining
-    setXp('mining', xpForRank(70));   // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): such a vein draws the whole deep table, tiers 3-6
+    setXp('mining', xpForRank(70));
     for (let i = 0; i < DEEP_UNCONFIRMED_PER_DAY; i++) {
       const r = await harvest({ node: dveinKey({ dungeon: 888000 + i, day, slot: 0 }), kind: 'ore', climate: MOUNTAIN, region: WAYREST, act: {} });
       assert.equal(r.status, 200, JSON.stringify(r.body));
@@ -256,7 +255,6 @@ test('CAP-OFF the words: the four refusals the service says no more keep their w
   assert.equal(accountRefusalText('prof-fish-cap'), 'Your account has hauled all the nets a day allows, across your characters. The water rests until midnight UTC.');
   assert.equal(accountRefusalText('prof-hunt-high'), `Your account has taken all the rare hides a day allows (${HIGH_HIDES_PER_DAY}, across your characters).`);
   const daily = eventTimerRows({ now: Date.UTC(2026, 9, 7, 12) }).find((r) => r.id === 'daily');
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - silver, never Marks; marked by AUDIT GUILD3 R4
   assert.equal(daily.detail, 'Gathering nodes come back. Daily limits reset for rare hides, silver and Court writs');
   assert.match(eventTimerRows({ now: Date.UTC(2026, 9, 7, 12), seatsOpen: true }).find((r) => r.id === 'daily').detail, /Court writs, and the Watch$/);
 });

@@ -1,4 +1,4 @@
-// INT18 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7): THE LEGACY RECORD HELD TO
+// INT18: THE LEGACY RECORD HELD TO
 // ITS OWN LAW. A line's copy at the realm (server-account/src/legacy.js putLineage) is asked the family law's bounds
 // (src/systems/legacy/legacyLaw.js - a member's blood and hearth, the waiting estate) and, beside the stored copy it was
 // made from, the facts store.js mergeFacts only ever adds (a member, a death, a retirement, a fallen's remains). A copy

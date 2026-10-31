@@ -1,9 +1,9 @@
-// QL11 (bible/06-Systems/Questlines-Arc.md section 4.5): THE ACTS - what the player did in one of the game's features,
+// QL11: THE ACTS - what the player did in one of the game's features,
 // said in one line where it is FINISHED (systems/questlines/qlActs.js noteAct) and heard by every running stamped quest.
 // The pins: the sweep, both ways (every kind has its producer, every producer names a kind, and every call names its
 // kind as a literal - so this sweep can read it); the leaf's own law; and the producers whose moment a node can drive,
 // each heard once, and nothing heard when the moment did not come.
-// AUDIT QUESTLINES ACTS-3 (2026-10-19): EVERY PRODUCER DRIVEN - the lane found 19 of the 31 sites driven by no case here
+// AUDIT QUESTLINES ACTS-3: EVERY PRODUCER DRIVEN - the lane found 19 of the 31 sites driven by no case here
 // and 15 probe mutants (its M1-M15) living through this file; each site now has its case below, through its own module
 // as the gate's case drives gateClaims, and each names the mutants it kills (`ACTS Mn` the lane's). ACTS-4/5/6/8 pinned too.
 import '../../modsOff.js';
@@ -135,7 +135,7 @@ test('QL11 the kinds: ACT_IDS is the leaf\'s keys, frozen; each kind lower-case 
   assert.ok(Object.isFrozen(ACT_KINDS) && Object.isFrozen(ACT_IDS));
   for (const k of ACT_IDS) assert.match(k, /^[a-z]+(-[a-z]+)*$/, k);
   for (const k of ACT_IDS) assert.ok(typeof ACT_KINDS[k] === 'string' && ACT_KINDS[k].length > 0, `${k} has its family`);
-  assert.equal(ACT_IDS.length, 22);   // PIN MOVED (Elite Gates removed): redoubt-taken and valkynaz-felled gone; PIN MOVED (STAR8): and star-held, a fallen star held; PIN MOVED (AUDIT STAR8 T1): and wyrd-met, a Wyrd Sister's window; PIN MOVED (T-A): and heart-star-held, the Heart-Star held
+  assert.equal(ACT_IDS.length, 22);
   assert.equal(ACT_KINDS['heart-star-held'], ACT_KINDS['star-held'], 'T-A: the Heart-Star\'s act the endgame\'s, as its star\'s - one family, so the festival\'s finds hear the two as one deed');
   assert.ok(!Object.hasOwn(ACT_KINDS, 'wagon-hauled'), 'no feature sells a wagon\'s load (qlActs.js says why)');
 });
@@ -276,7 +276,6 @@ test('QL11 port-reached (scenes/harbourOffice.js): a berth at another port than 
     L.sailed(PORT_VOYAGE_M * 4);
     berth(o, WAYREST);
     assert.equal(heard.length, 1, 'out and home to the same port: no port reached');
-    // PIN MOVED (FIELD BUGS 2026-10-21b VOYAGE-HOLD): a load keeps the voyage its save was on - the departure is its log's
     // own (it had read the first berth after a load as only where she lies, and a relog or a crash between two ports lost
     // the voyage) - and a departure past its log's way is no departure
     L.sailed(PORT_VOYAGE_M / 2);

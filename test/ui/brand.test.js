@@ -1,8 +1,4 @@
-// BR1 - DAGGERFALL ENHANCED (2026-09-13, Mac: "I want to rebrand across
-// the board as Daggerfall Enhanced ... Daggerfall Enhanced / An
-// open-source reimplementation of The Elder Scrolls II: Daggerfall. We
-// need to tackle any javascript mention across the website, game, and
-// note this in the bible").
+// BR1 - DAGGERFALL ENHANCED.
 //
 // THE NAME HAD NO PIN AT ALL. The rebrand touched nine surfaces - the
 // landing page's title, wordmark and cards, the game page, the PWA
@@ -28,20 +24,12 @@
 // tree, so each is pinned as deliberately unchanged rather than left to
 // look like an oversight.
 //
-// BR4 - DAGGERFALL ONLINE (2026-09-27, Mac: "I want to rebrand Daggerfall:
-// Enhanced to Daggerfall Online across every surface of the game and
-// website. The logo attached is the new temporary logo ... (Don't forget
-// about the intro video also)"). The same surfaces again, pinned HERE
+// BR4 - DAGGERFALL ONLINE. The same surfaces again, pinned HERE
 // again: NAME below is the only line that says what the product is called,
 // and the old name is swept for in both its whole and its split forms.
 // The logo is Mac's own transparent cut, drawn with no blend mode.
 //
-// BR5 - DFO ONLINE (2026-10-11, Mac: "So next up I want to replace the current
-// daggerfall online logo anywhere it's present with this logo. I want to
-// comprehensively scan the repo, ingame, etc for any mentions of
-// daggerfall/daggerfall online and change it to DFO Online/DFO. We are
-// rebranding for our own sake and I want to do this right"; asked how far, he
-// chose to MINIMIZE the original game's name too). Three laws now, each
+// BR5 - DFO ONLINE. Three laws now, each
 // pinned below: the PRODUCT is DFO Online (DFO where a label is short); the
 // ORIGINAL GAME is named only where it must be - the files a player brings,
 // the credits and the licence, the trademark notice, and the world's own

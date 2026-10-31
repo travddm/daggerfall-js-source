@@ -4,7 +4,6 @@
 // faced the target's live feet, where DFU's MeleeAnimation faces senses.LastKnownTargetPos (EnemyAttack.cs:155), which
 // only a detection writes. A foe a corridor put in front of an invisible player swung, and the blow landed. And the
 // wild gate's notice roll (WILD-ALERT) ran the stealth formula with no illusion gate at all.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-15f.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

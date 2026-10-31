@@ -1,7 +1,4 @@
 // FT1 - SMALLER DUNGEONS, THE FIRST ROW ON THE FEATURES HOME
-// (2026-09-14, Mac: "smaller dungeons should be a genuine enhanced
-// feature that we can build on instead of being hidden in the settings
-// menu ... go one by one, ensure proper detail and development").
 //
 // The 1:1 port (AUDIT 28 W4, audit28_smallerdungeons.test.js) was read
 // again against its consumers and two things were wrong at the seams:
@@ -69,7 +66,7 @@ test('FT1: the departure, driven - online builds the room\'s size whatever the s
     // in the full layout and this build is the plus.
     assert.equal(needsStartWarp(smallerDungeonsStamp(online), offline), true, 'the case DFU\'s raw-setting stamp missed');
     assert.equal(needsStartWarp(smallerDungeonsStamp(offline), offline), false, 'and a save made offline loads offline without a warp');
-    // SD-ONLINE (PIN MOVED): online every dungeon has the world's own size now - this seven-block dungeon's draw is the
+    // SD-ONLINE (
     // medium size, which it is at or under, so it stands whole online (above); a bigger one is laid medium, and its
     // stamp says the build
     const huge = loc([...BIG, 'W0000007.RDB', 'B0000008.RDB', 'B0000009.RDB']);
@@ -107,7 +104,7 @@ test('FT1: the registry row - DFU Classic, over the settings key, sound', () => 
   assert.deepEqual(f.kinds, ['classic'], 'DFU\'s own feature; it wears Enhanced too the day the port builds on it');
   assert.deepEqual(f.control, { store: 'settings', key: 'Experimental/SmallerDungeons' });
   assert.equal(f.title, 'Smaller dungeons');
-  assert.match(f.note, /five blocks/); assert.match(f.note, /Main-story dungeons keep full size; a quest keeps the size it was set up at/);   // AUDIT SD III (SD20g D8, PIN MOVED): the law - a quest started with the switch on builds small after it is turned off
+  assert.match(f.note, /five blocks/); assert.match(f.note, /Main-story dungeons keep full size; a quest keeps the size it was set up at/);     // AUDIT SD III (SD20g D8
   assert.match(f.note, /Online every dungeon has its own size instead\./, 'SD-ONLINE (PIN MOVED): online the world\'s size for each dungeon, which is not this switch');
   assert.match(f.effect, /next dungeon you enter/);
   assert.deepEqual(checkFeature(f), []);

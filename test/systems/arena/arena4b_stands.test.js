@@ -1,4 +1,4 @@
-// ARENA4b (2026-10-03): THE STANDS AND THE BANNERS ON A RELAY'S SAND, DRIVEN - the spectator's two presses on the bout's HUD
+// ARENA4b: THE STANDS AND THE BANNERS ON A RELAY'S SAND, DRIVEN - the spectator's two presses on the bout's HUD
 // (ui/arena/arenaHud.js: the model, the DOM, the keys, the allowance), my cheer or boo down a watched bout's room over the real
 // relay (scenes/arena/arenaBouts.js cheer, scenes/arena/arenaOnline.js send.cheer, server/src/index.js over test/fakeRoom.mjs) and my own
 // crowd moved at once without hearing my echo twice, and the realm's banners and laurel on a relay's sand and on this

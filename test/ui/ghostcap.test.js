@@ -1,6 +1,4 @@
-// GHOST-CAP and GHOST-DIM (2026-10-02, Discord "Fatigue Bar": "When you get your Fatigue damaged while fighting
-// Daedra, the pending change on the fatigue bar is white. It's really hard to see it if you are not looking at it
-// directly, and you can die from it while fighting. Please lower the opacity for the damaged part of the bar.") -
+// GHOST-CAP and GHOST-DIM -
 // every fresh loss restarted the strip's hold, so a bar losing a little every few frames never drained it: fatigue
 // through a fight read as the fight's first level, in the bar's palest tone under a cream line at 0.55 - a white bar
 // still full. Now the strip stands GHOST_HOLD_MAX at the most, however the losses come, and wears the bar's own body

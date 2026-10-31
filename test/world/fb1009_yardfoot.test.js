@@ -98,7 +98,6 @@ test('FB1009 HOME-FOOT the lot asks the house\'s ground, not its box: the step b
   assert.equal(yardWhyNot([-1.8, 0, 0], lot, []), YARD_IN_HOUSE, 'a point on the seam between the leg and the back: inside, though the pad takes in both');
   // a neighbour's L, the same: its open corner the owner's lot may hold, its roofs never
   const others = [[4.5, -3.6, 8.1, 0], [4.5, 0, 11.7, 3.6]];   // an L like it, 8.1 m east of its frame, its corner at x 8.1 to 11.7, z -3.6 to 0
-  // PIN MOVED (HOME-LINE, FIELD BUGS 2026-10-11b): the neighbour's open corner is no building's ground, and it is nearer
   // the neighbour's than the owner's - the ground between two houses is split down its middle, so it is theirs
   assert.equal(yardWhyNot([8.6, 0, -1.2], lot, others, CHAIR), YARD_ON_OTHER, 'a neighbour\'s open corner, within the lot, is the neighbour\'s side of the line');
   assert.equal(yardWhyNot([8.6, 0, -1.2], lot, [], CHAIR), null, 'and no building\'s ground of itself');
@@ -203,7 +202,6 @@ test('FB1009 HOME-FOOT the report on the real decorator: the owner of an L-shape
   const mine = town.built.homeFrames.get(A);
   assert.deepEqual(r3([[theirs.at[0] - mine.at[0], theirs.at[2] - mine.at[2]]]), [[9, 0]], 'nine metres east of the owner\'s');
   assert.deepEqual(r3(theirs.rects.map((q) => [q[0] - mine.at[0], q[1] - mine.at[2], q[2] - mine.at[0], q[3] - mine.at[2]])), [[9, 0, 12.6, 3.6], [5.4, -3.6, 12.6, 0]], 'its ground half turned: its leg north-east, its back south - the open corner north-west');
-  // PIN MOVED (HOME-LINE, FIELD BUGS 2026-10-11b - ShikiX3's "I can place in front of another's home"): the stranger's
   // open corner is no building's ground, but it is nearer the stranger's than the owner's: their side of the line
   await r.ghostAt(7.2, 1.8);
   assert.equal(r.tool.why(), YARD_ON_OTHER, 'the step before the stranger\'s door is theirs, though within the owner\'s lot');

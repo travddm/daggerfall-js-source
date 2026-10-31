@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - A MASTER'S WORK THROUGH THE REAL WORKER. The
+// MASTER-ART - A MASTER'S WORK THROUGH THE REAL WORKER. The
 // player's feedback ("Add more horizontal progression please!") and the decision: a Master in a craft makes a Legendary
 // piece of its kinds, its three lines chosen, their values the service's roll in the Legendary band, for its recipe's
 // goods and catalysts from three pursuits, one a character a UTC day. Built from the producers: the Worker over

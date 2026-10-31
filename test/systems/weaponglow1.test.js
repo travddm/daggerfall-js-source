@@ -1,6 +1,4 @@
-// WEAPON-GLOW1 (2026-10-16, Mac: "What if we designed our own sort of animated outline for each element? And even
-// introduced the same, more detailed design for the morrowind weapons?" ... "this is your baby"; bible/05-Combat/
-// Weapon-Glow.md; the audit, bible/01-Overview/audits/Audit-Weapon-Glow.md). The laws pinned here:
+// WEAPON-GLOW1. The laws pinned here:
 //   - THE ELEMENT IS THE BLOW'S: a weapon's `elemental` lines, rolled or socketed, read as the blow reads them
 //     (lootRarity.js readLines - lootPowers.js linesOf is the same reader); the most of one element shows, a tie in
 //     PROC_ELEMENTS' order; its level the band its total reads in; nothing for a piece not yet identified, with the
@@ -132,7 +130,7 @@ test('WEAPON-GLOW1: the Legendary band reads level 3 - an Exalted\'s own element
   assert.ok(line.value > LR.AFFIX_RANGES.elemental.rare[1]);
   assert.deepEqual(WG.weaponGlow(it, { on: true }), { look: line.param, level: 3 });
   // AUDIT WEAPON-GLOW LAW-2: a Gilded piece with no element is BARE in both hands - its powers are its record's, and
-  // it carries no enchantment for the arcane look to say (bible/05-Combat/Weapon-Glow.md "Not done")
+  // it carries no enchantment for the arcane look to say ("Not done")
   const oath = mintGilded(DRAGONFIRE_OATH);
   assert.equal(isEnchanted(oath), false);
   assert.equal(WG.meshGlow(oath, { on: true }), null);
@@ -241,7 +239,6 @@ test('WEAPON-GLOW1: the classic hand swings the PLAIN sheet while an element sho
   const T = WEAPON_TYPES;
   // AUDIT WEAPON-GLOW DOC-12: every type the table knows - a *_Magic its plain twin, every other itself
   for (const [k, v] of Object.entries(T)) assert.equal(plainWeaponType(v), k.endsWith('_Magic') ? T[k.slice(0, -'_Magic'.length)] : v, k);
-  // PIN MOVED (guns removed): Thunderlock_Magic and Pistolet_Magic left the table - DFU's seven *_Magic types remain
   assert.ok(Object.keys(T).filter((k) => k.endsWith('_Magic')).length >= 7);
   // Diverse Weapons asks its plain set too, and the item's own answer is unchanged when nothing is said
   on();
@@ -258,19 +255,16 @@ test('WEAPON-GLOW1: the classic hand swings the PLAIN sheet while an element sho
   assert.match(rig, /const heldGlowNow = \(\) => \{ if \(playerWeapon\.weapon !== heldFor\) askHeld\(\); return heldGlow; \};/);
   assert.match(rig, /syncWorn\(\);[^\n]*\n\s*askHeld\(\);/, 'asked once a frame, after the hand is synced');
   assert.match(rig, /const heldType = \(item\) => \(glowOf\(item\) \? plainWeaponType\(weaponTypeForItem\(item\)\) : weaponTypeForItem\(item\)\);/);
-  assert.match(rig, /const plain = !!glowOf\(held\);\s*const type = heldType\(held\);/);   // PIN MOVED (APPEARANCES): the weapon held is `held` - its glow and its type the piece's own, its art the look it wears (drawnPiece)
+  assert.match(rig, /const plain = !!glowOf\(held\);\s*const type = heldType\(held\);/);
   assert.match(rig, /atlasFileName\(item, WEAPON_FILE\[type\] \?\? '', undefined, plain \? false : undefined\)/);
   assert.match(rig, /loadFpsWeaponArt\(fetchBytes, palette, renderer, type, item\?\.material \?\? 0, item, \{ plain \}\)/);
-  // PIN MOVED (TWO-HANDS): a clone's frame is built per hand's item (weaponRig.js cloneFrame - the one hand's, or each of
   // a pair's), its set and outline that item's own
-  assert.match(rig, /weaponType: heldType\(item\), material: drawnPiece\(item\)\?\.material \?\? -1, glow: glowOf\(item\),/, 'the clone told the set and the outline');   // PIN MOVED (APPEARANCES): the metal the look's
-  // PIN MOVED (SPELL-HAND): the sprite's offset is the climb's (`offsetHeight`, built once on the line above) less the
+  assert.match(rig, /weaponType: heldType\(item\), material: drawnPiece\(item\)\?\.material \?\? -1, glow: glowOf\(item\),/, 'the clone told the set and the outline');
   // spell hand's guard (was: `weaponOffsetHeight() - climbDrop(...)` inline); the glow did not move
   // AUDIT SPELL-HAND L5-9: one pin, in order - the climb's offset, the guard's drop off it, the sprite drawn at their difference
   assert.match(rig, /const m = playerWeapon\.machine, offsetHeight = c \? weaponOffsetHeight\(\) - climbDrop\(_climbLower, c\.height\) : 0;\n\s*const spellDrop = art && _spellGuard\.weapon > 0 \? guardDrop\(_spellGuard\.weapon, fpsWeaponQuad\(c, art, m\.state, m\.frame, \{ offsetHeight \}\)\?\.rect\.h \?\? 0\) : 0;\n\s*if \(art && spriteShown\(\)\) drawFpsWeapon\(renderer, c, art, m\.state, m\.frame, \{ tint: fpTint, offsetHeight: offsetHeight - spellDrop, glow: heldGlowNow\(\) \}\);/);
   const widget = strip(read('src/combat/weapon/weaponWidget.js'));
   assert.match(widget, /renderer\.drawScreenQuad\(tex, getWeaponRect\(\), w\.curAnimRect, tint \?\? undefined\);\s*if \(ctx\.glow\) renderer\.drawScreenQuadGlow\?\.\(tex, getWeaponRect\(\), w\.curAnimRect, ctx\.glow, \{ art: \[rec\.width, rec\.height\], view: \[canvas\.width, canvas\.height\] \}\);/, 'the clone\'s frame, then its outline, on its rect and mirror, in the record\'s pixels');
-  // PIN MOVED (TWO-HANDS): the item the arm HOLDS (armItem: the one hand's, or a pair's right hand's whichever strikes),
   // and a pair's left blade its own
   assert.match(rig, /fpArm\.setWeaponGlow\?\.\(meshGlow\(armItem\), armItem\);\s*fpArm\.setOffWeaponGlow\?\.\(offItem \? meshGlow\(offItem\) : null, offItem\);/, 'the Morrowind hand told the spec and the weapon it is of');
   assert.match(widget, /atlasFileName\(w\.specificWeapon, classic, undefined, ctx\?\.glow \? false : undefined\)/);
@@ -605,8 +599,6 @@ test('WEAPON-GLOW1: a third-person picture is padded for its outline, in texels 
   // the arm hands its picture the look it shows, in both of its draws
   const arm = strip(read('src/combat/fpArm.js'));
   assert.match(arm, /const glow = glowShown\(\);\s*thirdMesh\.weaponGlow = glow;\s*const glowLook = glow \? glow\.look : null;/);
-  // PIN MOVED (TWO-HANDS): the pad's looks - the held weapon's, and a pair's left blade's beside it (padLooks)
-  // PIN MOVED (BODY-CROP x MW-DETAIL, 2026-10-22): through drawBodyPicture, which pads its window the same way (bodycrop.test.js)
   assert.equal(arm.match(/drawBodyPicture\(renderer, canvas, thirdMesh, model, \{[^\n]*, glowLook: padLooks \}, proj, view, eye\)/g)?.length, 2, 'the horse\'s rider and the body alone');
 });
 
@@ -742,7 +734,6 @@ test('WEAPON-GLOW1: a peer\'s body wears the word off the look NOW - the hand in
   const b = () => ({ weapon: peerWeaponOf(LOOK), ammo: 0, held: false, swing: null, cast: null, rig });
   pb._arm(b(), { wd: 1, an: 0, cn: 0 }, LOOK);
   assert.deepEqual(said.at(-1), [WG.glowSpec('fire', 2), right], 'the right hand\'s word, and the weapon it is of');
-  // PIN MOVED (AUDIT MIXED-PAIR L4-3): a weapon in each hand is a PAIR to the peers now - the body's right hand holds the
   // right's whichever leads, and the left's word rides the left weapon (setOffWeaponGlow); the hand-in-use rule is one
   // weapon's (was: the pair read as the left hand in use)
   pb._arm(b(), { wd: 1, an: 0, cn: 0, lh: 1 }, LOOK);

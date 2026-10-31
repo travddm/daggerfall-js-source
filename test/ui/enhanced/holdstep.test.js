@@ -1,6 +1,4 @@
-// HOLD-STEP (2026-09-27, Skeptikali on Discord: "would be nice addition to make it so we can simply hold a + or -
-// button in for example spell making to increase values instead of clicking hundred times"; Tabitha: "add a field to
-// type in the value !!"). The Enhanced Plus spell maker's spinners: a held button repeats its press - after 400 ms, then
+// HOLD-STEP. The Enhanced Plus spell maker's spinners: a held button repeats its press - after 400 ms, then
 // every 100, then every 40 - and the value between the buttons is a field a number is typed into, set by the step's
 // own law (clamped to the spinner's range, the magnitude pair rule, the cost). Never DFU's (UpDownSpinner steps once a
 // click); the classic window keeps its click. Measured in Chromium over the port (a scratch probe): a 1.2 s hold is

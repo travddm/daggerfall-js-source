@@ -1,11 +1,11 @@
-// PROF7 (2026-09-29, Mac: "Do it") - HUNTING AND OUTFITTING AS THE CLIENT MAKES THEM: a body the player's own blow felled,
+// PROF7 - HUNTING AND OUTFITTING AS THE CLIENT MAKES THEM: a body the player's own blow felled,
 // stamped at the kill and skinned with the knife where it lies (a loose node in the one gathering host - the trace, DFU's
 // Dagger in the hand, the act choice key's search of the body); the knife's checks, template and online shelves; the
 // hides, leathers, cloth, parts and butchery as items; the loom's pieces (leather armour at Leather, a garment in its
 // dye, the rugs and skins, the Fishing-Net, the knife at the anvil); the Loom on the Stores page with the stitch; Hunting
 // and Outfitting practised; a Tracker's marks; and the done-when, driven through the real Worker: A BEAR FELLED BY THE
 // PLAYER'S OWN BLOW, SKINNED ONLINE, ITS HIDES CURED AT A CLOTHING STORE'S RACK AND SEWN INTO A LEATHER HELM IN THE PACK,
-// AND A SHIRT IN THE DYE ITS SEWER CHOSE. Then the hosts' wiring. bible/06-Systems/Professions-Arc.md 29.
+// AND A SHIRT IN THE DYE ITS SEWER CHOSE. Then the hosts' wiring. 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -229,7 +229,6 @@ test('PROF7 plan: what E does at a body - the knife skins; the act choice key se
   assert.deepEqual(plan({ loot: true }), { harvest: 'hide', verb: 'Search the Grizzly Bear', rest: '', ready: false, loot: true });
   assert.deepEqual([plan({ taken: true }).verb, plan({ taken: true }).rest], ['The Grizzly Bear - skinned', '']);
   assert.equal(plan({ counting: true }).rest, 'being counted');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): thirty hides today said 'Hunting 10 - 30 of 30 hides today'
   assert.deepEqual(plan({ hides: 300 }), plan(), 'a day past the old thirty: as ready as none');
   assert.equal(plan({ high: 3 }).ready, true, 'a bear is no rare hide');
   const harpy = { foe: MOBILE_TYPES.Harpy, tier: 5, hide: 'hide:harpy' };
@@ -353,7 +352,7 @@ test('PROF7 items: the Skinning Knife is 603 (0.5 kg, 50 uses, 100 gold, DFU\'s 
     assert.deepEqual([knifeCustomItemsForGroup('UselessItems2'), knifeCustomItemsForGroup('Weapons')], [[603], []]);
     assert.ok(customItemsForGroup('UselessItems2').includes(603), 'on DFU\'s own custom-item loop');
   } finally { globalThis.location = where; }
-  assert.deepEqual(HIDE_TEMPLATE_ROWS.map((r) => r.index), [655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 681, 682, 683, 665, 666, 668, 669, 670, 671]);   // PIN MOVED (FIELD BUGS 2026-10-20h DEX-HIDES): the Wolf Pelt, the Boar Hide, the Mudcrab Chitin
+  assert.deepEqual(HIDE_TEMPLATE_ROWS.map((r) => r.index), [655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 681, 682, 683, 665, 666, 668, 669, 670, 671]);
   assert.ok(HIDE_TEMPLATE_ROWS.every((r) => r.stackable === true && r.rarity === 10));
   assert.deepEqual([657, 659, 662, 665, 666, 670].map((t) => [templateByIndex(t).name, templateByIndex(t).baseWeight, templateByIndex(t).basePrice]),
     [['Bear Hide', 1, 16], ['Spider Silk', 0.25, 32], ['Harpy Feathers', 0.25, 72], ['Cured Leather', 1, 24], ['Hardened Leather', 1, 108], ['Silk Bolt', 0.5, 72]]);
@@ -388,7 +387,6 @@ test('PROF7 pieces: the loom\'s - leather armour DFU\'s at Leather with the qual
   const knife = mintPiece({ recipe: 'knife:iron', quality: 0, seed: 0 }, PROV);
   assert.deepEqual([net.templateIndex, net.maxCondition, knife.group, knife.templateIndex, knife.name, knife.maxCondition], [1603, TOOL_LIFE[3], 'UselessItems2', 603, 'Skinning Knife', TOOL_LIFE[0]]);
   assert.match(LOOM_KEPT_TEXT, /last stitch/);
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the service says it no more - kept, without its thirty, for one not yet redeployed
   assert.equal(accountRefusalText('prof-hunt-cap'), 'Your account has taken all the hides a day allows, across your characters.');
   assert.match(accountRefusalText('prof-hunt-high'), /rare hides/);
   assert.match(accountRefusalText('prof-dye'), /cannot be dyed/);
@@ -426,7 +424,7 @@ test('PROF7 pages: the Loom at a Clothing Store - the cures for the hides held a
   const text = () => root.textContent;
   const buttons = () => [...root.querySelectorAll('button')];
   const press = (label) => buttons().find((b) => b.textContent.startsWith(label)).onclick();
-  assert.deepEqual([...PROF_STATIONS], ['forge', 'workbench', 'loom', 'mason', 'jeweller']);   // PIN MOVED (PROF11): the mason's bench; PIN MOVED (PROF10): the jeweller's bench
+  assert.deepEqual([...PROF_STATIONS], ['forge', 'workbench', 'loom', 'mason', 'jeweller']);
   assert.match(stationColdLine('loom'), /The loom is still/);
   assert.match(text(), /The Loom/);
   assert.match(text(), /The tailor's loom and tanning rack - 50 gold a craft, a cure or a weave/);
@@ -454,10 +452,8 @@ test('PROF7 pages: the Loom at a Clothing Store - the cures for the hides held a
   press('Clothing');
   assert.ok(buttons().some((b) => b.textContent === 'Women\'s' && b.className.includes(' on')), 'the player\'s own clothing first');
   press('Men\'s');
-  // PIN MOVED (CRAFT2): the loom lists its patterns (a garment of the clothing shown), the cloth chosen in the box - none
   // held, so its first (Linen)
   const shirt = buttons().find((b) => b.textContent.startsWith('Short Shirt') && !b.textContent.includes(','));
-  // PIN MOVED (CLOTH-GEMS, Professions-Arc 50): the four Bear Hides spin two Wool Bolts (SPIN_RECIPES), so the shirt can be
   // made from raw and its Wool is picked; the Linen chosen in the box
   assert.match(shirt.textContent, /can make from raw/);
   shirt.onclick();
@@ -491,7 +487,7 @@ test('PROF7 pages: the Loom at a Clothing Store - the cures for the hides held a
   held.set('cloth:linen', 2);
   draw();
   press('Clothing'); press('Men\'s');
-  buttons().find((b) => b.textContent.startsWith('Short Shirt, unchangeable')).onclick();   // PIN MOVED (CRAFT2): the pattern, in the Linen held
+  buttons().find((b) => b.textContent.startsWith('Short Shirt, unchangeable')).onclick();
   assert.match(text(), /Linen Short Shirt, unchangeable - rank 0/);
   assert.equal(buttons().some((b) => b.textContent === 'Aquamarine'), true, 'AUDIT 32 L3: an unchangeable shirt offers the ten');
   assert.doesNotMatch(text(), /takes no dye/);
@@ -502,7 +498,7 @@ test('PROF7 pages: the Loom at a Clothing Store - the cures for the hides held a
   held.delete('cloth:linen');
   draw();
   press('Clothing'); press('Men\'s');
-  buttons().find((b) => b.textContent.startsWith('Short Shirt')).onclick();   // PIN MOVED (CRAFT2): the pattern
+  buttons().find((b) => b.textContent.startsWith('Short Shirt')).onclick();
   assert.equal(buttons().some((b) => /Weavers/.test(b.textContent)), false, 'a home sells nothing');
   assert.match(text(), /Your loom/);
   loom = null;
@@ -519,12 +515,12 @@ test('PROF7 pages: the Loom at a Clothing Store - the cures for the hides held a
   };
   const hunting = page('Hunting');
   assert.doesNotMatch(hunting, /not practiced/);
-  assert.match(hunting, /Today: 7 hides, 1 of 3 of grades 5 and 6 \(shared by all your characters\)/);   // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): '7 of 30 hides'
-  assert.match(hunting, /Trophy HunterA clean pelt of a grade 5 or 6 body gives a mounted trophy of the beast\./);   // PIN MOVED (HUNTERS-MARK): the trophy built - "Comes when trophies are added" no more
+  assert.match(hunting, /Today: 7 hides, 1 of 3 of grades 5 and 6 \(shared by all your characters\)/);
+  assert.match(hunting, /Trophy HunterA clean pelt of a grade 5 or 6 body gives a mounted trophy of the beast\./);
   assert.match(hunting, /Harpy Feathers, Dreugh Shell/);
   const outfitting = page('Outfitting');
   assert.doesNotMatch(outfitting, /not practiced/);
-  assert.match(outfitting, /Comes when cloth can take a second dye/);   // PIN MOVED: BR5
+  assert.match(outfitting, /Comes when cloth can take a second dye/);
   assert.match(outfitting, /Comes when wagons can be upgraded/);
   const smithing = page('Smithing');
   assert.match(smithing, /Silver.*rank 25.*Elven, Dwarven.*rank 40.*Mithril.*rank 55/s, 'PROF7 (FOUND): the three AUDIT 30\'s note swallowed');
@@ -542,41 +538,37 @@ const GARMENT_WORDS = (buttons) => {
 test('PROF7 wiring: the street and the dungeon stamp and list their bodies for Hunting\'s kind, the knife drawn while E is held; the loom a Clothing Store\'s or a home\'s station, its crafts and works at it, the Weavers\' counter by name, the stitch\'s band off AGI and SPD, the player\'s own clothing first; a Butcher\'s meat withdrawn slow to rot; a Tracker\'s animals on the compass; the service\'s routes, statuses, refusals and deploy', () => {
   const w = hostText('src/scenes/world.js');
   assert.match(w, /registerPlayerKillListener\('hunting', \(entity\) => \{ bodyStamps\.stamp\(entity\); \}\);/);
-  // PIN MOVED (FIELD BUGS 2026-10-07 INDOOR-SKIN): the pool by the mode, a building's too - huntHost.js bodiesHere
   // (test/systems/quest/fb1007_indoorskin.test.js drives it over the real pools)
   assert.match(w, /huntBodies = \(\) => bodiesHere\(modeNow\(\), \{ street: exteriorFoes, dungeon: modes\?\.dungeonCtx, interior: modes\?\.interiorFoes \}, bodyStamps\);/);
   assert.match(src('src/scenes/huntHost.js'), /return bodiesOf\(pool\.foes, stamps, \(f\) => pool\.corpseAt\?\.\(f\), \(f\) => pool\.corpseKeyOf\?\.\(f\)\);/);
   assert.match(src('src/scenes/exteriorFoes.js'), /corpseAt: corpseLens\.feetOf,/, 'where a body lies has one home (DT1)');
   assert.doesNotMatch(w, /held\(keys, 'SwingWeapon'\)/, 'the knife is drawn with E held - attack is the weapon\'s, and its swing modes hold the look');
-  // PIN MOVED (2026-10-01 part four, TOUCH-HOLD): the key named unless the knife's Use holds it
   assert.match(src('src/scenes/huntHost.js'), /profession: 'hunting', label: used \? '' : keyLabel\('Interact'\),/);
   assert.match(w, /loom: \(\) => modes\?\.loomHere\?\.\(\) \?\? null,/);
   assert.match(w, /stitchBand: \(\) => stitchBand\(\{ agility: liveStat\(playerEntity, 'agility'\), speed: liveStat\(playerEntity, 'speed'\) \}\),/);
   assert.match(w, /clothing: \(\) => \(playerEntity\?\.gender === 'female' \? 'WomensClothing' : 'MensClothing'\),/);
-  assert.match(w, /: profession === 'outfitting'\n\s*\? \{ here: \(\) => modes\?\.loomHere\?\.\(\) \?\? null, a: 'a loom', who: 'tailor', noun: 'loom', kept: LOOM_KEPT_TEXT, xp: 'Outfitting' \}/);   // PIN MOVED (AUDIT PROF-541 R2-C2): no station's own busy word
-  // PIN MOVED (PROF11): a work at the mason's bench asks it first
-  assert.match(w, /const f = \(alch \? modes\?\.alchemyHere\?\.\(\) : mason \? modes\?\.masonHere\?\.\(\) : loom \? modes\?\.loomHere\?\.\(\) : bench \? workbenchHere\(\) : modes\?\.forgeHere\?\.\(\)\) \?\? null;/);   // PIN MOVED (PROF12): the alchemy station's transmutations first; PIN MOVED (CARP-YARD): a saw at a joinery's bench too
-  assert.match(w, /const who = counter === 'furnisher' \? 'furnisher' : counter === 'weavers' \? 'Weavers' : counter === 'apothecaries' \? 'Apothecaries' : 'smith';/);   // PIN MOVED (PROF12): the Apothecaries'
-  // PIN MOVED (BAG1): the rot's options are one function now, the pack's withdrawal's and the bag's mint's alike
-  assert.match(w, /const carryOpts = \(key\) => \(\{ slowRot: key === 'food:meat' && profBook\?\.track\('hunting'\)\?\.specs\?\.\[100\] === 'butcher', noRot: /);   // PIN MOVED (PROF9): a Provisioner's provisions beside the Butcher's meat
+  assert.match(w, /: profession === 'outfitting'\n\s*\? \{ here: \(\) => modes\?\.loomHere\?\.\(\) \?\? null, a: 'a loom', who: 'tailor', noun: 'loom', kept: LOOM_KEPT_TEXT, xp: 'Outfitting' \}/);
+  assert.match(w, /const f = \(alch \? modes\?\.alchemyHere\?\.\(\) : mason \? modes\?\.masonHere\?\.\(\) : loom \? modes\?\.loomHere\?\.\(\) : bench \? workbenchHere\(\) : modes\?\.forgeHere\?\.\(\)\) \?\? null;/);
+  assert.match(w, /const who = counter === 'furnisher' \? 'furnisher' : counter === 'weavers' \? 'Weavers' : counter === 'apothecaries' \? 'Apothecaries' : 'smith';/);
+  assert.match(w, /const carryOpts = \(key\) => \(\{ slowRot: key === 'food:meat' && profBook\?\.track\('hunting'\)\?\.specs\?\.\[100\] === 'butcher', noRot: /);
   assert.match(w, /withdrawIntoPack\(playerEntity, key, n, undefined, carryOpts\(key\)\)/);
   assert.match(w, /profBook\.track\('hunting'\)\.specs\?\.\[50\] !== 'tracker' \|\| _mode\(\) !== 'exterior'\) return null;\n\s*return trackerMarks\(exteriorFoes\.foes, enchantFeet\(\)\);/);
   const m = src('src/scenes/worldModes.js');
   assert.match(m, /if \(interiorBuilding\.buildingType === BUILDING_TYPES\.ClothingStore\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: LOOM_FEE \};/);
-  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'loom'\)\) return \{ kind: 'home', fee: 0 \};/);   // PIN MOVED (FB1018D HOME-BENCH, test/scenes/fb1018d_homebench.test.js): a home's stations serve its owner's account
+  assert.match(m, /if \(stationOwnerHere\(\) && interiorDecor\.list\(\)\.some\(\(p\) => p\?\.station === 'loom'\)\) return \{ kind: 'home', fee: 0 \};/);
   const g = src('src/scenes/gatherHost.js');
   assert.match(g, /const gone = act\.loose \? !w : !act\.dungeon && !stood\.has\(pixelKey\(act\.px, act\.py\)\);/);
   assert.match(g, /climate: a\.info\?\.climate \?\? null, region: a\.info\?\.region \?\? null, act: report,/);
-  assert.match(g, /at: Math\.floor\(deps\.nowMs\(\) \/ 1000\), \.\.\.\(\(typeof a\.ask === 'function' \? a\.ask\(\) : a\.ask\) \?\? \{\}\),/);   // AUDIT SILVER-WAYS D5 (PIN MOVED): an ask may be asked at the act's end
+  assert.match(g, /at: Math\.floor\(deps\.nowMs\(\) \/ 1000\), \.\.\.\(\(typeof a\.ask === 'function' \? a\.ask\(\) : a\.ask\) \?\? \{\}\),/);     // AUDIT SILVER-WAYS D5 (
   const b = src('src/net/profBook.js');
   assert.match(b, /\.\.\.\(h\.foe === undefined \? \{\} : \{ foe: h\.foe \}\),/);
   assert.match(b, /applyStore\(r\.data\?\.extraStore\);/);
   const idx = src('server-account/src/index.js');
-  assert.match(idx, /'prof-hunt-high': 409, 'prof-foe': 400, 'prof-dye': 400,/);   // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): no 'prof-hunt-cap'
+  assert.match(idx, /'prof-hunt-high': 409, 'prof-foe': 400, 'prof-dye': 400,/);
   assert.doesNotMatch(idx, /'prof-hunt-cap':/);
   const c = src('src/net/accountClient.js');
-  // SEAT2b part two (PIN MOVED): and the held town the station stands in (`seat`, its crafting halls' steps)
-  assert.match(c, /craft: \(character, recipe, clean, name, rid, heartwood = false, dye = null, seat = null, cracked = false\) => post\('\/v1\/prof\/craft', \{ character, recipe, clean, name, rid, heartwood, \.\.\.\(dye == null \? \{\} : \{ dye \}\), \.\.\.\(seat == null \? \{\} : \{ seat \}\), \.\.\.\(cracked === true \? \{ cracked: true \} : \{\}\), mint: MINT_VERSION \}\),/);   // PIN MOVED (PROF10): a Lapidary's `cracked` gem; PIN MOVED (AUDIT FB1026d C3): the mint version this build mints
+  // SEAT2b part two (
+  assert.match(c, /craft: \(character, recipe, clean, name, rid, heartwood = false, dye = null, seat = null, cracked = false\) => post\('\/v1\/prof\/craft', \{ character, recipe, clean, name, rid, heartwood, \.\.\.\(dye == null \? \{\} : \{ dye \}\), \.\.\.\(seat == null \? \{\} : \{ seat \}\), \.\.\.\(cracked === true \? \{ cracked: true \} : \{\}\), mint: MINT_VERSION \}\),/);
   for (const word of ['prof-hunt-cap', 'prof-hunt-high', 'prof-foe', 'prof-dye']) assert.doesNotMatch(accountRefusalText(word), /problem|could not be read/, word);
   assert.match(src('.github/workflows/account-deploy.yml'), /- "src\/characters\/dyes\.js"/);
   assert.match(src('src/systems/foraging/foragingInstall.js'), /hudText\(brokeMessage\(item\.templateIndex, item\.name\)\);/);

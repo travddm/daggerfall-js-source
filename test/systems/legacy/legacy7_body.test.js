@@ -1,4 +1,4 @@
-// LEGACY7 part four (2026-10-06, bible/06-Systems/Legacy-Arc.md section 10b): THE LINE IN ITS OWN BODY - the departure
+// LEGACY7 part four: THE LINE IN ITS OWN BODY - the departure
 // LEGACY-HOME recorded and named LEGACY7's ("their own race and kit, the way an online peer is drawn"). The look the
 // record keeps (systems/legacy/family.js memberLook, written by scenes/legacyHost.js at every write, dropped at a death),
 // the resident that carries it (household.js residentOf), the layers that draw it (world/familyBodies.js over the REAL

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02b - THE LIFTED SEA, AT ITS SOURCE (Mac: "Audit this"; "Controls for the player vessel are
+// FIELD BUGS 2026-10-02b - THE LIFTED SEA, AT ITS SOURCE (; "Controls for the player vessel are
 // currently broken, including not being able to lower sails"). FIELD BUGS 2026-10-02's SEA-SHOAL read a carved cell's
 // seafloor where World of Daggerfall's flatten had lifted a pixel's sea over Come Sail Away's 34 m line - and its
 // audit found it inert: Deep Waters' REAL hole mask carves a cell only where its four corners stand at the ocean's

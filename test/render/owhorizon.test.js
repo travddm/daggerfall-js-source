@@ -1,5 +1,4 @@
-// OW-HORIZON (2026-10-20, the owner: "the overworld map as it stands doesnt allow you to see as far as the eye can see, this
-// needs to change without impacting performance"; bible/06-Systems/Travel-View.md OW-HORIZON) - FROM THE AIR, AS FAR AS
+// OW-HORIZON - FROM THE AIR, AS FAR AS
 // THE EYE CAN SEE. Held here: the haze runs on to the far ring's rim under the view and nowhere else; the lens holds the
 // whole grid from the raised eye with its depth kept; the camera looks out to the horizon and keeps the far half of its
 // line of sight clear; the clouds' shadows run on past their square and onto the ring; the ring hazes from where the
@@ -247,7 +246,7 @@ test('OW-HORIZON the host\'s wiring: the fog row and the lens through the view\'
   assert.ok(tvfAt > 0 && projAt > tvfAt, 'the lens after the view\'s frame');
   assert.ok(projAt < w.indexOf('renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME);'), '...and before the frame begins with it');
   assert.ok(!/perspective\(glassFov\(fieldOfView\(\)/.test(w), 'no second lens');
-  assert.match(w, /new FarRingRenderer\(renderer\.gl, \{ renderer, mid: terrainGen \}\)/);   // PIN MOVED (MID-RING): and the terrain's client - the middle ring and the far field asked of its worker
+  assert.match(w, /new FarRingRenderer\(renderer\.gl, \{ renderer, mid: terrainGen \}\)/);
   assert.match(w, /\n  const built = new BuiltPixels\(\); \/\/ key -> pixel entry/, 'the host\'s built pixels count their changes');
   assert.match(w, /\}, state\.current\.x, state\.current\.y, state\.terrainDistance, built\);/);
   assert.match(w, /farRing\.punchHole\(state\.current\.x, state\.current\.y, state\.terrainDistance, built\);/);

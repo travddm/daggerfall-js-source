@@ -1,7 +1,6 @@
 // FIELD BUGS 2026-10-13e (SPENT-ASHORE) - a player near Knightshead, "Delayed death after combat despite full health":
 // "I killed all enemies without being hit. My health was full ... After the fight ended, the death screen suddenly
-// appeared. There was no visible attack, spell, trap, fall, or warning before death." Mac, on SWIM-SPENT: "I dont care
-// about DFU. We're our own thing now"; on FULL-GUARD: "No kill from full health".
+// appeared. There was no visible attack, spell, trap, fall, or warning before death."; on FULL-GUARD: "No kill from full health".
 //
 // DFU's exhaustion collapse: any fatigue write that reaches 0 raises OnExhausted (DaggerfallEntity.cs SetFatigue), and
 // PlayerEntity.OnExhausted SetHealth(0)s a player on dry feet when AreEnemiesNearby - any live foe inside the classic

@@ -1,4 +1,4 @@
-// UNQUIET III (bible/06-Systems/Revenants.md section 48; the owner, 2026-10-18: "Do it", of UNQUIET II's next three: a
+// UNQUIET III (;, of UNQUIET II's next three: a
 // revenant of mastery trains a counter to the player's most-used weapon; wounds heal over time, so leaving it unhunted has
 // a cost; and the trail picks its den from the nearest dungeon). Pinned: the numbers; a wound healing through the real
 // day loop (every five days left alone - AUDIT UNQUIET, it was three - the oldest first; a new wound counting again; never one out or the Dread),
@@ -45,7 +45,6 @@ function made(p, { personality = 'brutal', now = DAY * 10, deedName = 'fled' } =
 const at = (d) => ({ now: DAY * d + 60, rolls: () => 0.99 });   // 0.99: no deserter among the sworn
 
 test('UNQUIET III THE NUMBERS: a wound heals every five days left alone - counted from the day of its last; the days to the next (mutants: the days; a day before counted; the count from the wrong day)', () => {
-  // PIN MOVED (AUDIT UNQUIET, section 49): five days - at three a wound healed before most returns found it
   assert.deepEqual({ ...U.WOUND }, { MAX: 3, RESIST: -15, HEAL_DAYS: 5 });
   assert.deepEqual([10, 11, 14, 15, 16, 20, 25].map((d) => U.healsOn(10, d)), [false, false, false, true, false, true, true]);
   assert.deepEqual([U.healsOn(-1, 4), U.healsOn(-1, 5), U.healsOn(undefined, 5), U.healsOn(0, 5)], [false, false, false, true], 'no wound day, none');

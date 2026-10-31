@@ -1,6 +1,4 @@
-// INTRO4 (2026-10-26, the owner: "Overhaul the main intro sequence to be more in line with the elder scrolls game
-// oblivion and still zoom out into the entire map of tamriel. Utilize the imperial city we have built for this. I want
-// this to be as detailed as possible"; bible/10-UI/UI-Arc.md INTRO4): the film's cut on the recording's bars, its
+// INTRO4: the film's cut on the recording's bars, its
 // narrator, its flight clear of the city it flies over, its last frame holding the whole continent, its morning; the city
 // it draws being TESA's own (the landmarks' meshes, the plan's cells, the tile and tree laws); the continent's field; the
 // map's words; the build off the page's thread. Mutants: tools/mutants/intro4.json.
@@ -19,7 +17,7 @@ import {
   buildTamrielField, fillRing, pictureToFilm, INTRO_MAP_LABELS, IMPERIAL_CITY_AT, RIVER_SEGMENTS, BAY_RECT, UNIT_M,
 } from '../../src/ui/intro/introTamriel.js';
 import { startIntroBuild } from '../../src/ui/intro/introBuild.js';
-import { IMPERIAL, IMPERIAL_CELLS, IMPERIAL_CITY_PLAN, imperialTile, imperialTree } from '../../src/ui/intro/set/imperialCity.js';   // PIN MOVED (the merge of main into TESA): the film's own set, the city it was shot on
+import { IMPERIAL, IMPERIAL_CELLS, IMPERIAL_CITY_PLAN, imperialTile, imperialTree } from '../../src/ui/intro/set/imperialCity.js';
 import { BLOCK_M } from '../../src/world/spawnedDungeons.js';
 import { PROVINCES, RIVERS, SEAS, provinceRings } from '../../src/world/tamriel/tamrielGeography.js';
 import { BALFIERA } from '../../src/ui/intro/introMap.js';

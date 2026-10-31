@@ -87,7 +87,7 @@ test('P1: only loot, doors and the player\'s own piles are cached - enemies are 
   // since HT1 and DROPPED here, because the store kept three keys) and the camps
   // TERRAIN-SCALE1: and the entry names what its positions are measured from, and the ground they stood on
   // DECOR1c: and what an owner placed in the offline house or ship, and what its storage pieces hold
-  assert.deepEqual(Object.keys(back).sort(), ['actionDoors', 'camps', 'decor', 'decorItems', 'decorOwn', 'droppedPiles', 'droppedTorches', 'frame', 'groundFrame', 'guildShelves', 'hiddenBase', 'lootContainers', 'terrainScale']);   // PIN MOVED (BAY-LEFT-GROUND, D5): and the frame's law of its heights   // DECOR2a: the owner's own things, the save's; BASE-HIDE: what the owner took out of the room's own furniture
+  assert.deepEqual(Object.keys(back).sort(), ['actionDoors', 'camps', 'decor', 'decorItems', 'decorOwn', 'droppedPiles', 'droppedTorches', 'frame', 'groundFrame', 'guildShelves', 'hiddenBase', 'lootContainers', 'terrainScale']);
   assert.equal(back.enemies, undefined, 'an enemy list handed in is not carried');
   // an empty cache call is legal and stores empty arrays
   cacheScene(c, s);

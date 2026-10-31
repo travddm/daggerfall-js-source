@@ -1,6 +1,4 @@
-// GILDED2 (2026-10-15; bible/06-Systems/Gilded.md section 7; Mac: "With the introduction of elite dungeons soon. I want to
-// enhance the rewards for each world activety. We need to add a rare gilded weapon to the oblivion gates. A gilded weapon
-// to the serpent") - THE WORLD'S TWO GILDED. The laws pinned:
+// GILDED2 - THE WORLD'S TWO GILDED. The laws pinned:
 //   - THE RECORDS: the Dragonfire Oath (a Daedric Dai-Katana) and the Sunken Sovereign (an Ebony Saber) - four lines
 //     each at the Legendary band's TOP and no higher, a power each, frozen whole.
 //   - THE MINT: a DFU weapon's own (CreateWeapon), whole, known and priced; the wire takes it exactly as minted and
@@ -55,7 +53,7 @@ const lines = (r) => r.affixes.map((a) => [a.id, a.param ?? null, a.value]);
 // ── the records ───────────────────────────────────────────────────────
 
 test('GILDED2 THE RECORDS: the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +40% damage, +15 Strength, +30 Long Blade, +15 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +40% damage, +15 Agility, +30 Long Blade, 10% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
-  assert.deepEqual(GILDED_RECORDS, [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]);   // PIN MOVED: the Hourlock removed with the guns
+  assert.deepEqual(GILDED_RECORDS, [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]);
   assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-dragonfire-oath', 'the-sunken-sovereign']);
   assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 2, 'two ids');
   for (const r of [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]) {
@@ -110,7 +108,7 @@ test('GILDED2 THE MINT: a DFU weapon\'s own (CreateWeapon - its make, its span, 
 
 test('GILDED2 THE DROPS: ONE draw each, always - under its chance its record, else nothing; one in two hundred and fifty (mutants: the chances)', () => {
   on();
-  assert.deepEqual([GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE], [1 / 250, 1 / 250]);   // PIN MOVED (GILDED-RARER, 2026-10-24, the owner: "Reduce the drop rate of gilded weapons across the board"): one in a hundred each, before
+  assert.deepEqual([GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE], [1 / 250, 1 / 250]);
   for (const [roll, chance, id] of [[rollDragonfireOath, GATE_GILDED_CHANCE, 'the-dragonfire-oath'], [rollSunkenSovereign, SERPENT_GILDED_CHANCE, 'the-sunken-sovereign']]) {
     const yes = counted(() => chance - 1e-9), no = counted(() => chance);
     assert.equal(roll(yes.rolls)?.gilded, id);

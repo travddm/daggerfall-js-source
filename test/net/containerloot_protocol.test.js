@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 2 (2026-10-17) - RED PINS, A BUILDING'S CUPBOARDS UNDER ONE SEAT'S CLAIMS (AC8). test-harness/outdoor-loot/
+// OUTDOOR-LOOT, SLICE 2 - RED PINS, A BUILDING'S CUPBOARDS UNDER ONE SEAT'S CLAIMS (AC8). test-harness/outdoor-loot/
 // DESIGN.md section 4 is the plan; DESIGN-REVIEW.md is binding over it (R-1, R-3, R-5, D-1, D-1a). test/net/containerloot.test.js
 // is phase 1 (what a cupboard must be for everyone in the building, read as where the pieces ARE); this file pins what the fix
 // must SAY and DO on the way, black-box, before it exists:

@@ -1,8 +1,4 @@
 // ORL1 - OBLIVION REMASTER LIKE LEVELING 0.5.3, THE MOD, 1:1
-// (2026-09-17, Mac: "So I've been analyzing morrowind mods to integrate
-// and the first one I'd like to add is this. On new game, I want the
-// player to receive a notification on which leveling system they would
-// like to use").
 //
 // THE FIRST MORROWIND MOD IN THIS TREE, so the producer these pins read
 // is Lua and a 487-byte OpenMW data file rather than a `.dfmod` and a
@@ -149,7 +145,6 @@ test('ORL1: every setting default and minimum is READ OUT OF settings.lua, and e
   // of chosen skills Morrowind does not.
   const extra = Object.keys(ours).filter((k) => !shipped.has(k));
   assert.deepEqual(extra.sort(), ['Enabled', 'primarySkillsImpact']);
-  // PIN MOVED (PLAIN-TEXT, 2026-10-19): the words a player reads, exactly - why the row exists, said for the player
   // (Morrowind has no Primary tier) rather than as a note that the knob is the port's
   assert.equal(ours.primarySkillsImpact.description, 'Points given by a Primary Skill level up (100 points required to level up). Morrowind has no Primary skills, so this starts equal to Major skills.',
     'the port\'s own knob says in the pane why it is there');

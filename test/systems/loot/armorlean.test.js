@@ -1,5 +1,4 @@
-// ARMOR-LEAN (2026-10-26, a player: "can we make differences regarding stat distribution for all types when stats are
-// rolled on them") and DAEDRIC-SALE (the same player: "tune down daedric selling price by 50%"). DRIVEN: real rolls over
+// ARMOR-LEAN and DAEDRIC-SALE (the same player: "tune down daedric selling price by 50%"). DRIVEN: real rolls over
 // real seeds, counted - the families' differences measured, never read off the table they come from.
 import '../../modsOff.js';
 import { test } from 'node:test';

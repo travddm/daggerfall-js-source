@@ -1,5 +1,4 @@
-// HT3 (2026-09-15, Mac: "The player held torch mod shows the sprite
-// upside down when held").
+// HT3.
 //
 // It did, and the reason is that the port has TWO right answers and the
 // door took the wrong one.

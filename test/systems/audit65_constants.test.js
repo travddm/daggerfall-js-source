@@ -1,4 +1,4 @@
-// AUDIT 65 - THE CONSTANTS-VS-READS LANE (2026-09-11). Two findings,
+// AUDIT 65 - THE CONSTANTS-VS-READS LANE. Two findings,
 // both "the port spells a number where DFU reads one".
 //
 // CV-1: the character sheet's skills dialog printed the PERMANENT
@@ -83,7 +83,7 @@ function lycanthrope() {
   const p = { isPlayer: true, reflexes: 2, items: [], activeEffects: [] };
   createCharacter(p, CAREER, 16, { rolls: seq(0) });
   createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: QUIET });
-  morphSelf(p, { force: true, nowMinutes: QUIET });   // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the +30 is the beast's - the fixture changes
+  morphSelf(p, { force: true, nowMinutes: QUIET });
   lycanthropyMagicRound(p, { nowMinutes: QUIET });
   setSpellRecordsByIndex(null);
   return p;
@@ -217,7 +217,7 @@ test('AUDIT 65 CV-2: an enemy shaft meets the player at 0.45 + 0.35, two-sided, 
   const open = () => new ArrowFlight({ getGpuMesh: () => null, collider: { raycast: () => Infinity, heightAt: () => -100 } });
   // A step of 1.25, so a shaft loosed at z = -1.25 stands exactly on the
   // player's z after one update and its lateral offset from the capsule
-  // axis is read at face value. PIN MOVED (BAL-ARCHERY, Balance-Arc.md
+  // axis is read at face value.
   // section 18): the step was MISSILE_SPEED * 0.05; a shaft flies at
   // ARROW_FLIGHT_SPEED now, so the step's time is read off that.
   const shaft = (lateral) => {

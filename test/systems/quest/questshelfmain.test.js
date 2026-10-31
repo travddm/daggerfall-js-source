@@ -1,5 +1,4 @@
-// QUEST-SHELF-MAIN (2026-10-13, Dudey: "an Abandon button for all quests except main quest", then "leave the main quest
-// logic untouched") - pinned. The chronicle (the L key) draws QUEST-SHELF's Abandon, twice, on every running quest but the
+// QUEST-SHELF-MAIN - pinned. The chronicle (the L key) draws QUEST-SHELF's Abandon, twice, on every running quest but the
 // main story's - through the pause tab's own door (questBridge.js journalClean), in every host that builds a chronicle.
 // The machine's ladder is QUEST-SHELF's, unchanged. Its words are the text core's (L10N4, `chronicle.quests.*`).
 import { test } from 'node:test';

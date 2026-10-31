@@ -1,6 +1,5 @@
 // PROMO-NOW (FIELD BUGS 2026-10-15, a Discord report: "have traveled back and forth from daggerfall passed 200 days still
-// no promotion i meet the requirements i checked on uesp is this a bug"; Mac: "We need to change the way promotions
-// behave online", asked, "No wait"). Online a promotion does not wait DFU's 28 days - the hall's review promotes the
+// no promotion i meet the requirements i checked on uesp is this a bug";, asked, "No wait"). Online a promotion does not wait DFU's 28 days - the hall's review promotes the
 // moment the member qualifies - while a demotion, a probation and an expulsion still wait them. And online the hall's
 // popup says what the next rank asks that the member does not have.
 import { test } from 'node:test';
@@ -77,7 +76,7 @@ test('PROMO-NOW: the hall\'s line names what the next rank asks - the reputation
   const g = GUILDS.FightersGuild;
   const memberships = {};
   joinGuild(memberships, g, day(1)).rank = 1;
-  // rank 2 asks 20 reputation, one guild skill at 31 and a second at 9 - PIN MOVED (AUDIT GUILD-WORDS II A-7): the rest
+  // rank 2 asks 20 reputation, one guild skill at 31 and a second at 9
   // at 5, rank 1's own second bar, where 3 was short of rank 0's 4 and the line now warns of the probation that brings
   const skills = 'Archery, Axe, Blunt Weapon, Giantish, Hand-to-Hand, Long Blade, Orcish, Short Blade';
   assert.deepEqual(rankNeedsLines(withSkills(g, 5, { [SKILLS.LongBlade]: 40 }), g, memberships, storeWith(g, 14)),
@@ -94,7 +93,6 @@ test('PROMO-NOW: no review\'s line past the highest rank a review gives, nor for
   const memberships = {};
   const m = joinGuild(memberships, g, day(1));
   m.rank = 7;
-  // PIN MOVED (SEAT-LINE, Field-Bugs-2026-10-15g.md): at the ceiling the next rank is a seat, and the line says so
   assert.equal(rankNeeds(memberships, g, withSkills(g, 10), storeWith(g, 0), { rankCeiling: 7 }).seat, true, 'ranks 8 and 9 are seats online');
   assert.equal(rankNeeds(memberships, g, withSkills(g, 10), storeWith(g, 0)).rank, 8, 'offline the review gives 8');
   m.rank = 9;
@@ -106,7 +104,7 @@ test('PROMO-NOW: the enhanced popup shows a member the line above its buttons; a
   const hooks = (member) => ({ member: () => member, service: () => 'Training', rows: () => [], steps: () => [],
     rankNeeds: () => ['Next rank: Swordsman', 'Reputation 14 of 20'] });
   const view = PORT_SPECS.guild.view(new GuildServiceWindow(hooks(true)));
-  assert.deepEqual(view.blocks[0], { type: 'text', rows: ['Next rank: Swordsman', 'Reputation 14 of 20'], scroll: true });   // PIN MOVED (AUDIT GUILD-WORDS II F-1): in its own scrolling well
+  assert.deepEqual(view.blocks[0], { type: 'text', rows: ['Next rank: Swordsman', 'Reputation 14 of 20'], scroll: true });
   assert.equal(PORT_SPECS.guild.view(new GuildServiceWindow(hooks(false))).blocks.some((b) => b.type === 'text'), false);
 });
 

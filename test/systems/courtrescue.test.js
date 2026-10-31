@@ -1,4 +1,4 @@
-// CR1 - THE COURT GUILD RESCUES (2026-08-28). DaggerfallCourtWindow
+// CR1 - THE COURT GUILD RESCUES. DaggerfallCourtWindow
 // .cs:177-221, the arm court.js's header FLAGGED to the guilds arc:
 // assault or murder may be forgiven by the Dark Brotherhood, a
 // thieving crime by the Thieves Guild - `guild.Rank >= Random.Range

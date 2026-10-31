@@ -1,5 +1,4 @@
-// ETHER-DEEP (2026-10-12, the owner: "the area below water is very shallow and has no depth"; bible/03-World/
-// Eltheric-Ocean.md ETHER-DEEP) - THE ELTHERIC OCEAN CARVED BY ITS OWN BAKE. Iliac Puddle No More's bake was the Bay's
+// ETHER-DEEP - THE ELTHERIC OCEAN CARVED BY ITS OWN BAKE. Iliac Puddle No More's bake was the Bay's
 // 1000 x 500: past the Veil nothing was carved and the sea stood a stride deep on the kernel's clamp. The Eltheric's
 // box is a bake's own frame now (world/etherWatersBake.js), built by the Bay's own rules from the composed ground: its
 // classes the bound's, its flood an isle's cell at a time (every cell's ring is open sea - pinned here over three whole

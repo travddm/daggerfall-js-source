@@ -1,5 +1,4 @@
-// AUDIT SERPENT (2026-10-04, Mac: "I definitely want to do a conprehensive audit on this and ensure its absolute
-// perfection"): the pins of the audit's findings ON THE CLIENT AND IN THE BOOKS (bible/01-Overview/audits/Audit-Sea-Serpent.md) -
+// AUDIT SERPENT: the pins of the audit's findings ON THE CLIENT AND IN THE BOOKS -
 // each a law that failed before its fix. The host end to end against the brain's own words: a new day's attacks judged
 // afresh (H3), a silent fight left (M5), the phase a ship sails in on not said, my ship held in the site's frame (L1), a
 // word the socket would not take said with the next (L3), the wreck
@@ -160,7 +159,6 @@ test('AUDIT SERPENT B2/B5/T4/T8/M3: MOVE for a ship anywhere down a ram\'s lane 
   R.step(3000);
   const at = R.at() + 2500;
   R.hear({ k: 'atk', i: 5, a: SERPENT_ATTACK_TABLE.ram.id, at, x: 60, z: -120, yw: 0, tg: [[60, -120], [60, -120 + ramLen()]] });
-  // PIN MOVED (AUDIT SHIPS C4, 2026-10-06): the ram's wake is its dash's (scenes/serpentHost.js dashWake), over its head as
   // it runs down its lane - its run and its sounding said with its word, as the relay says them (serpentBrain.js begin);
   // it was its judging's, and stopped where the ram struck my ship
   R.hear({ k: 'sw', l: { k: LEG.line, at, x: 60, z: -120, yw: 0, v: RAM_V } });

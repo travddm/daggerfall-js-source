@@ -1,5 +1,4 @@
-// DEX0 (2026-10-19, Mac: "I want to implement this as our next mod 1:1. We also need to ensure these get proper
-// morrowind model replacements if applicable") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer & Kab): THE RECORD.
+// DEX0 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer & Kab): THE RECORD.
 //
 // What vendor/daggerfall-enemy-expansion/ claims, each claim held: the manifest is the bundle's; the C# beside the
 // compiled assembly is what the assembly was built from (every literal in its user-string heap, every member in its

@@ -1,8 +1,7 @@
-// AUDIT PRE-MERGE 1003b (2026-10-03, the owner: "We're going to do one last deep audit on everything before we push this.
-// It needs to be perfection"): THE PRIVATE SESSION'S CARD IN THE ARENA WINDOW (ARENA6; src/ui/arena/arenaWindow.js over
+// AUDIT PRE-MERGE 1003b: THE PRIVATE SESSION'S CARD IN THE ARENA WINDOW (ARENA6; src/ui/arena/arenaWindow.js over
 // src/systems/arena/arenaBoard.js sessionCard, src/ui/enhanced/enhancedPlusStyle.js) - lens U's findings, each red first, on chargenDom's
 // page as test/systems/arena/audit1003_ui.test.js mounts the window. The layout's measure is Chromium's (the lens's probe); the rules
-// that make it are pinned here. The record: bible/01-Overview/audits/Audit-PreMerge-1003.md, its second pass.
+// that make it are pinned here. The record:, its second pass.
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

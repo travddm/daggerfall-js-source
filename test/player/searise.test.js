@@ -1,5 +1,4 @@
-// SEA-RISE (2026-09-27, Yugi on Discord: "Underwater Deathloop - My character just autoran into the ocean, stuck at
-// the bottom because of my loot. No more puddles does nothing"). An over-encumbered swimmer sinks - DFU's own rule
+// SEA-RISE. An over-encumbered swimmer sinks - DFU's own rule
 // (LevitateMotor.Update :83-85), which Iliac Puddle No More's forged water level carries to the sea - and three things
 // the port owns turned that into a loop: the online respawn searched only the death's own region, and the open sea's
 // (politic 64, region 31) holds no temple, town or graveyard, so the player rose on the seafloor where they fell;

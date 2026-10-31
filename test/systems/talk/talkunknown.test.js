@@ -1,7 +1,5 @@
 // ---------------------------------------------------------------------------
-// TALK-UNKNOWN - A DEBUG SENTINEL IN A TAVERN (2026-09-17, Mac, with the
-// screenshot: "Listen up. Know anything about work possibilities
-// %2com[undefined]?").
+// TALK-UNKNOWN - A DEBUG SENTINEL IN A TAVERN.
 //
 // `%2com` is CLASSIC's macro, not the port's invention and not DFU's.
 // MacroHelper.cs's dictionary carries `%1com` (:44, GreetingOrFollowUpText)

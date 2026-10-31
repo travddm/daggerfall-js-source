@@ -1,6 +1,6 @@
-// AUDIT 28 (2026-09-28, Mac: "let's audit everything we have so far before we continue") - MARKS1's findings, each
+// AUDIT 28 - MARKS1's findings, each
 // pinned against the real Worker over node:sqlite (test/accountDb.mjs) or the client's own book, and each failing on
-// the code before the fix. bible/06-Systems/Online-Arc.md (AUDIT 28).
+// the code before the fix. (AUDIT 28).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -122,7 +122,7 @@ test('AUDIT 28 M3: a guild whose Marks would pass its guildmaster\'s cap does no
   await svc.found(g, { name: 'Full Hands', tag: 'FHD' });
   await svc.call('/v1/marks/guild/deposit', { character: g.character, marks: 400, rid: rid() }, g.secret);
   svc.seedMarks(g, 10_000_000 - 100, 'fill');
-  assert.deepEqual(await svc.call('/v1/guilds/disband', { character: g.character }, g.secret), { status: 409, body: { error: 'marks-full', keeps: ['marks-full'] } });   // PIN MOVED: GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md) - the refusal names everything that holds the guild, its first the error as ever
+  assert.deepEqual(await svc.call('/v1/guilds/disband', { character: g.character }, g.secret), { status: 409, body: { error: 'marks-full', keeps: ['marks-full'] } });
   assert.equal(svc.env.DB._raw.prepare('SELECT balance FROM guild_marks').get().balance, 400, 'the treasury holds them still');
 });
 
@@ -135,7 +135,7 @@ test('AUDIT 28 M3: a disband refused for the gold still in its treasury moves no
   assert.equal((await svc.call('/v1/guilds/deposit', { character: g.character, gold: 50, realm: g.at() }, g.secret)).status, 200, 'gold in the treasury');   // MERGE 2: paid on the realm character's record (REALM P2.2a)
   raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('mint', NULL, 'guild', ?, 'test', 90, 1, 1, ?, NULL, 'seed-guild')`).run(guild.id, g.id);
-  assert.deepEqual(await svc.call('/v1/guilds/disband', { character: g.character }, g.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });   // PIN MOVED: GUILD3c - and its whole list
+  assert.deepEqual(await svc.call('/v1/guilds/disband', { character: g.character }, g.secret), { status: 409, body: { error: 'guild-treasury', keeps: ['guild-treasury'] } });
   assert.equal(raw.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').get(guild.id).balance, 90, 'the Marks stay with the guild that stays');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM marks WHERE account = ?').get(g.id).n, 0, 'and none reached the guildmaster behind a shut switch');
 });
@@ -152,7 +152,7 @@ test('AUDIT 28 M4: the gate\'s row and its Marks are one transaction - a strike 
   raw.exec('DROP TRIGGER boom');
   const again = await svc.claim(a, 700, T0);
   assert.equal(again.body.recorded, true);
-  assert.deepEqual(again.body.marks, { struck: 50, balance: 50, combat: { earned: 50, max: 150 } }, 'the retry strikes');   // PIN MOVED (SILVER-WAYS): the day's combat silver beside it
+  assert.deepEqual(again.body.marks, { struck: 50, balance: 50, combat: { earned: 50, max: 150 } }, 'the retry strikes');
   assert.deepEqual((await svc.claim(a, 700, T0)).body.marks, undefined, 'and a third is the claimed row, striking nothing');
   assert.equal(gateStrikeStatement({ db: svc.env.DB, nowS: T0 }, { id: a.id, handle: null }, svc.env, 701), null, 'a guest has no statement to batch');
 });
@@ -239,12 +239,10 @@ test('AUDIT 28 M10: the weekly report counts the ACCOUNTS at a cap, once each, w
   const svc = await standService({ MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' });
   const d = await svc.registered('Devra');
   const a = await svc.registered('Anna');
-  // PIN MOVED (SILVER-WAYS): the cap is the day's combat silver - three gates (150) - where it was the gate's own two
   await svc.claim(a, 700, now); await svc.claim(a, 701, now); await svc.claim(a, 704, now);
   now = T0 + DAY;
   await svc.claim(a, 702, now); await svc.claim(a, 703, now); await svc.claim(a, 705, now);
   const r = (await svc.call('/v1/marks/report', {}, d.secret)).body;
-  // PIN MOVED (AUDIT 625 S6): and SILVER-FINDS' two faucets beside them (test/net/silverfinds_service.test.js)
   assert.deepEqual([r.capped, r.cappedDays], [{ combat: 1, bank: 0, gather: 0, find: 0 }, { combat: 2, bank: 0, gather: 0, find: 0 }]);
 });
 
@@ -257,7 +255,7 @@ test('AUDIT 28 M11: the service\'s own line ids carry a `:` no client id can - a
   svc.seedMarks(a, 100);
   assert.deepEqual(await svc.call('/v1/marks/exchange', { marks: 1, rid: 'gate:900' }, a.secret), { status: 400, body: { error: 'marks-rid' } });
   await svc.call('/v1/marks/exchange', { marks: 1, rid: 'gate-day-900' }, a.secret);   // MARKS1's spelling, now any client's
-  assert.deepEqual((await svc.claim(a, 900, T0)).body.marks, { struck: 50, balance: 149, combat: { earned: 50, max: 150 } }, 'the gate still strikes');   // PIN MOVED (SILVER-WAYS): the day's combat silver beside it
+  assert.deepEqual((await svc.claim(a, 900, T0)).body.marks, { struck: 50, balance: 149, combat: { earned: 50, max: 150 } }, 'the gate still strikes');
   assert.equal(utcDay(T0), Math.floor(T0 / DAY));
 });
 

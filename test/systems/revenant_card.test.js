@@ -1,6 +1,4 @@
-// REVENANT-CARD, REVENANT-PAGE, REVENANT-HARM, REVENANT-DUNGEON, REVENANT-WIRE (2026-10-02, Mac: "Definitely finish this with
-// love. Any new UI elements need to be enhanced UI plus. For taunting enemies. I was hoping it would have a portrait
-// popup and enemy dialog (kind of like our notification system)"). The laws pinned here:
+// REVENANT-CARD, REVENANT-PAGE, REVENANT-HARM, REVENANT-DUNGEON, REVENANT-WIRE. The laws pinned here:
 //   - THE EVENTS: each thing a revenant says or does is an event - its kicker, name, what it is, its portrait (the sprite
 //     it wore, else its kind's by gender; the idle's front record, else the walk's), its words or the narrator's, and
 //     the one line a text surface says instead; a face draws it or the host says the line.

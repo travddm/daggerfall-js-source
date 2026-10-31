@@ -1,5 +1,5 @@
-// THE MERGE (2026-09-28, Mac: "Lets keep moving") - main taken into the professions branch. What the two sides had
-// each built once is one thing now, and these pins hold it so (bible/06-Systems/Online-Arc.md THE MERGE):
+// THE MERGE - main taken into the professions branch. What the two sides had
+// each built once is one thing now, and these pins hold it so (THE MERGE):
 // LootTables.OnLootSpawned (FORAGE3's named registry and OH-E's add-and-remove door, one list); GetCustomItemsForGroup
 // (CSA-H's rows a provider in FORAGE1's one home); PlayerActivate.OnLootSpawned (CSA-H's shelf subscriber by name).
 import { test } from 'node:test';
@@ -38,7 +38,7 @@ test('THE MERGE: LootTables.OnLootSpawned is one list - a named subscriber and a
     registerTabledLootHandler('zz-merge-named', null);
     registerTabledLootHandler('zz-merge-after', null);
   }
-  assert.match(hostText('src/scenes/ohLootHost.js'), /const offTable = tableLootSpawned\.add\(\(e\) => ohUpgrade\(e\.key, e\.items, \[\], e\.where, e\.rolls \?\? Math\.random, e\.roller \?\? player\(\)\)\);/, 'OH-E subscribes through the door');   // PIN MOVED (HOST-SPLIT, EVENT-RULES): out of the world host whole   // PIN MOVED (PARTY-LOOT): the raiser's dice and roller ride the event
+  assert.match(hostText('src/scenes/ohLootHost.js'), /const offTable = tableLootSpawned\.add\(\(e\) => ohUpgrade\(e\.key, e\.items, \[\], e\.where, e\.rolls \?\? Math\.random, e\.roller \?\? player\(\)\)\);/, 'OH-E subscribes through the door');
 });
 
 test('THE MERGE: CSA-H\'s rows are a provider in GetCustomItemsForGroup\'s one home - after the providers before its first row, in registration order, a row only while its mod is on, a second registration none', () => {
@@ -52,7 +52,6 @@ test('THE MERGE: CSA-H\'s rows are a provider in GetCustomItemsForGroup\'s one h
   on = false;
   assert.deepEqual(customItemsForGroup(G), [9901, 9903], 'a mod switched off has no row');
   assert.doesNotMatch(rd('src/systems/roleplayRealismItems/rriItems.js'), /registerCustomItemGroup|_otherModItems/, 'rriItems.js answers RRI\'s own again');
-  // PIN MOVED (SHIPYARDS, 2026-10-11): Come Sail Away's two rows stand on no shelf - a port town's shipyard sells every
   // hull (systems/shipyards.js) - so the fish are the one home's mod rows
   assert.match(rd('src/systems/deepWater/deepWatersFishItems.js'), /import \{[^}]*registerCustomItemGroup[^}]*\} from '\.\.\/item\/itemTemplates\.js';/, 'the fish register into the one home');
   assert.doesNotMatch(rd('src/systems/comeSailAway/comeSailAwayItems.js').replace(/^\s*\/\/.*$/gm, ''), /registerCustomItemGroup/, 'the boats register no shelf row');

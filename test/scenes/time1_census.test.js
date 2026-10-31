@@ -1,5 +1,4 @@
-// TIME1 (2026-10-01, Mac: "I don't want a band aid, I want a detailed way we can do this" / "Let's do it. This needs to
-// be perfect"): THE CENSUS OF THE CLOCKS. Online the world keeps three clocks (bible/06-Systems/Online-Time-Arc.md):
+// TIME1: THE CENSUS OF THE CLOCKS. Online the world keeps three clocks:
 // the SKY (what time of day, what date, which moon - read for "now", never stamped), the EVENT clock (WORLD5's: what
 // the world schedules, stocks, prices and meters) and the character's own. A reader on the wrong one fails silently -
 // a sky read left on the event clock shows the wrong hour, an event read moved to the sky resets a day's cap four times

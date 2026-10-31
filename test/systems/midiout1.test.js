@@ -1,4 +1,4 @@
-// MIDI-OUT1 (2026-10-11, a player asking for MIDI out): THE SONGS ON A MIDI DEVICE (systems/midiOut.js). The player
+// MIDI-OUT1: THE SONGS ON A MIDI DEVICE (systems/midiOut.js). The player
 // is a SongPlayer whose voice is a Web MIDI output: the device is a fake that records what it is sent and when, the
 // clock a number the test moves, so every pin reads the bytes and the timestamps a real device would be handed.
 import { test, afterEach } from 'node:test';

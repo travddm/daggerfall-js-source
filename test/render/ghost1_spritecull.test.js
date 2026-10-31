@@ -1,4 +1,4 @@
-// GHOST1 (2026-09-19) - THE SPRITES THAT WERE CULLED WHILE ON SCREEN.
+// GHOST1 - THE SPRITES THAT WERE CULLED WHILE ON SCREEN.
 //
 // Two field reports from #bug-reports, one bug:
 //   Clerical Error: "loaded from a save and we have ghost campfires now"

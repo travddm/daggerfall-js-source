@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-19f BOSS-DOT (the owner, 2026-10-19: "Carry DoTs") - bible/11-Multiplayer/World-Bosses.md, BOSS-DOT.
+// FIELD BUGS 2026-10-19f BOSS-DOT , BOSS-DOT.
 //
 // A Continuous Damage spell on a body a relay runs landed its cast's round alone: the stand-in forgot every lasting family
 // the moment the count was done (scenes/gate/standInSpell.js countOnStandIn's wipe, and world.js serpentSpellOn's), so a

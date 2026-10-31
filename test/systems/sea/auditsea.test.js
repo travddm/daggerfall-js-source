@@ -1,6 +1,6 @@
-// AUDIT SEA VENTURES (2026-10-22, the owner: "Audit this and ensure perfection") - six cold lanes read SEA VENTURES at
+// AUDIT SEA VENTURES - six cold lanes read SEA VENTURES at
 // 886f2b4a6 (the relay and the wire, the account service, the open zone at sea, the ventures' law, the page's sea, the
-// record's honesty): bible/01-Overview/audits/Audit-Sea-Ventures.md. Each finding fixed is pinned here by its id, the
+// record's honesty):. Each finding fixed is pinned here by its id, the
 // failure it was driven through made to fail again - tools/mutants/auditsea.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -412,7 +412,6 @@ test('AUDIT SEA VENTURES B6: the day a season turns in counts for the old one - 
 /** A room's referee state: two captains in the zone, `gap` metres apart. */
 function seaRoom(gap = 50, now = 1000) {
   const st = newWildRef();
-  // PIN MOVED (AUDIT PVP-EASE L3-3, 2026-10-26): entered a minute before - ZONE-GRACE's safe passage keeps a captain's ship
   // from a shot, and these are captains at war
   wildZone(st, 'a', { id: 'pa', lv: 10, ci: RK }, true, { x: 0, y: 0, z: 0 }, now - WILD_GRACE.ms);
   wildZone(st, 'b', { id: 'pb', lv: 10, ci: RC }, true, { x: gap * SIEGE_UNITS_PER_M, y: 0, z: 0 }, now - WILD_GRACE.ms);
@@ -529,7 +528,7 @@ test('AUDIT SEA VENTURES A3, A4, F1/A1: the relay - what landed is said rounded 
     const a = await join(A, 'peer-0001', -5, RK), b = await join(A, 'peer-0002', 5, RC);
     const helm = (r, ws, hl, u, t = 240) => r.raw(ws, JSON.stringify({ t: 'wild', data: { k: 'helm', hl, t, u, h: 1000 } }));
     await helm(ra, a, 4, 11); await helm(ra, b, 4, 22);
-    clock += WILD_GRACE.ms;   // PIN MOVED (AUDIT PVP-EASE L3-3): past their entry's safe passage (it was 30 s, the guns' refill alone)
+    clock += WILD_GRACE.ms;
     await helm(ra, a, 4, 11); await helm(ra, b, 4, 22);
     for (let i = 0; i < 10; i++) { clock += 100; await ra.raw(a, JSON.stringify({ t: 'wild', data: { k: 'shot', to: 'peer-0002', d: 1, s: 0, f: 0 } })); }
     const hulls = b.sent.filter((m) => m.t === 'wref' && m.k === 'hull');
@@ -870,7 +869,7 @@ test('AUDIT SEA VENTURES C1, C3, C4, C5/F2: the linked bank cabin is a teleport 
   assert.match(w, /const wildWalkRow = \(x, y\) => \{ const m = wildMask\(\); return !online\?\.wildOk \? null : etherSea && etherWildRingAt\(x, y\) > 0 \? zoneWord\('walkInto', ETHER_KIND\) : m && wildNear\(m, x, y\) \? WILD_TEXT\.walkInto : null; \};/);
   assert.equal(zoneWord('walkInto', ETHER_KIND), ETHER_WILD_TEXT.walkInto());
   assert.match(zoneWord('walkInto', ETHER_KIND), /open Eltheric Ocean past Veilhaven's peace, an open PvP zone/);
-  // C4 (PIN MOVED, STORE-KEEPS 2026-10-26): a wagon parked on the open sea's ground was WITH its owner at a death there
+  // C4 (
   // (CART-AWAY's word), and its cargo taken. No death takes the cart now, wherever it is parked - the open sea's isle too
   const parked = (px) => ({ Mode: WAGON_MODE.Deployed, WorldX: px.x * 32768 + 16384, WorldZ: (499 - px.y) * 32768 + 16384 });
   const h = veilhaven(), isle = islesNear(h.px - 300, h.py, 40).find((i) => i.kind === 'wild' || i.kind === 'ruin');
@@ -894,9 +893,9 @@ test('AUDIT SEA VENTURES C1, C3, C4, C5/F2: the linked bank cabin is a teleport 
 
 test('AUDIT SEA VENTURES C6, C7: the open sea says its own words - /unstuck outdoors, a second revenant, a party left, a drop answered after the rise (by the room the fall was in), and the zone gone while still past the peace (never "Veilhaven\'s peace" where she is not) (mutants: each word, each call)', () => {
   const sea = (k) => zoneWord(k, ETHER_KIND), hills = (k) => zoneWord(k, null);
-  assert.equal(hills('unstuckOut'), '/unstuck does not work outdoors in Cyrodiil.');   // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the zone's ground Cyrodiil
+  assert.equal(hills('unstuckOut'), '/unstuck does not work outdoors in Cyrodiil.');
   assert.equal(sea('unstuckOut'), '/unstuck does not work outdoors on the open Eltheric Ocean.');
-  assert.equal(hills('revenantOne'), 'Only one revenant may walk at your side in Cyrodiil.');   // PIN MOVED (WW-C2)
+  assert.equal(hills('revenantOne'), 'Only one revenant may walk at your side in Cyrodiil.');
   assert.equal(sea('revenantOne'), 'Only one revenant may walk at your side on the open Eltheric Ocean.');
   assert.equal(hills('truce'), WILD_TEXT.truce);
   assert.match(sea('truce'), /^No longer in your party\. On the open Eltheric Ocean/);
@@ -904,7 +903,7 @@ test('AUDIT SEA VENTURES C6, C7: the open sea says its own words - /unstuck outd
   assert.match(sea('dropLate'), /when you died at sea/);
   assert.match(sea('burntLate')(), /when you died at sea .* frozen/);
   assert.equal(sea('quiet'), 'You are out of the open Eltheric Ocean\'s PvP zone. No player may attack you here.');
-  const w = hostText('src/scenes/world.js');   // PIN MOVED (HOST-SPLIT): the risen word in scenes/wildDropHost.js, read with its host
+  const w = hostText('src/scenes/world.js');
   assert.match(w, /say\(zoneWord\('unstuckOut'\)\); return true; \}/);
   assert.match(w, /townTalk\.say\(zoneWord\('truce'\)\);/);
   assert.match(w, /townTalk\.say\(d\.burnt \? zoneWord\('burntLate', seaRoomOf\(room\) \? ETHER_KIND : null\)\(\) : zoneWord\('dropLate', seaRoomOf\(room\) \? ETHER_KIND : null\)\);/);

@@ -262,7 +262,6 @@ test('SAV4 window: load go hands the RIGHT KEY through the (char,name) identity'
     seedSaves(globalThis.localStorage);
     win.refresh(); win._select(1);          // 'Old' = slot key 0
     win.input('Enter');
-    // PIN MOVED, ROAD-C C1. It asserted the load landed on the KEY
     // PRESS. It does not: SaveLoadEventHandler's load arm raises
     // `loading` and LoadGame waits out `loadingCountdown` (:313-315,
     // :516-520) so the "Please wait..." label can DRAW first. The half

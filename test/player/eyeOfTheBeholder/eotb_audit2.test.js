@@ -1,7 +1,6 @@
-// ═══ AUDIT-EOTB2 (2026-09-16) → EOTB-IL (2026-09-17): THE INTEGRATION ═══
+// ═══ AUDIT-EOTB2 → EOTB-IL: THE INTEGRATION ═══
 //
-// Mac: "Do an audit on eye of the beholder. Ensure its integrated 1:1.
-// No half assed work." Then, with the shipped archive in hand: "it
+// Then, with the shipped archive in hand: "it
 // needs to be 1:1 with the uploaded file. No exceptions."
 //
 // AUDIT-EOTB2 wired the body through the only path a player has
@@ -518,8 +517,7 @@ test('EOTB-IL: the SwitchShoulder and ToggleInput keys on their RELEASE edge (Ge
 // ─────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────
-// EOTB-FLIP (2026-09-16, Mac, off a GPU at last: "The character is
-// upside down (classic sprite)")
+// EOTB-FLIP
 // ─────────────────────────────────────────────────────────────────
 
 test('EOTB-FLIP: a decoded PNG is turned into the world billboard\'s row order ONCE, through the tree\'s one converter - the top row lands last', () => {

@@ -1,10 +1,10 @@
-// TEXT-F1 (2026-10-07, Mac: "Any human input elements need filtering, including notes"): A PLAYER'S WORDS, FILTERED.
+// TEXT-F1: A PLAYER'S WORDS, FILTERED.
 // NAME-F1's filter judged a NAME, read whole; a sentence read whole hides every word in it. net/nameFilter.js now reads a
 // line word by word (maskText, textCaught) and the laws every player's words pass through star what it catches: a chat
 // line, a red line and a narration (wire.js sanitizeChat - both ends and the relay's parse), a letter's lines, a note's,
 // a guild note's and a journal page's (wire.js wordsLine - net/letterLaw.js, the board's law, the page law). Name-shaped
 // words are judged instead: a rank's name refused naming the word, a custom class dropped from a look, a maker's mark left
-// off, an item's typed name starred wherever it is named. The record: bible/06-Systems/Online-Arc.md TEXT-F1.
+// off, an item's typed name starred wherever it is named. The record: TEXT-F1.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,11 +1,10 @@
-// HT-WAIST-BACK (2026-09-24). Mac, looking at screenshots of the Eye Of The Beholder sprite with HT-WAIST's lantern
+// HT-WAIST-BACK. Mac, looking at screenshots of the Eye Of The Beholder sprite with HT-WAIST's lantern
 // hung at the right hip - visible from the front, the side, walking and behind: "Just have it show on the back of the
 // sprite, not all angles. Make sure all the eye of the Beholder sprites get this change."
 //
 // THE LAW. The lantern's picture is drawn only while the viewer sees the sprite STRAIGHT FROM BEHIND: the one view
 // of EOTB's eight whose record is the back - orientation 4 (the camera straight behind, record +4) - and never from
-// the back diagonals 3 and 5 (record +3, the back three-quarter; HT-WAIST-BACK let them in first, and Mac: "It still
-// shows on the back side angle"), the front, the front diagonals or the sides (0, 1, 2, 6, 7). The numbering is orientationFor's (0 the camera in front, 4 behind) through the wheel [0, 1, 2, 3, 4, 3, 2, 1]; which
+// the back diagonals 3 and 5 (record +3, the back three-quarter; HT-WAIST-BACK let them in first, and), the front, the front diagonals or the sides (0, 1, 2, 6, 7). The numbering is orientationFor's (0 the camera in front, 4 behind) through the wheel [0, 1, 2, 3, 4, 3, 2, 1]; which
 // record is a back was read off the vendored art (112364 idle 0-4, walk 5-9, armed walk 20-24; 112372 idle 0-4).
 // Unseen, it still HANGS: it swings on, and the local player's light stays at the hip.
 //

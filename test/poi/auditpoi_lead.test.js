@@ -1,6 +1,5 @@
-// AUDIT POI, the lead's (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-4, POI-5, POI-6) - WHAT THE LANES LEFT TO
+// AUDIT POI, the lead's - WHAT THE LANES LEFT TO
 // THE MERGE: the joins between one lane's change and another's code, and the notes each lane left beside its own.
-// Mac: "Audit everything. Ensure perfection."
 //   - L1 a press holds the editor's docks until it ends (lane D's note: a field's change in the press's mousedown drew
 //     the dock again and took the button from under the pointer);
 //   - L2 the UV dialog unwraps off the page's thread (lane F's M13 wired to the panel), Apply waits for it, and an

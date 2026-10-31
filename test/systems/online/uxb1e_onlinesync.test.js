@@ -1,5 +1,4 @@
-// UXB1-E (2026-09-25, the UX backlog: "Add a 'sync from server' option so players can ensure their offline play
-// matches the host they prefer to play on if they want.").
+// UXB1-E.
 //
 // Online, the switches the room owns read the room's values and the player's store is never written (onlineLane.js);
 // offline the player's own stand again. There is no host to ask - a relay publishes no rules; they are the lane's,
@@ -28,14 +27,14 @@ function fresh() {
 test('UXB1-E: a sync writes only what differs, each into its own store, keeps what it replaced, and Undo puts it back', () => {
   fresh();
   setPref('enhancedAI', false);
-  setPref('enhancedClimbing', false);   // PIN MOVED (WATER-OFF, 2026-10-08): the water is the player's online now, so another forced switch stands in
+  setPref('enhancedClimbing', false);
   setValue('Controls', 'AllowMagicRepairs', 'False');
   setValue('Experimental', 'SmallerDungeons', 'True');
   setModSetting('pcaao', 'Enabled', false);
   setModSetting('roleplay-realism', 'RefinedTraining.intensiveTraining', true);
   saveSettings();
   const before = onlineSyncPlan({ search: '' });
-  // SD-ONLINE (PIN MOVED): the world's sizes are forced on online and off by default, so a fresh profile differs there too
+  // SD-ONLINE (
   assert.deepEqual(before.filter((r) => !r.same).map((r) => r.id).sort(), [
     'mods:pcaao/Enabled', 'mods:roads-hazelnut/RiversAndStreams', 'mods:roleplay-realism/RefinedTraining.intensiveTraining',
     'prefs:enhancedAI', 'prefs:enhancedClimbing', 'prefs:worldDungeonSizes',

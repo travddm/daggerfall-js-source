@@ -1,5 +1,4 @@
-// AUDIT HCC - THE BRANCH AUDIT (2026-09-23, Mac: "Let's do an audit on everything before we merge. This needs to be
-// perfect"). Five lenses over the whole branch; the findings in Horse Cart and Cargo's own machine and its hosts,
+// AUDIT HCC - THE BRANCH AUDIT. Five lenses over the whole branch; the findings in Horse Cart and Cargo's own machine and its hosts,
 // pinned here BY EXECUTION where the seam is a function and by source where it is a call in a frame. (The park lane's
 // and the riders' findings are pinned in test/net/hcc_park.test.js.) `06-Systems/Horse-Cart-And-Cargo.md` AUDIT BRANCH.
 import { test } from 'node:test';

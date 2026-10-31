@@ -1,4 +1,4 @@
-// WISPS-RETURN (2026-09-25): A WISP AS THE GAME DRAWS IT, IN NODE. The real WindWispsRenderer draws on a recording
+// WISPS-RETURN: A WISP AS THE GAME DRAWS IT, IN NODE. The real WindWispsRenderer draws on a recording
 // WebGL2 (a uniform's location is its name), and the uniforms it uploads are handed to the shaders' own main()s
 // (test/glsl.mjs): the vertex stage at one corner of one wisp, its outs handed on to the fragment stage. Nothing here
 // restates a uniform the renderer sets, so a pin read through it holds what the renderer and the shaders do together.

@@ -310,7 +310,7 @@ test('U47: the window is the guard, not its click method - and F11 no longer goe
   // survived restoring the defect.
   const tt = code('scenes/townTalk.js');
   const pd = tt.slice(tt.indexOf('function pointerdown(e) {'), tt.indexOf('function hover(e) {'));
-  // STATUS-LIVE (2026-09-22): the guard is still on the WINDOW - what
+  // STATUS-LIVE: the guard is still on the WINDOW - what
   // it asks is the PAUSE. A box the game is not stopped for (the
   // status readout, ui/statusBox.js) is standing in this slot while
   // the player walks, and a press then belongs to the world.

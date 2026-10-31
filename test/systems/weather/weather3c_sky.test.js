@@ -1,4 +1,4 @@
-// WEATHER3 slice C (2026-09-22): THE SKY IS THE MAP'S. Every system near
+// WEATHER3 slice C: THE SKY IS THE MAP'S. Every system near
 // the player is a cloud - its bands as nested discs - chosen for the few
 // slots by how much of the sky it fills and drawn lowest priority first
 // so the blend agrees with the worn word; the clouds stand on clear air

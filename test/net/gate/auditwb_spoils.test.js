@@ -1,7 +1,7 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE SPOILS AND THE CLAIMS, pinned - a fighter outside the
+// AUDIT WB: THE SPOILS AND THE CLAIMS, pinned - a fighter outside the
 // court at the kill who never got their spoils (A2), a receipt let go on a refusal the service could mend (A5), storage
 // that refused writes and lost receipts and records (A6), a crash record with one slot (A7), and keys that were the
-// device's when they were an account's (A9). Design: bible/11-Multiplayer/World-Bosses.md section 11.
+// device's when they were an account's (A9). Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -1,10 +1,10 @@
-// WALLET-UI (2026-10-07, Mac: "Polish and organize the ingame wallet item for ease of readability"): THE WALLET'S LEDGER.
+// WALLET-UI: THE WALLET'S LEDGER.
 // The wallet's sheet said its currencies as a stack of centred lines, the classic box's words one paragraph each. It is a
 // ledger now (systems/walletItem.js walletLedger): two parts under their names - the coin (gold, silver) and what the
 // wallet holds (letters of credit, Deadlands Embers, Welkynd Shards) - a row a currency, its label left and its figure
 // right in one column, an empty one dimmed, a figure not counted here giving way to why, a letter's worth under its count.
 // The classic box says the same rows as lines (walletLines), so the two cannot disagree. Photographed by
-// tools/walletProbe.mjs. The record: bible/06-Systems/Wallet.md WALLET-UI.
+// tools/walletProbe.mjs. The record: WALLET-UI.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

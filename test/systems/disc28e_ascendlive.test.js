@@ -52,7 +52,7 @@ function character() {
 function werewolf() {
   const p = character();
   assert.ok(createLycanthropyCurse(p, LYCANTHROPY_TYPES.Werewolf, { now: NIGHT }));
-  morphSelf(p, { force: true, nowMinutes: NIGHT });   // PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the +40 is the beast's - the report's werewolf has changed
+  morphSelf(p, { force: true, nowMinutes: NIGHT });
   lycanthropyMagicRound(p, { nowMinutes: NIGHT + 1 });
   assert.equal(liveStat(p, 'strength'), 100, 'the curse\'s +40, read through liveStat itself');
   return p;
@@ -89,9 +89,9 @@ test('ASCEND-LIVE: a vampire by day reads lower and by night higher - the live v
   vampirismMagicRound(p, { nowMinutes: DAY });
   const s = new LevelUpScreen(p, seq(0), { fanfare: false });
   assert.deepEqual([row(s, 'strength').value, row(s, 'strength').live], [63, 43]);
-  assert.equal(liveNote(row(s, 'strength')), 'Lowered to 43 for now');   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.equal(liveNote(row(s, 'strength')), 'Lowered to 43 for now');
   assert.equal(liveTint(row(s, 'strength')), 'lowered', 'the classic sheet\'s drained tint');
-  assert.equal(starLabel(row(s, 'strength')), 'Strength 43 (63 permanent)');   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.equal(starLabel(row(s, 'strength')), 'Strength 43 (63 permanent)');
   vampirismMagicRound(p, { nowMinutes: NIGHT + 24 * 60 });
   assert.equal(row(new LevelUpScreen(p, seq(0), { fanfare: false }), 'strength').live, 83);
 });
@@ -113,7 +113,7 @@ test('ASCEND-LIVE: a point held at a FLOOR is flagged as one at the ceiling is -
   // A point that shows is never flagged: by night the same Strength reads 63 - 45 + 20 and rises with a press.
   vampirismMagicRound(p, { nowMinutes: NIGHT + 24 * 60 });
   const night = row(new LevelUpScreen(p, seq(0), { fanfare: false }), 'strength');
-  assert.deepEqual([night.live, night.capped, liveNote(night)], [38, false, 'Lowered to 38 for now']);   // PIN MOVED (AUDIT GROWTH LANE5-1)
+  assert.deepEqual([night.live, night.capped, liveNote(night)], [38, false, 'Lowered to 38 for now']);
 });
 
 test('ASCEND-LIVE: the mod\'s lane and the view the Stats page opens read the same live values the Stats page draws', () => {

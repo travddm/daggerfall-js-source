@@ -1,6 +1,4 @@
-// GALLEON (2026-10-01, Mac: "So this model is to replace the current ingame gallon model. The doors/hatches should open
-// and close and we will need to give this a proper texture, along with a wheel at the helm, the sails and ropes, amd
-// ensuring cannon fire shoots from the cannon holes properly") - the new galleon held to her model: the bake to the
+// GALLEON - the new galleon held to her model: the bake to the
 // bytes, her parts facing out, her guns firing from her ports, her shutters, hatches and doors, her helm, her rig, her
 // pictures, the loader's fallback, and HULL_BUILDS' Small Ship measured off her.
 import '../../modsOff.js';
@@ -221,7 +219,7 @@ test('GALLEON THE GUN DECK AT WORK: a battery laid opens its side\'s shutters an
   t = run(t, shot + HOLD_S + 2 - t);
   r = deck.read(boat, t);
   assert.ok(!r.starboard.laid && r.starboard.guns.every((x) => Math.abs(x - RUN_IN_X) < 1e-9) && !r.starboard.open.some(Boolean), 'run in to load, shut');
-  // a hull of another build: none of her nodes, nothing asked (PIN MOVED, SHIPS-2: the Carrack is Mac's New Ship 2 and
+  // a hull of another build: none of her nodes, nothing asked (
   // carries a gun deck of her own - test/systems/naval/ships2_carrack.test.js - so the Large Boat, her swivels on her caps, is the hull
   // without one)
   const other = s.place(HULL.LargeBoat, 0);
@@ -280,13 +278,11 @@ test('GALLEON HER HELM: a wheel on the castle\'s roof before the helmsman\'s pla
   const { s, boat } = placed();
   const wheel = nodeNamed(boat, 'HelmWheel'), rudder = nodeNamed(boat, 'HelmRudder');
   assert.ok(wheel && rudder && wheel.parent === boat.RudderObject && rudder.parent === boat.RudderObject, 'both under her RudderObject');
-  // PIN MOVED (AUDIT GALLEON-2 PF7, 2026-10-03): the helm's trigger over the wheel and its binnacle - its metre's cube
   // 0.25 m forward of the hub, the hub inside it (at the hub, the binnacle's collider stood out of its fore face and took
   // the activation ray from forward of the wheel)
   assert.deepEqual([...boat.DriveTrigger.parent.localPosition], [...DRIVE_TRIGGER_AT], 'the helm\'s trigger at the wheel');
   assert.ok(DRIVE_TRIGGER_AT[0] === HELM.hub[0] && DRIVE_TRIGGER_AT[1] === HELM.hub[1] && Math.abs(DRIVE_TRIGGER_AT[2] - HELM.hub[2]) <= 0.3, 'the hub inside its cube');
   assert.deepEqual([...boat.DrivePosition.localPosition], [...HELM.stand]);
-  // PIN MOVED (AUDIT GALLEON P1, 2026-10-02): DrivePosition is where Come Sail Away pins the helmsman's capsule CENTRE
   // (world.js csaSetPlayerPosition: his feet half a height under it), so it stands half a capsule over her roof - on
   // the roof itself it put his feet 0.9 m under it, through it into her great cabin, and his eye under the wheel's hub
   near(HELM.stand[1], MEASURED.castleRoofY + CAPSULE_HEIGHT / 2, 1e-9, 'the helmsman on her roof: his capsule\'s centre half its height over it');
@@ -328,14 +324,13 @@ test('GALLEON HER RIG: five sails by Come Sail Away\'s names - three square (two
   const set = pts();
   const moved = set.filter((p, i) => Math.hypot(p[0] - furled[i][0], p[1] - furled[i][1], p[2] - furled[i][2]) > 0.5).length;
   assert.ok(moved > set.length / 2, `the canvas comes down off its yards (${moved} of ${set.length})`);
-  // the rig boxes: each out of her hull's box, and every point of her set canvas over her roof within them. PIN MOVED
+  // the rig boxes: each out of her hull's box, and every point of her set canvas over her roof within them.
   // (AUDIT GALLEON R5/G9): her boxes hang down to her canvas - the course's foot, the gaff sail's and the jib's lie under
   // her roof, and her boxes with them - so each reaches out of her hull's box (over her roof, past her stem or her side)
   // where every box stood over her roof; the chain shot's band starts at her roof (navalAI.js rigBand), and
   // test/systems/naval/auditgalleon_rig.test.js holds every point of her set canvas in them at every trim
   const b = hullBuild(HULL.SmallShip);
   for (const [mn, mx] of b.rig) assert.ok(mx[1] > b.top || mx[2] > b.bowZ || mn[2] < b.aftZ || mx[0] > b.halfWidth || mn[0] < -b.halfWidth, 'a rig box out of her hull\'s box');
-  // PIN MOVED (AUDIT GALLEON R5/G9): her canvas read in her mesh object's own frame, her heel taken off - she heels 1.4
   // degrees standing before the wind, and her boxes fit her canvas now (a main topsail's clew stood 0.32 m out of its
   // box at its height on the translation alone, where the old boxes had a metre to spare)
   const mw = boat.MeshObject.worldMatrix();

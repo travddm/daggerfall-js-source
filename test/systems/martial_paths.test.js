@@ -1,4 +1,4 @@
-// MARTIAL - MARTIAL SPECIALISATIONS (2026-10-17; bible/05-Combat/Martial-Specialisations.md). The owner: "we've properly
+// MARTIAL - MARTIAL SPECIALISATIONS. The owner: "we've properly
 // balanced mages, added a specialization tree and added the firmament system. I want to do the same for other weapon
 // types/classes." Asked, the owner chose: the six weapon skills, fifteen paths; the signature a technique on the technique
 // key when the weapon carries no line; an arcane path and a martial path together; and the balance pass whole - every
@@ -189,11 +189,11 @@ test('MARTIAL1 THE CHOICE: two weapon skills mastered open their path; the choic
   assert.equal(AP.pathHeld(sw)?.id, 'bloodmage'); assert.equal(MP.martialHeld(sw)?.id, 'blademaster');
   // the words: the box's rows, its two skills, its reset's price, each path's numbers in its own words
   const rows = MP.martialChoiceRows(fighter([LB, AR]), 'ranger');
-  assert.equal(rows[0], 'Martial specialization: Ranger?'); assert.equal(rows[1], 'Long Blade and Archery');   // PIN MOVED (AUDIT MARTIAL L4 L4): never the arcane ask's words
-  assert.ok(rows.includes('Resetting it later costs 200,000 gold.'));   // PIN MOVED (SPEC-RESET): the paid reset's price, where it said permanent
+  assert.equal(rows[0], 'Martial specialization: Ranger?'); assert.equal(rows[1], 'Long Blade and Archery');
+  assert.ok(rows.includes('Resetting it later costs 200,000 gold.'));
   assert.match(MP.martialPowerRows(MP.MARTIAL_BY_ID.vanguard).join(' '), /10% less damage.*Judgement \(signature technique\).*8 meters.*2\.5 meters.*4% of your health.*3 enemies/);
   assert.match(MP.martialPowerRows(MP.MARTIAL_BY_ID.berserker).join(' '), /Below 50%.*20% more damage.*10%.*Savage Whirl.*3 meters.*8 seconds.*10%/);
-  assert.match(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger, MP.MARTIAL_BY_ID.vanguard]).join(' '), /2 martial specializations are open to you: Ranger, Vanguard/);   // PIN MOVED (VOICE2): specialization (Voice.md rule 8)
+  assert.match(MP.martialOpenRows([MP.MARTIAL_BY_ID.ranger, MP.MARTIAL_BY_ID.vanguard]).join(' '), /2 martial specializations are open to you: Ranger, Vanguard/);
 });
 
 test('MARTIAL1 THE SAVE: the martial path and its one ask round-trip beside the arcane path; an id no table holds reads as none; a save from before the arc has none (mutants: the path dropped on save; an unknown id kept)', () => {
@@ -208,7 +208,7 @@ test('MARTIAL1 THE SAVE: the martial path and its one ask round-trip beside the 
   restorePlayer(forged, { ...snap, martialPath: 'samurai' });
   assert.equal(forged.martialPath, null);
   const { martialPath: _a, martialPrompted: _b, ...before } = snap;
-  before.career = { ...snap.career }; delete before.career.martialMirror;   // PIN MOVED (AUDIT MARTIAL L3 F1): a save from before the arc carries no mirror either
+  before.career = { ...snap.career }; delete before.career.martialMirror;
   const old = structuredClone(playerEntity);
   restorePlayer(old, before);
   assert.equal(old.martialPath, null); assert.equal(old.martialPrompted, false);
@@ -492,7 +492,7 @@ test('MARTIAL4 THE PASSIVES: each through its own seam, on both sides of its lin
 test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions tell, on a foe of mine alone - and the door told by the swing\'s resolveHit and the shaft\'s playerArrowHitFoe (mutants: each rider\'s number; another path\'s form answered; the tell dropped from either resolution)', () => {
   const rec = (name, ent) => ({ name, entity: ent, ai: { feet: [0, 0, 1] }, dead: false });
   const land = (id, f, damage, use = {}) => tellTechniqueLanded({ id, use }, f, damage);
-  const used = (id, ent) => tellTechniqueUsed(id, {}, ent);   // PIN MOVED (AUDIT MARTIAL L1 L3): a window opens as the press goes
+  const used = (id, ent) => tellTechniqueUsed(id, {}, ent);
   // Blademaster: cut again for half
   reset();
   let me = pathFighter('blademaster'); let o = rec('o', foe()); let d = door([o], me);
@@ -516,7 +516,7 @@ test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions te
   reset(); me = pathFighter('bladedancer'); o = rec('o', foe()); door([o], me);
   used('cyclone', me); assert.equal(POW.martialPace({ entity: me }), 20);
   _clock += 6.01; assert.equal(POW.martialPace({ entity: me }), 0);
-  // Bloodletter: a foe already under 25% takes it again (PIN MOVED, AUDIT MARTIAL L1 M1: its health before the blow - the
+  // Bloodletter: a foe already under 25% takes it again (
   // pool's door lands the blow after, and may land less)
   reset(); me = pathFighter('bloodletter'); o = rec('o', foe({ health: 24 })); const p25 = rec('p', foe({ health: 25 })); d = door([o, p25], me);
   land('guttingLunge', o, 6); assert.deepEqual(d.hurts, [['o', 6]], '24 of 100');
@@ -542,7 +542,7 @@ test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions te
   used('earthsplitter', me);
   me.health = me.maxHealth = 1000;
   setStruck(foe(), me, 100); hurtPlayer(me, 100); assert.equal(me.health, 925);
-  // Woodsman: a foe it fells restores 10% of my health - the kill's word (PIN MOVED, AUDIT MARTIAL L1 M1)
+  // Woodsman: a foe it fells restores 10% of my health - the kill's word (
   reset(); me = pathFighter('woodsman'); me.health = 100; door([], me);
   const tree = foe({ health: 10 });
   land('fellingStrike', rec('o', tree), 9); assert.equal(me.health, 100, 'not felled');
@@ -587,7 +587,6 @@ test('MARTIAL3 THE RIDERS: each through the one landing door both resolutions te
 
 test('BAL10 THE FIRMAMENT: every weapon family two notables that raise its skill - Axe and Blunt a third - stats moved, never a key; no sign passes a cap (mutants: a notable\'s skill dropped)', () => {
   const named = (name) => [...FIRM_NODES.values()].find((n) => n.name === name);
-  // PIN MOVED (AUDIT MARTIAL L2 F9): each skill notable keeps every stat it had, the skill beside it
   assert.deepEqual({ ...named('Blade Dancer').stats }, { longDmg: 4, speed: 2, 'skill.LongBlade': 4 });
   assert.deepEqual({ ...named('Iron Knuckles').stats }, { fistDmg: 5, strength: 3, 'skill.HandToHand': 4 });
   assert.deepEqual({ ...named('Headsman').stats }, { axeDmg: 4, strength: 3, 'skill.Axe': 5 });

@@ -1,4 +1,4 @@
-// POTION-DOOR (2026-10-25, SaberGGaming's report: "potions from recipes give no XP"; the owner: "No band aids") - ONE DOOR.
+// POTION-DOOR - ONE DOOR.
 // DFU's potion maker minted its potion on the client and asked no service, so it earned nothing, while the Stores page's
 // brew paid; and the Mages Guild's Make Potions was no alchemy station. Now, online at an alchemy station - an
 // Alchemist's, a Mages Guild hall, a home's - the maker's grid holds the Stores' ingredients and a mix DFU's recipe law

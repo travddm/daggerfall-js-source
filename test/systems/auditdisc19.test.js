@@ -1,6 +1,6 @@
-// AUDIT DISC19 (2026-09-24, Mac: "Do an audit on this") - four lenses over the DISC19 batch (the watch, the saves,
+// AUDIT DISC19 - four lenses over the DISC19 batch (the watch, the saves,
 // the Light / chunk / door fixes, and the pins themselves). Every confirmed finding was reproduced in node first, fixed
-// at its root, and is pinned here BY EXECUTION where the seam is a function (bible/01-Overview/bugs/Field-Bugs-2026-09-24.md,
+// at its root, and is pinned here BY EXECUTION where the seam is a function (,
 // "AUDIT DISC19"):
 //   W1 the defenders walked away mid-melee - a monster fighting one read as a quiet town (isTownThreat).
 //   W2 a blow on a defender levied no crime and made a rogue that turned the town's guards; now it is Assault and the

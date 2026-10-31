@@ -9,8 +9,7 @@ const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8')
 const slider = (m) => labWindSlider(m.vector());
 
 test('WIND1: a front builds, holds and rolls away - the time-lapse', () => {
-  // Mac: "seeing a storm rolling in as the wind kicks up, and the front
-  // rolling away as the wind kicks down." A sunny day; at midnight the
+  // A sunny day; at midnight the
   // sim turns to thunder; the next midnight, back to sunny.
   const m = createWindModel({ seed: 3 });
   const at = (t) => { m.tick(t, t >= 1440 && t < 2880 ? 'thunder' : 'sunny'); return slider(m); };

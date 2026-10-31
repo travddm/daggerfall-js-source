@@ -89,7 +89,7 @@ test('ROCK-SMEAR: every rock stand-in, and the pack\'s docks, ramp and steps bes
   }
 });
 
-// AUDIT FB1018f L4-6 (bible/01-Overview/audits/Audit-Field-Bugs-2026-10-18f.md): the pack's rocks stand near their
+// AUDIT FB1018f L4-6: the pack's rocks stand near their
 // origins and their prisms wind one way, so the law's two terms were not read - a face's centre against the boulder's
 // own axis (round (cx, cz)), and the corners' signed area whichever way they run
 test('ROCK-SMEAR THE LAW, NOT THE PACK\'S CASE (AUDIT FB1018f L4-6): a boulder whose box stands off its origin by more than its width still faces out - its faces are read against its own axis - and a prism faces out whichever way its corners run, in any quadrant', () => {

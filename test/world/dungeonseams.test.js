@@ -1,5 +1,4 @@
-// DUNGEON-SEAMS (2026-09-26, a player, relayed by Mac: "if you look around stairs and curved cellings in dungeons, you
-// can spot holes leading into void, sometimes you can even see other rooms through those holes"): THE HOLES IN
+// DUNGEON-SEAMS: THE HOLES IN
 // DAGGERFALL'S OWN MODELS, CLOSED. world/arch3dSeams.js moves the corners of the stairs whose treads stop short of their
 // walls and of the vault and round-room ceilings that stop short of their corridors, on a copy the pipeline draws
 // (scenes/dataPipeline.js); tools/seamCensus.mjs measures every dungeon block with and without it. Synthetic tests

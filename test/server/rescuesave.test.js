@@ -1,4 +1,4 @@
-// RESCUE-SAVE (2026-09-30, the outage: SwordsmanEB lost progress; Mac: "Do it") - A SAVE THE SERVICE HAS NOT TAKEN IS
+// RESCUE-SAVE - A SAVE THE SERVICE HAS NOT TAKEN IS
 // KEPT ON THE DEVICE. A realm character's save lived in the playing session's memory until a put landed: a page closed,
 // reloaded or exited while the service was away took everything since the last checkpoint that landed, and so did an
 // ordinary close, whose checkpoint the page's going cuts off (or its keepalive leave lands first and it is refused).
@@ -6,7 +6,7 @@
 // follows - once its put goes unanswered past a grace, at once on a hidden page, or when a put is refused or unanswered -
 // and dropped when a put lands with nothing newer behind it; a join whose record still stands at that sequence plays it
 // (openRealmBoot `restored`), and a record that moved past it (another device, a trade, an act) drops it unread.
-// AUDIT RESCUE-SAVE (2026-09-30, Mac: "Audit this"), its findings pinned below: A1 a kept save's spoils handed twice; A2
+// AUDIT RESCUE-SAVE, its findings pinned below: A1 a kept save's spoils handed twice; A2
 // a copy outliving its character; A3 a landed save's spoils handed again when its answer was lost (older than the copy,
 // closed by A1's own law); A4 an older tab's copy over a newer tab's; A5 a device out of room dropping the copy it kept;
 // A6 a save-sized write at every checkpoint; A7 copies no join can play; A8 the restore said after every close.
@@ -210,7 +210,6 @@ test('RESCUE-SAVE: A RECORD MOVED PAST THE COPY - another device played on and s
   assert.equal(boot.restored, undefined);
   assert.equal(boot.snap.level, 13);
   assert.equal(readUnsent(dev.storage, c.id), null, 'no longer the copy a join plays');
-  // PIN MOVED (STRANDED, FIELD BUGS 2026-10-25 - guild standing and quests reset): it was deleted here, unread, with
   // everything played since the last save that landed. A copy whose put failed is set aside, and the world says so
   assert.equal(boot.stranded, true);
   assert.equal(readStranded(dev.storage, c.id)?.text, JSON.stringify(save(20, 1)), 'the copy, whole, under its own key');
@@ -300,7 +299,7 @@ test('RESCUE-SAVE: the world host says it once the world stands - only for a cop
   assert.match(REALM_RESTORED_TEXT, /this device kept it/i);
 });
 
-// ═══ AUDIT RESCUE-SAVE (2026-09-30, Mac: "Audit this") ═══════════════════════════════════════════════════════════════
+// ═══ AUDIT RESCUE-SAVE ═══════════════════════════════════════════════════════════════
 
 /** world.js's own statements, sliced (test/systems/auditrealm2_client.test.js's harness). */
 function sliced(rel) {
@@ -569,7 +568,6 @@ test('AUDIT RESCUE-SAVE A7: the Online door drops a copy of the account\'s own c
   const os = sessionOf(other, c.id, theirs);
   await os.checkpoint(JSON.stringify(save(20, 1)));
   await os.leave({ keepalive: true });   // played there, and left (a row still playing is its tab's - AUDIT 2 B6)
-  // PIN MOVED (STRANDED): this copy's put failed (offline), so the door leaves it for the join, which reads the realm's
   // save before it sets the copy aside or drops it
   assert.equal(sweepUnsent(dev.storage, (await realmList(dev.io)).characters), 0, 'a copy whose put failed is the join\'s');
   assert.equal(readUnsent(dev.storage, c.id)?.missed, true);
@@ -583,7 +581,7 @@ test('AUDIT RESCUE-SAVE A7: the Online door drops a copy of the account\'s own c
   assert.equal(keepUnsent(dev.storage, stranger, 4, '{"v":2}', { lease: 'b'.repeat(32) }), false, 'A4 by the letter: another lease writes nothing');
 });
 
-// ═══ AUDIT RESCUE-SAVE 2 (2026-09-30, Mac: "Audit this", again - over the merge with REALM-GZIP) ════════════════════════
+// ═══ AUDIT RESCUE-SAVE 2 ════════════════════════
 
 test('AUDIT RESCUE-SAVE 2 B1: a tab the character was taken from never drops or marks the newer tab\'s copy - not by a refusal the route answers before the lease (too-large), not by its own lease refused', async () => {
   const acct = await account();
@@ -738,7 +736,7 @@ test('AUDIT RESCUE-SAVE 2 (REALM-GZIP): a save past the request\'s bound rides p
   assert.equal((await c.served()).level, 40);
 });
 
-// ═══ RESCUE-PACK (2026-09-30, Mac: "Do it") ══════════════════════════════════════════════════════════════════════════
+// ═══ RESCUE-PACK ══════════════════════════════════════════════════════════════════════════
 // A long life's copy rides packed: a save past REALM_UNSENT_PACK_OVER characters is kept gzipped (REALM-GZIP's codec)
 // as base64 - a browser's storage takes what the plain text would not.
 
@@ -841,7 +839,7 @@ test('RESCUE-PACK: a packed copy that will not open is dropped at the join, and 
 });
 
 // ═══ STRANDED (FIELD BUGS 2026-10-25: "Guild standing dropped from 100 brotherhood and mages 98 because i logged into ═
-// the browser not exe"; "all quests are gone and standings reset") - bible/06-Systems/Realm-Arc.md SAVES-SAID ═════════
+// the browser not exe"; "all quests are gone and standings reset") SAVES-SAID ═════════
 
 test('STRANDED: a copy whose put LANDED with its answer lost is the realm\'s save - dropped at the join, never set aside', async () => {
   const acct = await account();

@@ -3,7 +3,7 @@
 // the classic window's four filters as toggles on the SAME live store, through the classic window's own flip
 // (ui/travel/travelMapWindow.js flipTravelMapFilter, DFU's FilterButtonClickHandler); every glyph inked in its classic dot's
 // hue walked toward the pen (ui/ink/inkMap.js markInks over the colours the classic loader reads off FMAP_PAL.COL); and the
-// key saying which glyph is which, in the ink the sheet lays it in. bible/10-UI/Held-Map-Arc.md MAP-KEY.
+// key saying which glyph is which, in the ink the sheet lays it in. MAP-KEY.
 //
 // The window is driven whole on a fake document whose canvases RECORD, so the pins read what the sheet really inks
 // and what the key really shows. The palette is ARENA2 data: here it is an invented one fed through the real classic
@@ -95,7 +95,7 @@ const mkWin = (extra = {}) => new HeldMapWindow({
 /** The sheet rises (MAP-FIELD7) - the key's presses are the MAP phase's. */
 const open = (win) => { for (let i = 0; i < 20; i++) win.tick(0.05); return win; };
 
-/** The key's FILTER rows - each a toggle and its kinds' chips. WAYPOINTS (2026-10-06): the waypoints' row of switches
+/** The key's FILTER rows - each a toggle and its kinds' chips. WAYPOINTS: the waypoints' row of switches
  *  stands under them (as OW-WHO's players' row does while travellers are drawn) and is no kind of place. */
 const rows = (win) => [...win._chrome.key.children].filter((r) => r.children[0]?.dataset?.filter);
 const toggleOf = (win, f) => rows(win).map((r) => r.children[0]).find((b) => b.dataset.filter === f);

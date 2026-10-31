@@ -1,6 +1,4 @@
-// LOOT-STACK (2026-09-23, the community arc - Janome on Discord: "a toggle key to switch between the inventories of
-// enemies stacked on top of each other"; Mac, on the key it first shipped with: "that solution is better than a
-// keybind"): THE PILE OF BODIES, DRIVEN. The stack along the real pick (player/activate.js) over real ray geometry -
+// LOOT-STACK: THE PILE OF BODIES, DRIVEN. The stack along the real pick (player/activate.js) over real ray geometry -
 // its members, its reach, the world occluding one; the pick answering the nearest and noting the pile; the pile as
 // the loot window's tabs (lootPile), each tab back through the host's own corpse door; the pools' word on a body;
 // both windows drawing and working the tabs; the plaque's count; the producers' mark; and the key, gone.

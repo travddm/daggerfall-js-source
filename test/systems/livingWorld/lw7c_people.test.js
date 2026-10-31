@@ -1,4 +1,4 @@
-// LW7c (2026-10-05, bible/06-Systems/Living-World.md "LW7c", Mac: "make friends or enemies"): THE PEOPLE WHO KNOW YOU
+// LW7c: THE PEOPLE WHO KNOW YOU
 // - the character's regards as the chronicle's People page: each resident met, minted again from their id (nothing new
 // saved), by name and town, their standing and their fate; the page in the enhanced chronicle where the host hands it
 // over. The town is the synthetic one (test/lwTown.mjs); the window mounts on the minimal DOM.

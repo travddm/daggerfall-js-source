@@ -1,4 +1,4 @@
-// LAIR-WALK (FIELD BUGS 2026-10-19; bible/01-Overview/bugs/Field-Bugs-2026-10-19.md): A REVENANT AT HOME STANDS WHERE A
+// LAIR-WALK (FIELD BUGS 2026-10-19): A REVENANT AT HOME STANDS WHERE A
 // WALK FROM THE WAY IN REACHES. LAIR-REACH took the lair's end off the border caps (SD-REACH's candidates - an interior
 // block's enemy markers, out of the water); an interior marker could still stand in a pocket no walk reaches, which only a
 // walk over the floor can tell. The dungeon bakes that floor already (ENHANCED AI 3b's navmesh - on by default, and always

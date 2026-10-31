@@ -1,6 +1,6 @@
-// TESA-BIOME (2026-10-24, bible/03-World/Tamriel-Biomes.md) - the biomes past the Bay: each province split into the
+// TESA-BIOME - the biomes past the Bay: each province split into the
 // zones its lore names, each zone's ground, air and jungle; Cyrodiil's jungle standing on the Bantha law past the Bay.
-// AUDIT TESA-BIOME (bible/01-Overview/audits/Audit-Tesa-Biome.md): the seeds stood on the land in use, the peaks by
+// AUDIT TESA-BIOME: the seeds stood on the land in use, the peaks by
 // range, a city's own ground, the Nibenay Valley's grassland; where ARENA2_PATH names the data, every zone and city
 // pinned again on the player's own trace - the land the game runs on.
 import { test } from 'node:test';
@@ -34,7 +34,7 @@ const spine = (name, k = 1) => MOUNTAIN_RANGES.find((r) => r.name === name).pts[
 test('TESA-BIOME: every province is split into zones - each a land climate, its keys apart; every city is one zone\'s seed', () => {
   const keys = BIOMES.map((b) => b.key);
   assert.equal(new Set(keys).size, keys.length, 'keys apart');
-  assert.equal(BIOMES.length, 44);   // PIN MOVED (AUDIT TESA II G6/L25): the Grazelands
+  assert.equal(BIOMES.length, 44);
   for (const p of PROVINCES) {
     const zones = BIOMES.filter((b) => b.province === p.key);
     assert.ok(zones.length >= 3, `${p.key}: three zones at least`);
@@ -58,7 +58,7 @@ test('TESA-BIOME: every province is split into zones - each a land climate, its 
   assert.deepEqual(BIOMES.filter((b) => b.peaks === true).map((b) => b.province).sort(),
     ['Hammerfell', 'HighRock', 'Imperial', 'Morrowind', 'Skyrim', 'Sumurset'], 'six provinces have peaks');
   assert.deepEqual(BIOMES.filter((b) => Array.isArray(b.peaks)).map((b) => [b.key, [...b.peaks]]), [['morrowindRedMountain', ['Red Mountain']]]);
-  assert.equal(BIOMES_VERSION, 5);   // PIN MOVED (TAMRIEL-RELIEF): the peaks on the heightmap where the trace stands; PIN MOVED (IC-RING): the valley moved with its city; PIN MOVED (AUDIT TESA II)
+  assert.equal(BIOMES_VERSION, 5);
 });
 
 test('TESA-BIOME: on the authored rings every city stands in its own zone, and every zone holds land', () => {
@@ -136,14 +136,13 @@ test('TESA-BIOME: a city\'s own ground - within CITY_GROUND of its stood seed a 
     for (const s of list) if (!s[3]) assert.ok(!cities.some((c) => c[0] !== s[0] && Math.hypot(c[1] - s[1], c[2] - s[2]) < CITY_GROUND), `${s[0].key}'s heart`);
   }
   // a synthetic trace that makes it happen: the Imperial province four pixels about the Imperial City's corner (171, 99) -
-  // the Nibenay's five hearts within SEED_SNAP all stand 0.71 from the city, and give way to it (PIN MOVED, IC-RING: the
+  // the Nibenay's five hearts within SEED_SNAP all stand 0.71 from the city, and give way to it (
   // city in the middle of Lake Rumare's ring, its corner (178, 96) before)
   const w = 320, h = 200, land = new Uint8Array(w * h), province = new Uint8Array(w * h);
   for (let y = 98; y <= 99; y++) for (let x = 170; x <= 171; x++) { land[y * w + x] = 1; province[y * w + x] = 9; }
   setTamrielTrace({ w, h, land, province, dist: null });
   try {
     assert.equal(PROVINCE_OF_ID[9], 'Imperial');
-    // PIN MOVED (IC-RING): Colovia's Chorrol and Skingrad, fifteen units west of the city's new corner, snap onto the four
     // pixels too - the law read is the Nibenay's: its hearts give way, its city stands
     const stood = standSeeds().get('Imperial').map(([b, x, y, isCity]) => [b.key, x, y, isCity]);
     assert.deepEqual(stood.filter(([k]) => k.startsWith('cyrodiilNibenay')), [['cyrodiilNibenayValley', 171, 99, true]]);
@@ -167,7 +166,6 @@ test('TESA-BIOME: the border wanders - two octaves of value noise move the point
   near(wanderPoint(150.3, 90.7), [149.4822460755438, 89.80378067966484]);
   near(wanderPoint(240.1, 40.2), [239.676599692093, 41.88318641705413]);
   // the zone is the WANDERED point's nearest seed - read at the point itself, the border would be the seeds' bisectors.
-  // PIN MOVED (AUDIT TESA II J4): of a point whose wandered point stands on its own province - one whose wander crosses
   // a border reads the neighbour's seeds too (test/world/audittesa2g_zones.test.js)
   const list = standSeeds().get('Imperial');
   const nearest = (px, py) => { let best = null, bd = Infinity; for (const [b, sx, sy] of list) { const d = (sx - px) ** 2 + (sy - py) ** 2; if (d < bd) { bd = d; best = b; } } return best; };

@@ -1,4 +1,4 @@
-// REALM P1.2 (2026-09-28; bible/06-Systems/Realm-Arc.md section 2): THE REALM'S CHARACTERS, CLIENT SIDE
+// REALM P1.2: THE REALM'S CHARACTERS, CLIENT SIDE
 // (src/systems/realmSaves.js) - the calls and the playing tab's session, driven against the REAL Worker over the REAL
 // migrations through a fetch-shaped door (test/server/cloudsaves.test.js's fetchOf). A session checkpoints in order at the
 // next sequence, the newest save replacing an older one that never left; it resyncs a checkpoint whose answer was

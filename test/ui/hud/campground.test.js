@@ -1,5 +1,4 @@
-// CAMP-GROUND (2026-09-22, Mac: "Did you tackle camping not working in
-// the world because of flat tarren?") - THE PROBE ASKED THE WRONG DOOR.
+// CAMP-GROUND - THE PROBE ASKED THE WRONG DOOR.
 //
 // DragynDance reported camping kits that "don't work for me". The
 // silent refusal was one half (CAMP-SILENT); this is the other, and it
@@ -14,8 +13,7 @@
 // outdoors, for every kit.
 //
 // THE DOOR THAT FIXES IT IS TWO DAYS OLD AND WAS BUILT FOR THE SAME
-// MISTAKE: `surfaceHit` (MAC-BUG W5, Mac: "blood doesn't work
-// outside"). Its own note names this caller without knowing it - "a
+// MISTAKE: `surfaceHit` (MAC-BUG W5). Its own note names this caller without knowing it - "a
 // caller that reads 'nothing' as 'no surface' is right indoors and
 // silently wrong in the whole outdoors". Blood was moved onto it and
 // camping was not, which is why this pin holds the CLASS and not just
@@ -69,7 +67,7 @@ test('CAMP-GROUND: too far down is still no ground - the fix does not make every
 
 // ── NOTICE-SPAM: A TOAST SYSTEM DOES NOT SAY THE SAME LINE TWICE ──
 //
-// Mac: "the enhanced notification spam". DragynDance had a column of
+// . DragynDance had a column of
 // the same line over and over while a deathloop turned under him.
 //
 // The classic column SCROLLS, so a repeat there costs a row and goes

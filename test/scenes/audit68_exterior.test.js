@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster exterior - src/scenes exterior.js,
+// AUDIT 68, cluster exterior - src/scenes exterior.js,
 // exteriorFoes, hitEffects, horseCartPool: the frame loop's exits, the
 // one damage door on a corpse, the floating origin under a foe's memory,
 // a failed splash warm, and the encounter cap across the spawn's awaits.

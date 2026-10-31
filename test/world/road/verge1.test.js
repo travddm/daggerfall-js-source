@@ -1,5 +1,4 @@
-// VERGE1 (2026-10-07, Mac: "Making sure objects, like trees, avoid pathways and roads. Currently they slightly
-// overlap") - CLEAR ROADSIDES: a wilderness flat stands only where the disc of its widest picture - its classic
+// VERGE1 - CLEAR ROADSIDES: a wilderness flat stands only where the disc of its widest picture - its classic
 // picture's half width, or the crown Low Poly Trees stands for it at the tree's own scale - touches no road or track
 // (world/road/roadVerge.js); the herbs and the veins on the stone keep their glow off them; World of Daggerfall's flats count
 // their pictures; and the painter's path mask names a track laid over dirt (AUDIT FOREST1 F8, which never held).

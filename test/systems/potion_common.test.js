@@ -1,12 +1,10 @@
-// POTION-COMMON (2026-10-01, the field: "make health potions more common"; the economy arc - bible/06-Systems/
-// Economy-Arc.md: "Potions are the solo answer to healing, so they are easy to come by"). A Potion of Healing was a
+// POTION-COMMON. A Potion of Healing was a
 // twentieth of DFU's random potion - 0.15% of looting foes, 0.2% of J-O piles - and no ordinary shop sold one. Beside
 // that random potion (kept): a looting foe carries one 6 times in 100, a J-O pile holds one 12 times in 100, and an
 // alchemist's and a general store's shelf stock a few a day, counted by the shop's quality and drawn from no roll.
-// MAGICKA-COMMON (LOOT-EASE, 2026-10-05, Mac: "majicka potions should be more common loot drops, same with health
-// pots"): the healing potion 10 in 100 a foe and 18 a pile, and the Potion of Restore Power beside it, 6 and 10.
-// POT-THIN (2026-10-21, the owner: "I definitely want to decrease pot drops"; Professions-Arc.md section 48): the healing
-// potion 4 in 100 a foe and 8 a pile, Restore Power 2 and 4 - PIN MOVED, each number below.
+// MAGICKA-COMMON (LOOT-EASE, 2026-10-05): the healing potion 10 in 100 a foe and 18 a pile, and the Potion of Restore Power beside it, 6 and 10.
+// POT-THIN: the healing
+// potion 4 in 100 a foe and 8 a pile, Restore Power 2 and 4
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

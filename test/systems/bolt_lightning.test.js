@@ -1,5 +1,4 @@
-// BOLT (2026-09-24, Mac: "Can we do detailed cloud and cloud to ground lighting? Not just when in storms but also
-// being able to be seen far away?"): THE LIGHTNING ITSELF - systems/lightning.js (the strike, its strokes, its
+// BOLT: THE LIGHTNING ITSELF - systems/lightning.js (the strike, its strokes, its
 // channel, the hosts' store) and render/lightningBolts.js (the channel drawn, never thinner than a line far away).
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -197,7 +196,6 @@ test('BOLT wired: both exterior hosts feed their distant strikes and the storm o
     assert.match(s, /const boltsGl = sky\.enhanced \? new LightningBoltsRenderer\(renderer\.gl\) : null;/);
     assert.match(s, /for \(const s of ds\.strikes\) \{ const h = [^;]+; struckFar\.push\(\{ x: h\[0\], z: h\[1\], seed: s\.seed, kind: s\.kind, strength: s\.strength \}\); \}/);
     assert.match(s, /boltFrame = isEnhanced\(\)[^\n]*\n\s*\? stormLights\.frame\(\{ seconds: now \/ 1000, eye[^,]*, distant: struckFar, player: lightning, shown: !!lightningShown, test: Number\(params\.get\('bolttest'\)\) \|\| 0 \}\)/);
-    // PIN MOVED (STAR4): the world host's channel takes a fallen star's landing last (scenes/starfall/starfallHost.js flash)
     assert.ok(s.includes(`renderer.setFlashLight(sky.lightningLight() ?? boltFrame.flash${host === 'src/scenes/world.js' ? ' ?? starfall?.flash() ?? null' : ''});`));
     assert.match(s, /\{ distantStorms\.reset\(\); stormLights\.reset\(\); \}/);
     // RETRO1: with the world image's height, so a retro frame's minimum width is its own pixels

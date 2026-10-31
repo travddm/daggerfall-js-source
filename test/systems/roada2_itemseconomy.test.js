@@ -76,7 +76,6 @@ test('A2: the host takes the day comparison on all three loot arms, not a stock-
     'the shelf stamps the day and re-mints - `items.Clear()` then StockShopShelf');
   // the HOUSE CONTAINER arm (:910-915) and the owned latch (:907)
   assert.match(wm, /c\.stockedDate = 1;/, 'the owned arm stamps DFU\'s literal 1');
-  // PIN MOVED (OUTDOOR-LOOT): the roll is HELD a moment (`rolled`) and the room, online, mints it at the Yes - offline it is written as it was
   assert.match(wm, /if \(needsRestock\(c, today\)\) \{\s*\n\s*rolled = stockHouseContainer\(/,
     'the stranger arm takes the same gate');
   assert.match(wm, /if \(!interiorLootRoll\(interiorCtx, key, rolled, _intShared, today\)\) \{ c\.stockedDate = today; c\.items = rolled; \}/,
@@ -207,7 +206,6 @@ test('A2 (data-gated): the real BOOKS files price 300..800 off their own first f
 test('A2: a shelved arrow mints at currentCondition 0 (ItemBuilder.cs:359-364)', () => {
   // A weaponsmith at quality 21 with a rolls stream of 0 stocks every
   // weapon template, arrows included.
-  // PIN MOVED (SHOP-ARROWS): read off a shelf behind the counter - the counter's own arrows carry its quiver too
   // (test/systems/arrowsupply.test.js), and this pin is DFU's draw alone
   const shelf = stockShopShelf({ buildingType: BUILDING_TYPES.WeaponSmith, quality: 21 }, { level: 1 }, { rolls: () => 0, shelfIndex: 1 });
   const arrows = shelf.filter((it) => it.templateIndex === ARROW_TEMPLATE);
@@ -288,7 +286,7 @@ test('A2: SplitStack mints a FRESH template item (ItemCollection.cs:267 -> ItemB
   assert.equal(picked.material, 0, 'nativeMaterialValue = 0');
   assert.equal(picked.variant, 0, 'currentVariant = 0');
   assert.equal(picked.flags, 0, 'flags = 0');
-  // BOOK-SPLIT (2026-09-29, Port-Ledger A): FindExistingStack's identity terms ride the split - flipped from 0
+  // BOOK-SPLIT: FindExistingStack's identity terms ride the split - flipped from 0
   assert.equal(picked.message, 12345, 'message rides the split (a Paintings mint still rolls its own)');
   assert.equal(picked.currentCondition, t.hitPoints, 'currentCondition = itemTemplate.hitPoints');
   assert.equal(picked.maxCondition, t.hitPoints, 'maxCondition too');

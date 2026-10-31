@@ -1,6 +1,5 @@
-// NUDE-DECOR and NUDE-HOSTS (2026-10-05, the owner: "Even with nudity turned off. Players can see and have access to
-// nude vendors"). HOME-VENDOR (2026-10-03) made every person Daggerfall stands in a room a catalogue piece - Vendors -
-// a week after NUDE-FLATS (2026-09-27) put Show Nudity over the world's people, and no seam of the decorator asked
+// NUDE-DECOR and NUDE-HOSTS. HOME-VENDOR made every person Daggerfall stands in a room a catalogue piece - Vendors -
+// a week after NUDE-FLATS put Show Nudity over the world's people, and no seam of the decorator asked
 // NUDE-FLATS' table: the catalogue OFFERED the nude figures, and one placed stood in the room, flew as the ghost and
 // showed in the panel as itself. The Arena's tiers (ARENA2) seat two of the table's figures, unasked too. NUDE-FLATS
 // pinned the five hosts of its day by source; the two made after it never learned the rule.
@@ -122,7 +121,7 @@ test('NUDE-DECOR the decorator: a figure placed while Show Nudity was on shows i
     await settle();
     assert.equal(rowPicture(root, id), 'url:184.29', 'the stand-in\'s picture, asked anew - never the one kept from before');
     assert.ok(asked.includes('184.29'));
-    tab(root, /^Catalog/).fire('click');   // PIN MOVED (VOICE2): the tab says Catalog (Voice.md rule 8, American spelling)
+    tab(root, /^Catalog/).fire('click');
     assert.equal(rows(root).some((r) => r.dataset.key === 'f184.11'), false, 'the catalogue offers the figure no more');
     assert.equal(rows(root).some((r) => r.dataset.key === 'f184.29'), true, 'its stand-in, as itself');
     // moved: the ghost is what the room stands it as

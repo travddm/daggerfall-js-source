@@ -1,5 +1,4 @@
-// QUEST-POPUP-PAUSE (2026-09-26, SquidKamer on the Discord: a ship raid's box came up and the player "get[s] jumped by
-// everyone"; Mac, asked: "Pause them offline"). DFU's message box pauses the game (UserInterfaceWindow.PauseWhileOpen),
+// QUEST-POPUP-PAUSE. DFU's message box pauses the game (UserInterfaceWindow.PauseWhileOpen),
 // so a quest's box held every foe; WINFOE1 had let the foes run under every window. Offline, a quest box that is open
 // and on top of its slot holds the foes again - the street's pools, the watch, the town's answer and the interior
 // pools through the mode machine's bag. A rest window keeps WINFOE1; online nothing is held (one room, one clock).

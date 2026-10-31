@@ -1,5 +1,4 @@
-// LEGACY5 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 8; Mac: "Surnames, Marriage, Children. Live through the
-// world of Daggerfall, passing down your legacy, and continuing your adventures through your bloodline."): COURTING, THE
+// LEGACY5: COURTING, THE
 // WEDDING AND CHILDREN - the law (systems/legacy/marriage.js), the host's doors (scenes/legacyHost.js) and the talk's
 // own rows (scenes/townTalk.js's livingTalk.topics door).
 import { test } from 'node:test';
@@ -33,7 +32,7 @@ test('LEGACY5 the topics: a friend is courted, a full heart hears a proposal, a 
   const me = personOf(f, f.currentId);
   assert.deepEqual(topicsFor(f, me, RES, FRIEND_AT - 1), [], 'not yet a friend');
   assert.deepEqual(topicsFor(f, me, RES, FRIEND_AT), [TOPIC.court]);
-  court(me, RES, { day: 1, personality: 0, etiquette: 0, taste: 0, roll: 0.5 });   // PIN MOVED: TONE-TASTE - the tone as taken
+  court(me, RES, { day: 1, personality: 0, etiquette: 0, taste: 0, roll: 0.5 });
   assert.deepEqual(topicsFor(f, me, RES, 0), [TOPIC.court], 'a courtship begun goes on whatever the day\'s regard');
   assert.equal(propose(me, RES.id), false, 'a heart not yet full hears no proposal');
   me.courting[RES.id].affection = AFFECTION_MAX;
@@ -52,7 +51,6 @@ test('LEGACY5 the topics: a friend is courted, a full heart hears a proposal, a 
 });
 
 test('LEGACY5 a day\'s courtship: Personality, Etiquette and the tone on a roll, once a day, never past the full heart', () => {
-  // PIN MOVED: TONE-TASTE (2026-10-15) - the tone counts as the resident TOOK it (`taste`, talkTopics.js toneTaste),
   // never by its name (LEGACY5's COURT_TONE, Polite +3 to everyone): kindly COURT_TASTE more, the Normal tone nothing,
   // ill a loss of COURT_TASTE whatever else (test/systems/livingWorld/tonetaste.test.js)
   assert.equal(courtGain({ personality: 0, etiquette: 0, taste: 0, roll: 0.5 }), COURT_BASE);

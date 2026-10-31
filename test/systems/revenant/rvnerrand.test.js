@@ -1,6 +1,4 @@
-// RVN-ERRAND (bible/06-Systems/Revenants.md section 42; the owner, 2026-10-17: "Add the ability to send revnants off on
-// timed missions to anywhere within tamriel (They disappear and come back brining rewards like loot, crafting materials,
-// currency, etc)"). A sworn one sent to one of Tamriel's nine provinces on a venture (Plunder, Forage, Sell-sword) leaves
+// RVN-ERRAND (). A sworn one sent to one of Tamriel's nine provinces on a venture (Plunder, Forage, Sell-sword) leaves
 // through its portal, is gone the place's days on the character's own clock, and comes back - at the party's frame - with
 // a haul drawn on its errand's seed into my purse, pack and Materials Bag: won on its odds (its rank and kit against the
 // place's danger) and more loyal, or hard-won with half and hurt. At most two abroad. An errand is the save's.

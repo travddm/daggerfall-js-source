@@ -1,5 +1,4 @@
-// GIFT-QUIET (2026-10-04: "sometimes theres notification spam when putting a spell on companion. Ensure there's no
-// leftover notifications"): a gift's lines - the armed ready's ("Press button to fire spell." and "Aim at your
+// GIFT-QUIET: a gift's lines - the armed ready's ("Press button to fire spell." and "Aim at your
 // companion..."), the caster's ("You cast Heal on Hilda.") and a party mate's on the receiving end ("Bran casts Heal on
 // you.") - are said at most once in GIFT_LINE_QUIET_S of real time (systems/allyCast.js createGiftLineGate;
 // scenes/hostMagic.js sayGift and sayArm; scenes/world.js online.onCast). Each was a new toast every cast and told apart

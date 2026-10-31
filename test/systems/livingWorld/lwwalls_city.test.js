@@ -1,4 +1,4 @@
-// LW-WALLS (2026-10-06, bible/06-Systems/Living-World.md "LW-WALLS"; the field - MD-Geist on the Discord: "In Ripmarket
+// LW-WALLS (2026-10-06, "LW-WALLS"; the field - MD-Geist on the Discord: "In Ripmarket
 // (Daggerfall Province) the last few days there have been 0 NPC's walking around in the city...Tested on clear days and
 // rainy no change", and the ask: "Seems like with living world, a lot of towns are unpopulated"): THE CITY BEHIND ITS WALLS.
 // A town's street net is the walkable component its buildings' doors open onto (places.js doorsNet), never the grid's

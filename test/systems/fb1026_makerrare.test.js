@@ -1,5 +1,5 @@
-// MAKER-RARE (FIELD BUGS 2026-10-26, the owner: "You cant enchant masterwork/rare armor";
-// `bible/01-Overview/bugs/Field-Bugs-2026-10-26.md`). A Rare - a loot door's or a Masterwork's - carries one of DFU's
+// MAKER-RARE (FIELD BUGS 2026-10-26,;
+// ` `). A Rare - a loot door's or a Masterwork's - carries one of DFU's
 // catalogue enchantments as its flavour, and DFU's item maker refuses an enchanted item (AddFilteredItem :419-422), so
 // every Rare was out of every tab. The maker takes an identified Rare with the ladder's rows kept and riding free.
 // Every fixture from its real producer (TEST THE SHAPE THE PRODUCER MINTS): the smith's mint, the ladder's roll and curse,

@@ -1,5 +1,4 @@
-// TACT2 - THE TACTICS BRAIN (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "enemy tactics like backing off
-// and knowing when to strike"; his calls: 2 melee + 2 ranged tokens; animals and cowardly humans flee, undead,
+// TACT2 - THE TACTICS BRAIN (;; his calls: 2 melee + 2 ranged tokens; animals and cowardly humans flee, undead,
 // daedra, constructs and guards never). Driven on the REAL motor and the REAL attack component over the real collider,
 // on the brain's own clock: with the switch on, a crowd takes turns - two in, the rest on the ring, each blow followed
 // by a step back and the token handed on, a wounded foe backing off, a coward running, an archer kiting, a back

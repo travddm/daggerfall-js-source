@@ -1,4 +1,4 @@
-// AUDIT SD IV, SD26 (2026-10-08, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md "AUDIT SD IV"): WHAT
+// AUDIT SD IV, SD26: WHAT
 // THE PLAYER READS, AUDITED A FOURTH TIME - the text lens's findings, each reproduced and pinned here: the fight's turns
 // on the card where its bar stands (T1); the kill read whole, the way home with it - a line cut said again (T2); the
 // voice still under a window (T3); the message line over the gate's cards (T4) and its own width at every HUD scale

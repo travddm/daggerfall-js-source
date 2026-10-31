@@ -1,9 +1,9 @@
-// DISC6 (2026-09-23, Discord through Mac): five reports and one ask, each fixed at its root and pinned BY EXECUTION
+// DISC6: five reports and one ask, each fixed at its root and pinned BY EXECUTION
 // where the seam is a function and by source where it is a call in a frame.
 //   - "Theres no quest notification when you killed all monsters and no quest update in the log" - a party's shared-
 //     quest resync rebuilt the quest's Foe resources under the standing foes, whose deaths went on counting into the
 //     orphans (quest/resourceBehaviour.js, quest/machine.js updateSharedQuest).
-//   - "the rain sound in Taverns is louder than outside" and Mac: "ensure cricket noises can be heard in interiors" -
+//   - "the rain sound in Taverns is louder than outside" and -
 //     the street's ambience was frozen at the door and Better Ambience's indoor rain played on top of it
 //     (systems/ambientEffects.js, the hosts' modal branch).
 //   - "even when putting it away it still makes the torch sound" - each mode's weapon rig owns its own burning loop,

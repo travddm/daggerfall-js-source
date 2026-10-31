@@ -1,6 +1,4 @@
-// GATE-HEAL (2026-10-01, Mac: "Can we add a line on the damage round up showing the amount healed?" - asked which healing,
-// Mac chose each challenger's; then "Like for healers" - asked whether a fighter's own potions and self-heals count, Mac
-// chose allies only): HEALING ON THE ROUND-UP. Each fighter's game says what another's spell healed in it and whose spell
+// GATE-HEAL: HEALING ON THE ROUND-UP. Each fighter's game says what another's spell healed in it and whose spell
 // it was; the relay believes it within the receiver's own heal bucket and credits the CASTER - a heal on oneself is no
 // one's. The kill's chart carries each healer's figure, and the round-up shows a Healed column whenever anyone healed
 // another.
@@ -13,7 +11,7 @@
 //   the chart     ui/gate/gateDamageChart.js - the Healed column, wide and narrow
 //   the plumbing  scenes/world.js - the ally-cast door tells the court; the court's word goes out as `heal`
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 18.
+// Design:
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// MWBODY1 (2026-09-12, Mac: "knock out the deferred morrowind model"),
+// MWBODY1,
 // re-pinned by AUDIT MWBODY. THE OTHERS IN THE MORROWIND BODY EXECUTE:
 // a peer's look mapped onto the rig's build options (the same inputs
 // the player's entity maps onto - the race id spelling, the female

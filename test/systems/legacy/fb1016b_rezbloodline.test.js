@@ -1,4 +1,4 @@
-// REZ-BLOODLINE (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; bible/06-Systems/Legacy-Arc.md
+// REZ-BLOODLINE (FIELD BUGS 2026-10-16b,;
 // section 6): "I was testing with a friend, he dies and I cast resurrection. It works for a moment then he disappears and
 // remains dead" - "You died without a descendant. ... The line ends here". A Bloodline death was written at the death
 // door (AUDIT LEGACY A1/B3), so the party's Resurrect raised a body whose house had already buried it, and the slow step
@@ -218,7 +218,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
   const c = {
     social: { acct: 'acct-bran', party: { members: [{ acct: 'acct-ysolde', name: 'Ysolde' }, { acct: 'acct-bran', name: 'Bran' }] }, others: () => r.branHears ?? [], accountOfPeer: () => 'acct-ysolde' },
     remotePlayers: rp, onlineToScene: (p) => [p.x, p.y, p.z], cam: { pos: [0, 0.9, 0] }, peerName: () => 'Ysolde',
-    _rezOut: null, _partyComposedAt: 0, RESURRECT_HOLD_MS, sendRaiseWord, online: { room: 'world:10,20' },   // PIN MOVED (AUDIT WORLD-EVENTS L1-1): the door says the raise to a made level's room; a street's keeps no death
+    _rezOut: null, _partyComposedAt: 0, RESURRECT_HOLD_MS, sendRaiseWord, online: { room: 'world:10,20' },
   };
   r.bran = c;
   const { fallenTargetPick, raiseFallenDoor } = mount(`${declOf('fallenTargetPick')}\n${declOf('raiseFallenDoor')}\nreturn { fallenTargetPick, raiseFallenDoor };`, c);

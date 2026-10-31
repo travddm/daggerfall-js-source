@@ -1,6 +1,6 @@
-// AUDIT RECOVERY-SET (2026-10-14, "Audit this") - three cold lanes over RECOVERY-SET as pushed (7ce77a95b7): the
+// AUDIT RECOVERY-SET - three cold lanes over RECOVERY-SET as pushed (7ce77a95b7): the
 // service and its security, the client and its card, the pins and the records. Every finding reproduced before it was
-// paid; this file pins each one at its root. bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md AUDIT RECOVERY-SET.
+// paid; this file pins each one at its root. AUDIT RECOVERY-SET.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -40,7 +40,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

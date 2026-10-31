@@ -161,7 +161,7 @@ const crateMatrix = ([x, z]) => trs(x, CRATE_H / 2, z, 0, 0, 0);
 const inCrate = (feet, [x, z]) => Math.abs(feet[0] - x) < CRATE_HALF && Math.abs(feet[2] - z) < CRATE_HALF && feet[1] < CRATE_H;
 const inAnyCrate = (feet) => Object.values(AT).some((at) => inCrate(feet, at));
 
-// BAL4 (bible/05-Combat/Balance-Arc.md section 6): the Enhanced AI ships On now; this file's pins are the classic motor's
+// BAL4: the Enhanced AI ships On now; this file's pins are the classic motor's
 // restore and walk, so it says Off outright where it used to read the default (LR5's trap: a pin that leaned on a default
 // moves with it) - and AUDIT BAL's restore pin walks the freed giant again with the brain ON, its clock
 // (ai/tacticsClock.js, the foes' own time) ticked with the foes' step as every host ticks it
@@ -205,7 +205,7 @@ function classCfg() {
 function context(collider, { idleH = 3.2, batH = 1, playerFeet = [25.6, 0, 22.4] } = {}) {
   const foes = [], bound = [];
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     ENEMY_BASICS, enemyEntityType, isClassEnemyId, setupFoeLook, collider, foes, flyerStandFeet, enemyControllerHeight, keepRebuiltSpawn,   // DEX1: DFU's entity type and class test, the arms' free names
     freeLodgedFeet, clearPast, floorLanding,
     SEARCH_FOE_SPACING, SEARCH_DOOR_REACH_M, lastPlayerFeet: playerFeet, actions: { objects: new Map() }, objectAabb: () => null,
@@ -456,10 +456,10 @@ test('CRATE-FREE interior: a building\'s quest marker inside a house crate - wor
   assert.ok(inCrate([position.x, 0, position.z], [12, 10]), 'the marker is inside the crate');
   const pool = foePool(c);
   const stood = [];
-  // INTEGRATION (FIELD BUGS 2026-10-04d, PIN MOVED): QUEST-MARKERS' backstop runs in the same stand - the room's
+  // INTEGRATION (FIELD BUGS 2026-10-04d
   // collider (the host's own) and the backstop's spots join the scope; the marker has a floor under it, so it stands
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     interiorCtx: { parentPt: (x, y, z) => [x, y, z], collider: c }, interiorFoes: { spawnFoe: (...a) => pool.spawnFoe(...a).then((f) => { stood.push(f); return f; }) }, interiorFoeStands: [], console,
     markerScenePosition, siteMarkerSpots, standSpot, MARKER_FLOOR_REACH,
   };
@@ -707,7 +707,6 @@ test('CRATE-FREE real data: every RDB block of BLOCKS.BSA - of its 2,563 foe and
     }
   }
   assert.deepEqual([rdb, foes, quests, starts], [187, 2563, 144, 177]);
-  // PIN MOVED (QUEST-AUDIT III LODGED-STAND): the quest marker inside statue 62330 is the fourth - and stood clear (above)
   assert.deepEqual(lodged, ['N0000005.RDB quest@29157 in 62330', 'N0000048.RDB foe@16070 in 41833', 'N0000049.RDB foe@16070 in 41833', 'N0000050.RDB foe@16070 in 41833']);
 });
 

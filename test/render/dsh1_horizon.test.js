@@ -1,5 +1,4 @@
-// DSH1 (2026-09-20, Mac: "The far away horizon is still viewable even
-// though it's cloudy"). Under Dynamic Skies a full overcast lid ended in
+// DSH1. Under Dynamic Skies a full overcast lid ended in
 // a hard red sunset line at the horizon, and no weather in the game could
 // touch it. Two causes, one symptom:
 //
@@ -87,7 +86,7 @@ test('DSH1: the lid clears the horizon by a skirt, and the near early-out is the
   // the march's two early-outs agree: both answer the aerial fade's
   // colour, so the lid has no seam where one takes over from the other.
   assert.match(MARCH_FS, /if \(dir\.y <= 0\.004\) \{ outColor = underCurtains\(uHorizonColor, 0\.0, cam, dir\); return; \}/, 'the near early-out: the fade’s colour, fully covering (VC7c: with the rain curtains in front of it)');
-  // AUDIT PRECIP SKY-1 (PIN MOVED): the far one is the march's own law with nothing walked - the slab past FAR_M laid in
+  // AUDIT PRECIP SKY-1 (
   // the fade's colour by its length (farA), as the walk's end lays what it leaves - so the two meet at the cut and no row
   // past a cell's empty column is left bare to the dome (test/render/audit_precip_sky.test.js SKY-BAND)
   assert.match(MARCH_FS, /if \(t0 >= FAR_M\) \{ float a = farA\(len\); outColor = underCurtains\(uHorizonColor \* a, 1\.0 - a, cam, dir\); return; \}/, 'the far one, the walk\'s own answer');

@@ -1,5 +1,4 @@
-// VC3 - THE VOLUMETRIC CLOUDS (2026-09-07, Mac: "true volumetric clouds
-// that move across the sky, build during weather"). A raymarched cloud
+// VC3 - THE VOLUMETRIC CLOUDS. A raymarched cloud
 // slab written into a sky-space map a stripe per frame and composited
 // over the port's own dome. Node has no GL: the pure laws and the seams
 // are pinned here, the pictures in tools/volumetricCloudsProbe.mjs.
@@ -176,7 +175,6 @@ test('VC3: the seam - the clouds ride the dome only, behind the one switch, on t
   assert.match(SHADOW_FS, /int steps = min\(24, max\(uSteps, int\(ceil\(len \/ 150\.0\)\)\)\);/, 'a low sun\'s long slant is sampled no coarser than 150 m (SLAB-SPAN: over the length of its own spans)');
   for (const q of Object.values(QUALITY)) assert.ok(q.shadowSteps >= 8 && q.shadowSteps <= 24, 'the tier\'s count is the floor under the ceiling');
   // the far ring stands outside the square: a cover-derived dim on the slab's own law
-  // PIN MOVED (OW-HORIZON, 2026-10-20): the law named once (farCoverSun), the deck's `far` its second reader
   assert.match(shared, /const farCoverSun = \(\) => 1 - 0\.7 \* Math\.pow\(weatherRowNow\?\.cover \?\? 0, 1\.6\);/);
   assert.match(shared, /farSunFactor\(\) \{\s*\n\s*if \(!clouds\) return this\.sunFactor\(\);\s*\n\s*return farCoverSun\(\);/);
   assert.match(read('src/scenes/world.js'), /sunScale: renderer\._sunScale \* sky\.farSunFactor\(\), sunColor: renderer\._sunColor,/, 'the ring takes it');
@@ -192,7 +190,7 @@ test('VC3: the seam - the clouds ride the dome only, behind the one switch, on t
   // VC5 review: the FP arm is lens-local geometry at the origin - the deck is borrowed off for it, and only for it
   // MAC-P: the pass is `_renderCharacterSprite` now - `renderCharacterSprite` wraps it with the
   // viewmodel light borrow, and the lens-local flag it takes is unchanged.
-  assert.match(rr, /_renderCharacterSprite\(mesh, modelMatrix, proj, view, pw, ph, \{ lensLocal = false(?:, also = null)? \} = \{\}\)/);   // PIN MOVED, COATS3D: and a rider's horse in the picture
+  assert.match(rr, /_renderCharacterSprite\(mesh, modelMatrix, proj, view, pw, ph, \{ lensLocal = false(?:, also = null)? \} = \{\}\)/);
   assert.match(rr, /const sd = lensLocal \? this\._cloudShadow : null;\s*\n\s*if \(sd\) \{ this\._cloudShadow = null; this\._csStamp\+\+; \}/, 'borrowed off');
   // AUDIT 65 RS-2: the deck's return is still here and still
   // unconditional - but it is now the TAIL of one finally that returns

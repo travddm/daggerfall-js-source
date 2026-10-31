@@ -1,6 +1,5 @@
-// TIME1 (2026-10-01, Mac: "people have to wait insanely long, werewolf forms last insanely long" / "I don't want a
-// band aid, I want a detailed way we can do this" / "Let's do it. This needs to be perfect"): THE SKY'S OWN CLOCK.
-// Design: bible/06-Systems/Online-Time-Arc.md. Online the hour, the date, the season and the moons a player sees read
+// TIME1: THE SKY'S OWN CLOCK.
+// Design:. Online the hour, the date, the season and the moons a player sees read
 // the SKY - a function of the relay's clock like WORLD5's, at TimeScale 24 from an aligned switch (a day every real
 // hour, midnight on the hour - SKY-SLOW; it was 48) - while the EVENT clock (WORLD5's, TimeScale 12) keeps the
 // world's schedules, stock, prices, terms and stamps, and the character's own clock keeps combat and the body. THE LAW

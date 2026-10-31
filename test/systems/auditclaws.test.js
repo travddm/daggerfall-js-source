@@ -1,4 +1,4 @@
-// AUDIT CLAWS (2026-10-12; the owner: "Audit this"; bible/05-Combat/Balance-Arc.md section 12): BAL6-CLAWS and
+// AUDIT CLAWS: BAL6-CLAWS and
 // BAL6-GAUNTLETS read again before they merge - three cold lanes over the pull request's head (every place a claw blow
 // is struck, refereed or shown; every gauntlet the game can put on and what it is made of; what the change says and
 // pins), every finding reproduced before it was fixed. The fixes to the laws' own pins live in test/systems/bal6_curses.test.js;

@@ -1,4 +1,4 @@
-// ARENA-MAP (2026-10-03, the owner, live: "Arena doesn't show on town map") - THE ARENA ON THE TOWN MAP
+// ARENA-MAP - THE ARENA ON THE TOWN MAP
 // (`world/arena/arenaCity.js` arenaAutoMap / arenaTownLandmark, `ui/exteriorAutomapWindow.js` buildPlates,
 // `ui/town/townSheet.js` named, the two exterior hosts' `blocks`). Both town maps draw a cell off its block's own automap
 // bytes, and Kamer's bowl is byte 117 - BuildingTypes.Special1 + 1, "never displayed on automap" - so cell (4,3) of

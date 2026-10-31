@@ -363,7 +363,7 @@ test('ACC1e: the code stage is left only by acknowledging it, and the code is go
   flow.set('confirm', 'correcthorse');
   flow.agree('terms', true); flow.agree('privacy', true);   // TERMS1: a new account ticks both documents
   await flow.submit();
-  assert.deepEqual(flow.recoveryCodes, ['CODE1-CODE2']);   // PIN MOVED: RECOVERY-SET - the set, a code each
+  assert.deepEqual(flow.recoveryCodes, ['CODE1-CODE2']);
   await flow.acknowledgeCode();
   assert.equal(flow.stage, 'in');
   assert.equal(flow.recoveryCodes, null, 'the code outlived the one stage that may show it');

@@ -1,4 +1,4 @@
-// TIMERS2 (2026-10-22, the owner: "organize the timer system in the pause menu"): THE TIMERS WINDOW IN GROUPS. The law
+// TIMERS2: THE TIMERS WINDOW IN GROUPS. The law
 // (systems/eventTimers.js TIMER_GROUPS, timerGroupOf, timerGroups: each row under what it is, each group in the list's
 // own order), the window (ui/enhanced/enhancedTimers.js: a head a group, how many are under way, a row under way saying
 // "Now", a bar showing every group or one alone, kept while the game runs, a group that empties handing the list back to

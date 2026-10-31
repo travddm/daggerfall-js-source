@@ -1,4 +1,4 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
+// WITCH1: THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
 // the REAL migrations (test/accountDb.mjs, migration 0140): the finds the service's own die decides and a day caps, the
 // sales under a request id, the Hearth Offerings set out, filled, taken from once a day and taken in, an orphan's cakes
 // sent home, and the festival's wardrobe - the titles, the aura and the profile icon, held only as the rows say.
@@ -85,7 +85,6 @@ test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, 
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, {}), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(AFTER_S), player(alice), { source: 'foe' }, ON), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'gold' }, ON), { error: 'source' });
-  // PIN MOVED (CAKE-CAP-SAID, FIELD BUGS 2026-10-21b): each answer says the day's cakes found, this find's with them
   assert.deepEqual(await findFestival(ctx(DAY_S, MISS), player(alice), { source: 'foe' }, ON), { found: 0, cakes: 0, today: 0 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'foe' }, ON), { found: 1, cakes: 1, today: 1 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'endgame' }, ON), { found: 4, cakes: 5, today: 5 });
@@ -102,7 +101,7 @@ test('WITCH1 THE DAY\'S CAPS: FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cake
   const { alice, player, ctx, db, row } = await stand();
   const day = utcDay(DAY_S);
   db._raw.prepare('INSERT INTO fest_finds (account, day, asks, found) VALUES (?, ?, ?, ?)').run(alice.id, day, FIND_ASKS_PER_DAY - 1, FIND_CAKES_PER_DAY - 3);
-  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (PIN MOVED, CAKE-CAP-SAID)
+  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'endgame' }, ON), { found: 3, cakes: 3, today: FIND_CAKES_PER_DAY, capped: true });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, ON), { error: 'capped', cakes: 3 });
   assert.equal(row(alice.id).fest_cakes, 3);

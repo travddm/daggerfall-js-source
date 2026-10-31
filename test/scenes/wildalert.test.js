@@ -1,6 +1,4 @@
-// WILD-ALERT (2026-10-04, Mac: "Wilderness enemies now approach/non approach based on distance and a stealth check.
-// Enemies alerted are given an exclamation point and slow down as they do now, non alerted enemies do not slowdown or
-// bother the player"). The law (systems/wild/wildAlert.js: DFU's own stealth formula with the enemy's reach laid onto its
+// WILD-ALERT. The law (systems/wild/wildAlert.js: DFU's own stealth formula with the enemy's reach laid onto its
 // range, a check a classic minute apart on the traveller's clock), the alert predicate (systems/encounters.js
 // foeAlerted), the host's gate, band spotting and "!" marks lifted out of scenes/world.js and RUN, and the mark's DOM
 // layer (ui/wild/wildMarks.js) over a fake document.
@@ -180,7 +178,7 @@ test('WILD-ALERT host wiring: the pools leave the gated foe off its list (the ta
   assert.match(sh, /playerCrouching = false, wildUnaware = null \} = \{\}\)/);
   assert.match(sh, /\n\s*wildUnaware,\n\s*playerEntity: playerEntity \?\? entity,/);
   assert.match(W, /wildUnaware: \(f\) => wildGated\(f\),/);
-  assert.match(W, /wildFoesFrame\(foeDt\);[^\n]*\n\s*(?:const frame\w+ = \(\) => \{   \/\/ PERF-V8\n\s*)?if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{\n[^\n]*\n\s*exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);/);   // PERF-V8 (PIN MOVED): the pool update a closure of its own
+  assert.match(W, /wildFoesFrame\(foeDt\);[^\n]*\n\s*(?:const frame\w+ = \(\) => \{   \/\/ PERF-V8\n\s*)?if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{\n[^\n]*\n\s*exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);/);     // PERF-V8 (
   assert.match(W, /areEnemiesNearby\(\[\.\.\.cityGuards\.guards, \.\.\.wildSeen\(exteriorFoes\.foes\)\]\)/, 'the journey\'s stop');
   assert.match(W, /danger: \(\) => duelEnemyNear\(\) \|\| \(!playerEntity\.staffHidden && areEnemiesNearby\(wildSeen\(exteriorFoePool\(\)\)\)\) \|\| navalHostileNear\(\),/, 'the view\'s danger');   // PIN MOVED (TIME-DILATION: a hostile ship too)
   assert.match(W, /if \(!foeAlerted\(f\) \|\| !f\.ai\.feet \|\| f\.ai\.unreachable\) continue;/, 'the clock held for an alerted foe alone');
@@ -272,7 +270,6 @@ test('WILD-ALERT host: the Overworld\'s marks - a chase wears the "!", and so do
   const keys = new Function('exteriorFoes', 'foeAlerted', `${cutFn('wildCampKeys')} return wildCampKeys;`)({ foes: pool }, foeAlerted)();
   assert.deepEqual([...keys].sort(), ['me:7', 'p2:3']);
   assert.equal(WILD_MARK, '!');
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
   const tvm = readFileSync(new URL('../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
   assert.match(tvm, /label: chasing \? `\$\{WILD_MARK\} \$\{bandLabel\(mk\.name, mk\.mobileTypes\.length\)\}` : bandLabel/);
   assert.match(tvm, /label: wildCamps\.has\(c\.key\) \? `\$\{WILD_MARK\} \$\{c\.label\}` : c\.label/);

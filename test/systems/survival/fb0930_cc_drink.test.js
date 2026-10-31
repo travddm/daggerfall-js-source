@@ -58,7 +58,7 @@ test('TAVERN-DRINK: the report - a dehydrated Casual traveller buys one soft dri
   w._food();
   const drink = softDrink();
   const out = w.flow.top.onPick(w.flow.top.picker.indexOf(drink.text));
-  assert.equal(out[0].rows[0].text, TAVERN_MENU_TEXT.refreshed, 'poured and said');   // PIN MOVED (AUDIT C&C I6): a soft drink refreshes - "fortifies" was said over the milk
+  assert.equal(out[0].rows[0].text, TAVERN_MENU_TEXT.refreshed, 'poured and said');
   assert.equal(p.goldPieces, 100 - drink.price, 'paid for');
   assert.equal(Math.floor(ownMinutes()), INN_AT + DRINK_MINUTES, 'the quarter hour stands');
   assert.equal(thirstStage(p.survival.thirst), 'fine', `one drink leaves the red and the thirst (${p.survival.thirst.toFixed(1)} after its quarter hour)`);
@@ -69,7 +69,6 @@ test('TAVERN-DRINK: the report - a dehydrated Casual traveller buys one soft dri
 });
 
 test('TAVERN-DRINK: every kind quenches whole - milk, ale, wine and spirit alike; the drunk counter by its alcohol and the quarter hour stand, and Hard\'s blackout is still past the endurance (mutants: only a soft drink quenches; the drink takes forty again; the drink quenches nothing; the quench drops the drink\'s count; the quarter hour lost)', () => {
-  // PIN MOVED (AUDIT C&C I8): a drink counts its own alcohol, the mod's by its place in its list (DRINK_ALCOHOL), not a
   // kind the port guessed from its name - every alcohol the mod's lists pour, nought (the soft ones) to forty
   const alcohols = [...new Set(Object.values(DRINK_ALCOHOL).flat())].sort((a, b) => a - b);
   assert.deepEqual(alcohols, [0, 10, 12, 15, 20, 25, 30, 40]);
@@ -99,7 +98,7 @@ test('TAVERN-DRINK: the enhanced window pours the same law - one ale from Dehydr
       const view = mountEnhancedTavern(host, { entity: p, ...hooksOn(p), onExit: () => {} });
       const text = (n) => (n.textContent || '') + n.children.map(text).join(' ');
       dom.doc.querySelectorAll('.tavern-act').find((b) => b.textContent === 'Food & drink').onclick();
-      const ale = tavernMenu({ climateIndex: CLIMATES.Desert, quality: 10, hour: 13 }).rows.find((r) => r.kind === 'drink' && r.strength === 10);   // PIN MOVED (AUDIT C&C I8): the South's Beer, alcoMid's 10
+      const ale = tavernMenu({ climateIndex: CLIMATES.Desert, quality: 10, hour: 13 }).rows.find((r) => r.kind === 'drink' && r.strength === 10);
       dom.doc.querySelectorAll('.tavern-row').find((r) => text(r).includes(ale.name)).onclick();
       assert.ok(p.survival.drunk > 0 && p.survival.drunk <= 10, `the ale counted (${p.survival.drunk} - its quarter hour sobers a point a ten minutes)`);
       assert.equal(thirstStage(p.survival.thirst), 'fine', 'and quenched whole');

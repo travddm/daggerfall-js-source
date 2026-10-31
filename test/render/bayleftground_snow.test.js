@@ -1,5 +1,4 @@
-// BAY-LEFT-GROUND (2026-10-26, bible/03-World/Landforms.md "BAY-LEFT-GROUND"; the audit "no system left behind in the
-// Bay", D3) - THE SNOWFALL MOD PAST THE BAY. Skyrim's winter laid the snow cover and the peaks' caps, but no deep snow to
+// BAY-LEFT-GROUND - THE SNOWFALL MOD PAST THE BAY. Skyrim's winter laid the snow cover and the peaks' caps, but no deep snow to
 // wade, no footprint, no track, no corpse's hollow and no berm anywhere past the Bay: the world host's snow ground
 // (scenes/snowGround.js, moved out of bootWorld) stood no pixel off the Bay's 1000 x 500 and keyed one by `px * 1000 + py`
 // (two pixels a thousand apart one key past it); SnowContextData.Prepare's box (scenes/snowfallHost.js snowPixelBox) and

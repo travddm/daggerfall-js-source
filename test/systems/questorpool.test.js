@@ -1,4 +1,4 @@
-// QP1 - THE ANY-WORK QUESTOR POOL GOES LIVE (2026-08-28). AUDIT 24
+// QP1 - THE ANY-WORK QUESTOR POOL GOES LIVE. AUDIT 24
 // found npcSession.buildQuestorPool DEAD: the policy shipped, pinned,
 // and nothing could feed it - the host's building seam carried no
 // per-building NPC records, so npcsWithWork stayed empty for ever,

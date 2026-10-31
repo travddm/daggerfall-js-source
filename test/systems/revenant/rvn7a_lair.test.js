@@ -1,5 +1,4 @@
-// RVN7a - THE LAIR (bible/12-Enhanced-AI/Feud-Arc.md section 18.1; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). At a deed in the open world a revenant's lair is the named dungeon in the
+// RVN7a - THE LAIR (;, then "Go"). At a deed in the open world a revenant's lair is the named dungeon in the
 // bounty boards' 4-10 px ring about the deed's map pixel nearest a bearing drawn on its id - kept as {px, py, name,
 // region}; with none in the ring it roams. A deed underground makes that dungeon its lair. The host says where a deed
 // is done through the player's door (`lairHere`). A lair moved is one the player has not heard of.
@@ -115,7 +114,6 @@ test('RVN7a THE DEED through the door: a deed in the open world picks its lair a
   let here = { px: 100, py: 100, dungeons: [D(106, 100, 'East Keep', 3), D(94, 100, 'West Crypt', 3), D(100, 94, 'North Barrow', 3), D(100, 106, 'South Mine', 3)] };
   setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, lairHere: () => here });
   const foe = { mobileType: M.Orc, level: 6, champion: 'mighty', unquiet: true, health: 5, maxHealth: 50, team: 'Monster' };
-  // PIN MOVED (UNQUIET II, Revenants.md section 47): an escape's trail makes its lair known - the lair's own law is read
   // here through deeds that leave none (a kill, my flight); unquiet.test.js pins the trail
   const r = N.revenantDeed(p, foe, 'slew', { mobileType: M.Orc, rolls: () => 0 });
   assert.ok(r.lair, 'a lair');

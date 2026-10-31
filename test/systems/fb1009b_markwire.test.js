@@ -23,7 +23,7 @@ import { ARROW_TEMPLATE } from '../../src/systems/inventory.js';
 const { recordIsOffered, takeTradeGoods, TRADE_VOLATILE_FIELDS } = law;
 
 test('MARK-WIRE: the receiver\'s marks are ONE list - the realm\'s volatile fields, the wire\'s clamp and a wild death\'s record all drop every one of them, `acquired` among them (mutants: the volatile list spelled out without it; the moved record keeps it)', () => {
-  assert.deepEqual(law.RECEIVER_MARKS, ['equipSlot', 'questItem', ACQUIRED_FIELD, 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's; AUDIT STEED1: and its food's clock, its owner's character's; PIN MOVED (APPEARANCES): the look a piece wears, its wearer's (bible/04-Characters/Wardrobe.md)
+  assert.deepEqual(law.RECEIVER_MARKS, ['equipSlot', 'questItem', ACQUIRED_FIELD, 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);     // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's; AUDIT STEED1: and its food's clock, its owner's character's
   const dagger = createWeapon(113, 1, () => 0.5);
   for (const k of law.RECEIVER_MARKS) {
     assert.ok(TRADE_VOLATILE_FIELDS.includes(k), `${k} is volatile to the realm`);

@@ -20,7 +20,7 @@ import {
 import { HOUR_JOBS, MINUTE_JOBS, runCron, CRON_HOUR, CRON_MINUTE } from '../../server-account/src/cron.js';
 import { _resetTownEconForTests, TOWN_ECON_ISOLATE_S } from '../../server-account/src/townEcon.js';
 
-// TOWN-ECON TE2 (2026-10-18, bible/06-Systems/Town-Economy-Arc.md section 4): the account service's half of the players'
+// TOWN-ECON TE2: the account service's half of the players'
 // share - the town registry, the four witnessed sources (footsteps, a trader's sale, a patron's, a raid driven off),
 // each account capped a town a day, the read and the sweep.
 

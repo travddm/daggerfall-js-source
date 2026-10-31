@@ -1,4 +1,4 @@
-// GUILD1b (2026-09-25) - THE GUILD TAB: net/guild/guildBook.js (the character's guild as the client holds it, and the gold's
+// GUILD1b - THE GUILD TAB: net/guild/guildBook.js (the character's guild as the client holds it, and the gold's
 // order around every act) and ui/socialPanel.js's fourth tab, over a fake door and a fake document.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -258,7 +258,7 @@ test('GUILD1b the officer\'s view: members and recruits promoted and demoted wit
   ];
   const ledger = [{ at: 5, who: 'Cass', kind: 'deposit', amount: 500, balance: 500 }];
   const { door, panel, frame } = await tabRig({ guild: view({ rank: 1, members, treasury: 500, ledger }) });
-  // GUILD2 (PIN MOVED): the tab is pages now - the roster on Members, the gold on Treasury, the rank names on Settings
+  // GUILD2 (
   panel.openGuild('members'); await frame();
   const rowOf = (n) => find(panel.root, 'dfsocial-row').find((r) => texts(r).includes(n));
   assert.equal(buttons(rowOf('Aldric'), 'Promote').length + buttons(rowOf('Aldric'), 'Remove').length, 0, 'the guildmaster is not an officer\'s to touch');
@@ -286,7 +286,7 @@ test('GUILD1b the officer\'s view: members and recruits promoted and demoted wit
 });
 
 test('GUILD1b the guildmaster\'s view: alone with gold in the treasury, Leave and Disband stand disabled and say to take the gold out; with the treasury empty, Disband arms and the second press disbands; with members, Leave says to hand the guild on; the rank names are theirs to change (mutants: a disband with gold in it, leaving members behind, a rename offered to nobody)', async () => {
-  // GUILD2 (PIN MOVED): leaving, disbanding and the rank names are the Settings page's; handing on is the roster's
+  // GUILD2 (
   const rich = await tabRig({ guild: view({ treasury: 40 }) });
   rich.panel.openGuild('settings'); await rich.frame();
   assert.equal(button(rich.panel.root, 'Disband').disabled, true);

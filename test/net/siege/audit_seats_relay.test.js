@@ -1,7 +1,7 @@
-// AUDIT-SEATS (2026-10-01, Mac: "We need to do a comprehensive audit on everything and finish the not done"): THE SEATS
+// AUDIT-SEATS: THE SEATS
 // ARC'S RELAY, AUDITED - every finding reproduced here before its fix and pinned after it, over the real Room on its fake
 // sockets (test/fakeRoom.mjs), the real referee (net/siege/siegeRef.js), the real receipts (net/siege/siegeReceipt.js) and, for the
-// late pass, the real account Worker (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 6.1-6.8, 7.3, 7.6, 9.2, 16;
+// late pass, the real account Worker (test/accountDb.mjs). 6.1-6.8, 7.3, 7.6, 9.2, 16;
 // `06-Systems/Online-Arc.md` PVP-REF, SEAT2a, CROWN1.
 //
 //   R1  a climb is a step, and a point has a height        R6  a fighter back past the window collects its receipt
@@ -310,7 +310,6 @@ test('AUDIT-SEATS R5 THE ROYAL TOURNEY\'S BOUND IS WHO IS IN THE ROOM: forty-eig
     refused(await enter('duel-0300', 'duel', {}, { pose: ring }), 'the field is full');
     assert.ok(r.room._siege.fighters[next.att.sub], 'a contender in the room is never pruned');
     // a contender back from a drop: its record as it was, the ladder said
-    // PIN MOVED (AUDIT SEATS-3): a place made for it first - a contender back is counted as a new one is (B3: the
     // forty-ninth row was the roll call no client reads)
     await r.drop(inRoom0(r, 'duel-0201'));
     const back = await enter('duel-0001', 'duel', {}, { pose: ring, lv: 11 });
@@ -391,7 +390,7 @@ test('AUDIT-SEATS R6 THE LATE PASS (server-account/src/seatSiege.js siegePass): 
   now = S + 7200 - 1;
   assert.equal((await ask(fighter, { key: SK })).body.late, undefined, 'inside the window: an ordinary pass');
   assert.equal((await ask(fighter, { key: SK, week: W + 1 })).body.week, W, 'a week named that is not last week\'s is this week\'s');
-  // after the Turning: last week's battle, asked by name - PIN MOVED (AUDIT-SEATS S3): fought, its result written before
+  // after the Turning: last week's battle, asked by name
   // its Turning (a battle no receipt ever reached is voided there, and its late receipt refused - seatTurning.js)
   raw.prepare("INSERT INTO town_seat_results (week, key, result, raised, winner, rid, at) VALUES (?, ?, 'attack', 1, 'attack', 'r6-result', ?)").run(W, SK, S + 1800);
   raw.prepare("UPDATE town_seat_battles SET state = 'fought' WHERE week = ? AND key = ?").run(W, SK);

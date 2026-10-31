@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): A HELD STAR'S SPOILS - the Starspun Weave (the festival's own Aetheric
+// STAR7: A HELD STAR'S SPOILS - the Starspun Weave (the festival's own Aetheric
 // set: its law, its nine pieces, its three powers through SET2's seams), Starglass (template 576, its row, its picture, its
 // law's leaf) and the roll off the receipt's seed (the Heart-Star's doubled). tools/mutants/star7.json.
 import '../../modsOff.js';
@@ -83,7 +83,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 const swing = (e, weapon, target, n = 100) => { const d = setBlow(weapon, n, e, target, {}); setStrike(e, target, d, weapon); return d; };
 
 test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala its patron, the star\'s violet its colour, no raiding party\'s, never a world set; Spinner\'s Thread, Bound in Silk and Mephala\'s Veil at 2, 4 and 6 pieces with the design\'s numbers Faint to Ascendant, every brief inside BRIEF_MAX at every stage (mutants: a tier\'s number; the set\'s place; a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(-2), ['starspun', 'eltheric']);   // PIN MOVED (SEA-SET): the Eltheric Tidemail after it
+  assert.deepEqual(SIGIL_SET_IDS.slice(-2), ['starspun', 'eltheric']);
   const s = setById('starspun');
   assert.deepEqual([s.id, s.name, s.prince, s.colour, s.aetheric, 'raid' in s, s.role],
     ['starspun', 'The Starspun Weave', 'Mephala', STAR_VIOLET_CSS, true, false, 'The coven\'s thread, turned on the coven']);
@@ -125,7 +125,7 @@ test('STAR7 THE RECORDS: nine in the places\' order - the seven body pieces, a b
   assert.ok(!resists.includes('poison'), 'never poison - Spinner\'s Thread carries it');
   assert.equal(new Set(resists).size, resists.length);
   for (const r of STARSPUN_SET_PIECES) assert.ok(r.lore.length > 20 && r.lore.length <= 100 && !/\S - \S/.test(r.lore), `${r.id}: a line of lore`);
-  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length), [...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);   // PIN MOVED (SEA-SET): the Tidemail's nine after the Weave's   // PIN MOVED (WITCH1): the Wyrd's Raiment before the Weave
+  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length), [...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
 });
 
@@ -265,7 +265,7 @@ test('STAR7 STARGLASS: template 576, its row a leaf the law reads headless - lig
   assert.deepEqual(STARGLASS_LAW_ROW, { index: 576, baseWeight: 0.1, hitPoints: 1000, basePrice: 400, rarity: 20, stackable: true });
   assert.ok(!('bound' in STARGLASS_LAW_ROW), 'never bound - the holder\'s to sell or give');
   assert.equal(lawTemplate(576)?.index, 576, 'the law knows it');
-  assert.equal(templateByIndex(576)?.name, 'Starfall Glass');   // PIN MOVED (AUDIT STAR I1): the sea's trade good is Starglass
+  assert.equal(templateByIndex(576)?.name, 'Starfall Glass');
   assert.equal(STARGLASS_ROW.worldTextureArchive, STARGLASS_ARCHIVE);
   const s = starglass(3);
   assert.deepEqual([s.group, s.templateIndex, s.stackCount], ['UselessItems2', 576, 3]);

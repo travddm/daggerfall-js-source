@@ -1,4 +1,4 @@
-// AUDIT CREW-TRADE (2026-10-24, the owner: "Audit this", of CREW-TRADE - bible/01-Overview/audits/Audit-Crew-Trade.md):
+// AUDIT CREW-TRADE:
 // five cold lanes read CREW-TRADE at 5f4f04bef on frozen snapshots - the economy (E), her crew (H), the office, the
 // window, online and the realm (O), the pins and the record (P), the real game (R) - and each finding fixed is pinned
 // here, over the REAL sea fight (crewQuay.mjs - TEST THE SHAPE THE PRODUCER MINTS). tools/mutants/auditcrewtrade.json.

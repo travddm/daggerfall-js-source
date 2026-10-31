@@ -1,6 +1,4 @@
-// WB6a (2026-09-25, Mac, having walked the Burning Court: "the transition and the arena needs to be an oblivion
-// masterpiece ... the outside bounds arent a perfect square, maybe somehow introduce distant skybox design or some
-// other ambient detail. Whole thing needs to feel alive"): THE DEADLANDS' SKY AND SEA, DRIVEN. The clock and every
+// WB6a: THE DEADLANDS' SKY AND SEA, DRIVEN. The clock and every
 // rate whole over it; the lightning; the sea's disc (up-facing, inside the far plane from anywhere on the court, its rim
 // the sky's own horizon); the sky's rays; the court's own light; the pass over a fake GL (the sea solid, the sky at the
 // far plane, the renderer's compare back); and the seams by source. tools/deadlandsProbe.mjs draws it in a real WebGL2.

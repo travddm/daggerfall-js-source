@@ -1,7 +1,5 @@
-// LPT1 (2026-10-05, the owner: "Next mod to integrate is this ... Its important we make this compatible with seasons of
-// daggerfall, ensure performance doesnt take a hit and draw distance can remain the same. A true visual overhaul with no
-// performance loss"): LOW POLY TREES 5 (SquidKamer). bible/07-Rendering/Low-Poly-Trees.md is the design and
-// bible/01-Overview/audits/Audit-Low-Poly-Trees.md the audit; this file pins the pure module (world/lowPolyTrees.js), the
+// LPT1: LOW POLY TREES 5 (SquidKamer). is the design and
+// the audit; this file pins the pure module (world/lowPolyTrees.js), the
 // vendored data, the renderer's mesh mode and handover, the host's door (systems/lowPolyTreesAssets.js) and the two
 // exterior hosts' wiring.
 import { test } from 'node:test';
@@ -462,7 +460,6 @@ test('LPT1 BB_VS mesh mode: the tree\'s vertex turned about +Y and scaled at its
   assert.ok(near(banded.vFade, 2.5, 1e-3));
 });
 
-// PIN MOVED (FLORA-GROUND, FIELD BUGS 2026-10-27: "reflective flora"): a face's light no longer asks where the eye is -
 // the far picture's light is the sky's, straight above (LPT_IMPOSTOR_LIGHT), and the 3D tree takes it unturned: a matte
 // face, the same from every side, as DFU's Lambert nature batch (DaggerfallBillboardBatch.shader) lights its flats.
 test('LPT1 BB_VS mesh mode light (AUDIT LPT A2; FLORA-GROUND): at night a face takes the far picture\'s own law - LPT_IMPOSTOR_LIGHT, the sky\'s from straight above, never turned to the eye - so the tree and its picture agree where they hand over and no face shines toward the viewer; by day the sun\'s by its share; times its material\'s colour', () => {
@@ -552,7 +549,7 @@ test('LPT1 createBillboardBatch / moveBillboardBatch: each flat\'s scale written
   const r = new Renderer(canvas);
   calls.length = 0;
   const b = r.createBillboardBatch(504, '12#lpt', { w: 4, h: 8 }, [[0, 0, 0], [5, 0, 5]], { scales: [0.5, 1] });
-  const data = calls.find((c) => c[0] === 'bufferSubData' && c[3]?.length === 40)[3];   // PIN MOVED (PERF-ARENA): a still batch's corners are written into its arena's range
+  const data = calls.find((c) => c[0] === 'bufferSubData' && c[3]?.length === 40)[3];
   assert.equal(data[3], Math.fround(bbCornerX(-0.5, 0.5)));
   assert.equal(data[23], Math.fround(bbCornerX(-0.5, 1)));
   assert.ok('lptProto' in b && '_scales' in b && 'farH' in b && !('_tints' in b));
@@ -947,7 +944,6 @@ test('LPT1 the felled trees: a sink or a stand moves FOREST_STAMP (the near set 
 });
 
 test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s switch and ?trees=off, through the one door; a far-picture batch a handle, HELD while it stands (AUDIT LPT B5), MAC1\'s far rings reading the flat\'s own height (AUDIT LPT A8/B1); the near set handed on between the gibs\' call and the wind (WIND3 keeps the wind and the flats\' draw adjacent), culled to the view; the terrain\'s own flats alone take DFU\'s variety', () => {
-  // PIN MOVED (BANTHA1, HOST-SPLIT): the streaming host's door, its near sets and its handles' owners are the trees' host's
   // (scenes/treesHost.js), which world.js builds behind the same switch and the same door
   const w = hostText('src/scenes/world.js'), x = read('src/scenes/exterior.js'), th = read('src/scenes/treesHost.js');
   assert.match(w, /lowPolyTreesOn: modSetting\('low-poly-trees', 'Enabled'\) && params\.get\('trees'\) !== 'off'/, 'world.js: the switch and the door');
@@ -964,11 +960,9 @@ test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s
     assert.match(src.slice(gibs, wind), name === 'world.js' ? /trees\.frame\(_pixelOrder/ : /lowPolyTrees/, `${name}: the frame's trees between the gibs and the wind`);
   }
   assert.match(th, /seasonsActive\(\) && !seasons\.installing && seasons\.lookup\(a, 1\)/, 'the streaming host paints nothing seasonal mid-install (AUDIT LPT B3)');
-  // PIN MOVED (ECOTONE1, 2026-10-07): by the archive the flat is drawn in - a border's flat is a neighbour climate's
-  // PIN MOVED (AUDIT PRECIP HOST-7): logged wild, and marked by the log's grouping (scenes/pixelBuild.js groupFlats) - the build's and a re-skin's
   assert.match(w, /addFlat\(archive, f\.record, f\.x, f\.y, f\.z, \{ wild: base, tree \}\);/, 'the terrain layout\'s flats logged wild');
   assert.match(w, /if \(log\[j\]\.wild != null\) wild\.add\(`\$\{k\}#\$\{g\.length\}`\);/, '...and marked');
-  assert.match(w, /wild\[i\] = g\.wild\.has\(`\$\{k\}#\$\{i\}`\) \? 1 : 0;\n\s+const v = lptVariety\(g\.px, g\.py, c\[0\], c\[2\], !wild\[i\]\)\.scale;\n[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(fit && !wild\[i\]\) fit\[i\] = Math\.min\(fit\[i\], lptTrunkCap\([^\n]*\n\s+scales\[i\] = \(fit \? Math\.min\(v, fit\[i\]\) : v\) \/ LPT_SCALE_MAX;/);   // PIN MOVED (LPT-FIT): the variety read into `v`, the far picture the lesser of it and the tree's fit; PIN MOVED (FB1020c TRUNK-FIT): that fit the lesser of the crown's and, for a location's tree, the trunk's
+  assert.match(w, /wild\[i\] = g\.wild\.has\(`\$\{k\}#\$\{i\}`\) \? 1 : 0;\n\s+const v = lptVariety\(g\.px, g\.py, c\[0\], c\[2\], !wild\[i\]\)\.scale;\n[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(fit && !wild\[i\]\) fit\[i\] = Math\.min\(fit\[i\], lptTrunkCap\([^\n]*\n\s+scales\[i\] = \(fit \? Math\.min\(v, fit\[i\]\) : v\) \/ LPT_SCALE_MAX;/);
   assert.match(x, /buildTreeSet\(0, 0, lptGroups\)/, 'the location host: one set, none of it wild');
   assert.match(x, /lptGroups\.push\(\{ h: lptHandles\.length - 1, centers, wild: null \}\);/);
   assert.match(w, /lowPolyTrees: lptGroups\.length \? \{ px, py, ox: 0, oy: 0, oz: 0, handles: lptHandles, groups: lptGroups, trees: null, centers: null \} : null/);
@@ -991,7 +985,6 @@ test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s
   assert.match(fr, /ready\(a, p\._t\)/, '...the pixel\'s, this frame');
   assert.match(fr, /opts\.stamp = FOREST_STAMP\.n;/, 'a felling regathers');
   for (const [name, src] of [['world.js', w], ['exterior.js', x]]) {
-    // PIN MOVED (ECOTONE1, 2026-10-07): the streaming host's pixel asks by its nature set (its climate's and a border's)
     assert.match(src, name === 'world.js' ? /batch\.sway = floraSwayOf\(archive, g\.natureSet, plain\.h\);/ : /batch\.sway = floraSwayOf\(archive, natureArchive, plain\.h\);/, `${name}: the flat's sway share`);
     assert.match(src, /coverProxies\(c, plain, \{ tree:/, `${name}: the flat's cover (AUDIT LPT D3)`);
   }

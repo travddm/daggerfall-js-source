@@ -1,5 +1,4 @@
-// MAP-KEEP (2026-09-27, Flylighter on Discord: "3D Map Unfilling areas mid-dungeon - Parts of the map previously
-// filled out will randomly disappear from the 3D map ... just about every dungeon"). The reveal store only ever grows
+// MAP-KEEP. The reveal store only ever grows
 // while a player stands in a dungeon; it was the LOAD that took the map away. A save made in a dungeon comes back
 // through the world host's door build, and (1) that build entered the restored record on the FRESH-ENTRY arm - the
 // colour tier (visited this run) reset, so every step taken went gray, the record stamped and the store pruned - where

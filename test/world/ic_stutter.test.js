@@ -1,5 +1,4 @@
-// IC-STUTTER (2026-10-27, the owner: "Traveling in the Imperial City at x60 presents really bad stuttering"; bible/03-World/
-// Arena-Provinces.md IC-STUTTER) - THE CITY'S WORK OFF THE FRAME AT A JOURNEY'S PACE, pinned: the city's workers told the
+// IC-STUTTER - THE CITY'S WORK OFF THE FRAME AT A JOURNEY'S PACE, pinned: the city's workers told the
 // slices ahead of the traveller near, a ring before the stream asks; a piece a build waits on asked of its slice's worker
 // ahead of every wanted piece, made again where it was let go, never waited on for ever; a pool of workers, each slice
 // one worker's; the stream's pump building a pixel of the city only once its view's pieces are made, the next ready pixel
@@ -307,7 +306,6 @@ test('IC-STUTTER THE PLACES\' STEPS COUNTED - on a town of two quarters 512 cell
 });
 
 test('IC-STUTTER THE LIVING TOWN\'S PLACES AND THE STREETS\' PIECES A STEP AT A TIME - on a near slice of the Imperial City (its own blocks, its fabric\'s homes): the town\'s places and its quarters\' made in steps are the ones made whole, the street net and the town walk\'s pieces the same labels; each gives the frame back many times over the 512 by 512 grid; a LivingTown handed its places stands as one that made them (mutants: the places\' rows unbroken; the quarters made whole; the flood in one; the places handed in unread)', async () => {
-  // PIN MOVED (IC-STAIRS, IC-PROPS): the Arena District's slice is one quarter on the city laid again - a slice of five
   const nav = sliceNav(QUARTERED), homes = fabricHomesIn(QUARTERED);
   const IC = CAPITALS.findIndex((c) => c.family);
   const o = { town: { mapId: capitalPlaceId(IC, QUARTERED), blocks: 64, region: 70, people: 3, port: false }, buildings: homes.buildings, doors: homes.doors };

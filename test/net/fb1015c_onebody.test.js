@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-15c - ONE-BODY, the Discord: "Happened after a server restart. can interact with them with menu.
 // friend who is a duplicate of them is able to move around and can see them in world as well". A relay deploy drops
 // every socket; a tab or a half-open socket that outlived it stood beside the account's new one in the cell - two bodies
-// of one player, the friend's own page seeing the copy. Mac: "One body per account": a cell's room (`world:x,y`) and a
+// of one player, the friend's own page seeing the copy.: a cell's room (`world:x,y`) and a
 // world room (a dungeon's `dungeon:m<id>`, a building's `interior:m<id>.<n>`) close an account's older socket when it
 // says hello again under another id (CLOSE_REPLACED, its leave said), as a gate's court, a siege's field and a Super
 // dungeon's realm already did (server/src/index.js the hello's one-socket law). `01-Overview/bugs/Field-Bugs-2026-10-15c.md`.

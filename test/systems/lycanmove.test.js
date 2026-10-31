@@ -1,4 +1,4 @@
-// LM1 - THE TRANSFORMED MOVE SOUND (2026-08-29).
+// LM1 - THE TRANSFORMED MOVE SOUND.
 //
 // LycanthropyEffect.cs:201-211 + :586-604, the last member of that
 // effect the port had not carried - the ledger's own vampirism row

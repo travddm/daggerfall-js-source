@@ -1,4 +1,4 @@
-// PVPDUNGEONS + the owner's game changes (2026-10-08): the pure laws under them - the zone's halls (where they stand and
+// PVPDUNGEONS + the owner's game changes: the pure laws under them - the zone's halls (where they stand and
 // what stands in them), Heal Curse, the rest's warning, the hands swapped, Gothway Garden's side boards, and the spellbook
 // kept (KEEP-SPELLBOOK).
 import { test } from 'node:test';
@@ -83,7 +83,6 @@ test('REST-WARN: poisoned, diseased or both, the rest asks first and says which;
 });
 
 test('REST-WARN in THE FOUR HOSTS: the street\'s, a building\'s, a dungeon\'s and the fixed city\'s rest each ask before the window - its Yes the one way to it, nothing ailing the window at once', () => {
-  // PIN MOVED (AUDIT RPT1026 L3): world.js's restNow is declared beside the bed's press it carries (`const bed = ..., restNow`)
   const asks = /(?:const|, ) ?restNow = \(\) => [\s\S]{0,300}?createRestWindow\([^\n]*\n(?:[^\n]*\n){0,2}?\s*const ail = restAilmentLines\(playerEntity\);\s*\n\s*if \(ail\) \{[^\n]*new DecisionBoxWindow\(\{ rows: ail,[^\n]*return; \}\s*\n\s*restNow\(\);/;
   for (const host of ['world.js', 'worldModes.js', 'dungeonContext.js', 'exterior.js']) {
     const src = readFileSync(new URL(`../../src/scenes/${host}`, import.meta.url), 'utf8');
@@ -153,7 +152,6 @@ test('ZONE-GIANTS: two giants a tier, always; each walks inside its own tier, th
     for (const gi of wildGiantsAt(mask, free, t)) {
       assert.equal(gi.ring, wildGiantRing(gi.g));
       const later = wildGiantsAt(mask, free, t + 60_000).find((q) => q.g === gi.g);
-      // PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): the blob whole, no longer the owner's cut over it - a new day's
       // home across it is a longer walk, a twentieth of the zone's span a minute at the most, never a jump
       assert.ok(Math.hypot(later.x - gi.x, later.y - gi.y) < Math.hypot(mask.box.x1 - mask.box.x0, mask.box.y1 - mask.box.y0) / 20, 'a minute on, a short step - never a jump (the walk to a new day\'s home the longest)');
     }
@@ -206,8 +204,8 @@ import { dungeonRespawnMs, dungeonRespawnDue, DUNGEON_RESPAWN_MS, ELITE_DUNGEON_
 test('DUNGEON-RESPAWN: a normal dungeon 20 minutes, an elite 40, each on its own clock; the zone\'s halls and a Super dungeon keep WORLD8\'s - half an hour since RESPAWN-30', () => {
   assert.equal(dungeonRespawnMs({}), 20 * 60_000);
   assert.equal(dungeonRespawnMs({ elite: true }), 40 * 60_000);
-  assert.equal(dungeonRespawnMs({ elite: true, wild: true }), 30 * 60_000, 'the halls as they were');   // PIN MOVED (RESPAWN-30): an hour
-  assert.equal(dungeonRespawnMs({ superTier: true }), 30 * 60_000);   // PIN MOVED (RESPAWN-30): an hour
+  assert.equal(dungeonRespawnMs({ elite: true, wild: true }), 30 * 60_000, 'the halls as they were');
+  assert.equal(dungeonRespawnMs({ superTier: true }), 30 * 60_000);
   const t = 1e12;
   assert.equal(dungeonRespawnDue(t, t + DUNGEON_RESPAWN_MS - 1, DUNGEON_RESPAWN_MS), false);
   assert.equal(dungeonRespawnDue(t, t + DUNGEON_RESPAWN_MS, DUNGEON_RESPAWN_MS), true, 'twenty minutes after it fell, whoever came and went');
@@ -228,9 +226,9 @@ test('GREATER-GIANT: the zone\'s giants are Greater Giants, calling ten ordinary
 });
 
 // WILD-KEEPOUT (Wrothgaria kept out of the zone, its west border moved east) RETIRED with the Wrothgarian zone (WW-C2,
-// bible/03-World/World-Wide.md WW-C): Cyrodiil's zone is the province whole.
+// WW-C): Cyrodiil's zone is the province whole.
 
-// ── KEEP-SPELLBOOK (2026-10-08, the owner: "a player dropped his spellbook apparently") ──
+// ── KEEP-SPELLBOOK ──
 
 /** A new character's spellbook, off the producer that hands it over (startingGear.js, the bag's first piece). */
 const newSpellbook = () => {

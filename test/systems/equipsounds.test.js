@@ -1,4 +1,4 @@
-// ES2 - THE EQUIP SOUND (2026-08-28). equip.js's header FLAGGED it
+// ES2 - THE EQUIP SOUND. equip.js's header FLAGGED it
 // since U8f: DFU rings a per-item clip at EquipItem's own moment
 // (ItemEquipTable.cs:144-146, DaggerfallUI.PlayOneShot(item.
 // GetEquipSound())). The switch is DaggerfallUnityItem.cs:820-841

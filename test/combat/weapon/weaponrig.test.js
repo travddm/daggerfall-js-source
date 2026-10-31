@@ -19,7 +19,7 @@ import { equipSoundFor } from '../../../src/characters/weapons.js';
 import { midScreenText } from '../../../src/ui/midScreenText.js';   // AUDIT 64 F34: FPSWeapon.cs:365's surface
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-// SWING-DEFAULT1 (2026-09-22): the harness-artifact pin below reads the DRAG's direction (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
+// SWING-DEFAULT1: the harness-artifact pin below reads the DRAG's direction (WeaponSwingMode 0); the port's default is 2 now (click or hold), so the drag is asked for here, once for the file.
 import { setValue as _swingSetValue } from '../../../src/systems/settings/settings.js';
 _swingSetValue('Controls', 'WeaponSwingMode', '0');
 
@@ -165,9 +165,7 @@ test('weaponRig: envAttack - a door in reach bashes and consumes; others Receive
 
 // ── THE BOW'S PATH INTO THE MORROWIND ARM ────────────────────────────
 //
-// Mac: "the arrow doesn't show on the weapon being readied and fired,
-// instead the shot shoots like classic dagger and doesn't follow the
-// animation." Chasing it found the seam UNPINNED at both ends:
+// Chasing it found the seam UNPINNED at both ends:
 // mwarrow.test.js drives arm.attack() DIRECTLY, and this file pinned
 // the machine without ever asking what the arm was handed. So a bow
 // could swing on the melee path and every suite stayed green.
@@ -319,9 +317,7 @@ test('MW-D42: the bow\'s hit is held for the arm\'s release, and never swallowed
     assert.ok(classic.includes('hit'), 'no arm, no hold - the classic bow is exactly as it was');
     assert.ok(classic.includes('bowSound'), 'and its sound rides the machine\'s own frame 4');
 
-    // MW-D42c: AND THE WHEEL DOES NOT CHANGE THE LAW (Mac: "in third
-    // person, clicking instantly triggers the attack, unlike the
-    // changes we made to first person"). active() is the FIRST-person
+    // MW-D42c: AND THE WHEEL DOES NOT CHANGE THE LAW. active() is the FIRST-person
     // predicate by construction, so the hold silently switched off the
     // moment the view turned and the click fired the classic frame-5
     // hit again. The question is whether the ARM is animating, not

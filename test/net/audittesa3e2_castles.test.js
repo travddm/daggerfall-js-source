@@ -1,4 +1,4 @@
-// AUDIT TESA III E2-2 (2026-10-26; bible/01-Overview/audits/Audit-Tesa-III-E2.md): A CASTLE PAST THE BAY IS ITS CAPITAL'S.
+// AUDIT TESA III E2-2: A CASTLE PAST THE BAY IS ITS CAPITAL'S.
 // WW7-4 made each province's crown city keep a castle its Charter's guild may buy (net/castleLaw.js castleKeyOk), but the
 // Guild window named a castle by its REGION - the Bay's three crowns' regions are their cities' names, a province's is
 // not - so a guild holding Skyrim's Charter was offered "Castle Skyrim", told its door stood "in Skyrim" (it stands in

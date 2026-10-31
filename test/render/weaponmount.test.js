@@ -1,4 +1,4 @@
-// WEAPON-MOUNT (2026-09-26, Mac: "weapons dont show in houses properly"): DECOR2c hangs a weapon or a shield on the
+// WEAPON-MOUNT: DECOR2c hangs a weapon or a shield on the
 // decal pass as its pack picture, under a white tint - and the decal pass is the BLOOD's. Both of its programs read
 // the texel's red as a film's thickness and paint the tint through it (BLOOD3), so a hung sword came out a pale lit
 // silhouette of itself: the picture's colours thrown away. A mount is a PICTURE now - the pass's own program with its

@@ -1,6 +1,4 @@
-// PARTY-REST1 (2026-09-20, per-request: "when the party leader rests everyone in the party gets the
-// resting screen counting down... only the leader should spawn mobs when resting", then "is it possible
-// for it only working when party members near the leader?").
+// PARTY-REST1.
 //
 // The wire's own law (a rest/loiter session's live state riding the party pose, refused whole on one bad
 // number, `bk` distinguishing two shops sharing one town pixel) is pinned with real, executable coverage
@@ -26,10 +24,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
-// The outdoor toggleRest's tail (REST-WARN, the owner: "Poison/Disease warning on rest"): gated, then ONE act - the
+// The outdoor toggleRest's tail (REST-WARN): gated, then ONE act - the
 // spend through the shared function and the real window (restNow) - run at once, or, poisoned or diseased, on the
 // warning's Yes once its box has left the slot (the close callback, THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD)
-// PIN MOVED (AUDIT RPT1026 L3): the window opens with the bed's press read at the toggle (`bed`) - a REST-WARN box opens it
 // on its Yes, after the press
 const REST_OUTDOORS = /const partyRefusal = modes \? partyRestGate\(\) : null;[^\n]*\n\s*if \(partyRefusal\) \{ townTalk\.showOverlay\(new ActionTextBox\(\[partyRefusal\]\)\); return; \}\s*(?:\/\/[^\n]*\n\s*)*const bed = _restFromBed, restNow = \(\) => \{ if \(modes\) markPartyRestSpent\(\); townTalk\.showOverlay\(createRestWindow\(outdoorRestDeps, bed\)\); \};[^\n]*\n\s*const ail = restAilmentLines\(playerEntity\);\s*\n\s*if \(ail\) \{ let yes = false; townTalk\.showOverlay\(new DecisionBoxWindow\(\{ rows: ail, onYes: \(\) => \{ yes = true; \} \}\), \(\) => \{ if \(yes\) restNow\(\); \}\); return; \}\s*\n\s*restNow\(\);/;
 
@@ -107,14 +104,13 @@ test('PARTY-REST1c (2026-09-20, per-request: "when the member initializes the re
   const w2 = rd('src/scenes/world.js');
   assert.match(w2, /const samePlace = \(a, b\) => !!\(a && b && a\.px === b\.px && a\.py === b\.py && a\.in === b\.in && \(a\.in !== 2 \|\| a\.bk === b\.bk\)\);/,
     'px, py, in, and - only indoors - bk: two shops sharing one town pixel are not "the same place" here either, same law net/wire.js\'s own doc comment on bk states');
-  // PARTY-REST3 (2026-09-20, per-request: "how near is near" - a world-map pixel is ~832x416 METERS, so
-  // samePlace alone is nowhere near "together"): a second, tighter law - real distance, off the SAME 3D
+  // PARTY-REST3: a second, tighter law - real distance, off the SAME 3D
   // positions CAMP-REST's own group-roll guard already reads (peersNear/player.feetAt), not the wire's
   // own coarse px/py.
   assert.match(w2, /const PARTY_REST_RADIUS = 15;/, 'a room/camp-circle scale, not GROUP_ROLL_RADIUS\'s 100 - that guard only keeps unrelated camps from double-rolling, this one means "close enough to rest together"');
   assert.match(w2, /const feetOfPartyAccount = \(acct\) => \{\s*const row = social\?\.party\?\.members\.find\(\(m\) => m\.acct === acct\);\s*const peer = row \? peersNear\(\)\?\.find\(\(p\) => row\.peers\.includes\(p\.id\)\) : null;\s*return peer\?\.feet \? \[[^\n]*?\] : null;\s*\};\s*const distanceToPartyAccount = \(acct, from = player\.feetAt\(\)\) => \{\s*const peerFeet = feetOfPartyAccount\(acct\);\s*if \(!peerFeet\) return Infinity;/,   // AUDIT PARTY8: the feet are asked once, and the distance is measured from `from` (the leader's feet for a follower's gather check)
     'a member not even a rendered, visible peer right now (out of stream range, or never loaded in) is Infinity away - too far, not an error');
-  // PARTY-REST8 (2026-09-21): restructured from a single expression into a block body so the meters-based
+  // PARTY-REST8: restructured from a single expression into a block body so the meters-based
   // distance check can be skipped indoors (a building's own key is already precise enough - see the doc
   // comment on nearAccount itself) - but samePlace is still asked FIRST and is still REQUIRED either way, and
   // distanceToPartyAccount is still the deciding factor whenever it does run (outdoors, or in a dungeon).
@@ -161,7 +157,7 @@ test('PARTY-REST2 (extended, per-request: "can this also initiate a rest vote...
   // not only the timestamp - matched by the ownership loop and social.now() itself, and separately, that
   // `voteActive` (computed once, above) is what both gates it here and only ever gets written on this one path.
   // PARTY-REST22: the ownership computation now lives in its own shared function (computeVoteOwner), used by
-  // PARTY-REST25 (2026-09-22, per-request: "Change this to leader only so it isnt confusing anymore"): the
+  // PARTY-REST25: the
   // whole "who owns this round" tracking this test used to pin (computeVoteOwner/voteBy/_partyRestVoteInitiator)
   // was retired - only the leader's press can ever open a real rest now, a plain `social.leads()` check with
   // nothing left to derive or disagree about.
@@ -182,7 +178,7 @@ test('PARTY-REST2 (extended, per-request: "can this also initiate a rest vote...
 
 test('PARTY-REST2/28: the SAME gate reaches all three hosts - world.js\'s own outdoor toggleRest calls it directly, and it is injected into worldModes.js (as host.partyRestGate) and forwarded again into dungeonContext.js (as opts.partyRestGate) - so a leader resting indoors or underground is gated exactly as one resting outdoors. PARTY-REST28 (2026-09-22, per-request: confirmed by direct testing, in a dungeon - "when we finished resting... it shows 1/2 ready to rest again that shouldnt happen" - the bug this closes): the SAME three-host wiring now ALSO carries markPartyRestSpent, the "spent the moment it is acted on" reset - a rest granted indoors or underground used to leave the granting player\'s own ready flag (and the group\'s cooldown state) stuck true forever, since only world.js\'s own outdoor toggleRest ever reset it (mutants: the gate wired into only one or two of the three; the injection silently dropped on the way through worldModes.js into the dungeon; markPartyRestSpent wired into fewer hosts than partyRestGate itself, or dropped from any one of the three)', () => {
   const w = rd('src/scenes/world.js');
-  // REST-WARN (the owner: "Poison/Disease warning on rest"): the spend and the window are ONE act now (restNow), run at
+  // REST-WARN: the spend and the window are ONE act now (restNow), run at
   // once or, poisoned or diseased, on the warning's Yes once its box has left the slot - still gated first, spent second
   assert.match(w, REST_OUTDOORS,
     'the outdoor host: gated, then spent (through the shared function, not its own inline copy), then the real window - in that order');
@@ -374,7 +370,6 @@ test('PARTY-REST4 (2026-09-21, per-request: "15m away from the leader do not cha
   const sh = rd('src/scenes/shared.js');
   assert.match(sh, /overrideRestKind: \(fn\) => \{[^\n]*_restKindOverride = fn \?\? null;[^\n]*\},/,
     'the override door itself - null/undefined goes back to inheriting restKind(), a function wins over it');
-  // PIN MOVED (AUDIT RPT1026 L3): between the two, a window a bed's press opened (ui/restDoor.js `bedPressed`) - the override
   // still first
   assert.match(sh, /\(_restKindOverride \?\? \(out\.bedPressed \? pressedBedKind : restKind\)\)\(\)/,
     'setResting reads the override FIRST when one is set, falling back to the inherited position-based restKind() only when none was broadcast at all');

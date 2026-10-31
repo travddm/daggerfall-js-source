@@ -10,7 +10,7 @@ test('LV2: every press leaves a stepped mark, and reduced motion stands them dow
   for (const k of ['fx-pick', 'fx-up', 'fx-down', 'fx-no']) assert.ok(LV2_CSS.includes(`.lv-star.${k}`), k);
   assert.match(LV2_CSS, /lv-rise [0-9]+ms steps\(/);
   assert.match(LV2_CSS, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.lv-pop \{ display: none; \}/);
-  assert.ok(starHowto().includes('right-click'));   // PIN MOVED (AUDIT GROWTH LANE5-1): read when drawn
+  assert.ok(starHowto().includes('right-click'));
 });
 
 test('LV2: the dress moves no band - no plaque in a band takes a border or vertical padding', () => {

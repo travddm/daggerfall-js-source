@@ -1,8 +1,8 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 7 - B2 = E1): THE MARKET'S HUBS PAST THE
+// BAY-LEFT-SEA: THE MARKET'S HUBS PAST THE
 // BAY - a province's hub its crown seat's pixel, else its largest listed city's, made again as the seats and the places
 // move; the Bay's hubs HUB1's byte for byte. On the freeware (ARENA2_PATH): the nine provinces' hubs, and the real Worker
 // over node:sqlite buying and filling between a board in Solitude and one in Daggerfall, both ways - `market-no-road`
-// with HUB1's hubs alone (the before), a courier with the provinces' (bible/06-Systems/Professions-Arc.md BAY-LEFT-SEA).
+// with HUB1's hubs alone (the before), a courier with the provinces' (BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

@@ -1,5 +1,5 @@
-// SEASON1 part two, the economy's Tides (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): A HARVEST, A
-// BLIGHT, A STORM SEASON AND A BANDIT SUMMER (bible/11-Multiplayer/Seats-Arc.md 9.3) - the law (each kind's multiplier,
+// SEASON1 part two, the economy's Tides: A HARVEST, A
+// BLIGHT, A STORM SEASON AND A BANDIT SUMMER (9.3) - the law (each kind's multiplier,
 // the courier's factor, the yields' Tide after the March's) and, through the real Worker, a tree felled on confirmed
 // ground in Daggerfall's Harvest and Blight weeks and a courier bought into Daggerfall in its Bandit Summer, each set
 // against a twin service counting no Season; unconfirmed ground no Tide. The rolls are the law's: Daggerfall's Harvest

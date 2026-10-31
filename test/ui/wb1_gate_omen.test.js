@@ -1,6 +1,5 @@
-// WB1 (2026-09-25, Mac: "at any point in the world, on the timer, a large area would be shown on the map, also in
-// chat"): THE OBLIVION GATE'S OMEN - the schedule, the room's key, the site, the chat's lines, the maps' ring and the
-// compass's mark. Design: bible/11-Multiplayer/World-Bosses.md sections 1-2.
+// WB1: THE OBLIVION GATE'S OMEN - the schedule, the room's key, the site, the chat's lines, the maps' ring and the
+// compass's mark. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -26,7 +25,7 @@ const iso = (ms) => new Date(ms).toISOString();
 const MIN = 5000;   // a classic minute, real ms, online
 
 test('WB1 the schedule: the omen 17:00, risen 19:00, open 20:00-22:00, the wrath at midnight - HH:32:30 UTC every even hour', () => {
-  // the first gate day after the online epoch (2026-09-14T00:00Z is game 13:30 of day 363)
+  // the first gate day after the online epoch
   const t = gateTimes(363);
   assert.equal(iso(t.omenAt), '2026-09-14T00:17:30.000Z');
   assert.equal(iso(t.riseAt), '2026-09-14T00:27:30.000Z');
@@ -87,7 +86,7 @@ test('WB1 the countdown: to the opening while sealed, to the seal while open, ro
   const t = gateTimes(410);
   assert.deepEqual(gateCountdown(t, t.riseAt + 30_000), { to: 'open', ms: t.openAt - t.riseAt - 30_000 });
   assert.deepEqual(gateCountdown(t, t.openAt + 1000), { to: 'seal', ms: t.sealAt - t.openAt - 1000 });
-  // GATE-COLLAPSE (2026-09-28, Mac: "Count down to collapse"): sealed for the night, it counts to the wrath's collapse -
+  // GATE-COLLAPSE: sealed for the night, it counts to the wrath's collapse -
   // and not past it: collapsing (the wrath, or a kill inside) and gone count nothing
   assert.deepEqual(gateCountdown(t, t.sealAt), { to: 'collapse', ms: t.wrathAt - t.sealAt });
   assert.deepEqual(gateCountdown(t, t.sealAt + 61_000), { to: 'collapse', ms: t.wrathAt - t.sealAt - 61_000 });
@@ -108,7 +107,6 @@ test('WB1 the room: gate:<day>, exactly the keys the clock mints, admitted open-
   assert.equal(gateRoomKey(502), 'gate:502');
   for (const k of ['gate:502', 'gate:0', 'gate:123456789']) assert.ok(isGateRoom(k), k);
   for (const k of ['gate:', 'gate:0502', 'gate:-1', 'gate:1234567890', 'gate:1.0', 'gate:1.16', 'gate:1.05', 'gate:1.', 'Gate:5', 'gate:5 ', 'dungeon:m5', null]) assert.ok(!isGateRoom(k), String(k));
-  // PIN MOVED (GATE-COURTS, net/gate/gateCourts.js): a night's courts past its first are `gate:<day>.<k>`, k 1 to GATE_COURTS_MAX - 1
   assert.equal(gateRoomKey(502, 0), 'gate:502'); assert.equal(gateRoomKey(502, 3), 'gate:502.3');
   for (let c = 1; c < GATE_COURTS_MAX; c++) { assert.ok(isGateRoom(`gate:502.${c}`), `court ${c}`); assert.equal(gateDayOfRoom(`gate:502.${c}`), 502); assert.equal(gateCourtOfRoom(`gate:502.${c}`), c); }
   assert.equal(gateCourtOfRoom('gate:502'), 0); assert.equal(gateCourtOfRoom('world:1,2'), null);

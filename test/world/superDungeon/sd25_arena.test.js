@@ -1,4 +1,4 @@
-// SD25 S7 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE LAST
+// SD25 S7: THE LAST
 // MOMENT'S ARENA, its rest - the pillars dressed as clock-towers inside the law's squares, their dials' hands watching the
 // Remnant, their lanterns, the bodies' marks, the Reset's dimming. Every law run from its own code; the pass's dial
 // through test/glsl.mjs.

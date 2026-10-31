@@ -1,9 +1,6 @@
-// NAV-H (2026-09-28, Mac: "enhance the newly integrated ships by adding proper naval combat with a huge reference to
-// assassins creed black flag. Being able to aim and fire when viewing from the side ... actual sailing ships to the
-// world that players can encounter and pillage ... integrate into the pirate quest system ... directly integrate into
-// online mode") - THE HOST: the sea fight driven through real frames over Come Sail Away's real pool (the vendored
+// NAV-H - THE HOST: the sea fight driven through real frames over Come Sail Away's real pool (the vendored
 // hulls, a stand-in renderer and pipeline - test/systems/comeSailAway/csa_online.test.js's), every other seam a recording stand-in; then the
-// world host's wiring, pinned (bible/03-World/Naval-Combat.md NAV-H).
+// world host's wiring, pinned (NAV-H).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -104,7 +101,7 @@ test('NAV-H at an armed helm the attack is the broadside\'s: look to a side and 
   assert.ok(host.drawFrame().aim.arcs.length > 0, 'the arcs drawn');
   assert.equal(host.attackInput(false), true);
   assert.equal(host.aiming, false);
-  assert.ok(host._shots.inFlight >= 5, 'the whole broadside');   // PIN MOVED (GALLEON, 2026-10-01): five ports a side
+  assert.ok(host._shots.inFlight >= 5, 'the whole broadside');
   assert.deepEqual(log.shake, [], 'AUDIT NAV1 (the presentation): no kick at the release - each gun kicks as it goes');
   run(host, 0.6);
   const booms = log.sounds.filter(([k]) => k === NAVAL_SFX.cannon);
@@ -267,7 +264,7 @@ test('NAV-H boarders: a pirate that grapples a crewed boat brings Warm Ashes\' o
   assert.equal(h.host.boarding?.kind, 'repel', 'a crippled boat is boarded at once');
   run(h.host, GRAPPLE_S + 0.2);
   assert.deepEqual(h.log.raids, [WA_SMALLRAID]);
-  const quest = { uid: 778 };   // PIN MOVED (RAID-WON, test/systems/naval/raidwon.test.js): a raid of no boarding of mine - never the won raid's own uid, which stays the sea fight's until its quest ends
+  const quest = { uid: 778 };
   const raidQuest = [...h.log.raids].length && h.host.boarding?.quest;
   assert.ok(raidQuest, 'the raid is the fight');
   assert.ok(h.host.placeQuestFoe(raidQuest), 'its foes stand on my deck');
@@ -317,13 +314,10 @@ test('NAV-H the save: each boat of mine by its deed\'s UID (its hurts and barrel
   const d = h.host.getSaveData();
   assert.equal(d.v, NAVAL_SAVE_VERSION);
   assert.deepEqual(Object.keys(d.boats), ['42']);
-  // PIN MOVED (SHIP-CREW, SEA-REPAIR): her crew as people (`mates`) and her store part-spent (`credit`) beside her hurts
   const { mates, credit, ...hurts } = d.boats[42];
-  // PIN MOVED (TOUGHER-SHIPS): a boat is saved on her first build's scale, that whole said (navalHost.js savedRecord) - to
   // the hundredth, so her hands' first tenth of a second of mending shows
   const first = firstBuildOf(2);
   const { hull: hull1, sail: sail1, ...rest } = hurts;
-  // PIN MOVED (TOUGHER-SHIPS + HOLDINGS' merge of main's #574): and her fires each and the crew's burn (the damage's saveData)
   // and `exact`: her hurts on her whole now, read back to the bit by this build (FG-05)
   const { exact, ...plain } = rest;
   assert.deepEqual(plain, { crew: 10, fire: 0, fires: [], crewBurn: 0, state: 'afloat', maxHull: first.hullHp, maxSail: first.sailHp, barrels: 1 });
@@ -336,13 +330,12 @@ test('NAV-H the save: each boat of mine by its deed\'s UID (its hurts and barrel
   assert.deepEqual(d.raids, [777]);
   assert.ok(Math.abs(h.host.hudModel().ship.hull - 100 / firstBuildOf(2).hullHp) < 1e-3, 'her hurts as saved (AUDIT NAV1: her hands mending from there - test/systems/naval/navaudit_helm.test.js)');
   assert.equal(h.host.leaveShipGate({ uid: 777 }), 'naval', 'a raid of mine a load carried: thrown back, nothing sailed');
-  // PIN MOVED (RAID-WON): won by its Leave Ship it is ended as won (its crew withdrawn, its quest ended), and mine until
   // that end comes (raidEnded) - its grace's waves and Leave Ship still the sea fight's
   assert.deepEqual(h.host.getSaveData().raids, [777]);
   h.host.raidEnded({ uid: 777 });
   assert.deepEqual(h.host.getSaveData().raids, []);
   assert.deepEqual(d.party, { party: [], resting: [] }, 'CREW-COMPANIONS: an older save carries no party - nobody ashore');
-  assert.deepEqual(h.host.newSaveData(), { v: NAVAL_SAVE_VERSION, boats: {}, notoriety: {}, day: null, raids: [], party: { party: [], resting: [] } });   // PIN MOVED (CREW-COMPANIONS): the party ashore
+  assert.deepEqual(h.host.newSaveData(), { v: NAVAL_SAVE_VERSION, boats: {}, notoriety: {}, day: null, raids: [], party: { party: [], resting: [] } });
   assert.equal(NAVAL_SAVE_VENDOR, 'NavalCombat');
   h.host.spawnShip('pirateBrig', { range: 300 });
   h.host.restoreSaveData(null);

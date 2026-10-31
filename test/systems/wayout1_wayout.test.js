@@ -3,7 +3,7 @@
 // THE WAY OUT ON THE COMPASS: the held map's walked trail walked back to the way in - a breadth-first field over the
 // cells stood in, each walked teleporter an edge from its entrance to its exit - and the compass pointing at the farthest
 // cell along it the eye can see (systems/wayOut.js, scenes/dungeonContext.js wayOutMark, ui/enhanced/enhancedHud.js).
-// bible/03-World/Delve-Arc.md, WAYOUT1.
+// WAYOUT1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -27,7 +27,7 @@ function walk(points) {
 /** A corridor of cells along x from x0 to x1 at z, height y. */
 const run = (x0, x1, z = 0, y = 0) => Array.from({ length: Math.abs(x1 - x0) + 1 }, (_, i) => [x0 + Math.sign(x1 - x0) * i + 0.5, y, z + 0.5]);
 const ALL = () => true;
-// AUDIT SD III (D4, PIN MOVED): an aim's asks are paced by WAY_ASK_MS on the real clock too - a pin on how many steps
+// AUDIT SD III (D4
 // are asked holds the clock, so the count alone paces them (the clock's pace is sd20g_delve's own pin)
 const HELD = { clock: () => 0 };
 
@@ -138,7 +138,7 @@ test('WAYOUT1: the host\'s reader - gone at the way in, the crow\'s line with no
   assert.deepEqual(w.aim(new Set(), null, exitAt, [20.5, 0, 0.5], ALL, 0), [0.5, 0.5], 'no trail (another run\'s record, at once): the way in, as the crow flies');
   assert.equal(w.aim(trail, null, null, [5, 0, 0], ALL, 0), null);
   assert.equal(w.aim(trail, null, exitAt, null, ALL, 0), null);
-  // AUDIT SD III (D4, PIN MOVED): the trail's new cells are attached to the field as they come - the way out at once,
+  // AUDIT SD III (D4
   // no whole field built again (it waited a second for the rebuild, and pointed the crow's line meanwhile)
   const v = createWayOut();
   const t2 = walk(run(0, 10));
@@ -275,7 +275,7 @@ test('AUDIT DELVE B2: the field is built again only when the player stands off i
   assert.ok(first > 0);
   for (const p of run(21, 25)) automapTrailTick({ trail }, [p[0], 1.6, p[2]], 1.6);
   // the player still on the old field: the trail grew, but the way it has is a way - no rebuild before WAY_REFIELD_S.
-  // AUDIT SD III (D4, PIN MOVED): the new cells attached as they come - their own steps asked, nothing built again (a
+  // AUDIT SD III (D4
   // player on new ground was "off" the field and had it built whole each second)
   assert.deepEqual(w.aim(trail, null, exitAt, [20.5, 0, 0.5], ALL, 2, clear), [6.5, 0.5]);
   assert.equal(asks, first + 5, 'the five new cells\' own steps asked');

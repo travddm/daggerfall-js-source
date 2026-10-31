@@ -1,6 +1,6 @@
 // FB1020c ONE-SAVE (FIELD BUGS 2026-10-20c, the Discord: "storing your goods makes the buttons get stuck for a long
 // time"). A put-in waits for the save holding its take to land before it is asked (AUDIT2 BAG1 K3/K7/H2,
-// bible/06-Systems/Materials-Bag.md section 7) - a checkpoint of the whole game, a realm PUT. The Stores page's Put
+// ) - a checkpoint of the whole game, a realm PUT. The Stores page's Put
 // everything in asked a put-in a material, each its own checkpoint, in series, every button held at "Sending..." the
 // while; a craft's shortfalls the same, one an input. Now the take and its save live once (net/profBook.js depositMany):
 // every take of a batch stamped, ONE checkpoint, then each asked - `deposit` a batch of one, `ensureInStores` and the page

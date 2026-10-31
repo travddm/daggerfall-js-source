@@ -1,4 +1,4 @@
-// WB13c (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE HUD - his bar
+// WB13c: THE HUD - his bar
 // honed (the trailing segment, the ward a state, callouts that come and go with a line to the landing, Dagon's plate and
 // MOVE, the phase marks spent, his name and his epithet on lines of their own, the foot's chips, FELLED and the fade),
 // the phone layouts, the party's frames kept clear, the classic face loaded by the gate's own screens (bible/11-Multiplayer/

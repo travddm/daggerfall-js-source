@@ -1,5 +1,4 @@
-// SEAT-REPLICA (2026-10-13, the account database overloaded from 14:11 UTC and still down at 18:10; read off D1's own
-// query insights and the service's metrics - bible/11-Multiplayer/Scale-Arc.md SEAT-REPLICA): the seats' witness rows
+// SEAT-REPLICA: the seats' witness rows
 // were read whole on the primary - 15,899 rows a read, the isolates many enough that two lists in three missed their
 // isolate's kept copy, and in the outage more than half the primary's statement time and nine in ten of the rows it
 // answered. The kept read is now a read replica's (server-account/src/townSeats.js SEAT_ROWS_FROM): any instance's
@@ -18,7 +17,7 @@ const DAY = 86400;
 const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
-const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (PIN MOVED): the rows the law judges by are a read of them
+const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;     // LEAN-WITNESS (
 const PLAYER = { id: 'p-somebody', handle: 'Somebody', registered_at: T0 - 30 * DAY };
 const DEV = { id: 'p-devra', handle: 'Devra', registered_at: T0 - 30 * DAY };
 

@@ -1,6 +1,6 @@
 // QS4 - THE OFF-HAND CELL'S PRESS, DRIVEN THROUGH THE MOD.
 //
-// Mac: "The 4th quickslot doesnt have a keybind". Three of the diamond's
+// . Three of the diamond's
 // four corners named a key and the off hand did not - it spoke only
 // through Handheld Torches' own TextKey, which the enhanced pane cannot
 // rebind and no pad can carry. The cell has its own action now, and the

@@ -1,7 +1,4 @@
-// CLIMB-HANDS II (2026-10-13, Mac: "With climbing. The sprite hands should be spread out more and the morrowind model
-// should use climbing hands in first person. Additionally, the hands should stay on whatever your climbing and not rotate
-// with the screen. The only one that should rotate with the screen is the single arm out. The single arm out is also
-// inverted for both directions"). Record: bible/03-World/Parkour-Arc.md (CLIMB-HANDS II).
+// CLIMB-HANDS II. Record: (CLIMB-HANDS II).
 // THE LAW EXECUTES: the fists as far apart as the 3D body's wrists on the lip; pinned to the wall through the world's
 // lens - carried across the screen by the view's turn exactly where an independent rotation of the eye puts the stone
 // they hold, down it by a look up, up it by a look down only as far as the sleeve's slack (a hand gone under the edge

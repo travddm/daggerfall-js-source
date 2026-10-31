@@ -1,4 +1,4 @@
-// SNOWFALL1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments seamlessly") -
+// SNOWFALL1 -
 // THE CONTROLLER AND ITS HOSTS. systems/snowfallRuntime.js is DynamicSnowController's frame over the port's world (the
 // local window, the middle ring, the streamed blanket, the far track mask, the stamps, the refill, the snowpack's
 // clock); scenes/snowfallHost.js stands it on a host's ground (the tiles, a rebuilt tile replacing its old one, the
@@ -302,7 +302,7 @@ test('SNOWFALL1 the shader: the snow program is the ground\'s own fragment progr
   for (const v of ['out vec3 vNormal;', 'out vec3 vWorldPos;', 'out vec2 vLocalXZ;', 'out vec4 vSnow;']) assert.ok(SNOW_VS.includes(v), v);
   // AUDIT ENVIRONS: the vertex law's surface offset stands on the blanket's painted track edge as the fragment's coverage
   // does (DynamicSnow.glsl: max(onPath, st.g) before _SurfaceOffset); the blanket reads no window mask (it rises by its own)
-  // AUDIT PRECIP GROUND-9 (PIN MOVED): and the coverage laid where the ground wears snow (precip4_snowground pins snowLaid)
+  // AUDIT PRECIP GROUND-9 (
   assert.match(SNOW_VS, /float cover = st\.g;[^\n]*\n\s*if \(blanket && st\.b != 0\.0\) cover = max\(cover, snowOnPath\(st\.b, statUV\)\);\n\s*cover \*= laid;\n\s*float offset = cover \* uSnowRadius\.z \* st\.a \* fade;/);
   assert.match(SNOW_VS, /if \(!blanket\) \{[^\n]*\n\s*float depth = snowResolve\(textureLod\(uSnowContext/);
   assert.throws(() => snowTerrainFs('void main() { }'), /ONE span/);

@@ -1,5 +1,4 @@
-// EMPIRE-ACCOUNT (2026-10-01, the field - maya: "i deposited alot of letters of credit in a random bank somewhere but
-// theyre gone in the daggerfall bank"; Mac chose "2": online, every region one Empire-wide account). Online every branch
+// EMPIRE-ACCOUNT. Online every branch
 // keeps one account, the Empire's, at Daggerfall's index; a loan still stands where it was taken; an online character's
 // older branches fold into it as it boots; the service pays a realm record from the same account.
 import { test } from 'node:test';

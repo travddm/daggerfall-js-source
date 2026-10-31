@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, bible/11-Multiplayer/Arena.md 2: "Exhibition - online: yes - the relay runs it, every client sees
-// one bout"): THE RELAY'S EXHIBITION ON THE CLIENT, DRIVEN - the bout driver standing the relay's bout as the hour's on
+// ARENA4b: THE RELAY'S EXHIBITION ON THE CLIENT, DRIVEN - the bout driver standing the relay's bout as the hour's on
 // the city's sand (scenes/arena/arenaBouts.js startExhibitionRelay / exhibitionWord: the relay's frame on the city's, the
 // exterior's own bodies walked by their motor, the swing off the attack's count, the Red against the Blue, the call, the
 // purse's bark, the verdict to the bookmaker, the HUD by the distance), the host's glue (scenes/arena/arenaOnline.js: the

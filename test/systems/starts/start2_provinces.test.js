@@ -1,5 +1,4 @@
-// START2 (2026-10-24, bible/06-Systems/Alternate-Starts-Arc.md sections 7-10; the owner: "Each new region will each have
-// their own unique starting quest/dungeon within that region"): THE PROVINCES' STARTS - the start-choice page the
+// START2: THE PROVINCES' STARTS - the start-choice page the
 // character's making ends with, a province's start dungeon past the Bay (the nearest of the kinds its story wants near
 // its capital, a quest item's marker in it), its quest played on DFU's machine to the Daggerfall gate, the commission in
 // hand for a character born at no start, the world's start host, the writ of passage a ship's master honors, and the sea
@@ -616,7 +615,6 @@ test('START2 LONG-VOYAGE (travelRoute.js planSeaLanes): a booked voyage whose po
 // ── the game's own Tamriel ───────────────────────────────────────
 
 const ARENA2 = process.env.ARENA2_PATH;
-/** PIN MOVED (PLAN-SLICES): the most cells a voyage's plan spends (its floods, its lanes and its landfall - travelRoute.js `tally`). */
 const VOYAGE_CELLS_MAX = 450000;   // measured 392,822 and 393,363 (the two floods and the lanes): some twenty frames at PLAN_FRAME_CELLS
 const HAVE = !!ARENA2 && ['MAPS.BSA', 'BLOCKS.BSA', 'WOODS.WLD', 'TMAP00I0.IMG', 'TAMRIEL2.IMG', 'ART_PAL.COL'].every((f) => existsSync(join(ARENA2, f)));
 const skipReal = HAVE ? false : 'ARENA2_PATH not set or missing - real-data validation skipped';
@@ -714,7 +712,7 @@ test('START2 on the freeware\'s Tamriel: a voyage from every port past the Bay t
       // every port past the Bay - the provinces' starts' ways home among them - from the water about it a voyage reaches
       const ports = arenaPixels().stood.filter((p) => p.port);
       assert.equal(ports.length, 28, 'TESA12\'s 28 ports');
-      let most = 0;   // PIN MOVED (PLAN-SLICES): a plan's cells, an op count, never a clock (a flake on a shared runner)
+      let most = 0;
       for (const p of ports) {
         let routed = null;
         for (let dy = -3; dy <= 3 && !routed; dy++) for (let dx = -3; dx <= 3 && !routed; dx++) {

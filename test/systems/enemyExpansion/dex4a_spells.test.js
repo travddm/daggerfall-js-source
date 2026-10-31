@@ -1,4 +1,4 @@
-// DEX4a (2026-10-20, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION'S SPELLS. The
+// DEX4a - DAGGERFALL ENEMY EXPANSION'S SPELLS. The
 // mod's SpellRecords.json merged into the standard spells as DFU's RebuildClassicSpellsDict merges an enabled mod's
 // (systems/spell/standardSpells.js - TextAssetReader.Merge by index, then the first-wins fold), its spellbook tables
 // (dexSpells.js - ParseSpellbookTables' thirteen and "Class", and each row's raw book) cast in place of DFU's lists at a

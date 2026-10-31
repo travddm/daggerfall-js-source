@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - WOD-ROCK, over every World of Daggerfall layout on the game's own
+// AUDIT 2026-10-01 part five - WOD-ROCK, over every World of Daggerfall layout on the game's own
 // data (1,325 model records, 847 re-mapped: no NaN, no vertex added, positions and indices the model's own):
 //   WR1 the unfolding's frame was laid along the reference triangle's first edge - often a quad's diagonal - and an
 //       in-plane stretch keeps only that one direction's angle, so the textures with a grain turned on the re-mapped
@@ -7,7 +7,7 @@
 //   WR2 one outcrop mixes rock pebbles under and over the 4x threshold (60610 at 3.01 beside 4.69; 60718 at 3.5 beside
 //       60714 at 1.9), and touching pieces wore two to three and a half times each other's density - a pebble is
 //       unfolded from any real stretch, named by the model id the host hands in;
-//   and ROCK-CAP, asked (Mac: "Cap at ~8 m a repeat"): at the pebble's own density the rock read as rock within some
+//   and ROCK-CAP, asked: at the pebble's own density the rock read as rock within some
 //       10 m, a lattice at 30 to 100 m and flat from 300 m - a rock face now tiles no finer than a repeat per 8 m.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

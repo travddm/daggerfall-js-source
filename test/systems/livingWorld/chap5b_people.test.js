@@ -1,4 +1,4 @@
-// CHAP5b (2026-10-09, Mac: "Continue", the Chapters arc's living world - bible/11-Multiplayer/Chapters-Arc.md section 9):
+// CHAP5b:
 // THE HALL'S PEOPLE AND THE TOWN'S TALK - the living world reads the chapter sheet as one more input: a guild's evenings
 // at its hall go by its chapter's band (one a week Failing, two Steady, three Thriving and Ascendant), and the town talks
 // of a chapter not Steady; with no sheet - offline, a chapter the sheet does not name - it is exactly today's.

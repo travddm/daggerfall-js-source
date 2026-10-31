@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): DFU'S OWN INTERFACE WORDS, IN THE PLAYER'S LANGUAGE. The port holds DFU's Internal_Strings
+// L10N3d: DFU'S OWN INTERFACE WORDS, IN THE PLAYER'S LANGUAGE. The port holds DFU's Internal_Strings
 // values as constants in tables keyed by DFU's own key; each such table now reads through the text core at the moment
 // it is read (localizedStrings - GetLocalizedText(key) where DFU asks for it). Pinned: every key of every converted
 // table is one of DFU's 990 and holds DFU's English byte for byte (vendor/dfu-text/Internal_Strings.csv - a parity pin

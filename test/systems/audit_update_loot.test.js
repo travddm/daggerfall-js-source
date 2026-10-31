@@ -1,4 +1,4 @@
-// AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): LOOT-GATE's findings, lane L - the
+// AUDIT UPDATE: LOOT-GATE's findings, lane L - the
 // roll's own level (L1, L4), the Imbue's piece at its new tier's law (L2), the Item Maker's rows (L3), a counter's price
 // for an imbued piece (L5), the drought (L6), one reading of a level (L9). The room's base at the room's level is pinned
 // by test/systems/partyloot.test.js (each peer's own level registered, an elite among the layout's bodies).

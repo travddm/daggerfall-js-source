@@ -1,4 +1,4 @@
-// BAL7 - THE LOOT THAT WINS ALONE (2026-10-12; bible/05-Combat/Balance-Arc.md section 13). BAL5 left a watch item -
+// BAL7 - THE LOOT THAT WINS ALONE. BAL5 left a watch item -
 // "the next measurement, which should wear the loot" - and the measurement wore it: a level-20 kit of the ladder's own
 // pieces against an Ancient Lich in a Dragon's Den. Four powers decided the fight without the player in it:
 //   - VAMPIRIC EFFECT when strikes, one Rare weapon flavour in eleven, healed every point a blow dealt: the plain build

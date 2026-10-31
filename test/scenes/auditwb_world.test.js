@@ -1,8 +1,8 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE GATE IN THE WORLD's findings, pinned - the omen that
+// AUDIT WB: THE GATE IN THE WORLD's findings, pinned - the omen that
 // spoke before it knew the world's clock (C4), the countdown over the step's fire and the held frame (C5), the membrane
 // fogged into a black hole (C2), the vortex spun through turns as it opened (C6), and what every frame paid for (C7).
 // C1/C3 (the sea sites, the border town's province) are pinned beside the site's own law (wb1_gate_omen.test.js).
-// Design: bible/11-Multiplayer/World-Bosses.md section 11.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

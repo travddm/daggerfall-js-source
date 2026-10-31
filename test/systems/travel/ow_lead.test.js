@@ -1,5 +1,4 @@
-// OW-LEAD (2026-10-17, the player: "iam 100% sure it even slowed down to 1x without enemies in 500m nearby ... So far it
-// seems random it almost always [goes] down to 1x and after a while it goes up again"). bible/06-Systems/Travel-View.md OW-LEAD.
+// OW-LEAD. OW-LEAD.
 //
 // THE LAND'S HOLD IS HOW NEAR THE HOLE IS, NOT HOW LONG IT HAS STOOD. TV2's governor halved the clock every
 // TV_GOV_SETTLE_S while any pixel of the counted grid was still building - a slower clock builds nothing faster, so a
@@ -48,7 +47,7 @@ function rideHost(W, { buildS, mps, boatWay = null }) {
   const player = { pos: at, speed: mps, isPlayerSwimming: false, feetAt: () => [...player.pos] };
   const boat = boatWay == null ? null : { way: boatWay };   // PASSAGE-PACE: a boat at the traveller's helm, her way Come Sail Away's
   const scope = {
-    capitalPrebuild: { firstReady: () => true },   // PIN MOVED (IC-STUTTER): the pump asks the Imperial City's workers - none here
+    capitalPrebuild: { firstReady: () => true },
     travelControlUI: { isShowing: true }, travelOptions: { state: { autopilot: {} } },
     travelView: { active: true, state: 'up' }, tvOwnsJourneys: () => true,
     worldTimeScale: timeScale, setWorldTimeScale: setTimeScale, resetTimeScale, createLoadGovernor, travellerPace, MAX_TIME_SCALE,
@@ -136,7 +135,7 @@ test('OW-LEAD: the land\'s cap is how near the nearest owed pixel is - at the tr
   assert.deepEqual(out, [[11, 10]], 'emptied, then the owed pixel alone');
 });
 
-// PASSAGE-PACE (2026-10-27; bible/03-World/Passage.md, PASSAGE-PACE - FIELD BUGS 2026-10-21d found it and left it): the
+// PASSAGE-PACE: the
 // leads are sized by the traveller's own pace, and at a helm that is her way (travelGovernor.js travellerPace).
 const PACE_SITES = /travellerPace\(player, csaBoatUnderMe\(\)\)/g;
 test('PASSAGE-PACE: the traveller\'s own pace is the walking motor\'s, or the way of the boat at their helm where it is more - Come Sail Away\'s `way`; none, or a way that reads as nothing, the motor\'s (mutants: the boat unread, the more of the two)', () => {

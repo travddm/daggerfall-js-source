@@ -1,8 +1,8 @@
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - THE RECIPE LAW, AS THE RECORD SAYS IT: 9.3's recipes (the ingots and
+// PROF3 - THE RECIPE LAW, AS THE RECORD SAYS IT: 9.3's recipes (the ingots and
 // the fittings each product asks, the chain at three quarters, Foraging's tools, the kits), the rank a recipe asks
 // (its material's tier's), 9.2's quality (the margin's rows, the steps each source gives at most, Masterwright's points,
 // nothing past Masterwork, what a quality does), 3.2's XP, the heat's band, the smith's stock and the signed product
-// record. bible/06-Systems/Professions-Arc.md 9, 24.
+// record. 9, 24.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';
@@ -78,7 +78,7 @@ test('PROF3 law: the quality - the margin\'s four rows, a roll on them, a step e
 });
 
 test('PROF3 law: the XP - 20 x the tier, a quarter more than two tiers below the rank\'s top, +500 the first (FIRST-BUDGET: Smithing\'s first-make share, the 500 it paid); the heat\'s band and glow; the maker\'s name; a piece\'s lines', () => {
-  assert.deepEqual([craftXp(5, 55) + firstCraftXp(recipeById('longsword:mithril')), craftXp(5, 55), craftXp(1, 55), craftXp(1, 25), craftXp(7, 100)], [600, 100, 5, 20, 140]);   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500
+  assert.deepEqual([craftXp(5, 55) + firstCraftXp(recipeById('longsword:mithril')), craftXp(5, 55), craftXp(1, 55), craftXp(1, 25), craftXp(7, 100)], [600, 100, 5, 20, 140]);
   assert.equal(firstCraftXp(recipeById('longsword:mithril')), 500, 'Smithing\'s share: the 500 it always paid');
   assert.deepEqual(HEAT_ACT, { strikes: 3, periodS: 2, bandLo: 0.62, bandW: 0.2, gapS: 0.35 });
   assert.deepEqual(heatWindow(1).map((x) => +x.toFixed(3)), [0.62, 0.82]);
@@ -88,7 +88,6 @@ test('PROF3 law: the XP - 20 x the tier, a quarter more than two tiers below the
   assert.deepEqual([makerName('  Silverthorn  '), makerName(''), makerName(null), makerName('x'.repeat(40)).length, makerName('Ta\u0007ra')], ['Silverthorn', null, null, MAKER_MAX, 'Tara']);
   assert.deepEqual(pieceLines({ quality: 2, maker: 'Ann', provenance: '0123456789abcdef' }), ['Fine', 'Made by Ann']);
   assert.deepEqual(pieceLines({ kitMetal: 5, provenance: '0123456789abcdef' }), ['Mends a quarter of a Mithril piece\'s condition, up to 75%, once'], 'KIT-CEILING');
-  // PIN MOVED (CRAFT4, Professions-Arc 41.7): a piece no anvil made says no maker - but a found piece a temper raised says
   // its quality (Fine, Superior); the Standard it was says nothing
   assert.deepEqual(pieceLines({ quality: 2, maker: 'Ann' }), ['Fine'], 'no provenance, no anvil made it - a temper\'s quality alone');
   assert.deepEqual([pieceLines({ quality: 1 }), pieceLines({ quality: 3 }), pieceLines({ quality: 4 }), pieceLines({})], [[], ['Superior'], [], []]);
@@ -123,7 +122,6 @@ test('PROF3 law: the product record - p1, signed with the identity key, read by 
   assert.deepEqual(await verifyProductRecord(rec.replace(/^p1/, 'w1'), kp.publicKey, { subtle }), { ok: false, why: 'version' });
   for (const k of ['n', 'k', 't', 'o', 'd', 'b', 'w', 'y', 'e']) assert.equal(productRecordValid({ ...what, i: 1, [k]: 1 }), false, `a record never carries ${k}`);
   assert.equal(productRecordValid({ ...what, i: 1, q: 5 }), false);
-  // PIN MOVED (CRAFT5, Professions-Arc 41.8): a kit's craft rolls a quality now (its reach) - a kit made before none
   assert.equal(productRecordValid({ ...what, i: 1, r: 'kit:iron', q: 0 }), true, 'a kit its quality');
   assert.equal(productRecordValid({ ...what, i: 1, r: 'kit:iron', q: 5 }), false, 'never past Masterwork');
   assert.equal(productRecordValid({ ...what, i: 1, q: -1 }), false, 'a piece that takes a quality always carries one - only a kit made before none');

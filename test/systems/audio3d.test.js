@@ -1,6 +1,4 @@
-// 3D-AUDIO + RIDE-SOUND (2026-09-23, Discord through Mac: "we need 3d audio right now it doesnt matter where enemies
-// are it always sounds like the opposite or directly in front of you while the mob is behind"; and the known limit,
-// "other players' horses make no hoof sounds yet"). BY EXECUTION over a WebAudio graph that records what the engine
+// 3D-AUDIO + RIDE-SOUND. BY EXECUTION over a WebAudio graph that records what the engine
 // set: the scene is DFU's LEFT-handed frame and WebAudio is right-handed, so the audio door turns it once (a source
 // on the player's right plays on the right); every positional source is HRTF (a foe behind is heard behind); a peer
 // in the saddle is heard at them - the riding loop, its stop and its neigh - and their steps and swings too.

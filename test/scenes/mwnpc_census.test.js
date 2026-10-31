@@ -1,5 +1,4 @@
-// MWNPC CENSUS (2026-10-10, the MW-NPC arc's audit - bible/04-Characters/Morrowind-NPCs.md section 21; the old arc's
-// lesson NPC4b, section 5: "a gate test enumerates every host that draws living actors"). EVERY SOURCE THAT DRAWS A
+// MWNPC CENSUS. EVERY SOURCE THAT DRAWS A
 // LIVING ACTOR'S SPRITE - a mobile's eight-way unit, a walker, a mobile billboard sized off its record - either stands
 // it in a Morrowind body (one of the arc's adapters, named in the file) or is DECLARED here with the reason it keeps its
 // sprite. A new population drawn without either fails here, not in the field.

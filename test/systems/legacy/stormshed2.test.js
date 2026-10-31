@@ -1,5 +1,4 @@
-// STORM-SHED 2 (2026-10-06, the account database's follow-ups after the second overload; bible/06-Systems/Online-Arc.md
-// STORM-SHED 2): what the overload's numbers showed costing the database every hour, made small at the root:
+// STORM-SHED 2: what the overload's numbers showed costing the database every hour, made small at the root:
 //   A. the season's #1 - the whole board (BOARD_SQL) counted by every Worker each minute for the token's laurel, 109
 //      million of the database's 760 million rows a day - kept in `arena_champions`, counted when a rated bout lands and
 //      when the kept word is ARENA_CHAMPION_STORED_S old;

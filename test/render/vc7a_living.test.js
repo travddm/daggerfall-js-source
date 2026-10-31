@@ -1,9 +1,8 @@
-// VC7a (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive"; the first of the four chosen:
-// living clouds): THE FIELD HAS A LIFE. It was a fixed noise volume slid across the land by the wind, a bank the same
+// VC7a: THE FIELD HAS A LIFE. It was a fixed noise volume slid across the land by the wind, a bank the same
 // bank from horizon to horizon. Three clocks read from the GAME's minutes - the boil up the shape and detail volumes,
 // the coverage's own slower wind and its daily turn - and the day's convection (fair-weather towers low in the
 // morning, tall by mid-afternoon), and a weather-map cell's cloud as grown as its system. The record is
-// bible/07-Rendering/Volumetric-Clouds-Arc.md VC7.
+// VC7.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

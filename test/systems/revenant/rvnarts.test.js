@@ -1,5 +1,4 @@
-// RVN-ARTS (bible/06-Systems/Revenants.md section 41; the owner, 2026-10-17: "Give revenants the chance to have unique
-// telegraphed abilities, magic abilities like healing or other buffs, etc (Must be balanced)"). One revenant in
+// RVN-ARTS (). One revenant in
 // ARTS_CHANCE is born with an art, drawn on its id from its family's pool. Hunting me (from rank II, the Enhanced AI switch
 // on): Mending, Ward and War Cry CHANNEL - a disc in the art's colour about its own feet, broken by any blow that lands -
 // once a fight; Siphon, Barrage and Nova are THROWN - the brain's own shapes at or about me, my feet's verdict at the

@@ -1,5 +1,5 @@
-// MEM-AUDIT (2026-10-23, the owner: "a comprehensive performance audit, looking for memory leaks"): what a place, a map
-// pixel, a menu or a session online left standing after its life (bible/07-Rendering/Performance-Priority.md MEM-AUDIT).
+// MEM-AUDIT: what a place, a map
+// pixel, a menu or a session online left standing after its life (MEM-AUDIT).
 // Each pin drives the module that owned the leak; where the owner is a host's or a window's wiring (setMode, the menu's
 // account card and foot, the item menu's timer, the classic sky's bound) it reads that one line. Each names its mutants
 // (tools/mutants/memaudit.json). AUDIT MEM-AUDIT (01-Overview/audits/Audit-Mem-Audit.md) widened them.

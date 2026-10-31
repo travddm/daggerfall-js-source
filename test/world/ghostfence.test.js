@@ -1,4 +1,4 @@
-// GHOSTFENCE (bible/03-World/Red-Mountain.md, The Ghostfence): the Tribunal's fence round Red Mountain - its ring of
+// GHOSTFENCE (, The Ghostfence): the Tribunal's fence round Red Mountain - its ring of
 // pylons at the summit cone's foot and Ghostgate in the south (world/tamriel/ghostfence.js), the countryside kept off
 // inside it, no lair on its line and no road across it but at Ghostgate (the rolls, the roads' build), its models and
 // pictures (ghostfenceModel.js), stood and solid in a pixel's build (scenes/ghostfenceBuild.js), and its glow on the

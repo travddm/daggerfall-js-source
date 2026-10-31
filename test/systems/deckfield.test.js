@@ -1,5 +1,4 @@
-// DECK-FIELD (2026-09-29) - three field bugs from one sailing session, each root-caused (Mac: "Walking on the deck gives
-// water sounds, hunting notifications appear when sailing, shooting cannons should have attack canceling"):
+// DECK-FIELD - three field bugs from one sailing session, each root-caused:
 //
 //   SHIP-DECK - Immersive Footsteps read the terrain tile under the feet and nothing else (its own noted IsOnShip bug), so
 //               a deck over the open sea stepped in deep water: the floor under the feet decides now (the host's `deck`

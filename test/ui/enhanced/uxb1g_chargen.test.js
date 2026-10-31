@@ -1,4 +1,4 @@
-// UXB1-G / UXB1-H / UXB1-I / UXB1-J (2026-09-25, the UX backlog's CHARACTER CREATION list):
+// UXB1-G / UXB1-H / UXB1-I / UXB1-J:
 //   G "Stat explanations on hover/tiny button (Minimizes need for external resources)"
 //   H "Export/Import class from file/clipboard"
 //   I "Restore the difficulty dagger or some other similar visual indicator"

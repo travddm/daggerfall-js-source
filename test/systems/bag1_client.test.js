@@ -1,6 +1,6 @@
-// BAG1 (2026-10-03) - THE MATERIALS BAG, ON THE CLIENT: the bag a player buys at a General Store, carried as DFU carries
+// BAG1 - THE MATERIALS BAG, ON THE CLIENT: the bag a player buys at a General Store, carried as DFU carries
 // the wagon - a second list beside the pack, its own weight limit - and every harvest, withdrawal and station that reads
-// what it holds (bible/06-Systems/Materials-Bag.md). The law is net/bagLaw.js, the save's hands systems/materialsBag.js,
+// what it holds. The law is net/bagLaw.js, the save's hands systems/materialsBag.js,
 // the book's flows net/profBook.js; the service's half is test/net/bag1_service.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -188,7 +188,7 @@ test('BAG1 bought: every General Store shelves one online - on every shelf, whoe
     globalThis.location = { search: '?online' };
     const on = shelf({ items: [], level: 1 });
     const i = on.findIndex((it) => it.templateIndex === BAG_TEMPLATE);
-    assert.ok(i >= 0, 'shelved');   // PIN MOVED (MERCHANT-YARDS): first on the shelf now, no horse and cart before it
+    assert.ok(i >= 0, 'shelved');
     assert.equal(on[i].group, 'UselessItems2');
     assert.equal(on.some((it) => it.group === 'Transportation'), false, 'MERCHANT-YARDS: no horse and no cart on it now - the town\'s yards sell them');
     // BAG-SHELF (FIELD BUGS 2026-10-04, "nobody can find material bags in store"): online a shelf's stock is the room's for
@@ -196,7 +196,7 @@ test('BAG1 bought: every General Store shelves one online - on every shelf, whoe
     assert.equal(shelf({ items: [bagItem()], level: 1 }).some((it) => it.templateIndex === BAG_TEMPLATE), true, 'stocked by a bag-owner, still shelved');
     // and on every shelf, as the horse and the cart were (MERCHANT-YARDS: the yards' now) - the first shelf is only the first model the building lists
     const second = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 10 }, { items: [], level: 1 }, { rolls: () => 0.5, torchesFromItems: false, shelfIndex: 1 });
-    assert.deepEqual([second.some((it) => it.templateIndex === BAG_TEMPLATE), second.some((it) => it.group === 'Transportation')], [true, false]);   // PIN MOVED (MERCHANT-YARDS): the second shelf no longer carries the horse and the cart
+    assert.deepEqual([second.some((it) => it.templateIndex === BAG_TEMPLATE), second.some((it) => it.group === 'Transportation')], [true, false]);
     globalThis.location = { search: '' };
     assert.equal(shelf({ items: [], level: 1 }).some((it) => it.templateIndex === BAG_TEMPLATE), false, 'offline nothing gathers into it');
   } finally { globalThis.location = where; }
@@ -306,7 +306,7 @@ test('BAG1 a deposit: the items out of the bag first, the service asked with wha
   assert.equal(heldOf(e, HERB), 2);
 });
 
-// ─── THE AUDIT (bible/06-Systems/Materials-Bag.md, the audit) ───────
+// ─── THE AUDIT (, the audit) ───────
 
 test('BAG1 (AUDIT B2): what the pack holds is said at each ask, never when the act was kept - a harvest asked after another\'s items were minted says them, and a deposit still out counts as held; with the material it is of and the count as last heard (mutants: held kept from the queue; a deposit out uncounted; `seen` unsent)', async () => {
   const e = body();
@@ -824,7 +824,7 @@ test('BAG1 (AUDIT2 H1/U2/U1/U11/U14): the Stores page empties the bag into the p
       book, name: (k) => k, withdraw: async () => ({ ok: true, text: '' }), inTown: () => town, room: (k) => roomFor(store, k), carriedHeld: (k) => heldOf(store, k),
       bag: () => ({ has: true, kg: bagWeight(store), max: BAG_KG_LIMIT, count: store.bagItems.length }),
       emptyBag: () => { emptied++; return emptyBagIntoPack(store); },
-      deposit: async (plan) => { deposits.push(...plan.map((d) => [d.material, d.qty])); return plan.map(() => ({ ok: true, text: '' })); },   // PIN MOVED (FB1020c ONE-SAVE): a plan
+      deposit: async (plan) => { deposits.push(...plan.map((d) => [d.material, d.qty])); return plan.map(() => ({ ok: true, text: '' })); },
     });
     let root = null;
     const draw = () => { root = dom.mk('div'); drawStoresPage(root, draw, kit); };
@@ -860,7 +860,7 @@ test('BAG1 (AUDIT2 H1/U2/U1/U11/U14): the Stores page empties the bag into the p
     setProfessionsPages({
       book, name: (k) => k, withdraw: async () => ({ ok: true, text: '' }), inTown: () => true, room: (k) => roomFor(store, k), carriedHeld: (k) => heldOf(store, k),
       bag: () => ({ has: true, kg: bagWeight(store), max: BAG_KG_LIMIT, count: store.bagItems.length }),
-      deposit: async (plan) => { deposits.push(...plan.map((d) => [d.material, d.qty])); return plan.map(() => ({ ok: true, text: '' })); },   // PIN MOVED (FB1020c ONE-SAVE): a plan
+      deposit: async (plan) => { deposits.push(...plan.map((d) => [d.material, d.qty])); return plan.map(() => ({ ok: true, text: '' })); },
     });
     let root = null;
     let drawn = null;
@@ -886,7 +886,6 @@ test('BAG1 (AUDIT2 D3/D4): the bag\'s list in every door that reads a character\
   assert.equal(materialKeyOfItem({ ...mintMaterialItem(HERB), enchantments: [{ type: 1, param: 0 }] }), null);
   assert.equal(materialKeyOfItem({ ...mintMaterialItem(HERB), customEnchantments: [{ id: 'x' }] }), null);
   // D3: Put everything in - the service refuses one material, the rest still go in, the refused one named
-  // PIN MOVED (FB1020c ONE-SAVE): through the batch - the page hands the provider ONE plan, which the real book takes
   // whole (profBook.js depositMany) and the service is asked each put-in of; it asserted the provider's per-material calls
   const store = body();
   mintCarried(store, OAK, 3);

@@ -1,9 +1,9 @@
-// ELITE-FLOOR + FOE-TITLE (2026-10-02, Mac: "Do it" - the two cheap wins of the elites-and-champions review).
+// ELITE-FLOOR + FOE-TITLE.
 //   - ELITE-FLOOR: an elite is never a foe under ELITE_FOE_MIN_LEVEL (LOOT7's floor), the city watch, or an ally; a
 //     refused promotion leaves the foe as it was built, and the dungeon's build arm falls through to its plain path.
 //   - FOE-TITLE: one home names a special foe on every surface - a revenant by its own name, a champion by its trait,
 //     an elite as "Elite" - the target bar, the hover (at peace only, HOVER-PLAIN), the death line and the body's title alike.
-//   - ELITE-RATES (2026-10-03, Mac: "Feel like they are too sparse. Back to original"): ELITE-RARITY undone - one foe in
+//   - ELITE-RATES: ELITE-RARITY undone - one foe in
 //     twenty in the open world with no gate (any number standing, no gap, a loose stand too); a normal dungeon one time
 //     in five. The Elite Dungeon keeps its 3 or 4 (Mac's own number).
 

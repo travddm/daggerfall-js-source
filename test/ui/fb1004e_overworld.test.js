@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - the Overworld map and the travel map (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, reports 3
+// FIELD BUGS 2026-10-04e - the Overworld map and the travel map (, reports 3
 // and 5). Discord (Chilloutman): "Add a distance filter so players can decide how many km away they hide nodes;
 // Highlight fast travel hubs (cities with carriages); Change name colors of players in your guild or friend list; More
 // filters for players in general (filter by guild, friend, level etc), both in Overworld map and travel map" - and
@@ -145,18 +145,15 @@ test('OW-KIN / OW-WHO on the travel map: the rows keep their kin and Renown, a k
   assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\n {2}\.hmkeyname \{ display: none; \}/, 'which a phone hides');
   assert.ok(!/\.hmkeywho \{[^}]*display: none/.test(rd('src/ui/enhanced/enhancedStyle.js')));
   assert.match(H, /else if \(which === 'renown'\) cycleTravelViewRenown\(\); else toggleTravelViewWho\(which\);/);
-  // PIN MOVED (TOWN-ECON TE1, test/systems/townecon.test.js): every town's card, a seat's lines after the town's - and still whole
   assert.match(H, /const card = this\.deps\.townTipAt\?\.\(m\.summary\) \?\? \(m\.seat \? seatTipOf\(m\.seat\) : null\);\n\s*const tip = card \? readTip\(card, \{ textMax: SEAT_TIP_TEXT_MAX, linesMax: TOWN_TIP_LINES_MAX \}\) : null;/, 'a seat\'s lines whole (SEAT_TIP_TEXT_MAX)');
   assert.match(H, /\.\.\.\(seat \? \[seatInfoLine\(seat, seat\.holder\?\.guild \?\? null\)\] : \[\]\)/);
   const W = hostText('src/scenes/world.js');   // HOST-SPLIT 2: the host WHOLE - BAY-LEFT-MAPS moved carriageTown to scenes/mapPlacesHost.js
   assert.match(W, /ship: isShipMark\(t\.p\), kin: travellerKin\(\{ friend: !!social\?\.isFriendPeer\(t\.id\), gt: t\.gt \}, myGuildTag\(\)\), lv: t\.lv \?\? null \}\)\),/);
   assert.match(W, /carriageAt: \(summary\) => carriageTown\(summary\?\.mapID \?\? summary\?\.mapId\),/);
-  // PIN MOVED (BAY-LEFT-MAPS, test/scenes/bayleft_places.test.js): the town by the place's own key - a Bay town by its pixel id
   // (DFU's mask, `y * 1000 + x`), one past the Bay by its whole id where the registry stands it - never every id as the Bay's
   assert.match(W, /on = hasCarriageGate\(townOfKey\(id\)\);/);
   assert.match(W, /if \(key < BAY_PIXEL_IDS\) return locationIndex\.get\(`\$\{key % MAX_MAP_PIXEL_X\},\$\{Math\.floor\(key \/ MAX_MAP_PIXEL_X\)\}`\);/);
-  assert.match(W, /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\) \|\| isHallMapId\(mapId\)\) return false;/, 'no carriages without the mod');   // PIN MOVED (AUDIT WW F1): nor at a zone hall
-  // PIN MOVED (TOWN-ECON TE1, test/systems/townecon.test.js): the Overworld's card is the town's (systems/town/townEcon.js tipFnAt -
+  assert.match(W, /if \(!immersiveTravelLoaded\(\) \|\| !Number\.isFinite\(mapId\) \|\| isHallMapId\(mapId\)\) return false;/, 'no carriages without the mod');
   // made only when its plate is under the pointer, one kept a town); SEAT-TIP's seat card is its guild lines
   assert.match(W, /seaRaidPeerChase, townEcon, state, travelViewBands,/, 'a town\'s card, made only when its plate is asked');
   assert.match(rd('src/scenes/gatherHost.js'), /color: nodeMarkCss\(g\.profession\), dist: d \/ 1000 \} \}\);/, 'a group\'s distance, km');
@@ -171,7 +168,7 @@ test('OW-WHO travel map legend: the legend speaks for the players the sheet draw
   globalThis.document = { createElement: mk };
   try {
     const leg = mk('div');
-    const self = { _chrome: { legend: leg }, _party: [], _gate: null, _gates: [], _bounties: [], _revenants: [], _lodes: [], _pois: [], _raids: [], _stars: [], _quests: [],   // PIN MOVED (STAR6): the night's fallen stars are the window's too; PIN MOVED (FEUD's merge of main): RVN7c's lairs are the window's too; PIN MOVED (MINE-PERKS): and a Motherlode Sense's Motherlodes; PIN MOVED (POI-2): and the approved POIs' marks
+    const self = { _chrome: { legend: leg }, _party: [], _gate: null, _gates: [], _bounties: [], _revenants: [], _lodes: [], _pois: [], _raids: [], _stars: [], _quests: [],
       _trav: [{ name: 'Fren', kin: 'friend', lv: 3 }, { name: 'Gilda', kin: 'guild', lv: 3 }],
       _top: null, _info: null, _phase: 'map', _renderKey() {} };
     const said = () => leg.children.filter((n) => n.className === 'hmlegtext').map((n) => n.textContent);

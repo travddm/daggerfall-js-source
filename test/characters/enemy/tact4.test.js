@@ -1,5 +1,4 @@
-// TACT4 - TELEGRAPHED BLOWS (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "Introducing new attack patterns and
-// smaller telegraphed attacks (like our world boss) but not overdoing it"; his calls: one or two, tier-based - level 10
+// TACT4 - TELEGRAPHED BLOWS (;; his calls: one or two, tier-based - level 10
 // and up, or an elite foe). The law of the three shapes, the ground's reading of it, the verdict at the landing, the
 // weight on DFU's own damage - and on the real motor and attack component: a foe of the tier winds up and stands it,
 // its aim locked, the swing comes at the landing, a step out of the shape dodges it, a knock breaks it, one at a time
@@ -156,7 +155,6 @@ function untilWindup(foes, f, player, secs = 60) {
 test('TACT4: a foe of the tier winds up and stands it, its aim locked; the swing comes at the landing, and standing in the shape it lands', () => {
   const f = foe();
   const player = [0, 0, 0];
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.1): the swing BEGINS with the wind-up (held at its raised arm)
   // and the landing RELEASES it - the brain sees its blow at the landing (`_tacSwung`), never a second swing
   let blow = null, at = null, yaw = null, moved = 0, turned = 0, swingAt = null, verdict = null, tacAt = null, swungAt = null, began = null, seqAtStart = null, seqAtEnd = null, startAt = null, prevSeq = f.atk.swingSeq, prevTac = f.ai._tacSwung ?? 0;
   run([f], 60, player, () => {
@@ -187,7 +185,6 @@ test('TACT4: a step out of the shape during the wind-up dodges it', () => {
   const player = [0, 0, 0];
   const blow = untilWindup([f], f, player);
   assert.ok(blow);
-  // PIN MOVED (TELL5, bible/12-Enhanced-AI/Feud-Arc.md 7.2): a lunge turns after its target through the first half of its
   // wind-up, then locks - "a sidestep the moment the mark appears no longer beats a lunge". The step comes once its aim
   // is locked (at once for a sweep or a slam, which lock at their start)
   const lockAt = TELL.TRACKERS.includes(blow.kind) ? blow.start + TELL.TRACK_SHARE * (blow.land - blow.start) + 0.07 : 0;

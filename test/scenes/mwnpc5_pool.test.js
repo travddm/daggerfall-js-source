@@ -1,4 +1,4 @@
-// MWNPC5c (2026-10-09, the MW-NPC arc's fifth slice - bible/04-Characters/Morrowind-NPCs.md section 10c): THE ENCOUNTER
+// MWNPC5c: THE ENCOUNTER
 // POOL'S FOES IN THEIR BODIES. The dungeon context's law (section 10b) on the pool every other foe host draws
 // (scenes/exteriorFoes.js - world.js's exterior, worldModes.js's interiors, exterior.js): batches() offers the class
 // foes to the lane dressed as their billboards, drawBodies syncs it, marks each offered billboard cast-only where its
@@ -47,7 +47,6 @@ test('MWNPC5c the pool offers its class foes dressed, the dead from the kill, sy
     wantNpcBodies: () => want, makeNpcBodies: () => { made++; return (lane = recordingLane()); },
   });
   const knight = foe(130, [2, 0, 3], { seq: 7 });
-  // PIN MOVED (MWNPC9, bible/04-Characters/Morrowind-NPCs.md section 14b): the rat has a Morrowind body now - the creature
   // left out is one Morrowind has no match for (a giant bat, a declared miss)
   const rat = foe(3, [4, 0, 5], { seq: 8 });
   const fallen = foe(131, [6, 0, 1], { seq: 9, dead: true, corpse: true, corpseMarker: { batch: {} } });
@@ -56,7 +55,6 @@ test('MWNPC5c the pool offers its class foes dressed, the dead from the kill, sy
   const out = pool.batches();
   assert.equal(made, 1, 'the lane made the first frame it is wanted');
   assert.ok(out.includes(knight.batch) && out.includes(rat.batch), 'every live billboard still in the pass (it casts either way)');
-  // PIN MOVED (AUDIT MW-NPC B1): a body's id is the pool's own entry id (idOf, `uid`) - never `seq`, which a puppet
   // shares with its owner's foes
   assert.ok(knight.uid != null && fallen.uid != null && knight.uid !== fallen.uid);
   assert.deepEqual(lane.offered.map((o) => o.actor.id), [knight.uid, fallen.uid], 'the class foe and the dead class foe - never the unmatched creature');

@@ -1,6 +1,4 @@
-// GRAHT1 (2026-10-26, bible/03-World/Graht-Oaks.md; the owner, 2026-10-25: "Vardenfell needs proper super tall low poly
-// tree sprites with branchs/leaves that expand to cover the sky. The current simple skybox method is very low quality and
-// band aided") - Valenwood's graht-oaks: the tree made (world/jungle/grahtOakMesh.js), its pictures painted
+// GRAHT1 - Valenwood's graht-oaks: the tree made (world/jungle/grahtOakMesh.js), its pictures painted
 // (render/grahtOakArt.js), the law of where it stands and what it stands (world/jungle/grahtOaks.js, the terrain
 // worker's jungle layout), the sky its crowns close, its bodies, its host (scenes/grahtHost.js) and the wiring of all of it.
 import { test } from 'node:test';

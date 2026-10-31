@@ -1,4 +1,4 @@
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client"): THE
+// PRIVATE-REPORT: THE
 // SERVICE'S SIDE - migration 0129 (private_reports), server-account/src/reports.js and its five routes, the reader's
 // count on the post box and the heartbeat's post part. A report is a registered player's to the readers
 // REPORT_READER_HANDLES names, and nobody else lists or opens one.
@@ -200,7 +200,7 @@ test('PRIVATE-REPORT the functions refuse alone what the routes would: a reader 
   assert.deepEqual(await myReports(ctx, row), { reports: [], max: 20 });
 });
 
-// ── AUDIT PRIVATE-REPORT (2026-10-17, bible/01-Overview/audits/Audit-Private-Report.md) ─────────────────────────────
+// ── AUDIT PRIVATE-REPORT ─────────────────────────────
 
 /** A report laid straight into the table at T0 + `at`, by `who` - the reader's lists' order, which the route's clock cannot stand at. */
 const layOne = (svc, who, n, { at = n, state = 'open', read = null } = {}) => {

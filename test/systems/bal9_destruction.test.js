@@ -1,4 +1,4 @@
-// BAL9 - DESTRUCTION'S CHANNELS (2026-10-12; bible/05-Combat/Balance-Arc.md section 15). The owner: "I think destruction
+// BAL9 - DESTRUCTION'S CHANNELS. The owner: "I think destruction
 // needs a buff. A lot of players saying its lack luster. I want to also introduce some new magic/mage perks to the rarity
 // loot pool since weve done a lot of needing but still dont make it overpowered". The measurement found a Destruction
 // spell's damage had no channel but its caster's level (EntityEffect.GetMagnitude) - the school's skill prices it alone:

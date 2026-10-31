@@ -4,9 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createComeSailAwayAboard } from '../../src/scenes/comeSailAway/comeSailAwayAboard.js';
 const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
 // Execute the host's actual near-player marker loop with its view dependencies.
-// PIN MOVED (THE WROTHGARIAN ZONE): the zone's own loops over the drawable peers stand above this one now, so the
 // loop is found by the block it heads - the last such loop above the region's travellers (TV3)
-// PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js - the loop is
 // cut from there, and the six names it reads live off the host come in through `host`, as the module reads them
 const tvm = readFileSync(new URL('../../src/scenes/travelViewMarks.js', import.meta.url), 'utf8');
 const end = tvm.indexOf('    // TV3: THE REGION');
@@ -18,9 +16,9 @@ function markers(raw, drawn, hidden = new Set()) {
   const _peerMapPoses = new Map();
   const drawable = drawn;
   const start = world.indexOf('    _peerMapPoses.clear();');
-  const stop = world.indexOf('    const ranged = peerRange.cut(', start);   // PIN MOVED (PEER-RANGE): the draw distance's cut is the first reader after the map's poses - the poses are taken off the whole list before it
+  const stop = world.indexOf('    const ranged = peerRange.cut(', start);
   // eslint-disable-next-line no-new-func
-  new Function('_peerMapPoses', 'drawable', 'hccOn', 'hcc', 'campToWire', world.slice(start, stop))(_peerMapPoses, drawable, () => false, null, (q) => q);   // PIN MOVED (WAGONS3): the drivers' glue after the map's poses - no wagons here
+  new Function('_peerMapPoses', 'drawable', 'hccOn', 'hcc', 'campToWire', world.slice(start, stop))(_peerMapPoses, drawable, () => false, null, (q) => q);
   // eslint-disable-next-line no-new-func
   return new Function('online', '_peerMapPoses', '_hiddenPeers', `
     const marks = [], near = new Set(), sharing = new Map(), _veils = new Map();

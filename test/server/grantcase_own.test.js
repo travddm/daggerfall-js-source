@@ -1,4 +1,4 @@
-// FOE-BOUNDS and GRANT-ASKS (2026-10-19, Mac: "Spec + B + A"; bible/11-Multiplayer/Spawn-Grants.md sections 19 and 21):
+// FOE-BOUNDS and GRANT-ASKS:
 // THE RELAY'S OWN COUNT OPENS A CASE (server-account/src/grants.js) - a record the relay itself stripped because no
 // builder could give it opens the case on its sender alone, its evidence on the line; an account's own asks far past its
 // budget in one cell's window do too; one batch's findings on one account are ONE line (a case line is keyed by its

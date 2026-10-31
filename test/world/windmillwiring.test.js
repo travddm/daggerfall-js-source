@@ -133,7 +133,7 @@ test('WM2b: the hub the hosts mount at is the module\'s, not a copy', () => {
 });
 
 test('WM2f: the mill comes with the building that carries its door', () => {
-  // Mac: "the door is covered and I can't enter it". Kamer's subrecord
+  // . Kamer's subrecord
   // places TWO models - a CLASSIC building (118) and the mill beside it
   // - and WM2d read only the mill, so the structure with the real door
   // was never placed at all. His subrecord headers declare

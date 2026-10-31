@@ -1,5 +1,4 @@
-// PROVINCE-COURTS (2026-10-27; the audit "no system left behind in the Bay", item 33 - the owner's call taken: "Every
-// single thing here needs to be addressed. No exceptions."; bible/03-World/World-Wide.md PROVINCE-COURTS): THE PROVINCES'
+// PROVINCE-COURTS: THE PROVINCES'
 // OWN COURTS AND PEOPLE. FACTION.TXT has a Province, a Court and a People for each of the Bay's regions and none past it;
 // the port's own (systems/faction/provinceFactions.js) ride every faction dictionary through DFU's AddCustomFactions door,
 // so every reader of a region's court or people finds a province's: the palace's nobles, %rn/%rt, a crime's People half,

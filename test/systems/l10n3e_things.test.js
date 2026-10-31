@@ -1,4 +1,4 @@
-// L10N3e (2026-09-27): THE NAMES OF THINGS, IN THE PLAYER'S LANGUAGE - the things batch. DFU names an item, a magic
+// L10N3e: THE NAMES OF THINGS, IN THE PLAYER'S LANGUAGE - the things batch. DFU names an item, a magic
 // item and a spell through TextManager by the thing's own id - Internal_Items by the item TEMPLATE's index,
 // Internal_MagicItems by the MAGIC.DEF template's (its record's stream position), Internal_Spells by the SPELLS.STD
 // index - and the soul in a soul trap by its MobileTypes id (the enemyNames list). DFU writes an item's shortName in

@@ -1,4 +1,4 @@
-// TESA6 (2026-10-12, the owner: "Do it" - the ports; bible/03-World/Arena-Provinces.md TESA6) - THE PORTS PAST THE BAY,
+// TESA6 - THE PORTS PAST THE BAY,
 // pinned. A port stands on its own province's shore (world/arenaPlaces.js standArenaPixels) and its clone answers a harbour
 // (world/arenaLocations.js); the host's ports past the Bay answer as the Etheric Sea's do. TESA12: a port is a lore city
 // TAMRIEL1 sets on the sea (world/tamriel/tamrielGeography.js CITIES' `port`) - A.EXE's coastal list, its unpacker, its print and
@@ -97,7 +97,6 @@ test('TESA6 with ARENA2: on the player\'s own trace 28 of the lore\'s 30 ports s
   const ports = arenaPixels().stood.filter((p) => p.port);
   assert.equal(ports.length, 28, 'PIN MOVED (TESA12): the lore\'s ports, not A.EXE\'s 51');
   for (const p of ports) {
-    // PIN MOVED (AUDIT TESA II P11): the sea beside it is the ground's WATER (isWaterPixel - the Ocean climate, or a byte at
     // the ocean's floor), never `<= WATER_BYTE`, which the coast's own land at SHORE_BYTE answers too: moved 8 pixels
     // inland, 12 of the 28 still passed that
     assert.ok([[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]].some(([dx, dy]) => isWaterPixel(tamrielClimateAt(p.bx + dx, p.by + dy), g.getHeightMapValue(p.bx + dx, p.by + dy))), `${p.name}: the sea beside it`);

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02 - ROCK-FREE. Mac, testing sailing: "ships get stuck in the world of daggerfall ocean rocks".
+// FIELD BUGS 2026-10-02 - ROCK-FREE..
 // Come Sail Away's CheckCollision sweeps the hull's half-beam sphere along her length (SphereCastAll); the world's host
 // answered it off the collider's own sphereCastAll, Unity's SphereCastAll over a BUCKET as one collider - and a static
 // bucket is a pixel's whole ground, every World of Daggerfall rock of it in one. Two traps followed:
@@ -25,8 +25,7 @@
 //                           never grazing onto it again, a holding part silent (a shared edge crossed once), a mover
 //                           never holding; nothing under her keel
 //   THE HOST              - her keel line handed on, an overlap beside her kept where it touches
-// Moved by the record's audit (2026-10-02b, `01-Overview/bugs/Field-Bugs-2026-10-02b.md`; its own pins in
-// test/systems/comeSailAway/fb1002b_rocks.test.js): the sweep is the sphere's own (no spokes, so no `pass` for them), a ledge is no rock
+// Moved by the record's audit: the sweep is the sphere's own (no spokes, so no `pass` for them), a ledge is no rock
 // by the KEEL LINE where the host had dropped an overlap "beneath" her, and each sweep reaches her own end (ROCK-REACH)
 // - so the rocks of these pins stand inside her own length, and the ledge under her keel.
 // `01-Overview/bugs/Field-Bugs-2026-10-02.md`.
@@ -95,7 +94,7 @@ function under(rocks, { sails = true } = {}) {
 }
 
 /** A shelf under the sea's line 0.65 m under her keel (her collider's box's foot) - under her where she starts and
- *  running on under the rock ahead (its foot). PIN MOVED (AUDIT GALLEON, the merge with main, 2026-10-02): the Small
+ *  running on under the rock ahead (its foot).
  *  Ship is Mac's galleon, her keel 4.64 m down where the mod's galleon's was 3.35 - at 4 m the shelf stood over it. */
 const LEDGE = { min: [60, 20, 150], max: [140, 34 + hullBuild(SMALL_SHIP).keel - 0.65, 300] };
 /** A rock ahead, standing out of the sea. */
@@ -129,7 +128,6 @@ test('ROCK-FREE OUT OF THE ROCK: a hull standing inside a rock - a closed one, o
 
 test('ROCK-AWAY: what she met takes only her way INTO it - a rock astern of her under sail, and a rock ahead of her backing off it at the oars, each leave her the way open water does (each held her to the push\'s one metre a second for as long as it lay in her sweep); at rest, or rowing into it, the C#\'s push', () => {
   // a rock just inside her stern's sphere (her sweep astern reaches her box's after end), and she sails away from it.
-  // PIN MOVED (AUDIT GALLEON, the merge with main, 2026-10-02): the Small Ship is Mac's galleon - her box's ends her own
   // (stern -19.91, bow 21.93, where the mod's galleon's stood at -24.25 and 19.88), each rock as far inside them as it was
   const { aftZ, bowZ } = hullBuild(SMALL_SHIP);
   const astern = { min: [70, 0, 140], max: [130, 80, 200 + aftZ + 0.75] };
@@ -186,7 +184,7 @@ test('ROCK-FREE THE SWEEP\'S LAW: hullSweepAll answers part by part - an overlap
   const hull = rockMesh(box);
   boats.addMesh('boat', hull.positions, hull.indices, I, () => [0, 0, 0], () => [1, 0, 0, 0, 1, 0, 0, 0, 1]);
   assert.deepEqual(boats.hullSweepAll(o2, r2, [0, 0, 1], 30).filter((h) => h.start).map((h) => h.point), [[0, 0, 8]], 'a mover\'s overlap answers, where it touches');
-  // the keel line (2026-10-02b): the ledge wholly under her keel is not met at all - the rock ahead is, as it was
+  // the keel line: the ledge wholly under her keel is not met at all - the rock ahead is, as it was
   const keeled = col.hullSweepAll(o, r, [0, 0, 1], 30, { keelY: -1 });
   assert.deepEqual(keeled.map((h) => [h.part, Math.round(h.dist * 1e6) / 1e6]), [[1, 27]], 'the ledge (its top 1 m under her keel) unmet; the rock\'s face at 27');
   assert.equal(col.hullSweepAll(o, r, [0, 0, 1], 30, { keelY: -3 }).filter((h) => h.start).length, 1, 'a keel under the ledge\'s top: its overlap answers');

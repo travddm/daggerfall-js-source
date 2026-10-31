@@ -1,5 +1,4 @@
-// PIXEL-KEYS (2026-10-12, a profile of a player's live client walking the overworld's coast: the sea's soundings made
-// their pixel's key text anew, hundreds of times a frame; bible/07-Rendering/Performance-Priority.md PIXEL-KEYS) - A
+// PIXEL-KEYS - A
 // PIXEL'S KEY, MADE ONCE: the text it always was for every pixel - the map's, negative ones, -0, past the span, not a
 // whole number - the same string each time within the span, the keeping bounded; and the sea's soundings ask it.
 import { test } from 'node:test';

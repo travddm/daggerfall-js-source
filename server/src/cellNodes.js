@@ -1,5 +1,5 @@
 // @ts-check
-// THE CELL DIRECTORY AND THE WORKER'S DOOR TO A CELL (bible/11-Multiplayer/Scale-Arc.md, COST-2).
+// THE CELL DIRECTORY AND THE WORKER'S DOOR TO A CELL (, COST-2).
 //
 // A page asks for its 16-pixel cell (`/room/world:<cx>,<cy>`). The Worker asks the directory for the cell tree
 // (net/cellTree.js) - the directory is one object, named CELL_DIRECTORY, a name no page can ask for because wire.js

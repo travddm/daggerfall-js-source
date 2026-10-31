@@ -1,5 +1,5 @@
-// AUDIT SCALE (2026-10-08, Mac: "Do a comprehensive audit on this and ensure perfection") - the audit of SCALE3 and
-// SCALE4a-c (bible/11-Multiplayer/Scale-Arc.md; the record bible/01-Overview/audits/Audit-Scale.md). Four review lanes read a
+// AUDIT SCALE - the audit of SCALE3 and
+// SCALE4a-c (; the record). Four review lanes read a
 // snapshot of the pushed head (26594ff5): the account service (A), the client's heartbeat (B), the load harness and its
 // numbers (C), the tests' honesty and the record (D). Every finding fixed here was reproduced first, and each pin below
 // fails on the code as it stood - or, for a law that already held and no pin held (lane D's surviving mutants), dies
@@ -76,7 +76,7 @@ async function tithedMarket() {
   const gid = raw.prepare('SELECT guild_id FROM guild_members WHERE player = ?').get(gm.id).guild_id;
   raw.prepare(`INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, standing, truce_week, at, tithe, owed) VALUES (?, ?, ?, ?, 0, 50, NULL, ?, 8, 0)`)
     .run(ANTICLERE.key, gid, ANTICLERE.region, ANTICLERE.tier, T0 - 7 * DAY);
-  const seller = await svc.seated('Seller', { renown: 10 });   // PIN MOVED (INT19): a realm character - its auction's piece leaves its record
+  const seller = await svc.seated('Seller', { renown: 10 });
   const buyer = await svc.registered('Buyer', { renown: 10 });
   svc.seedMarks(seller, 100_000, 's'); svc.seedMarks(buyer, 100_000, 'b');
   return { svc, raw, seller, buyer, HUBS: { 21: [402, 151] } };
@@ -176,7 +176,7 @@ test('AUDIT SCALE A3 A5: the clock\'s reads by an index - the contracts past the
   assert.doesNotMatch(contracts, /SCAN guild_contracts/, contracts);
   assert.match(contracts, /idx_guild_contracts_open_due|idx_guild_contracts_unreturned/, contracts);
   const prune = await sqlOf((db) => pruneMarketHistory(db, T0, 1000));
-  assert.equal(prune.length, 10, 'ten tables');   // PIN MOVED (AUDIT LW-II P6): and a patron's sales (LW15's market_patron_sales), kept as its listing is
+  assert.equal(prune.length, 10, 'ten tables');
   for (const sql of prune) assert.match(sql, /^DELETE FROM (\w+) WHERE rowid IN \(SELECT rowid FROM \1 WHERE [\s\S]+ LIMIT \?2\)$/, sql);
   const auctions = prune.find((sql) => sql.startsWith('DELETE FROM market_auctions'));
   const plan = planOf(auctions);
@@ -220,43 +220,28 @@ test('AUDIT SCALE D7: on a quiet world the clock is nine statements a minute and
   _resetCronForTests();
   await runCron(svc.env, { cron: CRON_MINUTE, nowS: T0, rand });   // the day's Motherlodes picked, the seats' week settled
   const minute = await runCron(svc.env, { cron: CRON_MINUTE, nowS: T0 + 60, rand });
-  // PIN MOVED (SEAT-FACTS, 2026-10-13): and the seats' facts kept once for the service - the rows read and the one row
   // kept (townSeats.js keepSeatFacts), where every isolate read the rows each minute
-  // PIN MOVED (SAFE, Chat-Safety-Arc.md section 6): the chat safety's minute - the reviewer's feed and cases, and the
   // moderators' cards - asks nothing while neither the reviewer nor Discord is set, as on this world
-  // PIN MOVED (AUDIT TOWN-ECON 2 SVC-3): and the towns' shares kept once a keeping - the minute after asks nothing
-  // PIN MOVED (YARD-SNAP): and the towns' yards a write left stale built - one statement, none stale on a quiet world
-  assert.deepEqual(minute.map((j) => j.statements), [1, 1, 1, 1, 2, 0, 1, 1, 1, 0, 0], JSON.stringify(minute.map((j) => [j.name, j.statements])));   // PIN MOVED (REZ-BLOODLINE AUDIT R1): the falls held for a Resurrect whose window closed, asked once (legacy.js settleHolds)
+  assert.deepEqual(minute.map((j) => j.statements), [1, 1, 1, 1, 2, 0, 1, 1, 1, 0, 0], JSON.stringify(minute.map((j) => [j.name, j.statements])));
   const hour = await runCron(svc.env, { cron: CRON_HOUR, nowS: T0 + 120, rand });
-  // PIN MOVED (INT2/INT5, 2026-10-09): the hour sweeps the judge's findings and the wealth-hours past their keep - one
-  // statement each, its page short; seventeen became nineteen. PIN MOVED (INT9): and a death in the zone's drop past its
-  // keep (server-account/src/wild.js WILD_FALLS_KEEP_S) - twenty. PIN MOVED (LW15): the patrons' towns waiting asked
-  // once - none, so no town read; twenty-one. PIN MOVED (AUDIT LW-II P6, P8): the market's history prunes a patron's
+  // statement each, its page short; seventeen became nineteen.
+  // keep (server-account/src/wild.js WILD_FALLS_KEEP_S) - twenty.
+  // once - none, so no town read; twenty-one.
   // sales too (ten), and the patrons are asked nothing while the market is not open to everyone (this world's Marks and
   // board switches are off) - twenty-one still
-  // PIN MOVED (AUDIT LW-II-2 S3): while the market is not open to everyone the patrons' job marks every trader's hours
   // as they pass (market.js markPatronsShut - one statement), so opening it pays none of them - twenty-two
-  // PIN MOVED (PVP-ESCROW, 2026-10-14 -
   // Mac's two-phase handoff): an ended escrow swept as a fall is - twenty-four
-  // PIN MOVED (SAFE, Chat-Safety-Arc.md section 10): the chat safety's retention - the reviewer's feed past a day, a case
   // open past ninety, a resolved case's lines past ninety and the reviewer's spend past a month, one statement each,
-  // its page short (safetyClock.js safetySweep) - twenty-eight. PIN MOVED (AUDIT SAFE DOC-1, DOC-12): and a resolved
+  // its page short (safetyClock.js safetySweep) - twenty-eight.
   // case's lines, notes and reviewer's reason swept apart - the case marked first, its card redrawn without them - thirty
-  // PIN MOVED (INT17, Integrity-Arc section 7): the progression claims' hours swept past the wealth's keeping - thirty-one
-  // PIN MOVED (STAFF-PANEL1, mob 2026-10-22 12:12Z: "only keep for one month"): the staff audit log's rows past its month
   // swept - one statement, its page short (cron.js staff-audit) - thirty-five
-  // PIN MOVED (CRAFT-WRITS, Professions-Arc.md section 49): an unfilled crafting writ swept the day after its own - one
   // statement, its page short - thirty-six with STAFF-PANEL1's (renumbered at the merge), and the sea's five (AUDIT SEA VENTURES B5) - forty-one
-  // PIN MOVED (STAFF-PANEL3-REALM, STAFF-PANEL4-CENSUS): a staff removal past its 30 days swept - one statement, its page
   // short (cron.js staff-evidence) - forty-two; the census's day sum and its backfill ask nothing outside their quiet
   // hour, and the backfill nothing while CENSUS_BACKFILL is not 'on'
-  // PIN MOVED (STAFF-PANEL5): a staff message past its keep (one), the relay's net rows, Monster watch's rows and both
   // feeds' batch ids (four, one per table), the timed encounters past 14 days (one), and the freeze's staff chat - threads closed, lines past 90
   // days (two) - each page short: fifty
-  // PIN MOVED (STAFF-EVENT): a staff event past its 30 days (one, its page short): fifty-one
-  // PIN MOVED (CREW-SIGNED, SEA-OPEN): a crew hall's signing past its day (one, its page short; cron.js crew-signs): fifty-two
   assert.deepEqual(hour.map((j) => [j.name, j.statements]), [['board', 2], ['guild-board', 1], ['harvests', 2], ['craft-writs', 1], ['market-history', 10], ['town-econ', 3], ['rate-limits', 1], ['sessions', 1], ['guild-invites', 1], ['realm-findings', 1], ['realm-wealth-hours', 1], ['progress-hours', 1], ['wild-falls', 1], ['wild-escrow', 1], ['sea', 5], ['crew-signs', 1], ['patrons', 1], ['safety-sweep', 6], ['staff-audit', 1], ['staff-evidence', 1], ['census-day', 0], ['census-backfill', 0], ['staff-messages', 1], ['staff-events', 1], ['staff-feeds', 4], ['reactions', 1], ['staff-chat', 2]]);
-  assert.equal(minute.reduce((n, j) => n + j.statements, 0) + hour.reduce((n, j) => n + j.statements, 0), 9 + 51);   // PIN MOVED (EG removal): the Weir Key's stake clock (eg-stakes, one statement) went with the Elite Breach   // PIN MOVED (CREW-SIGNED: the crew hall's day swept)   // PIN MOVED (STAFF-EVENT: the staff events sweep)   // PIN MOVED (STAFF-PANEL5: Message on screen, the feeds, the staff chat; STAFF-PANEL3-REALM: a staff removal past its 30 days; AUDIT SEA VENTURES B5: the sea's five sweeps - a kill past the Wanted window, a wreck past its hour, a bounty claimed, a sum paid and a prize ended past their keeping, seaBounty.js seaSweeps; YARD-SNAP: the minute's stale yards; AUDIT LW-II-2 S3; SEAT-FACTS; EG-ZM; KG6; PVP-ESCROW; REZ-BLOODLINE AUDIT R1; SAFE; INT17: the progression claims' hours swept as the wealth's are; TOWN-ECON TE2: a town's days, acts and seen ticks)
+  assert.equal(minute.reduce((n, j) => n + j.statements, 0) + hour.reduce((n, j) => n + j.statements, 0), 9 + 51);
   // behind `dev` the Motherlodes are a developer's: never picked by the clock
   const dev = await standService({ PROFESSIONS_OPEN: 'dev' });
   _resetCronForTests();
@@ -579,7 +564,6 @@ test('AUDIT SCALE D10: the client parts\' small laws - a lost answer asked again
   await going; await settle();
   console.warn = quiet;
   assert.deepEqual(sleeps, NOTICE_RETRY_MS.slice(0, NOTICE_TRIES - 1));
-  // PIN MOVED (BUSY-HEART, 2026-10-16; test/net/busy_heart.test.js): an overload's 503 holds the heartbeat at the page's gate -
   // its retries answered there, the service asked once
   assert.equal(r.sent.length, 1, 'the overload answered: its retries held by the gate');
   _resetBusyForTests();

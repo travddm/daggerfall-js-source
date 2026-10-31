@@ -1,4 +1,4 @@
-// REP3 (2026-09-29, the reputation overhaul) - BANISHMENT, TIMED OR PARDONED. Mac's call: "Timed or pardoned" - "Only
+// REP3 - BANISHMENT, TIMED OR PARDONED. - "Only
 // for Murder and worse. Lifts after about 30 game days (~2.5 real days), or pay for a pardon at the region's palace." The
 // pardon is bought at the region's TEMPLE: the watch never enters one, so a banished criminal can reach it (a palace is
 // the watch's own ground).
@@ -90,7 +90,7 @@ test('REP3: a pardon bought at the temple - offered only to the banished, priced
   assert.equal(pardonPrice(p, 4), 3 * PARDON_BASE_PRICE);
 });
 
-// AUDIT REP F4: PIN MOVED - a short purse no longer goes on to DFU's donation field (auditrep.test.js F4: it is offered
+// AUDIT REP F4:
 // what is left, a cheaper penance, and a Yes ends the asking); a No still goes on to it
 test('REP3: a purse short of the pardon is told so; a No goes on to the donation (mutant: the short purse pardoned)', () => {
   const p = citizen(0, 100);

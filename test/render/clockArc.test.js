@@ -1,6 +1,4 @@
-// THE CLOCK ARC (CLK, 2026-09-08). Mac: "we need to change our weather/
-// day and night system to be in sync with the world clock to enhance
-// everything." bible/03-World/Clock-Arc.md. (test/world/clock.test.js is the
+// THE CLOCK ARC (CLK, 2026-09-08). . (test/world/clock.test.js is the
 // world clock's own file - the rig's curve, the hour gates; this one is
 // the arc's.)
 //

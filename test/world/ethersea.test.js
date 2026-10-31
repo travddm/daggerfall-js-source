@@ -1,6 +1,5 @@
-// ETHER-SEA (2026-10-11, the owner: "A brand new open sea map ... The etheric sea is a infinite procedural oceanscape with
-// procedural islands with towns, dungeons, exotic resources, deadly legendary ships") - THE ELTHERIC OCEAN'S LAW
-// (bible/03-World/Eltheric-Ocean.md): its box on the Bay's grid, the Veil and the bands, the isles' lattice, the ground the
+// ETHER-SEA - THE ELTHERIC OCEAN'S LAW
+// : its box on the Bay's grid, the Veil and the bands, the isles' lattice, the ground the
 // kernel grows there and the composition that hands it to the kernels, the stream and the far ring, and the crossing's
 // waters. tools/mutants/ethersea.json.
 import '../modsOff.js';
@@ -66,12 +65,10 @@ test('ETHER-SEA the box: inside the wire\'s world (a pose\'s x and z within POSE
   assert.ok(tamrielFrameInBay().y0 - ETHER_BOX.y1 > 1000);
   assert.equal(inEther(ETHER_BOX.x0, ETHER_BOX.y0), true); assert.equal(inEther(ETHER_BOX.x1, ETHER_BOX.y0), false); assert.equal(inEther(ETHER_BOX.x0, ETHER_BOX.y1), false);
   assert.equal(inEther(ETHER_BOX.x0 - 1, -5000), false); assert.equal(inEther(500, 250), false, 'the Bay is not the sea');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G1): the margin the far ring's whole reach from a ship in the box - four drew the Bay's
   // clamped row 0 on the Veil's horizon
   assert.equal(ETHER_MARGIN, 64);
   assert.equal(inEtherLaw(ETHER_BOX.x0 - 64, ETHER_BOX.y0 - 64), true); assert.equal(inEtherLaw(ETHER_BOX.x0 - 65, -5000), false); assert.equal(inEtherLaw(ETHER_BOX.x1 + 63, -5000), true); assert.equal(inEtherLaw(ETHER_BOX.x1 + 64, -5000), false);
   assert.deepEqual(etherFrame(), { x0: 64, y0: -7680, w: 8064, h: 4992 });
-  // PIN MOVED (ELTHERIC, 2026-10-12, the owner: "Apparently the ocean is suppose to be eltheric not etheric"): the lore's
   // Eltheric Ocean, the name the intro map already gave the waters west of the Bay - it was 'the Etheric Sea'
   assert.equal(ETHER_SEA_NAME, 'the Eltheric Ocean');
 });
@@ -154,7 +151,7 @@ test('ETHER-SEA no isle stands in the box\'s edge cells or east of Veilhaven - t
   assert.deepEqual([...VEILHAVEN_CELL], [800, 249]);
   const h = veilhaven();
   assert.equal(h.name, VEILHAVEN_NAME); assert.equal(h.name, 'Veilhaven');
-  assert.equal(h.kind, 'port'); assert.equal(h.haven, true); assert.equal(h.r, 1); assert.equal(h.peak, 12); assert.equal(h.climate, CLIMATES.Subtropical);   // PIN MOVED (AUDIT CAPTAIN'S SEA H1): a port's small isle, its town's harbour in reach
+  assert.equal(h.kind, 'port'); assert.equal(h.haven, true); assert.equal(h.r, 1); assert.equal(h.peak, 12); assert.equal(h.climate, CLIMATES.Subtropical);
   assert.equal(etherBandAt(h.px).id, 'shallows');
   assert.ok(etherDepthAt(h.px) < 8, 'a few leagues from the Veil');
   assert.deepEqual(landfall(), { px: h.px + LANDFALL_OFF_PX, py: h.py });
@@ -183,7 +180,6 @@ test('ETHER-SEA the names: a head, a middle on half, a tail - by the kind\'s for
 
 test('ETHER-SEA the ground: 0 at sea, the isle\'s peak at its centre falling to its rim by its kind\'s fall, the noise only on its land; the large map\'s detail small on land and all but none at sea; the climate the isle\'s to CLIMATE_REACH_PX past its rim, the Ocean\'s else - and the map\'s one water law agrees (mutants: the fall, the rim, the noise, the detail\'s tops, the reach)', () => {
   const h = veilhaven();
-  // PIN MOVED (AUDIT CAPTAIN'S SEA H1/P2): a port's land the four bytes framing its town's pixel (its land's centre half a
   // pixel north-west of it: the kernel lays a byte at its pixel's south-east corner), the peak's (1 - t^2)^fall at t ~0.71
   assert.deepEqual([h.lx, h.ly], [h.px - 0.5, h.py - 0.5]);
   for (const [dx, dy] of [[0, 0], [-1, 0], [0, -1], [-1, -1]]) assert.ok(Math.abs(etherHeightByte(h.px + dx, h.py + dy) - h.peak * 0.5) <= HEIGHT_NOISE, `the land about the town (${dx},${dy})`);
@@ -207,7 +203,6 @@ test('ETHER-SEA the ground: 0 at sea, the isle\'s peak at its centre falling to 
   assert.equal(etherClimateAt(VEIL_X + 4, h.py), CLIMATES.Ocean);
   assert.equal(etherClimateAt(h.px, h.py), h.climate);
   assert.equal(CLIMATE_REACH_PX, 1.5);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA H1): its smaller isle's reach - the pixel past its bytes, where the kernel carries its land
   assert.equal(etherClimateAt(h.px + 1, h.py + 1), h.climate, 'a pixel past its rim wears it (the kernel carries its land there)');
   assert.equal(etherClimateAt(h.px + 3, h.py), CLIMATES.Ocean);
   assert.equal(isWaterPixel(etherClimateAt(h.px, h.py), etherHeightByte(h.px, h.py)), false, 'its centre is land to the map');
@@ -227,7 +222,7 @@ test('ETHER-SEA the composition: a prototype child of the reader it is handed - 
   }
   const h = veilhaven();
   assert.equal(g.getHeightMapValue(h.px, h.py), etherHeightByte(h.px, h.py));
-  assert.equal(g.getHeightMapValue(ETHER_BOX.x0 - 64, ETHER_BOX.y0), 0, 'the margin answers the sea');   // PIN MOVED (AUDIT CAPTAIN'S SEA G1): its margin 64
+  assert.equal(g.getHeightMapValue(ETHER_BOX.x0 - 64, ETHER_BOX.y0), 0, 'the margin answers the sea');
   assert.equal(g.getHeightMapValue(ETHER_BOX.x0 - 65, ETHER_BOX.y0), bay.getHeightMapValue(ETHER_BOX.x0 - 65, ETHER_BOX.y0));
   assert.equal(g.etherLaw, inEtherLaw, 'AUDIT CAPTAIN\'S SEA G5: the composition says where it answers the ground itself');
   assert.equal(g.getLargeMapData(VEIL_X + 4, h.py)[0][0] <= 1, true);
@@ -254,7 +249,6 @@ test('ETHER-SEA through the kernel: the open sea all water, every port and ruin 
 });
 
 test('ETHER-SEA the crossing\'s waters: out on the open Abecean - west of CROSS_X, CROSS_LAND_PX pixels and more from any land - and never the sea\'s own; home through the Veil; the Bay\'s mouth the way home\'s fallback (mutants: the west, the land\'s distance, the box\'s refusal)', () => {
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X4): west of the Bay's mouth (its line crosses this row at about 243)
   assert.equal(CROSS_X, 230); assert.equal(CROSS_LAND_PX, 20);
   assert.equal(crossingWaters(200, 300, 20), true);
   assert.equal(crossingWaters(200, 300, 19), false, 'too near land');
@@ -308,7 +302,6 @@ test('ETHER-SEA by source: the host composes the sea over the ground between the
   assert.match(between, /maps\.getPoliticIndex = etherPoliticIndex\(maps\.getPoliticIndex\.bind\(maps\), ETHER_REGION\);/);
   assert.match(between, /StreamingWorldState\.frames = etherSea \? \[etherFrame\(\)\] : \[\];/);
   assert.ok(between.indexOf('woods = groundWoods(woods);') < between.indexOf('woods = etherWoods(woods);'), 'over the continent\'s ground');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G4/G9): the continent's past the map wherever it stands, the sea's in its law, the Bay edge's clamp else
   assert.match(src, /climatePast: tamrielLand \? \(x, y\) => maps\.getClimateIndex\(x, y\)\n\s+: etherSea \? \(x, y\) => maps\.getClimateIndex\(\.\.\.\(inEtherLaw\(x, y\) \? \[x, y\] : \[Math\.max\(0, Math\.min\(MAP_WIDTH - 1, x\)\), Math\.max\(0, Math\.min\(MAP_HEIGHT - 1, y\)\)\]\)\) : null,/);
   const worker = read('src/world/terrain/terrainGenWorker.js');
   assert.match(worker, /import \{ etherWoods \} from '\.\.\/ethericSea\.js';/);
@@ -335,6 +328,5 @@ test('ETHER-LIGHT the light past the Veil: cold and violet - the ambient leaned 
   const src = read('src/scenes/world.js');
   assert.match(src, /const etherAirW = etherPx && inEther\(etherPx\.x, etherPx\.y\) \? 1 : 0;/);
   assert.match(src, /etherLight\(sdBrassLight\(dreadLight\(/, 'the ambient');
-  // PIN MOVED (VALENWOOD-CANOPY): the key leaned green under the leaves after the sea's lean (world/jungle/jungleCanopy.js canopyLight)
   assert.match(src, /etherLight\(sdBrassLight\(dreadLight\(SUN_RIG_COLOR, skyDreadW\), sdAirW\), etherAirW, ETHER_KEY_TINT\), jungle\?\.canopy, 0\)\);/, 'the sun');
 });

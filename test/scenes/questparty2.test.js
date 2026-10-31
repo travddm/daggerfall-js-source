@@ -1,5 +1,4 @@
-// QUEST-PARTY phase 2 (2026-09-26, Mac: "Party shares them" - "then passing enemies to another member if that player
-// leaves"). Phase 1 kept a shared quest's foes with their host: a host that died or walked out of the open country took
+// QUEST-PARTY phase 2. Phase 1 kept a shared quest's foes with their host: a host that died or walked out of the open country took
 // them with it (they were never an heir's), and one whose connection dropped left them to vanish at every member - and
 // a member's copy, whose waves had counted as placed while the host stood them, was left with a quest it could not
 // finish. Now the dying or departing host names a party member heir (never a stranger), an owner gone without a word
@@ -131,7 +130,7 @@ test('QUEST-PARTY 2 executed: an owner gone without a handover leaves its quest\
   assert.equal(cat.p.foes.filter((f) => f.puppet === 'host-0001' || !f.dead).length, 0, 'another member lets them go - it sees them again on the taker\'s stream');
 });
 
-// ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): phase 1-3b's findings over real pools.
+// ---- AUDIT (the pre-merge audit, 2026-09-27): phase 1-3b's findings over real pools.
 const own = (p) => p.foes.filter((f) => !f.puppet && !f.dead);
 const pups = (p, from) => p.foes.filter((f) => f.puppet === from && !f.dead);
 
@@ -243,7 +242,7 @@ test('AUDIT pre-merge Q5 + Q6 executed: a quest foe\'s body offers no pile (its 
   const host = pool('host-0001');
   const [q] = await questFoes(host.p, 1);
   const plain = await host.p.spawnFoe(0, [130, 0, 100], { feetGiven: true, loose: true });
-  for (const f of [q, plain]) { f.dead = true; f.corpse = true; f.entity.items = [{ group: 'Currency', templateIndex: 276, name: 'Gold Pieces', stackCount: 3, value: 3 }]; }   // PIN MOVED (OUTDOOR-LOOT): a piece the loot tables mint - the record's `o` counts the PLACES a peer may take (a piece the wire could not carry is its owner's alone), and `{ name: 'Gold' }` is no item
+  for (const f of [q, plain]) { f.dead = true; f.corpse = true; f.entity.items = [{ group: 'Currency', templateIndex: 276, name: 'Gold Pieces', stackCount: 3, value: 3 }]; }
   const fr = host.p.foesFrame(true);
   const rec = (f) => fr.f.find((r) => r.i === f.seq);
   assert.equal(rec(q).o, 0, 'a quest foe\'s body: no pile - a member\'s press asked again forever');

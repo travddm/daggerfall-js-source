@@ -62,7 +62,7 @@ test('MARKET-KEEP: a crafted piece handed on in a trade, listed by its new holde
   const { s, ann, pack } = await handedOn();
   const sword = pack[0];
   const book = createMarketBook({ door: accountMarket({ fetch: s.fetch, storage: sessionStorageOf(SESSION_KEY, ann) }), storage: memStorage(), character: () => ann.character, sleep: noWait,
-    realm: pinRealmAct(s.env, ann.character) });   // PIN MOVED (INT19): through the realm act
+    realm: pinRealmAct(s.env, ann.character) });
   const r = await book.list({ region: DF, kind: 'piece', provenance: sword.provenance, wear: wearOf(sword), price: 50, hubs: {} }, pieceOf(pack));
   assert.equal(r.error, 'market-not-yours', 'the service\'s own word');
   assert.deepEqual(pack, [sword], 'the very piece back in the pack - it was taken out and never put back');
@@ -72,7 +72,6 @@ test('MARKET-KEEP: a crafted piece handed on in a trade, listed by its new holde
   assert.deepEqual([...PIECE_GONE].sort(), ['market-listed', 'market-standing', 'market-uncollected'], 'the answers that do say it is elsewhere ON THE SERVICE');
 });
 
-// PIN MOVED (INT19, Integrity-Arc section 7): a crafted piece is listed through the realm act now, and nothing of it is kept
 // (the record is the truth: silence ends the session, and a join reads it) - the kept list is a tab's from before, its
 // piece taken out of the pack and its answer never heard, which the settle still asks again with its own id
 test('MARKET-KEEP: a listing kept through silence and asked again by a settle, answered not-yours, is put back - never dropped from the save (mutant: the settle drops it)', async () => {
@@ -97,7 +96,7 @@ test('MARKET-KEEP: a commission filled with a piece whose record names another i
   const pack = [{ provenance: 'c0ffee00c0ffee01', name: 'sword' }];
   const door = { account: () => 'acct-1', fulfil: async () => ({ ok: false, error: 'market-not-yours', status: 409 }) };
   const passing = { act: async ({ reserve, call }) => { const undo = reserve?.(); const r = await call({ id: 'r00000000000000000001', lease: 'l', seq: 1 }); if (!r?.ok) undo?.(); return r; } };
-  const writs = createWritBook({ door, storage: memStorage(), character: () => 'char-a', sleep: noWait, realm: passing });   // PIN MOVED (INT19): through the realm act
+  const writs = createWritBook({ door, storage: memStorage(), character: () => 'char-a', sleep: noWait, realm: passing });
   const r = await writs.fulfil({ region: DF, commission: 'c1', provenance: pack[0].provenance, wear: 1000 }, pieceOf(pack));
   assert.deepEqual([r.ok, r.error, pack.length, writs.pending], [false, 'market-not-yours', 1, 0]);
   // and a settle's: a fill a tab from before kept on silence (INT19: none is kept now), answered not-yours, put back

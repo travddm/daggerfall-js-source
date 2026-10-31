@@ -1,9 +1,9 @@
 // FIELD BUGS 2026-10-19f (DISENCHANT-SAID) - a player's private report: crafted greaves and pauldrons could not be
-// disenchanted. PROF12 (bible/06-Systems/Professions-Arc.md 9.3, 37) gives a piece its DFU template's enchantment points,
+// disenchanted. PROF12 (9.3, 37) gives a piece its DFU template's enchantment points,
 // one Arcane Essence a hundred: Greaves 50, either Pauldron 40 - none at any metal (net/alchemyLaw.js piecePoints,
 // essenceOf), and the service refuses them (server-account/src/alchemy.js, prof-no-essence). The Enchanting Station's
 // list dropped them in the host (scenes/world.js, `essence > 0`), and the page explained only a list with nothing on it,
-// so the greaves vanished without a word. The owner (2026-10-19): "List them greyed with the reason" - no change to the
+// so the greaves vanished without a word. The owner: "List them greyed with the reason" - no change to the
 // law or the service. HOST-SPLIT: the list is made by the page's own module (ui/professions/profPages.js
 // disenchantableOf) and the host keeps one wiring line. Every piece the real producer's (systems/smithItems.js mintPiece).
 import '../chargenDom.mjs';
@@ -53,7 +53,7 @@ function station(pack, book = bookOf()) {
     done() { root?.remove?.(); setProfessionsPages(null); },
   };
 }
-const NONE = 'No crafted piece in your pack has enough enchantment to give Essence.';   // PIN MOVED (the merges of main): VOICE2's words, then PLAIN-SWEEP's
+const NONE = 'No crafted piece in your pack has enough enchantment to give Essence.';
 
 test('DISENCHANT-SAID: the station\'s list keeps a piece under one Essence - the Greaves (50) and Pauldrons (40), at every metal and of chain and leather, Essence 0; a Cuirass 4 and Boots 1 as before; a Disenchanter\'s twice; a form with no points (a dish, a tool), loot, a worn, a locked and a kept piece left off (mutants: the essence filter back; a form with none listed; the Disenchanter unread)', () => {
   const [greaves, lp, rp, cuirass, boots, chain, leather, stew, pick, worn, locked, kept] = ['greaves:iron', 'lpauldron:iron', 'rpauldron:silver', 'cuirass:iron',

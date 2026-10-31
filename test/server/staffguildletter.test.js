@@ -1,5 +1,4 @@
-// GUILD-LETTER-FIX (2026-10-25, mob: a player's level 10 Lyrezi vampire never had the Dark Brotherhood's letter - the
-// tally at InviteSent, no letter pending, The Acceptance Test nowhere in the save; "do it") - THE STAFF PANEL SENDS A
+// GUILD-LETTER-FIX - THE STAFF PANEL SENDS A
 // CRIME GUILD'S LETTER AGAIN, OR CALLS ONE OFF: /v1/staff/fix/letter { id, ticket, guild, op, note }, an Admin's
 // (server-account/src/staffRealm.js), the review's `letter` act (review.js letterAct, staffMend) over its law
 // (net/repairLaw.js guildLetterOf, applyGuildLetter) - and the game's own letter (systems/crimeGuilds.js) sends what the

@@ -1,4 +1,4 @@
-// L10N3c (2026-09-27): A QUEST IN A TRANSLATION'S OWN WORDS. Parser.ParseLocalized's law over a -LOC file (the
+// L10N3c: A QUEST IN A TRANSLATION'S OWN WORDS. Parser.ParseLocalized's law over a -LOC file (the
 // DisplayName, fixed and numbered messages, an author's empty line kept as ' ', QBN ignored, and the throws where the
 // C# throws); ParseLocalizedQuestText filling the language's Internal_Quests only where it has no entry; GetMessage
 // reading the translation into the same Message every time it is asked (ReplaceMessage); ParseQuest's tail taking the

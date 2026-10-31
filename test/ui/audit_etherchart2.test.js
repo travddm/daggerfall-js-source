@@ -1,5 +1,4 @@
-// AUDIT ETHER-CHART2 (2026-10-12, the owner: "Audit and ensure absolute perfection and detail";
-// bible/01-Overview/audits/Audit-Ether-Chart2.md) - the chart of the Eltheric Ocean read by cold lanes on frozen snapshots and
+// AUDIT ETHER-CHART2 - the chart of the Eltheric Ocean read by cold lanes on frozen snapshots and
 // rendered in Chromium (tools/etherChartProbe.mjs). These pins hold what the audit fixed that the chart's own suite
 // (test/ui/etherchart2.test.js, its moved pins) does not: the window's room, the world's edge, the scale in the key, the
 // face that lands late, the room watched, the card. tools/mutants/audit_etherchart2.json.

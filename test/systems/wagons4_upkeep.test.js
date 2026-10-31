@@ -1,13 +1,12 @@
-// WAGONS4 (2026-10-11, the owner: "Wagons have durability and require upkeep to keep from breaking down and becoming
-// unusable") - WAGON UPKEEP (bible/06-Systems/Wagon-Upkeep.md): the law (systems/wagon/wagonUpkeep.js) - a wagon's soundness
+// WAGONS4 - WAGON UPKEEP: the law (systems/wagon/wagonUpkeep.js) - a wagon's soundness
 // off the condition it always carried, what wears it, what mends it and what it costs; the runtime's wear by the metres
-// rolled and the journey's days (systems/upkeep/upkeepRuntime.js); WAGON-MEND (2026-10-12): no wagon ever broken - worn to
+// rolled and the journey's days (systems/upkeep/upkeepRuntime.js); WAGON-MEND: no wagon ever broken - worn to
 // Failing at the worst, slow and still driven; the Wagon Yard's Mend (systems/merchantYards.js, scenes/merchantYardsHost.js, scenes/world.js mendAtYard) and its kits; a smith's
 // counter refusing a horse and a wagon (systems/repairService.js); and the hosts wiring it.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS / WAGON-TIERS (PIN MOVED): the upkeep is handed each tier's rules - these pins pin the system as it stood, Hard
+import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';     // HORSE-TIERS / WAGON-TIERS (
 import { readFileSync } from 'node:fs';
 import {
   wagonCondition, wagonConditionMax, wagonSoundness, wagonState, WAGON_STATES, rollWear, journeyWear, wearWagon, WEAR_FLOOR,

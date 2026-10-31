@@ -1,11 +1,9 @@
-// CRAFT-HOLD (2026-10-11, the exploit audit the owner asked for: "Can we look deep for duping"). INT3 holds a realm
+// CRAFT-HOLD. INT3 holds a realm
 // character's trade (a breach of the law, or staff's hand) - and its crafted pieces were listed, auctioned, handed to a commission's
 // poster and disenchanted under ANY other character id: realmHoldOf asks the acting character alone and answers null for
 // an id that is no realm id, while a crafted piece is the account's (`products.owner`). And a commission filled asked
 // no hold at all. The hold now follows the piece (realm.js craftHoldOf: the realm character its maker's record names).
-// PIN MOVED (AUTO-HOLD, 2026-10-16): the hold the cases set is staff's, where it was the copies' - no verdict writes that
 // one now.
-// PIN MOVED (INT19, 2026-10-17, Integrity-Arc section 7): a listing, an auction and a commission's fill take the piece out
 // of the acting character's REALM RECORD (server-account/src/craftedPiece.js) - so another character's name lists nothing
 // ('realm-needed'), and the acting record's own hold is the one asked; the maker's hold (craftHoldOf) stands for the
 // disenchant's character with no record alone, and is pinned there.
@@ -53,7 +51,6 @@ test('CRAFT-HOLD a held realm character\'s crafted piece lists and auctions unde
     assert.equal(r.status, 409);
     assert.equal(r.body.error, 'trade-held', 'its own record held');
   }
-  // PIN MOVED (INT19): another character's name holds no record of the piece - it lists and auctions nothing
   for (const r of [await list('char-anything', P(0xa1)), await auction('char-anything', P(0xa2))]) {
     assert.deepEqual([r.status, r.body.error], [400, 'realm-needed'], 'whatever character the act names');
   }
@@ -86,7 +83,6 @@ test('CRAFT-HOLD a held character\'s craft is disenchanted to the Stores under n
   const { s, raw, eve, E, piece, hold } = await stand();
   piece(P(0xc1));
   hold('staff');
-  // PIN MOVED (INT16, Integrity-Arc section 7): a disenchant is a progression claim (its XP), asked of the account's
   // SEATED realm character before the route reads a word (progress.js progressRefusal) - another character's name is
   // refused 'progress-seat', and the held maker itself, the seat here, 'trade-held' at that gate
   const r = await s.call('/v1/prof/disenchant', { character: 'char-anything', provenance: P(0xc1), rid: rid() }, eve.secret);
@@ -112,7 +108,7 @@ test('AUDIT CRAFT-HOLD a held character with crafts at the account is not delete
   assert.ok(raw.prepare('SELECT 1 FROM realm_characters WHERE id = ?').get(E.id), 'the row and its hold stand');
   holdPieces(s.env, E.id, [{ provenance: P(0xd1) }]);
   const list = await s.call('/v1/market/list', { character: E.id, region: DF, kind: 'piece', provenance: P(0xd1), wear: 1000, price: 500, hubs: HUBS, rid: rid(), currency: 'marks' }, eve.secret);
-  assert.equal(list.body.error, 'trade-held', 'and its craft still lists for nothing');   // PIN MOVED (INT19): out of its own record, held
+  assert.equal(list.body.error, 'trade-held', 'and its craft still lists for nothing');
   hold(null);
   assert.equal((await s.call('/v1/realm/delete', { id: E.id }, eve.secret)).status, 200, 'lifted, it goes as any other');
   // a held character with no piece of its make at the account: its Stores go with its row, nothing escapes - it goes
@@ -123,7 +119,6 @@ test('AUDIT CRAFT-HOLD a held character with crafts at the account is not delete
 
 test('AUDIT CRAFT-HOLD the hold is a HOLD alone and the account\'s own: an unheld maker unjudged or dead refuses no sibling, another account\'s buyer of a held maker\'s piece is never refused, and a piece made before customs follows its customs character (mutants: record-unjudged refused; the account guard dropped; the origin unread)', async () => {
   const { s, raw, eve, E, piece, hold } = await stand();
-  // PIN MOVED (INT19): the maker's hold is the disenchant's alone now, for a character with no record - asked as the route
   // asks it (index.js ROUTES), behind the progression gate (INT16), as the disenchant's own pin above asks it
   const disenchant = (who, character, provenance) => disenchantPiece({ db: s.env.DB, primary: s.env.DB, nowS: _now, rand: (b) => crypto.getRandomValues(b), bucket: s.env.SAVES },
     raw.prepare('SELECT * FROM players WHERE id = ?').get(who.id), s.env, { character, provenance, rid: rid() });

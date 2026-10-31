@@ -1,7 +1,6 @@
-// VALENWOOD-CANOPY (2026-10-24, bible/03-World/Tamriel-Biomes.md "Valenwood's closed canopy"; the owner: "i want
-// valenwood to have no sky like the trees will cover it up") - Valenwood's forest stands the jungle under a closed canopy:
+// VALENWOOD-CANOPY - Valenwood's forest stands the jungle under a closed canopy:
 // the zones, the canopy's law (world/jungle/jungleCanopy.js), the jungle's host's frame, and the wiring of the water's
-// sky and the world host's light. GRAHT1 (bible/03-World/Graht-Oaks.md) retired the ceiling of leaves (render/canopySky.js)
+// sky and the world host's light. GRAHT1 retired the ceiling of leaves (render/canopySky.js)
 // for the graht-oaks themselves - their pins are test/world/graht1_oaks.test.js; the ceiling's two tests went with it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +33,6 @@ test('VALENWOOD-CANOPY: Valenwood\'s forest - Grahtwood, Malabal Tor, Greenshade
 });
 
 test('VALENWOOD-CANOPY: the law - the share across the line, under the crowns\' underside to their tops, eased and snapped; the light, the moon, the fog and the water under it', () => {
-  // PIN MOVED (GRAHT1): the canopy's top is the graht-oaks' - their crowns' underside (80 m) to their tops (190 m); it was
   // the emergents' 34 and 18 over them
   assert.deepEqual([JUNGLE_CANOPY.edge.out, JUNGLE_CANOPY.edge.in, JUNGLE_CANOPY.height, JUNGLE_CANOPY.above], [0, 600, 80, 110]);
   assert.deepEqual([canopyShare(-10), canopyShare(0), canopyShare(300), canopyShare(600), canopyShare(5000)], [0, 0, 0.5, 1, 1]);
@@ -66,7 +64,6 @@ test('VALENWOOD-CANOPY: the law - the share across the line, under the crowns\' 
   assert.ok(Math.abs(m.color[0] - 0.6 * JUNGLE_CANOPY.tint[0]) < 1e-6, 'its colour leaned, not dimmed twice');
   const fog = canopyFog([0.8, 0.8, 0.8], 1);
   for (let c = 0; c < 3; c++) assert.ok(Math.abs(fog[c] - 0.8 * (1 - JUNGLE_CANOPY.fog) * JUNGLE_CANOPY.tint[c]) < 1e-6, 'the air under the leaves');
-  // PIN MOVED (GRAHT1): the leaves the water mirrors (canopyLeaves) - the ceiling's eight uniforms (its eye's place, its
   // height, its open share) retired with it: the leaves lit by the fog, the weight
   const u = canopyLeaves(0.7, [0.5, 0.5, 0.5]);
   assert.equal(u.length, 4);

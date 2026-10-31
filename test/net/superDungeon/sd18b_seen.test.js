@@ -1,5 +1,4 @@
-// SD18b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18b;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MARKS, SEEN (ui/superDungeon/sdMarksView.js) - its Ending
+// SD18b: THE HOUR'S MARKS, SEEN (ui/superDungeon/sdMarksView.js) - its Ending
 // and its omens as the gate shows the Warden's: the gate's own card as a fighter steps into the Hour, a row under the
 // Remnant's bar all fight long, each in the Hour's own signs; its wake's card naming the Ending it keeps; its own blows'
 // colours leaning to its element and its brass burning in it (rimed, charged, venomed, soul-lit - the gate's grains); a
@@ -47,7 +46,7 @@ test('SD18b THE MARKS AS THEY ARE SHOWN: the Ending first - its signature, its e
   assert.equal(sdMarksViewOf(MK), v, 'kept');
   assert.equal(sdMarksViewOf(['nowhere', 'twin', 'short']), null); assert.equal(sdMarksViewOf(null), null);
   assert.match(sdMarksViewOf(['daggerfall', 'twin', 'short']).aspect.tip, /^Resist shock /, 'Lightning resisted as shock');
-  // AUDIT SD III (T17, PIN MOVED): no omens' line - the bar draws the row alone (sdOmensLine went with `trials`)
+  // AUDIT SD III (T17
   // every mark its sign and its tip; every element a word
   for (const m of [...SD_ENDINGS, ...SD_OMENS]) { assert.ok(SD_MARK_ICONS[m.id]?.d, `${m.id}: a sign`); assert.ok(SD_MARK_TIPS[m.id], `${m.id}: a tip`); }
   assert.ok(SD_ENDINGS.every((E) => SD_ELEMENT_WORD[E.el]));
@@ -84,7 +83,7 @@ test('SD18b UNDER ITS BAR AND ON ITS WAKE: the row of its marks and the omens\' 
   assert.deepEqual([bar.title, bar.epithet], ['The Walking Hour', ''], 'its phase over the row');
   const plain = newRemnantFight(4, 1, T0); joinRemnant(plain, 'a', 'A', 30, T0);
   const P = createSdFightLink({ now: () => T0 + 20_000 }); P.word(validSdOut({ ...remnantStateOf(plain), me: 1 }));
-  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);   // AUDIT SD III (T17, PIN MOVED): and no `trials`
+  assert.equal(remnantBarModel(P.state(), T0 + 20_000).marksView, null);     // AUDIT SD III (T17
   // the wake
   assert.deepEqual(sdWakeText(MK), { ...SD_BEAT_TEXT.wake, sub: 'The Turning Tide - the Ending of Wayrest' });
   assert.equal(sdWakeText(null), SD_BEAT_TEXT.wake);
@@ -146,12 +145,12 @@ test('SD18b A STRIKE IN ITS ELEMENT: softened by my resistance (the save door - 
 test('SD18b THE HALL: the Ending\'s own stone lit in its light, breathing on the hall\'s clock - in the Hour\'s light channel; the fray\'s arc round once by the Hollow\'s own snap (the Fraying\'s thirty-six)', () => {
   const slot = 5, E = sdEndingOf(sdMarksOf(slot)), k = SD_STONES.findIndex((s) => s.key === E.id);
   const L0 = sdEndingStoneLight(slot, 0), L1 = sdEndingStoneLight(slot, 1);
-  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);   // AUDIT SD III (V3, PIN MOVED): before its face, at its dial
+  const P = stonePoint(k, 0, SD_STONE_LIGHT.up, SD_STONE_LIGHT.out), d = realmToDungeon(P[0], P[1], P[2]);     // AUDIT SD III (V3
   assert.deepEqual([L0.x, L0.y, L0.z, L0.range, L0.stone], [d[0], d[1], d[2], SD_STONE_LIGHT.range, k]);
   assert.ok(L0.color.every((v, i) => near(v, E.light[i] * SD_STONE_LIGHT.gain * (1 - SD_STONE_LIGHT.breathe))));
   assert.ok(L1.color[0] !== L0.color[0], 'breathing');
   assert.equal(sdEndingStoneLight(null, 0), null);
-  // the fray by the Hollow's own snap - PIN MOVED (SD-LOOK S10): its TABS, one up a turn, as many round the rim as its snap
+  // the fray by the Hollow's own snap
   // has turns (the arc's steps scaled to them were the old reading)
   const fraySlot = [...Array(216).keys()].map((x) => x + 1).find((sl) => sdMarksOf(sl).includes('fraying'));
   const plainSlot = [...Array(216).keys()].map((x) => x + 1).find((sl) => !sdMarksOf(sl).includes('fraying'));

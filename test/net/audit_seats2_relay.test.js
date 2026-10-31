@@ -1,4 +1,4 @@
-// AUDIT SEATS-2 (2026-10-02, Mac: "Can we do a deep comprehensive audit on everything") - THE RELAY'S LANE: the relay's
+// AUDIT SEATS-2 - THE RELAY'S LANE: the relay's
 // own fighters answer whoever strikes them and are struck from nowhere they could never answer (R1); a work blow's field
 // frame says them where they stand (R2); the Throne's seconds never outrun the wire's bound (R3). Over the real Room and
 // its fake sockets (test/fakeRoom.mjs). `06-Systems/Online-Arc.md` AUDIT SEATS-2.

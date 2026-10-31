@@ -1,6 +1,5 @@
-// DISC10 - three Discord reports, fixed before the survival-tiers branch merges (2026-09-23, Mac: "Before we push
-// this can you fix these"). Each was reproduced in node against the real modules before it was touched; each pin
-// here fails at 110bce52 and passes with its fix (bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC10).
+// DISC10 - three Discord reports, fixed before the survival-tiers branch merges. Each was reproduced in node against the real modules before it was touched; each pin
+// here fails at 110bce52 and passes with its fix (, DISC10).
 //
 // ── DISC10-B: "Npc was supposed to mark it on the map. It is not on the map when I look." (Starempire42) ──
 // Where is -> Person -> "... Right here. You can see The Woodfield Residence on your map" and the town map

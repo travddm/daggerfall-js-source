@@ -1,6 +1,6 @@
 // AUDIT TESA II (lane G) - the zones past the Bay: Vvardenfell's lowland hearts about Red Mountain's own summit and the
 // Grazelands (G6, L25); a zone's border bending through the trace's province border (J4). Where ARENA2_PATH names the data,
-// on the player's own trace. bible/03-World/Tamriel-Biomes.md.
+// on the player's own trace..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

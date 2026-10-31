@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// ROAD-G G1 - THE FOE POOLS' THREE REMAINDERS (2026-09-04).
+// ROAD-G G1 - THE FOE POOLS' THREE REMAINDERS.
 //
 // Audit 58 left three, each recorded at its site rather than flagged,
 // and all three were the same shape: a LAW the port already owned,

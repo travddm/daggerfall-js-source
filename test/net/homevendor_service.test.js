@@ -1,6 +1,4 @@
-// HOME-VENDOR (2026-10-03, Mac: "add the ability for players that own houses to buy npcs that sell goods for them when
-// someone visits the house ... make the available npcs visible on the board with a tab and item search filter"; "Yes
-// only in the house ... set a waypoint where the trader is ... Selfplaced npcs should sell stuff waaaaay longer"). A
+// HOME-VENDOR. A
 // home's decor piece made the `vendor` station stocks its owner's pieces from the pack, for gold, for thirty days; they
 // stand on no regional board and are bought at the trader alone. Driven through the real Worker over node:sqlite with
 // every migration applied and R2 beside it (test/accountDb.mjs, test/realmSeat.mjs).

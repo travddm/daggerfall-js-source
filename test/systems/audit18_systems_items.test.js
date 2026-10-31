@@ -227,7 +227,7 @@ test('audit18 items: RandomizeArmorVariant verbatim, and the shelf takes its rol
   // the variant roll second (ApplyArmorSettings' tail).
   // .95 -> plate, .99 -> Dwarven (0x0204), .9 -> Range(1,4) = 3.
   const one = stockShopShelf({ buildingType: BUILDING_TYPES.Armorer, quality: 20 }, { level: 5, gender: 'male' }, { rolls: seq(0, 0.95, 0.99, 0.9, 0.999) });
-  assert.deepEqual(one.filter((i) => i.templateIndex !== 131), [{ group: 'Armor', templateIndex: 102, material: 0x0204, variant: 3, name: 'Cuirass', value: 4800, maxCondition: 12288, currentCondition: 12288 }]);   // AUDIT 23 (items-5): plate scales 4096 x 12/4   // PIN MOVED (SHOP-ARROWS): the Armorer's counter carries a quiver (Arrow, 131) beside it, from no roll   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): and no Dwemer Pellet - SHOP-PELLETS' shot is off the counter
+  assert.deepEqual(one.filter((i) => i.templateIndex !== 131), [{ group: 'Armor', templateIndex: 102, material: 0x0204, variant: 3, name: 'Cuirass', value: 4800, maxCondition: 12288, currentCondition: 12288 }]);     // AUDIT 23 (items-5): plate scales 4096 x 12/4   //
   assert.deepEqual(one.filter((i) => i.templateIndex === 131).map((i) => i.stackCount), [29], 'SHOP-ARROWS: nor the quiver');
 });
 
@@ -357,6 +357,6 @@ test('audit18 items: every minted shop/loot row carries the template ItemName', 
   // spot pins straight off ItemTemplates.txt
   const gs = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 20 }, { level: 5, gender: 'male' }, { rolls: () => 0.4 });
   assert.equal(gs.find((i) => i.templateIndex === OIL_TEMPLATE).name, 'Oil');
-  assert.equal(yardStock('stable').find((i) => i.templateIndex === 94).name, 'Horse');   // PIN MOVED (MERCHANT-YARDS, 2026-10-10): the horse is the Stable's row now, minted as a shelf mints one
+  assert.equal(yardStock('stable').find((i) => i.templateIndex === 94).name, 'Horse');
 });
 

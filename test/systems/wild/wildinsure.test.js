@@ -1,6 +1,4 @@
-// WILD-INSURE and REPEAT-SHIELD (2026-10-26, the owner: "Overhauling the open PvP to be a bit more palatable, being able to
-// insure gear on death ... while retaining its punishment"; asked, "Kept, policy spent" at "20% of worth", and the
-// "Repeat-kill shield" - bible/11-Multiplayer/Wild-Zone.md sections 4b and 4c). A policy on a piece of gear is written by
+// WILD-INSURE and REPEAT-SHIELD. A policy on a piece of gear is written by
 // the account service against its premium off the record (server-account/src/wildInsure.js) and keeps that piece from a
 // kill in the zone - never offered to the killer, never dropped - once in force; the kill spends it
 // (server-account/src/wild.js). A kill by the same hand inside half an hour takes nothing at all. Every piece here is the

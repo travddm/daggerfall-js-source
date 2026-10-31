@@ -1,5 +1,4 @@
-// FORAGE1-FORAGE2 - FORAGING 1.7 (Harbinger451), THE LAW (2026-09-28, Mac: "Heres this for life skills";
-// "Your lead"). bible/06-Systems/Foraging.md is the record. The pins hold src/systems/foraging/foragingLaw.js to the
+// FORAGE1-FORAGE2 - FORAGING 1.7 (Harbinger451), THE LAW. is the record. The pins hold src/systems/foraging/foragingLaw.js to the
 // mod's own build: every line it speaks is one of the IL's string literals, the templates are the vendored
 // rows, every table is the IL's (FORAGE0 section 6, read off <PrivateImplementationDetails> and the inline
 // stelem arrays), every check comes in its tool's order, and FORAGE-FIX patches only the lines it names.

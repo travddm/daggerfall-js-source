@@ -1,4 +1,4 @@
-// VEIL-PARTY (2026-10-27, the SEA-OPEN slice; bible/03-World/Eltheric-Ocean.md VEIL-PARTY): a party crosses the Veil
+// VEIL-PARTY: a party crosses the Veil
 // together - the captain's crossing no longer held back by her party aboard (comeSailAwayAboard.js passengersOn's skip,
 // world.js crossRefusal), and a member aboard her follows her crossing (scenes/naval/veilParty.js) by the party's own
 // journey, landing beside her captain. The picture is net/social.js's own SocialState. tools/mutants/seaopen.json (VEIL-).
@@ -26,11 +26,10 @@ function rig({ aboard = 'peer-capt', ready = true } = {}) {
   const w = { now: 0, here: { x: 150, y: 300 }, capt: { x: 150, y: 300 }, aboard, ready, said: [], trips: [], went: true };
   let social = picture(w.capt);
   const vp = createVeilParty({
-    social: () => social, aboard: () => (w.aboard ? { owner: w.aboard } : null), here: () => w.here,   // `across` left out: the module's own Veil law (world/ethericSea.js inEther) - PIN MOVED (the host's ceiling)
+    social: () => social, aboard: () => (w.aboard ? { owner: w.aboard } : null), here: () => w.here,     // `across` left out: the module's own Veil law (world/ethericSea.js inEther)
     ready: () => w.ready, now: () => w.now, say: (l) => w.said.push(l),   // `now` the page's wall clock: AUDIT HORIZONTAL C5, the window never reads it
     travel: (pick, opts, computed) => { w.trips.push({ pick, opts, computed }); return Promise.resolve(w.went); },
   });
-  // PIN MOVED (AUDIT HORIZONTAL C5): a step is a frame the world steps, `ms` long - the wall clock and the window both
   return { w, vp, cross: (to = { x: LAND.px, y: LAND.py }) => { w.capt = to; w.aboard = null; social = picture(to); }, step: (ms = 100) => { w.now += ms; vp.step(ms / 1000); } };
 }
 const settle = () => new Promise((res) => setImmediate(res));

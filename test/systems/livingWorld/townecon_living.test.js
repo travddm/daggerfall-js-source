@@ -16,7 +16,7 @@ import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
 import { PERSON_MOVE_SPEED } from '../../../src/characters/mobile/mobilePerson.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2: the world host whole
 
-// TOWN-ECON TE3 (2026-10-18, bible/06-Systems/Town-Economy-Arc.md section 5; Mac: "Everything") - THE LIVING WORLD READS
+// TOWN-ECON TE3 - THE LIVING WORLD READS
 // THE BAND: the townsfolk's talk of trade, the market days, and the chapters' patrons on the town's card.
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -137,7 +137,7 @@ test('TOWN-ECON TE3 the chapters\' patrons on the town\'s card: the region\'s ch
   const host = createTownEconHost({ online: () => true, townOf: (id) => towns.get(id), seatAt: () => null, seats: () => [], raidedAt: () => false, nowMs: () => 1_800_000_000_000,
     door: null, chapters: sheet });
   const card = host.tipAt(11);
-  assert.match(card.lines.at(-1), /^Chapter patrons in the region: Ebon Oath <EO>, Iron Wolves <IW>$/);   // PIN MOVED (AUDIT TOWN-ECON 2 LIV-11): the region's
+  assert.match(card.lines.at(-1), /^Chapter patrons in the region: Ebon Oath <EO>, Iron Wolves <IW>$/);
   const bare = createTownEconHost({ online: () => true, townOf: (id) => towns.get(id), seatAt: () => null, seats: () => [], raidedAt: () => false, nowMs: () => 1_800_000_000_000, door: null });
   assert.ok(!bare.tipAt(11).lines.some((l) => l.startsWith('Chapter patrons')), 'no sheet, no line');
   const four = [PAT('a', 'A', 'A'), PAT('b', 'B', 'B'), PAT('c', 'C', 'C'), PAT('d', 'D', 'D')];

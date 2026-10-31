@@ -1,5 +1,4 @@
-// GUILD-SEEN (2026-10-11, the owner: "the guild member list needs a 'last online' info, just like the friend list
-// does"): THE ROSTER SAYS WHEN EACH MEMBER WAS LAST ONLINE. The service's view carries each member's `seenAt` - the
+// GUILD-SEEN: THE ROSTER SAYS WHEN EACH MEMBER WAS LAST ONLINE. The service's view carries each member's `seenAt` - the
 // account's last play beat (ACC4's `played_at`), or its last authenticated call where it never beat - driven through
 // the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js viewOf); the book's law
 // over it (net/guild/guildBook.js guildMemberOnline, guildSeenText) and a look that moves a stamp alone repainting nothing;

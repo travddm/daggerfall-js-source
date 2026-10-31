@@ -1,12 +1,10 @@
-// GATE-RELOAD (2026-09-26, volo on Discord: "the oblivion gate is bugged rn" - "you cant enter it" - "it kicks you out
-// instantly"): AN OUTDATED GAME IS TOLD TO RELOAD, NOT THAT AN OPEN GATE IS CLOSED. AUDIT WBX R7 (world116, deployed
+// GATE-RELOAD: AN OUTDATED GAME IS TOLD TO RELOAD, NOT THAT AN OPEN GATE IS CLOSED. AUDIT WBX R7 (world116, deployed
 // 21:12 UTC) refuses the `in` of a game that does not know the brain's law in the one refusal word such a game acts on -
 // "the gate is closed" - and every game loaded before that deploy (a tab left open, a desktop copy whose update waits for
 // the app to quit) walked into the court, was refused and was thrown out before the gate a second later, reading "The
 // gate is closed." in front of an open gate. Reproduced in a real browser against the real Room: the build before the
 // deploy (c0093f70) is thrown out so; this build's own `in` fights. The relay says that word in a `no` for R7 alone (a
 // window that has ended is refused at the hello, as an `error`), so the client reads it as what it means. Design:
-// bible/11-Multiplayer/World-Bosses.md section 12.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

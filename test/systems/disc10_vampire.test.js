@@ -1,6 +1,5 @@
 // DISC10-D - THE VAMPIRE, DRIVEN THROUGH THE LIVE DOORS.
 //
-// Mac (2026-09-23): "vampires and werewolf. I think these systems are completely broken and not wired correctly".
 // These pins EXECUTE the port's own modules the way a host drives them - playerTicker's days through the real
 // worldTick, the real infection host seam (scenes/shared.js wireInfectionVideos), the real encounter and watch pools
 // with the real PlayerWeapon - and each failed on the code that shipped (DISC10 audits, HEAD e09a775d0):

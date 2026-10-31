@@ -1,8 +1,8 @@
-// PROF1 (2026-09-28, Mac: "Begin!") - THE PROFESSIONS' SERVICE: the switch and the wall, a character's state, a
+// PROF1 - THE PROFESSIONS' SERVICE: the switch and the wall, a character's state, a
 // harvest (the law's node, the day, the hour, the rank, the cap, the Stores' room, the witnessed pixel), a request asked
 // twice, a withdrawal (bought first), the Court writs (posted from witnessed ground, taken whole by the first, three a
 // day, the pay struck), and a specialisation (free, then 1,000 Marks and a week). Driven through the real Worker over
-// node:sqlite (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 22.
+// node:sqlite (test/accountDb.mjs). 22.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -84,7 +84,6 @@ test('PROF1 service: a character\'s state - ten tracks at nothing (CRAFT3: thirt
   const s = await stand();
   const mac = await s.seated('Mac');
   const r = (await s.call('/v1/prof/state', { character: mac.character }, mac.secret)).body;
-  // PIN MOVED (CRAFT3): the state lists the ten tracks - the five crafts, not the eight disciplines - in the tab's order
   assert.deepEqual(r.tracks.map((t) => t.profession), ['mining', 'logging', 'herbalism', 'hunting', 'fishing', 'smithing', 'building', 'outfitting', 'provisioning', 'enchanting']);
   assert.deepEqual(r.tracks.find((t) => t.profession === 'herbalism'), { profession: 'herbalism', xp: 0, rank: 0, specs: { 50: null, 100: null }, respec: null });
   assert.deepEqual([r.stores, r.taken, r.today, r.writs], [[], [], {}, { today: 0, max: 3 }]);
@@ -144,7 +143,6 @@ test('PROF1 service: the day and the node are the law\'s - yesterday\'s node lap
   assert.deepEqual(await post({ node: 'tree:1:1:1:0', kind: 'herbs' }), { error: 'prof-kind' }, 'PROF4: a tree is Logging\'s - logs, never herbs');
   assert.deepEqual(await post({ kind: 'logs' }), { error: 'prof-kind' });
   assert.deepEqual(await post({ climate: 223 }), { error: 'prof-pixel' }, 'the sea grows no herbs');
-  // PIN MOVED (ANY-HOUR, 2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"):
   // 02:00 on the shared clock refused (`prof-night`) and 07:00 was day (FORAGE0 14.3); now no hour is refused
   const night = secondAt(utcDay(_now) * DAY + 60, 2);
   clock(night);
@@ -166,7 +164,6 @@ test('PROF1 service: the rank - an uncommon herb wants Herbalism 10; unbruised i
   assert.equal(bruised.body.xp, 30, 'a bruise is never clean, whatever the report says');
   const c = patchOfTier(1);
   const common = await s.call('/v1/prof/harvest', harvestBody(mac, c, { act: { clean: true, bruised: true } }), mac.secret);
-  // PIN MOVED (2026-10-01 part four, HERB-XP - Mac: "XP follows your rank"): picked at the rank's tier, 2 at rank 10
   assert.equal(common.body.xp, 30, 'a common herb comes up by hand: no moment, no bruise - 15 x 2, never the clean act\'s +50%');
 });
 
@@ -178,7 +175,6 @@ test('PROF1 service: no day\'s cap (CAP-OFF) - sixty harvests a character today 
     VALUES (?, ?, 'herbs', ?, ?, 'herbalism', 'p1:9', 1, 15, ?, ?, 'x')`);
   for (let i = 0; i < 60; i++) ins.run(day, `herb:1:1:${day}:${i}x`, mac.id, mac.character, _now, `seed-${i}-xxxx`);
   const p = patchOfTier(1);
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the sixty-first was refused, `prof-cap`
   const past = await s.call('/v1/prof/harvest', harvestBody(mac, p), mac.secret);
   assert.equal(past.status, 200, JSON.stringify(past.body));
   assert.equal(past.body.today, 61, 'the sixty-first credited, the day counted on');
@@ -217,7 +213,7 @@ test('PROF1 service: the witnessed pixel - three accounts a week old agreeing co
   const liar = await s.seated('Eve');
   const r = await s.call('/v1/prof/harvest', harvestBody(liar, p, { region: DAGGERFALL }), liar.secret);
   assert.deepEqual([r.status, r.body], [409, { error: 'prof-pixel' }], 'the confirmed answer stands');
-  assert.deepEqual((await s.call('/v1/prof/pixels', { character: liar.character, pixels: [[8192, 1]] }, liar.secret)).body, { error: 'bad-pixels' });   // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): past the world's grid - a province's pixel past the Bay's map is ground
+  assert.deepEqual((await s.call('/v1/prof/pixels', { character: liar.character, pixels: [[8192, 1]] }, liar.secret)).body, { error: 'bad-pixels' });
 });
 
 // ─── WITHDRAW TO THE PACK ────────────────────────────────────────────
@@ -267,7 +263,7 @@ test('PROF1 service: Court writs - a region posts none until its ground is witne
     assert.ok(w.tier <= 2, 'an unconfirmed pixel\'s ground asks tiers 1-2 only');
   }
   assert.deepEqual((await list()).writs, l.writs, 'the day\'s writs never change under the players');
-  assert.deepEqual((await s.call('/v1/writs/list', { character: mac.character, region: 71 }, mac.secret)).body, { error: 'bad-region' });   // PIN MOVED (WW7-5): past the world's regions
+  assert.deepEqual((await s.call('/v1/writs/list', { character: mac.character, region: 71 }, mac.secret)).body, { error: 'bad-region' });
 });
 
 test('PROF1 service: a Court writ taken - filled whole from the Stores (bought first), the pay struck as a `writ` line, twice the pay in Herbalism XP, the Renown credited; asked twice it is one; another\'s is taken; three a day', async () => {

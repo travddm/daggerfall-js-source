@@ -1,7 +1,7 @@
-// SEA-DROPS (2026-10-23, the owner: "while at sea players encounter on and off persistent frame drops"): a mover's
+// SEA-DROPS: a mover's
 // bucket - a boat's, carried by her turn and her way (AUDIT NAV1 #12) - is handed to a query only where its box, as it
 // stands, reaches the query's; a posed one's box is made once a move (the world host's sync asks posesMoved) and kept.
-// Measured in the real game (bible/07-Rendering/Performance-Priority.md SEA-DROPS): at sea every ray of the deep's foes
+// Measured in the real game (SEA-DROPS): at sea every ray of the deep's foes
 // asked every bucket of my boat and of each ship within COLLIDE_RANGE - 101 of them - and a fresh water's spawns cast
 // 2,400-3,200 rays a frame. These pin that every answer is the old walk's, and the work the new one leaves.
 import { test } from 'node:test';

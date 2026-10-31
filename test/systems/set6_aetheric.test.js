@@ -1,5 +1,4 @@
-// SET6 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 6; Mac: "Boss kills has the chance of
-// dropping a rare boss themed weapon/armor set with the rarity Atheric (new)"): AETHERIC, AND RUHN'S REGALIA. The ladder's
+// SET6: AETHERIC, AND RUHN'S REGALIA. The ladder's
 // new rung under the Artifact - its place, its colour, never rolled; the nine Regalia records and their mint (Daedric,
 // known, a sigil of their set, a price, every field a declared one); the whole set worn; the drop - the spoils' LAST
 // roll, so every earlier spoils is what it was for its seed; the floor, the card, the wire.
@@ -157,10 +156,9 @@ test('SET6 the drop: the spoils\' LAST roll - a Regalia piece a sixth of the tim
     const b = before(seed, 12);
     assert.equal(s.gold, b.gold, `seed ${seed}: the gold`);
     assert.deepEqual(s.pieces.slice(0, 3).map((p) => p.item.name), b.names, `seed ${seed}: the three graded pieces`);
-    // LOOT2/LOOT4 (bible/06-Systems/Loot-Arc.md sections 4 and 6): an Exalted Legendary's extra line and a Magic's or a
+    // LOOT2/LOOT4: an Exalted Legendary's extra line and a Magic's or a
     // Rare's line that does something are drawn AFTER everything and appended - the lines before them are still the
     // seed's, exactly
-    // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): and a weapon's technique line, the door's very last draw, is
     // set aside first - an Exalted's line is the last line before it
     const own = (it) => it.affixes?.filter((a) => !isTechniqueAffix(a));
     const drawn = (it) => (it.exalted ? own(it).slice(0, -1) : own(it)?.filter((a) => !isProcAffix(a)));

@@ -1,13 +1,9 @@
-// MEADOW1 (2026-10-06, Mac: "These are 4 textures I want to blend into our grass system, all with varying sizes so its
-// not monotonous everywhere"; then a bush, "of different sizes", and "instead of billboarding, these should have a sort
-// of low poly look to them, like the trees"): THE OWNER'S SPRITES ON CROSSED CARDS. The sprites are his PNGs texel for
+// MEADOW1: THE OWNER'S SPRITES ON CROSSED CARDS. The sprites are his PNGs texel for
 // texel; the atlas and its chain keep each one's coverage; the vertex stage's own text picks a sprite and sizes its
 // card exactly as the JS law does, stands its cards fixed in the world at the tuft's yaw, turns and mirrors them by what
 // the corner carries, and shades each by the low-poly trees' face law; the fragment stage moves the owner's colours by
 // the ground exactly as meadowTexel does; the renderer uploads, binds, counts and frees what the style needs.
-// AUDIT MEADOW1 (2026-10-06, Mac: "These are my art. Please audit everything and ensure performance is perfect"; then
-// "Let's have our grass tufts off by default also, and have the wind sway effect the new foilage, like it does the
-// trees"): the cards cut to their sprites' drawn boxes and drawn indexed, the tuft's seed off its cell's lane (no shift
+// AUDIT MEADOW1: the cards cut to their sprites' drawn boxes and drawn indexed, the tuft's seed off its cell's lane (no shift
 // of the floating origin re-rolls it), the level by the card's height, the cards on the ground's slope, the face law by
 // the light's height, the third card handed over tuft by tuft, the box the meadow's own and the wind's, the gust wave
 // carried across the floating origin, the field still under the trees' switch, and the grass Off by default (Full

@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-25d HOME-POUR ("Disappearing House Storage: Items placed inside house storage randomly disappear";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-25d.md). A shared chest set back to private had its goods written into the
+// ). A shared chest set back to private had its goods written into the
 // building's scene (`DaggerfallInterior [...]`), which the owner's client never reads for its online home and which the
 // next world move clears. The goods go back into the home's own scene now, kept permanent. These pins run the real
 // Worker, then read the record back through the client's own scene cache, a world move in between.

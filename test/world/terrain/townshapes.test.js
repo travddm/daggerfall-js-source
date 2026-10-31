@@ -1,5 +1,4 @@
-// TOWN-SHAPES (2026-10-25, the owner: "IC should be round, give other towns unique shapes. Its time to move away from perfect
-// squares. Ensure nobody's home is removed. This needs to be perfection"; bible/03-World/Town-Shapes.md): a town's ground is
+// TOWN-SHAPES: a town's ground is
 // its own outline - every building's tile, its streets, a margin wandering on its own seed - stamped, flattened to its own
 // land and eased back to the land; the sea past its margin the sea's; the road's ring round the outline.
 import { test } from 'node:test';

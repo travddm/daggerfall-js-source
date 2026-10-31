@@ -1,5 +1,5 @@
-// SEASON1 part two, the banner ribbon (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE BANNER RIBBON
-// (bible/11-Multiplayer/Seats-Arc.md 9.1: "every member of it the Season's banner ribbon (a thin band in the guild's
+// SEASON1 part two, the banner ribbon: THE BANNER RIBBON
+// (9.1: "every member of it the Season's banner ribbon (a thin band in the guild's
 // colours under their name tag for the next Season)") - the law (the guilds a Season's end ribbons, the Season a ribbon
 // is worn in, a heraldry as the token's two colours and back); through the real Worker, a Season's end writing it and the
 // token's mint wearing it, against a twin counting no Season.

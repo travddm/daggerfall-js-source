@@ -1,6 +1,4 @@
-// INTERIOR-DIM (2026-10-11, Mac, of a player's screenshot of a guild hall - two hanging lanterns, warm pools on the
-// floor, the walls between them dark: "I want to improve interior lighting to be more like this and less bright";
-// bible/07-Rendering/Enhanced-Lighting-Arc.md INTERIOR-DIM). On the Enhanced Lighting lane a building's own lamps burn
+// INTERIOR-DIM. On the Enhanced Lighting lane a building's own lamps burn
 // at half their intensity (the white ones in the flame) and the room's grade holds the eye down. Pinned with no GL and
 // no game data: the law against every record AddLight's second switch knows, the grade through the air pass's own
 // setGrade, and both interior hosts' wiring. tools/interiorDimProbe.mjs draws it on SwiftShader.

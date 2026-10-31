@@ -1,5 +1,4 @@
-// REP4 (2026-09-29, the reputation overhaul) - THE ROAD BACK. Mac's call for how a bad name recovers: "Earn it + faster
-// drift" - "Temple penance, paid reparations (price rises each use), regional contracts and raid defence, plus negative
+// REP4 - THE ROAD BACK. - "Temple penance, paid reparations (price rises each use), regional contracts and raid defence, plus negative
 // standing drifting back about 1 point per 7 game days (~14 real hours)."
 //
 // DFU's one road back was NormalizeReputations: a point toward zero every 112 game days (about nine real days online),

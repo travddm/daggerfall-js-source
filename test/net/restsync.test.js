@@ -1,5 +1,4 @@
-// REST-SYNC (2026-09-26, Mac: "when resting in a dungeon it spawns enemys that are out of sync with others"; asked,
-// "Sync them into the room"): a rest's encounter was spawned past the layout's run - the resting player's own foe,
+// REST-SYNC: a rest's encounter was spawned past the layout's run - the resting player's own foe,
 // in no frame anyone received, hunting only its spawner. It is the ROOM's now: the host stands it SHARED (numbered by
 // the room), streams it on the layout's own frame, and every joiner stands it as a puppet, strikes it through the
 // host and loots its body as the room's container; a joiner's own rest ASKS the host for its encounter. Mounted, not
@@ -79,7 +78,7 @@ function restDoors(over = {}) {
     // (encounterSpot), and a night running hears the ask at once (ambushNight) - here a spot stands and no night runs
     // (a paced window), so these doors keep their own question; test/world/auditrest2_fires.test.js asks the others
     encounterSpot: () => ({ x: 9, y: 0, z: 9 }), ambushNight: () => false,
-    restReturn: () => false,   // PIN MOVED (RVN7d: offline a due revenant may answer the rest's roll - none here)
+    restReturn: () => false,
     ...over,
   };
   state.Date = { now: () => state.clock };
@@ -407,7 +406,7 @@ test('REST-SYNC by source: the rest, the hour\'s check, the act door, the frame,
   assert.match(D, /if \(hit\) \{ restEncounter\(hit\); break; \}/, 'the rest\'s spawn is the room\'s');
   assert.match(D, /enemiesNearby: \(\) => roomEncounterComing\(\) \|\| areEnemiesNearby\(foes, \{ resting: true \}\),/, 'the asker\'s rest breaks at the hour');
   assert.match(D, /const asked = data\.rs != null && roomEncounterAsked\(id, data\.rs\);[^\n]*\n[^\n]*\n\s*return n > 0 \|\| asked;/, 'the host hears the ask');
-  assert.match(D, /applySharedRecords\(Array\.isArray\(data\.x\) \? data\.x : \[\], data\.xf === XF_WHOLE \|\| data\.xf === XF_STANDING \? data\.xf : 0\);/, 'the joiner hears the encounters');   // PIN MOVED (RPT1026-ITEMS BODY-CAP): and a capped frame's 2
+  assert.match(D, /applySharedRecords\(Array\.isArray\(data\.x\) \? data\.x : \[\], data\.xf === XF_WHOLE \|\| data\.xf === XF_STANDING \? data\.xf : 0\);/, 'the joiner hears the encounters');
   assert.match(D, /const _roomFoe = isRoomFoe\(f, _fi\);[^\n]*\n\s*const _puppet = isPuppetFoe\(f, _fi\);/, 'a joiner\'s copy is a puppet (QUEST-PARTY phase 3c: and a party member\'s quest foe)');
   assert.match(D, /const isPuppetFoe = \(f, i = foes\.indexOf\(f\)\) => f != null && \(\(!_authority && isRoomFoe\(f, i\)\) \|\| f\._ownFrom != null\);/, 'AUDIT PRE-MERGE 0928 O6: the frame\'s one test - the room\'s foes (a shared encounter too) while another holds the seat');
   assert.match(D, /f\.ai\.update\(foeFrameDt\(dt\), _pf, _armed\(f, _senses, _roomFoe\), _fParalyzed, _fPaused\);/, 'and the host\'s hunts every player (FOE-CATCHUP re-aim: the frame at most three steps)');

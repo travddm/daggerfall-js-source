@@ -1,5 +1,5 @@
-// POI-1 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE POI FORMAT AND THE STORE THAT APPROVES IT.
-// Mac: "POI Tool (General Map Editor) ... a tool my developers can use without having to access the codebase"; "I need
+// POI-1 - THE POI FORMAT AND THE STORE THAT APPROVES IT.
+// "I need
 // to be able to approve changes"; "Developers + Builders".
 //   - the mesh (src/poi/poiMesh.js): one layout each way, and every way a mesh is refused;
 //   - the texture's header (src/poi/poiImage.js): PNG, JPEG and WebP known by their own bytes;
@@ -116,7 +116,6 @@ test('POI-1 DOCUMENT: a whole POI answers no problems; every field short of the 
   assert.match(badL({ name: '' }), /^name:/m);
   assert.deepEqual(bad({ about: 'two\nlines' }), []);
   assert.match(badL({ about: 'a\u0007bell' }), /^about:/m);
-  // PIN MOVED (AUDIT RELEASE R2-8): a place's pixel is the world's grid - (1000, y) and (x, -1) are land past the Bay now
   assert.match(badL({ place: { ...good.place, px: 8192 } }), /^place\.px:/m);
   assert.match(badL({ place: { ...good.place, py: -8192 } }), /^place\.py:/m);
   assert.match(badL({ place: { ...good.place, x: 819.2 } }), /^place\.x:/m);
@@ -250,7 +249,6 @@ test('POI-1 STORE: draft, submit, approve - the feed is live revisions only: a d
   assert.equal(q.json.queue[0].doc.name, 'The Watchtower');
   assert.equal(q.json.queue[0].stale, false);
   assert.equal((await req('POST', '/v1/poi/review', { who: dev, body: { id, rev: 1, verdict: 'approve' } })).status, 403);
-  // PIN MOVED (AUDIT POI S1): an approval names the document the approver saw - the queue's `docSha`
   assert.deepEqual((await req('POST', '/v1/poi/review', { who: mac, body: { id, rev: 1, verdict: 'approve', note: 'Good.', docSha: q.json.queue[0].docSha } })).json, { id, rev: 1, state: 'approved' });
   assert.equal((await req('POST', '/v1/poi/review', { who: mac, body: { id, rev: 1, verdict: 'reject' } })).status, 409, 'decided once');
 
@@ -273,7 +271,6 @@ test('POI-1 STORE: rejected with a word; a retirement asked and approved takes t
   const id = 'poi-0000000000aa';
   const save = async (who, name, base = null) => (await req('PUT', '/v1/poi/draft', { who, body: { doc: docOf(id, m.sha, { name }), base } })).json;
   const submit = async (who, rev) => (await req('POST', '/v1/poi/submit', { who, body: { id, rev } })).json;
-  // PIN MOVED (AUDIT POI S1): the approver's word names the document seen, as the queue gives it
   const review = async (rev, verdict, note) => {
     const seen = (await req('GET', '/v1/poi/queue', { who: mac })).json.queue.find((x) => x.id === id && x.rev === rev);
     return (await req('POST', '/v1/poi/review', { who: mac, body: { id, rev, verdict, note, docSha: seen?.docSha ?? null } })).json;
@@ -318,7 +315,6 @@ test('POI-1 STORE: rejected with a word; a retirement asked and approved takes t
   const list = (await req('GET', '/v1/poi/list', { who: mapper })).json.pois;
   assert.equal(list[0].name, 'First');
   assert.equal(list[0].liveRev, 1);
-  // PIN MOVED (AUDIT POI S14): the rollback is a revision of its own, the approver's, approved
   assert.deepEqual(list[0].revs.map((x) => [x.kind, x.state]), [['doc', 'approved'], ['doc', 'approved'], ['doc', 'rejected'], ['doc', 'draft'], ['retire', 'approved'], ['rollback', 'approved']]);
 });
 

@@ -1,6 +1,4 @@
-// HARD1 - THE LIFETIME GATE, GENERATIVE (2026-09-14, Mac: "I really want
-// to focus on making everything clean, hardened and not spaghetti ...
-// I think i want to take a break of additions and do this right").
+// HARD1 - THE LIFETIME GATE, GENERATIVE.
 //
 // WHY THIS FILE EXISTS, AND WHY audit24_lifetimes.test.js WAS NOT ENOUGH.
 //

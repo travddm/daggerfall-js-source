@@ -1,4 +1,4 @@
-// MWNPC11 (2026-10-10, the MW-NPC arc's eleventh slice - bible/04-Characters/Morrowind-NPCs.md section 16): EVERY NPC
+// MWNPC11: EVERY NPC
 // LANE'S ONE FRAME. Ten slices gave every population a lane of its own, each under its own caps, and the stated bound
 // was their sum - a port's street in a siege with a party on the road stood eight lanes' worth. Now the lanes share one
 // frame budget (characters/npcBodies.js createFrameBudget, NPC_FRAME_TIERS): the nearest bodies across every lane stand,
@@ -16,7 +16,6 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 const F = (...v) => Float64Array.from(v);
 
 test('MWNPC11-1 the budget: the cut is the k-th nearest across every lane\'s report, Infinity while fewer stand; a stale lane or a dropped one takes no share; the skins one a lane with a body in the cut and the rest by share - their sum the budget\'s, or one a lane where more lanes stand', () => {
-  // PIN MOVED (AUDIT MW-NPC B4): a lane reports once a frame, and the frames are written out - a report is the frame's
   // while it is of this round of reports or the last (NPC_BUDGET_ROUNDS), never by the clock
   const b = createFrameBudget();
   const A = {}, B = {}, C = {};

@@ -1,10 +1,9 @@
-// BAL6 - THE CURSES (2026-10-12; bible/05-Combat/Balance-Arc.md section 12; the owner, asked: "Beast-only bonuses",
-// "Hood only shields", "Beast claws count as silver"). Measured first: a lycanthrope with a sword in hand struck at
+// BAL6 - THE CURSES. Measured first: a lycanthrope with a sword in hand struck at
 // x1.8-2.9 a plain character's damage a second without ever changing, every change healed it whole (twice a day, and
 // without end under Hircine's Ring), and the beast's +30 Hand-to-Hand fist met a Lich's Mithril hide ungated; a hooded
-// vampire stood +20 at every hour. BAL6-CLAWS (2026-10-12; the owner: "revert the material nerf on werewolf"): the
+// vampire stood +20 at every hour. BAL6-CLAWS: the
 // claws' silver is taken back - the beast's fist meets a foe's metal ungated again, DFU's bare hand. BAL6-GAUNTLETS
-// (the same day; the owner: "based on your equipped gauntlets it would affect your attacks as a wereboar/werewolf"):
+// (the same day):
 // the plate gauntlets the beast wears add their metal's damage to its claws.
 //
 // Pinned by execution through the curse's own round and change (systems/lycanthropy.js), the stat and skill channels

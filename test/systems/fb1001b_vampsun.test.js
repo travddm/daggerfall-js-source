@@ -1,5 +1,4 @@
-// FB1001b - VAMP-SUN (FIELD BUGS 2026-10-01b, 2026-10-01; Mac: "Sunlight debuff applies in interior (Should be buffed
-// in interiors) (Vampires)"). VAMP-DAY (2026-09-26) traded the vampire's sun burn for 20 off seven stats by day and keyed
+// FB1001b - VAMP-SUN (FIELD BUGS 2026-10-01b, 2026-10-01). VAMP-DAY traded the vampire's sun burn for 20 off seven stats by day and keyed
 // it on the HOUR alone - "wherever the vampire stands" (vampirism.js vampireStatMod read isDayFromMinutes) - so at noon a
 // vampire in a tavern or a crypt was 20 DOWN where Daggerfall Unity gives him 20 up. DFU's sun reaches the street and
 // nothing else: DamageFromSunlight (PassiveSpecialsEffect.cs:149-172) strikes only `if (IsPlayerInSunlight)` (:168),

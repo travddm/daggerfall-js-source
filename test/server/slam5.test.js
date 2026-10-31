@@ -1,4 +1,4 @@
-// SLAM5 (2026-09-16, AUDIT SLAM): THE HELLO PATH - A HARD WALL AT 130 PLAYERS, AND A ROSTER RANKED BY THE WRONG
+// SLAM5: THE HELLO PATH - A HARD WALL AT 130 PLAYERS, AND A ROSTER RANKED BY THE WRONG
 // METRIC. Both found by the lenses over SLAM1-4; neither was SLAM1-4's doing.
 //
 // THE WALL. `webSocketMessage`'s hello arm read a look for EVERY hello'd socket - up to SOCKETS_MAX-1 = 255 keys in

@@ -1,4 +1,4 @@
-// WB6c (2026-09-25, Mac: "the transition and the arena needs to be an oblivion masterpiece"): THE STEP THROUGH THE
+// WB6c: THE STEP THROUGH THE
 // GATE, DRIVEN. The veil's law (the front closing past the centre and opening past the corners by all its raggedness,
 // the cover and the eye's heat); the veil on a fake page (the canvas made once, the fire closed and the promise
 // answered, held shut for the new place's first frames, opened, hidden; closed again from where it stood; the force's

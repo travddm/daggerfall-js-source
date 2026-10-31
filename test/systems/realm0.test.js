@@ -1,6 +1,4 @@
-// REALM phase 0 (2026-09-28, Mac: "I wanna do this as comprehensively as possible. A true separation while allowing
-// people to still play offline ... balance the gold economy, eliminate duping, eliminate true overpowered builds
-// online"): the hotfixes that need no migration (bible/06-Systems/Realm-Arc.md, "Phases").
+// REALM phase 0: the hotfixes that need no migration (, "Phases").
 //   P0.1 - the URL's powers stay offline: an online boot drops ?shot (and window.__addGold with it), ?fly, ?nofoes and
 //          the rest before anything reads them.
 //   P0.2 - the balance mods are the room's whole online: every key of Meaner Monsters, PCAAO, Unleveled Loot,
@@ -51,7 +49,7 @@ function onPage(search, fn) {
 }
 
 test('REALM P0.1: an online boot drops every power flag before anything reads it - offline, F304 stands', () => {
-  for (const f of ['shot', 'fly', 'nofoes', 'tp', 'timescale', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'weather', 'wseed', 'season', 'editor']) {   // PIN MOVED (POI-3): the editor's eye a power too
+  for (const f of ['shot', 'fly', 'nofoes', 'tp', 'timescale', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'weather', 'wseed', 'season', 'editor']) {
     assert.ok(ONLINE_REFUSED_FLAGS.includes(f), `?${f} is refused online`);
   }
   const all = ONLINE_REFUSED_FLAGS.map((f) => `${f}=1`).join('&');
@@ -241,7 +239,6 @@ test('REALM P0.4: online a shop pays at most half what it asks for the same piec
   // each, the top of the range the haggle reads online since MERC-CAP, Field-Bugs-2026-09-29f) - so no skill lowers a
   // sale; flipped from P0.4's half of the seller's own ask
   const best = { mercantile: 100, personality: 100 };
-  // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08): that half is the ceiling - the best haggler's - and the loop's weak
   // seller is paid under it, by their own offer against the best's at half its strength
   const half1 = Math.floor(calculateTradePrice(1_000, 1, best, false, { online: false }) / 2);
   assert.equal(calculateTradePrice(1_000, 1, best, true, { online: true }), half1, 'online the best haggler is paid half of what the counter asks them');
@@ -278,7 +275,7 @@ test('REALM P0.4: online a pile\'s gold is divided back by the level, every key,
   for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/interiorContext.js', 'src/scenes/world.js']) {
     const calls = [...src(f).matchAll(/addPileLootExtras\(([^\n]*)/g)].map((m) => m[1]);
     assert.ok(calls.length >= 1, `${f} mints a pile`);
-    for (const c of calls) assert.match(c, /\{ (locationIndex: [^,]+, luck(: liveStat\(playerEntity, 'luck'\))?, )?level(: (?:playerEntity\.level|effectiveLevel\(playerEntity\)))?(, where: '[a-z]+')?(, quarters)? \}\)/, `${f}: ${c}`);   // PIN MOVED (PARTY-LOOT): the dungeon's pile hands its Renown share on too   // THE MERGE: main's AUDIT OH-F B3 names the dungeon's own pile (`where`); MERGE 2: FORAGE3's index and luck before the level; SOFTCAP2: a mentor's pile at the group's level
+    for (const c of calls) assert.match(c, /\{ (locationIndex: [^,]+, luck(: liveStat\(playerEntity, 'luck'\))?, )?level(: (?:playerEntity\.level|effectiveLevel\(playerEntity\)))?(, where: '[a-z]+')?(, quarters)? \}\)/, `${f}: ${c}`);
   }
 });
 
@@ -326,7 +323,6 @@ test('REALM P0.4: a party\'s shared quest pays its gold in the party\'s shares, 
   const hooks = m._buildHooks();
   assert.equal(hooks.rewardShares({ questName: 'S0000999', _holdersHeard: new Set(['b', 'c']) }), 1, 'not shared: whole');
   m.markQuestShared('S0000999');
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS, machine.js rewardShares): the shares are the copies held - this one and each
   // partner heard holding it (noteShareHolder) - never more than the party
   assert.equal(hooks.rewardShares({ questName: 'S0000999' }), 1, 'shared, no partner heard: whole');
   assert.equal(hooks.rewardShares({ questName: 'S0000999', _holdersHeard: new Set(['b', 'c']) }), 3);
@@ -351,7 +347,6 @@ test('REALM P0.5: a checkpoint is written online, spawned, in the seat and out o
   assert.equal(checkpointAllowed({ ...ok, online: false }), false, 'offline: the player saves');
   assert.equal(checkpointAllowed({ ...ok, spawned: false }), false, 'no character yet');
   assert.equal(checkpointAllowed({ ...ok, seatOut: true }), false, 'a tab another took the seat from');
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES): a realm character out of the seat still saves - the service's lease decides
   assert.equal(checkpointAllowed({ ...ok, seatOut: true, realm: true }), true, 'a realm character out of the seat');
   assert.equal(checkpointAllowed({ ...ok, duel: true, realm: true }), false, 'the realm flag lifts the seat alone');
   assert.equal(checkpointAllowed({ ...ok, duel: true }), false, 'a duel\'s borrowed health is not the character\'s');

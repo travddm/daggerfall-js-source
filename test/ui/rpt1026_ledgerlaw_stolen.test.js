@@ -1,5 +1,4 @@
-// RPT1026-LEDGERLAW (2026-10-26, a private report: a stolen piece another player sold looked like any other; the
-// batch's Field-Bugs page): a stolen piece carries its theft (systems/stolenGoods.js - `stolen`, which
+// RPT1026-LEDGERLAW: a stolen piece carries its theft (systems/stolenGoods.js - `stolen`, which
 // rides the save, the wire and a listing: a piece handed on is no less stolen), and its buyer takes the court's risk and a
 // counter that destroys it at the sale - but the rows another player buys from said it nowhere: the market's Goods
 // (ui/marketTab.js) and a home's trader (ui/vendor/vendorTab.js, its look - scenes/vendorHost.js - and the Vendor page's

@@ -1,5 +1,4 @@
-// DISC10-C / MAPLOOT1 (2026-09-23, Discord through Mac, 01-Overview/bugs/Field-Bugs-2026-09-23.md): "If a corpse drops a map, you can only study it but leave it on their body ...
-// Potion recipe's can't be read at all."
+// DISC10-C / MAPLOOT1 (2026-09-23, Discord through
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

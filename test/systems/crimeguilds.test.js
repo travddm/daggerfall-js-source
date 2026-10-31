@@ -1,4 +1,4 @@
-// CG2 - THE CRIME-GUILD TALLY (2026-08-28).
+// CG2 - THE CRIME-GUILD TALLY.
 //
 // TallyCrimeGuildRequirements (PlayerEntity.cs:1271-1299) and
 // HandleStartingCrimeGuildQuests (:1503-1522). Neither guild is joined

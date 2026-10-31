@@ -1,4 +1,4 @@
-// AUDIT RENOWN1 (2026-09-25, Mac: "Lets audit this before we continue to build on it"): THE RENOWN, AUDITED - five
+// AUDIT RENOWN1: THE RENOWN, AUDITED - five
 // lenses over RENOWN1 and RENOWN2 (security and trust, the game's hooks, the wire and the session, the data and the
 // numbers, the displays and the records), every finding reproduced before it was fixed, and each fix pinned here:
 //   THE SERVICE - the hour's window only moves forward (SEC-1/DATA-1), and so does the rate limiter's; the report is
@@ -379,7 +379,7 @@ test('AUDIT RENOWN1 GAME-8: the page\'s last word - `leave` sends the held repor
 });
 
 test('AUDIT RENOWN1 UI-5/UI-7/WIRE-2c: the answer\'s plan - the order carried WHENEVER the service signed one, a rise announced against what was SAID (never against the page\'s level, which a token may have raised first), the hour\'s line only for a report the hour cut short (never at the cap, never for a repeat) (mutants: the order gated on the page\'s level; the announcement against the page\'s level; the cap line at the cap; the cap line for a repeat)', () => {
-  assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 5), { level: 6, order: 'v1.o.s', announce: 6, capped: false, xp: null, room: null });   // RENOWN4: xp null for an answer without a total. SCALE4h (PIN MOVED): and room
+  assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 5), { level: 6, order: 'v1.o.s', announce: 6, capped: false, xp: null, room: null });     // RENOWN4: xp null for an answer without a total. SCALE4h (
   assert.deepEqual(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, null).announce, 6, 'nothing said yet');
   assert.equal(renownAnswer({ level: 6, rose: true, order: 'v1.o.s', credited: 500 }, 500, 6).announce, null, 'said already');
   assert.equal(renownAnswer({ level: 6, rose: false, order: null, credited: 500 }, 500, 5).announce, null, 'no rise, nothing said');

@@ -1,10 +1,10 @@
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE BATTLES' WEEK, AS
+// SEAT2a: THE BATTLES' WEEK, AS
 // THE SERVICE KEEPS IT - the holder's window set at its board; the Turning placing every battle it names in the coming
 // week (a siege at the window it froze, a Tourney at Wednesday 20:00, moved where a guild would fight twice at once); the
 // two sides' rosters signed under 6.4's rules and their caps, closed ten minutes before the start; the Sellswords hired
 // by name with a fee escrowed, signed under the contract or withdrawn; the Seat tab's view of it all; the deploy
 // blackout's question. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/11-Multiplayer/Seats-Arc.md 6.3-6.5; `06-Systems/Online-Arc.md` SEAT2a.
+// 6.3-6.5; `06-Systems/Online-Arc.md` SEAT2a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

@@ -1,5 +1,4 @@
-// STEED1 (2026-10-11, the owner: "Horse should have stamina, feeding them grows your bond and improves their stats. Every
-// horse should have different stats") - HORSE CARE (bible/06-Systems/Horse-Care.md): the law (systems/steedCare.js) -
+// STEED1 - HORSE CARE: the law (systems/steedCare.js) -
 // each horse's born stats off its seed, the bond and what grows it, hunger and what it costs, the keep (the stable's,
 // grazing, the packs' oats through a span skipped), the breath under a gallop; the runtime (systems/upkeep/upkeepRuntime.js) -
 // the gallop's gate, the ride's pace, the HUD's bar, the Stable's model and acts, an inventory's Use; the transport's
@@ -7,7 +6,7 @@
 // item's law, fields and card; the Stable page; and the hosts wiring it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (PIN MOVED): the upkeep is handed a tier's rules - these pins pin the system as it stood, Hard
+import { HORSE_CARE_HARD as HARD, WAGON_UPKEEP_HARD as WHARD } from '../../src/systems/upkeep/upkeepTiers.js';     // HORSE-TIERS (
 import { readFileSync } from 'node:fs';
 import {
   bornStats, horseBornStats, STEED_STATS, STEED_BORN_MIN, STEED_BORN_MAX, bondTier, bondBonus, BOND_TIERS, BOND_STEP, BOND_TENTHS_MAX,
@@ -363,7 +362,7 @@ test('STEED1 THE STABLE\'S ACTS: oats and an apple fed by hand - beside the hors
   // the reach off the mod's runtime
   const rt = (o) => ({ stableView: () => ({ persistence: true, hasHorse: true, transport: TRANSPORT.Foot, horseMode: HORSE_MODE.LooseStationary, wagonMode: WAGON_MODE.WithPlayer, horseName: 'Ash', ...o.view }), canMountHorseFromTransportWindow: () => o.mount, canAccessWagonInventory: () => ({ allowed: o.wagon }) });
   assert.deepEqual(upkeepReach(rt({ mount: true, wagon: false }), true), { near: true, stabled: false, wagonNear: false, who: 'Ash' });
-  assert.deepEqual(upkeepReach(rt({ mount: false, wagon: true, view: { horseMode: HORSE_MODE.WithPlayer, horseStabled: true } }), true), { near: false, stabled: true, wagonNear: true, who: 'Ash' });   // WAGON-STABLED (PIN MOVED): sent away
+  assert.deepEqual(upkeepReach(rt({ mount: false, wagon: true, view: { horseMode: HORSE_MODE.WithPlayer, horseStabled: true } }), true), { near: false, stabled: true, wagonNear: true, who: 'Ash' });     // WAGON-STABLED (
   assert.deepEqual(upkeepReach(rt({ mount: false, wagon: false }), false), { near: true, stabled: false, wagonNear: true, who: 'Your horse' }, 'the mod off: always beside');
 });
 
@@ -410,7 +409,6 @@ test('STEED1 THE ITEM: `horseBond` (tenths, 1..1000) and `horseFed` (a minute, 1
   assert.deepEqual(itemFindings(horse(5, { horseBond: 420, horseFed: T0, value: 1000 })), []);
   assert.deepEqual(itemFindings({ group: 'Weapons', templateIndex: 113, horseBond: 30 }), ['horse']);
   assert.deepEqual(itemFindings({ group: 'Transportation', templateIndex: 93, horseFed: T0 }), ['horse']);
-  // PIN MOVED (AUDIT STEED1): `horseFed` is a minute of its OWNER's character's clock - carried to a buyer a year behind
   // it came fed a year ahead (and one ahead, starving); so it is the owner's mark too, and the horse comes fed as a horse
   // first seen (NEW_HORSE_FED) - and a minute's grazing never makes an offered record mismatch its checkpoint
   assert.ok(RECEIVER_MARKS.includes('horseBond') && RECEIVER_MARKS.includes('horseFed'), 'the bond and the belly\'s clock its owner\'s');

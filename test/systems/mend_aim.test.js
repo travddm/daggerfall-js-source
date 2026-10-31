@@ -1,6 +1,4 @@
-// MEND-AIM (2026-09-30, Discord suggestion, kurkku: "Allow targeting field repair kit use" - "always repairing the most
-// worn piece of equipment means fixing arrows or random loot you picked up most of the time. To fix the equipment you
-// want to fix, you have to drop everything that's more worn than it"). A repair kit is AIMED: both packs ask which
+// MEND-AIM. A repair kit is AIMED: both packs ask which
 // piece when there is more than one; the quick keys, which cannot ask, take what is worn first; an arrow is never
 // mended. Each law is driven through the door a player reaches it by - the classic window's Use click and its list
 // picker, the enhanced pack's card and chooser, the item-use door itself.

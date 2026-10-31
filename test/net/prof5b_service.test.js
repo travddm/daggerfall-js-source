@@ -1,9 +1,9 @@
-// PROF5b (2026-09-29, Mac: "Go") - TIMED AUCTIONS FOR MASTERWORKS AS THE SERVICE KEEPS THEM: a Masterwork posted at
+// PROF5b - TIMED AUCTIONS FOR MASTERWORKS AS THE SERVICE KEEPS THEM: a Masterwork posted at
 // an opening bid for 24 hours, the fee burnt; each bid 5% over the standing one, escrowed with its courier; the
 // standing bid outbid and its escrow back on its bidder's read; a bid in the last two minutes adding two; the auction
 // closed by anyone's read - the winner's piece theirs, the seller paid the bid less its tax, the escrow emptied; unsold,
 // cancelled and removed; the refusals, the repeats, the thirty. Driven through the real Worker over node:sqlite with
-// every migration applied (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 27.
+// every migration applied (test/accountDb.mjs). 27.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -33,7 +33,7 @@ async function stand(extra = {}) {
   const raw = s.env.DB._raw;
   const balance = (who) => Number(raw.prepare('SELECT balance FROM marks WHERE account = ?').get(who.id)?.balance ?? 0);
   const fund = (who, marks) => raw.prepare('INSERT INTO marks (account, balance) VALUES (?, ?) ON CONFLICT (account) DO UPDATE SET balance = excluded.balance').run(who.id, marks);
-  /** A crafted piece this account owns, as the anvil writes it - a Masterwork unless said. PIN MOVED (INT19, Integrity-Arc
+  /** A crafted piece this account owns, as the anvil writes it - a Masterwork unless said.
    *  section 7): an auction takes the piece out of its seller's realm record, so a realm character's piece stands there
    *  too, at the wear the posts name (900). */
   const piece = (who, provenance, { recipe = 'longsword:mithril', quality = 4 } = {}) => {
@@ -139,7 +139,7 @@ test('PROF5b DONE WHEN: a Masterwork posted in Daggerfall is bid on from Wayrest
 test('PROF5b service: only a Masterwork of a listable family, its owner\'s, on no other sale; the seller never bids, the leader never again, a bid under the next refused; the thirty count auctions; an auctioned piece is no listing', async () => {
   clock(T0);
   const s = await stand();
-  const mac = await s.seated('Mac'), ann = await s.registered('Ann');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac'), ann = await s.registered('Ann');
   s.fund(mac, 100_000); s.fund(ann, 5_000);
   s.piece(mac, P(1), { quality: 3 });
   assert.equal((await s.post(mac, P(1), 100)).body.error, 'auction-not-masterwork');
@@ -157,7 +157,7 @@ test('PROF5b service: only a Masterwork of a listable family, its owner\'s, on n
   assert.equal((await s.call('/v1/market/list', { character: mac.character, region: DF, kind: 'piece', provenance: P(7), wear: 1000, price: 50, hubs: HUBS, rid: rid() }, mac.secret)).status, 200);
   clock(T0 + 72 * 3600);
   s.raw.prepare(`UPDATE market_listings SET state = 'expired', closed_at = ? WHERE provenance = ?`).run(_now, P(7));
-  // MARKET-AUDIT (PIN MOVED: `market-listed`): an auction posted settles first, as a listing does - the listing past its hours
+  // MARKET-AUDIT (
   // is closed and its piece a delivery to collect, said so; refused either way, never two of it
   assert.equal((await s.post(mac, P(7), 100)).body.error, 'market-uncollected', 'auctioned while its return was still to come - two of it');
   clock(T0);
@@ -198,11 +198,11 @@ test('PROF5b service: only a Masterwork of a listable family, its owner\'s, on n
 test('PROF5b service: an auction with no bid closes unsold and its piece comes back on its seller\'s read; cancelled while none stands (the fee kept), never after; a moderator\'s removal voids the standing bid and returns the piece', async () => {
   clock(T0);
   const s = await stand();
-  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), mod = await s.registered('Asynian');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), mod = await s.registered('Asynian');
   s.fund(mac, 10_000); s.fund(ann, 10_000); s.fund(mod, 10);
   s.piece(mac, P(10)); s.piece(mac, P(11)); s.piece(mac, P(12));
   const unsold = (await s.post(mac, P(10), 100)).body.auction;
-  // cancel: while none stands, the piece answered back, the fee kept - PIN MOVED (INT19): by a delivery its seller's
+  // cancel: while none stands, the piece answered back, the fee kept
   // record collects (the record that left it), never minted at the pack
   const c = (await s.post(mac, P(11), 500)).body.auction;
   const crid = rid();
@@ -226,7 +226,7 @@ test('PROF5b service: an auction with no bid closes unsold and its piece comes b
   // the unsold one past its end
   clock(T0 + AUCTION_S);
   const mine = await s.read(mac, 'mine');
-  const back = mine.body.road.filter((d) => d.kind === 'item' && d.why === 'returned').map((d) => [d.why, d.item.provenance]).sort();   // PIN MOVED (INT19): each as its record
+  const back = mine.body.road.filter((d) => d.kind === 'item' && d.why === 'returned').map((d) => [d.why, d.item.provenance]).sort();
   assert.deepEqual(back, [['returned', P(10)], ['returned', P(11)], ['returned', P(12)]]);
   assert.deepEqual(mine.body.auctions.filter((x) => x.id === unsold.id).map((x) => x.state), ['unsold']);
   assert.equal(s.escrowHeld(), s.escrowLedger());
@@ -240,7 +240,7 @@ test('PROF5b service: an auction with no bid closes unsold and its piece comes b
 test('PROF5b service: a piece whose auction closed unsold is on that sale until it is back - with more returns owed than a read makes (SETTLE_MAX), the one still owed is refused another auction (`market-listed`) and no second auction stands; once back, it is a delivery to collect (AUDIT SCALE; mutant: the decision\'s `listed = 0` dropped)', async () => {
   clock(T0);
   const s = await stand();
-  const mac = await s.seated('Mac');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac');
   s.fund(mac, 100_000);
   const pv = (i) => P(0x300 + i);
   for (let i = 0; i < SETTLE_MAX; i++) {
@@ -277,7 +277,7 @@ test('PROF5b service: a piece whose auction closed unsold is on that sale until 
 test('PROF5b service: a bid asked twice is one; an auction\'s fee is `:afee`, never a listing\'s `:fee` under the same id; two bids at once, one stands; a sale the seller\'s cap cannot take waits', async () => {
   clock(T0);
   const s = await stand();
-  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), bob = await s.registered('Bob');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), bob = await s.registered('Bob');
   s.fund(mac, 10_000); s.fund(ann, 10_000); s.fund(bob, 10_000);
   s.piece(mac, P(20)); s.piece(mac, P(21), { quality: 2 });
   const R = rid();
@@ -326,7 +326,7 @@ test('PROF5b service: a bid asked twice is one; an auction\'s fee is `:afee`, ne
 test('PROF5b service: the Auctions view - every open auction ending soonest first, its courier to this board, the next bid, whether this reader leads; the courier\'s time on a won piece from another region', async () => {
   clock(T0);
   const s = await stand();
-  const mac = await s.seated('Mac'), ann = await s.registered('Ann');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac'), ann = await s.registered('Ann');
   s.fund(mac, 10_000); s.fund(ann, 10_000);
   s.piece(mac, P(30)); s.piece(mac, P(31));
   const far = (await s.post(mac, P(30), 300, { region: WR })).body.auction;

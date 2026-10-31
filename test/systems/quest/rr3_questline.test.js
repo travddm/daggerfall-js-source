@@ -88,7 +88,7 @@ test('RR3 the three factions: the registry, the records verbatim, the dictionary
   const dict = new Map([[0, { id: 0, name: 'root', parent: 0, children: null }]]);
   const nameToId = new Map();
   assert.equal(addCustomFactions(dict, nameToId), true, 'a parented faction asks the relink');
-  assert.equal(dict.size, 4 + PROVINCE_FACTION_IDS.length);   // PIN MOVED (PROVINCE-COURTS): the door adds the provinces' own courts and people first (systems/faction/provinceFactions.js)
+  assert.equal(dict.size, 4 + PROVINCE_FACTION_IDS.length);
   // DFU's quirk, kept: RelinkChildren (FactionFile.cs:879-893) ADDS to every children list without clearing it, so the
   // lord's own [1021] gains the relinked 1021 - and every parented faction in the dictionary is listed under its parent
   // twice after a custom faction with a parent lands. The port's relinkChildren is the same walk.

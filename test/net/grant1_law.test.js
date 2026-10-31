@@ -1,4 +1,4 @@
-// GRANT1 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md sections 4 and 7): THE SPAWN
+// GRANT1: THE SPAWN
 // GRANT'S LAW, PURE (net/grantLaw.js) - its pinned rates held to their homes, the grant read whole or not at all, the
 // relay's signature over every field, the marks rolled from the seed alone, one stream per die, the mint's gate in its
 // order, and the reader's check past the signature. Nothing calls it yet (GRANT2, GRANT3).
@@ -42,7 +42,7 @@ test('GRANT1 THE PINNED RATES: each copy the relay holds equals its home - the e
   assert.ok(lawRow && lawRow.includes('STAR-TUNE'), `world${STAR_GRANT_RELAY_MIN}'s law row is STAR-TUNE's (${lawRow?.slice(0, 120)})`);
   assert.ok(STAR_GRANT_RELAY_MIN <= Number(RELAY_VERSION.slice('world'.length)), 'the gate is no later than the relay this tree builds');
   assert.deepEqual(['world237', 'world238', 'world300', 'nope', undefined].map(relaySupportsStarGrant), [false, true, true, false, false], 'an older relay is asked the stand\'s own kind');
-  assert.deepEqual(Object.keys(GRANT_KINDS).slice(0, 2), ['enc', 'camp'], 'GRANT2\'s first stream; the other sources\' with GRANT4 (grant3_pool)');   // PIN MOVED (GRANT4): every source's kind
+  assert.deepEqual(Object.keys(GRANT_KINDS).slice(0, 2), ['enc', 'camp'], 'GRANT2\'s first stream; the other sources\' with GRANT4 (grant3_pool)');
   for (const [s, salt] of [[0, 'marks'], [0xdeadbeef, 'species:2'], [12345, 'health:0']]) {
     const a = grantRng(s, salt), b = eliteRng(eliteHash('grant', s, salt));
     assert.deepEqual(Array.from({ length: 6 }, a), Array.from({ length: 6 }, b), `${s} ${salt}`);

@@ -1,5 +1,4 @@
-// CARP-YARD (2026-10-12, Mac: "Let's also redesign their buildings like we did with stables, etc", choosing a new
-// Carpenter's Yard whose workbench is a Carpentry station; bible/03-World/Merchant-Yards.md CARP-YARD). THE JOINERY - a
+// CARP-YARD. THE JOINERY - a
 // third yard on the Stables' and the Wagon Yards' machinery: its law (systems/merchantYards.js - the kind, its order after
 // the port's places, its key after theirs, its one row, the bench as a station), its place (world/merchantYards/merchantYardSites.js
 // craftYardSitesOn, scenes/world.js townPlacesFor), its timber and its pictures (world/merchantYards/merchantYardModels.js,
@@ -219,7 +218,6 @@ test('CARP-YARD THE BENCH IS A STATION WHERE THE FEET STAND AT IT: workbenchNear
   y.frame();
   const bb = benchBoxOf(), mid = yardToScene([100, 2, 50], 180, (bb[0] + bb[3]) / 2, 0, (bb[2] + bb[5]) / 2);
   assert.equal(y.workbenchNear([mid[0], 2, mid[2] + 1]), site, 'at the bench');
-  // PIN MOVED (FB1020c BENCH-DOORS): the reach is measured to the nearest point of a door's box, never the bench's middle -
   // these two stand east of the bench's end, where the carpenter and the board are farther still
   const end = y.targets().find((t) => t.key === 'yard:7:carpenter|bench').aabb.max[0];
   assert.equal(y.workbenchNear([end + YARD_REACH - 0.01, 2, mid[2]]), site, 'at the reach');

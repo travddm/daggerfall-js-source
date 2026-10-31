@@ -1,4 +1,4 @@
-// SCALE2b (2026-10-04, Mac: "I definitely want to do all these changes in full. No exceptions"): the scale arc's relay
+// SCALE2b: the scale arc's relay
 // slice and its second half of NET-SMOOTH, in the one relay deploy SCALE's policy asks for (bible/11-Multiplayer/
 // Scale-Arc.md SCALE2b). The relay: the socket index kept rather than re-walked, the hello's storage moved to memory, a
 // pose's attachment written lazily, the fan selected rather than sorted, the caches bounded without thrashing, every
@@ -169,8 +169,8 @@ test('SCALE2b metrics: a room writes ONE point a window - its kind and the relay
   await r.drop(a); await r.drop(b);
   assert.equal(points.length, 1, 'the drain writes the window\'s one point');
   const p = points[0];
-  assert.deepEqual(p.indexes, ['world']); assert.deepEqual(p.blobs, ['world', RELAY_VERSION, '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '0']);   // PIN MOVED (COST-2 part two: blob12 and blob13, the cell directory's moves - test/server/cellmoves.test.js); PIN MOVED (COST-2): blob11 the node's level, '' for a room told none; PIN MOVED (FOES-FIRST): blob3 to 5, counts - test/net/fb1021_foesfirst.test.js holds them; PIN MOVED (FOES-HOLD): blob6 to 10, the hold's - test/net/fb1021b_foeshold.test.js
-  assert.equal(p.doubles.length, 20);   // PIN MOVED (SCALE5b): eight more after the twelve - test/net/scale5b.test.js holds them
+  assert.deepEqual(p.indexes, ['world']); assert.deepEqual(p.blobs, ['world', RELAY_VERSION, '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '0']);
+  assert.equal(p.doubles.length, 20);
   const [, sockets, hellos, busy, frames, bytesIn, poses, sends, bytesOut, reads, writes, refusals] = p.doubles;
   assert.equal(hellos, 2); assert.equal(busy, 0); assert.equal(poses, 5); assert.equal(refusals, 0);
   assert.equal(frames, 7, 'two hellos and five poses');

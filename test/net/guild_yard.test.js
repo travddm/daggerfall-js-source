@@ -1,4 +1,4 @@
-// GUILD-YARD (2026-10-02, Mac: "Guild hall next"): A GUILD HALL'S OUTSIDE AND ITS YARD - Seats-Arc 8.2's NOT YET ("a
+// GUILD-YARD: A GUILD HALL'S OUTSIDE AND ITS YARD - Seats-Arc 8.2's NOT YET ("a
 // hall's outside and yard (HOME-LOOK and HOME-YARD name a character)"). A hall's keepers (its Officers and its
 // guildmaster, a realm character each - decor.js OWNS, the rule its rooms are furnished by) paint its outside and place
 // its yard; a plain member and anyone outside the guild do neither; everyone sees both. The service through the real
@@ -260,7 +260,7 @@ test('GUILD-YARD the keeper\'s yard decorator: a yard piece taken out says its h
   assert.ok(w.said.includes("Your guild's hall is painted."), w.said.join(' / '));
 });
 
-// ── AUDIT GUILD-YARD (2026-10-02): the decorator's yard between two kept lots, the painted word, a keeper's rank moved,
+// ── AUDIT GUILD-YARD: the decorator's yard between two kept lots, the painted word, a keeper's rank moved,
 // a keeper's realm character, a home's character, the hall's own words ─────────────────────────────────────────────
 
 const HOME_ROW = { owner: 'Gwen', own: true, mine: true, character: 'r0123456789abcdef0123', hall: null, look: null };
@@ -409,9 +409,7 @@ test('AUDIT PROF-541 G2 the hall\'s door "Who may enter" follows what the servic
   assert.deepEqual([hallEntryTurnable(h), hallEntryTurnable({ ...h, hallEntry: false, keeper: true }), hallEntryTurnable({ ...h, hall: false }), hallEntryTurnable(null)], [true, false, false, false]);
 });
 
-// ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound"; PIN MOVED - this was
-// AUDIT GUILD-YARD's "a home's outside is its CHARACTER's: another character of the same account paints nothing of it, nor
-// places in its yard"): the outside is the ACCOUNT's, as the rooms are - one rule, decor.js OWNS.
+// ACCOUNT-HOMES: the outside is the ACCOUNT's, as the rooms are - one rule, decor.js OWNS.
 test('ACCOUNT-HOMES a home\'s outside is its ACCOUNT\'s: another character of the same account paints it and places in its yard, on its own record; another account\'s character neither (mutants: OWNS\'s home the buying character\'s again; OWNS\'s home any account\'s)', async (t) => {
   t.mock.method(Date, 'now', () => T0 * 1000);
   const svc = await standService();

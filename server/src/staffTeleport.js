@@ -6,8 +6,7 @@ const fold = (s) => String(s).toLowerCase().replace(/['\u2019]/g, '').replace(/[
 
 /** Only the verified target socket may answer a pending ticket. Nothing is
  * persisted or broadcast; an eviction cancels the lookup via the client's timer.
- * STAFF-PANEL5-FOLLOW (design doc "DFO Staff Panel: design", Invisible follow - silent TP; mob, 05:50Z: "always sending
- * party note with no serv affect to alway be bale to tp to them"): an Admin's or a Shadow Fang's ask from a build that
+ * STAFF-PANEL5-FOLLOW (design doc "DFO Staff Panel: design", Invisible follow - silent TP): an Admin's or a Shadow Fang's ask from a build that
  * reads notes (`nt`) is answered from the hub's copy of the target's where note, and the target's game is sent nothing.
  * Only a note missing (`fb: 'missing'`) or one the asker's game found does not match (`cap`, `fb: 'mismatch'`) falls back
  * to today's capture, which a modded game can see - flagged on the answer. Any other staff ask is today's capture. */

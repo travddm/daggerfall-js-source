@@ -1,5 +1,5 @@
-// AUDIT CHAP4 (2026-10-09, Mac: "Lets do a deep audit on everything so far"): the Chapters arc read again, end to end,
-// through six lenses (bible/01-Overview/audits/Audit-Chapters-4.md). Each fix pinned here by its finding's id; the lens T's
+// AUDIT CHAP4: the Chapters arc read again, end to end,
+// through six lenses. Each fix pinned here by its finding's id; the lens T's
 // pins - laws no test could fail - after them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -420,12 +420,11 @@ test('AUDIT CHAP4 T6, T8: the orders the record states - a tied candidate\'s cha
   const names = sheet.chapters.find((x) => x.f === MAGES && x.region === ANTICLERE).seats.map((x) => x.name);
   assert.deepEqual(names, [[b.id, 'Bren'], [c3.id, 'Cass']].sort((x, y) => (x[0] < y[0] ? -1 : 1)).map((x) => x[1]));
   const R2 = await seatRealm(s.env, a.who.secret, 'Alba');
-  // the larger id at the lower guild - the seats' own order (guild first) is not the characters'; PIN MOVED (CHAP6e): and
+  // the larger id at the lower guild - the seats' own order (guild first) is not the characters'
   // the later character the lower id, so the characters' own order (made first, first) is not it either - a random id
   // was the lower half the time, and the unsorted list passed then
   const lo = `0${R2.id.slice(1)}`, hi = a.id;
   assert.ok(lo < hi);
-  // PIN MOVED (the merge of main past INT1-INT6): the INTEGRITY arc's tables hold the character by a foreign key with no
   // ON UPDATE - the rename, a test's own, is made with the keys off and every row that names it carried with it
   s.raw.exec('PRAGMA foreign_keys = OFF');
   for (const { name } of s.raw.prepare("SELECT m.name FROM sqlite_master m WHERE m.type = 'table' AND EXISTS (SELECT 1 FROM pragma_foreign_key_list(m.name) f WHERE f.\"table\" = 'realm_characters')").all()) {
@@ -477,7 +476,6 @@ test('AUDIT CHAP4 T10: the roll\'s and the Hall\'s chapters\' lines flush left u
   };
   assert.equal(lineFormat(chapterRollTokens({ title: 'The Roll', lines: ['Master of the chapter: Alda.'] }), 'Master of the chapter: Alda.'), RSC.JustifyLeft);
   const seat = { key: 3021, name: 'Anticlere', region: ANTICLERE, tier: 'palace' };
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - the Master's chair; marked by AUDIT GUILD3 R4
   const line = 'In week 40, Alda took the Master\'s chair of the Fighters Guild.';
   assert.equal(lineFormat(hallOfRecordsTokens(seat, [], null, null, { rows: [{ kind: 'seat', faction: FIGHTERS, week: 40, data: { from: null, to: 'master' }, name: 'Alda' }], zero: null }), line), RSC.JustifyLeft);
   const all = (band) => CHAPTER_NEWS[band].map((x) => x.join(' ')).join(' | ');

@@ -38,15 +38,11 @@ test('hudText: the rubberband speedup only engages past maxRows', () => {
   assert.equal(over.timer, HUD_TEXT_POP_DELAY - 0.5 * (1 + HUD_TEXT_RUBBERBAND * 3));
 });
 
-// ── FONT1 (2026-09-16, Mac: "Enhanced mode UI ... Ambient Text mod also
-// doesnt use it. Any enhanced UI or text must be our enhanced
-// version"): THE POPUP ROWS IN THE ENHANCED FACE ────────────────────
+// ── FONT1: THE POPUP ROWS IN THE ENHANCED FACE ────────────────────
 //
 // The model above is PopupText and stays PopupText: what the skin
 // changes is the PAINT. FONT1's paint was a DOM column at the top of
-// the screen; ENH-NOTICE3 (2026-09-21, Mac: "All mods, including
-// climates and calories need to utilize the enhanced notification
-// popup") moved it into the notice stack as TOASTS - one panel per row
+// the screen; ENH-NOTICE3 moved it into the notice stack as TOASTS - one panel per row
 // in the same right-edge stack the message box slides into
 // (ui/enhanced/enhancedNotice.js drawEnhancedToasts). These drive that arm over
 // a fake document (the shape test/ui/enhancedNotice.test.js drives its
@@ -335,7 +331,7 @@ test('FONT1: the online status line is the skin\'s face too, and every silent pa
   });
 });
 
-// ── AUDIT FONT (2026-09-16) - THE FONT1 SLICE AUDITED ────────────────
+// ── AUDIT FONT - THE FONT1 SLICE AUDITED ────────────────
 //
 // Thirteen findings against FONT1's own arm. These are the fixes, each
 // driven over a fake document through the REAL modules - a HudText, a
@@ -620,7 +616,7 @@ test('ENH-NOTICE3 (AUDIT A1/A6/A9/A10): the sheet - the stack clips what will no
 });
 
 test('INFO1: a nameless row is not a row - no empty toast, and no blank line in the notebook', () => {
-  // kurkku on Discord (2026-09-21): "an empty message box appears when
+  // kurkku on Discord: "an empty message box appears when
   // clicking on residences in info mode... I assume the intended
   // behavior is that nothing comes up at all."
   //

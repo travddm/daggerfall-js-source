@@ -1,4 +1,4 @@
-// RATE-LAW (2026-10-04, Mac: "Remove travel options dials" / "Roads now travel at x100 and non roads at x60"): A JOURNEY'S
+// RATE-LAW: A JOURNEY'S
 // RATE IS ITS GROUND'S. This file pinned TRAVEL-LAST-SPEED - the spinner's chosen rate surviving a path's half cap - and
 // the spinner, its limit and the half cap are gone; what it pins now is the law that replaced them, driven through the
 // real mod and the real panel: a route by its legs (a road or a track x100, the open ground and the walk back to the
@@ -117,7 +117,7 @@ test('RATE-LAW: a stop asks for walking pace and forgets the rate, so the next j
 import { readFileSync } from 'node:fs';
 import { playerOnPathAt, pathsDataPoint, E, W } from '../../../src/systems/travel/travelPaths.js';
 import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/systems/travel/travelPace.js';   // PACE-DIALS: the road's x100 is the player's dial
-/** PACE-DIALS (2026-10-06): x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
+/** PACE-DIALS: x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 

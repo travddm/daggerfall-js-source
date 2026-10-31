@@ -1,4 +1,4 @@
-// INT1 (the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE HONEST PRODUCERS, SWEPT. Not a .test.js on
+// INT1 (the INTEGRITY arc): THE HONEST PRODUCERS, SWEPT. Not a .test.js on
 // purpose (the manifest counts suites, and this is a fixture): every item home this tree has, called the way the game
 // calls it, on seeded rolls - so the item law (src/systems/item/itemLaw.js itemFindings) can be pinned against what an
 // honest client really mints, never against hand-written literals.
@@ -234,7 +234,7 @@ function craftMagicDef(records) {
   return buf;
 }
 /** DFU's own MAGIC.DEF (test/dfuMagicItems.mjs - its MagicItemTemplates.txt, the table DFU reads): the thirty-six regular
- *  magic items, one row each, and the twenty-three artifacts, as readMagicDef answers them. PIN MOVED (INT1's audit,
+ *  magic items, one row each, and the twenty-three artifacts, as readMagicDef answers them.
  *  2026-10-09): the sweep minted its magic from sixty-four invented records of one to three rows of any kind - shapes no
  *  MAGIC.DEF holds, which the item law now proves against DFU's table. */
 export function fakeMagicTemplates() {
@@ -556,7 +556,7 @@ function runReforge(run, minted, seedsOf) {
       if ((item.rarity === 'rare' || item.rarity === 'legendary') && !LR.isCursed(item)) { const c = copyItem(base); if (LR.cursePiece(c, seeded(n ^ 5))) one(c); }
     }
   });
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md): a technique line added to every weapon and gauntlet the ladder minted that
+  // TECH1: a technique line added to every weapon and gauntlet the ladder minted that
   // carries none - each of its family's techniques in turn - then the passes that may follow a find on such a piece in
   // any order the game's doors or the Test Room take them: an Exalted's line, a curse's, a hone of the technique's own
   // line, a reforge of it - each lands BEFORE the technique (lootRarity.js withLine) and the law takes every one
@@ -1362,7 +1362,7 @@ const QL_REWARDS = await load('../src/systems/questlines/qlRewards.js');
 const QL_SHEETS = await load('../src/systems/questlines/qlSheets.js');
 const SKILLS_MOD = await load('../src/systems/skills.js');
 
-/** QL3 (bible/06-Systems/Questlines-Arc.md section 5.2; AUDIT QUESTLINES REWARD-9): A QUEST'S CHOICE OF THREE - the layer's
+/** QL3 (; AUDIT QUESTLINES REWARD-9): A QUEST'S CHOICE OF THREE - the layer's
  *  roll (systems/questlines/qlLayer.js ending) at every tier and three levels, for a fighter, an archer, a mage (chain,
  *  plate and every shield barred) and a class barred from every weapon, plain and with each questline ending's named
  *  piece in turn (made from its sheet's base and named), so the item law reads a quest's piece as it reads every other. */

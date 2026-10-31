@@ -1,6 +1,4 @@
-// FB0929 (2026-09-29, Discord #bug-reports, lumin, relayed by Mac): "Vendors selling items for 0 gold. Some cheap items
-// like bandages are selling for 0 gold from vendors in some instances. There should be a hard minimum of 1 gold for
-// anything."
+// FB0929 (2026-09-29, Discord #bug-reports, lumin, relayed by
 //
 // Daggerfall's own law, ported verbatim: CalculateCost floors a piece at 2 gold (1 after a Buy-mode holiday's halving)
 // and CalculateTradePrice's buying arm (FormulaHelper.cs:2000) scales the lot's cost by 66/256 to 256/256 and
@@ -111,7 +109,7 @@ test('FB0929: a stack pays a gold a piece - Roleplay & Realism: Items\' shelf of
     assert.equal(getTradePrice('Buy', fest.cost, STACK_Q, HAGGLER, fest.pieces), 7);
     // the lot is haggled ONCE, as DFU haggles it (GetTradePrice over UpdateCostAndGold's total): the floor is the
     // LOT's pieces, and a lot dearer than that is Daggerfall's own number - so a cheap piece beside a horse rounds
-    // into the horse's price like any piece of a lot (the reason the SALE is not floored). PIN MOVED (MERCHANT-YARDS,
+    // into the horse's price like any piece of a lot (the reason the SALE is not floored).
     // 2026-10-10): the horse was the General Store shelf's own; it is the Stable's now, minted as a shelf mints it
     const shelf = rriShelf();
     const horse = yardStock('stable')[0];

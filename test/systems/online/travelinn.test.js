@@ -1,9 +1,8 @@
-// TRAVEL-INN (2026-09-22) - WHAT THE INNS/CAMP OUT TOGGLE ACTUALLY DOES,
+// TRAVEL-INN - WHAT THE INNS/CAMP OUT TOGGLE ACTUALLY DOES,
 // MEASURED ON BOTH SIDES.
 //
 // DragynDance on Discord: "when you use instant travel the game ignores
-// the option to camp or rest at an inn". Mac: "there's a toggle to rest
-// at inns and stuff during travel. Why doesn't it work?"
+// the option to camp or rest at an inn".
 //
 // It works OFFLINE and it is inert ONLINE, and neither half was written
 // down anywhere an execution could check. The numbers below are driven
@@ -34,7 +33,7 @@
 // move and the online rows will - which is the signal to come back and
 // decide what an inn means when the nights belong to everyone.
 //
-// LIVED1 (2026-09-29) IS THAT SLICE, and the answer is the character's
+// LIVED1 IS THAT SLICE, and the answer is the character's
 // own time: the nights belong to the traveller. The trip's days pass on
 // their own clock (world.js advances them online too), so an inn is a
 // bed they sleep in and camping out is the slower road again - the
@@ -85,7 +84,7 @@ test('TRAVEL-INN (LIVED1): online the toggle is live again - the days pass on th
   const camp = trip(true, false);
   assert.ok(inn.days > 0 && camp.days >= inn.days, `the days are counted online: ${inn.days} by inns, ${camp.days} camping`);
   assert.ok(camp.minutes > inn.minutes, 'camping out is the slower road online too');
-  // TRAVEL-FARE (2026-09-22, kurkku: "really long trips ... don't cost anything") stands: the fare is the price of
+  // TRAVEL-FARE stands: the fare is the price of
   // the journey - and now the nights it pays for are really slept, on the character's own clock
   assert.ok(inn.cost > 0, 'the inn is billed online');
   assert.equal(camp.cost, 0, 'and camping out is still free, online as offline');

@@ -29,7 +29,7 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second
 // Online, exactly one of the players within 100m rolls (a deterministic
 // lowest-id pick).
 //
-// CAMP-NOTIMER (2026-09-19, Lost's package): world.js, the real
+// CAMP-NOTIMER: world.js, the real
 // streaming open world, WIRES UP ONLY THE SECOND. A camp or a pack must
 // be a consequence of the player stepping onto new ground, never a
 // background timer dropping one on a player standing still.
@@ -113,7 +113,7 @@ test('CAMP1: group ownership online - the one lowest id among the players within
 test('CAMP1 by source: both exterior hosts roll it after the single roll comes back empty, stand an anchor then the members around it, the world host under the group-ownership guard and on every pixel entered; a member that notices the player wakes its campmates; the feature row', () => {
   const w = hostText('src/scenes/world.js');
   const e = read('src/scenes/exterior.js');
-  // CAMP-NOTIMER (2026-09-19, Lost's package): THE TIMER ARM IS GONE
+  // CAMP-NOTIMER: THE TIMER ARM IS GONE
   // FROM world.js. It fired a GUARANTEED group every 15 real minutes of
   // play even while the player stood still; a camp or a pack must be a
   // consequence of walking onto new ground, so the chunk-load roll is
@@ -142,7 +142,7 @@ test('CAMP1 by source: both exterior hosts roll it after the single roll comes b
   for (const [name, h] of [['world.js', w], ['exterior.js', e]]) {
     const si = h.indexOf('const _standCampEncounter = (hit, feet) => {');
     const stand = h.slice(si, h.indexOf('\n  };', si));
-    // CAMP-FAR (2026-09-24): the anchor is no longer the ring law's - that law probes four units down from the
+    // CAMP-FAR: the anchor is no longer the ring law's - that law probes four units down from the
     // player's own height and cannot find ground a hundred metres out on any real grade. The far law takes the
     // group's band, the player's yaw and view, and the collider's own terrain sampler for its floor.
     assert.match(stand, /anchor = campAnchorSpot\(\{ feet, yawRad: (hit\.yawRad \?\? )?cam\.yaw, fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI, groundAt: collider\.heightAt, minDistance: hit\.minDistance, maxDistance: hit\.maxDistance(, bearingDegrees: hit\.bearingDegrees)? \}\);/, `${name}: the anchor stands by the far law - the group's band, out of view, on the terrain's floor`);
@@ -166,7 +166,7 @@ test('CAMP1 by source: both exterior hosts roll it after the single roll comes b
   }
   // CAMP1-REST re-aimed exterior.js's; world.js's timer roll is gone entirely (CAMP-NOTIMER, above)
   assert.match(e, /if \(!isResting && getPref\('wildernessCamps'\) !== false\) \{\s*\n\s*const campHit = rollCampEncounter\(/, 'exterior.js: no peers on this route, no guard - the rest gate stands alone');
-  // CAMP-REST (2026-09-19, Dudey: "the camp enemies should just not appear when resting"): the CHUNK-LOAD twin takes
+  // CAMP-REST: the CHUNK-LOAD twin takes
   // a rest gate too now. The old note said a resting player crosses no pixel, so a gate was a law with no case - but
   // the rule the player asked for is unconditional, and the gate costs one flag read.
   assert.ok(/!playerEntity\.isResting/.test(w.slice(w.indexOf('stream: entered ${r.current.x}'), w.indexOf('\n    pump();', w.indexOf('stream: entered ${r.current.x}')))), 'the chunk-load roll stands down while resting');
@@ -193,7 +193,7 @@ test('CAMP1 by source: both exterior hosts roll it after the single roll comes b
   assert.match(read('src/systems/campEncounters.js'), /^\/\/ This is an ORIGINAL addition, not a Daggerfall Unity or classic/m, 'the module says what it is');
 });
 
-// CAMP1-REST (2026-09-18, Mac's wilderness-resting hand-off): the group roll stands down while the tick is
+// CAMP1-REST: the group roll stands down while the tick is
 // servicing a rest. THE MECHANISM IS SIGHT FIRST, DISTANCE SECOND - the hand-off's own note read it as a pure
 // distance law and that is not what encounters.js does. areEnemiesNearby's resting arm reports a foe that has SEEN
 // the player at ANY range, and only falls back to the 12-unit proximity test for a foe that has not. A lone
@@ -250,7 +250,7 @@ test('CAMP1-REST: the rest interrupt is SIGHT first - a seen foe reports at any 
   // THE DIFFERENCE THAT ACTUALLY DECIDES IT, by source: the lone arm yaws its foe at the PLAYER, the group arm
   // yaws each member at the ANCHOR. That is the line a future "fix" would touch instead of this gate.
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const h = host === 'src/scenes/world.js' ? hostText(host) : read(host);   // PIN MOVED (HOST-SPLIT, at the merge of main into TESA): questWorld is scenes/questWorld.js's - the host read whole
+    const h = host === 'src/scenes/world.js' ? hostText(host) : read(host);
     assert.match(h, /yaw: Math\.atan2\(feet\[0\] - spot\.x, feet\[2\] - spot\.z\),   \/\/ LookAt player/, `${host}: the lone wanderer faces the player`);
     assert.match(h, /yaw: Math\.atan2\(anchorFeet\[0\] - spot\.x, anchorFeet\[2\] - spot\.z\),/, `${host}: a campmate faces the camp`);
   }
@@ -272,7 +272,7 @@ test('CAMP1-REST: the rest interrupt is SIGHT first - a seen foe reports at any 
     'and a foe that HAS seen the player wakes them at any distance');
 });
 
-// CAMP-REST (2026-09-19): time skips that are not the rest window must not be replayed as walking time. The exhaustion
+// CAMP-REST: time skips that are not the rest window must not be replayed as walking time. The exhaustion
 // collapse, a camp meal and a forage/hunt search (the hunt's retired with it, HUNT-OUT 2026-10-04) advance the clock
 // without touching the encounter cursor, so the next
 // frame's catch-up rolled them with isResting=false and the timer's 180-minute boundary fired a guaranteed group.
@@ -286,12 +286,9 @@ test('CAMP-REST by source: every time skip is spent through the tick as a rest, 
   assert.match(ef, /noTargetMode: campAsleep,[^\n]*\n\s*dropLocal: wildUnaware,/, 'the target machine leaves the player off its list for it (WILD-ALERT: and the local player alone for a wilderness foe that has not noticed a fast traveller - test/scenes/wildalert.test.js, test/systems/wildalertfix.test.js)');
 });
 
-// ═══ CAMP-FAR (2026-09-24) ══════════════════════════════════════════
+// ═══ CAMP-FAR ══════════════════════════════════════════
 //
-// Mac: "when stepping into a new chunk, enemy camps spawn immediately
-// behind the player, which is far too sudden and overwhelming. Instead,
-// when the spawn chance triggers, enemies should spawn at a distance of
-// 100-150 meters away from the player." The band moves out, and the
+// The band moves out, and the
 // anchor gets its own placement law, because DFU's ring cannot reach:
 // it walks out at the player's height and probes FOUR units down.
 test('CAMP-FAR: the band is 100..150 metres, and the anchor law stands it there - just outside the view, on the terrain\'s own floor, or nowhere off the built ground', () => {

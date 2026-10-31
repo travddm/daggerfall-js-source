@@ -1,5 +1,4 @@
-// LC1 (2026-09-23, Mac: "We need to take a chance and also make some insane improvements to our lighting system.
-// Its already really good, but it could be much better while also improving performance"): CLUSTERED LIGHTS.
+// LC1: CLUSTERED LIGHTS.
 //
 // The lane's lantern loop walked every one of the frame's lights (up to 48) in every lit fragment, asking each
 // "am I in your range" before any work. src/render/lightClusters.js cuts the frustum into 16 x 9 x 24 cells, writes

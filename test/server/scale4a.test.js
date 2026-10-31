@@ -1,7 +1,7 @@
-// SCALE4a (2026-10-08, Mac: "Do 1 2 and 3" - of PERF-NEXT's follow-up list, the account service's reads halved): every
+// SCALE4a: every
 // authenticated request resolved its secret in TWO statements one after the other - the session by its hash, then its
 // player by id - and the day before YARD-SHED those two were 4.86 and 4.73 million of the database's 17.4 million reads
-// (bible/06-Systems/Online-Arc.md YARD-SHED). One statement now (server-account/src/accounts.js resolveSession,
+// (YARD-SHED). One statement now (server-account/src/accounts.js resolveSession,
 // WHO_SQL): the session's six columns under a prefix beside `p.*`, LEFT JOINed so every exit the two reads had - the idle
 // session deleted, the orphan refused, the stale touch - is met in the same order. The old two reads are the oracle.
 // tools/mutants/scale4a.json.

@@ -1,4 +1,4 @@
-// AUDIT TESA II, lane P (2026-10-25; bible/03-World/Arena-Provinces.md, bible/03-World/World-Wide.md) - THE LAWS: the
+// AUDIT TESA II, lane P - THE LAWS: the
 // discovery store's key of a place off the Bay's pixel ids (P6), the journey into the land past the Bay (P4), and the
 // nearest safe place of the world (P2/P3, A2-4's rise), each run over the producers' own ids.
 import { test, afterEach } from 'node:test';

@@ -1,6 +1,6 @@
-// SEAT1a (2026-09-30, Mac: "Finish the seats"): THE SEATS AS EVERY CLIENT DERIVES AND SHOWS THEM - the derivation over a
+// SEAT1a: THE SEATS AS EVERY CLIENT DERIVES AND SHOWS THEM - the derivation over a
 // fixture MAPS set (never hand-built rows: TEST THE SHAPE THE PRODUCER MINTS), the one law module, the seat book, the
-// map's rings, the banners' anchors and the hosts by their source. bible/11-Multiplayer/Seats-Arc.md 3.1-3.4;
+// map's rings, the banners' anchors and the hosts by their source. 3.1-3.4;
 // `06-Systems/Online-Arc.md` SEAT1a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -80,10 +80,9 @@ test('SEAT1a the law: a report canonical in its bytes and read back; a crown in 
   assert.equal(parseSeatReport('[3021, "Anticlere",21,"palace",402,151]'), null, 'only the canonical bytes');
   for (const bad of [{ ...a, key: -1 }, { ...a, key: 2 ** 32 }, { ...a, name: '' }, { ...a, name: 'x'.repeat(49) }, { ...a, name: 'Antié' }, { ...a, region: 71 },
     { ...a, tier: 'castle' }, { ...a, pixel: [8192, 0] }, { ...a, pixel: [0, -8192] }, { ...a, pixel: [1.5, 2] }]) assert.equal(seatReportOf(bad), null, JSON.stringify(bad));
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): a seat past the Bay - a province's region, a pixel of the world's grid
   assert.ok(seatReportOf({ ...a, region: 64, pixel: [1000, 0] }) && seatReportOf({ ...a, region: 70, pixel: [-40, 600] }));
   assert.ok(seatReportOf({ ...a, name: 'x'.repeat(48) }));
-  assert.deepEqual(CROWN_SEAT_REGIONS, { 17: 'daggerfall', 23: 'wayrest', 20: 'sentinel', 64: 'skyrim', 65: 'morrowind', 66: 'summerset', 67: 'valenwood', 68: 'elsweyr', 69: 'blackmarsh', 70: 'cyrodiil' });   // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): the provinces' crowns
+  assert.deepEqual(CROWN_SEAT_REGIONS, { 17: 'daggerfall', 23: 'wayrest', 20: 'sentinel', 64: 'skyrim', 65: 'morrowind', 66: 'summerset', 67: 'valenwood', 68: 'elsweyr', 69: 'blackmarsh', 70: 'cyrodiil' });
   assert.ok(seatReportOf({ key: 2, name: 'Solitude', region: 64, tier: 'crown', pixel: [1600, 30] }), 'a province crown bears its capital\'s name');
   assert.equal(seatReportOf({ key: 2, name: 'Skyrim', region: 64, tier: 'crown', pixel: [1600, 30] }), null, 'never its kingdom\'s');
   assert.ok(seatReportOf({ key: 1, name: 'Wayrest', region: 23, tier: 'crown', pixel: [1, 1] }));
@@ -126,9 +125,9 @@ test('SEAT1a the words and the marks: the Charter, the arrival line, the map\'s 
   assert.equal(seatInfoLine(pal), 'The Charter of Anticlere: unheld');
   assert.equal(SEAT_RING_UNHELD, '#8a8a8a');
   assert.deepEqual(KINGDOM_METALS, { daggerfall: '#3b6fd8', wayrest: '#b3262e', sentinel: '#d4a017',
-    skyrim: '#e6e6e6', morrowind: '#7d1f1f', summerset: '#7fb3e6', valenwood: '#1f7f7f', elsweyr: '#c46a1b', blackmarsh: '#5a3e22', cyrodiil: '#7a3fa0' });   // PIN MOVED (WW7-3): the provinces' crowns' metals
+    skyrim: '#e6e6e6', morrowind: '#7d1f1f', summerset: '#7fb3e6', valenwood: '#1f7f7f', elsweyr: '#c46a1b', blackmarsh: '#5a3e22', cyrodiil: '#7a3fa0' });
   assert.equal(FREE_LAND_RING, '#2f8f4e');
-  // SEAT1c (PIN MOVED): an unheld, quiet seat's mark names no fill, no split and no siege
+  // SEAT1c (
   assert.deepEqual(seatMapMark(crown), { ring: '#8a8a8a', crown: '#b3262e', second: null, fill: null, split: null, siege: false });
   assert.deepEqual(seatMapMark(pal), { ring: '#8a8a8a', crown: null, second: ['#3b6fd8', '#b3262e'], fill: null, split: null, siege: false }, 'Anticlere: Daggerfall and Wayrest');
   assert.deepEqual(seatMapMark({ region: 26, tier: 'palace' }), { ring: '#8a8a8a', crown: null, second: ['#2f8f4e'], fill: null, split: null, siege: false });
@@ -181,7 +180,7 @@ test('SEAT1a the book: open by the service\'s word; the list kept its minutes (a
   now += 86_400_000;
   assert.equal(await book.witness(seat), true, 'the next day, again');
   assert.deepEqual(witnessed, [3021, 3021]);
-  assert.equal(await book.witness({ ...seat, pixel: [8192, 0] }), false, 'a bad seat is no report');   // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): off the world's grid
+  assert.equal(await book.witness({ ...seat, pixel: [8192, 0] }), false, 'a bad seat is no report');
   answer = { ok: false, error: 'seats-closed' };
   now += SEAT_LIST_CACHE_MS + 1;
   await book.read();
@@ -236,7 +235,7 @@ test('SEAT1a the banners: the palace door\'s two, a gate\'s on its town side bes
   assert.deepEqual(b.top, [0.5, 2 + BOARD_PENNANT_RISE_M, 0.1]);
   const frames = new Map([[makeBuildingKey(1, 2, 1), { at: [0, 0, 0], box: [-5, 0, -5, 5, 8, 5], door: { a: [-1, 0, 5], b: [1, 0, 5] } }]]);
   const boards = [{ local: I, box: [0, 0, 0, 1, 2, 0.2] }, { local: I, box: [3, 0, 0, 4, 2, 0.2] }];
-  const all = seatBannerAnchors({ frames, palaceKeys: [makeBuildingKey(1, 2, 1)], gates: [gate], boards, bounty: new Set([1]), centre: [0, 20] });   // ONE-BOARD REVERTED (PIN MOVED): a pennant over every rumour board
+  const all = seatBannerAnchors({ frames, palaceKeys: [makeBuildingKey(1, 2, 1)], gates: [gate], boards, bounty: new Set([1]), centre: [0, 20] });     // ONE-BOARD REVERTED (
   assert.equal(all.length, 4, 'the door\'s two, the gate\'s one, the rumour board\'s one - never the bounty board\'s');
   assert.deepEqual(all[3], boardPennantAnchor(boards[0]), 'the pennant over the rumour board itself');
   assert.equal(seatBannerAnchors({ boards, centre: [0, 20] }).length, 2, 'no bounty board: a pennant over each');

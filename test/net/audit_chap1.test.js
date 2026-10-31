@@ -1,6 +1,6 @@
-// AUDIT CHAP (2026-10-07, Mac: "Lets do a deep audit on everything so far before we continue"): CHAP0's record and
+// AUDIT CHAP: CHAP0's record and
 // CHAP1's Roll read by five lenses - the service (S), the playing tab (C), Daggerfall's law (D), the record (R) and the
-// pins (T) - at 1100fec1. bible/01-Overview/audits/Audit-Chapters.md holds every finding; these pins hold every fix, each
+// pins (T) - at 1100fec1. holds every finding; these pins hold every fix, each
 // named by its finding's ID, and tools/mutants/audit_chap1.json is their mutants.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -43,7 +43,7 @@ test('AUDIT CHAP S1: a claim sent twice at once is credited once - the twin that
   await readRoll(s.ctx(T0), s.player, s.body({ seed: { factions: { 40: 10, 41: 0 }, members: [] } }));
   const claim = s.body({ rid: 'twin-000001', deltas: { 40: 5, 41: -20 }, members: [] });
   let twin = null;
-  // the twin lands between this one's read and its write - PIN MOVED (PRIMARY-FOLD part three, AUDIT PLAN-1000 D1): the
+  // the twin lands between this one's read and its write
   // claim's first batch is its reads now, so the twin lands before the second, the one that writes
   let batches = 0;
   const racing = { prepare: (sql) => s.env.DB.prepare(sql), batch: async (list) => { if (++batches === 2) twin ??= await claimRoll(s.ctx(T0), s.player, claim); return s.env.DB.batch(list); } };
@@ -126,7 +126,6 @@ test('AUDIT CHAP T13: the route - a GET is 405, a lost race is 409, a tombstone 
   assert.equal(get.status, 405);
   await s.call('/v1/chapters/roll', s.body({ seed: { factions: {}, members: [] } }), s.who.secret);
   const real = s.env.DB.batch.bind(s.env.DB);
-  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the claim reads its head, rows and record in a batch of
   // their own first - the race is laid between those reads and the batch that writes, the claim's second
   let batches = 0;
   s.env.DB.batch = async (list) => { if (++batches < 2) return real(list); s.env.DB.batch = real; s.raw.prepare('UPDATE npc_roll_heads SET seq = seq + 1 WHERE char_id = ?').run(s.R.id); return real(list); };
@@ -150,7 +149,6 @@ test('AUDIT CHAP D2/D3: a reward past the day\'s pace is owed, not lost - paid a
   const c = await claimRoll(s.ctx(T0), s.player, s.body({ rid: 'worms-00001', deltas: { 21: 100 }, members: [] }));   // S0000106's +100
   assert.deepEqual([c.credited[21], c.roll.factions[21], c.roll.owed[21]], [15, 15, 85]);
   const next = await readRoll(s.ctx(T0 + DAY), s.player, s.body());
-  // PIN MOVED (AUDIT CHAP2 C1): the answer's sequence is the CLAIM sequence - owed paid is the service's own credit
   assert.deepEqual([next.from, next.roll.seq, next.roll.factions[21], next.roll.owed[21]], [1, 1, 30, 70], 'the next day\'s read pays 15');
   const later = await claimRoll(s.ctx(T0 + 2 * DAY), s.player, s.body({ rid: 'worms-00002', deltas: { 40: 1 }, members: [] }));
   assert.deepEqual([later.roll.factions[21], later.roll.owed[21]], [45, 55], 'and a claim on any line pays it too');
@@ -275,7 +273,6 @@ test('AUDIT CHAP T6/T10: a promotion alone is claimed; an uncut claim says nothi
   p.h[40] += 5;
   p.at(ROLL_CLAIM_MS); p.tracker.tick(); await p.settle();
   assert.deepEqual(p.box.said, [[40]], 'a repeat said nothing more');
-  // PIN MOVED (AUDIT GUILD-WORDS II B-3, C-4): the pace's words are rollNoticeHost.js's, with what is owed - test/systems/fb1015g_guildwords.test.js
 });
 
 test('AUDIT CHAP T8/T9: the wait doubles from 30 seconds to 15 minutes and resets on an answer; no Roll found reads again; a read with no Roll is a stop (mutants: the doubling, the cap, the reset, the unseeded reset)', async () => {

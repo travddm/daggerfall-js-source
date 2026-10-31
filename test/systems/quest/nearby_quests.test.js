@@ -1,6 +1,5 @@
 // @ts-check
-// NEARBY-QUESTS (2026-10-04, Discord: "quests of the game you take from guilds and so on need to be near you on
-// overworld map"): a remote quest site is drawn within the quest reach of the player's map pixel - ten pixels at level
+// NEARBY-QUESTS: a remote quest site is drawn within the quest reach of the player's map pixel - ten pixels at level
 // one, four more a level - with the nearest three standing in when fewer are that near, and DFU's region-wide draw
 // with the row off. Driven through the real parse (QuestMachine.scheduleQuest) over a crafted region whose sites stand
 // at known distances.
@@ -43,7 +42,6 @@ function makeWorld(sites) {
     const wc = mapPixelToWorldCoord(pixel.x, pixel.y);
     const ll = mapPixelToLongitudeLatitude(pixel.x, pixel.y);
     const dungeon = s.kind === 'dungeon';
-    // PIN MOVED (KVAR-HOLD, 2026-10-08): the ids start past 5000 - 1001 is Mantellan Crux, a main-story dungeon, and no
     // random quest draws one now
     return {
       loaded: true, regionIndex: 0, regionName: 'Testshire', name: `${s.kind}${s.dx}`, locationIndex: index, hasDungeon: dungeon,

@@ -1,5 +1,4 @@
-// BATCH-SALVAGE (2026-10-19; the owner: "We need to add the ability to batch salvage in the inventory";
-// bible/06-Systems/Loot-Arc.md section 11, BATCH-SALVAGE). The laws pinned here:
+// BATCH-SALVAGE. The laws pinned here:
 //   - THE LAW (systems/reforge.js salvageMany): each chosen piece through salvagePiece, in the order given - its shards
 //     in, it out - so a refusal costs only its own piece; a piece chosen twice breaks once; one refused (worn, locked,
 //     gone) is kept and named; `salvageable` lists what would break now.

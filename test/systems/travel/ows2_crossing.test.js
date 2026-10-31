@@ -1,5 +1,4 @@
-// OWS2 (2026-09-28, the player's ask: "You should transition to your boat if traveling across water then back onto
-// land when hitting land") - THE CROSSING. An Overworld journey whose route puts to sea walks to the shore, launches
+// OWS2 - THE CROSSING. An Overworld journey whose route puts to sea walks to the shore, launches
 // the boat (a packable one's parts put on the water, or the boat at whose helm the traveller stands, or theirs moored
 // within reach), sails its sea legs through Come Sail Away's own keys, and at the landfall leaves the helm, steps ashore
 // and packs a packable boat.
@@ -26,7 +25,6 @@ import { TRAVEL_VIEW_TEXT, travelTripLine } from '../../../src/scenes/travelView
 import { quatRotate } from '../../../src/world/quat.js';
 import { sea, sailTo, ctxFor } from '../../csaCrossing.mjs';   // FB1020c OAR-RUNG: the crossing's scene, shared
 
-// PIN MOVED (AUDIT OW5 G2): the Overworld's own lines are said through tvSay - held at the scale they are said at
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
 // ── THE PLANNER'S SEA ───────────────────────────────────────────────────────────────────────────────────────────────

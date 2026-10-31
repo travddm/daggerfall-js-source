@@ -5,7 +5,7 @@
 // (systems/revenant/revenant.js - the entity its latest stand put it in): entering its lair takes it home unless that body
 // is here already, is in a fight with me, kneels for my judgement, or has not stood up yet; the body it left is STALE and
 // its pool withdraws it with its band (scenes/exteriorFoes.js withdrawStale). The record:
-// bible/01-Overview/bugs/Field-Bugs-2026-10-19.md LAIR-HOME.
+// LAIR-HOME.
 import '../../modsOff.js';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// AUDIT WORLD6b-iii(a) (2026-09-14, Mac: "Continue" after WORLD6b-iii(a)): three opus lenses over the cast at a peer -
+// AUDIT WORLD6b-iii(a) (2026-09-14, after WORLD6b-iii(a)): three opus lenses over the cast at a peer -
 // the owner's side, the puppet's side, the wire / the dungeon twin / the merge / the records. The criticals: a puppet
 // cast ANY spell in SPELLS.STD on its owner's word (B1 - resolved out of the puppet's OWN list now), and a puppet's own
 // self or area cast went to its owner as MY hit through the pool's sink (B2 - the sink says whose it is). The highs:

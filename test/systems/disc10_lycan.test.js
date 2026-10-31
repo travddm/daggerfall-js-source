@@ -1,6 +1,5 @@
 // DISC10-E - THE WEREWOLF, DRIVEN THROUGH THE LIVE DOORS.
 //
-// Mac (2026-09-23): "vampires and werewolf. I think these systems are completely broken and not wired correctly".
 // Every pin here EXECUTES the port's own modules the way a host drives them - the real city watch pool on a synthetic
 // CLASS18.CFG, the real encounter pool on a crafted MONSTER.BSA (test/characters/enemy/watch1.test.js's rig), the real PlayerWeapon
 // resolving the swing, the real worldTick round, the real inventory/trade doors - and each one failed on the code

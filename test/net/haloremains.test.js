@@ -1,5 +1,4 @@
-// HALO-REMAINS (2026-10-09, the owner: "i died in the pvp zone again and still my pile isnt there", "other players can
-// see the pile but you dont see your own"). The relay says a room's remains at a socket's HELLO alone. Walking back to
+// HALO-REMAINS. The relay says a room's remains at a socket's HELLO alone. Walking back to
 // them, a player hello's their cell as a HALO first (from the cell beside it): the halo's words were dropped
 // (net/online.js delivered a room's wild word on the primary socket only), and crossing into the cell PROMOTES that
 // socket with no new hello - so the remains were never said again and the fallen's own pile never stood. Players who
@@ -58,7 +57,6 @@ test('HALO-REMAINS: the session delivers a halo\'s room word, sends a take to th
   const s = Object.create(OnlineSession.prototype);
   const out = { own: [], halo: [] };
   const own = { send: (x) => out.own.push(JSON.parse(x).data) }, halo = { send: (x) => out.halo.push(JSON.parse(x).data) };
-  // PIN MOVED (RPT1026-SECNET): both sockets welcomed - a room's word never goes ahead of its socket's welcome (sendWild)
   Object.assign(s, { id: 'me-0001', room: HERE, status: 'open', wildOk: true, _ws: own, _wildBucket: null, _now: () => 0, stats: { sent: 0 }, _welcomed: new WeakSet([own, halo]), _halo: new Map([[NEXT, { ws: halo, status: 'open', wildOk: true }], ['cell:9,9', { ws: null, status: 'connecting' }]]) });
   const take = { k: 'take', r: '0123456789ab', i: 0, n: 1 };
   assert.equal(s.sendWild(take, { room: NEXT }), true);

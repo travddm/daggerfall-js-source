@@ -1,4 +1,4 @@
-// SD9c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE TURNING HOUR - the
+// SD9c: THE TURNING HOUR - the
 // Brass Remnant's aura, "a slow wheel of brass gears and gold light about the wearer", one kill in eight on its first
 // write (server-account/src/sds.js, SD9b), held off the row (`sd_honours`) and worn as every aura is; drawn by the aura
 // pass's seventh look (render/auraRing.js): a brass wheel at the feet stepping on the second, its spokes and hub, the
@@ -64,14 +64,14 @@ test('SD9c THE LOOK\'S LAW: the seventh kind, added whole (no shade, no mesh, no
   // the wheel: held through most of each second, stepping in its first quarter, never back
   for (const s of [0, 7, 59, 119]) {
     assert.equal(turningWheelAngle(s + TURNING_STEP_S), turningWheelAngle(s + 0.9), `held after its step (${s})`);
-    // AUDIT SD II (SD11f, PIN MOVED): its angle falls - forward, clockwise on the screen (below)
+    // AUDIT SD II (SD11f
     assert.ok(turningWheelAngle(s + 0.1) < turningWheelAngle(s) && turningWheelAngle(s + 0.1) > turningWheelAngle(s + TURNING_STEP_S), 'stepping in its first quarter');
     assert.ok(Math.abs(turningWheelAngle(s) - turningWheelAngle(s + 1) - TAU * TURNING_HZ.wheel) < 1e-12, 'a step a second');
   }
   let last = Infinity;
   for (let t = 0; t <= AURA_CLOCK_PERIOD; t += 0.05) { const a = turningWheelAngle(t); assert.ok(a <= last + 1e-12, `never back (${t})`); last = a; }
   assert.ok(Math.abs(turningWheelAngle(AURA_CLOCK_PERIOD) + 2 * TAU) < 1e-9, 'two turns over the clock: whole at the wrap');
-  // AUDIT SD II (L2 F13 - PIN MOVED): BACK AS THE EYE SEES IT, never the math sign. Through the game's own camera
+  // AUDIT SD II (L2 F13
   // (world/mat4.js lookAt and its one mirror) a mark on the ground's dial - at (cos a, sin a) of (x, z) about the feet -
   // turns ANTICLOCKWISE on the screen, as the Hour's sky's hands do (render/superDungeon/sdSky.js: sin(back), cos(back) of (azimuth,
   // elevation), back falling); this pin read turningDialAngle < 0, and the dial turned clockwise - forward - on the screen
@@ -152,7 +152,7 @@ test('SD9c THE DIAL AND THE LIGHT, the shader RUN: the Hour\'s twelve marks on t
   }
   const deep = TURNING_DIAL_R - TURNING_MARK_M * 1.5;
   assert.ok(lum(at(0, polar(deep, d), { t })) > lum(at(0, polar(deep, d + TAU / TURNING_MARKS), { t })) + 0.3, 'the Hour\'s own mark the longer');
-  const d3 = turningDialAngle(t + 3), on3 = d - (d3 - d);   // AUDIT SD II (L2 F13 - PIN MOVED): where its law stands it, and where the other way would
+  const d3 = turningDialAngle(t + 3), on3 = d - (d3 - d);     // AUDIT SD II (L2 F13
   assert.ok(lum(at(0, polar(markR, d3), { t: t + 3 })) > 0.5 && lum(at(0, polar(markR, on3), { t: t + 3 })) < 0.3, 'it turned back, not on');
   // the light at the feet, breathing
   const feet = [0.02, 0.02];

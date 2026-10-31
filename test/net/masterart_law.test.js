@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - THE LAW OF A MASTER'S WORK, ALONE: which
+// MASTER-ART - THE LAW OF A MASTER'S WORK, ALONE: which
 // recipes take one, the lines a piece may be given, the refusals, the roll in the Legendary band (never past its top -
 // POWER-CEILING), the catalysts' one table, the record's `l`, the mint, the item law and the item maker's refusal.
 import '../chargenDom.mjs';

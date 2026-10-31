@@ -1,5 +1,4 @@
-// AUDIT FOES FOE2 - A BLOW THE WIRE REFUSED MUST NOT BE LOST (2026-09-15,
-// Mac relaying players: "during online play, certain enemies cant be damaged").
+// AUDIT FOES FOE2 - A BLOW THE WIRE REFUSED MUST NOT BE LOST.
 //
 // The acts got this law at AUDIT WORLD3 A3 and the blow did not, and the blow
 // needed it more: an act is a STATE, so a lost one reads wrong until someone
@@ -118,7 +117,7 @@ test('FOE2: the door refuses what is not a blow, and holds nothing for it', () =
   assert.equal(w.pend.held, 0);
 });
 
-// LOOT-DUP (2026-09-15, AUDIT ONCRASH1's own finding): AND EVERY FRAME LEARNS ITS OWN FATE.
+// LOOT-DUP: AND EVERY FRAME LEARNS ITS OWN FATE.
 //
 // The boolean this door returns is the QUEUE's news. With anything already waiting it answers `flush` - true when
 // some OTHER blow went - and a frame that is merely queued answers false although it usually leaves a frame later.

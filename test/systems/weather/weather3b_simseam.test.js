@@ -1,4 +1,4 @@
-// WEATHER3 slice B (2026-09-22): THE WORLD WEATHER MAP IS THE SKY - the
+// WEATHER3 slice B: THE WORLD WEATHER MAP IS THE SKY - the
 // sim's seam (systems/weather/weatherSim.js WEATHER3b). On the map's lane the
 // player's word is the map at the player: every exterior frame, every
 // arrival as a jump, and indoors at the door they went in by. The day
@@ -237,6 +237,6 @@ test('WEATHER3b: THE FRONT\'S PEAK IS THE PLACE\'S - the map\'s intensity placed
   assert.equal(g.state().episode.peak, h.state().episode.peak, 'no map: the seeded episode, as WX2 has it');
   // the hosts hand it over, and read the door indoors before the rain source does
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.match(rd(host), /weatherFront\.tick\(\{ dt, weather, arrival: enhancedFront \? sky\.frontArrival\(\) : 1, nowMinutes: playerTicker\.classicMinutes, tsec: now \/ 1000, jump, peak: weatherOverride \? null : (?:seaStormShown\(\) \? 1 : )?currentWeatherIntensity\(\) \}\);/, host);   // PIN MOVED (SEA-EVENTS, 2026-10-22): world.js's front peaks whole in the Aether Storm (scenes/seaVenturesHost.js seaStormShown)
+    assert.match(rd(host), /weatherFront\.tick\(\{ dt, weather, arrival: enhancedFront \? sky\.frontArrival\(\) : 1, nowMinutes: playerTicker\.classicMinutes, tsec: now \/ 1000, jump, peak: weatherOverride \? null : (?:seaStormShown\(\) \? 1 : )?currentWeatherIntensity\(\) \}\);/, host);
   }
 });

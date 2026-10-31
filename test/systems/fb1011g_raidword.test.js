@@ -5,7 +5,7 @@
 // location's rect - still on the town's map pixel, where the relay credits a word (server/src/index.js _raidWord's
 // `here`) - was never said; and a jump's sweep (scenes/world.js exteriorFoes.clearLive) took every raider and defender
 // out of the pool without a death, so the raid kept them standing and stood no one under its cap for the rest of it.
-// And the held map's raid card reads the town's ledger, not this machine's share. bible/01-Overview/bugs/Field-Bugs-2026-10-11g.md.
+// And the held map's raid card reads the town's ledger, not this machine's share..
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

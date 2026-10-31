@@ -1,7 +1,6 @@
-// WATER-FOES (2026-10-04, from the field: "Enemies in the water on a boat shouldn't slow down your ship or prevent you
-// from resting when on board") - a foe in the water reaches no one aboard (systems/foeReach.js), and the one sweep every
+// WATER-FOES - a foe in the water reaches no one aboard (systems/foeReach.js), and the one sweep every
 // "enemies nearby" asks (systems/encounters.js areEnemiesNearby - the helm's time scale, rest, a journey, the travel
-// view, a camp's placing) passes it over; the Overworld's threats too. bible/03-World/Come-Sail-Away.md.
+// view, a camp's placing) passes it over; the Overworld's threats too..
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

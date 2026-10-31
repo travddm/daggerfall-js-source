@@ -1,5 +1,4 @@
-// STAFF-PANEL4-CENSUS (2026-10-22, mob picked it, 04:13Z; design doc "DFO Staff Panel: design", "Item and gold census",
-// "Server load" and the weak spots "Copies found misses modded dupes..." and "Census rows ride every save...") - THE ITEM
+// STAFF-PANEL4-CENSUS - THE ITEM
 // AND GOLD CENSUS AND THE CONTESTED PIECES (server-account/src/staffCensus.js), driven through the real Worker on the
 // node:sqlite database every account pin stands on (test/accountDb.mjs): the tally a checkpoint takes - on the hour's row
 // and the character's latest, only when it changed, and never the checkpoint's undoing when it fails - a kind's count,

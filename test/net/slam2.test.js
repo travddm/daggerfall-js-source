@@ -1,4 +1,4 @@
-// SLAM2 (2026-09-16, Mac: Daggerfall's 30th, a streamer's server slam): THE RETRY IS JITTERED.
+// SLAM2: THE RETRY IS JITTERED.
 //
 // A room admits HELLO_HZ_MAX hellos a second and refuses the rest with CLOSE_BUSY. That is correct. What was not is
 // that every client refused in the same instant then waited the SAME `_backoff` and came back in the same instant -

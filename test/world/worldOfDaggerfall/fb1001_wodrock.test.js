@@ -1,5 +1,4 @@
-// FB1001-WODROCK (2026-10-01, the field: "MASSIVE buggy mountain at 823, 399 - insane"; Mac: "Retexture them to be as
-// detailed as possible"). World of Daggerfall builds its massifs out of ARCH3D's pebbles scaled by hundreds and
+// FB1001-WODROCK. World of Daggerfall builds its massifs out of ARCH3D's pebbles scaled by hundreds and
 // thousands (WOD_Mountain_01r1's spire at (824,399): model 60716 at 398 x 1101 x 398), and the model's own UVs rode the
 // scale - one 64x64 repeat over 600 m to 2.6 km of face, 0.03 to 0.5 texels a metre against the pebble's 12 to 150.
 // world/worldOfDaggerfall/wodRockUv.js unfolds each plane of a piece stretched 4x or more at its pebble's own texel density; the piece

@@ -1,5 +1,4 @@
-// IC-GRAND (2026-10-26; the KPbICA spec the owner forwarded: "Sewage system (that will be used for creating Sewers in the
-// future)"; bible/03-World/Arena-Provinces.md IC-GRAND) - THE IMPERIAL CITY'S SEWERS as a law and its data, pinned: a main
+// IC-GRAND - THE IMPERIAL CITY'S SEWERS as a law and its data, pinned: a main
 // under every avenue, radial and ring road and Green Emperor Way, each falling to where it pours; every radial's culvert to
 // the lake; the branches under the districts' own streets draining to the nearest main; the covers in the streets.
 import { test } from 'node:test';

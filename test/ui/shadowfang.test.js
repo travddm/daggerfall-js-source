@@ -1,7 +1,6 @@
-// SHADOW-FANG — ONE PLAYER'S OWN TITLE AND GLYPH (2026-09-26).
+// SHADOW-FANG — ONE PLAYER'S OWN TITLE AND GLYPH.
 //
-// Mac: "SirMcMobdon gets a brand new title/glyph. Remove them from Apostle. The glyph needs to be like the reference
-// shown" - a snarling wolf's head in profile, black, with a red eye - and "Black and crimson graident for the
+// a snarling wolf's head in profile, black, with a red eye - and "Black and crimson graident for the
 // title/glyph with the title name being Shadow Fang".
 //
 // The grant is TITLE-N's law (a handle list in the account service's config grants the title and its glyph, never to
@@ -136,7 +135,7 @@ test('SHADOW-FANG grant: SirMcMobdon alone holds it, case-folded, title and glyp
   const row = (handle, over = {}) => ({ handle, created_at: 1_800_000_000, registered_at: 1_900_000_000, ...over });   // FOUNDER3: first played after the cutoff too, so no Founder
   const nowS = 1_900_000_000;
   for (const h of ['SirMcMobdon', 'sirmcmobdon', 'SIRMCMOBDON']) {
-    // STAFF-PANEL1 (PIN MOVED, mob, 06:33Z: "add me to the dev and my shadow fang just becomes vanity"): beside the developer's
+    // STAFF-PANEL1 (
     assert.deepEqual(titlesHeld(row(h), env), ['developer', 'shadowfang'], `${h}: Shadow Fang and the developer's, nothing else`);
     assert.deepEqual(glyphsOf(row(h), env, nowS), ['dev', 'shadowfang'], `${h}: its glyph and no Apostle's`);
   }
@@ -144,7 +143,7 @@ test('SHADOW-FANG grant: SirMcMobdon alone holds it, case-folded, title and glyp
   assert.equal(titleWorn(row('SirMcMobdon', { title: 'shadowfang' }), env), 'shadowfang');
   assert.equal(equipRefusal('shadowfang', row('SirMcMobdon'), env), null, 'theirs to wear');
   assert.equal(equipRefusal('apostle', row('SirMcMobdon'), env), 'not-held');
-  assert.deepEqual(wardrobeOf(row('sirmcmobdon', { title: 'shadowfang' }), env, nowS), { titles: ['developer', 'shadowfang'], title: 'shadowfang', glyphs: ['dev', 'shadowfang'], auras: ['shadowcloak', 'seraphwings'], aura: null, insignia: [], icons: [], icon: null });   // STAFF-PANEL1 (PIN MOVED): the developer's beside, the Shadow Fang still worn; PIN MOVED (WITCH1): and no profile icon; WB9g: and no insignia bought; SHADOW-CLOAK (PIN MOVED): the list holds the Holo Shadow Cloak now, held but not worn until they put it on
+  assert.deepEqual(wardrobeOf(row('sirmcmobdon', { title: 'shadowfang' }), env, nowS), { titles: ['developer', 'shadowfang'], title: 'shadowfang', glyphs: ['dev', 'shadowfang'], auras: ['shadowcloak', 'seraphwings'], aura: null, insignia: [], icons: [], icon: null });     // STAFF-PANEL1 (
   for (const h of ['Dutchess', 'SquidKamer', 'Lattymoy', 'Stranger']) {
     assert.ok(!titlesHeld(row(h), env).includes('shadowfang'), `${h} does not hold it`);
     assert.ok(!glyphsOf(row(h), env, nowS).includes('shadowfang'));
@@ -163,7 +162,7 @@ test('SHADOW-FANG token and relay: a token may carry the title and the glyph and
   assert.equal(r.claims.t, 'shadowfang');
   assert.deepEqual(r.claims.g, ['shadowfang']);
   assert.equal(claimsValid({ v: 1, s: 'acct-sf', n: 'SirMcMobdon', k: 'linked', i: nowS, e: nowS + 60, g: [...GLYPHS] }), true, 'every glyph at once still fits');
-  const longest = TITLES.filter((t) => !titleClaimed(t)).reduce((a, t) => (t.length > a.length ? t : a), '');   // PIN MOVED (CHAP4c): the longest that rides alone - a claimed title rides with its claim, below
+  const longest = TITLES.filter((t) => !titleClaimed(t)).reduce((a, t) => (t.length > a.length ? t : a), '');
   const guild = { gi: `g${'z'.repeat(10)}`, gt: 'WWWW', gm: `m${'9'.repeat(15)}` };
   const wide = await mintToken({ s: 'a'.repeat(40), n: 'W'.repeat(NAME_MAX), k: 'linked', t: longest, g: [...GLYPHS], mu: nowS + 10 ** 9, lv: RENOWN_MAX, ...guild }, kp.privateKey, { subtle, nowS });
   assert.equal(JSON.parse(Buffer.from(wide.split('.')[1], 'base64url').toString()).gm, guild.gm, 'the guild rides it');
@@ -174,7 +173,7 @@ test('SHADOW-FANG token and relay: a token may carry the title and the glyph and
   // CRYSTAL-FIST AUDIT: AND THE ARENA'S TWO - the season's rating (`ar`, every registered account's) and the character's
   // level (`cl`, every account with a realm character) at their widest, which this token had left out; with them it is
   // 639 of 640 once the crystalfist glyph joined, so the NEXT word into the vocabulary trips this pin rather than a hello
-  const seatT = TITLES.filter(titleClaimed).reduce((a, t) => (t.length > a.length ? t : a), '');   // PIN MOVED (CHAP4c): the longest claimed title - a chapter's seat's now, the seats' before
+  const seatT = TITLES.filter(titleClaimed).reduce((a, t) => (t.length > a.length ? t : a), '');
   const aura = AURAS.reduce((a, x) => (x.length > a.length ? x : a), '');
   const widest = await mintToken({ s: 'a'.repeat(40), n: 'W'.repeat(NAME_MAX), k: 'linked', t: seatT, ts: [0xffffffff, 9999], g: [...GLYPHS], au: aura, mu: nowS + 10 ** 9, lv: RENOWN_MAX, ...guild, rc: 1, rb: [15, 14], ar: ARENA_RATING_MAX, cl: CHARACTER_LEVEL_MAX }, kp.privateKey, { subtle, nowS });
   assert.ok(widest.split('.')[1].length > 512, `past the old bound (${widest.split('.')[1].length})`);

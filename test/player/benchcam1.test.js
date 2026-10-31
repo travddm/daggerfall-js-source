@@ -1,6 +1,5 @@
-// BENCH-CAM (2026-10-10, from play - Temegast: "this is what i see when i use my carriage", Eye Of The Beholder's sprite
-// filling the screen; asked, "Thirs person view isnt working properly for wagon traversal"). THE CAMERA ON A WAGON'S
-// BENCH turns about a pivot over the wagon's roof (bible/06-Systems/Wagons.md BENCH-CAM): the wagon's `shell` (both bench
+// BENCH-CAM. THE CAMERA ON A WAGON'S
+// BENCH turns about a pivot over the wagon's roof (BENCH-CAM): the wagon's `shell` (both bench
 // wagons' body box - world/wagonModels.js wagonGeometry), the height the pivot rises to (scenes/horseCartPool.js
 // cameraFloor), both cameras reading it (player/eyeOfTheBeholder/eotbCamera.js, player/mwCamera.js), the seam that hands it on
 // (player/mwView.js) and the two exterior hosts that say it (scenes/world.js, scenes/exterior.js).

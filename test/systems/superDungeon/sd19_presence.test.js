@@ -1,5 +1,4 @@
-// SD19 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 4 and section 16's SD19;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOLLOW'S PRESENCE - the gate's sky burns over its
+// SD19: THE HOLLOW'S PRESENCE - the gate's sky burns over its
 // region, its banner counts down at its fire and the chat speaks of it; a Hollow had its column alone. Now the land's haze
 // and light lean to brass near a standing one (strongest at dusk, as the taverns always said), a banner and its marks on
 // the gate's own card stand at its door, its marks are said with its find, a found one's last hour is said to the realm,
@@ -74,7 +73,7 @@ test('SD19 THE BANNER AT ITS DOOR: its name, what it is and its state - fading, 
   assert.equal(SD_BANNER_M, 60);
   const risen = sdRise(sdFirst(T0 - 20 * M), T0 - 10 * M, 0);
   const found = sdFind(risen, T0, 'Mara');
-  // AUDIT SD III (T1, PIN MOVED): its name and its state - what it is is the card's beside it (a long name ran the banner
+  // AUDIT SD III (T1
   // off both sides of a phone)
   assert.equal(sdBannerText('The Stopped Bell', found, T0), `The Stopped Bell - fades in ${timerText(found.until - T0)}`);
   assert.equal(sdBannerText('', found, T0), `An Abyss Dungeon - fades in ${timerText(found.until - T0)}`, 'nameless: said once');
@@ -133,9 +132,8 @@ function harness({ scanReady = true } = {}) {
 test('SD19 THE WORDS: its marks said with its find - its Ending, its signature and both omens; a found Hollow\'s last hour said to the realm once, near its city - never while it is only risen, never before the hour, never twice; with no Hollow the world offers, the region\'s name', () => {
   const risen = sdRise(sdFirst(T0 - 20 * M), T0 - 10 * M, 0);
   const E = sdEndingOf(sdMarksOf(risen.s)), O = sdOmensOf(sdMarksOf(risen.s));
-  // AUDIT SD III (T11, PIN MOVED): each mark's article small inside the line - it read "under The Quickened Gears and The
+  // AUDIT SD III (T11
   // Hardened Hearts"
-  // PIN MOVED (AUDIT SD IV T9): its signature the Ending's own, between commas - it hung between dashes (WB13b's aside)
   assert.equal(sdMarksLine({ name: 'The Stopped Bell', s: risen.s }), `The Stopped Bell keeps the Ending of ${E.stone}, its ${E.sig.replace(/^The /, '')}, under ${sdNameIn(O[0].name)} and ${sdNameIn(O[1].name)}.`);
   assert.doesNotMatch(sdMarksLine({ name: 'The Stopped Bell', s: risen.s }).slice(1), /\bThe /, 'no capital article inside it');
   assert.match(sdMarksLine({ s: risen.s }), /^The Abyss Dungeon keeps the Ending of /);

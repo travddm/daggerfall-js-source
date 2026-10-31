@@ -1,9 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-C - THE TWO WINDOW KEYS (2026-09-17, Mac: "you can exit out of the F6
-// menu (inventory) by pressing F6 again, but you cannot do the same for the
-// F5 one (char sheet)" + "it would be extra cool if you could like, be on
-// the F5 page, press F6 and then go straight from char sheet to inv.,
-// instead of having to exit out of one menu and go into another").
+// MAC-C - THE TWO WINDOW KEYS.
 //
 // TWO FAULTS, ONE ROOT. The pack's key arm read `e.key !== 'F6'` - the DFU
 // DEFAULT spelled as a literal - and the sheet had no key arm at all,

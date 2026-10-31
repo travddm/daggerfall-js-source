@@ -1,4 +1,4 @@
-// MWNPC5 (2026-10-09, the MW-NPC arc's fifth slice - bible/04-Characters/Morrowind-NPCs.md section 10): A FOE'S TELLS ON
+// MWNPC5: A FOE'S TELLS ON
 // ITS BODY. The billboard shader draws three things on a foe that the Morrowind body's quad did not: the wind-up's glint
 // (TELL2 - a gameplay tell: the blow is coming), the elite's glow, outline and embers, and the dissolve (a revenant's fate
 // burning it away, a companion through a portal). The quad takes all three now (`fx`), its texel reads inside the
@@ -111,7 +111,7 @@ test('MWNPC5c the tells come down from the lane: PeerBodies hands each body fxOf
   assert.deepEqual(quads.at(-1), { glint: GLINT }, 'drawThird: the tells to the quad');
   rig.drawThird({ clientHeight: 480 }, { proj: PROJ, view: VIEW, eye, feet: [0, 0, 0], yaw: 1.5 });
   assert.equal(quads.at(-1), null, 'and none when none');
-  // BODY-CROP (2026-10-22): the main camera's own picture above; the card's lone pass is the Billboard Look's
+  // BODY-CROP: the main camera's own picture above; the card's lone pass is the Billboard Look's
   setPref('mwBillboardLook', true);
   try {
     rig.drawThird({ clientHeight: 480 }, { proj: PROJ, view: VIEW, eye, feet: [0, 0, 0], yaw: 1.5, fx: { glint: GLINT } });

@@ -1,5 +1,4 @@
-// INVIS-NET (2026-09-27, Mac relaying reports: "Other player's still see other players who are suppose to be
-// invisible"). A player's magical concealment - Invisibility, Chameleon, Shadow - lived on their own entity alone: the
+// INVIS-NET. A player's magical concealment - Invisibility, Chameleon, Shadow - lived on their own entity alone: the
 // pose carried none of it, so every other player drew them whole (the body, the sprite, the rider, the name), could
 // press F on them, and their own foes hunted them as if they stood in the open (enemyMotor's own note: "a peer's flags
 // are a later slice's wire field"). The pose carries it now (`cv`: 1 invisible, 2 blending, 4 a shade, omitted at 0),
@@ -71,7 +70,7 @@ test('INVIS-NET end to end: my invisibility leaves my session the moment it land
     const r = fakeRoom(ROOM);
     const relayMine = r.connect(), relayTheirs = r.connect();
     await r.hello(relayMine, 'ghost-0001', at); await r.hello(relayTheirs, 'seer-0001', at);
-    for (const f of relayMine.sent) mine.receive(f);   // SD-HELLO (PIN MOVED): my own welcome, off the real Room - a socket says nothing past its hello until it lands
+    for (const f of relayMine.sent) mine.receive(f);     // SD-HELLO (
     let heard = 0;
     const hear = () => { for (; heard < relayTheirs.sent.length; heard++) theirs.receive(relayTheirs.sent[heard]); };
     const relayLast = async () => {
@@ -135,11 +134,11 @@ test('INVIS-NET by source: the host packs my concealment onto every pose; on the
   const arm = w.slice(w.indexOf('    const arm = {\n      mv,'), w.indexOf('};   // the wire\'s move bit'));
   assert.match(arm, /\n\s*cv: concealBits\(playerEntity\) \|\| undefined,/, 'the arm spread into every pose');
   // Boat map markers cache the adjusted poses before the existing concealment and render ordering.
-  assert.match(w, /const drawable = isCellRoom\(online\.room\) && csaOn\(\) \? csaAboard\.glue\(staffFollow\.drawable\(\), [^\n]*\) : staffFollow\.drawable\(\);[^\n]*\n\s*_peerMapPoses\.clear\(\);\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), [^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, \{ on: modes\?\.gateArenaDay\?\.\(\) != null \|\| [^\n]*\}\);[^\n]*\n\s*peerCastVisuals\(visiblePeers\);[^\n]*\n(?:[^\n]*\n){0,5}?\s*const seen = \[\];\n\s*for \(const d of visiblePeers\) \{\n\s*const look = peerDraw\(d\.shown\?\.cv \| 0, veilOn, _veilT, d\.id\);\n\s*if \(look\.kind === 'hidden'\) \{ _hiddenPeers\.add\(d\.id\); continue; \}/, 'the cast off every peer, the draw off the seen - a concealed peer hidden where the look says so (the classic lane)');   // PIN MOVED (GATE-CROWD): the drawn list is cut to a court's crowd first (test/systems/gatecrowd.test.js) - CROWD-WIDE: everywhere a stranger cannot fight me; PIN MOVED (PEER-RANGE): and to the draw distance before that (test/systems/peerrange.test.js)
+  assert.match(w, /const drawable = isCellRoom\(online\.room\) && csaOn\(\) \? csaAboard\.glue\(staffFollow\.drawable\(\), [^\n]*\) : staffFollow\.drawable\(\);[^\n]*\n\s*_peerMapPoses\.clear\(\);\n\s*for \(const d of drawable\) if \(d\?\.shown\) _peerMapPoses\.set\(d\.id, d\.shown\);\n(?:\s*if \(hccOn\(\)\) hcc\.driverGlue\(drawable, \{ toWire: campToWire \}\);[^\n]*\n)?\s*const ranged = peerRange\.cut\(cabin \? drawable : drawable\.filter\(\(d\) => !csaPeers\.isBelowDeck\(d\.id\)\), [^\n]*\n\s*const visiblePeers = gateCrowd\.cut\(ranged, \{ on: modes\?\.gateArenaDay\?\.\(\) != null \|\| [^\n]*\}\);[^\n]*\n\s*peerCastVisuals\(visiblePeers\);[^\n]*\n(?:[^\n]*\n){0,5}?\s*const seen = \[\];\n\s*for \(const d of visiblePeers\) \{\n\s*const look = peerDraw\(d\.shown\?\.cv \| 0, veilOn, _veilT, d\.id\);\n\s*if \(look\.kind === 'hidden'\) \{ _hiddenPeers\.add\(d\.id\); continue; \}/, 'the cast off every peer, the draw off the seen - a concealed peer hidden where the look says so (the classic lane)');
   assert.match(w, /peerRiders\.sync\(seen, onlineToScene,/);
   assert.match(w, /const afoot = seen\.filter\(/);
   assert.match(w, /peerWalkers\.sync\(seen, onlineToScene,/);
-  assert.match(w, /remotePlayers\.sync\(visiblePeers, onlineToScene, \{[^\n]*conceal: veilOf, hidden: \(id\) => _hiddenPeers\.has\(id\)(?:, grow: tvGrow)?(?:, room: drawable)? \}\);/, 'the sprite and the name pass - every peer HEARD, the hidden drawn nowhere (AUDIT pre-merge I-G)');   // PIN MOVED (AUDIT PEER-RANGE A L1/L6): and the room's whole list handed beside it
+  assert.match(w, /remotePlayers\.sync\(visiblePeers, onlineToScene, \{[^\n]*conceal: veilOf, hidden: \(id\) => _hiddenPeers\.has\(id\)(?:, grow: tvGrow)?(?:, room: drawable)? \}\);/, 'the sprite and the name pass - every peer HEARD, the hidden drawn nowhere (AUDIT pre-merge I-G)');
   assert.doesNotMatch(w, /(?:peerRiders|peerWalkers)\.sync\(drawable,/, 'nothing draws off the whole list any more (the sprite pass hears it, and skips the hidden itself)');
   // the merge with main's PEERLIGHT2: a Light spell's candle (a sprite and its light) hangs before a player DRAWN here -
   // off the whole list, the classic lane's invisible player walked behind a floating candle
@@ -149,7 +148,7 @@ test('INVIS-NET by source: the host packs my concealment onto every pose; on the
   assert.match(w, /pickPeerInFront\(eye, dir, openPeers\(peersNear\(\), isPartyMate\)\.filter\(crowdDrawnHere\), SOCIAL_REACH, rayPersonDistance\);/, 'the F door and the plaque skip a concealed peer (CONCEAL-MATE: a stranger - a mate stays open)');
 });
 
-// ---- AUDIT (the pre-merge audit, 2026-09-27, Mac: "Audit before we merge"): what else named or showed a concealed player.
+// ---- AUDIT (the pre-merge audit, 2026-09-27): what else named or showed a concealed player.
 
 test('AUDIT pre-merge I-G executed: a peer the classic lane stands nowhere is still HEARD - its steps at it, as a concealed foe\'s sounds play in DFU (the renderer off, not the audio) - and has no doll and no name', () => {
   const calls = [];
@@ -172,14 +171,13 @@ test('AUDIT pre-merge I-A + I-E + I-F by source: a building\'s sheet opens the b
   assert.equal((m.match(/openInteriorSheet\b/g) ?? []).length, 4, 'its definition and its three takers - the pack, the pause bag, F5');
   assert.doesNotMatch(m, /host\.makeCharSheet\?\.\(\)/, 'none left on the street\'s pack');
   assert.match(w, /const partyOnMaps = \(\) => partyNear\(\)\.filter\(\(m\) => !_hiddenPeers\.has\(m\.id\)\);/);
-  assert.match(w, /townParty: \(\) => host\.partyOnMaps\(\)\.map\(/, 'the town map');   // PIN MOVED (STAR0): the town map's door left bootWorld for scenes/exteriorAutomapToggle.js, which reads the host's members off `host`
+  assert.match(w, /townParty: \(\) => host\.partyOnMaps\(\)\.map\(/, 'the town map');
   assert.match(w, /partyNear: \(\) => partyOnMaps\(\),/, 'the dungeon\'s and the building\'s plans');
   assert.match(w, /if \(tabId === 'local'\) return localRosterSource\(s, openPeers\(peersNear\(\), isPartyMate\), player\.feetAt\(\)\);/, 'the Nearby list');
   assert.match(w, /return openPeers\(near, isPartyMate\)(?:\.filter\(crowdDrawnHere\))?\.map\(\(p\) => \(\{ id: p\.id, name: peerName\(p\.id\)/, 'the page\'s readers');   // PIN MOVED (AUDIT CROWD-WIDE B5): and the crowd's count's, after the concealed (test/systems/gatecrowd.test.js)
 });
 
-// ---- CONCEAL-MATE (2026-10-07, a player: "you're not interactable with party members - would be a QoL if you can interact
-// with at least your party members while chameleon or shadow form, invis etc on"): a concealed player stays open to their
+// ---- CONCEAL-MATE: a concealed player stays open to their
 // own party - the F key and its plaque, the Nearby list, a page, a gift - and to nobody else.
 
 test('CONCEAL-MATE executed: openPeers keeps every open player and a concealed party mate (invisible, blending, a shade, all three), drops a concealed stranger, and with no party test drops every concealed one - the F key\'s pick then finds the mate', () => {

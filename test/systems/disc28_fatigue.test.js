@@ -1,5 +1,4 @@
-// DISC28-E (2026-09-28, Discord: "dying infinitely from fatigue" - the respawn at 0% fatigue, a second player's
-// "it gives me a small portion and I collapse again") and DISC28-F (the repeated Criminal Conspiracy arrests whose
+// DISC28-E and DISC28-F (the repeated Criminal Conspiracy arrests whose
 // legal reputation never came back).
 //
 // E: the online revival handed back a body the next tick killed. Two flaws. The fatigue was restored only when it was
@@ -44,7 +43,6 @@ function dieAndRise(screenMinutes) {
       if (n <= 0) return;
       e.fatigue = Math.max(0, e.fatigue - n);
       if (e.fatigue <= 0 && e.health > 0) {
-        // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): foes about, a collapse is no longer a death but a tenth of the
         // health a drain (the hosts' arm, through the damage door) - the hunted body still dies of the drain, ten minutes on
         const o = exhaustionOutcome({ enemiesNearby: true, entity: e });
         events.push(o.kind);
@@ -105,7 +103,7 @@ test('DISC28-E (LIVED1): the skip moves nothing of the player\'s - their own clo
 });
 
 const N = NORMALIZE_INTERVAL_MINUTES;
-// REP4 (the reputation overhaul, "Earn it + faster drift"): PIN MOVED - an absence pays the recovery half on the WEEKLY
+// REP4 (the reputation overhaul, "Earn it + faster drift"):
 // boundaries now (court.js RECOVERY_INTERVAL_MINUTES), so these pins count weeks where they counted DFU's 112 days; the
 // laws they hold - every boundary paid once, [last, now), the prison skip's shield - are the same
 const W = RECOVERY_INTERVAL_MINUTES;
@@ -115,7 +113,7 @@ test('DISC28-F: an arrival across three normalise boundaries pays all three - th
   setSharedClock(() => 3 * W + 10);
   const e = convict(W - 5);
   alignEntityClocks(e, 3 * W + 10, { worldLeft: W - 5 });   // crosses W, 2W and 3W - from the world's minute the save left at (LIVED1)
-  // AUDIT DISC28 TM-1 (Mac, 2026-09-28: "Recovery only"): an absence pays the recovery half - the -15 walks back three,
+  // AUDIT DISC28 TM-1: an absence pays the recovery half - the -15 walks back three,
   // the +3 standing is kept (it went to 0 before the decision)
   assert.deepEqual(e.legalRep.slice(0, 3), [0, -12, 3], 'three boundaries, three points of recovery, no standing lost');
 });

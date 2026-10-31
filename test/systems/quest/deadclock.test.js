@@ -1,5 +1,4 @@
-// DEAD-CLOCK (2026-09-26, KimNix on the Discord, N0B20Y02 "Protect an Honored Mage": "the quest keeps resting its
-// time" - 35 minutes left, then 4 days 22 hours): the journal's "Time remains" counts down the tightest running clock,
+// DEAD-CLOCK: the journal's "Time remains" counts down the tightest running clock,
 // and N0B20Y02 runs three - the trance's three hours (`_S.12_`, the quest's own deadline), a day and three hours that
 // nothing reads (`_oneday_`: `variable _oneday_`, no `when`, no `until`), and the seven days after the guild's mage is
 // killed (`_S.09_`). Between the first and the last the line counted the leftover down: the time seemed to reset. A

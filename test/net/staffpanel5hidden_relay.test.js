@@ -1,5 +1,4 @@
-// STAFF-PANEL5-HIDDEN (2026-10-22, mob: "no tag no faint outline nothing just nothing", "true invis not lattys invis", "we
-// want the player to have no idea we are wathcing them"; design doc "DFO Staff Panel: design", Invisible follow): THE
+// STAFF-PANEL5-HIDDEN: THE
 // RELAY'S HALF, OVER THE REAL ROOM (test/fakeRoom.mjs - a real signed token at a real hello, the hub's shards real Rooms on
 // fake objects). The design's own acceptance: a second game and a raw socket that logs every frame stand in the same room,
 // region and hub as a hidden staff socket and receive NOTHING that names it or comes from it, while the staff socket still
@@ -374,7 +373,7 @@ test('STAFF-PANEL5-HIDDEN the admissions: a private home admits the hidden spect
 
 test('STAFF-PANEL5-HIDDEN a battle and a realm: a hidden spectator is let into a siege\'s field and a Super dungeon\'s realm without a pass, a side or a place in the realm\'s record - and the player who has none is still refused (mutants: the siege\'s pass asked of it; the realm\'s record asked of it)', async () => {
   await quiet(async () => {
-    for (const key of ['siege:3021:20', sdTestKey(1)]) {   // PIN MOVED: SD-PARTY - a realm is a party's own Hour
+    for (const key of ['siege:3021:20', sdTestKey(1)]) {
       const r = fakeRoom(key);
       const stranger = r.connect(); await r.hello(stranger, 'strg-0001', P);
       assert.ok(!welcomeOf(stranger), `${key}: a player with no pass or place is refused`);
@@ -473,7 +472,7 @@ test('STAFF-PANEL5-HIDDEN-FIX a hidden Admin\'s /tp, on its hub shard: its ask i
   });
 });
 
-// STAFF-CHAT-RED (2026-10-23, mob: "give me a option next to chat to chat as /red or myself at all times"): the chat box's
+// STAFF-CHAT-RED: the chat box's
 // Me / Red switch, kept on Red by a hidden Admin - so its /red ask must be heard, and its line must still name nobody.
 test('STAFF-CHAT-RED a hidden Admin speaks as the server: on its hub shard its /red ask (`{t:\'say\', text}`) is heard, and every shard and the bus hear the server\'s line - `{t:\'red\', text, at}` and nothing else, naming nobody; a hidden socket without the dev glyph is ignored in silence, never closed, and its other frames are still dropped (mutants: the ask dropped; the dev glyph unread for a hidden socket; the line naming its speaker)', async () => {
   await world(async ({ link, say }) => {

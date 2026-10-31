@@ -27,7 +27,6 @@ const flatWorld = (byte) => ({
 
 test('EV8: the height law is the streamed terrain\'s own, not the travel map\'s skin', () => {
   assert.equal(ringHeight(0), SCALED_OCEAN_ELEVATION * STREAMING_TERRAIN_SCALE, 'the flat sea at 34.0');
-  // PIN MOVED (RELIEF-PEAKS): land is the kernel's two terms at the byte's node - byte*8 and the large map, by its law of the
   // byte (WOODS.WLD's own, about 1.18 x the byte), *4 - times 1.25, the game scene's TerrainScale (TERRAIN-SCALE1). The
   // ring stood byte*8*1.25 alone: a third under the ground it hands over to
   assert.equal(ringHeight(100), (100 * BASE_HEIGHT_SCALE + largeOfByte(100) * 4) * STREAMING_TERRAIN_SCALE, 'land is the kernel\'s two terms at the byte\'s node, world units');

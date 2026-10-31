@@ -1,5 +1,4 @@
-// SQUEEZE1 (2026-09-26, Ashley on the Discord: "have to kill a giant, its disappearing after a basically random amount
-// of time entering the dungeon"). A giant's capsule is its idle sprite's height - 3.4 m is ordinary (SetupDemoEnemy) -
+// SQUEEZE1. A giant's capsule is its idle sprite's height - 3.4 m is ordinary (SetupDemoEnemy) -
 // and a quest giant is stood at a QuestSpawn marker, which is laid for a body the player's size. Under a ceiling lower
 // than it, the collider's head push was the last word of every pass: it dragged the body's lower sphere under the
 // floor, a hair a frame, and the giant fell out of the level. A doorway's lintel already stopped such a body, as DFU's

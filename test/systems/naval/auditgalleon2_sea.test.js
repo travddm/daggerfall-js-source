@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03, the second audit of the new galleon) - HER AT SEA AND IN HARBOUR: what the first audit's
+// AUDIT GALLEON-2 - HER AT SEA AND IN HARBOUR: what the first audit's
 // G4, G6, R5 and D3 left undone, each pin seen to fail on the code as it stood (57baee705) before its fix:
 //   GN1  her draft (G6's 4.7 m) against harbours sounded for the Carrack's 3.2: every berth was land to her keel, and
 //        every merchant galleon, navy cutter and pirate brig stood at one lay frozen there for good - a harbour's berths
@@ -95,7 +95,6 @@ test('AUDIT GALLEON-2 PF6: a hull\'s draft (shipLife.js draftOf - world.js naval
     setGalleonStanding(false); assert.ok(Math.abs(LIFE.draftOf(HULL.SmallShip) - 3.41) < 1e-9, 'fallen back: 3.41');
   } finally { setGalleonStanding(true); }
   assert.deepEqual([HULL.Rowboat, HULL.LargeBoat, HULL.LargeGalley].map(LIFE.draftOf), [0.8, 1.4, 2.8], 'the others as they were');
-  // PIN MOVED (SHIPS-2, 2026-10-07): hull 4 is Mac's carrack - her draft her keel's as the galleon's is (4.65 over her
   // 4.59 m keel), the mod's Carrack's 3.2 fallen back (test/systems/naval/ships2_carrack.test.js holds both)
   assert.ok(Math.abs(LIFE.draftOf(HULL.Carrack) - (LIFE.DRAFT_SPARE - hullBuild(HULL.Carrack).keel)) < 1e-9, 'the Carrack\'s her keel\'s');
 });
@@ -156,7 +155,7 @@ test('AUDIT GALLEON-2 RG3: her rig\'s boxes are her canvas where it hangs - each
   boat.Sails.find((x) => /MainTopsail/.test(x.name)).setActive(true);
   stowSail(animatorOf(boat.Sails.find((x) => /ForeCourse/.test(x.name))), true);
   assert.equal(rigBoxesOf(boat).length, rig.length - 1, 'the fore course furled: its box gone');
-  // the other hulls: their boxes as they stood, furled or set. PIN MOVED (SHIPS-2, 2026-10-07): hulls 4 and 1 are Mac's
+  // the other hulls: their boxes as they stood, furled or set.
   // carrack and Tiny Ship - their boxes each a sail's of theirs, as hers are (the large boat's of her plan's): furled
   // none, set every one of hers (test/systems/naval/ships2_carrack.test.js, test/world/ships/ships2_largeboat.test.js)
   const theirs = [HULL.Carrack, HULL.LargeBoat];
@@ -187,7 +186,6 @@ test('AUDIT GALLEON-2 RG4: a sea galleon loses her highest canvas first - by whe
     assert.equal(sailsShown(5, d.sailShare()), 2);
     assert.deepEqual(e.boat.Sails.filter((s) => s.activeSelf).map((s) => s.name).sort(), ['ForeCourseSquareSail', 'MainGaffLargeSail'], 'her two lowest kept');
   }
-  // PIN MOVED (SHIPS-2, 2026-10-07): a merchant carrack is Mac's carrack - by where each canvas of hers hangs, as the
   // galleon's: her main topsail, her lateen mizzen, her main course, her fore course, her spritsail
   {
     const h = await sea({ hull: null, wind: [0, 0, 0] });

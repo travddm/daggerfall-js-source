@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS8 (2026-10-26, the owner: "Town walls and their curvature expose thin open extruding walls";
-// bible/03-World/Town-Shapes.md TS8): a bend's tower is Daggerfall's corner tower's BODY - the corner tower (ARCH3D 444)
+// TOWN-SHAPES TS8: a bend's tower is Daggerfall's corner tower's BODY - the corner tower (ARCH3D 444)
 // carries two 6.4 m stubs of wall, open at their ends, where a corner's two lengths meet it, and TS4 stood it whole at
 // every bend of a line that is no corner: one stub into the town, one out past the wall's face, the body off the line.
 // Pinned on a corner tower's shape (no data), on the game's own 444 and on the walls of the cities past the Bay (ARENA2).

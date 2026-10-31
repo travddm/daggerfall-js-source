@@ -1,5 +1,4 @@
-// FOUNDER5 (2026-10-07, Mac: "Can we grant every account before sept 25th the founder title. Ive tried this multiple
-// times and its never worked"; asked how, "Time zone + name list"). FOUNDER2 to FOUNDER4 each held Founder for an
+// FOUNDER5. FOUNDER2 to FOUNDER4 each held Founder for an
 // account the service could PROVE first played by 2026-09-25T00:00Z, and two kinds of player stayed outside it:
 //   - THE CLOCK. 00:00Z on the 25th is 8pm on the 24th in New York and 5pm in Los Angeles - a player who first played
 //     that evening played before the 25th on their own clock. The instant is now the end of the 24th on the last clock

@@ -1,5 +1,4 @@
-// TESA13 (2026-10-24; a tester saw nothing past the Bay "reflected on the map", and the owner asked "Does it render on
-// the map or not. The real roads, locations. Etc", then "Yes"; bible/03-World/Arena-Provinces.md TESA13) - THE LAND PAST
+// TESA13 - THE LAND PAST
 // THE BAY ON THE HELD MAP, pinned. Arena's roads and tracks walked off the layer the kernels paint into the sheet's chains
 // a tile at a time, their halves meeting over a tile's edge; the countryside and the lairs read off the host's own roll a
 // tile at a time and kept (world/tamrielAtlas.js), marked under the Bay's own buckets, bands and filters, and named on the

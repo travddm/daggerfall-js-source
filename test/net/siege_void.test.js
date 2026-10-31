@@ -1,4 +1,4 @@
-// VOID (2026-10-02, Mac: "lets finish the build work") - A MODERATOR VOIDS A SIEGE (`/siege void <key>`): Seats-Arc 18,
+// VOID - A MODERATOR VOIDS A SIEGE (`/siege void <key>`): Seats-Arc 18,
 // "Moderators (MOD1) may **void a siege** (`/siege void`) - a history row, the holder keeping the seat - when a fight was
 // won by an exploit found after it". The seat's battle of this week void: before its result, as a Turning voids an
 // unfinished one (the Sellswords' escrow home) but the challenger's Right NOT carried; after a capture, the Charter back
@@ -6,7 +6,7 @@
 // after a hold, the holder's Standing and defence fifth struck and the challenger's bar lifted; after a Tourney, the
 // winner's Charter gone. A Chronicle row; Honours paid stand; a later receipt refused; idempotent. Driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the chat word parsed.
-// bible/11-Multiplayer/Seats-Arc.md 18; `06-Systems/Online-Arc.md` SIEGE-VOID.
+// 18; `06-Systems/Online-Arc.md` SIEGE-VOID.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

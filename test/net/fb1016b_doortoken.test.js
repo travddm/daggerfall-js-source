@@ -318,7 +318,7 @@ test('DOOR-TOKEN THE HOST\'S DOORS: online only (no session, a terminal one, one
   assert.deepEqual([TOKEN_REUSE_MS, DOOR_SOON_MS, EXIT_WALK_MS, DOOR_PENDING_MS], [60_000, 2_000, 8_000, 30_000]);
 });
 
-// ═══ AUDIT (2026-10-16) A2 ═══════════════════════════════════════════════════════════════════════════════════════════
+// ═══ AUDIT A2 ═══════════════════════════════════════════════════════════════════════════════════════════
 /** A player hopping between a cell and buildings over the REAL doorTokenHost and the REAL accountTokenMinter (no host:
  *  before DOOR-TOKEN): `cycles` door gaps drawn from `gaps` s, a 1.5 s build, the walk away from the exit and back to it,
  *  frames every 200 ms, a mint that takes 3 s on the wire. Answers the mints, and how long the sockets waited on one. */

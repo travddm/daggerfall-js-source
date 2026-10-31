@@ -3,7 +3,7 @@
 // have them in my inventory, also if you trade ingredients that you can store to a friend he won't be able to store
 // them, I don't know if this is intended or not."
 //
-// Intended: law 3 (bible/06-Systems/Professions-Arc.md 1, restated in Materials-Bag.md 5) - the Stores take back only
+// Intended: law 3 (1, restated in Materials-Bag.md 5) - the Stores take back only
 // what the service handed to this character; a looted unit, a shop's and a traded one are held and never counted. The
 // fault was the page's silence: the Stores page built its rows from the counted materials alone, so a pack full of
 // Troll's Blood showed nothing, and nothing said why. It names them now - "N unstorable" on the card, and the law in the
@@ -74,7 +74,6 @@ test('UNCOUNTED: the Stores page lists the looted blood and says what it is; LOO
       book, name: (k) => k, withdraw: async () => ({ ok: true, text: '' }), inTown: () => true, room: (k) => roomFor(e, k),
       carriedHeld: (k) => heldOf(e, k), heldKeys: () => heldKeysOf(e),
       bag: () => ({ has: true, kg: bagWeight(e), max: 300, count: e.bagItems.length }),
-      // PIN MOVED (FB1020c ONE-SAVE): the page hands the provider its put-ins as one batch - a plan, answered one a put-in
       deposit: async (plan) => { batches.push(plan.map((d) => [d.material, d.qty, d.order])); return plan.map(() => ({ ok: true, text: '' })); },
     });
     let root = null;

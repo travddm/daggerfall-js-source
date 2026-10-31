@@ -1,4 +1,4 @@
-// RPT1026-SECNET (from a private security report, 2026-10-20; bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md, A
+// RPT1026-SECNET (from a private security report, 2026-10-20;, A
 // PASSWORD IS CHANGED WITH THE OLD ONE): THE RACES, through
 // the real service over the real migrations (test/accountDb.mjs), on a database that HOLDS one request between two of its
 // own statements while another runs whole - the interleaving two Worker requests on one D1 meet. Recovery signs every

@@ -1,4 +1,4 @@
-// PERF3 (2026-09-11, Mac: "just do your job and look for opportunities").
+// PERF3.
 // Three more that change no pixel: the terrain program's frame-constant
 // uniforms uploaded once a frame instead of once a pixel, the cutout
 // billboard pass sorted by texture with repeated binds skipped, and the

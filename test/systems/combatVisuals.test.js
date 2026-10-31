@@ -1,5 +1,4 @@
-// ECV1 - ENHANCED COMBAT VISUALS (2026-09-07, Mac: "ill let you lead
-// this. This can fold into a new toggle Enhanced Combat Visuals").
+// ECV1 - ENHANCED COMBAT VISUALS.
 //
 // What the enhanced skin DRAWS for a magically concealed foe. The rules
 // are DFU's and untouched: an imp casts Chameleon on itself (ImpSpells
@@ -143,7 +142,6 @@ test('ECV1: the renderer\'s blended phase - spectral and concealed together, bac
   const ghost = batch(273, 1); ghost.origin = [0, 9, 0];
   r.drawBillboards([batch(255, 1), mid, ghost, near], [1, 0, 0], [0, 1, 0]);
   assert.equal(calls(log, 'drawElements').length, 4, 'every batch drew once - the spectral one in the blended phase only');
-  // PIN MOVED (TELL2, bible/12-Enhanced-AI/Feud-Arc.md 4.2): the glint's frame reset is its own law's too
   const u4 = calls(log, 'uniform4f').filter((c) => c[1] !== r.bbUDissolve && c[1] !== r.bbUGlint && c[1] !== r.bbLpt.uLptCut).map((c) => c.slice(2));   // DISSOLVE's own zero (the frame's burn set whole) is its law's, not the conceal's; LPT1's handover off (the frame's) the same
   assert.deepEqual(u4, [
     [0, 0, 0, 0],                                    // the plain phase

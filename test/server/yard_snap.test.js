@@ -1,5 +1,4 @@
-// YARD-SNAP (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md YARD-SNAP; migration
-// 0136) - A TOWN'S YARDS READ AS ONE ROW: `home_yards` keeps each town's yard rows as yardsOf reads them, built at a
+// YARD-SNAP - A TOWN'S YARDS READ AS ONE ROW: `home_yards` keeps each town's yard rows as yardsOf reads them, built at a
 // version the database moves on every yard row written (a route, a home released, an account gone, a sweep); a read is
 // that row while it is its version's and the rows as they stand while it is not; a decor route builds its town again as
 // it answers and the minute's clock builds what anything else left stale.

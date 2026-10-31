@@ -50,13 +50,12 @@ test('U60: the root document is a page about the game, and the game is at /play/
   // game data" a page about the game can hold.
   // FIX-D: one url() is allowed, and it is not a picture - the digit five's
   // @font-face data URI (a 520-byte OFL glyph; see below), and since TWO
-  // (2026-10-18) the 2 and Z's beside it. Every other url()
+  // the 2 and Z's beside it. Every other url()
   // is still forbidden. <img\s, not <img: the asks' comment SAYS "<img>"
   // while explaining why the marks are drawn in box-shadow instead of being one.
-  // BR2 (2026-09-13) had put ONE raster here - Mac's uploaded logo as the
-  // wordmark, under a whitelist of one; BR3 (Mac, 2026-09-14: "revert the
-  // logo to the original Daggerfall Enhanced text") took it out again.
-  // AUDIT BR5 (Mac, 2026-10-11: "Use the new logo") brings the whitelist of
+  // BR2 had put ONE raster here - Mac's uploaded logo as the
+  // wordmark, under a whitelist of one; BR3 took it out again.
+  // AUDIT BR5 brings the whitelist of
   // one back for the product's own logo, DFO Online's: the wordmark is that
   // picture and nothing else is one. It is the GAME's own file, which the
   // build carries for the front door already - one copy, so public/brand/
@@ -113,8 +112,7 @@ test('U63: the landing page owns no colour - every one is the SKIN\'s, token or 
   assert.doesNotMatch(css, /^\s*--[\w-]+:/m, 'the landing declares no custom property - the skin does');
   // U63: and it is set in the PIXEL faces, which is what the menu wears.
   assert.match(css, /font-family: 'Pixelify Five', 'Pixelify Sans', monospace/, 'the body face is the menu\'s list face (the five first - FIX-D)');
-  // SITE1 (2026-09-15, Mac: "remove the fancy font from the site for capital
-  // letters (keep the daggerfall Enhanced title unchanged)"): JACQUARD 12 IS
+  // SITE1: JACQUARD 12 IS
   // THE WORDMARK'S FACE AND NOTHING ELSE'S. It had been set on every heading,
   // every step numeral and every Q&A term; those take the page's own pixel
   // face now, which the body, the sub-line and every tracked-caps rule were
@@ -289,8 +287,7 @@ test('U60: the dev server answers the game\'s relative data fetch from /play/', 
 });
 
 // ── U63: THE SITE WEARS THE GAME'S FACE ───────────────────────────
-// Mac: "update our website, reorganized and bring it inline with our new
-// UI." PX1 made the enhanced menu pixel art - a Bayer-dithered night, a
+// PX1 made the enhanced menu pixel art - a Bayer-dithered night, a
 // Jacquard 12 blackletter wordmark, Pixelify Sans lists, the classic
 // shadowed-label pair - and the site was still wearing the shell it
 // replaced, down to three screenshots of a menu that no longer exists.
@@ -336,7 +333,7 @@ test('U64 + PATREON1 + SUPPORT1: the corner asks are Patreon then Ko-fi, each a 
   const css = landing.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
   // THE ASKS, in the order the game's own door shows them, at SUPPORT_ASKS' addresses - and nothing else on the page
   // asks: not a banner, not a badge, and not an <img> (an image would be a second raster beside the logo, the one
-  // picture this site carries - AUDIT BR5). PATREON1 (2026-09-25, "Replace website KOFI with patreon") had made Patreon
+  // picture this site carries - AUDIT BR5). PATREON1 had made Patreon
   // the only one; SUPPORT1 put Ko-fi back beside it, at Mac's new page.
   const asks = [...landing.matchAll(/href="(https:\/\/(?:www\.)?(?:patreon\.com|ko-fi\.com)\/[\w/-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(asks, SUPPORT_ASKS.map((a) => a.url), 'the two asks, Patreon first, and no other');
@@ -410,8 +407,7 @@ test('SUPPORT1: the asks\' marks are the game\'s - injected verbatim after the t
 });
 
 test('DISC1: the Discord is front and centre - a plaque in the door\u2019s own row, one home, no new shape', () => {
-  // Mac, 2026-09-15: "Can you add our discord ... To our website. Front
-  // and center." The page has exactly TWO box shapes and that is the
+  // The page has exactly TWO box shapes and that is the
   // whole of its discipline - the plaque is what you PRESS, the corner
   // shape is an ASK - so the invite joins the plaque row rather
   // than inventing a third shape or a second corner.
@@ -437,8 +433,7 @@ test('DISC1: the Discord is front and centre - a plaque in the door\u2019s own r
   assert.match(landing, /href="https:\/\/discord\.gg\/jM2JdwSM8w" rel="noopener"/, 'the invite carries rel=noopener, as the asks do');
 });
 
-// ── FIX-D: THE DIGIT FIVE (2026-09-08, Mac: "the enhanced font number 5
-// looks like an 8") ───────────────────────────────────────────────
+// ── FIX-D: THE DIGIT FIVE ───────────────────────────────────────────────
 // Pixelify Sans draws its 5 with a cut top-left corner; rendered at 12,
 // 15, 26 and 36px, at 400 through 700, with and without the HUD's
 // shadow, it reads as an 8 or an S every time - the glyph, not the

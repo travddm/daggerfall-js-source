@@ -1,5 +1,4 @@
-// ETHER-NODES (2026-10-12, the owner: "We also need to implement gathering nodes within the area"; bible/03-World/
-// Eltheric-Ocean.md ETHER-NODES) - THE ELTHERIC OCEAN'S GROUND IS THE NODES' GROUND. Its isles stood the day's trees,
+// ETHER-NODES - THE ELTHERIC OCEAN'S GROUND IS THE NODES' GROUND. Its isles stood the day's trees,
 // herb patches, veins and boulders (their climates are the professions' own) and its open water the day's schools, and
 // the nodes' law - both ends read it, net/nodeLaw.js - knew the Bay's 1000 x 500 alone: an isle's node id was refused
 // (`bad-node`, "There is nothing here to gather."), a haul's too, and every ask after an isle pixel's witnesses was
@@ -29,7 +28,6 @@ const PATCH = herbPatches({ x: ISLE.px, y: ISLE.py, day: TODAY, climate: ISLE.cl
 
 test('ETHER-NODES: the law\'s ground is the Bay\'s map and the Eltheric\'s box - its corners in, a pixel past any side out, the law\'s margin and the continent past the map out (mutant: the Bay\'s map alone)', () => {
   const { x0, x1, y0, y1 } = ETHER_BOX;
-  // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): the ground is the world's whole grid (net/wire.js worldPixelOk) - the Bay's map and the box inside it, the provinces about them; past the grid out
   assert.deepEqual([[0, 0], [999, 499], [1000, 0], [0, 500], [-1, 0], [0, -1]].map(([x, y]) => pixelOk(x, y)), [true, true, true, true, true, true], 'the Bay\'s map, and the continent past each side');
   assert.deepEqual([[8191, 0], [-8191, 0], [0, 8191], [0, -8191], [8192, 0], [-8192, 0], [0, 8192], [0, -8192]].map(([x, y]) => pixelOk(x, y)), [true, true, true, true, false, false, false, false], 'the grid\'s edge in, a pixel past it out');
   assert.deepEqual([[x0, y0], [x1 - 1, y0], [x0, y1 - 1], [x1 - 1, y1 - 1], [ISLE.px, ISLE.py], [veilhaven().px, veilhaven().py]].map(([x, y]) => pixelOk(x, y)), [true, true, true, true, true, true], 'the box\'s four corners and its isles');
@@ -45,7 +43,6 @@ test('ETHER-NODES: an Eltheric node\'s id and a haul\'s read back - four digits 
   for (const kind of ['tree', 'vein', 'boulder']) assert.deepEqual(parseNodeKey(nodeKey({ kind, x: 8127, y: -7680, day: 1, slot: 0 })), { kind, x: 8127, y: -7680, day: 1, slot: 0 });
   const h = haulKey({ x: veilhaven().px + 4, y: veilhaven().py, day: TODAY, id: '0123456789ab' });
   assert.deepEqual(parseNodeKey(h), { kind: 'haul', x: veilhaven().px + 4, y: veilhaven().py, day: TODAY, id: '0123456789ab' });
-  // PIN MOVED (WW-C1): past the world's grid, where the box's edge was
   for (const bad of [`herb:0${ISLE.px}:${ISLE.py}:1:0`, `herb:${ISLE.px}:-0${-ISLE.py}:1:0`, 'herb:8192:-3000:1:0', 'herb:5000:-8192:1:0', 'herb:-8192:-3000:1:0', 'herb:12345:-3000:1:0',
     'herb:5000:--3000:1:0', 'herb:-0:0:1:0', 'herb:0:-0:1:0', 'haul:8192:-3000:1:0123456789ab', 'haul:5000:+3000:1:0123456789ab']) {
     assert.equal(parseNodeKey(bad), null, bad);

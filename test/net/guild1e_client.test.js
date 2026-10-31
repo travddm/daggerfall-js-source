@@ -1,7 +1,7 @@
-// GUILD1e (2026-09-30, Mac: "Finish the seats"): A GUILD'S OWN BOARD, AS THE CLIENT HOLDS IT - the notice book's guild
+// GUILD1e: A GUILD'S OWN BOARD, AS THE CLIENT HOLDS IT - the notice book's guild
 // acts through the real Worker (test/accountDb.mjs), the Notice Board's Guilds tab and the hall's own board on the
 // minimal DOM (test/chargenDom.mjs), the catalogue's hall board, and the hosts by their source.
-// bible/11-Multiplayer/Seats-Arc.md 8.2; `06-Systems/Online-Arc.md` GUILD1e.
+// 8.2; `06-Systems/Online-Arc.md` GUILD1e.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -106,7 +106,7 @@ test('GUILD1e the Guilds tab: the reader\'s guild\'s notes under its banner, the
   tabs[1].onclick();
   await until(() => /on The Silver Hand's board/.test(host.textContent));   // AUDIT SEATS-3 F1: the guild's board read
   const text = host.textContent;
-  assert.match(text, /<SH> The Silver Hand - members only/);   // BOARD-UI (PIN MOVED)
+  assert.match(text, /<SH> The Silver Hand - members only/);     // BOARD-UI (
   assert.match(text, new RegExp(GUILD_BOARD_EMPTY.none('The Silver Hand')));
   assert.match(text, /Recruiting in Daggerfall/);
   const posters = byClass(host, 'notice-poster');
@@ -199,11 +199,11 @@ test('GUILD1e the catalogue: Daggerfall\'s own board is the hall\'s board - offe
 
 test('GUILD1e the hosts by source: the hall\'s board pressed opens the guild\'s notes for a member and says whose it is to anyone else; its name on the plaque; the world host\'s door in guildOnly; the town boards carry the Guilds tab; the four hosts named (mutants: the member asked; the model asked; guildOnly; guilds)', () => {
   const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const isHallBoard = \(piece\) => \(!!interiorHome\?\.hall \|\| !!interiorSeatHall\) && piece\?\.model === BULLETIN_BOARD_MODEL_ID && !piece\.item;/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
+  assert.match(wm, /const isHallBoard = \(piece\) => \(!!interiorHome\?\.hall \|\| !!interiorSeatHall\) && piece\?\.model === BULLETIN_BOARD_MODEL_ID && !piece\.item;/);
   assert.match(wm, /if \(isHallBoard\(piece\)\) \{ openHallBoard\(\); return; \}/);
   const open = wm.slice(wm.indexOf('function openHallBoard() {'), wm.indexOf('\n  }', wm.indexOf('function openHallBoard() {')));
-  assert.match(open, /if \(!hallMemberHere\(\)\) \{ say\(hallBoardShutLine\(hallNameHere\(\)\)\); return; \}/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
-  assert.match(open, /if \(!host\.guildHall\?\.openBoard\?\.\(hallNameHere\(\)\)\) say\(HALL_BOARD_COLD\);/);   // PIN MOVED (SEAT-HALL): the palace's hall shares the line
+  assert.match(open, /if \(!hallMemberHere\(\)\) \{ say\(hallBoardShutLine\(hallNameHere\(\)\)\); return; \}/);
+  assert.match(open, /if \(!host\.guildHall\?\.openBoard\?\.\(hallNameHere\(\)\)\) say\(HALL_BOARD_COLD\);/);
   assert.match(wm, /boardTitle: piece && isHallBoard\(piece\) && hallMemberHere\(\) \? HALL_BOARD_TITLE : null/);   // the plaque's title, once the hover names a placed piece through decorPlaque
   assert.equal(HALL_BOARD_TITLE, "The Guild's Board");
   assert.equal(hallBoardShutLine('The Silver Hand'), "This board is The Silver Hand's. Its notes are for its members.");

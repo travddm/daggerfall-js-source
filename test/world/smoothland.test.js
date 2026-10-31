@@ -1,5 +1,4 @@
-// SMOOTH-LAND (2026-10-26, bible/03-World/Tamriel.md SMOOTH-LAND; the owner, asked whether to smooth the coasts and the
-// province borders: "Whatever is most detailed"): the land past the Bay is one smooth law (world/tamriel/tamrielLand.js
+// SMOOTH-LAND: the land past the Bay is one smooth law (world/tamriel/tamrielLand.js
 // landLabelAt) - every picture centre its own side, a square of four centres one label that label whole, the outline
 // between them the centres' contour made smooth - and every line the maps draw is its edges at the map's own pixel
 // (world/tamriel/tamrielLines.js lawLines): the held map's coasts and borders, Cyrodiil's zone line. Its readers follow
@@ -141,7 +140,6 @@ test('SMOOTH-LAND the law\'s distance: the coast\'s waterline 0, half a pixel at
   assert.ok(provinceLeadAt(L, 20, 12, 3, 9) && !provinceLeadAt(L, 20, 12, 9, 3), 'a tie the lower id\'s');
   assert.ok(provinceLeadAt(L, 37.5, 15.5, 0, 9) && !provinceLeadAt(L, 25.5, 12.5, 0, 9), 'the sea\'s own distance leads at sea, a province\'s on its land');
   assert.ok(landSideAt(L, 12.5, 15.5) && !landSideAt(L, 38.5, 15.5), 'a square of one label, the land\'s side or the sea\'s whole');
-  // PIN MOVED (AUDIT RELEASE R4-7): the fields are made a tile at a time as reads need them - compared made whole
   const copy = landLaw({ w: t.w, h: t.h, land: Uint8Array.from(t.land), province: Uint8Array.from(t.province) });
   assert.notEqual(copy, L);
   copy.materialize(); L.materialize();
@@ -349,7 +347,7 @@ test('SMOOTH-LAND (AUDIT RELEASE R4-7, the law\'s first build) the law made as i
   for (const [a, b] of [[back.S, whole.S], [lazy.S, whole.S], ...[0, 3, 7, 9].map((id) => [back.fieldOf(id), whole.fieldOf(id)])]) assert.ok(Buffer.from(a.buffer).equals(Buffer.from(b.buffer)), 'the fields bit for bit');
 });
 
-// AUDIT RELEASE R4-7 (bible/01-Overview/audits/Audit-Release-R4.md): the held map's first open held the page a second and
+// AUDIT RELEASE R4-7: the held map's first open held the page a second and
 // more for the continent's lines, Cyrodiil's line and the linking - now made in idle time as the trace lands
 test('SMOOTH-LAND (AUDIT RELEASE R4-7) the held map\'s lines in idle time: a trace landing on the page starts the job, which makes the traced chains TRACED_SLICE_STEPS steps a slice - byte for byte the whole walk\'s - into the keep the map\'s open then takes; a step\'s work bounded (a picture square\'s map squares, LINK_STEP pieces); a trace that moves on stops its job; no scheduler, no job (mutants: the job unheard; a slice the whole; the keep dropped; the walk\'s step, the linking\'s; the moved trace walked on)', () => {
   assert.deepEqual([TRACED_SLICE_STEPS, LINK_STEP, ZONE_LINE_STEP], [24, 2048, 4096]);

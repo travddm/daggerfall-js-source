@@ -15,7 +15,7 @@ import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { SKILLS } from '../../src/systems/skills.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ SURV7 (2026-09-18): THE FEED, THE GATE, THE ALIGNMENT ═════════
+// ═══ SURV7: THE FEED, THE GATE, THE ALIGNMENT ═════════
 //
 // The hosts say where the player stands; survival/env.js builds the
 // body's half from the entity, hands tickPlayerMinutes its `survival`

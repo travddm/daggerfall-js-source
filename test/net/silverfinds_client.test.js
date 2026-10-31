@@ -1,8 +1,7 @@
-// SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in more forms of interactions like foraging and
-// different activities, also needs to be sometimes lootable"): THE CLIENT'S HALF - the device rolls each container it
+// SILVER-FINDS: THE CLIENT'S HALF - the device rolls each container it
 // opens once (systems/silverFinds.js), every host's loot door asks there, a find is asked of the account service
 // through the marks book (each its own request id; one never answered is owed and asked again with it), and an answered
-// find is a card or a line. bible/06-Systems/Professions-Arc.md 10.5 (SILVER-FINDS).
+// find is a card or a line. 10.5 (SILVER-FINDS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -175,7 +174,6 @@ test('SILVER-FINDS the book\'s refusals: silver not this account\'s (a guest, th
   await r.book.find('corpse');
   assert.deepEqual((await r.book.find('pile')).map((f) => f.kind), ['pile'], 'the refused find is not owed');
   assert.equal(r.asks.length, 2);
-  // PIN MOVED (AUDIT 625 S3): the hour's refusal has an arm of its own now (the rest wait owed for the next hour), so
   // the arm that lets a refused find go is held here by the refusals of the FIND ITSELF - an id the service cannot
   // read, a kind of none - which the hour's no longer reaches
   for (const error of ['marks-rid', 'bad-find']) {
@@ -232,7 +230,6 @@ test('SILVER-FINDS a body\'s door: a body opened with treasure in it rolls its s
   try {
     const player = { items: [], goldPieces: 0 };
     const body = { corpse: true, corpseMarker: { archive: 400, record: 1, pos: [0, 0, 0] }, entity: { items: [{ name: 'Longsword', group: 'Weapons', templateIndex: 121 }] } };
-    // PIN MOVED (AUDIT 625 D6): a door that OPENED says so - `true` (test/net/audit625_silver.test.js: a refused one rolls none)
     openCorpseLoot(body, { playerEntity: player, openWindow: () => true });
     openCorpseLoot(body, { playerEntity: player, openWindow: () => true });
     assert.deepEqual(asked, ['corpse'], 'once a body');

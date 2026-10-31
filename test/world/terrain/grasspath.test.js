@@ -154,7 +154,7 @@ test('AUDIT PERF10 F1: a field with too few slots holds the NEAREST cells - a wr
   // ever want. The guarantee is not that the bound is right - it is that
   // the field holds the NEAREST `slots` cells whatever the bound says.
   const slots = full - 8;
-  const f = createGrassField(r, { keep: () => 0, perFrame: 1e9, span: rad, range: rad, slots, clock: () => 0 });   // PIN MOVED (FB1021B): a clock that stands still - the frame's time never runs out
+  const f = createGrassField(r, { keep: () => 0, perFrame: 1e9, span: rad, range: rad, slots, clock: () => 0 });
   assert.equal(f.slots, slots, 'the seam took');
   let ex = 0;
   for (let i = 0; i <= 80; i++) { ex = i * (cell / 4); f.update(ex, 0); }
@@ -191,7 +191,7 @@ test('AUDIT PERF10: the window is measured to a cell’s NEAREST POINT, as the d
   // say that, so this holds the live set against the law directly.
   const r = { allocSlots: () => {}, writeSlot: () => {}, clearSlot: () => {} };
   const cell = GRASS_CELL, rad = cell * 4;
-  const f = createGrassField(r, { keep: () => 0, perFrame: 1e9, span: rad, range: rad, clock: () => 0 });   // PIN MOVED (FB1021B): a clock that stands still - the whole disc in the one update
+  const f = createGrassField(r, { keep: () => 0, perFrame: 1e9, span: rad, range: rad, clock: () => 0 });
   const ex = 7.3, ez = 21.9;   // an offset with no symmetry to hide behind
   f.update(ex, ez);
   const k = Math.ceil(rad / cell) + 2;
@@ -228,7 +228,7 @@ test('WATER-DRAW1: the draw and the feet ask different questions, and only the d
     assert.equal(WATER_MASK_TABLE[r << 2], 0, `record ${r} is NOT water to DFU's motor, and still is not`);
     assert.equal(WATER_DRAW_MASK_TABLE[r << 2], 0xF, `...but the enhanced pass draws it whole`);
   }
-  // and nothing else differs between the two - PIN MOVED (WATER-DRAW2, test/world/water/waterdraw2.test.js): SHALLOW_DRAWN, the
+  // and nothing else differs between the two
   // islands, the corners and the saddles' half turns (each family's fourth record at turns 2 and 3, nothing else of it)
   const diff = [];
   for (let i = 0; i < 256; i++) if (WATER_MASK_TABLE[i] !== WATER_DRAW_MASK_TABLE[i]) diff.push(i);

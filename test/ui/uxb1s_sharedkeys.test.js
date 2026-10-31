@@ -1,6 +1,4 @@
-// UXB1-S (2026-09-25, the UX backlog: "Is there a reason you cannot have multiple keys bound to the same action such
-// as jump+swim-up? If so, highlight conflicting keybinds." - and then: "So you wont add multiple key bindings even when
-// asked? I dont care if it goes against daggerfall"): ONE KEY, SEVERAL ACTIONS.
+// UXB1-S: ONE KEY, SEVERAL ACTIONS.
 //
 // DFU's law was one key per action per dict: its window refused to close on a duplicate. That is a departure the port
 // now makes on purpose (Ledger A's UXB1 row): a key already in use asks, and a third answer - "use it for both" - puts
@@ -101,7 +99,7 @@ test('UXB1-S: the file - shares only where there are any (a file without is what
   const floatUpDefault = DEFAULT_BINDINGS.find(([, a]) => a === 'FloatUp')[0];
   shareBinding(b, space, 'FloatUp');
   const file = serializeKeyBinds(b);
-  assert.deepEqual(file.sharedActionKeyBinds, { ArrowUp: ['BoatSailUp'], ArrowDown: ['Professions'], KeyK: ['Spyglass'], [space]: ['FloatUp'] });   // PIN MOVED (SPYGLASS): K's default share
+  assert.deepEqual(file.sharedActionKeyBinds, { ArrowUp: ['BoatSailUp'], ArrowDown: ['Professions'], KeyK: ['Spyglass'], [space]: ['FloatUp'] });
   const back = createBindings();
   loadKeyBinds(back, JSON.parse(JSON.stringify(file)));
   resetDefaults(back, true);   // the startup's autofill, which fills a MISSING action on a free code

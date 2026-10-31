@@ -1,4 +1,4 @@
-// COATS3D (2026-10-11): THE 3D HORSE (bible/06-Systems/Horse-Coats.md "The 3D horse") - the bake of the owner's Courser
+// COATS3D: THE 3D HORSE ("The 3D horse") - the bake of the owner's Courser
 // (tools/bakeHorse.mjs) against its committed FBX, its frame, flanks, skin and gaits; the runtime's stream, gait and pose
 // (world/horseModel.js); the texel map and the 3D dye against the sprites' dye (systems/horse/horseCoats.js); the GL half
 // (world/horseRig.js) on a recording renderer - its looks dyed on the frame budget and let go; the body astride

@@ -1,4 +1,4 @@
-// WILD-REJOIN (FIELD BUGS 2026-10-25h, bible/11-Multiplayer/Wild-Zone.md section 4) - A FALL THAT OUTLIVES ITS PAGE.
+// WILD-REJOIN (FIELD BUGS 2026-10-25h) - A FALL THAT OUTLIVES ITS PAGE.
 //
 // The report: "if you die in the wilderness and alt f4 before you are looted you wont be able to be looted by who killed
 // you. you can also skip the death timer this way." A fall lived in the referee and on the dying game's screen alone;

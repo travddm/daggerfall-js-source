@@ -1,11 +1,10 @@
-// WBX (2026-09-26): THE OBLIVION GATE, FIXED AND DEEPENED - Mac, after the first fights: "None of the 3D geometry that
-// was built including the oblivion interior/exterior gate are visible", "The boss muusic phase doesn't play", "Loot drops
+// WBX: THE OBLIVION GATE, FIXED AND DEEPENED, "The boss muusic phase doesn't play", "Loot drops
 // should show their sprite and have a small colored loot line that extrudes from the sprite itself", "The boss phases
 // need to be more defined and more detailed mechanics", "The oblivion portal on the inside should spawn inside at the
 // end of the fight. Currently there's no way to leave after ending"; and a player's report (Swololo on Discord): the
 // damage too low, regeneration undoing it, the boss hard to place and to read, weapons broken, loot "pillaged", soul
 // trap dead - and "maybe it should be 1.5 times faster", which Mac turned down ("I dont think making mechanics faster is
-// the play"). Design: bible/11-Multiplayer/World-Bosses.md section 12.
+// the play"). Design:
 //
 //   WBX1 the one index type          render/renderer.js createMesh; the gate's, the court's and the land's builders
 //   WBX2 the portal home             scenes/gate/gateCourt.js portalFrame, world/gate/gateArena.js portalDoor, worldModes gateWayHome
@@ -201,7 +200,7 @@ test('WBX3 each piece is itself on the floor: an item stands as its own picture 
   for (let i = 0; i < 400; i++) { clock.t += 16; p.frame(); }
   const st = p.state();
   const items = st.pieces.filter((x) => x.kind === 'item'), gold = st.pieces.find((x) => x.kind === 'gold');
-  assert.ok(items.length === 5 && items.every((x) => x.rest && x.icon), 'every item rests as its own picture');   // PIN MOVED (GEM2, bible/06-Systems/Gem-Sockets.md): three pieces, the Warden's gem and the ember
+  assert.ok(items.length === 5 && items.every((x) => x.rest && x.icon), 'every item rests as its own picture');
   assert.ok(gold.rest && !gold.icon, 'gold keeps its pile');
   assert.ok(uploads.length >= 1 && uploads.every((u) => u[0] === SPOILS_ICON_ARCHIVE && u[1] === 'icon:207_3'), 'uploaded under the pool\'s pseudo-archive, keyed by the picture');
   const size = iconSize(30, 20);
@@ -462,7 +461,6 @@ test('WBX7 the soul trap on him: kept on the relay\'s clock for its rounds (a tr
   assert.equal(COURT_ROUND_MS, 5000, 'a game minute on the shared clock');
   h.clock.t = 1000 + 2 * COURT_ROUND_MS;
   assert.equal(h.c.trapped({ chance: 90, rounds: 2 }), true, 'recast while it runs');
-  // PIN MOVED (STACK-CAP): renewed, it now runs out at 1000 + 4 rounds - the recast's 2 from its own cast, never added
   // to the 1 left (a stack ran it to 5)
   at(h, 1000 + 4 * COURT_ROUND_MS - 10, state({ fell: { at: 1000 + 4 * COURT_ROUND_MS - 20, top: [], n: 1 } }));
   assert.deepEqual(h.traps, [{ chance: 40, mobile: bossLookOf('ruhn').mobile, name: 'Valkynaz Ruhn' }], 'rolled at his fall, the first trap\'s chance');

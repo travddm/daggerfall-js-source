@@ -1,6 +1,4 @@
-// INT2/INT3/INT6 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"; asked what a breach does: "Freeze trading"; and the characters already in the realm: "Items judged,
-// wealth baselined"): THE JUDGE, THE HOLD AND THE REVIEW, against the real Worker over the real migrations.
+// INT2/INT3/INT6: THE JUDGE, THE HOLD AND THE REVIEW, against the real Worker over the real migrations.
 //   - judge.js pure: the character law (level, its claim, attributes, skills), the item law over every list with where
 //     each finding lies, the wealth of what the character OWNS (never the world's untaken loot; loans owed; a bound or a
 //     quest's piece worth nothing);
@@ -108,7 +106,7 @@ test('INT2/INT3: a lawless checkpoint is STORED and its character held - said in
   assert.equal(s.row(R.id).judged_seq, 1, 'the first save judged');
   const forged = freshSave({ name: 'ann', items: [{ ...dagger(), affixes: [{ id: 'damage', value: 40 }] }] });
   const r = await s.put(who, R, forged, { summary: { level: 1 } });
-  assert.deepEqual([r.status, r.body], [200, { ok: true, seq: 2, tradeHeld: 'law', tradeHeldWhy: { code: 'rarity', t: 113 }, locked: [] }], 'stored, held, and the piece named');   // PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+  assert.deepEqual([r.status, r.body], [200, { ok: true, seq: 2, tradeHeld: 'law', tradeHeldWhy: { code: 'rarity', t: 113 }, locked: [] }], 'stored, held, and the piece named');
   assert.deepEqual([s.row(R.id).seq, s.row(R.id).held, s.row(R.id).strikes], [2, 'law', 1]);
   for (let i = 0; i < 4; i++) await s.put(who, R, forged);
   assert.equal(s.row(R.id).strikes, 1, 'the same piece carried on: one strike');
@@ -121,11 +119,11 @@ test('INT2/INT3: a lawless checkpoint is STORED and its character held - said in
   const { who: bea, R: B } = await s.seat('bea');
   const half = (P, at, sid, give, get) => s.call('/v1/realm/trade', { ...at, sid, give, get, pick: [] }, P.secret);
   assert.deepEqual((await half(bea, B.at(), 'heldtrade1', { items: [], gold: 0 }, { items: [], gold: 50 })).body, { state: 'waiting' });
-  assert.deepEqual((await half(who, R.at(), 'heldtrade1', { items: [], gold: 50 }, { items: [], gold: 0 })).body, { state: 'refused', why: 'trade-held', held: 'mine' });   // PIN MOVED (FIELD BUGS 2026-10-11g HELD-SIDE): and whose
+  assert.deepEqual((await half(who, R.at(), 'heldtrade1', { items: [], gold: 50 }, { items: [], gold: 0 })).body, { state: 'refused', why: 'trade-held', held: 'mine' });
   // the forged piece gone: the next checkpoint lifts the hold
   assert.deepEqual((await s.put(who, R, freshSave({ name: 'ann' }), { summary: { level: 1 } })).body.tradeHeld, null);
   assert.deepEqual([s.row(R.id).held, s.row(R.id).strikes], [null, 1]);
-  // three holds: a TIMED hold (PIN MOVED, AUTO-HOLD: it stood for staff) - the strikes count again from none
+  // three holds: a TIMED hold (
   for (let i = 0; i < STRIKES_FOR_TIMED - 1; i++) { await s.put(who, R, forged); await s.put(who, R, freshSave({ name: 'ann' })); }
   assert.deepEqual([s.row(R.id).strikes, s.row(R.id).law_holds, s.row(R.id).held_until > s.row(R.id).held_at], [0, 1, true]);
   assert.equal((await s.put(who, R, freshSave({ name: 'ann' }))).body.tradeHeld, 'law', 'clean, and held still');
@@ -181,7 +179,7 @@ test('INT3: EVERY ROUTE THAT HANDS A REALM CHARACTER\'S VALUE ON SAYS SO - no pr
   const dir = new URL('../../server-account/src/', import.meta.url);
   // payFromSave into nobody's hands: the realm's own price (FIRM1: the Firmament's respec, its gold burnt in the change's batch)
   // DECOR-ACCESS: the decorator's batch (decorBatch.js) is decor.js's sink in one Confirm - the realm's price for the pieces, the goods set in the room
-  // WILD-INSURE (PVP-EASE, 2026-10-26, PIN MOVED): a policy's premium (wildInsure.js) is the realm's price too - burnt in
+  // WILD-INSURE (PVP-EASE, 2026-10-26
   // the batch that writes the policy, into no player's hands
   const SINKS = { 'homes.js': 1, 'decor.js': 1, 'decorBatch.js': 1, 'guilds.js': 1, 'firmament.js': 1, 'wildInsure.js': 1 };
   const found = {};
@@ -200,12 +198,9 @@ test('INT3: EVERY ROUTE THAT HANDS A REALM CHARACTER\'S VALUE ON SAYS SO - no pr
       assert.ok(SINKS[f] && --SINKS[f] >= 0, `${f}: a record's goods or gold out with no word that they leave for another player:\n${call.slice(0, 300)}`);
     }
   }
-  // PIN MOVED (SEA-BOUNTY, 2026-10-22): a bounty's post - its gold paid to whichever hand ends the captain at sea
   // DECOR-ACCESS: a house's price paid by its buyer to its seller (homeTransfer.js)
   assert.deepEqual(found, { 'alchemy.js': 1, 'guildVault.js': 1, 'guilds.js': 1, 'homeTransfer.js': 1, 'market.js': 2, 'rent.js': 1, 'seaBounty.js': 1 });
   const trade = readFileSync(new URL('realmTrade.js', dir), 'utf8');
-  // PIN MOVED (its audit): the hold's own word - 'record-unjudged' was told 'trade-held'
-  // PIN MOVED (FIELD BUGS 2026-10-11g HELD-SIDE): and the side it held kept with the word
   assert.match(trade, /const heldA = gives\(firstHalf\) \? holdRefusal\(other\) : null;\n\s+const heldBy = heldA \?\? \(gives\(half\) \? holdRefusal\(row\) : null\);\n(?:\s*\/\/[^\n]*\n)*\s+if \(heldBy\) return refuse\(db, sid, `\$\{heldBy\.error\}:\$\{heldA \? 'a' : 'b'\}`, playerId, asker, true\);/);
 });
 
@@ -232,7 +227,6 @@ test('INT5/INT6: the service\'s own writes are WITNESSED, the next judgement cha
   assert.equal((await s.call('/v1/mod/realm-holds', {}, outsider.secret)).status, 403);
   const mac = await s.registered('mac');
   const holds = (await s.call('/v1/mod/realm-holds', {}, mac.secret)).body.characters;
-  // PIN MOVED (its audit): three lawless checkpoints in a row are one hold - one strike, one finding
   assert.deepEqual(holds.map((c) => [c.id, c.held, c.strikes]), [[R.id, 'law', 1]]);
   const f = (await s.call('/v1/mod/realm-findings', { id: R.id }, mac.secret)).body;
   assert.equal(f.findings.length, 1);

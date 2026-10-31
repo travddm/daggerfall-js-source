@@ -1,8 +1,8 @@
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - SMITHING AS THE CLIENT MAKES IT: the book's craft (kept before it is
+// PROF3 - SMITHING AS THE CLIENT MAKES IT: the book's craft (kept before it is
 // asked, its pieces minted on the answer, once) and the smith's stock; the piece minted as DFU mints it and the quality
 // laid on it (the condition, the weight, the Loot Rarity roll off the record's seed, the maker's mark); a tool's life;
 // the Repair Kit and its use; the heat; the anvil's section of the Stores page. The done-when: a crafted Mithril
-// Longsword is DFU's, with its quality. bible/06-Systems/Professions-Arc.md 24.
+// Longsword is DFU's, with its quality. 24.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -214,7 +214,6 @@ test('PROF3 anvil page: at a smith\'s forge - the families and metals, a recipe\
   const press = (label) => buttons().find((b) => b.textContent.startsWith(label)).onclick();
   assert.match(text(), /The Anvil/);
   assert.match(text(), /The smith's anvil - 50 gold a craft/);
-  // PIN MOVED (CRAFT2): the anvil lists its patterns, the metal chosen in the box from what is held - none made now, so the
   // open one holding most of its inputs (the three Mithril Ingots)
   const row = buttons().find((b) => b.textContent.startsWith('Longsword'));
   assert.match(row.textContent, /needs materials/, 'no Cured Leather yet');
@@ -260,7 +259,7 @@ test('PROF3 wiring: the host mints a craft\'s pieces once each by provenance, pa
   assert.match(w, /onSettle: \(\) => \{ profBook\.settle\(profMint, profMintCraft\)\.catch\(\(\) => \{\}\); \},/);
   // PROF4: a Heartwood for a plank; AUDIT 30 C4: the fee rides the kept craft and is paid where its pieces are minted
   // PROF7 moved it: the station's own kept word (craftStation), and a garment's dye beside the Heartwood
-  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: f\.fee > 0 \? f\.fee : 0, name: [^\n]*\n\s*\/\/ CRAFT1 \(bible[^\n]*\n\s*\/\/ AUDIT CRAFT1 F3: [^\n]*\n\s*const chain = \[refinedText\([^\n]*\n\s*if \(!r\?\.ok\) return \{ ok: false, text: r\?\.kept \? `\$\{st\.kept\}\$\{chain \? ` \$\{chain\}` : ''\}` : `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}\$\{chain \? ` \$\{chain\}` : ''\}` \};/);   // PIN MOVED (PROF10): a Lapidary's `cracked` gem; (AUDIT PROF-541 R2-C2) the busy word the book's   // PIN MOVED (AUDIT2 BAG1 K8): and what went into the Stores first; (CRAFT1) and what the chain refined first - kept or refused (AUDIT CRAFT1 F3)
+  assert.match(w, /const r = await profBook\.craft\(recipe, \{ clean, heartwood, dye, cracked, fee: f\.fee > 0 \? f\.fee : 0, name: [^\n]*\n\s*\/\/ CRAFT1 \(bible[^\n]*\n\s*\/\/ AUDIT CRAFT1 F3: [^\n]*\n\s*const chain = \[refinedText\([^\n]*\n\s*if \(!r\?\.ok\) return \{ ok: false, text: r\?\.kept \? `\$\{st\.kept\}\$\{chain \? ` \$\{chain\}` : ''\}` : `\$\{accountRefusalText\(r\?\.error\)\}\$\{movedFirstText\(r\)\}\$\{chain \? ` \$\{chain\}` : ''\}` \};/);
   assert.match(w, /const profMintCraft = \(data, kept = null\) => \{\n\s*if \(kept\?\.fee > 0\) \{ deductGold\(playerEntity, Math\.min\(kept\.fee, totalGoldAmount\(playerEntity\)\)\); saveSoon\.changed\(\); \}/);
   assert.match(w, /heatBand: \(\) => heatBand\(\{ strength: liveStat\(playerEntity, 'strength'\), agility: liveStat\(playerEntity, 'agility'\) \}\),/);
   assert.match(src('src/scenes/shared.js'), /installSmithing\(\);/);

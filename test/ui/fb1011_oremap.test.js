@@ -4,7 +4,7 @@
 // (ui/oreMapTip.js): the ground's veins (its climate's table), its dungeons' deep veins, its kingdom's own ore, and
 // whether the witnesses have vouched for it - every word read off the law that stands the veins, so the card cannot
 // promise an ore the ground would not give. The world host hands the map the card and asks the ground's witnessed
-// state once a pixel, through the gathering host. bible/01-Overview/bugs/Field-Bugs-2026-10-11d.md.
+// state once a pixel, through the gathering host..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -25,7 +25,6 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const GLENUMBRA = 59, SENTINEL = 20, ORSINIUM = 26, ALIKR = 0, BETONY = 19;
 
 test('ORE-MAP: the card says a pixel\'s veins, its dungeons\', its kingdom\'s own ore and its ground\'s witnessed state - for the report\'s own case, a Daggerfall woodland nobody has read yet (mutants: the signature unsaid; the held ores unsaid; a confirmed pixel said unwitnessed)', () => {
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): the Dungeons line is the table every dungeon draws on anyone's
   // word, and the woods' deep Moonstone - which still waits on its dungeon's witnesses - is said on the state line
   assert.deepEqual(oreMapTip({ climate: CLIMATES.Woodlands, region: GLENUMBRA, fact: null }), { title: ORE_TIP_TITLE, lines: [
     'Veins: Iron, Copper, Tin, Lodestone',
@@ -57,7 +56,6 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
         assert.ok(card.lines.length <= TIP_LINES_MAX && card.lines.every((l) => l.length <= TIP_TEXT_MAX));
         assert.equal(card.lines[0], `Veins: ${table.map(oreWord).join(', ')}`);
         const sig = regionSignature(region);
-        // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): a province's line says its richness after its own ore, and
         // Cyrodiil's every province's ores and metals (net/provinceNodes.js)
         const times = richness(region, 'vein') > 1 ? ` (${richness(region, 'vein')}x the veins)` : '';
         if (region === CYRODIIL_REGION) assert.ok(card.lines.includes(`Cyrodiil holds every province's ores and metals${times}`), 'Cyrodiil: every province\'s');
@@ -76,7 +74,7 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
 });
 
 test('ORE-MAP: the world host hands the held map the card online, asks a pixel\'s witnessed state once and after the pointer rests, through the gathering host - which stands again a pixel of its own whose state the answer moved - and the Mining page says where to look (mutants: the card offline; asked every hover; the ask past the host; the stood pixel left on its old word)', async () => {
-  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);   // VOICE1 (PIN MOVED): the same law in plain words
+  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);     // VOICE1 (
   // the gathering host's ask: a pixel it stands, answered as changed, is stood again
   const WOODS = CLIMATES.Woodlands, PX = 405, PY = 150, DAY = 20500;
   const law = veins({ x: PX, y: PY, day: DAY, climate: WOODS, region: GLENUMBRA, confirmed: false });

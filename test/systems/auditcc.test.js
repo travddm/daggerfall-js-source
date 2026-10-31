@@ -31,10 +31,10 @@ import { templateByIndex, mintCondition } from '../../src/systems/item/itemTempl
 import { createEquipTable } from '../../src/characters/equipTable.js';
 import { equipItem } from '../../src/systems/equip.js';
 
-// ═══ AUDIT C&C (2026-10-12): THE OWNER'S DECISIONS, MADE, AND THE COMPREHENSIVE AUDIT ═══
+// ═══ AUDIT C&C: THE OWNER'S DECISIONS, MADE, AND THE COMPREHENSIVE AUDIT ═══
 //
 // The owner: "Make the best decisions. DO a comprehensive audit on everything ensuring perfection". The open questions
-// AUDIT SURV-BOONS and AUDIT TEMP-UI left (bible/06-Systems/Climates-Calories.md, AUDIT C&C) decided - E4 the sea at
+// AUDIT SURV-BOONS and AUDIT TEMP-UI left (, AUDIT C&C) decided - E4 the sea at
 // nought, E5 a jump felt at its own hours offline - and six cold lenses over the whole arc, read against the mod's
 // published source: the needs law and the tiers (N), the temperature law (T), the items, food, camps, fires and the
 // tavern (I), the four hosts, the save and the wire (H), what the player sees (S), and the records and the pins (R).

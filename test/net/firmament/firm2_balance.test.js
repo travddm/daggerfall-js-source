@@ -1,4 +1,4 @@
-// FIRM2 (2026-10-15): every star counts - no channel of any sign sums past its cap - and the sky's attributes may stand
+// FIRM2: every star counts - no channel of any sign sums past its cap - and the sky's attributes may stand
 // past the 100 ceiling by what the sky adds.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

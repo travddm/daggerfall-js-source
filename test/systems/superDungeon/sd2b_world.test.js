@@ -1,9 +1,8 @@
-// SD2b (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time."): THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - the hub's record in, the Hollow it
+// SD2b: THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - the hub's record in, the Hollow it
 // names found over this client's own map files and stood at its pixel while its phase stands, the find said at its door
 // until the hub's word moves it, and the chat's lines for the moves everyone online hears. bible/11-Multiplayer/
 // Super-Dungeons.md sections 2-4.
-import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';   // SD19 (PIN MOVED): its marks said with its find
+import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';     // SD19 (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -158,7 +157,7 @@ test('SD2b the lines: the find, the kill and the fading said once each, to every
   host.frame();
   assert.equal(s.lines.length, 2, 'the collapse after a kill says nothing more');
   // a second Hollow fades unbeaten - its line said with the region's name when the world never placed it
-  // (AUDIT SD II, L6 - PIN MOVED: a FOUND one; the rise is said to nobody, so a fade never found says nothing)
+  // (AUDIT SD II, L6
   const { s: s2, host: h2 } = harness({ scanReady: false });
   const r2 = sdFind(sdRise(sdFirst(T0 - 20 * M), T0 - 10 * M, 0), T0 - 9 * M, 'Mara');
   h2.heard({ k: 'ev', ...r2 });

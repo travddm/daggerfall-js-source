@@ -103,11 +103,11 @@ test('settings: the LIVE tier does not lie - each consumer really reads the stor
   setValue('Enhancements', 'PlayerTorchFromItems', true);
   const e = { items: [], stats: {}, skills: [] };
   assignStartingGear(e, { classIndex: 0, rolls: () => 0 });
-  assert.ok(e.items.some((it) => it.group === 'UselessItems2' && !isWalletItem(it)), 'torches arrive with the setting on');   // PIN MOVED (WALLET1): never the wallet - it is miscellany whatever the setting
+  assert.ok(e.items.some((it) => it.group === 'UselessItems2' && !isWalletItem(it)), 'torches arrive with the setting on');
   setValue('Enhancements', 'PlayerTorchFromItems', false);
   const e2 = { items: [], stats: {}, skills: [] };
   assignStartingGear(e2, { classIndex: 0, rolls: () => 0 });
-  assert.equal(e2.items.filter((it) => it.group === 'UselessItems2' && !isWalletItem(it)).length, 0, 'and not with it off');   // PIN MOVED (WALLET1): the wallet is miscellany too, and the port's own tail's
+  assert.equal(e2.items.filter((it) => it.group === 'UselessItems2' && !isWalletItem(it)).length, 0, 'and not with it off');
   // MouseLookSensitivity + InvertMouseVertical
   setValue('Controls', 'MouseLookSensitivity', 1.0);
   assert.equal(lookScale(), LOOK_BASE, 'sensitivity 1.0 IS the port feel constant');

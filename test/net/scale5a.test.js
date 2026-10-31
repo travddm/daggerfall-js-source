@@ -1,5 +1,4 @@
-// SCALE5a (2026-10-10, Mac: "we just hit 500 online people. I think its time to scale up our server and improve
-// performance for more people"; bible/11-Multiplayer/Scale-Arc.md SCALE5a): THE HUB'S HELLO AND LEAVE WITHOUT A WALK OF
+// SCALE5a: THE HUB'S HELLO AND LEAVE WITHOUT A WALK OF
 // THE WORLD, AND A BUSY REFUSAL THAT MINTS NOTHING. Every player online holds a socket in the hub (`chat:world`), and a
 // relay deploy brings all of them back through its hello inside a minute: each hello walked every socket six times and
 // rebuilt the account index (O(N) a hello, O(N^2) a wave), each leave three times, and every hello the hub's gate

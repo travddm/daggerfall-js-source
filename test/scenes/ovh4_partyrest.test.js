@@ -1,4 +1,4 @@
-// OVH4 (2026-09-24, Mac: "How do we make it where it's not solo rest for other UI's" - and chose "A"): A PARTY'S REST
+// OVH4: A PARTY'S REST
 // IS AN ONLINE WINDOW, like the chat, the party panel and the player trade (OVH3) - the party card on either skin.
 //
 // THE BUG: ONLINE-REST1 gated the whole party rest on the enhanced skin, because classic's RestWindow carries none of

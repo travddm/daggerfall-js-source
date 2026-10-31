@@ -1,4 +1,4 @@
-// MAC'S FIVE (2026-09-12): "1. All mods should be enabled by default
+// MAC'S FIVE: "1. All mods should be enabled by default
 // 2. Bring back the pixelated sky we removed in a past commit. On by
 // default and apart of a new toggle within enhanced environments 3. I
 // wanna push the draw distance as far as we can push it while keeping
@@ -33,8 +33,7 @@ test('MO1: every mod with a switch ships ON - the Mods pane is where one is turn
     assert.equal(def.keys.Enabled.default, true, `${vendor} ships on`);
     assert.equal(modSetting(vendor, 'Enabled'), true, `${vendor} reads on with nothing stored`);
   }
-  // BR3 (2026-09-13, Mac: "can you do an audit on basic roads. I dont
-  // think its working") REVERSES MO1'S ONE EXEMPTION, and the reason it
+  // BR3 REVERSES MO1'S ONE EXEMPTION, and the reason it
   // was made is the reason it could go. MO1 held Basic Roads out because
   // it "is the road network itself" - a switch that could leave a player
   // with no roads at all is not a mod switch, it is a way to break the
@@ -51,8 +50,7 @@ test('MO1: every mod with a switch ships ON - the Mods pane is where one is turn
   assert.match(read('test/combat/audit18_combat.test.js'), /^import '\.\.\/modsOff\.js';/m, 'the formula suite runs without the mods');
 });
 
-// PS1 and PS2 (the pixelated sky and its reach) - REMOVED at FT3 (2026-09-14,
-// Mac: "Remove our version of pixelated sky"); their pins went with the pass.
+// PS1 and PS2 (the pixelated sky and its reach) - REMOVED at FT3; their pins went with the pass.
 
 test('LV1: the enhanced lane streams its own radius - 5 by default, 6 at most - and the 1:1 lane keeps DFU\'s 1..4', () => {
   assert.equal(TERRAIN_DISTANCE, 3, 'StreamingWorld.cs:56, untouched');

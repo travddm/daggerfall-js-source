@@ -1,5 +1,4 @@
-// HOOD-CAREER (2026-10-07, Mac: "Wearing a hood should protect you from the disadvantage of being damaged by
-// sunlight"): THE PORT'S DEPARTURE from PassiveSpecialsEffect.DamageFromSunlight (:107-121), DaggerfallUI's career box
+// HOOD-CAREER: THE PORT'S DEPARTURE from PassiveSpecialsEffect.DamageFromSunlight (:107-121), DaggerfallUI's career box
 // at the travel map's door (:614-621) and DaggerfallTravelPopUp's arrival clamp (:350-357). VAMP-HOOD and HOOD-SUN let a
 // raised hood keep the sun off the vampire's curse; the custom class's own Damage from Sunlight still burned 12 every
 // 4th round and barred the day's travel under the same hood. Every rule the career's CFG bit keys asks

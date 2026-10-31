@@ -1,12 +1,11 @@
-// ETHER-WILD (2026-10-21) - THE ELTHERIC OCEAN AN OPEN PVP ZONE. The owner: "I want there to be more of a reason to
+// ETHER-WILD - THE ELTHERIC OCEAN AN OPEN PVP ZONE. The owner: "I want there to be more of a reason to
 // venture into this zone. ... id also like to implement open pvp for this zone specifficaly and implement some of the
 // wrothgarian mountain open pvp aspects into the procedural Islands".
 //
 // The sea past Veilhaven's peace stands the mountains' law (systems/wild/wildZone.js's live flag, read by every pool,
 // fight, drop and name of the zone), its depth bands for the four rings - systems/wild/etherWild.js. Pinned here: the
 // zone's extent and its rings to the pixel, the peace, the words by the ground, an isle's ruin read by its band, and the
-// host's seams (scenes/world.js, scenes/dungeonContext.js) by source. bible/03-World/Eltheric-Ocean.md ETHER-WILD,
-// bible/11-Multiplayer/Wild-Zone.md section 24.
+// host's seams (scenes/world.js, scenes/dungeonContext.js) by source. ETHER-WILD,
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -75,11 +74,10 @@ test('ETHER-WILD: the live flag carries its ground - the zone\'s words are the s
     assert.equal(zoneWord('ringCross')(3, true), 'Deeper - The Deep Aether: +75% loot.');
     assert.equal(zoneWord('ringCross')(1, false), 'Back toward the Veil - The Shallows: +25% loot.');
     assert.match(zoneWord('chipTip'), /Eltheric Ocean past Veilhaven's peace/);
-    // PIN MOVED (AUDIT SEA VENTURES C7): the truce is the sea's own now - a word the sea does not say its own way is still the mountains'
     assert.equal(zoneWord('truce'), ETHER_WILD_TEXT.truce());
     assert.equal(zoneWord('noFight'), WILD_TEXT.noFight, 'a word the sea does not say its own way is the mountains\'');
     assert.equal(zoneWord('leave', ETHER_KIND), ETHER_WILD_TEXT.leave(), 'the words of the ground left, asked by name');
-    // Cyrodiil (PIN MOVED, WW-C2, bible/03-World/World-Wide.md WW-C: the default ground, the mountains' before it)
+    // Cyrodiil (
     setWildHere(true, 1);
     assert.equal(wildZoneKind(), WILD_KIND, 'Cyrodiil is the default ground');
     assert.equal(WILD_KIND, 'cyrodiil');
@@ -133,9 +131,9 @@ test('ETHER-WILD: the hosts\' seams - the frame stands the sea beside the mounta
   assert.match(frame, /ring = seaRing \|\| wildRingAt\(/, 'the sea\'s band is the ring');
   assert.match(frame, /setWildHere\(here, ring, seaRing \? ETHER_KIND : undefined\)/, 'the ground on the flag');
   assert.match(frame, /zoneWord\('enter'\)/);
-  assert.match(frame, /: 'leave', left \|\| undefined\)/, 'the leaving said in the words of the ground left');   // PIN MOVED (AUDIT SEA VENTURES C7): 'quiet' while still past the peace
+  assert.match(frame, /: 'leave', left \|\| undefined\)/, 'the leaving said in the words of the ground left');
   assert.match(w, /setPaceZoneCap\(wildHere\(\) && wildZoneKind\(\) !== ETHER_KIND \? WILD_PACE_CAP : null\)/, 'the mountains\' pace cap never at sea');
-  const rise = w.slice(w.indexOf('const wildRiseSite = (px, inDungeon = false, kill = true) => {'), w.indexOf('const wildClearSpawn = () => {'));   // PIN MOVED (AUDIT FOE-KEEPS E1): a kill's rise and a foe's
+  const rise = w.slice(w.indexOf('const wildRiseSite = (px, inDungeon = false, kill = true) => {'), w.indexOf('const wildClearSpawn = () => {'));
   assert.match(rise.split('\n')[1], /if \(etherSea && inEther\(px\.x, px\.y\)\) return etherRiseSite\(px\.x, px\.y\);/, 'a death at sea rises at the nearest freeport, before the mountains\' search of the Bay\'s maps');
   // the site itself (HOST-SPLIT, SEA VENTURES: out of bootWorld): the nearest freeport's town within ETHER_RISE_PX, else Veilhaven
   const vh = veilhaven(), far = { x: vh.px + 20 * ETHER_RISE_PX, y: vh.py };
@@ -170,7 +168,6 @@ test('ETHER-WILD: the crossing says what lies past the peace, online alone; at s
   assert.deepEqual(questionRows('  '), []);
   assert.deepEqual(crossingRows('home', { pvp: true }), crossingRows('home'), 'the way home warns of nothing');
   assert.match(src('src/scenes/world.js'), /rows: crossingRows\(way, \{ pvp: _onlineWorldSession\(\) && !!online\?\.wildOk \}\)/, 'online, past a relay that raises the zone');
-  // PIN MOVED (STORE-KEEPS, 2026-10-26): a hand ashore was held at my side in the mountains (COMPANION-DROP) and sent back
   // aboard at sea; his pack is storage no death takes now, and he is sent back aboard from either ground
   assert.ok(!src('src/systems/naval/crewCompanions.js').includes('heldAtSide'), 'no ground holds him');
 });
@@ -181,6 +178,5 @@ test('ETHER-WILD: a street foe past the Veil is the zone\'s to FOE-BOUNDS, read 
   assert.match(about, /const \[px, py\] = mapPixelOfWire\(r\.f\[0\], r\.f\[2\]\);\n    if \(inEther\(px, py\)\) return true;/);
   const w = src('src/scenes/world.js');
   const unstuck = w.slice(w.indexOf('const unstuckOutdoors = () => {'), w.indexOf('You find your way to the nearest town.'));
-  // PIN MOVED (AUDIT TESA II P2): elsewhere the world's nearest town (scenes/tamrielPlacesHost.js nearestTownOf), the Bay's and past it
   assert.match(unstuck, /const town = etherSea && inEther\(px\.x, px\.y\) \? wildRiseSite\(px\) : nearestTownOf\(px, /);
 });

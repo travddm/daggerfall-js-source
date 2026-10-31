@@ -1,4 +1,4 @@
-// LEGACY6 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 10; Mac: "World Influence"): WHAT THE WORLD REMEMBERS OF
+// LEGACY6: WHAT THE WORLD REMEMBERS OF
 // THE HOUSE - the law (systems/legacy/influence.js), the regard handed down (livingWorld/relations.js inherit), the
 // killer remembered (revenant.js killerOf / inheritRevenant), the towns' talk (lines.js KIN_NEWS, livingTown.js
 // familyNews) and the host's doors (scenes/legacyHost.js) through the real save records and store.
@@ -111,7 +111,7 @@ test('LEGACY6 the towns\' words: a kinsman\'s news has its own lines, by name an
   assert.ok(KIN_NEWS.wed.includes(told.script), 'the house\'s own words, never the road\'s');
   for (const k of ['died', 'rested', 'wed', 'born']) assert.ok(KIN_NEWS[k].length >= 2, k);
   assert.equal(fillLine('House {house}', {}), `House ${TOKEN_FALLBACK.house}`, 'never a brace on the screen');
-  // a meeting says it - LW-TALK (main's #630, at Project Legacy's merge of it): PIN MOVED - told in an exchange, on the
+  // a meeting says it - LW-TALK (main's #630, at Project Legacy's merge of it):
   // exchange's own draw (meetups.js exchangeScript), its first line the slot's opener's; the old circle of a billion
   // minutes laid its exchanges' slots past the array's bound
   const members = [{ id: 'a2', name: 'Ana Two', job: 'crafter' }, { id: 'b3', name: 'Bo Three', job: 'crafter' }];

@@ -1,4 +1,4 @@
-// AUDIT LW-III (bible/01-Overview/audits/Audit-LivingWorld-III.md, "The deep"): ONE PILE A BODY - the deep's remains tagged with
+// AUDIT LW-III (, "The deep"): ONE PILE A BODY - the deep's remains tagged with
 // their key, kept through a save made inside and adopted on the load, never laid again beside it (deepRemains.js
 // `pileOf`, dungeonContext.js `layRemains` / `remainsPile`, droppedLoot.js restorePiles); THE DIVERS' ELECTION ASKED EACH
 // FRAME - a reader that loses it gives its companies up (dungeonDivers.js, the outlaws' AUDIT LW-II-2 C13); the way out

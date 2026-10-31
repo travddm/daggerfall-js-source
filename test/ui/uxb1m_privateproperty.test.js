@@ -1,5 +1,4 @@
-// UXB1-M (2026-09-25, the UX backlog: "Private Property uses daggerfall's default Y/N prompt. Make the options
-// clickable at least or convert to new UI.").
+// UXB1-M.
 //
 // THE ROOT CAUSE, found by driving the box: the options WERE clickable - in the wrong place. ChoiceWindow's click
 // bands were [ty - lineH, ty) for a row whose glyphs start AT ty, so every band covered the row above its label: on

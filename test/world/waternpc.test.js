@@ -1,6 +1,5 @@
-// WATER-NPC - THE WANDERING NPCs LEARN THE WHOLE WATER FAMILY (2026-09-15).
+// WATER-NPC - THE WANDERING NPCs LEARN THE WHOLE WATER FAMILY.
 //
-// Mac, from live play: "NPCs arent water aware and will walk into it".
 //
 // THE PORT IS VERBATIM, AND THAT IS THE PROBLEM. DFU's `GetTileWeight`
 // (CityNavigation.cs) gives weight 0 - "never try to walk" - to seven

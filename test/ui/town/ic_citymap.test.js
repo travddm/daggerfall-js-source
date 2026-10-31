@@ -1,4 +1,4 @@
-// IC-TOWNMAP 3 (2026-10-26; the owner: "Curious how the town map will look", and his go-ahead for the city's own map) -
+// IC-TOWNMAP 3 -
 // THE IMPERIAL CITY ON THE HELD MAP. In any of the city's slices the town key's held map is the city itself
 // (ui/town/imperialSheet.js): its plan at city zoom - Lake Rumare, the walls and gates, Green Emperor Way, the rings,
 // avenues and radials, the districts and their names, the landmarks - built once a session; zoomed in near the player the

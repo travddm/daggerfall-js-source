@@ -1,5 +1,5 @@
-// ETHER-SHIPS, ETHER-LEGENDS (2026-10-11, the owner: "deadly legendary ships") - THE ELTHERIC OCEAN'S SHIPS
-// (bible/03-World/Eltheric-Ocean.md): its corsairs and its isles' traders - the Bay's classes under the sea's names and the
+// ETHER-SHIPS, ETHER-LEGENDS - THE ELTHERIC OCEAN'S SHIPS
+// : its corsairs and its isles' traders - the Bay's classes under the sea's names and the
 // Isles' colours, drawn by the band, no crown's navy and no crown's law - and its six legends, each her own class, haunt,
 // terror and purse; the director's traffic past the Veil and the host's seams. tools/mutants/ethership.json.
 import '../../modsOff.js';
@@ -94,7 +94,6 @@ test('ETHER-LEGENDS the haunts: each legend\'s off her own hash - in her band\'s
     assert.ok(d >= band.from + margin - 0.2 && d <= (next ? next.from : band.from + ABYSS_HAUNT_LEAGUES) - margin + 0.2, `${l.name} haunts ${band.id} (${d.toFixed(1)})`);
     assert.equal(etherBandOf(d).id, l.band);
     assert.ok(Math.abs(h.py - row) <= HAUNT_SPREAD[l.band], `${l.name} near Veilhaven's row`);
-    // PIN MOVED (AUDIT CAPTAIN'S SEA H7): `x === (l.id === x ? l.id : x)` held for any answer - a haunt's centre is hers
     assert.equal(legendAt(h.px, h.py)?.id, l.id, 'her haunt\'s centre hers');
     assert.ok(legendAt(h.px + HAUNT_PX, h.py), 'the haunt\'s edge');
   }

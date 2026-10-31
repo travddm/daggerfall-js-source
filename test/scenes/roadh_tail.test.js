@@ -1,4 +1,4 @@
-// ROAD-H TAIL (2026-09-07) - the three items Wave H's missiles lane
+// ROAD-H TAIL - the three items Wave H's missiles lane
 // recorded and left: the enemy shaft's contact with the player is the
 // player's CAPSULE (DaggerfallMissile.cs:339's SphereCast into the
 // CharacterController), not a point 0.9 up; the flight raycast reaches
@@ -19,7 +19,7 @@ import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 
 const src = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const open = (raycast = () => Infinity) => new ArrowFlight({ getGpuMesh: () => null, collider: { raycast, heightAt: () => -100 } });
-/** One step of a shaft's flight that is 1.25 units long. PIN MOVED (BAL-ARCHERY, bible/05-Combat/Balance-Arc.md
+/** One step of a shaft's flight that is 1.25 units long.
  *  section 18): a shaft flies at ARROW_FLIGHT_SPEED, so the fixtures' 0.05 s step (MISSILE_SPEED's 1.25) is read
  *  off the shaft's own speed - the geometry below stays as it was written. A spell (the magic hosts) is still MISSILE_SPEED. */
 const STEP = 1.25 / ARROW_FLIGHT_SPEED;
@@ -94,7 +94,7 @@ test('ROAD-H tail: the flight reach is displacement.magnitude + ColliderRadius a
   // along `direction` (which Physics normalises). A crouch-dipped
   // direction (:583-585, +down*0.05 after the normalise) has magnitude
   // sqrt(1 + 0.0025); the reach grows with it and the ray is unit.
-  const dt = 0.05, step = ARROW_FLIGHT_SPEED * dt;   // PIN MOVED (BAL-ARCHERY): a shaft's step is its own speed's
+  const dt = 0.05, step = ARROW_FLIGHT_SPEED * dt;
   const dipped = [0, -0.05, 1];
   const len = Math.hypot(0, -0.05, 1);
   const { unit, reach } = missileReach(dipped, step);
@@ -137,7 +137,7 @@ test('ROAD-H tail: the flight reach is displacement.magnitude + ColliderRadius a
 });
 
 // ───────────────────────────────────────────────────────────────────
-// ROAD-H TAIL, THE REVIEW ROUND (2026-09-07)
+// ROAD-H TAIL, THE REVIEW ROUND
 //
 // Four things the round's own pins did not hold: the THIRD ArrowFlight
 // host never got the live height at all; the host wiring of that height

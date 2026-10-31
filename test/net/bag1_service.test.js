@@ -1,7 +1,7 @@
-// BAG1 (2026-10-03) - THE MATERIALS BAG, ON THE SERVICE: what a character carries is COUNTED. A carrying client's
+// BAG1 - THE MATERIALS BAG, ON THE SERVICE: what a character carries is COUNTED. A carrying client's
 // harvest lands in the carried count, never the Stores; a withdrawal hands units over counted, under the origin they
 // left as; a deposit brings them back into the Stores - never more than the count, which is first cut to what the pack
-// says it holds and never raised (law 3's guarantee, restated: bible/06-Systems/Materials-Bag.md). Driven through the
+// says it holds and never raised (law 3's guarantee, restated). Driven through the
 // real Worker over node:sqlite (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -105,7 +105,7 @@ test('BAG1 service: a harvest\'s `held` cuts the count first - a pack that sold 
   assert.deepEqual([full.status, full.body], [409, { error: 'carried-full' }]);
 });
 
-// AUDIT BAG1 B2 (bible/06-Systems/Materials-Bag.md, the audit): a held count is only as good as the count it was read
+// AUDIT BAG1 B2 (, the audit): a held count is only as good as the count it was read
 // against. The auditors' repro: three herbs gathered offline, kept, each asked with `held: 0` - every one cut the units
 // the one before had counted, and the save was minted four that the service knew as one.
 test('BAG1 service (AUDIT B2): a `held` read against a count that has moved since cuts nothing - three kept harvests all keep their units; a current one is believed', async () => {
@@ -271,7 +271,7 @@ test('BAG1 service: the unbruised count follows its own units into the bag and b
   assert.equal(unbruised(), 1, 'a pack holding one: the count cut, and the unbruised with it');
 });
 
-// ─── THE SECOND AUDIT (bible/06-Systems/Materials-Bag.md, the second audit) ───
+// ─── THE SECOND AUDIT (, the second audit) ───
 
 test('BAG1 service (AUDIT2 S1): a carried harvest\'s row is kept thirty days, not two - it is the answer a kept harvest asked again is given, and only that answer mints its items; a Stores harvest\'s still goes at two, and past its bound a carried one goes too (mutants: swept at two days; never swept)', async () => {
   const s = await stand();
@@ -285,7 +285,7 @@ test('BAG1 service (AUDIT2 S1): a carried harvest\'s row is kept thirty days, no
   const rowsOf = (carry) => Number(s.raw.prepare('SELECT COUNT(*) AS n FROM node_harvests WHERE player = ? AND carry = ?').get(mac.id, carry).n);
   try {
     Date.now = () => (NOON + 3 * DAY) * 1000;
-    await runCron(s.env, { cron: CRON_HOUR, nowS: NOON + 3 * DAY });   // the sweep - PIN MOVED (SCALE4b): the service's clock's each hour, no longer the state's read
+    await runCron(s.env, { cron: CRON_HOUR, nowS: NOON + 3 * DAY });     // the sweep
     assert.deepEqual([rowsOf(1), rowsOf(0)], [1, 0], 'the Stores harvest swept, the carried one kept');
     const again = await s.call('/v1/prof/harvest', body, mac.secret);
     assert.deepEqual([again.body.repeat, again.body.carry, again.body.qty], [true, true, r.body.qty], 'asked again three days on: answered, so its items are minted');

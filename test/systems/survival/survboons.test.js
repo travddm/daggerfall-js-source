@@ -31,7 +31,7 @@ import { setTutorialHandler, _resetTutorialTriggerForTests } from '../../../src/
 import { createEquipTable } from '../../../src/characters/equipTable.js';
 import { fakeDom } from '../../invdrag.mjs';
 
-// ═══ SURV-BOONS (2026-10-12): THE FOURTH TIER ═════════════════════════
+// ═══ SURV-BOONS: THE FOURTH TIER ═════════════════════════
 //
 // The owner: "I want to force a new version of Climates and Calories, but a
 // completely different version. Instead of punishing players for not
@@ -50,8 +50,7 @@ import { fakeDom } from '../../invdrag.mjs';
 // pinned as LITERALS (A PIN MUST FAIL - AUDIT SURV-BOONS D3: a pin that
 // reads the law's own constant back survives that constant's mutation).
 //
-// AUDIT SURV-BOONS (the same day, the owner: "I want to ensure it's
-// perfection and highly detailed ... Audit everything we have also"): five
+// AUDIT SURV-BOONS (the same day): five
 // cold lenses - the law, the consumers, what the player sees, the records
 // and pins, the temperature - and every finding reproduced before it was
 // fixed; the pins from "THE OVER-CEILING POOL" on are theirs.
@@ -100,7 +99,7 @@ test('SURV-BOONS: the fourth tier - on the one key, stored by name between Off a
   assert.deepEqual([...SURVIVAL_TIER_IDS], ['off', 'boons', 'casual', 'hard']);
   assert.equal(SURVIVAL_STORED.boons, 'boons');
   assert.equal(isStoredTier('boons'), true); assert.equal(tierOfStored('boons'), 'boons'); assert.equal(rulesForTier('boons'), BOONS);
-  assert.equal(SURVIVAL_DEFAULT, 'boons', 'BOONS-DEFAULT (2026-10-13, Mac: "make boons the default")');   // PIN MOVED: SURV-BOONS had it a choice, not the default
+  assert.equal(SURVIVAL_DEFAULT, 'boons', 'BOONS-DEFAULT (2026-10-13, Mac: "make boons the default")');
   const row = FEATURES.find((f) => f.id === 'mod-climates-calories');
   assert.deepEqual(row.control.tiers[1], ['boons', 'Boons'], 'the bar\'s second segment');
   assert.match(row.note, /On Boons neglect costs nothing, and staying fed, watered and rested in a bed or by a fire gives bonuses/);
@@ -153,7 +152,6 @@ test('SURV-BOONS: NOTHING IS EVER TAKEN - the worst day (starving, dehydrated, e
   assert.equal(eatLaw(raw, { lastAte: 0, now: 5000, luck: 10, rolls: () => 0.99, rules: BOONS }).sick, null, 'no sickness roll');
   assert.deepEqual(tavernOrder({ ...newSurvival(0), drunk: 45 }, 0, { kind: 'drink', strength: 35, price: 1 }, { endurance: 50, rules: BOONS }), { ok: false, text: TAVERN_MENU_TEXT.cutOff }, 'the barkeep stops pouring before a blackout');
   const meal = { kind: 'food', worth: 200, price: 5 };
-  // PIN MOVED (AUDIT C&C I3): the hunger at the meal's end, its half hour passed first - 170 now is 200 then
   assert.deepEqual(tavernOrder({ ...newSurvival(0), lastAte: 1000 - 169 }, 1000, meal, { rules: BOONS }), { ok: false, text: TAVERN_MENU_TEXT.fullForMeal }, 'AUDIT SURV-BOONS D2: the kitchen will not waste a meal - and so takes no coin for one');
   assert.deepEqual(tavernOrder({ ...newSurvival(0), lastAte: 1000 - 170 }, 1000, meal, { rules: BOONS }), { ok: true }, 'a meal\'s worth of hunger buys it');
 });
@@ -378,7 +376,7 @@ test('SURV-BOONS: the strip and the page - the boons are green tiles on their ow
     const s = { ...newSurvival(0), boons: ['rested'], wellRested: bank };
     assert.equal(survivalHudChips({ survival: s }, 0).find((c) => c.key === 'boon:rested').foot, foot, `${bank} minutes`);
     assert.equal(restedLeft(s), left);
-    assert.equal(STATUS_TEXT.boon('rested', s), 'Well rested: +5 Intelligence, +5 Willpower.');   // PIN MOVED (AUDIT C&C, lens S): the bank's hours a line of their own
+    assert.equal(STATUS_TEXT.boon('rested', s), 'Well rested: +5 Intelligence, +5 Willpower.');
     assert.equal(STATUS_TEXT.restedFor(s), `Rested for another ${left}.`);
   }
   // NO RED but the drink
@@ -387,9 +385,9 @@ test('SURV-BOONS: the strip and the page - the boons are green tiles on their ow
   assert.deepEqual(survivalHudChips(worst, 1).filter((c) => c.level === 'danger').map((c) => c.key), ['drunk'], 'only the drink, chosen at a bar, is red');
   const hard = body({ survival: { ...newSurvival(0), lastAte: -5000, thirst: 140, sleepDebt: 20, wet: 250, drunk: 60 } });
   survivalMinute(hard, 1, BLIZZARD, deps(hard, [], HARD));
-  assert.deepEqual(survivalHudChips(hard, 1, { rules: HARD }).filter((c) => c.level === 'danger').map((c) => c.key), ['hunger', 'thirst', 'sleep', 'temp', 'drunk'], 'Hard keeps its red');   // PIN MOVED (AUDIT C&C S5, D2): the tier handed in, and Drenched amber in every tier - its cost is the temperature's
+  assert.deepEqual(survivalHudChips(hard, 1, { rules: HARD }).filter((c) => c.level === 'danger').map((c) => c.key), ['hunger', 'thirst', 'sleep', 'temp', 'drunk'], 'Hard keeps its red');
   // C14: the live tier, handed in, beats the record's last minute both ways
-  assert.equal(survivalHudChips(worst, 1, { rules: HARD }).filter((c) => c.level === 'danger').length, 5, 'turned to Hard: red at once');   // PIN MOVED (AUDIT C&C S5): the rules handed in; no red Drenched
+  assert.equal(survivalHudChips(worst, 1, { rules: HARD }).filter((c) => c.level === 'danger').length, 5, 'turned to Hard: red at once');
   assert.equal(survivalHudChips(hard, 1, { rules: BOONS }).filter((c) => c.level === 'danger').map((c) => c.key).join(), 'drunk', 'turned to Boons: no red at once');
   assert.equal(survivalHudChips(e, 481, { rules: CASUAL }).some((c) => c.level === 'boon'), false, 'and no green');
   assert.equal(temperatureReadout(worst, undefined, { rules: HARD }).level, 'danger');
@@ -399,7 +397,7 @@ test('SURV-BOONS: the strip and the page - the boons are green tiles on their ow
     'Well fed: +5 Strength, +5 Endurance.',
     'Quenched: +5 Agility, +5 Speed.',
     'Well rested: +5 Intelligence, +5 Willpower.',
-    'Rested for another 12 hours.',   // PIN MOVED (AUDIT C&C, lens S): the classic box wraps nothing - the bank's hours a line of their own
+    'Rested for another 12 hours.',
     'Thriving: +5 Luck.',
     'The fire\'s warmth restores your stamina.',
   ]);
@@ -426,11 +424,10 @@ test('SURV-BOONS: the sheet explains the points - the Stats side\'s Boons rows i
   ]);
   setPref(SURVIVAL_PREF, 'casual');
   assert.deepEqual(boonStatRows(e), [], 'another tier: none');
-  // PIN MOVED (CHARGEN-TUT): the first-need page waits for a need, not a boon - driven through the HUD in the next test
   const page = TUTORIALS.find((t) => t.id === 'survival');
   assert.deepEqual(page.body, [
-    'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.',   // PIN MOVED (AUDIT C&C S13): where the tiles stand; VOICE1: plain words
-    'Survival can be Off, Boons (the default), Casual or Hard, set under Settings > Features. On Boons, needs that are met give bonuses. On Hard, neglected needs hurt you and can make you ill.',   // PIN MOVED (BOONS-DEFAULT; VOICE1)
+    'You need food, water, warmth and sleep. Signs at the left edge of the screen show what you lack, and on Boons what you have earned.',
+    'Survival can be Off, Boons (the default), Casual or Hard, set under Settings > Features. On Boons, needs that are met give bonuses. On Hard, neglected needs hurt you and can make you ill.',
   ]);
 });
 

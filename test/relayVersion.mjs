@@ -1,4 +1,4 @@
-// SRV-N (2026-09-17): THE RELAY'S VERSION, ASKED IN A WAY THAT STAYS TRUE.
+// SRV-N: THE RELAY'S VERSION, ASKED IN A WAY THAT STAYS TRUE.
 //
 // NINE separate pins asserted `RELAY_VERSION === 'world66'` by hand -
 // and the count is the point: the first five were found by bumping the

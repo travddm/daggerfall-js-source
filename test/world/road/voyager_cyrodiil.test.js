@@ -1,5 +1,4 @@
-// VOYAGER-CYRODIIL (2026-10-26, KPbICA: "For Cyrodill I would suggest to use this detailed map"; bible/03-World/Roads.md
-// VOYAGER-CYRODIIL) - CYRODIIL'S NAMED ROADS (world/road/cyrodiilRoads.js): the table read off the reference map, the
+// VOYAGER-CYRODIIL - CYRODIIL'S NAMED ROADS (world/road/cyrodiilRoads.js): the table read off the reference map, the
 // Red Ring Road round the Imperial City from its own span and gates, each road planned coarse over the land and cut into
 // legs a region routes, and the host's spec read off the places that stand and the capital's own plan.
 import { test } from 'node:test';

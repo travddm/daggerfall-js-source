@@ -1,8 +1,8 @@
-// FIRM1 (2026-10-13) - WHAT THE FIRMAMENT DOES (src/systems/firmamentPowers.js over src/systems/firmamentLive.js): the
+// FIRM1 - WHAT THE FIRMAMENT DOES (src/systems/firmamentPowers.js over src/systems/firmamentLive.js): the
 // tree in force online alone; its attributes and skills folded where DFU's formulas read a ring's; a blow's, a spell's,
 // a price's and a pace's percent; what lands on me; the health and magicka on Renown's layer - and the combat channels
 // asleep in a refereed fight and while mentoring, the life channels read wherever the tree is in force; the gathering
-// acts' windows widened. Pinned through the real producers. bible/06-Systems/Firmament.md.
+// acts' windows widened. Pinned through the real producers..
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,6 +1,6 @@
-// PROF12 (2026-10-02) - THE ALCHEMY AND ENCHANTING LAYERS' LAW, PINNED (src/net/alchemyLaw.js; professionLaw.js's goods and
+// PROF12 - THE ALCHEMY AND ENCHANTING LAYERS' LAW, PINNED (src/net/alchemyLaw.js; professionLaw.js's goods and
 // transmutations; recipeLaw.js cookXp's steps; systems/potionRecipes.js, DFU's twenty's one home): every number the record
-// and its DECIDEDs set, deepEqual against the module (A PIN MUST FAIL). bible/06-Systems/Professions-Arc.md 3.3, 4.1, 4.5,
+// and its DECIDEDs set, deepEqual against the module (A PIN MUST FAIL). 3.3, 4.1, 4.5,
 // 9.3, 37; Seats-Arc 7.5.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -73,7 +73,7 @@ test('PROF12 law: THE APOTHECARIES\' SIXTEEN (4.5) - exactly the ingredients DFU
   assert.deepEqual(APOTHECARY_STOCK.map((x) => x.key), REAGENTS.map((r) => r.key));
   assert.deepEqual(COUNTER_ONLY.slice(0, 2), ['cloth:linen', 'cloth:wool']);
   assert.deepEqual(MATERIAL_FAMILIES.map(([id]) => id), ['metals', 'wood', 'herbs', 'hides', 'food', 'stone', 'gems', 'essences', 'spoils', 'siege'], 'no new filter');
-  assert.deepEqual([ALCHEMY_FEE, ENCHANT_FEE], [25, 50]);   // PIN MOVED: CRAFT-PAYS, the alchemy station's 50 halved (Professions-Arc.md section 48)
+  assert.deepEqual([ALCHEMY_FEE, ENCHANT_FEE], [25, 50]);
   assert.deepEqual([ARCANE_ESSENCE.key, ARCANE_ESSENCE.family, ARCANE_ESSENCE.tier, ARCANE_ESSENCE.templateIndex, ARCANE_ESSENCE.name, [...ARCANE_ESSENCE.icon]],
     ['essence:arcane', 'essences', 3, 680, 'Arcane Essence', [254, 39]]);
   assert.equal(materialOf('essence:arcane', () => null).value, 4);
@@ -106,7 +106,6 @@ test('PROF12 law: THE CAULDRON - every ingredient of the twenty held in the Stor
 });
 
 test('PROF12 law: THE BREW - its potions (CRAFT-PAYS: two below Journeyman, two at it, a Brewer\'s three, three at Master); Potent\'s chance (none below Expert, 10 at it, 20 at Master; +5 an unbruised herb, +10 a Distiller, +10 an Apothecary\'s step; at most 100) and its share (+25, a Master Alchemist\'s +40); the magnitudes raised by it, rounded; XP 20 x the tier, quartered, +500 the first', () => {
-  // PIN MOVED: CRAFT-PAYS (Professions-Arc.md section 48) - a Novice's two; it was [1, 1, 2, 2, 3] and [3, 1, 3, 2]
   assert.deepEqual([0, 49, 50, 99, 100].map((r) => brewCount(r)), [2, 2, 2, 2, 3]);
   assert.deepEqual([brewCount(50, 'brewer'), brewCount(49, 'brewer'), brewCount(100, 'brewer'), brewCount(50, 'distiller')], [3, 2, 3, 2]);
   // AUDIT PROF-541 R2-S1: a potion wholly of the Apothecaries' goods brews one whatever the rank or the Brewer; another its rank's
@@ -133,7 +132,7 @@ test('PROF12 law: THE BREW - its potions (CRAFT-PAYS: two below Journeyman, two 
   assert.deepEqual(potentEffect(e, 40), { ...e, magnitudeBaseLow: 7, magnitudeBaseHigh: 7, magnitudeLevelBase: 13, magnitudeLevelHigh: 13 });
   assert.equal(potentEffect(e, 30), e, 'a share no brew makes moves nothing');
   const h = potionById('healing'), inv = potionById('invisibility');
-  assert.deepEqual([brewXp(h, 0), brewXp(h, 0, true), brewXp(inv, 70), brewXp(h, 55)], [20, 20, 120, 5], 'a tier-1 brew past rank 55 quartered');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp, brewFirstXp, workFirstXp), no longer a flat 500 - the brew's law no longer takes a first (brewFirstXp, beside it)
+  assert.deepEqual([brewXp(h, 0), brewXp(h, 0, true), brewXp(inv, 70), brewXp(h, 55)], [20, 20, 120, 5], 'a tier-1 brew past rank 55 quartered');
   assert.deepEqual([brewFirstXp(h), brewFirstXp(inv), brewFirstXp(potionById('levitation'))], [3155, 3155, 0], 'Provisioning\'s share - none for the Apothecaries\' goods alone');
 });
 
@@ -180,7 +179,7 @@ test('PROF12 law: THE APOTHECARY\'S STEP for a dish (DECIDED: a dish takes no qu
   assert.equal(cookXp(0, { steps: -3 }), 20);
 });
 
-// ─── AUDIT PROF12 (2026-10-03): E1, E2, A3, E3 ───────────────────────
+// ─── AUDIT PROF12: E1, E2, A3, E3 ───────────────────────
 
 test('AUDIT PROF12 E1 law: Arcane Essence has no pack form (NO_PACK_FORM) - it sold to any shop at 32 gold a unit; the Apothecaries\' sixteen beside it in the Essences\' family still withdraw', () => {
   assert.deepEqual([...NO_PACK_FORM], ['work:ram', ARCANE_ESSENCE.key]);
@@ -232,7 +231,7 @@ test('AUDIT PROF12 A3 law (Mac: "Potent lasts longer"): the fourteen potions who
 test('AUDIT PROF12 E3 law (Mac: "2 + Mercury -> 1"): the Transmuter\'s recipe is two of a metal and a Mercury for one of the next, and its card says so', () => {
   assert.equal(TRANSMUTE_IN, 2);
   for (const r of TRANSMUTE_RECIPES) assert.deepEqual(r.inputs.map((i) => i.n), [2, 1], r.id);
-  assert.equal(SPECIALISATIONS.provisioning[100].find((sp) => sp.id === 'transmuter')?.text, 'Two of a metal and a Mercury make one of the next metal up.');   // PIN MOVED (CRAFT3): SPECIALISATIONS is keyed by track - the Transmuter's card stands under Provisioning, Alchemy's craft
+  assert.equal(SPECIALISATIONS.provisioning[100].find((sp) => sp.id === 'transmuter')?.text, 'Two of a metal and a Mercury make one of the next metal up.');
 });
 
 test('AUDIT PROF-541 B1 law: a cauldron is its recipe\'s own ingredients - DFU\'s int32 hash collides (a Purification with Jade for its Diamond: 4 9 17 27 33 60 62 63; a Healing of 17 19 62 65), and a collision answers no potion; the recipe\'s own, in any order, still does', () => {

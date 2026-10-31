@@ -151,8 +151,7 @@ test('TSR1: a preset becomes a live character - identity, armory, dressed baseli
   assert.ok(entity.items.some((it) => it.templateIndex === 200), 'womens Plain Robes (200) in the pack');
 });
 
-// TSR4 (2026-09-03, Mac: "an option that spawns you into the outside
-// world with a mount to test"). The ride is a SPAWN on top of a preset,
+// TSR4. The ride is a SPAWN on top of a preset,
 // resolved through the one entry door, with the horse minted the way
 // the general store mints one and the landing/mount owed to the host.
 

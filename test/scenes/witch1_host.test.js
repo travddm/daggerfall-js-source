@@ -1,5 +1,4 @@
-// WITCH1 (2026-10-20, the owner: "players with housing can place an object on the outside in which players can give
-// candy"; bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL IN THE STREETS (src/scenes/witchesHost.js) - the
+// WITCH1: THE WITCHES' FESTIVAL IN THE STREETS (src/scenes/witchesHost.js) - the
 // town underfoot asked for its offerings and each stood at its home's kept spot as the pixel's own batch and lantern, a
 // target in the street's ray named with its rows, taken from, filled and taken in; set out by the item's Use at one's
 // own door; taken down offline or for another account; asked only while the festival is live or one's own stands there;

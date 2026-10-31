@@ -1,4 +1,4 @@
-// BAY-LEFT-B (2026-10-27, the audit "no system left behind in the Bay" B4; world/locationKey.js): A LOCATION'S MapTable
+// BAY-LEFT-B: A LOCATION'S MapTable
 // KEY IS ITS BUILDINGS' DIRECTORY. Measured over the freeware's MAPS.BSA: every row's key is exactly what its own
 // buildings make by locationKeyOf's table - so a place the port makes past the Bay carries its own buildings' key.
 import '../modsOff.js';

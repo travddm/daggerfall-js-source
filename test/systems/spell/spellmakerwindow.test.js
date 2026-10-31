@@ -64,7 +64,7 @@ test('S1 catalog: DFU offers 90 spell-maker effects, families expanded in DFCare
   // maker's offer list: the spellbook names an effect through
   // GetEffectTemplate, which sees rows no crafting station offers.
   // The OFFER is still exactly 90 - what `craftable` gates.
-  // PARTY-MAP (2026-09-30): plus the port's own Shared Cartography (46,255), which the maker DOES offer - DFU's 90 and one
+  // PARTY-MAP: plus the port's own Shared Cartography (46,255), which the maker DOES offer - DFU's 90 and one
   assert.equal(SPELL_MAKER_EFFECTS.filter((e) => e.craftable).length, 91, 'the maker offers DFU\'s 90 and the port\'s Shared Cartography');
   assert.equal(SPELL_MAKER_EFFECTS.filter((e) => e.craftable && e.key !== '46,255').length, 90, 'DFU\'s own offer is still exactly 90');
   assert.equal(SPELL_MAKER_EFFECTS.length, 93, 'and the registry carries two more - MorphSelf, and the port\'s own Resurrect (RESURRECT1, sold ready-made online)');

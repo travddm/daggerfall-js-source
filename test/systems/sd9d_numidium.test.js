@@ -1,4 +1,4 @@
-// SD9d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS OF NUMIDIUM -
+// SD9d: THE BRASS OF NUMIDIUM -
 // the Brass Remnant's own Aetheric set (systems/sigil/sigilSets.js 'numidium', systems/aetheric.js NUMIDIUM_SET_PIECES): its
 // law, its nine records of Dwarven brass at the Legendary band's top, the spoils' last roll that carries one a third of
 // the time, and its three tiers through the powers' seams (systems/sigil/sigilSetPowers.js) - Dwemer Brass (magic and shock
@@ -198,7 +198,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   const e = wearSet(player(), 'numidium', 6);
   door(e);
   at(10);
-  e.health = 99;   // PIN MOVED (FULL-GUARD, FIELD BUGS 2026-10-11b): a foe's blow from full leaves me at 1 before any death save - a point short of full, the Hour's own save takes it
+  e.health = 99;
   const dead = blow(e, 150);
   assert.equal(dead, false, 'no death');
   assert.equal(e.health, 16, 'left at 1, and 15% of 100 back');
@@ -221,7 +221,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   const asc = wearSet(player(), 'numidium', 6, XP[4]);
   door(asc);
   at(5);
-  asc.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  asc.health = 99;
   blow(asc, 500);
   assert.equal(asc.health, 26, 'Ascendant: a quarter back');
   assert.equal(setPowerStates(5).hourRecoverLeft, 60);
@@ -229,7 +229,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   fresh(); online(1);
   const five = wearSet(player(), 'numidium', 5);
   door(five);
-  five.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  five.health = 99;
   assert.equal(blow(five, 150), true, 'five pieces wake no Hour Turns');
   assert.deepEqual(awakeTiersOf(wearSet(player(), 'numidium', 5)).get('numidium').map((t) => t !== null), [true, true, false]);
   fresh(); online(1);
@@ -237,7 +237,7 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
   door(duel);
   setSetsDueling(true);
   assert.equal(awakeTiersOf(duel), null);
-  duel.health = 99;   // PIN MOVED (FULL-GUARD): a point short of full
+  duel.health = 99;
   assert.equal(blow(duel, 150), true, 'asleep in a duel');
   setSetsDueling(false);
 });
@@ -246,10 +246,8 @@ test('SD9d THE HOUR TURNS (6): a blow that would kill me does not - the door lea
 
 test('SD9d THE HOST: world.js gives the Brass\'s powers the Orrery hall\'s own sounds through the voice\'s index door, as the hall plays them - the gear\'s clunk for Gearward, the low bell\'s toll for The Hour Turns (mutants: a power unvoiced; the sounds crossed)', () => {
   const w = strip(read('src/scenes/world.js'));
-  // PIN MOVED (RPT1026-EVENTS ORRERY-HANDS): the snap's line is sdSnapLine's now (it names whom it lashes), so SD_HALL_TEXT
   // left the import; the sounds are the hall's as ever
   assert.match(w, /import \{ sdSnapLine, sdHallNamed, SD_HALL_SOUNDS \} from '\.\/superDungeon\/sdHall\.js';/);
-  // PIN MOVED (AUDIT SD IV A3): the index door (playOneShot) - the ID door played whatever record carries the ID 433 or
   // 107, not the hall's records (sd26_audio runs the voice)
   assert.match(w, /else if \(name === 'gear'\) audio\.playOneShot\(SD_HALL_SOUNDS\.clunk, 1\);/);
   assert.match(w, /else if \(name === 'hour'\) audio\.playOneShot\(SD_HALL_SOUNDS\.toll, 1\);/);

@@ -1,8 +1,7 @@
-// BAY-LEFT-SEA (2026-10-26; the audit "no system left behind in the Bay", item 20 - B8 = E3; the owner's call taken:
-// "Every single thing here needs to be addressed. No exceptions."): A PROVINCE SEAT'S BOUNTY PAYS - past the Bay for its
+// BAY-LEFT-SEA: A PROVINCE SEAT'S BOUNTY PAYS - past the Bay for its
 // bailiwick's own foes' dens, an outlaws' hideout routed (LW12) and a lair whose foe falls (TESA8), by the camp claim's own
 // kind of proof (a den's id naming its map pixel; once a day, five an account a day, bounded and not witnessed). The Bay's
-// camp Bounty unchanged. The law, the client and the real Worker over node:sqlite (bible/11-Multiplayer/Seats-Arc.md
+// camp Bounty unchanged. The law, the client and the real Worker over node:sqlite (
 // BAY-LEFT-SEA).
 import test from 'node:test';
 import assert from 'node:assert/strict';

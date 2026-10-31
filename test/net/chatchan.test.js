@@ -1,4 +1,4 @@
-// CHAT-CHAN (2026-09-23, the community arc): THE FOUR CHANNELS - kurkku: "Global chat that everyone everywhere sees /
+// CHAT-CHAN: THE FOUR CHANNELS - kurkku: "Global chat that everyone everywhere sees /
 // regional chat that everyone in the region can see (so players in Wayrest see messages from other players in Wayrest
 // and so on) / party chat"; Addison Knox: "Roleplay chat channels (IC/OOC) keeps immersion intact by separating
 // in-character dialogue from coordination chatter".
@@ -35,14 +35,13 @@ const quiet = (fn) => { const info = console.info, warn = console.warn; console.
 
 test('CHAT-CHAN wire: one channel per politic region, whitelisted by enumeration; a line may name the party channel and nothing else; world102 is the first relay that routes either (world99 before the first merge, world101 before the sixth: main\'s world99, world100 and world101 route neither) (mutants: a region key off the end of the map; the whitelist a prefix test; an unknown channel falling through to the room; the version gate one high)', () => {
   assert.equal(CHAT_REGION_COUNT, REGION_NAMES.length, 'the politic map\'s regions, all of them - the channel a player joins is PlayerGPS.CurrentRegionIndex\'s');
-  assert.equal(CHAT_REGION_COUNT, 71);   // PIN MOVED (WW-R, bible/03-World/World-Wide.md): the Bay's 62 and the provinces' nine
+  assert.equal(CHAT_REGION_COUNT, 71);
   assert.equal(chatRegionRoom(0), `${CHAT_REGION_PREFIX}0`);
   assert.equal(chatRegionRoom(61), 'chat:region.61');
   for (const bad of [-1, 71, 1.5, NaN, null, undefined, '3']) assert.equal(chatRegionRoom(bad), null, `no region ${String(bad)}`);
-  // PIN MOVED (WW-R, bible/03-World/World-Wide.md): a province's channel only where the relay opens it
   assert.deepEqual([chatRegionRoom(64), chatRegionRoom(64, false), chatRegionRoom(61, false)], ['chat:region.64', null, 'chat:region.61']);
   for (let i = 0; i < CHAT_REGION_COUNT; i++) assert.ok(isChatRoom(chatRegionRoom(i)), `region ${i}'s channel is one the relay opens`);
-  assert.equal(CHAT_ROOMS.size, 1 + CHAT_REGION_COUNT + 16 + 62 * 4 + 15 + 2);   // PIN MOVED, SCALE5c: and the hub's sixteen shards; part two: and each region's four; CHAT-LANG: and the fifteen language channels; CHAT-TRADE: and the Trade and LFG channels   // PIN MOVED (PROVINCE-SLEEP, bible/03-World/Scale-Arc.md): the four a region the Bay's 62 alone - a province's channel is never split
+  assert.equal(CHAT_ROOMS.size, 1 + CHAT_REGION_COUNT + 16 + 62 * 4 + 15 + 2);
   for (const bad of ['chat:region.71', 'chat:region.-1', 'chat:region.01', 'chat:region.x', 'chat:party.q123']) assert.equal(isChatRoom(bad), false, `${bad}: a list, not a prefix (AUDIT CHAT A1)`);
   assert.ok(isSocialRoom(SOCIAL_ROOM) && !isSocialRoom(chatRegionRoom(4)), 'a region\'s channel is no hub: it keeps no seats');
 
@@ -448,7 +447,7 @@ test('CHAT-CHAN panel: each tab says who it reaches (and the region\'s name), th
   assert.equal(tabs[1].title, `Wayrest - ${CHAT_TABS[1].hint}`);
   assert.equal(input.placeholder, 'Say something - Wayrest', 'the place a moving channel is');
   log.select('world');
-  assert.equal(tabs[5].style.display, 'none', 'CHAT-P: the Party tab is off the bar outside a party');   // CHAT-LANG: the Language tab stands before it; CHAT-TRADE: and the Trade and LFG tabs (PIN MOVED: 3 -> 5)
+  assert.equal(tabs[5].style.display, 'none', 'CHAT-P: the Party tab is off the bar outside a party');     // CHAT-LANG: the Language tab stands before it; CHAT-TRADE: and the Trade and LFG tabs (
   log.setShown('party', true);
   panel.render({});
   assert.equal(tabs[5].style.display, '', 'and on it inside one');

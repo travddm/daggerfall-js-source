@@ -1,5 +1,4 @@
-// DISC25-E (2026-09-25, Sir McMobdon on Discord, "Cant send letters": "Gmae still takes input making u jump and move
-// and close the letter if u hit f").
+// DISC25-E.
 //
 // MAIL1's letter is written in the SOC3 social panel - real DOM fields, in a panel that is NOT a window in any host's
 // slot (it stands open while the player walks). So no overlay gate stood between a typed letter and the world host's

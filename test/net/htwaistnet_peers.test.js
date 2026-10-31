@@ -1,4 +1,4 @@
-// HT-WAIST-NET (2026-09-24): THE OTHERS SEE YOUR LANTERN AT THE WAIST.
+// HT-WAIST-NET: THE OTHERS SEE YOUR LANTERN AT THE WAIST.
 //
 // HT-WAIST hangs a lit lantern at the waist (Handheld Torches' port-own
 // Handling.LanternsAtWaist) and draws it swinging at the hip of the local
@@ -113,7 +113,7 @@ test('HT-WAIST-NET end to end: my lantern lit at the waist leaves my session THE
   const r = fakeRoom(ROOM);
   const relayMine = r.connect(), relayTheirs = r.connect();
   await r.hello(relayMine, 'lamp-0001', P); await r.hello(relayTheirs, 'seer-0001', P);
-  for (const f of relayMine.sent) mine.receive(f);   // SD-HELLO (PIN MOVED): my own welcome, off the real Room - a socket says nothing past its hello until it lands
+  for (const f of relayMine.sent) mine.receive(f);     // SD-HELLO (
   let heard = 0;
   const hear = () => { for (; heard < relayTheirs.sent.length; heard++) theirs.receive(relayTheirs.sent[heard]); };
   const relayLast = async () => {

@@ -1,6 +1,5 @@
-// WATER-NEXT 2 and 3 (2026-10-07, Mac: "real translucent water with proper waves and shoreline interactivity
-// completely replacing our current water implementation"): THE SWELL, THE BODY, THE LOOK THROUGH IT, THE SHORE. The
-// record: bible/07-Rendering/Water-Arc.md WATER-NEXT.
+// WATER-NEXT 2 and 3: THE SWELL, THE BODY, THE LOOK THROUGH IT, THE SHORE. The
+// record: WATER-NEXT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -48,9 +47,8 @@ test('WATER-NEXT 2 the GLSL is the JS: SWELL_GLSL carries each train\'s wavenumb
 });
 
 test('WATER-NEXT 2 the sheet: lifted by the swell, which dies over the bank (none on a bed shallower than nothing), whole on the open sea; its depth rides the swell (mutants: the swell on the bank; the open sea still)', () => {
-  // PIN MOVED (AUDIT WATER-NEXT H2/G8): a negative depth (water on uncarved ground) takes no swell, the heave fades with
   // the eye's distance, and the depth is the magnitude
-  assert.match(WATER_SURFACE_VS, /float grow = uOpen == 1 \? 1\.0 : \(aDepth < 0\.0 \? 0\.0 : smoothstep\(1\.668, 4\.168, aDepth\)\);/);   // PIN MOVED (BANK-FLUSH): the swell grows past the shelf the carve leaves
+  assert.match(WATER_SURFACE_VS, /float grow = uOpen == 1 \? 1\.0 : \(aDepth < 0\.0 \? 0\.0 : smoothstep\(1\.668, 4\.168, aDepth\)\);/);
   assert.match(WATER_SURFACE_VS, /vec3 sw = swellAt\(world\.xz, uTime, uWindDir, uSwell \* grow\);/);
   assert.match(WATER_SURFACE_VS, /float lift = sw\.x \* \(1\.0 - smoothstep\(300\.0, 600\.0, length\(world\.xz - uCamPos\.xz\)\)\);\s*\n\s*world\.y \+= lift;/);
   assert.match(WATER_SURFACE_VS, /vDepth = max\(abs\(aDepth\) \+ lift, 0\.0\);/);
@@ -62,7 +60,6 @@ test('WATER-NEXT 2 the look: the path through the water is the scene\'s depth be
   assert.match(fs, /float eyeDepth\(float d\) \{ return uProj\[3\]\[2\] \/ \(\(d \* 2\.0 - 1\.0\) \+ uProj\[2\]\[2\]\); \}/);
   assert.match(fs, /path = max\(bedD - here, bedPath\);/);
   assert.match(fs, /if \(pushedD < here\) uv = uv0; else path = max\(pushedD - here, bedPath\);/);
-  // PIN MOVED (AUDIT WATER-NEXT G1/G3): composed premultiplied - the copy at its share, the water's own light at the rest
   assert.match(fs, /vec3 T = exp\(-uAbsorb \* path\);\s*\n\s*under = textureLod\(uScene, uv, 0\.0\)\.rgb;[^\n]*\n\s*trans = T \* \(1\.0 - F\);\s*\n\s*own = lit \* \(vec3\(1\.0\) - T\) \* \(1\.0 - F\) \+ skyRefl \* F;/);
   assert.match(fs, /cover = 1\.0 - t \* \(1\.0 - F\);\s*\n\s*own = lit \* \(1\.0 - t\) \* \(1\.0 - F\) \+ skyRefl \* F;/);
   assert.ok(WATER_ABSORB[0] > WATER_ABSORB[1] && WATER_ABSORB[1] > WATER_ABSORB[2], 'red is swallowed first');
@@ -74,7 +71,7 @@ test('WATER-NEXT 3 the shore: foam over the shallow band the swell pushes up and
   assert.match(fs, /float shore = 1\.0 - smoothstep\(0\.0, band, vdepth - sw\.x \* 2\.20\);/);
   assert.match(fs, /\* smoothstep\(0\.55, 0\.9, uWindStrength\);/, 'the crests need a wind');
   assert.match(fs, /edge = max\(edge, foam \* smoothstep\(0\.0, 0\.2, edge\)\);/);
-  assert.match(fs, /float spec = seaSunLobe\(dot\(n, H\)\) \* uSunScale \* shadow \* \(1\.0 - foam\);/);   // PIN MOVED (AUDIT FAR-SEA1 C12): the lobe is one text with the far ring's sea
+  assert.match(fs, /float spec = seaSunLobe\(dot\(n, H\)\) \* uSunScale \* shadow \* \(1\.0 - foam\);/);
   assert.ok(fs.includes('float seaSunLobe(float nh) { return pow(max(nh, 0.0), 180.0); }'), 'the sun\'s lobe, 180');
 });
 

@@ -1,6 +1,4 @@
-// TESA15 (2026-10-24; the owner, of the held map past the Bay against the network's own picture: "I think the map itself
-// ingame doesnt match the image you just sent me. Like the fidelity of it", then "You make the best decision. No band
-// aids"; bible/03-World/Arena-Provinces.md TESA15) - THE MAP PAST THE BAY AT THE WORLD'S FIDELITY, pinned. One roll: a
+// TESA15 - THE MAP PAST THE BAY AT THE WORLD'S FIDELITY, pinned. One roll: a
 // region's places in its answer, kept a bin at a time and read by the map whole (world/pastBayPlaces.js), none on an
 // Arena place's or a capital's pixel and an Arena dungeon routed round. The roads' ink a tile at a time, made again only
 // where an install moved it (world/arenaRoads.js arenaRoadTiles, ui/tamrielInk.js arenaRoadInkAt). The paint kept on tiles
@@ -314,7 +312,6 @@ test('TESA15 the tiles: a frame paints the tiles nearest the middle first until 
   assert.equal(r.painted.length, jump + 1);
   assert.ok(r.drawn.length > 1, 'a zoom\'s jump of seven levels stood in for too');
 
-  // PIN MOVED (AUDIT TESA II M1): kept to the count, or to the view's own where it wants more - a view of six tiles with
   // four kept let go of the ones it had just drawn and painted them again every frame, never settling
   const hold = rig({ clock: 5, kept: 4 });
   hold.tiles.draw(hold.sheet, view, o);
@@ -384,7 +381,7 @@ test('TESA15 the painter: at far each pixel\'s steps, in to the Bay\'s scale the
 
 // ── THE WIRING ──────────────────────────────────────────────────
 
-// ── ZOOM-FAST (2026-10-24, the owner: "The map also is slow to load when zooming in and out") ──
+// ── ZOOM-FAST ──
 test('ZOOM-FAST the tiles: a draw told not to force paints none past its budget (a zoom still settling: none at all) and says it owes; a stand-in is sought under the last key at the same level, so a band crossed keeps the roads up (mutants: forced anyway; the last key forgotten)', () => {
   const r = rig();
   const view = { ox: 0, oy: -512, scale: 1 };

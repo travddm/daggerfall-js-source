@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): THE COLOSSEUM REBUILT (src/world/arena/arenaModel.js) - Kamer's half out of the vendored binary, the
+// ARENA1: THE COLOSSEUM REBUILT (src/world/arena/arenaModel.js) - Kamer's half out of the vendored binary, the
 // undercroft's pieces out of the player's ARCH3D, one model; registered as 864102 climate-free, its pieces' pictures
 // loaded before the build (src/world/customModels.js, src/scenes/dataPipeline.js); drawn by its own table and given
 // its collider in the two hosts that stand towns (src/scenes/world.js, src/scenes/exterior.js).

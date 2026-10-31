@@ -1,4 +1,4 @@
-// STREAM1 (2026-09-19): A PROMOTION IS QUEUED, NOT PAID ON THE CROSSING.
+// STREAM1: A PROMOTION IS QUEUED, NOT PAID ON THE CROSSING.
 //
 // EV4 lets a surviving pixel cross between the full-res core and the
 // strided far ring by swapping its terrain SURFACE, and world.js did all
@@ -79,9 +79,7 @@ test('STREAM1: the expensive direction is the one that is queued, and it is expe
   // a few preempted singles moving a median. The whole arm costs
   // about a quarter of a second.
   //
-  // DEPLOY-FLAKE (2026-10-04, the owner: "A test failed on deploy" - the site's deploy of PR #592, its verify shard 3/4,
-  // read 1.30 ms against 0.36: the stride-4 window still three times its honest cost through the best of seven
-  // batches). Two more changes of the same kind:
+  // DEPLOY-FLAKE. Two more changes of the same kind:
   //
   //   BOTH STRIDES ARE WARMED, THEN TIMED IN TURN. The stride-4 arm used to be warmed and timed only after
   //   the stride-1 arm had run alone, so the first stride-4 build met code tuned on stride 1 alone and could
@@ -135,7 +133,7 @@ test('STREAM1: the queue is spent a pixel a frame, nearest first, and never on a
   assert.deepEqual([far, near].sort(sorter), [near, far]);
   // BOTH call sites queue the promotion and take the demotion now
   assert.match(world, /if \(want === 1\) restridePending\.set\(`\$\{p\.px\},\$\{p\.py\}`, p\);/, 'the crossing sweep');
-  assert.match(world, /if \(wantStride === 1\) host\.restridePending\.set\(pkey, entry\);/, 'and the publish re-check');   // PIN MOVED (IC-SWAP-BEHIND): the pixel's own key
+  assert.match(world, /if \(wantStride === 1\) host\.restridePending\.set\(pkey, entry\);/, 'and the publish re-check');
   assert.ok(!/for \(const p of built\.values\(\)\) \{\s*const want = strideFor\(p\.px, p\.py\);\s*if \(want !== p\._stride\) restrideTerrain\(p, want\);/.test(world),
     'the inline sweep that paid all five is gone');
 });

@@ -1,4 +1,4 @@
-// AUDIT REALM2 (2026-09-28, the audit of the REALM service on main - bible/06-Systems/Realm-Arc.md): S1-S8, each
+// AUDIT REALM2: S1-S8, each
 // reproduced against the REAL Worker over the REAL migrations before it was fixed, and pinned here. The service is
 // node:sqlite behind a D1-shaped face whose batch is one transaction - and which fails on purpose where an audit needs
 // it: a statement refused (`hooks.onRun`), or a batch that COMMITS and then throws (`hooks.afterCommit`), as a D1
@@ -141,8 +141,8 @@ test('AUDIT REALM2 S1: a character born online starts where chargen starts one -
   assert.equal(s.env.SAVES._map.size, 0);
   // chargen's own - level 1, the purse to the bound - lands; the NEXT checkpoint is no birth (the first is what the
   // realm's later checks measure from)
-  // INT2 (PIN MOVED): a checkpoint's answer says the judge's hold - none for chargen's own
-  assert.deepEqual(Object.values(await first(freshSave({ goldPieces: REALM_BIRTH_WEALTH_MAX }))), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }]);   // PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+  // INT2 (
+  assert.deepEqual(Object.values(await first(freshSave({ goldPieces: REALM_BIRTH_WEALTH_MAX }))), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }]);
   assert.equal((await s.put(made.id, JSON.stringify({ level: 2, goldPieces: REALM_BIRTH_WEALTH_MAX * 2 }), P.secret, { lease: made.lease, seq: 2 })).status, 200);
 });
 
@@ -163,7 +163,7 @@ test('AUDIT REALM2 S1: a customs character\'s first save carries no more than th
     ['no JSON', 'not a save'],
   ]) assert.deepEqual(Object.values(typeof save === 'string' ? await s.put(c.id, save, P.secret, { lease: c.lease, seq: 1 }) : await first(save)), [403, { error: 'customs-allowance' }], why);
   assert.equal(s.env.SAVES._map.size, 0);
-  assert.deepEqual(Object.values(await first({ name: 'Legacy', level: 3, goldPieces: allowance })), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }], 'the copy customs capped');   // INT2 (PIN MOVED): the hold said; PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+  assert.deepEqual(Object.values(await first({ name: 'Legacy', level: 3, goldPieces: allowance })), [200, { ok: true, seq: 1, tradeHeld: null, locked: [] }], 'the copy customs capped');     // INT2 (
   // a customs asked with no level is held to a first level's allowance
   const origin2 = 'offline-legacy-04';
   s.exec('INSERT INTO realm_census (player, char_id) VALUES (?, ?)', P.id, origin2);
@@ -202,7 +202,7 @@ test('AUDIT REALM2 S2: a house, a piece and a founding are a realm character\'s 
   const s = await stand();
   const P = await s.account();
   const house = { mapId: 12345, buildingKey: 777, region: 17, layout: null };
-  // HOME-PRICE (PIN MOVED): a price of 1 is no home's online now (refused before the id is read) - the cheapest one is
+  // HOME-PRICE (
   assert.deepEqual(Object.values(await s.call('/v1/homes/claim', { ...house, character: 'madeUpId01', price: HOME_PRICE_MIN }, P.secret)), [400, { error: 'realm-only' }]);
   for (let k = 1; k <= 3; k++) assert.equal((await s.call('/v1/homes/claim', { ...house, buildingKey: 1000 + k, character: `fake${k}0000`, price: HOME_PRICE_MIN }, P.secret)).body.error, 'realm-only');
   assert.deepEqual(s.rows('SELECT COUNT(*) AS n FROM homes'), [{ n: 0 }], 'no building taken');
@@ -266,7 +266,7 @@ test('AUDIT REALM2 S3: every realm act whose batch COMMITS and then throws keeps
     assert.ok(s.saveStands(R.id), `${path}: the save the row names stands`);
     assert.equal((await s.load(R.id, P.secret)).seq, at.seq + 1);
   };
-  await lost('/v1/homes/claim', { ...house, character: R.id, price: HOME_PRICE_MIN });   // HOME-PRICE (PIN MOVED): a price inside the online range, where it was 1,000
+  await lost('/v1/homes/claim', { ...house, character: R.id, price: HOME_PRICE_MIN });     // HOME-PRICE (
   await lost('/v1/homes/decor/place', { mapId: 7, buildingKey: 9, character: R.id, piece: { id: 'p1', model: 41000, flat: null, pos: [0, 0, 0], rot: [0, 0, 0], scale: 1, light: null, storage: false, paid: 40 } });
   await lost('/v1/homes/release', { mapId: 7, buildingKey: 9 });
   await lost('/v1/guilds/found', { character: R.id, name: 'Lost Answers', tag: 'LOST' });
@@ -285,8 +285,8 @@ test('AUDIT REALM2 S4: an offer is its record BOTH ways - a record carrying what
   const wire = validLootItem(dagger);
   assert.ok(recordIsOffered(JSON.parse(JSON.stringify(dagger)), wire), 'an honest record is its wire projection');
   assert.ok(recordIsOffered({ ...dagger, equipSlot: null, questItem: false, stackCount: 3, value: 1 }, wire), 'its count, its price and the receiver\'s marks aside');
-  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's; PIN MOVED (APPEARANCES): the look a piece wears, its wearer's
-  const minimal = validLootItem({ templateIndex: 113, group: 'Weapons', material: 9 });   // INT1 (PIN MOVED): a piece with no group is no piece the item law takes
+  assert.deepEqual(TRADE_VOLATILE_FIELDS, ['stackCount', 'value', 'equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);     // WAGONS2-VISIT (AUDIT): a caravan's door, its owner's word; STEED1: a horse's bond, its owner's
+  const minimal = validLootItem({ templateIndex: 113, group: 'Weapons', material: 9 });     // INT1 (
   for (const [why, rec] of [
     ['a worn edge', { ...dagger, currentCondition: 1 }],
     ['an enchantment nobody was shown', { ...dagger, enchantments: [{ type: 9, param: 0 }] }],
@@ -368,12 +368,12 @@ test('AUDIT REALM2 S7: two checkpoints under one lease race to one sequence - th
   const c = await s.character(P, 'Racer', { name: 'Racer', goldPieces: 1 });
   const realPut = s.env.SAVES.put.bind(s.env.SAVES);
   s.env.SAVES.put = async (k, b) => { await new Promise((r) => { setTimeout(r, 20); }); return realPut(k, b); };
-  // INT2 (PIN MOVED): saves the judge reads clean, and the answer that says so
+  // INT2 (
   const [x, y] = await Promise.all([
     s.put(c.id, JSON.stringify(freshSave({ name: 'Racer', v: 'first' })), P.secret, { lease: c.lease, seq: 2 }),
     s.put(c.id, JSON.stringify(freshSave({ name: 'Racer', v: 'retry' })), P.secret, { lease: c.lease, seq: 2 }),
   ]);
-  assert.deepEqual([x, y].map((r) => [r.status, r.body]).sort((m, n) => m[0] - n[0]), [[200, { ok: true, seq: 2, tradeHeld: null, locked: [] }], [409, { error: 'seq', seq: 2 }]]);   // PIN MOVED: AUDIT AUTO-HOLD - every answer names the locked pieces, [] for none
+  assert.deepEqual([x, y].map((r) => [r.status, r.body]).sort((m, n) => m[0] - n[0]), [[200, { ok: true, seq: 2, tradeHeld: null, locked: [] }], [409, { error: 'seq', seq: 2 }]]);
   assert.equal(s.rows('SELECT lease FROM realm_characters')[0].lease, c.lease, 'the lease stands');
   // a join while the checkpoint's object is on its way
   let joined = null;

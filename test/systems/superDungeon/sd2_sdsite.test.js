@@ -1,5 +1,4 @@
-// SD2 (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most";
-// bible/11-Multiplayer/Super-Dungeons.md sections 3 and 5): WHERE THE HOLLOW STANDS, AND WHAT STANDS THERE
+// SD2: WHERE THE HOLLOW STANDS, AND WHAT STANDS THERE
 // (systems/superDungeon/sdSite.js). The relay names a region (the census) and nothing more; every client finds the same city, the
 // same pixel and the same template from the map files it holds, and clones the same Hollow under the slot's own id.
 import { test } from 'node:test';
@@ -135,7 +134,7 @@ test('SD2: the Hollow - the template cloned on the site under the slot\'s own id
   assert.equal(h.dungeon.blocks.length, 14, 'the template\'s blocks, whatever size the world lays it at');
   assert.equal(template.name, 'Castle Necromoghan', 'the template untouched');
   assert.equal(dungeonTier(h), 'super', 'TIER1 reads it Super');
-  assert.equal(dungeonTierLabel(h).text, 'Abyss Dungeon');   // ABYSS-NAME (PIN MOVED)
+  assert.equal(dungeonTierLabel(h).text, 'Abyss Dungeon');     // ABYSS-NAME (
   assert.equal(sdHollowLocation(null, site, template), null);
   assert.equal(sdHollowLocation(rec, site, null), null);
 });

@@ -1,5 +1,4 @@
-// ROGUE-IMP (2026-09-26, Triage on the Discord: "Rogue imp unable to kill hes in the floorboards" - "was able to fireball
-// the floor, but it spawns in the floorboards"): N0B30Y15 places its imp (a FLYING foe) at a QuestSpawn marker of a
+// ROGUE-IMP: N0B30Y15 places its imp (a FLYING foe) at a QuestSpawn marker of a
 // palace - a building. A building's marker is its flat's BASE on the floor (world/interior/interiorLayout.js); the interior's
 // stand handed it to the pool as a sprite CENTRE (the dungeon's RDB convention), and the pool dropped the flyer half its
 // idle sprite: its feet under the boards, its body in the floor, out of every blade's reach. The stand hands the marker

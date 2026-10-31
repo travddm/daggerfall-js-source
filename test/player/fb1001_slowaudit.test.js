@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - SLOW-SLIP, SLOW-GRASP, SLOW-PRESS, on the real PlayerMotor over a
+// AUDIT 2026-10-01 part five - SLOW-SLIP, SLOW-GRASP, SLOW-PRESS, on the real PlayerMotor over a
 // real Collider. Two findings against SLOW-PRESS, each red on the branch before its fix:
 //   SP1 under the Jump spell (enhancedJumping) the airborne branch re-reads the input every step, so Forward held re-
 //       pressed a slow fall into a face past the slope limit after SLOW-PRESS spent it: 72 deg at a walk took 19.9 s to

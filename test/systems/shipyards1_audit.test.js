@@ -1,5 +1,5 @@
-// AUDIT SHIPYARDS (2026-10-11, Mac: "Audit everything"): seven cold lanes read the SHIPYARDS change on a frozen snapshot,
-// every finding was checked by hand, and each one fixed is pinned here (bible/03-World/Shipyards.md, AUDIT SHIPYARDS).
+// AUDIT SHIPYARDS: seven cold lanes read the SHIPYARDS change on a frozen snapshot,
+// every finding was checked by hand, and each one fixed is pinned here (, AUDIT SHIPYARDS).
 // The crew hall is driven over the REAL sea fight (test/navalSea.mjs - the producer, never a fake that mints another
 // shape: TEST THE SHAPE THE PRODUCER MINTS), the shipmaster's acts over the real Fleet ledger.
 import '../modsOff.js';

@@ -1,10 +1,10 @@
-// SEAT2a part three (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): WHAT THE
+// SEAT2a part three: WHAT THE
 // SERVICE SAYS OF A BATTLE - the pass (a signed fighter on its side, anyone else a spectator, from ten minutes before
 // the start to its window's close, over the field the two sides' games agree), the result off a fighter's `s1` receipt
 // (written once a battle, with all it gives: a Charter taken, a seat held and the Turning's memory of it, a forfeit, a
 // Tourney's winner and its fee, the Sellswords paid), each fighter's Honours, and the deploy blackout's public question.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/11-Multiplayer/Seats-Arc.md 6.2, 6.5-6.8, 17; `06-Systems/Online-Arc.md` SEAT2a (part three).
+// 6.2, 6.5-6.8, 17; `06-Systems/Online-Arc.md` SEAT2a (part three).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
@@ -97,7 +97,7 @@ test('SEAT2a part three THE PASS AND THE FIELD: from ten minutes before the star
   assert.deepEqual({ ...r.body, pass: !!r.body.pass }, { side: 'defend', week: W + 1, key: ANTICLERE.key, startsAt: START, endsAt: START + 1800, window: START + 7200, pass: true });
   const v = await verifyOrder(r.body.pass, s.svc.identityPublic, { subtle, nowS: s.getNow(), kind: 'siege' });
   assert.ok(v.ok, v.why);
-  assert.deepEqual({ ...v.claims, i: 0, e: 0 }, { o: 'siege', s: d1.id, sk: ANTICLERE.key, sw: W + 1, sd: 'defend', st: 'palace', sn: 'siege', sb: START, se: START + 7200, sf: F, sx: [0, -1, 0, 0, 0], i: 0, e: 0 });   // SEAT2b part two (b) (PIN MOVED): and its works, frozen - none raised, a palace with no Gatehouse
+  assert.deepEqual({ ...v.claims, i: 0, e: 0 }, { o: 'siege', s: d1.id, sk: ANTICLERE.key, sw: W + 1, sd: 'defend', st: 'palace', sn: 'siege', sb: START, se: START + 7200, sf: F, sx: [0, -1, 0, 0, 0], i: 0, e: 0 });     // SEAT2b part two (b) (
   assert.equal(s.battle().field, JSON.stringify(F), 'settled on the battle');
   const late = await s.pass(a1, F2);
   assert.deepEqual((await verifyOrder(late.body.pass, s.svc.identityPublic, { subtle, nowS: s.getNow(), kind: 'siege' })).claims.sf, F, 'settled once: a later field changes nothing');
@@ -110,8 +110,8 @@ test('SEAT2a part three THE PASS AND THE FIELD: from ten minutes before the star
   assert.equal((await s.pass(a1)).body.error, 'battle-none', 'a void battle has no field');
   s.raw.prepare("UPDATE town_seat_battles SET state = 'scheduled' WHERE week = ? AND key = ?").run(W + 1, ANTICLERE.key);
   s.setNow(START + 7200);
-  assert.equal((await s.pass(eye)).body.error, 'pass-late');   // PIN MOVED (AUDIT-SEATS): R6 - a spectator is refused past the window's close as before
-  assert.equal((await s.pass(a1)).body.late, true);   // PIN MOVED (AUDIT-SEATS): R6 - a rostered fighter is signed a late pass, for its receipt (its own pins: test/net/siege/audit_seats_relay.test.js)
+  assert.equal((await s.pass(eye)).body.error, 'pass-late');
+  assert.equal((await s.pass(a1)).body.late, true);
   assert.equal((await s.pass(a1, F, ASHFIELD.key)).body.error, 'battle-none');
 });
 
@@ -168,7 +168,6 @@ test('SEAT2a part three A SEAT HELD AND THE TURNING\'S MEMORY: held with a banne
   assert.deepEqual([r.body.result, r.body.winner, r.body.honours.won, r.body.honours.marks], ['defend', 'defend', true, SIEGE_HONOURS.win.marks]);
   assert.equal(s.holdOf().standing, standing0 + 15);
   assert.deepEqual(s.raw.prepare('SELECT guild_id, what FROM town_seat_aftermath WHERE week = ? AND key = ? ORDER BY what').all(W + 1, ANTICLERE.key).map((x) => [x.guild_id, x.what]), [[eo.gid, 'barred'], [sh.gid, 'bonus']]);
-  // PIN MOVED (AUDIT-SEATS): cleared by voiding, never deleting (S9) - the caps that count an account's rows still count them
   assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_influence WHERE week = ? AND key = ? AND guild_id = ? AND voided = 0').get(W + 1, ANTICLERE.key, eo.gid).n, 0, 'the challenger\'s week here cleared');
   assert.ok(s.raw.prepare('SELECT COUNT(*) AS n FROM town_seat_influence WHERE week = ? AND key = ? AND guild_id = ? AND voided = 1').get(W + 1, ANTICLERE.key, eo.gid).n > 0, 'kept, voided');
   assert.ok(s.raw.prepare("SELECT 1 FROM town_seat_history WHERE key = ? AND kind = 'siege-held'").get(ANTICLERE.key));
@@ -195,7 +194,6 @@ test('SEAT2a part three A SEAT HELD AND THE TURNING\'S MEMORY: held with a banne
   const fight = (week) => {
     s.raw.prepare(`INSERT INTO town_seat_battles (week, key, kind, tier, attacker, defender, starts_at, ends_at, moved, state, at)
       VALUES (?, ?, 'siege', 'palace', ?, ?, ?, ?, 0, 'scheduled', ?)`).run(week, ANTICLERE.key, eo.gid, sh.gid, START + (week - W - 1) * 7 * DAY, START + (week - W - 1) * 7 * DAY + 1800, s.getNow());
-    // PIN MOVED (AUDIT SEATS-3): A3 - Honours go to the character on the battle's roster, so its two fighters sign it
     for (const [who, g, side] of [[d1, sh, 'defend'], [a1, eo, 'attack']]) {
       s.raw.prepare('INSERT INTO town_seat_rosters (week, key, account, char_id, guild_id, side, at) VALUES (?, ?, ?, ?, ?, ?, ?)').run(week, ANTICLERE.key, who.id, who.character, g.gid, side, s.getNow());
     }
@@ -246,7 +244,6 @@ test('SEAT2a part three THE TOURNEY AND THE BLACKOUT: the side with more banners
   // a dead heat: the higher influence
   tourney(ASHFIELD.key, W + 3);
   s.treasury(rw.gid, CLAIM_FEE.palace); s.treasury(rv.gid, CLAIM_FEE.palace);
-  // PIN MOVED (AUDIT-SEATS): the dead heat reads the week that made the seat Contested - the Tourney's week less one - as its
   // Turning counted it, the two pledged there (S8: the standings' totals and the Legacy, never the rows' raw sum)
   for (const g of [rw, rv]) s.raw.prepare('INSERT INTO town_seat_pledges (week, guild_id, region, key, set_by, at) VALUES (?, ?, ?, ?, ?, ?)').run(W + 2, g.gid, ASHFIELD.region, ASHFIELD.key, 'x', s.getNow());
   await s.earn(rw.gid, ASHFIELD, 3000, W + 2); await s.earn(rv.gid, ASHFIELD, 2000, W + 2);

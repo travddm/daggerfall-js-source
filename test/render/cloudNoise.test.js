@@ -1,4 +1,4 @@
-// VC2 - THE CLOUD NOISE AND THE RENDER TARGET (2026-09-07). The
+// VC2 - THE CLOUD NOISE AND THE RENDER TARGET. The
 // volumetric cloud arc's first machinery: an offscreen target helper
 // that obeys the upload law, and two tiling 3D noise volumes generated
 // on the GPU. Node has no GL, so the shapes are pinned here and the

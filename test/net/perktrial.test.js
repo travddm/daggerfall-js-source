@@ -1,10 +1,7 @@
-// PERK-TRIAL (2026-10-24, the Discord's feature-feedback, "The time limit of a profession's perks changing" - marbletoff:
-// "1k silver + week wait is too punishing ... the effects of some of the perks can be properly understood only after
-// trying"; the owner's pick: a day's free trial after a choice, and a paid change at once with the week as the lock after
-// it) - the law's reads (src/net/professionLaw.js), the track as the service says it (server-account/src/professions.js
+// PERK-TRIAL - the law's reads (src/net/professionLaw.js), the track as the service says it (server-account/src/professions.js
 // trackView) and migration 0173, which lands every change still waiting its week. The service's walk through a choice,
 // its trial, a paid change and its lock is test/net/prof1_service.test.js; the page's, test/net/fb1016b_firstpick.test.js.
-// Recorded in bible/06-Systems/Professions-Arc.md PERK-TRIAL.
+// Recorded in PERK-TRIAL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -37,7 +34,7 @@ test('PERK-TRIAL the track as said: `trial` its ranks on trial and until when, `
   assert.deepEqual([v.trial, v.lock, v.respec], [{ 50: NOW - 10 + DAY }, NOW + DAY, null]);
   const bare = trackView({ xp: 0, spec50: 'gardener' }, 'herbalism', NOW);
   assert.equal('trial' in bare || 'lock' in bare, false, 'nothing said where there is nothing');
-  // AUDIT PERK-TRIAL P8 (PIN MOVED: it was said waiting, with no lock): a change still written as waiting - the older
+  // AUDIT PERK-TRIAL P8 (
   // service's, across the deploy - stands at once, its week the lock
   const old = trackView({ xp: 0, spec50: 'gardener', respec_rank: 50, respec_to: 'botanist', respec_at: NOW + DAY }, 'herbalism', NOW);
   assert.deepEqual([old.specs[50], old.respec, old.lock], ['botanist', null, NOW + DAY]);

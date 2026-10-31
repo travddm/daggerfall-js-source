@@ -107,8 +107,7 @@ test('floorLanding: FixStanding snap - a raised landing floors instantly', () =>
   assert.deepEqual(noHit, [20, 1.9, 20]);
 });
 
-// ── THE EXTERIOR SIDE OF THE DOOR (2026-08-27, Mac: "when entering/
-// exiting locations your character spawns in the air and drops") ──
+// ── THE EXTERIOR SIDE OF THE DOOR ──
 //
 // Both exterior exits are RepositionPlayer(Offset|DungeonEntrance) in
 // DFU (StreamingWorld.cs:283-288): the door centre plus the normal is
@@ -137,8 +136,6 @@ test('repositionFeetY: RepositionPlayer\'s height law, in feet', () => {
 });
 
 // ── TL1: THE ARRIVAL LOOKS FURTHER FOR ITS FLOOR ──────────────────
-// Mac: "you don't remain on the ground after traveling, you spawn in
-// the air and drop."
 test('TL1: an arrival finds a floor far below OR far above its raw, where a door step would not', async () => {
   const { floorLanding } = await import('../../src/player/enterExit.js');
   const plane = (floorY) => ({ raycast(o, d, max) { const t = (o[1] - floorY) / -d[1]; return t >= 0 && t <= max ? t : Infinity; } });
@@ -156,7 +153,7 @@ test('TL1: an arrival finds a floor far below OR far above its raw, where a door
 });
 
 // ── TSR4c: THE RAY ONLY SEES MESHES; THE GROUND IS THE COLLIDER'S ──
-// Mac: "Now I spawn in mid air after hitting ride out." Over bare
+// Over bare
 // terrain outside every block the footprint sweep finds nothing - the
 // exterior collider carries the terrain as its heightAt callback, read
 // by move() and never by the ray - and the miss arm answered the raw

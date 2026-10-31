@@ -1,4 +1,4 @@
-// AUDIT-EL (2026-09-17, Mac: "Audit") - THE ENHANCED LIGHTING ARC'S FINDINGS,
+// AUDIT-EL - THE ENHANCED LIGHTING ARC'S FINDINGS,
 // EACH PINNED. Two unanchored reviewer reads (the GL and shader lane; the host
 // wiring and light data flow) and two of my own (the frame lifecycle under
 // real WebGL semantics; the classic lane's byte-identity). Twenty findings,

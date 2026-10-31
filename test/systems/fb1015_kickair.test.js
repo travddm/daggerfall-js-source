@@ -2,12 +2,12 @@
 // flat ground aiming up aiming down etc nothing works" - the HUD: "You cannot leap from here."). The technique key's one
 // gate refused every leap and dash off the ground (combat/techniques.js refusal), asked on the press and again on the
 // release, so a kick pressed in a jump, in a fall or off a ledge - or pressed on the ground and let go after the takeoff -
-// said it. Mac's call (2026-10-15): the Flying Kick goes from the air - the roster marks it `airborne`
+// said it. Mac's call: the Flying Kick goes from the air - the roster marks it `airborne`
 // (combat/technique/techniqueRoster.js) and the gate reads the mark; every other leap and dash stays on the ground, and every other
 // refusal is the kick's too. A flight launched mid-fall keeps that fall's start (player/motor.js techniqueLaunch), so a
 // kick is no feather fall. Driven through the runner's press, hold and release on a REAL PlayerMotor over a real
 // Collider, built as the hosts build theirs (exterior.js, world.js: motorStats, the Jumping skill's boost, the Jump
-// spell's air control). bible/05-Combat/Weapon-Techniques.md; the Field-Bugs page of 2026-10-15.
+// spell's air control).; the Field-Bugs page of 2026-10-15.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

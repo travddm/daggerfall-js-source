@@ -35,7 +35,7 @@ import { equipItem, equipTableOf, isEquipped } from '../../src/systems/equip.js'
 import { isLightSource } from '../../src/systems/useItem.js';
 import { setLightSource } from '../../src/systems/lightSource.js';
 import { setSeed, getSeed, rand } from '../../src/formats/dfRandom.js';
-// STOLEN-GOODS AUDIT (2026-10-16): the owner's keeping, the bag at a verdict, the room's word and the counter, the two
+// STOLEN-GOODS AUDIT: the owner's keeping, the bag at a verdict, the room's word and the counter, the two
 // theft arms that marked nothing, the patron
 import { theftBasket, shopShelfTheft } from '../../src/systems/theft.js';
 import { confiscateStolen } from '../../src/systems/court.js';
@@ -172,7 +172,7 @@ test('STOLEN-GOODS a shut shop\'s shelf: a take through the inventory window (bo
   const arrows = shelf.find((it) => it.templateIndex === ARROW_TEMPLATE);
   const mine = ownArrows();
   const player = thief({ items: [mine] });
-  const w = new NativeInventoryWindow({ items: () => player.items, icons: ICONS, entity: player, loot: { items: () => shelf, stolenFrom: new Set(shelf) } });   // PIN MOVED (AUDIT S1): the shop's keeping, as the host takes it
+  const w = new NativeInventoryWindow({ items: () => player.items, icons: ICONS, entity: player, loot: { items: () => shelf, stolenFrom: new Set(shelf) } });
   w._pickRemote(shelf.indexOf(arrows), 'remove');
   assert.equal(shelf.includes(arrows), false, 'taken off the shelf');
   assert.deepEqual(player.items.map((it) => [it.stackCount, isStolen(it)]), [[mine.stackCount, false], [85, true]],
@@ -357,15 +357,13 @@ test('STOLEN-GOODS the court: every guilty exit takes them - a fine paid with no
 test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece through landSold - the counter\'s commitTrade and the keyed doSell - and neither pushes onto the shelf; the shut shop\'s shelf and a stranger\'s cupboard are loot targets marked stolen, a cupboard of one\'s own is not; the enhanced card says what the mark means (mutants: either arm shelving, either target unmarked)', () => {
   const wm = src('src/scenes/worldModes.js');
   const sellArm = wm.slice(wm.indexOf("} else if (mode === 'Sell' || mode === 'SellMagic') {"), wm.indexOf("} else if (mode === 'Repair') {"));
-  assert.match(sellArm, /for \(const it of staged\) \{\n\s+const i = playerEntity\.items\.indexOf\(it\);\n\s+if \(i >= 0\) playerEntity\.items\.splice\(i, 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
+  assert.match(sellArm, /for \(const it of staged\) \{\n\s+const i = playerEntity\.items\.indexOf\(it\);\n\s+if \(i >= 0\) playerEntity\.items\.splice\(i, 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');
   const doSell = wm.slice(wm.indexOf('function doSell(shelf, it) {'), wm.indexOf('function itemValue(it)'));
-  assert.match(doSell, /playerEntity\.items\.splice\(playerEntity\.items\.indexOf\(it\), 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list');   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
+  assert.match(doSell, /playerEntity\.items\.splice\(playerEntity\.items\.indexOf\(it\), 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list');
   for (const [name, body] of [['the counter', sellArm], ['the keyed list', doSell]]) assert.doesNotMatch(body, /shelf\.items\.push\(/, `${name} pushes nothing onto the shelf`);
-  // PIN MOVED (AUDIT UPDATE II B2): the sale arms land through shopStock.js landSoldAt, which is landSold's own door
   assert.match(wm, /landSoldAt \} from '\.\.\/systems\/shopStock\.js';/);
   assert.match(readFileSync(new URL('../../src/systems/shopStock.js', import.meta.url), 'utf8'), /import \{ landSold \} from '\.\/stolenGoods\.js';[^\n]*\n[\s\S]*export function landSoldAt\(shelfItems, item, buildingType = null\) \{\n  if \(endlessArrowsAt\(buildingType\) && isShelfArrow\(item\)\) return false;\n  return landSold\(shelfItems, item\);\n\}/);
   const shelfArm = wm.slice(wm.indexOf('function openShelf'), wm.indexOf('function openMerchantSell'));
-  // PIN MOVED (AUDIT S1): each target hands over the owner's keeping, taken as the window opens - the one Set the mark and
   // the theft's own law (the shelf's tally, the cupboard's basket) read
   assert.match(shelfArm, /if \(b\.insideOpenShop === false\) \{[\s\S]*const shelfBefore = new Set\(shelf\.items\);[^\n]*\n\s*const win = interiorInventory\(\{\n\s*loot: \{ items: \(\) => shelf\.items, stolenFrom: shelfBefore \},[\s\S]{0,300}if \(shopShelfTheft\(shelfBefore, shelf\.items\)\)/, 'a shut shop\'s shelf');
   assert.match(wm, /const openLoot = \(privateProperty = false\) => \{\n\s*if \(privateProperty\) interiorLootBirth\(interiorCtx, key, _intShared\);[^\n]*\n\s*const before = privateProperty \? new Set\(c\.items \?\? \[\]\) : null;[^\n]*\n\s*const win = interiorInventory\(\{\n\s*loot: \{ items: \(\) => c\.items, storage: !privateProperty, stolenFrom: before \},[\s\S]{0,400}basket: theftBasket\(before, c\.items \?\? \[\]\),/, 'a stranger\'s cupboard - the theft arm alone, its basket the same Set');   // PIN MOVED (OUTDOOR-LOOT): the Yes mints the room's birth and composes it into the cupboard FIRST - the keeping is taken after, or a first opener's takes would mark nothing
@@ -387,7 +385,7 @@ test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece
   });
 });
 
-// ─── AUDIT (2026-10-16) ──────────────────────────────────────────────────────────────────────────────────────────────
+// ─── AUDIT ──────────────────────────────────────────────────────────────────────────────────────────────
 
 test('STOLEN-GOODS AUDIT S1: A THEFT IS OF THE OWNER\'S PIECES - an honest Longsword misclicked into a stranger\'s cupboard and taken straight back comes out clean (the theft basket 0, shelved at a sale, kept at a verdict); a piece stolen elsewhere is not laundered by the cupboard; a handful off the owner\'s stack is marked AND in the basket, and put back is theirs and out of it; a handful of their coin is counted, never marked (mutants: every take marked, every put cleared, a split\'s source unasked, the split outside the keeping, a merge left in it, the coin uncounted, a stack\'s basket by the list)', () => {
   const sword = createWeapon(120, 0, () => 0.5);   // a Longsword found, never stolen

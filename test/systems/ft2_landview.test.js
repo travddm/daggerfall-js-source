@@ -1,6 +1,4 @@
-// FT2 - LAND VIEW DISTANCE, THE FIRST CONDENSED ROW (2026-09-14, Mac:
-// "some toggles can be condensed and receive 2 labels ... mods/classic/
-// enhanced that share commonalities").
+// FT2 - LAND VIEW DISTANCE, THE FIRST CONDENSED ROW.
 //
 // Two controls sat in two panes for ONE radius: the Enhanced category's
 // Land view distance over uiPrefs landViewDistance (LV1, the enhanced

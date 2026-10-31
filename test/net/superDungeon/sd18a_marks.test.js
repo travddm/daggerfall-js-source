@@ -1,5 +1,4 @@
-// SD18a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD18a;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S MARKS (net/superDungeon/sdMarks.js) - each Hollow keeps one
+// SD18a: THE HOUR'S MARKS (net/superDungeon/sdMarks.js) - each Hollow keeps one
 // of six Endings (the Orrery's stones) and two of nine omens, its place in a cycle of 216 by its slot, past the gate's 144:
 // no two Hollows running share an Ending or an omen, every Ending meets every pair once. Its fight's profile
 // (net/superDungeon/sdRemnant.js sdFightProfile) runs by them - the Brazen Hide's health, the Quickened Gears' wind-ups, the Short
@@ -87,7 +86,7 @@ test('SD18a THE FIGHT\'S PROFILE: with no marks the table\'s own, frame for fram
   assert.deepEqual([P('wayrest').hpX, P('wayrest').endsMs], [1.25, 12 * 60_000], 'the Brazen Hide, the Short Hour');
   const Q = sdFightProfile(['sentinel', 'quickened', 'burning']);
   assert.deepEqual([Q.windX, Q.pool.ms, Q.pool.r], [0.85, 18_000, 4], 'the Quickened Gears; Sunfall and the Burning Brass together');
-  assert.deepEqual([sdFightProfile(['blades', 'hardened', 'fraying']).heartX, sdFightProfile(['blades', 'hardened', 'fraying']).fray], [1.25, 36]);   // PIN MOVED (AUDIT SD III F5): the Hardened Hearts a quarter again, from half again
+  assert.deepEqual([sdFightProfile(['blades', 'hardened', 'fraying']).heartX, sdFightProfile(['blades', 'hardened', 'fraying']).fray], [1.25, 36]);
   assert.deepEqual([sdFightProfile(['blades', 'restless', 'unending']).pulseStep, sdFightProfile(['blades', 'restless', 'unending']).resetMs, sdFightProfile(['blades', 'twin', 'short']).pairHandMs], [0.04, 40_000, 10_000]);
   assert.equal(sdFightProfile(['blades', 'twin', 'short']), sdFightProfile(['blades', 'twin', 'short']), 'kept');
   assert.ok(Object.isFrozen(Q) && Object.isFrozen(Q.pool));
@@ -156,7 +155,7 @@ test('SD18a THE LAW UNDER ITS MARKS: the Brazen Hide\'s health; the Short Hour; 
   const words = beatTo(hh, T0, hh.op + 60_000, () => ringOf(hh));
   const ph3 = words.find((x) => x.k === 'ph' && x.n === 3), cx = words.find((x) => x.k === 'cx');
   assert.ok(ph3 && cx, 'the Last Moment, the Hearts');
-  assert.equal(cx.m, Math.round(heartHpFor(Array(4).fill(30), heartCountFor(4)) * 1.25));   // PIN MOVED (AUDIT SD III F5)
+  assert.equal(cx.m, Math.round(heartHpFor(Array(4).fill(30), heartCountFor(4)) * 1.25));
   const reset = words.find((x) => x.k === 'atk' && x.a === SD_BLOWS.reset.id);
   assert.ok(reset.now >= ph3.up + 40_000 && reset.now < ph3.up + SD_RESET_EVERY_MS, `forty seconds from its return (its blow in flight let land first): ${reset.now - ph3.up}`);
   assert.equal(reset.at - reset.now, SD_BLOWS.reset.windup, 'the Reset\'s own wind-up, never quickened');
@@ -225,7 +224,7 @@ test('SD18a THE WIRE AND THE PAGE: a blow\'s shape bounded key by key, an elemen
   // the bar's "rises again" and the card
   const brk = { ...s, ph: 2, op: T0 - 60_000, h: 500, m: 1000, ec: [{ x: 0, z: 0, yw: 0, mv: null, atk: null, h: 0, m: 100, up: T0 - 9000, dn: T0 - 4000 }, { x: 5, z: 0, yw: 0, mv: null, atk: null, h: 80, m: 100, up: T0 - 9000, dn: 0 }] };
   const bar = remnantBarModel(brk, T0);
-  assert.equal(bar.callout?.text, 'Gold rises - 6s', 'the callout: six seconds, not eleven');   // AUDIT SD III (T5, PIN MOVED): its count after the dash
+  assert.equal(bar.callout?.text, 'Gold rises - 6s', 'the callout: six seconds, not eleven');     // AUDIT SD III (T5
   const beats = createSdBeats();
   beats.frame({ ...s, ph: 1, op: T0 - 60_000 }, T0);
   const card = beats.frame({ ...s, ph: 2, op: T0 - 60_000 }, T0 + 10);

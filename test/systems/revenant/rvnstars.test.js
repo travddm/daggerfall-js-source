@@ -1,5 +1,4 @@
-// RVN-STARS (bible/06-Systems/Revenants.md section 44; the owner, 2026-10-17: "develop a firnanament style tree for
-// revnants. Just like we did for ships and characters"). Each sworn revenant grows a sky of its own: a level earned at my
+// RVN-STARS (). Each sworn revenant grows a sky of its own: a level earned at my
 // side (a fight won, by the foe's level; an errand home, by its days and danger - once an errand), a point a level and a
 // rank past the first, and thirty stars about the Oath in three aspects - the Blade (its health, its blows), the Grave
 // (its art's weight and haste, and Awakened Art), the Road (its odds, haul and road abroad, its loyalty's losses, its

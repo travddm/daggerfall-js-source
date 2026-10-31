@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02 - CREW-SAY. Mac, testing sailing: "your crew mates speaking sometimes seems like gibberish".
+// FIELD BUGS 2026-10-02 - CREW-SAY..
 // Nothing scrambles a crewman's words - every line is the tables' own English (systems/naval/crewLife.js,
 // shipCrew.js) - but the bubbles that carry them (ui/naval/navalHud.js drawCrewLines) stood on their own heads with nothing
 // between them, at 0.62 of an opaque ground, the farther painted OVER the nearer: the chorus is every hand at once (each
@@ -56,7 +56,7 @@ test('CREW-SAY THE CHORUS ONCE: five minutes of a real crew from the helm - when
     const laid = layoutCrewLines(points);
     const said = new Map();
     for (const p of points) said.set(p.text, [...(said.get(p.text) ?? []), p]);
-    // FIELD BUGS 2026-10-02b PIN MOVED: a line SUNG or SHOUTED by many is theirs together; two hands' talk is each his own
+    // FIELD BUGS 2026-10-02b
     for (const b of laid) if (b.kind === 'talk') assert.match(b.text, /^Hand\d+: /, 'talk by its speaker\'s name, always');
     for (const [text, by] of said) {
       if (by.length >= 2 && by.every((p) => p.kind !== 'talk')) {

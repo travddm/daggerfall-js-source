@@ -1,6 +1,4 @@
-// FT13 - THE MOVED ROWS LEAVE THE SETTINGS PANE (2026-09-14, Mac:
-// "Remove the now moved settings options that are now in our new
-// Features pane"). FT1 drew a key whose switch lives on the Features
+// FT13 - THE MOVED ROWS LEAVE THE SETTINGS PANE. FT1 drew a key whose switch lives on the Features
 // home as a POINTER row on the settings pane, the Mods page and the
 // pause door; Mac read those as the options still being there. A moved
 // key draws nothing now: movedRow answers null, every caller appends

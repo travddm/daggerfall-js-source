@@ -1,4 +1,4 @@
-// LOCKPICK (2026-10-26, bible/06-Systems/Lockpicking.md): THE LOCKPICKING MINIGAME AND THE LOCKPICK - the tumblers' law by
+// LOCKPICK: THE LOCKPICKING MINIGAME AND THE LOCKPICK - the tumblers' law by
 // value, the machine played (a clean hand, a slip, a snap, a free pin forced, a spool's false set, the Auto attempt), the
 // Lockpick as the producers mint it (its row, the item law headless, the counter's endless stack, the kit and the gift, a
 // rogue's pockets), the host's one home (no pick, a snap, the last snap, an open, a dispose), the window's pure geometry
@@ -43,7 +43,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 
 test('LOCKPICK law: the act\'s numbers by value, the pins and spools a lock is built of, its window and its snap', () => {
   assert.deepEqual({ ...LOCKPICK_ACT }, {
-    riseS: 0.2, riseJitter: 0.45, fallS: 0.32, springS: 0.22, graceS: 0.03, windowMinS: 0.08, windowMaxS: 0.6,   // PIN MOVED (AUDIT LOCKPICK A2): the rise's spread outspans the 5% hang
+    riseS: 0.2, riseJitter: 0.45, fallS: 0.32, springS: 0.22, graceS: 0.03, windowMinS: 0.08, windowMaxS: 0.6,
     breakScale: 0.55, breakMin: 0.04, breakMax: 0.6, freeRisk: 0.35, senseSkill: 50,
   });
   assert.deepEqual([LOCK_PINS_MIN, LOCK_PINS_MAX, LOCK_PINS_STEP, SPOOL_ONE, SPOOL_TWO], [2, 6, 4, 8, 14]);

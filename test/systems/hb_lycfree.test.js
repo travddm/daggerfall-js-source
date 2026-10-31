@@ -1,5 +1,4 @@
-// HB-LYCFREE (2026-09-30, Mac: "Lycanthropy costs to cast from hotbar when it shouldnt. Also want to make the hotbar
-// the default on option."): TWO THINGS.
+// HB-LYCFREE: TWO THINGS.
 //
 //   - THE CURSE'S SPELL IS FREE FROM THE BAR AS FROM THE BOOK. The book readies the lycanthrope's Lycanthropy spell with DFU's
 //     noSpellPointCost (DaggerfallSpellBookWindow's cast: `noSpellPointCost = spellSettings.Tag ==
@@ -133,7 +132,7 @@ test('HB-LYCFREE: Diamond and Off are still the player\'s to choose, and are kep
   _resetForTests();
   quickSlotsWrite('diamond');
   assert.equal(quickSlotsRead(), 'diamond');
-  // DIAMOND-HB (PIN MOVED): Diamond is the hotbar's four now, its own style ('diamond'), not QS's 'quickbar'
+  // DIAMOND-HB (
   assert.equal(overridesOf({ ...PREF_DEFAULTS, quickbarStyle: getPref('quickbarStyle') }).quickbarStyle, 'diamond', 'the choice is on the shelf');
   quickSlotsWrite('off');
   assert.equal(quickSlotsRead(), 'off');

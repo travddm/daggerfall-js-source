@@ -1,9 +1,9 @@
-// WB13e (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE BEATS - his wake
+// WB13e: THE BEATS - his wake
 // (the relay's `op`: a roar, a flare and his name as the opening ends), a phase's turn as a card held until he lands with
 // his roar after the bound's bark, his fall as an event (a burst, the court's light white, a shake, a column of embers,
 // his body sinking and left on the floor, the spoils after it under a card), the Wrath said and seen, his low health
 // sputtering, a Meteor or a Leap aimed at me stung, and the court's lines standing for their length
-// (bible/11-Multiplayer/World-Bosses.md section 20, WB13e).
+// (WB13e).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

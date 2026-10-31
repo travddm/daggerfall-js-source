@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-04e - the Arena's feedback (bible/01-Overview/bugs/Field-Bugs-2026-10-04e.md, report 2).
+// FIELD BUGS 2026-10-04e - the Arena's feedback (, report 2).
 //
 // Discord (Draugr): "Great feature and first tournament. But some small problems. Arrows are not refunded, which causes
 // problems; The ghosts outside are bothersome (I know they're story related); The multiple npc arena fights will target
@@ -77,7 +77,7 @@ test('ARENA-ARROWS tally: a real round spent from the watched pack is a shot, a 
   const bow = { weapon: { templateIndex: 130, name: 'Long Bow' }, pos: [0, 0, 0] };
   const foe = (extra = {}) => ({ dead: false, entity: { items: [], basics: {}, level: 1, stats: {}, skills: {}, ...extra }, ai: { feet: [0, 0, 0], yaw: 0, height: 1.8 } });
   const player = { level: 1, items: pack, stats: {}, skills: {} };
-  const lodges = () => 0;   // PIN MOVED (ARROW-LODGE): each shaft survives its strike (under ARROW_LODGE_CHANCE) - the pin is where it lodges
+  const lodges = () => 0;
   playerArrowHitFoe(bow, foe(), { playerEntity: player, rolls: lodges });   // a wild foe: lootable
   playerArrowHitFoe(bow, foe({ bout: { id: 'b' } }), { playerEntity: player, rolls: lodges });   // a bout fighter: lost
   playerArrowHitFoe(bow, { ...foe(), rival: 'p1' }, { playerEntity: player, rolls: lodges });   // a relay opponent's stand-in: lost
@@ -182,7 +182,7 @@ test('CURSE-OFF-SAND: the Curse of Daggerfall\'s wave waits outside the arena\'s
   for (const host of ['world.js', 'exterior.js']) {
     assert.match(read(`src/scenes/${host}`), /foeKeptOff: \(foe\) => \(\((?:host\.)?modes\?\.mode \?\? 'exterior'\) !== 'exterior'\n\s*\? !!(?:host\.)?modes\?\.questFoeKeptOff\?\.\(foe\)\n\s*: keptOffArenaGround\(\{ questName: foe\?\.parentQuest\?\.questName, feet: player\.pos, centre: arenaCity(Pixel\(\)|Origin) \? arenaCityStage\.centre\(\) : null \}\)\),/, host);
     const src = read(`src/scenes/${host}`), at = src.indexOf('tryPlaceFoe: (handle) => {');
-    assert.ok(at > 0 && !src.slice(at, at + 6000).includes('keptOffArenaGround'), `${host}: no refusal at placement`);   // PIN MOVED (TESA's merge): world.js's quest world is scenes/questWorld.js's (host.modes), the host read whole
+    assert.ok(at > 0 && !src.slice(at, at + 6000).includes('keptOffArenaGround'), `${host}: no refusal at placement`);
   }
 });
 

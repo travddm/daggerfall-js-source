@@ -1,8 +1,8 @@
-// WINDFALL1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments seamlessly")
+// WINDFALL1
 // - WINDFALL's PRESENTATION AND ITS LAW ON THE FLATS: WindEnvironmentEffects (the sounds and the particle flows), the
 // AudioSource the port gives it (systems/audio.js source), the particle systems (render/windfallParticles.js), the
 // vertex wind (render/windfallSway.js, run in BB_VS through the GLSL evaluator), and the hosts' wiring.
-// bible/07-Rendering/Windfall.md is the record.
+// is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

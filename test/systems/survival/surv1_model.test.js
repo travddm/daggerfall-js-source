@@ -23,11 +23,9 @@ import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { RACES } from '../../../src/systems/races.js';
 import { DISEASES } from '../../../src/systems/diseases.js';
 
-// ═══ SURV1 (2026-09-18): THE SURVIVAL MODEL ═════════════════════════
+// ═══ SURV1: THE SURVIVAL MODEL ═════════════════════════
 //
-// Mac: "we have been given permission to completely overhaul this mod
-// [Climates & Calories], figure out bugs and implement it to our
-// desire ... We're going to tackle everything here properly." The
+// The
 // mod's rules were read off its DLL (no source ships) and rebuilt as
 // pure laws: a felt temperature from the world and the worn items,
 // and five needs on one record per entity, ticked a world minute at a
@@ -91,10 +89,9 @@ test('SURV1: clothing warms by piece and cloak, wetness eats it one for one and 
   assert.equal(clothingWarmth(w).warmth, 8 + 10 + 4 + 15, 'tunic, pants, boots, a formal cloak at variant 1 (5 x 3)');
   assert.equal(clothingWarmth(w, { wet: 20 }).warmth, 17, 'soaked, it keeps less');
   assert.equal(clothingWarmth(w, { wet: 300 }).warmth, 0, 'drenched clothes warm nothing');
-  // CLOTHES-BREATHE (FIELD BUGS 2026-09-30, PIN MOVED): 37 - 10 -> 18 - 10 and 37 -> 18 - above a natural ten the clothes
+  // CLOTHES-BREATHE (FIELD BUGS 2026-09-30
   // count half their warmth, and the hood shades the half (test/systems/survival/fb0930_cc_breathe.test.js)
   assert.equal(clothingWarmth(w, { natural: 40, inSunlight: true }).warmth, Math.trunc(37 / 2) - 10, 'the hood shades in strong sun');
-  // PIN MOVED (AUDIT TEMP-UI E7): the halving eases in a degree at a time from ten - at twenty the outfit has given up ten
   // of its 37, not half at once (a warmer world read cooler across the line)
   assert.equal(clothingWarmth(w, { natural: 20, inSunlight: true }).warmth, 37 - (20 - 10), 'but not in mild sun');
   assert.equal(clothingWarmth(worn({})).warmth, 0, 'naked');
@@ -343,11 +340,10 @@ test('SURV1: a jump owes at most two days, and a player arriving from longer awa
 
 // ── SURV-THIRST1: A BODY PAST DEHYDRATED FAILS WHEREVER IT STANDS ──
 //
-// Mac, 2026-09-19: "You should also should die on dehydration".
 //
 // Climates & Calories bleeds you for thirst only in HEAT. THE PORT
 // DEPARTS: water is not a climate. The mod's own line is recorded in
-// bible/06-Systems/Climates-Calories.md, so a tidy-up cannot put the
+// so a tidy-up cannot put the
 // gate back by mistake - these pins are what stop it.
 const thirstRig = () => {
   const mk = () => ({
@@ -450,7 +446,6 @@ test('SURV-THIRST1 AUDIT: a clock JUMP wounds to the floor and does not kill on 
     assert.ok(jump(hours, NEED.DEHYDRATED) > 0, `a ${hours}h jump already dehydrated must not be fatal either`);
   }
   // it HURTS, though - arriving at death's door is the whole point
-  // PIN MOVED (AUDIT TEMP-UI E6): this read `< 5`, which held only because the twelve-hour jump lands on a harm tick
   // (720) and the landing minute then bit past the floor - the coin flip the record says the arrival is not: one landing
   // in ten killed outright. The landing minute floors too; it is the next minute lived that may kill.
   assert.equal(jump(12, 0), 5, 'and it really does wound - to the floor, death\'s door, and no further');

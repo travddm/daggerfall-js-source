@@ -8,7 +8,7 @@
 // outdoors or in a building healed every hour and aged no effect; cast, rest the magicka back, cast again, and the
 // incumbent's rounds stacked for good. The ticker spends that minute on the rounds now, as the dungeon's arm does.
 //
-// LIVED1 (2026-09-29) re-aims the file: the minutes are the CHARACTER's own now (worldTick.js ownMinutes), moved by
+// LIVED1 re-aims the file: the minutes are the CHARACTER's own now (worldTick.js ownMinutes), moved by
 // the ticker's advance online as the one clock is moved offline - no session counter, no sub-tick end handed over.
 // The laws the file holds stand: a rested night ages every effect by its rounds, online as offline; the exploit
 // stacks nothing; the night is never run twice; the foes get the same window; the needs are paid asleep. What is

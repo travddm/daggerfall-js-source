@@ -1,6 +1,5 @@
-// STORM-SHED (2026-10-06 evening, the account service overloaded a second time - "D1_ERROR: D1 DB is overloaded.
-// Requests queued for too long." - and players' decorations missing): read off the database and the service's own
-// metrics (bible/06-Systems/Online-Arc.md STORM-SHED), the overload came in waves - a relay deploy, midnight, a burst of
+// STORM-SHED: read off the database and the service's own
+// metrics (STORM-SHED), the overload came in waves - a relay deploy, midnight, a burst of
 // reconnects at 20:10 - and the clients' own asking again held each wave up:
 //   A. a token mint slower than the session's TOKEN_WAIT_MS was marked as its room's though that room's hello went
 //      without it, so the room's retry minted again (net/accountClient.js `opened`); and a failed mint was asked again
@@ -253,7 +252,7 @@ test('STORM-SHED B: a Watch claim that failed waits SEAT_WATCH_RETRY_MS before t
 const ENV = { SEATS_OPEN: 'on', DEVELOPER_HANDLES: 'Devra' };
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
 const ALCAIRE = { key: 3022, name: 'Alcaire', region: 21, tier: 'palace', pixel: [410, 160] };
-const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (PIN MOVED): the rows the law judges by are a read of them
+const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;     // LEAN-WITNESS (
 
 /** The service's database with three witnesses agreeing on Anticlere, its seat witness reads counted - and, `gate.hold`
  *  set, each such read held until `gate.release()`. */

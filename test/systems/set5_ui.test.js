@@ -1,5 +1,4 @@
-// SET5 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md; Mac: "sigil armor sets that also come with set
-// builds ... go all out on this"): THE SETS ON SCREEN. The law's one view of a set for a wearer (the places filled, the
+// SET5: THE SETS ON SCREEN. The law's one view of a set for a wearer (the places filled, the
 // stage and what holds it, why it sleeps, the tiers) and its words for a line-printing tooltip; the HUD's chips for the
 // powers; the set block, the doll's strip and the frame's mark built on the fake document (test/invdrag.mjs); the sigil
 // block's words for a set's armour; the sheet's rules; and every surface's wiring. The browser's side - the strip in its
@@ -150,7 +149,7 @@ test('SET5 the HUD\'s chips for the powers: a window running burns (the Rampage\
   T = 10;
   reportPlayerKill({}); reportPlayerKill({});
   T = 10.4;
-  assert.deepEqual(setHudChips(e), [{ key: 'rampage', set: 'dagon', name: 'Rampage II', text: '12s', state: 'active', tier: 2 }]);   // PIN MOVED (AUDIT STAR S2): a chip carries its tier, which the HUD's card reads
+  assert.deepEqual(setHudChips(e), [{ key: 'rampage', set: 'dagon', name: 'Rampage II', text: '12s', state: 'active', tier: 2 }]);
   assert.deepEqual(setHudChips({ ...e, peer: 'p1' }), [], 'a peer\'s entity');
   setSetsDueling(true);
   assert.deepEqual(setHudChips(e), [], 'a duel');
@@ -212,7 +211,6 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.deepEqual(places.map((p) => p.classList.contains('on')), [true, true, true, true, false, false, false, false, false]);
     assert.equal(places[0].title, 'Head - worn');
     assert.equal(places[8].title, 'Weapon');
-    // PIN MOVED (SET-CATCHUP, Sigil-Sets.md section 5): three pieces stand at Bright, so the helm below them drinks faster
     assert.equal(one(box, 'set-stage').textContent, 'Kindled · Bright: grow your Helm (3x XP), reach Renown 20');
     const tiers = kids(box, 'set-tier');
     assert.deepEqual(tiers.map((t) => t.classList.contains('awake')), [true, true, false]);
@@ -226,7 +224,7 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.equal(card.className, 'setbox compact');
     assert.equal(one(card, 'set-count').textContent, '4/9 · Kindled');
     assert.equal(one(card, 'set-role'), null, 'the Prince and the role are the Info box\'s');
-    assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');   // PIN MOVED (SET-CATCHUP)
+    assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');
     const rows = kids(card, 'set-tier');
     assert.deepEqual(rows.map((t) => t.classList.contains('awake')), [true, true, false]);
     assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 6 }));

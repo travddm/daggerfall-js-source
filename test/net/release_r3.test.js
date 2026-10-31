@@ -1,4 +1,4 @@
-// AUDIT RELEASE R3 (2026-10-26, bible/01-Overview/audits/Audit-Release-R3.md): what the merge of main into TESA composed
+// AUDIT RELEASE R3: what the merge of main into TESA composed
 // in the hub's gate kill - GATE-COURTS (main: a court's kill is said, never kept as the night's fall) and WW2 (TESA: each
 // lane keeps its own fall, under its own key). tools/mutants/release_r3.json R3-5-*.
 import test from 'node:test';

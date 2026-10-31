@@ -1,4 +1,4 @@
-// PROF2 (2026-09-28, Mac: "Go") - MINING AND QUARRYING, AND THE FORGE, AS THE SERVICE KEEPS THEM: a vein's ore, a
+// PROF2 - MINING AND QUARRYING, AND THE FORGE, AS THE SERVICE KEEPS THEM: a vein's ore, a
 // boulder's stone and a dungeon's deep vein through the one harvest (the law's node, the day, the hour - and none
 // underground - the rank, the act's bounded report); the witnessed dungeon; the forge's smelts (every input held, bought
 // first, an ingot own only when all its units were, Smithing's XP under the crafter's limit, asked twice one). Driven
@@ -109,7 +109,6 @@ test('PROF2 service: the Pick-Axe\'s report, bounded - clean only with every str
   assert.equal(plain.body.xp, harvestXp(1, 10, false), 'one glint of the two: no clean finish, whatever it says');
   const fresh = await s.seated('Ann');
   assert.deepEqual((await s.call('/v1/prof/harvest', ore(fresh, v), fresh.secret)).body, { error: 'prof-rank' }, 'tier 2 wants Mining 10');
-  // PIN MOVED (ANY-HOUR, 2026-10-01, Mac: "Remove the time limit for professions. Should be available at any time"):
   // 02:00 refused a surface vein (`prof-night`); now it is mined as at noon
   clock(secondAt(today() * DAY + 60, 2));
   const [night] = veinsAt(WOODS, GLENUMBRA, [(x) => x.tier === 1]);
@@ -138,7 +137,6 @@ test('PROF2 service: a boulder quarried - Rough Stone 3-5; a clean finish, or a 
   s.setXp(sb, xpForRank(100), 'mining', { spec100: 'stonebreaker' });
   const d = await s.call('/v1/prof/harvest', stone(sb, 400, 2, { glints: 0 }), sb.secret);
   assert.equal(d.body.material, 'stone:cut', 'a Stonebreaker cuts it always');
-  // PIN MOVED (BOULDERS, acct47): the Mountain's five boulders a day - the fifth quarried, a sixth no node
   assert.equal(b.length, 5);
   assert.equal((await s.call('/v1/prof/harvest', stone(mac, 400, 4, { glints: 0 }), mac.secret)).status, 200, 'the fifth slot');
   assert.deepEqual((await s.call('/v1/prof/harvest', stone(mac, 400, 5, { glints: 0 }), mac.secret)).body, { error: 'bad-node' }, 'past the day\'s count');
@@ -156,7 +154,6 @@ test('PROF2 service: a dungeon\'s vein - no hours underground; its whole deep ta
   clock(secondAt(today() * DAY + 60, 2));
   const r = await s.call('/v1/prof/harvest', deep(mac, 0), mac.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): unconfirmed, the deep table's own draw -
   // it was the least a deep vein is, Silver at tier 3
   const un = dungeonVeins({ dungeon: id, day: today(), climate: MOUNTAIN, confirmed: false })[0];
   assert.deepEqual([r.body.material, r.body.xp], [un.material, harvestXp(un.tier, 99, false)], 'unconfirmed: the whole table\'s draw');
@@ -216,7 +213,7 @@ test('PROF2 service: Deep Delver\'s dungeon veins yield double (MINE-PERKS; half
   const s = await stand();
   const mac = await s.seated('Mac');
   s.setXp(mac, xpForRank(100), 'mining', { spec50: 'deep-delver' });
-  // the service's dice at their highest: the roll 3, x2 = 6 (3 without the specialisation) - PIN MOVED (MINE-PERKS): x1.5's 4.
+  // the service's dice at their highest: the roll 3, x2 = 6 (3 without the specialisation)
   // Four dungeons: an account works no more a day in dungeons nobody has vouched for (AUDIT 29 A5).
   const real = globalThis.crypto.getRandomValues.bind(globalThis.crypto);
   t.mock.method(globalThis.crypto, 'getRandomValues', (b) => (b.byteLength === 4 ? b.fill(0xff) : real(b)));
@@ -228,7 +225,6 @@ test('PROF2 service: Deep Delver\'s dungeon veins yield double (MINE-PERKS; half
   s.raw.prepare(`INSERT INTO node_harvests (day, node, kind, player, char_id, profession, material, qty, xp, at, rid, n)
     SELECT ?, 'vein:1:1:' || ? || ':' || value, 'ore', ?, ?, 'mining', 'metal:iron', 1, 1, ?, 'fill' || value, 'x' FROM json_each(?)`)
     .run(today(), today(), mac.id, mac.character, _now, JSON.stringify(Array.from({ length: 56 }, (_, i) => i)));
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the day held 60 - a sixty-first was `prof-cap`.
   // Now the sixty-first is credited, and the bound that stands is the unvouched dungeons' four (AUDIT 29 A5)
   const past = await s.call('/v1/prof/harvest', ore(mac, veinOf(WOODS, GLENUMBRA, (x) => x.tier === 1)), mac.secret);
   assert.deepEqual([past.status, past.body.today], [200, 61], JSON.stringify(past.body));
@@ -275,7 +271,6 @@ test('PROF2 service: a smelt refused - the product\'s room; the crafter\'s limit
   assert.deepEqual((await s.call('/v1/prof/smelt', { character: mac.character, recipe: 'ingot:mithril', count: 3, rid: rid() }, mac.secret)).body, { error: 'stores-full' });
   s.give(mac, 'ingot:mithril', 'own', 0);
   s.raw.prepare('DELETE FROM prof_stores WHERE material = ?').run('ingot:mithril');
-  // PIN MOVED (CRAFT3): Alchemy and Cooking are one track (Provisioning) - the two crafts past Journeyman are Provisioning and Building, seeded under the craft's id
   s.setXp(mac, xpForRank(60), 'provisioning');
   s.setXp(mac, xpForRank(60), 'building');
   s.setXp(mac, xpForRank(51) - 10, 'smithing');

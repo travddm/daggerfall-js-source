@@ -1,5 +1,4 @@
-// OW-TOWN-ROUND (2026-10-23, the owner: "Overworld pathing always wants to walk into the middle of the town let the player
-// always go around it if not clicking vaguely in the middle of the city"): THE TOWN IS GONE ROUND, AND ASKED FOR AT ITS
+// OW-TOWN-ROUND: THE TOWN IS GONE ROUND, AND ASKED FOR AT ITS
 // MIDDLE. Three laws, each pure:
 //   - travelPathMode.js pickNearPlaceMiddle: a click on a town takes the town's journey only in its middle;
 //   - travelOptions.js spotOffTownFor: a spot clicked elsewhere on the town is put out on its ring (unless the
@@ -87,7 +86,7 @@ test('OW-TOWN-ROUND: a spot beyond its pixel\'s town is reached round the town (
   assert.deepEqual(routeLegs(out, ['sea', 'sea'], { ringAt }, [me, { x: 8 * P + 100, z: mid.z }]).filter((l) => l.ring), [], 'never a ring left under sail');
 });
 
-// AUDIT UPDATE (2026-10-25, bible/01-Overview/audits/Audit-Update-2026-10-25.md): lane T's laws the pins above left loose
+// AUDIT UPDATE: lane T's laws the pins above left loose
 test('AUDIT UPDATE T6: every band of the ring is its own - the west and the north as the east and the south, a dead-centre spot to the first of w, e, s, n (mutants: a band moved to the town\'s edge)', () => {
   const rects = { locationRect: L, locationBorderRect: B }, outside = { x: mid.x - 12000, z: mid.z };
   assert.deepEqual(rel(spotOffTownFor({ x: mid.x - 5000, z: mid.z + 1000 }, rects, outside)), [-7000, 1000], 'nearest the west wall: the west band\'s middle');
@@ -139,7 +138,7 @@ test('AUDIT UPDATE T6: a walk with two equal ways round goes the one way every t
   assert.equal(crosses(me, legs), false);
 });
 
-// AUDIT UPDATE II (2026-10-25, bible/01-Overview/audits/Audit-Update-II-2026-10-25.md) B4
+// AUDIT UPDATE II B4
 test('AUDIT UPDATE II B4: a spot in the location\'s own middle is kept - a place the map holds no plate for (an undiscovered dungeon) is asked its middle by the spot\'s own law; off the middle it is put out on the ring as before (mutants: the middle unasked)', () => {
   const rects = { locationRect: L, locationBorderRect: B }, outside = { x: mid.x - 12000, z: mid.z };
   assert.deepEqual(rel(spotOffTownFor({ x: mid.x + 1000, z: mid.z - 1000 }, rects, outside)), [1000, -1000], 'the middle: kept as clicked');

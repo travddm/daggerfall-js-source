@@ -1,5 +1,5 @@
-// AUDIT REP (2026-09-30) - THE REPUTATION OVERHAUL, AUDITED. Mac: "Audit this" - REP1-REP6 (bible/06-Systems/
-// Standing-Arc.md), read end to end against its own claims; the record is bible/01-Overview/audits/Audit-REP.md. Each pin below
+// AUDIT REP - THE REPUTATION OVERHAUL, AUDITED. - REP1-REP6 (bible/06-Systems/
+// Standing-Arc.md), read end to end against its own claims; the record is. Each pin below
 // fails on the code as REP shipped it (b65f7691d).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

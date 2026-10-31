@@ -1,6 +1,6 @@
-// FORAGE-FIX (2026-09-28): the quest and list patches RUN - each pinned on
+// FORAGE-FIX: the quest and list patches RUN - each pinned on
 // the port's own quest machine and list manager, patched against the
-// author's text as shipped (bible/06-Systems/Foraging.md 12). A patch that
+// author's text as shipped (12). A patch that
 // only matched its line would pass forage1_law; these fail unless the
 // patched quest does what the author meant, and the unpatched one still
 // shows the fault it mends.

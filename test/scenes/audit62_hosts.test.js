@@ -1,4 +1,4 @@
-// AUDIT 62 - THE HOSTS AND ENCOUNTERS LANE (2026-09-07).
+// AUDIT 62 - THE HOSTS AND ENCOUNTERS LANE.
 //
 // Seven findings against the two walkable outdoor hosts and the mode
 // machine they both mount. What is pinned here is the REFERENCE's own

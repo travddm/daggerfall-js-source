@@ -32,9 +32,9 @@ import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { assignStartingGear } from '../../../src/systems/startingGear.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ AUDIT SURV (2026-09-18): five lenses over SURV1-SURV7 ════════
+// ═══ AUDIT SURV: five lenses over SURV1-SURV7 ════════
 //
-// Mac: "Let's audit everything so far". Five opus agents read the arc
+// . Five opus agents read the arc
 // - the pure laws, the wiring walk, the player-facing surfaces, the
 // tests and records, a runtime probe - and the confirmed findings are
 // fixed and pinned here, one test a lens.
@@ -225,7 +225,6 @@ test('AUDIT SURV C: what the player is told - a vampire\'s strip has no hunger o
   assert.match(survivalInfoTokens(skin).map((r) => r.text).join('\n'), /Weight: [0-9.]+ kilograms/, 'DFU\'s word, shortened by the panel alone');
   assert.equal(isSurvivalItem(skin), true);
   assert.match(ENHANCED_CSS, /\.hud-stat:empty\s*\{\s*display:\s*none;?\s*\}/, 'no gap for an empty widget (UI3: the needs are its tiles)');
-  // Mac (review): "Hide wear for non wearables. Same for use for non-usables"
   const wearer = { equip: null, activeEffects: [] };
   assert.equal(localPrimaryAct(skin, wearer), null, 'no slot takes a waterskin: no Wear');
   assert.equal(localPrimaryAct(createSurvivalItem(TEMPLATE.RawMeat), null), null, 'nor a raw meat, wearer or none');
@@ -268,7 +267,7 @@ test('AUDIT SURV B: the camps - the sweep spares them and the scene cache carrie
   assert.equal(pool.snapshot().length, 4, '...and the next save still carries it');
   assert.equal(pool.applyOwner('peer', [{ i: 'p:1', k: 1, p: [20, 0, 20], y: 0, u: 500, w: 0 }]), true, 'a peer\'s word lands too');
   assert.equal(pool.camps.length, 5);
-  // ENDLESS PROVISIONS (2026-10-04, Mac: the Campfire Kit and Rations for EVERYONE, Climates & Calories or not):
+  // ENDLESS PROVISIONS:
   // this supersedes SURV-OFFSIGHT's "Off sees another's camp and uses none". A camp is every tier's - the ray, the
   // lights, the flames, the tent, the name and the menu are all there with the arc Off. What stays the arc's is the
   // WARMTH (byFire reads `shown`: there is no felt temperature to warm).

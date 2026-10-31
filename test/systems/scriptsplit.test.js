@@ -1,6 +1,4 @@
-// SCRIPT-SPLIT (2026-09-26, two players via Mac, both outdoors on ANGLE
-// Direct3D11: "script 107.5 ms" of a 104.3 ms frame on a GTX 1650, "script
-// 203.6 ms" of 201.6 on an RTX 4090 Laptop). The script line is measured
+// SCRIPT-SPLIT. The script line is measured
 // from the rAF's stamp, and Chrome stamps a frame at the display's beat, so
 // a main thread busy with anything first is in it before the game's frame
 // runs a line. The frame clock now says which part a sample's milliseconds

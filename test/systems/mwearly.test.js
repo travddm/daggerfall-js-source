@@ -1,5 +1,4 @@
-// MW-EARLY (Mac: "The player shouldnt load into the game and have to wait
-// for the morrowind models to load") - THE ARMS START WITH THE LOAD, NOT
+// MW-EARLY - THE ARMS START WITH THE LOAD, NOT
 // AFTER IT. The world's load door knows the save it will restore the
 // moment the boot begins, and the Morrowind build needs only that
 // character and the attached files; it was asked for at the END of
@@ -59,7 +58,7 @@ test('MW-EARLY buildingFor: null at rest, the identity of the build in flight, t
   assert.equal(arm.buildingFor(), null, 'no build: nobody');
   const held = heldRig();
   const first = arm.build({ race: 'fprace', faceIndex: 1, deps: held.deps });
-  assert.deepEqual(arm.buildingFor(), { race: 'fprace', female: false, faceIndex: 1, werewolf: false, vampire: false }, 'the build in flight says whom it builds');   // PIN MOVED (PORTRAIT3D): and the curse's face
+  assert.deepEqual(arm.buildingFor(), { race: 'fprace', female: false, faceIndex: 1, werewolf: false, vampire: false }, 'the build in flight says whom it builds');
   const queued = await arm.build({ race: 'fprace', faceIndex: 2, deps: held.deps });
   assert.equal(queued.queued, true);
   assert.deepEqual(arm.buildingFor(), { race: 'fprace', female: false, faceIndex: 2, werewolf: false, vampire: false }, 'the queued one is who will stand once the queue drains');

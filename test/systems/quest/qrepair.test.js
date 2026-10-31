@@ -1,4 +1,4 @@
-// QREPAIR (2026-09-24, Mac: "Add a quest refresh option to settings" - "Repair active quests"): the repair over a REAL
+// QREPAIR: the repair over a REAL
 // quest machine, Place and scene mount (systems/quest/questRepair.js): what it puts back, what it never touches, the
 // progress it leaves alone, the line it says; the by-name mount; and the door, by source, in every host and the menu.
 import { test } from 'node:test';

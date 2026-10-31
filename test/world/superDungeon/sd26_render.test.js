@@ -1,4 +1,4 @@
-// SD26 (2026-10-08, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md): AUDIT SD IV's sync and render
+// SD26: AUDIT SD IV's sync and render
 // lenses - each finding measured before it was fixed. Where the Rift stands read the doors open on the frame it was
 // stood; the Hour's light was drawn under the flats that came after it; the Stomp's dust rose from the void past the
 // arena's rim; the lamps' heads and the stones' caps were open underneath; the Hour's fog and trilight made garbage a
@@ -18,7 +18,7 @@ import { sdRiftArt } from '../../../src/world/superDungeon/sdRiftArt.js';
 import { Collider } from '../../../src/player/collider.js';
 import { ActionSystem } from '../../../src/world/actionSystem.js';
 import { sdRiftPlace, sdReturnPlace, sdLandingPlace } from '../../../src/world/superDungeon/sdDungeon.js';
-import { sdProbeOf } from '../../../src/scenes/superDungeon/sdEnd.js';   // SD-THROUGH (PIN MOVED): the end's one probe over the collider
+import { sdProbeOf } from '../../../src/scenes/superDungeon/sdEnd.js';     // SD-THROUGH (
 import { floorLanding } from '../../../src/player/enterExit.js';
 import { trs } from '../../../src/world/mat4.js';
 import { glslFunctions } from '../../glsl.mjs';
@@ -52,7 +52,6 @@ function box(x0, y0, z0, x1, y1, z1) {
 test('AUDIT SD IV (S1): THE END IS STOOD WITH THE LEVEL - the Rift, the Return and the landing back are placed by the host\'s own probe as the context is built, its doors shut, before a save or the room can open one; a door opened first moves all three (mutants: the stand left to the first unpaused frame)', () => {
   const D = read('src/scenes/dungeonContext.js');
   const at = D.indexOf('function standSdEnd()');
-  // PIN MOVED (SD-THROUGH): the host's probe is the end's one over its collider (scenes/superDungeon/sdEnd.js sdProbeOf - the
   // Way Through's too), asked in standSdEnd before the Rift is placed
   const p0 = D.indexOf('const probe = sdProbeOf(collider);', at);
   assert.ok(p0 > at && p0 < D.indexOf('const rift = sdRiftPlace(', at), 'the stand asks the end\'s probe');
@@ -106,7 +105,6 @@ test('AUDIT SD IV (R1): THE HOUR\'S LIGHT AFTER THE LAST FLAT - its blows, spoil
   // the arm: the record filled every frame, after the Rift's window; the Hour's light drawn here only under a window
   const rift = M.indexOf('if (dungeonCtx.sdEndLook) host.drawSdRift?.(');
   const kept = M.indexOf('_sdLate.on = isSdRealm(dungeonLoc); _sdLate.proj = proj; _sdLate.view = view; _sdLate.eye = mwv.eye;');
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE): the arm's window test is windowHoldsDungeon's - a window holds the dungeon offline, or over a death online (scenes/windowWorld.js)
   const under = M.indexOf('if (_sdLate.on && windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) host.drawSdTelegraph?.(_sdLate);');
   const overlay = M.indexOf('if (windowHoldsDungeon(dungeonCtx.uiOverlayActive, aliveUnder())) { dungeonCtx.hideHudText?.();');
   const foes = M.indexOf('dungeonCtx.drawFoes(dt, canvas, proj, view,');

@@ -1,10 +1,10 @@
-// PERF-ALLOC1 (2026-10-10, Mac: "Exterior performance is really bad"): the lanterns' face matrices made in place. The
+// PERF-ALLOC1: the lanterns' face matrices made in place. The
 // shadow pass makes six view-projections a lantern a frame (pointFaceMatrices), and each was a fresh projection, six
 // lookAt views and their twenty-four arrays - the real game at Knightstale by night (tools/frameProbe.mjs over the
 // freeware ARENA2): lookAt alone 47 KB of the 1.4 MB the frame allocated. They are written into two scratches now, by
 // lookAtInto and perspectiveInto (shadowPass.js - world/mat4.js is the relay's, and its bytes stay) - mat4.js's
 // arithmetic in its order, so its floats. The
-// record is `bible/07-Rendering/Performance-Arena.md` (PERF-ALLOC1).
+// record is ` ` (PERF-ALLOC1).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { lookAt, perspective, multiply } from '../../src/world/mat4.js';

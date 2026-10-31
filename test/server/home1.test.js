@@ -1,6 +1,4 @@
-// HOME1 (2026-09-25, Mac: "allowing online players to purchase housing in any location"; asked: "Housing is
-// exclusive. World is super large. Can revisit later if needed"; bought "At its front door"; a house bought offline
-// "Stay[s] offline only"; who walks in, "Owner chooses"): AN ONLINE HOME, ONE OWNER A BUILDING, SERVER-WIDE. The law
+// HOME1: AN ONLINE HOME, ONE OWNER A BUILDING, SERVER-WIDE. The law
 // both ends read (net/homeLaw.js), the account service's registry driven through the real Worker over node:sqlite
 // with every migration applied (server-account/src/homes.js), the client's door to it, and the deploy's wiring.
 // `06-Systems/Online-Arc.md` HOME1.
@@ -93,8 +91,8 @@ test('HOME1 the law: a home is a town\'s unsigned map id and a building key insi
   assert.deepEqual([homeMapIdOk(1), homeMapIdOk(0xffffffff), homeMapIdOk(0), homeMapIdOk(-5), homeMapIdOk(2 ** 32), homeMapIdOk(1.5), homeMapIdOk('1')], [true, true, false, false, false, false, false]);
   assert.deepEqual([homeBuildingKeyOk(1), homeBuildingKeyOk(HOME_KEY_MAX), homeBuildingKeyOk(0), homeBuildingKeyOk(HOME_KEY_MAX + 1)], [true, true, false, false]);
   assert.equal(HOME_KEY_MAX, 1 << 24, 'talkTopics makeBuildingKey spells key 0 as 1<<24');
-  assert.deepEqual([homeRegionOk(0), homeRegionOk(61), homeRegionOk(62), homeRegionOk(70), homeRegionOk(71), homeRegionOk(-1)], [true, true, true, true, false, false]);   // PIN MOVED (WW7-5)
-  // HOME-PRICE (PIN MOVED): the range a home costs online, its floor and its top - never 1 gold, never ten million
+  assert.deepEqual([homeRegionOk(0), homeRegionOk(61), homeRegionOk(62), homeRegionOk(70), homeRegionOk(71), homeRegionOk(-1)], [true, true, true, true, false, false]);
+  // HOME-PRICE (
   assert.deepEqual([homePriceOk(HOME_PRICE_MIN), homePriceOk(HOME_PRICE_MAX), homePriceOk(HOME_PRICE_MIN - 1), homePriceOk(HOME_PRICE_MAX + 1), homePriceOk(0), homePriceOk(5000.5)], [true, true, false, false, false, false]);
   assert.deepEqual([homeEntryOk('party'), homeEntryOk('friends'), homeEntryOk(null)], [true, false, false], 'an entry the law does not know');   // GUILD1d (re-aimed by content): `guild` is an entry now
   const row = (entry, mine = false) => ({ owner: 'Aldric', entry, mine });
@@ -132,7 +130,6 @@ test('HOME1 the service: a town\'s homes are any session\'s to read (a guest\'s 
   // the claim
   const c = await buy(aldric, A);
   assert.equal(c.status, 200);
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and the claim's home order, for every page online
   assert.deepEqual({ ...c.body, homeOrders: undefined }, { ok: true, home: { mapId: home().mapId, buildingKey: home().buildingKey, region: 17, character: A.id, entry: 'private', price: 42000, boughtAt: T0 }, refund: homeSaleRefund(42000), realm: { seq: 2 }, homeOrders: undefined });   // AUDIT HOME-PRICE C2: the claim says what its sale pays
   assert.equal(c.body.homeOrders?.length, 1);
   assert.deepEqual(await call('POST', '/v1/homes/claim', home({ buildingKey: 9 }), aldric), { status: 400, body: { error: 'realm-only' } }, 'no other id buys a house');
@@ -142,7 +139,7 @@ test('HOME1 the service: a town\'s homes are any session\'s to read (a guest\'s 
   const again = await buy(aldric, A);
   assert.deepEqual([again.status, again.body.repeat, again.body.home.character], [200, true, A.id], 'a claim sent again after a lost answer is answered as the claim');
   const A2 = await seatRealm(env, aldric, 'Aldric Two', RICH('Aldric Two'));   // the account's other character
-  // ACCOUNT-HOMES (2026-10-06): the house is the ACCOUNT's already - another of its characters asking is answered as the
+  // ACCOUNT-HOMES: the house is the ACCOUNT's already - another of its characters asking is answered as the
   // claim, the house still its buyer's purchase, and its own record pays nothing
   const at2 = await realmJoinAt(env, aldric, A2.id);
   const otherChar = await call('POST', '/v1/homes/claim', home({ character: A2.id, realm: at2 }), aldric);
@@ -171,7 +168,7 @@ test('HOME1 the service: a town\'s homes are any session\'s to read (a guest\'s 
   const fourth = await buy(aldric, A, { buildingKey: 4 });
   assert.deepEqual([fourth.status, fourth.body.error], [409, 'home-cap']);
   assert.equal((await buy(aldric, A2, { buildingKey: 4 })).status, 200, 'another character has its own three');
-  // HOUSES-3 (2026-10-27, the owner: "Up the house ownership limit to 3 houses per region"): three a REGION - the fourth
+  // HOUSES-3: three a REGION - the fourth
   // in another region lands, and its region has three of its own
   for (const k of [5, 6, 7]) assert.equal((await buy(aldric, A, { mapId: 1291010264, buildingKey: k, region: 18 })).status, 200, 'another region\'s three');
   const eighth = await buy(aldric, A, { mapId: 1291010264, buildingKey: 8, region: 18 });
@@ -201,7 +198,7 @@ test('HOME1 the service: a town\'s homes are any session\'s to read (a guest\'s 
   // shapes
   assert.equal((await call('POST', '/v1/homes/claim', home({ buildingKey: 0 }), aldric)).body.error, 'bad-home');
   assert.equal((await call('POST', '/v1/homes/claim', home({ price: 0 }), aldric)).body.error, 'bad-home');
-  assert.equal((await call('POST', '/v1/homes/claim', home({ region: 71 }), aldric)).body.error, 'bad-home');   // PIN MOVED (WW7-5): past the world's regions
+  assert.equal((await call('POST', '/v1/homes/claim', home({ region: 71 }), aldric)).body.error, 'bad-home');
   assert.equal((await call('POST', '/v1/homes/claim', home({ character: 'no spaces!' }), aldric)).body.error, 'home-character');
   assert.equal((await call('POST', '/v1/homes/town', { mapId: -1 }, aldric)).body.error, 'bad-home');
   // an account deleted takes its homes (the buildings stand free)
@@ -431,7 +428,7 @@ test('HOME1 a home\'s room carries no loot: it IS a room (its owner and their gu
   assert.deepEqual(shared.world.loot, [], 'the memory names no cupboard, even one marked seen');
   assert.deepEqual(shared.world.actions.map((a) => a.key), ['door:0'], 'the doors are the room\'s');
   const mine = ctx();
-  // INT1 (PIN MOVED): the peer's piece in the group its template stands in - the wire's item law takes no piece without one
+  // INT1 (
   const peer = { locationKey: key, stamp: 'other', world: { actions: [{ key: 'door:0', state: 'start', t: 0 }], loot: [{ k: 'container:0', r: [{ name: 'Rags', group: 'Gems', templateIndex: 2 }], d: 5 }] } };
   assert.equal(applyInteriorShared(mine, peer, { ...mintInteriorShared(key, { home: true }), today: 10 }), true);
   assert.deepEqual(mine.containers[0].items.map((i) => i.name), ['My Sword'], 'a peer\'s word never lands on the owner\'s chest');

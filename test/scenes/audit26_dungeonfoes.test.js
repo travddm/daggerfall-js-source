@@ -216,7 +216,7 @@ test('F218: applyWorld destroys the live foes past the snapshot (SerializableSta
   // retried, falsifying the law mobileEnemyActivate.js:"The flag is per-foe" states in
   // its own header. A PRE-PASS over the whole live pool, because the
   // per-record loop only ever visits the indices the record carries.
-  assert.match(XF, /spawnFoe\(sf\.mobileType, feet,/, 'the exterior pool RE-MINTS on restore, so its latch dies with the pool');   // PIN MOVED (SEALED-SAVE, FIELD BUGS 2026-10-05c): its feet the saved ones, or the moved marker's
+  assert.match(XF, /spawnFoe\(sf\.mobileType, feet,/, 'the exterior pool RE-MINTS on restore, so its latch dies with the pool');
   // Mounted, not matched: the statements below are the ones in src/.
   const run = (foes, w) => {
     const scope = new Proxy({ foes, w }, {
@@ -269,7 +269,7 @@ test('F036: the passive watch rolls, verbatim (PlayerEntity.cs:498-511)', () => 
 
 test('F036: the world host runs those rolls in the catch-up loop and calls SpawnCityGuards(FALSE) - REP1 RETIRED THE LEVY: the loop rolls none, and the witness arm\'s eye stops a known criminal instead', () => {
   // The witness arm of cityGuards.spawnCityGuards had NO production caller until F036 put the passive rolls in the loop.
-  // REP1 (the reputation overhaul, 2026-09-29, Mac: "Challenged on sight"): PIN MOVED - the per-minute levy is retired
+  // REP1 (the reputation overhaul, 2026-09-29):
   // (in town the watch about every hundred real seconds for a bad name, no guard anywhere near), and a guard who SEES a
   // known criminal stops them (scenes/standingHost.js, test/systems/rep1_watchstop.test.js). The loop rolls nothing for a name;
   // the roll's own law above is DFU's record (encounters.js keeps it, with no production caller).
@@ -486,7 +486,6 @@ test('F212: the world host collects both pools with the pixel, which is also wha
   // that one caller. F212's law is unweakened - the default is still
   // "collect", and every real unload takes both pools with it - so the
   // pin follows the signature and now also pins the DEFAULT.
-  // PIN MOVED (IC-SWAP-BEHIND, scenes/swapBehind.js): `carried` and `carryOnly` beside it - a rebuild behind its view takes its carry at the mark and not again at the swap; the default still collects
   const i = WORLD.indexOf('function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {})');
   const fn = WORLD.slice(i, WORLD.indexOf('\n  }\n', i));
   assert.ok(i > 0);
@@ -495,7 +494,6 @@ test('F212: the world host collects both pools with the pixel, which is also wha
   assert.ok(fn.includes('exteriorFoes.collectPixel(key);'), 'and the encounter pool\'s');
   // ClearStreamingWorld's CollectLooseObjects(true) is the teleport core
   // walking every built pixel through that same function.
-  // PIN MOVED (Road to 1:1, a3): the core took a fourth argument.
   // StreamingWorld.RepositionPlayer's `grounded` (:1587, :1592) is what
   // the court's location-entrance arm passes TRUE, so the signature now
   // reads `(px, py, localPos = null, { grounded = false } = {})`. Anchor
@@ -509,40 +507,25 @@ test('F212: the world host collects both pools with the pixel, which is also wha
   // stand at the head of the core too, because a fast travel is where
   // the calendar jumps weeks and the destination must not be skinned
   // for the month the player left.
-  // PIN MOVED (ROAD-Ar, R1/R0), 2100 -> 2600: that straightening now
   // reads the ARRIVAL clock the caller passes (performFastTravel
   // raises time only AFTER TeleportToCoordinates, :333/:344, so the
   // one clock still read the departure date here), and the core also
   // drops the season re-skin's motor hold on its way past. Both notes
   // sit above these needles; the needles themselves are unchanged.
-  // PIN MOVED AGAIN (CLOSEOUT), 2600 -> 2800: the straightening now
   // raises a latch the frame's season poll honours across the awaited
   // destination build, which is two more statements above the needles.
-  // PIN MOVED AGAIN (BLOOD1 AUDIT 2), 2800 -> 3700: the sweep now
   // clears the splash pool and its ring beside the missiles and the
   // arrows, with its own note, above the needles.
-  // PIN MOVED AGAIN (AUDIT BRANCH (WoD)), 3700 -> 3900: the sweep now also
   // clears DFU's terrain array and raises the markers' arrival gate, two
   // statements beside the carry's, above the needles.
-  // PIN MOVED AGAIN (AUDIT SURV-TIERS, the third pass, at the merge of
   // main), 3900 -> 4600: the camps now go through natives across the
   // re-anchored frame, their snapshot and teardown with their own note
   // above the needles.
-  // PIN MOVED AGAIN (PERF-EXT21), 4600 -> 5400: the sweep now empties the
   // grass field too - a crossing no longer does it - with its own note,
   // above the needles.
-  // PIN MOVED AGAIN (CSA-F), 5400 -> 5600: the core now raises Come Sail
   // Away's OnTeleportToCoordinates beside DW-D's (the waves laid a tenth of
   // a second on), one statement above the needles.
-  // PIN MOVED (AUDIT OW5 J2), 5600 -> 6600: a jump stops a route's walk first thing, with its note
-  // PIN MOVED (AUDIT CLIMB-ARC F6), 6600 -> 6800: the climb's feel resets beside the recoiler, one statement above
-  // PIN MOVED (RVN10), 6800 -> 7000: a jump out of a fight routs me before the sweep, one statement above
-  // PIN MOVED (AUDIT LW-II-2 H9), 7000 -> 7300: the stood hideout let go beside the camps, with its note, above the needles
-  // PIN MOVED (HELM-JUMP, FIELD BUGS 2026-10-11), 7300 -> 7800: a jump lets go of Come Sail Away's helm first, with its note
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G2/P7, at the merge of main), 7800 -> 8100: a pixel this game does not stream is landed
   // where the world stands (`_streamedLanding`) beside the resets, with its note - three lines above the needles
-  // PIN MOVED (AUDIT PRECIP HOST-2), 8100 -> 8300: the snow's clock takes the arrival's minute beside the season's, one statement
-  // PIN MOVED (AUDIT DEX C1), 8300 -> 8700: PlayerGPS's own rect flag dropped beside the host's, one statement above (the
   // needle stands at 8486)
   const core = WORLD.slice(t, t + 8700);
   assert.ok(core.includes('destroyPixel(bx, by);'),
@@ -574,7 +557,7 @@ test('F045: a night sky that cannot load degrades to the gradient instead of fre
   // degraded; the NIGHT branch awaited two fetches bare.
   // DaggerfallSky.LoadVanillaNightSky (:565-604) reads local files
   // synchronously and has no such guard to wedge.
-  // ES1 (2026-08-27): the skin defaults to ENHANCED and the enhanced sky
+  // ES1: the skin defaults to ENHANCED and the enhanced sky
   // builds no panorama at all, so this test - which is about the CLASSIC
   // panorama path - asks for that path by name, the way a player who
   // wants the painted sky does.

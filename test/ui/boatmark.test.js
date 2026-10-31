@@ -1,6 +1,4 @@
-// BOAT-MARK (2026-10-01, the field: a Large Boat put in from its deed, her owner killed aboard her and woken at a
-// temple - "is there any way to know where your ships are located at?", then "I want to build a compass icon that
-// tracks your boat").
+// BOAT-MARK.
 //
 // YOUR BOATS ON THE COMPASS. A Large Boat's deed is spent on placing, the boat is kept where she was left, and the
 // compass marked the sea's ships alone. Now:
@@ -10,7 +8,7 @@
 //   - both compasses draw each as a little boat - a sail over a hull - in one teal: the classic box (ui/hud/hud.js
 //     drawBoatCompassMarks) and the enhanced strip (ui/enhanced/enhancedHud.js);
 //   - the street's host hands them on the street alone, under the travel view too (scenes/world.js), line-neutral.
-// bible/03-World/Come-Sail-Away.md, BOAT-MARK.
+// BOAT-MARK.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

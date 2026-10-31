@@ -1,5 +1,5 @@
-// REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12, option A): AUDIT TIMEFREE's pins, restored
-// with the reading they audit (test/audit_timefree.test.js, DELETED by QCLOCK-WORLD; bible/01-Overview/audits/Audit-Timefree.md).
+// REST8: AUDIT TIMEFREE's pins, restored
+// with the reading they audit (test/audit_timefree.test.js, DELETED by QCLOCK-WORLD).
 // Every vendored clock was read by hand against the reading, the main quest's whole, and each misreading found is pinned
 // here over the real script: the closings that never closed (T1), the letters and arrivals a conditional `when` froze
 // (T2), the endings a sequenced beat froze and the "at once" clocks (T3), the item a closing hands over and the reward
@@ -172,7 +172,7 @@ test('REST8 (AUDIT TIMEFREE T7 retired with the freeze): a deadline armed at not
   }
 });
 
-// ═══ AUDIT TIMEFREE II (2026-10-02, Mac: "One more audit") - the real machine, ticked: what a player meets ═══
+// ═══ AUDIT TIMEFREE II - the real machine, ticked: what a player meets ═══
 // The scripts' map placements (`place npc`, `create npc at`) want a loaded world; headless they throw and abort the
 // quest's update, so the machine here reads each script without those lines - every clock, task and `when` is the
 // script's own. REST8: online the hosts' played step and the session's raises, as world.js hands them; the sky held at

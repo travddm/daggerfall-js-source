@@ -1,6 +1,4 @@
-// GUILD-SHELF (2026-09-27, Discord - Bagneres, "Potion seller restock instantly": "You only have to close the
-// shopping window and the potions are available to purchase again. I dont know if its a bug, but you could buy
-// infinite amount of potions this way"). A guild's Buy shelf is the DAY'S: minted once, bought down by the trade
+// GUILD-SHELF. A guild's Buy shelf is the DAY'S: minted once, bought down by the trade
 // window, and restocked when the day turns - kept on the building through the scene hand-off and the save.
 // AUDIT A4: kept AS LONG AS THE HALL'S SCENE IS - a map pixel left drops the town's scenes (world.js clearSceneCache),
 // and the next open mints the day's shelf again; the known limit, recorded in Field-Bugs-2026-09-27e.md.

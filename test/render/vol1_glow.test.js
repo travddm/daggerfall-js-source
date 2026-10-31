@@ -1,4 +1,4 @@
-// VOL1 / BOUNCE1 (2026-09-23, Mac: "Continue" - the second arc's last step): THE LANTERNS' GLOW THROUGH THEIR
+// VOL1 / BOUNCE1: THE LANTERNS' GLOW THROUGH THEIR
 // SHADOWS, AND THEIR BOUNCE.
 //
 // EL1's glow was one closed-form integral per lantern per FRAGMENT in every world shader, unshadowed - a lamp behind

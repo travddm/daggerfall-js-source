@@ -1,4 +1,4 @@
-// MUDEX1 (2026-10-20, Mac: "We need to make everything compatible. No if ands or vutts", then "Approve MUDEX") - MEANER
+// MUDEX1 - MEANER
 // MONSTERS BESIDE DAGGERFALL ENEMY EXPANSION IS MUDEX. Ralzar's Meaner Monsters finds DEX by its GUID and asks the player
 // to switch to MUDEX, its author's form of it for that mod (MeanerMonsters.cs:159-164); the port makes the switch. MUDEX
 // is two tables in DEX's own format, read by DEX's reader after DEX's own (BestiaryMod.GetDBAssets walks the enabled

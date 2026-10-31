@@ -9,7 +9,7 @@
 // AUDIT (the same day): the cadence's distance is the camera's that draws - the zoomed-out boom's, not the head's - over
 // its lens (the spyglass's), for the pool's horses and the bodies alike; a body that must pose out of the view poses its
 // horse with it.
-// bible/07-Rendering/Performance-Priority.md HORSE-VIEW.
+// HORSE-VIEW.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

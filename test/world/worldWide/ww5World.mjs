@@ -1,4 +1,4 @@
-// WW5 (bible/03-World/World-Wide.md WW5): THE FREEWARE'S WORLD AS THE WORLD HOST MAKES IT, for the stars' and the Hollows'
+// WW5 (WW5): THE FREEWARE'S WORLD AS THE WORLD HOST MAKES IT, for the stars' and the Hollows'
 // tests - the player's own ARENA2 (ARENA2_PATH; sh tools/fetch-data.sh), MAPS.BSA's rows, the Bay's gate scan (the
 // world host's gateScanner over the map files), TAMRIEL2's composed ground and politic (the trace and its shipped fit),
 // and the world's registry with the Bay's places and TESA's (the capitals and Arena's places as the live list WW7-1

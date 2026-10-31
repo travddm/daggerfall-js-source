@@ -1,4 +1,4 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL ON THIS PAGE (src/systems/festival/
+// WITCH1: THE WITCHES' FESTIVAL ON THIS PAGE (src/systems/festival/
 // festivalClient.js) - the finds a kill of mine and an act ask for, the pack restacked to the service's counts (its cakes
 // and its bowls), a sale kept on the save until its answer lands and minted once whatever asks overlap, kept under the
 // account that made it, the reason a guest is told, and nothing asked at all while the festival is not live here.

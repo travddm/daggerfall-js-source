@@ -1,4 +1,4 @@
-// GRANT4, GRANT6, GRANT8 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 14-16): THE
+// GRANT4, GRANT6, GRANT8: THE
 // CLIENT'S SIDE OF THE LAST SLICES, over FOE-FORGE's rig (real encounter pools, each with its own grants' host and a fake
 // relay signing real grants): the watch rides on its grant; marks a caller decided ask `kept`; a room's grants stay its
 // own; while the law enforces an owner stands nothing without a grant and a reader stands down only a forged grant or
@@ -85,7 +85,7 @@ async function player(R, id, { mode, room, climate = () => 231, wait = 300, verd
 const watchman = () => ({ mobileType: 146, gender: 'male', ai: { feet: [5, 0, 5], yaw: 0, target: null, moving: false }, entity: { health: 30, maxHealth: 30, level: 9, items: [] }, dead: false });
 
 test('GRANT6 THE LAW\'S WORDS: a case\'s reasons are what only a changed client gives - a grant never signed, another\'s, a member past it, marks past it, a member twice; an enforcing reader stands those down and a record with none; the rest (a record that beat its carry or renewal, a level since its checkpoint, a species off its tables) are the measure\'s (mutants: a timing word counted against a sender)', () => {
-  assert.deepEqual(GRANT_CASE_REASONS, ['unsigned', 'sender', 'member', 'marks', 'twice', 'stats']);   // PIN MOVED (FOE-BOUNDS, Spawn-Grants section 19): a health past every builder's worst is no timing and no setting
+  assert.deepEqual(GRANT_CASE_REASONS, ['unsigned', 'sender', 'member', 'marks', 'twice', 'stats']);
   assert.deepEqual(GRANT_STANDDOWN_REASONS, [...GRANT_CASE_REASONS, 'ungranted']);
   assert.ok([...GRANT_STANDDOWN_REASONS].every((r) => GRANT_READER_REFUSALS.includes(r)));
   assert.deepEqual(GRANT_READER_REFUSALS.filter((r) => !GRANT_STANDDOWN_REASONS.includes(r)), ['cell', 'expired', 'dice']);
@@ -129,7 +129,7 @@ test('GRANT6 THE READER WAITS FOR A GRANT IT HAS NOT HEARD, AND A LEVEL OR TWO: 
   await new Promise((r) => setTimeout(r, 50));
   host.heard(OWNER, [gr]);
   assert.equal(await late, null, 'heard inside the wait: judged, and honest');
-  assert.equal(await host.check(OWNER, CELL, { i: 2, t: 0, gr: [8, 0] }), 'ungranted', 'never carried');   // PIN MOVED (GRANT-UNHEARD): unheard, never `unsigned`
+  assert.equal(await host.check(OWNER, CELL, { i: 2, t: 0, gr: [8, 0] }), 'ungranted', 'never carried');
   assert.equal(await host.check(OWNER, CELL, { i: 3, t: 135, l: 9 + GRANT_LEVEL_SLACK, gr: [7, 1] }), null, 'a level or two since its checkpoint');
   assert.equal(await host.check(OWNER, CELL, { i: 4, t: 135, l: 10 + GRANT_LEVEL_SLACK, gr: [7, 2] }), 'dice');
 });

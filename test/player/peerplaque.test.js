@@ -1,10 +1,9 @@
-// PEER-PLAQUE1 (2026-09-22, Mac: "Using the world tooltip implementation
-// for other players and interaction prompt"): ANOTHER PLAYER UNDER THE
+// PEER-PLAQUE1: ANOTHER PLAYER UNDER THE
 // CROSSHAIR IS NAMED BY THE WORLD PLAQUE, with the acts the interact
 // key would open under the name. The pick is SOC5's own (pickPeerInFront
 // over peersNear, SOCIAL_REACH, rayPersonDistance), dressed for the
 // race (peerRayPick); the words are the F-menu's own bag (actionsFor +
-// tradeActionsFor) - ACT-MENU (2026-09-23): the card's own rows are the
+// tradeActionsFor) - ACT-MENU: the card's own rows are the
 // plaque's (ui/socialMenu.js socialPlaqueRows, pinned in
 // test/systems/disc7.test.js and test/systems/auditdisc7.test.js), the relation its sub
 // line (peerRelationText); the racer stands between

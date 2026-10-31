@@ -1,4 +1,4 @@
-// MACRO-3 (2026-09-22, the macro audit): FOUR BOXES THAT NEVER WALKED.
+// MACRO-3: FOUR BOXES THAT NEVER WALKED.
 // The broken-item line (TEXT.RSC 29, "%it is broken."), the drop-gold
 // prompt (25, "You have %gii gold pieces"), the classic skin's mastery
 // box (4020, "Congratulations, %pcn, You are now a Master of %ski") and

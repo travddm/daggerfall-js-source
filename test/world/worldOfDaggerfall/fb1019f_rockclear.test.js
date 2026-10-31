@@ -9,7 +9,7 @@
 // the world frame settles the gate every frame with the walking body - none while a jump's landing builds, which the
 // landing's own law reads whole; and a bucket dropped anywhere (a pixel streamed out) forgets its withheld parts.
 // Driven on the REAL motor, collider and streaming state, the providers in the pixel build's own shape.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-19f.md ROCK-CLEAR; bible/03-World/Player-Arc.md UNSTUCK-OUT, DECOR-CLEAR.
+// ROCK-CLEAR; UNSTUCK-OUT, DECOR-CLEAR.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

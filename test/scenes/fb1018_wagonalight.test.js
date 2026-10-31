@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-18 WAGON-ALIGHT (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, Nauya: "when they dismount from
+// FIELD BUGS 2026-10-18 WAGON-ALIGHT (, Nauya: "when they dismount from
 // the wagon, they just drop down inside of it, and they get stuck in your wagon unable to help you or move out of it").
 // A companion's seat in the wagon's back was read by the motor alone, so a seat that went (the wagon parked) left the
 // body where it sat - and the parked wagon's box, kept from closing round the PLAYER's capsule only, stood round it.

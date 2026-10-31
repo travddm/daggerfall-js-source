@@ -1,5 +1,4 @@
-// LA-POST (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues, performance
-// improvements and just a complete detailed overhaul to make this insanely better") - THE POST CHAIN, AUDITED.
+// LA-POST - THE POST CHAIN, AUDITED.
 // render/airPass.js's screen-space passes, each fix pinned where it can be run: the shaders' own text through the
 // GLSL evaluator (test/glsl.mjs) against synthetic frames and depths, the JS mirrors of what the shaders keep, and the
 // lifecycle on a fake GL.

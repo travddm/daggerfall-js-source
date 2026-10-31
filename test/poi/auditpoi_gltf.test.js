@@ -1,5 +1,5 @@
-// AUDIT POI, lane E (2026-10-15; bible/06-Systems/POI-Editor-Arc.md POI-4 and POI-6's A MODEL BACK OUT) - THE glTF READER
-// AND WRITER, AUDITED. Mac: "Audit everything. Ensure perfection." Each finding pinned by a file that exercises exactly it,
+// AUDIT POI, lane E - THE glTF READER
+// AND WRITER, AUDITED. Each finding pinned by a file that exercises exactly it,
 // built byte by byte to the Khronos specification or written by the editor's own export (src/poi/gltfExport.js) and read
 // back by its own importer (src/poi/gltfImport.js, src/poi/poiImport.js):
 //   - G1 a large model baked (its arrays were spread into a call, past V8's limit on arguments);

@@ -1,5 +1,4 @@
-// AUDIT FLICKER (2026-09-30, a player: "interior lights flickering and not casting right"; the ask: "investigate
-// shadow flickering with enhanced lighting") - THE SHADOWS THAT CHANGED WHEN NOTHING DID.
+// AUDIT FLICKER - THE SHADOWS THAT CHANGED WHEN NOTHING DID.
 //
 // Four passes over the lane (the sun, the lamps, the frame's records, the receivers) found the frames where a shadow
 // moved, came or went with nothing in the world moving. Each fix is pinned here by what it does - the GLSL through the

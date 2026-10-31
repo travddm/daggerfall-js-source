@@ -1,5 +1,4 @@
-// QUEST-OWNER (2026-10-12, Mac: "quest mobs that get spawned in dungeons to only appear for the questowner or the
-// questowners party so he gets credit, same for the main quest", then "Yes quest monsters always owner and its party"):
+// QUEST-OWNER:
 // everywhere - underground, in a building, in the open air - a quest's foe - a side quest's or the main
 // quest's, whose dungeons are fixed and so shared by every player on that step - stands, is struck and hunts for its
 // owner's party alone (scenes/quest/questFoeHost.js partyOnlyQuestShare over the world host's seam, the dungeon's ownShare).

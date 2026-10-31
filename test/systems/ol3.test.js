@@ -1,4 +1,4 @@
-// OL3 (Mac, 2026-09-14: "Go ahead and get these done per your opinion") -
+// OL3 -
 // THE CLOCK DOES NOT PUNISH ABSENCE. Three of AUDIT WORLD5's recorded
 // items, paid. (1) Every world-time deadline runs on wall time through a
 // logout; the shared world keeps one clock, so the price is SAID in real
@@ -12,7 +12,7 @@
 // year from this machine's is SAID - the console and the HUD line - rather
 // than run uncorrected in silence.
 //
-// LIVED1 (2026-09-29) re-aims (1)'s deadlines: a room, a loan and a
+// LIVED1 re-aims (1)'s deadlines: a room, a loan and a
 // repair run on the CHARACTER's own clock now (worldTick.js ownMinutes),
 // which stands while they are away - so the price is said in THEIR time
 // and in play (ownTimeLeftText), not as a wall-clock date the character's

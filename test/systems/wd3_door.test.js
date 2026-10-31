@@ -1,5 +1,4 @@
-// WD3 (2026-10-01, Mac: "These are the next mods I'd like to implement (We have permission) and ensure this doesn't
-// conflict or regress anything (For example housing customization)") - THE WORLD-DATA DOOR WITH TWO TOWN MODS ON IT
+// WD3 - THE WORLD-DATA DOOR WITH TWO TOWN MODS ON IT
 // (src/formats/worldData/worldDataReplacement.js, scenes/modWorldData.js), and the laws of Daggerfall's the two mods meet.
 //
 // Held here: a name two mods carry answers from the later-loaded mod (ModManager.TryGetAsset's reverse load order -

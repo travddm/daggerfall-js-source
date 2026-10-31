@@ -1,9 +1,8 @@
-// CRAFT3 (2026-10-07, Mac: "How could we enhance the profession element of the game while reducing complexity and
-// making crafting more viable"; then "Lets do it") - FIVE CRAFTS, NOT EIGHT: Smithing with Jewelcrafting, Building of
+// CRAFT3 - FIVE CRAFTS, NOT EIGHT: Smithing with Jewelcrafting, Building of
 // Carpentry and Masonry, Outfitting, Provisioning of Alchemy and Cooking, Enchanting. The disciplines stay - a Ring is
 // Jewelcrafting's, the Gemcutter its choice - and the TRACK is the craft's (net/professionLaw.js trackOf); 0088 merges
 // the eight tracks a character held (the higher's XP, its choices, the lost one's change free). The done-when: a Ring and
-// a Dagger raise one Smithing through the real Worker; the merge as 0088 writes it. bible/06-Systems/Professions-Arc.md 41.
+// a Dagger raise one Smithing through the real Worker; the merge as 0088 writes it. 41.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -43,7 +42,7 @@ test('CRAFT3 DONE WHEN: a Silver Ring and an Iron Dagger raise one Smithing trac
     assert.equal(r.ok, true, `${id}: ${JSON.stringify(r)}`);
     made.push([id, r.data.track.profession, r.data.xp]);
   }
-  const each = craftXp(1, 0) + 500;   // PIN MOVED (FIRST-BUDGET): Smithing's first-make share, the 500 a first always paid it
+  const each = craftXp(1, 0) + 500;
   assert.deepEqual(made, [['ring:silver', 'smithing', each], ['dagger:iron', 'smithing', each]]);
   assert.equal(book.track('smithing').xp, 2 * each);
   assert.equal(book.track('jewelcrafting'), book.track('smithing'), 'a discipline\'s track its craft\'s');
@@ -154,7 +153,7 @@ test('CRAFT3 law: ten tracks - the five that gather, the five that craft; eight 
   assert.deepEqual([ids('outfitting', 50), ids('enchanting', 100), ids('mining', 50)], [['tailor', 'leatherworker'], ['soulbinder', 'runecaster'], ['prospector', 'deep-delver']]);
   assert.deepEqual(['gemcutter', 'sculptor', 'chef', 'tailor', 'prospector', 'nobody'].map(specDiscipline), ['jewelcrafting', 'masonry', 'cooking', 'outfitting', 'mining', null]);
   assert.deepEqual([specOk('jewelcrafting', 50, 'weaponsmith'), specOk('smithing', 100, 'lapidary'), specOk('building', 50, 'sculptor'), specOf('masonry', 100, 'sculptor')?.name], [true, true, false, 'Sculptor']);
-  // a choice whose slice is to come is named, never chosen (AUDIT 29 A17) - the Couturier, the Saddler; PIN MOVED
+  // a choice whose slice is to come is named, never chosen (AUDIT 29 A17) - the Couturier, the Saddler
   // (HUNTERS-MARK): the Trophy Hunter is chosen since its trophy was built (Professions-Arc 58)
   assert.deepEqual([specOk('hunting', 100, 'trophy-hunter'), specOk('outfitting', 100, 'couturier'), specOk('outfitting', 100, 'saddler'), specOk('hunting', 100, 'butcher')], [true, false, false, true]);
   for (const p of PROFESSIONS) for (const r of SPEC_RANKS) assert.equal(SPECIALISATIONS[p.id][r].length, disciplinesOf(p.id).length > 1 ? 4 : 2, `${p.id} ${r}`);
@@ -204,7 +203,7 @@ test('CRAFT3 service: the merge\'s free change - no Marks, in effect at once, an
   const dish = await book.craft('stew:north', { clean: false, name: 'Mac' }, (data) => mintPieces(data));
   assert.equal(dish.ok, true, JSON.stringify(dish));
   assert.deepEqual([dish.data.track.profession, dish.data.xp, dish.data.track.xp], ['provisioning', 100, xpForRank(51) - 1], 'held one short of 51');
-  assert.ok(cookXp(50) + firstCraftXp(recipeById('stew:north')) > dish.data.xp, 'the cap is what held it');   // PIN MOVED (FIRST-BUDGET)
+  assert.ok(cookXp(50) + firstCraftXp(recipeById('stew:north')) > dish.data.xp, 'the cap is what held it');
 });
 
 // ─── THE PAGE ────────────────────────────────────────────────────────

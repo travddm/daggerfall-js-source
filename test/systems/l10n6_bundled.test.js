@@ -1,4 +1,4 @@
-// L10N6 (2026-10-03, Mac: "build it, bundle nothing"): A PACK THE TREE BUNDLES, AT WORK. Where an author's terms allow
+// L10N6: A PACK THE TREE BUNDLES, AT WORK. Where an author's terms allow
 // it, `locales/<tag>/pack/` holds their Daggerfall Unity pack as a player would install it (tools/l10nPack.mjs checks
 // what it must carry). The language loader (scenes/localeData.js) lays it over the machine drafts and beneath a pack the
 // player installs: drafts < bundled < installed, table by table and document by document - the player's own choice is

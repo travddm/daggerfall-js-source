@@ -1,4 +1,4 @@
-// LW16 (bible/06-Systems/Living-World-II.md "LW16"): THE WORD TRAVELS - what happens in one town is heard in the next.
+// LW16 ("LW16"): THE WORD TRAVELS - what happens in one town is heard in the next.
 // The law (systems/livingWorld/carried.js: the word a visit carries from its town as it stood when it set out, known
 // from its coming in for NEWS_DAYS, a courier's one hop further; the character's repute, read and bounded); the town's
 // talk of it (lines.js newsScript's CARRIED_SHARE, its opener, a party robbed's words); the living town's half on the
@@ -140,7 +140,7 @@ test('LW16 the living town: any town\'s deeds (the word a visitor carries from t
   const roads = { away: new Map(), visitors: [], news: [road('own', D - 30, { helped: true, kind: 'won' })] };
   const day = Math.floor((D + 600 - 240) / DAY_MIN);
   let carried = [];
-  const { town, rel } = makeTown(roads, { carriedOf: (d) => (d === day ? carried : null) });   // PIN MOVED (AUDIT LW-II-2 W10): the word through the host's carriedOf, the game's one path (the roads' word carried none - no producer wrote it)
+  const { town, rel } = makeTown(roads, { carriedOf: (d) => (d === day ? carried : null) });
   // any town's deeds
   rel.turn('slain', 'L1.4@3', { t: D + 100, seen: true, who: 'Bo Brine' });
   assert.deepEqual(town.deedNews(D + 1000, A).map((x) => [x.kind, x.who]), [['slain', 'Bo Brine']]);
@@ -155,7 +155,7 @@ test('LW16 the living town: any town\'s deeds (the word a visitor carries from t
   lone.rel.turn('held', `R17.${D + 50}~2`, { t: D + 50, who: 'Cy Moss' });
   assert.equal(lone.town.deedNews(D + 500).length, 1, 'a robbery alone is told');
   // the word carried in: a party from Wayrest come in, its fight the character turned and Bo struck down there
-  carried = [visit(A, D + 600, D + 900, [road('a1', D + 100, { kind: 'won', helped: true })])];   // PIN MOVED (AUDIT LW-II-2 W10): the word through the host's carriedOf, the game's one path (the roads' word carried none - no producer wrote it)
+  carried = [visit(A, D + 600, D + 900, [road('a1', D + 100, { kind: 'won', helped: true })])];
   town._roadsOf(day);
   const ctx = town.lineCtx(D + 1000);
   const far = ctx.news.filter((x) => x.carried);
@@ -190,7 +190,7 @@ test('LW16 the living town: any town\'s deeds (the word a visitor carries from t
   ready = [visit(A, D + 600, D + 900, [road('a9', D + 100)])];
   assert.deepEqual(hosted.town.carriedAt(D + 1000).map((x) => x.key), ['trip:a9'], 'told once done');
   // with nothing known: as ever
-  const quiet = makeTown({ away: new Map(), visitors: [], news: [] }, { carriedOf: () => [] });   // PIN MOVED (AUDIT LW-II-2 W10): the word through the host's carriedOf, the game's one path (the roads' word carried none - no producer wrote it)
+  const quiet = makeTown({ away: new Map(), visitors: [], news: [] }, { carriedOf: () => [] });
   quiet.town._roadsOf(day);
   for (let m = 0; m < 100; m++) { const w = quiet.town.greetingFor(stranger, D + 1000 + m * 7, true); assert.ok(words.has(w)); }
   assert.deepEqual(quiet.town.reputeAt(D + 1000), { regard: 0, deeds: [] });
@@ -200,7 +200,7 @@ test('AUDIT LW-II LW16: a visit\'s deeds read once, not every minute; a courier\
   const roads = { away: new Map(), visitors: [], news: [road('own', D + 700, { helped: true, kind: 'won' })] };
   const day = Math.floor((D + 600 - 240) / DAY_MIN);
   let carried = [];
-  const { town, rel } = makeTown(roads, { carriedOf: (d) => (d === day ? carried : null) });   // PIN MOVED (AUDIT LW-II-2 W10): the word through the host's carriedOf, the game's one path (the roads' word carried none - no producer wrote it)
+  const { town, rel } = makeTown(roads, { carriedOf: (d) => (d === day ? carried : null) });
   rel.turn('slain', 'L1.4@3', { t: D + 100, seen: true, who: 'Bo Brine' });
   carried = [visit(A, D + 600, D + 900, [])];
   town._roadsOf(day);
@@ -221,7 +221,7 @@ test('AUDIT LW-II LW16: a visit\'s deeds read once, not every minute; a courier\
   const courier = visit(C, D + 600, D + 900, [], { courier: true, relay: [back] });
   assert.deepEqual(carriedNews([courier], D + 1000, { here: TOWN.mapId }), [], 'its own word');
   assert.equal(carriedNews([courier], D + 1000).length, 1, 'any other town\'s word comes on');
-  const r2 = makeTown({ away: new Map(), visitors: [], news: [] }, { carriedOf: (d) => (d === day ? [visit(A, D + 600, D + 900, [])] : null) });   // PIN MOVED (AUDIT LW-II-2 W10): the word through the host's carriedOf, the game's one path (the roads' word carried none - no producer wrote it)
+  const r2 = makeTown({ away: new Map(), visitors: [], news: [] }, { carriedOf: (d) => (d === day ? [visit(A, D + 600, D + 900, [])] : null) });
   r2.rel.turn('routed', `O17.${D + 50}`, { t: D + 50, who: 'the Red Hand' });
   r2.town._roadsOf(day);
   const past = D + 50 + DEED_KNOWN_MIN + NEWS_DAYS * DAY_MIN + 10;   // past its own days, inside the visit's
@@ -245,7 +245,7 @@ test('AUDIT LW-II LW15 client: the buyer the day\'s holder of the place - a newc
   assert.ok(people.some((r) => r.id.endsWith('~1')), 'the newcomer holds it');
   for (let seed = 0; seed < 50; seed++) {
     const b = town.patronOfSale(seed, t);
-    assert.equal(b.id, people.find((r) => placeKeyOf(r) === patronOf(seed, town.residents).id).id);   // PIN MOVED (AUDIT LW-II-2 W2): the place dealt over the census (every reader's), named by its holder that day
+    assert.equal(b.id, people.find((r) => placeKeyOf(r) === patronOf(seed, town.residents).id).id);
     assert.ok(!town.residents.some((r) => r.slot === 3 && r.roll === 'h' && r.id === b.id), 'never the gone');
   }
   // B2: the errand an appointment
@@ -291,7 +291,7 @@ test('AUDIT LW-II LW15 client: a town\'s patrons\' word reaches its households\'
   assert.ok(visit, 'the word made the day again: the errand walked');
   // AUDIT LW-II B12: the place's holder that day walks it - a newcomer where the census's own is gone
   const nt = makeTown({ away: new Map(), visitors: [], news: [] }, { patronsOf: () => word, holderOf: (r) => (r.roll === 'h' ? { ...r, id: `${r.id}~1`, name: `New ${r.name}` } : r) });
-  const np = nt.town.peopleOf(day), nb = np.find((r) => placeKeyOf(r) === patronOf(seed, nt.town.residents).id);   // PIN MOVED (AUDIT LW-II-2 W2): the place dealt over the census, walked by its holder that day
+  const np = nt.town.peopleOf(day), nb = np.find((r) => placeKeyOf(r) === patronOf(seed, nt.town.residents).id);
   assert.ok(nb.id.endsWith('~1'));
   assert.ok(nt.town.planOf(nb, day).some((e) => e.at?.key === at.key && e.kind === 'shop'), 'the newcomer walks in');
   assert.equal(visit.t0, day * DAY_MIN + 240 + 600);

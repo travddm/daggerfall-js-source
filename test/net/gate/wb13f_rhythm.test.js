@@ -1,8 +1,8 @@
-// WB13f (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE RHYTHM - no
+// WB13f: THE RHYTHM - no
 // attack more than twice running (with the fighters spread, phase one was the Charge in 36 of 50 attacks, 28 back to
 // back: now he walks in, and a walk-in of six seconds breaks the run, so one who keeps away is charged again), and his
 // heaviest blows recover longer, in a spent pose a fighter can punish - slower, never
-// faster (Mac, WBX: "I dont think making mechanics faster is the play") (bible/11-Multiplayer/World-Bosses.md section
+// faster (section
 // 20, WB13f).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

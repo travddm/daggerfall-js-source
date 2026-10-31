@@ -1,5 +1,4 @@
-// ZONE-SAFE (2026-10-25; bible/11-Multiplayer/Wild-Zone.md section 26), the owner: "Btw with the pvp changes. All cities
-// should be considered safe zones" - and, asked which places, "Every settlement". In the open zone no player's blow or
+// ZONE-SAFE, - and, asked which places, "Every settlement". In the open zone no player's blow or
 // spell lands in the streets of a city, a town or a village, nor out of them: the law (systems/wild/zoneSafe.js
 // settledAt - DFU's location rect over the place a point stands on, of a settlement's kind), my word on the zone (0 in
 // the streets, so the relay's referee refuses every blow into and out of them), every door of mine (no body in the
@@ -122,7 +121,7 @@ test('ZONE-SAFE THE REFEREE (net/wild/wildRef.js, unchanged): a blow lands only 
   const now = 1_000_000;
   for (const [aIn, bIn, ok] of [[true, true, true], [true, false, false], [false, true, false]]) {
     const st = newWildRef();
-    // both stood in the zone - PIN MOVED (ZONE-GRACE, Wild-Zone.md section 3b): since before an entry's safe passage, which
+    // both stood in the zone
     // refuses every player's blow its first minute; then each says where it stands now - 0 a step into a settlement's streets
     for (const [sub, id, x] of [['a', 'A', 0], ['b', 'B', SIEGE_UNITS_PER_M]]) wildZone(st, sub, { id, lv: 10 }, true, { x, y: 0, z: 0 }, now - WILD_GRACE.ms - 20_000);
     wildZone(st, 'a', { id: 'A', lv: 10 }, aIn, { x: 0, y: 0, z: 0 }, now - 10_000);
@@ -247,11 +246,11 @@ test('ZONE-SAFE THE WORDS (zoneSafe.js zoneSafeFrame, ZONE_SAFE_TEXT; the frame,
   const doc = { createElement: () => { const e = { children: [], style: {}, className: '', textContent: '', append: (...c) => e.children.push(...c), addEventListener: () => {} }; return e; }, createTextNode: (s) => ({ textContent: s }) };
   const legend = buildZoneLegend(/** @type {any} */ (doc));
   const find = (e, cls) => (e.className?.split(' ').includes(cls) ? e : e.children?.map((c) => find(c, cls)).find(Boolean));
-  const laws = find(legend, 'hmwild-rules').children.map((c) => c.textContent);   // PIN MOVED (the merge with AUDIT TESA II M5: Cyrodiil's travel law among the laws)
+  const laws = find(legend, 'hmwild-rules').children.map((c) => c.textContent);
   assert.deepEqual([laws[0], laws[1]], [ZONE_RULES[0], ZONE_SAFE_TEXT.rule], 'the settlements\' peace beside the first law');
   assert.deepEqual(laws.filter((l) => l !== ZONE_SAFE_TEXT.rule && ZONE_RULES.includes(l)), [...ZONE_RULES], 'every other law, in its order');
   assert.equal(laws.length, ZONE_RULES.length + 2, 'the zone\'s laws, the peace and the travel law');
-  assert.match(rd('src/ui/heldMap.js'), /item\.title = this\._zoneLaws\(\) \? `\$\{WILD_TEXT\.chipTip\} \$\{ZONE_SAFE_TEXT\.rule\}` : ZONE_MAP_TEXT\.chipTipOffline\(\);/);   // PIN MOVED (the merge with AUDIT TESA II M5: online alone)
+  assert.match(rd('src/ui/heldMap.js'), /item\.title = this\._zoneLaws\(\) \? `\$\{WILD_TEXT\.chipTip\} \$\{ZONE_SAFE_TEXT\.rule\}` : ZONE_MAP_TEXT\.chipTipOffline\(\);/);
   // in the player's language
   tm.patchLocaleTable('de', 'Port_Strings', tm.loadStringTableCsv(rd('locales/de/Port_Strings.csv')));
   try {

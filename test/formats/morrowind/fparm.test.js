@@ -625,7 +625,7 @@ test('MW-D9f: the rig gates the step on ready() and the draw on active()', () =>
 
   // ready() must not require the mesh, or the deadlock comes straight back.
   const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too; PIN MOVED (MWNPC4): and the recoil and the death
+  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,     // MW-D39: the jump slot counts here too
     'ready() is update()\'s own requirements - no mesh term, no camera term (MW-D26 widened the clip term)');
 });
 
@@ -782,7 +782,7 @@ test('MW-D11: a texture the archives do not carry becomes the warning image, not
 
 // --- MW-D18: A MISSING HAND IS A SENTENCE, NOT A HOLE ----------------------
 //
-// Mac's report from retail: "hands are missing". Two doors could eat a
+// . Two doors could eat a
 // hand without a word: bindPart THREW on one absent weighted bone (rule
 // 40 says the reference skips it and draws), and a shape that fails rule
 // 15's filter on every bone bound nothing and said nothing. Both are
@@ -1445,10 +1445,6 @@ test('MW-D27: the faceIndex THREAD is unbroken, swept at the source', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   assert.match(arm, /buildTpBody\(\{ race, female, beast, faceIndex, faceMatch,/,
     'buildFpArm no longer hands the face to the body build');
-  // PIN MOVED (MWNPC14, Morrowind-NPCs.md section 19): the picker takes a vampire's face beside the rest
-  // PIN MOVED (MWNPC17, section 25): and an NPC's walked head and hair
-  // PIN MOVED (AUDIT MW-HEADS1): and the archives' directory, so the port's own heads stand only where their archive is
-  // PIN MOVED (MW-HEADS2): and whether the body is a player's - the port's own heads are a player's alone
   assert.match(arm, /playerBodyRows\(parts, race, female, \{ beast, faceIndex, faceMatch(, vampire(, walk(, has: exists(, ownHeads)?)?)?)? \}\)/,
     'the body build no longer hands the face to the picker');
   // TR2: the menu's inline opts moved into weaponRig's ONE HOME - the
@@ -1741,7 +1737,6 @@ test('MW-D29: the thread is unbroken - the menu reads the equip table, the build
   // MW-D31: ONE composition serves both rigs - buildFpArm composes,
   // the third person receives verdicts, the fp build filters and
   // shadows from the same result.
-  // PIN MOVED (AUDIT MW-FOLK1 L2-F2): the composition the third person receives is the one buildFpArm composed, built
   // once - and composed again without an outfit that bound nothing, the body built again from that (the card's verdicts
   // read the composition the body was built from)
   assert.match(arm, /const tpBody = \(wornNow\) => buildTpBody\(\{ race, female, beast, faceIndex, faceMatch, weapon, hasAmmo, worn: wornNow,/);
@@ -2001,7 +1996,6 @@ test('MW-D33: the worn verdicts reach status() - one per piece, dressed or reaso
   // took the per-piece readout off the assets card ("reduce the amount of
   // over explaining text") - it answers a probe's status() read now.
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (AUDIT MW-FOLK1 L2-F2): the verdicts of the composition the body was built from (an outfit that bound
   // nothing composed out again, and said so)
   assert.match(arm, /worn: wornVerdicts\(armor \?\? \[\], wornBuilt\),/);
   assert.match(arm, /worn: built && built\.ok \? built\.worn : null,/);
@@ -2091,9 +2085,7 @@ test('MW-D35: precedence - curated over matched over the walk, and the wiring', 
   // facePools is the same law the walk uses.
   assert.deepEqual(facePools(parts, 'fprace', false).heads.map((p) => p.id), ['b_head_01', 'b_head_02', 'b_head_03']);
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (AUDIT MW-HEADS1): the matcher is handed the build's pools - facePools over the archives' directory, the
   // ones the rows walk and the verdict's key names - where it read the race's out of `parts` again
-  // PIN MOVED (MW-HEADS2): and the pools a player's body wears - the port's own heads asked for
   assert.match(arm, /const pools = werewolf \|\| npcFace \? null : facePools\(parts, race, female, \{ has: archiveHas\(archives\), own: ownHeads \}\);/);
   assert.match(arm, /await matchFaceFor\(\{ race, female, faceIndex, pools, archives, deps: d \}\)/);
   assert.match(arm, /face: faceMatch,/);
@@ -2400,7 +2392,7 @@ test('AUDIT 32 F1: the head is sampled through its own mesh - the texture layout
     rgba[o] = c[0]; rgba[o + 1] = c[1]; rgba[o + 2] = c[2]; rgba[o + 3] = 255;
   }
   // A head mesh: front vertices at cheek height point their UVs into the
-  // skin quarter; back vertices point into the dark region. PIN MOVED
+  // skin quarter; back vertices point into the dark region.
   // (MW-HEADS2): the front is LOW y - in the Head node's frame a head
   // looks -Y (the port's own, baked +Y, hung backwards in game).
   const pos = []; const uvs = [];
@@ -2424,7 +2416,6 @@ test('AUDIT 32 F1: the head is sampled through its own mesh - the texture layout
 
 test('AUDIT 32 F2/F3: the match is memoised per identity and generation, and a miss is not', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (MW-HEADS2): and the pools measured - a player's (the port's own) and an escort's (the data's) are two
   assert.match(arm, /const fkey = `\$\{gen\}:\$\{race\}:\$\{female \? 'f' : 'm'\}:\$\{faceIndex \| 0\}:\$\{fnv\(measured\)\}`;/,
     'the face cache key lost the identity or the generation');
   assert.match(arm, /faceMatch = FACE_MATCH_CACHE\.get\(fkey\);/);
@@ -2488,7 +2479,7 @@ test('AUDIT 33: the figure stands in ANY view, through the one upload, at a quan
   assert.match(pack, /armMod\.figure\(\{ yaw, height: 384 \}\)/);
 });
 
-// ═══ IG1-IG3: MAC'S IN-GAME NOTES (2026-08-31) ══════════════════════
+// ═══ IG1-IG3: MAC'S IN-GAME NOTES ══════════════════════
 
 test('IG3: the SHIELD wears getShieldMesh\'s whole ladder - body part, hard refusal, ground fallback', () => {
   // actoranimation.cpp:108-139. A shield is the ONE worn piece whose
@@ -2832,8 +2823,7 @@ test('PX25: the pack hands the rig the worn table on every refresh', () => {
 
 // ═══ MAC-S1: THE SHIELD THAT SOMETIMES IS NOT THERE ══════════════════
 //
-// 2026-09-16, Mac: "Shields sometimes do not show up in the morrowind
-// paperdoll."
+// 2026-09-16,
 //
 // The mapping was never the problem: dfWornEquipment reads a shield out
 // of either hand slot and composeWornArmor has carried IG3's
@@ -2905,7 +2895,7 @@ test('MAC-S1: ONE flush, called from every exit out of `busy`', () => {
   // MW-D51: the third arrived - setTorch's slow path binds the light's
   // mesh on both rigs and takes `busy` for the fetch. HT-WAIST: the fourth -
   // setHipLight's slow path, the lantern at the waist on the body.
-  // TWO-HANDS: the fifth - setOffWeapon's slow path, the left hand's weapon bound on both rigs. PIN MOVED (was: 4)
+  // TWO-HANDS: the fifth - setOffWeapon's slow path, the left hand's weapon bound on both rigs.
   assert.equal(takers, 5, `a door that takes \`busy\` must flush on its way out (${takers} takers)`);
   assert.equal(flushes, takers, `every taker flushes (${flushes} flushes for ${takers} takers)`);
   // ...and setWeapon's own `finally` still does all three of its duties.
@@ -3054,16 +3044,13 @@ test('MW-D39: readySpell and castSpell are the two doors, and neither gates the 
   assert.equal(arm.status().spellReady ?? false, false);
   const src = readFileSync('src/combat/fpArm.js', 'utf8');
   // the stance re-composes on ready, and the three group readers take the flag
-  // PIN MOVED (MWNPC9, bible/04-Characters/Morrowind-NPCs.md section 14b): the idle, the jump and the movement read it
   // through `stanceOf()` - the stance a non-biped creature takes bare - which reads it once
-  // PIN MOVED (MIXED-PAIR): the weapon group reads the blow's own type first - a mixed pair's off-hand blow plays its
   // own weapon's group (was: `animWeaponType(built.mwType, ...)` at all three)
   // AUDIT SPELL-HAND L5-9: the blow's own type in the weapon group alone (was: either form, three times)
   assert.equal((src.match(/animWeaponType\((?:blowType \?\? )?built\.mwType, sheathed, spellReady\)/g) || []).length, 3,
     'stanceOf, the weapon group and the torch\'s carried-left rule (MW-D51) must all read the spell stance');
   assert.equal((src.match(/= stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');
   assert.match(src, /readySpell\(ready\) \{[\s\S]*?refreshWeaponGroup\(\);\n      resetIdle\(\);\n      resetMovement\(\);/);
-  // PIN MOVED (MW-CAST1): an un-ready mid-cast is the spell GOING - Daggerfall clears the ready at its release - so
   // the cast finishes and the stance drops at its end (it used to be taken for an abort and dropped mid-motion)
   assert.match(src, /if \(!want && upper === UPPER_BODY\.Casting\) \{ unreadyAfterCast = true; return false; \}/);
   // the cast plays the group's own section and lands back in the stance
@@ -3095,12 +3082,8 @@ test('MW-D39: the hosts wire it through the rig\u2019s one door, on the referenc
   // ROAD-E6 moved the moment: the door is CastReadySpell's PlayOneShot
   // (:430-435), it takes the release handler the engine parks its
   // resolution on, and it ANSWERS - false when PlayOneShot refused.
-  // PIN MOVED (MW-CAST1): the door now asks whether the Morrowind arm on screen took the cast, and if it did the release
   // waits for its "<type> release" (fpsSpellCasting's hold) - still ONE door, the range, the element and the release
-  // PIN MOVED (CAST-SPEED): and the caster's rate, read once here and handed to both lanes (systems/castSpeed.js)
-  // PIN MOVED (AUDIT SPELL-HAND L2-4): and the cast's hands decided as it starts - kept only by a cast that does (was:
   // `return fpsSpellCasting.playOneShot(...)` straight)
-  // PIN MOVED (RPT1026-MISC CAST-PACE): the arm is handed the spell's moment (castReleaseS) and paced to it, and only an
   // arm it could not pace holds the release (armHolds - was: every arm on screen, `armCasts ? { hold: ...`)
   assert.match(rig, /castSpellAnim: \(rangeType, element, onRelease = null\) => \{\n\s+cast\.n = \(cast\.n \+ 1\) & 0xffff; cast\.rangeType = rangeType \| 0;[^\n]*\n(?:\s+eotbBody\.cast\(\);[^\n]*\n)?(?:\s*\/\/[^\n]*\n)*\s+const rate = castRate\(entity\);\n\s+const armCasts = fpArm\.castSpell\(rangeType, rate, castReleaseS\(rate\)\) && \(fpArm\.active\(\) \|\| fpArm\.thirdActive\(\)\);\n(?:\s*\/\/[^\n]*\n)*\s+const armHolds = armCasts && !fpArm\.castPaced\?\.\(\);\n\s+const oneHand = spellHandFits\(\);[^\n]*\n\s+const started = fpsSpellCasting\.playOneShot\(element, onRelease, armHolds \? \{ hold: \(\) => fpArm\.takeCastRelease\(\) \|\| !fpArm\.castInFlight\(\), rate \} : \{ rate \}\);\n\s+if \(started\) _castOneHand = oneHand;\n\s+return started;/,
     'the cast must have one door, and it carries the range, the element and the release');
@@ -3130,7 +3113,7 @@ test('AUDIT 36 F1: ALL THREE hosts run the cast animation, on the cast moment, w
 
 test('AUDIT 36 F2: an INSTANT self-cast animates - the cast latches its own stance', async () => {
   const src = readFileSync('src/combat/fpArm.js', 'utf8');
-  const fn = src.slice(src.indexOf('    castSpell(rangeType = 2, rate = 1, releaseIn = 0) {'), src.indexOf('    /** The held bow comes up.'));   // PIN MOVED (CAST-SPEED): the cast's rate; PIN MOVED (RPT1026-MISC CAST-PACE): and the moment its release is paced to
+  const fn = src.slice(src.indexOf('    castSpell(rangeType = 2, rate = 1, releaseIn = 0) {'), src.indexOf('    /** The held bow comes up.'));
   // the old gate refused a cast that arrived before any frame read the
   // ready - which is EVERY CasterOnly spell, readied and cast in one
   // synchronous call (hostMagic readySpell -> castInput for range 0).
@@ -3144,16 +3127,14 @@ test('AUDIT 36 F2: an INSTANT self-cast animates - the cast latches its own stan
   const hm = readFileSync('src/scenes/hostMagic.js', 'utf8');
   // AUDIT ALLY-CAST A1: the instant arm arms instead when a party mate is in touch reach; with nobody there it is
   // the same synchronous castInput, which is the case F2 exists for.
-  // PIN MOVED (AUDIT WATCH-KIT WK-M9, 2026-10-01): my companion's two arms (COMPANION-KIT) stand among the mate's, in the
   // click's own order, where they stood in a block ahead of this one; the instant cast is still the arm's last line
-  // PIN MOVED (AUDIT SPELL-HAND L2-2): beside a weapon mid-blow the instant cast waits for the blow as a pressed one does
   // (a kept press) - the line before it; the instant cast is still the arm's last
   assert.match(hm, /if \(sp\.rangeType === 0\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(!free && allyCastable\(sp\) && allyInReach\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(companionInReach\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!free && allyCastable\(sp\) && allyNear\([^\n]*\n\s*if \(companionNear\([^\n]*\n\s*if \(!free && hasResurrect\(sp\)\)[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(spellHandBusy\(\)\) \{ setPending\(true\); return true; \}\n\s*return castInput\(null, null\) !== false;\n\s*\}/,   // SPELL-GIFT: the near arm between   // AUDIT CONTRIB H3: the instant cast is the ready's answer   // RESURRECT1: the dead's own arm beside the ally's
     'the CasterOnly instant cast is the case F2 exists for');
   // ROAD-E6 folded the four release arms' identical tail into one
   // `done` closure - RaiseOnCastReadySpell (:2129) still runs BEFORE
   // `readySpell = null` (:2135), which is the ordering F2 rests on.
-  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,   // FIX-F: lastSpell (:2136) before the raise (:2137); PIN MOVED (EG15): the cast told after the raise, still while the spell is readied
+  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,     // FIX-F: lastSpell (:2136) before the raise (:2137)
     'the cast callback must fire while the spell is still readied');
 });
 
@@ -3179,7 +3160,6 @@ test('PX26 F4: the interior lane sends the jump-state inputs - without them the 
 test('PX26 F1/F2/F3: the menu figure carries the hand, instantly, and a mid-build swap is not dropped', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   // F1: the portrait shows the weapon whether or not it is drawn
-  // PIN MOVED (TWO-HANDS AUDIT): the window 3000 -> 3400 - the portrait poses a carried pair with both arms up (its
   // `mirror:`) and flags the left hand's blade, which moved the flag lines past the old edge
   const fig = arm.slice(arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {'), arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {') + 3400);
   assert.match(fig, /if \(r\.slot === 'weapon'\) r\.hidden = false;/, 'a paperdoll shows what you carry, drawn or not');
@@ -3229,7 +3209,6 @@ test('PX27: the arm\u2019s REACH is swept over every clip, not the idle alone', 
   assert.equal(clipSweepTimes(null, null).length, 25);
   // and the build uses it
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (MWNPC3): the sweep is the default (the player's arm); a rig never looked out of (reachSweep: false -
   // the peers' and the NPCs' builds) takes the idle's reach instead
   assert.match(arm, /const sweep = reachSweep \? clipSweepTimes\(sources, idleCheck\) : null;\n    const union = sweep \? clipUnionBounds\(arm, poseAt, sweep\) : null;/,
     'the build must measure the reach over the sweep');
@@ -3276,7 +3255,7 @@ test('PX29: the movement rate divides by the PLAYING clip\u2019s own velocity (M
 // Source-pinned, like AUDIT 33's checks above it, because a live pin
 // would need a third-person BUILD and the fixtures reach the first-
 // person arm only - and a check that cannot run is worse than one that
-// says what it is (the lesson of the nine dead probes, bible/09-Testing/Testing-Rows-2026-10-19.md).
+// says what it is (the lesson of the nine dead probes).
 test('PX32: the inventory figure poses the body before it uploads it', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   const start = arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {');

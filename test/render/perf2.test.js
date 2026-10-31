@@ -1,5 +1,4 @@
-// PERF2 (2026-09-11, Mac: "find ways we can improve performance without
-// downgrading across the board"). Two optimisations that change no
+// PERF2. Two optimisations that change no
 // pixel: the sky drawn AFTER the ground as a depth-tested far-plane
 // pass (so it shades only the pixels nothing nearer claimed), and the
 // grass field drawn one cell at a time, only the cells in view and in

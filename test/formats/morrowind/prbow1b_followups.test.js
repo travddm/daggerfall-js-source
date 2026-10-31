@@ -1,4 +1,4 @@
-// PR-BOW1b (2026-09-24): PR-BOW1's three follow-ups, from the review that
+// PR-BOW1b: PR-BOW1's three follow-ups, from the review that
 // shipped it ("Equipping a bow enlarges your character").
 //
 // (1) THE SECOND WALK. PR-BOW1 folded a box per drawn range by walking

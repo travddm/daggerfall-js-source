@@ -1,4 +1,4 @@
-// L10N4 (2026-09-28): THE PORT'S OWN ENGLISH, HELD TO A RATCHET. The port's own words - menus, the enhanced interface,
+// L10N4: THE PORT'S OWN ENGLISH, HELD TO A RATCHET. The port's own words - menus, the enhanced interface,
 // the online game, every notice DFU does not have - reach a player in their language only through the text core
 // (`t(key, en, args)`, Port_Strings; locales/README.md). tools/l10nHardcoded.mjs counts the prose still written into the
 // code, file by file. Pinned here: the counts (HARDCODED) - a file's count may only FALL, as its words are routed, and
@@ -50,7 +50,7 @@ const HARDCODED = {
   'src/formats/cifRciFile.js': 2,
   'src/formats/hmiFile.js': 17,
   'src/formats/imgFile.js': 1,
-  'src/formats/mapsTables.js': 25,   // WW-R (bible/03-World/World-Wide.md): +3, the provinces' region names (PROVINCE_REGION_NAMES - High Rock, Sumurset Isle, Black Marsh the two-word ones): the canonical English a region's name is, which the locale's regionNames list translates past the Bay's 62 as on it (systems/textManager.js getLocalizedRegionName)
+  'src/formats/mapsTables.js': 25,     // WW-R: +3, the provinces' region names (PROVINCE_REGION_NAMES - High Rock, Sumurset Isle, Black Marsh the two-word ones): the canonical English a region's name is, which the locale's regionNames list translates past the Bay's 62 as on it (systems/textManager.js getLocalizedRegionName)
   'src/formats/morrowind/mwAnim.js': 11,
   'src/formats/morrowind/mwFaceMatch.js': 6,
   'src/formats/morrowind/mwFirstPerson.js': 75,
@@ -79,7 +79,7 @@ const HARDCODED = {
   'src/net/duel/duelRecord.js': 6,
   'src/net/duel/duelSession.js': 36,
   'src/net/superDungeon/egRouteProof.js': 8,   // THE ASCENT - THE PROOFS (LAW 9): THE ROUTE'S refusals (egLegRefusal's and egClimbGrip's `why` - a stair too steep, a Drop upward or past the billed fall, a climb downward, faceless or past the grip) - read by a test and the sweep's tool, never said to a player, kept as egSpanLaw.js's are
-  'src/net/superDungeon/egSpanLaw.js': 16,   // PIN MOVED (AUDIT EG V, f: +4, THE TIMED SOLVER's law-8 refusals (egSpanProof's `why` - the set pieces' margin, the Collapsing Tube's, the Forge Line's hammers) - read by a test and the sweep's tool, never said to a player, kept as egLaw.js's hero refusals are)
+  'src/net/superDungeon/egSpanLaw.js': 16,
   'src/net/firmament/firmamentLaw.js': 42,
   'src/net/firmament/firmamentTree.js': 113,
   'src/net/fortLaw.js': 21,
@@ -301,7 +301,7 @@ const HARDCODED = {
   'src/systems/banking.js': 20,
   'src/systems/betterAmbience.js': 42,
   'src/systems/booksData.js': 85,
-  'src/systems/bounty/bountyBoard.js': 41,   // QUARRY-WORLD (2026-10-27): the beasts' words through t() (bounty.foes.*)
+  'src/systems/bounty/bountyBoard.js': 41,     // QUARRY-WORLD: the beasts' words through t() (bounty.foes.*)
   'src/systems/bounty/bountyReward.js': 2,
   'src/systems/breachBook.js': 1,
   'src/systems/buildingLocks.js': 1,
@@ -347,7 +347,7 @@ const HARDCODED = {
   'src/systems/equip.js': 3,
   'src/systems/eventTimers.js': 44,   // Elite Gates removed: -6
   'src/systems/faction/factionStanding.js': 3,
-  'src/systems/faction/provinceFactions.js': 1,   // PROVINCE-COURTS (bible/03-World/World-Wide.md): Cyrodiil's ruler, Uriel Septim VII - a proper name, Daggerfall's own Emperor (TEXT.RSC), a faction's name and its key
+  'src/systems/faction/provinceFactions.js': 1,     // PROVINCE-COURTS: Cyrodiil's ruler, Uriel Septim VII - a proper name, Daggerfall's own Emperor (TEXT.RSC), a faction's name and its key
   'src/systems/features.js': 128,   // RPT1026-CLIENT: the mod's 'Camera Shake.maxShake' on its tile - a mod's settings key the scan reads as words, as its three neighbours on the list are
   'src/systems/fleet.js': 10,
   'src/systems/fletching.js': 1,
@@ -433,7 +433,7 @@ const HARDCODED = {
   'src/systems/quest/actions.js': 11,
   'src/systems/quest/machine.js': 1,
   'src/systems/quest/questMacros.js': 1,
-  'src/systems/quest/questPatches.js': 13,   // PIN MOVED (AUDIT STARTS Q3): _BRISIEN's 1010 and 1020 - DFU's own sentences found, and the two the starts made false replaced in the script's own English, as A0C00Y10's are: a translation's -LOC words for them are the pack's (L10N3c). SHAM-TRAIL (FIELD BUGS 2026-10-17b): the patches' anchors into DFU's own C0B00Y02 - its text found and kept, never the port's words; the entry the patch files is the text core's (quest.possessedChild.shamTrail). PIN MOVED (QUEST-AUDIT III DUEL-TOWN): A0C00Y10's two, DFU's own sentence found and kept with its town's symbol changed. PIN MOVED (AUDIT QA3 C3): M0B11Y18's latch - QBN script that starts a task of its own, no sentence a player reads. PIN MOVED (START1): _BRISIEN's start-up lines, its `say 1025` taken out - QBN script, no sentence a player reads
+  'src/systems/quest/questPatches.js': 13,
   'src/systems/quest/questRepair.js': 9,
   'src/systems/quest/questGuidance.js': 2,
   'src/systems/quickLoot.js': 4,
@@ -479,7 +479,7 @@ const HARDCODED = {
   'src/systems/sigil/sigil.js': 8,
   'src/systems/sigil/sigilBroker.js': 8,
   'src/systems/sigil/sigilSetPowers.js': 21,   // Elite Gates removed: -3
-  'src/systems/sigil/sigilSets.js': 117,   // Elite Gates removed: -9   // PIN MOVED (AUDIT HORIZONTAL D6): +1, SET-CATCHUP's pace English inside the set's English stage line until the sets' batch routes the line whole; SEA-SET: +9, the Eltheric Tidemail's name, prince, role, tiers and their words, as every set's; WITCH1: the Wyrd's Raiment - its name, its prince, its three tiers' names and lines (+9), as every set's; STAR7: +8, the Starspun Weave's name, role, tiers and their words, as every set's
+  'src/systems/sigil/sigilSets.js': 117,     // Elite Gates removed: -9   //
   'src/systems/smithItems.js': 26,
   'src/systems/snowfall.js': 12,
   'src/systems/snowfallRuntime.js': 10,
@@ -508,7 +508,7 @@ const HARDCODED = {
   'src/systems/travel/travelOptionsText.js': 30,
   'src/systems/travel/travelPace.js': 5,
   'src/systems/travel/travelPathMode.js': 3,
-  'src/systems/travel/travelViewFilters.js': 7,   // HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (MAP-PLAYERS: +1, the Players switch's tip)
+  'src/systems/travel/travelViewFilters.js': 7,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (MAP-PLAYERS: +1, the Players switch's tip)
   'src/systems/tutorialCatalogue.js': 209,   // RPT1026-QUESTS BOUNTY-WAY: +1, the bounties page rewritten - its old words held "return", which the scan reads as code, so they were never counted; the catalogue is English, as every page's
   'src/systems/uiSkin.js': 1,
   'src/systems/upkeep/upkeepItemRows.js': 2,
@@ -573,8 +573,8 @@ const HARDCODED = {
   'src/ui/enhanced/enhancedFrame.js': 2,
   'src/ui/enhanced/enhancedHelm.js': 16,
   'src/ui/enhanced/enhancedHotbar.js': 13,
-  'src/ui/enhanced/enhancedHud.js': 9,   // HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: +3, the two tiles' names and their cell's class)
-  'src/ui/enhanced/enhancedInventory.js': 91,   // CHAT-POST: +3 Link/Post/Linked strings on the pack card; HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (BELT-LANTERN: +5, the lantern slot's acts)
+  'src/ui/enhanced/enhancedHud.js': 9,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: +3, the two tiles' names and their cell's class)
+  'src/ui/enhanced/enhancedInventory.js': 91,     // CHAT-POST: +3 Link/Post/Linked strings on the pack card; HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (BELT-LANTERN: +5, the lantern slot's acts)
   'src/ui/enhanced/enhancedLevelingChoice.js': 6,
   'src/ui/enhanced/enhancedMenu.js': 52,   // AUDIT MEM-AUDIT G5: -2, the Graphics preset's name and note routed (with its effect, its Custom and its four labels). QUEST-AUDIT III SHELF-WORDS: -5, the shelf's buttons and lines through t(). AUDIT COLLECTIONS-II: -2, the empty Holdings rail's words, gone with the rail that is never empty now. AUDIT EG V (c, L7-10): the Spire's three accessibility rows routed; UI-CALM's doors at the merge of main. REALM-COPY: -1, the copy's slot name moved to systems/realmCopyMark.js
   'src/ui/enhanced/enhancedMerchantPanel.js': 1,
@@ -604,7 +604,7 @@ const HARDCODED = {
   'src/ui/gate/gateMarksView.js': 18,
   'src/ui/gate/gateTitleCard.js': 1,
   'src/ui/grimoireDress.js': 13,
-  'src/ui/growth/growthStage.js': 1,   // HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (GROWTH-BOOK)
+  'src/ui/growth/growthStage.js': 1,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (GROWTH-BOOK)
   'src/ui/guildServiceWindow.js': 1,
   'src/ui/guildServiceWindows.js': 8,
   'src/ui/hallOfRecords.js': 4,
@@ -614,10 +614,10 @@ const HARDCODED = {
   'src/ui/hitNumbers.js': 1,
   'src/ui/holdingsPages.js': 59,
   'src/ui/howManyField.js': 1,
-  'src/ui/hud/hudAdvance.js': 8,   // HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: ADV_WORDS, the tiles' hover card)
+  'src/ui/hud/hudAdvance.js': 8,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (SKILL-READY, FIRM-STARS: ADV_WORDS, the tiles' hover card)
   'src/ui/hud/hudLayout.js': 28,
   'src/ui/hud/hudStatus.js': 1,
-  'src/ui/hud/statusTips.js': 53,   // HUD/GROWTH PATCHES (2026-10-20): counted as they arrived at their merge with main - English until a slice routes them through t() (STATUS-TIPS: what each status tile says under the pointer)
+  'src/ui/hud/statusTips.js': 53,     // HUD/GROWTH PATCHES: counted as they arrived at their merge with main - English until a slice routes them through t() (STATUS-TIPS: what each status tile says under the pointer)
   'src/ui/ink/inkDungeonGL.js': 1,
   'src/ui/ink/inkDungeonSolid.js': 6,
   'src/ui/input.js': 2,
@@ -644,7 +644,7 @@ const HARDCODED = {
   'src/ui/naval/navalPlunderWindow.js': 19,
   'src/ui/naval/navalYardWindow.js': 67,
   'src/ui/noticeWindow.js': 99,
-  'src/ui/oreMapTip.js': 2,   // WW-C1 (bible/03-World/World-Wide.md WW-C): Cyrodiil's line and the richest ores held back, its English - main's DEEP-OPEN routed the card's other lines through the text core (TESA x MAIN, the merge: 2 measured)
+  'src/ui/oreMapTip.js': 2,     // WW-C1 (WW-C): Cyrodiil's line and the richest ores held back, its English - main's DEEP-OPEN routed the card's other lines through the text core (TESA x MAIN, the merge: 2 measured)
   'src/ui/padGlyphsHD.js': 15,
   'src/ui/pageWindow.js': 4,
   'src/ui/partyMapMarks.js': 3,
@@ -773,7 +773,7 @@ const HARDCODED = {
   'src/world/windowRoomArt.js': 2,
   'src/world/worldOfDaggerfall/wodLocationData.js': 3,
   'src/world/worldOfDaggerfall/worldOfDaggerfall.js': 7,
-  // KPbICA's spec, forwarded by the owner (2026-10-26; recorded at the streams' merge, AUDIT TESA III): proper names in
+  // KPbICA's spec, forwarded by the owner: proper names in
   // data tables, as the districts' and Lake Rumare's above - none yet shown a player; routing them through t() is their
   // arcs' own to do when a label shows them.
   'src/world/road/cyrodiilRoads.js': 8,   // VOYAGER-CYRODIIL: the named roads (the Red Ring Road, the Gold Road...)
@@ -809,7 +809,7 @@ test('L10N4 the scan itself: prose counted; the text core\'s arguments, console 
   assert.equal(isProse('Resume'), false, 'one word is not counted (a known gap of the heuristic: a one-word label)');
   assert.equal(isProse('rgba(0, 0, 0, 0.5) solid'), false);
   assert.equal(isProse('1px solid black'), false, 'a CSS value with two words in it');
-  // CARDS-PLUS (bible/11-Multiplayer/Tavern-Cards.md section 38): a selector naming an id, an attribute or a pseudo-class
+  // CARDS-PLUS: a selector naming an id, an attribute or a pseudo-class
   // is CSS - every part a compound of CSS identifiers, a class among them; English that only looks like one is English
   assert.equal(isProse('body .dfiliac button[data-kind="warn"]'), false, 'a kit role naming an attribute');
   assert.equal(isProse('#wp-menu input.wpm-name'), false, 'an id');

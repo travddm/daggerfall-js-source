@@ -47,7 +47,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #3: THE MORROWIND CAMERA AT A HELM - a not
   assert.ok(n <= 14, `out of first person to the hull's reach in ${n} notches (seventy-seven to 800 alone before)`);
   for (let i = 0; i < 40 && fresh.thirdPerson(); i++) { fresh.wheel(1); fresh.eye({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0 }); }
   assert.equal(fresh.mode(), 'first', 'and in by the ratio to the nearest ring, then into the head as on foot');
-  // PIN MOVED (AUDIT HELM-ZOOM E2): one notch a frame at a helm - out notch by notch, as a wheel's clicks come
   for (let i = 0; i < 12; i++) { cam.wheel(-1); settle(); }
   assert.ok(cam.baseDistance() > MAX_DISTANCE);
   cam.setSeaReach(0);
@@ -71,7 +70,6 @@ test('FIELD BUGS 2026-09-29 (the sea) #3: EYE OF THE BEHOLDER AT A HELM - past t
   assert.ok(Math.abs(dist() - 66) < 1e-6, 'and no farther');
   c.wheel(1); c.tick({});
   assert.ok(Math.abs(dist() - 66 / SEA_ZOOM_RATIO) < 1e-6, 'in by the ratio');
-  // PIN MOVED (HELM-ZOOM): in by the ratio to the offset's own base, the mod's own ladder below it
   let k = 0;
   while (dist() > base + 1e-6 && k < 60) { c.wheel(1); c.tick({}); k++; }
   assert.ok(Math.abs(dist() - base) < 1e-6 && k <= 12, `in by the ratio to the base (${dist()} in ${k})`);

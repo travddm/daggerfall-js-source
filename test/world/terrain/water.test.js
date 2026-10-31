@@ -1,5 +1,4 @@
-// WATER1 (2026-09-08, Mac: "develop proper water shader for the
-// oceans/rivers/ponds of daggerfall"): THE WATER SURFACE. The pins hold
+// WATER1: THE WATER SURFACE. The pins hold
 // the water-corner table to the marching squares it inverts, the pass to
 // its draw state, both exterior hosts to the one slot and the one gate,
 // and the record to its two pages.
@@ -63,7 +62,7 @@ test('WATER1: the water-corner table inverts the marching squares - a shape\'s w
     for (let t = 0; t < 4; t++) assert.equal(waterCorners((r << 2) | t), 0xF, `record ${r} t${t}: whole`);
   }
   assert.ok(!onShallowWaterTile(9), 'record 9 is not in DFU\'s list...');
-  // WATER-DRAW1 (2026-09-19): ...and it stays out of THIS table, which is
+  // WATER-DRAW1: ...and it stays out of THIS table, which is
   // the LAW's - what the player swims in. The enhanced pass draws it
   // (test/world/terrain/grasspath.test.js holds WATER_DRAW_MASK_TABLE): DFU never drew
   // a water surface, so OnShallowWaterTile was never a drawing list, and
@@ -111,7 +110,6 @@ test('WATER1: the uniforms - the eased wind on the row\'s scale, null as calm, t
   assert.equal(u.rain, 0.5);
   assert.deepEqual(u.zenith, [0.1, 0.2, 0.3]);
   assert.deepEqual(u.horizon, [0.4, 0.5, 0.6]);
-  // PIN MOVED (AUDIT WATER-NEXT m6): the scroll and the one opacity are no uniforms of the sheet's - the rate stays the
   // dungeon water's own (WATER_SCROLL_TILES_PER_SEC, below)
   assert.equal(u.scroll, undefined, 'no scrolled texel'); assert.equal(u.opacity, undefined, 'no one opacity');
   assert.equal(WATER_SCROLL_TILES_PER_SEC, 0.05, 'the dungeon water\'s rate, its one home');
@@ -137,7 +135,7 @@ test('WATER1: the uniforms - the eased wind on the row\'s scale, null as calm, t
   // and scenes/worldModes.js (as DUNGEON_WATER_SCROLL) - and this line's own
   // message named scenes/dungeon.js while reading only this module, so retuning
   // either host could never redden it. Both hosts import the name now, and no
-  // scene may declare a second one. WATER-D1 (2026-09-21): the dungeon draw
+  // scene may declare a second one. WATER-D1: the dungeon draw
   // moved into scenes/dungeonContext.js's own frame function (one home for
   // both hosts), so the ONE importer is the context.
   for (const h of ['src/scenes/dungeonContext.js']) {
@@ -151,7 +149,6 @@ test('WATER1: the uniforms - the eased wind on the row\'s scale, null as calm, t
 });
 
 test('WATER1: the shader - the terrain\'s own grid lifted, the corner lookup by compare, the discards, one light law with the ground', () => {
-  // PIN MOVED (WATER-NEXT 2): the sheet's own attributes - the grid as it stood, and the bed's depth under it
   assert.match(WATER_SURFACE_VS, /layout\(location=0\) in vec3 aPos;\s*\n\s*layout\(location=1\) in float aDepth;/, 'the sheet\'s attributes');
   assert.match(WATER_SURFACE_VS, /vec4 world = uModel \* vec4\(aPos\.x, aPos\.y \+ uLift, aPos\.z, 1\.0\);/, 'lifted in the model\'s frame');
   const fs = waterSurfaceFs('/*CS*/ float cloudShadowAt(vec3 wp) { return 1.0; }');
@@ -162,17 +159,14 @@ test('WATER1: the shader - the terrain\'s own grid lifted, the corner lookup by 
   assert.match(fs, /float edge = 1\.0;/, 'PIN MOVED (WATER-NEXT 2): the open sea\'s edge is the whole sheet');
   assert.match(fs, /\n\s*edge = smoothstep\(0\.5 - uShoreSoft, 0\.5 \+ uShoreSoft, coverage\(corners, f\) - \(geEntry\(data\) != 0u \? geWander\(unwrapped\) : 0\.0\)\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*uint rec = data >> 2u;\n\s*if \(isPuddleRecord\(rec\)\) \{\n(?:[^\n]*\n){8}\s*\}\n\s*if \(edge <= 0\.002\) discard;/, 'the feather (WATER-PUDDLE: a puddle record\'s own art multiplied in), then nothing past it');   // AUDIT PRECIP GROUND-5 (PIN MOVED): its winter art's under the snow, five lines; PIN MOVED (COAST-LOOK): the coverage less the ground's wander
   assert.match(fs, /float diff = max\(dot\(n, uLightDir\), 0\.0\) \* shadow;/, 'the ground\'s sun term, shadowed by the deck');
-  // PIN MOVED (WATER-NEXT 2): the body is the water's colour, lit by TERRAIN_FS's terms (the sun's softened - light
   // goes into water, it does not bounce off it like dirt); Schlick capped higher; the alpha is the shore's and, without
   // the frame's copy, how much of the bed the water hides
-  // PIN MOVED (AUDIT FAR-SEA1 C12): the open sea's light is one text with the far ring's sea (render/horizonHaze.js SEA_LOOK_GLSL)
   assert.match(fs, /vec3 lit = body \* seaLight\(uAmbient, uSunColor, uSunScale \* diff, uMoonColor, uMoonScale \* mdiff\);/, 'TERRAIN_FS\'s light law');
   assert.ok(fs.includes('return ambient + sunColor * (sunDiff * 0.6) + moonColor * moonDiff;'), '...the sky\'s light, the sun\'s softly and the moon\'s');
-  assert.match(fs, /float F = seaFresnel\(NdV, uF0\);/, 'Schlick, capped');   // PIN MOVED (AUDIT FAR-SEA1 C12)
+  assert.match(fs, /float F = seaFresnel\(NdV, uF0\);/, 'Schlick, capped');
   assert.ok(fs.includes('float seaFresnel(float ndv, float f0) { return f0 + (0.85 - f0) * pow(1.0 - clamp(ndv, 0.0, 1.0), 5.0); }'), '...in the open sea\'s one text');
-  // PIN MOVED (AUDIT WATER-NEXT G1): the fogs over the water's own light at its share - the copy under it was fogged when drawn
   assert.match(fs, /vec3 fogged = own \* fw \+ uFogColor \* \(1\.0 - fw\) \* ownShare;\s*\n\s*fogged = dwWaterFogAdd\(fogged, vWorldPos\) \+ dwWaterFog\(vec3\(0\.0\), vWorldPos\) \* ownShare;/, 'the fog every world pass takes (DW-C: and the carved sea\'s distance fog over it)');
-  // GRAIN1 (2026-09-19): the same texel, the same layer, the same scroll -
+  // GRAIN1: the same texel, the same layer, the same scroll -
   // but sampled with the UNWRAPPED gradient, because the tile array is
   // mipmapped now and `fract` jumps. Taking the footprint from the
   // wrapped coordinate would draw a blurred line wherever the scroll
@@ -181,7 +175,6 @@ test('WATER1: the shader - the terrain\'s own grid lifted, the corner lookup by 
   assert.ok(fs.indexOf('vec2 wgx = dFdx(unwrapped), wgy = dFdy(unwrapped);') < fs.indexOf('if (corners == 0u) discard;'), 'GRAIN AUDIT 1: the derivatives are taken ABOVE the discards - inside non-uniform control flow they are undefined');
   assert.doesNotMatch(fs, /uScroll|uOpacity/, 'the scrolled texel and the one opacity are gone');
   // the trains fade with distance on their own scale - the far sea keeps the swell
-  // PIN MOVED (WATER-NEXT 2): the long train is the swell's now; the fine trains are shorter, each still fading on its own scale
   assert.match(fs, /exp\(-dist \* 0\.004\)\) \* cos\(dot\(p, d0\) \* 1\.10/);
   assert.match(fs, /exp\(-dist \* 0\.010\)\) \* cos\(dot\(p, d1\) \* 2\.30/);
   assert.match(fs, /exp\(-dist \* 0\.020\)\) \* cos\(dot\(p, d2\) \* 4\.10/);

@@ -1,4 +1,4 @@
-// AUDIT GALLEON (2026-10-02, Mac: "Audit this. It must be perfect") - HER PREFAB AND ITS ART: what stands in her tree,
+// AUDIT GALLEON - HER PREFAB AND ITS ART: what stands in her tree,
 // where it stands, what it is drawn in and how it is lit, held to the final bake (eac64ad59). Each pin failed on the code
 // as it stood (64e27ef97, the final bake merged under it).
 //   P1  her helmsman pinned by his capsule's centre (DrivePosition half a capsule over her roof), his view to the bow clear

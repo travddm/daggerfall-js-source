@@ -2,7 +2,7 @@
 // set down on its way where the way leaves its town, and that was townTrim - a radius (half the grid's side and half a
 // block). A town's walls stand on its RMB grid's square edge: a way leaving on a diagonal set the party down inside the
 // walls, and it walked out through them (and in through the next town's). A long town's long axis the same. The trim is
-// now where the way leaves the grid's box. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// now where the way leaves the grid's box..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

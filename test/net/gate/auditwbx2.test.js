@@ -1,4 +1,4 @@
-// AUDIT WBX2 (2026-09-26, Mac: "Audit this before we merge"): THE BRANCH READ WHOLE AGAINST MAIN BEFORE IT MERGES -
+// AUDIT WBX2: THE BRANCH READ WHOLE AGAINST MAIN BEFORE IT MERGES -
 // the relay's fight, its hub's receipts and the client's spoils - and every finding checked in the code before it was
 // fixed. M1 a crash's spoils given again at every boot offline (their record's keeper was made online alone); M2 a
 // Warden every fighter had left stood up whole for the first back; M3 a `spent` that came before the kill's own word
@@ -7,7 +7,7 @@
 // the relay held him at the leap's start); M6 an older build's mark for anyone said spent for another account; M7 a
 // root check's `first` that was always true; M8 the beat's copy of the kill's rule (M5's other half); M9 the sweep's
 // cursors read twice. M10, the court's frame run twice on the collapse frame, is its putting itself away (the link is
-// left first) - not changed. Design: bible/11-Multiplayer/World-Bosses.md section 12.
+// left first) - not changed. Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

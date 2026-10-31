@@ -17,8 +17,7 @@ test('DA6/REL1/REL3: the release\'s number is ONE variable - the tag and the sta
   // THE NAG THIS FILE EXISTS TO PREVENT: app-v0.1.3 was cut from a
   // marker bumped alone, named for one version and stamped with the
   // last, so every fresh install announced an update it already had.
-  // REL1 gated the two files together. REL3 (Mac: "auto push a release
-  // on each merge") removed the second file: the version is DERIVED in
+  // REL1 gated the two files together. REL3 removed the second file: the version is DERIVED in
   // the workflow - MAJOR.MINOR from app/package.json's committed base,
   // PATCH from the commit count on main - into one shell variable, and
   // both the release tag and the `npm version` stamp electron-builder

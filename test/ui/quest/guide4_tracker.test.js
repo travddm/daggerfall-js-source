@@ -1,6 +1,5 @@
-// GUIDE4 (2026-09-29, Mac: "How can we set the foundation and improve the quest system substantially? Like really
-// modernize it, make it more accessible", then, of the Quest Guide arc: "This is your baby. Take your time") - THE
-// TRACKER (ui/quest/questTracker.js, bible/06-Systems/Quest-Guide-Arc.md): the quest you follow, as a card on the HUD. Its
+// GUIDE4 - THE
+// TRACKER (ui/quest/questTracker.js): the quest you follow, as a card on the HUD. Its
 // laws, each over the real producers:
 //
 //   WHICH QUEST - the one the player tracks, else the one the journal last changed (started, updated, urgent), else the
@@ -241,7 +240,7 @@ test('GUIDE4 THE BRIDGE FEEDS IT - over the real bridge and machine: the tracker
     beat(b);
     assert.equal(n.looks, 1);
     assert.equal(n.wheres[0], questWhere, 'the host\'s questions, handed to the look');
-    // TRACK-ONLY (the owner: "When you dont track a quest it should never appear on the screen!"): the baseline is
+    // TRACK-ONLY: the baseline is
     // FOLLOWED at once (the journal opens on it), and on no screen until it is tracked
     assert.equal(questTracker.frame(), null, 'running, untracked: on no screen');
     assert.equal(questTracker.tracked().title, 'The First Road', 'the baseline is followed at once - the quests as they stand');
@@ -369,7 +368,7 @@ test('GUIDE4 THE CARD - built once on the page, aria-hidden (the herald speaks),
     assert.equal(drawQuestTracker({ doc }), null, 'nothing to follow: nothing on the page');
     assert.equal(doc.getElementById(TRACKER_ID), null);
     questTracker.hear({ quests: [view('1', { title: 'The Beast', main: true, lines: [' Kill it.'], clockSeconds: 80000, where: 'Llugwych in Devilrock province' })], events: [] });
-    // TRACK-ONLY (the owner: "When you dont track a quest it should never appear on the screen!"): followed, never drawn
+    // TRACK-ONLY: followed, never drawn
     assert.equal(drawQuestTracker({ doc }), null, 'an untracked quest: nothing on the page');
     assert.equal(doc.getElementById(TRACKER_ID), null);
     questTracker.toggle('1');

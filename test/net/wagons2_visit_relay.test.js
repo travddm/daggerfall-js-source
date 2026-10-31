@@ -1,5 +1,4 @@
-// WAGONS2-VISIT (2026-10-09, Mac: "People should be able to use the interior just like houses, like crafting and such";
-// who comes in, "Like an online home"): THE RELAY'S HALF, BY EXECUTION over the real Room (test/fakeRoom.mjs) and the real
+// WAGONS2-VISIT: THE RELAY'S HALF, BY EXECUTION over the real Room (test/fakeRoom.mjs) and the real
 // session (net/online.js over a fake socket) - a caravan's own room keeps what its OWNER placed in it (the `caravan`
 // frame: net/wire.js validCaravanData), keyed as the cell keys the caravan's record (parkKeyOf of the account the token
 // verified and the character the frame names), hands it to every joiner after its welcome, fans each new one, and forgets

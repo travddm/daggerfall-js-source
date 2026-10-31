@@ -1,4 +1,4 @@
-// WB6b (2026-09-25, Mac: "the arena needs to be an oblivion masterpiece ... Whole thing needs to feel alive"): THE
+// WB6b: THE
 // DEADLANDS' LIFE, DRIVEN. The land out in the fire (the islands: seeded, round the court, clear of the great tower's
 // sightline, inside the far plane); the floor's shards (off the court, clear of its spires over the whole period, bobbing
 // and turning whole over it, never mirrored); the air's life (the embers from past the court's edge, the ash from over
@@ -264,7 +264,7 @@ test('WB6b the thunder: every strike the sky draws is heard once, late by its di
 test('WB6b the air\'s driver: the beds set every frame (the wind breathing on the clock, the sea\'s roar, a loop at each brazier), the events between two frames played once from their stand-ins with the ear\'s offset held (`far`), a gap past AIR_BACKLOG_S playing nothing; stop silences every loop it set and nothing when it set none; a later boot\'s air silences the old one\'s as it is made (mutants: stop leaving a bed looping; the backlog played; an event unheld; the old air outliving its host)', () => {
   const log = [];
   const engine = {
-    setBed: (...a) => log.push(['setBed', ...a]),   // AUDIT SD III (A3, PIN MOVED): the beds named native loops - they were setLoop's re-armed one-shots
+    setBed: (...a) => log.push(['setBed', ...a]),     // AUDIT SD III (A3
     setBed3d: (...a) => log.push(['setBed3d', ...a]),
     play3d: (...a) => log.push(['play3d', ...a]),
   };
@@ -300,7 +300,7 @@ test('WB6b the air\'s driver: the beds set every frame (the wind breathing on th
     assert.equal(c[1], want[i].clip);
     assert.deepEqual(c[2], airSourceAt(ear, want[i].az, want[i].lift));
     assert.equal(c[3], want[i].volume);
-    assert.deepEqual(c[4], { refDistance: THUNDER_SOURCE_M, pitch: want[i].pitch, far: AIR_FAR }, 'its offset from the ear held while it sounds');   // PIN MOVED (AUDIT SD IV A5): far under the court's name, which its stop lets go
+    assert.deepEqual(c[4], { refDistance: THUNDER_SOURCE_M, pitch: want[i].pitch, far: AIR_FAR }, 'its offset from the ear held while it sounds');
   });
   // a tab put away: the gap plays nothing of what it passed
   log.length = 0;
@@ -339,17 +339,17 @@ test('WB6b the seams, by source: the world host keeps the Deadlands\' clock on t
   assert.match(w, /const lived = deadlandsPass\(\)\?\.drawLife\(proj, view, _courtCentre, deadlandsSeconds\(\), fog, glow, _courtBeds, renderer\.worldViewportPx\?\.\[3\]\);\n\s+if \(told \|\| lived\) renderer\.markForeignPass\(\);/);
   assert.match(w, /\n    deadlandsSeconds: \(\) => deadlandsSeconds\(\),/);
   const wm = src('src/scenes/worldModes.js');
-  // WB14b (PIN MOVED): the court and its land are stood by scenes/gate/gateStand.js, out of the host whole
+  // WB14b (
   const gs = src('src/scenes/gate/gateStand.js');
   assert.match(gs, /if \(courtMesh\) ctx\.dynamicDraws\.push\(\{ gpu: courtMesh, object: \{ matrix: identity\(\) \} \}\);\n\s+standDeadlands\(ctx\);/, 'the land after the court, whose art it is cut from');
   assert.match(gs, /if \(shardMesh\) for \(const s of deadlandsShards\(\)\) ctx\.dynamicDraws\.push\(\{ gpu: shardMesh, object: \{ matrix: shardMatrix\(s, host\.deadlandsSeconds\?\.\(\) \?\? 0\) \}, shard: s \}\);/);
   assert.match(gs, /if \(landMesh\) ctx\.dynamicDraws\.push\(\{ gpu: landMesh, object: \{ matrix: identity\(\) \} \}\);/);
   const shards = wm.indexOf('\n      if (isGateArena(dungeonLoc)) for (const d of dungeonCtx.dynamicDraws) if (d.shard) shardMatrix(d.shard, _deadS, d.object.matrix);');
   const clock = wm.indexOf('\n      const _deadS = isGateArena(dungeonLoc) ? (host.deadlandsSeconds?.() ?? performance.now() / 1000) : 0;');
-  const begin = wm.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
+  const begin = wm.indexOf('renderer.beginFrame(proj, view, INTERIOR_LIGHT_DIR, WORLD_FRAME);');
   assert.ok(clock > 0 && clock < shards && shards < begin, 'the shards moved before the frame\'s draws, which the shadows record');
   assert.match(wm, /const _cl = courtLighting\(deadlandsFlash\(_deadS\)\);/);
   const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /\n      if \(!isGateArena\(dfLocation\)(?: && !isArenaFloor\(dfLocation\))?(?: && !_sdRealm)?(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/, 'no drip, no door, no bird in the Deadlands');   // KETCH (PIN MOVED): nor aboard the sky-ketch; SD5a (PIN MOVED): nor in the Shattered Hour; EG-ROAR (PIN MOVED): nor in the Spire
+  assert.match(dc, /\n      if \(!isGateArena\(dfLocation\)(?: && !isArenaFloor\(dfLocation\))?(?: && !_sdRealm)?(?: && !_egHall)?(?: && !_ketch)?\) sceneAmbience\.update\(dt, \{/, 'no drip, no door, no bird in the Deadlands');     // KETCH (
   assert.ok(GATE_BLOCK_SIDE > 0);
 });

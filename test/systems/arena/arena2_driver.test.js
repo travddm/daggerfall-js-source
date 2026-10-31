@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02): A BOUT PLAYED THROUGH, HEADLESS (scenes/arena/arenaBouts.js over a fake stage - the bodies the pools
+// ARENA2: A BOUT PLAYED THROUGH, HEADLESS (scenes/arena/arenaBouts.js over a fake stage - the bodies the pools
 // would stand, their doors the pools' bout hooks): a ladder bout from the Herald's call to the purse and the ladder's
 // step; my blows taken counted and my 1 HP floor; a yield by sheathing at the line (and refused above it); an
 // exhibition between two AI fighters, the stranger's blow on it warned then a crime; a blow before the word made good;

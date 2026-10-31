@@ -1,5 +1,4 @@
-// INT16-INT17 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7; the owner: "Take care
-// of the integrity arc", then, asked, "Measure first"): PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT
+// INT16-INT17: PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT
 // PAYS FOR THEM (server-account/src/progress.js).
 //   - INT16: every claim (Renown, a raid's cleanse, a camp, the Watch, a silver find, a profession's XP) is the account's
 //     SEATED realm character's - an offline id, another character of the account, a seat another device took and a held

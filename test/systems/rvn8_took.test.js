@@ -1,5 +1,4 @@
-// RVN8 - WHAT IT TAKES (bible/12-Enhanced-AI/Feud-Arc.md section 19; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). Online alone: at the respawn, when this death was a revenant's kill, it
+// RVN8 - WHAT IT TAKES (;, then "Go"). Online alone: at the respawn, when this death was a revenant's kill, it
 // takes one piece - drawn on its id and its kill count from the equipped weapon and the pack's five most valuable pieces;
 // never a quest item, a summoned piece, the Materials Bag, gold or a locked piece; at most three held, past that it only
 // gloats. Off the hand that held it, out of the pack, onto its record (the save's copy winning over the app's mirror),
@@ -181,7 +180,6 @@ test('RVN8 BACK: carried at every stand (once); slain carrying it, the record le
 
 test('RVN8 THE CAP AND THE SAVE: the cap never buries one holding a piece; the save\'s copy of what it took wins over the app\'s mirror - a load never brings back a piece the save holds (mutants: one holding a piece buried; the mirror\'s copy kept)', () => {
   const p = me();
-  // PIN MOVED (UNQUIET, Revenants.md section 46): none rises past the cap - the cap buries only for a deserter coming back
   const sw = N.revenantDeed(p, { ...killer(), champion: 'swift' }, 'fled', { mobileType: M.Orc, rolls: () => 0 });
   N.revenantSpared(p, { revenant: { id: sw.id } }, { state: 'away' });
   const r = slain(p);

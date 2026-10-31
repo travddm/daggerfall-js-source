@@ -1,6 +1,4 @@
-// CAST-SPEED (2026-10-08, Mac on a Discord post, "Morrowind magic anims nerf you": "I think we nerf the animation of
-// the regular sprite spellcasting to fall in line with the morrowind model. Also have casting speed a new rarity affix
-// along with scaling with speed"). The laws pinned here:
+// CAST-SPEED. The laws pinned here:
 //   - THE RATE (systems/castSpeed.js): 1 at Speed 50, a quarter faster at 100 and slower at 0, the attribute clamped,
 //     every registered modifier's percent added on, the whole clamped to [0.5, 2].
 //   - THE CLASSIC HANDS (combat/fpsSpellCasting.js): CAST_FRAME_PERIOD over the cast's rate - the release at 0.5 s and
@@ -185,7 +183,7 @@ test('CAST-SPEED: the loot line - casting speed, a line that does something on j
   assert.deepEqual(['magic', 'rare', 'legendary'].map((t) => LR.affixWord({ id: 'castSpeed', value: 3 }, t)), ['of Quickening', 'of Alacrity', 'of the Swift Hand']);
   assert.equal(LR.validAffix({ id: 'castSpeed', value: 16 }), false, 'past its ceiling');
   assert.equal(LR.validAffix({ id: 'castSpeed', param: 'fire', value: 5 }), false, 'it takes no param');
-  // a door's last pass may land it on a ring or a sword, never on armour - PIN MOVED (BAL9c): it was each group's last
+  // a door's last pass may land it on a ring or a sword, never on armour
   // proc kind (a roll of 0.999); potency follows it on both and wellspring on a jewel, so it is the second of a jewel's
   // four (focus, castSpeed, potency, wellspring) and the fourth of a blade's five (elemental, leech, slayer, castSpeed,
   // potency)

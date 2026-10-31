@@ -1,6 +1,4 @@
-// WW7-3 (2026-10-25, the owner: "we need the same city nodes populating the entire map of tamriel"; asked, a province's
-// crown its own kingdom: "Yes"; High Rock and Hammerfell's past the Bay: "Whatever makes sense"; bible/03-World/
-// World-Wide.md WW7): the seats past the Bay - a crown at each province's capital, a palace at every Arena city-state -
+// WW7-3: the seats past the Bay - a crown at each province's capital, a palace at every Arena city-state -
 // the provinces' kingdoms, the law's regions and pixels, a province's gate its own seats'.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

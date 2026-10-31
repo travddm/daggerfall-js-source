@@ -1,5 +1,4 @@
-// NIGHT-FOG (2026-10-26; bible/07-Rendering/Weather-Arc.md NIGHT-FOG; the owner: "In foggy biomes, when its dark, you can
-// barely see anything"): THE FOG IS LIT BY THE LIGHT THE LAND IS LIT BY. On the enhanced lane the frame's fog colour is
+// NIGHT-FOG: THE FOG IS LIT BY THE LIGHT THE LAND IS LIT BY. On the enhanced lane the frame's fog colour is
 // never darker than air of NIGHT_AIR.albedo lit by the open air's light - the exterior ambient and the moons - and what
 // a fog lacks of that air's luminance is made up in the air's own colour (systems/weather/nightFog.js). Under Dynamic
 // Skies (the lane's default sky) every fog closed to black from dusk to dawn; under the port's dome a clear night's fog

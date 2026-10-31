@@ -1,7 +1,5 @@
-// DE1 - ENTERING A DUNGEON PUT THE PLAYER ACROSS IT (2026-08-29).
+// DE1 - ENTERING A DUNGEON PUT THE PLAYER ACROSS IT.
 //
-// Mac: "when entering a dungeon, it places you at the end of the
-// dungeon instead of the entrance."
 //
 // THERE ARE TWO DFU MEMBERS HERE AND THEY DO NOT AGREE:
 //

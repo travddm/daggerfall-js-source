@@ -262,7 +262,7 @@ test('D10: SetPerson mints the mobile walker TFAC record from the outfit variant
 
 // ── PORTRAIT1: THE HOST HAND-OFF, WHICH THE STUB ABOVE CANNOT SEE ──
 //
-// Mac, 2026-09-18: "talking to anyone indoors shows the error, outdoors looks normal" - the talk window drew
+// the talk window drew
 // Daggerfall's own "OOPS! Tell Mack NOW" debug face - and, for one tavern NPC, "the portrait doesn't match the
 // overworld sprite". ONE ROOT, and it was not in the law above, which is a faithful translation and was green
 // throughout: it was the HOST BAG. `world.js` and `exterior.js` handed `worldModes` a hand-listed pipeline literal

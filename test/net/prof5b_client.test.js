@@ -1,8 +1,8 @@
-// PROF5b (2026-09-29, Mac: "Go") - THE AUCTIONS' CLIENT: the books through the real Worker (a Masterwork posted out of
+// PROF5b - THE AUCTIONS' CLIENT: the books through the real Worker (a Masterwork posted out of
 // its seller's pack, bid on from two regions, the outbid bidder's escrow back on a read, the winner's piece collected
 // into their pack at its wear); the book's kept post (put back on a refusal, asked again with its own route) and its bid
 // (one id a press asked again); the Market tab's Auctions view, its bar, the List form's auction and the held Marks.
-// bible/06-Systems/Professions-Arc.md 27.
+// 27.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +34,7 @@ test('PROF5b DONE WHEN (the books): a Masterwork auctioned out of its seller\'s 
   clock(T0);
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' });
   const raw = s.env.DB._raw;
-  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), bob = await s.registered('Bob');   // PIN MOVED (INT19): the seller a realm character
+  const mac = await s.seated('Mac'), ann = await s.registered('Ann'), bob = await s.registered('Bob');
   s.seedMarks(mac, 100); s.seedMarks(ann, 5000); s.seedMarks(bob, 5000);
   raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
     VALUES (?, ?, ?, 'Silverthorn', 'longsword:mithril', 120, 5, 4, 77, 'p1.x', ?)`).run(PV, mac.id, mac.character, T0);
@@ -83,7 +83,6 @@ test('PROF5b DONE WHEN (the books): a Masterwork auctioned out of its seller\'s 
   clock(T0);
 });
 
-// PIN MOVED (INT19, Integrity-Arc section 7): an auction post goes through the realm act (net/marketBook.js realmPieceAct) -
 // out of the pack inside the hold, put back on a refusal, nothing kept on silence (the record is the truth); a post a tab
 // from before kept is still asked again by the settle on its own route
 test('PROF5b book: an auction post is kept - out of the pack before it is asked, put back on a refusal, asked again by the settle on its own route; a bid\'s id kept for a press asked again; a bid another overtook forgets the view', async () => {
@@ -201,11 +200,10 @@ test('PROF5b tab: Auctions - each Masterwork\'s standing bid, bids and end, wher
   // My listings: the auction form offers the Masterwork alone; the auctions and the bids
   buttons().find((b) => b.textContent === 'My listings').onclick();
   await tick();
-  // PIN MOVED (PACK-PICK): the kind a press, the Masterworks pictured tiles - and none chosen until one is pressed
   buttons().find((b) => b.getAttribute('data-kind') === 'auction').onclick();
   const tiles = () => [...root.querySelectorAll('.packpick')[0].querySelectorAll('button')];
   assert.deepEqual(tiles().map((b) => b.querySelectorAll('.packpick-name')[0].textContent), ['Silverthorn\'s Mithril Longsword']);
-  assert.match(text(), new RegExp(`Runs ${AUCTION_S / 3600} hours on every board; each bid beats the last by 5%, and a bid in the last 2 minutes adds 2 minutes\\.`));   // AUDIT 657 B9 (PIN MOVED): the add's unit said; AUDIT 31 L4, L7: strictly less, the add its own number; BOARD-UI (PIN MOVED)
+  assert.match(text(), new RegExp(`Runs ${AUCTION_S / 3600} hours on every board; each bid beats the last by 5%, and a bid in the last 2 minutes adds 2 minutes\\.`));     // AUDIT 657 B9 (
   assert.equal(buttons().find((b) => b.textContent === 'List').disabled, true, 'nothing chosen yet');
   tiles()[0].onclick();
   await buttons().find((b) => b.textContent === 'List').onclick();
@@ -222,7 +220,7 @@ test('PROF5b wiring: the two routes behind a session and in the Worker\'s table,
   const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
   assert.match(src('server-account/src/service.js'), /'\/v1\/market\/remove', '\/v1\/market\/auction', '\/v1\/market\/bid',/);
   const idx = src('server-account/src/index.js');
-  assert.match(idx, /'\/v1\/market\/auction': \(\) => marketAuction\(mctx, who\.player, env, body\)/);   // PIN MOVED (INT19): its Masterwork out of the seller's record, in R2
+  assert.match(idx, /'\/v1\/market\/auction': \(\) => marketAuction\(mctx, who\.player, env, body\)/);
   assert.match(idx, /'\/v1\/market\/bid': \(\) => marketBid\(ctx, who\.player, env, body\)/);
   assert.match(idx, /'auction-not-masterwork': 409, 'auction-low': 409, 'auction-leading': 409, 'auction-bid-standing': 409/);
   const door = accountMarket({ fetch: async () => ({}), storage: memStorage() });

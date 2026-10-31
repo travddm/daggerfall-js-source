@@ -1,5 +1,4 @@
-// SERPENT1 (2026-10-04, Mac: "A new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean"; "make this something truly special"): THE CLIENT'S HALF. Where it rises off the packet
+// SERPENT1: THE CLIENT'S HALF. Where it rises off the packet
 // lanes (systems/serpent/serpentSite.js); the cell's words folded (net/serpent/serpentLink.js); its blows judged on my own ship
 // (systems/serpent/serpentStrike.js); the sighting's lines and ring (systems/serpent/serpentOmen.js); the host end to end against the
 // relay's own brain (scenes/serpentHost.js - the `in`, the volleys gathered, a blow landed, the coil held and broken,
@@ -177,7 +176,7 @@ test('SERPENT1 strike: each shape meets a ship by her bow, her middle or her ste
   assert.equal(shipPoints(CARRACK).length, 3);
   // the hurt: her whole's share and points on top - alike for a rowboat and a carrack
   const h = shipHurt(SERPENT_ATTACK_TABLE.breach, CARRACK);
-  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });   // AUDIT SERPENT T1's numbers (PIN MOVED: SERPENT4 - its canvas halved)
+  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });     // AUDIT SERPENT T1's numbers (
   assert.ok(close(shipHurt(SERPENT_ATTACK_TABLE.breach, ROWBOAT).hull / ROWBOAT.maxHull, (0.07 * 120 + 8) / 120, 0.01));
   assert.deepEqual(crushHurt(CARRACK), shipHurt(CRUSH, CARRACK));
 });
@@ -192,7 +191,7 @@ test('SERPENT1 strike: the grip and the eye grind by the second with their fract
   for (let i = 0; i < 4; i++) { const g = grindHurt(CARRACK, 0.25, gc); gc = g.carry; gh += g.hurt.hull; }
   assert.ok(Math.abs(gh + gc - (MAEL_GRIND.hull * 1200 + MAEL_GRIND.base)) < 1e-9);
   const v = shoveOf({ a: SERPENT_ATTACK_TABLE.breach.id, tg: [[0, -10]] }, CARRACK);
-  assert.ok(close(v[0], 0) && close(v[1], SERPENT_ATTACK_TABLE.breach.shove * SERPENT_THROW_X), 'away from it');   // PIN MOVED: SERPENT4 - half the throw
+  assert.ok(close(v[0], 0) && close(v[1], SERPENT_ATTACK_TABLE.breach.shove * SERPENT_THROW_X), 'away from it');
   const lane = shoveOf({ a: SERPENT_ATTACK_TABLE.ram.id, tg: [[0, -100], [0, 100]] }, { ...CARRACK, x: 5 });
   assert.ok(close(lane[0], SERPENT_ATTACK_TABLE.ram.shove * SERPENT_THROW_X) && close(lane[1], 0), 'across the ram\'s lane, to her side');
   assert.deepEqual(shoveOf({ a: SERPENT_ATTACK_TABLE.spit.id, tg: [[0, 0]] }, CARRACK), [0, 0], 'no throw in venom');
@@ -317,7 +316,7 @@ function rig({ shipAt = [60, 0], acct = 'acct-0001' } = {}) {
     level: () => 20,
     boat: () => (ship.none ? null : { boat, hull: 4, root: [ship.at[0] + OFF[0], ship.at[1] + OFF[1]], pos: [ship.at[0] + OFF[0], 0, ship.at[1] + OFF[1]], yaw: ship.yaw, hl: 25, hw: 7, maxHull: 1200, maxSail: 600, atHelm: ship.atHelm, wrecked: ship.wrecked }),
     strike: (b, hurt, o) => strikes.push({ b, hurt, o }),
-    maxHealth: () => 100, hurt: (n, el) => hurts.push([n, el]),   // PIN MOVED (AUDIT 2 XC4): the bite in points
+    maxHealth: () => 100, hurt: (n, el) => hurts.push([n, el]),
     say: (t) => says.push(t), mid: (t) => mids.push(t), sound: (k, p) => sounds.push([k, p]), fx: (k, p) => fx.push([k, p]),
   });
   // the cell's word as the relay fans it - its fight's site stamped on it (AUDIT SERPENT 2 F1)
@@ -554,7 +553,6 @@ test('SERPENT1 voice: DAGGER.SND\'s own records, never a new clip - the Dreugh\'
 test('SERPENT1 hoard: the seed\'s own - the same seed, level and earning the same hoard; a ship that dealt has a Rare-or-better piece and a Magic-or-better, one that stood the second alone and STOOD_GOLD of the gold; its own spoils keys, never a raid\'s (mutants: the earning ignored; the gold unscaled; the keys shared)', () => {
   const a = rollSerpentSpoils(12345, 20, 'dealt'), b = rollSerpentSpoils(12345, 20, 'dealt');
   assert.deepEqual(a, b);
-  // PIN MOVED (CAST-SPEED): the castSpeed line is a Weapons' and Jewellery's proc kind, so this seed's dai-katana draws
   // it at the last pass and the Coilscale roll after it reads a moved stream - and lands: the set piece third
   assert.equal(a.pieces.length, 3);
   assert.ok(['rare', 'legendary', 'exalted'].includes(a.pieces[0].tier), a.pieces[0].tier);
@@ -565,7 +563,7 @@ test('SERPENT1 hoard: the seed\'s own - the same seed, level and earning the sam
   assert.equal(s.pieces.length, 1);
   assert.ok(Math.abs(s.gold - a.gold * STOOD_GOLD) <= 1, 'the same seed\'s gold, its share');
   const list = serpentSpoilsList(12345, 20, 'dealt');
-  assert.deepEqual(list.map((p) => p.kind), ['item', 'item', 'item', 'item', 'item', 'gold']);   // PIN MOVED (SERPENT-SET): the gate's embers between the pieces and the gold; PIN MOVED (CAST-SPEED): three pieces before them; PIN MOVED (GEM2): the Old Coil's gem after the pieces, a dealer's
+  assert.deepEqual(list.map((p) => p.kind), ['item', 'item', 'item', 'item', 'item', 'gold']);
   assert.equal(a.gems.length, 1); assert.equal(s.gems.length, 0, 'a ship that stood: no gem');
   assert.equal(serpentSpoilsDay(DAY), `serpent:${DAY}`);
   assert.notEqual(SERPENT_SPOILS_KEYS.store, RAID_SPOILS_KEYS.store);

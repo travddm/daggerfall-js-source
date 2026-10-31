@@ -200,7 +200,7 @@ test('ROADS 3: every region\'s map table becomes settlements, a dead region cont
   assert.equal(buildRoadsFromArchives({ get regionCount() { throw new Error('bad'); } }, woods), null);
 });
 
-// AUDIT ROADS (2026-09-01): the fixes, each pinned - the sweep found all
+// AUDIT ROADS: the fixes, each pinned - the sweep found all
 // three fixes UNPINNED, which is the vacuous shape this bible keeps
 // catching, so the audit's first product is these.
 test('AUDIT ROADS F1: a farm gets no track - it sits in the fields it works', async () => {
@@ -278,8 +278,7 @@ test('ROADS 22/AUDIT 51: a road pixel paves the rect\u2019s padding, the streets
   for (const [x, y] of [[54, 64], [73, 64], [64, 73], [53, 53], [74, 74]]) assert.equal(tilemap[y * 128 + x], 0, `nothing outside the rect at ${x},${y}`);
 });
 
-// ROADS 5 (2026-09-01, Mac's first real-data look: "the roads are
-// extremely jagged"): A ROAD-BUILDER LAYS STRAIGHT STRETCHES. Plain A*
+// ROADS 5: A ROAD-BUILDER LAYS STRAIGHT STRETCHES. Plain A*
 // on an 8-connected grid draws a 1-in-10 slope as nine E and one NE,
 // over and over, and the painter turns each change into a 135-degree
 // kink at a pixel centre. With the heading in the search state and a

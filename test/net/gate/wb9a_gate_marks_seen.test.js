@@ -1,5 +1,4 @@
-// WB9a (2026-09-30, Mac: "Can we add the modifers below his health bar? Allow people to see the modifers/trial as a
-// popup before it starts.") - THE WARDEN'S MARKS, SEEN.
+// WB9a - THE WARDEN'S MARKS, SEEN.
 //
 // WB8b gave the Warden an aspect and two trials every gate and said them in words; nothing showed what a mark DOES while
 // the fight was on, and nothing showed them before the step. Now: a row of the night's marks under his health (each its

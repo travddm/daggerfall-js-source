@@ -1,4 +1,4 @@
-// AUDIT 31 (2026-09-29, Mac: "let's first do a comprehensive audit and ensure everything so far is perfect") - THE
+// AUDIT 31 - THE
 // WORK AND MARKET TABS, AUDITED: the field being typed in and the list's scroll kept through every redraw (U1 - the
 // window emptied itself before the tabs looked, and the fake DOM never let the focus go); every field named on the
 // page and every button that cannot be pressed saying why (U2, U10); Yours' Decline and where a commission naming you
@@ -6,7 +6,7 @@
 // note's commission handing the focus to its pay (U9); Decline pressed twice (U11); drafts that outlive the window,
 // and Escape closing a form first (U12); the words (U13); one grid, and a form's opener saying it is open (U14); a
 // filled commission's piece pointed to the Market tab (H6); a next bid past any balance said (L6); an empty auction
-// view saying its filter (U14). bible/06-Systems/Online-Arc.md "AUDIT 31".
+// view saying its filter (U14). "AUDIT 31".
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -158,7 +158,7 @@ test('AUDIT 31 U2, U10: every field under its visible name; a Post or a Commissi
   // Deliver: the guild Stores can take 30 of W1's 280 - the field's most; one's own guild's (W2): not offered
   assert.equal(field(r.host, 'supply|W1').max, '30');
   assert.equal(btn(r.host, 'Deliver').textContent, 'Deliver 30');
-  const own = byClass(r.host, 'seal-guild').find((c) => /The Silver Hand/.test(c.textContent));   // PIN MOVED (BOARD-SIFT): W2 by its guild - the work ends soonest first, and W2 ends first
+  const own = byClass(r.host, 'seal-guild').find((c) => /The Silver Hand/.test(c.textContent));
   assert.equal(field(own, 'supply|W2'), undefined);
   assert.match(own.textContent, /Officers and the Guildmaster do not deliver to their own guild's writs\./);   // BOARD-UI (PIN MOVED)
   // the writ form: an Officer with no budget
@@ -223,7 +223,7 @@ test('AUDIT 31 U4, U11, H6, U13: Yours declines a commission naming you and says
   const held = Object.assign([], { blocked: 1 });
   const h = workRig({ data: boardData(), pieces: held });
   await openWork(h.host);
-  assert.match(byClass(h.host, 'seal-commission')[0].textContent, /Your piece for it is equipped, locked or bound\. Free it first\./);   // BOARD-UI (PIN MOVED)
+  assert.match(byClass(h.host, 'seal-commission')[0].textContent, /Your piece for it is equipped, locked or bound\. Free it first\./);     // BOARD-UI (
   h.v.unmount();
 });
 
@@ -274,7 +274,7 @@ test('AUDIT 31 L6, U14: a next bid past any balance is said, never a Bid greyed 
   redraw();
   byClass(root, 'market-row')[0].click();
   redraw();
-  assert.match(root.textContent, /The next bid \(10,000,001 silver\) is more than an account can hold\./);   // BOARD-UI (PIN MOVED)
+  assert.match(root.textContent, /The next bid \(10,000,001 silver\) is more than an account can hold\./);     // BOARD-UI (
   assert.equal(byClass(root, 'market-bid').length, 0);
   data = { rows: [] };
   tab.state.family = 'weapons';

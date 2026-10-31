@@ -1,5 +1,4 @@
-// AUDIT RELEASE R2-5f (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-5; bible/06-Systems/Quest-Arc.md
-// "AUDIT RELEASE R2-5", R2-5f; the owner, holding the release for "proper fixes") - THE IMPERIAL CITY'S SLICES' SITES
+// AUDIT RELEASE R2-5f - THE IMPERIAL CITY'S SLICES' SITES
 // INDEX. A local site the centre cannot give is the city's (R2-5c), and a remote dart may land on any of its sited slices;
 // each search stood a slice and walked its blocks to learn it held no building of the kind, and the walk made every one of
 // the city's own cells afresh: 154-279 s for a Mages Guild at the centre. Now a slice's sites by kind (quest/place.js
@@ -119,7 +118,7 @@ test('R2-5f a town\'s sites index: every building of its blocks a search could e
   ]);
   assert.ok(Object.isFrozen(index) && index.every((s) => Object.isFrozen(s)), 'frozen: the law no quest or owner changes');
   assert.deepEqual(townSitesIndex(world, { loaded: true, exterior: {} }), [], 'no layout, no sites');
-  // A CAPITAL'S OWN GENERATED CELL is read as any block is - PIN MOVED (QUEST-FABRIC): BLD-3 stands buildings there, and a
+  // A CAPITAL'S OWN GENERATED CELL is read as any block is
   // world that still names such a block (R2-5f's `noBuildingBlock`) is not asked
   const own = imperialOwnName(10, 10);
   const asked = [];
@@ -321,7 +320,6 @@ test('R2-5f end to end on a fixture city through the quest layer: a centre\'s lo
   assert.deepEqual(stood, [], 'unstood');
   assert.equal(dart._tryTownLocation(qw, CYRODIIL, cyr.mapNameLookup.get(sliceQuestName(...second)), 15), true, 'a marked tavern: landed');
   assert.deepEqual(stood, [`${second[0]},${second[1]}`]);
-  // PIN MOVED (QUEST-FABRIC): the quest layer names no block as holding none; a town that is no capital is read whole
   assert.equal(qw.noBuildingBlock, undefined);
   made.length = 0; viewed.length = 0;
   assert.deepEqual(townBlockGrid(qw, townOf('Elsewhere', [own(3, 4)])).map((b) => !!b.dfBlock), [true]);
@@ -331,7 +329,6 @@ test('R2-5f end to end on a fixture city through the quest layer: a centre\'s lo
 
 test('QUEST-FABRIC (the owner: "Let quests use them") on a fixture city through the quest layer: a marked tavern in a fabric building of the centre\'s own cells is the centre\'s local tavern - its own site, no other slice stood, nothing picked; where R2-5f read those cells as holding none it was sent a slice away (mutants: the city\'s own cells skipped again)', () => {
   const { ic, slice } = icFixture();
-  // PIN MOVED (IC-PROPS, IC-STAIRS: the plan's cells laid again - Daggerfall's blocks gone, a building across a cell's corner
   // that cell's ground): the plan's cell (34, 95) holds one tavern, its record 0 (world/imperialFabricBuildings.js fabricCellBuildings), its
   // donor TVRNBM04.RMB's record 5 - whose interior here holds a spawn marker; the fixture's other slices are the plan's
   // corner, no building

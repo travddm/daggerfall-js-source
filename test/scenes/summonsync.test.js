@@ -1,4 +1,4 @@
-// SUMMON-SYNC (2026-09-27, Mac: "Finish the 2 gaps"). QUEST-PARTY phase 3c left one foe past a dungeon's layout run its
+// SUMMON-SYNC. QUEST-PARTY phase 3c left one foe past a dungeon's layout run its
 // player's alone: a LOOSE stand - a summon's foe (a SoulBound's release, the Sanguine Rose's Daedroth) or a Wabbajack's
 // change - in no frame and blind to every other player (the ONLINE-DUNGEON-FOES flag's last half). It rides the room's
 // own lane now, as a cell's loose stand rides its cell (WORLD6b): named in the frame's `lf`, stood by EVERY player in
@@ -13,7 +13,7 @@ import * as acorn from 'acorn';
 import '../modsOff.js';
 import { validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, CELL_LOOSE_PUPPETS, FOES_FRAME_MAX } from '../../src/net/wire.js';
 import { validQuestTags, questMarkerYields, QUEST_PUPPETS_MAX, validLooseSeqs, companionNames } from '../../src/scenes/exteriorFoes.js';
-import { summonedWord, summonedRecord, markSummoned } from '../../src/systems/foeLootCap.js';   // PIN MOVED (RPT1026-PROGRESS, test/scenes/rpt1026_progress_peersummon.test.js): the own lane names its summons and marks their puppets
+import { summonedWord, summonedRecord, markSummoned } from '../../src/systems/foeLootCap.js';
 import { isPrivateQuestFoe } from '../../src/scenes/quest/questFoeHost.js';   // CURSE-SYNC: the handovers' word for a quest's foe
 import { PARTY_ME, noteFighter, foeFighters, partyFoeLoses, partyFoeHeals, partyFoeHits, _resetPartyScaleForTests } from '../../src/systems/party/partyScale.js';
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   // AUDIT MW-NPC II K3: the dungeon context's look seed, in the mounted scope
@@ -87,7 +87,7 @@ function side(self, { layout = [], own = [], authority = true } = {}) {
     _layoutFoes: layout.length, foes, _authority: authority, _ctxDead: false, _locationKey: 'dungeon:7',
     _ownSeq: 0, _ownFrameSeq: 0, _ownGen: 0, _ownPups: new Map(), _ownPending: new Map(), _ownOwners: new Map(), _ownPendLoose: new Set(), _ownAdopted: new Map(), _ownKept: new Map(),
     FOE_HEALTH_MAX, FOE_LEVEL_MAX, CELL_FRAME_RECORDS_MAX, QUEST_PUPPETS_MAX, CELL_LOOSE_PUPPETS, LOOSE_PUPPETS_MAX, HIT_DMG_MAX: 10000, FOES_FRAME_MAX,
-    isClassEnemyId, enemyEntityType, validFoeRecord, validQuestTags, validLooseSeqs, companionNames, questMarkerYields, summonedWord, summonedRecord, markSummoned, GENDER_BIT: ['male', 'female'],   // PIN MOVED (AUDIT WK-U3, 2026-10-01): the own lane reads companions' names beside their places
+    isClassEnemyId, enemyEntityType, validFoeRecord, validQuestTags, validLooseSeqs, companionNames, questMarkerYields, summonedWord, summonedRecord, markSummoned, GENDER_BIT: ['male', 'female'],
     _sharedFoe: () => false, fightN: () => 1, canStandFoe: () => true,
     applyFoeRecord: (f, r) => { if (r.f) f.ai.feet = [...r.f]; if (Number.isFinite(r.h)) f.entity.health = r.h; if (r.d === 1) f.dead = true; f._pup = { feet: [...(r.f ?? f.ai.feet)], yaw: r.y ?? 0 }; },
     buildFoeAt: async (e) => { const f = foe({ mobileType: e.mobileType, gender: e.gender, ai: { feet: [e.x, e.y, e.z], yaw: 0, resumeLive() { this.resumed = true; } } }); built.push(f); foes.push(f); return f; },

@@ -1,6 +1,4 @@
-// LAYERED-PEERS (2026-10-19, the owner, playing LAYERED-GEAR: "when layered skins are on you only see it on your char
-// and players who also choosen the option. Normaly once you picked it you should see all other players too in their
-// layered gear").
+// LAYERED-PEERS.
 //
 // The walker layer (net/peer/peerRiders.js createPeerWalkers) drew a peer in the armor they wear only when their own
 // look carried `lg`, so a player in Layered Gearing saw it on themselves and on the few who had chosen it too - and on

@@ -1,5 +1,4 @@
-// REST-SLEEP1 (2026-10-04, from play: "Seems like if you have to wait for night to pass you cannot rest again to remove
-// the tiredness/drowsy debuffs until the time passes"; bible/06-Systems/Rest-Arc.md, As built "REST-SLEEP1"). Inside
+// REST-SLEEP1. Inside
 // the night interval a rest is a short rest, and it paid nothing of the sleep need - the need has no other payer, so a
 // night that left its sleeper Tired or Drowsy (a foe's break in the first hour still stamps the interval; a rough
 // night pays a third of a bed's rate; a debt past the twelve hours a night pays) kept the penalties for the whole ten

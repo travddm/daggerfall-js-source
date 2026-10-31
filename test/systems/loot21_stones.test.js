@@ -1,5 +1,4 @@
-// LOOT21 - THE AYLEID STONES (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 13; Mac: "what could we do to make it
-// even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT21 - THE AYLEID STONES.
 //
 // Two things DFU's roll cannot make, found at the deepest sources through the loot door's unique-find registry as LATE finds - the
 // door's last draws, so no seed's earlier draw moves (the arc's law 9): the Welkynd Stone from a source of tier 6 (used,
@@ -64,7 +63,7 @@ test('LOOT21: the finds - late, from tier 6 and tier 10, never in rollUniqueFind
   // every draw a find, still no stone
   let drawn = 0;
   LR.rollUniqueFinds({ kind: 'corpse', tier: 21, boss: true, luck: 50 }, () => { drawn++; return 0.999; });
-  assert.equal(drawn, finds.filter((f) => !f.late && !f.final).length);   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): a final find is the door's last draw, never rollUniqueFinds'
+  assert.equal(drawn, finds.filter((f) => !f.late && !f.final).length);
   assert.ok(!LR.rollUniqueFinds({ kind: 'corpse', tier: 21, boss: true, luck: 50 }, () => 0).some((it) => isWelkyndStone(it) || isVarlaStone(it)));
   // rollLateFinds rolls them alone, the Welkynd first
   drawn = 0;
@@ -76,13 +75,12 @@ test('LOOT21: the finds - late, from tier 6 and tier 10, never in rollUniqueFind
   LR.rollLateFinds({ kind: 'corpse', tier: 8, luck: 50 }, () => { drawn++; return 0.999; });
   assert.equal(drawn, 1, 'a find under its tier costs a seed no draw');
   // the door: the stones are its last two draws - each seed's draws recorded, then replayed with the last two found and
-  // not found: everything before them the seed's own. GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md, PIN MOVED): the gem
+  // not found: everything before them the seed's own. GEM1/GEM2 (
   // arc's draws come after the stones (law 9) - the weapons' sockets and the gem find - so they are held off here, and
   // test/systems/gem1_sockets.test.js pins that they follow
   LR._setWeaponSocketsForTests({ first: 0, more: 0 });
   LR.registerGemFind(null);
   const src = { kind: 'corpse', tier: 21, boss: true, family: null };
-  // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's draw after the stones' and
   // the gem arc's - off here (a tier with no chance takes no draw), so the stones are this replay's last two draws;
   // test/tech1_roster holds the technique pass the door's very last
   LR._setTechniqueForTests({});

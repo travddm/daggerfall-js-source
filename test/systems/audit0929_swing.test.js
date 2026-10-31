@@ -1,7 +1,7 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - SWING-LAW's half: one sprite swing a blow on the Eye of the
+// AUDIT PRE-MERGE 0929 - SWING-LAW's half: one sprite swing a blow on the Eye of the
 // Beholder body (the report's own werewolf clawed two and three times a claw blow, where every peer saw one), and the
 // swing law's reader in every rig (it was a boot call, and a rig built without that boot swung with no weight). The
-// record: bible/01-Overview/audits/Audit-PreMerge-0929.md and bible/05-Combat/Combat.md SWING-LAW.
+// record: and SWING-LAW.
 //
 // This file never imports scenes/shared.js: the reader it finds is the one combat/weapon/weaponRig.js's import registered.
 import { test } from 'node:test';
@@ -109,7 +109,7 @@ test('AUDIT PRE-MERGE 0929 S6: the reader reads and never writes - asked of a bo
   const body = { stats: { strength: 60 }, activeEffects: [] };
   const read = readSwing({ entity: body, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true });
   assert.equal(body.equip, undefined, 'no table grown');
-  assert.deepEqual(read, { weaponType: WEAPON_TYPES.LongBlade, weight: 0, strength: 60, twoHanded: false, family: 'handToHand', shortBlade: false }, 'an empty hand weighs nothing');   // PIN MOVED (BAL10): the reader names the swing's family - an empty hand's the fist's
+  assert.deepEqual(read, { weaponType: WEAPON_TYPES.LongBlade, weight: 0, strength: 60, twoHanded: false, family: 'handToHand', shortBlade: false }, 'an empty hand weighs nothing');
   const played = [];
   const rig = createWeaponRig({
     renderer: {}, canvas: { clientWidth: 1000, clientHeight: 800 }, fetchBytes: () => { throw new Error('no art'); }, palette: null,

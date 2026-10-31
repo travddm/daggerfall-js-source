@@ -1,4 +1,4 @@
-// OT1 (2026-09-10) - AUDIT 64 F0's RESIDUE, WIRED: IsPlayerSwimming
+// OT1 - AUDIT 64 F0's RESIDUE, WIRED: IsPlayerSwimming
 // ABOVE GROUND.
 //
 // F0 fixed the exterior swim SPEED through `sunk` and recorded the rest:

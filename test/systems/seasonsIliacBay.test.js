@@ -616,7 +616,7 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   // (older install AND a batch on an archive the mod has ever managed,
   // AUDIT 62 F4) lives in world/seasonReskin.js, where it is executed
   // by the pins rather than matched as text.
-  assert.match(world, /if \(seasons && seasonsGen !== seasons\.generation\) _reskin\.mark\(pkey\);/, 'AUDIT 61: a pixel published across an install asks for its own re-skin - ROAD-H H3: for its key alone');   // PIN MOVED (IC-SWAP-BEHIND): the pixel's key, never the build's behind it
+  assert.match(world, /if \(seasons && seasonsGen !== seasons\.generation\) _reskin\.mark\(pkey\);/, 'AUDIT 61: a pixel published across an install asks for its own re-skin - ROAD-H H3: for its key alone');
   assert.match(world, /refresh: \(\) => _reskin\.markStale\(seasons, built\),/,
     'AUDIT 62 F4 / ROAD-H H3: refresh marks only what stands on an older install AND carries a batch on an archive the mod manages');
   // the pick and the boot registration
@@ -624,7 +624,6 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   assert.match(ds, /textureStoreKey\(f, deps\)/, 'the texture pick decides every file through the one exported decision');
   assert.match(ds, /storeAssets\(TEXTURE_STORE, keyed\.map\(\(\[f\]\) => f\), \(\) => true, \(f\) => keyOf\.get\(f\)\)/, 'and storeAssets does not re-decide on the basename');
   assert.match(ds, /setSeasonsSources\(names, loadTextureFile\)/, 'and registers them');
-  // PIN MOVED (AUDIT VE R2): the boot's registration is the store's one - the call above, reached from the seam
   assert.match(read('src/scenes/shared.js'), /const textures = registerTextureStore\(\)/, 'the boot registers them on the same seam');
   // the switch and the credit
   assert.equal(MOD_SETTINGS['seasons-iliac-bay'].keys.Enabled.default, true);
@@ -634,7 +633,7 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   assert.deepEqual([...row.vendor], ['seasons-iliac-bay']);
 });
 
-// ---- SIB2 (2026-09-08, Mac: "ensure the seasons mod is 1:1 and working") --
+// ---- SIB2 --
 
 test('SIB2: the bundle is the mod by its MANIFEST, not by one guessed file name; the events are DFU\'s per caller; a later version says so', () => {
   // any .dfmod that says "season" is stored under its own lowercased name; the manifest inside decides (seasonsBundle: GUID, then title)
@@ -659,14 +658,13 @@ test('SIB2: the bundle is the mod by its MANIFEST, not by one guessed file name;
   assert.match(world, /await _teleportToPixel\(w\.pixel\.x, w\.pixel\.y, null, \{ modEvent: 'load' \}\);/, 'the quickload: a load');
   assert.match(world, /await _teleportToPixel\(px\.x, px\.y, null, \{ modEvent: 'load' \}\);/, 'the classic import: a load');
   assert.match(world, /await _teleportToPixel\(pixel\.x, pixel\.y, null, \{ modEvent: 'load' \}\);/, 'MAC6 #1: the dungeon save\'s load: a load too');
-  // ONLINE-UNDERGROUND-LOAD1 (2026-09-19): the FIFTH caller, and a load
+  // ONLINE-UNDERGROUND-LOAD1: the FIFTH caller, and a load
   // like the four above it - an online boot that wakes a character
   // saved underground teleports them to the nearest safe place, which
   // is a terrain change the mod has to hear about exactly as a
   // quickload's is. Named here rather than merely counted, because the
   // count alone is what this line is guarding.
   assert.match(world, /await _teleportToPixel\(wake\.mapPixel\.x, wake\.mapPixel\.y, null, \{ modEvent: 'load', reposition: REPOSITION\.RandomStartMarker \}\);/, 'the online underground wake: a load');
-  // PIN MOVED (ETHER-CROSSING, bible/03-World/Eltheric-Ocean.md): the crossing to and from the Eltheric Ocean is a voyage of
   // days - a travel, OnPostFastTravel and all
   assert.match(world, /await _teleportToPixel\(to\.px, to\.py, null, \{\n\s+arriveMinutes: sharedClockOn\(\) \? skyMinutes\(\) : worldMinutes\(\) \+ minutes,\n\s+modEvent: 'travel',/, 'the crossing: a travel');
   assert.equal((world.match(/modEvent: '(travel|load)'/g) || []).length, 6, 'and no other caller names an event');

@@ -1,4 +1,4 @@
-// RW1 (2026-10-09, Mac: "...allowing players to see inside/outside of house windows"): THE VIEW OUT - from inside a
+// RW1: THE VIEW OUT - from inside a
 // building, its glass shows the real street: drawn from the interior camera into a target of its own
 // (renderer.outsideViewFrame - a bracket that puts back everything it sets), cropped to the screen rectangle the glass
 // covered last frame, kept while the camera is still, painted as the interior frame's background inside that

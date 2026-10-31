@@ -1,5 +1,4 @@
-// PROF-FOUND (2026-10-12, Mac: "Ensure all the professions new stores are flagged on the town map and you can ask NPCs
-// where they are"; bible/06-Systems/Professions-Arc.md 42). THE STATION SHOPS FOUND AS EVERY SHOP IS: of the shops the
+// PROF-FOUND. THE STATION SHOPS FOUND AS EVERY SHOP IS: of the shops the
 // professions' stations stand in (scenes/worldModes.js forgeHere .. enchantHere), the Furniture Store - the furnisher's
 // counter (DECOR2b) and Carpentry's workbench (PROF4) - was the one DFU keeps off the Where-is page (TalkManager
 // CheckBuildingTypeInSkipList) and draws in the house colour (ExteriorAutomap.cs:1482-1541), because classic never

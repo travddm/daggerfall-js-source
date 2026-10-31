@@ -1,4 +1,4 @@
-// WORLD6b (Mac, 2026-09-14: "Continue" after AUDIT WORLD6a): THE CELL STREAMS ITS FOES. The open country's room
+// WORLD6b (after AUDIT WORLD6a): THE CELL STREAMS ITS FOES. The open country's room
 // is a sixteen-pixel cell, nothing in it is a layout every client builds alike, and every foe was one client's
 // roll - so a cell has no host and no memory, and A FOE IS ITS SPAWNER'S: the spawner steps it and streams it,
 // everyone else in the cell puppets it, and a blow on another's foe goes to its OWNER as a hit (`to`). The relay
@@ -33,7 +33,6 @@ const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);
 
 test('WORLD6b: the wire - a cell is world:<x>,<y> alone (no dungeon, no building, no town, no fourth digit, no third number), at both ends; a room streams foes when it is a world room or a cell; a hit\'s owner is its `to`, a peer id of at most 64, or nothing', () => {
   for (const k of ['world:3,12', 'world:0,0', 'world:999,999']) { assert.equal(isCellRoom(k), true, k); assert.equal(streamsFoes(k), true, k); assert.equal(isWorldRoom(k), false, `${k} is no world room: no host, no memory`); }
-  // PIN MOVED (TV-BEYOND): 'world:-1,1' is the cell west of the Bay now (fb1009_beyond) - a sign twice, or four digits, still none
   for (const k of ['world:3', 'world:3,12,1', 'world:1234,1', 'world:1,1234', 'world:--1,1', 'world:-1234,1', 'world:1,-1-', 'world:a,1', 'dungeon:m187', 'interior:m187.4', 'town:m9', 'chat:global', '', null, undefined, 3]) assert.equal(isCellRoom(k), false, String(k));
   assert.equal(streamsFoes('dungeon:m187'), true); assert.equal(streamsFoes('interior:m187.4'), true, 'a building is a world room (WORLD6a) and streams its foes by law, though its pool streams none yet'); assert.equal(streamsFoes('town:m9'), false);
   assert.equal(hitOwnerOf({ to: 'bbbb-0002' }), 'bbbb-0002'); assert.equal(hitOwnerOf({ to: 'x'.repeat(40) }), 'x'.repeat(40), 'the wire\'s own id law (AUDIT WORLD6b A5: ID_RE, 4 to 40 of [A-Za-z0-9_-])');
@@ -177,7 +176,6 @@ test('WORLD6b: the pool streams MINE - numbered from one, every changed foe (eve
   const rat = await pool.spawnFoe(0, [10, 0, 10], { yaw: 1.5, feetGiven: true });
   assert.ok(rat, 'the rat stands on the crafted career'); assert.equal(rat.seq, 1, 'mine, numbered from one'); assert.equal(rat.puppet, null);
   const f1 = pool.foesFrame(false);
-  // PIN MOVED (AUDIT MW-NPC II K2-K4): the first record carries the look its owner stands it in - its seed (`ls`; a rat
   // is no person, so no kit `lw`), minted once on its own foe
   assert.equal(f1.f[0].ls, foeSeed(rat), 'its look\'s seed, the one every puppet of it takes');
   assert.deepEqual(f1, { n: 1, k: 'world:3,12', full: 0, f: [{ i: 1, t: 0, x: rat.gender === 'female' ? 1 : 0, f: [10, 0, 10], y: 1.5, h: rat.entity.health, k: rat.entity.maxHealth, d: 0, a: 0, b: '', m: 0, g: '', l: rat.entity.level | 0, w: null, c: 0, s: 0, u: '', o: 0, ls: foeSeed(rat) }] }, 'the first frame carries the rat (WORLD6b-ii: and its target - none yet, AUDIT WORLD6b-ii A8; its level and no weapon, B2; WORLD6b-iii: no cast yet; AUDIT WORLD6b-iii(a) A3: no blow and no cast at anyone yet)');

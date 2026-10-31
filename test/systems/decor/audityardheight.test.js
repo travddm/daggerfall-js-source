@@ -1,4 +1,4 @@
-// AUDIT YARD-HEIGHT (2026-10-06, Mac: "Audit"): YARD-HEIGHT and DECOR-TURN read again before their deploy
+// AUDIT YARD-HEIGHT: YARD-HEIGHT and DECOR-TURN read again before their deploy
 // (`06-Systems/Online-Arc.md` AUDIT YARD-HEIGHT). Y1: a placed piece's turn was a write to the account service on every
 // press - four statements on its database, one of the hour's DECOR_OPS_MAX - and the piece stood still until it
 // answered; now it turns at once and its turning is written once the presses settle (scenes/decor/decorTool.js turnPlaced,

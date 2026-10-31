@@ -1,6 +1,5 @@
-// SEASON-BOOK (2026-10-22, the owner: "I think we need a new pause menu icon, like we did for the timers and mail. A
-// condensed place to see season related content and descriptions"; bible/10-UI/UI-Arc.md SEASON-BOOK) - and AUDIT
-// SEASON-BOOK (bible/01-Overview/audits/Audit-Season-Book.md): every finding's fix held here, or in seasonbook_face.test.js
+// SEASON-BOOK - and AUDIT
+// SEASON-BOOK: every finding's fix held here, or in seasonbook_face.test.js
 // (the face mounted).
 import test from 'node:test';
 import assert from 'node:assert/strict';

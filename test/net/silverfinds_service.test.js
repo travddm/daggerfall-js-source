@@ -1,9 +1,8 @@
-// SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in more forms of interactions like foraging and
-// different activities, also needs to be sometimes lootable"): THE SERVICE'S HALF - a counted harvest finds silver now
+// SILVER-FINDS: THE SERVICE'S HALF - a counted harvest finds silver now
 // and then (the service's own dice, inside the harvest's batch, by its row alone), and a loot find the device rolled is
 // struck by the service's dice under its own day (`/v1/marks/find`). Both bounded, not witnessed: the day is what a lying
 // client is paid. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Professions-Arc.md 10.5 (SILVER-FINDS).
+// 10.5 (SILVER-FINDS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -60,9 +59,7 @@ const PATCHES = (() => {
 async function stand(extra = {}) {
   const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', ...extra });
   const raw = s.env.DB._raw;
-  // PIN MOVED (AUDIT 625 S1, Mac: "A week old, like witnesses"): finds and gathering silver open to an account a week
   // registered - the harness's accounts are a week old; `young` is one registered this moment
-  // PIN MOVED (INT16, Integrity-Arc section 7): a harvest and a loot find are progression claims, asked of the account's
   // SEATED realm character (progress.js progressRefusal) - `seated` is a week-old account playing one, and `young`, one
   // registered this moment, is seated too, so the Marks' own age law is what refuses it
   const aged = (w) => { raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(NOON - WITNESS.ageS, w.id); return w; };
@@ -90,7 +87,7 @@ test('SILVER-FINDS the law: a harvest finds 2-5 one time in ten, 30 a day; a loo
   assert.deepEqual(MARKS_FAUCETS.gather, { chance: 0.1, amount: [2, 5], perDay: 30 });
   assert.deepEqual(MARKS_FAUCETS.find, { chance: { corpse: 0.05, pile: 0.12, search: 0.15 }, amount: [1, 4], perDay: 20 });
   assert.deepEqual([MARKS_KINDS.gather, MARKS_KINDS.find], ['mint', 'mint']);
-  assert.deepEqual(MARKS_COMBAT.kinds, ['gate', 'raid', 'serpent', 'star'], 'a find is no combat strike');   // PIN MOVED (STAR7): a fallen star held is one
+  assert.deepEqual(MARKS_COMBAT.kinds, ['gate', 'raid', 'serpent', 'star'], 'a find is no combat strike');
   // the harvest's: the chance roll's edge, then the amount's whole range off its roll
   assert.deepEqual([gatherFindOf(0.0999, 0), gatherFindOf(0.1, 0), gatherFindOf(0.5, 0)], [2, 0, 0]);
   assert.deepEqual([0, 0.2499, 0.25, 0.5, 0.75, 0.9999].map((u) => gatherFindOf(0, u)), [2, 2, 3, 4, 5, 5]);
@@ -139,7 +136,6 @@ test('SILVER-FINDS a harvest asked twice: the same request answers its find agai
   assert.deepEqual([shut.r.body.repeat, shut.r.body.marks], [true, first.r.body.marks], 'a find made, answered whatever the switch says now');
   s.env.MARKS_OPEN = 'on';
   // the Stores full of the next patch's herb: it is refused in its own INSERT, before its row - and its find with it.
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): the refusal here was the character's day of
   // sixty spent (`prof-cap`), decided in the same INSERT - there is no day's cap to spend now
   s.raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
     ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = excluded.qty`).run(mac.id, mac.character, herbKey(PATCHES[1].herb, ANTICLERE), STORES_MAX);
@@ -219,7 +215,6 @@ test('SILVER-FINDS the loot find\'s day: 20 an account a UTC day, the day\'s las
 test('SILVER-FINDS the loot find\'s doors: a guest holds none; a request id the service cannot read, or one another act took, is refused; a kind of none is `bad-find`; the switch shut is `marks-closed` - but a find already made is answered before it (AUDIT 28 M2) (mutants: the guest struck; the rid unread; the kind unread; the switch before the line)', async () => {
   const s = await stand();
   const g = await s.guest();
-  // PIN MOVED (INT16, Integrity-Arc section 7): a find is asked of the account's seated realm character first - a guest
   // playing none is refused 'progress-seat' before the Marks read it; a guest seated reaches the Marks' own door
   assert.deepEqual([(await s.find(g)).status, (await s.find(g)).body], [403, { error: 'progress-seat' }]);
   await seatRealm(s.env, g.secret, 'Guestling');

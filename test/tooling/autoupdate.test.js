@@ -1,6 +1,4 @@
-// DA7 - THE AUTO-UPDATER (2026-09-21, Mac: "Is there an easy way to make
-// it where players dont have to manually install each release?" - "#1 is
-// best?" - "Do it").
+// DA7 - THE AUTO-UPDATER.
 //
 // REL3 made every merge a release and DA6's notice asked the player to
 // download and install each one. Where the installer can replace itself

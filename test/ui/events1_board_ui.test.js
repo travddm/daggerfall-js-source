@@ -1,7 +1,6 @@
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE EVENT BOARD ON THE HUD (ui/eventBoard.js) on a fake document, and THE SEAMS - the
+// EVENTS1: THE EVENT BOARD ON THE HUD (ui/eventBoard.js) on a fake document, and THE SEAMS - the
 // events' lines through the one door instead of the chat, the board drawn from drawHud, the status widget never making
-// way for it. Design: bible/10-UI/Event-Board.md; AUDIT EVENTS1, bible/01-Overview/audits/Audit-Event-Board.md. The
+// way for it. Design:; AUDIT EVENTS1,. The
 // layout is photographed and measured by tools/eventBoardProbe.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';

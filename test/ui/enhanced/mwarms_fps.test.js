@@ -1,5 +1,4 @@
-// MWA1 + FPS1 (2026-09-11, RookieG's report via Mac: "morrowind arms
-// did not work on first launch" / "we need an ingame fps counter").
+// MWA1 + FPS1.
 // The pure halves EXECUTE; the DOM half runs against AUDIT 62's stub
 // document; the hosts and the pane are text-pinned. Every pin names
 // its mutant.
@@ -74,8 +73,7 @@ test('MWA1 autoBuildArms: nothing without a made character or without the archiv
 // ---------------------------------------------------------------
 // MWA3 - the arm stands FOR the entity, not merely stands
 // ---------------------------------------------------------------
-// Mac, 2026-09-16: "my character who is an argonian uses a human
-// morrowind model". fpArm is one module singleton for the session and
+// . fpArm is one module singleton for the session and
 // autoBuildArms's last gate was `fpArm.ready()` - so whichever identity
 // first reached a door (the wizard's character, an earlier save, a
 // ?test preset) owned the arm, and a save loaded over it in-session
@@ -91,7 +89,6 @@ test('MWA3 armsStandFor: a standing arm counts only when its race, sex and face 
   assert.equal(armsStandFor(argonian, { ready: () => true, builtFor: () => ({ ...forHer, race: 'breton' }) }), false, 'a human\'s arm is not hers - the report');
   assert.equal(armsStandFor(argonian, { ready: () => true, builtFor: () => ({ ...forHer, female: false }) }), false, 'the male skeleton is not hers');
   assert.equal(armsStandFor(argonian, { ready: () => true, builtFor: () => ({ ...forHer, faceIndex: 4 }) }), false, 'another face is not hers');
-  // PIN MOVED (PORTRAIT3D): and the curse's face - a vampire's body wears the race's vampire head
   assert.deepEqual(armIdentityOf({ race: 'DarkElf', gender: 'male', faceIndex: 7 }), { race: 'dark elf', female: false, faceIndex: 7, werewolf: false, vampire: false }, 'the identity third of armBuildOptsOf, in the ESM\'s own race spelling');
   assert.deepEqual(armIdentityOf(null), { race: null, female: false, faceIndex: 0, werewolf: false, vampire: false }, 'no entity, no identity - never a throw at a boot door');
 });
@@ -116,7 +113,7 @@ test('MWA1 pins: the hosts build at every door a made character arrives through 
   assert.match(rig, /if \(!entity\?\.chargenDone \|\| !\(dataCount\(\) > 0\) \|\| standing\(entity\)\) return null;/, 'the three gates, the last so a second door does not rebuild an arm that already stands FOR THIS ENTITY (MWA3: not merely a built one)');
   const w = read('src/scenes/world.js');
   assert.equal((w.match(/autoBuildArms\(playerEntity\);/g) ?? []).length, 5, 'world: the rig, the wizard, the load, the classic load, a family member\'s birth (LEGACY1)');
-  assert.match(w, /questInitAtGameStart\(r\.startKey\);\s+\/\/ Q4-v: OnStartGame for the new character[^\n]*\n\s+autoBuildArms\(playerEntity\);/, 'after the wizard');   // PIN MOVED (START2): the page's answer handed on
+  assert.match(w, /questInitAtGameStart\(r\.startKey\);\s+\/\/ Q4-v: OnStartGame for the new character[^\n]*\n\s+autoBuildArms\(playerEntity\);/, 'after the wizard');
   assert.match(w, /if \(!extras\) \{ townTalk\.say\('Save version mismatch\.'\); return; \}\n\s+autoBuildArms\(playerEntity\);/, 'after the restore');
   assert.match(read('src/scenes/exterior.js'), /\n  \}\);\n  autoBuildArms\(playerEntity\);/, 'exterior: after its rig');
   const menu = read('src/ui/enhanced/enhancedMenu.js');

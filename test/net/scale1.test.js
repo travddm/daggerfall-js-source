@@ -1,5 +1,4 @@
-// SCALE1 (2026-09-30, the scaling audit - Mac: "set the stage for a larger player base in the future"; "This is all
-// you man. Just do whatever is best"). The account service's half, before any relay deploy:
+// SCALE1. The account service's half, before any relay deploy:
 //
 //   A. the per-request writes: `last_seen` touched only once it has gone stale (SESSION_TOUCH_S), both rows in one
 //      round trip - two of every authenticated request's three D1 writes;
@@ -60,7 +59,7 @@ test('SCALE1 A: a session resolved within SESSION_TOUCH_S of its last touch writ
   // and the window starts again from the touch
   assert.ok(await resolveSession({ db, subtle, nowS: NOW + SESSION_TOUCH_S + 5 }, made.secret));
   assert.equal(tally.updates, 2);
-  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');   // SCALE4h (PIN MOVED): an hour, from ten minutes - still nothing reads it finer
+  assert.ok(SESSION_TOUCH_S <= 60 * 60, 'coarse enough to save the writes, fine enough for a device list');     // SCALE4h (
 });
 
 test('SCALE1 A: a stale touch that fails never fails the request it rode in on (AUDIT-ACC F10, kept)', async () => {

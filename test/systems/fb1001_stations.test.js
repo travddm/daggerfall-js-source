@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part four (Mac: "...and also ensure the other professions are sound") - THE STATIONS' COUNTERS.
+// AUDIT 2026-10-01 part four - THE STATIONS' COUNTERS.
 //
 // CHARCOAL-BUY. The Forge says "Steel wants Charcoal: a log burns to it here (Logging's), and the smith sells it" - and the
 // smith's stock was bought only from an anvil recipe short of one of its inputs. No anvil recipe takes Charcoal, so its
@@ -71,9 +71,8 @@ test('CHARCOAL-BUY: at a smith\'s forge with no Charcoal held, the Forge offers 
 });
 
 test('COUNTER-GATES: the anvil\'s and the workbench\'s counters keep the loom\'s gates - none with Marks shut; held and said with too few; offered with enough (mutants: the gates dropped)', async () => {
-  // PIN MOVED (CRAFT2, Professions-Arc 41.5): the anvil lists its patterns, the material chosen in the box - the Longsword, in Iron
   const anvil = (o) => { const p = pages({ forge: () => ({ kind: 'shop', fee: 50 }), workbench: () => null, ...o }); p.btn('Weapons').onclick(); p.btn('Longsword').onclick(); p.btn('Iron').onclick(); return p; };
-  const bench = (o) => { const p = pages({ forge: () => null, workbench: () => ({ kind: 'shop', fee: 50 }), ...o }, { 'plank:pine': 8 }); p.btn('Furniture').onclick(); p.btn('Plain Single Bed').onclick(); return p; };   // PIN MOVED (CRAFT2): the bed a pattern, its wood the box's
+  const bench = (o) => { const p = pages({ forge: () => null, workbench: () => ({ kind: 'shop', fee: 50 }), ...o }, { 'plank:pine': 8 }); p.btn('Furniture').onclick(); p.btn('Plain Single Bed').onclick(); return p; };
   for (const [who, open, words] of [['the anvil', anvil, 'Buy 1 from the smith'], ['the workbench', bench, 'Buy 2 from the furnisher']]) {
     let p = open({ marksOpen: () => false });
     try { assert.equal(p.btn(words), undefined, `${who}: Marks shut - no counter`); } finally { done(); }

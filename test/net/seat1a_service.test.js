@@ -1,5 +1,5 @@
-// SEAT1a (2026-09-30, Mac: "Finish the seats"): THE SEATS' WITNESSED REGISTRY, AS THE SERVICE KEEPS IT - driven through
-// the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md
+// SEAT1a: THE SEATS' WITNESSED REGISTRY, AS THE SERVICE KEEPS IT - driven through
+// the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 // 3.2; `06-Systems/Online-Arc.md` SEAT1a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -37,7 +37,7 @@ test('SEAT1a three witnesses a week old confirm a seat byte for byte; a younger 
   assert.equal((await witness(b)).body.counted, true);
   assert.deepEqual((await list(a)).seats, [], 'two agree: not yet');
   assert.equal((await witness(c)).body.counted, true);
-  assert.deepEqual((await list(a)).seats, [{ ...ANTICLERE, state: 'confirmed', holder: null, battle: null }]);   // SEAT1c (PIN MOVED): each seat's holder and battle beside it
+  assert.deepEqual((await list(a)).seats, [{ ...ANTICLERE, state: 'confirmed', holder: null, battle: null }]);     // SEAT1c (
   assert.deepEqual((await list(a)).me, { witness: true, developer: false });
   assert.equal((await list(young)).me.witness, false);
   // the first answer stands: a witness's second, different report changes nothing
@@ -76,7 +76,7 @@ test('SEAT1a the shape: a crown stands in its crown\'s region and bears its name
   const dev = await aged('Devra');
   assert.equal((await witness(dev, { ...WAYREST, name: 'Daggerfall' })).body.error, 'bad-seat', 'a crown bearing another\'s name');
   assert.equal((await witness(dev, { ...WAYREST, region: 21 })).body.error, 'bad-seat', 'a crown outside its region');
-  assert.equal((await witness(dev, { ...ANTICLERE, pixel: [8192, 1] })).body.error, 'bad-seat');   // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): off the world's grid
+  assert.equal((await witness(dev, { ...ANTICLERE, pixel: [8192, 1] })).body.error, 'bad-seat');
   assert.equal((await witness(dev, { ...ANTICLERE, name: ' Anticlere' })).body.error, 'bad-seat', 'the canonical name alone');
   assert.equal((await witness(dev, WAYREST)).status, 200);
   for (let i = 1; i < SEAT_WITNESS_REPORTS_HOUR; i++) await witness(dev);

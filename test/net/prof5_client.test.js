@@ -1,4 +1,4 @@
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET'S CLIENT: THE DONE-WHEN through the real Worker (a crafted Mithril
+// PROF5 - THE MARKET'S CLIENT: THE DONE-WHEN through the real Worker (a crafted Mithril
 // Longsword listed at a board in one region, bought at a board in another by a second account, the courier's fee burnt,
 // the sword on the road, then collected into the buyer's pack - DFU's own piece with its quality and its wear, its owner
 // moved - and Mithril Ore bought the same way reaching the buyer's Stores after its courier's time); the book (a piece
@@ -58,7 +58,6 @@ test('PROF5 DONE WHEN: a crafted Mithril Longsword listed at a board in Daggerfa
   assert.equal(made.ok, true, JSON.stringify(made));
   const [sword] = pack;
   sword.currentCondition = Math.round(sword.maxCondition * 0.62);
-  // PIN MOVED (INT19, Integrity-Arc section 7): the pack is the record's - its checkpoint wrote the sword there
   layRecord(s.env, mac.character, { ...recordOf(s.env, mac.character), items: [JSON.parse(JSON.stringify(sword))] });
   // Mac lists it, and 40 Mithril Ore, at a board in Daggerfall - the sword taken out of the pack, and out of his record
   const macMarks = [];
@@ -110,7 +109,6 @@ test('PROF5 DONE WHEN: a crafted Mithril Longsword listed at a board in Daggerfa
 
 // ─── THE BOOK ────────────────────────────────────────────────────────
 
-// PIN MOVED (INT19, Integrity-Arc section 7): a crafted piece is listed through the realm act (net/marketBook.js
 // realmPieceAct) - out of the save inside the hold, put back on a refusal; on silence nothing is kept (a lost answer ends
 // the session, and a join reads the record: listed, or in the pack)
 test('PROF5 book: a piece listed is taken out of the save before it is asked - silence keeps it, a refusal puts it back, a settle asks it again with its own id; a bought piece minted once however many tabs settle it', async () => {
@@ -230,7 +228,7 @@ test('PROF5 tab: the five views - Materials (cheapest first, here or its region 
   await tab.open();
   const text = () => root.textContent;
   const buttons = () => [...root.querySelectorAll('button')];
-  // BOARD-UI (PIN MOVED): the views in their parts - Buy, then Sell (the orders to fill, your listings), then History
+  // BOARD-UI (
   assert.deepEqual(buttons().filter((b) => b.className.includes('market-view')).map((b) => b.textContent), ['Materials', 'Crafted', 'Auctions', 'Goods', 'Orders', 'My listings', 'History']);
   assert.deepEqual(MARKET_VIEW_GROUPS.flatMap(([, ids]) => ids).sort(), MARKET_VIEWS.map(([v]) => v).sort(), 'every view in one part, once');
   assert.match(text(), /On the road40 Mithril Ore from Wayrest - 32 minutes/);
@@ -253,7 +251,7 @@ test('PROF5 tab: the five views - Materials (cheapest first, here or its region 
   buttons().find((b) => b.textContent === 'My listings').onclick();
   await new Promise((r) => setTimeout(r, 0));
   assert.match(text(), /Iron Ore - 5 of 10 left3 silver each/);
-  assert.match(text(), /Fee 1 silver, kept if you cancel\. Up for 72 hours on every board\./);   // GLOBAL-MARKET (PIN MOVED: "the boards of Daggerfall"); BOARD-UI (PIN MOVED): one line
+  assert.match(text(), /Fee 1 silver, kept if you cancel\. Up for 72 hours on every board\./);     // GLOBAL-MARKET (
   await buttons().find((b) => b.textContent === 'Cancel').onclick();
   assert.deepEqual(calls.at(-1)[0], 'cancel');
   // Orders: Fill from the Stores
@@ -261,7 +259,7 @@ test('PROF5 tab: the five views - Materials (cheapest first, here or its region 
   await new Promise((r) => setTimeout(r, 0));
   assert.match(text(), /Mithril Ore140 of 200 wanted at 8 silver eachmedian 8\.5/);
   await buttons().find((b) => b.textContent.startsWith('Fill 50')).onclick();
-  assert.deepEqual(calls.at(-1), ['fill', { region: 17, order: 'O', units: 50, hubs: HUBS, least: 400 - 20 }]);   // GLOBAL-MARKET (PIN MOVED): the pay agreed - the tax on the order's running total, no courier here
+  assert.deepEqual(calls.at(-1), ['fill', { region: 17, order: 'O', units: 50, hubs: HUBS, least: 400 - 20 }]);     // GLOBAL-MARKET (
   assert.match(text(), /Post a buy order/);
   // History
   buttons().find((b) => b.textContent === 'History').onclick();
@@ -290,18 +288,18 @@ test('PROF5 window: the Market tab stands beside Notices while the market is thi
 // ─── THE WIRING ──────────────────────────────────────────────────────
 
 test('PROF5 wiring: the host builds the market book online, its answers told to the Marks book; the board hands the Market its own region, the hubs, the pieces and the mint; a piece minted once at its wear; the smith\'s stock tells the Marks book (FOUND); a kept craft settles alone (FOUND); the plane dressed (FOUND)', () => {
-  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');   // PIN MOVED (BAY-LEFT-SEA): HOST-SPLIT - the market's pieces and hubs moved out of bootWorld to scenes/marketPiecesHost.js
+  const w = src('src/scenes/world.js') + src('src/scenes/marketPiecesHost.js');
   assert.match(w, /const marketBook = params\.has\('online'\)\n\s*\? createMarketBook\(\{ door: accountMarket\(/);
   assert.match(w, /now: \(\) => Date\.now\(\) \+ _sharedOffsetMs, marks: marksBook,\n\s*stores: \{ apply: \(st\) => profBook\?\.applyStore\(st\) \},/);   // AUDIT 30 U1: the Stores told too (AUDIT 31: its holds after)
-  assert.match(w, /const market = marketBook && profBook && profBook\.state\.open !== false && marksBook\?\.state\?\.open !== false && Number\.isInteger\(region\) \? \{/);   // AUDIT 30 U11; MARKET-AUDIT (PIN MOVED: `=== true` - the tab stands while the professions' read is unanswered)
+  assert.match(w, /const market = marketBook && profBook && profBook\.state\.open !== false && marksBook\?\.state\?\.open !== false && Number\.isInteger\(region\) \? \{/);     // AUDIT 30 U11; MARKET-AUDIT (
   // GUILD1e: the board's window built by the host's one builder (showNoticeWindow), which adds the book and the character
-  assert.match(w, /gate: \(\) => noticeGateCard\(\), sd: \(\) => noticeSdCard\(\), answer: \(note\) => answerNote\(note\), work, market,\n/);   // PIN MOVED (SD2c): a found Super dungeon's note beside the gate's
+  assert.match(w, /gate: \(\) => noticeGateCard\(\), sd: \(\) => noticeSdCard\(\), answer: \(note\) => answerNote\(note\), work, market,\n/);
   assert.match(w, /book: noticeBook, character: \(\) => characterIdOf\(playerEntity\),/);
   assert.match(w, /if \(heldProvenances\(\)\.has\(piece\.provenance\)\) return;\n\s*const it = mintPiece\(piece, piece\.provenance\);\n\s*if \(!it\) return;\n\s*if \(it\.maxCondition > 0\) it\.currentCondition = wearCondition\(it\.maxCondition, piece\.wear\);/);
   assert.match(w, /\.filter\(\(it\) => it\?\.provenance && asMinted\(it\) && !tradeRefusal\(it\) && !isLocked\(it\) && !pieceKept\(it\.provenance\)\)/);   // AUDIT 30 C2
   assert.match(w, /const r = await profBook\.stock\(material, qty\);\n\s*toldBalance\(r\?\.data\?\.balance\);/);   // AUDIT 32 B3: the Bank's book and the market's
-  assert.match(src('src/ui/professions/profPages.js'), /if \(\(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) && p\.settle/);   // BAG1 (PIN MOVED): a kept deposit settles too
-  assert.match(src('src/scenes/gatherHost.js'), /if \(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) deps\.onSettle\?\.\(\);/);   // PIN MOVED (AUDIT2 BAG1 K3): and a kept deposit
+  assert.match(src('src/ui/professions/profPages.js'), /if \(\(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) && p\.settle/);     // BAG1 (
+  assert.match(src('src/scenes/gatherHost.js'), /if \(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) deps\.onSettle\?\.\(\);/);
   for (const rule of [/\.prof-grain \{ fill: none; stroke:/, /\.prof-trail \{ fill: none; stroke:/, /\.prof-board \{ position: relative; height: 96px; touch-action: none;/, /\.prof-boardhead \{ fill:/]) {
     assert.match(PROF_CSS, rule, 'the plane dressed');
   }

@@ -1,4 +1,4 @@
-// BAY-LEFT-GROUND (2026-10-26, bible/06-Systems/Living-World-II.md; the audit "no system left behind in the Bay", D2) -
+// BAY-LEFT-GROUND -
 // THE ROAD'S TROUBLE ON THE LAND'S OWN WILD. The living world's trouble handed the encounter law no `fauna`, so a caravan
 // past the Bay was beset out of Daggerfall's climate tables (Black Marsh's: Centaurs, Orcs, Orc Warlords), against
 // TESA-BIOME's recorded choice 4 (a province's own beasts). The trouble now hands the place it falls, and the host's

@@ -242,6 +242,6 @@ test('WOD1: the registry row, the credit, the Features row and the online lane a
   assert.equal(row2.group, 'world');
 
   // The ground the room stands on: room-owned, like the roads.
-  assert.deepEqual({ ...ONLINE_ROOM_MOD_KEYS['world-of-daggerfall'] }, { Enabled: true, Mountains: false });   // PIN MOVED (WOD-PEAKS): the spires the room's too, off
+  assert.deepEqual({ ...ONLINE_ROOM_MOD_KEYS['world-of-daggerfall'] }, { Enabled: true, Mountains: false });
   assert.ok(!ONLINE_PLAYERS_OWN_MODS.includes('world-of-daggerfall'));
 });

@@ -1,5 +1,4 @@
-// HT-WAIST (2026-09-24, Mac: "Let it be a separate animated item on
-// movement with eye of the Beholder sprites also"). THE LANTERN ON THE
+// HT-WAIST. THE LANTERN ON THE
 // EYE OF THE BEHOLDER SPRITE.
 //
 // Not the mod's (its billboard draws no light; TorchOffset only moves
@@ -13,10 +12,9 @@
 // at the waist, NOTHING of this runs - no second batch, no second draw
 // (eotb_body.test.js reads `batches.at(-1)` as the body's).
 //
-// HT-WAIST-BACK (2026-09-24, Mac: "Just have it show on the back of the
-// sprite, not all angles"): the picture is drawn only from behind - the
+// HT-WAIST-BACK: the picture is drawn only from behind - the
 // painted orientation 4, straight behind - not the back diagonals 3 and 5
-// (Mac: "It still shows on the back side angle"; player/eyeOfTheBeholder/eotbLantern.js isRearView;
+// (; player/eyeOfTheBeholder/eotbLantern.js isRearView;
 // test/player/eyeOfTheBeholder/htwaistback.test.js pins the rule and the peers'). So every body here
 // is first walked a step away from the camera, sheathed and with no lantern,
 // and stands with its back to the eye (orientation 4 - the IL keeps a
@@ -117,8 +115,7 @@ test('HT-WAIST (EOTB): it SWINGS with the sprite\'s walk - a walk begun tilts th
   b.draw(null, view);
   const walk = lanternDraws(r).at(-1);
   assert.ok(walk.size.h < HIP_LANTERN_SPRITE.height - 1e-6, 'swinging along the line of sight: foreshortened');
-  // turning to walk away and to the right of the screen (HT-WAIST-BACK: a back diagonal, orientation 3 - Mac: "It
-  // still shows on the back side angle"): it swings across its body, and is NOT drawn
+  // turning to walk away and to the right of the screen (HT-WAIST-BACK: a back diagonal, orientation 3): it swings across its body, and is NOT drawn
   const atDiagonal = lanternDraws(r).length;
   ticks(b, 40, state({ hipLantern: true }, { forward: 1, strafe: 1, standing: false, speed: 5 }));
   b.draw(null, view);

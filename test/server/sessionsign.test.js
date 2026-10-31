@@ -1,5 +1,4 @@
-// SESSION-SIGN (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, decision 4 - the owner: "Make the best
-// call for future proofing"): THE SESSION'S LOOKUP OFF THE HOT ROUTES. A hot route whose lookup the primary answered
+// SESSION-SIGN: THE SESSION'S LOOKUP OFF THE HOT ROUTES. A hot route whose lookup the primary answered
 // carries a pass back (server-account/src/sessionPass.js), and the next asks of it believe the pass without the lookup.
 // These pins hold that a hot route answers under a pass as it answers under the lookup, that a pass is believed nowhere
 // else and in no other hands, that the lag the owner took - five minutes, less the renewal - is the most a sign-out or a
@@ -46,7 +45,7 @@ const HOT = (character) => [
   ['/v1/prof/pixels', { character, pixels: [[500, 200], [501, 200]] }],
   ['/v1/chapters/list', { character }],
   ['/v1/seats/list', {}],
-  ['/v1/festival/town', { mapId: 7 }],   // PIN MOVED (WITCH1): a town's Hearth Offerings, asked as its homes are
+  ['/v1/festival/town', { mapId: 7 }],
 ];
 
 test('SESSION-SIGN the oracle: every hot route answers under a pass exactly as under the lookup - for a guest, an account, a developer, a newcomer a week can not yet witness and a muted one, with the switches on and at `dev`, in a town with a home - and asks no lookup; the first ask, the lookup\'s, hands the pass back, exposed to the page; a banned account is handed none (mutants: a field the pass leaves out; the handle; the registration; the mute; a route added; the mint before the ban)', async () => {
@@ -61,7 +60,7 @@ test('SESSION-SIGN the oracle: every hot route answers under a pass exactly as u
       const muted = await t.s.seated('mute');
       const banned = await t.s.seated('bann');
       assert.equal((await t.s.seatHome(eve, { mapId: 7, buildingKey: 300, region: 17, price: 5000 })).status, 200, 'a home in the town the oracle reads');
-      // WITCH1 (PIN MOVED): and a Hearth Offering at its door, so the town's offerings answer each account its own way
+      // WITCH1 (
       t.raw.prepare('INSERT INTO fest_offerings (map_id, building_key, player, char_id, stock, placed_at) SELECT map_id, building_key, player, char_id, 3, ? FROM homes WHERE map_id = 7 AND building_key = 300').run(T0);
       t.raw.prepare('UPDATE players SET registered_at = ? WHERE id IN (?, ?, ?, ?)').run(T0 - 30 * 86400, eve.id, mac.id, muted.id, banned.id);
       t.raw.prepare('UPDATE players SET registered_at = ? WHERE id = ?').run(T0 - 3600, newcomer.id);

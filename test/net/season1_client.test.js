@@ -1,6 +1,6 @@
-// SEASON1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEASON ON THE SEAT TAB - the week
+// SEASON1 part one: THE SEASON ON THE SEAT TAB - the week
 // of the Season the standings name, above the week's clock; nothing where no Season is counted; a Season's titles in
-// words on the badge (bible/11-Multiplayer/Seats-Arc.md 9.1, 7.4).
+// words on the badge (9.1, 7.4).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';

@@ -1,5 +1,4 @@
-// COMPASS-PARTY (2026-09-27, Discord - Ashley: "being able to see where party members are on compass? - just lil green
-// marks that point in that direction"; Satranath: "Party members show up on the map but not compass").
+// COMPASS-PARTY.
 //
 // THE PARTY ON THE COMPASS: one reading of where each mate is, in the scene's XZ (ui/partyMapMarks.js
 // partyCompassPoints - the bodies this client draws where they stand; outdoors the rest where their poses say), marked

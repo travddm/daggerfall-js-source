@@ -1,4 +1,4 @@
-// CSA-E (2026-09-27) - COME SAIL AWAY'S SAILS AND WIND: systems/comeSailAway/comeSailAway.js's UpdateWind and its RotateWind
+// CSA-E - COME SAIL AWAY'S SAILS AND WIND: systems/comeSailAway/comeSailAway.js's UpdateWind and its RotateWind
 // coroutine, the three events that roll a wind, GetSailPower, raising and lowering (all of them and the square ones),
 // Update's sail arm (the sails' Wind, the square sails stowed upwind, the trim, the sails' power and the rudder's turn),
 // the manual trim, the wind widget's frame and rect, the rudder's and the door's Animators - over the vendored hulls

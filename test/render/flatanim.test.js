@@ -243,7 +243,6 @@ test('FA1 slice 3: no site hand-writes a frame into a record any more', () => {
     const src = read(host);
     assert.ok(!/createBillboardBatch\([^,]+, `\$\{[^}]+\}#0`/.test(src),
       `${host} still writes a frame into the record it passes`);
-    // PIN MOVED (AUDIT DEX B3): a corpse marker carries its own clock now (corpseMarker.js tickCorpseMarkers), so the
     // street's rebuilt corpse batch says the frame its clock is on - still a frame named, never one in the record
     assert.match(src, /\.frame = (?:0|c\.anim\?\.frame \?\? 0);/, `${host} mounts a frame-keyed batch without saying which frame`);
   }

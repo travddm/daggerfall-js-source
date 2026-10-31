@@ -1,6 +1,5 @@
 // @ts-nocheck
-// CHAP7a (2026-10-09, Mac: "continue", the Chapters arc's last slice - bible/11-Multiplayer/Chapters-Arc.md section 8,
-// CALL 6): THE PATRONS ON THE SERVICE. A player guild's guildmaster bids silver from the guild's treasury for a chapter's
+// CHAP7a: THE PATRONS ON THE SERVICE. A player guild's guildmaster bids silver from the guild's treasury for a chapter's
 // patronage in the Season after this one, held in escrow and raised, never lowered; at the Turning that opens that Season
 // the highest bid wins and is burnt, every other goes home (burnt where its guild is gone or full); the chapter keeps its
 // patron for the Season, the Chronicle names it, the sheet and the board carry it. Never a hidden guild's chapter.

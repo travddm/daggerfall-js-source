@@ -1,5 +1,4 @@
-// PROFILE1 (2026-09-25, Mac: "I kinda wanna make the menu profile icon more relevant, more like a profile icon less
-// like a button"; asked what its picture should be: the LAST CHARACTER'S FACE).
+// PROFILE1.
 //
 // The door's top-right mark was a bordered box holding a gem and a word - one more button. It is a portrait now: the
 // face of the character last played (TILE1's loadFace, the save tiles' one home), in a round rimmed frame, with the

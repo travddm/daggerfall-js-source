@@ -1,5 +1,4 @@
-// PROF-SAVE (2026-09-29, Mac, asked whether to switch Marks and the professions on: "Board now, rest after fixes"; MERGE
-// 2's open question 2, bible/06-Systems/Online-Arc.md PROF-SAVE): A PROFESSIONS ACT THAT CHANGES THE SAVE IS SAVED AT
+// PROF-SAVE: A PROFESSIONS ACT THAT CHANGES THE SAVE IS SAVED AT
 // ONCE, as a trade is. The law (systems/online/onlineCheckpoint.js createSaveSoon): every change of one task is ONE checkpoint on
 // the next, the checkpoint handed in once the host has built it, a change made before it saved then. The host
 // (scenes/world.js): a withdrawal from the Stores, a craft's pieces and its fee, a smelt's fee, a market piece minted,

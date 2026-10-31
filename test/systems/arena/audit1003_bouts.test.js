@@ -1,8 +1,8 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03, PR 545 read before it merges) - lens B, the offline bout engine and the arena's
+// AUDIT PRE-MERGE 1003 - lens B, the offline bout engine and the arena's
 // economy: the law's clock held while the world is (B1); a stranger's blow on an exhibition fighter kept nothing (B2);
 // the book on a bout walked away from, the Herald's Watch and an hour already seen (B3); no price shorter than the
 // bookmaker's shortest rung (B4); my 1 HP spare held from the word to the healers (B5); a crowd half-built when its bout
-// went (B6). The record: bible/01-Overview/audits/Audit-PreMerge-1003.md; the design, bible/11-Multiplayer/Arena.md.
+// went (B6). The record:; the design,.
 //
 // Each test failed on the unfixed tree for its finding's reason: 200 s under an open window and the Grand Champion bout
 // was the judges' at the 3-minute mark, 9,900 paid (B1); my one blow for the favourite's whole health felled it and the

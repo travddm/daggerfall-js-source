@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-01 - Mac: "Are you actually looking into tools not being able to be used on boulders? Like it gives a
-// notification but you cant mine".
+// FIELD BUGS 2026-10-01.
 //
 // SETTLE-SAID. A gathering act asks Foraging's checks at its start (FORAGE0 14.3), the settlement's among them: a town,
 // a hamlet, a village, a farm, a wealthy home, a tavern or a temple - its footprint and a whole city block round it

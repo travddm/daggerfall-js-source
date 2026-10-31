@@ -1,4 +1,4 @@
-// REST5 (2026-10-03, bible/06-Systems/Rest-Arc.md 2.6; OPEN 11 and 15): ONLINE THE NIGHT CARRIES THE PARTY. The vote,
+// REST5: ONLINE THE NIGHT CARRIES THE PARTY. The vote,
 // the gather and the mirrors retire online; a member's night sleeps every member within 15 m who keeps "Rest with my
 // party" on, each through their own host's bag, each their own yield and interval, waking to no ambush (only the
 // rester rolls); the night's stamp rides the pose's `restStartedAt` (no relay bump). A rest point is public: a

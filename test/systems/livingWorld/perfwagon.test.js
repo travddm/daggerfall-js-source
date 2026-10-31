@@ -1,5 +1,5 @@
-// PERF-WAGON (2026-10-10, Mac: "For carts, wagons, etc, we need culling"): THE REST OF THE CARTS, WAGONS AND TENTS ARE
-// CULLED (bible/07-Rendering/Performance-Priority.md PERF-WAGON). PERF-TEAMS (test/scenes/perf_teams.test.js) cut another
+// PERF-WAGON: THE REST OF THE CARTS, WAGONS AND TENTS ARE
+// CULLED (PERF-WAGON). PERF-TEAMS (test/scenes/perf_teams.test.js) cut another
 // player's team by its distance and asked each of the pool's wagons the street's view test in the world host; what it
 // left drawn every frame, behind the eye or not - the living world's road teams (LW10), the harness, Eye of the
 // Beholder's cart, the camps' and the hideouts' tents, and every one of them in the fixed city's host - now takes the

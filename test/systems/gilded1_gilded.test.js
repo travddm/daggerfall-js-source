@@ -1,4 +1,4 @@
-// GILDED1 (2026-10-07; bible/06-Systems/Gilded.md) - THE GILDED RUNG. The laws pinned, on the gate's Dragonfire Oath
+// GILDED1 - THE GILDED RUNG. The laws pinned, on the gate's Dragonfire Oath
 // (test/systems/gilded2_world.test.js pins the records themselves):
 //   - THE RUNG: the ladder's top, rank 6 over the Artifact's 5, a colour of its own (GILDED-RED: crimson); NOTHING ROLLS IT.
 //   - A STATIC ROLL: one number off, a line short or long, a mark another door lays - the wire refuses it; and no door
@@ -33,7 +33,7 @@ test('GILDED1 THE RUNG: the ladder\'s top - rank 6 over the Artifact\'s 5, gold 
   on();
   assert.equal(GILDED, 'gilded');
   assert.equal(LR.RARITY_ORDER.at(-1), GILDED, 'the last rung');
-  assert.deepEqual({ rank: LR.RARITIES.gilded.rank, label: LR.RARITIES.gilded.label, colour: LR.RARITIES.gilded.colour }, { rank: 6, label: 'Gilded', colour: '#ff3b4a' });   // PIN MOVED (GILDED-RED): the rung in crimson, its pieces' art still gold leaf - test/ui/gildedred.test.js
+  assert.deepEqual({ rank: LR.RARITIES.gilded.rank, label: LR.RARITIES.gilded.label, colour: LR.RARITIES.gilded.colour }, { rank: 6, label: 'Gilded', colour: '#ff3b4a' });
   for (const t of LR.RARITY_ORDER.slice(0, -1)) assert.ok(LR.RARITIES[t].rank < LR.RARITIES.gilded.rank, `over ${t}`);
   assert.equal(LR.RARITIES.gilded.tint.length, 4);
   assert.deepEqual([...LR.ROLLED_TIERS], ['magic', 'rare', 'legendary'], 'nothing rolls it');

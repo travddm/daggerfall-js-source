@@ -1,6 +1,4 @@
-// STORE-KEEPS (2026-10-26, the owner: "Make it where you cant lose your wagon/horse or anything stored on death"; asked,
-// "Wagon + companions' packs") - THE CART IS STORAGE, AND NO DEATH TAKES IT. FIELD BUGS 2026-10-15d CART-AWAY (Mac: "if
-// its parked outside the zone nothing should be lost") had the cart's cargo and a share of its coin taken while the wagon
+// STORE-KEEPS - THE CART IS STORAGE, AND NO DEATH TAKES IT. FIELD BUGS 2026-10-15d CART-AWAY had the cart's cargo and a share of its coin taken while the wagon
 // was WITH the fallen - driven, beside them, following, or parked on the zone's own ground - and the fallen's tab say when
 // it was away. STORE-KEEPS retired that word: a death in the zone takes the bag and the purse alone
 // (systems/wild/wildDropLaw.js takeWildDeath, taken by the account service off the record - server-account/src/wild.js),
@@ -8,7 +6,7 @@
 // wagon's out of the real Horse Cart and Cargo runtime (test/hccWorld.mjs), the pack the starting kit and the producers'
 // pieces, the record as the save writes it; the zone's mask over the blob the zone's own pins stand
 // (test/systems/pvpdungeons_game.test.js) - WW-C2: a cell a pixel, as buildWildMask lays one (Cyrodiil's own:
-// test/world/worldWide/wwc2_zone.test.js). bible/11-Multiplayer/Wild-Zone.md section 4.
+// test/world/worldWide/wwc2_zone.test.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -40,7 +38,7 @@ const quiet = async (fn) => { const w = console.warn, i = console.info; console.
 
 // ─── THE ZONE, as every client's maps paint it ──────────────────────────────────────────────────────────────────
 
-/** The zone's pins' blob (PIN MOVED, WW-C2: the zone a mask's cells - the Wrothgarian region and the owner's cut retired). */
+/** The zone's pins' blob ( */
 const blob = (x, y) => { const dx = (x - 520) / 38, dy = (y - 110) / 24; return dx * dx + dy * dy + 0.15 * Math.sin(x / 5) < 1; };
 const mask = buildWildMask({ width: 1000, height: 500, inZone: blob });
 /** Three map pixels: the zone's heart, its band (near the zone, not in it - the maps' hiding), and far off it. */

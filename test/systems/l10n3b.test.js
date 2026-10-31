@@ -1,4 +1,4 @@
-// L10N3b (2026-09-27, Mac: "Install + bundle allowed"): A DFU TRANSLATION PACK, INSTALLED FROM THE PLAYER'S OWN FILES.
+// L10N3b: A DFU TRANSLATION PACK, INSTALLED FROM THE PLAYER'S OWN FILES.
 // What a pack holds, by the folders DFU reads it from (systems/translationPacks.js); the store that keeps it in the
 // browser and nowhere else (scenes/translationStore.js, over an in-memory IndexedDB); and the language loader putting
 // it to use (scenes/localeData.js) - its tables patched over the machine drafts, so a person's translation outranks a

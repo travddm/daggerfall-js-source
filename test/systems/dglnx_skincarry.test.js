@@ -1,4 +1,4 @@
-// DG-LNX + SKIN-CARRY (2026-09-16, two reports relayed by Mac).
+// DG-LNX + SKIN-CARRY.
 //
 // DG-LNX (Ember, Linux): "Picking the arena2 folder doesn't work.
 // Picking a zip with the game files does though." The zip arm of the

@@ -146,7 +146,7 @@ test('A1: both hosts take the season from the clock, with ?season demoted to a p
     assert.doesNotMatch(text, /const season = /, `${host}: the season is frozen again`);
     // PlayerFootsteps (:107, :122-133) re-reads SeasonValue every
     // frame and re-picks the set; the snow crunch is not a boot value.
-    // AUDIT PRECIP (PIN MOVED): the world host asks the snow under the feet on the snow lane - the season's winter off it
+    // AUDIT PRECIP (
     assert.match(text, /winter: (?:snowCover\.winterAt\(player\.pos, )?season === SEASON\.Winter/,
       `${host}: the footstep set lost its winter arm`);
     // SetSunlightScale (WeatherManager.cs:316-319).
@@ -154,7 +154,6 @@ test('A1: both hosts take the season from the clock, with ?season demoted to a p
       `${host}: the winter sun lost its term`);
     // The poll is on the frame, beside the weather drain, and it only
     // builds a date when the DAY turns over.
-    // PIN MOVED (ROAD-Ar, R1): the streaming host's refreshSeason now
     // takes the clock to READ, because a fast travel has to straighten
     // from the arrival minute - performFastTravel raises time only
     // after TeleportToCoordinates (:333, :344) and the port keeps that

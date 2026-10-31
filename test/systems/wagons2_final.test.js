@@ -1,7 +1,7 @@
-// WAGONS2 (FINAL AUDIT, 2026-10-09, Mac: "Audit this one more time"): the last audit of the wagons branch, after the merge
+// WAGONS2 (FINAL AUDIT, 2026-10-09): the last audit of the wagons branch, after the merge
 // of main that renumbered its relay world185 - five cold lenses (the relay and the visits, the riders and the wheels, the
 // caravan's room as a house, the windows' render half, the items and the docs). Each fix below is pinned by execution where
-// its code runs on its own, and by its wiring where it is a host's; bible/06-Systems/Wagons.md "The final audit".
+// its code runs on its own, and by its wiring where it is a host's; "The final audit".
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

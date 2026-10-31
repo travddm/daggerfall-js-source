@@ -1,4 +1,4 @@
-// SD20c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md "SD20 - AUDIT SD III"): THE HOUR
+// SD20c: THE HOUR
 // SEEN, AUDITED A THIRD TIME - each finding measured on the arc's own scripts before it was fixed. The blows' spent sparks
 // piled on panes in the air; the Hour-Hand's beam passed over the heads of the bodies the law struck, a third of the band
 // it sweeps; the whole arena's shakes kicked the Hall and the Steps; a blow over my feet made 7-32 KB a frame, the beam
@@ -241,7 +241,7 @@ test('SD20c NO REVERSED SMOOTHSTEP IN ANY SHADER (V14): GLSL leaves smoothstep(a
   assert.ok(read1 > 150, `${read1} read`);
   for (const [name, glsl] of [['the beam', SD_BEAM_VS + SD_BEAM_FS], ['the sky', SD_SKY_VS + SD_SKY_FS + SD_SKY_PAINT_FS]]   /* SD-LOOK (PIN MOVED): its paint holds its horizon and its face */) {
     const edges = smoothEdges(glsl), told = edges.filter(([a, b]) => a !== null && b !== null);
-    assert.ok(told.length >= 5, `${name}: ${told.length} of ${edges.length} read`);   // SD-LOOK (PIN MOVED): the sky's five, now its paint's (it had six)
+    assert.ok(told.length >= 5, `${name}: ${told.length} of ${edges.length} read`);     // SD-LOOK (
     for (const [a, b, src] of told) assert.ok(a < b, `${name}: smoothstep(${src}, ...)`);
   }
 });

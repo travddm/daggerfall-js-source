@@ -1,5 +1,4 @@
-// LW4b (2026-10-05, bible/06-Systems/Living-World.md, Mac: NPCs "can encounter enemies in the overworld ... make friends
-// or enemies"): THE FIGHT, STOOD - a beset party near the player on the ground fought for real (its foes the pool's own,
+// LW4b: THE FIGHT, STOOD - a beset party near the player on the ground fought for real (its foes the pool's own,
 // its armed the player's allies), the end what happens (the fallen, the won with the spared, the lost), the fights let
 // go, and the roads drawing none of the bodies the pool holds - over a mock pool and the synthetic map.
 import test from 'node:test';
@@ -92,7 +91,7 @@ test('LW4b the end is what happens: an ally cut down FELL; every foe dead, the f
   rig.fights.frame([{ trip, at }], here, 1001);
   await settle();
   const allies = rig.spawned.filter((r) => r.o.allied), foes = rig.spawned.filter((r) => !r.o.allied);
-  allies[1].dead = true; allies[1].corpse = true;   // PIN MOVED (AUDIT LW-III): killed as the pool kills - dead, a corpse
+  allies[1].dead = true; allies[1].corpse = true;
   rig.fights.frame([], here, 1005);
   assert.deepEqual(rig.rel.turns().died.get('L9.t5@K'), { t: 1005, seen: false, who: 'Cy Fenn' }, 'cut down beside the player: died at their side, at that minute (AUDIT-C3)');
   for (const f of foes) { f.dead = true; f.corpse = true; }

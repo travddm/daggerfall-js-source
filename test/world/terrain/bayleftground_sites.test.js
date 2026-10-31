@@ -1,5 +1,4 @@
-// BAY-LEFT-GROUND (2026-10-26, bible/03-World/Landforms.md "BAY-LEFT-GROUND"; the audit "no system left behind in the
-// Bay", D1 - LANDFORM4, Mac's "a town walled in by its own levelling") - THE LANDFORMS' SITES PAST THE BAY. LANDFORM4's
+// BAY-LEFT-GROUND - THE LANDFORMS' SITES PAST THE BAY. LANDFORM4's
 // table is MAPS.BSA's 1000 x 500, so no place past the Bay pulled its land to its level and every town there stood in
 // its own levelling wall. The places past the Bay every client stands alike are a second table by the world's key
 // (world/landforms.js landformSitesBeyond over world/pastBayRows.js pastBaySites), on both kernels and made again as the

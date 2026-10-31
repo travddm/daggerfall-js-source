@@ -1,4 +1,4 @@
-// SHIP-WATCH (2026-10-01, Mac: "Do #3" - life aboard between fights: the crew sleep below at night but their watch, a
+// SHIP-WATCH (2026-10-01, - life aboard between fights: the crew sleep below at night but their watch, a
 // lookout at the bow cries "Sail ho!", the crew swab, haul and patch after a fight; "If not already, ships at night
 // should use their lanterns (AI)"; "I also want to keep improving the AI"):
 //
@@ -131,7 +131,7 @@ test('SHIP-WATCH ALL HANDS: the guns or a muster call every hand up at once out 
   run(life, 40, { asleep: true });
   life.step(0.05, { asleep: true, struck: true });
   assert.equal(life.belowCount(), 0, 'her colours down');
-  // the morning - PIN MOVED (AUDIT WK-W8): one at a time out of her hatch (auditwatchkit_crew), every hand up within
+  // the morning
   // seconds, and quietly all the while
   const m2 = crewOf(5);
   run(m2, 40, { asleep: true });
@@ -316,7 +316,7 @@ test('SHIP-WATCH THE ERRANDS BY NIGHT: a merchantman whose dwell is spent after 
 // ── the host ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('SHIP-WATCH THE LANTERNS ON THE REAL HOST: at the lights\' hour a merchantman and a navy light theirs and a pirate keeps hers out - a merchantman running douses hers; by day none; the captains\' contacts say who shows a light, mine my own lantern switch; the captains are told the night (mutants: every ship lit, the pirate lit, the contacts unlit, the night untold)', async () => {
-  const h = await sea({ hull: HULL.SmallShip, where: { cityLights: true, night: true } });   // AUDIT WK-N5 (PIN MOVED): the dark's hours named apart from the lanterns'
+  const h = await sea({ hull: HULL.SmallShip, where: { cityLights: true, night: true } });     // AUDIT WK-N5 (
   const ids = { m: h.host.spawnShip('merchantGalleon', { range: 300, bearing: 1 }), n: h.host.spawnShip('navyCutter', { range: 320, bearing: -1 }), p: h.host.spawnShip('pirateBrig', { range: 700, bearing: Math.PI, temper: 'bold' }) };
   h.run(0.5);
   const e = (k) => h.host._sea.get(ids[k]);
@@ -332,7 +332,7 @@ test('SHIP-WATCH THE LANTERNS ON THE REAL HOST: at the lights\' hour a merchantm
   assert.equal(e('m').boat.LightOn, false, 'running, she douses hers');
   // the contacts the captains see
   assert.match(HOST, /ship: e\.ship, lit: shipLit\(e\) \}\);/);
-  // AUDIT WK-N4 (PIN MOVED): a boat lit only by lanterns she carries; WK-N5: the captains' night is the dark's
+  // AUDIT WK-N4 (
   assert.match(HOST, /lit: !!boat\.LightOn && carriesLanterns\(boat, boat\.hull\),/);
   assert.match(HOST, /lit: !!p\.boat\?\.LightOn && carriesLanterns\(p\.boat, p\.hull\),/);
   assert.match(HOST, /const night = !!where\(\)\.night;[^\n]*\n\s*const world = \{/);
@@ -344,7 +344,7 @@ test('SHIP-WATCH THE LANTERNS ON THE REAL HOST: at the lights\' hour a merchantm
 });
 
 test('SHIP-WATCH THE LOOKOUT\'S CRY ON THE REAL HOST: by night a dark pirate is hailed only within NIGHT_DARK_SIGHT (by day at SAIL_HO_RANGE); the cry goes to my crewed boat\'s lookout, taken once through myCrew, which also says her work - all hands to it under a repair order, else her hurts\' (mutants: the night unread, the cry never handed, handed every frame, the work unread)', async () => {
-  const h = await sea({ hull: HULL.SmallShip, where: { cityLights: true, night: true } });   // AUDIT WK-N5 (PIN MOVED)
+  const h = await sea({ hull: HULL.SmallShip, where: { cityLights: true, night: true } });     // AUDIT WK-N5 (
   h.boat.crewed = true;
   const p = h.host._sea.get(h.host.spawnShip('pirateBrig', { range: (SAIL_HO_RANGE + NIGHT_DARK_SIGHT) / 2, bearing: Math.PI / 2, temper: 'bold' }));
   p.ship.speed = 0;
@@ -377,7 +377,7 @@ test('SHIP-WATCH THE FAR LAMPS ON THE REAL HOST: by night a lit ship past LAMP_N
   const h = await sea({ hull: HULL.SmallShip, where: { cityLights: true } });
   const m = h.host._sea.get(h.host.spawnShip('merchantGalleon', { range: 400, bearing: 1 }));
   const p = h.host._sea.get(h.host.spawnShip('pirateBrig', { range: 400, bearing: -1, temper: 'bold' }));
-  h.run(SHIP_FADE_S + 0.3);   // AUDIT BAY A13 PIN MOVED: come into the world whole - under FADE_FLATS a ship shows no lamp
+  h.run(SHIP_FADE_S + 0.3);     // AUDIT BAY A13
   m.ship.speed = 0; p.ship.speed = 0;
   const lamps = h.host.drawFrame().particles.filter((q) => q.kind === 'lamp');
   assert.ok(lamps.length >= 1 && lamps.length <= LAMP_MAX * 2, `lamps: ${lamps.length}`);

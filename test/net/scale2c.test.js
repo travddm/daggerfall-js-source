@@ -1,5 +1,4 @@
-// SCALE2c (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE2c): A RELAY DEPLOY'S RECONNECT, SPREAD BY THE
+// SCALE2c: A RELAY DEPLOY'S RECONNECT, SPREAD BY THE
 // ROOM'S OWN COUNT - client only. #755's deploy dropped every player and their reconnect wave overloaded the one D1
 // primary 23 s later (SCALE4e): every page's first retry was uniform over [1 s, 2 s], so every token was asked for at
 // once. A page that sees a wave (two of its open sockets dropped together, the browser online) now waits one offset,

@@ -1,11 +1,10 @@
-// ASHFALL1 (the owner, 2026-10-27: "I think with the volcanic isles we could do an ashfall sort of weather with tiny lava
-// flakes" - "I also definitely want to develop the new weather I mentioned"): THE ASHFALL. The port's own NINTH weather
+// ASHFALL1 (- "I also definitely want to develop the new weather I mentioned"): THE ASHFALL. The port's own NINTH weather
 // word, appended as the sandstorm was, never rolled: the world weather map births it over the volcano's country past the
 // Bay - a zone's `ash`, the share of its sky's hours under the ash (Red Mountain half, the Ashlands TES III's 30%,
 // Stonefalls 15%, the least - ESO's loading screen names its ashfall) - taken from the dry sky and never from what falls. Every seam a word reaches: its
 // fog, sun, flags and fall; the front, the ear, the sky row, the pall's cloud, tint and veil; the wind, the grass, the
 // body's air; the forecast; and the fall itself - grey ash and the tiny embers among it, glowing and cooling - drawn by
-// the dry falls' one renderer beside the sandstorm's sand. bible/07-Rendering/Weather-Arc.md, E.
+// the dry falls' one renderer beside the sandstorm's sand., E.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

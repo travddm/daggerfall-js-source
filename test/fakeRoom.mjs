@@ -9,8 +9,6 @@ import { mintToken, MAX_TTL_S, _b64url } from '../src/net/identityToken.js';
 
 // ═══ ACC1g: EVERY HELLO CARRIES A REAL, SIGNED TOKEN ═══════════════
 //
-// Mac: "You shouldnt be able to just type a name and enter anymore....
-// this is what the account system is for."
 //
 // The relay refuses a hello it cannot verify, so a harness that sent a
 // bare `{ t: 'hello', name }` would now be testing the refusal and
@@ -135,7 +133,7 @@ export function fakeRoom(key, { now = () => Date.now(), ROOMS = null, poll = 'dr
     getWebSockets: () => sockets.slice(),
     acceptWebSocket: (ws) => sockets.push(ws),
     storage: {
-      // AUDIT SOC (2026-09-16): THE RUNTIME'S BATCH LIMIT IS A LAW HERE TOO. A Durable Object's batched get takes 128 keys
+      // AUDIT SOC: THE RUNTIME'S BATCH LIMIT IS A LAW HERE TOO. A Durable Object's batched get takes 128 keys
       // and its batched put 128 pairs; SLAM5 found the 130th player's hello throwing on exactly this wall, and the fake
       // let it pass - a fake that lies makes a pin pass that production would fail (this file's own header).
       // AUDIT WB12d (lens T, F8): A VALUE IS COPIED IN AND OUT, as the runtime's structured clone copies it - a fake that

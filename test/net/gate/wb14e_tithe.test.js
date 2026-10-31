@@ -1,4 +1,4 @@
-// WB14e (2026-10-19, Mac: "And whatever else you can cook up", then "This is all yours to take on"): THE TITHE-IMP - one
+// WB14e: THE TITHE-IMP - one
 // night in five, unannounced, an Imp at 1.3 of its size burning gold rises at his court's rim farthest from him a while
 // after his wake and runs from the nearest challenger; it strikes nobody, and dives into the fire TITHE_LIFE_MS after it
 // rose. Caught, each challenger who struck it is handed its tithe - a seed of the relay's own, to that account alone:
@@ -11,7 +11,7 @@
 //   the screen       net/gate/gateLink.js (the fold), systems/gate/gateSpoils.js titheList, scenes/gate/gateCourt.js (the
 //                    tithe into the pack, once), scenes/gate/gateHost.js (its words, its size, its gold), the bar
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md section 9.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -83,7 +83,7 @@ test('WB14e the kind: an Imp at 1.3 of its body, under a runner\'s pace, that st
   assert.equal(titheHpFor([10, 10, 10]), Math.round(TITHE_S * dpsRef(10)));
   assert.equal(titheHpFor([1]), Math.max(HOST_HP_MIN, Math.round(TITHE_S * dpsRef(1))));
   assert.equal(titheHpFor([]), HOST_HP_MIN);
-  assert.deepEqual([GATE_HOST_KINDS, GATE_HOST_GONE], [8, 4]);   // PIN MOVED (WB14f): and the Captive's gaolers
+  assert.deepEqual([GATE_HOST_KINDS, GATE_HOST_GONE], [8, 4]);
 });
 
 test('WB14e it rises once at its moment after his wake, at his court\'s rim on the side away from him, with the court\'s levels\' health - never before, never on a night without one (mutants: risen at the fight\'s birth; at the rim beside him; twice)', () => {
@@ -258,7 +258,7 @@ test('WB14e the court: my tithe into my pack once (the spoils\' own door), its g
 
 test('WB14e its words, its look and the bar: its bolt said as it rises, its catching by name, its escape; an Imp\'s sprite at TITHE_SCALE named the Tithe-Imp; sinking into the fire as it flees; never counted his host (mutants: no line at its rising; an escape said as a catch; counted on the bar)', () => {
   assert.equal(waveLine({}, HOST.tithe, 'Ruhn', 'Tithe-Imps'), COURT_HOST_TEXT.tithe());
-  assert.equal(COURT_HOST_TEXT.titheCaught('Ann'), 'Ann catches the Tithe-Imp! Its tithe goes to all who struck it.');   // PIN MOVED (AUDIT WB14 TEXT-11): nothing spills - it goes into their packs
+  assert.equal(COURT_HOST_TEXT.titheCaught('Ann'), 'Ann catches the Tithe-Imp! Its tithe goes to all who struck it.');
   assert.deepEqual([COURT_TITHE_TEXT.mine(594, 'Ruby'), COURT_TITHE_TEXT.mine(1200, 'Emerald'), COURT_TITHE_TEXT.mine(600, 'Amber')], ['You take its tithe of 594 gold and a Ruby.', 'You take its tithe of 1,200 gold and an Emerald.', 'You take its tithe of 600 gold and an Amber.'], 'AUDIT WB14 (TEXT-1): the gem with its article');
   assert.equal(COURT_HOST_TEXT.titheEscaped(), 'The Tithe-Imp escapes into the fire.');
   const L = hostLookOf(HOST.tithe, 'rime');

@@ -1,4 +1,4 @@
-// MW-STEEL3 (2026-10-07) cut this rig from retail's own skeleton; MW-STEEL4 (2026-10-07, Mac: "You do it properly")
+// MW-STEEL3 cut this rig from retail's own skeleton; MW-STEEL4
 // keeps it for the plate shipped skinned. RETAIL'S SKELETON, AS THE GAME STANDS IT:
 //
 // - THE SKELETON is the vendored retail hierarchy (vendor/weapon-sheathing/.../xbase_anim_sh.nif): every NiNode's own

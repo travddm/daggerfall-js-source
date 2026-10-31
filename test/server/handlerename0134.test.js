@@ -1,4 +1,4 @@
-// HANDLE-RENAME (2026-10-19, Mac: "Change the name PROSTITUTE_STRANGLER to SanguinePanguine. This is an account").
+// HANDLE-RENAME.
 // Migration 0134 renames the one account - its handle, how it signs in, and the rows that keep its name as it was - and
 // leaves the moderation record as it was. Driven over the real worker and the real migrations: the account's row is the
 // live one's (a handle issued before NAME-WORDS, which the service now refuses), its letters are sent through the

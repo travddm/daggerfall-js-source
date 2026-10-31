@@ -1,10 +1,10 @@
-// AUDIT CLIMB-HANDS (2026-10-02, Mac: "Audit this and ensure all the animations and stuff are perfect"). The classic
+// AUDIT CLIMB-HANDS. The classic
 // lane's hands on the wall (combat/climbHands.js, CLIMB-HANDS) held to the climb they draw: every hand continuous through
 // every change of state; the shimmy's and the free climb's grips on the beats the ear plays and the 3D body takes
 // (player/climb/climbPose.js's own gaits); each move on ClimbPose's windows, from where the hands were; the hands leaving the
 // wall from where they were; the large HUD's bar; the weapon and the hands never on the screen together; and, found on
 // the way, ClimbPose's corner leading with the wrong hand half the time. Each finding pinned red, then fixed. Record:
-// bible/03-World/Parkour-Arc.md (AUDIT CLIMB-HANDS).
+// (AUDIT CLIMB-HANDS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

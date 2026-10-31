@@ -1,4 +1,4 @@
-// AUDIT REST-PARTY (2026-10-03, bible/06-Systems/Rest-Arc.md "AUDIT REST-PARTY"): the Campfire, the supplies and the act,
+// AUDIT REST-PARTY: the Campfire, the supplies and the act,
 // each finding pinned by execution where it can be. B1: a load out of a dungeon drops my fire (the save's pack is the
 // pack) where a leave packs it; B2: an offline night at my own Campfire keeps it lit and spends its charge; B3: my fire
 // leaves before the room's memory goes, and a cold fire whose owner left the room goes too; B4: customs keeps the
@@ -100,7 +100,7 @@ test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their source
     const r = applyCustoms(snap);
     assert.equal(r.restKept, 2);
     assert.deepEqual(snap.items, [sword], 'the copy carries none of them');
-    assert.ok(customsLines(r).some((l) => /rest supplies stayed with your offline character/.test(l)));   // AUDIT REST II H13 (PIN MOVED)
+    assert.ok(customsLines(r).some((l) => /rest supplies stayed with your offline character/.test(l)));     // AUDIT REST II H13 (
     assert.ok(customsLines(r, { before: true }).some((l) => /will stay/.test(l)));
     const tonic = createRestItem(REST_ITEM.Tonic);
     globalThis.location = { search: '?online' };
@@ -111,7 +111,7 @@ test('AUDIT REST-PARTY B4: customs keeps the supplies offline while their source
     assert.notEqual(h(tonic, [tonic], { entity }).text, REST_ITEM_TEXT.notOnline, 'offline it is drunk');
   } finally { _setRestItemsOnlineForTests(null); globalThis.location = { search: '' }; }
   for (const t of Object.values(REST_ITEM)) assert.equal(typeof itemUseHandler(t)?.usable, 'function', `${t} is gated`);
-  // REST-LOOT (2026-10-05): the switch on - the character's own cross, nothing is said, and online the Tonic is drunk
+  // REST-LOOT: the switch on - the character's own cross, nothing is said, and online the Tonic is drunk
   const open = { level: 1, goldPieces: 0, items: [createRestItem(REST_ITEM.Bedroll), sword, createRestItem(REST_ITEM.Tonic)], wagonItems: [], bankAccounts: [] };
   const r = applyCustoms(open);
   assert.deepEqual([r.restKept, open.items.length], [0, 3], 'open: they cross with the character');

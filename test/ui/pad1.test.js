@@ -1,6 +1,4 @@
-// PAD1 (2026-09-21, Mac: "a comprehensive pass on m/kb keybinds and
-// controller support. Ensuring all mods and keybinds are supported
-// (including the quickbar)"). The map first: forty-nine actions in one
+// PAD1. The map first: forty-nine actions in one
 // registry, two dicts (DFU's primary and secondary), pad buttons as keys
 // (GP1 synthesises a keydown by Unity name), a joystick UI dict for the
 // clicks, two controls screens with the primary/secondary toggle, and
@@ -109,7 +107,6 @@ test('PAD1-C the pad layout: pad-only codes, one action each, none the UI dict s
   assert.equal(new Set(actions).size, actions.length, 'no action twice');
   for (const c of codes) assert.ok(PAD_CODE(c), `${c} is a pad code`);
   for (const a of actions) assert.ok(ACTIONS.includes(a), `${a} is an action`);
-  // PIN MOVED (2026-10-01 part four, TOUCH-HOLD - Mac: "Interact button + knife Use"): B's UI action is Back, which
   // answers only in a window - in the world B is Interact's (Plus shares B the same way, its pack and Back); A, X and Y
   // keep DFU's clicks
   const ui = new Set(DEFAULT_JOYSTICK_UI.filter(([, a]) => a !== 'Back').map(([c]) => c));
@@ -259,7 +256,7 @@ test('PAD1-E every registry action has a consumer, or is on the recorded list of
   const walk = (d) => { for (const e of readdirSync(join(ROOT, d), { withFileTypes: true })) { const p = `${d}/${e.name}`; if (e.isDirectory()) walk(p); else if (e.name.endsWith('.js') && !EDITORS.has(p)) files.push([p, stripComments(readFileSync(join(ROOT, p), 'utf8'))]); } };
   walk('src');
   const unread = ACTIONS.filter((a) => !files.some(([, src]) => new RegExp(`(?<![A-Za-z0-9_])${a}(?![A-Za-z0-9_])`).test(src)));
-  // KB1: CenterView and PrintScreen are READ now (Mac: "build 2") - the look filter's centre and ui/screenshot.js -
+  // KB1: CenterView and PrintScreen are READ now - the look filter's centre and ui/screenshot.js -
   // and the two left are HIDDEN_ACTIONS (off the pane, unbound). The hotbar's slots are read through the one list
   // that names them (HOTBAR_SLOT_ACTIONS, beside the registry), so it is counted as their reader.
   const hotbarRead = files.some(([, src]) => /const slotOfActions = \(acts\) => acts\.map\(\(a\) => HOTBAR_SLOT_ACTIONS\.indexOf\(a\)\)/.test(src) && /slotOfActions\(eventActions\(/.test(src));   // AUDIT KB1: the event's own read; UXB1-S: each action a shared key carries
@@ -268,8 +265,7 @@ test('PAD1-E every registry action has a consumer, or is on the recorded list of
   assert.deepEqual(left.sort(), [...HIDDEN_ACTIONS].sort(), `unrouted: ${left}`);
 });
 
-// Mac, on PAD1: "changing the keybind on the quick pane should change the
-// glyph also". It does, and this is the seam that makes it so: the HUD's
+// . It does, and this is the seam that makes it so: the HUD's
 // diamond reads `bindings()` - the live registry - EVERY frame, the pane's
 // CONTINUE applies its staged copy into that same registry, and the chip's
 // repaint key folds the bound code (or the key's text) in, so a rebind is

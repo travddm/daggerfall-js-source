@@ -1,5 +1,4 @@
-// RVN-GEAR (bible/06-Systems/Revenants.md section 40; the owner, 2026-10-17: "Add gear slots to revnants and the ability
-// to customize with gear (Must be balanced)"). A sworn revenant's kit: ten slots (a melee weapon, a shield, eight armour
+// RVN-GEAR (). A sworn revenant's kit: ten slots (a melee weapon, a shield, eight armour
 // places, a charm), filled from the player's pack and taken back to it; worn over the kit its stand rolls, its armour read
 // again by DFU's own pass (EnemyEntity.SetEnemyEquipment - the class clamp, a monster's hide), its rarity's lines folded.
 // Balanced by rank (the metal and the tier it may bear) and by kind (DFU's equipment table: the classes, the orcs, the

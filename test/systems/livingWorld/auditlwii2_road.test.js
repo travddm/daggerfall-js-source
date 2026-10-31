@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10, the second audit of THE LIVING WORLD II, lane R - the road: LW9, LW10, LW13): every pin red
+// AUDIT LW-II-2: every pin red
 // on the code as it stood (its mutants, tools/mutants/auditlwii2_road.json), on the synthetic map (test/lwRoads.mjs - the
 // census's rosters, townTrips, livingMap's lives and trouble as the host composes them). No game data.
 import test from 'node:test';

@@ -1,4 +1,4 @@
-// OCEAN-STUCK (2026-09-26, Mac, from the Discord: "someone is stuck in the ocean" - "You can get stuck in the ocean"):
+// OCEAN-STUCK:
 // the carved sea keeps an over-encumbered swimmer under. LevitateMotor's first arm (:81-84, AUDIT 26 F027) drags a
 // swimmer past 62.5 kg DOWN and takes the float keys away, and Iliac Puddle No More's one way out - the shore exit -
 // asks for a SURFACE swimmer (the check point within 0.75 m of the sea). So the weight sank the player to the carved

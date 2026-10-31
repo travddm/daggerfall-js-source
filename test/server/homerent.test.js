@@ -1,5 +1,4 @@
-// HOME-RENT (2026-09-30, asked: "For houses with multiple rooms, the owner can choose to rent out to other players and
-// adjust the price as needed"). A ROOM OF A HOME, RENTED TO ANOTHER PLAYER. The law both ends read (net/homeLaw.js
+// HOME-RENT. A ROOM OF A HOME, RENTED TO ANOTHER PLAYER. The law both ends read (net/homeLaw.js
 // RENT_*); the service through the real Worker over node:sqlite with every migration applied (server-account/src/
 // rent.js): the owner offers and prices, another player's realm character rents on its record, the rent is held on the
 // home and collected by the owner, a sale and a delete wait for the tenants; the client's half (systems/homeRent.js,
@@ -379,7 +378,7 @@ test('HOME-RENT the decorator\'s rooms view: an online home of two rooms gets "R
   for (let i = 0; i < 3; i++) { r3.frame({ overlayUp: true }); await settle(); }
   btn('Collect rent').fire('click');
   await settle(); await settle();
-  assert.ok(r3.said.includes('You collected 70 gold in rent. It went to your account at the Bank of the Empire.'));   // AUDIT HOME-PRICE E4 (PIN MOVED): online the rent lands in the Empire's account
+  assert.ok(r3.said.includes('You collected 70 gold in rent. It went to your account at the Bank of the Empire.'));     // AUDIT HOME-PRICE E4 (
   for (let i = 0; i < 3; i++) { r3.frame({ overlayUp: true }); await settle(); }
   rowsNow().find((r) => /Offered at/.test(JSON.stringify(r.children.map((k) => k.children?.map((x) => x.textContent))))).fire('click');
   btn('Stop offering').fire('click');

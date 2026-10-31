@@ -1,4 +1,4 @@
-// SD9e (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS REMNANT'S SPOILS -
+// SD9e: THE BRASS REMNANT'S SPOILS -
 // the roll off the relay's receipt (systems/superDungeon/sdSpoils.js: section 11's table, the Brass of Numidium last), thrown from
 // where it fell by the spoils pool under keys of its own (scenes/superDungeon/sdSpoils.js - the court's burst for the arena: its
 // moment, its place, kept on the arena's floor over the realm's REAL collider), granted straight into the pack outside
@@ -83,11 +83,10 @@ test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, t
     if (brass) pieces.push({ item: brass, tier: brass.rarity });
     rolls();   // the draw the Hourlock's roll took before the guns were removed, kept so every later draw is what it was
     rolls();   // the draw the Brass Remnant's card took, kept so every later draw is what it was
-    // PIN MOVED (GEM1/GEM2, bible/06-Systems/Gem-Sockets.md): the sockets' passes over the pieces, then its two gems - last
     socketPass(pieces.map((p) => p.item), rolls);
     weaponSocketPass(pieces.map((p) => p.item), rolls);
     const gems = bossGems('abyss', rolls);
-    techniquePass(pieces.map((p) => p.item), rolls);   // PIN MOVED (TECH1): a weapon's technique, the door's draw after the gems' (Loot-II law 9)
+    techniquePass(pieces.map((p) => p.item), rolls);
     return { gold, pieces, gems };
   };
   for (let seed = 1; seed <= 300; seed++) {
@@ -99,14 +98,13 @@ test('SD9e THE ORDER: the roll is its law\'s stream, read in order - the gold, t
 test('SD9e THE LIST: the pieces as the pool throws them - each item with its tier, then the gold, each dressed in the treasure flat its own look-stream chooses; every item the loot\'s validator admits off the wire (mutants: the gold first; a piece undressed)', () => {
   for (const seed of [3, 99, 123456, 0xfffffff0]) {
     const s = rollSdSpoils(seed, 12), list = sdSpoilsList(seed, 12);
-    // PIN MOVED (GEM2): its two gems after the pieces, before the gold
     assert.equal(s.gems.length, 2);
     assert.deepEqual(list.map((p) => p.kind), [...s.pieces.map(() => 'item'), 'item', 'item', 'gold']);
     assert.deepEqual(list.slice(0, -1).map((p) => p.tier), [...s.pieces.map((p) => p.tier), 'common', 'common']);
     assert.deepEqual(list.slice(-3, -1).map((p) => p.item), s.gems);
     assert.deepEqual(list.at(-1), { kind: 'gold', gold: s.gold, tier: 'common', record: list.at(-1).record });
     const look = seededRng(((seed >>> 0) ^ 0x5eed) >>> 0);
-    // the look-stream draws the pieces', then the gold's; PIN MOVED (GEM2): and the gems' after the gold's
+    // the look-stream draws the pieces', then the gold's
     const gem = (_, i) => i === list.length - 3 || i === list.length - 2;
     const drawn = [...list.filter((p, i) => !gem(p, i)), ...list.filter(gem)];
     for (const p of drawn) assert.equal(p.record, RANDOM_TREASURE_ICONS[Math.floor(look() * RANDOM_TREASURE_ICONS.length)]);

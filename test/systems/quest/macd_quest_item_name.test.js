@@ -1,6 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-D - A QUEST NAMES WHAT IT ASKS FOR (2026-09-17, Mac: "I was given a
-// quest to find a book, but the book's name was just *Book*").
+// MAC-D - A QUEST NAMES WHAT IT ASKS FOR.
 //
 // `Item.ExpandMacro` (Item.cs:236-260) answers `_symbol_` and `=symbol_`
 // with `GetLongName(item)`, and `GetLongName` (:304-307) is one line:

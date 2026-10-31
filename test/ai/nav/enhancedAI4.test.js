@@ -459,16 +459,14 @@ test('ENHANCED AI 4a: the nudge\u2019s fall probe is not silenced by a stuck foe
 });
 
 test('AUDIT 55: the switch\u2019s reach is the dungeon host\u2019s foes and nothing else', () => {
-  // Mac's report: "I think enhanced AI is affecting NPCs - hovering and
-  // walking in mid air." The pref is read in exactly four files, and
+  // The pref is read in exactly four files, and
   // none of them is a path a townsperson, a guard or an exterior foe
   // takes. This pins that reach so a future reader can answer the same
   // question in one test instead of a sweep.
-  // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): ENHANCED AI 5's interior half - a building's mesh (scenes/interiorNav.js)
   // and the two pools that walk it. The pools read the switch only where a host hands them a mesh (`nav && getPref`), and
   // only the mode machine's building does: the street's pools (world.js, exterior.js) hand none, so no townsperson, no
   // street guard and no street foe sees it - the reach this pin was written for.
-  const readers = ['src/ai/enhancedMotor.js', 'src/scenes/dungeonContext.js', 'src/systems/uiPrefs.js', 'src/systems/features.js', 'src/ai/cover.js', 'src/ai/tactics.js', 'src/scenes/interiorNav.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js'];   // FT5: the row is the registry's, not the menu's   // TACT1 (Mac: "Everywhere, Enhanced on"): cover is the one thing the switch does outside the dungeon - billboards block sight and missiles - and ai/cover.js is its one reader; it never moves a body, so no townsperson hovers. TACT2: ai/tactics.js reads it for the brain, which only steers a foe that sees its target - never a townsperson
+  const readers = ['src/ai/enhancedMotor.js', 'src/scenes/dungeonContext.js', 'src/systems/uiPrefs.js', 'src/systems/features.js', 'src/ai/cover.js', 'src/ai/tactics.js', 'src/scenes/interiorNav.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js'];     // FT5: the row is the registry's, not the menu's   // TACT1: cover is the one thing the switch does outside the dungeon - billboards block sight and missiles - and ai/cover.js is its one reader; it never moves a body, so no townsperson hovers. TACT2: ai/tactics.js reads it for the brain, which only steers a foe that sees its target - never a townsperson
   for (const f of ['src/characters/mobile/mobilePerson.js', 'src/scenes/world.js', 'src/scenes/exterior.js', 'src/characters/enemy/enemyMotor.js']) {
     const src = rd(f);
     assert.ok(!/enhancedAI|EnhancedEnemyAI|enhancedNav|enhancedMotor|interiorNav/.test(src), `${f} can see the switch`);

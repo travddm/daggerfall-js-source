@@ -1,4 +1,4 @@
-// MWNPC7 (2026-10-09, the MW-NPC arc's seventh slice - bible/04-Characters/Morrowind-NPCs.md section 12): THE STREET'S
+// MWNPC7: THE STREET'S
 // WALKERS IN MORROWIND BODIES. A walker carries what Daggerfall rolled at their spawn (systems/town/townPopulation.js
 // RandomiseNPC): the climate's race, a gender, one of four outfits (the sprite archive), a face, a name - or the
 // guard's arm. characters/folkBodies.js reads that roll for a body; characters/npcBodies.js createPopulationLane is the
@@ -11,9 +11,9 @@ import assert from 'node:assert/strict';
 import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { folkLook, folkActor, folkVariant, FOLK_DRESS } from '../../src/characters/folkBodies.js';
-import { wornByRole } from '../../src/characters/wardrobe.js';   // PIN MOVED (MWNPC17, section 25): a walker is their variant's role and cut, dressed off their spawn
+import { wornByRole } from '../../src/characters/wardrobe.js';
 import { createPopulationLane } from '../../src/characters/npcBodies.js';
-import { townsfolkOutfitOf } from '../../src/characters/ownModels/ownClothingModels.js';   // PIN MOVED (MW-FOLK1, Townsfolk-Outfits.md): a sprite with its own outfit wears it
+import { townsfolkOutfitOf } from '../../src/characters/ownModels/ownClothingModels.js';
 import { PERSON_TEXTURES, GUARD_TEXTURE } from '../../src/characters/mobile/mobilePerson.js';
 import { GENDERS } from '../../src/characters/nameHelper.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
@@ -32,7 +32,6 @@ test('MWNPC7a a walker\'s look is their roll - the race and gender, the outfit t
         assert.equal(l.race, race);
         assert.equal(l.gender, gender);
         assert.ok(l.faceIndex >= 0 && l.faceIndex <= 9);
-        // PIN MOVED (MW-FOLK1, bible/04-Characters/Townsfolk-Outfits.md): a sprite the port has made its outfit for
         // wears that outfit - the clothes its picture draws, in its colours - and no garment of the wardrobe's
         if (townsfolkOutfitOf(archive)) {
           own++;
@@ -54,7 +53,6 @@ test('MWNPC7a a walker\'s look is their roll - the race and gender, the outfit t
     }
   }
   assert.deepEqual([own, dressed], [11, 13], 'the eleven sprites with an outfit of their own (MW-FOLK1), the wardrobe the other thirteen');
-  // PIN MOVED (MW-FOLK1): a street's variety is the wardrobe's, on a sprite with no outfit of its own - Breton 391, the
   // traveller (385, this pin's sprite, wears its picture's)
   const dyes = new Set();
   const outfits = new Set();
@@ -65,7 +63,6 @@ test('MWNPC7a a walker\'s look is their roll - the race and gender, the outfit t
   assert.equal(guard.gender, 'male');
   const plate = guard.items.filter((it) => it.group === 'Armor');
   assert.deepEqual(plate.map((it) => it.templateIndex).sort((a, b) => a - b), [ARMOR_ENUM.Cuirass, ARMOR_ENUM.Gauntlets, ARMOR_ENUM.Greaves, ARMOR_ENUM.Left_Pauldron, ARMOR_ENUM.Right_Pauldron, ARMOR_ENUM.Helm, ARMOR_ENUM.Boots].sort((a, b) => a - b), 'the watch\'s whole plate');
-  // PIN MOVED (MWNPC12, Morrowind-NPCs.md section 17): steel is ARMOR_MATERIAL.Steel - the 1 this pinned named no material
   assert.ok(plate.every((it) => it.material === ARMOR_MATERIAL.Steel), 'steel');
 });
 

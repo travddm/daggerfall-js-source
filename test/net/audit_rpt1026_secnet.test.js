@@ -1,5 +1,5 @@
-// AUDIT RPT1026 lane A (SECNET), the relay and the session (bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md,
-// RPT1026-SECNET; bible/06-Systems/Online-Arc.md LINE-STALL): driven through the real Room (test/fakeRoom.mjs, real
+// AUDIT RPT1026 lane A (SECNET), the relay and the session (,
+// RPT1026-SECNET; LINE-STALL): driven through the real Room (test/fakeRoom.mjs, real
 // tokens) and the real session.
 // - A1: a blow spends the relay's POSE meter (server/src/index.js, the hit arm's `_meter`), and LINE-STALL held a
 //   stalled line's poses but not its blows - a fighter on a held line was handed HIT_HZ_MAX blows a second beside its

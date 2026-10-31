@@ -1,7 +1,7 @@
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): A SIEGE'S WORKS ON ITS PASS - frozen at
+// SEAT2b part two (b): A SIEGE'S WORKS ON ITS PASS - frozen at
 // the battle's first pass (`town_seat_battles.works`, migration 0063): each work's tier then, a palace's Gatehouse or
 // none, the camp's Rams where a gate stands, a Siegewright on the attacking roster; every later pass carries the same
-// though a work stands between them (bible/11-Multiplayer/Seats-Arc.md 6.2, 7.5; server-account/src/seatSiege.js
+// though a work stands between them (6.2, 7.5; server-account/src/seatSiege.js
 // siegePass). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), on
 // SEAT2a part three's battle week (test/net/seat2a_siege_service.test.js's harness, copied). `06-Systems/Online-Arc.md`
 // SEAT2b part two (b).
@@ -96,7 +96,7 @@ test('SEAT2b part two (b) THE WORKS FROZEN AT THE FIRST PASS: the Walls\' tier, 
   work(s.raw, 'barracks', 2, { building: 3, standsAt: T0 + 60 });   // a tier whose day has come counts
   work(s.raw, 'walls', 2, { building: 3, standsAt: START });   // ...one whose day comes after the door opens does not
   s.raw.prepare('UPDATE town_seat_battles SET rams = 2 WHERE week = ? AND key = ?').run(W + 1, ANTICLERE.key);
-  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.a2.id, s.a2.character, xpForRank(100), T0);  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.a2.id, s.a2.character, xpForRank(100), T0);
   s.setNow(START - 600 + 1);
   assert.equal((await s.pass(s.d1, F)).body.error, 'field-unsettled', 'one side\'s field alone settles nothing - and freezes nothing');
   assert.equal(s.battle().works, null);
@@ -111,7 +111,7 @@ test('SEAT2b part two (b) THE WORKS FROZEN AT THE FIRST PASS: the Walls\' tier, 
 test('SEAT2b part two (b) A PALACE WITHOUT A GATE, AND NO SIEGEWRIGHT: no Gatehouse (-1) and no Ram whatever the camp sent; a Siegewright among the defenders is not the attackers\' (mutants: the gate\'s -1; the Rams\' gate; the attacking side)', async (t) => {
   const s = await battleWeek(t);
   s.raw.prepare('UPDATE town_seat_battles SET rams = 3 WHERE week = ? AND key = ?').run(W + 1, ANTICLERE.key);
-  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.d1.id, s.d1.character, xpForRank(100), T0);  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
+  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.d1.id, s.d1.character, xpForRank(100), T0);
   s.setNow(START - 600 + 1);
   await s.pass(s.a1, F);
   assert.deepEqual(await sxOf(s, s.d1), [0, -1, 0, 0, 0]);

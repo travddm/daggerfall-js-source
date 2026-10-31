@@ -1,6 +1,4 @@
-// CRICKET-QUIET (2026-09-22, Mac: "The cricket noise at night is way too
-// persistent. I want to make a change that lowers its occurrence and
-// persistence, but doesn't remove it as a sound"). DFU plays
+// CRICKET-QUIET. DFU plays
 // AmbientCrickets at full volume from nightfall to dawn without a break;
 // the night now sings in CHORUSES - quieter, swelling in and dying away,
 // with silent spells between.

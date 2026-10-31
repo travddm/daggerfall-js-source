@@ -1,6 +1,4 @@
-// CLICK-STUTTER, OW-DUNGEON-DOT, GRIM-MARKS (2026-10-13, from the field: "when I'm spamming the left mouse button the game
-// starts to stutter"; "some dungeons appear on the Overworld map as towns"; "what are those colored edges, the blue and
-// greenish ones"). A click in the world restyles nothing and asks no lock the canvas holds (the lock half is pinned in
+// CLICK-STUTTER, OW-DUNGEON-DOT, GRIM-MARKS. A click in the world restyles nothing and asks no lock the canvas holds (the lock half is pinned in
 // macfive's PL3 and fb1002_herbcursor_audit's A4/B4); a found dungeon in the Overworld's grid is the dungeons' mark and
 // switch; the Grimoire compass's marks stand on its parchment, not under its frame.
 import { test } from 'node:test';

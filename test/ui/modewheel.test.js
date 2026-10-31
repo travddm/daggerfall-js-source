@@ -1,4 +1,4 @@
-// CROUCH-SNEAK + MODE-WHEEL (2026-10-08, Port-Ledger A: "CROUCH IS SNEAK, AND A WHEEL PICKS THE INTERACTION MODE").
+// CROUCH-SNEAK + MODE-WHEEL.
 // The two departures, pinned: a crouch is a sneak (player/motor.js); a held Left Alt opens the mode wheel, a mouse
 // flick picks a spoke and the release chooses (ui/modeWheel.js); F1-F4 and Sneak ship unbound; a v2 bindings file
 // lets Left Alt go of Sneak so the wheel lands there; the three look-owning hosts hand the mouse to the wheel first.
@@ -59,7 +59,7 @@ test('CROUCH-SNEAK + MODE-WHEEL defaults: Crouch keeps C and LB; Sneak and F1-F4
   assert.equal(by.get('Crouch'), 'KeyC');
   for (const a of ['Sneak', 'StealMode', 'GrabMode', 'InfoMode', 'TalkMode']) assert.equal(by.get(a), undefined, `${a} ships unbound`);
   assert.equal(by.get(MODE_WHEEL_ACTION), 'AltLeft');
-  assert.equal(ACTIONS.at(-8), MODE_WHEEL_ACTION,   // SHOT-KINDS: the guns' load after the hold   // PIN MOVED (UI-CALM: the saddle panel's key; CARGO-ANYWHERE: the hold's last; PARTY-PING: the ping's; Decorate)
+  assert.equal(ACTIONS.at(-8), MODE_WHEEL_ACTION,     // SHOT-KINDS: the guns' load after the hold   //
     'appended - a saved file resolves by position (TECH1\'s technique after it, SPYGLASS\' glass after that - PIN MOVED)');
   assert.ok(ACTIONS.includes('Sneak') && ACTIONS.includes('StealMode'), 'the old rows stay, rebindable');
   assert.ok(PORT_ACTIONS.includes(MODE_WHEEL_ACTION), 'the classic windows yield it');

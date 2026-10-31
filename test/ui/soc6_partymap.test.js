@@ -1,6 +1,4 @@
-// SOC6 - THE PARTY ON THE WORLD MAP (2026-09-16, Mac: "Party members
-// should be able to be seen on the world map, regardless of their
-// location").
+// SOC6 - THE PARTY ON THE WORLD MAP.
 //
 // The slice is one seam and two drawings of it. The seam is a dep
 // FUNCTION - `party: () => [{acct, name, px, py, in, loc, online,
@@ -53,7 +51,7 @@ const skin = (v) => { _resetForTests(); globalThis.location = { search: `?skin=$
 
 // ── THE ENHANCED HARNESS (test/ui/heldmap.test.js's own) ────────────
 //
-// MAP1 (2026-09-18): the enhanced map is the HELD PARCHMENT
+// MAP1: the enhanced map is the HELD PARCHMENT
 // (ui/heldMap.js + ui/ink/inkMap.js); the 3D relief and its DOM labels are
 // RETIRED. The party is INK now - a ring and a name on the sheet, drawn
 // by paintInk through the same view transform as every other mark - so

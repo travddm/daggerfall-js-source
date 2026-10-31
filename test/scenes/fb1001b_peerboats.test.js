@@ -1,5 +1,4 @@
-// FIELD BUGS 2026-10-01b - ANOTHER PLAYER'S BOAT. Mac: "Players aren't colliding with other players' boats and can't
-// stand on board". Online (CSA-K) another player's boat stood in a player's collider only while that player was ABOARD
+// FIELD BUGS 2026-10-01b - ANOTHER PLAYER'S BOAT.. Online (CSA-K) another player's boat stood in a player's collider only while that player was ABOARD
 // it - PR-WAGON1's "Others' wagons don't block", carried over to boats - so to everyone else her hull was walked and
 // swum through and her deck was no floor to step, climb or come up onto (only her ladder's press or a drop onto her
 // deck from above boarded her); and the aboard door took only that drop, so a body standing on her own colliders was
@@ -157,7 +156,6 @@ test('FB1001b PEER-HULL: ANOTHER PLAYER\'S HULL TAKES ME WHERE MY OWN TAKES ME -
 test('FB1001b PEER-HULL: HER DECK\'S FURNITURE AND HER HULL ARE MET AS MINE ARE - a ray across her deck at chest height meets her mainmast where the same ray meets mine, and the helm\'s sweep (world.js csaSphereCastAll, CheckCollision\'s) meets her hull at the distance it meets my boat\'s, so a boat of mine backs off hers as it backs off my own (HULL-PASS: the host hands Come Sail Away this sweep through peerHulls.js, which drops her outside a PvP zone - the next pin)', async () => {
   const r = await rig({ hull: SMALL_SHIP });
   for (let i = 0; i < 2; i++) r.frame();
-  // PIN MOVED (GALLEON, 2026-10-01): the new galleon's mainmast (MainMast, Mac's), stepped 0.12 m abaft her middle
   const mast = (boat) => colliderPoses(boat.GameObject).find((x) => x.node.name === 'MainMast')?.collider;
   assert.ok(mast(r.hers) && mast(r.own), 'the Small Ship carries her mainmast\'s collider (MainMast)');
   /** A ray athwartships across a Small Ship's deck at the mainmast's station, chest high, from 3 m to port. */

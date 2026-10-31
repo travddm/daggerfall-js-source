@@ -105,7 +105,6 @@ test('audit26 F033: the flash is record 1 of the MISSILE\'s archive at 15fps, wi
   // TEXTURE, defaulting to null, which changes nothing this arm claims:
   // the blood defaults are still the defaults and the flash is still
   // unscaled (WW1: DoClang/DoThud's x2 rides `scale`, 1 by default).
-  // PIN MOVED (EG-ZG, Elite-Gates.md section 25.4): `conceal` joins the tail, null by default - an ally's flash drawn
   // translucent in a Spire trial; the blood defaults and the unscaled, unnudged flash are as they were
   assert.match(he, /function spawn\(record, pos, facing = null, \{ archive = BLOOD_ARCHIVE, fps = BLOOD_FPS, scale = 1, tracked = false, conceal = null \} = \{\}\)/);
   assert.match(he, /showImpactFlash: \(archive, pos, scale = 1, conceal = null\) => spawn\(IMPACT_RECORD, pos, null, \{ archive, fps: IMPACT_FPS, scale, conceal \}\)/);   // SUNBABY2 moved it: a sky fireball's flash is drawn larger
@@ -115,7 +114,7 @@ test('audit26 F033: the flash is record 1 of the MISSILE\'s archive at 15fps, wi
   // FORWARD_NUDGE, unlike a blood splash.
   assert.match(he, /spawn\(IMPACT_RECORD, pos, null,/);
   // the entry carries archive/fps so a recenter can REBUILD the batch
-  assert.match(he, /const entry = \{ batch: null, anim: null, dead: false, record, pos: at, at: \[\.\.\.at\], size: null, archive, fps, scale, tracked, conceal \};/);   // PIN MOVED (EG-ZG): and its translucency, carried through a rebuild as the rest is
+  assert.match(he, /const entry = \{ batch: null, anim: null, dead: false, record, pos: at, at: \[\.\.\.at\], size: null, archive, fps, scale, tracked, conceal \};/);
   assert.match(he, /e\.batch = renderer\.createBillboardBatch\(e\.archive, e\.record, e\.size, \[centredBase\(e\.pos, e\.size\)\]\);/);   // FIELD-GUN20: rebuilt where it was built - CENTRED on its position, the base half a height under it
   // ...and the ANIM is built on the entry's archive too. That is
   // unobservable today - flatFps overrides only ANIMALS (201) and
@@ -195,7 +194,6 @@ test('audit26 F034: renderCharacterSprite borrows the clear colour and returns i
   // the shadow is born beside the one constructor clearColor it mirrors
   assert.match(s, /gl\.clearColor\(0\.53, 0\.7, 0\.92, 1\.0\);[^]{0,400}this\._clearColor = new Float32Array\(\[0\.53, 0\.7, 0\.92, 1\.0\]\);/,
     'the shadow and the real clear colour are set together');
-  // PIN MOVED, ROAD-C c2/S2. The bank model preview used to keep its
   // OWN borrow idiom out in worldModes.js, and it borrowed with a
   // synchronous gl.getParameter(COLOR_CLEAR_VALUE) every frame -
   // exactly the driver-query class EV2 killed in precipitation, done

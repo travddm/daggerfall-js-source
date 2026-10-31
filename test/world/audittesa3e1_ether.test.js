@@ -1,5 +1,4 @@
-// AUDIT TESA III E1-4, the Eltheric half (2026-10-26, bible/01-Overview/audits/Audit-Tesa-III-E1.md; routed to the terrain
-// stream - stream G): the isles' Deep Waters bake blends each isle's place with the isle's OWN outline, the one its clone's
+// AUDIT TESA III E1-4, the Eltheric half: the isles' Deep Waters bake blends each isle's place with the isle's OWN outline, the one its clone's
 // streamed build stands (TOWN-SHAPES TS2, seeded by the isle's map id), where it read the template's rect alone.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

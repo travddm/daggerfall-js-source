@@ -1,6 +1,5 @@
-// HAZE1 (2026-10-08, Mac: "We have permission to use and implement everything into the codebase. These should be on
-// by default and integrate into our enhanced environments seamlessly") - HEAT HAZE 1.0.1 (demifiend000), ported off its
-// assembly and its compiled shader (vendor/heat-haze/). bible/07-Rendering/Heat-Haze.md is the record.
+// HAZE1 - HEAT HAZE 1.0.1 (demifiend000), ported off its
+// assembly and its compiled shader (vendor/heat-haze/). is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -87,7 +86,7 @@ test('HAZE1 the settings: the mod\'s keys, its own Enabled the port\'s switch (o
   assert.equal(MOD_SETTINGS[HEAT_HAZE_VENDOR].keys.Enabled.default, true);
   assert.deepEqual(Object.keys(MOD_SETTINGS[HEAT_HAZE_VENDOR].keys), ['Enabled', 'Heat Haze.AllowSubtropical', 'Heat Haze.Intensity', 'Heat Haze.FullStrengthDistance', 'Heat Haze.RingHeight', 'Heat Haze.NoiseScale', 'Heat Haze.AnimationSpeed']);
   const ms = JSON.parse(read('vendor/heat-haze/modsettings.json').replace(/^﻿/, ''));
-  // PLAIN-TEXT (2026-10-19): four of the mod's lines that spoke in engine terms, said plainly for a player - their words, exactly
+  // PLAIN-TEXT: four of the mod's lines that spoke in engine terms, said plainly for a player - their words, exactly
   const PLAIN = {
     'Intensity': 'How strongly the haze bends the view, in pixels.',
     'FullStrengthDistance': 'Distance from you, in meters, of the ring of haze.',

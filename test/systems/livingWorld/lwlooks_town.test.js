@@ -1,5 +1,4 @@
-// LW-LOOKS (2026-10-06, bible/06-Systems/Living-World.md "LW-LOOKS"; Mac: NPCs should "even utilize different sprite
-// forms not just the basic npc sprites" - and, asked how, "Class looks + still flats"): WHAT A RESIDENT LOOKS LIKE. Every
+// LW-LOOKS: WHAT A RESIDENT LOOKS LIKE. Every
 // resident walked the town in one of their people's four outfits (LW0 decision 4); a class's sprite was a fighter's gear
 // on the road alone (LW3). Now those whose calling is a class's walk the town in it - one with a class of their own, a
 // guild hall's own members (their guild's), a temple's priests (the healer's robes) - and one keeping their place alone
@@ -307,7 +306,7 @@ test('LW-LOOKS indoors: one whose calling is a class\'s in it; the palace\'s cou
   const town = { insideAt: (key) => (key === st.key ? st.inside.map((res) => ({ res, e: { kind: 'home' } })) : []), typeOf: () => st.type, dayOf: () => 100, o: { relations: () => null } };
   const room = { move(q, dx, dy, dz) { q[0] = Math.max(-5.7, Math.min(5.7, q[0] + dx)); q[2] = Math.max(-4.7, Math.min(4.7, q[2] + dz)); q[1] += dy; } };
   const enter = () => createLivingIndoors({ sprites, building: () => ({ key: st.key, town }), collider: () => room, floorAt: () => 0, origin: () => [0, 0, 0], staticFeet: () => [], clock: () => 1000 });
-  // LW-ROOMS: PIN MOVED - the room's places all over it, so the way in is looked at her own place (the first cut's put
+  // LW-ROOMS:
   // her before the player's every look): found by a first visit, the room the same for every one
   const first = enter();
   first.frame(0.016, [0, 0, 0], 0, [0, 1.6, 0]);

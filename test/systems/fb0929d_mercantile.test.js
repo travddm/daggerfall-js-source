@@ -22,7 +22,6 @@ test('MERC-RISE: the field\'s counter - a higher Mercantile never sells for less
   // the report's two offers were half of each seller's own ask - the old law, to the gold
   assert.deepEqual([Math.floor(ask(COST, Q, 60, 100) / 2), Math.floor(ask(COST, Q, 90, 100) / 2)], [3499, 2888]);
   assert.ok(sale(COST, Q, 90, 100) >= sale(COST, Q, 60, 100), `${sale(COST, Q, 90, 100)} at 90, ${sale(COST, Q, 60, 100)} at 60`);
-  // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08, EvoAva: "the same exact prices ... no matter how many mercantile
   // levels"): the half of the 5436 this counter asks the best haggler is the CEILING, the best haggler's own; under it
   // each seller stands where their Daggerfall offer stands against the best's, at half its strength
   assert.equal(ask(COST, Q, 100, 100), 5436);

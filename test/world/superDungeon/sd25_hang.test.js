@@ -1,4 +1,4 @@
-// SD25 S11 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 6): THE HANG AND THE
+// SD25 S11: THE HANG AND THE
 // WORKS - what hangs under and around the Hour's islands: strata spires, gear rims and chains under each island
 // (world/superDungeon/sdIslandModel.js), the far islands, the Works far below (world/superDungeon/sdWorksModel.js), stood and moved by scenes/superDungeon/sdHang.js.
 // Every law here is run from its own code; none of it is a collider, and every draw is noShadow.

@@ -1,4 +1,4 @@
-// REALM P2.2b (2026-09-28; bible/06-Systems/Realm-Arc.md section 3, Mac: "eliminate duping"): A HOME'S AND ITS DECOR'S
+// REALM P2.2b: A HOME'S AND ITS DECOR'S
 // GOLD MOVES ON THE REALM CHARACTER'S RECORD. "Homes, decor, stations and guild founding. The service debits the
 // character's gold at claim time." The law (net/homeLaw.js homeSaleRefund, server-account/src/decor.js decorGoldDelta,
 // pinned to the client's own arithmetic), the service (homes.js, decor.js over realm.js prepareRealmRecord) through the
@@ -134,7 +134,7 @@ test('REALM P2.2b: a realm character buys a home on its record and sells it back
 
 test('REALM P2.2b: a refusal moves nothing - a purse that cannot pay, a house another holds, a record that moved under the claim', async () => {
   const { env, player, record } = await stand();
-  // HOME-PRICE (PIN MOVED): the purse and the account hold the range's floor, a hundred short of the price asked (a home's
+  // HOME-PRICE (
   // price is whole hundreds, AUDIT HOME-PRICE L2), where they were 1,000 + 500 against 1,501
   const A = await player('Aldric', { goldPieces: HOME_PRICE_MIN - 500, items: [], bankAccounts: bank(REGION, 500) });
   const B = await player('Brisienna', { goldPieces: 90_000, items: [] });
@@ -149,7 +149,7 @@ test('REALM P2.2b: a refusal moves nothing - a purse that cannot pay, a house an
     if (!raced) { raced = true; assert.equal((await realmPut(A.io, A.char, { lease: A.lease, seq: 2 }, '{"goldPieces":1000,"mid":1}')).ok, true); }
     return realBatch(list);
   };
-  const r = await A.homes.claim({ mapId: MAP, buildingKey: KEY + 1, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) });   // HOME-PRICE (PIN MOVED): a price inside the online range, where it was 900
+  const r = await A.homes.claim({ mapId: MAP, buildingKey: KEY + 1, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) });     // HOME-PRICE (
   assert.deepEqual([r.error, r.seq], ['seq', 2]);
   assert.equal(env.DB._raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE building_key = ?').get(KEY + 1).n, 0, 'no house without its payment');
 });
@@ -157,7 +157,7 @@ test('REALM P2.2b: a refusal moves nothing - a purse that cannot pay, a house an
 test('REALM P2.2b: a realm character\'s decor moves the record\'s gold with the piece - placed, grown, shrunk, a station made, removed; a free write names no record; a paid one without it is refused', async () => {
   const { player, record } = await stand();
   const A = await player('Aldric', { goldPieces: 300_000, items: [], bankAccounts: bank(REGION, 0) });
-  assert.equal((await A.homes.claim({ mapId: MAP, buildingKey: KEY, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) })).ok, true);   // HOME-PRICE (PIN MOVED): a price inside the online range, where it was 1,000
+  assert.equal((await A.homes.claim({ mapId: MAP, buildingKey: KEY, region: REGION, character: A.char, price: HOME_PRICE_MIN, realm: A.at(1) })).ok, true);     // HOME-PRICE (
   const where = { mapId: MAP, buildingKey: KEY, character: A.char };
   let seq = 2;
   const gold = async () => (await record(A)).save.goldPieces;
@@ -204,7 +204,7 @@ test('REALM P2.2b end to end: onlineHomes buys and sells for a realm character -
     afford: (n) => n <= entity.goldPieces, pay: (n) => { entity.goldPieces -= n; }, refund: (n) => { entity.goldPieces += n; }, realm: { act },
   });
   assert.equal(buy.ok, true, JSON.stringify(buy));
-  // THE FLAKE FIELD BUGS 2026-09-29 NOTED AND COULD NOT EXPLAIN (2026-09-29b): the outcome's checkpoint is sent and not
+  // THE FLAKE FIELD BUGS 2026-09-29 NOTED AND COULD NOT EXPLAIN: the outcome's checkpoint is sent and not
   // waited on, so on a loaded machine its answer came after this line read the sequence (3, never 4). The pin waits for it.
   await saved;
   assert.deepEqual([entity.goldPieces, (await record(A)).save.goldPieces, session.seq], [8_000, 8_000, 4], 'checkpoint 2, the claim 3, the outcome 4');
@@ -213,7 +213,7 @@ test('REALM P2.2b end to end: onlineHomes buys and sells for a realm character -
   assert.equal((await record(A)).save.bankAccounts[REGION].accountGold, homeSaleRefund(42_000));
   // a refused buy gives the price back
   const B = await player('Bran', { goldPieces: 50_000, items: [] });
-  await B.homes.claim({ mapId: MAP, buildingKey: KEY + 5, region: 0, character: B.char, price: HOME_PRICE_MIN, realm: B.at(1) });   // HOME-PRICE (PIN MOVED): a price inside the online range, where it was 1,000
+  await B.homes.claim({ mapId: MAP, buildingKey: KEY + 5, region: 0, character: B.char, price: HOME_PRICE_MIN, realm: B.at(1) });     // HOME-PRICE (
   const taken = await buyOnlineHome(homes, {
     mapId: MAP, buildingKey: KEY + 5, region: REGION, price: HOME_PRICE_MIN,
     afford: (n) => n <= entity.goldPieces, pay: (n) => { entity.goldPieces -= n; }, refund: (n) => { entity.goldPieces += n; }, realm: { act },
@@ -291,7 +291,7 @@ test('REALM P2.2b the decor tool for a realm character: a piece placed pays at o
   // a removal whose answer was lost after it landed: the half is the service's to say, so nothing is guessed - the act
   // answers unknown and the session ends (AUDIT REALM L1-F3); a second piece from the catalogue
   const root = panelOf(rig);
-  all(root, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');   // PIN MOVED (VOICE2): Catalog, American spelling
+  all(root, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');
   rows(root).find((r) => r.dataset.key === 'm41000').fire('click');
   all(root, 'dfdecor-btn').find((b) => b.textContent === 'Place').fire('click');
   rig.frame(); await settle(); rig.frame();
@@ -307,7 +307,7 @@ test('REALM P2.2b the decor tool for a realm character: a piece placed pays at o
   svc.answer = null;
   // a third piece, grown and shrunk: the difference paid at once, the shrink's half on the answer
   const root2 = panelOf(rig);
-  all(root2, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');   // PIN MOVED (VOICE2): Catalog, American spelling
+  all(root2, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');
   rows(root2).find((r) => r.dataset.key === 'm41000').fire('click');
   all(root2, 'dfdecor-btn').find((b) => b.textContent === 'Place').fire('click');
   rig.frame(); await settle(); rig.frame();
@@ -383,7 +383,7 @@ test('AUDIT REALM L1-F3: the decor tool takes what the SERVICE paid the record -
   // removed, landed, its answer lost: as the shrink - nothing guessed, no checkpoint after
   svc.answer = null;
   const root = panelOf(rig);
-  all(root, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');   // PIN MOVED (VOICE2): Catalog, American spelling
+  all(root, 'dfdecor-chip').find((c) => c.textContent === 'Catalog').fire('click');
   rows(root).find((r) => r.dataset.key === 'm41000').fire('click');
   all(root, 'dfdecor-btn').find((b) => b.textContent === 'Place').fire('click');
   rig.frame(); await settle(); rig.frame();

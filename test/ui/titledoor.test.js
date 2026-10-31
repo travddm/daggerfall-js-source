@@ -1,6 +1,4 @@
-// TITLE-DOOR (2026-10-27, the owner: "People really love the start game intro screen. I think instead of this leading to
-// the online/offline options. We use the intro title screen as the landing pad itself with these options"; bible/10-UI/
-// UI-Arc.md TITLE-DOOR). THE HELD TITLE IS THE FRONT DOOR: the film lands, steps under the menu, holds its last frame
+// TITLE-DOOR. THE HELD TITLE IS THE FRONT DOOR: the film lands, steps under the menu, holds its last frame
 // for the whole visit and is let go when a game is chosen; the menu's home stands on it - no sky, no masthead, the doors
 // in a row under the mark where Tap to continue stood. Skip intro, Escape and Skip start video land on the title, not
 // past it. Mutants: tools/mutants/titledoor.json.

@@ -1,7 +1,7 @@
-// ARENA4b (2026-10-03, Mac: "Move them to a new house"): AN ONLINE HOME THE ARENA DISPLACED, MOVED BY THE ACCOUNT
+// ARENA4b: AN ONLINE HOME THE ARENA DISPLACED, MOVED BY THE ACCOUNT
 // SERVICE - driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). The rows
 // in Daggerfall's cell (4,3) are laid by hand, as they stand from before the arena (no route can buy one there now - the
-// claim's and the hall's guard, pinned here too). Design: bible/11-Multiplayer/Arena.md, the ARENA1 record's "ARENA4 -
+// claim's and the hall's guard, pinned here too). Design:, the ARENA1 record's "ARENA4 -
 // the online homes' migration"; server-account/src/homes.js arenaMoveHome.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -69,7 +69,6 @@ test('ARENA4b a home MOVED: the row whole at the new key, the old gone; the cata
   const at = R.at();
   const r = await move(owner, { realm: at });
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  // PIN MOVED (FIELD BUGS 2026-10-14 QUEST-HOME, test/net/fb1014_questhome.test.js): and the move's one home order, for every page online
   assert.deepEqual({ ...r.body, realm: undefined, homeOrders: undefined }, { ok: true, mapId: DF, from: OLD, to: NEW, refund: 700, pieces: 2, items: 1, tenancies: 1, withdrawn: 2, hidden: true, realm: undefined, homeOrders: undefined });
   assert.equal(r.body.homeOrders?.length, 1, 'one town, the old house and the new');
   assert.equal(r.body.realm.seq, at.seq + 1, 'the record moved one on - a realm act');

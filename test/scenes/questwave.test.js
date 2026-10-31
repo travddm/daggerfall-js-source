@@ -1,5 +1,4 @@
-// QUEST-WAVE (2026-09-26, SquidKamer, Warm Ashes - Ships' author: "ship encounters ... get jumped by everyone"; "no
-// collision on monsters = free space to spawn enemy always"). CreateFoe places a wave through PlaceFoeFreely, whose
+// QUEST-WAVE. CreateFoe places a wave through PlaceFoeFreely, whose
 // OverlapSphere(0.65) meets every PLACED foe's capsule - Unity syncs a placed foe before the next action's test in the
 // same tick (CreateFoe.cs:319-328), so a spot that is taken refuses the next foe and it waits a tick. Here a pool's
 // stand is async (the career, the texture) and its record joins the pool only after, so WAQ_SHIP_SMALLRAID's thirteen

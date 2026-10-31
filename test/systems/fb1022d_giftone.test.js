@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-22d GIFT-ONE (bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md, report 1): PauloHF on the Discord's
+// FIELD BUGS 2026-10-22d GIFT-ONE (, report 1): PauloHF on the Discord's
 // #bug-reports, "[Glitch] Overpowered spells": "This was a shield with 6002 strength, 1600 duration, and AoE (not mine).
 // And yes, both shields work" - the buff's card reading "Absorbs 2829 more damage." over "Absorbs 3001 more damage." in one
 // bundle, Mega Shield. A party mate's spell carrying one effect twice landed it twice: the tags that keep a mate's bundle

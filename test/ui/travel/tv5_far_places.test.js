@@ -1,5 +1,4 @@
-// TV5 (2026-09-28, bible/06-Systems/Travel-View.md, Mac choosing between the horizon's town shapes and these: "Edge
-// markers") and PERF-TV (Mac: "I also want to ensure performance is golden").
+// TV5 and PERF-TV.
 //
 // TV5: the discovered settlements past the streamed grid, the nearest within reach, held at the view's edge with their
 // distance - a click a journey there by the roads (systems/travel/travelFarPlaces.js, scenes/world.js). PERF-TV: the readout's
@@ -117,7 +116,6 @@ test('PERF-TV readout: every mark on the one canvas; the screen read ONCE a fram
   hud.showTravelViewHud({}, doc);
   try {
     const marks = [];
-    // PIN MOVED (OW-CROWD): forty marks held at one edge - a band's each, never folded (forty travellers there are one
     // crowd's arrow now, test/ui/travel/owcrowd.test.js)
     for (let i = 0; i < 40; i++) marks.push({ key: `band:${i}`, x: 3000 + i, y: 100, front: false, label: `Rider ${i}`, kind: 'band', edge: true });   // all held at the edge
     marks.push({ key: 'place:1', x: 600, y: 300, front: true, label: 'Ripwych', kind: 'place', pick: true });
@@ -423,7 +421,6 @@ test('AUDIT NAMES N1-1/N1-5 readout: a busy first frame makes BADGE_BUILDS_PER_F
   hud.showTravelViewHud({}, P.doc);
   try {
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [
-      // PIN MOVED (OW-CROWD): an arrow at the edge wears a badge only for my party now - the held badge's box asked of one
       { key: 'peer:long', x: 195, y: -3000, front: true, label: 'Aldric Stormcrown Vellan', kind: 'party', edge: true, badge: { title: 'dungeonmaster', glyphs: ['dm', 'dev', 'mod', 'sprout'], lv: 40, gt: 'DAGR' } },
     ] });
     const [, x, , w] = P.draws.at(-1);
@@ -438,7 +435,6 @@ test('AUDIT NAMES N1-8 readout: the kept images are capped by their pixels as we
   hud.showTravelViewHud({}, doc);
   try {
     const mark = (i) => ({ key: `peer:px${i}`, x: 100 + (i % 20) * 50, y: 200 + Math.floor(i / 20) * 40, front: true, label: `Pixelsworth the ${i}`, kind: 'traveller', badge: { title: 'founder', glyphs: ['dev'], lv: 12, gt: 'HND' } });
-    // PIN MOVED (OW-CROWD): the six nearest wear a badge a frame now - fed six at a time, every one of them made
     const step = Math.min(hud.BADGE_BUILDS_PER_FRAME, hud.TV_BADGES_MAX);
     for (let i = 0; i < 300; i += step) {
       const marks = [];
@@ -460,7 +456,6 @@ test('AUDIT NAMES N1-6 readout: a titled player held at the top near a corner an
   hud.showTravelViewHud({}, doc);
   try {
     hud.updateTravelViewHud({ feet: null, heading: null, yaw: 0, where: '', marks: [
-      // PIN MOVED (OW-CROWD): held badges are my party's alone now - two of them
       { key: 'peer:top', x: -5047, y: -3176, front: true, label: 'Mack', kind: 'party', edge: true, badge: { title: 'developer', glyphs: ['dev'], lv: 40, gt: 'DAGR' } },
       { key: 'peer:left', x: -5867, y: -3056, front: true, label: 'Aldric the Gray', kind: 'party', edge: true, badge: { title: 'founder', glyphs: ['sprout', 'dev'], lv: 12, gt: 'HND' } },
     ] });

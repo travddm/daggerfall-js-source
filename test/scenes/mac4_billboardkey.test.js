@@ -1,4 +1,4 @@
-// MAC4 (2026-09-11, Mac: "enemy animations are completely broken").
+// MAC4.
 // PERF3 cached each billboard batch's texture key and re-minted it on
 // a change of `frame` only - the field FA1's animated flats tick. The
 // mobiles never touch `frame`: a foe, a guard or a townsperson

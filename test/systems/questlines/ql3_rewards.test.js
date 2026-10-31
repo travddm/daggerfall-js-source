@@ -1,4 +1,4 @@
-// QL3 (bible/06-Systems/Questlines-Arc.md section 5.2): WHAT AN OUTCOME PAYS, PINNED - AUDIT QUESTLINES REWARD-9 found the
+// QL3: WHAT AN OUTCOME PAYS, PINNED - AUDIT QUESTLINES REWARD-9 found the
 // reward law held by nothing (eight probe mutants lived through every questlines pin: the class fit removed, a lesser
 // outcome's gold at 1, a greater one's at 1 with no rung, tier 1 paying Rare, the roll on Math.random, a named piece every
 // time, its name never set, the letter rule). Each is held here, through the real bridge where a quest's own script is
@@ -372,7 +372,6 @@ test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11)
   const q = start('QLCH03');
   for (const t of q.tasks.values()) for (const a of t.actions) if (a.typeName === 'PlaceNpc') a.isComplete = true;
   bridge.machine.markQuestShared('QLCH03');
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS, machine.js rewardShares): the shares are the copies held, not the party's
   // size - the partner's answer (its envelope of the copy) names it a holder before the split is two
   bridge.machine.noteShareHolder('QLCH03', 'acct-b');
   const minted = q.getItem({ name: 'gold' }).daggerfallUnityItem.stackCount;

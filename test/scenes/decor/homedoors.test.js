@@ -1,5 +1,4 @@
-// HOME-DOORS (2026-09-30, asked: "For houses with multiple rooms attached, I want to add a door item that can attach to
-// the wall that leads to another room. This needs to have an easy element where it tells you where you can place it").
+// HOME-DOORS.
 //
 // A DOOR HUNG IN A DOORWAY. The doorway finder over the real collider built of boxes (systems/decor/decorDoorways.js): an
 // opening in a wall is a doorway - its middle between the jambs, in the wall's thickness, its floor, its lintel, the way

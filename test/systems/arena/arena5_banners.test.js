@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): THE BANNERS' COLOURS ON THE SAND, DRIVEN (bible/11-Multiplayer/Arena.md 3: a team gives "its
+// ARENA5: THE BANNERS' COLOURS ON THE SAND, DRIVEN (3: a team gives "its
 // colours on your ladder bouts (your banners on your side of the floor, the crowd's half in your colour)"; the ARENA3
 // record left them "waiting on a tint the billboard pass does not take and on hangings the floor's instance does not
 // stand"). The billboard pass's per-batch wash on both lanes (render/renderer.js BB_FS uBatchTint, render/enhancedLighting.js

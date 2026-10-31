@@ -169,7 +169,6 @@ test('audit18 sweep: all three spawn sites run the one shared equip chain', () =
   const guards = hostSrc('cityGuards.js');
   // RF2: the equip chain rides the ONE enemy-loot seam (hostCombat.spawnEnemyLoot) - a host calls that, once per branch
   assert.equal((dungeon.match(/\bspawnEnemyLoot\(/g) ?? []).length, 2, 'class + monster branch');
-  // PIN MOVED (HOST-SPLIT, FIELD BUGS 2026-10-14): a room body's base - PARTY-LOOT's, the same one seam on the room's
   // terms - left buildDungeonContext with its block for src/scenes/roomLootHost.js, which the dungeon host constructs
   assert.equal((hostSrc('roomLootHost.js').match(/\bspawnEnemyLoot\(/g) ?? []).length, 1, 'a room body\'s base (PIN MOVED, PARTY-LOOT: the same one seam on the room\'s terms)');
   assert.match(dungeon, /= createRoomLoot\(\{   \/\/ HOST-SPLIT: src\/scenes\/roomLootHost\.js/, 'and the dungeon host constructs it');
@@ -489,7 +488,6 @@ test('audit18: the dungeon spell map keeps the FIRST duplicate, as DFU does', { 
   // dungeonContext into the shared one, so the pin follows the law
   // rather than the file it used to sit in.
   // AUDIT 68 S12-spellsstd-dup: through spellsStd.js's one fold, not a copy of it
-  // PIN MOVED (DEX4a): through the one RebuildClassicSpellsDict (systems/spell/standardSpells.js), which folds through it
   assert.ok(/standardSpellsByIndex\(await fetch\('SPELLS\.STD'\)\)/.test(hostSrc('shared.js')));
   assert.equal(/new Map\(readSpellsStd\(/.test(hostSrc('shared.js')), false, 'the last-wins fold is gone');
 });
@@ -503,7 +501,7 @@ test('audit18 sweep: SPELLS.STD and MAGIC.DEF no longer share one catch', () => 
   // the registries through that loader and none of them reads the two
   // files itself.
   const src = hostSrc('shared.js');
-  const i = src.indexOf("standardSpellsByIndex(await fetch('SPELLS.STD')");   // PIN MOVED (DEX4a): the one rebuild
+  const i = src.indexOf("standardSpellsByIndex(await fetch('SPELLS.STD')");
   const j = src.indexOf('readMagicDef(await fetch(');
   assert.ok(i > 0 && j > i, 'both reads live in loadMagicRegistries');
   assert.ok(src.slice(i, j).includes('} catch {'), 'a bad MAGIC.DEF must not null the spell table');
@@ -528,14 +526,13 @@ test('audit18 sweep: enemy loot rolls the PLAYER gender at both dungeon spawn si
   const src = hostSrc('dungeonContext.js');
   assert.equal((src.match(/spawnEnemyLoot\(entity, e\.mobileType, basics, D\.playerEntity, \{ \.\.\.eliteLootOpts\(e\), where: 'dungeon' \}\)/g) ?? []).length, 2);
   assert.equal(/generateItems\([^)]*gender: e\.gender/.test(src), false);
-  assert.match(hostSrc('hostCombat.js'), /generateItems\(enemyLootTableKey\(mobileType, basics\?\.lootTableKey \?\? '-'\), \{ level: effectiveLevel\(player\), gender: player\.gender \}, rolls, \{ itemChanceScale, mobileType \}\)/, 'the PLAYER\'s gender (SOFTCAP2: at the mentor\'s level), LootTables.cs:212/:229/:237');   // PIN MOVED (PARTY-LOOT): on the caller's dice - the player a room's base hands in is the room's roller
+  assert.match(hostSrc('hostCombat.js'), /generateItems\(enemyLootTableKey\(mobileType, basics\?\.lootTableKey \?\? '-'\), \{ level: effectiveLevel\(player\), gender: player\.gender \}, rolls, \{ itemChanceScale, mobileType \}\)/, 'the PLAYER\'s gender (SOFTCAP2: at the mentor\'s level), LootTables.cs:212/:229/:237');
 });
 
 test('audit18 sweep: the swing fatigue and the tally arm are wired into the dungeon rig', () => {
   const src = hostSrc('dungeonContext.js');
   assert.equal((src.match(/drainFatigue\(SWING_FATIGUE_COST\)/g) ?? []).length, 2,   // BALANCE1: DFU's swing loss on exertion's scale
     'the melee swing and the bow release');
-  // PIN MOVED (TWO-HANDS AUDIT 2, bible/05-Combat/Two-Hands.md): the tally counts the swing's weight - an off-hand blow of
   // a pair 0.8 of a use (hostCombat.js tallySwingSkills), every other swing 1 as before
   assert.equal((src.match(/tallySwingSkills\(playerEntity, playerWeapon\.weapon, playerWeapon\.blowWeight\)/g) ?? []).length, 2);
   assert.ok(/const hitEnemy = resolvePlayerHit\(/.test(src), 'the tally arm needs hitEnemy');

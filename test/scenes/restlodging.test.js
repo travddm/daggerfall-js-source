@@ -575,7 +575,7 @@ test('S40 hosts: all four can now rest, and each supplies its own place', () => 
     const close = ladder.indexOf('\n    }');
     assert.ok(at > 0, `${f}: the Rest arm is not below the guard at all`);
     assert.ok(close > 0 && at < close, `${f}: the Rest arm escaped the guard`);
-    assert.match(s, /createRestWindow\(outdoorRestDeps(?:, bed)?\)/, f);   // PIN MOVED (AUDIT RPT1026 L3): world.js's carries its ship bed's press
+    assert.match(s, /createRestWindow\(outdoorRestDeps(?:, bed)?\)/, f);
     assert.match(s, /setCrimeCommitted\(playerEntity, crime\)/, f);   // V4: through the one setter (SuppressCrime)
     assert.match(s, /if \(spawnGuards\) _crimeResponse\(\)/, f);
     assert.match(s, /inTownOutside: _isPlayerInTownStrict\(\)/, f);
@@ -1617,7 +1617,7 @@ test('S40/merge -> ROAD-B B1: a rest under a pushed box is SUSPENDED, not replac
   // QuestMachine.Tick, which this merge finally ported - so a quest
   // popup landing mid-rest became reachable in the same change.
   //
-  // THIS PIN MOVED, DELIBERATELY, AT ROAD-B B1. It used to read "a
+  // THIS
   // rest REPLACED in the slot still clears its flags", and it was
   // honest about why: a single overlay slot cannot stack, so the port
   // could not pause - the incoming window REPLACED the rest, and the

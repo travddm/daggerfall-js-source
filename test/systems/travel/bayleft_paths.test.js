@@ -1,5 +1,4 @@
-// BAY-LEFT-MAPS C10 (2026-10-27, the owner after AUDIT LEFT IN THE BAY: "Every single thing here needs to be addressed. No
-// exceptions."; bible/06-Systems/Travel-Options.md BAY-LEFT-MAPS) - TRAVEL OPTIONS' ROADS PAST THE BAY.
+// BAY-LEFT-MAPS C10 - TRAVEL OPTIONS' ROADS PAST THE BAY.
 //
 // Basic Roads' path data is the Bay's 1000 x 500 table (world/road/pathData.js dataPoint), and every read past it
 // answered 0: on every road past the Bay Follow Paths said "no path", the junction map was blank (its section skipped

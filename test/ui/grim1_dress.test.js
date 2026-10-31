@@ -1,5 +1,4 @@
-// GRIM1 (2026-10-09, Discord: CLEM - "Grimoir UI is almost amazing ... I want some of the features of enhanced+ just
-// not the overall look of it"; Skibbster - "More support for grimoire and classic UI in general") - DFO GRIMOIRE: the
+// GRIM1 - DFO GRIMOIRE: the
 // enhanced skin, every window and feature it carries, dressed in GrimoireUI's own art (ui/grimoireDress.js,
 // ui/grimoireArt.js). The browser half - the dress worn on the front door, the pack, the books, the Ascend, the HUD's
 // vials - is tools/grimoireDressProbe.mjs (no ARENA2).
@@ -263,7 +262,7 @@ test('GRIM4: THE BARS - the foe\'s and the boss\'s are the player\'s own whole v
   assert.match(css, /\.px-mrow\[data-grim-meter="vital"\] \.px-fill\.blood \{ background: var\(--grim-vialHealthHead,/);
   assert.match(css, /\.px-mrow\[data-grim-meter="vital"\] \.px-fill\.verdigris \{ background: var\(--grim-vialMagickaHead,/);
   assert.match(css, /\.px-mrow\[data-grim-meter="attr"\] \.px-meter \{ height: calc\(3 \* var\(--gq/, 'an attribute: the skill bar\'s thin groove');
-  // PAGE-CENTRE (2026-10-12): the right-hand page's outer side takes the gutter's extra width, so its writing stands centred
+  // PAGE-CENTRE: the right-hand page's outer side takes the gutter's extra width, so its writing stands centred
   assert.match(css, /\.px-journal > \.px-qdetail \{[^}]*padding: calc\(2 \* var\(--gp, 3px\)\) calc\(calc\(2 \* var\(--gp, 3px\)\) \+ calc\(18 \* var\(--gp, 3px\)\)\) calc\(1 \* var\(--gp, 3px\)\) calc\(2 \* var\(--gp, 3px\)\)/);
   assert.match(css, /\.lv-ribbon:has\(\.lv-sk:nth-child\(15\)\) \{ grid-template-columns: 1fr; grid-auto-rows: minmax\(min-content, 1fr\); align-content: stretch; \}/);
   for (const w of ['Strength', 'intelligence', 'Luck']) assert.ok(ATTRIBUTE_WORD.test(w), w);
@@ -305,7 +304,7 @@ test('GRIM6: the front door\'s desk is the pack\'s painting at its own resolutio
   assert.doesNotMatch(css, /[^\]] \.hmfindme \{ display: none/, 'never off the world map\'s and the town\'s');
   assert.match(css, /\.pack-shell \.equipped \.wornrow \{ padding: calc\(5 \* var\(--gq[^}]*overflow: hidden; \}/);
   assert.match(css, /body \.dfchat-input \{ color: #2b1a0c !important; -webkit-text-fill-color: #2b1a0c !important;/);
-  // NAME-INK (2026-10-11, Mac: "the color was the problem not the font"): a name in a colour of its own on the page, never the words' ink
+  // NAME-INK: a name in a colour of its own on the page, never the words' ink
   assert.match(css, /\.dfchat-box :is\(\.dfchat-name, \.dfchat-who-name\) \{ color: #7a170c !important; filter: none !important; \}/);
   assert.match(css, /\.dfchat-peek, [^{]*\.dfchat-peek \* \{\n  text-shadow: -1px 0 0 #120804/);
   assert.match(css, /\.lv-count \{ font-size: 32px !important; line-height: 32px;/);
@@ -324,8 +323,7 @@ test('TURN1 + FLIP-FIT: the compass turns over in the HUD editor (Alt+U) - the p
   assert.match(css, /\.pack-shell \.statflip-back \{ overflow: hidden !important; \}/);
 });
 
-// INK-TONES (2026-10-10, a player: "make the fonts better visible ... the blue and Mora's Mantle ones ... don't make them
-// totally different") and PACK-ROOM (the same day: the worn map's flanks broke a pair's names a letter at a time).
+// INK-TONES and PACK-ROOM (the same day: the worn map's flanks broke a pair's names a letter at a time).
 test('INK-TONES: a rarity\'s, a set\'s and the sigil\'s words are their own colour deepened into the ink on the page - the tier\'s tone as the loot plaque writes it, a set\'s and the sigil\'s own colour mixed down with the ink (each set keeps its hue), a tier not yet awake in ink, never faded; every set colour then reads at 4.5:1 or better on the cream page. PACK-ROOM: the goods give 40px back and the figure stands at most 210px wide (mutants: a rarity left pale; the set\'s ink not mixed from its own colour; the faded tier back; the old columns)', async () => {
   const { RARITY_INK, SET_INK, SIGIL_INK, grimoireKitCss } = await import('../../src/ui/grimoireDress.js');
   const css = kitCss();
@@ -346,7 +344,7 @@ test('INK-TONES: a rarity\'s, a set\'s and the sigil\'s words are their own colo
   assert.match(all, /\.pack-shell \.wornmap-doll\.hasart \{ max-width: 210px; \}/);
 });
 
-// DESK-HD (2026-10-10, Mac: "the background is still blurry as hell ... use this one").
+// DESK-HD.
 test('DESK-HD: the front door stands on the detailed desk (public/art/grimoire-desk.jpg), as big as the screen holds it, no second vignette laid over its own dark edges, the pack\'s BIOG00I0 under it only as the fallback (mutants: the blocky pack desk back on top; the file missing; the vignette doubled)', async () => {
   const { GRIMOIRE_DESK_FILE, grimoireDeskUrl } = await import('../../src/ui/grimoireArt.js');
   const { grimoireKitCss } = await import('../../src/ui/grimoireDress.js');
@@ -363,8 +361,7 @@ test('DESK-HD: the front door stands on the detailed desk (public/art/grimoire-d
   assert.ok(!/radial-gradient|linear-gradient/.test(rule), 'its own dark edges, never a second vignette');
 });
 
-// WOOD-HD (2026-10-10, Mac: "can every board wood background in DFO Grimoire UI in ALL windows and frames look like this
-// that has that blurred wood?").
+// WOOD-HD.
 test('WOOD-HD: every board of the dress - a window\'s body and bars, a pane, a chip, a tab plate, a plank and the frame\'s rim - is the one `wood` tile, now the soft desk wood (public/art/grimoire-wood.jpg) at 100 x 189 of the game\'s pixels, built at the screen\'s own device pixels so it is laid one to one (mutants: the pack\'s pixel planks back; the tile at its old size; the frame keeping the old wood)', async () => {
   const { GRIMOIRE_WOOD_FILE, WOOD_TILE, nativeSize } = await import('../../src/ui/grimoireArt.js');
   const buf = readFileSync(new URL(`../../public/art/${GRIMOIRE_WOOD_FILE}`, import.meta.url));

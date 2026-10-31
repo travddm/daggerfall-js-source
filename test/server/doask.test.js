@@ -1,5 +1,4 @@
-// DO-ASK (2026-10-16, Mac: "Yes and do any other improvements along the way. I really wanna continue to beef up the
-// server"; bible/11-Multiplayer/Scale-Arc.md DO-ASK): THE WORKER'S ASK OF A ROOM. The live relay's Durable Objects threw
+// DO-ASK: THE WORKER'S ASK OF A ROOM. The live relay's Durable Objects threw
 // at the Worker now and then - a region channel's storage reset, a crowded cell's queue overloaded - and the Worker let
 // it out as an exception: the socket's upgrade failed with nothing a page could read, and a reset that a second ask
 // would have survived cost the player a reconnect's backoff. server/src/relayScale.js askRoom asks a `retryable` one

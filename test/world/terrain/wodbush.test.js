@@ -1,4 +1,4 @@
-// WOD-BUSH (2026-10-01, Mac: "World of daggerfall bush props float above the ground in bandit camps"). The mod stands
+// WOD-BUSH. The mod stands
 // every object on the site's average plus the author's own height, and levels the ground to that average only inside
 // the site's rect - the band past it is eased toward it (flattenForLocation). The layouts ring their sites with the
 // shrub model 60610, in that band, at heights the author read off the ground of the one place they were laid out, so

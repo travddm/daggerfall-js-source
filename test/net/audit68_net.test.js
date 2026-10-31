@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster "net" (S14, src/net). The halo socket a join forgot without
+// AUDIT 68, the whole-tree sweep - cluster "net" (S14, src/net). The halo socket a join forgot without
 // closing, a halo's error frame wedging the primary, the quest arm's missing per-room gate and party seat, the trade
 // confirm a cancel could strand the peer's goods behind, the class-sprite builds kept for peers already gone, and the
 // emote target read as a replacement pattern. Each pin is driven through the real module and fails on the base.

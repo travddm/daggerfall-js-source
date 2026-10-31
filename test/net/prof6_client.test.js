@@ -1,9 +1,9 @@
-// PROF6 (2026-09-29, Mac: "continue") - GUILD WRITS, THE GUILD STORES AND COMMISSIONS, THE CLIENT: the books through the
+// PROF6 - GUILD WRITS, THE GUILD STORES AND COMMISSIONS, THE CLIENT: the books through the
 // real Worker (a guild writ posted and supplied, the guild Stores read and withdrawn, a commission filled out of the
 // crafter's pack and collected into the poster's by the market's book); the writs' book's kept fill (put back on a
 // refusal, asked again with its own id, dropped from the save on a late yes), its ids, its one act at a time and what
 // its answers tell the other books; the Work tab's guild writs, commissions, "Yours" and forms, and the note's button;
-// the Guild tab's Stores and budget; the wiring, and the Court writ's word (FOUND). bible/06-Systems/Professions-Arc.md 28.
+// the Guild tab's Stores and budget; the wiring, and the Court writ's word (FOUND). 28.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -67,7 +67,7 @@ test('PROF6 DONE WHEN (the books): a Guildmaster\'s writ posted and an outsider\
   assert.deepEqual([w.ok, told.stores.at(-1)], [true, ['Aldric', { material: OAK, own: 0, bought: 40 }]]);
   assert.deepEqual(gmBook.state.guildStores.rows, [], 'the answer\'s Stores, emptied');
   // THE COMMISSION
-  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann');   // PIN MOVED (INT19): the crafter a realm character - the piece leaves its record
+  const smith = await s.seated('Silverthorn'), ann = await s.registered('Ann');
   s.seedMarks(ann, 2_000);
   raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
     VALUES (?, ?, ?, 'Silverthorn', 'longsword:mithril', 120, 5, 3, 77, 'p1.x', ?)`).run(PV, smith.id, smith.character, T0);
@@ -103,7 +103,6 @@ test('PROF6 the writs\' book: a fill keeps its piece out of the save until answe
     post: async () => new Promise(() => {}),   // never answers
   };
   const storage = memStorage();
-  // PIN MOVED (INT19, Integrity-Arc section 7): a fill goes through the realm act (net/marketBook.js realmPieceAct) - out of
   // the save inside the hold, put back on a refusal, nothing kept on silence (the record is the truth: a join reads it); a
   // fill a tab from before kept is still asked again by the settle with its own id
   const at = { id: 'r00000000000000000003', lease: 'L'.repeat(32), seq: 2 };
@@ -216,7 +215,7 @@ test('PROF6 the Work tab: this region\'s guild writs under the guild blue (Deliv
   await ticks();
   const cards = byClass(host, 'notice-writ');
   assert.deepEqual(cards.map((c) => c.className.match(/seal-\w+/)[0]), ['seal-guild', 'seal-guild', 'seal-commission', 'seal-commission']);
-  assert.match(cards[1].textContent, /Guild writThe Silver Hand \[SH\] needs 280 more Oak Logs/);   // PIN MOVED (BOARD-SIFT): the work ends soonest first - W2's two days before W1's five
+  assert.match(cards[1].textContent, /Guild writThe Silver Hand \[SH\] needs 280 more Oak Logs/);
   assert.match(cards[1].textContent, /Pays 3 silver each - 520 \/ 800 delivered/);
   assert.match(cards[1].textContent, /5 days left/);
   assert.match(cards[1].textContent, /50 in your Stores/);
@@ -229,7 +228,7 @@ test('PROF6 the Work tab: this region\'s guild writs under the guild blue (Deliv
   const before = reads();
   go.click();
   await ticks();
-  // BAG1 (PIN MOVED): and the writ's material, so the host puts in what the Stores lack of it from the bag and the pack first
+  // BAG1 (
   assert.deepEqual(calls.at(-1), ['supply', { region: DF, writ: 'W1', units: 40, material: 'log:oak' }]);
   assert.ok(reads() > before, 'the list read again');
   assert.match(host.textContent, /Delivered 40 Oak Logs: 114 silver struck to your account \(6 silver tax taken\)\./, 'AUDIT 31 U13: never "114 less 6"');
@@ -270,7 +269,7 @@ test('PROF6 the Work tab: this region\'s guild writs under the guild blue (Deliv
   r2.v.unmount();
   const r3 = workRig({ data: boardData(), pieces: [] });
   await ticks(); byClass(r3.host, 'notice-tab')[1].click(); await ticks();
-  assert.match(byClass(r3.host, 'notice-writ')[2].textContent, /You carry no unworn piece you made for it\./);   // BOARD-UI (PIN MOVED)
+  assert.match(byClass(r3.host, 'notice-writ')[2].textContent, /You carry no unworn piece you made for it\./);     // BOARD-UI (
   r3.v.unmount();
 });
 
@@ -306,7 +305,7 @@ test('PROF6 the Work tab\'s forms: an Officer\'s guild writ - the escrow, the pa
   assert.equal(byClass(form(), 'work-post')[0].disabled, true, 'no crafter, no commission');
   who.value = 'Silverthorn'; who.oninput();
   field('comm|pay').value = '900'; field('comm|pay').oninput();
-  assert.match(form().textContent, /The crafter gets it, less 45 silver tax, for an unworn piece they made\./);   // BOARD-UI (PIN MOVED)
+  assert.match(form().textContent, /The crafter gets it, less 45 silver tax, for an unworn piece they made\./);     // BOARD-UI (
   byClass(form(), 'work-post')[0].click();
   await ticks();
   assert.deepEqual(calls.at(-1), ['commission', { region: DF, crafter: 'Silverthorn', recipe: 'dagger:iron', quality: 2, pay: 900 }]);
@@ -370,7 +369,7 @@ test('PROF6 the Guild tab: the guild Stores read once, each material\'s count an
   const doc = { ...document, createElement: (t) => Object.assign(document.createElement(t), { dataset: {} }) };
   doc.head.dataset ??= {}; doc.body.dataset ??= {};
   const panel = createSocialPanel({ social: new SocialState({ acct: 'acct-a' }), guild: book, doc, win: { addEventListener() {}, removeEventListener() {} }, overlay: () => false, touch: false });
-  panel.openGuild('stores');   // GUILD2 (PIN MOVED): the guild Stores are the Guild tab's Stores page
+  panel.openGuild('stores');     // GUILD2 (
   await ticks(6); panel.render(); await ticks(6); panel.render();
   const t = panel.root.textContent;
   assert.match(t, /Guild Stores/);
@@ -379,14 +378,14 @@ test('PROF6 the Guild tab: the guild Stores read once, each material\'s count an
   assert.match(t, /Writ budget/);
   assert.equal(calls.filter((c) => c[0] === 'read').length, 1, 'read once');
   const fields = byClass(panel.root, 'dfsocial-field');
-  const units = fields.find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (PIN MOVED): empty is all of it
+  const units = fields.find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');     // GUILD-UX (
   units.value = '15'; units.dispatch('input', {});
   const btn = (label) => byClass(panel.root, 'dfsocial-btn').find((b) => b.textContent.startsWith(label));
   btn('Put in').click();
   await ticks();
   assert.deepEqual(calls.at(-1), ['deposit', OAK, 15]);
   panel.render();
-  const units2 = byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');   // GUILD-UX (PIN MOVED): empty is all of it
+  const units2 = byClass(panel.root, 'dfsocial-field').find((f) => f.getAttribute('aria-label') === 'Units (leave empty for all)');     // GUILD-UX (
   units2.value = '10'; units2.dispatch('input', {});
   btn('Take out').click();
   await ticks();

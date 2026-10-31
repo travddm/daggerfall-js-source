@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): THE GATE'S WARDENS AND THE CITY'S LAW (bible/11-Multiplayer/Arena.md 1: "the gate wardens - two
+// ARENA5: THE GATE'S WARDENS AND THE CITY'S LAW (1: "the gate wardens - two
 // guards (the city watch's own), so a brawl at the gate is a crime like any other"). What was read: the wardens are the
 // gate's static people (world/arena/arenaCity.js ARENA_GATE_PEOPLE - the Royal Guard's, in a person archive the ray meets, named
 // by their office); a crime at the gate runs the street's own law with no arena term anywhere on its path - both hosts'

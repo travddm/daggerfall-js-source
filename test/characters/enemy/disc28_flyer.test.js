@@ -1,4 +1,4 @@
-// DISC28-H (2026-09-28, Discord: the Dragonslayer quest's dragonling "stuck in the floor").
+// DISC28-H.
 //
 // Quest B0B70Y16 places a Dragonling (id 40, behaviour Flying) at a dungeon marker, and Meaner Monsters - on by default,
 // forced on online - scales its texture 2.5x, so its idle sprite is several metres tall. A flyer hangs on its marker as

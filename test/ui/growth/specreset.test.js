@@ -1,5 +1,4 @@
-// SPEC-RESET (2026-10-18, the owner: "Lets allow players to reset their ingame builds for a high cost"; asked, the owner
-// chose the specialisations and 200k; bible/10-UI/Growth.md section 10). Pinned here:
+// SPEC-RESET. Pinned here:
 //   the law     a family's path given up for SPEC_RESET_GOLD (systems/specReset.js) - paid as the Firmament's respec is
 //               (court.js payUndoable: the coins, else the letters and then the coins, online the Empire's account after),
 //               refused short of it or with nothing held; the masteries, the other family and the spellbook untouched; its

@@ -1,6 +1,5 @@
-// PERF-COL2 (2026-10-10, the owner: "performance must be highest priority now ... prob caused by placed objects by
-// players, crowded places and render range"): A STREAMED PIXEL'S BUCKETS ARE FILED BY PLACE (player/collider.js
-// onFloatingFrame, BROAD_COARSE_CELL; bible/07-Rendering/Performance-Priority.md PERF-COL2).
+// PERF-COL2: A STREAMED PIXEL'S BUCKETS ARE FILED BY PLACE (player/collider.js
+// onFloatingFrame, BROAD_COARSE_CELL; PERF-COL2).
 //
 // Every streamed pixel's collider bucket rides the floating origin (a translation provider), so FB0930-FRAME's broad
 // phase asked every one of them on every ray and every sphere - and each spans its pixel, too wide for the fine cells
@@ -16,7 +15,7 @@
 // the world host marks every streamed pixel's bucket as riding its state, and only those - and the two hosts that lay
 // a pixel's bucket of their own (Deep Waters' walls, a bounty farm) mark theirs with the frame it hands them.
 //
-// AUDIT PERF-COL2 (2026-10-10, the owner: "Lets do an audit on this"): FOUR: a query's candidates hold every bucket
+// AUDIT PERF-COL2: FOUR: a query's candidates hold every bucket
 // whose filed box meets its own, in the walk's order, once - against a brute force over random boxes, after frames
 // moved and buckets grew. FIVE: a mesh streamed into a standing filing is filed into it (the whole filing was made again
 // for each - 0.2 ms of a frame at the default view while a pixel built), its answers the old walk's; a frame moved
@@ -145,7 +144,7 @@ test('PERF-COL2: the work - a short probe asks the buckets round it and the fram
   assert.ok((nOld() - b0) > 3 * (nReal() - a0), `a capsule's move: ${nReal() - a0} asks, the old walk ${nOld() - b0}`);
 });
 
-/** Where a bucket's box stands in the world now: its own box, moved by its translation - SEA-DROPS (PIN MOVED: a mover
+/** Where a bucket's box stands in the world now: its own box, moved by its translation - SEA-DROPS (
  *  was asked always, `null` here): and a turned one's turned by its turn, every point of it inside (|R| on its half
  *  extents, collider.js turnedBox's bound). [x0, x1, z0, z1]. */
 function worldBox(b) {

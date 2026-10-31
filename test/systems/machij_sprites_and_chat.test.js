@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-H + MAC-I + MAC-J - THREE NOTES ON THE CLASSIC LANE (2026-09-17).
+// MAC-H + MAC-I + MAC-J - THREE NOTES ON THE CLASSIC LANE.
 //
 // Mac:
 //   1. "On the classic sprite, when a torch is unequipped, a random sprite is

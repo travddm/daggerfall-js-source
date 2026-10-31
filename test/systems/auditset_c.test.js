@@ -1,4 +1,4 @@
-// AUDIT SET (2026-09-27, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md, "AUDIT SET"): slice C - the drops, the
+// AUDIT SET: slice C - the drops, the
 // economy, the wire, the saves and the tooltips. What the audit found and each fix's own pins; the powers' fixes live
 // beside the powers (set3_powers.test.js), the Broker's beside the Broker (set7_*.test.js).
 import '../modsOff.js';
@@ -66,7 +66,7 @@ test('AUDIT SET D4: a Test Room character stays offline - the mark rides its sav
   const was = mkEntity({ testRoom: true });
   restorePlayer(was, worldly, null);
   assert.equal(was.testRoom, undefined, 'loading a character of the world over the room\'s leaves no mark behind');
-  // REALM P1.5: the Online pane's local tile brings a character in through customs (PIN MOVED: ui/enhanced/bringOnlineButton.js)
+  // REALM P1.5: the Online pane's local tile brings a character in through customs (
   assert.deepEqual(bringOnlineButton({ testRoom: true }, { realmCopy: false }), { label: 'Test Room: offline only', offlineOnly: true });
   assert.deepEqual(bringOnlineButton({ testRoom: false }, { realmCopy: false }), { label: 'Bring online', offlineOnly: false });
 });

@@ -1,5 +1,4 @@
-// LW6c (2026-10-05, bible/06-Systems/Living-World.md "LW6c", Mac: "make friends or enemies, and explore a dynamic
-// world"): CARRIED HOME - each of the fallen of a dive carries a keepsake, found with their remains (LW6b); carried home,
+// LW6c: CARRIED HOME - each of the fallen of a dive carries a keepsake, found with their remains (LW6b); carried home,
 // it is the household's moment: handed over, their words on the parchment, the one spoken with and the rest of the
 // household remembering it. The town is the synthetic one (test/lwTown.mjs).
 import test from 'node:test';

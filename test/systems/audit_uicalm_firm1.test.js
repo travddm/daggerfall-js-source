@@ -1,5 +1,5 @@
-// AUDIT UICALM-FIRM1 (2026-10-14, the owner: "Lets do an audit on everything") - every FIXED finding of the audit of
-// UI-CALM and FIRM1 (bible/01-Overview/audits/Audit-UICalm-Firm1.md), pinned through the producers that mint the shapes in
+// AUDIT UICALM-FIRM1 - every FIXED finding of the audit of
+// UI-CALM and FIRM1, pinned through the producers that mint the shapes in
 // play: the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), the real door and book,
 // the real law, fold and damage door, the real ship scene.
 import '../modsOff.js';

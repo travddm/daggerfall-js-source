@@ -1,6 +1,4 @@
-// BAL11 - THE HERO'S THREAT (2026-10-17; bible/05-Combat/Balance-Arc.md section 17; the Discord's field report: "the game
-// gets too easy pretty early ... starting around character level 10/renown 15ish ... 4x-6x more damage and 2x-3x more hp
-// ... every type of mobs elite etc"). Each Daggerfall level past 10 (to 30) a foe hits 7% harder and stands 4% tougher,
+// BAL11 - THE HERO'S THREAT. Each Daggerfall level past 10 (to 30) a foe hits 7% harder and stands 4% tougher,
 // each Renown past 15 (to 50) 1% and 0.5% - compounding, through the one writer, at the two seams BAL3's place runs
 // through, over every kind's own scale. Never an ally, a stage, a town's ground; a puppet's blows alone; the ladder's gate.
 //

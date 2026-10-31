@@ -1,6 +1,4 @@
-// TUT1 (2026-10-11, Mac: "replace the current DFU tutorial with our own custom tutorial that not only explains how to
-// play, but has popups for whenever you are interacting with a new system ... dont mention daggerfall ... a menu
-// section where tutorials can be revisited. This needs to be comprehensive").
+// TUT1.
 //
 // The catalogue's rules (systems/tutorialCatalogue.js), the read list on the prefs shelf (systems/tutorials.js), the
 // trigger and its popup line (ui/tutorialPopup.js) driven through fake seams, the seams themselves swept both ways
@@ -90,7 +88,7 @@ test('TUT1: a page fits a popup - every wrapped line within the measure, no page
       if (typeof r === 'string') assert.ok(text.length <= TUTORIAL_WRAP + 8, `${t.id}: "${text}" overruns the measure`);
     }
     assert.ok(rows.length <= 16, `${t.id}: ${rows.length} rows - too tall for a popup`);
-    // TUT1 audit (Mac: "Ensure explanations dont sound AI and arent overloaded"): two paragraphs at most, three points
+    // TUT1 audit: two paragraphs at most, three points
     // at most, and no page over sixty words
     assert.ok(t.body.length <= 2 && (t.points ?? []).length <= 3, `${t.id}: too many parts`);
     const words = [...t.body, ...(t.points ?? [])].join(' ').split(/\s+/).length;

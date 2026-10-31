@@ -1,8 +1,4 @@
-// DISC23-B (2026-09-24, Gryphoth and Scratchie on Discord, "Eye of the Beholder third person sprites": "EOTB comes
-// with 16 ground models and different mounted models, it would be nice to be able to change our models like in the
-// original mod ... Also just a way to change our sprite in general instead of it defaulting depending on the class" /
-// "The default EOTB has many different options for males and females but the game is not allowing us to choose
-// between the different index slots").
+// DISC23-B.
 //
 // THE GAP, two of them. (1) The mod's two sprite sliders (Graphics.OnFoot 0-15, Graphics.OnHorse 0-4) were declared
 // and read by the body, and on NO screen: the mod's own pane went with FT14's Mods pane and its curated list never
@@ -66,14 +62,12 @@ test('DISC23-B: the sets are NAMED - sixteen on foot, five in the saddle, the ar
     assert.ok(foot.labels[i].startsWith(kind), `${p.Title} is set ${i}: ${foot.labels[i]}`);
   }
   foot.labels.slice(0, EOTB_FOOT_SET_COUNT).forEach((l, i) => assert.match(l, i % 2 ? /\(male\)$/ : /\(female\)$/));
-  // Mac: "make it a choosable skin system in the menu player profile system itself instead of it being hidden in the
-  // feature menu"
   assert.ok(!MOD_CURATED[V].includes('Graphics.OnFoot') && !MOD_CURATED[V].includes('Graphics.OnHorse'), 'not a tile\'s dial');
 });
 
 test('DISC23-B2: the PROFILE carries the skin - every set as its own picture, the worn one marked, a press worn at once', () => {
   _resetModSettings();
-  setModSetting(V, 'Graphics.LayeredGear', 0);   // PIN MOVED (LAYERED-GEAR-ON): Layered Gearing is on by default; these pins are the Skins look's
+  setModSetting(V, 'Graphics.LayeredGear', 0);
   const sets = skinSets();
   assert.equal(sets.foot.length, FOOT_SKINS); assert.equal(sets.horse.length, 5);   // SKIN2: the mod's sixteen and the classes
   assert.deepEqual(sets.foot.map((s) => s.name), MOD_SETTINGS[V].keys['Graphics.OnFoot'].labels);
@@ -156,7 +150,7 @@ const pose = (o = {}) => ({ x: 4, y: 0, z: 9, yaw: 0, pitch: 0, mv: 0, wd: 0, an
 
 test('DISC23-B: a peer on foot stands as the set they chose - their own archive, the move bit walking it, the name at its top', async () => {
   const { art } = rig();
-  const w = createPeerWalkers({ art, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const w = createPeerWalkers({ art, layeredAll: () => false });
   const peer = { id: 'p1', look: { eo: 7 }, shown: pose({ mv: 1 }) };
   w.sync([peer], toScene, { eye: [4, 1, 20], dt: 0.01 });
   assert.equal(w.isWalking('p1'), false, 'art not up yet - the class sprite still stands for them, never nothing');
@@ -177,7 +171,7 @@ test('DISC23-B: a peer on foot stands as the set they chose - their own archive,
 
 test('DISC23-B: a swing, a loosed shaft and a cast each play their clip ONCE - and first sight is no swing', async () => {
   const { art } = rig();
-  const w = createPeerWalkers({ art, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const w = createPeerWalkers({ art, layeredAll: () => false });
   const at = (o) => ({ id: 'p1', look: { eo: 2 }, shown: pose(o) });
   w.sync([at({ an: 41 })], toScene, { eye: [4, 1, 20], dt: 0 });
   assert.equal(w.walkers.get('p1').table, 'Idle', 'a peer met mid-session has a swing count of their own - not a swing');
@@ -214,7 +208,7 @@ test('DISC23-B: a swing, a loosed shaft and a cast each play their clip ONCE - a
 test('DISC23-B: who is NOT a walker - a Morrowind body on this screen, a rider, a beast, the dying, a look with no set, the card on the doll', async () => {
   const { art } = rig();
   let sprites = true;
-  const w = createPeerWalkers({ art, enabled: () => sprites, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const w = createPeerWalkers({ art, enabled: () => sprites, layeredAll: () => false });
   const on = (o = {}, look = { eo: 1 }) => ({ id: 'p', look, shown: pose(o) });
   w.sync([on()], toScene, { eye: [0, 1, 0], dt: 0 }); await settle();
   const drawn = (peer, skip) => { w.sync([peer], toScene, { eye: [0, 1, 0], dt: 0, skip }); return w.isWalking('p'); };

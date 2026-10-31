@@ -11,7 +11,7 @@
 // hearEveryTown / homeStands), and the quest machine's isPlayerHome asks it (scenes/world.js). Every fixture is the
 // producer's: the real Worker over node:sqlite with every migration applied, the client's own door to it, the real
 // registry, and the real quest machine choosing its residence in a region of synthetic blocks (test/fb1004dTowns.mjs).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14.md QUEST-HOME; 06-Systems/Online-Arc.md HOME1.
+// QUEST-HOME; 06-Systems/Online-Arc.md HOME1.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

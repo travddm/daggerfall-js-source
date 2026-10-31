@@ -1,5 +1,4 @@
-// GATE-CLEAR (2026-09-28, Mac: "the gate can spawn inside the rock geometry from world of daggerfall"; the field, on
-// Discord: "gate under the rock didnt go away stayed there") - World of Daggerfall's rock keeps off the Oblivion Gate.
+// GATE-CLEAR - World of Daggerfall's rock keeps off the Oblivion Gate.
 // The gate's spot is the clock's and the map files' alone (every client rolls it alike), and the mod stands a site on
 // 114,087 of the pixels the gate may take; nothing kept the two apart. world/gate/gateClearance.js is the law, ROADS-CLEAR's
 // shape: a whole site reaching the clearing stands none of its objects, any other piece reaching it is not stood, and the

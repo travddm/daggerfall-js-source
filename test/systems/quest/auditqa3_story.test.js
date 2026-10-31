@@ -1,4 +1,4 @@
-// AUDIT QA3 (2026-10-23, the owner: "Audit this", of QUEST-AUDIT III; bible/01-Overview/audits/Quest-Audit-III.md): the
+// AUDIT QA3: the
 // main story's door (STORY-AGAIN, #982) held to Daggerfall's own scripts. The ladder read a step's success and its direct
 // `start quest` lines alone, and over the real story it offered the Orcish Treaty and Lysandus' Revenge again from an old
 // save (they finish without the QuestComplete box), kept S0000004 and S0000015 off the door because they had paid on the

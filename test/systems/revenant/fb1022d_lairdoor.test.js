@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-22d LAIR-DOOR (bible/01-Overview/bugs/Field-Bugs-2026-10-22d.md, report 4): fogs, on Zenako's behalf -
+// FIELD BUGS 2026-10-22d LAIR-DOOR (, report 4): fogs, on Zenako's behalf -
 // "the Revenant lair designated on the Revenants page is inaccessible -- there are no interactable doors, hatches or
 // openings to the marked dungeon ... The Stuvam Graveyard, south of Ceriburea ... approximate coordinates 565, 427". A
 // revenant's lair (RVN7, Revenants.md 18.1) is one of the game's own dungeons in the boards' ring about a deed - and 28 of

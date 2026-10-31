@@ -1,4 +1,4 @@
-// WB14g (2026-10-19, Mac: "This is all yours to take on"): WHAT A PORTENT NIGHT PAYS - the kill's receipt says the night's
+// WB14g: WHAT A PORTENT NIGHT PAYS - the kill's receipt says the night's
 // portents a bit each (1 the Vanguard, 2 the Sundering, 4 the Captive freed; a Captive night whose knight stayed chained
 // says none), the spoils roll one more piece of Magic or better for each, after every draw they made before (the Dragonfire
 // Oath's law: a receipt without them rolls what it always rolled), each such piece's picture drawn last.
@@ -9,7 +9,7 @@
 //   the spoils       systems/gate/gateSpoils.js rollSpoils's `p`, SPOILS_PORTENT_BITS; scenes/spoilsPool.js spoilsList (the
 //                    claims' `p`, the pieces' pictures last)
 //
-// Design: bible/11-Multiplayer/Breach-Portents.md section 11.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';

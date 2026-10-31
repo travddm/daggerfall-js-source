@@ -1,6 +1,5 @@
-// MOD1 — THE MODERATOR GLYPH AND /mute, /unmute (2026-09-22).
+// MOD1 — THE MODERATOR GLYPH AND /mute, /unmute.
 //
-// Mac: "Next up I want a moderator glyph and moderator chat commands",
 // and when asked which commands and which glyph: /mute and /unmute, and
 // the blue shield.
 //
@@ -69,7 +68,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -291,7 +290,6 @@ test('MOD1: THE NEWEST ORDER WINS - a replayed mute cannot undo the unmute that 
   const troll = r.connect(); await r.hello(troll, 'trol-0001');
   const bob = r.connect(); await r.hello(bob, 'bobb-0002');
   const nowS = Math.floor(Date.now() / 1000);
-  // PIN MOVED (AUDIT SAFE RELAY-6): an order older than the socket's own token no longer overrides it - these two are
   // minted after the troll's hello, as an order a moderator issues is
   const mute = await order('acct-trol-0001', nowS + 600, nowS + 1);
   const unmute = await order('acct-trol-0001', 0, nowS + 2);

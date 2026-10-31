@@ -1,5 +1,4 @@
-// DISC10-A / LH1 (2026-09-23, Discord: "Weapons when swapped into left hand dont work showing fists";
-// 01-Overview/bugs/Field-Bugs-2026-09-23.md). The quickslot swap readied into the RIGHT slot whatever hand the
+// DISC10-A / LH1. The quickslot swap readied into the RIGHT slot whatever hand the
 // player was using, so on the left hand "You ready your Dagger." stood over bare fists. By execution.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// AUDIT LOCKPICK (2026-10-26, the owner: "Audit this" - bible/01-Overview/audits/Audit-Lockpick.md): THE LOCK'S DOORS,
+// AUDIT LOCKPICK: THE LOCK'S DOORS,
 // DRIVEN. The record's sites were pinned by their source text alone, and a front door that threw on every press shipped
 // green (A1: the ladder's own `lockpick` - the skill - shadowed the host). Here the real worldModes `tryEnter` picks a
 // locked House1's front door in Steal mode, and the real door and window (ui/lockpickDoor.js, ui/lockpickWindow.js) stand

@@ -1,5 +1,4 @@
-// CLIMB6 (2026-10-01, the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "Definitely want you to use the
-// morrowind model to get correct animations for everything. Be as detailed as possible"): THE MORROWIND BODY ON THE
+// CLIMB6: THE MORROWIND BODY ON THE
 // WALL. The skeleton's half (combat/climbRig.js) - the reach solved on whatever skeleton it is handed: Weapon
 // Sheathing's vendored retail-shaped biped (bones along their local X, three-digit hands, clavicles under the neck)
 // and chains of random rest frames take a hold to the same place; the hands set by their fingers and palms, the

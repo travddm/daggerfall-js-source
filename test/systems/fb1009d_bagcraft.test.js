@@ -1,11 +1,9 @@
-// BAG-CRAFT (FIELD BUGS 2026-10-09d - "People cannot craft from their bag"; Mac: "I just want players to also be able to
-// craft from their inventory, not just the store") - A STATION WORKS WHAT THE BAG AND THE PACK HOLD, counted or not: a
+// BAG-CRAFT (FIELD BUGS 2026-10-09d - "People cannot craft from their bag") - A STATION WORKS WHAT THE BAG AND THE PACK HOLD, counted or not: a
 // craft, a brew, a smelt and a temper put their shortfall in from every unit the bag, the pack and the wagon hold but
 // gold's (net/bagLaw.js carriedWorkable), by the deposit's `work` order, which the service takes past its carried count
 // into the Stores as loose - a station's alone (server-account/src/professions.js depositStores; AUDIT BAG-CRAFT A1,
 // test/net/auditbagcraft.test.js, the stations' wall at every other door). A writ, the market and the Stores page's
-// Put in still move only what the service handed out. bible/06-Systems/Materials-Bag.md section 14;
-// bible/01-Overview/bugs/Field-Bugs-2026-10-09c.md.
+// Put in still move only what the service handed out.;
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

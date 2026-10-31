@@ -1,5 +1,4 @@
-// GRANT5 and GRANT7 (2026-10-18, Mac: "Do all slices"; the owner, question 2: "3 accounts / 10 min"; bible/11-Multiplayer/
-// Spawn-Grants.md section 15): THE MEASURE SUGGESTS, THE READERS' WORD OPENS A CASE (server-account/src/grants.js) - the
+// GRANT5 and GRANT7: THE MEASURE SUGGESTS, THE READERS' WORD OPENS A CASE (server-account/src/grants.js) - the
 // measure's read says each kind's rate and the cell's ceiling half again past what honest play reached; readers on three
 // accounts that count, tallying what only a changed client gives against one sender inside ten minutes, open the
 // moderators' case on it - a reviewer's case with one line a window, never a report, so never the reports' mute.

@@ -1,5 +1,4 @@
-// LEGACY7 (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9; Mac: "online integration with permadeath (Bloodline)
-// or non-permadeath (Enduring)"): PROJECT LEGACY ONLINE, CLIENT SIDE - the line's realm copy (systems/legacy/realmLine.js),
+// LEGACY7: PROJECT LEGACY ONLINE, CLIENT SIDE - the line's realm copy (systems/legacy/realmLine.js),
 // the session's tombstone (systems/realmSaves.js die), the host's online law (scenes/legacyHost.js: founded as asked, a
 // fall the realm's tombstone and the Succession waiting on it, a birth whose first save answers later, the realm's id
 // rebound into the record), the chargen's question open, and the world host's wiring by source.
@@ -124,7 +123,6 @@ test('LEGACY7 the host online: founded as asked; a fall is the realm\'s tombston
   assert.ok(w.stored > 0, 'each write of the device\'s is the realm\'s to follow');
   const out = w.host.deathOutcome();
   assert.equal(out.kind, 'fall');
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE AUDIT R1): asked at the door with its hold (the realm holds the fall for
   // a party's Resurrect), and again as the player goes on - the window closed
   assert.equal(w.tombs, 2, 'the tombstone asked at the door, and its window closed');
   assert.equal(w.host.succeed({ newborn: true }), true);
@@ -143,7 +141,7 @@ test('LEGACY7 the host online: a tombstone refused is said, and asked again befo
   assert.ok(w.said.includes(LEGACY_TEXT.unTombed));
   assert.equal(w.host.succeed({ newborn: true }), true);
   await tick();
-  assert.equal(w.tombs, 3, 'asked again');   // PIN MOVED (REZ-BLOODLINE AUDIT R1): the door's, the window's close, and the Succession's
+  assert.equal(w.tombs, 3, 'asked again');
   assert.deepEqual(w.booted, [], 'no birth while the realm has not heard');
   assert.ok(w.host.family.pending, 'the fall waits on the record - the Succession is raised again');
   w.tombAnswer = true;

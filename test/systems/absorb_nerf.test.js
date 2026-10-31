@@ -1,4 +1,4 @@
-// ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"). A 100% AbsorbsSpells item (or a
+// ABSORB-NERF. A 100% AbsorbsSpells item (or a
 // 100% crafted Spell Absorption) left its wearer all but immune to casters AND refilled their magicka off every bolt.
 // The law now: the item enchantment is a 50% roll; the Spell Absorption effect's chance caps at 50% and the Spell
 // Maker's chanceBase for it stops at 50; every absorb refunds HALF its points (floored); the career's Always keeps its

@@ -1,8 +1,7 @@
-// FOUNDER3 (2026-09-27, Mac: "we still need to grant everyone the founder title befire the original cut off date. A
-// lot of people are missing it"). Founder was read off `registered_at`, and registering is only the moment a player
+// FOUNDER3. Founder was read off `registered_at`, and registering is only the moment a player
 // chose a name: a player here as a guest since before the cutoff who registered after it held nothing (Field-Bugs
 // 2026-09-26b, report 3). It is read off when the account FIRST PLAYED now - the row's `created_at`, stamped at first
-// contact and kept through registration's upgrade in place. The instant (2026-09-25T00:00Z, FOUNDER2's) does not move,
+// contact and kept through registration's upgrade in place. The instant does not move,
 // so nobody who holds it loses it, and it is still registered accounts only.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,7 +14,7 @@ import { verifyToken, importPublicKeyB64 } from '../../src/net/identityToken.js'
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
 
 const DAY = 24 * 60 * 60;
-const CUT = Date.UTC(2026, 8, 25, 12) / 1000;   // FOUNDER5 (PIN MOVED): 00:00Z until the end of the 24th on every clock
+const CUT = Date.UTC(2026, 8, 25, 12) / 1000;     // FOUNDER5 (
 
 test('FOUNDER3: an account that first played by the cutoff holds Founder whenever it registered (mutants: registration again; the later stamp; first contact exclusive)', () => {
   const since = { handle: 'Played', created_at: CUT - 3 * DAY, registered_at: CUT + 2 * DAY, title: null };
@@ -63,7 +62,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };

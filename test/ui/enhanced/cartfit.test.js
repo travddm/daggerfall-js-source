@@ -1,5 +1,4 @@
-// CART-FIT (2026-09-27, Discord, "Can't see all items in cart": "My resolution is 1366 x 768. I tried setting the HUD
-// to %50, but I still can't see all the items"). The pack and a side window beside it - the wagon, the player's own
+// CART-FIT. The pack and a side window beside it - the wagon, the player's own
 // storage - were each clamped to the viewport ALONE (min(1040px, 95vw), min(680px, 94vw)), so side by side they wanted
 // 1738 px and at 1366 the wagon's list stood off the right edge of a host that clips. Paired, they share the width.
 // The geometry was measured in Chromium (every row of a twelve-item wagon within the viewport at 1366x657, 1366x768,

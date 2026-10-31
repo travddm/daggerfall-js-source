@@ -1,4 +1,4 @@
-// MWNPC8a (2026-10-09, the MW-NPC arc's eighth slice - bible/04-Characters/Morrowind-NPCs.md section 13): THE BUILDING'S
+// MWNPC8a: THE BUILDING'S
 // STANDING PEOPLE IN THEIR BODIES. A StaticNPC's own data (race off the faction, gender off the record's flags) and
 // their faction's row (its type, social group and guild group) dress the body: priests, mages, knights and fighters,
 // nobles, merchants, the underworld, scholars, and everyone else in the street's outfits; a child and a vampire keep
@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { ARMOR_MATERIAL } from '../../src/systems/armorMaterials.js';
 import { readFileSync } from 'node:fs';
 import { wardrobeOf, personLook, personActor, KIND_ROLE, PERSON_TURN_RATE } from '../../src/characters/peopleBodies.js';
-import { wornByRole, ARMOR_KITS, WARDROBE_ROLES } from '../../src/characters/wardrobe.js';   // PIN MOVED (MWNPC17, section 25): a look is its role's, dressed off the seed - no one outfit to compare
+import { wornByRole, ARMOR_KITS, WARDROBE_ROLES } from '../../src/characters/wardrobe.js';
 import { SOCIAL_GROUPS, GUILD_GROUPS, FACTION_TYPES } from '../../src/formats/factionFile.js';
 import { RACES } from '../../src/systems/races.js';
 import { GENDERS } from '../../src/characters/nameHelper.js';
@@ -27,7 +27,6 @@ test('MWNPC8a-1 the wardrobe a faction gives: a temple\'s priest, a mage, a knig
   assert.equal(wardrobeOf(fac({ ggroup: GUILD_GROUPS.HolyOrder })), 'priest');
   assert.equal(wardrobeOf(fac({ ggroup: GUILD_GROUPS.MagesGuild })), 'mage');
   assert.equal(wardrobeOf(fac({ type: FACTION_TYPES.MagicUser })), 'mage');
-  // PIN MOVED (MWNPC17): the one 'steel' split - a knightly order's and a court's guard a knight's plate, a fighters'
   // guild's a fighter's armour; a coven's and a necromancer a mage's, the Brotherhood the underworld's
   assert.equal(wardrobeOf(fac({ ggroup: GUILD_GROUPS.KnightlyOrder })), 'knight');
   assert.equal(wardrobeOf(fac({ ggroup: GUILD_GROUPS.FightersGuild })), 'fighter');
@@ -50,7 +49,6 @@ test('MWNPC8a-1 the wardrobe a faction gives: a temple\'s priest, a mage, a knig
 });
 
 test('MWNPC8a-2 the look: their race and gender, the faction\'s garments in its dyes, a knight\'s plate, the street\'s outfits for the rest; a child, a vampire, a race the data cannot name keep their sprite; read once', () => {
-  // PIN MOVED (MWNPC17, section 25): each look is its role's, dressed off the seed - the role's garments in its dyes,
   // the hint the build reads beside them
   const priest = personLook({}, data({ gender: GENDERS.Female, race: RACES.DarkElf }), fac({ type: FACTION_TYPES.Temple }));
   assert.equal(priest.race, 'DarkElf');

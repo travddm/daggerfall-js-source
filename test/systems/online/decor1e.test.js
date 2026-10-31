@@ -1,6 +1,4 @@
-// DECOR1e (2026-09-25, Mac: decor "Gold per placement", priced "By size", opened from "A UI element that can be clicked
-// to open the decorate panel. Allows free cam mode for placement and an intuitive scrolling menu with filters", and
-// "kept in the save" offline): THE ROOM'S OWN PIECES. The panel's "In this room" view (ui/decorPanel.js); a placed
+// DECOR1e: THE ROOM'S OWN PIECES. The panel's "In this room" view (ui/decorPanel.js); a placed
 // piece moved by the free camera, lit or put out, made to hold things or not, removed for half its cost
 // (scenes/decor/decorTool.js) - offline into the room's pool, online through the account service first; the sale that takes
 // a room's pieces with it (the client's registry, the scene's record, the host's hooks); and the touch screen's

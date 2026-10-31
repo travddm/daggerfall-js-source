@@ -1,7 +1,4 @@
-// BANTHA1 (2026-10-18, the owner: "Bantha, north of daggerfall is going to be the first region in the continent to
-// recieve a biome expansion. Using the attached file, populate the area in a dense jungle like format. When traveling
-// inside the area there should be a fog-like haze that reduces visability. This needs to be insanely detailed and not
-// hurt performance. No band aids"): THE JUNGLE OF BANTHA - bible/03-World/Bantha-Jungle.md is the design and the record.
+// BANTHA1: THE JUNGLE OF BANTHA is the design and the record.
 // The owner's trees read and measured off their own files, the field the layout and the haze share, the layout's laws, the
 // haze's law and its shader twin, the bound the cull reads, the hosts, the renderer's second tree slot and the door.
 // Mutants: tools/mutants/bantha1.json.
@@ -258,14 +255,13 @@ test('BANTHA1 the layout, four storeys: a canopy tree a cell where the jungle is
   const trees = out.filter((f) => f.jungle != null), rest = out.filter((f) => f.jungle == null);
   const canopy = trees.filter((f) => f.js >= JUNGLE.canopyScale[0]), young = trees.filter((f) => f.js <= JUNGLE.underScale[1]);
   assert.equal(canopy.length + young.length, trees.length, 'every tree a storey');
-  // PIN MOVED (SPREAD): a canopy tree a SITE - every other cell, a quincunx - where it was a tree a cell
   const sites = (128 / JUNGLE.cell) ** 2 / 2;
   assert.ok(canopy.length > sites * 0.45 && canopy.length < sites * JUNGLE.canopy, `a closed canopy (${canopy.length} of ${sites} sites)`);
   // ...and the gaps are the canopy's own chance: no site stands its tree on a draw past JUNGLE.canopy, whatever its ground
   const C = JUNGLE.cell, cellOf = (f) => [PX * 128 + Math.floor(f.x / 6.4 / C) * C, -PY * 128 + Math.floor(f.z / 6.4 / C) * C];
   assert.deepEqual(canopy.filter((f) => tileDraw(...cellOf(f), 22) >= JUNGLE.canopy), [], 'a site\'s gap is kept at JUNGLE.canopy');
   assert.deepEqual(canopy.filter((f) => !canopySite(...cellOf(f))), [], 'every canopy tree on a site');
-  assert.ok(young.length > 400, `an understorey (${young.length})`);   // PIN MOVED (SPREAD): a cell's one young tree at most - it was 600 a tile's
+  assert.ok(young.length > 400, `an understorey (${young.length})`);
   for (const f of trees) {
     assert.equal(f.archive, 500); assert.equal(f.wood, 1);
     assert.equal(f.record, JUNGLE_SPECIES[f.jungle].record);
@@ -359,7 +355,7 @@ test('AUDIT BANTHA1 LAY-1/2/3/7/8/9: the groves and the stands on the world\'s l
   assert.ok(ringYoung / 220 < deepYoung, `a town's ring stands fewer young trees a tile than the deep jungle (${(ringYoung / 220).toFixed(3)} vs ${deepYoung.toFixed(3)})`);
   // LAY-7: two pixels side by side over flat grass - every cell at the west one's east edge whose young tree or palm a
   // trunk of the EAST pixel's crowds (and none of its own) stands nothing; such a cell is rare (a trunk stands 3.2 m
-  // inside its site), so fifty edges are read. PIN MOVED (SPREAD): the understorey a cell's - its place in the cell and
+  // inside its site), so fifty edges are read.
   // its roll (salts 40-42), a light gap where no crown reaches - where it was a tile's
   const flat = { hm: new Float32Array(HEIGHTMAP_DIMENSION ** 2).fill(SCALED_BEACH_ELEVATION / MAX_TERRAIN_HEIGHT * 1.6), tm: new Uint8Array(16384).fill(2), paths: new Uint8Array(16384) };
   const S7 = PIXEL_M / 128, C7 = JUNGLE.cell, [u0, u1] = JUNGLE.underInset, [i0, i1] = JUNGLE.inset;
@@ -811,7 +807,7 @@ test('BANTHA1 the jungle\'s door: Low Poly Trees\' own over the owner\'s files -
     decode: async (bytes) => { const p = PNG.sync.read(Buffer.from(bytes)); return { width: p.width, height: p.height, data: new Uint8Array(p.data) }; },
   });
   await Promise.all([door.load(), door.load()]);
-  assert.equal(fetched, 21, 'every file once');   // JUNGLE-ROADSIDE (PIN MOVED): the five trees' fifteen and the three roadside pairs' OBJs and MTLs
+  assert.equal(fetched, 21, 'every file once');     // JUNGLE-ROADSIDE (
   assert.equal(door.loaded, true);
   // AUDIT BANTHA1 TREE-6: a load that failed is asked again on BUILD-RETRY's clock, never latched for the session
   let t = 0, drop = true, asked = 0;
@@ -894,8 +890,8 @@ test('AUDIT BANTHA1 DOC-5: the four storeys\' laws, on a pixel with glades - no 
     assert.equal(f.jungle, canopySpecies(origin, tx, tz, above, light, draw), `the canopy tree at ${f.x.toFixed(1)}, ${f.z.toFixed(1)}`);
     n++; if (canopySpecies(origin, tx, tz, above, 0, draw) !== f.jungle) lit++;
   }
-  assert.ok(n > 500 && lit > 20, `the light chose ${lit} of ${n}`);   // PIN MOVED (SPREAD): a site's canopy, half the cells'
-  // the understorey (PIN MOVED, SPREAD: a cell's spot, a light gap where no canopy crown reaches it - its young trees at
+  assert.ok(n > 500 && lit > 20, `the light chose ${lit} of ${n}`);
+  // the understorey (
   // JUNGLE.gapUnder, under a crown JUNGLE.under), read a cell inside the pixel's edge, where every crown is this pixel's
   const crowned = new Set(canopy.map((f) => `${Math.floor(f.x / S / C)},${Math.floor(f.z / S / C)}`));
   const [u0, u1] = JUNGLE.underInset;

@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02): THE FIX FROM ARENA1 - a house the arena displaced moves WHAT WAS IN IT, never its places
+// ARENA2: THE FIX FROM ARENA1 - a house the arena displaced moves WHAT WAS IN IT, never its places
 // (systems/arena/arenaMove.js emptyArenaScene). ARENA1 renamed the old house's scene onto the new house, and the old room's
 // placed pieces stood where it had floor, its chest indices named another house's chests and its furniture marks named
 // pieces the new house never had. Now: the owner's own things go back where they live (furniture to the furnishings,

@@ -273,7 +273,6 @@ test('B2: the house and ship buttons refuse before opening anything (:417-472)',
   const a = win();
   clickRect(a.w, 'buyHouse');
   assert.equal(idOf(a.w.box), R.NO_HOUSES_FOR_SALE);
-  // PIN MOVED (HOUSES-3): owning one refuses nothing - the region's THREE refuse, in the bank's words counted to three
   const b = win({ ownsHouse: true, housesForSale: 3, hooks: { housesFull: () => true } });
   clickRect(b.w, 'buyHouse');
   assert.deepEqual(b.w.box.rows.map((r) => r.text), [housesFullText()]);

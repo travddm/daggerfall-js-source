@@ -1,5 +1,5 @@
-// FORAGE1-FORAGE2 - FORAGING 1.7 (Harbinger451), THE TOOLS, THE FOODS, THE QUESTS (2026-09-28, Mac: "Your lead").
-// bible/06-Systems/Foraging.md is the record. The pins hold src/systems/foraging/foragingInstall.js and
+// FORAGE1-FORAGE2 - FORAGING 1.7 (Harbinger451), THE TOOLS, THE FOODS, THE QUESTS.
+// is the record. The pins hold src/systems/foraging/foragingInstall.js and
 // src/systems/quest/questActionsExtension.js to the mod: a tool used where its checks pass gives its yield, its box,
 // its quest and its wear; a tool at its last point breaks with DFU's popup and the mod's line and is gone; a check
 // that fails speaks its line and gives nothing; the switch off makes every tool inert; the foods; the console

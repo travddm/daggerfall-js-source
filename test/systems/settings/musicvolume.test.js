@@ -1,6 +1,4 @@
 // THE MUSIC SLIDER, LIVE - and a replacement pack at its own level
-// (2026-08-27, Mac, from play; re-landed alone after the music arc was
-// reverted, because these two were fixes, not the arc).
 //
 // Two roots. Controls/MusicVolume was LIVE in the registry's tier and
 // read once per player, at _ensureMaster, and never again - so the

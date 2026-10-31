@@ -1,5 +1,4 @@
-// OW-CHASE-RANGE (2026-10-19, the owner, of the Overworld's gaps: "4. Fix it"; bible/06-Systems/Travel-View.md
-// OW-CHASE-RANGE): A CHASE SEEN AS FAR AS ITS BAND IS DRAWN. The relay fans a cell's foes frame - TV7b's chase word on it
+// OW-CHASE-RANGE: A CHASE SEEN AS FAR AS ITS BAND IS DRAWN. The relay fans a cell's foes frame - TV7b's chase word on it
 // - RANGE_PIXELS (3) about its sender, and the Overworld draws the bands BAND_REACH_PX (6) about the viewer: a player three
 // to six pixels off saw a chased band at its own wander. The chaser's trav frame (TV3, the region's channel) now carries
 // its chase words BESIDE its mark (world230: `bd` the bands', `sr` the raiders' - AUDIT OW-REVISITED L4-1: as a key of the

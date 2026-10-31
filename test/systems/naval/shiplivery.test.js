@@ -1,6 +1,4 @@
-// SHIP-LIVERY, CABIN-LOOK and DECK-PROPS (2026-10-17, the owner: "Letting players customize the exterior and interior
-// textures of the ship. Allowing prop placement on the ship itself and inside if not already enabled."; bible/03-World/
-// Naval-Refit.md SHIP-LIVERY, DECK-PROPS).
+// SHIP-LIVERY, CABIN-LOOK and DECK-PROPS.
 //
 // A ship's paint (systems/naval/shipLivery.js), her port-built pictures repainted by their families (world/ships/
 // shipLiveryArt.js), the paint shop and the remap a boat is drawn by (scenes/comeSailAway/shipLiveryPaint.js, the real

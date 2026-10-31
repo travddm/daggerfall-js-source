@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-14 - PVP-LOOT's two decisions of Mac's, the same day (bible/01-Overview/bugs/Field-Bugs-2026-10-14.md):
+// FIELD BUGS 2026-10-14 - PVP-LOOT's two decisions of Mac's, the same day:
 //
 //   "Guildmates are friends" - in the open zone one's guild is kin, as one's party, its truce and one's duel are: the
 //   referee lands no blow between them (net/wild/wildRef.js wildKin, the one law the relay and every client door ask).

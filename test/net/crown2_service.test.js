@@ -1,10 +1,10 @@
-// CROWN2 (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): FEALTY AND PACTS, AS THE SERVICE KEEPS THEM -
+// CROWN2: FEALTY AND PACTS, AS THE SERVICE KEEPS THEM -
 // fealty offered by either side and sworn when the other accepts (a palace of a crown's kingdom, or a March it claims,
 // to that crown's holder); neither pledging against the other's seats; at the Turning the vassal's 5% tribute, the
 // liege's half-reach on the vassal's defence, Conscription sparing the vassal, a break's -10 at every seat of the
 // breaker, a pair that no longer fits lapsing; Pacts of non-aggression for the rest of the Season, broken early and
 // announced in red on the seats' list. Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 7.8; `06-Systems/Online-Arc.md` CROWN2.
+// (test/accountDb.mjs). 7.8; `06-Systems/Online-Arc.md` CROWN2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

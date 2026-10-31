@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-10-13e AOE-PERF (HellRay, Discord: "massive FPS drops when the boss performs AoE attacks and circles
 // appear on the ground"): THE BOSS'S CIRCLES SHADED GROUND THEY NEVER DRAW ON. Every telegraph shape is its own blended
 // pass over its own quad, and an AoE frame at a fighter's eye rasterised 3.3 to 3.7 screens of the telegraph's fragment
-// stage (tools/fb1013ePerfProbe.mjs; bible/07-Rendering/Performance-Rig.md AOE-PERF). Most quads are TELEGRAPH_REACH
+// stage (tools/fb1013ePerfProbe.mjs; AOE-PERF). Most quads are TELEGRAPH_REACH
 // past their shape because the shape draws there - its glow, its keyline and its shockwave reach as far as the pixel is
 // large - but two kinds draw nothing past their own ground at any pixel's size: HIS MARK (a ring, the floor inside it,
 // a chevron; every frame of the fight) and HIS HOST'S PATHS AND TETHERS (the lane alone - dashes flowing to him), whose

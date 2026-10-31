@@ -1,4 +1,4 @@
-// CSA-D (2026-09-27) - COME SAIL AWAY'S HELM: systems/comeSailAway/comeSailAway.js's sailing half - StartSailing, StopSailing and
+// CSA-D - COME SAIL AWAY'S HELM: systems/comeSailAway/comeSailAway.js's sailing half - StartSailing, StopSailing and
 // its delayed coroutine, Update's oar arm and LateUpdate's move, CheckCollision's two sweeps, the cargo's weight, the
 // beaching and the turns, FixedUpdate's enemies riding a hull, the seven activations and the events that end a sail.
 // The runtime runs over the vendored hulls (the real SpawnBoat) and a scripted scene; every expectation is worked out
@@ -671,7 +671,7 @@ test('CSA-D: the pause gates - Update marks wasPaused and does nothing, LateUpda
   assert.equal(s.rt.state.wasPaused, true);
   assert.deepEqual(s.rt.state.MoveVectorCurrent, [0, 0, 0]);
   assert.equal(s.player.frozen, 0, 'the pin did not run');
-  // HELM-LADDER (PIN MOVED): a held key no longer pulls - a press climbs the ladder, and a bare update presses nothing -
+  // HELM-LADDER (
   // so her oars are put to pulling ahead here, or LateUpdate has no vector to spend and the gate nothing to hold
   s.rt.state.oarThrottle = 1;
   s.rt.update();
@@ -916,8 +916,7 @@ test('CSA-K: the laws another player\'s boat shares with mine, one export each -
   assert.equal(yawDelta(before, turned), 90);
 });
 
-// ── HELM-KEYS (2026-09-29, the player: "Arrow keys should not only control your ship, but also setting and raising your
-// sails. I also want to find a way to make the ship controls more intuitive") ─────────────────────────────────────────
+// ── HELM-KEYS ─────────────────────────────────────────
 
 const stowed = (sail) => animatorOf(sail).GetBool('Stowed');
 
@@ -1003,7 +1002,6 @@ test('HELM-LADDER the world\'s seam by source: W and S are pressed through the f
 });
 
 test('HELM-KEYS in irons: her sails up, her bow within IRONS_TELL_DEG of the wind\'s eye and her way under IRONS_TELL_WAY for IRONS_TELL_S running - the helm is told once how she comes out, again only after she has been out of them; the panel says it while it lasts; a sail just raised is not lying in irons (mutants: told every frame, told at once, the wind\'s sense reversed, the way unread)', () => {
-  // PIN MOVED (AUDIT NAV2 F15): under the mod's own default waves, the sea's current never forced away - it rides in her
   // velocity (half the wind), and her way through the water is what is read
   const s = scene({ settings: { 'Waves.Enable': true } });
   const boat = s.place(4, 0);

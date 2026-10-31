@@ -1,4 +1,4 @@
-// FLORA-GROUND, THE RINGS (FIELD BUGS 2026-10-27, the owner: "No band aids or half assed work"; the coordinator: "Fix it
+// FLORA-GROUND, THE RINGS (FIELD BUGS 2026-10-27,; the coordinator: "Fix it
 // at the root in the terrain's level of detail, so the coarse surface the player sees and the ground the plants stand on
 // agree at every ring") - A BUILT PIXEL'S PLANTS DRAWN ON THE GROUND IT DRAWS: the ground a pixel draws one law
 // (world/terrain/terrainSurface.js drawnGroundAt - its stride, its bed), which the snow lies on, and every plant of the

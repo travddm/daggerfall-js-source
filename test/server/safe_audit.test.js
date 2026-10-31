@@ -1,5 +1,4 @@
-// AUDIT SAFE (2026-10-17, the owner: "Lets audit everything and ensure perfection"; bible/01-Overview/audits/
-// Audit-Chat-Safety.md): THE ACCOUNT SERVICE'S FINDINGS, each pinned red on the code the audit read - the reviewer
+// AUDIT SAFE: THE ACCOUNT SERVICE'S FINDINGS, each pinned red on the code the audit read - the reviewer
 // (AI-n), the moderators' queue in Discord (DISCORD-n), the cases and the sanctions (SERVICE-n), and the record's own
 // claims the code now keeps (DOC-n). Driven through the real Worker over a real schema on node:sqlite; every outside
 // service is a stub that records what it was asked, every signature a real Ed25519 one.

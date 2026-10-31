@@ -1,4 +1,4 @@
-// SHIP-STORE (2026-09-26, Mac: "No ui to put items in storage on boat - problem for enhanced and enhanced +"):
+// SHIP-STORE:
 // MAC-M2 B made the enhanced skins' loot session take-only - the pile's frame alone, no way to the pack ("the loot
 // window is for taking") - which is right for a body or a stranger's shelf. But the player's OWN storage opens
 // through that same session: the ship's chest, an owned house's cupboards, a placed storage piece. Every one of them

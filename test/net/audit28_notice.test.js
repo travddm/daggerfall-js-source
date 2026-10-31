@@ -1,4 +1,4 @@
-// AUDIT 28 (2026-09-28, Mac: "let's audit everything we have so far before we continue") - NOTICE1's findings, each
+// AUDIT 28 - NOTICE1's findings, each
 // pinned against the real Worker over node:sqlite (test/accountDb.mjs), the client's book, or the board's window on
 // the minimal DOM (test/chargenDom.mjs), and each failing on the code before the fix. bible/06-Systems/
 // Professions-Arc.md 10.7 (AUDIT 28).

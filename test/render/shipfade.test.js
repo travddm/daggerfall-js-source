@@ -1,5 +1,4 @@
-// SHIP-FADE (2026-10-02, Mac: "Ships should just disappear into the void. If theyre going out to open sea, they should
-// fade away") - a ship let go by her range was dropped where she sailed: the director's past DESPAWN_BEYOND, a raider
+// SHIP-FADE - a ship let go by her range was dropped where she sailed: the director's past DESPAWN_BEYOND, a raider
 // past RAIDER_DROP_M, a harbour's moored ships the moment the port was left, a peer's ship out of their word - each gone
 // between one frame and the next, and every ship stood came into the world whole, from nothing. Now a ship comes into
 // the world over SHIP_FADE_S and goes out of it over SHIP_FADE_S - she sails on, dissolving (the renderer's ordered
@@ -40,7 +39,7 @@ function until(h, done, max = 30, dt = 0.1) {
 test('SHIP-FADE A SHIP COMES INTO THE WORLD: every ship stood comes in over SHIP_FADE_S - her share of the world from nought to whole, her boat\'s with her and her tag\'s (she stood whole at once, from nothing)', async () => {
   const h = await sea({ hull: 2 });
   const e = h.host._sea.get(h.host.spawnShip('merchantCoaster', { range: 300 }));
-  knowAll(h.host);   // PIN MOVED (SPYGLASS): her colours made out - an unknown hull wears no tag
+  knowAll(h.host);
   assert.deepEqual([e.fade, e.retiring], [0, false], 'stood: not yet in the world');
   h.run(1);
   assert.ok(Math.abs(e.fade - 1 / SHIP_FADE_S) < 1e-6, `a second in: ${e.fade}`);

@@ -1,5 +1,4 @@
-// WD3 (2026-10-01, Mac: "These are the next mods I'd like to implement (We have permission) and ensure this doesn't
-// conflict or regress anything (For example housing customization)") - THE WORLD-DATA PACK: Beautiful Villages of
+// WD3 - THE WORLD-DATA PACK: Beautiful Villages of
 // Daggerfall's and Beautiful Cities of Daggerfall's whole world data carried as the authors' edits over the player's
 // own MAPS.BSA and BLOCKS.BSA (src/formats/worldData/worldDataPack.js), built by tools/worldDataPackBuild.mjs.
 //

@@ -1,5 +1,4 @@
-// SUMMON-REPAIR (2026-10-15; bible/01-Overview/bugs/Field-Bugs-2026-10-14.md SUMMON-OFFER; Mac, asked how to mend the
-// reporter's save: "Operator tool"). SUMMON-OFFER stops a summoning whose quest cannot be made from taking the gold and
+// SUMMON-REPAIR. SUMMON-OFFER stops a summoning whose quest cannot be made from taking the gold and
 // setting the prince's Summoned flag - but the reporter's save already holds both: faction 8's flags at 65 (FACTION.TXT's
 // 0x01 and Summoned, 0x40), 100,000 gold gone. Nothing in a save tells that flag from one a refused offer set, so staff
 // mend the one character: the review's `repair` act (server-account/src/review.js, net/repairLaw.js).

@@ -1,6 +1,4 @@
-// MAC7 (Mac, 2026-09-12: "Bug. 1. Morrowind doesnt show the player
-// holding their weapon/attacking. It shows the full sprite and
-// animations but no weapons", then "Do bow hold, spell casting and
+// MAC7 (, then "Do bow hold, spell casting and
 // arrows on bow"). #1 THE PEER'S WEAPON AND SWING, #2 THE BOW'S HOLD,
 // THE CAST AND THE ARROW. A peer's Morrowind body (MWBODY1) was built
 // with the weapon the look carries, but the rig's weapon is sheathed

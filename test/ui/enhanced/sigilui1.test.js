@@ -1,6 +1,4 @@
-// SIGIL-UI + RARITY-UI (2026-09-26, Mac: "sigil weapons need a visible indicator within the info section, something
-// that makes it stand out, along with progress as you use it. Rarity needs to be more noticable in the UI with the icon
-// borders being color coded"). The view is pure (systems/sigil/sigil.js sigilView) and the block is BUILT here on the fake
+// SIGIL-UI + RARITY-UI. The view is pure (systems/sigil/sigil.js sigilView) and the block is BUILT here on the fake
 // document (test/invdrag.mjs); the frames are the Plus sheet's own rules, read as text, and the four places that mark
 // a frame are driven (the pack's helper) or pinned (the hotbar's and the diamond's writes).
 import { test } from 'node:test';

@@ -1,4 +1,4 @@
-// LW-FIX6 (2026-10-05, bible/06-Systems/Living-World.md "LW-FIX6"): THE ROOMS' SEVEN - the deep audit found the
+// LW-FIX6: THE ROOMS' SEVEN - the deep audit found the
 // player's own house peopled (DFU stands nobody in a house the player owns), the ways never asked indoors (a load made
 // in a tavern or below left every trip waiting all visit), the room astir under the talk window, the room laid out from
 // the player's feet (a load made upstairs stood the drinkers about the bed; another door or a peer laid it out anew), a
@@ -19,7 +19,7 @@ import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
 import { partiesNear, CALENDAR_MPM } from '../../../src/systems/livingWorld/trips.js';
 import { createLivingIndoors, soundRoom, INDOOR_CLEAR_M, INDOOR_DOOR_M } from '../../../src/scenes/livingWorld/livingIndoors.js';
 import { createLivingRoads, ROAD_GREET_REST_MIN, ROAD_GREET_S } from '../../../src/scenes/livingWorld/livingRoads.js';
-import { ROUND_S, GATHER_BEAT_S, lineMinutes, dealCircles, circleSlots, exchangeAt, circleLine } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - a table's company
+import { ROUND_S, GATHER_BEAT_S, lineMinutes, dealCircles, circleSlots, exchangeAt, circleLine } from '../../../src/systems/livingWorld/meetups.js';     // LW-TALK:
 import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { ROAD_GREETINGS } from '../../../src/systems/livingWorld/lines.js';
 
@@ -60,7 +60,6 @@ const AWAY = [0, 0, -4.65];   // AUDIT LW-ROOMS: a step behind the door's row, l
 test('LW-FIX6 a player\'s own room stands nobody of the living world - DFU\'s AddPeople stands nobody in a house the player owns; an online home (anyone\'s), a private room and a cabin likewise - the room\'s answer the people gate\'s own law, kept with the room; the host asks it (mutants: the home, the house, the private room, the answer unread)', () => {
   const m = rd('src/scenes/worldModes.js');
   const owned = lift(m, /\n\s*ctx\.ownedRoom = (!!\(restore\?\.privateRoom[^\n]*\)\)\)\);)\n/, 'the room\'s answer');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
   assert.match(m, /isHouseOwned: \(key\) => home !== null \|\| houseOwnedAt\(building, key\),   \/\/ HOME1/, 'the people gate\'s law, the one it mirrors');
   const houses = [{ region: 17, key: 41 }];
   const houseOwnedAt = (b, key) => houses.some((h) => h.region === (b?.regionIndex ?? 0) && h.key === key);
@@ -73,7 +72,6 @@ test('LW-FIX6 a player\'s own room stands nobody of the living world - DFU\'s Ad
   assert.equal(ask({ hit: { sailingCabin: { uid: 'b1' } }, building: null }), true, 'a cabin');
   assert.equal(ask({ building: null }), false);
   const w = rd('src/scenes/world.js');
-  // PIN MOVED (LEGACY-HOME): the closure spans lines now, and a house of Project Legacy's family holds the line only
   const building = new Function('modes', 'livingTownOfMap', 'legacyHost', 'isFamilyRes', `return ${lift(w, /\n\s*building: (\(\) => \{\n\s*const b = modes\?\.interiorBuilding;[\s\S]*?\n\s*\}),\n/, 'the host\'s building')}`);
   const town = { mapId: 5 };
   const modes = (ownedRoom) => ({ interiorBuilding: { buildingKey: 41, townMapId: 5 }, interiorCtx: { ownedRoom } });
@@ -129,7 +127,7 @@ test('LW-FIX6 two who come to an empty table never begin mid-script - LW-TALK: P
   r.layer.frame(0.016, DOOR, 0, [0, 1.6, -4.6]);   // in: nobody at any table
   r.st.clock = T + 5;
   r.st.inside = [RES(1), RES(2)];
-  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);   // the player looks away: the pair stood - AUDIT LW-ROOMS: PIN MOVED - a step
+  r.layer.frame(1, AWAY, Math.PI, [0, 1.6, -4.65]);     // the player looks away: the pair stood - AUDIT LW-ROOMS:
   // behind the door's row (the room's walk lays its first table in that row now, square to the player's look out of the
   // door, where the eye's own rounding saw it)
   const [a, b] = r.layer.stood();
@@ -227,7 +225,7 @@ test('LW-FIX6 the hosts: the ways asked in the modal frame too (a load made in a
   const modal = w.slice(at, w.indexOf('\n      return;\n    }\n', at));
   assert.ok(modal.length > 0 && modal.length < 20000, 'the modal frame');
   const ways = modal.indexOf('      livingWays.frame(); livingMemoFresh();   // AUDIT-E2');
-  assert.ok(ways > 0 && ways < modal.indexOf('      try { livingDiversStep(now); }'), 'asked before the deep and the rooms read the trips');   // PIN MOVED (AUDIT LW-II-2): the divers' step wrapped as its neighbours are
+  assert.ok(ways > 0 && ways < modal.indexOf('      try { livingDiversStep(now); }'), 'asked before the deep and the rooms read the trips');
   assert.match(modal, /\n\s*livingIndoorsStep\(townTalk\.overlayActive \? 0 : dt\);/, 'held under a talk');
   assert.match(w, /livingRoadsOf\(\)\.frame\(townTalk\.overlayActive \? 0 : dt, /, 'as the road and the street are');
   // a room stepped at nought runs nothing: nobody stirs, no word runs out
@@ -242,7 +240,7 @@ test('LW-FIX6 the hosts: the ways asked in the modal frame too (a load made in a
   const flats = [{ x: 1, y: 0, z: 2, dead: false, active: true }, { x: 5, y: 0, z: 5, dead: true, active: true }, { x: NaN, z: 0 }];
   assert.deepEqual(questFeet('interior', flats), [[1, 0, 2]], 'the standing ones');
   assert.deepEqual(questFeet('exterior', flats), []);
-  // AUDIT LW-ROOMS: PIN MOVED - the building's own people every one (at their post at the hour or not), the quest's people
+  // AUDIT LW-ROOMS:
   // apart: the reader's own, kept clear when one is placed - in no reader's measure of the room
   const staticFeet = new Function('modes', `return ${lift(w, /\n\s*staticFeet: (\(\) => \(modes\?\.interiorCtx\?\.people \?\? \[\]\)[^\n]*?\)),   \/\/ AUDIT LW-ROOMS/, 'the host\'s static feet')}`);
   const hostQuest = new Function('modes', `return ${lift(w, /\n\s*questFeet: (\(\) => modes\?\.interiorQuestFeet\?\.\(\) \?\? \[\]),/, 'the host\'s quest feet')}`);

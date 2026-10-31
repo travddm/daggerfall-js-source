@@ -1,5 +1,4 @@
-// ARENA3 (2026-10-02, Mac: "Joining a team comes with it's own enhanced UI where you can view your ranking and even player
-// leaderboards"; "All UI elements and text must be enhanced UI plus"): THE ARENA WINDOW (systems/arena/arenaBoard.js the model,
+// ARENA3: THE ARENA WINDOW (systems/arena/arenaBoard.js the model,
 // ui/arena/arenaWindow.js the window, ui/arena/arenaDoor.js its door, scenes/arena/arenaGate.js its presses). Pinned here: every page's
 // model - Bouts (the hour's exhibition or the next, the Red's against the Blue's with records and prices, Watch and
 // Wager and why not; the players' bouts said online; the ladder's next with Fight and why not; what the bookmaker owes),

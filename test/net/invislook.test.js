@@ -1,5 +1,4 @@
-// INVIS-LOOK (2026-09-27, Mac: "Give invisibility the same invisibility we give enemies in enhanced AI. That transparent
-// look"). INVIS-NET drew a concealed peer (the pose's `cv`) as the A5 law draws a concealed foe - not at all. Under
+// INVIS-LOOK. INVIS-NET drew a concealed peer (the pose's `cv`) as the A5 law draws a concealed foe - not at all. Under
 // Enhanced Combat Visuals a peer is drawn as that lane draws a concealed foe: Chameleon's translucent shimmer and ripple,
 // a shade's dark silhouette - and, the one departure (asked for), an INVISIBLE player takes the shimmer where a foe's
 // invisibility is still not drawn. Every figure that can stand for a peer carries it: the rider, the walker, the class
@@ -37,7 +36,6 @@ test('INVIS-LOOK: the look - open is plain; the classic lane hides every conceal
   const shade = peerDraw(4, true, 1, 'p').visual;
   assert.deepEqual([shade.mode, shade.alpha], [CONCEAL_MODE.shade, SHADE_ALPHA], 'a shade: the dark silhouette');
   for (const bits of [3, 5, 6]) assert.equal(peerDraw(bits, true, 1, 'p').visual.mode, CONCEAL_MODE.blend, `${bits}: the stronger concealment wins`);
-  // PIN MOVED (STAFF-PILOT, 2026-10-26, systems/staffBossPilot.js PILOT_CONCEAL): all three at once is a staff member inside its event's boss - drawn nowhere
   assert.equal(peerDraw(7, true, 1, 'p').kind, 'hidden', '7: a staff boss pilot, not drawn');
   // the departure is the peer's alone: a foe's invisibility on the same lane is still not drawn
   const foe = { entity: { activeEffects: [{ kind: 'invisNormal', roundsRemaining: 5 }] } };
@@ -81,7 +79,7 @@ test('INVIS-LOOK executed: the walker and the rider - the chosen set and the sad
   const art = createEotbArt({ renderer, urlFor: (k) => `u:${k}`, decode: async () => ({ width: 50, height: 110, colors: new Uint32Array(50 * 110) }) });
   const pose = (o = {}) => ({ x: 4, y: 0, z: 9, yaw: 0, pitch: 0, mv: 0, wd: 0, an: 0, sr: 0, cn: 0, ar: 0, ...o });
   const V = peerDraw(2, true, 1, 'w').visual;
-  const w = createPeerWalkers({ art, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const w = createPeerWalkers({ art, layeredAll: () => false });
   const walker = { id: 'w', look: { eo: 3 }, shown: pose() };
   w.sync([walker], toScene, { eye: [4, 1, 20], dt: 0, conceal: () => V }); await settle();
   w.sync([walker], toScene, { eye: [4, 1, 20], dt: 0, conceal: () => V });
@@ -100,7 +98,7 @@ test('INVIS-LOOK executed: the walker and the rider - the chosen set and the sad
   assert.equal(w.batches()[0].conceal, null, 'the spell ended: plain');
   // the lantern: from straight behind (the walker faces +Z, the eye on -Z) it is drawn - on a concealed walker it is not
   const lit = createEotbArt({ renderer: { ...renderer, drawBillboards() {} }, urlFor: (k) => `u:${k}`, decode: async () => ({ width: 50, height: 110, colors: new Uint32Array(50 * 110) }), loadLantern: async () => ({ width: 10, height: 20, colors: new Uint8ClampedArray(800) }) });
-  const lw = createPeerWalkers({ art: lit, layeredAll: () => false });   // PIN MOVED (LAYERED-PEERS): a Skins viewer - one in Layered Gearing sees every walker in armor (layered_peers.test.js)
+  const lw = createPeerWalkers({ art: lit, layeredAll: () => false });
   const back = (conceal) => { lw.sync([{ id: 'w', look: { eo: 3 }, shown: pose({ hl: 1 }) }], toScene, { eye: [4, 1.5, 7], right: [-1, 0, 0], dt: 1 / 60, conceal }); return lw.drawLanterns(); };
   back(() => null); await settle(); back(() => null); await settle();
   assert.equal(back(() => null), 1, 'open: the lantern at the hip, seen from behind');
@@ -210,8 +208,8 @@ test('INVIS-LOOK executed: the quad\'s own fragment shader - plain it is the old
     const f = glslFunctions(fs, {
       vUV: uv, vWorld: [0, 0, 0], uFogColor: [0, 0, 0], uFogMode: 0, uFogDensity: 0, uFogRange: [0, 1], uCamPos: [0, 0, 0],
       uDwFog: Array.from({ length: 5 }, () => [0, 0, 0, 0]), uConceal: conceal, uSpan: span, outColor: [0, 0, 0, 0],
-      uGlint: [0, 0, 0, 0], uElite: [0, 0], uDissolve: [0, 0, 0, 0], uHitFlash: 0,   // PIN MOVED (MWNPC5): a foe's tells, off - the quad as this test has always run it
-      uDepthK: [0, 0, 0, 0], gl_FragCoord: [0, 0, 0.625, 1], gl_FragDepth: 0,   // PIN MOVED (FB1015 BODY-DEPTH): no picture depth - the quad's own
+      uGlint: [0, 0, 0, 0], uElite: [0, 0], uDissolve: [0, 0, 0, 0], uHitFlash: 0,
+      uDepthK: [0, 0, 0, 0], gl_FragCoord: [0, 0, 0.625, 1], gl_FragDepth: 0,
       texture: (_s, at) => { seen.push(at); return texel; },
     });
     try { f.main(); } catch (e) { if (e instanceof GlslDiscard) return { discarded: true, seen }; throw e; }

@@ -1,5 +1,4 @@
-// LEAN-WITNESS (2026-10-19, the account database overloaded again: "D1 DB is overloaded. Requests queued for too long."
-// on the harvest and the pixels; bible/11-Multiplayer/Scale-Arc.md LEAN-WITNESS; migration 0135) - A WITNESSED KEY'S
+// LEAN-WITNESS - A WITNESSED KEY'S
 // ANSWERS READ AS FAR AS THEY CAN MATTER: the database keeps each hall's and seat's confirmation and lets every agreeing
 // answer of a later second go LATE; the reads that judge (a hall witness's ignored, a region's chapters, the seats' kept
 // facts) read the rows that are not late, a key an ignored account answered whole; a witness whose own answers could not

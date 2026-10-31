@@ -1,4 +1,4 @@
-// AUDIT TESA II Z4 and Z8 (2026-10-25, lane Z; bible/11-Multiplayer/Wild-Zone.md section 25): CYRODIIL'S ZONE, WHOLE AND
+// AUDIT TESA II Z4 and Z8: CYRODIIL'S ZONE, WHOLE AND
 // ONE. Z4: what the zone encloses is the zone's (systems/wild/wildZone.js fillEnclosed) - the painting's Lake Rumare and
 // the Niben were holes, so their shores were the zone's edge (the Imperial City stood in The Borderlands) and their water
 // a way out of the travel law and the fights. Z8: online, the zone is the traced picture's alone (systems/wild/

@@ -1,4 +1,4 @@
-// MACRO-6 (2026-09-22, the macro audit): THE TALK FALLBACK AND THE
+// MACRO-6: THE TALK FALLBACK AND THE
 // DUNGEON'S NAME.
 //   - The Where-is answer records 7269 and 7275-7294 carry %fn/%mn
 //     (TalkManagerMCP FemaleName/MaleName) and %hnt2 (DialogHint2, whose

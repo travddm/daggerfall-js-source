@@ -1,4 +1,4 @@
-// POWER-CEILING, AUDIT HORIZONTAL D2 (bible/05-Combat/Power-Ceiling.md section 5): THE ROOM IS OBEYED, NOT ONLY ASKED. The
+// POWER-CEILING, AUDIT HORIZONTAL D2: THE ROOM IS OBEYED, NOT ONLY ASKED. The
 // source sweep proves each registry asks blowRoom or guardRoom; a registry that asked and then spent its raw per cent
 // passed it. Here each one the execution pins in powerceiling.test.js did not reach - the sky's, mastery's and the
 // martial path's blows, the sky's, the martial path's and the Living Aegis's guards, and Unbroken's half - runs with

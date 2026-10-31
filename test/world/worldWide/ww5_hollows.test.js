@@ -1,4 +1,4 @@
-// WW5 (bible/03-World/World-Wide.md WW5; bible/11-Multiplayer/Super-Dungeons.md WW5 - the owner's call taken, 2026-10-26:
+// WW5 (WW5; WW5 - the owner's call taken, 2026-10-26:
 // "Every single thing here needs to be addressed. No exceptions."): A HOLLOW IN EVERY THEATRE. One Abyss Dungeon stood at a
 // time, in the world: the hub's one record (`sdev`), its census the Bay's 62 region channels, its site over MAPS.BSA's
 // rows (`W = 1000`), its find's word the Bay's 0..999. Now each theatre that holds ground for one (the Bay and the eight
@@ -71,7 +71,7 @@ test('WW5 THE LAW: a slot names its lane - lane t\'s are t x SD_LANE_SPAN + 1, +
   assert.equal(pickSdRegion(SKY_S + 1, counts), 64, 'a crowd in Skyrim draws Skyrim\'s Hollow');
   assert.equal(pickSdRegion(2 * SD_LANE_SPAN + 1, counts), -1, 'none in Hammerfell: its great cities');
   assert.equal(pickSdRegion(SKY_S + 1, { ...counts, 64: 1 }), -1);
-  assert.equal(sdRoomKey(80_000_001, '0123456789abcdef'), 'sd:80000001.0123456789abcdef'); assert.ok(isSdRoom(sdRoomKey(80_000_001, '0123456789abcdef')));   // PIN MOVED (the eighth merge of main, SD-PARTY): a lane's slot is a room key with its party's owner, as every Hour's is
+  assert.equal(sdRoomKey(80_000_001, '0123456789abcdef'), 'sd:80000001.0123456789abcdef'); assert.ok(isSdRoom(sdRoomKey(80_000_001, '0123456789abcdef')));
 });
 
 test('WW5 THE WIRE: a record on its own lane\'s span and region - the Bay\'s `ev` as it always was, a province\'s `ln` (an older client drops a kind it does not know), never one read as the other; a find\'s word and its tell on the lane\'s pixel (the Bay\'s map for the Bay\'s, a world pixel off it past it); a lane\'s hub records and an account\'s receipt under a lane\'s key, the Bay\'s the keys they always were (mutants: the lane\'s region unread; the kinds crossed; the find\'s pixel by the Bay\'s bound; a receipt key shared)', () => {

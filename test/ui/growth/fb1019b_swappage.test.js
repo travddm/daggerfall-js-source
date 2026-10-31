@@ -1,4 +1,4 @@
-// AUDIT SUGGESTIONS-1019 L6-1 (bible/01-Overview/audits/Audit-Suggestions-1019.md): SKILL-SWAP'S PAGE, DRAWN - the Growth
+// AUDIT SUGGESTIONS-1019 L6-1: SKILL-SWAP'S PAGE, DRAWN - the Growth
 // tab's Specialisations page over the fake document (test/chargenDom.mjs) and the real guide (ui/growth/specGuide.js
 // drawSpecGuide): the hint under a family's headline where one swap opens a path (L5-1), the form's two picks, its
 // refusal standing beside a disabled press, its warnings (L5-1, L5-2) in the ask, and the ask's Yes doing the swap.

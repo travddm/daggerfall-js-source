@@ -1,4 +1,4 @@
-// DISC15 (2026-09-24, Mac: "Constant reports of interior light flickering ... Its not solved"): EVERY LIGHT IN A
+// DISC15: EVERY LIGHT IN A
 // ROOM CASTS.
 //
 // The cause, measured on the real TVRNGM03 (a tavern: twenty lamps of range 15-18) through the real renderer on

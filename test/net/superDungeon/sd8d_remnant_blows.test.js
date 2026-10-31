@@ -1,4 +1,4 @@
-// SD8d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10): THE BRASS REMNANT'S BLOWS
+// SD8d: THE BRASS REMNANT'S BLOWS
 // ON ME - each judged on my own machine (net/superDungeon/sdStrike.js: the Stomp's disc and its ring, jumped; the Hour-Hand outrun or
 // shaded by a pillar; the Gear Volley's discs and its burning brass; the Hour's own), shown on the arena's floor (the gate's
 // telegraph pass over another floor), heard, and its fall (scenes/superDungeon/sdRemnantBlows.js), wired into the hosts.
@@ -90,7 +90,7 @@ test('SD8d THE GEAR VOLLEY AND THE HOUR\'S OWN: the Volley one strike however ma
   assert.deepEqual(one(SD_BLOWS.pulse, { n: 3 }), [['all', pulsePct(3), 0]], 'the Pulse grows with its count');
   assert.deepEqual(one(SD_BLOWS.reset), [['all', SD_RESET_PCT, 0]]);
   assert.deepEqual(one(SD_BLOWS.end), [['all', SD_END_PCT, 0]]);
-  assert.equal(run(blow(SD_BLOWS.end, at), at - 100, at + 300, () => [0, SD_ARENA.r + SD_ARENA_SLACK - 0.5]).length, 1, 'at its rim, within the slack');   // AUDIT SD II (SD11e, PIN MOVED): L4 C2 - the arena's own slack, short of the Steps
+  assert.equal(run(blow(SD_BLOWS.end, at), at - 100, at + 300, () => [0, SD_ARENA.r + SD_ARENA_SLACK - 0.5]).length, 1, 'at its rim, within the slack');     // AUDIT SD II (SD11e
   assert.deepEqual(run(blow(SD_BLOWS.end, at), at - 100, at + 300, () => [0, -(SD_ARENA.r + SD_ARENA_SLACK + 4)]), [], 'off the arena - on the Steps - nothing');
 });
 
@@ -229,7 +229,7 @@ test('SD8d THE BRASS BURNS, THE HOUR STRIKES: the Volley\'s landing strikes once
   rs.word({ k: 'ph', n: 3, at: T0 + 18_000, up: T0 + 19_000 });
   rs.word({ k: 'atk', b: 0, i: 31, a: R.id, at: A0 + 8000, x: 0, z: 0, yw: 0, tg: [] });
   rs.to(A0);
-  assert.deepEqual(rs.said, [SD_BLOWS_TEXT.reset(0)], 'said as it gathers');   // AUDIT SD II (L6 F7, PIN MOVED): the call counts its Hearts - none heard yet here
+  assert.deepEqual(rs.said, [SD_BLOWS_TEXT.reset(0)], 'said as it gathers');     // AUDIT SD II (L6 F7
   rs.word({ k: 'stun', until: A0 + 9000, at: A0 + 1000 });
   rs.across(A0 + 1000, A0 + 9000, 100);
   assert.deepEqual(rs.struck, [], 'broken: it never lands');

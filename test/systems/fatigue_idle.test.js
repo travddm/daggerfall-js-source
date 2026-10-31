@@ -1,6 +1,4 @@
-// FATIGUE-IDLE (2026-09-29, Mac: "fatigue seems to be insanely draining when being idle with no status effects", then
-// "You shouldn't lose fatigue at an insane rate standing still"; asked what standing still should cost: "Nothing", and
-// Roleplay Realism's overload keeps the mod's rule). MEASURED FIRST, on the live build and through the hosts' own
+// FATIGUE-IDLE. MEASURED FIRST, on the live build and through the hosts' own
 // ticker (offline and online, 60 and 144 fps): standing still paid exactly the walk's minute - 8 fatigue a game minute
 // on BALANCE1's scale, a full bar at STR/END 50 in ~67 real minutes of doing nothing - because DFU charges
 // DefaultFatigueLoss every minute the player is not climbing, running or swimming (PlayerEntity.cs:405-418), standing

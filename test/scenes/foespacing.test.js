@@ -1,4 +1,4 @@
-// FOE-SPACING (2026-09-26, SquidKamer on the Discord: "no collision on monsters"; Mac, asked: "Yes, add it"). DFU's foes
+// FOE-SPACING. DFU's foes
 // are CharacterControllers, so one stops at another and a pack spreads round what it hunts; the port's foes are not in
 // the collider, so a pack stood in one heap. Each pool now pushes apart every two of its bodies whose capsules overlap -
 // softly, through the collider, never off an edge; not the dead, not a body another client poses. Driven over the real

@@ -1,6 +1,4 @@
-// LAMP-KEEPER II (2026-10-14, Mac: "Reimplement an old bug that was previously removed. A chance of finding a vendor NPC
-// as a lamp model. Anybody that interacts with the lamp model should earn the 'I Love Lamp' title. Implement exclusive
-// dialogue and ensure there is a loot popup for obtaining the title"). Pinned here: the pick (a shop's keeper, one day
+// LAMP-KEEPER II. Pinned here: the pick (a shop's keeper, one day
 // in LAMP_KEEPER_ODDS, the room's own answer), the lamp's words, the title's carrier (granted once, said and raised as a
 // banner; held, guest, offline, a failed call asked again), the account service's grant and its title, the vocabulary,
 // and the wiring - the interior's stand, the press, the hover's name, the host's door.
@@ -36,7 +34,7 @@ test('LAMP-KEEPER II THE PICK: a shop\'s keeper (182_0-2) stands as the lamp one
   assert.deepEqual([...LAMP_KEEPER_RECORDS], [0, 1, 2]);
   assert.deepEqual({ ...LAMP_CLASSIC }, { archive: RR_NPC_ARCHIVE, record: 6 }, 'Kludge Town\'s street lamp - the record the bug drew');
   assert.deepEqual(RR_NPC_XML_SCALE[6], [3, 0.8], 'and the stretch Roleplay & Realism gives it');
-  assert.equal(LAMP_ARCHIVE, 38232);   // PIN MOVED (AUDIT EG V, the merge of main): 38241 is the Spire's Broken Galleries (world/pseudoArchives.js EG_BAND_ARCHIVES) - the lamp moved to the first free number after the harbour's
+  assert.equal(LAMP_ARCHIVE, 38232);
   for (const r of [0, 1, 2]) assert.equal(isLampCandidate(keeper(r), shop), true);
   assert.equal(isLampCandidate(keeper(3), shop), false, 'not every 182 person');
   assert.equal(isLampCandidate({ textureArchive: 184, textureRecord: 2 }, shop), false);

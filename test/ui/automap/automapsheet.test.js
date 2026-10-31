@@ -1,4 +1,4 @@
-// EM3 - THE AUTOMAP SHEET (2026-09-21), the first sheet written to the
+// EM3 - THE AUTOMAP SHEET, the first sheet written to the
 // held map's contract FROM THE OUTSIDE: no back-reference to the
 // window, no DOM, no renderer. It is handed the reveal record and the
 // reveal index and it answers a coordinate space, some ink and a

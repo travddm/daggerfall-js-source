@@ -1,4 +1,4 @@
-// AUDIT SEATS-2 (2026-10-02, Mac: "Can we do a deep comprehensive audit on everything"): THE SEATS ARC AUDITED AGAIN,
+// AUDIT SEATS-2: THE SEATS ARC AUDITED AGAIN,
 // after SEAT2b part two, SEAT-HALL and CROWN-HALL - five lanes (the service, the relay, the shared law against the spec,
 // the client, the design's coverage), every finding verified, fixed and pinned here. `06-Systems/Online-Arc.md` AUDIT
 // SEATS-2.
@@ -29,7 +29,6 @@ test('AUDIT SEATS-2 L3, L4, L5, L7: a crown\'s Gatehouse stands from the first a
   assert.equal(fortWorkLine('gatehouse', { tier: 0 }, { seatTier: 'crown' }), 'Gatehouse: standing - its vitality 20,000.');
   assert.equal(fortWorkLine('gatehouse', { tier: 0 }, { seatTier: 'palace' }), 'Gatehouse: none raised.');
   assert.match(EDICT_WORDS.bounty, /^Camps near the town yield double/);
-  // PIN MOVED (PROF12, Mac: "2 and 4"): the Apothecary's three stand - Cooking's fire, Jewelcrafting's bench, Alchemy's
   // station - and it is raised (Professions-Arc 37; Seats-Arc 7.5)
   assert.equal(APOTHECARY_OPEN, true);
   assert.equal(fortMayRaise('apothecary', { tier: 'palace' }), true);

@@ -1,5 +1,4 @@
-// RIDE-POV (2026-09-20, Mac: "When riding the horse with the morrowind
-// model, you should be exempt from using 3rd person"). The Morrowind body
+// RIDE-POV. The Morrowind body
 // has no saddle; the sprite body does. So the Morrowind lane stays in the
 // head while the host says `riding`: a rider in third person is put there
 // on the frame, and the wheel cannot take one out. The rule lives in the

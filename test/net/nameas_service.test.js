@@ -1,5 +1,4 @@
-// NAME-AS (2026-10-12, Mac: "I want to add an option to the profile menu where players can toggle to use their account
-// name or character name for ingame use"): THE SERVICE'S HALF. The room reads the token's `n` (ACC1g: no client writes
+// NAME-AS: THE SERVICE'S HALF. The room reads the token's `n` (ACC1g: no client writes
 // it), so the choice is the account row's (`name_as`, migration 0111) and the mint signs it - the account's name, or the
 // realm character's own the token is minted for, where the wire carries it as it stands and it is no other account's
 // username (accounts.js wornNameOf); otherwise the account's, and the answer says why. And the two places a name stood

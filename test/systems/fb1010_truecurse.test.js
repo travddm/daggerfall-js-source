@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-10 (bible/01-Overview/bugs/Field-Bugs-2026-10-10.md), TRUE-CURSE - the Discord's "True cursed item
+// FIELD BUGS 2026-10-10, TRUE-CURSE - the Discord's "True cursed item
 // experience": "a super powerful sword that drains a ton of your hp ... cannot have their curse lifted". A DAMNED piece:
 // one cursed Legendary weapon in DAMNED_IN, its curse line at the very top of its band, its drawback DFU's Health Leech:
 // Whenever Used (8 health a strike, 16 a use), and no temple lifts it. Taking it off ends the bite, as any curse's.
@@ -129,7 +129,7 @@ test('TRUE-CURSE: the Test Room lays a damned Legendary weapon, known, after eve
   assert.equal(damned.length, 1);
   assert.equal(damned[0].group, 'Weapons');
   assert.equal(LR.tierLabel(damned[0]), 'Damned Legendary', 'known');
-  assert.equal(entity.items.filter((it) => !LR.techniqueLineOf(it) && !LR.ARCANE_LEGENDARIES.some((r) => r.id === it.legendary)).at(-1), damned[0], 'last');   // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): the room's twelve technique pieces are laid after it; PIN MOVED (BAL9c, bible/05-Combat/Balance-Arc.md section 15): and the arcane three after them
+  assert.equal(entity.items.filter((it) => !LR.techniqueLineOf(it) && !LR.ARCANE_LEGENDARIES.some((r) => r.id === it.legendary)).at(-1), damned[0], 'last');
   assert.ok(entity.items.some((it) => LR.isCursed(it) && it.rarity === 'legendary' && !LR.isDamned(it)), 'the cursed Legendary beside it');
 });
 

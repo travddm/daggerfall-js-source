@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): EVERY DFU WORD THE PORT ROUTES, CHECKED WHERE IT STANDS. Read off the whole of src/: each
+// L10N3d: EVERY DFU WORD THE PORT ROUTES, CHECKED WHERE IT STANDS. Read off the whole of src/: each
 // `localizedText('key', 'English')` and `localizedTextList('key', [...])` with a literal key, and each entry of a
 // `localizedStrings({...})` or `localizedTable({...})` table. Pinned for every one: the key is one of DFU's in the
 // collection it names (vendor/dfu-text), and the English is DFU's, byte for byte, unless it is named below with the
@@ -85,7 +85,7 @@ const ROUTED = {
   'src/systems/modSettings.js': 16,   // L10N4: the mods' option names DFU has - Unleveled Loot's ten materials, None, Low/Medium/High
   'src/systems/mysticism.js': 14,
   'src/systems/notebook.js': 5,
-  'src/systems/online/onlineHomes.js': 1,   // IC-PROPS (2026-10-27): a nameless house's door says DFU's "Residence" (PlayerGPS.cs:1306-1309)
+  'src/systems/online/onlineHomes.js': 1,     // IC-PROPS: a nameless house's door says DFU's "Residence" (PlayerGPS.cs:1306-1309)
   'src/systems/playerTorch.js': 1,
   'src/systems/potions.js': 20,
   'src/systems/quest/actions.js': 2,

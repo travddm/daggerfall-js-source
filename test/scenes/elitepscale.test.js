@@ -1,5 +1,4 @@
-// ELITE x PSCALE1 (2026-09-25, Mac: "Can you ensure our elite mod integration doesnt break with the new party
-// scaling implemented") - the EliteDungeons drop and main's party scaling meet on the same foes. Each holds its own
+// ELITE x PSCALE1 - the EliteDungeons drop and main's party scaling meet on the same foes. Each holds its own
 // half and the two MULTIPLY: elite at the foe's mint and in the blow's own tail, the party at the door where the
 // damage lands. Nothing of either is lost, doubled or applied to the wrong side.
 import { test } from 'node:test';

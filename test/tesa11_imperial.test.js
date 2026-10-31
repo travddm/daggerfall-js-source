@@ -1,6 +1,4 @@
-// TESA11 (2026-10-13, the owner: "the imperial city needs to be much larger and be split into distinct districts with the
-// tower very large. The entire city also needs to be lore accurate to daggerfall"; asked, "3x3 pixels" and "Canon layout,
-// DF era"; bible/03-World/Arena-Provinces.md TESA11) - THE IMPERIAL CITY OVER NINE PIXELS, pinned: its plan (City Isle in
+// TESA11 - THE IMPERIAL CITY OVER NINE PIXELS, pinned: its plan (City Isle in
 // Lake Rumare, the six districts on their sectors, Green Emperor Way, the Prison, the University, the Waterfront), its
 // slices (each pixel's location, its name, id and index, its buildings' seeds, its ground flattened to the centre's), its
 // pixel law over nine pixels, Arena's places off its pixels, its ground's laws, its landmarks, and the host and the kernel
@@ -10,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  IMPERIAL, IMPERIAL_SPAN, IMPERIAL_CELLS, IMPERIAL_SECTORS, IMPERIAL_MODELS, IMPERIAL_CARRY, PALACE,   // PIN MOVED (IC-PROPS): no IMPERIAL_MIX nor IMPERIAL_SIGNATURE - the trade is the fabric's
+  IMPERIAL, IMPERIAL_SPAN, IMPERIAL_CELLS, IMPERIAL_SECTORS, IMPERIAL_MODELS, IMPERIAL_CARRY, PALACE,
   polar, imperialBearing, imperialLand, imperialDistrictAt, imperialReserved, imperialCode, imperialCell, imperialSliceName, imperialSlicePlan,
   imperialTile, imperialClosed, imperialTree, districtWallLines, prisonAt, universityTowerAt, IMPERIAL_PARTS, imperialSliceRect, imperialPartId, OPEN_TILE,
   imperialArenaCell, IMPERIAL_ARENA_CODE, tombAt,
@@ -46,10 +44,10 @@ import { hostText } from './hostText.mjs';   // HOST-SPLIT (at the merge of main
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 afterEach(() => { setTamrielFit(null); setTamrielTrace(null); });
-const IC = CAPITALS[0], B = BLOCK_M, HALF = IMPERIAL_CELLS / 2, N = IMPERIAL_SPAN, CENTRE = (N * N - 1) / 2;   // PIN MOVED (IC-GRAND): twenty-five pixels a side (TS5's seven)
+const IC = CAPITALS[0], B = BLOCK_M, HALF = IMPERIAL_CELLS / 2, N = IMPERIAL_SPAN, CENTRE = (N * N - 1) / 2;
 const isOwn = (cell) => /^I[0-9a-z]{4}$/.test(cell ?? '');
 const cellRect = (r, c) => [(c - HALF) * B, (r - HALF) * B, (c - HALF + 1) * B, (r - HALF + 1) * B];
-/** PIN MOVED (IC-GRAND): the plan is no table the module holds (forty thousand cells, each worked with its slice when first
+/**
  *  asked) - the pins read it whole once, through its law. */
 let _plan = null;
 const PLAN = () => (_plan ??= Array.from({ length: IMPERIAL_CELLS }, (_, r) => Array.from({ length: IMPERIAL_CELLS }, (_, c) => imperialCell(r, c))));
@@ -78,10 +76,9 @@ test('TESA11 the plan: 200 x 200 (PIN MOVED, IC-GRAND: twenty-five pixels; TS5 5
       if (!pts.some(Boolean)) { counts.bridged++; assert.equal(imperialReserved(x0, z0, x1, z1), true, `${c},${r} a lake cell its own only where a landmark crosses it`); }
       return;
     }
-    // PIN MOVED (IC-PROPS): no other cell - 671 of Daggerfall's blocks stood here till 2026-10-27
     counts.classic++;
   }));
-  assert.ok(counts.classic === 0 && counts.O >= 9000 && counts.L >= 10000 && counts.own >= 19900 && counts.arena === 1 && counts.bridged > 0, JSON.stringify(counts));   // PIN MOVED (IC-GRAND; IC-PROPS: no block of Daggerfall's but the arena's)
+  assert.ok(counts.classic === 0 && counts.O >= 9000 && counts.L >= 10000 && counts.own >= 19900 && counts.arena === 1 && counts.bridged > 0, JSON.stringify(counts));
 });
 
 test('TESA11 the districts on their sectors: the Palace District inside the palace wall (PIN MOVED, IC-GRAND: the team\'s list names it; TESA11\'s "Green Emperor Way" is its ring road\'s name); the Market north-east, the Arena District east, the Arboretum south-east, the Temple District south-west, Talos Plaza west, the Elven Gardens north-west; outside the walls the Prison, the University, the Waterfront and the isle; the lake past it', () => {
@@ -89,7 +86,7 @@ test('TESA11 the districts on their sectors: the Palace District inside the pala
   assert.equal(PALACE, 'Palace District');
   assert.equal(imperialDistrictAt(0, 0), PALACE);
   assert.equal(imperialDistrictAt(...polar(45, IMPERIAL.palaceWall.r - 1)), PALACE);
-  for (const [b, d] of [[45, 'Market District'], [90, 'Arena District'], [135, 'Arboretum'], [225, 'Temple District'], [270, 'Talos Plaza District'], [315, 'Elven Gardens District']]) assert.equal(imperialDistrictAt(...polar(b, 4600)), d, `${b}`);   // PIN MOVED (IC-GRAND): the wheel at twenty-five pixels
+  for (const [b, d] of [[45, 'Market District'], [90, 'Arena District'], [135, 'Arboretum'], [225, 'Temple District'], [270, 'Talos Plaza District'], [315, 'Elven Gardens District']]) assert.equal(imperialDistrictAt(...polar(b, 4600)), d, `${b}`);
   assert.equal(imperialDistrictAt(...prisonAt()), 'Prison District');
   assert.equal(imperialDistrictAt(...polar(IMPERIAL.university.b, IMPERIAL.university.r)), 'Arcane University');
   assert.equal(imperialDistrictAt(...polar(180, 7500)), 'Waterfront District');
@@ -99,7 +96,7 @@ test('TESA11 the districts on their sectors: the Palace District inside the pala
   assert.equal(IC.districtOf(100, 100), PALACE, 'IC-GRAND: the districts by cell, a law');
   assert.equal(IC.districtOf(0, 0), null, 'the land past the lake none');
   assert.ok(Math.abs(imperialBearing(...polar(123.4, 50)) - 123.4) < 1e-9 && Math.abs(imperialBearing(0, -5)) < 1e-9 && Math.abs(imperialBearing(5, 0) - 90) < 1e-9);
-  // the canon's own placings: the Prison on the isle's north-eastern shore (PIN MOVED, TESA-LORE: it stood north of
+  // the canon's own placings: the Prison on the isle's north-eastern shore (
   // north-east, in the north pixel), the University south-east, Talos Bridge west, the Waterfront south
   assert.ok(IMPERIAL.prison.b === 45 && IMPERIAL.university.b === 135 && IMPERIAL.bridge.b === 270 && IMPERIAL.waterfront.b0 < 180 && IMPERIAL.waterfront.b1 > 180);
 });
@@ -128,7 +125,7 @@ test('TESA11 the slices: six hundred and twenty-five (PIN MOVED, IC-GRAND; TS5 f
 test('TESA11 the pixel law over six hundred and twenty-five (PIN MOVED, IC-GRAND; TS5 forty-nine): the centre the nearest pixel all of whose pixels are the Imperial Province\'s land; every slice on its pixel, the centre\'s pin Arena\'s place of its name', () => {
   setTamrielFit({ ox: 38 * 15.5, oy: 57 * 15.5, ppu: 15.5 });
   const at = capitalPixel(IC);
-  assert.deepEqual(at, { px: 2069, py: 658 });   // PIN MOVED (IC-RING): the middle of Lake Rumare's ring, (2177, 612) on its east rim before
+  assert.deepEqual(at, { px: 2069, py: 658 });
   const hs = (N - 1) / 2;
   for (let sy = 0; sy < N; sy++) for (let sx = 0; sx < N; sx++) {
     const o = capitalOnPixel(at.px + sx - hs, at.py + sy - hs);
@@ -143,7 +140,7 @@ test('TESA11 the pixel law over six hundred and twenty-five (PIN MOVED, IC-GRAND
   const w = 320, h = 200, land = new Uint8Array(w * h).fill(1), province = new Uint8Array(w * h).fill(9);
   for (let y = 0; y < h; y++) for (let x = 0; x < 172; x++) province[y * w + x] = 3;
   setTamrielTrace({ w, h, land, province });
-  const first = 2077;   // the first Bay pixel whose centre is column 172's: (2077.5 + 589) / 15.5 = 172.03 (PIN MOVED, IC-RING: 2185 and 179 before)
+  const first = 2077;     // the first Bay pixel whose centre is column 172's: (2077.5 + 589) / 15.5 = 172.03 (
   assert.deepEqual([Math.floor((first - 1 + 0.5 + 589) / 15.5), Math.floor((first + 0.5 + 589) / 15.5)], [171, 172]);
   assert.deepEqual(capitalPixel(IC), { px: first + hs, py: 658 }, 'its west slice on the land\'s first pixel');   // PIN MOVED (IC-GRAND): twelve slices west of its centre (TS5's three)
   assert.deepEqual(capitalPixel({ ...IC, span: 1 }), { px: first, py: 658 }, 'one pixel: the first');
@@ -186,7 +183,6 @@ test('TESA11 a slice\'s location: its eight by eight of the plan (its hash the p
     const R = CAPITAL_RIM_TILES, edge = N - 1;   // TESA x AUDIT TESA II: the rim's tiles on its outer sides
     assert.deepEqual(loc.capital, { key: 'imperial-city', k: 0, s, flattenAt: { px: 2069, py: 658 }, rim: { W: sx === 0 ? R : 0, E: sx === edge ? R : 0, N: sy === 0 ? R : 0, S: sy === edge ? R : 0 } }, `${s}: flattened to the centre's`);
     assert.equal('arena' in loc, s === CENTRE);
-    // PIN MOVED (ROAD-FOLLOW, 03-World/Town-Shapes.md ROAD-FOLLOW): but a cell Talos Bridge's approach crosses, a block of its own
     assert.ok(sub.flat().every((c, i) => c !== 'O' || ed.blockNames[(7 - Math.floor(i / 8)) * 8 + (i % 8)] === (wayCells.has(`${sy * 8 + Math.floor(i / 8)},${sx * 8 + (i % 8)}`) ? capitalApproachName(IC, sx * 8 + (i % 8), sy * 8 + Math.floor(i / 8)) : TOWN_OUTLINE_BLOCK)), 'TS5: open ground the open block');
     sub.forEach((row, i) => row.forEach((c, j) => { if (isOwn(c)) assert.equal(ed.blockNames[(7 - i) * 8 + j], imperialOwnName(sy * 8 + i, sx * 8 + j)); }));
     if (ed.blockNames.includes(ARENA_BLOCK)) arenaSlices++;
@@ -196,12 +192,11 @@ test('TESA11 a slice\'s location: its eight by eight of the plan (its hash the p
     if (loc.exterior.buildings.length) bySector.push(new Map(loc.exterior.buildings.map((b) => [b.sector, b.nameSeed])));
   }
   assert.equal(arenaSlices, 1, 'IC-GRAND: Daggerfall\'s arena in one slice, its block the arena\'s own');
-  // PIN MOVED (IC-PROPS, 2026-10-27: "Old daggerfall city layout placements are in imperial city"): no slice of the city
   // stands one of Daggerfall's blocks now - its buildings are its fabric's, each record its own seed
   // (world/imperialFabricBuildings.js, test/world/icbld_buildings.test.js) - so none is on a slice's list
   assert.equal(bySector.length, 0, 'no slice a building of Daggerfall\'s list');
   // each slice's seeds its own, held on a plan that lays Daggerfall's blocks: two slices' buildings in the same cell of
-  // their grids named apart (PIN MOVED, IC-GRAND: every slice against the first - the same sector's seed a shared one if
+  // their grids named apart (
   // the slice's ordinal were not in it)
   const laid = { ...IC, slicePlan: () => Array.from({ length: 8 }, () => Array(8).fill('GENR')) };
   for (const s of [1, 40, 300, 600]) {
@@ -375,7 +370,7 @@ test('TESA11 the walls (PIN MOVED, IC-GRAND - the team\'s spec: "Walls should be
     }
   }
   const { hi } = bounds(city(P3(0, W.r, 0)));
-  assert.ok(Math.max(hi[0], hi[2]) <= W.r + W.watchR + 4 && W.r + W.watchR + 4 < IMPERIAL.isle);   // PIN MOVED (TESA-LORE): its watch towers the widest
+  assert.ok(Math.max(hi[0], hi[2]) <= W.r + W.watchR + 4 && W.r + W.watchR + 4 < IMPERIAL.isle);
 });
 
 test('TESA11 the districts\' landmarks (PIN MOVED, IC-GRAND: the Colosseum retired - Daggerfall\'s arena stands in its cell, test/world/icgrand_arena.test.js): the Temple of the One\'s dome over its roof and its towers over the dome; Talos Plaza\'s dragon on its plinth; the Prison\'s Bastion; the University\'s tower; the Waterfront\'s piers over the water; Talos Bridge to the lake\'s far shore', () => {

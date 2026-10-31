@@ -1,4 +1,4 @@
-// ROADS-CLEAR (2026-09-25, Mac: "Camps, mountains from WOD, shouldnt be placed on roads") - World of Daggerfall's
+// ROADS-CLEAR - World of Daggerfall's
 // sites and pieces, and the wilderness camps, stand off the painted road network. The mod's own test
 // (LocationLoader.cs:146-151) asks only the site's own pixel for a road or track; the shipped layouts reach far
 // past it (mountains ~1.9 km, large rock fields ~500 m: 41,349 of 114,087 sites spill into the next pixel), and a

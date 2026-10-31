@@ -1,4 +1,4 @@
-// RSH1 (2026-10-11, Mac: "can we implement this mod into the source") - READIED SPELLCASTING HANDS 1.3 (jefetienne,
+// RSH1 - READIED SPELLCASTING HANDS 1.3 (jefetienne,
 // vendor/readied-spellcasting-hands/, MIT): while a spell that is not CasterOnly is readied and the cast is not
 // playing, the element's casting hands stand at frame 0 (Modded_FPSSpellCasting_Ready.cs AnimateSpellCast). Driven
 // through the REAL weapon rig over a synthetic six-record casting CIF, whose records differ in width so a drawn quad

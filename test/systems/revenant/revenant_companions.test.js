@@ -1,8 +1,4 @@
-// REVENANT-COMPANION + COMPANION-SLOTS + COMPANION-ROSTER + COMPANION-PORTAL + DISSOLVE (2026-10-02, Mac: "Spare should
-// allow you to free the enemy, which then adds them as a companion, which you could keep send them away or keep them
-// with you. Reuse the crew companion system. Companion slots should still be limited and will need a new enhanced plus
-// UI feature"; "Companions when playing catch up, spawning in, or spawning out should use a unique portal animation
-// instead of just popping in and out").
+// REVENANT-COMPANION + COMPANION-SLOTS + COMPANION-ROSTER + COMPANION-PORTAL + DISSOLVE.
 //
 // The sworn party in the crew's shape; the slots one law for the crew and the sworn; the crew's own layer standing the
 // sworn through portals - in, out (the body taken out only once the portal has it) and a catch-up's pair; the portal's

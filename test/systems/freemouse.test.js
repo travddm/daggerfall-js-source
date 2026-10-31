@@ -1,5 +1,4 @@
-// FREEMOUSE (2026-09-22, Mac: "Lets also add an entirely new keybind. A
-// mouse free that allows you to toggle the use of your mouse").
+// FREEMOUSE.
 //
 // THE TOGGLE ITSELF IS NOT NEW, AND SAYING SO IS THE POINT. DFU has
 // `Actions.ActivateCursor` and PlayerMouseLook.cs:190-198 reads it; the

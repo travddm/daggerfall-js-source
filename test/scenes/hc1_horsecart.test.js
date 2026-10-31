@@ -1,6 +1,4 @@
-// HC1 - THE HORSE AND CART, AUDITED FOR PLAY (2026-09-14, Mac: "audit
-// the horse and cart ensuring it works properly ingame and the sprites
-// actually show").
+// HC1 - THE HORSE AND CART, AUDITED FOR PLAY.
 //
 // They did not show, on the deployed site, ever - and for three
 // separate reasons at three separate seams, each of which passed every

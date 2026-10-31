@@ -1,4 +1,4 @@
-// SAFE1-SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE CLIENT'S HALF - the session carrying the
+// SAFE1-SAFE7: THE CLIENT'S HALF - the session carrying the
 // relay's stamp and its word on my own chat (`law`, `banned`, `slowed`), the log that keeps a line's account and stamp,
 // hears through the block list, takes a blocked account's lines back and picks what a report carries, the social picture
 // that drops a blocked account's requests, a line's own menu in the chat panel, the host module's commands and the code
@@ -408,7 +408,7 @@ test('SAFE7 THE CARD: its rules in the player\'s language, "I agree" and "Not no
   assert.equal(c.isUp(), false);
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE (2026-10-17) ═══════════════════════════════════════════════════════════════════════
+/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
  * The audit of the chat safety arc, read cold: each pin below failed on the arc as it merged (driven against a copy of
  * the old modules) and holds the fix now. Its mutants are tools/mutants/safe_audit_client.json. */
 
@@ -655,7 +655,7 @@ test('AUDIT SAFE CLIENT-6 / RELAY-1 A LINE IS REPORTED IN THE WORDS THE RELAY SI
 });
 
 test('AUDIT SAFE CLIENT-7 A BLOCK HOLDS BACK WHAT A BLOCKED ACCOUNT ASKS OF ME: its trade, card, duel and page requests never land (by its account as the relay verified it), each the frame the REAL relay routes to me; another account\'s do; the host gives every room the block list\'s ear (mutants: the directed frames never asked; the host never handing the ear; RPT1026-SECNET: the relay\'s trade and page sent with no account)', async () => {
-  // RPT1026-SECNET (PIN MOVED): this pin fed a trade frame carrying an account the relay never sent, in the world channel,
+  // RPT1026-SECNET (
   // where the relay routes no trade, and no page at all - so the block it pinned held only here. The frames are now the
   // relay's own: three players in one place room (test/fakeRoom.mjs's Room, real tokens), two of them asking the third
   const R = fakeRoom('world:3,12');

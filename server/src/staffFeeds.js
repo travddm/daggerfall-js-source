@@ -1,6 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Network bursts, Monster watch, Bot check, Server
-// load) - THE RELAY'S STAFF COUNTS: what a room counts for the Staff Panel, in its own memory, and posts to the account
+// STAFF-PANEL5-FEEDS - THE RELAY'S STAFF COUNTS: what a room counts for the Staff Panel, in its own memory, and posts to the account
 // service. The Room (index.js) calls these at the doors it already has - a frame in, a meter's refusal, a close, a leave,
 // a foes frame fanned, a record stripped, a natural encounter's grant minted, a pose taken - one line each; the rest is
 // here. NOTHING A PLAYER RECEIVES CHANGES: no frame, field or timing (mob, 03:51Z: the game "must not be able to tell it is
@@ -14,8 +13,7 @@
 // are counted, never parsed for it: a frame's kind is its first word (`{"t":"..."`). Monsters (design doc, Weak spots:
 // "Monster watch would flag honest dungeon hosts"): the distinct live monster ids in each full foes frame a sender streams
 // in an OUTDOOR cell are its own; indoors only the host streams them, so an indoor sender is "host of N monsters", never
-// an owner. STAFF-PANEL5-MONSTERS (2026-10-23, mob wants all three feed pages working with grantStrip off - an audit
-// showed the strip hides honest players' monsters, so it stays off): they are counted whatever grantStrip says, on the
+// an owner. STAFF-PANEL5-MONSTERS: they are counted whatever grantStrip says, on the
 // frame as it fans (stripped first while the switch is on), so a batch says `ms` 1 always and the panel "measured" (an
 // older relay counted them only while grantStrip was on, and said 0 with it off). Read, never changed: no record dropped,
 // altered or held for it.

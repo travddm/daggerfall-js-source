@@ -1,6 +1,4 @@
-// GRANT-SLEEP and PROVINCE-SLEEP (2026-10-25, Mac: "ensuring this new integration doesnt implode the server or insanely
-// skyrocket our server cost"; bible/11-Multiplayer/Spawn-Grants.md section 22, bible/11-Multiplayer/Scale-Arc.md
-// PROVINCE-SLEEP): what keeps a Durable Object awake is billed, so the two things the live relay showed holding rooms
+// GRANT-SLEEP and PROVINCE-SLEEP: what keeps a Durable Object awake is billed, so the two things the live relay showed holding rooms
 // awake are gone from the land past the Bay before it opens - a cell's grant measure holds no timer, and a province's
 // channel is one object that sleeps between its lines. tools/mutants/sleepcost.json.
 import test from 'node:test';
@@ -104,7 +102,6 @@ test('PROVINCE-SLEEP the law: the Bay\'s 62 regions are split four ways, a provi
       assert.equal(isChatRoom(`${bus}.${k}`), split, `${bus}.${k} a room`);
       assert.equal(H.regionShardRoom(r, k), split ? `${bus}.${k}` : null);
     }
-    // PIN MOVED (PROVINCE-SLEEP x COST-1, the merge of main into TESA): no region is split unless the relay's REGION_SHARDS
     // names it (main's COST-1) - and a province never, whatever the set it is handed names (TESA's PROVINCE-SLEEP)
     assert.equal(H.shardOf(bus, 'acct-x'), null, `region ${r}: whole by default`);
     assert.equal(H.shardOf(bus, 'acct-x', H.regionsSharded('all')), split ? `${bus}.${H.shardHash('acct-x') % H.REGION_SHARDS}` : null, `region ${r}: ${split ? 'its shard' : 'the channel itself'}`);
@@ -118,7 +115,7 @@ test('PROVINCE-SLEEP the relay: a current build\'s link to a province\'s channel
   Date.now = () => clock;
   try {
     await quiet(async () => {
-      const W = fakeRooms({ now: () => clock, vars: { REGION_SHARDS: 'all' } });   // PIN MOVED (PROVINCE-SLEEP x COST-1): the relay naming every region it may split - a province still one channel
+      const W = fakeRooms({ now: () => clock, vars: { REGION_SHARDS: 'all' } });
       const link = async (n, key) => { const R = W.room(key); const ws = R.connect(); clock += 30; await R.hello(ws, `peer-${n}`, null, { name: n, acct: `acct-${n}`, asecret: `secret-of-acct-${n}`, hs: 1 }); return ws; };
       const SKYRIM = chatRegionRoom(64);
       const a = await link('ska', SKYRIM), b = await link('skb', SKYRIM);

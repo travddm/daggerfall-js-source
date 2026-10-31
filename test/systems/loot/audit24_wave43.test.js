@@ -229,7 +229,6 @@ test('audit24 wave43: the potion registry, and CreatePotion', () => {
 });
 
 test('audit24 wave43: all four spawn sites roll, AFTER the equipment', () => {
-       // PIN MOVED (PARTY-LOOT): the roll's Renown share rides to the extras
   for (const [f, branches] of [['src/scenes/dungeonContext.js', 2], ['src/scenes/exteriorFoes.js', 1], ['src/scenes/cityGuards.js', 1]]) {
     const src = rd(f);
     const calls = src.split('\n').filter((l) => /^\s*spawnEnemyLoot\(entity, /.test(l));

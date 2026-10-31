@@ -1,7 +1,7 @@
 // FIELD BUGS 2026-09-30 (FALL-KEPT) - the report "saves dont save player velocity": "you can negate all fall damage by
 // saving while falling right before you hit ground. once you load your save, you will land safely. as your velocity
 // will be reset". DFU's own behaviour - SerializablePlayer keeps the position, the yaw, the pitch and the crouch
-// (:204-226) and LoadGame cancels the movement - and Mac, of the DFU-faithful field bugs: "Dont worry abour DFU."
+// (:204-226) and LoadGame cancels the movement - and
 //
 // A DECLARED DEPARTURE. The save carries the fall in the pose (PlayerMotor.fallSnapshot): how far above the feet it
 // began and the speed the body had. A load that lands the player where the save stood lands the fall with them

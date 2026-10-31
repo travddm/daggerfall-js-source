@@ -1,4 +1,4 @@
-// DAEDRIC-SMELT (2026-10-25; bible/06-Systems/Professions-Arc.md section 53) - THE DAEDRIC INGOT, MADE. The report
+// DAEDRIC-SMELT - THE DAEDRIC INGOT, MADE. The report
 // (SaberGGaming): no Daedric ingot could be had - the transmutation stops at Platinum (as intended), and the forge's
 // table ended at Orichalcum ("Daedric waits on its heart and its stone") while 27 anvil recipes spent the ingot. The
 // owner: "No band aids", and "the heart may come FROM LOOT OR THE GATE". PROF0 4.1's recipe, built: an Ebony Ingot, a

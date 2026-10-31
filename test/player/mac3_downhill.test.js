@@ -1,5 +1,4 @@
-// MAC3 (2026-09-11, Mac: "when moving down hills, the camera hitches
-// badly"). The collider's ground snap - the port's answer to
+// MAC3. The collider's ground snap - the port's answer to
 // AcrobatMotor.ApplyGravity's anti-bump (:191-197), recorded at
 // player/motor.js A6 - probed MESHES only; the terrain floor beneath
 // everything (heightAt) was a floor and nothing more. A capsule walking

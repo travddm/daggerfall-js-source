@@ -1,4 +1,4 @@
-// L10N6 (2026-10-03): THE TRANSLATIONS IN THE CREDITS. Mac's decisions (Localization-Arc.md): the game says which
+// L10N6: THE TRANSLATIONS IN THE CREDITS. Mac's decisions (Localization-Arc.md): the game says which
 // languages are machine-translated, a person's translation outranks a draft, and a pack is bundled only on its authors'
 // terms. The About pane credits them as it credits the works (ui/credits.js translationCredits): one row a language the
 // game holds text for - its own name; Claude's drafts said to be drafts, "checked and corrected by" the people who did

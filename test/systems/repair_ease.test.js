@@ -1,5 +1,4 @@
-// REPAIR-EASE (2026-09-30, Mac: "nerf repair costs", "instant repair on by default", "Add repair items you can find by
-// looting"). Every repair costs two thirds of Daggerfall's price; the port's InstantRepairs default is on; and a Field
+// REPAIR-EASE. Every repair costs two thirds of Daggerfall's price; the port's InstantRepairs default is on; and a Field
 // Repair Kit - any metal, 15% - turns up in dungeon piles (keys J-O) and on foes that carry loot.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

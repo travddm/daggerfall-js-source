@@ -1,4 +1,4 @@
-// SLAM8 (2026-09-16, AUDIT SLAM): RELAY_VERSION CANNOT BE FORGOTTEN AGAIN.
+// SLAM8: RELAY_VERSION CANNOT BE FORGOTTEN AGAIN.
 //
 // The line above `RELAY_VERSION` has said "Bump it with every relay-changing slice" since WORLD1, and SLAM5 changed
 // the relay's hello path - the 130-player wall - and left it at `world67`. So `world67` named BOTH the relay that
@@ -37,12 +37,13 @@ export const RELAY_GRAPH = graph('server/src/index.js');
 const LAW = {
   world277: '9f06f4c2c532d3d9d0183ea19f5bf4f81de59c34c9ca39925bcb6743c5ed8551',
   world278: '44c9edab2ddeebe8c51c60afe58f252591f818d153a87c7b963757062961e975',
+  world279: 'a9cee55aa119c72c2377f9edea416ffd31714b9e2184731cf89673271f30a06b',
   world276: '082554ed19550c4884cb8d45ccd412686346f3e080de9e3bbaf39365c094af07',
   // Unpublished TESA release used world274 / e1322ca57f57dd2850fb61e0c55f2b8bb8770f2e4b75dcca0fc24a2fb972a464 (ASHFALL1's fold, re-hashed in place; bytes b90c2080... before it) before the seventh merge of main renumbered it world275, past LADDER-CUT's world274
   // Unpublished TESA release used world272 / 1e218ca29a46a8bac663c7b8a1d9e87097ead7d43f79d535c961a811656bf3b6 (the third merge of main, ecf9b257ea) before the fourth merge of main renumbered it world274
   // Unpublished TESA release used world271 / c3290cb40ff9fb8f183f39835dceaff1ca93615519b700055b44439c84694938 (the second merge of main, 202664fdc5) before the third merge of main renumbered it world272, past MASTER-THREE's world271.
   // Unpublished TESA release used world270 / a4449b7bbaa13ec084fd3121bcb318d732a777a9008f5f901e6649d381e4dc48 (the first merge of main, a367d9045a) before the second merge of main renumbered it world271, past CHAT-POST's world270.
-  // Unpublished TESA release used world269 / 7911e57099f437c210381f11770b0a808fb69f4300e157f01af3a05366d20af4 and world270 / bc1cead9bef9573428db5b48a70a451838e802059319c09e9ef37882ebbd3ef0 before the merge of main (2026-10-27) folded them into world270, past BOW-TOPS's world269.
+  // Unpublished TESA release used world269 / 7911e57099f437c210381f11770b0a808fb69f4300e157f01af3a05366d20af4 and world270 / bc1cead9bef9573428db5b48a70a451838e802059319c09e9ef37882ebbd3ef0 before the merge of main folded them into world270, past BOW-TOPS's world269.
   // Unpublished PVP-EASE branch used world269 / fbaf5bd410a707de47717c2f6369ab07b014688df73df46c1462e1c4271781fc and world268 / 8e90bd322058c3d70c6aca229c45062a1283cfa689ce74ee61f1c3bc19281f56 before its fold into #1184 renumbered it world270.
   world274: 'd6ac01e610c057e7bbf3368802fb49e0683d4c119e4e11d0a6e708dbcf6fba68',
   world275: '0956668f334cc3af9dd82cc13ff3d4fa1578e134af2a63f6eba83ace1b156d89',
@@ -54,14 +55,14 @@ const LAW = {
   world269: 'b0e8a439fc0d2ea9b4b634003a7b2631bdfa3484f8c246e750f38eaac74c556a',
   // Unpublished TESA release used world268 / 64ce2280842839ba2c2fed3ba5f4d2622844e7bb535e27126d223c2a9463335a (the release's first merge of main, 27a58c6ef7) before the second merge renumbered it world269.
   // Unpublished TESA release used world266 / ea0b896b46d6676a20874f235eb1357bb9f0fbfe016e088f7ca86a6cb40ca1e9 (the R3 trial merge, 2026-10-26) before the merge renumbered it world268.
-  // Unpublished TESA branch used world260 / 40db7a4ccd60f16e8530f6b6181ee8fa8bff7ce77c5a85d055f978577a2eafc9 (bffbdd3d... before AUDIT RELEASE R2 re-hashed it in place) before the merge of main (2026-10-26) renumbered it world266, past THE FOLD's world260, EVENT-RULES' world261, HIBERNATE's world263, REWARD-KILLS' world264 and GATE-COURTS' world265.
+  // Unpublished TESA branch used world260 / 40db7a4ccd60f16e8530f6b6181ee8fa8bff7ce77c5a85d055f978577a2eafc9 (bffbdd3d... before AUDIT RELEASE R2 re-hashed it in place) before the merge of main renumbered it world266, past THE FOLD's world260, EVENT-RULES' world261, HIBERNATE's world263, REWARD-KILLS' world264 and GATE-COURTS' world265.
   // Unpublished WORLD-WIDE branch used world254 / 90246f66c76e9ebb17c75f18aa871c03a61ed68d2a6981f47115ab3f6c9ebdbd (WW2) and world255 / 34a43f897de85bbf572567e1cc0b7bc64559a7f4ef16ce75299686b4da682f91 (WW-R, re-hashed in place for WW-C2) before this merge renumbered them into world256.
   // Unpublished TESA branch used world256 / a199e4559e0cb48f1bb999b7cb0522a373ac0548bf840d924e4718c751c8bd84 (the fold, before main's KETCH) and world255 / 9cc27d321d98dad2d85a339a8828fd4c14e41fa7553bce56ab4fb8cd0e0b82e9 (AUDIT TESA-BIOME) before the merge with main renumbered it into world256, past KETCH's world255.
   // Unpublished DOMAINS branch used world256 / 35cb323d0022cb299dd21cdb61564c5eaf7fed4696c77e57f8cd17f106953136 (DOMAIN2, world255 on its branch before its merge with main) and TESA's head world256 / d1321dedbfc23620ccfb3452260322987b2ed0cd0234a05754e97c96f468a035 before DOMAINS merged into #1184 and the two became one release.
   // WW7-3 re-hashed world256 in place before its deploy (516155580832a6ca... the composed release's): the seats past the Bay - the provinces' crowns (net/kingdomLaw.js), their glyphs (net/identityToken.js GLYPHS), the seat law's regions and pixels (net/townSeatLaw.js).
   // WW7-4 re-hashed it again (750d9a71401278ce... WW7-3's): the guild arm's rooms the provinces' capitals' castles too (net/instanceRoom.js PROVINCE_CASTLE_MAP_IDS).
   // WW7-5 re-hashed it again (f6bb05fdde25ebd6... WW7-4's): the Watch's ground the world's grid but the Veil's box (net/watchReceipt.js watchPixelOk) - the relay mints a receipt past the Bay.
-  // Unpublished TESA branch used world256 / d1321dedbfc23620ccfb3452260322987b2ed0cd0234a05754e97c96f468a035 (the fold past KETCH) before the merge with main (2026-10-25) renumbered it into world260, past STAFF-EVENT's world256, STAFF-EVENT BOSS's world257, KETCH-LONGER's world258 and ASK-LONGER's world259.
+  // Unpublished TESA branch used world256 / d1321dedbfc23620ccfb3452260322987b2ed0cd0234a05754e97c96f468a035 (the fold past KETCH) before the merge with main renumbered it into world260, past STAFF-EVENT's world256, STAFF-EVENT BOSS's world257, KETCH-LONGER's world258 and ASK-LONGER's world259.
   world268: '9526fc08fea9df415e14d1998d03703fc8b3460009b668b59913d3457040ca5d',
   // Unpublished NIRNROOT-SAGE branch used world267 / 89642bf686dd761c14a5817178f068700600f198519bf47ea33e96450c09d286 before this merge renumbered it world268.
   world267: '919c3539ff3988f11e9f087ba91b87cf08ffcbc7ffb63d6c9a4a3a678c3d8e49',
@@ -165,7 +166,7 @@ const LAW = {
   // Unpublished FIELD BUGS 2026-10-16b branch used world208 / 3f321538c82a2fdd6fa431ae73882f29697e8f17513c43046a538d9c719d5547 before the merge renumbered it past main's INSTANCES world208 and WEAPON-GLOW1 world209.
   // Unpublished FIELD BUGS 2026-10-16b branch used world210 / bd1634f4168ab9b8993c1da423194a27b7f7fd153c2ed39bc5de2ebd24e9a51f (the merge's), then bbcc955472bddf86dcdec44b690fdae7f0bbfc98bb42c809ec50f9797f042f1d (GRAVE-PARTY's, re-hashed in place, undeployed) before the merge renumbered it past main's HUB-PULL + DO-ASK world210.
   world211: '4f9100dc12b9ed639c1a20d08db9523824374b93bb96803dfab5aa477751318f',
-  // Unpublished TIDY branch used world209 / 67d07796fcf4d26a8439160430a268314945c09c763f3b6f65bf773e84237257 before the merge of main renumbered it world211 (re-hashed in place on the branch - bytes 6a9f771a... before it: TIDY6, the relay's comments name 01-Overview's records by their folders; 2deb4630... before that: TIDY5, its tests by theirs) TIDY2 (2026-10-16, Mac: "Do everything"; bible/01-Overview/Code-Map.md; NOT YET DEPLOYED): the relay's own files moved into feature folders - net/gate/, net/wild/, net/arena/, net/siege/, net/superDungeon/, net/serpent/, net/iliac/, net/card/, net/duel/, net/gambit/, net/guild/, net/raid/, net/realm/, net/firmament/, net/peer/ and systems/arena/ - no behaviour moved: the bundle's bytes are its re-based imports and the paths its comments name; the same files, in the same order
+  // Unpublished TIDY branch used world209 / 67d07796fcf4d26a8439160430a268314945c09c763f3b6f65bf773e84237257 before the merge of main renumbered it world211 (re-hashed in place on the branch - bytes 6a9f771a... before it: TIDY6, the relay's comments name 01-Overview's records by their folders; 2deb4630... before that: TIDY5, its tests by theirs) TIDY2: the relay's own files moved into feature folders - net/gate/, net/wild/, net/arena/, net/siege/, net/superDungeon/, net/serpent/, net/iliac/, net/card/, net/duel/, net/gambit/, net/guild/, net/raid/, net/realm/, net/firmament/, net/peer/ and systems/arena/ - no behaviour moved: the bundle's bytes are its re-based imports and the paths its comments name; the same files, in the same order
   world210: '4e3a0accae573b38a5d8cad626fba8bc4a6897ae05301b3ef4f1add41eddd381',
   // Unpublished HUB-PULL branch used world208 / 048cfcfe5695915a7d8d2e8c308c08d43c2604d4be762c576e77f49af32b92cf before the merge of main renumbered it world209.
   // Unpublished HUB-PULL world209 was 8a9505982e605d6462a4ada8a3ed10ee4c56a16bf082b663dbe736bebcde90d6 before the HUB-PULL audit's fixes (the rs hand-up never awaited by the held poll, a miss retried, the backoff woken, rs said until heard, the outbox's bounds) - never deployed.

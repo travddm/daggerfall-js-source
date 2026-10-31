@@ -1,9 +1,8 @@
-// SET1 (2026-09-26, Mac: "sigil armor sets that also come with set builds (think having multiple of one set type grants
-// detailed abilities)"; chose tiers at 2 / 4 / 6, "Grow together", online only and never in duels): THE SET LAW
+// SET1: THE SET LAW
 // (systems/sigil/sigilSets.js, and the record's one new field in systems/sigil/sigil.js). The registry and its numbers; the record
 // with a `set` and no `power`, and every reader of the power reading its absence as no blow; what may be a piece; the
 // worn pieces per set - the nine places, one weapon a set; the stage - the lowest piece's, the Renown's cap, what holds
-// it; the tiers awake by the count; the one question the powers ask. bible/11-Multiplayer/Sigil-Sets.md sections 1-2.
+// it; the tiers awake by the count; the one question the powers ask.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// MWNPC10a (2026-10-09, the MW-NPC arc's tenth slice - bible/04-Characters/Morrowind-NPCs.md section 15a): THE GATE'S
+// MWNPC10a: THE GATE'S
 // BOSS AND HIS HOST IN THEIR MORROWIND BODIES. They are no foe pool's - the relay drives them - so their actors keep
 // their own counts (characters/rosterBodies.js rosterActor: a swing each time the relay's attack time changes, a recoil
 // each time a blow met them) and wear their creature (creatureBodies.js); the court offers each shown body on a lane of
@@ -69,7 +69,6 @@ test('MWNPC10a-2 the court offers him and his host their creatures, each on the 
     wantBodies: () => true, makeBodies: () => (lane = recordingLane()),
   });
   const frame = (t, st) => { if (st) link.st = st; clock.t = t; c.frame(); };
-  // PIN MOVED (AUDIT MW-NPC D4): a Daedroth (a bearer under venom - matched), a Flesh Atronach (a sapper under venom - no
   // match) and an Imp (a harrier - no match now: Daggerfall's imp flies, Morrowind's scamp walks)
   const st = stOf({ md: ['venom', 'legion', 'echoing'], lg: { ads: [ad({ i: 1, k: HOST.bearer, x: 20, z: 6 }), ad({ i: 2, k: HOST.sapper, x: -20, z: 6 }), ad({ i: 3, x: 0, z: 12 })], gone: [] } });
   frame(1000, st);

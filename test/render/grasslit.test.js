@@ -1,5 +1,4 @@
-// GRASS-LIT (2026-10-01, Mac: "drastically improve the grass texture that isn't super dark and blends well into the
-// terrain") - the grass painted in the ground's own colours and lit by the ground's own light, on both lighting lanes,
+// GRASS-LIT - the grass painted in the ground's own colours and lit by the ground's own light, on both lighting lanes,
 // and the ambient occlusion read off the world without the field in it. The fragment stage is run on its OWN TEXT
 // through test/glsl.mjs and held against the terrain programs' formulas (renderer.js TERRAIN_FS, enhancedLighting.js
 // EL_TERRAIN_FS), term for term.

@@ -1,5 +1,4 @@
-// BOSS-TRAITS (2026-10-25, the owner: "boss types that might be shielded, have resistances, curb power, etc for more
-// artifical difficulty"; asked where, "Raid leaders", "Elite foes", "Relay bosses"; bible/05-Combat/Boss-Traits.md):
+// BOSS-TRAITS:
 // A HARD FOE'S OWN RULES, run - each trait's rule, the striker's half and the owner's, the mask on the wire, the draw,
 // the words.
 import '../modsOff.js';
@@ -92,7 +91,7 @@ test('BOSS-TRAITS THE OWNER\'S HALF: the curb holds a blow to 5% of its health; 
   assert.equal(bossWardNow(w, 3 + WARD_REGROW_S + WARD_REFILL_S + 5).now, 300, 'whole again');
   const wr = foe(['wrathful']);
   bossTake(wr, 10, { nowS: 100 });
-  bossTake(wr, 10, { nowS: 120 });   // PIN MOVED - AUDIT WORLD-EVENTS L2-5: inside WRATH_COOL_S of the first (a fight dropped that long starts again)
+  bossTake(wr, 10, { nowS: 120 });
   assert.equal(bossWrathDue(wr, 100 + WRATH_AFTER_S - 1), false);
   assert.equal(bossWrathDue(wr, 100 + WRATH_AFTER_S), true, 'from its first wound');
   assert.equal(wr.damageScale, 3 * WRATH_X);

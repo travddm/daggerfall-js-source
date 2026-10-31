@@ -1,9 +1,9 @@
-// SPREAD (2026-10-19, the owner: "Lets spread out on the distance between trees"). BANTHA1's canopy stood a tree in every
+// SPREAD. BANTHA1's canopy stood a tree in every
 // cell of 2 x 2 tiles (12.8 m apart, as near as 5 m), and its young trees and palms rolled a tile's dice each (two as near
 // as 1.3 m): ~5,700 trees a pixel, one to 118 m², the nearest neighbour 7 m at the median. Now the canopy stands on every
 // other cell - a quincunx on the world's lattice - in its middle half, and the young trees and the palms one a cell at
 // most: about 16 m between the canopy's trunks, never under 9 m; a cell between the understorey's; and the owner's crowns,
-// 16-19 m across, still meet overhead. world/terrain/jungleNature.js; bible/03-World/Bantha-Jungle.md "The layout".
+// 16-19 m across, still meet overhead. world/terrain/jungleNature.js; "The layout".
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JUNGLE, JUNGLE_PALMS, JUNGLE_COVER, withJungle, canopySite } from '../../src/world/terrain/jungleNature.js';

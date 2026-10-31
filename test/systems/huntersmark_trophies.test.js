@@ -1,5 +1,4 @@
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.5, Professions-Arc.md section 58, 10-UI/Collections.md
-// section 9): THE MOUNTED TROPHY AND WHAT A CHARACTER GATHERS - the trophy minted (a named mark's and a beast's, a mod's
+// HUNTERS-MARK: THE MOUNTED TROPHY AND WHAT A CHARACTER GATHERS - the trophy minted (a named mark's and a beast's, a mod's
 // beast drawn as its hide's kin), hung as a mount with its own name and its plaque composed at runtime; the Trophy Hunter
 // built on the real Worker (a clean pelt of a grade 5 or 6 body, the spec's alone) and minted once a body by the hunt's
 // kind; the gathered log (a fish once a haul, a trophy as minted) and the Collections page's three parts read off it.

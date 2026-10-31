@@ -1,4 +1,4 @@
-// GRASS3 (2026-09-18): A BLADE STANDS ON THE SURFACE THAT IS DRAWN.
+// GRASS3: A BLADE STANDS ON THE SURFACE THAT IS DRAWN.
 //
 // The terrain is TRIANGLES. `buildTerrainIndices` cuts every quad on the
 // diagonal (x, z)-(x+1, z+1), so inside a quad the drawn ground is two

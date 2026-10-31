@@ -1,6 +1,4 @@
-// ACC1b - THE ACCOUNT SERVICE (2026-09-21, Mac: "cloud storage and
-// account creation needed for accessing online mode" / "Im not
-// rotating. Lets do this").
+// ACC1b - THE ACCOUNT SERVICE.
 //
 // THE SQL IS THE REAL SQL. These pins apply
 // `server-account/migrations/0001_accounts.sql` to a real SQLite
@@ -71,7 +69,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -154,26 +152,26 @@ test('ACC1b: the migration is the real schema, and applying it twice changes not
   // their board
   // SEAT2a added four (0052): `town_seat_windows` (a holder's window), `town_seat_battles` (the week's battles the Turning
   // placed), `town_seat_rosters` (each side's signed fighters) and `town_seat_hires` (the Sellswords' contracts)
-  // CROWN1 part two added four (0055, PIN MOVED): `town_seat_royal_fields` (each contender's ring), `town_seat_royal` (a
+  // CROWN1 part two added four (0055
   // Royal Tourney's week - its ring and champion), `town_seat_bouts` (each bout a receipt brought) and `town_seat_titles`
   // (the titles kept for good)
-  // CROWN2 added three (0056, PIN MOVED): `guild_fealty` (a vassal's liege, offered, sworn or breaking), `guild_pacts` (a
+  // CROWN2 added three (0056
   // pair's Pact for the rest of the Season) and `town_seat_red` (the server's red lines)
-  // SEASON1 part two added one (0058, PIN MOVED): `town_seat_ribbons` (each guild a Season's end gave its banner ribbon)
-  // SEAT2b added four (0061, PIN MOVED): `town_seat_forts` (a seat's works, each its tier and the project raising the next),
+  // SEASON1 part two added one (0058
+  // SEAT2b added four (0061
   // `town_seat_fort_held` (what a project holds), `town_seat_fortifier` (a Fortifier's save a Season) and `town_seat_camps` (a
   // challenger's Siege Camp)
   // ARENA4 added three (0074 - 0047 on its branch, 0070 at the first merge onto main, 0072 past PROF9's and PROF12's 0069_cooking and 0070_alchemy at the second, past SILVER-WAYS' 0071_silver_ways and PROF2b's 0072_motherlodes at the third): `arena_pve` (one row a ladder bout's receipt - the climb is its wins in order),
   // `arena_pvp` (one row a bout between players, both ratings before and after) and `arena_members` (the banner an
   // account wears, and the one it quit this season) - the boards, the points and the arena's titles COUNTED from them
-  // ARENA4b added two (0075 - 0071 before the second merge, 0073 before the third, PIN MOVED): `home_moves` (an online home the arena displaced, moved once - its old key and
+  // ARENA4b added two (0075 - 0071 before the second merge, 0073 before the third
   // its new) and `arena_renown` (a bout's Renown, credited once an account)
-  // BAG1 added two (0076 - 0073 on its branch, past main's WD3 and ARENA4's 0073-0075 at the merge, PIN MOVED): `prof_carried` (what
+  // BAG1 added two (0076 - 0073 on its branch, past main's WD3 and ARENA4's 0073-0075 at the merge
   // the service handed a character's bag and pack, by origin) and `prof_deposits` (one row a deposit back into the Stores); GUILD2
   // added three (0077 - 0074 on its branch): `guild_renames`, `guild_vault` (a guild's pieces, a slot each) and `guild_vault_log`.
   // The BAG1 audit (B2) added `prof_carried_gate` to 0076: whether a request's held count may cut the count, one row a
-  // request, made and cleared inside its own batch (PIN MOVED)
-  // SERPENT1 added two (0081 - 0078 then 0079 on its branch, past main's FOUNDER4, KNIGHT-HOUSE and HOME-VENDOR at the merges, PIN MOVED): `serpent_kills` (one row a sea serpent and account - the kill counted, the character paid)
+  // request, made and cleared inside its own batch (
+  // SERPENT1 added two (0081 - 0078 then 0079 on its branch, past main's FOUNDER4, KNIGHT-HOUSE and HOME-VENDOR at the merges
   // and `serpent_spoils` (one row a serpent and account - the device whose claim was given the hoard)
   // SD9b added `sd_kills` the same way (0090 - 0087 on its branch, renumbered past FOUNDER5's and CRAFT2-CRAFT5's at the merges): one row a Hollow and account - an Hour broken, counted once, with what its
   // first write granted (the grants themselves ride the row, `sd_honours`, as the Broker's sale does)
@@ -189,54 +187,54 @@ test('ACC1b: the migration is the real schema, and applying it twice changes not
   // HOME-VOTE added one (0108 - 0106, then 0107, on its branch, renumbered past LW15's 0106_patrons and PATRON-LOAD II's 0107_trader_reads at the merges): `home_votes` (one
   // row an account's vote on one online home, -1 or +1 - the home's score is its rows summed; they go with the home and
   // with the voting account)
-  // EG-PLAY added three (0119 - 0112, 0113, 0114, 0116 then 0117 on its branch, renumbered past SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges, PIN MOVED): `eg_stakes` (one row an Elite Breach's open order - the Weir Key held against it until it
+  // EG-PLAY added three (0119 - 0112, 0113, 0114, 0116 then 0117 on its branch, renumbered past SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges
   // settles), `eg_redoubts` (one row a Redoubt an account took in a breach) and `eg_runs` (one row a member's end of a breach)
-  // EG-E2 added two (0119 - 0112, 0113, 0114, 0116 then 0117 on its branch, renumbered past SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges, PIN MOVED): `eg_feats` (one row an account's lord - the feats of it the account has held, OR'ed)
+  // EG-E2 added two (0119 - 0112, 0113, 0114, 0116 then 0117 on its branch, renumbered past SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges
   // and `eg_champions` (one row an account in a Descent bracket's top ten at a season's end - Spire Champion through the next)
-  // SEAT-FACTS added one (0112, PIN MOVED): `seat_facts_kept` (one row - the seats' facts the minute's clock counted
+  // SEAT-FACTS added one (0112
   // once for the whole service, townSeats.js keepSeatFacts)
-  // PVP-ESCROW added one (0118 - 0113 on its branch, renumbered past LAMP-KEEPER II's 0113 and SUMMON-REPAIR's 0114 at the merge, and 0115 on the integration, renumbered past main's 0114-0116 and SUMMON-REPAIR's 0117 at the merge of main; PIN MOVED): `wild_escrow` (one row a killer's worn piece held between a fall and its end -
+  // PVP-ESCROW added one (0118 - 0113 on its branch, renumbered past LAMP-KEEPER II's 0113 and SUMMON-REPAIR's 0114 at the merge, and 0115 on the integration, renumbered past main's 0114-0116 and SUMMON-REPAIR's 0117 at the merge of main
   // into its killer's record on the room's signed collect, or back into its fallen's; wild.js wildCollect, wildReclaim)
-  // SEAT-LEASE added one (0110, PIN MOVED): `town_seat_settling` (one row - who holds the Turning's lease, and until when;
+  // SEAT-LEASE added one (0110
   // seatTurning.js settleDueOnce)
-  // EG-E3 added one (0119, grown in place - PIN MOVED): `eg_finds` (one row an account's asks of a dungeon tier a real day
+  // EG-E3 added one (0119, grown in place
   // for a Weir Key, and the keys they found - eg.js findEg)
-  // EG-E1 added one (0119, unshipped, PIN MOVED): `eg_sink` (one row an account's arena week at the Broker's Panoply sink - the
+  // EG-E1 added one (0119, unshipped
   // piece it bought, once a week for 20 embers)
-  // AUDIT EG V added one (0119, grown in place - PIN MOVED (AUDIT EG V, d: lane8 L8-4)): `eg_reliqs` (one row an account's
+  // AUDIT EG V added one (0119, grown in place
   // arena week and circle - the end whose claim first opened that circle's Reliquaries that week, egEconomy.js egReliquariesOf)
-  // AUDIT POI added two (0116 - 0114 on its branch, PIN MOVED - the POI store's migration, not yet deployed, grown in place): `poi_rev_assets`
+  // AUDIT POI added two (0116 - 0114 on its branch
   // (one row an asset an approved POI revision names - whether an asset is live is asked of them) and `poi_upload_days`
   // (one row a builder's bytes uploaded in a UTC day, reserved before the bytes are stored)
-  // PRIVATE-REPORT added one (0129 - 0126 then 0127 on its branch, renumbered past SAFE's and INT16-INT19's at the merges; PIN MOVED): `private_reports` (one row a player's private report to the readers -
+  // PRIVATE-REPORT added one (0129 - 0126 then 0127 on its branch, renumbered past SAFE's and INT16-INT19's at the merges
   // an exploit, a bug or a security hole; reports.js)
   // QL12 added one (0133): `ql_steps` (one row an account's questline step the service pays - when its first claim opened it,
   // when a receipt written after that witnessed it and the outcome's choice; questlines.js claimQl)
-  // SUMMON-REPAIR added one (0117 - 0113 on its branch, renumbered past LAMP-KEEPER II's 0113_lamp_title at the merge, and 0114 on the integration, renumbered past main's 0114_firmament, 0115_gambit_ladder and 0116_poi at the merge of main; PIN MOVED): `realm_repairs` (one row a staff repair of one realm character - its ticket
+  // SUMMON-REPAIR added one (0117 - 0113 on its branch, renumbered past LAMP-KEEPER II's 0113_lamp_title at the merge, and 0114 on the integration, renumbered past main's 0114_firmament, 0115_gambit_ladder and 0116_poi at the merge of main
   // the key, so a repair asked again mends once; review.js repairAct)
   // CRAFT-WRITS added one (0145): `craft_writs` (one row an account's crafting writ of a UTC day - its product, guild,
   // count and pay, and once filled its request and the goods it took; craftWrits.js)
-  // STAFF-PANEL3 to STAFF-PANEL6 added seven (0150-0155, PIN MOVED): `staff_notes`, `staff_watch` and `staff_settings` (a
+  // STAFF-PANEL3 to STAFF-PANEL6 added seven (0150-0155
   // staff member's notes on a player, their watchlist and their own settings; staffDesk.js), `staff_evidence` (an item a
   // staff member removed, kept 30 days for Put back; staffRealm.js), `item_census` and `item_census_days` (the day's count
   // of every piece and the days it covers; staffCensus.js), `staff_limits` (the status tiles' lines an Admin sets;
   // staffStatus.js)
-  // STAFF-PANEL5 added eight (0157-0160, PIN MOVED): `staff_net_batches`, `staff_net_rows` and `staff_foe_rows` (the relay's
+  // STAFF-PANEL5 added eight (0157-0160
   // net feed and Monster watch's rows; staffNet.js, staffMonsters.js), `reaction_batches` and `encounter_reactions` (the
   // bot check's batches and timed encounters; staffReactions.js), `staff_messages` (Message on screen; staffMessage.js),
   // `staff_chat_threads` and `staff_chat_lines` (the freeze's staff chat; staffFreeze.js)
-  // AUDIT FB1024 (BROKER-RID) added one (0174, PIN MOVED): `broker_sales` (a Broker sale by its request id, or its fence;
+  // AUDIT FB1024 (BROKER-RID) added one (0174
   // brokerSales.js)
   // TESA (the merge of main): its own 3 beside main's - guild_castles, town_domain_witness, town_seat_gifts (its migrations 0183-0186, renumbered past main's 0174-0176, WOVEN-PAYS' 0177 and RPT1026's, MASTER-ART's, CREW-SIGNED's and HUNTERS-MARK's 0178-0182 at the merges of main into #1184)
-  // WILD-INSURE (PVP-EASE, 2026-10-26) added one (0187 - 0176 on its branch, renumbered past TESA's at the fold, past LOCKPICK's 0176 at the fold's merge of main, past WOVEN-PAYS' 0177 and past main's 0178-0182 at the merges of main into #1184; PIN MOVED): `wild_insurance` (a policy on a piece of gear, one row
+  // WILD-INSURE (PVP-EASE, 2026-10-26) added one (0187 - 0176 on its branch, renumbered past TESA's at the fold, past LOCKPICK's 0176 at the fold's merge of main, past WOVEN-PAYS' 0177 and past main's 0178-0182 at the merges of main into #1184
   // a piece a character; wildInsure.js) - and REPEAT-SHIELD's `ki` on `wild_falls` (AUDIT PVP-EASE L1-1)
-  // MASTER-ART added one (0179 - 0180, then 0178, on its branch, renumbered at the merges; PIN MOVED): `prof_masters` (a Master's work by its request id, one a character a UTC day;
+  // MASTER-ART added one (0179 - 0180, then 0178, on its branch, renumbered at the merges
   // masterWork.js)
-  // CREW-SIGNED added one (0180, 0179 on its branch; PIN MOVED): `crew_signed` (a crew hall's recruit held by the account that signed him;
+  // CREW-SIGNED added one (0180, 0179 on its branch
   // crewSigns.js)
-  // HUNTERS-MARK added one (0181, 0180 on its branch; PIN MOVED): `hunt_clears` (a paid bounty's clear, a row a character a notice's slot or a
+  // HUNTERS-MARK added one (0181, 0180 on its branch
   // mark's week; hunts.js)
-  assert.deepEqual(tables, ['arena_attempts', 'arena_board_ver', 'arena_boards', 'arena_champions', 'arena_members', 'arena_pve', 'arena_pvp', 'arena_renown', 'blocks', 'board_notes', 'board_notices', 'board_reports', 'broker_sales', 'commissions', 'craft_writs', 'crew_signed', 'decor_access', 'decor_batch_receipt', 'decor_bin', 'decor_hold', 'decor_rev', 'duel_results', 'encounter_reactions', 'fest_finds', 'fest_offerings', 'fest_sales', 'fest_takes', 'firmament', 'firmament_sets', 'gate_kills', 'grant_batches', 'grant_rows', 'grant_tallies', 'guild_castles', 'guild_contract_pays', 'guild_contracts', 'guild_deed_marks', 'guild_fealty', 'guild_invites', 'guild_ledger', 'guild_marks', 'guild_members', 'guild_notes', 'guild_pacts', 'guild_prof_stores', 'guild_renames', 'guild_store_ledger', 'guild_store_moves', 'guild_vault', 'guild_vault_log', 'guild_writ_budgets', 'guild_writ_fills', 'guild_writs', 'guilds', 'hall_writ_days', 'home_decor', 'home_hidden', 'home_moves', 'home_offers', 'home_rooms', 'home_votes', 'home_yards', 'home_yards_ver', 'homes', 'homes_gen', 'hunt_clears', 'item_census', 'item_census_days', 'item_dupes', 'item_uids', 'letters', 'lineages', 'market_auction_reports', 'market_auctions', 'market_bids', 'market_deliveries', 'market_fills', 'market_gold', 'market_gold_prices', 'market_listings', 'market_orders', 'market_patron_sales', 'market_prices', 'market_reports', 'market_sales', 'market_vendor_boards', 'market_vendor_ver', 'marks', 'marks_ledger', 'mod_actions', 'mod_ai_days', 'mod_case_lines', 'mod_cases', 'mod_feed', 'mod_reports', 'motherlode_days', 'motherlode_strikes', 'motherlodes', 'node_harvests', 'npc_chapter_backing', 'npc_chapter_history', 'npc_chapter_merit', 'npc_chapter_patron_bids', 'npc_chapter_seats', 'npc_chapter_weeks', 'npc_chapters', 'npc_hall_regions', 'npc_hall_strikes', 'npc_receipt_credits', 'npc_rep_events', 'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'poi_assets', 'poi_docs', 'poi_feed', 'poi_rev_assets', 'poi_revs', 'poi_shelf', 'poi_upload_days', 'private_reports', 'products', 'prof_brews', 'prof_carried', 'prof_carried_gate', 'prof_choices', 'prof_crafts', 'prof_deposits', 'prof_disenchants', 'prof_masters', 'prof_reforges', 'prof_silver_cloth', 'prof_smelts', 'prof_stock', 'prof_stores', 'prof_tempers', 'prof_tracks', 'prof_unbruised', 'prof_withdrawals', 'progress_hours', 'progress_play', 'ql_steps', 'raid_cleanses', 'raid_spoils', 'rate_limits', 'reaction_batches', 'realm_census', 'realm_characters', 'realm_config', 'realm_faucets', 'realm_findings', 'realm_passes', 'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves', 'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_bounties', 'sea_bounty_owed', 'sea_kills', 'sea_prizes', 'sea_season', 'sea_wrecks', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils', 'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence', 'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches', 'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held', 'town_domain_witness', 'town_econ_acts', 'town_econ_days', 'town_econ_kept', 'town_econ_seen', 'town_econ_struck', 'town_econ_towns', 'town_seat_aftermath', 'town_seat_battles', 'town_seat_binds', 'town_seat_bounties', 'town_seat_bouts', 'town_seat_camps', 'town_seat_edicts', 'town_seat_fields', 'town_seat_fort_held', 'town_seat_fortifier', 'town_seat_forts', 'town_seat_gifts', 'town_seat_hires', 'town_seat_history', 'town_seat_holds', 'town_seat_honours', 'town_seat_influence', 'town_seat_legacy', 'town_seat_levies', 'town_seat_pledges', 'town_seat_red', 'town_seat_renown', 'town_seat_results', 'town_seat_ribbons', 'town_seat_rights', 'town_seat_rosters', 'town_seat_royal', 'town_seat_royal_fields', 'town_seat_settling', 'town_seat_stockpile', 'town_seat_titles', 'town_seat_weeks', 'town_seat_windows', 'wild_escrow', 'wild_falls', 'wild_insurance', 'witness_confirmed', 'world_witness', 'writ_days', 'writs']);   // KETCH (0166): the voyages sailed, an account a voyage (PIN MOVED); // SEAT2a part three: the field, the result, the aftermath, Honours (PIN MOVED); SEAT-HALL: the Charter Room's pieces (PIN MOVED); PROF12 (0070): a brew's row, a disenchant's, the herbs picked unbruised (PIN MOVED); SILVER-WAYS: a guild's deeds and contracts, PROF2b: the Motherlodes (PIN MOVED); ARENA4 (0074) and ARENA4b (0075): the arena's rows, the homes it displaced, a bout's Renown (PIN MOVED); CRAFT4 (0089): a temper's row and a Reforge with Essence's (PIN MOVED); CHAP1 (0091 - 0088, then 0090, on its branch): the Roll - its heads, its rows and its record; CHAP2a (0092 - 0089, then 0091, on its branch): a region's hall writs posted for the day, AUDIT CHAP2 a struck town; CHAP2b (0093 - 0092 on its branch): what a receipt gave; CHAP3a (0094 - 0093 on its branch): Merit - renumbered past SD9b's 0090 at the merge; CHAP3b (0095): the weeks settled and each chapter's Strength; AUDIT CHAP3 S3 (0092, grown in place): a region's chapters computed once a change; CHAP4a (0096): the seats and their Chronicle (PIN MOVED); CARDS6 (0092 - 0088 on its branch, renumbered past main's at the merge): a card table's stakes (PIN MOVED); CHAP6b (0100, grown in place): a chapter's Season's backing (PIN MOVED); CHAP7a (0100 grown in place): a chapter's patronage's bids (PIN MOVED); CARDS10 (0095, 0093 on its branch): Iliac Hand's season board - its games and its champion (PIN MOVED) - the Chapters' 0095-0100 renumbered 0096-0101 past it at the merge; INT2-INT6 (0096 - 0095 on its branch, renumbered past main's Iliac ladder at the merge): the judge's findings, the wealth's hours, the pieces' ledger and its copies, and the review's config (PIN MOVED) - the Chapters' 0096-0101 renumbered 0098-0103 past it and BAG-CRAFT's 0097 at the merge; INT9 (0104 - 0097, then 0098, on its branch, renumbered past BAG-CRAFT's 0097 and the Chapters' 0098-0103 at the merges): a death in the open zone's drop, taken once (PIN MOVED); LW15 (0105, 0097 on its branch, renumbered past main's referee): the patrons' sales and the service's faucets, their own tables (PIN MOVED); FIRM1 (0113 - 0112 on its branch, renumbered past SEAT-FACTS' 0112 at the merge): a character's Firmament and its changes (PIN MOVED); SAFE (0126, 0125 on its branch, renumbered past KEY-LAW's at the merge): a player's blocks, the moderators' cases with their reports, lines and actions, the reviewer's feed and its daily spend (PIN MOVED); INT17 (0127 - 0125, then 0126, on its branch, renumbered past KEY-LAW and SAFE at the merges): a progression stream's bucket and its hours, measured (PIN MOVED); INT19 (0128 - 0127 on its branch, renumbered past SAFE at the merge): a crafted piece's record, held by the market while it is listed or auctioned (PIN MOVED); GRANT2 (0131): the spawn grants' measure, a window once and its rows (PIN MOVED); TOWN-ECON TE2 (0132, renumbered past GRANT2's 0131 at the merge): the towns confirmed, an account's acts at a town a day, a town's days and the Watch's ticks counted (PIN MOVED); AUDIT TOWN-ECON 2 (0132 grown in place): the map ids struck and the shares the clock keeps (PIN MOVED); LEAN-WITNESS (0135, 0133 then 0134 on its branch, renumbered past QL12 and HANDLE-RENAME at the merges): each hall's and seat's confirmation as the database keeps it (PIN MOVED); YARD-SNAP (0136): each town's yards, one row, and its version a row of its own (PIN MOVED; AUDIT LEAN-READS 2 B3); VENDOR-BOARD (0137): each region's traders, one row, and its version a row of its own (PIN MOVED; AUDIT LEAN-READS 2 B3); ARENA-BOARD (0139): each season's board counts, one row, and the arena's one version (PIN MOVED); WITCH1 (0140): the Witches' Festival's finds, sales, offerings and takes (PIN MOVED); STAR7 (0141 - 0140 on its branch, past WITCH1's 0140 when the festival was folded in): a fallen star held, one row a (star, account), and its spoils given to one device (PIN MOVED); STAFF-PANEL1 (0144): the staff panel's keys, invites, sessions and append-only audit (PIN MOVED); SEA-BOUNTY (0146 - 0144, then 0145, on its branch, past STAFF-PANEL1's 0144 and CRAFT-WRITS' 0145 at the merges): a kill at sea, the bounties posted on a wanted captain, and what a fall claimed for its killer (PIN MOVED); SEA-SEASON (0147 - 0145, then 0146, on its branch): a captain's season figures, the deepest voyage and the legends ended (PIN MOVED); SHIP-PVP (0148 - 0146, then 0147, on its branch): a wreck at sea taken once, and its prize's pieces held for its killer (PIN MOVED); STAFF-EVENT (0167 - 0166 on its branch, renumbered past KETCH's 0166 at the merge): the staff events, a row each (PIN MOVED); WOVEN-PAYS (0177 - 0176 on its branch, renumbered past AUDIT GATHER's 0176 at the merge): a character's count of cloth bought with silver, its own table (PIN MOVED); CREW-SIGNED (0179 - 0182 on its branch, renumbered at the merge): a crew hall's recruit held by the account that signed him (PIN MOVED); HUNTERS-MARK (0180 - 0178 on its branch, renumbered at the merge): a paid bounty's clear, a row a character a notice or a mark's week (PIN MOVED)
+  assert.deepEqual(tables, ['arena_attempts', 'arena_board_ver', 'arena_boards', 'arena_champions', 'arena_members', 'arena_pve', 'arena_pvp', 'arena_renown', 'blocks', 'board_notes', 'board_notices', 'board_reports', 'broker_sales', 'commissions', 'craft_writs', 'crew_signed', 'decor_access', 'decor_batch_receipt', 'decor_bin', 'decor_hold', 'decor_rev', 'duel_results', 'encounter_reactions', 'fest_finds', 'fest_offerings', 'fest_sales', 'fest_takes', 'firmament', 'firmament_sets', 'gate_kills', 'grant_batches', 'grant_rows', 'grant_tallies', 'guild_castles', 'guild_contract_pays', 'guild_contracts', 'guild_deed_marks', 'guild_fealty', 'guild_invites', 'guild_ledger', 'guild_marks', 'guild_members', 'guild_notes', 'guild_pacts', 'guild_prof_stores', 'guild_renames', 'guild_store_ledger', 'guild_store_moves', 'guild_vault', 'guild_vault_log', 'guild_writ_budgets', 'guild_writ_fills', 'guild_writs', 'guilds', 'hall_writ_days', 'home_decor', 'home_hidden', 'home_moves', 'home_offers', 'home_rooms', 'home_votes', 'home_yards', 'home_yards_ver', 'homes', 'homes_gen', 'hunt_clears', 'item_census', 'item_census_days', 'item_dupes', 'item_uids', 'letters', 'lineages', 'market_auction_reports', 'market_auctions', 'market_bids', 'market_deliveries', 'market_fills', 'market_gold', 'market_gold_prices', 'market_listings', 'market_orders', 'market_patron_sales', 'market_prices', 'market_reports', 'market_sales', 'market_vendor_boards', 'market_vendor_ver', 'marks', 'marks_ledger', 'mod_actions', 'mod_ai_days', 'mod_case_lines', 'mod_cases', 'mod_feed', 'mod_reports', 'motherlode_days', 'motherlode_strikes', 'motherlodes', 'node_harvests', 'npc_chapter_backing', 'npc_chapter_history', 'npc_chapter_merit', 'npc_chapter_patron_bids', 'npc_chapter_seats', 'npc_chapter_weeks', 'npc_chapters', 'npc_hall_regions', 'npc_hall_strikes', 'npc_receipt_credits', 'npc_rep_events', 'npc_roll', 'npc_roll_heads', 'piece_escrow', 'players', 'poi_assets', 'poi_docs', 'poi_feed', 'poi_rev_assets', 'poi_revs', 'poi_shelf', 'poi_upload_days', 'private_reports', 'products', 'prof_brews', 'prof_carried', 'prof_carried_gate', 'prof_choices', 'prof_crafts', 'prof_deposits', 'prof_disenchants', 'prof_masters', 'prof_reforges', 'prof_silver_cloth', 'prof_smelts', 'prof_stock', 'prof_stores', 'prof_tempers', 'prof_tracks', 'prof_unbruised', 'prof_withdrawals', 'progress_hours', 'progress_play', 'ql_steps', 'raid_cleanses', 'raid_spoils', 'rate_limits', 'reaction_batches', 'realm_census', 'realm_characters', 'realm_config', 'realm_faucets', 'realm_findings', 'realm_passes', 'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves', 'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'sea_bounties', 'sea_bounty_owed', 'sea_kills', 'sea_prizes', 'sea_season', 'sea_wrecks', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils', 'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence', 'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches', 'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held', 'town_domain_witness', 'town_econ_acts', 'town_econ_days', 'town_econ_kept', 'town_econ_seen', 'town_econ_struck', 'town_econ_towns', 'town_seat_aftermath', 'town_seat_battles', 'town_seat_binds', 'town_seat_bounties', 'town_seat_bouts', 'town_seat_camps', 'town_seat_edicts', 'town_seat_fields', 'town_seat_fort_held', 'town_seat_fortifier', 'town_seat_forts', 'town_seat_gifts', 'town_seat_hires', 'town_seat_history', 'town_seat_holds', 'town_seat_honours', 'town_seat_influence', 'town_seat_legacy', 'town_seat_levies', 'town_seat_pledges', 'town_seat_red', 'town_seat_renown', 'town_seat_results', 'town_seat_ribbons', 'town_seat_rights', 'town_seat_rosters', 'town_seat_royal', 'town_seat_royal_fields', 'town_seat_settling', 'town_seat_stockpile', 'town_seat_titles', 'town_seat_weeks', 'town_seat_windows', 'wild_escrow', 'wild_falls', 'wild_insurance', 'witness_confirmed', 'world_witness', 'writ_days', 'writs']);     // KETCH (0166): the voyages sailed, an account a voyage (
   // ACC1b IS IDENTITY ALONE, and the PLAYERS row still is: the save
   // arrived beside it, never inside it.
   const cols = db._raw.prepare('PRAGMA table_info(players)').all().map((c) => c.name);
@@ -277,15 +275,15 @@ test('ACC1b: the migration is the real schema, and applying it twice changes not
   // kills in a row that rolled none (`eg_key_miss`, the pity), the breach it is in and its bound (`eg_live_b`, `eg_live_until`
   // - one at a time), the day of its last Rehearsal (`eg_rh_day`) and whether the first breach's mercy is spent (`eg_mercy`).
   // Counts and facts of play, as `insignia_spent` is; none grants a title or a glyph.
-  // EG-E1 added TWO (0119, unshipped, PIN MOVED): the Panoply passes in a row that drew no piece (`eg_pity` - the tenth
+  // EG-E1 added TWO (0119, unshipped
   // forces one) and the arena week a Valkynaz's Redoubt last found a Weir Key (`eg_valk_wk` - at most one a week). Counts
   // of play, as `eg_key_miss` is; neither grants a title or a glyph.
   // SD9b added ONE (0090): `sd_honours`, what a Brass Remnant's kills granted the account on their first writes (Hourbreaker,
   // The Turning Hour) - a roll that happened, recorded as WB9g's sale is and held for good; the kills are `sd_kills`' rows.
-  // EG-E2 added TWO (0119, renumbered past NAME-AS's 0111, SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges; PIN MOVED): `eg_annals`, the Annals' pages the relay said a member was given (a fact of play), and
+  // EG-E2 added TWO (0119, renumbered past NAME-AS's 0111, SEAT-FACTS' 0112, LAMP-KEEPER II's 0113, FIRMAMENT-ON's 0114, KG6's 0115, POI-1's 0116, SUMMON-REPAIR's 0117 and PVP-ESCROW's 0118 at the merges
   // `eg_honours`, the Spire's honours a recorded Redoubt granted (Spirewalker ... the four Masters) - recorded as `sd_honours`
   // is and held for good; Spire Champion and First of the Spire are read, never columns.
-  // EG-ZF added ONE (0119, unshipped, PIN MOVED): `eg_first`, the first-time lines of the Spire the account has been shown (a
+  // EG-ZF added ONE (0119, unshipped
   // bit a line - Elite-Gates.md section 27.7, once an account) - a fact of play, as `eg_annals` is; it grants nothing.
   // NAME-AS added ONE (0111): `name_as`, which name the room reads - 'character' for the realm character's the token is
   // minted for, null for the account's - the one choice about a name, as `title` is about a title. The name itself is
@@ -299,15 +297,13 @@ test('ACC1b: the migration is the real schema, and applying it twice changes not
   // QL12 added TWO (0133): `ql_titles`, the questlines' titles a claim laid on the row (a bit a line, questlineClaims.js
   // qlTitleBit) - recorded as `sd_honours` is and held for good; and `ql_key`, 1 once the Covens' Hoard paid its Weir Key
   // (once an account) - a fact of play, as `eg_mercy` is.
-  // PIN MOVED (WITCH1, 0134): the Soul Cakes, the wares bought, the cakes given and taken, the profile icon worn
-  // PIN MOVED (STAFF-PANEL1, 0144): `staff_mod`, 1 for a Moderator an Admin added from the staff panel - a fact about the account,
   // read as the role lists are (titles.js isModerator)
-  // STAFF-PANEL2-FIX added four (0156, PIN MOVED): `banned_by`, `mute_admin` and `ban_admin` (who set a ban, and whether
+  // STAFF-PANEL2-FIX added four (0156
   // an Admin set the mute or the ban, which only an Admin lifts or shortens; sanctions.js, accounts.js) and `staff_suspended`
   // (a staff member an owner cut off, read by every role path; titles.js)
-  // STAFF-PANEL5 added seven (0159-0160, PIN MOVED): `staff_hide` (a staff member hidden from every player; staffHidden.js),
+  // STAFF-PANEL5 added seven (0159-0160
   // and the freeze's `frozen_until`, `frozen_reason`, `frozen_by`, `frozen_at`, `freeze_rev` and `freeze_live` (staffFreeze.js)
-  // STAFF-HIDE-TOGGLE added one (0165, PIN MOVED): `staff_hide_on`, Hide me's switch off by default (staffHidden.js) - 0159's
+  // STAFF-HIDE-TOGGLE added one (0165
   // `staff_hide` stays for an older Worker, read by this one no more
   assert.deepEqual(cols.sort(), ['aura', 'ban_admin', 'ban_reason', 'banned_by', 'banned_until', 'conduct_v', 'created_at', 'email', 'fest_bowls', 'fest_cakes', 'fest_given', 'fest_taken', 'fest_wares', 'first_played_at', 'freeze_live', 'freeze_rev', 'frozen_at', 'frozen_by', 'frozen_reason', 'frozen_until', 'glyphs_off', 'guest_name', 'handle', 'handle_lc', 'icon', 'id', 'insignia', 'insignia_spent', 'lamp_title', 'last_seen', 'legal_accepted_at', 'mute_admin', 'muted_by', 'muted_until', 'name_as', 'password', 'patreon_at', 'patreon_status', 'patreon_tiers', 'patreon_user', 'played_at', 'played_s', 'privacy_version', 'ql_titles', 'recovery_hash', 'registered_at', 'renown_hour', 'renown_hour_xp', 'renown_last_credit', 'sd_honours', 'serpent_honours', 'staff_hide', 'staff_hide_on', 'staff_mod', 'staff_suspended', 'terms_version', 'title']);
   // GLYPH-WEAR: `glyphs_off` is the one glyph column, and it grants nothing - it is the choice of which true glyphs to hide
@@ -595,7 +591,7 @@ test('AUDIT-ACC F7: the draw that used to 500 now yields a name, and an account'
 });
 
 test('ACC1b: A GUEST NAME AND A HANDLE CANNOT COLLIDE, and it is structural', async () => {
-  // Mac: "definitely a random name". The guarantee is the SHAPE - a
+  // . The guarantee is the SHAPE - a
   // generated name carries exactly one space and a handle carries none
   // - so no lookup is needed to keep them apart and none can race a
   // rename. The alternative, checking each generated name against the
@@ -924,8 +920,7 @@ test('ACC1-CI: the service hands back its own public key, openly and without a c
 
 // ── ACC1c: USERNAME, PASSWORD, AND THE ONE WAY BACK IN ──────────────
 //
-// Mac (2026-09-21): "I want email completely optional. Username and
-// Password will be the main thing for the account", and "Yes" to a
+// and "Yes" to a
 // recovery code when asked what a player does who forgets one.
 
 test('ACC1c: the stored password is self-describing, so its cost can be raised without logging anybody out', async () => {
@@ -1052,7 +1047,6 @@ test('ACC1c: registering is an UPGRADE IN PLACE, and the code is shown exactly o
   // THE CODE IS NEVER READABLE AGAIN - not from the account, not from
   // anywhere. It is a credential, not a hint.
   assert.ok(!JSON.stringify(acct).includes(reg.body.recoveryCode));
-  // PIN MOVED: RECOVERY-SET - the ONE recovery fact the view carries is the count (the profile's "1 left" for this
   // build-from-before's single code), never a code or its hash: past it, the view still says nothing of recovery
   const { recoveryLeft, ...rest } = acct.account;
   assert.equal(recoveryLeft, 1);
@@ -1223,7 +1217,7 @@ test('ACC1c: no credential of any kind is stored in the clear, or shipped back',
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT-PW (2026-09-22, Mac: "Can you read those") - THE ADVERSARIAL
+// AUDIT-PW - THE ADVERSARIAL
 // READ server-account/src/password.js had never had. AUDIT-ACC named
 // it as unexamined twice and never came back to it.
 // ═══════════════════════════════════════════════════════════════════

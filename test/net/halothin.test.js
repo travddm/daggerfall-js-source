@@ -1,5 +1,4 @@
-// HALO-THIN (2026-10-10, the owner: "For you when you are near a player ... Theres 10 position updates every time.
-// Multiply it by the times the player is near you and its an insane bottleneck"): A HALO HEARS WHERE I AM, NOT EVERY
+// HALO-THIN: A HALO HEARS WHERE I AM, NOT EVERY
 // STEP. Every pose went down my cell's socket AND every halo's, and a listener holding the same rooms heard each pose
 // once per room - two copies astride an edge, four at a corner. Everyone in range of me holds my own cell (wire.js
 // cellHaloFor's symmetry), so its fan alone reaches them; a halo hears a pose when it is due (net/online.js
@@ -7,7 +6,7 @@
 // and every pose while my own cell's socket takes none, while it reaches a player in range who does not hold my cell,
 // or while a referee may stand in a halo (the host's `haloWhole`). AUDIT PEER-RANGE + HALO-THIN: a word for a referee
 // down a halo brings it my latest pose first, and a halo is pinged on its own clock. Design:
-// bible/11-Multiplayer/Scale-Arc.md HALO-THIN.
+// HALO-THIN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -208,7 +207,6 @@ test('HALO-THIN the halos\' own keepalive: standing and turning for half a minut
   const count = new Map(sockets.slice(1).map((ws) => [ws, 0]));
   for (let f = 0; f < 30 * 60; f++) {
     clock.t += 1000 / 60;
-    // PIN MOVED (RPT1026-SECNET, LINE-STALL): my own cell busy HEARS its room too - a cell that hears nothing for PING_MS
     // is pinged, and that ping goes down every halo with it, which is no halo's own clock
     if (f % 6 === 0) sockets[0].receive({ t: 'pong' });
     s.sendPose({ ...start, mv: 0, yaw: f * 0.01 });

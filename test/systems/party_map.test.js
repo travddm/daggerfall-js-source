@@ -1,5 +1,4 @@
-// PARTY-MAP (2026-09-30, Discord: "share map data between party members, possibly with a spell effect so that
-// maintaining some kind of buff for it becomes part of the dungeoneering loop"): SHARED CARTOGRAPHY. The wire's law on
+// PARTY-MAP: SHARED CARTOGRAPHY. The wire's law on
 // both ends, the hub's party-only fan, the session's send and receive, the automap merge (revealed, never trail or
 // visitedThisRun), the sender's batching (buff and dungeon and party, new rows only, capped), and the effect itself
 // (a BUFF_KINDS row, in the Spell Maker, priced at Mysticism, on the spell shop's shelf online).
@@ -225,7 +224,7 @@ test('PARTY-MAP effect: the ready-made spell lands the buff on its caster for a 
   e.roundsRemaining = 5;
   applySpell(sp, 1, me, {}, () => 0.5, { level: 1, entity: me }, {});
   assert.equal(me.activeEffects.filter((a) => a.kind === SHARED_CARTOGRAPHY_KIND).length, 1, 'a recast merges into the incumbent');
-  assert.equal(e.roundsRemaining, 21, 'a recast renews it to a fresh 21 - never adds its 22');   // PIN MOVED (STACK-CAP)
+  assert.equal(e.roundsRemaining, 21, 'a recast renews it to a fresh 21 - never adds its 22');
   const cost = calculateCastCost(sp, me);
   assert.ok(cost.gold > 0 && cost.gold < 1000, `modest: ${cost.gold} gold`);
   assert.ok(cost.sp >= 5 && cost.sp < 60, `and cheap to keep up: ${cost.sp} SP`);

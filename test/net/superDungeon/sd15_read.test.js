@@ -1,5 +1,4 @@
-// SD15 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD15;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE ARENA READ (scenes/superDungeon/sdArenaRead.js, ui/superDungeon/sdTitleCard.js)
+// SD15: THE ARENA READ (scenes/superDungeon/sdArenaRead.js, ui/superDungeon/sdTitleCard.js)
 // - "in it", as the gate's WB13a: a blow of the Remnant's or an Echo's still to land on my feet (the Stomp's disc, the
 // Hand's sweep unshaded by a pillar, a Volley's mark), the soonest, with the nearest way out as the screen turns it; the
 // Stomp's ring rolling out at me, "jump!"; the Hour's own blows over the whole floor none; the burning brass felt on the

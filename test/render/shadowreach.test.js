@@ -1,4 +1,4 @@
-// SHADOW-REACH (2026-09-23, Mac: "Can you tackle the 2 limitations" - the audit's two): THE CASTERS THE VIEW CULL
+// SHADOW-REACH: THE CASTERS THE VIEW CULL
 // REJECTS, AND THE SWAY.
 //
 // The exterior hosts cull what they draw to the view frustum, and the shadow maps are replayed from what they drew -

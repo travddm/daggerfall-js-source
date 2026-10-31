@@ -1,6 +1,6 @@
-// AUDIT DISC7 (2026-09-23, Mac: "Do an audit before we merge"): four lenses over DISC6 + DISC7, every verified finding
+// AUDIT DISC7: four lenses over DISC6 + DISC7, every verified finding
 // paid and pinned here BY EXECUTION where the seam is a function (the by-source pins ride test/systems/disc6.test.js and
-// test/systems/disc7.test.js). The record is bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, section AUDIT DISC7.
+// test/systems/disc7.test.js). The record is, section AUDIT DISC7.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

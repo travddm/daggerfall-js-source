@@ -1,5 +1,4 @@
-// THE Z KEY IN A DUNGEON (2026-08-27, Mac's report: "cannot
-// sheath/unsheath in dungeons").
+// THE Z KEY IN A DUNGEON.
 //
 // ReadyWeapon is polled by every host's frame on an edge
 // (WeaponManager.Update:284 - not GameManager's dispatch chain). U45

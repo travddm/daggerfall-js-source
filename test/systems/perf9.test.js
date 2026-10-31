@@ -1,4 +1,4 @@
-// PERF9 (2026-09-11). The performance probe, and the counter seam it
+// PERF9. The performance probe, and the counter seam it
 // reads. The counter EXECUTES against a stub document and window; the
 // probe is text-pinned (it needs a browser and ARENA2).
 import { test } from 'node:test';

@@ -1,7 +1,6 @@
-// AUDIT CLIMB1 (2026-09-30, Mac: "let's do an audit on this. I want to ensure it's perfect and 1:1 with what I
-// want"): the enhanced climb's first slice audited in four lenses - fidelity to the ask and the four calls, an
+// AUDIT CLIMB1: the enhanced climb's first slice audited in four lenses - fidelity to the ask and the four calls, an
 // adversarial read of the code, the sensor against hostile geometry, and the hosts and records
-// (bible/03-World/Parkour-Arc.md, AUDIT CLIMB1). Every finding below was pinned here RED on the CLIMB1 code before
+// (, AUDIT CLIMB1). Every finding below was pinned here RED on the CLIMB1 code before
 // its fix. The geometry is boxes, and the body's overlap with them is measured EXACTLY (a capsule against an
 // axis-aligned box), never through the collider's own resolve - which reverts a body it would push up into a
 // ceiling and so reads a head through a slab as clear (the reason the fit needs its ray; parkour.js capsuleFits).

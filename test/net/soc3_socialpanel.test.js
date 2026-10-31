@@ -1,7 +1,4 @@
-// SOC3 (2026-09-16, Mac: "A social button next to the chat UI, that when tapped opens the new friends list + party
-// interface. Players should now be able to friend other users, see if they are online/last online + be able to
-// invite friends or other individuals to the new 4 person party system. Party system: Upon joining a party, the
-// players name who are in a party together should turn green"): THE SURFACE.
+// SOC3: THE SURFACE.
 //
 // Driven headless over a fake document and window - the shape chat1.test.js drives its own panel through, copied
 // here rather than shared, because a fake DOM that two slices tune for each other stops being either one's. The
@@ -924,9 +921,7 @@ test('AUDIT SOC C20: a roster row with NOTHING behind it is not a door - which i
   assert.match(rowFor('Zed').className, /\bact\b/, 'a stranger still is one');
 });
 
-// ── FONT1 (2026-09-16, Mac: "Especially the new online interfaces font
-// use our enhanced font ... Any enhanced UI or text must be our
-// enhanced version") ────────────────────────────────────────────────
+// ── FONT1 ────────────────────────────────────────────────
 
 test('FONT1: the friends + party panel and its toast wear the enhanced face, unsmoothed, with the five in their own sheet', () => {
   // `--data` is the MENU's face (the boot screens, the settings pages).
@@ -952,7 +947,7 @@ test('FONT1: the friends + party panel and its toast wear the enhanced face, uns
 
 // ═══ PARTY-UI: THE JOURNEY ON THE PARTY TAB ══════════════════════════
 //
-// 2026-09-26, Mac: "Instead of party chat commands, we need to add the party travel commands to the UI". The chat's
+// 2026-09-26,. The chat's
 // /leader and /travel become buttons on the Party tab, over the one session (systems/party/partyTravel.js - its status,
 // command and respond, pinned in test/systems/party/partytravel.test.js); the tab draws the session's status and redraws on the
 // live pass when it moves, since poses move no version.
@@ -1031,7 +1026,7 @@ test('PARTY-UI: the Party tab\'s Journey - the leader\'s Travel map, the round a
   assert.deepEqual(secs(root), ['Your party (2/8)'], 'no session status (out of a party): none either');
 });
 
-// ═══ AUDIT PARTY-UI (2026-09-27, the read-only audit of PARTY-UI) ═══════
+// ═══ AUDIT PARTY-UI ═══════
 //
 // The Journey block's buttons say why not rather than refuse - or, the leader's Travel map, rather than open a map on a
 // building's floor or turn a round into a journey alone - every answer is the note, and the live pass rebuilds the
@@ -1116,7 +1111,7 @@ test('AUDIT PARTY-UI: the live pass rebuilds the Journey only when its buttons c
   assert.equal(find(root, 'dfsocial-field')[0], field, 'the form stands - the journey is the Party tab\'s alone');
 });
 
-// ═══ AUDIT PARTY-UI2 (2026-09-27, the second audit - of the fixes above) ═══════
+// ═══ AUDIT PARTY-UI2 ═══════
 
 test('AUDIT PARTY-UI2: where two reasons stand, the leader\'s Travel map says the one gathering cannot mend - indoors first, then an old hub, then a round still held for its followers ("The party is still on its way"), and only then "Gather the party first" (mutants: the hub and gathered checks swapped; the held round unread)', () => {
   const party = { id: 'p1', leader: 'acct-me', members: [member('Mac', { acct: 'acct-me' }), member('Bob')] };
@@ -1141,7 +1136,7 @@ test('AUDIT PARTY-UI2: where two reasons stand, the leader\'s Travel map says th
   assert.deepEqual([!!btnBy(bodyRows(root)[2], 'Travel map').disabled, why()], [false, null]);
 });
 
-// PARTY-READY (2026-10-01, Mac: "Also when party readying up, the ui element is hidden"): a cover still closes the panel,
+// PARTY-READY: a cover still closes the panel,
 // but the Party tab a cover took mid-journey comes back when it lifts - the leader's Travel map opened the travel map, the
 // map's cover closed the tab, and the round's count and Call off stood nowhere for the whole ready-up.
 test('PARTY-READY: the Party tab the travel map took comes back when the map closes, and so does one a window took over an open round; a cover with no journey of the tab\'s keeps it closed, as does one over a round that has set out or over another tab (mutants: never put back, put back after any cover, put back on the tab it was not on)', () => {

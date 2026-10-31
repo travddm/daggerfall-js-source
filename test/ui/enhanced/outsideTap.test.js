@@ -1,6 +1,5 @@
-// OT1 - A TAP OUTSIDE ANY UI CLOSES IT (2026-09-12).
+// OT1 - A TAP OUTSIDE ANY UI CLOSES IT.
 //
-// Mac: "make it where tapping outside of any UI closes the UI."
 //
 // One helper on the overlay registry, wired on every enhanced window
 // that stands in a scrim: the pause window, the pack, the spellbook,

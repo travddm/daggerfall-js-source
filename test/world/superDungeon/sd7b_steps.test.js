@@ -1,4 +1,4 @@
-// SD7b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS ON THE
+// SD7b: THE UNMOORED STEPS ON THE
 // PAGE - world/superDungeon/sdStepsModel.js (the meshes and the colliders the steps are), world/superDungeon/sdStepsArt.js (what they wear),
 // scenes/superDungeon/sdSteps.js (the dungeon host's set: stood, moved on the realm's clock, ridden before the motor), and the hosts'
 // wiring - the ride beside the movers', the cast-back, the edge let go over the Steps, Levitate warded in the Hour. And
@@ -63,7 +63,6 @@ function slab(col, key, kind, at) {
 const parkourAt = (skill) => ({ enabled: () => true, inputs: () => ({ climbing: skill, jumping: skill, khajiit: false, enhanced: false, fatigue: 1, load: 0 }), tally: () => {}, say: () => {}, hold: null });
 
 test('SD7b THE STEPS, MADE: each kind a box in its own frame, its top the origin - the Drift\'s, the Beat\'s and the Crumble\'s a slab, a riser reaching past the step it rises from; every face turned out, the collider\'s twelve triangles the same box; what each wears; the checkpoints B and C islands at their heights (mutants: a face turned in; a riser no deeper than a step; the wrong wear)', () => {
-  // PIN MOVED (SD-LOOK S9): each step bevelled (about 36 triangles, a riser's rack of teeth more), one atlas a kind - its
   // drawn box still the law's box exactly, every face but a rack tooth's turned out from its middle (a tooth's from its own)
   assert.deepEqual(SD_STEP_KINDS, ['drift', 'beat', 'riser', 'crumble']);
   assert.deepEqual(stepBox('drift'), { w: SD_DRIFT_SIZE.w, d: SD_DRIFT_SIZE.d, h: SD_STEP_THICK });
@@ -117,7 +116,6 @@ test('SD7b THE STEPS, MADE: each kind a box in its own frame, its top the origin
 });
 
 test('SD7b THE ART: the pictures after the hall\'s - the Crumble\'s cracked stone, its cracks alight and the rest dark; the Beat\'s brass plate, its rim alight and its hub dark - the same pixels every time (mutants: the cracks unlit; the hub alight)', () => {
-  // PIN MOVED (SD-LOOK S9): an atlas a kind (world/superDungeon/sdStepsArt.js SD_STEPS_ATLAS - top, side, the rim's line, the chamfer,
   // the underside), the Beat's twelve frames and its falter, the Crumble's rest and three stages, the parts lit and dark
   const art = stepsArt(), R = SD_STEPS_RECORD;
   assert.deepEqual(art.map(([r]) => r), [R.crumble[0], R.beat[0], R.drift, R.riser, ...R.beat.slice(1), R.falter, ...R.crumble.slice(1), R.parts, R.partsDark]);
@@ -184,7 +182,7 @@ test('SD7b ON THE REALM\'S CLOCK: every step stood where the law has it - the Dr
       else assert.ok(s.kind === 'beat' && beatBlinks(s, t), 'only a blinking step is ever hidden while it stands');
     }
   }
-  // a Beat step's blink: faltered for some of its last 0.4 s, lit for the rest - PIN MOVED (SD-LOOK S9): the falter is its
+  // a Beat step's blink: faltered for some of its last 0.4 s, lit for the rest
   // light (its falter frame, a draw's texRemap), never the plate: a step that holds stays seen
   const s = step(8), falterRec = `${SD_REALM_ARCHIVE}_${SD_STEPS_RECORD.falter}`;
   let lit = 0, faltered = 0;
@@ -259,7 +257,6 @@ test('SD7b THE CRUMBLE, MY OWN: my foot on a Crumble step starts it - its grind 
   st = r.steps.steps[i];
   assert.equal(st.solid, false);
   assert.equal(st.T[1], SD_STEP_GONE_Y, 'its bucket gone - a body falls');
-  // PIN MOVED (SD-LOOK S9): fallen, its draw hidden and its four chunks falling in its stead, at the law's own gravity
   assert.ok(st.matrix.every((x) => x === 0), 'its draw gone');
   assert.ok(st.chunks.length === 4 && st.chunks.every((m) => Math.abs(m[13] - (restOf(i)[1] - SD_STEP_THICK / 2 - 0.5 * SD_CRUMBLE_FALL_G * 0.01 * (1 + 0.06 * (st.chunks.indexOf(m) - 1.5)))) < 1e-4), 'its chunks falling');
   r.steps.ride(t0 + SD_CRUMBLE_DELAY + 4, 1 / 60, null, true);
@@ -312,7 +309,7 @@ test('SD7b THE WARP\'S BREATH: over the Crumble a body is moved through the reso
 });
 
 test('SD7b THE VOID: a body fallen past y -30 is answered with the checkpoint of the span it last STOOD in - A over the Drift, B over the Beat, C over the Crumble - the moan heard; any fall caught, one that stood on no span answered with A; above it, or under a window, nothing (mutants: every fall to A; the void heard nowhere)', () => {
-  // AUDIT SD II (L4 F1 - PIN MOVED): the span the body stood in, never the one its fall crosses the void's floor over;
+  // AUDIT SD II (L4 F1
   // and no fall goes uncaught - this pin held that a fall before the first step was answered with nothing
   const r = rig();
   r.stand();
@@ -437,7 +434,7 @@ function worldCast({ health = 80, max = 100 } = {}) {
     playerEntity, SD_CAST_BACK_LOSS, SD_STEPS_TEXT,
     hurtPlayer: (e, n, o) => { log.push(['hurt', n, !!o?.bypassShield]); e.health -= n; }, flashPlayerDamage: (n) => log.push(['flash', n]),
     setMidScreenText: (t) => log.push(['said', t]),
-    sdSay: (t) => log.push(['said', t]),   // AUDIT SD II (SD11d, PIN MOVED): through the Hour's voice
+    sdSay: (t) => log.push(['said', t]),     // AUDIT SD II (SD11d
   };
   return { sdCastBack: new Function(...Object.keys(env), `${text}\nreturn sdCastBack;`)(...Object.values(env)), log };
 }

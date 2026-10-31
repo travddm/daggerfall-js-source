@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster combat_c - src/combat shieldWidget ..
+// AUDIT 68, cluster combat_c - src/combat shieldWidget ..
 // weaponWidgetMotion: the rig's attack gate and held shot, its module
 // singletons, the EOTB canvas, and the Shield Widget's
 // material, sheet key and parry ring. Every pin drives a real rig or the

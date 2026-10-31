@@ -1,7 +1,7 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE COURT ON THE CLIENT's findings, pinned - a dead player
+// AUDIT WB: THE COURT ON THE CLIENT's findings, pinned - a dead player
 // taken out of the court at no health (B1), a way home walked by the dead (B2), a court entered by the dead (B3), a
 // relay woken from its checkpoint whose attacks passed unfelt (B4), a court the relay would not admit to (B5), a Warden
-// struck after his Wrath (B6), and his death cry heard minutes late (B7). Design: bible/11-Multiplayer/World-Bosses.md
+// struck after his Wrath (B6), and his death cry heard minutes late (B7). Design:
 // section 11.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -92,7 +92,6 @@ test('AUDIT WB B7 his death cry is heard at his fall, not minutes after it: a pl
 test('AUDIT WB B5 the link tells its host the relay\'s refusal of my `in`, with its word; nothing else is a refusal', () => {
   const refused = [], said = [];
   const link = createGateLink({ now: () => 0, say: (s) => said.push(s), onRefused: (m) => refused.push(m) });
-  // PIN MOVED (COURT-WATCH, World-Bosses.md section 24): a full court keeps its watcher - no refusal; a sealed gate still refuses
   link.word({ k: 'no', m: 'the gate is sealed' });
   assert.deepEqual(refused, ['the gate is sealed']);
   assert.deepEqual(said, [GATE_NO_TEXT['the gate is sealed']]);
@@ -105,7 +104,7 @@ test('AUDIT WB B5 the seams: the door asked again once the fire has closed; a re
   const world = read('src/scenes/world.js');
   assert.match(world, /onRefused: \(why\) => \{ if \(modes\?\.gateArenaDay\?\.\(\) != null\) ejectFromCourt\(gateRefusalText\(why\)\); \},/);   // GATE-RELOAD: in what the word means (net/gate/gateLink.js gateRefusalText)
   assert.match(world, /else if \(courtDay != null && online\?\.terminal\) ejectFromCourt\(GATE_NO_TEXT\[online\.error\] \?\? COURT_TEXT\.lost\);/);
-  const refusal = world.slice(world.indexOf('gateRefusal: (g) =>'), world.indexOf('gateRefusal: (g) =>') + 600);   // PIN MOVED (AUDIT WB14 WIRE-1): the longer for the portents' clause
+  const refusal = world.slice(world.indexOf('gateRefusal: (g) =>'), world.indexOf('gateRefusal: (g) =>') + 600);
   assert.match(refusal, /!online\?\.gateOk \|\| online\?\.terminal \|\| \(!!gatePortentsOf\(g\.day\) && !online\?\.portentsOk\) \? GATE_TEXT\.notYet/, 'no relay to hold it (AUDIT WB14 WIRE-1: nor, on a portent night, one from before them)');
   assert.match(refusal, /Number\.isFinite\(gateLink\?\.fellAt\(g\.day\)\) \? GATE_NO_TEXT\['the gate is closing'\]/, 'its master fallen');
   assert.match(refusal, /!gateAdmits\(g\.day, Date\.now\(\) \+ _sharedOffsetMs\) \? GATE_TEXT\.sealed : null/, 'sealed while the fire burned');

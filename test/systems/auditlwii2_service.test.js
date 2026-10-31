@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10), the service's lane: THE LIVING WORLD II's patrons a second time - their law
+// AUDIT LW-II-2, the service's lane: THE LIVING WORLD II's patrons a second time - their law
 // (src/net/patronLaw.js), their reckoning (server-account/src/market.js reckonPatrons), a trader's door (homes.js
 // setHomeEntry), the hour's cron (cron.js), the measure staff read (review.js, tools/realmReview.mjs), the region's
 // traders (marketVendors) and the counter's mark (systems/tradeModes.js markCounterBought, at worldModes.js's two Buy
@@ -236,11 +236,11 @@ test('AUDIT LW-II-2 S2: A PATRON\'S SALE TELLS THE INT4 LEDGER - a rare piece (i
   const a = await run(true);
   assert.deepEqual({ ...a.ledger(a.U) }, { char_id: '', state: 'gone', claim_char: null }, 'the row gone, the claim settled');
   assert.deepEqual(a.raw.prepare('SELECT uid, char_id FROM item_dupes').all().map((x) => ({ ...x })), [{ uid: a.U, char_id: a.R.id }], 'the copy written down, the claimant\'s');
-  assert.equal(a.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(a.R.id).dupes, 0, 'no strike');   // PIN MOVED (AUDIT AUTO-HOLD): contested, as a player's purchase of the piece is - it struck the claimant
+  assert.equal(a.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(a.R.id).dupes, 0, 'no strike');
   assert.deepEqual(a.raw.prepare("SELECT detail FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").all(a.R.id).map((x) => JSON.parse(x.detail)), [{ keys: [a.U], count: 1, contested: true }], 'its finding, said contested');
   // the copy's checkpoints after: found once, and it never takes the piece up
   for (let i = 0; i < 2; i++) { _now += DUPE_GRACE_S + 60; assert.equal((await realmPut(a.s, a.eve, a.R, [a.piece])).status, 200); }
-  assert.deepEqual([a.ledger(a.U).state, a.raw.prepare("SELECT COUNT(*) AS n FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").get(a.R.id).n], ['gone', 1], 'never taken up, found once');   // PIN MOVED (AUDIT AUTO-HOLD): the finding counted, no strike to count
+  assert.deepEqual([a.ledger(a.U).state, a.raw.prepare("SELECT COUNT(*) AS n FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").get(a.R.id).n], ['gone', 1], 'never taken up, found once');
   const b = await run(false);
   assert.equal(b.ledger(b.U), null, 'no copy kept: the row goes');
   assert.deepEqual([b.raw.prepare('SELECT COUNT(*) AS n FROM item_dupes').get().n, b.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(b.R.id).dupes], [0, 0], 'and no one is charged');

@@ -1,4 +1,4 @@
-// LW7b (2026-10-05, bible/06-Systems/Living-World.md "LW7b", Mac: "make friends or enemies"): THE ARMED BEYOND THE
+// LW7b: THE ARMED BEYOND THE
 // WALLS - an armed traveller who counts the player hostile draws on them, an armed friend comes to their fight, and the
 // end is what happens (the slain, the died at their side); a roadside fight's enemies keep the ring; a diving company's
 // hostile draws on the player in the dungeon and its enemies keep away - over mock pools and the synthetic map.
@@ -76,7 +76,7 @@ test('LW7b an armed enemy draws: a member who counts the player HOSTILE within D
   await settle();
   assert.equal(far.spawned.length, 0, 'past DRAW_M, from the sky, nothing able to stand, nowhere');
   // cut down: slain, seen, their party's living turned; the body the pool's own
-  rec.dead = true; rec.corpse = true; rec.killedBy = 'player';   // PIN MOVED (AUDIT LW-III): killed as the pool kills - dead, a corpse; PIN MOVED (AUDIT FB1025i D2): by the player's own hand, as the pool's death door names it
+  rec.dead = true; rec.corpse = true; rec.killedBy = 'player';
   rig.stands.frame([], HERE, T + 2);
   assert.deepEqual(rig.slays, [{ res: BO, t: T + 2, seen: true }]);
   assert.equal(rig.rel.regard(CY.id, DAY), Math.max(-100, EVENTS.struck + EVENTS.slain), 'their party turned against the player');

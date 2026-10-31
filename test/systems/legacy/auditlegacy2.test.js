@@ -1,5 +1,5 @@
-// AUDIT LEGACY II (2026-10-05, Mac: "let's do a deep comprehensive audit on everything so far"): the six-lens audit of
-// Project Legacy - LEGACY1-LEGACY4, AUDIT LEGACY's fixes and LEGACY-HOME - bible/01-Overview/audits/Audit-Legacy-II.md, every
+// AUDIT LEGACY II: the six-lens audit of
+// Project Legacy - LEGACY1-LEGACY4, AUDIT LEGACY's fixes and LEGACY-HOME, every
 // finding pinned here by its id. The law end to end through the real host (scenes/legacyHost.js), the real save
 // records (systems/modSaveData.js), the real store (systems/legacy/store.js), the real Living World town
 // (systems/livingWorld/livingTown.js on the synthetic town) and the real transfer law (systems/item/itemTransfer.js); the
@@ -277,7 +277,6 @@ test('AUDIT LEGACY II A6/A7/F2/B4: the line learns a deed and where a member sta
   assert.deepEqual(f.houses.map((h) => h.location), ['Gothway Garden'], 'the save holds the deed: the line\'s');
   assert.deepEqual(f.people[0].parked, { mapId: HOUSE_A.mapId, buildingKey: HOUSE_A.buildingKey }, 'and the save says where they stand');
   // F2/B4 (AUDIT LEGACY II): online the line learned whatever the host handed it, against the arc. LEGACY7 part five
-  // (PIN MOVED, the law changed by its own slice - Legacy-Arc 10b): the realm keeps the line now, and online the world
   // hands this realm character's online homes - learned with the save as a deed is offline; a list not read yet (null)
   // learns nothing and drops nothing (test/systems/legacy/legacy7_homes.test.js holds the online law whole)
   const o = world({ model: MODELS.enduring });

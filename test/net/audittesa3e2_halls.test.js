@@ -1,5 +1,4 @@
-// AUDIT TESA III E2-5 (2026-10-26; bible/01-Overview/audits/Audit-Tesa-III-E2.md E2-5; the owner: "Take care of exclusions
-// and gaps"): WHAT ONE SOCKET CAN MAKE THE HUB KEEP, BOUNDED. A hub's `wdun` word names any world map pixel as a hall, and
+// AUDIT TESA III E2-5: WHAT ONE SOCKET CAN MAKE THE HUB KEEP, BOUNDED. A hub's `wdun` word names any world map pixel as a hall, and
 // every word kept something - an epoch two days, an emptiness a day, a lock an hour - and wrote the whole record: one
 // signed-in socket at WDUN_HZ_MAX grew it 69 bytes a word, toward Durable Object storage's 2 MB value in four hours
 // (reproduced before the fix: 1,000 words, 1,000 writes, 500 halls in each of the epochs, the empties and the locks).

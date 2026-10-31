@@ -1,6 +1,6 @@
-// WEAPON-POOL (2026-10-06, Mac: "keep the material disparity, but unify all the weapons types condition stat"): EVERY
+// WEAPON-POOL: EVERY
 // WEAPON TYPE WEARS FROM ONE POOL - the Warhammer's 1,600 - through Daggerfall's material ladder, and a save's weapons
-// minted on their rows move to it on load. bible/05-Combat/Physical-Combat-Overhaul.md WEAPON-POOL; Ledger A, WEAPON-POOL.
+// minted on their rows move to it on load. WEAPON-POOL; Ledger A, WEAPON-POOL.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -72,7 +72,7 @@ test('WEAPON-POOL: every weapon type mints one pool, the Warhammer\'s 1,600, thr
 });
 
 test('WEAPON-POOL: the flat costs stop picking a type - a Worm\'s Tooth (the Legendary that rolls on a Dagger or a Tanto) strikes 160 times at iron before it breaks, as a Warp-Edge Claymore does; a Cast-When-Held dagger the item maker made pays its spell\'s first-equip bill (159 - an iron dagger\'s 50 broke on it) and runs four magic rounds a point of what is left, 5,764; 25 blows of 20 damage, which broke an iron short bow, leave it at 1,550 (mutants: the pool\'s number; the weapon test)', () => {
-  // Cast-When-Strikes bills 10 a strike (CastWhenStrikes.cs:30) through the real dispatcher, to the break - PIN MOVED
+  // Cast-When-Strikes bills 10 a strike (CastWhenStrikes.cs:30) through the real dispatcher, to the break
   // (RPT1026-ITEMS RARE-KEPT): the break no longer consumes a laddered piece, so the count runs to its condition's end, and
   // the piece is still in the pack after it (test/systems/rpt1026_items.test.js holds that law)
   const strikesToBreak = (piece) => {

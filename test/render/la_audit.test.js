@@ -1,4 +1,4 @@
-// LA-AUDIT (2026-09-27, the audit before LA's merge - Mac: "Audit before we merge"): SIX LENSES ON THE OVERHAUL, EVERY
+// LA-AUDIT: SIX LENSES ON THE OVERHAUL, EVERY
 // FINDING PROVED BY A DRIVER BEFORE ANYTHING WAS FIXED, AND EACH FIX PINNED HERE. `07-Rendering/Enhanced-Lighting-Arc.md`
 // AUDIT (LA) has the lenses, the numbers and what was declined.
 //   A1  the dungeon's lo maps drew the whole level a face - the batch's shadow cells, culled by cell;

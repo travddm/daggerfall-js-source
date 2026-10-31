@@ -1,5 +1,4 @@
-// REST1 (2026-10-03, bible/06-Systems/Rest-Arc.md; Mac: "Resting is no longer time based online with campfires, beds,
-// camping sets, being the main way to rest", then "Go"): THE REST ACT ONLINE. Online the rest window opens on the act -
+// REST1: THE REST ACT ONLINE. Online the rest window opens on the act -
 // refused with no rest point, or a channel held at a fire or a bed - and lands ONE NIGHT through the host's own rest
 // bag: the timed rest's own session, eight hours, run in one call, so every sub-tick system sees what an eight-hour rest
 // gave it. A second rest inside the night interval (two hours of the character's clock) is a short rest: it heals, and
@@ -66,7 +65,7 @@ test('REST1 the yield: a bed or a fire, Casual\'s rough or the arc off end full;
   assert.deepEqual([short.health, short.fatigue, short.magicka], [30, 300, 21], 'Hard\'s rough short rest: half of what is missing');
 });
 
-// AUDIT REST II (PIN MOVED): a night spent sixteen hours more off the room's expiry, and the play between nights spent
+// AUDIT REST II (
 // the same days again (three days rented, an hour of play between nights: two nights). A room counts NIGHTS now
 // (restAct.js spendRoomNight) - test/systems/auditrest2_party.test.js P6 runs them through a real bag.
 test('REST1 a rented room\'s night: a day rented is a night slept - one of the room\'s nights spent, its expiry left to the days lived; the last spent, the room is over', () => {
@@ -251,7 +250,7 @@ test('REST1 the enhanced card online: the channel card with its meter, the night
 test('REST1 the Next night tile: a buff while the night interval runs, its real minutes at its foot, the campfire glyph; none once a night may pass', async () => {
   const { statusTiles } = await import('../../../src/ui/hud/hudStatus.js');
   const [t] = statusTiles({ rested: { minutes: 7 } });
-  assert.deepEqual([t.key, t.kind, t.name, t.foot, t.glyph], ['rested', 'buff', 'Next night', '7m', 'rested']);   // PIN MOVED (AUDIT C&C, lens S): "Rested" stood beside Boons' Well rested
+  assert.deepEqual([t.key, t.kind, t.name, t.foot, t.glyph], ['rested', 'buff', 'Next night', '7m', 'rested']);
   assert.equal(t.name, REST_ACT_TEXT.rested, 'the act\'s own word for it');
   assert.deepEqual(statusTiles({ rested: { minutes: 0 } }), []);
   assert.deepEqual(statusTiles({ rested: null }), []);

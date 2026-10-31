@@ -1,6 +1,6 @@
-// AUDIT ONLINE 3 (2026-10-16, the user: "audita online.js") - net/online.js read by four lanes, a quarter of the file
+// AUDIT ONLINE 3 - net/online.js read by four lanes, a quarter of the file
 // each, every finding driven through the real OnlineSession over the fake socket before it was believed. The seven
-// worst are fixed and pinned here; the rest are recorded with the audit (bible/06-Systems/Online-Arc.md).
+// worst are fixed and pinned here; the rest are recorded with the audit.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

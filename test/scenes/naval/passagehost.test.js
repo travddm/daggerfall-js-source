@@ -1,4 +1,4 @@
-// PASSAGE (2026-10-19; bible/03-World/Passage.md) - THE VOYAGE'S HOST HALF (scenes/naval/passageHost.js), over stand-in
+// PASSAGE - THE VOYAGE'S HOST HALF (scenes/naval/passageHost.js), over stand-in
 // doors: the booking (her master's ports, the question, all of it or none of it) and the passage's life (sailed on when
 // a voyage stops, over when I step off her - her hold ashore, her boat gone, her record forgotten). AUDIT PASSAGE (lane A):
 // the stand-in runtime moves her hold as Come Sail Away's LayUpBoat does (under her number) and refuses while a player

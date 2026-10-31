@@ -1,8 +1,7 @@
-// SHADER-STALL (2026-10-20, a player via the owner: "Gate shader initialization: 11.43-second stall", "Node-outline shader
-// initialization: 5.65-second stall"): A PASS BUILT IN PLAY NEVER WAITS ON ITS COMPILE. render/glProgram.js starts a
+// SHADER-STALL: A PASS BUILT IN PLAY NEVER WAITS ON ITS COMPILE. render/glProgram.js starts a
 // pass's programs and asks the driver whether they are done without waiting (KHR_parallel_shader_compile); the build that
 // follows takes each started program, so its one read waits on nothing. The world's gate fire, the courts' passes, the
-// nodes' glint (the outline's before NODE-GLINT) and the sea's warm are built through it (bible/07-Rendering/Performance-Priority.md SHADER-STALL).
+// nodes' glint (the outline's before NODE-GLINT) and the sea's warm are built through it (SHADER-STALL).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -246,7 +245,7 @@ test('SHADER-STALL the warm\'s named steps (warmPrograms): a step that names its
   assert.ok(!ran.includes('never'), 'a warm that ends runs nothing more');
 });
 
-// AURA-STALL (#1137) and AURA-SPLIT (#1143, bible/07-Rendering/Performance-Priority.md): the auras' one program was 81 KB
+// AURA-STALL (#1137) and AURA-SPLIT (#1143): the auras' one program was 81 KB
 // of fragment shader, and its build at the first wearer in range held the main thread 8.5-11 s on D3D11 - met on the frame
 // the travel view came down near a crowd, since the view draws no aura. Each look is now a program of its own (67 ms to
 // 1.65 s alone on the same machine), started at the boot's idle and built at its own door the first time its look is drawn.

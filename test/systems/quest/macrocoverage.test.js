@@ -5,7 +5,7 @@
 // gate needs the DFU sparse clone and SKIPS without it - the
 // ARENA2-gate posture; the behavior pins below it run everywhere.
 //
-// E7 (2026-09-02) closed the last thirty-seven rows and deleted the
+// E7 closed the last thirty-seven rows and deleted the
 // ELSEWHERE crutch, so the gate now proves the ONE table IS the whole
 // dictionary - 217 rows, none missing, none invented, C#'s nulls
 // exactly ours.
@@ -236,7 +236,7 @@ test('M-X: the error shapes hold - call-throughs, null rows, and the news pair',
 
 // ── ATTRMACRO1: THE EIGHT ATTRIBUTE DESCRIPTIONS ────────────────────
 //
-// Mac, 2026-09-18: "none of the attribute explanations show actual values." Clicking an attribute on the character
+// Clicking an attribute on the character
 // sheet popped its TEXT.RSC record with the tokens raw - "With your strength of %str, you are considered %ark",
 // "%enc kilograms is your maximum encumbrance". Two things were missing and the box needed both: the window made
 // NO macro pass at all (DFU's line is SetTextTokens(tag, playerEntity.Stats) - a record AND a source), and the

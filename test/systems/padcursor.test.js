@@ -1,5 +1,4 @@
-// PAD-CURSOR (2026-10-08, Port-Ledger A; the player: "For controllers, where applicable, can we add a sort of
-// navigatable cursor? Like destiny? For all the menus"). The controller cursor's Destiny feel - the curve, the ramp,
+// PAD-CURSOR. The controller cursor's Destiny feel - the curve, the ramp,
 // the boost, the friction over a control and the pull to its centre (systems/padCursor.js) - in the game's pad layer
 // on both skins (ui/gamepadInput.js) and at the front door (ui/menu/menuPad.js); `padCursorAssist` off is DFU's linear
 // cursor (test/systems/gamepad.test.js GP3 holds that law).

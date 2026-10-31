@@ -352,7 +352,6 @@ test('AUDIT 62 F8 (review): a held BUTTON releases only the keys the stick does 
 test('AUDIT 62 F8: the tap is the ActivateCenterObject ACTION, read straight into the gate - no synthesized "Mouse0" (mutant: keys.add(\'Mouse0\') back)', () => {
   for (const h of HOSTS) {
     const s = read(h);
-    // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): the street names its press first (`_activateDown`)
     assert.match(s, /(?:down: |const _activateDown = )held\(keys, 'ActivateCenterObject'\) \|\| _tapArmed > 0[,;]/,
       `${h}: a rebind of ActivateCenterObject off Mouse0 must not kill the finger`);
     assert.ok(!/_tapArmed = 2; keys\.add\('Mouse0'\)/.test(s), `${h}: the tap no longer stuffs a literal code into the held set`);
@@ -435,7 +434,6 @@ test('AUDIT 62 F16/F28: the world hosts publish the lock doors and worldModes ar
     assert.ok(!/modeNow\(\) === 'exterior'[^\n]*lockOn\.tick/.test(s), `${h}: the tick must not be gated on the mode`);
   }
   const wm = read('src/scenes/worldModes.js');
-  // PIN MOVED (AUDIT WATCH-KIT WK-P2, 2026-10-01): each arm's pool passes my companion by (`.filter((f) => f.companion ==
   // null)`, the street's law - test/systems/auditwatchkit_ui.test.js runs both arms); re-aimed by content, the arms' own pool
   // and collider as before
   assert.match(wm, /if \(host\.activateDir\?\.\(\) && interiorCtx\) \{\s*\n\s*const f = pickFoe\(eye, dir, interiorFoePool\(\)\.filter\(\(f\) => f\.companion == null\), interiorCtx\.collider, LOCK_PICK_DISTANCE\);[^\n]*\n\s*if \(f\) \{ host\.lockToggle\?\.\(f\); return true; \}/,
@@ -469,7 +467,6 @@ test('AUDIT 62 F8 (review): worldModes\' OWN activate gate sees the finger - its
   const wm = read('src/scenes/worldModes.js');
   const m = /\n\s*down: (.+?),\s*\n\s*hasReadySpell:/.exec(wm);
   assert.ok(m, 'worldModes no longer builds its activate gate with a `down:` input');
-  // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): the press is named before the gate (`_activateDown`), and the
   // act's click is asked with it - its own expression is the one run
   const named = m[1] === '_activateDown' ? /\n\s*const _activateDown = (.+?);\n/.exec(wm) : null;
   assert.ok(m[1] !== '_activateDown' || named, 'the named press is defined');
@@ -560,7 +557,6 @@ test('AUDIT FONT F5/F6: with the enhanced hook the layer AND its naming field ar
     const abc = h.el.children.find((c) => c.textContent === 'abc')
       ?? h.el.children.flatMap((c) => c.children ?? []).find((c) => c.textContent === 'abc');
     abc.fire('touchstart', { preventDefault() {}, stopPropagation() {} });
-    // PIN MOVED (AUDIT RPT1026 L1): the field is the page's own (document.body), over the window that raised it - it was
     // the layer's child, under every DOM window
     const field = globalThis.document.body.children.find((c) => c.style?.cssText?.includes('placeholder') || c.type === 'text');
     return { root: h.el.style.cssText, entry: field?.style?.cssText ?? '' };

@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03) - THE BAKE, SECOND READ: findings GN2-BK1 to GN2-BK5 pinned over tools/fbxMesh.mjs's
+// AUDIT GALLEON-2 - THE BAKE, SECOND READ: findings GN2-BK1 to GN2-BK5 pinned over tools/fbxMesh.mjs's
 // port of Blender's fill, tools/bakeGalleon.mjs and the file it bakes (src/assets/galleon/galleon.json). The first
 // audit (GN-B1) ported the fill as Blender 5.0 holds it; Mac's export was written by Blender 5.1.1 (its SceneInfo says
 // so), and 5.1.0 rewrote the fill's point test and its kd-tree. So the judge here is Blender 5.1.1's own source -

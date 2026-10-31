@@ -1,5 +1,4 @@
-// AUDIT FEUD 2 (bible/12-Enhanced-AI/Feud-Arc.md - the AUDIT FEUD 2 record; Mac, 2026-10-05: "Let's audit this and
-// ensure perfection"): AUDIT FEUD and FEUD BALANCE read again by four lenses - the record and its flows, the hosts and
+// AUDIT FEUD 2 (- the AUDIT FEUD 2 record): AUDIT FEUD and FEUD BALANCE read again by four lenses - the record and its flows, the hosts and
 // the wire, the duel harness's fidelity, the pins and the docs - every finding reproduced before it was fixed.
 // Pinned here: each fix through its real door where it has one (the brain, the street pool, the merge, the deed), its
 // seam where it is a host's; the harness's own steps through its exported helpers and its seeded fights.

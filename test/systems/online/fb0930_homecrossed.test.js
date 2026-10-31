@@ -1,10 +1,8 @@
-// HOME-CROSSED (2026-09-30, FIELD BUGS 2026-09-30 - Seanobi's "Sold House for 600 K, Got Nothing Back": "Tried selling
-// my house for about 600 K and got 0 gold back. Got a strange message in my notes"; bible/01-Overview/
-// Field-Bugs-2026-09-30.md). A home customs carried into the realm (CUSTOMS-CARRY) was never paid for by a realm record
+// HOME-CROSSED. A home customs carried into the realm (CUSTOMS-CARRY) was never paid for by a realm record
 // (`homes.paid` 0, migration 0020), so the service's sale paid its deed share of nothing - and deleted it, house and
 // pieces - while the door asked "Sell your home for 600100 gold?" off the client's own price. The notes held the sale's
 // "You sold your home. 0 gold went to this region's bank account." and a second press's "The account service had a
-// problem. Try again." (the realm act still out: `busy`). The law is RESTORE's (Mac: "Keep all, can't sell"): what
+// problem. Try again." (the realm act still out: `busy`). The law is RESTORE's: what
 // came through customs is never bought back online - it stays a house.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -4,7 +4,7 @@
 // against it, and (that near face gone, the rest seen from behind) the whole neighbour: the street showed where a wall
 // stands. Now the watched frame's glass and cutout sub-meshes are drawn again, depth alone, under the view out's lens,
 // and the street draws only past that depth. Pinned by execution over a recording GL (the bracket's own state is
-// windows1_view.test.js V4's). bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// windows1_view.test.js V4's)..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

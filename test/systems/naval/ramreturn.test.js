@@ -1,6 +1,4 @@
-// RAM-RETURN (2026-10-26, the owner: "So players are complaining about ship ramming being removed. So I would like to
-// reintegrate it in a thoughtful way. The major issue was that you could easily instability ships just by ramming";
-// bible/03-World/Naval-Refit.md RAM-RETURN and AUDIT RAM-RETURN, the owner: "Audit this") - THE RAM BACK, BOUNDED: the
+// RAM-RETURN - THE RAM BACK, BOUNDED: the
 // law's own numbers (systems/naval/navalRam.js: the face, the closing way toward it, the blow, the line, what pays for
 // it); THE BOUND driven through the rams' own module (scenes/naval/navalRams.js) over every player's hull against every
 // class, every way to a storm's and three angles - one ram takes GALLEY_SHARE of the lesser hull at the most, none takes

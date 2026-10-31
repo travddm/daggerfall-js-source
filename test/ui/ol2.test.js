@@ -1,4 +1,4 @@
-// OL2 (Mac, 2026-09-14: "Now tackle #s 5/6") - AUDIT WORLD5's fifth and
+// OL2 - AUDIT WORLD5's fifth and
 // sixth recorded items, paid. (5) THE REST WINDOW SAYS IT IS CLOCK-PACED:
 // under the shared clock the counter moves once per five real minutes and
 // a bare hour count read as a hang; the status carries the world's minutes
@@ -37,11 +37,11 @@ test('OL2 (5): the rest window\'s status carries the world\'s minutes while the 
 });
 
 test('OL2 (5): the clock line says the world\'s time of day (RESTX2: and that a rest does not move it - the pace half went with the shared-clock pacing)', () => {
-  // RESTX2 (2026-09-17) put every mode on the window's own timer, so "an
+  // RESTX2 put every mode on the window's own timer, so "an
   // hour here is 5 real minutes" stopped being true and the line says
   // the one thing that still is: the world's clock, which a rest online
   // never moves. REAL_MINUTES_PER_WORLD_HOUR went with the sentence.
-  // LIVED1 (2026-09-29): and the hours are the character's own - the line says whose time the counter spends
+  // LIVED1: and the hours are the character's own - the line says whose time the counter spends
   assert.equal(restClockLine(CLASSIC_GAME_START_TIME), 'World time 13:30 - you rest on your own clock', 'the classic start, 13:30');
   assert.equal(restClockLine(CLASSIC_GAME_START_TIME + 95), 'World time 15:05 - you rest on your own clock', 'padded');
   void ONLINE_MINUTES_PER_MS;
@@ -62,8 +62,7 @@ test('OL2 (6) + TRAVEL-FARE + LIVED1: online the trip\'s days are the traveller\
   };
   const on = mk(() => true);
   assert.equal(on.w.sleepModeInn, true, 'Inns is still the default toggle');
-  // TRAVEL-FARE (2026-09-22, kurkku: "really long trips ... don't cost
-  // anything"): THE FARE IS BILLED ONLINE NOW, and this pin is the
+  // TRAVEL-FARE: THE FARE IS BILLED ONLINE NOW, and this pin is the
   // reversal's own record. OL2 read "no nights, so no inn", which was
   // right about the nights and wrong about the UNIT - DFU bills the
   // trip's HOURS, and the journey has a length online even though the

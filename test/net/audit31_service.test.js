@@ -1,4 +1,4 @@
-// AUDIT 31 (2026-09-29, Mac: "let's first do a comprehensive audit and ensure everything so far is perfect") - PROF5b
+// AUDIT 31 - PROF5b
 // AND PROF6 AS THE SERVICE KEEPS THEM, AUDITED: an auction whose leading bidder's account is gone closes unsold and
 // every read still answers (S1); a won auction its seller's Marks cap cannot take is void after seven days (S3); a bid
 // another bid overtook is refused in its own word (S4); a commission's fill says why a piece is held (S5); a rank that
@@ -8,7 +8,7 @@
 // it (L9); a writ's escrow waiting on a full treasury says so (A15); the last two minutes' edge (L4); the early words
 // PROF5b recorded as equivalent (R5); the room and the eligible pieces the Work tab reads (U10, U7). Driven through
 // the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Online-Arc.md "AUDIT 31"; bible/06-Systems/Professions-Arc.md 18, 27, 28.
+// "AUDIT 31"; 18, 27, 28.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -41,7 +41,7 @@ async function stand(extra = {}) {
   const held = (who, key) => Object.fromEntries(raw.prepare('SELECT origin, qty FROM prof_stores WHERE player = ? AND char_id = ? AND material = ?')
     .all(who.id, who.character, key).map((r) => [r.origin, Number(r.qty)]));
   const guildMarks = (g) => Number(raw.prepare('SELECT balance FROM guild_marks WHERE guild_id = ?').get(g)?.balance ?? 0);
-  /** A crafted piece this account owns - of its own make (a craft row names it) unless said. PIN MOVED (INT19, Integrity-Arc
+  /** A crafted piece this account owns - of its own make (a craft row names it) unless said.
    *  section 7): an auction, a listing and a fill take the piece out of the realm record, so a realm character's piece
    *  stands there too. */
   const piece = (who, provenance, { recipe = 'longsword:mithril', quality = 4, made = true } = {}) => {
@@ -120,7 +120,6 @@ test('AUDIT 31 S1: an auction whose leading bidder\'s account is gone closes uns
   assert.equal(s.raw.prepare('SELECT owner FROM products WHERE provenance = ?').get(P(2)).owner, mac.id, 'never an owner of NULL');
   const seller = await s.read(mac, 'mine');
   assert.equal(seller.status, 200);
-  // PIN MOVED (INT19): back as the record that left, a delivery its seller's record collects
   assert.deepEqual({ ...s.raw.prepare("SELECT why, player FROM market_deliveries WHERE json_extract(item, '$.provenance') = ?").get(P(2)) }, { why: 'returned', player: mac.id });
 });
 
@@ -146,7 +145,7 @@ test('AUDIT 31 S3: a won auction its seller\'s Marks cap cannot take waits seven
   await s.read(mac, 'mine');
   assert.equal(s.balance(mac), MARKS_MAX, 'the seller paid nothing past the cap');
   assert.deepEqual({ ...s.raw.prepare('SELECT owner, listed FROM products WHERE provenance = ?').get(P(5)) }, { owner: mac.id, listed: 0 });
-  assert.equal(s.raw.prepare("SELECT why FROM market_deliveries WHERE json_extract(item, '$.provenance') = ?").get(P(5)).why, 'returned');   // PIN MOVED (INT19): as its record
+  assert.equal(s.raw.prepare("SELECT why FROM market_deliveries WHERE json_extract(item, '$.provenance') = ?").get(P(5)).why, 'returned');
 });
 
 test('AUDIT 31 S4: a bid another bid overtook between its read and its decision is refused `auction-moved` (a 409 the tab reads again), never "no longer on the market" while it stands', async () => {
@@ -385,7 +384,6 @@ test('AUDIT 31 L2: a piece of a material nothing yields yet is never commissione
   await s.registered('Silverthorn');
   const pia = await s.registered('Pia');
   s.seedMarks(pia, 10_000);
-  // PIN MOVED (DAEDRIC-SMELT, Professions-Arc.md section 53): the Daedric Longsword was refused `commission-unyielded` - the
   // forge smelts its ingot now, and nothing waits on a yield (UNYIELDED stands empty; the heart is the loose door's)
   const r = await s.commission(pia, 'Silverthorn', { recipe: 'longsword:daedric' });
   assert.equal(r.status, 200, JSON.stringify(r.body));
@@ -393,13 +391,13 @@ test('AUDIT 31 L2: a piece of a material nothing yields yet is never commissione
   // commissionUnyielded), a piece no crafter could be sure of making
   const gem = await s.commission(pia, 'Silverthorn', { recipe: 'ring:silver:chipped-sapphire' });
   assert.deepEqual([gem.status, gem.body.error], [409, 'commission-unyielded']);
-  assert.notEqual((await s.commission(pia, 'Silverthorn', { recipe: 'cuirass:warforged' })).body.error, 'commission-unyielded');   // PIN MOVED (AUDIT-SEATS): a siege's Spoils yield the ingot
+  assert.notEqual((await s.commission(pia, 'Silverthorn', { recipe: 'cuirass:warforged' })).body.error, 'commission-unyielded');
 });
 
 test('AUDIT 31 S5: a commission\'s fill says why the piece is held - on its way to the crafter still, listed, or standing in a home', async () => {
   clock(T0);
   const s = await stand();
-  const smith = await s.seated('Silverthorn'), pia = await s.registered('Pia');   // PIN MOVED (INT19): the crafter a realm character
+  const smith = await s.seated('Silverthorn'), pia = await s.registered('Pia');
   s.fund(smith, 10_000); s.seedMarks(pia, 10_000);
   s.piece(smith, P(9), { quality: 3 });
   const l = await s.call('/v1/market/list', { character: smith.character, region: DF, kind: 'piece', provenance: P(9), wear: 1000, price: 50, hubs: HUBS, rid: rid() }, smith.secret);

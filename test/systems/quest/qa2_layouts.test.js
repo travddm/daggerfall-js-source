@@ -1,4 +1,4 @@
-// QUEST-AUDIT II (bible/01-Overview/audits/Quest-Audit-II.md): A QUEST'S STATE WHEN THE LAYOUT IT WAS MADE IN IS NOT THE ONE
+// QUEST-AUDIT II: A QUEST'S STATE WHEN THE LAYOUT IT WAS MADE IN IS NOT THE ONE
 // PLAYED. The town mods (WD3) lay a town anew; the port keeps a save's records in their own layout (systems/layoutPins.js)
 // and chooses a quest's site, or seats its questor, again where the town stands otherwise (place.js reseatMovedSite,
 // person.js reseatMovedQuestor). Four defects of that machinery, each reproduced on the real modules first:
@@ -333,7 +333,6 @@ test('QUEST-AUDIT II SHARED-SEAT: a shared copy chooses again by ONE die per sha
     D.m.restoreSaveData(structuredClone(B.m.getSaveData()));
     const dq = [...D.m.quests.values()][0];
     assert.equal(dq.shareId, envelope.shareId, 'the save keeps its share');
-    // PIN MOVED (QUEST-AUDIT III SHARE-MEMORY; AUDIT QA3 A6): a load keeps the share memory as it was saved - this copy
     // was stamped with a share and never kept in step (B shared nothing), so it loads out of step, the copy QA2 means
     assert.equal(D.m.hasSharedQuestNamed(dq.questName), false, 'loaded as it was saved: out of step');
     dq.rolls = () => own;

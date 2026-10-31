@@ -1,5 +1,4 @@
-// AUDIT LOCKPICK, LANE C (2026-10-26, the owner: "Also ensure this is enhanced ui plus" - bible/01-Overview/audits/
-// Audit-Lockpick.md): THE LOCK'S WINDOW IN THE KIT. The real window (ui/lockpickWindow.js) behind the real door
+// AUDIT LOCKPICK, LANE C: THE LOCK'S WINDOW IN THE KIT. The real window (ui/lockpickWindow.js) behind the real door
 // (ui/lockpickDoor.js) over test/lockDom.mjs, and the real Plus pad poller (ui/gamepadInput.js attachGamepad):
 //   C1 - the window is the stone-and-brass kit's by role (FRAME_ROLES), its layout the Plus sheet's, the pixel face; on
 //        the classic skin it lays the layout and the kit cut to its own selectors, and nothing of another surface.

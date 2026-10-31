@@ -1,5 +1,4 @@
-// DA11 (2026-09-30, Mac: "Everytime DFO updates, even with the launcher, it
-// deletes itself").
+// DA11.
 //
 // The built site shipped beside the app as `extraResources` - 18,354 loose
 // files under resources/dist, 18,430 in the Windows install (read out of the
@@ -30,7 +29,6 @@ const b = JSON.parse(rd('app/package.json')).build;
 test('DA11 the built site is packed into app.asar, never shipped beside it as loose files', () => {
   const sets = b.files.filter((f) => typeof f === 'object');
   // DA12: and the game's pad loop, one module beside the launcher's page - into the archive too
-  // PIN MOVED: AUDIT BR5 - and the product's logo beside it, the game's own file, which the launcher wears
   assert.deepEqual(sets, [{ from: '../src/ui/menu', to: 'launcher', filter: ['menuPad.js'] }, { from: '../src/assets/branding', to: 'launcher', filter: ['dfo-online.png'] }, { from: '../dist', to: 'dist' }], 'dist/ rides the app\'s own files - into the archive');
   assert.notEqual(b.asar, false, 'the archive is what makes it one file');
   assert.equal(b.asarUnpack, undefined, 'and nothing is unpacked back out beside it');

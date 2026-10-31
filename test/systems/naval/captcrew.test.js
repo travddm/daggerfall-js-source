@@ -1,5 +1,4 @@
-// CAPT-CREW (2026-10-11, the owner: "make the decisions and completely make this as detailed as possible, providing depth
-// without overcomplicating systems") - A HAND'S SERVICE, AND WHAT HIS POST IS WORTH (bible/03-World/Captains-Sea.md). The
+// CAPT-CREW - A HAND'S SERVICE, AND WHAT HIS POST IS WORTH. The
 // fights and boardings every hand counted now rank him - Green, Seasoned, Veteran, Old Salt - and a post is worth
 // something, more in a seasoned hand: her Gunner the reload, her Carpenter the mending, her Lookout the hail's reach, her
 // Cook the sea's wear on spirits, her Bosun her way under sail, a boarding-hardened First Mate more hands over the rail.

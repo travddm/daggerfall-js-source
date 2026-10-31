@@ -28,7 +28,6 @@ for (const d of destinations) test(`STAFF-TP: lossless validated destination ${d
 
 test('STAFF-TP: malformed positions, pixels, door identities and destinations fail closed', () => {
   for (const pos of [[NaN, 1, 2], [1, Infinity, 2], [1, 2], [1, 2, 3, 4], ['1', 2, 3], [1e10, 0, 0]]) assert.equal(validStaffDestination({ ...ext, pos }), null);
-  // PIN MOVED (AUDIT RELEASE R2-1): a pixel is the world's grid (wire.js WORLD_PIXEL_BOUND), not the Bay's 0..999 x 0..499 - (-1, 0), (1000, 0) and (0, 500) are land past the Bay now (test/net/auditrelease_r2.test.js)
   for (const pixel of [{ x: 8192, y: 0 }, { x: 0, y: -8192 }, { x: 1.5, y: 0 }, { x: '1', y: 0 }, null]) assert.equal(validStaffDestination({ ...ext, pixel }), null);
   for (const d of [{ ...interior, door: null }, { ...interior, door: { ...interior.door, buildingKey: -1 } }, { ...dungeon, mapId: null }, { ...gate, gate: { ...gate.gate, spot: [] } }, { ...boat, boat: { ...boat.boat, local: [0, NaN, 0] } }, { ...abyss, abyss: { ...abyss.abyss, TemplateRegionIndex: -1 } }, { ...ext, kind: 'made-up' }]) assert.equal(validStaffDestination(d), null);
   assert.deepEqual(parseClient(JSON.stringify({ t: 'stp', k: 'ask', name: 'Bran', nonce: 'n' })), { error: 'stp before hello' });
@@ -219,7 +218,7 @@ test('STAFF-TP dungeon identity selects the target dungeon; interior entry uses 
     restoreInterior: async (_saved, pos) => { assert.equal(pos, null, 'no unchecked target position during the build'); return true; } };
   const prepare = hostFunction('prepareStaffDestination', { gateLink: null, modes, _wodInside: false, playerSpawned: false,
     _teleportToPixel: async () => {}, staffLanding: (d) => d.pos, ohAbyss: null });
-  await prepare(d); assert.deepEqual(calls, [{ locationKey: 'dungeon:9812', holdOpen: true, recorded: { ins: null, whole: false, staff: true } }]);   // PIN MOVED (HOLD-ONCE): staff may land by a player in Privateer's Hold; PIN MOVED (INSTANCES' audit): in the room the player stands in - here its public room
+  await prepare(d); assert.deepEqual(calls, [{ locationKey: 'dungeon:9812', holdOpen: true, recorded: { ins: null, whole: false, staff: true } }]);
   const inst = validStaffDestination({ ...dungeon, locationKey: 'dungeon:9812', ins: '0123456789abcdef.89abcdef' });
   assert.deepEqual([inst.ins, inst.whole], ['0123456789abcdef.89abcdef', true], 'an instance\'s place is the dungeon whole');
   calls.length = 0; await prepare(inst);

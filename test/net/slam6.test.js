@@ -1,4 +1,4 @@
-// SLAM6 (2026-09-16, AUDIT SLAM, before Mac's 30th-anniversary server slam): THE POSE FAN STOPPED ERASING PEOPLE.
+// SLAM6: THE POSE FAN STOPPED ERASING PEOPLE.
 //
 // SLAM1 bounded the fan to the nearest POSE_FAN_MAX listeners and sent the rest NOTHING. That is not a quiet peer,
 // it is a deleted one: the silence law (AUDIT ONLINE B3/B11/B14) HIDES a peer that says nothing for

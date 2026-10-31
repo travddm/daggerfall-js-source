@@ -1,14 +1,13 @@
-// FIELD BUGS 2026-10-19f COMPANION-DROP (the owner, 2026-10-19: "Bag drops; no send-off in zone") had a companion at the
+// FIELD BUGS 2026-10-19f COMPANION-DROP had a companion at the
 // player's side in the open zone drop his pack with theirs - a crew hand ashore, the sworn revenant the zone stands, its
 // pack and its kit - and so kept him at their side there: no send-off, nothing given to one waiting outside, and one
-// knocked out handing what he carried into the player's own pack. STORE-KEEPS (2026-10-26, the owner: "Make it where you
-// cant lose your wagon/horse or anything stored on death"; asked, "Wagon + companions' packs") made every companion's
+// knocked out handing what he carried into the player's own pack. STORE-KEEPS made every companion's
 // pack, kit and coin storage, which no death takes - and the rules that kept them at the side went with the drop they
 // served. The zone still stands one sworn one at the side (PVPDUNGEONS); the lists at the side are still named
 // (systems/wild/wildDropLaw.js wildPacks, wildPacksOf), for the one reader left: an answer from before the word, asked
 // again. Every record here is the game's own: the crew's party out of the real naval host (test/navalSea.mjs), the sworn
 // out of the real feud and its retinue, the packs filled through their own live lists, the record as the save writes it.
-// bible/11-Multiplayer/Wild-Zone.md section 4; bible/03-World/Naval-Combat.md COMPANION-KIT; bible/06-Systems/Revenants.md.
+//  COMPANION-KIT;.
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';

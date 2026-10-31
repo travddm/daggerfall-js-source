@@ -1,4 +1,4 @@
-// WB7 (2026-09-25, Mac: "Proper boss audio during the boss fight"): THE WARDEN'S VOICE AND HIS MUSIC, DRIVEN. The score
+// WB7: THE WARDEN'S VOICE AND HIS MUSIC, DRIVEN. The score
 // (four songs made in code, in the shape the song player plays: tick-ordered, set up at tick 0, whole bars, in range;
 // the harmony each claims - D minor at war, the Neapolitan in his wrath, D major at his fall; the tempos rising); the
 // law of which plays (his phase, the Wrath's last minute, the fall's fanfare then quiet); the music service's door for

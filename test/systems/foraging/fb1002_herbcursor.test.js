@@ -1,5 +1,5 @@
 // HERB-CURSOR (FIELD BUGS 2026-10-02 part four; #bug-reports, "Herbalism minigame bugged": "Doesn't make mouse appear
-// when the minigame starts, so cant click on the targets"; Mac: "Also check the other minigames"). The Basket's glints
+// when the minigame starts, so cant click on the targets"). The Basket's glints
 // stand about the crosshair (ui/professions/profReticle.js BASKET_SPREAD), where no look reaches them - with the mouse locked to the
 // look, moving it toward a glint turned the view and the glint with it. Its act now holds the cursor free while it
 // plays (player/pointerLock.js holdCursor - not the player's own FreeMouse toggle) and hands the look back as it ends,

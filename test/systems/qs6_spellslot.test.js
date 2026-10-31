@@ -1,8 +1,4 @@
-// QS6 (2026-09-17, Mac: "For the new quick bar we introduced, for slot 3, I
-// want to change it to be for spells. So you should be able to hold the
-// keybind to switch between applicable spells, and then press the keybind to
-// equip. Same for 2/3. Pressing the keybind, if not equipped, should equip the
-// slot."): THE SPELL SLOT, AND THE HOLD THAT FILLS A SLOT.
+// QS6: THE SPELL SLOT, AND THE HOLD THAT FILLS A SLOT.
 //
 // TWO THINGS, and they are separable:
 //
@@ -36,8 +32,8 @@ import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { equipItem } from '../../src/systems/equip.js';
 import { potionRecipeKeys } from '../../src/systems/potions.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
-// HB-LYCFREE (2026-09-30): the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
-// diamond was the default, so it chooses the diamond (PIN MOVED: the environment it always ran in, now said).
+// HB-LYCFREE: the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
+// diamond was the default, so it chooses the diamond (
 setPref('quickbarStyle', 'quickbar');
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -99,7 +95,6 @@ test('QS6: the first press takes the book\'s first spell and READIES it through 
   const r = rig({ spells: [spark, bolt(9, 'Shock')] });
   assert.equal(spellQuickslot(), null, 'nothing chosen yet');
 
-  // Mac: "Pressing the keybind, if not equipped, should equip the slot."
   const first = spellQuickslotPress({ entity: r.player, magic: r.magic, say: (l) => r.said.push(l) });
   assert.deepEqual(first, { kind: 'pressed', name: 'Spark', readied: true });
   assert.equal(r.magic.readied(), spark, 'the ENGINE holds it, which is what "equipped" means here');

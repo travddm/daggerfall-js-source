@@ -1,4 +1,4 @@
-// SHIPS-2 (2026-10-07): Mac's Tiny_Ship.fbx - the one scene that holds both new ships (his New Ship 2 and his Tiny Ship,
+// SHIPS-2: Mac's Tiny_Ship.fbx - the one scene that holds both new ships (his New Ship 2 and his Tiny Ship,
 // tools/bakeCarrack.mjs says why it is the one committed) - baked into src/assets/ships/carrack.json and largeBoat.json
 // by tools/shipBake.mjs, the galleon's bake made every ship's: each file re-made to the byte, the scene split between
 // the two ships with nothing read twice and nothing unread, and a scene that has moved under a spec refused.

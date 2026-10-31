@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02b - THE CREW'S WORDS AUDITED (Mac: "Audit this"). FIELD BUGS 2026-10-02's CREW-SAY laid the
+// FIELD BUGS 2026-10-02b - THE CREW'S WORDS AUDITED. FIELD BUGS 2026-10-02's CREW-SAY laid the
 // crew's bubbles clear of each other (ui/naval/navalHud.js layoutCrewLines) - and its audit, over five minutes of real crews
 // at the helm and on deck, found three things wrong with how:
 //   TALK IS HIS OWN   - every line said by two at once was laid once, by no name: right for the chorus and a battle's

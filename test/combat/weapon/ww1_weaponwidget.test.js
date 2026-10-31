@@ -1,6 +1,4 @@
-// WW1 - WEAPON WIDGET 1.6 (RedRoryOTheGlen), THE MOD, 1:1 (2026-09-14,
-// Mac: "This is our next mod I want to add 1:1 while also having it
-// work with morrowind's first person view").
+// WW1 - WEAPON WIDGET 1.6 (RedRoryOTheGlen), THE MOD, 1:1.
 //
 // The mod's script is a compiled DLL (FPSWeaponClone) read off the IL
 // and restated in combat/weapon/weaponWidget.js method by method; the pins
@@ -57,7 +55,7 @@ test('WW1: the Mods pane entry is the shipped modsettings.json - every key, its 
   assert.equal(manifest.Files.filter((f) => /\.png$/i.test(f)).length, 173, 'the 173 double-scale textures the manifest names, none vendored');
   assert.ok(manifest.Files.some((f) => /FPSWeaponClone\.cs$/.test(f)), 'the one script the manifest names and the bundle does not carry');
   const shipped = JSON.parse(rd('vendor/weapon-widget/modsettings.json'));
-  // PLAIN-TEXT (2026-10-19): three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
+  // PLAIN-TEXT: three of the mod's lines said plainly for a player (the idle bob named the shield) - their words, exactly
   const PLAIN = {
     'Bob.BobWhileIdle': 'Whether the weapon will slightly bob while stationary',
     'Step.Length': 'Size of each step. Higher moves in bigger jumps.',

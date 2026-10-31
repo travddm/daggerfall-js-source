@@ -1,9 +1,8 @@
-// DOMAIN3 (2026-10-24, the owner: "A transition to tamriel region control instead of just city control"; asked, "Replace
-// seats"): THE REGION'S CHARTER - from the seat week DOMAINS_WEEK names, one Charter a region, keyed by its seat of power
+// DOMAIN3: THE REGION'S CHARTER - from the seat week DOMAINS_WEEK names, one Charter a region, keyed by its seat of power
 // (the region's seat ranking first by HUB1's own claim, the crown in a crown's region), every other seat town of the
 // region its holding: the seat of power witnessed beside the seat, the pledge a region's Charter alone, a holding's Watch
 // and the region's homes counted there, every Notice Board of the region its bailiwick, and the Turning before the first
-// such week folding every other Charter into its region's (bible/11-Multiplayer/Domains.md section 7; src/net/domainLaw.js,
+// such week folding every other Charter into its region's (; src/net/domainLaw.js,
 // server-account/src/domains.js). Driven through the real Worker over node:sqlite with every migration applied
 // (test/accountDb.mjs).
 import { test } from 'node:test';
@@ -81,11 +80,9 @@ test('DOMAIN3 THE LAW: DOMAINS_WEEK a whole week, ruling from that week on; a se
   assert.deepEqual(['6', ' 7 ', '', undefined, null, 'x', '-1', '6.5', 6].map(domainsWeekOf), [6, 7, null, null, null, null, null, null, 6]);
   assert.deepEqual([domainsRule(6, 6), domainsRule(7, 6), domainsRule(5, 6), domainsRule(7, null)], [true, true, false, false]);
   assert.deepEqual(domainReportOf({ region: 21, key: 3021 }), { region: 21, key: 3021 });
-  // PIN MOVED (WW7-3, bible/03-World/World-Wide.md WW7): 62-70 the provinces'
   for (const bad of [{ region: 71, key: 3021 }, { region: 21, key: -1 }, { region: 21, key: 1.5 }, { region: '21', key: 3021 }, null]) assert.equal(domainReportOf(bad), null, JSON.stringify(bad));
   assert.equal(domainReportText({ region: 21, key: 3021 }), '[21,3021]');
   assert.deepEqual(parseDomainReport('[21,3021]'), { domain: { region: 21, key: 3021 } });
-  // PIN MOVED (WW7-3): 62-70 the provinces'
   for (const bad of ['[21, 3021]', '[21,3021,1]', '{"region":21}', 'x', '[71,3021]']) assert.equal(parseDomainReport(bad), null, bad);
   const seats = new Map([ANTICLERE, RIPMORE, WAYREST, GLENPOINT, { key: 5024, name: 'Wayrest Keep', region: 23, tier: 'palace', pixel: [600, 120] }].map((s) => [s.key, s]));
   const d = domainSeats(seats, new Map([[21, RIPMORE.key], [23, 5024], [18, ANTICLERE.key], [17, 9999]]));
@@ -121,7 +118,7 @@ test('DOMAIN3 THE SEAT OF POWER as every client derives it: a region\'s seat ran
   assert.deepEqual([...seats.powers], [[17, 1700], [21, 3021], [30, 3002]]);
   const none = deriveTownSeats([row({ region: 30, name: 'Twin', mapId: 3004, type: 99 }), row({ region: 30, index: 1, name: 'Hollow', mapId: 3001, type: 99 })], { regionNameOf: () => '' });
   assert.deepEqual([...none.powers], [[30, 3001]], 'no claim on either: the lower key');
-  // measured on the freeware ARENA2 (2026-10-24, scratchpad probe over tools/seatCount.mjs baseRows): 322 seats, 39 regions,
+  // measured on the freeware ARENA2: 322 seats, 39 regions,
   // 37 of the seats of power their region's hub - Wrothgaria for Newing and Aldcester for Koegria the two that are not
 });
 

@@ -1,4 +1,4 @@
-// DISC22-D (2026-09-24, kurkku on Discord, over a classic inventory: "Steel light flail sprite doesn't show up").
+// DISC22-D.
 //
 // THE BUG: the Light Flail is Roleplay Realism Items' template 514, an archive that exists only as the mod's PNGs, one
 // per metal (514_0-0_Steel.png), registered LAZY - decoded when drawn, as DFU's GetItemImage imports it

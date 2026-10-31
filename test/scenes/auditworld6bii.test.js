@@ -1,4 +1,4 @@
-// AUDIT WORLD6b-ii (Mac, 2026-09-14: "Lead the way"): three opus lenses over the hunt - the owner's side (A), the
+// AUDIT WORLD6b-ii: three opus lenses over the hunt - the owner's side (A), the
 // puppet's side and the hit-in (B), the wiring, the merge and the record (C). Twenty-four findings paid at their root;
 // these pins EXECUTE the pay-outs on the encounter pool over a crafted MONSTER.BSA with a net that has peers, an id
 // and a clock of its own.

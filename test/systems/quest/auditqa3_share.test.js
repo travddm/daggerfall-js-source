@@ -1,4 +1,4 @@
-// AUDIT QA3 (2026-10-23, the owner: "Audit this", of QUEST-AUDIT III; bible/01-Overview/audits/Quest-Audit-III.md): the
+// AUDIT QA3: the
 // party share, held to the laws the audit found broken. Each pin runs the real machine and the real share path
 // (prepareQuestShare -> receiveSharedQuest) over two or three machines passing real envelopes, and each is red on the
 // commit the audit read (29624034e) on its own law:

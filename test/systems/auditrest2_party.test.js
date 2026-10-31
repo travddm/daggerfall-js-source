@@ -1,5 +1,4 @@
-// AUDIT REST II - THE PARTY'S NIGHT AND THE ACT (2026-10-03; bible/06-Systems/Rest-Arc.md sections 2 and 5, and its
-// AUDIT REST / AUDIT REST-PARTY as-built bullets). A second pass over the party's night and the rest act, each finding
+// AUDIT REST II - THE PARTY'S NIGHT AND THE ACT. A second pass over the party's night and the rest act, each finding
 // reproduced on the real modules before it was fixed:
 //  P1 nothing limited how often one mate's stamp carried the party (a forged pose: 60 nights in 60 s; two replayed
 //     stamps taking turns: 11) - partyRestLaw.js's night watch: a per-member high-water mark, one move a minute;

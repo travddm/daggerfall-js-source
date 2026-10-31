@@ -1,4 +1,4 @@
-// DW-E4 (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2's FOES OF THE DEEP (jet082), PINNED: the depth table
+// DW-E4 - ILIAC PUDDLE NO MORE 1.2.2's FOES OF THE DEEP (jet082), PINNED: the depth table
 // and its weights against UnderwaterEnemySpawner.DepthAquaticTable; the rare and boss rosters; the column
 // and the place; the floor-bound drop; the attempts off the frequency; the treasure guards' count, ring and
 // view test (DeepWaterWorld); the spawner and the pulse's two lanes through fakes; a foe stood by the real

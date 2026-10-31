@@ -54,7 +54,7 @@ test('TO-ROADS THE SWITCH: the port\'s own key beside First-Person Travel - OFF 
   assert.ok(def, 'declared on Travel Options\' pane');
   assert.equal(def.default, false, 'OFF - First-Person Travel keeps "the original travel option" (Mac, OW-TOGGLE)');
   assert.equal(typeof def.default, 'boolean', 'a toggle');
-  // PLAIN-TEXT (2026-10-19): the words a player reads, exactly - what it does on and off, and that it takes effect at once
+  // PLAIN-TEXT: the words a player reads, exactly - what it does on and off, and that it takes effect at once
   // (read live, as First-Person Travel is - AUDIT OW5 T1; the tile's "when the world next loads" is the mod's other keys');
   // the note that the switch is the port's own is gone from the pane
   assert.equal(def.description, 'With First Person Travel on, journeys follow the roads and tracks as Overworld journeys do, and a place with no way there by land can\u2019t be picked. Off, you head straight for your destination. Takes effect at once.');
@@ -187,8 +187,8 @@ function host({ firstPerson = false, roads = false, enhanced = true } = {}) {
     terrainGen: { roads: () => NET }, maps: { getClimateIndex: climateAt }, woods: { getHeightMapValue: heightAt }, WATER_BYTE, wod: null, _locationToBuild: () => null,
     planRoute, routeGround, routeLegs, joinPoint, routeDrawPoints, roadShare, crossesWater, dryLine, TV_MOUNTAIN_CLIMATE, travelTripLine,
     travelPathUsesRoads, TRAVEL_PATH_TEXT,   // OW-PATH (main's Roads / Free switch on the Overworld's bar): the route asks it
-    freePull,   // PIN MOVED (GRANT3, HOST-SPLIT): tvFreePull's pull is systems/travel/freePull.js
-    planJourney, tvMooredDry, tvSeaAsk,   // PIN MOVED (PLAN-SLICES): the journeys run through the slicer; OWS2's two asks out of the host (systems/travel/seaAsk.js)
+    freePull,
+    planJourney, tvMooredDry, tvSeaAsk,
     tvSeaMeans: () => null, tvSeaBegin: () => {}, csaRuntime: null, csaOn: () => false, csaAboard: { aboard: false },
     tvOfferPassage: (place) => { h.offered.push(place.name); return false; },
     tvCautious: () => false, partyWalkBegin: (dest) => h.party.push(dest), travelGovernor: { reset() {} },
@@ -198,7 +198,7 @@ function host({ firstPerson = false, roads = false, enhanced = true } = {}) {
     TEST_GODMODE: false, staffPowers: () => ({ god: false }), teleportTo: refuse('teleportTo'),   // TESTBUILD: the shipped build's god mode is off
     wildMapMask: () => null, wildInside: () => false,   // WILD1: no open zone on this map
     wagonRiders: null,   // WAGONS2: seated in no one's wagon - the Overworld's own refusal of a rider stands unasked
-    rumareSeaPixel: () => false,   // PIN MOVED (RUMARE-WATER): the voyages' sea takes the Imperial City's lake (world/rumareWaters.js) - none on this map
+    rumareSeaPixel: () => false,
   };
   Object.assign(h, new Function(...Object.keys(env), HOST)(...Object.values(env)));
   Object.assign(h, { to, ui, view });

@@ -1,5 +1,4 @@
-// TOWN-SHAPES TS6 (2026-10-25, the owner: "Its time to move away from perfect squares ... This needs to be perfection";
-// bible/03-World/Town-Shapes.md TS6): the trees, the walkers and the town map follow a town's outline - the woods kept off
+// TOWN-SHAPES TS6: the trees, the walkers and the town map follow a town's outline - the woods kept off
 // its own ground and four tiles past it (not a square cut about it), its people on its ground and never through a wall past
 // the Bay, the wall on its town map; and a wall's chord never cut in across a tight bulge onto a house.
 import { test } from 'node:test';

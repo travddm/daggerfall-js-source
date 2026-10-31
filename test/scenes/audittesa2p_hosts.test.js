@@ -1,5 +1,4 @@
-// AUDIT TESA II, lane P (2026-10-25; bible/03-World/Arena-Provinces.md, bible/03-World/World-Wide.md,
-// bible/11-Multiplayer/Wild-Zone.md) - THE HOSTS PAST THE BAY: the build's hall in the open zone (P1), the zone's halls
+// AUDIT TESA II, lane P - THE HOSTS PAST THE BAY: the build's hall in the open zone (P1), the zone's halls
 // off the places and the rolls and their ground's cost (Z7, Z9), the world's nearest town wired where the rise and
 // /unstuck read it (P2, P3), the journey's door (P4), the living world held to the Bay (P7), the lanes past the Bay at
 // their own reach and scale (P7), the trace's door (P9) and Arena's nearest port (K15) - each lifted off its host and run,
@@ -11,7 +10,7 @@ import { join } from 'node:path';
 import { createZoneHalls } from '../../src/scenes/zoneHallsHost.js';
 import { createWorldPlaces } from '../../src/world/worldWide/worldPlaces.js';
 import { createLivingLanes } from '../../src/scenes/livingWorld/livingLanes.js';
-import { livingSide, LIVING_SIDES } from '../../src/scenes/livingWorld/livingIndex.js';   // PIN MOVED (WW7-7): P7's livingRoams lifted
+import { livingSide, LIVING_SIDES } from '../../src/scenes/livingWorld/livingIndex.js';
 import { portIdOf } from '../../src/world/worldWide/worldPorts.js';
 import { createWorldLanes, beyondLaneWay, worldLaneWater, BEYOND_LANE_MAX_PX, BEYOND_LANE_PATH_PX, LANE_NEAR_PX } from '../../src/scenes/naval/worldLanes.js';
 import { laneNetwork, LANE_PATH_PX, LANE_MAX_PX, LANE_STRAIGHT_STEPS } from '../../src/systems/naval/seaLanes.js';
@@ -30,7 +29,7 @@ const HAVE = !!ARENA2 && existsSync(join(ARENA2, 'MAPS.BSA'));
 const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const W = rd('src/scenes/world.js');
-const STAND = rd('src/scenes/spawnStandHost.js');   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild left world.js, its live names read through `host`
+const STAND = rd('src/scenes/spawnStandHost.js');
 const lift = (text, head, end = '\n  }\n') => { const i = text.indexOf(head); assert.ok(i >= 0, head); return text.slice(i, text.indexOf(end, i) + end.length); };
 afterEach(() => { setTamrielTrace(null); setTamrielFit(null); });
 
@@ -191,7 +190,6 @@ test('AUDIT TESA II Z7/Z9 (ARENA2) THE DAY\'S HALLS ON THE FREEWARE\'S WORLD: th
   assert.ok([...reads.values()].every((n) => n <= 1), 'a pixel\'s plateau read once a session');
 });
 
-// PIN MOVED (WW7-7, bible/03-World/World-Wide.md - the owner, 2026-10-26: "Yes travellers to need to travel everywhere. Same
 // for ships."): P7 held the living world to the Bay until WW7; WW7-7 lifts it - each trip keeps to its own side of the Bay's
 // edge (scenes/livingWorld/livingIndex.js livingSide), and a town past the Bay sails its travellers on the lanes past it
 test('AUDIT TESA II P7 -> WW7-7 THE LIVING WORLD ON BOTH SIDES OF THE BAY\'S EDGE: a town past the Bay a lane\'s traveller as a Bay port\'s is - its port\'s lanes past the Bay, a Bay port\'s the Bay\'s; the sides the Bay\'s and the land past it (mutants: the side law; a lane over the edge)', () => {
@@ -317,7 +315,6 @@ test('AUDIT TESA II P7 THE LIVING INDEX AT THE BAY\'S EDGE: asked from the Bay, 
   assert.equal(idx.townAt(-2, 100)?.name, 'Beyond', 'a record all the same');
 });
 
-// PIN MOVED (WW-GATES-EVERYWHERE, bible/03-World/World-Wide.md): the lanes of the eight provinces stand now (net/wire.js
 // GATE_LANES_OPEN 0 to 8) - the lane that stays shut is Cyrodiil's, the open zone's, and its theatre is the one never scanned
 test('AUDIT TESA II P7 THE GATES PAST THE BAY UNSCANNED WHILE THEIR LANES ARE SHUT: with the places past the Bay on the registry, a theatre whose gate lane does not stand (net/wire.js GATE_LANES_OPEN - Cyrodiil\'s, the open zone\'s) is never scanned - the host\'s scans read the wire\'s law (mutant: the closed lanes scanned)', async () => {
   const { createTheatreGateScans } = await import('../../src/scenes/gate/gateLanes.js');
@@ -356,7 +353,6 @@ test('AUDIT TESA II P2/P3/P4 THE WIRING: the world\'s nearest town (scenes/tamri
   assert.match(W, /const town = etherSea && inEther\(px\.x, px\.y\) \? wildRiseSite\(px\) : nearestTownOf\(px, \(hit\) => hit\.kind === 'city' && !\(_zm && wildNear\(_zm, hit\.mapPixel\.x, hit\.mapPixel\.y\)\)\);/, '/unstuck');
   assert.match(W, /const town = nearestTownOf\(px\);\n\s+if \(town\) land = town\.mapPixel;/, 'the rise past the Bay');
   assert.doesNotMatch(W, /nearestTownPastTheBay|TOWN_RISE_REACH|nearestSafeLocationAnywhere\(maps, px, \(hit\)/, 'no second law');
-  // PIN MOVED (PORTAL-BAY, bible/06-Systems/Portal-Stone.md): the gate's law past the Bay is its third argument - a journey's
   // pastBayJourney unless a teleport hands its own (pastBayTravel.js teleportJourney: teleportTo, Recall, a stone's pick and step)
   assert.match(W, /const wildTravelGate = \(to, spoken = 0, law = pastBayJourney\) => \{/, 'every journey\'s gate: the journey\'s law unless told');
   assert.match(W, /const j = law\(playerTravelPixel\(\), to, online\?\.wildOk \? wildMapMask\(\) : null, wildJourney\(\{/, 'asked after the zone\'s own');

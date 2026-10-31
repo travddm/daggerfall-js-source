@@ -1,4 +1,4 @@
-// SEAT2b part two (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS AT PEACE, THEIR LAW - a
+// SEAT2b part two: THE WORKS AT PEACE, THEIR LAW - a
 // Siegewright's project a day sooner; what the Watchtowers see and say; whether a town is coastal and a Harbour a port
 // for its holder's members; the Shrine's Standing row; the Ram Kit as the Stores hold it (bible/11-Multiplayer/
 // Seats-Arc.md 7.5; Professions-Arc 3.3, 4.8; net/fortLaw.js, net/townSeatLaw.js, net/professionLaw.js,
@@ -29,7 +29,6 @@ test('SEAT2b part two THE SIEGEWRIGHT\'S DAY: a project begun by a Siegewright s
   assert.equal(fortStandsAt(NaN, 1, { siegewright: true }), null);
   assert.deepEqual([isSiegewright({ 100: 'siegewright' }), isSiegewright({ 100: 'master-joiner' }), isSiegewright({ 50: 'siegewright' }), isSiegewright(null)], [true, false, false, false]);
   assert.equal(specOk('carpentry', 100, 'siegewright'), true);
-  // PIN MOVED (CRAFT3, Professions-Arc 41): Carpentry is a discipline of Building - the Siegewright Building's choice at 100
   assert.equal(SPECIALISATIONS.carpentry, undefined, 'no track of its own');
   assert.equal(SPECIALISATIONS.building[100].find((s) => s.id === 'siegewright')?.later, undefined);
   assert.equal(specOk('building', 100, 'siegewright'), true);
@@ -110,7 +109,7 @@ test('SEAT2b part two THE RAM KIT IN THE STORES: a siege work, template 690, tie
   assert.equal(RAM_KIT.key, RAM_KIT_KEY);
   assert.equal(material(RAM_KIT_KEY).value, r.inputs.reduce((a, i) => a + i.n * material(i.key).value, 0), 'the inputs\' worth: a writ\'s pay and a delivery\'s influence keep the materials\'');
   assert.ok(MATERIAL_FAMILIES.some(([f, w]) => f === 'siege' && w === 'Siege Works'));
-  assert.deepEqual([...NO_PACK_FORM], [RAM_KIT_KEY, 'essence:arcane']);   // AUDIT PROF12 E1 (PIN MOVED): and Arcane Essence
+  assert.deepEqual([...NO_PACK_FORM], [RAM_KIT_KEY, 'essence:arcane']);     // AUDIT PROF12 E1 (
   assert.equal(withdrawable(RAM_KIT_KEY), false, 'its road is the writ\'s');
   assert.ok(marketCatalogue().some((m) => m.key === RAM_KIT_KEY && m.family === 'siege'), 'a Stores material lists - a sale makes it bought');
   assert.deepEqual([r.kind, r.rank, recipeOpen(r, 60), recipeOpen(r, 59), takesQuality(r)], ['siege', 60, true, false, false]);

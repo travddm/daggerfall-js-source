@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24, Mac: "a deep comprehensive audit across the entirety of the codebase"), cluster systems_a -
+// AUDIT 68, cluster systems_a -
 // src/systems audio..chargen. The behavioural fixes are pinned by execution on the real producers; the
 // single-sourcing items by the ONE DFU MEMBER, ONE EXPORT law they broke (one binding, and no second body left in
 // the files that had one). Namespace imports and a dynamic import where the base had no such export, so each pin

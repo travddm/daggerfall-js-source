@@ -236,7 +236,6 @@ test('IM1: the %ba cache - the reader\'s load feeds it, an empty author line kee
 });
 
 test('IM1: a dungeon-loot book carries its id - CreateRandomBook\'s message roll, BEFORE the variant', () => {
-  // PIN MOVED at A2 (ROAD TO 1:1): the inline mint in loot.js became a
   // call to books.createRandomBook, the one member all four sites now
   // share, so the source pin on loot.js's expression can no longer see
   // the draw order. The claim is the same and it is now BEHAVIOURAL -
@@ -280,7 +279,7 @@ test('AUDIT 22 F2: a multi-variant record reads ANY of its variants, with alignm
 });
 
 test('ROAD-U (was AUDIT 22 F11): artifact IDENTITY is the enchantment record, not a mint-only flag', async () => {
-  // THIS PIN MOVED, and the law it now holds is DFU's. It used to
+  // THIS
   // assert that createArtifact stamped two BOOLEANS - `oghmaInfinium`
   // on index 5, `azurasStar` on index 9 - and the subtype tests keyed
   // on them. DFU carries no such flags: GetItemInfo asks the item's
@@ -325,8 +324,6 @@ test('ROAD-U (was AUDIT 22 F11): artifact IDENTITY is the enchantment record, no
 
 // ═══ MAC-M1: THE CLASSIC SIDE'S TWO NUMBERS, PINNED AT LAST ═══════
 //
-// Mac, 2026-09-17: "Damage values arent showing on weapon tool tips.
-// Also, not sure if armor has values either."
 //
 // The ENHANCED card was the one at fault and is fixed in
 // `ui/enhanced/enhancedInventory.js`. But "not sure" is the important half of

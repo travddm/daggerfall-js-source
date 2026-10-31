@@ -1,6 +1,5 @@
 // FIELD BUGS 2026-10-19f STEED-KEPT (a player's private report: their horse vanished after dying in a dungeon - not in
-// the pack, not at the stable; the owner, 2026-10-19, answering this session's questions: "Exclude, and return taken
-// ones"). A revenant that kills me takes one piece (RVN8, Feud-Arc.md section 19) - and its law refused letters, quest
+// the pack, not at the stable). A revenant that kills me takes one piece (RVN8, Feud-Arc.md section 19) - and its law refused letters, quest
 // items, summoned pieces, gold, the Materials Bag, pack-only and locked pieces, but not a vehicle or a deed, which the
 // open zone's own law already calls pieces that never change hands (wildDropLaw.js WILD_NEVER_GROUPS). A stable's horse
 // beside a worn longsword and four spare weapons was drawn 165 times in 1,000. Pinned: it never takes a horse, a cart, a

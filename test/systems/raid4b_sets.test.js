@@ -1,11 +1,9 @@
-// RAID4b (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): THE RAIDING PARTIES' OWN SETS AND A TOWN'S THANKS. The three sets' law (systems/sigil/sigilSets.js), each
+// RAID4b: THE RAIDING PARTIES' OWN SETS AND A TOWN'S THANKS. The three sets' law (systems/sigil/sigilSets.js), each
 // power driven through the REAL seam SET2 opened (systems/sigil/sigilSetPowers.js - the fold, the blow, the damage door, the
 // kill, the round, the HUD's chips) with a stand-in for the running host's door and a clock of the test's own, the
 // twenty-seven Aetheric records and the wire's check of them (systems/aetheric.js), the thanks rolled off a receipt's
 // seed (systems/raidSpoils.js), the spoils pool's own keys for them (scenes/spoilsPool.js), and the host's wiring by
-// source (scenes/world.js). Design: bible/03-World/Raiding-Parties.md, "The rewards (RAID4)"; the numbers
-// bible/11-Multiplayer/Sigil-Sets.md section 6b.
+// source (scenes/world.js). Design:, "The rewards (RAID4)"; the numbers
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -90,7 +88,7 @@ function door(foes = [], { feet = [0, 0, 0], me = null, clear = undefined } = {}
 const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)]; };
 
 test('RAID4b the law: three sets after the gate boss\'s own - the Broken Oath (the knights\', party 0), the Thief-Taker\'s Garb (the bandits\', 1), Orcsbane Harness (the orcs\', 2) - Aetheric, the Bay\'s towns their Prince, each tier\'s numbers a whole pair and its words whole; a raiding party names its set and nothing else does; no roll of the world ever lands on one (mutants: a raid set among the world\'s; a party naming the wrong set; a missing party naming a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(5, 8), ['oath', 'thieftaker', 'orcsbane']);   // PIN MOVED (SERPENT-SET): right after the gate boss's own, the serpent's own after them
+  assert.deepEqual(SIGIL_SET_IDS.slice(5, 8), ['oath', 'thieftaker', 'orcsbane']);
   assert.deepEqual([0, 1, 2].map((p) => raidSetOf(p)?.id), ['oath', 'thieftaker', 'orcsbane']);
   for (const p of [3, -1, undefined, null, '1', 1.5]) assert.equal(raidSetOf(p), null, `no set for ${String(p)}`);
   for (const id of ['oath', 'thieftaker', 'orcsbane']) {
@@ -317,7 +315,7 @@ test('RAID4b the HUD\'s chips: No Escape\'s mark while it stands, Iron Hide\'s w
   at(0);
   assert.deepEqual(setHudChips(t), []);
   reportPlayerKill(RAT);
-  assert.deepEqual(setHudChips(t), [{ key: 'mark', set: 'thieftaker', name: 'No Escape', text: '10s', state: 'active', tier: 2 }]);   // PIN MOVED (AUDIT STAR S2): a chip carries its tier, which the HUD's card reads
+  assert.deepEqual(setHudChips(t), [{ key: 'mark', set: 'thieftaker', name: 'No Escape', text: '10s', state: 'active', tier: 2 }]);
   fresh(); online(1);
   const o = wearSet(player(), 'orcsbane', 6);
   door([], { me: o });
@@ -367,7 +365,6 @@ test('RAID4b every raid power sleeps with the sets - offline, in a duel - and fo
 
 test('RAID4b the records: twenty-seven, nine a set in the places\' order - the seven body pieces, the set\'s shield and its ONE-HANDED weapon (so all nine are worn at once) - each of its party\'s make (the knights\' Mithril, the bandits\' Elven, the orcs\' Orcish), three affixes at the Legendary band\'s FLOOR, a weapon\'s blow at its floor too, a line of plain lore; every id its own among every Aetheric record, and the Regalia as it was (mutants: an affix at the top; a raid weapon at the top blow; a record of the wrong make)', () => {
   assert.equal(RAID_SET_PIECES.length, 27);
-  // PIN MOVED (SERPENT-SET): the Regalia, then the raiding parties' - then the Old Coil's own (test/systems/serpentset.test.js)
   assert.deepEqual(AETHERIC_RECORDS.slice(0, REGALIA.length + RAID_SET_PIECES.length), [...REGALIA, ...RAID_SET_PIECES]);
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
   assert.equal(RAID_SET_POWER, SIGIL_BANDS.legendary[0]);

@@ -1,5 +1,4 @@
-// MW-MOUNT (2026-09-26, Mac, over the house's hung weapons and displayed armour: "Morrowind models if activated should
-// show"): A DISPLAYED ITEM HANGS AS ITS MORROWIND PICTURE while a build stands. The picture is the icon's own record
+// MW-MOUNT: A DISPLAYED ITEM HANGS AS ITS MORROWIND PICTURE while a build stands. The picture is the icon's own record
 // (the one item map: a weapon's type and material, an armour's template and material - so a Daedric blade is
 // Morrowind's daedric one), its ground mesh rendered FACE-ON at its own size (combat/fpArm.js mountFrame, mountPicture)
 // rather than the icon's three-quarter view, since it hangs flat on a surface. The room and the decorator's ghost ask
@@ -276,7 +275,7 @@ test('MW-MOUNT: the decorator\'s ghost is the picture the room will hang - the M
 
 // ── the host ─────────────────────────────────────────────────────────
 
-// ── AUDIT DYE-ICON (2026-09-27): the audit of the three, fixed ─────────
+// ── AUDIT DYE-ICON: the audit of the three, fixed ─────────
 
 test('AUDIT DYE-ICON 2: a mount\'s own textures are loaded before it renders - a mesh textured by a file no build draw loaded hangs that file\'s texels, never the magenta warning an unloaded read answers (mutants: the texture preload dropped)', async () => {
   const { arm, archive, textures, build } = await rig();
@@ -413,7 +412,7 @@ test('AUDIT DYE-ICON 5: a refresh lets the old Morrowind pictures go once their 
   assert.deepEqual([released.at(-1), drawn(), textures.has(`mw-mount_${next.key}`)], [`mw-mount_${next.key}`, `tex:mw-mount_${next.key}#4`, true], 'freed, then uploaded anew - the mount draws a live texture');
 });
 
-// ── AUDIT DYE-ICON r3 (2026-09-27): the second audit, fixed ────────────
+// ── AUDIT DYE-ICON r3: the second audit, fixed ────────────
 
 /** The decorator over a REAL room (scenes/decor/decorRoom.js), the tool's pool as the host hands it, and a renderer whose
  *  texture cache is renderer.js's: an upload memoized by key (a second ask is the SAME texture), a release deleting it -

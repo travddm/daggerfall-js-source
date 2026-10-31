@@ -1,6 +1,4 @@
-// DECOR1d (2026-09-25, Mac: the decorator opens from "A UI element that can be clicked to open the decorate panel.
-// Allows free cam mode for placement and an intuitive scrolling menu with filters"; decor "Gold per placement", priced
-// "By size"; online and offline, "kept in the save"): THE DECORATOR. The catalogue read out of the game's own blocks a
+// DECOR1d: THE DECORATOR. The catalogue read out of the game's own blocks a
 // few at a time (systems/decor/decorScan.js), where a new piece stands (systems/decor/decorPlacer.js), the three surfaces
 // (ui/decorPanel.js) driven headless over a fake document, the tool that joins them (scenes/decor/decorTool.js) over fakes of
 // the host's seams, and the host's wiring by source. `06-Systems/Online-Arc.md` DECOR1.

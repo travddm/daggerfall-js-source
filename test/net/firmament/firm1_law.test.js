@@ -1,7 +1,7 @@
-// FIRM1 (2026-10-13) - THE FIRMAMENT'S SKY AND LAW (src/net/firmament/firmamentTree.js, src/net/firmament/firmamentLaw.js): the sky's shape
+// FIRM1 - THE FIRMAMENT'S SKY AND LAW (src/net/firmament/firmamentTree.js, src/net/firmament/firmamentLaw.js): the sky's shape
 // PoE's (seven starts, every star reachable, none crowding another, its keys persisted data), the two purses, the life
 // ring paid by Craft and never a fight, the law's whole-tree judgement, the path preview and the refund's cascade, and
-// THE BUDGET - however the whole sky is spent, no channel past its cap. bible/06-Systems/Firmament.md.
+// THE BUDGET - however the whole sky is spent, no channel past its cap..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -185,7 +185,6 @@ test('FIRM1 law: THE BUDGET - the whole sky allocated at once holds every channe
   assert.deepEqual(capped({ strength: 99, hp: -5, nonsense: 3, spellPower: 0 }), { strength: 15, hp: 0 });
 });
 
-// PIN MOVED (AUDIT UICALM-FIRM1 L5 L3): the build spent 35 of the 98 its title promised, and its trim never ran - it
 // now walks the sky from the Warrior's sign star by star, nearest first (its own 49 first, then on), until the Renown 50
 // purse is spent
 test('FIRM1 law: the PvE budget a real build reaches - a whole Renown 50 purse spent from the Warrior\'s sign adds no more than the caps to a blow and never a channel past one', () => {

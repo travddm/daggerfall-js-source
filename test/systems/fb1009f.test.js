@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-09f (bible/01-Overview/bugs/Field-Bugs-2026-10-09f.md): HELD-REWEAR (a Cast-When-Held piece re-worn
+// FIELD BUGS 2026-10-09f: HELD-REWEAR (a Cast-When-Held piece re-worn
 // within its spell's six hours pays nothing, and the equip bill never breaks it) and HOUSE-WAITS (a line whose
 // Succession waits is answered from the Online page).
 import { test } from 'node:test';

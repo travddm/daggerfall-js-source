@@ -1,5 +1,4 @@
-// PORT-SHIPS (2026-10-27, the owner's field report, item 8: "I went to solitude and the ships at works were inside town
-// walls"; bible/03-World/Holdings.md section 7, PORT-SHIPS) - EVERY PORT ON THE FREEWARE: each harbour sounded through the book
+// PORT-SHIPS - EVERY PORT ON THE FREEWARE: each harbour sounded through the book
 // (systems/naval/harbourBook.js) as the world host hands it - its town's keep (systems/naval/harbourKeep.js) and the
 // ground over the sea's top - on the ground the game builds (test/portShipsWorld.mjs), and every berth's ship measured
 // against this test's own reading of the town: inside its walls or on them, on a landmark over the water (a capital's
@@ -24,11 +23,11 @@ test('PORT-SHIPS (ARENA2): EVERY PORT PAST THE BAY - the 29 harbours sounded as 
   const before = measurePorts(w, w.pastBay, false), now = measurePorts(w, w.pastBay, true);
   assert.deepEqual(Object.fromEntries(before.filter((r) => r.wrong.length).map((r) => [r.name, r.wrong])), {
     'Waterfront District': ['pier'],
-    Solitude: ['arch', 'arch'],   // PIN MOVED (SOLITUDE-RELIEF, bible/03-World/Arena-Provinces.md): on its rock its walls stand on cliffs, the Karth at their feet
+    Solitude: ['arch', 'arch'],
     Alinor: ['walls', 'walls', 'walls', 'walls', 'walls', 'walls'],
     Torval: ['pier', 'pier'],
     Sunhold: ['land'], Woodhearth: ['land', 'land'],
-  }, 'sounded off the water alone');   // PIN MOVED (RELIEF-PEAKS, at its merge into #1184): the land past the Bay stands on the kernel's own large map, so the shores' ground moved - Windhelm's, Winterhold's, Shimmerene's and Skywatch's banks under the sea now, Sunhold's and Woodhearth's over it
+  }, 'sounded off the water alone');
   assert.deepEqual(now.filter((r) => r.wrong.length).map((r) => [r.name, r.wrong]), [], 'every berth stands');
   assert.deepEqual(now.map((r) => [r.name, r.berths.length]), before.map((r) => [r.name, 6]), 'every port its six berths');
   assert.ok(now.every((r) => r.keep), 'every port past the Bay keeps its town (a capital, or a city walled on its outline)');

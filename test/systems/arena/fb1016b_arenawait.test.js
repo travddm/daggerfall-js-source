@@ -1,4 +1,4 @@
-// ARENA-WAIT (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord: "I reloaded my game near the
+// ARENA-WAIT (FIELD BUGS 2026-10-16b,; the Discord: "I reloaded my game near the
 // arena, and I saw that there was the option to fight from the Arena master guy (I've done all 40 fights already for this
 // season), so I hit fight, and it reset my rank, and when I look at the season it doesn't have a number"). On the online
 // lane, before the relay has said whether its arena is open - no session yet, or one no welcome has answered - every
@@ -136,13 +136,12 @@ test('ARENA-WAIT: what is not waiting - off the online lane the save\'s arena as
   sockets[0].receive({ t: 'welcome', id: 'alva-0001', peers: [], host: 'alva-0001', now: Date.now(), v: `world${ARENA_RELAY_MIN - 1}` });
   assert.deepEqual([session.arenaOk, session.arenaHeard, A.live(), A.waiting()], [false, true, false, false], 'a relay without the arena said so: offline');
   assert.ok(gate.heraldChoice({ cityBout: null, healthShare: 1, league: null }).options.some((o) => o.act === 'fight'));
-  // PIN MOVED (ARENA-WAIT AUDIT A4): a seat given up was offline here (O9) - the save's ladder, its purses paid into the
   // realm's save; on the online lane its doors are shut now, in the seat's own words (the next test)
   session = { arenaOk: false, arenaHeard: false, superseded: true, terminal: true };
   assert.deepEqual([A.waiting(), A.shutText(O.climbWait)], [true, SEAT_NOTICE], 'a seat given up is shut, never offline');
 });
 
-// ═══ AUDIT (2026-10-16) ═══════════════════════════════════════════════════════════════════════════════════════════════
+// ═══ AUDIT ═══════════════════════════════════════════════════════════════════════════════════════════════
 const W = ARENA_TEXT.window;
 const kids = (n, cls) => (n?.children ?? []).flatMap((c) => [...(c.classList?.contains(cls) ? [c] : []), ...kids(c, cls)]);
 const one = (n, cls) => kids(n, cls)[0] ?? null;

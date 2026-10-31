@@ -1,4 +1,4 @@
-// HACKED-GOLD (2026-10-12, bible/01-Overview/bugs/Field-Bugs-2026-10-12f.md): "apparently theres people handing out hacked gold
+// HACKED-GOLD: "apparently theres people handing out hacked gold
 // ingame". A modified client handed other players gold no record ever held - and nothing in the realm saw it:
 //   - THE PEER'S WORD. A room's record of a container (WORLD4, WORLD6a), a body's grant (WORLD6b-iii(c)), a foe's heir's
 //     pack (PORTAL1's `it`) and a fallen player's worn offer (WILD1) are a client's word. A coin pile on one is bounded

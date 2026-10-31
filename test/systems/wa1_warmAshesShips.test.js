@@ -1,5 +1,4 @@
-// WA1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - WARM ASHES - SHIPS 1.1 (Kamer).
+// WA1 - WARM ASHES - SHIPS 1.1 (Kamer).
 //
 // Held here: the vendored files (the manifest, the assembly and the IL
 // the port reads, the quests byte for byte, the six variant patches'
@@ -237,7 +236,6 @@ test('WA1 Leave Ship: in region 31, the blocks back to _base and ashore - a lent
   assert.deepEqual(h.calls, [['variant', 'SHIPAA00.RMB', '_base'], ['variant', 'SHIPAA01.RMB', '_base'], ['assign', SHIP_TYPES.Large], ['ship'], ['reset']]);
   assert.equal(isTempShip(), false);
   assert.equal(a.isComplete, true);
-  // PIN MOVED (RAID-ASHORE, 2026-10-17, bible/03-World/Naval-Refit.md): not at sea - the raid was fought where the player
   // stands, and ends there: the blocks back to _base, its foes withdrawn (the host's raidAshore), the quest ended as its
   // own `end quest` ends one (the IL's arm did nothing but complete, and the quest's crew stood on for its hour)
   h = recordingHost({ region: 17 }); setWarmAshesHost(h);

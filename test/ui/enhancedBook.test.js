@@ -1,7 +1,6 @@
-// EB1 - THE ENHANCED BOOK (2026-09-12).
+// EB1 - THE ENHANCED BOOK.
 //
-// Mac: "For the book reader, I was wondering if we could use the
-// animated book in my repo project-raum." Then: "Do it."
+// Then: "Do it."
 //
 // A Daggerfall book read in project-raum's animated book. The face
 // owns no reading law - the classic BookReaderWindow is the model
@@ -32,8 +31,7 @@ test('EB1 door: the reader has ONE construction site, the hook lives there, and 
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
     assert.match(read(f), /import \{ makeOpenBookHook \} from '\.\.\/ui\/bookDoor\.js';/, `${f} opens through the door`);
   }
-  // EB4 (Mac: "tapping use doesn't do anything and then locks me out
-  // of pointerclick in inventory"): the pack hands over THEN closes,
+  // EB4: the pack hands over THEN closes,
   // and the file lands a microtask after `done` and a frame before the
   // slot is dropped - so every host takes the reader over a DONE
   // occupant, and the door raises its canvas only when the host draws.

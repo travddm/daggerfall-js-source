@@ -1,5 +1,4 @@
-// HOUSE-LOSS (2026-09-29, the field through Mac: "GarySoup lost his house and furniture. I suspect a lot of people lost a
-// ton of belongings"). Two roads took them, both reproduced here first:
+// HOUSE-LOSS. Two roads took them, both reproduced here first:
 //   1. THE DELETE THAT TOOK WHAT CUSTOMS CARRIED. Customs carries the offline character's online home, guild place and
 //      track to the realm's id in the census's own batch, before the first save is sent (CUSTOMS-CARRY). A first save
 //      that failed (refused, too large, lost) left a "Never saved" tile whose one live button was Delete - and the
@@ -8,8 +7,7 @@
 //      customs whose first save never landed is UNDONE by its delete (server-account/src/realm.js undoCustoms), and the
 //      door offers "Undo bringing in" on its own route (undoRealm).
 //   2. THE DEED STRIPPED FOR AN EXCESS THE GOLD COULD PAY. Customs stripped whole deeds - a house and every piece bought
-//      for its room, the ship - before a coin of the bank or the purse (AUDIT REALM2 T3's order). RESTORE (Mac: "Keep
-//      all, can't sell"): customs never takes a deed now - every one crosses marked, the realm's bank never buys a crossed
+//      for its room, the ship - before a coin of the bank or the purse (AUDIT REALM2 T3's order). RESTORE: customs never takes a deed now - every one crosses marked, the realm's bank never buys a crossed
 //      one back, and the gold alone is capped (src/systems/realmCustoms.js applyCustoms, crossDeeds).
 // The service's pins drive the REAL Worker over the REAL migrations (node:sqlite behind a D1-shaped face whose batch is
 // one transaction), as test/server/fb0929_customs.test.js does.

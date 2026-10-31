@@ -21,7 +21,7 @@ import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
 import { CLIMATES, REGION_NAMES } from '../../../src/formats/mapsFile.js';
 import { withDom } from '../../invdrag.mjs';
 
-// ═══ AUDIT C&C (2026-10-12): THE TAVERN - I3, I4, I6, I8 ═══
+// ═══ AUDIT C&C: THE TAVERN - I3, I4, I6, I8 ═══
 //
 // The owner: "Make the best decisions. DO a comprehensive audit on everything ensuring perfection". Lens I (the items,
 // the food, the camps, the fires and the tavern) read the tavern against the mod's own source (Ralzar's Climates &

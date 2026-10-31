@@ -1,4 +1,4 @@
-// GRANT-DOOR and FOE-BOUNDS (2026-10-19, Mac: "Spec + B + A"; bible/11-Multiplayer/Spawn-Grants.md sections 19 and 20):
+// GRANT-DOOR and FOE-BOUNDS:
 // THE RELAY'S HALF, over real Rooms (test/fakeRoom.mjs) - while `grantDoor` is on a foes room turns away a build whose
 // hello says no spawn grants (GROUND-GATE's own law: a current build asks nothing, a cold room asks the hub before its
 // first such hello, the hub itself lets anyone in); the relay vouches on every foes frame it fans for a sender whose
@@ -16,7 +16,7 @@ const { subtle } = globalThis.crypto;
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 const P0 = { x: 402 * PIXEL_UNITS + 100, y: 60, z: (499 - 151) * PIXEL_UNITS + 100, yaw: 0, pitch: 0 };
 const CELL = cellRoomOfWire(P0.x, P0.z);
-const CURRENT = { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW };   // PIN MOVED (LEASE1, net/roomLease.js): a current build hands its hub's lease on too - a foes cell is a lease room. PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): and says the loot it reads - one that did not would ask the hub for the loot door
+const CURRENT = { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW };
 
 test('GRANT-DOOR THE WIRE: a hello says `gv` 1 to GRANT_HELLO_LAW_WIRE_MAX, any other value read as none (never refused for it); the setting is `grantDoor`, on or off; the refusal\'s reason fits a WebSocket close (mutants: the field dropped; the range)', () => {
   const hello = (gv) => parseClient(JSON.stringify({ t: 'hello', id: 'mac-0001', secret: 'secret-of-mac-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, gv }), { hasHello: false });

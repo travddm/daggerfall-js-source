@@ -1,4 +1,4 @@
-// PRIMARY-FOLD (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, PRIMARY-FOLD): THE DOOR'S READS IN ONE
+// PRIMARY-FOLD: THE DOOR'S READS IN ONE
 // TRIP. A progression claim asked the account database's one primary four reads of its own - the tombstone of the body's
 // `character`, the account's seat, its stream's bucket at the door, and the bucket again at its spend - each a round trip.
 // The door asks the three as one statement (server-account/src/door.js doorReads), and the spend steps the bucket where it

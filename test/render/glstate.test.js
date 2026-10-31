@@ -152,10 +152,10 @@ test('EV6: the skies neither query CURRENT_PROGRAM nor restore - the hosts mark 
     // WB12d: and the faithful's rite's pillar of smoke, one more in the world host (after the gate's fire)
     // HAZE1: and the heat haze's grab and ring, one more in both hosts (drawn once the opaque world is whole)
     // WINDFALL1: and Windfall's leaves and snow flurries, one more in both hosts (before the haze, which bends them)
-    // SD2c: and a Super dungeon's omen, one more in the world host (after the rite's smoke - PIN MOVED)
-    // POI-3: and the POI editor's lines, one more in the world host (its boxes and handles, after the translucent pass - PIN MOVED)
-    // STAR4: and the Starfall in the sky - an omen, a fall, a landing, a beacon - one more in the world host (after the Hollow's omen - PIN MOVED)
-    const want = host === 'src/scenes/world.js' ? 31 : 8;   // NPC-MARKS (AUDIT NPC-MARKS R1): the marks over the people, one seam on each exterior host (render/npcMarkPass.js - PIN MOVED)   // SHIP-COLOURS: the ships' flags, cloth after the banners, one seam (PIN MOVED)   // PIN MOVED (EG removal): an Elite Breach's own sky and its hall's telegraphs, two seams, went with the Elite Breach   // SD-LOOK: the Rift's window, its floor light and its halos, one seam (PIN MOVED)   // SD8d: the Brass Remnant's blows on the arena's floor (PIN MOVED)   // SD5b: the Shattered Hour's sky (PIN MOVED)   // HOTFIX 1003l: the sky over the arena's floor, through the world host's drawSky hook   // CROWN-HALL: the banners' cloth in a castle's throne room (PIN MOVED)   // LOOT11: the loot lines' two seams, the street's pass and the modes' hook
+    // SD2c: and a Super dungeon's omen, one more in the world host (after the rite's smoke
+    // POI-3: and the POI editor's lines, one more in the world host (its boxes and handles, after the translucent pass
+    // STAR4: and the Starfall in the sky - an omen, a fall, a landing, a beacon - one more in the world host (after the Hollow's omen
+    const want = host === 'src/scenes/world.js' ? 31 : 8;     // NPC-MARKS (AUDIT NPC-MARKS R1): the marks over the people, one seam on each exterior host (render/npcMarkPass.js
     assert.equal((s.match(/renderer\.markForeignPass\(\);/g) || []).length, want,
       `${host} marks its foreign seams (the sky, the rain, the sand, the wisps, the bolts${want === 6 ? ', and the grass' : ''})`);
   }
@@ -393,8 +393,7 @@ test('AUDIT 47: no shader in the tree uses a uniform it did not declare in its o
 
 // ═══ PERF-TEX: THE EMISSION UNIT GETS EV6's TREATMENT ═══════════════
 //
-// Mac, 2026-09-18: "maximum performance with maximum quality. No
-// exceptions." So: not a setting, not a tier - deleted work.
+// So: not a setting, not a tier - deleted work.
 //
 // MEASURED, not guessed, over a real `Renderer` on a logging GL stub
 // (PERF-ON's precedent). The batched static mesh path - what PERF4/5/6
@@ -1150,8 +1149,6 @@ test('PERF-TEX3 AUDIT: a model drawn after a character still has its texture', (
 
 // ── AUDIT-AIR1: THE RESOLVE IS A FOREIGN PASS ──────────────────────
 //
-// Mac, 2026-09-19: "the screenshot shows a bug where sometimes
-// unsheathing, it spawns a weird water texture".
 //
 // It was not water. `airPass.composite()` binds units 0..3 and leaves
 // its own unit selected; `_compositeAir` forgot the PROGRAM and VAO
@@ -1224,8 +1221,7 @@ test('AUDIT-AIR1: the shadow reset is ONE HOME - six copies of a rule is five ch
   // The bug WAS the sixth copy that never got written. A source pin, so
   // a seventh seam cannot be added with its own hand-copied block.
   const src = readFileSync(new URL('../../src/render/renderer.js', import.meta.url), 'utf8');
-  // PIN MOVED (ECOTONE1, 2026-10-07): the terrain's neighbour sets on units 3-5 and the border switch are shadows the
-  // same seams lose, so the one home forgets them too, after the tile size; PRECIP4 (2026-10-19): and the snow's switch
+  // same seams lose, so the one home forgets them too, after the tile size; PRECIP4: and the snow's switch
   assert.match(src, /_forgetTextureShadows\(\) \{\s*\n\s*this\._tex1Bound = null;\s*\n\s*this\._tex0Bound = null; this\._activeUnit = null;\s*\n\s*this\._sq = \{\};\s*\n\s*this\._tArrayTex = null;\s*\n\s*this\._tTileSize = null;\s*\n\s*\(this\._tEcoTex \?\?= \[null, null, null\]\)\.fill\(null\);[^\n]*\n\s*this\._tEcoOn = null;[^\n]*\n\s*this\._tSnowOn = null;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*this\._frameStamp\+\+;\s*\n\s*\}/,
     'the one home exists and clears all six (LA-COST1: and forgets the four frame blocks, whose lane images sit on units too; ECOTONE1: and the neighbour sets)');
   // nobody clears them by hand any more

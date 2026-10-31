@@ -1,6 +1,4 @@
-// POI-3 (2026-10-14; bible/06-Systems/POI-Editor-Arc.md) - THE EDITOR'S CORE, PURE: WHAT A BUILDER CHANGES AND HOW.
-// Mac: "POI Tool (General Map Editor) - Realtime editor ... a tool my developers can use without having to access the
-// codebase ... No short cuts or band aids".
+// POI-3 - THE EDITOR'S CORE, PURE: WHAT A BUILDER CHANGES AND HOW.
 //   - the editing model (src/poi/poiEdit.js): Unity's Euler angles; a place renormalised across its pixel's edges; a
 //     part moved, turned and sized in its POI's frame; keys and new things the law takes; every change one step, a drag
 //     one step, undo and redo with the selection, the saved state compared;
@@ -62,7 +60,7 @@ test('POI-3 THE PLACE: map metres both ways; a move over a pixel\'s east, west, 
   assert.deepEqual([p.px, p.py], [101, 200]); near(p.z, 15, 1e-9);
   movePlace(p, [-20, 0, 0]);  // west
   assert.deepEqual([p.px, p.py], [100, 200]); near(p.x, POI_PIXEL_M - 9.2, 1e-9);
-  // the map's own edges hold - PIN MOVED (AUDIT RELEASE R2-8): the world's grid's (8191 pixels either side of the Bay's corner), not the Bay's
+  // the map's own edges hold
   const corner = { px: -8191, py: -8191, x: 1, z: 818, y: 0, ground: 'snap', r: [0, 0, 0, 1], s: 1 };
   movePlace(corner, [-50, 0, 50]);
   assert.deepEqual([corner.px, corner.py, corner.x], [-8191, -8191, 0]);
@@ -253,7 +251,6 @@ function dirToFrom(from, p) { const d = [p[0] - from[0], p[1] - from[1], p[2] - 
 test('POI-3 WORDS: every code the law, the glTF reader, the mesh and the picture header can say has its own sentence - walked from their sources; a code no table knows is still said; a problem\'s place said by its part\'s name (mutants: a code unsaid; the part by its index when it has a name)', () => {
   const unknown = (s) => /Something is wrong/.test(s);
   assert.match(meshErrorText('too-many-vertices'), /262,144/);
-  // PIN MOVED (AUDIT POI L8): the two a damaged file meets have words of their own; every other mesh code is a damaged model
   assert.match(meshErrorText('index-range'), /names a vertex it does not have/);
   assert.match(meshErrorText('submesh-run'), /malformed/, 'every other mesh code a damaged model');
   assert.match(problemText({ code: 'never-heard' }), /never-heard/);

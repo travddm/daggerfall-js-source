@@ -1,5 +1,4 @@
-// DW2 - THE SPRITES SHIP WITH THE PORT (2026-09-23, Mac: "this needs to
-// be in the codebase, not an attachable file"). public/art/diverse-
+// DW2 - THE SPRITES SHIP WITH THE PORT. public/art/diverse-
 // weapons/ carries Diverse Weapons' 12,624 sprites by the name DFU asks
 // for; the door's index of them is derived from the mod's own manifest
 // (tools/diverseWeaponsIndex.mjs -> combat/diverseWeapons/diverseWeaponsIndex.js), the

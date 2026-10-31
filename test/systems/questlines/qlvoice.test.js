@@ -1,4 +1,4 @@
-// AUDIT QUESTLINES VOICE-QL (2026-10-20): THE QUESTLINES' OWN TEXT IN THE GAME'S VOICE - main's bible/10-UI/Voice.md
+// AUDIT QUESTLINES VOICE-QL: THE QUESTLINES' OWN TEXT IN THE GAME'S VOICE - main's
 // (VOICE1, VOICE2) arrived after this branch was cut, and the house brings a branch's text into it at the merge (that
 // page's "At the merge onto main"). What the overhaul wrote is held here to the page's rules:
 // - rule 8, American spelling, in every sheet's text and named piece (systems/questlines/sheets/*.json), every
@@ -94,7 +94,7 @@ test('AUDIT QUESTLINES VOICE-QL rule 5: no dash aside in a sheet\'s text - an ob
   const at = (quest, pick) => pick(all.find((s) => s.quest === quest));
   // the package's own example, and one of each kind
   assert.equal(at('B0B60Y12', (s) => s.objectives.find((o) => o.id === 'rest').text), 'Burn the corpse of _nobleman_\'s ancestor in ___dungeon_. Destroy it if it walks.');
-  assert.equal(at('QLCH03', (s) => s.branches[0].text), 'Sell the Weir Key to the Guild, or let the Order of the Hour seal it away?');   // PIN MOVED (Elite Gates removed): the key sold, no longer kept
+  assert.equal(at('QLCH03', (s) => s.branches[0].text), 'Sell the Weir Key to the Guild, or let the Order of the Hour seal it away?');
   assert.equal(at('QLCH03', (s) => s.branches[0].choices.find((c) => c.id === 'keep').text), 'Sell it to the Guild');
   assert.equal(at('M0B00Y07', (s) => s.outcomes.find((o) => o.id === 'done').text), 'The animal is dead and the client is safe, for now.');
 });

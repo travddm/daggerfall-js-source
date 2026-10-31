@@ -1,5 +1,4 @@
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss. For example, the oblivion gates. Abyss dungeons, elite breaches, etc"; asked, "Mail the leftovers"): THE
+// LOST-SPOILS: THE
 // SERVICE'S SIDE - server-account/src/lostSpoils.js and its route, /v1/post/lost. A floor's leftovers are written as
 // pieces of the server's post, one an item, from the Lost and Found - only under a kill the service itself recorded for
 // the asking account (a gate's, an Hour's), within the window, each once; and their claim is charged

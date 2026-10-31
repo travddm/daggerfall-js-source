@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 // is why it survived seven slices - so this file makes it checkable.
 //
 // THE INVENTORY, and how to reproduce it. The mod's assembly is
-// `Eye Of The Beholder.dll`, which EOTB-IL (2026-09-16) took out of
+// `Eye Of The Beholder.dll`, which EOTB-IL took out of
 // the shipped `.dfmod` with `tools/eotbIl.mjs` and vendored beside the
 // art, with its whole IL dumped by `tools/ilDump.py` (dnfile + dncil;
 // `monodis` segfaults on it) to `vendor/eye-of-the-beholder/il/`.

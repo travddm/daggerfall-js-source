@@ -1,5 +1,4 @@
-// SOC5 (2026-09-16, Mac: "Players should be able to interact with others in the world upon encountering them by
-// pressing F on their body, which should show options to add as a friend or invite to a party"): F ON A BODY.
+// SOC5: F ON A BODY.
 //
 // FOUR LAWS, and each is driven rather than read where it can be:
 //   - THE ACTION. 'SocialInteract' is appended past DFU's forty-four (the port's own, Ledger A / ONLINE), parses,
@@ -440,7 +439,7 @@ test('AUDIT SOC D3: the port own action YIELDS in the classic windows - a grid a
   resetDefaults(store);
   assert.equal(getBinding(store, 'SocialInteract'), 'KeyF');
   assert.ok(checkDuplicates(createUnsavedKeybinds(store)).ok, 'the untouched defaults clash with nothing');
-  // UXB1-S (2026-09-25): THE SAME KEY IS A SHARE NOW, and a share blocks nothing - so it is never yielded either. The
+  // UXB1-S: THE SAME KEY IS A SHARE NOW, and a share blocks nothing - so it is never yielded either. The
   // yield is for the clash DFU's law still refuses (a combo against its own modifier bound bare), which a classic
   // window cannot show on a port row and so could never clear.
   const enhanced = createUnsavedKeybinds(store);
@@ -531,8 +530,7 @@ test('AUDIT SOC D14: the pick header says the two things it does NOT do - the cy
   assert.equal(pickPeerInFront(cam, fwd, [peer('feet', [0, 0, 0]), peer('ahead', [0, 0, 3])], SOCIAL_REACH, rayPersonDistance).peer.id, 'ahead');
 });
 
-// ── FONT1 (2026-09-16, Mac: "Any enhanced UI or text must be our
-// enhanced version") ────────────────────────────────────────────────
+// ── FONT1 ────────────────────────────────────────────────
 
 test('FONT1: the F-menu over a body is the skin\'s face too, and the two online sheets carry the five each on its own', () => {
   const root = SOCIAL_MENU_CSS.slice(SOCIAL_MENU_CSS.indexOf('\n.dfpeer {'));

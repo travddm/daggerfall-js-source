@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The audit's fixes to the scene, the sites and
+// QUEST-AUDIT III. The audit's fixes to the scene, the sites and
 // the journal windows, each pinned here (questaudit3.test.js holds the story's and the stands'). No game data: every
 // town, dungeon and quest is built here.
 //

@@ -1,4 +1,4 @@
-// SEA-DECK (FIELD BUGS 2026-10-23, the owner after DECK-POSE: "Do the not fixed items" - "Other players also slide when on
+// SEA-DECK (FIELD BUGS 2026-10-23, - "Other players also slide when on
 // board your ship/npc ships"): THE SEA'S OWN SHIPS CARRY WHOEVER STANDS ON THEIR DECKS (scenes/naval/seaDecks.js, wired by
 // the naval host and the world's deck door). A merchantman under sail stood in the player's collider and moved nobody: she
 // sailed out from under the body, her rail shoving it along, and every other screen drew it a play-out behind her. Now her

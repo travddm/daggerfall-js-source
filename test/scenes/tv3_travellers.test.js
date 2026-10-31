@@ -1,5 +1,4 @@
-// TV3 (2026-09-28, bible/06-Systems/Travel-View.md, Mac: "being able to see other players traveling also"; his call:
-// "Region-wide from the start").
+// TV3.
 //
 // Pinned here: the wire's mark (net/wire.js validTravellerMark - the seven keys and no eighth, each in its range - its
 // frame, its parse arm, its gates and its relay version), the relay over a real Room (a region's channel keeps each
@@ -40,12 +39,12 @@ const MARK = Object.freeze({ px: 207, py: 213, fx: 12, fy: 250, h: 64, m: 1, tv:
 // ── THE WIRE ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 test('TV3 wire: a mark is seven keys and no eighth, each in its range - refused WHOLE otherwise; `tv` absent reads 0 (OW-CHASE-RANGE, world230: its chase words ride BESIDE the mark, never as an eighth key - AUDIT OW-REVISITED L4-1, test/systems/travel/ow_chaserange.test.js)', () => {
-  assert.deepEqual(TRAV_KEYS, ['px', 'py', 'fx', 'fy', 'h', 'm', 'tv']);   // PIN MOVED BACK (AUDIT OW-REVISITED L4-1): an eighth key dropped the traveller from every older client's book - the chase words ride beside the mark
+  assert.deepEqual(TRAV_KEYS, ['px', 'py', 'fx', 'fy', 'h', 'm', 'tv']);
   assert.deepEqual(validTravellerMark(MARK), MARK);
   assert.deepEqual(validTravellerMark({ ...MARK, tv: undefined }), { ...MARK, tv: 0 });
   assert.deepEqual(TRAV_MODES, ['foot', 'horse', 'cart', 'ship']);
   for (const [why, p] of [
-    ['an eighth key', { ...MARK, name: 'Lord Nobody' }], ['off the world east', { ...MARK, px: WORLD_PIXEL_BOUND }], ['off the world north', { ...MARK, py: -WORLD_PIXEL_BOUND }],   // PIN MOVED (TV-BEYOND): off the MAP is the land past the Bay
+    ['an eighth key', { ...MARK, name: 'Lord Nobody' }], ['off the world east', { ...MARK, px: WORLD_PIXEL_BOUND }], ['off the world north', { ...MARK, py: -WORLD_PIXEL_BOUND }],
     ['a byte past 255', { ...MARK, fx: 256 }], ['a negative', { ...MARK, fy: -1 }], ['a fraction', { ...MARK, h: 1.5 }],
     ['a fifth way', { ...MARK, m: 4 }], ['a journey that is not 0 or 1', { ...MARK, tv: 2 }], ['a string number', { ...MARK, px: '207' }],
     ['an array', [1, 2, 3]], ['nothing', null],

@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The fixes the audit made, each pinned here:
+// QUEST-AUDIT III. The fixes the audit made, each pinned here:
 //
 // - STORY-AGAIN (#982, "Add way to reset a failed mandatory main quest"): a step of the main story that ended without
 //   succeeding - S0000012's two days run out, a `_no_` - and whose story went no further is started again from the
@@ -54,7 +53,6 @@ const ticks = (m, n = 5) => { for (let i = 0; i < n; i++) m.tick(); };
 const run = (m, name) => { const q = m.startQuestByName(name); ticks(m); return q; };
 
 test('STORY-AGAIN: the main story is the S group by number - the world\'s backbone, the Totem\'s aftermath (S00001xx) and the guilds\' series (S00005xx) apart; a script says its successors, the globals it sets and the work a global would run again (mutants: the backbone, the aftermath, the guilds, the padding, each read)', () => {
-  // PIN MOVED (AUDIT QA3 B5/B6): S0000500 is the Fighters Guild's Lord K'avar, S0000106 the Totem's powers
   assert.deepEqual(['S0000012', 's0000020', 'S0000988', 'S0000500', 'S0000503', 'S0000106', 'S0000100', 'S0000999', 'S0000977', '_BRISIEN', 'A0C00Y41', 'S000012'].map(isMainStoryQuest),
     [true, true, true, false, false, false, false, false, false, false, false, false]);
   assert.deepEqual(storySuccessors(['\tstart quest 20 20 ', '-- start quest 7 7', '\tstart quest _child_', 'x start quest 3 3']), ['S0000020', '_CHILD_']);

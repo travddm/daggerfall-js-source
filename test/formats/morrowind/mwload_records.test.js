@@ -152,7 +152,6 @@ test('MW-LOAD: the answer survives JSON whole, and the envelope is refused when 
   // a master that carries nothing the build asks for still answers the shape
   const empty = extractArmRecords(new Uint8Array([...rec('TES3', [sub('HEDR', new Array(300).fill(0))])]));
   assert.ok(isArmRecords(empty));
-  // PIN MOVED (MWNPC9, bible/04-Characters/Morrowind-NPCs.md section 14): the shape carries the creatures (v5)
   assert.deepEqual(empty, { version: ARM_RECORDS_VERSION, parts: [], races: [], armors: [], clothes: [], weapons: [], lights: [], magicEffects: [], statics: [], creatures: [], gmst: {} });
   assert.equal(isArmRecords({ ...back, creatures: undefined }), false, 'MWNPC9: a set from before the creatures (v4) is not this shape - and its version says so first');
   assert.equal(isArmRecords({ ...back, version: 4 }), false, 'MWNPC9: the version moved past it');

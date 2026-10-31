@@ -1,4 +1,4 @@
-// PLAN-SLICES (2026-10-26, the owner: "No band aids"; bible/06-Systems/Travel-View.md PLAN-SLICES) - A JOURNEY'S PLAN IN
+// PLAN-SLICES - A JOURNEY'S PLAN IN
 // SLICES OF CELLS. The Overworld's planner ran as one call, and a plan past the Bay that found no way spent its whole count
 // (up to 300,000 cells, seconds) inside one frame. Its body is a generator (travelRoute.js planRouteSteps), the world
 // host's two journeys run through the slicer (systems/travel/planSlices.js), and a plan its first slice does not finish

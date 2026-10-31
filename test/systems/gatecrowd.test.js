@@ -1,12 +1,10 @@
-// GATE-CROWD (2026-10-07, Mac: "We need to not allow followers inside the oblivion gates, plus need some type of filter
-// when there are too many people"): THE COURT, ALONE AND THINNED. GATE-ALONE - no companion steps into an Oblivion
+// GATE-CROWD: THE COURT, ALONE AND THINNED. GATE-ALONE - no companion steps into an Oblivion
 // Gate's court (scenes/world.js companionPlace answers no place there, so the companion layer, scenes/crewAshore.js,
 // lifts the crew's hands and the sworn as the player steps in and stands them again outside), the party panel draws no
 // card for them there, and the court says so once as a fighter steps in with any at their side. THE CROWD - past the
 // count on the Other players card only the nearest other players are drawn, the party always, the places held against a
 // newcomer only a little nearer (net/gate/gateCrowd.js; the online frame's drawn list) - in a court, and since
-// CROWD-WIDE (2026-10-23, the owner: "Can we implement the player toggle we have for the oblivion gate into the entire
-// game?") everywhere a stranger cannot fight me, my duel's opponent always. Design: bible/11-Multiplayer/World-Bosses.md
+// CROWD-WIDE everywhere a stranger cannot fight me, my duel's opponent always. Design:
 // section 21.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -205,7 +203,7 @@ test('GATE-CROWD the online frame: the drawn list cut after the map\'s poses are
   // ...and the doors that answer a player on this screen: one the crowd leaves undrawn is not there to press, aim a gift
   // at, hand a page or hear struck (INVIS-NET's law for the concealed) - the crosshair's pick and the plaque, a gift's
   // aim and its burst, a page, a blow's spark and a cry
-  assert.match(WORLD, /const crowdDrawnHere = \(p\) => gateCrowd\.shows\(p\.id\) && peerRange\.shows\(p\.id\);/);   // PIN MOVED (PEER-RANGE): and the distance's
+  assert.match(WORLD, /const crowdDrawnHere = \(p\) => gateCrowd\.shows\(p\.id\) && peerRange\.shows\(p\.id\);/);
   assert.match(WORLD, /const peerInSight = \(eye, dir\) => \{\n\s*const hit = pickPeerInFront\(eye, dir, openPeers\(peersNear\(\), isPartyMate\)\.filter\(crowdDrawnHere\), SOCIAL_REACH, rayPersonDistance\);/, 'the F key and the plaque');
   assert.match(WORLD, /const giftablePeers = \(list\) => openPeers\(list, isPartyMate\)\.filter\(\(p\) => !\(duelMgr\.fighting && p\.id === duelMgr\.opponent\) && crowdDrawnHere\(p\)\);/, 'a gift\'s aim and its burst');
   assert.match(WORLD, /const pageReaders = \(\) => \{[\s\S]{0,200}?return openPeers\(near, isPartyMate\)\.filter\(crowdDrawnHere\)\.map\(/, 'AUDIT CROWD-WIDE B5: a page');
@@ -246,7 +244,7 @@ function placeOf(day, mode = 'dungeon') {
     navalOn: () => true, walkMode: true, playerSpawned: true, _loading: false, travelView: null, csaRuntime: null,
     modes: { transitioning: false, gateArenaDay: () => day, interiorPool: () => street, interiorCollider: null }, _mode: () => mode,
     exteriorFoes: street, collider: null, revenantSpawnOptions: () => ({}), effectiveLevel: () => 1, playerEntity: {}, _dungeonPool: () => pool,
-    madeRuleHere: (rule) => madeLevelRule(day != null ? 'court' : null, rule),   // PIN MOVED (EG-H2): the world host's word on the made level - a court of day `day` is the court (systems/madeLevel.js)
+    madeRuleHere: (rule) => madeLevelRule(day != null ? 'court' : null, rule),
   });
 }
 
@@ -259,7 +257,7 @@ test('GATE-ALONE the place: a gate\'s court is no place for a companion - the cr
   assert.ok(placeOf(null, 'interior')(), 'a building');
   assert.ok(placeOf(null, 'exterior')({ crew: false }), 'the street');
   assert.ok(placeOf(0)() === null, 'the court of day zero is a court');
-  assert.match(PLACE, /if \(\(crew && !navalOn\(\)\) \|\|[^\n]*\) return null;\n\s*if \(madeRuleHere\('companions'\) === 'out'\) return null;   \/\/ GATE-ALONE/, 'asked before any place is made');   // PIN MOVED (EG-H2): the made level's law (the court's row keeps companions out)
+  assert.match(PLACE, /if \(\(crew && !navalOn\(\)\) \|\|[^\n]*\) return null;\n\s*if \(madeRuleHere\('companions'\) === 'out'\) return null;   \/\/ GATE-ALONE/, 'asked before any place is made');
   assert.equal(madeLevelRule('court', 'companions'), 'out', 'the law: the court keeps companions out');
 });
 

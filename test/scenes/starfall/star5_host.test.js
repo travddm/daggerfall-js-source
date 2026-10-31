@@ -1,9 +1,9 @@
-// STAR5/STAR6 (bible/11-Multiplayer/Starfall.md sections 3, 4, 5 and 8): THE STARFALL'S HOST, END TO END on the world's
+// STAR5/STAR6 (4, 5 and 8): THE STARFALL'S HOST, END TO END on the world's
 // bindings by name - a night's stars found over a scan, their moments said where they should be heard, the defense
 // stood by the ledger the cell says (each wave, the master, its circle at its calls, the ward), the star a body its own
 // coven's monsters strike and each blow kept across a reload, the word to the cell, the hold and the loss, the camp's
 // race; and the Timers', the map's and the compass's readings. tools/mutants/star5.json.
-// AUDIT STARFALL (2026-10-20): the foes handed over taken as the star's (C1), one leash (C2), the master stood again
+// AUDIT STARFALL: the foes handed over taken as the star's (C1), one leash (C2), the master stood again
 // (C4), the festival's last stars (C5), the blows by account (C6), the star's allowance (C7); the crater where its
 // heart is (R1), the beacon clamped (R2), the ring on the land (R3), the floor pulled forward (R4), the landing's cues
 // (R7), a first ledger taken in silently (R8), the coarse ground and the pass at idle (R9).
@@ -436,7 +436,7 @@ test('STAR6 THE READINGS: the Timers\' rows (the standing star and the next fall
   Date.now = realNow;
 });
 
-// ── AUDIT STARFALL (2026-10-20) ──────────────────────────────────────────────────────────────────────────────────────
+// ── AUDIT STARFALL ──────────────────────────────────────────────────────────────────────────────────────
 
 /** A foe of the star handed to this screen (scenes/exteriorFoes.js adopt): mine now, its site kept and nothing else. */
 const handed = (career, site, at, hp = 100, max = 100) => ({ mobileType: career, site, entity: { health: hp, maxHealth: max }, ai: { feet: [...at] }, dead: false, puppet: null });

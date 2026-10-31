@@ -1,5 +1,4 @@
-// RVN2 - ADAPTATIONS (bible/12-Enhanced-AI/Feud-Arc.md section 13; Mac, 2026-10-04: "more complex, less easy to
-// accomplish and more detailed", then "Go"). At each deed a revenant LEARNS one lesson of the fight - the first of its
+// RVN2 - ADAPTATIONS (;, then "Go"). At each deed a revenant LEARNS one lesson of the fight - the first of its
 // scars (its leading source first) that teaches something it does not hold - and keeps its rank's worth (three at most),
 // the oldest forgotten. What it learned stands with it (`entity.revenant.edge`, systems/revenant/revenantFeud.js adaptEdge):
 // a weapon class taken less (never below x0.6), an element resisted on the saving throw (+25 - the arc's +50 was
@@ -145,7 +144,6 @@ test('RVN2 A WEAPON CLASS, through the REAL formulas\' tail: Mailed blades x0.7,
   }
   const sword = createWeapon(W.Longsword, 1, () => 0.5);
   const plain = hit(foe(), sword);
-  // PIN MOVED (RVN3: its weakness's blow is x1.5 - and no adaptation takes from it)
   assert.equal(hit(adapted(['mailed'], { weak: 'blade' }), sword), Math.max(1, Math.round(plain * 1.5)), 'its weakness\'s class: untouched by Mailed (x1.5, RVN3)');
   const dwarven = createWeapon(W.Longsword, 4, () => 0.5);
   assert.equal(hit(adapted(['mailed'], { weak: 'dwarven' }), dwarven), Math.max(1, Math.round(hit(foe(), dwarven) * 1.5)), 'its weakness\'s metal: untouched by Mailed (x1.5, RVN3)');
@@ -182,7 +180,7 @@ test('RVN2 AN ELEMENT, on the REAL saving throw: +25 (DFU\'s own Resistant) for 
   assert.ok(savingThrow(0, EFFECT_FLAGS.Fire, e, 0, roll(0.99)) > 0, 'a high roll still burns it: never immune');
   const weak = adapted(['fireproof'], { weak: 'fire' });
   computeEntityMods(weak);
-  assert.equal(entityResistMod(weak, ['fire']), -50, 'nothing touches its weakness (its -50, RVN3)');   // PIN MOVED (RVN3)
+  assert.equal(entityResistMod(weak, ['fire']), -50, 'nothing touches its weakness (its -50, RVN3)');
 });
 
 test('RVN2 SILVER-SCARRED, in BOTH cores: the Skeletal Warrior\'s double gone in DFU\'s, a Ghost\'s in PCAAO\'s; another metal untouched; a silver weakness keeps the double (mutants: the veto unregistered; the stock core ignores it; PCAAO\'s ignores it; a silver weakness scarred)', () => {

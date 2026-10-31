@@ -1,4 +1,4 @@
-// MWNPC6 (2026-10-09, the MW-NPC arc's sixth slice - bible/04-Characters/Morrowind-NPCs.md section 11): THE WATCH IN
+// MWNPC6: THE WATCH IN
 // ITS BODIES. The encounter pool's law (section 10c) on the city watch (scenes/cityGuards.js - world.js's street,
 // worldModes.js's buildings, exterior.js), on a lane of its own under smaller caps (WATCH_BODY_TIERS - the same switch,
 // a third of the foes' bodies): every watchman offered dressed as his billboard by his POOL id (his wire number comes
@@ -43,9 +43,7 @@ test('MWNPC6a the watch\'s own caps: the same switch\'s tiers, a third of the fo
   const m = man(3);
   assert.equal(foeActor(m, m.id).id, 3, 'the actor by the id the population names');
   const s = foeSeed(m);
-  // PIN MOVED (AUDIT MW-NPC C5): his wire number, once it arrives, is his seed - the number every puppet of him carries,
   // so each machine draws one man (MWNPC5b's law). Kept off his local id, his owner drew one man and every peer another.
-  // PIN MOVED again (AUDIT MW-NPC II K3/K4): the seed is MINTED ONCE and rides the wire (the record's `ls`) - his number
   // arriving changes nothing, and his puppets take the very seed (mwnpc_audit2.test.js K4)
   m.seq = 41;
   assert.equal(foeSeed(m), s, 'his number arrived: he is the same man - the seed his puppets are handed');

@@ -1,7 +1,4 @@
-// HCC-PARK + RIDE + HCC-TIP (2026-09-23, Mac: "I think we should build that. And if not already, ensure this is
-// compatible with our tooltip implementation and ensure it shows owned if another players. Also need to ensure over
-// people see others riding on horses"), AND THE BRANCH AUDIT'S FINDINGS ON THEM (Mac: "Let's do an audit on
-// everything before we merge. This needs to be perfect"). BY EXECUTION: the wire's park law and the pose's mount; the
+// HCC-PARK + RIDE + HCC-TIP, AND THE BRANCH AUDIT'S FINDINGS ON THEM. BY EXECUTION: the wire's park law and the pose's mount; the
 // RELAY keeping a parked team in its cell past its owner's presence, keyed by the ACCOUNT the token verified and the
 // CHARACTER the frame names (never the peer id a client picks), handing it to joiners, the owner's registry dropping
 // the old cell's record in the order the words were said; the pool keeping each cell's word apart and a kept team
@@ -46,7 +43,7 @@ test('HCC-PARK wire: the frame names its CHARACTER; the anchor names the cell (M
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { h: [AX, 1, AZ, 0, 1, 1] } }), null, 'a walking horse is not parked');
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { w: W(AX + 20000) } }), null, 'a part far from its anchor is a second place');
   assert.deepEqual(validParkData({ c: CA, a: [AX, AZ], r: { h: [AX, 1, AZ, 0, 1e300, 0] } }).r.h, [AX, 1, AZ, 0, 1, 0], 'AUDIT D5: a facing is a unit one - 1e300 is not stored and fanned');
-  assert.equal(validParkData({ c: CA, a: [-POSE_BOUND - 1, AZ] }), null);   // PIN MOVED (TV-BEYOND): an anchor west of the Bay is the world's - past the world is none assert.equal(validParkData({ c: CA, a: [AX] }), null);
+  assert.equal(validParkData({ c: CA, a: [-POSE_BOUND - 1, AZ] }), null);
   assert.equal(validParkData({ c: CA, a: [AX, AZ], r: { n: 'Bess' } }), null, 'a name with nothing parked');
   assert.deepEqual(parseClient(JSON.stringify({ t: 'park', data: { c: CA } }), { hasHello: true }), { t: 'park', data: { c: CA } });
   assert.equal(parseClient(JSON.stringify({ t: 'park', data: null }), { hasHello: true }).error, 'bad park', 'the old null word names no character');

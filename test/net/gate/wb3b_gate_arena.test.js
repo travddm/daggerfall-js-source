@@ -1,5 +1,4 @@
-// WB3b (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area, a gate
-// of oblivion which takes place in a large boss arena"): THE BURNING COURT, DRIVEN. The made level through the port's
+// WB3b: THE BURNING COURT, DRIVEN. The made level through the port's
 // own dungeon layout (world/gate/gateArena.js - a location and a blocks file answering one made block, laid by the real
 // layoutDungeon and layoutRdbBlock); the court's geometry (a clear floor facing up, the rune ring the boss keeps
 // inside, the lava under it all, the braziers clear of the bridge and after the player's own lights - GATE-FBX: and no
@@ -204,7 +203,7 @@ test('WB3b the link: the relay\'s words folded into one state - a whole state st
   assert.deepEqual(said, [GATE_NO_TEXT['the gate is sealed']]);
   link.word(validGateOut({ k: 'fell', at: 4000, top: ['Mac', 'Bran'], n: 2 }));
   link.word(validGateOut({ k: 'fell', at: 4000, top: ['Mac', 'Bran'], n: 2, d: 200 }));
-  link.word(validGateOut({ k: 'fell', at: 4000, top: ['Mac', 'Bran'], n: 2, d: 200 }));   // PIN MOVED (AUDIT GATE-COURTS): the hub's word again, as every hello hears it while the gate holds - a court's own `fell` says no kill since GATE-COURTS, so only this reaches the guard
+  link.word(validGateOut({ k: 'fell', at: 4000, top: ['Mac', 'Bran'], n: 2, d: 200 }));
   assert.deepEqual(fell, [[200, ['Mac', 'Bran']]], 'the court\'s word and the hub\'s, twice: one kill, said once');
   assert.equal(link.fellAt(200), 4000); assert.equal(link.fellAt(201), null);
   link.word(validGateOut({ k: 'fell', at: 7000, top: [], n: 1, d: 205 }));
@@ -235,7 +234,7 @@ test('WB3b the seams, by source: the dungeon host enters the court through its o
   // WB4a: the boss's glow joins them - WB9b: the fight's own lights first, the braziers nearest first after (the cap drops a far court's fire)
   assert.match(wm, /if \(isGateArena\(dungeonLoc\)\) \{ const _court = withCourtLights\(_dgLit, \[\.\.\.\(host\.gateCourtLights\?\.\(\) \?\? \[\]\), \.\.\.courtLightsNear\(cam\.pos, planOfDay\(dungeonLoc\.gate\)\)\]\); renderer\.setPointLights\(_court\.data, null, _court\.colors\); \}/);   // WB14b: the night's braziers
   // GATE-FBX: the court lays no door of its own (the bridge's membrane is gone) - the portal's, laid at his fall, is named the way home
-  // WB14b (PIN MOVED): the court is stood by scenes/gate/gateStand.js (out of the host whole) - the night's floors
+  // WB14b (
   const gs = read('src/scenes/gate/gateStand.js');
   assert.match(gs, /function standCourt\(ctx, day = null\) \{[\s\S]{0,2800}\n\s*ctx\.addActivationNamer\(\(key\) => \(typeof key === 'string' && key\.startsWith\('exit:'\) \? \{ title: COURT_TEXT\.wayHome \} : null\)\);/, 'the way home named the way home');
   assert.doesNotMatch(gs.slice(gs.indexOf('function standCourt(ctx, day = null) {'), gs.indexOf('function standCourt(ctx, day = null) {') + 2800), /exitDoors\.push/, 'and no door of its own');
@@ -244,7 +243,6 @@ test('WB3b the seams, by source: the dungeon host enters the court through its o
   assert.match(gs, /ctx\.collider\.addMesh\(COURT_BUCKET, tris, idx, identity\(\)\);/);
   assert.match(wm, /if \(hit\.gateArena\) cam\.yaw = Math\.PI;/, 'arriving by the bridge, facing him');
   const dc = read('src/scenes/dungeonContext.js');
-  // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the court's refusals are its row's, in COURT_TEXT's own words
   for (const [what, re] of [['the map', /toggleAutomap\(\) \{\n\s+if \(activeOverlay\) return;\n\s+if \(madeLevelRule\(_made, 'automap'\) === 'off'\) \{ hudText\.add\(madeLevelSays\(_made, 'automap'\)\); return; \}/],
     ['the rest', /toggleRest\(\) \{\n\s+if \(activeOverlay\) return;\n\s+if \(madeLevelRule\(_made, 'rest'\) === 'refused'\) \{ hudText\.add\(madeLevelSays\(_made, 'rest'\)\); return; \}/],
     ['the save', /if \(madeLevelRule\(_made, 'save'\) === 'refused'\) \{ if \(!quiet\) hudText\.add\(madeLevelSays\(_made, 'save'\)\); return false; \}[^\n]*\n(?:[^\n]*isArenaFloor\(dfLocation\)[^\n]*\n)?\s+const snap = snapshotPlayer\(/],   // ARENA2: the arena floor's own refusal may follow   // REALM P0.5: a quiet checkpoint is refused in silence
@@ -254,17 +252,17 @@ test('WB3b the seams, by source: the dungeon host enters the court through its o
   const w = read('src/scenes/world.js');
   assert.match(w, /ready: \(\) => !!online\?\.gateOk,/);
   assert.match(w, /enter: \(g\) => \{ modes\?\.enterGateArena\?\.\(g\); \},/);
-  assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'gate'\) key = \(gateLink\?\.room \?\? gateRoomKey\)\(modes\?\.roomIdentity\?\.\(\)\?\.day\);/);   // PIN MOVED (GATE-COURTS): the court the night's book seats me in
-  assert.match(w, /if \(gateLink && online\.gateOk && isGateRoom\(online\.room\) && \(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in', lv: Math\.max\(1, playerEntity\.level \| 0\), bv: GATE_BRAIN_V \}\)\) _gateInFor = online\.welcomes;/);   // PIN MOVED (COURT-WATCH): and a watcher's ask again; AUDIT WBX R7: the brain's law said with it
-  assert.match(w, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);   // PIN MOVED (INT11): the count's fall heard beside the link
+  assert.match(w, /else if \(modes\?\.roomIdentity\?\.\(\)\?\.kind === 'gate'\) key = \(gateLink\?\.room \?\? gateRoomKey\)\(modes\?\.roomIdentity\?\.\(\)\?\.day\);/);
+  assert.match(w, /if \(gateLink && online\.gateOk && isGateRoom\(online\.room\) && \(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in', lv: Math\.max\(1, playerEntity\.level \| 0\), bv: GATE_BRAIN_V \}\)\) _gateInFor = online\.welcomes;/);
+  assert.match(w, /online\.onGate = \(g\) => \{ if \(g\?\.k === 'bd'\) bossCountFell\(modes\?\.gateArenaDay\?\.\(\) != null\); else gateLink\?\.word\(g\); \};/);
   assert.match(w, /if \(tab\.room === SOCIAL_ROOM\) link\.onGate = \(g\) => gateLink\?\.word\(g\);/);
   // WB9b: the three courts' floor, as far as the walkways are laid - one arena, its crossings and clock refilled each frame
-  assert.match(w, /if \(!player\.arena && modes\?\.gateArenaDay\?\.\(\) != null\) player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/, 'the floor in the online frame');   // WB14b: the night's plan; PIN MOVED (WB14e): guarded, as every read of modes above its making (audit24_wave37); PIN MOVED (WB14, the merge of LAYERED-GEAR): refilled by world/gate/gateArena.js courtArenaAt - the host's ceiling
+  assert.match(w, /if \(!player\.arena && modes\?\.gateArenaDay\?\.\(\) != null\) player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/, 'the floor in the online frame');     // WB14b: the night's plan
   assert.match(w, /if \(!onlineOn && modes\?\.gateArenaDay\?\.\(\) != null\) \{ ejectFromCourt\(COURT_TEXT\.collapse\); gateCourt\?\.leave\(\);/, 'offline, no court - and (AUDIT SS) its floor gathered on the way out');
   // AUDIT WBX F10: the court's own frame once first - a screen asleep through midnight lands the Wrath, then is carried out
   assert.match(w, /if \(courtDay != null && Date\.now\(\) \+ _sharedOffsetMs >= gateTimes\(courtDay\)\.wrathAt \+ GATE_COLLAPSE_MS\) \{[\s\S]{0,400}?try \{ gateCourt\?\.frame\(\); \} catch[^\n]*\n\s*ejectFromCourt\(COURT_TEXT\.collapse\);/);
   assert.match(w, /const courtGate = modes\?\.gateArenaGate\?\.\(\) \?\? null;[\s\S]{0,200}if \(courtGate\) \{\n\s+modes\?\.forceExitToExterior\(\);\n\s+if \(landBeforeGate\(courtGate\)\) \{ gateVeil\?\.flash\(\); townTalk\.showOverlay\(new ActionTextBox\(\[COURT_TEXT\.castOut\]\)\); return; \}/, 'a death in the court is cast out before its gate');
-  assert.match(w, /function setRecallAnchor\(\) \{\n\s+if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js)
+  assert.match(w, /function setRecallAnchor\(\) \{\n\s+if \(madeRuleHere\('mark'\) === 'refused'\) \{ madeSay\('mark'\); return; \}/);
   assert.deepEqual([madeLevelRule('court', 'mark'), madeLevelRule('court', 'says'), madeLevelRule('court', 'recall')], ['refused', 'mid', null], 'the court refuses the Mark alone, on the mid-screen line');
   assert.match(w, /fellAt: \(day\) => gateLink\?\.fellAt\(day\) \?\? null, {3}\/\/ WB3b: the relay's word of the kill/, 'the omen hears the kill');   // AUDIT GATE-FBX P12: the omen's own line - the rite's (AUDIT WB12d R7) is its twin
   assert.equal(gateRoomKey(200), 'gate:200');

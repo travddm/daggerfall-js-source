@@ -4,7 +4,7 @@
 // colliders know no snow - ai/foeBlows.js fitBlowToGround) and drawn 0.06 m over it, depth-tested; Snowfall's deep
 // snow stands 0.4-0.8 m over that same ground in the wild, drawn first and depth-written - so every mark outdoors in
 // winter was buried. The renderer keeps the frame's snow height (drawSnow, render/snowfallGlsl.js snowSurfaceRise) and
-// the telegraph pass lies that much higher (render/foeTelegraph.js telegraphLift). bible/01-Overview/bugs/Field-Bugs-2026-10-11d.md.
+// the telegraph pass lies that much higher (render/foeTelegraph.js telegraphLift)..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

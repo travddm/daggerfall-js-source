@@ -1,10 +1,10 @@
-// AUDIT SEATS-2 (2026-10-02, Mac: "We need to do a comprehensive audit on everything and finish the not done") - THE
+// AUDIT SEATS-2 - THE
 // SEATS' FORTIFICATIONS AND SEAT WRITS IN THE ACCOUNT SERVICE, THE AUDITED FINDINGS FIXED: a capture that ignored a
 // project whose day had come (S1); a crown's Tithe past 15 a 500 (S2); a Season's wear a project under way erased, and the
 // Siege Camps' Rams read before it (S4); a lapsed Charter's project building on for nobody (S5); a seat writ
 // feeding a seat its guild no longer holds or is pledged to (S6). Driven through the real Worker over node:sqlite with
 // every migration applied (test/accountDb.mjs), and the statements the batches carry where a Worker path cannot reach
-// the state (a Season's wear over a delivered project). bible/11-Multiplayer/Seats-Arc.md 4.2, 7.2, 7.5, 7.7, 9.1, 16;
+// the state (a Season's wear over a delivered project). 4.2, 7.2, 7.5, 7.7, 9.1, 16;
 // server-account/src/seatForts.js, seatSiege.js, seatTurning.js, townSeats.js, writs.js; migration 0051.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -126,7 +126,7 @@ test('AUDIT SEATS-2 S1: A CAPTURE RAISES THE PROJECTS WHOSE DAY HAS COME BEFORE 
   const s = await stood(t);
   const { sh, eo, a1, d1 } = await siegeWeek(s);
   // the defender a Fortifier (Masonry 100), on the defending roster
-  s.raw.prepare("INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'building', 100000, 'builder', 'fortifier', ?)").run(d1.id, d1.character, T0);   // PIN MOVED (CRAFT3): Masonry's choices are Building's track's
+  s.raw.prepare("INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, 'building', 100000, 'builder', 'fortifier', ?)").run(d1.id, d1.character, T0);
   // after the Turning (its own reads raise what is due by then): three projects, two due before the claim
   const due = START + 1000;
   s.fort(ANTICLERE, 'walls', 0, 1, { guild: sh.gid, standsAt: due, held: { 'stone:cut': 400, 'plank:oak': 100 } });

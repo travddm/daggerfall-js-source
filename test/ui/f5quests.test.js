@@ -1,4 +1,4 @@
-// F5-QUESTS (2026-09-26, Mac: "Cant see quest on f5 menu but can on tab menu"): on the enhanced skin F5 opens the
+// F5-QUESTS: on the enhanced skin F5 opens the
 // pause window on its Stats page (PX27) - the SAME window Tab's dial opens through the host's pause door - and F5's
 // door handed it the sheet's four buttons and nothing else. So on F5's copy the Quests tab said "The journal is not
 // wired into this place yet" while Tab's listed every quest, Save and Load said there was no door, and Exit did

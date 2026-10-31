@@ -1,4 +1,4 @@
-// WILD1 (2026-10-07, bible/11-Multiplayer/Wild-Zone.md): THE OPEN ZONE'S FIGHTS AND A BODY'S ONE PIECE (net/wild/wildFight.js),
+// WILD1: THE OPEN ZONE'S FIGHTS AND A BODY'S ONE PIECE (net/wild/wildFight.js),
 // and THE ROOM'S REMAINS ON A PLAYER'S SIDE (net/wild/wildRemains.js) - each over a fake wire.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,7 +27,6 @@ function pair({ fairA = () => true, fairB = () => true } = {}) {
 }
 const blow = { by: 'melee', p: [1000, 2, 1000], d: 7 };
 
-// PIN MOVED (INT9, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): WILD1's defender resolved every blow on its
 // own machine and answered with a `result`, and the last fair attacker whose blow landed was the killer for ten seconds.
 // Now the relay referees the zone (net/wild/wildRef.js): a blow goes out carrying the striker's rolled number for the referee,
 // nothing at me is resolved, and a fall and its killer are the referee's word (test/net/int9_wild_ref.test.js).
@@ -46,7 +45,6 @@ test('WILD1 fight: no blow out at a player who is not fair (my party, outside th
   assert.equal(w.log.a.length, 0);
 });
 
-// PIN MOVED (INT9): WILD1's fallen took the picked piece out of its pack and GAVE it (`gave`) - a pick nobody answered was
 // given up. Now the pick goes to the relay, in the room that refereed the fall, under the fall's id: the relay signs the
 // fall with it, the service takes the piece off the fallen's record, and the remains hold it for the killer alone.
 test('WILD1 fight: a body offers its worn pieces to its killer - only under a fall the referee called by its hand; ONE pick, to the room that refereed the fall (INT9), naming what the offer showed there (PIN MOVED, AUDIT INT9: `t`, `m` - the place alone was an index into a list the fallen built)', () => {

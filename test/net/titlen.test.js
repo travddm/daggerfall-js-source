@@ -1,9 +1,5 @@
-// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS (2026-09-24).
+// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS.
 //
-// Mac: "Add 4 new titles/glyphs. Dungeon Master is an orange title with its own glyph. This title allows the user to
-// use the /dm to message chat with orange text (similar to /red). This goes strictly to the account SquidKamer.
-// Disciple, Apostle, Hierophant are new patreon titles. These also recieve their own unique glyphs. The account
-// Dutchess will recieve the Disciple title/glyph."
 //
 // Each grant is a handle list in the account service's config (the developers' law), each title carries its own
 // glyph, and /dm is RED1's law one glyph over: the relay alone decides, off the `dm` glyph in the signed token.
@@ -51,9 +47,9 @@ test('TITLE-N vocabulary: four titles and four glyphs join, each title with its 
 // ── THE GRANTS ──────────────────────────────────────────────────────
 
 test('TITLE-R founder: no account registered after the cutoff can obtain Founder, and every account that holds it keeps it - held and worn (Mac: "Remove the founder title from being obtained. Current users keep their founder title") (mutants: the cutoff moved forward; the cutoff an open end)', () => {
-  // FOUNDER2 (2026-09-24): Mac granted it once more to every account then registered - the cutoff is the end of that
+  // FOUNDER2: Mac granted it once more to every account then registered - the cutoff is the end of that
   // day now (founder2.test.js), and the title is closed again past it
-  // FOUNDER5 (2026-10-07, PIN MOVED): the end of that day on every clock, twelve hours past 00:00Z
+  // FOUNDER5 (2026-10-07
   assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000, 'the cutoff is the end of the day FOUNDER2 was asked, on the last clock to reach the next');
   const later = Date.UTC(2026, 8, 26) / 1000;
   assert.deepEqual(titlesHeld({ handle: 'New', registered_at: later }, {}), [], 'registered after it: no Founder');
@@ -70,18 +66,18 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   assert.equal(v('DISCIPLE_HANDLES'), 'Dutchess,Satranath,Skibbster,Flylighter,valenvalarys', 'Mac: "The account Dutchess will recieve the Disciple title/glyph", then "Satranath please add this account as a disciple also", then "Skibbster needs to be a disciple ingame", then "Grant Flylighter the disciple title/glyph", then "Add valenvalarys as a disciple ingame"');
   assert.deepEqual(titlesHeld({ handle: 'flylighter', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), ['disciple'], 'Flylighter: the Disciple title, case-folded');
   assert.deepEqual(glyphsOf({ handle: 'FLYLIGHTER', created_at: 0 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }, 10 ** 10), ['disciple'], 'and its glyph');
-  // 2026-09-29, Mac: "Add valenvalarys as a disciple ingame" - the fifth, the same list and the same law
+  // 2026-09-29, - the fifth, the same list and the same law
   assert.deepEqual(titlesHeld({ handle: 'Valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), ['disciple'], 'valenvalarys: the Disciple title, case-folded');
   assert.deepEqual(glyphsOf({ handle: 'VALENVALARYS', created_at: 0 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }, 10 ** 10), ['disciple'], 'and its glyph');
   assert.equal(equipRefusal('disciple', { handle: 'valenvalarys', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DISCIPLE_HANDLES: v('DISCIPLE_HANDLES') }), null, 'theirs to wear');
-  // Mac (2026-09-25): "Add SirMcMobdon as an Apostle ingame title/glyph"; then (2026-09-26): "SirMcMobdon gets a brand
+  // then: "SirMcMobdon gets a brand
   // new title/glyph. Remove them from Apostle" - Shadow Fang is theirs now (test/ui/shadowfang.test.js), and the Apostle
   // list is empty again
   assert.equal(v('APOSTLE_HANDLES'), '', 'SirMcMobdon is no longer an Apostle');
   assert.deepEqual(titlesHeld({ handle: 'sirmcmobdon', created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }), [], 'SirMcMobdon holds no Apostle title');
   assert.deepEqual(glyphsOf({ handle: 'SirMcMobdon', created_at: 0 }, { APOSTLE_HANDLES: v('APOSTLE_HANDLES') }, 10 ** 10), [], 'and no Apostle glyph');
   assert.equal(v('DEVELOPER_HANDLES'), 'Lattymoy,LostMyLeg,Tabby,RookieG,Roderic,SirMcMobdon,kpblca_1', 'DEV2, Mac: "Give trashBattery, LostMyLeg the developer title/glyph"; DEV3: "grant Tabby the developer title/glyph"; DEV4, the owner: "Also add RookieG(Dev) as developer", then "Change RookieG(Dev) to RookieG"; DEV5, Mac: "Remove trashBattery ingame as a dev"; DEV6, Mac: "Give roderic the developer access ingame (title/glyph)"; STAFF-PANEL1, mob 06:33Z: \"can we just add me to the dev and my shadow fang just becomes vanity and i gain admin as well?\"; then \"kpblca_1 needs added to them as welll\"');
-  // DEV6 (2026-10-16): Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
+  // DEV6: Roderic in every case - the title, the glyph, the wings and the moderating, as every developer's
   for (const h of ['LOSTMYLEG', 'tabby', 'RookieG', 'rookieg', 'ROOKIEG', 'roderic', 'Roderic', 'RODERIC']) {
     const dev = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };   // FOUNDER3: first played after the cutoff too, so no Founder
     const denv = { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') };
@@ -94,7 +90,7 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   for (const h of ['Roderick', 'Roderi', 'Roderic_', 'Rod']) {
     assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
   }
-  // DEV5 (2026-10-16, Mac: "Remove trashBattery ingame as a dev"): off the list in any case, and the whole set with it -
+  // DEV5: off the list in any case, and the whole set with it -
   // the title, the glyph, the wings, the moderating; and the title and wings a row still stores are no longer worn
   for (const h of ['trashBattery', 'trashbattery', 'TRASHBATTERY']) {
     const was = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000, title: 'developer', aura: 'seraphwings' };
@@ -111,7 +107,7 @@ test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is 
   for (const h of ['RookieG(Dev)', 'RookieGDev', 'Rookie', 'RookieGG', 'RookieG_']) {
     assert.deepEqual(titlesHeld({ handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 }, { DEVELOPER_HANDLES: v('DEVELOPER_HANDLES') }), [], `${h}: not a developer`);
   }
-  // MOD2 (2026-10-02, Mac: "give tabbyvish the moderator title/glyph for ingame"): the moderator list, case-folded
+  // MOD2: the moderator list, case-folded
   assert.equal(v('MODERATOR_HANDLES'), 'Asynian,tabbyvish,Starempire42', 'MOD1: Asynian; MOD2: tabbyvish; MOD3 (Mac: "Also add Starempire42 as a moderator"): Starempire42');
   for (const h of ['asynian', 'TabbyVish', 'starempire42']) {
     const mod = { handle: h, created_at: 1_800_000_000, registered_at: 1_900_000_000 };

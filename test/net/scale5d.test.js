@@ -1,5 +1,4 @@
-// SCALE5d (2026-10-11, Mac's decision 3 - a full city overflows into a layer rather than refusing `room full`; then
-// "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md SCALE5d): A CROWDED PLACE OVERFLOWS INTO LAYERS.
+// SCALE5d: A CROWDED PLACE OVERFLOWS INTO LAYERS.
 // The law (net/wire.js isLayered, layerOf, layerName), the Worker's walk (server/src/relayScale.js layerWalk), the room's
 // word of its layer, the session's ask and its welcome, the party's layer on its pose, and the host's wiring.
 // tools/mutants/scale5d.json.

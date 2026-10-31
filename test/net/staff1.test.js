@@ -1,5 +1,4 @@
-// STAFF1 (2026-09-28, Mac: "So for developer, dungeon master and the shadow fang titles I want to add teleport, debug,
-// and other admin commands") - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal,
+// STAFF1 - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal,
 // /pos, /staff, for a player whose own glyphs are `dev`, `dm` or `shadowfang`, and nobody else.
 //
 // Pinned here: who may (isStaff), the grammar (parseStaffCommand), the matching (findPlace, findPlayer), the two
@@ -49,7 +48,7 @@ test('STAFF1 grammar: /tp takes a place, a map pixel or @player; /god and /fly f
   assert.deepEqual(parseStaffCommand('/staff'), { cmd: 'staff' });
   assert.ok('error' in parseStaffCommand('/heal me'));
   for (const line of ['/red hi', '/unstuck', 'tp Daggerfall', '/tpx 1 2', '//tp 1 2', 'hello']) assert.equal(parseStaffCommand(line), null, line);
-  assert.deepEqual([...STAFF_COMMANDS], ['tp', 'god', 'fly', 'heal', 'pos', 'staff', 'relay']);   // PIN MOVED (SCALE5b): /relay, a developer's (net/relayCfg.js, test/net/scale5b.test.js)
+  assert.deepEqual([...STAFF_COMMANDS], ['tp', 'god', 'fly', 'heal', 'pos', 'staff', 'relay']);
   for (const c of STAFF_COMMANDS.filter((n) => n !== 'staff')) assert.ok(STAFF_HELP_LINES.some((l) => l.startsWith(`/${c} `)), `/staff lists /${c}`);
 });
 

@@ -1,7 +1,6 @@
-// DRAKES (2026-09-29, Mac: "Can we change the name of marks to something else"; asked what to, "Drakes"; bible/06-Systems/
-// Online-Arc.md DRAKES): THE SERVER'S CURRENCY IS CALLED DRAKES WHEREVER A PLAYER READS IT. Only the words changed: the
+// DRAKES: THE SERVER'S CURRENCY IS CALLED DRAKES WHEREVER A PLAYER READS IT. Only the words changed: the
 // balances, the ledger, the routes, the switch (MARKS_OPEN) and the code's own name for them (marks, MARKS1) stand, so
-// no account's balance moved and no stored row was touched. SILVER (2026-10-02, test/net/silver.test.js) named it again:
+// no account's balance moved and no stored row was touched. SILVER named it again:
 // the words read "silver" now, and these pins read them - the Marks never come back either way.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

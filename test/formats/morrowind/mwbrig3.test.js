@@ -1,5 +1,4 @@
-// MW-BRIG3 (2026-09-29, Mac on MW-BRIG2: "completely broke the morrowind torso" - asked what it looks like: "it's
-// placed lower where the torso should be", only with the brigandine worn, on a male body): THE BRIGANDINE IS FITTED
+// MW-BRIG3: THE BRIGANDINE IS FITTED
 // ONTO THE WEARER.
 //
 // MW-BRIG1 and MW-BRIG2 both drew the brigandine at the height of the modeller's scene, taken on faith as the

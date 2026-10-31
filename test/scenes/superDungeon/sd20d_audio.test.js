@@ -1,4 +1,4 @@
-// SD20d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md "SD20 - AUDIT SD III"): THE HOUR
+// SD20d: THE HOUR
 // HEARD, AUDITED A THIRD TIME - each finding reproduced on the arc's own scripts first. A Rift's step played the street's
 // song between the Hollow's and the hall's, cut both ways; the Hour's End sounded whole every two seconds for half a
 // minute; the beds were one-shots re-armed as each pass ended, a gap at every seam, and the void's one moan came round

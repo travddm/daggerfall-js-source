@@ -1,4 +1,4 @@
-// SD11c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16's AUDIT SD II): THE
+// SD11c: THE
 // REMNANT'S LAW, ITS UNTESTED ARMS (the lens on the tests, L8 G5, G6, G7, G12) - the Echoes' and the Hearts' belief (a
 // pose in the arena, a melee blow within reach of the body it meets), the one hand every body shares (four blows a
 // second; one blow's number counted once across the bodies it meets), a fighter away from the arena taking its share out

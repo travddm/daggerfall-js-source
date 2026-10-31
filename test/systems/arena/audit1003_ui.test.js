@@ -1,4 +1,4 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03) - LENS U: THE ARENA'S WINDOW AND ITS HUD, read on real Chromium before #545 merges
+// AUDIT PRE-MERGE 1003 - LENS U: THE ARENA'S WINDOW AND ITS HUD, read on real Chromium before #545 merges
 // (src/ui/arena/arenaWindow.js, arenaDoor.js, arenaHud.js, hudFoeTarget.js; src/systems/arena/arenaBoard.js, arenaText.js; the sheets
 // in src/ui/enhanced/enhancedPlusStyle.js, enhancedStyle.js, partyPanel.js; the hosts' arena HUD in src/scenes/world.js and
 // exterior.js). Each pin FAILED on the unfixed tree for its finding's reason; each fix carries an `AUDIT PRE-MERGE 1003

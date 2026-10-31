@@ -1,6 +1,4 @@
-// TI2 - THE PHONE IN HAND, TUNED (2026-09-11, Mac: "enhance the mobile
-// element of DFJS in terms of camera movement, character movement and
-// a more phone built feel where it doesnt seem so non-native"). The
+// TI2 - THE PHONE IN HAND, TUNED. The
 // pure halves EXECUTE (ui/touch/touchLook.js, the MoveAxes joystick arm);
 // the layer runs against the same stub document AUDIT 62 built; the
 // hosts, the pane, the manifest and the prefs are text-pinned. Every

@@ -1,5 +1,4 @@
-// MAC-T (2026-09-18, Mac's play report on the deployed build): "when typing in chat, if typing H, it triggers you
-// switching your weapon hand".
+// MAC-T (2026-09-18,.
 //
 // T2 - THE SAME ROOT AS JANOME'S HAND SWITCH, MET FROM THE CHAT LINE. The chat panel stops the field's keydown in the
 // window's CAPTURE phase (CG2 / AUDIT CHAT D2), so the host's bubble listener never fills its ring from a typed line -

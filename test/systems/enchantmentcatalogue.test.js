@@ -131,7 +131,6 @@ test('M4: the table as a whole, machine-diffed against the twenty-four effect cl
     sum += perEffect[type];
   }
   assert.equal(cells, 209, 'settings the catalogue can mint');
-  // PIN MOVED (DRAGON-SOUL, FIELD BUGS 2026-10-11): the general spawn's Dragonling soul binds at -5000, the one cell
   // moved off DFU's table on purpose - 99680 -> 94680, and SoulBound's own -23440 -> -28440
   assert.equal(sum, 94680, 'every cost, added up');
 
@@ -150,7 +149,7 @@ test('M4: the table as a whole, machine-diffed against the twenty-four effect cl
   // economy: the powers on offer outweigh the drawbacks many times
   const owed = (list) => list.reduce((a, t) => a + perEffect[t], 0);
   assert.equal(owed(powerTypes()), 154840);
-  assert.equal(owed(sideEffectTypes()), -60160);   // PIN MOVED (DRAGON-SOUL): -55160 -> -60160, a soul bound is a side effect's points
+  assert.equal(owed(sideEffectTypes()), -60160);
   assert.equal(owed(powerTypes()) + owed(sideEffectTypes()), sum);
 });
 
@@ -204,7 +203,6 @@ test('M4: SoulBound is forty-three rows keyed by monster ID (:160-206)', () => {
   // which classic gives no soul and prices at nothing; 40 the quest
   // spawn, which has one and costs 5000. Both rows print the same
   // enemy name, because that is the name the enemy has.
-  // PIN MOVED (DRAGON-SOUL, FIELD BUGS 2026-10-11, the owner: "Fuck
   // matching DFU."): a player traps the general spawn and reads
   // "Dragonling" - so it binds as the quest's does, the same -5000.
   assert.equal(enchantmentCost('SoulBound', 34), -5000);
@@ -402,7 +400,7 @@ test('M4: the flags, four of which are NONE and one of which is missing entirely
   // that can deteriorate or hurt you under more than one condition at
   // once (UserTakesDamage.cs:35, ItemDeteriorates.cs:37) - and SIDE-ONCE
   // (FIELD BUGS 2026-10-19f, the owner) took it from both: a setting is
-  // picked once. PIN MOVED from ['ItemDeteriorates', 'UserTakesDamage'];
+  // picked once.
   // both still allow more than one primary (`once` above)
   const twice = enchantmentTypes().filter((t) => hasItemMakerFlag(t, ITEM_MAKER_FLAGS.AllowMultipleSecondaryInstances));
   assert.deepEqual(twice, []);

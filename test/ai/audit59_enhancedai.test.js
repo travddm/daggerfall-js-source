@@ -1,9 +1,8 @@
-// AUDIT 59 - ENHANCED AI, BEFORE THE MERGE (2026-09-04, Mac: "Lets do a
-// comprehensive audit on enhanced AI before we merge"). The arc came
+// AUDIT 59 - ENHANCED AI, BEFORE THE MERGE. The arc came
 // back by reverting its revert; this audit reads it against today's
 // tree and the production BUILD, which no node test had looked at. Four
 // findings, all fixed here and pinned below; the sweeps that came back
-// clean are recorded in bible/01-Overview/audits/Audit-59.md.
+// clean are recorded in.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +11,7 @@ import { EnhancedEnemyAI, makeNavWorld } from '../../src/ai/enhancedMotor.js';
 
 const read = (p) => readFileSync(p, 'utf8');
 
-// ROAD-H H7a (2026-09-07): THE WALK THAT READS A WHOLE FUNCTION.
+// ROAD-H H7a: THE WALK THAT READS A WHOLE FUNCTION.
 //
 // F2's pin below used to read `destroy()` as `src.slice(at, at + 3000)`.
 // The function is ~3770 characters, so the window stopped four fifths

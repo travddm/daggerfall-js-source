@@ -1,5 +1,4 @@
-// PATRON-LOAD II (2026-10-11, the owner: "I think the database is overloaded"; bible/06-Systems/Living-World-II.md
-// PATRON-LOAD II): read off the database (wrangler d1 insights, a day), the region's traders read (market.js
+// PATRON-LOAD II: read off the database (wrangler d1 insights, a day), the region's traders read (market.js
 // marketVendors, /v1/market/vendors - every online client in a living town each PATRON_READ_S) was 4.2 billion of the
 // day's 5.66 billion rows: its two statements walked every open listing in the market and, for each, every piece in its
 // town (~720,000 rows a statement, ~860 ms), and the region was asked last. PATRON-LOAD (acct109) had taken the patrons'
@@ -34,7 +33,6 @@ test('PATRON-LOAD II A: the region\'s traders read walks its own region\'s trade
   assert.equal(reads.length, 2, 'the newest pieces and each house\'s newest');
   for (const { sql, plan } of reads) {
     const at = sql.includes('v_rank') ? 'each house\'s newest' : 'the newest';
-    // PIN MOVED (AUDIT LEAN-READS B8, 2026-10-20): the region's open trader listings by their age or, for each house's
     // newest, by their end (idx_market_vendor_expiry, the board's next-to-run-out index - its range never wider)
     const byRegion = sql.includes('v_rank') ? /SEARCH l USING INDEX idx_market_vendor_(region \(region=\?\)|expiry \(region=\? AND expires_at>\?\))/ : /SEARCH l USING INDEX idx_market_vendor_region \(region=\?\)/;
     assert.ok(plan.some((p) => byRegion.test(p)), `${at}: by the region's trader listings - ${plan.join(' | ')}`);

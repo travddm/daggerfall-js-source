@@ -1,4 +1,4 @@
-// DEX1 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION: THE ENEMY
+// DEX1 - DAGGERFALL ENEMY EXPANSION: THE ENEMY
 // REGISTRY. BestiaryMod.Start's reading (systems/enemyExpansion/dexTables.js) of the shipped tables, and what the install
 // (dexInstall.js) makes of it in the port: the fifty enemies in the table, their careers resolving, DFU's entity type
 // and career index for an id past MobileTypes, the classic rows edited in DFU's order over Meaner Monsters', the names,

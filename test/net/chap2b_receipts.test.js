@@ -1,8 +1,8 @@
-// CHAP2b (2026-10-08, Mac: "Keep going with the arc/slices") - THE RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate
+// CHAP2b - THE RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate
 // closed or a raided town defended by a realm character, in a region where a guild it is a member of on the Roll keeps
 // a chapter, is remembered - +1 a guild a receipt (Chapters-Arc 3.3), and +2 more for that chapter's receipt writ, its
 // first such receipt of the UTC day there, where the guild's row of section 4 asks that kind. Each member its own; no
-// Marks; outside the three a day. bible/11-Multiplayer/Chapters-Arc.md sections 3.3 and 4 (CHAP2b).
+// Marks; outside the three a day. (CHAP2b).
 //
 // The law against literals; the service through the real gate and raid routes over the real migrations; the board's
 // asks; the card in a DOM; the host's wiring.
@@ -109,9 +109,9 @@ test('CHAP2b a gate closed: +1 to each of the character\'s guilds with a chapter
   const g = await s.gate();
   assert.equal(g.status, 200, JSON.stringify(g.body));
   assert.equal(g.body.recorded, true);
-  assert.deepEqual(g.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });   // PIN MOVED (CHAP3a: and its Merit - none inside a new member's week)
+  assert.deepEqual(g.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });
   assert.deepEqual([s.rep(41).rep, s.rep(368).rep, s.rep(108).rep], [13, 8, 0], 'a Brotherhood chapter there - but no member');
-  const day = utcDay(_now), gday = gameDayAt(_now * 1000);   // PIN MOVED (AUDIT CHAP3 E1): the gate's own day, the writ's UTC day
+  const day = utcDay(_now), gday = gameDayAt(_now * 1000);
   assert.deepEqual(s.credits(), [
     { f: 41, ref: `gate:${gday}`, amount: 1 }, { f: 41, ref: `wgate:${day}`, amount: 2 },
     { f: 368, ref: `gate:${gday}`, amount: 1 }, { f: 368, ref: `wgate:${day}`, amount: 2 },
@@ -128,9 +128,9 @@ test('CHAP2b raids: the town defended credits by its key\'s region; the day\'s w
   const s = await stand();
   const a = await s.raid(7);
   assert.equal(a.status, 200, JSON.stringify(a.body));
-  assert.deepEqual(a.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });   // PIN MOVED (CHAP3a)
+  assert.deepEqual(a.body.chapters, { counted: true, credited: [{ f: 41, amount: 3 }, { f: 368, amount: 3 }], merit: [] });
   const b = await s.raid(8);
-  assert.deepEqual(b.body.chapters, { counted: true, credited: [{ f: 41, amount: 1 }, { f: 368, amount: 1 }], merit: [] }, 'the day\'s writ is filled: the receipt\'s own +1');   // PIN MOVED (CHAP3a)
+  assert.deepEqual(b.body.chapters, { counted: true, credited: [{ f: 41, amount: 1 }, { f: 368, amount: 1 }], merit: [] }, 'the day\'s writ is filled: the receipt\'s own +1');
   assert.deepEqual([s.rep(41).rep, s.rep(368).rep], [14, 9]);
   const elsewhere = await s.raid(9, 17);
   assert.deepEqual(elsewhere.body.chapters, { counted: false, why: 'no-chapter' }, 'Daggerfall keeps no chapter of its guilds');
@@ -163,11 +163,11 @@ test('CHAP2b the credit\'s bounds: never past 100, what is owed trimmed; never a
   assert.deepEqual(await creditReceipt(ctx, { id: mallory.id }, env, { character: s.R.id, kind: 'raid', id: '21:3:1', region: ANTICLERE }), { counted: false, why: 'no-member' });
   s.raw.prepare('UPDATE realm_characters SET dead_at = ? WHERE id = ?').run(_now, s.R.id);
   assert.deepEqual(await creditReceipt(ctx, { id: s.who.id }, env, { character: s.R.id, kind: 'raid', id: '21:4:1', region: ANTICLERE }), { counted: false, why: 'no-member' });
-  for (const [body, why] of [[{ character: s.R.id, kind: 'serpent', id: 1, region: ANTICLERE }, 'no-receipt'], [{ character: s.R.id, kind: 'gate', id: 1, region: 71 }, 'no-region']   /* PIN MOVED (WW7-5) */]) {
+  for (const [body, why] of [[{ character: s.R.id, kind: 'serpent', id: 1, region: ANTICLERE }, 'no-receipt'], [{ character: s.R.id, kind: 'gate', id: 1, region: 71 }, 'no-region']]) {
     assert.deepEqual(await creditReceipt(ctx, { id: s.who.id }, env, body), { counted: false, why }, why);
   }
   const throws = { prepare: () => { throw new Error('D1 down'); } };
-  assert.deepEqual(await creditReceipt({ db: throws, nowS: _now }, { id: s.who.id }, env, { character: s.R.id, kind: 'gate', id: gameDayAt(_now * 1000), region: ANTICLERE }), { counted: false, why: 'server' });   // PIN MOVED (AUDIT CHAP3 E1): a gate of this week, so the store is asked
+  assert.deepEqual(await creditReceipt({ db: throws, nowS: _now }, { id: s.who.id }, env, { character: s.R.id, kind: 'gate', id: gameDayAt(_now * 1000), region: ANTICLERE }), { counted: false, why: 'server' });
 });
 
 test('CHAP2b a lost race: a credit whose head moved before its write credits nothing and says so - the Roll\'s one guard (mutants: the tag)', async () => {
@@ -206,7 +206,6 @@ test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-P
   ];
   const chapters = [{ faction: 41, strength: 50, band: 'steady' }, { faction: 368, strength: 50, band: 'steady' }];
   const book = { state: { open: true, writs: { today: 0, max: 3 } }, held: () => 0,
-    // PIN MOVED: AUDIT GUILD3 L2 - a member is promised Merit where its Merit row here says it earns some (meritEarnsOf)
     writs: async () => ({ data: { writs: [], receipts, chapters, merit: [{ faction: 41, merit: 100, max: 600, elsewhere: false, from: null }], today: { filled: 0, max: 3 } }, error: null, stale: false }), deliver: async () => ({ ok: true, data: {} }) };
   const notices = { seenAt: () => null, read: async () => ({ board: { notes: [], notices: [], me: {} } }), markSeen() {}, cached: () => null, draft: () => ({ subject: '', body: '', days: 7, button: '' }), noticeDraft: () => ({ subject: '', body: '', days: 3 }) };
   const host = document.createElement('div');

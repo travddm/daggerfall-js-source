@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b BELT-WAIST (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md): "Equipping the lantern with O still
+// FIELD BUGS 2026-10-21b BELT-WAIST: "Equipping the lantern with O still
 // puts it into your shield slot and not the lantern slot". The world hangs a lit lantern at the hip whenever the mod's
 // switch says so (shipped on), and the inventory read the belt's mark alone - so the O key's lantern was drawn in the
 // shield's hand and the lantern slot stood empty. Every fixture is minted by the shops' own shelves and every act is the

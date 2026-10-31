@@ -1,27 +1,26 @@
-// TWO-HANDS, THE MORROWIND LANE (2026-10-16, bible/05-Combat/Two-Hands.md): the second hand on the 3D body - an arm, or
+// TWO-HANDS, THE MORROWIND LANE: the second hand on the 3D body - an arm, or
 // the whole body, as the mirror of another (combat/twoHands/mirrorRig.js) on the vendored retail biped (Weapon Sheathing's
 // xbase_anim, bones along their local X) and the fixture rig; the left hand's weapon on the Weapon Bone Left
 // (combat/fpArm.js resolveOffWeaponParts, setOffWeapon); the left-hand blow, the fists' mirror, and the running hands
 // through the real arm's update. The sprite lane's pins are test/combat/twohands.test.js.
 //
-// TWO-HANDS AUDIT (2026-10-16): the lane's eleven findings, each pinned where it was reproduced - a Weapon Bone Left made
+// TWO-HANDS AUDIT: the lane's eleven findings, each pinned where it was reproduced - a Weapon Bone Left made
 // by the mirror for a skeleton without one (every retail one), each arm hung from this frame's body and every joint on
 // its bone (the law in each bone's frame), the carry in each bone's frame, the run and the climb blended, a mirrored
 // blow's way across the screen, a carry kept across a view switch, the pair's draw composed, the portrait's pair, a
 // failed left-hand swap remembered forever, the mirror's cost, the run's lens - and the rig's own stride phase.
 //
-// TWO-HANDS FIELD (2026-10-16, Mac after the merge): a pair's left arm in first person was out of the picture whole ("No
+// TWO-HANDS FIELD: a pair's left arm in first person was out of the picture whole ("No
 // left arm") - mirrored across the chest the clip posed, not across the eye; and on the move in third person both arms
 // swung the same way ("Both arms swing the same direction") - the left arm was the frame's own right, mirrored.
 //
-// TWO-HANDS AUDIT 2 (2026-10-16, lane 3): the made Weapon Bone Left mirrored hand to hand in the skin's frame (M1), the
+// TWO-HANDS AUDIT 2: the made Weapon Bone Left mirrored hand to hand in the skin's frame (M1), the
 // guard dropped where something else has the hands and carried off the arm (M2), the stride following the head bob
 // without jumping (M3, the sprite lane's law too), the guard sized by the blade's own height (M4), the made bone and the
 // guard paid for only where used (M5), a rebuild keeping the left blade (M6), the blades' effects and glows going with
 // the blades; and two of L5's - the lantern under the Morrowind arm, H between the fists.
 //
-// TWO-HANDS SPREAD (2026-10-17, Mac: "For the morrowind first person, when duel wielding can we spread out the arms a bit
-// more sense it can make the weapons overlap"): the first-person pair's arms turned out at their tops - the law's angle,
+// TWO-HANDS SPREAD: the first-person pair's arms turned out at their tops - the law's angle,
 // a blade's inner edge on the picture, the turn on the skeleton, and the arm laying it in first person alone.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -105,7 +104,6 @@ test('TWO-HANDS mirror, THE LAW on the retail biped: at rest it is the rest; an 
   const wrote = applyMirrorRig(sk, p1, GRAPH_ROOT, skeletonSpaceMatrices, { limbs: { L: { pose: null, side: 'R', mirror: true } } });
   assert.ok(wrote.length >= 10);
   const got = M(sk, p1);
-  // PIN MOVED (TWO-HANDS AUDIT): the skin delta's TRANSLATION is no longer the graph law's on retail. Its rest stands a
   // few tenths of a unit (its legs 6.7) off its own mirror, and the graph law hung each bone at the mirror of its
   // counterpart's frame - a turned counterpart slid the joint off its parent by that asymmetry (a finger joint 10% off
   // its bone here). The rotations stay the law's exactly; every joint now stays on its bone (mirrorRig.js's header).
@@ -321,7 +319,7 @@ test('TWO-HANDS AUDIT the left hand\'s weapon bone (finding 1; AUDIT 2, L3 M1): 
   assert.equal(made.nodes.get(made.nodes.get(wbl).parent).name, 'Left Hand', 'under the left hand');
   assert.ok(diff(M(made, new Map()).get(wbl), M(authored, new Map()).get(authored.byName.get('weapon bone left'))) < 1e-6, 'the authored node, exactly');
   // retail, no skin handed: the rest's own mirror of the hands, K = the 3x3 of Rest(R hand)^-1 . S . Rest(L hand) - the
-  // 3x3 alone (PIN MOVED, TWO-HANDS AUDIT 2: the first cut hung it at S . Rest(Weapon Bone) . X in the graph's space,
+  // 3x3 alone (
   // which carried the rest's own asymmetry - its hands 1.09 units off each other's mirror - into the grip)
   const sk = retail();
   injectAddon(sk);
@@ -532,7 +530,6 @@ test('TWO-HANDS AUDIT the arm, THE PAIR\'S GUARD (Mac: "When attacking with a we
   const rel = g.map((r, i) => (r.u === 'AttackRelease' ? i : -1)).filter((i) => i >= 0);
   const at = rel[rel.length - 1];   // the release's last frame: the blow's hit
   const drop = rest - g[at].e;
-  // PIN MOVED (TWO-HANDS AUDIT 2, L3 M4): the drop was the fists' GUARD.DOWN of 200 px (GUARD_LENS_DROP, 0.0519 rad)
   assert.ok(Math.abs(drop - wantDrop) < 0.15 * wantDrop, `at the hit the held wrist is ${drop.toFixed(4)} rad lower on the picture (LOWER ${GUARD.LOWER} of its blade's ${shownHeight().toFixed(3)} on the picture: ${wantDrop.toFixed(4)}; the fists' ${GUARD_LENS_DROP.toFixed(4)})`);
   assert.ok(Math.abs(arm.handsState().guardDrop.L - wantDrop) < 0.1 * wantDrop, `measured once, on the build's rest: ${arm.handsState().guardDrop.L.toFixed(4)} (as drawn at rest ${wantDrop.toFixed(4)})`);
   // the left blade is measured in the RIGHT hand (its bone's counterpart, unmirrored): a pair at rest holds the left arm as
@@ -592,7 +589,6 @@ test('TWO-HANDS AUDIT the arm on a skeleton WITHOUT a Weapon Bone Left (finding 
 }));
 
 test('TWO-HANDS the arm, the fists: a blow by the hand its clip throws with plays as the clip has it; a blow by the other is the clip in the mirror - the other fist held where the idle holds it', () => seeded(async () => {
-  // PIN MOVED (TWO-HANDS AUDIT): run on a seeded stream (seeded()) - the blows' strengths are the reference's random
   // draw on this fixture (no wind-up window), and unseeded the 3x ratio below failed one run in ten at the base commit
   // too (2.67x at the worst draw, measured over forty streams)
   const arm = await drawnArm();
@@ -657,7 +653,6 @@ test('TWO-HANDS the arm, the running hands: running with nothing in hand the pum
   let opposite = 0, n = 0;
   for (let i = 21; i < 60; i++) { const a = zs.L[i] - zs.L[i - 1], b = zs.R[i] - zs.R[i - 1]; if (Math.abs(a) > 1e-3 && Math.abs(b) > 1e-3) { n++; if (Math.sign(a) !== Math.sign(b)) opposite++; } }
   assert.ok(opposite / n > 0.8, `out of step (${opposite}/${n})`);
-  // PIN MOVED (TWO-HANDS AUDIT 2, L3 M3): the rig's phase was taken AS IT STANDS (`run.phase === 2.5` for a phase handed
   // still) - and HeadBobber's clock jumps: a run resumed inside its 0.5 s stop sets the timer to PI, so a stutter-step
   // swapped the fists in a frame. Now the phase FOLLOWS the bob: on it while the bob keeps the stride's step, caught up
   // within RUN_PUMP.CATCH of the stride's own tempo when it jumps, never backward. A real HeadBobber drives it here.
@@ -742,7 +737,7 @@ test('TWO-HANDS AUDIT the arm, THE RUN ON THE LENS (finding 11): with the arms o
     arm.setHands({ mode: 'fists', lead: 'R' });
     arm.setSheathed(true);
     for (let i = 0; i < 40; i++) arm.update(1 / 60);
-    // a phase that stands, so each look reads the same stroke - PIN MOVED (TWO-HANDS AUDIT 2): and a stride that stands
+    // a phase that stands, so each look reads the same stroke
     // with it (speed 0): the phase now FOLLOWS the bob within the stride's tempo (handsLaw.js runPhaseFollow), and a bob
     // standing still under a body running 7 m/s is no clock it stands on
     arm.setRunHands(true, { speed: 0, phase: 1 });
@@ -1082,7 +1077,7 @@ test('TWO-HANDS AUDIT 2 the rig under a READY Morrowind arm (L5): a light that i
   } finally { fpArm.ready = saved; _resetModSettings(); }
 });
 
-// ---- TWO-HANDS FIELD (2026-10-16, Mac after the merge) ------------------------------------------------------------
+// ---- TWO-HANDS FIELD ------------------------------------------------------------
 
 test('TWO-HANDS FIELD the law, A STRIDE\'S OTHER HALF (strideOppositeTime): half the group\'s loop window on, read off its own loop keys inside the block the state plays - wrapping inside the window; the group\'s start to stop where it has no loop keys; another block\'s keys never; nothing without a window', () => {
   const st = { group: 'walkforward', startTime: 1.0, stopTime: 2.4, loopStartTime: 1.0, loopStopTime: Infinity };
@@ -1200,8 +1195,7 @@ test('TWO-HANDS FIELD the arm, THE FIRST-PERSON PAIR IS MIRRORED ACROSS THE EYE 
   assert.ok(Math.abs(tl[0] + tr[0]) < 0.02, `third person: the body's own mirror (${tl} / ${tr})`);
 }));
 
-// ---- TWO-HANDS MIRROR-BIND (2026-10-17, Mac: "adjust the positioning of the morrowind left hand duel wield model on first
-// person, so its properly mirrored. Third person looks good") --------------------------------------------------------
+// ---- TWO-HANDS MIRROR-BIND --------------------------------------------------------
 
 /** The MW-STEEL4 stand-in for a first-person rig (test/formats/morrowind/mwsteel4.test.js): retail's bones, a camera, and
  *  the arms' rests turned off each other's mirror as a clip's first frame turns them - `shadow` its Tri Shadow or none. */
@@ -1295,8 +1289,7 @@ test('TWO-HANDS MIRROR-BIND the bind is read only where it is a mirror, and the 
   assert.ok(dist(mirrored.get(hand('L')).t, a.get(hand('L')).t) < 1e-6, 'and the joint where the mirror stands it');
 });
 
-// ---- TWO-HANDS SPREAD (2026-10-17, Mac: "For the morrowind first person, when duel wielding can we spread out the arms
-// a bit more sense it can make the weapons overlap") ----------------------------------------------------------------
+// ---- TWO-HANDS SPREAD ----------------------------------------------------------------
 
 test('TWO-HANDS SPREAD the law (handsLaw.js pairSpreadAngle): the least turn in [MIN, MAX] at which the blades stand GAP apart on the picture - each a share of its height, as the angle it spans at its middle; MIN where the blades stand clear already or no pair of them is on the picture, MAX where even it cannot clear them, and between, the turn the edges ask - read at every angle tried, so an arm turned about a shoulder (an edge moving less than the turn) still stands GAP apart (mutants: TWO-HANDS-SPREAD-no-min, TWO-HANDS-SPREAD-no-max, TWO-HANDS-SPREAD-no-gap, TWO-HANDS-SPREAD-halving-backwards, TWO-HANDS-SPREAD-answer-short, TWO-HANDS-SPREAD-one-blade-asks)', () => {
   assert.deepEqual({ ...PAIR_SPREAD }, { MIN: 0.04, GAP: 0.04, MAX: 0.2, TAU: 0.12 });

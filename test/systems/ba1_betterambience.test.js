@@ -1,5 +1,4 @@
-// BA1 - BETTER AMBIENCE 0.1.4 (Joshua Steinhauer), THE MOD, 1:1 (2026-09-16,
-// Mac: "Next mod to integrate 1:1 ensuring compatibility").
+// BA1 - BETTER AMBIENCE 0.1.4 (Joshua Steinhauer), THE MOD, 1:1.
 //
 // Six modules whose sixteen sources ride INSIDE the shipped bundle (vendored
 // under vendor/better-ambience/Scripts/), restated in systems/betterAmbience.js
@@ -99,7 +98,7 @@ test('BA1: the Mods pane entry is the shipped modsettings.json - six sections, t
   assert.match(rd('vendor/better-ambience/LICENSE'), /^MIT License/);
   const shipped = JSON.parse(rd('vendor/better-ambience/modsettings.json'));
   const PORT_DEFAULT = Object.freeze({ 'Better Footsteps.enable': false, 'Dungeon Lighting.enableFogAmbientEffect': false });   // the two departures (modSettings.js says why; BA2 the second)
-  // PLAIN-TEXT (2026-10-19): the mod's lines that read as notes to a developer, said plainly for a player - their words, exactly
+  // PLAIN-TEXT: the mod's lines that read as notes to a developer, said plainly for a player - their words, exactly
   const PLAIN = {
     'Better Footsteps.enable': 'Plays Better Ambience’s own footstep sounds',
     'Dungeon Fog.enableFog': 'Gives each dungeon its own random fog',
@@ -135,7 +134,7 @@ test('BA1: the Mods pane entry is the shipped modsettings.json - six sections, t
   assert.equal(m.keys.Enabled.default, true, 'MO1');
   assert.equal(m.keys['Better Footsteps.enable'].default, false, 'the departure: Immersive Footsteps\' author says so');
   assert.equal(JSON.parse(rd('vendor/better-ambience/modsettings.json')).Sections[0].Keys[0].Value, true, 'and the mod ships it on');
-  // BA2 (2026-09-17, Mac: the dungeons were "properly dark" before the mod): the mod's Trilight ambient ships OFF - the classic flat 0.12 stays the dungeon's dark; the fog and the reverb ship on
+  // BA2: the mod's Trilight ambient ships OFF - the classic flat 0.12 stays the dungeon's dark; the fog and the reverb ship on
   assert.equal(m.keys['Dungeon Lighting.enableFogAmbientEffect'].default, false, 'BA2: the mod\'s dungeon ambient ships off');
   assert.equal(JSON.parse(rd('vendor/better-ambience/modsettings.json')).Sections[4].Keys[0].Value, true, 'and the mod ships it on');
   assert.equal(m.keys['Dungeon Fog.enableFog'].default, true); assert.equal(m.keys['Dungeon Lighting.dungeonDarkness'].default, 1.0);

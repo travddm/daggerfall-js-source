@@ -55,7 +55,7 @@ test('ASCEND-ANYTIME: the crown promises no level, and the window says so', () =
   assert.equal(crown.to, crown.from);
   assert.equal(crownTitle(crown), 'Level 7', 'no arrow to a level that is not coming');
   assert.equal(levelUpFrame(e, s).crown.to, 7);
-  assert.equal(askView(), 'Your attributes');   // PIN MOVED (AUDIT GROWTH LANE5-1): read when drawn, and named plainly
+  assert.equal(askView(), 'Your attributes');
   // A real owed level still reads its arrow.
   e.pendingLevel = 8;
   assert.equal(crownTitle(levelUpCrown(e, { pool: 3, base: e.stats, working: e.stats })), 'Level 7 → 8');
@@ -63,7 +63,6 @@ test('ASCEND-ANYTIME: the crown promises no level, and the window says so', () =
 
 test('ASCEND-ANYTIME: a mod-law character\'s view reads the mod\'s bar, a classic one the skill-sum bar', () => {
   const e = hero();
-  // PIN MOVED (AUDIT GROWTH LANE5-1): the bar's two labels say what they measure
   assert.equal(levelProgress(e, viewOnlyScreen(e, false)).label, 'Skill progress to next level');
   assert.equal(levelProgress(e, viewOnlyScreen(e, true)).label, 'Progress to next level');
 });

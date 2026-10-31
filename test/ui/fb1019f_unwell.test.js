@@ -5,7 +5,7 @@
 // its incubation was over - DFU's own law (DaggerfallUI.CreateHealthStatusBox, DiseaseEffect.IncubationOver; DFU's
 // HUDActiveSpells shows a disease never, ShowSpellIcon false). Incubation ends at the character's own next midnight, and
 // a long rest or journey catches up its days while the HUD is hidden - so a disease could take hold, run, and kill unseen.
-// THE OWNER'S DECISION (2026-10-19, "Unnamed 'Unwell' tile", a departure from DFU): while a disease incubates, the HUD
+// THE OWNER'S DECISION: while a disease incubates, the HUD
 // shows an UNNAMED tile, "Unwell", and the Status box says the character feels unwell without naming it; once incubation
 // is over, the named disease as before. A vampirism or lycanthropy infection is no plain disease and stays as it was.
 // Driven on the real producers: startDisease, the character's own clock and the magic rounds a rest runs, the temple's

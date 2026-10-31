@@ -1,5 +1,4 @@
-// TIME-DILATION (2026-10-17, the owner: "fix a pre existing issue where AI can actually use the overworld as time
-// dilation"; bible/03-World/Naval-Refit.md TIME-DILATION) - the sea fight is stepped on the world's clock, and the
+// TIME-DILATION - the sea fight is stepped on the world's clock, and the
 // Overworld's journeys and keys run that clock at x5 to x100: the ships of the sea, and theirs alone of the AI (land
 // foes keep their own pace, TO1's departure), fired and sailed at that rate on a traveller who could not fire back. Held:
 // the journey's clock at x1 inside a hostile ship's hold (travelThreat.js foeRate, the threats' `holds`); the Overworld

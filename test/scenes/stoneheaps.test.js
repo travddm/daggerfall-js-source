@@ -1,4 +1,4 @@
-// STONE-HEAPS (AUDIT TAMRIEL-NODES, bible/03-World/World-Wide.md): a boulder is a World of Daggerfall rock field's piece,
+// STONE-HEAPS (AUDIT TAMRIEL-NODES): a boulder is a World of Daggerfall rock field's piece,
 // and the fields stand on the Bay alone (scenes/pixelBuild.js TAMRIEL2), so past the Bay no boulder ever stood - WW-C1's
 // stone-rich provinces stood none, and the Overworld's Mining groups counted veins alone. Where no field stands a boulder
 // is a heap on the stone, as a vein with no piece is, and the heaps and the veins there keep NODE_SPACING_M apart where

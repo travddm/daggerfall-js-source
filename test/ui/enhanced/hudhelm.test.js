@@ -1,5 +1,4 @@
-// HUD-HELM (2026-10-15, Mac: "Yes, same branch" - the helm panel registered as the saddle panel was, HUD-SADDLE;
-// bible/01-Overview/bugs/Field-Bugs-2026-10-14-riding-panel.md): THE HELM PANEL IS A HUD PIECE. Come Sail Away's helm panel
+// HUD-HELM: THE HELM PANEL IS A HUD PIECE. Come Sail Away's helm panel
 // (ui/enhanced/enhancedHelm.js, CSA-L) is the saddle panel's twin - a whole-screen layer, its bar under the compass - and stood
 // outside HUD-MOVE's list as the saddle did, so Alt+U could not move it, size it or turn it off. The bar is a piece now,
 // placed when it is built, with a preview of itself while nobody is at a helm; and the sea's target card (ui/naval/navalHud.js)

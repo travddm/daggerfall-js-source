@@ -1,7 +1,4 @@
-// GATE-COURTS (2026-10-26, the owner: "We need to develop instances for oblivion gate. The player counts are becoming
-// too large for one instance"; asked: fifty a court, placed automatically with the party together, the gate standing
-// until every court is done, each court's kill said in the chat and the night once on Discord - bible/11-Multiplayer/
-// World-Bosses.md section 29): A NIGHT'S BURNING COURTS. The law (net/gate/gateCourts.js: the book's seat, the night
+// GATE-COURTS: A NIGHT'S BURNING COURTS. The law (net/gate/gateCourts.js: the book's seat, the night
 // done, its word, the rite's own), the rooms (net/gate/gateLaw.js gateRoomKey), the wire's `go` and `cf` and the night's
 // `fell`, the relay over real Rooms (server/src/index.js _gateSentOn, _gateSeatHere, _gateBookBeat, the hub's doors), the
 // client's link (net/gate/gateLink.js) and the host's wiring. tools/mutants/gatecourts.json.
@@ -368,9 +365,9 @@ test('GATE-COURTS the words: a court\'s kill by its number, where, and who struc
   assert.ok(card({}).includes(`${gateBossOf(DAY).name} has fallen"`), 'a night of one court: the card as it was');
 });
 
-// ═══ AUDIT GATE-COURTS (2026-10-26) ════════════════════════════════════════════════════════════
+// ═══ AUDIT GATE-COURTS ════════════════════════════════════════════════════════════
 // The owner: "Audit this". Three cold lanes (the relay; the law, the wire and the client; the pins, the record and the
-// cost) - bible/11-Multiplayer/World-Bosses.md section 30. Each finding's pin below fails on the code before its fix.
+// cost) Each finding's pin below fails on the code before its fix.
 
 const inWord = { k: 'in', lv: 10, bv: GATE_BRAIN_V };
 /** The Warden of court `c` a blow from falling, `ws` its fighter who stood the fight. */

@@ -1,4 +1,4 @@
-// STAFF-PANEL3-REALM (2026-10-22, design doc "DFO Staff Panel: design", build step 3) - THE PANEL'S TRADE HOLDS, ROLLBACKS,
+// STAFF-PANEL3-REALM - THE PANEL'S TRADE HOLDS, ROLLBACKS,
 // FIXES, GAINS AND REMOVALS (server-account/src/staffRealm.js), driven through the real Worker on the node:sqlite database
 // every account pin stands on (test/accountDb.mjs) with R2 beside it (test/realmSeat.mjs): the held characters most
 // urgent first with why, a hold laid on one character or a whole account and lifted (saying it excused the finding and

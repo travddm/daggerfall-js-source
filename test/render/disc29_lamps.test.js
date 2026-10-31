@@ -1,5 +1,4 @@
-// DISC29-E (2026-09-28, Kristian B on Discord: interior lighting flickers and throws shadows through walls, worst in
-// the Mages Guild) - A LAMP'S SHADOW OF A FLAT FACES IT FROM THE FLAT, AND AN IDLING FLAT CASTS INTO EVERY LAMP.
+// DISC29-E - A LAMP'S SHADOW OF A FLAT FACES IT FROM THE FLAT, AND AN IDLING FLAT CASTS INTO EVERY LAMP.
 //
 // Traced on the real renderer over the real MAGEAA00/MAGEAA08 (a Mages Guild: ten people a hall, nearly half of them
 // idling in place, fourteen floor braziers). Two faults compounded:

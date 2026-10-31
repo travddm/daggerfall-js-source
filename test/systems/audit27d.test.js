@@ -1,10 +1,8 @@
-// AUDIT (2026-09-27, "Lets do a comprehensive audit on these changes" - the Discord batch of 2026-09-27: GUILD-SHELF,
-// SHORT-TOUCH, PAD-DOOR, TOUCH-BUTTONS, SPELL-GIFT, PARTY-BUFFS, COMPASS-PARTY, REST-OPT, SHARE-MEND, TRADE-INFO/FIT,
-// CHAT-POST, HOME-STATIONS). Six lenses read the batch, each finding was checked against the code, and each real one is
+// AUDIT. Six lenses read the batch, each finding was checked against the code, and each real one is
 // fixed and pinned. Most pins sit beside their slice's own (homestations, tradeinfo, sharemend, spellgift, partybuffs,
 // menupad, touchbuttons, guildshelf, decor1, auditsoc, own1); these are the ones whose seam is a pure law, or a host's
 // closure read by its source (world.js - the scene cannot be stood up here), recorded in
-// bible/01-Overview/bugs/Field-Bugs-2026-09-27e.md ## AUDIT.
+// ## AUDIT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -20,7 +18,7 @@ const W = src('src/scenes/world.js');
 
 test('AUDIT SPELL-GIFT B4: the live Spell Absorption is the BEST of its entries - a gift never merges with my own (ALLY-CAST C2), and a stranger\'s 0% one, first in the list, made my own 100% read 0 for as long as it ran (mutants: the first entry\'s)', () => {
   const entry = (chanceBase, over = {}) => ({ kind: 'spellAbsorption', chanceBase, chanceMod: 0, chancePerLevel: 1, ...over });
-  // ABSORB-NERF (2026-09-30): the chance caps at 50 (absorption.js SPELL_ABSORPTION_CHANCE_CAP) - the best is read under it
+  // ABSORB-NERF: the chance caps at 50 (absorption.js SPELL_ABSORPTION_CHANCE_CAP) - the best is read under it
   assert.equal(spellAbsorptionChance({ level: 10, activeEffects: [entry(0), entry(40)] }), 40, 'the gift ahead of my own');
   assert.equal(spellAbsorptionChance({ level: 10, activeEffects: [entry(45), entry(20)] }), 45);
   assert.equal(spellAbsorptionChance({ level: 10, activeEffects: [entry(0), entry(100)] }), 50, 'my own 100% reads the cap');
@@ -35,14 +33,14 @@ test('AUDIT SPELL-GIFT B6: a cure may leave an incubating infection be - the str
   assert.deepEqual(t.activeEffects.map((a) => a.infection ?? a.kind), ['Vampirism-Infection', 'poison']);
   cureAllOfKind(t, 'disease');
   assert.deepEqual(t.activeEffects.map((a) => a.kind), ['poison']);
-  // FIELD BUGS 29h (INFECTION-KEPT): PIN MOVED - the stranger's flag read beside the plain disease any cure takes
+  // FIELD BUGS 29h (INFECTION-KEPT):
   // first (test/systems/fb0929h_infectionkept.test.js); the host still says whose a cast is
   assert.match(src('src/systems/effects.js'), /cureAllOfKind\(target, CURE_KINDS\[e\.subType\], ctx\?\.strangerCast === true \|\| plainDiseaseLive\(target\)\);/);
   assert.match(W, /magic\.applySpellToPlayer\(spell, d\.level, null, \{ allyCast: true, strangerCast: !mate \}\);/);
 });
 
 test('AUDIT SPELL-GIFT B1 + B3 + B5: a gift never lands on the opponent of the duel I fight (a duel\'s beneficial spell stays home), nor on a CONCEALED stranger (INVIS-NET: named aloud and given to), a concealed mate still a mate; the marks say who is a mate, mates first - a blast\'s burst went to the room\'s first strangers (mutants: each dropped)', () => {
-  assert.match(W, /const giftablePeers = \(list\) => openPeers\(list, isPartyMate\)\.filter\(\(p\) => !\(duelMgr\.fighting && p\.id === duelMgr\.opponent\) && crowdDrawnHere\(p\)\);/);   // CONCEAL-MATE: the concealed-stranger law is openPeers' now (test/concealmate.test.js); PIN MOVED (GATE-CROWD): nor a player a gate court's crowd leaves undrawn (test/systems/gatecrowd.test.js)
+  assert.match(W, /const giftablePeers = \(list\) => openPeers\(list, isPartyMate\)\.filter\(\(p\) => !\(duelMgr\.fighting && p\.id === duelMgr\.opponent\) && crowdDrawnHere\(p\)\);/);     // CONCEAL-MATE: the concealed-stranger law is openPeers' now (test/concealmate.test.js)
   assert.match(W, /const hit = pickPeerInFront\(eye \?\? cam\.pos, dir \?\? socialFwd\(\), giftablePeers\(peersNear\(\)\), reach, rayPersonDistance\);/, 'the crosshair\'s pick');
   assert.match(W, /const marks = giftablePeers\(near\)\.filter\(\(p\) => online\.reachesPeer\?\.\(p\.id\) && \(mateOf\(p\.id\) \|\| strangers\)\)\s*\n\s*\.map\(\(p\) => \(\{ \.\.\.p, mate: mateOf\(p\.id\), name: [^\n]*\n\s*return \[\.\.\.marks\.filter\(\(m\) => m\.mate\), \.\.\.marks\.filter\(\(m\) => !m\.mate\)\];/, 'the marks, mates first');
   assert.match(src('src/scenes/hostMagic.js'), /out\.push\(\{ ally: true, mate: q\.mate !== false, id: q\.id,/, 'the engine keeps the word');
@@ -54,7 +52,6 @@ test('AUDIT SPELL-GIFT B1 + B7: the receiver refuses my duel opponent\'s gift wh
   assert.match(on, /if \(duelMgr\.fighting && id === duelMgr\.opponent\) return;/);
   assert.match(on, /if \(!mate && !\(peersNear\(\) \?\? \[\]\)\.some\(\(p\) => p\.id === id\)\) return;/);
   assert.match(on, /const loud = mate \|\| !\(t - \(_strangerCastSaid\.get\(id\) \?\? -Infinity\) < STRANGER_CAST_SAY_MS\);\s*\n\s*if \(loud && !mate\) _strangerCastSaid\.set\(id, t\);/);
-  // PIN MOVED (GIFT-QUIET, 2026-10-04): a stranger's line still rides `loud`; a party mate's goes through the gift gate
   assert.match(on, /const targetLine = allyCastTargetLine\(who, spell\.name\);\s*\n\s*if \(loud && \(!mate \|\| _mateGiftGate\(targetLine\)\)\) townTalk\.say\(targetLine\);/);
   assert.match(W, /const STRANGER_CAST_SAY_MS = 3000;/);
 });

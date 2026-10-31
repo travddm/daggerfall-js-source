@@ -1,4 +1,4 @@
-// FORAGE3 (2026-09-28, Mac: "Let's do it"): FORAGING 1.7 (Harbinger451),
+// FORAGE3: FORAGING 1.7 (Harbinger451),
 // THE LOOT HOOKS - ForagingLoot_OnLootSpawned (a shelf, a house
 // container), ForagingLoot_OnDungeonLootSpawned (a pile, by its index) and
 // ForagingLoot_OnEnemyDeath (a corpse), IL_0520-IL_0b8f; and the two DFU

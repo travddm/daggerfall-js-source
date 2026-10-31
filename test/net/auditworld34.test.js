@@ -1,6 +1,4 @@
-// AUDIT WORLD34 (Mac, 2026-09-13: "enemies, doors, and everything else
-// doesnt persist between connected players. They still see their own
-// enemies and stuff") - five opus lenses over slices 3 and 4 together (the
+// AUDIT WORLD34 - five opus lenses over slices 3 and 4 together (the
 // boot path and the room's lifecycle; the foes stream end to end; the acts,
 // the loot and the memory; the relay as deployed; the shipped scope against
 // what a player sees), plus the PR #125 audit beside them. THE ONE ROOT (A1):

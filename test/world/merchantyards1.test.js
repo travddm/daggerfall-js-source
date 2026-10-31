@@ -1,4 +1,4 @@
-// MERCHANT-YARDS (2026-10-10): EVERY CITY'S AND TOWN'S STABLE AND WAGON YARD - systems/merchantYards.js (the trade, the
+// MERCHANT-YARDS: EVERY CITY'S AND TOWN'S STABLE AND WAGON YARD - systems/merchantYards.js (the trade, the
 // keepers, the towns), world/merchantYards/merchantYardSites.js (where they stand), world/merchantYards/merchantYardModels.js and
 // world/merchantYards/merchantYardArt.js (what they are made of), scenes/merchantYardsHost.js (the pool), the General Store's shelf
 // they took the horse, the cart and the wagons from, and the wiring in the four hosts.
@@ -54,7 +54,6 @@ test('MERCHANT-YARDS THE TOWNS: Daggerfall\'s cities and towns (TownCity, TownHa
 });
 
 test('MERCHANT-YARDS THE STOCK: the Stable sells a Horse, the Wagon Yard the Small Cart, the Open Wagon and the Caravan - each row minted as a shelf mints it, a fresh list every Buy (mutants: a horse at the wagon yard; the list kept)', () => {
-  // PIN MOVED (STEED1/WAGONS4): the Stable stands three horses, each its own (stableHorses - test/systems/steed1_horsecare.test.js),
   // and sells a sack of oats; the Wagon Yard a Wagon Repair Kit beside its three - the upkeep's items offline, and online
   // while their switch is on (UPKEEP-ONLINE: on since 2026-10-12 - systems/upkeep/upkeepItemRows.js)
   const s = yardStock('stable');
@@ -147,7 +146,6 @@ test('MERCHANT-YARDS THE PLACE: its own ground open and off every road, a ring r
   for (let gy = s.gy - pad; gy < s.gy + s.nz + pad; gy++) for (let gx = s.gx - pad; gx < s.gx + s.nx + pad; gx++) assert.equal(g.blocked[gy * 128 + gx], 0);
   assert.deepEqual([s.x, s.z], [(s.gx + s.nx / 2) * NAV_CELL, (s.gy + s.nz / 2) * NAV_CELL]);
   assert.equal(s.yaw, YARD_TURNS[s.turn]);
-  // PIN MOVED (IC-PROPS, 2026-10-27: "They have no logical placements"): a place facing no way ALWAYS loses to one facing
   // one (YARD_FRONT_COST, more than any town is across - NO_ROAD_COST's 12 cells stay the ports'): a road at row 76, the
   // middle open - the Wagon Yard's gate opens on the road, never on the middle's open ground
   assert.ok(YARD_FRONT_COST >= 4096);
@@ -204,7 +202,6 @@ test('MERCHANT-YARDS BOTH YARDS: the Stable first, the Wagon Yard on what is lef
   const loc = { width: 1, height: 1, blocks: [{ x: 0, y: 0, dfBlock: { rmbBlock: { fldHeader: { autoMapData: auto, groundData: { groundTiles: tiles } } } } }] };
   const nav = new CityNavigation(1, 1);
   nav.setBlockData(0, 0, auto, (tx, ty) => tiles[tx][ty].textureRecord, { enhancedWater: true });
-  // PIN MOVED (IC-PROPS): the yards' law lays its own reading over that ground (its ways, gardens, edge) - the ground itself is
   // the people's
   assert.deepEqual(townGroundOf(loc).blocked, yardGround(nav).blocked, 'the same ground the people walk');
   assert.deepEqual(yardSitesOf(loc), yardSitesOn(townGroundOf(loc)));

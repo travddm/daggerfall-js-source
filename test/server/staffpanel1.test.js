@@ -1,4 +1,4 @@
-// STAFF-PANEL1 (2026-10-22, mob: a staff admin panel; design doc "DFO Staff Panel: design", build step 1) - THE PANEL'S
+// STAFF-PANEL1 - THE PANEL'S
 // SIGN-IN, SESSIONS, ROLES AND AUDIT LOG (server-account/src/staff.js), driven through the real Worker on the node:sqlite
 // database every account pin stands on (test/accountDb.mjs). Three locks (mob, 06:18Z): the password, a key only the
 // staff member's own extension holds, and the role lists.
@@ -90,7 +90,7 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
     '/v1/staff/players', '/v1/staff/player', '/v1/staff/player/devices', '/v1/staff/player/signout', '/v1/staff/player/rename',
     // STAFF-PANEL6-STATUS: server status, its limits and Home (staffStatus.js)
     '/v1/staff/home', '/v1/staff/limit/set', '/v1/staff/limits', '/v1/staff/status',
-    // STAFF-PANEL3-REALM: trade holds, rollbacks, fixes, gains and removals (staffRealm.js); STAFF-SET-BANK: a bank set - PIN MOVED
+    // STAFF-PANEL3-REALM: trade holds, rollbacks, fixes, gains and removals (staffRealm.js); STAFF-SET-BANK: a bank set
     '/v1/staff/trade-holds', '/v1/staff/findings', '/v1/staff/trade-hold', '/v1/staff/trade-unhold', '/v1/staff/rollback', '/v1/staff/fix/repair',
     '/v1/staff/fix/mend', '/v1/staff/fix/bank', '/v1/staff/fix/letter', '/v1/staff/gains', '/v1/staff/market/pull', '/v1/staff/market/remove', '/v1/staff/item/take', '/v1/staff/item/purge-dupes', '/v1/staff/evidence',
     '/v1/staff/evidence/return',
@@ -104,11 +104,11 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
     '/v1/staff/follow',
     // STAFF-PANEL5-MESSAGE: Message on screen (staffMessage.js)
     '/v1/staff/message', '/v1/staff/messages',
-    // STAFF-EVENT: the Events page (staffEvents.js) - PIN MOVED
+    // STAFF-EVENT: the Events page (staffEvents.js)
     '/v1/staff/event', '/v1/staff/events',
     // STAFF-PANEL5-FEEDS: Network bursts, Monster watch and its Flag, the bot check (the relay's /v1/staff/net-feed takes no session)
     '/v1/staff/net', '/v1/staff/monsters', '/v1/staff/monster/flag', '/v1/staff/reactions', '/v1/staff/reactions/keep',
-    // STAFF-PANEL5-HIDDEN: Hide me and Show myself (staffHidden.js) - PIN MOVED
+    // STAFF-PANEL5-HIDDEN: Hide me and Show myself (staffHidden.js)
     '/v1/staff/hide',
     // STAFF-PANEL5-FREEZE: freeze and the staff chat (staffFreeze.js)
     '/v1/staff/freeze', '/v1/staff/unfreeze', '/v1/staff/freezes', '/v1/staff/freeze-push', '/v1/staff/talk', '/v1/staff/chat', '/v1/staff/chat-send',
@@ -121,7 +121,6 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
   for (const k of ownerKeys({ OWNER_KEYS: toml.match(/^OWNER_KEYS = "([^"]*)"$/m)?.[1] }).values()) {
     await crypto.subtle.importKey('raw', Buffer.from(k, 'base64url'), { name: 'Ed25519' }, false, ['verify']);
   }
-  // mob, 06:33Z: "add me to the dev and my shadow fang just becomes vanity and i gain admin as well"
   assert.match(toml, /^DEVELOPER_HANDLES = "[^"]*,SirMcMobdon,kpblca_1"$/m);
   assert.match(toml, /^SHADOW_FANG_HANDLES = "SirMcMobdon"$/m);
 });

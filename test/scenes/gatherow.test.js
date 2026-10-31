@@ -1,5 +1,4 @@
-// GATHER-OW (2026-10-02, Mac: "increase all profession nodes and also allow them to appear in the overworld without
-// being overwhelming, maybe a glyph marker showing where a group of them are"; asked, "Groups nearby").
+// GATHER-OW.
 //
 // The Overworld marks each profession's group of nodes on the land near the player: one glyph a profession a stood
 // pixel, at its nodes' middle, in its compass colour - a diamond, a gem's - with its count today ("Mining ×6"), the

@@ -1,8 +1,4 @@
-// WORLD1 (Mac, 2026-09-12: "So now that this is situated its now
-// important that we bring the world in line for anyone online.
-// Currently theres a lot disconnected like enemies, doors, etc. The
-// world is the server and every player should inhabit that world while
-// also being able to continue their progress ... True persistance").
+// WORLD1.
 // SLICE 1: THE ROOM'S MEMORY. A world room (a dungeon, today) keeps a
 // snapshot of its world in the relay's own storage - the layout's foes
 // and how they stand, the piles, the dropped loot, the actions and door

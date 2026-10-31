@@ -1,5 +1,4 @@
-// MW-STEEL1 (2026-10-06, Mac: "These 2 files are for the armor replacement of the morrowind steel armor with a
-// varient to toggle the helmet type"): MAC'S STEEL PLATE, THE WHOLE CLASSIC SET, ON THE MORROWIND BODY.
+// MW-STEEL1: MAC'S STEEL PLATE, THE WHOLE CLASSIC SET, ON THE MORROWIND BODY.
 //
 // Daggerfall's seven classic pieces in Steel wear Mac's plate in place of retail's steel_* records (Steel only - his
 // answer); the helm comes closed (a visor and a plume) or open (a nasal helm), by the Steel Helm switch, closed by

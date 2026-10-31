@@ -1,5 +1,4 @@
-// PORTAL-GIFT (2026-10-04, the owner: "every current player should recieve x10 of these. They should stack";
-// bible/06-Systems/Portal-Stone.md "The gift"): EVERY CHARACTER THAT ALREADY EXISTS IS GIVEN TEN PORTAL STONES, ONCE.
+// PORTAL-GIFT: EVERY CHARACTER THAT ALREADY EXISTS IS GIVEN TEN PORTAL STONES, ONCE.
 // The law (systems/gate/gateSpoils.js givePortalGift, PORTAL_GIFT, PORTAL_GIFT_STONES, takePortalGiftNotice), the mark the
 // save carries (systems/save/save.js), and the host's word once the world stands (scenes/world.js) - LOAN-AMNESTY's shape.
 import '../modsOff.js';

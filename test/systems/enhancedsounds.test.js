@@ -1,6 +1,4 @@
-// ES1 (2026-09-16, Mac: "lump this in as a new enhanced toggle. Enhanced
-// Sounds, add the wind noise to it") + MAC-O6 (Mac's patch: "looting
-// gold/items makes no sound"). ONE switch over the port's own sounds:
+// ES1 + MAC-O6. ONE switch over the port's own sounds:
 // the wind loop (WIND3's own row, folded in) and the enhanced
 // inventory's transfer cues - DoTransferItem's gold clink and button
 // click, which the classic window always played and the enhanced one

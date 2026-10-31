@@ -1,5 +1,4 @@
-// WEATHER2c (Mac, 2026-09-14: "different generative cloud types, like being able to see a thunderhead in the distance
-// with the weather happening elsewhere"): CLOUD TYPES BY PLACE. The one volumetric field had one profile for the whole
+// WEATHER2c: CLOUD TYPES BY PLACE. The one volumetric field had one profile for the whole
 // sky - the zone's word, eased. It takes CELLS now: a world position, a radius and a soft rim, a profile of its own with
 // its weather's cover and grey, blended over the zone's terms by the rim's weight at every sample both marches take,
 // under a slab that is the union of the zone's and the cells' (SLAB-SPAN: each ray's own, since - see the spans' tests). Ships with the `?cloudcell=` door (one static cell) and
@@ -116,7 +115,7 @@ test('SLAB-SPAN both marches: a cell a ray never passes changes nothing it draws
     const frag = [east, (elDeg / 90) * ZONE.uMapSize[1], 0, 1], a = sky([thin], frag), b = sky([], frag);
     assert.ok(a.every((v, i) => Math.abs(v - b[i]) < 0.01), `${elDeg} degrees: ${a.map((v) => v.toFixed(3))} against ${b.map((v) => v.toFixed(3))} without the cell`);
   }
-  // the aerial perspective itself (PIN MOVED, SKY-ARC: each sample's own distance): what the horizon's colour adds is a share
+  // the aerial perspective itself (
   // of the cloud's opacity between fade(entry) (1 - T) and fade(exit) (1 - T) - every sample faded by where it stands
   // in the slab, never all of it by where it begins
   for (const elDeg of [3, 8, 20]) {

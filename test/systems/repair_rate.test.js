@@ -1,6 +1,4 @@
-// REPAIR-RATE and KIT-CEILING (2026-10-01, the economy arc - bible/06-Systems/Economy-Arc.md, set from its confirmed
-// intent: repairs "exist to limit outings and force planning. Their function is not to remove money from the economy";
-// field repair stays partial). A repair costs a third of Daggerfall's price (REPAIR-EASE had two thirds); no kit - a
+// REPAIR-RATE and KIT-CEILING. A repair costs a third of Daggerfall's price (REPAIR-EASE had two thirds); no kit - a
 // field kit or a smith's - mends a piece past three quarters of its condition, and a kit that has nothing below them
 // to mend says a smith can do the rest.
 import { test } from 'node:test';
@@ -75,7 +73,7 @@ test('KIT-CEILING: no kit mends a piece past three quarters - 60% to 75%, 70% to
   const whole = mintFieldRepairKit();
   assert.deepEqual(repairKitUse(whole, [whole, at(sword(), 100)]), { kind: 'repairKit', text: 'Nothing here wants mending.', refused: true });
   // AUDIT ECON R4/R5: the ceiling is ROUNDED DOWN - an Iron Dagger's 50 stopped at 37 (74%), never 38 (76%, the sharp
-  // band), and at 37 it is refused in words that do not say 75%. WEAPON-POOL (2026-10-06): every weapon's pool is a
+  // band), and at 37 it is refused in words that do not say 75%. WEAPON-POOL: every weapon's pool is a
   // multiple of four now, at any material and quality (AUDIT WEAPON-POOL P9: 400 per step of the ladder, and the smith's
   // 0.75, 1.15 and 1.3 of that), so three quarters of one is whole; a smith's Fine Buckler (512 x
   // 1.15 = 588.8, so 589) is a piece whose three quarters is not - it stops at 441 (74.9%), never 442

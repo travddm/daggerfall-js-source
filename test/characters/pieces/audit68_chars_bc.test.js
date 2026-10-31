@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), the whole-tree sweep - cluster chars_bc
+// AUDIT 68, the whole-tree sweep - cluster chars_bc
 // (src/characters from equipRules to pieceFromSprite, the pieces and
 // the rewrite rig). The behavioural fixes: the Khajiit tail's twisted
 // frame and inside-out tube, the drapes' group tag, the arachnid's

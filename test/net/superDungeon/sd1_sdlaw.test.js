@@ -1,5 +1,4 @@
-// SD1 (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time." ... "The Super dungeon collapses when the feat is done."): THE SUPER DUNGEON'S
+// SD1: THE SUPER DUNGEON'S
 // LAW (net/superDungeon/sdLaw.js) - its slot, its record's life, where it rises, its name, its room. bible/11-Multiplayer/
 // Super-Dungeons.md sections 2-4. Pure, and the relay's: the hub stores one record (`sdev`) and moves it on with one
 // function per move, each refusing a move its phase does not allow; every phase is derived from the record's own
@@ -26,7 +25,7 @@ test('SD1: the numbers - two days standing, three minutes collapsing, two hours 
   assert.equal(SD_COOLDOWN_MS, 2 * H);
   assert.equal(SD_FIRST_RISE_MS, 10 * M);
   assert.equal(SD_CENSUS_MIN, 2);
-  assert.equal(SD_REGION_COUNT, 71, 'pinned equal to the world\'s regions (not imported: the relay\'s graph)');   // PIN MOVED (WW5): every region's channel is counted - each lane its own (wire.js sdLaneRegionOk); PIN MOVED (WW-R): the Bay's - REGION_NAMES holds the provinces' after them
+  assert.equal(SD_REGION_COUNT, 71, 'pinned equal to the world\'s regions (not imported: the relay\'s graph)');
   assert.equal(REGION_NAMES[SD_REGION_COUNT - 1], 'Cyrodiil');
   assert.equal(REGION_NAMES[61], 'Cybiades', 'the Bay\'s lane rises in the Bay\'s 62 alone');
   for (const r of [62, 64, 70]) assert.equal(sdRise(null, SD_FIRST_RISE_MS, r), null, `the Bay's lane never in a province's region ${r}`);
@@ -141,7 +140,7 @@ test('SD1: the director\'s step - first, gone, rise, or nothing until the next i
 test('SD1: the census\'s region - the fullest at the minimum or more, a tie broken by the slot\'s roll, the last region resting while another qualifies; none, the Bay\'s great cities', () => {
   const counts = (o) => Object.assign(new Array(SD_REGION_COUNT).fill(0), o);
   assert.equal(pickSdRegion(1, counts({})), -1, 'nobody: the great cities');
-  assert.equal(pickSdRegion(1, counts({ 5: 1 })), -1, 'one player is no crowd');   // PIN MOVED (SD-SEA): Dwynnen (5), not Yeorth Burrowland (4) - a region with no town the census never chooses (sdLaw.js SD_TOWNLESS_REGIONS)
+  assert.equal(pickSdRegion(1, counts({ 5: 1 })), -1, 'one player is no crowd');
   assert.equal(pickSdRegion(1, counts({ 5: 2 })), 5);
   assert.equal(pickSdRegion(1, counts({ 5: 2, 9: 5, 17: 3 })), 9, 'the fullest');
   // a tie: the slot's own roll picks, the same for every asker, and the slots spread over the tied regions
@@ -153,7 +152,7 @@ test('SD1: the census\'s region - the fullest at the minimum or more, a tie brok
   assert.equal(pickSdRegion(2, counts({ 9: 50 }), 9), 9, 'the only crowd is the crowd');
   assert.equal(pickSdRegion(2, counts({ 9: 50, 17: 1 }), 9), 9, 'a region under the minimum does not take its turn');
   assert.equal(pickSdRegion(1, null), -1);
-  assert.equal(pickSdRegion(1, counts({ 60: 3 })), 60, 'the last region with a town counts');   // PIN MOVED (SD-SEA): Ilessan Hills (60) - Cybiades (61) has no town
+  assert.equal(pickSdRegion(1, counts({ 60: 3 })), 60, 'the last region with a town counts');
   assert.equal(sdRoll(7, 1), gateHash(SD_SALT, 7, 1), 'the gate\'s mix, the Hollow\'s salt');
 });
 
@@ -192,7 +191,6 @@ test('SD1: the name, the room and the words', () => {
   assert.equal(sdNameOf(s, 'Wayrest'), SD_NAMES[cityName].replace('{city}', 'Wayrest'));
   assert.equal(sdNameOf(s), SD_NAMES[0], 'a city\'s name with no city falls back to the first');
   // the room
-  // PIN MOVED: SD-PARTY - a realm is a party's own, `sd:<s>.<owner>`; the bare `sd:<s>` of the one shared Hour is no room
   const O = '0123456789abcdef';
   assert.equal(sdRoomKey(7, O), `sd:7.${O}`);
   assert.equal(sdRoomKey(7), null, 'no owner, no room');
@@ -206,11 +204,11 @@ test('SD1: the name, the room and the words', () => {
   assert.equal(sdOwnerOfRoom(`sd:42.${O}`), O);
   assert.equal(sdOwnerOfRoom('sd:42'), null);
   // the words
-  assert.equal(sdFoundLine({ who: 'Mara', near: 'Daggerfall' }), 'Mara has found an Abyss Dungeon near Daggerfall!');   // ABYSS-NAME (PIN MOVED): the player's word
-  assert.equal(sdFellLine({ top: 'Mara', n: 1, name: 'The Brass Hollow' }), 'Mara broke the Hour in the Brass Hollow. It collapses.');   // AUDIT SD II (L6 F20, PIN MOVED): the article small mid-sentence
+  assert.equal(sdFoundLine({ who: 'Mara', near: 'Daggerfall' }), 'Mara has found an Abyss Dungeon near Daggerfall!');     // ABYSS-NAME (
+  assert.equal(sdFellLine({ top: 'Mara', n: 1, name: 'The Brass Hollow' }), 'Mara broke the Hour in the Brass Hollow. It collapses.');     // AUDIT SD II (L6 F20
   assert.equal(sdFellLine({ top: 'Mara', n: 2, name: 'The Brass Hollow' }), 'Mara and 1 other broke the Hour in the Brass Hollow. It collapses.');
   assert.equal(sdFellLine({ top: 'Mara', n: 5, name: 'The Brass Hollow' }), 'Mara and 4 others broke the Hour in the Brass Hollow. It collapses.');
   assert.equal(sdFadeLine({ name: 'The Stopped Bell' }), 'The Hour closes over the Stopped Bell, unbroken.');
-  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');   // AUDIT SD III (T15, PIN MOVED): the player's word for it, Abyss Dungeon
+  assert.equal(SD_CAST_OUT_LINE, 'The Hour closes, and the Abyss Dungeon folds in on itself behind you.');     // AUDIT SD III (T15
 });
 

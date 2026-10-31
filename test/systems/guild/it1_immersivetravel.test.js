@@ -1,7 +1,7 @@
-// IT1 (2026-10-04, the owner: "Actually lets let this be the next mod we integrate 1:1"): IMMERSIVE TRAVEL 1.5, by
+// IT1: IMMERSIVE TRAVEL 1.5, by
 // kkgobkk - carriages at the city gates, a driver's Fast Travel, a ship captain's passage. The port's law is the
 // shipped assembly's IL (vendor/immersive-travel/il); every pin here names the offsets it holds the port to, and the
-// mod's own bugs are pinned as it ships them (bible/06-Systems/Immersive-Travel.md).
+// mod's own bugs are pinned as it ships them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -45,7 +45,7 @@ test('IT1 the record: the manifest and the settings verbatim, every key restated
   const restated = Object.keys(keys).filter((k) => k !== 'Enabled');
   const shipped = SHIPPED.Sections.flatMap((s) => s.Keys.map((k) => [`${s.Name}.${k.Name}`, k]));
   assert.deepEqual(restated, shipped.map(([n]) => n), 'every key, in the file\'s order');
-  // PLAIN-TEXT (2026-10-19): six of the author's lines said plainly for a player (two typos among them) - their words, exactly
+  // PLAIN-TEXT: six of the author's lines said plainly for a player (two typos among them) - their words, exactly
   const PLAIN = {
     'General.DisableNormalTravel': 'You can no longer travel from the map, and must use carriages and ships.',
     'General.DrawRoads': 'Draws roads on the map when Basic Roads is on.',
@@ -93,7 +93,7 @@ test('IT1 Init: Carriage Drivers (8642) and Sailors (8643) as the IL writes them
     // StaticNPCClick's routing: sgroup 1 is Merchants, so the custom service answers - outdoors too (no building)
     const route = staticNpcRoute({ npcFactionId: 8642, npcFaction: customFactions().get(8642), insideBuilding: false, hasCustomMerchantService });
     assert.deepEqual(route, { kind: 'merchant', service: 'sell' });
-    // AUDIT IT1 W4 (PIN MOVED): the mod is loaded for the game - a switch flipped mid-game waits for the next start
+    // AUDIT IT1 W4 (
     // (the dictionary took the factions once); off AT THE START, nothing (auditit1.test.js)
     setModSetting(IMMERSIVE_TRAVEL_VENDOR, 'Enabled', false);
     assert.equal(hasCustomMerchantService(8642), true);

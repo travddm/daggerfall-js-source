@@ -1,5 +1,4 @@
-// PERF-CROWD (2026-10-10, Dudey: "the game has huge performance issues in almost all departments" and "big problems
-// are caused by many players causing severe stutter") - bible/07-Rendering/Performance-Crowd.md. The pins (the pass's
+// PERF-CROWD . The pins (the pass's
 // own PERF-V8 pin is not here: the world host's frame is PERF-PRIORITY's PERF-V8, pinned by test/scenes/perfv8.test.js):
 //
 //   INPUT1  the binding maps walked by forEach (no [key, value] pair a binding a poll), the same codeDown sequence

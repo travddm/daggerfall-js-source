@@ -1,4 +1,4 @@
-// PERF4 (2026-09-11, Mac: "look for opportunities"). A streamed pixel's
+// PERF4. A streamed pixel's
 // static RMB models merged into one mesh per pixel, one draw call per
 // resolved texture, instead of one call per sub-mesh per model. The
 // builder EXECUTES; the world host is text-pinned. Every pin names its

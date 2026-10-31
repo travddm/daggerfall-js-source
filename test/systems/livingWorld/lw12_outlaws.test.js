@@ -1,4 +1,4 @@
-// LW12 (bible/06-Systems/Living-World-II.md "LW12"): THE OUTLAWS - a region's bands and their hideouts off its roads,
+// LW12 ("LW12"): THE OUTLAWS - a region's bands and their hideouts off its roads,
 // their generations (the dice's routs and the character's), their people and names, the hold-up on the dice (a band's
 // share of a trouble near its hideout; robbed below the ratio, no blood), the take, the news; the hideout stood (tents,
 // fire, people, chest), the rout, the chest looted, heard of and its rumoured ring; a robbed caravan's counter. Pure and
@@ -257,7 +257,7 @@ test('LW12 the take: the parties the band robbed since it formed and within TAKE
 });
 
 test('LW12 heard of and told: the road\'s news of a hold-up names the band; a town of its region tells of a rout by the player; the routed tale, the heard and looted marks ride the save as add-only kinds (mutants: the band named, the region, the kinds)', () => {
-  assert.deepEqual([...TALE_KINDS], ['home', 'routed', 'held']);   // PIN MOVED (LW16): a party robbed, charged
+  assert.deepEqual([...TALE_KINDS], ['home', 'routed', 'held']);
   assert.deepEqual([...MARK_KINDS], ['laid', 'heard', 'looted']);
   const trip = { id: 'L1.t0:3', leader: { name: 'Ada Lark' }, to: { name: 'Wayrest' }, backT1: 100, enc: { id: 'L1.t0:3:e', kind: 'robbed', foes: [138], band: 'O1.0~2', bandName: 'the Black Hand' } };
   const n = newsOf([trip], 200);
@@ -290,13 +290,13 @@ function hostOver({ band = null, here = null, t = 12 * 60, owner = true, looted 
     spawn: (type, feet, o) => { const rec = { type, feet, o, dead: false, entity: {} }; log.spawned.push(rec); return Promise.resolve(rec); },
     remove: (rec) => log.removed.push(rec), inPool: (rec) => log.spawned.includes(rec) && !log.removed.includes(rec),
     relations: () => rel, say: (s) => log.said.push(s),
-    chest: function* () { return { items: items(), robbed }; },   // PIN MOVED (AUDIT LW-II-2 C5): the chest a generator, worked after the stand frame
+    chest: function* () { return { items: items(), robbed }; },
     dropPile: (items) => { const pile = { items: [...items] }; log.piles.push(pile); return pile; },
     removePile: (p) => log.removedPiles.push(p),
   };
   return { host: createHideouts(deps), log, clock, rel, h, deps };
 }
-const tick = async (host, n = 1) => { for (let i = 0; i < n; i++) { host.frame(1.01); host.frame(0); await new Promise((r) => setImmediate(r)); } };   // PIN MOVED (AUDIT LW-II-2 C5): and the frame after each second's - the chest is worked after the frame that stood it
+const tick = async (host, n = 1) => { for (let i = 0; i < n; i++) { host.frame(1.01); host.frame(0); await new Promise((r) => setImmediate(r)); } };
 const someBand = () => ({ key: 'O17.0~3', gen: 3, heir: 0, name: 'the Black Hand', people: [0, 1, 2, 3, 4].map((i) => ({ id: `O17.0~3.${i}`, name: `Out ${i}`, cls: 138, level: 5 + i, sex: 'male' })) });
 
 test('LW12 the hideout stood: on foot within BAND_LIVE_M, the one standing it - its tents about a fire, its people as the pool\'s foes by name and level (by night half), its chest of its take; an empty hideout its tents alone; let go past BAND_KEEP_M - the living taken out, a chest taken from looted for the character (mutants: the reach, the night, the chest, the looted, the let-go)', async () => {
@@ -312,7 +312,6 @@ test('LW12 the hideout stood: on foot within BAND_LIVE_M, the one standing it - 
   assert.equal(far.host.shown(), null, 'beyond its reach');
   const no = hostOver({ band, owner: false });
   await tick(no.host);
-  // PIN MOVED (AUDIT LW-II C11b): another player stands its people - its camp and its chest every reader's own
   assert.deepEqual(no.host.shown(), { key: 'O17.0', band: band.key, foes: 0, tents: 2, pile: true, routed: false }, 'another player stands its people');
   assert.equal(no.log.spawned.length, 0);
   const { host, log, clock, rel } = hostOver({ band });
@@ -354,7 +353,7 @@ test('LW12 routed: every one of its people down - the character\'s tale (`routed
   const robbed = [{ party: [{ id: 'L903.t1' }, { id: 'L903.t2' }] }];
   const { host, log, rel } = hostOver({ band, robbed });
   await tick(host);
-  log.spawned.slice(0, 4).forEach((r) => { r.dead = true; r.corpse = true; });   // PIN MOVED (AUDIT LW-II C3): killed as the pool kills - a body
+  log.spawned.slice(0, 4).forEach((r) => { r.dead = true; r.corpse = true; });
   await tick(host);
   assert.equal(host.shown().routed, false, 'one stands');
   log.spawned[4].dead = true; log.spawned[4].corpse = true;
@@ -385,7 +384,7 @@ test('LW12 heard of: a band near the player not yet heard of is warned of in a t
   const p = rumourAt(h, band.key);
   assert.ok(Math.hypot(p.x - h.x, p.z - h.z) <= RUMOUR_OFF_N + 1e-6);
   assert.deepEqual(m[0].at, [p.x / NATIVE_PER_M, 0, p.z / NATIVE_PER_M]);
-  assert.ok(BAND_WARNINGS.every((w) => /\b[Tt]he Black Hand\b/.test(fillLine(w, { band: 'the Black Hand' }))));   // PIN MOVED (AUDIT LW-II-2 W8): a band's "the" opening a sentence is a capital
+  assert.ok(BAND_WARNINGS.every((w) => /\b[Tt]he Black Hand\b/.test(fillLine(w, { band: 'the Black Hand' }))));
 });
 
 test('LW12 a caravan the outlaws held up: its purse theirs (a sale refused), half its goods gone - the band\'s, never the character\'s (mutants: the purse, the half, the band\'s)', () => {
@@ -436,7 +435,7 @@ test('LW12 a caravan the outlaws held up: its purse theirs (a sale refused), hal
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// AUDIT LW-II (2026-10-10): THE OUTLAWS, AUDITED - each finding reproduced, fixed, and pinned below.
+// AUDIT LW-II: THE OUTLAWS, AUDITED - each finding reproduced, fixed, and pinned below.
 
 test('AUDIT LW-II C2: a hand in the chest is `looted` the frame it shows - a piece taken and another put in its place, before any let-go; a save made while it stands carries it, and the chest stands empty from that save (mutants: the frame, the pieces, the counts)', async () => {
   const band = someBand();

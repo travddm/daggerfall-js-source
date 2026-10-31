@@ -1,5 +1,4 @@
-// RIVER-FORDS (2026-10-26, the owner: "Take care of exclusions and gaps"; AUDIT RELEASE R1-3, bible/01-Overview/audits/
-// Audit-Release-R1.md; bible/03-World/Roads.md RIVER-FORDS) - THE CARVED RIVERS CROSSED AS FORDS. CYRODIIL-WATERS carves its
+// RIVER-FORDS - THE CARVED RIVERS CROSSED AS FORDS. CYRODIIL-WATERS carves its
 // rivers narrower than a pixel inside the kernel, so the pixels' bytes the roads' worker routes on carried none: the roads
 // crossed the channels anywhere, ran along them (192 road pixels on a channel in five of Cyrodiil's regions, 37 along
 // one), priced as dry ground, and the kernel then painted the channel's water over the road. Now the roads' build prices

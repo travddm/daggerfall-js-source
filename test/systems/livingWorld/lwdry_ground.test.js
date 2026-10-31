@@ -1,4 +1,4 @@
-// LW-DRY (field, 2026-10-05, Mac: "NPCs will get stuck over bodies of water"; bible/06-Systems/Living-World.md, the
+// LW-DRY (field, 2026-10-05,;, the
 // LW-DRY record): A PARTY STOPS ON DRY GROUND. A way is the planner's straight legs between its pixels' centres and the
 // planner's water a whole pixel's, so by a coast a leg runs over the sea's edge - and nothing asked the ground where a
 // party stopped: night camped it in the water, trouble fought it there and its fallen lay there. The ground is the

@@ -1,5 +1,5 @@
-// AUDIT POI (2026-10-15), LANE C - THE EDITOR'S CORE AND ITS HOST IN THE WORLD (bible/06-Systems/POI-Editor-Arc.md
-// POI-3a, POI-3b). Mac: "Audit everything. Ensure perfection." Each pin below failed on the audited head (0c78d81a85):
+// AUDIT POI, LANE C - THE EDITOR'S CORE AND ITS HOST IN THE WORLD (
+// POI-3a, POI-3b). Each pin below failed on the audited head (0c78d81a85):
 //   - the core (src/poi/poiEdit.js): Unity's angles at a pole (E4); a saved new POI undone past its create and redone
 //     (E8); an undo mid-drag (E9); a model and its new POI one step (E11); nothing edited while another is shown in its
 //     place (E17);

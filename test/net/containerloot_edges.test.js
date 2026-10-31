@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 2 (2026-10-17) - THE EDGES THE WRITTEN PINS DO NOT REACH. test/net/containerloot*.test.js pin the design's laws
+// OUTDOOR-LOOT, SLICE 2 - THE EDGES THE WRITTEN PINS DO NOT REACH. test/net/containerloot*.test.js pin the design's laws
 // against the doors the interior host calls; the implementation (world/interior/interiorRoomLoot.js) also decides a few things the
 // design leaves to it, each one a way a player would otherwise meet the bug again or lose something the old law never lost:
 //   - OFFLINE the room is inert: the page has no peer id, so the roll is written as it always was, a take is the player's own and
@@ -193,7 +193,7 @@ test('a birth no seat ever answers (an older build holds the seat, or its socket
   assert.deepEqual(names(items(s.B)), ['Dagger', 'Mace'], 'and B\'s own window shows its roll');
 });
 
-// ═══ AUDIT OUTDOOR-LOOT (2026-10-18, PR #1019's audit) - WHAT A LOST TIE-BREAK AND A LEAVE MAY TOUCH ════════════════════════════
+// ═══ AUDIT OUTDOOR-LOOT - WHAT A LOST TIE-BREAK AND A LEAVE MAY TOUCH ════════════════════════════
 // C1: a lost tie-break lifted back out of the seat's pack every piece it had taken from the cupboard that visit - and a same-day birth
 // with an earlier `tm` is a lost tie-break whenever it comes, so one forged word, minutes later, took a seat's Katana (and, after a
 // take put back, the seat's own honest arrows that stack with it). What a lost roll gives back is bounded to the window an honest

@@ -1,5 +1,4 @@
-// LEVEL-EVEN (2026-10-19, Discord #suggestions "Make Health from Endurance retroactive", through Mac; Mac on which to
-// build: "Your opinion" - the floor and the fixed pool, online): "make the endurance effect on health per level
+// LEVEL-EVEN: "make the endurance effect on health per level
 // retroactive, so that people are not penalized dozens or possibly hundreds of hp for not investing in endurance as early
 // as possible ... making class health per level apply as an average ... Making levels consistently give 5 attribute
 // points". Online the maximum is never below the class's average body at its level and its Endurance now (the

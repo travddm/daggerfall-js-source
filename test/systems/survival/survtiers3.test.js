@@ -30,20 +30,19 @@ import { CLIMATES } from '../../../src/formats/mapsFile.js';
 import { RACES } from '../../../src/systems/races.js';
 import { renownFoeStruck, renownFoeDied } from '../../../src/net/renownTracker.js';   // RENOWN1: the kill door's stamps, in the harness's scope
 import { reportPlayerKill } from '../../../src/systems/playerKills.js';   // SET2: the kill door's third word, in the harness's scope
-import { ROOM_LOOT_OFF } from '../../roomLootOff.mjs';   // PIN MOVED (PARTY-LOOT): the room's seams with no room
-import { appliedOwnerTm } from '../../../src/net/ownerClock.js';   // PIN MOVED (OWNER-CLOCK): the stream door copies its frame's owner clock beside the feet - a free name of the mount
+import { ROOM_LOOT_OFF } from '../../roomLootOff.mjs';
+import { appliedOwnerTm } from '../../../src/net/ownerClock.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the mounted scope
 import { bossClockS } from '../../../src/systems/bossTraits.js';
 const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };
 
-// ═══ AUDIT SURV-TIERS, THE THIRD PASS (2026-09-23) ═══════════════════
+// ═══ AUDIT SURV-TIERS, THE THIRD PASS ═══════════════════
 //
-// Mac: "Just do one more comprehensive audit and ensure everything is
-// perfect and makes sense". Main merged in first (DISC6/DISC7), then five
+// . Main merged in first (DISC6/DISC7), then five
 // fresh lenses over the merged tree - the newest slices and the merge,
 // the player's sense tier by tier, the laws fuzzed, the records and pins,
 // and online and saves. Every finding was reproduced before it was fixed;
-// each test here is one of them (bible/06-Systems/Climates-Calories.md,
+// each test here is one of them (,
 // AUDIT SURV-TIERS, "The third pass").
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -219,7 +218,7 @@ test('the third pass: a stage line is said when the need WORSENS, never on the w
   assert.equal(e.survival.notes.thirst, 'thirsty');
   const stageLines = (l) => said(l).filter((t) => [SURVIVAL_TEXT.thirsty, SURVIVAL_TEXT.parched, SURVIVAL_TEXT.dehydrated].includes(t));
   assert.deepEqual(stageLines(log), [], 'a drink from Dehydrated does not say "You are getting thirsty" (the loan\'s repaid line may speak: the red lifted)');
-  // ...and getting worse again is said - AUDIT C&C N6 (PIN MOVED): once the line heard at minute 1 is half an hour old
+  // ...and getting worse again is said - AUDIT C&C N6 (
   // (STAGE_REPEAT_MINUTES); within it, it is not said again (a body at a boundary heard it at every step across)
   e.survival.thirst = 100; survivalMinute(e, 3, INDOORS, minuteDeps(e, log, CASUAL));
   assert.deepEqual(stageLines(log), [], 'Dehydrated again two minutes on: heard lately');
@@ -263,7 +262,7 @@ test('the third pass: beside a lit fire in Casual the cold is felt, not paid - i
   assert.deepEqual(survivalHudChips(warm, 0).filter((c) => c.key === 'temp').map((c) => [c.text, c.level]), [['Warm', 'warn']], 'Warm, the Cold\'s twin');
   const vamp = body(); Object.assign(survivalOf(vamp, 0), { thirst: 110 });
   assert.equal(survivalHudChips(vamp, 0, { vampire: true }).some((c) => c.key === 'thirst'), false, 'a vampire\'s frozen thirst shows no chip');
-  // and Drenched is AMBER, as Soaked is (PIN MOVED, AUDIT C&C S5 decision D2: it costs through the felt temperature,
+  // and Drenched is AMBER, as Soaked is (
   // which has its own chip, never a charge of its own - it had stood red as a warning; status.js needLevel)
   const wetChip = (wet) => { const w = body(); Object.assign(survivalOf(w, 0), { wet }); return survivalHudChips(w, 0).find((c) => c.key === 'wet'); };
   assert.deepEqual([wetChip(NEED.WET_DRENCHED), wetChip(NEED.WET_SOAKED)].map((c) => [c.text, c.level]), [['Drenched', 'warn'], ['Soaked', 'warn']]);
@@ -295,7 +294,6 @@ test('the third pass: a Casual rough night that leaves the sleeper short says so
 });
 
 test('the third pass: a Hard blackout says the waking - the classic window\'s box carries it after the fall, and the law hands it', () => {
-  // PIN MOVED (AUDIT C&C I4): the law hands the waking under the sky the sleeper wakes to (blackoutWaking) - offline the
   // night carries the one clock to six
   assert.deepEqual(blackoutWaking(23 * 60 + blackout({ drunk: 60 }, 23 * 60, { endurance: 50 }).minutes), TAVERN_MENU_TEXT.woke);
   setPref(SURVIVAL_PREF, 'hard');

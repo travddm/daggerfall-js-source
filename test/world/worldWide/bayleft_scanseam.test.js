@@ -1,4 +1,4 @@
-// AUDIT BAY-LEFT, its packages merged (2026-10-27, bible/01-Overview/audits/Audit-Left-In-The-Bay.md): THE SEAM BETWEEN
+// AUDIT BAY-LEFT, its packages merged: THE SEAM BETWEEN
 // WW-GATES-EVERYWHERE A2c AND WW5. A2c made a province's gate scan a few ring pixels an idle moment
 // (scenes/gate/gateLanes.js createTheatreGateScans' warm); WW5's Starfall and Hollow lanes read the same scans
 // (scenes/eventTheatres.js) and made a theatre's scan in one idle moment of their own (`scanOf`) - merged, every province's

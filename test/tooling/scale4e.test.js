@@ -1,4 +1,4 @@
-// SCALE4e (2026-10-10, PR #755's own deploy; bible/11-Multiplayer/Scale-Arc.md SCALE4e): AN OVERLOADED DATABASE IS
+// SCALE4e: AN OVERLOADED DATABASE IS
 // WAITED OUT, NOTHING ELSE IS. The merge deployed the relay (world189) and the account service (acct106) at once; the
 // relay's drop sent every player's reconnect at the one D1 primary, and the account deploy's `migrations apply` landed
 // 23 s into that wave and was refused "D1 DB is overloaded. Requests queued for too long. [code: 7429]" - the deploy

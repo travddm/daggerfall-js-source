@@ -1,5 +1,4 @@
-// BANISH-SKY (2026-10-07, bible/06-Systems/Online-Waits.md WAIT4; Mac: "Take care of this", over the sweep of the waits
-// still long online): A BANISHMENT'S THIRTY DAYS ARE THE CALENDAR'S THE PLAYER SEES. REP3 counted them on the world's
+// BANISH-SKY: A BANISHMENT'S THIRTY DAYS ARE THE CALENDAR'S THE PLAYER SEES. REP3 counted them on the world's
 // event clock - sixty real hours - when the event clock was the calendar every menu showed; TIME1 then gave the menus the
 // sky's calendar, a day every real hour since SKY-SLOW, and a player told "banished for 28 more days" watched twenty-eight
 // days pass on it and was banished as long again. Online the term is thirty sky days, stamped (as every term) in the event

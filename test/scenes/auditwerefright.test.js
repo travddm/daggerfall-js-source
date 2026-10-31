@@ -1,4 +1,4 @@
-// AUDIT WERE-FRIGHT (2026-09-30, Mac: "Audit this") - PR #459's WERE-FRIGHT and MW-BRIG3, audited in six lenses: the
+// AUDIT WERE-FRIGHT - PR #459's WERE-FRIGHT and MW-BRIG3, audited in six lenses: the
 // arrest flow and its laws, the watch pool, the enemy motor, the hosts' seams (online and every input path to the
 // box), MW-BRIG3's fit, and the records. Each pin here failed on the code before its fix.
 import { test } from 'node:test';
@@ -37,7 +37,7 @@ test('AUDIT WERE-FRIGHT F2: a roar is a beast\'s - asked as a beast and answered
   // Online the world runs under the box (WORLD5), so the change can end while it stands - the mirror of the man's
   // question answered as a beast (WERE-FRIGHT, arrestFlow's Y arm). The roll used to run whatever the form: a MAN's
   // crime written to None through the setter (outside beast form that write is real) and the watch routed by a roar
-  // nobody heard. Mac's rule is the form's: "human form surrenders as before" - a man has no roar, and fights.
+  // nobody heard. - a man has no roar, and fights.
   const player = mkWanted();
   const f = mkFlow(player, { roll: 0 });   // a roar would work
   let landed = 0;

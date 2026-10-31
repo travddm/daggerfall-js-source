@@ -1,6 +1,4 @@
-// LOOT8 - THE DROUGHT (2026-10-01; bible/06-Systems/Loot-Arc.md section 10, Mac: "Do you wanna turn this into an arc
-// and do all of the above?" - "Bad-luck protection. Track pieces looted since your last Legendary; past a threshold,
-// raise the chance"). The laws pinned here:
+// LOOT8 - THE DROUGHT. The laws pinned here:
 //   - THE MULTIPLIER: 1 + 0.2 x floor(drought / 25), at most x3 - never above the Rare threshold (the ladder never
 //     inverts); a finder, so Foxglove's and it multiply; off, 1.
 //   - THE MARK: every eligible piece a source door rolls is `untaken` - whatever its tier, never an ineligible one,
@@ -56,7 +54,7 @@ test('LOOT8: the mark - every eligible piece a source door rolls, whatever its t
     const items = [createWeapon(113, 1), createWeapon(127, 1), gold, arrows];
     LR.rollLootRarity(items, { kind: 'pile', tier: 6 }, { rolls: lcg(seed) });
     for (const it of items) {
-      if (it === gold || it === arrows || LR.gemKindOf(it)) assert.equal(it.untaken, undefined, 'gold, arrows and a found gem are no piece');   // PIN MOVED (GEM2): the door's gem find, after every piece
+      if (it === gold || it === arrows || LR.gemKindOf(it)) assert.equal(it.untaken, undefined, 'gold, arrows and a found gem are no piece');
       else { assert.equal(it.untaken, true, `seed ${seed}: ${it.rarity ?? 'common'} (a unique find too)`); pieces++; }
     }
   }

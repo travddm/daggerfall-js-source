@@ -1,4 +1,4 @@
-// SLOTS2 (Mac, 2026-09-26: "Go ahead and do the follow up" - the MW-EARLY
+// SLOTS2 (- the MW-EARLY
 // audit's note that picking the most recent save parsed every slot).
 // THE MOST-RECENT PICK STOPS AT THE FIRST SAVE IT CAN RESTORE.
 // mostRecentRestorable was restorableSaves' head: every slot's envelope

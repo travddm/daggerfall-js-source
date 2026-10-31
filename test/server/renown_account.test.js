@@ -1,6 +1,5 @@
-// RENOWN-ACCOUNT (2026-09-28, Mac: "can you make sure renown is account based and not character based? Along with
-// reducing the accumulation of renown from resources a bit. Want some more oomph to the grind"): ONE RENOWN AN
-// ACCOUNT, AND A SLOWER GRIND - and RENOWN-CHAR (2026-09-29, Mac: "Can we make renown per character again") took the
+// RENOWN-ACCOUNT: ONE RENOWN AN
+// ACCOUNT, AND A SLOWER GRIND - and RENOWN-CHAR took the
 // first half back the next day (test/server/renown_char.test.js holds a character's track again, and migration 0035). What
 // stands here is RENOWN-ACCOUNT's own: the law (src/net/renown.js) - every source pays RENOWN_RATE_PCT, three quarters,
 // of its full rate, floored once (renownRate), the hour's bound 15,000, the curve unmoved; migration 0021 as it ran -

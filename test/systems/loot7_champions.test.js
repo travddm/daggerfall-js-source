@@ -1,5 +1,4 @@
-// LOOT7 - CHAMPION FOES (2026-10-01; bible/06-Systems/Loot-Arc.md section 9, Mac: "Do you wanna turn this into an arc
-// and do all of the above?" - "Champion foes. Single named foes with visible traits (Fiery, Swift, Vampiric) and a
+// LOOT7 - CHAMPION FOES (2026-10-01;  - "Champion foes. Single named foes with visible traits (Fiery, Swift, Vampiric) and a
 // guaranteed Rare"). The laws pinned here:
 //   - THE TRAITS: five, each a name that is its id's (the HUD's leaf spells it), each what its sentence says.
 //   - WHO: about one foe in fourteen (CHAMP-RATE, was twenty) - a dungeon's by a hash of the place and the marker (every client the same), the

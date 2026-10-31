@@ -1,5 +1,4 @@
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot and bounce (sort of how dropping a
-// torch works) and have a sort of rarity glow attached to it"): THE SPOILS, DRIVEN. The spew (world/gate/gateSpew.js - each
+// WB5: THE SPOILS, DRIVEN. The spew (world/gate/gateSpew.js - each
 // piece's launch out of his chest toward the player's side, one at a time, and the thrown torch's own flight: gravity
 // by its drag, the bounce off the struck face at its bounciness, rest under a fifth of the throw); the glow
 // (render/spoilsGlow.js - Loot Rarity's own colours, a beam by tier over a halo, the pass on the duel wall's law); the
@@ -301,7 +300,7 @@ test('WB5 a crash loses nothing: at boot the record\'s pieces AS KEPT (not a re-
   // a piece the validator refuses is not handed over; the rest are
   const bad = JSON.parse(JSON.stringify(spoilsList(42, 6)));
   bad[0].item.templateIndex = 99999;
-  bad[bad.length - 1].gold = -5;   // GEM2 (PIN MOVED): the gold is last, after the Warden's gem and the ember
+  bad[bad.length - 1].gold = -5;     // GEM2 (
   st.set(SPOILS_STORE_KEY, { day: 701, at: WALL, who: 'char-1', pieces: bad });
   const got2 = [];
   assert.equal(bad.at(-1).kind, 'gold');

@@ -1,5 +1,4 @@
-// AUDIT RELEASE R2-5 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-5; the owner: "expand our world
-// seamlessly. All systems should be integrated precisely") - A QUEST GIVER PAST THE BAY HAS REMOTE SITES TO GIVE: the
+// AUDIT RELEASE R2-5 - A QUEST GIVER PAST THE BAY HAS REMOTE SITES TO GIVE: the
 // quest layer's maps answer a province's region (62..70) from the places past the Bay (scenes/quest/questProvinceSites.js),
 // so DFU's own draws (Place.SelectRemoteTownSite, SelectRemoteDungeonSite, SelectRemoteLocationExteriorSite) send a
 // Skyrim questor's courier to another town of Skyrim and its dungeon to a lair of Skyrim. The law first, on a fixture;
@@ -275,7 +274,7 @@ test('R2-5 the lairs are bounded: the table asks the places host for the nearest
   const p = createQuestProvinceSites({ worldPlaces: createWorldPlaces(), regionAt: () => SKYRIM, standAt: () => null, origin: () => ({ x: 1700, y: -400 }),
     lairsNear: (...a) => { asked.push(a); return []; } });
   p.getRegion(SKYRIM);
-  assert.deepEqual(asked, [[1700, -400, 66, 12, 16]]);   // PIN MOVED (AUDIT RELEASE R2-5e): 16 within 66, 40 first rolls - now 12, at most 16 cells read, beside the countryside's
+  assert.deepEqual(asked, [[1700, -400, 66, 12, 16]]);
   assert.deepEqual([PROVINCE_LAIR_REACH, PROVINCE_LAIR_COUNT, PROVINCE_LAIR_ROLLS], [66, 12, 16]);
   p.getRegion(SKYRIM);
   assert.equal(asked.length, 1, 'the same questor\'s pixel: the table kept');

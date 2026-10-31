@@ -1,4 +1,4 @@
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection"; bible/01-Overview/audits/Audit-World-Events.md)
+// AUDIT WORLD-EVENTS
 // - THE HOUR'S RAISE, RECORDED BY THE REALM (SD-REZ's findings): any hello inside the window was a rise, a friend's spell or
 // not (L1-1); the raised fell again to the count (L1-2); the window said two minutes and was one (L1-5); the page's window
 // stamped every frame of the death screen (L1-6); a death the list could not hold was forgotten (L1-7); the down cleared
@@ -76,7 +76,6 @@ test('AUDIT WORLD-EVENTS L1-1: the Hour lets a body back only when a living figh
     const risen = await hello('peer-ann', inArena(0, -12));
     assert.equal(risen.closed, null, 'raised: back in the Hour');
     assert.deepEqual([realm.store.get(SD_REALM_KEY).down.map(([x]) => x), realm.store.get(SD_REALM_KEY).raised], [['acct-peer-zed'], []], 'off the lying and the raised');
-    // PIN MOVED (SD-BACK, 2026-10-28, the owner: "let them go back in if they die to that partys instance"): unraised -
     // inside the window or past it - its own Hour takes it back, off the lying and the dead (it was held at the door, busy,
     // and past the window refused SD_NO_FALLEN)
     await realm.raw(risen, JSON.stringify({ t: 'pose', p: inArena(0, -12, { dd: 1 }) }));

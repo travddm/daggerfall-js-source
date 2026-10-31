@@ -1,4 +1,4 @@
-// TELL4 - THE PUNISH WINDOW AND THE PERFECT DODGE (bible/12-Enhanced-AI/Feud-Arc.md section 6; Mac, 2026-10-04:
+// TELL4 - THE PUNISH WINDOW AND THE PERFECT DODGE (; Mac, 2026-10-04:
 // "breath more depth into it", then "Go" on every call). Before it a telegraphed blow that missed cost its foe nothing:
 // it walked back into the fight. Now a blow that lands on no feet leaves its foe OVERREACHED for its shape's window -
 // locked as a stagger locks, its swing's follow-through standing, every blow it takes x1.3, and the first blow that

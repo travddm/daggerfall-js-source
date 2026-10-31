@@ -1,4 +1,4 @@
-// MASTER-ART (2026-10-27; bible/06-Systems/Professions-Arc.md section 57) - THE MASTER'S WORK AT THE STATION. In the
+// MASTER-ART - THE MASTER'S WORK AT THE STATION. In the
 // craft box at Master: the three lines to choose (native selects, 40px), the catalysts held and asked, the day's bound,
 // the press through the station's own craft door, and the result card. Built from the producers: the real Worker over
 // node:sqlite, the client's door and book, the pages drawn for real, and the craft door world.js hands the page.
@@ -131,7 +131,6 @@ test('MASTER-ART NO BOX below Master, none for a piece no tier takes; a catalyst
     setProfessionsPages(null);
     resetProfPages();
   }
-  // PIN MOVED (AUDIT HORIZONTAL B6): a catalyst is asked of the counted units alone - a Pearl jewel's own Pearl is a good
   assert.deepEqual(masterNeeds(() => 3).find((c) => c.key === PEARL.key), { key: PEARL.key, need: 3, have: 3, pursuit: 'sea' });
   assert.equal(masterOptionWords({ id: 'focus' }), '-7 to 10% spell cost');
   resetMasterBoxes();

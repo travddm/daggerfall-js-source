@@ -1,7 +1,4 @@
-// COLLECTIONS-II (2026-10-22, the owner: "with the introduction of a lot of titles, auras, profile icons, etc I think its
-// time we introduce these elements to the collections tab, along with telling how they are found, even if they arent
-// currently able to be obtained"; bible/10-UI/Collections.md) and AUDIT COLLECTIONS-II (2026-10-22, the owner: "Audit
-// this"; bible/01-Overview/audits/Audit-Collections-II.md): THE WARDROBE IN THE COLLECTIONS PAGE. The catalogue whole -
+// COLLECTIONS-II and AUDIT COLLECTIONS-II: THE WARDROBE IN THE COLLECTIONS PAGE. The catalogue whole -
 // every title, aura, icon and glyph of the vocabulary, its source and availability as a literal the record names, its
 // words of how - and held to the service's own law (the lists and what they grant together, each roll's odds, each
 // board's floor, each questline's giver, the founders' instant, Season 0, the cakes
@@ -100,7 +97,7 @@ function mintedWardrobe() {
   return wardrobeOf(player, {}, nowS);
 }
 
-/** THE CATALOGUE AS THE RECORD STATES IT (bible/10-UI/Collections.md section 3; AUDIT COLLECTIONS-II): `kind:key` ->
+/** THE CATALOGUE AS THE RECORD STATES IT (; AUDIT COLLECTIONS-II): `kind:key` ->
  *  `source availability [scope]`, every one. */
 const CATALOGUE = {
   'title:hourbreaker': 'abyss chance', 'title:hoursfirst': 'abyss retired', 'title:coilbreaker': 'serpent chance',
@@ -112,7 +109,7 @@ const CATALOGUE = {
   'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
   'title:founder': 'account closed', 'title:disciple': 'patrons patron', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons patron',
   'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff', 'title:shadowfang': 'bestowed bestowed',
-  /* HUNTERS-MARK, MARKS-OF-MASTERY (PIN MOVED): the hunt's four, a Master's ten, the sea's two */
+  /* HUNTERS-MARK, MARKS-OF-MASTERY ( */
   'title:bloodhound': 'hunt open', 'title:beastbane': 'hunt open', 'title:grandhuntsman': 'hunt open', 'title:huntlegend': 'hunt open',
   'title:mastermining': 'mastery open', 'title:masterlogging': 'mastery open', 'title:masterherbalism': 'mastery open', 'title:masterhunting': 'mastery open',
   'title:masterfishing': 'mastery open', 'title:mastersmithing': 'mastery open', 'title:masterbuilding': 'mastery open', 'title:masteroutfitting': 'mastery open',
@@ -123,7 +120,7 @@ const CATALOGUE = {
   'icon:twinmoons': 'festival seasonal', 'icon:wyrdcauldron': 'festival seasonal', 'icon:soulcake': 'festival seasonal', 'glyph:tower': 'seats open character',
   'glyph:crownDF': 'seats open character', 'glyph:crownWR': 'seats open character', 'glyph:crownSN': 'seats open character',
   'glyph:crownSK': 'seats open character', 'glyph:crownMW': 'seats open character', 'glyph:crownSU': 'seats open character', 'glyph:crownVW': 'seats open character',
-  'glyph:crownEW': 'seats open character', 'glyph:crownBM': 'seats open character', 'glyph:crownCY': 'seats open character',   // PIN MOVED (WW7-3): the provinces' crowns
+  'glyph:crownEW': 'seats open character', 'glyph:crownBM': 'seats open character', 'glyph:crownCY': 'seats open character',
   'glyph:laurel': 'ranked ranked',
   'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons patron', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons patron',
   'glyph:herald': 'patrons patron', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
@@ -147,7 +144,7 @@ test('COLLECTIONS-II THE CATALOGUE IS WHOLE AND AS RECORDED: every title, aura, 
     assert.ok(W.AVAIL_TAG[e.avail] && W.availLine(e, DURING).length > 4);
   }
   assert.deepEqual(W.WARDROBE_KINDS.flatMap((k) => W.wardrobeEntries(k).filter((e) => e.via).map((e) => [k, e.key, e.via])), [['title', 'highmaster', 'chaptermaster']]);
-  assert.deepEqual(W.WARDROBE_KINDS.flatMap((k) => W.wardrobeEntries(k).filter((e) => e.note).map((e) => `${k}:${e.key}`)), [], 'no entry says its own availability');   // PIN MOVED (Elite Gates removed): Spire Champion, the one that did, gone
+  assert.deepEqual(W.WARDROBE_KINDS.flatMap((k) => W.wardrobeEntries(k).filter((e) => e.note).map((e) => `${k}:${e.key}`)), [], 'no entry says its own availability');
 });
 
 test('COLLECTIONS-II WHAT COMES TOGETHER, ALL OF IT EACH WAY (AUDIT COLLECTIONS-II lane 1: an aura named its title and not the glyph granted beside it): each grant group of the service - a listed title with its glyph and aura (TIER_GLYPH, TIER_AURA), the developer\'s three, the first\'s two, the champion\'s laurel - is one clique in the catalogue, and nothing is said to come with anything else (mutants: an aura not granted with its title; an aura\'s glyph dropped)', () => {
@@ -214,7 +211,7 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   assert.match(how('title', 'hearthkeeper'), new RegExp(`have other players take ${HEARTHKEEPER_GIVEN} Soul Cakes from it`));
   assert.match(how('icon', 'soulcake'), new RegExp(`\\b${SOULCAKE_TAKEN} Soul Cakes`));
   for (const k of Object.keys(W.SERPENT_ODDS)) assert.match(how(k === 'maelstrom' ? 'aura' : 'title', k), /if your own fire dealt a real share of your ship’s/);
-  // the embers: every purse (PIN MOVED, Elite Gates removed: the Redoubts' purse gone)
+  // the embers: every purse (
   for (const table of ['gate_kills', 'serpent_kills']) assert.ok(EMBERS_EARNED_SQL.includes(table), table);
   for (const o of INSIGNIA) { const e = entry(o.kind, o.key); assert.equal(e.src, 'broker'); assert.match(e.how(), new RegExp(`\\b${o.price} Deadlands Embers - won closing Dagon’s Breaches and slaying Sea Serpents`)); }
   for (const w of FESTIVAL_WARES.filter((x) => ['title', 'aura', 'icon'].includes(x.kind))) { const e = entry(w.kind, w.key); assert.deepEqual([e.src, e.avail], ['festival', 'seasonal']); assert.match(e.how(), new RegExp(`\\b${w.price} Soul Cakes`)); }
@@ -240,12 +237,12 @@ test('COLLECTIONS-II HELD, WORN AND COUNTED off the wardrobe the service mints (
   // a seat's glyph: the character's
   const seated = wardrobeOf({ handle: 'g', registered_at: 1, created_at: 1, seatTitles: ['warden', 'protector'] }, {}, 2e9);
   assert.ok(seated.titles.includes('warden'), 'the account holds the seat\'s title');
-  assert.deepEqual(seated.glyphs.filter((g) => ['tower', 'crownDF', 'crownWR', 'crownSN', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY'].includes(g)), [], 'and none of its glyphs - they are minted on the character');   // PIN MOVED (WW7-3): the provinces' crowns too
+  assert.deepEqual(seated.glyphs.filter((g) => ['tower', 'crownDF', 'crownWR', 'crownSN', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY'].includes(g)), [], 'and none of its glyphs - they are minted on the character');
   for (const g of ['tower', 'crownDF', 'crownWR', 'crownSN', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY']) {
     const e = { ...W.wardrobeEntry('glyph', g), kind: 'glyph', key: g };
     assert.deepEqual([W.wardrobeKnown(e), W.wardrobeCounted(e), W.wardrobeHeld('glyph', g, { glyphs: [g] })], [false, false, false], g);
   }
-  assert.deepEqual(W.wardrobeCount('glyph', null), { held: 0, total: GLYPHS.length - 11 });   // PIN MOVED (WW7-3): a seat's eleven glyphs (the tower, ten crowns) the character's, uncounted
+  assert.deepEqual(W.wardrobeCount('glyph', null), { held: 0, total: GLYPHS.length - 11 });
   assert.equal(W.wardrobeHeld('icon', 'twinmoons', { titles: ['founder'] }), false, 'a wardrobe from before icons holds none');
 });
 
@@ -284,7 +281,7 @@ test('COLLECTIONS-II THE PAGE: six tiles, each its part\'s name over its count a
   const p = page({ flow, player: me });
   await settle();
   const tiles = cls(p.root, 'coll-part');
-  assert.deepEqual(tiles.map((b) => b.attrs['data-focus']), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'codex', 'trophies', 'fish'].map((id) => `coll-part-${id}`));   // PIN MOVED (HUNTERS-MARK): the gathered parts after them, always shown; PIN MOVED (APPEARANCES): the looks' part, first of the character's
+  assert.deepEqual(tiles.map((b) => b.attrs['data-focus']), ['titles', 'auras', 'icons', 'glyphs', 'appearances', 'codex', 'trophies', 'fish'].map((id) => `coll-part-${id}`));
   assert.equal(tiles[0].children[1].textContent, `3 / ${TITLES.length - 1}`);
   assert.equal(cls(tiles[0], 'px-meter')[0].textContent, `3/${TITLES.length - 1}`, 'the meter, held of all');
   assert.equal(tiles[0].attrs['aria-pressed'], 'true');

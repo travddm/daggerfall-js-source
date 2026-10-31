@@ -1,4 +1,4 @@
-// SAVES-SAID (FIELD BUGS 2026-10-25, guild standing and quests reset; bible/06-Systems/Realm-Arc.md): THE PLAYER IS
+// SAVES-SAID (FIELD BUGS 2026-10-25, guild standing and quests reset): THE PLAYER IS
 // TOLD WHEN THEIR PROGRESS HAS NOT REACHED THE REALM. A realm session's puts that the service refuses for a while or
 // never answers wait on the device, and only a save pressed by hand said so - a player could play for hours with
 // nothing reaching the realm. Driven here through the real session (systems/realmSaves.js createRealmSession) over a

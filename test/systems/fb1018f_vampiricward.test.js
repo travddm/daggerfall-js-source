@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-18f VAMPIRIC-WARD (Low_Poly_Gaming, "Weir Key Generated Elite Breach bugs": "Its an exploit for heals if
 // you have a vampiric weapon to heal yourself during the breach run"). Vampiric Effect when strikes heals the wearer every
-// point a blow DEALS (systems/enchantments.js - VampiricEffect.cs; bible/05-Combat/Balance-Arc.md BAL7). A blow on a body a
+// point a blow DEALS (systems/enchantments.js - VampiricEffect.cs; BAL7). A blow on a body a
 // referee holds is resolved against its stand-in, and a ward the referee keeps turns it whole - the stand-in says so
 // (`warded`: the Warden's ward and the Brass Remnant shut, scenes/dungeonContext.js gateBossBody). Every other heal and power of a landed blow already refused one (the leech since
 // AUDIT WORLD-REWARDS B3); the payload alone healed the whole claim. Driven through the real payload dispatcher and the real

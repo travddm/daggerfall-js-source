@@ -1,5 +1,4 @@
-// MAP-WHOLE (2026-10-26, the owner: "The held map still struggles to load everything at once"; bible/03-World/
-// Arena-Provinces.md MAP-WHOLE) - THE HELD MAP PAST THE BAY, WHOLE FROM ITS FIRST FRAMES: the continent's dots
+// MAP-WHOLE - THE HELD MAP PAST THE BAY, WHOLE FROM ITS FIRST FRAMES: the continent's dots
 // rasterised by hand (ui/inkRaster.js, ui/tamrielInk.js rasterPass) and the base under every tile owed
 // (ui/tamrielTiles.js BASE_SCALE).
 import { test } from 'node:test';

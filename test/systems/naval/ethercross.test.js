@@ -1,5 +1,4 @@
-// ETHER-CROSSING, ETHER-SEA's host, ETHER-CHART (2026-10-11, the owner: "Sail far enough and you are prompted to travel
-// into the open sea") - THE CROSSING, AND WHAT A CAPTAIN KEEPS OF THE SEA (bible/03-World/Eltheric-Ocean.md): when the
+// ETHER-CROSSING, ETHER-SEA's host, ETHER-CHART - THE CROSSING, AND WHAT A CAPTAIN KEEPS OF THE SEA: when the
 // crossing is asked and how it is sailed; the ledger's Eltheric record; the Eltheric host's waters, charting, strands,
 // legends, charts and papers; the chart of the Eltheric Ocean. tools/mutants/ethercross.json.
 import '../../modsOff.js';
@@ -57,13 +56,12 @@ test('ETHER-CROSSING the voyage: three days; out to the open water off Veilhaven
   assert.match(out.join(' '), /Set a course into the open sea\? \(3 days\. Your ship,/);
   assert.match(crossingRows('home').join(' '), /Set a course for home\? \(3 days\)/);
   assert.match(crossingRows('out', { days: 1 }).join(' '), /\(1 day\. Your ship/);
-  assert.match(crossingWords('out'), /You have crossed into the Eltheric Ocean\. Veilhaven lies ahead\.$/);   // PIN MOVED (ELTHERIC): the Etheric Sea's
-  assert.match(crossingWords('home'), /The Iliac Bay, and home\.$/);   // PIN MOVED (VOICE2, in PLAIN-SWEEP's words): no dash aside (Voice.md rule 5)
-  assert.match(CROSS_REFUSED.passengers, /until only your party is aboard/); assert.match(CROSS_REFUSED.hostile, /enemy/);   // PIN MOVED (AUDIT HORIZONTAL C7): her party may stay aboard
+  assert.match(crossingWords('out'), /You have crossed into the Eltheric Ocean\. Veilhaven lies ahead\.$/);
+  assert.match(crossingWords('home'), /The Iliac Bay, and home\.$/);
+  assert.match(CROSS_REFUSED.passengers, /until only your party is aboard/); assert.match(CROSS_REFUSED.hostile, /enemy/);
 });
 
 test('ETHER-CROSSING by source: asked at a helm in the exterior with no window up, an enemy near or another player aboard said instead; sailed - the helm let go first, the jump a travel of CROSS_DAYS whose arrival brings her round onto the landfall\'s middle, her helm taken after, the clock\'s days, the haven charted, the way home leaving the gate asked; the ship held while she crosses (mutants: each step and its order)', () => {
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X9): the success's path read past the failure's (a voyage that could not be made brings her back)
   const order = ['captainLedger.setCrossedFrom', 'hudFade.smashHUDToBlack()', 'csaRuntime.StopSailing()', 'await _teleportToPixel(to.px, to.py', 'csaRuntime.RepositionBoat(boat, [x, tvSeaY(), z], dir', 'setSyntheticTimeIncrease(true); playerTicker.advance(minutes)', 'captainLedger.crossed()'];
   const asked = [];
   const island = (x, y) => { asked.push(`${x},${y}`); return !(x === 13 && y === 10); };   // one pixel of land, three east
@@ -79,7 +77,7 @@ test('ETHER-CROSSING by source: asked at a helm in the exterior with no window u
 });
 
 test('ETHER-SEA the ledger\'s record: isles charted once each (the log\'s islands), a legend\'s day, a strand\'s day (the newest kept), the way out, the crossings, the legends heard - kept whole by the save and cleaned field by field (mutants: each field, the bounds)', () => {
-  assert.deepEqual(newEther(), { charted: [], legends: {}, harvested: {}, from: null, crossings: 0, heard: [], season: null, fleets: [], wrack: [] });   // PIN MOVED (SEA-SEASON): and no season's figures; (AUDIT SEA VENTURES D2, D4, D6): no fleet's flagship ended, no wrack hauled
+  assert.deepEqual(newEther(), { charted: [], legends: {}, harvested: {}, from: null, crossings: 0, heard: [], season: null, fleets: [], wrack: [] });
   assert.equal(ETHER_CHARTED_MAX, 4096); assert.equal(ETHER_HARVEST_KEEP, 128);
   const a = createCaptainLedger();
   assert.equal(a.chartIsle('800,249'), true); assert.equal(a.chartIsle('800,249'), false); assert.equal(a.chartIsle(5), false);
@@ -103,11 +101,11 @@ test('ETHER-SEA the ledger\'s record: isles charted once each (the log\'s island
   const c = createCaptainLedger();
   c.restoreSaveData({ ether: { charted: ['1,2', '1,2', 'x', 5, '-3,4'], legends: { wake: 4, junk: 'q' }, harvested: { '1,1': 3, n: null }, from: { px: 'no' }, crossings: -4, heard: ['wake', 9, 'wake'] } });
   const e = c.getSaveData().ether;
-  assert.deepEqual(e, { charted: ['1,2'], legends: { wake: 4 }, harvested: { '1,1': 3 }, from: null, crossings: 0, heard: ['wake'], season: null, fleets: [], wrack: [] });   // PIN MOVED (SEA-SEASON): no season's figures; (AUDIT SEA VENTURES D2, D4, D6): nor fleets nor wrack
+  assert.deepEqual(e, { charted: ['1,2'], legends: { wake: 4 }, harvested: { '1,1': 3 }, from: null, crossings: 0, heard: ['wake'], season: null, fleets: [], wrack: [] });
   for (let i = 0; i < ETHER_CHARTED_MAX + 3; i++) c.chartIsle(`${i % 4000},${Math.floor(i / 4000)}`);
   assert.equal(c.charted().length, ETHER_CHARTED_MAX, 'no more than the charts hold');
   const lines = Object.fromEntries(logLines({ ...newLog(), islands: 3, deepest: 12, legends: ['The Drowned Queen'] }));
-  assert.deepEqual([lines['Eltheric isles charted'], lines['Deepest Eltheric waters'], lines['Legends ended']], ['3', '12 leagues past the Veil', 'The Drowned Queen']);   // PIN MOVED (ELTHERIC): 'Etheric'
+  assert.deepEqual([lines['Eltheric isles charted'], lines['Deepest Eltheric waters'], lines['Legends ended']], ['3', '12 leagues past the Veil', 'The Drowned Queen']);
   assert.equal(Object.fromEntries(logLines({ ...newLog(), deepest: 1 }))['Deepest Eltheric waters'], '1 league past the Veil');
 });
 
@@ -116,7 +114,6 @@ test('ETHER-SEA the host\'s waters and charting: the band, the depth and the leg
   const h = veilhaven();
   assert.deepEqual(host.waters(500, 250), null);
   const w = host.waters(h.px, h.py);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA D18/D19): the haunt's legend was reckoned every frame and read nowhere - the waters say
   // whether she is in the Veil itself instead (the plate's "The Veil")
   assert.deepEqual([w.band, w.bandName, w.veil], ['shallows', 'the Shallows', false]);
   assert.equal(host.waters(VEIL_X + 4, h.py).veil, true, 'in the Veil');
@@ -164,7 +161,7 @@ test('ETHER-SEA the legends\' host: the haunt\'s legend while she sails and is a
   assert.equal(host.legendHere(lan.px, lan.py, { night: true })?.id, 'lantern');
   assert.equal(host.legendEnded('queen', 'sink'), 3000);
   assert.equal(purse(), 4000);
-  assert.match(mid.at(-1), /^The Drowned Queen is sunk! The Eltheric Ocean will speak of this\. 3,000 gold/);   // PIN MOVED (ELTHERIC): the Etheric Sea's
+  assert.match(mid.at(-1), /^The Drowned Queen is sunk! The Eltheric Ocean will speak of this\. 3,000 gold/);
   assert.equal(L.legendDay('queen'), 40);
   assert.equal(host.legendHere(q.px, q.py), null, 'ended');
   setDay(70); assert.equal(host.legendHere(q.px, q.py)?.id, 'queen', 'risen');
@@ -185,7 +182,6 @@ test('ETHER-SEA the legends\' host: the haunt\'s legend while she sails and is a
   assert.equal(purse(), 4000 - 150);
   assert.equal(host.buyChart(port).ok, false, 'nothing new to mark');
   const office = host.office(port);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X11): heard where the harbourmaster's tab is shown - the model's read hears nothing
   assert.deepEqual(L.heard(), [], 'the model read: nothing heard yet');
   office.hear();
   assert.deepEqual(L.heard(), LEGENDS.map((l) => l.id), 'the quay\'s talk: every legend heard of');
@@ -240,7 +236,6 @@ test('ETHER-CHART the model: the charted isles in view (a port named at any zoom
   assert.ok(m.veil != null && m.veil > 500, 'the Veil to the east');
   assert.deepEqual([m.ship.x, m.ship.y, m.ship.yaw], [...toScreen({ cx: h.px, cy: h.py, zoom: 2 }, h.px + 4.5, h.py + 0.5, 1000, 700), 1]);
   assert.match(m.sub, /^4 isles charted - deepest 12 leagues past the Veil - 1 crossing$/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA X12): the Shallows named by the Veil (no line of its own), each name on its deeper side
   const wide = chartModel(word, { cx: VEIL_X - 60 * LEAGUE_PX, cy: h.py, zoom: 0 }, 1000, 700);
   assert.deepEqual(wide.bands.map((b) => [b.name, b.line]), [['the Shallows', false], ['the Reaches', true], ['the Deep Aether', true], ['the Abyss', true]], 'the bounds in view');
   const shallow = chartModel(word, { cx: h.px, cy: h.py, zoom: 4 }, 400, 300);
@@ -259,7 +254,6 @@ test('ETHER-CHART the doors: the travel map\'s door opens the chart past the Vei
   const o = { ether: true, port: 'Veilhaven', waters: 'the Shallows, 7 leagues past the Veil', rumours: ['A tale.', 'Another.'], charted: 1, chart: { price: 150, fresh: 12, can: true, why: '' } };
   const t = officeText(o);
   assert.deepEqual(t, etherOfficeText(o));
-  // PIN MOVED (ELTHERIC): the Etheric Sea's
   assert.equal(t.lede, 'Veilhaven - a freeport of the Eltheric Ocean, in the Shallows, 7 leagues past the Veil. No crown\'s writ runs past the Veil, and no crown\'s favors. Your charts hold 1 isle.');
   assert.deepEqual(t.board.map((b) => [b.title, b.words, b.press]), [['Talk on the quay', 'A tale.', ''], ['Talk on the quay', 'Another.', '']]);
   assert.deepEqual(t.letters, [{ id: 'chart', title: 'A chart of these waters', words: '12 isles your charts do not hold, marked on them.', press: 'Buy - 150 gold', can: true }]);

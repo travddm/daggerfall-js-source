@@ -1,8 +1,8 @@
-// GUILD1d (2026-09-30, Mac: "Lets do this"): THE GUILD HALL AND HERALDRY, THE CLIENT'S HALF - the law both ends read
+// GUILD1d: THE GUILD HALL AND HERALDRY, THE CLIENT'S HALF - the law both ends read
 // (net/heraldryLaw.js, net/hallLaw.js, net/homeLaw.js), the drawing (ui/heraldryArt.js), the homes' registry and the
 // door's rows (systems/online/onlineHomes.js), the guild book's acts (net/guild/guildBook.js), the Guild tab's Hall and Heraldry
 // (ui/socialPanel.js), the banners' anchors and the cloth (scenes/hallBanners.js, render/bannerPass.js), and the hosts'
-// wiring by source. bible/11-Multiplayer/Seats-Arc.md 8; `06-Systems/Online-Arc.md` GUILD1d.
+// wiring by source. 8; `06-Systems/Online-Arc.md` GUILD1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -246,7 +246,7 @@ const view = (over = {}) => ({
   id: 'g0123456789', name: 'The Hand', tag: 'HND', ranks: [...GUILD_RANK_NAMES], treasury: 0, foundedAt: 1, rank: 0,
   members: [{ member: 'm1', name: 'Aldric', rank: 0, joinedAt: 1, you: true }], invites: [], ledger: [], hall: null, heraldry: null, ...over,
 });
-// GUILD2 (PIN MOVED): the Guild tab is pages - the hall on the Overview, the ledger on Treasury, the arms on Arms, leaving
+// GUILD2 (
 // on Settings; `go` turns to one
 async function tabRig(guild, page = null) {
   const { book, calls } = hallBook(guild);
@@ -293,7 +293,7 @@ test('GUILD1d the Guild tab: with no hall how one is bought; with one where it s
   await gm.go('settings');
   assert.equal(button(gm.panel.root, 'Leave').disabled, true);
   assert.equal(button(gm.panel.root, 'Disband').disabled, true, 'sell the hall first');
-  // a change short of Drakes - GUILD2c: the field's colour a swatch now, not a select (PIN MOVED)
+  // a change short of Drakes - GUILD2c: the field's colour a swatch now, not a select (
   await gm.go('arms');
   const crimson = find(gm.panel.root, 'dfsocial-swatch').find((b) => b.attrs['aria-label'] === 'Field color: Crimson');
   crimson.fire('click');

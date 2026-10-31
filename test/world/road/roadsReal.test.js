@@ -1,5 +1,4 @@
-// BR3 - THE SHIPPED DATA, END TO END (2026-09-13, Mac: "can you do an
-// audit on basic roads, I dont think its working").
+// BR3 - THE SHIPPED DATA, END TO END.
 //
 // EVERY ROADS TEST BEFORE THIS ONE USED A SYNTHETIC MASK. roads.test.js
 // hands paintRoads a `DIR.N | DIR.S` it wrote itself; roadsParity.test.js

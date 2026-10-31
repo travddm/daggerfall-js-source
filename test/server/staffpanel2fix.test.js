@@ -1,5 +1,4 @@
-// STAFF-PANEL2-FIX (2026-10-22; design doc "DFO Staff Panel: design", Weak spots "Sanctions, cases and roles" and "Panel
-// Mute and Ban have no route") - THE CASES' AND SANCTIONS' GAPS, closed in the code every door shares (server-account/src/
+// STAFF-PANEL2-FIX - THE CASES' AND SANCTIONS' GAPS, closed in the code every door shares (server-account/src/
 // safety.js modAct), driven through the real Worker on the node:sqlite database every account pin stands on
 // (test/accountDb.mjs), from each door: the staff panel (/v1/staff/*), the game's moderators (/v1/mod/*) and Discord.
 import { test } from 'node:test';

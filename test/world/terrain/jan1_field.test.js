@@ -1,4 +1,4 @@
-// JAN1 (2026-09-18, Janome's play report, relayed by Mac) - the four field reports: the hand that switched sides on
+// JAN1 - the four field reports: the hand that switched sides on
 // T-then-H, the fist under the torch on a dungeon exit, the townsfolk walking in the sky outside the city, and the
 // lantern glare shining through an attic floor. See test/systems/jan1_fixes.test.js for the three crashes.
 import '../../modsOff.js';

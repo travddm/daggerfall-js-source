@@ -1,4 +1,4 @@
-// MWNPC10c (2026-10-10, the MW-NPC arc's tenth slice - bible/04-Characters/Morrowind-NPCs.md section 15c): THE LIVING
+// MWNPC10c: THE LIVING
 // WORLD'S PEOPLE IN THEIR MORROWIND BODIES - the roads' parties and their foes, and the residents the day has inside a
 // building. Both draw through world/travellerSprites.js, so its lane stands them all: each dressed as its sprite shows it
 // (characters/rosterBodies.js residentLook - a class's sprite its class's look and blade in their own race, a still
@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { rosterLook } from '../../src/characters/foeBodies.js';
 import { residentLook, rosterActor } from '../../src/characters/rosterBodies.js';
 import { FOLK_DRESS } from '../../src/characters/folkBodies.js';
-import { wornByRole } from '../../src/characters/wardrobe.js';   // PIN MOVED (MWNPC17, section 25): a look is its role's, dressed off the seed
+import { wornByRole } from '../../src/characters/wardrobe.js';
 import { GUARD_TEXTURE } from '../../src/characters/mobile/mobilePerson.js';
 import { MOBILE_TYPES as M } from '../../src/characters/mobile/mobileTypes.js';
 import { EQUIP_SLOTS } from '../../src/systems/equip.js';
@@ -68,7 +68,6 @@ test('MWNPC10c-2 residentLook: a class\'s sprite its class\'s look in their own 
   assert.ok(wornByRole(priest, 'priest') && !priest.items.some((it) => it.equipSlot === EQUIP_SLOTS.LegsClothes), 'a priest at the door in his robes');
   const beggar = residentLook({}, res({ job: 'beggar' }), { still: true });
   assert.ok(wornByRole(beggar, FOLK_DRESS.male[0].role), 'a beggar the street\'s outfit');
-  // PIN MOVED (MW-FOLK1, bible/04-Characters/Townsfolk-Outfits.md): 383, this pin's sprite, wears the outfit its
   // picture draws (ownClothingModels.js TOWNSFOLK_OUTFITS) - the wardrobe's own outfit as their sprite is a Breton 391's
   const pictured = residentLook({}, res({ archive: 383 }));
   assert.deepEqual([pictured.outfit, pictured.items], ['townsfolk_383', []], 'their sprite\'s own outfit, nothing of the wardrobe with it');

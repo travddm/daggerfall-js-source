@@ -1,4 +1,4 @@
-// PARTY-LEAD (2026-10-04, the player: "add a make person party leader option for the leader when in a party"): THE LEAD
+// PARTY-LEAD: THE LEAD
 // HANDED ON. The hub's `party.lead` act (world164 - world162 on its branch, renumbered past main's PRIMARCH and SUNBABY1 at the merge): the leader names a seated member who is online and the lead is
 // theirs - every member hears the `party.leader` note a leave already says, then the party as it stands. A member may
 // not, nor may the leader name themself, a stranger or an away seat. An older hub closes the socket on an act it does

@@ -1,5 +1,4 @@
-// PARTY8-B (2026-09-23, Mac, shown three renders of the party HUD and asked "how can we really push the fidelity
-// and reduce clutter": "B"): QUIET ROWS - each fact on a seat's row is DRAWN ONLY WHEN IT IS ACTIONABLE.
+// PARTY8-B: QUIET ROWS - each fact on a seat's row is DRAWN ONLY WHEN IT IS ACTIONABLE.
 //
 // SOC4's fixture (test/net/soc4_partyhud.test.js: the fake document with a write counter on every node) is copied
 // here rather than shared, the way every chat-shaped test carries its own; the laws pinned are the ones the

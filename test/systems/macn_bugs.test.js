@@ -1,8 +1,4 @@
-// MAC-N (2026-09-16, Mac's three bug reports): "1. Weapon and Armorsmiths
-// dont want to pay for loot / 2. Classic inventory issues in shops. Item
-// inventory is very large, scrollbar not working correctly, submenus are
-// completely unclickable / 3. Chat UI not visable with classic in online
-// mode". Three roots, none of them where the report points:
+// MAC-N (2026-09-16,. Three roots, none of them where the report points:
 //
 //   N1  the corpse's ARMOR was minted without SetItem's value (the
 //       weapon beside it had one), so the staged lot summed to NaN and

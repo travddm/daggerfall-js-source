@@ -1,4 +1,4 @@
-// DISC20 (2026-09-24, Mac, five in one message). bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC20.
+// DISC20., DISC20.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -142,7 +142,7 @@ test('DISC20-D: a storm cell strikes only where it is drawn - wholly outside its
   assert.deepEqual([squall.strikes.length, squall.sounds, squall.lit], [0, 0, 0], 'a squall\'s edge is no storm');
 
   // the report's own afternoon, measured: a swamp everywhere, the player's word sunny, 18 clipped cells in range.
-  // RAIN-HOURS (2026-10-13) moved the map's births, and the report's place grew a real storm inside these four game
+  // RAIN-HOURS moved the map's births, and the report's place grew a real storm inside these four game
   // hours (218 strikes, every one where the map paints thunder); the same minute 600 km east is the report's afternoon
   // on the map as it stands - sunny, 11 clipped cells in range, 208 strikes and 6 claps with the clip gate dropped
   const { systemsNear, weatherAt } = await import('../../src/systems/weather/weatherMap.js');

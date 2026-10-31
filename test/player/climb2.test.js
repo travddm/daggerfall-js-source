@@ -1,5 +1,5 @@
-// CLIMB2 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac said yes to it after AUDIT CLIMB1): THE
-// HANG, THE SHIMMY, THE GRIP AND THE FREE CLIMB. Mac's calls: "Jump is the grab" (a lip caught in the air is held;
+// CLIMB2 (the Enhanced Climbing arc; Mac said yes to it after AUDIT CLIMB1): THE
+// HANG, THE SHIMMY, THE GRIP AND THE FREE CLIMB. (a lip caught in the air is held;
 // Forward climbs up, Crouch drops), "Skill scales it" (the grip's time, the climb's and the shimmy's pace), "Free-climb
 // on grip" (a sheer wall climbed without the classic roll, on a grip that runs out) and the proposal's "heavy packs
 // cut your reach". The laws (player/parkour.js), the hand-hold against a real Collider's boxes, the motor living

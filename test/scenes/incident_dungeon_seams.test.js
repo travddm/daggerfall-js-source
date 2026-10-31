@@ -1,6 +1,4 @@
-// THE 2026-09-04 DUNGEON SEAMS INCIDENT, pinned. Mac: "Dungeon interiors
-// have some sort of see through line in its walls. Like it's not fully
-// connected." Nothing was disconnected. Four laws had drifted from DFU
+// THE 2026-09-04 DUNGEON SEAMS INCIDENT, pinned. Nothing was disconnected. Four laws had drifted from DFU
 // at once, and each made the same one-texel line worse:
 //
 //   1. A MODEL texture was uploaded through the billboard's door -
@@ -65,10 +63,10 @@ test('seams 1: alphaIndex -1 keeps palette index 0 opaque; 0 cuts it (MaterialRe
 
 test('seams 1: the pipeline uploads MESH materials opaque and flats as cutouts, through the one door', () => {
   const p = src('src/scenes/dataPipeline.js');
-  assert.match(p, /const uploadRecord = \(archive, record, \{ opaque = false, mips, removeMask = false, dye = null, dyeTarget = null, cutout = false \} = \{\}\) =>/);   // REVIEW 2026-09-05: + the icon door's mips opt-out; DYE-ICON: + the swatch the dye changes; PIN MOVED (DF-ART, kept by DF-LOOK): + the cut-out a ship's window asks
+  assert.match(p, /const uploadRecord = \(archive, record, \{ opaque = false, mips, removeMask = false, dye = null, dyeTarget = null, cutout = false \} = \{\}\) =>/);     // REVIEW 2026-09-05: + the icon door's mips opt-out; DYE-ICON: + the swatch the dye changes
   assert.match(p, /const masked = swap \? null : removeMask \? changeMask\(bitmap\) : bitmap;/);
   assert.match(p, /const color32 = swap \?\? t\.getColor32\(dyed \? changeDyeBitmap\(masked, dye, dyeTarget\) : masked, opaque \? -1 : 0\);/);   // DYE-ICON: the opaque/cutout choice is untouched
-  assert.match(p, /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/);   // PIN MOVED (DF-ART, kept by DF-LOOK): + the cut-out a ship's window asks (comeSailAwayPool.js cutOf)
+  assert.match(p, /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/);
   // every sub-mesh upload asks for the opaque material
   const meshSites = [...p.matchAll(/uploadRecord\(sm\.textureArchive, sm\.textureRecord(, \{ opaque: true \})?\)/g)];
   assert.ok(meshSites.length >= 2, `the pipeline uploads sub-mesh textures at ${meshSites.length} sites`);
@@ -91,7 +89,7 @@ test('seams 1: the model shader carries no alpha clip; the billboard shader keep
   const model = r.slice(r.indexOf('const FS = `'), r.indexOf('const CHAR_FS = `'));
   assert.doesNotMatch(model, /tex\.a < 0\.5\) discard/, 'DaggerfallDefault.shader is Opaque with no clip()');
   assert.doesNotMatch(model, /if \(tex\.a[^\n]*discard/);
-  // RW1 (2026-10-09): the law narrowed, not broken - a picture uploaded { cutout: true } (the caravan's glass) cuts, and
+  // RW1: the law narrowed, not broken - a picture uploaded { cutout: true } (the caravan's glass) cuts, and
   // only behind its own flag; every other picture keeps DaggerfallDefault.shader's no-clip
   assert.match(RW_MAIN_CUTOUT, /^  if \(uCutout > 0\.5 && tex\.a < 0\.5\) discard;/, 'the one cut is the flag\'s');
   assert.equal(model.split('${RW_MAIN_CUTOUT}').length, 2, 'and it stands once');
@@ -166,7 +164,7 @@ test('seams 2: every host sets the clear colour - interiors black, the streaming
   const wm = src('src/scenes/worldModes.js');
   const modeFrames = [...wm.matchAll(/renderer\.setClearColor\(INTERIOR_CLEAR\);[^\n]*\n\s+renderer\.setWorldViewport\([^\n]*\n\s+renderer\.beginFrame\(proj, view, (?:_ktLook\?\.sunDir \?\? )?INTERIOR_LIGHT_DIR, WORLD_FRAME\);/g)];   // AUDIT-EL F5: a world frame
   assert.equal(modeFrames.length, 2, 'both mode frames (dungeon, interior) clear black above their viewport + beginFrame pair (E5 wants the rect immediately above the frame)');
-  assert.equal([...wm.matchAll(/renderer\.beginFrame\(proj, view, (?:_ktLook\?\.sunDir \?\? )?INTERIOR_LIGHT_DIR, WORLD_FRAME\);/g)].length, 2, 'and those are the only two');   // PIN MOVED (KETCH): the dungeon arm's light the deck's sun on a sky-ketch
+  assert.equal([...wm.matchAll(/renderer\.beginFrame\(proj, view, (?:_ktLook\?\.sunDir \?\? )?INTERIOR_LIGHT_DIR, WORLD_FRAME\);/g)].length, 2, 'and those are the only two');
   // the mode-driven pair run BEFORE the frame they colour
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = src(f);
@@ -235,5 +233,5 @@ test('seams review 2: item icons are UI art - the icon door uploads a world arch
     assert.match(src(f), /icons\.uploadRecord\(img\.archive, img\.record, \{ mips: false, removeMask: true, dye: img\.dye, dyeTarget: img\.dyeTarget \}\);/, `${f} asks for the UI variant (HM1: with the mask stripped; DYE-ICON: its metal dyed)`);
     assert.match(src(f), /icons\.textures\.get\(glKeys\.get\(key\) \?\? `\$\{img\.archive\}_\$\{img\.record\}#ui`\)/, `${f} reads it back (DW3: by the variant the upload answered, the shared #ui when none)`);
   }
-  assert.match(src('src/scenes/dataPipeline.js'), /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/, 'the door forwards it');   // PIN MOVED (DF-ART, kept by DF-LOOK): + the cut-out a ship's window asks (comeSailAwayPool.js cutOf)
+  assert.match(src('src/scenes/dataPipeline.js'), /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/, 'the door forwards it');
 });

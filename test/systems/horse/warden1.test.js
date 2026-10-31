@@ -1,7 +1,4 @@
-// WARDEN1 (2026-10-10, Mac: "So I want to do something extremely funny. Anytime there are too many carts/wagons in a city
-// or they are parked on the road for a long time. I want a gaurd to navigate, lift the wagon/horse on top of their sprite
-// and yeet it far away"; asked: it lands outside town, fetched or summoned; everyone sees it; ten real minutes on a road;
-// four a town, the longest parked first). BY EXECUTION: the wire's law (the park word's town, road and landing; which
+// WARDEN1. BY EXECUTION: the wire's law (the park word's town, road and landing; which
 // teams the watch throws; the owner's word); THE RELAY keeping the clock - the road's ten minutes thrown at the first
 // frame past them, a fifth team in a town throwing the longest parked, the throw fanned and told its owner, the owner
 // away told when they re-say the spot, a moved word clearing the mark, a word with no landing never thrown, the alarm
@@ -120,7 +117,6 @@ test('WARDEN1 wire: the cell\'s round is due when it has not read its teams sinc
   assert.deepEqual(parkSpotOf({ h: H(7, 8) }), [7, 8]);
   assert.equal(parkSpotOf({}), null);
   assert.equal(parkSameSpot({ w: W(), h: H(), n: 'Bess' }, { w: W(), h: H(), n: 'Bessie' }), true, 'a new name moves nothing');
-  // PIN MOVED (AUDIT WARDEN1 R2): the team's spot, not every part exactly - a ground solved again, a horse not yet drawn
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX + WARDEN_SPOT_NATIVES) }), true);
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX + WARDEN_SPOT_NATIVES + 1) }), false);
   assert.equal(parkSameSpot({ w: W() }, { w: W(AX, AZ - WARDEN_SPOT_NATIVES - 1) }), false);
@@ -210,7 +206,7 @@ test('WARDEN1 relay: a woken cell reads its teams at its first frame (a hibernat
     const a2 = await join2(X, 'ann1'), b2 = await join2(X, 'bob1');
     await park2(X, a2, { c: CA, a: [AX, AZ], r: road() });
     step(5 * 60 * 1000);
-    await park2(X, a2, { c: CA, a: [AX + 100, AZ], r: road({ w: W(AX + 100) }) });   // PIN MOVED (AUDIT WARDEN1 R2): a move past WARDEN_SPOT_NATIVES
+    await park2(X, a2, { c: CA, a: [AX + 100, AZ], r: road({ w: W(AX + 100) }) });
     assert.equal(w2.room(X).store.get(parkKey(k)).since, now());
     step(5 * 60 * 1000);
     await w2.room(X).ping(b2);
@@ -553,7 +549,6 @@ test('WARDEN1 host: my parked wagon is stamped once the ground under it is built
   const s = hw.h.stamp;
   assert.equal(s.tw, 77); assert.equal(s.rd, true); assert.deepEqual(s.a, [AX + 40, AZ]);
   assert.deepEqual(hw.h.word([AX + 40, AZ]), { ly: s.ly, tw: 77, rd: 1 });
-  // PIN MOVED (AUDIT WARDEN1 R6): out through the nearest edge whose landing keeps the team in its own map pixel - the
   // west's (6 m off) and the south's (50 m) leave pixel (100, 150), the north's (52.4 m) stands in it, strayed along it
   const along = Math.max(0, Math.min(64 * NAV_CELL, 6 + strayOf([AX + 40, AZ]) * WARDEN_LAND_SCATTER));
   assert.deepEqual(s.ly, [Math.round((along - 5) * 40 + AX), Math.round((64 * NAV_CELL + WARDEN_LAND_PAST - 50) * 40 + AZ)]);

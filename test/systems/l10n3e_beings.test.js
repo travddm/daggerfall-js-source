@@ -1,4 +1,4 @@
-// L10N3e (2026-09-27): THE NAMES OF BEINGS, IN THE PLAYER'S LANGUAGE - the beings batch. DFU names an enemy through
+// L10N3e: THE NAMES OF BEINGS, IN THE PLAYER'S LANGUAGE - the beings batch. DFU names an enemy through
 // GetLocalizedEnemyName (the enemyNames list: row = its MobileTypes id, a class at 43 + id - 128) and a faction
 // through GetLocalizedFactionName (Internal_Factions, by its FACTION.TXT id) - and only where the name is SHOWN.
 // Pinned here through the port's own functions: the three enemy lines ("You see a/an %s", whose vowel test reads the

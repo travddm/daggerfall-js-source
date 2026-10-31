@@ -1,4 +1,4 @@
-// AUDIT WATCH-KIT (2026-10-01, Mac: "Just want to audit this to make sure it's perfection") - the audit of COMPANION-KIT
+// AUDIT WATCH-KIT - the audit of COMPANION-KIT
 // (PR #502: my companions' detailed bars, their party-panel cards and their packs), lenses U and P:
 //
 //   U - the cards and the bars on real Chromium: what a heal and a blow say on his card, through a window and a door;

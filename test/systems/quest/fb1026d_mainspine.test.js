@@ -1,5 +1,4 @@
-// MAIN-SPINE (2026-10-26, Discord #feature-feedback "Main quest borked": "Level 8 and still no letter from Morgiah ...
-// Other people having issues too"; bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): the main quest's backbone
+// MAIN-SPINE: the main quest's backbone
 // (S0000999, which sends Morgiah's letter at level 3) is started again when its one start failed to parse - the world's
 // faction records not yet loaded on the page an online birth reloads into - and a game that already lost it gets it back.
 // The real quest bridge over the vendored DFU quests; the world's faction records a stand-in (every royal an individual

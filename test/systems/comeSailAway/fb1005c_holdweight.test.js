@@ -1,4 +1,4 @@
-// HOLD-WEIGHT (FIELD BUGS 2026-10-05c, bible/01-Overview/bugs/Field-Bugs-2026-10-05c.md; the report: "Impossibly heavy boats
+// HOLD-WEIGHT (FIELD BUGS 2026-10-05c,; the report: "Impossibly heavy boats
 // can never be retrieved from storage" - "Parts of Small Ship 'I'" at 450 kg in a chest, the bearer's most 304).
 // PackBoat lays her hold's weight on her parts (SHIP-PACK keeps it, as the mod's own did) and a hold has no ceiling but
 // her speed: a ship packed off a plundered hold was ONE item heavier than the bearer could ever carry, AddItem took it
@@ -6,7 +6,7 @@
 // good. Parts no take could ever lift are not made now (systems/comeSailAway/comeSailAway.js partsTooHeavy) - the pick-up says why,
 // the boat menu says why, a fast travel and a landfall leave her where she lies, her hold aboard; a lost boat is packed
 // whatever she weighs. Come Sail Away's real runtime over test/csaScene.mjs, the world host's seams as world.js gives.
-// PARTS-WEIGHT (FIELD BUGS 2026-10-18e, bible/01-Overview/bugs/Field-Bugs-2026-10-18e.md) MOVED THESE PINS: her hold rides
+// PARTS-WEIGHT (FIELD BUGS 2026-10-18e) MOVED THESE PINS: her hold rides
 // her parts no more, so the gate weighs her timbers alone - a bearer too weak for those is the one refused now, and a
 // heavy hold packs (test/systems/comeSailAway/fb1018e_partsweight.test.js pins the rest).
 import { test } from 'node:test';

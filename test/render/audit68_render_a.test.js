@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24, Mac: "a deep comprehensive audit across the entirety of the codebase ... No band aids"):
+// AUDIT 68:
 // cluster render_a - src/render from airPass to perfMeter. Each pin names its finding's key, and each failed on the
 // code it fixes: the billboard key re-minted by the replays too, the AO mixed only into a frame the pass prepared,
 // the ?perf frame closed without an air pass, the flat clock that keeps every owed advance, the JS scatter on the
@@ -188,7 +188,6 @@ test('AUDIT 68 S16-batch-sphere-dup: the batch sphere\'s half-height lift has on
   const { batchSphere } = await import('../../src/render/bounds.js');
   assert.equal(typeof batchSphere, 'function');
   const out = new Float64Array(4);
-  // PIN MOVED (FIELD BUGS 2026-10-04d CULL-SIZE): the radius is no longer the stored 0.5 passed through - a 1 x 4 quad
   // reaches hypot(1, 4) / 2 from its centre, and the sphere now reaches the size the batch is drawn at (bounds.js
   // batchReach). The lift, this pin's claim, is unchanged.
   assert.deepEqual([...batchSphere({ bounds: [1, 2, 3, 0.5], origin: [10, 20, 30], size: { w: 1, h: 4 } }, out)], [11, 24, 33, Math.hypot(1, 4) / 2], 'the lift is half the height');

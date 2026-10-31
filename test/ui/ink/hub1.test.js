@@ -1,6 +1,4 @@
-// HUB1 (2026-09-25, Mac: "giving each region's main city a natural player hub and future ownership for online
-// guilds"; the marker: "a color coded circle indicator or something along those lines for distinguishing"; respawn:
-// "leave that out. That'll be a seperate idea"): EVERY REGION'S MAIN CITY IS ITS HUB (systems/region/regionHubs.js). The
+// HUB1: EVERY REGION'S MAIN CITY IS ITS HUB (systems/region/regionHubs.js). The
 // rule, the words, the base-row count, the held map's circles and names, and the world host's wiring by source.
 // The held map window's label and info box are driven in test/ui/heldmap.test.js. `06-Systems/Online-Arc.md` HUB1.
 import '../../modsOff.js';

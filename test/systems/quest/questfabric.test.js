@@ -1,5 +1,4 @@
-// QUEST-FABRIC (2026-10-26, the owner, asked whether quests may land in BLD-3's buildings: "Let quests use them";
-// bible/06-Systems/Quest-Arc.md QUEST-FABRIC) - A CELL'S BUILDINGS AS A QUEST READS THEM. A quest's site search reads every
+// QUEST-FABRIC - A CELL'S BUILDINGS AS A QUEST READS THEM. A quest's site search reads every
 // block of a town (systems/quest/place.js townBlockGrid); the Imperial City's own cells are made whole by the scene's door
 // (world/capitalModels.js: the cell's fabric, ground, models and lamps, then world/imperialFabricBuildings.js
 // withFabricBuildings), some 15 ms a cell, and with the cells read a temple's remote dart over the city stood eighty
@@ -61,7 +60,6 @@ test('QUEST-FABRIC THE VIEW IS THE BLOCK\'S BUILDINGS (world/imperialFabricBuild
     view.rmbBlock.subRecords.forEach((sub, i) => {
       const d = FABRIC_DONORS[recs[i].donor];
       assert.equal(sub.interior, made.rmbBlock.subRecords[i].interior, `${at} #${i}: the made block's interior`);
-      // PIN MOVED (IC-INTERIORS): the interior is the building's own (world/interior/fabricInterior.js) and carries its donor's
       // quest marker among its own flats, no longer the donor's record whole
       assert.equal(sub.interior.blockFlatObjectRecords.find((f) => f.textureArchive === 199 && f.textureRecord === 11)?.of, `${d.block}#${d.record}`, `${at} #${i}: its own donor's`);
     });

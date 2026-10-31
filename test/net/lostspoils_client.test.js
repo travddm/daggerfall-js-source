@@ -1,5 +1,4 @@
-// LOST-SPOILS (2026-10-22, the owner: "I want to utilize the mailbox as a way to obtain lost items/loot if not picked up
-// from a boss"; asked, "Mail the leftovers"): THE CLIENT'S SIDE - net/lostSpoils.js (the pools' door, its one route and
+// LOST-SPOILS: THE CLIENT'S SIDE - net/lostSpoils.js (the pools' door, its one route and
 // what an answer means), the post box's Claim all (net/serverPost.js), the window's (ui/enhanced/enhancedPost.js), and the
 // whole road over the real service: a gate's kill recorded, its floor left, each item in the mailbox from the Lost and
 // Found, the envelope lit, and every one claimed into the realm character being played.

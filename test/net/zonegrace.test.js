@@ -1,5 +1,4 @@
-// ZONE-GRACE (2026-10-26, the owner: "making the experience more palatable while retaining its punishment"; asked,
-// "Entry/rise grace" - bible/11-Multiplayer/Wild-Zone.md section 3b): SAFE PASSAGE. For WILD_GRACE.ms after a fighter
+// ZONE-GRACE: SAFE PASSAGE. For WILD_GRACE.ms after a fighter
 // enters the open zone or rises from a fall, the relay's referee lands no player's blow or cast on it, and its own blow or
 // cast on a player ends it at once (net/wild/wildRef.js). An entry grants it only to one away from the zone
 // WILD_GRACE.awayMs and out of every fight WILD_GRACE.fightMs - a step out and back is no way out of a fight - and a cell

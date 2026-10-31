@@ -1,12 +1,11 @@
-// SHIP-PORT (2026-09-28, Discord through Mac: "a player is at a port but unable to set sail"). The map's ship passage
+// SHIP-PORT. The map's ship passage
 // asks Travel Options' IsNotAtPort of the player's location. On their own ship that location is "Your Ship" (2,2 or
 // 5,5), which is in neither port list (the mod's 378 harbours; the MAPS byte's 343, every one of them among the 378),
 // while every trip from the deck is reckoned from the port the ship was boarded at (playerTravelOrigin,
 // TravelTimeCalculator.GetPlayerTravelPosition). So the passage was refused from the deck ("since there's no port")
 // and By land walked out onto the sea. Now, on the ship, the ship laws read the boarding port. Two more on the same
 // road: the enhanced map's card re-bills a trip whose ship its guard knocked off (it showed By land over the ship's
-// fare, and Begin gold-checked that fare). SHIP-SAIL (Mac, of the Overworld taking the map's passage itself: "Shouldn't
-// it already function as such?"): where the Overworld refuses a place across the water and the map's passage sails
+// fare, and Begin gold-checked that fare). SHIP-SAIL: where the Overworld refuses a place across the water and the map's passage sails
 // there, the Overworld OFFERS the passage and takes it, priced by the map's own popup headless (partyTripFare) - with
 // Come Sail Away on or off (AUDIT 28e: it was offered only with the mod on). Every place below is the retail MAPS.BSA's
 // own (its region, its index, its pixel, its id); the source pins read CODE (test/codeOnly.mjs).
@@ -251,7 +250,6 @@ test('SHIP-SAIL: the passage is priced by the map\'s own popup, which prices its
   // partyTripFare itself, mounted over the real popup: the gate's two halves told apart (AUDIT 28e) - coins short of the
   // inns' nights while the purse holds the fare, or the purse short of the fare.
   const purse = { gold: 1000, pieces: 1000 };
-  // PIN MOVED (AUDIT-TESA A2-3): its summary asked of a Bay pixel alone - the harness on the Bay
   const tripFare = new Function('d', `const { TravelPopUpWindow, travelFareDeps, playerTravelOrigin, maps, travelLocationSummaryAt, mapDict, guildFastTravel, playerEntity, diseaseCount, poisonCount, onTheBay } = d;\n${fnOf('  function partyTripFare(to, opts) {')}\nreturn partyTripFare;`)({
     TravelPopUpWindow, playerTravelOrigin: () => DAGGERFALL.pixel, maps: { getClimateIndex: (x) => strait(x) }, mapDict: null,
     travelLocationSummaryAt: () => ({ mapID: ALDINGHOPE.mapId }), guildFastTravel: (_, m) => m, playerEntity: {}, diseaseCount: () => 0, poisonCount: () => 0, onTheBay: () => true,

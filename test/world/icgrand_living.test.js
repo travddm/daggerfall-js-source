@@ -1,10 +1,9 @@
-// IC-GRAND x THE LIVING WORLD (2026-10-26, bible/03-World/Arena-Provinces.md IC-GRAND, "The living world") - THE IMPERIAL
+// IC-GRAND x THE LIVING WORLD - THE IMPERIAL
 // CITY ONE TOWN. Profiled in the running game (tools/imperialCityProbe.mjs PROFILE): the first frame over the city's centre
 // held 50-88 s of script, all of it the living world's trips (scenes/livingWorld/livingIndex.js -> systems/livingWorld/
 // trips.js visitorsOf -> townTrips -> ownTrip -> roadChoices) - the city's 625 slices each a place of a populated type,
 // each a city of 64 blocks, all within each other's TRIP_REACH_PX, every one's trips the others' visitors. A family
 // capital's slice but its centre is a part of the city, no town of its own; the centre's place is its one town.
-// PIN MOVED (IC-GRAND x WW7-11, at the merge into the TESA branch): stream I's WW7-11 had already made a capital one town
 // (livingIndex.js capitalStreet - no square, area or town's list names a street, a street sends no traveller), so IC-GRAND's
 // own townOf line and its capitalSliceAside retired at the merge; this pin now holds the city once among the towns near and
 // a street's own record standing for a reader on it (the soundscape's and the wagon warden's townAt) - WW7-11's law.
@@ -43,13 +42,13 @@ test('IC-GRAND THE LIVING WORLD - the Imperial City one town (WW7-11 capitalStre
   // fixture's Bay pixels are no capital's side)
 });
 
-// AUDIT RELEASE R2-9 (2026-10-26, bible/01-Overview/audits/Audit-Release-R2.md R2-9) - A CAPITAL'S DEED IS ITS SLICE'S. Every
+// AUDIT RELEASE R2-9 - A CAPITAL'S DEED IS ITS SLICE'S. Every
 // slice of a capital is a map id over its own eight by eight blocks, and a building key is its block's column and row and
 // its record (talk/talkTopics.js makeBuildingKey), so a key names a building in every slice: on the freeware 1,173 of the
 // Imperial City's 1,241 residences' keys are a residence's in two slices or more (up to sixteen - measured with the game's
 // rows and blocks, 31 s, not pinned here). DFU's (region, key) law owned them all with one deed.
 test('AUDIT RELEASE R2-9 A CAPITAL\'S DEED IS ITS SLICE\'S - a deed bought in one of a capital\'s slices owns its key there alone, never the same key in another slice; a Bay town and a question with no town keep DFU\'s (region, key) law; every host that asks names its town (mutants: the town unread; the slot\'s map id unread; every deed held to its town; a host\'s town dropped)', () => {
-  // the hazard: one key a residence in two slices or more. PIN MOVED (IC-PROPS, 2026-10-27): Daggerfall's residences'
+  // the hazard: one key a residence in two slices or more.
   // blocks are gone from the plan (world/imperialCity.js cellOf) - the fabric's homes are keyed as a block's buildings
   // are (its cell of the slice's eight by eight and its record, world/imperialFabricBuildings.js fabricBuildingsIn), so
   // the same cell and record of a dozen slices' grids, read through each district
@@ -77,21 +76,19 @@ test('AUDIT RELEASE R2-9 A CAPITAL\'S DEED IS ITS SLICE\'S - a deed bought in on
   // the hosts that ask name their town
   const read = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
   assert.match(read('src/scenes/worldModes.js'), /isHouseOwned\(playerEntity\.houses \?\? \[\], b\?\.regionIndex \?\? 0, key, homeTownOf\(b\)\)/, 'a building where it stands');
-  // PIN MOVED (HOUSES-3): the bank's resolver over the region's three (banking.js townDeeds)
   assert.match(read('src/systems/banking.js'), /\.filter\(\(deed\) => deedStands\(deed\) && deedHeldIn\(deed, dir\.mapId\)\)/, 'the bank\'s sale: the town the bank stands in');
   assert.match(read('src/scenes/world.js'), /isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \}/, 'the quest machine\'s');
   assert.match(read('src/scenes/questWorld.js'), /isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, _questLoc\(\)\?\.mapTableData\?\.mapId \?\? null\)/, 'the quest world\'s');
   assert.match(read('src/scenes/exterior.js'), /isHouseOwned\(playerEntity\.houses \?\? \[\], dfLocation\.regionIndex, buildingKey, dfLocation\.mapTableData\?\.mapId \?\? null\)/, 'the town\'s locks\'');
 });
 
-// IC-GRAND x THE LIVING WORLD (2026-10-26, the owner walking the city: "Seems like NPCs arent navigating the entirety of
-// the city"; bible/03-World/Arena-Provinces.md IC-GRAND, "The fabric's homes") - THE CITY'S PEOPLE: the living town made
+// IC-GRAND x THE LIVING WORLD - THE CITY'S PEOPLE: the living town made
 // its people from its slice's buildings, and the city's own blocks stood none (425 of 625 slices nobody but the watch and
 // its travellers); and it walked the one street net most doors open onto, where a slice cut from the city holds pieces
 // of several (a district wall whose gate stands in the next slice). Each near slice's fabric hands the town homes, shops
 // and taverns (world/imperialHomes.js fabricHomesIn), and a capital's slice is a town of quarters (places.js): each
 // quarter's people live, work and walk in it.
-const SPLIT = 112;   // a slice a district wall splits: its fabric's homes on two street nets (78 and 75) - PIN MOVED (IC-STAIRS: 341's split
+const SPLIT = 112;     // a slice a district wall splits: its fabric's homes on two street nets (78 and 75)
 // was a far ring's court laid over another neighbourhood's streets, found at the stairs' sweep and gone)
 /** A slice's walkers' grid of its own blocks (Daggerfall's cells left shut - the fabric's streets alone). */
 async function sliceNav(s) {

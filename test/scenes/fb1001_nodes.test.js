@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part four (Mac: "...and also ensure the other professions are sound") - THE NODES AND THEIR WORDS.
+// AUDIT 2026-10-01 part four - THE NODES AND THEIR WORDS.
 //
 // NODE-SPAN. A node is found by the look anywhere up its upright, base to aim point (NODE-AIM); a tree's aim point is 1.2 m
 // up its trunk and its glow stands 3.4 m, so a level look from two metres or closer passed over the tree, a look up never
@@ -145,10 +145,9 @@ test('NODE-CLEAR: a patch whose ground is inside a rock piece stands nowhere; a 
   assert.ok(moved.every((t) => !insideRocks([stone], t.local[0], t.local[2])), 'no tree inside');
   // and the kinds hand their pixel's rocks to both
   const read = (f) => readFileSync(new URL(`../../src/scenes/${f}`, import.meta.url), 'utf8');
-  // (ROCK-NEAR, FIELD BUGS 2026-10-09b - PIN MOVED: and the pieces its built neighbours stand that reach in)
+  // (ROCK-NEAR, FIELD BUGS 2026-10-09b
   assert.match(read('herbHost.js'), /\n\s*rocks: \[\.\.\.\(entry\.rocks \?\? \[\]\), \.\.\.\(near \?\? \[\]\)\],/, 'the patches are stood with the pixel\'s rocks');
-  // PIN MOVED (WW-C1, bible/03-World/World-Wide.md WW-C): and the pixel's region, a forest province's richness; PIN MOVED
-  // (AUDIT TESA II J5, bible/06-Systems/Professions-Arc.md JUNGLE-WOODS PAST THE BAY): and its jungle's word
+  // (AUDIT TESA II J5, JUNGLE-WOODS PAST THE BAY): and its jungle's word
   assert.match(read('treeHost.js'), /standTrees\(\{ px, py, day, climate: info\.climate, region: info\.region, confirmed, jungle: info\.jungle === true, forest: entry\.forest \?\? null, rocks: \[\.\.\.\(entry\.rocks \?\? \[\]\), \.\.\.\(near \?\? \[\]\)\] \}\)/, 'and the trees');
 });
 

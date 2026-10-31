@@ -1,4 +1,4 @@
-// STAR8 (bible/11-Multiplayer/Starfall.md section 7): THE THIRTEENTH OF FROSTFALL - the Starfall's questline. Its shape
+// STAR8: THE THIRTEENTH OF FROSTFALL - the Starfall's questline. Its shape
 // and its law on both ends (the first star and three more witnessed, the Starwarden on the three); its season - the line
 // begins only on the Witches' Festival's days (net/festivalLaw.js, the Starfall's own calendar) and the window draws none
 // not begun outside them (UI-Calm's law), while a begun line's star steps wait for the next Festival and the rest go on;
@@ -47,7 +47,6 @@ function runnerAt({ level = 10, online = true, ms = IN } = {}) {
   const clock = { s: 1000, ms };
   const service = { claim: async () => ({ ok: true, data: { why: 'unpaid' } }), guest: () => false };
   const runner = createLineRunner({ machine, service, nowMs: () => clock.ms, ctx: { level: () => level, online: () => online, nowSeconds: () => clock.s } });
-  // PIN MOVED (QL-OFFERED - a questline is taken, never sent): a day of looks begins nothing unasked; `settle` is the
   // player's take, then a look
   const step = () => { runner.look(); machine.tick(); };
   const settle = () => { for (let i = 0; i < 24; i++) { step(); clock.s += STEP_GAP_S; } assert.equal(runner.lineState(LINE.id), null, 'never begun unasked'); runner.takeLine(LINE.id); step(); };
@@ -63,7 +62,7 @@ test('STAR8 THE LINE: the Festival\'s, tier 3 - from level 6, online, a register
     ['QLTF01', 'Music in the Woods', ['starfall']], ['QLTF02', 'The Coven on the Bluff', []],
     ['QLTF03', 'Three Stars', ['starfall']], ['QLTF04', 'What the Thread Is Worth', []],
   ]);
-  assert.deepEqual([LINE.title(), LINE.giver()], ['The Thirteenth of Frostfall', 'Morwen, a Wyrd Sister of Glenmoril']);   // PIN MOVED (AUDIT STAR8 T1): of the Festival's Glenmoril Wyrd
+  assert.deepEqual([LINE.title(), LINE.giver()], ['The Thirteenth of Frostfall', 'Morwen, a Wyrd Sister of Glenmoril']);
   assert.equal(QL_LINES.indexOf(LINE), QL_LINES.findIndex((l) => l.id === 'oldCoil') + 1, 'after the Coil, before the introductions');
   const law = QL_SERVICE_LINES.thirteenthFrostfall;
   assert.deepEqual({ ...law, witness: { ...law.witness } }, { steps: 4, witness: { 0: 'star', 2: 'stars3' }, title: 'starwarden', titleAt: 2 });
@@ -91,7 +90,6 @@ test('STAR8 THE SEASON: the line begins only on the Festival\'s days - the festi
   assert.equal(NEED_CHECKS.starfall(IN), true);
   const low = runnerAt({ level: 5 });
   low.step();
-  // PIN MOVED (QL-OFFERED): a line its gate shuts is no row - UI-Calm's law, nothing drawn that cannot be taken - and no take
   assert.equal(row(low.runner), null, 'in season, level 5: not on offer, not drawn');
   assert.equal(low.runner.takeLine(LINE.id).reason, 'closed');
   const r = runnerAt();
@@ -357,7 +355,7 @@ test('STAR8 WHAT THE THREAD IS WORTH, run on the machine: Morwen asks at the cov
   assert.equal(quest.ql.outcome, 'guild', 'sold to the Mages Guild');
 });
 
-// ═══ AUDIT STAR8 (2026-10-20): the line's defects fixed, and its ties to the Witches' Festival ═══
+// ═══ AUDIT STAR8: the line's defects fixed, and its ties to the Witches' Festival ═══
 
 test('AUDIT STAR8 S1 THE COVEN GONE UNFOUGHT COMES AGAIN, NEVER BESIDE ITSELF: the Spinner culled while her sisters stand brings no second coven, even at a return; the whole coven gone - the Spinner unkilled, her sisters fallen (a body that fell stands for nobody) - calls it again at the Bluff; a load that did not bring it back calls it again (what stood is saved); the Spinner slain hands over the spindle, costs the Sisters of the Bluff their favour (FACTION.TXT 423, -10) and stops Morwen\'s clock - and nothing gone after her death calls a coven (mutants: `ql gone` on the first foe alone; the fallen standing; the beat unread; `seen` unsaved; the kill unread; the re-arm unscripted; the re-arm after the ambush; the spindle on her body; the repute; the clock run on)', async () => {
   const { questSource } = await import('../../qlSources.mjs');
@@ -539,7 +537,6 @@ test('AUDIT STAR8 S2 A STAR STEP THE FESTIVAL ENDS UNDER IS SET ASIDE, FAIL-FREE
   p.clock.ms = IN;
   p.step();
   assert.deepEqual(pSaid, [], 'neither set aside again nor reclaimed');
-  // PIN MOVED (QL-OFFERED): a first step the player set aside puts its line back on offer - its Take up takes that step
   // back (machine.js reclaimQuest), never a new one
   assert.equal(row(p.runner).state, 'offered');
   assert.deepEqual(p.runner.takeLine(LINE.id), { ok: true, line: LINE.id, reclaimed: true });

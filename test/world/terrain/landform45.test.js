@@ -1,5 +1,4 @@
-// LANDFORM4-5 (2026-10-07, Mac, of a town walled in by its own levelling: "I dont care about DFU. I want detailed
-// generation, rolling hills, varied terrian. This isnt about being 1:1") - A TOWN STANDS IN ITS LAND and THE LAND ROLLS
+// LANDFORM4-5 - A TOWN STANDS IN ITS LAND and THE LAND ROLLS
 // (world/landforms.js). Pinned with no game data, on the landforms' synthetic world (test/landformWorld.mjs) and a steep
 // upland stamped into it - the shape the field shot showed: a town levelled to its pixel's mean on a lifted hillside.
 
@@ -106,7 +105,7 @@ test('LANDFORM4: a site\'s rect stands at its level, the pixel\'s mean, wherever
   assert.equal(reach, LANDFORM_DIALS.site.most, 'a 6x6 town reaches the most');
   // a site in the sea pulls toward a level under the knee - a sea truly at the ocean's floor (no large heightmap over
   // it) and a strand rising out of it to a byte of 7 in the pixel east of the site's; its pixel has no land on the grid,
-  // so its level is the whole mean (AUDIT LANDFORMS III D4 - PIN MOVED: the site stood on the strand's pixel, whose level
+  // so its level is the whole mean (AUDIT LANDFORMS III D4
   // the sea dragged under the knee; a level is its land's now) - and the land it pulls is held over the knee, at
   // LANDFORM_FLOOR as a cut is; the sea and the beach DFU's to the bit (LANDFORM1's knee)
   const byte = (x) => (x <= 100 ? 0 : 7);
@@ -183,7 +182,7 @@ test('LANDFORM5: the land rolls - hills over every land sample, a pure function 
   spans.sort((a, b) => a - b);
   assert.ok(spans[spans.length - 1] > 3 * spans[0], `country varies (${spans[0].toFixed(1)} to ${spans[spans.length - 1].toFixed(1)} units across 13 km squares)`);
   // the kernel takes them: a lowland pixel moves by them and a road is graded to them - its bed the land with its hills,
-  // eased to LANDFORM7's `keep` of themselves on its centre line (PIN MOVED: they rode the bed whole)
+  // eased to LANDFORM7's `keep` of themselves on its centre line (
   const flat = generateSamples(woods, 300, 250, H, createLandforms({ woods, roads: NET, hills: false })), roll = generateSamples(woods, 300, 250, H, createLandforms({ woods, roads: NET }));
   const smooth = sampleKernel(woods, 300, 250, H, false, createLandforms({ woods })), bare = sampleKernel(woods, 300, 250, H, false, createLandforms({ woods, hills: false }));
   let moved = 0;

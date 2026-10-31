@@ -1,8 +1,8 @@
-// AUDIT 29 (2026-09-28, Mac: "Lets audit everything so far before we continue") - THE PROFESSIONS' CLIENT, AS THE
+// AUDIT 29 - THE PROFESSIONS' CLIENT, AS THE
 // AUDIT FOUND IT: the book's state read once at a time and never in a loop; stale for another account, and a shut
 // switch asked again slowly; a kept withdrawal minted by the tab that let it go, never by two; a smelt's kept id
 // forgotten after the service's ten minutes; a paid change asked as the client saw the track. Each pin failed on the
-// code before its fix. bible/06-Systems/Online-Arc.md AUDIT 29.
+// code before its fix. AUDIT 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

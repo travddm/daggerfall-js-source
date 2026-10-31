@@ -1,8 +1,8 @@
 // FIELD BUGS 2026-10-19f DUEL-BAR - a player's private report: in a duel, their own health bar did not drop when the other
-// player hit them. By design since INT8 (bible/06-Systems/Integrity-Arc.md section 5, "Decisions (2026-10-09)"): a fight
+// player hit them. By design since INT8 ("Decisions "): a fight
 // between players never touches the save's health, the relay's referee holds both fighters' VITALITY, and the player's
 // own was a 13px line in the corner (world.js duelHudSay, "Your vitality: n / m") while the bar went on reading the save.
-// THE OWNER'S DECISION (2026-10-19, "Bar shows duel vitality"): DISPLAY ONLY - for the length of a duel the HUD's health
+// THE OWNER'S DECISION: DISPLAY ONLY - for the length of a duel the HUD's health
 // bar, on both skins, reads the referee's vitality, and the save's again at its end; the save's health is never written.
 // Driven on the real modules: the real relay Room (test/fakeRoom.mjs) refereeing the bout, its words projected by the
 // wire's own laws into a real duel manager (net/duel/duelSession.js), whose live duel net/duel/duelBar.js reads as my

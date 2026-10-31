@@ -21,7 +21,7 @@ test('requestLook: a synchronous throw is non-fatal', () => {
   assert.doesNotThrow(() => requestLook(canvas));
 });
 
-// ── PL1: the 0.3s toggle refusal after an input box (2026-08-28) ──
+// ── PL1: the 0.3s toggle refusal after an input box ──
 // PlayerMouseLook.cs:192-196 over DaggerfallInputMessageBox
 // .CloseWindow's stamp (:301): Return both submits the box and is the
 // toggle's default binding, so the submitting keypress must not also

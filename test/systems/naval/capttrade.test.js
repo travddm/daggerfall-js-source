@@ -1,5 +1,4 @@
-// CAPT-TRADE, CAPT-CHARTS (2026-10-11, the owner: "giving a reason to players to experience it" - and of the Eltheric Ocean,
-// "exotic resources"; bible/03-World/Captains-Sea.md) - THE EXCHANGE AND THE TREASURE CHARTS: the Bay's goods made cheap
+// CAPT-TRADE, CAPT-CHARTS - THE EXCHANGE AND THE TREASURE CHARTS: the Bay's goods made cheap
 // where they are made and sold dear where they are wanted, the Eltheric Ocean's wanted everywhere, a day's prices the same
 // for every client, a port's day's dealing; the goods as items in a ship's hold; a chart among a pirate's papers, read
 // and marked, its cache raised and paid; the exchange's tab. tools/mutants/capttrade.json.
@@ -63,7 +62,6 @@ test('CAPT-TRADE a port\'s trade: its crown\'s makes and wants, twisted by one g
   assert.ok(!GOODS.find((g) => g.id === extra[0]).ether);
   const twists = new Set(Array.from({ length: 30 }, (_, i) => JSON.stringify(portTrade({ key: `p${i}`, crown: 'Wayrest' }))));
   assert.ok(twists.size > 3, 'ports of a crown differ');
-  // PIN MOVED (ISLE-TRADE, 2026-10-17): an isle makes its own good of the Bay besides (tradeGoods.js isleGood - Driftholm's
   // key draws iron), and wants every other good of the Bay
   assert.deepEqual(portTrade(ISLE), { makes: ['etheramber', 'starglass', 'voidsilk', 'iron'], wants: ['wine', 'grain', 'wool', 'spice', 'silk', 'silver', 'ivory'] });
   assert.equal(standOf(WAYREST, 'wine'), 'makes');
@@ -80,7 +78,6 @@ test('CAPT-TRADE the price: a good\'s base at MADE_K where made, WANT_K where wa
     assert.ok(made.mid >= 30 * 0.6 * 0.88 - 1e-9 && made.mid <= 30 * 0.6 * 1.12 + 1e-9, `${made.mid}`);
     assert.equal(made.sell, Math.round(made.mid * 1.08));
     assert.equal(made.buy, Math.round(made.mid * 0.92));
-    // PIN MOVED (AUDIT CAPTAIN'S SEA H8): `assert.ok(wanted)` held for any price - the wanted port's own, read
     assert.equal(wanted.stand, 'wants');
     assert.ok(wanted.mid >= 30 * 1.55 * 0.88 - 1e-9 && wanted.mid <= 30 * 1.55 * 1.12 + 1e-9, `${wanted.mid}`);
     const ex = priceOf(WAYREST, 'starglass', day);
@@ -92,7 +89,6 @@ test('CAPT-TRADE the price: a good\'s base at MADE_K where made, WANT_K where wa
   assert.ok(iron.mid >= 24 * 1.55 * 0.88 && iron.mid <= 24 * 1.55 * 1.12);
   assert.equal(priceOf(WAYREST, 'nope', 1), null);
   // a run of the trade: Wayrest's wine to Sentinel - the margin a voyage is worth
-  // PIN MOVED (AUDIT CAPTAIN'S SEA B12): the margin read where wine is wanted - the guarded check never ran at Sentinel's key
   const w = priceOf(WAYREST, 'wine', 5), s = priceOf(WINE_WANTED, 'wine', 5);
   assert.equal(standOf(WINE_WANTED, 'wine'), 'wants');
   assert.ok(s.buy > w.sell * 1.5, 'carried to where it is wanted: half again and more');
@@ -110,7 +106,6 @@ test('CAPT-TRADE the exchange\'s board: every good of its sea, the other sea\'s 
   assert.equal(dealt.find((r) => r.id === 'wine').sells, 18);
   assert.equal(dealt.find((r) => r.id === 'iron').buys, 25);
   const isle = exchangeOf(ISLE, 3);
-  // PIN MOVED (ISLE-TRADE): an isle sells its own good of the Bay as made (iron, Driftholm's), and none of the rest
   assert.ok(isle.find((r) => r.id === 'wine').sells === 0 && isle.find((r) => r.id === 'voidsilk').sells === 30);
   const iron = isle.find((r) => r.id === 'iron');
   assert.deepEqual([iron.stand, iron.exotic, iron.sells, iron.buys], ['makes', false, 30, 4], 'its own good: sold as made, never "not sold here"');

@@ -1,5 +1,4 @@
-// HOME-LOOK (2026-09-30, asked: "The introduction of exterior customization. The ability to choose the texture for the
-// roof, walls, door, windows, etc"). AN ONLINE HOME'S OUTSIDE, AS ITS OWNER PAINTS IT. The law both ends read
+// HOME-LOOK. AN ONLINE HOME'S OUTSIDE, AS ITS OWNER PAINTS IT. The law both ends read
 // (net/homeLaw.js homeLookOf); which part of a house a face is and what it wears (world/homeLook.js - Daggerfall's own
 // families, through ApplyClimate so winter still snows on it); a painted house's own table (the pixel's climate swaps
 // and the look over them, a record the archive lacks left to the town's); the service's write and the town's answer

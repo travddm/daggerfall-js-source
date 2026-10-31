@@ -126,7 +126,6 @@ test('R1 hours: the verbatim tables and their edge rows (PlayerActivate.cs:91-10
     'the entry-time shop latch reads the effective online answer');
   assert.equal(isBuildingOpen(BUILDING_TYPES.House2, 23, { online: true }), false,
     'online staffing does not flatten residence hours');
-  // PIN MOVED (OL6, 2026-10-07): the palace joined the relief - test/systems/ol6_service_hours.test.js holds the three it
   // added; the house for sale (8-16) is the hours this pin keeps.
   assert.equal(isBuildingOpen(BUILDING_TYPES.HouseForSale, 23, { online: true }), false,
     'online staffing does not flatten the house for sale\'s hours');

@@ -1,5 +1,4 @@
-// STACK-CAP (2026-10-11, the owner: "the ability to keep accumulating spell times to max out spells and never have to
-// refresh" - answered "Refresh, never stack"). A like-kind re-cast RENEWS its incumbent to what the cast would stand at
+// STACK-CAP. A like-kind re-cast RENEWS its incumbent to what the cast would stand at
 // as a new instance, never adds to it and never shortens it (systems/effects.js renewRounds). DFU's AddState adds the
 // rounds up, so a caster with magicka to spare banked a Shield Group at 11,397 rounds (BUFF-END, systems/mysticism.js).
 // Recorded departure: Port-Ledger section A.

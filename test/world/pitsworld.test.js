@@ -1,4 +1,4 @@
-// PITS-WORLD (2026-10-27, bible/03-World/World-Wide.md WORLD-LANES; the audit NO SYSTEM LEFT BEHIND IN THE BAY item 35): There's
+// PITS-WORLD: There's
 // a Hole in the Bottom of the Ocean's pits stood on the Bay's map alone - ETHER-DEEP held them there because a pit's drowned
 // dungeon was named by its pixel's id's low twenty bits (world/oceanHoles.js GetAbyssMapId), the Bay's 1000 x 500 alone
 // apart: past it a pit a thousand pixels from a Bay pit would have shared its abyss. TAMRIEL-DEEP carves the continent's

@@ -1,4 +1,4 @@
-// WORLD3 (Mac, 2026-09-12: "Begin") - SLICE 3: THE LIVE WORLD AS EVENTS.
+// WORLD3 - SLICE 3: THE LIVE WORLD AS EVENTS.
 // A dungeon's doors, levers and platforms are everyone's: whoever moves
 // one sends what changed ({t:'act', data} - the action records an
 // outermost entry changed, diffed on the save record) and the room fans
@@ -154,7 +154,7 @@ test('WORLD3: the action graph\'s change seam and remote apply, executed on bare
   C.a.attemptBash(C.door, 0.01);
   assert.equal(C.door.currentLockValue, 0); assert.equal(cOut.length, 1); assert.equal(cOut[0][0].lock, 0);
   D.a.applyRemote(cOut[0]); assert.equal(D.door.currentLockValue, 0, 'the lock rides'); assert.equal(D.door.state, 'forward');
-  // LOCKPICK (bible/06-Systems/Lockpicking.md): a lock a host's tumblers opened rides the same way - its lock and its swing
+  // LOCKPICK: a lock a host's tumblers opened rides the same way - its lock and its swing
   // in ONE set, an entry of its own (the window answers after the press that opened it has long returned)
   const P = graph(), Q = graph(); P.door.currentLockValue = 5; Q.door.currentLockValue = 5;
   const pOut = []; P.a.onChanged = (r) => pOut.push(r);
@@ -167,7 +167,7 @@ test('WORLD3: the action graph\'s change seam and remote apply, executed on bare
   assert.equal(E.a._depth, 0, 'the depth unwinds'); assert.equal(A.a._depth, 0);
   assert.equal(B.a.applyRemote(null), 0); assert.equal(B.a.applyRemote([{ key: 'nope', state: 'end' }]), 0, 'a record for no object is skipped');
   const src = rd('src/world/actionSystem.js');
-  assert.match(src, /for \(const name of \['activate', 'attemptBash', 'toggleDoor', 'receive', 'attemptLockpicking', 'lockpicked'\]\) \{\s*const body = ActionSystem\.prototype\[name\];\s*ActionSystem\.prototype\[name\] = function \(\.\.\.args\) \{ return this\._changed\(\(\) => body\.apply\(this, args\)\); \};\s*\}/, 'the six entries ride the seam, their signatures kept');   // PIN MOVED (LOCKPICK): and the lock a host's tumblers opened
+  assert.match(src, /for \(const name of \['activate', 'attemptBash', 'toggleDoor', 'receive', 'attemptLockpicking', 'lockpicked'\]\) \{\s*const body = ActionSystem\.prototype\[name\];\s*ActionSystem\.prototype\[name\] = function \(\.\.\.args\) \{ return this\._changed\(\(\) => body\.apply\(this, args\)\); \};\s*\}/, 'the six entries ride the seam, their signatures kept');
 });
 
 test('WORLD3: the target machine with a PEER, executed - a peer is a player to every gate and wins on distance; measured at its own feet and capsule; a peer in sight arms GetTargets when the host is out of the band and unseen; the machine hands the peer\'s own feet back; a peer gone (health 0) is dropped; the aim point is the peer\'s transform; the motor aims its senses at the peer\'s feet and reads its capsule - and the hosts by source', () => {

@@ -1,7 +1,7 @@
-// SEAT-HALL (2026-10-02, Mac: "Please do" - the palace as the holder's guild hall): A PALACE'S CHARTER ROOM, AS THE
+// SEAT-HALL: A PALACE'S CHARTER ROOM, AS THE
 // SERVICE KEEPS IT - its own table (`seat_hall_decor`, migration 0065), written through DECOR's own routes with `seat`
 // named, by an Officer of the guild holding the palace seat, at most a hundred pieces over the seat, DECOR's gold a
-// placement; cleared whenever the seat changes hands or lapses (bible/11-Multiplayer/Seats-Arc.md 7.2;
+// placement; cleared whenever the seat changes hands or lapses (7.2;
 // server-account/src/decor.js SEAT_STORE). Driven through the real Worker over node:sqlite with every migration applied
 // (test/accountDb.mjs). `06-Systems/Online-Arc.md` SEAT-HALL.
 import { test } from 'node:test';

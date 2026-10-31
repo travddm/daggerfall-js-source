@@ -1,7 +1,7 @@
-// CROWN2 (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): FEALTY AND PACTS AS THE GAME SHOWS THEM - the
+// CROWN2: FEALTY AND PACTS AS THE GAME SHOWS THEM - the
 // Seat tab's rows for a guild's liege, vassals, Pacts and the offers standing, and an Officer's levers on each; the seat
 // book's calls down their own paths and its words; the server's red lines off the seats' list, said once a device, and
-// read again on their own clock; the world's wiring (bible/11-Multiplayer/Seats-Arc.md 7.8).
+// read again on their own clock; the world's wiring (7.8).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -31,7 +31,7 @@ test('CROWN2 THE POLITICS\' ROWS: sworn either way with its break; a fealty brea
   assert.deepEqual(politicsRows({ pacts: [{ with: SH, state: 'offered', until: 16, mine: false }] }), [{ text: 'The Silver Hand <SH> offers your guild a Pact of non-aggression, until week 16.', act: 'pact-accept', alt: 'pact-decline', tag: 'SH' }]);
   assert.deepEqual(politicsRows(null), []);
   assert.equal(politicsRows({ fealty: [f('sworn', true)], pacts: [{ with: EO, state: 'offered', until: 8, mine: true }] }).length, 2, 'fealty first, then Pacts');
-  assert.deepEqual({ ...POLITICS_ACTS }, { 'fealty-accept': 'Accept', 'fealty-withdraw': 'Withdraw', 'fealty-break': 'Break fealty', 'pact-accept': 'Sign', 'pact-withdraw': 'Withdraw', 'pact-break': 'Break the Pact', 'fealty-decline': 'Decline', 'pact-decline': 'Decline' });   // AUDIT-SEATS (PIN MOVED): an offer made to the guild has a Decline beside its Accept
+  assert.deepEqual({ ...POLITICS_ACTS }, { 'fealty-accept': 'Accept', 'fealty-withdraw': 'Withdraw', 'fealty-break': 'Break fealty', 'pact-accept': 'Sign', 'pact-withdraw': 'Withdraw', 'pact-break': 'Break the Pact', 'fealty-decline': 'Decline', 'pact-decline': 'Decline' });     // AUDIT-SEATS (
   assert.equal(pactBrokenText(SH, DG), 'The Silver Hand <SH> has broken its Pact of non-aggression with Daggers <DG>.');
   assert.equal(seatBattleLine({ kind: 'siege', guild: SH, against: EO }), 'The Silver Hand <SH> has won a Right of Siege against Ebon Oath <EO> this week.');
   assert.match(battleAnnouncement({ kind: 'tourney', startsAt: 0, attackerGuild: SH, defenderGuild: EO }, 'Anticlere'), /^The Silver Hand <SH> and Ebon Oath <EO> meet/);

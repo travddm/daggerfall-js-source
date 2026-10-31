@@ -1,4 +1,4 @@
-// DW-E3 (2026-09-25) - ILIAC PUDDLE NO MORE 1.2.2's PASSIVE FISH (jet082), PINNED: the species
+// DW-E3 - ILIAC PUDDLE NO MORE 1.2.2's PASSIVE FISH (jet082), PINNED: the species
 // against PassiveFishSpeciesCatalog.All; the depth weight and the weighted pick; the school's cruise,
 // threat and water; a fish's flee, dart, school cohesion, clamp and obstacle; the spawner's placement
 // (the depth band, the deep's floor bias, the schoolmates' ring); the icon's aspect; the pulse and the

@@ -1,4 +1,4 @@
-// WORLD4 (Mac, 2026-09-13: "Lets start on slice 4") - SLICE 4: THE
+// WORLD4 - SLICE 4: THE
 // ROOM'S LOOT. A container nobody has opened is each client's OWN roll -
 // the room knows nothing of it, and the room's memory carries nothing
 // for it, which is what AUDIT WORLD's "loot's memory should carry

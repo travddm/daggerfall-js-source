@@ -95,7 +95,6 @@ test('B5: RegisterPreventRestCondition / GetPreventedRestMessage, and the null -
 test('B5: the OPEN gate finally has a producer - all four hosts read the registry', () => {
   // restDecision's third arm has existed since U48 and nothing in src/
   // could ever hand it a message. The four dispatch sites now do.
-  // PIN MOVED (ROAD review-p): the hosts hand over the PRODUCER, not
   // its answer. DFU fetches the registry inside the third `else`
   // (DaggerfallUI.cs:667-669), so a press the enemy arm or the
   // swimming/grounded arm answers never runs a registered condition -

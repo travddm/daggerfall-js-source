@@ -1,4 +1,4 @@
-// WB8a (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified") - THE WARDEN IS NEVER SWAYED.
+// WB8a - THE WARDEN IS NEVER SWAYED.
 //
 // No path reached him before this, but only by accident: he is in no foe pool, so the language roll (DFU's
 // EnemySenses pacification, X11's seam for all three pools) never met him; his spell door took harmful families and a

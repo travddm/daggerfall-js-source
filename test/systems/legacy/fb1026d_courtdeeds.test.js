@@ -1,6 +1,4 @@
-// COURT-DEEDS (2026-10-26, Discord #feature-feedback "Better Courtship": "Compliments, giving gifts, hugging, kissing ...
-// Right now it's confusing on what exactly you're supposed to use to improve relationships";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): a compliment, a gift, a hug and a kiss on the Tell me about page,
+// COURT-DEEDS: a compliment, a gift, a hug and a kiss on the Tell me about page,
 // each once a day, each saying what it moved. Through the real host (scenes/legacyHost.js topicRows) over the real
 // relations (systems/livingWorld/regardClock.js characterRelations - the one construction point world.js uses).
 // AUDIT FB1026d (B1-B6, E4, E10): a reload through the real mod-save registry, the regard read as it stands, the tone

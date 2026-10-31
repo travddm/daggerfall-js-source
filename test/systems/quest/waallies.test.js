@@ -1,5 +1,4 @@
-// WA-ALLIES (2026-09-26, SquidKamer - Kamer, Warm Ashes - Ships' author - on the Discord: "Just so you know if the wa
-// ships allies aren't attacking then my other mods may have issues ... say we port some quests packs in"). His raid
+// WA-ALLIES. His raid
 // quest musters the ship's crew with `change foe _ally_ team 1` and `change foe _X_ infighting true` for every foe:
 // the crew is the player's ally, and every quest foe may be fought by other AI. The team landed; the infighting
 // flag never did - ChangeFoeInfighting wrote `inst.behaviour`, and a host's foe record keeps its behaviour as

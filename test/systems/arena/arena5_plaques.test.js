@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): THE HALL OF CHAMPIONS' PLAQUE WALL, DRIVEN (bible/11-Multiplayer/Arena.md 1: "the Hall of Champions
+// ARENA5: THE HALL OF CHAMPIONS' PLAQUE WALL, DRIVEN (1: "the Hall of Champions
 // - a plaque wall naming every Grand Champion this save (offline) or this realm (online)"). The row measured about the
 // Keeper in a room's collider (world/arena/arenaPlaques.js hallPlaquePlan - the nearest wall, a plaque where that wall stands and
 // nothing between her and it, left to right as one faces it, capped); the plaque's two boards (plaqueModel - Daggerfall's

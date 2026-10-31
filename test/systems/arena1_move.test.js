@@ -1,4 +1,4 @@
-// ARENA1 (2026-10-02): WHAT THE ARENA DISPLACES (Mac: "Move them to a new house"). A deed whose house stood in
+// ARENA1: WHAT THE ARENA DISPLACES. A deed whose house stood in
 // Daggerfall's cell (4,3) moves once to a house of its kind in the city, its scene with it, the bank's letter said
 // (systems/arena/arenaMove.js); every other record keyed there - a rented room, a repair ticket, a quest site, an inside
 // save - names no building now (layoutPins.recordStands) and each system's own law for that takes it. And the

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
-// MAC-Q - THE MORROWIND TORCH'S FLAME (2026-09-17).
+// MAC-Q - THE MORROWIND TORCH'S FLAME.
 //
-// Mac: "the torch doesn't emit fire" - and, told this port had never drawn a
+// and, told this port had never drawn a
 // Morrowind particle system and that one could not be verified in a
 // container with no Morrowind data, "Please take care of the morrowind
 // torch flame." His call. So the particle system is PORTED, law by law, from

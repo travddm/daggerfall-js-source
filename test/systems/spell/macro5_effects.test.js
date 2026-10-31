@@ -1,4 +1,4 @@
-// MACRO-5 (2026-09-22, the macro audit): THE EFFECT IS THE SOURCE.
+// MACRO-5: THE EFFECT IS THE SOURCE.
 // DaggerfallSpellBookWindow.ShowEffectPopup (:651-660) hands the effect
 // itself to MacroHelper as the box's source, and every description record
 // (1202-1305) is built of its eleven settings rows - %bdr %adr %cld, %bch

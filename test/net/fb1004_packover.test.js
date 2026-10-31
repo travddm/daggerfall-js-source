@@ -3,7 +3,7 @@
 // the rest was "left where it was gathered" - counted carried by the service and never made. A DFU pack is carried to
 // its limit, and a character with no Materials Bag has nothing else, so it gathered goods it never saw. Every unit the
 // service counts is minted now: the bag, the pack, then the pack past its weight - the hands' `give` (giveCarried), B5's
-// law for a withdrawal and the Foraging mod's own AddItem (bible/01-Overview/bugs/Field-Bugs-2026-10-04.md).
+// law for a withdrawal and the Foraging mod's own AddItem.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

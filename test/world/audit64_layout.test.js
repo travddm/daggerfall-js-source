@@ -254,8 +254,7 @@ test('AUDIT 64 F14: DaggerfallCityGate.Update is a state machine, not an IsNight
 });
 
 test('OL5: the shared world never lets a town gate shut, and a gate laid CLOSED still opens', () => {
-  // Mac, 2026-09-20: "Town gates online... should all be open at night time
-  // online mode". A closed gate carries a collider (GameObjectHelper.cs:246-250),
+  // . A closed gate carries a collider (GameObjectHelper.cs:246-250),
   // so online this was a walled city sealed for two real hours with no way to
   // sleep the clock forward.
   const ON = { online: true };

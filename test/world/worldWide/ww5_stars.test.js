@@ -1,4 +1,4 @@
-// WW5 (bible/03-World/World-Wide.md WW5; bible/11-Multiplayer/Starfall.md section 16, WW5 - the owner's call taken,
+// WW5 (WW5; WW5 - the owner's call taken,
 // 2026-10-26: "Every single thing here needs to be addressed. No exceptions."): A COVEN NIGHT IN EVERY THEATRE. One coven a
 // night on the Bay was the Starfall whole - its sites the Bay's scan's (`W = 1000`, `px = id % W`), the wire's star word
 // the Bay's 0..999, three stars an hour for the world. Now each theatre that stands one (the Bay's and the eight
@@ -132,8 +132,8 @@ test('WW5 THE WIRE AND THE RELAY: the star word on its lane\'s pixel - the Bay\'
   assert.deepEqual(validStarOut({ k: 'hd', n: N, s: 10, px: 1600, py: -120, at: 9, top: ['Ann'], c: 1 }), { k: 'hd', n: N, s: 10, px: 1600, py: -120, at: 9, top: ['Ann'], c: 1 });
   assert.deepEqual(validStarOut({ k: 'hds', l: [[N, 10, 1600, -120, 9], [N, 10, 300, 200, 9], [N, 1, 300, 200, 9]] }).l, [[N, 10, 1600, -120, 9], [N, 1, 300, 200, 9]]);
   assert.equal(STAR_HELD_MAX, 9 * 3 * 2 + 6, 'a night\'s and the night before\'s three in every lane, and room');
-  assert.equal(WW5_RELAY_MIN, 276);   // PIN MOVED (the eighth merge of main into #1184): world276, past main's world275 (SD-PARTY, live), which refuses; PIN MOVED (the seventh merge of main into #1184): world275, past main's world274 (LADDER-CUT), which refuses
-  assert.ok(relaySupportsWw5(RELAY_VERSION) && relaySupportsWw5('world277') && !relaySupportsWw5('world275') && !relaySupportsWw5('acct272') && !relaySupportsWw5(undefined));   // PIN MOVED (the fourth merge of main into #1184): the gate is world274, past main's world273, which refuses; PIN MOVED (the third merge of main into #1184): the gate is world272, past MASTER-THREE's world271 (main's), which refuses; world271 at the second merge, past CHAT-POST's world270   // PIN MOVED: world276, SHOP (Genesis, Eternal and Origin join the vocabulary, last; the token's body bound 896); PIN MOVED: world275, the merge of main (world274 on its branch, renumbered past world274 on main at the merge); PIN MOVED: world274, the merge of main (world272 on its branch, renumbered past world272-world273 on main at the merge)
+  assert.equal(WW5_RELAY_MIN, 276);
+  assert.ok(relaySupportsWw5(RELAY_VERSION) && relaySupportsWw5('world277') && !relaySupportsWw5('world275') && !relaySupportsWw5('acct272') && !relaySupportsWw5(undefined));
   const base = { sf: [N, 13], s: 'acct_1234', c: 1, l: 5, i: 100, e: 160 };
   assert.ok(starReceiptValid(base), 'a province\'s star\'s receipt - the relay mints it, the account service reads it (both bundle the law)');
   assert.ok(!starReceiptValid({ ...base, sf: [N, 27] }));

@@ -1,4 +1,4 @@
-// DICE1 (2026-09-23, the community arc - Addison Knox: "Chat dice-rolling"): THE RELAY ROLLS, and a roll is a frame of
+// DICE1: THE RELAY ROLLS, and a roll is a frame of
 // its own type. Driven: the grammar and its bounds, the unbiased draw over a scripted source, the client's check of
 // what it is told; the relay's roll arm over the real Room (its own CSPRNG, its gate, the mute, the channel fans); the
 // session's ask and its door; the log's roll line; the host's /roll by source.

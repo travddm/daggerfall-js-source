@@ -1,4 +1,4 @@
-// L10N3d part 2 (2026-09-27), THE TALK BATCH: TALK, THE MACROS, AND THE NAMES THEY BUILD, IN THE PLAYER'S LANGUAGE.
+// L10N3d part 2, THE TALK BATCH: TALK, THE MACROS, AND THE NAMES THEY BUILD, IN THE PLAYER'S LANGUAGE.
 // DFU reads these Internal_Strings where it shows them - TalkManager's topic lists and its never-mind, MacroHelper's
 // words (%ltn %lp %ct %cn2 %rt %sea), QuestMCP's divines, BiogFileMCP's %hpn/%hpw, RaceTemplate's names, ItemHelper's
 // and the item MCP's (the long name, %po %ba %hs %mat %qua, the recipe box, the powers box - and the inventory window's
@@ -263,7 +263,6 @@ test('L10N3d talk: Place\'s "The %s Residence", GetItem\'s gold line and RevealL
   const said = () => {
     const hud = [], notes = [];
     const quest = {
-      // PIN MOVED (AUDIT QA3 A3): GetItem's gold asks the quest's tasks whether this is the reward - a quest has its map
       uid: 1, tasks: new Map(), getItem: () => ({ daggerfallUnityItem: { group: 'Currency', templateIndex: 276, stackCount: 50 } }),
       getPlace: () => ({ siteDetails: { regionName: 'Daggerfall', locationName: 'Privateer\'s Hold' } }),
       hooks: { addGold: () => {}, addHUDText: (line) => hud.push(line), world: { discoverLocation: () => {}, addNote: (line) => notes.push(line) } },

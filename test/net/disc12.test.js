@@ -1,4 +1,4 @@
-// DISC12 (2026-09-23, Mac: "Those open tasks? ... tackle it"): the two online gaps DISC10 left - a peer fighting
+// DISC12: the two online gaps DISC10 left - a peer fighting
 // with the LEFT hand was drawn and heard with the right hand's weapon (or a fist), and a peer in beast form was
 // drawn as the person. The pose carries both now (`lh`, `wb`, world101). 01-Overview/bugs/Field-Bugs-2026-09-23.md.
 import { test } from 'node:test';
@@ -67,10 +67,9 @@ test('DISC12 doll: a peer in beast form stands as the werewolf or the wereboar -
   const mk = (id, wb) => ({ id, name: id, look: { ...LOOK, class: '' }, shown: { ...P, ...(wb ? { wb } : {}) } });
   rp.sync([mk('wolf', 1), mk('boar', 2), mk('man', 0)], (p) => [p.x, p.y, p.z], {});
   assert.deepEqual(asked.filter(([id]) => id !== 'man'), [['wolf', MOBILE_TYPES.Werewolf], ['boar', MOBILE_TYPES.Wereboar]]);
-  // the contributor's sprite fix (2026-09-23): a human with no class to go on stands as the THIEF sprite, the Unity
+  // the contributor's sprite fix: a human with no class to go on stands as the THIEF sprite, the Unity
   // mod's own default, rather than the flat doll - and never as a beast
   assert.deepEqual(asked.filter(([id]) => id === 'man'), [['man', 138]], 'a human with no class stands as the Thief, never the beast');
-  // PIN MOVED (AUDIT MIXED-PAIR L4-3): `lh` from poseHandsOf beside `ah` - each omitted at 0, the wire's omission law
   assert.deepEqual(poseHandsOf(true, null), {}, 'right-handed, no left blow: the bytes it always had');
   assert.deepEqual(poseHandsOf(false, null), { lh: 1 });
   assert.deepEqual(poseHandsOf(true, 'L'), { ah: 1 }, 'a pair\'s left hand struck last');

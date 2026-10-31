@@ -1,10 +1,9 @@
-// SILVER-WAYS (2026-10-03, Mac: "With the introduction of guilds. I want to talk about how we can make silver obtainable
-// and balanced outside of crafting"; then "Do it"): SILVER OUTSIDE THE CRAFTS, AS THE SERVICE KEEPS IT - a town defended
+// SILVER-WAYS: SILVER OUTSIDE THE CRAFTS, AS THE SERVICE KEEPS IT - a town defended
 // strikes 30 silver; the gates and the raids share one combat cap of 150 a UTC day, the day's last strike what it has
 // left; three of a guild's accounts on one raid or gate strike its treasury a deed of 25, four a guild a day, members of
 // seven days alone; a guild's contract pays each defender of a raid in its region from its escrowed treasury, less the
 // tax, never its own posters. Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). bible/06-Systems/Professions-Arc.md 10.5; bible/06-Systems/Online-Arc.md SILVER-WAYS.
+// (test/accountDb.mjs). 10.5; SILVER-WAYS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -87,7 +86,7 @@ test('SILVER-WAYS the law: a gate 50 and a raid 30 under one combat cap of 150 a
   assert.deepEqual(MARKS_FAUCETS.raid, { amount: 30 });
   assert.deepEqual(MARKS_FAUCETS.deed, { amount: 25, perDay: 4, members: 3, tenureS: 7 * DAY });
   assert.deepEqual(MARKS_FAUCETS.motherlode, { amount: 10, perDay: 1 });
-  assert.deepEqual(MARKS_COMBAT, { kinds: ['gate', 'raid', 'serpent', 'star'], perDay: 150 });   // PIN MOVED (STAR7): and a fallen star held; PIN MOVED (SERPENT-SET): the serpents under the same cap, the ceiling unmoved
+  assert.deepEqual(MARKS_COMBAT, { kinds: ['gate', 'raid', 'serpent', 'star'], perDay: 150 });
   assert.deepEqual([combatStrike(50, 0), combatStrike(30, 100), combatStrike(30, 130), combatStrike(50, 140), combatStrike(30, 150), combatStrike(30, 170), combatStrike(30, -5)],
     [50, 30, 20, 10, 0, 0, 30]);
   assert.deepEqual(['raid', 'guild-deed', 'motherlode', 'contract-escrow', 'contract-pay', 'contract-return'].map((k) => MARKS_KINDS[k]),

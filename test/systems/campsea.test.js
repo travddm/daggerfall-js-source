@@ -1,5 +1,4 @@
-// CAMP-SEA (2026-09-26, SquidKamer on the Discord: "puddle no more is too aggressive ... I jumped in last night and it
-// summoned an army of everything"). Iliac Puddle No More's deep has its own population, and the land's rolls stand down
+// CAMP-SEA. Iliac Puddle No More's deep has its own population, and the land's rolls stand down
 // over it (SuppressVanillaWaterEncounters sets PreventEnemySpawns in or above deep water). The lone roll honoured it; the
 // port's own chunk-load CAMP roll did not: it runs on the pixel crossing, BEFORE the frame writes the flag, and the lone
 // roll clears the flag at its tail - so at sea the camp roll read `false` every time and stood two to five land

@@ -1,4 +1,4 @@
-// HOME-OFFER (2026-09-26, Mac: "Enhanced plus cant buy house"): HOME1 put a house's offer (and its owner's menu)
+// HOME-OFFER: HOME1 put a house's offer (and its owner's menu)
 // behind Info mode alone. Nothing on the enhanced skins says so - the mode is a drawn word, the default is Grab
 // (PlayerActivate.cs:70) - so a player the bank told "a home is bought at its own front door" pressed the door and
 // walked in. The offer asks now in any mode but Steal, once a session per house (a No is remembered; Info always

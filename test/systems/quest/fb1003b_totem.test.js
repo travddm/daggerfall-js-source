@@ -1,6 +1,6 @@
 // TOTEM-CAGE (FIELD BUGS 2026-10-03b, Shortstori on Discord: "Im about to end my mainquest but the Totem of Tiber Septim
 // isnt here. And I think daggerfall Castle will Never reset with 300+ people around the clock"; the screenshot an empty
-// pedestal, the tracker on "Who Gets the Totem"; `bible/01-Overview/bugs/Field-Bugs-2026-10-03b.md`).
+// pedestal, the tracker on "Who Gets the Totem"; ` `).
 //
 // DFU stands a quest item at its marker's layout point and PARENTS it to the marker's scene object
 // (GameObjectHelper.cs AddQuestItem :1144-1148), found by GetDaggerfallMarker's unique-or-null law (:1165-1186), whose

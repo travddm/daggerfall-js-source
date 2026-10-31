@@ -1,5 +1,4 @@
-// WW7-5 (2026-10-25, the owner: "This needs to apply everywhere", "We also need to fully integrate our living world into
-// the entirety of tamriel"; bible/03-World/World-Wide.md WW7-5): the town books past the Bay - every region's (the Bay's 62
+// WW7-5: the town books past the Bay - every region's (the Bay's 62
 // and the provinces' 62-70), the seven tables whose CHECKs said the Bay's rebuilt, the Watch on the land past the Bay and
 // never past the Veil, a town past the Bay a report of its own.
 import { test } from 'node:test';

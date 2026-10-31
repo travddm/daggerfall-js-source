@@ -1,5 +1,4 @@
-// AUDIT SD III, SD20e (2026-10-08, Mac: "a deep comprehensive audit over everything, ensuring absolute polish and
-// perfection"; bible/11-Multiplayer/Super-Dungeons.md "AUDIT SD III"): WHAT THE PLAYER READS - the text and the HUD
+// AUDIT SD III, SD20e: WHAT THE PLAYER READS - the text and the HUD
 // lens's findings, each reproduced and pinned here: the door's banner on a phone and in the Hour's brass (T1, T3), the
 // title card clear of the Remnant's bar (T2), the Hour's card on the Plus skin (T4), the Echo's callout standing still
 // (T5), one count of time (T6), the ring's card on the held map (T7), the Dragon's two names and its window's one form
@@ -239,7 +238,7 @@ test('SD20e A REGION SAID AS A REGION (T19): where no city is known, the find an
   assert.equal(sdFoundLine({ who: 'Mara', region: 'Dragontail Mountains' }), 'Mara has found an Abyss Dungeon in the Dragontail Mountains region!');
   assert.equal(sdHourLine({ name: 'The Stopped Bell', region: 'Dragontail Mountains' }), 'The Stopped Bell in the Dragontail Mountains region will fade within the hour.');
   const H2 = read('src/scenes/superDungeon/sdHost.js');
-  assert.match(H2, /const near = h\?\.site\?\.cityName \|\| '', region = province \? '' : regionName\(o\.rec\.r\) \|\| '';/);   // PIN MOVED (WW5): a province lane's Hollow said in its province, never as a region
+  assert.match(H2, /const near = h\?\.site\?\.cityName \|\| '', region = province \? '' : regionName\(o\.rec\.r\) \|\| '';/);
   assert.match(H2, /sdHourLine\(\{ name: hh\?\.loc\?\.name, near: hh\?\.site\?\.cityName \|\| '', region: province \? '' : regionName\(rec\.r\) \|\| '', province \}\)/);
 });
 
@@ -264,7 +263,7 @@ test('SD20e THE HOUR\'S READOUTS WAIT FOR THE VEIL (T18), run from the world hos
   const veil = { busy: true }, drawn = [], bars = [];
   const env = {
     modes: { sdRealmSlot: () => 3 }, sdFightLink: { leave() {}, state: () => ({}), now: () => 0 }, _sdReceipts: new Map(), sdReceiptsLeft() {},
-    sdSpoilsBurst: { leave() {}, frame() {} }, sdBlows: { leave() {}, frame() {} }, sdFx: { leave() {}, frame() {}, away() {} }, saveSoon: { changed() {} },   // AUDIT SD V (L5, PIN MOVED): `away`
+    sdSpoilsBurst: { leave() {}, frame() {} }, sdBlows: { leave() {}, frame() {} }, sdFx: { leave() {}, frame() {}, away() {} }, saveSoon: { changed() {} },     // AUDIT SD V (L5
     player: { pos: [0, 0, 0] }, playerEntity: { health: 10, maxHealth: 10 }, sdDungeonToRealm: () => [0, 0, 0], sdBarNear: () => true,
     remnantBarModel: () => ({ bar: true }), drawGateBossBar: (m, o) => bars.push(!!o?.hidden), gamePaused: () => false, townTalk: { hudHidden: false },
     sdRemVoice: { leave() {}, frame() {} }, cam: { yaw: 0 }, SD_ARENA: { x: 0, z: 0 }, sdPerilAt: () => null, sdGroundModel: () => null,

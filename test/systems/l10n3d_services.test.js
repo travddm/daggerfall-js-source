@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE SHOPS AND SERVICES IN THE PLAYER'S LANGUAGE. DFU reads the words of its guilds (Temple,
+// L10N3d: THE SHOPS AND SERVICES IN THE PLAYER'S LANGUAGE. DFU reads the words of its guilds (Temple,
 // Services and the five guild classes) and of the trade, merchant, guild-service, cure, donation, banking, purchase and
 // tavern windows through TextManager.GetLocalizedText at the moment it shows them; the port's laws and windows now do
 // the same, each word through the text core by DFU's key with DFU's English. Pinned through the port's own functions
@@ -192,7 +192,7 @@ test('L10N3d services: the service popups - each guild service\'s label by its D
   french({ gettingQuests1: fr('gettingQuests1'), gettingQuests2: 'Patientez donc un moment, %pcf.' });
   const wait = () => new QuestOfferFlow(
     { isLastNPCClickedAnActiveQuestor: () => false, deps: { playerLevel: () => 1 } },
-    { getGuildQuestPool: () => [{ name: 'M0B00Y00' }] },   // PIN MOVED (QUEST-AUDIT III NO-WORK): a pool with work in it - an empty one answers the "no work" line, not the wait box
+    { getGuildQuestPool: () => [{ name: 'M0B00Y00' }] },
     { guildQuestListBox: true, getGuildFactionId: () => 41 },
   ).offerGuildQuest({ guildGroup: GUILD_GROUPS.FightersGuild, guild: { isMember: () => false, rank: 0, getReputation: () => 0 } }).textLines;
   speaks(wait, [GETTING_QUESTS_1, GETTING_QUESTS_2], [fr('gettingQuests1'), 'Patientez donc un moment, %pcf.'],

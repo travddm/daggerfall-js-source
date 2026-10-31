@@ -1,5 +1,4 @@
-// GIANT-LOOT + GIANT-BLOWS (2026-10-12, a player in the open zone: "the greater giant now drops like 2 gold and does less
-// damage than normal mobs in the zone").
+// GIANT-LOOT + GIANT-BLOWS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

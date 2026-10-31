@@ -1,4 +1,4 @@
-// WIND4 (2026-09-15, Mac, three in one message):
+// WIND4:
 //
 //   1. "The wind wisps are far too many and the amount should be reduced."
 //   2. "Clouds dont follow on the world timer with the direction of the wind"

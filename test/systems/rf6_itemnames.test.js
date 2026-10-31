@@ -1,5 +1,4 @@
-// RF6 - THE ENHANCED SKIN READS THE ONE NAME RESOLVER (2026-09-14,
-// Mac's refactor pass, the sixth). The enhanced inventory's line and
+// RF6 - THE ENHANCED SKIN READS THE ONE NAME RESOLVER. The enhanced inventory's line and
 // the loot plaque rebuilt ResolveItemLongName's arms by hand -
 // ResolveItemName for the name, materialName for the sub-line - and
 // lost four of them: an arrow, a helm under HelmAndShieldMaterialDisplay,

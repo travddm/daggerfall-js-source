@@ -1,4 +1,4 @@
-// MW-ASSIGN (2026-09-27, Discord: "Some sprites not assigned morrowind skin").
+// MW-ASSIGN.
 //
 // THE PIECES THAT FELL THROUGH THE ITEM MAP, ASSIGNED. With Morrowind data attached a hung weapon or a displayed piece
 // of armour is its Morrowind picture (MW-MOUNT) - but only for what the one item map could read: DFU's own weapons and

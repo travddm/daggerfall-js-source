@@ -1,4 +1,4 @@
-// SCALE2 (2026-09-30, the scaling audit - bible/11-Multiplayer/Scale-Arc.md): A RELAY DEPLOY'S RECONNECT WAVE, made
+// SCALE2: A RELAY DEPLOY'S RECONNECT WAVE, made
 // survivable from the client - nothing here deploys the relay.
 //
 // What broke first at five hundred players: a deploy drops every socket, every player reconnects three to six at
@@ -48,7 +48,7 @@ test('SCALE2 A: one token opens every OTHER room asked within TOKEN_REUSE_MS - a
   let t = 1_000_000;
   const svc = service();
   const mint = accountTokenMinter({ fetch: svc.fetch, storage: fakeStorage(SESSION), now: () => t });
-  // STORM-SHED (PIN MOVED): a room is opened by the hello that carries the token - net/online.js says so (`opened`), as here
+  // STORM-SHED (
   const open = async (/** @type {string} */ room) => { const tok = await mint(room); if (tok) mint.opened(room, tok); return tok; };
   const cell = await open('world:3,12');
   assert.equal(svc.n, 1);

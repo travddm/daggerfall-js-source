@@ -1,5 +1,4 @@
-// STAND-FLAT / STAND-HORSE (2026-10-12, the owner: "Some models arent affected when morrowind is attached, like static
-// NPCs, static horses, etc" - bible/04-Characters/Morrowind-NPCs.md section 28). The standing horses' manager
+// STAND-FLAT / STAND-HORSE. The standing horses' manager
 // (world/standingHorses.js) on a recording rig - the cut, the range, the hold, the view, the billboard cast-only while a
 // horse stands and drawn again once it is let go, through the rig that made it; the stand flat's one record
 // (world/standFlats.js); the Stable's horses offered whether or not their pictures are up (scenes/merchantYardsHost.js);
@@ -157,7 +156,6 @@ test('STAND-HORSE let go: a horse not offered (its pixel gone, the street left) 
   assert.deepEqual(r2.log.released, [1]);
   assert.equal(a.castOnly, false);
   // the view: a camera looking down -z from the origin; a horse behind it stands (its billboard hidden) but is not posed.
-  // PIN MOVED (HORSE-VIEW II): its idle's clock is stepped all the same (`pose: false`), so turned back into the view it
   // shows the pose an every-frame horse shows (fb1021b_strangers.test.js on the real rig) - it stood still before
   const r3 = fakeRig('r3');
   const v = createStandingHorses();

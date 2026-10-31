@@ -1,4 +1,4 @@
-// STAR2 (bible/11-Multiplayer/Starfall.md sections 1 and 2): THE COVENS, THE NIGHT'S STARS AND THE WITCHES' NIGHT - the bag
+// STAR2: THE COVENS, THE NIGHT'S STARS AND THE WITCHES' NIGHT - the bag
 // that names a night's coven, the thirteen (WW-C2) held against the player's own data (MAPS.BSA's covens, FACTION.TXT's witches,
 // DFU's quest places), a night's three pixels in its coven's wilds over the gate's own scan, and the festival's night
 // read off the sky. tools/mutants/star2.json.
@@ -25,7 +25,6 @@ const { fromMs: FESTIVAL_FROM_MS, toMs: FESTIVAL_TO_MS } = FESTIVALS[0];   // th
 
 const SKIP = HAS_ARENA2 ? false : 'no ARENA2 (sh tools/fetch-data.sh, then ARENA2_PATH)';
 
-// PIN MOVED (WW-C2, bible/03-World/World-Wide.md WW-C): THIRTEEN - the Daughters of Wroth back in the bag, the open zone
 // Cyrodiil's (their coven was kept apart while it was the Wrothgarian Mountains')
 test('STAR2 THE BAG: every coven takes a night in each round of thirteen, none twice running, the rounds\' seams too (mutants: the seam unchecked; the round\'s roll fixed)', () => {
   const K = STAR_COVENS.length;

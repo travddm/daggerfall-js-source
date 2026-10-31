@@ -1,14 +1,13 @@
-// LAYERED-GEAR, THE LOOK TOGGLE (2026-10-19, the owner, merging the Layered Gearing package: "These need a proper
-// toggle in the account profile for players to either equip skins or use this integration").
+// LAYERED-GEAR, THE LOOK TOGGLE.
 //
 // The profile's Skin card (ui/skinCard.js) opens on Look: Skins | Layered Gearing (WIP), a radio pair. Skins is the
 // card as SKIN2 laid it out - On foot and Mounted. Layered Gearing puts the On foot panel away (it is not what the
 // player is drawn as on foot), offers the two bodies as pictures, and keeps the Mounted panel (a rider has no layered
-// art). LAYERED-GEAR-ON (the owner, the same day: "Make sure this is on by default"): Graphics.LayeredGear's default is
+// art). LAYERED-GEAR-ON: Graphics.LayeredGear's default is
 // 3, the character's own body, so a fresh card opens on Layered Gearing with that body marked and said. A body pressed
 // is 1 or 2; turned on again, it wears the body last chosen this session, else the character's own; Skins writes 0, and
 // the on-foot skin chosen before is worn again, untouched.
-// Pinned through the real card over a fake document, as SKIN2's pins drive it (bible/04-Characters/Layered-Gearing.md).
+// Pinned through the real card over a fake document, as SKIN2's pins drive it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { modSetting, setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';

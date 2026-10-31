@@ -1,5 +1,4 @@
-// LW5b (2026-10-05, bible/06-Systems/Living-World.md "LW5b", Mac: NPCs "travel between towns ... link with the ship AI
-// at ports"): THE PASSAGE BY SEA - a port town's travellers now and then sail the Bay's lanes to a port across the water:
+// LW5b: THE PASSAGE BY SEA - a port town's travellers now and then sail the Bay's lanes to a port across the water:
 // out on a morning tide from the dock, at a ship's pace by night as by day, home on a later tide; never on the road; in
 // and out of both towns by the dock; a passenger the lives take lost at sea; the towns' talk. On the synthetic map's
 // ports (test/lwRoads.mjs `sea`) and the synthetic town.
@@ -183,7 +182,6 @@ test('LW5b the town by the dock: a traveller sailing walks to the dock and is go
 });
 
 test('LW5b the streaming host: a port town\'s lanes from the Bay\'s own network - the far port, the lane\'s length - none for a town with no harbour, none yet while the map is unread (mutants: the lanes, the harbour, the unread)', () => {
-  // PIN MOVED (AUDIT WW F7, bible/03-World/World-Wide.md "The audit"): a town's lanes are the living lanes' book's
   // (scenes/livingWorld/livingLanes.js), run here - the far port's town, the lane's length, none where the water joins not
   const town = (px, py) => ({ mapId: (1 << 20) | (py * 1000 + px), px, py, port: true });
   const a = town(200, 100), b = town(300, 110), c = town(400, 120);

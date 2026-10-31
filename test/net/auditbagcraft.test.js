@@ -1,4 +1,4 @@
-// AUDIT BAG-CRAFT (2026-10-09, Mac: "Audit this"; bible/06-Systems/Materials-Bag.md section 15) - THE STATIONS' WALL.
+// AUDIT BAG-CRAFT - THE STATIONS' WALL.
 // A1: BAG-CRAFT's `work` put-in moved the units the carried count did not hold into the Stores as BOUGHT - and a `work`
 // put-in is no station's act but a request any client may send. Reproduced against the real Worker before the fix: 200
 // Mithril Ore no pack had, put in by a bare `work` deposit, listed for Drakes, and withdrawn counted as carried (every

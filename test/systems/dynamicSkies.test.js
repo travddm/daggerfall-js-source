@@ -1,6 +1,4 @@
-// DS1 - DYNAMIC SKIES (2026-09-04, Mac: "I want to implement this mod
-// 1:1. We received permission from the creator. I also want it to be
-// compatible with our current implementation").
+// DS1 - DYNAMIC SKIES.
 //
 // What is pinned: the vendored tree is the mod's (manifest, presets,
 // textures the presets name); the logic port answers what BLBSkybox.cs
@@ -84,7 +82,7 @@ test('DS1 vendor: every texture a shipped preset names is vendored, with an impo
   for (const f of files) assert.ok(TEXTURE_IMPORTS[f], `${f} has its Unity import settings restated`);
   // the one normal map is the converted one (bilinear, no mips, not sRGB)
   assert.deepEqual(TEXTURE_IMPORTS.CdMCloudsNormal, { filter: 'bilinear', mips: false, srgb: false, normal: true });
-  // DS3 (2026-09-15, Mac: "the nighttime sky has these dark spots in the skybox") - THE ONE DEPARTURE FROM THE
+  // DS3 - THE ONE DEPARTURE FROM THE
   // MOD'S IMPORTS, AND ITS BOUNDS. At night `night * horizonValue` reaches 1.0, so the sky IS `_StarTex` and
   // `_MoonNightColor` (0, 0, 39) floors the BLUE channel alone - the star field's own per-texel dither in red and
   // green has nothing under it, and Point magnified ~3.5x by StarsTiling 0.25 turns each dark texel into a visible
@@ -566,7 +564,7 @@ test('DS1 shader: every property the mod declares is a uniform of the same name,
   }
   for (const s of TEXTURE_SLOTS) { assert.ok(glslUniforms.has(s)); assert.ok(glslUniforms.has(s + '_ST')); }
   // the baked keywords: REDUCE_COLOR's posterise, HQ sun disk, both tidal locks.
-  // PS3 (2026-09-12) hoisted the mod's own step out of the three channel
+  // PS3 hoisted the mod's own step out of the three channel
   // lines and gave the quantizer an ordered dither - the step formula is
   // still the mod's to the character, the ceil is still the mod's, and
   // uBandDither 0 is its raw threshold back (?bands=raw).
@@ -685,7 +683,7 @@ test('DS1 ambience: AmbientEffectsPlayer.OnPlayEffect - raised from PlayEffects 
   assert.equal(got.length, 0);
 });
 
-// ── MODS AUDIT (2026-09-08): the 1:1 re-audit against BLBSkybox.cs ────
+// ── MODS AUDIT: the 1:1 re-audit against BLBSkybox.cs ────
 test('MODS AUDIT: FlashOnce reads the player LIVE - a double flash\u2019s second half follows the player (LightningFlash.cs:95)', () => {
   // a double: rolls [< 0.5] [< 0.33] then FlashOnce's draws at 0.5
   const d = new LightningFlash(seq([0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]));

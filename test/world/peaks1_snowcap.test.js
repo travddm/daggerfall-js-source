@@ -1,5 +1,4 @@
-// PEAKS1 (2026-10-26, bible/03-World/Peaks.md; the owner: "The world of daggerfall mountains need to be completely redesigned
-// from the ground up with more integration into the terrian, snow capped, and properly place throughout tamriel") - THE
+// PEAKS1 - THE
 // SNOW THAT NEVER MELTS: a perennial snowline by climate and zone (world/peaks/snowcap.js), a floor under the snowpack's
 // lines near the player (scenes/snowCoverHost.js), a steep face over it bare rock in both terrain programs
 // (render/snowCapGlsl.js), and the summits white on the far ring, the middle ring and the far field. Where ARENA2_PATH
@@ -248,7 +247,7 @@ test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stand
       for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const h = H(x + dx, y + dy); if (h > best) { best = h; at = [x + dx, y + dy]; } }
       return { h: best, at, line: capLineOfPixel(at[0], at[1], climateAt), zone: tamrielBiomeAt(at[0], at[1])?.key ?? null };
     };
-    // the summits the probes found (bible/03-World/Peaks.md's table): the relief's own, past the Bay; the Bay's highest
+    // the summits the probes found ('s table): the relief's own, past the Bay; the Bay's highest
     const white = [
       ['Skyrim\'s summit (the Throat)', 2076, 106, 'skyrimPeaks', 3000],
       ['the Jerall', 2202, 332, 'cyrodiilJerall', 2600],
@@ -259,7 +258,6 @@ test('PEAKS1 with ARENA2: on the freeware\'s ground every range the relief stand
     ];
     for (const [name, x, y, zone, least] of white) {
       const t = top(x, y);
-      // PIN MOVED (RELIEF-PEAKS, bible/03-World/Tamriel.md): the ranges under the heightmap's grain stand the highest ground
       // about a summit where their crests fall - the Reach's shoulder's on the border of Skyrim's peaks and Hammerfell's
       // Dragontail, its top on either side; each top wears its own zone's cap
       assert.ok([zone].flat().includes(t.zone), `${name}'s zone (${t.zone})`);

@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 1 (2026-10-17) - RED PINS, THE BODY PROTOCOL: another player's foe's body, street and building
+// OUTDOOR-LOOT, SLICE 1 - RED PINS, THE BODY PROTOCOL: another player's foe's body, street and building
 // (AC1-AC7), pinned BLACK-BOX before the fix exists. test-harness/outdoor-loot/DESIGN.md sections 3 and 8 are the plan;
 // DESIGN-REVIEW.md is binding over it (D-1, R-1, R-2). test/net/bodyloot.test.js is phase 1 (what the press must do, read as
 // where the pieces ARE); this file pins what the fix must SAY and DO on the way - the frames it puts on the wire, the doors
@@ -661,7 +661,7 @@ const NEW_KEYS = ['bw', 'bp', 'br', 'bq', 'bv'];
  *  applyHit that reads it, so an older build still falls to its blow arm (no dmg) and refuses. */
 const CLAIM_EXTRA_KEYS = ['g'];
 /** DESIGN.md 3.4: the old hit arms' keys, and the routing every hit frame carries. */
-/** PIN EXTENDED (DEX5b, bible/04-Characters/Enemy-Expansion.md section 11): `cs` - a strike spell's hit (`sp`, `lv`) on a mod's corpse
+/** PIN EXTENDED (DEX5b): `cs` - a strike spell's hit (`sp`, `lv`) on a mod's corpse
  *  prefab's body, the blow arm's own (ahead of its dead-foe refusal); an older build falls to the blow arm and refuses a dead foe. */
 const OLD_KEYS = ['dmg', 'take', 'back', 'grant', 'slain', 'fb', 'ar', 'al', 'ac', 'sf', 'z', 'wc', 'sp', 'lv', 'pt', 'p', 'd', 'kind', 'nv', 'own', 'to', 'k', 'i', 'n', 'cs'];
 
@@ -1205,7 +1205,7 @@ for (const where of WHERES) {
   });
 }
 
-// ═══ AUDIT OUTDOOR-LOOT (2026-10-18, PR #1019's audit) - THE READER'S EDGES ═══════════════════════════════════════════════
+// ═══ AUDIT OUTDOOR-LOOT - THE READER'S EDGES ═══════════════════════════════════════════════
 // B1: a piece the taker lays into another player's kill is handed back at the close - but the close's arm for a body no longer
 // there (its owner left, went stale past FOES_STALE_MS, reloaded) lifted the window's takes and RETURNED before the hand-back:
 // what was laid in was destroyed (a Stash all, the whole pack). B2: a body that turns UNBORN or UNREADABLE under an open window

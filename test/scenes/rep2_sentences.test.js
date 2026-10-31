@@ -1,4 +1,4 @@
-// REP2 (2026-09-29, the reputation overhaul) - A SENTENCE PAYS THE DEBT. Mac's call for what serving time or paying the
+// REP2 - A SENTENCE PAYS THE DEBT. Mac's call for what serving time or paying the
 // fine gives back: "The charge, with a mark" ("Lesser crimes come back in full; Murder and Assault leave half as a lasting
 // mark"). And from the same signed shape: "Surrender is always honoured, unless you killed a watchman during that chase."
 //

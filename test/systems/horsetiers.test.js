@@ -1,5 +1,4 @@
-// HORSE-TIERS (2026-10-15, Mac: "Allow turn off. Rework this system to be more in line with how we handle climates and
-// calories boons.") - HORSE CARE ON CLIMATES & CALORIES' MODEL (bible/06-Systems/Horse-Care.md, systems/upkeep/upkeepTiers.js):
+// HORSE-TIERS - HORSE CARE ON CLIMATES & CALORIES' MODEL (, systems/upkeep/upkeepTiers.js):
 // one key, three tiers - Off (DFU's plain horse), Boons (the default: care earns, neglect costs nothing, never below
 // DFU's horse) and Hard (the system as it stood) - each player's own online, every reader asking the tier through one
 // accessor (systems/upkeep/upkeepSwitch.js horseCareRules). Driven over the real switch, the real tile, the real shelf, the
