@@ -684,10 +684,14 @@ Only the shared part goes by cell and version. The caller's own part is one read
 
 ### 12.3 The caller's own part
 
-`POST /v1/homes/own`, `{ mapId, character }`: the homes in the town that the caller owns, is a member of, rents, voted
-on, has an open offer on, or may enter as a guildmate, each with its own fields, plus `openGates`. It reads by the
-caller's rows, not the whole town, so its cost follows what the caller holds. It stays on the primary: its rows are
-the caller's own writes.
+The cells request with `own: true` and the `character` answers it as `own`: the homes in the town that the caller owns,
+is a member of, rents, voted on, has an open offer on, or may enter as a guildmate, each with its own fields, plus
+`openGates`. It reads by the caller's rows, not the whole town, so its cost follows what the caller holds. It stays on
+the primary: its rows are the caller's own writes.
+
+It rides the cells request, not a route of its own. The base this was rebuilt on asks every town it builds at boot,
+29 in Daggerfall's reach: as two requests each that was 60 a page, against 30 for `/v1/homes/town` (two-client check,
+2026-10-31). As one it is 30 again.
 
 ### 12.4 The push: the HOME CELL ORDER
 

@@ -400,11 +400,14 @@ test('YC4 over the real Worker: a claim answers the cell it moved, the cells rou
   const after = await ask([[cell, first.body.cells[0].ver]], stranger.secret);
   assert.deepEqual(after.body.cells.map((c) => c.homes[0].entry), ['public'], 'read at once, inside HOMES_KEPT_S');
   const town = await svc.call('/v1/homes/town', { mapId: 7, character: claimed.character }, owner.secret);
-  const own = await svc.call('/v1/homes/own', { mapId: 7, character: claimed.character }, owner.secret);
+  const own = await svc.call('/v1/homes/cells', { mapId: 7, cells: [[cell, 0]], own: true, character: claimed.character }, owner.secret);
   assert.equal(own.status, 200);
-  assert.deepEqual(own.body, { mapId: 7, homes: town.body.homes, hidden: [] }, 'the owner\'s own part: its town row in full');
-  assert.equal(own.body.homes[0].mine, true);
+  assert.deepEqual(own.body.own, { mapId: 7, homes: town.body.homes, hidden: [] }, 'the owner\'s own part, in the cells answer: its town row in full');
+  assert.equal(own.body.own.homes[0].mine, true);
+  assert.deepEqual(own.body.cells, after.body.cells, 'and the cells as asked');
+  assert.equal((await ask([[cell, 0]], owner.secret)).body.own, undefined, 'no own part unless asked');
   const strangers = await svc.call('/v1/homes/town', { mapId: 7 }, stranger.secret);
   assert.deepEqual(strangers.body.homes.map((h) => without(h, 'mine')), after.body.cells[0].homes, 'the old route: the shared rows and `mine`');
-  assert.deepEqual((await svc.call('/v1/homes/own', { mapId: 7 }, stranger.secret)).body, { mapId: 7, homes: [], hidden: [] });
+  assert.deepEqual((await svc.call('/v1/homes/cells', { mapId: 7, cells: [[cell, 0]], own: true }, stranger.secret)).body.own, { mapId: 7, homes: [], hidden: [] });
+  assert.notEqual((await svc.call('/v1/homes/own', { mapId: 7 }, stranger.secret)).status, 200, 'no route of its own');
 });

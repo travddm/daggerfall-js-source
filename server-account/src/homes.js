@@ -489,7 +489,7 @@ const homesReadSql = (/** @type {string} */ where) => `SELECT h.building_key, h.
  *  account's, a hall of a guild it is in, a room it rents, a vote it cast, an open offer it made or was made, a home
  *  open to its character's guildmates - picked by the caller's own rows before any home is read. Binds as homesReadSql.
  *  Two compounds of three: D1 refuses a compound SELECT of more than five terms (the six as one answered every
- *  /v1/homes/own with a 500 in local workerd, 2026-10-29). */
+ *  own-part read with a 500 in local workerd, 2026-10-29). */
 const OWN_KEYS_SQL = ` AND (h.building_key IN (SELECT building_key FROM homes INDEXED BY idx_homes_owner WHERE player = ?2 AND map_id = ?4
       UNION SELECT hh.building_key FROM guild_members k JOIN homes hh ON hh.guild_id = k.guild_id WHERE k.player = ?2 AND hh.map_id = ?4
       UNION SELECT building_key FROM home_rooms INDEXED BY idx_home_rooms_tenant WHERE tenant = ?2 AND tenant_char = ?3 AND until > ?1 AND map_id = ?4)

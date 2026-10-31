@@ -1,10 +1,10 @@
 // @ts-check
 // YC4 (2026-10-29, bible/11-Multiplayer/Yard-Cells.md section 12.5): A TOWN'S HOMES READ IN TWO PARTS. The shared part
 // comes by cell and version (server-account/src/homeCells.js, `/v1/homes/cells`), as scenes/yardCellSync.js reads the
-// yards; the caller's own part (`/v1/homes/own`) is one read of the caller's rows. `read` answers what `/v1/homes/town`
+// yards; the caller's own part rides the same request when it is due (`own`). `read` answers what `/v1/homes/town`
 // answers, so the registry (onlineHomes.js) believes it by the same rules: a home's own row where the own part has one,
 // else its shared row - its entry 'public' under Open Gates unless it is a hall (homes.js homeRowOf) - with the deeds
-// the own part hides left out. A service from before acct209 answers the new routes with a refusal: from then on this
+// the own part hides left out. A service from before acct209 answers the new route with a refusal: from then on this
 // page reads `/v1/homes/town` as before.
 
 import { yardCellOf } from '../../net/yardCellLaw.js';
@@ -32,8 +32,8 @@ export const HOME_TOWN_CELLS = Object.freeze([
   yardCellOf(HOME_KEY_MAX),
 ]);
 
-/** How a service from before acct209 refuses `/v1/homes/cells` and `/v1/homes/own`: a 404 or a 405, or - the paths
- *  unknown to it fall through to its home write routes - the refusals those give a body with no building and no entry
+/** How a service from before acct209 refuses `/v1/homes/cells`: a 404 or a 405, or - the path
+ *  unknown to it falls through to its home write routes - the refusals those give a body with no building and no entry
  *  (`bad-entry`, `no-home`) or a guest (`homes-need-account`). Never a ban's or a freeze's 403: those pass. */
 const OLDER_SERVICE_STATUSES = new Set([404, 405]);
 const OLDER_SERVICE_ERRORS = new Set(['bad-entry', 'no-home', 'homes-need-account']);
@@ -53,12 +53,12 @@ function fromOlderService(/** @type {Answer | null} */ answer) {
 const MALFORMED = Object.freeze({ ok: false, error: 'server' });
 
 /**
- * The page's two-part reads of towns' homes over `api` (net/accountClient.js accountHomes). An `api` without `cells` and
- * `own` (a test's fake, an older client door) reads `/v1/homes/town` alone.
+ * The page's two-part reads of towns' homes over `api` (net/accountClient.js accountHomes). An `api` without `cells` (a
+ * test's fake, an older client door) reads `/v1/homes/town` alone.
  * @param {{ api: any, now?: () => number }} deps
  */
 export function createHomeCellSync({ api, now = () => Date.now() }) {
-  let older = typeof api?.cells !== 'function' || typeof api?.own !== 'function';
+  let older = typeof api?.cells !== 'function';
   /** @type {Map<number, HeldTown>} */
   const towns = new Map();
 
@@ -86,25 +86,29 @@ export function createHomeCellSync({ api, now = () => Date.now() }) {
     }
   }
 
-  /** Every cell of the town with the versions held, then the cells a full answer left for later. Answers the last
-   *  answer - a refusal as it came. */
-  async function askCells(/** @type {number} */ mapId, /** @type {HeldTown} */ town) {
+  /** Every cell of the town with the versions held, then the cells a full answer left for later. `own` (`{ character }`)
+   *  asks the caller's own part with the first request, so a town's read is one request. Answers the last answer - a
+   *  refusal as it came - and the own part the first one carried. */
+  async function askCells(/** @type {number} */ mapId, /** @type {HeldTown} */ town, /** @type {{ character: string | null } | null} */ own) {
     /** @type {number[]} */
     let wanted = [...HOME_TOWN_CELLS];
     /** @type {Answer} */
     let answer = MALFORMED;
+    /** @type {any} */
+    let ownData = null;
     for (let round = 0; round < HOME_CELLS_ROUNDS_MAX && wanted.length; round++) {
       /** @type {Array<[number, number]>} */
       const asked = wanted.map((cell) => [cell, town.cells.get(cell)?.ver ?? 0]);
-      answer = await api.cells(mapId, asked);
-      if (!answer?.ok) return answer;
+      answer = await api.cells(mapId, asked, round === 0 ? own : null);
+      if (!answer?.ok) return { answer, ownData };
       const data = answer.data;
-      if (!data || !Array.isArray(data.cells)) return MALFORMED;
+      if (!data || !Array.isArray(data.cells)) return { answer: MALFORMED, ownData };
+      if (round === 0) ownData = data.own ?? null;
       const more = Array.isArray(data.more) ? data.more.filter((cell) => wanted.includes(cell)) : [];
       takeCells(town, asked, data.cells, more);
       wanted = more;
     }
-    return answer;
+    return { answer, ownData };
   }
 
   /** The own part's answer as held, or null for a body that is not the route's shape. */
@@ -142,8 +146,8 @@ export function createHomeCellSync({ api, now = () => Date.now() }) {
   return {
     /**
      * A town's homes for `character`, in `/v1/homes/town`'s answer shape. The cells are asked each read with the
-     * versions held; the own part when `own` says so, on the town's first read, for another character, or once
-     * HOME_OWN_TTL_MS has passed. A refusal of either part is the read's refusal.
+     * versions held; the own part, in the same request, when `own` says so, on the town's first read, for another
+     * character, or once HOME_OWN_TTL_MS has passed. A refusal is the read's refusal.
      * @param {number} mapId @param {string | null} character @param {{ own?: boolean }} [opts]
      * @returns {Promise<Answer>}
      */
@@ -151,16 +155,15 @@ export function createHomeCellSync({ api, now = () => Date.now() }) {
       if (older) return api.town(mapId, character);
       const town = townOf(mapId);
       const ownDue = own || !town.own || town.own.character !== character || now() - town.own.at >= HOME_OWN_TTL_MS;
-      const [cellsAnswer, ownAnswer] = await Promise.all([askCells(mapId, town), ownDue ? api.own(mapId, character) : null]);
-      if (fromOlderService(cellsAnswer) || fromOlderService(ownAnswer)) {
+      const { answer, ownData } = await askCells(mapId, town, ownDue ? { character } : null);
+      if (fromOlderService(answer)) {
         older = true;
         towns.clear();
         return api.town(mapId, character);
       }
-      if (!cellsAnswer?.ok) return cellsAnswer ?? MALFORMED;
-      if (ownAnswer) {
-        if (!ownAnswer.ok) return ownAnswer;
-        const held = ownOf(ownAnswer.data, character);
+      if (!answer?.ok) return answer ?? MALFORMED;
+      if (ownDue) {
+        const held = ownOf(ownData, character);
         if (!held) return MALFORMED;
         town.own = held;
       }

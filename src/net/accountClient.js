@@ -2104,9 +2104,9 @@ export function accountHomes({ fetch, storage }) {
   const post = sessionPost({ fetch, storage });
   return {
     town: (mapId, character = null) => post('/v1/homes/town', { mapId, ...(character ? { character } : {}) }),   // HOME-RENT: the playing character's own tenancies
-    // YC4: a town's homes in two parts - its cells past the versions held, and the caller's own (systems/online/homeCellSync.js)
-    cells: (mapId, cells) => post('/v1/homes/cells', { mapId, cells }),
-    own: (mapId, character = null) => post('/v1/homes/own', { mapId, ...(character ? { character } : {}) }),
+    // YC4: a town's homes in two parts - its cells past the versions held and, when `own` is given, the caller's own part
+    // in the same answer, for `own.character` (systems/online/homeCellSync.js)
+    cells: (mapId, cells, own = null) => post('/v1/homes/cells', { mapId, cells, ...(own ? { own: true, ...(own.character ? { character: own.character } : {}) } : {}) }),
     mine: () => post('/v1/homes/mine', {}),
     claim: ({ mapId, buildingKey, region, character, price, realm = null, layout = null }) => post('/v1/homes/claim', { mapId, buildingKey, region, character, price, ...(realm ? { realm } : {}), layout: layout || null }),   // REALM P2.2b: a realm character's record pays; WD3: the layout the town stands in, always said (null: Daggerfall's - AUDIT WD3 B2)
     layouts: () => post('/v1/homes/layouts', {}),   // WD3: every town holding a home, and the layout it keeps

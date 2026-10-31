@@ -31,7 +31,7 @@ const MIGRATIONS = readdirSync(new URL('../server-account/migrations', import.me
 export const D1_MAX_BOUND = 100;
 
 /** D1's bound on one compound SELECT's terms (SQLITE_LIMIT_COMPOUND_SELECT) - node:sqlite's is 500, so YC4's six-term
- *  UNION passed here and answered every /v1/homes/own with a 500 on D1 (2026-10-29). Counted, not set: Node 22 (CI) has
+ *  UNION passed here and answered every own-part read with a 500 on D1 (2026-10-29). Counted, not set: Node 22 (CI) has
  *  no `limits` option. Not held by `d1()`: the market's History read is six terms on main. */
 export const D1_MAX_COMPOUND = 5;
 

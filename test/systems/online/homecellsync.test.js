@@ -54,24 +54,25 @@ function door() {
     townAsks: 0,
     /** @type {any} */
     cellsReply: null,
-    /** @type {any} */
-    ownReply: null,
+    /** every request the door was asked, the cells route's alone */
+    requests: 0,
   };
   const api = {
     town: async () => {
       state.townAsks++;
       return { ok: true, data: { homes: [{ buildingKey: A, owner: 'Olga', entry: 'party' }] } };
     },
-    cells: async (/** @type {number} */ mapId, /** @type {Array<[number, number]>} */ asked) => {
+    cells: async (/** @type {number} */ mapId, /** @type {Array<[number, number]>} */ asked, /** @type {{ character: string | null } | null} */ own = null) => {
+      state.requests++;
       state.cellAsks.push(asked.map(([cell, ver]) => [cell, ver]));
-      if (state.cellsReply) return state.cellsReply(asked);
+      if (own) state.ownAsks.push(own.character);
+      const ownPart = own ? { own: { mapId, ...state.own } } : {};
+      if (state.cellsReply) {
+        const reply = state.cellsReply(asked);
+        return reply.ok && reply.data ? { ...reply, data: { ...ownPart, ...reply.data } } : reply;
+      }
       const moved = asked.filter(([cell, have]) => (state.cells.get(cell)?.ver ?? 0) > have);
-      return { ok: true, data: { mapId, cells: moved.map(([cell]) => ({ cell, ...state.cells.get(cell) })), more: [] } };
-    },
-    own: async (/** @type {number} */ mapId, /** @type {string | null} */ character) => {
-      state.ownAsks.push(character);
-      if (state.ownReply) return state.ownReply;
-      return { ok: true, data: { mapId, ...state.own } };
+      return { ok: true, data: { mapId, cells: moved.map(([cell]) => ({ cell, ...state.cells.get(cell) })), more: [], ...ownPart } };
     },
     release: async () => ({ ok: true, data: {} }),
   };
@@ -95,6 +96,7 @@ test('YC4 a town read in two parts: every cell at version 0 and the own part at 
   assert.deepEqual(state.cellAsks, [HOME_TOWN_CELLS.map((cell) => [cell, 0])], 'every cell a town can hold, none held yet');
   assert.ok(HOME_TOWN_CELLS.includes(CELL_AB) && HOME_TOWN_CELLS.includes(CELL_CD) && HOME_TOWN_CELLS.includes(yardCellOf(1 << 24)));
   assert.deepEqual(state.ownAsks, [ME], 'the own part, for the character playing');
+  assert.equal(state.requests, 1, 'one request: the own part rides the cells');
   assert.equal(state.townAsks, 0, 'never the whole town');
   assert.equal(homes.homeAt(TOWN, A)?.entry, 'public', 'Open Gates: another\'s home opens to anyone');
   assert.equal(homes.homeAt(TOWN, A)?.own, false);
@@ -194,10 +196,10 @@ test('YC4 a service from before acct209 (404, or its write routes\' refusals) is
   }
   {
     const { state, api } = door();
-    state.ownReply = { ok: false, error: 'no-home', status: 400 };
+    state.cellsReply = () => ({ ok: true, data: { mapId: TOWN, cells: [], more: [], own: null } });
     const { homes } = registry(api);
-    await homes.ensure(TOWN);
-    assert.equal(state.townAsks, 1, 'the own part refused as unknown: the old route too');
+    assert.equal(await homes.ensure(TOWN), false, 'an own part asked and not answered is a failure');
+    assert.equal(state.townAsks, 0);
   }
   for (const [status, error] of [[503, 'server'], [403, 'banned']]) {
     const { state, api } = door();
@@ -266,7 +268,7 @@ test('YC4 the hub\'s home cell frames: checked, HOME_CELL_WORDS_MAX a frame, gat
   _resetHomeCellPush();
 });
 
-test('YC4 the account door: a home write\'s homeCellOrders carried to the hub; the cells and own routes asked as the service takes them', async (t) => {
+test('YC4 the account door: a home write\'s homeCellOrders carried to the hub; the cells route asked as the service takes it, the own part with it when asked', async (t) => {
   _resetHomeCellPush();
   t.after(() => _resetHomeCellPush());
   const sent = [];
@@ -285,11 +287,11 @@ test('YC4 the account door: a home write\'s homeCellOrders carried to the hub; t
   await door.entry(TOWN, A, 'public');
   assert.deepEqual(sent, [{ t: 'hcell', order: 'signed' }], 'the write\'s order, down the hub link');
   await door.cells(TOWN, [[CELL_AB, 3]]);
-  await door.own(TOWN, ME);
-  await door.own(TOWN, null);
+  await door.cells(TOWN, [[CELL_AB, 3]], { character: ME });
+  await door.cells(TOWN, [[CELL_AB, 3]], { character: null });
   assert.deepEqual(posts.slice(1), [
     ['/v1/homes/cells', { mapId: TOWN, cells: [[CELL_AB, 3]] }],
-    ['/v1/homes/own', { mapId: TOWN, character: ME }],
-    ['/v1/homes/own', { mapId: TOWN }],
+    ['/v1/homes/cells', { mapId: TOWN, cells: [[CELL_AB, 3]], own: true, character: ME }],
+    ['/v1/homes/cells', { mapId: TOWN, cells: [[CELL_AB, 3]], own: true }],
   ]);
 });

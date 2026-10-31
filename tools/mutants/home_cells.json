@@ -248,5 +248,15 @@
       "test/server/sessionsign.test.js"
     ],
     "note": "every page's minute ask of its town pays a session lookup"
+  },
+  {
+    "name": "YC4-cells-own-unasked",
+    "file": "server-account/src/index.js",
+    "old": "if (body?.own !== true) return json(r, 200, origin);",
+    "new": "",
+    "tests": [
+      "test/server/home_cells.test.js"
+    ],
+    "note": "every cells read pays for the own part, asked or not"
   }
 ]

@@ -1826,11 +1826,11 @@ const service = {
         }
         if (path === '/v1/homes/cells') {   // YC4: the town's homes every caller reads alike, by cell and version
           const r = await homeCellsKept(ctx, body, nowS);
-          return 'error' in r ? no(r.error, 400, origin) : json(r, 200, origin);
-        }
-        if (path === '/v1/homes/own') {   // YC4: the caller's own part of a town
-          const r = await homesOwn(ctx, who.player, body, { seats: seatsOpenFor(who.player, env) });
-          return 'error' in r ? no(r.error, r.error === 'dead' ? 410 : 400, origin) : json(r, 200, origin);
+          if ('error' in r) return no(r.error, 400, origin);
+          if (body?.own !== true) return json(r, 200, origin);
+          // the caller's own part, asked in the same request: a town's first read is one request, not two
+          const own = await homesOwn(ctx, who.player, body, { seats: seatsOpenFor(who.player, env) });
+          return 'error' in own ? no(own.error, 400, origin) : json({ ...r, own }, 200, origin);
         }
         if (path === '/v1/homes/mine') return json(await homesOf(ctx, who.player), 200, origin);
         if ((path === '/v1/homes/decor' || path.startsWith('/v1/homes/decor/')) && body?.seat === true && !seatsOpenFor(who.player, env)) return no('seats-closed', 403, origin);   // SEAT-HALL: a palace's Charter Room while the seats are open

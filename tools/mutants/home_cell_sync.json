@@ -102,7 +102,7 @@
   {
     "name": "YC4-HOME-CELL-no-fallback",
     "file": "src/systems/online/homeCellSync.js",
-    "old": "if (fromOlderService(cellsAnswer) || fromOlderService(ownAnswer)) {",
+    "old": "if (fromOlderService(answer)) {",
     "new": "if (false) {",
     "tests": [
       "test/systems/online/homecellsync.test.js"
@@ -110,14 +110,14 @@
     "note": "a service from before acct209 leaves every town unknown"
   },
   {
-    "name": "YC4-HOME-CELL-the-own-refusal-unread",
+    "name": "YC4-HOME-CELL-the-own-part-unread",
     "file": "src/systems/online/homeCellSync.js",
-    "old": "if (fromOlderService(cellsAnswer) || fromOlderService(ownAnswer)) {",
-    "new": "if (fromOlderService(cellsAnswer)) {",
+    "old": "if (round === 0) ownData = data.own ?? null;",
+    "new": "",
     "tests": [
       "test/systems/online/homecellsync.test.js"
     ],
-    "note": "an older service refusing the own part is a failure for ever"
+    "note": "a town read with its own part asked is never known"
   },
   {
     "name": "YC4-HOME-CELL-an-overload-read-as-older",
