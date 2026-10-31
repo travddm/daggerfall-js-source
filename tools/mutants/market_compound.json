@@ -1,0 +1,52 @@
+[
+  {
+    "name": "MARKET-COMPOUND-the-merge-oldest-first",
+    "file": "server-account/src/market.js",
+    "old": "sort((a, b) => Number(b.at) - Number(a.at))",
+    "new": "sort((a, b) => Number(a.at) - Number(b.at))",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "the History lists its oldest trades, not its newest"
+  },
+  {
+    "name": "MARKET-COMPOUND-the-merge-past-the-shown-count",
+    "file": "server-account/src/market.js",
+    "old": ".slice(0, MARKET_TRADES_SHOWN);",
+    "new": ";",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "the History lists up to twice the trades it shows"
+  },
+  {
+    "name": "MARKET-COMPOUND-the-filled-term-dropped",
+    "file": "server-account/src/market.js",
+    "old": "FROM market_fills WHERE filler = ?1 AND at > ?2\n",
+    "new": "FROM market_fills WHERE filler = ?1 AND at > ?2 AND 0\n",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "an order the player filled never shows in its History"
+  },
+  {
+    "name": "MARKET-COMPOUND-the-second-compound-unread",
+    "file": "server-account/src/market.js",
+    "old": "const sales = newestTrades(salesAndFills, ordersAndAuctions);",
+    "new": "const sales = newestTrades(salesAndFills, []);",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "orders, won and sold auctions never show in the History"
+  },
+  {
+    "name": "MARKET-COMPOUND-the-bound-at-six",
+    "file": "test/accountDb.mjs",
+    "old": "if (terms > D1_MAX_COMPOUND) throw",
+    "new": "if (terms > D1_MAX_COMPOUND + 1) throw",
+    "tests": [
+      "test/server/market_compound.test.js"
+    ],
+    "note": "a six-term compound passes every test and is refused on D1"
+  }
+]

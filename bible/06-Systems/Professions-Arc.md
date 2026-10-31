@@ -6742,6 +6742,20 @@ Pins: `test/systems/huntersmark_trophies.test.js` (the Worker's answer and the k
 AUDIT HORIZONTAL F8: the code names this section for the Trophy Hunter (`professionLaw.js` trophyHunted and its spec,
 `huntHost.js`, `profTemplates.js`, `professions.js`, the two tests above); section 57 is MASTER-ART's.
 
+## 59. MARKET-COMPOUND - the History read under D1's compound bound (FIXED 2026-10-29)
+
+"Your trades" (section 26, AUDIT 30 U15) was one compound SELECT of six terms: bought, sold, filled, ordered, won and
+auctioned. D1 refuses a compound of more than five terms (workerd sets `SQLITE_LIMIT_COMPOUND_SELECT` to 5), so every
+History read answered a 500. node:sqlite allows 500 terms, so every test passed. Local workerd showed it on 2026-10-29.
+
+The read is now two compounds of three, each newest first and limited to the 20 shown. `market.js` newestTrades keeps
+the newest 20 of both. Its sort keeps equal times in place, so a tie stays in the six terms' order, as the one compound
+gave it. The rows and their order are the same as before.
+
+Pins: `test/accountDb.mjs` `d1()` refuses a compound of more than five terms, as D1 does, so every server test holds the
+bound. `test/server/market_compound.test.js` checks the read against the six-term read over node:sqlite.
+`tools/mutants/market_compound.json` holds its mutants.
+
 ## Appendix A - a day of a gatherer
 
 Ilsa, a Journeyman herbalist and Apprentice miner in Anticlere (a march), sets out at seven (ANY-HOUR: the wilderness keeps no hours now - seven is her habit). The board's Work tab has a
