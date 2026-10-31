@@ -27,7 +27,6 @@ import { ITEM_TEMPLATES, inventoryItemImage, templateByIndex } from '../../src/s
 import { playerArchiveFor } from '../../src/characters/paperdoll/paperdollArt.js';
 import { CLOTHING_DYES, DYE_COLORS } from '../../src/characters/dyes.js';
 import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
-import { PELLET_TEMPLATE } from '../../src/characters/thunderlockIds.js';   // SHOP-PELLETS
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 // Exhausted seq HOLDS its last value (the loot.test.js convention).
@@ -229,7 +228,6 @@ test('audit18 items: RandomizeArmorVariant verbatim, and the shelf takes its rol
   // .95 -> plate, .99 -> Dwarven (0x0204), .9 -> Range(1,4) = 3.
   const one = stockShopShelf({ buildingType: BUILDING_TYPES.Armorer, quality: 20 }, { level: 5, gender: 'male' }, { rolls: seq(0, 0.95, 0.99, 0.9, 0.999) });
   assert.deepEqual(one.filter((i) => i.templateIndex !== 131), [{ group: 'Armor', templateIndex: 102, material: 0x0204, variant: 3, name: 'Cuirass', value: 4800, maxCondition: 12288, currentCondition: 12288 }]);   // AUDIT 23 (items-5): plate scales 4096 x 12/4   // PIN MOVED (SHOP-ARROWS): the Armorer's counter carries a quiver (Arrow, 131) beside it, from no roll   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): and no Dwemer Pellet - SHOP-PELLETS' shot is off the counter
-  assert.deepEqual(one.filter((i) => i.templateIndex === PELLET_TEMPLATE), [], 'PELLETS-SCARCE: no shot on the counter');
   assert.deepEqual(one.filter((i) => i.templateIndex === 131).map((i) => i.stackCount), [29], 'SHOP-ARROWS: nor the quiver');
 });
 

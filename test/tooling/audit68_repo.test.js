@@ -1,6 +1,6 @@
 // AUDIT 68 (2026-09-24), cluster "repo": the house around the code - the
 // release workflow's gate and tag, the dev server's data door, the build's
-// page list, the lab's frame, the lint's reach, the runner's glob and the
+// page list, the lint's reach, the runner's glob and the
 // CDN scripts' integrity. Each pin failed on the tree before its fix.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -130,14 +130,6 @@ test('AUDIT 68 X2-cdn-three-no-sri: every script a tracked page loads from anoth
     }
   }
   assert.ok(seen > 0, 'the pages still load three.js from cdnjs - this pin is not vacuous');
-});
-
-test('AUDIT 68 S08-gunproto-inlines-gunFrameRect: the gun lab draws through the game\'s frame rather than restating it', () => {
-  const page = read('gun-proto.html');
-  assert.match(page, /\bgunFrameRect\(\{/, 'the page composes its frame with combat/gunViewmodel.gunFrameRect (via gunLab.js)');
-  for (const step of ['placeSprite(', 'widgetTransformRect(', 'unionDrawRect(']) {
-    assert.ok(!page.includes(step), `the page calls ${step} itself - a second copy of the frame the game draws`);
-  }
 });
 
 test('AUDIT 68 X2-eslint-coverage-gaps: tests, tools, scripts and the desktop shell are linted for the structural rules', async () => {

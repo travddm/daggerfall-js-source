@@ -31,9 +31,6 @@ import { atlasFileName } from './diverseWeapons/diverseWeapons.js';   // DW1: FP
 import { customWeaponImage } from './diverseWeapons/diverseWeaponsAssets.js';   // DW1: TryImportCifRci's answer, off the player's own bundles
 import { MATERIAL_NAMES } from '../systems/item/itemInfo.js';   // MetalTypes' names, for GetNameCifRci's suffix
 import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: GetWeaponType is a virtual a custom class answers
-import { THUNDERLOCK_TEMPLATE, PISTOLET_TEMPLATE } from '../characters/thunderlockIds.js';   // the port's own weapon (a leaf - see the file)
-import { THUNDERLOCK_STRIP } from './gun/thunderlockStrip.js';   // THUNDERLOCK-ART2: each gun's cycle its strip's own frame count - leaves both
-import { PISTOL_STRIP } from './gun/pistolStrip.js';
 import { applyDyeToIndex, DYE_TARGETS } from '../characters/dyes.js';
 
 // WeaponTypes (DaggerfallUnityEnums), the animation-set ids.
@@ -47,23 +44,7 @@ export const WEAPON_TYPES = Object.freeze({
   Warhammer: 10, Warhammer_Magic: 11,
   Battleaxe: 12, Battleaxe_Magic: 13,
   Bow: 14, Melee: 15, Werecreature: 16,
-  // THE PORT'S OWN, past the end of DFU's enum so nothing classic
-  // shifts: the Dwarven Thunderlock (systems/thunderlock.js). It has
-  // no WEAPON*.CIF - its frames come off one sheet, which is why
-  // WEAPON_FILE below has no row for it and combat/thunderlockArt.js
-  // loads it instead.
-  Thunderlock: 17, Thunderlock_Magic: 18,
-  // PISTOLET (2026-10-21): the Dwarven Pistolet, the second gun, on the same terms - its frames off one strip
-  // (combat/gun/pistoletArt.js), no WEAPON*.CIF.
-  Pistolet: 19, Pistolet_Magic: 20,
 });
-
-/** PISTOLET: is this weapon type one of the port's own guns - the Thunderlock or the Pistolet, plain or enchanted? The one
- *  question the machine, the rig and the arm ask of a gun that is not about which gun. */
-export const isGunType = (t) => t === WEAPON_TYPES.Thunderlock || t === WEAPON_TYPES.Thunderlock_Magic
-  || t === WEAPON_TYPES.Pistolet || t === WEAPON_TYPES.Pistolet_Magic;
-/** PISTOLET: the Pistolet's types, plain or enchanted. */
-export const isPistoletType = (t) => t === WEAPON_TYPES.Pistolet || t === WEAPON_TYPES.Pistolet_Magic;
 
 // GetWeaponFilename, verbatim.
 export const WEAPON_FILE = Object.freeze({
@@ -173,24 +154,9 @@ export const WERECREATURE_ANIMS = Object.freeze([
   A(6, 5, WERE_FPS, ALIGN.Left, 0.2),
 ]);
 
-/** A gun's table, `n` fire frames. Not a WeaponBasics row - there is no
- *  such row - but the same five columns, so everything that reads an anim
- *  reads this one too. Record 0 is the idle pose, record 1 the fire
- *  frames, and every strike direction plays the same: a gun does not care
- *  which way you dragged. AlignRight, because that is where the lab
- *  settled it and where the classic weapons sit. */
-const gunAnims = (n) => Object.freeze([A(0, 1, IDLE_FPS, ALIGN.Right, 0), ...Array.from({ length: 6 }, () => A(1, n, STRIKE_FPS, ALIGN.Right, 0))]);
-/** The Thunderlock's: THUNDERLOCK-ART2 - the owner's seven frames (combat/thunderlockArt.js THUNDERLOCK_STRIP), the rest
- *  frame first and the flash on the second, as the six-frame sheet had them. */
-export const THUNDERLOCK_ANIMS = gunAnims(THUNDERLOCK_STRIP.frames);
-/** The Pistolet's: its six (combat/gun/pistolStrip.js PISTOL_STRIP) - the table the Thunderlock's was. */
-export const PISTOLET_ANIMS = gunAnims(PISTOL_STRIP.frames);
-
 /** GetWeaponAnims, verbatim routing. */
 export function getWeaponAnims(weaponType) {
   const T = WEAPON_TYPES;
-  if (weaponType === T.Thunderlock || weaponType === T.Thunderlock_Magic) return THUNDERLOCK_ANIMS;   // the port's own, ahead of the verbatim routing
-  if (weaponType === T.Pistolet || weaponType === T.Pistolet_Magic) return PISTOLET_ANIMS;   // PISTOLET: an idle and six fire frames, AlignRight, every direction alike (THUNDERLOCK-ART2: its own table now - the Thunderlock plays seven)
   if (weaponType === T.Melee) return MELEE_ANIMS;
   if (weaponType === T.Dagger || weaponType === T.Dagger_Magic) return DAGGER_ANIMS;
   if (weaponType === T.Staff || weaponType === T.Staff_Magic) return STAFF_ANIMS;
@@ -214,8 +180,6 @@ export function plainWeaponType(type) {
     case T.Flail_Magic: return T.Flail;
     case T.Warhammer_Magic: return T.Warhammer;
     case T.Battleaxe_Magic: return T.Battleaxe;
-    case T.Thunderlock_Magic: return T.Thunderlock;
-    case T.Pistolet_Magic: return T.Pistolet;
     default: return type;
   }
 }
@@ -229,15 +193,6 @@ export function weaponTypeForItem(item) {
   // transformed rig binds the WERECLAWS_ITEM marker, which is not a
   // template at all
   if (item.werecreatureClaws) return T.Werecreature;
-  // THE PORT'S OWN WEAPON, ahead of the verbatim switch so the switch
-  // stays exactly ConvertItemToAPIWeaponType. It takes the enchanted
-  // promotion the classic weapons take - there is no WEAPO1xx sheet
-  // for it, so the magic art is the same sheet through a shimmer
-  // (combat/thunderlockArt.js) rather than a second set of frames.
-  if (item.templateIndex === THUNDERLOCK_TEMPLATE) {
-    return isEnchanted(item) ? T.Thunderlock_Magic : T.Thunderlock;
-  }
-  if (item.templateIndex === PISTOLET_TEMPLATE) return isEnchanted(item) ? T.Pistolet_Magic : T.Pistolet;   // PISTOLET: the same arm
   const cls = customItemClass(item.templateIndex);   // RRI1: an Archer's Axe swings the battleaxe sheet, a Light Flail the flail's
   if (cls?.weaponType) return T[cls.weaponType(isEnchanted(item))];
   let result;

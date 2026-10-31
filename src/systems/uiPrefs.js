@@ -116,10 +116,8 @@ export const PREF_DEFAULTS = Object.freeze({
   // anyone's): how much ANOTHER player's spell shakes the view where it lands (scenes/hostMagic.js
   // peerKickShare) - 1 Full, 0.5 Half, 0 Off; my own spells, a foe's and an event's keep their whole kick
   peerSpellShake: 0.5,
-  // EG-G1 (bible/11-Multiplayer/Elite-Gates.md section 25.7): THE SPIRE'S ACCESSIBILITY (ui/eliteGates/egAccess.js) - the danger
-  // palette ('standard' | 'contrast' | 'deutan' | 'tritan'), a danger fill's light (0.5-1), and reduced motion (the
-  // system's setting does the same)
-  dangerPalette: 'standard', telegraphFill: 1, reducedMotion: false,
+  // Reduced motion: the gate's title cards stand still (ui/gate/gateTitleCard.js); the system's setting does the same
+  reducedMotion: false,
   // PEERMENU1: the player menu's two binds, keyboard and controller, each { code, hold } (null = the defaults: hold E,
   // hold A - systems/peerMenuBind.js). Online only.
   peerMenuKey: null, peerMenuPad: null,

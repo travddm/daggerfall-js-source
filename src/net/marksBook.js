@@ -92,11 +92,10 @@ const owedFind = (/** @type {any} */ f) => !!f && typeof f === 'object' && typeo
 export const MARKS_TEXT = Object.freeze({
   struck: (n, balance) => `${marksText(n)} added to your account. You now hold ${marksText(balance)}.`,
   // WB12a; WB13b: the record's own line says it is recorded; SILVER: the currency's name; SILVER-WAYS: the day's cap is
-  // the gates' and the raids' together - SERPENT-SET: and the serpents' - EG-E1: and the Spire's Redoubts'
-  capped: `No silver for this breach. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents, Redoubts and fallen stars.`,
-  cappedRaid: `No silver for this town. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents, Redoubts and fallen stars.`,
-  cappedSerpent: `No silver for this serpent. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents, Redoubts and fallen stars.`,
-  cappedEg: `No silver for this Redoubt. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents, Redoubts and fallen stars.`,   // EG-E1: a Redoubt of the Elite Breach
+  // the gates' and the raids' together - SERPENT-SET: and the serpents'
+  capped: `No silver for this breach. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents and fallen stars.`,
+  cappedRaid: `No silver for this town. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents and fallen stars.`,
+  cappedSerpent: `No silver for this serpent. You can earn at most ${marksText(MARKS_COMBAT.perDay)} a day from breaches, town defenses, serpents and fallen stars.`,
   cappedStar: () => t('marks.capped.star', 'No silver for this star. You\'ve reached today\'s limit of {cap, number} silver.', { cap: MARKS_COMBAT.perDay }),   // STAR7: a held star, through the text core; AUDIT STAR (W2): the number handed in, the language's own words round it
   /** SILVER-WAYS: a guild deed this claim completed - three of the guild's accounts on one raid or gate. */
   deed: (n, guild) => `A deed for ${guild?.name ?? 'your guild'}: three of its members fought together. ${marksText(n)} added to its treasury.`,
@@ -210,15 +209,14 @@ export function createMarksBook({ door, store = null, character = () => null, ri
     /** The balance a gate's strike or an account card answered. */
     set(balance) { if (Number.isSafeInteger(balance)) { state.balance = balance; state.open = true; } },
     /** The line a gate claim's `marks` says, or null for none (a service from before it, or Marks not this account's).
-     *  SILVER-WAYS: `kind` the claim's - a raid's capped line names the town; SERPENT-SET: a serpent's, the serpent; EG-E1: a
-     *  Redoubt's (`eg`), the Redoubt. */
+     *  SILVER-WAYS: `kind` the claim's - a raid's capped line names the town; SERPENT-SET: a serpent's, the serpent. */
     strikeLine(marks, kind = 'gate') {
       if (!marks || typeof marks !== 'object') return null;
       if (Number.isSafeInteger(marks.balance)) this.set(marks.balance);
       // SILVER-WAYS: the day's combat silver as the strike answered it - the Bank's card reads it
       if (Number.isSafeInteger(marks.combat?.earned)) state.today = { ...(state.today ?? {}), combat: marks.combat.earned, combatMax: marks.combat.max };
       if (marks.struck > 0) return MARKS_TEXT.struck(marks.struck, marks.balance);
-      return marks.why === 'cap' ? (kind === 'raid' ? MARKS_TEXT.cappedRaid : kind === 'serpent' ? MARKS_TEXT.cappedSerpent : kind === 'eg' ? MARKS_TEXT.cappedEg : kind === 'star' ? MARKS_TEXT.cappedStar() : MARKS_TEXT.capped) : null;
+      return marks.why === 'cap' ? (kind === 'raid' ? MARKS_TEXT.cappedRaid : kind === 'serpent' ? MARKS_TEXT.cappedSerpent : kind === 'star' ? MARKS_TEXT.cappedStar() : MARKS_TEXT.capped) : null;
     },
     /** SILVER-WAYS: every silver line a counted claim's answer says - its strike (strikeLine), the guild deed it
      *  completed, the contracts that paid it - in that order; none for a service from before them. */

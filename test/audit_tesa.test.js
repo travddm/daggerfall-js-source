@@ -111,7 +111,6 @@ test('AUDIT-TESA A2-5: past the Bay a town\'s walkers, a building\'s people and 
   assert.match(read('src/scenes/pixelBuild.js'), /nameBank: provinceNameBank\(provinceAt\(px, py\)\?\.key\) \?\? getNameBankOfRegion\(dfLocation\.regionIndex\),/, 'the streets');
   assert.match(W, /var modes = createWorldModes\(\{\n\s+climbFeel[,:][^\n]*\n\s+outsideView,[^\n]*\n\s+instanceDoor,[^\n]*\n\s+provinceBank: \(\) => provinceBankHere\(\),/, 'the interior host told');   // PIN MOVED (at the merge of main): after INSTANCES' door and RW1's view, which main's own pins read first
   assert.match(wm, /const currentNameBank = \(\) => host\.provinceBank\?\.\(\) \?\? getNameBankOfRegion\(/, 'a building\'s people');
-  assert.match(wm, /bank = host\.provinceBank\?\.\(\) \?\? getNameBankOfRegion\(b\?\.regionIndex \?\? 0\);/, 'the regulars');
 });
 
 test('AUDIT-TESA A6-2: a capital\'s gardens are its own blocks - each cell\'s, named apart; the port blocks\' indices past the Shadow Realm\'s; every block built when first read, its capital\'s footprint with it, once', async () => {

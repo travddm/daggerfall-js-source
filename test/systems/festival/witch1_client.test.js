@@ -15,9 +15,10 @@ import { noteAct } from '../../../src/systems/questlines/qlActs.js';
 import { SESSION_KEY, adoptIdentity } from '../../../src/net/accountClient.js';
 import { ownIcon } from '../../../src/systems/ownGlyphs.js';
 import { FESTIVALS, wareById } from '../../../src/net/festivalLaw.js';
-import { isIliacCard } from '../../../src/systems/iliac/iliacItems.js';
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 
+/** The festival's hood, a piece a sale mints (the wares' first set piece). */
+const isWyrdHood = (/** @type {any} */ it) => it?.aetheric === 'wyrd-hood';
 const store = new Map();
 const mem = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => { store.set(k, String(v)); }, removeItem: (k) => { store.delete(k); } };
 const seat = (kind = 'linked') => store.set(SESSION_KEY, JSON.stringify({ secret: 'sekrit', id: 'acct-alice', name: 'Alice', kind }));
@@ -52,7 +53,7 @@ test('WITCH1 NOT LIVE, NOTHING ASKED - AND SAID WHY: unbound or offline (`offlin
   assert.equal(festivalLive(), true);
   seat('guest');
   assert.equal(festivalShut(), 'guest', 'a guest\'s cakes would be a cleared browser\'s');
-  assert.deepEqual([(await buyWare('card:warlock')).text, (await offeringMove('take', { mapId: 1, buildingKey: 2 })).text], ['Link an account to keep Soul Cakes.', 'Link an account to keep Soul Cakes.'], 'a guest is told so, never that the festival is over (AUDIT WITCH1 F-M1)');
+  assert.deepEqual([(await buyWare('piece:wyrd-hood')).text, (await offeringMove('take', { mapId: 1, buildingKey: 2 })).text], ['Link an account to keep Soul Cakes.', 'Link an account to keep Soul Cakes.'], 'a guest is told so, never that the festival is over (AUDIT WITCH1 F-M1)');
   seat();
   await refreshFestival();
   assert.equal(festivalShut(), 'closed', 'the service said it is shut for this account (FESTIVAL_OPEN)');
@@ -96,7 +97,7 @@ test('WITCH1 AN ACT, A QUEST AND A BOUNTY ask by their group: a fish caught is `
   await new Promise((r) => setTimeout(r, 0));
   noteAct('elite-foe-slain');   // its kill already asked its own
   await new Promise((r) => setTimeout(r, 0));
-  noteAct('redoubt-taken');   // a later deed: its own find
+  noteAct('hour-broken');   // a later deed: its own find
   await askFind('world');
   assert.deepEqual(asked.filter(([n]) => n === 'find').map(([, s]) => s), ['endgame', 'endgame', 'world']);
   assert.equal(FESTIVAL_FIND, 'festival-find');
@@ -122,17 +123,17 @@ test('WITCH1 A SALE: asked by its own id, the piece minted on the answer; a lost
   let lose = ['offline', 'server'];
   const { api, asked } = fakeApi({ buy: (ware, rid) => { const r = buy(ware, rid); const e = lose.shift(); return e ? { ok: false, error: e } : r; }, mine: { ok: true, data: { cakes: 0 } } });
   bind(api);
-  const r = await buyWare('card:warlock');
+  const r = await buyWare('piece:wyrd-hood');
   assert.equal(r.ok, false, 'the answer was lost');
   const rid = pendingSale()?.rid;
   assert.match(rid, /^[0-9a-f]{12}$/);
   assert.equal(pendingSale().account, 'acct-alice', 'kept under the account that made it');
-  assert.equal(entity.items.filter(isIliacCard).length, 0, 'nothing minted on no answer');
+  assert.equal(entity.items.filter(isWyrdHood).length, 0, 'nothing minted on no answer');
   await refreshFestival();
   assert.equal(pendingSale()?.rid, rid, 'the service\'s fault says nothing of the sale: still kept (AUDIT WITCH1 C3)');
   await refreshFestival();
   assert.equal(pendingSale(), null, 'answered');
-  assert.equal(entity.items.filter(isIliacCard).length, 1, 'minted once');
+  assert.equal(entity.items.filter(isWyrdHood).length, 1, 'minted once');
   assert.deepEqual(asked.filter(([n]) => n === 'buy').map(([, , id]) => id), [rid, rid, rid], 'the same id asked again');
   // a refusal that says the sale never happened lets it go and says why
   for (const final of SALE_FINAL) assert.ok(['ware', 'rid', 'owned', 'cakes', 'closed', 'rate'].includes(final));
@@ -168,9 +169,9 @@ test('WITCH1 ONE SALE, ONE PIECE: the window\'s refresh lands while the buy is o
 
 test('WITCH1 A KEPT SALE IS ITS ACCOUNT\'S: another account signed in on the device never asks it (it would be a new sale, charged to them) - its own asks it again (AUDIT WITCH1 C3/A9)', async () => {
   let up = false;
-  const { api, asked } = fakeApi({ buy: () => (up ? { ok: true, data: { repeat: true, ware: 'card:warlock', cakes: 0, wares: [] } } : { ok: false, error: 'offline' }), mine: { ok: true, data: { cakes: 0 } } });
+  const { api, asked } = fakeApi({ buy: () => (up ? { ok: true, data: { repeat: true, ware: 'piece:wyrd-hood', cakes: 0, wares: [] } } : { ok: false, error: 'offline' }), mine: { ok: true, data: { cakes: 0 } } });
   bind(api);
-  await buyWare('card:warlock');
+  await buyWare('piece:wyrd-hood');
   const kept = pendingSale();
   assert.ok(kept);
   up = true;
@@ -181,16 +182,15 @@ test('WITCH1 A KEPT SALE IS ITS ACCOUNT\'S: another account signed in on the dev
   seat();
   await refreshFestival();
   assert.equal(pendingSale(), null);
-  assert.equal(entity.items.filter(isIliacCard).length, 1);
+  assert.equal(entity.items.filter(isWyrdHood).length, 1);
 });
 
-test('WITCH1 THE WARES\' PIECES: a set piece (bound), a card - an account ware and the Hearth Offering mint nothing, the service holds them', () => {
+test('WITCH1 THE WARES\' PIECES: a set piece (bound) - an account ware and the Hearth Offering mint nothing, the service holds them', () => {
   assert.equal(wareItem(wareById('title:witchwarden')), null);
   assert.equal(wareItem(wareById('icon:twinmoons')), null);
   assert.equal(wareItem(wareById('item:offering')), null, 'a bowl is the account\'s count');
   assert.equal(wareItem(wareById('piece:wyrd-athame'))?.aetheric, 'wyrd-athame');
   assert.equal(isBound(wareItem(wareById('piece:wyrd-robe'))), true);
-  assert.equal(isIliacCard(wareItem(wareById('card:spectre-of-lysandus'))), true);
   let i = 0;
   assert.equal(saleRid(() => [0.0, 0.99, 0.5][i++ % 3]), '0f80f80f80f8');
 });

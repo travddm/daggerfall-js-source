@@ -23,7 +23,6 @@ import { validLootItem } from '../../src/systems/loot/loot.js';
 import { createArtifact } from '../../src/systems/loot/loot.js';
 import { readMagicDef, MAGIC_ITEM_RECORD_SIZE } from '../../src/formats/magicDef.js';
 import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { DFU_MAGIC_ITEMS } from '../dfuMagicItems.mjs';
 
@@ -94,7 +93,7 @@ test('APPEARANCES THE CATALOGUE: every look there is - each template\'s material
   assert.equal(L.lookOfKey('131.0.0'), null, 'an arrow is none');
 });
 
-test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a piece of armour of each family, a style past its clamp - read as the look they draw; an artifact\'s and a Gilded piece\'s own art, an arrow, a gun and a mod\'s piece are none (mutants: the clamp unread; Chain2 its own; an artifact collected; a Gilded piece collected)', () => {
+test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a piece of armour of each family, a style past its clamp - read as the look they draw; an artifact\'s and a Gilded piece\'s own art, an arrow and a mod\'s piece are none (mutants: the clamp unread; Chain2 its own; an artifact collected; a Gilded piece collected)', () => {
   assert.deepEqual(L.lookOfPiece(createWeapon(WEAPONS.Katana, 7)), { t: 121, m: 7, v: 0, kind: 'longBlade' });
   assert.deepEqual(L.lookOfPiece(armour(102, ARMOR_MATERIAL.Iron, 0)), { t: 102, m: 0x200, v: 1, kind: 'chest' }, 'loot\'s variant 0 draws style 1 (SetVariant)');
   assert.deepEqual(L.lookOfPiece(armour(102, ARMOR_MATERIAL.Chain2, 2)), { t: 102, m: 0x100, v: 4, kind: 'chest' }, 'Chain2 draws as chain');
@@ -104,7 +103,6 @@ test('APPEARANCES A PIECE IS ITS LOOK: the producers\' own pieces - a weapon, a 
   assert.equal(L.lookVariant(107, ARMOR_MATERIAL.Steel, 9), 5);
   assert.equal(L.lookOfPiece(artifact('The Mehrunes Razor')), null, 'an artifact wears its own record');
   assert.equal(L.lookOfPiece(mintGilded(DRAGONFIRE_OATH)), null, 'a Gilded piece its own gold');
-  assert.equal(L.lookOfPiece(createThunderlock()), null, 'a gun has one look');
   assert.equal(L.lookOfPiece({ ...createWeapon(WEAPONS.Dagger, 0), group: 'Armor' }), null, 'a group that is not its template\'s');
   assert.equal(L.lookOfPiece(setItemFields({ group: 'Armor', templateIndex: 520, material: 0 })), null, 'Roleplay & Realism\'s jerkin is no look');
 });

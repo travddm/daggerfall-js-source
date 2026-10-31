@@ -12,7 +12,7 @@ same checks.
 
 Other shared protocol modules in `src/net/` are bundled into the relay the same way: `identityToken.js`,
 `hubShards.js`, `cellTree.js`, `instanceRoom.js`, `roomLease.js`, and the per-mode `*Law.js`, `*Receipt.js` and
-`*Brain.js` files (gates, arena, Super Dungeons, Elite Gates, wild, duel, raid, serpent).
+`*Brain.js` files (gates, arena, Super Dungeons, wild, duel, raid, serpent).
 
 ## Frames
 
@@ -69,7 +69,7 @@ fewer in a crowd, `POSE_CROWD`); the relay allows `POSE_HZ_MAX` (20/s) and batch
 ## The relay version
 
 ```js
-export const RELAY_VERSION = 'world276';   // src/net/wire.js
+export const RELAY_VERSION = 'world277';   // src/net/wire.js
 ```
 
 The format is `world<N>` (checked by `relayVersionOf` and by `test/net/relayversion.test.js`). It is read by:

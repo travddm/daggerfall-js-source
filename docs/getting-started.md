@@ -131,7 +131,7 @@ Every entry is registered in `vite.config.js` under `build.rollupOptions.input`.
 | `viewer.html`, `mw-viewer.html`, `mw-inspect.html` | Paperdoll viewer, Morrowind mesh viewer and data inspector. |
 | `studio.html` | Art studio listing (`src/tools/studioLab.js`; its index is built by `scripts/studioArtIndex.mjs`). |
 | `menu.html`, `chargen.html`, `enhanced.html`, `levelup.html`, `growth.html`, `firmament.html` | UI labs for the Enhanced menu, character creation, level-up and the passive tree. |
-| `abyss.html`, `spire.html` | Labs for scenes drawn by the game's renderer (`src/tools/abyssLab.js`, `src/tools/spireLab.js`). |
+| `abyss.html` | A lab for scenes drawn by the game's renderer (`src/tools/abyssLab.js`). |
 
 The labs are development aids. The player reaches only `index.html`, `play/index.html` and the legal pages.
 

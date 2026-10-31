@@ -1,108 +1,18 @@
 // AUDIT RPT1026 (lane K, the client): the audit of FIELD BUGS 2026-10-26r's RPT1026-CLIENT, each finding driven through
 // the real modules (bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md, RPT1026-CLIENT's AUDIT rows).
-//   K1 - a Weir Key face thrown in one dungeon was still counted as lying on a body in the next (or the same one built
-//        again) when no balance answer had landed outside between them: the pack one key short of the balance, no face
-//        anywhere to take up. Driven through the real find (registerEgFind with the world host's own place door,
-//        egFindPlace, and its throw, egFindThrow) and the real take (inventory.js takeOneInto).
 //   K2 - the lost graphics context's report, the page's one way back, carried the new Dismiss: dismissed, the dead
 //        canvas was left with nothing to say how to reload. Driven through main.js's own three statements.
-//   K3 - the pins of PEER-SHAKE held neither an event's sky fire at its whole kick nor the Motion row's own values:
-//        driven through the one cast engine (createPlayerMagic's skyFire) and the menu's own row (portPool).
+//   K3 - the pins of PEER-SHAKE did not hold the Motion row's own values: driven through the one cast engine
+//        (createPlayerMagic) and the menu's own row (portPool).
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { registerEgFind, egFindThrow, egFindPlace } from '../../src/systems/eliteGates/egFind.js';
-import { raiseEnemyDeath, registerEnemyDeathHandler } from '../../src/scenes/corpseMarker.js';
-import { weirKeysHeld, restackWeirKeys, weirKeysLying, isWeirKey, _resetWeirKeyFacesForTests } from '../../src/systems/eliteGates/weirKey.js';
-import { takeOneInto } from '../../src/systems/inventory.js';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { betterAmbience } from '../../src/systems/betterAmbience.js';
 import { getPref, setPref, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { portPool } from '../../src/ui/enhanced/enhancedMenu.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const tick = () => new Promise((r) => setImmediate(r));
-
-// ── K1: the Weir Key's faces, kept against the visit they were thrown in ─────────────────────────────────────────────
-
-/** The world's modes as the world host's place door reads them (worldModes.js modesApi: `dungeonLocation`, the location
- *  the player stands in, and `dungeonCtx`, the context built at the entry), and the find registered as scenes/world.js
- *  registers it - its place door egFindPlace, its throw egFindThrow onto the player's pack. */
-function rig() {
-  _resetWeirKeyFacesForTests();
-  const player = { items: [] };
-  const S = { balance: 0, mode: 'dungeon', modes: { dungeonLocation: { hasDungeon: true, elite: true }, dungeonCtx: { entry: 1 } }, answers: [] };
-  const find = registerEgFind({
-    ask: () => new Promise((r) => S.answers.push(() => { S.balance++; r({ ok: true, data: { found: true, keys: S.balance, asks: 5 } }); })),
-    placeNow: () => egFindPlace(S.mode, S.modes), selfId: () => 'me', online: () => true,
-    throwKey: (e, n) => egFindThrow(e, player.items, n),
-  });
-  /** Out of the dungeon (worldModes.js exitDungeonNow: its context destroyed, its bodies with it) and into the next. */
-  const walkOutAndIn = () => { S.mode = 'exterior'; S.modes = { dungeonLocation: null, dungeonCtx: null }; S.mode = 'dungeon'; S.modes = { dungeonLocation: { hasDungeon: true, elite: true }, dungeonCtx: { entry: 2 } }; };
-  const kill = async (body) => { raiseEnemyDeath(body, { by: null }); await tick(); S.answers.shift()?.(); await tick(); };
-  return { player, S, find, walkOutAndIn, kill, done: () => { find.dispose(); registerEnemyDeathHandler('eg-find', null); } };
-}
-const elite = () => ({ eliteFoe: true, items: [], mobileType: 1 });
-
-test('AUDIT RPT1026 K1: the world host\'s place door is the dungeon\'s tier and the visit - its context, new at every entry - and the world registers the find with it', () => {
-  const loc = { hasDungeon: true, elite: true }, ctx = {};
-  assert.deepEqual(egFindPlace('dungeon', { dungeonLocation: loc, dungeonCtx: ctx }), { tier: 'elite', visit: ctx });
-  assert.equal(egFindPlace('exterior', { dungeonLocation: loc, dungeonCtx: ctx }), null, 'outside a dungeon, no place');
-  assert.equal(egFindPlace('dungeon', { dungeonLocation: null, dungeonCtx: null }), null);
-  assert.match(read('src/scenes/world.js'), /registerEgFind\(\{[^]*?\n\s*placeNow: \(\) => egFindPlace\(_mode\(\), modes\),/, 'world.js hands the find its place, not the tier alone');
-});
-
-test('AUDIT RPT1026 K1: a face left on a body, out of the dungeon and into the next before any answer landed outside - the next answer gives the pack the whole balance, not one short', async () => {
-  const R = rig();
-  try {
-    const a = elite();
-    await R.kill(a);
-    assert.deepEqual([R.S.balance, weirKeysHeld(R.player.items), weirKeysHeld(a.items)], [1, 0, 1], 'the find: a face on the body, the pack the balance less it');
-    // the ten-minute ask lands while the player is still there: the face lies, the pack stands
-    assert.equal(restackWeirKeys(R.player.items, R.S.balance), false);
-    assert.equal(weirKeysLying(), 1);
-    R.walkOutAndIn();   // no answer outside: nothing folded there
-    restackWeirKeys(R.player.items, R.S.balance);   // the keys asked again, in the next dungeon
-    assert.deepEqual([weirKeysHeld(R.player.items), weirKeysLying()], [1, 0], 'the whole balance in the pack, no face counted on a body this dungeon never had');
-    assert.equal(weirKeysHeld(a.items), 0, 'and the face folded off the body left behind, as one away is');
-  } finally { R.done(); }
-});
-
-test('AUDIT RPT1026 K1: in the next dungeon a find of its own still counts its own face, and its take-up makes the whole balance', async () => {
-  const R = rig();
-  try {
-    const a = elite();
-    await R.kill(a);
-    R.walkOutAndIn();
-    const b = elite();
-    await R.kill(b);
-    assert.deepEqual([R.S.balance, weirKeysHeld(R.player.items), weirKeysHeld(b.items), weirKeysLying()], [2, 1, 1, 1], 'the pack the balance less the one face here');
-    for (const it of b.items.filter(isWeirKey)) takeOneInto(R.player, b.items, it);
-    assert.equal(weirKeysHeld(R.player.items), 2);
-    assert.equal(restackWeirKeys(R.player.items, R.S.balance), false, 'the next answer has nothing to change');
-  } finally { R.done(); }
-});
-
-test('AUDIT RPT1026 K1: a find\'s answer that lands after the player went into another dungeon throws no face on the body left behind - the key is the pack\'s', async () => {
-  const R = rig();
-  try {
-    const a = elite();
-    raiseEnemyDeath(a, { by: null }); await tick();   // asked here...
-    R.walkOutAndIn();
-    R.S.answers.shift()(); await tick();              // ...answered there
-    assert.deepEqual([R.S.balance, weirKeysHeld(R.player.items), weirKeysHeld(a.items), weirKeysLying()], [1, 1, 0, 0]);
-  } finally { R.done(); }
-});
-
-test('AUDIT RPT1026 K1: a face the world\'s throw (egFindThrow) lays while the door says away is no face lying - the pack the whole balance', () => {
-  const R = rig();
-  try {
-    R.S.mode = 'exterior'; R.S.modes = { dungeonLocation: null, dungeonCtx: null };
-    const a = elite();
-    egFindThrow(a, R.player.items, 2);
-    assert.deepEqual([weirKeysHeld(R.player.items), weirKeysHeld(a.items), weirKeysLying()], [2, 0, 0], 'away, every face is folded - one kept against no visit too');
-  } finally { R.done(); }
-});
 
 // ── K2: the lost graphics context's report keeps its way back ──────────────────────────────────────────────────────
 
@@ -139,29 +49,7 @@ function page() {
 }
 const buttons = (el) => el.children.filter((c) => c.tag === 'button');
 
-test('AUDIT RPT1026 K2: a lost graphics context\'s report carries no Dismiss - nothing draws again on the page, and the report is its way back', () => {
-  const P = page();
-  P.lose();
-  const el = P.els.get('crash');
-  assert.match(el.textContent, /^CRASH\nthe graphics stopped/);
-  assert.deepEqual(buttons(el), [], 'no Dismiss over the dead canvas');
-  // a later throw on the dead page: its words, and still no Dismiss to take the way back away
-  P.crashOverlay('TypeError: a frame on a lost context');
-  assert.deepEqual(buttons(el), []);
-  el.onclick();
-  assert.equal(P.reloads(), 1, 'the report still reloads');
-});
-
-test('AUDIT RPT1026 K2: a report already up when the context goes loses its Dismiss; any other report keeps it', () => {
-  const P = page();
-  const el = P.crashOverlay('IndexSizeError: an arc of negative radius');
-  assert.equal(buttons(el).length, 1, 'a throw the game runs on past: dismissible (RPT1026-CLIENT DISMISS)');
-  P.lose();
-  assert.equal(P.els.get('crash'), el);
-  assert.deepEqual(buttons(el), [], 'the context gone: the report is kept');
-});
-
-// ── K3: an event's sky fire keeps its whole kick; the Motion row writes the shares the engine reads ──────────────────
+// ── K3: the Motion row writes the shares the engine reads ──────────────────
 
 afterEach(() => resetPrefs());
 
@@ -193,22 +81,6 @@ function kicks(t) {
   return seen;
 }
 const peerBolt = () => { const E = engine(); E.magic.spellVisual({ from: [0, 1, 0], dir: [0, 0, 1], element: 0, rangeType: 2, casterId: 'peer-1' }); E.fly(); };
-
-test('AUDIT RPT1026 K3: an event\'s sky fire (drawn, no caster) keeps its whole kick whatever the other players\' share', (t) => {
-  const seen = kicks(t);
-  const sky = (share) => {
-    if (share != null) setPref('peerSpellShake', share);
-    const E = engine();
-    assert.equal(E.magic.skyFire({ from: [0, 20, 2], to: [0, 0, 2] }), true);
-    E.fly(150);
-    assert.equal(E.magic.missileCount(), 0, 'landed');
-  };
-  sky(null);
-  assert.equal(seen.length, 1, 'the fall kicks');
-  sky(0);
-  assert.equal(seen.length, 2, 'Off is the other players\' share: the sky\'s fire still kicks');
-  assert.ok(Math.abs(seen[1] - seen[0]) < 1e-9, `at its whole strength (${seen[1]} against ${seen[0]})`);
-});
 
 /** A document just big enough for the menu's row builders (test/systems/org2_options.test.js's), the Motion row's main
  *  button pressed until the share stands at `want`. */

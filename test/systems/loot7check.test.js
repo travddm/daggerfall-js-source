@@ -3,9 +3,9 @@
 // Just want this to be as detailed as possible". LOOT7's champions were driven through the real combat formula (the
 // five traits each did what its sentence says) and four things were found and fixed - each pin below failed on the code
 // before it:
-//   - CORPSE-FIND: the corpse door rolled a COPY of the body's carried loot, and the door's unique find (the Dwarven
-//     Thunderlock and its pellets) was pushed onto the copy and thrown away - no body ever kept one, and a champion's
-//     body (its source four tiers up, so always past the find's tier 4) was where it was likeliest.
+//   - CORPSE-FIND: the corpse door rolled a COPY of the body's carried loot, and the door's unique find was pushed
+//     onto the copy and thrown away - no body ever kept one, and a champion's body (its source four tiers up) was where
+//     it was likeliest. Since the guns' removal the door's unique finds are the Ayleid stones (systems/ayleidStones.js).
 //   - CHAMP-HOVER: the World Tooltips plaque never names a HOSTILE foe (the mod's .cs:304-312), so a living champion's
 //     name - its trait - was never on it; a champion was made the mod's one recorded exception. HOVER-PLAIN (2026-10-03,
 //     Mac: "remove the crosshair tooltip. They should only have names/modifiers under their healthbar") retired it.
@@ -22,8 +22,7 @@ import * as acorn from 'acorn';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as CH from '../../src/systems/champions.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
-import { isThunderlock, isPellet } from '../../src/systems/thunderlock.js';
-import { isPistolet } from '../../src/systems/pistolet.js';   // PISTOLET: the find's second gun   // imported, it registers its unique find
+import { isWelkyndStone, isVarlaStone } from '../../src/systems/ayleidStones.js';   // imported, it registers the stones' unique finds
 import { spawnEnemyLoot } from '../../src/scenes/hostCombat.js';
 import { equipTableOf } from '../../src/systems/equip.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
@@ -56,8 +55,10 @@ const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; r
 const orc = (trait = null) => { const e = makeEnemyEntity(7, ENEMY_BASICS[7], null, 10, lcg(9)); if (trait != null) CH.applyChampion(e, trait); return e; };
 const said = (it) => [it.templateIndex, it.name ?? null, it.rarity ?? null, it.legendary ?? null, it.stackCount ?? null, JSON.stringify(it.affixes ?? null)];
 const player = { level: 10, gender: 'male', stats: { luck: 50 }, activeEffects: [] };
+// The door's unique finds since the guns' removal: the Ayleid stones (late finds, the Welkynd Stone's from tier 6).
+const isStone = (item) => isWelkyndStone(item) || isVarlaStone(item);
 
-test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - the Thunderlock and its pellets (GUNS-UNFOUND: its pellets alone) - as the list door keeps it, seed for seed; through the spawn seam a champion\'s body carries it; off, nothing', () => {
+test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - an Ayleid stone - as the list door keeps it, seed for seed; through the spawn seam a champion\'s body carries it; off, nothing', () => {
   on();
   // THE SAME SEEDS THROUGH BOTH DOORS: a champion orc's body (its source four tiers up and half again its quality)
   // against the list door handed that same source - every piece and every find the list keeps, the body keeps
@@ -69,34 +70,31 @@ test('LOOT7-CHECK CORPSE-FIND: a body keeps its unique find - the Thunderlock an
     const list = [createWeapon(113, 1)];
     LR.rollLootRarity(list, LR.championSource(src), { rolls: lcg(seed), luck: 50 });   // CHAMP-LOOT: the champion's own source, one home
     assert.deepEqual(body.items.map(said), list.map(said), `seed ${seed}: the body is the list`);
-    // PIN MOVED (PISTOLET, AUDIT PISTOLET C8 D4): the find mints either gun from the draw it always made, so the same
-    // seeds find and the count is either gun's
-    // PIN MOVED (GUNS-UNFOUND, the owner: "it should no longer be able to drop. Ammo should still drop"): the find is its
-    // Pellets alone, from the same draw - the same seeds find, and no body carries a gun
-    assert.ok(!body.items.some((i) => isThunderlock(i) || isPistolet(i)), `seed ${seed}: no gun`);
-    if (body.items.some(isPellet)) finds++;
+    if (body.items.some(isStone)) finds++;
   }
-  assert.ok(finds >= 15, `the find comes to bodies (${finds} in 6,000 - about 5.6 per thousand at tier 16)`);
+  // PIN MOVED (guns removed): the count is the Ayleid stones' (50 in 6,000 at this champion's tier 12), not the Pellets'
+  assert.ok(finds >= 15, `the find comes to bodies (${finds} in 6,000)`);
   // A FORCED FIND ON A BODY THAT WEARS ITS KIT: onto the body, the worn pieces untouched; a body with no list gets one
   const kitted = { items: [], level: 21, mobileType: 7 };
   const wornSword = createWeapon(113, 1);
   kitted.items.push(wornSword);
   equipTableOf(kitted)[5] = wornSword;
   LR.rollCorpseLoot(kitted, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });
-  assert.ok(kitted.items.some(isPellet) && !kitted.items.some(isThunderlock), 'the find on the body - its Pellets, no gun (GUNS-UNFOUND)');
+  assert.ok(kitted.items.some(isStone), 'the find on the body');
   assert.equal(kitted.items[0], wornSword, 'the kit where it was');
   assert.equal(wornSword.rarity, undefined, 'and never rolled (LR4)');
   const bare = { level: 21, mobileType: 7 };
   LR.rollCorpseLoot(bare, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });
-  assert.ok(Array.isArray(bare.items) && bare.items.some(isPellet), 'a body with no list gets one, its find on it');
-  // THE SPAWN SEAM, end to end: a champion orc's spawn on a stream that finds everything
-  const champ = orc(0);
-  spawnEnemyLoot(champ, 7, ENEMY_BASICS[7], player, { rolls: () => 0.0001 });
-  // PIN MOVED (GUNS-UNFOUND): the champion's body carries the find's Pellets, and no Thunderlock
-  assert.ok(!champ.items.some(isThunderlock), 'no gun on the champion\'s body');
-  const shot = champ.items.find(isPellet);
-  assert.ok(shot, 'its pellets');
-  assert.notEqual(shot.untaken, true, 'ammunition, never counted for the drought (LOOT8)');
+  assert.ok(Array.isArray(bare.items) && bare.items.some(isStone), 'a body with no list gets one, its find on it');
+  // THE SPAWN SEAM, end to end: a champion's spawn on a stream that finds everything.
+  // An Orc Sergeant (mobile type 12), not the orc: an orc champion's source is tier 5, under the Welkynd Stone's 6.
+  const sergeantType = 12;
+  const champ = makeEnemyEntity(sergeantType, ENEMY_BASICS[sergeantType], null, 10, lcg(9));
+  CH.applyChampion(champ, 0);
+  spawnEnemyLoot(champ, sergeantType, ENEMY_BASICS[sergeantType], player, { rolls: () => 0.0001 });
+  const stone = champ.items.find(isStone);
+  assert.ok(stone, 'the champion\'s body carries its find');
+  assert.notEqual(stone.untaken, true, 'not a piece, never counted for the drought (LOOT8)');
   off();
   const offBody = { items: [createWeapon(113, 1)], level: 21, mobileType: 7 };
   LR.rollCorpseLoot(offBody, { level: 21, affinity: 'Daedra' }, { rolls: () => 0.0001, luck: 100 });

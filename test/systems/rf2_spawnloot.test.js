@@ -98,8 +98,8 @@ test('RF2: the port\'s arm rides the seam - loot rarity rolls the carried loot a
   for (const it of e.items) {
     if (worn.has(it)) assert.equal(it.rarity, undefined, 'the kit it wears stays DFU\'s');
   }
-  // LOOT7-CHECK CORPSE-FIND: the boss's body keeps its unique find now (the Thunderlock and its pellets) - and AMMUNITION
-  // is never promoted (an arrow or a pellet), so the claim is the eligible pieces', not every weapon's
+  // LOOT7-CHECK CORPSE-FIND: the boss's body keeps its unique find now - and AMMUNITION is never promoted (an arrow),
+  // so the claim is the eligible pieces', not every weapon's
   const carried = e.items.filter((it) => !worn.has(it) && ['Weapons', 'Armor', 'Jewellery'].includes(it.group) && !isAmmunition(it));
   for (const it of carried) assert.notEqual(rarityOf(it), 'common', 'the loot it carries rolled at the boss\'s tier');
   _resetForTests(); setPref('lootRarity', false);   // LR5: the row ships ON, so OFF is a press - a bare reset would leave this half testing the ON path

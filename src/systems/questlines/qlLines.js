@@ -7,16 +7,14 @@
 //
 // A LINE IS DATA: its steps' quests, the words the window shows of it, when it opens, and where it is offered (`post` -
 // QL-OFFERED: a line is taken, never sent). What it pays beyond its
-// quests' own rewards is the service's (net/questlineClaims.js QL_SERVICE_LINES - the witnessed steps, the title, the
-// Covens' Hoard's key), read by id here, never restated. The runner (qlLineRunner.js) begins a line the player takes and
+// quests' own rewards is the service's (net/questlineClaims.js QL_SERVICE_LINES - the witnessed steps, the title), read
+// by id here, never restated. The runner (qlLineRunner.js) begins a line the player takes and
 // starts its next step; the window (ui/questlines/qlJournal.js) draws the line.
 //
-//   THE DAGON CYCLE (4.1) - three lines, one story: the Burning Doors (Dagon's Breach), the Covens' Hoard (the Elite
-//     Dungeons' gold-lit champions), the Weir Road (the Elite Breach). Online: every witness is a relay's receipt.
+//   THE DAGON CYCLE (4.1) - two lines, one story: the Burning Doors (Dagon's Breach), the Covens' Hoard (the Elite
+//     Dungeons' gold-lit champions). Online: every witness is a relay's receipt.
 //   THE HOUR THAT WAS NOT (4.2) - the Abyss Dungeon, from the Order of the Hour. Online.
 //   THE OLD COIL (4.3) - the Sea Serpent, from Sentinel's sailors. Online.
-//   THE SKY-KETCH (KETCH, bible/11-Multiplayer/Sky-Ketch.md section 13) - the Rourken sky-ketch over Daggerfall, from an
-//     antiquarian of Sentinel. Online: its witness is the Tonal Warden's receipt.
 //   THE INTRODUCTIONS (4.5) - a short line for each Tutorials group with a feature to go to: the crafts, the gear's own
 //     laws, the sea, the road, the tavern's tables, the Arena, the Bay's troubles, the Firmament. The Tutorials explain;
 //     an introduction gives a reason to go, and pays for it.
@@ -35,9 +33,9 @@ import { REVENANT_MIN_RENOWN } from '../revenant/revenant.js';   // AUDIT QUESTL
  * @typedef {{ quest: string, title: () => string, needs?: ReadonlyArray<LineNeed> }} LineStep
  *   `needs` what the step's deed cannot be done without (AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6): the step waits,
  *   saying so, until each holds - never started to fail every day
- * @typedef {'lootRarity'|'kingsGambit'|'naval'|'renown'|'starfall'} LineNeed
- *   `lootRarity` Loot rarity on (a socket, a reforge); `kingsGambit` The King's Gambit on (its table); `naval` Naval
- *   Combat on (the sea's own deeds); `renown` the Renown a revenant comes at (revenant.js REVENANT_MIN_RENOWN, online);
+ * @typedef {'lootRarity'|'naval'|'renown'|'starfall'} LineNeed
+ *   `lootRarity` Loot rarity on (a socket, a reforge); `naval` Naval Combat on (the sea's own deeds); `renown` the
+ *   Renown a revenant comes at (revenant.js REVENANT_MIN_RENOWN, online);
  *   `starfall` (STAR8) the Starfall running - the Witches' Festival's days (net/festivalLaw.js, through
  *   net/starfall/starfallLaw.js starfallRuns), when stars fall to be held
  * @typedef {{ level?: number, after?: string, online?: boolean, account?: boolean, event?: LineNeed }} LineOpens
@@ -53,14 +51,14 @@ import { REVENANT_MIN_RENOWN } from '../revenant/revenant.js';   // AUDIT QUESTL
  *   Quest (Ysolde Marnhel, the Mages Guild's own), `temple` a temple's (Prior Anselm Vey, a guest of its temple), `tavern`
  *   someone with work in a tavern (Corvane Tull, Imrah Bel-Tavir, Hamid al-Rasheen, each met in one) -
  *   scenes/quest/questlineOffers.js; none, the Quests tab alone (the Thirteenth of Frostfall: a Wyrd Sister opens it)
- * @typedef {{ id: string, group: 'cycle'|'hour'|'coil'|'ketch'|'intro'|'festival', tier: number, post?: LinePost,
+ * @typedef {{ id: string, group: 'cycle'|'hour'|'coil'|'intro'|'festival', tier: number, post?: LinePost,
  *   title: () => string, lead: () => string, giver: () => string, opens: LineOpens, steps: ReadonlyArray<LineStep> }} Line
  */
 
 /** @param {Line} l @returns {Readonly<Line>} */
 const line = (l) => Object.freeze({ ...l, opens: Object.freeze({ ...l.opens }), steps: Object.freeze(l.steps.map((s) => Object.freeze({ ...s, ...(s.needs ? { needs: Object.freeze([...s.needs]) } : {}) }))) });
 
-/** The lines, in the window's order: the Cycle, the Hour, the Ketch, the Coil, the Festival's, then the introductions. */
+/** The lines, in the window's order: the Cycle, the Hour, the Coil, the Festival's, then the introductions. */
 export const QL_LINES = Object.freeze([
   line({
     id: 'burningDoors', group: 'cycle', tier: 3, post: 'magery',
@@ -89,19 +87,6 @@ export const QL_LINES = Object.freeze([
     ],
   }),
   line({
-    id: 'weirRoad', group: 'cycle', tier: 4, post: 'tavern',
-    title: () => t('ql.line.weirRoad', 'The Weir Road'),
-    lead: () => t('ql.line.weirRoad.lead', 'The Battlespire fell in 3E 398. One of its last class of Battlemages has never stopped living that year.'),
-    giver: () => t('ql.line.weirRoad.giver', 'Corvane Tull, Battlemage of the Spire’s last class'),
-    opens: { after: 'covensHoard', online: true, account: true },
-    steps: [
-      { quest: 'QLWR01', title: () => t('ql.step.QLWR01', 'The Weir Gate') },
-      { quest: 'QLWR02', title: () => t('ql.step.QLWR02', 'The Torn Halls') },
-      { quest: 'QLWR03', title: () => t('ql.step.QLWR03', 'A Warrior Duke') },
-      { quest: 'QLWR04', title: () => t('ql.step.QLWR04', 'The Battlemage’s Account') },
-    ],
-  }),
-  line({
     id: 'hourThatWasNot', group: 'hour', tier: 4, post: 'temple',
     title: () => t('ql.line.hourThatWasNot', 'The Hour That Was Not'),
     lead: () => t('ql.line.hourThatWasNot.lead', 'The priests of Akatosh feel a wound in time under the Bay, and brass where there should be stone.'),
@@ -110,19 +95,6 @@ export const QL_LINES = Object.freeze([
     steps: [
       { quest: 'QLHR01', title: () => t('ql.step.QLHR01', 'Brass at Dusk') },
       { quest: 'QLHR02', title: () => t('ql.step.QLHR02', 'The Orrery of Endings') },
-    ],
-  }),
-  line({
-    id: 'skyKetch', group: 'ketch', tier: 4, post: 'tavern',
-    title: () => t('ql.line.skyKetch', 'The Sky-Ketch'),
-    lead: () => t('ql.line.skyKetch.lead', 'Every ten hours a Rourken airship appears over Daggerfall. An antiquarian from Sentinel wants to know why.'),
-    giver: () => t('ql.line.skyKetch.giver', 'Imrah Bel-Tavir, Antiquarian of Sentinel'),
-    opens: { level: 12, online: true, account: true },
-    steps: [
-      { quest: 'QLSK01', title: () => t('ql.step.QLSK01', 'The Ketch That Never Lands') },
-      { quest: 'QLSK02', title: () => t('ql.step.QLSK02', 'The Starved Engine') },
-      { quest: 'QLSK03', title: () => t('ql.step.QLSK03', 'The Tonal Warden') },
-      { quest: 'QLSK04', title: () => t('ql.step.QLSK04', 'What the Lodestone Answers') },
     ],
   }),
   line({
@@ -196,17 +168,6 @@ export const QL_LINES = Object.freeze([
     steps: [
       { quest: 'QLIR01', title: () => t('ql.step.QLIR01', 'A Wagon’s Load') },
       { quest: 'QLIR02', title: () => t('ql.step.QLIR02', 'The Long Haul') },
-    ],
-  }),
-  line({
-    id: 'introTables', group: 'intro', tier: 1, post: 'board',
-    title: () => t('ql.line.introTables', 'A Seat at the Table'),
-    lead: () => t('ql.line.introTables.lead', 'A tavern regular is looking for someone new to lose to. Or, better, to beat.'),
-    giver: () => t('ql.line.introTables.giver', 'a tavern regular'),
-    opens: { level: 2 },
-    steps: [
-      { quest: 'QLIT01', title: () => t('ql.step.QLIT01', 'A Hand of Cards') },
-      { quest: 'QLIT02', title: () => t('ql.step.QLIT02', 'The King’s Gambit'), needs: ['kingsGambit'] },
     ],
   }),
   line({
@@ -290,7 +251,6 @@ export const eventHolds = (l, probe) => !l.opens.event || (probe.need?.(l.opens.
 /** A step's need, in words - the window's "Opens with ..." (the Features rows' own names). */
 const NEED_WORDS = Object.freeze({
   lootRarity: () => t('ql.line.needs.lootRarity', 'with Loot rarity on'),
-  kingsGambit: () => t('ql.line.needs.kingsGambit', 'with The King\u2019s Gambit on'),
   naval: () => t('ql.line.needs.naval', 'with Naval Combat on'),
   renown: () => t('ql.line.needs.renown', 'at Renown {n}', { n: REVENANT_MIN_RENOWN }),
   starfall: () => t('ql.line.needs.starfall', 'during the Witches’ Festival'),   // STAR8

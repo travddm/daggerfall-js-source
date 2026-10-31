@@ -14,7 +14,7 @@ import {
   _resetSigilSetsForTests,
 } from '../../../src/systems/sigil/sigilSets.js';
 import {
-  AETHERIC_RECORDS, PANOPLY_SET_PIECES, WYRD_SET_PIECES, STARSPUN_SET_PIECES, ELTHERIC_SET_PIECES, STARSPUN_SET_CHANCE, RAID_SET_CHANCE, RAID_SET_POWER, aethericById,
+  AETHERIC_RECORDS, WYRD_SET_PIECES, STARSPUN_SET_PIECES, ELTHERIC_SET_PIECES, STARSPUN_SET_CHANCE, RAID_SET_CHANCE, RAID_SET_POWER, aethericById,
   aethericMaterial, mintAetheric, rollStarspunPiece, validSetMarks, AETHERIC,
 } from '../../../src/systems/aetheric.js';
 import { _resetPlayerHealForTests } from '../../../src/systems/playerHeal.js';
@@ -36,7 +36,7 @@ import { STARGLASS_TEMPLATE, STARGLASS_LAW_ROW } from '../../../src/systems/star
 import { starglass, isStarglass, STARGLASS_ROW } from '../../../src/systems/starfall/starglass.js';
 import { starglassArt, starglassTexel, registerStarglassArt, _resetStarglassArt, STARGLASS_ARCHIVE, STARGLASS_ART, STARGLASS_ART_SIZE, STARGLASS_OUTLINE } from '../../../src/world/starfall/starglassArt.js';
 import { STAR_RAMPS } from '../../../src/world/starfall/starArt.js';
-import { PSEUDO_ARCHIVES, pseudoArchiveCollisions } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES, pseudoArchiveCollisions } from '../../../src/world/pseudoArchives.js';
 import { rollStarSpoils, starSpoilsList, starSpoilsDay, STAR_SPOILS_GOLD_PER_LEVEL, STARGLASS_MAX, STAR_SPOILS_KEYS, STAR_SPOILS_TEXT } from '../../../src/systems/starfall/starSpoils.js';
 import { RAID_SPOILS_KEYS } from '../../../src/systems/raidSpoils.js';
 import { SERPENT_SPOILS_KEYS } from '../../../src/systems/serpent/serpentSpoils.js';
@@ -125,7 +125,7 @@ test('STAR7 THE RECORDS: nine in the places\' order - the seven body pieces, a b
   assert.ok(!resists.includes('poison'), 'never poison - Spinner\'s Thread carries it');
   assert.equal(new Set(resists).size, resists.length);
   for (const r of STARSPUN_SET_PIECES) assert.ok(r.lore.length > 20 && r.lore.length <= 100 && !/\S - \S/.test(r.lore), `${r.id}: a line of lore`);
-  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length - PANOPLY_SET_PIECES.length), [...PANOPLY_SET_PIECES, ...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);   // PIN MOVED (SEA-SET): the Tidemail's nine after the Weave's   // PIN MOVED (WITCH1): the Wyrd's Raiment between the Panoply and the Weave
+  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length), [...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);   // PIN MOVED (SEA-SET): the Tidemail's nine after the Weave's   // PIN MOVED (WITCH1): the Wyrd's Raiment before the Weave
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
 });
 

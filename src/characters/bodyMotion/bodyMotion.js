@@ -5,8 +5,7 @@
 // MOTION, ONE PER RIG. The Morrowind body in third person walks, runs, creeps, stands, carries what is in its hands and
 // strikes with its whole body - the gait (gait.js), the carry (carry.js) and the blows (melee.js) joined into one request
 // and solved on the skeleton over the clip's pose (bodySolve.js), through poseAssembly's `motion` slot
-// (formats/morrowind/mwFirstPerson.js) - under the climb, the seat and the long gun's hold, which still win the bones
-// they ask for.
+// (formats/morrowind/mwFirstPerson.js) - under the climb and the seat, which still win the bones they ask for.
 //
 // THE CLIP IS NOT THROWN AWAY. The clip machine (combat/fpArm.js) still runs every group and still decides everything a
 // group decides - the draw and the sheathe, a cast, a bow's draw and loose, the hit recoil, the death, the jump, the
@@ -54,19 +53,18 @@ const SHEET_BLADE = Object.freeze({ one: 58, two: 88, wide: 112, spear: 120, dua
  *   null where none: the pace along the keys stands in), carriedYaw (the turns a deck gave it, cumulative);
  *   height, weight (the race's scale);
  *   mwType, shown (the weapon in the hand), hands ('single' | 'dual' | 'fists'), torch (the left hand's light), shield
- *   (a shield on the left arm), spell (a readied spell or a cast), equip (a draw or a sheathe in the hands), rifle (the
- *   long gun's hold has the hands);
+ *   (a shield on the left arm), spell (a readied spell or a cast), equip (a draw or a sheathe in the hands);
  *   blow - { type, reversed, hand, section, progress, strength } while a melee blow is in the machine, else null;
  *   guard - { L, R } (radians) the pair's guard: how far each arm is lowered while the other strikes, or null.
  */
 export function sceneInput({
   forward = 0, strafe = 0, speed = 0, running = false, sneaking = false, yaw = 0, grounded = true, travel = null, carriedYaw = 0,
   weapon = MW_WEAPON_TYPE.None, hands = 'single', shown = undefined, blow = null, kind = 'male',
-  height = 1, weight = 1, torch = false, shield = false, spell = false, spellHand = false, equip = false, rifle = false, on = true, busy = null, guard = null,
+  height = 1, weight = 1, torch = false, shield = false, spell = false, spellHand = false, equip = false, on = true, busy = null, guard = null,
 } = {}) {
   return {
     on, kind, busy, speed, forward, strafe, running, sneaking, grounded, swimming: false, levitating: false, yaw, travel, carriedYaw,
-    height, weight, mwType: weapon, shown: shown ?? weapon !== MW_WEAPON_TYPE.None, hands, torch, shield, spell, spellHand, equip, rifle, blow, guard,
+    height, weight, mwType: weapon, shown: shown ?? weapon !== MW_WEAPON_TYPE.None, hands, torch, shield, spell, spellHand, equip, blow, guard,
   };
 }
 
@@ -80,13 +78,12 @@ const SECTION_OF = Object.freeze({ AttackWindUp: 'windup', AttackRelease: 'relea
  * path, its weapon type, the pieces it wears - a shield among them), `built` the rig's (its race's scale, a werewolf's or a creature's body), `dead`, `hit` (a
  * recoil in the clip), `climb` the climb's weight, `upper` the upper body's state by name, the blow's `attackType`,
  * `reversed` and `hand` and its section's `progress` and `strength`, `shown` the weapon in the hand, `hands` how the
- * hands are held (TWO-HANDS), `torch` the left hand's light, `spell` a spell readied or cast, `rifle` the long gun's
- * hold weight. The switch is systems/features.js 'mw-body-motion' (the viewer's - how this machine draws a body).
+ * hands are held (TWO-HANDS), `torch` the left hand's light, `spell` a spell readied or cast. The switch is systems/features.js 'mw-body-motion' (the viewer's - how this machine draws a body).
  */
 export function motionWord({
   cam = null, third = false, rig = null, built = null, dead = false, hit = false, climb = 0, upper = 'None',
   attackType = null, reversed = false, hand = null, progress = 0, strength = 1, shown = false, hands = 'single',
-  torch = false, spell = false, spellHand = false, rifle = 0, guard = null,
+  torch = false, spell = false, spellHand = false, guard = null,
 } = {}) {
   const mv = (cam && cam.move) || {};
   const kind = bodyKindOf(rig?.settingsSkeleton);
@@ -107,7 +104,7 @@ export function motionWord({
     // SHIELD-RUN: a shield is a piece the body wears on its left arm, at the Shield Bone - the composer names its slot
     // `shield (<record>)` (formats/morrowind/mwItemMap.js composeWornArmor; fitThirdPersonCloak reads it so too)
     shield: !!rig?.arm?.pieces?.some((p) => /^shield\b/.test(p.slot ?? '')),
-    equip: upper === 'Equipping' || upper === 'Unequipping', rifle: rifle > 0.01,
+    equip: upper === 'Equipping' || upper === 'Unequipping',
     blow: section && attackType ? { type: attackType, reversed: !!reversed, hand, section, progress, strength } : null,
     // AUDIT BODY-MOTION MELEE-11: the pair's guard - each arm's dip while the other strikes (fpArm.js pairDip, radians)
     guard: guard && (guard.L > 0 || guard.R > 0) ? { L: Number(guard.L) || 0, R: Number(guard.R) || 0 } : null,
@@ -223,7 +220,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
       }
       clsMix = ease(clsMix, 1, MOTION_EASE.cls, dt);
       if (clsMix > 0.999) { clsMix = 1; clsFrom = null; }
-      const hands = !input.equip && !input.rifle && cls !== 'clip';
+      const hands = !input.equip && cls !== 'clip';
       // SHIELD-RUN (the Discord's "sprinting with my mace and shield out just makes me look incredibly stupid"): a shield
       // on the arm leaves the left arm to the clip, as a torch does - Morrowind's own groups carry a shield; the free
       // run's pump swung it up behind the head. Only where the reference shows it: drawn fists and a two-hander hide it.

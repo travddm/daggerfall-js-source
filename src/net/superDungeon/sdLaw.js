@@ -236,7 +236,7 @@ export function sdNameOf(s, city = '') {
 // ═══ THE ROOM ═════════════════════════════════════════════════════════
 //
 // SD-PARTY (2026-10-28, the owner: "we need to make this a party instance"): ONE room per slot AND party, `sd:<s>.<owner>`,
-// the owner the party's account digest (net/instanceRoom.js instanceOwnerOf - the Ketch's crew law); its door the owner,
+// the owner the party's account digest (net/instanceRoom.js instanceOwnerOf); its door the owner,
 // staff and the owner's party (server/src/sdCopy.js). SD-SOLO ("if no one is in a party allow them to be put into a 8
 // player instance"): owner `p<n>`, a shared Hour of SD_PUB_SEATS, the next opened when it is full or won.
 const SD_ROOM = /^sd:([1-9]\d{0,8})\.([0-9a-f]{16}|p(?:0|[1-9]\d?))$/;
@@ -280,7 +280,7 @@ export const SD_NO_FULL = 'The Hour is full.';
  *  prove your worth"): the Hour refuses an account that died in it - one life a Hollow. */
 export const SD_NO_FALLEN = 'The Hour will not take you back.';
 /**
- * SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed" in the Hour, the Spire and the Ketch): ONE LIFE, UNLESS A
+ * SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed" in the Hour and the Spire): ONE LIFE, UNLESS A
  * FRIEND CALLS IT BACK. A death in the Hour no longer marks its account dead at once: the realm keeps it DOWN (`down`,
  * `[sub, at, x?, z?]` - where it fell, the realm's metres, when its dying pose said) for SD_REZ_MS. AUDIT WORLD-EVENTS L1-1:
  * THE RAISE IS THE REALM'S TO RECORD - a living fighter of the realm casting Resurrect at the body says so to the realm

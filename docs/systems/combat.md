@@ -224,5 +224,3 @@ bleed; `bloodGibs.js` throws gibs on a heavy overkill; `bloodArt.js` generates t
   leaves so formulas can read them. Keep them import-free.
 - **Frame-rate independence.** Off-hand costs and flurries are counted in machine ticks, not seconds; keep new timing
   terms in ticks.
-- **Removed features.** Branches for the Thunderlock and Pistolet guns (`src/combat/gun/` and their cases in
-  `fpsWeapon.js`, `handsLaw.js`, `techniqueRoster.js`) are being removed; do not extend them.

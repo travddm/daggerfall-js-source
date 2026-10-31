@@ -66,8 +66,6 @@ const SCENE_CACHE = await load('../src/systems/sceneCache.js');
 const START = await load('../src/systems/startingGear.js');
 const RRI_KITS = await load('../src/systems/roleplayRealismItems/rriKits.js');
 const RRI_INSTALL = await load('../src/systems/roleplayRealismItems/rriInstall.js');
-const ILIAC = await load('../src/systems/iliac/iliacItems.js');
-const CARDS = await load('../src/net/iliac/iliacCards.js');
 const RECIPES = await load('../src/net/recipeLaw.js');
 const SMITH = await load('../src/systems/smithItems.js');
 const COOK = await load('../src/systems/cookItems.js');
@@ -88,7 +86,6 @@ const SURV_LOOT = await load('../src/systems/survival/loot.js');
 const SURV_SWITCH = await load('../src/systems/survival/switch.js');
 const FORAGE = await load('../src/systems/foraging/foragingInstall.js');
 const FORAGE_LAW = await load('../src/systems/foraging/foragingLaw.js');
-const THUNDER = await load('../src/systems/thunderlock.js');
 const AYLEID = await load('../src/systems/ayleidStones.js');
 const WALLET = await load('../src/systems/walletItem.js');
 const KEEPSAKE = await load('../src/systems/livingWorld/keepsake.js');
@@ -97,7 +94,6 @@ const CSA = await load('../src/systems/comeSailAway/comeSailAwayItems.js');
 const NAVAL = await load('../src/systems/naval/navalStores.js');
 const GOODS = await load('../src/systems/naval/tradeGoods.js');   // AUDIT CAPTAIN'S SEA B12: the exchange's goods
 const CHARTS = await load('../src/systems/naval/treasureCharts.js');   // AUDIT CAPTAIN'S SEA B12: the treasure chart
-const WEIR = await load('../src/systems/eliteGates/weirKey.js');   // KEY-LAW (FIELD BUGS 2026-10-17): the Weir Key
 const FISH = await load('../src/systems/deepWater/deepWatersFishItems.js');
 const FISH_ROWS = await load('../src/systems/deepWater/deepWatersFishRows.js');
 const BOOKS = await load('../src/systems/books.js');
@@ -474,15 +470,10 @@ function sweep({ seeds, run, skip }) {
       for (const s of seedsOf()) {
         const rolls = seeded(s);
         for (const it of [AETH.rollRegalia(rolls), AETH.rollRaidSetPiece(s % 3, rolls), AETH.rollSerpentSetPiece(rolls), AETH.rollNumidiumPiece(rolls)]) one(it);
-        one(AETH.mintPanoplyPiece(rolls));   // EG15: the Battlemage's Panoply's pick (a Redoubt's spoils decide whether)
       }
-      for (const id of AETH.PANOPLY_SET_PIECES.map((r) => r.id)) one(AETH.panoplyPieceById(id));   // EG15: and the Broker's weekly sink, by id
     });
-    run('gilded.mintGilded / mintHourlock', (one) => {
+    run('gilded.mintGilded', (one) => {
       for (const r of GILD.GILDED_RECORDS) one(GILD.mintGilded(r));
-      for (const r of GILD.GILDED_ERAS) one(GILD.mintGilded(r));   // GUNS-UNFOUND: the guns minted before, as a save holds them
-      one(GILD.mintHourlock());
-      for (const s of seedsOf(S * 4)) one(GILD.rollHourlock(seeded(s)));   // one draw in fifty
     });
 
     // ── 6. the Reforge, on the pieces the doors above minted ──
@@ -715,7 +706,6 @@ function runChargen(run, seedsOf) {
     for (let classIndex = 0; classIndex < 18; classIndex++) for (const isCustom of [false, true]) for (const gender of ['male', 'female']) for (const race of (isCustom ? races.slice(0, 1) : races).filter((_, r) => isCustom || (r + classIndex) % 3 === 0 || r === 0)) {
       const e = { ...newPlayer({ level: 1, gender, gold: 0 }), race };
       START.assignStartingGear(e, { classIndex, isCustom, rolls: seeded(hashOf(`${classIndex}${gender}${race}${isCustom}`)), torchesFromItems: classIndex % 2 === 0 });
-      ILIAC?.giveBinderAtChargen?.(e);
       all(e.items);
     }
   });
@@ -1062,10 +1052,6 @@ function runHomes(run, seedsOf, S, minted) {
       for (const it of items) one(it);
     }
   });
-  run('thunderlock.createThunderlock / createPellets', (one) => {
-    for (let material = 0; material <= 9; material++) one(THUNDER.createThunderlock({ material }));
-    for (const n of [1, 5, 20, 50]) one(THUNDER.createPellets(n));
-  });
   run('ayleidStones / gateSpoils stones', (one) => {
     one(AYLEID.welkyndStone()); one(AYLEID.varlaStone());
     for (const n of [1, 3, 10]) { for (const it of [].concat(GATE.welkyndShards(n) ?? [])) one(it); for (const it of [].concat(GATE.portalStones(n) ?? [])) one(it); }
@@ -1079,14 +1065,6 @@ function runHomes(run, seedsOf, S, minted) {
   run('walletItem.mintWallet / giveWallet', (one) => {
     one(WALLET.mintWallet());
     const e = newPlayer(); WALLET.giveWallet(e); for (const it of e.items) one(it);
-  });
-  run('iliacItems (every card, binders with decks)', (one) => {
-    const ids = CARDS.ILIAC_CARDS.map((c) => c.id);
-    for (const [i, id] of ids.entries()) one(ILIAC.mintIliacCard(id, 1 + (i % 4)));
-    const decks = range(ILIAC.BINDER_DECKS_MAX).map((d) => ({ name: `Deck ${d}`, cards: ids.slice(d, d + 20) }));
-    for (const n of [0, 1, 5, ILIAC.BINDER_DECKS_MAX]) one(ILIAC.mintBinder(decks.slice(0, n)));
-    one(ILIAC.mintBinder([{ name: 'Starter', cards: [...CARDS.STARTER_DECK] }]));
-    const e = newPlayer(); ILIAC.giveBinderAtChargen(e); for (const it of e.items) one(it);
   });
   run('livingWorld/keepsake.mintKeepsake', (one) => {
     for (const s of seedsOf()) one(KEEPSAKE.mintKeepsake({ id: `L${s % 900}.t${s % 7}~${s % 3}`, name: `Resident ${s % 97}`, town: s % 5000, home: s % 3 ? s % 40 : null }));
@@ -1127,11 +1105,6 @@ function runHomes(run, seedsOf, S, minted) {
   // AUDIT CAPTAIN'S SEA B12: the exchange's every good at a cask, a day's stock and a hold's worth, and a chart at its seeds' ends
   run('naval/tradeGoods.mintGood (every good)', (one) => { for (const g of GOODS.GOODS) for (const n of [1, 30, 500]) one(GOODS.mintGood(g.id, n)); });
   run('naval/treasureCharts.mintChart', (one) => { for (const seed of [0, 2 ** 31 + 1, 2 ** 32 - 1]) one(CHARTS.mintChart(seed)); });
-  // KEY-LAW (FIELD BUGS 2026-10-17): the Weir Key, as a find throws it and as the balance restacks the pack
-  run('eliteGates/weirKey.weirKeys / restackWeirKeys', (one) => {
-    for (const n of [1, 2, 40]) one(WEIR.weirKeys(n));
-    const pack = []; WEIR.restackWeirKeys(pack, 7); for (const it of pack) one(it);
-  });
   run('deepWatersFishItems.createFishItem (every species)', (one) => {
     for (const t of FISH_ROWS.DEEP_WATERS_FISH_TEMPLATES) one(FISH.createFishItem({ templateIndex: t.index }));
   });
@@ -1260,7 +1233,10 @@ function runPackActs(run, seedsOf, minted) {
       for (const it of LOOT.generateItems('C', { level: 10, gender: 'male' }, rolls)) INV.addItem(list, copyItem(it));
       for (const it of LOOT.generateItems('C', { level: 10, gender: 'male' }, rolls)) INV.addItem(list, copyItem(it));
       for (const key of LOOT.CLASSIC_RECIPE_KEYS.slice(0, 4)) { INV.addItem(list, LOOT.createPotion(key)); INV.addItem(list, LOOT.createPotion(key)); }
-      INV.addItem(list, Object.assign(THUNDER.createPellets(20))); INV.addItem(list, THUNDER.createPellets(7));
+      // two arrow stacks that merge (the Dwemer Pellets' stacks stood here until the guns were removed)
+      const arrowStack = (count) => Object.assign(ENEMY_EQ.createWeapon(ENEMY_EQ.ARROW_TEMPLATE, 0, seeded(s)), { stackCount: count });
+      INV.addItem(list, arrowStack(20));
+      INV.addItem(list, arrowStack(7));
       for (const it of [...list]) if ((it.stackCount ?? 1) > 1) INV.splitStack(list, it, 1 + Math.floor(rolls() * ((it.stackCount ?? 2) - 1)), { rolls });
       all(list);
     }

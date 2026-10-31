@@ -6,37 +6,30 @@
 //
 // THE PROBLEM. There is no one door an item comes through. A take from a body or a chest tells the LOOT8 listeners
 // (inventory.js tellTaken), but a purchase, the Sigil Broker's sale, a quest's reward, a gate's or a raid's spoils, a
-// craft, a trade, the market and a card all `addItem` straight into the pack - and a take from the wagon or the
+// craft, a trade and the market all `addItem` straight into the pack - and a take from the wagon or the
 // Materials Bag tells the listeners as if it were new. A popup hung on any one door misses the rest or lies.
 //
 // SO THE PACK IS WATCHED, NOT THE DOORS. Once a frame (ui/hud/hud.js drawHud - the one call every host makes, with the
 // player entity it already passes) the watcher reads the player's three own lists - the pack, the wagon, the Materials
 // Bag - and answers what is NEW there:
-//   - A piece that could ever announce (`markable`: a weapon, a piece of armour or clothing, jewellery, an artifact, a
-//     card) is marked `acquired` the first frame it stands in one of the lists. An unmarked one there is an ARRIVAL. The
+//   - A piece that could ever announce (`markable`: a weapon, a piece of armour or clothing, jewellery, an artifact) is
+//     marked `acquired` the first frame it stands in one of the lists. An unmarked one there is an ARRIVAL. The
 //     mark is a declared item field (itemFields.js) - it rides the save and the house's chest, so a piece taken back out
 //     of the player's own storage, or picked back up off the ground, is not new; and it is the RECEIVER's mark (loot.js
 //     validLootItem strips it with equipSlot and questItem), so a piece another player hands over - a trade, the zone's
 //     remains, the market, a room's chest - is new to its taker.
-//   - A CARD stacks, and a card that lands on a stack the player already holds merges into it and is gone as a record.
-//     So a card's arrival is its COUNT rising: the three lists' total of each card, frame to frame, less what a marked
-//     record new to the lists brought (a stack of the player's own back from a chest).
-//   - Moving a piece between the three lists is never an arrival: a whole move carries the same marked record, a split
-//     mints a record of a card whose total did not rise.
+//   - Moving a piece between the three lists is never an arrival: a whole move carries the same marked record.
 // A NEW BASELINE, NOT A FLOOD: the first frame of an entity, a new pack (a load replaces the lists - save.js
-// restorePlayer), and every frame before and at the end of character creation (its kit and the starter deck) are read
-// and marked, and announce nothing.
+// restorePlayer), and every frame before and at the end of character creation (its kit) are read and marked, and
+// announce nothing.
 //
-// WHAT ANNOUNCES is a tier at or over `BANNER_MIN_TIER` (Rare): a card its catalog's tier (net/iliac/iliacCards.js - printed on
-// its face, whatever loot rarity's switch says), any other piece the tier the pack shows it in (lootRarity.js
+// WHAT ANNOUNCES is a tier at or over `BANNER_MIN_TIER` (Rare): the tier the pack shows a piece in (lootRarity.js
 // rarityAttr - none with loot rarity off, none for Common).
 //
 // PURE: no DOM, no clock. The face (ui/lootBanner.js) builds its banners from what this answers.
 // ═══════════════════════════════════════════════════════════════════
 
 import { rarityAttr, RARITIES } from './loot/lootRarity.js';
-import { isIliacCard } from './iliac/iliacItems.js';
-import { cardById } from '../net/iliac/iliacCards.js';
 import { isAmmunition } from './item/itemTemplates.js';
 
 /** The item field the watcher writes: true, or absent (itemFields.js declares it). */
@@ -50,21 +43,16 @@ export const BANNER_BIG_TIER = 'aetheric';
  *  a garment - plus what already wears one). */
 const TIERED_GROUPS = new Set(['Weapons', 'Armor', 'Jewellery', 'MensClothing', 'WomensClothing']);
 
-/** Whether a piece could ever announce, and so carries the mark: a card, an artifact, a piece of a tiered group. */
+/** Whether a piece could ever announce, and so carries the mark: an artifact, a piece of a tiered group. */
 export function markable(item) {
   if (!item || typeof item !== 'object') return false;
-  if (isIliacCard(item) || item.artifact === true) return true;
+  if (item.artifact === true) return true;
   return TIERED_GROUPS.has(item.group) && !(item.group === 'Weapons' && isAmmunition(item));
 }
 
-/** The tier a piece announces itself in: a card its catalog's, any other the pack's (null with loot rarity off, or for
- *  Common). */
+/** The tier a piece announces itself in: the pack's (null with loot rarity off, or for Common). */
 export function acquiredTier(item) {
   if (!item) return null;
-  if (isIliacCard(item)) {
-    const t = cardById(item.card)?.tier;
-    return typeof t === 'string' && RARITIES[t] ? t : null;
-  }
   return rarityAttr(item);
 }
 
@@ -104,10 +92,6 @@ export function createAcquireWatch() {
   let lastEntity = null;
   let lastItems = null;
   let lastDone = null;
-  /** card id -> the three lists' count of it, last frame */
-  let totals = new Map();
-  /** the card records standing in the lists last frame */
-  let held = new Set();
   /** records that can never announce - read once (a record's group and template do not change) */
   const never = new WeakSet();
 
@@ -121,26 +105,10 @@ export function createAcquireWatch() {
     lastDone = done;
     /** @type {{ item: any, count: number, tier: string }[]} */
     const arrivals = [];
-    const nowTotals = new Map();
-    /** card id -> what marked records new to the lists brought (the player's own stack back) */
-    const movedIn = new Map();
-    /** card id -> a record to stand for its arrival (an unmarked one when there is one) */
-    const face = new Map();
-    const nowHeld = new Set();
     for (const list of listsOf(entity)) {
       for (const item of list) {
         if (!item || typeof item !== 'object' || never.has(item)) continue;
         if (!markable(item)) { never.add(item); continue; }
-        if (isIliacCard(item)) {
-          const id = item.card;
-          const n = countOf(item);
-          nowTotals.set(id, (nowTotals.get(id) ?? 0) + n);
-          if (!held.has(item) && isAcquired(item)) movedIn.set(id, (movedIn.get(id) ?? 0) + n);
-          if (!face.has(id) || !isAcquired(item)) face.set(id, item);
-          nowHeld.add(item);
-          item[ACQUIRED_FIELD] = true;
-          continue;
-        }
         if (isAcquired(item)) continue;
         item[ACQUIRED_FIELD] = true;
         if (prime) continue;
@@ -148,23 +116,12 @@ export function createAcquireWatch() {
         if (tierAnnounces(tier)) arrivals.push({ item, count: countOf(item), tier });
       }
     }
-    if (!prime) {
-      for (const [id, total] of nowTotals) {
-        const rose = total - (totals.get(id) ?? 0) - (movedIn.get(id) ?? 0);
-        if (rose <= 0) continue;
-        const item = face.get(id);
-        const tier = acquiredTier(item);
-        if (tierAnnounces(tier)) arrivals.push({ item, count: rose, tier });
-      }
-    }
-    totals = nowTotals;
-    held = nowHeld;
     return arrivals;
   }
 
   return {
     observe,
     /** Forget the baseline: the next frame is a new one (tests, a host's reset). */
-    reset() { lastEntity = null; lastItems = null; lastDone = null; totals = new Map(); held = new Set(); },
+    reset() { lastEntity = null; lastItems = null; lastDone = null; },
   };
 }

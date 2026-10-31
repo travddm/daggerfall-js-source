@@ -55,7 +55,6 @@ import { perspective } from '../../src/world/mat4.js';
 import { CHAR_SPRITE_RT_SIZE } from '../../src/render/renderer.js';
 import { Collider } from '../../src/player/collider.js';
 import { playerTorchLight } from '../../src/systems/playerTorch.js';
-import { thunderlockMuzzleLight } from '../../src/systems/thunderlock.js';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { candleBase, CANDLE } from '../../src/scenes/magicCandle.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
@@ -99,13 +98,12 @@ const RATES = {
   '144 Hz': Array(144).fill(1 / 144),
   '60 Hz, +-1 ms': Array.from({ length: 120 }, () => 1 / 60 + (jitter() - 0.5) * 0.002),
 };
-const torchIn = { _torch: { range: 14 } }, gunIn = { _thunderlockFlash: 1 };
+const torchIn = { _torch: { range: 14 } };
 const HAND = {
   torch: (feet) => playerTorchLight(torchIn, feet, 0),
-  'Thunderlock flash': (feet) => thunderlockMuzzleLight(gunIn, feet, 0),
 };
 
-test('DISC13-A: the torch and the Thunderlock\'s flash hold still against the camera while walking when built on the render feet; on the stepped feet (the hosts\' old read) they slide every frame', () => {
+test('DISC13-A: the torch holds still against the camera while walking when built on the render feet; on the stepped feet (the hosts\' old read) it slides every frame', () => {
   for (const [name, lightOf] of Object.entries(HAND)) {
     for (const [rate, dts] of Object.entries(RATES)) {
       assert.ok(slide(dts, (m) => m.feetAt(), lightOf) < 1e-6, `${name}, ${rate}: rigid to the eye on feetAt`);
@@ -115,14 +113,14 @@ test('DISC13-A: the torch and the Thunderlock\'s flash hold still against the ca
   }
 });
 
-test('DISC13-A: every host builds the hand lights off the render feet - both builders in every light array, and no host hands them player.pos (mutants: any one site back to player.pos)', () => {
+test('DISC13-A: every host builds the hand light off the render feet - the torch\'s builder in every light array, and no host hands it player.pos (mutants: any one site back to player.pos)', () => {
   let sites = 0;
   for (const [file, n] of [['src/scenes/world.js', 2], ['src/scenes/worldModes.js', 2], ['src/scenes/exterior.js', 1], ['src/scenes/dungeon.js', 1]]) {
     const src = rd(file);
-    for (const b of ['playerTorchLight(playerEntity, player.feetAt(), cam.yaw)', 'thunderlockMuzzleLight(playerEntity, player.feetAt(), cam.yaw)']) {
+    for (const b of ['playerTorchLight(playerEntity, player.feetAt(), cam.yaw)']) {
       assert.equal(src.split(b).length - 1, n, `${file}: ${b.slice(0, b.indexOf('('))} in all ${n} arrays`);   // AUDIT DISC19: counted apart - the world host's dungeon arm tints each with the dungeon's colour
     }
-    assert.doesNotMatch(src, /(?:playerTorchLight|thunderlockMuzzleLight)\(playerEntity, player\.pos,/, `${file} hands no builder the stepped feet`);
+    assert.doesNotMatch(src, /playerTorchLight\(playerEntity, player\.pos,/, `${file} hands no builder the stepped feet`);
     sites += n;
   }
   assert.equal(sites, 6);

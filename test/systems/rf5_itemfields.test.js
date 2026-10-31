@@ -130,7 +130,7 @@ test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refu
   assert.equal(ok({ rarity: 'epic' }), null, 'a rarity off the ladder');
   for (const r of RARITY_ORDER.filter((x) => x !== 'aetheric' && x !== 'gilded')) assert.ok(ok({ rarity: r }));
   assert.equal(ok({ rarity: 'aetheric' }), null, 'AUDIT SET D6: the Aetheric tier is its record\'s, never a bare word (auditset_c.test.js walks the Regalia through)');
-  assert.equal(ok({ rarity: 'gilded' }), null, 'GILDED1: nor the Gilded - its record\'s, minted whole (gilded1_gilded.test.js walks the Hourlock through)');
+  assert.equal(ok({ rarity: 'gilded' }), null, 'GILDED1: nor the Gilded - its record\'s, minted whole (gilded1_gilded.test.js walks a record through)');
   assert.equal(ok({ equipSlot: ITEM_EQUIP_SLOTS }), null, 'a slot past the table');
   assert.equal(ok({ equipSlot: -1 }), null);
   assert.ok(ok({ equipSlot: ITEM_EQUIP_SLOTS - 1 }));
@@ -162,7 +162,7 @@ test('RF5: a declared field\'s shape is closed on the wire - the wrong kind refu
 
 test('RF5: one declaration - the array list derives from the kinds, the validator carries no hand list, the look\'s fields are declared', () => {
   assert.deepEqual([...LOOT_ARRAY_FIELDS], itemFieldsOfKind('array'));
-  assert.deepEqual(itemFieldsOfKind('array'), ['enchantments', 'customEnchantments', 'affixes', 'sockets', 'decks', 'socketBought']);   // GEM1 (PIN MOVED): a piece's socket list; CARDS8 (PIN MOVED): a Card Binder's decks; AUDIT TOWN-ECON 2 PRICE-2 (PIN MOVED): the sockets a counter sold a stone for
+  assert.deepEqual(itemFieldsOfKind('array'), ['enchantments', 'customEnchantments', 'affixes', 'sockets', 'socketBought']);   // GEM1 (PIN MOVED): a piece's socket list; AUDIT TOWN-ECON 2 PRICE-2 (PIN MOVED): the sockets a counter sold a stone for
   assert.equal(LOOT_STR_MAX, ITEM_STR_MAX);
   assert.ok(Object.isFrozen(ITEM_FIELDS) && ITEM_FIELD_NAMES.length >= 40);
   for (const k of ITEM_FIELD_NAMES) assert.ok(['int', 'number', 'bool', 'string', 'enum', 'array', 'object'].includes(ITEM_FIELDS[k].kind), k);

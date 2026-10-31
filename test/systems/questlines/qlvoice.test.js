@@ -94,8 +94,8 @@ test('AUDIT QUESTLINES VOICE-QL rule 5: no dash aside in a sheet\'s text - an ob
   const at = (quest, pick) => pick(all.find((s) => s.quest === quest));
   // the package's own example, and one of each kind
   assert.equal(at('B0B60Y12', (s) => s.objectives.find((o) => o.id === 'rest').text), 'Burn the corpse of _nobleman_\'s ancestor in ___dungeon_. Destroy it if it walks.');
-  assert.equal(at('QLCH03', (s) => s.branches[0].text), 'The Guild gives a house one Weir Key. Keep it, or let the Order of the Hour seal it away?');
-  assert.equal(at('QLCH03', (s) => s.branches[0].choices.find((c) => c.id === 'keep').text), 'Keep it, for a key is meant to be turned');
+  assert.equal(at('QLCH03', (s) => s.branches[0].text), 'Sell the Weir Key to the Guild, or let the Order of the Hour seal it away?');   // PIN MOVED (Elite Gates removed): the key sold, no longer kept
+  assert.equal(at('QLCH03', (s) => s.branches[0].choices.find((c) => c.id === 'keep').text), 'Sell it to the Guild');
   assert.equal(at('M0B00Y07', (s) => s.outcomes.find((o) => o.id === 'done').text), 'The animal is dead and the client is safe, for now.');
 });
 

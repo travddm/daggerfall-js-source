@@ -258,13 +258,8 @@ test('AUDIT 64 F34: every SetMidScreenText caller speaks to the label, and the t
   assert.match(src('scenes/dungeonContext.js'), /setMidScreenText\(lookAtLockText\(/);
   assert.equal((src('scenes/worldModes.js').match(/setMidScreenText\(lookAtLockText\(/g) ?? []).length, 1);   // PIN MOVED (LOCKPICK): the refusal's - the anti-grind record's second line retired with its gate (a snapped pick is a retry's cost); the lock's window says the line at its head (scenes/lockpickHost.js)
   // FPSWeapon.cs:365
-  // AUDIT-THUNDERLOCK F5: the guard covers every ranged weapon now and
-  // the line names what it is out of, so the classic weapon's classic
-  // line is one arm of a ternary rather than the whole call. Both arms
-  // are asserted: the Thunderlock gained a line, the bow did not lose
-  // one.
+  // PIN MOVED (guns removed): the bow's line is the guard's only line again - the Pellets' arm went with the guns
   assert.match(src('combat/weapon/weaponRig.js'), /setMidScreenText\([^)]*'You have no arrows\.'/);
-  assert.match(src('combat/weapon/weaponRig.js'), /'You have no pellets\.'/);
   // ...and the siblings that are PopupMessage in the reference stay on
   // the popup queue: PlayerActivate.cs:527 (lockedExteriorDoor, one
   // line above LookAtInteriorLock) and :553/:564 with

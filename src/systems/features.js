@@ -101,9 +101,6 @@ export const GROUP_ORDER = Object.freeze(['sight', 'interface', 'sound', 'world'
  *  defaults - the other direction closes a cycle and the shelf loads
  *  before the row exists. */
 export const WINDMILLS_KEY = 'windmills';
-/** KG3: The King's Gambit's switch key - declared here with its row, as the Windmills' is (the game reads it through
- *  `uiPrefs`, which reads this page's defaults). */
-export const KINGS_GAMBIT_KEY = 'kingsGambit';
 /** EVENTS2 (2026-10-24, the players on Discord: "Allow us to filter which events we want to show up in the event
  *  tracker"): THE SHARED EVENTS' KINDS - their one home, declared HERE with the Event board row whose chips they are, as
  *  the Windmills' key is (systems/eventNotices.js reads their switches through `uiPrefs`, which reads this page's
@@ -1068,7 +1065,7 @@ export const FEATURES = Object.freeze([
     // `gear`, which qlJournal.js qlObjectivesBlock reads) - "each one finished offers" was no longer true. Still two
     // sentences and no longer than it was (FT15's note budget)
     get note() { return t('features.questlines.note', 'Every quest shows its objectives, some let you choose how they end, some offer a piece of gear '
-      + 'fitted to you when done, and questlines lead to the Breaches, the Battlespire and the Abyss. Off is the classic journal '
+      + 'fitted to you when done, and questlines lead to the Breaches and the Abyss. Off is the classic journal '
       + 'and its rewards, and online it is always on.'); },
     get effect() { return t('features.questlines.effect', 'Takes effect on the next quest you take; quests you already have keep the rules they began with.'); },
     kinds: Object.freeze(['enhanced']),
@@ -1118,21 +1115,6 @@ export const FEATURES = Object.freeze([
     get effect() { return t('features.effect.worldLoads', 'Takes effect when the world next loads.'); },
     kinds: Object.freeze(['mod']),
     control: Object.freeze({ store: 'prefs', key: WINDMILLS_KEY, initial: true, online: 'player' }),
-  }),
-  // KG3 (2026-10-13, bible/11-Multiplayer/Kings-Gambit.md section 10.7): THE KING'S GAMBIT, the card table's third game.
-  // The bundle ships no settings file, so the row is declared for the mod by id, as the Windmills' is; on by default (MO1,
-  // "All mods should be enabled by default"); off, no card table offers it. In the world's group: the record's "Gameplay
-  // tab" is a settings tab, no Features group (FOUND AT KG3). Read as a table's panel is painted - at once.
-  Object.freeze({
-    id: 'mod-kings-gambit',
-    group: 'world',
-    // the mod's own name and its author, as every mod row carries them (AUDIT SURV E) - the bundle names none, so the
-    // credits' own unnamed form (ui/credits.js), as Oblivion Remaster Like Leveling's row names its source
-    get title() { return t('features.mod.title', '{title} by {author}', { title: 'The King\u2019s Gambit', author: t('credits.author.unnamed', 'Unnamed ({source})', { source: 'thekingsgambit.dfmod' }) }); },
-    get note() { return t('features.mod.kingsGambit.note', 'A game of armies and kings at a tavern\'s card table, against a regular or another player, for gold or for fun. Off, the tables offer only Hold\'em and Iliac Hand.'); },
-    get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },
-    kinds: Object.freeze(['mod']),
-    control: Object.freeze({ store: 'prefs', key: KINGS_GAMBIT_KEY, initial: true, online: 'player' }),
   }),
   modFeature('seasons-iliac-bay', () => t('features.effect.worldLoads', 'Takes effect when the world next loads.'), 'sight'),   // FT18: was world
   modFeature('low-poly-trees', () => t('features.effect.worldLoads', 'Takes effect when the world next loads.'), 'sight'),   // LPT1: read once, as the world loads

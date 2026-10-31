@@ -61,7 +61,7 @@ const toward = (Rc, Rt, w) => (w >= 1 ? Rt : mul(rotFraction(mul(Rt, transpose(R
  *   chest  - { yaw, roll, pitch } - the chest's turn in the body frame;
  *   head   - { yaw, roll, pitch } - the head's;
  *   feet   - { L, R }: { at, toe, up, w } - the ankle's point, the toes' way, the sole's up;
- *   armW   - { L, R }: how far each arm is the layer's (0 the clip's - a bow's, a spell's, a draw's, the long gun's, a
+ *   armW   - { L, R }: how far each arm is the layer's (0 the clip's - a bow's, a spell's, a draw's, a
  *            torch's left): the chest, the neck and the head are the layer's as far as either arm is, each collarbone as
  *            far as its own arm is - the rest the clip's, so an aim the clip holds stays where it holds it;
  *   arms   - (ctx) => { L, R }: each a climb hand request ({ at, fingers, palm, pole, curl, w }) or null, asked with
@@ -110,8 +110,7 @@ export function solveBody(skeleton, pose, rootRef, skelMats, plan) {
   // the trunk: the chest's turn spread up the spine; then the neck and the collarbones as they stand at rest on it (the
   // clip's own swings of them - an attack clip's, a draw's - would carry the shoulders off the arms' requests)
   // AUDIT BODY-MOTION RIG-4 / DOC-3 / CARRY-10: the upper body is whoever has the arms' - the layer's chest turn, lean
-  // and collarbones under a bow's arms swung its hand 18.6 units and 38 degrees off the clip's aim, and turned a long
-  // gun's barrel 9 to 14 degrees with the gait's counter-turn
+  // and collarbones under a bow's arms swung its hand 18.6 units and 38 degrees off the clip's aim
   const armL = clamp01(plan.armW?.L ?? 1), armR = clamp01(plan.armW?.R ?? 1), armAny = Math.max(armL, armR);
   if (plan.chest) {
     const own = mul(mul(bodyTurn(plan.chest.yaw ?? 0, plan.chest.roll ?? 0, plan.chest.pitch ?? 0), body.chestFix), body.restRot.get(body.chest));

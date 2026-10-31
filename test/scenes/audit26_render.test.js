@@ -107,7 +107,7 @@ test('audit26 F033: the flash is record 1 of the MISSILE\'s archive at 15fps, wi
   // unscaled (WW1: DoClang/DoThud's x2 rides `scale`, 1 by default).
   // PIN MOVED (EG-ZG, Elite-Gates.md section 25.4): `conceal` joins the tail, null by default - an ally's flash drawn
   // translucent in a Spire trial; the blood defaults and the unscaled, unnudged flash are as they were
-  assert.match(he, /function spawn\(record, pos, facing = null, \{ archive = BLOOD_ARCHIVE, fps = BLOOD_FPS, scale = 1, tracked = false, onTexture = null, conceal = null \} = \{\}\)/);
+  assert.match(he, /function spawn\(record, pos, facing = null, \{ archive = BLOOD_ARCHIVE, fps = BLOOD_FPS, scale = 1, tracked = false, conceal = null \} = \{\}\)/);
   assert.match(he, /showImpactFlash: \(archive, pos, scale = 1, conceal = null\) => spawn\(IMPACT_RECORD, pos, null, \{ archive, fps: IMPACT_FPS, scale, conceal \}\)/);   // SUNBABY2 moved it: a sky fireball's flash is drawn larger
   assert.equal(BLOOD_ARCHIVE, 380);
   assert.equal(BLOOD_FPS, 10);
@@ -147,7 +147,7 @@ test('audit26 F033: both missile hosts flash, gated on element None and ByTouch,
     // SUNBABY2: and an EIGHTH - the sun baby's sky fireball landing where it was thrown
     // SERPENT4: and a NINTH - a harmful missile of mine meeting a box mark (the sea serpent's hide)
     // DEX5: and a TENTH - a missile of mine meeting a body a mod's corpse prefab stands (the troll's trigger)
-    const impacts = f === 'src/scenes/hostMagic.js' ? 10 : 3;
+    const impacts = f === 'src/scenes/hostMagic.js' ? 9 : 3;
     assert.equal((s.match(/(?<!function )showImpactFlash\(m, /g) ?? []).length, impacts,
       `${f} flashes at all ${impacts} impacts`);
     // the wall flash is OUTSIDE the AoE branch - DFU flashes on any

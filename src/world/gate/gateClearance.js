@@ -25,11 +25,10 @@
 // - the frame world/streamingWorld.js pixelTranslation, the WoD placements and the gate's spot share (north is the row
 // ABOVE: py - 1). Pure; a leaf apart from the two constants' homes.
 //
-// EG-F (2026-10-12, the Elite Gates arc, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section
-// 6.3): A SET OF CLEARINGS. The sweep tracked one key, the clock's gate; an Elite Breach's arch keeps its own clearing
-// (EG_ARCH_ROCK_M about its foot), keyed by its breach id `eg:<b>`, for as long as it stands - the gate's and every
-// standing arch's at once (`gateClearSet`). A clearing is the gate's (gateClearFor) or a set of them ({ key, list }):
-// every question here asks each member of a set, the gate's own its own way (its rite with it) and an arch's by its `r`.
+// EG-F (2026-10-12): A SET OF CLEARINGS. The sweep tracked one key, the clock's gate; a fallen star keeps its own
+// clearing (STAR_ROCK_M about its heart), keyed by its id `star:<s>`, for as long as it stands - the gate's and every
+// standing star's at once (`gateClearSet`). A clearing is the gate's (gateClearFor) or a set of them ({ key, list }):
+// every question here asks each member of a set, the gate's own its own way (its rite with it) and a star's by its `r`.
 // A pixel is built against the set's key (its members' keys, joined); when the set turns, a pixel is built again only for
 // what changed - a clearing gone that had cost it a site or a piece, or one come that something it stands reaches - and
 // a gate alone keeps the one key it always had, so the gate's sweep is what it was.
@@ -93,22 +92,19 @@ const boxNear = (cx, cz, x0, z0, x1, z1, r) => {
  * clearing, and `margin` more? The box's nearest point to the gate's foot, measured on the ground - AUDIT WB12d (G12):
  * or to the faithful's circle, within its own clearing.
  * @param {{px:number, py:number, x:number, z:number, rx?:number, rz?:number, r?:number, list?:ReadonlyArray<any>}|null} clear null answers false (no gate to keep off);
- *   EG-F: an arch's (`r` its reach) or a set (`list`)
+ *   EG-F: a star's (`r` its reach) or a set (`list`)
  */
 export function boxNearGate(clear, px, py, x0, z0, x1, z1, margin = 0) {
   if (!clear) return false;
   if (Array.isArray(clear.list)) return clear.list.some((c) => boxNearGate(c, px, py, x0, z0, x1, z1, margin));   // EG-F: a set - any of its clearings
   const [gx, gz] = gatePointIn(clear, px, py);
-  if (Number.isFinite(clear.r)) return boxNear(gx, gz, x0, z0, x1, z1, clear.r + margin);   // EG-F: an arch's, by its own reach
+  if (Number.isFinite(clear.r)) return boxNear(gx, gz, x0, z0, x1, z1, clear.r + margin);   // EG-F: a star's, by its own reach
   if (boxNear(gx, gz, x0, z0, x1, z1, GATE_CLEAR_M + margin)) return true;
   if (!Number.isFinite(clear.rx) || !Number.isFinite(clear.rz)) return false;
   const [cx, cz] = ritePointIn(clear, px, py);
   return boxNear(cx, cz, x0, z0, x1, z1, RITE_CLEAR_M + margin);
 }
 
-/** EG-F: an arch's clearing about its foot, metres - its stone (the gate's GATE_HALF_W at 0.62, 4.8 either side), the
- *  opener's landing before it (scenes/eliteGates/egArch.js EG_ARCH_LANDING_M) and room to walk round. */
-export const EG_ARCH_ROCK_M = 14;
 /** STAR-CLEAR: a fallen star's clearing about its heart, metres - its crater's thrown earth (world/starfall/starModel.js
  *  STAR_BARE_R, 9.6), the ring its coven stands on (systems/starfall/starfallClient.js STAR_STAND_R, out to 20) and room
  *  past the ring to walk round a foe stood at its edge (the gate's own room, GATE_CLEAR_M's). */
@@ -128,30 +124,29 @@ function membersFrom(items, id, prefix, r) {
   return out;
 }
 /**
- * EG-F: THE CLEARINGS NOW - the gate's (gateClearFor's, or null), each standing arch's (`{ b, px, py, x, z }`, its pixel
- * and its foot there, the gate's spot's frame) and STAR-CLEAR each fallen star's (`{ s, px, py, x, z }` - `s` its
- * `<night>.<k>`, its heart in its pixel's frame), one clearing: null for none, the gate's own record for the gate alone,
- * else `{ key, list }` - the members' keys joined (the gate's first, the arches' by breach id, the stars' by theirs). Pure.
- * @param {ReturnType<typeof gateClearFor>} gate @param {ReadonlyArray<{b: string, px: number, py: number, x: number, z: number}>} [arches]
+ * EG-F: THE CLEARINGS NOW - the gate's (gateClearFor's, or null) and STAR-CLEAR each fallen star's (`{ s, px, py, x, z }`
+ * - `s` its `<night>.<k>`, its heart in its pixel's frame), one clearing: null for none, the gate's own record for the
+ * gate alone, else `{ key, list }` - the members' keys joined (the gate's first, the stars' by their ids). Pure.
+ * @param {ReturnType<typeof gateClearFor>} gate
  * @param {ReadonlyArray<{s: string, px: number, py: number, x: number, z: number}>} [stars]
  */
-export function gateClearSet(gate, arches = [], stars = []) {
+export function gateClearSet(gate, stars = []) {
   /** @type {any[]} */
-  const list = [...(gate ? [gate] : []), ...membersFrom(arches, 'b', 'eg:', EG_ARCH_ROCK_M), ...membersFrom(stars, 's', 'star:', STAR_ROCK_M)];
+  const list = [...(gate ? [gate] : []), ...membersFrom(stars, 's', 'star:', STAR_ROCK_M)];
   if (!list.length) return null;
   if (list.length === 1 && list[0] === gate) return gate;
   return Object.freeze({ key: list.map((c) => c.key).join(CLEAR_KEY_JOIN), list: Object.freeze(list) });
 }
 /**
- * STAR-CLEAR: THE SET, MADE AGAIN ONLY WHEN WHAT IT IS MADE OF MOVES - `(gate, arches, stars)` answers gateClearSet's set
- * for them, the same object while each of the three is the same (the gate's record, the arches' and the stars' lists are
- * each kept by their owners while they stand), so a pixel's build and the frame's sweep read one set (the world host's
- * memo, EG-F, moved here with the stars).
+ * STAR-CLEAR: THE SET, MADE AGAIN ONLY WHEN WHAT IT IS MADE OF MOVES - `(gate, stars)` answers gateClearSet's set for
+ * them, the same object while each of the two is the same (the gate's record and the stars' list are each kept by their
+ * owners while they stand), so a pixel's build and the frame's sweep read one set (the world host's memo, EG-F, moved
+ * here with the stars).
  */
 export function gateClearMemo() {
-  let g = null, a = null, s = null, set = null;
-  return (gate, arches, stars) => {
-    if (gate !== g || arches !== a || stars !== s) { g = gate; a = arches; s = stars; set = gateClearSet(gate, arches ?? [], stars ?? []); }
+  let g = null, s = null, set = null;
+  return (gate, stars) => {
+    if (gate !== g || stars !== s) { g = gate; s = stars; set = gateClearSet(gate, stars ?? []); }
     return set;
   };
 }

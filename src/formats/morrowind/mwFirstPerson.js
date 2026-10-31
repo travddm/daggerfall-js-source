@@ -2790,7 +2790,7 @@ export function posePartClocks(assembly, value, { frameTime = value, slots = WEA
 }
 
 export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
-  time = 0, accumRoot = null, neckPitch = 0, neckAim = 0, neckOffset = null, climb = null, skin = true, mirror = null, run = null, hold = null, motion = null, aim = null } = {}) {
+  time = 0, accumRoot = null, neckPitch = 0, neckAim = 0, neckOffset = null, climb = null, skin = true, mirror = null, run = null, motion = null, aim = null } = {}) {
   const { fns, skeleton, pieces } = assembly;
   if (!fns || !skeleton) return assembly;
   // MIRROR-BIND: an arm mirrored across the picture is mirrored by the binds of the skins it wears (mirrorBindsOf)
@@ -2815,8 +2815,8 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // chest while the clip has the arms
   assembly.aimFit = aim ? aim(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   // BODY-MOTION (characters/bodyMotion/bodyMotion.js, the third-person body's): the gait, the carry and a blow's body
-  // solved over the clip's pose - after the mirror (a pair's arm is the layer's to place) and UNDER the run, the climb,
-  // the seat and the long gun's hold, which still win the bones they ask for
+  // solved over the clip's pose - after the mirror (a pair's arm is the layer's to place) and UNDER the run, the climb
+  // and the seat, which still win the bones they ask for
   assembly.motionFit = motion ? motion(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   // TWO-HANDS AUDIT: the running hands' reach (combat/fpArm.js firstRun), by the climb's own solver and UNDER the
   // climb's request - each at its own weight: the climb eases every wrist on from where the run put it, so the two
@@ -2825,9 +2825,6 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // CLIMB6: the climb's pose over the clip's - the hands on the stone, the feet on the wall - solved on THIS skeleton's
   // own bones (combat/climbRig.js) in the same graph space, before any piece is placed on it
   assembly.climbFit = climb ? applyClimbRig(skeleton, pose, GRAPH_ROOT, fns.skelMats, climb) : null;
-  // RIFLE-STANCE: a held long gun's hands (combat/gun/rifleStance.js applyRifleStance) - `hold` solves them on THIS frame's
-  // body, after the clip and the climb's slot (never both: a gun is not held on the stone or a seat), before any piece
-  assembly.holdFit = hold ? hold(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   const mats = fns.skelMats(skeleton, pose, GRAPH_ROOT);
   // MWNPC1: `skin: false` - THE GPU SKIN'S POSE. The skeleton is posed and
   // its matrices kept exactly as below, and the pieces are NOT: the vertex

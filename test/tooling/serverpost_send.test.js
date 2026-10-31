@@ -18,7 +18,7 @@ import { seatRealm } from '../realmSeat.mjs';
 import { portalStones, isPortalStone } from '../../src/systems/gate/gateSpoils.js';
 import { postBoxOf } from '../../server-account/src/post.js';
 import { POST_SENDER, POST_BODY_MAX, POST_SUBJECT_MAX } from '../../src/net/postLaw.js';
-import { mintHourlock, mintGilded, HOURLOCK_GUN_ERA, validGildedMarks } from '../../src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 
 const ROOT = new URL('../../', import.meta.url);
 const src = (p) => readFileSync(new URL(p, ROOT), 'utf8');
@@ -38,15 +38,15 @@ test('SERVER-POST the tool: names a handle\'s shape, none twice, folded; a send\
   assert.throws(() => postWords({ subject: 'x'.repeat(POST_SUBJECT_MAX + 1), body: 'x' }), /not a subject/);
   assert.throws(() => postWords({ subject: 'x', body: 'x'.repeat(POST_BODY_MAX + 1) }), /not a message/);
   assert.throws(() => postWords({ subject: 'x', body: 'bell\u0007' }), /control character/);
-  assert.deepEqual(Object.keys(POST_ITEMS), ['none', 'hourlock']);
+  assert.deepEqual(Object.keys(POST_ITEMS), ['none']);
   assert.equal(postItem('none'), null);
-  assert.deepEqual(JSON.parse(postItem('hourlock')), mintHourlock(), 'the Hourlock as its drop mints it');
+  assert.throws(() => postItem('hourlock'), /not an item/, 'the Hourlock left the game with the guns: nothing mints it');
   assert.throws(() => postItem('{"templateIndex":560}'), /not an item/);
   assert.equal(sqlText("Hour's First"), "'Hour''s First'");
 
   assert.equal(execFileSync(process.execPath, [TOOL, '--names', 'Duck,Terra'], { encoding: 'utf8' }), 'duck\nterra\n');
   assert.equal(execFileSync(process.execPath, [TOOL, '--look', 'Duck', 'b-one'], { encoding: 'utf8' }), `${lookSql('Duck', 'b-one')}\n`);
-  assert.equal(execFileSync(process.execPath, [TOOL, '--sql', 'Duck', 'b-one', 'hourlock', 'Hi', 'A gift'], { encoding: 'utf8' }), `${sendSql({ handles: 'Duck', batch: 'b-one', item: 'hourlock', subject: 'Hi', body: 'A gift' })}\n`);
+  assert.equal(execFileSync(process.execPath, [TOOL, '--sql', 'Duck', 'b-one', 'none', 'Hi', 'A gift'], { encoding: 'utf8' }), `${sendSql({ handles: 'Duck', batch: 'b-one', item: 'none', subject: 'Hi', body: 'A gift' })}\n`);
   assert.equal(execFileSync(process.execPath, [TOOL, '--migration', 'hours-first'], { encoding: 'utf8' }), `${hoursFirstSql()}\n`);
   for (const args of [['--sql', 'Duck', 'b-one', 'sword', 'Hi', 'x'], ['--sql', "x'; --", 'b-one', 'none', 'Hi', 'x'], ['--look', 'Duck'], ['--migration', 'nobody'], []]) {
     const r = spawnSync(process.execPath, [TOOL, ...args], { encoding: 'utf8' });
@@ -58,7 +58,9 @@ test('SERVER-POST the tool: names a handle\'s shape, none twice, folded; a send\
 test('SERVER-POST the send, over the real schema: one piece to each registered account the names find - never a guest, never another; the words and the item as the tool made them; RETURNING names what it wrote; the same send again writes nothing, another send is another piece; the dry run reads who holds it; a quote in the words is words (mutants: the send not once a name; a guest sent post; the item\'s record changed)', () => {
   const db = d1();
   player(db, 'p-duck', 'Duck'); player(db, 'p-terra', 'Terra'); player(db, 'p-other', 'Other'); player(db, 'p-guest', null);
-  const o = { handles: 'duck, TERRA, Nobody', batch: 'gift-one', item: 'hourlock', subject: "Hour's First", body: "It's yours.\\nClaim it." };
+  // POST_ITEMS names no item now, so the send carries a record the way a frozen send does (sendSql's `record`)
+  const oathRecord = JSON.stringify(mintGilded(DRAGONFIRE_OATH));
+  const o = { handles: 'duck, TERRA, Nobody', batch: 'gift-one', item: 'none', record: oathRecord, subject: "Hour's First", body: "It's yours.\\nClaim it." };
   const wrote = rows(db, sendSql(o));
   assert.deepEqual(wrote.map((r) => r.to_id).sort(), ['p-duck', 'p-terra'], 'the names found, no other');
   const kept = rows(db, 'SELECT * FROM server_post ORDER BY to_id');
@@ -66,12 +68,12 @@ test('SERVER-POST the send, over the real schema: one piece to each registered a
   for (const k of kept) {
     assert.match(k.id, /^[0-9a-f]{24}$/);
     assert.deepEqual([k.batch, k.sender, k.subject, k.body, k.read_at, k.claimed_at], ['gift-one', POST_SENDER, "Hour's First", "It's yours.\nClaim it.", null, null]);
-    assert.deepEqual(JSON.parse(k.item), mintHourlock());
+    assert.deepEqual(JSON.parse(k.item), mintGilded(DRAGONFIRE_OATH));
     assert.ok(Math.abs(k.sent_at - Date.now() / 1000) < 60, 'the database\'s own clock');
   }
   assert.notEqual(kept[0].id, kept[1].id);
   assert.deepEqual(rows(db, sendSql(o)), [], 'the same send twice sends once');
-  assert.equal(rows(db, sendSql({ ...o, batch: 'gift-two', item: 'none' })).length, 2, 'another send is another piece');
+  assert.equal(rows(db, sendSql({ ...o, batch: 'gift-two', item: 'none', record: null })).length, 2, 'another send is another piece');
   assert.equal(rows(db, "SELECT item FROM server_post WHERE batch = 'gift-two'")[0].item, null, 'a message alone');
   assert.deepEqual(rows(db, lookSql('Duck,Terra,Other,Nobody', 'gift-one')), [
     { handle: 'Duck', handle_lc: 'duck', sent: 1 }, { handle: 'Other', handle_lc: 'other', sent: 0 }, { handle: 'Terra', handle_lc: 'terra', sent: 1 },
@@ -79,7 +81,7 @@ test('SERVER-POST the send, over the real schema: one piece to each registered a
   assert.equal(rows(db, "SELECT COUNT(*) AS n FROM server_post WHERE to_id = 'p-guest'")[0].n, 0, 'never a guest');
 });
 
-test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to the thirteen, holding the Hourlock - its names and its record FROZEN in the tool (an applied migration never runs again), every one of them holding the title, the record the mint\'s own; applied over the live accounts it sends each of the thirteen one piece and no one else, the box shows the gift by name, and applied again it sends nothing (mutants: a name missing from the send; the gun swapped; the send not once)', async () => {
+test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to the thirteen, holding the Hourlock - its names and its record FROZEN in the tool (an applied migration never runs again), every one of them holding the title; applied over the live accounts it sends each of the thirteen one piece and no one else, the box lists it as words alone (its Hourlock left the game with the guns), and applied again it sends nothing (mutants: a name missing from the send; the record swapped; the send not once)', async () => {
   const mig = src('server-account/migrations/0094_hours_first_post.sql');
   const statement = mig.split('\n').filter((l) => !l.startsWith('--')).join('\n').trim();
   assert.equal(statement, hoursFirstSql(), 'the tool\'s statement, as it prints it');
@@ -87,10 +89,10 @@ test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to t
   assert.equal(first.length, 13);
   assert.deepEqual(first, HOURS_FIRST.handles.split(',').map((h) => h.toLowerCase()), 'thirteen names, each a handle');
   const titled = new Set(postHandles(hoursFirstHandles()));
-  assert.ok(first.every((h) => titled.has(h)), 'every one sent the gun holds the title (HOURS_FIRST_HANDLES) - a name added there later is sent the gun by the workflow');
-  // PIN MOVED (GUNS-UNFOUND): the Hourlock is a bow now - the thirteen's gun is its gun era's mint, lawful still
-  assert.deepEqual(JSON.parse(HOURS_FIRST_RECORD), mintGilded(HOURLOCK_GUN_ERA), 'the frozen record is the gun era\'s mint - a change to it makes every unclaimed gift a forgery');
-  assert.ok(validGildedMarks(JSON.parse(HOURS_FIRST_RECORD)), 'and an unclaimed gift stays lawful');
+  assert.ok(first.every((h) => titled.has(h)), 'every one sent the gift holds the title (HOURS_FIRST_HANDLES) - the workflow sends no item now');
+  // The Hourlock left the game with the guns: its record is no longer minted or lawful (a claim drops it), but the
+  // frozen record must stay the migration's own text, since an applied migration never changes
+  assert.ok(statement.includes(sqlText(HOURS_FIRST_RECORD)), 'the frozen record is the migration\'s');
   assert.equal(HOURS_FIRST.item, 'hourlock');
   assert.equal(HOURS_FIRST.subject, "Hour's First");
   assert.ok(HOURS_FIRST.body.length <= POST_BODY_MAX);
@@ -105,9 +107,11 @@ test('HOURS-FIRST THE FIRST SEND, migration 0094: the tool\'s own statement to t
   assert.equal(pieces.length, 13, 'one each');
   assert.deepEqual(new Set(pieces.map((p) => p.to_id)), new Set(thirteen.map((t) => t.id)));
   assert.ok(pieces.every((p) => p.batch === 'hours-first-hourlock'));
-  assert.ok(pieces.every((p) => JSON.stringify(JSON.parse(p.item)) === JSON.stringify(mintGilded(HOURLOCK_GUN_ERA))), 'the gilded gun, as its drop minted it then (PIN MOVED, GUNS-UNFOUND: its gun era)');
+  assert.ok(pieces.every((p) => p.item === HOURS_FIRST_RECORD), 'the frozen record, as the migration wrote it');
   const box = await postBoxOf({ db: svc.env.DB }, { id: thirteen[0].id });
-  assert.deepEqual([box.post.length, box.post[0].subject, box.post[0].item, box.unread, box.unclaimed], [1, "Hour's First", { name: 'The Hourlock', rarity: 'gilded' }, 1, 1]);
+  // PIN MOVED (guns removed): the Hourlock's template (560) left the game, so the box reads the piece as words alone
+  // (server-account/src/post.js recordOf) - nothing to claim, and the piece may be thrown away
+  assert.deepEqual([box.post.length, box.post[0].subject, box.post[0].item, box.unread, box.unclaimed], [1, "Hour's First", null, 1, 0]);
   assert.equal((await postBoxOf({ db: svc.env.DB }, { id: other.id })).post.length, 0, 'no one else');
   svc.env.DB._raw.exec(mig);
   assert.equal(rows(svc.env.DB, 'SELECT COUNT(*) AS n FROM server_post')[0].n, 13, 'applied again, nothing more');
@@ -168,7 +172,7 @@ test('SERVER-POST the workflow: run by hand only, a dry run unless asked, its in
   assert.match(on, /^ {2}workflow_dispatch:/);
   assert.doesNotMatch(on, /push:|pull_request|schedule:/);
   assert.match(on, /\n {6}apply:\n(?: {8}.*\n)*? {8}default: false\n/, 'a dry run unless asked');
-  assert.match(on, /\n {6}item:\n(?: {8}.*\n)*? {8}type: choice\n {8}options:\n {10}- none\n {10}- hourlock\n/, 'the tool\'s names, and only those');
+  assert.match(on, /\n {6}item:\n(?: {8}.*\n)*? {8}type: choice\n {8}options:\n {10}- none\n(?! {10}- )/, 'the tool\'s names, and only those');
   assert.equal(wf.match(/\$\{\{ inputs\./g)?.length, 6, 'the six inputs, each read once');
   assert.match(wf, /\n {6}HANDLES: \$\{\{ inputs\.handles \}\}\n {6}BATCH: \$\{\{ inputs\.batch \}\}\n {6}ITEM: \$\{\{ inputs\.item \}\}\n {6}SUBJECT: \$\{\{ inputs\.subject \}\}\n {6}MESSAGE: \$\{\{ inputs\.message \}\}\n {6}APPLY: \$\{\{ inputs\.apply \}\}\n/);
   assert.match(wf, /\nconcurrency:\n {2}group: server-post\n {2}cancel-in-progress: false\n/);
@@ -176,7 +180,7 @@ test('SERVER-POST the workflow: run by hand only, a dry run unless asked, its in
   assert.doesNotMatch(wf, /d1 create|migrations apply|wrangler deploy|--file/, 'it creates, migrates and deploys nothing');
   assert.equal(wf.match(/if: env\.APPLY == 'true'\n/g)?.length, 1);
   assert.match(wf, /- name: Send the post\n {8}if: env\.APPLY == 'true'\n/);
-  assert.deepEqual(Object.keys(POST_ITEMS), ['none', 'hourlock'], 'the choice list is the tool\'s');
+  assert.deepEqual(Object.keys(POST_ITEMS), ['none'], 'the choice list is the tool\'s');
 
   const dir = mkdtempSync(join(tmpdir(), 'serverpost-'));
   const fake = join(dir, 'wrangler');
@@ -184,7 +188,7 @@ test('SERVER-POST the workflow: run by hand only, a dry run unless asked, its in
   writeFileSync(fake, '#!/usr/bin/env bash\ncase "$*" in *"--remote --json"*) ;; *) echo "not remote json" >&2; exit 9;; esac\ncase "$*" in *"INSERT OR IGNORE"*) cat "$FAKE_DIR/send.json";; *) cat "$FAKE_DIR/look.json";; esac\n');
   chmodSync(fake, 0o755);
   const d1Answer = (r) => JSON.stringify([{ results: r, success: true, meta: {} }]);
-  const run = (step, { handles = 'Duck,Terra', batch = 'gift-one', item = 'hourlock', subject = "Hour's First", message = 'For you.', apply = 'false', look = [], send = [] } = {}) => {
+  const run = (step, { handles = 'Duck,Terra', batch = 'gift-one', item = 'none', subject = "Hour's First", message = 'For you.', apply = 'false', look = [], send = [] } = {}) => {
     writeFileSync(join(dir, 'look.json'), d1Answer(look));
     writeFileSync(join(dir, 'send.json'), d1Answer(send));
     const summary = join(dir, `summary-${Math.random()}`);
@@ -202,7 +206,7 @@ test('SERVER-POST the workflow: run by hand only, a dry run unless asked, its in
   assert.equal(r.status, 0, r.stderr);
   assert.equal(readFileSync(join(dir, 'names.txt'), 'utf8'), 'duck\nterra\n');
   assert.equal(readFileSync(join(dir, 'look.sql'), 'utf8'), `${lookSql('Duck,Terra', 'gift-one')}\n`);
-  assert.equal(readFileSync(join(dir, 'send.sql'), 'utf8'), `${sendSql({ handles: 'Duck,Terra', batch: 'gift-one', item: 'hourlock', subject: "Hour's First", body: 'For you.' })}\n`);
+  assert.equal(readFileSync(join(dir, 'send.sql'), 'utf8'), `${sendSql({ handles: 'Duck,Terra', batch: 'gift-one', item: 'none', subject: "Hour's First", body: 'For you.' })}\n`);
   assert.deepEqual(JSON.parse(readFileSync(join(dir, 'words.json'), 'utf8')), { subject: "Hour's First", body: 'For you.' }, 'the words as they will be sent');
   for (const bad of [{ item: 'sword' }, { handles: '$(touch pwned)' }, { batch: 'Not A Name' }, { subject: '' }]) {
     assert.notEqual(run('Write the statements', bad).status, 0, `a bad input stops the run before the database is asked: ${JSON.stringify(bad)}`);
@@ -212,7 +216,7 @@ test('SERVER-POST the workflow: run by hand only, a dry run unless asked, its in
   const found = [{ handle: 'Duck', handle_lc: 'duck', sent: 0 }, { handle: 'Terra', handle_lc: 'terra', sent: 1 }];
   r = run('Read the recipients', { look: found });
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.summary, /^Send \*\*gift-one\*\*, holding: hourlock\n\nSubject: Hour's First\n\n````text\nFor you\.\n````\n/, 'the send, and its words as they will be sent, in a block of their own');
+  assert.match(r.summary, /^Send \*\*gift-one\*\*, holding: none\n\nSubject: Hour's First\n\n````text\nFor you\.\n````\n/, 'the send, and its words as they will be sent, in a block of their own');
   assert.match(r.summary, /\| Duck \|  \|/);
   assert.match(r.summary, /\| Terra \| yes \|/);
   assert.match(r.summary, /A dry run: nothing was sent/);

@@ -10,8 +10,7 @@
 //   R3-3  any page had a private empty layer on demand (`?ly=`), and a layer stood its own serpent and raid ledger
 //   R3-8  a team parked in a layer was never dropped from it
 //   R3-9  the hub's wipe of a zone hall reached the place alone
-//   R3-3 (c) the law made one - a layer holds no event state: a layer stood its own rite, its own overworld ledger and
-//         its own card tables, their stakes spent where the place never heard of them
+//   R3-3 (c) the law made one - a layer holds no event state: a layer stood its own rite and its own overworld ledger
 //   D-8   the batches' numbers the record states (POSE_BATCH_MS, ROSTER_BATCH_MS) had no pin
 // tools/mutants/auditscale2_relay.json.
 import { test } from 'node:test';
@@ -33,12 +32,6 @@ import * as SL from '../../src/net/serpent/serpentLaw.js';
 import { raidDaySlots, raidLedgerId, RAID_DAY_MINUTES } from '../../src/net/raid/raidLaw.js';
 import * as wire from '../../src/net/wire.js';
 import { webcrypto } from 'node:crypto';
-import { mintStakeOrder, mintDeckOrder, deckDigest } from '../../src/net/identityToken.js';
-import { readCardReceipt } from '../../src/net/card/cardReceipt.js';
-import { HOLDEM_REFUSALS } from '../../src/ui/card/cardTableHud.js';
-import { SIT_REFUSALS } from '../../src/systems/card/cardRemoteTable.js';
-import { ILIAC_ONLINE_REFUSALS } from '../../src/scenes/iliacTableGame.js';
-import { STARTER_DECK } from '../../src/net/iliac/iliacCards.js';
 import { BAND_LIFE_MS } from '../../src/systems/travel/travelBands.js';
 import { riteNativeOf, RITE_UNITS_PER_M } from '../../src/net/gate/gateRite.js';
 import { gateTimes } from '../../src/net/gate/gateLaw.js';
@@ -449,66 +442,6 @@ test('AUDIT SCALE II R3-3 (c) a layer stands no circle and keeps no overworld le
     const a = L0.connect(); await L0.hello(a, 'peer-0001', ON);
     await L0.raw(a, spent);
     assert.deepEqual(L0.store.get(wire.OW_LEDGER_KEY)?.sp?.map((e) => e[0]), [band], 'the place\'s ledger');
-  });
-});
-
-test('AUDIT SCALE II R3-3 (c) a layer deals no cards and spends no stake: a sit there - staked, for chips, ranked or not - and a top-up are refused before anything is spent, in the client\'s own words; a void there is spent by the place, once for every layer, its receipt handed over in the layer and owed in both; what a layer owes it keeps telling (mutants: a layer\'s staked sit; its chips sit; its top-up; its Iliac sit; its void spent in the layer; the place\'s spend unremembered)', async () => {
-  const { subtle } = webcrypto;
-  const gateKey = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']).then(async (kp) => Buffer.from(await subtle.exportKey('pkcs8', kp.privateKey)).toString('base64'));
-  const ROOM = 'interior:m100.200';
-  await onClock(1e12, async ({ tick, now }) => {
-    const W = fakeRooms();
-    const P = W.room(ROOM), L = W.room(layerName(ROOM, 2));
-    P.env.GATE_SIGNING_KEY = L.env.GATE_SIGNING_KEY = gateKey;
-    const a = L.connect(); a.att.key = ROOM; a.att.ly = 2; await L.hello(a, 'peer-a', null, { name: 'peer-a' });
-    P.env.IDENTITY_PUBLIC_KEY = L.env.IDENTITY_PUBLIC_KEY;   // one service key, as every object of the deploy holds it
-    const kp = await L.signer(), nowS = () => Math.floor(now() / 1000);
-    let n = 0;
-    const order = async (o = {}) => { const cj = (0xb0000000 + ++n).toString(16).padEnd(20, '0'); return { cj, stake: await mintStakeOrder({ s: 'acct-peer-a', cj, cr: ROOM, ct: 1, ca: 500, cb: 10, ...o }, kp.privateKey, { subtle, nowS: nowS() }) }; };
-    const holdem = (o) => { tick(300); return L.raw(a, JSON.stringify({ t: 'holdem', ...o })); };
-    const said = (t) => a.sent.filter((m) => m.t === t);
-    const receipts = () => said('holdem').filter((m) => m.cashout).map((m) => readCardReceipt(m.cashout)).map((x) => [x.j, x.r, x.w]);
-    const spentIn = (R) => [...R.store.keys()].filter((k) => k.startsWith('cstake:')).sort();
-    // a staked sit, a chips sit and a top-up: refused, nothing spent, no table
-    const oa = await order();
-    await holdem({ op: 'sit', table: 1, chair: 0, chairs: 2, bb: 10, stake: oa.stake });
-    assert.equal(said('holdem').at(-1).error, 'stakes closed');
-    await holdem({ op: 'sit', table: 0, chair: 0, chairs: 2, bb: 10 });
-    assert.equal(said('holdem').at(-1).error, 'bad table');
-    await holdem({ op: 'topup', table: 1, stake: oa.stake });
-    assert.equal(said('holdem').at(-1).error, 'stakes closed');
-    for (const w of ['stakes closed', 'bad table']) { assert.ok(HOLDEM_REFUSALS[w], `${w}: in the client's words`); assert.ok(SIT_REFUSALS.includes(w), `${w}: a chair the client lets go`); }
-    assert.equal((await L.room._holdemOf()).size, 0, 'no table in the layer');
-    assert.deepEqual([spentIn(L), spentIn(P), receipts()], [[], [], []], 'no order spent anywhere');
-    // Iliac: a ranked sit and a friendly one
-    const deck = [...STARTER_DECK];
-    const dorder = await mintDeckOrder({ s: 'acct-peer-a', dh: await deckDigest(deck, { subtle }) }, kp.privateKey, { subtle, nowS: nowS() });
-    tick(300); await L.raw(a, JSON.stringify({ t: 'iliac', op: 'sit', table: 2, chair: 0, chairs: 2, deck, order: dorder }));
-    assert.equal(said('iliac').at(-1).error, 'ranked closed');
-    tick(300); await L.raw(a, JSON.stringify({ t: 'iliac', op: 'sit', table: 2, chair: 0, chairs: 2, deck }));
-    assert.equal(said('iliac').at(-1).error, 'busy');
-    for (const w of ['ranked closed', 'busy']) assert.ok(ILIAC_ONLINE_REFUSALS[w], `${w}: in the client's words`);
-    assert.equal((await L.room._iliacOf()).size, 0, 'no Iliac table in the layer');
-    // the stake the service holds for that refused sit comes home: the device voids it, and the place spends it
-    await holdem({ op: 'void', table: 1, stake: oa.stake });
-    assert.deepEqual(receipts(), [[oa.cj, 500, 'void']], 'the whole stake back, handed over in the layer');
-    assert.deepEqual([spentIn(L), spentIn(P)], [[], [`cstake:${oa.cj}`]], 'spent by the place, never the layer');
-    assert.equal(P.store.get('cashout:acct-peer-a')?.length, 1, 'owed by the place');
-    assert.equal(L.store.get('cashout:acct-peer-a')?.length, 1, 'and by the layer that handed it over');
-    await holdem({ op: 'void', table: 1, stake: oa.stake });
-    assert.equal(said('holdem').at(-1).error, 'stake spent', 'voided once, for every layer');
-    // an order the place already spent (a seat there) is never handed back by a layer
-    const ob = await order();
-    P.store.set(`cstake:${ob.cj}`, nowS());
-    await holdem({ op: 'void', table: 1, stake: ob.stake });
-    assert.equal(said('holdem').at(-1).error, 'stake spent');
-    assert.equal(receipts().length, 1, 'no second receipt');
-    // what the layer owes, it keeps telling at a look - as any room does
-    const before = receipts().length;
-    await holdem({ op: 'look', table: 1 });
-    assert.equal(receipts().length, before + 1, 'told again at a look in the layer');
-    await holdem({ op: 'ack', table: 1, j: oa.cj });
-    assert.equal(L.store.has('cashout:acct-peer-a'), false, 'and kept until the device holds it');
   });
 });
 

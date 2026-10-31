@@ -58,11 +58,6 @@ export const validRepairData = (r) => !!r && typeof r === 'object' && !Array.isA
   && (typeof r.buildingKey === 'string' || Number.isInteger(r.buildingKey))   // INT1: the shop's key as makeBuildingKey mints it - a number
   && Number.isInteger(r.timeStarted) && Number.isInteger(r.repairTime);
 
-/** CARDS8: a Card Binder's deck (systems/iliac/iliacItems.js) - a name and the catalog ids of its cards, a deck's worth. */
-export const BINDER_DECK_NAME_MAX = 40;
-export const validBinderDeck = (d) => !!d && typeof d === 'object' && !Array.isArray(d)
-  && typeof d.name === 'string' && d.name.length <= BINDER_DECK_NAME_MAX && Array.isArray(d.cards) && d.cards.length <= 40
-  && d.cards.every((c) => typeof c === 'string' && c.length > 0 && c.length <= 40);
 
 /** The declared fields, by name. Frozen: a new field is a new line here, not a reader's private knowledge. */
 export const ITEM_FIELDS = Object.freeze({
@@ -116,7 +111,7 @@ export const ITEM_FIELDS = Object.freeze({
   rarity: oneOf(RARITY_ORDER),
   legendary: str(),
   aetheric: str(),   // SET6: an Aetheric piece's record (systems/aetheric.js) - Ruhn's Regalia
-  gilded: str(),   // GILDED1: a Gilded piece's record (systems/gilded.js) - the Hourlock
+  gilded: str(),   // GILDED1: a Gilded piece's record (systems/gilded.js)
   affixes: list(validAffix),
   qlNamed: bool(),   // AUDIT QUESTLINES REWARD-5: a questline's named piece - its name stands without a metal before it (itemInfo.js withholdsMaterialPrefix)
   exalted: bool(),   // LOOT2 (bible/06-Systems/Loot-Arc.md section 4): a Legendary minted Exalted - one line more, true or absent
@@ -148,9 +143,6 @@ export const ITEM_FIELDS = Object.freeze({
   kitMetal: int({ min: 0, max: 9 }),
   // REPAIR-EASE: a Field Repair Kit (systems/smithItems.js) - found in loot, mends any metal; true, or absent
   fieldKit: bool(),
-  // CARDS8 (bible/11-Multiplayer/Tavern-Cards.md section 26): a card's catalog id (net/iliac/iliacCards.js); a Card Binder's decks
-  card: str(),
-  decks: list(validBinderDeck),
   // AUDIT 31 H3: the recipe a crafted piece was minted of (recipeLaw's id) - an Ebony and a Warforged piece share their
   // template and material, so a commission's picker reads this before any look-alike
   recipe: str(),

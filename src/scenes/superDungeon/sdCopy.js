@@ -1,8 +1,8 @@
 // @ts-check
 // SD-PARTY (2026-10-28, the owner: "we need to make this a party instance ... to stop griefin on the bosses";
 // bible/11-Multiplayer/Super-Dungeons.md SD-PARTY): WHICH PARTY'S HOUR THE RIFT TAKES ME TO. Each party has its own
-// Shattered Hour, `sd:<s>.<owner>` (net/superDungeon/sdLaw.js sdRoomKey), the owner its leader's account digest - the
-// Ketch's crew law (scenes/ketch/ketchClient.js ketchShipChoice). The copy I went into is kept on the device, so a reload
+// Shattered Hour, `sd:<s>.<owner>` (net/superDungeon/sdLaw.js sdRoomKey), the owner its leader's account digest
+// (net/instanceRoom.js instanceOwnerOf). The copy I went into is kept on the device, so a reload
 // or a new leader keeps me in it while its owner is me or still in my party. SD-SOLO: in no party, the relay's walk
 // (server/src/sdCopy.js sdOpenDoor) finds the shared Hour that holds me or has a seat; none answering, my own.
 import { instanceOwnerOf } from '../../net/instanceRoom.js';

@@ -424,7 +424,7 @@ test('SD11c THE INSPECT CARD SAYS THE TOWNS, THE SERPENTS AND THE HOURS (L5 F1):
   // the world host's card, from its own text
   const env = {
     profileRenown, online: null, _profileSub: 'acct-x', duelRecords: { get: () => rec }, duelButtonFor: () => null, wedButtonFor: () => null,
-    profileDuelLine, profileRecordLines,   // PIN MOVED (KETCH): the host lays the record's lines through profileRecordLines (ui/profileWindow.js), the voyages beside them
+    profileDuelLine, profileRecordLines,   // the host lays the record's lines through profileRecordLines (ui/profileWindow.js)
   };
   const withDuel = new Function(...Object.keys(env), `let _profileView = null;\n${constOf('withDuel')}\nreturn withDuel;`)(...Object.values(env));
   const v = withDuel('peer-x', profileView({ name: 'Ann', state: 'answered' }));
@@ -483,7 +483,7 @@ test('SD11c THE SPENT WORD IS OWED UNTIL IT GOES (L5 F4): a spend whose word cou
   const calls = [];
   const env = {
     performance: { now: () => t }, SPOILS_SPENT_RESEND_MS, socialLink: () => ({ status }),
-    spoilsPool: { resendSpent: () => calls.push('gate') }, sdSpoilsPool: { resendSpent: () => calls.push('sd') }, ketch: { spoils: { resendSpent: () => calls.push('kt') } },
+    spoilsPool: { resendSpent: () => calls.push('gate') }, sdSpoilsPool: { resendSpent: () => calls.push('sd') },
   };
   const resend = new Function(...Object.keys(env), `let _spentResendAt = -Infinity;\n${constOf('resendSpentWords')}\nreturn resendSpentWords;`)(...Object.values(env));
   resend();
@@ -492,11 +492,11 @@ test('SD11c THE SPENT WORD IS OWED UNTIL IT GOES (L5 F4): a spend whose word cou
   t = 4999; resend();
   assert.deepEqual(calls, [], 'inside the throttle');
   t = 5000; resend(); resend();
-  assert.deepEqual(calls, ['gate', 'sd', 'kt'], 'every pool, once');   // PIN MOVED (AUDIT KETCH II L3-6): and the Ketchmaster's hold's
+  assert.deepEqual(calls, ['gate', 'sd'], 'every pool, once');
   t = 9999; resend();
-  assert.deepEqual(calls.length, 3);
+  assert.deepEqual(calls.length, 2);
   t = 10_000; resend();
-  assert.equal(calls.length, 6);
+  assert.equal(calls.length, 4);
   const w = strip(W);
   assert.match(w, /onSpent: \(day\) => socialLink\(\)\?\.sendGateSpent\?\.\(day\) === true,\s*\n\s*me: _accountGates\.me,/);
   assert.match(w, /onSpent: \(day\) => \{ const s = sdSpoilsSlot\(day\); return s == null \|\| socialLink\(\)\?\.sendSdSpent\?\.\(s\) === true; \},\s*\n\s*me: _accountGates\.me,/);

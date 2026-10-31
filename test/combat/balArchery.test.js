@@ -18,9 +18,6 @@ import { getItemHands, ITEM_HANDS } from '../../src/characters/equipTable.js';
 import { setValue } from '../../src/systems/settings/settings.js';
 import { weaponPastPct, weaponMasteryBlow, _resetWeaponMasteryForTests } from '../../src/systems/weaponMastery.js';
 import { SKILLS } from '../../src/systems/skills.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
-import { GUN_COOLDOWN_SECONDS, GUN_FEEL, PISTOLET_FEEL, thunderlockReloadSeconds } from '../../src/combat/gun/gunFeel.js';
-import { liveStat } from '../../src/systems/statMods.js';
 import { doItemEnchantmentPayloads, PAYLOAD, ENCHANTMENT_TYPES, POTENT_VS_DAMAGE } from '../../src/systems/enchantments.js';
 import { affixWeaponDamage } from '../../src/systems/loot/lootRarity.js';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
@@ -40,7 +37,6 @@ const player = (skill) => ({
 const daedric = (templateIndex) => ({ group: 'Weapons', templateIndex, material: WEAPON_MATERIALS.Daedric, flags: 0, maxCondition: 100, currentCondition: 100 });
 const bow = () => daedric(WEAPONS.Long_Bow);
 const blade = () => daedric(WEAPONS.Longsword);
-const gun = () => createThunderlock({ material: WEAPON_MATERIALS.Daedric });
 
 const mean = (attacker, target, weapon, swing) => {
   const n = weaponMaxDamage(weapon.templateIndex) - weaponMinDamage(weapon.templateIndex) + 1;
@@ -84,8 +80,6 @@ test('BAL-ARCHERY: both bows are +1 at each end, and nothing else in the span mo
   assert.deepEqual([weaponMinDamage(WEAPONS.Long_Bow), weaponMaxDamage(WEAPONS.Long_Bow)], [5, 19]);
   assert.deepEqual([weaponMinDamage(WEAPONS.Longsword), weaponMaxDamage(WEAPONS.Longsword)], [2, 16]);
   assert.deepEqual([weaponMinDamage(WEAPONS.Claymore), weaponMaxDamage(WEAPONS.Claymore)], [2, 18]);
-  assert.equal(weaponMinDamage(gun().templateIndex), 7);
-  assert.equal(weaponMaxDamage(gun().templateIndex), 26);
   assert.equal(RRI_WEAPON_MIN_DAMAGE[WEAPONS.Long_Bow], 5);
   assert.equal(RRI_WEAPON_MAX_DAMAGE[WEAPONS.Short_Bow], 17);
   assert.equal(RRI_WEAPON_MAX_DAMAGE[WEAPONS.Long_Bow], 19);
@@ -107,18 +101,14 @@ test('BAL-ARCHERY: a bow takes the two-handed strength term, in either hand; the
   }
   const stock = weaponAttackDamage(p, foe, 0, { ...bow(), material: 1 }, () => 0);
   assert.equal(stock, 5 + damageModifier(STR), 'overhaul off: every weapon, a bow included, adds strength once');
-  const tl = pcaaoWeaponAttackDamage(p, foe, 0, 0, { ...gun(), material: 1 }, () => 0, M);
-  assert.equal(tl, 7 + 4, 'the Thunderlock was already two-handed and is not doubled a second time');
 });
 
-test('BAL-ARCHERY: a shaft is 35% faster; a spell and a gun orb stay on MISSILE_SPEED; the bow clock is the one it was', () => {
+test('BAL-ARCHERY: a shaft is 35% faster; a spell stays on MISSILE_SPEED; the bow clock is the one it was', () => {
   assert.equal(MISSILE_SPEED, 25);
   assert.equal(ARROW_FLIGHT_SPEED, MISSILE_SPEED * 1.35);
   assert.equal(getBowCooldownTime(50), (10 * (100 - 50) + 800) / 980);
   assert.equal(getBowCooldownTime(SPD), (10 * (100 - SPD) + 800) / 980);
   assert.equal(CLASSIC_UPDATE_INTERVAL, 0.0625);
-  assert.equal(GUN_FEEL.reloadMs, 1700);
-  assert.equal(GUN_COOLDOWN_SECONDS, 1.7);
 });
 
 test('BAL-ARCHERY: mastery is +1% of the blow per effective point past 100, and never against a player', () => {
@@ -158,50 +148,16 @@ test('BAL-ARCHERY: a backstab, a damage affix and Potent Vs land on a bow the sa
   assert.equal(doItemEnchantmentPayloads(PAYLOAD.Strikes, { ...bow(), enchantments: [{ type: ENCHANTMENT_TYPES.PotentVs, param: 0 }] }, { target: foe, damage: 10 }), 10, 'a foe of another affinity takes none of it');
 });
 
-test('BAL-ARCHERY: a Thunderlock reloads from live Speed, and the pump already running keeps its span', () => {
-  const hundredths = (x) => Math.round(x * 100) / 100;
-  assert.deepEqual([50, 75, 100, 150].map((s) => hundredths(thunderlockReloadSeconds(s))), [1.7, 1.53, 1.36, 1.02]);
-  assert.equal(thunderlockReloadSeconds(200), 1);
-  assert.equal(thunderlockReloadSeconds(50), GUN_COOLDOWN_SECONDS);
-  assert.ok(thunderlockReloadSeconds(0) > GUN_COOLDOWN_SECONDS);
-  assert.equal(PISTOLET_FEEL.reloadMs, 1400);
-  const fortified = { stats: { speed: 50 }, activeEffects: [{ kind: 'fortifyAttribute', stat: 'speed', magnitude: 25 }] };
-  assert.equal(liveStat(fortified, 'speed'), 75);
-  const tuned = new PlayerWeapon({ weapon: gun(), liveSpeed: () => liveStat(fortified, 'speed') });
-  tuned.update(1 / 60);
-  assert.equal(hundredths(tuned.machine.cooldown), 1.53, 'the machine reads effective Speed');
-  const pw = new PlayerWeapon({ weapon: gun(), liveSpeed: 50 });
-  const dt = 1 / 60;
-  pw.update(dt);
-  let span = null;
-  for (let i = 0; i < 400 && span == null; i++) {
-    pw.gesture(0, 0, true, dt, 1000, { swingMode: 2, rolls: () => 0 });
-    if (pw.update(dt).includes('done')) span = pw.machine.cooldownUntil - pw.machine.now;
-  }
-  assert.equal(hundredths(span), 1.7);
-  const until = pw.machine.cooldownUntil;
-  pw.liveSpeed = 150;
-  pw.update(dt);
-  assert.equal(pw.machine.cooldownUntil, until, 'the pump and the fire gate share the span committed at the shot');
-  assert.equal(hundredths(pw.machine.cooldown), 1.02, 'the next shot takes the new Speed');
-  assert.equal(pw.gesture(0, 0, true, dt, 1000, { swingMode: 2, rolls: () => 0 }), null);
-  const bowPw = new PlayerWeapon({ weapon: bow(), liveSpeed: 150 });
-  bowPw.update(dt);
-  assert.equal(bowPw.machine.cooldown, null, 'a bow still cools by getBowCooldownTime');
-});
-
-test('BAL-ARCHERY: sustained damage of a Daedric Long Bow, a Daedric Longsword and a Daedric Thunderlock', () => {
+test('BAL-ARCHERY: sustained damage of a Daedric Long Bow and a Daedric Longsword', () => {
   const p = player(100);
-  const b = bow(), s = blade(), g = gun();
+  const b = bow(), s = blade();
   const bowHit = mean(p, foe, b, SWING_MODS.StrikeDown.damage);
   const bladeHit = mean(p, foe, s, clickSwing);
-  const gunHit = mean(p, foe, g, clickSwing);
   const beforeHit = meanBefore(p, b, SWING_MODS.StrikeDown.damage);
   const entity = { stats, equip: { slots: { [EQUIP_SLOTS.RightHand]: s } } };
   const animCtx = () => ({ entity, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true });
   const bowGap = hitGap(b, SPD);
   const bladeGap = hitGap(s, SPD, { animCtx });
-  const gunGap = hitGap(g, SPD);
   const heft = swingHeft(4.5, STR);
   const frame = swingFrameSeconds(SPD, { heft, handling: swingHandling(WEAPON_TYPES.LongBlade, false) });
   const plate = { group: 'Armor', templateIndex: 103, material: 0x209, maxCondition: 100, currentCondition: 100 };
@@ -211,10 +167,8 @@ test('BAL-ARCHERY: sustained damage of a Daedric Long Bow, a Daedric Longsword a
   assert.equal(bowHit, 26);
   assert.equal(beforeHit, 23);
   assert.equal(bladeHit, 17);
-  assert.equal(gunHit, 26.5);
   assert.equal(frames(bowGap), 96, 'seven bow ticks plus the cooldown, at 60 fps');
   assert.equal(frames(bladeGap), 55);
-  assert.equal(frames(gunGap), 124, 'seven gun frames plus Speed 70\'s reload');
   assert.equal(clickSwing, 0);
   assert.ok(Math.abs(bowGap - (7 * CLASSIC_UPDATE_INTERVAL + getBowCooldownTime(SPD))) < 0.05);
   assert.ok(Math.abs(bladeGap - 5 * frame) < 0.05, `blade gap ${bladeGap} frame ${frame}`);

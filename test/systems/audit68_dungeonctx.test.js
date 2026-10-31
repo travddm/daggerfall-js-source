@@ -326,8 +326,8 @@ function missileHarness(getTexture) {
   const state = {
     ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
     missiles: [], _pendingCasts: [], billboardBatches: [], dynamicDraws: [], freed: [],
-    flatAnims: { remove: () => {} }, getTexture, missileArchive: () => 375, ORB_RECORD: 0, uploadRecord: () => {},
-    noteOrbColour: () => {}, billboardSize: () => ({ w: 1, h: 1 }), ORB_SCALE: 1, centredBase: (p) => p, armFlatAnim: () => {}, MISSILE_FPS: 5,
+    flatAnims: { remove: () => {} }, getTexture, missileArchive: () => 375, uploadRecord: () => {},
+    billboardSize: () => ({ w: 1, h: 1 }), centredBase: (p) => p, armFlatAnim: () => {}, MISSILE_FPS: 5,
     flatAnimsFps: 0, uploadRecordFrame: () => {},
   };
   state.renderer = { createBillboardBatch: () => ({ id: 'late' }), destroyBillboardBatch: (b) => { state.freed.push(b); } };

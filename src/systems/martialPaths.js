@@ -41,7 +41,7 @@ const { LongBlade: LB, ShortBlade: SB, Axe: AX, BluntWeapon: BL, Archery: AR, Ha
 /** The six weapon skills, in the order the paths are tabled. */
 export const MARTIAL_SKILLS = Object.freeze([LB, SB, AX, BL, AR, HH]);
 /** A weapon skill's technique FAMILY - combat/technique/techniqueRoster.js TECHNIQUE_FAMILIES' words (pinned equal; that
- *  leaf reads the item tables, and this one must not). The Thunderlock is scored on Archery but is a gun: no path's. */
+ *  leaf reads the item tables, and this one must not). */
 export const MARTIAL_FAMILY = Object.freeze({ [LB]: 'longBlade', [SB]: 'shortBlade', [AX]: 'axe', [BL]: 'blunt', [AR]: 'archery', [HH]: 'handToHand' });
 
 /**

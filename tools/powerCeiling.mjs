@@ -7,7 +7,6 @@
 //   node tools/powerCeiling.mjs        the tops, the ceilings and the kit each top is reached with
 import { isMain } from './lib/isMain.mjs';
 import { AFFIX_RANGES, allLegendaries, powerOf } from '../src/systems/loot/lootRarity.js';
-import '../src/systems/thunderlock.js';   // registers The Last Lock, a Legendary record of its own
 import { GILDED_RECORDS } from '../src/systems/gilded.js';
 import { SIGIL_POWER_MAX, SIGIL_STAGES } from '../src/systems/sigil/sigil.js';
 import { SIGIL_SETS, tierValues, SET_STAGE_MAX, RAMPAGE_STACKS, BLOOD_STACKS, COIL_STACKS, UNBROKEN_LESS } from '../src/systems/sigil/sigilSets.js';
@@ -21,7 +20,6 @@ import { EFFECTIVE_SKILL_MAX, SKILL_SOFT_CAP } from '../src/systems/skillSoftcap
 import { MARTIAL_BLOW_MOST } from '../src/systems/martialPowers.js';
 import { MARTIAL_NUMBERS } from '../src/systems/martialPaths.js';
 import { PATH_NUMBERS } from '../src/systems/arcanePaths.js';
-import { WEAPON_HANDS } from '../src/characters/equipRules.js';
 
 /** The places a set is worn (sigilSets.js SET_PLACES: seven body pieces, the shield, one weapon). */
 export const SET_PLACE_COUNT = 9;
@@ -39,7 +37,6 @@ export const SET_TIER_BLOW = Object.freeze({
   'blood-for-blood': (v) => v.stack * BLOOD_STACKS,
   constrict: (v) => v.stack * COIL_STACKS,
   'tallow-ward': (v) => v.more,
-  'battlemages-discipline': (v) => v.armed,      // a foe that takes the cast's element whole
   'bound-in-silk': (v) => v.more,
   undertow: (v) => v.more,                       // the open sea
 });
@@ -61,9 +58,7 @@ export const POWER_BLOW = Object.freeze({
   rage: { pct: (p) => p.pct, moment: 'any' },
   execute: { pct: (p) => p.pct, moment: 'any' },
   firstblood: { pct: (p) => p.pct, moment: 'fresh' },
-  toll: { pct: (p) => p.pct, moment: 'any' },           // the third shot of the weapon, at any foe
   undertow: { pct: (p) => p.pct * p.max, moment: 'struck' },
-  broadside: { pct: (p) => p.pct, moment: 'struck' },   // the other hand's mark: the pistol's shot landed on this foe
 });
 /** A power's share off a hurt - lootPowers.js lootDamageMod. Dawnward and the Raven turn a blow aside whole (an
  *  avoidance), Bulwark takes points, Unyielding caps a hit by health: none is a share, all stand outside. */
@@ -121,24 +116,19 @@ function lootPowers() {
   for (const r of GILDED_RECORDS) weapons.push({ id: r.id, power: r.power, templates: [r.templateIndex], slayer: false });   // a static roll: no slayer line is ever added
   return { weapons, worn };
 }
-/** A weapon record a free hand can go with (any one of its templates held in one hand). */
-const oneHanded = (w) => !w.templates || w.templates.some((t) => WEAPON_HANDS[t] !== 'Both');
 
 /** THE LOOT'S TOP onto one blow: the best weapon power, every worn blow power and the best slayer line, at the moment
- *  that pays most - a foe's first blow (First Blood) or a foe already struck (the Undertow's stacks, Broadside's mark). */
+ *  that pays most - a foe's first blow (First Blood) or a foe already struck (the Undertow's stacks). */
 export function lootBlowTop() {
   const { weapons, worn } = lootPowers();
-  const marks = weapons.filter((w) => w.power.kind === 'broadside');
   const slayerTop = AFFIX_RANGES.slayer.legendary[1];   // an Exalted Legendary's line; a Rare's is lower
   const blowOf = (p, moment) => { const b = POWER_BLOW[p.kind]; return b && (b.moment === 'any' || b.moment === moment) ? b.pct(p) : 0; };
   let best = { pct: 0, kit: [] };
   for (const w of [{ id: 'no power', power: null, templates: null, slayer: true }, ...weapons]) {
-    if (w.power?.kind === 'broadside') continue;   // the mark is the other hand's
     for (const moment of ['fresh', 'struck']) {
       let pct = (w.power ? blowOf(w.power, moment) : 0) + (w.slayer ? slayerTop : 0);
       const kit = [w.id];
       for (const o of worn) { const n = blowOf(o.power, moment); if (n) { pct += n; kit.push(o.id); } }
-      if (moment === 'struck' && oneHanded(w)) for (const m of marks) { pct += blowOf(m.power, moment); kit.push(`${m.id} (other hand)`); }
       if (pct > best.pct) best = { pct, kit: [...kit, `slayer ${w.slayer ? slayerTop : 0}`, moment] };
     }
   }
@@ -192,10 +182,10 @@ export function measureGuardKeeps() {
  *  new one has to be measured before the walk passes it. */
 export const SET_TIER_OTHER = Object.freeze(['orc-hide', 'spite', 'ravager', 'shadows-grace', 'eventide', 'forbidden-lore', 'waters', 'eye',
   'burning-gate', 'cleave', 'watch-oath', 'keen-eyed', 'thick-skinned', 'iron-hide', 'sea-scale', 'shed-skin', 'dwemer-brass', 'hour-turns',
-  'battlemages-bearing', 'battlemages-reprieve', 'wyrd-sight', 'soul-harvest', 'spinners-thread', 'mephalas-veil', 'stormwrack', 'captains-due']);
+  'wyrd-sight', 'soul-harvest', 'spinners-thread', 'mephalas-veil', 'stormwrack', 'captains-due']);
 export const POWER_OTHER = Object.freeze(['chain', 'unyielding', 'dawnward', 'fortune', 'tribute', 'mastery', 'venom', 'quake', 'conduit', 'siphon',
   'echo', 'vigil', 'haste', 'fists', 'evade', 'bulwark', 'grace', 'regen', 'absorb', 'climate', 'school', 'longroad', 'bearing', 'hood',
-  'pierce', 'attune', 'surge', 'dragonfire', 'hammerfall']);
+  'pierce', 'attune', 'surge', 'dragonfire']);
 /** A number's role by its field's name; `kind.field` (a power's kind, a tier's key) where one name means two things. A
  *  `line:` role is a line's kind, held to the Legendary band's top; `id` names a thing, not an amount. */
 export const FIELD_ROLES = Object.freeze({

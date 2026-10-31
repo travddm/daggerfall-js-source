@@ -1,9 +1,8 @@
 // THE ARMOUR MORROWIND DOES NOT HAVE.
 //
 // MW-BRIG1 (2026-09-29, Mac: "This is for the morrowind model. The steel
-// brigantine"). The worn counterpart of ownWeaponModels.js, and a leaf
-// for the same reason that one is: mwItemMap.js asks it, and nothing it
-// imports may reach back.
+// brigantine"). A leaf: mwItemMap.js asks it, and nothing it imports may
+// reach back.
 //
 // A worn Daggerfall piece reaches the Morrowind body through the player's
 // own records - mwArmorRecords finds an ARMO by material and piece token,
@@ -18,8 +17,7 @@
 //
 // ═══ KEYED ON TEMPLATE AND MATERIAL ═══════════════════════════════
 //
-// The weapon table keys on the template alone because the Thunderlock has
-// no material ladder. Armour does: Roleplay & Realism Items' Jerkin is
+// Armour has a material ladder: Roleplay & Realism Items' Jerkin is
 // leather, fur or "Brigandine" by its material (rriItems.js lightWord -
 // Iron and up). Mac's model was the STEEL one (MW-BRIG1); since MW-BRIG4
 // every brigandine metal wears it in its own painting, and the leather

@@ -300,7 +300,7 @@ export const registerPlayerDamageMod = namedRegistry(_damageMods);
 export const registerPlayerDeathSave = namedRegistry(_deathSaves);
 export const registerPlayerHurtListener = namedRegistry(_hurtListeners);
 /** AUDIT WORLD-EVENTS L1-4 (RAISE BEFORE THE FALL): a HOLD on the player's body - `fn() -> boolean`, true while it lies down
- *  where it fell for a made level's raise (scenes/ketch/ketchClient.js): the motor held as paralysis holds it (the hosts'
+ *  where it fell for a made level's raise: the motor held as paralysis holds it (the hosts'
  *  paralysis gate ORs `playerHeld()`, as it does `staffFrozen()`). */
 const _holds = new Map();
 export const registerPlayerHold = namedRegistry(_holds);

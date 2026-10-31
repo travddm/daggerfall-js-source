@@ -36,8 +36,8 @@ import { withDom } from '../invdrag.mjs';
 import { rollGemFind } from '../../src/systems/gems.js';   // GEM2: the gem find, held off and put back
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-// PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's final find is the door's draw after every pass these laws
-// read - held off here (test/systems/pelletsscarce.test.js holds it the door's very last)
+// A final find is the door's draw after every pass these laws read - held off here (no find is registered final since
+// the Dwemer Pellet's went with the guns)
 const on = () => { _resetForTests(); setPref('lootRarity', true); LR._setSocketForTests(null); LR._setCurseForTests(Infinity); LR._holdFinalFindsForTests(true); };
 const off = () => { _resetForTests(); setPref('lootRarity', false); LR._setSocketForTests(null); LR._setCurseForTests(null); LR._holdFinalFindsForTests(false); };
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };

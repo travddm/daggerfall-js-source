@@ -15,7 +15,6 @@ import { Collider } from '../../src/player/collider.js';
 import { startShotTally, stopShotTally } from '../../src/systems/shotTally.js';
 import { spendAmmoFor, ARROW_TEMPLATE, ammoCountFor } from '../../src/systems/inventory.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { capLootList } from '../../src/systems/foeLootCap.js';
 import { stockShopShelf, shopArrowStack, shopAmmoStack, SHOP_ARROWS_MAX, SHOP_ITEM_GROUPS, endlessArrowsAt, GENERAL_STORE_ARROWS } from '../../src/systems/shopStock.js';
 import { BUILDING_TYPES as B } from '../../src/world/buildingNames.js';
@@ -83,7 +82,7 @@ test('STUCK-ARROWS: a shaft into the bare ground sticks where its step crossed t
   assert.deepEqual(groundEntry([0, -0.2, 0], [0, -0.5, 2], { heightAt: () => 0 }), [0, 0, 0], 'already under: where the step began');
 });
 
-test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo, a conjured round, the gun\'s pellet, a shaft on a bout\'s sand, and a host with no pool (mutants: each gate dropped)', () => {
+test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo, a conjured round, a shaft on a bout\'s sand, and a host with no pool (mutants: each gate dropped)', () => {
   const shoot = (meta, loot = pool()) => {
     const a = new ArrowFlight({ getGpuMesh: () => null, collider: walled(), loot });
     a.fire([0, 1.5, 0], [0, 0, 1], { muzzle: { world: [0, 1.5, 0] }, ...meta });
@@ -94,7 +93,6 @@ test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo,
   assert.equal(shoot({ enemy: true, weapon: BOW }), 0, 'an enemy\'s');
   assert.equal(shoot({ fromPlayer: true, visual: true, weapon: BOW }), 0, 'a peer\'s echo');
   assert.equal(shoot({ fromPlayer: true, summoned: true, weapon: BOW }), 0, 'a conjured round vanishes');
-  assert.equal(shoot({ fromPlayer: true, weapon: createThunderlock() }), 0, 'a pellet is spent');
   startShotTally([]);
   assert.equal(shoot({ fromPlayer: true, weapon: BOW }), 0, 'the sand keeps the LOST law - the healers pay it');
   stopShotTally();

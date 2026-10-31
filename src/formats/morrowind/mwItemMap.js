@@ -51,7 +51,6 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { WEAPONS, WEAPON_MATERIALS } from '../../characters/weapons.js';
-import { OWN_MW_MODELS } from '../../characters/ownModels/ownWeaponModels.js';   // FIELD-GUN-MW2: the weapons Morrowind does not have
 import { OWN_MW_ARMOR, ownArmorModelFor, ownArmorParts } from '../../characters/ownModels/ownArmorModels.js';   // MW-BRIG1: the armour Morrowind does not have; MW-STEEL1: and its styles
 import { CLOAK_NAMES, CLOAK_PAINTINGS, cloakModel, ownCloakFor, ownOutfitFor } from '../../characters/ownModels/ownClothingModels.js';   // MW-CLOAK1: and the clothing; MW-FOLK1: and the townsfolk's outfits
 import { t } from '../../systems/textManager.js';   // L10N4: MW-FOLK1's notes in the player's language
@@ -349,32 +348,12 @@ export function mwArmorRecords(armorRecords, templateIndex, material) {
 /**
  * THE TOTALITY ANSWER: one entry for every weapon template x weapon
  * material and every armor template x armor material. Each entry is
- * { kind:'mapped', ... }, { kind:'sprite', reason } or - since
- * FIELD-GUN-MW2 - { kind:'own', model } for a weapon of the port's own
- * that carries its own shipped mesh; and the pin fails the build if any
- * combination answers none of them.
+ * { kind:'mapped', ... }, { kind:'sprite', reason } or { kind:'own', model }
+ * for a piece of the port's own that carries its own shipped mesh; and the
+ * pin fails the build if any combination answers none of them.
  */
 export function itemMapCoverage() {
   const out = [];
-  // FIELD-GUN-MW2: THE PORT'S OWN WEAPONS, and the reason they are
-  // FIRST is the hole they were found in.
-  //
-  // This walk's population was `WEAPONS` alone - DFU's frozen eighteen
-  // - and the Dwarven Thunderlock is template 560, minted at runtime by
-  // registerCustomTemplates. So the one weapon in the whole port that
-  // genuinely had no Morrowind model was the one weapon this census
-  // never asked about: it reported total coverage while the gun drew
-  // EMPTY HANDS in Morrowind first person, for every player, for the
-  // life of the arc. The guarantee in this file's header says a row
-  // "must SAY it, never fall through silently"; an item outside the
-  // population cannot even fall through.
-  //
-  // A row per model, not per material: the port's own weapons have no
-  // material ladder to walk - `pickWeaponRecord` is not reached at all
-  // - and inventing one would be a census that reports work nobody did.
-  for (const [index, own] of Object.entries(OWN_MW_MODELS)) {
-    out.push({ kind: 'own', item: own.name, material: 'n/a', via: 'ownWeaponModels', index: Number(index), model: own.model });
-  }
   for (const [wName] of Object.entries(WEAPONS)) {
     for (const [mName, m] of Object.entries(WEAPON_MATERIALS)) {
       if (m === WEAPON_MATERIALS.None) continue;
@@ -399,7 +378,7 @@ export function itemMapCoverage() {
       else out.push({ kind: 'UNMAPPED', item: aName, material: mName });
     }
   }
-  // MW-ASSIGN: A MOD'S WEAPONS AND ARMOUR ARE IN THE SPACE TOO - the Thunderlock's lesson again: templates outside
+  // MW-ASSIGN: A MOD'S WEAPONS AND ARMOUR ARE IN THE SPACE TOO: templates outside
   // DFU's population were never asked about, and a mod's hauberk stood as its classic picture while this census
   // reported the map total. Every material of each, as the classic rows.
   for (const index of Object.keys(MOD_WEAPON_TO_MW)) {

@@ -15,7 +15,7 @@ import { wrapModes } from '../formats/morrowind/mwTexture.js';
 export const VFX_VERTEX_FLOATS = 12;
 export const VFX_COLOR_AT = 7;
 /**
- * EG-ZG (2026-10-12; bible/11-Multiplayer/Elite-Gates.md section 25.4 - THE QUIET COMPANY): a stream's quads at `alpha` of
+ * A stream's quads at `alpha` of
  * themselves, into `out` (the caller's, kept): each vertex's colour - its alpha where the blend reads the source's alpha
  * (NiAlphaProperty's SRC_ALPHA and every other), all four where it adds the source as it is (`srcBlend` 0, ONE). The
  * particle program multiplies the texel by this colour (render/renderer.js PARTICLE_FS), so an ally's effect draws at
@@ -57,8 +57,8 @@ export function createVfxGpu(renderer, textures, capacity) {
 
   return {
     /** This frame's streams onto the GPU. Answers the live effects in stream order; a stream absent this frame is
-     *  hidden, not freed - it comes back the frame its node is visible again. EG-ZG: `alpha` the effect's share of itself
-     *  (an ally's during a Spire trial - vfxFade). */
+     *  hidden, not freed - it comes back the frame its node is visible again. `alpha` the effect's share of itself
+     *  (vfxFade). */
     sync(streams, alpha = 1) {
       if (released) return [];
       const live = new Set();

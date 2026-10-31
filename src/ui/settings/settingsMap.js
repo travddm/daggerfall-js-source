@@ -111,7 +111,7 @@ export const CATEGORIES = Object.freeze([
     sec("weather", "Weather & ambience", [
       "feat:weather-events", "feat:mod-better-ambience"]),
     sec("towns", "Towns & people", [
-      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:mod-kings-gambit", "feat:town-watch"]),
+      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch"]),
     sec("encounters", "Wilderness & encounters", [
       "feat:mod-world-of-daggerfall", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
     sec("travel", "Travel", [
@@ -182,8 +182,6 @@ export const CATEGORIES = Object.freeze([
       "Effects/VignetteRounded"]),
     sec("reading", "Readability", [
       "GUI/SwapHealthAndFatigueColors", "GUI/DimAlphaStrength", "GUI/SDFFontRendering"]),
-    sec("danger", "Danger shapes", [
-      "port:dangerPalette", "port:telegraphFill"]),
     sec("largehud", "Large status bar", [
       "GUI/LargeHUD", "GUI/LargeHUDDocked", "GUI/LargeHUDUndockedScale", "GUI/LargeHUDUndockedAlignment", "GUI/LargeHUDUndockedOffsetWeapon",
       "GUI/LargeHUDOffsetHorse"]),

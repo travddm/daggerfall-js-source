@@ -1216,7 +1216,7 @@ const fpStandIn = (shadow) => {
 async function pairAcrossThePicture(skeletonBytes) {
   const worn = composeWornArmor({ pieces: [{ templateIndex: 103, material: 0x201 }], armors: [], bodyPool: [] });
   const onDisk = (p) => new Uint8Array(readFileSync(new URL(`../../${p}`, import.meta.url)));
-  const blade = onDisk('src/assets/mw/meshes/thunderlock.nif');
+  const blade = f('weapon.nif');   // the fixture blade: a rigid mesh, as a weapon is
   const parts = [...worn.adds.map((a) => ({ slot: a.slot, partName: a.partName, bones: a.bones, bytes: onDisk(`src/assets/mw/meshes/${a.model}`) })),
     { slot: 'weapon', bones: ['Weapon Bone'], bytes: blade }, { slot: 'offweapon', bones: [OFF_WEAPON_BONE], bytes: blade },
     { slot: 'attach R', bones: ['Right Hand'], bytes: blade }, { slot: 'attach L', bones: ['Left Hand'], bytes: blade }];   // a rigid part on each hand's attach node (rule 13 draws the left one negated)

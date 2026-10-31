@@ -429,7 +429,4 @@ test('MWNPC1i the rig: a third-person body on a renderer with the skinned path i
   assert.equal(arm.status().third.skin, 'gpu', 'the door open again: laid out again');
   assert.equal(renderer.c.skinMeshes, 2);
   assert.equal(gpuSkinOn(countingRenderer()), false, 'a renderer without the path keeps the CPU skin - every earlier pin\'s renderer');
-  // the third-person muzzle asks the palette for its one point (skinnedVertex - MWNPC1b holds it to the CPU skin)
-  const src = rd('src/combat/fpArm.js');
-  assert.ok(src.includes('const at = thirdMesh && thirdMesh.skin && thirdSkin ? skinnedVertex(thirdSkin, piece, muzzleIndexOf(piece)) : posedVertex(piece.positions, muzzleIndexOf(piece));'));
 });

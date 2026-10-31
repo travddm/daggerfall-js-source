@@ -591,7 +591,7 @@ export function createBetterAmbience({ audio = defaultAudio, settings = readBett
     removeHealth(amount, maxHealth) { syncSettings(); if (s.Enabled) damageShake(shaker, s, amount, maxHealth); },
     /** FIELD-GUN6: a shake that is not a wound. DamageShaker is the
      *  mod's only producer and it prices a blow by how much of you it
-     *  took; the Dwarven Thunderlock going off is neither damage nor
+     *  took; a weapon's own kick is neither damage nor
      *  the mod's, but the camera it wants to move is this one - the
      *  port has exactly one shaker and `view()` is already wired
      *  through all four hosts. So the magnitude arrives made, rather

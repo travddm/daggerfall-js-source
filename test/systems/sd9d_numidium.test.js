@@ -65,7 +65,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 // ── the law and the records ───────────────────────────────────────────
 
 test('SD9d THE LAW: The Brass of Numidium after the serpent\'s - Aetheric, Kagrenac its patron, the Hourbreaker\'s brass its colour, no raiding party\'s, never a world set; Dwemer Brass, Gearward and The Hour Turns at 2, 4 and 6 pieces, each a whole pair from Faint to Ascendant, every brief inside BRIEF_MAX at every stage (mutants: a tier\'s number; a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(-5), ['numidium', 'panoply', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the Brass Remnant\'s own - PIN MOVED (EG15): the Battlemage\'s Panoply after it - PIN MOVED (WITCH1): the Wyrd\'s Raiment after that - PIN MOVED (STAR7): the Starspun Weave last');
+  assert.deepEqual(SIGIL_SET_IDS.slice(-4), ['numidium', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - the Brass Remnant\'s own - PIN MOVED (WITCH1): the Wyrd\'s Raiment after it - PIN MOVED (STAR7): the Starspun Weave last');
   const s = setById('numidium');
   assert.deepEqual([s.id, s.name, s.prince, s.colour, s.aetheric, 'raid' in s, s.role],
     ['numidium', 'The Brass of Numidium', 'Kagrenac', '#b5862f', true, false, 'What the Warp kept of the Walking Brass']);
@@ -103,7 +103,7 @@ test('SD9d THE RECORDS: nine in the places\' order - the seven body pieces, a ro
   assert.ok(!resists.includes('magic') && !resists.includes('shock'), 'never magic or shock - Dwemer Brass carries them');
   assert.equal(new Set(resists).size, resists.length, 'one resistance of an element at most');
   const upTo = REGALIA.length + RAID_SET_PIECES.length + SERPENT_SET_PIECES.length + NUMIDIUM_SET_PIECES.length;
-  assert.deepEqual(AETHERIC_RECORDS.slice(0, upTo), [...REGALIA, ...RAID_SET_PIECES, ...SERPENT_SET_PIECES, ...NUMIDIUM_SET_PIECES], 'PIN MOVED (EG15): then the Battlemage\'s Panoply');
+  assert.deepEqual(AETHERIC_RECORDS.slice(0, upTo), [...REGALIA, ...RAID_SET_PIECES, ...SERPENT_SET_PIECES, ...NUMIDIUM_SET_PIECES], 'the Brass after the serpent\'s');
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
 });
 

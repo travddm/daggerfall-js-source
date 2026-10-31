@@ -32,7 +32,7 @@ export function readGateMark(fn, size) {
 /** BAY-LEFT-MAPS (bible/10-UI/Held-Map-Arc.md): ONE RING over a BOX of map pixels (`box` {x0, y0, w, h} - the held map's
  *  sheet: the continent's frame while it is shown, world/tamriel/tamrielFrame.js tamrielFrameInBay; the Bay's own
  *  rectangle else), as each of WW2's rings is read (readGateMarks). The held map read the serpent's ring, a Super dungeon's,
- *  an arch's and the Ketch's against the Bay's 1000 x 500 (readGateMark), so a ring past the Bay was never drawn; the
+ *  and an arch's against the Bay's 1000 x 500 (readGateMark), so a ring past the Bay was never drawn; the
  *  Bay's own box is readGateMark's, to the pixel.
  *  @param {(() => any) | undefined} fn @param {{x0:number, y0:number, w:number, h:number}} box */
 export function readGateMarkIn(fn, box) {
@@ -67,7 +67,7 @@ export const GATE_MARKS_MAX = 9;
 export const gateMarksKey = (list) => list.map(gateMarkKey).join(';');
 
 /** What the held map repaints on: the ring AND its words (the countdown ticks each second) - its card's too (AUDIT KETCH
- *  L3-10: a card whose countdown is its tip's line, the Ketch's, kept the one it was opened on). */
+ *  L3-10: a card whose countdown is its tip's line kept the one it was opened on). */
 export const gateMarkKey = (m) => (m ? `${m.day}|${m.cx.toFixed(3)}|${m.cy.toFixed(3)}|${m.r}|${m.phase}|${m.label}|${tipKey(m.tip)}` : '');
 /** What the classic page repaints on: the ring alone - it draws no words, and a whole-page rebuild a second for a
  *  countdown it does not show would be the repaint-forever SOC6 refused. */

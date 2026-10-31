@@ -215,18 +215,10 @@ import { privateInteriorOf } from './privateInterior.js';   // SLIM-FRAME: an ow
 import { validSdMarks, SD_ELEMENTS } from './superDungeon/sdMarks.js';   // SD18a: a Hollow's marks and its blows' elements - sdMarks.js imports nothing, so the worker's graph stays
 import { validArenaIn, validArenaOut } from './arena/arenaLaw.js';   // ARENA4: the arena's words both ways - arenaLaw.js imports nothing, so the worker's graph stays flat
 import { readHouse } from './houseLaw.js';   // LEGACY7 part two: a house rides a row - houseLaw.js imports nothing, so the worker's graph stays flat
-import { validHoldemIn, validHoldemOut } from './holdemTable.js';   // CARDS5: the relay's card table's words both ways - holdemTable.js imports only cardLaw.js, which imports only dice.js (already the bundle's)
-import { validIliacIn, validIliacOut } from './iliac/iliacTable.js';   // CARDS10: the relay's Iliac table's words both ways - iliacTable.js imports the rules (iliacHand.js, iliacCards.js) and Hold'em's bounds
-import { validGambitIn, validGambitOut } from './gambit/gambitTable.js';   // KG5: the relay's King's Gambit table's words both ways - gambitTable.js imports the law (kingsGambit.js, which brings enemyBasics.js and mathf.js) and Hold'em's bounds
 import { GATE_COURTS_MAX } from './gate/gateCourts.js';   // GATE-COURTS: a court's number on the wire - gateCourts.js imports nothing, so the worker's graph stays flat
 import { validGateMods, GATE_FEEDS_MAX, validGatePortents } from './gate/gateMods.js';   // WB8b: the Warden's marks on a gate's state - gateMods.js imports nothing, so the worker's graph stays flat
-import { egStampOk } from './eliteGates/egShape.js';   // EG-FULL: a Spire blow's FULL shape stamp, checked as the wire carries it - egShape.js imports nothing, so the worker's graph stays flat
-import { KT_WATCH_WAVES } from './ketch/ketchLaw.js';   // AUDIT KETCH II L2-2: the Watch's waves, one number for the `wave` and the `st` words (the `st`'s stood at three) - ketchLaw.js imports instanceRoom.js alone, which the relay walks already
 import { validWireAppearance } from './appearanceLaw.js';   // APPEARANCES: a worn piece's look on a look's item - appearanceLaw.js imports systems/armorMaterials.js alone, a leaf, so the worker's graph stays flat
 export { validRollSpec, validRoll, rollDice, ROLL_DICE_MAX, ROLL_SIDES_MAX, ROLL_MOD_MAX };
-export { validHoldemIn, validHoldemOut };
-export { validIliacIn, validIliacOut };
-export { validGambitIn, validGambitOut };
 
 /** WORLD5: the instant the online world stood at the classic game start - 2026-09-14T00:00:00Z. */
 export const ONLINE_EPOCH_MS = Date.UTC(2026, 8, 14, 0, 0, 0);
@@ -521,7 +513,7 @@ export function validHomeFrame(m) {
  * the relay carries one of these names and nothing a stager could shape into anything else. Appended, never
  * reordered or renamed - a client that does not know a word shows no event, so a new one is safe against an old build.
  */
-export const LIVE_EVENTS = Object.freeze(['dread', 'sunbaby', 'rocket']);   // SUNBABY1: the sun baby's sky of flowers (world/sunbabySky.js), world163; ROCKET1: the rocket's mounds, farting horses and frenzy (world/rocketEvent.js), world253
+export const LIVE_EVENTS = Object.freeze(['dread']);
 /** EVENT1: stages a second - a dev's deliberate act, and tokenGate cannot go lower (RED_HZ_MAX's reason). */
 export const EVENT_HZ_MAX = 1;
 /** EVENT1: the hub's storage key for the event staged now - its own prefix, apart from every one a drain or the hub's
@@ -1000,13 +992,13 @@ const SECRET_RE = /^[A-Za-z0-9_-]{8,64}$/;
  *  too. Every claim at once had reached 639 of 640, and a house (LEGACY7) took such a token past it: minted, then
  *  refused here at every hello. With a house at its bounds and the realm character (`ci`) the body is 778.
  *
- *  WIKIMAID (world214): 864 - the WikiMaid's glyph took every claim at once, a house and the arms to 808 of 800. SHOP (world274): 896 - the Origin's, to 867.
+ *  WIKIMAID (world214): 864 - the WikiMaid's glyph took every claim at once, a house and the arms to 808 of 800.
  *
  *  THE VERSION PREFIX IS NOT SPELLED OUT HERE. identityToken.js is the
  *  one home for which version exists and the verifier refuses anything
  *  else before parsing a byte; a second copy of `v1` in this file would
  *  be a second thing to forget on the day there is a v2. */
-const TOKEN_RE = /^[A-Za-z0-9]{1,8}\.[A-Za-z0-9_-]{1,896}\.[A-Za-z0-9_-]{1,128}$/;
+const TOKEN_RE = /^[A-Za-z0-9]{1,8}\.[A-Za-z0-9_-]{1,864}\.[A-Za-z0-9_-]{1,128}$/;
 
 /** The name a refused one becomes. Not a mask (`C**` is a shape a
  *  player treats as a puzzle) and not an error the relay could not
@@ -1702,7 +1694,8 @@ export const KEEPALIVE_FAN_MS = HEARTBEAT_MS / 2;
  *  is deployed by CI and the relay by hand, so a skew between them is the ordinary state of a release day, and until
  *  now nothing on either end could see it. */
 // Integrated Arena spectator visibility with staff teleport, stable boat identity and private ownership; deploy relay before clients.
-export const RELAY_VERSION = 'world276';   // world276: TESA's release (#1184) and SHOP, one version - TESA's world275 below renumbered past main's SD-PARTY world275 (live) at the eighth merge of main; its gates (WORLD_WIDE, GUILD_INSTANCE, WW5, RAID_WORLD, OW_WORLD) open at 276. SHOP (2026-10-28, world274 on its branch, renumbered past TESA's LADDER-CUT world274 and ASHFALL1 world275 at the fold into #1184; the owner: "A new glyph panel alongside the timer and mailbox that will be used for our monetization shop"; bible/06-Systems/Shop.md; NOT YET DEPLOYED): the vocabulary's three new words - GENESIS last of TITLES, ORIGIN last of GLYPHS, ETERNAL last of AURAS - which the relay reads off every token (net/identityToken.js) - and the hello's token body bound, 896 (TOKEN_RE): a token wearing every glyph, the Origin with them, is 867. Deploy the relay first.
+export const RELAY_VERSION = 'world277';   // world277: the cleanup's feature removals - the SUNBABY and ROCKET sky events, the Sky-Ketch, the tavern card games and King's Gambit, the SHOP, the guns and Elite Gates. The relay refuses their frames, items and vocabulary. Deploy the relay first, then the account service (acct207, migration 0190), then the site.
+// world276: TESA's release (#1184) and SHOP, one version - TESA's world275 below renumbered past main's SD-PARTY world275 (live) at the eighth merge of main; its gates (WORLD_WIDE, GUILD_INSTANCE, WW5, RAID_WORLD, OW_WORLD) open at 276. SHOP (2026-10-28, world274 on its branch, renumbered past TESA's LADDER-CUT world274 and ASHFALL1 world275 at the fold into #1184; the owner: "A new glyph panel alongside the timer and mailbox that will be used for our monetization shop"; bible/06-Systems/Shop.md; NOT YET DEPLOYED): the vocabulary's three new words - GENESIS last of TITLES, ORIGIN last of GLYPHS, ETERNAL last of AURAS - which the relay reads off every token (net/identityToken.js) - and the hello's token body bound, 896 (TOKEN_RE): a token wearing every glyph, the Origin with them, is 867. Deploy the relay first.
 // (world276, TESA's release - world275 on #1184 until the eighth merge of main renumbered it past SD-PARTY's world275) (world274 on its branch, renumbered past world274 on main at the merge) ASHFALL1 (2026-10-27, folded in place, NOT YET DEPLOYED; bible/07-Rendering/Weather-Arc.md E) - systems/wind/wind.js, which this bundle carries, gains the ashfall's VIOLENCE row; nothing the relay does reads it. (world272 on its branch, renumbered past world272-world273 on main at the merge) THE THIRD MERGE OF MAIN INTO #1184 (2026-10-27, NOT YET DEPLOYED) - #1184's world271 renumbered past MASTER-THREE's world271 (main's), its law MASTER-THREE's mastery slots with every change of #1184's, re-hashed. THE SECOND MERGE OF MAIN INTO #1184 (2026-10-27, NOT YET DEPLOYED) - #1184's world270 renumbered past CHAT-POST's world270 (main's), its law CHAT-POST's chat items with every change of #1184's, re-hashed. THE MERGE OF MAIN INTO TESA (2026-10-27, NOT YET DEPLOYED) - #1184's own world269 and world270, one release, folded into world270 past BOW-TOPS's world269 (main's): its law BOW-TOPS's bows with every change of #1184's, re-hashed. HOUSES-3 (2026-10-27, folded in place, NOT YET DEPLOYED; bible/06-Systems/Online-Arc.md HOUSES-3) - net/homeLaw.js, which this bundle carries, counts HOME_CAP in a region and reads a region's three deeds (regionDeedsOf); nothing the relay does with a home changes. AUDIT BAY-LEFT's packages (2026-10-27, folded in place, NOT YET DEPLOYED; bible/01-Overview/audits/Audit-Left-In-The-Bay.md): WW-GATES-EVERYWHERE - gate lanes 0 to 8 stand (GATE_LANES_OPEN), Cyrodiil's never; KETCH-EVERYWHERE - a Sky-Ketch station a province at its crown capital, voyage numbers by lane (k + lane x 100,000,000), the hub's receipts `ktrc:<account>.<lane>` and herald `ktherald:<lane>` a station, net/kingdomLaw.js in the bundle; WW5 - star words on their lane's pixel, the held list 60 long the Bay's first, a stored ledger on its lane's pixel, the Hollows a slot lane a province (SD_LANE_SPAN), the census over every region, the `ln` kind, per-lane keys, the live door by the slot's lane (WW5_RELAY_MIN 270); WW6 - raid words on world pixels, keys for every region with a town past the Bay, per-lane day slots, the operator's pinned towns the Bay's alone, the staff town-event law (RAID_WORLD_RELAY_MIN 270); SPAWN-WORLD - the `dg` row past the Bay (owWireRow worldPixelOk, OW_WORLD_RELAY_MIN 270); BAY-LEFT-GROUND - GROUND_LAW 2; PROVINCE-COURTS - textManager.js's faction-name door and buildingNames.js's four titles. Deploy the relay first, then the account service, then the site. WORLD_WIDE_RELAY_MIN is 269 here, a number main's own world269 (BOW-TOPS, not yet deployed) holds too: whichever deploys first, the other renumbers. ARCHERY-REF (2026-10-26, re-hashed in place, NOT YET DEPLOYED: the siege's and the arena's referees take BAL-ARCHERY's bow tops, net/siege/siegeRef.js SIEGE_WEAPON_MAX and net/arena/arenaLaw.js ARENA_WEAPON_MAX the Short Bow 17 and the Long Bow 19 - main's #1326 raised the game's and left these at DFU's 16 and 18; bible/05-Combat/Balance-Arc.md ARCHERY-REF). LAIR-WORLD (2026-10-26, re-hashed in place, NOT YET DEPLOYED: a party pose's bounty id carries the world's pixel, net/wire.js BOUNTY_POSE_ID_RE - the owner: "with revenants and their lairs, this will work everywhere correct?", asked "Fix both in this PR"; bible/06-Systems/Bounty-Boards.md LAIR-WORLD). ZONE-GRACE (2026-10-26, world268 on its branch, renumbered past NIRNROOT-SAGE's world268 at its merge with main, and world269 past the TESA fold's world269 when it was folded into #1184; PVP-EASE, the owner: "just overall making the experience more palatable while retaining its punishment", asked "Entry/rise grace"; bible/11-Multiplayer/Wild-Zone.md section 3b; NOT YET DEPLOYED) - net/wild/wildRef.js WILD_GRACE: sixty seconds of safe passage on entering the zone (after thirty seconds away and a minute clear of a fight) and on rising from a fall; no player's blow lands, one's own blow on a player ends it; carried across a cell (`gr`); said as the `wref` `grace` word (WILD_GRACE_MS_MAX). AUDIT PVP-EASE (re-hashed in place): the carry holds the fight, the stand in the zone, a foe's death and a passage ended - put at an entry, a leave, a socket gone, a death and a passage's end, the hub dropping a leave from a room already left - so no crossing and no woken room grants a fresh minute; every rise grants it; a take from a remains ends it; a captain's ship under it takes no shot, and a shot ends the shooter's (net/sea/seaRef.js seaShot).
 // (world275, the TESA fold - world269 on #1184 until the merge of main renumbered it past BOW-TOPS's world269) (world268 on its branch, renumbered past world268 on main at the merge) (world266 on its branch, renumbered past world266-world267 on main at the merge) (world260 on its branch, renumbered past world260-world265 on main at the merge) WORLD-WIDE folded into TESA and DOMAIN2, one release (#1184; DOMAIN2 below; its WW2 and WW-R were world254 and world255 on its branch, and AUDIT TESA-BIOME's world255 on TESA's, renumbered past AUDIT FOE-KEEPS's world254 and KETCH's world255 at the merges into world256 on TESA's, then past STAFF-EVENT's world256, STAFF-EVENT BOSS's world257, KETCH-LONGER's world258 and ASK-LONGER's world259 at the next, and their RELAY_MIN gates with them - GATE_LANES_RELAY_MIN, PROVINCE_REGIONS_RELAY_MIN and WDUN_WORLD_RELAY_MIN 260): WW-R (2026-10-24, the owner: "Separate regions make sense"; bible/03-World/World-Wide.md WW-R; NOT YET DEPLOYED) - THE PROVINCES AS REGIONS: formats/mapsTables.js REGION_NAMES holds the nine provinces past the Bay after its 62 (Daggerfall stays High Rock's), the regional channels CHAT_REGION_COUNT 71 (net/hubShards.js REGION_CHANNELS 71 - a province's channel and its shards; PROVINCE_REGIONS_RELAY_MIN 255, an older relay refuses the key) and the Abyss census the Bay's 62 (SD_REGION_COUNT CHAT_BAY_REGIONS).; and WW-C2 folded in before its deploy (bible/03-World/World-Wide.md WW-C: the open zone is Cyrodiil's) - a zone hall's key is a world map pixel's (wdunHall), its room the halls' own lane over the world's pixel key (spawnedHallMapId, WDUN_WORLD_LANE; WDUN_WORLD_RELAY_MIN 255 - an older hub refuses the key), and a pose's map pixel FLOORED (mapPixelOfWire, cellRoomOfWire: DFU's truncation on the Bay, the pixel it stands in past the Bay's west and south edges); and AUDIT WW folded in before its deploy - THE LANES THAT STAND (GATE_LANES_OPEN: the Bay's alone until a province's places are registered, Cyrodiil's never): the hub admits a gate, keeps a site, a rite's word and a spent receipt on those alone (gateHolds, gateAdmits, gateNumberOk, gatePixelOk), a lane past the Bay's pixel never on the Bay's map, and a zone hall's map id is known as one (isHallMapId)
 // (world275, GRANT-SLEEP and PROVINCE-SLEEP) GRANT-SLEEP and PROVINCE-SLEEP (2026-10-25, Mac: "ensuring this new integration doesnt implode the server or insanely skyrocket our server cost"; bible/11-Multiplayer/Spawn-Grants.md section 22, bible/11-Multiplayer/Scale-Arc.md PROVINCE-SLEEP; NOT YET DEPLOYED) - a cell's grant measure holds no timer (it posts at a fold once due, and when the cell drains), so the cell hibernates; a province past the Bay's channel is one, unsplit (net/hubShards.js REGION_SPLIT). No frame changes.
@@ -2007,7 +2000,7 @@ export const poseHandsOf = (usingRightHand, strikeHand) => ({ ...(usingRightHand
 /** A pose the room will relay, or null. */
 export function validPose(p) {
   if (!p || typeof p !== 'object') return null;
-  const { x, y, z, yaw, pitch, mv, wd, an, as, am, sr, cn, cr, ce, ar, fk, rd, rv, rc, hs, lh, ah, wb, dd, hl, lt, lc, hk, hp, hb, hq, hu, uq, cv, cl, cw, ck, cy, cd, st, ga, gb, gm, ts, pl, ab } = p;
+  const { x, y, z, yaw, pitch, mv, wd, an, as, am, sr, cn, cr, ce, ar, fk, rd, rv, rc, hs, lh, ah, wb, dd, hl, lt, lc, hk, hp, hb, hq, hu, uq, cv, cl, cw, ck, cy, cd, st, ga, gb, gm, ts, ab } = p;
   if (![x, y, z, yaw, pitch].every(finite)) return null;
   if (Math.abs(x) > POSE_BOUND || Math.abs(z) > POSE_BOUND || Math.abs(y) > POSE_Y_BOUND) return null;
   // ONCRASH1 (2026-09-15, Mac: "reports of player browser crashing when
@@ -2049,7 +2042,7 @@ export function validPose(p) {
     // (validLook's `class` law): a right-handed human's pose keeps the bytes it always had.
     ...(uint(lh, 1) ? { lh: 1 } : {}),
     // AUDIT MIXED-PAIR L4-3 (bible/05-Combat/Two-Hands.md, Peers on the wire): `ah` 1 when the last strike was a PAIR's
-    // LEFT hand's - a blade-and-Pistolet pair's or two blades' - so the others play it with that hand's weapon and group
+    // LEFT hand's - two blades' - so the others play it with that hand's weapon and group
     // (a shot as a shot, a blade's blow as a blade's) off the two hands the look carries. It changes with `an` alone, so
     // poseChanged's swing edge carries it. OMITTED otherwise: a pose with no left blow keeps the bytes it always had.
     ...(uint(ah, 1) ? { ah: 1 } : {}),
@@ -2096,7 +2089,6 @@ export function validPose(p) {
     // otherwise: a hold, and the ground, keep their bytes.
     ...climbOf(cl, cw, ck, cy, cd),
     ...seatOf(st),   // CARDS2b: seated at a card table, and the table's top - omitted standing
-    ...riddenOf(pl),   // EG-H1: RIDDEN POSES - a pose on an Elite Breach's moving piece, its index and its offset from the piece's top
     ...aboardOf(ab),   // DECK-POSE: a pose aboard a boat - whose, which of theirs, and the feet in her own frame
     // PEER-ACTS (GATHER-FEEL II, 2026-10-13): `ga` the player's GATHERING ACT and `gm` the net's throw, and `gb` the
     // beats - its own, as `hk` is, so a beat counted as an act ends rides the pose that ends it (gatherOf) - so the
@@ -2157,14 +2149,6 @@ function peerFxOf(hk, hp, hb, hq, hu, uq) {
   if (u) { out.hu = u; out.uq = uint(uq, 100) ?? 20; }   // PEERFX2: and what that blow cost, 0-100 (the splash's size)
   return out;
 }
-/** EG-H1 (EG8d; bible/11-Multiplayer/Elite-Gates.md section 10.8 - RIDDEN POSES): a pose on an Elite Breach's moving piece
- *  (a Drift, a Rail, a Drum) carries `pl` - `[i, dx, dy, dz]`, the piece's index in its hall's course and the body's offset
- *  from the piece's top (m, to the cm) at the sender's time - so a receiver draws it on the piece at its own clock and the
- *  relay judges it on the piece's clock position (net/eliteGates/egFair.js egRideAt). OMITTED off a piece (validLook's `class` law); a
- *  field out of bounds is no ride, never clamped into one. */
-export const POSE_RIDE_OFF_MAX = 8;
-const riddenOf = (pl) => (Array.isArray(pl) && pl.length === 4 && Number.isInteger(pl[0]) && pl[0] >= 0 && pl[0] <= 255 && pl.slice(1).every((v) => finite(v) && Math.abs(v) <= POSE_RIDE_OFF_MAX)
-  ? { pl: [pl[0], Math.round(pl[1] * 100) / 100, Math.round(pl[2] * 100) / 100, Math.round(pl[3] * 100) / 100] } : {});
 /** DECK-POSE (2026-10-23, the owner: "Players on board the ship jitter while sailing instead of staying put. Other players
  *  also slide when on board your ship/npc ships"): A POSE ABOARD A BOAT SAYS WHERE ON HER DECK. `ab` - `[owner, slot, x,
  *  y, z]`, Come Sail Away's place aboard (scenes/comeSailAway/comeSailAwayAboard.js `word`, and `helmWord` at one's own
@@ -2348,7 +2332,7 @@ export function inRangeOf(roomKey, from) {
   return (to) => !!to && Math.max(Math.abs(fx - Math.floor(to.x / PIXEL_UNITS)), Math.abs(fy - Math.floor(to.z / PIXEL_UNITS))) <= RANGE_PIXELS;
 }
 
-/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'kt'|'eg'|'wild'|'wdun'|'holdem'|'iliac'|'gambit'|'lease', ...}
+/** One client frame, parsed and checked: {t:'hello'|'pose'|'ping'|'chat'|'roll'|'say'|'narrate'|'stage'|'mute'|'ban'|'renown'|'guild'|'guildout'|'home'|'world'|'foes'|'own'|'hit'|'act'|'who'|'quest'|'social'|'party'|'trade'|'cast'|'card'|'page'|'duel'|'wed'|'park'|'caravan'|'look'|'gate'|'grant'|'siege'|'arena'|'raid'|'raidtowns'|'sev'|'rite'|'star'|'ow'|'trav'|'amap'|'stp'|'cfg'|'find'|'serpent'|'sd'|'wild'|'wdun'|'lease', ...}
  *  or {error} - the caller closes on an error. INSPECT1: every arm below, named - this line had fallen seven behind
  *  (test/net/auditworld2.test.js derives the list from the arms now, so it cannot fall behind again - the merge with
  *  main's HCC-PARK was its first catch: the park arm, unnamed). */
@@ -2480,16 +2464,6 @@ export function parseClient(text, { hasHello = false } = {}) {
     if (!hasHello) return { error: 'star before hello' };
     const r = validStarIn(m);
     return r ? { t: 'star', ...r } : { error: 'bad star' };
-  }
-  if (m.t === 'kt') {   // KETCH: a word aboard a crew's ship - projected by validKetchIn; the ship's director (net/ketch/ketchBrain.js) judges it
-    if (!hasHello) return { error: 'kt before hello' };
-    const r = validKetchIn(m);
-    return r ? { t: 'kt', ...r } : { error: 'bad kt' };
-  }
-  if (m.t === 'eg') {   // EG-PLAY: a word on an Elite Breach - the open to the hub, a member's admission, door and blows to its room - projected by validEgIn; the hub and the room's director (net/eliteGates/egBrain.js) judge it
-    if (!hasHello) return { error: 'eg before hello' };
-    const r = validEgIn(m);
-    return r ? { t: 'eg', ...r } : { error: 'bad eg' };
   }
   if (m.t === 'sd') {   // SD3: a word on the Super dungeon - `found`, to the cell its Hollow stands in - projected by validSdIn; the cell and the hub judge it (net/superDungeon/sdLaw.js). SD6b: `pz`, a turn in the realm's Orrery (net/superDungeon/sdBrain.js)
     if (!hasHello) return { error: 'sd before hello' };
@@ -2623,34 +2597,6 @@ export function parseClient(text, { hasHello = false } = {}) {
     const linked = items ? { items, item: items[0] } : {};   // `item` kept so a one-link line still reads on an older client build
     if (m.ch === undefined) return { t: 'chat', text, ...me, ...linked };
     return CHAT_LINE_CHANNELS.includes(m.ch) ? { t: 'chat', text, ch: m.ch, ...me, ...linked } : { error: 'bad chat' };
-  }
-  if (m.t === 'holdem') {
-    // CARDS5: A WORD TO THE ROOM'S CARD TABLE - sit in a chair, stand, act, or look (net/holdemTable.js, both ends). The
-    // relay deals and runs the table; nothing on this frame is a card.
-    if (!hasHello) return { error: 'holdem before hello' };
-    if (text.length > HOLDEM_FRAME_MAX) return { error: 'frame too large' };
-    const h = validHoldemIn(m);
-    if (!h) return { error: 'bad holdem' };
-    return { t: 'holdem', ...h };
-  }
-  if (m.t === 'iliac') {
-    // CARDS10: A WORD TO THE ROOM'S ILIAC TABLE - sit with a deck (and, ranked, the service's order on it), stand, commit
-    // a turn's plays, or look (net/iliac/iliacTable.js, both ends). The relay deals and runs the game.
-    if (!hasHello) return { error: 'iliac before hello' };
-    if (text.length > ILIAC_FRAME_MAX) return { error: 'frame too large' };
-    const w = validIliacIn(m);
-    if (!w) return { error: 'bad iliac' };
-    return { t: 'iliac', ...w };
-  }
-  if (m.t === 'gambit') {
-    // KG5: A WORD TO THE ROOM'S KING'S GAMBIT TABLE - sit with a crown, ready with an army, act (the law's command in the
-    // game the panel showed), forfeit, stand, or look (net/gambit/gambitTable.js, both ends). The relay builds the board, rolls
-    // every die and runs the clock.
-    if (!hasHello) return { error: 'gambit before hello' };
-    if (text.length > GAMBIT_FRAME_MAX) return { error: 'frame too large' };
-    const w = validGambitIn(m);
-    if (!w) return { error: 'bad gambit' };
-    return { t: 'gambit', ...w };
   }
   if (m.t === 'roll') {
     // DICE1: A ROLL ASKED OF THE RELAY - how many dice, how many sides, what to add, inside the dice's own bounds
@@ -2847,23 +2793,6 @@ export const eventGate = (bucket, nowMs) => tokenGate(bucket, nowMs, EVENT_HZ_MA
  *  roll ten times a second until the number suits is a table nobody trusts (every roll is SAID, so the table sees each
  *  try; the gate keeps the tries readable). */
 export const ROLL_HZ_MAX = 1;
-/** CARDS5: a player's words to the card table, a second - a seat acts once a turn, and sits or looks rarely. */
-export const HOLDEM_HZ_MAX = 4;
-export const HOLDEM_FRAME_MAX = 1600;   // CARDS6: a sit carries the service's stake order (net/holdemTable.js HOLDEM_STAKE_MAX)
-export const holdemGate = (bucket, nowMs) => tokenGate(bucket, nowMs, HOLDEM_HZ_MAX);
-/** CARDS10: an Iliac sit carries thirty card ids and the service's deck order (net/iliac/iliacTable.js ILIAC_ORDER_MAX); its
- *  words a second are Hold'em's (holdemGate, a bucket of their own). */
-export const ILIAC_FRAME_MAX = 2400;
-/** KG5: a King's Gambit word's longest is a Ready - twelve roster ids and a crown, and (KG6) at the gold table the
- *  service's stake order (net/holdemTable.js HOLDEM_STAKE_MAX, Hold'em's sit's own cap); its words a second are Hold'em's
- *  (holdemGate, a bucket of their own), and its sits spend the room's one sit budget (holdemSitRoomGate). */
-export const GAMBIT_FRAME_MAX = 1600;
-/** AUDIT CARDS-3 A4: the room's sits a second, every socket together - a sit fans the whole table to every socket in the
- *  room and writes the room's tables, and a socket's own gate let ten sockets toggling sit and stand push a megabyte
- *  a second into a room of sixty. A sit past it is refused 'busy'; acts and looks are the seat's own (one a turn, and
- *  a look answers its asker alone). */
-export const HOLDEM_SIT_ROOM_HZ_MAX = 4;
-export const holdemSitRoomGate = (bucket, nowMs) => tokenGate(bucket, nowMs, HOLDEM_SIT_ROOM_HZ_MAX);
 export const rollGate = (bucket, nowMs) => tokenGate(bucket, nowMs, ROLL_HZ_MAX);
 /** MOD1: the mute order's own bucket - see MUTE_HZ_MAX. */
 export const muteGate = (bucket, nowMs) => tokenGate(bucket, nowMs, MUTE_HZ_MAX);
@@ -3790,7 +3719,7 @@ export const relaySupportsEvent = (v) => { const m = /^world(\d+)$/.exec(typeof 
 /** SUNBABY1: THE FIRST RELAY THAT KNOWS EACH LIVE EVENT'S WORD. A relay's parseClient answers a word it does not know
  *  with 'bad stage' and CLOSES the socket, so knowing the frame (EVENT_RELAY_MIN) is not knowing every word on it: a
  *  word is staged only on a relay at or past its own row. One row a word of LIVE_EVENTS, appended with it. */
-export const LIVE_EVENT_RELAY_MIN = Object.freeze({ dread: EVENT_RELAY_MIN, sunbaby: 163, rocket: 253 });
+export const LIVE_EVENT_RELAY_MIN = Object.freeze({ dread: EVENT_RELAY_MIN });
 export const relayKnowsLiveEvent = (v, kind) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Object.hasOwn(LIVE_EVENT_RELAY_MIN, kind) && Number(m[1]) >= LIVE_EVENT_RELAY_MIN[kind]; };
 export const relaySupportsPark = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= PARK_RELAY_MIN; };
 export const relaySupportsCast = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= CAST_RELAY_MIN; };
@@ -3805,17 +3734,6 @@ export const EMOTE_RELAY_MIN = 102;   // MERGE: world102, as ROLL_RELAY_MIN
 export const DM_RELAY_MIN = 104;
 export const relaySupportsDm = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= DM_RELAY_MIN; };
 export const relaySupportsEmote = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= EMOTE_RELAY_MIN; };
-/** CARDS5: the relay's card table - TAVERN CARDS' world178 (world176 on its branch). A relay before it closes on the
- *  frame. AUDIT CARDS-6 E20: it still read 176 after the merge renumbered TAVERN CARDS past main's SUPER-DUNGEONS world176
- *  and THE WROTHGARIAN ZONE world177 - two relays that deal nothing, which it called able to. */
-export const HOLDEM_RELAY_MIN = 178;
-/** CARDS10: the relay that first deals Iliac Hand (an older one CLOSES the socket on an iliac frame). */
-export const ILIAC_RELAY_MIN = 182;   // world179 on its branch - renumbered at the merges past main's HOURS-FIRST world179, TAVERN-TABLES world180 and TV-BEYOND world181, none of which deals Iliac Hand (an `iliac` frame to them closes the socket)
-export const relaySupportsIliac = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= ILIAC_RELAY_MIN; };
-/** KG5: the relay that first runs The King's Gambit (an older one CLOSES the socket on a gambit frame). */
-export const GAMBIT_RELAY_MIN = 204;   // world203 on its branch - renumbered past main's FIVE-ASKS world202 at the merge, which runs no King's Gambit
-export const relaySupportsGambit = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= GAMBIT_RELAY_MIN; };
-export const relaySupportsHoldem = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= HOLDEM_RELAY_MIN; };
 export const relaySupportsRoll = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= ROLL_RELAY_MIN; };
 /** CHAT-CHAN: the relay that first routes a party's line and opens the region channels. An older one would take a
  *  `ch` it does not know as... nothing: its parse projects `{t:'chat', text}` and the party's line would be fanned to
@@ -6701,608 +6619,4 @@ export function validSdFoundTell(b) {
   if (!b || typeof b !== 'object' || !sdSlotOk(b.s) || !siteEventPixelOk(sdLaneWire(b.s), b.px, b.py)) return null;   // WW5: a lane's find on its lane's pixel
   if (!Number.isFinite(b.x) || !Number.isFinite(b.z) || typeof b.fb !== 'string') return null;
   return { s: b.s, px: b.px, py: b.py, x: b.x, z: b.z, fb: sanitizeName(b.fb) };
-}
-
-// ═══ EG-PLAY: THE ELITE BREACH (bible/11-Multiplayer/Elite-Gates.md section 23) ══════════════════════════════════
-//
-// ONE FRAME TYPE, `eg`, with a kind. The opener says its signed open order to the HUB (`open` - the service's word,
-// net/identityToken.js `egopen`, and where the company answers from); the hub freezes the company from its party record,
-// opens the breach's room (`eg:<16hex>`, net/eliteGates/egLaw.js) and says the CALL to every member (`call`). Each member enters the
-// room with its own signed admission (`in`); the room's director (net/eliteGates/egBrain.js) runs the halls and says the breach
-// (`st` whole, `sg` a stage, `co` the company, `fall`, `rd` a Redoubt, `end`), each member's receipt (`rcpt` - `e1`,
-// net/eliteGates/egReceipt.js).
-//
-// EG-FULL (2026-10-11, Mac: "I said I want everything"): THE FIGHTS IN THE SPIRE'S OWN WORDS (net/eliteGates/egBodies.js) - `efs` a
-// fight's whole state, `ead`/`emv`/`ehp`/`edie`/`efl` its bodies, `eb` a blow with its FULL shape stamp (net/eliteGates/egShape.js),
-// `ecut` a feint, `etx` tethers, `emk` marks, `eph` a phase, `efell` a lord's fall, `eob` an errand's state, `ez` a zone,
-// `esay` a beat's words, `egust`/`edark`/`erail` the place's own; THE RUN'S - `offer` (a member's Vestiges), `ask`/`asked`/
-// `tally` (the company's word), `egot` and `run` (a member's run), `rise` (a recall), `eping` (a ping), `pz` (an
-// Athenaeum's turn), `eheal` (the room's word on a heal). A member's words: `hit` (a blow on a body by its number),
-// `down`, `home`, `pick`, `surplus`, `vote`, `cant`, `buy`, `lping`, `ping`, `bequest`, `forsake`, `pz`, `use` (EG-FULL
-// LAYER THREE: a fragment's engine worked - and `egot` 'page', a page of the Annals found). Every time is the
-// relay's clock; every point the hall's own frame.
-//
-// EG-H1 (EG8d, 2026-10-12; bible/11-Multiplayer/Elite-Gates.md sections 21, 10.8 and 15): WHAT THE RELAY JUDGES - a
-// member's own word of its body (`vt`, thousandths: the body counted, enforced in the Spire - net/eliteGates/egBrain.js egBodyWord) and
-// the shared clock's ping (`clk` and its answer, the relay's `now` - net/eliteGates/egClock.js); the count's fall (`bd`, to the fallen);
-// a lord's blow told early to a Watchfire holder's company (`tell` - the blow's own fields and `sh`, the lead shown) and a
-// told blow THE UNION FLOOR held (`untell`). A pose on a moving piece carries `pl` (validPose - RIDDEN POSES).
-//
-// EG-ZI (2026-10-12; Elite-Gates.md section 10.6): THE PULL'S TOLL said to its member (`toll` - `q` the quarters of its
-// road still ahead, 1..EG_TOLL_WIRE_MAX, `h` the hall it was pulled from).
-//
-// EG-ZJ (2026-10-12; sections 11.7, 22 and 23): THE FIGHT WHOLE ON THE WIRE - a body's row carries its feet and its walk's
-// end's height (`y`, `ty`), and its state as the room said it with since when (`st`, `sa`); each walk (`emv`) its height
-// and its end's; the whole fight (`efs`) the zones still to burn (`zs`), so a member who joins mid-fight holds the company's.
-//
-// EG-ZQ (2026-10-12; section 14, Colossal): a body's row carries its size (`sz`, thousandths of its look's - a Colossal lord's),
-// so every screen draws the lord at the size the relay judges it by.
-//
-// AUDIT EG V (2026-10-15, lane1 #7; sections 8.5 and 21): a body's row and each walk carry its FACING (`yw`), so every screen draws
-// the Kynreeve facing the way his Shield-Wall is judged; and a blow its dim outline's lead (`ol`, lane1 #18 - a chained shape's).
-//
-// AUDIT EG III (2026-10-13, lane 1 #7 / lane 3 #10; sections 15 and 23): SPIREBRIDGE ON THE WIRE - a holder's ask (`mast`, no
-// fields: the room reads the asker's own pose) and the room's word to the company (`ebridge` - the hall, its gap's number
-// in the hall's chain, when the plank stands and until when, who raised it), its life at most EG_SB_WIRE_MS.
-// AUDIT EG III (lane2 #1; Elite-Gates.md section 16.3): `wkpaid` - a member's own word that the account service answered its
-// Redoubt `w`'s receipt paid already this arena week (its gold alone), so the room turns that circle's Reliquaries into 20
-// lumen each; and a run's row carries its Reliquaries' circles (`r[8]`, at most EG_RUN_REL_MAX) for the rest's stake line.
-
-/** What a client may say: `open` to the hub (EG-ZA: and `void` and `claimed`); the rest to a breach's room (EG-ZF: `heal`). */
-export const EG_KINDS = Object.freeze(['open', 'in', 'down', 'home', 'hit', 'pick', 'surplus', 'vote', 'cant', 'buy', 'lping', 'ping', 'bequest', 'forsake', 'pz', 'fell', 'use', 'vt', 'clk', 'spec', 'void', 'claimed', 'heal', 'tonic', 'mast', 'wkpaid', 'yield', 'rz']);   // AUDIT WORLD-EVENTS L1-4: `yield` the fall given in to, lying down; `rz` my Resurrect at a member lying down   // AUDIT EG III (lane1 #5): `tonic` a Spire Tonic drunk; AUDIT EG III: `wkpaid` a Redoubt the service paid already this week (section 16.3); AUDIT EG III (section 15): `mast` - Spirebridge asked; EG-H2: `spec` - a hall of the breach's own law asked; EG-H1: `vt` my body, `clk` the shared clock's ping; EG-ZA: `void` a stake no call answered, `claimed` a held receipt the service counted - both to the hub alone
-/** What the hub and a breach's room say back. */
-export const EG_FIGHT_KINDS = Object.freeze(['efs', 'ead', 'emv', 'ehp', 'edie', 'efl', 'eb', 'ecut', 'etx', 'emk', 'eph', 'efell', 'eob', 'ez', 'esay', 'egust', 'edark', 'erail', 'tell', 'untell', 'ebridge']);   // EG-H1: Watchfire's `tell`, the union floor's `untell`; AUDIT EG III: Spirebridge's `ebridge`
-/** AUDIT EG III (Elite-Gates.md section 15): the longest a Spirebridge stands on the wire (ms - net/eliteGates/egSpanLaw.js EG_SB_MS, 6 s,
- *  pinned under it: wire.js imports no law of the Spire's), and the most gaps a hall's chain numbers. */
-export const EG_SB_WIRE_MS = 10_000;
-export const EG_GAP_WIRE_MAX = 999;
-export const EG_RUN_KINDS = Object.freeze(['offer', 'ask', 'asked', 'tally', 'egot', 'run', 'rise', 'eping', 'pz', 'eheal', 'toll', 'eland', 'efair']);   // EG-ZI: `toll` the pull's toll, to its member; FIELD BUGS 2026-10-20f: `eland` what a blow landed and `efair` why the door will not take me, each to its member
-/** FIELD BUGS 2026-10-20f DOOR-WORD: the door's words to a member it will not take (net/eliteGates/egFair.js EG_FAIR_WORDS, pinned
- *  equal: wire.js imports no law of the Spire's). */
-export const EG_FAIR_WIRE_WORDS = Object.freeze(['blind', 'speed', 'air', 'void']);
-/** EG-ZI (Elite-Gates.md section 10.6): the most quarters a pull's toll says (net/eliteGates/egLaw.js EG_TOLL_QUARTERS - pinned equal:
- *  wire.js imports no law of the Spire's). */
-export const EG_TOLL_WIRE_MAX = 4;
-export const EG_OUT_KINDS = Object.freeze(['call', 'st', 'sg', 'co', 'fall', 'down', 'rd', 'rcpt', 'end', 'no', 'bd', 'clk', 'spec', ...EG_FIGHT_KINDS, ...EG_RUN_KINDS]);   // AUDIT WORLD-EVENTS L1-4: `down` a member lying down   // EG-H1: `bd` the count's fall of me, `clk` the clock's answer
-/** A hall's stages as the wire says them (section 7): before the first hall (`wait` - the arch rising, sealed, open),
- *  the arrival and gather, the trial, the closing (its door open), a Redoubt's rest, the end. */
-export const EG_STAGES = Object.freeze(['wait', 'arrive', 'trial', 'closing', 'rest', 'end']);
-/** How a breach ends (the `end` frame's `why`, net/eliteGates/egReceipt.js EG_END_WHYS' room half). AUDIT EG III: THE SEAL's
- *  `'seal'` too - the director's `egEnd(B, 'seal')` (section 13.3, for a deploy that opens fewer bands than four) said an
- *  end and a state this list refused, so every screen would have dropped them; the client words it (EG_END_TEXT.seal). */
-export const EG_END_WORDS = Object.freeze(['tear', 'wipe', 'gone', 'last', 'empty', 'rehearsal', 'void', 'home', 'seal']);
-/** The room's refusals, in words. */
-export const EG_NO_WORDS = Object.freeze(['the breach is closed', 'the breach answers only to its company', 'the order is spent', 'you have fallen', 'you went home', 'the order is not yours', 'the road is shut', 'the breach took the key', 'the void is too old']);   // EG-H2: THE DRAIN's refusal at the hub (its stake handed back); EG-ZA: a void refused - the breach took the order (its own receipts settle the stake), or it is past EG_VOID_MAX_S
-/** The beats a room names (`esay`'s `w` - the client words each: scenes/eliteGates/egFight.js EG_SAY). */
-export const EG_SAY_KEYS = Object.freeze(['wake', 'fury', 'covenant', 'covenantrest', 'stunned', 'scent', 'scorched', 'phase', 'images', 'examination', 'cage', 'passed', 'failed', 'challenge', 'challengewon',
-  'challengeend', 'conquest', 'muster', 'tithe', 'bare', 'twinfell', 'twinraised', 'crossing', 'chaining', 'grounded', 'anchors', 'vanish', 'tether', 'tetherbroken', 'eclipse', 'mirrors', 'relit', 'landed',
-  'broken', 'stirs', 'raised', 'raisebroken', 'door', 'recalled', 'home', 'goldrun', 'mimic', 'memento', 'relicbroken', 'silenced', 'orrerytrue', 'chamberdone', 'freed', 'desertertook', 'sapperfed',
-  'reopened', 'cantrip', 'bargain', 'respite', 'ready', 'rezzed',   // AUDIT WORLD-EVENTS L1-4: `rezzed` a member raised where it lay
-  // EG-FULL LAYER THREE: a false wall falls, an engine worked, the Clan Pit's horn (blown, won, fouled), the Low Road's
-  // niche, the High Road's cache, the Low Road taken
-  'seam', 'engine', 'horn', 'hornwon', 'hornfoul', 'niche', 'hcache', 'lowroad',
-  // AUDIT EG III (Elite-Gates.md section 27.5): Bladestorm and Deadeye struck - said to their striker (`s`), its screen's beat
-  'storm', 'deadeye',
-  // AUDIT EG IV (Elite-Gates.md section 8.3): a Rampart's march holding its gate - its Ward-Bearers warded
-  'gateheld',
-  // EG-PERFECT (Elite-Gates.md section 13.3): the Wyrm's broken perches rising again, molten, at its second phase's turn
-  'perches']);
-/** The gifts a member is told of (`egot`'s `w`). */
-export const EG_GOT_WORDS = Object.freeze(['shard', 'tonic', 'cant', 'lumen', 'rel', 'longstep', 'page']);   // LAYER THREE: 'page' - a page of the Annals (`p`)
-/** The zones' kinds (`ez`). */
-export const EG_ZONE_KINDS = Object.freeze(['burn', 'void', 'soul', 'haven']);
-/** THE BRAIN'S LAW by number, said on every `in` (`bv`) and refused below EG_BRAIN_MIN (the gate's law). EG-FULL: 2 - the
- *  Spire's own fight words. */
-export const EG_BRAIN_V = 2;
-export const EG_BRAIN_MIN = 2;
-/** The breach frames' own bucket: the gate's (a swing through a pack of the legion is a frame a body). */
-export const EG_HZ_MAX = 16;
-export const egGate = (bucket, nowMs) => tokenGate(bucket, nowMs, EG_HZ_MAX);
-/** AUDIT EG IV (lane3 #5): THE HUB'S OWN BREACH WORDS - `open`, `void` and `claimed`, each said about once a minute and each
- *  a storage write, an Ed25519 verify or calls on another object at the one object every client holds - on a bucket of
- *  their own at the social acts' rate (SOCIAL_HZ_MAX), its depth a flush's few receipts said together; never the breach
- *  room's blow bucket (EG_HZ_MAX, a swing through a pack of the legion). At the hub and at home (net/online.js sendEg). */
-export const EG_HUB_HZ_MAX = SOCIAL_HZ_MAX;
-export const EG_HUB_BURST = 8;
-export const egHubGate = (bucket, nowMs) => tokenGate(bucket, nowMs, EG_HUB_HZ_MAX, EG_HUB_BURST);
-/** The breach words the hub takes (anywhere else junk) - the rest are a breach room's. */
-export const EG_HUB_KINDS = Object.freeze(['open', 'void', 'claimed']);
-/** The first relay that opens an Elite Breach - an older one closes the socket on the frame, so none is sent it. AUDIT EG V
- *  (lane4 L4-8): the arc's own number, RELAY_VERSION's (`world213` - `world201` until the merge of main past CHAT-TRADE's
- *  world201 and FIVE-ASKS' world202, `world203` until the next, past KG-SET's world203 and KG5's world204, `world205`
- *  until the next, past PVP-LOOT + QUEST-HOME's world205, `world206` until the next, past SERPENT5's world206 to HUB-PULL +
- *  DO-ASK's world210, `world211` until the next, past TIDY2's world211, `world212` until the next, past REZ-BLOODLINE +
- *  GRAVE-PARTY's world212) - 197 was its branch's first, and main's world197 to world212 carry no breach: a client meeting one
- *  believed it could open, and the relay closed the socket on the `eg`. */
-export const EG_RELAY_MIN = 213;
-export const relaySupportsEg = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= EG_RELAY_MIN; };
-/** FIELD BUGS 2026-10-20f LANDED-WORD: the first relay that tells a striker what each blow on a breach's body landed (`eland`) - a
- *  page facing an older one keeps showing its claims (a page that waited for a word an older relay never says would show none).
- *  `world237` - `world236` on its branch until the merge past LONE-HERALD's world236, which says no `eland`. */
-export const EG_LAND_RELAY_MIN = 237;
-export const relaySupportsEgLand = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= EG_LAND_RELAY_MIN; };
-/** The door the hub opens a breach's room through (HCC-PARK's doors' law - the public worker forwards /room/<key> alone). */
-export const EG_INTERNAL_OPEN = '/internal/eg/open';
-/** Where a breach's room keeps its breach, and where the hub keeps an account's live call (AUDIT EG IV, lane3 #9: swept by
- *  the hub's own sweep once its open window has ended - server/src/index.js _sweepHub). */
-export const EG_KEY = 'egbreach';
-export const egCallKey = (sub) => `egcall:${sub}`;
-/** An order on the wire (net/identityToken.js TOKEN_MAX_CHARS bounds it again where it is opened), a receipt. */
-const EG_ORDER_RE = /^v1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-const EG_ORDER_MAX = 1024;
-const EG_RECEIPT_RE = /^e1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/;
-/** EG-F: the hub's signature over a call's arch fields on the wire (net/eliteGates/egCallSig.js signEgCall - 64 bytes, base64url). */
-export const EG_CALL_SG_RE = /^[A-Za-z0-9_-]{86}$/;
-const EG_RECEIPT_WIRE_MAX = 640;
-const EG_B_RE = /^[0-9a-f]{16}$/;
-/** A hall number's bound on the wire, a count's (ms - the last word), a company's size, a coordinate's (m), a body's
- *  health, the most bodies, blows, zones, tethers and marks a word carries. */
-export const EG_HALL_WIRE_MAX = 99_999;
-const EG_COUNT_WIRE_MAX = 4 * 3600 * 1000;
-const EG_COMPANY_MAX = 8;
-const EG_XZ_MAX = 400;
-const EG_HP_MAX = 1e8;
-const EG_WIRE_BODIES_MAX = 64;
-const EG_WIRE_BLOWS_MAX = 40;
-const EG_WIRE_LIST_MAX = 32;
-const egOrder = (z) => typeof z === 'string' && z.length <= EG_ORDER_MAX && EG_ORDER_RE.test(z);
-const egMs = (v) => v === 0 || gateMs(v);
-const egXZ = (v) => finite(v) && Math.abs(v) <= EG_XZ_MAX;
-const egId = (s) => typeof s === 'string' && ID_RE.test(s);
-const egText = (s, max = 64) => (typeof s === 'string' && s.length <= max ? sanitizeName(s) : null);
-/** Where a member answered from (the landing): its map pixel and its place there, the MapsFile frame. EG-F: the arch's
- *  site - its pixel, its foot in that pixel's own frame (metres from the pixel's corner, the gate's spot's frame - the
- *  height the world frame's) and its turn; exported for the cell's arch word (scenes/eliteGates/egArch.js validEgArchWord). */
-export function egSite(s) {
-  // AUDIT RELEASE R2-2 (bible/01-Overview/audits/Audit-Release-R2.md): the arch's pixel is the WORLD's (worldPixelOk), not the
-  // Bay's 0..999 x 0..499 - past the Bay a Weir Key was staked and its `open` never left the client (validEgIn refused the
-  // site), the key handed back by its void a minute later
-  if (!s || typeof s !== 'object' || !worldPixelOk(s.px) || !worldPixelOk(s.py)) return null;
-  if (![s.x, s.y, s.z].every((v) => finite(v) && Math.abs(v) <= 1e7) || !finite(s.yaw) || Math.abs(s.yaw) > 8) return null;
-  return { px: s.px, py: s.py, x: s.x, y: s.y, z: s.z, yaw: s.yaw };
-}
-/** The company as the wire says it: `[sub, name, numeral]`, and in a room's state whether each lives, went home, has
- *  entered, watches as a witness, forsook it, how often it fell and whether its recall is still in hand. */
-function egCompany(co, full) {
-  if (!Array.isArray(co) || co.length < 1 || co.length > EG_COMPANY_MAX) return null;
-  const out = [];
-  for (const t of co) {
-    // AUDIT EG V (c, L3-10): a full row's eleventh, `here` (0 or 1 - net/eliteGates/egBrain.js egCompanyOf), kept; a row of ten has none
-    if (!Array.isArray(t) || !(full ? t.length === 10 || t.length === 11 : t.length === 3) || typeof t[0] !== 'string' || !ID_RE.test(t[0]) || typeof t[1] !== 'string' || !intIn(t[2], 1, EG_COMPANY_MAX)) return null;
-    if (full && !(t.slice(3, 8).every((v) => v === 0 || v === 1) && intIn(t[8], 0, 2) && (t[9] === 0 || t[9] === 1) && (t.length === 10 || t[10] === 0 || t[10] === 1))) return null;
-    out.push(full ? [t[0], sanitizeName(t[1]), ...t.slice(2)] : [t[0], sanitizeName(t[1]), t[2]]);
-  }
-  return new Set(out.map((t) => t[0])).size === out.length ? out : null;
-}
-/** A stage's word: the hall, the stage, when it began and ends (0 open-ended), the count (`cl` left, `ca` when it last
- *  began to run - 0 held), the hall's wake and its door (0 none). EG-PERFECT (2026-10-18; Elite-Gates.md section 11.3): `tm`
- *  when the company reached a routed hall's Collapsing Tube (relay ms - net/eliteGates/egBrain.js egTubeMouthOf), kept only
- *  with it: a word without one is the word it was, and a bad one is no instant, never no stage. */
-function egStage(m) {
-  if (!intIn(m.h, 0, EG_HALL_WIRE_MAX) || !EG_STAGES.includes(m.sg) || !egMs(m.sa) || !egMs(m.su)) return null;
-  if (!intIn(m.cl, 0, EG_COUNT_WIRE_MAX) || !egMs(m.ca) || !egMs(m.hw) || !egMs(m.dn)) return null;
-  return { h: m.h, sg: m.sg, sa: m.sa, su: m.su, cl: m.cl, ca: m.ca, hw: m.hw, dn: m.dn, ...(gateMs(m.tm) ? { tm: m.tm } : {}) };
-}
-/** EG-ZQ (Elite-Gates.md section 14, Colossal): a body's size on the wire, thousandths of its look's - 0 its look's own, else
- *  within these (Colossal's rank II, the largest the law folds, is 1400: net/eliteGates/egLaw.js EG_DECREES, pinned under it - wire.js
- *  imports no law of the Spire's). */
-export const EG_SIZE_WIRE_MIN = 500;
-export const EG_SIZE_WIRE_MAX = 2000;
-/** AUDIT EG V (lane1 #18): the longest dim outline's lead a blow says (ms - net/eliteGates/egShape.js EG_OUTLINE_MAX_MS, pinned equal:
- *  wire.js imports no law of the Spire's). */
-export const EG_OUTLINE_WIRE_MAX = 30_000;
-/** AUDIT EG V (lane1 #7): a body's facing on the wire (radians, hundredths - net/eliteGates/egBodies.js egYawOf), within a turn either way. */
-export const EG_YAW_WIRE_MAX = 7;
-const egYaw = (v) => finite(v) && Math.abs(v) <= EG_YAW_WIRE_MAX;
-/** A body (net/eliteGates/egBodies.js egBodyWire): `[i, role, k, pt, x, z, hp, max, fl, tx, tz, v, at, y, ty, st, sa, sz, yw]` - EG-ZJ: its
- *  feet and its walk's end's height (a coordinate's bound, whole centimetres on the room's side), its state as said (an object's
- *  `eob`, a lord's phase) and since when; EG-ZQ: its size (0, or EG_SIZE_WIRE_MIN..EG_SIZE_WIRE_MAX thousandths); AUDIT EG V
- *  (lane1 #7): its facing, which the relay judges a flank by. */
-function egBody(t) {
-  if (!Array.isArray(t) || t.length !== 19 || !intIn(t[0], 1, 1e9) || !intIn(t[1], 0, 2) || !intIn(t[2], 0, 99) || !intIn(t[3], 0, 99)) return null;
-  if (!egXZ(t[4]) || !egXZ(t[5]) || !intIn(t[6], 0, EG_HP_MAX) || !intIn(t[7], 1, EG_HP_MAX) || !intIn(t[8], 0, 0xffff) || !egXZ(t[9]) || !egXZ(t[10]) || !finite(t[11]) || t[11] < 0 || t[11] > 30 || !egMs(t[12])) return null;
-  if (!egXZ(t[13]) || !egXZ(t[14]) || !intIn(t[15], 0, 99) || !egMs(t[16])) return null;
-  if (t[17] !== 0 && !intIn(t[17], EG_SIZE_WIRE_MIN, EG_SIZE_WIRE_MAX)) return null;
-  if (!egYaw(t[18])) return null;
-  return [...t];
-}
-const egBodies = (a, max = EG_WIRE_BODIES_MAX) => { if (!Array.isArray(a) || a.length > max) return null; const out = a.map(egBody); return out.every(Boolean) ? out : null; };
-/** AUDIT FB1018f L3-4: each body's radius beside its row (net/eliteGates/egBodies.js egRadiusWire - metres, hundredths; one a row,
- *  in its order) - or none, a relay's before it (the screen then judges as it did). Beside the rows, not in them: a build before it
- *  drops the field and keeps the word. Answers the list (a copy), undefined for none, null for a malformed one. */
-const egRadii = (r, n) => (r === undefined ? undefined : Array.isArray(r) && r.length === n && r.every((v) => finite(v) && v >= 0 && v <= EG_XZ_MAX) ? [...r] : null);
-/** A blow (net/eliteGates/egShape.js egBlowOf): its number, thrower, stamps, landing, wind-up, share, points, element, name, CHECK,
- *  push, span. THE ASCENT (LAW 9; Elite-Gates-Ascent.md section 2): `y`, the height it lands at (a hall that judges by height
- *  says it - net/eliteGates/egBodies.js egAim; a coordinate's bound), so every screen draws and judges it on its own storey; none
- *  before. */
-function egBlowW(m) {
-  if (!m || !intIn(m.i, 1, 1e9) || !intIn(m.o, 0, 1e9) || !Array.isArray(m.s) || m.s.length < 1 || m.s.length > 10 || !m.s.every((s) => egStampOk(s, EG_XZ_MAX))) return null;
-  if (!gateMs(m.at) || !intIn(m.wu, 0, 30_000) || !finite(m.p) || m.p < 0 || m.p > 10 || !finite(m.b) || m.b < 0 || m.b > 999) return null;
-  if (m.el != null && !['fire', 'frost', 'shock', 'poison', 'magic'].includes(m.el)) return null;
-  if (!(m.ch === 0 || m.ch === 1) || !finite(m.pu) || m.pu < 0 || m.pu > 20 || !intIn(m.sp, 0, 60_000)) return null;
-  if (m.on != null && !(Array.isArray(m.on) && m.on.length >= 1 && m.on.length <= 8 && m.on.every(egId))) return null;   // AUDIT EG IV (lane1 #5): the members a failure blow names (net/eliteGates/egShape.js egBlowOn)
-  if (m.ol != null && !intIn(m.ol, 1, EG_OUTLINE_WIRE_MAX)) return null;   // AUDIT EG V (lane1 #18): a chained shape's dim outline's lead
-  if (m.y != null && !egXZ(m.y)) return null;   // THE ASCENT: the height it lands at
-  return { i: m.i, o: m.o, s: m.s.map((s) => [...s]), at: m.at, wu: m.wu, p: m.p, b: m.b, el: m.el ?? null, nm: egText(m.nm ?? '', 48) ?? '', ch: m.ch, pu: m.pu, sp: m.sp, ...(m.on != null ? { on: [...m.on] } : {}), ...(m.ol != null ? { ol: m.ol } : {}), ...(m.y != null ? { y: m.y } : {}) };
-}
-/** A zone (net/eliteGates/egLords.js zoneOut). THE ASCENT (section 2): `y`, the floor it lies on (a hall that judges by height says it). */
-function egZone(m) {
-  if (!m || !intIn(m.i, 1, 1e9) || !EG_ZONE_KINDS.includes(m.kind) || !egStampOk(m.s, EG_XZ_MAX) || !egMs(m.from) || !egMs(m.until)) return null;
-  if (!finite(m.p) || m.p < 0 || m.p > 1 || !finite(m.b) || m.b < 0 || m.b > 99 || (m.el != null && !['fire', 'frost', 'shock', 'poison', 'magic'].includes(m.el))) return null;
-  if (m.y != null && !egXZ(m.y)) return null;
-  return { i: m.i, kind: m.kind, s: [...m.s], from: m.from, until: m.until, p: m.p, b: m.b, el: m.el ?? null, ...(m.y != null ? { y: m.y } : {}) };
-}
-/** A tether: `[a, b, kind, r]` - a body or a member to a member or a body. */
-const egTether = (t) => Array.isArray(t) && t.length === 4 && (intIn(t[0], 1, 1e9) || egId(t[0])) && (intIn(t[1], 1, 1e9) || egId(t[1])) && intIn(t[2], 0, 9) && intIn(t[3], 0, 99_999) ? [...t] : null;
-/** A mark on a member: `[sub, mark, until, n]`. */
-const egMarkW = (t) => Array.isArray(t) && t.length === 4 && egId(t[0]) && intIn(t[1], 0, 15) && egMs(t[2]) && intIn(t[3], 0, 9) ? [...t] : null;
-const egList = (a, fn, max = EG_WIRE_LIST_MAX) => { if (!Array.isArray(a) || a.length > max) return null; const out = a.map(fn); return out.every(Boolean) ? out : null; };
-/** A fight's progress (`pg` - each errand's own small numbers, the ring, the Orrery's stones). */
-function egProgress(pg) {
-  if (!pg || typeof pg !== 'object' || Array.isArray(pg)) return {};
-  const out = {};
-  for (const [k, v] of Object.entries(pg).slice(0, 16)) {
-    if (!/^[a-z]{1,12}$/.test(k)) continue;
-    if (typeof v === 'string' && v.length <= 16) out[k] = v;
-    else if (finite(v) && Math.abs(v) <= 1e9) out[k] = v;
-    else if (v === null) out[k] = null;
-    else if (Array.isArray(v) && v.length <= 12 && v.every((x) => finite(x) && Math.abs(x) <= 1e9 || (Array.isArray(x) && x.length <= 3 && x.every(finite)))) out[k] = v.map((x) => (Array.isArray(x) ? [...x] : x));
-  }
-  return out;
-}
-/** AUDIT EG III (lane2 #1): the most Reliquaries' circles a run's row carries (net/eliteGates/egBrain.js oweEnd's own 64). */
-export const EG_RUN_REL_MAX = 64;
-/** A member's run: `[sub, reliquaries, lumen, shards, tonics, cantrips, vestiges, mastery, circles?]` - AUDIT EG III: each
- *  Reliquary's circle, the newest EG_RUN_REL_MAX (an eight-field row, an older relay's, still read). */
-function egRunW(t) {
-  if (!Array.isArray(t) || (t.length !== 8 && t.length !== 9) || !egId(t[0]) || !intIn(t[1], 0, 999) || !intIn(t[2], 0, 99_999) || !intIn(t[3], 0, 999) || !intIn(t[4], 0, 9)) return null;
-  if (!Array.isArray(t[5]) || t[5].length > 3 || !t[5].every((c) => intIn(c, 0, 9))) return null;
-  if (!Array.isArray(t[6]) || t[6].length > 32 || !t[6].every((p) => Array.isArray(p) && p.length === 2 && intIn(p[0], 0, 99) && intIn(p[1], 1, 3))) return null;
-  if (!intIn(t[7], -1, 199)) return null;
-  if (t.length === 9 && (!Array.isArray(t[8]) || t[8].length > EG_RUN_REL_MAX || !t[8].every((w) => intIn(w, 1, 19_999)))) return null;   // AUDIT EG III: the Reliquaries' circles
-  return [t[0], t[1], t[2], t[3], t[4], [...t[5]], t[6].map((p) => [...p]), t[7], ...(t.length === 9 ? [[...t[8]]] : [])];
-}
-const egDecreesW = (a) => egList(a, (p) => (Array.isArray(p) && p.length === 2 && intIn(p[0], 0, 31) && intIn(p[1], 1, 2) ? [...p] : null), 9);
-/** EG-ZF (2026-10-12; bible/11-Multiplayer/Elite-Gates.md section 27.6, THE RECAP): a number of the recap's - all a member
- *  dealt or healed in a breach (net/eliteGates/egTally.js), whole. */
-const EG_TALLY_WIRE_MAX = 1e9;
-const egTallyN = (v) => intIn(v, 0, EG_TALLY_WIRE_MAX);
-/** EG-ZF: a Court's DAMAGE CHART at its lord's fall (`rd`'s and an end's `dm` - net/eliteGates/egTally.js egChartOf): at most a
- *  company's rows, each `[sub, level, dealt, on the lord, blows, heaviest, falls, healed]` (the lord's part and the
- *  heaviest never past the whole), most dealt first, no member twice; anything else is no chart. */
-const egChartW = (a) => {
-  const rows = egList(a, (t) => (Array.isArray(t) && t.length === 8 && egId(t[0]) && intIn(t[1], 1, GATE_LV_WIRE_MAX) && egTallyN(t[2]) && egTallyN(t[3]) && t[3] <= t[2]
-    && intIn(t[4], 0, EG_TALLY_WIRE_MAX) && egTallyN(t[5]) && t[5] <= t[2] && intIn(t[6], 0, 99) && egTallyN(t[7]) ? [...t] : null), EG_COMPANY_MAX);
-  return rows && rows.every((r, i) => i === 0 || r[2] <= rows[i - 1][2]) && new Set(rows.map((r) => r[0])).size === rows.length ? rows : null;
-};
-/** EG-ZF: each member's part in the breach (`st`'s and `end`'s `ds` - net/eliteGates/egTally.js egTalliesOf): `[sub, dealt, healed]`,
- *  at most a company's, no member twice. */
-const egTalliesW = (a) => {
-  const rows = egList(a, (t) => (Array.isArray(t) && t.length === 3 && egId(t[0]) && egTallyN(t[1]) && egTallyN(t[2]) ? [...t] : null), EG_COMPANY_MAX);
-  return rows && new Set(rows.map((r) => r[0])).size === rows.length ? rows : null;
-};
-
-/**
- * A client's breach frame, projected (every number bounded), or null.
- */
-export function validEgIn(m) {
-  if (!m || typeof m !== 'object' || !EG_KINDS.includes(m.k)) return null;
-  switch (m.k) {
-    case 'open': { const site = egSite(m.site); return egOrder(m.z) && site ? { k: 'open', z: m.z, site } : null; }
-    case 'in': return egOrder(m.z) && intIn(m.lv, 1, GATE_LV_WIRE_MAX) ? { k: 'in', z: m.z, lv: m.lv, ...(intIn(m.bv, 0, 999) ? { bv: m.bv } : {}) } : null;
-    case 'down': return intIn(m.h, 1, EG_HALL_WIRE_MAX) ? { k: 'down', h: m.h } : null;
-    case 'home': return { k: 'home' };
-    case 'forsake': return { k: 'forsake' };
-    case 'fell': return { k: 'fell' };
-    case 'yield': return { k: 'yield' };   // AUDIT WORLD-EVENTS L1-4
-    case 'rz': return egId(m.to) ? { k: 'rz', to: m.to } : null;   // AUDIT WORLD-EVENTS L1-4: the member raised, by account
-    case 'tonic': return { k: 'tonic' };   // AUDIT EG III (lane1 #5): a Spire Tonic of my run drunk (section 17.1 - the room heals it)
-    case 'hit': return intIn(m.i, 1, 1e9) && intIn(m.q, 0, 0x7fffffff) && finite(m.d) && m.d >= 1 && m.d <= 1e6 && intIn(m.r, 0, 2) ? { k: 'hit', i: m.i, q: m.q, d: m.d, r: m.r } : null;
-    case 'pick': return intIn(m.v, 0, 199) ? { k: 'pick', v: m.v } : null;
-    case 'surplus': return m.use === 0 || m.use === 1 ? { k: 'surplus', use: m.use } : null;
-    case 'vote': return typeof m.q === 'string' && /^[a-z:]{1,24}$/.test(m.q) && intIn(m.y, 0, 9) ? { k: 'vote', q: m.q, y: m.y } : null;
-    case 'cant': return intIn(m.i, 0, 2) ? { k: 'cant', i: m.i } : null;
-    case 'buy': return intIn(m.i, 0, 2) ? { k: 'buy', i: m.i } : null;
-    case 'lping': case 'ping': return egXZ(m.x) && egXZ(m.z) && intIn(m.w, 0, 2) ? { k: m.k, x: m.x, z: m.z, w: m.w } : null;
-    case 'bequest': return intIn(m.v, 0, 99) ? { k: 'bequest', v: m.v } : null;
-    case 'pz': return intIn(m.i, 0, 5) && (m.a === 1 || m.a === -1) ? { k: 'pz', i: m.i, a: m.a } : null;
-    case 'use': return intIn(m.i, 0, 7) ? { k: 'use', i: m.i } : null;   // LAYER THREE: an engine worked (section 11.10)
-    case 'vt': return intIn(m.v, 0, BODY_WORD_MAX) ? { k: 'vt', v: m.v } : null;   // EG-H1: my body's share, thousandths (INT11's word)
-    case 'clk': return intIn(m.c, 0, 0x7fffffff) ? { k: 'clk', c: m.c, ...(intIn(m.h, 0, 5000) ? { h: m.h } : {}) } : null;   // EG-H1: a ping of the shared clock by its number, and the one-way delay my corrected clock measured (ms)
-    case 'spec': return intIn(m.h, 1, EG_HALL_WIRE_MAX) ? { k: 'spec', h: m.h } : null;   // EG-H2: a hall asked of its breach's own law
-    case 'void': return egOrder(m.z) ? { k: 'void', z: m.z } : null;   // EG-ZA: my open's order, a stake no call answered (the hub asks its room)
-    case 'claimed': return typeof m.b === 'string' && EG_B_RE.test(m.b) && ['w', 'x', 'v'].includes(m.q) && intIn(m.w ?? 0, 0, 19_999) ? { k: 'claimed', b: m.b, q: m.q, w: m.w ?? 0 } : null;   // EG-ZA: a receipt of mine the service counted (the hub forgets its copy)
-    // EG-ZF (section 27.6): what companions' spells healed in me, each caster by peer id in the room, once - the gate's own
-    // word and law (GATE-HEAL: validGateIn's `heal`), heard by a breach's room for the recap and the chart
-    case 'heal': { const g = validGateIn({ k: 'heal', h: m.h }); return g ? { k: 'heal', h: g.h } : null; }
-    case 'mast': return { k: 'mast' };   // AUDIT EG III (section 15): a Mastery used - Spirebridge, over the gap ahead of my own pose
-    case 'wkpaid': return intIn(m.w, 1, 19_999) ? { k: 'wkpaid', w: m.w } : null;   // AUDIT EG III: Redoubt `w` paid me already this week - its circle's Reliquaries 20 lumen each
-    default: return null;
-  }
-}
-/** EG-H2 (section 22, THE LAW PIN): a hall's spec as the room says it - an object naming its seed and hall (hall `h`), of
- *  at most EG_SPEC_WIRE_MAX characters, handed on whole (the relay's own bytes: net/eliteGates/egLaw.js egSpecGive takes them). */
-export const EG_SPEC_WIRE_MAX = 32_768;
-const egSpecW = (sp, h) => {
-  if (!sp || typeof sp !== 'object' || Array.isArray(sp) || sp.h !== h || !intIn(sp.seed, 0, 0xffffffff) || !intIn(sp.geo ?? 0, 0, 8)) return null;
-  let text = '';
-  try { text = JSON.stringify(sp); } catch { return null; }
-  return text.length <= EG_SPEC_WIRE_MAX ? JSON.parse(text) : null;
-};
-
-/**
- * A breach frame from the hub or a breach's room, projected for the client: the kind's own fields, bounded, or null.
- */
-export function validEgOut(m) {
-  if (!m || typeof m !== 'object' || !EG_OUT_KINDS.includes(m.k)) return null;
-  switch (m.k) {
-    case 'call': {
-      const co = egCompany(m.co, false), site = egSite(m.site);
-      if (typeof m.b !== 'string' || !EG_B_RE.test(m.b) || typeof m.o !== 'string' || typeof m.os !== 'string' || !ID_RE.test(m.os)) return null;
-      if (!intIn(m.seed, 0, 0xffffffff) || !gateMs(m.op) || !(m.rh === 0 || m.rh === 1) || !co || !site) return null;
-      // EG-F (section 6.4): the start Redoubt, the Wager, and the hub's signature over the arch's fields (net/eliteGates/egCallSig.js -
-      // '' unsigned: a stranger then stands no arch); a call that says none of them is EG-PLAY's, read as Hall 1, no Wager
-      const ew = intIn(m.ew, 0, 999) ? m.ew : 0, sg = typeof m.sg === 'string' && EG_CALL_SG_RE.test(m.sg) ? m.sg : '';
-      const wg = Array.isArray(m.wg) && m.wg.length <= 3 && m.wg.every((x) => intIn(x, 0, 31)) ? [...m.wg] : [];
-      return { k: 'call', b: m.b, o: sanitizeName(m.o), os: m.os, seed: m.seed, op: m.op, rh: m.rh, co, site, ew, wg, sg };
-    }
-    case 'st': {
-      const st = egStage(m), co = egCompany(m.co, true);
-      if (!st || !co || typeof m.b !== 'string' || !EG_B_RE.test(m.b) || !intIn(m.seed, 0, 0xffffffff) || !intIn(m.egv, 1, 999) || !gateMs(m.op) || !egMs(m.wk)) return null;
-      if (!intIn(m.rd, 0, EG_HALL_WIRE_MAX) || !(m.rh === 0 || m.rh === 1) || !intIn(m.dg, 0, 0xffffffff) || (m.end != null && !EG_END_WORDS.includes(m.end))) return null;
-      const dc = egDecreesW(m.dc ?? []), ms = egList(m.ms ?? [], egRunW, EG_COMPANY_MAX);
-      const nx = egDecreesW(m.nx ?? []);   // AUDIT EG V (L2-11): the rest's beacon - the next circle's decrees the company chose
-      const mm = egList(m.mm ?? [], (q) => (Array.isArray(q) && q.length === 5 && egId(q[0]) && intIn(q[1], 1, EG_HALL_WIRE_MAX) && egXZ(q[2]) && egXZ(q[3]) && (q[4] === '' || egId(q[4])) ? [...q] : null), 8);
-      const as = egList(m.as ?? [], (a) => (Array.isArray(a) && a.length === 3 && typeof a[0] === 'string' && /^[a-z:]{1,24}$/.test(a[0]) && Array.isArray(a[1]) && a[1].length <= 4 && a[1].every((x) => intIn(x, 0, 99)) && gateMs(a[2]) ? [a[0], [...a[1]], a[2]] : null), 8);
-      const ds = egTalliesW(m.ds ?? []);   // EG-ZF: the recap's numbers
-      if (!dc || !nx || !ms || !mm || !as || !ds || !intIn(m.geo ?? 0, 0, 8) || !intIn(m.rp ?? 0, 0, 1e8) || !intIn(m.sp ?? 0, 0, 9)) return null;
-      const words = (a) => (Array.isArray(a) && a.length <= 8 && a.every((x) => typeof x === 'string' && /^[a-z]{0,16}$/.test(x)) ? [...a] : null);
-      const sr = words(m.sr ?? []);
-      if (!sr || (m.pr != null && !/^[a-z]{0,16}$/.test(m.pr)) || (m.td != null && !/^[a-z]{0,16}$/.test(m.td)) || (m.ca2 != null && !/^[a-z]{0,8}$/.test(m.ca2))) return null;
-      const wg = Array.isArray(m.wg) && m.wg.length <= 3 && m.wg.every((x) => intIn(x, 0, 31)) ? [...m.wg] : [];
-      return { k: 'st', b: m.b, seed: m.seed, egv: m.egv, op: m.op, wk: m.wk, ...st, co, rd: m.rd, rh: m.rh, dg: m.dg, end: m.end ?? null,
-        dc, nx, pr: m.pr ?? '', wg, td: m.td ?? '', sr, geo: m.geo ?? 0, ms, ca2: m.ca2 ?? '', mm, rp: m.rp ?? 0, sp: m.sp ?? 0, as, ds,
-        site: egSite(m.site) };   // EG-F (section 6.3): the arch's site, kept by the room - a cast-out member with no landing of its own lands there
-    }
-    case 'sg': { const st = egStage(m); return st ? { k: 'sg', ...st } : null; }
-    case 'co': { const co = egCompany(m.co, true); return co ? { k: 'co', co } : null; }
-    case 'fall': return egId(m.s) && typeof m.n === 'string' && gateMs(m.at) ? { k: 'fall', s: m.s, n: sanitizeName(m.n), at: m.at, fin: m.fin === 1 ? 1 : 0 } : null;
-    case 'down': return egId(m.s) && typeof m.n === 'string' && gateMs(m.until) ? { k: 'down', s: m.s, n: sanitizeName(m.n), until: m.until } : null;   // AUDIT WORLD-EVENTS L1-4: a member lying down, for a raise until then
-    case 'rd': {
-      const dm = m.dm === undefined ? null : egChartW(m.dm);   // EG-ZF: the Court's chart at its lord's fall - a bad one is no chart, never no Redoubt
-      return intIn(m.w, 1, EG_HALL_WIRE_MAX) && intIn(m.h, 1, EG_HALL_WIRE_MAX) && gateMs(m.at) && intIn(m.cl, 0, EG_COUNT_WIRE_MAX) && intIn(m.g ?? 0, -EG_COUNT_WIRE_MAX, EG_COUNT_WIRE_MAX)
-        ? { k: 'rd', w: m.w, h: m.h, at: m.at, cl: m.cl, g: m.g ?? 0, v: m.v === 1 ? 1 : 0, cov: m.cov === 1 ? 1 : 0, ...(dm?.length ? { dm } : {}) } : null;
-    }
-    case 'rcpt': return typeof m.r === 'string' && m.r.length <= EG_RECEIPT_WIRE_MAX && EG_RECEIPT_RE.test(m.r) ? { k: 'rcpt', r: m.r } : null;
-    case 'end': {
-      // EG-ZF (section 27.6): each member's part in the breach, and the chart of a lord's fall the end came at (a Rehearsal's)
-      const ds = egTalliesW(m.ds ?? []) ?? [], dm = m.dm === undefined ? null : egChartW(m.dm);
-      return EG_END_WORDS.includes(m.why) && gateMs(m.at) ? { k: 'end', why: m.why, at: m.at, ds, ...(dm?.length ? { dm } : {}) } : null;
-    }
-    case 'no': return EG_NO_WORDS.includes(m.m) ? { k: 'no', m: m.m } : null;
-    case 'bd': return { k: 'bd' };   // EG-H1: no fields - the fall is mine, the socket's own
-    case 'clk': return intIn(m.c, 0, 0x7fffffff) && gateMs(m.now) ? { k: 'clk', c: m.c, now: m.now } : null;   // EG-H1: the relay's clock as it answered my ping
-    case 'spec': { const sp = intIn(m.egv, 1, 999) && intIn(m.h, 1, EG_HALL_WIRE_MAX) ? egSpecW(m.sp, m.h) : null; return sp ? { k: 'spec', egv: m.egv, h: m.h, sp } : null; }   // EG-H2
-    // ── the fight ──
-    case 'efs': {
-      const b = egBodies(m.b), bl = egList(m.bl ?? [], egBlowW, EG_WIRE_BLOWS_MAX), tx = egList(m.tx ?? [], egTether), mk = egList(m.mk ?? [], egMarkW), zs = egList(m.zs ?? [], egZone);   // EG-ZJ: the live zones (section 22 - a joiner's)
-      const r = b ? egRadii(m.r, b.length) : null;   // AUDIT FB1018f L3-4: the bodies' radii beside them
-      return b && r !== null && bl && tx && mk && zs && intIn(m.h, 1, EG_HALL_WIRE_MAX) && egMs(m.wk) ? { k: 'efs', h: m.h, wk: m.wk, b, ...(r ? { r } : {}), bl, tx, mk, pg: egProgress(m.pg), zs } : null;
-    }
-    case 'ead': { const a = egBodies(m.a, 24), r = a ? egRadii(m.r, a.length) : null; return a && r !== null && gateMs(m.at) ? { k: 'ead', a, ...(r ? { r } : {}), at: m.at } : null; }   // AUDIT FB1018f L3-4: and their radii
-    case 'emv': { const mv = egList(m.m, (t) => (Array.isArray(t) && t.length === 10 && intIn(t[0], 1, 1e9) && egXZ(t[1]) && egXZ(t[2]) && egXZ(t[3]) && egXZ(t[4]) && finite(t[5]) && t[5] >= 0 && t[5] <= 30 && gateMs(t[6]) && egXZ(t[7]) && egXZ(t[8]) && egYaw(t[9]) ? [...t] : null), EG_WIRE_BODIES_MAX); return mv ? { k: 'emv', m: mv } : null; }   // EG-ZJ: each walk's height and its end's; AUDIT EG V (lane1 #7): its facing
-    case 'ehp': { const h = egList(m.h, (t) => (Array.isArray(t) && t.length === 2 && intIn(t[0], 1, 1e9) && intIn(t[1], 0, EG_HP_MAX) ? [...t] : null), EG_WIRE_BODIES_MAX); return h ? { k: 'ehp', h } : null; }
-    case 'edie': return Array.isArray(m.is) && m.is.length >= 1 && m.is.length <= EG_WIRE_BODIES_MAX && m.is.every((i) => intIn(i, 1, 1e9)) && intIn(m.w, 0, 2) && gateMs(m.at) ? { k: 'edie', is: [...m.is], w: m.w, n: egText(m.n ?? '', 48) ?? '', at: m.at } : null;
-    case 'efl': return intIn(m.i, 1, 1e9) && intIn(m.fl, 0, 0xffff) ? { k: 'efl', i: m.i, fl: m.fl } : null;
-    case 'eb': { const b = egBlowW(m); return b ? { k: 'eb', ...b } : null; }
-    case 'ecut': return intIn(m.i, 1, 1e9) ? { k: 'ecut', i: m.i, ...(Number.isSafeInteger(m.at) && m.at >= 0 ? { at: m.at } : {}) } : null;   // EG-PERFECT: the instant it was cut at (its FEINT_AT - net/eliteGates/egBodies.js egCut)
-    case 'tell': { const b = egBlowW(m); return b && intIn(m.sh, 1, 400) ? { k: 'tell', ...b, sh: m.sh } : null; }   // EG-H1: Watchfire's early outline, its lead shown (ms)
-    case 'untell': return intIn(m.i, 1, 1e9) ? { k: 'untell', i: m.i } : null;
-    case 'etx': { const t = egList(m.t, egTether); return t ? { k: 'etx', t } : null; }
-    case 'emk': { const mk = egList(m.m, egMarkW); return mk ? { k: 'emk', m: mk } : null; }
-    case 'eph': return intIn(m.i, 1, 1e9) && intIn(m.ph, 1, 3) ? { k: 'eph', i: m.i, ph: m.ph } : null;
-    case 'efell': return intIn(m.i, 1, 1e9) && gateMs(m.at) ? { k: 'efell', i: m.i, at: m.at, n: egText(m.n ?? '', 48) ?? '' } : null;
-    case 'eob': return intIn(m.i, 1, 1e9) && intIn(m.st, 0, 99) && gateMs(m.at) ? { k: 'eob', i: m.i, st: m.st, at: m.at } : null;
-    case 'ez': { const z = egZone(m); return z ? { k: 'ez', ...z } : null; }
-    case 'esay': {
-      if (!EG_SAY_KEYS.includes(m.w)) return null;
-      const s = Array.isArray(m.s) && m.s.length <= 8 && m.s.every(egId) ? [...m.s] : undefined;
-      return { k: 'esay', w: m.w, n: egText(m.n ?? '', 48) ?? '', t: egText(m.t ?? '', 48) ?? '', ...(s ? { s } : {}) };
-    }
-    case 'egust': return gateMs(m.at) && finite(m.dx) && Math.abs(m.dx) <= 1 && finite(m.dz) && Math.abs(m.dz) <= 1 && finite(m.v) && m.v >= 0 && m.v <= 10 && intIn(m.ms, 0, 5000) ? { k: 'egust', at: m.at, dx: m.dx, dz: m.dz, v: m.v, ms: m.ms } : null;
-    case 'edark': case 'erail': return gateMs(m.until) ? { k: m.k, until: m.until } : null;
-    // AUDIT EG III (section 15): a Spirebridge raised - its hall, its gap, from when until when (at most EG_SB_WIRE_MS), who raised it
-    case 'ebridge': return intIn(m.h, 1, EG_HALL_WIRE_MAX) && intIn(m.g, 0, EG_GAP_WIRE_MAX) && gateMs(m.at) && gateMs(m.until) && m.until > m.at && m.until - m.at <= EG_SB_WIRE_MS && egId(m.s)
-      ? { k: 'ebridge', h: m.h, g: m.g, at: m.at, until: m.until, s: m.s, n: egText(m.n ?? '', 48) ?? '' } : null;
-    // ── the run ──
-    case 'offer': return Array.isArray(m.v) && m.v.length <= 6 && m.v.every((c) => intIn(c, 0, 199)) && intIn(m.n ?? 0, 0, 9) ? { k: 'offer', v: [...m.v], n: m.n ?? 0 } : null;
-    case 'ask': return typeof m.q === 'string' && /^[a-z:]{1,24}$/.test(m.q) && Array.isArray(m.o) && m.o.length <= 4 && m.o.every((x) => intIn(x, 0, 99)) && gateMs(m.until) ? { k: 'ask', q: m.q, o: [...m.o], until: m.until } : null;
-    case 'asked': return typeof m.q === 'string' && /^[a-z:]{1,24}$/.test(m.q) && intIn(m.r, -1, 9) ? { k: 'asked', q: m.q, r: m.r } : null;
-    case 'tally': return typeof m.q === 'string' && /^[a-z:]{1,24}$/.test(m.q) && Array.isArray(m.v) && m.v.length <= 8 && m.v.every((x) => intIn(x, 0, 9)) ? { k: 'tally', q: m.q, v: [...m.v] } : null;
-    case 'egot': return EG_GOT_WORDS.includes(m.w) ? (m.w === 'page' ? (intIn(m.p, 0, 29) ? { k: 'egot', w: 'page', p: m.p } : null) : { k: 'egot', w: m.w }) : null;
-    case 'run': { const r = egRunW(m.r); return r ? { k: 'run', r } : null; }
-    case 'rise': return egId(m.s) && finite(m.p) && m.p > 0 && m.p <= 1 && egXZ(m.x) && egXZ(m.z) && intIn(m.h, 1, EG_HALL_WIRE_MAX) ? { k: 'rise', s: m.s, p: m.p, x: m.x, z: m.z, h: m.h, ...(typeof m.by === 'string' && m.by ? { by: egText(m.by, 48) ?? '' } : {}) } : null;   // AUDIT WORLD-EVENTS L1-4: `by` the raiser's name
-    case 'eping': return egId(m.s) && egXZ(m.x) && egXZ(m.z) && intIn(m.w, 0, 2) ? { k: 'eping', s: m.s, x: m.x, z: m.z, w: m.w, wit: m.wit === 1 ? 1 : 0 } : null;
-    case 'pz': return Array.isArray(m.st) && m.st.length === 6 && m.st.every((h) => intIn(h, 0, 11)) && intIn(m.f, 0, 99) && intIn(m.lit, 0, 6) ? { k: 'pz', st: [...m.st], f: m.f, lit: m.lit, ok: m.ok === 1 ? 1 : 0, x: m.x === 1 ? 1 : 0, by: egText(m.by ?? '', 48) ?? '' } : null;
-    case 'eheal': return finite(m.p) && m.p >= -1 && m.p <= 1 ? { k: 'eheal', p: m.p, why: typeof m.why === 'string' && /^[a-z]{0,12}$/.test(m.why) ? m.why : '' } : null;
-    case 'toll': return intIn(m.q, 1, EG_TOLL_WIRE_MAX) && intIn(m.h, 1, EG_HALL_WIRE_MAX) ? { k: 'toll', q: m.q, h: m.h } : null;   // EG-ZI: the pull's toll - its quarters of the road, the hall it was taken from
-    // FIELD BUGS 2026-10-20f LANDED-WORD: what my blow on body `i` landed - the room's whole points, never past a body's health
-    case 'eland': return intIn(m.i, 1, 1e9) && intIn(m.d, 0, EG_HP_MAX) ? { k: 'eland', i: m.i, d: m.d } : null;
-    case 'efair': return EG_FAIR_WIRE_WORDS.includes(m.w) ? { k: 'efair', w: m.w } : null;   // FIELD BUGS 2026-10-20f DOOR-WORD
-    default: return null;
-  }
-}
-/** The open as the hub hands it to the breach's room (EG_INTERNAL_OPEN) - the verified order's own fields, the company
- *  it froze, the seed it drew and the opener's landing - projected, or null. */
-export function validEgOpenTell(v) {
-  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
-  const b = /** @type {any} */ (v), co = egCompany(b.co, false), site = egSite(b.site);
-  if (typeof b.b !== 'string' || !EG_B_RE.test(b.b) || typeof b.ez !== 'string' || !/^[a-z0-9]{16,32}$/.test(b.ez)) return null;
-  if (typeof b.s !== 'string' || !ID_RE.test(b.s) || typeof b.o !== 'string' || !intIn(b.ew, 0, 999) || !(b.rh === 0 || b.rh === 1)) return null;
-  if (!intIn(b.seed, 0, 0xffffffff) || !gateMs(b.op) || !co || !site || !co.some((t) => t[0] === b.s)) return null;
-  const wg = Array.isArray(b.wg) && b.wg.length <= 3 && b.wg.every((x) => intIn(x, 0, 31)) ? [...b.wg] : [];
-  return { b: b.b, ez: b.ez, s: b.s, o: sanitizeName(b.o), ew: b.ew, rh: b.rh, seed: b.seed, op: b.op, co, site, wg };
-}
-
-// ── KETCH (2026-10-24; bible/11-Multiplayer/Sky-Ketch.md section 10): THE SKY-KETCH'S WORDS ──────────────────────────
-// One frame type, `kt`, in a crew's ship's room alone (`kt:<voyage>.<owner>` - net/ketch/ketchLaw.js; anywhere else
-// junk), behind its relay version: a relay before it closes the socket on a frame it does not know, so no page boards
-// until its relay says KT_RELAY_MIN. Each blow on it is the Spire's FULL shape stamp (egBlowW, above), with the Ketch's
-// two own fields: `a` the Warden's blow (its table's number) and `jp` 1 for one a jump lets pass.
-/** The relay that keeps ships (RELAY_VERSION world255 - world253 on its branch). */
-export const KT_RELAY_MIN = 255;
-export const relaySupportsKetch = (v) => { const m = /^world(\d+)$/.exec(typeof v === 'string' ? v : ''); return !!m && Number(m[1]) >= KT_RELAY_MIN; };
-/** KETCH-EVERYWHERE (bible/11-Multiplayer/Sky-Ketch.md section 22): the first relay that keeps a ship of a station past the
- *  Bay (its voyage's number naming its theatre - ketchLaw.js ketchTheatreOf); an older one mints no room for its voyage (its
- *  clock reads that number as a voyage a hundred thousand years on), so a client boards none of them there and stands only
- *  the Bay's. The world-wide relay's one number (WORLD_WIDE_RELAY_MIN - shipped in it). */
-export const KT_THEATRES_RELAY_MIN = WORLD_WIDE_RELAY_MIN;
-export const relaySupportsKetchTheatres = relaySupportsWorldWide;
-/** What a member may say: its `in` to the bridge's fight, a blow (`hit`), a cell taken, set, let go or knocked from its
- *  hands, and its body's word (`vt`). */
-export const KT_IN_KINDS = Object.freeze(['in', 'hit', 'pick', 'bank', 'drop', 'hurt', 'vt', 'spent', 'rz']);   // AUDIT WORLD-EVENTS L1-4: `rz` my Resurrect at a crewmate lying down   // AUDIT KETCH L1-2: `spent`, a voyage's share given - to the hub alone
-/** What the room says (a page drops any other kind). */
-export const KT_OUT_KINDS = Object.freeze(['st', 'nb', 'mv', 'bl', 'hp', 'dn', 'sg', 'cl', 'wave', 'wk', 'drop', 'pick', 'bank', 'wf', 'ws', 'whp', 'ph', 'ward', 'rs', 'fk', 'fkh', 'fkb', 'stun', 'sec', 'lost', 'wl', 'fell', 'rcpt', 'no', 'bd', 'rez']);   // AUDIT WORLD-EVENTS L1-4: `rez` a member raised where it lay
-/** The fight's brain, by number (the Hour's SD_BRAIN_V law): said on every `in`, refused below KT_BRAIN_MIN. */
-export const KT_BRAIN_V = 1;
-export const KT_BRAIN_MIN = 1;
-/** The ship's words' own bucket - the gate's fight's (its four blows a second, a swing's bodies under one `q`, the cells'
- *  words), the relay's deeper. */
-export const KT_HZ = 16;
-export const ketchGate = (bucket, nowMs) => tokenGate(bucket, nowMs, KT_HZ);
-export const ketchRelayGate = (bucket, nowMs) => tokenGate(bucket, nowMs, KT_HZ, KT_HZ + 4);
-/** The ship's bounds the wire reads (net/ketch/ketchDeck.js and ketchBrain.js - the wire imports no law, so they are pinned
- *  equal there): a deck coordinate's; a body's number; a cradle's, a socket's; the crew's. */
-export const KT_XZ_MAX = 400;
-export const KT_BODY_ID_MAX = 99_999;
-export const KT_CELL_SPOT_MAX = 13;
-export const KT_CREW_WIRE_MAX = 8;
-export const KT_KIND_MAX = 4;
-export const KT_HP_MAX = 99_999_999;
-/** The receipt on the wire - a `y1` (net/ketch/ketchReceipt.js KT_RECEIPT_MAX, pinned equal), signed or not. */
-export const KT_RECEIPT_WIRE_MAX = 560;
-const KT_RECEIPT_RE = /^y1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/;
-/** Why a ship refuses an `in` or a word, by the number on the wire - the voyage gone, the fight over, a game whose brain
- *  is older. The page says each in the player's language (net/ketch/ketchLink.js KT_LINK_TEXT.no, in this order). */
-export const KT_NO_WORDS = Object.freeze(['gone', 'over', 'older']);
-/** A member's word, projected - or null. */
-export function validKetchIn(m) {
-  if (!m || typeof m !== 'object' || !KT_IN_KINDS.includes(m.k)) return null;
-  if (m.k === 'vt') return intIn(m.v, 0, BODY_WORD_MAX) ? { k: 'vt', v: m.v } : null;
-  if (m.k === 'in') return intIn(m.lv, 1, GATE_LV_WIRE_MAX) ? { k: 'in', lv: m.lv, ...(intIn(m.bv, 0, 999) ? { bv: m.bv } : {}) } : null;
-  if (m.k === 'drop' || m.k === 'hurt') return { k: m.k };
-  if (m.k === 'pick') return intIn(m.c, 0, KT_CELL_SPOT_MAX) ? { k: 'pick', c: m.c } : intIn(m.l, 1, 1e9) ? { k: 'pick', l: m.l } : null;
-  if (m.k === 'bank') return intIn(m.s, 0, KT_CELL_SPOT_MAX) ? { k: 'bank', s: m.s } : null;
-  if (m.k === 'spent') return intIn(m.n, 0, KT_VOYAGE_N_MAX) ? { k: 'spent', n: m.n } : null;
-  if (m.k === 'rz') return typeof m.to === 'string' && ID_RE.test(m.to) ? { k: 'rz', to: m.to } : null;   // AUDIT WORLD-EVENTS L1-4: the crewmate raised, by account
-  if (!intIn(m.o, 1, KT_BODY_ID_MAX) || !intIn(m.q, 0, GATE_SEQ_MAX) || !finite(m.d) || m.d <= 0 || m.d > GATE_DMG_WIRE_MAX || (m.r !== 0 && m.r !== 1 && m.r !== 2)) return null;
-  return { k: 'hit', o: m.o, q: m.q, d: m.d, r: m.r };
-}
-const ktXZ = (v) => finite(v) && Math.abs(v) <= KT_XZ_MAX;
-const ktMs = (v) => Number.isSafeInteger(v) && v >= 0;
-const ktMv = (m) => (m && typeof m === 'object' && intIn(m.o, 1, KT_BODY_ID_MAX) && [m.x, m.z, m.tx, m.tz].every(ktXZ) && finite(m.v) && m.v >= 0 && m.v <= 20 && ktMs(m.at)
-  ? { k: 'mv', o: m.o, x: m.x, z: m.z, tx: m.tx, tz: m.tz, v: m.v, at: m.at } : null);
-const ktBlow = (m) => { const b = egBlowW(m); if (!b) return null; if (m.a != null && !intIn(m.a, 0, 15)) return null; return { ...b, ...(m.a != null ? { a: m.a } : {}), ...(m.jp === 1 ? { jp: 1 } : {}) }; };
-const ktBody = (b) => (Array.isArray(b) && b.length >= 8 && intIn(b[0], 1, KT_BODY_ID_MAX) && intIn(b[1], 0, KT_KIND_MAX) && ktXZ(b[2]) && ktXZ(b[3]) && ktXZ(b[4]) && finite(b[5]) && Math.abs(b[5]) <= 8 && intIn(b[6], 0, KT_HP_MAX) && intIn(b[7], 0, KT_HP_MAX)
-  ? [b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8] === 0 ? 0 : 1, ktMs(b[9]) ? b[9] : 0] : null);
-const ktCells = (m) => {
-  const spots = (a, n) => Array.isArray(a) && a.length === n && a.every((v) => v === 1 || ktMs(v));
-  if (!m || typeof m !== 'object' || !spots(m.cr, 6) || !spots(m.br, 2) || !Array.isArray(m.lo) || m.lo.length > 32 || !Array.isArray(m.ca) || m.ca.length > KT_CREW_WIRE_MAX) return null;
-  if (!m.lo.every((l) => Array.isArray(l) && l.length === 5 && intIn(l[0], 1, 1e9) && ktXZ(l[1]) && ktXZ(l[2]) && ktXZ(l[3]) && ktMs(l[4]))) return null;
-  if (!m.ca.every((c) => Array.isArray(c) && typeof c[0] === 'string' && ID_RE.test(c[0]) && intIn(c[1], 1, 1e9))) return null;
-  if (!intIn(m.bk, 0, 7) || !intIn(m.nd, 0, 7) || !Array.isArray(m.sk) || m.sk.length !== 7 || !m.sk.every((v) => v === 0 || v === 1)) return null;
-  return { k: 'cl', cr: [...m.cr], br: [...m.br], lo: m.lo.map((l) => [...l]), ca: m.ca.map((c) => [c[0], c[1]]), bk: m.bk, nd: m.nd, sk: [...m.sk] };
-};
-const ktWardenState = (m) => {
-  if (!m || typeof m !== 'object' || !intIn(m.fi, 1, 1e9) || !intIn(m.ph, 1, 3) || !intIn(m.h, 0, KT_HP_MAX) || !intIn(m.m, 0, KT_HP_MAX) || !ktMs(m.op)) return null;
-  const W = m.wd;
-  if (!W || !ktXZ(W.x) || !ktXZ(W.z) || !finite(W.yw)) return null;
-  const mv = W.mv ? ktMv({ ...W.mv, o: 1 }) : null;
-  const bl = Array.isArray(m.bl) && m.bl.length <= 32 ? m.bl.map(ktBlow) : null;
-  if (!bl || !bl.every(Boolean) || !Array.isArray(m.rs) || m.rs.length !== 4 || !m.rs.every((v) => v === 0 || v === 1)) return null;
-  const fk = m.fk == null ? null : (intIn(m.fk.i, 1, 1e9) && ktMs(m.fk.at) && intIn(m.fk.m, 0, KT_HP_MAX) && Array.isArray(m.fk.c) && m.fk.c.length <= 7 && m.fk.c.every((q) => Array.isArray(q) && ktXZ(q[0]) && ktXZ(q[1]) && intIn(q[2], 0, KT_HP_MAX)) ? { i: m.fk.i, at: m.fk.at, m: m.fk.m, c: m.fk.c.map((q) => [q[0], q[1], q[2]]) } : undefined);
-  if (fk === undefined) return null;
-  const sec = Array.isArray(m.sec) && m.sec.length <= 8 && m.sec.every((s) => Array.isArray(s) && intIn(s[0], 0, 7) && ktMs(s[1]) && ktMs(s[2])) ? m.sec.map((s) => [s[0], s[1], s[2]]) : null;
-  if (!sec) return null;
-  return {
-    k: 'ws', fi: m.fi, ph: m.ph, h: m.h, m: m.m, op: m.op, ou: ktMs(m.ou) ? m.ou : 0, wd: { x: W.x, z: W.z, yw: W.yw, mv }, bl, ward: m.ward === 1 ? 1 : 0, rs: [...m.rs],
-    da: ktMs(m.da) ? m.da : 0, su: ktMs(m.su) ? m.su : 0, sa: ktMs(m.sa) ? m.sa : 0, fk, sec, ends: ktMs(m.ends) ? m.ends : 0, ended: ktMs(m.ended) ? m.ended : 0,
-    n: intIn(m.n, 0, KT_CREW_WIRE_MAX) ? m.n : 0, fell: m.fell && ktMs(m.fell.at) ? { at: m.fell.at, top: Array.isArray(m.fell.top) ? m.fell.top.filter((x) => typeof x === 'string').slice(0, 3).map(sanitizeName) : [], n: intIn(m.fell.n, 0, KT_CREW_WIRE_MAX) ? m.fell.n : 0 } : null,
-    lost: ktMs(m.lost) ? m.lost : 0, ...(m.me === 1 ? { me: 1 } : {}),
-  };
-};
-/** The room's word, projected for the page - or null. */
-export function validKetchOut(m) {
-  if (!m || typeof m !== 'object' || !KT_OUT_KINDS.includes(m.k)) return null;
-  const name = (v) => (typeof v === 'string' && v.length <= 48 ? sanitizeName(v) : '');
-  switch (m.k) {
-    case 'bd': return { k: 'bd' };
-    case 'rez': return typeof m.s === 'string' && ID_RE.test(m.s) && ktMs(m.at) ? { k: 'rez', s: m.s, n: name(m.n), by: name(m.by), at: m.at } : null;   // AUDIT WORLD-EVENTS L1-4
-    case 'no': return intIn(m.m, 0, KT_NO_WORDS.length - 1) ? { k: 'no', m: m.m } : null;
-    case 'rcpt': return typeof m.r === 'string' && m.r.length <= KT_RECEIPT_WIRE_MAX && KT_RECEIPT_RE.test(m.r) ? { k: 'rcpt', r: m.r } : null;
-    case 'nb': { const b = ktBody(m.b); return b && ktMs(m.up) ? { k: 'nb', b, up: m.up, wk: m.wk === 0 ? 0 : 1 } : null; }
-    case 'mv': return ktMv(m);
-    case 'bl': { const b = ktBlow(m.b); return b ? { k: 'bl', b } : null; }
-    case 'hp': return Array.isArray(m.h) && m.h.length <= 64 && m.h.every((e) => Array.isArray(e) && intIn(e[0], 1, KT_BODY_ID_MAX) && intIn(e[1], 0, KT_HP_MAX)) ? { k: 'hp', h: m.h.map((e) => [e[0], e[1]]) } : null;
-    case 'dn': return intIn(m.o, 1, KT_BODY_ID_MAX) && ktMs(m.at) ? { k: 'dn', o: m.o, n: name(m.n), at: m.at, ...(m.sw === 1 ? { sw: 1 } : {}) } : null;   // AUDIT KETCH II L3-3: `sw` - the ship took it off (the engine fed, a fight lost, the Warden's fall), nobody felled it
-    case 'wk': return intIn(m.o, 1, KT_BODY_ID_MAX) && ktMs(m.at) ? { k: 'wk', o: m.o, at: m.at } : null;
-    case 'sg': return intIn(m.sg, 0, 5) && ktMs(m.at) ? { k: 'sg', sg: m.sg, at: m.at, ...(m.by != null ? { by: name(m.by) } : {}) } : null;
-    case 'wave': return intIn(m.w, 1, KT_WATCH_WAVES) && ktMs(m.at) ? { k: 'wave', w: m.w, at: m.at } : null;   // KETCH-LONGER: the Watch's five (ketchLaw.js KT_WATCH_WAVES)
-    case 'cl': return ktCells(m);
-    case 'drop': case 'pick': case 'bank': return typeof m.s === 'string' && ID_RE.test(m.s) && ktMs(m.at) ? { k: m.k, s: m.s, n: name(m.n), at: m.at, ...(m.k === 'drop' && typeof m.why === 'string' && /^[a-z]{1,8}$/.test(m.why) ? { why: m.why } : {}), ...(m.k === 'bank' && intIn(m.sk, 0, KT_CELL_SPOT_MAX) ? { sk: m.sk } : {}) } : null;
-    case 'wf': return intIn(m.fi, 1, 1e9) && ktMs(m.at) ? { k: 'wf', fi: m.fi, at: m.at } : null;
-    case 'ws': return ktWardenState(m);
-    case 'whp': return intIn(m.h, 0, KT_HP_MAX) && intIn(m.m, 0, KT_HP_MAX) ? { k: 'whp', h: m.h, m: m.m } : null;
-    case 'ph': return intIn(m.n, 2, 3) && ktMs(m.at) && ktMs(m.up) ? { k: 'ph', n: m.n, at: m.at, up: m.up } : null;
-    case 'ward': return (m.on === 0 || m.on === 1) && ktMs(m.at) ? { k: 'ward', on: m.on, at: m.at, ...(ktMs(m.stun) ? { stun: m.stun } : {}) } : null;
-    case 'rs': return Array.isArray(m.rs) && m.rs.length === 4 && m.rs.every((v) => v === 0 || v === 1) && ktMs(m.at) ? { k: 'rs', rs: [...m.rs], at: m.at } : null;
-    case 'fk': return intIn(m.i, 1, 1e9) && ktMs(m.at) && intIn(m.m, 0, KT_HP_MAX) && Array.isArray(m.c) && m.c.length <= 7 && m.c.every((q) => Array.isArray(q) && ktXZ(q[0]) && ktXZ(q[1])) ? { k: 'fk', i: m.i, at: m.at, m: m.m, c: m.c.map((q) => [q[0], q[1]]) } : null;
-    case 'fkh': return intIn(m.i, 1, 1e9) && Array.isArray(m.h) && m.h.length <= 7 && m.h.every((v) => intIn(v, 0, KT_HP_MAX)) ? { k: 'fkh', i: m.i, h: [...m.h] } : null;
-    case 'fkb': return intIn(m.i, 1, 1e9) && intIn(m.c, 0, 6) && ktMs(m.at) ? { k: 'fkb', i: m.i, c: m.c, n: name(m.n), at: m.at } : null;
-    case 'stun': return ktMs(m.until) && ktMs(m.at) ? { k: 'stun', until: m.until, at: m.at } : null;
-    case 'sec': return Array.isArray(m.s) && m.s.length <= 8 && m.s.every((s) => Array.isArray(s) && intIn(s[0], 0, 7) && ktMs(s[1]) && ktMs(s[2])) ? { k: 'sec', s: m.s.map((s) => [s[0], s[1], s[2]]) } : null;
-    case 'lost': case 'wl': return ktMs(m.at) ? { k: m.k, at: m.at } : null;
-    case 'fell': return ktMs(m.at) ? { k: 'fell', at: m.at, top: Array.isArray(m.top) ? m.top.filter((x) => typeof x === 'string').slice(0, 3).map(sanitizeName) : [], n: intIn(m.n, 0, KT_CREW_WIRE_MAX) ? m.n : 0 } : null;
-    case 'st': {
-      if (!intIn(m.n, 0, 0xffffffff) || !intIn(m.sg, 0, 5) || !ktMs(m.sga) || !Array.isArray(m.cr) || m.cr.length > KT_CREW_WIRE_MAX) return null;
-      if (!m.cr.every((c) => Array.isArray(c) && typeof c[0] === 'string' && ID_RE.test(c[0]))) return null;
-      const bd = Array.isArray(m.bd) && m.bd.length <= 64 ? m.bd.map(ktBody) : null;
-      const mv = Array.isArray(m.mv) && m.mv.length <= 64 ? m.mv.map(ktMv) : null;
-      const bl = Array.isArray(m.bl) && m.bl.length <= 64 ? m.bl.map(ktBlow) : null;
-      const cl = ktCells(m.cl), ws = m.ws == null ? null : ktWardenState(m.ws);
-      if (!bd || !bd.every(Boolean) || !mv || !mv.every(Boolean) || !bl || !bl.every(Boolean) || !cl || (m.ws != null && !ws)) return null;
-      return {
-        k: 'st', n: m.n, sg: m.sg, sga: m.sga, cr: m.cr.map((c) => [c[0], name(c[1])]), bd, mv, bl, wv: intIn(m.wv, 0, KT_WATCH_WAVES) ? m.wv : 0, cl,
-        br: m.br && ktMs(m.br.at) ? { at: m.br.at, by: name(m.br.by) } : null, ws,
-        fell: m.fell && ktMs(m.fell.at) ? { at: m.fell.at, top: Array.isArray(m.fell.top) ? m.fell.top.filter((x) => typeof x === 'string').slice(0, 3).map(sanitizeName) : [], n: intIn(m.fell.n, 0, KT_CREW_WIRE_MAX) ? m.fell.n : 0 } : null,
-      };
-    }
-    default: return null;
-  }
-}
-/** Where a ship's room keeps its voyage (net/ketch/ketchBrain.js newVoyage's record - outside every swept prefix). */
-export const KT_VOYAGE_KEY = 'ktvoyage';
-/** AUDIT KETCH L1-2 (an earner off the ship at the fall, who never boarded her again, lost its receipt - every other
- *  event's are kept at the hub): WHERE THE HUB KEEPS AN EARNER'S KETCH RECEIPT - its latest voyage's, `{ n, r, e }`, or
- *  `{ n, spent: true, e }` once its account says that voyage's share is given (`kt` `spent`, on the hub's socket) - for
- *  the receipt's life, handed at its account's next hello (the Hour's SD9a, rung for rung). */
-export const KT_RC_PREFIX = 'ktrc:';
-/** KETCH-EVERYWHERE: one a STATION (net/ketch/ketchLaw.js ketchTheatreOf - the gate's receipt-a-lane, gateReceiptKey): the
- *  Bay's station's key the one it always was, and a station past the Bay keeps its own - two voyages of one round are two
- *  receipts, and one sailed over another province never stands over the other's. */
-export const ketchReceiptKey = (sub, theatre = 0) => (theatre ? `${KT_RC_PREFIX}${sub}.${theatre}` : `${KT_RC_PREFIX}${sub}`);
-/** The hub's internal door a ship's room tells its fall's receipts at, and how long it waits to tell again. */
-export const KT_INTERNAL_RC = '/internal/ketch/rc';
-export const KT_TELL_RETRY_MS = 30_000;
-/** The most a voyage's number is on the wire - AUDIT KETCH II L1-8: a receipt's own bound (net/ketch/ketchReceipt.js
- *  KT_RECEIPT_VOYAGE_MAX, pinned equal); 10,000 was two centuries of Saturdays, and every ten hours ran out in 2038. */
-export const KT_VOYAGE_N_MAX = 0xffffffff;
-/** A ship's receipts as told to the hub - its voyage and `[account, receipt]` each, the wire's own receipts alone -
- *  projected, or null. */
-export function validKtRcTell(v) {
-  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
-  const b = /** @type {any} */ (v);
-  if (!intIn(b.n, 0, KT_VOYAGE_N_MAX) || !Array.isArray(b.rc)) return null;
-  const rc = b.rc.slice(0, KT_CREW_WIRE_MAX).filter((e) => Array.isArray(e) && typeof e[0] === 'string' && ID_RE.test(e[0]) && typeof e[1] === 'string' && e[1].length <= KT_RECEIPT_WIRE_MAX && KT_RECEIPT_RE.test(e[1])).map((e) => [e[0], e[1]]);
-  return { n: b.n, rc };
 }

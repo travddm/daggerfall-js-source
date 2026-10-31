@@ -25,7 +25,7 @@ import { STAR_SOUNDS, playStarSound, starHeardAfterMs } from '../../../src/syste
 import { thunderOf } from '../../../src/systems/distantStorms.js';
 import { glslFunctions } from '../../glsl.mjs';
 import { SOUND } from '../../../src/systems/soundClips.js';
-import { PSEUDO_ARCHIVES, pseudoArchiveCollisions, pseudoArchiveOwner } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES, pseudoArchiveCollisions, pseudoArchiveOwner } from '../../../src/world/pseudoArchives.js';
 import { STAR_VIOLET_CSS, STAR_GOLD_CSS } from '../../../src/ui/starfall/starMapMark.js';
 
 const N = 493_210, K = 1;

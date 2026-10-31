@@ -236,8 +236,8 @@ export const pathAbsorbChance = (target) => (awakePathId(target) === 'wardwright
  *  @param {{ caster?: any, target?: any, foe?: any, spell?: any, r?: any, self?: boolean, reflected?: boolean, took?: number, cast?: any }} [landing] */
 export function pathLanded({ caster = null, target = null, foe = null, spell = null, r = null, self = false, reflected = false, took = null, cast = null } = {}) {
   const id = awakePathId(caster);
-  // AUDIT FB1018f L3-2: a spell on a stand-in its referee turns whole (`warded` - the Warden's ward, the Remnant shut, the
-  // Spire's turned blows: scenes/eliteGates/egFight.js turnStandIn) landed nothing - no Siphon Life, no Conflux, no rider
+  // AUDIT FB1018f L3-2: a spell on a stand-in its referee turns whole (`warded` - the Warden's ward, the Remnant shut)
+  // landed nothing - no Siphon Life, no Conflux, no rider
   // answers it, as the leech refuses a warded blow (systems/loot/lootPowers.js lootStrike)
   if (!id || !r || reflected || target?.warded) return;
   const landed = Number.isFinite(took) ? took : Number.isFinite(r.damage) ? r.damage : 0;

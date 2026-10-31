@@ -68,7 +68,6 @@ import { VENDOR_REFUSAL_WORDS } from './vendorLaw.js';   // HOME-VENDOR: a trade
 import { SEA_BOUNTY_MIN, SEA_BOUNTY_MAX } from './sea/seaBountyLaw.js';   // SEA-BOUNTY: a post's bounds, in its refusal
 import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './busyLaw.js';   // BUSY-GATE: the reads that stand back while the service is overloaded
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
-import { cardById } from './iliac/iliacCards.js';   // AUDIT CARDS-6 D7: the card a short deck lacks, said by its name
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
 import { MINT_VERSION } from './productRecord.js';   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
@@ -167,22 +166,8 @@ const REFUSAL_WORDS = {
   rate: () => t('account.refusal.rate', 'Too many attempts. Wait a few minutes and try again.'),
   auth: () => t('account.refusal.auth', 'You have been signed out. Sign in again.'),
   'no-signing-key': () => t('account.refusal.noSigningKey', 'The account service cannot confirm accounts right now. Try again later.'),
-  // EG-PLAY: an Elite Breach's refusals (server-account/src/eg.js)
-  rq: () => t('account.refusal.rq', 'The Spire could not read that request. Try again.'),
-  unproven: () => t('account.refusal.unproven', 'The Spire opens only to those who have closed a Dagon\'s Breach.'),
-  live: () => t('account.refusal.live', 'You hold a breach already.'),
-  rehearsed: () => t('account.refusal.rehearsed', 'You have rehearsed the Spire today. A Weir Key opens it again.'),
-  spent: () => t('account.refusal.spent', 'That breach is spent.'),
-  breach: () => t('account.refusal.breach', 'That breach is not one the Spire knows.'),
-  none: () => t('account.refusal.none', 'The Spire took no key for that.'),   // AUDIT EG IV (lane3 #1): an open asked again (`again`) whose ask never reached it
-  // EG-E3: a dungeon elite's find (server-account/src/eg.js findEg)
-  tier: () => t('account.refusal.tier', 'That is no dungeon the Spire knows.'),
+  none: () => t('account.refusal.none', 'There is nothing there for that.'),
   capped: () => t('account.refusal.capped', 'The dungeons have given all they will today. Come back tomorrow.'),
-  bits: () => t('account.refusal.bits', 'The Spire could not read those lines.'),   // EG-ZF: the first-time lines' bits (server-account/src/eg.js egFirstSay)
-  // EG-F: the start window's refusals (server-account/src/eg.js, egStarts.js)
-  start: () => t('account.refusal.start', 'You may not start a breach that deep this season.'),
-  wager: () => t('account.refusal.wager', 'The Spire could not read that Wager.'),
-  subs: () => t('account.refusal.subs', 'The Spire could not read that company.'),
   body: () => t('account.refusal.body', 'The account service could not read that request.'),
   method: () => t('account.refusal.method', 'The account service refused that request.'),
   // The two the ROUTER refuses with, before any account is looked at.
@@ -228,8 +213,6 @@ const REFUSAL_WORDS = {
   'no-insignia': () => t('account.refusal.noInsignia', 'The Broker does not sell that any more. The game may need updating.'),
   owned: () => t('account.refusal.owned', 'Your account already owns that.'),
   fenced: () => t('account.refusal.fenced', 'The Broker already settled that sale. Open her window again.'),   // AUDIT FB1024 (BROKER-RID): a press whose request id a settle fenced first (server-account/src/brokerSales.js)
-  bought: () => t('account.refusal.bought', 'You have bought from the Panoply this week. Come back next week.'),   // EG-E1: the Broker's Panoply sink, once a week (server-account/src/egEconomy.js egSink)
-  piece: () => t('account.refusal.piece', 'The Broker does not sell that piece. The game may need updating.'),
   short: () => t('account.refusal.short', 'Your account has too few embers for that.'),   // WB12a; WB13b: the card says the rule; AUDIT WB12d (A4): a rite's ember counts, and is no breach closed
   guest: () => t('account.refusal.guest', 'Insignia need a registered account. Add a username and password first.'),
   // ARENA4, the banners (server-account/src/arena.js arenaTeam)
@@ -247,9 +230,6 @@ const REFUSAL_WORDS = {
   'patreon-down': () => t('account.refusal.patreonDown', 'Patreon did not answer. Try linking again in a minute.'),
   'patreon-needs-account': () => t('account.refusal.patreonNeedsAccount', 'Linking Patreon needs a username and a password. Give this account one first.'),
   signature: () => t('account.refusal.signature', 'The account service could not check who sent that request.'),
-  // SHOP (server-account/src/shop.js): the shop's doors are pages in a browser and Stripe's webhook, met by no screen here
-  'shop-closed': () => t('account.refusal.shopClosed', 'The shop does not take payments yet.'),
-  'stripe-down': () => t('account.refusal.stripeDown', 'Stripe did not answer. Try again in a minute.'),
   // MOD1, moderation. A moderator reads these in chat, beside the
   // command they just typed.
   'not-moderator': () => t('account.refusal.notModerator', 'Only moderators can do that.'),
@@ -551,7 +531,7 @@ const REFUSAL_WORDS = {
   'prof-transmuter': () => t('account.refusal.profTransmuter', 'Only a Transmuter can turn one metal into the next. Choose it at Alchemy 100, under Provisioning.'),   // CRAFT3
   // DAEDRIC-SMELT (Professions-Arc.md section 53): the Daedric smelt's embers - the account's purse short (the service's
   // half), or the pack's (the client's, net/profBook.js smelt over systems/sigil/sigilBroker.js emberHands)
-  'prof-embers': () => t('account.refusal.profEmbers', 'Each Daedric Ingot takes a Deadlands Ember, won closing Dagon\'s Breaches, slaying Sea Serpents and taking Elite Breach Redoubts. Your account has too few left to spend.'),
+  'prof-embers': () => t('account.refusal.profEmbers', 'Each Daedric Ingot takes a Deadlands Ember, won closing Dagon\'s Breaches and slaying Sea Serpents. Your account has too few left to spend.'),
   embers: () => t('account.refusal.embers', 'Each Daedric Ingot takes a Deadlands Ember from your pack, and your pack holds too few.'),
   'bad-brew': () => t('account.refusal.badBrew', 'That cauldron makes no such potion.'),
   'bad-piece': () => t('account.refusal.badPiece', 'That is no crafted piece.'),
@@ -757,10 +737,6 @@ const REFUSAL_WORDS = {
   // AUDIT REALM2 S1: a first save the realm reads - a new character's, or customs' own
   'realm-birth': () => t('account.refusal.realmBirth', 'The realm only accepts characters made in character creation. Delete this one and create it again.'),
   'customs-allowance': () => t('account.refusal.customsAllowance', 'That character carries more gold than customs lets in. Bring it online again.'),
-  'customs-cards': () => t('account.refusal.customsCards', 'That character carries more cards than customs lets in. Bring it online again.'),   // CARDS9: the cards' customs
-  'ranked-needs-account': () => t('account.refusal.rankedNeedsAccount', 'Ranked games need a registered account.'),   // CARDS10: a ranked seat's deck order (server-account/src/iliac.js)
-  'bad-deck': () => t('account.refusal.badDeck', 'The table will not take that deck.'),
-  'deck-short': () => t('account.refusal.deckShort', 'Your realm character does not hold every card of that deck.'),
   // LEGACY7: Project Legacy online (server-account/src/legacy.js) - a fallen character's tombstone, and a member's birth
   dead: () => t('account.refusal.dead', 'That character has died for good. Their house carries on: play one of its living members.'),
   'no-lineage': () => t('account.refusal.noLineage', 'The realm does not hold that family yet. Save once, then try again.'),
@@ -825,8 +801,6 @@ const REFUSAL_WORDS = {
   'no-season': () => t('account.refusal.noSeason', 'No Season is counted yet, so there is no patronage to bid for.'),
   'no-chapter': () => t('account.refusal.noChapter', 'There is no chapter there whose patronage a guild may bid for.'),
   'patron-low': () => t('account.refusal.patronLow', 'A bid for a patronage is at least 1,000 silver, and more than your guild bid before.'),
-  // CARDS6: a gold card table's stake and its cash-out (server-account/src/cards.js)
-  'cards-realm': () => t('account.refusal.cardsRealm', 'Only an online character of the realm can play a card table for gold.'),
   // SEA-BOUNTY (server-account/src/seaBounty.js): a freeport's bounty board
   'sea-bounty-realm': () => t('account.refusal.seaBountyRealm', 'Only an online character of the realm can post or collect a bounty.'),
   'sea-bounty-gold': () => t('account.refusal.seaBountyGold', 'A bounty is between {min} and {max} gold.', { min: SEA_BOUNTY_MIN.toLocaleString('en-US'), max: SEA_BOUNTY_MAX.toLocaleString('en-US') }),
@@ -842,18 +816,6 @@ const REFUSAL_WORDS = {
   'crew-day': () => t('account.refusal.crewDay', 'The crewmaster has a new day\'s roster.'),
   'crew-taken': () => t('account.refusal.crewTaken', 'That sailor has signed on elsewhere.'),
   'crew-many': () => t('account.refusal.crewMany', 'You have signed on as many sailors as one day allows. Come back tomorrow.'),
-  'cards-closed': () => t('account.refusal.cardsClosed', 'The realm is not holding stakes for card tables right now. Try again later.'),
-  'cards-stake-paid': () => t('account.refusal.cardsStakePaid', 'That stake has already been settled.'),
-  'bad-table': () => t('account.refusal.badTable', 'The account service could not read that card table.'),
-  'bad-stakes': () => t('account.refusal.badStakes', 'That table does not play at those stakes.'),
-  'bad-buy-in': () => t('account.refusal.badBuyIn', 'A buy-in at that table must be between 20 and 100 big blinds.'),
-  'cards-stake-failed': () => t('account.refusal.cardsStakeFailed', 'The stake could not be held. Try again.'),
-  'cards-receipt': () => t('account.refusal.cardsReceipt', 'The table\'s cash-out could not be read.'),
-  'cards-not-yours': () => t('account.refusal.cardsNotYours', 'That cash-out belongs to another account.'),
-  'cards-no-stake': () => t('account.refusal.cardsNoStake', 'The realm holds no stake for that cash-out.'),
-  'cards-other-character': () => t('account.refusal.cardsOtherCharacter', 'That cash-out belongs to another of your characters. It is paid to the one who staked it.'),
-  'cards-cashout-failed': () => t('account.refusal.cardsCashoutFailed', 'The cash-out could not be paid. Try again.'),
-  'cards-held': () => t('account.refusal.cardsHeld', 'This character has gold staked at a card table. Collect it before the character is deleted.'),
   'sea-held': () => t('account.refusal.seaHeld', 'Bounties, prizes or hold goods are waiting for this character at a freeport. Collect them before the character is deleted.'),   // AUDIT SEA VENTURES B4
   // INT3/INT4 (bible/06-Systems/Integrity-Arc.md): the judge's own (server-account/src/realm.js holdRefusal,
   // prepareRealmRecord)
@@ -1944,23 +1906,6 @@ export function accountSds({ fetch, storage }) {
   };
 }
 
-/** KETCH (bible/11-Multiplayer/Sky-Ketch.md section 9): a Tonal Warden's receipt the relay signed for this account, carried
- *  to the service - `{ recorded: true, voyage, share: true, sailed }`, or `{ recorded: false, why, share, sailed }` (`claimed`
- *  - this ship's kill again; `taken` - another crew's ship this voyage), `guest` beside either for a guest. */
-export const claimKetchReceipt = (io, receipt, cid) => call(io, '/v1/ketch/claim', { receipt, cid });   // AUDIT KETCH L2-1: the device's claim id
-/**
- * KETCH: THE KETCHMASTER'S HOLD'S ONE CALL, bound to this device's stored session (the Hours' own shape). With no session
- * there is no account to claim for: `{ ok: false, error: 'no-session' }`, never a knock - and net/ketch/ketchClaims.js keeps
- * the receipt for when there is one.
- */
-export function accountKetch({ fetch, storage }) {
-  const io = () => { const s = storedSession(storage); return s ? { fetch, base: serviceBase(storage), secret: s.secret } : null; };
-  return {
-    claim: async (receipt, cid) => { const i = io(); return i ? claimKetchReceipt(i, receipt, cid) : { ok: false, error: 'no-session' }; },
-    /** The signed-in account's id - the receipts this device may offer are its alone. */
-    me: () => storedSession(storage)?.id ?? null,
-  };
-}
 
 /** LAMP-KEEPER II (2026-10-14): THE LAMP'S TITLE (server-account/src/lamp.js) through the one door - `claim()` a lamp
  *  keeper spoken to, `{ ok, data: { granted, why? } }`; no session is `no-session`, never a throw. */
@@ -1975,7 +1920,7 @@ export function accountLamp({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
 
 /** QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 5.3): THE QUESTLINES' CLAIM (server-account/src/
  *  questlines.js) through the one door - `claim({ line, step, phase, choice? })` a questline's step opened or ended,
- *  `{ ok, data: { opened?, witnessed?, title?, key?, keys?, keyHeld?, why? } }`; no session is `no-session`, never a
+ *  `{ ok, data: { opened?, witnessed?, title?, why? } }`; no session is `no-session`, never a
  *  throw. `guest()` whether the signed-in account is a guest's. */
 export function accountQuestlines({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
   const post = waitedPost({ fetch, storage }, waitMs);
@@ -1983,36 +1928,6 @@ export function accountQuestlines({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS
     claim: async (body) => { const a = await post('/v1/ql/claim', body); if (a?.error === 'auth') forgetSession(storage); return a; },
     account: () => storedSession(storage)?.id ?? null,   // whose the line's pay is: none signed in, none asked
     guest: () => (storedSession(storage)?.kind ?? null) === 'guest',   // AUDIT QUESTLINES LINES-2: a guest's witnessed deed is never recorded
-  };
-}
-
-/**
- * EG-PLAY: THE ELITE BREACH (server-account/src/eg.js) through the one door - the Weir Keys the account holds and its live
- * breach (`keys`), the open that stakes one (`open` - idempotent on its request id `rq`; `rh` the day's Rehearsal, no
- * key), a member's admission (`admit`) and a receipt the relay signed (`claim` - EG-E1: with the claiming character, its
- * guild's deed). EG-E1: the Broker's Panoply piece (`sink` - one of EG_PANOPLY_IDS, once an account an arena week; the
- * week's sale rides `keys`' `sink`); EG-E2: the three boards (`board` - the Descent's brackets, the Depths, the Deepest
- * Redoubts: ui/eliteGates/egBoardWindow.js reads it). Every answer is `call`'s shape, waited for ACCOUNT_ACT_WAIT_MS at most; no session
- * is `no-session`, never a throw. `me()` the signed-in account's id - the receipts this device may offer are its alone
- * (AUDIT WB A9's law); `guest()` whether it is a guest's.
- */
-export function accountEg({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    keys: () => post('/v1/eg/keys', {}),
-    // EG-F: the open carries the start window's choice - its start Redoubt `ew` and its Wager `wg` (none: Hall 1, no Wager)
-    // AUDIT EG IV (lane3 #1): `again` - an open whose answer was lost, asked by its own request id for the stake it took alone
-    open: (rq, rh = false, { ew = 0, wg = [], again = false } = {}) => post('/v1/eg/open', { rq, ...(rh ? { rh: 1 } : {}), ...(ew > 0 ? { ew } : {}), ...(wg?.length ? { wg: [...wg] } : {}), ...(again ? { again: 1 } : {}) }),
-    /** EG-F: the start window's preflight - which starts each member of my party (`subs`) may make. */
-    starts: (subs) => post('/v1/eg/starts', { subs: [...subs] }),
-    admit: (b) => post('/v1/eg/admit', { b }),
-    board: () => post('/v1/eg/board', {}),   // EG-E2: the three boards (server-account/src/egHonours.js egBoardOf)
-    claim: (receipt, character = null) => post('/v1/eg/claim', { receipt, ...(typeof character === 'string' && character ? { character } : {}) }),   // EG-E1: the claiming character - its guild's deed
-    sink: (piece, rid = null) => post('/v1/eg/sink', rid ? { piece, rid } : { piece }),   // EG-E1: the Broker's Panoply piece, once a week (AUDIT FB1024: and the press's request id)
-    find: (tier) => post('/v1/eg/find', { tier }),   // EG-E3: a dungeon elite's find (section 5) - `{ found, keys, asks }`
-    first: (bits) => post('/v1/eg/first', { bits }),   // EG-ZF: the first-time lines shown, kept once an account (section 27.7) - `{ first }`
-    me: () => storedSession(storage)?.id ?? null,
-    guest: () => (storedSession(storage)?.kind ?? null) === 'guest',
   };
 }
 
@@ -2443,16 +2358,6 @@ export function accountMarket({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) 
   };
 }
 
-/** CARDS6: a card table's stakes' door (server-account/src/cards.js) - a realm character's buy-in held against the
- *  service's order, and the relay's cash-out receipt paid back into its record. */
-export function accountCards({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    stake: (req) => post('/v1/cards/stake', req),
-    cashout: (req) => post('/v1/cards/cashout', req),
-  };
-}
-
 /** SEA-BOUNTY: A FREEPORT'S BOUNTY BOARD'S DOOR (server-account/src/seaBounty.js) - the wanted captains and what is owed the
  *  asking character (`board`: `{ character }`), gold posted on a wanted head (`post`: `{ character, realm, region, target,
  *  gold, rid }`) and the owed collected (`collect`: `{ character, realm, region }`). Every answer is `call`'s shape. */
@@ -2495,56 +2400,6 @@ export function accountCrewSigns({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS 
     sign: (req) => post('/v1/crew/sign', req),
     release: (req) => post('/v1/crew/release', req),
   };
-}
-
-/** CARDS10: ILIAC HAND'S DOOR (server-account/src/iliac.js) - a ranked seat's deck vouched for (`deck`: `{ character,
- *  realm, deck }` - the service's order the relay seats it ranked on), a ranked game's receipt the relay signed, carried
- *  here by an account it names (`claim`), and the season board (`board`). Every answer is `call`'s shape. */
-export function accountIliac({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    deck: (req) => post('/v1/cards/deck', req),
-    claim: (receipt) => post('/v1/iliac/claim', { receipt }),
-    board: () => post('/v1/iliac/board', {}),
-    me: () => storedSession(storage)?.id ?? null,
-    guest: () => storedSession(storage)?.kind === 'guest',   // AUDIT CARDS-6 E14: a guest's account plays no ranked game (iliac.js deckOrderOf)
-  };
-}
-
-/** KG6 (bible/11-Multiplayer/Kings-Gambit.md section 19): THE KING'S GAMBIT'S SEASON - its rated results carried to the
- *  service (server-account/src/gambit.js claimGambit) and its board read (gambitBoardOf). */
-export function accountGambit({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return {
-    claim: (receipt) => post('/v1/gambit/claim', { receipt }),
-    board: () => post('/v1/gambit/board', {}),
-    me: () => storedSession(storage)?.id ?? null,
-  };
-}
-
-/** AUDIT CARDS-6 D8/E14: ILIAC HAND'S REFUSALS, IN ITS OWN WORDS. The deck order's and the claim's words are shared with
- *  other doors - the gold tables' (`cards-realm`, `cards-closed`), a backup's (`no-data`), the gate's (`receipt`,
- *  `not-yours`) - whose sentences in REFUSALS name a card table for gold, its stakes, a backup and a gate's receipt; and
- *  the vouch said "The realm could not vouch for that deck." over every one of them, a guest's and the service's without
- *  its key alike. A word not here is REFUSALS' own (iliacRefusalText). */
-export const ILIAC_REFUSALS = Object.freeze({
-  // L10N4: REFUSALS' own words read when said, never copied at load (they are the player's language's)
-  get 'ranked-needs-account'() { return REFUSALS['ranked-needs-account']; },
-  'cards-realm': 'Ranked games need a realm character, because the realm keeps its cards.',
-  'cards-closed': 'The realm cannot check decks right now. Try again later.',
-  get 'bad-deck'() { return REFUSALS['bad-deck']; },
-  get 'deck-short'() { return REFUSALS['deck-short']; },
-  'no-data': 'The realm could not read this character\'s record. Save, then try again.',
-  receipt: 'That game\'s result could not be verified, or it has expired.',
-  'not-yours': 'That game\'s result belongs to another account.',
-  offline: 'The realm is not answering. Try again.',
-  busy: 'The realm is busy with something else. Try again in a moment.',
-});
-/** The sentence for an Iliac Hand refusal - `deck-short` with the card it lacks, by name (D7: the service names it). */
-export function iliacRefusalText(error, card = null) {
-  const said = ILIAC_REFUSALS[error] ?? accountRefusalText(error);
-  if (error !== 'deck-short' || typeof card !== 'string' || !card) return said;
-  return `${said.replace(/\.$/, '')} (${cardById(card)?.name ?? card}).`;
 }
 
 /** PROF6: the writs' door beside the Court's (server-account/src/writs.js) - a guild writ posted, supplied, withdrawn,

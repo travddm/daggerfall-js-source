@@ -22,7 +22,6 @@ import { careerTolerance } from '../../../src/systems/spellcast.js';
 import { careerAttackModifier } from '../../../src/combat/formulas.js';
 import { applyMeanerMonsters, MEANER_MONSTERS_EDIT } from '../../../src/characters/meanerMonsters.js';
 import { meanerMonstersRow as pcaaoMeanerMonstersRow, meanerMonstersOn } from '../../../src/combat/pcaaoMeanerMonsters.js';
-import { KG_ROSTER, makeUnit } from '../../../src/net/kingsGambit.js';
 import { loadQuestTables, foesTable, addIntoQuestTables, _resetExtraQuestRows } from '../../../src/systems/quest/tables.js';
 import { adaptBlowClass } from '../../../src/systems/revenant/revenantFeud.js';   // AUDIT DEX A2
 import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
@@ -240,10 +239,6 @@ test('DEX1 loaded: the classic rows written in the table, and at a foe\'s mint -
   assert.deepEqual(ENEMY_BASICS[9], dexClassicRow(9, VANILLA_ENEMY_BASICS[9]), 'the row written is the line over the vanilla row');
   assert.deepEqual(VANILLA_ENEMY_BASICS[9], before, 'VANILLA_ENEMY_BASICS: DFU\'s row, whatever the mod wrote');
   assert.ok(Object.isFrozen(VANILLA_ENEMY_BASICS[9]) && !('256' in VANILLA_ENEMY_BASICS), 'frozen, and no mod\'s row joins it');
-  // King's Gambit's roster is the vanilla rows' (Kings-Gambit.md, one roster for every client and the relay) - a unit
-  // made after the mod's Start is the unit made before it, the Dragonling 34 among them (the mod gives it 146 health)
-  for (const u of KG_ROSTER) assert.deepEqual(makeUnit(u.id, { ranged: u.ranged }), u, `the gambit's ${u.name} unmoved`);
-  assert.ok(ENEMY_BASICS[34].maxHealth !== VANILLA_ENEMY_BASICS[34].maxHealth && KG_ROSTER.some((u) => u.id === 34));
 });
 
 test('DEX1 a mod\'s monster and a mod\'s class are built on DFU\'s two arms (EnemyEntity.SetEnemyCareer :251-274)', async (t) => {

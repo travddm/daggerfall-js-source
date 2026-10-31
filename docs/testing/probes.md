@@ -128,6 +128,5 @@ installer's payload. See [../operations/desktop-release.md](../operations/deskto
 
 - `tools/verify-deploy.mjs [url]`: after `npm run build`, polls the live site until it serves your build, by
   content. HTTP 200 alone proves nothing, because a failed deploy leaves the previous build up.
-- `tools/egSpanSolve.mjs --sweep`: the Elite Breach course sweep that CI runs (`eg-sweep.yml`).
 - Intro probes (`tools/introProbe.mjs`, `tools/introCapture.mjs`, `tools/introAudioCheck.mjs`): run by
   `intro-quality.yml`.

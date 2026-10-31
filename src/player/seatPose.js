@@ -38,8 +38,7 @@ export const SEATED_HIP_HEIGHT = SEAT_PELVIS_HEIGHT - SEAT_HIP_DROP;
  *  and so is this). */
 export const SEATED_EYE_HEIGHT = EYE_HEIGHT - SEAT_HIP_DROP;
 /** MEASURED (CARDS2b, AUDIT CARDS D3): how far from a table's edge the sitter's hips are - close enough that the
- *  biped's seated arms lay its hands SEAT_HAND_ON past the edge, the knees under the table's lip. A world distance (the
- *  table's), read by world/card/cardTables.js where it stands the seats. */
+ *  biped's seated arms lay its hands SEAT_HAND_ON past the edge, the knees under the table's lip. A world distance. */
 export const SEAT_OUT = 0.35;
 /** MEASURED (CARDS2b, AUDIT CARDS D3): how far past the edge the hands lie on the top. On the measured biped they land
  *  to the unit; a race the table does not scale with reaches as far as its arms do - at build 0.9 and height 1.1 the

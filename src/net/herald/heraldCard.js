@@ -1,13 +1,13 @@
 // @ts-check
 // HERALD-CARDS (2026-10-22, the owner: "I want to overhaul our discord world event notification system to be more
-// organized"): THE HERALDS' ONE CARD. Four heralds post to the world events' Discord channel - the gate's
-// (net/gate/gateHerald.js: the omen, the kill, the broken rite), the serpent's (net/serpent/serpentHerald.js), the Abyss
-// Dungeon's (net/superDungeon/sdHerald.js) and the Spire's (net/eliteGates/egHerald.js) - and each wrote its own post: one
+// organized"): THE HERALDS' ONE CARD. Three heralds post to the world events' Discord channel - the gate's
+// (net/gate/gateHerald.js: the omen, the kill, the broken rite), the serpent's (net/serpent/serpentHerald.js) and the
+// Abyss Dungeon's (net/superDungeon/sdHerald.js) - and each wrote its own post: one
 // paragraph of plain text, the headline in bold, the times and the place and the names inside the sentence. Fourteen
 // kinds of post in one channel, every one a wall of words a reader had to read to the end to find when, where and who.
 //
 // So every post is now ONE CARD, built here and nowhere else - a Discord embed of the same shape for every moment:
-//   - AUTHOR: the event's family ("Dagon's Breach", "The Sea Serpent", "The Abyss Dungeon", "The Battlespire"), and the
+//   - AUTHOR: the event's family ("Dagon's Breach", "The Sea Serpent", "The Abyss Dungeon"), and the
 //     card's edge in the family's colour - the colour its ring has on the map (HERALD_FAMILIES) - so the channel reads
 //     by event at a glance;
 //   - TITLE: the moment, in a line ("The sky burns near Copperham", "Valkynaz Ruhn has fallen");
@@ -35,16 +35,14 @@ import { NAME_MAX } from '../wire.js';
 /**
  * THE FAMILIES: each event's card. `name` its author line, `colour` its edge - the family's marker in the pause menu's
  * Timers (the gate's red is this table's, read by ui/enhanced/enhancedStyle.js through heraldCss; the others are their
- * rings on the map - ui/serpentMapMark.js SERPENT_RING_MAP_CSS, ui/superDungeon/sdMapMark.js SD_RING_MAP_CSS,
- * ui/eliteGates/egArchMapMark.js EG_ARCH_RING_CSS - held equal by test/net/herald/heraldcards.test.js), `thread` the relay
+ * rings on the map - ui/serpentMapMark.js SERPENT_RING_MAP_CSS, ui/superDungeon/sdMapMark.js SD_RING_MAP_CSS - held
+ * equal by test/net/herald/heraldcards.test.js), `thread` the relay
  * setting naming its thread (net/relayCfg.js).
  */
 export const HERALD_FAMILIES = Object.freeze({
   gate: Object.freeze({ name: 'Dagon\'s Breach', colour: 0xe2554c, thread: 'gateThread' }),
   serpent: Object.freeze({ name: 'The Sea Serpent', colour: 0x3fd6c6, thread: 'serpentThread' }),
   abyss: Object.freeze({ name: 'The Abyss Dungeon', colour: 0xe8b24a, thread: 'sdThread' }),
-  spire: Object.freeze({ name: 'The Battlespire', colour: 0xffd56a, thread: 'egThread' }),
-  ketch: Object.freeze({ name: 'The Sky-Ketch', colour: 0x7cc4ff, thread: 'ktThread' }),   // KETCH: her ring on the map (ui/ketch/ketchMapMark.js KT_RING_CSS)
 });
 /** @typedef {keyof typeof HERALD_FAMILIES} HeraldFamily */
 /** A family's colour as a stylesheet writes it ('#e2554c'). */

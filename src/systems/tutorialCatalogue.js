@@ -339,27 +339,6 @@ export const TUTORIALS = Object.freeze([
     ],
   }),
   page({
-    id: 'tavern-cards', group: 'towns', title: 'Card Games', trigger: 'When you first sit at a card table.',
-    body: [
-      'Play Texas Hold\'em, Iliac Hand or The King\'s Gambit against the locals, and the first two against other players too. Online, one table plays for real gold.',
-      'Cards you collect go into your Card Binder, kept under Menu > Holdings > Collections.',
-    ],
-  }),
-  // KG3 (bible/11-Multiplayer/Kings-Gambit.md section 14.5): the third game at the card table - its words through the
-  // text core, read when the page is shown; no number (the panel's guide carries them) and no crown (a page names no
-  // old game, and the game's own crown is its capital's)
-  page({
-    id: 'kings-gambit', group: 'towns',
-    get title() { return t('tutorials.kingsGambit.title', 'The King\'s Gambit'); },
-    get trigger() { return t('tutorials.kingsGambit.trigger', 'When you first sit down to The King\'s Gambit.'); },
-    get body() {
-      return [
-        t('tutorials.kingsGambit.body1', 'A game of armies and kings, played on a board laid across a tavern\'s card table. Choose a regular to play, set down your stake and raise your army.'),
-        t('tutorials.kingsGambit.body2', 'Each turn, move your pieces, strike and drink potions. Bring down the enemy king to win, and guard your own.'),
-      ];
-    },
-  }),
-  page({
     id: 'holdings', group: 'towns', title: 'Houses', trigger: 'When you first look at buying or renting a house.',
     body: [
       'Offline, banks sell houses. Online, you may buy up to three empty houses at their front doors and choose who may enter.',
@@ -549,18 +528,6 @@ export const TUTORIALS = Object.freeze([
       'Online, there is one Abyss Dungeon at a time, near a city in the busiest region. Look for the pillar of light, or listen to the talk in that city\'s taverns.',
       'The Rift at its end leads to the Shattered Hour and the Brass Remnant. You have only one life in there.',
     ],
-  }),
-  page({
-    id: 'sky-ketch', group: 'challenges',
-    // KETCH: the whole page in the player's language (L10N4), as the guilds' is
-    get title() { return t('tutorials.skyKetch.title', 'The Sky-Ketch'); },
-    get trigger() { return t('tutorials.skyKetch.trigger', 'When you first ride the anchor-lift up to the Sky-Ketch.'); },
-    get body() {
-      return [
-        t('tutorials.skyKetch.body1', 'Every ten hours the Sky-Ketch stays over the fields east of the capital for seven hours. Ride its anchor-lift up with your party, eight players at most.'),
-        t('tutorials.skyKetch.body2', 'Carry aether cells to the engine. A hit makes you drop the cell. Nets catch a fall; only death wakes you in the fields below.'),
-      ];
-    },
   }),
   page({
     id: 'ocean-holes', group: 'challenges', title: 'Ocean Holes', trigger: 'When you first dive into an Ocean Hole.',

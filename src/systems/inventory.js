@@ -23,10 +23,8 @@ import { weightForMaterial, WEAPONS } from '../characters/weapons.js';   // AUDI
 // is a leaf of this module's import graph - it reads the same JSON).
 import { mintCondition, rollPaintingMessage, templateByIndex, isAmmunition } from './item/itemTemplates.js';
 import { isPlate, plateMetal } from './armorMaterials.js';   // AUDIT CLAWS B2: a plate piece's metal, one decode (a leaf)
-import { ammoTemplateFor } from '../characters/thunderlockIds.js';   // what a ranged weapon spends - a leaf, so no cycle (see the file)
 import { isRriStackable } from './roleplayRealismItems/rriRealism.js';   // RRI2: the IsItemStackable override - an added yes (FormulaHelper.cs:2100-2102)
 import { noteShot } from './shotTally.js';   // ARENA-ARROWS: the shots a bout loosed - a leaf, so no cycle
-import { cardWorth } from '../net/card/cardWorthLaw.js';   // AUDIT CARDS-6 A6: a card split off is worth its card (the law imports nothing of systems/)
 import { PATRON_COUNTER_MARK, COUNTER_PAID_MARK, COUNTER_VALUE_MARK } from '../net/patronLaw.js';   // AUDIT LW-II-2 S1: a stack keeps the counter's mark (the law imports nothing)
 import { isStolen, markStolen } from './stolenGoods.js';   // STOLEN-GOODS: a stolen piece stacks with stolen kin alone, and a split keeps the mark (a leaf)
 import { sameFoundMark, carryFoundMark } from './item/foundMark.js';   // AUDIT MEND-THIRD: a found stack keeps its mark
@@ -252,8 +250,6 @@ export function stacksWith(a, b) {
     // AUDIT MERGE-PLUS C4 (LOCK1 - the port's own field, Ledger A): a locked stack merges only with a locked one. Thirty
     // locked arrows stowed in a wagon holding five came out as thirty-five unlocked, and dropped.
     (a.locked === true) === (b.locked === true) &&
-    // CARDS8 (the port's own field, Ledger A): a card stacks only with its own card - two Rats, never a Rat and a Lich
-    (a.card ?? null) === (b.card ?? null) &&
     // STOLEN-GOODS (FIELD BUGS 2026-10-16b; the port's own field, Ledger A): a stolen piece stacks only with stolen kin -
     // three arrows off a shut shop's shelf merged into the pack's twenty were twenty-three honest arrows (or twenty-three
     // stolen ones), and the court took the wrong count
@@ -406,13 +402,6 @@ export function splitStack(list, stack, numberToPick, { rolls = Math.random } = 
   if (priced && stack.worldTextureRecord != null) picked.worldTextureRecord = stack.worldTextureRecord;
   if (stack.timeForItemToDisappear) picked.timeForItemToDisappear = stack.timeForItemToDisappear;
   if (stack.locked === true) picked.locked = true;   // AUDIT MERGE-PLUS C4: the part split off keeps the stack's lock
-  if (typeof stack.card === 'string') {   // CARDS8: the card split off is the card it was
-    picked.card = stack.card;
-    // AUDIT CARDS-6 A6: and worth its card's worth (net/card/cardWorthLaw.js CARD_WORTH, the mint's) - it took the template's
-    // coin, so a Lich split off its stack read 1 on its item card while the stack read 75
-    const w = cardWorth(stack.card);
-    if (w > 0) picked.value = w;
-  }
   if (stack.bound === true) picked.bound = true;   // AUDIT SS: and its binding (systems/item/itemBound.js) - never the Broker's price, which a dismantle pays out of
   if (stack[PATRON_COUNTER_MARK] === true) picked[PATRON_COUNTER_MARK] = true;   // AUDIT LW-II-2 S1: and the counter's mark (net/patronLaw.js) - a split is no way out of it
   if (Number.isInteger(stack[COUNTER_PAID_MARK])) picked[COUNTER_PAID_MARK] = stack[COUNTER_PAID_MARK];   // LAW-3: and what the counter was paid a piece
@@ -499,19 +488,12 @@ export const spendArrow = (list) => removeOne(list, ARROW_TEMPLATE,
   { group: 'Weapons', allowQuestItem: false, priorityToConjured: true });
 
 /**
- * THE SHOT'S AMMUNITION, by the weapon that fires it.
- *
- * DFU has one ranged weapon family and therefore one ammunition, so
- * `spendArrow` was the whole law and every host said it by name. The
- * port has two now - the Dwarven Thunderlock spends a Dwemer Pellet -
- * and a host that asks "spend an arrow" while holding a gun is asking
- * the wrong question. This asks the weapon.
- *
- * A bow, or anything else that reaches here, still spends an Arrow:
- * the answer for every classic weapon is unchanged.
+ * THE SHOT'S AMMUNITION, by the weapon that fires it. DFU has one ranged
+ * weapon family and therefore one ammunition: every weapon spends an Arrow.
+ * The hosts pass the weapon so the question stays the weapon's.
  */
-export function spendAmmoFor(list, weapon, shot = null) {
-  const template = ammoTemplateFor(weapon) ?? ARROW_TEMPLATE;
+export function spendAmmoFor(list, _weapon, shot = null) {
+  const template = ARROW_TEMPLATE;
   const opts = { group: 'Weapons', allowQuestItem: false, priorityToConjured: true };
   // ARENA-ARROWS: a REAL round spent is a shot the bout's tally counts (systems/shotTally.js) - asked before it goes
   const real = !isSummoned(getItem(list, opts.group, template, opts));
@@ -523,8 +505,8 @@ export function spendAmmoFor(list, weapon, shot = null) {
 
 /** How much ammunition the pack holds for that weapon - the number the
  *  out-of-ammo sheathe and the quiver both read. */
-export function ammoCountFor(list, weapon) {
-  const template = ammoTemplateFor(weapon) ?? ARROW_TEMPLATE;
+export function ammoCountFor(list, _weapon) {
+  const template = ARROW_TEMPLATE;
   let n = 0;
   for (const it of list ?? []) if (it?.templateIndex === template) n += Math.max(0, it.stackCount ?? 1);
   return n;
@@ -615,7 +597,7 @@ export function unitWeightInKg(item) {
   if (Number.isFinite(item.weightInKg)) return item.weightInKg + (Number.isFinite(item.water) && item.water > 0 ? item.water : 0);
   let base = t ? t.baseWeight : 0;
   if (Number.isFinite(item.water) && item.water > 0) base += item.water;   // SURV2: a waterskin weighs its water
-  if (item.group === 'Weapons' && !isAmmunition(item) && item.material != null) {   // AUDIT 68 S27-ammo-arrow-only: ammunition skips the ladder - the Arrow by index, not by name, and the Dwemer Pellet
+  if (item.group === 'Weapons' && !isAmmunition(item) && item.material != null) {   // AUDIT 68 S27-ammo-arrow-only: ammunition skips the ladder - the Arrow by index, not by name
     base = weightForMaterial(base, item.material);
   }
   if (item.group === 'Armor' && item.material != null) {

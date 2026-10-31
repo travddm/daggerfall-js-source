@@ -2,23 +2,20 @@
 // dungeons and elite breaches"; bible/06-Systems/Questlines-Arc.md sections 1 (decision 8) and 5.3): THE QUESTLINES'
 // CLAIM, as the account service pays it - `POST /v1/ql/claim` (server-account/src/questlines.js claimQl). Pinned here:
 // a step opened by its first claim and witnessed by a later one only against the place's own receipt row written at or
-// after the opening (each witness kind - the rite, the breach, a Redoubt and no Rehearsal's, three of them, a Valkynaz's,
-// an Hour, the Sea Serpent); a line's title once, and only behind its earlier witnessed steps; the Covens' Hoard's Weir
-// Key once an account, kept, behind the Burning Doors' breach; a guest writes nothing; a bad body, a step paid nothing,
-// the switch shut or at `dev`; the route listed and reachable; the vocabulary, its words and its colours. The real
-// Worker over node:sqlite with every migration (test/accountDb.mjs), each receipt minted by its own producer and
-// claimed through its own route, so the SQL itself is what is tested.
+// after the opening (each witness kind - the rite, the breach, an Hour, the Sea Serpent); a line's title once, and only
+// behind its earlier witnessed steps; the Covens' Hoard's title behind the Burning Doors witnessed whole; a guest writes
+// nothing; a bad body, a step paid nothing, the switch shut or at `dev`; the route listed and reachable; the vocabulary,
+// its words and its colours. The real Worker over node:sqlite with every migration (test/accountDb.mjs), each receipt
+// minted by its own producer and claimed through its own route, so the SQL itself is what is tested.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../accountDb.mjs';
 import { mintReceipt } from '../../src/net/gate/gateReceipt.js';
-import { mintEgReceipt } from '../../src/net/eliteGates/egReceipt.js';
 import { mintSdReceipt } from '../../src/net/superDungeon/sdReceipt.js';
 import { mintSerpentReceipt } from '../../src/net/serpent/serpentReceipt.js';
 import { mintStarReceipt } from '../../src/net/starfall/starReceipt.js';   // STAR8: the fallen stars' witness
 import { STAR_HOUR_MS } from '../../src/net/starfall/starfallLaw.js';
-import { egValkRedoubt } from '../../src/net/eliteGates/egPay.js';
 import { QL_SERVICE_LINES, QL_TITLES, QL_WITNESS_KINDS, qlTitleBit, qlStepClaimed } from '../../src/net/questlineClaims.js';
 import { claimQl, QL_WITNESS_SQL, QL_STATUS, qlTitleSteps, qlSwitchOf, questlinesOpenFor, qlStepsBefore, qlInOrderSql, QL_PURSES } from '../../server-account/src/questlines.js';
 import { titlesHeld } from '../../server-account/src/titles.js';
@@ -54,30 +51,12 @@ async function stood(t, extra = {}) {
   /** A step's `open`, and its `end` (with the outcome's choice, where it has one). */
   const open = (who, line, step) => S.call('/v1/ql/claim', { line, step, phase: 'open' }, who.secret);
   const ql = (who, line, step, choice) => S.call('/v1/ql/claim', { line, step, phase: 'end', ...(choice !== undefined ? { choice } : {}) }, who.secret);
-  let day = 600, slot = 7, rq = 0;
+  let day = 600, slot = 7;
   /** A Dagon's Breach receipt claimed - a fighter's ('dealt'), a rite's own ('rite'), a fighter who broke the rite (r 1). */
   const gate = async (who, x = 'dealt', r = undefined) => {
     const res = await S.call('/v1/gate/claim', { receipt: await mintReceipt({ d: day++, b: 'ruhn', s: who.id, c: 4242, x, ...(r ? { r } : {}) }, S.gatePriv, { subtle, nowS: now() }) }, who.secret);
     assert.equal(res.body.recorded, true, `the gate's row is written (${JSON.stringify(res.body)})`);
     return res.body;
-  };
-  /** An Elite Breach opened (a key staked, or the day's Rehearsal), its live breach cleared so the next may open. */
-  const breach = async (who, rh = 0) => {
-    const o = (await S.call('/v1/eg/open', { rq: `rq${String(++rq).padStart(16, '0')}`, ...(rh ? { rh: 1 } : {}) }, who.secret)).body;
-    assert.match(o.b ?? '', /^[0-9a-f]{16}$/, `opened (${JSON.stringify(o)})`);
-    raw.prepare('UPDATE players SET eg_live_b = NULL, eg_live_until = 0 WHERE id = ?').run(who.id);
-    return { b: o.b, ez: o.ez, rh };
-  };
-  /** A Redoubt's receipt claimed (its `eg_redoubts` row), a Rehearsal's carrying `rh`. */
-  const redoubt = async (who, br, w) => {
-    const receipt = await mintEgReceipt({ q: 'w', b: br.b, s: who.id, z: br.ez, c: 77 + w, w, h: w * 5, t: 900, n: 1, ew: 0, l: 12, ...(br.rh ? { rh: 1 } : {}) }, S.gatePriv, { subtle, nowS: now() });
-    const res = await S.call('/v1/eg/claim', { receipt }, who.secret);
-    assert.equal(res.body.recorded, true, `the Redoubt's row is written (${JSON.stringify(res.body)})`);
-  };
-  /** A breach's end claimed - a Rehearsal's carries `rh` onto its `eg_runs` row. */
-  const end = async (who, br) => {
-    const receipt = await mintEgReceipt({ q: 'x', b: br.b, s: who.id, z: br.ez, c: 5, h: 5, t: 960, n: 1, ew: 0, l: 12, why: br.rh ? 'rehearsal' : 'home', ...(br.rh ? { rh: 1 } : {}) }, S.gatePriv, { subtle, nowS: now() });
-    assert.equal((await S.call('/v1/eg/claim', { receipt }, who.secret)).body.recorded, true);
   };
   /** An Hour broken - a Brass Remnant's receipt claimed (its `sd_kills` row). */
   const hour = async (who) => {
@@ -99,12 +78,12 @@ async function stood(t, extra = {}) {
     const res = await S.call('/v1/star/claim', { receipt, character: CH, name: who.handle }, who.secret);
     assert.equal(res.body.recorded, true, `the star's row is written (${JSON.stringify(res.body)})`);
   };
-  const row = (who) => ({ ...raw.prepare('SELECT eg_keys, ql_titles, ql_key FROM players WHERE id = ?').get(who.id) });
+  const row = (who) => ({ ...raw.prepare('SELECT ql_titles FROM players WHERE id = ?').get(who.id) });
   const steps = (who) => raw.prepare('SELECT line, step, opened_at, done_at, seen_at, choice FROM ql_steps WHERE account = ? ORDER BY line, step').all(who.id).map((r) => ({ ...r }));
-  return { S, raw, at, now, open, ql, gate, breach, redoubt, end, hour, serpent, star, row, steps };
+  return { S, raw, at, now, open, ql, gate, hour, serpent, star, row, steps };
 }
 
-test('QL12 THE LAW: every step the service pays is witnessable - by a kind this module reads or its line\'s `after` - and each kind has its SQL; a line\'s title waits on its witnessed steps before it; the switch reads off, dev and on; the Valkynaz\'s SQL is egValkRedoubt (mutants: a kind unread; the title\'s steps; the fifth)', async (t) => {
+test('QL12 THE LAW: every step the service pays is witnessable - by a kind this module reads or its line\'s `after` - and each kind has its SQL; a line\'s title waits on its witnessed steps before it; the switch reads off, dev and on (mutants: a kind unread; the title\'s steps)', () => {
   for (const k of QL_WITNESS_KINDS) assert.equal(typeof QL_WITNESS_SQL[k], 'string', `${k} has a witness`);
   assert.deepEqual(Object.keys(QL_WITNESS_SQL).sort(), [...QL_WITNESS_KINDS].sort());
   for (const [line, l] of Object.entries(QL_SERVICE_LINES)) {
@@ -115,15 +94,14 @@ test('QL12 THE LAW: every step the service pays is witnessable - by a kind this 
   }
   assert.deepEqual(qlTitleSteps('burningDoors'), [2, 3], 'the rite, then the breach');
   assert.deepEqual(qlTitleSteps('covensHoard'), [2]);
-  assert.deepEqual(qlTitleSteps('weirRoad'), [0, 1, 2]);
   assert.deepEqual(qlTitleSteps('hourThatWasNot'), [1]);
   assert.deepEqual(qlTitleSteps('oldCoil'), [2]);
   assert.deepEqual(qlTitleSteps('thirteenthFrostfall'), [0, 2], 'STAR8: the first star, then the three');   // PIN MOVED (STAR8)
   assert.deepEqual(qlTitleSteps('nope'), []);
   // AUDIT STARFALL B2: the witnessed steps an end waits on - its line's before it, the law's own numbers
-  assert.deepEqual([qlStepsBefore('thirteenthFrostfall', 0), qlStepsBefore('thirteenthFrostfall', 2), qlStepsBefore('weirRoad', 2), qlStepsBefore('burningDoors', 3), qlStepsBefore('covensHoard', 2), qlStepsBefore('nope', 1)], [[], [0], [0, 1], [2], [], []]);
+  assert.deepEqual([qlStepsBefore('thirteenthFrostfall', 0), qlStepsBefore('thirteenthFrostfall', 2), qlStepsBefore('burningDoors', 3), qlStepsBefore('covensHoard', 2), qlStepsBefore('nope', 1)], [[], [0], [2], [], []]);
   assert.equal(qlInOrderSql('burningDoors', 2), '1', 'the line\'s first witnessed step waits on nothing');
-  assert.equal(qlInOrderSql('weirRoad', 2), '(SELECT COUNT(*) FROM ql_steps b WHERE b.account = ?1 AND b.line = ?2 AND b.step IN (0, 1) AND b.done_at IS NOT NULL) = 2');
+  assert.equal(qlInOrderSql('thirteenthFrostfall', 2), '(SELECT COUNT(*) FROM ql_steps b WHERE b.account = ?1 AND b.line = ?2 AND b.step IN (0) AND b.done_at IS NOT NULL) = 1');
   // T-B: the Starwarden's purse, the one a line pays
   assert.deepEqual({ ...QL_PURSES }, { thirteenthFrostfall: 30 });
   assert.equal(QL_STARWARDEN_CAKES, 30);
@@ -133,17 +111,6 @@ test('QL12 THE LAW: every step the service pays is witnessable - by a kind this 
   assert.deepEqual([questlinesOpenFor(dev, env('dev')), questlinesOpenFor({ handle: 'Ann' }, env('dev'))], [true, false], 'dev: the developers alone');
   assert.deepEqual([questlinesOpenFor(dev, env('off')), questlinesOpenFor(dev, {})], [false, false], 'off, and off by default');
   assert.deepEqual({ ...QL_STATUS }, { 'ql-closed': 403, 'ql-body': 400 });
-  // the Valkynaz's witness is egPay.js egValkRedoubt in SQL - asked of the real tables, one Redoubt's row at a time, every
-  // Redoubt a receipt may name to 60
-  const { S, raw } = await stood(t);
-  const me = await S.registered('ValkProbe');
-  raw.prepare("INSERT INTO ql_steps (account, line, step, opened_at) VALUES (?, 'probe', 0, 10)").run(me.id);
-  const ask = raw.prepare(`SELECT ${QL_WITNESS_SQL.valkynaz} IS NOT NULL AS ok`);
-  for (let w = 1; w <= 60; w++) {
-    raw.prepare('DELETE FROM eg_redoubts WHERE account = ?').run(me.id);
-    raw.prepare("INSERT INTO eg_redoubts (b, account, w, h, t, at) VALUES ('0123456789abcdef', ?, ?, 1, 1, 10)").run(me.id, w);
-    assert.equal(ask.get(me.id, 'probe', 0).ok === 1, egValkRedoubt(w), `w ${w}`);
-  }
 });
 
 test('QL12 THE BURNING DOORS: an `open` writes the step\'s opening; an `end` reads its witness - a receipt from before the LINE\'s first opening witnesses nothing, one at or after it does - the rite by a rite\'s own receipt or a fighter\'s that broke it, never a plain kill; the breach by a kill, never the rite alone; the Doorwarden once, on the step that completes the line\'s witnessed steps; the line\'s window, never a step\'s own; in the line\'s order (AUDIT STARFALL B2); a later step\'s receipt its ceiling (mutants: `>=` for `>`; the rite\'s embers; the breach\'s rite; the title\'s steps; the title\'s guard; QL12-step-window; QL12-order-ceiling; B2-the-order-unasked)', async (t) => {
@@ -258,54 +225,6 @@ test('QL12 THE BURNING DOORS: an `open` writes the step\'s opening; an `end` rea
   assert.deepEqual((await ql(c2, 'burningDoors', 2)).body, { witnessed: true, title: 'doorwarden' }, 'the rite, older than the breach\'s receipt: the line whole');
 });
 
-test('QL12 THE WEIR ROAD: a Redoubt\'s row witnesses `redoubt`, a Rehearsal\'s never (its stake says so, or its end where the stake is gone); three Redoubts newer than the one that witnessed the step before witness `redoubts3`; a Valkynaz\'s - every fifth - witnesses `valkynaz`; the Weirwalker after all three (mutants: the Rehearsal\'s stake; its end; the count; the fifth; the order)', async (t) => {
-  const { S, raw, at, open, ql, gate, breach, redoubt, end, row } = await stood(t);
-  const me = await S.registered('Weirwalker1');
-  await gate(me);   // proven, and the first breach's key
-  at(T0 + 100);
-  assert.deepEqual((await open(me, 'weirRoad', 0)).body, { opened: true });
-  // A REHEARSAL'S REDOUBT witnesses nothing - its stake is a Rehearsal's
-  at(T0 + 200);
-  const rh = await breach(me, 1);
-  await redoubt(me, rh, 1);
-  assert.deepEqual((await ql(me, 'weirRoad', 0)).body, { witnessed: false }, 'a Rehearsal\'s Redoubt');
-  // and where its stake is gone (its opener's account gone with it), its end says so
-  await redoubt(me, rh, 2);
-  await end(me, rh);
-  raw.prepare('DELETE FROM eg_stakes WHERE b = ?').run(rh.b);
-  assert.deepEqual((await ql(me, 'weirRoad', 0)).body, { witnessed: false }, 'a Rehearsal\'s Redoubt with no stake: its end');
-  // A BREACH'S REDOUBT witnesses it
-  at(T0 + 86_400);
-  const br = await breach(me);
-  await redoubt(me, br, 1);
-  assert.deepEqual((await ql(me, 'weirRoad', 0)).body, { witnessed: true });
-  // THREE REDOUBTS newer than the one that witnessed the step before - that one counts not again
-  at(T0 + 86_500);
-  assert.deepEqual((await open(me, 'weirRoad', 1)).body, { opened: true });
-  await redoubt(me, br, 2);
-  await redoubt(me, br, 3);
-  assert.deepEqual((await ql(me, 'weirRoad', 1)).body, { witnessed: false }, 'two newer (the first witnessed the step before)');
-  await redoubt(me, br, 4);
-  assert.deepEqual((await ql(me, 'weirRoad', 1)).body, { witnessed: true }, 'three');
-  // A VALKYNAZ'S REDOUBT - every fifth
-  at(T0 + 86_600);
-  assert.deepEqual((await open(me, 'weirRoad', 2)).body, { opened: true });
-  await redoubt(me, br, 9);
-  assert.deepEqual((await ql(me, 'weirRoad', 2)).body, { witnessed: false }, 'the ninth is no Valkynaz\'s');
-  await redoubt(me, br, 10);
-  assert.deepEqual((await ql(me, 'weirRoad', 2)).body, { witnessed: true, title: 'weirwalker' }, 'the tenth is, and the line\'s three are done');
-  assert.equal(row(me).ql_titles, qlTitleBit('weirwalker'));
-  // the Weirwalker waits on every witnessed step before it
-  const you = await S.registered('Weirwalker2');
-  await gate(you);
-  at(T0 + 86_700);
-  await open(you, 'weirRoad', 2);
-  const b3 = await breach(you);
-  await redoubt(you, b3, 5);
-  assert.deepEqual((await ql(you, 'weirRoad', 2)).body, { witnessed: false }, 'the Valkynaz\'s step alone: the two witnessed steps before it not done (PIN MOVED, AUDIT STARFALL B2)');
-  assert.equal(row(you).ql_titles, 0);
-});
-
 test('QL12 THE HOUR AND THE OLD COIL: an Hour broken witnesses the Hour\'s step and a serpent slain the Coil\'s, each only after its line\'s opening - and each pays its line\'s title (mutants: the Hour\'s table; the serpent\'s; the opening ignored)', async (t) => {
   const { S, at, open, ql, hour, serpent, row } = await stood(t);
   const me = await S.registered('Witness', { character: CH });
@@ -350,8 +269,8 @@ test('STAR8 THE THIRTEENTH OF FROSTFALL: a star held after the line\'s first ope
   assert.deepEqual((await ql(me, 'thirteenthFrostfall', 3, 'burned')).body, { why: 'unpaid' }, 'the spindle\'s fate is the client\'s');
 });
 
-test('AUDIT STARFALL B2: A STAR COUNTS FOR ONE STEP, WHICHEVER END IS ASKED FIRST - QLTF03\'s three asked before QLTF01\'s star is not witnessed (its earlier witnessed step not done); QLTF01 then takes the first star, and QLTF03 the three after it: the Starwarden on four stars, never three. The Weir Road\'s three Redoubts the same, after its first (mutants: B2-the-order-unasked; B2-the-steps-before-unread)', async (t) => {
-  const { S, raw, at, open, ql, star, breach, redoubt, gate, row, steps } = await stood(t);
+test('AUDIT STARFALL B2: A STAR COUNTS FOR ONE STEP, WHICHEVER END IS ASKED FIRST - QLTF03\'s three asked before QLTF01\'s star is not witnessed (its earlier witnessed step not done); QLTF01 then takes the first star, and QLTF03 the three after it: the Starwarden on four stars, never three (mutants: B2-the-order-unasked; B2-the-steps-before-unread)', async (t) => {
+  const { S, raw, at, open, ql, star, row, steps } = await stood(t);
   const me = await S.registered('OutOfOrderStars', { character: CH });
   at(T0 + 10);
   assert.deepEqual((await open(me, 'thirteenthFrostfall', 0)).body, { opened: true });
@@ -368,20 +287,6 @@ test('AUDIT STARFALL B2: A STAR COUNTS FOR ONE STEP, WHICHEVER END IS ASKED FIRS
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM stars_held WHERE account = ?').get(me.id).n, 4, 'four stars held');
   assert.deepEqual(steps(me).map((s) => [s.step, s.seen_at]), [[0, T0 + 20], [2, T0 + 70]], 'one star a step: the first, and the third after it');
   assert.equal(row(me).ql_titles, qlTitleBit('starwarden'));
-  // THE WEIR ROAD: `redoubts3` asked before `redoubt` waits, and its three are newer than the Redoubt that witnessed step 0
-  const w = await S.registered('OutOfOrderWeir');
-  await gate(w);   // proven, and the first breach's key
-  at(T0 + 100);
-  assert.deepEqual((await open(w, 'weirRoad', 0)).body, { opened: true });
-  const br = await breach(w);
-  for (const k of [1, 2, 3]) { at(T0 + 100 + k * 10); await redoubt(w, br, k); }
-  at(T0 + 200);
-  assert.deepEqual((await ql(w, 'weirRoad', 1)).body, { witnessed: false }, 'three Redoubts before the first Redoubt\'s end');
-  assert.deepEqual((await ql(w, 'weirRoad', 0)).body, { witnessed: true });
-  assert.deepEqual((await ql(w, 'weirRoad', 1)).body, { witnessed: false }, 'two after it are not three');
-  at(T0 + 210);
-  await redoubt(w, br, 4);
-  assert.deepEqual((await ql(w, 'weirRoad', 1)).body, { witnessed: true }, 'the fourth');
 });
 
 test('T-B THE STARWARDEN\'S PURSE: QLTF03\'s witnessed end lays Starwarden and, in the same guarded write, 30 Soul Cakes on the account\'s count while the festival is open for it - answered `purse`; never twice (a re-claim answers it held), never outside the festival\'s days or with its switch off, never to a guest (mutants: T-B-the-purse-unpaid; T-B-the-days-unread; T-B-the-switch-unread; T-B-the-purse-unguarded; T-B-the-purse-said-to-every-claim)', async (t) => {
@@ -458,7 +363,7 @@ test('T-B THE PURSE ON THE PAGE: the questlines\' door hears a paid purse - "+30
   } finally { _resetFestivalClientForTests(); }
 });
 
-test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burning Doors witnessed whole (the Doorwarden held - never its breach alone); Covenbane on its END, never its opening; the Weir Key once an account - to an end that keeps it, a seal no bar to a later keep, never twice and said so (mutants: the after-gate; the opening paying; the choice; the key\'s guard; the balance; keyHeld)', async (t) => {
+test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burning Doors witnessed whole (the Doorwarden held - never its breach alone); Covenbane on its END, never its opening, once an account; the step\'s record the first end\'s choice (mutants: the after-gate; the opening paying; the choice)', async (t) => {
   const { S, at, open, ql, gate, row, steps } = await stood(t);
   /** The Burning Doors witnessed whole at `s`: the line opened, a rite, its end, a breach, its end. */
   const doors = async (who, s) => {
@@ -474,14 +379,14 @@ test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burnin
   at(T0 + 100);
   assert.deepEqual((await open(me, 'covensHoard', 2)).body, { opened: true });
   assert.deepEqual((await ql(me, 'covensHoard', 2, 'keep')).body, { witnessed: false }, 'the Burning Doors not yet witnessed');
-  assert.deepEqual(row(me), { eg_keys: 0, ql_titles: 0, ql_key: 0 }, 'nothing paid');
+  assert.deepEqual(row(me), { ql_titles: 0 }, 'nothing paid');
   // ONE STEP IS NOT THE LINE WHOLE (AUDIT QUESTLINES SERVICE-4) - PIN MOVED (AUDIT STARFALL B2): the breach's end asked
   // before the rite's is not witnessed at all now; the rite's alone is, and the Doorwarden still not held
   await open(me, 'burningDoors', 2);
   at(T0 + 120);
   await gate(me, 'rite');
   at(T0 + 150);
-  await gate(me);   // the first breach closed: the Spire's certain key
+  await gate(me);   // the first breach closed
   assert.deepEqual((await ql(me, 'burningDoors', 3)).body, { witnessed: false }, 'the breach\'s end before the rite\'s: the line\'s order');
   assert.deepEqual((await ql(me, 'covensHoard', 2, 'keep')).body, { witnessed: false }, 'the Doorwarden not held');
   assert.deepEqual((await ql(me, 'burningDoors', 2)).body, { witnessed: true }, 'the rite witnessed');
@@ -490,28 +395,23 @@ test('QL12 THE COVENS\' HOARD: its last step is witnessed only behind the Burnin
   // AN OPENING ASKED AGAIN PAYS NOTHING (SERVICE-6: Covenbane was told at QLCH03's start)
   assert.deepEqual((await open(me, 'covensHoard', 2)).body, { opened: true });
   assert.equal(row(me).ql_titles & qlTitleBit('covenbane'), 0, 'no Covenbane at the opening');
-  const before = row(me).eg_keys;
   const paid = (await ql(me, 'covensHoard', 2, 'keep')).body;
-  assert.deepEqual(paid, { witnessed: true, title: 'covenbane', key: true, keys: before + 1 }, 'kept: the key, its balance, and Covenbane');
-  assert.deepEqual(row(me), { eg_keys: before + 1, ql_titles: qlTitleBit('doorwarden') | qlTitleBit('covenbane'), ql_key: 1 });
-  assert.deepEqual((await ql(me, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane', keyHeld: true }, 'once an account - and said so (AUDIT QUESTLINES LINES-4); the title held (SERVICE-7 (c), PIN MOVED)');
-  assert.equal(row(me).eg_keys, before + 1, 'no second key');
-  // SEALED: the title, no key - the step's record the first end's choice; and a later character of the account who keeps
-  // it is the account's key (AUDIT QUESTLINES LINES-4: a first `seal` barred the key from every character for good)
+  assert.deepEqual(paid, { witnessed: true, title: 'covenbane' }, 'kept: Covenbane');
+  assert.deepEqual(row(me), { ql_titles: qlTitleBit('doorwarden') | qlTitleBit('covenbane') });
+  assert.deepEqual((await ql(me, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane' }, 'once an account - the title held (SERVICE-7 (c), PIN MOVED)');
+  // SEALED: the title too - the step's record the first end's choice, a later end's choice never written over it
   const seal = await S.registered('Sealer');
   await doors(seal, T0 + 300);
   await open(seal, 'covensHoard', 2);
-  const k0 = row(seal).eg_keys;
   assert.deepEqual((await ql(seal, 'covensHoard', 2, 'seal')).body, { witnessed: true, title: 'covenbane' });
-  assert.deepEqual([row(seal).eg_keys, row(seal).ql_key], [k0, 0], 'sealed: no key');
-  assert.deepEqual((await ql(seal, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane', key: true, keys: k0 + 1 }, 'a later keep: the account\'s key (its title held - SERVICE-7 (c))');
+  assert.deepEqual((await ql(seal, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane' }, 'a later keep: its title held (SERVICE-7 (c))');
   assert.equal(steps(seal).find((s) => s.line === 'covensHoard').choice, 'seal', 'the record keeps the first choice');
   // A STEP DONE BY AN END WITH NO CHOICE takes the next end's
   const late = await S.registered('LateKeeper');
   await doors(late, T0 + 400);
-  const k1 = row(late).eg_keys;
   assert.deepEqual((await ql(late, 'covensHoard', 2)).body, { witnessed: true, title: 'covenbane' }, 'done, undecided - its opening never landed: the end opens it');
-  assert.deepEqual((await ql(late, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane', key: true, keys: k1 + 1 }, 'then kept');
+  assert.deepEqual((await ql(late, 'covensHoard', 2, 'keep')).body, { witnessed: true, titleHeld: 'covenbane' }, 'then kept');
+  assert.equal(steps(late).find((s) => s.line === 'covensHoard').choice, 'keep', 'the next end\'s choice taken');
 });
 
 test('QL12 THE REFUSALS: a guest\'s opening is written and its end refused, paying nothing; a bad body - a phase missing among them - is 400; a step the service pays nothing is `unpaid` at its end, and opened (its line\'s window); the switch shut is 403 for everyone, at `dev` for all but the developers (mutants: the guest; the phase; the switch; qlStepClaimed)', async (t) => {
@@ -526,7 +426,6 @@ test('QL12 THE REFUSALS: a guest\'s opening is written and its end refused, payi
     assert.deepEqual(await S.call('/v1/ql/claim', bad, me.secret), { status: 400, body: { error: 'ql-body' } }, JSON.stringify(bad));
   }
   assert.deepEqual(await ql(me, 'burningDoors', 0), { status: 200, body: { why: 'unpaid' } }, 'the letter\'s end is the client\'s alone');
-  assert.deepEqual(await ql(me, 'weirRoad', 3), { status: 200, body: { why: 'unpaid' } });
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM ql_steps WHERE account = ?').get(me.id).n, 0, 'an unpaid end writes nothing');
   assert.deepEqual(await open(me, 'burningDoors', 0), { status: 200, body: { opened: true } }, 'SERVICE-2: the letter\'s opening is the line\'s - its first letter opens the witness\'s window');
   // the switch, read as FIRMAMENT_OPEN is
@@ -557,21 +456,22 @@ test('QL12 THE ROUTE (AUDIT FIVE-ASKS A1\'s lesson): /v1/ql/claim is listed, beh
   assert.match(sql, /^ {2}PRIMARY KEY \(account, line, step\),$/m);
   assert.match(sql, /^ {2}seen_at {3}INTEGER,$/m, 'AUDIT QUESTLINES SERVICE-5: the receipt that witnessed a step, so no receipt witnesses two');
   assert.match(sql, /^ALTER TABLE players ADD COLUMN ql_titles INTEGER NOT NULL DEFAULT 0;$/m);
-  assert.match(sql, /^ALTER TABLE players ADD COLUMN ql_key INTEGER NOT NULL DEFAULT 0;$/m);
   assert.match(read('.github/workflows/account-deploy.yml'), /^ {6}- "src\/net\/questlineClaims\.js"$/m, 'the shared law deploys the service');
 });
 
-test('QL12 THE VOCABULARY: the six join TITLES last, in QL_TITLES\' order; a registered row holds each by its bit and a guest none; their words; their colours - each its own, more than 40 from every title\'s; a title\'s loot banner (mutants: the order; the guest; a word)', () => {
+test('QL12 THE VOCABULARY: the five join TITLES last, in QL_TITLES\' order; a registered row holds each by its bit and a guest none; their words; their colours - each its own, more than 40 from every title\'s; a title\'s loot banner (mutants: the order; the guest; a word)', () => {
   // PIN MOVED (STAR8): the five and the Starwarden of the Thirteenth of Frostfall, its bit the sixth (63 every one)
-  assert.deepEqual([...TITLES.slice(-27, -21) /* PIN MOVED (SHOP): Genesis joined the list last */ /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */, TITLES.at(-19)] /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): Witchwarden and Hearthkeeper joined the list last */ /* PIN MOVED (KETCH): the Skyfarer, the questlines' seventh, after the festival's two */, [...QL_TITLES]);
-  assert.deepEqual([...QL_TITLES], ['doorwarden', 'covenbane', 'weirwalker', 'hourwitness', 'satakalwitness', 'starwarden', 'skyfarer']);   // PIN MOVED (KETCH): the Sky-Ketch's Skyfarer, its bit the seventh (127 every one)
+  // PIN MOVED (Elite Gates removed): the Weirwalker left - the four and the Starwarden, its bit the fifth (31 every one),
+  // and the Spire's thirteen left the titles before them
+  assert.deepEqual([...TITLES.slice(-24, -19) /* PIN MOVED (HUNTERS-MARK): the Marks of Mastery's sixteen joined the list last */] /* PIN MOVED (NIRNROOT-SAGE): the Nirnroot Sage joined the list last */ /* PIN MOVED (WITCH1): Witchwarden and Hearthkeeper joined the list last */, [...QL_TITLES]);
+  assert.deepEqual([...QL_TITLES], ['doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden']);
   for (const t of QL_TITLES) {
     assert.deepEqual(titlesHeld({ handle: 'Mac', ql_titles: qlTitleBit(t) }, {}), [t], `${t} by its bit alone`);
     assert.deepEqual(titlesHeld({ handle: null, ql_titles: 127 }, {}), [], 'a guest row holds none');
   }
-  assert.deepEqual(titlesHeld({ handle: 'Mac', ql_titles: 127 }, {}), [...QL_TITLES], 'all seven, in the lines\' order');
-  assert.deepEqual(QL_TITLES.map((t) => TITLE_TEXT[t]), ['Doorwarden', 'Covenbane', 'Weirwalker', 'Witness of the Hour', "Satakal's Witness", 'Starwarden', 'Skyfarer']);
-  assert.deepEqual(QL_TITLES.map((t) => cssRgba(TITLE_RGBA[t])), ['#e8400c', '#d0aa10', '#1f5fff', '#ada530', '#12b8b8', '#7850ff', '#58d8ff'], 'the ember, the coven\'s gold, the Spire\'s blue, Akatosh\'s brass, the sea\'s teal, a falling star\'s violet, the open sky\'s blue');
+  assert.deepEqual(titlesHeld({ handle: 'Mac', ql_titles: 31 }, {}), [...QL_TITLES], 'all five, in the lines\' order');
+  assert.deepEqual(QL_TITLES.map((t) => TITLE_TEXT[t]), ['Doorwarden', 'Covenbane', 'Witness of the Hour', "Satakal's Witness", 'Starwarden']);
+  assert.deepEqual(QL_TITLES.map((t) => cssRgba(TITLE_RGBA[t])), ['#e8400c', '#d0aa10', '#ada530', '#12b8b8', '#7850ff'], 'the ember, the coven\'s gold, Akatosh\'s brass, the sea\'s teal, a falling star\'s violet');
   const apart = (a, b) => Math.hypot(...[0, 1, 2].map((i) => (a[i] - b[i]) * 255));
   for (const t of QL_TITLES) {
     for (const o of TITLES.filter((x) => x !== t)) assert.ok(apart(TITLE_RGBA[t], TITLE_RGBA[o]) > 40, `${t} apart from the ${o}'s (${apart(TITLE_RGBA[t], TITLE_RGBA[o]).toFixed(0)})`);
@@ -662,7 +562,7 @@ test('AUDIT QUESTLINES SERVICE-1/-3, LINES-2: a guest\'s page begins no line the
   R.done('QLOC03', 'scale');
   await R.tick();
   assert.deepEqual(R.wire.at(-1), ['oldCoil', 2, 'end', { witnessed: true, title: 'satakalwitness' }]);
-  assert.deepEqual(R.honours, [{ line: 'oldCoil', title: 'satakalwitness', key: false, keys: null, keyHeld: false }], 'told once');
+  assert.deepEqual(R.honours, [{ line: 'oldCoil', title: 'satakalwitness' }], 'told once');
   assert.equal(H.row(me).ql_titles, qlTitleBit('satakalwitness'));
   assert.equal(R.runner.lineState('oldCoil').claims[2], 'witnessed');
 });
@@ -754,7 +654,7 @@ test('AUDIT QUESTLINES SERVICE-2/-3: a claim is never given up - the Hour\'s ope
   assert.equal(R.runner.rows().find((l) => l.id === 'oldCoil').steps[2].unseen, false);
 });
 
-test('AUDIT QUESTLINES SERVICE-3/-7: the Covens\' Hoard kept through the real runner - the end carries the outcome, the key is paid and its balance handed on (mutants: the end\'s outcome dropped; `keys` dropped)', async (t) => {
+test('AUDIT QUESTLINES SERVICE-3/-7: the Covens\' Hoard kept through the real runner - the end carries the outcome, and Covenbane is paid and told (mutants: the end\'s outcome dropped)', async (t) => {
   setPref(QUESTLINES_PREF, true);
   const H = await stood(t);
   const me = await H.S.registered('Keeper2');
@@ -771,12 +671,11 @@ test('AUDIT QUESTLINES SERVICE-3/-7: the Covens\' Hoard kept through the real ru
   R.runner.restore({ burningDoors: { step: 5, outcomes: {}, done: true, wait: 0, claims: { 2: 'witnessed', 3: 'witnessed' } }, covensHoard: { step: 2, outcomes: {}, done: false, wait: 0, claims: {} } });
   await R.tick();   // QLCH03 starts
   assert.ok(R.wire.some(([l, st, p]) => l === 'covensHoard' && st === 2 && p === 'open'), 'QLCH03 opened');
-  const before = H.row(me).eg_keys;
   R.done('QLCH03', 'keep');
   await R.tick();
-  assert.deepEqual(R.wire.at(-1), ['covensHoard', 2, 'end', { witnessed: true, title: 'covenbane', key: true, keys: before + 1 }]);
-  assert.deepEqual(R.honours, [{ line: 'covensHoard', title: 'covenbane', key: true, keys: before + 1, keyHeld: false }], 'the key\'s balance handed on, for the pack');
-  assert.equal(H.row(me).ql_key, 1);
+  assert.deepEqual(R.wire.at(-1), ['covensHoard', 2, 'end', { witnessed: true, title: 'covenbane' }]);
+  assert.deepEqual(R.honours, [{ line: 'covensHoard', title: 'covenbane' }], 'Covenbane told');
+  assert.equal(H.steps(me).find((s) => s.line === 'covensHoard').choice, 'keep', 'the end carried its outcome');
 });
 
 test('AUDIT QUESTLINES DOC-4: the door itself - accountQuestlines posts to the route the Worker answers, a refused session is forgotten, and with no session there is no account to claim for; guest() reads a guest\'s session (mutants: the route; the forgetting; account() always truthy; guest())', async (t) => {

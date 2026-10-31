@@ -77,7 +77,7 @@ test('WET-FALL: the front\'s own frames - the sim says rain, the cloud has not c
   assert.ok(e.survival.wet > 0 && e.survival.wet < 10 * 3 * 0.3, `ten minutes in a light shower soak lightly, got ${e.survival.wet}`);
 });
 
-test('WET-FALL: after a jump the street\'s word no longer stands - the host\'s own sky, whole: the Sun Baby\'s clear day stays dry (mutant: the fallback the sim\'s word)', () => {
+test('WET-FALL: after a jump the street\'s word no longer stands - the host\'s own sky, whole (mutant: the fallback the sim\'s word)', () => {
   W.setWeather('rain');
   W.setHeardWeather('rain', 0.4);
   // AUDIT PRECIP FALL-4 (PIN MOVED): the fall carries its snow share - null off the law's lane (the word's own row)

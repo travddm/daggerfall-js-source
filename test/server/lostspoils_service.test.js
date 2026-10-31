@@ -2,7 +2,7 @@
 // from a boss. For example, the oblivion gates. Abyss dungeons, elite breaches, etc"; asked, "Mail the leftovers"): THE
 // SERVICE'S SIDE - server-account/src/lostSpoils.js and its route, /v1/post/lost. A floor's leftovers are written as
 // pieces of the server's post, one an item, from the Lost and Found - only under a kill the service itself recorded for
-// the asking account (a gate's, an Hour's, a Redoubt that paid), within the window, each once; and their claim is charged
+// the asking account (a gate's, an Hour's), within the window, each once; and their claim is charged
 // to the budget, never witnessed. Every piece here is one the game's own rollers made (TEST THE SHAPE THE PRODUCER MINTS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,10 +14,7 @@ import { LOST_INDEX_MAX, LOST_WINDOW_S, LOST_WAITING_MAX, LOST_FINAL, LOST_BATCH
 import { POST_BATCH_RE, POST_SENDER, POST_SUBJECT_MAX, POST_BODY_MAX, postHead } from '../../src/net/postLaw.js';
 import { spoilsList } from '../../src/scenes/spoilsPool.js';
 import { sdSpoilsList, sdSpoilsDay } from '../../src/systems/superDungeon/sdSpoils.js';
-import { egSpoilsList, egSpoilsDay } from '../../src/systems/eliteGates/egSpoils.js';
-import { mintHourlock, mintGilded, DRAGONFIRE_OATH, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD } from '../../src/systems/gilded.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
-import { createPistolet } from '../../src/systems/pistolet.js';
+import { mintGilded, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN } from '../../src/systems/gilded.js';
 
 const nowS = () => Math.floor(Date.now() / 1000);
 /** A floor's leftovers as the pool sends them: each item piece of the spoils as rolled, by its place. */
@@ -27,28 +24,26 @@ const box = async (svc, who) => {
   return (await res.json());
 };
 const lost = (svc, who, body) => svc.call('/v1/post/lost', body, who.secret);
-/** An Hour's kill row as sds.js claimSd writes it, and a Redoubt's as egEconomy.js egRedoubtPay does. */
+/** An Hour's kill row as sds.js claimSd writes it. */
 const sdKill = (svc, who, slot, at = nowS()) => svc.env.DB._raw.prepare('INSERT INTO sd_kills (slot, account, boss, earned, lv, nonce, at) VALUES (?, ?, ?, ?, ?, ?, ?)').run(slot, who.id, 'remnant', 'dealt', 20, 'n0', at);
-const egKill = (svc, who, b, w, paid, at = nowS()) => svc.env.DB._raw.prepare('INSERT INTO eg_redoubts (b, account, w, h, t, at, wk, paid, nonce) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(b, who.id, w, w, 0, at, 0, paid, 'n0');
 
-test('LOST-SPOILS the law and the door: one route behind a session, a registered account\'s alone (the post\'s wall); a floor\'s day names its kill - a gate\'s day, an Hour\'s slot, a breach\'s Redoubt - and every batch fits the post\'s shape and is the Lost and Found\'s; the words within the post\'s bounds (mutants: the route open; a guest let in; a kill misread)', async () => {
+test('LOST-SPOILS the law and the door: one route behind a session, a registered account\'s alone (the post\'s wall); a floor\'s day names its kill - a gate\'s day, an Hour\'s slot - and every batch fits the post\'s shape and is the Lost and Found\'s; the words within the post\'s bounds (mutants: the route open; a guest let in; a kill misread)', async () => {
   assert.ok(ROUTES.has('/v1/post/lost') && !OPEN_ROUTES.has('/v1/post/lost'));
   assert.deepEqual(lostKillOf(20380), { kind: 'gate', day: 20380, key: 'gate-20380' });
   assert.deepEqual(lostKillOf(sdSpoilsDay(12)), { kind: 'sd', slot: 12, key: 'sd-12' });
-  assert.deepEqual(lostKillOf(egSpoilsDay('0123456789abcdef', 5)), { kind: 'eg', b: '0123456789abcdef', w: 5, key: 'eg-0123456789abcdef-5' });
   for (const junk of [0, -3, 1.5, '20380', 'sd:0', 'eg:xyz:1', null, {}]) assert.equal(lostKillOf(junk), null, String(junk));
-  const longest = lostBatchOf(lostKillOf(egSpoilsDay('f'.repeat(16), 99999)), LOST_INDEX_MAX - 1);
+  const longest = lostBatchOf(lostKillOf(Number.MAX_SAFE_INTEGER), LOST_INDEX_MAX - 1);
   assert.match(longest, POST_BATCH_RE, 'the longest batch fits the post\'s own shape');
-  assert.ok(isLostBatch(longest) && !isLostBatch('spire-stake-x') && !isLostBatch('hours-first-hourlock'));
+  assert.ok(isLostBatch(longest) && !isLostBatch('hours-first-hourlock'));
   assert.equal(LOST_BATCH, 'lost-');
-  for (const k of ['gate', 'sd', 'eg']) {
+  for (const k of ['gate', 'sd']) {
     assert.ok(LOST_WORDS[k].subject.length <= POST_SUBJECT_MAX && LOST_WORDS[k].body.length <= POST_BODY_MAX, k);
     assert.ok(LOST_WORDS[k].body.endsWith(`- ${LOST_SENDER}`), `${k} is signed`);
   }
   assert.notEqual(LOST_SENDER, POST_SENDER, 'never the developers\' name');
   const svc = await standService();
   const g = await svc.guest();
-  assert.deepEqual(await lost(svc, g, { day: 20380, pieces: [{ i: 0, item: mintHourlock() }] }), { status: 403, body: { error: 'post-needs-account' } }, 'a guest has no mailbox');
+  assert.deepEqual(await lost(svc, g, { day: 20380, pieces: [{ i: 0, item: mintGilded(DRAGONFIRE_OATH) }] }), { status: 403, body: { error: 'post-needs-account' } }, 'a guest has no mailbox');
   assert.ok(LOST_FINAL.includes('post-needs-account'), 'and the client gives a guest\'s floor to the pack');
 });
 
@@ -82,7 +77,7 @@ test('LOST-SPOILS a gate\'s leftovers: written under the kill its receipt record
   assert.deepEqual(await lost(svc, ann, { day, pieces: leftovers(list).slice(0, 1) }), { status: 409, body: { error: 'lost-spent' } }, 'but a new piece past the window is not taken');
 });
 
-test('LOST-SPOILS the kill is the service\'s, and the account\'s: another account\'s kill holds none of mine; an Hour\'s slot; a Redoubt only where it paid (a week\'s second pays its gold alone); the window (mutants: another\'s kill taken; a gold-only Redoubt taken; the window dropped)', async () => {
+test('LOST-SPOILS the kill is the service\'s, and the account\'s: another account\'s kill holds none of mine; an Hour\'s slot; the window (mutants: another\'s kill taken; the window dropped)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann'), bob = await svc.registered('Bob');
   const day = 20381;
@@ -94,12 +89,6 @@ test('LOST-SPOILS the kill is the service\'s, and the account\'s: another accoun
   sdKill(svc, ann, 9);
   assert.deepEqual((await lost(svc, ann, { day: sdSpoilsDay(9), pieces: sd })).body, { ok: true, sent: sd.length, kept: sd.length });
   assert.equal(svc.env.DB._raw.prepare('SELECT subject FROM server_post WHERE to_id = ? LIMIT 1').get(ann.id).subject, LOST_WORDS.sd.subject);
-  // a Redoubt
-  const b = '0123456789abcdef', eg = leftovers(egSpoilsList(55, 30, 5, { lord: '', pity: [], goldOnly: false, embers: 2 }));
-  egKill(svc, ann, b, 5, 0);
-  assert.deepEqual((await lost(svc, ann, { day: egSpoilsDay(b, 5), pieces: eg })).body, { error: 'lost-no-kill' }, 'a Redoubt that paid its gold alone threw no items');
-  egKill(svc, ann, b, 10, 1);
-  assert.deepEqual((await lost(svc, ann, { day: egSpoilsDay(b, 10), pieces: eg })).body, { ok: true, sent: eg.length, kept: eg.length });
   // the window
   sdKill(svc, ann, 10, nowS() - LOST_WINDOW_S - 5);
   assert.deepEqual((await lost(svc, ann, { day: sdSpoilsDay(10), pieces: sd })).body, { error: 'lost-spent' });
@@ -147,18 +136,18 @@ test('LOST-SPOILS a send\'s shape and its pieces\' law: places under LOST_INDEX_
   assert.ok(!LOST_FINAL.includes('lost-no-kill'), 'a kill not yet recorded is asked again');
 });
 
-test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: never a gun - the Sky-Ketch\'s alone - and no Gilded but its own (an Hour the Hourlock, a gate the Oath, a Redoubt none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: a gun mailed under an Hour\'s kill; a Ketch Gilded under a gate\'s; any Gilded under any kill)', async () => {
+test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: no Gilded but its own (a gate the Oath, an Hour none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: any Gilded under any kill)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const day = 20383;
   assert.equal((await svc.claim(ann, day, nowS())).status, 200);
   sdKill(svc, ann, 12);
   const sdDay = sdSpoilsDay(12), plain = (x) => JSON.parse(JSON.stringify(x));
-  for (const [d, item] of [[sdDay, createThunderlock()], [sdDay, createPistolet()], [sdDay, mintGilded(VOLENDRUNGS_ECHO)], [sdDay, mintGilded(DRAGONFIRE_OATH)], [day, mintGilded(KETCHMASTERS_WORD)], [day, mintHourlock()]]) {
+  // The Hourlock (an Hour's own Gilded) is gone with the guns: the Last Moment now leaves no Gilded, and a gate only the Oath.
+  for (const [d, item] of [[sdDay, mintGilded(DRAGONFIRE_OATH)], [sdDay, mintGilded(SUNKEN_SOVEREIGN)], [day, mintGilded(SUNKEN_SOVEREIGN)]]) {
     assert.deepEqual((await lost(svc, ann, { day: d, pieces: [{ i: 0, item: plain(item) }] })).body, { error: 'lost-item' }, `${item.name} under ${d}`);
   }
   assert.equal(svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM server_post WHERE to_id = ?').get(ann.id).n, 0);
-  assert.equal((await lost(svc, ann, { day: sdDay, pieces: [{ i: 0, item: plain(mintHourlock()) }] })).status, 200, 'an Hour\'s own');
   assert.equal((await lost(svc, ann, { day, pieces: [{ i: 0, item: plain(mintGilded(DRAGONFIRE_OATH)) }] })).status, 200, 'a gate\'s own');
 });
 
@@ -179,7 +168,7 @@ test('LOST-SPOILS THE CLAIM IS CHARGED TO THE BUDGET: a Lost and Found piece cla
   assert.equal(witnessed(), before, 'never witnessed - charged as the floor\'s piece is');
   // the developers' gift, the same claim: witnessed, as every act of the service's own is
   svc.env.DB._raw.prepare('INSERT INTO server_post (id, to_id, batch, sender, subject, body, item, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-    .run('g'.repeat(24), ann.id, 'a-gift', POST_SENDER, 'A gift', 'For you.', JSON.stringify(mintHourlock()), nowS());
+    .run('g'.repeat(24), ann.id, 'a-gift', POST_SENDER, 'A gift', 'For you.', JSON.stringify(mintGilded(DRAGONFIRE_OATH)), nowS());
   const w0 = witnessed();
   assert.equal((await svc.call('/v1/post/claim', { id: 'g'.repeat(24), character: R.id, realm: R.at() }, ann.secret)).status, 200);
   assert.ok(witnessed() > w0, 'a gift the service minted is witnessed');

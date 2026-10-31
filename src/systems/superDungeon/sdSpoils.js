@@ -13,8 +13,7 @@
 // a fifth either way); ONE piece Legendary SD_SPOILS_LEGENDARY of the time, else Rare; TWO Rare or better by the
 // source's chances (SD_SPOILS_SOURCE - a boss past the ladder's top tier, a lucky hand: the hardest fight in the game);
 // every piece KNOWN, the ladder's last pass after them (LOOT2); then (SD9d) a piece of the Brass of Numidium
-// NUMIDIUM_SET_CHANCE of the time (systems/aetheric.js rollNumidiumPiece); and LAST OF ALL (GILDED1) the Hourlock, the
-// Gilded rung's first record, GILDED_CHANCE of the time (systems/gilded.js rollHourlock) - so no roll before either ever moves.
+// NUMIDIUM_SET_CHANCE of the time (systems/aetheric.js rollNumidiumPiece) - so no roll before it ever moves.
 //
 // THROWN FROM WHERE IT FELL (scenes/superDungeon/sdSpoils.js): the spoils pool's burst on the arena's floor, under keys of its own
 // (SD_SPOILS_KEYS - an Hour's receipts never push a boss's or a hoard's out of the spent list); a receipt that comes
@@ -26,9 +25,7 @@ import { spoilsBase } from '../gate/gateSpoils.js';
 import { applyRarity, rarityChances, lastPass, socketPass, weaponSocketPass, techniquePass } from '../loot/lootRarity.js';   // GEM1: the sockets' passes; TECH1: the technique pass, a door's last draw
 import { bossGems } from '../gems.js';   // GEM2: the Brass Remnant's gems
 import { rollNumidiumPiece } from '../aetheric.js';   // SD9d: the Brass Remnant's own set
-import { rollHourlock } from '../gilded.js';   // GILDED1: the Hourlock - the spoils' last roll
 import { RANDOM_TREASURE_ICONS } from '../loot/loot.js';
-import { bossCardRoll } from '../bossCards.js';   // CARDS9: the Brass Remnant's own card, the hoard's last draw
 
 /** Gold a level of the player's, before the seed's variation (0.8 to 1.2 of it) - over half again a gate boss's. */
 export const SD_SPOILS_GOLD_PER_LEVEL = 400;
@@ -73,8 +70,8 @@ function graded(item, tier, rolls) {
 }
 
 /**
- * THE SPOILS for one fighter: `{ gold, pieces: [{ item, tier }], card, gems }` - in the order they leave it: the first piece, the two
- * Rare-or-better, then (SD9d) a piece of the Brass of Numidium when one drops, then (GILDED1) the Hourlock when it does.
+ * THE SPOILS for one fighter: `{ gold, pieces: [{ item, tier }], gems }` - in the order they leave it: the first piece, the two
+ * Rare-or-better, then (SD9d) a piece of the Brass of Numidium when one drops.
  * The same seed, level and world answer the same spoils.
  * @param {number} seed the receipt's `c` @param {number} level the level it fought at
  */
@@ -89,19 +86,17 @@ export function rollSdSpoils(seed, level) {
   // SD9d: THE BRASS OF NUMIDIUM - rolled after every piece, so every spoils before it is what it was for its seed
   const brass = rollNumidiumPiece(rolls);
   if (brass) pieces.push({ item: brass, tier: brass.rarity });
-  // GILDED1: THE HOURLOCK - one draw more, LAST of all, so every spoils before it (the Brass's own) is what it was
-  const hourlock = rollHourlock(rolls);
-  if (hourlock) pieces.push({ item: hourlock, tier: hourlock.rarity });
-  // CARDS9 (Tavern-Cards section 32; Mac: "Dont forget about a card needing to come from the abyss dungeon also"): THE
-  // BRASS REMNANT'S OWN CARD - one draw more after the Hourlock's, LAST of all; kept beside the pieces
-  const card = bossCardRoll('abyss', rolls);
-  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the sockets' passes over the pieces (the Gilded Hourlock never
-  // takes one - socketCap answers none for its rung), then the Remnant's two gems, LAST of all (after the card)
+  // The Hourlock's roll and the Brass Remnant's card were drawn here before the guns and the card games were removed:
+  // their draws are still taken, so every spoils after them is what it was for its seed
+  rolls();
+  rolls();
+  // GEM1/GEM2 (bible/06-Systems/Gem-Sockets.md section 4): the sockets' passes over the pieces, then the Remnant's two
+  // gems, LAST of all
   socketPass(pieces.map((p) => p.item), rolls);
   weaponSocketPass(pieces.map((p) => p.item), rolls);
   const gems = bossGems('abyss', rolls);
-  techniquePass(pieces.map((p) => p.item), rolls);   // TECH1: a weapon's technique - after even the Remnant's gems (law 9); a fixed record (the Brass, the Hourlock) takes none
-  return { gold, pieces, card, gems };
+  techniquePass(pieces.map((p) => p.item), rolls);   // TECH1: a weapon's technique - after even the Remnant's gems (law 9); a fixed record (the Brass) takes none
+  return { gold, pieces, gems };
 }
 
 /** The spoils as the pool throws them (scenes/spoilsPool.js's pieces): each item, then the gold - the gate's own order -
@@ -112,14 +107,12 @@ export function sdSpoilsList(seed, level) {
   const s = rollSdSpoils(seed, level);
   const pieces = s.pieces.map((p) => ({ kind: 'item', item: p.item, tier: p.tier, record: flat() }));
   const gold = { kind: 'gold', gold: s.gold, tier: 'common', record: flat() };
-  // AUDIT CARDS-6 A8: the card's picture drawn LAST, after the gold's, so the gold pile's is what the seed gave it before
-  const card = s.card ? [{ kind: 'item', item: s.card, tier: 'aetheric', record: flat() }] : [];
-  // GEM2: the Remnant's gems, their pictures drawn after the card's (every picture before them the seed's), thrown after it
+  // GEM2: the Remnant's gems, their pictures drawn after the gold's (every picture before them the seed's), thrown after
+  // the pieces
   const gems = s.gems.map((g) => ({ kind: 'item', item: g, tier: 'common', record: flat() }));
   return [
     ...pieces,
-    ...card,   // CARDS9: the Remnant's card, after the pieces
-    ...gems,   // GEM2: the Remnant's gems, after the card
+    ...gems,   // GEM2: the Remnant's gems, after the pieces
     gold,
   ];
 }

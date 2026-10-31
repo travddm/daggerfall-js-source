@@ -4,8 +4,8 @@
 // never a bone axis: each leg's and each arm's length, the hips' and the shoulders' widths, how high the ankle stands
 // over the sole, the bone that carries the thighs (retail's thighs hang from "Bip01 Spine", not the pelvis), the trunk's
 // bones above it, and the frames the rest pose calls "facing forward". So the male skeleton, the female, the beast and
-// a race scaled tall or short take the same request to the same place, as the climb (combat/climbRig.js) and the long
-// gun (combat/gun/rifleStance.js) already do - and every distance a law asks for is a SHARE of the body's own leg or arm.
+// a race scaled tall or short take the same request to the same place, as the climb (combat/climbRig.js) already
+// does - and every distance a law asks for is a SHARE of the body's own leg or arm.
 //
 // RIG SPACE throughout (the space skeletonSpaceMatrices answers with GRAPH_ROOT): Morrowind units, Z up, the actor
 // facing +Y, its right +X, the ground at z = 0 (the rig stands on its feet - fpArm.js drawThird places the rig root at

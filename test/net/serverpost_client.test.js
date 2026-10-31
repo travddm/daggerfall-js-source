@@ -17,7 +17,8 @@ import { RARITIES } from '../../src/systems/loot/lootRarity.js';
 import { HELP_LINES, HOST_COMMANDS } from '../../src/net/chatCommands.js';
 import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { REFUSALS } from '../../src/net/accountClient.js';
-import { mintHourlock } from '../../src/systems/gilded.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
+import { HOURS_FIRST_RECORD } from '../../tools/sendServerPost.mjs';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const send = (env, who, { batch, subject = 'A gift', body = 'For you.', item = null, at = T0 } = {}) => {
@@ -41,10 +42,10 @@ test('SERVER-POST the box: a sitting\'s first look says what waits, a later one 
   const box = new PostBox({ ioOf: ioFor(svc, ann), onPost: (e) => said.push(e) });
   assert.equal(box.state, 'unknown');
   send(svc.env, ann, { batch: 'welcome', subject: 'Welcome', at: T0 });
-  send(svc.env, ann, { batch: 'gift', subject: 'The Hourlock', item: mintHourlock(), at: T0 + 5 });
+  send(svc.env, ann, { batch: 'gift', subject: 'The Dragonfire Oath', item: mintGilded(DRAGONFIRE_OATH), at: T0 + 5 });
   assert.equal((await box.refresh()).ok, true);
   assert.deepEqual([box.state, box.post.length, box.unread, box.unclaimed, box.waiting], ['ready', 2, 2, 1, 2]);
-  assert.deepEqual([said.length, said[0].kind, said[0].count, said[0].post.map((p) => p.subject)], [1, 'waiting', 2, ['The Hourlock', 'Welcome']], 'the first look of a sitting: what waits (a gift first), never "new"');
+  assert.deepEqual([said.length, said[0].kind, said[0].count, said[0].post.map((p) => p.subject)], [1, 'waiting', 2, ['The Dragonfire Oath', 'Welcome']], 'the first look of a sitting: what waits (a gift first), never "new"');
   assert.equal(postNoticeText(said[0]), 'You have 2 messages waiting in your mailbox. Open the mailbox beside the hourglass in the pause menu, or type /mail.');
   send(svc.env, ann, { batch: 'later', subject: 'Another', at: T0 + 9 });
   await box.refresh();
@@ -52,11 +53,11 @@ test('SERVER-POST the box: a sitting\'s first look says what waits, a later one 
   assert.equal(said[1].kind, 'new');
   assert.deepEqual(said[1].post.map((p) => p.subject), ['Another']);
   assert.equal(postNoticeText(said[1]), `Post from ${POST_SENDER}: "Another". Open the mailbox beside the hourglass in the pause menu, or type /mail.`);
-  assert.equal(postNoticeText({ kind: 'new', post: [{ from: POST_SENDER, subject: 'The Hourlock', item: { name: 'The Hourlock' } }] }),
-    `Post from ${POST_SENDER}: "The Hourlock", with The Hourlock to claim. Open the mailbox beside the hourglass in the pause menu, or type /mail.`, 'a gift said by name');
-  // AUDIT SERVER-POST: the thirteen's first word of the Hourlock is a sitting's first look - one waiting gift, by name
-  assert.equal(postNoticeText({ kind: 'waiting', count: 1, post: [{ from: POST_SENDER, subject: "Hour's First", item: { name: 'The Hourlock' }, claimed: false }] }),
-    `Post from ${POST_SENDER}: "Hour's First", with The Hourlock to claim. Open the mailbox beside the hourglass in the pause menu, or type /mail.`);
+  assert.equal(postNoticeText({ kind: 'new', post: [{ from: POST_SENDER, subject: 'The Dragonfire Oath', item: { name: 'The Dragonfire Oath' } }] }),
+    `Post from ${POST_SENDER}: "The Dragonfire Oath", with The Dragonfire Oath to claim. Open the mailbox beside the hourglass in the pause menu, or type /mail.`, 'a gift said by name');
+  // AUDIT SERVER-POST: a gift that lands with a deploy is first heard of in a sitting's first look - one waiting gift, by name
+  assert.equal(postNoticeText({ kind: 'waiting', count: 1, post: [{ from: POST_SENDER, subject: 'A Gift', item: { name: 'The Dragonfire Oath' }, claimed: false }] }),
+    `Post from ${POST_SENDER}: "A Gift", with The Dragonfire Oath to claim. Open the mailbox beside the hourglass in the pause menu, or type /mail.`);
   // read, it no longer counts; a gift counts until it is claimed
   const gift = box.post.find((p) => p.item);
   assert.equal((await box.open(gift.id)).ok, true);
@@ -93,8 +94,8 @@ test('SERVER-POST THE CLAIM, from the client: the realm\'s act asks the service 
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const R = await seatRealm(svc.env, ann.secret, 'Ann', { name: 'Ann', level: 20, goldPieces: 10, items: [] });
-  const gun = mintHourlock();
-  const id = send(svc.env, ann, { batch: 'hours-first-hourlock', subject: 'The Hourlock', item: gun });
+  const oath = mintGilded(DRAGONFIRE_OATH);
+  const id = send(svc.env, ann, { batch: 'gift', subject: 'The Dragonfire Oath', item: oath });
   const pack = [];
   let changed = 0;
   const abandoned = [];
@@ -107,9 +108,9 @@ test('SERVER-POST THE CLAIM, from the client: the realm\'s act asks the service 
   const r = await box.claim(id);
   assert.equal(r.ok, true, JSON.stringify(r));
   assert.equal(pack.length, 1);
-  assert.equal(pack[0].name, 'The Hourlock');
+  assert.equal(pack[0].name, 'The Dragonfire Oath');
   assert.equal(pack[0].rarity, 'gilded');
-  assert.equal(pack[0].gilded, 'the-hourlock', 'the record as minted, through the wire\'s clamp');
+  assert.equal(pack[0].gilded, DRAGONFIRE_OATH.id, 'the record as minted, through the wire\'s clamp');
   assert.equal(changed, 1, 'the save told');
   assert.deepEqual(abandoned, [], 'the answer held the item - the session stands');
   assert.deepEqual([box.post[0].claimed, box.unclaimed, box.waiting], [true, 0, 0]);
@@ -119,7 +120,7 @@ test('SERVER-POST THE CLAIM, from the client: the realm\'s act asks the service 
   assert.equal(box.post.length, 0);
 
   // AN ANSWER WITH NO ITEM THE PACK CAN TAKE ends the session: the record holds it, a join reads it
-  const id2 = send(svc.env, ann, { batch: 'second', item: gun });
+  const id2 = send(svc.env, ann, { batch: 'second', item: oath });
   await box.refresh();
   const bad = new PostBox({
     ioOf: ioFor(svc, ann), character: () => R.id, realm: { act: async ({ call, apply }) => { const res = await call(R.at()); if (res.ok) apply({ ...res, data: { ...res.data, item: { templateIndex: 'no' } } }); return res; }, abandon: (w) => abandoned.push(w) },
@@ -130,9 +131,21 @@ test('SERVER-POST THE CLAIM, from the client: the realm\'s act asks the service 
   assert.deepEqual(abandoned, ['unknown'], 'abandoned - never a pack short of what the record holds');
   assert.equal(pack.length, 1, 'nothing forged into the pack');
 
+  // THE OLD HOURS-FIRST GIFT (migration 0094, frozen as HOURS_FIRST_RECORD): the Hourlock's template (560) left the game
+  // with the guns, so the service reads the piece as holding no item (post.js recordOf) - the claim is refused before
+  // anything is written, the session stands, nothing lands in the pack and nothing throws
+  const hourlockId = send(svc.env, ann, { batch: 'hours-first-hourlock', subject: "Hour's First", item: JSON.parse(HOURS_FIRST_RECORD) });
+  const oldGiftAbandoned = [];
+  const oldGift = new PostBox({ ioOf: ioFor(svc, ann), character: () => R.id, realm: realmOf(R, oldGiftAbandoned), pack: { add: (rec) => pack.push(rec), changed() {} } });
+  await oldGift.refresh();
+  assert.equal(oldGift.post.find((p) => p.id === hourlockId)?.item ?? null, null, 'listed as words alone');
+  assert.deepEqual(await oldGift.claim(hourlockId), { ok: false, error: 'post-no-item' }, 'refused, never delivered');
+  assert.deepEqual(oldGiftAbandoned, [], 'the session stands');
+  assert.equal(pack.length, 1, 'no Hourlock in the pack');
+
   // NO REALM CHARACTER, NO CLAIM
   const offline = new PostBox({ ioOf: ioFor(svc, ann), character: () => 'char-ann', realm: null, pack: { add() {}, changed() {} } });
-  send(svc.env, ann, { batch: 'third', item: gun });
+  send(svc.env, ann, { batch: 'third', item: oath });
   await offline.refresh();
   assert.deepEqual(await offline.claim(offline.post.find((p) => p.item && !p.claimed).id), { ok: false, error: 'realm-only' });
 });
@@ -190,7 +203,7 @@ test('SERVER-POST the envelope: a button that opens, an envelope and a count - h
 
 test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, not only seen) and waiting gifts marked, an item named in its rarity\'s colour; a piece opened shows its words and a Claim naming its gift for a waiting one, its state once claimed, Throw away only then; the states said - looking, signed out, a guest, empty, a failed look with Try again, a piece that would not open with Try again; refusals in the account\'s own words; the rarity\'s rules LR1\'s own hexes, lifted on Stone (mutants: Throw away beside a waiting gift; the count never written)', async () => {
   const post = [
-    { id: 'a'.repeat(24), from: POST_SENDER, subject: 'The Hourlock', sentAt: T0, read: false, item: { name: 'The Hourlock', rarity: 'gilded' }, claimed: false },
+    { id: 'a'.repeat(24), from: POST_SENDER, subject: 'The Dragonfire Oath', sentAt: T0, read: false, item: { name: 'The Dragonfire Oath', rarity: 'gilded' }, claimed: false },
     { id: 'b'.repeat(24), from: POST_SENDER, subject: 'Welcome', sentAt: T0 - 100, read: true, item: null, claimed: false },
   ];
   const calls = [];
@@ -198,7 +211,7 @@ test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, 
     state: 'ready', post, version: 1, busy: false, waiting: 1,
     refresh: async () => {},
     open: async (id) => { calls.push(['open', id]); return { ok: true, post: { ...post.find((p) => p.id === id), body: 'For the first clear.' } }; },
-    claim: async (id) => { calls.push(['claim', id]); post[0].claimed = true; box.version++; return { ok: true, item: { name: 'The Hourlock' } }; },
+    claim: async (id) => { calls.push(['claim', id]); post[0].claimed = true; box.version++; return { ok: true, item: { name: 'The Dragonfire Oath' } }; },
     remove: async (id) => { calls.push(['remove', id]); return { ok: true }; },
   };
   let closed = 0;
@@ -213,7 +226,7 @@ test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, 
   assert.ok(!rows[1].className.includes('unread'));
   const chip = all(rows[0], 'pm-chip')[0];
   assert.equal(chip.children[0].attrs['data-rarity'], 'gilded', 'in the Gilded rung\'s colour');
-  assert.match(text(chip), /The Hourlock.*Waiting/);
+  assert.match(text(chip), /The Dragonfire Oath.*Waiting/);
   assert.equal(all(rows[0], 'pm-sr')[0].textContent, ' - unread', 'unread said, as the dot is seen');
   assert.equal(all(rows[1], 'pm-sr').length, 0);
   assert.equal(postRarity('gilded'), 'gilded');
@@ -229,12 +242,12 @@ test('SERVER-POST the window: the box\'s pieces as it lists them, unread (said, 
   assert.equal(all(root, 'pm-body')[0].textContent, 'For the first clear.');
   const claim = all(root, 'pm-claim')[0];
   assert.ok(claim, 'a Claim for a waiting gift');
-  assert.equal(claim.attrs['aria-label'], 'Claim The Hourlock', 'naming what it claims');
+  assert.equal(claim.attrs['aria-label'], 'Claim The Dragonfire Oath', 'naming what it claims');
   assert.equal(all(root, 'pm-throw').length, 0, 'and no Throw away while it waits');
   await claim.listeners.click[0]();
   await new Promise((r) => setImmediate(r));
   assert.deepEqual(calls.at(-1), ['claim', post[0].id]);
-  assert.equal(all(root, 'pm-say')[0].textContent, 'The Hourlock is in your pack.');
+  assert.equal(all(root, 'pm-say')[0].textContent, 'The Dragonfire Oath is in your pack.');
   assert.equal(all(root, 'pm-claim').length, 0, 'claimed: no Claim');
   assert.match(text(all(root, 'pm-item')[0]), /Claimed\./, 'claimed - by whichever of the account\'s characters took it');
   assert.ok(all(root, 'pm-throw')[0], 'claimed, it may be thrown away');
@@ -279,7 +292,7 @@ test('SERVER-POST the wiring: the pause face stands the envelope beside the hour
   assert.match(menu, /function postEnvelope\(home, glass\) \{\n  if \(!hooks\.post\?\.\(\)\) return null;/, 'online only - where the host hands a box');
   assert.match(menu, /postAnchor = anchorPost\(envelope, glass, home\.querySelector\?\.\('\.px-profile'\), home\);/);
   assert.match(menu, /else if \(postOpen && hooks\.post\?\.\(\)\) \{\n[^\n]*\n\s*const pstage = el\('div', 'px-stage px-timersstage px-poststage'\);/);
-  assert.match(menu, /for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);/);   // PIN MOVED (SEASON-BOOK): and the laurel beside it; PIN MOVED (SHOP): and the gem
+  assert.match(menu, /for \(const n of \[stage, home\.querySelector\?\.\('\.px-profile'\), mark, envelope, laurel\]\) n\?\.setAttribute\?\.\('inert', ''\);/);   // PIN MOVED (SEASON-BOOK): and the laurel beside it; PIN MOVED (SHOP): and the gem
   assert.match(menu, /: postOpen && postView \? \(\) => \{ postOpen = false; postKeep = \{\}; postFocusBack = true; render\(\); \}/, 'Escape closes it first');
   assert.match(menu, /stopTimers\(\);   \/\/ TIMERS1: a rebuild builds the window again, with its own tick\n  stopPost\(\);/);
   assert.match(menu, /releaseShotsPane\(\);   \/\/ LOAD1[^\n]*\n      stopPost\(\);   \/\/ SERVER-POST/, 'and on unmount');
@@ -305,7 +318,7 @@ test('AUDIT SERVER-POST the box: a look that set out before a claim (or an open)
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const R = await seatRealm(svc.env, ann.secret, 'Ann');
-  const id = send(svc.env, ann, { batch: 'gift', item: mintHourlock() });
+  const id = send(svc.env, ann, { batch: 'gift', item: mintGilded(DRAGONFIRE_OATH) });
   const pack = [];
   const box = new PostBox({ ioOf: ioFor(svc, ann), character: () => R.id, realm: realmOf(R), pack: { add: (r) => pack.push(r), changed() {} } });
   await box.refresh();
@@ -320,7 +333,7 @@ test('AUDIT SERVER-POST the box: a look that set out before a claim (or an open)
   await box.refresh();
   assert.deepEqual([box.post[0].claimed, box.waiting], [true, 0], 'a look after it agrees');
   // a claim whose answer never came: unknown
-  const id2 = send(svc.env, ann, { batch: 'gift-2', item: mintHourlock() });
+  const id2 = send(svc.env, ann, { batch: 'gift-2', item: mintGilded(DRAGONFIRE_OATH) });
   const lost = new PostBox({ ioOf: ioFor(svc, ann), character: () => R.id, realm: { act: async () => ({ ok: false, error: 'offline', unknown: true }), abandon() {} }, pack: { add() {}, changed() {} } });
   await lost.refresh();
   assert.deepEqual(await lost.claim(id2), { ok: false, error: 'unknown' });
@@ -349,12 +362,12 @@ function focusDoc() {
 }
 
 test('AUDIT SERVER-POST the window keeps its place: rebuilt by the face (a render), it reopens on the piece it showed with the line it said; the focus never falls out of it - on Back after opening, on the row after Back, on Back after a claim; a second press on Claim while the first is out is no second claim and no busy sentence (mutants: the place forgotten; the line wiped on reopen; the focus dropped; the second press sent)', async () => {
-  const post = [{ id: 'a'.repeat(24), from: POST_SENDER, subject: 'The Hourlock', sentAt: T0, read: false, item: { name: 'The Hourlock', rarity: 'gilded' }, claimed: false }];
+  const post = [{ id: 'a'.repeat(24), from: POST_SENDER, subject: 'The Dragonfire Oath', sentAt: T0, read: false, item: { name: 'The Dragonfire Oath', rarity: 'gilded' }, claimed: false }];
   let claims = 0, release = null;
   const box = {
     state: 'ready', post, version: 1, busy: false, waiting: 1, refresh: async () => {},
     open: async (id) => ({ ok: true, post: { ...post.find((p) => p.id === id), body: 'For the first clear.' } }),
-    claim: (id) => { claims++; box.busy = true; box.version++; return new Promise((r) => { release = () => { box.busy = false; post[0].claimed = true; box.version++; r({ ok: true, item: { name: 'The Hourlock' } }); }; }); },
+    claim: (id) => { claims++; box.busy = true; box.version++; return new Promise((r) => { release = () => { box.busy = false; post[0].claimed = true; box.version++; r({ ok: true, item: { name: 'The Dragonfire Oath' } }); }; }); },
     remove: async () => ({ ok: true }),
   };
   const doc = focusDoc();
@@ -370,14 +383,14 @@ test('AUDIT SERVER-POST the window keeps its place: rebuilt by the face (a rende
   assert.equal(claims, 1, 'one claim');
   assert.equal(all(v1.root, 'pm-say')[0].textContent, '', 'and no busy sentence');
   release(); await first;
-  assert.equal(all(v1.root, 'pm-say')[0].textContent, 'The Hourlock is in your pack.');
+  assert.equal(all(v1.root, 'pm-say')[0].textContent, 'The Dragonfire Oath is in your pack.');
   assert.equal(doc.activeElement?.attrs['data-key'], 'back', 'after the claim: on Back');
   // A RENDER of the face rebuilds the window: it reopens where it stood, the line still said
   const v2 = postWindow(doc, { box: () => box, onClose() {}, every: 1e9, keep });
   v2.stop();
   await new Promise((r) => setImmediate(r));
   assert.equal(all(v2.root, 'pm-piece').length, 1, 'the piece still open');
-  assert.equal(all(v2.root, 'pm-say')[0].textContent, 'The Hourlock is in your pack.', 'the line still said');
+  assert.equal(all(v2.root, 'pm-say')[0].textContent, 'The Dragonfire Oath is in your pack.', 'the line still said');
   all(v2.root, 'pm-back')[0].listeners.click[0]();
   assert.equal(doc.activeElement?.attrs['data-key'], post[0].id, 'Back: the focus on the row it came from');
   assert.equal(keep.openId, null);
@@ -398,7 +411,7 @@ test('AUDIT SERVER-POST the doors: /mail opens the mailbox on either skin and wh
   assert.match(door, /\.filter\(\(n\) => !n\.closest\?\.\('\[inert\]'\)\);/, 'Tab never into what is out of reach');
   const menu = src('src/ui/enhanced/enhancedMenu.js');
   assert.match(menu, /else if \(at === 'mailbox'\) postOpen = true;/, 'the door lands on the window');
-  assert.match(menu, /closeOnOutsideTap\(home, '\.px-acctwin', [^\n]*\n\s*for \(const n of \[stage, mark, envelope, laurel, gem\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'the face under the account window inert');   // PIN MOVED (SEASON-BOOK): the laurel too; PIN MOVED (SHOP): and the gem
+  assert.match(menu, /closeOnOutsideTap\(home, '\.px-acctwin', [^\n]*\n\s*for \(const n of \[stage, mark, envelope, laurel\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'the face under the account window inert');   // PIN MOVED (SEASON-BOOK): the laurel too; PIN MOVED (SHOP): and the gem
   assert.match(menu, /postKeep = \{\};\n/, 'the window\'s place reset with the visit');
   assert.match(menu, /postView = postWindow\(document, \{ box: \(\) => hooks\.post\?\.\(\) \?\? null, keep: postKeep,/);
 });

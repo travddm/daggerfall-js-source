@@ -11,7 +11,7 @@
 //   - HERE (standing, or the pace not yet measured) and a place's card read whole, the minute a change comes found to the
 //     minute (L3-7: a bisection inside forecastAt's quarter hour - "in 15 min" was said of a change six minutes off), a
 //     card kept a minute of the weather's clock.
-// Off the map's lane (weatherMapOn), and while an event holds the sky (`held`: Sun Baby's sun over the land - L3-14), it
+// Off the map's lane (weatherMapOn), and while an event holds the sky (`held`, L3-14), it
 // says nothing. While no journey drives (stopped for a foe, a place, the view down) the pace is not measured and HERE is
 // said (L3-3: a stopped journey forecast at the pace it no longer had for twenty seconds).
 // The streaming host constructs it (scenes/world.js) - the one host with the Overworld; scenes/exterior.js,

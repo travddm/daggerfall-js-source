@@ -78,7 +78,7 @@ test('TWO-HANDS law: the hands\' modes - both empty is the fists, two one-handed
   const T = WEAPON_TYPES;
   assert.deepEqual([...DUAL_TYPES].sort((a, b) => a - b), [T.LongBlade, T.LongBlade_Magic, T.Dagger, T.Dagger_Magic, T.Mace, T.Mace_Magic,
     T.Flail, T.Flail_Magic, T.Warhammer, T.Warhammer_Magic, T.Battleaxe, T.Battleaxe_Magic].sort((a, b) => a - b));
-  for (const t of [T.Staff, T.Staff_Magic, T.Bow, T.Melee, T.Werecreature, T.Thunderlock, T.Thunderlock_Magic]) {
+  for (const t of [T.Staff, T.Staff_Magic, T.Bow, T.Melee, T.Werecreature]) {
     assert.equal(dualEligible({ item: true, type: t, hands: ITEM_HANDS.Either }), false, `type ${t}`);
   }
   assert.equal(dualEligible({ item: true, type: T.Mace, hands: ITEM_HANDS.Both }), false, 'ItemHands.Both is the leaf\'s 4');
@@ -533,8 +533,8 @@ test('TWO-HANDS (AUDIT 2): THE OFF HAND\'S BLOW IS 0.8 OF A BLOW IN EVERYTHING I
   pw.applyWeapon(); pw.clickAttack(() => 0.5);
   assert.ok(pw.offStrike && pw.blowWeight === DUAL.OFF_DAMAGE, 'the off hand\'s, its share');
   // every tally a host makes hands the swing's weight on; techniques are the lead's. PIN MOVED (AUDIT PISTOLET A2): the
-  // ranged arm's too - a bow never strikes off (DFU's line), but a Pistolet pair's off-hand shot does, and world.js and
-  // exterior.js counted it whole where the other two hosts weighed it (THE FOUR HOSTS RULE)
+  // ranged arm's tallies in world.js and exterior.js hand it on too (THE FOUR HOSTS RULE); a bow never strikes off (DFU's
+  // line), so its weight there is always one
   for (const [file, rig, n] of [['worldModes', 'interiorWeapon.playerWeapon', 2], ['dungeonContext', 'playerWeapon', 2], ['world', 'weaponRig.playerWeapon', 4], ['exterior', 'weaponRig.playerWeapon', 3], ['cityGuards', 'playerWeapon', 1]]) {
     const text = rd(`src/scenes/${file}.js`);
     const weighed = text.split(`tallySwingSkills(playerEntity, ${rig}.weapon, ${rig}.blowWeight)`).length - 1;
@@ -1253,7 +1253,7 @@ test('TWO-HANDS rig, by source: the two-hands branch is the classic body\'s own 
   assert.ok(branch < rig.indexOf('_armDrewLast = !eotbHidesWeapon() && fpArm.active();'), 'above the arm\'s seam');
   assert.match(rig, /const runHands = !!c && twoHands\.running && !fpArm\.active\(\) && !eotbHidesWeapon\(\) && !sheetWindowUp\(\);/);
   // AUDIT 2: and never over another picture in the hands - the run yields to it at once
-  assert.match(rig, /const runDrawn = runHands && \(handsEmpty\(\) \|\| !\(shown\(\) \|\| torchOnly \|\| !!shieldRect \|\| gunSliding \|\| spellHandsDrawn\)\);/);
+  assert.match(rig, /const runDrawn = runHands && \(handsEmpty\(\) \|\| !\(shown\(\) \|\| torchOnly \|\| !!shieldRect \|\| spellHandsDrawn\)\);/);
   assert.match(rig, /finally \{ widget\.endOfFrame\(\); twoHands\.offWidget\.endOfFrame\(\); shield\.endOfFrame\(\); \}/);
   assert.match(rig, /playerWeapon\.leftBusy = lightInHand\(\);[^\n]*\n\s*playerWeapon\.applyWeapon\(claws\);/, 'the light\'s hand decided before the mode');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {

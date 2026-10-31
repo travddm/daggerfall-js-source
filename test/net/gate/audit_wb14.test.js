@@ -424,7 +424,7 @@ test('AUDIT WB14 WIRE-6 the account: a portent night\'s receipt fills the wealth
   assert.match(read('server-account/src/accounts.js'), /if \(recorded\) return \{ recorded, day: c\.d, stones: embers, \.\.\.\(c\.p > 0 \? \{ portent: c\.p \} : \{\}\),/);
   const svc = read('server-account/src/index.js');
   assert.match(svc, /if \(r\.recorded === true\) await grantSpoils\(ctx\.db, who\.player\.id, portentPieces\(r\.portent\)\);/);
-  assert.match(svc, /delete answer\.weirRow; delete answer\.portent;/);
+  assert.match(svc, /delete answer\.portent;/);   // PIN MOVED (Elite Gates removed): the Weir Key's row no longer rides the answer
 });
 
 // ═══ PLAY: the balance by simulation ══════════════════════════════════════════════════════════════════════════════

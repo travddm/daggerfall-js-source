@@ -28,8 +28,7 @@
 
 import { STAGES, FIELDS, FIELD_SPEC, AGREEMENTS, AGREEMENT_SPEC, recoveryCodesText, recoveryCodesFileName } from '../accountFlow.js';   // RECOVERY-SET: the codes as the saved file says them
 import { profileIconNode, ICON_TEXT } from '../profileIcons.js';   // WITCH1: the profile icons, worn in the portrait well
-import { TITLE_TEXT, AURA_TEXT, glyphBadges, glyphArtNode, badgeClass } from '../playerBadge.js';
-import { setTitleFlame } from '../titleFlame.js';   // SHOP: a flame title's plate - a class, as every colour here is   // ACC3c: the SAME table the name over a head reads, so the picker shows what a player will actually wear - the COLOUR is the skin's (this card may not style itself, and a pin holds that)
+import { TITLE_TEXT, AURA_TEXT, glyphBadges, glyphArtNode, badgeClass } from '../playerBadge.js';   // ACC3c: the SAME table the name over a head reads, so the picker shows what a player will actually wear - the COLOUR is the skin's (this card may not style itself, and a pin holds that)
 import { duelRecordText } from '../../net/duel/duelRecord.js';   // DUEL1: the account card's K/D row
 import { renownText, renownProgressText, renownProgress } from '../../net/renown.js';   // RENOWN1: Renown, left of the name and in its rows
 import { gateRecordText } from '../../net/gate/gateClaims.js';   // WB5b: and its gates-closed row
@@ -38,7 +37,6 @@ import { raidRecordText } from '../../net/raid/raidClaims.js';   // RAID4: and i
 import { t, localizedTable, intlLocale } from '../../systems/textManager.js';   // L10N4: the card's words in the player's language, read when it is drawn
 import { serpentRecordText } from '../../net/serpent/serpentClaims.js';   // AUDIT SERPENT D4: and its serpents-slain row
 import { sdRecordText } from '../../net/superDungeon/sdClaims.js';   // SD9b: and its Hours-broken row
-import { ketchRecordText } from '../../net/ketch/ketchClaims.js';   // KETCH: and its voyages-sailed row
 import { starRecordText } from '../../net/starfall/starClaims.js';   // STAR7: and its stars-held row
 
 /** RENOWN-CHAR (Mac: "Can we make renown per character again"): the card's Renown tracks as the service sends them -
@@ -87,7 +85,6 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   crystalfist: () => t('account.glyph.crystalfist', 'Crystal Fist'),   // CRYSTAL-FIST: the three slashes, beside Flylighter's name
   wikimaid: () => t('account.glyph.wikimaid', 'WikiMaid'),   // WIKIMAID: the rabbit in its maid's headdress, beside SylviaBun's name
   nirnrootsage: () => t('account.glyph.nirnrootsage', 'Nirnroot Sage'),   // NIRNROOT-SAGE: the nirnroot sprig, beside Blob-Marley's name
-  origin: () => t('account.glyph.origin', 'Origin'),   // SHOP: the ouroboros dragon, the shop's pre-alpha glyph
 });
 
 /** ACC4: THE TWO FACTS MAC ASKED FOR, as words. Pure, so node pins
@@ -244,7 +241,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       if (worn) {
         const t = el('span', `acctworntitle ${badgeClass('tl', worn)}`);
         const word = el('span', 'acctwornword', TITLE_TEXT[worn] ?? worn);
-        setTitleFlame(word, worn);   // SHOP: Genesis on its fire
         t.append(word);
         line.append(t);
       }
@@ -377,7 +373,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
         // the button's border in its plain colour (ui/playerBadge.js badgeCss)
         const b = keyedAs(el('button', `acttitle ${badgeClass('tl', key)}${worn ? ' worn' : ''}`), `title:${key}`);
         const word = el('span', 'acttitleword', TITLE_TEXT[key] ?? key);
-        setTitleFlame(word, key);   // SHOP: Genesis on its fire
         b.append(word);
         b.type = 'button';
         b.disabled = !!flow.busy;
@@ -687,10 +682,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       // (net/starfall/starClaims.js carries the receipts). A service from before it says nothing.
       const stars = starRecordText(flow.account.stars);
       if (stars) row(t('account.card.stars', 'Stars held'), stars);
-      // KETCH: the voyages this account sailed to the Tonal Warden's fall - each a receipt the relay signed and this service
-      // counted once a voyage (net/ketch/ketchClaims.js carries the receipts). A service from before it says nothing.
-      const voyages = ketchRecordText(flow.account.ketch);
-      if (voyages) row(t('account.card.voyages', 'Voyages sailed'), voyages);
       // MARKS1: the account's Marks - the server's currency, struck for acts a server witnessed (PROF0 10.5). Null where
       // Marks are not this account's (a guest, the service's switch), and a service from before it says nothing.
       if (Number.isSafeInteger(flow.account.marks)) row(t('account.card.silver', 'Silver'), marksText(flow.account.marks));

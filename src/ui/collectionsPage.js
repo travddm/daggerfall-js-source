@@ -1,7 +1,7 @@
 // @ts-check
 // COLLECTIONS (2026-10-08, Mac: "I think we add a new tab in holdings for the weapon codex and card collection"; answered:
 // "One 'Collections' tab"): THE COLLECTIONS PAGE on the Enhanced pause menu's Holdings rail (ui/enhanced/enhancedMenu.js
-// pauseHoldings) - what a character has gathered, in two parts under one switch:
+// pauseHoldings) - what a character has gathered, under one switch:
 //
 //   THE CODEX (LOOT10, systems/loot/lootCodex.js; bible/06-Systems/Loot-Arc.md section 12): every Legendary record and every
 //     Aetheric set, found and not - a found one's name, its group, the day it was first found and what it is; an unfound
@@ -9,39 +9,35 @@
 //     Reforge's Codex page's (ui/reforgeWindow.js renderCodex - AUDIT CARDS-5 D12 made the lines the same), read from the
 //     same codex, so the two never disagree; the Scry door is the guilds' window's alone. The pack's Codex button still
 //     opens that window.
-//   THE CARDS (CARDS8, bible/11-Multiplayer/Tavern-Cards.md section 26): the Card Binder's collection and its decks - the
-//     binder's own page (ui/card/cardBinderPage.js), drawn here.
 //
 // Dressed by the stone-and-brass kit's roles as the other Holdings pages are (ui/enhanced/enhancedFrame.js FRAME_ROLES) - this
 // sheet writes geometry and the words' colours alone. CARDS-PLUS (2026-10-13, bible/11-Multiplayer/Tavern-Cards.md
-// section 38): until then that sentence was a claim the roles did not keep - none named the switch, the codex's rows or
-// the binder's filters, chips and decks, and this sheet's own `background` and border colours painted over any that
-// might; the switch and the binder's presses are the kit's tiles now, a codex row its list line, a deck its panel.
+// section 38): until then that sentence was a claim the roles did not keep - none named the switch or the codex's rows,
+// and this sheet's own `background` and border colours painted over any that might; the switch is the kit's tiles now,
+// a codex row its list line.
 //
 // COLLECTIONS-II (2026-10-22, the owner: "with the introduction of a lot of titles, auras, profile icons, etc I think its
 // time we introduce these elements to the collections tab, along with telling how they are found, even if they arent
 // currently able to be obtained. This needs to be a proper overhaul to the collections ui"; bible/10-UI/Collections.md):
 // the page is every player's now, its parts six - the account's WARDROBE first, a kind a part (Titles, Auras, Icons,
 // Glyphs: ui/collections/wardrobePart.js over ui/collections/wardrobeCatalogue.js - every one, held or not, where it
-// comes from and how it is had, worn from here), then this character's Codex and Cards. The switch is a row of tiles,
+// comes from and how it is had, worn from here), then this character's Codex. The switch is a row of tiles,
 // each its part's name over its count and a meter of it, so the page opens on how much of everything is collected.
 
 import { codexRows, codexSets, codexCount, codexGilded } from '../systems/loot/lootCodex.js';   // AUDIT WORLD-REWARDS A5: and the Gilded rung's rows
 import { lootRarityOn, powerLine, legendaryById, affixLine, RARITIES } from '../systems/loot/lootRarity.js';
 import { gildedById } from '../systems/gilded.js';
 import { setById } from '../systems/sigil/sigilSets.js';
-import { cardsPartShown, drawCardsPart, resetCardsPart, disarmCardsPart, deckCards } from './card/cardBinderPage.js';
-import { collectionOf } from '../systems/iliac/iliacItems.js';   // COLLECTIONS-II: the Cards tile's count
 import { t } from '../systems/textManager.js';
 import { wardrobeCount, wordPair } from './collections/wardrobeCatalogue.js';   // COLLECTIONS-II: the wardrobe's parts
-import { GATHERED_PARTS, isGatheredPart, gatheredCount, drawGatheredPart } from './collections/gatheredPart.js';   // HUNTERS-MARK: the Trophies, the Fish, the Annals
+import { GATHERED_PARTS, isGatheredPart, gatheredCount, drawGatheredPart } from './collections/gatheredPart.js';   // HUNTERS-MARK: the Trophies, the Fish
 import { drawWardrobePart, wardrobeAccount, wardrobeOfFlow, resetWardrobePart, rereadWardrobeAccount, WARDROBE_PART_CSS, WARDROBE_THEME_CSS } from './collections/wardrobePart.js';
 import { drawAppearancesPart, resetAppearancesPart, appearancesCount, LOOKS_PART_CSS } from './collections/appearancesPart.js';   // APPEARANCES: the character's looks (bible/04-Characters/Wardrobe.md)
 
 export const COLLECTION_PAGE_SECTIONS = Object.freeze([Object.freeze(['collections', 'Collections'])]);
 export const COLLECTION_PAGE_STYLE_ID = 'collections-page-css';
 /** The page's parts, in the switch's order - COLLECTIONS-II: the account's wardrobe, a kind a part, then the character's
- *  looks (APPEARANCES), codex and cards. Each `[id, its name]`, the name read when drawn. */
+ *  looks (APPEARANCES) and codex. Each `[id, its name]`, the name read when drawn. */
 export const COLLECTION_PARTS = Object.freeze([
   wordPair('titles', () => t('coll.part.titles', 'Titles')),
   wordPair('auras', () => t('coll.part.auras', 'Auras')),
@@ -49,7 +45,6 @@ export const COLLECTION_PARTS = Object.freeze([
   wordPair('glyphs', () => t('coll.part.glyphs', 'Glyphs')),
   wordPair('appearances', () => t('coll.part.appearances', 'Appearances')),   // APPEARANCES: the character's looks, first of its own parts
   wordPair('codex', () => t('coll.part.codex', 'Codex')),
-  wordPair('cards', () => t('coll.part.cards', 'Cards')),
   ...GATHERED_PARTS,   // HUNTERS-MARK (Collections.md section 10): what a character gathers, then the account's pages
 ]);
 /** COLLECTIONS-II: the wardrobe's parts and the kind each lists (ui/collections/wardrobeCatalogue.js WARDROBE_KINDS). */
@@ -57,24 +52,24 @@ export const WARDROBE_PARTS = Object.freeze({ titles: 'title', auras: 'aura', ic
 const partOfKind = (/** @type {string} */ kind) => Object.keys(WARDROBE_PARTS).find((id) => WARDROBE_PARTS[/** @type {keyof typeof WARDROBE_PARTS} */ (id)] === kind) ?? null;
 
 /** COLLECTIONS-II: THE RAIL SHOWS THE PAGE ALWAYS - the wardrobe's catalogue is every player's to read, held or not
- *  (until then the page showed only while the codex or the cards had something). */
+ *  (until then the page showed only while the codex had something). */
 export const collectionsPageShown = (_player = null) => true;
-/** The parts shown now, in order: the wardrobe's four always, the codex while Loot rarity makes Legendaries, the cards
- *  while the character carries a Card Binder. */
-export const collectionParts = (player = null) => COLLECTION_PARTS.filter(([id]) => (id === 'codex' ? lootRarityOn() : id === 'cards' ? cardsPartShown(player) : true));
+/** The parts shown now, in order: the wardrobe's four always, the codex while Loot rarity makes Legendaries. */
+export const collectionParts = (_player = null) => COLLECTION_PARTS.filter(([id]) => (id === 'codex' ? lootRarityOn() : true));
 
 let _part = 'titles';
 let _picked = null;   // the codex row opened whole
 /** The page forgotten (a load, a new character): back to its first part. COLLECTIONS-II: and the wardrobe's rows, its
  *  filter and its account read. */
-export function resetCollectionsPage() { _part = 'titles'; _picked = null; resetCardsPart(); resetWardrobePart(); resetAppearancesPart(); }
-/** AUDIT CARDS-5 D5: leaving the page (another rail page, another tab) disarms what was armed on it. (AUDIT COLLECTIONS-II,
- *  lane 2: the account's read is the menu visit's, kept across leaving - resetCollectionsPage lets it go.) */
-export function disarmCollectionsPage() { disarmCardsPart(); }
+export function resetCollectionsPage() { _part = 'titles'; _picked = null; resetWardrobePart(); resetAppearancesPart(); }
+/** AUDIT CARDS-5 D5: the menu's hook for leaving the page (another rail page, another tab). No part arms an act now, so it
+ *  has nothing to disarm. (AUDIT COLLECTIONS-II, lane 2: the account's read is the menu visit's, kept across leaving -
+ *  resetCollectionsPage lets it go.) */
+export function disarmCollectionsPage() {}
 /** AUDIT COLLECTIONS-II (lane 2): the account card closed - the page's read of the account asked again (a wear, a
  *  sign-out or another account there is the service's to say). */
 export function rereadCollectionsAccount() { rereadWardrobeAccount(); }
-/** AUDIT CARDS-5 D14: a landing names the part to open on ('codex' | 'cards'; COLLECTIONS-II: or a wardrobe kind's). */
+/** AUDIT CARDS-5 D14: a landing names the part to open on ('codex'; COLLECTIONS-II: or a wardrobe kind's). */
 export function setCollectionsPart(/** @type {string} */ part) { if (COLLECTION_PARTS.some(([id]) => id === part)) _part = part; }
 
 export const COLLECTION_PAGE_CSS = `
@@ -117,26 +112,23 @@ export function drawCollectionsPage(detail, rerender, kit) {
   if (!parts.some(([id]) => id === _part)) _part = parts[0][0];
   detail.append(partTiles(kit, parts, wardrobeOfFlow(flow), rerender));
   const kind = WARDROBE_PARTS[/** @type {keyof typeof WARDROBE_PARTS} */ (_part)];
-  const goTo = (/** @type {string} */ k) => { const id = partOfKind(k); if (id) { _part = id; disarmCardsPart(); } };
+  const goTo = (/** @type {string} */ k) => { const id = partOfKind(k); if (id) _part = id; };
   if (kind) drawWardrobePart(detail, rerender, { ...kit, goTo }, kind, flow);
   else if (_part === 'appearances') drawAppearancesPart(detail, rerender, kit);   // APPEARANCES
   else if (_part === 'codex') drawCodexPart(detail, rerender, kit);
   else if (isGatheredPart(_part)) drawGatheredPart(detail, kit, _part, wardrobeOfFlow(flow));   // HUNTERS-MARK
-  else drawCardsPart(detail, rerender, kit);
 }
 
 /** COLLECTIONS-II: A PART'S COUNT - `{ held, total }`, held null where it cannot be known (no account read): a wardrobe
  *  kind's off the account's wardrobe, the codex's every record found (the Gilded rung, the Legendaries, the Aetheric
- *  pieces), the cards' every card of the catalog the binder holds one of. */
+ *  pieces). */
 export function partCount(/** @type {string} */ id, /** @type {any} */ wardrobe, /** @type {any} */ player = null) {
   const kind = WARDROBE_PARTS[/** @type {keyof typeof WARDROBE_PARTS} */ (id)];
   if (kind) { const n = wardrobeCount(kind, wardrobe); return { held: wardrobe ? n.held : null, total: n.total }; }
   if (id === 'appearances') return appearancesCount(player);   // APPEARANCES: every look there is, and those the character holds
   if (isGatheredPart(id)) return gatheredCount(id, wardrobe);   // HUNTERS-MARK
-  if (id === 'codex') { const n = codexCount(); return { held: n.gilded + n.legendary + n.aetheric, total: n.gildeds + n.legendaries + n.aetherics }; }
-  const have = collectionOf(player?.items);
-  const all = deckCards();
-  return { held: all.filter((c) => have.has(c.id)).length, total: all.length };
+  const n = codexCount();
+  return { held: n.gilded + n.legendary + n.aetheric, total: n.gildeds + n.legendaries + n.aetherics };
 }
 
 /** COLLECTIONS-II: THE SWITCH - a tile a part, its name over its count and a meter of it; the one shown brass. */
@@ -151,7 +143,7 @@ function partTiles(/** @type {any} */ kit, /** @type {ReadonlyArray<readonly [st
     b.setAttribute('aria-pressed', id === _part ? 'true' : 'false');
     b.append(el('span', 'coll-pname', label()), el('span', 'coll-pcount', t('coll.count', '{held} / {total}', { held: n.held ?? '–', total: n.total })));
     if (typeof kit.meter === 'function') b.append(kit.meter(n.held ?? 0, n.total));
-    b.onclick = () => { _part = id; disarmCardsPart(); rerender(); };
+    b.onclick = () => { _part = id; rerender(); };
     sw.append(b);
   }
   return sw;

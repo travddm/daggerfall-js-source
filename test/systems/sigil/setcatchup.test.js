@@ -118,8 +118,8 @@ test('SET-CATCHUP THE DRINK: a full Dagon\'s Brand at Radiant, a fresh helm swap
 
 test('SET-CATCHUP THE SAVE: the reach rides the character\'s save under its own slot, a forged or unknown entry dropped, a new game empty (mutants: the record left out of the save; a stage past Ascendant taken)', () => {
   fresh();
-  noteReach(new Map([['dagon', [3, 3]], ['panoply', [4, 2]]]));
-  assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 3, panoply: 2 } });
+  noteReach(new Map([['dagon', [3, 3]], ['numidium', [4, 2]]]));
+  assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 3, numidium: 2 } });
   restoreModSaveRecords({ [SET_REACH_SAVE_VENDOR]: { reach: { dagon: 4, mora: 5, sheogorath: 2, nocturnal: 1.5, ruhn: 0 } } });
   assert.deepEqual(modSaveRecords()[SET_REACH_SAVE_VENDOR], { reach: { dagon: 4, ruhn: 0 } }, 'a stage 0..4 of a set that is one');
   restoreModSaveRecords({});

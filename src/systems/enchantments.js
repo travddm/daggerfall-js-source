@@ -402,7 +402,7 @@ export const repairsObjectsMend = (it) => (it.magic || it.artifact ? CONDITION_A
  *  that wears itself, then the pack), and within a tier the mend order's first (itemTemplates.js mendOrder, the repair
  *  kit's: the lowest share left first, ties in the pack's order). Never what a smith refuses as not
  *  repairable (repairService.js repairRefusal) - DFU's own flag on the quiver it mints at 0 and on the lights, whose
- *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on the Dwemer Pellet, a
+ *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on a
  *  campfire's nights and the rest items' doses (AUDIT REST II H7). RepairsObjects.cs reads no such flag, so a lit
  *  torch first in the pack was refuelled as it burned. An enchanted piece only under AllowMagicRepairs
  *  (RepairsObjects.cs:93). */
@@ -513,8 +513,8 @@ const REGISTRY = new Map([
   [T.CastWhenStrikes, {
     flags: PAYLOAD.Strikes,
     strikes({ param, entity, target, damage, ctx }) {
-      // AUDIT FB1018f L3-2: a blow its referee turns whole (a stand-in `warded` - the Warden's ward, the Remnant shut, the
-      // Spire's turned blows) DEALT nothing, and the class's own sourceDamage == 0 guard casts nothing and wears nothing for
+      // AUDIT FB1018f L3-2: a blow its referee turns whole (a stand-in `warded` - the Warden's ward, the Remnant shut) DEALT
+      // nothing, and the class's own sourceDamage == 0 guard casts nothing and wears nothing for
       // it (VAMPIRIC-WARD's reading, below) - its spell met the same turned body and landed nothing either
       if (!target || damage === 0 || target.warded) return null;
       const record = ctx?.spellsByIndex?.()?.get?.(param);
@@ -573,8 +573,8 @@ const REGISTRY = new Map([
     },
     strikes({ param, entity, damage, target }) {
       // FIELD BUGS 2026-10-18f VAMPIRIC-WARD (Low_Poly_Gaming: "an exploit for heals if you have a vampiric weapon"): the damage
-      // DEALT - a blow a referee's ward turns whole (a stand-in `warded`: the Warden's ward, the Remnant shut, the Spire's turned
-      // blows - scenes/eliteGates/egFight.js turnStandIn) dealt nothing, and heals nothing, as the leech's own rule says
+      // DEALT - a blow a referee's ward turns whole (a stand-in `warded`: the Warden's ward, the Remnant shut) dealt
+      // nothing, and heals nothing, as the leech's own rule says
       // (systems/loot/lootPowers.js lootStrike, AUDIT WORLD-REWARDS B3). DFU never meets one - its target is always the entity
       // whose health the blow then takes - so this is VampiricEffect.cs's own law told what the blow dealt, no departure.
       if (param !== 1 || target?.warded) return null;

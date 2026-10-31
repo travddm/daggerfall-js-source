@@ -48,8 +48,8 @@ function journal() {
     unlogged: [{ id: '20', name: 'A Silent Summons', questName: 'M0B10Y02', ql: ql([{ id: 'read', text: 'Read the letter the courier brought', state: 'open' }]) }],
     shelved: [], hidden: [],
     finished: notebook.getFinishedQuests(),
-    lines: [{ id: 'introTables', group: 'intro', title: 'A Seat at the Table', lead: 'A card player wants a partner.', giver: 'Tavern keeper', state: 'running', opens: null, outcome: null, honour: null,
-      steps: [{ quest: 'QLIT01', title: 'The First Hand', state: 'current', witnessed: false, outcome: null }, { quest: 'QLIT02', title: 'The Long Game', state: 'next', witnessed: false, outcome: null }] }],
+    lines: [{ id: 'introGear', group: 'intro', title: 'The Smith’s Secrets', lead: 'An armorer wants an apprentice.', giver: 'an armorer', state: 'running', opens: null, outcome: null, honour: null,
+      steps: [{ quest: 'QLIG01', title: 'A Stone in the Setting', state: 'current', witnessed: false, outcome: null }, { quest: 'QLIG02', title: 'Tempered Again', state: 'next', witnessed: false, outcome: null }] }],
     ladders: [],
   };
   const taken = [], said = [];
@@ -92,10 +92,10 @@ test('AUDIT QUESTLINES UI-9: the Quests tab draws its new wiring - the rewards w
     assert.match(detailOf(host).textContent, /What to do.*Read the letter the courier brought/);
     // the questlines
     const lineRows = host.querySelectorAll('.px-qlinerow');
-    assert.deepEqual(lineRows.map((b) => b.textContent.replace(/^\W+/, '')), ['A Seat at the Table']);
+    assert.deepEqual(lineRows.map((b) => b.textContent.replace(/^\W+/, '')), ['The Smith’s Secrets']);
     assert.equal(lineRows[0].title, 'Under way');
     lineRows[0].click();
-    assert.match(detailOf(host).textContent, /A questline is a story told in several quests.*A card player wants a partner\..*Given by Tavern keeper.*The First Hand.*now.*The Long Game/);
+    assert.match(detailOf(host).textContent, /A questline is a story told in several quests.*An armorer wants an apprentice\..*Given by an armorer.*A Stone in the Setting.*now.*Tempered Again/);
   });
 });
 

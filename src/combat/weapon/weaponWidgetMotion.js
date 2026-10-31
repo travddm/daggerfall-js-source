@@ -7,20 +7,12 @@
 // there, in the order it was in; the component imports them back and
 // calls them where it used to do the work itself.
 //
-// TWO reasons they are their own file rather than four more exports on
-// a 900-line component:
-//
-//   - THE GUN LAB RUNS THEM. src/tools/gunLab.js prototypes a weapon
-//     this game does not have, and "the idle and bob our weapon mods
-//     give us" is a thing a prototype has to SHOW. A second copy of a
-//     bob pinned to an IL offset would be a second copy to drift.
-//   - THE COMPONENT IS EXPENSIVE TO IMPORT. weaponWidget.js reaches
-//     the inventory, the equip tables and the texture bundles, and
-//     through them a vendored mod's mesh folder - four megabytes of
-//     .nif the lab has no use for. These four functions need one
-//     import between them.
-//
-// Nothing here knows about the lab; the arrow points one way.
+// They are their own file rather than four more exports on a 900-line
+// component because THE COMPONENT IS EXPENSIVE TO IMPORT: weaponWidget.js
+// reaches the inventory, the equip tables and the texture bundles, and
+// through them a vendored mod's mesh folder - four megabytes of .nif a
+// reader of the arithmetic has no use for. These four functions need one
+// import between them.
 
 import { modSettingsOf } from '../../systems/modSettings.js';
 import { withDiverseWeaponsPreset } from '../diverseWeapons/diverseWeapons.js';   // DW1
@@ -40,8 +32,7 @@ export const MISS_VFX_AT = Object.freeze({ Target: 0, Crosshair: 1 });
  *  derives them (Offset.Speed x10, Bob.Length /100, SizeX/Y x2,
  *  SpeedMove x4, SpeedState x500, Shape x0.5, Inertia.Scale/Speed x500,
  *  ForwardDepth/ForwardSpeed x0.2, Recoil.Chance /100). `preset` false reads the values as handed, with Diverse
- *  Weapons' preset NOT laid over them (PISTOLET: a weapon's own tuning, parsed with the mod's multipliers -
- *  combat/gun/gunViewmodel.js gunWidgetSettings). */
+ *  Weapons' preset NOT laid over them. */
 export function readWidgetSettings(read = () => modSettingsOf(WEAPON_WIDGET_VENDOR), { preset = true } = {}) {
   const s = preset ? withDiverseWeaponsPreset(read()) : read();   // DW1: the mod's preset over the player's values while its switch is on
   return {
@@ -90,14 +81,6 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 // arithmetic is untouched - every line below is the line that was
 // inline, in the order it was in - and the component calls these where
 // it used to do the work itself.
-//
-// The reason they are exported rather than merely tidier: the gun lab
-// (src/tools/gunLab.js) prototypes a weapon this game does not have,
-// and "the idle and bob the mod gives our weapons" is a thing a
-// prototype has to SHOW, not approximate. A second copy of a bob
-// pinned to an IL offset would be a second copy to drift; the lab runs
-// THESE. Nothing about the component's behaviour changes, and the lab
-// is still a one-way reader - no module the game runs imports it.
 
 /** Offset (IL 0x1cd9-0x1dc5): off screen while hidden or equipping,
  *  back when shown, eased by the live speed. `offsetSpeedLive` is
@@ -110,8 +93,7 @@ export function offsetStep({
   offsetCurrent, offsetTarget, animating = false, shown = true, equipCountdown = 0,
   // The mod's own hidden target is [2, 2] and the component never passes
   // anything else. It is a parameter so a CALLER can slide the sprite
-  // somewhere else through this same easing - the gun lab lowers the
-  // weapon straight down for a reload it has no animation for.
+  // somewhere else through this same easing.
   hiddenTarget = [2, 2],
 }, dt, offsetSpeedLive) {
   let target = offsetTarget, current = offsetCurrent;

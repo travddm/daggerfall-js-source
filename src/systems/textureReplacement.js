@@ -351,12 +351,10 @@ const vendorEntryOf = (archive, record, map = 'Albedo') => {
   for (const e of _vendor.values()) if (e.archive === Number(archive) && e.record === Number(record) && e.frame === 0 && e.map === map) return e;
   return null;
 };
-/** THUNDERLOCK-ART (AUDIT SD III; Mac: "The thunderlock/ammo also doesnt recieve proper artwork in slots like the
- *  hotbar or inventory"): A STAND-IN TAKES NO DYE. DISC22-D taught every icon door to ask a record by the item's dye
+/** THUNDERLOCK-ART (AUDIT SD III): A STAND-IN TAKES NO DYE. DISC22-D taught every icon door to ask a record by the item's dye
  *  (GetItemImage's TryImportTexture by item.dyeColor, ItemHelper.cs:458) - right for a dyed set (Roleplay Realism Items'
  *  520_10-0_Iron .. _Daedric), and a miss for the port's own art, which is ONE truecolor picture with no dyed forms: the
- *  Thunderlock is Dwarven and its pellets Iron, so the doors asked 560_0-0_Dwarven and 561_0-0_Iron, nothing answered,
- *  and every pack tile and hotbar slot drew the initials. An imported texture is drawn as it is - DFU's ChangeDye is
+ *  doors asked a record by a dye nothing was registered under, and every pack tile and hotbar slot drew the initials. An imported texture is drawn as it is - DFU's ChangeDye is
  *  the classic arm's alone (:466-476) - so a stand-in registered undyed, whose record has no dyed entry at all, answers
  *  every dye with itself. A record with any dyed entry (a dyed set) still answers by its dyes alone, as before. */
 const standInDye = (archive, record, frame, map, dye) => {

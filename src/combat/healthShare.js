@@ -5,7 +5,7 @@
 //
 // Five copies of `health / maxHealth` stood in five files (the loot's powers, the weapon masteries, the martial and the
 // arcane paths, the sigil sets). A body the relay runs - the gate's Warden, his crystals and his host, the Abyss
-// Dungeon's Remnant, its Echoes and its Hearts, every lord and every add of an Elite Breach, the sea serpent - is struck
+// Dungeon's Remnant, its Echoes and its Hearts, the sea serpent - is struck
 // on this machine against a stand-in (world/gate/gateBoss.js bossStandIn) whose health is a placeholder nothing empties
 // (1e9 of 1e9), and every copy but the mastery's (AUDIT MARTIAL L3 F2) read it as whole: Sweet Mother's Kiss, Serpent's
 // Kiss's double, Gutting Lunge, Blood Boil and Run Them Down never fired on any of them, though every screen in the fight

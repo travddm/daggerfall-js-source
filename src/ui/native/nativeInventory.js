@@ -66,7 +66,6 @@ import { boundRefusesPut, boundText, isPackOnly, packOnlyText } from '../../syst
 import { letterRefusesPut, letterPutText } from '../../systems/peerWord.js';   // HACKED-GOLD: online a letter of credit goes nowhere a peer's word could hand it on
 import { walletContents, walletLines, refreshWalletSilver } from '../../systems/walletItem.js';   // WALLET1: the wallet's box
 import { lookLine } from '../../systems/appearances.js';   // APPEARANCES-II: the Info box says the look a piece wears
-import { BINDER_CARD_LINES } from '../../systems/iliac/iliacItems.js';   // CARDS8 (AUDIT CARDS-5 C5): the binder's box
 import { dismantleStones, dismantleRefusal, dismantleWare, DISMANTLE_INSTEAD, DISMANTLED, wareName } from '../../systems/sigil/sigilBroker.js';   // SS5: a Broker ware back into stones
 import { YesNoBoxWindow } from '../yesNoBox.js';   // SS5: the dismantle's question, DFU's own Yes/No box
 import { ListPickerWindow, listPickerArtLoaded } from '../listPicker.js';   // MEND-AIM: the piece a repair kit mends, chosen
@@ -819,7 +818,6 @@ export class NativeInventoryWindow {
     }
     // WALLET1: the wallet says what it holds - DFU's own click-anywhere box, its lines; this window is DFU's and keeps
     // DFU's four tabs, the currencies where they always were. The account's silver asked afresh for the next look.
-    if (r.kind === 'binder') { this.boxes = [{ rows: BINDER_CARD_LINES.map((text) => ({ text, center: true })) }]; return; }   // CARDS8 (AUDIT CARDS-5 C5): the binder's lines in DFU's box
     if (r.kind === 'wallet') noteFirstUse('wallet');   // TUT1: the wallet's box read
     if (r.kind === 'wallet') { this.boxes = [{ rows: walletLines(walletContents(this.hooks.items(), this.hooks.entity)).map((text) => ({ text, center: true })) }]; void refreshWalletSilver(); return; }
     // MEND-AIM: a use that asks WHICH (a repair kit, with more than one piece to mend) pushes DFU's list picker over

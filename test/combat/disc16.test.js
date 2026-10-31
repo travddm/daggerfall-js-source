@@ -21,7 +21,6 @@ import { Collider } from '../../src/player/collider.js';
 import { modSettingsOf, setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { readWidgetSettings, WEAPON_WIDGET_VENDOR } from '../../src/combat/weapon/weaponWidget.js';
 import { diverseWeaponsPresetOn, moddedWeaponHUDAnimsEnabled } from '../../src/combat/diverseWeapons/diverseWeapons.js';
-import { gunWidgetSettings } from '../../src/combat/gun/gunViewmodel.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const rad = (deg) => deg * Math.PI / 180;
@@ -93,8 +92,6 @@ test('DISC16-B: the weapons move as they did before Diverse Weapons - the mod on
   assert.deepEqual([s.swing, s.ambidexterity, s.offset, s.bob, s.inertia, s.stepTransforms, s.doubleScale, s.trueSize, s.recoil],
     ['Swings', 'Ambidexterity', 'Offset', 'Bob', 'Inertia', 'Step', 'DoubleScaleTextures', 'TrueTextureSize', 'Recoil'].map(mod));
   assert.equal(s.bobLength, Number(shipped['Bob.Length']) / 100, 'the mod\'s bob, not the preset\'s 142');
-  // the Thunderlock's own departure stands: its inertia on, at the player's scale (the shipped 1.0, x500)
-  assert.deepEqual([gunWidgetSettings().inertia, gunWidgetSettings().inertiaScale], [true, 500]);
   // the mod decides WHICH sprite, never how it moves: with it off, the same motion
   setModSetting('diverse-weapons', 'Enabled', false);
   const without = readWidgetSettings();

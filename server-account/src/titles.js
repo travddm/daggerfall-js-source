@@ -101,13 +101,11 @@ import { insigniaHeld, insigniaKeys } from '../../src/net/insignia.js';   // WB9
 import { patreonTitlesOf } from './patreon.js';   // PATREON-LINK: a Patreon tier's title, held by the pledge
 import { SD_HONOUR_TITLE, SD_HONOUR_AURA } from './sds.js';   // SD9b: the Hour's grants on the row
 import { SERPENT_HONOUR_TITLE, SERPENT_HONOUR_AURA } from './serpents.js';   // SERPENT5: the Old Coil's grants on the row
-import { EG_HONOUR, EG_HONOUR_TITLES, EG_HONOUR_AURA, EG_CHAMPION_TITLE, EG_FIRST_TITLE, EG_FIRST_AURA } from './egHonours.js';   // EG-E2: the Spire's honours on the row
 import { LAMP_TITLE } from './lamp.js';   // LAMP-KEEPER II: I Love Lamp on the row
 import { QL_TITLES, qlTitleBit } from '../../src/net/questlineClaims.js';   // QL12: the questlines' titles on the row
 import { festivalWaresHeld, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN } from '../../src/net/festivalLaw.js';   // WITCH1: the Witches' Festival's wares and honours on the row
 import { STAFF_GLYPHS } from '../../src/net/staffCommands.js';   // STAFF-PANEL2-FIX: the glyphs that open the staff's commands, none held while cut off
 import { MASTERY_MARKS } from '../../src/net/huntLaw.js';   // HUNTERS-MARK, MARKS-OF-MASTERY: the hunt's, a Master's and the sea's titles
-import { shopKeysOf } from '../../src/net/shopLaw.js';   // SHOP: a ware bought, its bit on the row
 
 /** THE FOUNDER CUTOFF, and it is a date rather than a count because
  *  "all current players" is a statement about a MOMENT. Everyone who
@@ -179,16 +177,6 @@ export const isHoursFirst = (player, env) =>
   && hoursFirstHandles(env).has(player.handle.toLowerCase());
 /** HOURS-FIRST: the aura Hour's First carries - The Turning Hour in the first dawn's light (render/auraRing.js). */
 export const HOURS_FIRST_AURA = 'firsthour';
-/** EG-E2 (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 19, THE HONOURS): FIRST OF THE SPIRE - the first company
- *  ever to take Redoubt 10, by name, granted as Hour's First is: a list in config (wrangler.toml EG_FIRST_HANDLES - SPIRE-FIRST,
- *  2026-10-20: the account Serveride, who took it alone - SPIRE-FIRST-NAME: shown in the room by his character's name,
- *  Severide; this list is the account's HANDLE, never the name the herald reads), held while listed, never a guest's. The title and its aura, Firstlight. */
-export function egFirstHandles(env) {
-  return handleList(env?.EG_FIRST_HANDLES);
-}
-export const isSpireFirst = (player, env) =>
-  typeof player?.handle === 'string' && !!player.handle
-  && egFirstHandles(env).has(player.handle.toLowerCase());
 
 /** How long the sprout stays on a new account: two weeks, in seconds,
  *  spelled as the arithmetic rather than as 1209600 so a reader can
@@ -377,8 +365,6 @@ export function titlesHeld(player, env) {
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.
   if (player?.arena?.grand === true) held.push('grandchampion');
   if (player?.arena?.champion === true) held.push('arenachampion');
-  if (player?.iliac?.champion === true) held.push('iliacchampion');   // CARDS10: Iliac Hand's season #1 (iliac.js), while they hold the top
-  if (player?.gambit?.champion === true) held.push('grandmaster');   // KG6: The King's Gambit's season #1 (gambit.js), while they hold the top
   // SD9b: HOURBREAKER - rolled on a Brass Remnant's kill's first write and laid on the row (sds.js claimSd, `sd_honours`),
   // held for good. A guest's kill is never written, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.sd_honours) & SD_HONOUR_TITLE)) held.push('hourbreaker');
@@ -389,12 +375,6 @@ export function titlesHeld(player, env) {
   // SERPENT5: COILBREAKER - rolled on a dealing ship's serpent kill's first write and laid on the row (serpents.js
   // claimSerpent, `serpent_honours`), held for good; a guest's kill is never written, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.serpent_honours) & SERPENT_HONOUR_TITLE)) held.push('coilbreaker');
-  // EG-E2: THE SPIRE'S - the honours a recorded Redoubt wrote on the row (egHonours.js, `eg_honours`), held for good; a
-  // guest's claim is never written. Spire Champion while the row says a Descent bracket's top ten held it last season
-  // (`eg`, egHonours.js withEgHonours); First of the Spire by name
-  if (typeof player?.handle === 'string' && player.handle) for (const t of EG_HONOUR_TITLES) if (Number(player?.eg_honours) & EG_HONOUR[t]) held.push(t);
-  if (player?.eg?.champion === true) held.push(EG_CHAMPION_TITLE);
-  if (isSpireFirst(player, env)) held.push(EG_FIRST_TITLE);
   // QL12: THE QUESTLINES' - a line's title laid on the row by the claim that witnessed its last step (questlines.js
   // claimQl, `ql_titles`), held for good; a guest's claim writes nothing, so a guest row holds none
   if (typeof player?.handle === 'string' && player.handle) for (const t of QL_TITLES) if (Number(player?.ql_titles) & qlTitleBit(t)) held.push(t);
@@ -406,13 +386,9 @@ export function titlesHeld(player, env) {
     // HUNTERS-MARK, MARKS-OF-MASTERY: derived from the account's rows (hunts.js masteryMarksRead) - its board clears, a
     // living Master of a profession, the serpents it helped slay - laid on the row as `masteryMarks` for this request alone
     if (Array.isArray(player?.masteryMarks)) for (const t of MASTERY_MARKS) if (player.masteryMarks.includes(t) && !held.includes(t)) held.push(t);
-    for (const t of shopKeys(player, 'title')) if (!held.includes(t)) held.push(t);   // SHOP: Genesis, bought (shop.js)
   }
   return held;
 }
-/** SHOP (bible/06-Systems/Shop.md): the keys of one kind the shop sold this row (`shop_wares`, its bits - shop.js sets
- *  them on a paid order and takes them off on a refund). A registered account's alone: a guest cannot buy. */
-export const shopKeys = (/** @type {any} */ player, /** @type {string} */ kind) => (typeof player?.handle === 'string' && player.handle ? shopKeysOf(player?.shop_wares, kind) : []);
 /** WITCH1: the title an account's Hearth Offerings earn (net/identityToken.js TITLES's spelling). */
 export const HEARTHKEEPER_TITLE = 'hearthkeeper';
 /** WITCH1: the keys of one kind among the festival's account wares a row bought (festivalLaw.js FESTIVAL_WARES). */
@@ -434,15 +410,10 @@ export function aurasHeld(player, env) {
   // claimSd, `sd_honours`), held for good; a registered account's alone, as Hourbreaker is
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.sd_honours) & SD_HONOUR_AURA)) held.push('turninghour');
   if (isHoursFirst(player, env) && !held.includes(HOURS_FIRST_AURA)) held.push(HOURS_FIRST_AURA);   // HOURS-FIRST: with the title, by name
-  // EG-E2: the Spire's two auras with their titles' bits (Kynbane's Beaconlight, Wellhead-Walker's The Burning Stair), a
-  // registered account's alone; Firstlight with First of the Spire, by name
-  if (typeof player?.handle === 'string' && player.handle) for (const [t, a] of Object.entries(EG_HONOUR_AURA)) if ((Number(player?.eg_honours) & EG_HONOUR[t]) && !held.includes(a)) held.push(a);
-  if (isSpireFirst(player, env) && !held.includes(EG_FIRST_AURA)) held.push(EG_FIRST_AURA);
   for (const a of insigniaKeys(player?.insignia, 'aura')) if (!held.includes(a)) held.push(a);
   // SERPENT5: THE MAELSTROM - the Old Coil's second grant, laid on the row as Coilbreaker is, held for good
   if (typeof player?.handle === 'string' && player.handle && (Number(player?.serpent_honours) & SERPENT_HONOUR_AURA)) held.push('maelstrom');
   if (typeof player?.handle === 'string' && player.handle) for (const a of festivalKeys(player, 'aura')) if (!held.includes(a)) held.push(a);   // WITCH1: Witchfire, bought
-  for (const a of shopKeys(player, 'aura')) if (!held.includes(a)) held.push(a);   // SHOP: Eternal, bought
   return held;
 }
 
@@ -489,7 +460,6 @@ export function glyphsOf(player, env, nowS) {
   if (isModerator(player, env)) on.push('mod');   // MOD1: the blue shield
   for (const t of Object.keys(TIER_LISTS)) if (holdsTier(t, player, env)) on.push(TIER_GLYPH[t]);   // TITLE-N: each title's own glyph
   if (player?.arena?.champion === true) on.push('laurel');   // ARENA4: the laurel, true of the season's #1 while they hold it
-  for (const g of shopKeys(player, 'glyph')) if (!on.includes(g)) on.push(g);   // SHOP: the Origin, bought - true of the account that paid for it
   return on;
 }
 

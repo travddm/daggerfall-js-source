@@ -52,7 +52,7 @@
 
 // WW-LAB: the settings and the three movement modules live in
 // weaponWidgetMotion.js now - the arithmetic with no component around
-// it, which the gun lab imports without dragging this file's world in.
+// it, which a reader imports without dragging this file's world in.
 // Re-exported here because this is still the mod's front door.
 import {
   readWidgetSettings, offsetStep, bobStep, inertiaStep, widgetTransformRect,

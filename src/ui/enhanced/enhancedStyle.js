@@ -44,7 +44,6 @@ import { paceControlsCss } from '../travel/travelPaceControls.js';   // PACE-DIA
 import { SERPENT_RING_MAP_CSS } from '../serpentMapMark.js';   // SERPENT-TIMERS: the sea serpent's row marked in its waters' own colour
 import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js';   // SD2c: the Super dungeon's row in its omen's brass
 import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's row in its violet
-import { EG_ARCH_RING_CSS } from '../eliteGates/egArchMapMark.js';   // TIMERS2: an Elite Breach's row in its arch's gold
 import { heraldCss } from '../../net/herald/heraldCard.js';   // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
 import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js';   // LOOT-MARKS: the quick loot's tier gem and wash
 import { SUPPORT_MARKS_CSS } from '../supportAsks.js';   // SUPPORT1: the asks' marks - the door's icons and the website's corner, one drawing
@@ -2793,8 +2792,8 @@ ${SUPPORT_MARKS_CSS}
    10px above the title of a live row (its clock three lines tall with the "Now") and 11px above a one-line row's */
 .px-timerswin .tm-name::before { content: '\\25c6'; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); font-size: 9px;
   line-height: 1; color: var(--tm-kind, #9c937d); }
-.px-timerswin .tm-gate { --tm-kind: ${heraldCss('gate')}; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-ketch { --tm-kind: ${heraldCss('ketch')}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
-.px-timerswin .tm-seat { --tm-kind: #c08a3e; } .px-timerswin .tm-reset { --tm-kind: #85a8a1; } .px-timerswin .tm-elite { --tm-kind: ${EG_ARCH_RING_CSS}; }
+.px-timerswin .tm-gate { --tm-kind: ${heraldCss('gate')}; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
+.px-timerswin .tm-seat { --tm-kind: #c08a3e; } .px-timerswin .tm-reset { --tm-kind: #85a8a1; }
 .px-timerswin .tm-row.live { background: rgba(192,138,62,0.08); }
 .px-timerswin .tm-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .px-timerswin .tm-name { font-size: 15px; color: #efe8d6; }
@@ -2805,7 +2804,6 @@ ${SUPPORT_MARKS_CSS}
 .px-timerswin .tm-row.live .tm-count { color: #9fe8b4; }
 .px-timerswin .tm-when { font-size: 11px; color: var(--dim); white-space: nowrap; }
 .px-timerswin .tm-empty { color: var(--dim); font-size: 13px; }
-.px-timerswin .tm-door { flex: 0 0 auto; }   /* EG-ZM: a row's door (the Elite rows' Boards) beside its clock */
 /* AUDIT TIMERS1 UI-4: STONE'S LIGHT GROUND (AUDIT MERGE-PLUS D3's law) - the window takes the theme's panel, and Stone's
    light grey left the dim words at 2.6:1 and the where line at 3.0; lifted past 4.5:1 over a hard black drop. */
 :root[data-plus-theme="stone"] .px-timerswin { --dim: #e2dccd; --brass: #ffd98a; text-shadow: 1px 1px 0 rgba(5,6,8,0.85); }
@@ -2819,10 +2817,9 @@ ${SUPPORT_MARKS_CSS}
 @media (max-width: 560px) {
   .px-win.px-timerswin .px-body { padding: 16px 14px 18px; }
   .px-timerswin .tm-count { font-size: 16px; }
-  /* TIMERS2: a row's door on a line of its own on a phone - beside the clock it squeezed the row's words to a word a line */
+  /* TIMERS2: on a phone a row may wrap, its words keeping the room beside the clock */
   .px-timerswin .tm-row { flex-wrap: wrap; }
   .px-timerswin .tm-text { flex: 1 1 0; }
-  .px-timerswin .tm-door { flex: 1 0 100%; justify-content: center; text-align: center; }   /* AUDIT TIMERS2 H2: at the button's own 46px - a 36px rule here had taken 10px off a thumb's target */
 }
 /* AUDIT TIMERS2 M6: a short screen (a phone on its side) - the whole height, and the lead's line given to the list (the head
    and the bar took 180 of a 370px window) */

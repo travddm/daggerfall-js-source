@@ -132,7 +132,7 @@ test('TECHFX1 THE TABLE: every technique of the roster has its moments - a swing
     }
   }
   assert.equal(FX.TECH_FX.volley.loose.sound, undefined, 'the host\'s bowSound is the loose\'s - a second ArrowShoot only doubled it');
-  assert.equal(FX.TECH_FX.pierce.loose.sound, undefined, '...and a Thunderlock\'s loose is its own shot');
+  assert.equal(FX.TECH_FX.pierce.loose.sound, undefined, '...and Piercing Shot\'s loose is the bow\'s too');
   // a ring's radius is the technique's own reach, so the burst draws the blow's true size
   assert.equal(FX.TECH_FX.slam.hit.r, TECHNIQUES.slam.reach);
   assert.equal(FX.TECH_FX.whirlwind.hit.r, TECHNIQUES.whirlwind.reach);

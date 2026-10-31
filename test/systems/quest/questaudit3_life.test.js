@@ -345,24 +345,24 @@ test('RESTART-WORDS: a questline step the journal restarted is no stall - its en
       tick() { for (const q of m.questsToInvoke.splice(0)) m.quests.set(q.uid, q); },
     };
     const clock = { s: 1000 };
-    const runner = createLineRunner({ machine: m, ctx: { level: () => 2, online: () => false, nowSeconds: () => clock.s, outcomeText: () => 'ok' } });
+    const runner = createLineRunner({ machine: m, ctx: { level: () => 4, online: () => false, nowSeconds: () => clock.s, outcomeText: () => 'ok' } });
     // PIN MOVED (QL-OFFERED): the line taken - and the refused case stands at its second step (a save's), for a first
     // step that will not begin is no take at all (its line stays on offer)
-    if (refuse) runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, taken: true } });
-    else runner.takeLine('introTables');
+    if (refuse) runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, taken: true } });
+    else runner.takeLine('introGear');
     runner.look(); m.tick();
     /** The journal's Restart (machine.js restartQuest): the old copy removed - its tombstone hands it to `dropped` - and
      *  the new started. */
     const restart = () => {
-      const old = [...m.quests.values()].find((q) => q.questName === 'QLIT01');
-      const fresh = { uid: uid++, questName: 'QLIT01', questComplete: false, questTombstoned: false };
+      const old = [...m.quests.values()].find((q) => q.questName === 'QLIG01');
+      const fresh = { uid: uid++, questName: 'QLIG01', questComplete: false, questTombstoned: false };
       old.questTombstoned = true;
       runner.dropped(old);
       m.quests.delete(old.uid);
       m.quests.set(fresh.uid, fresh);
       return fresh;
     };
-    return { m, clock, runner, restart, rec: () => runner.snapshot().introTables, row: () => runner.rows().find((r) => r.id === 'introTables') };
+    return { m, clock, runner, restart, rec: () => runner.snapshot().introGear, row: () => runner.rows().find((r) => r.id === 'introGear') };
   };
   const STALLED = 'Its next step could not begin here: it will be offered again.';
 

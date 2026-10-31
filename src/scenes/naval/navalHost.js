@@ -247,7 +247,7 @@ export const HIT_CONFIRM_REF_M = 60;
 export const HIT_BURST_M = 50;
 export const HIT_BURST_MAX = 3;
 /** AUDIT NAV1 (the presentation): each gun of mine kicks the camera as it goes, by its kind (the broadside shook it
- *  once, 1.2 - under the Thunderlock pistol's 3); a powder barrel going up on my deck shakes it BLAST_SHAKE (it shook
+ *  once, 1.2); a powder barrel going up on my deck shakes it BLAST_SHAKE (it shook
  *  1.6, under a holed ball's 2.5). */
 export const GUN_KICK = Object.freeze({ long: 1.1, heavy: 1.6, swivel: 0.45, chain: 0.9 });
 export const BLAST_SHAKE = 3.2;

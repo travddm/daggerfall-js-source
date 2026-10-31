@@ -3,8 +3,7 @@
 -- are in the journal at once. A coven lieutenant in a remote dungeon, as a Mages Guild quest sends one (M0B30Y04's
 -- `reveal` and `place foe`), named by the machine's own name banks (`=lieutenant_`, Foe.cs SetFoeName); the key is
 -- given to the foe before it is placed (B0B81Y02's map) and brought back to Ysolde (`toting`, as DFU's deliveries). The
--- key is a quest item that only LOOKS like a Weir Key in its coven-cloth (a talisman, its words in message 1017): the
--- real one is the account service's to pay, at the line's last step (net/questlineClaims.js `key`).
+-- key is a quest item in its coven-cloth (a talisman, its words in message 1017); the line's last step decides its fate.
 Quest: QLCH02
 DisplayName: The Lieutenant
 -- Message panels

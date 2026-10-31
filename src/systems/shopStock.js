@@ -50,7 +50,6 @@ import { CLOTHING_DYES } from '../characters/dyes.js';
 import { BUILDING_TYPES } from '../world/buildingNames.js';
 import { MINUTES_PER_DAY, dayOfYear } from './gameDate.js';   // X6: the soul-gem stock's daily seed; A2: CreateStockedDate's day term
 import { SOUL_TRAP_TEMPLATE } from './mysticism.js';   // X6: one home for the template id (X5 put it there with fillEmptyTrap)
-import { ILIAC_CARD_TEMPLATE, CARD_PACK_TEMPLATE } from './iliac/iliacItems.js';   // AUDIT CARDS-5 C2: the collectible card, which no shop buys; CARDS9: nor its pack
 import { goodOfTemplate } from './naval/tradeGoods.js';   // AUDIT CAPTAIN'S SEA B2: the exchange's goods, which no shop buys
 import { landSold } from './stolenGoods.js';   // AUDIT UPDATE II B2: the sale's own door, for the counter's arrows
 import { OIL_TEMPLATE, ARROW_TEMPLATE, addItem } from './inventory.js';   // SHOP-ARROWS: the counter's quiver   // AUDIT-RR2 G10: the shelf's AddItem   // AUDIT 58: UselessItems2.Oil (ItemEnums.cs:357) - one home for the id
@@ -104,16 +103,8 @@ export const SHOP_ITEM_GROUPS = Object.freeze({
   [BUILDING_TYPES.FurnitureStore]: [0x08, FURNISHER_CHANCE],
 });
 
-/**
- * PELLETS-SCARCE (2026-10-24, the owner: "Remove their ammo from shops and only have ammo has a rare resource drop (not
- * super duper rare but still rare)"; bible/05-Combat/Dwarven-Thunderlock.md "PELLETS-SCARCE"): NO SHELF SELLS THE
- * DWEMER PELLET. SHOP-PELLETS (2026-10-07) put the Thunderlock's shot on every weapon counter; that line is gone, and
- * every other draw and stack on the shelf is what it was (it drew no roll). A Pellet is found - the loot door's last
- * draw (systems/thunderlock.js, the Dwemer find) and the airship's hold (systems/ketch/ketchSpoils.js; bible/11-Multiplayer/
- * Sky-Ketch.md section 9) - and passes between players by trade. A shop still BUYS one back, as it buys any weapon.
- */
 const WEAPONS_GROUP_ID = 0x03;
-/** THE COUNTER'S ROUNDS (SHOP-PELLETS' law, SHOP-ARROWS' since PELLETS-SCARCE took the Pellet off the counter): `max` at
+/** THE COUNTER'S ROUNDS (SHOP-ARROWS' law): `max` at
  *  a quality-20 Weapon Smith, the shop's own Weapons chance over the Weapon Smith's of it, and a poor shop half of that;
  *  nothing where no weapon is sold. */
 export function shopAmmoStack(buildingType, quality, max) {
@@ -194,12 +185,7 @@ export const SHOP_BUYS_GROUPS = Object.freeze({
   [BUILDING_TYPES.WeaponSmith]: ['Armor', 'Weapons'],
 });
 export const shopBuysItem = (buildingType, item) => (SHOP_BUYS_GROUPS[buildingType] ?? []).includes(item.group)
-  // AUDIT CARDS-5 C2: no shop buys a collectible card - every character is given thirty, and a shelf is no card's market
-  && item.templateIndex !== ILIAC_CARD_TEMPLATE
-  // CARDS9: nor a sealed pack - the tavern sells it at its counter's price, and no shelf buys it back (a pack bought
-  // well and sold dear was the gold-for-nothing ENDLESS-STOCK shut)
-  && item.templateIndex !== CARD_PACK_TEMPLATE
-  // AUDIT CAPTAIN'S SEA B2: nor the exchange's goods - the exchange alone deals in them (a General Store paid more for a
+  // AUDIT CAPTAIN'S SEA B2: no shop buys the exchange's goods - the exchange alone deals in them (a General Store paid more for a
   // tusk of ivory than the quay where it is made asked: a money loop without a voyage)
   && !goodOfTemplate(item.templateIndex)
   // SHIPYARDS (2026-10-11, Mac: "Shipyard only"): nor a boat's parts or deed - a port town's shipyard buys a ship back

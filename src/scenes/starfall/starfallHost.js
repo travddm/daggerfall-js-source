@@ -474,7 +474,7 @@ export function createStarfallHost(host) {
   /** THE MASTER'S MARKS, stood or taken over: its name, its circle's ward on it (`f.circleWard`, exteriorFoes.js
    *  damageFoe), and the world boss's mark on its body (`entity.worldBoss` - the port's word for one: its fall is the
    *  star's own deed, which the festival's finds pay once as a held star, never again as a body - systems/festival/,
-   *  systems/foeLootCap.js titledFoe, systems/card/cardSources.js). The master alone: never a witch of its coven. */
+   *  systems/foeLootCap.js titledFoe). The master alone: never a witch of its coven. */
   function masterOf(S, f, M) {
     S.master = f; S.masterStood = true;
     if (f.entity) { f.entity.name = M.name(); f.entity.properName = M.name(); f.entity.worldBoss = true; }

@@ -8,12 +8,11 @@ import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import {
-  STATUS_ROUTES, STATUS_METRICS, STATUS_FAST_S, STATUS_SLOW_S, STATUS_SLOW_MS, HOME_WATCHES, levelOf, homeOf, _resetStatusForTests, EG_LIVE_PATH as STATUS_EG_PATH,
+  STATUS_ROUTES, STATUS_METRICS, STATUS_FAST_S, STATUS_SLOW_S, STATUS_SLOW_MS, HOME_WATCHES, levelOf, homeOf, _resetStatusForTests,
 } from '../../server-account/src/staffStatus.js';
 import { HOME_WATCH as REPORTS_WATCH, AI_WAIT_S } from '../../server-account/src/staffCases.js';
 import { STAFF_ROUTES } from '../../server-account/src/service.js';
 import { SAFE_LAW_PATH } from '../../src/net/wire.js';
-import { EG_LIVE_PATH } from '../../src/net/eliteGates/egDurable.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 
 const { subtle } = globalThis.crypto;
@@ -48,7 +47,7 @@ async function stand(extra = {}) {
   });
   const asked = [];
   const answers = {
-    relay: (url) => (url.endsWith('/health') ? { ok: true, service: 'daggerfall-online', version: 'world245', t: Date.now() } : { live: 2, between: true, laws: [10], until: 0, drain: false }),
+    relay: () => ({ ok: true, service: 'daggerfall-online', version: 'world245', t: Date.now() }),
     ae: () => ({ data: [] }),
   };
   const real = globalThis.fetch;
@@ -95,7 +94,6 @@ const checkOf = (body, id) => tileOf(body, 'health').checks.find((c) => c.id ===
 
 test('STAFF-PANEL6-STATUS: the doors are listed among the staff panel\'s, and none opens without a staff session', async () => {
   for (const r of STATUS_ROUTES) assert.ok(STAFF_ROUTES.has(r), r);
-  assert.equal(STATUS_EG_PATH, EG_LIVE_PATH, 'the relay\'s breach list, where the relay serves it');
   const s = await stand();
   try {
     for (const r of STATUS_ROUTES) assert.deepEqual([(await s.staff(r)).status, (await s.staff(r, {}, 'x'.repeat(43))).status], [401, 401], r);
@@ -192,15 +190,15 @@ test('STAFF-PANEL6-STATUS: with no Analytics token the load says "not configured
     const load = tileOf(body, 'load');
     assert.deepEqual([load.sources, load.values], [{ analytics: 'not-configured' }, { rps: null, slow: null, refused: null, errors: null, dbWait: null }]);
     const players = tileOf(body, 'players');
-    assert.deepEqual(players.values, { registered: 1, tabs: null, breaches: 2 }, 'one at play; the breaches the relay\'s');
-    assert.deepEqual(players.sources, { registered: 'ok', tabs: 'not-configured', breaches: 'ok', rooms: 'not-configured' });
+    assert.deepEqual(players.values, { registered: 1, tabs: null }, 'one at play');
+    assert.deepEqual(players.sources, { registered: 'ok', tabs: 'not-configured', rooms: 'not-configured' });
     assert.deepEqual([players.rooms, players.unmeasured], [null, ['hub shards', 'layers', 'distinct accounts per room kind']]);
     assert.deepEqual(tileOf(body, 'activity').values, { listings: 0, sales: 1, vault: 1, store: 1, trades: 1, minted: 70, burned: 30 });
     const health = tileOf(body, 'health');
     assert.equal(health.level, 'grey');
     assert.deepEqual(health.checks.map((c) => [c.id, c.ok]), [['cron', null], ['relay', true], ['service', true], ['ai', null]]);
     assert.equal(checkOf(body, 'relay').version, 'world245');
-    assert.deepEqual(s.asked.map((a) => a.url).sort(), [`${RELAY}/health`, `${RELAY}${EG_LIVE_PATH}`], 'the relay\'s two public doors, and no Analytics ask without a token');
+    assert.deepEqual(s.asked.map((a) => a.url).sort(), [`${RELAY}/health`], 'the relay\'s public door, and no Analytics ask without a token');
   } finally { s.restore(); }
 });
 
@@ -209,7 +207,7 @@ test('STAFF-PANEL6-STATUS: with the token, the load is read from Analytics Engin
   try {
     s.answers.ae = (url, init) => {
       const sql = String(init.body);
-      if (sql.includes('daggerfall_relay')) return { data: [{ kind: 'world', sockets: 40 }, { kind: 'dungeon', sockets: '12' }, { kind: 'eg', sockets: 6 }, { kind: 'arena', sockets: 2 }] };
+      if (sql.includes('daggerfall_relay')) return { data: [{ kind: 'world', sockets: 40 }, { kind: 'dungeon', sockets: '12' }, { kind: 'arena', sockets: 2 }] };
       if (sql.includes("blob2 = 'CRON'")) return { data: [{ job: 'cron:auctions', failed: 2 }, { job: 'cron:board', failed: 0 }] };
       return { data: [{ requests: 3000, slow: 52, r429: 10, r503: 5, r5xx: 15, d1_wait_ms: 60000, beats: 120 }] };
     };
@@ -225,7 +223,7 @@ test('STAFF-PANEL6-STATUS: with the token, the load is read from Analytics Engin
     assert.deepEqual(tileOf(body, 'load').values, { rps: 10, slow: 10.4, refused: 3, errors: 2, dbWait: 20 }, '3000 in 5 min; 52 slow, 15 refused, 10 other 5xx a 5 min; 60 s of wait over 3000');
     const players = tileOf(body, 'players');
     assert.equal(players.values.tabs, 120);
-    assert.deepEqual(players.rooms, { basis: '5-minute sockets', kinds: { world: 40, dungeon: 12, eg: 6, arena: 2 }, dungeons: 12, arenas: 2, breaches: 6 });
+    assert.deepEqual(players.rooms, { basis: '5-minute sockets', kinds: { world: 40, dungeon: 12, arena: 2 }, dungeons: 12, arenas: 2 });
     const cron = checkOf(body, 'cron');
     assert.deepEqual([cron.ok, cron.why], [false, 'cron failed in the last hour: auctions']);
     assert.deepEqual([tileOf(body, 'health').level, body.level], ['red', 'red']);
@@ -240,8 +238,6 @@ test('STAFF-PANEL6-STATUS: missing data is said so - an Analytics Engine or rela
     const { body } = await s.staff('/v1/staff/status', {}, s.mob.session);
     assert.deepEqual(tileOf(body, 'load').sources, { analytics: 'missing' });
     assert.equal(tileOf(body, 'load').values.rps, null);
-    assert.equal(tileOf(body, 'players').sources.breaches, 'missing');
-    assert.equal(tileOf(body, 'players').values.breaches, null);
     assert.deepEqual([checkOf(body, 'relay').ok, checkOf(body, 'relay').why], [false, 'relay /health did not answer']);
     assert.equal(checkOf(body, 'cron').ok, null, 'a cron nobody could read is no verdict');
     assert.equal(tileOf(body, 'health').level, 'red');
@@ -318,20 +314,20 @@ test('STAFF-PANEL6-STATUS: each part is kept for its window - a poll in ten seco
   try {
     const status = () => s.staff('/v1/staff/status', { poll: true }, s.mob.session);
     const first = (await status()).body;
-    const count = () => ({ health: s.asked.filter((a) => a.url.endsWith('/health')).length, ae: s.asked.filter((a) => a.to === 'ae').length, eg: s.asked.filter((a) => a.url.endsWith(EG_LIVE_PATH)).length });
-    assert.deepEqual(count(), { health: 1, ae: 3, eg: 1 });
+    const count = () => ({ health: s.asked.filter((a) => a.url.endsWith('/health')).length, ae: s.asked.filter((a) => a.to === 'ae').length });
+    assert.deepEqual(count(), { health: 1, ae: 3 });
     const again = (await status()).body;
-    assert.deepEqual(count(), { health: 1, ae: 3, eg: 1 }, 'kept');
+    assert.deepEqual(count(), { health: 1, ae: 3 }, 'kept');
     assert.equal(again.tiles[0].asOf, first.tiles[0].asOf);
     off = (STATUS_FAST_S - 1) * 1000;
     await status();
-    assert.deepEqual(count(), { health: 1, ae: 3, eg: 1 }, 'still inside the window');
+    assert.deepEqual(count(), { health: 1, ae: 3 }, 'still inside the window');
     off = STATUS_FAST_S * 1000;
     await status();
-    assert.deepEqual(count(), { health: 2, ae: 3, eg: 1 }, 'the fast part read again at its window\'s end; the slow part kept');
+    assert.deepEqual(count(), { health: 2, ae: 3 }, 'the fast part read again at its window\'s end; the slow part kept');
     off = STATUS_SLOW_S * 1000;
     await status();
-    assert.deepEqual(count(), { health: 3, ae: 6, eg: 2 }, 'the slow part at its own');
+    assert.deepEqual(count(), { health: 3, ae: 6 }, 'the slow part at its own');
     // a limit set in this isolate shows on the next read, not STATUS_FAST_S on
     s.raw.prepare('UPDATE players SET played_at = ? WHERE handle IS NOT NULL').run(nowS());
     await s.staff('/v1/staff/limit/set', { metric: 'players.registered', amber: 1, red: 3 }, s.mob.session);

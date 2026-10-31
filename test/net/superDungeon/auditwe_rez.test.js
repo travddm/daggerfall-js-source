@@ -103,7 +103,7 @@ test('AUDIT WORLD-EVENTS L1-1: the Hour lets a body back only when a living figh
   assert.equal(validSdIn({ k: 'rz', to: 'no spaces' }), null);
   // the page says it to the realm it stands in, and nowhere else
   const sent = [];
-  const online = (room) => ({ room, sendSdRaise: (to) => sent.push(['sd', to]), sendEg: (k, f) => sent.push(['eg', k, f.to]), sendKetch: (k, f) => sent.push(['kt', k, f.to]) });
+  const online = (room) => ({ room, sendSdRaise: (to) => sent.push(['sd', to]), sendEg: (k, f) => sent.push(['eg', k, f.to]) });
   assert.equal(sendRaiseWord(online(sdTestKey(3)), 'acct-a'), true);
   assert.equal(sendRaiseWord(online('town:m9'), 'acct-a'), false);
   assert.deepEqual(sent, [['sd', 'acct-a']]);

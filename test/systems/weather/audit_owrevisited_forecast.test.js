@@ -156,7 +156,7 @@ test('AUDIT OW-REVISITED L3-10 / L3-6: A PASS IS READ A FEW PLACES A FRAME, and 
   } finally { setWeatherMapLaw(null); }
 });
 
-test('AUDIT OW-REVISITED L3-4 / L3-7 / L3-14: HERE AT THE TRAVELLER\'S OWN HEIGHT (the sky\'s air, never the ground\'s mean); a change found to the minute, not the quarter hour; an event that holds the sky (Sun Baby) says nothing (mutants: the height dropped; the bisection undone; the event unread)', () => {
+test('AUDIT OW-REVISITED L3-4 / L3-7 / L3-14: HERE AT THE TRAVELLER\'S OWN HEIGHT (the sky\'s air, never the ground\'s mean); a change found to the minute, not the quarter hour; an event that holds the sky says nothing (mutants: the height dropped; the bisection undone; the event unread)', () => {
   setWeatherMapLaw(true);
   try {
     const heights = [];

@@ -10,16 +10,15 @@
 // tally counted (systems/shotTally.js) - so an arrow dropped, sold or given away on the sand is no shot, and never
 // comes back while the dropped stack still lies there.
 //
-// Counted: the ammunition every ranged weapon spends (inventory.js spendAmmoFor - an Arrow, a Dwemer Pellet), REAL
+// Counted: the ammunition every ranged weapon spends (inventory.js spendAmmoFor - the Arrow), REAL
 // stacks only: a conjured arrow (isSummoned) is spent first and vanishes anyway, and a quest's is never loosed. Never
 // more than went in: a stack grown on the sand hands nothing back. Handed back as inventory.js addItem stacks it. Pure:
 // the lists in, the count handed back out. Not a DFU member - Ledger A (ARENA-ARROWS).
 
 import { ARROW_TEMPLATE, isSummoned, addItem } from '../inventory.js';
-import { PELLET_TEMPLATE } from '../../characters/thunderlockIds.js';
 
 /** The ammunition a bout's quiver counts - every template inventory.js's spendAmmoFor can spend. */
-export const QUIVER_TEMPLATES = Object.freeze([ARROW_TEMPLATE, PELLET_TEMPLATE]);
+export const QUIVER_TEMPLATES = Object.freeze([ARROW_TEMPLATE]);
 
 /** @param {any} it @param {number} template */
 const counted = (it, template) => it?.templateIndex === template && !isSummoned(it) && !it.questItem;

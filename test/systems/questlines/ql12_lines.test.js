@@ -12,7 +12,6 @@ import { readFileSync } from 'node:fs';
 import { QL_LINES, lineById, lineStepOf, lineOpens, opensWords } from '../../../src/systems/questlines/qlLines.js';
 import { createLineRunner, STEP_GAP_S, RETRY_GAP_S, CLAIM_RETRY_MS, NEED_CHECKS } from '../../../src/systems/questlines/qlLineRunner.js';
 import { LOOT_RARITY_KEY } from '../../../src/systems/loot/lootRarity.js';
-import { KINGS_GAMBIT_KEY } from '../../../src/systems/features.js';
 import { setSigilOnline, setSigilRenown } from '../../../src/systems/sigil/sigil.js';
 import { REVENANT_MIN_RENOWN } from '../../../src/systems/revenant/revenant.js';
 import { QL_SERVICE_LINES, QL_WITNESS_KINDS, qlClaimOf, qlStepClaimed, QL_TITLES } from '../../../src/net/questlineClaims.js';
@@ -24,10 +23,8 @@ import { QUEST_FILES, packMachine, parsedQuest } from '../../qlSources.mjs';
 
 /** The act a witness's receipt is, and how many of it the step asks (the script's `ql act <kind> <n>`). */
 const WITNESS_ACT = Object.freeze({
-  rite: ['rite-broken', 1], breach: ['breach-closed', 1], redoubt: ['redoubt-taken', 1], redoubts3: ['redoubt-taken', 3],
-  valkynaz: ['valkynaz-felled', 1], hour: ['hour-broken', 1], serpent: ['serpent-slain', 1],
+  rite: ['rite-broken', 1], breach: ['breach-closed', 1], hour: ['hour-broken', 1], serpent: ['serpent-slain', 1],
   star: ['star-held', 1], stars3: ['star-held', 3],   // PIN MOVED (STAR8): the fallen stars
-  ketch: ['warden-felled', 1],   // PIN MOVED (KETCH): the Tonal Warden felled
 });
 
 const scriptText = (name) => readFileSync(QUEST_FILES.get(name.toUpperCase()).path, 'utf8');
@@ -95,14 +92,13 @@ test('QL11/QL12 every act a line\'s script waits on is one the features say; a w
   assert.deepEqual(problems, []);
 });
 
-test('QL13 the Covens\' Hoard\'s key: kept by the outcome the service reads, and only behind the Burning Doors witnessed whole', () => {
+test('QL13 the Covens\' Hoard\'s end: the key sold or sealed, the claim\'s two words; and the line only behind the Burning Doors witnessed whole', () => {
   const svc = QL_SERVICE_LINES.covensHoard;
-  const step = lineById('covensHoard').steps[svc.key.at];
+  const step = lineById('covensHoard').steps[2];
   const sheet = sheetFor(step.quest);
   assert.ok(sheet, `${step.quest}: its sheet`);
   const ids = (sheet?.outcomes ?? []).filter((o) => !o.failure).map((o) => o.id);
-  assert.ok(ids.includes(svc.key.choice), `the outcome "${svc.key.choice}" keeps the key`);
-  assert.ok(ids.some((id) => id !== svc.key.choice), 'and another gives it up');
+  assert.deepEqual(ids, ['keep', 'seal'], 'the key sold to the Guild (`keep`), or sealed by the Order');
   assert.equal(svc.after, 'burningDoors', 'the Burning Doors witnessed whole (AUDIT QUESTLINES SERVICE-4: its title held, never its breach alone)');
   assert.equal(QL_SERVICE_LINES.burningDoors.title, 'doorwarden');
   assert.deepEqual(QL_SERVICE_LINES.burningDoors.witness, { 2: 'rite', 3: 'breach' });
@@ -137,24 +133,23 @@ async function stepOnBridge(name, { inTown = true } = {}) {
   return { bridge, quest, st, tick, words };
 }
 
-test('AUDIT QUESTLINES LINES-4: the Covens\' Hoard kept pays the Guild\'s fee in gold, as the seal does - the Weir Key is the account\'s, once, so the keep is never paid by the key alone - and Ysolde says so before the choice and after it, never handing over a key the script cannot promise (mutants: `ql paid` back on the keep path; 1030 without the house\'s once; 1040\'s "slides the key across")', async () => {
+test('AUDIT QUESTLINES LINES-4: the Covens\' Hoard\'s key sold pays the Guild\'s fee in gold, as the seal does, and the key\'s worth besides - and Ysolde asks before the choice and counts it out after, never handing over a key (mutants: `ql paid` back on the keep path; the worth unpaid; 1040\'s "slides the key across")', async () => {
   const { quest, st, tick, words } = await stepOnBridge('QLCH03');
   tick(2);
   for (const r of quest.resources.values()) if (r.isPerson && r.symbol?.name === 'ysolde') r.setPlayerClicked();
   tick(2);
   assert.equal(st.asked.length, 1, 'asked once');
   assert.equal(st.asked[0].message.id, 1030);
-  assert.match(words(1030), /gives a Spire key to a house once/, 'the house\'s once, said before the choice');
-  st.asked[0].respond(0);   // keep
+  assert.match(words(1030), /Sell it to the Guild/, 'the sale, said before the choice');
+  st.asked[0].respond(0);   // keep: the sale
   tick(6);
   assert.ok(quest.questComplete && quest.questSuccess);
-  assert.equal(quest.ql.outcome, QL_SERVICE_LINES.covensHoard.key.choice, 'the outcome the service pays the key on');
-  assert.equal(st.rewards.length, 1, 'the Guild\'s fee, in gold - whatever the service answers of the key');
+  assert.equal(quest.ql.outcome, 'keep', 'the claim\'s word for the sale');
+  assert.equal(st.rewards.length, 2, 'the Guild\'s fee, in gold, and the key\'s worth');
   assert.equal(st.offers.length, 1, 'and the choice of gear');
   assert.doesNotMatch(words(1040), /slides the key/);
-  assert.match(words(1040), /A house has it once/);
-  // PIN MOVED (AUDIT QUESTLINES VOICE-QL): the house's once said as a sentence of its own, no dash aside (Voice.md rule 5)
-  assert.match(sheetFor('QLCH03').outcomes.find((o) => o.id === 'keep').text, /A house is given that key only once/);
+  assert.match(words(1040), /Sold, then/);
+  assert.match(sheetFor('QLCH03').outcomes.find((o) => o.id === 'keep').text, /sold the Weir Key to the Guild/);
 });
 
 test('AUDIT QUESTLINES LINES-8, ACTS-7: the watch\'s letter waits for a town by day, as a courier\'s does, and the purse and the end wait for the letter - a revenant that kneels in the wild ends nothing there; the sheet\'s word is heard when they are (mutants: the purse and the end in the letter\'s own tick; the word bound to `_heard_`)', async () => {
@@ -199,17 +194,13 @@ const messagesOf = (text) => {
 };
 const personsOf = (text) => new Set([...qbnOf(text).matchAll(/^\s*Person (_[a-zA-Z0-9]+_)/gm)].map((m) => m[1]));
 
-test('AUDIT QUESTLINES LINES-9, -10, -23, -24, -27, ACTS-7: the lines\' words hold to the world they run in - no year named but the Spire\'s fall (the online calendar runs a year a month), no years counted on the Weir Road, Corvane never "always" at a tavern a step moves, no giver asks for "tomorrow" (the next step is an hour off), a later introduction\'s giver new, the Covenant never the Order\'s, a revenant brought to its knees, every purse its tier\'s band (mutants: QLWR04\'s "3E 406"; QLWR02\'s "eight years"; QLWR01\'s "I am always here"; QLIT01\'s "Ask me about it tomorrow"; QLIP02\'s "_crafter_, the court crafter"; QLBD05\'s "keepers of the Covenant"; QLIW02\'s "Beat a revenant"; QLBD01\'s 150 to 250)', () => {
+test('AUDIT QUESTLINES LINES-9, -10, -23, -24, -27, ACTS-7: the lines\' words hold to the world they run in - no year named but the Spire\'s fall (the online calendar runs a year a month), no giver asks for "tomorrow" (the next step is an hour off), a later introduction\'s giver new, the Covenant never the Order\'s, a revenant brought to its knees, every purse its tier\'s band (mutants: QLIG01\'s "Ask me about it tomorrow"; QLIP02\'s "_crafter_, the court crafter"; QLBD05\'s "keepers of the Covenant"; QLIW02\'s "Beat a revenant"; QLBD01\'s 150 to 250)', () => {
   const problems = [];
   for (const l of QL_LINES) l.steps.forEach((s, i) => {
     if (!QUEST_FILES.has(s.quest)) return;   // the script pin names it
     const text = scriptText(s.quest);
     const flat = `${qrcWords(text)}\n${sheetWords(s.quest)}`.replace(/\s+/g, ' ');
     for (const m of flat.matchAll(/3E (\d+)/g)) if (m[1] !== '398') problems.push(`${s.quest}: names 3E ${m[1]} - the world's year runs on`);
-    if (l.id === 'weirRoad') {
-      for (const m of flat.matchAll(/\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+) years\b/gi)) problems.push(`${s.quest}: counts "${m[0]}" since the Spire fell`);
-      if (/\balways (?:here|there)\b/i.test(flat)) problems.push(`${s.quest}: Corvane "always" at a tavern each step moves`);
-    }
     if (/\b(?:ask|see|find|come to) me\b[^."]*\btomorrow\b/i.test(flat)) problems.push(`${s.quest}: a giver asks for tomorrow - the next step is an hour off`);
     if (/keepers? of the Covenant|kept the Covenant/i.test(flat)) problems.push(`${s.quest}: the Order of the Hour as the Covenant's keeper - it is the Emperors' blood's`);
     if (/\bbeat (?:a|one|your) revenant/i.test(flat)) problems.push(`${s.quest}: a revenant "beaten" by the player - it kneels whoever struck it`);
@@ -292,65 +283,65 @@ function runnerWith({ level = 30, online = true, service = null } = {}) {
 }
 
 test('QL12 the runner (PIN MOVED, QL-OFFERED): a line whose gate holds is on offer and never begun unasked; taken, its first step starts once, the next an hour after it ends, the line done at its last (mutants: look begins a line; the take schedules nothing)', () => {
-  const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
+  const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
   step(); step();
   assert.deepEqual(machine.scheduled, [], 'QL-OFFERED: a line is taken, never sent - nothing scheduled unasked');
-  assert.equal(runner.lineState('introTables'), null);
-  assert.equal(runner.rows().find((r) => r.id === 'introTables')?.state, 'offered', 'on offer');
+  assert.equal(runner.lineState('introGear'), null);
+  assert.equal(runner.rows().find((r) => r.id === 'introGear')?.state, 'offered', 'on offer');
   assert.equal(runner.takeLine('introBay').reason, 'closed', 'the Bay: level 6, online - not on offer');
-  assert.deepEqual(runner.takeLine('introTables'), { ok: true, line: 'introTables' });
-  assert.equal(runner.takeLine('introTables').reason, 'begun', 'taken once');
+  assert.deepEqual(runner.takeLine('introGear'), { ok: true, line: 'introGear' });
+  assert.equal(runner.takeLine('introGear').reason, 'begun', 'taken once');
   step(); step();
-  assert.deepEqual(machine.scheduled.filter((n) => n.startsWith('QLIT')), ['QLIT01'], 'started once, not every tick');
+  assert.deepEqual(machine.scheduled.filter((n) => n.startsWith('QLIG')), ['QLIG01'], 'started once, not every tick');
   assert.ok(!machine.scheduled.includes('QLBD01'), 'the Burning Doors: level 10, online');
   assert.ok(!machine.scheduled.includes('QLIP01'), 'the crafts: online - the Professions answer there');
   assert.ok(!machine.scheduled.includes('QLIS01'), 'the sea: level 5');
-  const q = machine.end('QLIT01');
-  assert.deepEqual(runner.ended(q, { id: 'done', failure: false }), { line: 'introTables', step: 0, moved: true, done: false });
+  const q = machine.end('QLIG01');
+  assert.deepEqual(runner.ended(q, { id: 'done', failure: false }), { line: 'introGear', step: 0, moved: true, done: false });
   step();
-  assert.ok(!machine.scheduled.includes('QLIT02'), 'not in the same breath');
+  assert.ok(!machine.scheduled.includes('QLIG02'), 'not in the same breath');
   clock.s += STEP_GAP_S;
   step();
-  assert.ok(machine.scheduled.includes('QLIT02'));
-  const last = runner.ended(machine.end('QLIT02'), { id: 'done', failure: false });
+  assert.ok(machine.scheduled.includes('QLIG02'));
+  const last = runner.ended(machine.end('QLIG02'), { id: 'done', failure: false });
   assert.equal(last.done, true);
-  const row = runner.rows().find((r) => r.id === 'introTables');
+  const row = runner.rows().find((r) => r.id === 'introGear');
   assert.equal(row.state, 'done');
   assert.deepEqual(row.steps.map((s) => s.state), ['done', 'done']);
-  assert.equal(row.outcome, 'QLIT02 ended', 'the last step\'s outcome is the line\'s');
+  assert.equal(row.outcome, 'QLIG02 ended', 'the last step\'s outcome is the line\'s');
 });
 
 test('QL12 the runner (PIN MOVED, QL-OFFERED): a first step that ends badly puts its line back on offer - never sent again; a later step that ends badly is offered again a day later; a quest no line holds moves nothing (mutants: the first step re-sent; the later step\'s day)', () => {
-  const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
-  runner.takeLine('introTables');
+  const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
+  runner.takeLine('introGear');
   step();
-  const r = runner.ended(machine.end('QLIT01', false), { id: 'failed', failure: true });
-  assert.deepEqual(r, { line: 'introTables', step: 0, moved: false, reoffered: true });
-  assert.equal(runner.lineState('introTables'), null, 'its record let go');
-  assert.equal(runner.rows().find((l) => l.id === 'introTables').state, 'offered', 'on offer again');
+  const r = runner.ended(machine.end('QLIG01', false), { id: 'failed', failure: true });
+  assert.deepEqual(r, { line: 'introGear', step: 0, moved: false, reoffered: true });
+  assert.equal(runner.lineState('introGear'), null, 'its record let go');
+  assert.equal(runner.rows().find((l) => l.id === 'introGear').state, 'offered', 'on offer again');
   clock.s += 2 * RETRY_GAP_S; step();
-  assert.equal(machine.scheduled.filter((n) => n === 'QLIT01').length, 1, 'never sent again');
-  assert.equal(runner.takeLine('introTables').ok, true, 'taken again');
+  assert.equal(machine.scheduled.filter((n) => n === 'QLIG01').length, 1, 'never sent again');
+  assert.equal(runner.takeLine('introGear').ok, true, 'taken again');
   step();
-  assert.equal(machine.scheduled.filter((n) => n === 'QLIT01').length, 2);
-  runner.ended(machine.end('QLIT01'), { id: 'done', failure: false });
+  assert.equal(machine.scheduled.filter((n) => n === 'QLIG01').length, 2);
+  runner.ended(machine.end('QLIG01'), { id: 'done', failure: false });
   clock.s += STEP_GAP_S; step();
-  const r2 = runner.ended(machine.end('QLIT02', false), { id: 'failed', failure: true });
-  assert.deepEqual(r2, { line: 'introTables', step: 1, moved: false });
+  const r2 = runner.ended(machine.end('QLIG02', false), { id: 'failed', failure: true });
+  assert.deepEqual(r2, { line: 'introGear', step: 1, moved: false });
   clock.s += RETRY_GAP_S - 1; step();
-  assert.equal(machine.scheduled.filter((n) => n === 'QLIT02').length, 1);
+  assert.equal(machine.scheduled.filter((n) => n === 'QLIG02').length, 1);
   clock.s += 1; step();
-  assert.equal(machine.scheduled.filter((n) => n === 'QLIT02').length, 2, 'a later step: again, a day later');
+  assert.equal(machine.scheduled.filter((n) => n === 'QLIG02').length, 2, 'a later step: again, a day later');
   assert.equal(runner.ended({ questName: 'M0B00Y06', questSuccess: true }, null), null);
-  assert.equal(runner.lineState('introTables').step, 1);
+  assert.equal(runner.lineState('introGear').step, 1);
 });
 
 test('QL12 the runner, the switch off: no line opens, none is taken (its quests would not be stamped)', () => {
   const { runner, machine, step } = runnerWith({ level: 30 });
   setPref(QUESTLINES_PREF, false);
   step();
-  assert.equal(runner.takeLine('introTables').reason, 'off');
-  assert.equal(runner.onOffer('introTables'), false);
+  assert.equal(runner.takeLine('introGear').reason, 'off');
+  assert.equal(runner.onOffer('introGear'), false);
   assert.deepEqual(machine.scheduled, []);
   setPref(QUESTLINES_PREF, true);
 });
@@ -413,7 +404,7 @@ test('QL12 the service: every step of a paid line opened at its start, a witness
   clock.s += STEP_GAP_S; step(); await settle();
   runner.ended(machine.end('QLBD04'), { id: 'done', failure: false });
   step(); await settle();
-  assert.deepEqual(honours, [{ line: 'burningDoors', title: 'doorwarden', key: false, keys: null, keyHeld: false }]);
+  assert.deepEqual(honours, [{ line: 'burningDoors', title: 'doorwarden' }]);
 });
 
 test('QL12 the runner offline: an endgame line begun waits where it stood, and says why', () => {
@@ -469,14 +460,13 @@ test('QL1/QL12 an outcome settles at the end its script names: a failure clock\'
 // ═══ AUDIT QUESTLINES (LINES, ACTS-2): the runner's gates, its stalls and its order ═══
 
 test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switch that is off, or the Renown a revenant comes at, waits and says so - never started to fail every day; each need is one the runner can read (mutants: the needs unread; the line begun regardless; the Renown)', () => {
-  assert.deepEqual(Object.keys(NEED_CHECKS).sort(), ['kingsGambit', 'lootRarity', 'naval', 'renown', 'starfall']);   // PIN MOVED (STAR8): the Starfall running
+  assert.deepEqual(Object.keys(NEED_CHECKS).sort(), ['lootRarity', 'naval', 'renown', 'starfall']);   // PIN MOVED (STAR8): the Starfall running
   for (const l of QL_LINES) for (const s of l.steps) for (const n of s.needs ?? []) assert.ok(n in NEED_CHECKS, `${s.quest} needs ${n}`);
   assert.deepEqual(QL_LINES.flatMap((l) => l.steps.filter((s) => s.needs).map((s) => `${s.quest}:${s.needs.join('+')}`)),
-    ['QLTF01:starfall', 'QLTF03:starfall', 'QLIG01:lootRarity', 'QLIG02:lootRarity', 'QLIS01:naval', 'QLIS02:naval', 'QLIS03:naval', 'QLIT02:kingsGambit', 'QLIW02:renown']);   // PIN MOVED (STAR8): the Festival line's star steps
+    ['QLTF01:starfall', 'QLTF03:starfall', 'QLIG01:lootRarity', 'QLIG02:lootRarity', 'QLIS01:naval', 'QLIS02:naval', 'QLIS03:naval', 'QLIW02:renown']);   // PIN MOVED (STAR8): the Festival line's star steps
   // Loot rarity off: the Smith's Secrets is not on offer - never taken to fail; PIN MOVED (QL-OFFERED): a line its gate
   // shuts is no row (UI-Calm's law - nothing drawn that cannot be taken), and its take is refused
   setPref(LOOT_RARITY_KEY, false);
-  setPref(KINGS_GAMBIT_KEY, true);
   try {
     const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
     for (let i = 0; i < 4; i++) { step(); clock.s += STEP_GAP_S; }
@@ -490,22 +480,6 @@ test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switc
     step();
     assert.ok(machine.scheduled.includes('QLIG01'), 'taken: it begins');
   } finally { setPref(LOOT_RARITY_KEY, true); }
-  // The King's Gambit off: A Seat at the Table's second step waits where the line stands
-  setPref(KINGS_GAMBIT_KEY, false);
-  try {
-    const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
-    runner.takeLine('introTables');
-    step();
-    runner.ended(machine.end('QLIT01'), { id: 'done', failure: false });
-    clock.s += STEP_GAP_S;
-    step();
-    assert.ok(!machine.scheduled.includes('QLIT02'));
-    const row = runner.rows().find((l) => l.id === 'introTables');
-    assert.deepEqual([row.state, row.opens], ['waiting', 'Opens with The King’s Gambit on.']);
-    setPref(KINGS_GAMBIT_KEY, true);
-    step();
-    assert.ok(machine.scheduled.includes('QLIT02'));
-  } finally { setPref(KINGS_GAMBIT_KEY, true); }
   // the Renown a revenant comes at: online, below it the Bay's second step waits
   setSigilOnline(true);
   setSigilRenown(3);
@@ -518,28 +492,28 @@ test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switc
 });
 
 test('AUDIT QUESTLINES LINES-12, LINES-19, LINES-7 (PIN MOVED, QL-OFFERED): a first step that will not begin here is no take - nothing begun, still on offer; a later step that will not begin waits RETRY_GAP_S and says so; a later step\'s quest gone without its end (an error) is offered again a day later, never every tick, and a first step\'s puts its line back on offer (mutants: the wait on a refused parse; the stall\'s words; dropped; the first step re-sent)', () => {
-  const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
+  const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
   const schedule = machine.scheduleQuestByName.bind(machine);
-  let refuse = 'QLIT01';
+  let refuse = 'QLIG01';
   machine.scheduleQuestByName = (name) => (name === refuse ? null : schedule(name));
-  assert.deepEqual(runner.takeLine('introTables'), { ok: false, line: 'introTables', reason: 'noplace' });
-  assert.equal(runner.lineState('introTables'), null, 'nothing begun');
-  assert.equal(runner.rows().find((l) => l.id === 'introTables').state, 'offered', 'still on offer');
-  refuse = 'QLIT02';
-  assert.equal(runner.takeLine('introTables').ok, true);
+  assert.deepEqual(runner.takeLine('introGear'), { ok: false, line: 'introGear', reason: 'noplace' });
+  assert.equal(runner.lineState('introGear'), null, 'nothing begun');
+  assert.equal(runner.rows().find((l) => l.id === 'introGear').state, 'offered', 'still on offer');
+  refuse = 'QLIG02';
+  assert.equal(runner.takeLine('introGear').ok, true);
   step();
-  runner.ended(machine.end('QLIT01'), { id: 'done', failure: false });
+  runner.ended(machine.end('QLIG01'), { id: 'done', failure: false });
   clock.s += STEP_GAP_S;
   step(); step(); step();
-  assert.equal(runner.lineState('introTables').wait, clock.s + RETRY_GAP_S, 'a day');
-  assert.equal(runner.rows().find((l) => l.id === 'introTables').opens, 'Its next step could not begin here: it will be offered again.');
+  assert.equal(runner.lineState('introGear').wait, clock.s + RETRY_GAP_S, 'a day');
+  assert.equal(runner.rows().find((l) => l.id === 'introGear').opens, 'Its next step could not begin here: it will be offered again.');
   refuse = null;
   step();
-  assert.ok(!machine.scheduled.includes('QLIT02'), 'not before its day');
+  assert.ok(!machine.scheduled.includes('QLIG02'), 'not before its day');
   clock.s += RETRY_GAP_S;
   step();
-  assert.deepEqual(machine.scheduled.filter((n) => n === 'QLIT02'), ['QLIT02'], 'then once');
-  assert.equal(runner.rows().find((l) => l.id === 'introTables').opens, null, 'begun: the stall unsaid');
+  assert.deepEqual(machine.scheduled.filter((n) => n === 'QLIG02'), ['QLIG02'], 'then once');
+  assert.equal(runner.rows().find((l) => l.id === 'introGear').opens, null, 'begun: the stall unsaid');
   // an error removes the quest: no `end quest`, the machine's onQuestEnded alone
   const drop = (name) => {
     const q = [...machine.quests.values()].find((x) => x.questName === name);
@@ -547,36 +521,36 @@ test('AUDIT QUESTLINES LINES-12, LINES-19, LINES-7 (PIN MOVED, QL-OFFERED): a fi
     q.questTombstoned = true;
     runner.dropped(q);
   };
-  drop('QLIT02');
+  drop('QLIG02');
   step();
-  assert.deepEqual(machine.scheduled.filter((n) => n === 'QLIT02'), ['QLIT02'], 'not parsed again every tick');
+  assert.deepEqual(machine.scheduled.filter((n) => n === 'QLIG02'), ['QLIG02'], 'not parsed again every tick');
   clock.s += RETRY_GAP_S;
   step();
-  assert.equal(machine.scheduled.filter((n) => n === 'QLIT02').length, 2, 'a day later');
+  assert.equal(machine.scheduled.filter((n) => n === 'QLIG02').length, 2, 'a day later');
   // a first step's error: its line back on offer at the next look, never parsed again unasked
-  const other = runnerWith({ level: 2, online: false });
-  other.runner.takeLine('introTables');
+  const other = runnerWith({ level: 4, online: false });
+  other.runner.takeLine('introGear');
   other.step();
-  const q1 = [...other.machine.quests.values()].find((x) => x.questName === 'QLIT01');
+  const q1 = [...other.machine.quests.values()].find((x) => x.questName === 'QLIG01');
   other.machine.quests.delete(q1.uid);
   q1.questTombstoned = true;
   other.runner.dropped(q1);
   other.step();
-  assert.equal(other.runner.lineState('introTables'), null, 'its record let go');
+  assert.equal(other.runner.lineState('introGear'), null, 'its record let go');
   other.clock.s += 2 * RETRY_GAP_S;
   other.step();
-  assert.deepEqual(other.machine.scheduled, ['QLIT01'], 'never sent again');
+  assert.deepEqual(other.machine.scheduled, ['QLIG01'], 'never sent again');
 });
 
 test('AUDIT QUESTLINES LINES-13, LINES-17, LINES-18 (PIN MOVED, QL-OFFERED): ended() moves a line only on its own step; a dozen lines open begin none unasked, and each taken begins at once; a step\'s quest already running is the step - its take adopts it, its opening asked (mutants: the step guard; look begins a line; the adopted copy\'s open; the copy doubled)', async () => {
-  const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
-  runner.takeLine('introTables');
+  const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
+  runner.takeLine('introGear');
   step();
-  const q2 = machine.scheduleQuestByName('QLIT02');
+  const q2 = machine.scheduleQuestByName('QLIG02');
   machine.tick();
   q2.questComplete = true;
   assert.equal(runner.ended(q2, { id: 'done', failure: false }), null, 'a stale copy of another step moves nothing');
-  assert.equal(runner.lineState('introTables').step, 0);
+  assert.equal(runner.lineState('introGear').step, 0);
   // the pacing (LINES-17's, retired): level 30 offline - the introductions that open offline, none begun unasked for a
   // day of looks; each taken begins at once, the take itself the player's pace
   const many = runnerWith({ level: 30, online: false });
@@ -584,10 +558,10 @@ test('AUDIT QUESTLINES LINES-13, LINES-17, LINES-18 (PIN MOVED, QL-OFFERED): end
   for (let i = 0; i < 24; i++) { many.step(); many.clock.s += STEP_GAP_S; }
   assert.equal(begun(), 0, 'none unasked');
   const open = many.runner.rows().filter((l) => l.state === 'offered').map((l) => l.id);
-  assert.deepEqual(open, ['introGear', 'introSea', 'introRoad', 'introTables'], 'the four that open offline, on offer');
+  assert.deepEqual(open, ['introGear', 'introSea', 'introRoad'], 'the three that open offline, on offer');
   for (const id of open) assert.equal(many.runner.takeLine(id).ok, true, id);
   many.step();
-  assert.equal(begun(), 4, 'taken, each begins');
+  assert.equal(begun(), 3, 'taken, each begins');
   // an adopted copy: the Old Coil's first step already running when the line is taken - its opening asked all the same
   const calls = [];
   const svc = { account: () => 'a', guest: () => false, claim: async (b) => { calls.push(b); return { ok: true, data: { opened: true } }; } };
@@ -623,36 +597,35 @@ test('AUDIT QUESTLINES LINES-21: a claim answered after a load belongs to the re
 });
 
 test('AUDIT QUESTLINES UI-7, UI-14: the rows say a failed step is offered again (`retry`), a step set aside (`shelved`), a step between steps still to come (never "now"); offline a line that can only begin online is not drawn - one begun shows, continuing online (mutants: retry; shelved; the gap\'s `current`; the offline filter)', () => {
-  const { runner, machine, clock, step } = runnerWith({ level: 2, online: false });
-  const row = () => runner.rows().find((l) => l.id === 'introTables');
+  const { runner, machine, clock, step } = runnerWith({ level: 4, online: false });
+  const row = () => runner.rows().find((l) => l.id === 'introGear');
   assert.deepEqual([row().state, row().steps.map((s) => s.state)], ['offered', ['next', 'next']], 'QL-OFFERED: on offer, nothing under way');
-  runner.takeLine('introTables');
+  runner.takeLine('introGear');
   step();
   assert.equal(row().state, 'running');
-  runner.ended(machine.end('QLIT01'), { id: 'done', failure: false });
+  runner.ended(machine.end('QLIG01'), { id: 'done', failure: false });
   assert.deepEqual([row().state, row().steps[1].state], ['waiting', 'next'], 'between steps: the next is still to come');
   clock.s += STEP_GAP_S;
   step();
-  runner.ended(machine.end('QLIT02', false), { id: 'failed', failure: true });
+  runner.ended(machine.end('QLIG02', false), { id: 'failed', failure: true });
   assert.deepEqual([row().state, row().steps[1].state], ['retry', 'next'], 'a later step failed: offered again, its step not under way');
   clock.s += RETRY_GAP_S;
   step();
   assert.equal(row().state, 'running', 'offered again: under way');
-  const q2 = [...machine.quests.values()].find((q) => q.questName === 'QLIT02' && !q.questComplete);
+  const q2 = [...machine.quests.values()].find((q) => q.questName === 'QLIG02' && !q.questComplete);
   q2.shelvedAt = 5;
   assert.deepEqual([row().state, row().steps[1].state], ['shelved', 'current'], 'set aside in the journal');
   // offline: the endgame lines and the online introductions are not drawn - unless begun; PIN MOVED (QL-OFFERED): nor a
-  // line its gate shuts (the Smith's Secrets at level 2 - level 4)
+  // line its gate shuts (the Harbormaster's Word at level 4 - level 5)
   const ids = runner.rows().map((l) => l.id);
-  assert.ok(!ids.includes('burningDoors') && !ids.includes('introCrafts') && ids.includes('introTables') && !ids.includes('introGear'));
+  assert.ok(!ids.includes('burningDoors') && !ids.includes('introCrafts') && ids.includes('introGear') && !ids.includes('introSea'));
   const begun = runnerWith({ level: 30, online: false });
   begun.runner.restore({ oldCoil: { step: 1, outcomes: {}, done: false, wait: 0, claims: {} } });
   const coil = begun.runner.rows().find((l) => l.id === 'oldCoil');
   assert.deepEqual([coil?.state, coil?.opens], ['waiting', 'Continues online.'], 'a line begun online, seen offline');
 });
 
-test('AUDIT QUESTLINES DOC-18, DOC-6, DOC-34: the Cycle is one story in order - the Covens\' Hoard after the Burning Doors, the Weir Road after the Hoard; and every step\'s sheet pays at its line\'s tier - the line\'s `tier` is the sheets\' (mutants: an `after` dropped; a sheet\'s tier drifted)', () => {
+test('AUDIT QUESTLINES DOC-18, DOC-6, DOC-34: the Cycle is one story in order - the Covens\' Hoard after the Burning Doors; and every step\'s sheet pays at its line\'s tier - the line\'s `tier` is the sheets\' (mutants: an `after` dropped; a sheet\'s tier drifted)', () => {
   assert.equal(lineById('covensHoard').opens.after, 'burningDoors');
-  assert.equal(lineById('weirRoad').opens.after, 'covensHoard');
   for (const l of QL_LINES) for (const s of l.steps) assert.equal(sheetFor(s.quest)?.tier, l.tier, `${s.quest}: its sheet's tier is ${l.id}'s`);
 });

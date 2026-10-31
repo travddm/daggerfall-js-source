@@ -46,7 +46,6 @@ import { blowSchedule } from '../characters/weaponStates.js';
 import { ARROW_FLIGHT_SPEED } from '../systems/spellcast.js';   // BAL-ARCHERY: a volley's shafts fly at the arrow's speed, the one constant (spellcast.js)
 import { WEAPON_REACH, friendlyProtected } from './playerWeapon.js';
 import { playerBody, bodyRadius, tellTechniqueUsed } from './technique/techniqueBlow.js';
-import { madeRuleHere, madeSaysHere, madeOnTraverse } from '../systems/madeLevel.js';   // EG-H2 (bible/11-Multiplayer/Elite-Gates.md section 10.7): the Spire refuses a flight on its traversal ground - the made level's law
 import { techniqueCue, resetTechniqueFx, TECH_FX } from './technique/techniqueFx.js';   // TECH-FX: what each moment looks, moves and sounds like (bible/05-Combat/Weapon-Techniques.md THE FEEL)
 
 /** The registry action (systems/inputActions.js) - the roster's (TECH-CARD: the leaf, so the card names the key). */
@@ -494,9 +493,6 @@ export function refusal(hand, ctx) {
     // on the ground the spell holds nothing up (JUMP-SLOW gave the jump back there), and a piece that casts Slowfalling
     // while held refused every leap and dash its wearer owned; the Flying Kick from the air is still refused under it
     if (m.climb?.isClimbing || m._wall || m._pkMove || m.swimming || m.onExteriorWater || m.isPlayerSwimming || m.levitating || (m.slowFalling && !m.grounded) || m.riding || m.isDown?.() || (!m.grounded && !t.airborne)) return CANNOT_LEAP_TEXT;   // AUDIT TECH1: the open water too - DFU refuses a jump there
-    // EG-H2 (Elite-Gates.md section 10.7): on a fight floor a leap is a technique; on the Spire's traversal ground it
-    // would be a bridge - refused there, said in the Spire's words (the made level's law: systems/madeLevel.js)
-    if (madeRuleHere('techFlight') === 'refused' && madeOnTraverse()) return madeSaysHere('techFlight');
   }
   return null;
 }

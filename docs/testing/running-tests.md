@@ -93,7 +93,6 @@ file's wall time to that JSON file (`tools/fileTimes.mjs`).
 | `static` | `npm run lint`, `npm run types` |
 | `times` | Finds the newest saved times in the Actions cache (`test-times-*`), lookup only. |
 | `test` (matrix 1..8) | Restores those times, then `node tools/testShards.mjs <i>/8 --record ...`. Uploads each shard's record as an artifact. |
-| `sweep` | Calls `eg-sweep.yml` (the Elite Breach course sweep, `tools/egSpanSolve.mjs`) with 25 seeds a band, or 500 before a relay deploy. |
 | `build` | `npm run build`, unless the caller passes `build: false`. |
 
 Every job restores `node_modules` from a cache keyed on `package-lock.json` and runs `npm ci` only on a miss.

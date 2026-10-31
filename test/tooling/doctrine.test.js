@@ -86,43 +86,8 @@ const PUBLIC_ALLOWLIST = new Map([
   ['public/fonts/opendyslexic/opendyslexic-latin-400-normal.woff2', "TEXT-FONT: OpenDyslexic (Abbie Gonzalez), SIL Open Font License 1.1 - its latin regular, as @fontsource/opendyslexic 5.3.0 ships it; no ARENA2 pixel in it"],
   ['public/fonts/opendyslexic/opendyslexic-latin-700-normal.woff2', "TEXT-FONT: OpenDyslexic's latin bold, the same package and licence"],
   ['public/fonts/opendyslexic/OFL.txt', 'TEXT-FONT: the font\'s SIL Open Font License, which travels with it'],
-  ['public/art/gun-idle.png', "OURS - Mac's own weapon art for the gun lab (2026-09-19); no ARENA2 pixel in it"],
-  ['public/art/gun-fire-sheet.webp', "OURS - Mac's own six-frame fire sheet for the gun lab (2026-09-19); no ARENA2 pixel in it"],
-  ['public/art/pistol-frames.png', "OURS - the owner's own six fire frames for the pistol lab (2026-10-21), laid side by side with their pixels unchanged; no ARENA2 pixel in it"],
-  ['public/art/pistolet-icon.png', "OURS - the owner's own Dwarven Pistolet sprite (PISTOLET, 2026-10-21), its 24x17 pixels recovered from the owner's screenshot; the inventory picture as it is; no ARENA2 pixel in it"],
-  ['public/art/pistolet-paperdoll.png', "OURS - pistolet-icon.png with the fist's gap cut across its grip, flipped left to right and tilted barrel-down toward the other hand (RotSprite, no new colour) by tools/pistoletArt.mjs (the right hand's doll layer); no ARENA2 pixel in it"],
-  ['public/art/pistolet-paperdoll-left.png', "OURS - pistolet-icon.png with the fist's gap cut across its grip and tilted barrel-down (RotSprite, no new colour) by tools/pistoletArt.mjs (the left hand's doll layer); no ARENA2 pixel in it"],
-  ['public/art/pistolet-icon-gilded.png', "OURS - pistolet-icon.png laid on the gold-leaf ramp by tools/pistoletArt.mjs (tools/gunIcons.mjs gild - the Sunken Sovereign's); no ARENA2 pixel in it"],
-  ['public/art/pistolet-paperdoll-gilded.png', "OURS - pistolet-paperdoll.png in gold leaf by tools/pistoletArt.mjs; no ARENA2 pixel in it"],
-  ['public/art/pistolet-paperdoll-left-gilded.png', "OURS - pistolet-paperdoll-left.png in gold leaf by tools/pistoletArt.mjs; no ARENA2 pixel in it"],
-  ['public/art/gun-paperdoll.png', "OURS - Mac's own weapon art for the gun lab (2026-09-19), baked down and cut for the doll's hand by tools/gunPaperdoll.mjs; no ARENA2 pixel in it"],
-  ['public/art/gun-ammo.png', "OURS - Mac's own ammunition art for the gun lab (2026-09-19), baked down by tools/gunPaperdoll.mjs; no ARENA2 pixel in it"],
-  // THUNDERLOCK-ART + GILDED1 (2026-10-07): the gun's list picture and the Hourlock's gold pair, each DERIVED from the
-  // doll layer above by tools/gunIcons.mjs (test/systems/thunderlockart.test.js re-runs it and holds them pixel for pixel)
-  // THUNDERLOCK-ART2 (2026-10-24): the owner's new Thunderlock - seven first-person frames and the list picture
-  ['public/art/thunderlock-frames.png', "OURS - the owner's own seven first-person Thunderlock frames (THUNDERLOCK-ART2, 2026-10-24), 160x98 each, laid side by side with their pixels unchanged; no ARENA2 pixel in it"],
-  ['public/art/thunderlock-icon.png', "OURS - the owner's own Thunderlock list picture (THUNDERLOCK-ART2, 2026-10-24), 88x31, its pixels unchanged (palette to RGBA); no ARENA2 pixel in it"],
-  ['public/art/gun-icon.png', "OURS - thunderlock-icon.png (the owner's own) trimmed to what it draws, by tools/gunIcons.mjs (THUNDERLOCK-ART2; it was gun-paperdoll.png with the fist's gap healed); no ARENA2 pixel in it"],
-  ['public/art/gun-icon-gilded.png', 'OURS - gun-icon.png laid on a gold-leaf ramp by tools/gunIcons.mjs (the Hourlock\'s list picture); no ARENA2 pixel in it'],
-  ['public/art/gun-paperdoll-gilded.png', 'OURS - gun-paperdoll.png laid on a gold-leaf ramp by tools/gunIcons.mjs (the Hourlock\'s doll layer); no ARENA2 pixel in it'],
   ['public/sfx/SOURCES.md', 'documentation - where every sound in this folder came from, with its license'],
   ['public/sfx/spell-heal.wav', "IMPACTFX HEAL-FILE: the owner's chosen heal sound (02_Heal_02.wav, 2026-10-05), softened; 22050Hz 16-bit mono - SOURCE/LICENSE TO BE CONFIRMED in public/sfx/SOURCES.md"],
-  ['public/sfx/fire-shotgun.wav', 'CC0 (Freesound 473846, LilMati), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/fire-20gauge.wav', 'CC0 (Freesound 427595, michorvath), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/fire-musket.wav', 'CC0 (Freesound 244345, Willlewis), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/fire-blast.wav', 'CC0 (Freesound 773873, MrGungus), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/fire-dry.wav', 'CC0 (Freesound 564480, lumikon), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/open-winchester.wav', 'CC0 (Freesound 153560, SpliceSound), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/open-rack.wav', 'CC0 (Freesound 449614, dasBUTCHER84), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/open-gunrack.wav', 'CC0 (Freesound 679878, AKkingStudio), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/open-shell.wav', 'CC0 (Freesound 108793, CeebFrack), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/close-ready.wav', 'CC0 (Freesound 383933, LilMati), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/close-rack2.wav', 'CC0 (Freesound 449613, dasBUTCHER84), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/close-rack3.wav', 'CC0 (Freesound 449612, dasBUTCHER84), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/close-shell.wav', 'CC0 (Freesound 108793, CeebFrack), public domain - baked to DAGGER.SND\'s 11025Hz 8-bit by tools/sndify.mjs; see public/sfx/SOURCES.md'],
-  ['public/sfx/gun-fire-synth.wav', 'OURS - synthesised from noise and sine by tools/gunSfx.mjs, deterministically; no recording in it at all'],
-  ['public/sfx/gun-reload-open-synth.wav', 'OURS - synthesised from noise and sine by tools/gunSfx.mjs, deterministically; no recording in it at all'],
-  ['public/sfx/gun-reload-close-synth.wav', 'OURS - synthesised from noise and sine by tools/gunSfx.mjs, deterministically; no recording in it at all'],
   ['public/sfx/naval-cannon.wav', 'OURS - NAV-E: synthesised from noise and sine by tools/navalSfx.mjs, deterministically; no recording in it at all'],
   ['public/sfx/naval-cannon-far.wav', 'OURS - NAV-E: synthesised from noise and sine by tools/navalSfx.mjs, deterministically; no recording in it at all'],
   ['public/sfx/naval-swivel.wav', 'OURS - NAV-E: synthesised from noise and sine by tools/navalSfx.mjs, deterministically; no recording in it at all'],
@@ -498,28 +463,9 @@ const PUBLIC_ALLOWLIST = new Map([
   // alone; Vite bundles them with the page (the workers' pattern).
   ['src/ui/assets/foe-blade-empty.png', "FOEBAR1: the blade face's empty bar - a friend's original art, given for the port, cropped by us"],
   ['src/ui/assets/foe-blade-full.png', "FOEBAR1: the blade face's fill - a friend's original art, given for the port, cropped by us"],
-  // FIELD-GUN-MW2 (2026-09-20): THE PORT'S OWN MORROWIND ASSETS. Both
-  // are in Bethesda FORMATS and neither contains one byte of Bethesda
-  // DATA - which is the distinction this list is for. The mesh is
-  // Mac's own Blender model, baked to a 4.0.0.2 NIF by
-  // tools/fbxMesh.mjs -> tools/meshUnwrap.mjs -> tools/nifWrite.mjs;
-  // the texture is generated from that mesh's own geometry by
-  // tools/meshTexture.mjs, deterministically, with no image input at
-  // all. Re-run the chain on the same .fbx and the same bytes come out.
-  // They ship because Morrowind has no firearm: no player's archives
-  // can carry a model for the port's own weapon.
-  ['src/assets/mw/source/Pellet_Shot.fbx', "OURS - Mac's own Blender export of the Dwarven Thunderlock, committed so the two files below are a DERIVATION the gate can re-run rather than a blob"],
-  ['src/assets/mw/meshes/thunderlock.nif', "OURS - Mac's own Dwarven Thunderlock model, baked to a Morrowind NIF by tools/nifWrite.mjs; a Bethesda format, no Bethesda data"],
-  ['src/assets/mw/textures/thunderlock.dds', 'OURS - generated from that mesh\'s own geometry by tools/meshTexture.mjs (position, normal and cast occlusion); no image input, no ARENA2 or Morrowind pixel in it'],
-  ['src/assets/mw/meshes/pistolet.nif', "OURS - the Dwarven Pistolet modelled part by part by tools/modelPistolet.mjs and written by tools/nifWrite.mjs (PISTOLET-MODEL); a Bethesda format, no Bethesda data"],
-  ['src/assets/mw/textures/pistolet.dds', "OURS - that model's atlas, painted from its own surface by tools/modelPistolet.mjs; no ARENA2 or Morrowind pixel in it"],
-  ['src/assets/mw/meshes/pistolet_gilded.nif', "OURS - the same model as pistolet.nif (the Sunken Sovereign's twin), naming its own texture, by tools/bakePistolet.mjs; a Bethesda format, no Bethesda data"],
-  ['src/assets/mw/textures/pistolet_gilded.dds', "OURS - that model's atlas painted in gold leaf by tools/modelPistolet.mjs; no ARENA2 or Morrowind pixel in it"],
-  ['src/assets/mw/meshes/thunderlock_gilded.nif', "OURS - the same baked mesh as thunderlock.nif (GILDED1, the Hourlock's twin), naming its own texture, by tools/bakeThunderlock.mjs; a Bethesda format, no Bethesda data"],
-  ['src/assets/mw/textures/thunderlock_gilded.dds', 'OURS - generated from that mesh\'s own geometry by tools/meshTexture.mjs on its gold-leaf bands (GILDED_BANDS); no image input, no ARENA2 or Morrowind pixel in it'],
   // MW-BRIG1 (2026-09-29): the Steel Brigandine, the port's own worn
-  // model, supplied by Mac for the Morrowind body. Unlike the
-  // Thunderlock it carries a PAINTED texture (the FBX names it
+  // model, supplied by Mac for the Morrowind body. It carries a
+  // PAINTED texture (the FBX names it
   // Steel.png), so the DDS is that image mip-chained rather than grown
   // from geometry. tools/bakeBrigandine.mjs re-makes the three shipped
   // files from the two sources, and test/mwbrig1.test.js holds it to
@@ -744,66 +690,13 @@ const PUBLIC_ALLOWLIST = new Map([
   // to the bytes. Their pictures carry no file: world/ships/carrackArt.js and world/ships/largeBoatArt.js paint them at load.
   ['src/assets/ships/source/Tiny_Ship.fbx', "SUPPLIED - Mac's Blender export of the new carrack and the new large boat in one scene (2026-10-07; the newest of the three he sent), committed so carrack.json and largeBoat.json are DERIVATIONS the gate can re-run"],
   ['src/assets/ships/carrack.json', 'SUPPLIED - Tiny_Ship.fbx\'s carrack baked to the boat\'s frame by tools/bakeCarrack.mjs; geometry only, no ARENA2 or Come Sail Away data'],
-  ['src/assets/ships/largeBoat.json', 'SUPPLIED - Tiny_Ship.fbx\'s large boat baked to the boat\'s frame by tools/bakeLargeBoat.mjs; geometry only, no ARENA2 or Come Sail Away data'],  ['src/assets/sunbaby/todd.jpg', 'SUPPLIED - a photograph of Todd Howard that Mac supplied for the sun baby event (SUNBABY3, 2026-10-04), cropped to the face and recompressed by ImageMagick; no ARENA2 pixel in it - a third-party photo, not the port own art, kept at his explicit request'],
+  ['src/assets/ships/largeBoat.json', 'SUPPLIED - Tiny_Ship.fbx\'s large boat baked to the boat\'s frame by tools/bakeLargeBoat.mjs; geometry only, no ARENA2 or Come Sail Away data'],
   // GATE-FBX (2026-10-09, Mac: "replace the oblivion gate model with this handcrafted model which also needs texturing"):
   // MAC'S OBLIVION GATE, supplied as one Blender export of his whole "Oblivion Models" scene - the gate one object of
   // it, committed whole as the ships' scenes are. tools/bakeGate.mjs re-makes the JSON from it (tools/shipBake.mjs), and
   // test/tooling/gatefbx.test.js holds it to the bytes. Its pictures carry no file: world/gate/gateArt.js paints them at load.
   ['src/assets/gate/source/Oblivion_Gate.fbx', "SUPPLIED - Mac's Blender export of his Oblivion models' scene, the gate (Cube.1688) among them (2026-10-09), committed so oblivionGate.json is a DERIVATION the gate can re-run"],
   ['src/assets/gate/oblivionGate.json', 'SUPPLIED - Oblivion_Gate.fbx\'s gate baked to the gate\'s frame by tools/bakeGate.mjs; geometry only, no ARENA2 data'],
-  // EG6c (2026-10-12, Elite-Gates.md section 11.6): THE REFERENCE HERO FRAGMENT - the port's own stand-in for Mac's
-  // authored fragments, a scene written from numbers alone by tools/egRefFragScene.mjs (no image, no game data, no
-  // third-party art) and committed as the .fbx tools/fragBake.mjs bakes; tools/bakeEgRefFrag.mjs re-makes its two halves,
-  // and test/tooling/eg6c_bake.test.js holds the scene and both halves to their bytes.
-  ['src/assets/egfrags/source/egRefFrag.fbx', 'OURS - the reference hero fragment\'s scene, written by tools/egRefFragScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egRefFrag.law.json', 'OURS - egRefFrag.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgRefFrag.mjs; numbers only'],
-  ['src/assets/egfrags/egRefFrag.mesh.json', 'OURS - egRefFrag.fbx\'s mesh half baked by tools/bakeEgRefFrag.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  // EG-HERO (the Soul Cairn, 2026-10-13, the owner: "You have to author the fragments"): THE OSSUARY AND THE MIST STAIR, the
-  // Cairn's hero fragments, each a scene written from numbers alone by its tools/egHero*Scene.mjs (no image, no game data,
-  // no third-party art) and baked by its tools/bakeEgHero*.mjs; test/tooling/eghero_cairn.test.js holds each scene and both halves
-  // to their bytes.
-  ['src/assets/egfrags/source/egheroOssuary.fbx', 'OURS - the Ossuary\'s scene, written by tools/egHeroOssuaryScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroOssuary.law.json', 'OURS - egheroOssuary.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroOssuary.mjs; numbers only'],
-  ['src/assets/egfrags/egheroOssuary.mesh.json', 'OURS - egheroOssuary.fbx\'s mesh half baked by tools/bakeEgHeroOssuary.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroMistStair.fbx', 'OURS - the Mist Stair\'s scene, written by tools/egHeroMistStairScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroMistStair.law.json', 'OURS - egheroMistStair.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroMistStair.mjs; numbers only'],
-  ['src/assets/egfrags/egheroMistStair.mesh.json', 'OURS - egheroMistStair.fbx\'s mesh half baked by tools/bakeEgHeroMistStair.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  // EG-HERO (2026-10-13, the owner: "You have to author the fragments"): THE SHADE'S TWO HEROES - the Gloam Thicket's
-  // passage and the Eclipse Vault's chamber, each a scene written from numbers alone by its tools/egHero*Scene.mjs and
-  // baked by its tools/bakeEgHero*.mjs; test/tooling/eghero_shade.test.js holds each scene and both its halves to their bytes.
-  ['src/assets/egfrags/source/egheroGloam.fbx', 'OURS - the Gloam Thicket hero passage\'s scene, written by tools/egHeroGloamScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroGloam.law.json', 'OURS - egheroGloam.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroGloam.mjs; numbers only'],
-  ['src/assets/egfrags/egheroGloam.mesh.json', 'OURS - egheroGloam.fbx\'s mesh half baked by tools/bakeEgHeroGloam.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroEclipse.fbx', 'OURS - the Eclipse Vault hero chamber\'s scene, written by tools/egHeroEclipseScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroEclipse.law.json', 'OURS - egheroEclipse.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroEclipse.mjs; numbers only'],
-  ['src/assets/egfrags/egheroEclipse.mesh.json', 'OURS - egheroEclipse.fbx\'s mesh half baked by tools/bakeEgHeroEclipse.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  // EG-HERO (2026-10-13, Mac: "You have to author the fragments"; Elite-Gates.md section 31, EG-HERO (the Broken
-  // Galleries)): THE GALLERIES' THREE HERO FRAGMENTS - scenes the port writes from numbers alone (tools/egHeroCavernsScene.mjs,
-  // egHeroStacksScene.mjs, egHeroColonnadeScene.mjs - no image, no game data, no third-party art), committed as the .fbx
-  // tools/fragBake.mjs bakes; each its own bake script re-makes its two halves, and test/tooling/eghero_galleries.test.js holds every
-  // scene and half to its bytes.
-  ['src/assets/egfrags/source/egheroCaverns.fbx', 'OURS - the Oblivion Caverns hero passage\'s scene, written by tools/egHeroCavernsScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroCaverns.law.json', 'OURS - egheroCaverns.fbx\'s law half baked by tools/bakeEgHeroCaverns.mjs; numbers only'],
-  ['src/assets/egfrags/egheroCaverns.mesh.json', 'OURS - egheroCaverns.fbx\'s mesh half baked by tools/bakeEgHeroCaverns.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroStacks.fbx', 'OURS - the Fallen Stacks hero chamber\'s scene, written by tools/egHeroStacksScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroStacks.law.json', 'OURS - egheroStacks.fbx\'s law half baked by tools/bakeEgHeroStacks.mjs; numbers only'],
-  ['src/assets/egfrags/egheroStacks.mesh.json', 'OURS - egheroStacks.fbx\'s mesh half baked by tools/bakeEgHeroStacks.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroColonnade.fbx', 'OURS - the Broken Colonnade hero passage\'s scene, written by tools/egHeroColonnadeScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroColonnade.law.json', 'OURS - egheroColonnade.fbx\'s law half baked by tools/bakeEgHeroColonnade.mjs; numbers only'],
-  ['src/assets/egfrags/egheroColonnade.mesh.json', 'OURS - egheroColonnade.fbx\'s mesh half baked by tools/bakeEgHeroColonnade.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  // EG-HERO (2026-10-13, the owner: "You have to author the fragments"): THE HAVOC WELLHEAD'S HERO FRAGMENTS - the Forge Gut,
-  // the Clan Pit and the Oblivion Caverns, deep, each a scene written from numbers alone by its tools/egHero*Scene.mjs (no
-  // image, no game data, no third-party art), committed as the .fbx tools/fragBake.mjs bakes; each tools/bakeEgHero*.mjs
-  // re-makes its two halves, and test/tooling/eghero_wellhead.test.js holds each scene and both halves to their bytes.
-  ['src/assets/egfrags/source/egheroForgeGut.fbx', 'OURS - a Wellhead hero fragment\'s scene, written by tools/egHeroForgeGutScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroForgeGut.law.json', 'OURS - egheroForgeGut.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroForgeGut.mjs; numbers only'],
-  ['src/assets/egfrags/egheroForgeGut.mesh.json', 'OURS - egheroForgeGut.fbx\'s mesh half baked by tools/bakeEgHeroForgeGut.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroClanPit.fbx', 'OURS - a Wellhead hero fragment\'s scene, written by tools/egHeroClanPitScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroClanPit.law.json', 'OURS - egheroClanPit.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroClanPit.mjs; numbers only'],
-  ['src/assets/egfrags/egheroClanPit.mesh.json', 'OURS - egheroClanPit.fbx\'s mesh half baked by tools/bakeEgHeroClanPit.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
-  ['src/assets/egfrags/source/egheroDeepCaverns.fbx', 'OURS - a Wellhead hero fragment\'s scene, written by tools/egHeroDeepCavernsScene.mjs from numbers alone; no ARENA2 data, no third-party art'],
-  ['src/assets/egfrags/egheroDeepCaverns.law.json', 'OURS - egheroDeepCaverns.fbx\'s law half (its markers, section 11.5\'s record) baked by tools/bakeEgHeroDeepCaverns.mjs; numbers only'],
-  ['src/assets/egfrags/egheroDeepCaverns.mesh.json', 'OURS - egheroDeepCaverns.fbx\'s mesh half baked by tools/bakeEgHeroDeepCaverns.mjs; geometry only, its pictures the band\'s painted dress, no ARENA2 data'],
   // WAGONS1 (2026-10-09, Mac: "Here are 3 new models that will need to be textured"): MAC'S THREE WAGONS, supplied as
   // four saves of one Blender scene ("wagons.blend") - the newest committed whole, as the ships' scenes are.
   // tools/bakeWagons.mjs re-makes the three JSONs from it (tools/shipBake.mjs), and test/tooling/wagons1_bake.test.js holds them

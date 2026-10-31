@@ -21,13 +21,12 @@ import { createLineRunner, letterOnItsWay, STEP_GAP_S } from '../../../src/syste
 import { QL_LINES, lineStepOf } from '../../../src/systems/questlines/qlLines.js';
 import { QUESTLINES_PREF, questlinesOn } from '../../../src/systems/questlines/qlLaw.js';
 import { LOOT_RARITY_KEY } from '../../../src/systems/loot/lootRarity.js';
-import { KINGS_GAMBIT_KEY } from '../../../src/systems/features.js';
 import { setPref } from '../../../src/systems/uiPrefs.js';
 import { questSource, loadTables, packMachine, parsedQuest } from '../../qlSources.mjs';
 import { starfallRuns } from '../../../src/net/starfall/starfallLaw.js';   // the run's wall clock held out of the festival
 
 loadTables();
-for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, KINGS_GAMBIT_KEY, 'naval']) setPref(k, true);
+for (const k of [QUESTLINES_PREF, LOOT_RARITY_KEY, 'naval']) setPref(k, true);
 
 /** The letter a step's quest hands over by courier: its `give pc <letter> notify` actions. */
 const letterGives = (quest) => [...quest.tasks.values()].flatMap((t) => t.actions)
@@ -54,7 +53,7 @@ const startUp = (quest) => {
   for (const a of task?.actions ?? []) if (a.typeName === 'StartStopTimer') a.update(task);
 };
 /** The later steps whose courier brings a letter (QL-OFFERED: the only couriers a line has). */
-const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLWR03', 'QLWR04', 'QLHR02', 'QLSK02', 'QLSK03', 'QLSK04', 'QLOC03',
+const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLHR02', 'QLOC03',
   'QLTF02', 'QLTF03', 'QLTF04', 'QLIS02', 'QLIS03', 'QLIW02'];
 
 test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent - its start-up puts its letter in hand (`start task`, `get item`), so nothing of it is ever on its way; a later step\'s courier hands its letter over as `give pc <Item ... letter> notify`, on its way while held, not once given or set aside (mutants: textId, isComplete, the item\'s kind, the shelf)', () => {
@@ -62,7 +61,7 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent
   // The Thirteenth of Frostfall opens IN PERSON - a Wyrd Sister hands her letter as she is met (QLTF01 `get item
   // _letter_`), or Morwen's raven its note once a star is held: neither at the start-up, neither by courier
   const IN_PERSON = new Set(['thirteenthFrostfall']);
-  assert.equal(QL_LINES.length, 15);
+  assert.equal(QL_LINES.length, 12);   // PIN MOVED (Elite Gates removed): the Weir Road gone
   const couriers = [];
   for (const l of QL_LINES) {
     const { quest } = parsedQuest(l.steps[0].quest, machine);
@@ -185,16 +184,16 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED), the runner: the take is a let
 
 test('FB1020c LETTER-PACE, the runner: the save keeps when the last letter came - a load inside its hour starts no later step, an hour on it starts; an older save without it loads as no letter yet (mutants: restore drops `lettered`)', () => {
   const { runner, clock, step, named } = runnerOf();
-  runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1, lettered: clock.s - 60 } });
-  assert.equal(runner.lineState('introTables').lettered, clock.s - 60, 'restored');
-  assert.equal(runner.snapshot().introTables.lettered, clock.s - 60, 'and saved again');
+  runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1, lettered: clock.s - 60 } });
+  assert.equal(runner.lineState('introGear').lettered, clock.s - 60, 'restored');
+  assert.equal(runner.snapshot().introGear.lettered, clock.s - 60, 'and saved again');
   step();
-  assert.equal(named('QLIT02'), null, 'inside the letter\'s hour: nothing starts');
+  assert.equal(named('QLIG02'), null, 'inside the letter\'s hour: nothing starts');
   clock.s += STEP_GAP_S;
   step();
-  assert.ok(named('QLIT02'), 'an hour on');
-  runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1 } });
-  assert.equal(runner.lineState('introTables').lettered, 0, 'a save from before LETTER-PACE');
+  assert.ok(named('QLIG02'), 'an hour on');
+  runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, begun: 1 } });
+  assert.equal(runner.lineState('introGear').lettered, 0, 'a save from before LETTER-PACE');
 });
 
 /** The real bridge as the game ticks it, online: a registered account (every line's gate), the short wait
@@ -248,10 +247,9 @@ test('FB1020c x QL-OFFERED, the real bridge online - THE REPORT\'S OWN LAW: a ch
 
 test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED), the real bridge online: the later steps of the lines the player took, set out while the town\'s letters wait (the sky\'s night), never land in one breath at dawn - an hour of the character\'s clock and more between any two questline letters - and they still come, one after another (mutants: the wait unread; the hour from the letter; the layer\'s arm; textId; isComplete)', () => {
   assert.equal(starfallRuns(OUT_OF_FESTIVAL_MS), false, 'the run\'s day is out of the Witches\' Festival');
-  // five lines taken and standing at a step whose courier sets out at its start-up: the Doors (QLBD05 - QLBD02's coven
-  // is a dungeon this bridge has no world to place), the Hour (QLHR02), the Ketch (QLSK02), the Coil (QLOC03), the sea
-  // (QLIS02)
-  const lines = { burningDoors: standingAt(4), hourThatWasNot: standingAt(1), skyKetch: standingAt(1), oldCoil: standingAt(2), introSea: standingAt(1) };
+  // four lines taken and standing at a step whose courier sets out at its start-up: the Doors (QLBD05 - QLBD02's coven
+  // is a dungeon this bridge has no world to place), the Hour (QLHR02), the Coil (QLOC03), the sea (QLIS02)
+  const lines = { burningDoors: standingAt(4), hourThatWasNot: standingAt(1), oldCoil: standingAt(2), introSea: standingAt(1) };
   const { letters } = play(900 + 2400, { lines });   // six sky hours to dawn, then 2,400 real seconds of day (eight hours of the character's)
   const gaps = letters.slice(1).map((l, i) => l.s - letters[i].s);
   assert.ok(letters.length >= 4, `the lines still begin: ${letters.map((l) => l.quest).join(', ')}`);

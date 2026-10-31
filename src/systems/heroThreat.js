@@ -32,7 +32,7 @@
 // characters/enemy/enemyEntity.js applyProgressionScaling): every dungeon foe and every foe of the wilds, of every kind -
 // an elite, a champion, a revenant, the zone's own - over its kind's own scale, as the place compounds with them. Never
 // an ally, the watch, a town's or a building's ground, or a tuned stage (a made level, the arena's floor); never a body
-// the relay keeps (a gate's lord, an Elite Breach's, the Remnant). The gate is the loot ladder's, as the place's,
+// the relay keeps (a gate's lord, the Remnant). The gate is the loot ladder's, as the place's,
 // the elites' and the champions' are: the ladder off is DFU's own foes.
 //
 // Not a DFU member: DFU's monsters stand at their row whatever the player's level (EnemyEntity.SetEnemyCareer), and a

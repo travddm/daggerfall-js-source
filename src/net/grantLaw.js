@@ -19,9 +19,8 @@
 //     member a handed-on grant stands `h` (-1: every member - GRANT3's heir), when it expires `x`, and the relay's
 //     signature `sg`.
 //   THE SIGNATURE - Ed25519 with the relay's receipt key (GATE_SIGNING_KEY), verified with its public half (`rk`, the
-//     account service's /v1/eg/keys), as the Elite Gates arch call is (net/eliteGates/egCallSig.js). ONE KEY, NEVER
-//     CONFUSED: the signed bytes begin `spawn-grant1\n`, so no receipt (its version and a '.') and no call (`ec1|`)
-//     verifies as a grant, nor a grant as either.
+//     account service's /v1/relaykey). ONE KEY, NEVER CONFUSED: the signed bytes begin `spawn-grant1\n`, so no receipt
+//     (its version and a '.') verifies as a grant, nor a grant as one.
 //   THE MARKS (section 4.2, `e` and `c`) - rolled by the relay from the seed alone, so a mint asked again rolls the same.
 //     Three draws a member, always: the elite's, the champion's chance, its trait. RENOWN-GATE as the street has it
 //     (systems/eliteFoes.js rollOverworldElite): the elite's draw is made first, then the Renown's word. An elite is
@@ -39,7 +38,9 @@
 // its bracket to Port-Ledger section A, row ONLINE (Spawn-Grants section 6).
 import { _b64url, SIG_BYTES, ID_RE, characterLevelIssuable, renownIssuable } from './identityToken.js';
 import { coversCell } from './cellTree.js';   // COST-2 (b): a grant stands in any cell the reader's socket covers
-import { EG_CALL_SG_RE, roomOf, tokenGate, worldPixelOk, WORLD_WIDE_RELAY_MIN, relaySupportsWorldWide } from './wire.js';   // a signature's shape on the wire (64 bytes, base64url) - the wire's own; a room's name; the relay's one bucket
+import { roomOf, tokenGate, worldPixelOk, WORLD_WIDE_RELAY_MIN, relaySupportsWorldWide } from './wire.js';   // a room's name; the relay's one bucket
+/** A signature's shape on the wire: 64 bytes, base64url. */
+const GRANT_SG_RE = /^[A-Za-z0-9_-]{86}$/;
 
 /** The version leading the signed bytes, and the line that ends it. */
 export const GRANT_SIG_V = 'spawn-grant1';
@@ -217,7 +218,7 @@ export function validGrant(v) {
     if (((v.e >>> i) & 1) && v.c[i] !== -1) return null;   // an elite is never a champion
   }
   if (!intIn(v.h, -1, v.n - 1)) return null;   // GRANT3: -1 every member; a handed-on grant's one (grantHanded)
-  if (v.sg !== undefined && (typeof v.sg !== 'string' || !EG_CALL_SG_RE.test(v.sg))) return null;
+  if (v.sg !== undefined && (typeof v.sg !== 'string' || !GRANT_SG_RE.test(v.sg))) return null;
   /** @type {SpawnGrant} */
   const g = { g: v.g, o: v.o, q: v.q, a: v.a, k: v.k, p: [v.p[0], v.p[1]], m: v.m, l: v.l, r: v.r, n: v.n, s: v.s, e: v.e, c: v.c.slice(), h: v.h, x: v.x };
   if (v.sg !== undefined) g.sg = v.sg;

@@ -47,7 +47,6 @@ import { rrMeleeWeaponAnimTime } from '../../src/systems/roleplayRealism/rrReali
 import { EQUIP_SLOTS, equipTableOf } from '../../src/systems/equip.js';
 import { mintCondition, setItemFields } from '../../src/systems/item/itemTemplates.js';
 import { WEAPONS } from '../../src/characters/weapons.js';
-import { THUNDERLOCK_TEMPLATE } from '../../src/characters/thunderlockIds.js';
 import { FIRM_NODES } from '../../src/net/firmament/firmamentTree.js';
 
 const { LongBlade: LB, ShortBlade: SB, Axe: AX, BluntWeapon: BL, Archery: AR, HandToHand: HH, Destruction: DES, Restoration: RES } = SKILLS;
@@ -221,7 +220,7 @@ function press(p, item, { held: down = true } = {}) {
   return { entity: p, pw, held: down, ready: true, cam: { feet: [0, 0, 0], pos: [0, 1.6, 0], yaw: 0, pitch: 0 }, rig: 'rig', door: { drainFatigue: (n) => { p.fatigue -= n; } }, startSwing: () => true, say: () => {} };
 }
 
-test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line on the weapon - the form of the family in hand; a line on the weapon wins; the bare hand Hand-to-Hand\'s, gloves or none; never the claws, the Thunderlock, a weapon outside the pair, or a path not held; no ladder needed; the forms share one cooldown (mutants: the line loses; the claws strike; the ladder refuses a signature; the forms\' cooldowns apart)', () => {
+test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line on the weapon - the form of the family in hand; a line on the weapon wins; the bare hand Hand-to-Hand\'s, gloves or none; never the claws, a weapon outside the pair, or a path not held; no ladder needed; the forms share one cooldown (mutants: the line loses; the claws strike; the ladder refuses a signature; the forms\' cooldowns apart)', () => {
   reset();
   const ranger = pathFighter('ranger');
   const sword = weapon(WEAPONS.Longsword), bow = weapon(WEAPONS.Long_Bow);
@@ -232,7 +231,6 @@ test('MARTIAL3 THE SIGNATURE IN HAND: the technique key\'s answer with no line o
   assert.equal(techniqueInHand(ranger, { weapon: bow }), hand, 'kept while nothing it was read from moves');
   assert.equal(techniqueInHand(ranger, { weapon: weapon(WEAPONS.War_Axe) }), null, 'an axe is no Ranger\'s');
   assert.equal(techniqueInHand(ranger, { weapon: null }), null, 'nor the bare hand');
-  assert.equal(techniqueInHand(ranger, { weapon: weapon(THUNDERLOCK_TEMPLATE) }), null, 'the Thunderlock is a gun, no bow\'s');
   const lined = weapon(WEAPONS.Longsword, { affixes: [{ id: 'technique', param: 'leap', value: 20 }] });
   assert.equal(techniqueInHand(ranger, { weapon: lined })?.id, 'leap', 'a line on the weapon wins');
   const dancer = pathFighter('bladedancer');

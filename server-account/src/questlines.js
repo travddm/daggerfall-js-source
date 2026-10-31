@@ -6,8 +6,8 @@
 //
 // `POST /v1/ql/claim { line, step, phase, choice? }`, behind a session. Its pay for a registered account (FOUNDER's law,
 // as lamp.js: a guest's end is answered `guest` and nothing is paid - its opening is written, AUDIT QUESTLINES SERVICE-1). The law both ends share is src/net/questlineClaims.js -
-// QL_SERVICE_LINES names the steps the service pays, each step's witness, the title a line pays and on which step, and
-// the Covens' Hoard's Weir Key. A step the service pays nothing is answered `unpaid` (qlStepClaimed).
+// QL_SERVICE_LINES names the steps the service pays, each step's witness and the title a line pays and on which step. A
+// step the service pays nothing is answered `unpaid` (qlStepClaimed).
 //
 // A STEP IS CLAIMED TWICE (the client's line runner, systems/questlines/qlLineRunner.js), each claim saying its PHASE:
 //   - `open`, when the step starts: one `ql_steps` row (migration 0133), `opened_at` the service's clock - `{ opened:
@@ -25,7 +25,7 @@
 //     A step with no receipt (the Covens' Hoard's last) is witnessed once its line's `after` is witnessed whole: that
 //     line's title held on this row (SERVICE-4). Only an end pays (SERVICE-6: an opening asked again paid Covenbane at
 //     the step's START).
-//   `at` is the claim's own time on each receipt row (accounts.js claimGate, eg.js claimEg, sds.js claimSd, serpents.js
+//   `at` is the claim's own time on each receipt row (accounts.js claimGate, sds.js claimSd, serpents.js
 //   claimSerpent, STAR8's stars.js claimStar all write `nowS`), so a receipt held unclaimed across the line's opening - the client claims its
 //   receipts as they come, and each lives a week (RECEIPT_TTL_S) - is read as the claim's, not the kill's.
 //
@@ -39,12 +39,6 @@
 //     UPDATE - its WHERE the purse's guard, so once an account - and only while the festival is open for the account at
 //     the claim's clock (festival.js festivalOpenFor, festivalLaw.js festivalOpen); a guest's end never reaches the batch.
 //     Answered `purse` (the cakes paid) to the claim whose write laid the title.
-//   THE KEY - the Covens' Hoard's Weir Key, once an account: its `key.at` step done with the choice that keeps it
-//     (`keep`) - the step is done only behind the Cycle's first line witnessed whole (`after`). ONE statement, `eg_keys` + 1 and
-//     `ql_key` = 1 together, only while `ql_key` is 0 - the balance every Weir Key is (eg.js: the item in the pack is
-//     its face, restacked to every answer that carries the count), so `key: true` comes with `keys`, the balance after.
-//     No ledger rides it: every key grant of the service's (eg.js rollWeirKey, egGateWeir, findEg; egEconomy.js a
-//     Valkynaz's) is that one UPDATE, and the item law reads the key's row (KEY-LAW), not the grant.
 //
 // Opened by QUESTLINES_OPEN (`off` | `dev` | `on`, wrangler.toml), read as FIRMAMENT_OPEN is: `dev` the developers
 // alone; shut, `ql-closed` (403).
@@ -76,12 +70,6 @@ export const QL_STATUS = Object.freeze({ 'ql-closed': 403, 'ql-body': 400 });
  *  order was asked (a row acct159-164 wrote). */
 const SINCE = 'MAX((SELECT MIN(o.opened_at) FROM ql_steps o WHERE o.account = ?1 AND o.line = ?2), COALESCE((SELECT MAX(p.seen_at) + 1 FROM ql_steps p WHERE p.account = ?1 AND p.line = ?2 AND p.step < ?3), 0))';
 const UNTIL = 'COALESCE((SELECT MIN(p.seen_at) FROM ql_steps p WHERE p.account = ?1 AND p.line = ?2 AND p.step > ?3), 9007199254740991)';
-/** AN ELITE BREACH'S REDOUBT THAT IS NO REHEARSAL'S - a Rehearsal's Redoubt writes its `eg_redoubts` row (paid 0; eg.js
- *  claimEg), and the house's honours never read one (egHonours.js: `c.rh === 1`). The row carries no `rh` of its own: its
- *  breach's stake does (`eg_stakes.rh`, written at the open, before any Redoubt - whoever opened it), and the account's
- *  end does (`eg_runs.rh`, should the opener's stake be gone with its account). */
-const NOT_REHEARSAL = 'NOT EXISTS (SELECT 1 FROM eg_stakes k WHERE k.b = r.b AND k.rh = 1) AND NOT EXISTS (SELECT 1 FROM eg_runs x WHERE x.b = r.b AND x.account = r.account AND x.rh = 1)';
-
 /**
  * WHAT EACH WITNESS READS - the second of the receipt that witnesses the step, or NULL: a scalar over the account
  * (`?1`) inside the line's window (SINCE, UNTIL - `?2` the line, `?3` the step), one receipt table each
@@ -89,28 +77,19 @@ const NOT_REHEARSAL = 'NOT EXISTS (SELECT 1 FROM eg_stakes k WHERE k.b = r.b AND
  *   rite      a Dagon's Breach's rite broken - the rite's own receipt (`earned` 'rite'), or a fighter's that broke it
  *             (accounts.js claimGate: `c.r === 1`, the row's two embers - `stones` 2 is written for nothing else)
  *   breach    a Dagon's Breach closed - a kill's row, never the rite alone
- *   redoubt   an Elite Breach's Redoubt taken, no Rehearsal's
- *   redoubts3 three of them - one row a (breach, account, Redoubt) by eg_redoubts' key, so each row is a distinct (b, w)
- *   valkynaz  a Valkynaz's Redoubt - every fifth (src/net/eliteGates/egPay.js egValkRedoubt: w >= 5, w % 5 = 0)
  *   hour      an Hour broken - a Brass Remnant's row
  *   serpent   the Sea Serpent slain - a serpent's row
  *   star      STAR8: a fallen star held - a star's row (stars.js claimStar: one a (star, account), `at` the claim's second)
  *   stars3    three of them - each row a distinct star by stars_held's key
- *   ketch     KETCH: the Tonal Warden felled - a voyage's row (ketch.js claimKetch: one a (voyage, account), `at` the claim's
- *             second; a share `taken` with another crew writes none - the week's first ship's row is the witness)
  */
 const WINDOW = (x) => `${x}.at >= ${SINCE} AND ${x}.at < ${UNTIL}`;
 export const QL_WITNESS_SQL = Object.freeze({
   rite: `(SELECT MIN(g.at) FROM gate_kills g WHERE g.account = ?1 AND ${WINDOW('g')} AND (g.earned = 'rite' OR g.stones >= 2))`,
   breach: `(SELECT MIN(g.at) FROM gate_kills g WHERE g.account = ?1 AND ${WINDOW('g')} AND g.earned != 'rite')`,
-  redoubt: `(SELECT MIN(r.at) FROM eg_redoubts r WHERE r.account = ?1 AND ${WINDOW('r')} AND ${NOT_REHEARSAL})`,
-  redoubts3: `(SELECT r.at FROM eg_redoubts r WHERE r.account = ?1 AND ${WINDOW('r')} AND ${NOT_REHEARSAL} ORDER BY r.at, r.b, r.w LIMIT 1 OFFSET 2)`,
-  valkynaz: `(SELECT MIN(r.at) FROM eg_redoubts r WHERE r.account = ?1 AND ${WINDOW('r')} AND r.w >= 5 AND r.w % 5 = 0 AND ${NOT_REHEARSAL})`,
   hour: `(SELECT MIN(d.at) FROM sd_kills d WHERE d.account = ?1 AND ${WINDOW('d')})`,
   serpent: `(SELECT MIN(z.at) FROM serpent_kills z WHERE z.account = ?1 AND ${WINDOW('z')})`,
   star: `(SELECT MIN(s.at) FROM stars_held s WHERE s.account = ?1 AND ${WINDOW('s')})`,
   stars3: `(SELECT s.at FROM stars_held s WHERE s.account = ?1 AND ${WINDOW('s')} ORDER BY s.at, s.star LIMIT 1 OFFSET 2)`,
-  ketch: `(SELECT MIN(k.at) FROM ketch_voyages k WHERE k.account = ?1 AND ${WINDOW('k')})`,
 });
 for (const k of QL_WITNESS_KINDS) if (!QL_WITNESS_SQL[/** @type {keyof typeof QL_WITNESS_SQL} */ (k)]) throw new Error(`questlines.js: no witness for ${k}`);
 
@@ -120,8 +99,7 @@ for (const l of Object.values(QL_SERVICE_LINES)) if ('after' in l && !qlTitleBit
 
 /** AUDIT STARFALL B2: THE LINE'S ORDER - the witnessed steps of a line before `step`, which its end waits on: every one done
  *  before it is read (qlInOrderSql). The window's floor is the latest of their receipts (SINCE), and a step asked before them
- *  read its window from the line's opening, so one receipt witnessed two steps - QLTF03's three took QLTF01's star, the Weir
- *  Road's three its first Redoubt. Pure. */
+ *  read its window from the line's opening, so one receipt witnessed two steps - QLTF03's three took QLTF01's star. Pure. */
 export function qlStepsBefore(lineId, step) {
   const l = QL_SERVICE_LINES[/** @type {keyof typeof QL_SERVICE_LINES} */ (lineId)];
   return l ? Object.keys(l.witness).map(Number).filter((s) => s < step).sort((a, b) => a - b) : [];
@@ -145,7 +123,7 @@ export function qlTitleSteps(lineId) {
 
 /**
  * THE CLAIM. An `open`: `{ opened: true }`, any step of a line the service pays. An `end`: `{ witnessed: false }`,
- * `{ witnessed: true, title?, purse?, key?, keys?, keyHeld? }`, `{ why: 'guest' }` for a row with no handle, or `{ why: 'unpaid' }` for a
+ * `{ witnessed: true, title?, purse? }`, `{ why: 'guest' }` for a row with no handle, or `{ why: 'unpaid' }` for a
  * step the service pays nothing. Either: `{ error }` - 'ql-closed' (the switch), 'ql-body' (a body questlineClaims.js
  * qlClaimOf refuses).
  * @param {{ db: any, env?: any }} ctx
@@ -196,18 +174,7 @@ export async function claimQl({ db, env = null }, player, body, nowS) {
       AND (SELECT COUNT(*) FROM ql_steps WHERE account = ?1 AND line = ?3 AND step IN (SELECT value FROM json_each(?4)) AND done_at IS NOT NULL) = ?5`)
       .bind(player.id, qlTitleBit(law.title), line, JSON.stringify(titleSteps), titleSteps.length, purse));
   }
-  // THE KEY - once an account: its step done (behind the Cycle's first line witnessed whole) by an end that KEEPS it -
-  // this end's own choice (AUDIT QUESTLINES LINES-4: a first character's `seal` never bars the account's key from a later
-  // character who keeps it; the step's `choice` stays the first one said, its record). A keep that finds the key given
-  // already is told so (`keyHeld`), never silent.
-  const key = law.key ?? null;
-  const keyAt = key && key.at === step && choice === key.choice ? statements.length : -1;
-  if (keyAt >= 0) {
-    statements.push(db.prepare(`UPDATE players SET eg_keys = eg_keys + 1, ql_key = 1 WHERE id = ?1 AND ql_key = 0
-      AND EXISTS (SELECT 1 FROM ql_steps WHERE account = ?1 AND line = ?2 AND step = ?3 AND done_at IS NOT NULL)
-      RETURNING eg_keys`).bind(player.id, line, step));
-  }
-  statements.push(db.prepare('SELECT s.done_at, p.ql_key, p.ql_titles FROM ql_steps s JOIN players p ON p.id = s.account WHERE s.account = ?1 AND s.line = ?2 AND s.step = ?3').bind(player.id, line, step));
+  statements.push(db.prepare('SELECT s.done_at, p.ql_titles FROM ql_steps s JOIN players p ON p.id = s.account WHERE s.account = ?1 AND s.line = ?2 AND s.step = ?3').bind(player.id, line, step));
   const results = await db.batch(statements);
   const row = results.at(-1)?.results?.[0];
   if (row?.done_at == null) return { witnessed: false };
@@ -216,11 +183,9 @@ export async function claimQl({ db, env = null }, player, body, nowS) {
   // lay it - an answer lost after the commit (a timeout) is asked again, and the retry is how the page hears it; the
   // runner tells it only for a claim whose earlier answer was lost (qlLineRunner.js ask), so it is told once
   const held = titleAt >= 0 && !titled && (Number(row.ql_titles) & qlTitleBit(law.title)) !== 0;
-  const keyed = keyAt >= 0 ? results[keyAt]?.results?.[0] : null;
   return {
     witnessed: true,
     ...(titled ? { title: law.title } : held ? { titleHeld: law.title } : {}),
     ...(titled && purse > 0 ? { purse } : {}),
-    ...(keyed ? { key: true, keys: Number(keyed.eg_keys) || 0 } : keyAt >= 0 && Number(row.ql_key) === 1 ? { keyHeld: true } : {}),
   };
 }

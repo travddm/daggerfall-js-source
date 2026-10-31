@@ -40,7 +40,6 @@ import { registerCarrackArt, _resetCarrackArt } from '../../../src/world/ships/c
 import { registerLargeBoatArt, _resetLargeBoatArt } from '../../../src/world/ships/largeBoatArt.js';
 import { townPictureEntries, TOWN_PICTURES } from '../../../src/world/townPictures.js';
 import { installSurvivalIcons } from '../../../src/systems/survival/items.js';
-import { installThunderlockIcons, PAPERDOLL_OFFSET } from '../../../src/systems/thunderlock.js';
 import { yardArt, YARD_ARCHIVE } from '../../../src/world/merchantYards/merchantYardArt.js';
 import { PORT_PAINTERS, PORT_ARCHIVE } from '../../../src/world/portArt.js';
 import { lefayArt } from '../../../src/world/lefayArt.js';
@@ -169,7 +168,7 @@ test('AUDIT STUDIO1 S5: the studio inherits `lazy`; a studio picture of one dye 
     addVendorTextures([{ archive: 39300, record: 1, lazy: true, load: async () => { loads++; return picture(2, 2, [4, 4, 4]); } }]);
     await preloadTextureArchive(39300, { decode });
     assert.equal(loads, 0, 'lazy either way round: decoded when asked, never by the archive\'s preload');
-    // A8: the Thunderlock's way - ONE undyed stand-in picture, asked by the item's dye
+    // A8: ONE undyed stand-in picture, asked by the item's dye
     addVendorTextures([{ archive: 39301, record: 0, standIn: true, load: async () => picture(2, 2, [9, 9, 9]) }]);
     assert.equal(hasTextureReplacement(39301, 0, 0, 'Albedo', 'Iron'), true);
     addVendorTextures([{ archive: 39301, record: 0, dye: 'Dwarven', studio: true, load: async () => picture(2, 2, [8, 8, 8]) }]);
@@ -409,17 +408,20 @@ test('AUDIT STUDIO1 S12 (lane E K4-K8): the registry\'s merges through the real 
     await studioLanded();
     assert.deepEqual(red(decodedTexture(532, 0)), [9, 8, 7]);
     assert.equal(isVendorArchive(532), true);
-    // K7: the Thunderlock's icons under the studio's: the doll's place theirs; a registration the studio absorbs is
-    // counted and moves the tiers' epoch, and its missing offset leaves the place as it was
+    // K7: a stand-in's icons, registered with their place on the doll, under the studio's: the doll's place theirs; a
+    // registration the studio absorbs is counted and moves the tiers' epoch, and its missing offset leaves the place as
+    // it was. The Thunderlock's icons were this producer; with the guns gone, a stand-in registered here takes its part.
     reset();
-    assert.equal(installThunderlockIcons({ fetchBytes: async () => picture(2, 2, [1, 2, 3]) }), 5);
-    await installStudioArt({ fetch: responses({ 'a/560_0-0.png': picture(2, 2, [4, 5, 6]) }).fetch, decode });
-    assert.deepEqual(vendorTextureStandIn(560).getOffset(0), PAPERDOLL_OFFSET);
-    assert.equal(isVendorArchive(560), true);
+    const dollIconArchive = 39302;
+    const dollPlace = Object.freeze({ x: 208, y: 101 });
+    assert.equal(addVendor([{ archive: dollIconArchive, record: 0, standIn: true, offset: dollPlace, fileName: 'icon', load: async () => picture(2, 2, [1, 2, 3]) }]), 1);
+    await installStudioArt({ fetch: responses({ [`a/${dollIconArchive}_0-0.png`]: picture(2, 2, [4, 5, 6]) }).fetch, decode });
+    assert.deepEqual(vendorTextureStandIn(dollIconArchive).getOffset(0), dollPlace);
+    assert.equal(isVendorArchive(dollIconArchive), true);
     const epoch = textureTierEpoch();
-    assert.equal(addVendor([{ archive: 560, record: 0, standIn: true, fileName: 'later', load: async () => picture(2, 2, [1, 2, 3]) }]), 1, 'absorbed, and counted');
+    assert.equal(addVendor([{ archive: dollIconArchive, record: 0, standIn: true, fileName: 'later', load: async () => picture(2, 2, [1, 2, 3]) }]), 1, 'absorbed, and counted');
     assert.notEqual(textureTierEpoch(), epoch, 'a scene asks its archives again');
-    assert.deepEqual(vendorTextureStandIn(560).getOffset(0), PAPERDOLL_OFFSET, 'the first place on the doll holds');
+    assert.deepEqual(vendorTextureStandIn(dollIconArchive).getOffset(0), dollPlace, 'the first place on the doll holds');
     // K8: between two non-studio registrations the later replaces the earlier - mark, place and picture
     reset();
     addVendor([{ archive: 562, record: 0, standIn: true, offset: { x: 1, y: 1 }, fileName: 'one', load: async () => picture(2, 2, [1, 1, 1]) }]);

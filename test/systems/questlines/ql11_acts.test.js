@@ -23,21 +23,11 @@ import { createSdClaims } from '../../../src/net/superDungeon/sdClaims.js';
 import { mintSdReceipt } from '../../../src/net/superDungeon/sdReceipt.js';
 import { createSerpentClaims } from '../../../src/net/serpent/serpentClaims.js';
 import { mintSerpentReceipt } from '../../../src/net/serpent/serpentReceipt.js';
-import { createEgClient } from '../../../src/scenes/eliteGates/egClient.js';
-import { mintEgReceipt } from '../../../src/net/eliteGates/egReceipt.js';
-import { validEgOut, SOCIAL_ROOM } from '../../../src/net/wire.js';
 import { createProfBook, PROF_KEPT_KEY } from '../../../src/net/profBook.js';
 import { recipeById } from '../../../src/net/recipeLaw.js';
 import { createArenaBouts } from '../../../src/scenes/arena/arenaBouts.js';
 import { ARENA_FLOOR_CENTRE } from '../../../src/net/arena/arenaLaw.js';
 import { newArenaLadder, nextLadderBout } from '../../../src/systems/arena/arenaLadder.js';
-import { openGambitTableGame } from '../../../src/scenes/gambitTableGame.js';
-import { newGambitTable, gambitSit, gambitReady, gambitTick, gambitForfeit, GAMBIT_FIRST_MS } from '../../../src/net/gambit/gambitTable.js';
-import { autoFill, KG_POINT_BUDGET } from '../../../src/net/kingsGambit.js';
-import { GAMBIT_RESULT_MS } from '../../../src/systems/gambit/gambitTableSession.js';
-import { CARD_TABLE_W, CARD_TABLE_D } from '../../../src/world/card/cardTableProp.js';
-import { xorshift } from '../../../tools/kgMeasure.mjs';
-import { fakeDoc } from '../../decorFakes.mjs';
 import { createDeepWatersFish } from '../../../src/scenes/deepWater/deepWatersFish.js';
 import { PASSIVE_FISH_SPECIES } from '../../../src/world/passiveFish.js';
 import { createFishItem } from '../../../src/systems/deepWater/deepWatersFishItems.js';
@@ -46,11 +36,6 @@ import { renownFoeStruck, _resetRenownKillsForTests } from '../../../src/net/ren
 import { setSharedClock, setWorldMinutes } from '../../../src/systems/worldTick.js';
 import { MINUTES_PER_DAY } from '../../../src/systems/gameDate.js';
 import { setModSetting } from '../../../src/systems/modSettings.js';
-import { IliacTableSession, ILIAC_REVEAL_MS } from '../../../src/systems/iliac/iliacTableSession.js';
-import { patronDeck, patronPlays, seededUnit } from '../../../src/systems/iliac/iliacPatrons.js';
-import { STARTER_DECK } from '../../../src/net/iliac/iliacCards.js';
-import { ILIAC_TURNS } from '../../../src/net/iliac/iliacHand.js';
-import { CardTableSession } from '../../../src/systems/card/cardTableSession.js';
 import { fishKind } from '../../../src/scenes/fishHost.js';
 import { haulKey } from '../../../src/net/nodeLaw.js';
 import { useForagingTool, createForagingItem, setForagingHost, _setForagingRandomForTests } from '../../../src/systems/foraging/foragingInstall.js';
@@ -75,8 +60,6 @@ import { createCaptainLedger } from '../../../src/systems/naval/captainLedger.js
 import { boardFor, takeContract } from '../../../src/systems/naval/harbourBoard.js';
 import { createGateClaims } from '../../../src/net/gate/gateClaims.js';
 import { mintReceipt } from '../../../src/net/gate/gateReceipt.js';
-import { RemoteCardTable } from '../../../src/systems/card/cardRemoteTable.js';
-import { RemoteIliacTable } from '../../../src/systems/iliac/iliacRemoteTable.js';
 import { herbKind } from '../../../src/scenes/herbHost.js';
 import { mineKind } from '../../../src/scenes/mineHost.js';
 import { treeKind } from '../../../src/scenes/treeHost.js';
@@ -152,10 +135,9 @@ test('QL11 the kinds: ACT_IDS is the leaf\'s keys, frozen; each kind lower-case 
   assert.ok(Object.isFrozen(ACT_KINDS) && Object.isFrozen(ACT_IDS));
   for (const k of ACT_IDS) assert.match(k, /^[a-z]+(-[a-z]+)*$/, k);
   for (const k of ACT_IDS) assert.ok(typeof ACT_KINDS[k] === 'string' && ACT_KINDS[k].length > 0, `${k} has its family`);
-  assert.equal(ACT_IDS.length, 29);   // PIN MOVED (STAR8): and star-held, a fallen star held; PIN MOVED (AUDIT STAR8 T1): and wyrd-met, a Wyrd Sister's window; PIN MOVED (T-A): and heart-star-held, the Heart-Star held; PIN MOVED (KETCH): and the sky-ketch's three - boarded, a cell banked, the Warden felled
+  assert.equal(ACT_IDS.length, 22);   // PIN MOVED (Elite Gates removed): redoubt-taken and valkynaz-felled gone; PIN MOVED (STAR8): and star-held, a fallen star held; PIN MOVED (AUDIT STAR8 T1): and wyrd-met, a Wyrd Sister's window; PIN MOVED (T-A): and heart-star-held, the Heart-Star held
   assert.equal(ACT_KINDS['heart-star-held'], ACT_KINDS['star-held'], 'T-A: the Heart-Star\'s act the endgame\'s, as its star\'s - one family, so the festival\'s finds hear the two as one deed');
   assert.ok(!Object.hasOwn(ACT_KINDS, 'wagon-hauled'), 'no feature sells a wagon\'s load (qlActs.js says why)');
-  assert.ok(Object.hasOwn(ACT_KINDS, 'valkynaz-felled'), 'the Weir Road\'s third step waits on it');
 });
 
 // ── THE LEAF'S LAW ─────────────────────────────────────────────
@@ -181,9 +163,9 @@ test('QL11 noteAct: an unknown kind is refused with a warning and never reaches 
     for (const n of [0, -2, 0.5, NaN, 'x', null]) assert.equal(noteAct('fish-caught', n), 0, `n ${n}`);
     assert.deepEqual(heard, [['fish-caught', 1], ['ore-mined', 2], ['star-taken', 3]], 'n floored; none or less is no act');
     setActSink(() => 2.7);
-    assert.equal(noteAct('cards-won'), 2, 'the count a whole number');
+    assert.equal(noteAct('fish-caught'), 2, 'the count a whole number');
     setActSink(() => undefined);
-    assert.equal(noteAct('cards-won'), 0);
+    assert.equal(noteAct('fish-caught'), 0);
     setActSink(() => { throw new Error('a layer broke'); });
     assert.doesNotThrow(() => noteAct('arena-won'));
     assert.equal(noteAct('arena-won'), 0);
@@ -359,32 +341,6 @@ test('QL11 breach-closed and rite-broken (net/gate/gateClaims.js): said off the 
   } finally { done(); }
 });
 
-test('QL11 cards-won (the relay\'s tables, systems/card/cardRemoteTable.js and systems/iliac/iliacRemoteTable.js): a showdown whose main pot my chair takes, an end that names my seat - once each; a hand lost, a watcher, a game voided, none (mutants: any showdown counted; the main pot\'s winners unread; any end counted)', () => {
-  listen();
-  try {
-    const showdown = (winners) => ({ t: 'showdown', hand: 4, seats: [0, 1], result: { shown: true, pots: [{ amount: 20, eligible: [0, 1], winners }], payouts: [0, 0], hands: {} } });
-    const frame = (events) => ({ state: { seats: [{ id: 'them' }, { id: 'me' }], handNo: 4, hand: null, handSeats: [0, 1], button: 0, sb: 1, bb: 2 }, events, now: 0, at: 0 });
-    const t = new RemoteCardTable({ myId: 'me', chair: 1 });
-    t.ingest(frame([showdown([0])]));
-    assert.deepEqual(heard, [], 'the pot went to the other chair');
-    t.ingest(frame([showdown([1])]));
-    assert.deepEqual(heard, [['cards-won', 1]]);
-    const watcher = new RemoteCardTable({ myId: 'someone', chair: -1 });
-    watcher.ingest(frame([showdown([1])]));
-    assert.equal(heard.length, 1, 'a watcher wins nothing');
-    heard.length = 0;
-    const state = { seats: [{ id: 'me' }, { id: 'them' }], gameNo: 1 };
-    const i = new RemoteIliacTable({ myId: 'me' });
-    i.apply({ state, events: [{ t: 'end', gameNo: 1, winner: 1, how: 'board' }] }, 0);
-    i.apply({ state, events: [{ t: 'end', gameNo: 1, winner: null, how: 'void' }] }, 0);
-    assert.deepEqual(heard, [], 'lost, and no contest');
-    i.apply({ state, events: [{ t: 'end', gameNo: 1, winner: 0, how: 'board' }] }, 0);
-    assert.deepEqual(heard, [['cards-won', 1]]);
-    new RemoteIliacTable({ myId: 'watching' }).apply({ state, events: [{ t: 'end', gameNo: 1, winner: 0, how: 'board' }] }, 0);
-    assert.equal(heard.length, 1, 'a watcher sits in no seat');
-  } finally { done(); }
-});
-
 test('QL11 herb-gathered, ore-mined, wood-chopped (the gathering kinds\' `answered`, which the gathering host calls once for each harvest the service answered): each its own kind, once (mutants: a kind\'s act swapped; the Motherlode alone counted)', () => {
   listen();
   try {
@@ -450,38 +406,6 @@ test('QL11 serpent-slain (net/serpent/serpentClaims.js): said off a serpent rece
     assert.deepEqual(await added(before), [], 'counted before: no act');
     guest = true;
     assert.deepEqual(await added(await serpent(903)), [], 'a guest\'s: kept, not counted');
-  } finally { done(); }
-});
-
-test('QL11 redoubt-taken and valkynaz-felled (scenes/eliteGates/egClient.js redoubtActs, off this screen\'s claim loop): a Redoubt receipt the service counted (`recorded`) - every fifth Court\'s a Valkynaz\'s besides; a Rehearsal\'s, one answered `again` (counted before), none (mutants: ACTS M1 a Valkynaz\'s on every Redoubt; the Rehearsal counted; a re-claim counted)', async (t) => {
-  let clock = T0S * 1000;
-  t.mock.method(Date, 'now', () => clock);
-  const B = '0123456789abcdef', ME = 'acct-mac';
-  const answers = [];
-  const mem = new Map();
-  const store = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => { mem.set(k, String(v)); }, removeItem: (k) => mem.delete(k) };
-  const modes = { mode: 'exterior', stepping: false, egHallBreach: () => null, egHallCircle: () => null, stepThroughFire: async () => true, enterEgHall: () => true };
-  const account = { me: () => ME, guest: () => false, keys: async () => ({ ok: false }), claim: async () => answers.shift() ?? { ok: false, error: 'offline' } };
-  // the rig of test/net/eliteGates/egaudit4_net_client.test.js: this screen's client on open ground, every door a stand-in
-  const client = createEgClient({ modes: () => modes, online: () => ({ sendEg: () => true }), hub: () => ({ egOk: true, sendEg: () => true }), account, now: () => clock,
-    entity: { level: 20, health: 100, maxHealth: 100, items: [] }, player: { pos: [0, 0, 0] }, cam: { pos: [0, 0, 0], yaw: 0 }, say: () => {}, site: () => ({}),
-    wire: () => ({ px: 300, py: 200, x: 1000, y: 0, z: 2000, yaw: 0 }), landAt: () => true, hurt: () => {}, store, paid: () => {},
-    callPortal: { open: () => ({ at: [0, 0, 0] }), clear: () => {}, tick: () => {}, standing: () => false }, feet: () => [0, 0, 0] });
-  const redoubt = (w, o = {}) => mintEgReceipt({ q: 'w', b: B, s: ME, z: 'z'.repeat(20), c: 7, w, h: 5 * w, t: 600, n: 1, ew: 0, l: 20, ...o }, null, { subtle: SUBTLE, nowS: T0S });
-  const claimed = async (r, data) => {
-    heard.length = 0;
-    answers.push({ ok: true, data: { q: 'w', b: B, keys: 0, paid: true, ...data } });
-    client.word(validEgOut({ k: 'rcpt', r }), SOCIAL_ROOM);
-    await settled();
-    assert.equal(answers.length, 0, 'claimed');
-    return kinds();
-  };
-  listen();
-  try {
-    assert.deepEqual(await claimed(await redoubt(4), { recorded: true, w: 4 }), ['redoubt-taken']);
-    assert.deepEqual(await claimed(await redoubt(5), { recorded: true, w: 5 }), ['redoubt-taken', 'valkynaz-felled'], 'the fifth Court: a Valkynaz\'s');
-    assert.deepEqual(await claimed(await redoubt(10, { rh: 1 }), { recorded: true, w: 10 }), [], 'a Rehearsal\'s is practice');
-    assert.deepEqual(await claimed(await redoubt(15), { recorded: false, again: true, w: 15 }), [], 'answered `again`: counted before');
   } finally { done(); }
 });
 
@@ -637,46 +561,6 @@ test('QL11 arena-won on this screen\'s floor (scenes/arena/arenaBouts.js verdict
   } finally { done(); }
 });
 
-test('QL11 gambit-won (scenes/gambitTableGame.js settle, a game the relay decided): the seat that won - once; the seat that lost, and a watcher at the cloth (whose board is the host\'s, side 0), none (mutants: ACTS M8 a watcher\'s board counted; the winner unread)', () => {
-  const FRAME = { centre: [0, 0.8, 0], axisYaw: Math.PI / 2, halfLong: CARD_TABLE_W / 2, halfShort: CARD_TABLE_D / 2 };
-  const CHAIRS = [[0, 0, -0.9], [0.9, 0, 0], [0, 0, 0.9], [-0.9, 0, 0]];
-  // the relay's table (net/gambit/gambitTable.js), two seated and dealt (test/net/kg5_client.test.js `dealt`), its frames kept
-  const table = newGambitTable({ chairs: 4 });
-  const frames = [];
-  const keep = (m) => { for (const x of m) frames.push({ t: 'gambit', table: 0, now: 0, ...x.frame }); return m; };
-  keep(gambitSit(table, { id: 'a', name: 'Ana', chair: 0, crown: 0, now: 0 }));
-  keep(gambitSit(table, { id: 'b', name: 'Bors', chair: 2, crown: 2, now: 0 }));
-  keep(gambitReady(table, { id: 'a', army: autoFill([], KG_POINT_BUDGET, xorshift(3)), now: 0 }));
-  keep(gambitReady(table, { id: 'b', army: autoFill([], KG_POINT_BUDGET, xorshift(4)), now: 0 }));
-  keep(gambitTick(table, GAMBIT_FIRST_MS, xorshift(3)));
-  const page = (id, chair) => {
-    let local = 0;
-    const g = openGambitTableGame({
-      doc: fakeDoc(), renderer: { createMesh: (m) => ({ m }), drawMesh() {}, destroyMesh() {}, uploadTexture() {}, releaseTexture() {} },
-      entity: { name: id, items: [], goldPieces: 100 }, say: () => {}, holdCursor: () => () => true, relock() {}, rand32: xorshift(9), now: () => local, day: () => 100,
-      key: 'town:7:0', friendly: true, regulars: [{ name: 'Cael', seed: 3, chair: 3 }], frame: FRAME, mySeatFeet: CHAIRS[chair], touch: () => false, onHoldem() {}, onIliac() {}, onStand() {},
-      online: { send: () => true, myId: () => id, now: () => GAMBIT_FIRST_MS + 1000, table: 0, chairs: 4, chair, chairFeet: (k) => CHAIRS[k], welcomes: () => 1 },
-    });
-    for (const f of frames) g.relay(f);
-    return { g, step: (ms) => { local += ms; g.frame(local); } };
-  };
-  const seats = { a: page('a', 0), b: page('b', 2), watcher: page('c', 3) };
-  assert.equal(seats.watcher.g.g.watcher, true, 'the third chair watches');
-  const forfeit = gambitForfeit(table, { id: 'b', gameNo: table.gameNo, now: GAMBIT_FIRST_MS + 5000 }).map((x) => ({ t: 'gambit', table: 0, now: 0, ...x.frame }));
-  listen();
-  try {
-    const out = {};
-    for (const [who, p] of Object.entries(seats)) {
-      heard.length = 0;
-      for (const f of forfeit) p.g.relay(f);
-      p.step(10); p.step(GAMBIT_RESULT_MS);
-      assert.equal(p.g.g.phase, 'over', `${who}: decided`);
-      out[who] = kinds();
-    }
-    assert.deepEqual(out, { a: ['gambit-won'], b: [], watcher: [] }, 'the host won by the guest\'s forfeit');
-  } finally { done(); }
-});
-
 test('QL11 fish-caught (scenes/deepWater/deepWatersFish.js remove): a fish whose item was taken (its loot emptied - only the player\'s loot window empties one) - once, as it goes; one that swam off whole (the pulse\'s despawn), none (mutants: ACTS M9 a despawned fish counted; counted at every remove)', () => {
   const host = createDeepWatersFish({
     settings: () => ({ frequency: 3, maxLive: 50, waterDepth: 200 }), canRunHeavy: () => true, exteriorWaterContext: () => true, playerPosition: () => [0, 0, 0],
@@ -733,44 +617,6 @@ test('QL11 raid-repelled (systems/raidingParties.js cleanse): a raid I fought (a
     assert.deepEqual(await cleansed({ pixel: { x: 200, y: 100 }, fight: false }), [], 'unfought');
     assert.deepEqual(await cleansed({ pixel: { x: 201, y: 100 }, fight: true }), [], 'fought, but off the town\'s pixel at the cleanse');
   } finally { done(); _resetRaidingParties(); _resetRenownKillsForTests(); modsOff(); }
-});
-
-test('QL11 cards-won offline (systems/iliac/iliacTableSession.js _finish): an Iliac game against a regular won - once each; a game lost or drawn, none (mutants: ACTS M11 a lost game counted; a draw counted)', () => {
-  const src32 = (seed) => { const u = seededUnit(seed); return () => Math.floor(u() * 4294967296); };
-  const ends = { won: 0, lost: 0, draw: 0 };
-  listen();
-  try {
-    for (let seed = 1; seed <= 12; seed++) {
-      const s = new IliacTableSession({ player: { id: 'you', name: 'Ves', deck: STARTER_DECK.slice() }, patron: { id: 'regular:1', name: 'Bors', temper: 'loose', grade: 0, deck: patronDeck(4, 'loose', 0) }, rand32: src32(seed), now: 0 });
-      const u = seededUnit(seed + 100);
-      for (let turn = 1; turn <= ILIAC_TURNS && !s.over; turn++) { const at = s.thinkAt; s.tick(at); s.playerCommit(patronPlays(s.state, 0, 'tight', 2, u), at); s.tick(at + ILIAC_REVEAL_MS); }
-      ends[s.over]++;
-    }
-    assert.ok(ends.won > 0 && ends.lost > 0 && ends.draw > 0, `won, lost and drawn among them: ${JSON.stringify(ends)}`);
-    assert.deepEqual(heard, Array(ends.won).fill(['cards-won', 1]), 'one a game won');
-  } finally { done(); }
-});
-
-test('QL11 cards-won offline (systems/card/cardTableSession.js, a Hold\'em evening against the regulars): each hand whose main pot I take (or share) - once; a hand I fold or lose, none (mutants: ACTS M12 any showdown counted)', () => {
-  const seeded = (seed) => { let x = seed >>> 0; return () => { x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; return x >>>= 0; }; };
-  const s = new CardTableSession({ player: { id: 'you', name: 'You', stack: 300 }, patrons: [{ id: 'patron:0', name: 'Ana', temper: 'loose', stack: 300 }, { id: 'patron:1', name: 'Bors', temper: 'tight', stack: 300 }], stakes: { sb: 5, bb: 10 }, rand32: seeded(7), now: 0 });
-  let won = 0, lost = 0;
-  listen();
-  try {
-    // 'cautious' (test/systems/card/cards4_session.test.js): checks, calls up to two big blinds, folds the rest
-    for (let now = 0; now < 2_000_000 && !s.over && s.handNo <= 12; now += 100) {
-      s.tick(now);
-      const legal = s.legal();
-      if (legal) s.playerAct(legal.check ? { type: 'check' } : legal.call <= 20 ? { type: 'call' } : { type: 'fold' }, now);
-      for (const e of s.drain()) {
-        if (e.t !== 'showdown') continue;
-        const k = e.seats.indexOf(s.playerSeat);
-        if (k >= 0 && e.result.pots[0]?.winners.includes(k)) won++; else lost++;
-      }
-    }
-    assert.ok(won > 0 && lost > 0, `hands won and lost: ${won}, ${lost}`);
-    assert.deepEqual(heard, Array(won).fill(['cards-won', 1]), 'one a hand won');
-  } finally { done(); }
 });
 
 test('QL11 fish-caught (scenes/fishHost.js, the net\'s answered haul): every haul the service answered - a trophy\'s or not - once (mutants: ACTS M13 only a trophy haul counted)', () => {

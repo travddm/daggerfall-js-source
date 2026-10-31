@@ -508,8 +508,8 @@ export function interiorVoidRescue(collider, at) {
  *  triangle. A dungeon had no failsafe: its collider has no ground (heightAt -Infinity), so a body out of its floor - a
  *  mover's work before MOVER-BODY, a swimmer under the floor, a save made there - fell or swam on for good, and
  *  /unstuck, the one way out, waits out its cooldown. Null with no such spot or a collider with nothing in it - and in
- *  a realm that casts its own void back (`ownsVoid`: the Hour's Unmoored Steps, SD7b; an Elite Breach's spans, EG
- *  section 8), whose fall costs what its own law says. */
+ *  a realm that casts its own void back (`ownsVoid`: the Hour's Unmoored Steps, SD7b), whose fall
+ *  costs what its own law says. */
 export function dungeonVoidRescue(collider, at, ownsVoid = false) {
   let rescue;
   return () => {

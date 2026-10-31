@@ -181,7 +181,7 @@ test('QL3 the fit: never a piece the class may not equip, a weapon of the player
 // ---- the named pieces (REWARD-5) ----
 
 test('QL3 a named piece is made FROM its base (AUDIT QUESTLINES REWARD-5): every sheet\'s named piece names a base of its kind; the card is that template, the name the sheet\'s, no metal before it; a holder who cannot wear the base gets the card unnamed (mutants: name never set; the base ignored; the fit skipped for the named card; the metal prefix kept)', () => {
-  assert.equal(NAMED.length, 28, 'the questlines\' 28 named pieces');   // PIN MOVED (STAR8): the Thirteenth of Frostfall's three; PIN MOVED (AUDIT STAR8 T2): and the Heart-Star Ring; PIN MOVED (KETCH): and the Sky-Ketch's two - Bel-Tavir's Tuning-Charm, the Steersman's Hammer
+  assert.equal(NAMED.length, 23, 'the questlines\' 23 named pieces');   // PIN MOVED (Elite Gates removed): the Weir Road's two gone; PIN MOVED (STAR8): the Thirteenth of Frostfall's three; PIN MOVED (AUDIT STAR8 T2): and the Heart-Star Ring
   for (const { quest, named } of NAMED) {
     const base = namedBaseOf(named);
     assert.ok(base != null, `${quest} ${named.name}: base "${named.base}" is a ${named.kind} the roll makes`);
@@ -283,31 +283,31 @@ test('QL3 a failure\'s standing obeys QFAIL-FREE (AUDIT QUESTLINES REWARD-14): o
 
 test('QL3 a named piece is spent when TAKEN, never when rolled (AUDIT QUESTLINES LINES-20): a second ending names nothing once it is taken; a card chosen instead leaves the name for a later ending; one waiting offer holds a line\'s name at a time (mutants: named every time; the name spent on take deleted)', () => {
   const { layer } = fixtureLayer();
-  const first = layer.ending(endedQuest('QLWR04', 'mercy', 1));
+  const first = layer.ending(endedQuest('QLCH03', 'seal', 1));
   const named = first.pieces.find((p) => p.named);
-  assert.ok(named, 'the first mercy names Corvane\'s blade');
-  assert.equal(named.item.name, 'Corvane\'s Spire-Blade');
-  assert.equal(layer.history()['named:QLWR04'], undefined, 'not spent by the roll');
-  const waiting = layer.ending(endedQuest('QLWR04', 'mercy', 2));
+  assert.ok(named, 'the first seal names the Hourkeeper\'s signet');
+  assert.equal(named.item.name, 'Hourkeeper\'s Linen Signet');
+  assert.equal(layer.history()['named:QLCH03'], undefined, 'not spent by the roll');
+  const waiting = layer.ending(endedQuest('QLCH03', 'seal', 2));
   assert.equal(waiting.pieces.some((p) => p.named), false, 'a name a waiting offer holds is not rolled twice');
   layer.take(waiting.id, 2);   // the jewel of the second: no name spent
-  assert.equal(layer.history()['named:QLWR04'], undefined);
+  assert.equal(layer.history()['named:QLCH03'], undefined);
   layer.take(first.id, first.pieces.indexOf(named));
-  assert.equal(layer.history()['named:QLWR04'], 'Corvane\'s Spire-Blade', 'spent when taken');
-  const later = layer.ending(endedQuest('QLWR04', 'mercy', 3));
+  assert.equal(layer.history()['named:QLCH03'], 'Hourkeeper\'s Linen Signet', 'spent when taken');
+  const later = layer.ending(endedQuest('QLCH03', 'seal', 3));
   assert.equal(later.pieces.some((p) => p.named || p.item.qlNamed), false, 'once a character');
   // a card chosen instead of the named one: the name is the line's still
   const { layer: other } = fixtureLayer();
-  const a = other.ending(endedQuest('QLWR04', 'truth', 4));
+  const a = other.ending(endedQuest('QLCH03', 'seal', 4));
   const ai = a.pieces.findIndex((p) => !p.named);
   other.take(a.id, ai);
-  assert.equal(other.history()['named:QLWR04'], undefined);
-  assert.ok(other.ending(endedQuest('QLWR04', 'truth', 5)).pieces.some((p) => p.named), 'offered again');
+  assert.equal(other.history()['named:QLCH03'], undefined);
+  assert.ok(other.ending(endedQuest('QLCH03', 'seal', 5)).pieces.some((p) => p.named), 'offered again');
 });
 
 test('QL3 the cap (OFFERS_MAX): the oldest offer naming no piece goes first and its going is said; a named one outlives twelve newer (AUDIT QUESTLINES LINES-20, REWARD-8) (mutants: the cap cuts the oldest whatever it holds; the dropped offer unsaid)', () => {
   const { layer, rec } = fixtureLayer();
-  const named = layer.ending(endedQuest('QLWR04', 'mercy', 1));
+  const named = layer.ending(endedQuest('QLCH03', 'seal', 1));
   assert.ok(named.pieces.some((p) => p.named));
   const plain = [];
   for (let i = 0; i < OFFERS_MAX; i++) plain.push(layer.ending(endedQuest('M0B00Y06', 'done', 10 + i)));
@@ -367,16 +367,16 @@ test('QL3 the gold still owed, pure: the settled outcome\'s factor above the one
   assert.equal(goldStillOwed(null, { pay: 'greater' }), 0, 'nothing paid, nothing owed');
 });
 
-test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11): QLWR04\'s mercy in a party of two - the HUD names the purse the pile holds (mutants: the split before the scale)', () => {
+test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11): QLCH03\'s seal in a party of two - the HUD names the purse the pile holds (mutants: the split before the scale)', () => {
   const { bridge, rec, start, tick } = packBridge({ entity: { ...FIGHTER, level: 20 }, over: { partySize: () => 2 } });
-  const q = start('QLWR04');
+  const q = start('QLCH03');
   for (const t of q.tasks.values()) for (const a of t.actions) if (a.typeName === 'PlaceNpc') a.isComplete = true;
-  bridge.machine.markQuestShared('QLWR04');
+  bridge.machine.markQuestShared('QLCH03');
   // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS, machine.js rewardShares): the shares are the copies held, not the party's
   // size - the partner's answer (its envelope of the copy) names it a holder before the split is two
-  bridge.machine.noteShareHolder('QLWR04', 'acct-b');
+  bridge.machine.noteShareHolder('QLCH03', 'acct-b');
   const minted = q.getItem({ name: 'gold' }).daggerfallUnityItem.stackCount;
-  q.getTask({ name: 'tomercy' }).start(); tick(6);
+  q.getTask({ name: 'toseal' }).start(); tick(6);
   const pile = rec.rewards.find((i) => i.group === 'Currency');
   assert.equal(pile.stackCount, Math.floor(Math.round(minted * 1.25) / 2), 'scaled, then halved');
   assert.deepEqual(rec.hud.filter((h) => /share/.test(h)), [`Your share of the party's reward: ${pile.stackCount} gold.`]);

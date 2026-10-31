@@ -107,8 +107,7 @@ export function weaponGlow(item, { arcane = false, on, ladder } = {}) {
  * THE LOOKS' COLOURS, the one table both drawers read: four stops each, dark to hot, linear 0..1 RGB. The sprite's
  * outline steps through them in Daggerfall's own way (a ramp of a few palette shades, never a smooth blend); the
  * Morrowind shell mixes them. Fire is an ember's red to a flame's white heart; frost a deep glacier blue to rime;
- * shock an indigo to a spark's violet-white; arcane the Thunderlock's enchanted blue-violet (thunderlockArt.js
- * MAGIC_TINT) - the one enchanted look the port already drew.
+ * shock an indigo to a spark's violet-white; arcane an enchanted blue-violet.
  */
 export const GLOW_RAMPS = Object.freeze({
   fire: Object.freeze([[0.45, 0.06, 0.02], [0.88, 0.27, 0.04], [1.0, 0.62, 0.12], [1.0, 0.93, 0.62]]),

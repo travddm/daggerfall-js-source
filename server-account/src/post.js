@@ -12,12 +12,7 @@
 // box, open one, CLAIM its item, and throw one away. Nothing here writes
 // a piece: the operator's workflow does (.github/workflows/server-post.yml,
 // tools/sendServerPost.mjs), and no route a player can reach sends one of
-// a player's choosing. EG-ZF (2026-10-12): the one letter a list in the
-// operator's config sends - First of the Spire's, its words fixed, once an
-// account the list names (egHonours.js egFirstPost, at its balance's read).
-// EG-ZM (2026-10-12): and the service's own hourly clock's - a Weir Key's
-// stake spent with no receipt ever naming it, its words fixed, one a stake
-// (eg.js spendLapsedStakes, cron.js).
+// a player's choosing.
 //
 // ═══ A READER'S POST IS THEIRS ALONE ═══════════════════════════════
 //
@@ -41,19 +36,20 @@
 import { realmActFirst, prepareRealmRecord, mustChange, dropObjects, dropIfUnnamed, recordMovedOf, REALM_ID_RE } from './realm.js';
 import { giveTradeGoods } from '../../src/net/realm/realmTradeLaw.js';
 import { POST_ID_RE, POST_BOX_MAX, postItemHead } from '../../src/net/postLaw.js';
-import { isLostBatch } from '../../src/net/lostLaw.js';   // LOST-SPOILS: the Lost and Found's pieces, charged to the budget
+import { isLostBatch } from '../../src/net/lostLaw.js';
+import { lawTemplate } from '../../src/systems/item/itemLaw.js';   // a gift of a template the game no longer knows is no item   // LOST-SPOILS: the Lost and Found's pieces, charged to the budget
 import { isReportReader, reportCountsOf } from './reports.js';   // PRIVATE-REPORT: a reader's box counts the reports waiting
-import { shopWareById } from '../../src/net/shopLaw.js';   // SHOP: a receipt names the ware it granted
 
 /** The record a row holds, or null. AUDIT SERVER-POST: ONE ANSWER to "does this piece hold an item" for the box, the
  *  claim and the throw - a record the box can name (postItemHead) - so no row can be listed as words alone and refused as
  *  holding a gift, or claimed where the box shows nothing to claim. A row the operator wrote is such a record; any other
- *  is no item. */
+ *  is no item - and so is a record of a template the game no longer knows (migration 0094's Hourlock, template 560, sent
+ *  before the guns were removed): it is never written into a character, and the piece can be thrown away. */
 export const recordOf = (/** @type {any} */ row) => {
   if (typeof row?.item !== 'string') return null;
   let r = null;
   try { r = JSON.parse(row.item); } catch { return null; }
-  return r && typeof r === 'object' && !Array.isArray(r) && postItemHead(r) ? r : null;
+  return r && typeof r === 'object' && !Array.isArray(r) && postItemHead(r) && lawTemplate(r.templateIndex) ? r : null;
 };
 
 /** A row's head as the box lists it. */
@@ -62,7 +58,6 @@ const headOf = (/** @type {any} */ row) => {
   return {
     id: row.id, from: row.sender, subject: row.subject, sentAt: row.sent_at, read: row.read_at != null,
     item, claimed: item ? row.claimed_at != null : false,
-    ...(shopWareById(row.ware) ? { ware: row.ware } : {}),   // SHOP: a receipt's ware, drawn in the letter - nothing to claim
   };
 };
 
@@ -76,7 +71,7 @@ const headOf = (/** @type {any} */ row) => {
 export async function postBoxOf({ db }, reader, env = null) {
   // AUDIT SERVER-POST: WHAT WAITS FIRST - a gift not yet claimed, then the unread, then the rest newest first: the box
   // lists POST_BOX_MAX, and a gift behind fifty newer pieces had been neither shown nor counted
-  const { results = [] } = await db.prepare(`SELECT id, sender, subject, item, sent_at, read_at, claimed_at, ware FROM server_post
+  const { results = [] } = await db.prepare(`SELECT id, sender, subject, item, sent_at, read_at, claimed_at FROM server_post
     WHERE to_id = ? ORDER BY (item IS NOT NULL AND claimed_at IS NULL) DESC, (read_at IS NULL) DESC, sent_at DESC, id DESC LIMIT ?`).bind(reader.id, POST_BOX_MAX).all();
   const post = results.map(headOf);
   return {
@@ -94,7 +89,7 @@ export async function postBoxOf({ db }, reader, env = null) {
  */
 export async function readPost({ db, nowS }, reader, id) {
   if (typeof id !== 'string' || !POST_ID_RE.test(id)) return { error: 'no-post' };
-  const row = await db.prepare('SELECT id, sender, subject, body, item, sent_at, read_at, claimed_at, ware FROM server_post WHERE id = ? AND to_id = ?')
+  const row = await db.prepare('SELECT id, sender, subject, body, item, sent_at, read_at, claimed_at FROM server_post WHERE id = ? AND to_id = ?')
     .bind(id, reader.id).first();
   if (!row) return { error: 'no-post' };
   if (row.read_at == null) await db.prepare('UPDATE server_post SET read_at = ? WHERE id = ? AND to_id = ? AND read_at IS NULL').bind(nowS, id, reader.id).run();

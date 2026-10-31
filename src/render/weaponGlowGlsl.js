@@ -109,7 +109,7 @@ export const GLOW_SPRITE_WINDOW = Object.freeze(Object.fromEntries(['fire', 'fro
   return [look, Object.freeze(look === 'fire' ? [Math.floor(e), Math.floor(r * GLOW_FIRE_DOWN), Math.floor(e * GLOW_FIRE_UP)] : [Math.floor(e), Math.floor(e), Math.floor(e)])];
 })));
 /** AUDIT WEAPON-GLOW SPR-1: the most frames' fields the renderer keeps (render/renderer.js drawScreenQuadGlow) - a
- *  weapon's sheet is seven records of a few frames each, so two weapons' worth and the Thunderlock's; the least
+ *  weapon's sheet is seven records of a few frames each, so two weapons' worth and more; the least
  *  recently drawn goes first. */
 export const GLOW_FIELDS_MAX = 128;
 
@@ -227,7 +227,7 @@ void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
 /** AUDIT WEAPON-GLOW SPR-1: THE FRAME'S FIELD, baked once a frame and look (render/renderer.js _glowField) - the
  *  search the outline used to run for every screen pixel of every frame (up to 234 texel reads each, 80 times the
  *  sprite's own cost) run once, a cell at a time, into a small RGBA8 picture the outline then reads once a pixel. A cell
- *  is a Daggerfall pixel of the frame (`uArt` cells over the texture's texels - SPR-4: an HD frame's or the Thunderlock's
+ *  is a Daggerfall pixel of the frame (`uArt` cells over the texture's texels - SPR-4: an HD frame's
  *  outline the size of a classic one's, never a few texels thin), solid when the texel at its middle is at half alpha.
  *  Out: r the distance to the nearest solid cell in the look's metric over `uDmax` (1 for none within), g whether that
  *  cell is below (a fire ember rises only off a solid), b the cell's own kind - 0 open, 0.5 an edge (the rim), 1 inside.

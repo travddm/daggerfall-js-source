@@ -772,9 +772,8 @@ async function _openMorrowindArchives(gen) {
   } catch (err) {
     console.warn(`weapon sheathing assets: ${err.message}`);
   }
-  // FIELD-GUN-MW2: THE PORT'S OWN Morrowind assets - the Dwarven
-  // Thunderlock's mesh and texture, which no player's archives can
-  // carry because Morrowind has no firearm. Same rank and the same
+  // THE PORT'S OWN Morrowind assets - the meshes and textures of
+  // pieces no player's archives can carry. Same rank and the same
   // reason as the line above: after the loose files, so Mac dropping
   // his own texture in REPLACES ours without a rebuild, and before
   // every .bsa, where these names do not exist.

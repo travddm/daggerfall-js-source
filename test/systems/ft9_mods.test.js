@@ -17,7 +17,6 @@ import '../../src/world/landView.js';   // RF4: the condensed rows' lanes regist
 import '../../src/world/outdoors.js';
 import '../../src/systems/featureLanes.js';   // FT18: the wind, the quick slots and the blood lanes register themselves too
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
-import { CREDITS } from '../../src/ui/credits.js';
 
 const rows = FEATURES.filter((f) => f.control.store === 'mods');
 
@@ -48,9 +47,8 @@ test('FT9: every vendored mod with a switch has exactly one row over it, and eve
   const tagged = filterFeatures(FEATURES, 'mod');
   const notMods = tagged.filter((f) => !rows.includes(f)).map((f) => f.id).sort();
   // AUDIT SURV E: Climates & Calories is a PREF too (one switch, on by default, no settings file) and wears the tag
-  // KG3: and The King's Gambit - a pref, its bundle shipping no settings file
-  assert.deepEqual(notMods, ['enhanced-environments', 'mod-climates-calories', 'mod-kings-gambit', 'mod-weapon-sheathing', 'mod-windmills-kamer'],
-    'the only Mod Authored rows that are not mods-store rows: Dynamic Skies rides the outdoors row, Windmills is a pref, Weapon Sheathing (WS1) is a pref - the mod ships art and no settings - and The King\'s Gambit (KG3) is a pref, its bundle shipping no settings');
+  assert.deepEqual(notMods, ['enhanced-environments', 'mod-climates-calories', 'mod-weapon-sheathing', 'mod-windmills-kamer'],
+    'the only Mod Authored rows that are not mods-store rows: Dynamic Skies rides the outdoors row, Windmills is a pref, and Weapon Sheathing (WS1) is a pref - the mod ships art and no settings');
   assert.equal(tagged.length, rows.length + notMods.length);
 });
 
@@ -65,12 +63,6 @@ test('FT9: a mod row is the mod\'s own - the creator in the title, the modsettin
     assert.match(f.effect, /^Takes effect /, `${f.id} says when`);
   }
   assert.deepEqual(rows.map((f) => f.id), ['mod-seasons-iliac-bay', 'mod-low-poly-trees', 'mod-heat-haze', 'mod-windfall', 'mod-snowfall', 'mod-roads-hazelnut', 'mod-travel-options', 'mod-immersive-travel', 'mod-world-of-daggerfall', 'mod-aquatic-sprites', 'mod-detailed-ships', 'mod-beautiful-villages', 'mod-beautiful-cities', 'mod-warm-ashes-ships', 'mod-world-events-raiding-parties', 'mod-iliac-puddle-no-more', 'mod-ocean-holes', 'mod-come-sail-away', 'mod-foraging', 'mod-meanermonsters', 'mod-daggerfall-enemy-expansion', 'mod-pcaao', 'mod-unleveledloot', 'mod-weapon-widget', 'mod-shield-widget', 'mod-readied-spellcasting-hands', 'mod-diverse-weapons', 'mod-roleplay-realism-items', 'mod-roleplay-realism', 'mod-handheld-torches', 'mod-ambient-text', 'mod-eye-of-the-beholder', 'mod-immersive-footsteps', 'mod-world-tooltips', 'mod-better-ambience', 'mod-horse-cart-and-cargo', 'mod-physical-items', 'mod-oblivion-remaster-leveling', 'mod-project-legacy'], 'the Mods pane\'s order');
-  // KG3: a pref row carries its creator too (AUDIT SURV E) - The King's Gambit's bundle names none, so the credits' own
-  // unnamed form, one source: the row says what the About pane says (mutant: the creator dropped)
-  const kg = FEATURES.find((f) => f.id === 'mod-kings-gambit');
-  const credit = CREDITS.mods.find((m) => m.vendor?.includes('kings-gambit'));
-  assert.equal(kg.title, `${credit.title} by ${credit.author}`);
-  assert.equal(kg.title, 'The King\u2019s Gambit by Unnamed (thekingsgambit.dfmod)');
 });
 
 test('FT9: when each switch lands, as the port knows it', () => {

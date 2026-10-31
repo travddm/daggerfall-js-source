@@ -41,7 +41,7 @@ export const LAMP_KEEPER_RECORDS = Object.freeze([0, 1, 2]);
 /** The lamp: Kludge Town's street lamp, the classic TEXTURE.197 record 6 the bug drew. */
 export const LAMP_CLASSIC = Object.freeze({ archive: 197, record: 6 });
 /** The port's own key its classic picture is uploaded under (after world/portArt.js PORT_ARCHIVE's 38231, registered in
- *  world/eliteGates/pseudoArchives.js; AUDIT FIVE-ASKS D7 took 38241, which the Elite Breach's Broken Galleries hold - EG-G2's
+ *  world/pseudoArchives.js; AUDIT FIVE-ASKS D7 took 38241, which the Elite Breach's Broken Galleries hold - EG-G2's
  *  registry refused the pair at the merge of main into the Spire, and the lamp, a runtime key nothing stores, moved), so a
  *  pack's 197_6 - Roleplay & Realism's keeper - and the lamp never share one. */
 export const LAMP_ARCHIVE = 38232;

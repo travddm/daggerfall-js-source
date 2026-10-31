@@ -39,12 +39,6 @@
 # key - all eight split by the same times, so every file is still in
 # exactly one shard; a key gone between the two fails the shard, never
 # splits it apart. No saved times yet: the committed file, as before.
-#
-# EG6a (2026-10-12): and THE COURSE SWEEP - every Elite Breach course crossed
-# step by step by the real player motor, `sweep` seeds a band (25 here;
-# relay-deploy.yml asks 500), in eg-sweep.yml's four band jobs beside the
-# shards (six parts a band past a hundred seeds - SWEEP-FAST).
-# test/tooling/eg6a_sweep.test.js holds the wiring.
 name: verify
 
 on:
@@ -58,10 +52,6 @@ on:
         description: Run the build as a part (the deploy builds its own site).
         type: boolean
         default: true
-      sweep:
-        description: Seeds a band the course sweep crosses with the real motor (eg-sweep.yml) - 25 on a pull request, 500 before a relay deploy.
-        type: number
-        default: 25
     outputs:
       times:
         description: The cache key of the times the shards were split by (empty - the committed tools/testTimes.json); test-times.yml merges this run's records onto them.
@@ -159,12 +149,6 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
           overwrite: true   # a re-run of the shard replaces its own record
-
-  sweep:
-    uses: ./.github/workflows/eg-sweep.yml
-    with:
-      ref: ${{ inputs.ref }}
-      seeds: ${{ inputs.sweep }}
 
   build:
     if: ${{ inputs.build }}

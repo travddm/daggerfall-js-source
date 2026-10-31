@@ -199,17 +199,12 @@ const NO_PERSON = Object.freeze({
   'src/scenes/droppedTorches.js': 'torches',
   'src/scenes/exteriorFoes.js': 'foes as mobile units',
   'src/scenes/gate/gateCourt.js': 'the gate boss as a mobile unit, and his corpse',
-  'src/scenes/eliteGates/egFight.js': 'an Elite Breach\'s champion or Court lord as a mobile unit (EG-PLAY)',
-  'src/scenes/eliteGates/egLordFall.js': 'a felled Elite Breach lord\'s corpse, its mobile\'s own (EG-FALL)',
   'src/scenes/gate/gateHost.js': 'the boss\'s host as mobile units',
   'src/scenes/gate/gateFlame.js': 'the boss\'s Flame (WB14d) as a mobile unit - his aspect\'s Atronach',
   'src/scenes/gate/gateCaptive.js': 'the Captive (WB14f) as a mobile unit - Daggerfall\'s Knight (archives 488 and 487), never the table\'s flats',
   'src/scenes/gatherHost.js': 'gathering nodes',
   'src/scenes/hideouts.js': 'a band\'s camp fire (its people are the encounter pool\'s own)',   // LW12
   'src/scenes/hitEffects.js': 'hit splashes',
-  'src/scenes/ketch/ketchDeckHost.js': 'the sky-ketch\'s clouds round her deck and her engine\'s steam (KT_ARCHIVE) - never a person',   // KETCH
-  'src/scenes/ketch/ketchFight.js': 'the sky-ketch\'s Dwarven constructs as mobile units - never a person; the Warden is a construct too',   // KETCH
-  'src/tools/ketchLab.js': 'the lab\'s Tonal Warden (?warden), a Dwarven construct - never a person',   // KETCH-LOOK KL2
   'src/scenes/horseCartPool.js': 'the cart\'s horse',
   'src/scenes/hostMagic.js': 'spell missiles',
   'src/scenes/lefayMonumentHost.js': 'flowers thrown at Julian LeFay\'s monument (TEXTURE.254\'s roses)',   // LEFAY1

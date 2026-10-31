@@ -1,0 +1,117 @@
+// @ts-check
+// EG-G2 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md sections 11.6 and 25.1 - EG1's
+// registry): THE ONE REGISTRY OF PSEUDO-ARCHIVES - every texture archive the port answers that is not one of
+// Daggerfall's own TEXTURE.000-511, in one place, so a new one is picked against all the others and never on top of one.
+//
+// A picture is kept by its archive and its record (renderer.uploadTexture(archive, record, ...)), so two owners that
+// pick one number share every picture under it: whichever uploads first stands for both. That happened once (AUDIT SD IV
+// R6: the large boat took 38151, the Shattered Hour's own, and was moved to 38171), and the numbers were scattered
+// constants with nothing to say which were taken. Four kinds live here:
+//   port       - painted in code by the port (bloodArt.js's law, BLOOD_ATLAS_ARCHIVE 38001, and every made level since);
+//   mod        - a mod's own archive the port carries (Handheld Torches, the shields, Eye Of The Beholder, the waves);
+//   data       - a number Daggerfall's own block data names that no catalogue holds, which the port answers with a
+//                stand-in (the towns' clutter and gardens) - never to be taken by a picture of ours;
+//   synthetic  - a number the port mints at runtime (the peers' dolls).
+// A string key (`'cards'`, `'hcc'`) is a pseudo-archive too - the renderer keys a picture by `${archive}_${record}`, so a
+// string can collide only with a string - and is registered beside the numbers.
+//
+// Each owner keeps its own constant (its module, its pins); this registry says the number is taken and by whom, and
+// test/world/eglook_registry.test.js sweeps the source both ways - every `*ARCHIVE*` constant past TEXTURE.511 in src/ is
+// registered here at its own value and owner, every registered constant still stands in its owner - and refuses any two
+// entries that overlap.
+//
+//
+// A leaf: no imports. Not a DFU member. Ledger A (ELITE-GATES).
+
+/** The last of Daggerfall's own texture archives (TEXTURE.511 - scenes/dataPipeline.js LAST_CLASSIC_TEXTURE_ARCHIVE). A
+ *  pseudo-archive number lies past it. */
+export const PSEUDO_ARCHIVE_FLOOR = 511;
+
+/**
+ * @typedef {{ from: number, to: number, owner: string, name: string, kind: 'port'|'mod'|'data'|'synthetic', what: string }} PseudoArchiveRange
+ * @typedef {{ key: string, owner: string, name: string, what: string }} PseudoArchiveKey
+ */
+const N = (from, owner, name, kind, what, to = from) => Object.freeze({ from, to, owner, name, kind, what });
+const K = (key, owner, name, what) => Object.freeze({ key, owner, name, what });
+
+/** EVERY NUMBERED PSEUDO-ARCHIVE, lowest first: `from`-`to` inclusive, the owner's file (under src/), the constant that
+ *  names its first number there, its kind and what it
+ *  holds. @type {ReadonlyArray<PseudoArchiveRange>} */
+export const PSEUDO_ARCHIVES = Object.freeze([
+  N(10035, 'world/townStandIns.js', 'TOWN_GARDEN_ARCHIVE', 'data', "the temples' gardens Daggerfall's blocks name"),
+  N(38001, 'combat/blood/bloodArt.js', 'BLOOD_ATLAS_ARCHIVE', 'port', 'the blood atlas'),
+  N(38101, 'world/gate/gateModel.js', 'GATE_ARCHIVE', 'port', "Dagon's Breach's gate stone"),
+  N(38111, 'world/gate/gateArena.js', 'COURT_ARCHIVE', 'port', 'the Burning Court'),
+  N(38121, 'scenes/spoilsPool.js', 'SPOILS_ICON_ARCHIVE', 'port', "the gate's spoils' pictures"),
+  N(38131, 'world/ships/galleonArt.js', 'GALLEON_ARCHIVE', 'port', 'the galleon'),
+  N(38141, 'world/ships/carrackArt.js', 'CARRACK_ARCHIVE', 'port', 'the carrack'),
+  N(38151, 'world/superDungeon/sdRealm.js', 'SD_REALM_ARCHIVE', 'port', 'the Shattered Hour'),
+  N(38155, 'world/superDungeon/sdRemnantArt.js', 'SD_REMNANT_ARCHIVE', 'port', 'the Brass Remnant'),
+  N(38161, 'scenes/physicalItemsLayer.js', 'PI_ICON_ARCHIVE', 'port', "the physical items' pictures"),
+  N(38171, 'world/ships/largeBoatArt.js', 'LARGE_BOAT_ARCHIVE', 'port', 'the large boat (moved from 38151 - AUDIT SD IV R6)'),
+  N(38181, 'world/wagonArt.js', 'WAGON_ARCHIVE', 'port', 'the wagons'),
+  N(38191, 'systems/naval/shipLivery.js', 'LIVERY_ARCHIVE', 'port', "a ship's paint - her painted pictures, made at run time (SHIP-LIVERY)"),
+  N(38192, 'scenes/cabinLook.js', 'CABIN_ARCHIVE', 'port', "a ship's cabin stained, made at run time (CABIN-LOOK)"),
+  N(38193, 'scenes/comeSailAway/shipPlaque.js', 'PLAQUE_ARCHIVE', 'port', "a ship's name boards, painted at run time (SHIP-PLAQUE)"),
+  N(38201, 'world/townStandIns.js', 'TOWN_BED_ARCHIVE', 'port', "the towns' beds"),
+  N(38202, 'world/townPictures.js', 'TOWN_PICTURE_ARCHIVE', 'port', "the towns' pictures"),
+  N(38211, 'world/lefayMonument.js', 'LEFAY_ARCHIVE', 'port', "Lefay's monument"),
+  N(38221, 'world/merchantYards/merchantYardArt.js', 'YARD_ARCHIVE', 'port', "the merchant yards"),
+  N(38231, 'world/portArt.js', 'PORT_ARCHIVE', 'port', "the harbour - the shipyard and the lighthouse"),
+  N(38232, 'systems/lampKeeper.js', 'LAMP_ARCHIVE', 'port', "Kludge Town's lamp - the classic 197_6 under the port's own key (LAMP-KEEPER II)"),
+  N(38291, 'world/festivalArt.js', 'FESTIVAL_ARCHIVE', 'port', "the Witches' Festival - the Soul Cake, the Hearth Offering and the towns' turnip lanterns, effigies and ward-staves (WITCH1; a block of nine)", 38299),
+  N(38301, 'world/starfall/starArt.js', 'STAR_ARCHIVE', 'port', 'the fallen star - its crater, its stone and its thread (STAR4)'),
+  N(38302, 'world/starfall/starglassArt.js', 'STARGLASS_ARCHIVE', 'port', 'Starglass, the glass a held star leaves (STAR7)'),
+  N(38321, 'systems/lockpick/lockpickArt.js', 'LOCKPICK_ARCHIVE', 'port', 'the Lockpick - a hook pick over a tension wrench (LOCKPICK)'),
+  N(38331, 'world/tamriel/ghostfenceModel.js', 'GHOSTFENCE_ARCHIVE', 'port', "the Ghostfence - its pylons' basalt and their orbs' light (GHOSTFENCE)"),
+  N(38400, 'world/capitalShapes.js', 'CAPITAL_ARCHIVE', 'port', "the capitals past the Bay - their stone, roofs, domes and statues, painted at run time (TESA10, TESA-LORE)"),
+  N(38500, 'world/urban/urbanRecords.js', 'URBAN_ARCHIVE', 'port', "the towns' fabric past the Bay - brick, half-timbering, ashlar and each province's paving, painted at run time (URBANIZER)"),
+  N(38990, 'tools/abyssLab.js', 'LAB_ARCHIVE', 'port', "the abyss lab's walls and floor"),
+  N(56790, 'world/townStandIns.js', 'TOWN_CLUTTER_ARCHIVE', 'data', "the towns' clutter Daggerfall's blocks name"),
+  N(112358, 'systems/handheldTorches.js', 'DROPPED_ARCHIVE', 'mod', 'Handheld Torches: a dropped torch'),
+  N(112359, 'systems/handheldTorches.js', 'SPRITE_ARCHIVE', 'mod', 'Handheld Torches: the held torch'),
+  N(112360, 'combat/shieldWidget.js', 'SHIELD_ARCHIVE_FIRST', 'mod', 'the shields: buckler, round, kite, tower', 112363),
+  N(112364, 'player/eyeOfTheBeholder/eotbBillboard.js', 'ARCHIVE_FOOT', 'mod', 'Eye Of The Beholder: on foot, sixteen bodies', 112379),
+  N(112380, 'player/eyeOfTheBeholder/eotbBillboard.js', 'ARCHIVE_LYCAN', 'mod', 'Eye Of The Beholder: the werewolf and the wereboar', 112381),
+  N(112382, 'player/eyeOfTheBeholder/eotbBillboard.js', 'ARCHIVE_HORSE', 'mod', 'Eye Of The Beholder: mounted, five', 112386),
+  N(112395, 'systems/comeSailAway/comeSailAwayWaves.js', 'WAVE_ARCHIVE', 'mod', "Come Sail Away's waves"),
+  N(600000, 'poi/poiRuntime.js', 'POI_TEXTURE_ARCHIVE', 'port', "the POIs' textures, a record each look - poi/poiRuntime.js createTextureBook (POI-1, the merge of main)"),
+  N(900000, 'net/remotePlayers.js', 'PEER_ARCHIVE', 'synthetic', "the peers' dolls"),
+]);
+
+/** EVERY STRING PSEUDO-ARCHIVE. @type {ReadonlyArray<PseudoArchiveKey>} */
+export const PSEUDO_ARCHIVE_KEYS = Object.freeze([
+  K('fxportal', 'scenes/portalFx.js', 'PORTAL_ARCHIVE', "the Portal Stone's vortex"),
+  K('hcc', 'scenes/horseCartPool.js', 'HORSE_ARCHIVE', "Horses, Carts and Coaches"),
+  K('htwaist-lantern', 'player/eyeOfTheBeholder/eotbLantern.js', 'LANTERN_ART_KEY', 'the waist lantern'),
+  K('model-icon', 'ui/item/itemScroller.js', 'MODEL_ICON_ARCHIVE', "a model's icon in the item lists"),
+  K('mw-stand', 'scenes/decor/decorRoom.js', 'MW_STAND_ARCHIVE', "a placed Morrowind stand's picture"),
+]);
+
+/** Where two numbered entries overlap: `[[a, b], ...]` by their names (pure - the test's refusal, and any slice's own
+ *  check before it picks a number). */
+export function pseudoArchiveCollisions(list = PSEUDO_ARCHIVES) {
+  const out = [];
+  const sorted = [...list].sort((a, b) => a.from - b.from);
+  for (let i = 1; i < sorted.length; i++) {
+    for (let j = 0; j < i; j++) if (sorted[i].from <= sorted[j].to && sorted[j].from <= sorted[i].to) out.push([`${sorted[j].name}:${sorted[j].from}`, `${sorted[i].name}:${sorted[i].from}`]);
+  }
+  return out;
+}
+
+/** The entry that holds archive `n` (a number or a string key), or null - a free number answers null. */
+export function pseudoArchiveOwner(n) {
+  if (typeof n === 'string') return PSEUDO_ARCHIVE_KEYS.find((e) => e.key === n) ?? null;
+  return PSEUDO_ARCHIVES.find((e) => n >= e.from && n <= e.to) ?? null;
+}
+
+/** The first free block of `size` numbers at or past `from` (a slice's pick - section 11.6's "picked against all the
+ *  others"). Pure. */
+export function pseudoArchiveFree(from, size = 1) {
+  let at = Math.max(from, PSEUDO_ARCHIVE_FLOOR + 1);
+  for (;;) {
+    const hit = PSEUDO_ARCHIVES.find((e) => at <= e.to && e.from <= at + size - 1);
+    if (!hit) return at;
+    at = hit.to + 1;
+  }
+}

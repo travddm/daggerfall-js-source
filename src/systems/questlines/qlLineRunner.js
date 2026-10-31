@@ -21,10 +21,9 @@
 // LETTER-PACE: the next courier's hour counts from it). A step's quest is found by NAME on the
 // machine, never by uid, so a restart (QUEST-RESET - a new copy) or a quest set aside (QUEST-SHELF) is still the step.
 //
-// THE SERVICE'S PART (decision 8; net/questlineClaims.js). A step the service pays - a witnessed one, a title's, the
-// key's - is CLAIMED twice, each claim saying its phase: `open` when it starts (the service writes the opening - the
-// line's first is its witness's window), `end` when it ends well (the service looks for its receipt, and pays the title
-// or the key). A claim the service could not answer - the network down, the switch shut - or an end it could not witness
+// THE SERVICE'S PART (decision 8; net/questlineClaims.js). A step the service pays - a witnessed one or a title's - is
+// CLAIMED twice, each claim saying its phase: `open` when it starts (the service writes the opening - the line's first
+// is its witness's window), `end` when it ends well (the service looks for its receipt, and pays the title). A claim the service could not answer - the network down, the switch shut - or an end it could not witness
 // yet - a receipt not claimed - is asked again: a minute apart CLAIM_TRIES times, then every CLAIM_SLOW_MS for as long
 // as the page lives, and again at the next start of the page - never given up (AUDIT QUESTLINES SERVICE-2: an open
 // dropped after five minutes left a step no deed could witness). An end the service has not witnessed is the step's
@@ -36,13 +35,12 @@ import { questlinesOn } from './qlLaw.js';
 import { t } from '../textManager.js';
 import { lootRarityOn } from '../loot/lootRarity.js';
 import { getPref } from '../uiPrefs.js';
-import { KINGS_GAMBIT_KEY } from '../features.js';
 import { modSetting } from '../modSettings.js';
 import { revenantHeld } from '../revenant/revenant.js';
 import { starfallRuns } from '../../net/starfall/starfallLaw.js';   // STAR8: the Witches' Festival's stars falling
 
 /** AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: WHAT A STEP'S DEED NEEDS, read where the game reads it - Loot rarity's own
- *  switch (a socket, a reforge refuse 'off' without it), The King's Gambit's (no table offers the game), the sea's
+ *  switch (a socket, a reforge refuse 'off' without it), the sea's
  *  (scenes/world.js navalOn: the Naval Combat row and Come Sail Away's own switch), and the Renown a revenant comes at
  *  (revenant.js revenantHeld - online, below it none rises). STAR8: and the Starfall - the Witches' Festival's own calendar
  *  (net/festivalLaw.js, through starfallLaw.js starfallRuns) at `nowMs`, the runner's clock, exactly as the starfall host
@@ -50,7 +48,6 @@ import { starfallRuns } from '../../net/starfall/starfallLaw.js';   // STAR8: th
  *  off waits, saying so. */
 export const NEED_CHECKS = Object.freeze({
   lootRarity: () => lootRarityOn(),
-  kingsGambit: () => !!getPref(KINGS_GAMBIT_KEY),
   naval: () => getPref('naval') !== false && (() => { try { return modSetting('come-sail-away', 'Enabled') !== false; } catch { return false; } })(),
   renown: () => !revenantHeld(),
   starfall: (/** @type {number} */ nowMs) => starfallRuns(nowMs),
@@ -99,11 +96,10 @@ const hasCourier = (quest) => [...(quest?.tasks?.values?.() ?? [])].some((t) => 
 
 /**
  * @param {{ machine: any, ctx?: any, service?: any, nowMs?: () => number }} deps
- *   `ctx` - level(), online(), nowSeconds() (the character's clock), onHonour({ line, title, key, keys }) (a title or key
- *   the service paid - `keys` the account's Weir Keys after it), outcomeText(quest) (the step's outcome in the player's
- *   words, filed with the step);
+ *   `ctx` - level(), online(), nowSeconds() (the character's clock), onHonour({ line, title }) (a title the service
+ *   paid), outcomeText(quest) (the step's outcome in the player's words, filed with the step);
  *   `service` - the account service's door (scenes/quest/questlineHost.js): `claim({ line, step, phase, choice })`
- *   answering `{ ok, data: { opened?, witnessed?, title?, key?, keys?, why? } }`, never a throw; null offline
+ *   answering `{ ok, data: { opened?, witnessed?, title?, why? } }`, never a throw; null offline
  */
 export function createLineRunner({ machine, ctx = {}, service = null, nowMs = () => Date.now() }) {
   /** id -> the line's record */
@@ -160,7 +156,7 @@ export function createLineRunner({ machine, ctx = {}, service = null, nowMs = ()
       // only for a claim an earlier attempt of which went unanswered: its answer may have carried the title, lost after the
       // commit. An answer that arrived told it then, or another character's line laid it
       const title = d.title ?? (c.lost ? d.titleHeld ?? null : null);
-      if (title || d.key || d.keyHeld) ctx.onHonour?.({ line: c.line, title, key: !!d.key, keys: Number.isSafeInteger(d.keys) ? d.keys : null, keyHeld: !!d.keyHeld });
+      if (title) ctx.onHonour?.({ line: c.line, title });
       return;
     }
     // SERVICE-7 (c): no service's answer (offline, a timeout, a 5xx, a body that never came) - it may have committed

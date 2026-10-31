@@ -665,18 +665,16 @@ test('SET3 the round: each recovering power is said ready again at the first mag
 
 test('SET3 the HUD\'s read of the powers: the Rampage\'s stacks and seconds, the halving, the fury and every recovery - whole seconds left, 0 for one not running (mutants: a window read past its end)', () => {
   // PIN MOVED (STAR7): the Starspun Weave's join it - the strands on the foe I last struck, and the Veil's recovery
-  // PIN MOVED (EG15): the Battlemage's Panoply's states join the read - the Discipline's armed element (-1 none), the
-  // Reprieve's shield, window and recovery, and the death saves the Spire holds to its next Redoubt (none here)
   fresh(); online(1);
-  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 });
+  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 });
   const e = wearSet(player(), 'dagon', 6);
   door([], { me: e });
   at(10);
   reportPlayerKill(RAT); reportPlayerKill(RAT);
   at(10.5);
-  assert.deepEqual(setPowerStates(), { rampage: 2, rampageLeft: 12, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 });
+  assert.deepEqual(setPowerStates(), { rampage: 2, rampageLeft: 12, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 });
   at(22);
-  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, armed: -1, reprieve: 0, reprieveLeft: 0, reprieveRecoverLeft: 0, harvestRecoverLeft: 0, redoubt: [], strands: 0, veilRecoverLeft: 0 }, 'every window past its end: 0, never a count below it');
+  assert.deepEqual(setPowerStates(), { rampage: 0, rampageLeft: 0, halvedLeft: 0, unbrokenLeft: 0, wrathLeft: 0, wrathRecoverLeft: 0, eventideLeft: 0, riposteLeft: 0, blood: 0, bloodLeft: 0, markLeft: 0, ward: 0, wardRecoverLeft: 0, coil: 0, coilLeft: 0, shedRecoverLeft: 0, gearLeft: 0, hourRecoverLeft: 0, harvestRecoverLeft: 0, strands: 0, veilRecoverLeft: 0 }, 'every window past its end: 0, never a count below it');
   fresh(); online(1);
   const m = wearSet(player(), 'malacath', 6);
   m.health = 5;

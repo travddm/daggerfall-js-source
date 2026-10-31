@@ -3,13 +3,13 @@
 // new armor set, a new weapon, a new title and aura, a brand new item (profile icon), new cards"; bible/06-Systems/
 // Witches-Festival.md): THE WYRD SISTER'S WINDOW - the Witches' Festival's wares for Soul Cakes.
 //
-// Four parts, each a heading and its rows: THE INSIGNIA (the Witchwarden title, the Witchfire aura, three profile icons -
+// Three parts, each a heading and its rows: THE INSIGNIA (the Witchwarden title, the Witchfire aura, three profile icons -
 // the account's, bought once - and the two the festival gives: Hearthkeeper, for cakes given from an offering, and the
 // Soul Cake icon, for cakes taken; and, AUDIT STAR8 T3, the Starwarden beside Hearthkeeper - The Thirteenth of
 // Frostfall's title, Morwen's coven being the Wyrd's own: shown, never sold), THE WYRD'S RAIMENT (the set's nine
-// pieces, the Athame its weapon), THE ILIAC HAND (the festival's six cards) and the HEARTH OFFERING. A row: its picture, its name and kind, its price, and one press - Buy,
+// pieces, the Athame its weapon) and the HEARTH OFFERING. A row: its picture, its name and kind, its price, and one press - Buy,
 // Wear or Take off - that says why it cannot when it cannot. A row pressed shows it whole beside the list: a piece's
-// lines and its set, a card's rules, an insignia's sign large.
+// lines and its set, an insignia's sign large.
 //
 // THE BROKER'S HOUSE (ui/brokerWindow.js): its sheet and its classes, the festival's colours over them (`WYRD_CSS`), its
 // door's shape (ui/wyrdDoor.js) - `mountWyrdWindow(host, deps)` answers `{ repaint, unmount }`; the back key and a tap on
@@ -28,7 +28,6 @@ import { isEnhancedPlus } from '../systems/uiSkin.js';
 import { brokerSkinCss, BROKER_SKIN_STYLE_ID, refusePress } from './brokerWindow.js';
 import { paintTitle, titleBadge, TITLE_TEXT, AURA_TEXT, WITCH_FIRE, WITCH_GLOW, WITCH_MOSS, WITCH_VIOLET } from './playerBadge.js';
 import { profileIconNode, ICON_TEXT } from './profileIcons.js';
-import { iliacCardLines } from '../systems/iliac/iliacItems.js';
 import { SOUL_CAKE_TEXT } from '../systems/festival/soulCake.js';
 import { cakesText, festivalName, vendorOffice, festivalNightText, festivalRefusalText, findsTodayText, findsTodayFullText } from '../systems/festival/festivalWords.js';
 import { FESTIVAL_WARES, accountWare, HEARTHKEEPER_GIVEN, SOULCAKE_TAKEN } from '../net/festivalLaw.js';
@@ -43,14 +42,13 @@ const el = (tag, cls = null, text = null) => {
 };
 
 /** The window's parts, in its order, and each part's heading and line. */
-const PARTS = Object.freeze(['insignia', 'raiment', 'cards', 'offering']);
+const PARTS = Object.freeze(['insignia', 'raiment', 'offering']);
 const PART_WORDS = Object.freeze({
   insignia: () => [t('festival.window.insignia', 'Insignia'), t('festival.window.insigniaSub', 'Account-wide. Kept for good.')],
   raiment: () => [t('festival.window.raiment', "The Wyrd's Raiment"), t('festival.window.raimentSub', 'An Aetheric set of nine. Bound to you.')],
-  cards: () => [t('festival.window.cards', 'The Iliac Hand'), t('festival.window.cardsSub', 'Festival cards. Never in a pack.')],
   offering: () => [t('festival.window.offering', 'Hearth Offering'), t('festival.window.offeringSub', 'Set it out at your own door.')],
 });
-const partOf = (/** @type {{ kind: string }} */ w) => (accountWare(w) ? 'insignia' : w.kind === 'piece' ? 'raiment' : w.kind === 'card' ? 'cards' : 'offering');
+const partOf = (/** @type {{ kind: string }} */ w) => (accountWare(w) ? 'insignia' : w.kind === 'piece' ? 'raiment' : 'offering');
 /** What kind an insignia is, in a word. */
 const KIND_WORD = Object.freeze({
   title: () => t('festival.window.kindTitle', 'Title'), aura: () => t('festival.window.kindAura', 'Aura'), icon: () => t('festival.window.kindIcon', 'Profile icon'),
@@ -307,7 +305,7 @@ export function mountWyrdWindow(host, deps) {
       const r = rarityAttr(row.item);
       if (r) card.dataset.rarity = r;
       card.append(el('h3', null, row.name));
-      const lines = row.part === 'raiment' ? rarityLines(row.item, { sigil: false, set: false }) : row.part === 'cards' ? iliacCardLines(row.item) : SOUL_CAKE_TEXT.offering();
+      const lines = row.part === 'raiment' ? rarityLines(row.item, { sigil: false, set: false }) : SOUL_CAKE_TEXT.offering();
       if (lines.length) { const ul = el('ul', 'rarity'); for (const l of lines) ul.append(el('li', null, l)); card.append(ul); }
       const set = row.part === 'raiment' ? setCard(row.item, deps.wearer ?? null, deps.nameOf) : null;
       if (set) card.append(set);

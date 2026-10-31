@@ -415,7 +415,7 @@ test('AUDIT TEMP-UI E8: a drink to hand cools a warm reading to nine at the cool
   for (let f = 0; f < 40; f++) assert.ok(cool(f + 1) >= cool(f), `${f + 1} cools no lower than ${f}`);
 });
 
-test('AUDIT TEMP-UI E11, E12: the needs feel the weather the land wears (the Sun Baby\'s clear day too); a record whose counters are no numbers is mended, not left reading NaN', () => {
+test('AUDIT TEMP-UI E11, E12: the needs feel the weather the land wears; a record whose counters are no numbers is mended, not left reading NaN', () => {
   const e = { survival: { lastAte: 0, thirst: 0, awakeSince: 0, sleepDebt: 0 } };
   const s = survivalOf(e, 100);
   assert.deepEqual([s.wet, s.exposure, s.fed, s.drunk, s.rotMinutes, s.rotDays], [0, 0, 0, 0, 0, 0], 'the missing counters, the fresh record\'s');

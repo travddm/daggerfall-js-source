@@ -231,7 +231,7 @@ function smoothEdges(glsl) {
   return out;
 }
 
-test('SD20c NO REVERSED SMOOTHSTEP IN ANY SHADER (V14): GLSL leaves smoothstep(a, b, x) undefined for a >= b - the beam\'s ends, the Hour\'s shards and clock, and ten more across the port (the Deadlands\' horizon and channels, the sky\'s near horizon, the gate veil\'s sparks, the ink dungeon\'s hatching, the sun baby\'s skin, shadow and horns) rose on drivers that honour the order and nowhere the spec promises; every one now rises, its fall written 1 - smoothstep - read in the source of every module, and in the Hour\'s shaders as they are built, their tables\' numbers in them (mutants: an edge reversed, a literal\'s and a table\'s)', () => {
+test('SD20c NO REVERSED SMOOTHSTEP IN ANY SHADER (V14): GLSL leaves smoothstep(a, b, x) undefined for a >= b - the beam\'s ends, the Hour\'s shards and clock, and ten more across the port (the Deadlands\' horizon and channels, the sky\'s near horizon, the gate veil\'s sparks, the ink dungeon\'s hatching) rose on drivers that honour the order and nowhere the spec promises; every one now rises, its fall written 1 - smoothstep - read in the source of every module, and in the Hour\'s shaders as they are built, their tables\' numbers in them (mutants: an edge reversed, a literal\'s and a table\'s)', () => {
   const files = readdirSync(join(ROOT, 'src'), { recursive: true }).filter((f) => String(f).endsWith('.js'));
   let read1 = 0;
   for (const f of files) {

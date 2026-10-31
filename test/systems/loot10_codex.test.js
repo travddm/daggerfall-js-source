@@ -107,7 +107,7 @@ test('LOOT10: the record - saved, restored, a forged one cleaned, a new game non
   assert.deepEqual(CX.foundIds('legendary'), [], 'a new game: none');
 });
 
-test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 a registered one), a found one whole and an unfound one by its hint; the Aetheric sets piece by piece; the count', () => {
+test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 any a module registers), a found one whole and an unfound one by its hint; the Aetheric sets piece by piece; the count', () => {
   on();
   CX.noteFind(legend('nightwhisper'), { quiet: true });
   const rows = CX.codexRows();
@@ -121,8 +121,8 @@ test('LOOT10: the page - every record (the thirty, and AUDIT LOOT F8 a registere
   for (const r of rows) assert.ok(r.hint, `${r.id}: a hint`);
   const sets = CX.codexSets();
   assert.equal(sets.reduce((n, s) => n + s.pieces.length, 0), AETHERIC_RECORDS.length);
-  assert.deepEqual(CX.codexCount(), { legendary: 1, legendaries: LR.allLegendaries().length, aetheric: 0, aetherics: AETHERIC_RECORDS.length, gilded: 0, gildeds: GILDED_RECORDS.length }, 'GILDED1: and the Gilded rung\'s records (PIN MOVED, GILDED2: three; KETCH: five)');
-  assert.equal(GILDED_RECORDS.length, 5, 'GILDED2: the Hourlock, the Dragonfire Oath and the Sunken Sovereign; KETCH (PIN MOVED): Volendrung\'s Echo and the Ketchmaster\'s Word');
+  assert.deepEqual(CX.codexCount(), { legendary: 1, legendaries: LR.allLegendaries().length, aetheric: 0, aetherics: AETHERIC_RECORDS.length, gilded: 0, gildeds: GILDED_RECORDS.length }, 'GILDED1: and the Gilded rung\'s records (PIN MOVED, GILDED2: three)');
+  assert.equal(GILDED_RECORDS.length, 2, 'GILDED2: the Dragonfire Oath and the Sunken Sovereign (the Hourlock went with the guns)');
 });
 
 test('LOOT10: the imprint - a known, unworn Rare takes a found power of its group, once, for 20 shards and 5,000 gold; its card and its power', () => {

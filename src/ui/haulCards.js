@@ -32,7 +32,7 @@ import { lootRarityOn } from '../systems/loot/lootRarity.js';
 import { MARKS_COMBAT, MARKS_FAUCETS } from '../net/marksLaw.js';
 
 /** A strike the day's combat cap refused, as its muted card says it - the chat's own line keeps the whole of it.
- *  SERPENT-SET: the serpents strike under the same cap; EG-E1: and the Spire's Redoubts; STAR7: and the held stars.
+ *  SERPENT-SET: the serpents strike under the same cap; STAR7: and the held stars.
  *  AUDIT STAR (W2): a label, through the text core, read when the card is made - the chat's line names the cap. */
 export const haulCappedText = () => t('haul.capped', 'Daily silver cap reached');
 /** A gather card holds a little longer than a pickup's (ui/pickupFeed.js PICKUP_FEED_HOLD_MS) - it says more. */
@@ -172,14 +172,14 @@ export function findHaul(found, kind) {
   });
 }
 
-/** A combat claim's source, as its silver card says it. SERPENT-SET: a serpent slain. EG-E1: a Redoubt of the Elite Breach. */
-export const CLAIM_SOURCE = Object.freeze({ gate: 'Breach closed', raid: 'Town defended', serpent: 'Serpent slain', eg: 'Redoubt taken', get star() { return t('starfall.haul.source', 'Star held'); } });   // STAR7: a held star's, read through the text core where it is shown
+/** A combat claim's source, as its silver card says it. SERPENT-SET: a serpent slain. */
+export const CLAIM_SOURCE = Object.freeze({ gate: 'Breach closed', raid: 'Town defended', serpent: 'Serpent slain', get star() { return t('starfall.haul.source', 'Star held'); } });   // STAR7: a held star's, read through the text core where it is shown
 /**
- * A COUNTED CLAIM'S SILVER AS ITS CARDS (a raid's, a gate's or - SERPENT-SET - a serpent's answer; EG-E1: a Redoubt's:
+ * A COUNTED CLAIM'S SILVER AS ITS CARDS (a raid's, a gate's or - SERPENT-SET - a serpent's answer:
  * net/marksBook.js claimLines' own data): its strike (the day's combat bar on it, or the cap's muted card), the guild
  * deed it completed (into the treasury - brass, never the account's coin) and each contract that paid it. The chat keeps
  * its lines; these are what the eye catches.
- * @param {any} data @param {'raid'|'gate'|'serpent'|'eg'|'star'} kind
+ * @param {any} data @param {'raid'|'gate'|'serpent'|'star'} kind
  */
 export function claimHauls(data, kind = 'gate') {
   if (!data || typeof data !== 'object') return [];

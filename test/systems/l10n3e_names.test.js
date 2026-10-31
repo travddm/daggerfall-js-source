@@ -56,7 +56,6 @@ const NAMED = {
   'src/systems/worldTick.js': 1,
   'src/ui/bankWindow.js': 1,
   'src/ui/collections/gatheredPart.js': 1,   // HUNTERS-MARK: a fish's name on the Collections page's Fish part
-  'src/ui/gambitTableWords.js': 1,   // KG3: a unit's name at The King's Gambit's table, through DFU's own list (Kings-Gambit.md 14.6)
   'src/ui/native/nativeInventory.js': 1,
   'src/ui/quest/questJournal.js': 2,
   'src/ui/travel/travelMapWindow.js': 5,

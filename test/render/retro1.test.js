@@ -30,7 +30,6 @@ import { setValue, resetToDefaults, LIVE, tierOf } from '../../src/systems/setti
 import { ENUM_LAW, NUMBER_LAW, formatValue, stepValue } from '../../src/ui/settings/settingsLaw.js';
 import { largeHudWorldAspect, worldViewportRect, largeHudViewportRect } from '../../src/ui/hud/hudLarge.js';
 import { hudShortcutKey } from '../../src/ui/hud/hudShortcuts.js';
-import { muzzleRay } from '../../src/combat/weapon/weaponRig.js';
 import { LightningBoltsRenderer } from '../../src/render/lightningBolts.js';
 
 const src = (rel) => readFileSync(new URL(`../../src/${rel}`, import.meta.url), 'utf8');
@@ -493,7 +492,7 @@ test('RETRO1: under the Enhanced Lighting lane the lane\'s frame IS the image\'s
   } finally { setFrameTarget(null); }
 });
 
-// ── the doors: settings, the shortcut, the muzzle, the bolts ──────────
+// ── the doors: settings, the shortcut, the lens, the bolts ────────────
 
 test('RETRO1: the five are LIVE, read by systems/retroMode.js, and the screen speaks DFU\'s words', () => {
   for (const k of ['RetroRenderingMode', 'PostProcessingInRetroMode', 'UseMipMapsInRetroMode', 'RetroModeAspectCorrection', 'PalettizationLUTShift']) {
@@ -524,20 +523,14 @@ test('RETRO1: Shift-F11 is RetroRenderer.TogglePostprocessing - a flip, one edge
   _resetRetroPostprocessing();
 });
 
-test('RETRO1: the muzzle maps through the LENS\'s aspect - a retro world is projected at 1.6 and stretched over a 16:9 strip', () => {
-  const base = { rect: { x: 0, y: 0, w: 1280, h: 720 }, canvasW: 1280, canvasH: 720, muzzle: { x: 1, y: 0.5 }, flip: false, viewport: null };
-  const fov = Math.PI / 2;
-  const plain = muzzleRay(base, fov, 1);
-  assert.ok(near(plain.right, 1280 / 720), 'no aspect handed over: the strip\'s own (unchanged)');
-  const retro = muzzleRay({ ...base, aspect: 1.6 }, fov, 1);
-  assert.ok(near(retro.right, 1.6), 'the lens\'s');
-  assert.ok(near(retro.up, plain.up), 'the vertical is the fov\'s either way');
+// The muzzle half of this pin went with the guns; the lens's aspect is still read by the climbing hands (weaponRig.js
+// climbLens).
+test('RETRO1: the renderer reads the LENS\'s aspect off the world projection - a retro world is projected at 1.6 and stretched over a 16:9 strip', () => {
   const { canvas } = recordingGl();
   const r = new Renderer(canvas);
   const proj = new Float32Array(16); proj[0] = -1 / 1.6; proj[5] = 1;   // a mirrored projection at 1.6
   r.beginFrame(proj, I, L);
   assert.ok(near(r.worldProjAspect, 1.6));
-  assert.match(src('combat/weapon/weaponRig.js'), /aspect: renderer\.worldProjAspect \?\? null \};/, 'the rig parks it with the rect');
 });
 
 test('RETRO1: a bolt\'s minimum width is the world IMAGE\'s pixels - 200 of them on a retro frame - and the drawing buffer\'s when the host names none', () => {

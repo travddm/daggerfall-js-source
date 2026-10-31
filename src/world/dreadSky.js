@@ -133,8 +133,7 @@ export const DREAD_FLASH_COLOR = Object.freeze([1.0, 0.22, 0.1]);
 /** The most slots one frame walks - a tab asleep for an hour does not fire the hour's strikes on waking. */
 export const DREAD_SLOTS_MAX = 8;
 
-/** A slot's hash (a 32-bit mix of its index), the one seed its strike is read from - the same on every client. SUNBABY2: the
- *  sun baby's fireballs read their slots through it too (world/sunbabySky.js). */
+/** A slot's hash (a 32-bit mix of its index), the one seed its strike is read from - the same on every client. */
 export const slotHash = (slot) => { let h = Math.imul(slot | 0, 0x9e3779b1) ^ 0x7f4a7c15; h = Math.imul(h ^ (h >>> 15), 0x85ebca6b); h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35); return (h ^ (h >>> 16)) >>> 0; };
 
 /**

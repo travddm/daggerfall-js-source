@@ -13,8 +13,7 @@ import { equipItem, equipTableOf, addEquipChangeListener, EQUIP_SLOTS } from '..
 import { assignQuickslot, swapQuickslot, clearQuickslots } from '../../src/systems/quickslots.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintCondition, setItemFields, itemBaseValue } from '../../src/systems/item/itemTemplates.js';
-import { createPellets } from '../../src/systems/thunderlock.js';
-import { unitWeightInKg, itemWeight, weightForMaterial as inventoryWeightForMaterial } from '../../src/systems/inventory.js';
+import { weightForMaterial as inventoryWeightForMaterial } from '../../src/systems/inventory.js';
 import { weightForMaterial } from '../../src/characters/weapons.js';
 import { itemLongName, itemInfoTextId, itemDamageLine, itemHandsLine, itemStatRows, expandItemInfo, INFO_TEXT } from '../../src/systems/item/itemInfo.js';
 import { createHorseCartPool } from '../../src/scenes/horseCartPool.js';
@@ -135,21 +134,14 @@ test('AUDIT 68 S27-hcc-walk-fetch-storm: a walk set that failed to load is not f
 });
 
 // ── S27-ammo-arrow-only ─────────────────────────────────────────────
-test('AUDIT 68 S27-ammo-arrow-only: the Dwemer Pellet is ammunition to every reader - its own weight and price, no material name, the ammunition record, no damage or hands rows', () => {
-  const p = createPellets(10);
-  assert.equal(unitWeightInKg(p), 0.2, 'a lead ball weighs its template\'s 0.2 kg - not the material ladder\'s trunc to nothing');
-  assert.equal(itemWeight(p), 2, 'and ten weigh 2 kg');
-  assert.equal(itemBaseValue(p), 4, 'the basePrice - twice an arrow, as designed - not 4 x 3 x the Iron band');
-  assert.equal(p.value, 4, 'which is what the mint wrote');
-  assert.equal(itemLongName(p), 'Dwemer Pellet', 'no "Iron" prefix');
-  assert.equal(itemInfoTextId(p), INFO_TEXT.arrow, 'the ammunition record');
-  assert.equal(itemDamageLine(p), null);
-  assert.equal(itemHandsLine(p), null);
-  // and the Arrow still reads as it always did
+// The Dwemer Pellet's half of this audit went with the guns; the Arrow, the one ammunition left, still reads as it did
+test('AUDIT 68 S27-ammo-arrow-only: the Arrow reads as it always did - its own price, no material name, the ammunition record, no damage or hands rows', () => {
   const a = createWeapon(131, 0, () => 0.5);
   assert.equal(itemBaseValue(a), a.value);
   assert.equal(itemLongName(a), 'Arrow');
   assert.equal(itemInfoTextId(a), INFO_TEXT.arrow);
+  assert.equal(itemDamageLine(a), null);
+  assert.equal(itemHandsLine(a), null);
 });
 
 // ── S27-statrows-material-leak ──────────────────────────────────────

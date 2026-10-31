@@ -12,7 +12,6 @@ import { playerEntity } from '../characters/playerEntity.js';
 import { QUICK_SAVE_NAME, requestScreenshot, saveSlot } from '../systems/save/saveSlots.js';
 import { realmSaveSink } from './shared.js';
 import { sayRealmSave } from '../systems/realmSaves.js';
-import { stakedSaveRefusal } from '../ui/gambitTableWords.js';
 
 /** @param {any} host */
 export function createWorldQuickSave(host) {
@@ -45,11 +44,6 @@ export function createWorldQuickSave(host) {
     // AUDIT NAV1 (B14): nor in a boarding or on a ship of the sea's deck - the sea is never a save's, and the load set the
     // player over open water, the ship and her prize gone
     if (host.naval?.saveRefused?.()) { if (!quiet) townTalk.say('You cannot save now.'); return false; }
-    // AUDIT CARDS-2 H1: nor with chips on a card table - the purse is short the buy-in and the chips are in no save
-    if (host.modes?.cardTableLive?.()) { if (!quiet) townTalk.say('You cannot save with chips on the table.'); return false; }
-    // CARDS10: nor with a card staked on a game of Iliac Hand - the card it may cost is in no save
-    if (host.modes?.iliacStaked?.()) { if (!quiet) townTalk.say('You cannot save with a card staked on the table.'); return false; }
-    if (host.modes?.gambitStaked?.()) { if (!quiet) townTalk.say(stakedSaveRefusal()); return false; }   // KG3: gold staked on The King's Gambit (Kings-Gambit.md 5.7)
     const pf = walkMode && host.playerSpawned ? player.pos : cam.pos;
     const wc = state.worldCoords(pf);
     // IS1 (AUDIT 26 F221): the inside-building half (SerializablePlayer

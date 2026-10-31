@@ -34,8 +34,7 @@ ones, or let the next push to `main` retry them. Every deploy is idempotent.
 2. Runs `verify.yml` on it (without its own build) in parallel with the site build.
 3. Builds the site: `npm ci`, `npm run build` (Vite, `vite.config.js`, `base: './'`). The build writes the commit
    into `src/buildTag.js` (`prebuild`: `scripts/buildTag.mjs`) and restores the file after (`postbuild`).
-4. Adds previews under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`, and two weapon lab builds
-   (`vite.config.gun.js`, `vite.config.pistol.js`) that belong to features being removed. **A missing
+4. Adds a preview under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`. **A missing
    `chatgpt/exact-face-atlas` branch fails the site deploy.** Remove the step when that preview is no longer wanted.
 5. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
 
@@ -56,22 +55,18 @@ So the trigger is the version, not the changed paths. `src/net/wire.js` changes 
 
 Steps when the versions differ:
 
-1. `drift`: compares source and live. If they differ, `verify.yml` runs with 500 sweep seeds a band.
+1. `drift`: compares source and live. If they differ, `verify.yml` runs.
 2. Refuses to deploy on a push when `/health` does not answer. A manual run may.
 3. Checks that `IDENTITY_PUBLIC_KEY` in `server/wrangler.toml` equals the key the account service publishes at
    `/v1/pubkey`. A mismatch stops the deploy, because the relay would refuse every token. No answer is only a warning.
 4. **Siege blackout:** waits, in 5-minute steps, while the account service's `/v1/seats/sieges/live` says a siege is
    live or starts within 30 minutes.
-5. **Elite Breach drain and hold:** reads the relay's `/v1/eg/live`. If a live breach was opened under a law
-   (`EG_LAWS` in `src/net/eliteGates/egDurable.js`) that this build does not have, it waits until none is live or the
-   longest has ended. Otherwise it waits up to 20 minutes for every live breach to stand between trials.
-6. `npx wrangler@4 deploy` in `server/`.
-7. Polls `/health` until it reports the new version (5 minutes at most).
+5. `npx wrangler@4 deploy` in `server/`.
+6. Polls `/health` until it reports the new version (5 minutes at most).
 
 Manual inputs:
 
-- `force`: skips the siege and breach waits. It voids any live siege, and deploys with
-  `--var EG_VOID_BEFORE:<now ms>`, which voids every breach opened before that moment (stakes returned).
+- `force`: skips the siege wait. It voids any live siege.
 - `redeploy`: deploys even when the live version already matches. Use it for a change that only `wrangler.toml`
   carries (a var).
 
@@ -182,7 +177,6 @@ Repository secrets (Settings > Secrets and variables > Actions):
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
 | `DISCORD_BOT_TOKEN` | `account-deploy.yml` -> Worker secret and command registration | The Discord bot is off. |
 | `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | The shop is closed (the shop is being removed). |
 
 Worker secrets the workflow mints and never stores in the repository: `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`,
 `GATE_PUBLIC_KEY` (account service) and `GATE_SIGNING_KEY` (relay). Rotate the identity pair only on purpose: delete
