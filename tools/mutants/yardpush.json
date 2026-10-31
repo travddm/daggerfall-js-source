@@ -1,0 +1,22 @@
+[
+  {
+    "name": "YC2-YARD-PUSH-the-owners-word-dropped",
+    "file": "src/scenes/yardCellSync.js",
+    "old": "        if (v <= held.ver) continue;\n",
+    "new": "        if (v <= held.ver || [...writes.keys()].some((key) => key.startsWith(`${mapId}:`))) continue;\n",
+    "tests": [
+      "test/scenes/yardpush.test.js"
+    ],
+    "note": "a neighbour's yard written in the same second as the owner's does not show on the owner's page until the slow poll"
+  },
+  {
+    "name": "YC2-YARD-PUSH-the-version-rule",
+    "file": "src/scenes/yardCellSync.js",
+    "old": "        if (v <= held.ver) continue;\n",
+    "new": "        if (v < held.ver) continue;\n",
+    "tests": [
+      "test/scenes/yardpush.test.js"
+    ],
+    "note": "a word at the version held asks the cell again"
+  }
+]

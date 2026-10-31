@@ -69,6 +69,7 @@ import { homeLookRecords } from '../world/homeLook.js';   // HOME-LOOK (AUDIT): 
 import { onPathTile } from '../player/exteriorSurface.js';   // FB1001 ROAD-LOT: PlayerMotor.OnPathTile - Daggerfall's own road tiles
 import { RMB_TILE_SIDE } from '../world/locationEntrance.js';   // FB1001 ROAD-LOT: RMBLayout.RMBTileSide, a ground tile's side
 import { createYardCellSync, YARD_ASK_M, YARD_KEEP_MARGIN_M } from './yardCellSync.js';   // YARD-CELL: the yards asked and held a block at a time
+import { onYardWords, yardPushState } from '../net/yardPush.js';   // YARD-CELL YC2: the hub's word that a cell moved
 import { yardCellOf } from '../net/yardCellLaw.js';
 import { TERRAIN_TILE_DIM } from '../world/terrain/terrainSurface.js';
 import { homeOutsideKept, homeYardWhere, homeCandidate } from '../systems/online/onlineHomes.js';   // GUILD-YARD: a hall's keepers keep its outside
@@ -534,7 +535,8 @@ export function createHomeYards(deps) {
     const outside = deps.outside ? !!deps.outside() : true;
     return outside && !overlayUpNow && !deps.doc?.hidden;
   };
-  const cells = createYardCellSync({ api: deps.api, now, polling: pollingNow });
+  const cells = createYardCellSync({ api: deps.api, now, polling: pollingNow, push: deps.push ?? yardPushState });
+  const offYardWords = (deps.onYardWords ?? onYardWords)((words) => cells.hear(words));   // YC2: a pushed cell asked; the ear let go with the yards (destroy)
   /** What a frame's standing time is read on - the host's clock for its tests, else the page's. */
   const standClock = () => deps.standClock?.() ?? (typeof performance !== 'undefined' ? performance.now() : Date.now());
   /** @type {Map<string, {pool: any, px: number, py: number, mapId: number, bk: number, t: number[], sig: string, src: any[] | null, srcSig: string, kept: boolean, lot: any, frame: any, entry: any, skin: number, trees: Map<string, any>, treeSet: any}>} */
@@ -962,6 +964,6 @@ export function createHomeYards(deps) {
     yards: () => [...yards.values()],
     here: () => cur,
     tool: () => tool,
-    destroy() { for (const y of yards.values()) y.pool.destroyAll(); yards.clear(); tool.destroy(); },
+    destroy() { for (const y of yards.values()) y.pool.destroyAll(); yards.clear(); tool.destroy(); offYardWords(); },
   };
 }
