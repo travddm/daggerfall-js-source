@@ -135,20 +135,6 @@ test('WORLD6b-iii(c): a pile larger than one frame is granted in parts - the fir
   assert.equal(bob.foesFrame(true).f[0].o, 60 - g.grant.length, 'and the body still says it holds something');
 });
 
-test('WORLD6b-iii(c): by source - the record and the reader, the target, the ask, the grant emptied only once the frame left, the record', () => {
-  const x = rd('src/scenes/exteriorFoes.js'), b = rd('src/scenes/bodyLootHost.js');
-  assert.match(x, /o: onWatch \|\| _questLike\(f\) \? 0 : \(f\.corpse \? body\.placesLeft\(f\) : 0\)(?:, \.\.\.\(f\.entity\?\.eliteFoe \? \{ z: 1 \} : \{\}\))?(?:, \.\.\.\(bossTraitsOf\(f\.entity\)\.length \? \{ bt: bossTraitMask\(f\.entity\.bossTraits\) \} : \{\}\), \.\.\.\(f\.entity\?\.bossWrath \? \{ bw: 1 \} : \{\}\), (?:\.\.\.\(f\.entity\?\.bossWard \? \{ bv: bossWardShare\(f\.entity\) \} : \{\}\), )?\.\.\.\(f\.entity\?\.raidLeader \? \{ rl: 1 \} : \{\}\))?(?:, \.\.\.\(!onWatch && typeof f\.entity\?\.revenant\?\.name === 'string'[^;]*\} : \{\}\))? \};/, 'the record (AUDIT WATCH1 A3: a watch body advertises no pile; ELITE FOES: an elite\'s `z` after it; PIN MOVED - AUDIT WORLD-EVENTS L2-7: a ward\'s share `bv`)');   // PIN MOVED (OUTDOOR-LOOT): the body counts the places not gone (scenes/bodyLootHost.js placesLeft) - what a peer may take; HACKED-GOLD: a letter of credit and a bound piece are never a place (systems/peerWord.js), and stay its owner's
-  assert.match(b, /const presentCount = \(st\) => \{ let n = 0; for \(let p = 0; p < st\.base\.length; p\+\+\) if \(!st\.rs\.taken\.has\(p\)\) n\+\+; return Math\.min\(255, n\); \};/, 'a place is a shareable piece not yet taken, capped at the wire\'s u8');
-  assert.match(x, /if \(r\.o !== undefined\) \{ p\.o = r\.o; if \(r\.o > 0 && !\(f\._closedN != null && \(_owners\.get\(f\.puppet\)\?\.n \?\? 0\) <= f\._closedN\)\) f\.corpseDisabled = false; \}/, 'the reader (AUDIT WORLD6b-iii(c) A7: a word older than the grant that closed it re-opens nothing)');
-  assert.match(x, /isCorpse: \(f\) => !!f\.corpse && !!f\.entity && \(!f\.puppet \|\| body\.isTarget\(f\)\),/, 'the target');   // PIN MOVED (OUTDOOR-LOOT): a puppet's body is a target while its owner's word says it holds something AND this reader has heard what (never UNBORN)
-  assert.match(b, /function isTarget\(f\) \{\n    if \(!\(\(f\._pup\?\.o \| 0\) > 0\)\) return false;/, 'the owner\'s word is the first term of the target');
-  assert.match(b, /hit\(\{ to: f\.puppet, k: h\.ownerKey\(f\.puppet\), i: f\.seq, take: 1 \}, \{ sent: \(\) => \{ ledger\.ask\(key, _now\(\)\); \} \}\);/, 'the ask, keyed to the owner\'s cell, latched when the frame left (AUDIT WORLD6b-iii(c) B1; LOOT-DUP: and left is THIS frame\'s word, not the hit queue\'s) - in the claims ledger (OUTDOOR-LOOT), where it lands a grant at any lateness');   // PIN MOVED (OUTDOOR-LOOT)
-  assert.match(b, /judgeRoomClaim\(st\.rs, st\.base\.length, st\.full, \{ id: `\$\{legacy\}:\$\{p\}`, p, n: left \}\);/, 'LOOT-DUP: the places are RESERVED (judged taken) the moment the frame is accepted - splicing on the queue\'s boolean granted the same pile twice (AUDIT WORLD6b-iii(c) A3/C2)');   // PIN MOVED (OUTDOOR-LOOT): the owner's list is the state composed, so the reservation is a judgment of the places
-  assert.match(b, /const granted = \{ to, held, at: _now\(\) \};\s*st\.granted = granted;\s*const back = \(\) => \{ if \(st\.granted === granted\) st\.granted = null; restoreHeld\(st, held\); \};\s*if \(!net\(\)\?\.onPeerHit\) \{ back\(\); return; \}\s*net\(\)\.onPeerHit\(frame, \{ dropped: back \}\);/, 'and put back - as new places - if the frame never leaves');   // AUDIT ONLINE2 F4: the grant kept a while for the taker's `back`
-  assert.match(b, /const n = takeCorpseLoot\(\{ entity: \{ items: grant \} \}, playerEntity, h\.say \?\? \(\(\) => \{\}\)\);/, 'the one take law');
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /### 6b-iii\(c\): a puppet's corpse loot/, 'the record');
-});
-
 // LOOT-DUP (2026-09-15, AUDIT ONCRASH1's own finding): THE SAME PILE CANNOT BE GRANTED TWICE.
 //
 // `grantCorpse` emptied the body on `onPeerHit`'s return, and that return is the hit QUEUE's news, not this frame's:

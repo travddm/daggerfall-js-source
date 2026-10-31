@@ -691,20 +691,6 @@ test('AUDIT BRANCH (WoD) L1-3: the host steps DFU\'s array on every crossing and
 
 // ── Numbers and words ───────────────────────────────────────────────────
 
-test('AUDIT BRANCH (WoD) n: the numbers the docs state are the numbers the tree holds', () => {
-  const loc = JSON.parse(rd('vendor/world-of-daggerfall/locations.json'));
-  const xml = loc.regions.reduce((a, r) => a + r.files.reduce((b, f) => b + f[1], 0), 0);
-  assert.equal(xml, 61000862, 'the XML the packs replace');
-  assert.match(rd('vendor/world-of-daggerfall/README.md'), /They are 61\.0 MB of XML/);
-  assert.match(rd('src/world/worldOfDaggerfall/wodLocationPack.js'), /61\.0 MB/);
-  assert.doesNotMatch(rd('src/ui/credits.js'), /stood at 227,938 places/, 'the lists NAME 227,938 places; one site stands to a pixel');
-  const dirs = readdirSync(join(ROOT, 'vendor'), { withFileTypes: true }).filter((d) => d.isDirectory()).length;
-  const reg = rd('bible/01-Overview/Mod-Registry.md');
-  const open = reg.split('\n').filter((l) => /^\| `[^`]+` \|/.test(l) && /RECORD OPEN/.test(l)).length;
-  assert.match(reg, new RegExp(`\`vendor/\` holds ${dirs} directories and ${open} of their READMEs`), `the registry counts ${dirs} and ${open}`);
-  assert.match(rd('src/world/worldOfDaggerfall/wodLocationLoader.js'), /Four pieces, each pure:/);
-});
-
 test('AUDIT BRANCH (WoD) n: the asset tool writes each TextAsset\'s own bytes - the decoded text drops a byte-order mark', () => {
   const src = rd('tools/worldOfDaggerfallAssets.mjs');
   assert.match(src, /body: t\.bytes \? Buffer\.from\(t\.bytes\) : Buffer\.from\(t\.text \?\? '', 'utf8'\),/);

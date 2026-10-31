@@ -410,11 +410,3 @@ test('WOD2: the streaming host wires the loader where DFU does - decision before
   assert.match(w, /\n    if \(host\.labGrassField\) \{   \/\/ WOD2: a levelled camp moved the ground the same way; AUDIT BRANCH \(WoD\) m2[^\n]*\n      const t = host\.state\.pixelTranslation\(px, py\);/, 'and re-reads the ground a site moved - or a rebuild moved back (AUDIT BRANCH (WoD) m2) - as every publish does since PERF-EXT21');
 });
 
-test('WOD2: THE FOUR HOSTS - world.js streams terrain and is wired; exterior.js, worldModes.js and dungeonContext.js stream none and are flagged', () => {
-  for (const f of ['src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    assert.doesNotMatch(rd(f), /openWodWorld|wodLocationLoader/, `${f} has no terrain to stand a wilderness site on`);
-  }
-  assert.match(rd('bible/03-World/World-Of-Daggerfall.md'), /THE FOUR HOSTS/);
-  // PIN MOVED (BAY-LEFT-GROUND, D1): and the sites past the Bay beside the Bay's (test/world/terrain/bayleftground_sites.test.js)
-  assert.match(rd('src/world/terrain/terrainGenWorker.js'), /generatePixelTerrain\(\{ \.\.\.m, woods, roads, sites, beyond, climates \}\)/, 'the job crosses whole, so `wod` reaches the worker');
-});

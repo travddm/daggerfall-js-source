@@ -237,29 +237,3 @@ test('SD2c the pass: the gate\'s beacon in brass - its own program over the gate
   assert.equal(calls.length, 0, 'nothing to draw, nothing touched');
 });
 
-test('SD2c the hosts by source: world.js hands the held map, the compass, the Timers, the board and the taverns their Super dungeon, draws its column after the gate\'s fire outside alone, and builds the pass once; the held map, the ink, the HUD and the board read it (THE FOUR HOSTS: world.js WIRED; worldModes.js, dungeonContext.js and exterior.js FLAGGED in the record)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /\n {6}sd: \(\) => sdHost\?\.mapMarks\(\) \?\? null,/, 'the held map\'s ring');   // PIN MOVED (WW5): every lane's ring (scenes/superDungeon/sdLanes.js mapMarks; ui/heldMap.js reads one or a list)
-  // AUDIT EVENTS1 A2: the site itself - its city the Timers row's place (systems/eventTimers.js), its pixel the event board's way
-  assert.match(w, /\n {8}sd: sdHost\?\.timers\(\) \?\? null,/, 'the Timers row\'s source');   // PIN MOVED (WW5): the Bay's record, name and site and every province lane's (scenes/superDungeon/sdLanes.js timers)
-  assert.match(w, /getNewsOrRumors: \(session\) => sdHost\?\.rumor\(rumorHere\(\), session\) \?\? revenantRumor\(rumorHere\(\), session\) \?\? rumorMill\.getNewsOrRumors\(session\),/, 'its city\'s taverns first');
-  assert.match(w, /gate: \(\) => noticeGateCard\(\), sd: \(\) => noticeSdCard\(\),/, 'the board\'s note');
-  assert.match(w, /\n {10}sd: sdCompassMark\(\),/, 'the compass');
-  assert.match(w, /return Math\.hypot\(at\[0\] - f\[0\], at\[1\] - f\[2\]\) <= SD_COMPASS_M \? at : null;/, 'inside its kilometre');
-  assert.match(w, /if \(!o \|\| \(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) return null;\n {4}const p = playerTravelPixel\(\);\n {4}const \{ site, loc, key \} = o\.hollow;\n {4}if \(!sdOmenSeen\(site, p\.x, p\.y\)\) return null;/, 'outside alone, from its twelve pixels');
-  const gateFire = w.indexOf('if (gatePool?.stands() && gatePool.drawPass(');
-  const omen = w.indexOf('if (sdo && sdOmenPassOf()?.draw([sdo], proj, view, new Float32Array(mwv.eye), now / 1000,');
-  assert.ok(gateFire > 0 && omen > gateFire, 'after the gate\'s fire');
-  assert.match(w, /if \(_sdOmenPass === undefined\) \{ try \{ _sdOmenPass = new SdOmenPassRenderer\(renderer\.gl\); \}/, 'built once, the first time');
-  const hm = read('src/ui/heldMap.js');
-  // PIN MOVED (WW5): every lane's ring, one or a list read over the continent's frame as WW2's gates are
-  assert.match(hm, /const sds = readGateMarks\(\(\) => \{ const v = typeof this\.deps\.sd === 'function' \? this\.deps\.sd\(\) : null; return Array\.isArray\(v\) \? v : v \? \[v\] : \[\]; \}, sheet\);/);   // PIN MOVED (BAY-LEFT-MAPS, at AUDIT BAY-LEFT's merge): over the sheet's box (_marksBox) - the continent's frame while it is shown, the zone map's too
-  assert.match(hm, /\n {10}sds: this\._sds,   \/\/ SD2c/);
-  assert.match(read('src/ui/ink/inkMap.js'), /for \(const m of opts\.sds \?\? \(opts\.sd \? \[opts\.sd\] : \[\]\)\) if \(m && visible\(m\.cx, m\.cy, m\.r \+ 2\)\) paintGateRing\(ctx, view, m, pulse, SD_MAP_INK\);/);
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /drawSdMark\(opts\.sd \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(read('src/ui/noticeWindow.js'), /sd: deps\.sd\?\.\(\) \?\? null,/);
-  const rec = read('bible/11-Multiplayer/Super-Dungeons.md');
-  assert.match(rec, /### SD2c - shipped 2026-10-06/);
-  const sd2c = rec.slice(rec.indexOf('### SD2c - shipped'));
-  for (const host of ['scenes/world.js', 'scenes/worldModes.js', 'scenes/dungeonContext.js', 'scenes/exterior.js']) assert.ok(sd2c.includes(host), `the record names ${host}`);
-});

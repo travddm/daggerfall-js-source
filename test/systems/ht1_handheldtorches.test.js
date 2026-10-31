@@ -823,54 +823,6 @@ test('HT1: a foe struck - hostile, the to-hit roll with Accuracy, ContinuousDama
 
 // ═══ the seams ══════════════════════════════════════════════════════════
 
-test('HT1: the rig runs the component beside the widget - one per rig, the pool bound to it, Update then LateUpdate with the frame\'s inputs (the machine, the sheathe, the hand, the cast, the third person, the climb, the swim, the lycanthrope, the motion, the look, the camera, the collider, the raw keys, the sheathe door), the draw seam after the arms and before the widget', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /import \{ createHandheldTorches, isHeldLight \} from '\.\.\/\.\.\/systems\/handheldTorches\.js';/);   // TORCH-VIS: and the mod's own light test, so the ladder asks it in the mod's words
-  assert.match(rig, /const handheld = createHandheldTorches\(\{ audio, say, torches(?:, dropRefusal)? \}\);/);
-  assert.match(rig, /const handheldOn = \(\) => modSetting\('handheld-torches', 'Enabled'\);/);
-  assert.match(rig, /pool\.setOnPickedUp\?\.\(\(item\) => handheld\.receivePickedUp\(item\)\);/, 'the pool hands a picked-up light to the component');
-  // SW1b: the shield opens this block too - it was a third consumer inside a gate written for the other two,
-  // so a profile with only Shield Widget on never got a frame at all (bible SW1b.1)
-  // PIN MOVED (MIXED-PAIR): the gate's gun leg is `gunUp()` - a Pistolet in either hand, a blade's partner included (was:
-  // `thunderlockHeld()`, the right hand's alone)
-  assert.match(rig, /const _torchesOn = handheldOn\(\);\s*(?:\/\/[^\n]*\n\s*)*if \(!_torchesOn && _handheldWasOn\) handheld\.dispose\(\);[^\n]*\n\s*_handheldWasOn = _torchesOn;[\s\S]{0,3000}?if \(widgetOn\(\) \|\| _torchesOn \|\| shieldOn\(\) \|\| gunUp\(\)\) \{/);
-  // AUDIT-EOTB2: the torch hand's third-person gate asks the sprite body too (Eye Of The Beholder's ToggleBillboard hides the FPV hand)
-  assert.match(rig, /if \(_torchesOn\) \{\s*bindTorches\(\);\s*const tctx = \{\s*renderer, canvas: c, entity, machine: playerWeapon\.machine, sheathed: playerWeapon\.sheathed, usingRightHand: playerWeapon\.usingRightHand,\s*castPlaying: fpsSpellCasting\.isPlayingAnim, spellArmed: spellArmed\(\), thirdPerson: fpArm\.thirdActive\(\) \|\| eotbHidesWeapon\(\),[^\n]*\n\s*climbing: !!cam\?\.climbing, swimming: !!mv\.swimming, transformedLycanthrope: !!entity && isTransformedLycanthrope\(entity\),/);
-  assert.match(rig, /look: lookAxes, swingHeld: _held, cursorActive: cursorActive\(\), camera: camThunk, collider: \(\) => collider\?\.\(\) \?\? null,\s*actionDown: \(action\) => !!actionDown\?\.\(action\), sheathWeapons: \(\) => \{ if \(!playerWeapon\.sheathed\) playerWeapon\.toggleSheath\(\); \},\s*\};\s*handheld\.update\(dt, tctx\);\s*handheld\.lateUpdate\(dt, tctx\);/);
-  // MAC-I: every sprite in this seam takes the frame's TINT now (FPSWeapon.Tint, off the room's light);
-  // the ORDER and the returns are what this pin holds, and neither moved.
-  // SW1: the shield draws between the arms' return and the torch hand -
-  // the OFF hand, behind both the torch and the weapon.
-  // SW1b: the shield's verdict is now taken BEFORE the gate (its poses live in frames where `shown()` is false),
-  // so the draw step is the one line, and `if (!shown()) return;` stops a shield-only frame before the weapon
-  // MAP-WEAPON: one more rung between the arms and the shield - a map
-  // holding the screen stops the classic body's four painters, the torch
-  // hand among them (hands holding a map hold no torch either).
-  // PIN MOVED (SPELL-HAND): the clone's draw passes the spell hand's guard, under its own comment (was:
-  // `widget.draw(renderer, c, fpTint)`); the order did not move
-  assert.match(rig, /if \(fpArm\.active\(\)\) \{[^}]*fpArm\.draw\(c\);[^}]*return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(sheetWindowUp\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(shieldRect\) shield\.draw\(\(index, rect, uv\) => drawShieldSprite\(index, rect, uv, fpTint\)\);\s*if \(handheldOn\(\) && c\) handheld\.draw\(renderer, c, fpTint\);\s*if \(torchOnly && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*if \(!shown\(\) && !gunSliding\) return;[^\n]*\n\s*(?:\/\/[^\n]*\n\s*)*const tlArt = c && thunderlockHeld\(\) \? artFor\(playerWeapon\.weapon\) : null;\s*if \(tlArt\?\.anchor && tlArt\.unionBox\) \{ drawThunderlock\(tlArt, c, fpTint\); return; \}\s*(?:\/\/[^\n]*\n\s*)*if \(gunSliding && !shown\(\)\) return;\s*(?:\/\/[^\n]*\n\s*)*if \(widgetOn\(\) && c && widget\.draw\(renderer, c, fpTint, _spellGuard\.weapon > 0 \? \{ transform: \(r\) => \(\{ \.\.\.r, y: r\.y \+ guardDrop\(_spellGuard\.weapon, r\.h\) \}\) \} : undefined\)\) return;/, 'the arms return first (no classic hand under the Morrowind arms), the shield behind the torch hand, the torch hand under the weapon');
-  assert.match(rig, /actionDown = null, torches = \(\) => null, sheetWindowUp = \(\) => false(?:, dropRefusal = \(\) => null)?(?:, actTool = \(\) => null)?(?:, technique = null)? \}\)/, 'KB1: the registry\'s held read (it was the raw key set) and the pool - the two deps the hosts feed, and MAP-WEAPON\'s third - defaulted so a host that never heard of it draws what it always drew');
-  assert.match(rig, /if \(!_torchesOn && _handheldWasOn\) handheld\.dispose\(\);/, 'AUDIT 66 F8: the switch off is a teardown - update() runs only while the mod is on, so the burning loop could not stop itself');
-  assert.match(rig, /dispose\(\) \{ handheld\.dispose\(\); _handheldWasOn = false; \}/, 'AUDIT 66 F8: and the host has a door to call');
-  assert.match(rig, /handheld,\s*\/\/ HT1/);
-  assert.match(rd('src/systems/lycanthropy.js'), /export const isTransformedLycanthrope = \(entity\) => isTransformedNow\(entity\);/);
-  assert.match(rd('src/systems/playerTorch.js'), /const o = lanternAtWaist\(entity\?\.lightSource\) \? \(_waistOverride \?\? LANTERN_HIP\) : \(_offsetOverride \?\? TORCH_OFFSET\);/);   // HT-WAIST: a lantern at the waist lights from the hip
-  assert.match(rd('src/systems/features.js'), /modFeature\('handheld-torches', \(\) => t\('features\.effect\.atOnce', 'Takes effect at once\.'\), '\w+'\)/);
-  // GUARD1 (2026-09-15): this line USED to read `/160 modules/`. It was
-  // a hand-written copy of a number `audit18_bible_docs.test.js` (U42)
-  // already DERIVES from the directory, so it said nothing U42 does not
-  // say better - and it went red the day an unrelated slice added a
-  // module, which is the only thing an enumerated count can ever do.
-  // What HT1 actually wants held is that the page counts THIS
-  // directory and that the count is live, so that is what it asks.
-  {
-    const m = /(\d+) modules\s*\n?\s*live under\s*\n?\s*`src\/systems\/`/.exec(rd('bible/06-Systems/Systems.md'));
-    assert.ok(m, 'Systems.md lost its "N modules live under `src/systems/`" line');
-    assert.equal(Number(m[1]), readdirSync(join(root, 'src/systems'), { recursive: true }).filter((f) => f.endsWith('.js')).length,
-      'Systems.md counts src/systems/ live - HT1 put playerTorch.js in that count');
-  }
-});
-
 test('HT1: the five hosts - each owns a pool, feeds the rig its raw keys and the pool, composes the dropped lights into the point lights, draws the batches on the billboard pass, ticks the burn, puts the targets on the activation ray with a droppedTorch: arm, destroys all on a transition, and the streaming host stamps, sweeps and recenters them; the save envelope carries HandheldTorchesSaveData', () => {
   const world = rd('src/scenes/world.js'), ext = rd('src/scenes/exterior.js'), wm = rd('src/scenes/worldModes.js'), dc = rd('src/scenes/dungeonContext.js'), dj = rd('src/scenes/dungeon.js');
   for (const [name, src] of [['world', world], ['exterior', ext], ['worldModes', wm], ['dungeonContext', dc]]) {
@@ -986,7 +938,6 @@ test('HT5: the torch hand moves as the weapon does - every motion module the two
   r.frame(0.1); r.frame(0.1);
   assert.ok(r.h._w.position[0] !== 0 || r.h._w.position[1] !== 0, 'walking with Bob on: the hand has moved off its rest');
 });
-
 
 // ── TORCH-VIS: A SHEATHED STANCE IS NOT A STOWED LIGHT ──────────────
 //

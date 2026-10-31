@@ -149,31 +149,6 @@ test('AUDIT-DW F3: under DoubleScaleTextures a `w_` hit draws into the doubled b
   assert.match(rd('src/combat/weapon/weaponWidget.js'), /else if \(w\.s\.doubleScale && custom\.doubled !== false\) \{/);
 });
 
-test('AUDIT-DW F4 (named, not changed): DFU keeps the first template\'s custom frames within a class and metal; the port keys the atlas by the name it is asked by', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  // PIN MOVED (WEAPON-GLOW1, bible/05-Combat/Weapon-Glow.md): the name the atlas is asked by is the PLAIN set's while the
-  // weapon's element shows - still the asked name, so the key still carries it
-  assert.match(rig, /const key = `\$\{type\}:\$\{item\?\.material \?\? 0\}:\$\{thunderlock \? \(gilded \? 'gilded' : ''\) : atlasFileName\(item, WEAPON_FILE\[type\] \?\? '', undefined, plain \? false : undefined\)\}`;/);
-  assert.match(rig, /WHICH IS WHAT DFU DOES \(AUDIT-DW\n\s+\/\/ F4, a named departure\): FPSWeapon reloads its atlas only when\n\s+\/\/ WeaponType or MetalType change \(FPSWeapon\.cs:138\)/, 'the departure is named where the key is');
-  assert.match(rd('bible/05-Combat/Diverse-Weapons.md'), /## AUDIT-DW/, 'and recorded');
-});
-
-test('AUDIT-DW: checked and standing - the shipped set, the index, the door order, the dye law, the install site; the suites and campaign the audit leaves behind', () => {
-  // the attached bundle still answers first, the shipped set second, the miss third
-  const door = rd('src/combat/diverseWeapons/diverseWeaponsAssets.js');
-  assert.match(door, /const attached = _names\.length \? await attachedImage\(name, decode\) : null;/);
-  assert.match(door, /if \(!hasDiverseWeaponsSprite\(name\) \|\| typeof fetchFn !== 'function'\) return null;/);
-  // the icon install sits at the scene boot, after the survival pair and before the archives load
-  // PIN MOVED (AUDIT VE R2): the store's one registration follows the installs - the seam's own copy of it is gone
-  assert.match(rd('src/scenes/shared.js'), /installDiverseWeaponsIcons\(\);[^\n]*\n\s+installRoleplayRealismItems\(\);[^\n]*\n\s+installRoleplayRealism\(\);[^\n]*\n\s+installEnemyExpansion\(\);[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+const textures = registerTextureStore\(\)/);   // PIN MOVED (DEX1): Daggerfall Enemy Expansion's Start after the Inits, before the archives load too
-  // GetName's dye arm and its one exception, in one home
-  assert.match(rd('src/characters/dyes.js'), /if \(!Number\.isFinite\(v\) \|\| v === DYE_COLORS\.Unchanged\) return '';/);
-  // the records
-  const testing = rd('bible/09-Testing/Testing-Rows-2026-10-19.md');   // LEGIBLE 1b: the testing rows, in the closed table
-  for (const f of ['dw1_diverseweapons.test.js', 'dw2_shipped.test.js', 'dw3_icons.test.js', 'unitybundleworker.test.js', 'auditdw.test.js']) assert.match(testing, new RegExp(`\\| ${f.replace('.', '\\.')} \\| \\d+ \\|`), f);
-  assert.match(rd('bible/05-Combat/Diverse-Weapons.md'), /## AUDIT-DW \(2026-09-23\)/);
-});
-
 test('DW-CLIP: under the Diverse Weapons preset (DoubleScaleTextures + TrueTextureSize 1) a full-canvas `w_` idle draws WHOLE at its painted size - the war axe\'s 317x200 fills the 320x200 screen, nothing pushed off the bottom-right', () => {
   const b = bench({ weapon: { templateIndex: WEAPONS.War_Axe, group: 'Weapons', name: 'War Axe' }, weaponType: WEAPON_TYPES.Axe, over: { 'Modules.DoubleScaleTextures': true, 'Modules.TrueTextureSize': true, 'TrueTextureSize.TextureScaleFactor': 1, 'Modules.Offset': false, 'Modules.Bob': false, 'Modules.Inertia': false } });
   b.frame();

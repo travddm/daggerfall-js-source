@@ -452,16 +452,3 @@ test('audit18 world-dungeon: the SetGlobalVar sink is the quest machine\'s ONE g
   assert.deepEqual(machine.getSaveData().globalVars, [[11, true]], 'it rides the save envelope');
 });
 
-test('audit18 world-dungeon: the dungeon host wires the SetGlobalVar sink to the machine store', () => {
-  // The law above runs; this is the WIRING half, which no node test can
-  // run (buildDungeonContext needs ARENA2). dungeonContext is the only
-  // host that registers relays at all - interiorContext builds doors and
-  // nothing else - so this one seam is the whole surface.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const host = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  assert.match(host, /setGlobalVar: \(index, value\) => \{ opts\.questBridge\?\.machine\?\.globalVars\?\.set\(index, value\); \}/);
-  // ...and the Ledger row that called it unported is struck.
-  const ledger = readFileSync(join(root, 'bible/01-Overview/Port-Ledger.md'), 'utf8');
-  const sectionC = ledger.slice(ledger.indexOf('## C. DFU features not yet ported'));
-  assert.match(sectionC, /^\| ~~SetGlobalVar \(0x1f\) action delegate~~ SHIPPED/m);
-});

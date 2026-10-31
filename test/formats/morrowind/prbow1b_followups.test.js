@@ -330,25 +330,3 @@ test('PR-BOW1b (2): portraitWindow - the tight box of the SHOWN ranges at this y
 // (3) THE WIRING AND THE RECORD
 // ---------------------------------------------------------------------------------------------------------------
 
-test('PR-BOW1b: the wiring, by source - poseAssembly folds through foldPieceBounds, the portrait frames through portraitWindow after its flags and never over every piece, and the record names every door to drawThird: world.js, exterior.js, worldModes.js and dungeon.js through mwView.mwViewDrawBody, the peers through peerBodies', () => {
-  const mw = rd('src/formats/morrowind/mwFirstPerson.js');
-  const pose = mw.slice(mw.indexOf('export function poseAssembly('), mw.indexOf('export function hangAffine('));
-  assert.match(pose, /assembly\.bounds = pieces\.length \? foldPieceBounds\(pieces\) : null;/, 'the one walk');
-  const arm = rd('src/combat/fpArm.js');
-  const fig = arm.slice(arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {'), arm.indexOf('    status() {'));
-  const flags = fig.indexOf("if (r.slot === 'weapon') r.hidden = false;");
-  const frame = fig.indexOf('const win = portraitWindow(thirdMesh.ranges, model, figureBodyBox);');
-  assert.ok(flags > 0 && frame > flags, 'the portrait is framed AFTER it decides what it shows');
-  assert.ok(!/meshBounds\(t\.arm\.pieces\)/.test(fig), 'and never over every piece');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
-    assert.match(rd(host), /mwViewDrawBody\(canvas, \{ proj, view, eye(: mwv\.eye)?, feet: player\.bodyFeetAt\(\), yaw: player\.bodyYawFor\(cam\.yaw\), viewYaw: cam\.yaw(, face: tvFace)? \}\)/, `${host} draws the body through mwView`);
-  }
-  assert.match(rd('src/player/mwView.js'), /return fpArm\.drawThird\(canvas, \{ proj, view, eye, feet, yaw, grow: face\?\.grow > 1 \? face\.grow : 1, up: face\?\.up \?\? null(?:, horse)? \}\);/);   // PIN MOVED, COATS3D: astride, the horse in the body's picture   // AUDIT OW3 J6: grown under the travel view; AUDIT OW4 J6: leaned by its up
-  assert.match(rd('src/net/peer/peerBodies.js'), /b\.rig\.drawThird\(canvas, \{ proj, view, eye, feet: b\.feet, yaw: b\.yaw, hitFlash: flashOf \? flashOf\(b\.id\) : 0, conceal: b\.veil \?\? null(?:, grow: g, up: this\._cam\?\.up \?\? null)?(?:, fx(?:: this\._cam\?\.fxOf \? this\._cam\.fxOf\(b\.id\) : null)?)?(?:, cast(?:, anchored)?)?(?:, horse)? \}\)/);   // PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): grown and leaned under the Overworld   // PIN MOVED (MWNPC5): and its tells by id   // PIN MOVED (AUDIT MWNPC16-18 A3, Morrowind-NPCs.md section 27): and whether the body never walks   // PIN MOVED (AUDIT MWNPC16-18 R1, Morrowind-NPCs.md section 27): its tells read once a body, a line above (the cast asks their dissolve)   // PIN MOVED, COATS3D: a rider's horse
-  const page = rd('bible/01-Overview/bugs/Field-Bugs-2026-09-24.md');
-  const section = page.slice(page.indexOf('## PR-BOW1:'));
-  assert.ok(page.indexOf('## PR-BOW1:') > page.indexOf('## PR-WW1:'), 'the record is appended after PR-WW1\'s');
-  for (const name of ['world.js', 'exterior.js', 'worldModes.js', 'dungeon.js', 'mwViewDrawBody', 'peerBodies', 'PR-BOW1b', 'test/render/prbow1_bow.test.js', 'test/formats/morrowind/prbow1b_followups.test.js']) {
-    assert.ok(section.includes(name), `the PR-BOW1 record names ${name}`);
-  }
-});

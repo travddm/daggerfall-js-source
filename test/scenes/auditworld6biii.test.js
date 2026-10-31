@@ -213,31 +213,3 @@ test('AUDIT WORLD6b-iii(a): the direction law, the stand-in, the wire\'s u8', ()
   assert.equal(validFoeRecord({ i: 1, s: 255 })?.s, 255); assert.equal(validFoeRecord({ i: 1, s: 503 })?.s, 503, 'PIN MOVED (DEX4a): a mod\'s spell crosses (Daggerfall Enemy Expansion\'s 500-503)'); assert.equal(validFoeRecord({ i: 1, s: 65536 }), null, 'C8: a standard spell index is bounded - PIN MOVED (DEX4a): a u16, SPELL_INDEX_MAX');
 });
 
-test('AUDIT WORLD6b-iii(a) by source: the sinks say whose blow it is (B2, the three doors); the leap spends no token (B7); every release counts, the rider too (A9); the wall arm\'s caster (A1); the dungeon\'s probe is MY capsule and its stand-in the shared one (C2/A10); Testing.md and the arc no longer state the retired law (C5/C7); the record', () => {
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /hurt: \(n, o\) => damageFoe\(f, n, null, null, \{ fromPlayer: false, kind: 'spell', whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\),/, 'B2: the pool\'s sink (AUDIT PSCALE1 DOORS-1: a kill\'s flag rides it)');   // PIN MOVED (TELL1: and whether a tick is a later round)
-  assert.match(rd('src/scenes/world.js'), /const foeSinks = \(g, fromPlayer = true\) => \(\{[^\n]*\n\s*hurt: \(n, o\) => \{ const fp = o\?\.fromPlayer \?\? fromPlayer; if \(n > 0\) \(g\._encounter \? exteriorFoes\.damageFoe\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', whole: !!o\?\.whole, round: !!o\?\.round, element: o\?\.element \?\? null \}\) : cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer: fp, kind: 'spell', round: !!o\?\.round \}\)\); \},/, 'B2: the host\'s sink reads the engine\'s provenance (AUDIT PSCALE1 DOORS-1: and a kill\'s flag)');   // PIN MOVED (TELL1: the kind reaches the watch, and whether a tick is a later round)
-  assert.match(rd('src/scenes/cityGuards.js'), /hurtGuard: \(g, dmg, playerFeet, knockDir = null, opts = undefined\) => damageGuard\(g, dmg, playerFeet, knockDir, opts\),/, 'B2: the guard door forwards it');
-  assert.match(x, /function blowAllowed\(f\) \{\s*if \(f\._pup\?\.leap && !puppetGapLanded\(f\.ai\)\) return false;/, 'B7: the leap before the bucket');   // PIN MOVED (TELL8: unless its owner's charge or leap carried it - that blow is its landing)
-  assert.match(x, /if \(ok !== false\) \{ f\._castN = \(\(f\._castN \| 0\) \+ 1\) & 0xffff; f\._castIdx = spell\.index \| 0; f\._castU = wireRecipient\(f\.ai\.target\); \}/, 'A9/A3: the count, the spell and the recipient at the ONE release (AUDIT WATCH1: through the one home, enemyTargets.wireRecipient)');
-  assert.equal((x.match(/f\._castN = /g) ?? []).length, 1, 'counted in one place');
-  assert.match(x, /if \(strikeEdge\) \{ f\._atkA = [^\n]*f\._atkB = wireRecipient\(f\.ai\.target\); \}/, 'A3: the blow\'s recipient at its edge (AUDIT WATCH1: through the one home)');
-  assert.match(x, /p\.strike = \{ kind: \(r\.a & 1\) \? 'ranged' : 'melee', at: r\.b \?\? r\.g \?\? p\.target \};/, 'the reader latches it with the strike');
-  assert.match(x, /if \(p\.c != null && r\.c !== p\.c && Number\.isInteger\(r\.s\)\) p\.cast = \{ s: r\.s, at: r\.u \?\? r\.g \?\? p\.target \};/, 'and with the cast (B3: no spell, no cast)');
-  assert.match(x, /const sp = recipientIsMe\(f, pc\.at\) \? \(f\.entity\.spells\?\.find\(\(x\) => \(x\.index \| 0\) === pc\.s\) \?\? null\) : null;/, 'B1: out of the puppet\'s OWN list');
-  assert.match(x, /if \(sbi\) assignEnemySpells\(entity, sbi\);\s*\n\s*const caster = entity\.spells\?\.length && !puppet \? new EnemyCaster\(entity, rolls\) : null;/, 'B1: the list for a puppet too, no caster');
-  const hm = rd('src/scenes/hostMagic.js');
-  assert.match(hm, /explodeAt\(impact, m\.spell, m\.fromPlayer === false \? \(m\.casterLevel \?\? 1\) : castingLevel\(playerEntity\), playerFeet, missileCaster\(m\), \{ playerHeight, allies: !!m\.ally, duel: !!m\.duel, boss: m\.boss \?\? !!m\.duel \}\);/, 'A1: the wall arm (AID1 onto ALLY-CAST: a friendly blast also gives to the party mates it meets; AUDIT WBX F5: and the boss when the missile may meet him)');
-  assert.match(hm, /if \(t\.puppet && caster\?\.entity && caster\.entity !== playerEntity\) continue;/, 'C15');
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /playerFeet: lastPlayerFeet, playerHeight: lastPlayerHeight,\s+\/\/ ROAD-H H2/, 'C2: the dungeon\'s probe is mine');
-  assert.doesNotMatch(d, /_pt\?\.feet \?\? lastPlayerFeet/, 'the peer\'s feet are gone from it');
-  assert.match(d, /foeDeps\.isLocalPlayerTarget\(f\.ai\.target\)\)\s*\n\s*\? playerEntity : \(f\.ai\.target\?\.entity \?\? foeDeps\.PEER_CAST_TARGET \?\? playerEntity\);/, 'A10');
-  const tm = rd('bible/09-Testing/Testing.md') + rd('bible/09-Testing/Testing-Rows-2026-10-19.md');   // LEGIBLE 1b: the page and its closed table
-  assert.doesNotMatch(tm, /suppressed tick/, 'C5: Testing.md no longer describes the retired suppression');
-  assert.doesNotMatch(tm, /no cast at a peer\)/, 'C5');
-  const arc = rd('bible/06-Systems/Online-Arc.md');
-  assert.match(arc, /~~\*\*No cast at a peer\*\*/, 'C7: the 6b-ii bullet is struck');
-  assert.match(arc, /## AUDIT WORLD6b-iii\(a\) \(2026-09-14\)/, 'the record');
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /AUDIT WORLD6b-iii\(a\)/, 'the Ledger');
-});

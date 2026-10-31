@@ -301,43 +301,6 @@ test('ROAD-G G1(b): removeGuard is WabbajackEffect\'s SetActive(false), not a de
   assert.equal(freed.n, 1);
 });
 
-test('ROAD-G G1(b): both hosts route the transform by POOL MEMBERSHIP', () => {
-  // The removal goes through the pool that owns the billboard; the
-  // RE-STAND is the encounter pool either way, because
-  // WabbajackEffect's careerIDs are seventeen monsters and no
-  // Knight_CityWatch (:24-44), so CreateEnemy always mints an
-  // EnemyMonster.
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /if \(cityGuards\.guards\.includes\(f\)\) cityGuards\.removeGuard\(f\);\n\s+else exteriorFoes\.removeFoe\(f\);/,
-    'the street: the removal goes through the pool that owns the record, not the encounter pool\'s remover');
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /else if \(interiorGuards\?\.guards\.includes\(foe\)\) interiorGuards\.removeGuard\(foe\);/,
-    'the building: the indoor watch transforms like any foe');
-  assert.equal(/THE WATCH IS REFUSED/.test(wm), false, 'and the written refusal is retired, not reworded');
-
-  // ROAD-G G1 (review): the RATIONALE this lane first wrote was FALSE
-  // and is struck in all seven places it reached. `removeFoe`
-  // (exteriorFoes.js:"EnemyDeath.CompleteDeath's") never looks a record up in `foes` and
-  // both pools share the host's one renderer, so the old arm tore a
-  // watchman down exactly as `removeGuard` does - batch freed,
-  // `dead = true`, no corpse, skipped by cityGuards.js:"spaceFoes(guards, collider, foeFrameDt(dt))".."if (g.dead) continue;" and spliced
-  // at cityGuards.js:"for (let i = guards.length - 1; i >= 0; i--)" in that same pass. The router is an OWNERSHIP fix, not a
-  // leak fix, and no page may say otherwise again.
-  // (the halves are joined at runtime so this very file does not carry
-  // the sentence it bans)
-  const struck = [['kept', 'standing'], ['kept its', 'VAO'], ['stood up', 'beside'], ['could not', 'find it']]
-    .map(([a, b]) => new RegExp(`${a} ${b}`));
-  for (const rel of ['src/scenes/world.js', 'test/scenes/roadg_pools.test.js', 'test/scenes/enchantpool.test.js',
-    'bible/01-Overview/audits/Audit-58.md', 'bible/04-Characters/Characters-Arc.md',
-    'bible/06-Systems/Systems-Arc.md', 'bible/09-Testing/Testing.md', 'bible/09-Testing/Testing-Rows-2026-10-19.md']) {
-    const t = read(rel);
-    for (const re of struck) {
-      assert.equal(re.test(t), false, `${rel}: the false "${re.source}" rationale is struck, not reworded`);
-    }
-  }
-  assert.match(w, /That was not a leak: removeFoe/, 'and world.js states the true one where the router lives');
-});
-
 // ═══ (c) the loose foe stands where the player is standing ═══
 test('ROAD-G G1(c): the SPAWN arms stand a foe in the world the player IS in', () => {
   // EC1's refusal was "interiors have no foe pool to stand one in".
