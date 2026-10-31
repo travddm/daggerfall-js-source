@@ -45,7 +45,7 @@ test('INTRO2: supplied logo and Mac\u2019s remastered recording are byte-exact; 
 
 test('INTRO4: the 19 s beat (decoded sample 230016 / 12000) is the crest; the logo lands on bar 16 at sample 592128 / 12000, and one frame earlier it is still out in front', () => {
   assert.ok(Math.abs(CREST_TIME - 230016 / 12000) < 1e-9, 'Mac\u2019s beat is the one around 19 seconds - INTRO2\u2019s landing, INTRO4\u2019s crest');
-  const measured = 592128 / 12000; // reproduced by tools/introAudioCheck.mjs, independently of the cue
+  const measured = 592128 / 12000;
   assert.ok(measured > 49.3 && measured < 49.4, 'the third phrase\u2019s downbeat, sixteen bars after the 19 s beat');
   assert.ok(Math.abs(TITLE_IMPACT_TIME - measured) < 1e-6);
   const before = introTitleAt(measured - 1 / 60), at = introTitleAt(measured + 1e-8);

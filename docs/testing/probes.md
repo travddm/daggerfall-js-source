@@ -31,7 +31,7 @@ the rule. Other boot parameters are read through
 ### Running one
 
 ```sh
-node tools/chatScrollProbe.mjs
+node tools/frameProbe.mjs
 ```
 
 Some have an npm script (`npm run blood`, `npm run firsthour`, `npm run perf`; see `package.json`).
@@ -128,5 +128,3 @@ installer's payload. See [../operations/desktop-release.md](../operations/deskto
 
 - `tools/verify-deploy.mjs [url]`: after `npm run build`, polls the live site until it serves your build, by
   content. HTTP 200 alone proves nothing, because a failed deploy leaves the previous build up.
-- Intro probes (`tools/introProbe.mjs`, `tools/introCapture.mjs`, `tools/introAudioCheck.mjs`): run by
-  `intro-quality.yml`.

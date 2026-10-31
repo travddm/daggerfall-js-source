@@ -1,8 +1,8 @@
 // INTRO3 (2026-10-14, Mac: "With the main menu music, is there anyway to recreate it using the sound system daggerfall's
 // music uses", then "you do it and it's for both"): THE MAIN THEME, WRITTEN AS NOTES (systems/introScore.js) and played
 // by the game's own song player for the film and the menu (systems/introTheme.js). What the ear needs - the render's
-// loudness, its peaks, the landmarks heard where the cue sheet puts them - is tools/introScoreProbe.mjs's, in a real
-// browser; this file holds what node can: the song's shape as the producer mints it, the film's two landmarks on its
+// loudness, its peaks, the landmarks heard where the cue sheet puts them - needs a real browser; this file holds what
+// node can: the song's shape as the producer mints it, the film's two landmarks on its
 // bar lines, and the transcription as it was read off the recording. Mutants: tools/mutants/intro3.json.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
