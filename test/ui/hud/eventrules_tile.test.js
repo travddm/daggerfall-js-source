@@ -35,9 +35,9 @@ test('EVENT-RULES THE TILE: a made level\'s tile names its place and says the re
 });
 
 test('EVENT-RULES THE TIP: every rule the level holds, said off its own row - the held regeneration, no saving or resting, the map, Mark and Recall, companions, the Spire\'s potions and flight, the death\'s way (a friend\'s Resurrect named), the purse spared; nothing for a rule a level leaves alone (mutants: a rule unsaid; a rule said of a level that leaves it; the Recall said in the court)', () => {
-  const court = madeRulesLines('court'), hour = madeRulesLines('hour'), spire = madeRulesLines('spire'), ketch = madeRulesLines('ketch');
+  const court = madeRulesLines('court'), hour = madeRulesLines('hour'), spire = madeRulesLines('spire');
   const has = (lines, re) => lines.some((l) => re.test(l));
-  for (const lines of [court, hour, spire, ketch]) {
+  for (const lines of [court, hour, spire]) {
     assert.ok(has(lines, new RegExp(`half strength, and not at all for ${REGEN_HELD_HURT_MS / 1000} seconds after you are hurt`)), 'the held regeneration');
     assert.ok(has(lines, /No saving and no resting/));
     assert.ok(has(lines, /No map/));
@@ -52,7 +52,7 @@ test('EVENT-RULES THE TIP: every rule the level holds, said off its own row - th
   assert.ok(!has(hour, /potions/), 'the Hour counts none');
   assert.ok(has(spire, /No Levitate and no Slowfall/) && has(hour, /^No Levitate\.$/));
   assert.ok(has(spire, /weapon technique cannot carry you/) && !has(court, /technique/));
-  assert.ok(has(ketch, /A death lays you down for 60 seconds: a party member can raise you there\. Past it, you fall\./) && has(spire, /lays you down for 60 seconds/));   // PIN MOVED (AUDIT WORLD-EVENTS L1-4): raise before the fall
+  assert.ok(has(spire, /A death lays you down for 60 seconds: a party member can raise you there\. Past it, you fall\./));   // PIN MOVED (AUDIT WORLD-EVENTS L1-4): raise before the fall
   assert.ok(has(court, /^No \/unstuck\.$/) && has(spire, /^No \/unstuck\.$/) && has(hour, /way home/), 'AUDIT WORLD-EVENTS L5-14: the unstuck rule said');
   assert.ok(has(spire, /no gold/) && !has(court, /no gold/));
   assert.ok(has(spire, /Stendarr/) && !has(hour, /Stendarr/));

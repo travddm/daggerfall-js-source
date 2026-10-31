@@ -116,9 +116,7 @@ import { relaySupportsWw5, STAR_STARS_MAX as STAR_PER_NIGHT_WIRE, SD_LANE_KIND, 
 import { validEgIn, validEgOut, egGate, relaySupportsEg, relaySupportsEgLand, EG_BRAIN_V } from './wire.js';   // EG-PLAY: an Elite Breach's frame - the open to the hub, a member's words to its room; the call, the breach and its fights in
 import { egHubGate, EG_HUB_KINDS } from './wire.js';   // AUDIT EG IV (lane3 #5): the hub's breach words on their own bucket
 import { isEgRoom } from './eliteGates/egLaw.js';   // SD3: the Super dungeon's frame - a find out, the hub's record in; SD6b: a turn out, the realm's Orrery in
-import { isSdRoom } from './superDungeon/sdLaw.js';
-import { validKetchIn, validKetchOut, ketchGate, relaySupportsKetch, relaySupportsKetchTheatres, KT_BRAIN_V } from './wire.js';   // KETCH: a crew's ship's words - mine to its room, its voyage and its fight to me
-import { isKetchRoom } from './ketch/ketchLaw.js';   // KETCH: a crew's ship's room   // SD6b: the realm's room, where the Orrery's turns go
+import { isSdRoom } from './superDungeon/sdLaw.js';   // SD6b: the realm's room, where the Orrery's turns go
 import { owGate, validOwIn, validOwOut, relaySupportsOverworld, OW_WORD_IDS_MAX, OW_WORD_ROWS_MAX, relaySupportsOwGraves, owGraveGate, relaySupportsOwWorld } from './wire.js';   // GRAVE-PARTY: and the graves' word's relay - AUDIT GRAVE-PARTY G3: and its own bucket
 import { validSerpentIn, validSerpentOut, serpentGate, relaySupportsSerpent, relaySupportsSerpentSite } from './wire.js';   // SERPENT1: the sea serpent's frame, both ways   // OW6L: the overworld ledger's frame, both ways
 import { owIdInCell, owRowInCell, owRowSane } from './overworldLaw.js';   // OW6L: and the cell's law, held at home before a word is said
@@ -870,17 +868,13 @@ export class OnlineSession {
     this.onRite = null;           // WB12d: (word, room) => void - the hub's word of a broken rite, projected by the wire's validRiteOut
     this.onSd = null;             // SD3: (word, room) => void - the hub's word of the Super dungeon (its record), projected by the wire's validSdOut
     this.onSdHall = null;         // SD6b: (word, room) => void - the realm's word of its Orrery (the stones, the fray, the dial, the Concord), from my own realm alone
-    this.ktOk = false;            // KETCH: the relay that welcomed this socket keeps a crew's ship (relaySupportsKetch) - an older one CLOSES the socket on `kt`
-    this.ktTheatresOk = false;    // KETCH-EVERYWHERE: and a ship of a station past the Bay (relaySupportsKetchTheatres) - an older one mints none
-    this.onKetch = null;          // KETCH: (word, room) => void - my ship's word (net/wire.js validKetchOut), from the ship I stand on alone
-    this._ktBucket = null;        // KETCH: my words aboard - the ship's own bucket (net/wire.js ketchGate)
     this.onEg = null;             // EG-PLAY: (word, room) => void - an Elite Breach's word (net/wire.js validEgOut): the hub's call, my own breach room's state, fights and receipts
     /** EG-H1 (bible/11-Multiplayer/Elite-Gates.md section 10.8 - RIDDEN POSES): () => [i, dx, dy, dz] | null - my pose's ride on
      *  a breach's moving piece, laid on each pose I say (scenes/eliteGates/egClient.js ridePl); and (pose) => void - a peer's drawn place
      *  moved onto its ride at my shared clock (rideDraw), EG-ZL: and a peer on no ride told, never moved (its ghost slab on a
      *  Crumble I have seen fall - section 10.8). Null outside the Spire. */
     this.poseRide = null;
-    this.poseDown = null;   // AUDIT WORLD-EVENTS L1-4: () => [x, y, z] | null - where my body lies down (scenes/eliteGates/egClient.js, scenes/ketch/ketchClient.js)
+    this.poseDown = null;   // AUDIT WORLD-EVENTS L1-4: () => [x, y, z] | null - where my body lies down (scenes/eliteGates/egClient.js)
     this.rideAt = null;
     /** DECK-POSE: () => [owner, slot, x, y, z] | null - my place aboard a boat (scenes/comeSailAway/comeSailAwayAboard.js
      *  word, or helmWord at my own helm), laid on each pose I say (net/wire.js validAboard). Null ashore, or no Come Sail Away. */
@@ -2161,31 +2155,6 @@ export class OnlineSession {
    *  damage `d`, its kind `r` (net/gate/gateBrain.js HIT_KINDS). TRUE MEANS THE WORD LEFT THE SOCKET. */
   sendSdBlow(k, fields) { return this._sdFightSend(validSdIn({ ...fields, k })); }
 
-  /** KETCH: A WORD ABOARD down my own socket in my crew's ship (net/wire.js validKetchIn): my `in` to the bridge's fight
-   *  (my level, my game's brain), a blow (`hit` on a construct, the Warden or a fork), a cell taken, set, let go or knocked
-   *  from my hands, my body's word (`vt`, on its own bucket) - at a relay that keeps ships, after its welcome, on the ship's
-   *  own bucket. TRUE MEANS THE WORD LEFT THE SOCKET. */
-  /** AUDIT KETCH L1-2: a voyage's share given - said to the hub on my own hub socket (net/wire.js validKetchIn `spent`),
-   *  which keeps that voyage's receipt spent and hands it to no other device of mine. TRUE MEANS THE WORD LEFT THE SOCKET. */
-  sendKetchSpent(n) {
-    const w = validKetchIn({ k: 'spent', n });
-    if (!w || !this.acct || !this.ktOk || !isSocialRoom(this.room) || this.status !== 'open' || !this._ws) return false;
-    const gate = ketchGate(this._ktBucket, this._now());
-    if (!gate.pass) return false;
-    try { this._ws.send(JSON.stringify({ t: 'kt', ...w })); } catch { return false; }
-    this._ktBucket = gate.bucket; this.stats.sent++;
-    return true;
-  }
-  sendKetch(k, fields = {}) {
-    const w = validKetchIn({ ...fields, k, ...(k === 'in' ? { bv: KT_BRAIN_V } : {}) });
-    if (!w || !this.ktOk || !isKetchRoom(this.room) || this.status !== 'open' || !this._ws || !this._welcomed.has(this._ws)) return false;
-    if (k === 'vt') return this._bodySend('kt', w, this._ws, this.bossOk);
-    const gate = ketchGate(this._ktBucket, this._now());
-    if (!gate.pass) return false;
-    try { this._ws.send(JSON.stringify({ t: 'kt', ...w })); } catch { return false; }
-    this._ktBucket = gate.bucket; this.stats.sent++;
-    return true;
-  }
   /** AUDIT RELEASE R2-2: may an Elite arch stand at `site` on this relay - the Bay's map on any relay that opens breaches,
    *  a pixel past the Bay on the world-wide relay alone (worldPixelsOk). The key's refusal asks it before the key is staked
    *  (scenes/eliteGates/egClient.js openRefusal), and the open asks it again. @param {any} site */
@@ -3622,8 +3591,6 @@ export class OnlineSession {
       if (primary) { this.starOk = relaySupportsStar(relayV); this.ww5Ok = relaySupportsWw5(relayV); }   // STAR3: the cell keeps a fallen star - an older relay closes the socket on `star`; WW5: and a province's
       else { const h = this._halo.get(room); if (h) { h.starOk = relaySupportsStar(relayV); h.ww5Ok = relaySupportsWw5(relayV); } }   // WW5: a halo says for itself (AUDIT RAID R8b's law)
       if (primary) this.egOk = relaySupportsEg(relayV);   // EG-PLAY: a relay that opens Elite Breaches - an older one closes the socket on `eg`
-      if (primary) this.ktOk = relaySupportsKetch(relayV);   // KETCH: a relay that keeps a crew's ship - an older one closes the socket on `kt`
-      if (primary) this.ktTheatresOk = relaySupportsKetchTheatres(relayV);   // KETCH-EVERYWHERE: and the stations past the Bay
       if (primary) this.egLandOk = relaySupportsEgLand(relayV);   // FIELD BUGS 2026-10-20f LANDED-WORD: a relay that says what my blows on a breach's bodies land
       if (primary) this.sdOk = relaySupportsSd(relayV);   // SD3: the cell hears a Hollow found - an older relay closes the socket on `sd`
       else { const h = this._halo.get(room); if (h) h.sdOk = relaySupportsSd(relayV); }
@@ -3863,11 +3830,6 @@ export class OnlineSession {
       else if (r?.k === 'rcpt') { if ((room === this.room && isSdRoom(room)) || isSocialRoom(room)) this._deliver('sd', () => this.onSdReceipt?.(r.r, room)); }   // SD9a: my receipt - my own realm's, or the hub's
       else if (r && r.k !== 'ev' && r.k !== SD_LANE_KIND) { if (room === this.room && isSdRoom(room)) this._deliver('sd', () => this.onSdFight?.(r, room)); }   // SD8b: the realm's fight, from my own realm alone; WW5: a province lane's record is the hub's, as the Bay's
       else if (r && isSocialRoom(room)) this._deliver('sd', () => this.onSd?.(r, room));
-    } else if (m.t === 'kt') {
-      // KETCH: a crew's ship's word - from the ship I stand on alone, projected by the wire's own law; AUDIT KETCH L1-2: and
-      // my receipt from the hub, which keeps it (at the fall when I stood off her, and at my hello)
-      const r = validKetchOut(m);
-      if (r && ((room === this.room && isKetchRoom(room)) || (r.k === 'rcpt' && isSocialRoom(room)))) this._deliver('kt', () => this.onKetch?.(r, room));
     } else if (m.t === 'eg') {
       // EG-PLAY: an Elite Breach's word - the call from the hub, everything else from the breach room I stand in alone
       const r = validEgOut(m);

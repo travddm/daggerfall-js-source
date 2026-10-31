@@ -16,10 +16,6 @@ export const BURNING_DOORS_ID = 417;
 /** GUN-LORE (2026-10-24; bible/05-Combat/Dwarven-Thunderlock.md "GUN-LORE"): Rourken Thunder - id 418, a Sentinel
  *  antiquarian's account of the Dwemer guns and the shot they throw. */
 export const ROURKEN_THUNDER_ID = 418;
-/** KETCH (2026-10-24; bible/11-Multiplayer/Sky-Ketch.md): The Ketch That Never Lands - id 419, the same antiquarian's
- *  account of the Rourken sky-ketch Mzunthar, which comes over Daggerfall every ten real hours (net/ketch/ketchLaw.js) -
- *  never by the online calendar (it runs twelve days a real day), so the book names no day (AUDIT KETCH L5-3). */
-export const KETCH_BOOK_ID = 419;
 
 /**
  * A port book: its header's title and author, and its pages - each a list of rows, a row a paragraph the reader wraps
@@ -76,26 +72,6 @@ export const PORT_BOOKS = new Map([[BURNING_DOORS_ID, book({
     section('The long gun and the short', 'I know of two Rourken guns. The long one, which dealers call a thunderlock, belonged to the Tonal Guard: a heavy two-handed gun with a long coil and a deep note. The short one, the pistolet, was made for the decks of their airships. Its coil fires once before it must be wound, so their marines carried them in pairs and fired one while winding the other. Both use the same beads, and neither is any use without them.'),
     section('Why they are rare', 'No forge in the Bay has made a pellet since the Dwemer disappeared, and no mage I know can charge a dead one. Live ones turn up in the old stores under the Alik\'r, in the packs of the treasure-hunters who died robbing them, and in the hold of the Rourken airship that still comes over Daggerfall.'),
     section('Counsel', 'Do not open the lock. Do not hold a bead to your ear. Do not fire one indoors. Do not buy a gun without beads, or beads that do not hum. A dead bead is only a pea.'),
-  ]),
-})], [KETCH_BOOK_ID, book({
-  title: 'The Ketch That Never Lands',
-  author: 'Imrah Bel-Tavir',
-  pages: Object.freeze([
-    Object.freeze([
-      { text: 'The Ketch That Never Lands', center: true, font: BOOK_TITLE_FONT }, '',
-      { text: 'An Account of the Rourken Sky-Ketch Mzunthar', center: true }, '',
-      { text: 'by Imrah Bel-Tavir', center: true },
-      { text: 'Antiquarian of Sentinel', center: true }, '',
-      'Every so often a brass shape comes out of the east and hangs over Daggerfall. The boatmen keep a tally and say it comes every fifth day without fail. Children call it the brass cloud. Priests call it a portent. It is a two-masted ship with a brass hull, and it has been flying since before the first Emperor was born.',
-      '',
-    ]),
-    section('What it is', 'It is the Mzunthar, an airship of the Rourken of Volenfell. The hull is brass and Dwemer steel, and the masts carry brass vanes instead of sails. A note sung by its engine keeps it in the air, and the engine runs on cells of aetherium.'),
-    section('Why it still flies', 'The ship was in the air on the day the Dwemer disappeared, and its crew disappeared with them. Its steersman did not, because it was never alive. It is a construct of the Rourken\'s Tonal Guard, bound to the helm, and it kept to its last course, a circuit of the Iliac Bay high above the clouds. Nobody saw the ship for centuries. I cannot say for certain why it now comes down over Daggerfall. Its lodestone is tuned to large amounts of Dwemer brass, and I believe something near Daggerfall is answering it.'),
-    section('Boarding', 'While the ship is over the city it lowers its anchor-lift, a brass cage on a chain, into a field east of the walls. The cage holds eight and will not rise for nine. Riders come up at the bow and can ride back down when they like. Nets catch most of those who fall from the deck.'),
-    section('The Watch and the Gallery', 'Constructs guard the upper deck: spheres that unfold into soldiers, and sentries that throw lightning. Below is the Gallery of Hammers, where pistons slam and steam vents across the passage in time with the engine. Watch the rhythm before you cross.'),
-    section('The Starved Engine', 'The engine is starving. Charged cells sit in cradles in the hold, but there is no crew left to carry them. A cell takes both hands, so whoever carries one cannot fight and moves slowly. Spiders and arc-coils in the hold go for the carriers. A dropped cell can be picked up again. Once the engine is fed, the lift to the masts starts running.'),
-    section('The Sailwalk and the Bridge', 'The way to the bridge runs along the yards from mast to mast, over swinging spars and planks that do not stay put. The Tonal Warden waits on the bridge. When pressed, it throws the ship out of tune, and its resonators need fresh cells to set them right. At the end it sings the keel-song itself, and the tuning-forks that rise around it must be broken before the song finishes. If the fight goes on too long, the ship turns west, and nothing on the bridge survives that.'),
-    section('What is aboard', 'The boatmen say the master\'s cabin behind the helm opens for whoever defeats the Warden. They say it holds Rourken guns and beads, that the Warden\'s own long gun is gilded, and that the master\'s gold pistolet is there too. I believe about half of what boatmen say. This time I believe all of it.'),
   ]),
 })]]);
 

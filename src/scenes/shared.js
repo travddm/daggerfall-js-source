@@ -760,10 +760,9 @@ export function createSkyController(gl, params) {
       }
     },
     /** KETCH-LOOK KL1 (bible/11-Multiplayer/Sky-Ketch-Look.md section 14): THE SKY'S CLOCK OFF THE STREET. A made level
-     *  that draws the world's sky (the Sky-Ketch's decks, the Arena's floor - the dungeon arm's `host.drawSky`, through
+     *  that draws the world's sky (the Arena's floor - the dungeon arm's `host.drawSky`, through
      *  `draw`'s clocks) runs no exterior frame, so its sky stood at the minute the player left the street while the hour
-     *  turned under it (online, twelve game hours a real one: a raid's sun stood at its boarding while her decks went to
-     *  dusk). The last `use` again on the clocks now - its sky index, its night sky, its weather as the street last
+     *  turned under it (online, twelve game hours a real one). The last `use` again on the clocks now - its sky index, its night sky, its weather as the street last
      *  handed them. Before any `use`, nothing. */
     retime(minuteOfDay, classicMinutes, skyMinutes) {
       if (lastUse.index === null) return;

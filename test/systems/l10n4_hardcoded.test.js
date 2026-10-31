@@ -108,7 +108,7 @@ const HARDCODED = {
   'src/net/guild/guildBook.js': 1,
   'src/net/guild/guildPowers.js': 34,
   'src/net/guild/guildVaultLaw.js': 4,
-  'src/net/herald/heraldCard.js': 4,   // HERALD-CARDS: the families' names on their cards ('The Sea Serpent', ...) - the Discord channel's English, as every herald post is; KETCH: +1, the Sky-Ketch's family name ('The Sky-Ketch') - the Discord channel's English, as every herald post is
+  'src/net/herald/heraldCard.js': 3,   // HERALD-CARDS: the families' names on their cards ('The Sea Serpent', ...) - the Discord channel's English, as every herald post is
   'src/net/heraldryLaw.js': 8,
   'src/net/hitPend.js': 2,
   'src/net/holdemTable.js': 2,
@@ -119,11 +119,6 @@ const HARDCODED = {
   'src/net/iliac/iliacHand.js': 13,
   'src/net/journalPage.js': 16,
   'src/net/kingdomLaw.js': 2,   // WW7-3: two provinces' names of two words ('Black Marsh', the Imperial City its seat) - proper names, as the Bay's kingdoms' and world/tamrielCapitals.js's
-  'src/net/ketch/ketchConstructs.js': 1,   // KETCH: the Watch-Captain's stomp's wave's name ('Tonal Wave') - a blow's `nm`, the relay's record on the wire as every gate blow's is (egBlowOf); the Ketch's page names nothing by it (its kinds by key - systems/ketch/ketchWords.js ketchKindName)
-  'src/net/ketch/ketchDeck.js': 1,   // KETCH: the Gallery's hammers' blow name ('Gallery Hammer') - a blow's `nm`, the relay's record on the wire (egBlowOf), never said by the page
-  'src/net/ketch/ketchHerald.js': 15,   // KETCH: the Sky-Ketch's three cards - their titles, pings, texts, field names and values - the Discord channel's English, as every herald post is (the relay sets no locale)
-  'src/net/ketch/ketchLaw.js': 4,   // KETCH: the door's four refusals (KT_TEXT.refuse - ketchAdmits' answers, the relay's own words on a socket's close); the page says each in the player's language, key for key (systems/ketch/ketchWords.js ketchRefusal)
-  'src/net/ketch/ketchWarden.js': 6,   // KETCH: the Tonal Warden's blows' names (KW_BLOWS - Steam Lash, Tonal Ring, its wave, the Discord, the Keel-Song, the turn west) - each a blow's `nm`, the relay's record on the wire (egBlowOf); the page names a blow by its key (systems/ketch/ketchWords.js ketchBlowName)
   'src/net/mail.js': 3,
   'src/net/marketBook.js': 1,
   'src/net/marketLaw.js': 12,
@@ -206,7 +201,6 @@ const HARDCODED = {
   'src/render/gate/gateTelegraph.js': 5,
   'src/render/gate/gateVeil.js': 1,
   'src/render/heatHaze.js': 2,
-  'src/render/ketch/ktGaugePass.js': 1,   // KETCH-LOOK KL3: its vertex stage's source, as every pass's
   'src/render/labGrass.js': 176,
   'src/render/lightningBolts.js': 2,
   'src/render/navalRender.js': 2,
@@ -397,7 +391,7 @@ const HARDCODED = {
   'src/systems/gate/gateOmen.js': 10,
   'src/systems/gate/gateSpoils.js': 3,
   'src/systems/gateTier.js': 4,
-  'src/systems/gilded.js': 25,   // GILDED2: the Dragonfire Oath's and the Sunken Sovereign's names, powers, lore and hints - written as the Hourlock's are   // AUDIT PISTOLET A7 C1 D8: +1, the Sunken Sovereign's saber-era lore - an item's own story, as the records' are; KETCH: +9, Hammerfall's and Broadside's briefs and texts, Volendrung's Echo's lore and hint, the Ketchmaster's Word's name, lore and hint (the Echo's name and the two powers' a word or two the scan passes), The Hour Tolls' text re-read for the Pellet's dweamer in its old one's place (a kill returns the shot) - written as the Hourlock's are (AUDIT KETCH L5-10: the reason named the Hourlock's lore, unchanged, and left out the Echo and Broadside)
+  'src/systems/gilded.js': 16,   // GILDED2: the Dragonfire Oath's and the Sunken Sovereign's names, powers, lore and hints - written as the Hourlock's are   // AUDIT PISTOLET A7 C1 D8: +1, the Sunken Sovereign's saber-era lore - an item's own story, as the records' are
   'src/systems/gravestoneLore.js': 16,
   'src/systems/guild/guilds.js': 3,
   'src/systems/handheldTorches.js': 12,
@@ -466,7 +460,7 @@ const HARDCODED = {
   'src/systems/party/partyTravelLaw.js': 28,
   'src/systems/peerWord.js': 2,
   'src/systems/physicalItems.js': 25,
-  'src/systems/portBooks.js': 56,   // KETCH-WORDS: -1, the Ketch book's 'How she is boarded' head now the one word 'Boarding'; KETCH: +39, two books (Rourken Thunder - the guns and the shot; The Ketch That Never Lands) - a port book's pages are written into the BOK format's bytes and read whole, and no language holds a -LOC book for one (ui/bookDoor.js), so they are English as On the Burning Doors is
+  'src/systems/portBooks.js': 37,   // GUN-LORE: +20, Rourken Thunder (the guns and the shot) - a port book's pages are written into the BOK format's bytes and read whole, and no language holds a -LOC book for one (ui/bookDoor.js), so they are English as On the Burning Doors is
   'src/systems/portPlaces.js': 8,
   'src/systems/portalStone.js': 21,   // PORTAL-BULK: -2, the counter's offer and its sale's line through t() (portal.buy.ask, portal.buy.bought - their plurals the count's)
   'src/systems/potionRecipes.js': 15,
@@ -584,7 +578,6 @@ const HARDCODED = {
   'src/tools/enhanced/enhancedVisuals.js': 1,
   'src/tools/firmamentLab.js': 3,
   'src/tools/gunLab.js': 7,
-  'src/tools/ketchLab.js': 1,   // KETCH-LOOK KL0: the lab's bill (its draws, casters and CPU) - a reviewer's tool page, never the game's
   'src/tools/mwViewer.js': 9,
   'src/tools/paperdoll/paperdollViewer.js': 18,
   'src/tools/studioLab.js': 3,   // STUDIO1: the studio page's own words to the game's artists (studio.html) - no player reads them
@@ -807,7 +800,7 @@ const HARDCODED = {
   'src/world/oceanHoles.js': 9,
   'src/world/outdoors.js': 2,
   'src/world/passiveFish.js': 5,
-  'src/world/eliteGates/pseudoArchives.js': 52,   // GHOSTFENCE (AUDIT RED-MOUNTAIN, CI): +1, the Ghostfence's art row (GHOSTFENCE_ARCHIVE) - the registry's own words for a developer; LOCKPICK (main): +1, the Lockpick's picture's row (LOCKPICK_ARCHIVE) - the registry's own words for a developer; AUDIT TESA III (at URBANIZER's merge): +1, the towns' fabric's art row (URBAN_ARCHIVE) - the registry's own words for a developer; KETCH: +1, the Sky-Ketch's art row (KT_ARCHIVE) - the registry's own words for a developer; TESA10 (at the merge of main into TESA): +1, the capitals' row (CAPITAL_ARCHIVE) - the registry's own words for a developer; PISTOLET: +1, the Dwarven Pistolet's art row (PISTOLET_ARCHIVE) - the registry's own words for a developer; WITCH1: +1, the Witches' Festival's pictures' row (FESTIVAL_ARCHIVE) - the registry's own words for a developer; NAVAL-REFIT: +3, the ship's paint's, her cabin's and her name boards' rows (LIVERY_ARCHIVE, CABIN_ARCHIVE, PLAQUE_ARCHIVE) - the registry's own words for a developer, never a player's; STAR4/STAR7: +2, the star's two archives' rows
+  'src/world/eliteGates/pseudoArchives.js': 51,   // GHOSTFENCE (AUDIT RED-MOUNTAIN, CI): +1, the Ghostfence's art row (GHOSTFENCE_ARCHIVE) - the registry's own words for a developer; LOCKPICK (main): +1, the Lockpick's picture's row (LOCKPICK_ARCHIVE) - the registry's own words for a developer; AUDIT TESA III (at URBANIZER's merge): +1, the towns' fabric's art row (URBAN_ARCHIVE) - the registry's own words for a developer; TESA10 (at the merge of main into TESA): +1, the capitals' row (CAPITAL_ARCHIVE) - the registry's own words for a developer; PISTOLET: +1, the Dwarven Pistolet's art row (PISTOLET_ARCHIVE) - the registry's own words for a developer; WITCH1: +1, the Witches' Festival's pictures' row (FESTIVAL_ARCHIVE) - the registry's own words for a developer; NAVAL-REFIT: +3, the ship's paint's, her cabin's and her name boards' rows (LIVERY_ARCHIVE, CABIN_ARCHIVE, PLAQUE_ARCHIVE) - the registry's own words for a developer, never a player's; STAR4/STAR7: +2, the star's two archives' rows
   'src/world/superDungeon/sdDungeon.js': 6,
   'src/world/superDungeon/sdRealm.js': 10,
   'src/world/spawnedDungeons.js': 3,

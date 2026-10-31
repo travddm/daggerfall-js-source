@@ -147,7 +147,7 @@ test('POWER-CEILING THE SETS AND THE POWERS: every number at Ascendant and in ev
     gold: 5, guard: 30, heal: 30, hitCap: 25, magicka: 30, mana: 15, manaFlat: 3, pierce: 15, reach: 6, recover: 10, regen: 2, road: 50,
     rounds: 4, seconds: 8, shield: 40, ship: 30, spell: 25, splash: 60, stacks: 5, thorns: 30, ward: 40,
   };
-  holdRoles(powerNumbers(), 149, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
+  holdRoles(powerNumbers(), 145, STRONGEST, LOWER_IS_STRONGER, 'FIELD_ROLES');
 });
 /** THE ROLES HELD: every number has a role; a line's under its kind's Legendary top; every other at or under today's
  *  strongest of its role (`strongest`, as written down - a lower one is lowered there and in the page). */

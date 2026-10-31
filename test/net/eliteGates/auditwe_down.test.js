@@ -1,17 +1,16 @@
 // AUDIT WORLD-EVENTS L1-4 (2026-10-25; bible/01-Overview/audits/Audit-World-Events.md) - RAISE BEFORE THE FALL, the
-// owner's answer to what Resurrect means in the Spire and the Sky-Ketch ("Raise before the fall"): "Resurrect allowed"
-// did nothing in either - a death there was caught by a death save and was the fall at once, with no body for a spell.
+// owner's answer to what Resurrect means in the Spire ("Raise before the fall"): "Resurrect allowed"
+// did nothing there - a death there was caught by a death save and was the fall at once, with no body for a spell.
 // Now a death lays the member DOWN where it fell for a minute, and a party member's Resurrect at the body stands it up in
 // the fight; otherwise it falls as before. The Spire's brain (net/eliteGates/egBrain.js egLayDown, egRezMember), the
-// Ketch's (net/ketch/ketchBrain.js ketchRaise), the wire both ways, and the pages' halves by source.
+// wire both ways, and the pages' halves by source.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validEgOut, validEgIn, validKetchIn, validKetchOut } from '../../../src/net/wire.js';
+import { validEgOut, validEgIn } from '../../../src/net/wire.js';
 import { egHallOf, egCircleOfHall, EG_SEALED_MS, EG_ARRIVE_MAX_MS } from '../../../src/net/eliteGates/egLaw.js';
 import { egGive8 } from '../../egGive8.mjs';
 import { egBreachNew, egEnter, egStep, egWord, EG_DOWN_MS, EG_REZ_REACH_M, EG_REZ_PCT } from '../../../src/net/eliteGates/egBrain.js';
-import { ketchRaise, KT_DOWN_MS, KT_REZ_REACH_M, KT_REZ_PCT } from '../../../src/net/ketch/ketchBrain.js';
 import { RESURRECT_HEALTH_PCT } from '../../../src/systems/resurrect.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -99,18 +98,5 @@ test('AUDIT WORLD-EVENTS L1-4 THE SPIRE: the fall given in to (`yield`), a death
   W.step();
   assert.equal(W.B.mem['acct-1'].falls, 1, 'the last standing gone: the one down falls');
   assert.deepEqual([validEgIn({ k: 'yield' }), validEgIn({ k: 'rz', to: 'acct-1' }), validEgIn({ k: 'rz', to: '' })], [{ k: 'yield' }, { k: 'rz', to: 'acct-1' }, null]);
-});
-
-test('AUDIT WORLD-EVENTS L1-4 THE SKY-KETCH: a crewmate\'s Resurrect at a member lying on the deck raises it - alive aboard, within reach, inside the window - and the relay gives the raised a new life on the count; the wire both ways (mutants: the reach unread; the window unread; no new life)', () => {
-  const V = { players: { a: { name: 'Ann' }, b: { name: 'Bo', lay: { x: 10, y: 0, z: 5, at: 1000 } } } };
-  assert.equal(ketchRaise(V, 'a', 'b', { x: 10 + KT_REZ_REACH_M + 1, y: 0, z: 5 }, 2000), null, 'out of reach');
-  assert.equal(ketchRaise(V, 'a', 'b', null, 2000), null, 'the caster lying too');
-  assert.equal(ketchRaise(V, 'a', 'b', { x: 10, y: 0, z: 5 }, 1001 + KT_DOWN_MS), null, 'past the window');
-  assert.deepEqual(ketchRaise(V, 'a', 'b', { x: 11, y: 0, z: 5 }, 2000), { k: 'rez', s: 'b', n: 'Bo', by: 'Ann', at: 2000 });
-  assert.equal(V.players.b.lay, null, 'once');
-  assert.equal(KT_REZ_PCT, RESURRECT_HEALTH_PCT / 100);
-  assert.equal(KT_DOWN_MS, EG_DOWN_MS, 'one minute on the ship as in the Spire (the tile says one)');
-  assert.deepEqual(validKetchIn({ k: 'rz', to: 'acct-b1' }), { k: 'rz', to: 'acct-b1' });
-  assert.deepEqual(validKetchOut({ k: 'rez', s: 'acct-b1', n: 'Bo', by: 'Ann', at: 5 }), { k: 'rez', s: 'acct-b1', n: 'Bo', by: 'Ann', at: 5 });
 });
 

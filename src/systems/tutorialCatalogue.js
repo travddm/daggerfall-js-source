@@ -551,18 +551,6 @@ export const TUTORIALS = Object.freeze([
     ],
   }),
   page({
-    id: 'sky-ketch', group: 'challenges',
-    // KETCH: the whole page in the player's language (L10N4), as the guilds' is
-    get title() { return t('tutorials.skyKetch.title', 'The Sky-Ketch'); },
-    get trigger() { return t('tutorials.skyKetch.trigger', 'When you first ride the anchor-lift up to the Sky-Ketch.'); },
-    get body() {
-      return [
-        t('tutorials.skyKetch.body1', 'Every ten hours the Sky-Ketch stays over the fields east of the capital for seven hours. Ride its anchor-lift up with your party, eight players at most.'),
-        t('tutorials.skyKetch.body2', 'Carry aether cells to the engine. A hit makes you drop the cell. Nets catch a fall; only death wakes you in the fields below.'),
-      ];
-    },
-  }),
-  page({
     id: 'ocean-holes', group: 'challenges', title: 'Ocean Holes', trigger: 'When you first dive into an Ocean Hole.',
     body: [
       'Black holes in the seabed beneath purple mist lead down to flooded dungeons. Mind your breath.',

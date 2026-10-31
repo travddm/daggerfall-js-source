@@ -54,8 +54,8 @@ test('HERALD-CARDS the card: one embed - its family\'s name and colour, the titl
   const bare = heraldCard({ family: 'abyss', moment: 'M', title: 'T' }).embeds[0];
   assert.ok(!('description' in bare) && !('fields' in bare), 'no text, no fields: neither key');
   assert.equal(heraldCard({ family: 'nonesuch', moment: 'M', title: 'T' }).embeds[0].author.name, 'Dagon\'s Breach', 'a family the table lacks: the gate\'s, never a throw on the hub\'s alarm');
-  assert.deepEqual(Object.keys(HERALD_FAMILIES), ['gate', 'serpent', 'abyss', 'spire', 'ketch']);   // PIN MOVED (KETCH): the Sky-Ketch's family joins last
-  assert.deepEqual(Object.values(HERALD_FAMILIES).map((f) => f.name), ['Dagon\'s Breach', 'The Sea Serpent', 'The Abyss Dungeon', 'The Battlespire', 'The Sky-Ketch']);
+  assert.deepEqual(Object.keys(HERALD_FAMILIES), ['gate', 'serpent', 'abyss', 'spire']);
+  assert.deepEqual(Object.values(HERALD_FAMILIES).map((f) => f.name), ['Dagon\'s Breach', 'The Sea Serpent', 'The Abyss Dungeon', 'The Battlespire']);
 });
 
 test('HERALD-CARDS the bounds: every part of a card is cut to Discord\'s own bound, never refused - a body past one would be refused whole and let go (mutants: a bound lifted; the cut without its ellipsis)', () => {
@@ -163,12 +163,12 @@ async function withHub(fn, env) {
 
 test('HERALD-CARDS relay: each family posts to its own thread when the operator names one, else the gate\'s, else the channel itself - the gate\'s omen, the serpent\'s bells, the Abyss Dungeon\'s rise and the Spire\'s Redoubt each to theirs (mutants: every family to the gate\'s thread; a family\'s own thread ignored; the gate\'s not the fallback)', async () => {
   await withHub(async ({ r, posts }) => {
-    assert.deepEqual(r.room._heraldOf().threads, { gate: null, serpent: null, abyss: null, spire: null, ketch: null }, 'none named: the channel itself');   // PIN MOVED (KETCH): and the Sky-Ketch's
+    assert.deepEqual(r.room._heraldOf().threads, { gate: null, serpent: null, abyss: null, spire: null }, 'none named: the channel itself');
     await r.room._heraldSend(gateHerald.omenPost({ day: 538 }), 'gate');
     assert.equal(posts.at(-1).url, HOOK, 'as before');
   }, {});
   await withHub(async ({ r, posts }) => {
-    assert.deepEqual(r.room._heraldOf().threads, { gate: T_GATE, serpent: T_SEA, abyss: T_GATE, spire: T_EG, ketch: T_GATE });   // PIN MOVED (KETCH): the Sky-Ketch's unnamed - the gate's
+    assert.deepEqual(r.room._heraldOf().threads, { gate: T_GATE, serpent: T_SEA, abyss: T_GATE, spire: T_EG });
     await r.room._heraldSend(gateHerald.omenPost({ day: 538 }), 'gate');
     await r.room._heraldSend(serpentOmenPost({ day: 5 }), 'serpent');
     await r.room._heraldSend(sdHeraldPost('rise', { s: 3, r: 17, until: 1.8e12, next: 1.8e12 }), 'abyss');
@@ -202,7 +202,7 @@ test('HERALD-CARDS relay: a thread is a setting a developer changes at run time 
 });
 
 test('HERALD-CARDS the client says a thread setting only to a relay that knows it - an older one finds no such name and closes the hub link on the frame; the roles and every older setting as before (mutants: a thread said to world242; the floor read for every setting)', async () => {
-  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, egThread: 250, ktRole: 255, ktThread: 255, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });   // PIN MOVED (SD-PARTY, world275): sdCollapse; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor, world272's - re-hashed in place); PIN MOVED (THE FOLD: world260, one release; COST-2 part two, world262): cellSeed; PIN MOVED (KETCH): the Sky-Ketch's role and thread, world253's
+  assert.deepEqual(RELAY_CFG_KEY_MIN, { gateThread: 250, serpentThread: 250, sdThread: 250, egThread: 250, cellSeed: 260, lootDoor: 273, sdCollapse: 275 });   // PIN MOVED (SD-PARTY, world275): sdCollapse; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7: lootDoor, world272's - re-hashed in place); PIN MOVED (THE FOLD: world260, one release; COST-2 part two, world262): cellSeed
   assert.ok(relayCfgSupported(RELAY_VERSION, 'gateThread'), 'this relay knows them');
   assert.deepEqual([relayCfgSupported('world242'), relayCfgSupported('world242', 'gateThread'), relayCfgSupported('world250', 'egThread'), relayCfgSupported('world242', 'gateRole'), relayCfgSupported('world191', 'gateRole')], [true, false, true, true, false]);
   await quiet(() => {
@@ -298,7 +298,7 @@ test('AUDIT HERALD-CARDS S1: the threads\' floor is the relay that made them - t
   const law = readFileSync(new URL('../relayversion.test.js', import.meta.url), 'utf8');
   for (const [k, min] of Object.entries(RELAY_CFG_KEY_MIN)) {
     const row = law.split('\n').find((l) => l.startsWith(`  world${min}: '`)) ?? '';
-    const own = k === 'cellSeed' ? /COST-2 part two/ : k.startsWith('kt') ? /KETCH/ : k === 'lootDoor' ? /LOOT-DOOR/ : k === 'sdCollapse' ? /SD-PARTY/ : /HERALD-CARDS/;   // PIN MOVED (SD-PARTY): sdCollapse is world275's; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): lootDoor is world273's; PIN MOVED (COST-2 part two): cellSeed is world260's (the fold's one release; world262 on its branch); PIN MOVED (KETCH): the Sky-Ketch's two settings are world255's, the relay that made them
+    const own = k === 'cellSeed' ? /COST-2 part two/ : k === 'lootDoor' ? /LOOT-DOOR/ : k === 'sdCollapse' ? /SD-PARTY/ : /HERALD-CARDS/;   // PIN MOVED (SD-PARTY): sdCollapse is world275's; PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): lootDoor is world273's; PIN MOVED (COST-2 part two): cellSeed is world260's (the fold's one release; world262 on its branch)
     assert.match(row, own, `${k}: world${min}'s row is the row of the relay that made it`);
   }
 });

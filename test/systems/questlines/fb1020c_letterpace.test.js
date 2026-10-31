@@ -54,7 +54,7 @@ const startUp = (quest) => {
   for (const a of task?.actions ?? []) if (a.typeName === 'StartStopTimer') a.update(task);
 };
 /** The later steps whose courier brings a letter (QL-OFFERED: the only couriers a line has). */
-const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLWR03', 'QLWR04', 'QLHR02', 'QLSK02', 'QLSK03', 'QLSK04', 'QLOC03',
+const LATER_COURIERS = ['QLBD02', 'QLBD03', 'QLBD05', 'QLCH03', 'QLWR03', 'QLWR04', 'QLHR02', 'QLOC03',
   'QLTF02', 'QLTF03', 'QLTF04', 'QLIS02', 'QLIS03', 'QLIW02'];
 
 test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent - its start-up puts its letter in hand (`start task`, `get item`), so nothing of it is ever on its way; a later step\'s courier hands its letter over as `give pc <Item ... letter> notify`, on its way while held, not once given or set aside (mutants: textId, isComplete, the item\'s kind, the shelf)', () => {
@@ -62,7 +62,7 @@ test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED): no line\'s first step is sent
   // The Thirteenth of Frostfall opens IN PERSON - a Wyrd Sister hands her letter as she is met (QLTF01 `get item
   // _letter_`), or Morwen's raven its note once a star is held: neither at the start-up, neither by courier
   const IN_PERSON = new Set(['thirteenthFrostfall']);
-  assert.equal(QL_LINES.length, 15);
+  assert.equal(QL_LINES.length, 14);
   const couriers = [];
   for (const l of QL_LINES) {
     const { quest } = parsedQuest(l.steps[0].quest, machine);
@@ -248,10 +248,9 @@ test('FB1020c x QL-OFFERED, the real bridge online - THE REPORT\'S OWN LAW: a ch
 
 test('FB1020c LETTER-PACE (PIN MOVED, QL-OFFERED), the real bridge online: the later steps of the lines the player took, set out while the town\'s letters wait (the sky\'s night), never land in one breath at dawn - an hour of the character\'s clock and more between any two questline letters - and they still come, one after another (mutants: the wait unread; the hour from the letter; the layer\'s arm; textId; isComplete)', () => {
   assert.equal(starfallRuns(OUT_OF_FESTIVAL_MS), false, 'the run\'s day is out of the Witches\' Festival');
-  // five lines taken and standing at a step whose courier sets out at its start-up: the Doors (QLBD05 - QLBD02's coven
-  // is a dungeon this bridge has no world to place), the Hour (QLHR02), the Ketch (QLSK02), the Coil (QLOC03), the sea
-  // (QLIS02)
-  const lines = { burningDoors: standingAt(4), hourThatWasNot: standingAt(1), skyKetch: standingAt(1), oldCoil: standingAt(2), introSea: standingAt(1) };
+  // four lines taken and standing at a step whose courier sets out at its start-up: the Doors (QLBD05 - QLBD02's coven
+  // is a dungeon this bridge has no world to place), the Hour (QLHR02), the Coil (QLOC03), the sea (QLIS02)
+  const lines = { burningDoors: standingAt(4), hourThatWasNot: standingAt(1), oldCoil: standingAt(2), introSea: standingAt(1) };
   const { letters } = play(900 + 2400, { lines });   // six sky hours to dawn, then 2,400 real seconds of day (eight hours of the character's)
   const gaps = letters.slice(1).map((l, i) => l.s - letters[i].s);
   assert.ok(letters.length >= 4, `the lines still begin: ${letters.map((l) => l.quest).join(', ')}`);

@@ -329,7 +329,7 @@ test('WB5b the seams: the gate link tells every receipt it folds; the world host
   const link = createGateLink({ now: () => 0, onReceipt: (r) => told.push(r) });
   link.word({ k: 'rcpt', r: 'junk' });
   assert.deepEqual(told, [], 'a word that is not a receipt tells nothing');
-  assert.deepEqual(Object.keys(profileRecordLines({})), ['gates', 'raids', 'serpents', 'hours', 'stars', 'voyages']);
+  assert.deepEqual(Object.keys(profileRecordLines({})), ['gates', 'raids', 'serpents', 'hours', 'stars']);
 });
 
 test('WB5b a folded receipt reaches the queue: the gate link\'s `rcpt` for a real receipt is told once a fold (mutants: the hook never called)', async () => {

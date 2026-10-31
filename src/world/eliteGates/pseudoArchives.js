@@ -90,7 +90,6 @@ export const PSEUDO_ARCHIVES = Object.freeze([
   N(EG_ARCH_ARCHIVES.from, 'world/eliteGates/pseudoArchives.js', 'EG_ARCH_ARCHIVES', 'port', "the Spire's arch (held), the Weir Key (38282, painted - world/eliteGates/egKeyArt.js) and the beacon (held)", EG_ARCH_ARCHIVES.to),
   N(38301, 'world/starfall/starArt.js', 'STAR_ARCHIVE', 'port', 'the fallen star - its crater, its stone and its thread (STAR4)'),
   N(38302, 'world/starfall/starglassArt.js', 'STARGLASS_ARCHIVE', 'port', 'Starglass, the glass a held star leaves (STAR7)'),
-  N(38311, 'world/ketch/ketchArt.js', 'KT_ARCHIVE', 'port', 'the Sky-Ketch Mzunthar - its decks, hull, brass, the land below and its puffs (KETCH)'),
   N(38321, 'systems/lockpick/lockpickArt.js', 'LOCKPICK_ARCHIVE', 'port', 'the Lockpick - a hook pick over a tension wrench (LOCKPICK)'),
   N(38331, 'world/tamriel/ghostfenceModel.js', 'GHOSTFENCE_ARCHIVE', 'port', "the Ghostfence - its pylons' basalt and their orbs' light (GHOSTFENCE)"),
   N(38400, 'world/capitalShapes.js', 'CAPITAL_ARCHIVE', 'port', "the capitals past the Bay - their stone, roofs, domes and statues, painted at run time (TESA10, TESA-LORE)"),

@@ -53,7 +53,7 @@ export function markFoeStruck(foe, { fromPlayer = true } = {}) {
 }
 
 /** STAND-IN-BAR (AUDIT KETCH II, 2026-10-26, the owner: "the additional enemies dont have health bars"): A BODY THE RELAY
- *  KEEPS THE HEALTH OF - an event's host: the gate's legion, the Spire's, the Hour's Echoes, the Sky-Ketch's constructs
+ *  KEEPS THE HEALTH OF - an event's host: the gate's legion, the Spire's, the Hour's Echoes
  *  (world/gate/gateBoss.js hostStandIn) - is struck through the dungeon host's landOnHost, which never marked it, so none of
  *  them ever had the bar; and its stand-in's own health is a count nothing empties (STAND_IN_WHOLE). A blow on one that
  *  went (`went`, the event's own answer) marks it - `hb` the host's foe-shaped record, its stand-in its `entity` - and the bar

@@ -95,7 +95,7 @@ test('QL-OFFERED THE LAW: a line whose gate holds is offered and never scheduled
   const svc = { account: () => 'acct', guest: () => false, claim: async () => ({ ok: true, data: { opened: true } }) };
   const on = createLineRunner({ machine: machineOf(), service: svc, ctx: { level: () => 30, online: () => true, nowSeconds: () => clock.s } });
   const posts = Object.fromEntries(on.rows().map((r) => [r.id, r.post]));
-  assert.deepEqual([posts.burningDoors, posts.hourThatWasNot, posts.skyKetch, posts.oldCoil, posts.introCrafts], ['magery', 'temple', 'tavern', 'tavern', 'board']);
+  assert.deepEqual([posts.burningDoors, posts.hourThatWasNot, posts.oldCoil, posts.introCrafts], ['magery', 'temple', 'tavern', 'board']);
   assert.equal(posts.covensHoard, undefined, 'after the Burning Doors: not yet on offer, no row');
 });
 
@@ -237,7 +237,7 @@ test('QL-OFFERED THE GIVERS\' DOORS: a Mages Guild hall\'s Get Quest offers Ysol
   assert.equal(guild(R, GUILD_GROUPS.HolyOrder)?.line, 'hourThatWasNot');
   assert.equal(guild(R, GUILD_GROUPS.FightersGuild)?.line, undefined, 'a guild that posts none: its own draw');
   const npc = { nameSeed: 4242, factionID: 0, gender: 0 };
-  assert.equal(R.bridge.offerSocialQuest(npc, 0, false, true)?.line, 'skyKetch');
+  assert.equal(R.bridge.offerSocialQuest(npc, 0, false, true)?.line, 'oldCoil');
   assert.deepEqual(R.st.removed, [4242], 'the questor leaves the work pool, as DFU\'s offer window does');
   assert.equal(R.bridge.offerSocialQuest(npc, 0, false, false)?.line, undefined, 'outside a tavern: DFU\'s own social draw');
   // a questor whose quest is still open offers nothing new - DFU's door says so

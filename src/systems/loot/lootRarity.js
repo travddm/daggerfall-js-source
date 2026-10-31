@@ -1275,12 +1275,12 @@ export function imprintLine(item) {
   return rec && p?.name ? `Imprint: ${p.name} (of ${rec.name})${p.brief ? ` - ${p.brief}` : ''}` : '';
 }
 /** AUDIT LOOT F1: WHETHER A POWER CAN WORK ON A PIECE - Chain Lightning arcs off an arrow (lootPowers.js lootStrike: a
- *  weapon of the Archery skill, the Thunderlock's too) and Earthshaker shakes off a melee blow (any other weapon); KETCH's
- *  Hammerfall and Broadside answer a shot alone, as the chain does; every other power works on any piece of its group. The imprint offers and the wire takes no power its piece could not use. */
+ *  weapon of the Archery skill, the Thunderlock's too) and Earthshaker shakes off a melee blow (any other weapon); every
+ *  other power works on any piece of its group. The imprint offers and the wire takes no power its piece could not use. */
 export function powerFits(item, power) {
   if (!item || !power) return false;
   const shoots = item.group === 'Weapons' && weaponSkillUsed(item.templateIndex) === SKILLS.Archery;
-  if (power.kind === 'chain' || power.kind === 'hammerfall' || power.kind === 'broadside') return shoots;   // KETCH: the Ketch's two ring and mark off a shot
+  if (power.kind === 'chain') return shoots;
   if (power.kind === 'quake') return item.group === 'Weapons' && !shoots;
   if (power.kind === 'hood') return hoodCapable(item);   // LOOT15: Unseen answers a hood, and a garment with none never raises one
   return true;

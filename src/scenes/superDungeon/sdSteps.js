@@ -80,7 +80,7 @@ export const SD_CHUNK = Object.freeze({ rewind: 0.6, rise: 2.2, drift: 0.5, spin
 /** The longest frame the breath pushes for (s) - a hitch is not a gale. */
 const BREATH_DT_MAX = 0.1;
 /** AUDIT KETCH II L4-6: how far either side of a course's steps (their breadth and their sway) its breath reaches - on a course
- *  laid beside a ship's decks, never the Hour's (its void is all about it). */
+ *  laid beside other ground, never the Hour's (its void is all about it). */
 export const SD_BREATH_BAND_M = 3;
 /** The breath's band across a course `[x0, x1]` (the realm's x) - null for the Hour's, which breathes at every x. Pure. */
 export function sdBreathBand(course) {
@@ -186,7 +186,7 @@ export function createSdSteps({ renderer = null, audio = null, ending = null, li
   /** @type {any[] | null} */
   let draws = null;
   let checksMesh = null, lastTick = null, lastWarned = null;
-  const band = sdBreathBand(course);   // AUDIT KETCH II L4-6: the ship's gust blew on her aft deck and her bridge, and its wind sounded all through the Warden's fight
+  const band = sdBreathBand(course);   // AUDIT KETCH II L4-6: a course beside other ground breathes on its own band alone
   /** AUDIT SD II (L2 F18): the breath's streaks - their mesh and their draw, hidden but while the breath is seen. L4 F1:
    *  the span my feet last stood in (a checkpoint's included), where the void casts me back to. */
   let breathMesh = null, breathDraw = null, lastSpan = -1;

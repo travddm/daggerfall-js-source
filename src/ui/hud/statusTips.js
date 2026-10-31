@@ -21,7 +21,7 @@ import { EG_POTIONS_PER_HALL } from '../eliteGates/egHud.js';
 import { SD_REZ_MS } from '../../net/superDungeon/sdLaw.js';   // SD-REZ: the Hour's window for a friend's Resurrect
 import { SD_REZ_PAGE_SLACK_MS } from '../../systems/superDungeon/sdSlots.js';   // AUDIT WORLD-EVENTS L1-5: the page's own part of it
 import { mentorTipCard } from '../../systems/mentorText.js';   // MENTOR2: the mentor's tile, in its own words
-import { EG_DOWN_MS } from '../../net/eliteGates/egBrain.js';   // AUDIT WORLD-EVENTS L1-4: a fall's window to be raised in (the Ketch's KT_DOWN_MS pinned equal)
+import { EG_DOWN_MS } from '../../net/eliteGates/egBrain.js';   // AUDIT WORLD-EVENTS L1-4: a fall's window to be raised in
 
 /** The attributes as the sheet names them. */
 export const STAT_WORDS = Object.freeze({
@@ -208,7 +208,7 @@ export function statusTip(tile, entity, extra = {}) {
 
 // ── EVENT-RULES: a world event's rules, said (2026-10-25) ─────────────────────────────────────────────────────────────
 // The owner: "A lot of people are unhappy with the world event restrictions including the regen not working". The made
-// levels (systems/madeLevel.js - the Burning Court, the Shattered Hour, the Spire, the Sky-Ketch) each hold a handful of
+// levels (systems/madeLevel.js - the Burning Court, the Shattered Hour, the Spire) each hold a handful of
 // the game's ways, and said so only as each was refused - a regeneration not at all. Now one tile stands first on the
 // status widget while the player stands in one (ui/enhanced/enhancedHud.js), its name the place's, its tip every rule
 // the place holds in plain words off the law's own table, and its foot the regeneration's pause while it runs.
@@ -218,7 +218,6 @@ export const MADE_LEVEL_PLACE = Object.freeze({
   court: () => t('madeRules.place.court', 'The Burning Court'),
   hour: () => t('madeRules.place.hour', 'The Shattered Hour'),
   spire: () => t('madeRules.place.spire', 'The Spire'),
-  ketch: () => t('madeRules.place.ketch', 'The Sky-Ketch'),
 });
 
 /** Every rule a made level holds, in the law's order, as a player reads it - none for no level. Pure but for the language.
@@ -243,7 +242,7 @@ export function madeRulesLines(level) {
   const death = r('death');
   if (death === 'castOut') out.push(t('madeRules.castOut', 'A death casts you out before the gate.'));
   if (death === 'final') out.push(t('madeRules.finalIn', 'A death is final for this Abyss Dungeon - unless a party member raises you within {s} seconds.', { s: (SD_REZ_MS - SD_REZ_PAGE_SLACK_MS) / 1000 }));   // AUDIT WORLD-EVENTS L1-5: the page's minute, the body's (it said two minutes; the body was gone at one)
-  if (death === 'fall') out.push(t('madeRules.fallDown', 'A death lays you down for {s} seconds: a party member can raise you there. Past it, you fall.', { s: EG_DOWN_MS / 1000 }));   // AUDIT WORLD-EVENTS L1-4: raise before the fall (the Spire's and the Ketch's window, one minute each)
+  if (death === 'fall') out.push(t('madeRules.fallDown', 'A death lays you down for {s} seconds: a party member can raise you there. Past it, you fall.', { s: EG_DOWN_MS / 1000 }));   // AUDIT WORLD-EVENTS L1-4: raise before the fall (the Spire's window, one minute)
   if (r('deathPenalty') === 'none') out.push(t('madeRules.noPenalty', 'A death costs you no gold.'));
   return out;
 }
@@ -252,5 +251,5 @@ export function madeRulesLines(level) {
  *  @param {string|null|undefined} level @param {number} pausedMs @returns {{ level: string, name: string, foot: string|null }|null} */
 export function madeRulesTile(level, pausedMs = 0) {
   if (!level || !Object.hasOwn(MADE_LEVEL_PLACE, level)) return null;
-  return { level, name: MADE_LEVEL_PLACE[/** @type {'court'|'hour'|'spire'|'ketch'} */ (level)](), foot: pausedMs > 0 ? `${Math.ceil(pausedMs / 1000)}s` : null };
+  return { level, name: MADE_LEVEL_PLACE[/** @type {'court'|'hour'|'spire'} */ (level)](), foot: pausedMs > 0 ? `${Math.ceil(pausedMs / 1000)}s` : null };
 }

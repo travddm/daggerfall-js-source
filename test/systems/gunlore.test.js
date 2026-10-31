@@ -5,17 +5,16 @@
 //     a gun era's - and said in the Info box under the item's name; nothing of DFU's says any.
 //   - THE WORDS AGREE WITH THE SHOT: the coil's one note wakes the Pellet's aetherium and throws it as lightning (the shock
 //     orb), and a coil sung must be wound again (the reload).
-//   - THE BOOKS: Rourken Thunder (418) and The Ketch That Never Lands (419) - port books above every classic id, their low
-//     bytes no classic book's, in the BOK format's own bytes, eight pages each, by the line's antiquarian.
+//   - THE BOOK: Rourken Thunder (418) - a port book above every classic id, its low byte no classic book's, in the BOK
+//     format's own bytes, eight pages, by the line's antiquarian.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createThunderlock, createPellets, GUN_LORE, THUNDERLOCK_TEMPLATE, PELLET_TEMPLATE } from '../../src/systems/thunderlock.js';
 import { createPistolet, PISTOLET_TEMPLATE } from '../../src/systems/pistolet.js';
 import { templateLore, templateByIndex } from '../../src/systems/item/itemTemplates.js';
-import { mintGilded, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD } from '../../src/systems/gilded.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
-import { ROURKEN_THUNDER_ID, KETCH_BOOK_ID, PORT_BOOKS, openPortBook, portBookBytes, isPortBook } from '../../src/systems/portBooks.js';
+import { ROURKEN_THUNDER_ID, PORT_BOOKS, openPortBook, portBookBytes, isPortBook } from '../../src/systems/portBooks.js';
 import { BOOK_ID_TITLES } from '../../src/systems/booksData.js';
 import { RSC } from '../../src/formats/textRsc.js';
 import { itemInfoBoxes } from '../../src/ui/enhanced/enhancedInventory.js';
@@ -25,8 +24,6 @@ test('GUN-LORE EACH SAYS WHAT IT IS: the Thunderlock, the Pistolet and the Pelle
   assert.equal(templateLore(createThunderlock()), GUN_LORE.thunderlock);
   assert.equal(templateLore(createPistolet()), GUN_LORE.pistolet);
   assert.equal(templateLore(createPellets(5)), GUN_LORE.pellet);
-  assert.equal(templateLore(mintGilded(VOLENDRUNGS_ECHO)), GUN_LORE.thunderlock, 'a Gilded gun is the gun still');
-  assert.equal(templateLore(mintGilded(KETCHMASTERS_WORD)), GUN_LORE.pistolet);
   assert.equal(templateLore(createWeapon(120, 1)), null, 'DFU\'s weapons carry no words of the port\'s');
   assert.equal(templateLore(null), null);
   assert.equal(new Set(Object.values(GUN_LORE)).size, 3, 'three things, three sayings');
@@ -63,10 +60,10 @@ test('GUN-LORE THE INFO BOX: the template\'s words a box of their own under the 
   assert.ok(!flat(itemInfoBoxes(createWeapon(120, 1), d)).some((t) => Object.values(GUN_LORE).includes(t)));
 });
 
-test('GUN-LORE THE BOOKS: Rourken Thunder (418) and The Ketch That Never Lands (419) - above every classic id, their low bytes no classic book\'s; by Imrah Bel-Tavir; eight pages each in the BOK format\'s own bytes, every page closed; the coil, the bead and the eight-place lift said (mutants: an id a classic book\'s; a page left open)', () => {
-  assert.deepEqual([ROURKEN_THUNDER_ID, KETCH_BOOK_ID], [418, 419]);
+test('GUN-LORE THE BOOK: Rourken Thunder (418) - above every classic id, its low byte no classic book\'s; by Imrah Bel-Tavir; eight pages in the BOK format\'s own bytes, every page closed; the coil, the bead and the eight-place lift said (mutants: an id a classic book\'s; a page left open)', () => {
+  assert.equal(ROURKEN_THUNDER_ID, 418);
   const classic = [...BOOK_ID_TITLES.keys()];
-  for (const id of [ROURKEN_THUNDER_ID, KETCH_BOOK_ID]) {
+  for (const id of [ROURKEN_THUNDER_ID]) {
     assert.ok(isPortBook(id));
     assert.ok(classic.every((c) => c < id && (c & 0xff) !== (id & 0xff)), `${id}: its filename no classic book's`);
     const f = openPortBook(id);
@@ -79,13 +76,7 @@ test('GUN-LORE THE BOOKS: Rourken Thunder (418) and The Ketch That Never Lands (
     }
   }
   assert.equal(openPortBook(ROURKEN_THUNDER_ID).title, 'Rourken Thunder');
-  assert.equal(openPortBook(KETCH_BOOK_ID).title, 'The Ketch That Never Lands');
   const text = (id) => PORT_BOOKS.get(id).pages.flat().map((r) => (typeof r === 'string' ? r : r.text)).join(' ');
-  const gun = text(ROURKEN_THUNDER_ID), ship = text(KETCH_BOOK_ID);
+  const gun = text(ROURKEN_THUNDER_ID);
   for (const w of ['Volendrung', 'Volenfell', 'tonal architecture', 'coil', 'aetherium', 'lightning', 'The thunder you hear is the note', 'pistolet', 'thunderlock']) assert.ok(gun.includes(w), `Rourken Thunder says ${w}`);
-  // PIN MOVED (AUDIT KETCH L5-3): 'Loredas' out - the Ketch keeps the real week, never the online calendar's day; the book
-  // says her week is twelve of ours, and names no day. PIN MOVED (KETCH-EVERY): she comes every ten hours - the book says
-  // every fifth day, five of the online calendar's
-  assert.ok(!ship.includes('Loredas'), 'The Ketch That Never Lands names no day of the calendar');
-  for (const w of ['Mzunthar', 'every fifth day', 'Daggerfall', 'holds eight and will not rise for nine', 'Gallery of Hammers', 'cells', 'Tonal Warden', 'resonators', 'tuning-forks', 'turns west']) assert.ok(ship.includes(w), `The Ketch That Never Lands says ${w}`);
 });

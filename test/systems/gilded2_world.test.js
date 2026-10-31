@@ -21,7 +21,7 @@ import * as LR from '../../src/systems/loot/lootRarity.js';
 import * as LP from '../../src/systems/loot/lootPowers.js';
 import * as CX from '../../src/systems/loot/lootCodex.js';
 import {
-  GILDED, GILDED_WORTH, GILDED_RECORDS, HOURLOCK, HOURLOCK_GUN_ERA, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, DRAGONFIRE, UNDERTOW, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD,
+  GILDED, GILDED_WORTH, GILDED_RECORDS, HOURLOCK, HOURLOCK_GUN_ERA, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, DRAGONFIRE, UNDERTOW,
   GATE_GILDED_CHANCE, SERPENT_GILDED_CHANCE, gildedById, mintGilded, mintHourlock, rollDragonfireOath, rollSunkenSovereign,
   validGildedMarks,
 } from '../../src/systems/gilded.js';
@@ -57,11 +57,9 @@ const lines = (r) => r.affixes.map((a) => [a.id, a.param ?? null, a.value]);
 // ── the records ───────────────────────────────────────────────────────
 
 test('GILDED2 THE RECORDS: the Hourlock, then the gate\'s Dragonfire Oath (a Daedric Dai-Katana: +40% damage, +15 Strength, +30 Long Blade, +15 Endurance - AUDIT WORLD-REWARDS B1: no slayer) and the serpent\'s Sunken Sovereign (an Ebony Saber: +40% damage, +15 Agility, +30 Long Blade, 10% leech) - every line the Legendary band\'s TOP and no higher, a power each, frozen whole (mutants: a line over the band; the Oath\'s make; the Sovereign\'s slayer)', () => {
-  // PIN MOVED (KETCH, 2026-10-24, bible/06-Systems/Gilded.md section 10): the airship's two guns after the world's two
-  // (test/systems/ketch_gilded.test.js holds them)
-  assert.deepEqual(GILDED_RECORDS, [HOURLOCK, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD]);
-  assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-hourlock', 'the-dragonfire-oath', 'the-sunken-sovereign', 'volendrungs-echo', 'the-ketchmasters-word']);
-  assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 5, 'five ids');
+  assert.deepEqual(GILDED_RECORDS, [HOURLOCK, DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]);
+  assert.deepEqual(GILDED_RECORDS.map((r) => r.id), ['the-hourlock', 'the-dragonfire-oath', 'the-sunken-sovereign']);
+  assert.equal(new Set(GILDED_RECORDS.map((r) => r.id)).size, 3, 'three ids');
   for (const r of [DRAGONFIRE_OATH, SUNKEN_SOVEREIGN]) {
     assert.equal(gildedById(r.id), r);
     assert.equal(r.group, 'Weapons');
@@ -314,8 +312,6 @@ test('GILDED2 THE LOOK: named as an artifact is (no metal before it); its card t
     ['the-hourlock', false, null, CX.GILDED_HINT],
     ['the-dragonfire-oath', false, null, DRAGONFIRE_OATH.hint],
     ['the-sunken-sovereign', false, null, SUNKEN_SOVEREIGN.hint],
-    ['volendrungs-echo', false, null, VOLENDRUNGS_ECHO.hint],   // PIN MOVED (KETCH, 2026-10-24): and the airship's two
-    ['the-ketchmasters-word', false, null, KETCHMASTERS_WORD.hint],
   ], 'listed, unfound, each by its own hint');
   assert.notEqual(DRAGONFIRE_OATH.hint, CX.GILDED_HINT);
   assert.equal(CX.noteFind(o), true);

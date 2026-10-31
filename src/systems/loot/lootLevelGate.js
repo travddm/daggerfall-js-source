@@ -8,7 +8,7 @@
 // thresholds are multiplied by a factor of the roller's level before the roll (lootRarity.js rarityChances); Magic is
 // left alone. The source still decides the odds; the level only holds the top tiers back until the character is ready.
 // NOT EVERY DOOR (AUDIT UPDATE L7, AUDIT UPDATE II A6 - LEFT, the owner's call): the world's shared and receipt-seeded
-// spoils pick their tier off rarityChances with no level - the Gate, the Abyss, the raids, the Ketch, the serpent, the
+// spoils pick their tier off rarityChances with no level - the Gate, the Abyss, the raids, the serpent, the
 // starfall, a staff event's, a revenant's trophy - so a young character there meets them as anyone does.
 //
 //   Rare:      x0.15 up to level 7, then up to x1 at level 12

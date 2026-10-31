@@ -15,7 +15,7 @@ import { POST_BATCH_RE, POST_SENDER, POST_SUBJECT_MAX, POST_BODY_MAX, postHead }
 import { spoilsList } from '../../src/scenes/spoilsPool.js';
 import { sdSpoilsList, sdSpoilsDay } from '../../src/systems/superDungeon/sdSpoils.js';
 import { egSpoilsList, egSpoilsDay } from '../../src/systems/eliteGates/egSpoils.js';
-import { mintHourlock, mintGilded, DRAGONFIRE_OATH, VOLENDRUNGS_ECHO, KETCHMASTERS_WORD } from '../../src/systems/gilded.js';
+import { mintHourlock, mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { createThunderlock } from '../../src/systems/thunderlock.js';
 import { createPistolet } from '../../src/systems/pistolet.js';
 
@@ -147,14 +147,14 @@ test('LOST-SPOILS a send\'s shape and its pieces\' law: places under LOST_INDEX_
   assert.ok(!LOST_FINAL.includes('lost-no-kill'), 'a kill not yet recorded is asked again');
 });
 
-test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: never a gun - the Sky-Ketch\'s alone - and no Gilded but its own (an Hour the Hourlock, a gate the Oath, a Redoubt none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: a gun mailed under an Hour\'s kill; a Ketch Gilded under a gate\'s; any Gilded under any kill)', async () => {
+test('LOST-SPOILS A DOOR LEAVES ONLY WHAT IT DROPS: never a gun, and no Gilded but its own (an Hour the Hourlock, a gate the Oath, a Redoubt none); every such piece refused whole, the send with it (AUDIT SHIP C1; mutants: a gun mailed under an Hour\'s kill; any Gilded under any kill)', async () => {
   const svc = await standService();
   const ann = await svc.registered('Ann');
   const day = 20383;
   assert.equal((await svc.claim(ann, day, nowS())).status, 200);
   sdKill(svc, ann, 12);
   const sdDay = sdSpoilsDay(12), plain = (x) => JSON.parse(JSON.stringify(x));
-  for (const [d, item] of [[sdDay, createThunderlock()], [sdDay, createPistolet()], [sdDay, mintGilded(VOLENDRUNGS_ECHO)], [sdDay, mintGilded(DRAGONFIRE_OATH)], [day, mintGilded(KETCHMASTERS_WORD)], [day, mintHourlock()]]) {
+  for (const [d, item] of [[sdDay, createThunderlock()], [sdDay, createPistolet()], [sdDay, mintGilded(DRAGONFIRE_OATH)], [day, mintHourlock()]]) {
     assert.deepEqual((await lost(svc, ann, { day: d, pieces: [{ i: 0, item: plain(item) }] })).body, { error: 'lost-item' }, `${item.name} under ${d}`);
   }
   assert.equal(svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM server_post WHERE to_id = ?').get(ann.id).n, 0);

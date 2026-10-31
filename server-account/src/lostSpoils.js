@@ -52,7 +52,7 @@ export const LOST_WORDS = Object.freeze({
 });
 
 /** AUDIT SHIP C1: WHAT A DOOR CAN HAVE LEFT - the one Gilded its spoils roll (gateSpoils.js the Oath, sdSpoils.js the
- *  Hourlock, a Redoubt none) and never a gun, the Sky-Ketch's alone (Gilded.md section 10: "a gun is minted nowhere else"). */
+ *  Hourlock, a Redoubt none) and never a gun. */
 export const LOST_GILDED = Object.freeze({ gate: DRAGONFIRE_OATH.id, sd: HOURLOCK.id, eg: null });
 export const lostLeftBy = (/** @type {{ kind: string }} */ kill, /** @type {any} */ item) => !isGunTemplate(item?.templateIndex)
   && ((item?.gilded == null && item?.rarity !== GILDED) || item?.gilded === LOST_GILDED[kill.kind]);

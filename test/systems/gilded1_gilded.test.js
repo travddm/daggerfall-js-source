@@ -89,8 +89,7 @@ test('GILDED1 THE RUNG: the ladder\'s top - rank 6 over the Artifact\'s 5, gold 
 
 test('GILDED1 THE RECORD: one, a Dwarven Long Bow (GUNS-UNFOUND; a Thunderlock of the gun\'s own Dwarven make until then, its gun era) - +40% damage, +15 Agility, +30 Archery, +10 shock a shot: each line the Legendary band\'s TOP and no higher - its power The Hour Tolls, its lore; frozen whole (mutants: a line over the band\'s top; the power\'s every)', () => {
   // PIN MOVED (GILDED2, bible/06-Systems/Gilded.md section 7): the Hourlock first of three - the gate's and the serpent's after it
-  // PIN MOVED (KETCH, 2026-10-24, Gilded.md section 10): of five - the airship's two guns after them
-  assert.equal(GILDED_RECORDS.length, 5);
+  assert.equal(GILDED_RECORDS.length, 3);
   assert.equal(GILDED_RECORDS[0], HOURLOCK);
   assert.equal(gildedById('the-hourlock'), HOURLOCK);
   assert.equal(gildedById('the-hourlocks'), null);
