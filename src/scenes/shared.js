@@ -21,9 +21,7 @@ import { releaseUnloadGuard } from '../systems/unloadGuard.js';   // MAC-L3: a d
 import { EnhancedSkyRenderer, skyState, easeWeather, weatherRow, CLOUD_SHADOW, moonlightTerm, WEATHER_EASE_MINUTES, WIND_SECONDS_PER_MINUTE } from '../render/enhancedSky.js';   // ES1: the enhanced sky, behind the skin; EV5: its moons light the world
 import { meterFor } from '../render/perfMeter.js';   // VC6d: `?perf=zones` - the sky's own span
 import { dreadGrade, DREAD_SKY_WORD } from '../world/dreadSky.js';   // EVENT1: the live event's grade and the sky it wears
-import { sunbabyHaze, sunbabyWaterSky } from '../world/sunbabySky.js';   // SUNBABY1: the sun baby's haze and the sky the water mirrors under it
 import { sdBrassGrade } from '../systems/superDungeon/sdOmen.js';   // SD19: the brass air near a standing Hollow
-import { SunbabySkyRenderer } from '../render/sunbabySkyRenderer.js';   // SUNBABY1: its flower sky, over every sky
 import { canopyWaterSky } from '../world/jungle/jungleCanopy.js';   // VALENWOOD-CANOPY: the sky the water mirrors under a closed canopy
 import { VolumetricClouds, QUALITY as CLOUD_QUALITY } from '../render/volumetricClouds.js';   // VC3: the clouds over the dome
 import { cloudsStateUnderMod, dynamicMoonState, dynamicMoonlight } from '../render/dynamicSkiesBridge.js';   // DS1/DS2: the mod's state in the port's shapes - the moons, the clouds, and the moons' own term (AUDIT 65 MC-3: the bridge's third export had no caller and this file carried its body inline)
@@ -282,27 +280,14 @@ export function createSkyController(gl, params) {
   let brassW = 0;   // SD19: the brass air's weight this frame (setBrass) - 0 is none, and nothing below changes
   let dreadW = 0;   // EVENT1: the live event's weight this frame (setDread) - 0 is no event, and nothing below changes
   let dreadGlow = 0;   // EVENT1: and the red strikes' glow in the cloud deck this frame (the composite's flash, beside the storm's)
-  // SUNBABY1: the sun baby's weight this frame (setSunbaby) - 0 is no event, and nothing below changes - and its pass,
-  // built the first time the event shows (a session that never sees one never compiles it); null after a failed build
-  let sunbabyW = 0;
-  let sunbabyOn = false;   // ...and whether it is staged now (the clear day below), apart from the weight that fades
-  let sunbabyEvil = 0, sunbabyTodd = 0;   // SUNBABY2: and the face it wears (setSunbabyFace) - the wrath's weight burns the fog and the water's sky
-  let sunbabySky;
-  const sunbabyPass = () => {
-    if (sunbabySky === undefined) {
-      try { sunbabySky = new SunbabySkyRenderer(gl); } catch (e) { console.warn('[sunbaby] the flower sky could not be built', e); sunbabySky = null; }
-    }
-    return sunbabySky;
-  };
   // VALENWOOD-CANOPY (world/jungle/jungleCanopy.js canopyLeaves): the leaves over a closed canopy, [rgb, weight] - the
   // water's mirror (`leaved`). GRAHT1 (bible/03-World/Graht-Oaks.md): the sky itself is the graht-oaks' to close - their
   // crowns stand in the world, and no ceiling is drawn over any sky
   const canopyLeaves = new Float32Array(4);
-  /** EVENT1: a reflected sky ({zenith, horizon}) under the dread - the water mirrors the sky it is under, on either lane;
-   *  SUNBABY1: and under the sun baby, its flower sky's blue. */
+  /** EVENT1: a reflected sky ({zenith, horizon}) under the dread - the water mirrors the sky it is under, on either lane. */
   /** AUDIT SD III (V8): and the water's sky brass as the sky over it is. */
   const brassed = (ws) => (brassW > 0 ? { ...ws, zenith: sdBrassGrade(ws.zenith, brassW), horizon: sdBrassGrade(ws.horizon, brassW) } : ws);
-  const dreaded = (ws) => brassed(sunbabyWaterSky(dreadW > 0 ? { zenith: dreadGrade(ws.zenith, dreadW), horizon: dreadGrade(ws.horizon, dreadW) } : ws, sunbabyW, sunbabyEvil));   // SUNBABY2: the wrath's sky
+  const dreaded = (ws) => brassed(dreadW > 0 ? { zenith: dreadGrade(ws.zenith, dreadW), horizon: dreadGrade(ws.horizon, dreadW) } : ws);
   /** VALENWOOD-CANOPY: and under a closed canopy, the leaves' (world/jungle/jungleCanopy.js canopyWaterSky). */
   const leaved = (ws) => canopyWaterSky(ws, canopyLeaves);
   /** EV5: the moons' term (`moonlight` below) - the dome's own state; DS1: the same term from the mod's own moons - where
@@ -443,8 +428,7 @@ export function createSkyController(gl, params) {
      *  as before. */
     fogColorFor(fogNow) {
       const own = litAir(dynamic?.fogColor ?? outdoorFogColor(fogNow, (enhancedSky ?? dynamicSky ?? sky).clearColor));   // NIGHT-FOG: never darker than the lit air (systems/weather/nightFog.js)
-      const c = sunbabyW > 0 ? sunbabyHaze(own, sunbabyW, sunbabyEvil) : own;   // SUNBABY1: the land's haze is the flower sky's horizon (SUNBABY2: the wrath's, burning)
-      const d = dreadW > 0 ? dreadGrade(c, dreadW) : c;   // EVENT1: the land's haze is the sky's colour under the dread too
+      const d = dreadW > 0 ? dreadGrade(own, dreadW) : own;   // EVENT1: the land's haze is the sky's colour under the dread too
       return brassW > 0 ? sdBrassGrade(d, brassW) : d;   // SD19: and brass near a standing Hollow
     },
     /** EVENT1: the live event's weight this frame, 0..1 (world/dreadSky.js createDread) - every pass that draws the sky
@@ -478,24 +462,6 @@ export function createSkyController(gl, params) {
     setCanopy(v) {
       if (v && v[3] > 0) canopyLeaves.set(v);
       else canopyLeaves[3] = 0;
-    },
-    /** SUNBABY1: the sun baby's weight this frame, 0..1 (world/sunbabySky.js createSunbaby) - its flower sky is drawn over
-     *  the sky and its clouds by it, the fog and the water's sky lean to it - and `on`, whether it is staged now: while
-     *  it is, the sky's frame (use) stands on the clear day the host shows, without the weather map's storm cells, its
-     *  violence or its approaching front. 0 and false are exactly the sky there was. */
-    setSunbaby(w, on = false) {
-      sunbabyW = Math.max(0, Math.min(1, Number(w) || 0));
-      sunbabyOn = !!on;
-      if (sunbabyW > 0) { const p = sunbabyPass(); if (p) p.weight = sunbabyW; }
-      else if (sunbabySky) sunbabySky.weight = 0;
-    },
-    /** SUNBABY2: the face the sun baby wears this frame (world/sunbabySky.js sunbabyPhase) - `evil` the wrath's weight
-     *  and `todd` Todd's, 0..1, the baby the rest: its pass draws the face and the wrath's burning sky, and the fog and
-     *  the water's sky lean to that sky. 0 and 0 are the laughing baby. */
-    setSunbabyFace(evil = 0, todd = 0) {
-      sunbabyEvil = Math.max(0, Math.min(1, Number(evil) || 0));
-      sunbabyTodd = Math.max(0, Math.min(1, Number(todd) || 0));
-      if (sunbabySky) { sunbabySky.evil = sunbabyEvil; sunbabySky.todd = sunbabyTodd; }
     },
     /** DS1: AmbientEffectsPlayer.OnPlayEffect reaches the mod's
      *  LightningFlashListener here (a no-op under any other sky). */
@@ -625,7 +591,6 @@ export function createSkyController(gl, params) {
      *  it is synchronous - numbers into uniforms, nothing to load. */
     use(skyIndex, minuteOfDay, showNightSky = true, extra = null) {
       lastUse.index = skyIndex; lastUse.night = showNightSky; lastUse.extra = extra;   // KETCH-LOOK KL1: what retime takes again
-      if (sunbabyOn && extra) extra = { ...extra, violence: extra.weather, cells: null, cloudBase: null, approach: 0 };   // SUNBABY1: the clear day, whole
       airAt.minute = minuteOfDay; airAt.sun = extra?.sun ?? 1;   // NIGHT-FOG: the air's hour and the weather's sunlight scale (the host's one, AUDIT 61)
       if (enhancedSky || dynamic) {
         const now = (typeof performance !== 'undefined' ? performance.now() : 0);
@@ -819,7 +784,6 @@ export function createSkyController(gl, params) {
       meter?.mark('sky');
       (enhancedSky ?? dynamicSky ?? sky).draw(yaw, pitch, fovY, aspect);
       if (clouds) { clouds.update(viewport); clouds.draw(yaw, pitch, fovY, aspect); }   // VC3: over the dome, under the host's marker
-      if (sunbabyW > 0) sunbabySky?.draw(yaw, pitch, fovY, aspect);   // SUNBABY1: the flower sky over all of it, by the event's weight
       meter?.mark('world');
     },
   };

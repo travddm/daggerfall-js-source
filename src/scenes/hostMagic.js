@@ -91,11 +91,6 @@ import { fpsSpellCasting } from '../combat/fpsSpellCasting.js';   // CAST-SPEED:
 import { spellHandUp, spellHandBusy, tellCastPending, CAST_PRESS } from '../combat/twoHands/spellHand.js';   // SPELL-HAND: a spell in the free hand beside a weapon - the swing is the weapon's
 export { CAST_PRESS };   // SPELL-HAND: the cast's own press, handed on - the hosts ask the magic door for it, never a two-hands module (TWO-HANDS, THE FOUR HOSTS)
 
-/** SUNBABY2: a sky fireball (skyFire) is drawn this many times its flat's size, its flash too - a ball a sun throws,
- *  seen falling from far up - and heard this far (metres) from where it lands. */
-export const SKY_FIRE_SCALE = 3;
-export const SKY_FIRE_HEARD_M = 48;
-
 /**
  * GROUND-BOLT (FIELD BUGS 2026-10-23c; the owner: "spells cast at the ground outdoors don't collide with it at all and
  * sail straight through"): the collider a host hands this engine - whichever of its colliders the player stands in
@@ -734,19 +729,18 @@ export function createPlayerMagic({
     if (!m.spell || m.spell.element == null || m.spell.rangeType === 1) return;
     // EG-ZG (Elite-Gates.md section 25.4 - THE QUIET COMPANY): an ally's missile in a Spire trial lands as its classic flash
     // alone, at the quiet share - no bloom, no chunks, no burst in light of its own, no kick
-    if (m.quiet) { impacts.showImpactFlash(missileArchive(m.spell.element), pos, m.scale ?? 1, allyConceal(m.quiet)); return; }
-    impacts.showImpactFlash(missileArchive(m.spell.element), pos, m.scale ?? 1);   // SUNBABY2: a sky fireball's, at its own size
+    if (m.quiet) { impacts.showImpactFlash(missileArchive(m.spell.element), pos, 1, allyConceal(m.quiet)); return; }
+    impacts.showImpactFlash(missileArchive(m.spell.element), pos);
     // IMPACTFEEL: the impact reads heavier - a larger, slower bloom behind the classic flash, a few chunks of the
     // element's own art, and (IMPACTFX) the burst in light: the element's spray thrown back off what it struck and down
     // onto the floor, its rings and its light, its sound, and the camera's kick (blasts harder; the player's maxShake /
     // shake-off rule it, betterAmbience.weaponKick). All additive: the classic flash above is untouched.
     try {
-      const sc = m.scale ?? 1;
       const kind = fxKindOf(m.spell);
       const ground = impactGround(collider, pos);
       if (kind !== 'heal') {
-        impacts.showMissEffect('spell', pos, { archive: missileArchive(m.spell.element), record: 1, fps: 12, scale: sc * 1.8 });
-        spawnSparks(m, pos, sc, ground);
+        impacts.showMissEffect('spell', pos, { archive: missileArchive(m.spell.element), record: 1, fps: 12, scale: 1.8 });
+        spawnSparks(m, pos, 1, ground);
       }
       const dl = Array.isArray(m.dir) ? Math.hypot(m.dir[0], m.dir[1], m.dir[2]) : 0;
       const back = dl > 1e-6 ? [-m.dir[0] / dl, -m.dir[1] / dl, -m.dir[2] / dl] : null;
@@ -759,13 +753,10 @@ export function createPlayerMagic({
       const blast = m.spell.rangeType === 4;
       // AOE-SIZE: an Area at Range blast is drawn to the sphere explodeAt sweeps (EXPLOSION_RADIUS about the impact); a
       // single-target bolt keeps its own smaller burst
-      landFx(kind, kind === 'heal' ? [pos[0], ground, pos[2]] : pos, { back, ground, scale: sc, power: blast ? 1.25 : 1, radius: 0.8,
-        area: blast ? EXPLOSION_RADIUS : 0, areaFrom: blast ? pos : null, heard: m.sky ? SKY_FIRE_HEARD_M : 40, shake: (blast ? 4.5 : 3) * peerKickShare(m),
+      landFx(kind, kind === 'heal' ? [pos[0], ground, pos[2]] : pos, { back, ground, power: blast ? 1.25 : 1, radius: 0.8,
+        area: blast ? EXPLOSION_RADIUS : 0, areaFrom: blast ? pos : null, heard: 40, shake: (blast ? 4.5 : 3) * peerKickShare(m),
         normal: kind === 'heal' ? null : normal, surfaceAt });   // WALL-RING: the shockwave lies on what it struck
     } catch { /* feel is never worth a crash */ }
-    // SUNBABY2: and a sky fireball is HEARD where it lands - its element's cast clip (DFU has no impact clip; the
-    // missile's sound is its cast's), from the impact, as far as SKY_FIRE_HEARD_M
-    if (m.sky) { try { audio.play3dId?.(SPELL_CAST_SOUND[m.spell.element] ?? SPELL_CAST_SOUND[4], pos, 1, { maxDistance: SKY_FIRE_HEARD_M }); } catch { /* a sound never costs the flash */ } }
   }
 
   /** Every spell landing ON THE PLAYER rides this: the S19 Paralyze
@@ -1416,8 +1407,7 @@ export function createPlayerMagic({
     // the scene. Check before publishing.
     if (m.dead) { m.batch = null; return; }
     uploadRecord(archive, 0);
-    const own = billboardSize(t, 0);
-    const size = m.scale ? { ...own, w: own.w * m.scale, h: own.h * m.scale } : own;   // SUNBABY2: a sky fireball is drawn larger
+    const size = billboardSize(t, 0);
     m.firePos = [...m.pos];
     m.batch = renderer.createBillboardBatch(archive, 0, size, [centredBase(m.firePos, size)]);   // FIELD-GUN20: a missile is CENTRED on its position (DaggerfallMissile.cs:601-602, no AlignToBase) - the base is half a height under it
     if (m.quiet) m.batch.conceal = allyConceal(m.quiet);   // EG-ZG: an ally's missile at the quiet share
@@ -1500,12 +1490,6 @@ export function createPlayerMagic({
       // SPELLFX1: A PEER'S MISSILE, DRAWN - it flies, meets a wall (above), a body or me, flashes and is gone, and
       // applies NOTHING: the caster's own world decided what it hit (a beneficial one of theirs reached its target as ALLY-CAST's cast frame)
       if (m.visual) {
-        // SUNBABY2: a sky fireball lands where it was thrown - on the ground the host found under it (GROUND-BOLT: the
-        // ray above meets the terrain now; this count still lands it where the throw said, should the two grounds part)
-        if (m.sky) {
-          m.left -= _adv * _len;
-          if (m.left <= 0) { showImpactFlash(m, m.to); retireMissile(m); continue; }
-        }
         const body = (playerFeet && missileHitsCapsule(m.pos, playerFeet, playerHeight, PLAYER_BODY_RADIUS))
           || foes().some((f) => !f.dead && missileHitsFoe(m.pos, f)) || !!corpsePrefabStruck(m.pos, foes(), MISSILE_COLLIDER_RADIUS)   // DEX5: where its caster's own stops (a prefab's body, below)
           || (peerBodies?.() ?? []).some((q) => q && q.id !== m.casterId && Array.isArray(q.feet) && missileHitsCapsule(m.pos, q.feet, q.height ?? CAPSULE_HEIGHT, PLAYER_BODY_RADIUS));
@@ -1891,18 +1875,6 @@ export function createPlayerMagic({
       const at = rangeType === 1 && Array.isArray(dir) ? [from[0] + dir[0] * 1.5, from[1] + dir[1] * 1.5, from[2] + dir[2] * 1.5] : [from[0], from[1] - 0.6, from[2]];
       impacts.showImpactFlash(missileArchive(el), at, 1, allyConceal(quiet));
       if (rangeType === 1 && !quiet) landFx(elementFxKind(el), at, { scale: 0.75, power: 0.6, heard: 24 });   // IMPACTFX: a peer's touch, its small spray (EG-ZG: none of its light in a trial)
-      return true;
-    },
-    /** SUNBABY2: a fireball the evil sun baby throws (world/sunbabySky.js sunbabyFireball) - a DRAWN fire missile,
-     *  spellVisual's kind, falling `from` the sky `to` the ground at the engine's own speed, SKY_FIRE_SCALE times the
-     *  flat's size. It flashes and is heard where it lands, or on a roof or a body it meets first. Visual only: nothing
-     *  is applied, spent or tallied - an event burns no one. */
-    skyFire({ from, to }) {
-      const ok = (p) => Array.isArray(p) && p.length === 3 && p.every(Number.isFinite);
-      if (!ok(from) || !ok(to)) return false;
-      const d = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
-      if (!(d > 0)) return false;
-      missiles.push({ spell: { element: 0, rangeType: 2 }, pos: [...from], dir: [(to[0] - from[0]) / d, (to[1] - from[1]) / d, (to[2] - from[2]) / d], age: 0, batch: null, fromPlayer: null, visual: true, casterId: null, sky: true, to: [...to], left: d, scale: SKY_FIRE_SCALE });
       return true;
     },
     /** X3-slice: an enemy spell missile joins the engine's pool -

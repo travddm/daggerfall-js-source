@@ -490,6 +490,6 @@ test('SEA-EVENTS the chart: the storm a violet ring about its eye, named once wi
   assert.deepEqual([...M.CHART_FLEET_KEY], ['fleet', 'The treasure fleet, under way']);
 });
 
-test('SEA-EVENTS the seams by source: the world shows the storm\'s thunder (its weather, its front, its rain, its sky, its wind) as the Sun Baby\'s clear day is shown; the sea\'s host wired over the clock, the naval host, the scene, the hub and the ether host, stepped with the lanes; its wrack among the captain\'s sites and its haul; the hub\'s word; the flagship\'s end; the harbourmaster\'s talk; the naval host\'s fleet, spoils and lightning (mutants: each seam)', () => {
+test('SEA-EVENTS the seams by source: the world shows the storm\'s thunder (its weather, its front, its rain, its sky, its wind); the sea\'s host wired over the clock, the naval host, the scene, the hub and the ether host, stepped with the lanes; its wrack among the captain\'s sites and its haul; the hub\'s word; the flagship\'s end; the harbourmaster\'s talk; the naval host\'s fleet, spoils and lightning (mutants: each seam)', () => {
   assert.ok(inEther(8000, -5100));
 });

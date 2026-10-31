@@ -379,7 +379,6 @@ import { gateSeatRegion, gateClaimWaits } from './gate/gateSeat.js';   // WW-GAT
 import { gateScanner, findGateSite, gateSeaPixel } from '../systems/gate/gateSite.js';   // WB1: where the day's gate stands, over the map files every client holds alike
 import { createGatePool, GATE_TEXT } from './gate/gatePool.js';   // WB2: the gate the world stands - its stone, its fire and beacon, its collider and its door
 import { createStarfallHost } from './starfall/starfallHost.js';   // STAR4-STAR6: the Witches' Festival's fallen stars - in the sky, in the world, defended
-import { createRocketHost } from './rocketHost.js';   // ROCKET1: /event rocket - the mounds, their poop, the farting horses and the frenzy
 import { createRiteHost, RITE_TEXT } from './riteHost.js';   // WB12d: the faithful's rite - its circle, its smoke, its faithful, its word and its chest
 import { createSdLanes } from './superDungeon/sdLanes.js';   // SD2b: the Hollow in the world - the hub's record in, the Hollow stood at its pixel, the find, the lines; WW5: a Hollow in every theatre, a lane at a time (the Bay's host as it was)
 import { sdOmenSeen, sdNoticeCard, SD_COMPASS_M, sdAirWeight, sdBrassLight, sdBannerText, SD_BANNER_M } from '../systems/superDungeon/sdOmen.js';   // SD2c: the Hollow seen and heard of - its column, its note, its compass's reach
@@ -1100,8 +1099,7 @@ import { createStormLights } from '../systems/lightning.js';   // BOLT: the stri
 import { LightningBoltsRenderer } from '../render/lightningBolts.js';   // BOLT: the channels, drawn
 import { createDread, createDreadStorm, dreadLight, dreadCloudGlow, DREAD_KEY_DIM, DREAD_FLASH_COLOR } from '../world/dreadSky.js';   // EVENT1: the live event's sky and its red storm
 import { parseEventCommand } from '../net/chatCommands.js';   // EVENT1: /event, a dev's live event
-import { createSunbaby, sunbabyLight, SUNBABY_WEATHER, sunbabyKey, createSunbabyRain } from '../world/sunbabySky.js';   // SUNBABY1: the sun baby's sky of flowers, the clear day and the light under it; SUNBABY2: the wrath's key light and its fireballs
-import { relayKnowsLiveEvent } from '../net/wire.js';   // SUNBABY1: a word staged only on a relay that knows it
+import { relayKnowsLiveEvent } from '../net/wire.js';   // a word staged only on a relay that knows it
 import { createStaffTeleportClient, validStaffDestination, staffDestinationKey, followStaffPlayer, staffTpLine } from '../net/staffTeleport.js';   // STAFF-PANEL5-FOLLOW: and the line a /tp @player ends on
 import { gameMaps, gamePlaces } from '../net/staffPlaces.js';   // STAFF-EVENT: the game's maps, for the Staff Panel's place picker; AUDIT RELEASE R2-7: and the world's places past the Bay
 import { staffFollowOnPage, relinkGame } from './staffFollowHost.js';   // STAFF-PANEL5-FOLLOW: the game's staff hook (net/staffHook.js) and the host's half of a follow; STAFF-HIDE-TOGGLE: and the panel's relink
@@ -2809,16 +2807,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   // EVENT1: THE LIVE EVENT - the hub link's word (chatStart: onEvent) walked into a weight each exterior frame, and the
   // red storm it brings. Offline there is no hub link, nothing sets it, and the weight stays 0: nothing below changes.
   const dread = createDread();
-  // SUNBABY1: THE SUN BABY - the same hub word walked into a weight each exterior frame (its flower sky, the land's haze
-  // and light), and while it is staged the land wears the clear day: the SHOWN weather, never the sim's, which is the
-  // world's (rolled, shared on the weather map, saved) and comes back the frame the event ends. Offline nothing sets it.
-  const sunbaby = createSunbaby();
-  const shownWeather = () => (sunbaby.on ? SUNBABY_WEATHER : seaStormShown() ?? currentWeather());   // SEA-EVENTS: the Aether Storm's thunder over the player at sea (scenes/seaVenturesHost.js), shown as the Sun Baby's clear day is
+  const shownWeather = () => seaStormShown() ?? currentWeather();   // SEA-EVENTS: the Aether Storm's thunder over the player at sea (scenes/seaVenturesHost.js)
   let seenSystem = weatherSystemStamp(); const weatherStale = () => shownWeather() !== weather || weatherSystemStamp() !== seenSystem;   // AUDIT PRECIP FALL-2: the word, or the system under it, moved
-  // SUNBABY2: THE WRATH'S FIRE - its fireballs on the shared clock, dropped onto the ground under each (the terrain's
-  // height there, or my feet's where nothing is streamed) by the spell engine (magic.skyFire)
-  const sunbabyRain = createSunbabyRain();
-  const sunbabyGround = (x, z) => { const h = heightAt(x, z); return Number.isFinite(h) ? h : player.pos[1]; };
   const dreadStorm = createDreadStorm();
   // WBX8: THE SKY OVER A GATE - the dread's grade and a red storm of its own, gathered over the gate's site (the omen's
   // `sky`, read each exterior frame); the site's translation into a scratch of its own
@@ -6084,7 +6074,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     const m = _mode();
     const feet = walkMode && playerSpawned ? player.pos : cam.pos;
     const wm = skyMinutes();   // TIME1: the air's month and hour are the sky's
-    const weather = shownWeather();   // AUDIT TEMP-UI E11: the weather the land wears - the Sun Baby's clear day too (SUNBABY1); the sim's rain soaked a body under a clear sky
+    const weather = shownWeather();   // AUDIT TEMP-UI E11: the weather the land wears
     const lyc = liveLycanthropy(playerEntity);
     const hour = (((wm % 1440) + 1440) % 1440) / 60;
     const sheltered = m === 'exterior' && !!playerEntity.isResting && !!camps.tentNear(feet);   // AUDIT C&C I2: a rest at a tent sleeps under its roof
@@ -20461,7 +20451,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // EVERY link, not the hub's alone - a close that marks the Region link (this tab's id taken in its channel) left
       // it shut for the page's life, with no Play online here to open it again
       link.onSuperseded = () => seatLostNow();
-      if (tab.room === SOCIAL_ROOM) link.onEvent = (ev, o) => { dread.set(ev, o); sunbaby.set(ev, o); rocket.set(ev, o); };   // SUNBABY1: and the sun baby; ROCKET1: and the rocket   // EVENT1: the hub - the one room every online player holds - says the live event
+      if (tab.room === SOCIAL_ROOM) link.onEvent = (ev, o) => { dread.set(ev, o); };   // EVENT1: the hub - the one room every online player holds - says the live event
       if (tab.room === SOCIAL_ROOM) link.onHome = (words) => { onlineHomes?.hearHome(words); };   // QUEST-HOME: and a home that moved since the boot's read, every page told
     }
     // SRV-N: the PRESENCE session hears the relay too, and it is usually
@@ -20557,7 +20547,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
           if ('error' in staged) return say(staged.error);
           const hub = chatLinks.get('world');
           if (!hub?.eventOk) return say('The server cannot stage live events yet.');
-          if (staged.kind && !relayKnowsLiveEvent(hub.eventV, staged.kind)) return say('The server cannot stage that event yet.');   // SUNBABY1: an older relay closes the socket on a word it does not know
+          if (staged.kind && !relayKnowsLiveEvent(hub.eventV, staged.kind)) return say('The server cannot stage that event yet.');   // an older relay closes the socket on a word it does not know
           return hub.sendStage(staged.kind);
         }   // CHAT-CHAN: from any tab, on the World channel - the one room every player online is in
         // AUDIT-SEATS C1: `/leave` - out of the battle or the Royal Tourney entered (its own word said in the town's talk)
@@ -23738,9 +23728,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // STAR7: the rewards' (scenes/starfall/starRewards.js) - the pack's door, the relay's clock, the silver, the Renown
     takeSpoil, relayNowS, marksBook, renownXpAdopt, renownAdopt, renownRose, get renownSaid() { return renownSaid; },
   }) : null;
-  /** ROCKET1: THE ROCKET (scenes/rocketHost.js) - the hub's third live event word: mounds round the traveller on the world's
-   *  own grid, their poop, the horses farting across the sky and the diarrhea frenzy, on the shared clock. Offline nothing sets it. */
-  const rocket = createRocketHost(renderer, sunbabyGround, state);
   /** SD2b: THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - online alone: the hub's record of the Super dungeon (its hub link's
    *  onSd), the Hollow it names found over this client's own map files (the gate's scan, the game's own rows) and stood in
    *  the index at its pixel while its phase stands - built there as a spawned dungeon is, its pixel built again when it
@@ -30734,7 +30721,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     }
     return holder._tvAt;
   }
-  const owForecast = createOverworldForecast({ climateAt, ground: mapGroundHere, minuteNow: () => playerTicker.classicMinutes, here: () => state.worldCoords(player.pos), alt: () => fieldXZ()[2], tvTrip, tvTripLive, travel: () => travelOptions, shared: sharedClockOn, rateNow: worldTimeScale, held: () => sunbaby.on });   // OW-FORECAST: the weather ahead (scenes/overworldForecastHost.js)
+  const owForecast = createOverworldForecast({ climateAt, ground: mapGroundHere, minuteNow: () => playerTicker.classicMinutes, here: () => state.worldCoords(player.pos), alt: () => fieldXZ()[2], tvTrip, tvTripLive, travel: () => travelOptions, shared: sharedClockOn, rateNow: worldTimeScale });   // OW-FORECAST: the weather ahead (scenes/overworldForecastHost.js)
   const { travelViewMarks } = createTravelViewMarks({   // HOST-SPLIT: src/scenes/travelViewMarks.js
     TV_PLACE_LIFT, _bandChase, _bandSpent, _hiddenPeers, _lodesSensed, _peerMapPoses, _townOfMapId, _tvBountyHold,
     _tvLodeHold, _tvPartyHold, _tvVendorHold, _tvWaypointHold, _veils, _wildStrangerIds, bandMake, bandNowMs,
@@ -32815,7 +32802,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     meterFor(renderer.gl)?.markCpu('snow');   // PERF-SIM1: the snow layer's frame
     _snowPixels.clear();
     snowfall.frame({ now: now / 1000, inside: false, player: snowPlayer(), weather, seconds: worldMinutes() * 60, winter: snowCover.winterNear(season === SEASON.Winter), climate: maps.getClimateIndex(_wfPx.x, _wfPx.y), overworld: !!tvf, npcs: snowNpcs, corpses: snowBodies });   // SNOWFALL1: DynamicSnowController.Update - its tiers round the player, the tracks, the snowpack by the event clock; TV-SNOW: under the Overworld, which draws no snow, the clocks alone (snowfallHost.js)
-    meterFor(renderer.gl)?.markCpu('storms');   // PERF-SIM1: the animals, the lightning, the dread and the sun baby, the sky and the light settings
+    meterFor(renderer.gl)?.markCpu('storms');   // PERF-SIM1: the animals, the lightning, the dread, the sky and the light settings
     animalAmbience.update(dt, cam.pos);   // A4: town animal barks (PlayRandomlyIfPlayerNear)
     // Storm lightning strobe. AUDIT 39 (#14): ENHANCED-SKIN ONLY -
     // shipped DFU renders no flash (PlayLightningEffect is 0 on both
@@ -32827,10 +32814,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     // EVENT1: the live event's weight this frame (0 offline, and with no event) - the sky, the fog, the key light and
     // the red storm below all read this one number
     const dreadW = dread.tick(dt);
-    const sunbabyW = sunbaby.tick(dt);   // SUNBABY1: the sun baby's - the flower sky, the land's haze and its light
-    // SUNBABY2: and the face it wears on the shared clock - the baby, the wrath, Todd - said when it changes under me
-    const sunbabyFace = sunbaby.frame(Date.now() + _sharedOffsetMs);
-    if (sunbabyFace.line) townTalk.say(sunbabyFace.line);
     // WBX8 (Mac: "Improve the sky effect to be more like the /event dread command" - the overworld's, "not the inside"):
     // THE SKY OVER A GATE BURNS, as the omen has always said it does - its weight by the gate's life and this eye's
     // distance from it (systems/gate/gateOmen.js gateSkyWeight); the sky, its fog and the land's light take the greater of it
@@ -32859,7 +32842,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     seenArrival = weatherArrivalStamp();
     const struckFar = [];   // BOLT: the distant strikes fired this frame, in host metres
     const frameDistantStorm = () => {   // PERF-V8
-    if (isEnhanced() && !weatherOverride && !sunbaby.on) {   // SUNBABY1: no storm anywhere under the sun baby
+    if (isEnhanced() && !weatherOverride) {
       const ds = distantStorms.tick({ systems: currentMapSystems(), at: fieldXZ(), minutes: playerTicker.classicMinutes, seconds: now / 1000, ground: mapGroundHere });
       const hostOf = (x, z) => { const n = nativeFromField(x, z); return state.localFromWorld(n[0], n[1]); };
       const bh = ds.bolt && hostOf(ds.bolt.x, ds.bolt.z);
@@ -32881,11 +32864,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     }
     };
     frameDreadStorm();
-    // SUNBABY2: THE FIRE - under the wrath the sun baby's fireballs fall round the traveller on the shared clock (every
-    // player online sees one drop in the same second, each round themselves), drawn by the spell engine, burning no one
-    if (jump) sunbabyRain.reset();
-    for (const fb of sunbabyRain.tick({ sharedMs: Date.now() + _sharedOffsetMs, eye: tvStand, fire: sunbaby.on && sunbabyFace.fire, ground: sunbabyGround })) magic.skyFire(fb);
-    rocket.frame(dt, Date.now() + _sharedOffsetMs, tvStand, townTalk);   // ROCKET1: the rocket's weight, its line owed, its mounds round the traveller and its sounds
     // WBX8: THE GATE'S RED STORM - the same strikes' law on a schedule of its own, round the gate's site (so its
     // lightning shows where the gate stands), its thunder from each strike's distance to the ear; ticked every frame,
     // at nothing when no gate burns, so a gate coming into reach fires no backlog
@@ -32904,8 +32882,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     boltFrame = isEnhanced()
       ? stormLights.frame({ seconds: now / 1000, eye: tvf ? cam.pos : mwv.eye, distant: struckFar, player: lightning, shown: !!lightningShown, test: Number(params.get('bolttest')) || 0 })   // TV4: a strike's column stands on the traveller's ground, not 448 m under the raised eye
       : { bolts: [], flash: null };
-    sky.setSunbaby(sunbabyW, sunbaby.on);   // SUNBABY1: its flower sky, and the clear day the sky wears while it is staged
-    sky.setSunbabyFace(sunbabyFace.evil, sunbabyFace.todd);   // SUNBABY2: the face it wears, and the wrath's burning sky
     sky.setDread(skyDreadW, dreadCloudGlow(boltFrame.bolts));   // EVENT1: the sky's grade, and the red strikes' glow in its deck; WBX8: the gate's, where it is the greater
     const sdAirW = sdHost ? sdAirNow(tvStand, minute) : 0;   // SD19: the brass air near a standing Hollow - its haze and its light
     sky.setBrass?.(sdAirW);
@@ -32921,8 +32897,8 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     renderer.setMoonlight(canopyMoon(moonNow && etherAirW ? { scale: moonNow.scale, dir: moonNow.dir, color: etherLight(moonNow.color, etherAirW, ETHER_KEY_TINT) } : moonNow, jungle?.canopy));   // VALENWOOD-CANOPY: under the leaves the moon's key with the sun's
     const frameLighting = () => {   // PERF-V8
     renderer.setLighting(
-      canopyLight(etherLight(sdBrassLight(sunbabyLight(dreadLight(withMoonAmbient(exteriorAmbient(minute, getFloat('Enhancements', 'NightAmbientLightScale', 0, 1), wxNow.sun), moonNow), skyDreadW), sunbabyW, sunbabyFace.evil), sdAirW), etherAirW), jungle?.canopy), sunScale(minute) * wxNow.sun * flash * sky.sunFactor() * (1 - DREAD_KEY_DIM * skyDreadW) * canopyKey(jungle?.canopy),   // VALENWOOD-CANOPY: under a closed canopy the ambient dimmed and greened, the key taken   // EVENT1: the land under the dread's light; SUNBABY1: lifted toward noon's under the sun baby (SUNBABY2: reddened under its wrath)   // ES1d: the cloud in front of the sun takes the KEY light (never the ambient - the sky still lights the ground); WX2: the scale is the front's
-      canopyLight(etherLight(sdBrassLight(sunbabyKey(dreadLight(SUN_RIG_COLOR, skyDreadW), sunbabyW, sunbabyFace.evil), sdAirW), etherAirW, ETHER_KEY_TINT), jungle?.canopy, 0));   // VALENWOOD-CANOPY: the key leaned green through the leaves (its strength is the scale's)   // SUNBABY2: the key reddened under the wrath; SD19: brass near a Hollow
+      canopyLight(etherLight(sdBrassLight(dreadLight(withMoonAmbient(exteriorAmbient(minute, getFloat('Enhancements', 'NightAmbientLightScale', 0, 1), wxNow.sun), moonNow), skyDreadW), sdAirW), etherAirW), jungle?.canopy), sunScale(minute) * wxNow.sun * flash * sky.sunFactor() * (1 - DREAD_KEY_DIM * skyDreadW) * canopyKey(jungle?.canopy),   // VALENWOOD-CANOPY: under a closed canopy the ambient dimmed and greened, the key taken   // EVENT1: the land under the dread's light   // ES1d: the cloud in front of the sun takes the KEY light (never the ambient - the sky still lights the ground); WX2: the scale is the front's
+      canopyLight(etherLight(sdBrassLight(dreadLight(SUN_RIG_COLOR, skyDreadW), sdAirW), etherAirW, ETHER_KEY_TINT), jungle?.canopy, 0));   // VALENWOOD-CANOPY: the key leaned green through the leaves (its strength is the scale's)   // SD19: brass near a Hollow
     };
     frameLighting();
     // DW-C: the distance fog's own "under" (UnderwaterDistanceFog.TryGetUnderwaterPresentation) - the surfaces'
@@ -34064,7 +34040,6 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
       { mode: renderer._fogMode, density: renderer._fogDensity, range: renderer._fogRange, color: renderer._fogColor, camPos: renderer._camPos, focus: renderer._focus, haze: renderer._haze })) renderer.markForeignPass();
     // STAR4: THE STARFALL'S SKY - the omens, the falls, the flashes and their rings, the beacons - the same eye and fog
     if (starfall?.showing() && starfall.drawSky(proj, view, new Float32Array(mwv.eye), now / 1000)) renderer.markForeignPass();
-    rocket.draw(proj, view, mwv.eye);   // ROCKET1: the rocket - its brown sky, mounds, poop, horses and their clouds, the same eye and fog
     // LOOT11 (the Loot arc): THE LINES OF LIGHT over my bodies and the street's piles holding a Rare or better - after the
     // gate's fire, the same eye and fog (scenes/lootLines.js: the nearest eight within 40 m)
     if (lootLines.draw(() => [...exteriorFoes.lootFinds(), ...droppedLoot.lootFinds()], proj, view, new Float32Array(mwv.eye), now / 1000,

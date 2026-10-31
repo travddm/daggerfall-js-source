@@ -296,7 +296,7 @@ export function createHitEffects({
      *  The flash ENDS on FlatAnim.done, which is DFU's OneShot
      *  self-destruct - not the missile's 0.6s lifetime, which governs
      *  the parent rather than the billboard. */
-    showImpactFlash: (archive, pos, scale = 1, conceal = null) => spawn(IMPACT_RECORD, pos, null, { archive, fps: IMPACT_FPS, scale, conceal }),   // SUNBABY2: a sky fireball's flash is drawn larger (`scale`); EG-ZG: `conceal` an ally's, at THE QUIET COMPANY's share
+    showImpactFlash: (archive, pos, scale = 1, conceal = null) => spawn(IMPACT_RECORD, pos, null, { archive, fps: IMPACT_FPS, scale, conceal }),   // EG-ZG: `conceal` an ally's, at THE QUIET COMPANY's share
     /** WW1: Weapon Widget's DoClang / DoThud (FPSWeaponClone IL 0xe0c,
      *  0xf58): TEXTURE.380 record 2, one-shot at 20 fps, twice its size,
      *  at the point the widget worked out. The CLANG's emissive material

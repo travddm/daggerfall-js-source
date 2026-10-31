@@ -6,8 +6,8 @@
 //        egFindPlace, and its throw, egFindThrow) and the real take (inventory.js takeOneInto).
 //   K2 - the lost graphics context's report, the page's one way back, carried the new Dismiss: dismissed, the dead
 //        canvas was left with nothing to say how to reload. Driven through main.js's own three statements.
-//   K3 - the pins of PEER-SHAKE held neither an event's sky fire at its whole kick nor the Motion row's own values:
-//        driven through the one cast engine (createPlayerMagic's skyFire) and the menu's own row (portPool).
+//   K3 - the pins of PEER-SHAKE did not hold the Motion row's own values: driven through the one cast engine
+//        (createPlayerMagic) and the menu's own row (portPool).
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -118,7 +118,7 @@ function statementAt(src, needle) {
 }
 const buttons = (el) => el.children.filter((c) => c.tag === 'button');
 
-// ── K3: an event's sky fire keeps its whole kick; the Motion row writes the shares the engine reads ──────────────────
+// ── K3: the Motion row writes the shares the engine reads ──────────────────
 
 afterEach(() => resetPrefs());
 
@@ -150,22 +150,6 @@ function kicks(t) {
   return seen;
 }
 const peerBolt = () => { const E = engine(); E.magic.spellVisual({ from: [0, 1, 0], dir: [0, 0, 1], element: 0, rangeType: 2, casterId: 'peer-1' }); E.fly(); };
-
-test('AUDIT RPT1026 K3: an event\'s sky fire (drawn, no caster) keeps its whole kick whatever the other players\' share', (t) => {
-  const seen = kicks(t);
-  const sky = (share) => {
-    if (share != null) setPref('peerSpellShake', share);
-    const E = engine();
-    assert.equal(E.magic.skyFire({ from: [0, 20, 2], to: [0, 0, 2] }), true);
-    E.fly(150);
-    assert.equal(E.magic.missileCount(), 0, 'landed');
-  };
-  sky(null);
-  assert.equal(seen.length, 1, 'the fall kicks');
-  sky(0);
-  assert.equal(seen.length, 2, 'Off is the other players\' share: the sky\'s fire still kicks');
-  assert.ok(Math.abs(seen[1] - seen[0]) < 1e-9, `at its whole strength (${seen[1]} against ${seen[0]})`);
-});
 
 /** A document just big enough for the menu's row builders (test/systems/org2_options.test.js's), the Motion row's main
  *  button pressed until the share stands at `want`. */

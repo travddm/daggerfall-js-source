@@ -744,7 +744,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // to the bytes. Their pictures carry no file: world/ships/carrackArt.js and world/ships/largeBoatArt.js paint them at load.
   ['src/assets/ships/source/Tiny_Ship.fbx', "SUPPLIED - Mac's Blender export of the new carrack and the new large boat in one scene (2026-10-07; the newest of the three he sent), committed so carrack.json and largeBoat.json are DERIVATIONS the gate can re-run"],
   ['src/assets/ships/carrack.json', 'SUPPLIED - Tiny_Ship.fbx\'s carrack baked to the boat\'s frame by tools/bakeCarrack.mjs; geometry only, no ARENA2 or Come Sail Away data'],
-  ['src/assets/ships/largeBoat.json', 'SUPPLIED - Tiny_Ship.fbx\'s large boat baked to the boat\'s frame by tools/bakeLargeBoat.mjs; geometry only, no ARENA2 or Come Sail Away data'],  ['src/assets/sunbaby/todd.jpg', 'SUPPLIED - a photograph of Todd Howard that Mac supplied for the sun baby event (SUNBABY3, 2026-10-04), cropped to the face and recompressed by ImageMagick; no ARENA2 pixel in it - a third-party photo, not the port own art, kept at his explicit request'],
+  ['src/assets/ships/largeBoat.json', 'SUPPLIED - Tiny_Ship.fbx\'s large boat baked to the boat\'s frame by tools/bakeLargeBoat.mjs; geometry only, no ARENA2 or Come Sail Away data'],
   // GATE-FBX (2026-10-09, Mac: "replace the oblivion gate model with this handcrafted model which also needs texturing"):
   // MAC'S OBLIVION GATE, supplied as one Blender export of his whole "Oblivion Models" scene - the gate one object of
   // it, committed whole as the ships' scenes are. tools/bakeGate.mjs re-makes the JSON from it (tools/shipBake.mjs), and

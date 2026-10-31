@@ -366,7 +366,7 @@ export const weatherSystemStamp = () => _systems;
 export const weatherPhaseFlip = () => _phaseFlip;
 /** AUDIT PRECIP FALL-2: THE SYSTEM A HOST'S WORD IS - on the law's lane, when the word is the sim's own, the system
  *  falling there (`raw`: a storm falling as snow is a storm - its wind, its episode, its deck, its strikes); any other
- *  word (off the lane, a pin, the Sun Baby's sky) is itself. What the hosts key a weather's identity on; its phase reaches
+ *  word (off the lane, a pin) is itself. What the hosts key a weather's identity on; its phase reaches
  *  them through the share. */
 export const systemWordOf = (word) => (precipLawOn() && word === WEATHER_TYPES[_current] ? WEATHER_TYPES[_raw] : word);
 
@@ -541,8 +541,7 @@ export const heardRainGain = () => (_heard != null && _heardAtJump === _jumps ? 
 /** WET-FALL (FIELD BUGS 2026-10-15f, "Player is getting wet despite it not raining"): WHAT FALLS ON THE PLAYER - the
  *  street's word and level as the outdoor frame last wrote them, the one truth the skin reads beside the ear. RAIN-HEART
  *  made most rain a sprinkle the eye barely sees, and the soak read the sim's word at the downpour's rate - and soaked
- *  before the front's first drop. `shown` is the host's own word for its sky (world.js's: the Sun Baby's clear day,
- *  AUDIT TEMP-UI E11), taken whole where the street holds none: after a jump, as the ear's, and before the first frame. */
+ *  before the front's first drop. `shown` is the host's own word for its sky (world.js's, AUDIT TEMP-UI E11), taken whole where the street holds none: after a jump, as the ear's, and before the first frame. */
 export const fallingWeather = (shown = currentWeather()) => (_heard != null && _heardAtJump === _jumps ? { word: _heard, level: _heardFall?.level ?? _heardGain, snow: _heardFall?.snow ?? null } : { word: shown, level: 1, snow: null });
 
 /** WX2a: the count of weather changes that were jumps. A host keeps the
