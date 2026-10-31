@@ -40,6 +40,7 @@
 
 import { HANDLE_RE } from './handleShape.js';
 import { carryYardOrder } from './yardPush.js';   // YARD-CELL YC2
+import { carryHomeCellOrders } from './homeCellPush.js';   // YC4: a home write's cells, carried to the hub
 import { SESSION_PASS_HEADER } from './sessionPassLaw.js';   // SESSION-SIGN: the pass's one name on the wire
 import { AURAS, ICONS } from './identityToken.js';   // WB9g: the auras that exist - a stored one is one of them, or none; WITCH1: and the icons
 import { NAME_MAX } from './wire.js';   // NAME-AS: the wire's bound on a name, in the sentence that says a character's is past it
@@ -1209,6 +1210,7 @@ export async function call({ fetch, base = DEFAULT_ACCOUNT_SERVICE, secret = nul
   _busy = { n: 0, until: _busy.until };   // BUSY-GATE: an answer starts the count again; a hold already running runs out
   heardHomeOrders(data);   // QUEST-HOME: a home bought, held or given up, said to every page online
   if (typeof data?.yardOrder === 'string') carryYardOrder(data.yardOrder);   // YARD-CELL YC2: a yard that moved, carried to the hub (net/yardPush.js)
+  if (Array.isArray(data?.homeCellOrders)) carryHomeCellOrders(data.homeCellOrders);   // YC4: the home cells a write moved, carried to the hub (net/homeCellPush.js)
   return { ok: true, data, status: res.status };
 }
 
@@ -2102,6 +2104,9 @@ export function accountHomes({ fetch, storage }) {
   const post = sessionPost({ fetch, storage });
   return {
     town: (mapId, character = null) => post('/v1/homes/town', { mapId, ...(character ? { character } : {}) }),   // HOME-RENT: the playing character's own tenancies
+    // YC4: a town's homes in two parts - its cells past the versions held and, when `own` is given, the caller's own part
+    // in the same answer, for `own.character` (systems/online/homeCellSync.js)
+    cells: (mapId, cells, own = null) => post('/v1/homes/cells', { mapId, cells, ...(own ? { own: true, ...(own.character ? { character: own.character } : {}) } : {}) }),
     mine: () => post('/v1/homes/mine', {}),
     claim: ({ mapId, buildingKey, region, character, price, realm = null, layout = null }) => post('/v1/homes/claim', { mapId, buildingKey, region, character, price, ...(realm ? { realm } : {}), layout: layout || null }),   // REALM P2.2b: a realm character's record pays; WD3: the layout the town stands in, always said (null: Daggerfall's - AUDIT WD3 B2)
     layouts: () => post('/v1/homes/layouts', {}),   // WD3: every town holding a home, and the layout it keeps
